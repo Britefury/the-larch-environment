@@ -13,7 +13,7 @@ import gtk
 from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
-from Britefury.CodeViewTree.CVTNull import CVTNull
+from Britefury.CodeViewTree.CVTNullExpression import CVTNullExpression
 
 from Britefury.CodeView.CVNode import *
 
@@ -24,11 +24,11 @@ from Britefury.DocView.Toolkit.DTDirection import DTDirection
 
 
 
-class CVNull (CVNode):
-	treeNodeClass = CVTNull
+class CVNullExpression (CVNode):
+	treeNodeClass = CVTNullExpression
 
 
-	treeNode = SheetRefField( CVTNull )
+	treeNode = SheetRefField( CVTNullExpression )
 
 
 	def _refreshCell(self):
@@ -49,7 +49,7 @@ class CVNull (CVNode):
 
 
 	def __init__(self, treeNode, view):
-		super( CVNull, self ).__init__( treeNode, view )
+		super( CVNullExpression, self ).__init__( treeNode, view )
 		self.widget = DTEntryLabel( '<nil>', font=DTFont( slant=cairo.FONT_SLANT_ITALIC ) )
 		self.widget.bEditable = False
 		self.widget.keyHandler = self

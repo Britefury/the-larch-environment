@@ -11,7 +11,6 @@ from Britefury.SheetGraph.SheetGraph import *
 from Britefury.CodeGraph.CGModule import CGModule
 from Britefury.CodeGraph.CGLocalVarDeclaration import CGLocalVarDeclaration
 from Britefury.CodeGraph.CGVar import CGVar
-from Britefury.CodeGraph.CGNull import CGNull
 
 from Britefury.CodeViewTree.CVTNode import CVTNode
 

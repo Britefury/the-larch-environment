@@ -9,7 +9,7 @@ from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
 from Britefury.CodeGraph.CGLocalVarDeclaration import CGLocalVarDeclaration
-from Britefury.CodeGraph.CGNull import CGNull
+from Britefury.CodeGraph.CGNullExpression import CGNullExpression
 
 from Britefury.CodeViewTree.CVTNode import CVTNode
 
@@ -41,5 +41,5 @@ class CVTLocalVarDeclaration (CVTNode):
 
 	def ensureHasValue(self):
 		if len( self.graphNode.value ) == 0:
-			value = CGNull()
+			value = CGNullExpression()
 			self.graphNode.value.append( value.parent )
