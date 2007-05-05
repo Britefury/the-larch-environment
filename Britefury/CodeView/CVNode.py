@@ -29,6 +29,7 @@ class CVChildNodeSlotFunctionField (FunctionRefField):
 	def __init__(self, doc=''):
 		super( CVChildNodeSlotFunctionField, self ).__init__( doc )
 		self._keyToInputHandler = {}
+		self._charToInputHandler = {}
 
 
 	def _f_metaMember_initClass(self):
@@ -46,6 +47,7 @@ class CVChildNodeListSlotFunctionField (FunctionField):
 	def __init__(self, doc=''):
 		super( CVChildNodeListSlotFunctionField, self ).__init__( doc )
 		self._keyToInputHandler = {}
+		self._charToInputHandler = {}
 
 
 	def _f_metaMember_initClass(self):
@@ -63,13 +65,25 @@ class CVChildNodeListSlotFunctionField (FunctionField):
 
 
 class _CVlInputHandler (KMeta.KMetaMember):
-	def __init__(self, handlerMethod, keyTuples, childNodeSlot=None):
+	def __init__(self, handlerMethod, childNodeSlot=None):
 		super( _CVlInputHandler, self ).__init__()
 		self._handlerMethod = handlerMethod
 		self._childNodeSlot = childNodeSlot
-		self._keyTuples = keyTuples
 		if childNodeSlot is not None:
 			self._o_addDependency( childNodeSlot )
+
+
+	def _f_handleKeyPress(self, instance, receivingNodePath, entry, keyPressEvent):
+		return self._handlerMethod( instance, receivingNodePath, entry, keyPressEvent )
+
+
+class CVAccelInputHandler (_CVlInputHandler):
+	def __init__(self, handlerMethod, keys, childNodeSlot=None):
+		super( CVAccelInputHandler, self ).__init__( handlerMethod, childNodeSlot )
+		if isinstance( keys, str ):
+			self._keyTuples = [ gtk.accelerator_parse( keys ) ]
+		else:
+			self._keyTuples = [ gtk.accelerator_parse( key )   for key in keys ]
 
 
 	def _f_metaMember_initClass(self):
@@ -81,17 +95,6 @@ class _CVlInputHandler (KMeta.KMetaMember):
 				self._cls._keyToInputHandler[key] = self
 
 
-	def _f_handleKeyPress(self, instance, receivingNodePath, entry, keyPressEvent):
-		return self._handlerMethod( instance, receivingNodePath, entry, keyPressEvent )
-
-
-class CVAccelInputHandler (_CVlInputHandler):
-	def __init__(self, handlerMethod, keys, childNodeSlot=None):
-		if isinstance( keys, str ):
-			keyTuples = [ gtk.accelerator_parse( keys ) ]
-		else:
-			keyTuples = [ gtk.accelerator_parse( key )   for key in keys ]
-		super( CVAccelInputHandler, self ).__init__( handlerMethod, keyTuples, childNodeSlot )
 
 
 def CVAccelInputHandlerMethod(keys, childNodeSlot=None):
@@ -104,17 +107,19 @@ def CVAccelInputHandlerMethod(keys, childNodeSlot=None):
 
 class CVCharInputHandler (_CVlInputHandler):
 	def __init__(self, handlerMethod, chars, childNodeSlot=None):
-		keyTuples = [ CVCharInputHandler._p_charToKeyTuple( char )   for char in chars ]
-		super( CVCharInputHandler, self ).__init__( handlerMethod, keyTuples, childNodeSlot )
+		super( CVCharInputHandler, self ).__init__( handlerMethod, childNodeSlot )
+		self._chars = chars
 
 
-	@staticmethod
-	def _p_charToKeyTuple(char):
-		bShift = char.isupper()
-		if bShift:
-			return ord( char.upper() ), gtk.gdk.SHIFT_MASK
+	def _f_metaMember_initClass(self):
+		if self._childNodeSlot is not None:
+			for char in self._chars:
+				self._childNodeSlot._charToInputHandler[char] = self
 		else:
-			return ord( char.upper() ), 0
+			for char in self._chars:
+				self._cls._charToInputHandler[char] = self
+
+
 
 
 def CVCharInputHandlerMethod(chars, childNodeSlot=None):
@@ -130,11 +135,13 @@ def CVCharInputHandlerMethod(chars, childNodeSlot=None):
 class CVNodeClass (SheetClass):
 	def __init__(cls, clsName, clsBases, clsDict):
 		cls._keyToInputHandler = {}
+		cls._charToInputHandler = {}
 		cls._nodeSlots = set()
 
 		for base in clsBases:
 			if hasattr( base, '_keyToInputHandler' ):
 				cls._keyToInputHandler.update( base._keyToInputHandler )
+				cls._charToInputHandler.update( base._charToInputHandler )
 				cls._nodeSlots = cls._nodeSlots.union( set( base._nodeSlots ) )
 		cls._nodeSlots = list( cls._nodeSlots )
 
@@ -177,6 +184,9 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 		state = keyPressEvent.state  &  ( gtk.gdk.SHIFT_MASK | gtk.gdk.CONTROL_MASK | gtk.gdk.MOD1_MASK )
 		keyVal = keyPressEvent.keyVal
 		key = keyVal, state
+		char = keyPressEvent.keyString
+
+		inputHandler = None
 
 		# Try to get the node slot input handler
 		if len( receivingNodePath ) > 0:
@@ -189,21 +199,30 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 				try:
 					inputHandler = nodeSlot._keyToInputHandler[key]
 				except KeyError:
-					pass
-				else:
-					return inputHandler._f_handleKeyPress( self, ( self, ) + receivingNodePath, entry, keyPressEvent )
+					try:
+						inputHandler = nodeSlot._charToInputHandler[char]
+					except KeyError:
+						pass
+
 
 
 		try:
 			inputHandler = self._keyToInputHandler[key]
 		except KeyError:
+			try:
+				inputHandler = self._charToInputHandler[char]
+			except KeyError:
+				pass
+
+
+		if inputHandler is not None:
+			return inputHandler._f_handleKeyPress( self, ( self, ) + receivingNodePath, entry, keyPressEvent )
+		else:
 			# Pass to the parent node
 			if self._parent is not None:
 				return self._parent._o_handleKeyPress( ( self, ) + receivingNodePath, entry, keyPressEvent )
 			else:
 				return False
-		else:
-			return inputHandler._f_handleKeyPress( self, ( self, ) + receivingNodePath, entry, keyPressEvent )
 
 
 	def _f_handleKeyPress(self, entry, keyPressEvent):

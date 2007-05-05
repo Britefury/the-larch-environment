@@ -17,5 +17,6 @@ import CVTLocalVarDeclaration
 import CVTModule
 import CVTReturn
 import CVTSendMessage
+import CVTMessageArguments
 import CVTStringLiteral
 import CVTVar
