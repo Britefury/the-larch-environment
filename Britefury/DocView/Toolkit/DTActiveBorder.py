@@ -11,7 +11,7 @@ from Britefury.DocView.Toolkit.DTBorder import DTBorder
 
 
 class DTActiveBorder (DTBorder):
-	def __init__(self, leftMargin=3.0, rightMargin=3.0, topMargin=3.0, bottomMargin=3.0, borderWidth=1.0, borderColour=Colour3f( 0.8, 0.85, 0.9 ), prelitBorderColour=Colour3f( 0.6, 0.7, 0.8 ), highlightedBorderColour=Colour3f( 0.4, 0.6, 0.7 ) ):
+	def __init__(self, leftMargin=3.0, rightMargin=3.0, topMargin=3.0, bottomMargin=3.0, borderWidth=1.0, borderColour=Colour3f( 0.8, 0.85, 0.9 ), prelitBorderColour=Colour3f( 0.6, 0.7, 0.8 ), highlightedBorderColour=Colour3f( 0.4, 0.6, 0.7 ), highlightedBackgroundColour=Colour3f( 0.93, 0.93, 0.93 ) ):
 		super( DTActiveBorder, self ).__init__( leftMargin, rightMargin, topMargin, bottomMargin )
 
 		self.keyHandler = None
@@ -19,6 +19,7 @@ class DTActiveBorder (DTBorder):
 		self._borderColour = borderColour
 		self._prelitBorderColour = prelitBorderColour
 		self._highlightedBorderColour = highlightedBorderColour
+		self._highlightedBackgroundColour = highlightedBackgroundColour
 		self._bPrelit = False
 
 
@@ -52,6 +53,14 @@ class DTActiveBorder (DTBorder):
 
 	def getHighlightedBorderColour(self):
 		return self.highlightedBorderColour
+
+
+	def setHighlightedBackgroundColour(self, colour):
+		self._highlightedBackgroundColour = colour
+		self._o_queueFullRedraw()
+
+	def getHighlightedBackgroundColour(self):
+		return self._highlightedBackgroundColour
 
 
 	def _o_onButtonDown(self, localPos, button, state):
@@ -97,6 +106,8 @@ class DTActiveBorder (DTBorder):
 		# Border
 		context.set_line_width( b )
 		if self._bHasFocus:
+			context.set_source_rgb( self._highlightedBackgroundColour.r, self._highlightedBackgroundColour.g, self._highlightedBackgroundColour.b )
+			context.fill_preserve()
 			context.set_source_rgb( self._highlightedBorderColour.r, self._highlightedBorderColour.g, self._highlightedBorderColour.b )
 		elif self._bPrelit:
 			context.set_source_rgb( self._prelitBorderColour.r, self._prelitBorderColour.g, self._prelitBorderColour.b )
@@ -112,3 +123,4 @@ class DTActiveBorder (DTBorder):
 	borderColour = property( getBorderColour, setBorderColour )
 	prelitBorderColour = property( getPrelitBorderColour, setPrelitBorderColour )
 	highlightedBorderColour = property( getHighlightedBorderColour, setHighlightedBorderColour )
+	highlightedBackgroundColour = property( getHighlightedBackgroundColour, setHighlightedBackgroundColour )
