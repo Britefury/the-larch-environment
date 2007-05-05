@@ -1,0 +1,16 @@
+AUTHORS
+=======
+
+
+The gCell distribution includes the following libraries:
+
+greenlet		Found in cpp/extlibs/greenlet			By Armin Rigo, Christian Tismer, et al				http://codespeak.net/py/current/doc/home.html
+
+
+
+The gCell application was written by Geoffrey French (MrMeanie / Britefury).
+gCell is (C)copyright Geoffrey French 2006-2007.
+
+
+
+
