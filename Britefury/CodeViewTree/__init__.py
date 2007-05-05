@@ -6,7 +6,8 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
 import CodeViewTree
-import CVTNull
+import CVTExpression
+import CVTNullExpression
 import CVTBlockStatements
 import CVTBlockParameters
 import CVTClosure

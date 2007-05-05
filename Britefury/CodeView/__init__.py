@@ -6,7 +6,8 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
 import CodeView
-import CVNull
+import CVExpression
+import CVNullExpression
 import CVBlockStatements
 import CVBlockParameters
 import CVClosure

@@ -14,7 +14,7 @@ from Britefury.SheetGraph.SheetGraph import *
 
 from Britefury.CodeViewTree.CVTStringLiteral import CVTStringLiteral
 
-from Britefury.CodeView.CVExpressionNode import *
+from Britefury.CodeView.CVExpression import *
 
 from Britefury.DocView.Toolkit.DTBox import DTBox
 from Britefury.DocView.Toolkit.DTLabel import DTLabel
@@ -23,7 +23,7 @@ from Britefury.DocView.CellEdit.DVCStringCellEditEntryLabel import DVCStringCell
 
 
 
-class CVStringLiteral (CVExpressionNode):
+class CVStringLiteral (CVExpression):
 	treeNodeClass = CVTStringLiteral
 
 

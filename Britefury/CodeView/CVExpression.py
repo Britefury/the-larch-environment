@@ -18,7 +18,7 @@ from Britefury.CodeView.CVBorderNode import *
 
 
 
-class CVExpressionNode (CVBorderNode):
+class CVExpression (CVBorderNode):
 	treeNodeClass = CVTExpression
 
 

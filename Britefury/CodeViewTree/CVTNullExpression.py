@@ -8,18 +8,18 @@
 from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
-from Britefury.CodeGraph.CGNull import CGNull
+from Britefury.CodeGraph.CGNullExpression import CGNullExpression
 from Britefury.CodeGraph.CGStringLiteral import CGStringLiteral
 
 from Britefury.CodeViewTree.CVTNode import CVTNode
 
 
 
-class CVTNull (CVTNode):
-	graphNodeClass = CGNull
+class CVTNullExpression (CVTNode):
+	graphNodeClass = CGNullExpression
 
 
-	graphNode = SheetRefField( CGNull )
+	graphNode = SheetRefField( CGNullExpression )
 
 
 	def replaceWithStringLiteral(self):
