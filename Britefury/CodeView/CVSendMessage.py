@@ -51,43 +51,13 @@ class CVSendMessage (CVBorderNode):
 
 
 
-	@FunctionField
-	def argNodes(self):
-		return [ self._view.buildView( argNode, self )   for argNode in self.treeNode.argNodes ]
-
-	@FunctionField
-	def argWidgets(self):
-		return [ node.widget   for node in self.argNodes ]
-
+	@FunctionRefField
+	def argumentsNode(self):
+		return self._view.buildView( self.treeNode.argumentsNode, self )
 
 	@FunctionRefField
-	def expandArgNode(self):
-		if self.treeNode.expandArgNode is not None:
-			return self._view.buildView( self.treeNode.expandArgNode, self )
-		else:
-			return None
-
-	@FunctionRefField
-	def expandArgWidget(self):
-		if self.expandArgNode is not None:
-			return self.expandArgNode.widget
-		else:
-			return None
-
-
-	@FunctionRefField
-	def argsWidget(self):
-		w = DTWrappedLine()
-		w.append( DTLabel( '(' ) )
-		w.extend( self.argWidgets )
-		if self.expandArgWidget is not None:
-			x = DTBox( spacing=3.0 )
-			x.append( '*' )
-			x.append( self.expandArgWidget )
-			w.append( x )
-		w.append( DTLabel( ')' ) )
-		return w
-
+	def argumentsWidget(self):
+		return self.argumentsNode.widget
 
 
 	@FunctionField
@@ -100,7 +70,7 @@ class CVSendMessage (CVBorderNode):
 
 	@FunctionField
 	def _refreshArgs(self):
-		self._box[3] = self.argsWidget
+		self._box[3] = self.argumentsWidget
 
 	@FunctionField
 	def refreshCell(self):
@@ -108,6 +78,13 @@ class CVSendMessage (CVBorderNode):
 		self._refreshMessageName
 		self._refreshArgs
 
+
+
+
+	@CVCharInputHandlerMethod( '(' )
+	def _editArguments(self, receivingNodePath, entry, event):
+		self.argumentsNode.startEditing()
+		return True
 
 
 

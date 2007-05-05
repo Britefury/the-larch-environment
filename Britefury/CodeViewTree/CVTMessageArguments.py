@@ -9,13 +9,13 @@ from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
 from Britefury.CodeGraph.CGSendMessage import CGSendMessage
+from Britefury.CodeGraph.CGNullExpression import CGNullExpression
 
 from Britefury.CodeViewTree.CVTNode import CVTNode
-from Britefury.CodeViewTree.CVTMessageArguments import CVTMessageArguments
 
 
 
-class CVTSendMessage (CVTNode):
+class CVTMessageArguments (CVTNode):
 	graphNodeClass = CGSendMessage
 
 
@@ -23,14 +23,22 @@ class CVTSendMessage (CVTNode):
 
 
 
-	@FunctionRefField
-	def targetObjectNode(self):
-		return self._tree.buildNode( self.graphNode.targetObject[0].node )
-
-
-	messageName = FieldProxy( graphNode.messageName )
+	@FunctionField
+	def argNodes(self):
+		return [ self._tree.buildNode( argSource.node )   for argSource in self.graphNode.args ]
 
 
 	@FunctionRefField
-	def argumentsNode(self):
-		return self._tree.buildNode( self.graphNode, CVTMessageArguments )
+	def expandArgNode(self):
+		if len( self.graphNode.expandArg ) > 0:
+			return self._tree.buildNode( self.graphNode.expandArg[0].node )
+		else:
+			return None
+
+
+
+	def addArgument(self):
+		sendMsgCG = self.graphNode
+		argCG = CGNullExpression()
+		sendMsgCG.args.append( argCG.parent )
+		return self._tree.buildNode( argCG )
