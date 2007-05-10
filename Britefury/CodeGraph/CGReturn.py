@@ -16,7 +16,7 @@ class CGReturn (CGExpression):
 	value = SheetGraphSinkSingleField( 'Value', 'Value' )
 	rootBlock = SheetGraphSinkSingleField( 'Root node', 'Root node' )
 
-	def generateLLCT(self):
+	def generateLLCT(self, tree):
 		assert len( self.value ) > 0
 		assert len( self.parent ) > 0
 
@@ -31,4 +31,4 @@ class CGReturn (CGExpression):
 		else:
 			numFrames = 1
 
-		return LLCTReturnExp( self.value[0].node.generateLLCT(), numFrames )
+		return LLCTReturnExp( self.value[0].node.generateLLCT( tree ), numFrames )

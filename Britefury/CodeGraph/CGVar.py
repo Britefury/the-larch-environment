@@ -5,6 +5,7 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
+from Britefury.LowLevelCodeTree.LLCTTag import LLCTTag
 from Britefury.CodeGraph.CGNode import CGNode
 from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
@@ -15,3 +16,11 @@ class CGVar (CGNode):
 	name = Field( str, '', 'Variable name' )
 	references = SheetGraphSourceField( 'References', 'All references to this local variable' )
 	declaration = SheetGraphSourceField( 'Declaraion', 'The variable declaration' )
+
+	def generateLLCT(self, tree):
+		try:
+			return tree[self]
+		except KeyError:
+			tag = LLCTTag( 'Variable', self.name )
+			tree[self] = tag
+			return tag

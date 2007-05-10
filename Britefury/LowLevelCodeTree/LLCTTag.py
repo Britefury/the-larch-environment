@@ -5,16 +5,19 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
-from Britefury.CodeGraph.CGExpression import CGExpression
-from Britefury.Sheet.Sheet import *
-from Britefury.SheetGraph.SheetGraph import *
-from Britefury.LowLevelCodeTree.LLCTLoadLocalExp import LLCTLoadLocalExp
+
+class LLCTTag (object):
+	def __init__(self, systemName, userName):
+		self._systemName = systemName
+		self._userName = userName
 
 
+	def getSystemName(self):
+		return self._systemName
 
-class CGLocalRef (CGExpression):
-	variable = SheetGraphSinkSingleField( 'Variable', 'Target variable' )
+	def getUserName(self):
+		return self._userName
 
-	def generateLLCT(self, tree):
-		assert len( self.variable ) > 0
-		return LLCTLoadLocalExp( self.variable[0].node.generateLLCT( tree ) )
+	systemName = property( getSystemName )
+	userName = property( getUserName )
+

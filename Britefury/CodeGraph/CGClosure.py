@@ -15,6 +15,6 @@ from Britefury.LowLevelCodeTree.LLCTClosureExp import LLCTClosureExp
 class CGClosure (CGExpression):
 	block = SheetGraphSinkSingleField( 'Block', 'Block' )
 
-	def generateLLCT(self):
+	def generateLLCT(self, tree):
 		assert len( self.block ) > 0
-		return LLCTClosureExp( self.block[0].node.generateLLCT() )
+		return LLCTClosureExp( self.block[0].node.generateLLCT( tree ) )

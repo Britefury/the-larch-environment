@@ -21,11 +21,11 @@ class CGBlock (CGNode):
 	statements = SheetGraphSinkMultipleField( 'Statements', 'Statement list' )
 
 
-	def generateLLCT(self):
-		llctStatements = [ statementSource.node.generateLLCT()   for statementSource in self.statements ]
-		paramNames = [ paramSource.node.name   for paramSource in self.params ]
+	def generateLLCT(self, tree):
+		llctStatements = [ statementSource.node.generateLLCT( tree )   for statementSource in self.statements ]
+		paramNames = [ paramSource.node.generateLLCT( tree )   for paramSource in self.params ]
 		if len( self.expandParam ) > 0:
-			expandParanName = self.expandParam[0].node.name
+			expandParamName = self.expandParam[0].node.generateLLCT( tree )
 		else:
-			expandParanName = None
-		return LLCTBlock( self.name, llctStatements, paramNames, expandParanName )
+			expandParamName = None
+		return LLCTBlock( self.name, llctStatements, paramNames, expandParamName )

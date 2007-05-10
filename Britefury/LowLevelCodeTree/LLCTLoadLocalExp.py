@@ -11,12 +11,12 @@ from Britefury.LowLevelCodeTree.LLCTExpression import *
 
 
 class LLCTLoadLocalExp (LLCTExpression):
-	def __init__(self, varName):
+	def __init__(self, varTag):
 		super( LLCTLoadLocalExp, self ).__init__()
-		self._varName = varName
+		self._varTag = varTag
 
 	def generateInstructions(self, instructions, constants, block, registerAllocator, bResultRequired):
 		if bResultRequired:
-			return block.getLocalReg( self._varName )
+			return block.getLocalReg( self._varTag )
 		else:
 			return None

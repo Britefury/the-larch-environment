@@ -13,18 +13,18 @@ from Britefury.LowLevelCodeTree.LLCTBuiltins import *
 
 
 class LLCTBindExp (LLCTExpression):
-	def __init__(self, varName, srcExpression=None):
+	def __init__(self, varTag, srcExpression=None):
 		super( LLCTBindExp, self ).__init__()
-		self._varName = varName
+		self._varTag = varTag
 		self._srcExpression = srcExpression
 
 	def allocateLocalRegisters(self, block):
-		block.allocLocalReg( self._varName )
+		block.allocLocalReg( self._varTag )
 
 	def generateInstructions(self, instructions, constants, block, registerAllocator, bResultRequired):
 		if self._srcExpression is not None:
 			srcReg = self._srcExpression.generateInstructions( instructions, constants, block, registerAllocator, True )
-			instructions.append( MoveInstruction( block.getLocalReg( self._varName ), srcReg ) )
+			instructions.append( MoveInstruction( block.getLocalReg( self._varTag ), srcReg ) )
 			registerAllocator.freeReg( srcReg )
 
 			if bResultRequired:
@@ -33,7 +33,7 @@ class LLCTBindExp (LLCTExpression):
 				return None
 		else:
 			noneReg = llctBuiltin_none( constants )
-			instructions.append( MoveInstruction( block.getLocalReg( self._varName ), noneReg ) )
+			instructions.append( MoveInstruction( block.getLocalReg( self._varTag ), noneReg ) )
 
 			if bResultRequired:
 				return noneReg

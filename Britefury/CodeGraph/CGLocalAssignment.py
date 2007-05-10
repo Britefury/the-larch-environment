@@ -16,7 +16,7 @@ class CGLocalAssignment (CGStatement):
 	variable = SheetGraphSinkSingleField( 'Variable', 'Target variable' )
 	value = SheetGraphSinkSingleField( 'Value', 'Value' )
 
-	def generateLLCT(self):
+	def generateLLCT(self, tree):
 		assert len( self.variable ) > 0
 		assert len( self.value ) > 0
-		return LLCTAssignmentExp( self.variable[0].node.name, self.value[0].node.generateLCT() )
+		return LLCTAssignmentExp( self.variable[0].node.generateLLCT( tree ), self.value[0].node.generateLLCT( tree ) )
