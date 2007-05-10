@@ -22,7 +22,7 @@ class VMBlock (object):
 		self.outerBlock = outerBlock
 		self.argNames = argNames
 		self.expandArgName = expandArgName
-		self.localNameToRegIndex = {}
+		self.localVarTagToRegIndex = {}
 		self.constants = None
 		self.argRegisters = [ self.allocLocalReg( arg )   for arg in argNames ]
 		if expandArgName is not None:
@@ -41,27 +41,30 @@ class VMBlock (object):
 		self.constants = constants
 
 
-	def allocLocalReg(self, name):
+	def allocLocalReg(self, varTag):
 		try:
-			return localRegister( 0, self.localNameToRegIndex[name] )
+			return localRegister( 0, self.localVarTagToRegIndex[varTag] )
 		except KeyError:
 			regIndex = self.numLocalRegs
-			self.localNameToRegIndex[name] = regIndex
+			self.localVarTagToRegIndex[varTag] = regIndex
 			self.numLocalRegs += 1
 			return localRegister( 0, regIndex )
 
 
-	def getLocalReg(self, name, levelOffset=0):
+	def getLocalReg(self, varTag, levelOffset=0):
 		block = self
 		level = levelOffset
 		while True:
 			try:
-				return ( level, block.localNameToRegIndex[name] )
+				return ( level, block.localVarTagToRegIndex[varTag] )
 			except KeyError:
 				if block.outerBlock is not None:
 					block = block.outerBlock
 					level += 1
 				else:
-					raise LocalRegisterNameError
+					if isinstance( varTag, str ):
+						raise LocalRegisterNameError, 'tag: %s'  %  ( varTag )
+					else:
+						raise LocalRegisterNameError, 'tag: %s (%s)'  %  ( varTag, varTag.userName )
 
 

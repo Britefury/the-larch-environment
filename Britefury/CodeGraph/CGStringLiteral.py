@@ -16,5 +16,5 @@ from Britefury.LowLevelCodeTree.LLCTLoadConstantExp import LLCTLoadConstantExp
 class CGStringLiteral (CGExpression):
 	value = Field( str, '' )
 
-	def generateLLCT(self):
+	def generateLLCT(self, tree):
 		return LLCTLoadConstantExp( pyStrToVString( self.value ) )

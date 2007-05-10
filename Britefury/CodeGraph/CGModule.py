@@ -19,6 +19,7 @@ from Britefury.LowLevelCodeTree.LLCTClosureExp import LLCTClosureExp
 from Britefury.LowLevelCodeTree.LLCTSendMessageExp import LLCTSendMessageExp
 from Britefury.LowLevelCodeTree.LLCTReturnExp import LLCTReturnExp
 from Britefury.LowLevelCodeTree.LLCTLoadConstantExp import LLCTLoadConstantExp
+from Britefury.LowLevelCodeTree.LLCTTag import LLCTTag
 
 
 
@@ -40,21 +41,24 @@ class CGModule (CGNode):
 
 
 
-	def generateStatementLLCT(self, node):
+	def generateStatementLLCT(self, node, moduleTag, tree):
 		if isinstance( node, CGLocalVarDeclaration ):
 			varName = node.variable[0].node.name
+			varTag = node.variable[0].node.generateLLCT( tree )
+			loadVarTag = LLCTTag( 'ModuleLoadVariable', loadVarName( varName ) )
 			getVarNameLLCT = LLCTLoadConstantExp( pyStrToVString( getVarName( varName ) ) )
 			setVarNameLLCT = LLCTLoadConstantExp( pyStrToVString( setVarName( varName ) ) )
-			getBlock = LLCTBlock( '%s:%s.get' % ( self.name, varName ), [ LLCTReturnExp( LLCTLoadLocalExp( varName ) ) ] )
-			setBlock = LLCTBlock( '%s:%s.set' % ( self.name, varName ), [ LLCTAssignmentExp( varName, LLCTLoadLocalExp( loadVarName( varName ) ) ) ], [ loadVarName( varName ) ] )
-			addGet = LLCTSendMessageExp( LLCTLoadLocalExp( localModuleName ), 'setInstanceMessage', [ getVarNameLLCT, LLCTClosureExp( getBlock ) ] )
-			addSet = LLCTSendMessageExp( LLCTLoadLocalExp( localModuleName ), 'setInstanceMessage', [ setVarNameLLCT, LLCTClosureExp( setBlock ) ] )
-			return [ node.generateLLCT() ]  +  [ addGet, addSet ]
+			getBlock = LLCTBlock( '%s:%s.get' % ( self.name, varName ), [ LLCTReturnExp( LLCTLoadLocalExp( varTag ) ) ] )
+			setBlock = LLCTBlock( '%s:%s.set' % ( self.name, varName ), [ LLCTAssignmentExp( varTag, LLCTLoadLocalExp( loadVarTag ) ) ], [ loadVarTag ] )
+			addGet = LLCTSendMessageExp( LLCTLoadLocalExp( moduleTag ), 'setInstanceMessage', [ getVarNameLLCT, LLCTClosureExp( getBlock ) ] )
+			addSet = LLCTSendMessageExp( LLCTLoadLocalExp( moduleTag ), 'setInstanceMessage', [ setVarNameLLCT, LLCTClosureExp( setBlock ) ] )
+			return [ node.generateLLCT( tree ) ]  +  [ addGet, addSet ]
 		else:
-			return [ node.generateLLCT() ]
+			return [ node.generateLLCT( tree ) ]
 
-	def generateLLCT(self):
-		llctStatements = [ LLCTBindExp( localModuleName, LLCTSendMessageExp( LLCTLoadLocalExp( 'Module' ), 'new', [] ) ) ]
+	def generateLLCT(self, tree):
+		moduleTag = LLCTTag( 'Module', localModuleName )
+		llctStatements = [ LLCTBindExp( moduleTag, LLCTSendMessageExp( LLCTLoadLocalExp( 'Module' ), 'new', [] ) ) ]
 		for statementSource in self.statements:
-			llctStatements += self.generateStatementLLCT( statementSource.node )
+			llctStatements += self.generateStatementLLCT( statementSource.node, moduleTag, tree )
 		return LLCTBlock( self.name, llctStatements )

@@ -20,13 +20,13 @@ class CGSendMessage (CGExpression):
 
 
 
-	def generateLLCT(self):
+	def generateLLCT(self, tree):
 		assert len( self.targetObject ) > 0
 
-		targetObjectLLCT = self.targetObject[0].node.generateLLCT()
-		argsLLCT = [ argSource.node.generateLLCT()   for argSource in self.args ]
+		targetObjectLLCT = self.targetObject[0].node.generateLLCT( tree )
+		argsLLCT = [ argSource.node.generateLLCT( tree )   for argSource in self.args ]
 		expandLLCT = None
 		if len( self.expandArg ) > 0:
-			expandLLCT = self.expandArg[0].node.generateLLCT()
+			expandLLCT = self.expandArg[0].node.generateLLCT( tree )
 
 		return LLCTSendMessageExp( targetObjectLLCT, self.messageName, argsLLCT, expandLLCT )

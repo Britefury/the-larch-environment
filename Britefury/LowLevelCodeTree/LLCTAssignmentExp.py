@@ -13,14 +13,14 @@ from Britefury.LowLevelCodeTree.LLCTBuiltins import *
 
 
 class LLCTAssignmentExp (LLCTExpression):
-	def __init__(self, varName, srcExpression):
+	def __init__(self, varTag, srcExpression):
 		super( LLCTAssignmentExp, self ).__init__()
-		self._varName = varName
+		self._varTag = varTag
 		self._srcExpression = srcExpression
 
 	def generateInstructions(self, instructions, constants, block, registerAllocator, bResultRequired):
 		srcReg = self._srcExpression.generateInstructions( instructions, constants, block, registerAllocator, True )
-		instructions.append( MoveInstruction( block.getLocalReg( self._varName ), srcReg ) )
+		instructions.append( MoveInstruction( block.getLocalReg( self._varTag ), srcReg ) )
 		registerAllocator.freeReg( srcReg )
 
 		if bResultRequired:

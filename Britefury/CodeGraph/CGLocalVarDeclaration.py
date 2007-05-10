@@ -17,9 +17,9 @@ class CGLocalVarDeclaration (CGStatement):
 	variable = SheetGraphSinkSingleField( 'Variable', 'The variable' )
 
 
-	def generateLLCT(self):
+	def generateLLCT(self, tree):
 		assert len( self.variable ) > 0
 		if len( self.value ) > 0:
-			return LLCTBindExp( self.variable[0].node.name, self.value[0].node.generateLLCT() )
+			return LLCTBindExp( self.variable[0].node.generateLLCT( tree ), self.value[0].node.generateLLCT( tree ) )
 		else:
-			return LLCTBindExp( self.variable[0].node.name, None )
+			return LLCTBindExp( self.variable[0].node.generateLLCT( tree ), None )

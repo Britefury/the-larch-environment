@@ -26,6 +26,8 @@ from Britefury.CodeView.CodeView import CodeView
 
 from Britefury.Event.QueuedEvent import queueEvent
 
+from Britefury.LowLevelCodeTree.LowLevelCodeTree import LowLevelCodeTree
+
 
 
 
@@ -107,8 +109,9 @@ if __name__ == '__main__':
 	def executeCode(widget):
 		machine = VMMachine()
 
-		llct = mainModule.generateLLCT()
-		block = llct.generateBlockInstructions()
+		llctTree = LowLevelCodeTree( graph )
+		llctNode = mainModule.generateLLCT( llctTree )
+		block = llctNode.generateBlockInstructions()
 
 		machine.run( block, bDebug=False )
 
@@ -117,8 +120,9 @@ if __name__ == '__main__':
 	def executeCodeWithDebug(widget):
 		machine = VMMachine()
 
-		llct = mainModule.generateLLCT()
-		block = llct.generateBlockInstructions()
+		llctTree = LowLevelCodeTree( graph )
+		llctNode = mainModule.generateLLCT( llctTree )
+		block = llctNode.generateBlockInstructions()
 
 		machine.run( block, bDebug=True )
 
