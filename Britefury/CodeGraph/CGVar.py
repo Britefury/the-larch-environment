@@ -5,7 +5,7 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
-from Britefury.LowLevelCodeTree.LLCTTag import LLCTTag
+from Britefury.VirtualMachine.VMTag import VMTag
 from Britefury.CodeGraph.CGNode import CGNode
 from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
@@ -21,6 +21,6 @@ class CGVar (CGNode):
 		try:
 			return tree[self]
 		except KeyError:
-			tag = LLCTTag( 'Variable', self.name )
+			tag = VMTag( 'Variable', self.name )
 			tree[self] = tag
 			return tag

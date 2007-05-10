@@ -9,6 +9,8 @@ import pygtk
 pygtk.require( '2.0' )
 import gtk
 
+from Britefury.Math.Math import Colour3f
+
 from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
@@ -33,6 +35,7 @@ class CVStringLiteral (CVExpression):
 	@FunctionRefField
 	def stringValueWidget(self):
 		entry = DVCStringCellEditEntryLabel()
+		entry.entry.textColour=Colour3f( 0.0, 0.0, 0.75 )
 		entry.keyHandler = self
 		entry.attachCell( self.treeNode.cells.stringValue )
 		return entry.entry
@@ -59,6 +62,6 @@ class CVStringLiteral (CVExpression):
 		super( CVStringLiteral, self ).__init__( treeNode, view )
 		self._box = DTBox()
 		self._box.append( DTLabel( '\'' ) )
-		self._box.append( DTLabel( 'nil' ) )
+		self._box.append( DTLabel( 'nil', colour=Colour3f( 0.0, 0.0, 0.5 ) ) )
 		self._box.append( DTLabel( '\'' ) )
 		self.widget.child = self._box

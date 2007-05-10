@@ -9,6 +9,7 @@ from Britefury.VirtualMachine.Instructions import *
 from Britefury.VirtualMachine.vcls_string import *
 from Britefury.VirtualMachine.vcls_block import *
 from Britefury.VirtualMachine.Registers import *
+from Britefury.VirtualMachine.VMMachine import VMMachine
 from Britefury.LowLevelCodeTree.LLCTExpression import *
 
 
@@ -23,7 +24,7 @@ class LLCTClosureExp (LLCTExpression):
 			newConstant = constants.addConstant( pyStrToVString( 'new' ) )
 			blockConstant = constants.addConstant( blockToVBlock( self._block.generateBlockInstructions( block ) ) )
 
-			closureClassReg = block.getLocalReg( 'Closure' )
+			closureClassReg = block.getLocalReg( VMMachine.tag_Closure )
 
 			currentFrameReg = registerAllocator.allocReg()
 			closureReg = registerAllocator.allocReg()
