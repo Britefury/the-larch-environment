@@ -5,7 +5,8 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
-from weakref import WeakKeyDictionary
+from Britefury.VirtualMachine.VMMachine import VMMachine
+from Britefury.VirtualMachine.VMTag import VMTag
 
 
 
@@ -17,6 +18,19 @@ class LowLevelCodeTree (object):
 
 		self._graph = graph
 		self._graphNodeToTreeNode = {}
+
+		self.tag_Object = VMMachine.tag_Object
+		self.tag_Class = VMMachine.tag_Class
+		self.tag_Bool = VMMachine.tag_Bool
+		self.tag_String = VMMachine.tag_String
+		self.tag_List = VMMachine.tag_List
+		self.tag_Closure = VMMachine.tag_Closure
+		self.tag_Frame = VMMachine.tag_Frame
+		self.tag_Block = VMMachine.tag_Block
+		self.tag_Module = VMMachine.tag_Module
+		self.tag_none = VMMachine.tag_none
+		self.tag_false = VMMachine.tag_false
+		self.tag_true = VMMachine.tag_true
 
 
 
@@ -31,4 +45,11 @@ class LowLevelCodeTree (object):
 
 	def has_key(self, graphNode):
 		return self._graphNodeToTreeNode.has_key( graphNode )
+
+
+
+
+
+
+
 

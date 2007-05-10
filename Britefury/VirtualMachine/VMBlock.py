@@ -62,9 +62,6 @@ class VMBlock (object):
 					block = block.outerBlock
 					level += 1
 				else:
-					if isinstance( varTag, str ):
-						raise LocalRegisterNameError, 'tag: %s'  %  ( varTag )
-					else:
-						raise LocalRegisterNameError, 'tag: %s (%s)'  %  ( varTag, varTag.userName )
+					raise LocalRegisterNameError, 'tag: %s (%s)'  %  ( varTag, varTag.userName )
 
 

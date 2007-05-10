@@ -19,7 +19,8 @@ from Britefury.LowLevelCodeTree.LLCTClosureExp import LLCTClosureExp
 from Britefury.LowLevelCodeTree.LLCTSendMessageExp import LLCTSendMessageExp
 from Britefury.LowLevelCodeTree.LLCTReturnExp import LLCTReturnExp
 from Britefury.LowLevelCodeTree.LLCTLoadConstantExp import LLCTLoadConstantExp
-from Britefury.LowLevelCodeTree.LLCTTag import LLCTTag
+
+from Britefury.VirtualMachine.VMTag import VMTag
 
 
 
@@ -45,7 +46,7 @@ class CGModule (CGNode):
 		if isinstance( node, CGLocalVarDeclaration ):
 			varName = node.variable[0].node.name
 			varTag = node.variable[0].node.generateLLCT( tree )
-			loadVarTag = LLCTTag( 'ModuleLoadVariable', loadVarName( varName ) )
+			loadVarTag = VMTag( 'ModuleLoadVariable', loadVarName( varName ) )
 			getVarNameLLCT = LLCTLoadConstantExp( pyStrToVString( getVarName( varName ) ) )
 			setVarNameLLCT = LLCTLoadConstantExp( pyStrToVString( setVarName( varName ) ) )
 			getBlock = LLCTBlock( '%s:%s.get' % ( self.name, varName ), [ LLCTReturnExp( LLCTLoadLocalExp( varTag ) ) ] )
@@ -57,8 +58,8 @@ class CGModule (CGNode):
 			return [ node.generateLLCT( tree ) ]
 
 	def generateLLCT(self, tree):
-		moduleTag = LLCTTag( 'Module', localModuleName )
-		llctStatements = [ LLCTBindExp( moduleTag, LLCTSendMessageExp( LLCTLoadLocalExp( 'Module' ), 'new', [] ) ) ]
+		moduleTag = VMTag( 'Module', localModuleName )
+		llctStatements = [ LLCTBindExp( moduleTag, LLCTSendMessageExp( LLCTLoadLocalExp( tree.tag_Module ), 'new', [] ) ) ]
 		for statementSource in self.statements:
 			llctStatements += self.generateStatementLLCT( statementSource.node, moduleTag, tree )
 		return LLCTBlock( self.name, llctStatements )

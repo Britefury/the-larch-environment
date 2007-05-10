@@ -6,8 +6,9 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
 
-class LLCTTag (object):
+class VMTag (object):
 	def __init__(self, systemName, userName):
+		super( VMTag, self ).__init__()
 		self._systemName = systemName
 		self._userName = userName
 
