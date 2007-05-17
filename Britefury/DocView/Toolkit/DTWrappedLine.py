@@ -39,6 +39,15 @@ class DTWrappedLine (DTContainer):
 
 
 
+	def _p_itemToChildEntry(self, item):
+		if isinstance( item, tuple ):
+			child, padding = item
+			return self.ChildEntry( child, padding )
+		else:
+			return self.ChildEntry( item, self._padding )
+
+
+
 	def __len__(self):
 		return len( self._childEntries )
 
@@ -48,13 +57,6 @@ class DTWrappedLine (DTContainer):
 			return [ e.child   for e in entry ]
 		else:
 			return entry.child
-
-	def _p_itemToChildEntry(self, item):
-		if isinstance( item, tuple ):
-			child, padding = item
-			return self.ChildEntry( child, padding )
-		else:
-			return self.ChildEntry( item, self._padding )
 
 	def __setitem__(self, index, item):
 		if isinstance( index, slice ):
@@ -70,6 +72,8 @@ class DTWrappedLine (DTContainer):
 
 			for entry in added:
 				self._o_registerChildEntry( entry )
+
+			self._o_queueResize()
 		else:
 			newEntry = self._p_itemToChildEntry( item )
 			oldEntry = self._childEntries[index]
@@ -81,7 +85,11 @@ class DTWrappedLine (DTContainer):
 	def __delitem__(self, index):
 		entry = self._childEntries[index]
 		del self._childEntries[index]
-		self._o_unregisterChildEntry( entry )
+		if isinstance( entry, list ):
+			for e in entry:
+				self._o_unregisterChildEntry( entry )
+		else:
+			self._o_unregisterChildEntry( entry )
 		self._o_queueResize()
 
 

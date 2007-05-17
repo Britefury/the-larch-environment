@@ -49,6 +49,14 @@ class DTBox (DTContainer):
 
 
 
+	def _p_itemToChildEntry(self, item):
+		if isinstance( item, tuple ):
+			child, bExpand, bFill, bShrink, padding = item
+			return self.ChildEntry( child, bExpand, bFill, bShrink, padding )
+		else:
+			return self.ChildEntry( item, self._bExpand, self._bFill, self._bShrink, self._padding )
+
+
 	def __len__(self):
 		return len( self._childEntries )
 
@@ -58,13 +66,6 @@ class DTBox (DTContainer):
 			return [ e.child   for e in entry ]
 		else:
 			return entry.child
-
-	def _p_itemToChildEntry(self, item):
-		if isinstance( item, tuple ):
-			child, bExpand, bFill, bShrink, padding = item
-			return self.ChildEntry( child, bExpand, bFill, bShrink, padding )
-		else:
-			return self.ChildEntry( item, self._bExpand, self._bFill, self._bShrink, self._padding )
 
 	def __setitem__(self, index, item):
 		if isinstance( index, slice ):
@@ -80,6 +81,9 @@ class DTBox (DTContainer):
 
 			for entry in added:
 				self._o_registerChildEntry( entry )
+
+			self._p_childListModified()
+			self._o_queueResize()
 		else:
 			newEntry = self._p_itemToChildEntry( item )
 			oldEntry = self._childEntries[index]
@@ -92,7 +96,11 @@ class DTBox (DTContainer):
 	def __delitem__(self, index):
 		entry = self._childEntries[index]
 		del self._childEntries[index]
-		self._o_unregisterChildEntry( entry )
+		if isinstance( entry, list ):
+			for e in entry:
+				self._o_unregisterChildEntry( e )
+		else:
+			self._o_unregisterChildEntry( entry )
 		self._p_childListModified()
 		self._o_queueResize()
 

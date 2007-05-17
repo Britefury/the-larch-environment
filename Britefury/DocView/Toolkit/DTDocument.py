@@ -7,11 +7,15 @@
 ##-*************************
 import weakref
 
+import math
+
 import pygtk
 pygtk.require( '2.0' )
 import gtk
 import gobject
 import cairo
+
+from Britefury.Event.QueuedEvent import queueEvent
 
 from Britefury.Math.Math import Vector2, Point2, BBox2
 from Britefury.DocView.Toolkit.DTKeyEvent import DTKeyEvent
@@ -21,7 +25,7 @@ from Britefury.DocView.Toolkit.DTBin import DTBin
 
 
 class DTDocument (gtk.DrawingArea, DTBin):
-	def __init__(self):
+	def __init__(self, bCanGrabFocus=True):
 		gtk.DrawingArea.__init__( self )
 		DTBin.__init__( self )
 
@@ -56,20 +60,36 @@ class DTDocument (gtk.DrawingArea, DTBin):
 					gtk.gdk.KEY_PRESS_MASK |
 					gtk.gdk.KEY_RELEASE_MASK )
 
-		self.set_flags( gtk.CAN_FOCUS )
+		if bCanGrabFocus:
+			self.set_flags( gtk.CAN_FOCUS )
 
+
+
+	def getRootDocument(self):
+		return self
 
 
 	def _o_queueRedraw(self, localPos, localSize):
 		self._p_invalidateRect( localPos, localSize )
 
 	def _p_invalidateRect(self, pos, size):
-		self.queue_draw_area( int( pos.x ), int( pos.y ), int( size.x + 0.5 ), int( size.y + 0.5 ) )
+		self.queue_draw_area( int( pos.x ), int( pos.y ), int( math.ceil( size.x ) ), int( math.ceil( size.y ) ) )
 
 
 	def _o_queueResize(self):
 		self._bAllocationRequired = True
 		self.queue_draw()
+
+
+
+
+	def _p_performAllocation(self):
+		if self._bAllocationRequired:
+			reqWidth = self._f_getRequisitionWidth()
+			self._f_allocateX( self._documentSize.x )
+			reqHeight = self._f_getRequisitionHeight()
+			self._f_allocateY( self._documentSize.y )
+			self._bAllocationRequired = False
 
 
 
@@ -105,12 +125,7 @@ class DTDocument (gtk.DrawingArea, DTBin):
 
 
 	def _p_exposeEvent(self, widget, event):
-		if self._bAllocationRequired:
-			reqWidth = self._f_getRequisitionWidth()
-			self._f_allocateX( self._documentSize.x )
-			reqHeight = self._f_getRequisitionHeight()
-			self._f_allocateY( self._documentSize.y )
-			self._bAllocationRequired = False
+		self._p_performAllocation()
 		context = widget.window.cairo_create()
 		context.rectangle( event.area.x, event.area.y, event.area.width, event.area.height )
 		context.clip_preserve()

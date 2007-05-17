@@ -11,12 +11,13 @@ import gtk
 
 import cairo
 
-from Britefury.Math.Math import Colour3f, Vector2
+from Britefury.Math.Math import Colour3f, Vector2, Point2
 
 from Britefury.Util.SignalSlot import *
 
 from Britefury.DocView.Toolkit.DTWidget import DTWidget
 from Britefury.DocView.Toolkit.DTFont import DTFont
+from Britefury.DocView.Toolkit.DTAutoCompleteDropDown import DTAutoCompleteDropDown
 
 
 
@@ -26,7 +27,7 @@ class DTEntry (DTWidget):
 	textDeletedSignal = ClassSignal()				# ( entry, startIndex, endIndex, textDeleted )
 
 
-	def __init__(self, text='', font=None, borderWidth=2.0, backgroundColour=Colour3f( 0.9, 0.95, 0.9 ), highlightedBackgroundColour=Colour3f( 0.0, 0.0, 0.5 ), textColour=Colour3f( 0.0, 0.0, 0.0 ), highlightedTextColour=Colour3f( 1.0, 1.0, 1.0 ), borderColour=Colour3f( 0.6, 0.8, 0.6 )):
+	def __init__(self, text='', font=None, borderWidth=2.0, backgroundColour=Colour3f( 0.9, 0.95, 0.9 ), highlightedBackgroundColour=Colour3f( 0.0, 0.0, 0.5 ), textColour=Colour3f( 0.0, 0.0, 0.0 ), highlightedTextColour=Colour3f( 1.0, 1.0, 1.0 ), borderColour=Colour3f( 0.6, 0.8, 0.6 ), autoCompleteList=None):
 		super( DTEntry, self ).__init__()
 
 		if font is None:
@@ -53,6 +54,9 @@ class DTEntry (DTWidget):
 		self._cursorLocation = 0
 		self._selectionBounds = None
 		self._bButtonPressed = False
+
+		self._autoCompleteList = autoCompleteList
+		self._autoCompleteDropDown = DTAutoCompleteDropDown( [] )
 
 		self._o_queueResize()
 
@@ -131,6 +135,26 @@ class DTEntry (DTWidget):
 		return self._borderColour
 
 
+	def setAutoCompleteList(self, autoCompleteList):
+		self._autoCompleteList = autoCompleteList
+
+
+
+
+	def _p_displayAutoComplete(self):
+		if self._autoCompleteList is not None:
+			filtered = [ text   for text in self._autoCompleteList   if text.startswith( self._text ) ]
+			bEmpty = len( filtered ) == 0
+
+			if bEmpty:
+				self._autoCompleteDropDown.hide()
+			else:
+				self._autoCompleteDropDown.setAutoCompleteList( filtered )
+				if not self._autoCompleteDropDown.isVisible():
+					self._autoCompleteDropDown.showAt( self, Point2( self._entryPosition.x, self._entryPosition.y + self._entrySize.y ) )
+
+
+
 
 	def _p_computeTextSize(self):
 		self._font.select( self._realiseContext )
@@ -159,6 +183,7 @@ class DTEntry (DTWidget):
 				self._entrySize = self._textSize  +  Vector2( self._borderWidth * 2.0, self._borderWidth * 2.0 )
 				self._o_queueResize()
 		self._o_queueFullRedraw()
+		self._p_displayAutoComplete()
 
 
 
@@ -306,6 +331,7 @@ class DTEntry (DTWidget):
 
 	def _o_onLoseFocus(self):
 		super( DTEntry, self )._o_onLoseFocus()
+		self._autoCompleteDropDown.hide()
 		self._o_queueFullRedraw()
 
 
@@ -398,6 +424,7 @@ class DTEntry (DTWidget):
 	textColour = property( getTextColour, setTextColour )
 	highlightedTextColour = property( getHighlightedTextColour, setHighlightedTextColour )
 	borderColour = property( getBorderColour, setBorderColour )
+	autoCompleteList = property( None, setAutoCompleteList )
 
 
 
@@ -432,7 +459,10 @@ if __name__ == '__main__':
 	doc = DTDocument()
 	doc.show()
 
-	entry = DTEntry( 'Hello world' )
+
+	autoCompleteList = [ 'abc', 'Hello', 'Hello world', 'Hi', 'Hi world', 'Hello world 2' ]
+
+	entry = DTEntry( 'Hello world', autoCompleteList=autoCompleteList )
 	doc.child = entry
 	entry.grabFocus()
 
