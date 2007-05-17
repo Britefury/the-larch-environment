@@ -59,6 +59,20 @@ class DTWidget (object):
 		return self._allocation
 
 
+	def getPositionRelativeToDocument(self, pos):
+		if self._parent is not None:
+			return self._parent._f_getChildPositionRelativeToDocument( self, pos )
+		else:
+			return pos
+
+
+	def getRootDocument(self):
+		if self._parent is not None:
+			return self._parent.getRootDocument()
+		else:
+			return None
+
+
 
 	def grabFocus(self):
 		if not self._bFocusGrabbed:

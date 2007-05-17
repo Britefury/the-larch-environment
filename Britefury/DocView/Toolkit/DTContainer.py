@@ -35,6 +35,9 @@ class DTContainer (DTWidget):
 		def containerToChildSpace(self, p):
 			return p * self.invXform
 
+		def containerToChildSpace(self, p):
+			return p * self.invXform
+
 
 
 
@@ -58,6 +61,13 @@ class DTContainer (DTWidget):
 			if child is entry.child:
 				return True
 		return False
+
+
+	def _f_getChildPositionRelativeToDocument(self, child, pos):
+		entry = self._childToEntry[child]
+		localPos = pos * entry.xform
+		return self.getPositionRelativeToDocument( localPos )
+
 
 
 
