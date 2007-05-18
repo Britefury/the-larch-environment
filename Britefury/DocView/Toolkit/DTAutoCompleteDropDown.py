@@ -16,6 +16,7 @@ from Britefury.Math.Math import Colour3f, Vector2
 from Britefury.UI.PopupWindow import PopupWindow
 
 from Britefury.DocView.Toolkit.DTLabel import DTLabel
+from Britefury.DocView.Toolkit.DTBorder import DTBorder
 from Britefury.DocView.Toolkit.DTBox import DTBox
 from Britefury.DocView.Toolkit.DTPopupDocument import DTPopupDocument
 from Britefury.DocView.Toolkit.DTDirection import DTDirection
@@ -24,11 +25,12 @@ from Britefury.DocView.Toolkit.DTDirection import DTDirection
 
 class DTAutoCompleteDropDown (DTPopupDocument):
 	autoCompleteSignal = ClassSignal()
+	autoCompleteDismissedSignal = ClassSignal()
 
 
 	class _Label (DTLabel):
 		def __init__(self, autoComplete, text, font=None, textColour=Colour3f( 0.0, 0.0, 0.0 ), highlightedTextColour=Colour3f( 1.0, 1.0, 1.0), highlightColour=Colour3f( 0.0, 0.0, 0.5 )):
-			super( DTAutoCompleteDropDown._Label, self ).__init__( text, font, textColour )
+			super( DTAutoCompleteDropDown._Label, self ).__init__( text, font, textColour, hAlign=DTLabel.HALIGN_LEFT )
 			self._autoComplete = autoComplete
 			self._textColour = textColour
 			self._highlightedTextColour = highlightedTextColour
@@ -77,6 +79,59 @@ class DTAutoCompleteDropDown (DTPopupDocument):
 		super( DTAutoCompleteDropDown, self ).__init__( False )
 
 		self._autoCompleteList = autoCompleteList
+		self._labels = []
+		self._highlightIndex = 0
+		self._bUserSelection = False
+		self._border = DTBorder( 2.0, 2.0, 2.0, 2.0 )
+		self.child = self._border
+
+
+	def reset(self):
+		label = self._p_getLabel( self._highlightIndex )
+		if label is not None:
+			label.disableHighlighting()
+
+		self._highlightIndex = 0
+		self._bUserSelection = False
+
+
+
+	def nextEntry(self):
+		label = self._p_getLabel( self._highlightIndex )
+		if label is not None:
+			label.disableHighlight()
+
+		self._highlightIndex += 1
+		if self._highlightIndex >= len( self._autoCompleteList ):
+			self._highlightIndex = 0
+		self._bUserSelection = True
+
+		label = self._p_getLabel( self._highlightIndex )
+		if label is not None:
+			label.enableHighlight()
+
+
+	def prevEntry(self):
+		label = self._p_getLabel( self._highlightIndex )
+		if label is not None:
+			label.disableHighlight()
+
+		self._highlightIndex -= 1
+		if self._highlightIndex < 0:
+			self._highlightIndex = len( self._autoCompleteList ) - 1
+		self._bUserSelection = True
+
+		label = self._p_getLabel( self._highlightIndex )
+		if label is not None:
+			label.enableHighlight()
+
+
+
+	def getHighlightedText(self):
+		try:
+			return self._autoCompleteList[self._highlightIndex]
+		except IndexError:
+			return None
 
 
 
@@ -89,11 +144,46 @@ class DTAutoCompleteDropDown (DTPopupDocument):
 
 
 	def setAutoCompleteList(self, autoCompleteList):
+		currentText = None
+		if self._bUserSelection:
+			try:
+				currentText = self._autoCompleteList[self._highlightIndex]
+			except IndexError:
+				pass
+
 		self._autoCompleteList = autoCompleteList
+
+		self._highlightIndex = 0
+		if self._bUserSelection:
+			try:
+				self._highlightIndex = self._autoCompleteList.index( currentText )
+			except ValueError:
+				pass
 
 		if self.isVisible():
 			self._p_refreshContents()
 
+
+
+
+	def handleKeyPressEvent(self, event):
+		if event.keyVal == gtk.keysyms.Escape:
+			self.hide()
+			self.autoCompleteDismissedSignal.emit( self )
+			return True
+		elif event.keyVal == gtk.keysyms.Down:
+			self.nextEntry()
+			return True
+		elif event.keyVal == gtk.keysyms.Up:
+			self.prevEntry()
+			return True
+		elif event.keyVal == gtk.keysyms.Tab:
+			text = self.getHighlightedText()
+			if text is not None:
+				self.autoCompleteSignal.emit( self, text )
+				return True
+			else:
+				return False
 
 
 	def _o_draw(self, context):
@@ -114,7 +204,18 @@ class DTAutoCompleteDropDown (DTPopupDocument):
 	def _p_refreshContents(self):
 		box = DTBox( direction=DTDirection.TOP_TO_BOTTOM )
 
-		labels = [ self._Label( self, text )   for text in self._autoCompleteList ]
-		box[:] = labels
+		self._labels = [ self._Label( self, text )   for text in self._autoCompleteList ]
+		box[:] = self._labels
 
-		self.child = box
+		self._border.child = box
+
+		label = self._p_getLabel( self._highlightIndex )
+		if label is not None:
+			label.enableHighlight()
+
+
+	def _p_getLabel(self, index):
+		try:
+			return self._labels[index]
+		except IndexError:
+			return None

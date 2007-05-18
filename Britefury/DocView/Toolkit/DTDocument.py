@@ -96,7 +96,7 @@ class DTDocument (gtk.DrawingArea, DTBin):
 
 	def _f_childGrabFocus(self, child):
 		if child is not self._keyboardFocusChild:
-			if self._keyboardFocusGrabChild is not None  and  child is not None:
+			if self._keyboardFocusGrabChild is not None  and  child is not None  and  child is not self._keyboardFocusGrabChild:
 				self._keyboardFocusGrabChild._f_clearFocusGrab()
 			if self._keyboardFocusChild is not None  and  child is not None:
 				self._keyboardFocusChild._o_onLoseFocus()

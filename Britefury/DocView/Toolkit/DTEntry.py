@@ -57,6 +57,9 @@ class DTEntry (DTWidget):
 
 		self._autoCompleteList = autoCompleteList
 		self._autoCompleteDropDown = DTAutoCompleteDropDown( [] )
+		self._autoCompleteDropDown.autoCompleteSignal.connect( self._p_onAutoComplete )
+		self._autoCompleteDropDown.autoCompleteDismissedSignal.connect( self._p_onAutoCompleteDismissed )
+		self._bAutoCompleteDisabled = False
 
 		self._o_queueResize()
 
@@ -183,7 +186,8 @@ class DTEntry (DTWidget):
 				self._entrySize = self._textSize  +  Vector2( self._borderWidth * 2.0, self._borderWidth * 2.0 )
 				self._o_queueResize()
 		self._o_queueFullRedraw()
-		self._p_displayAutoComplete()
+		if not self._bAutoCompleteDisabled:
+			self._p_displayAutoComplete()
 
 
 
@@ -273,10 +277,26 @@ class DTEntry (DTWidget):
 			self._p_moveCursor( True, loc )
 
 
+	def _p_onAutoComplete(self, autoComplete, text):
+		deletedText = self._text
+		self._text = text
+		self._selectionBounds = None
+		self.textDeletedSignal.emit( self, 0, len( deletedText ), deletedText )
+		self._cursorLocation = len( self._text )
+		self.textInsertedSignal.emit( self, 0, True, text )
+		self._p_onTextModified()
+
+
+	def _p_onAutoCompleteDismissed(self, autoComplete):
+		self._bAutoCompleteDisabled = True
+
+
 	def _o_onKeyPress(self, event):
 		super( DTEntry, self )._o_onKeyPress( event )
 		bHandled = False
-		if self.keyHandler is not None:
+		if self._autoCompleteDropDown.isVisible():
+			bHandled = self._autoCompleteDropDown.handleKeyPressEvent( event )
+		if self.keyHandler is not None  and  not bHandled:
 			bHandled = self.keyHandler._f_handleKeyPress( self, event )
 		if not bHandled:
 			if event.keyVal == gtk.keysyms.Left:
@@ -327,6 +347,7 @@ class DTEntry (DTWidget):
 	def _o_onGainFocus(self):
 		super( DTEntry, self )._o_onGainFocus()
 		self._cursorLocation = len( self._text )
+		self._bAutoCompleteDisabled = False
 		self._o_queueFullRedraw()
 
 	def _o_onLoseFocus(self):
