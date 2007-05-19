@@ -240,11 +240,11 @@ class DTBox (DTContainer):
 				childX = x
 				if not entry.bFill:
 					childX += expandPerChild * 0.5
-				self._o_allocateChildX( entry.child, childX, childWidth, 1.0 )
+				self._o_allocateChildX( entry.child, childX, childWidth )
 				x += childAlloc + self._spacing
 		else:
 			for entry in self._childEntries:
-				self._o_allocateChildX( entry.child, 0.0, allocation, 1.0 )
+				self._o_allocateChildX( entry.child, 0.0, allocation )
 
 
 	def _o_onAllocateY(self, allocation):
@@ -281,11 +281,11 @@ class DTBox (DTContainer):
 				childY = y
 				if not entry.bFill:
 					childY += expandPerChild * 0.5
-				self._o_allocateChildY( entry.child, childY, childHeight, 1.0 )
+				self._o_allocateChildY( entry.child, childY, childHeight )
 				y += childAlloc + self._spacing
 		else:
 			for entry in self._childEntries:
-				self._o_allocateChildY( entry.child, 0.0, allocation, 1.0 )
+				self._o_allocateChildY( entry.child, 0.0, allocation )
 
 
 	def _o_onChildResizeRequest(self, child):
@@ -307,7 +307,6 @@ if __name__ == '__main__':
 
 
 	from Britefury.DocView.Toolkit.DTLabel import DTLabel
-	from Britefury.DocView.Toolkit.DTFont import DTFont
 	from Britefury.DocView.Toolkit.DTDocument import DTDocument
 	import cairo
 	from Britefury.Math.Math import Colour3f
@@ -323,8 +322,7 @@ if __name__ == '__main__':
 		label1.text = 'Something else'
 
 	def onChangeFont(widget, data=None):
-		label1.font.weight = cairo.FONT_WEIGHT_BOLD
-		label1.font.size = 20.0
+		label1.font = 'Sans bold 20'
 
 	def onChangeColour(widget, data=None):
 		label1.colour = Colour3f( 1.0, 0.0, 0.0 )
@@ -361,7 +359,7 @@ if __name__ == '__main__':
 	label2 = MyLabel( 'Hello world 2' )
 	label3 = MyLabel( 'Hello world 3' )
 	label4 = MyLabel( 'Hello world 4' )
-	label4.font.size = 30.0
+	label4.font = 'Sans 30'
 
 	hbox = DTBox( DTDirection.LEFT_TO_RIGHT )
 	hbox.append( label1, True )

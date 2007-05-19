@@ -16,6 +16,7 @@ class DTBin (DTContainer):
 
 		self._child = None
 		self._childRequisition = Vector2()
+		self._childScale = 1.0
 
 
 
@@ -39,6 +40,14 @@ class DTBin (DTContainer):
 			self._o_queueResize()
 
 
+	def getChildScale(self):
+		return self._childScale
+
+	def setChildScale(self, childScale):
+		self._childScale = childScale
+		self._o_queueResize()
+
+
 	def _f_removeChild(self, child):
 		assert child is self._child, 'cannot remove child'
 		self.setChild( None )
@@ -56,17 +65,22 @@ class DTBin (DTContainer):
 
 
 	def _o_onAllocateX(self, allocation):
-		self._o_allocateChildX( self._child, 0.0, allocation, 1.0 )
+		self._o_allocateChildX( self._child, 0.0, allocation )
 
 	def _o_onAllocateY(self, allocation):
-		self._o_allocateChildY( self._child, 0.0, allocation, 1.0 )
+		self._o_allocateChildY( self._child, 0.0, allocation )
 
 
 	def _o_onChildResizeRequest(self, child):
 		self._o_queueResize()
 
 
+	def _f_refreshScale(self, scale, rootScale):
+		self._child._f_setScale( self._childScale, rootScale * self._childScale )
+
+
 
 
 	child = property( getChild, setChild )
+	childScale = property( getChildScale, setChildScale )
 

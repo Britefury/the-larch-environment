@@ -162,7 +162,7 @@ class DTWrappedLine (DTContainer):
 					# Terminate current line
 					self._lineLengths.append( lineLength )
 					# Put this child on a new line
-					self._o_allocateChildX( entry.child, 0.0, childWidth, 1.0 )
+					self._o_allocateChildX( entry.child, 0.0, childWidth )
 					x = childWidth + self._spacing
 					# Continue on this line: length of this line is 1
 					lineLength = 1
@@ -172,13 +172,13 @@ class DTWrappedLine (DTContainer):
 					# This line has 1 child
 					self._lineLengths.append( 1 )
 					# Put it at x=0
-					self._o_allocateChildX( entry.child, 0.0, childWidth, 1.0 )
+					self._o_allocateChildX( entry.child, 0.0, childWidth )
 					# Start a new line
 					lineLength = 0
 					x = 0.0
 			else:
 				# Continue existing line
-				self._o_allocateChildX( entry.child, x, childWidth, 1.0 )
+				self._o_allocateChildX( entry.child, x, childWidth )
 				lineLength += 1
 				x += childWidth + self._spacing
 
@@ -192,7 +192,7 @@ class DTWrappedLine (DTContainer):
 		for lineLength in self._lineLengths:
 			lineHeight = max( [ entry._reqHeight   for entry in self._childEntries[i:i+lineLength] ] )
 			for entry in self._childEntries[i:i+lineLength]:
-				self._o_allocateChildY( entry.child, y, lineHeight, 1.0 )
+				self._o_allocateChildY( entry.child, y, lineHeight )
 			i += lineLength
 			y += lineHeight
 
@@ -216,7 +216,6 @@ if __name__ == '__main__':
 
 
 	from Britefury.DocView.Toolkit.DTLabel import DTLabel
-	from Britefury.DocView.Toolkit.DTFont import DTFont
 	from Britefury.DocView.Toolkit.DTDocument import DTDocument
 	import cairo
 	from Britefury.Math.Math import Colour3f
@@ -232,8 +231,7 @@ if __name__ == '__main__':
 		label1.text = 'Something else'
 
 	def onChangeFont(widget, data=None):
-		label1.font.weight = cairo.FONT_WEIGHT_BOLD
-		label1.font.size = 20.0
+		label1.font = 'Sand bold 20'
 
 	def onChangeColour(widget, data=None):
 		label1.colour = Colour3f( 1.0, 0.0, 0.0 )

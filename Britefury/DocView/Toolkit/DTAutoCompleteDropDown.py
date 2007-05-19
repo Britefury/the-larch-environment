@@ -97,29 +97,28 @@ class DTAutoCompleteDropDown (DTPopupDocument):
 
 
 	def nextEntry(self):
-		label = self._p_getLabel( self._highlightIndex )
-		if label is not None:
-			label.disableHighlight()
-
-		self._highlightIndex += 1
-		if self._highlightIndex >= len( self._autoCompleteList ):
-			self._highlightIndex = 0
+		x = self._highlightIndex + 1
+		if x >= len( self._autoCompleteList ):
+			x = 0
+		self._p_setHighlightIndex( x )
 		self._bUserSelection = True
-
-		label = self._p_getLabel( self._highlightIndex )
-		if label is not None:
-			label.enableHighlight()
 
 
 	def prevEntry(self):
+		x = self._highlightIndex - 1
+		if x < 0:
+			x = len( self._autoCompleteList ) - 1
+		self._p_setHighlightIndex( x )
+		self._bUserSelection = True
+
+
+
+	def _p_setHighlightIndex(self, x):
 		label = self._p_getLabel( self._highlightIndex )
 		if label is not None:
 			label.disableHighlight()
 
-		self._highlightIndex -= 1
-		if self._highlightIndex < 0:
-			self._highlightIndex = len( self._autoCompleteList ) - 1
-		self._bUserSelection = True
+		self._highlightIndex = x
 
 		label = self._p_getLabel( self._highlightIndex )
 		if label is not None:
@@ -198,11 +197,20 @@ class DTAutoCompleteDropDown (DTPopupDocument):
 
 
 	def _p_onLabelClicked(self, label):
-		pass
+		try:
+			x = self._labels.index( label )
+		except ValueError:
+			pass
+		else:
+			self._p_setHighlightIndex( x )
+			text = self.getHighlightedText()
+			if text is not None:
+				self.autoCompleteSignal.emit( self, text )
 
 
 	def _p_refreshContents(self):
 		box = DTBox( direction=DTDirection.TOP_TO_BOTTOM )
+
 
 		self._labels = [ self._Label( self, text )   for text in self._autoCompleteList ]
 		box[:] = self._labels

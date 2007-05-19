@@ -9,11 +9,12 @@ import pygtk
 pygtk.require( '2.0' )
 
 import cairo
+import pango
+import pangocairo
 
 from Britefury.Math.Math import Colour3f, Vector2
 
 from Britefury.DocView.Toolkit.DTWidget import DTWidget
-from Britefury.DocView.Toolkit.DTFont import DTFont
 
 
 
@@ -31,18 +32,19 @@ class DTLabel (DTWidget):
 		super( DTLabel, self ).__init__()
 
 		if font is None:
-			font = DTFont()
+			font = 'Sans 11'
 
 		self._text = text
-		self._font = font
-		self._font.changedSignal.connect( self._p_onFontChanged )
+		self._fontString = font
+		self._fontDescription = pango.FontDescription( font )
+		self._font = None
+		self._layout = None
+		self._bLayoutNeedsRefresh = True
 		self._colour = colour
 		self._hAlign = hAlign
 		self._vAlign = vAlign
 		self._textPosition = Vector2()
 		self._textSize = Vector2()
-		self._textBearing = Vector2()
-		self._textAscent = 0.0
 
 		self._o_queueResize()
 
@@ -50,6 +52,7 @@ class DTLabel (DTWidget):
 
 	def setText(self, text):
 		self._text = text
+		self._bLayoutNeedsRefresh = True
 		self._o_queueResize()
 
 	def getText(self):
@@ -57,15 +60,13 @@ class DTLabel (DTWidget):
 
 
 	def setFont(self, font):
-		if self._font is not None:
-			self._font.changedSignal.disconnect( self._p_onFontChanged )
-		self._font = font
-		if self._font is not None:
-			self._font.changedSignal.connect( self._p_onFontChanged )
+		self._fontString = font
+		self._fontDescription = pango.FontDescription( font )
+		self._font = None
 		self._o_queueResize()
 
 	def getFont(self):
-		return self._font
+		return self._fontString
 
 
 	def setColour(self, colour):
@@ -97,23 +98,51 @@ class DTLabel (DTWidget):
 
 
 
+	def _p_refreshFont(self):
+		if self._font is None:
+			fontMap = pangocairo.cairo_font_map_get_default()
+			self._font = fontMap.load_font( self._pangoContext, self._fontDescription )
+
+
+	def _p_refreshLayout(self):
+		self._p_refreshFont()
+		if self._bLayoutNeedsRefresh  and  self._layout is not None:
+			self._layout.set_markup( self._text )
+			self._bLayoutNeedsRefresh = False
+
+
+	def _o_onRealise(self, context, pangoContext):
+		super( DTLabel, self )._o_onRealise( context, pangoContext )
+		self._layout = self._realiseContext.create_layout()
+		self._layout.set_font_description( self._fontDescription )
+		self._p_refreshFont()
 
 
 
 	def _o_draw(self, context):
 		super( DTLabel, self )._o_draw( context )
-		self._font.select( context )
+		self._p_refreshLayout()
 		context.set_source_rgb( self._colour.r, self._colour.g, self._colour.b )
 		context.move_to( self._textPosition.x, self._textPosition.y )
-		self._font.showText( context, self._text )
+		context.update_layout( self._layout )
+		context.show_layout( self._layout )
+
+
+	def _o_onSetScale(self, scale, rootScale):
+		context = self._realiseContext
+		context.save()
+		context.scale( rootScale, rootScale )
+		context.update_layout( self._layout )
+		context.restore()
+
 
 	def _o_getRequiredWidth(self):
-		self._font.select( self._realiseContext )
-		return self._font.getTextSpace( self._realiseContext, self._text ).x + 2
+		self._p_refreshLayout()
+		return self._layout.get_pixel_size()[0]  +  2.0
 
 	def _o_getRequiredHeight(self):
-		self._font.select( self._realiseContext )
-		return self._font.getFontSpace( self._realiseContext ) + 2
+		self._p_refreshLayout()
+		return self._layout.get_pixel_size()[1]  +  2.0
 
 
 	def _o_onAllocateX(self, allocation):
@@ -121,10 +150,10 @@ class DTLabel (DTWidget):
 
 	def _o_onAllocateY(self, allocation):
 		super( DTLabel, self )._o_onAllocateY( allocation )
-		self._font.select( self._realiseContext )
-		self._textBearing, self._textSize, advance = self._font.getTextExtents( self._realiseContext, self._text )
-		self._textAscent, descent, height, maxAdvance = self._font.getFontExtents( self._realiseContext )
-		self._textSize.y = height
+		self._p_refreshLayout()
+
+		self._textSize = Vector2( *self._layout.get_pixel_size() )
+
 		self._o_refreshTextPosition()
 
 
@@ -143,7 +172,7 @@ class DTLabel (DTWidget):
 		elif self._vAlign == self.VALIGN_BOTTOM:
 			y = self._allocation.y - self._textSize.y
 
-		self._textPosition = Vector2( x, y )  +  Vector2( -self._textBearing.x + 1.0, self._textAscent + 1.0 )
+		self._textPosition = Vector2( x, y )  +  Vector2( 1.0, 1.0 )
 
 
 	def _p_onFontChanged(self):

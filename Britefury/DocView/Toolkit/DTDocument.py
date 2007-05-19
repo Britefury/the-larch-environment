@@ -29,6 +29,12 @@ class DTDocument (gtk.DrawingArea, DTBin):
 		gtk.DrawingArea.__init__( self )
 		DTBin.__init__( self )
 
+
+		self._docOffset = Vector2()
+		self._docScale = 1.0
+		self._docDragStartPos = Point2()
+		self._docDragButton = None
+
 		self._documentSize = Vector2()
 		self._bAllocationRequired = False
 		self._keyboardFocusChild = None
@@ -85,12 +91,19 @@ class DTDocument (gtk.DrawingArea, DTBin):
 
 	def _p_performAllocation(self):
 		if self._bAllocationRequired:
+			self._f_setScale( self._docScale, self._docScale )
 			reqWidth = self._f_getRequisitionWidth()
-			self._f_allocateX( self._documentSize.x )
+			self._f_allocateX( self._documentSize.x * self._docScale )
 			reqHeight = self._f_getRequisitionHeight()
-			self._f_allocateY( self._documentSize.y )
+			self._f_allocateY( self._documentSize.y * self._docScale )
 			self._bAllocationRequired = False
 
+
+	def _o_onAllocateX(self, allocation):
+		self._o_allocateChildX( self._child, self._docOffset.x, allocation )
+
+	def _o_onAllocateY(self, allocation):
+		self._o_allocateChildY( self._child, self._docOffset.y, allocation )
 
 
 
@@ -140,17 +153,26 @@ class DTDocument (gtk.DrawingArea, DTBin):
 		self.grab_focus()
 		x, y, state = event.x, event.y, event.state
 		localPos = Point2( x, y )
-		if event.type == gtk.gdk.BUTTON_PRESS:
-			self._f_evButtonDown( localPos, event.button, state )
-		elif event.type == gtk.gdk._2BUTTON_PRESS:
-			self._f_evButtonDown2( localPos, event.button, state )
-		elif event.type == gtk.gdk._3BUTTON_PRESS:
-			self._f_evButtonDown3( localPos, event.button, state )
+		if event.state & gtk.gdk.MOD1_MASK  ==  0:
+			if event.type == gtk.gdk.BUTTON_PRESS:
+				self._f_evButtonDown( localPos, event.button, state )
+			elif event.type == gtk.gdk._2BUTTON_PRESS:
+				self._f_evButtonDown2( localPos, event.button, state )
+			elif event.type == gtk.gdk._3BUTTON_PRESS:
+				self._f_evButtonDown3( localPos, event.button, state )
+		else:
+			if self._docDragButton is None:
+				self._docDragButton = event.button
+				self._docDragStartPos = localPos
 
 	def _p_buttonReleaseEvent(self, widget, event):
 		x, y, state = event.x, event.y, event.state
 		localPos = Point2( x, y )
-		self._f_evButtonUp( localPos, event.button, state )
+		if self._docDragButton is None:
+			self._f_evButtonUp( localPos, event.button, state )
+		else:
+			self._docDragButton = None
+
 
 
 	def _p_motionNotifyEvent(self, widget, event):
@@ -159,19 +181,39 @@ class DTDocument (gtk.DrawingArea, DTBin):
 		else:
 			x, y, state = event.x, event.y, event.state
 		localPos = Point2( x, y )
-		self._f_evMotion( localPos )
+
+		if self._docDragButton is None:
+			self._f_evMotion( localPos )
+		else:
+			delta = localPos - self._docDragStartPos
+			bModified = False
+			if self._docDragButton == 1  or  self._docDragButton == 2:
+				delta *= 1.0 / self._docScale
+				self._docOffset += delta
+				bModified = True
+			elif self._docDragButton == 3:
+				scaleDeltaPixels = delta.x + delta.y
+				scaleDelta = 2.0  **  ( scaleDeltaPixels / 200.0 )
+				self._docScale *= scaleDelta
+				self.childScale = self._docScale
+				bModified = True
+			self._docDragStartPos = localPos
+			if bModified:
+				self._o_queueResize()
 
 
 	def _p_enterNotifyEvent(self, widget, event):
 		x, y, state = event.window.get_pointer()
 		localPos = Point2( x, y )
-		self._f_evEnter( localPos )
+		if self._docDragButton is None:
+			self._f_evEnter( localPos )
 
 
 	def _p_leaveNotifyEvent(self, widget, event):
 		x, y, state = event.window.get_pointer()
 		localPos = Point2( x, y )
-		self._f_evLeave( localPos )
+		if self._docDragButton is None:
+			self._f_evLeave( localPos )
 
 
 	def _p_scrollEvent(self, widget, event):
@@ -199,7 +241,8 @@ class DTDocument (gtk.DrawingArea, DTBin):
 
 	def _p_realiseEvent(self, widget):
 		context = widget.window.cairo_create()
-		self._f_evRealise( context )
+		pangoContext = widget.get_pango_context()
+		self._f_evRealise( context, pangoContext )
 
 	def _p_unrealiseEvent(self, widget):
 		self._f_evUnrealise()
@@ -215,7 +258,6 @@ class DTDocument (gtk.DrawingArea, DTBin):
 
 if __name__ == '__main__':
 	from Britefury.DocView.Toolkit.DTLabel import DTLabel
-	from Britefury.DocView.Toolkit.DTFont import DTFont
 	import cairo
 	from Britefury.Math.Math import Colour3f
 	import traceback
@@ -230,8 +272,7 @@ if __name__ == '__main__':
 		label.text = 'Something else'
 
 	def onChangeFont(widget, data=None):
-		label.font.weight = cairo.FONT_WEIGHT_BOLD
-		label.font.size = 20.0
+		label.font = 'Sans bold 20'
 
 	def onChangeColour(widget, data=None):
 		label.colour = Colour3f( 1.0, 0.0, 0.0 )

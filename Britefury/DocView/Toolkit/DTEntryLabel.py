@@ -168,7 +168,6 @@ if __name__ == '__main__':
 	import cairo
 
 	from Britefury.DocView.Toolkit.DTDocument import DTDocument
-	from Britefury.DocView.Toolkit.DTFont import DTFont
 	from Britefury.Math.Math import Colour3f
 	import traceback
 
