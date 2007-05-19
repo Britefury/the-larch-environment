@@ -644,7 +644,7 @@ class FieldProxy (FieldBase):
 
 	def _f_setLiteralValueInInstance(self, instance, value):
 		"""Set the literal value of the cell proxy managed by @self in @instance"""
-		getattr( instance, self._cellAttrName ).setValue( value )
+		getattr( instance, self._cellAttrName ).setLiteralValue( value )
 
 
 	def _f_copyFrom(self, instance, srcInstance):
@@ -722,7 +722,7 @@ class FieldSecondOrderProxy (FieldBase):
 
 	def _f_setLiteralValueInInstance(self, instance, value):
 		"""Set the literal value of the cell proxy managed by @self in @instance"""
-		getattr( instance, self._cellAttrName ).setValue( value )
+		getattr( instance, self._cellAttrName ).setLiteralValue( value )
 
 
 	def _f_copyFrom(self, instance, srcInstance):

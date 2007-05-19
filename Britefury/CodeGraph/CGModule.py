@@ -63,3 +63,18 @@ class CGModule (CGNode):
 		for statementSource in self.statements:
 			llctStatements += self.generateStatementLLCT( statementSource.node, moduleTag, tree )
 		return LLCTBlock( self.name, llctStatements )
+
+
+
+	def getReferenceableNodeByName(self, targetName, sourceNode=None):
+		if sourceNode is not None:
+			n = self.statements.index( sourceNode.parent )
+			nodeTable = {}
+			for statementSource in self.statements[:n]:
+				statementSource.node.buildReferenceableNodeTable( nodeTable )
+			try:
+				return nodeTable[targetName]
+			except KeyError:
+				return None
+		else:
+			return None

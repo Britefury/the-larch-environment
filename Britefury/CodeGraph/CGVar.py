@@ -6,10 +6,12 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
 from Britefury.VirtualMachine.VMTag import VMTag
-from Britefury.CodeGraph.CGNode import CGNode
+
 from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
+from Britefury.CodeGraph.CGNode import CGNode
+from Britefury.CodeGraph.CGLocalRef import CGLocalRef
 
 
 class CGVar (CGNode):
@@ -24,3 +26,10 @@ class CGVar (CGNode):
 			tag = VMTag( 'Variable', self.name )
 			tree[self] = tag
 			return tag
+
+
+
+	def createRefNode(self):
+		refNode = CGLocalRef()
+		refNode.variable.append( self.references )
+		return refNode

@@ -23,3 +23,8 @@ class CGLocalVarDeclaration (CGStatement):
 			return LLCTBindExp( self.variable[0].node.generateLLCT( tree ), self.value[0].node.generateLLCT( tree ) )
 		else:
 			return LLCTBindExp( self.variable[0].node.generateLLCT( tree ), None )
+
+
+	def buildReferenceableNodeTable(self, nodeTable):
+		nodeTable[self.variable[0].node.name] = self.variable[0].node
+

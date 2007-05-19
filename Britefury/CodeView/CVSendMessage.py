@@ -44,10 +44,10 @@ class CVSendMessage (CVBorderNode):
 
 	@FunctionRefField
 	def messageNameWidget(self):
-		entry =DVCStringCellEditEntryLabel()
-		entry.keyHandler = self
-		entry.attachCell( self.treeNode.cells.messageName )
-		return entry.entry
+		self._messageNameEntry =DVCStringCellEditEntryLabel()
+		self._messageNameEntry.keyHandler = self
+		self._messageNameEntry.attachCell( self.treeNode.cells.messageName )
+		return self._messageNameEntry.entry
 
 
 
@@ -97,6 +97,8 @@ class CVSendMessage (CVBorderNode):
 		self._box.append( DTLabel( 'nil' ) )
 		self._box.append( DTLabel( 'nil' ) )
 		self.widget.child = self._box
+		self._messageNameEntry = None
 
 
-
+	def startEditingMessageName(self):
+		self._messageNameEntry.startEditing()

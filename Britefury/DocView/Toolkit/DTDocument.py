@@ -132,6 +132,11 @@ class DTDocument (gtk.DrawingArea, DTBin):
 			self._keyboardFocusChild = None
 
 
+	def removeFocusGrab(self):
+		if self._keyboardFocusChild is not None:
+			self._keyboardFocusChild.ungrabFocus()
+
+
 
 
 

@@ -18,9 +18,19 @@ class CodeView (object):
 
 		self._nodeTable = WeakKeyDictionary()
 		self._tree = tree
+		self._document = None
 
 		self.refreshCell = Cell()
 		self.refreshCell.function = self._p_refresh
+
+
+
+	def setDocument(self, document):
+		self._document = document
+
+
+	def documentUngrab(self):
+		self._document.removeFocusGrab()
 
 
 

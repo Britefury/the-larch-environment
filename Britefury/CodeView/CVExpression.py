@@ -30,6 +30,6 @@ class CVExpression (CVBorderNode):
 		sendCVT = self.treeNode.wrapInSendMessage()
 		self._view.refresh()
 		sendCV = self._view.getViewNodeForTreeNode( sendCVT )
-		sendCV.messageNameWidget.startEditing()
+		sendCV.startEditingMessageName()
 		return True
 
