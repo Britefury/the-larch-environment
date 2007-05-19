@@ -29,3 +29,19 @@ class CGBlock (CGNode):
 		else:
 			expandParamName = None
 		return LLCTBlock( self.name, llctStatements, paramNames, expandParamName )
+
+
+
+	def getReferenceableNodeByName(self, targetName, sourceNode=None):
+		if sourceNode is not None:
+			n = self.statements.index( sourceNode.parent[0] )
+			nodeTable = {}
+			for statementSource in self.statements[:n]:
+				statementSource.node.buildReferenceableNodeTable( nodeTable )
+			try:
+				return nodeTable[targetName]
+			except KeyError:
+				pass
+
+		return self.parent[0].node.getReferenceableNodeByName( targetName, self )
+

@@ -154,6 +154,8 @@ if __name__ == '__main__':
 
 	doc.child = viewNode.widget
 
+	view.setDocument( doc )
+
 
 	oneToOneButton = gtk.Button( '1:1' )
 	oneToOneButton.show()

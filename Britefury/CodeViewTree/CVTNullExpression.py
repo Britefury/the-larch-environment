@@ -10,6 +10,7 @@ from Britefury.SheetGraph.SheetGraph import *
 
 from Britefury.CodeGraph.CGNullExpression import CGNullExpression
 from Britefury.CodeGraph.CGStringLiteral import CGStringLiteral
+from Britefury.CodeGraph.CGUnboundRef import CGUnboundRef
 
 from Britefury.CodeViewTree.CVTNode import CVTNode
 
@@ -28,4 +29,13 @@ class CVTNullExpression (CVTNode):
 		strLit = CGStringLiteral()
 		parentCGSink[n] = strLit.parent
 		return self._tree.buildNode( strLit )
+
+
+
+	def replaceWithUnboundRef(self):
+		parentCGSink = self.graphNode.parent[0]
+		n = parentCGSink.index( self.graphNode.parent )
+		ref = CGUnboundRef()
+		parentCGSink[n] = ref.parent
+		return self._tree.buildNode( ref )
 

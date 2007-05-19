@@ -5,19 +5,16 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
-import CodeViewTree
-import CVTExpression
-import CVTNullExpression
-import CVTBlockStatements
-import CVTBlockParameters
-import CVTClosure
-import CVTLocalAssignment
-import CVTLocalRef
-import CVTLocalVarDeclaration
-import CVTModule
-import CVTReturn
-import CVTSendMessage
-import CVTMessageArguments
-import CVTStringLiteral
-import CVTUnboundRef
-import CVTVar
+from Britefury.CodeGraph.CGExpression import CGExpression
+from Britefury.Sheet.Sheet import *
+from Britefury.SheetGraph.SheetGraph import *
+from Britefury.LowLevelCodeTree.LLCTLoadLocalExp import LLCTLoadLocalExp
+
+
+
+class CGUnboundRef (CGExpression):
+	targetName = Field( str, '' )
+
+
+	def generateLLCT(self, tree):
+		raise TypeError, 'cannot generate LLCT node for unbound reference'

@@ -13,3 +13,11 @@ from Britefury.CodeGraph.CGNode import CGNode
 
 class CGStatement (CGNode):
 	parent = SheetGraphSourceField( 'Parent node', 'Parent node' )
+
+
+	def getReferenceableNodeByName(self, targetName, sourceNode=None):
+		return self.parent[0].node.getReferenceableNodeByName( targetName, self )
+
+
+	def buildReferenceableNodeTable(self, nodeTable):
+		pass

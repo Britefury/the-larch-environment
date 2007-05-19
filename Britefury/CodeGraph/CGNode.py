@@ -10,4 +10,5 @@ from Britefury.SheetGraph.SheetGraph import *
 
 
 class CGNode (SheetGraphNode):
-	pass
+	def getReferenceableNodeByName(self, targetName, sourceNode=None):
+		return None

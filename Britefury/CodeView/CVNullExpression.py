@@ -9,6 +9,8 @@ import pygtk
 pygtk.require( '2.0' )
 import gtk
 
+import string
+
 
 from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
@@ -43,6 +45,16 @@ class CVNullExpression (CVNode):
 		self._view.refresh()
 		strLitCV = self._view.getViewNodeForTreeNode( strLitCVT )
 		strLitCV.stringValueWidget.startEditing()
+		return True
+
+
+	@CVCharInputHandlerMethod( string.ascii_letters )
+	def _replaceWithRef(self, receivingNodePath, entry, event):
+		unboundRefCVT = self.treeNode.replaceWithUnboundRef()
+		unboundRefCVT.targetName = event.keyString
+		self._view.refresh()
+		unboundRefCV = self._view.getViewNodeForTreeNode( unboundRefCVT )
+		unboundRefCV.startEditing()
 		return True
 
 

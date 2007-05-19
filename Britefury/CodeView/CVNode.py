@@ -227,3 +227,8 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 
 	def _f_handleKeyPress(self, entry, keyPressEvent):
 		return self._o_handleKeyPress( (), entry, keyPressEvent)
+
+
+	def makeCurrent(self):
+		self.widget.grabFocus()
+

@@ -10,6 +10,8 @@ pygtk.require( '2.0' )
 import gtk
 
 
+from Britefury.Util.SignalSlot import *
+
 from Britefury.DocView.Toolkit.DTEntryLabel import DTEntryLabel
 from Britefury.DocView.CellEdit.DVCBasicWidgetSingleCellEdit import DVCBasicWidgetSingleCellEdit
 
@@ -17,6 +19,7 @@ from Britefury.DocView.CellEdit.DVCBasicWidgetSingleCellEdit import DVCBasicWidg
 
 class DVCStringCellEditEntryLabel (DVCBasicWidgetSingleCellEdit):
 	"""String cell editor"""
+	finishSignal = ClassSignal()
 
 
 	__valueclass__ = str
@@ -49,6 +52,7 @@ class DVCStringCellEditEntryLabel (DVCBasicWidgetSingleCellEdit):
 			self._o_blockCell( text )
 			self._cell.literalValue = text
 			self._o_unblockCell()
+			self.finishSignal.emit( self, text )
 
 
 
