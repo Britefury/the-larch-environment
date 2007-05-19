@@ -28,17 +28,20 @@ class DTLabel (DTWidget):
 	VALIGN_RIGHT = 2
 
 
-	def __init__(self, text='', font=None, colour=Colour3f( 0.0, 0.0, 0.0), hAlign=HALIGN_CENTRE, vAlign=VALIGN_CENTRE):
+	def __init__(self, text='', markup=None, font=None, colour=Colour3f( 0.0, 0.0, 0.0), hAlign=HALIGN_CENTRE, vAlign=VALIGN_CENTRE):
 		super( DTLabel, self ).__init__()
 
 		if font is None:
 			font = 'Sans 11'
 
 		self._text = text
+		self._markup = markup
+
 		self._fontString = font
 		self._fontDescription = pango.FontDescription( font )
-		self._font = None
 		self._layout = None
+		self._layoutContext = None
+
 		self._bLayoutNeedsRefresh = True
 		self._colour = colour
 		self._hAlign = hAlign
@@ -57,6 +60,16 @@ class DTLabel (DTWidget):
 
 	def getText(self):
 		return self._text
+
+
+	def setMarkup(self, markup):
+		self._markup = markup
+		self._text = markup
+		self._bLayoutNeedsRefresh = True
+		self._o_queueResize()
+
+	def getMarkup(self):
+		return self._markup
 
 
 	def setFont(self, font):
@@ -98,24 +111,23 @@ class DTLabel (DTWidget):
 
 
 
-	def _p_refreshFont(self):
-		if self._font is None:
-			fontMap = pangocairo.cairo_font_map_get_default()
-			self._font = fontMap.load_font( self._pangoContext, self._fontDescription )
-
-
 	def _p_refreshLayout(self):
-		self._p_refreshFont()
 		if self._bLayoutNeedsRefresh  and  self._layout is not None:
-			self._layout.set_markup( self._text )
+			self._layout.set_font_description( self._fontDescription )
+			if self._markup is not None:
+				self._layout.set_markup( self._markup )
+			else:
+				self._layout.set_text( self._text )
 			self._bLayoutNeedsRefresh = False
 
 
 	def _o_onRealise(self, context, pangoContext):
 		super( DTLabel, self )._o_onRealise( context, pangoContext )
-		self._layout = self._realiseContext.create_layout()
-		self._layout.set_font_description( self._fontDescription )
-		self._p_refreshFont()
+		if context is not self._layoutContext:
+			self._layoutContext = context
+			self._layout = context.create_layout()
+			self._layout.set_font_description( self._fontDescription )
+			self._bLayoutNeedsRefresh = True
 
 
 
@@ -144,9 +156,6 @@ class DTLabel (DTWidget):
 		self._p_refreshLayout()
 		return self._layout.get_pixel_size()[1]  +  2.0
 
-
-	def _o_onAllocateX(self, allocation):
-		super( DTLabel, self )._o_onAllocateX( allocation )
 
 	def _o_onAllocateY(self, allocation):
 		super( DTLabel, self )._o_onAllocateY( allocation )
@@ -181,6 +190,7 @@ class DTLabel (DTWidget):
 
 
 	text = property( getText, setText )
+	markup = property( getMarkup, setMarkup )
 	font = property( getFont, setFont )
 	colour = property( getColour, setColour )
 	hAlign = property( getHAlign, setHAlign )
