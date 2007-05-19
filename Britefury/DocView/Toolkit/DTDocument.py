@@ -75,6 +75,11 @@ class DTDocument (gtk.DrawingArea, DTBin):
 		return self
 
 
+	def oneToOne(self):
+		self._docScale = 1.0
+		self.childScale = self._docScale
+
+
 	def _o_queueRedraw(self, localPos, localSize):
 		self._p_invalidateRect( localPos, localSize )
 
@@ -188,13 +193,21 @@ class DTDocument (gtk.DrawingArea, DTBin):
 			delta = localPos - self._docDragStartPos
 			bModified = False
 			if self._docDragButton == 1  or  self._docDragButton == 2:
-				delta *= 1.0 / self._docScale
 				self._docOffset += delta
 				bModified = True
 			elif self._docDragButton == 3:
 				scaleDeltaPixels = delta.x + delta.y
 				scaleDelta = 2.0  **  ( scaleDeltaPixels / 200.0 )
+
+				# We want to scale about the centre of the document, not the top left corner
+				centre = self._documentSize * 0.5
+				centreInDocSpace = ( centre - self._docOffset )  *  ( 1.0 / self._docScale )
 				self._docScale *= scaleDelta
+				newCentreInDocSpace = ( centre - self._docOffset )  *  ( 1.0 / self._docScale )
+
+				self._docOffset += ( newCentreInDocSpace - centreInDocSpace ) * self._docScale
+
+
 				self.childScale = self._docScale
 				bModified = True
 			self._docDragStartPos = localPos

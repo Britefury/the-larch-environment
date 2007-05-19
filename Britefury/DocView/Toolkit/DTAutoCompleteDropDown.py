@@ -29,8 +29,8 @@ class DTAutoCompleteDropDown (DTPopupDocument):
 
 
 	class _Label (DTLabel):
-		def __init__(self, autoComplete, text, font=None, textColour=Colour3f( 0.0, 0.0, 0.0 ), highlightedTextColour=Colour3f( 1.0, 1.0, 1.0), highlightColour=Colour3f( 0.0, 0.0, 0.5 )):
-			super( DTAutoCompleteDropDown._Label, self ).__init__( text, font, textColour, hAlign=DTLabel.HALIGN_LEFT )
+		def __init__(self, autoComplete, text, markup=None, font=None, textColour=Colour3f( 0.0, 0.0, 0.0 ), highlightedTextColour=Colour3f( 1.0, 1.0, 1.0), highlightColour=Colour3f( 0.0, 0.0, 0.5 )):
+			super( DTAutoCompleteDropDown._Label, self ).__init__( text, markup, font, textColour, hAlign=DTLabel.HALIGN_LEFT )
 			self._autoComplete = autoComplete
 			self._textColour = textColour
 			self._highlightedTextColour = highlightedTextColour

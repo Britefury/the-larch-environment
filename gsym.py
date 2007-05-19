@@ -128,6 +128,10 @@ if __name__ == '__main__':
 
 
 
+	def oneToOne(widget):
+		doc.oneToOne()
+
+
 	view.refresh()
 
 
@@ -151,6 +155,11 @@ if __name__ == '__main__':
 	doc.child = viewNode.widget
 
 
+	oneToOneButton = gtk.Button( '1:1' )
+	oneToOneButton.show()
+	oneToOneButton.connect( 'clicked', oneToOne )
+
+
 	executeButton = gtk.Button( 'Execute' )
 	executeButton.show()
 	executeButton.connect( 'clicked', executeCode )
@@ -164,6 +173,7 @@ if __name__ == '__main__':
 	buttonBox = gtk.HBox( spacing=20 )
 	buttonBox.pack_end( executeDebugButton, False, False, 0 )
 	buttonBox.pack_end( executeButton, False, False, 0 )
+	buttonBox.pack_end( oneToOneButton, False, False, 0 )
 	buttonBox.show()
 
 

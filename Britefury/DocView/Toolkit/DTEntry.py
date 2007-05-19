@@ -10,13 +10,14 @@ pygtk.require( '2.0' )
 import gtk
 
 import cairo
+import pango
+import pangocairo
 
 from Britefury.Math.Math import Colour3f, Vector2, Point2
 
 from Britefury.Util.SignalSlot import *
 
 from Britefury.DocView.Toolkit.DTWidget import DTWidget
-from Britefury.DocView.Toolkit.DTFont import DTFont
 from Britefury.DocView.Toolkit.DTAutoCompleteDropDown import DTAutoCompleteDropDown
 
 
@@ -31,14 +32,25 @@ class DTEntry (DTWidget):
 		super( DTEntry, self ).__init__()
 
 		if font is None:
-			font = DTFont()
+			font = 'Sans 11'
 
 		self.keyHandler = None
 		self.allowableCharacters = None
 		self.bEditable = True
 		self._text = text
-		self._font = font
-		self._font.changedSignal.connect( self._p_onFontChanged )
+
+		self._fontString = font
+		self._fontDescription = pango.FontDescription( font )
+
+		self._layout = None
+		self._preSelectionLayout = None
+		self._selectionLayout = None
+		self._postSelectionLayout = None
+		self._layoutContext = None
+
+		self._bLayoutNeedsRefresh = True
+		self._bSelectionLayoutsNeedRefresh = True
+
 		self._borderWidth = borderWidth
 		self._backgroundColour = backgroundColour
 		self._highlightedBackgroundColour = highlightedBackgroundColour
@@ -68,9 +80,9 @@ class DTEntry (DTWidget):
 	def setText(self, text):
 		if text != self._text:
 			self._text = text
-			self._textSize = None
 			if self._bHasFocus:
 				self._cursorLocation = len( self._text )
+			self._p_textChanged()
 			self._o_queueResize()
 
 	def getText(self):
@@ -78,16 +90,15 @@ class DTEntry (DTWidget):
 
 
 	def setFont(self, font):
-		if self._font is not None:
-			self._font.changedSignal.disconnect( self._p_onFontChanged )
-		self._font = font
-		if self._font is not None:
-			self._font.changedSignal.connect( self._p_onFontChanged )
+		self._fontString = font
+		self._fontDescription = pango.FontDescription( font )
 		self._textSize = None
+		self._bLayoutNeedsRefresh = True
 		self._o_queueResize()
 
 	def getFont(self):
-		return self._font
+		return self._fontString
+
 
 
 	def setBorderWidth(self, width):
@@ -159,27 +170,14 @@ class DTEntry (DTWidget):
 
 
 
-	def _p_computeTextSize(self):
-		self._font.select( self._realiseContext )
-		x = self._font.getTextSpace( self._realiseContext, self._text ).x + 2.0
-		y = self._font.getFontSpace( self._realiseContext ) + 2.0
-		self._textSize = Vector2( x + y * 3.0,  y )
-		self._entrySize = self._textSize  +  Vector2( self._borderWidth * 2.0, self._borderWidth * 2.0 )
-		self._o_queueResize()
-
-
-	def _p_refreshTextSize(self):
-		if self._textSize is None:
-			self._p_computeTextSize()
-
-
 	def _p_onTextModified(self):
+		self._bLayoutNeedsRefresh = True
+		self._bSelectionLayoutsNeedRefresh = True
 		if self._textSize is None:
 			self._p_computeTextSize()
 		else:
-			self._font.select( self._realiseContext )
-			x = self._font.getTextSpace( self._realiseContext, self._text ).x + 2.0
-			y = self._font.getFontSpace( self._realiseContext ) + 2.0
+			self._p_refreshLayout()
+			x, y = self._layout.get_pixel_size()
 			bufferZoneWidth = y * 3.0
 			if x > self._textSize.x  or  x < ( self._textSize.x - ( bufferZoneWidth * 2.0 ) ):
 				self._textSize = Vector2( x + bufferZoneWidth,  y )
@@ -195,16 +193,19 @@ class DTEntry (DTWidget):
 		if bDragSelection:
 			# Extend the selection
 			if self._selectionBounds is None:
-				self._selectionBounds = self._cursorLocation, location
+				bounds = self._cursorLocation, location
 			else:
 				first, second = self._selectionBounds
 				if first != location:
-					self._selectionBounds = first, location
+					bounds = first, location
 				else:
-					self._selectionBounds = None
+					bounds = None
 		else:
 			# Clear the selection
-			self._selectionBounds = None
+			bounds = None
+
+		self._p_setSelectionBounds( bounds )
+
 		self._cursorLocation = location
 		self._o_queueFullRedraw()
 
@@ -216,18 +217,18 @@ class DTEntry (DTWidget):
 		self._text = self._text[:start] + self._text[end:]
 		self._cursorLocation = start
 		self.textDeletedSignal.emit( self, start, end, textDeleted )
-		self._selectionBounds = None
+		self._p_setSelectionBounds( None )
 
 
 
 	def _p_textPosToTextLocation(self, textX):
 		lowerX = 0.0
-		upperX = self._font.getTextSpace( self._realiseContext, self._text ).x
+		upperX = self._layout.index_to_pos( len( self._text ) )[0]  /  pango.SCALE
 		lowerLoc = 0
 		upperLoc = len( self._text )
 		while upperLoc  >  ( lowerLoc + 1 ):
 			midLoc = ( lowerLoc + upperLoc ) >> 1
-			midX = self._font.getTextSpace( self._realiseContext, self._text[:midLoc] ).x
+			midX = self._layout.index_to_pos( midLoc )[0]  /  pango.SCALE
 			if textX < midX:
 				upperLoc = midLoc
 				upperX = midX
@@ -257,7 +258,7 @@ class DTEntry (DTWidget):
 	def _o_onButtonDown2(self, localPos, button, state):
 		super( DTEntry, self )._o_onButtonDown2( localPos, button, state )
 		if button == 1:
-			self._selectionBounds = 0, len( self._text )
+			self._p_setSelectionBounds( ( 0, len( self._text ) ) )
 			self._cursorLocation = self._selectionBounds[1]
 			self._o_queueFullRedraw()
 		return True
@@ -280,7 +281,7 @@ class DTEntry (DTWidget):
 	def _p_onAutoComplete(self, autoComplete, text):
 		deletedText = self._text
 		self._text = text
-		self._selectionBounds = None
+		self._p_setSelectionBounds( None )
 		self.textDeletedSignal.emit( self, 0, len( deletedText ), deletedText )
 		self._cursorLocation = len( self._text )
 		self.textInsertedSignal.emit( self, 0, True, text )
@@ -361,6 +362,9 @@ class DTEntry (DTWidget):
 		super( DTEntry, self )._o_draw( context )
 		b = self._borderWidth
 
+		self._p_refreshLayout()
+
+
 		# Background
 		context.rectangle( self._entryPosition.x + b * 0.5, self._entryPosition.y + b * 0.5, self._entrySize.x - b, self._entrySize.y - b )
 
@@ -373,35 +377,44 @@ class DTEntry (DTWidget):
 		context.set_source_rgb( self._borderColour.r, self._borderColour.g, self._borderColour.b )
 		context.stroke()
 
-		# Text with selection
-		self._font.select( context )
 		if self._selectionBounds is not None  and  self._bHasFocus:
+			self._p_refreshSelectionLayouts()
+			# Text with selection
 			start = min( self._selectionBounds )
 			end = max( self._selectionBounds )
-			space = self._font.getTextSpace( self._realiseContext, self._text[:start] )
-			startX = self._textRoot.x + space.x
-			selectionSpace = self._font.getTextSpace( self._realiseContext, self._text[start:end] )
+
+			preSelSize = self._preSelectionLayout.get_pixel_size()
+			selSize = self._selectionLayout.get_pixel_size()
+
+			startX = self._textRoot.x  +  preSelSize[0]
+			selectionSpace = selSize[0]
+
 			context.set_source_rgb( self._highlightedBackgroundColour.r, self._highlightedBackgroundColour.g, self._highlightedBackgroundColour.b )
-			context.rectangle( startX, self._entryPosition.y + self._borderWidth, selectionSpace.x, self._textSize.y )
+			context.rectangle( startX, self._entryPosition.y + self._borderWidth, selectionSpace, self._textSize.y )
 			context.fill()
 
 			context.move_to( self._textPosition.x, self._textPosition.y )
 			context.set_source_rgb( self._textColour.r, self._textColour.g, self._textColour.b )
-			self._font.showText( context, self._text[:start] )
+			context.show_layout( self._preSelectionLayout )
+
+
+			context.move_to( self._textPosition.x + preSelSize[0], self._textPosition.y )
 			context.set_source_rgb( self._highlightedTextColour.r, self._highlightedTextColour.g, self._highlightedTextColour.b )
-			self._font.showText( context, self._text[start:end] )
+			context.show_layout( self._selectionLayout )
+
+			context.move_to( self._textPosition.x + preSelSize[0] + selSize[0], self._textPosition.y )
 			context.set_source_rgb( self._textColour.r, self._textColour.g, self._textColour.b )
-			self._font.showText( context, self._text[end:] )
+			context.show_layout( self._postSelectionLayout )
 		else:
 			# Text without selection
 			context.set_source_rgb( self._textColour.r, self._textColour.g, self._textColour.b )
 			context.move_to( self._textPosition.x, self._textPosition.y )
-			self._font.showText( context, self._text )
+			context.show_layout( self._layout )
 
 		# Cursor
 		if self._bHasFocus:
-			space = self._font.getTextSpace( self._realiseContext, self._text[:self._cursorLocation] )
-			cursorPositionX = self._textRoot.x + space.x
+			space = self._layout.index_to_pos( self._cursorLocation )[0]  /  pango.SCALE
+			cursorPositionX = self._textRoot.x + space
 			context.set_line_width( 1.0 )
 			context.set_source_rgb( 0.0, 0.0, 0.0 )
 			context.move_to( cursorPositionX, self._entryPosition.y + self._borderWidth )
@@ -409,12 +422,41 @@ class DTEntry (DTWidget):
 			context.stroke()
 
 
+
+
+	def _o_onRealise(self, context, pangoContext):
+		super( DTEntry, self )._o_onRealise( context, pangoContext )
+		if context is not self._layoutContext:
+			self._layoutContext = context
+			self._layout = self._realiseContext.create_layout()
+			self._preSelectionLayout = self._realiseContext.create_layout()
+			self._selectionLayout = self._realiseContext.create_layout()
+			self._postSelectionLayout = self._realiseContext.create_layout()
+			self._layout.set_font_description( self._fontDescription )
+			self._preSelectionLayout.set_font_description( self._fontDescription )
+			self._selectionLayout.set_font_description( self._fontDescription )
+			self._postSelectionLayout.set_font_description( self._fontDescription )
+			self._bLayoutNeedsRefresh = True
+			self._bSelectionLayoutsNeedRefresh = True
+
+
+	def _o_onSetScale(self, scale, rootScale):
+		context = self._realiseContext
+		context.save()
+		context.scale( rootScale, rootScale )
+		context.update_layout( self._layout )
+		context.update_layout( self._preSelectionLayout )
+		context.update_layout( self._selectionLayout )
+		context.update_layout( self._postSelectionLayout )
+		context.restore()
+
+
 	def _o_getRequiredWidth(self):
 		self._p_refreshTextSize()
 		return self._entrySize.x
 
 	def _o_getRequiredHeight(self):
-		self._font.select( self._realiseContext )
+		self._p_refreshTextSize()
 		return self._entrySize.y
 
 
@@ -425,15 +467,58 @@ class DTEntry (DTWidget):
 		super( DTEntry, self )._o_onAllocateY( allocation )
 		self._entryPosition = ( self._allocation - self._entrySize )  *  0.5
 		self._textRoot = self._entryPosition + Vector2( self._borderWidth + 1.0, self._borderWidth + 1.0 )
-		self._font.select( self._realiseContext )
-		bearing, size, advance = self._font.getTextExtents( self._realiseContext, self._text )
-		ascent, descent, height, maxAdvance = self._font.getFontExtents( self._realiseContext )
-		self._textPosition = self._textRoot  +  Vector2( -bearing.x, ascent )
+		self._textPosition = self._textRoot
 
 
-	def _p_onFontChanged(self):
+
+
+	def _p_textChanged(self):
 		self._textSize = None
+		self._bLayoutNeedsRefresh = True
+		self._bSelectionLayoutsNeedRefresh = True
+
+
+	def _p_setSelectionBounds(self, bounds):
+		self._selectionBounds = bounds
+		self._bSelectionLayoutsNeedRefresh = True
+
+
+
+	def _p_refreshLayout(self):
+		if self._bLayoutNeedsRefresh  and  self._layout is not None:
+			self._layout.set_text( self._text )
+			self._bLayoutNeedsRefresh = False
+
+
+	def _p_refreshSelectionLayouts(self):
+		if self._bSelectionLayoutsNeedRefresh  and  self._layout is not None:
+			if self._selectionBounds is None:
+				self._preSelectionLayout.set_text( self._text )
+				self._selectionLayout.set_text( '' )
+				self._postSelectionLayout.set_text( '' )
+			else:
+				start = min( self._selectionBounds )
+				end = max( self._selectionBounds )
+				self._preSelectionLayout.set_text( self._text[:start] )
+				self._selectionLayout.set_text( self._text[start:end] )
+				self._postSelectionLayout.set_text( self._text[end:] )
+			self._bSelectionLayoutsNeedRefresh = False
+
+
+
+	def _p_computeTextSize(self):
+		self._p_refreshLayout()
+		layoutSize = self._layout.get_pixel_size()
+		self._textSize = Vector2( layoutSize[0] + layoutSize[1] * 3.0  +  6.0,   layoutSize[1] + 2.0 )
+		self._entrySize = self._textSize  +  Vector2( self._borderWidth * 2.0, self._borderWidth * 2.0 )
 		self._o_queueResize()
+
+
+	def _p_refreshTextSize(self):
+		if self._textSize is None:
+			self._p_computeTextSize()
+
+
 
 
 

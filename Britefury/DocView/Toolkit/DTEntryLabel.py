@@ -26,8 +26,8 @@ class DTEntryLabel (DTBin):
 
 
 	class _Label (DTLabel):
-		def __init__(self, entryLabel, text, font=None, colour=Colour3f( 0.0, 0.0, 0.0 )):
-			super( DTEntryLabel._Label, self ).__init__( text, font, colour )
+		def __init__(self, entryLabel, text, markup=None, font=None, colour=Colour3f( 0.0, 0.0, 0.0 )):
+			super( DTEntryLabel._Label, self ).__init__( text, markup, font, colour )
 			self._entryLabel = entryLabel
 
 
@@ -64,7 +64,7 @@ class DTEntryLabel (DTBin):
 
 		self._text = text
 
-		self._label = self._Label( self, text, font, textColour )
+		self._label = self._Label( self, text, None, font, textColour )
 		self._entry = self._Entry( self, text, font, textColour=textColour )
 		self._entry.textInsertedSignal.connect( self._p_onEntryTextInserted )
 		self._entry.textDeletedSignal.connect( self._p_onEntryTextDeleted )
