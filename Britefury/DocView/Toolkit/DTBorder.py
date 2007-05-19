@@ -71,10 +71,10 @@ class DTBorder (DTBin):
 
 
 	def _o_onAllocateX(self, allocation):
-		self._o_allocateChildX( self._child, self._leftMargin, allocation - self._leftMargin - self._rightMargin, 1.0 )
+		self._o_allocateChildX( self._child, self._leftMargin, allocation - self._leftMargin - self._rightMargin )
 
 	def _o_onAllocateY(self, allocation):
-		self._o_allocateChildY( self._child, self._topMargin, allocation - self._topMargin - self._bottomMargin, 1.0 )
+		self._o_allocateChildY( self._child, self._topMargin, allocation - self._topMargin - self._bottomMargin )
 
 
 

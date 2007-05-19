@@ -17,7 +17,6 @@ from Britefury.CodeViewTree.CVTNullExpression import CVTNullExpression
 
 from Britefury.CodeView.CVNode import *
 
-from Britefury.DocView.Toolkit.DTFont import *
 from Britefury.DocView.Toolkit.DTBox import DTBox
 from Britefury.DocView.Toolkit.DTEntryLabel import DTEntryLabel
 from Britefury.DocView.Toolkit.DTDirection import DTDirection
@@ -50,7 +49,7 @@ class CVNullExpression (CVNode):
 
 	def __init__(self, treeNode, view):
 		super( CVNullExpression, self ).__init__( treeNode, view )
-		self.widget = DTEntryLabel( '<nil>', font=DTFont( slant=cairo.FONT_SLANT_ITALIC ) )
+		self.widget = DTEntryLabel( '<nil>', font='Sans italic 11' )
 		self.widget.bEditable = False
 		self.widget.keyHandler = self
 

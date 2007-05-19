@@ -79,7 +79,7 @@ class DTContainer (DTWidget):
 		child._f_setParent( self )
 
 		if self._realiseContext is not None:
-			child._f_evRealise( self._realiseContext )
+			child._f_evRealise( self._realiseContext, self._pangoContext )
 
 		return childEntry
 
@@ -122,9 +122,14 @@ class DTContainer (DTWidget):
 
 
 
-	def _o_allocateChildX(self, child, localPositionX, localWidth, scale):
-		assert isinstance( localPositionX, float )  and  isinstance( localWidth, float )  and  isinstance( scale, float )
-		childWidth = localWidth / scale
+	def _f_refreshScale(self, scale, rootScale):
+		for entry in self._childEntries:
+			entry.child._f_setScale( 1.0, rootScale )
+
+
+	def _o_allocateChildX(self, child, localPositionX, localWidth):
+		assert isinstance( localPositionX, float )  and  isinstance( localWidth, float )
+		childWidth = localWidth / child._scale
 		child._f_allocateX( childWidth )
 		entry = self._childToEntry[child]
 
@@ -133,16 +138,16 @@ class DTContainer (DTWidget):
 
 
 
-	def _o_allocateChildY(self, child, localPositionY, localHeight, scale):
-		assert isinstance( localPositionY, float )  and  isinstance( localHeight, float )  and  isinstance( scale, float )
-		childHeight = localHeight / scale
+	def _o_allocateChildY(self, child, localPositionY, localHeight):
+		assert isinstance( localPositionY, float )  and  isinstance( localHeight, float )
+		childHeight = localHeight / child._scale
 		child._f_allocateY( childHeight )
 		entry = self._childToEntry[child]
 
 		entry._yPos = localPositionY
 		entry._height = localHeight
 
-		xform = Xform2( scale, Vector2( entry._xPos, entry._yPos ) )
+		xform = Xform2( child._scale, Vector2( entry._xPos, entry._yPos ) )
 		entry.xform = xform
 		entry.invXform = xform.inverse()
 		entry.box = BBox2( Point2( entry._xPos, entry._yPos ), Point2( entry._xPos + entry._width, entry._yPos + entry._height ) )
@@ -292,10 +297,10 @@ class DTContainer (DTWidget):
 		self._o_onScroll( scroll )
 
 
-	def _f_evRealise(self, context):
-		super( DTContainer, self )._f_evRealise( context )
+	def _f_evRealise(self, context, pangoContext):
+		super( DTContainer, self )._f_evRealise( context, pangoContext )
 		for entry in self._childEntries:
-			entry.child._f_evRealise( context )
+			entry.child._f_evRealise( context, pangoContext )
 
 
 	def _f_evUnrealise(self):

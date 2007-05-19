@@ -8,7 +8,7 @@
 from copy import copy
 
 
-from Britefury.Math.Math import Point2, Vector2
+from Britefury.Math.Math import Point2, Vector2, Xform2
 
 from Britefury.Kernel.Abstract import *
 
@@ -36,8 +36,11 @@ class DTWidget (object):
 		self._bHasFocus = False
 		self._bFocusGrabbed = False
 		self._realiseContext = None
+		self._pangoContext = None
 		self._bResizeQueued = False
 		self._sizeRequest = Vector2( -1, -1 )
+		self._scale = 1.0
+		self._rootScale = 1.0
 		self._allocation = Vector2()
 
 
@@ -129,7 +132,7 @@ class DTWidget (object):
 	def _o_onLoseFocus(self):
 		self._bHasFocus = False
 
-	def _o_onRealise(self, context):
+	def _o_onRealise(self, context, pangoContext):
 		pass
 
 	def _o_onUnrealise(self):
@@ -138,6 +141,9 @@ class DTWidget (object):
 	def _o_draw(self, context):
 		pass
 
+
+	def _o_onSetScale(self, scale, rootScale):
+		pass
 
 	def _o_getRequiredWidth(self):
 		pass
@@ -196,9 +202,10 @@ class DTWidget (object):
 	def _f_evScroll(self, scroll):
 		self._o_onScroll( scroll )
 
-	def _f_evRealise(self, context):
+	def _f_evRealise(self, context, pangoContext):
 		self._realiseContext = context
-		self._o_onRealise( context )
+		self._pangoContext = pangoContext
+		self._o_onRealise( context, pangoContext )
 		self._o_queueResize()
 		if self._bFocusGrabbed  and  self._parent is not None:
 			self._parent._f_childGrabFocus( self )
@@ -214,14 +221,26 @@ class DTWidget (object):
 
 
 
+
+	def _f_refreshScale(self, scale, rootScale):
+		self._o_onSetScale( scale, rootScale )
+
+
+	def _f_setScale(self, scale, rootScale):
+		if scale != self._scale  or  rootScale != self._rootScale:
+			self._scale = scale
+			self._rootScale = rootScale
+			self._o_onSetScale( scale, rootScale )
+		self._f_refreshScale( scale, rootScale )
+
 	def _f_getRequisitionWidth(self):
-		requisition = self._o_getRequiredWidth()
+		requisition = self._o_getRequiredWidth()  *  self._scale
 		if self._sizeRequest.x != -1:
 			requisition = self._sizeRequest.x
 		return requisition
 
 	def _f_getRequisitionHeight(self):
-		requisition = self._o_getRequiredHeight()
+		requisition = self._o_getRequiredHeight()  *  self._scale
 		if self._sizeRequest.y != -1:
 			requisition = self._sizeRequest.y
 		return requisition
