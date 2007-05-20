@@ -18,6 +18,8 @@ from Britefury.CodeViewTree.CVTStringLiteral import CVTStringLiteral
 
 from Britefury.CodeView.CVExpression import *
 
+from Britefury.CodeViewBehavior.CVBStringLiteralBehavior import *
+
 from Britefury.DocView.Toolkit.DTBox import DTBox
 from Britefury.DocView.Toolkit.DTLabel import DTLabel
 from Britefury.DocView.Toolkit.DTDirection import DTDirection
@@ -32,12 +34,17 @@ class CVStringLiteral (CVExpression):
 	treeNode = SheetRefField( CVTStringLiteral )
 
 
+	behaviors = [ CVBStringLiteralBehavior() ]
+
+
+
 	@FunctionRefField
 	def stringValueWidget(self):
 		entry = DVCStringCellEditEntryLabel()
 		entry.entry.textColour=Colour3f( 0.0, 0.0, 0.75 )
 		entry.keyHandler = self
 		entry.attachCell( self.treeNode.cells.stringValue )
+		entry.grabCharsInverse = '\''
 		return entry.entry
 
 
@@ -51,13 +58,6 @@ class CVStringLiteral (CVExpression):
 
 
 
-	@CVCharInputHandlerMethod( '\'' )
-	def _finishEditingString(self, receivingNodePath, entry, event):
-		self.stringValueWidget.finishEditing()
-		self.widget.grabFocus()
-		return True
-
-
 	def __init__(self, treeNode, view):
 		super( CVStringLiteral, self ).__init__( treeNode, view )
 		self._box = DTBox()
@@ -65,3 +65,8 @@ class CVStringLiteral (CVExpression):
 		self._box.append( DTLabel( 'nil', colour=Colour3f( 0.0, 0.0, 0.5 ) ) )
 		self._box.append( DTLabel( '\'' ) )
 		self.widget.child = self._box
+
+
+	def closeString(self):
+		self.stringValueWidget.finishEditing()
+		self.widget.grabFocus()

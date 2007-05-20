@@ -73,7 +73,20 @@ class DTEntry (DTWidget):
 		self._autoCompleteDropDown.autoCompleteDismissedSignal.connect( self._p_onAutoCompleteDismissed )
 		self._bAutoCompleteDisabled = False
 
+		self._grabChars = None
+		self._bGrabCharsInverse = False
+
 		self._o_queueResize()
+
+
+
+	def setGrabChars(self, grabChars):
+		self._grabChars = grabChars
+		self._bGrabCharsInverse = False
+
+	def setGrabCharsInverse(self, grabChars):
+		self._grabChars = grabChars
+		self._bGrabCharsInverse = True
 
 
 
@@ -297,8 +310,6 @@ class DTEntry (DTWidget):
 		bHandled = False
 		if self._autoCompleteDropDown.isVisible():
 			bHandled = self._autoCompleteDropDown.handleKeyPressEvent( event )
-		if self.keyHandler is not None  and  not bHandled:
-			bHandled = self.keyHandler._f_handleKeyPress( self, event )
 		if not bHandled:
 			if event.keyVal == gtk.keysyms.Left:
 				self._p_moveCursor( ( event.state & gtk.gdk.SHIFT_MASK ) != 0, max( self._cursorLocation - 1, 0 ) )
@@ -311,25 +322,34 @@ class DTEntry (DTWidget):
 			elif event.keyVal == gtk.keysyms.Return:
 				self.returnSignal.emit()
 				self.ungrabFocus()
-			elif self.bEditable:
-				if event.keyVal == gtk.keysyms.BackSpace:
-					if self._selectionBounds is not None:
-						self._p_deleteSelection()
-					elif self._cursorLocation > 0:
-						textDeleted = self._text[self._cursorLocation-1:self._cursorLocation]
-						self._text = self._text[:self._cursorLocation-1] + self._text[self._cursorLocation:]
-						self._cursorLocation -= 1
-						self.textDeletedSignal.emit( self, self._cursorLocation, self._cursorLocation+1, textDeleted )
-					self._p_onTextModified()
-				elif event.keyVal == gtk.keysyms.Delete:
-					if self._selectionBounds is not None:
-						self._p_deleteSelection()
-					elif self._cursorLocation < len( self._text ):
-						textDeleted = self._text[self._cursorLocation:self._cursorLocation+1]
-						self._text = self._text[:self._cursorLocation] + self._text[self._cursorLocation+1:]
-						self.textDeletedSignal.emit( self, self._cursorLocation, self._cursorLocation+1, textDeleted )
-					self._p_onTextModified()
-				elif event.keyString != '':
+			elif event.keyVal == gtk.keysyms.BackSpace  and  self.bEditable:
+				if self._selectionBounds is not None:
+					self._p_deleteSelection()
+				elif self._cursorLocation > 0:
+					textDeleted = self._text[self._cursorLocation-1:self._cursorLocation]
+					self._text = self._text[:self._cursorLocation-1] + self._text[self._cursorLocation:]
+					self._cursorLocation -= 1
+					self.textDeletedSignal.emit( self, self._cursorLocation, self._cursorLocation+1, textDeleted )
+				self._p_onTextModified()
+			elif event.keyVal == gtk.keysyms.Delete  and  self.bEditable:
+				if self._selectionBounds is not None:
+					self._p_deleteSelection()
+				elif self._cursorLocation < len( self._text ):
+					textDeleted = self._text[self._cursorLocation:self._cursorLocation+1]
+					self._text = self._text[:self._cursorLocation] + self._text[self._cursorLocation+1:]
+					self.textDeletedSignal.emit( self, self._cursorLocation, self._cursorLocation+1, textDeleted )
+				self._p_onTextModified()
+			elif event.keyString != '':
+				if self.keyHandler is not None  and  not bHandled:
+					bGrabbed = False
+					if self._grabChars is not None:
+						if self._bGrabCharsInverse:
+							bGrabbed = event.keyString not in self._grabChars
+						else:
+							bGrabbed = event.keyString in self._grabChars
+					if not bGrabbed:
+						bHandled = self.keyHandler._f_handleKeyPress( self, event )
+				if not bHandled  and  self.bEditable:
 					if self.allowableCharacters is None  or  event.keyString in self.allowableCharacters:
 						if self._selectionBounds is not None:
 							self._p_deleteSelection()
@@ -531,7 +551,8 @@ class DTEntry (DTWidget):
 	highlightedTextColour = property( getHighlightedTextColour, setHighlightedTextColour )
 	borderColour = property( getBorderColour, setBorderColour )
 	autoCompleteList = property( None, setAutoCompleteList )
-
+	grabChars = property( None, setGrabChars )
+	grabCharsInverse = property( None, setGrabCharsInverse )
 
 
 

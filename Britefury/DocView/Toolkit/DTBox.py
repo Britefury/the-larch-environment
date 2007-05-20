@@ -12,6 +12,12 @@ from Britefury.DocView.Toolkit.DTDirection import DTDirection
 
 
 class DTBox (DTContainer):
+	ALIGN_TOPLEFT = 0
+	ALIGN_CENTRE = 1
+	ALIGN_BOTTOMRIGHT = 2
+	ALIGN_EXPAND = 3
+
+
 	class ChildEntry (DTContainer.ChildEntry):
 		def __init__(self, child, bExpand, bFill, bShrink, padding):
 			super( DTBox.ChildEntry, self ).__init__( child )
@@ -24,10 +30,11 @@ class DTBox (DTContainer):
 
 
 
-	def __init__(self, direction=DTDirection.LEFT_TO_RIGHT, spacing=0.0, bExpand=False, bFill=False, bShrink=False, padding=0.0):
+	def __init__(self, direction=DTDirection.LEFT_TO_RIGHT, minorDirectionAlignment=ALIGN_EXPAND, spacing=0.0, bExpand=False, bFill=False, bShrink=False, padding=0.0):
 		super( DTBox, self ).__init__()
 
 		self._direction = direction
+		self._minorDirectionAlignment = minorDirectionAlignment
 		self._spacing = spacing
 		self._bExpand = bExpand
 		self._bFill = bFill
@@ -244,7 +251,14 @@ class DTBox (DTContainer):
 				x += childAlloc + self._spacing
 		else:
 			for entry in self._childEntries:
-				self._o_allocateChildX( entry.child, 0.0, allocation )
+				if self._minorDirectionAlignment == self.ALIGN_TOPLEFT:
+					self._o_allocateChildX( entry.child, 0.0, entry._reqWidth )
+				elif self._minorDirectionAlignment == self.ALIGN_CENTRE:
+					self._o_allocateChildX( entry.child, ( allocation - entry._reqWidth )  *  0.5, entry._reqWidth )
+				elif self._minorDirectionAlignment == self.ALIGN_BOTTOMRIGHT:
+					self._o_allocateChildX( entry.child, allocation - entry._reqWidth, entry._reqWidth )
+				elif self._minorDirectionAlignment == self.ALIGN_EXPAND:
+					self._o_allocateChildX( entry.child, 0.0, allocation )
 
 
 	def _o_onAllocateY(self, allocation):
@@ -285,7 +299,14 @@ class DTBox (DTContainer):
 				y += childAlloc + self._spacing
 		else:
 			for entry in self._childEntries:
-				self._o_allocateChildY( entry.child, 0.0, allocation )
+				if self._minorDirectionAlignment == self.ALIGN_TOPLEFT:
+					self._o_allocateChildY( entry.child, 0.0, entry._reqHeight )
+				elif self._minorDirectionAlignment == self.ALIGN_CENTRE:
+					self._o_allocateChildY( entry.child, ( allocation - entry._reqHeight )  *  0.5, entry._reqHeight )
+				elif self._minorDirectionAlignment == self.ALIGN_BOTTOMRIGHT:
+					self._o_allocateChildY( entry.child, allocation - entry._reqHeight, entry._reqHeight )
+				elif self._minorDirectionAlignment == self.ALIGN_EXPAND:
+					self._o_allocateChildY( entry.child, 0.0, allocation )
 
 
 	def _o_onChildResizeRequest(self, child):

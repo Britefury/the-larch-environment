@@ -16,6 +16,9 @@ from Britefury.CodeViewTree.CVTMessageArguments import CVTMessageArguments
 
 from Britefury.CodeView.CVBorderNode import *
 
+from Britefury.CodeViewBehavior.CVBMessageArgumentsBehavior import *
+from Britefury.CodeViewBehavior.CVBCreateExpressionBehavior import *
+
 from Britefury.DocView.Toolkit.DTWrappedLine import DTWrappedLine
 from Britefury.DocView.Toolkit.DTBox import DTBox
 from Britefury.DocView.Toolkit.DTDirection import DTDirection
@@ -29,6 +32,10 @@ class CVMessageArguments (CVBorderNode):
 
 
 	treeNode = SheetRefField( CVTMessageArguments )
+
+
+
+	behaviors = [ CVBMessageArgumentsBehavior(), CVBCreateExpressionBehavior() ]
 
 
 
@@ -80,15 +87,6 @@ class CVMessageArguments (CVBorderNode):
 
 
 
-	@CVCharInputHandlerMethod( '+' )
-	def _addArgument(self, receivingNodePath, entry, event):
-		argCVT = self.treeNode.addArgument()
-		self._view.refresh()
-		argCV = self._view.getViewNodeForTreeNode( argCVT )
-		argCV.startEditing()
-		return True
-
-
 	def __init__(self, treeNode, view):
 		super( CVMessageArguments, self ).__init__( treeNode, view )
 		self._box = DTBox()
@@ -96,6 +94,14 @@ class CVMessageArguments (CVBorderNode):
 		self._box.append( DTLabel( 'nil' ) )
 		self._box.append( DTLabel( ')' ) )
 		self.widget.child = self._box
+
+
+
+	def addArgument(self):
+		argCVT = self.treeNode.addArgument()
+		self._view.refresh()
+		argCV = self._view.getViewNodeForTreeNode( argCVT )
+		argCV.startEditing()
 
 
 

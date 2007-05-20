@@ -31,6 +31,13 @@ class DVCStringCellEditEntryLabel (DVCBasicWidgetSingleCellEdit):
 		self.entry.finishEditingSignal.connect( self._p_onEntry )
 
 
+	def setGrabChars(self, grabChars):
+		self.entry.setGrabChars( grabChars )
+
+	def setGrabCharsInverse(self, grabChars):
+		self.entry.setGrabCharsInverse( grabChars )
+
+
 	def startEditing(self):
 		self.entry.startEditing()
 
@@ -61,6 +68,8 @@ class DVCStringCellEditEntryLabel (DVCBasicWidgetSingleCellEdit):
 
 
 	keyHandler = property( None, _p_setKeyHandler )
+	grabChars = property( None, setGrabChars )
+	grabCharsInverse = property( None, setGrabCharsInverse )
 
 
 

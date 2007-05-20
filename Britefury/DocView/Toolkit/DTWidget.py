@@ -170,7 +170,7 @@ class DTWidget (object):
 
 
 	def _o_queueRedraw(self, localPos, localSize):
-		if self._realiseContext is not None:
+		if self._realiseContext is not None  and  self._parent is not None:
 			self._parent._f_childRedrawRequest( self, localPos, localSize )
 
 	def _o_queueFullRedraw(self):

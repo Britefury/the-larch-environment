@@ -23,19 +23,11 @@ class CVTNullExpression (CVTNode):
 	graphNode = SheetRefField( CGNullExpression )
 
 
-	def replaceWithStringLiteral(self):
+
+	def insertNode(self, graphNodeToInsert, treeNodePath):
 		parentCGSink = self.graphNode.parent[0]
 		n = parentCGSink.index( self.graphNode.parent )
-		strLit = CGStringLiteral()
-		parentCGSink[n] = strLit.parent
-		return self._tree.buildNode( strLit )
+		parentCGSink[n] = graphNodeToInsert.parent
+		return self._tree.buildNode( graphNodeToInsert )
 
-
-
-	def replaceWithUnboundRef(self):
-		parentCGSink = self.graphNode.parent[0]
-		n = parentCGSink.index( self.graphNode.parent )
-		ref = CGUnboundRef()
-		parentCGSink[n] = ref.parent
-		return self._tree.buildNode( ref )
 

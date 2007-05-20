@@ -16,6 +16,8 @@ from Britefury.CodeViewTree.CVTBlockStatements import CVTBlockStatements
 
 from Britefury.CodeView.CVBorderNode import *
 
+from Britefury.CodeViewBehavior.CVBStatementListBehavior import *
+
 from Britefury.DocView.Toolkit.DTBox import DTBox
 from Britefury.DocView.Toolkit.DTLabel import DTLabel
 from Britefury.DocView.Toolkit.DTDirection import DTDirection
@@ -27,6 +29,9 @@ class CVBlockStatements (CVBorderNode):
 
 
 	treeNode = SheetRefField( CVTBlockStatements )
+
+
+	behaviors = [ CVBStatementListBehavior() ]
 
 
 	@FunctionField
@@ -47,6 +52,6 @@ class CVBlockStatements (CVBorderNode):
 
 	def __init__(self, treeNode, view):
 		super( CVBlockStatements, self ).__init__( treeNode, view )
-		self._box = DTBox( DTDirection.TOP_TO_BOTTOM, spacing=4.0 )
+		self._box = DTBox( DTDirection.TOP_TO_BOTTOM, minorDirectionAlignment=DTBox.ALIGN_TOPLEFT, spacing=4.0 )
 		self.widget.child = self._box
 

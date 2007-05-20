@@ -9,6 +9,8 @@ import pygtk
 pygtk.require( '2.0' )
 import gtk
 
+import string
+
 from Britefury.Math.Math import Colour3f
 
 from Britefury.Sheet.Sheet import *
@@ -40,6 +42,7 @@ class CVUnboundRef (CVExpression):
 		entry.keyHandler = self
 		entry.attachCell( self.treeNode.cells.targetName )
 		entry.finishSignal.connect( self._p_onEntryFinish )
+		entry.grabChars = string.ascii_letters + '_'
 		return entry.entry
 
 

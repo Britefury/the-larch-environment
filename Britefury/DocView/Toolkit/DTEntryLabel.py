@@ -74,6 +74,13 @@ class DTEntryLabel (DTBin):
 
 
 
+	def setGrabChars(self, grabChars):
+		self._entry.setGrabChars( grabChars )
+
+	def setGrabCharsInverse(self, grabChars):
+		self._entry.setGrabCharsInverse( grabChars )
+
+
 	def getText(self):
 		return self._text
 
@@ -153,6 +160,8 @@ class DTEntryLabel (DTBin):
 	keyHandler = property( None, _p_setKeyHandler )
 	allowableCharacters = property( None, _p_setAllowableCharacters )
 	bEditable = property( None, _p_setBEditable )
+	grabChars = property( None, setGrabChars )
+	grabCharsInverse = property( None, setGrabCharsInverse )
 
 
 

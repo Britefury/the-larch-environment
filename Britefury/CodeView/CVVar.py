@@ -9,6 +9,7 @@ import pygtk
 pygtk.require( '2.0' )
 import gtk
 
+import string
 
 from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
@@ -36,6 +37,7 @@ class CVVar (CVNode):
 		entry = DVCStringCellEditEntryLabel()
 		entry.keyHandler = self
 		entry.attachCell( self.treeNode.cells.varName )
+		entry.grabChars = string.ascii_letters
 		return entry.entry
 
 

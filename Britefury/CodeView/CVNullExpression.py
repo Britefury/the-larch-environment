@@ -9,8 +9,6 @@ import pygtk
 pygtk.require( '2.0' )
 import gtk
 
-import string
-
 
 from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
@@ -23,6 +21,7 @@ from Britefury.DocView.Toolkit.DTBox import DTBox
 from Britefury.DocView.Toolkit.DTEntryLabel import DTEntryLabel
 from Britefury.DocView.Toolkit.DTDirection import DTDirection
 
+from Britefury.CodeViewBehavior.CVBCreateExpressionBehavior import *
 
 
 class CVNullExpression (CVNode):
@@ -32,30 +31,16 @@ class CVNullExpression (CVNode):
 	treeNode = SheetRefField( CVTNullExpression )
 
 
+
+	behaviors = [ CVBCreateExpressionBehavior() ]
+
+
+
 	def _refreshCell(self):
 		pass
 
 	refreshCell = FunctionField( _refreshCell )
 
-
-
-	@CVCharInputHandlerMethod( '\'' )
-	def _replaceWithStringLiteral(self, receivingNodePath, entry, event):
-		strLitCVT = self.treeNode.replaceWithStringLiteral()
-		self._view.refresh()
-		strLitCV = self._view.getViewNodeForTreeNode( strLitCVT )
-		strLitCV.stringValueWidget.startEditing()
-		return True
-
-
-	@CVCharInputHandlerMethod( string.ascii_letters )
-	def _replaceWithRef(self, receivingNodePath, entry, event):
-		unboundRefCVT = self.treeNode.replaceWithUnboundRef()
-		unboundRefCVT.targetName = event.keyString
-		self._view.refresh()
-		unboundRefCV = self._view.getViewNodeForTreeNode( unboundRefCVT )
-		unboundRefCV.startEditing()
-		return True
 
 
 
@@ -64,6 +49,8 @@ class CVNullExpression (CVNode):
 		self.widget = DTEntryLabel( '<nil>', font='Sans italic 11' )
 		self.widget.bEditable = False
 		self.widget.keyHandler = self
+
+
 
 
 
