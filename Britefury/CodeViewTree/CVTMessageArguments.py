@@ -42,3 +42,17 @@ class CVTMessageArguments (CVTNode):
 		argCG = CGNullExpression()
 		sendMsgCG.args.append( argCG.parent )
 		return self._tree.buildNode( argCG )
+
+
+
+	def insertNode(self, graphNodeToInsert, treeNodePath):
+		position = len( self.argNodes )
+		if len( treeNodePath ) > 1:
+			try:
+				n = self.argNodes.index( treeNodePath[1] )
+			except ValueError:
+				pass
+			else:
+				position = n
+		self.graphNode.args.insert( position, graphNodeToInsert.parent )
+		return self._tree.buildNode( graphNodeToInsert )

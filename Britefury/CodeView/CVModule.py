@@ -16,6 +16,9 @@ from Britefury.CodeViewTree.CVTModule import CVTModule
 
 from Britefury.CodeView.CVBorderNode import *
 
+from Britefury.CodeViewBehavior.CVBStatementListBehavior import *
+from Britefury.CodeViewBehavior.CVBCreateExpressionBehavior import *
+
 from Britefury.DocView.Toolkit.DTBox import DTBox
 from Britefury.DocView.Toolkit.DTLabel import DTLabel
 from Britefury.DocView.Toolkit.DTDirection import DTDirection
@@ -29,6 +32,7 @@ class CVModule (CVBorderNode):
 	treeNode = SheetRefField( CVTModule )
 
 
+	behaviors = [ CVBStatementListBehavior(), CVBCreateExpressionBehavior() ]
 
 
 
@@ -47,21 +51,12 @@ class CVModule (CVBorderNode):
 
 
 
-	@CVAccelInputHandlerMethod( '<alt>v' )
-	def _addLocalVar(self, receivingNodePath, entry, event):
-		if len( receivingNodePath ) > 1:
-			position = self.treeNode.statementNodes.index( receivingNodePath[1].treeNode )
-		else:
-			position = len( self.treeNode.statementNodes )
-		self.treeNode.addLocalVarNode( position )
-		localVarCV = self.statementNodes[position]
-		localVarCV.startEditing()
-		return True
-
 
 
 
 	def __init__(self, treeNode, view):
 		super( CVModule, self ).__init__( treeNode, view )
-		self._box = DTBox( DTDirection.TOP_TO_BOTTOM, spacing=4.0 )
+		self._box = DTBox( DTDirection.TOP_TO_BOTTOM, minorDirectionAlignment=DTBox.ALIGN_TOPLEFT, spacing=4.0 )
 		self.widget.child = self._box
+
+

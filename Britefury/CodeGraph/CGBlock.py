@@ -33,8 +33,16 @@ class CGBlock (CGNode):
 
 
 	def getReferenceableNodeByName(self, targetName, sourceNode=None):
+		for paramSource in self.params:
+			if targetName == paramSource.node.name:
+				return paramSource.node
+
+		if len( self.expandParam ) > 0:
+			if targetName == self.expandParam[0].name:
+				return self.expandParam[0].node
+
 		if sourceNode is not None:
-			n = self.statements.index( sourceNode.parent[0] )
+			n = self.statements.index( sourceNode.parent )
 			nodeTable = {}
 			for statementSource in self.statements[:n]:
 				statementSource.node.buildReferenceableNodeTable( nodeTable )

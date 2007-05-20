@@ -9,12 +9,16 @@ import pygtk
 pygtk.require( '2.0' )
 import gtk
 
+import string
+
 from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
 from Britefury.CodeViewTree.CVTSendMessage import CVTSendMessage
 
 from Britefury.CodeView.CVBorderNode import *
+
+from Britefury.CodeViewBehavior.CVBSendMessageBehavior import *
 
 from Britefury.DocView.Toolkit.DTWrappedLine import DTWrappedLine
 from Britefury.DocView.Toolkit.DTBox import DTBox
@@ -32,6 +36,9 @@ class CVSendMessage (CVBorderNode):
 
 
 
+	behaviors = [ CVBSendMessageBehavior() ]
+
+
 	@FunctionRefField
 	def targetObjectNode(self):
 		return self._view.buildView( self.treeNode.targetObjectNode, self )
@@ -47,6 +54,7 @@ class CVSendMessage (CVBorderNode):
 		self._messageNameEntry =DVCStringCellEditEntryLabel()
 		self._messageNameEntry.keyHandler = self
 		self._messageNameEntry.attachCell( self.treeNode.cells.messageName )
+		self._messageNameEntry.grabChars = string.ascii_letters
 		return self._messageNameEntry.entry
 
 
@@ -81,12 +89,6 @@ class CVSendMessage (CVBorderNode):
 
 
 
-	@CVCharInputHandlerMethod( '(' )
-	def _editArguments(self, receivingNodePath, entry, event):
-		self.argumentsNode.startEditing()
-		return True
-
-
 
 
 	def __init__(self, treeNode, view):
@@ -102,3 +104,7 @@ class CVSendMessage (CVBorderNode):
 
 	def startEditingMessageName(self):
 		self._messageNameEntry.startEditing()
+
+
+	def startEditingArguments(self):
+		self.argumentsNode.startEditing()

@@ -16,6 +16,8 @@ from Britefury.CodeViewTree.CVTLocalVarDeclaration import CVTLocalVarDeclaration
 
 from Britefury.CodeView.CVBorderNode import *
 
+from Britefury.CodeViewBehavior.CVBLocalVarDeclarationBehavior import *
+
 from Britefury.DocView.Toolkit.DTBox import DTBox
 from Britefury.DocView.Toolkit.DTLabel import DTLabel
 from Britefury.DocView.Toolkit.DTDirection import DTDirection
@@ -30,9 +32,15 @@ class CVLocalVarDeclaration (CVBorderNode):
 	treeNode = SheetRefField( CVTLocalVarDeclaration )
 
 
+
 	@CVChildNodeSlotFunctionField
 	def varNode(self):
 		return self._view.buildView( self.treeNode.varNode, self )
+
+	_varNodeBehaviors = [ CVBLocalVarDeclarationBehavior() ]
+	varNode.setBehaviors( _varNodeBehaviors )
+
+
 
 	@FunctionRefField
 	def varWidget(self):
@@ -82,14 +90,6 @@ class CVLocalVarDeclaration (CVBorderNode):
 
 
 
-	@CVCharInputHandlerMethod( '=', varNode )
-	def _setValue(self, receivingNodePath, entry, event):
-		self.treeNode.ensureHasValue()
-		valueCV = self.valueNode
-		valueCV.startEditing()
-		return True
-
-
 	def __init__(self, treeNode, view):
 		super( CVLocalVarDeclaration, self ).__init__( treeNode, view )
 		self._box = DTBox( spacing=10.0 )
@@ -97,6 +97,12 @@ class CVLocalVarDeclaration (CVBorderNode):
 		self._box.append( DTLabel( 'nil' ) )
 		self.widget.child = self._box
 
+
+
+	def startEditingValue(self):
+		self.treeNode.ensureHasValue()
+		valueCV = self.valueNode
+		valueCV.startEditing()
 
 
 	def startEditing(self):

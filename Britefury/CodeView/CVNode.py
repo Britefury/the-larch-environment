@@ -28,8 +28,7 @@ from Britefury.DocView.Toolkit.DTWidget import *
 class CVChildNodeSlotFunctionField (FunctionRefField):
 	def __init__(self, doc=''):
 		super( CVChildNodeSlotFunctionField, self ).__init__( doc )
-		self._keyToInputHandler = {}
-		self._charToInputHandler = {}
+		self._behaviors = []
 
 
 	def _f_metaMember_initClass(self):
@@ -41,13 +40,18 @@ class CVChildNodeSlotFunctionField (FunctionRefField):
 		return node is self._f_getImmutableValueFromInstance( instance )
 
 
+	def setBehaviors(self, behaviors):
+		self._behaviors = behaviors
+
+
+
+
 
 
 class CVChildNodeListSlotFunctionField (FunctionField):
 	def __init__(self, doc=''):
 		super( CVChildNodeListSlotFunctionField, self ).__init__( doc )
-		self._keyToInputHandler = {}
-		self._charToInputHandler = {}
+		self._behaviors = []
 
 
 	def _f_metaMember_initClass(self):
@@ -59,73 +63,9 @@ class CVChildNodeListSlotFunctionField (FunctionField):
 		return node in self._f_getImmutableValueFromInstance( instance )
 
 
+	def setBehaviors(self, behaviors):
+		self._behaviors = behaviors
 
-
-
-
-
-class _CVlInputHandler (KMeta.KMetaMember):
-	def __init__(self, handlerMethod, childNodeSlot=None):
-		super( _CVlInputHandler, self ).__init__()
-		self._handlerMethod = handlerMethod
-		self._childNodeSlot = childNodeSlot
-		if childNodeSlot is not None:
-			self._o_addDependency( childNodeSlot )
-
-
-	def _f_handleKeyPress(self, instance, receivingNodePath, entry, keyPressEvent):
-		return self._handlerMethod( instance, receivingNodePath, entry, keyPressEvent )
-
-
-class CVAccelInputHandler (_CVlInputHandler):
-	def __init__(self, handlerMethod, keys, childNodeSlot=None):
-		super( CVAccelInputHandler, self ).__init__( handlerMethod, childNodeSlot )
-		if isinstance( keys, str ):
-			self._keyTuples = [ gtk.accelerator_parse( keys ) ]
-		else:
-			self._keyTuples = [ gtk.accelerator_parse( key )   for key in keys ]
-
-
-	def _f_metaMember_initClass(self):
-		if self._childNodeSlot is not None:
-			for key in self._keyTuples:
-				self._childNodeSlot._keyToInputHandler[key] = self
-		else:
-			for key in self._keyTuples:
-				self._cls._keyToInputHandler[key] = self
-
-
-
-
-def CVAccelInputHandlerMethod(keys, childNodeSlot=None):
-	def cvinputhandlermethoddecorator(method):
-		return CVAccelInputHandler( method, keys, childNodeSlot )
-	return cvinputhandlermethoddecorator
-
-
-
-
-class CVCharInputHandler (_CVlInputHandler):
-	def __init__(self, handlerMethod, chars, childNodeSlot=None):
-		super( CVCharInputHandler, self ).__init__( handlerMethod, childNodeSlot )
-		self._chars = chars
-
-
-	def _f_metaMember_initClass(self):
-		if self._childNodeSlot is not None:
-			for char in self._chars:
-				self._childNodeSlot._charToInputHandler[char] = self
-		else:
-			for char in self._chars:
-				self._cls._charToInputHandler[char] = self
-
-
-
-
-def CVCharInputHandlerMethod(chars, childNodeSlot=None):
-	def cvinputhandlermethoddecorator(method):
-		return CVCharInputHandler( method, chars, childNodeSlot )
-	return cvinputhandlermethoddecorator
 
 
 
@@ -134,16 +74,19 @@ def CVCharInputHandlerMethod(chars, childNodeSlot=None):
 
 class CVNodeClass (SheetClass):
 	def __init__(cls, clsName, clsBases, clsDict):
-		cls._keyToInputHandler = {}
-		cls._charToInputHandler = {}
-		cls._nodeSlots = set()
+		cls.behaviors = []
+		cls._nodeSlots = []
 
 		for base in clsBases:
-			if hasattr( base, '_keyToInputHandler' ):
-				cls._keyToInputHandler.update( base._keyToInputHandler )
-				cls._charToInputHandler.update( base._charToInputHandler )
-				cls._nodeSlots = cls._nodeSlots.union( set( base._nodeSlots ) )
-		cls._nodeSlots = list( cls._nodeSlots )
+			if hasattr( base, 'behaviors' ):
+				cls.behaviors = base.behaviors  +  [ b   for b in cls.behaviors   if b not in base.behaviors ]
+			if hasattr( base, '_nodeSlots' ):
+				cls._nodeSlots = base._nodeSlots  +  [ s   for s in cls._nodeSlots   if s not in base._nodeSlots ]
+		try:
+			myBehaviors = clsDict['behaviors']
+		except KeyError:
+			myBehaviors = []
+		cls.behaviors = myBehaviors  +  [ b   for b in cls.behaviors   if b not in myBehaviors ]
 
 
 		super( CVNodeClass, cls ).__init__( clsName, clsBases, clsDict )
@@ -188,41 +131,27 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 
 		inputHandler = None
 
+		receivingNodePath = ( self, )  +  receivingNodePath
+
 		# Try to get the node slot input handler
-		if len( receivingNodePath ) > 0:
+		if len( receivingNodePath ) > 1:
 			nodeSlot = None
 			for slot in self._nodeSlots:
-				if slot._f_containsNode( self, receivingNodePath[0] ):
-					nodeSlot = slot
-
-			if nodeSlot is not None:
-				try:
-					inputHandler = nodeSlot._keyToInputHandler[key]
-				except KeyError:
-					try:
-						inputHandler = nodeSlot._charToInputHandler[char]
-					except KeyError:
-						pass
+				if slot._f_containsNode( self, receivingNodePath[1] ):
+					for behavior in slot._behaviors:
+						if behavior.handleKeyPress( self, receivingNodePath, entry, keyPressEvent ):
+							return True
 
 
+		for behavior in self.behaviors:
+			if behavior.handleKeyPress( self, receivingNodePath, entry, keyPressEvent ):
+				return True
 
-		try:
-			inputHandler = self._keyToInputHandler[key]
-		except KeyError:
-			try:
-				inputHandler = self._charToInputHandler[char]
-			except KeyError:
-				pass
-
-
-		if inputHandler is not None:
-			return inputHandler._f_handleKeyPress( self, ( self, ) + receivingNodePath, entry, keyPressEvent )
+		# Pass to the parent node
+		if self._parent is not None:
+			return self._parent._o_handleKeyPress( ( self, ) + receivingNodePath, entry, keyPressEvent )
 		else:
-			# Pass to the parent node
-			if self._parent is not None:
-				return self._parent._o_handleKeyPress( ( self, ) + receivingNodePath, entry, keyPressEvent )
-			else:
-				return False
+			return False
 
 
 	def _f_handleKeyPress(self, entry, keyPressEvent):

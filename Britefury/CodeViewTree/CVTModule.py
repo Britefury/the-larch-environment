@@ -30,12 +30,19 @@ class CVTModule (CVTNode):
 
 
 
-	def addLocalVarNode(self, position):
-		var = CGVar()
-		decl = CGLocalVarDeclaration()
-		decl.variable.append( var.declaration )
-		self.graphNode.statements.insert( position, decl.parent )
-		return self.statementNodes[position ]
+
+
+	def insertNode(self, graphNodeToInsert, treeNodePath):
+		position = len( self.statementNodes )
+		if len( treeNodePath ) > 1:
+			try:
+				n = self.statementNodes.index( treeNodePath[1] )
+			except ValueError:
+				pass
+			else:
+				position = n
+		self.graphNode.statements.insert( position, graphNodeToInsert.parent )
+		return self._tree.buildNode( graphNodeToInsert )
 
 
 
