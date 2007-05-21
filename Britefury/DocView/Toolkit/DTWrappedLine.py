@@ -103,8 +103,11 @@ class DTWrappedLine (DTContainer):
 		self._o_queueResize()
 
 	def extend(self, children):
-		for child in children:
-			self.append( child )
+		entries = [ self.ChildEntry( child, self._padding )   for child in children ]
+		self._childEntries.extend( entries )
+		for entry in entries:
+			self._o_registerChildEntry( entry )
+		self._o_queueResize()
 
 	def insert(self, index, child, padding=None):
 		assert not self.hasChild( child ), 'child already present'
@@ -125,7 +128,6 @@ class DTWrappedLine (DTContainer):
 
 
 	def _f_removeChild(self, child):
-		assert child is self._child, 'cannot remove child'
 		self.remove( None )
 
 

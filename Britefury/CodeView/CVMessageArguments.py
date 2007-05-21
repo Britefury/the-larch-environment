@@ -19,7 +19,7 @@ from Britefury.CodeView.CVBorderNode import *
 from Britefury.CodeViewBehavior.CVBMessageArgumentsBehavior import *
 from Britefury.CodeViewBehavior.CVBCreateExpressionBehavior import *
 
-from Britefury.DocView.Toolkit.DTWrappedLine import DTWrappedLine
+from Britefury.DocView.Toolkit.DTWrappedLineWithSeparators import DTWrappedLineWithSeparators
 from Britefury.DocView.Toolkit.DTBox import DTBox
 from Britefury.DocView.Toolkit.DTDirection import DTDirection
 from Britefury.DocView.Toolkit.DTLabel import DTLabel
@@ -65,7 +65,7 @@ class CVMessageArguments (CVBorderNode):
 
 	@FunctionRefField
 	def argsWidget(self):
-		w = DTWrappedLine()
+		w = DTWrappedLineWithSeparators( spacing=5.0 )
 		w.extend( self.argWidgets )
 		if self.expandArgWidget is not None:
 			x = DTBox( spacing=3.0 )
