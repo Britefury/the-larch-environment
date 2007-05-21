@@ -161,7 +161,6 @@ class DTBox (DTContainer):
 
 
 	def _f_removeChild(self, child):
-		assert child is self._child, 'cannot remove child'
 		self.remove( None )
 
 

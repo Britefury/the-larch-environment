@@ -16,7 +16,7 @@ from Britefury.CodeViewTree.CVTBlockParameters import CVTBlockParameters
 
 from Britefury.CodeView.CVBorderNode import *
 
-from Britefury.DocView.Toolkit.DTWrappedLine import DTWrappedLine
+from Britefury.DocView.Toolkit.DTWrappedLineWithSeparators import DTWrappedLineWithSeparators
 from Britefury.DocView.Toolkit.DTLabel import DTLabel
 
 
@@ -57,7 +57,7 @@ class CVBlockParameters (CVBorderNode):
 
 	def __init__(self, treeNode, view):
 		super( CVBlockParameters, self ).__init__( treeNode, view )
-		self._line = DTWrappedLine( spacing=10.0 )
+		self._line = DTWrappedLineWithSeparators( spacing=10.0 )
 		self.widget.child = self._line
 
 
