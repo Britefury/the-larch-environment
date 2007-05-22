@@ -365,21 +365,40 @@ class DTEntry (DTWidget):
 
 	def _o_onKeyPress(self, event):
 		super( DTEntry, self )._o_onKeyPress( event )
+
+		# Flag to determine if the key event has been handled
 		bHandled = False
+
+		# If the auto-complete drop down is visible, pass the event to it, and see if it handles it
 		if self._autoCompleteDropDown.isVisible():
 			bHandled = self._autoCompleteDropDown.handleKeyPressEvent( event )
+
+		# Not handle it ourselves
 		if not bHandled:
 			if event.keyVal == gtk.keysyms.Left:
-				self._p_moveCursor( ( event.state & gtk.gdk.SHIFT_MASK ) != 0, max( self._cursorLocation - 1, 0 ) )
+				if self._cursorLocation > 0:
+					self._p_moveCursor( ( event.state & gtk.gdk.SHIFT_MASK ) != 0, self._cursorLocation - 1 )
+					bHandled = True
+				else:
+					# Handled if shift not pressed
+					bHandled = event.state & gtk.gdk.SHIFT_MASK  ==  0
 			elif event.keyVal == gtk.keysyms.Right:
-				self._p_moveCursor( ( event.state & gtk.gdk.SHIFT_MASK ) != 0, min( self._cursorLocation + 1, len( self._text ) ) )
+				if self._cursorLocation  <  len( self._text ):
+					self._p_moveCursor( ( event.state & gtk.gdk.SHIFT_MASK ) != 0, self._cursorLocation + 1 )
+					bHandled = True
+				else:
+					# Handled if shift not pressed
+					bHandled = event.state & gtk.gdk.SHIFT_MASK  ==  0
 			elif event.keyVal == gtk.keysyms.Home:
 				self._p_moveCursor( ( event.state & gtk.gdk.SHIFT_MASK ) != 0, 0 )
+				bHandled = True
 			elif event.keyVal == gtk.keysyms.End:
 				self._p_moveCursor( ( event.state & gtk.gdk.SHIFT_MASK ) != 0, len( self._text ) )
+				bHandled = True
 			elif event.keyVal == gtk.keysyms.Return:
 				self.returnSignal.emit()
 				self.ungrabFocus()
+				bHandled = True
 			elif event.keyVal == gtk.keysyms.BackSpace  and  self.bEditable:
 				bCanDelete = True
 				if self._regexp is not None:
@@ -395,6 +414,8 @@ class DTEntry (DTWidget):
 						self._text = self._text[:self._cursorLocation-1] + self._text[self._cursorLocation:]
 						self._cursorLocation -= 1
 						self.textDeletedSignal.emit( self, self._cursorLocation, self._cursorLocation+1, textDeleted )
+						# Event handled
+						bHandled = True
 					self._p_onTextModified()
 			elif event.keyVal == gtk.keysyms.Delete  and  self.bEditable:
 				bCanDelete = True
@@ -404,6 +425,7 @@ class DTEntry (DTWidget):
 						bCanDelete = False
 
 				if bCanDelete:
+					text = self._text
 					if self._selectionBounds is not None:
 						self._p_deleteSelection()
 					elif self._cursorLocation < len( self._text ):
@@ -411,21 +433,16 @@ class DTEntry (DTWidget):
 						self._text = self._text[:self._cursorLocation] + self._text[self._cursorLocation+1:]
 						self.textDeletedSignal.emit( self, self._cursorLocation, self._cursorLocation+1, textDeleted )
 					self._p_onTextModified()
-			elif event.keyString != '':
+					# Event not handled if text was empty
+					bHandled = len( text ) == 0
+			elif event.keyString != ''  and  self.bEditable:
 				bTextOk = True
 
 				if self._regexp is not None:
 					text = self._p_computeTextAfterReplacingSelection( event.keyString )
 					bTextOk = self._p_checkText( text )
 
-				if not self.bEditable:
-					bTextOk = False
-
-				if not bTextOk:
-					if self.keyHandler is not None:
-						bHandled = self.keyHandler._f_handleKeyPress( self, event )
-
-				if not bHandled  and  bTextOk:
+				if bTextOk:
 					if self._selectionBounds is not None:
 						self._p_deleteSelection()
 					position = self._cursorLocation
@@ -434,6 +451,13 @@ class DTEntry (DTWidget):
 					self._cursorLocation += len( event.keyString )
 					self.textInsertedSignal.emit( self, position, bAppended, event.keyString )
 					self._p_onTextModified()
+					bHandled = True
+
+		# Not handled; pass to the key handler, if there is one
+		if not bHandled:
+			if self.keyHandler is not None:
+				bHandled = self.keyHandler._f_handleKeyPress( self, event )
+
 
 	def _o_onKeyRelease(self, event):
 		super( DTEntry, self )._o_onKeyRelease( event )
