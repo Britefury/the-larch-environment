@@ -25,17 +25,10 @@ class DVCStringCellEditEntryLabel (DVCBasicWidgetSingleCellEdit):
 	__valueclass__ = str
 
 
-	def __init__(self):
+	def __init__(self, regexp=None):
 		super( DVCStringCellEditEntryLabel, self ).__init__()
-		self.entry = DTEntryLabel()
+		self.entry = DTEntryLabel( regexp=regexp )
 		self.entry.finishEditingSignal.connect( self._p_onEntry )
-
-
-	def setGrabChars(self, grabChars):
-		self.entry.setGrabChars( grabChars )
-
-	def setGrabCharsInverse(self, grabChars):
-		self.entry.setGrabCharsInverse( grabChars )
 
 
 	def startEditing(self):
@@ -68,8 +61,6 @@ class DVCStringCellEditEntryLabel (DVCBasicWidgetSingleCellEdit):
 
 
 	keyHandler = property( None, _p_setKeyHandler )
-	grabChars = property( None, setGrabChars )
-	grabCharsInverse = property( None, setGrabCharsInverse )
 
 
 
