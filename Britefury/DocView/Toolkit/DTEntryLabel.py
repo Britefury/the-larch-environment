@@ -45,8 +45,8 @@ class DTEntryLabel (DTBin):
 
 
 	class _Entry (DTEntry):
-		def __init__(self, entryLabel, text, font=None, borderWidth=2.0, backgroundColour=Colour3f( 0.9, 0.95, 0.9 ), highlightedBackgroundColour=Colour3f( 0.0, 0.0, 0.5 ), textColour=Colour3f( 0.0, 0.0, 0.0 ), highlightedTextColour=Colour3f( 1.0, 1.0, 1.0 ), borderColour=Colour3f( 0.6, 0.8, 0.6 )):
-			super( DTEntryLabel._Entry, self ).__init__( text, font, borderWidth, backgroundColour, highlightedBackgroundColour, textColour, highlightedTextColour, borderColour )
+		def __init__(self, entryLabel, text, font=None, borderWidth=2.0, backgroundColour=Colour3f( 0.9, 0.95, 0.9 ), highlightedBackgroundColour=Colour3f( 0.0, 0.0, 0.5 ), textColour=Colour3f( 0.0, 0.0, 0.0 ), highlightedTextColour=Colour3f( 1.0, 1.0, 1.0 ), borderColour=Colour3f( 0.6, 0.8, 0.6 ), regexp=None):
+			super( DTEntryLabel._Entry, self ).__init__( text, font, borderWidth, backgroundColour, highlightedBackgroundColour, textColour, highlightedTextColour, borderColour, regexp=regexp )
 			self._entryLabel = entryLabel
 
 		def _o_onLoseFocus(self):
@@ -59,26 +59,19 @@ class DTEntryLabel (DTBin):
 
 
 
-	def __init__(self, text='', font=None, textColour=Colour3f( 0.0, 0.0, 0.0 )):
+	def __init__(self, text='', font=None, textColour=Colour3f( 0.0, 0.0, 0.0 ), regexp=None):
 		super( DTEntryLabel, self ).__init__()
 
 		self._text = text
 
 		self._label = self._Label( self, text, None, font, textColour )
-		self._entry = self._Entry( self, text, font, textColour=textColour )
+		self._entry = self._Entry( self, text, font, textColour=textColour, regexp=regexp )
 		self._entry.textInsertedSignal.connect( self._p_onEntryTextInserted )
 		self._entry.textDeletedSignal.connect( self._p_onEntryTextDeleted )
 		self._entry.returnSignal.connect( self._p_onEntryReturn )
 
 		self.setChild( self._label )
 
-
-
-	def setGrabChars(self, grabChars):
-		self._entry.setGrabChars( grabChars )
-
-	def setGrabCharsInverse(self, grabChars):
-		self._entry.setGrabCharsInverse( grabChars )
 
 
 	def getText(self):
@@ -160,8 +153,6 @@ class DTEntryLabel (DTBin):
 	keyHandler = property( None, _p_setKeyHandler )
 	allowableCharacters = property( None, _p_setAllowableCharacters )
 	bEditable = property( None, _p_setBEditable )
-	grabChars = property( None, setGrabChars )
-	grabCharsInverse = property( None, setGrabCharsInverse )
 
 
 

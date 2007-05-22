@@ -5,6 +5,8 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
+import re
+
 import pygtk
 pygtk.require( '2.0' )
 import gtk
@@ -28,14 +30,13 @@ class DTEntry (DTWidget):
 	textDeletedSignal = ClassSignal()				# ( entry, startIndex, endIndex, textDeleted )
 
 
-	def __init__(self, text='', font=None, borderWidth=2.0, backgroundColour=Colour3f( 0.9, 0.95, 0.9 ), highlightedBackgroundColour=Colour3f( 0.0, 0.0, 0.5 ), textColour=Colour3f( 0.0, 0.0, 0.0 ), highlightedTextColour=Colour3f( 1.0, 1.0, 1.0 ), borderColour=Colour3f( 0.6, 0.8, 0.6 ), autoCompleteList=None):
+	def __init__(self, text='', font=None, borderWidth=2.0, backgroundColour=Colour3f( 0.9, 0.95, 0.9 ), highlightedBackgroundColour=Colour3f( 0.0, 0.0, 0.5 ), textColour=Colour3f( 0.0, 0.0, 0.0 ), highlightedTextColour=Colour3f( 1.0, 1.0, 1.0 ), borderColour=Colour3f( 0.6, 0.8, 0.6 ), autoCompleteList=None, regexp=None):
 		super( DTEntry, self ).__init__()
 
 		if font is None:
 			font = 'Sans 11'
 
 		self.keyHandler = None
-		self.allowableCharacters = None
 		self.bEditable = True
 		self._text = text
 
@@ -73,20 +74,12 @@ class DTEntry (DTWidget):
 		self._autoCompleteDropDown.autoCompleteDismissedSignal.connect( self._p_onAutoCompleteDismissed )
 		self._bAutoCompleteDisabled = False
 
-		self._grabChars = None
-		self._bGrabCharsInverse = False
+		if regexp is None:
+			self._regexp = None
+		else:
+			self._regexp = re.compile( regexp )
 
 		self._o_queueResize()
-
-
-
-	def setGrabChars(self, grabChars):
-		self._grabChars = grabChars
-		self._bGrabCharsInverse = False
-
-	def setGrabCharsInverse(self, grabChars):
-		self._grabChars = grabChars
-		self._bGrabCharsInverse = True
 
 
 
@@ -305,6 +298,71 @@ class DTEntry (DTWidget):
 		self._bAutoCompleteDisabled = True
 
 
+	def _p_computeTextAfterDeletingSelection(self):
+		if self._selectionBounds is not None:
+			i = min( self._selectionBounds )
+			j = max( self._selectionBounds )
+			# Remove the selected text
+			return self._text[:i] + self._text[j:]
+		else:
+			return self._text
+
+
+	def _p_computeTextAfterDelete(self):
+		text = self._text
+		cursorLoc = self._cursorLocation
+		if self._selectionBounds is not None:
+			i = min( self._selectionBounds )
+			j = max( self._selectionBounds )
+			# Remove the selected text
+			text = text[:i] + text[j:]
+			cursorLoc = i
+		if cursorLoc  <  len( text ) - 1:
+			# Delete a character
+			return text[:cursorLoc] + text[cursorLoc+1:]
+		else:
+			return text
+
+
+
+	def _p_computeTextAfterBackspace(self):
+		text = self._text
+		cursorLoc = self._cursorLocation
+		if self._selectionBounds is not None:
+			i = min( self._selectionBounds )
+			j = max( self._selectionBounds )
+			# Remove the selected text
+			text = text[:i] + text[j:]
+			cursorLoc = i
+		if cursorLoc > 0:
+			# Delete a character
+			return text[:cursorLoc-1] + text[cursorLoc:]
+		else:
+			return text
+
+
+
+	def _p_computeTextAfterReplacingSelection(self, replacement):
+		text = self._text
+		cursorLoc = self._cursorLocation
+		if self._selectionBounds is not None:
+			i = min( self._selectionBounds )
+			j = max( self._selectionBounds )
+			# Remove the selected text
+			text = text[:i] + text[j:]
+			cursorLoc = i
+		# Insert the string
+		return text[:cursorLoc] + replacement + text[cursorLoc:]
+
+
+	def _p_checkText(self, text):
+		if self._regexp is not None:
+			# Match to the regexp
+			match = self._regexp.match( text )
+			return match.span( 0 )  ==  ( 0, len( text ) )
+
+
+
 	def _o_onKeyPress(self, event):
 		super( DTEntry, self )._o_onKeyPress( event )
 		bHandled = False
@@ -323,42 +381,59 @@ class DTEntry (DTWidget):
 				self.returnSignal.emit()
 				self.ungrabFocus()
 			elif event.keyVal == gtk.keysyms.BackSpace  and  self.bEditable:
-				if self._selectionBounds is not None:
-					self._p_deleteSelection()
-				elif self._cursorLocation > 0:
-					textDeleted = self._text[self._cursorLocation-1:self._cursorLocation]
-					self._text = self._text[:self._cursorLocation-1] + self._text[self._cursorLocation:]
-					self._cursorLocation -= 1
-					self.textDeletedSignal.emit( self, self._cursorLocation, self._cursorLocation+1, textDeleted )
-				self._p_onTextModified()
+				bCanDelete = True
+				if self._regexp is not None:
+					text = self._p_computeTextAfterBackspace()
+					if not self._p_checkText( text ):
+						bCanDelete = False
+
+				if bCanDelete:
+					if self._selectionBounds is not None:
+						self._p_deleteSelection()
+					elif self._cursorLocation > 0:
+						textDeleted = self._text[self._cursorLocation-1:self._cursorLocation]
+						self._text = self._text[:self._cursorLocation-1] + self._text[self._cursorLocation:]
+						self._cursorLocation -= 1
+						self.textDeletedSignal.emit( self, self._cursorLocation, self._cursorLocation+1, textDeleted )
+					self._p_onTextModified()
 			elif event.keyVal == gtk.keysyms.Delete  and  self.bEditable:
-				if self._selectionBounds is not None:
-					self._p_deleteSelection()
-				elif self._cursorLocation < len( self._text ):
-					textDeleted = self._text[self._cursorLocation:self._cursorLocation+1]
-					self._text = self._text[:self._cursorLocation] + self._text[self._cursorLocation+1:]
-					self.textDeletedSignal.emit( self, self._cursorLocation, self._cursorLocation+1, textDeleted )
-				self._p_onTextModified()
+				bCanDelete = True
+				if self._regexp is not None:
+					text = self._p_computeTextAfterDelete()
+					if not self._p_checkText( text ):
+						bCanDelete = False
+
+				if bCanDelete:
+					if self._selectionBounds is not None:
+						self._p_deleteSelection()
+					elif self._cursorLocation < len( self._text ):
+						textDeleted = self._text[self._cursorLocation:self._cursorLocation+1]
+						self._text = self._text[:self._cursorLocation] + self._text[self._cursorLocation+1:]
+						self.textDeletedSignal.emit( self, self._cursorLocation, self._cursorLocation+1, textDeleted )
+					self._p_onTextModified()
 			elif event.keyString != '':
-				if self.keyHandler is not None  and  not bHandled:
-					bGrabbed = False
-					if self._grabChars is not None:
-						if self._bGrabCharsInverse:
-							bGrabbed = event.keyString not in self._grabChars
-						else:
-							bGrabbed = event.keyString in self._grabChars
-					if not bGrabbed:
+				bTextOk = True
+
+				if self._regexp is not None:
+					text = self._p_computeTextAfterReplacingSelection( event.keyString )
+					bTextOk = self._p_checkText( text )
+
+				if not self.bEditable:
+					bTextOk = False
+
+				if not bTextOk:
+					if self.keyHandler is not None:
 						bHandled = self.keyHandler._f_handleKeyPress( self, event )
-				if not bHandled  and  self.bEditable:
-					if self.allowableCharacters is None  or  event.keyString in self.allowableCharacters:
-						if self._selectionBounds is not None:
-							self._p_deleteSelection()
-						position = self._cursorLocation
-						bAppended = position == len( self._text )
-						self._text = self._text[:self._cursorLocation] + event.keyString + self._text[self._cursorLocation:]
-						self._cursorLocation += len( event.keyString )
-						self.textInsertedSignal.emit( self, position, bAppended, event.keyString )
-						self._p_onTextModified()
+
+				if not bHandled  and  bTextOk:
+					if self._selectionBounds is not None:
+						self._p_deleteSelection()
+					position = self._cursorLocation
+					bAppended = position == len( self._text )
+					self._text = self._text[:self._cursorLocation] + event.keyString + self._text[self._cursorLocation:]
+					self._cursorLocation += len( event.keyString )
+					self.textInsertedSignal.emit( self, position, bAppended, event.keyString )
+					self._p_onTextModified()
 
 	def _o_onKeyRelease(self, event):
 		super( DTEntry, self )._o_onKeyRelease( event )
@@ -551,8 +626,6 @@ class DTEntry (DTWidget):
 	highlightedTextColour = property( getHighlightedTextColour, setHighlightedTextColour )
 	borderColour = property( getBorderColour, setBorderColour )
 	autoCompleteList = property( None, setAutoCompleteList )
-	grabChars = property( None, setGrabChars )
-	grabCharsInverse = property( None, setGrabCharsInverse )
 
 
 
