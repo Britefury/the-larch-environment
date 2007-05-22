@@ -27,6 +27,10 @@ from Britefury.DocView.CellEdit.DVCStringCellEditEntryLabel import DVCStringCell
 
 
 
+
+
+
+
 class CVStringLiteral (CVExpression):
 	treeNodeClass = CVTStringLiteral
 
@@ -40,11 +44,10 @@ class CVStringLiteral (CVExpression):
 
 	@FunctionRefField
 	def stringValueWidget(self):
-		entry = DVCStringCellEditEntryLabel()
+		entry = DVCStringCellEditEntryLabel( regexp='[^\']*' )
 		entry.entry.textColour=Colour3f( 0.0, 0.0, 0.75 )
 		entry.keyHandler = self
 		entry.attachCell( self.treeNode.cells.stringValue )
-		entry.grabCharsInverse = '\''
 		return entry.entry
 
 

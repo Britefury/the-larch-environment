@@ -9,7 +9,7 @@ import pygtk
 pygtk.require( '2.0' )
 import gtk
 
-import string
+from Britefury.Util import RegExpStrings
 
 from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
@@ -51,10 +51,9 @@ class CVSendMessage (CVBorderNode):
 
 	@FunctionRefField
 	def messageNameWidget(self):
-		self._messageNameEntry =DVCStringCellEditEntryLabel()
+		self._messageNameEntry =DVCStringCellEditEntryLabel( regexp=RegExpStrings.identifier )
 		self._messageNameEntry.keyHandler = self
 		self._messageNameEntry.attachCell( self.treeNode.cells.messageName )
-		self._messageNameEntry.grabChars = string.ascii_letters
 		return self._messageNameEntry.entry
 
 

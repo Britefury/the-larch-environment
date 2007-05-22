@@ -9,7 +9,7 @@ import pygtk
 pygtk.require( '2.0' )
 import gtk
 
-import string
+from Britefury.Util import RegExpStrings
 
 from Britefury.Math.Math import Colour3f
 
@@ -36,13 +36,12 @@ class CVUnboundRef (CVExpression):
 
 	@FunctionRefField
 	def targetNameWidget(self):
-		entry = DVCStringCellEditEntryLabel()
+		entry = DVCStringCellEditEntryLabel( regexp=RegExpStrings.identifier )
 		entry.entry.textColour = Colour3f( 0.5, 0.0, 0.0 )
 		entry.entry.highlightedTextColour = Colour3f( 1.0, 0.5, 0.5 )
 		entry.keyHandler = self
 		entry.attachCell( self.treeNode.cells.targetName )
 		entry.finishSignal.connect( self._p_onEntryFinish )
-		entry.grabChars = string.ascii_letters + '_'
 		return entry.entry
 
 

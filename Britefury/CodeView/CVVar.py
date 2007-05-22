@@ -9,7 +9,7 @@ import pygtk
 pygtk.require( '2.0' )
 import gtk
 
-import string
+from Britefury.Util import RegExpStrings
 
 from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
@@ -34,10 +34,9 @@ class CVVar (CVNode):
 
 	@FunctionRefField
 	def nameWidget(self):
-		entry = DVCStringCellEditEntryLabel()
+		entry = DVCStringCellEditEntryLabel( regexp=RegExpStrings.identifier )
 		entry.keyHandler = self
 		entry.attachCell( self.treeNode.cells.varName )
-		entry.grabChars = string.ascii_letters
 		return entry.entry
 
 
