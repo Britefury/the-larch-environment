@@ -10,12 +10,12 @@ from Britefury.SheetGraph.SheetGraph import *
 
 from Britefury.CodeGraph.CGSendMessage import CGSendMessage
 
-from Britefury.CodeViewTree.CVTNode import CVTNode
+from Britefury.CodeViewTree.CVTExpression import CVTExpression
 from Britefury.CodeViewTree.CVTMessageArguments import CVTMessageArguments
 
 
 
-class CVTSendMessage (CVTNode):
+class CVTSendMessage (CVTExpression):
 	graphNodeClass = CGSendMessage
 
 
