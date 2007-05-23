@@ -16,7 +16,7 @@ from Britefury.SheetGraph.SheetGraph import *
 
 from Britefury.CodeViewTree.CVTSendMessage import CVTSendMessage
 
-from Britefury.CodeView.CVBorderNode import *
+from Britefury.CodeView.CVExpression import *
 
 from Britefury.CodeViewBehavior.CVBSendMessageBehavior import *
 
@@ -28,7 +28,7 @@ from Britefury.DocView.CellEdit.DVCStringCellEditEntryLabel import DVCStringCell
 
 
 
-class CVSendMessage (CVBorderNode):
+class CVSendMessage (CVExpression):
 	treeNodeClass = CVTSendMessage
 
 
@@ -107,3 +107,6 @@ class CVSendMessage (CVBorderNode):
 
 	def startEditingArguments(self):
 		self.argumentsNode.startEditing()
+
+	def stopEditingArguments(self):
+		self.widget.grabFocus()

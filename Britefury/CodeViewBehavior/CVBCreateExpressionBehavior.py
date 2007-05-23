@@ -23,7 +23,7 @@ class CVBCreateExpressionBehavior (CodeViewBehavior):
 		return True
 
 
-	@CVBCharInputHandlerMethod( string.ascii_letters )
+	@CVBCharInputHandlerMethod( string.ascii_letters + '_' )
 	def _replaceWithRef(self, viewNode, receivingNodePath, entry, event):
 		unboundRefCVT = cvto_insertUnboundRef( viewNode.treeNode, [ node.treeNode  for node in receivingNodePath ] )
 		unboundRefCVT.targetName = event.keyString

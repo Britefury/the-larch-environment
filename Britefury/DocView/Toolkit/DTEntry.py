@@ -359,7 +359,10 @@ class DTEntry (DTWidget):
 		if self._regexp is not None:
 			# Match to the regexp
 			match = self._regexp.match( text )
-			return match.span( 0 )  ==  ( 0, len( text ) )
+			if match is not None:
+				return match.span( 0 )  ==  ( 0, len( text ) )
+			else:
+				return None
 
 
 

@@ -15,4 +15,10 @@ class CVBSendMessageBehavior (CodeViewBehavior):
 		return True
 
 
+	@CVBCharInputHandlerMethod( ')' )
+	def _stopEditingArguments(self, viewNode, receivingNodePath, entry, event):
+		viewNode.stopEditingArguments()
+		return True
+
+
 

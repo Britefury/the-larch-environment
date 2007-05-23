@@ -32,8 +32,13 @@ def vstringmsg_init(instance, machine, args):
 def vstringmsg_print(instance, machine, args):
 	print instance._value
 
+def vstringmsg_add(instance, machine, args):
+	return pyStrToVString( instance._value + args[0]._value )
+
+
 vcls_string.setMessage( 'init', VMBuiltinMessage( vstringmsg_init ) )
 vcls_string.setMessage( 'print', VMBuiltinMessage( vstringmsg_print ) )
+vcls_string.setMessage( 'add', VMBuiltinMessage( vstringmsg_add ) )
 
 
 

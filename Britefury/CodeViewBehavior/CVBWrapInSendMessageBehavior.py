@@ -12,6 +12,7 @@ class CVBWrapInSendMessageBehavior (CodeViewBehavior):
 	@CVBCharInputHandlerMethod( '`' )
 	def _wrapInSendMessage(self, viewNode, receivingNodePath, entry, event):
 		viewNode.wrapInSendMessage()
+		return True
 
 
 
