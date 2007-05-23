@@ -15,13 +15,4 @@ class CVBMessageArgumentsBehavior (CodeViewBehavior):
 		return True
 
 
-	@CVBAccelInputHandlerMethod( 'Left' )
-	def _prev(self, viewNode, receivingNodePath, entry, event):
-		return viewNode.prevArgument( receivingNodePath[1] )
-
-	@CVBAccelInputHandlerMethod( 'Right' )
-	def _next(self, viewNode, receivingNodePath, entry, event):
-		return viewNode.nextArgument( receivingNodePath[1] )
-
-
 

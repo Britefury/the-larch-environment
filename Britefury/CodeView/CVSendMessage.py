@@ -106,7 +106,7 @@ class CVSendMessage (CVExpression):
 
 
 	def startEditingArguments(self):
-		self.argumentsNode.startEditing()
+		self.argumentsNode.makeCurrent()
 
 	def stopEditingArguments(self):
 		self.widget.grabFocus()
