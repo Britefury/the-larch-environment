@@ -47,17 +47,11 @@ class CVUnboundRef (CVExpression):
 
 	@FunctionField
 	def _refreshTargetName(self):
-		self.widget = self.targetNameWidget
+		self.widget.child = self.targetNameWidget
 
 	@FunctionField
 	def refreshCell(self):
 		self._refreshTargetName
-
-
-
-	def __init__(self, treeNode, view):
-		super( CVUnboundRef, self ).__init__( treeNode, view )
-		self.widget = None
 
 
 
