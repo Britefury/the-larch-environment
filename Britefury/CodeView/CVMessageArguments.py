@@ -104,6 +104,32 @@ class CVMessageArguments (CVBorderNode):
 		argCV.startEditing()
 
 
+	def prevArgument(self, receivingArg):
+		try:
+			index = self.argNodes.index( receivingArg )
+		except ValueError:
+			return False
+		else:
+			if index > 0:
+				self.argNodes[index-1].makeCurrent()
+				return True
+			else:
+				return False
+
+
+	def nextArgument(self, receivingArg):
+		try:
+			index = self.argNodes.index( receivingArg )
+		except ValueError:
+			return False
+		else:
+			if index  <  len( self.argNodes ) - 1:
+				self.argNodes[index+1].makeCurrent()
+				return True
+			else:
+				return False
+
+
 
 	def startEditing(self):
 		self.widget.grabFocus()

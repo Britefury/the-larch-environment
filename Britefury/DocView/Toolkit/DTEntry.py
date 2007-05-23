@@ -383,15 +383,15 @@ class DTEntry (DTWidget):
 					self._p_moveCursor( ( event.state & gtk.gdk.SHIFT_MASK ) != 0, self._cursorLocation - 1 )
 					bHandled = True
 				else:
-					# Handled if shift not pressed
-					bHandled = event.state & gtk.gdk.SHIFT_MASK  ==  0
+					# Handled if shift pressed
+					bHandled = event.state & gtk.gdk.SHIFT_MASK  !=  0
 			elif event.keyVal == gtk.keysyms.Right:
 				if self._cursorLocation  <  len( self._text ):
 					self._p_moveCursor( ( event.state & gtk.gdk.SHIFT_MASK ) != 0, self._cursorLocation + 1 )
 					bHandled = True
 				else:
-					# Handled if shift not pressed
-					bHandled = event.state & gtk.gdk.SHIFT_MASK  ==  0
+					# Handled if shift pressed
+					bHandled = event.state & gtk.gdk.SHIFT_MASK  !=  0
 			elif event.keyVal == gtk.keysyms.Home:
 				self._p_moveCursor( ( event.state & gtk.gdk.SHIFT_MASK ) != 0, 0 )
 				bHandled = True

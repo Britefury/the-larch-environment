@@ -14,7 +14,7 @@ from Britefury.SheetGraph.SheetGraph import *
 
 from Britefury.CodeViewTree.CVTLocalRef import CVTLocalRef
 
-from Britefury.CodeView.CVNode import *
+from Britefury.CodeView.CVExpression import *
 
 from Britefury.DocView.Toolkit.DTBox import DTBox
 from Britefury.DocView.Toolkit.DTLabel import DTLabel
@@ -22,7 +22,7 @@ from Britefury.DocView.Toolkit.DTDirection import DTDirection
 
 
 
-class CVLocalRef (CVNode):
+class CVLocalRef (CVExpression):
 	treeNodeClass = CVTLocalRef
 
 
@@ -33,7 +33,7 @@ class CVLocalRef (CVNode):
 		return DTLabel( self.treeNode.varName )
 
 	def _refreshCell(self):
-		self.widget[0] = self.nameWidget
+		self.widget.child = self.nameWidget
 
 	nameWidget = FunctionField( _nameWidget )
 	refreshCell = FunctionField( _refreshCell )
@@ -42,7 +42,5 @@ class CVLocalRef (CVNode):
 
 	def __init__(self, treeNode, view):
 		super( CVLocalRef, self ).__init__( treeNode, view )
-		self.widget = DTBox()
-		self.widget.append( DTLabel( 'nil' ) )
 
 

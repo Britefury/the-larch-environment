@@ -10,11 +10,11 @@ from Britefury.SheetGraph.SheetGraph import *
 
 from Britefury.CodeGraph.CGLocalRef import CGLocalRef
 
-from Britefury.CodeViewTree.CVTNode import CVTNode
+from Britefury.CodeViewTree.CVTExpression import CVTExpression
 
 
 
-class CVTLocalRef (CVTNode):
+class CVTLocalRef (CVTExpression):
 	graphNodeClass = CGLocalRef
 
 
