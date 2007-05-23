@@ -104,30 +104,28 @@ class CVMessageArguments (CVBorderNode):
 		argCV.startEditing()
 
 
-	def prevArgument(self, receivingArg):
+	def getChildToLeft(self, child):
 		try:
-			index = self.argNodes.index( receivingArg )
+			index = self.argNodes.index( child )
 		except ValueError:
-			return False
+			return None
 		else:
 			if index > 0:
-				self.argNodes[index-1].makeCurrent()
-				return True
+				return self.argNodes[index-1]
 			else:
-				return False
+				return None
 
 
-	def nextArgument(self, receivingArg):
+	def getChildToRight(self, child):
 		try:
-			index = self.argNodes.index( receivingArg )
+			index = self.argNodes.index( child )
 		except ValueError:
-			return False
+			return None
 		else:
 			if index  <  len( self.argNodes ) - 1:
-				self.argNodes[index+1].makeCurrent()
-				return True
+				return self.argNodes[index+1]
 			else:
-				return False
+				return None
 
 
 

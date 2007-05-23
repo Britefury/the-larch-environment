@@ -11,7 +11,7 @@ from Britefury.DocView.Toolkit.DTBorder import DTBorder
 
 
 class DTActiveBorder (DTBorder):
-	def __init__(self, leftMargin=3.0, rightMargin=3.0, topMargin=3.0, bottomMargin=3.0, borderWidth=1.0, borderColour=Colour3f( 0.8, 0.85, 0.9 ), prelitBorderColour=Colour3f( 0.6, 0.7, 0.8 ), highlightedBorderColour=Colour3f( 0.4, 0.6, 0.7 ), highlightedBackgroundColour=Colour3f( 0.93, 0.93, 0.93 ) ):
+	def __init__(self, leftMargin=3.0, rightMargin=3.0, topMargin=3.0, bottomMargin=3.0, borderWidth=1.0, borderColour=Colour3f( 0.8, 0.85, 0.9 ), prelitBorderColour=Colour3f( 0.6, 0.7, 0.8 ), highlightedBorderColour=Colour3f( 0.2, 0.2, 0.2 ), highlightedBackgroundColour=Colour3f( 0.93, 0.93, 0.93 ) ):
 		super( DTActiveBorder, self ).__init__( leftMargin, rightMargin, topMargin, bottomMargin )
 
 		self.keyHandler = None
