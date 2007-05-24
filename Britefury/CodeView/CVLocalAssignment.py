@@ -32,8 +32,11 @@ class CVLocalAssignment (CVBorderNode):
 	def _nameWidget(self):
 		return DTLabel( self.treeNode.varName )
 
+	def _valueNode(self):
+		return self._view.buildView( self.treeNode.valueNode, self )
+
 	def _valueWidget(self):
-		return self._view.buildView( self.treeNode.valueNode, self ).widget
+		return self._valueNode.widget
 
 	def _refreshName(self):
 		self._box[0] = self.nameWidget
@@ -61,3 +64,9 @@ class CVLocalAssignment (CVBorderNode):
 		self._box.append( DTLabel( '=' ) )
 		self._box.append( DTLabel( 'nil' ) )
 		self.widget.child = self._box
+
+
+
+
+	def horizontalNavigationList(self):
+		return [ self._nameWidget, self._valueNode ]

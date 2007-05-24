@@ -10,7 +10,7 @@ from Britefury.CodeViewBehavior.CodeViewBehavior import *
 
 class CVBWrapInSendMessageBehavior (CodeViewBehavior):
 	@CVBCharInputHandlerMethod( '`' )
-	def _wrapInSendMessage(self, viewNode, receivingNodePath, entry, event):
+	def _wrapInSendMessage(self, viewNode, receivingNodePath, widget, event):
 		viewNode.wrapInSendMessage()
 		return True
 

@@ -12,7 +12,7 @@ from Britefury.CodeViewTreeOperations.CVTOStatementListOperations import *
 
 class CVBStatementListBehavior (CodeViewBehavior):
 	@CVBAccelInputHandlerMethod( '<alt>v' )
-	def _addLocalVar(self, viewNode, receivingNodePath, entry, event):
+	def _addLocalVar(self, viewNode, receivingNodePath, widget, event):
 		if len( receivingNodePath ) > 1:
 			position = viewNode.treeNode.statementNodes.index( receivingNodePath[1].treeNode )
 		else:

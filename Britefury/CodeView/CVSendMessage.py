@@ -109,4 +109,9 @@ class CVSendMessage (CVExpression):
 		self.argumentsNode.makeCurrent()
 
 	def stopEditingArguments(self):
-		self.widget.grabFocus()
+		self.makeCurrent()
+
+
+
+	def horizontalNavigationList(self):
+		return [ self.targetObjectNode, self.messageNameWidget, self.argumentsNode ]

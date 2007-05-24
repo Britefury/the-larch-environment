@@ -25,8 +25,8 @@ class _CVBInputHandler (KMeta.KMetaMember):
 		self._handlerMethod = handlerMethod
 
 
-	def _f_handleKeyPress(self, viewNode, receivingNodePath, entry, keyPressEvent):
-		return self._handlerMethod( self, viewNode, receivingNodePath, entry, keyPressEvent )
+	def _f_handleKeyPress(self, viewNode, receivingNodePath, widget, keyPressEvent):
+		return self._handlerMethod( self, viewNode, receivingNodePath, widget, keyPressEvent )
 
 
 class CVBAccelInputHandler (_CVBInputHandler):
@@ -97,7 +97,7 @@ class CodeViewBehavior (Sheet):
 	__metaclass__ = CodeViewBehaviorClass
 
 
-	def handleKeyPress(self, fromNode, receivingNodePath, entry, keyPressEvent):
+	def handleKeyPress(self, fromNode, receivingNodePath, widget, keyPressEvent):
 		state = keyPressEvent.state  &  ( gtk.gdk.SHIFT_MASK | gtk.gdk.CONTROL_MASK | gtk.gdk.MOD1_MASK )
 		keyVal = keyPressEvent.keyVal
 		key = keyVal, state
@@ -115,7 +115,7 @@ class CodeViewBehavior (Sheet):
 
 
 		if inputHandler is not None:
-			return inputHandler._f_handleKeyPress( fromNode, receivingNodePath, entry, keyPressEvent )
+			return inputHandler._f_handleKeyPress( fromNode, receivingNodePath, widget, keyPressEvent )
 		else:
 			return False
 

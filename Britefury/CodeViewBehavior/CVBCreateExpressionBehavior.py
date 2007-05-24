@@ -15,7 +15,7 @@ from Britefury.CodeViewTreeOperations.CVTOCreateExpressionOperations import *
 
 class CVBCreateExpressionBehavior (CodeViewBehavior):
 	@CVBCharInputHandlerMethod( '\'' )
-	def _replaceWithStringLiteral(self, viewNode, receivingNodePath, entry, event):
+	def _replaceWithStringLiteral(self, viewNode, receivingNodePath, widget, event):
 		strLitCVT = cvto_insertStringLiteral( viewNode.treeNode, [ node.treeNode  for node in receivingNodePath ] )
 		viewNode._view.refresh()
 		strLitCV = viewNode._view.getViewNodeForTreeNode( strLitCVT )
@@ -24,7 +24,7 @@ class CVBCreateExpressionBehavior (CodeViewBehavior):
 
 
 	@CVBCharInputHandlerMethod( string.ascii_letters + '_' )
-	def _replaceWithRef(self, viewNode, receivingNodePath, entry, event):
+	def _replaceWithRef(self, viewNode, receivingNodePath, widget, event):
 		unboundRefCVT = cvto_insertUnboundRef( viewNode.treeNode, [ node.treeNode  for node in receivingNodePath ] )
 		unboundRefCVT.targetName = event.keyString
 		viewNode._view.refresh()

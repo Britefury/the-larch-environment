@@ -21,7 +21,7 @@ class DTWidgetKeyHandlerInterface (object):
 	# Return False if the widget should handle the event as normal
 	# Return True if the widget should ignore it (let the key handler take care of it)
 	@abstractmethod
-	def _f_handleKeyPress(self, entry, keyPressEvent):
+	def _f_handleKeyPress(self, widget, keyPressEvent):
 		pass
 
 

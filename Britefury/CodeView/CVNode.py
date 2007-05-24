@@ -16,6 +16,8 @@ from Britefury.Kernel import KMeta
 from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
+from Britefury.CodeViewBehavior.CVBMovementBehavior import CVBMovementBehavior
+
 from Britefury.CodeViewTree.CVTNode import CVTNode
 
 from Britefury.CodeView.CodeView import CodeView
@@ -108,6 +110,9 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 	treeNode = SheetRefField( CVTNode )
 
 
+	behaviors = [ CVBMovementBehavior() ]
+
+
 
 	def __init__(self, treeNode, view):
 		super( CVNode, self ).__init__()
@@ -122,8 +127,108 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 
 
 
+	def horizontalNavigationList(self):
+		return None
 
-	def _o_handleKeyPress(self, receivingNodePath, entry, keyPressEvent):
+	def verticalNavigationList(self):
+		return None
+
+
+
+
+
+
+	def getChildToLeft(self, child):
+		navList = self.horizontalNavigationList()
+		if navList is None:
+			return None
+		else:
+			try:
+				index = navList.index( child )
+			except ValueError:
+				return None
+			if index > 0:
+				return navList[index-1]
+			else:
+				return None
+
+
+	def getChildToRight(self, child):
+		navList = self.horizontalNavigationList()
+		if navList is None:
+			return None
+		else:
+			try:
+				index = navList.index( child )
+			except ValueError:
+				return None
+			if index < len(navList) - 1:
+				return navList[index+1]
+			else:
+				return None
+
+
+	def getChildAbove(self, child):
+		navList = self.verticalNavigationList()
+		if navList is None:
+			return None
+		else:
+			try:
+				index = navList.index( child )
+			except ValueError:
+				return None
+			if index > 0:
+				return navList[index-1]
+			else:
+				return None
+
+
+	def getChildBelow(self, child):
+		navList = self.verticalNavigationList()
+		if navList is None:
+			return None
+		else:
+			try:
+				index = navList.index( child )
+			except ValueError:
+				return None
+			if index < len(navList) - 1:
+				return navList[index+1]
+			else:
+				return None
+
+
+	def _move(self, toChild):
+		if toChild is not None:
+			if isinstance( toChild, CVNode ):
+				toChild.makeCurrent()
+				return True
+			elif isinstance( toChild, DTWidget ):
+				toChild.grabFocus()
+				return True
+			else:
+				raise TypeError, 'cannot handle child %s' % ( toChild, )
+				return False
+		else:
+			return False
+
+
+	def moveLeft(self, fromChild):
+		return self._move( self.getChildToLeft( fromChild ) )
+
+	def moveRight(self, fromChild):
+		return self._move( self.getChildToRight( fromChild ) )
+
+	def moveUp(self, fromChild):
+		return self._move( self.getChildAbove( fromChild ) )
+
+	def moveDown(self, fromChild):
+		return self._move( self.getChildBelow( fromChild ) )
+
+
+
+
+	def _o_handleKeyPress(self, receivingNodePath, widget, keyPressEvent):
 		state = keyPressEvent.state  &  ( gtk.gdk.SHIFT_MASK | gtk.gdk.CONTROL_MASK | gtk.gdk.MOD1_MASK )
 		keyVal = keyPressEvent.keyVal
 		key = keyVal, state
@@ -139,23 +244,23 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 			for slot in self._nodeSlots:
 				if slot._f_containsNode( self, receivingNodePath[1] ):
 					for behavior in slot._behaviors:
-						if behavior.handleKeyPress( self, receivingNodePath, entry, keyPressEvent ):
+						if behavior.handleKeyPress( self, receivingNodePath, widget, keyPressEvent ):
 							return True
 
 
 		for behavior in self.behaviors:
-			if behavior.handleKeyPress( self, receivingNodePath, entry, keyPressEvent ):
+			if behavior.handleKeyPress( self, receivingNodePath, widget, keyPressEvent ):
 				return True
 
 		# Pass to the parent node
 		if self._parent is not None:
-			return self._parent._o_handleKeyPress( ( self, ) + receivingNodePath, entry, keyPressEvent )
+			return self._parent._o_handleKeyPress( ( self, ) + receivingNodePath, widget, keyPressEvent )
 		else:
 			return False
 
 
-	def _f_handleKeyPress(self, entry, keyPressEvent):
-		return self._o_handleKeyPress( (), entry, keyPressEvent)
+	def _f_handleKeyPress(self, widget, keyPressEvent):
+		return self._o_handleKeyPress( (), widget, keyPressEvent)
 
 
 	def makeCurrent(self):

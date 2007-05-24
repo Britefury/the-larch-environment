@@ -60,3 +60,7 @@ class CVModule (CVBorderNode):
 		self.widget.child = self._box
 
 
+
+
+	def verticalNavigationList(self):
+		return self.statementNodes

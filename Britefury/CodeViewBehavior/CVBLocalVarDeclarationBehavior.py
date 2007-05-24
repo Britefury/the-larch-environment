@@ -10,7 +10,7 @@ from Britefury.CodeViewBehavior.CodeViewBehavior import *
 
 class CVBLocalVarDeclarationBehavior (CodeViewBehavior):
 	@CVBCharInputHandlerMethod( '=' )
-	def _setValue(self, viewNode, receivingNodePath, entry, event):
+	def _setValue(self, viewNode, receivingNodePath, widget, event):
 		viewNode.startEditingValue()
 		return True
 
