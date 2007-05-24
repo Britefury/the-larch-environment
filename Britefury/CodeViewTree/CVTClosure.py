@@ -10,13 +10,13 @@ from Britefury.SheetGraph.SheetGraph import *
 
 from Britefury.CodeGraph.CGClosure import CGClosure
 
-from Britefury.CodeViewTree.CVTNode import CVTNode
+from Britefury.CodeViewTree.CVTExpression import CVTExpression
 from Britefury.CodeViewTree.CVTBlockStatements import CVTBlockStatements
 from Britefury.CodeViewTree.CVTBlockParameters import CVTBlockParameters
 
 
 
-class CVTClosure (CVTNode):
+class CVTClosure (CVTExpression):
 	graphNodeClass = CGClosure
 
 	graphNode = SheetRefField( CGClosure )

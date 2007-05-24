@@ -62,6 +62,12 @@ class CVBlockParameters (CVBorderNode):
 
 
 
+	def horizontalNavigationList(self):
+		expandParamNode = self.expandParamNode
+		if expandParamNode is not None:
+			return self.paramNodes + [ expandParamNode ]
+		else:
+			return self.paramNodes
 
 
 

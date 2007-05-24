@@ -14,7 +14,7 @@ from Britefury.SheetGraph.SheetGraph import *
 
 from Britefury.CodeViewTree.CVTClosure import CVTClosure
 
-from Britefury.CodeView.CVNode import *
+from Britefury.CodeView.CVExpression import *
 
 from Britefury.DocView.Toolkit.DTBox import DTBox
 from Britefury.DocView.Toolkit.DTBorder import DTBorder
@@ -23,7 +23,7 @@ from Britefury.DocView.Toolkit.DTDirection import DTDirection
 
 
 
-class CVClosure (CVNode):
+class CVClosure (CVExpression):
 	treeNodeClass = CVTClosure
 
 
@@ -74,6 +74,7 @@ class CVClosure (CVNode):
 		self._lambdaBox.append( DTLabel( '):' ) )
 		self._statementsBorder = DTBorder( 30.0, 0.0, 0.0, 0.0 )
 		self._statementsBorder.child = DTLabel( 'nil' )
-		self.widget = DTBox( DTDirection.TOP_TO_BOTTOM, spacing=4.0 )
-		self.widget.append( self._lambdaBox )
-		self.widget.append( self._statementsBorder )
+		self._box = DTBox( DTDirection.TOP_TO_BOTTOM, spacing=4.0 )
+		self._box.append( self._lambdaBox )
+		self._box.append( self._statementsBorder )
+		self.widget.child = self._box

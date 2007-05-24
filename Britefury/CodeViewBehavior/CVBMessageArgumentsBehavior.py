@@ -10,7 +10,7 @@ from Britefury.CodeViewBehavior.CodeViewBehavior import *
 
 class CVBMessageArgumentsBehavior (CodeViewBehavior):
 	@CVBCharInputHandlerMethod( ',' )
-	def _addArgument(self, viewNode, receivingNodePath, entry, event):
+	def _addArgument(self, viewNode, receivingNodePath, widget, event):
 		viewNode.addArgument()
 		return True
 

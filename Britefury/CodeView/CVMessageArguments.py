@@ -104,30 +104,16 @@ class CVMessageArguments (CVBorderNode):
 		argCV.startEditing()
 
 
-	def getChildToLeft(self, child):
-		try:
-			index = self.argNodes.index( child )
-		except ValueError:
-			return None
-		else:
-			if index > 0:
-				return self.argNodes[index-1]
-			else:
-				return None
-
-
-	def getChildToRight(self, child):
-		try:
-			index = self.argNodes.index( child )
-		except ValueError:
-			return None
-		else:
-			if index  <  len( self.argNodes ) - 1:
-				return self.argNodes[index+1]
-			else:
-				return None
-
-
-
 	def startEditing(self):
 		self.widget.grabFocus()
+
+
+
+	def horizontalNavigationList(self):
+		expandArgNode = self.expandArgNode
+		if expandArgNode is not None:
+			return self.argNodes + [ expandArgNode ]
+		else:
+			return self.argNodes
+
+

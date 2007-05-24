@@ -55,3 +55,8 @@ class CVBlockStatements (CVBorderNode):
 		self._box = DTBox( DTDirection.TOP_TO_BOTTOM, minorDirectionAlignment=DTBox.ALIGN_TOPLEFT, spacing=4.0 )
 		self.widget.child = self._box
 
+
+
+
+	def verticalNavigationList(self):
+		return self.statementNodes

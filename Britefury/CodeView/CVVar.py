@@ -16,7 +16,7 @@ from Britefury.SheetGraph.SheetGraph import *
 
 from Britefury.CodeViewTree.CVTVar import CVTVar
 
-from Britefury.CodeView.CVNode import *
+from Britefury.CodeView.CVBorderNode import *
 
 from Britefury.DocView.Toolkit.DTBox import DTBox
 from Britefury.DocView.Toolkit.DTLabel import DTLabel
@@ -25,7 +25,7 @@ from Britefury.DocView.CellEdit.DVCStringCellEditEntryLabel import DVCStringCell
 
 
 
-class CVVar (CVNode):
+class CVVar (CVBorderNode):
 	treeNodeClass = CVTVar
 
 
@@ -42,17 +42,11 @@ class CVVar (CVNode):
 
 	@FunctionField
 	def _refreshName(self):
-		self.widget = self.nameWidget
+		self.widget.child = self.nameWidget
 
 	@FunctionField
 	def refreshCell(self):
 		self._refreshName
-
-
-
-	def __init__(self, treeNode, view):
-		super( CVVar, self ).__init__( treeNode, view )
-		self.widget = None
 
 
 
