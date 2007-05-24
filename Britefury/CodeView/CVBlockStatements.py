@@ -17,6 +17,7 @@ from Britefury.CodeViewTree.CVTBlockStatements import CVTBlockStatements
 from Britefury.CodeView.CVBorderNode import *
 
 from Britefury.CodeViewBehavior.CVBStatementListBehavior import *
+from Britefury.CodeViewBehavior.CVBCreateExpressionBehavior import *
 
 from Britefury.DocView.Toolkit.DTBox import DTBox
 from Britefury.DocView.Toolkit.DTLabel import DTLabel
@@ -31,7 +32,7 @@ class CVBlockStatements (CVBorderNode):
 	treeNode = SheetRefField( CVTBlockStatements )
 
 
-	behaviors = [ CVBStatementListBehavior() ]
+	behaviors = [ CVBStatementListBehavior(), CVBCreateExpressionBehavior() ]
 
 
 	@FunctionField
