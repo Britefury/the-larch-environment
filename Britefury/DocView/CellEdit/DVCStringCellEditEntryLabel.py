@@ -52,7 +52,7 @@ class DVCStringCellEditEntryLabel (DVCBasicWidgetSingleCellEdit):
 			self._o_blockCell( text )
 			self._cell.literalValue = text
 			self._o_unblockCell()
-			self.finishSignal.emit( self, text )
+		self.finishSignal.emit( self, text )
 
 
 
