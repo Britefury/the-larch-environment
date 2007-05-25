@@ -24,6 +24,12 @@ from Britefury.DocView.Toolkit.DTAutoCompleteDropDown import DTAutoCompleteDropD
 
 
 
+_modKeysMask = ( gtk.gdk.SHIFT_MASK | gtk.gdk.CONTROL_MASK | gtk.gdk.MOD1_MASK )
+
+
+
+
+
 class DTEntry (DTWidget):
 	returnSignal = ClassSignal()
 	textInsertedSignal = ClassSignal()				# ( entry, position, bAppended, textInserted )
@@ -392,19 +398,23 @@ class DTEntry (DTWidget):
 		# Not handle it ourselves
 		if not bHandled:
 			if event.keyVal == gtk.keysyms.Left:
-				if self._cursorLocation > 0:
-					self._p_moveCursor( ( event.state & gtk.gdk.SHIFT_MASK ) != 0, self._cursorLocation - 1 )
-					bHandled = True
-				else:
-					# Handled if shift pressed
-					bHandled = event.state & gtk.gdk.SHIFT_MASK  !=  0
+				modKeys = event.state & _modKeysMask
+				if modKeys == gtk.gdk.SHIFT_MASK  or  modKeys == 0:
+					if self._cursorLocation > 0:
+						self._p_moveCursor( ( event.state & gtk.gdk.SHIFT_MASK ) != 0, self._cursorLocation - 1 )
+						bHandled = True
+					else:
+						# Handled if shift pressed
+						bHandled = event.state & gtk.gdk.SHIFT_MASK  !=  0
 			elif event.keyVal == gtk.keysyms.Right:
-				if self._cursorLocation  <  len( self._text ):
-					self._p_moveCursor( ( event.state & gtk.gdk.SHIFT_MASK ) != 0, self._cursorLocation + 1 )
-					bHandled = True
-				else:
-					# Handled if shift pressed
-					bHandled = event.state & gtk.gdk.SHIFT_MASK  !=  0
+				modKeys = event.state & _modKeysMask
+				if modKeys == gtk.gdk.SHIFT_MASK  or  modKeys == 0:
+					if self._cursorLocation  <  len( self._text ):
+						self._p_moveCursor( ( event.state & gtk.gdk.SHIFT_MASK ) != 0, self._cursorLocation + 1 )
+						bHandled = True
+					else:
+						# Handled if shift pressed
+						bHandled = event.state & gtk.gdk.SHIFT_MASK  !=  0
 			elif event.keyVal == gtk.keysyms.Home:
 				self._p_moveCursor( ( event.state & gtk.gdk.SHIFT_MASK ) != 0, 0 )
 				bHandled = True

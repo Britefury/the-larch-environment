@@ -49,6 +49,9 @@ class CVMessageName (CVNode):
 		self._refreshName
 
 
+	def makeCurrent(self):
+		self.widget.startEditing()
+
 	def startEditing(self):
 		self.widget.startEditing()
 
