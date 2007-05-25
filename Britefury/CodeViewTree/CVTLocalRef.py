@@ -40,6 +40,5 @@ class CVTLocalRef (CVTExpression):
 			parentCGSink = self.graphNode.parent[0]
 			unboundRefGraphNode = CGUnboundRef()
 			unboundRefGraphNode.targetName = varName
-			n = parentCGSink.index( self.graphNode.parent )
-			parentCGSink[n] = unboundRefGraphNode.parent
+			parentCGSink.replace( self.graphNode.parent, unboundRefGraphNode.parent )
 			return self._tree.buildNode( unboundRefGraphNode )

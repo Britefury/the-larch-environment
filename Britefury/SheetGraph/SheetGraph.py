@@ -265,6 +265,7 @@ class SheetGraphNodeSink (SheetGraphNodePin):
 
 
 	def append(self, source):
+		assert isinstance( source, SheetGraphNodeSource )
 		assert self._node is not None, 'no node'
 		assert len( self ) < self.maxLen() or  self.maxLen() is None, 'cannot add another input'
 		assert source not in self, 'input already present'
@@ -281,6 +282,7 @@ class SheetGraphNodeSink (SheetGraphNodePin):
 		assert self._node is not None, 'no node'
 		assert ( len( self ) + len( sources ) <= self.maxLen() or  self.maxLen() is None ), 'insufficient space for inputs'
 		for source in sources:
+			assert isinstance( source, SheetGraphNodeSource )
 			assert source not in self, 'input already present'
 		for source in sources:
 			source._f_addOutput( self )
@@ -294,6 +296,7 @@ class SheetGraphNodeSink (SheetGraphNodePin):
 		self._node._f_sinkModified( self )
 
 	def insert(self, index, source):
+		assert isinstance( source, SheetGraphNodeSource )
 		assert self._node is not None, 'no node'
 		assert len( self ) < self.maxLen() or  self.maxLen() is None, 'cannot add another input'
 		assert source not in self, 'input already present'
@@ -308,6 +311,7 @@ class SheetGraphNodeSink (SheetGraphNodePin):
 		self._node._f_sinkModified( self )
 
 	def remove(self, source):
+		assert isinstance( source, SheetGraphNodeSource )
 		assert self._node is not None, 'no node'
 		assert source in self, 'input not present'
 		self.removeSignal.emit( self, source )
@@ -323,6 +327,22 @@ class SheetGraphNodeSink (SheetGraphNodePin):
 		source = self[-1]
 		self.remove( source )
 		return source
+
+	def replace(self, source, withSource):
+		assert isinstance( source, SheetGraphNodeSource )
+		assert isinstance( withSource, SheetGraphNodeSource )
+		assert self._node is not None, 'no node'
+		assert source in self, 'input @source not present'
+		assert withSource not in self, 'input @withSource already present'
+		n = self.index( source )
+		self[n] = withSource
+
+	def splitLinkWithNode(self, linkToSource, nodeSink, nodeSource):
+		assert isinstance( linkToSource, SheetGraphNodeSource )
+		assert isinstance( nodeSink, SheetGraphNodeSink )
+		assert isinstance( nodeSource, SheetGraphNodeSource )
+		self.replace( linkToSource, nodeSource )
+		nodeSink.append( linkToSource )
 
 
 	def clear(self):
@@ -344,6 +364,7 @@ class SheetGraphNodeSink (SheetGraphNodePin):
 		if isinstance( contents, tuple ):
 			contents = list( contents )
 		for source in self:
+			assert isinstance( source, SheetGraphNodeSource )
 			source._f_removeOutput( self )
 			self._node._o_onRemoveInputSource( source )
 		oldContents = self[:]

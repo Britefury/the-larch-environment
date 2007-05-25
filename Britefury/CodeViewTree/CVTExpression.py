@@ -25,7 +25,5 @@ class CVTExpression (CVTNode):
 	def wrapInSendMessage(self):
 		parentCGSink = self.graphNode.parent[0]
 		sendCG = CGSendMessage()
-		n = parentCGSink.index( self.graphNode.parent )
-		parentCGSink[n] = sendCG.parent
-		sendCG.targetObject.append( self.graphNode.parent )
+		parentCGSink.splitLinkWithNode( self.graphNode.parent, sendCG.targetObject, sendCG.parent )
 		return self._tree.buildNode( sendCG )
