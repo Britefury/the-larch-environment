@@ -107,25 +107,26 @@ class DTActiveBorder (DTBorder):
 
 
 	def _o_draw(self, context):
-		if self._bHasFocus:
-			b = self._highlightedBorderWidth
-		else:
-			b = self._borderWidth
+		if self._bHasFocus  or  self._bPrelit  or  self._borderColour is not None:
+			if self._bHasFocus:
+				b = self._highlightedBorderWidth
+			else:
+				b = self._borderWidth
 
-		# Background
-		context.rectangle( b * 0.5, b * 0.5, self._allocation.x - b, self._allocation.y - b )
+			# Background
+			context.rectangle( b * 0.5, b * 0.5, self._allocation.x - b, self._allocation.y - b )
 
-		# Border
-		context.set_line_width( b )
-		if self._bHasFocus:
-			context.set_source_rgb( self._highlightedBackgroundColour.r, self._highlightedBackgroundColour.g, self._highlightedBackgroundColour.b )
-			context.fill_preserve()
-			context.set_source_rgb( self._highlightedBorderColour.r, self._highlightedBorderColour.g, self._highlightedBorderColour.b )
-		elif self._bPrelit:
-			context.set_source_rgb( self._prelitBorderColour.r, self._prelitBorderColour.g, self._prelitBorderColour.b )
-		else:
-			context.set_source_rgb( self._borderColour.r, self._borderColour.g, self._borderColour.b )
-		context.stroke()
+			# Border
+			context.set_line_width( b )
+			if self._bHasFocus:
+				context.set_source_rgb( self._highlightedBackgroundColour.r, self._highlightedBackgroundColour.g, self._highlightedBackgroundColour.b )
+				context.fill_preserve()
+				context.set_source_rgb( self._highlightedBorderColour.r, self._highlightedBorderColour.g, self._highlightedBorderColour.b )
+			elif self._bPrelit:
+				context.set_source_rgb( self._prelitBorderColour.r, self._prelitBorderColour.g, self._prelitBorderColour.b )
+			else:
+				context.set_source_rgb( self._borderColour.r, self._borderColour.g, self._borderColour.b )
+			context.stroke()
 
 		super( DTActiveBorder, self )._o_draw( context )
 
@@ -136,3 +137,4 @@ class DTActiveBorder (DTBorder):
 	prelitBorderColour = property( getPrelitBorderColour, setPrelitBorderColour )
 	highlightedBorderColour = property( getHighlightedBorderColour, setHighlightedBorderColour )
 	highlightedBackgroundColour = property( getHighlightedBackgroundColour, setHighlightedBackgroundColour )
+

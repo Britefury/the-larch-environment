@@ -55,6 +55,7 @@ class CVBlockStatements (CVBorderNode):
 		super( CVBlockStatements, self ).__init__( treeNode, view )
 		self._box = DTBox( DTDirection.TOP_TO_BOTTOM, minorDirectionAlignment=DTBox.ALIGN_TOPLEFT, spacing=4.0 )
 		self.widget.child = self._box
+		self.widget.bottomMargin = 10.0
 
 
 
