@@ -11,7 +11,7 @@ from Britefury.SheetGraph.SheetGraph import *
 from Britefury.VirtualMachine.VMMachine import VMMachine
 
 from Britefury.CodeGraph.CGBlock import CGBlock
-from Britefury.CodeGraph.CGClosure import CGClosure
+from Britefury.CodeGraph.CGLambda import CGLambda
 from Britefury.CodeGraph.CGLocalAssignment import CGLocalAssignment
 from Britefury.CodeGraph.CGLocalRef import CGLocalRef
 from Britefury.CodeGraph.CGLocalVarDeclaration import CGLocalVarDeclaration
@@ -33,7 +33,7 @@ from Britefury.LowLevelCodeTree.LowLevelCodeTree import LowLevelCodeTree
 
 if __name__ == '__main__':
 	# function printString
-	printStringClosure = CGClosure()
+	printStringClosure = CGLambda()
 	printStringBlock = CGBlock()
 	printStringSendPrintMessage = CGSendMessage()
 	printStringLoadText = CGLocalRef()

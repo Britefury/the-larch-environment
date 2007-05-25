@@ -12,7 +12,7 @@ import gtk
 from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
-from Britefury.CodeViewTree.CVTClosure import CVTClosure
+from Britefury.CodeViewTree.CVTLambda import CVTLambda
 
 from Britefury.CodeView.CVExpression import *
 
@@ -23,11 +23,11 @@ from Britefury.DocView.Toolkit.DTDirection import DTDirection
 
 
 
-class CVClosure (CVExpression):
-	treeNodeClass = CVTClosure
+class CVLambda (CVExpression):
+	treeNodeClass = CVTLambda
 
 
-	treeNode = SheetRefField( CVTClosure )
+	treeNode = SheetRefField( CVTLambda )
 
 
 	@FunctionRefField
@@ -50,7 +50,7 @@ class CVClosure (CVExpression):
 
 	@FunctionField
 	def _refreshParams(self):
-		self._lambdaBox[2] = self.paramsWidget
+		self._lambdaBox[1] = self.paramsWidget
 
 	@FunctionField
 	def _refreshStatements(self):
@@ -66,12 +66,10 @@ class CVClosure (CVExpression):
 
 
 	def __init__(self, treeNode, view):
-		super( CVClosure, self ).__init__( treeNode, view )
+		super( CVLambda, self ).__init__( treeNode, view )
 		self._lambdaBox = DTBox( spacing=1.0 )
 		self._lambdaBox.append( DTLabel( 'lambda' ) )
-		self._lambdaBox.append( DTLabel( '(' ) )
 		self._lambdaBox.append( DTLabel( 'nil' ) )
-		self._lambdaBox.append( DTLabel( '):' ) )
 		self._statementsBorder = DTBorder( 30.0, 0.0, 0.0, 0.0 )
 		self._statementsBorder.child = DTLabel( 'nil' )
 		self._box = DTBox( DTDirection.TOP_TO_BOTTOM, spacing=4.0 )

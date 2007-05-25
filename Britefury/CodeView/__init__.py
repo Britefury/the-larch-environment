@@ -10,7 +10,7 @@ import CVExpression
 import CVNullExpression
 import CVBlockStatements
 import CVBlockParameters
-import CVClosure
+import CVLambda
 import CVLocalAssignment
 import CVLocalRef
 import CVLocalVarDeclaration

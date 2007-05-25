@@ -8,7 +8,7 @@
 from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
-from Britefury.CodeGraph.CGClosure import CGClosure
+from Britefury.CodeGraph.CGLambda import CGLambda
 
 from Britefury.CodeViewTree.CVTExpression import CVTExpression
 from Britefury.CodeViewTree.CVTBlockStatements import CVTBlockStatements
@@ -16,10 +16,10 @@ from Britefury.CodeViewTree.CVTBlockParameters import CVTBlockParameters
 
 
 
-class CVTClosure (CVTExpression):
-	graphNodeClass = CGClosure
+class CVTLambda (CVTExpression):
+	graphNodeClass = CGLambda
 
-	graphNode = SheetRefField( CGClosure )
+	graphNode = SheetRefField( CGLambda )
 
 
 	def _statementsNode(self):
