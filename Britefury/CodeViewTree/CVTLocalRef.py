@@ -9,6 +9,7 @@ from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
 from Britefury.CodeGraph.CGLocalRef import CGLocalRef
+from Britefury.CodeGraph.CGUnboundRef import CGUnboundRef
 
 from Britefury.CodeViewTree.CVTExpression import CVTExpression
 
@@ -26,3 +27,19 @@ class CVTLocalRef (CVTExpression):
 
 
 	varName = FunctionField( _varName )
+
+
+
+
+	def rebind(self, varName):
+		targetGraphNode = self.graphNode.getReferenceableNodeByName( varName )
+		if targetGraphNode is not None:
+			self.graphNode.variable[0] = targetGraphNode.references
+			return self
+		else:
+			parentCGSink = self.graphNode.parent[0]
+			unboundRefGraphNode = CGUnboundRef()
+			unboundRefGraphNode.targetName = varName
+			n = parentCGSink.index( self.graphNode.parent )
+			parentCGSink[n] = unboundRefGraphNode.parent
+			return self._tree.buildNode( unboundRefGraphNode )

@@ -49,6 +49,9 @@ class CVMessageName (CVNode):
 		self._refreshName
 
 
+	def startEditing(self):
+		self.widget.startEditing()
+
 	def startEditingOnLeft(self):
 		self.widget.startEditingOnLeft()
 

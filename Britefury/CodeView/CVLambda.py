@@ -76,3 +76,10 @@ class CVLambda (CVExpression):
 		self._box.append( self._lambdaBox )
 		self._box.append( self._statementsBorder )
 		self.widget.child = self._box
+
+
+	def verticalNavigationList(self):
+		return [ self.paramsNode, self.statementsNode ]
+
+	def horizontalCursorNavigationList(self):
+		return self.verticalNavigationList()

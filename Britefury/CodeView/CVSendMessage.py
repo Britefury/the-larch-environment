@@ -103,7 +103,7 @@ class CVSendMessage (CVExpression):
 
 
 	def startEditingMessageName(self):
-		self._messageNameEntry.startEditing()
+		self.messageNameNode.startEditing()
 
 
 	def startEditingArguments(self):

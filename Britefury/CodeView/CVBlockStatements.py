@@ -61,3 +61,6 @@ class CVBlockStatements (CVBorderNode):
 
 	def verticalNavigationList(self):
 		return self.statementNodes
+
+	def horizontalCursorNavigationList(self):
+		return self.statementNodes
