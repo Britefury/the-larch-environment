@@ -136,106 +136,11 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 
 
 
-
-
-	def getChildToLeft(self, child):
-		navList = self.horizontalNavigationList()
-		if navList is None:
-			return None
-		else:
-			try:
-				index = navList.index( child )
-			except ValueError:
-				return None
-			if index > 0:
-				return navList[index-1]
-			else:
-				return None
-
-
-	def getChildToRight(self, child):
-		navList = self.horizontalNavigationList()
-		if navList is None:
-			return None
-		else:
-			try:
-				index = navList.index( child )
-			except ValueError:
-				return None
-			if index < len(navList) - 1:
-				return navList[index+1]
-			else:
-				return None
-
-
-	def getChildAbove(self, child):
-		navList = self.verticalNavigationList()
-		if navList is None:
-			return None
-		else:
-			try:
-				index = navList.index( child )
-			except ValueError:
-				return None
-			if index > 0:
-				return navList[index-1]
-			else:
-				return None
-
-
-	def getChildBelow(self, child):
-		navList = self.verticalNavigationList()
-		if navList is None:
-			return None
-		else:
-			try:
-				index = navList.index( child )
-			except ValueError:
-				return None
-			if index < len(navList) - 1:
-				return navList[index+1]
-			else:
-				return None
-
-
-	def _move(self, toChild):
-		if toChild is not None:
-			if isinstance( toChild, CVNode ):
-				toChild.makeCurrent()
-				return True
-			else:
-				raise TypeError, 'cannot handle child %s' % ( toChild, )
-				return False
-		else:
-			return False
-
-
-	def moveLeft(self, fromChild):
-		return self._move( self.getChildToLeft( fromChild ) )
-
-	def moveRight(self, fromChild):
-		return self._move( self.getChildToRight( fromChild ) )
-
-	def moveUp(self, fromChild):
-		return self._move( self.getChildAbove( fromChild ) )
-
-	def moveDown(self, fromChild):
-		return self._move( self.getChildBelow( fromChild ) )
-
-
-
-	def verticalCursorNavigationList(self):
-		return self.verticalNavigationList()
-
-
-
-
 	def cursorLeft(self, bItemStep=False):
 		if self._parent is not None:
 			return self._parent._f_cursorLeftFromChild( self, bItemStep )
 		else:
 			return True
-
 
 	def cursorRight(self, bItemStep=False):
 		if self._parent is not None:
@@ -245,41 +150,86 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 
 
 
-	def _f_cursorLeftFromChild(self, child, bItemStep):
-		navList = self.horizontalNavigationList()
+	def cursorUp(self):
+		if self._parent is not None:
+			return self._parent._f_cursorUpFromChild( self )
+		else:
+			return True
+
+	def cursorDown(self):
+		if self._parent is not None:
+			return self._parent._f_cursorDownFromChild( self )
+		else:
+			return True
+
+
+
+	def _p_prevNavListItem(self, navList, item):
 		if navList != []:
 			try:
-				index = navList.index( child )
+				index = navList.index( item )
 			except ValueError:
 				pass
 			else:
 				if index > 0:
-					leftChild = navList[index-1]
-					return leftChild._f_cursorEnterFromRight( self, bItemStep )
+					return navList[index-1]
+		return None
 
-		if self._parent is not None:
+	def _p_nextNavListItem(self, navList, item):
+		if navList != []:
+			try:
+				index = navList.index( item )
+			except ValueError:
+				pass
+			else:
+				if index < len( navList ) - 1:
+					return navList[index+1]
+		return None
+
+
+
+	def _f_cursorLeftFromChild(self, child, bItemStep):
+		navList = self.horizontalNavigationList()
+		leftChild = self._p_prevNavListItem( navList, child )
+		if leftChild is not None:
+			return leftChild._f_cursorEnterFromRight( self, bItemStep )
+		elif self._parent is not None:
 			return self._parent._f_cursorLeftFromChild( self, bItemStep )
 		else:
 			return True
 
-
-
 	def _f_cursorRightFromChild(self, child, bItemStep):
 		navList = self.horizontalNavigationList()
-		if navList != []:
-			try:
-				index = navList.index( child )
-			except ValueError:
-				pass
-			else:
-				if index <  len( navList ) - 1:
-					leftChild = navList[index+1]
-					return leftChild._f_cursorEnterFromLeft( self, bItemStep )
-
-		if self._parent is not None:
+		leftChild = self._p_nextNavListItem( navList, child )
+		if rightChild is not None:
+			return rightChild._f_cursorEnterFromLeft( self, bItemStep )
+		elif self._parent is not None:
 			return self._parent._f_cursorRightFromChild( self, bItemStep )
 		else:
 			return True
+
+
+	def _f_cursorUpFromChild(self, child):
+		navList = self.verticalNavigationList()
+		childAbove = self._p_prevNavListItem( navList, child )
+		if childAbove is not None:
+			return childAbove._f_cursorEnterFromBelow( self )
+		elif self._parent is not None:
+			return self._parent._f_cursorUpFromChild( self )
+		else:
+			return True
+
+	def _f_cursorDownFromChild(self, child):
+		navList = self.verticalNavigationList()
+		childBelow = self._p_nextNavListItem( navList, child )
+		if childBelow is not None:
+			return childBelow._f_cursorEnterFromAbove( self )
+		elif self._parent is not None:
+			return self._parent._f_cursorDownFromChild( self )
+		else:
+			return True
+
+
 
 
 
@@ -306,6 +256,22 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 			return True
 
 
+
+	def _f_cursorEnterFromAbove(self, parent):
+		navList = self.verticalNavigationList()
+		if navList != []:
+			return navList[0]._f_cursorEnterFromAbove( self )
+		else:
+			self.makeCurrent()
+			return True
+
+	def _f_cursorEnterFromBelow(self, parent):
+		navList = self.verticalNavigationList()
+		if navList != []:
+			return navList[-1]._f_cursorEnterFromBelow( self )
+		else:
+			self.makeCurrent()
+			return True
 
 
 
