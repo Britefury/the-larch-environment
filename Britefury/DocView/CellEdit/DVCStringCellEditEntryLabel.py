@@ -39,6 +39,13 @@ class DVCStringCellEditEntryLabel (DVCBasicWidgetSingleCellEdit):
 		self.entry.finishEditing()
 
 
+	def startEditingOnLeft(self):
+		self.entry.startEditingOnLeft()
+
+	def startEditingOnRight(self):
+		self.entry.startEditingOnRight()
+
+
 	def _o_setWidgetValue(self, value):
 		self._bIgnoreCheck = True
 		self.entry.text = value

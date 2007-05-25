@@ -59,6 +59,12 @@ class CVUnboundRef (CVExpression):
 		self.targetNameWidget.startEditing()
 
 
+	def startEditingOnLeft(self):
+		self.widget.startEditingOnLeft()
+
+	def startEditingOnRight(self):
+		self.widget.startEditingOnRight()
+
 
 	def _p_onEntryFinish(self, entry, text):
 		self._replaceWithRef()

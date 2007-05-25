@@ -5,20 +5,19 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
-import CodeViewTree
-import CVTExpression
-import CVTNullExpression
-import CVTBlockStatements
-import CVTBlockParameters
-import CVTLambda
-import CVTLocalAssignment
-import CVTLocalRef
-import CVTLocalVarDeclaration
-import CVTModule
-import CVTReturn
-import CVTSendMessage
-import CVTMessageName
-import CVTMessageArguments
-import CVTStringLiteral
-import CVTUnboundRef
-import CVTVar
+from Britefury.Sheet.Sheet import *
+from Britefury.SheetGraph.SheetGraph import *
+
+from Britefury.CodeGraph.CGSendMessage import CGSendMessage
+
+from Britefury.CodeViewTree.CVTNode import CVTNode
+from Britefury.CodeViewTree.CVTMessageArguments import CVTMessageArguments
+
+
+
+class CVTMessageName (CVTNode):
+	graphNode = SheetRefField( CGSendMessage )
+
+
+	name = FieldProxy( graphNode.messageName )
+

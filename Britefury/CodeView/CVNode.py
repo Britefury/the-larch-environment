@@ -128,10 +128,10 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 
 
 	def horizontalNavigationList(self):
-		return None
+		return []
 
 	def verticalNavigationList(self):
-		return None
+		return []
 
 
 
@@ -203,9 +203,6 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 			if isinstance( toChild, CVNode ):
 				toChild.makeCurrent()
 				return True
-			elif isinstance( toChild, DTWidget ):
-				toChild.grabFocus()
-				return True
 			else:
 				raise TypeError, 'cannot handle child %s' % ( toChild, )
 				return False
@@ -224,6 +221,78 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 
 	def moveDown(self, fromChild):
 		return self._move( self.getChildBelow( fromChild ) )
+
+
+
+	def cursorLeft(self):
+		if self._parent is not None:
+			return self._parent._f_cursorLeftFromChild( self )
+		else:
+			return True
+
+
+	def cursorRight(self):
+		if self._parent is not None:
+			return self._parent._f_cursorRightFromChild( self )
+		else:
+			return True
+
+
+
+	def _f_cursorLeftFromChild(self, child):
+		navList = self.horizontalNavigationList()
+		if navList != []:
+			try:
+				index = navList.index( child )
+			except ValueError:
+				pass
+			else:
+				if index > 0:
+					leftChild = navList[index-1]
+					return leftChild._f_cursorEnterFromRight( self )
+
+		if self._parent is not None:
+			return self._parent._f_cursorLeftFromChild( self )
+		else:
+			return True
+
+
+
+	def _f_cursorRightFromChild(self, child):
+		navList = self.horizontalNavigationList()
+		if navList != []:
+			try:
+				index = navList.index( child )
+			except ValueError:
+				pass
+			else:
+				if index <  len( navList ) - 1:
+					leftChild = navList[index+1]
+					return leftChild._f_cursorEnterFromLeft( self )
+
+		if self._parent is not None:
+			return self._parent._f_cursorRightFromChild( self )
+		else:
+			return True
+
+
+
+	def _f_cursorEnterFromLeft(self, parent):
+		navList = self.horizontalNavigationList()
+		if navList != []:
+			return navList[0]._f_cursorEnterFromLeft( self )
+		else:
+			self.startEditingOnLeft()
+			return True
+
+	def _f_cursorEnterFromRight(self, parent):
+		navList = self.horizontalNavigationList()
+		if navList != []:
+			return navList[-1]._f_cursorEnterFromRight( self )
+		else:
+			self.startEditingOnRight()
+			return True
+
 
 
 
@@ -265,4 +334,13 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 
 	def makeCurrent(self):
 		self.widget.grabFocus()
+
+
+
+	def startEditingOnLeft(self):
+		pass
+
+
+	def startEditingOnRight(self):
+		pass
 

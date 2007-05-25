@@ -50,11 +50,12 @@ class CVSendMessage (CVExpression):
 
 
 	@FunctionRefField
+	def messageNameNode(self):
+		return self._view.buildView( self.treeNode.messageNameNode, self )
+
+	@FunctionRefField
 	def messageNameWidget(self):
-		self._messageNameEntry =DVCStringCellEditEntryLabel( regexp=RegExpStrings.identifier )
-		self._messageNameEntry.keyHandler = self
-		self._messageNameEntry.attachCell( self.treeNode.cells.messageName )
-		return self._messageNameEntry.entry
+		return self.messageNameNode.widget
 
 
 
@@ -114,4 +115,4 @@ class CVSendMessage (CVExpression):
 
 
 	def horizontalNavigationList(self):
-		return [ self.targetObjectNode, self.messageNameWidget, self.argumentsNode ]
+		return [ self.targetObjectNode, self.messageNameNode, self.argumentsNode ]

@@ -73,3 +73,10 @@ class CVStringLiteral (CVExpression):
 	def closeString(self):
 		self.stringValueWidget.finishEditing()
 		self.widget.grabFocus()
+
+
+	def startEditingOnLeft(self):
+		self.stringValueWidget.startEditingOnLeft()
+
+	def startEditingOnRight(self):
+		self.stringValueWidget.startEditingOnRight()
