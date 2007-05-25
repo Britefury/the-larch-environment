@@ -16,6 +16,8 @@ from Britefury.CodeViewTree.CVTBlockParameters import CVTBlockParameters
 
 from Britefury.CodeView.CVBorderNode import *
 
+from Britefury.CodeViewBehavior.CVBBlockParametersBehavior import *
+
 from Britefury.DocView.Toolkit.DTWrappedLineWithSeparators import DTWrappedLineWithSeparators
 from Britefury.DocView.Toolkit.DTBox import DTBox
 from Britefury.DocView.Toolkit.DTLabel import DTLabel
@@ -27,6 +29,9 @@ class CVBlockParameters (CVBorderNode):
 
 
 	treeNode = SheetRefField( CVTBlockParameters )
+
+
+	behaviors = [ CVBBlockParametersBehavior() ]
 
 
 	@FunctionField
@@ -74,5 +79,18 @@ class CVBlockParameters (CVBorderNode):
 		else:
 			return self.paramNodes
 
+
+
+
+	def addParameter(self, name):
+		paramCVT = self.treeNode.addParameter( name )
+		self._view.refresh()
+		paramCVT = self._view.getViewNodeForTreeNode( paramCVT )
+		paramCVT.startEditing()
+
+
+
+	def startEditing(self):
+		self.makeCurrent()
 
 

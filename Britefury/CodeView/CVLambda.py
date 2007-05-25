@@ -16,6 +16,8 @@ from Britefury.CodeViewTree.CVTLambda import CVTLambda
 
 from Britefury.CodeView.CVExpression import *
 
+from Britefury.CodeViewBehavior.CVBLambdaBehavior import *
+
 from Britefury.DocView.Toolkit.DTBox import DTBox
 from Britefury.DocView.Toolkit.DTBorder import DTBorder
 from Britefury.DocView.Toolkit.DTLabel import DTLabel
@@ -28,6 +30,9 @@ class CVLambda (CVExpression):
 
 
 	treeNode = SheetRefField( CVTLambda )
+
+
+	behaviors = [ CVBLambdaBehavior() ]
 
 
 	@FunctionRefField
@@ -70,9 +75,10 @@ class CVLambda (CVExpression):
 		self._lambdaBox = DTBox( spacing=1.0 )
 		self._lambdaBox.append( DTLabel( 'lambda' ) )
 		self._lambdaBox.append( DTLabel( 'nil' ) )
+		self._lambdaBox.append( DTLabel( ':' ) )
 		self._statementsBorder = DTBorder( 30.0, 0.0, 0.0, 0.0 )
 		self._statementsBorder.child = DTLabel( 'nil' )
-		self._box = DTBox( DTDirection.TOP_TO_BOTTOM, spacing=4.0 )
+		self._box = DTBox( DTDirection.TOP_TO_BOTTOM, minorDirectionAlignment=DTBox.ALIGN_EXPAND, spacing=4.0 )
 		self._box.append( self._lambdaBox )
 		self._box.append( self._statementsBorder )
 		self.widget.child = self._box
@@ -83,4 +89,11 @@ class CVLambda (CVExpression):
 
 	def verticalNavigationList(self):
 		return [ self.paramsNode, self.statementsNode ]
+
+
+	def startEditingParameters(self):
+		self.paramsNode.startEditing()
+
+	def startEditingStatements(self):
+		self.statementsNode.makeCurrent()
 

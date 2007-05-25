@@ -33,4 +33,11 @@ class CVBCreateExpressionBehavior (CodeViewBehavior):
 		return True
 
 
+	@CVBAccelInputHandlerMethod( '<alt>l' )
+	def _replaceWithLambda(self, viewNode, receivingNodePath, widget, event):
+		lambdaCVT = cvto_insertLambda( viewNode.treeNode, [ node.treeNode  for node in receivingNodePath ] )
+		viewNode._view.refresh()
+		lambdaCV = viewNode._view.getViewNodeForTreeNode( lambdaCVT )
+		lambdaCV.startEditingParameters()
+		return True
 

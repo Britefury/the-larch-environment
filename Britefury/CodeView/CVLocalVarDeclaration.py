@@ -92,7 +92,7 @@ class CVLocalVarDeclaration (CVBorderNode):
 
 	def __init__(self, treeNode, view):
 		super( CVLocalVarDeclaration, self ).__init__( treeNode, view )
-		self._box = DTBox( spacing=10.0, minorDirectionAlignment=DTBox.ALIGN_CENTRE )
+		self._box = DTBox( spacing=10.0 )
 		self._box.append( DTLabel( 'var', font='Sans bold 11' ) )
 		self._box.append( DTLabel( 'nil' ) )
 		self.widget.child = self._box
