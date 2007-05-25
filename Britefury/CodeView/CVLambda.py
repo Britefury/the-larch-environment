@@ -15,6 +15,7 @@ from Britefury.SheetGraph.SheetGraph import *
 from Britefury.CodeViewTree.CVTLambda import CVTLambda
 
 from Britefury.CodeView.CVExpression import *
+from Britefury.CodeView.CVLabel import *
 
 from Britefury.CodeViewBehavior.CVBLambdaBehavior import *
 
@@ -36,6 +37,17 @@ class CVLambda (CVExpression):
 
 
 	@FunctionRefField
+	def lambdaLabelNode(self):
+		label = self._view.buildView( self.treeNode, self, CVLabel )
+		label.setText( 'lambda' )
+		return label
+
+	@FunctionRefField
+	def lambdaLabelWidget(self):
+		return self.lambdaLabelNode.widget
+
+
+	@FunctionRefField
 	def paramsNode(self):
 		return self._view.buildView( self.treeNode.paramsNode, self )
 
@@ -54,6 +66,10 @@ class CVLambda (CVExpression):
 
 
 	@FunctionField
+	def _refreshLambdaLabel(self):
+		self._lambdaBox[0] = self.lambdaLabelWidget
+
+	@FunctionField
 	def _refreshParams(self):
 		self._lambdaBox[1] = self.paramsWidget
 
@@ -63,6 +79,7 @@ class CVLambda (CVExpression):
 
 	@FunctionField
 	def refreshCell(self):
+		self._refreshLambdaLabel
 		self._refreshParams
 		self._refreshStatements
 
@@ -73,7 +90,7 @@ class CVLambda (CVExpression):
 	def __init__(self, treeNode, view):
 		super( CVLambda, self ).__init__( treeNode, view )
 		self._lambdaBox = DTBox( spacing=1.0 )
-		self._lambdaBox.append( DTLabel( 'lambda' ) )
+		self._lambdaBox.append( DTLabel( 'nil' ) )
 		self._lambdaBox.append( DTLabel( 'nil' ) )
 		self._lambdaBox.append( DTLabel( ':' ) )
 		self._statementsBorder = DTBorder( 30.0, 0.0, 0.0, 0.0 )
@@ -85,7 +102,7 @@ class CVLambda (CVExpression):
 
 
 	def horizontalNavigationList(self):
-		return self.verticalNavigationList()
+		return [ self.lambdaLabelNode, self.paramsNode, self.statementsNode ]
 
 	def verticalNavigationList(self):
 		return [ self.paramsNode, self.statementsNode ]
