@@ -248,13 +248,17 @@ class DTDocument (gtk.DrawingArea, DTBin):
         def do_key_press_event(self, event):
 		if self._keyboardFocusChild is not None:
 			self._keyboardFocusChild._o_onKeyPress( DTKeyEvent( event ) )
-		return True
+			return True
+		else:
+			return False
 
 
         def do_key_release_event(self, event):
 		if self._keyboardFocusChild is not None:
 			self._keyboardFocusChild._o_onKeyRelease( DTKeyEvent( event ) )
-		return True
+			return True
+		else:
+			return False
 
 
 
