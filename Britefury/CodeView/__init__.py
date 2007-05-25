@@ -17,6 +17,7 @@ import CVLocalVarDeclaration
 import CVModule
 import CVReturn
 import CVSendMessage
+import CVStatement
 import CVMessageArguments
 import CVMessageName
 import CVStringLiteral

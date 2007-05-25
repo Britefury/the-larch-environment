@@ -11,11 +11,11 @@ from Britefury.SheetGraph.SheetGraph import *
 from Britefury.CodeGraph.CGLocalVarDeclaration import CGLocalVarDeclaration
 from Britefury.CodeGraph.CGNullExpression import CGNullExpression
 
-from Britefury.CodeViewTree.CVTNode import CVTNode
+from Britefury.CodeViewTree.CVTStatement import CVTStatement
 
 
 
-class CVTLocalVarDeclaration (CVTNode):
+class CVTLocalVarDeclaration (CVTStatement):
 	graphNodeClass = CGLocalVarDeclaration
 
 

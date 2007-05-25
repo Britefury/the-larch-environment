@@ -18,6 +18,8 @@ from Britefury.CodeViewTree.CVTVar import CVTVar
 
 from Britefury.CodeView.CVBorderNode import *
 
+from Britefury.CodeViewBehavior.CVBDeleteVarBehavior import *
+
 from Britefury.DocView.Toolkit.DTBox import DTBox
 from Britefury.DocView.Toolkit.DTLabel import DTLabel
 from Britefury.DocView.Toolkit.DTDirection import DTDirection
@@ -30,6 +32,9 @@ class CVVar (CVBorderNode):
 
 
 	treeNode = SheetRefField( CVTVar )
+
+
+	behaviors = [ CVBDeleteVarBehavior() ]
 
 
 	@FunctionRefField
@@ -59,3 +64,15 @@ class CVVar (CVBorderNode):
 
 	def startEditingOnRight(self):
 		self.nameWidget.startEditingOnRight()
+
+
+	def deleteVar(self, bMoveFocusLeft, widget):
+		if bMoveFocusLeft:
+			self.cursorLeft( widget == self.widget )
+		else:
+			self.cursorRight( widget == self.widget )
+		self._parent.deleteVar( self )
+
+
+	def isNameEmpty(self):
+		return self.nameWidget.text == ''

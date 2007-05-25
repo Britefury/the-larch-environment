@@ -94,3 +94,5 @@ class CVBlockParameters (CVBorderNode):
 		self.makeCurrent()
 
 
+	def deleteVar(self, var):
+		self.treeNode.deleteParameter( var.treeNode )
