@@ -18,6 +18,7 @@ import CVModule
 import CVReturn
 import CVSendMessage
 import CVMessageArguments
+import CVMessageName
 import CVStringLiteral
 import CVUnboundRef
 import CVVar

@@ -155,6 +155,16 @@ class DTEntry (DTWidget):
 		return self._borderColour
 
 
+
+	def moveCursorToStart(self):
+		self._cursorLocation = 0
+		self._o_queueFullRedraw()
+
+	def moveCursorToEnd(self):
+		self._cursorLocation = len( self._text )
+		self._o_queueFullRedraw()
+
+
 	def setAutoCompleteList(self, autoCompleteList):
 		self._autoCompleteList = autoCompleteList
 

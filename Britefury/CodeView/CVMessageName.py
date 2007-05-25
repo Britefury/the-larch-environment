@@ -9,53 +9,44 @@ import pygtk
 pygtk.require( '2.0' )
 import gtk
 
+from Britefury.Util import RegExpStrings
 
 from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
-from Britefury.CodeViewTree.CVTNullExpression import CVTNullExpression
+from Britefury.CodeViewTree.CVTMessageName import CVTMessageName
 
 from Britefury.CodeView.CVNode import *
 
 from Britefury.DocView.Toolkit.DTBox import DTBox
-from Britefury.DocView.Toolkit.DTEntryLabel import DTEntryLabel
+from Britefury.DocView.Toolkit.DTLabel import DTLabel
 from Britefury.DocView.Toolkit.DTDirection import DTDirection
-
-from Britefury.CodeViewBehavior.CVBCreateExpressionBehavior import *
-
-
-class CVNullExpression (CVNode):
-	treeNodeClass = CVTNullExpression
-
-
-	treeNode = SheetRefField( CVTNullExpression )
+from Britefury.DocView.CellEdit.DVCStringCellEditEntryLabel import DVCStringCellEditEntryLabel
 
 
 
-	behaviors = [ CVBCreateExpressionBehavior() ]
+class CVMessageName (CVNode):
+	treeNodeClass = CVTMessageName
 
 
-
-	def _refreshCell(self):
-		pass
-
-	refreshCell = FunctionField( _refreshCell )
+	treeNode = SheetRefField( CVTMessageName )
 
 
+	@FunctionRefField
+	def nameWidget(self):
+		entry = DVCStringCellEditEntryLabel( regexp=RegExpStrings.identifier )
+		entry.keyHandler = self
+		entry.attachCell( self.treeNode.cells.name )
+		return entry.entry
 
 
-	def __init__(self, treeNode, view):
-		super( CVNullExpression, self ).__init__( treeNode, view )
-		self.widget = DTEntryLabel( '<expr>', font='Sans italic 11' )
-		self.widget.bEditable = False
-		self.widget.keyHandler = self
+	@FunctionField
+	def _refreshName(self):
+		self.widget = self.nameWidget
 
-
-
-
-
-	def startEditing(self):
-		self.widget.startEditing()
+	@FunctionField
+	def refreshCell(self):
+		self._refreshName
 
 
 	def startEditingOnLeft(self):
@@ -63,3 +54,4 @@ class CVNullExpression (CVNode):
 
 	def startEditingOnRight(self):
 		self.widget.startEditingOnRight()
+

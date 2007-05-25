@@ -114,6 +114,15 @@ class DTEntryLabel (DTBin):
 			self.finishEditingSignal.emit( self )
 
 
+	def startEditingOnLeft(self):
+		self.startEditing()
+		self._entry.moveCursorToStart()
+
+	def startEditingOnRight(self):
+		self.startEditing()
+		self._entry.moveCursorToEnd()
+
+
 
 	def _p_onLabelClicked(self):
 		self.startEditing()

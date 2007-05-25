@@ -12,6 +12,7 @@ from Britefury.CodeGraph.CGSendMessage import CGSendMessage
 
 from Britefury.CodeViewTree.CVTExpression import CVTExpression
 from Britefury.CodeViewTree.CVTMessageArguments import CVTMessageArguments
+from Britefury.CodeViewTree.CVTMessageName import CVTMessageName
 
 
 
@@ -28,7 +29,9 @@ class CVTSendMessage (CVTExpression):
 		return self._tree.buildNode( self.graphNode.targetObject[0].node )
 
 
-	messageName = FieldProxy( graphNode.messageName )
+	@FunctionRefField
+	def messageNameNode(self):
+		return self._tree.buildNode( self.graphNode, CVTMessageName )
 
 
 	@FunctionRefField
