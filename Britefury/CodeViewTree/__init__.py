@@ -10,7 +10,7 @@ import CVTExpression
 import CVTNullExpression
 import CVTBlockStatements
 import CVTBlockParameters
-import CVTClosure
+import CVTLambda
 import CVTLocalAssignment
 import CVTLocalRef
 import CVTLocalVarDeclaration

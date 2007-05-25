@@ -12,7 +12,7 @@ from Britefury.LowLevelCodeTree.LLCTClosureExp import LLCTClosureExp
 
 
 
-class CGClosure (CGExpression):
+class CGLambda (CGExpression):
 	block = SheetGraphSinkSingleField( 'Block', 'Block' )
 
 	def generateLLCT(self, tree):
