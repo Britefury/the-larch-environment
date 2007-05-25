@@ -49,8 +49,6 @@ class DTDocument (gtk.DrawingArea, DTBin):
 		self.connect( 'enter-notify-event', self._p_enterNotifyEvent )
 		self.connect( 'leave-notify-event', self._p_leaveNotifyEvent )
 		self.connect( 'scroll-event', self._p_scrollEvent )
-		self.connect( 'key-press-event', self._p_keyPressEvent )
-		self.connect( 'key-release-event', self._p_keyReleaseEvent )
 		self.connect_after( 'realize', self._p_realiseEvent )
 		self.connect( 'unrealize', self._p_unrealiseEvent )
 
@@ -247,13 +245,16 @@ class DTDocument (gtk.DrawingArea, DTBin):
 
 
 
-	def _p_keyPressEvent(self, widget, event):
+        def do_key_press_event(self, event):
 		if self._keyboardFocusChild is not None:
 			self._keyboardFocusChild._o_onKeyPress( DTKeyEvent( event ) )
+		return True
 
-	def _p_keyReleaseEvent(self, widget, event):
+
+        def do_key_release_event(self, event):
 		if self._keyboardFocusChild is not None:
 			self._keyboardFocusChild._o_onKeyRelease( DTKeyEvent( event ) )
+		return True
 
 
 
@@ -269,6 +270,9 @@ class DTDocument (gtk.DrawingArea, DTBin):
 
 
 
+
+
+gobject.type_register( DTDocument )
 
 
 
