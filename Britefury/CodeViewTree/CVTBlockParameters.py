@@ -9,6 +9,7 @@ from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
 from Britefury.CodeGraph.CGBlock import CGBlock
+from Britefury.CodeGraph.CGVar import CGVar
 
 from Britefury.CodeViewTree.CVTNode import CVTNode
 
@@ -33,3 +34,10 @@ class CVTBlockParameters (CVTNode):
 
 
 
+
+	def addParameter(self, name):
+		blockParmsCG = self.graphNode
+		paramCG = CGVar()
+		paramCG.name = name
+		blockParmsCG.params.append( paramCG.declaration )
+		return self._tree.buildNode( paramCG )

@@ -7,6 +7,8 @@
 ##-*************************
 from Britefury.CodeGraph.CGStringLiteral import *
 from Britefury.CodeGraph.CGUnboundRef import *
+from Britefury.CodeGraph.CGLambda import *
+from Britefury.CodeGraph.CGBlock import *
 
 
 
@@ -17,3 +19,11 @@ def cvto_insertStringLiteral(treeNode, treeNodePath):
 
 def cvto_insertUnboundRef(treeNode, treeNodePath):
 	return treeNode.insertNode( CGUnboundRef(), treeNodePath )
+
+
+
+def cvto_insertLambda(treeNode, treeNodePath):
+	lambdaNode = CGLambda()
+	blockNode = CGBlock()
+	lambdaNode.block.append( blockNode.parent )
+	return treeNode.insertNode( lambdaNode, treeNodePath )
