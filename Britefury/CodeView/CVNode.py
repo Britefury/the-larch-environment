@@ -200,7 +200,7 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 
 	def _f_cursorRightFromChild(self, child, bItemStep):
 		navList = self.horizontalNavigationList()
-		leftChild = self._p_nextNavListItem( navList, child )
+		rightChild = self._p_nextNavListItem( navList, child )
 		if rightChild is not None:
 			return rightChild._f_cursorEnterFromLeft( self, bItemStep )
 		elif self._parent is not None:

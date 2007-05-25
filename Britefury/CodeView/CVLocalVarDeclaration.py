@@ -14,7 +14,7 @@ from Britefury.SheetGraph.SheetGraph import *
 
 from Britefury.CodeViewTree.CVTLocalVarDeclaration import CVTLocalVarDeclaration
 
-from Britefury.CodeView.CVBorderNode import *
+from Britefury.CodeView.CVStatement import *
 
 from Britefury.CodeViewBehavior.CVBLocalVarDeclarationBehavior import *
 
@@ -25,7 +25,7 @@ from Britefury.DocView.CellEdit.DVCStringCellEditEntryLabel import DVCStringCell
 
 
 
-class CVLocalVarDeclaration (CVBorderNode):
+class CVLocalVarDeclaration (CVStatement):
 	treeNodeClass = CVTLocalVarDeclaration
 
 
@@ -111,3 +111,8 @@ class CVLocalVarDeclaration (CVBorderNode):
 
 	def horizontalNavigationList(self):
 		return [ self.varNode, self.valueNode ]
+
+
+
+	def deleteVar(self, var):
+		self.deleteStatement()

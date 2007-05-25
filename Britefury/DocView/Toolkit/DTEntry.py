@@ -460,7 +460,7 @@ class DTEntry (DTWidget):
 						self.textDeletedSignal.emit( self, self._cursorLocation, self._cursorLocation+1, textDeleted )
 					self._p_onTextModified()
 					# Event not handled if text was empty
-					bHandled = len( text ) == 0
+					bHandled = len( text ) != 0
 			elif event.keyString != ''  and  self.bEditable:
 				bTextOk = True
 

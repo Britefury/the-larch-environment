@@ -8,23 +8,21 @@
 from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
-from Britefury.CodeGraph.CGExpression import CGExpression
+from Britefury.CodeGraph.CGStatement import CGStatement
 from Britefury.CodeGraph.CGSendMessage import CGSendMessage
 
-from Britefury.CodeViewTree.CVTStatement import CVTStatement
+from Britefury.CodeViewTree.CVTNode import CVTNode
 
 
 
-class CVTExpression (CVTStatement):
-	graphNodeClass = CGExpression
+class CVTStatement (CVTNode):
+	graphNodeClass = CGStatement
 
 
-	graphNode = SheetRefField( CGExpression )
+	graphNode = SheetRefField( CGStatement )
 
 
-	def wrapInSendMessage(self):
+	def deleteStatement(self):
 		parentCGSink = self.graphNode.parent[0]
-		sendCG = CGSendMessage()
-		parentCGSink.splitLinkWithNode( self.graphNode.parent, sendCG.targetObject, sendCG.parent )
-		return self._tree.buildNode( sendCG )
+		parentCGSink.remove( self.graphNode.parent )
 
