@@ -224,6 +224,15 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 
 
 
+	def horizontalCursorNavigationList(self):
+		return self.horizontalNavigationList()
+
+	def verticalCursorNavigationList(self):
+		return self.verticalNavigationList()
+
+
+
+
 	def cursorLeft(self):
 		if self._parent is not None:
 			return self._parent._f_cursorLeftFromChild( self )
@@ -240,7 +249,7 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 
 
 	def _f_cursorLeftFromChild(self, child):
-		navList = self.horizontalNavigationList()
+		navList = self.horizontalCursorNavigationList()
 		if navList != []:
 			try:
 				index = navList.index( child )
@@ -259,7 +268,7 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 
 
 	def _f_cursorRightFromChild(self, child):
-		navList = self.horizontalNavigationList()
+		navList = self.horizontalCursorNavigationList()
 		if navList != []:
 			try:
 				index = navList.index( child )
@@ -278,7 +287,7 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 
 
 	def _f_cursorEnterFromLeft(self, parent):
-		navList = self.horizontalNavigationList()
+		navList = self.horizontalCursorNavigationList()
 		if navList != []:
 			return navList[0]._f_cursorEnterFromLeft( self )
 		else:
@@ -286,7 +295,7 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 			return True
 
 	def _f_cursorEnterFromRight(self, parent):
-		navList = self.horizontalNavigationList()
+		navList = self.horizontalCursorNavigationList()
 		if navList != []:
 			return navList[-1]._f_cursorEnterFromRight( self )
 		else:
@@ -338,9 +347,9 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 
 
 	def startEditingOnLeft(self):
-		pass
+		self.makeCurrent()
 
 
 	def startEditingOnRight(self):
-		pass
+		self.makeCurrent()
 

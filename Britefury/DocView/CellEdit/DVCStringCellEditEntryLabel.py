@@ -52,9 +52,8 @@ class DVCStringCellEditEntryLabel (DVCBasicWidgetSingleCellEdit):
 		self._bIgnoreCheck = False
 
 
-	def _p_onEntry(self, entry):
+	def _p_onEntry(self, entry, text):
 		assert self._cell is not None
-		text = self.entry.text
 		if self._cell.bLiteral  and  text != self._cell.literalValue:
 			self._o_blockCell( text )
 			self._cell.literalValue = text

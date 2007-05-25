@@ -11,11 +11,12 @@ from Britefury.DocView.Toolkit.DTBorder import DTBorder
 
 
 class DTActiveBorder (DTBorder):
-	def __init__(self, leftMargin=3.0, rightMargin=3.0, topMargin=3.0, bottomMargin=3.0, borderWidth=1.0, borderColour=Colour3f( 0.8, 0.85, 0.9 ), prelitBorderColour=Colour3f( 0.6, 0.7, 0.8 ), highlightedBorderColour=Colour3f( 0.2, 0.2, 0.2 ), highlightedBackgroundColour=Colour3f( 0.93, 0.93, 0.93 ) ):
+	def __init__(self, leftMargin=3.0, rightMargin=3.0, topMargin=3.0, bottomMargin=3.0, borderWidth=1.0, highlightedBorderWidth=2.0, borderColour=Colour3f( 0.8, 0.85, 0.9 ), prelitBorderColour=Colour3f( 0.5, 0.5, 0.5 ), highlightedBorderColour=Colour3f( 0.2, 0.2, 0.2 ), highlightedBackgroundColour=Colour3f( 0.93, 0.93, 0.93 ) ):
 		super( DTActiveBorder, self ).__init__( leftMargin, rightMargin, topMargin, bottomMargin )
 
 		self.keyHandler = None
 		self._borderWidth = borderWidth
+		self._highlightedBorderWidth = highlightedBorderWidth
 		self._borderColour = borderColour
 		self._prelitBorderColour = prelitBorderColour
 		self._highlightedBorderColour = highlightedBorderColour
@@ -30,6 +31,14 @@ class DTActiveBorder (DTBorder):
 
 	def getBorderWidth(self):
 		return self._borderWidth
+
+
+	def setHighlightedBorderWidth(self, width):
+		self._highlightedBorderWidth = width
+		self._o_queueFullRedraw()
+
+	def getHighlightedBorderWidth(self):
+		return self._highlightedBorderWidth
 
 
 	def setBorderColour(self, colour):
@@ -98,7 +107,10 @@ class DTActiveBorder (DTBorder):
 
 
 	def _o_draw(self, context):
-		b = self._borderWidth
+		if self._bHasFocus:
+			b = self._highlightedBorderWidth
+		else:
+			b = self._borderWidth
 
 		# Background
 		context.rectangle( b * 0.5, b * 0.5, self._allocation.x - b, self._allocation.y - b )

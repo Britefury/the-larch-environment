@@ -105,13 +105,13 @@ class DTEntryLabel (DTBin):
 		if self.getChild() is not self._entry:
 			self.setChild( self._entry )
 			self._entry.grabFocus()
-			self.startEditingSignal.emit( self )
+			self.startEditingSignal.emit( self, self.text )
 
 	def finishEditing(self):
 		if self.getChild() is not self._label:
 			self._entry.ungrabFocus()
 			self.setChild( self._label )
-			self.finishEditingSignal.emit( self )
+			self.finishEditingSignal.emit( self, self.text )
 
 
 	def startEditingOnLeft(self):
