@@ -224,32 +224,29 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 
 
 
-	def horizontalCursorNavigationList(self):
-		return self.horizontalNavigationList()
-
 	def verticalCursorNavigationList(self):
 		return self.verticalNavigationList()
 
 
 
 
-	def cursorLeft(self):
+	def cursorLeft(self, bItemStep=False):
 		if self._parent is not None:
-			return self._parent._f_cursorLeftFromChild( self )
+			return self._parent._f_cursorLeftFromChild( self, bItemStep )
 		else:
 			return True
 
 
-	def cursorRight(self):
+	def cursorRight(self, bItemStep=False):
 		if self._parent is not None:
-			return self._parent._f_cursorRightFromChild( self )
+			return self._parent._f_cursorRightFromChild( self, bItemStep )
 		else:
 			return True
 
 
 
-	def _f_cursorLeftFromChild(self, child):
-		navList = self.horizontalCursorNavigationList()
+	def _f_cursorLeftFromChild(self, child, bItemStep):
+		navList = self.horizontalNavigationList()
 		if navList != []:
 			try:
 				index = navList.index( child )
@@ -258,17 +255,17 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 			else:
 				if index > 0:
 					leftChild = navList[index-1]
-					return leftChild._f_cursorEnterFromRight( self )
+					return leftChild._f_cursorEnterFromRight( self, bItemStep )
 
 		if self._parent is not None:
-			return self._parent._f_cursorLeftFromChild( self )
+			return self._parent._f_cursorLeftFromChild( self, bItemStep )
 		else:
 			return True
 
 
 
-	def _f_cursorRightFromChild(self, child):
-		navList = self.horizontalCursorNavigationList()
+	def _f_cursorRightFromChild(self, child, bItemStep):
+		navList = self.horizontalNavigationList()
 		if navList != []:
 			try:
 				index = navList.index( child )
@@ -277,29 +274,35 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 			else:
 				if index <  len( navList ) - 1:
 					leftChild = navList[index+1]
-					return leftChild._f_cursorEnterFromLeft( self )
+					return leftChild._f_cursorEnterFromLeft( self, bItemStep )
 
 		if self._parent is not None:
-			return self._parent._f_cursorRightFromChild( self )
+			return self._parent._f_cursorRightFromChild( self, bItemStep )
 		else:
 			return True
 
 
 
-	def _f_cursorEnterFromLeft(self, parent):
-		navList = self.horizontalCursorNavigationList()
+	def _f_cursorEnterFromLeft(self, parent, bItemStep):
+		navList = self.horizontalNavigationList()
 		if navList != []:
-			return navList[0]._f_cursorEnterFromLeft( self )
+			return navList[0]._f_cursorEnterFromLeft( self, bItemStep )
 		else:
-			self.startEditingOnLeft()
+			if bItemStep:
+				self.makeCurrent()
+			else:
+				self.startEditingOnLeft()
 			return True
 
-	def _f_cursorEnterFromRight(self, parent):
-		navList = self.horizontalCursorNavigationList()
+	def _f_cursorEnterFromRight(self, parent, bItemStep):
+		navList = self.horizontalNavigationList()
 		if navList != []:
-			return navList[-1]._f_cursorEnterFromRight( self )
+			return navList[-1]._f_cursorEnterFromRight( self, bItemStep )
 		else:
-			self.startEditingOnRight()
+			if bItemStep:
+				self.makeCurrent()
+			else:
+				self.startEditingOnRight()
 			return True
 
 

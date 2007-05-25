@@ -62,8 +62,9 @@ class CVModule (CVBorderNode):
 
 
 
+	def horizontalNavigationList(self):
+		return self.verticalNavigationList()
+
 	def verticalNavigationList(self):
 		return self.statementNodes
 
-	def horizontalCursorNavigationList(self):
-		return self.verticalNavigationList()
