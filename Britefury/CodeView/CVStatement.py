@@ -26,7 +26,3 @@ class CVStatement (CVBorderNode):
 
 	treeNode = SheetRefField( CVTStatement )
 
-
-	def deleteStatement(self):
-		self.treeNode.deleteStatement()
-

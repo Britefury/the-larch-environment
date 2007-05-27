@@ -40,8 +40,14 @@ class CVTMessageArguments (CVTNode):
 	def addArgument(self):
 		sendMsgCG = self.graphNode
 		argCG = CGNullExpression()
+		self.graph.nodes.append( argCG )
 		sendMsgCG.args.append( argCG.parent )
 		return self._tree.buildNode( argCG )
+
+
+	def deleteArgument(self, argument):
+		self.graphNode.args.remove( argument.graphNode.parent )
+		argument.graphNode.destroy()
 
 
 

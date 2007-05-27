@@ -41,11 +41,17 @@ class CVSendMessage (CVExpression):
 
 	@FunctionRefField
 	def targetObjectNode(self):
-		return self._view.buildView( self.treeNode.targetObjectNode, self )
+		if self.treeNode.targetObjectNode is not None:
+			return self._view.buildView( self.treeNode.targetObjectNode, self )
+		else:
+			return None
 
 	@FunctionRefField
 	def targetObjectWidget(self):
-		return self.targetObjectNode.widget
+		if self.targetObjectNode is not None:
+			return self.targetObjectNode.widget
+		else:
+			return None
 
 
 
@@ -70,7 +76,10 @@ class CVSendMessage (CVExpression):
 
 	@FunctionField
 	def _refreshTargetObject(self):
-		self._box[0] = self.targetObjectWidget
+		if self.targetObjectWidget is not None:
+			self._box[0] = self.targetObjectWidget
+		else:
+			self._box[0] = DTLabel( 'nil' )
 
 	@FunctionField
 	def _refreshMessageName(self):
@@ -100,6 +109,20 @@ class CVSendMessage (CVExpression):
 		self._box.append( DTLabel( 'nil' ) )
 		self.widget.child = self._box
 		self._messageNameEntry = None
+
+
+	def deleteChild(self, child):
+		if child is self.messageNameNode:
+			self.treeNode.unwrapSendMessage()
+			self._view.refresh()
+			return True
+		elif child is self.targetObjectNode:
+			self.targetObjectNode.treeNode.replaceWithNullExpression()
+			self._view.refresh()
+			self.targetObjectNode.startEditing()
+			return False
+		else:
+			return False
 
 
 	def startEditingMessageName(self):

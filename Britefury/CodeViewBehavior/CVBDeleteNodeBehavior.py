@@ -5,20 +5,26 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
+from Britefury.DocView.Toolkit.DTEntry import *
+
 from Britefury.CodeViewBehavior.CodeViewBehavior import *
 
 
-class CVBDeleteVarBehavior (CodeViewBehavior):
+class CVBDeleteNodeBehavior (CodeViewBehavior):
 	@CVBAccelInputHandlerMethod( 'BackSpace' )
-	def _backspaceVar(self, viewNode, receivingNodePath, widget, event):
-		if viewNode.isNameEmpty():
-			viewNode.deleteVar( True, widget )
+	def _backspaceNode(self, viewNode, receivingNodePath, widget, event):
+		if isinstance( widget, DTEntry ):
+			if widget.text != '':
+				return True
+		viewNode.deleteNode( True, widget )
 		return True
 
 
 	@CVBAccelInputHandlerMethod( 'Delete' )
-	def _deleteVar(self, viewNode, receivingNodePath, widget, event):
-		if viewNode.isNameEmpty():
-			viewNode.deleteVar( False, widget )
+	def _deleteNode(self, viewNode, receivingNodePath, widget, event):
+		if isinstance( widget, DTEntry ):
+			if widget.text != '':
+				return True
+		viewNode.deleteNode( False, widget )
 		return True
 

@@ -13,17 +13,23 @@ from Britefury.CodeGraph.CGBlock import *
 
 
 def cvto_insertStringLiteral(treeNode, treeNodePath):
-	return treeNode.insertNode( CGStringLiteral(), treeNodePath )
+	strLit = CGStringLiteral()
+	treeNode.graph.nodes.append( strLit )
+	return treeNode.insertNode( strLit, treeNodePath )
 
 
 
 def cvto_insertUnboundRef(treeNode, treeNodePath):
-	return treeNode.insertNode( CGUnboundRef(), treeNodePath )
+	ref = CGUnboundRef()
+	treeNode.graph.nodes.append( ref )
+	return treeNode.insertNode( ref, treeNodePath )
 
 
 
 def cvto_insertLambda(treeNode, treeNodePath):
 	lambdaNode = CGLambda()
 	blockNode = CGBlock()
+	treeNode.graph.nodes.append( lambdaNode )
+	treeNode.graph.nodes.append( blockNode )
 	lambdaNode.block.append( blockNode.parent )
 	return treeNode.insertNode( lambdaNode, treeNodePath )

@@ -12,3 +12,14 @@ from Britefury.SheetGraph.SheetGraph import *
 class CGNode (SheetGraphNode):
 	def getReferenceableNodeByName(self, targetName, sourceNode=None):
 		return None
+
+
+	def destroy(self):
+		self.destroyChildren()
+		self._graph.nodes.remove( self )
+
+
+	def destroyChildren(self):
+		pass
+
+

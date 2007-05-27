@@ -37,3 +37,9 @@ class CVTBlockStatements (CVTNode):
 				position = n
 		self.graphNode.statements.insert( position, graphNodeToInsert.parent )
 		return self._tree.buildNode( graphNodeToInsert )
+
+
+
+	def deleteStatement(self, statement):
+		self.graphNode.statements.remove( statement.graphNode.parent )
+		statement.graphNode.destroy()

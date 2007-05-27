@@ -17,6 +17,14 @@ class CGLocalVarDeclaration (CGStatement):
 	variable = SheetGraphSinkSingleField( 'Variable', 'The variable' )
 
 
+	def destroyChildren(self):
+		for source in self.value:
+			source.node.destroy()
+
+		for source in self.variable:
+			source.node.destroy()
+
+
 	def generateLLCT(self, tree):
 		assert len( self.variable ) > 0
 		if len( self.value ) > 0:

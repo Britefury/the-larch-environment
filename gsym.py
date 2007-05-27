@@ -5,6 +5,8 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
+import sys
+
 from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
@@ -29,9 +31,19 @@ from Britefury.Event.QueuedEvent import queueEvent
 from Britefury.LowLevelCodeTree.LowLevelCodeTree import LowLevelCodeTree
 
 
+from Britefury.GraphView.SheetGraphView import *
+from Britefury.GraphView.SheetGraphViewDisplayTable import *
+
+
 
 
 if __name__ == '__main__':
+	bBuildGraphView = '--with-graph-view'  in  sys.argv
+
+
+
+	graph = SheetGraph()
+
 	# function printString
 	printStringClosure = CGLambda()
 	printStringBlock = CGBlock()
@@ -50,6 +62,10 @@ if __name__ == '__main__':
 	printStringLoadText.variable = printStringTextParam.references
 
 	printStringTextParam.name = 'text'
+
+
+
+	graph.nodes.extend( [ printStringClosure, printStringBlock, printStringSendPrintMessage, printStringLoadText, printStringTextParam ] )
 
 
 
@@ -78,12 +94,11 @@ if __name__ == '__main__':
 
 	mainPrintStringVar.name = 'printString'
 
-
-	graph = SheetGraph()
+	graph.nodes.extend( [ mainModule, mainBindPrintString, mainLoadPrintString, mainHelloWorld, mainCallPrintString, mainPrintStringVar ] )
 
 	print 'Built graph'
 
-	tree = CodeViewTree( graph )
+	tree = CodeViewTree( graph, mainModule )
 	treeNode = tree.buildNode( mainModule )
 
 	print 'Built code view tree'
@@ -132,6 +147,10 @@ if __name__ == '__main__':
 		doc.oneToOne()
 
 
+	def showGraphView(widget):
+		graphViewWindow.show()
+
+
 	view.refresh()
 
 
@@ -157,6 +176,12 @@ if __name__ == '__main__':
 	view.setDocument( doc )
 
 
+	if bBuildGraphView:
+		showGraphViewButton = gtk.Button( 'Show graph view' )
+		showGraphViewButton.show()
+		showGraphViewButton.connect( 'clicked', showGraphView )
+
+
 	oneToOneButton = gtk.Button( '1:1' )
 	oneToOneButton.show()
 	oneToOneButton.connect( 'clicked', oneToOne )
@@ -176,6 +201,8 @@ if __name__ == '__main__':
 	buttonBox.pack_end( executeDebugButton, False, False, 0 )
 	buttonBox.pack_end( executeButton, False, False, 0 )
 	buttonBox.pack_end( oneToOneButton, False, False, 0 )
+	if bBuildGraphView:
+		buttonBox.pack_end( showGraphViewButton, False, False, 0 )
 	buttonBox.show()
 
 
@@ -195,5 +222,41 @@ if __name__ == '__main__':
 	window.set_size_request( 640, 480 )
 	window.add( box )
 	window.show()
+
+
+
+
+	# Graph window
+
+
+	def createLink(sourcePin, sinkPin):
+		pass
+
+	def eraseLink(source, sink):
+		pass
+
+
+
+	if bBuildGraphView:
+		def onGraphViewDeleteEvent(widget, event, data=None):
+			graphViewWindow.hide()
+			return True
+
+		graphViewWindow = gtk.Window( gtk.WINDOW_TOPLEVEL );
+		graphViewWindow.connect( 'delete-event', onGraphViewDeleteEvent )
+		graphViewWindow.set_border_width( 10 )
+		graphViewWindow.set_size_request( 800, 600 )
+
+		graphViewDisplayTable = SheetGraphViewDisplayTable()
+
+
+		graphView = SheetGraphView( createLink, eraseLink )
+		graphView.attachGraph( graph, graphViewDisplayTable )
+		graphView.show()
+
+		graphViewWindow.add( graphView )
+
+
+
 
 	gtk.main()

@@ -39,6 +39,8 @@ class CVTLocalRef (CVTExpression):
 		else:
 			parentCGSink = self.graphNode.parent[0]
 			unboundRefGraphNode = CGUnboundRef()
+			self.graph.nodes.append( unboundRefGraphNode )
 			unboundRefGraphNode.targetName = varName
 			parentCGSink.replace( self.graphNode.parent, unboundRefGraphNode.parent )
+			self.graphNode.destroy()
 			return self._tree.buildNode( unboundRefGraphNode )

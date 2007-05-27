@@ -19,6 +19,16 @@ class CGSendMessage (CGExpression):
 	expandArg = SheetGraphSinkSingleField( 'Expand arguments', 'Argument to be expanded' )
 
 
+	def destroyChildren(self):
+		for source in self.targetObject:
+			source.node.destroy()
+
+		for source in self.args:
+			source.node.destroy()
+
+		for source in self.expandArg:
+			source.node.destroy()
+
 
 	def generateLLCT(self, tree):
 		assert len( self.targetObject ) > 0

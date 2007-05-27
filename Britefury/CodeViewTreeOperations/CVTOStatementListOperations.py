@@ -13,6 +13,8 @@ from Britefury.CodeGraph.CGLocalVarDeclaration import *
 def cvto_addLocalVarStatement(treeNode, position):
 	var = CGVar()
 	decl = CGLocalVarDeclaration()
+	treeNode.graph.nodes.append( var )
+	treeNode.graph.nodes.append( decl )
 	decl.variable.append( var.declaration )
 	treeNode.graphNode.statements.insert( position, decl.parent )
 	return treeNode.statementNodes[position ]

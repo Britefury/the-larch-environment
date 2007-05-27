@@ -47,3 +47,6 @@ class CVTModule (CVTNode):
 
 
 
+	def deleteStatement(self, statement):
+		self.graphNode.statements.remove( statement.graphNode.parent )
+		statement.graphNode.destroy()

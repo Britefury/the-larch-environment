@@ -72,6 +72,8 @@ class DTEntryLabel (DTBin):
 
 		self.setChild( self._label )
 
+		self._bIgnoreLoseFocus = False
+
 
 
 	def getText(self):
@@ -109,7 +111,10 @@ class DTEntryLabel (DTBin):
 
 	def finishEditing(self):
 		if self.getChild() is not self._label:
+			# Ignore incoming 'lose focus' events
+			self._bIgnoreLoseFocus = True
 			self._entry.ungrabFocus()
+			self._bIgnoreLoseFocus = False
 			self.setChild( self._label )
 			self.finishEditingSignal.emit( self, self.text )
 
@@ -142,7 +147,8 @@ class DTEntryLabel (DTBin):
 		self.finishEditing()
 
 	def _p_onEntryLoseFocus(self):
-		self.finishEditing()
+		if not self._bIgnoreLoseFocus:
+			self.finishEditing()
 
 
 	def _p_setKeyHandler(self, handler):

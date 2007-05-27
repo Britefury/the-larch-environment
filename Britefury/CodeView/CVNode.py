@@ -17,6 +17,7 @@ from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
 from Britefury.CodeViewBehavior.CVBMovementBehavior import CVBMovementBehavior
+from Britefury.CodeViewBehavior.CVBDeleteNodeBehavior import CVBDeleteNodeBehavior
 
 from Britefury.CodeViewTree.CVTNode import CVTNode
 
@@ -110,7 +111,7 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 	treeNode = SheetRefField( CVTNode )
 
 
-	behaviors = [ CVBMovementBehavior() ]
+	behaviors = [ CVBMovementBehavior(), CVBDeleteNodeBehavior() ]
 
 
 
@@ -124,6 +125,23 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 
 	def refresh(self):
 		self.refreshCell
+
+
+
+
+
+	def deleteChild(self, child):
+		return False
+
+
+	def deleteNode(self, bMoveFocusLeft, widget):
+		if self._parent is not None:
+			if self._parent.deleteChild( self ):
+				if bMoveFocusLeft:
+					self.cursorLeft( widget == self.widget )
+				else:
+					self.cursorRight( widget == self.widget )
+
 
 
 

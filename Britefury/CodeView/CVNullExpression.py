@@ -10,21 +10,23 @@ pygtk.require( '2.0' )
 import gtk
 
 
+from Britefury.Math.Math import Colour3f
+
 from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
 from Britefury.CodeViewTree.CVTNullExpression import CVTNullExpression
 
-from Britefury.CodeView.CVNode import *
+from Britefury.CodeView.CVBorderNode import *
 
 from Britefury.DocView.Toolkit.DTBox import DTBox
-from Britefury.DocView.Toolkit.DTEntryLabel import DTEntryLabel
+from Britefury.DocView.Toolkit.DTLabel import DTLabel
 from Britefury.DocView.Toolkit.DTDirection import DTDirection
 
 from Britefury.CodeViewBehavior.CVBCreateExpressionBehavior import *
 
 
-class CVNullExpression (CVNode):
+class CVNullExpression (CVBorderNode):
 	treeNodeClass = CVTNullExpression
 
 
@@ -46,20 +48,11 @@ class CVNullExpression (CVNode):
 
 	def __init__(self, treeNode, view):
 		super( CVNullExpression, self ).__init__( treeNode, view )
-		self.widget = DTEntryLabel( '<expr>', font='Sans italic 11' )
-		self.widget.bEditable = False
-		self.widget.keyHandler = self
+		self.widget.child = DTLabel( '<expr>', font='Sans italic 11', colour=Colour3f( 0.7, 0.0, 0.0 ) )
 
 
 
 
 
 	def startEditing(self):
-		self.widget.startEditing()
-
-
-	def startEditingOnLeft(self):
-		self.widget.startEditingOnLeft()
-
-	def startEditingOnRight(self):
-		self.widget.startEditingOnRight()
+		self.makeCurrent()

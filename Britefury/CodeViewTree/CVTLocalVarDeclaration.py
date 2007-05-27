@@ -42,4 +42,12 @@ class CVTLocalVarDeclaration (CVTStatement):
 	def ensureHasValue(self):
 		if len( self.graphNode.value ) == 0:
 			value = CGNullExpression()
+			self.graph.nodes.append( value )
 			self.graphNode.value.append( value.parent )
+
+
+	def deleteValue(self):
+		if len( self.graphNode.value ) == 1:
+			valueNode = self.graphNode.value[0].node
+			del self.graphNode.value[0]
+			valueNode.destroy()

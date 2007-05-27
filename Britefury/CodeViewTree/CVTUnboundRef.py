@@ -30,7 +30,9 @@ class CVTUnboundRef (CVTExpression):
 		if targetGraphNode is not None:
 			parentCGSink = self.graphNode.parent[0]
 			refGraphNode = targetGraphNode.createRefNode()
+			self.graph.nodes.append( refGraphNode )
 			parentCGSink.replace( self.graphNode.parent, refGraphNode.parent )
+			self.graphNode.destroy()
 			return self._tree.buildNode( refGraphNode )
 		else:
 			return None
