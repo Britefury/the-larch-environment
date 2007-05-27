@@ -60,10 +60,10 @@ class CVUnboundRef (CVExpression):
 
 
 	def startEditingOnLeft(self):
-		self.widget.startEditingOnLeft()
+		self.targetNameWidget.startEditingOnLeft()
 
 	def startEditingOnRight(self):
-		self.widget.startEditingOnRight()
+		self.targetNameWidget.startEditingOnRight()
 
 
 	def _p_onEntryFinish(self, entry, text):
