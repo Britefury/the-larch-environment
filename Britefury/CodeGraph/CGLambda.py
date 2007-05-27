@@ -15,6 +15,12 @@ from Britefury.LowLevelCodeTree.LLCTClosureExp import LLCTClosureExp
 class CGLambda (CGExpression):
 	block = SheetGraphSinkSingleField( 'Block', 'Block' )
 
+
+	def destroyChildren(self):
+		for source in self.block:
+			source.node.destroy()
+
+
 	def generateLLCT(self, tree):
 		assert len( self.block ) > 0
 		return LLCTClosureExp( self.block[0].node.generateLLCT( tree ) )

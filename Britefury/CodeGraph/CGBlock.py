@@ -21,6 +21,17 @@ class CGBlock (CGNode):
 	statements = SheetGraphSinkMultipleField( 'Statements', 'Statement list' )
 
 
+	def destroyChildren(self):
+		for source in self.params:
+			source.node.destroy()
+
+		for source in self.expandParam:
+			source.node.destroy()
+
+		for source in self.statements:
+			source.node.destroy()
+
+
 	def generateLLCT(self, tree):
 		llctStatements = [ statementSource.node.generateLLCT( tree )   for statementSource in self.statements ]
 		paramNames = [ paramSource.node.generateLLCT( tree )   for paramSource in self.params ]

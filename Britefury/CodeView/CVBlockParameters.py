@@ -88,11 +88,13 @@ class CVBlockParameters (CVBorderNode):
 		paramCVT = self._view.getViewNodeForTreeNode( paramCVT )
 		paramCVT.startEditing()
 
+	def deleteChild(self, child):
+		self.treeNode.deleteParameter( child.treeNode )
+		self._view.refresh()
+		return True
 
 
 	def startEditing(self):
 		self.makeCurrent()
 
 
-	def deleteVar(self, var):
-		self.treeNode.deleteParameter( var.treeNode )

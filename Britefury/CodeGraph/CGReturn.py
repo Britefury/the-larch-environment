@@ -16,6 +16,15 @@ class CGReturn (CGExpression):
 	value = SheetGraphSinkSingleField( 'Value', 'Value' )
 	rootBlock = SheetGraphSinkSingleField( 'Root node', 'Root node' )
 
+
+	def destroyChildren(self):
+		# Don't destroy rootBlock; its a reference
+
+		for source in self.value:
+			source.node.destroy()
+
+
+
 	def generateLLCT(self, tree):
 		assert len( self.value ) > 0
 		assert len( self.parent ) > 0

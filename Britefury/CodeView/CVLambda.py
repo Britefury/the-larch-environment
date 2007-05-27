@@ -101,6 +101,14 @@ class CVLambda (CVExpression):
 		self.widget.child = self._box
 
 
+	def deleteChild(self, child):
+		if child is self.lambdaLabelNode:
+			if self._parent is not None:
+				self._parent.deleteNode( self )
+				return True
+		return False
+
+
 	def horizontalNavigationList(self):
 		return [ self.lambdaLabelNode, self.paramsNode, self.statementsNode ]
 

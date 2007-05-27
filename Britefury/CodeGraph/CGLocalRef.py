@@ -15,6 +15,12 @@ from Britefury.LowLevelCodeTree.LLCTLoadLocalExp import LLCTLoadLocalExp
 class CGLocalRef (CGExpression):
 	variable = SheetGraphSinkSingleField( 'Variable', 'Target variable' )
 
+
+	def destroyChildren(self):
+		# Don't destroy @varaible; its a reference
+		pass
+
+
 	def generateLLCT(self, tree):
 		assert len( self.variable ) > 0
 		return LLCTLoadLocalExp( self.variable[0].node.generateLLCT( tree ) )

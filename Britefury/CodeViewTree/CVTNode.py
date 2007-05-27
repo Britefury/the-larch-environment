@@ -50,3 +50,14 @@ class CVTNode (Sheet):
 		return self.graphNode  is  node.graphNode
 
 
+	def getTree(self):
+		return self._tree
+
+	def getGraph(self):
+		return self._tree.graph
+
+
+	tree = property( getTree )
+	graph = property( getGraph )
+
+

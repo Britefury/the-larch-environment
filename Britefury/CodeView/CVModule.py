@@ -62,9 +62,19 @@ class CVModule (CVBorderNode):
 
 
 
+	def deleteChild(self, child):
+		self.treeNode.deleteStatement( child.treeNode )
+		self._view.refresh()
+		return True
+
+
+
+
 	def horizontalNavigationList(self):
 		return self.verticalNavigationList()
 
 	def verticalNavigationList(self):
 		return self.statementNodes
+
+
 

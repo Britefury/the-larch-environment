@@ -99,6 +99,19 @@ class CVLocalVarDeclaration (CVStatement):
 
 
 
+	def deleteChild(self, child):
+		if child is self.varNode:
+			if self._parent is not None:
+				self._parent.deleteChild( self )
+				return True
+		elif child is self.valueNode:
+			self.treeNode.deleteValue()
+			return True
+		return False
+
+
+
+
 	def startEditingValue(self):
 		self.treeNode.ensureHasValue()
 		valueCV = self.valueNode
@@ -114,5 +127,3 @@ class CVLocalVarDeclaration (CVStatement):
 
 
 
-	def deleteVar(self, var):
-		self.deleteStatement()

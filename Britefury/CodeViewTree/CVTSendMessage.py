@@ -26,7 +26,10 @@ class CVTSendMessage (CVTExpression):
 
 	@FunctionRefField
 	def targetObjectNode(self):
-		return self._tree.buildNode( self.graphNode.targetObject[0].node )
+		if len( self.graphNode.targetObject ) > 0:
+			return self._tree.buildNode( self.graphNode.targetObject[0].node )
+		else:
+			return None
 
 
 	@FunctionRefField
@@ -37,3 +40,16 @@ class CVTSendMessage (CVTExpression):
 	@FunctionRefField
 	def argumentsNode(self):
 		return self._tree.buildNode( self.graphNode, CVTMessageArguments )
+
+
+
+
+	def unwrapSendMessage(self):
+		parentCGSink = self.graphNode.parent[0]
+		targetObjectSource = self.graphNode.targetObject[0]
+
+		self.graphNode.targetObject.remove( targetObjectSource )
+
+		parentCGSink.replace( self.graphNode.parent, targetObjectSource )
+
+		self.graphNode.destroy()

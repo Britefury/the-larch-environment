@@ -41,6 +41,10 @@ class CGModule (CGNode):
 	statements = SheetGraphSinkMultipleField( 'Statements', 'Statement list' )
 
 
+	def destroyChildren(self):
+		for source in self.statements:
+			source.node.destroy()
+
 
 	def generateStatementLLCT(self, node, moduleTag, tree):
 		if isinstance( node, CGLocalVarDeclaration ):

@@ -12,11 +12,12 @@ from weakref import WeakKeyDictionary
 class CodeViewTree (object):
 	_nodeClassTable = {}
 
-	def __init__(self, graph):
+	def __init__(self, graph, rootGraphNode):
 		super( CodeViewTree, self ).__init__()
 
 		self._nodeTable = WeakKeyDictionary()
 		self._graph = graph
+		self._rootGraphNode = rootGraphNode
 
 
 
@@ -45,5 +46,16 @@ class CodeViewTree (object):
 				subTable[nodeClass] = treeNode
 
 			return treeNode
+
+
+	def getGraph(self):
+		return self._graph
+
+
+	def getRootNode(self):
+		return self.buildNode( self._rootGraphNode )
+
+
+	graph = property( getGraph, None )
 
 

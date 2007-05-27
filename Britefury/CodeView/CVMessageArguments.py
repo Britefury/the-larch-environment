@@ -104,6 +104,13 @@ class CVMessageArguments (CVBorderNode):
 		argCV.startEditing()
 
 
+	def deleteChild(self, child):
+		self.treeNode.deleteArgument( child.treeNode )
+		self._view.refresh()
+		return True
+
+
+
 	def startEditing(self):
 		self.widget.grabFocus()
 

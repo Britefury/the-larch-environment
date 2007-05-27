@@ -66,3 +66,9 @@ class CVBlockStatements (CVBorderNode):
 	def verticalNavigationList(self):
 		return self.statementNodes
 
+
+
+	def deleteChild(self, child):
+		self.treeNode.deleteStatement( child.treeNode )
+		return True
+

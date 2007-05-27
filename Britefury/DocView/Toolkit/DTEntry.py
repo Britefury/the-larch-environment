@@ -435,6 +435,7 @@ class DTEntry (DTWidget):
 				if bCanDelete:
 					if self._selectionBounds is not None:
 						self._p_deleteSelection()
+						bHandled = True
 					elif self._cursorLocation > 0:
 						textDeleted = self._text[self._cursorLocation-1:self._cursorLocation]
 						self._text = self._text[:self._cursorLocation-1] + self._text[self._cursorLocation:]
@@ -454,13 +455,14 @@ class DTEntry (DTWidget):
 					text = self._text
 					if self._selectionBounds is not None:
 						self._p_deleteSelection()
+						bHandled = True
 					elif self._cursorLocation < len( self._text ):
 						textDeleted = self._text[self._cursorLocation:self._cursorLocation+1]
 						self._text = self._text[:self._cursorLocation] + self._text[self._cursorLocation+1:]
 						self.textDeletedSignal.emit( self, self._cursorLocation, self._cursorLocation+1, textDeleted )
+						bHandled = len( text ) != 0
 					self._p_onTextModified()
 					# Event not handled if text was empty
-					bHandled = len( text ) != 0
 			elif event.keyString != ''  and  self.bEditable:
 				bTextOk = True
 

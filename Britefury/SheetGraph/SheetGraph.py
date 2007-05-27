@@ -1064,7 +1064,7 @@ class SheetGraph (object):
 
 		def extend(self, nodes):
 			for node in nodes:
-				append( node )
+				self.append( node )
 
 		def remove(self, node):
 			assert node in self._nodes, 'function graph node not in list'
