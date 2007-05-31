@@ -113,6 +113,7 @@ class CVLocalVarDeclaration (CVStatement):
 
 
 	def startEditingValue(self):
+		self.varNode.finishEditing()
 		self.treeNode.ensureHasValue()
 		valueCV = self.valueNode
 		valueCV.startEditing()

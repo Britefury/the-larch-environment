@@ -182,6 +182,15 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 
 
 
+	def _f_commandHistoryFreeze(self):
+		self._view._f_commandHistoryFreeze()
+
+
+	def _f_commandHistoryThaw(self):
+		self._view._f_commandHistoryThaw()
+
+
+
 	def _p_prevNavListItem(self, navList, item):
 		if navList != []:
 			try:

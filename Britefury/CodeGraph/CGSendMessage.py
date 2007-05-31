@@ -14,7 +14,7 @@ from Britefury.LowLevelCodeTree.LLCTSendMessageExp import LLCTSendMessageExp
 
 class CGSendMessage (CGExpression):
 	targetObject = SheetGraphSinkSingleField( 'Target object', 'Expression that evaluates to the object to which the message is to be sent' )
-	messageName = Field( str, '', 'The message name' )
+	messageName = Field( str, '', doc='The message name' )
 	args = SheetGraphSinkMultipleField( 'Arguments', 'Argument list' )
 	expandArg = SheetGraphSinkSingleField( 'Expand arguments', 'Argument to be expanded' )
 

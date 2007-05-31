@@ -17,9 +17,11 @@ class CVBStatementListBehavior (CodeViewBehavior):
 			position = viewNode.treeNode.statementNodes.index( receivingNodePath[1].treeNode )
 		else:
 			position = len( viewNode.treeNode.statementNodes )
+		viewNode._f_commandHistoryFreeze()
 		cvto_addLocalVarStatement( viewNode.treeNode, position )
 		localVarCV = viewNode.statementNodes[position]
 		localVarCV.startEditing()
+		viewNode._f_commandHistoryThaw()
 		return True
 
 

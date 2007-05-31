@@ -11,13 +11,17 @@ from Britefury.CodeViewBehavior.CodeViewBehavior import *
 class CVBSendMessageBehavior (CodeViewBehavior):
 	@CVBCharInputHandlerMethod( '(' )
 	def _editArguments(self, viewNode, receivingNodePath, widget, event):
+		viewNode._f_commandHistoryFreeze()
 		viewNode.startEditingArguments()
+		viewNode._f_commandHistoryThaw()
 		return True
 
 
 	@CVBCharInputHandlerMethod( ')' )
 	def _stopEditingArguments(self, viewNode, receivingNodePath, widget, event):
+		viewNode._f_commandHistoryFreeze()
 		viewNode.stopEditingArguments()
+		viewNode._f_commandHistoryThaw()
 		return True
 
 

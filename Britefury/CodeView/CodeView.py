@@ -13,12 +13,13 @@ from Britefury.Cell.Cell import Cell
 class CodeView (object):
 	_nodeClassTable = {}
 
-	def __init__(self, tree):
+	def __init__(self, tree, commandHistory):
 		super( CodeView, self ).__init__()
 
 		self._nodeTable = WeakKeyDictionary()
 		self._tree = tree
 		self._document = None
+		self._commandHistory = commandHistory
 
 		self.refreshCell = Cell()
 		self.refreshCell.function = self._p_refresh
@@ -106,3 +107,13 @@ class CodeView (object):
 	def refresh(self):
 		self.refreshCell.immutableValue
 
+
+
+	def _f_commandHistoryFreeze(self):
+		if self._commandHistory is not None:
+			self._commandHistory.freeze()
+
+
+	def _f_commandHistoryThaw(self):
+		if self._commandHistory is not None:
+			self._commandHistory.thaw()

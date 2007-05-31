@@ -16,7 +16,9 @@ class CVBDeleteNodeBehavior (CodeViewBehavior):
 		if isinstance( widget, DTEntry ):
 			if widget.text != '':
 				return True
+		viewNode._f_commandHistoryFreeze()
 		viewNode.deleteNode( True, widget )
+		viewNode._f_commandHistoryThaw()
 		return True
 
 
@@ -25,6 +27,8 @@ class CVBDeleteNodeBehavior (CodeViewBehavior):
 		if isinstance( widget, DTEntry ):
 			if widget.text != '':
 				return True
+		viewNode._f_commandHistoryFreeze()
 		viewNode.deleteNode( False, widget )
+		viewNode._f_commandHistoryThaw()
 		return True
 

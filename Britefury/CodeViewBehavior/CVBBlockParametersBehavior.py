@@ -13,12 +13,16 @@ from Britefury.CodeViewBehavior.CodeViewBehavior import *
 class CVBBlockParametersBehavior (CodeViewBehavior):
 	@CVBCharInputHandlerMethod( ',' )
 	def _addParameter(self, viewNode, receivingNodePath, widget, event):
+		viewNode._f_commandHistoryFreeze()
 		viewNode.addParameter( '' )
+		viewNode._f_commandHistoryThaw()
 		return True
 
 
 	@CVBCharInputHandlerMethod( string.ascii_letters + '_' )
 	def _addNamedParameter(self, viewNode, receivingNodePath, widget, event):
+		viewNode._f_commandHistoryFreeze()
 		viewNode.addParameter( event.keyString )
+		viewNode._f_commandHistoryThaw()
 		return True
 

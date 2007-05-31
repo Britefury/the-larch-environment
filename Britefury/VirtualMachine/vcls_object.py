@@ -6,7 +6,7 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
 from Britefury.VirtualMachine.VMBuiltinMessage import VMBuiltinMessage
-import Britefury.VirtualMachine.VMMessage
+#import Britefury.VirtualMachine.VMMessage
 from Britefury.VirtualMachine.VObject import VObject
 from Britefury.VirtualMachine.VClass import VClass
 
@@ -47,8 +47,8 @@ def vobjectmsg_getClass(instance, machine, args):
 def vobjectmsg_isInstanceOf(instance, machine, args):
 	return pyBoolToVBool( instance.isInstanceOf( args[0] ) )
 
-def vobjectmsg_setInstanceMessage(instance, machine, args):
-	instance.setInstanceMessage( args[0]._value, Britefury.VirtualMachine.VMMessage.VMMessage( args[1] ) )
+#def vobjectmsg_setInstanceMessage(instance, machine, args):
+#	instance.setInstanceMessage( args[0]._value, Britefury.VirtualMachine.VMMessage.VMMessage( args[1] ) )
 
 def vobjectmsg_toString(instance, machine, args):
 	return pyStrToVStr( 'object class <%d> id<%d>' % ( instance._class._name, id( instance ), ) )
@@ -58,7 +58,7 @@ vcls_object.setMessage( 'alloc', VMBuiltinMessage( vobjectmsg_alloc ) )
 vcls_object.setMessage( 'init', VMBuiltinMessage( vobjectmsg_init ) )
 vcls_object.setMessage( 'getClass', VMBuiltinMessage( vobjectmsg_getClass ) )
 vcls_object.setMessage( 'isInstanceOf', VMBuiltinMessage( vobjectmsg_isInstanceOf ) )
-vcls_object.setMessage( 'setInstanceMessage', VMBuiltinMessage( vobjectmsg_setInstanceMessage ) )
+#vcls_object.setMessage( 'setInstanceMessage', VMBuiltinMessage( vobjectmsg_setInstanceMessage ) )
 vcls_object.setMessage( 'toString', VMBuiltinMessage( vobjectmsg_toString ) )
 
 

@@ -38,10 +38,10 @@ vtrue.setInstanceMessage( 'toString', VMBuiltinMessage( vtruemsg_toString ) )
 
 
 
-
 def pyBoolToVBool(pyBool):
 	if pyBool:
 		return vtrue
 	else:
 		return vfalse
+
 
