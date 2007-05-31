@@ -11,7 +11,9 @@ from Britefury.CodeViewBehavior.CodeViewBehavior import *
 class CVBStringLiteralBehavior (CodeViewBehavior):
 	@CVBCharInputHandlerMethod( '\'' )
 	def _finishEditingString(self, viewNode, receivingNodePath, widget, event):
+		viewNode._f_commandHistoryFreeze()
 		viewNode.closeString()
+		viewNode._f_commandHistoryThaw()
 		return True
 
 

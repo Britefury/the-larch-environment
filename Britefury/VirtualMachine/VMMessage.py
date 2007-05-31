@@ -7,6 +7,7 @@
 ##-*************************
 from Britefury.VirtualMachine.VMAbstractMessage import VMAbstractMessage
 from Britefury.VirtualMachine.VMFrame import VMFrame
+from Britefury.VirtualMachine.vcls_object import *
 from Britefury.VirtualMachine.vcls_list import pyListToVList
 
 
@@ -27,3 +28,11 @@ class VMMessage (VMAbstractMessage):
 		frame.selfRegister = instance
 		machine.pushFrame( frame )
 
+
+
+
+def vobjectmsg_setInstanceMessage(instance, machine, args):
+	instance.setInstanceMessage( args[0]._value, VMMessage( args[1] ) )
+
+
+vcls_object.setMessage( 'setInstanceMessage', VMBuiltinMessage( vobjectmsg_setInstanceMessage ) )

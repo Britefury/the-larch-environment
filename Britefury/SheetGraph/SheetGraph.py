@@ -728,7 +728,7 @@ class SheetGraphPinField (KMeta.KMetaMember):
 	def _f_readInstancePinXml(self, instance, xmlNode):
 		pin = self._f_getPinFromInstance( instance )
 		xmlNode.getChild( self._xmlName )  >>  pin
-		pin._f_setName( self._name )
+		pin._f_setName( self._pinName )
 
 	def _f_writeInstancePinXml(self, instance, xmlNode):
 		xmlNode.addChild( self._xmlName )  <<  self._f_getPinFromInstance( instance )

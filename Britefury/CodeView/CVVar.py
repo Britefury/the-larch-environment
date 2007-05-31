@@ -53,6 +53,9 @@ class CVVar (CVBorderNode):
 	def startEditing(self):
 		self.nameWidget.startEditing()
 
+	def finishEditing(self):
+		self.nameWidget.finishEditing()
+
 
 	def startEditingOnLeft(self):
 		self.nameWidget.startEditingOnLeft()

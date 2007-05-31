@@ -7,6 +7,7 @@
 ##-*************************
 from Britefury.VirtualMachine.VMBuiltinMessage import VMBuiltinMessage
 from Britefury.VirtualMachine.VClass import VClass
+import Britefury.VirtualMachine.vcls_object
 from Britefury.VirtualMachine import vcls_object
 from Britefury.VirtualMachine.vcls_string import pyStrToVString
 
@@ -46,4 +47,6 @@ def pyListToVList(pyList):
 	vlist_init( l )
 	l._value = pyList
 	return l
+
+
 

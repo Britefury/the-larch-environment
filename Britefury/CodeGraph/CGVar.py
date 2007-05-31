@@ -15,7 +15,7 @@ from Britefury.CodeGraph.CGLocalRef import CGLocalRef
 
 
 class CGVar (CGNode):
-	name = Field( str, '', 'Variable name' )
+	name = Field( str, '', doc='Variable name' )
 	references = SheetGraphSourceField( 'References', 'All references to this local variable' )
 	declaration = SheetGraphSourceField( 'Declaraion', 'The variable declaration' )
 

@@ -65,7 +65,9 @@ class CVLocalRef (CVExpression):
 
 
 	def _p_onEntryFinish(self, entry, text):
+		self._f_commandHistoryFreeze()
 		self._rebind( text )
+		self._f_commandHistoryThaw()
 
 
 	def _rebind(self, varName):
