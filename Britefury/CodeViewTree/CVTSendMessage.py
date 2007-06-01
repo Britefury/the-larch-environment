@@ -52,4 +52,4 @@ class CVTSendMessage (CVTExpression):
 
 		parentCGSink.replace( self.graphNode.parent, targetObjectSource )
 
-		self.graphNode.destroy()
+		self.graphNode.destroySubtree()

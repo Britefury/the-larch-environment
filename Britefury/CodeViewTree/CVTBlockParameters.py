@@ -46,4 +46,4 @@ class CVTBlockParameters (CVTNode):
 
 	def deleteParameter(self, param):
 		self.graphNode.params.remove( param.graphNode.declaration )
-		param.graphNode.destroy()
+		param.graphNode.destroySubtree()

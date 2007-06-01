@@ -7,21 +7,16 @@
 ##-*************************
 from Britefury.CodeGraph.CGExpression import CGExpression
 from Britefury.Sheet.Sheet import *
-from Britefury.SheetGraph.SheetGraph import *
+from Britefury.SemanticGraph.SemanticGraph import *
 from Britefury.LowLevelCodeTree.LLCTReturnExp import LLCTReturnExp
 
 
 
 class CGReturn (CGExpression):
-	value = SheetGraphSinkSingleField( 'Value', 'Value' )
-	rootBlock = SheetGraphSinkSingleField( 'Root node', 'Root node' )
+	value = SemanticGraphSinkSingleSubtreeField( 'Value', 'Value' )
+	rootBlock = SemanticGraphSinkSingleField( 'Root node', 'Root node' )
 
 
-	def destroyChildren(self):
-		# Don't destroy rootBlock; its a reference
-
-		for source in self.value:
-			source.node.destroy()
 
 
 

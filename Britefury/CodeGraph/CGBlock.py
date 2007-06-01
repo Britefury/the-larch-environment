@@ -8,28 +8,18 @@
 from Britefury.CodeGraph.CGNode import CGNode
 from Britefury.CodeGraph.CGVar import CGVar
 from Britefury.Sheet.Sheet import *
-from Britefury.SheetGraph.SheetGraph import *
+from Britefury.SemanticGraph.SemanticGraph import *
 from Britefury.LowLevelCodeTree.LLCTBlock import LLCTBlock
 
 
 
 class CGBlock (CGNode):
 	name = Field( str, '' )
-	parent = SheetGraphSourceField( 'Parent node', 'Parent node' )
-	params = SheetGraphSinkMultipleField( 'Parameters', 'Parameters' )
-	expandParam = SheetGraphSinkSingleField( 'Expand parameter', 'Expand parameter' )
-	statements = SheetGraphSinkMultipleField( 'Statements', 'Statement list' )
+	parent = SemanticGraphSourceField( 'Parent node', 'Parent node' )
+	params = SemanticGraphSinkMultipleSubtreeField( 'Parameters', 'Parameters' )
+	expandParam = SemanticGraphSinkSingleSubtreeField( 'Expand parameter', 'Expand parameter' )
+	statements = SemanticGraphSinkMultipleSubtreeField( 'Statements', 'Statement list' )
 
-
-	def destroyChildren(self):
-		for source in self.params:
-			source.node.destroy()
-
-		for source in self.expandParam:
-			source.node.destroy()
-
-		for source in self.statements:
-			source.node.destroy()
 
 
 	def generateLLCT(self, tree):

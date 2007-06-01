@@ -6,13 +6,13 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
 from Britefury.Sheet.Sheet import *
-from Britefury.SheetGraph.SheetGraph import *
+from Britefury.SemanticGraph.SemanticGraph import *
 from Britefury.CodeGraph.CGNode import CGNode
 
 
 
 class CGStatement (CGNode):
-	parent = SheetGraphSourceField( 'Parent node', 'Parent node' )
+	parent = SemanticGraphSourceField( 'Parent node', 'Parent node' )
 
 
 	def getReferenceableNodeByName(self, targetName, sourceNode=None):

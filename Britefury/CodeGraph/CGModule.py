@@ -8,7 +8,7 @@
 from Britefury.CodeGraph.CGNode import CGNode
 from Britefury.CodeGraph.CGLocalVarDeclaration import CGLocalVarDeclaration
 from Britefury.Sheet.Sheet import *
-from Britefury.SheetGraph.SheetGraph import *
+from Britefury.SemanticGraph.SemanticGraph import *
 from Britefury.VirtualMachine.vcls_string import pyStrToVString
 
 from Britefury.LowLevelCodeTree.LLCTBlock import LLCTBlock
@@ -38,12 +38,8 @@ localModuleName = '__module__'
 
 class CGModule (CGNode):
 	name = Field( str, '' )
-	statements = SheetGraphSinkMultipleField( 'Statements', 'Statement list' )
+	statements = SemanticGraphSinkMultipleSubtreeField( 'Statements', 'Statement list' )
 
-
-	def destroyChildren(self):
-		for source in self.statements:
-			source.node.destroy()
 
 
 	def generateStatementLLCT(self, node, moduleTag, tree):

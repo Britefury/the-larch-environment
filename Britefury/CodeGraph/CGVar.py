@@ -8,7 +8,7 @@
 from Britefury.VirtualMachine.VMTag import VMTag
 
 from Britefury.Sheet.Sheet import *
-from Britefury.SheetGraph.SheetGraph import *
+from Britefury.SemanticGraph.SemanticGraph import *
 
 from Britefury.CodeGraph.CGNode import CGNode
 from Britefury.CodeGraph.CGLocalRef import CGLocalRef
@@ -16,8 +16,8 @@ from Britefury.CodeGraph.CGLocalRef import CGLocalRef
 
 class CGVar (CGNode):
 	name = Field( str, '', doc='Variable name' )
-	references = SheetGraphSourceField( 'References', 'All references to this local variable' )
-	declaration = SheetGraphSourceField( 'Declaraion', 'The variable declaration' )
+	references = SemanticGraphSourceField( 'References', 'All references to this local variable' )
+	declaration = SemanticGraphSourceField( 'Declaraion', 'The variable declaration' )
 
 	def generateLLCT(self, tree):
 		try:

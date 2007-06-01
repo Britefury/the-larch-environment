@@ -28,7 +28,7 @@ class CVTNullExpression (CVTNode):
 	def insertNode(self, graphNodeToInsert, treeNodePath):
 		parentCGSink = self.graphNode.parent[0]
 		parentCGSink.replace( self.graphNode.parent, graphNodeToInsert.parent )
-		self.graphNode.destroy()
+		self.graphNode.destroySubtree()
 		return self._tree.buildNode( graphNodeToInsert )
 
 
