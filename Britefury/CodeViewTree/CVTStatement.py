@@ -25,5 +25,5 @@ class CVTStatement (CVTNode):
 	def deleteStatement(self):
 		parentCGSink = self.graphNode.parent[0]
 		parentCGSink.remove( self.graphNode.parent )
-		self.graphNode.destroy()
+		self.graphNode.destroySubtree()
 

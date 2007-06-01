@@ -7,18 +7,13 @@
 ##-*************************
 from Britefury.CodeGraph.CGExpression import CGExpression
 from Britefury.Sheet.Sheet import *
-from Britefury.SheetGraph.SheetGraph import *
+from Britefury.SemanticGraph.SemanticGraph import *
 from Britefury.LowLevelCodeTree.LLCTClosureExp import LLCTClosureExp
 
 
 
 class CGLambda (CGExpression):
-	block = SheetGraphSinkSingleField( 'Block', 'Block' )
-
-
-	def destroyChildren(self):
-		for source in self.block:
-			source.node.destroy()
+	block = SemanticGraphSinkSingleSubtreeField( 'Block', 'Block' )
 
 
 	def generateLLCT(self, tree):

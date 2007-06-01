@@ -37,5 +37,5 @@ class CVTExpression (CVTStatement):
 		self.graph.nodes.append( nullExpression )
 		parentCGSink = self.graphNode.parent[0]
 		parentCGSink.replace( self.graphNode.parent, nullExpression.parent )
-		self.graphNode.destroy()
+		self.graphNode.destroySubtree()
 		return self._tree.buildNode( nullExpression )

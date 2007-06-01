@@ -7,27 +7,18 @@
 ##-*************************
 from Britefury.CodeGraph.CGExpression import CGExpression
 from Britefury.Sheet.Sheet import *
-from Britefury.SheetGraph.SheetGraph import *
+from Britefury.SemanticGraph.SemanticGraph import *
 from Britefury.LowLevelCodeTree.LLCTSendMessageExp import LLCTSendMessageExp
 
 
 
 class CGSendMessage (CGExpression):
-	targetObject = SheetGraphSinkSingleField( 'Target object', 'Expression that evaluates to the object to which the message is to be sent' )
+	targetObject = SemanticGraphSinkSingleSubtreeField( 'Target object', 'Expression that evaluates to the object to which the message is to be sent' )
 	messageName = Field( str, '', doc='The message name' )
-	args = SheetGraphSinkMultipleField( 'Arguments', 'Argument list' )
-	expandArg = SheetGraphSinkSingleField( 'Expand arguments', 'Argument to be expanded' )
+	args = SemanticGraphSinkMultipleSubtreeField( 'Arguments', 'Argument list' )
+	expandArg = SemanticGraphSinkSingleSubtreeField( 'Expand arguments', 'Argument to be expanded' )
 
 
-	def destroyChildren(self):
-		for source in self.targetObject:
-			source.node.destroy()
-
-		for source in self.args:
-			source.node.destroy()
-
-		for source in self.expandArg:
-			source.node.destroy()
 
 
 	def generateLLCT(self, tree):

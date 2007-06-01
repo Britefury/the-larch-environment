@@ -8,7 +8,7 @@
 from Britefury.VirtualMachine.vcls_string import pyStrToVString
 from Britefury.CodeGraph.CGExpression import CGExpression
 from Britefury.Sheet.Sheet import *
-from Britefury.SheetGraph.SheetGraph import *
+from Britefury.SemanticGraph.SemanticGraph import *
 from Britefury.LowLevelCodeTree.LLCTLoadConstantExp import LLCTLoadConstantExp
 
 

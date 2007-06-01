@@ -47,7 +47,7 @@ class CVTMessageArguments (CVTNode):
 
 	def deleteArgument(self, argument):
 		self.graphNode.args.remove( argument.graphNode.parent )
-		argument.graphNode.destroy()
+		argument.graphNode.destroySubtree()
 
 
 

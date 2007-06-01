@@ -50,4 +50,4 @@ class CVTLocalVarDeclaration (CVTStatement):
 		if len( self.graphNode.value ) == 1:
 			valueNode = self.graphNode.value[0].node
 			del self.graphNode.value[0]
-			valueNode.destroy()
+			valueNode.destroySubtree()

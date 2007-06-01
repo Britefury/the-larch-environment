@@ -32,7 +32,7 @@ class CVTUnboundRef (CVTExpression):
 			refGraphNode = targetGraphNode.createRefNode()
 			self.graph.nodes.append( refGraphNode )
 			parentCGSink.replace( self.graphNode.parent, refGraphNode.parent )
-			self.graphNode.destroy()
+			self.graphNode.destroySubtree()
 			return self._tree.buildNode( refGraphNode )
 		else:
 			return None

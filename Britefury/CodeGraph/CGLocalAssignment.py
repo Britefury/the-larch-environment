@@ -7,21 +7,15 @@
 ##-*************************
 from Britefury.CodeGraph.CGStatement import CGStatement
 from Britefury.Sheet.Sheet import *
-from Britefury.SheetGraph.SheetGraph import *
+from Britefury.SemanticGraph.SemanticGraph import *
 from Britefury.LowLevelCodeTree.LLCTAssignmentExp import LLCTAssignmentExp
 
 
 
 class CGLocalAssignment (CGStatement):
-	variable = SheetGraphSinkSingleField( 'Variable', 'Target variable' )
-	value = SheetGraphSinkSingleField( 'Value', 'Value' )
+	variable = SemanticGraphSinkSingleField( 'Variable', 'Target variable' )
+	value = SemanticGraphSinkSingleSubtreeField( 'Value', 'Value' )
 
-
-	def destroyChildren(self):
-		# Don't destroy @varaible; its a reference
-
-		for source in self.value:
-			source.node.destroy()
 
 
 	def generateLLCT(self, tree):
