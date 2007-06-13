@@ -9,7 +9,6 @@ from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
 from Britefury.CodeGraph.CGStatement import CGStatement
-from Britefury.CodeGraph.CGSendMessage import CGSendMessage
 
 from Britefury.CodeViewTree.CVTNode import CVTNode
 

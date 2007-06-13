@@ -9,7 +9,6 @@ from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
 from Britefury.CodeGraph.CGModule import CGModule
-from Britefury.CodeGraph.CGLocalVarDeclaration import CGLocalVarDeclaration
 from Britefury.CodeGraph.CGVar import CGVar
 
 from Britefury.CodeViewTree.CVTNode import CVTNode
@@ -23,30 +22,9 @@ class CVTModule (CVTNode):
 	graphNode = SheetRefField( CGModule )
 
 
-	def _statementNodes(self):
-		return [ self._tree.buildNode( statementSource.node )   for statementSource in self.graphNode.statements ]
 
-	statementNodes = FunctionField( _statementNodes )
-
-
+	@FunctionField
+	def statementsNode(self):
+		return self._tree.buildNode( self.graphNode.block[0].node )
 
 
-
-	def insertNode(self, graphNodeToInsert, treeNodePath):
-		position = len( self.statementNodes )
-		if len( treeNodePath ) > 1:
-			try:
-				n = self.statementNodes.index( treeNodePath[1] )
-			except ValueError:
-				pass
-			else:
-				position = n
-		self.graphNode.statements.insert( position, graphNodeToInsert.parent )
-		return self._tree.buildNode( graphNodeToInsert )
-
-
-
-
-	def deleteStatement(self, statement):
-		self.graphNode.statements.remove( statement.graphNode.parent )
-		statement.graphNode.destroySubtree()

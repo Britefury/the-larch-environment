@@ -9,12 +9,12 @@ from Britefury.VirtualMachine.vcls_string import pyStrToVString
 from Britefury.CodeGraph.CGExpression import CGExpression
 from Britefury.Sheet.Sheet import *
 from Britefury.SemanticGraph.SemanticGraph import *
-from Britefury.LowLevelCodeTree.LLCTLoadConstantExp import LLCTLoadConstantExp
 
 
 
 class CGStringLiteral (CGExpression):
 	value = Field( str, '' )
 
-	def generateLLCT(self, tree):
-		return LLCTLoadConstantExp( pyStrToVString( self.value ) )
+	def generatePyCode(self):
+		return "'" + self.value + "'"
+

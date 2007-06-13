@@ -15,14 +15,15 @@ from Britefury.CodeViewTree.CVTNode import CVTNode
 
 
 class CVTBlockStatements (CVTNode):
+	graphNodeClass = CGBlock
+
 	graphNode = SheetRefField( CGBlock )
 
 
-	def _statementNodes(self):
+	@FunctionField
+	def statementNodes(self):
 		return [ self._tree.buildNode( statementSource.node )   for statementSource in self.graphNode.statements ]
 
-
-	statementNodes = FunctionField( _statementNodes )
 
 
 

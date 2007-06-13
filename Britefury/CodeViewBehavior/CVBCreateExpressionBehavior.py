@@ -28,11 +28,11 @@ class CVBCreateExpressionBehavior (CodeViewBehavior):
 	@CVBCharInputHandlerMethod( string.ascii_letters + '_' )
 	def _replaceWithRef(self, viewNode, receivingNodePath, widget, event):
 		viewNode._f_commandHistoryFreeze()
-		unboundRefCVT = cvto_insertUnboundRef( viewNode.treeNode, [ node.treeNode  for node in receivingNodePath ] )
-		unboundRefCVT.targetName = event.keyString
+		refCVT = cvto_insertLocalRef( viewNode.treeNode, [ node.treeNode  for node in receivingNodePath ] )
+		refCVT.graphNode.variable[0].node.name = event.keyString
 		viewNode._view.refresh()
-		unboundRefCV = viewNode._view.getViewNodeForTreeNode( unboundRefCVT )
-		unboundRefCV.startEditing()
+		refCV = viewNode._view.getViewNodeForTreeNode( refCVT )
+		refCV.startEditing()
 		viewNode._f_commandHistoryThaw()
 		return True
 

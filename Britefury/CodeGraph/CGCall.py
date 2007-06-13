@@ -5,17 +5,18 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
-from Britefury.CodeGraph.CGStatement import CGStatement
+from Britefury.CodeGraph.CGExpression import CGExpression
 from Britefury.Sheet.Sheet import *
 from Britefury.SemanticGraph.SemanticGraph import *
 
 
 
-class CGLocalAssignment (CGStatement):
-	variable = SemanticGraphSinkSingleField( 'Variable', 'Target variable' )
-	value = SemanticGraphSinkSingleSubtreeField( 'Value', 'Value' )
+class CGCall (CGExpression):
+	targetObject = SemanticGraphSinkSingleSubtreeField( 'Target object', 'Expression that evaluates to the object to be called' )
+	arguments = SemanticGraphSinkSingleSubtreeField( 'Arguments', 'Arguments' )
+
 
 
 
 	def generatePyCode(self):
-		return self.variable[0].node.generatePyCode() + ' = ' + self.value[0].node.generatePyCode()
+		return self.targetObject[0].node.generatePyCode() + '( ' + self.arguments[0].node.generatePyCode() + ' )'

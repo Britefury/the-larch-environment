@@ -18,6 +18,8 @@ from Britefury.CodeViewTree.CVTLocalRef import CVTLocalRef
 
 from Britefury.CodeView.CVExpression import *
 
+from Britefury.CodeViewBehavior.CVBLocalRefBehavior import CVBLocalRefBehavior
+
 from Britefury.DocView.Toolkit.DTBox import DTBox
 from Britefury.DocView.Toolkit.DTLabel import DTLabel
 from Britefury.DocView.Toolkit.DTEntryLabel import DTEntryLabel
@@ -32,49 +34,37 @@ class CVLocalRef (CVExpression):
 	treeNode = SheetRefField( CVTLocalRef )
 
 
+	behaviors = [ CVBLocalRefBehavior() ]
+
+
 	@FunctionRefField
-	def nameWidget(self):
-		self._entry.text = self.treeNode.varName
-		return self._entry
+	def varNode(self):
+		return self._view.buildView( self.treeNode.varNode, self )
+
+	@FunctionRefField
+	def varWidget(self):
+		return self.varNode.widget
 
 	@FunctionField
 	def refreshCell(self):
-		self.nameWidget
+		self.widget.child = self.varWidget
 
 
 
 
 	def __init__(self, treeNode, view):
 		super( CVLocalRef, self ).__init__( treeNode, view )
-		self._entry = DTEntryLabel( regexp=RegExpStrings.identifier )
-		self._entry.keyHandler = self
-		self._entry.finishEditingSignal.connect( self._p_onEntryFinish )
-		self.widget.child = self._entry
+		self.widget.child = DTLabel( 'nil' )
 
 
 
 	def startEditing(self):
-		self.nameWidget.startEditing()
+		self.varNode.startEditing()
 
 
 	def startEditingOnLeft(self):
-		self.nameWidget.startEditingOnLeft()
+		self.varNode.startEditingOnLeft()
 
 	def startEditingOnRight(self):
-		self.nameWidget.startEditingOnRight()
+		self.varNode.startEditingOnRight()
 
-
-	def _p_onEntryFinish(self, entry, text):
-		self._f_commandHistoryFreeze()
-		self._rebind( text )
-		self._f_commandHistoryThaw()
-
-
-	def _rebind(self, varName):
-		refCVT = self.treeNode.rebind( varName )
-		if refCVT is not None:
-			self._view.refresh()
-			refCV = self._view.getViewNodeForTreeNode( refCVT )
-			return refCV
-		else:
-			return None

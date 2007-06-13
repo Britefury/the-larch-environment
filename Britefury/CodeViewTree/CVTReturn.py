@@ -10,19 +10,18 @@ from Britefury.SheetGraph.SheetGraph import *
 
 from Britefury.CodeGraph.CGReturn import CGReturn
 
-from Britefury.CodeViewTree.CVTNode import CVTNode
+from Britefury.CodeViewTree.CVTStatement import CVTStatement
 
 
 
-class CVTReturn (CVTNode):
+class CVTReturn (CVTStatement):
 	graphNodeClass = CGReturn
 
 
 	graphNode = SheetRefField( CGReturn )
 
 
+	@FunctionRefField
 	def _valueNode(self):
 		return self._tree.buildNode( graphNode.value[0].node )
-
-	valueNode = FunctionRefField( _valueNode )
 

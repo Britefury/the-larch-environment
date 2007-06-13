@@ -11,8 +11,6 @@ from Britefury.SheetGraph.SheetGraph import *
 from Britefury.CodeGraph.CGLambda import CGLambda
 
 from Britefury.CodeViewTree.CVTExpression import CVTExpression
-from Britefury.CodeViewTree.CVTBlockStatements import CVTBlockStatements
-from Britefury.CodeViewTree.CVTBlockParameters import CVTBlockParameters
 
 
 
@@ -22,13 +20,11 @@ class CVTLambda (CVTExpression):
 	graphNode = SheetRefField( CGLambda )
 
 
-	def _statementsNode(self):
-		return self._tree.buildNode( self.graphNode.block[0].node, CVTBlockStatements )
+	@FunctionRefField
+	def paramsNode(self):
+		return self._tree.buildNode( self.graphNode.parameters[0].node )
 
-	def _paramsNode(self):
-		return self._tree.buildNode( self.graphNode.block[0].node, CVTBlockParameters )
-
-
-	statementsNode = FunctionRefField( _statementsNode )
-	paramsNode = FunctionRefField( _paramsNode )
+	@FunctionRefField
+	def statementNode(self):
+		return self._tree.buildNode( self.graphNode.statement[0].node )
 

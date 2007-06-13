@@ -7,20 +7,20 @@
 ##-*************************
 from Britefury.CodeViewBehavior.CodeViewBehavior import *
 
-from Britefury.CodeViewTreeOperations.CVTOStatementListOperations import *
 
-
-class CVBStatementListBehavior (CodeViewBehavior):
-	@CVBAccelInputHandlerMethod( '<alt>r' )
-	def _addReturn(self, viewNode, receivingNodePath, widget, event):
-		if len( receivingNodePath ) > 1:
-			position = viewNode.treeNode.statementNodes.index( receivingNodePath[1].treeNode )
-		else:
-			position = len( viewNode.treeNode.statementNodes )
+class CVBCallBehavior (CodeViewBehavior):
+	@CVBCharInputHandlerMethod( '(' )
+	def _editArguments(self, viewNode, receivingNodePath, widget, event):
 		viewNode._f_commandHistoryFreeze()
-		cvto_addReturnStatement( viewNode.treeNode, position )
-		localVarCV = viewNode.statementNodes[position]
-		localVarCV.startEditing()
+		viewNode.startEditingArguments()
+		viewNode._f_commandHistoryThaw()
+		return True
+
+
+	@CVBCharInputHandlerMethod( ')' )
+	def _stopEditingArguments(self, viewNode, receivingNodePath, widget, event):
+		viewNode._f_commandHistoryFreeze()
+		viewNode.stopEditingArguments()
 		viewNode._f_commandHistoryThaw()
 		return True
 

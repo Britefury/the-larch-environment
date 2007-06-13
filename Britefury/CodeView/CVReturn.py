@@ -14,7 +14,7 @@ from Britefury.SheetGraph.SheetGraph import *
 
 from Britefury.CodeViewTree.CVTReturn import CVTReturn
 
-from Britefury.CodeView.CVBorderNode import *
+from Britefury.CodeView.CVStatement import *
 
 from Britefury.DocView.Toolkit.DTBox import DTBox
 from Britefury.DocView.Toolkit.DTLabel import DTLabel
@@ -22,7 +22,7 @@ from Britefury.DocView.Toolkit.DTDirection import DTDirection
 
 
 
-class CVReturn (CVBorderNode):
+class CVReturn (CVStatement):
 	treeNodeClass = CVTReturn
 
 

@@ -12,11 +12,11 @@ import gtk
 from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
-from Britefury.CodeViewTree.CVTBlockParameters import CVTBlockParameters
+from Britefury.CodeViewTree.CVTParameters import CVTParameters
 
 from Britefury.CodeView.CVBorderNode import *
 
-from Britefury.CodeViewBehavior.CVBBlockParametersBehavior import *
+from Britefury.CodeViewBehavior.CVBParametersBehavior import *
 
 from Britefury.DocView.Toolkit.DTWrappedLineWithSeparators import DTWrappedLineWithSeparators
 from Britefury.DocView.Toolkit.DTBox import DTBox
@@ -24,14 +24,14 @@ from Britefury.DocView.Toolkit.DTLabel import DTLabel
 
 
 
-class CVBlockParameters (CVBorderNode):
-	treeNodeClass = CVTBlockParameters
+class CVParameters (CVBorderNode):
+	treeNodeClass = CVTParameters
 
 
-	treeNode = SheetRefField( CVTBlockParameters )
+	treeNode = SheetRefField( CVTParameters )
 
 
-	behaviors = [ CVBBlockParametersBehavior() ]
+	behaviors = [ CVBParametersBehavior() ]
 
 
 	@FunctionField
@@ -62,7 +62,7 @@ class CVBlockParameters (CVBorderNode):
 
 
 	def __init__(self, treeNode, view):
-		super( CVBlockParameters, self ).__init__( treeNode, view )
+		super( CVParameters, self ).__init__( treeNode, view )
 		self._line = DTWrappedLineWithSeparators( spacing=10.0 )
 		self._box = DTBox()
 		self._box.append( DTLabel( '(' ) )

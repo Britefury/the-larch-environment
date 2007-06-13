@@ -5,16 +5,12 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
-from Britefury.CodeGraph.CGVar import *
-from Britefury.CodeGraph.CGLocalVarDeclaration import *
+from Britefury.CodeGraph.CGReturn import *
 
 
 
-def cvto_addLocalVarStatement(treeNode, position):
-	var = CGVar()
-	decl = CGLocalVarDeclaration()
-	treeNode.graph.nodes.append( var )
-	treeNode.graph.nodes.append( decl )
-	decl.variable.append( var.declaration )
-	treeNode.graphNode.statements.insert( position, decl.parent )
+def cvto_addReturnStatement(treeNode, position):
+	rtn = CGReturn()
+	treeNode.graph.nodes.append( rtn )
+	treeNode.graphNode.statements.insert( position, rtn.parent )
 	return treeNode.statementNodes[position ]

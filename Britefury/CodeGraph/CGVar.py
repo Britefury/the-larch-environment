@@ -11,25 +11,15 @@ from Britefury.Sheet.Sheet import *
 from Britefury.SemanticGraph.SemanticGraph import *
 
 from Britefury.CodeGraph.CGNode import CGNode
-from Britefury.CodeGraph.CGLocalRef import CGLocalRef
 
 
 class CGVar (CGNode):
+	parent = SemanticGraphSourceField( 'Parent node', 'Parent node' )
+
 	name = Field( str, '', doc='Variable name' )
-	references = SemanticGraphSourceField( 'References', 'All references to this local variable' )
-	declaration = SemanticGraphSourceField( 'Declaraion', 'The variable declaration' )
-
-	def generateLLCT(self, tree):
-		try:
-			return tree[self]
-		except KeyError:
-			tag = VMTag( 'Variable', self.name )
-			tree[self] = tag
-			return tag
 
 
 
-	def createRefNode(self):
-		refNode = CGLocalRef()
-		refNode.variable.append( self.references )
-		return refNode
+	def generatePyCode(self):
+		return self.name
+

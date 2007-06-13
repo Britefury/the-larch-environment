@@ -25,7 +25,7 @@ from Britefury.DocView.CellEdit.DVCStringCellEditEntryLabel import DVCStringCell
 
 
 
-class CVVar (CVBorderNode):
+class CVVar (CVNode):
 	treeNodeClass = CVTVar
 
 
@@ -42,11 +42,17 @@ class CVVar (CVBorderNode):
 
 	@FunctionField
 	def _refreshName(self):
-		self.widget.child = self.nameWidget
+		self.widget[0] = self.nameWidget
 
 	@FunctionField
 	def refreshCell(self):
 		self._refreshName
+
+
+	def __init__(self, treeNode, view):
+		super( CVVar, self ).__init__( treeNode, view )
+		self.widget = DTBox()
+		self.widget.append( DTLabel( 'nil' ) )
 
 
 
