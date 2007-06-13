@@ -8,20 +8,18 @@
 from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
-from Britefury.CodeGraph.CGSendMessage import CGSendMessage
+from Britefury.CodeGraph.CGGetAttr import CGGetAttr
 
 from Britefury.CodeViewTree.CVTExpression import CVTExpression
-from Britefury.CodeViewTree.CVTMessageArguments import CVTMessageArguments
-from Britefury.CodeViewTree.CVTMessageName import CVTMessageName
+from Britefury.CodeViewTree.CVTAttrName import CVTAttrName
 
 
 
-class CVTSendMessage (CVTExpression):
-	graphNodeClass = CGSendMessage
+class CVTGetAttr (CVTExpression):
+	graphNodeClass = CGGetAttr
 
 
-	graphNode = SheetRefField( CGSendMessage )
-
+	graphNode = SheetRefField( CGGetAttr )
 
 
 	@FunctionRefField
@@ -33,18 +31,13 @@ class CVTSendMessage (CVTExpression):
 
 
 	@FunctionRefField
-	def messageNameNode(self):
-		return self._tree.buildNode( self.graphNode, CVTMessageName )
-
-
-	@FunctionRefField
-	def argumentsNode(self):
-		return self._tree.buildNode( self.graphNode, CVTMessageArguments )
+	def attrNameNode(self):
+		return self._tree.buildNode( self.graphNode, CVTAttrName )
 
 
 
 
-	def unwrapSendMessage(self):
+	def unwrapGetAttr(self):
 		parentCGSink = self.graphNode.parent[0]
 		targetObjectSource = self.graphNode.targetObject[0]
 
@@ -53,3 +46,4 @@ class CVTSendMessage (CVTExpression):
 		parentCGSink.replace( self.graphNode.parent, targetObjectSource )
 
 		self.graphNode.destroySubtree()
+

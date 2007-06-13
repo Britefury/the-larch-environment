@@ -8,11 +8,14 @@
 from Britefury.CodeViewBehavior.CodeViewBehavior import *
 
 
-class CVBLocalVarDeclarationBehavior (CodeViewBehavior):
+class CVBLocalRefBehavior (CodeViewBehavior):
 	@CVBCharInputHandlerMethod( '=' )
 	def _setValue(self, viewNode, receivingNodePath, widget, event):
 		viewNode._f_commandHistoryFreeze()
-		viewNode.startEditingValue()
+		localAssignCVT = viewNode.treeNode.replaceWithLocalAssignment()
+		viewNode._view.refresh()
+		localAssignCV = viewNode._view.getViewNodeForTreeNode( localAssignCVT )
+		localAssignCV.startEditingValue()
 		viewNode._f_commandHistoryThaw()
 		return True
 

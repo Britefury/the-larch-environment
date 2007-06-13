@@ -5,19 +5,16 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
-from Britefury.Sheet.Sheet import *
-from Britefury.SheetGraph.SheetGraph import *
-
-from Britefury.CodeGraph.CGSendMessage import CGSendMessage
-
-from Britefury.CodeViewTree.CVTNode import CVTNode
-from Britefury.CodeViewTree.CVTMessageArguments import CVTMessageArguments
+from Britefury.CodeViewBehavior.CodeViewBehavior import *
 
 
+class CVBWrapInCallBehavior (CodeViewBehavior):
+	@CVBCharInputHandlerMethod( '(' )
+	def _wrapInCall(self, viewNode, receivingNodePath, widget, event):
+		viewNode._f_commandHistoryFreeze()
+		viewNode.wrapInCall()
+		viewNode._f_commandHistoryThaw()
+		return True
 
-class CVTMessageName (CVTNode):
-	graphNode = SheetRefField( CGSendMessage )
 
-
-	name = FieldProxy( graphNode.messageName )
 

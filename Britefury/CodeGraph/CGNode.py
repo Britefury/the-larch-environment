@@ -10,5 +10,4 @@ from Britefury.SemanticGraph.SemanticGraph import *
 
 
 class CGNode (SemanticGraphNode):
-	def getReferenceableNodeByName(self, targetName, sourceNode=None):
-		return None
+	pass

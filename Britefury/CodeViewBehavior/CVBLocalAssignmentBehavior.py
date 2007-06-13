@@ -8,11 +8,11 @@
 from Britefury.CodeViewBehavior.CodeViewBehavior import *
 
 
-class CVBMessageArgumentsBehavior (CodeViewBehavior):
-	@CVBCharInputHandlerMethod( ',' )
-	def _addArgument(self, viewNode, receivingNodePath, widget, event):
+class CVBLocalAssignmentBehavior (CodeViewBehavior):
+	@CVBCharInputHandlerMethod( '=' )
+	def _setValue(self, viewNode, receivingNodePath, widget, event):
 		viewNode._f_commandHistoryFreeze()
-		viewNode.addArgument()
+		viewNode.startEditingValue()
 		viewNode._f_commandHistoryThaw()
 		return True
 

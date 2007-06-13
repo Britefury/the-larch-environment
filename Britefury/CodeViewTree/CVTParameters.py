@@ -8,15 +8,17 @@
 from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
-from Britefury.CodeGraph.CGBlock import CGBlock
+from Britefury.CodeGraph.CGParameters import CGParameters
 from Britefury.CodeGraph.CGVar import CGVar
 
 from Britefury.CodeViewTree.CVTNode import CVTNode
 
 
 
-class CVTBlockParameters (CVTNode):
-	graphNode = SheetRefField( CGBlock )
+class CVTParameters (CVTNode):
+	graphNodeClass = CGParameters
+
+	graphNode = SheetRefField( CGParameters )
 
 
 	def _paramNodes(self):
@@ -40,10 +42,10 @@ class CVTBlockParameters (CVTNode):
 		paramCG = CGVar()
 		self.graph.nodes.append( paramCG )
 		paramCG.name = name
-		blockParmsCG.params.append( paramCG.declaration )
+		blockParmsCG.params.append( paramCG.parent )
 		return self._tree.buildNode( paramCG )
 
 
 	def deleteParameter(self, param):
-		self.graphNode.params.remove( param.graphNode.declaration )
+		self.graphNode.params.remove( param.graphNode.parent )
 		param.graphNode.destroySubtree()

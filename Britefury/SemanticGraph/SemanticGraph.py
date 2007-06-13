@@ -45,12 +45,14 @@ class SemanticGraphNodeClass (SheetGraphNodeClass):
 	def __init__(cls, clsName, clsBases, clsDict):
 		super( SemanticGraphNodeClass, cls ).__init__( clsName, clsBases, clsDict )
 
-		self._SemanticGraphNode_subtreeFields = [ pinField   for pinField in cls._SheetGraphNode_sinkFields.values()   if isinstance( pinField, SemanticGraphSubtreeField ) ]
+		cls._SemanticGraphNode_subtreeFields = [ pinField   for pinField in cls._SheetGraphNode_sinkFields.values()   if isinstance( pinField, SemanticGraphSubtreeField ) ]
 
 
 
 
 class SemanticGraphNode (SheetGraphNode):
+	__metaclass__ = SemanticGraphNodeClass
+
 	def getReferenceableNodeByName(self, targetName, sourceNode=None):
 		return None
 

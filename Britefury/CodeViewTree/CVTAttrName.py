@@ -5,17 +5,18 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
-from Britefury.CodeGraph.CGStatement import CGStatement
 from Britefury.Sheet.Sheet import *
-from Britefury.SemanticGraph.SemanticGraph import *
+from Britefury.SheetGraph.SheetGraph import *
+
+from Britefury.CodeGraph.CGGetAttr import CGGetAttr
+
+from Britefury.CodeViewTree.CVTNode import CVTNode
 
 
 
-class CGLocalAssignment (CGStatement):
-	variable = SemanticGraphSinkSingleField( 'Variable', 'Target variable' )
-	value = SemanticGraphSinkSingleSubtreeField( 'Value', 'Value' )
+class CVTAttrName (CVTNode):
+	graphNode = SheetRefField( CGGetAttr )
 
 
+	name = FieldProxy( graphNode.attrName )
 
-	def generatePyCode(self):
-		return self.variable[0].node.generatePyCode() + ' = ' + self.value[0].node.generatePyCode()

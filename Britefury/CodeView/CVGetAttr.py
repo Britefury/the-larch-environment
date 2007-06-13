@@ -14,11 +14,11 @@ from Britefury.Util import RegExpStrings
 from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
-from Britefury.CodeViewTree.CVTSendMessage import CVTSendMessage
+from Britefury.CodeViewTree.CVTGetAttr import CVTGetAttr
 
 from Britefury.CodeView.CVExpression import *
 
-from Britefury.CodeViewBehavior.CVBSendMessageBehavior import *
+from Britefury.CodeViewBehavior.CVBGetAttrBehavior import *
 
 from Britefury.DocView.Toolkit.DTWrappedLine import DTWrappedLine
 from Britefury.DocView.Toolkit.DTBox import DTBox
@@ -28,15 +28,15 @@ from Britefury.DocView.CellEdit.DVCStringCellEditEntryLabel import DVCStringCell
 
 
 
-class CVSendMessage (CVExpression):
-	treeNodeClass = CVTSendMessage
+class CVGetAttr (CVExpression):
+	treeNodeClass = CVTGetAttr
 
 
-	treeNode = SheetRefField( CVTSendMessage )
+	treeNode = SheetRefField( CVTGetAttr )
 
 
 
-	behaviors = [ CVBSendMessageBehavior() ]
+	behaviors = [ CVBGetAttrBehavior() ]
 
 
 	@FunctionRefField
@@ -56,22 +56,12 @@ class CVSendMessage (CVExpression):
 
 
 	@FunctionRefField
-	def messageNameNode(self):
-		return self._view.buildView( self.treeNode.messageNameNode, self )
+	def attrNameNode(self):
+		return self._view.buildView( self.treeNode.attrNameNode, self )
 
 	@FunctionRefField
-	def messageNameWidget(self):
-		return self.messageNameNode.widget
-
-
-
-	@FunctionRefField
-	def argumentsNode(self):
-		return self._view.buildView( self.treeNode.argumentsNode, self )
-
-	@FunctionRefField
-	def argumentsWidget(self):
-		return self.argumentsNode.widget
+	def attrNameWidget(self):
+		return self.attrNameNode.widget
 
 
 	@FunctionField
@@ -82,18 +72,13 @@ class CVSendMessage (CVExpression):
 			self._box[0] = DTLabel( 'nil' )
 
 	@FunctionField
-	def _refreshMessageName(self):
-		self._box[2] = self.messageNameWidget
-
-	@FunctionField
-	def _refreshArgs(self):
-		self._box[3] = self.argumentsWidget
+	def _refreshAttrName(self):
+		self._box[2] = self.attrNameWidget
 
 	@FunctionField
 	def refreshCell(self):
 		self._refreshTargetObject
-		self._refreshMessageName
-		self._refreshArgs
+		self._refreshAttrName
 
 
 
@@ -101,19 +86,17 @@ class CVSendMessage (CVExpression):
 
 
 	def __init__(self, treeNode, view):
-		super( CVSendMessage, self ).__init__( treeNode, view )
+		super( CVGetAttr, self ).__init__( treeNode, view )
 		self._box = DTBox( spacing=5.0 )
 		self._box.append( DTLabel( 'nil' ) )
 		self._box.append( DTLabel( '.' ) )
 		self._box.append( DTLabel( 'nil' ) )
-		self._box.append( DTLabel( 'nil' ) )
 		self.widget.child = self._box
-		self._messageNameEntry = None
 
 
 	def deleteChild(self, child):
-		if child is self.messageNameNode:
-			self.treeNode.unwrapSendMessage()
+		if child is self.attrNameNode:
+			self.treeNode.unwrapGetAttr()
 			self._view.refresh()
 			return True
 		elif child is self.targetObjectNode:
@@ -125,17 +108,13 @@ class CVSendMessage (CVExpression):
 			return False
 
 
-	def startEditingMessageName(self):
-		self.messageNameNode.startEditing()
+	def startEditingAttrName(self):
+		self.attrNameNode.makeCurrent()
 
-
-	def startEditingArguments(self):
-		self.argumentsNode.makeCurrent()
-
-	def stopEditingArguments(self):
+	def stopEditingAttrName(self):
 		self.makeCurrent()
 
 
 
 	def horizontalNavigationList(self):
-		return [ self.targetObjectNode, self.messageNameNode, self.argumentsNode ]
+		return [ self.targetObjectNode, self.attrNameNode ]

@@ -8,18 +8,17 @@
 from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
-from Britefury.CodeGraph.CGSendMessage import CGSendMessage
+from Britefury.CodeGraph.CGArguments import CGArguments
 from Britefury.CodeGraph.CGNullExpression import CGNullExpression
 
 from Britefury.CodeViewTree.CVTNode import CVTNode
 
 
 
-class CVTMessageArguments (CVTNode):
-	graphNodeClass = CGSendMessage
+class CVTArguments (CVTNode):
+	graphNodeClass = CGArguments
 
-
-	graphNode = SheetRefField( CGSendMessage )
+	graphNode = SheetRefField( CGArguments )
 
 
 

@@ -20,13 +20,11 @@ class CVTLocalAssignment (CVTNode):
 	graphNode = SheetRefField( CGLocalAssignment )
 
 
-	def _varName(self):
-		return self.graphNode.variable[0].node.name
+	@FunctionRefField
+	def varNode(self):
+		return self._tree.buildNode( self.graphNode.variable[0].node )
 
-	def _valueNode(self):
+	@FunctionRefField
+	def valueNode(self):
 		return self._tree.buildNode( self.graphNode.value[0].node )
-
-
-	varName = FunctionField( _varName )
-	valueNode = FunctionRefField( _valueNode )
 

@@ -10,7 +10,7 @@ import string
 from Britefury.CodeViewBehavior.CodeViewBehavior import *
 
 
-class CVBBlockParametersBehavior (CodeViewBehavior):
+class CVBParametersBehavior (CodeViewBehavior):
 	@CVBCharInputHandlerMethod( ',' )
 	def _addParameter(self, viewNode, receivingNodePath, widget, event):
 		viewNode._f_commandHistoryFreeze()

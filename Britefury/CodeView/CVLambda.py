@@ -57,12 +57,12 @@ class CVLambda (CVExpression):
 
 
 	@FunctionRefField
-	def statementsNode(self):
-		return self._view.buildView( self.treeNode.statementsNode, self )
+	def statementNode(self):
+		return self._view.buildView( self.treeNode.statementNode, self )
 
 	@FunctionRefField
-	def statementsWidget(self):
-		return self.statementsNode.widget
+	def statementWidget(self):
+		return self.statementNode.widget
 
 
 	@FunctionField
@@ -74,14 +74,14 @@ class CVLambda (CVExpression):
 		self._lambdaBox[1] = self.paramsWidget
 
 	@FunctionField
-	def _refreshStatements(self):
-		self._statementsBorder.child = self.statementsWidget
+	def _refreshStatement(self):
+		self._lambdaBox[3] = self.statementWidget
 
 	@FunctionField
 	def refreshCell(self):
 		self._refreshLambdaLabel
 		self._refreshParams
-		self._refreshStatements
+		self._refreshStatement
 
 
 
@@ -93,32 +93,25 @@ class CVLambda (CVExpression):
 		self._lambdaBox.append( DTLabel( 'nil' ) )
 		self._lambdaBox.append( DTLabel( 'nil' ) )
 		self._lambdaBox.append( DTLabel( ':' ) )
-		self._statementsBorder = DTBorder( 30.0, 0.0, 0.0, 0.0 )
-		self._statementsBorder.child = DTLabel( 'nil' )
-		self._box = DTBox( DTDirection.TOP_TO_BOTTOM, minorDirectionAlignment=DTBox.ALIGN_EXPAND, spacing=4.0 )
-		self._box.append( self._lambdaBox )
-		self._box.append( self._statementsBorder )
-		self.widget.child = self._box
+		self._lambdaBox.append( DTLabel( 'nil' ) )
+		self.widget.child = self._lambdaBox
 
 
 	def deleteChild(self, child):
 		if child is self.lambdaLabelNode:
 			if self._parent is not None:
-				self._parent.deleteNode( self )
+				self._parent.deleteChild( self )
 				return True
 		return False
 
 
 	def horizontalNavigationList(self):
-		return [ self.lambdaLabelNode, self.paramsNode, self.statementsNode ]
-
-	def verticalNavigationList(self):
-		return [ self.paramsNode, self.statementsNode ]
+		return [ self.lambdaLabelNode, self.paramsNode, self.statementNode ]
 
 
 	def startEditingParameters(self):
 		self.paramsNode.startEditing()
 
-	def startEditingStatements(self):
-		self.statementsNode.makeCurrent()
+	def startEditingStatement(self):
+		self.statementNode.makeCurrent()
 

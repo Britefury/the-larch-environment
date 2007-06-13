@@ -16,8 +16,6 @@ from Britefury.CodeViewTree.CVTStatement import CVTStatement
 
 from Britefury.CodeView.CVBorderNode import *
 
-from Britefury.CodeViewBehavior.CVBWrapInSendMessageBehavior import *
-
 
 
 class CVStatement (CVBorderNode):

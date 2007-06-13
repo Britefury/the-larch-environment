@@ -5,16 +5,18 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
-from Britefury.CodeViewBehavior.CodeViewBehavior import *
-
-
-class CVBWrapInSendMessageBehavior (CodeViewBehavior):
-	@CVBCharInputHandlerMethod( '`' )
-	def _wrapInSendMessage(self, viewNode, receivingNodePath, widget, event):
-		viewNode._f_commandHistoryFreeze()
-		viewNode.wrapInSendMessage()
-		viewNode._f_commandHistoryThaw()
-		return True
+from Britefury.CodeGraph.CGExpression import CGExpression
+from Britefury.Sheet.Sheet import *
+from Britefury.SemanticGraph.SemanticGraph import *
 
 
 
+class CGGetAttr (CGExpression):
+	targetObject = SemanticGraphSinkSingleSubtreeField( 'Target object', 'Expression that evaluates to the object from which the attribute is retrieved' )
+	attrName = Field( str, '' )
+
+
+
+
+	def generatePyCode(self):
+		return self.targetObject[0].node.generatePyCode() + '.' + self.attrName

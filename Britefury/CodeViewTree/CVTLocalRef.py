@@ -9,7 +9,8 @@ from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
 from Britefury.CodeGraph.CGLocalRef import CGLocalRef
-from Britefury.CodeGraph.CGUnboundRef import CGUnboundRef
+from Britefury.CodeGraph.CGLocalAssignment import CGLocalAssignment
+from Britefury.CodeGraph.CGNullExpression import CGNullExpression
 
 from Britefury.CodeViewTree.CVTExpression import CVTExpression
 
@@ -22,25 +23,25 @@ class CVTLocalRef (CVTExpression):
 	graphNode = SheetRefField( CGLocalRef )
 
 
-	def _varName(self):
-		return self.graphNode.variable[0].node.name
-
-
-	varName = FunctionField( _varName )
-
+	@FunctionRefField
+	def varNode(self):
+		return self._tree.buildNode( self.graphNode.variable[0].node )
 
 
 
-	def rebind(self, varName):
-		targetGraphNode = self.graphNode.getReferenceableNodeByName( varName )
-		if targetGraphNode is not None:
-			self.graphNode.variable[0] = targetGraphNode.references
-			return self
-		else:
-			parentCGSink = self.graphNode.parent[0]
-			unboundRefGraphNode = CGUnboundRef()
-			self.graph.nodes.append( unboundRefGraphNode )
-			unboundRefGraphNode.targetName = varName
-			parentCGSink.replace( self.graphNode.parent, unboundRefGraphNode.parent )
-			self.graphNode.destroySubtree()
-			return self._tree.buildNode( unboundRefGraphNode )
+	def replaceWithLocalAssignment(self):
+		localAssignment = CGLocalAssignment()
+		self.graph.nodes.append( localAssignment )
+
+		nullExpression = CGNullExpression()
+		self.graph.nodes.append( nullExpression )
+
+		localAssignment.variable.append( self.graphNode.variable[0] )
+		localAssignment.value.append( nullExpression.parent )
+		del self.graphNode.variable[0]
+
+		parentCGSink = self.graphNode.parent[0]
+		parentCGSink.replace( self.graphNode.parent, localAssignment.parent )
+		self.graphNode.destroySubtree()
+		return self._tree.buildNode( localAssignment )
+

@@ -29,30 +29,37 @@ class CVLocalAssignment (CVBorderNode):
 	treeNode = SheetRefField( CVTLocalAssignment )
 
 
-	def _nameWidget(self):
-		return DTLabel( self.treeNode.varName )
+	@FunctionRefField
+	def varNode(self):
+		return self._view.buildView( self.treeNode.varNode, self )
 
-	def _valueNode(self):
+	@FunctionRefField
+	def varWidget(self):
+		return self.varNode.widget
+
+
+	@FunctionRefField
+	def valueNode(self):
 		return self._view.buildView( self.treeNode.valueNode, self )
 
-	def _valueWidget(self):
-		return self._valueNode.widget
+	@FunctionRefField
+	def valueWidget(self):
+		return self.valueNode.widget
 
-	def _refreshName(self):
-		self._box[0] = self.nameWidget
 
+	@FunctionField
+	def _refreshVar(self):
+		self._box[0] = self.varWidget
+
+	@FunctionField
 	def _refreshValue(self):
 		self._box[2] = self.valueWidget
 
-	def _refreshCell(self):
-		self.refreshName
-		self.refreshValue
+	@FunctionField
+	def refreshCell(self):
+		self._refreshVar
+		self._refreshValue
 
-	nameWidget = FunctionField( _nameWidget )
-	valueWidget = FunctionField( _valueWidget )
-	refreshName = FunctionField( _refreshName )
-	refreshValue = FunctionField( _refreshValue )
-	refreshCell = FunctionField( _refreshCell )
 
 
 
@@ -68,5 +75,19 @@ class CVLocalAssignment (CVBorderNode):
 
 
 
+	def deleteChild(self, child):
+		if child is self.valueNode:
+			self.valueNode.treeNode.replaceWithNullExpression()
+			self._view.refresh()
+			return False
+		else:
+			return False
+
+
+
 	def horizontalNavigationList(self):
-		return [ self._nameWidget, self._valueNode ]
+		return [ self.varNode, self.valueNode ]
+
+
+	def startEditingValue(self):
+		self.valueNode.makeCurrent()

@@ -14,7 +14,7 @@ from Britefury.Util import RegExpStrings
 from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
-from Britefury.CodeViewTree.CVTMessageName import CVTMessageName
+from Britefury.CodeViewTree.CVTAttrName import CVTAttrName
 
 from Britefury.CodeView.CVNode import *
 
@@ -25,11 +25,11 @@ from Britefury.DocView.CellEdit.DVCStringCellEditEntryLabel import DVCStringCell
 
 
 
-class CVMessageName (CVNode):
-	treeNodeClass = CVTMessageName
+class CVAttrName (CVNode):
+	treeNodeClass = CVTAttrName
 
 
-	treeNode = SheetRefField( CVTMessageName )
+	treeNode = SheetRefField( CVTAttrName )
 
 
 	@FunctionRefField

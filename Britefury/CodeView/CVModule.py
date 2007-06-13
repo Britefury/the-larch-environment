@@ -32,20 +32,17 @@ class CVModule (CVBorderNode):
 	treeNode = SheetRefField( CVTModule )
 
 
-	behaviors = [ CVBStatementListBehavior(), CVBCreateExpressionBehavior() ]
 
+	@FunctionRefField
+	def statementsNode(self):
+		return self._view.buildView( self.treeNode.statementsNode, self )
 
-
-	@CVChildNodeListSlotFunctionField
-	def statementNodes(self):
-		return [ self._view.buildView( childTreeNode, self )   for childTreeNode in self.treeNode.statementNodes ]
-
-	@FunctionField
-	def statementWidgets(self):
-		return [ node.widget   for node in self.statementNodes ]
+	@FunctionRefField
+	def statementsWidget(self):
+		return self.statementsNode.widget
 
 	def _refreshCell(self):
-		self._box[:] = self.statementWidgets
+		self.widget.child = self.statementsWidget
 
 	refreshCell = FunctionField( _refreshCell )
 
@@ -56,16 +53,7 @@ class CVModule (CVBorderNode):
 
 	def __init__(self, treeNode, view):
 		super( CVModule, self ).__init__( treeNode, view )
-		self._box = DTBox( DTDirection.TOP_TO_BOTTOM, minorDirectionAlignment=DTBox.ALIGN_TOPLEFT, spacing=4.0 )
-		self.widget.child = self._box
-
-
-
-
-	def deleteChild(self, child):
-		self.treeNode.deleteStatement( child.treeNode )
-		self._view.refresh()
-		return True
+		self.widget.child = DTLabel( 'nil' )
 
 
 
@@ -74,7 +62,7 @@ class CVModule (CVBorderNode):
 		return self.verticalNavigationList()
 
 	def verticalNavigationList(self):
-		return self.statementNodes
+		return [ self.statementsNode ]
 
 
 

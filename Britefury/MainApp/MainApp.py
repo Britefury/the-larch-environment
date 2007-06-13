@@ -206,24 +206,17 @@ class MainApp (object):
 
 
 	def _p_onExecuteCode(self, widget):
-		machine = VMMachine()
-
-		llctTree = LowLevelCodeTree( self._graph )
-		llctNode = self._graphRoot.generateLLCT( llctTree )
-		block = llctNode.generateBlockInstructions()
-
-		machine.run( block, bDebug=False )
+		pyCodeBlock = self._graphRoot.generatePyCodeBlock()
+		text = pyCodeBlock.asText()
+		exec( text )
 
 
 
 	def _p_onExecuteCodeWithDebug(self, widget):
-		machine = VMMachine()
-
-		llctTree = LowLevelCodeTree( self._graph )
-		llctNode = self._graphRoot.generateLLCT( llctTree )
-		block = llctNode.generateBlockInstructions()
-
-		machine.run( block, bDebug=True )
+		pyCodeBlock = self._graphRoot.generatePyCodeBlock()
+		text = pyCodeBlock.asText()
+		print text
+		exec( text )
 
 
 

@@ -9,15 +9,19 @@ from Britefury.Sheet.Sheet import *
 from Britefury.SemanticGraph.SemanticGraph import *
 from Britefury.CodeGraph.CGNode import CGNode
 
+from Britefury.PyCodeGen.PyCodeGen import *
+
 
 
 class CGStatement (CGNode):
 	parent = SemanticGraphSourceField( 'Parent node', 'Parent node' )
 
 
-	def getReferenceableNodeByName(self, targetName, sourceNode=None):
-		return self.parent[0].node.getReferenceableNodeByName( targetName, self )
+	def generatePyCode(self):
+		return ''
 
 
-	def buildReferenceableNodeTable(self, nodeTable):
-		pass
+	def generatePyCodeBlock(self):
+		codeBlock = PyCodeBlock()
+		codeBlock.append( self.generatePyCode() )
+		return codeBlock

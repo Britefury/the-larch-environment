@@ -8,14 +8,14 @@
 from Britefury.CodeGraph.CGExpression import CGExpression
 from Britefury.Sheet.Sheet import *
 from Britefury.SemanticGraph.SemanticGraph import *
-from Britefury.LowLevelCodeTree.LLCTClosureExp import LLCTClosureExp
 
 
 
 class CGLambda (CGExpression):
-	block = SemanticGraphSinkSingleSubtreeField( 'Block', 'Block' )
+	parameters = SemanticGraphSinkSingleSubtreeField( 'Parameters', 'Parameters' )
+	statement = SemanticGraphSinkSingleSubtreeField( 'Statement', 'Statement' )
 
 
-	def generateLLCT(self, tree):
-		assert len( self.block ) > 0
-		return LLCTClosureExp( self.block[0].node.generateLLCT( tree ) )
+
+	def generatePyCode(self):
+		return 'lambda ' + self.parameters[0].node.generatePyCode() + ': ' + self.statement[0].node.generatePyCode()

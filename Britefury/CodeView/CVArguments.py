@@ -12,11 +12,11 @@ import gtk
 from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
-from Britefury.CodeViewTree.CVTMessageArguments import CVTMessageArguments
+from Britefury.CodeViewTree.CVTArguments import CVTArguments
 
 from Britefury.CodeView.CVBorderNode import *
 
-from Britefury.CodeViewBehavior.CVBMessageArgumentsBehavior import *
+from Britefury.CodeViewBehavior.CVBArgumentsBehavior import *
 from Britefury.CodeViewBehavior.CVBCreateExpressionBehavior import *
 
 from Britefury.DocView.Toolkit.DTWrappedLineWithSeparators import DTWrappedLineWithSeparators
@@ -27,15 +27,15 @@ from Britefury.DocView.CellEdit.DVCStringCellEditEntryLabel import DVCStringCell
 
 
 
-class CVMessageArguments (CVBorderNode):
-	treeNodeClass = CVTMessageArguments
+class CVArguments (CVBorderNode):
+	treeNodeClass = CVTArguments
 
 
-	treeNode = SheetRefField( CVTMessageArguments )
+	treeNode = SheetRefField( CVTArguments )
 
 
 
-	behaviors = [ CVBMessageArgumentsBehavior(), CVBCreateExpressionBehavior() ]
+	behaviors = [ CVBArgumentsBehavior(), CVBCreateExpressionBehavior() ]
 
 
 
@@ -88,7 +88,7 @@ class CVMessageArguments (CVBorderNode):
 
 
 	def __init__(self, treeNode, view):
-		super( CVMessageArguments, self ).__init__( treeNode, view )
+		super( CVArguments, self ).__init__( treeNode, view )
 		self._box = DTBox()
 		self._box.append( DTLabel( '(' ) )
 		self._box.append( DTLabel( 'nil' ) )

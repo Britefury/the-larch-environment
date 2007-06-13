@@ -8,7 +8,6 @@
 from Britefury.CodeGraph.CGExpression import CGExpression
 from Britefury.Sheet.Sheet import *
 from Britefury.SemanticGraph.SemanticGraph import *
-from Britefury.LowLevelCodeTree.LLCTLoadLocalExp import LLCTLoadLocalExp
 
 
 
@@ -17,6 +16,5 @@ class CGLocalRef (CGExpression):
 
 
 
-	def generateLLCT(self, tree):
-		assert len( self.variable ) > 0
-		return LLCTLoadLocalExp( self.variable[0].node.generateLLCT( tree ) )
+	def generatePyCode(self):
+		return self.variable[0].node.generatePyCode()
