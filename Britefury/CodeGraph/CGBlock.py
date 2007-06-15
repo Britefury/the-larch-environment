@@ -26,3 +26,19 @@ class CGBlock (CGNode):
 		for statementSource in self.statements:
 			codeBlock += statementSource.node.generatePyCodeBlock()
 		return codeBlock
+
+
+
+
+	def getReferenceableNodeByName(self, targetName, sourceNode=None):
+		if sourceNode is not None:
+			n = self.statements.index( sourceNode.parent )
+			nodeTable = {}
+			for statementSource in self.statements[:n]:
+				statementSource.node.buildReferenceableNodeTable( nodeTable )
+			try:
+				return nodeTable[targetName]
+			except KeyError:
+				pass
+
+		return self.parent[0].node.getReferenceableNodeByName( targetName, self )

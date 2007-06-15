@@ -5,22 +5,16 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
-import CodeViewTree
-import CVTArguments
-import CVTAttrName
-import CVTBlockStatements
-import CVTCall
-import CVTExpression
-import CVTGetAttr
-import CVTLambda
-import CVTLocalAssignment
-import CVTLocalRef
-import CVTLocalVarDeclaration
-import CVTModule
-import CVTNullExpression
-import CVTParameters
-import CVTReturn
-import CVTStatement
-import CVTStringLiteral
-import CVTUnboundRef
-import CVTVar
+from Britefury.CodeViewBehavior.CodeViewBehavior import *
+
+
+class CVBLocalVarDeclarationBehavior (CodeViewBehavior):
+	@CVBCharInputHandlerMethod( '=' )
+	def _setValue(self, viewNode, receivingNodePath, widget, event):
+		viewNode._f_commandHistoryFreeze()
+		viewNode.startEditingValue()
+		viewNode._f_commandHistoryThaw()
+		return True
+
+
+

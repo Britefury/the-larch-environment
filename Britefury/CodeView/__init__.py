@@ -15,10 +15,12 @@ import CVGetAttr
 import CVLambda
 import CVLocalAssignment
 import CVLocalRef
+import CVLocalVarDeclaration
 import CVModule
 import CVNullExpression
 import CVParameters
 import CVReturn
 import CVStatement
 import CVStringLiteral
+import CVUnboundRef
 import CVVar

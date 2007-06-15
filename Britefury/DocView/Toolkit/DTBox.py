@@ -161,7 +161,7 @@ class DTBox (DTContainer):
 
 
 	def _f_removeChild(self, child):
-		self.remove( None )
+		self.remove( child )
 
 
 	def _p_childListModified(self):

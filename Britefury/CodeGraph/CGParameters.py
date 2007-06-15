@@ -25,3 +25,16 @@ class CGParameters (CGNode):
 		if len( self.expandParam ) > 0:
 			p += ', *' + self.expandParam[0].node.generatePyCode()
 		return p
+
+
+
+	def getReferenceableNodeByName(self, targetName, sourceNode=None):
+		for paramSource in self.params:
+			if targetName == paramSource.node.name:
+				return paramSource.node
+
+		if len( self.expandParam ) > 0:
+			if targetName == self.expandParam[0].name:
+				return self.expandParam[0].node
+
+		return None

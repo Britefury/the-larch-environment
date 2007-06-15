@@ -5,22 +5,16 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
-import CodeViewTree
-import CVTArguments
-import CVTAttrName
-import CVTBlockStatements
-import CVTCall
-import CVTExpression
-import CVTGetAttr
-import CVTLambda
-import CVTLocalAssignment
-import CVTLocalRef
-import CVTLocalVarDeclaration
-import CVTModule
-import CVTNullExpression
-import CVTParameters
-import CVTReturn
-import CVTStatement
-import CVTStringLiteral
-import CVTUnboundRef
-import CVTVar
+from Britefury.CodeGraph.CGExpression import CGExpression
+from Britefury.Sheet.Sheet import *
+from Britefury.SemanticGraph.SemanticGraph import *
+from Britefury.LowLevelCodeTree.LLCTLoadLocalExp import LLCTLoadLocalExp
+
+
+
+class CGUnboundRef (CGExpression):
+	targetName = Field( str, '' )
+
+
+	def generatePyCode(self):
+		return self.targetName

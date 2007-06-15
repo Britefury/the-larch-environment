@@ -25,6 +25,6 @@ class CVTLambda (CVTExpression):
 		return self._tree.buildNode( self.graphNode.parameters[0].node )
 
 	@FunctionRefField
-	def statementNode(self):
-		return self._tree.buildNode( self.graphNode.statement[0].node )
+	def valueExprNode(self):
+		return self._tree.buildNode( self.graphNode.valueExpr[0].node )
 

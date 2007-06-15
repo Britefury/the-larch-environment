@@ -10,9 +10,9 @@ from Britefury.CodeViewBehavior.CodeViewBehavior import *
 
 class CVBLambdaBehavior (CodeViewBehavior):
 	@CVBCharInputHandlerMethod( ':' )
-	def _startEditingStatement(self, viewNode, receivingNodePath, widget, event):
+	def _startEditingValueExpr(self, viewNode, receivingNodePath, widget, event):
 		viewNode._f_commandHistoryFreeze()
-		viewNode.startEditingStatement()
+		viewNode.startEditingValueExpr()
 		viewNode._f_commandHistoryThaw()
 		return True
 

@@ -57,12 +57,12 @@ class CVLambda (CVExpression):
 
 
 	@FunctionRefField
-	def statementNode(self):
-		return self._view.buildView( self.treeNode.statementNode, self )
+	def valueExprNode(self):
+		return self._view.buildView( self.treeNode.valueExprNode, self )
 
 	@FunctionRefField
-	def statementWidget(self):
-		return self.statementNode.widget
+	def valueExprWidget(self):
+		return self.valueExprNode.widget
 
 
 	@FunctionField
@@ -74,8 +74,8 @@ class CVLambda (CVExpression):
 		self._lambdaBox[1] = self.paramsWidget
 
 	@FunctionField
-	def _refreshStatement(self):
-		self._lambdaBox[3] = self.statementWidget
+	def _refreshValueExpr(self):
+		self._lambdaBox[3] = self.valueExprWidget
 
 	@FunctionField
 	def refreshCell(self):
@@ -106,12 +106,12 @@ class CVLambda (CVExpression):
 
 
 	def horizontalNavigationList(self):
-		return [ self.lambdaLabelNode, self.paramsNode, self.statementNode ]
+		return [ self.lambdaLabelNode, self.paramsNode, self.valueExprNode ]
 
 
 	def startEditingParameters(self):
 		self.paramsNode.startEditing()
 
-	def startEditingStatement(self):
-		self.statementNode.makeCurrent()
+	def startEditingValueExpr(self):
+		self.valueExprNode.makeCurrent()
 

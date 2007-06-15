@@ -21,8 +21,8 @@ class CVTLocalAssignment (CVTNode):
 
 
 	@FunctionRefField
-	def varNode(self):
-		return self._tree.buildNode( self.graphNode.variable[0].node )
+	def varRefNode(self):
+		return self._tree.buildNode( self.graphNode.varRef[0].node )
 
 	@FunctionRefField
 	def valueNode(self):
