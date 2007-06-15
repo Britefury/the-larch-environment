@@ -20,6 +20,8 @@ from Britefury.CodeViewTree.CVTUnboundRef import CVTUnboundRef
 
 from Britefury.CodeView.CVExpression import *
 
+from Britefury.CodeViewBehavior.CVBVarRefBehavior import *
+
 from Britefury.DocView.Toolkit.DTBox import DTBox
 from Britefury.DocView.Toolkit.DTLabel import DTLabel
 from Britefury.DocView.Toolkit.DTDirection import DTDirection
@@ -33,6 +35,9 @@ class CVUnboundRef (CVExpression):
 
 
 	treeNode = SheetRefField( CVTUnboundRef )
+
+
+	behaviors = [ CVBVarRefBehavior() ]
 
 
 	@FunctionRefField

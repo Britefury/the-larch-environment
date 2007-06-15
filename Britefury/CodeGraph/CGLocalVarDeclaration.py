@@ -5,31 +5,26 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
+from Britefury.CodeGraph.CGStatement import CGStatement
 from Britefury.Sheet.Sheet import *
 from Britefury.SemanticGraph.SemanticGraph import *
-from Britefury.CodeGraph.CGNode import CGNode
-
-from Britefury.PyCodeGen.PyCodeGen import *
+from Britefury.LowLevelCodeTree.LLCTBindExp import LLCTBindExp
 
 
 
-class CGStatement (CGNode):
-	parent = SemanticGraphSourceField( 'Parent node', 'Parent node' )
+class CGLocalVarDeclaration (CGStatement):
+	value = SemanticGraphSinkSingleSubtreeField( 'Value', 'Value' )
+	variable = SemanticGraphSinkSingleSubtreeField( 'Variable', 'The variable' )
 
 
 	def generatePyCode(self):
-		return ''
+		if len( self.value ) > 0:
+			return self.variable[0].node.name + ' = ' + self.value[0].node.generatePyCode()
+		else:
+			return self.variable[0].node.name + ' = None'
 
-
-	def generatePyCodeBlock(self):
-		codeBlock = PyCodeBlock()
-		codeBlock.append( self.generatePyCode() )
-		return codeBlock
-
-
-	def getReferenceableNodeByName(self, targetName, sourceNode=None):
-		return self.parent[0].node.getReferenceableNodeByName( targetName, self )
 
 
 	def buildReferenceableNodeTable(self, nodeTable):
-		pass
+		nodeTable[self.variable[0].node.name] = self.variable[0].node
+

@@ -30,12 +30,12 @@ class CVLocalAssignment (CVBorderNode):
 
 
 	@FunctionRefField
-	def varNode(self):
-		return self._view.buildView( self.treeNode.varNode, self )
+	def varRefNode(self):
+		return self._view.buildView( self.treeNode.varRefNode, self )
 
 	@FunctionRefField
-	def varWidget(self):
-		return self.varNode.widget
+	def varRefWidget(self):
+		return self.varRefNode.widget
 
 
 	@FunctionRefField
@@ -49,7 +49,7 @@ class CVLocalAssignment (CVBorderNode):
 
 	@FunctionField
 	def _refreshVar(self):
-		self._box[0] = self.varWidget
+		self._box[0] = self.varRefWidget
 
 	@FunctionField
 	def _refreshValue(self):
@@ -86,7 +86,7 @@ class CVLocalAssignment (CVBorderNode):
 
 
 	def horizontalNavigationList(self):
-		return [ self.varNode, self.valueNode ]
+		return [ self.varRefNode, self.valueNode ]
 
 
 	def startEditingValue(self):

@@ -13,9 +13,18 @@ from Britefury.SemanticGraph.SemanticGraph import *
 
 class CGLambda (CGExpression):
 	parameters = SemanticGraphSinkSingleSubtreeField( 'Parameters', 'Parameters' )
-	statement = SemanticGraphSinkSingleSubtreeField( 'Statement', 'Statement' )
+	valueExpr = SemanticGraphSinkSingleSubtreeField( 'ValueExpr', 'Value expression' )
 
 
 
 	def generatePyCode(self):
-		return 'lambda ' + self.parameters[0].node.generatePyCode() + ': ' + self.statement[0].node.generatePyCode()
+		return 'lambda ' + self.parameters[0].node.generatePyCode() + ': ' + self.valueExpr[0].node.generatePyCode()
+
+
+
+	def getReferenceableNodeByName(self, targetName, sourceNode=None):
+		param = self.parameters[0].node.getReferenceableNodeByName( targetName, sourceNode )
+		if param is not None:
+			return param
+		else:
+			return None

@@ -62,6 +62,7 @@ class CodeView (object):
 				subTable[nodeClass] = viewNode
 				bNodeTableChanged = True
 
+
 			viewNode._parent = parentNode
 
 			viewNode.refresh()

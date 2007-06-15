@@ -12,6 +12,8 @@ from Britefury.CodeGraph.CGUnboundRef import CGUnboundRef
 
 from Britefury.CodeViewTree.CVTExpression import CVTExpression
 
+from Britefury.CodeViewTreeOperations.CVTOWrapInAssignment import cvto_wrapInAssignment
+
 
 
 class CVTUnboundRef (CVTExpression):
@@ -36,3 +38,8 @@ class CVTUnboundRef (CVTExpression):
 			return self._tree.buildNode( refGraphNode )
 		else:
 			return None
+
+
+
+	def wrapInLocalAssignment(self):
+		return cvto_wrapInAssignment( self )

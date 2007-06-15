@@ -12,10 +12,10 @@ from Britefury.SemanticGraph.SemanticGraph import *
 
 
 class CGLocalAssignment (CGStatement):
-	variable = SemanticGraphSinkSingleField( 'Variable', 'Target variable' )
+	varRef = SemanticGraphSinkSingleField( 'Variable reference', 'Target variable reference' )
 	value = SemanticGraphSinkSingleSubtreeField( 'Value', 'Value' )
 
 
 
 	def generatePyCode(self):
-		return self.variable[0].node.generatePyCode() + ' = ' + self.value[0].node.generatePyCode()
+		return self.varRef[0].node.generatePyCode() + ' = ' + self.value[0].node.generatePyCode()

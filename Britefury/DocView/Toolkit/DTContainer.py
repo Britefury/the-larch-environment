@@ -76,6 +76,8 @@ class DTContainer (DTWidget):
 
 		self._childToEntry[child] = childEntry
 
+		child._f_unparent()
+
 		child._f_setParent( self )
 
 		if self._realiseContext is not None:

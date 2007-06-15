@@ -271,8 +271,11 @@ class DTWidget (object):
 
 
 	def __copy__(self):
-		return self
+		raise TypeError, 'widgets cannot be copied'
 
+
+	def __deepcopy__(self):
+		raise TypeError, 'widgets cannot be copied'
 
 
 	parent = property( _p_getParent )
