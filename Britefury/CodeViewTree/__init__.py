@@ -10,6 +10,7 @@ import CVTArguments
 import CVTAttrName
 import CVTBlockStatements
 import CVTCall
+import CVTDef
 import CVTExpression
 import CVTGetAttr
 import CVTLambda

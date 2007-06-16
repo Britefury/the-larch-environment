@@ -42,10 +42,10 @@ class CVTParameters (CVTNode):
 		paramCG = CGVar()
 		self.graph.nodes.append( paramCG )
 		paramCG.name = name
-		blockParmsCG.params.append( paramCG.parent )
+		blockParmsCG.params.append( paramCG.declaration )
 		return self._tree.buildNode( paramCG )
 
 
 	def deleteParameter(self, param):
-		self.graphNode.params.remove( param.graphNode.parent )
+		self.graphNode.params.remove( param.graphNode.declaration )
 		param.graphNode.destroySubtree()

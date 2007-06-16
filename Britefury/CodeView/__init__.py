@@ -10,6 +10,7 @@ import CVArguments
 import CVAttrName
 import CVBlockStatements
 import CVCall
+import CVDef
 import CVExpression
 import CVGetAttr
 import CVLambda

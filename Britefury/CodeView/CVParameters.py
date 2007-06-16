@@ -98,3 +98,6 @@ class CVParameters (CVBorderNode):
 		self.makeCurrent()
 
 
+
+	def _o_isExtendable(self):
+		return True

@@ -72,7 +72,9 @@ class CVUnboundRef (CVExpression):
 		self.targetNameWidget.startEditingOnRight()
 
 
-	def _p_onEntryFinish(self, entry, text):
+	def _p_onEntryFinish(self, entry, text, bUserEvent):
+		if bUserEvent:
+			self.cursorRight()
 		self._f_commandHistoryFreeze()
 		self._replaceWithRef()
 		self._f_commandHistoryThaw()

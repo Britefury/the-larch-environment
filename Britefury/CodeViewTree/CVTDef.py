@@ -8,20 +8,32 @@
 from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
-from Britefury.CodeGraph.CGReturn import CGReturn
+from Britefury.CodeGraph.CGDef import CGDef
 
 from Britefury.CodeViewTree.CVTStatement import CVTStatement
 
 
 
-class CVTReturn (CVTStatement):
-	graphNodeClass = CGReturn
+class CVTDef (CVTStatement):
+	graphNodeClass = CGDef
 
 
-	graphNode = SheetRefField( CGReturn )
+	graphNode = SheetRefField( CGDef )
 
 
 	@FunctionRefField
-	def valueNode(self):
-		return self._tree.buildNode( self.graphNode.value[0].node )
+	def declVarNode(self):
+		if len( self.graphNode.declVar ) > 0:
+			return self._tree.buildNode( self.graphNode.declVar[0].node )
+		else:
+			return None
+
+	@FunctionRefField
+	def paramsNode(self):
+		return self._tree.buildNode( self.graphNode.parameters[0].node )
+
+	@FunctionField
+	def statementsNode(self):
+		return self._tree.buildNode( self.graphNode.block[0].node )
+
 
