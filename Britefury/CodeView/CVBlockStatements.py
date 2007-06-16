@@ -60,6 +60,11 @@ class CVBlockStatements (CVBorderNode):
 
 
 
+	def startEditing(self):
+		self.makeCurrent()
+
+
+
 	def horizontalNavigationList(self):
 		return self.verticalNavigationList()
 
@@ -72,3 +77,7 @@ class CVBlockStatements (CVBorderNode):
 		self.treeNode.deleteStatement( child.treeNode )
 		return True
 
+
+
+	def _o_isExtendable(self):
+		return True

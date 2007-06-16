@@ -95,6 +95,7 @@ class CodeViewBehaviorClass (SheetClass):
 
 class CodeViewBehavior (Sheet):
 	__metaclass__ = CodeViewBehaviorClass
+	__debug_display_keypresses__ = False
 
 
 	def handleKeyPress(self, fromNode, receivingNodePath, widget, keyPressEvent):
@@ -102,6 +103,9 @@ class CodeViewBehavior (Sheet):
 		keyVal = keyPressEvent.keyVal
 		key = keyVal, state
 		char = keyPressEvent.keyString
+
+		if self.__debug_display_keypresses__:
+			print '%s: ' % ( self.__class__.__name__, ), keyVal, state, char
 
 		# Look up the key handler
 		inputHandler = None

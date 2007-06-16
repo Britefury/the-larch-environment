@@ -69,7 +69,9 @@ class CVLocalRef (CVExpression):
 		self.nameWidget.startEditingOnRight()
 
 
-	def _p_onEntryFinish(self, entry, text):
+	def _p_onEntryFinish(self, entry, text, bUserEvent):
+		if bUserEvent:
+			self.cursorRight()
 		self._f_commandHistoryFreeze()
 		self._rebind( text )
 		self._f_commandHistoryThaw()

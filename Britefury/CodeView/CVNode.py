@@ -108,6 +108,10 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 	__metaclass__ = CVNodeClass
 
 
+	class _CouldNotFindNextChildError (Exception):
+		pass
+
+
 	treeNode = SheetRefField( CVTNode )
 
 
@@ -156,13 +160,25 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 
 	def cursorLeft(self, bItemStep=False):
 		if self._parent is not None:
-			return self._parent._f_cursorLeftFromChild( self, bItemStep )
+			try:
+				return self._parent._f_cursorLeftFromChild( self, bItemStep )
+			except CVNode._CouldNotFindNextChildError:
+				try:
+					return self._parent._f_cursorToParent()
+				except CVNode._CouldNotFindNextChildError:
+					self._parent.makeCurrent()
 		else:
 			return True
 
 	def cursorRight(self, bItemStep=False):
 		if self._parent is not None:
-			return self._parent._f_cursorRightFromChild( self, bItemStep )
+			try:
+				return self._parent._f_cursorRightFromChild( self, bItemStep )
+			except CVNode._CouldNotFindNextChildError:
+				try:
+					return self._parent._f_cursorToParent()
+				except CVNode._CouldNotFindNextChildError:
+					self._parent.makeCurrent()
 		else:
 			return True
 
@@ -170,13 +186,25 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 
 	def cursorUp(self):
 		if self._parent is not None:
-			return self._parent._f_cursorUpFromChild( self )
+			try:
+				return self._parent._f_cursorUpFromChild( self )
+			except CVNode._CouldNotFindNextChildError:
+				try:
+					return self._parent._f_cursorToParent()
+				except CVNode._CouldNotFindNextChildError:
+					self._parent.makeCurrent()
 		else:
 			return True
 
 	def cursorDown(self):
 		if self._parent is not None:
-			return self._parent._f_cursorDownFromChild( self )
+			try:
+				return self._parent._f_cursorDownFromChild( self )
+			except CVNode._CouldNotFindNextChildError:
+				try:
+					return self._parent._f_cursorToParent()
+				except CVNode._CouldNotFindNextChildError:
+					self._parent.makeCurrent()
 		else:
 			return True
 
@@ -214,6 +242,20 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 		return None
 
 
+	def _o_isExtendable(self):
+		return False
+
+
+	def _f_cursorToParent(self):
+		if self._o_isExtendable():
+			self.makeCurrent()
+			return True
+		elif self._parent is not None:
+			return self._parent._f_cursorToParent()
+		else:
+			raise CVNode._CouldNotFindNextChildError
+			return True
+
 
 	def _f_cursorLeftFromChild(self, child, bItemStep):
 		navList = self.horizontalNavigationList()
@@ -223,6 +265,7 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 		elif self._parent is not None:
 			return self._parent._f_cursorLeftFromChild( self, bItemStep )
 		else:
+			raise CVNode._CouldNotFindNextChildError
 			return True
 
 	def _f_cursorRightFromChild(self, child, bItemStep):
@@ -233,6 +276,7 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 		elif self._parent is not None:
 			return self._parent._f_cursorRightFromChild( self, bItemStep )
 		else:
+			raise CVNode._CouldNotFindNextChildError
 			return True
 
 
@@ -244,6 +288,7 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 		elif self._parent is not None:
 			return self._parent._f_cursorUpFromChild( self )
 		else:
+			raise CVNode._CouldNotFindNextChildError
 			return True
 
 	def _f_cursorDownFromChild(self, child):
@@ -254,6 +299,7 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 		elif self._parent is not None:
 			return self._parent._f_cursorDownFromChild( self )
 		else:
+			raise CVNode._CouldNotFindNextChildError
 			return True
 
 

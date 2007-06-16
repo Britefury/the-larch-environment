@@ -6,14 +6,21 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
 from Britefury.CodeGraph.CGReturn import *
+from Britefury.CodeGraph.CGNullExpression import *
 from Britefury.CodeGraph.CGVar import *
 from Britefury.CodeGraph.CGLocalVarDeclaration import *
+from Britefury.CodeGraph.CGDef import *
+from Britefury.CodeGraph.CGParameters import *
+from Britefury.CodeGraph.CGBlock import *
 
 
 
 def cvto_addReturnStatement(treeNode, position):
 	rtn = CGReturn()
+	nullExp = CGNullExpression()
 	treeNode.graph.nodes.append( rtn )
+	treeNode.graph.nodes.append( nullExp )
+	rtn.value.append( nullExp.parent )
 	treeNode.graphNode.statements.insert( position, rtn.parent )
 	return treeNode.statementNodes[position ]
 
@@ -27,4 +34,22 @@ def cvto_addLocalVarStatement(treeNode, position):
 	treeNode.graph.nodes.append( decl )
 	decl.variable.append( var.declaration )
 	treeNode.graphNode.statements.insert( position, decl.parent )
+	return treeNode.statementNodes[position ]
+
+
+
+
+def cvto_addDefStatement(treeNode, position):
+	defStmt = CGDef()
+	declVar = CGVar()
+	params = CGParameters()
+	block = CGBlock()
+	treeNode.graph.nodes.append( defStmt )
+	treeNode.graph.nodes.append( declVar )
+	treeNode.graph.nodes.append( params )
+	treeNode.graph.nodes.append( block )
+	defStmt.declVar.append( declVar.declaration )
+	defStmt.parameters.append( params.parent )
+	defStmt.block.append( block.parent )
+	treeNode.graphNode.statements.insert( position, defStmt.parent )
 	return treeNode.statementNodes[position ]

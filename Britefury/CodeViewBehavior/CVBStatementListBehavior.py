@@ -11,12 +11,17 @@ from Britefury.CodeViewTreeOperations.CVTOStatementListOperations import *
 
 
 class CVBStatementListBehavior (CodeViewBehavior):
+	@staticmethod
+	def _p_getPosition(viewNode, receivingNodePath):
+		if len( receivingNodePath ) > 1:
+			return viewNode.treeNode.statementNodes.index( receivingNodePath[1].treeNode )
+		else:
+			return len( viewNode.treeNode.statementNodes )
+
+
 	@CVBAccelInputHandlerMethod( '<alt>r' )
 	def _addReturn(self, viewNode, receivingNodePath, widget, event):
-		if len( receivingNodePath ) > 1:
-			position = viewNode.treeNode.statementNodes.index( receivingNodePath[1].treeNode )
-		else:
-			position = len( viewNode.treeNode.statementNodes )
+		position = CVBStatementListBehavior._p_getPosition( viewNode, receivingNodePath )
 		viewNode._f_commandHistoryFreeze()
 		cvto_addReturnStatement( viewNode.treeNode, position )
 		localVarCV = viewNode.statementNodes[position]
@@ -27,14 +32,22 @@ class CVBStatementListBehavior (CodeViewBehavior):
 
 	@CVBAccelInputHandlerMethod( '<alt>v' )
 	def _addLocalVar(self, viewNode, receivingNodePath, widget, event):
-		if len( receivingNodePath ) > 1:
-			position = viewNode.treeNode.statementNodes.index( receivingNodePath[1].treeNode )
-		else:
-			position = len( viewNode.treeNode.statementNodes )
+		position = CVBStatementListBehavior._p_getPosition( viewNode, receivingNodePath )
 		viewNode._f_commandHistoryFreeze()
 		cvto_addLocalVarStatement( viewNode.treeNode, position )
 		localVarCV = viewNode.statementNodes[position]
 		localVarCV.startEditing()
+		viewNode._f_commandHistoryThaw()
+		return True
+
+
+	@CVBAccelInputHandlerMethod( '<alt>d' )
+	def _addDef(self, viewNode, receivingNodePath, widget, event):
+		position = CVBStatementListBehavior._p_getPosition( viewNode, receivingNodePath )
+		viewNode._f_commandHistoryFreeze()
+		cvto_addDefStatement( viewNode.treeNode, position )
+		defCV = viewNode.statementNodes[position]
+		defCV.startEditing()
 		viewNode._f_commandHistoryThaw()
 		return True
 

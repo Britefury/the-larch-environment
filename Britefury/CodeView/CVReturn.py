@@ -48,6 +48,15 @@ class CVReturn (CVStatement):
 	def __init__(self, treeNode, view):
 		super( CVReturn, self ).__init__( treeNode, view )
 		self._box = DTBox( spacing=10.0 )
-		self._box.append( DTLabel( 'return' ) )
+		self._box.append( DTLabel( 'return', font='Sans bold 11' ) )
 		self._box.append( DTLabel( 'nil' ) )
 		self.widget.child = self._box
+
+
+
+	def startEditing(self):
+		self.valueNode.startEditing()
+
+
+	def horizontalNavigationList(self):
+		return [ self.valueNode ]

@@ -48,6 +48,7 @@ class CVStringLiteral (CVExpression):
 		entry.entry.textColour=Colour3f( 0.0, 0.0, 0.75 )
 		entry.keyHandler = self
 		entry.attachCell( self.treeNode.cells.stringValue )
+		entry.finishSignal.connect( self._p_onEntryFinish )
 		return entry.entry
 
 
@@ -80,3 +81,9 @@ class CVStringLiteral (CVExpression):
 
 	def startEditingOnRight(self):
 		self.stringValueWidget.startEditingOnRight()
+
+
+
+	def _p_onEntryFinish(self, entry, text, bUserEvent):
+		if bUserEvent:
+			self.cursorRight()

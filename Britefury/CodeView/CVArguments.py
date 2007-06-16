@@ -124,3 +124,7 @@ class CVArguments (CVBorderNode):
 			return self.argNodes
 
 
+
+	def _o_isExtendable(self):
+		return True
+
