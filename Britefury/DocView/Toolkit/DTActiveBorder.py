@@ -11,8 +11,8 @@ from Britefury.DocView.Toolkit.DTBorder import DTBorder
 
 
 class DTActiveBorder (DTBorder):
-	def __init__(self, leftMargin=3.0, rightMargin=3.0, topMargin=3.0, bottomMargin=3.0, borderWidth=1.0, highlightedBorderWidth=2.0, borderColour=Colour3f( 0.8, 0.85, 0.9 ), prelitBorderColour=Colour3f( 0.5, 0.5, 0.5 ), highlightedBorderColour=Colour3f( 0.2, 0.2, 0.2 ), highlightedBackgroundColour=Colour3f( 0.93, 0.93, 0.93 ) ):
-		super( DTActiveBorder, self ).__init__( leftMargin, rightMargin, topMargin, bottomMargin )
+	def __init__(self, leftMargin=3.0, rightMargin=3.0, topMargin=3.0, bottomMargin=3.0, borderWidth=1.0, highlightedBorderWidth=2.0, borderColour=Colour3f( 0.8, 0.85, 0.9 ), prelitBorderColour=Colour3f( 0.5, 0.5, 0.5 ), highlightedBorderColour=Colour3f( 0.2, 0.2, 0.2 ), backgroundColour=None, highlightedBackgroundColour=Colour3f( 0.93, 0.93, 0.93 ) ):
+		super( DTActiveBorder, self ).__init__( leftMargin, rightMargin, topMargin, bottomMargin, backgroundColour )
 
 		self.keyHandler = None
 		self._borderWidth = borderWidth
@@ -50,7 +50,7 @@ class DTActiveBorder (DTBorder):
 
 
 	def setPrelitBorderColour(self, colour):
-		self._prelitBorderColour = color
+		self._prelitBorderColour = colour
 
 	def getPrelitBorderColour(self):
 		return self._borderColour
@@ -119,13 +119,20 @@ class DTActiveBorder (DTBorder):
 			# Border
 			context.set_line_width( b )
 			if self._bHasFocus:
-				context.set_source_rgb( self._highlightedBackgroundColour.r, self._highlightedBackgroundColour.g, self._highlightedBackgroundColour.b )
-				context.fill_preserve()
+				if self._highlightedBackgroundColour is not None:
+					context.set_source_rgb( self._highlightedBackgroundColour.r, self._highlightedBackgroundColour.g, self._highlightedBackgroundColour.b )
+					context.fill_preserve()
+
 				context.set_source_rgb( self._highlightedBorderColour.r, self._highlightedBorderColour.g, self._highlightedBorderColour.b )
-			elif self._bPrelit:
-				context.set_source_rgb( self._prelitBorderColour.r, self._prelitBorderColour.g, self._prelitBorderColour.b )
 			else:
-				context.set_source_rgb( self._borderColour.r, self._borderColour.g, self._borderColour.b )
+				if self._backgroundColour is not None:
+					context.set_source_rgb( self._backgroundColour.r, self._backgroundColour.g, self._backgroundColour.b )
+					context.fill_preserve()
+
+				if self._bPrelit:
+					context.set_source_rgb( self._prelitBorderColour.r, self._prelitBorderColour.g, self._prelitBorderColour.b )
+				else:
+					context.set_source_rgb( self._borderColour.r, self._borderColour.g, self._borderColour.b )
 			context.stroke()
 
 		super( DTActiveBorder, self )._o_draw( context )
@@ -133,6 +140,7 @@ class DTActiveBorder (DTBorder):
 
 
 	borderWidth = property( getBorderWidth, setBorderWidth )
+	highlightedBorderWidth = property( getHighlightedBorderWidth, setHighlightedBorderWidth )
 	borderColour = property( getBorderColour, setBorderColour )
 	prelitBorderColour = property( getPrelitBorderColour, setPrelitBorderColour )
 	highlightedBorderColour = property( getHighlightedBorderColour, setHighlightedBorderColour )

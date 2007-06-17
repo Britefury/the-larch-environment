@@ -6,6 +6,7 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
 from Britefury.CodeGraph.CGStringLiteral import *
+from Britefury.CodeGraph.CGIntLiteral import *
 from Britefury.CodeGraph.CGUnboundRef import *
 from Britefury.CodeGraph.CGLambda import *
 from Britefury.CodeGraph.CGParameters import *
@@ -17,6 +18,13 @@ def cvto_insertStringLiteral(treeNode, treeNodePath):
 	strLit = CGStringLiteral()
 	treeNode.graph.nodes.append( strLit )
 	return treeNode.insertNode( strLit, treeNodePath )
+
+
+
+def cvto_insertIntLiteral(treeNode, treeNodePath):
+	intLit = CGIntLiteral()
+	treeNode.graph.nodes.append( intLit )
+	return treeNode.insertNode( intLit, treeNodePath )
 
 
 

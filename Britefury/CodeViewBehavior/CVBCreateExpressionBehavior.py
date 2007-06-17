@@ -25,6 +25,18 @@ class CVBCreateExpressionBehavior (CodeViewBehavior):
 		return True
 
 
+	@CVBCharInputHandlerMethod( string.digits )
+	def _replaceWithIntLiteral(self, viewNode, receivingNodePath, widget, event):
+		viewNode._f_commandHistoryFreeze()
+		intLitCVT = cvto_insertIntLiteral( viewNode.treeNode, [ node.treeNode  for node in receivingNodePath ] )
+		intLitCVT.strValue = event.keyString
+		viewNode._view.refresh()
+		intLitCV = viewNode._view.getViewNodeForTreeNode( intLitCVT )
+		intLitCV.stringValueWidget.startEditing()
+		viewNode._f_commandHistoryThaw()
+		return True
+
+
 	@CVBCharInputHandlerMethod( string.ascii_letters + '_' )
 	def _replaceWithRef(self, viewNode, receivingNodePath, widget, event):
 		viewNode._f_commandHistoryFreeze()

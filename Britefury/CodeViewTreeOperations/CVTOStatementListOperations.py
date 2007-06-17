@@ -12,6 +12,7 @@ from Britefury.CodeGraph.CGLocalVarDeclaration import *
 from Britefury.CodeGraph.CGDef import *
 from Britefury.CodeGraph.CGParameters import *
 from Britefury.CodeGraph.CGBlock import *
+from Britefury.CodeGraph.CGClass import *
 
 
 
@@ -52,4 +53,19 @@ def cvto_addDefStatement(treeNode, position):
 	defStmt.parameters.append( params.parent )
 	defStmt.block.append( block.parent )
 	treeNode.graphNode.statements.insert( position, defStmt.parent )
+	return treeNode.statementNodes[position ]
+
+
+
+
+def cvto_addClassStatement(treeNode, position):
+	classStmt = CGClass()
+	declVar = CGVar()
+	block = CGBlock()
+	treeNode.graph.nodes.append( classStmt )
+	treeNode.graph.nodes.append( declVar )
+	treeNode.graph.nodes.append( block )
+	classStmt.declVar.append( declVar.declaration )
+	classStmt.block.append( block.parent )
+	treeNode.graphNode.statements.insert( position, classStmt.parent )
 	return treeNode.statementNodes[position ]

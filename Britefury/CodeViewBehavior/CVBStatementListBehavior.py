@@ -51,3 +51,13 @@ class CVBStatementListBehavior (CodeViewBehavior):
 		viewNode._f_commandHistoryThaw()
 		return True
 
+
+	@CVBAccelInputHandlerMethod( '<alt>c' )
+	def _addClass(self, viewNode, receivingNodePath, widget, event):
+		position = CVBStatementListBehavior._p_getPosition( viewNode, receivingNodePath )
+		viewNode._f_commandHistoryFreeze()
+		cvto_addClassStatement( viewNode.treeNode, position )
+		defCV = viewNode.statementNodes[position]
+		defCV.startEditing()
+		viewNode._f_commandHistoryThaw()
+		return True

@@ -11,8 +11,8 @@ from Britefury.DocView.Toolkit.DTBin import DTBin
 
 
 class DTBorder (DTBin):
-	def __init__(self, leftMargin=0.0, rightMargin=0.0, topMargin=0.0, bottomMargin=0.0):
-		super( DTBorder, self ).__init__()
+	def __init__(self, leftMargin=0.0, rightMargin=0.0, topMargin=0.0, bottomMargin=0.0, backgroundColour=None):
+		super( DTBorder, self ).__init__( backgroundColour )
 
 		self._leftMargin = leftMargin
 		self._rightMargin = rightMargin

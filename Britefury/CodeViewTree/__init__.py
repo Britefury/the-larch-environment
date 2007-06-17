@@ -10,9 +10,12 @@ import CVTArguments
 import CVTAttrName
 import CVTBlockStatements
 import CVTCall
+import CVTClass
+import CVTClassBases
 import CVTDef
 import CVTExpression
 import CVTGetAttr
+import CVTIntLiteral
 import CVTLambda
 import CVTLocalAssignment
 import CVTLocalRef

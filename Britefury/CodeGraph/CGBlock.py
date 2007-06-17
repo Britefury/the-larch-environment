@@ -23,8 +23,13 @@ class CGBlock (CGNode):
 
 	def generatePyCodeBlock(self):
 		codeBlock = PyCodeBlock()
-		for statementSource in self.statements:
-			codeBlock += statementSource.node.generatePyCodeBlock()
+
+		if len( self.statements ) > 0:
+			for statementSource in self.statements:
+				codeBlock += statementSource.node.generatePyCodeBlock()
+		else:
+			codeBlock.append( 'pass' )
+
 		return codeBlock
 
 

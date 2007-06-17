@@ -14,11 +14,11 @@ from Britefury.Math.Math import Colour3f
 from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
-from Britefury.CodeViewTree.CVTDef import CVTDef
+from Britefury.CodeViewTree.CVTClass import CVTClass
 
 from Britefury.CodeView.CVStatement import *
 
-from Britefury.CodeViewBehavior.CVBDefBehavior import *
+from Britefury.CodeViewBehavior.CVBClassBehavior import *
 
 from Britefury.DocView.Toolkit.DTBox import DTBox
 from Britefury.DocView.Toolkit.DTLabel import DTLabel
@@ -28,14 +28,14 @@ from Britefury.DocView.CellEdit.DVCStringCellEditEntryLabel import DVCStringCell
 
 
 
-class CVDef (CVStatement):
-	treeNodeClass = CVTDef
+class CVClass (CVStatement):
+	treeNodeClass = CVTClass
 
 
-	treeNode = SheetRefField( CVTDef )
+	treeNode = SheetRefField( CVTClass )
 
 
-	behaviors = [ CVBDefBehavior() ]
+	behaviors = [ CVBClassBehavior() ]
 
 
 
@@ -50,12 +50,12 @@ class CVDef (CVStatement):
 
 
 	@FunctionRefField
-	def paramsNode(self):
-		return self._view.buildView( self.treeNode.paramsNode, self )
+	def basesNode(self):
+		return self._view.buildView( self.treeNode.basesNode, self )
 
 	@FunctionRefField
-	def paramsWidget(self):
-		return self.paramsNode.widget
+	def basesWidget(self):
+		return self.basesNode.widget
 
 
 
@@ -74,8 +74,8 @@ class CVDef (CVStatement):
 		self._declBox[1] = self.declVarWidget
 
 	@FunctionField
-	def _refreshParams(self):
-		self._declBox[2] = self.paramsWidget
+	def _refreshBases(self):
+		self._declBox[2] = self.basesWidget
 
 	@FunctionField
 	def _refreshStatements(self):
@@ -85,20 +85,20 @@ class CVDef (CVStatement):
 	@FunctionField
 	def refreshCell(self):
 		self._refreshDeclVar
-		self._refreshParams
+		self._refreshBases
 		self._refreshStatements
 
 
 
 
 	def __init__(self, treeNode, view):
-		super( CVDef, self ).__init__( treeNode, view )
+		super( CVClass, self ).__init__( treeNode, view )
 		self._declBox = DTBox( spacing=5.0 )
-		self._declBox.append( DTLabel( markup='D<span size="small">EF</span>', font='Sans bold 11', colour=Colour3f( 0.0, 0.5, 0.0 ) ) )
+		self._declBox.append( DTLabel( markup='C<span size="small">LASS</span>', font='Sans bold 11', colour=Colour3f( 0.1, 0.3, 0.5 ) ) )
 		self._declBox.append( DTLabel( 'nil' ) )
 		self._declBox.append( DTLabel( 'nil' ) )
 		self._declBox.append( DTLabel( ':' ) )
-		self._declBox.backgroundColour = Colour3f( 0.825, 0.925, 0.825 )
+		self._declBox.backgroundColour = Colour3f( 0.8, 0.825, 0.85 )
 		self._statementsBorder = DTBorder( leftMargin=30.0 )
 		self._statementsBorder.child = DTLabel( 'nil' )
 		self._box = DTBox( spacing=5.0, direction=DTDirection.TOP_TO_BOTTOM, minorDirectionAlignment=DTBox.ALIGN_EXPAND )
@@ -107,15 +107,15 @@ class CVDef (CVStatement):
 		self.widget.child = self._box
 		#self.widget.borderWidth = 5.0
 		#self.widget.highlightedBorderWidth = 7.0
-		#self.widget.borderColour = Colour3f( 0.6, 1.0, 0.6 )
-		#self.widget.prelitBorderColour = Colour3f( 0.1, 0.5, 0.1 )
+		#self.widget.borderColour = Colour3f( 0.3, 0.5, 0.7 )
+		#self.widget.prelitBorderColour = Colour3f( 0.1, 0.3, 0.5 )
 		#self.widget.allMargins = 8.0
 
 
 
-	def startEditingParameters(self):
+	def startEditingBases(self):
 		self.declVarNode.finishEditing()
-		self.paramsNode.startEditing()
+		self.basesNode.startEditing()
 
 	def startEditingStatements(self):
 		self.statementsNode.startEditing()
@@ -126,7 +126,7 @@ class CVDef (CVStatement):
 
 
 	def horizontalNavigationList(self):
-		return [ self.declVarNode, self.paramsNode, self.statementsNode ]
+		return [ self.declVarNode, self.basesNode, self.statementsNode ]
 
 	def verticalNavigationList(self):
 		return [ self.declVarNode, self.statementsNode ]

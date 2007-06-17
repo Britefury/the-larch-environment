@@ -11,8 +11,8 @@ from Britefury.DocView.Toolkit.DTContainer import DTContainer
 
 
 class DTBin (DTContainer):
-	def __init__(self):
-		super( DTBin, self ).__init__()
+	def __init__(self, backgroundColour=None):
+		super( DTBin, self ).__init__( backgroundColour )
 
 		self._child = None
 		self._childRequisition = Vector2()
