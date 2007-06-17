@@ -42,7 +42,7 @@ class DTContainer (DTWidget):
 
 
 
-	def __init__(self):
+	def __init__(self, backgroundColour=None):
 		super( DTContainer, self ).__init__()
 
 		self._childEntries = []
@@ -53,6 +53,17 @@ class DTContainer (DTWidget):
 		self._pressGrabChildEntry = None
 		self._pressGrabButton = None
 		self._pointerChildEntry = None
+		self._backgroundColour = backgroundColour
+
+
+
+	def setBackgroundColour(self, colour):
+		self._backgroundColour = colour
+		self._o_queueFullRedraw()
+
+	def getBackgroundColour(self):
+		return self._backgroundColour
+
 
 
 
@@ -164,6 +175,13 @@ class DTContainer (DTWidget):
 			self._widgetBoxTable.setWidgetBox( childId, entry.box )
 
 
+
+	def _o_drawBackground(self, context):
+		if self._backgroundColour is not None:
+			# Background
+			context.rectangle( 0.0, 0.0, self._allocation.x, self._allocation.y )
+			context.set_source_rgb( self._backgroundColour.r, self._backgroundColour.g, self._backgroundColour.b )
+			context.fill()
 
 
 
@@ -313,6 +331,7 @@ class DTContainer (DTWidget):
 
 	def _f_draw(self, context, areaBox):
 		super( DTContainer, self )._f_draw( context, areaBox )
+		self._o_drawBackground( context )
 		widgets = self._widgetBoxTable.getIntersectingWidgetList( areaBox )
 		for childId in widgets:
 			entry = self._childIdToEntry[childId]
@@ -325,4 +344,6 @@ class DTContainer (DTWidget):
 			entry.child._f_draw( context, areaBox * entry.invXform )
 			context.restore()
 
+
+	backgroundColour = property( getBackgroundColour, setBackgroundColour )
 

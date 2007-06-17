@@ -37,10 +37,10 @@ class CVTArguments (CVTNode):
 
 
 	def addArgument(self):
-		sendMsgCG = self.graphNode
+		argumentsCG = self.graphNode
 		argCG = CGNullExpression()
 		self.graph.nodes.append( argCG )
-		sendMsgCG.args.append( argCG.parent )
+		argumentsCG.args.append( argCG.parent )
 		return self._tree.buildNode( argCG )
 
 

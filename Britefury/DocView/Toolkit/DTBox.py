@@ -31,8 +31,8 @@ class DTBox (DTContainer):
 
 
 
-	def __init__(self, direction=DTDirection.LEFT_TO_RIGHT, minorDirectionAlignment=ALIGN_CENTRE, spacing=0.0, bExpand=False, bFill=False, bShrink=False, padding=0.0):
-		super( DTBox, self ).__init__()
+	def __init__(self, direction=DTDirection.LEFT_TO_RIGHT, minorDirectionAlignment=ALIGN_CENTRE, spacing=0.0, bExpand=False, bFill=False, bShrink=False, padding=0.0, backgroundColour=None):
+		super( DTBox, self ).__init__( backgroundColour )
 
 		self._direction = direction
 		self._minorDirectionAlignment = minorDirectionAlignment

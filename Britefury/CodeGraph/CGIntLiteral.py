@@ -5,26 +5,22 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
-import CodeView
-import CVArguments
-import CVAttrName
-import CVBlockStatements
-import CVCall
-import CVClass
-import CVClassBases
-import CVDef
-import CVExpression
-import CVGetAttr
-import CVIntLiteral
-import CVLambda
-import CVLocalAssignment
-import CVLocalRef
-import CVLocalVarDeclaration
-import CVModule
-import CVNullExpression
-import CVParameters
-import CVReturn
-import CVStatement
-import CVStringLiteral
-import CVUnboundRef
-import CVVar
+from Britefury.VirtualMachine.vcls_string import pyStrToVString
+from Britefury.CodeGraph.CGExpression import CGExpression
+from Britefury.Sheet.Sheet import *
+from Britefury.SemanticGraph.SemanticGraph import *
+
+
+
+class CGIntLiteral (CGExpression):
+	strValue = Field( str, '' )
+
+
+	@FunctionField
+	def intValue(self):
+		return int( self.strValue )
+
+
+	def generatePyCode(self):
+		return self.strValue
+

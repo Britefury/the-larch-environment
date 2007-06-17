@@ -20,8 +20,8 @@ class DTWrappedLine (DTContainer):
 
 
 
-	def __init__(self, spacing=0.0, padding=0.0):
-		super( DTWrappedLine, self ).__init__()
+	def __init__(self, spacing=0.0, padding=0.0, backgroundColour=None):
+		super( DTWrappedLine, self ).__init__( backgroundColour )
 
 		self._spacing = spacing
 		self._padding = padding
