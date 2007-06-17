@@ -125,3 +125,10 @@ class CVDef (CVStatement):
 
 
 
+	def deleteChild(self, child):
+		if child is self.declVarNode:
+			self.deleteNode( False, None )
+
+
+
+

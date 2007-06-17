@@ -14,12 +14,14 @@ class CVBMovementBehavior (CodeViewBehavior):
 		viewNode._f_commandHistoryFreeze()
 		result = viewNode.cursorUp()
 		viewNode._f_commandHistoryThaw()
+		return result
 
 	@CVBAccelInputHandlerMethod( 'Down' )
 	def _down(self, viewNode, receivingNodePath, widget, event):
 		viewNode._f_commandHistoryFreeze()
 		result = viewNode.cursorDown()
 		viewNode._f_commandHistoryThaw()
+		return result
 
 
 
@@ -28,12 +30,14 @@ class CVBMovementBehavior (CodeViewBehavior):
 		viewNode._f_commandHistoryFreeze()
 		result = viewNode.cursorLeft( True )
 		viewNode._f_commandHistoryThaw()
+		return result
 
 	@CVBAccelInputHandlerMethod( '<alt>Right' )
 	def _itemToRight(self, viewNode, receivingNodePath, widget, event):
 		viewNode._f_commandHistoryFreeze()
 		result = viewNode.cursorRight( True )
 		viewNode._f_commandHistoryThaw()
+		return result
 
 
 
@@ -43,12 +47,14 @@ class CVBMovementBehavior (CodeViewBehavior):
 		viewNode._f_commandHistoryFreeze()
 		result = viewNode.cursorLeft()
 		viewNode._f_commandHistoryThaw()
+		return result
 
 	@CVBAccelInputHandlerMethod( 'Right' )
 	def _right(self, viewNode, receivingNodePath, widget, event):
 		viewNode._f_commandHistoryFreeze()
 		result = viewNode.cursorRight()
 		viewNode._f_commandHistoryThaw()
+		return result
 
 
 

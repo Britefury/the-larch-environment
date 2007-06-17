@@ -42,5 +42,6 @@ class CVTBlockStatements (CVTNode):
 
 
 	def deleteStatement(self, statement):
-		self.graphNode.statements.remove( statement.graphNode.parent )
-		statement.graphNode.destroySubtree()
+		if statement.graphNode.parent in self.graphNode.statements:
+			self.graphNode.statements.remove( statement.graphNode.parent )
+			statement.graphNode.destroySubtree()

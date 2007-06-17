@@ -8,6 +8,7 @@
 from Britefury.Math.Math import Point2, Vector2
 from Britefury.DocView.Toolkit.DTContainer import DTContainer
 from Britefury.DocView.Toolkit.DTDirection import DTDirection
+from Britefury.DocView.Toolkit.DTBin import DTBin
 
 
 
@@ -161,7 +162,9 @@ class DTBox (DTContainer):
 
 
 	def _f_removeChild(self, child):
-		self.remove( child )
+		entry = self._childToEntry[child]
+		index = self._childEntries.index( entry )
+		self[index] = DTBin()
 
 
 	def _p_childListModified(self):

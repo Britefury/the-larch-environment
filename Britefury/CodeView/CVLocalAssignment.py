@@ -80,7 +80,9 @@ class CVLocalAssignment (CVBorderNode):
 			self.valueNode.treeNode.replaceWithNullExpression()
 			self._view.refresh()
 			return False
-		else:
+		elif child is self.varRefNode:
+			self.treeNode.removeAssignment()
+			self._view.refresh()
 			return False
 
 
