@@ -128,7 +128,9 @@ class DTWrappedLine (DTContainer):
 
 
 	def _f_removeChild(self, child):
-		self.remove( child )
+		entry = self._childToEntry[child]
+		index = self._childEntries.index( entry )
+		self[index] = DTBin()
 
 
 	def _o_getRequiredWidth(self):

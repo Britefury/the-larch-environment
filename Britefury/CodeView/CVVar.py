@@ -37,6 +37,7 @@ class CVVar (CVNode):
 		entry = DVCStringCellEditEntryLabel( regexp=RegExpStrings.identifier )
 		entry.keyHandler = self
 		entry.attachCell( self.treeNode.cells.varName )
+		entry.finishSignal.connect( self._p_onEntryFinish )
 		return entry.entry
 
 
@@ -72,3 +73,8 @@ class CVVar (CVNode):
 
 	def isNameEmpty(self):
 		return self.nameWidget.text == ''
+
+
+	def _p_onEntryFinish(self, entry, text, bUserEvent):
+		if text == '':
+			self.deleteNode( False, None )

@@ -45,8 +45,9 @@ class CVTArguments (CVTNode):
 
 
 	def deleteArgument(self, argument):
-		self.graphNode.args.remove( argument.graphNode.parent )
-		argument.graphNode.destroySubtree()
+		if argument.graphNode.parent in self.graphNode.args:
+			self.graphNode.args.remove( argument.graphNode.parent )
+			argument.graphNode.destroySubtree()
 
 
 

@@ -9,6 +9,8 @@ import pygtk
 pygtk.require( '2.0' )
 import gtk
 
+import traceback
+
 from Britefury.Util.SignalSlot import ClassSignal
 
 from Britefury.Kernel import KMeta
@@ -140,11 +142,13 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 
 	def deleteNode(self, bMoveFocusLeft, widget):
 		if self._parent is not None:
-			if self._parent.deleteChild( self ):
-				if bMoveFocusLeft:
-					self.cursorLeft( widget == self.widget )
-				else:
-					self.cursorRight( widget == self.widget )
+			if bMoveFocusLeft:
+				#self.cursorLeft( widget == self.widget )
+				self.cursorLeft( False )
+			else:
+				#self.cursorRight( widget == self.widget )
+				self.cursorRight( False )
+			self._parent.deleteChild( self )
 
 
 
@@ -261,46 +265,46 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 		navList = self.horizontalNavigationList()
 		leftChild = self._p_prevNavListItem( navList, child )
 		if leftChild is not None:
-			return leftChild._f_cursorEnterFromRight( self, bItemStep )
+			leftChild._f_cursorEnterFromRight( self, bItemStep )
+			return True
 		elif self._parent is not None:
 			return self._parent._f_cursorLeftFromChild( self, bItemStep )
 		else:
 			raise CVNode._CouldNotFindNextChildError
-			return True
 
 	def _f_cursorRightFromChild(self, child, bItemStep):
 		navList = self.horizontalNavigationList()
 		rightChild = self._p_nextNavListItem( navList, child )
 		if rightChild is not None:
-			return rightChild._f_cursorEnterFromLeft( self, bItemStep )
+			rightChild._f_cursorEnterFromLeft( self, bItemStep )
+			return True
 		elif self._parent is not None:
 			return self._parent._f_cursorRightFromChild( self, bItemStep )
 		else:
 			raise CVNode._CouldNotFindNextChildError
-			return True
 
 
 	def _f_cursorUpFromChild(self, child):
 		navList = self.verticalNavigationList()
 		childAbove = self._p_prevNavListItem( navList, child )
 		if childAbove is not None:
-			return childAbove._f_cursorEnterFromBelow( self )
+			childAbove._f_cursorEnterFromBelow( self )
+			return True
 		elif self._parent is not None:
 			return self._parent._f_cursorUpFromChild( self )
 		else:
 			raise CVNode._CouldNotFindNextChildError
-			return True
 
 	def _f_cursorDownFromChild(self, child):
 		navList = self.verticalNavigationList()
 		childBelow = self._p_nextNavListItem( navList, child )
 		if childBelow is not None:
-			return childBelow._f_cursorEnterFromAbove( self )
+			childBelow._f_cursorEnterFromAbove( self )
+			return True
 		elif self._parent is not None:
 			return self._parent._f_cursorDownFromChild( self )
 		else:
 			raise CVNode._CouldNotFindNextChildError
-			return True
 
 
 
@@ -309,42 +313,38 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 	def _f_cursorEnterFromLeft(self, parent, bItemStep):
 		navList = self.horizontalNavigationList()
 		if navList != []:
-			return navList[0]._f_cursorEnterFromLeft( self, bItemStep )
+			navList[0]._f_cursorEnterFromLeft( self, bItemStep )
 		else:
 			if bItemStep:
 				self.makeCurrent()
 			else:
 				self.startEditingOnLeft()
-			return True
 
 	def _f_cursorEnterFromRight(self, parent, bItemStep):
 		navList = self.horizontalNavigationList()
 		if navList != []:
-			return navList[-1]._f_cursorEnterFromRight( self, bItemStep )
+			navList[-1]._f_cursorEnterFromRight( self, bItemStep )
 		else:
 			if bItemStep:
 				self.makeCurrent()
 			else:
 				self.startEditingOnRight()
-			return True
 
 
 
 	def _f_cursorEnterFromAbove(self, parent):
 		navList = self.verticalNavigationList()
 		if navList != []:
-			return navList[0]._f_cursorEnterFromAbove( self )
+			navList[0]._f_cursorEnterFromAbove( self )
 		else:
 			self.makeCurrent()
-			return True
 
 	def _f_cursorEnterFromBelow(self, parent):
 		navList = self.verticalNavigationList()
 		if navList != []:
-			return navList[-1]._f_cursorEnterFromBelow( self )
+			navList[-1]._f_cursorEnterFromBelow( self )
 		else:
 			self.makeCurrent()
-			return True
 
 
 

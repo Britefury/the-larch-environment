@@ -28,3 +28,18 @@ class CVTLocalAssignment (CVTNode):
 	def valueNode(self):
 		return self._tree.buildNode( self.graphNode.value[0].node )
 
+
+
+	def removeAssignment(self):
+		varRefCG = self.graphNode.varRef[0].node
+
+		valueCGSource = self.graphNode.value[0]
+
+		parentCGSink = self.graphNode.parent[0]
+
+		del self.graphNode.value[0]
+		parentCGSink.replace( self.graphNode.parent, valueCGSource )
+
+		self.graphNode.destroySubtree()
+
+		return valueCGSource.node

@@ -70,11 +70,15 @@ class CVLocalRef (CVExpression):
 
 
 	def _p_onEntryFinish(self, entry, text, bUserEvent):
-		if bUserEvent:
-			self.cursorRight()
-		self._f_commandHistoryFreeze()
-		self._rebind( text )
-		self._f_commandHistoryThaw()
+		if text == '':
+			self.deleteNode( False, None )
+		else:
+			if bUserEvent:
+				self.cursorRight()
+			self._f_commandHistoryFreeze()
+			self._rebind( text )
+			self._f_commandHistoryThaw()
+
 
 
 	def _rebind(self, varName):
