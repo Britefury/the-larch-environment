@@ -24,6 +24,7 @@ from Britefury.CodeViewBehavior.CVBDeleteNodeBehavior import CVBDeleteNodeBehavi
 from Britefury.CodeViewTree.CVTNode import CVTNode
 
 from Britefury.CodeView.CodeView import CodeView
+from Britefury.CodeView.MoveFocus import MoveFocus
 
 from Britefury.DocView.Toolkit.DTWidget import *
 
@@ -136,19 +137,20 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 
 
 
-	def deleteChild(self, child):
-		return False
+	def _o_moveFocus(self, moveFocus):
+		if moveFocus == MoveFocus.LEFT:
+			self.cursorLeft()
+		else:
+			self.cursorRight()
 
 
-	def deleteNode(self, bMoveFocusLeft, widget):
+	def deleteChild(self, child, moveFocus):
+		pass
+
+
+	def deleteNode(self, moveFocus):
 		if self._parent is not None:
-			if bMoveFocusLeft:
-				#self.cursorLeft( widget == self.widget )
-				self.cursorLeft( False )
-			else:
-				#self.cursorRight( widget == self.widget )
-				self.cursorRight( False )
-			self._parent.deleteChild( self )
+			self._parent.deleteChild( self, moveFocus )
 
 
 

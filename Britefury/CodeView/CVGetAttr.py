@@ -19,6 +19,7 @@ from Britefury.CodeViewTree.CVTGetAttr import CVTGetAttr
 from Britefury.CodeView.CVExpression import *
 
 from Britefury.CodeViewBehavior.CVBGetAttrBehavior import *
+from Britefury.CodeViewBehavior.CVBWrapInAssignmentBehavior import *
 
 from Britefury.DocView.Toolkit.DTWrappedLine import DTWrappedLine
 from Britefury.DocView.Toolkit.DTBox import DTBox
@@ -36,7 +37,7 @@ class CVGetAttr (CVExpression):
 
 
 
-	behaviors = [ CVBGetAttrBehavior() ]
+	behaviors = [ CVBGetAttrBehavior(), CVBWrapInAssignmentBehavior() ]
 
 
 	@FunctionRefField
@@ -94,18 +95,15 @@ class CVGetAttr (CVExpression):
 		self.widget.child = self._box
 
 
-	def deleteChild(self, child):
+	def deleteChild(self, child, moveFocus):
 		if child is self.attrNameNode:
 			self.treeNode.unwrapGetAttr()
 			self._view.refresh()
-			return True
+			self.targetObjectNode.startEditing()
 		elif child is self.targetObjectNode:
 			self.targetObjectNode.treeNode.replaceWithNullExpression()
 			self._view.refresh()
 			self.targetObjectNode.startEditing()
-			return False
-		else:
-			return False
 
 
 	def startEditingAttrName(self):

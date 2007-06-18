@@ -46,6 +46,6 @@ def cvto_insertLambda(treeNode, treeNodePath):
 	treeNode.graph.nodes.append( nullExpression )
 
 	lambdaNode.parameters.append( paramsNode.parent )
-	lambdaNode.statement.append( nullExpression.parent )
+	lambdaNode.valueExpr.append( nullExpression.parent )
 
 	return treeNode.insertNode( lambdaNode, treeNodePath )

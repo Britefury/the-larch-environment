@@ -17,6 +17,7 @@ from Britefury.SheetGraph.SheetGraph import *
 from Britefury.CodeViewTree.CVTVar import CVTVar
 
 from Britefury.CodeView.CVBorderNode import *
+from Britefury.CodeView.MoveFocus import *
 
 from Britefury.DocView.Toolkit.DTBox import DTBox
 from Britefury.DocView.Toolkit.DTLabel import DTLabel
@@ -77,4 +78,4 @@ class CVVar (CVNode):
 
 	def _p_onEntryFinish(self, entry, text, bUserEvent):
 		if text == '':
-			self.deleteNode( False, None )
+			self.deleteNode( MoveFocus.RIGHT )

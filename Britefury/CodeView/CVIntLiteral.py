@@ -17,6 +17,7 @@ from Britefury.SheetGraph.SheetGraph import *
 from Britefury.CodeViewTree.CVTIntLiteral import CVTIntLiteral
 
 from Britefury.CodeView.CVExpression import *
+from Britefury.CodeView.MoveFocus import *
 
 from Britefury.DocView.Toolkit.DTBox import DTBox
 from Britefury.DocView.Toolkit.DTLabel import DTLabel
@@ -73,7 +74,7 @@ class CVIntLiteral (CVExpression):
 
 	def _p_onEntryFinish(self, entry, text, bUserEvent):
 		if text == '':
-			self.deleteNode( False, None )
+			self.deleteNode( MoveFocus.RIGHT )
 		else:
 			if bUserEvent:
 				self.cursorRight()

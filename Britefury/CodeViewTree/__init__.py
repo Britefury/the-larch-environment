@@ -17,7 +17,7 @@ import CVTExpression
 import CVTGetAttr
 import CVTIntLiteral
 import CVTLambda
-import CVTLocalAssignment
+import CVTAssignment
 import CVTLocalRef
 import CVTLocalVarDeclaration
 import CVTModule

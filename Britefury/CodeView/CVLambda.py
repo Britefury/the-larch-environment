@@ -81,7 +81,7 @@ class CVLambda (CVExpression):
 	def refreshCell(self):
 		self._refreshLambdaLabel
 		self._refreshParams
-		self._refreshStatement
+		self._refreshValueExpr
 
 
 
@@ -97,12 +97,13 @@ class CVLambda (CVExpression):
 		self.widget.child = self._lambdaBox
 
 
-	def deleteChild(self, child):
+	def deleteChild(self, child, moveFocus):
 		if child is self.lambdaLabelNode:
-			if self._parent is not None:
-				self._parent.deleteChild( self )
-				return True
-		return False
+			self.deleteNode( moveFocus )
+		elif child is self.valueExprNode:
+			self.valueExprNode.treeNode.replaceWithNullExpression()
+			self._view.refresh()
+			self.valueExprNode.startEditing()
 
 
 	def horizontalNavigationList(self):

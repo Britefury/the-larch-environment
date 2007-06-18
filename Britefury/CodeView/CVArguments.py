@@ -104,10 +104,10 @@ class CVArguments (CVBorderNode):
 		argCV.startEditing()
 
 
-	def deleteChild(self, child):
+	def deleteChild(self, child, moveFocus):
+		child._o_moveFocus( moveFocus )
 		self.treeNode.deleteArgument( child.treeNode )
 		self._view.refresh()
-		return True
 
 
 

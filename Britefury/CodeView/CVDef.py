@@ -133,9 +133,9 @@ class CVDef (CVStatement):
 
 
 
-	def deleteChild(self, child):
+	def deleteChild(self, child, moveFocus):
 		if child is self.declVarNode:
-			self.deleteNode( False, None )
+			self.deleteNode( moveFocus )
 
 
 

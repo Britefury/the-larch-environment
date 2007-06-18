@@ -10,7 +10,7 @@ from Britefury.SheetGraph.SheetGraph import *
 
 from Britefury.CodeGraph.CGLocalRef import CGLocalRef
 from Britefury.CodeGraph.CGUnboundRef import CGUnboundRef
-from Britefury.CodeGraph.CGLocalAssignment import CGLocalAssignment
+from Britefury.CodeGraph.CGAssignment import CGAssignment
 from Britefury.CodeGraph.CGNullExpression import CGNullExpression
 
 from Britefury.CodeViewTree.CVTExpression import CVTExpression
@@ -56,6 +56,6 @@ class CVTLocalRef (CVTExpression):
 
 
 
-	def wrapInLocalAssignment(self):
+	def wrapInAssignment(self):
 		return cvto_wrapInAssignment( self )
 

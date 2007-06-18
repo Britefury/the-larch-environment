@@ -13,6 +13,8 @@ from Britefury.CodeGraph.CGGetAttr import CGGetAttr
 from Britefury.CodeViewTree.CVTExpression import CVTExpression
 from Britefury.CodeViewTree.CVTAttrName import CVTAttrName
 
+from Britefury.CodeViewTreeOperations.CVTOWrapInAssignment import cvto_wrapInAssignment
+
 
 
 class CVTGetAttr (CVTExpression):
@@ -47,3 +49,7 @@ class CVTGetAttr (CVTExpression):
 
 		self.graphNode.destroySubtree()
 
+
+
+	def wrapInAssignment(self):
+		return cvto_wrapInAssignment( self )

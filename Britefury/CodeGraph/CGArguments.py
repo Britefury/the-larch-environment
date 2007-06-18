@@ -24,3 +24,7 @@ class CGArguments (CGNode):
 		if len( self.expandArg ) > 0:
 			p += ', *(' + self.expandArg[0].node.generatePyCode() + ')'
 		return p
+
+
+	def getReferenceableNodeByName(self, targetName, sourceNode=None):
+		return self.parent[0].node.getReferenceableNodeByName( targetName, self )

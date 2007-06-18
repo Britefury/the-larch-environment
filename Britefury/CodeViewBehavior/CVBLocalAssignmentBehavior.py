@@ -8,7 +8,7 @@
 from Britefury.CodeViewBehavior.CodeViewBehavior import *
 
 
-class CVBLocalAssignmentBehavior (CodeViewBehavior):
+class CVBAssignmentBehavior (CodeViewBehavior):
 	@CVBCharInputHandlerMethod( '=' )
 	def _setValue(self, viewNode, receivingNodePath, widget, event):
 		viewNode._f_commandHistoryFreeze()

@@ -99,12 +99,12 @@ class CVLocalVarDeclaration (CVStatement):
 
 
 
-	def deleteChild(self, child):
+	def deleteChild(self, child, moveFocus):
 		if child is self.varNode:
 			if self._parent is not None:
-				self._parent.deleteChild( self )
-				return True
+				self._parent.deleteChild( self, moveFocus )
 		elif child is self.valueNode:
+			self._o_moveFocus( moveFocus )
 			self.treeNode.deleteValue()
 			return True
 		return False
