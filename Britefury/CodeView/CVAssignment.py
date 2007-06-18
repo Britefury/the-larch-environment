@@ -12,7 +12,7 @@ import gtk
 from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
-from Britefury.CodeViewTree.CVTLocalAssignment import CVTLocalAssignment
+from Britefury.CodeViewTree.CVTAssignment import CVTAssignment
 
 from Britefury.CodeView.CVBorderNode import *
 
@@ -22,20 +22,20 @@ from Britefury.DocView.Toolkit.DTDirection import DTDirection
 
 
 
-class CVLocalAssignment (CVBorderNode):
-	treeNodeClass = CVTLocalAssignment
+class CVAssignment (CVBorderNode):
+	treeNodeClass = CVTAssignment
 
 
-	treeNode = SheetRefField( CVTLocalAssignment )
+	treeNode = SheetRefField( CVTAssignment )
 
 
 	@FunctionRefField
-	def varRefNode(self):
-		return self._view.buildView( self.treeNode.varRefNode, self )
+	def targetRefNode(self):
+		return self._view.buildView( self.treeNode.targetRefNode, self )
 
 	@FunctionRefField
-	def varRefWidget(self):
-		return self.varRefNode.widget
+	def targetRefWidget(self):
+		return self.targetRefNode.widget
 
 
 	@FunctionRefField
@@ -49,7 +49,7 @@ class CVLocalAssignment (CVBorderNode):
 
 	@FunctionField
 	def _refreshVar(self):
-		self._box[0] = self.varRefWidget
+		self._box[0] = self.targetRefWidget
 
 	@FunctionField
 	def _refreshValue(self):
@@ -65,7 +65,7 @@ class CVLocalAssignment (CVBorderNode):
 
 
 	def __init__(self, treeNode, view):
-		super( CVLocalAssignment, self ).__init__( treeNode, view )
+		super( CVAssignment, self ).__init__( treeNode, view )
 		self._box = DTBox( spacing=10.0 )
 		self._box.append( DTLabel( 'nil' ) )
 		self._box.append( DTLabel( '=' ) )
@@ -75,20 +75,25 @@ class CVLocalAssignment (CVBorderNode):
 
 
 
-	def deleteChild(self, child):
+	def deleteChild(self, child, moveFocus):
 		if child is self.valueNode:
-			self.valueNode.treeNode.replaceWithNullExpression()
-			self._view.refresh()
-			return False
-		elif child is self.varRefNode:
+			if moveFocus == MoveFocus.RIGHT:
+				self.valueNode.treeNode.replaceWithNullExpression()
+				self._view.refresh()
+				self.valueNode.startEditing()
+			else:
+				child._o_moveFocus( moveFocus )
+				self.treeNode.removeAssignment()
+				self._view.refresh()
+		elif child is self.targetRefNode:
+			child._o_moveFocus( moveFocus )
 			self.treeNode.removeAssignment()
 			self._view.refresh()
-			return False
 
 
 
 	def horizontalNavigationList(self):
-		return [ self.varRefNode, self.valueNode ]
+		return [ self.targetRefNode, self.valueNode ]
 
 
 	def startEditingValue(self):

@@ -19,8 +19,9 @@ from Britefury.SheetGraph.SheetGraph import *
 from Britefury.CodeViewTree.CVTUnboundRef import CVTUnboundRef
 
 from Britefury.CodeView.CVExpression import *
+from Britefury.CodeView.MoveFocus import *
 
-from Britefury.CodeViewBehavior.CVBVarRefBehavior import *
+from Britefury.CodeViewBehavior.CVBWrapInAssignmentBehavior import *
 
 from Britefury.DocView.Toolkit.DTBox import DTBox
 from Britefury.DocView.Toolkit.DTLabel import DTLabel
@@ -37,14 +38,14 @@ class CVUnboundRef (CVExpression):
 	treeNode = SheetRefField( CVTUnboundRef )
 
 
-	behaviors = [ CVBVarRefBehavior() ]
+	behaviors = [ CVBWrapInAssignmentBehavior() ]
 
 
 	@FunctionRefField
 	def targetNameWidget(self):
 		entry = DVCStringCellEditEntryLabel( regexp=RegExpStrings.identifier )
-		entry.entry.textColour = Colour3f( 0.5, 0.0, 0.0 )
-		entry.entry.highlightedTextColour = Colour3f( 1.0, 0.5, 0.5 )
+		entry.entry.textColour = Colour3f( 0.5, 0.0, 0.5 )
+		entry.entry.highlightedTextColour = Colour3f( 1.0, 0.75, 1.0 )
 		entry.keyHandler = self
 		entry.attachCell( self.treeNode.cells.targetName )
 		entry.finishSignal.connect( self._p_onEntryFinish )
@@ -74,7 +75,7 @@ class CVUnboundRef (CVExpression):
 
 	def _p_onEntryFinish(self, entry, text, bUserEvent):
 		if text == '':
-			self.deleteNode( False, None )
+			self.deleteNode( MoveFocus.RIGHT )
 		else:
 			if bUserEvent:
 				self.cursorRight()

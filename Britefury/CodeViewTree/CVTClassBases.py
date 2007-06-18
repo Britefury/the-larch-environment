@@ -9,6 +9,7 @@ from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
 from Britefury.CodeGraph.CGClass import CGClass
+from Britefury.CodeGraph.CGNullExpression import CGNullExpression
 
 from Britefury.CodeViewTree.CVTStatement import CVTStatement
 

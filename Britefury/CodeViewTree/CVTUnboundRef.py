@@ -41,5 +41,5 @@ class CVTUnboundRef (CVTExpression):
 
 
 
-	def wrapInLocalAssignment(self):
+	def wrapInAssignment(self):
 		return cvto_wrapInAssignment( self )

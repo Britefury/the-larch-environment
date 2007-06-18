@@ -8,21 +8,21 @@
 from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
-from Britefury.CodeGraph.CGLocalAssignment import CGLocalAssignment
+from Britefury.CodeGraph.CGAssignment import CGAssignment
 
 from Britefury.CodeViewTree.CVTNode import CVTNode
 
 
 
-class CVTLocalAssignment (CVTNode):
-	graphNodeClass = CGLocalAssignment
+class CVTAssignment (CVTNode):
+	graphNodeClass = CGAssignment
 
-	graphNode = SheetRefField( CGLocalAssignment )
+	graphNode = SheetRefField( CGAssignment )
 
 
 	@FunctionRefField
-	def varRefNode(self):
-		return self._tree.buildNode( self.graphNode.varRef[0].node )
+	def targetRefNode(self):
+		return self._tree.buildNode( self.graphNode.targetRef[0].node )
 
 	@FunctionRefField
 	def valueNode(self):
@@ -31,7 +31,7 @@ class CVTLocalAssignment (CVTNode):
 
 
 	def removeAssignment(self):
-		varRefCG = self.graphNode.varRef[0].node
+		targetRefCG = self.graphNode.targetRef[0].node
 
 		valueCGSource = self.graphNode.value[0]
 

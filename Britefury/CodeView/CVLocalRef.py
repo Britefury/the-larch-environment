@@ -17,8 +17,9 @@ from Britefury.SheetGraph.SheetGraph import *
 from Britefury.CodeViewTree.CVTLocalRef import CVTLocalRef
 
 from Britefury.CodeView.CVExpression import *
+from Britefury.CodeView.MoveFocus import *
 
-from Britefury.CodeViewBehavior.CVBVarRefBehavior import *
+from Britefury.CodeViewBehavior.CVBWrapInAssignmentBehavior import *
 
 from Britefury.DocView.Toolkit.DTBox import DTBox
 from Britefury.DocView.Toolkit.DTLabel import DTLabel
@@ -34,7 +35,7 @@ class CVLocalRef (CVExpression):
 	treeNode = SheetRefField( CVTLocalRef )
 
 
-	behaviors = [ CVBVarRefBehavior() ]
+	behaviors = [ CVBWrapInAssignmentBehavior() ]
 
 
 	@FunctionRefField
@@ -71,7 +72,7 @@ class CVLocalRef (CVExpression):
 
 	def _p_onEntryFinish(self, entry, text, bUserEvent):
 		if text == '':
-			self.deleteNode( False, None )
+			self.deleteNode( MoveFocus.RIGHT )
 		else:
 			if bUserEvent:
 				self.cursorRight()

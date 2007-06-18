@@ -7,6 +7,8 @@
 ##-*************************
 from Britefury.DocView.Toolkit.DTEntry import *
 
+from Britefury.CodeView.MoveFocus import MoveFocus
+
 from Britefury.CodeViewBehavior.CodeViewBehavior import *
 
 
@@ -17,7 +19,7 @@ class CVBDeleteNodeBehavior (CodeViewBehavior):
 			if widget.text != '':
 				return True
 		viewNode._f_commandHistoryFreeze()
-		viewNode.deleteNode( True, widget )
+		viewNode.deleteNode( MoveFocus.LEFT )
 		viewNode._f_commandHistoryThaw()
 		return True
 
@@ -28,7 +30,7 @@ class CVBDeleteNodeBehavior (CodeViewBehavior):
 			if widget.text != '':
 				return True
 		viewNode._f_commandHistoryFreeze()
-		viewNode.deleteNode( False, widget )
+		viewNode.deleteNode( MoveFocus.RIGHT )
 		viewNode._f_commandHistoryThaw()
 		return True
 

@@ -8,11 +8,11 @@
 from Britefury.CodeViewBehavior.CodeViewBehavior import *
 
 
-class CVBVarRefBehavior (CodeViewBehavior):
+class CVBWrapInAssignmentBehavior (CodeViewBehavior):
 	@CVBCharInputHandlerMethod( '=' )
-	def _setValue(self, viewNode, receivingNodePath, widget, event):
+	def _wrapInAssignment(self, viewNode, receivingNodePath, widget, event):
 		viewNode._f_commandHistoryFreeze()
-		localAssignCVT = viewNode.treeNode.wrapInLocalAssignment()
+		localAssignCVT = viewNode.treeNode.wrapInAssignment()
 		viewNode._view.refresh()
 		localAssignCV = viewNode._view.getViewNodeForTreeNode( localAssignCVT )
 		localAssignCV.startEditingValue()

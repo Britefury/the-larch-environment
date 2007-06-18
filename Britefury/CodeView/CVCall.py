@@ -94,18 +94,15 @@ class CVCall (CVExpression):
 		self._messageNameEntry = None
 
 
-	def deleteChild(self, child):
+	def deleteChild(self, child, moveFocus):
 		if child is self.argumentsNode:
+			self.targetObjectNode.makeCurrent()
 			self.treeNode.unwrapCall()
 			self._view.refresh()
-			return True
 		elif child is self.targetObjectNode:
 			self.targetObjectNode.treeNode.replaceWithNullExpression()
 			self._view.refresh()
 			self.targetObjectNode.startEditing()
-			return False
-		else:
-			return False
 
 
 	def startEditingArguments(self):
