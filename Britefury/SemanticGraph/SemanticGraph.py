@@ -62,6 +62,7 @@ class SemanticGraphNode (SheetGraphNode):
 
 	def destroySubtree(self):
 		self._p_destroyChildren()
+		self.destroy()
 
 
 	def _p_destroyChildren(self):

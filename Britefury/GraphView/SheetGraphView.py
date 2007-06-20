@@ -210,8 +210,8 @@ def _computeLinkCurveControlPoints(fromOut, toIn):
 	dy3 = -dy2
 
 	# Compute the control points p2 and p3
-	p2 = p1 + Vector2( dx, dy2 )
-	p3 = p4 + Vector2( -dx, dy3 )
+	p2 = p1 + Vector2( -dx, dy2 )
+	p3 = p4 + Vector2( dx, dy3 )
 
 	return p1, p2, p3, p4
 
@@ -795,55 +795,10 @@ class SheetGraphViewNode (_SheetGraphViewWidget):
 			assert self.rect is not None
 
 			context.save()
-
 			context.translate( self.rect.position.x, self.rect.position.y )
 
 			context.new_path()
 			context.set_line_width( 1.0 )
-			self._p_setPinColour( context )
-			context.arc( 0.0, self.rect.size.y * 0.5, PIN_CIRCLE_RADIUS, math.pi * 1.5, math.pi * 2.5 )
-			context.fill_preserve()
-			context.set_source_rgb( 0.2, 0.2, 0.2 )
-			context.stroke()
-
-			# Set the name font
-			context.select_font_face( 'Sans', cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL )
-			context.set_font_size( PIN_FONT_SIZE )
-
-			# Get the text extents
-			xBearing, yBearing, width, height, xAdvance, yAdvance = textExtents( context, self._name )
-
-			# Compute the position
-			nameX = PIN_CIRCLE_RADIUS + PIN_NAME_XOFFSET - xBearing
-			nameY = self.rect.size.y * 0.5 - ( height/2 + yBearing )
-
-			# Draw
-			self._p_setPinNameColour( context )
-			context.move_to( nameX, nameY )
-			showText( context, self._name )
-
-			context.restore()
-
-
-		def _p_getConnectionPoint(self):
-			if self.rect is not None:
-				size = self.rect.size
-			else:
-				size = Vector2()
-			return self._p_getRootPosition()  +  Vector2( 0.0, size.y * 0.5 )
-
-
-
-
-
-	class _SourceView (_PinView):
-		def _p_draw(self, context):
-			assert self.rect is not None
-
-			context.save()
-			context.translate( self.rect.position.x, self.rect.position.y )
-
-			context.new_path()
 			self._p_setPinColour( context )
 			context.arc( self.rect.size.x, self.rect.size.y * 0.5, PIN_CIRCLE_RADIUS, math.pi * 0.5, math.pi * 1.5 )
 			context.fill_preserve()
@@ -859,6 +814,50 @@ class SheetGraphViewNode (_SheetGraphViewWidget):
 
 			# Compute the position
 			nameX = self.rect.size.x - PIN_CIRCLE_RADIUS - PIN_NAME_XOFFSET - width - xBearing
+			nameY = self.rect.size.y * 0.5 - ( height/2 + yBearing )
+
+			# Draw
+			self._p_setPinNameColour( context )
+			context.move_to( nameX, nameY )
+			showText( context, self._name )
+
+			context.restore()
+
+
+		def _p_getConnectionPoint(self):
+			if self.rect is not None:
+				size = self.rect.size
+			else:
+				size = Vector2()
+			return self._p_getRootPosition()  +  Vector2( size.x, size.y * 0.5 )
+
+
+
+
+
+	class _SourceView (_PinView):
+		def _p_draw(self, context):
+			assert self.rect is not None
+
+			context.save()
+			context.translate( self.rect.position.x, self.rect.position.y )
+
+			context.new_path()
+			self._p_setPinColour( context )
+			context.arc( 0.0, self.rect.size.y * 0.5, PIN_CIRCLE_RADIUS, math.pi * 1.5, math.pi * 2.5 )
+			context.fill_preserve()
+			context.set_source_rgb( 0.2, 0.2, 0.2 )
+			context.stroke()
+
+			# Set the name font
+			context.select_font_face( 'Sans', cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL )
+			context.set_font_size( PIN_FONT_SIZE )
+
+			# Get the text extents
+			xBearing, yBearing, width, height, xAdvance, yAdvance = textExtents( context, self._name )
+
+			# Compute the position
+			nameX = PIN_CIRCLE_RADIUS + PIN_NAME_XOFFSET - xBearing
 			nameY = self.rect.size.y * 0.5 - ( height/2 + yBearing )
 
 			# Draw
@@ -878,7 +877,7 @@ class SheetGraphViewNode (_SheetGraphViewWidget):
 				size = self.rect.size
 			else:
 				size = Vector2()
-			return self._p_getRootPosition()  +  Vector2( size.x, size.y * 0.5 )
+			return self._p_getRootPosition()  +  Vector2( 0.0, size.y * 0.5 )
 
 
 
@@ -1007,14 +1006,14 @@ class SheetGraphViewNode (_SheetGraphViewWidget):
 
 	class _SinkListView (PinListView):
 		def __init__(self, nodeView, graphView):
-			super( SheetGraphViewNode._SinkListView, self ).__init__( nodeView, graphView, SheetGraphViewNode._SinkView, SheetGraphViewNode.PinListView.JUSTIFY_LEFT )
+			super( SheetGraphViewNode._SinkListView, self ).__init__( nodeView, graphView, SheetGraphViewNode._SinkView, SheetGraphViewNode.PinListView.JUSTIFY_RIGHT )
 
 
 
 
 	class _SourceListView (PinListView):
 		def __init__(self, nodeView, graphView):
-			super( SheetGraphViewNode._SourceListView, self ).__init__( nodeView, graphView, SheetGraphViewNode._SourceView, SheetGraphViewNode.PinListView.JUSTIFY_RIGHT )
+			super( SheetGraphViewNode._SourceListView, self ).__init__( nodeView, graphView, SheetGraphViewNode._SourceView, SheetGraphViewNode.PinListView.JUSTIFY_LEFT )
 
 
 
@@ -1312,8 +1311,8 @@ class SheetGraphViewNode (_SheetGraphViewWidget):
 		sinkHeight = self._sinkViews._requisition.y
 		sourceWidth = min( size.x, self._sourceViews._requisition.x )
 		sourceHeight = self._sourceViews._requisition.y
-		self._sinkViews._p_allocate( _SheetGraphViewRectangle( Point2( 0.0, NODE_TITLEBAR_HEIGHT ), Vector2( sinkWidth, sinkHeight ) ) )
-		self._sourceViews._p_allocate( _SheetGraphViewRectangle( Point2( size.x - sourceWidth, NODE_TITLEBAR_HEIGHT + self._sinkViews._requisition.y ), Vector2( sourceWidth, sourceHeight ) ) )
+		self._sinkViews._p_allocate( _SheetGraphViewRectangle( Point2( size.x - sinkWidth, NODE_TITLEBAR_HEIGHT ), Vector2( sinkWidth, sinkHeight ) ) )
+		self._sourceViews._p_allocate( _SheetGraphViewRectangle( Point2( 0.0, NODE_TITLEBAR_HEIGHT + self._sinkViews._requisition.y ), Vector2( sourceWidth, sourceHeight ) ) )
 
 
 
@@ -2198,9 +2197,10 @@ class SheetGraphView (_SheetGraphViewWidgetContainer, gtk.DrawingArea):
 			self._bRefreshQueued = True
 
 	def _p_refresh(self):
-		self._p_refreshNodeViews( self.window.cairo_create() )
-		self._p_refreshLinks()
-		self._bRefreshQueued = False
+		if self._graph is not None:
+			self._p_refreshNodeViews( self.window.cairo_create() )
+			self._p_refreshLinks()
+			self._bRefreshQueued = False
 
 
 
