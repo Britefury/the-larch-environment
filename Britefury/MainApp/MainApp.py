@@ -36,35 +36,38 @@ from Britefury.CodeViewTree.CodeViewTree import CodeViewTree
 from Britefury.CodeView.CodeView import CodeView
 
 from Britefury.GraphView.SheetGraphView import SheetGraphView
+from Britefury.GraphView.SheetGraphViewDisplayTable import SheetGraphViewDisplayTable
+from Britefury.GraphView.SheetGraphViewLayout import SheetGraphViewLayout
 
 
 
 
 class MainApp (object):
-	def __init__(self, graph, rootNode, bBuildGraphView):
+	def __init__(self, graph, rootNode):
 		self._graph = None
 		self._graphRoot = None
 		self._tree = None
 		self._view = None
 		self._viewRoot = None
-		self._bBuildGraphView = bBuildGraphView
 		self._commandHistory = None
 		self._bUnsavedData = False
+
+		self._graphView = None
+		self._graphViewDisplayTable = None
+		self._graphViewLayout = None
+		self._graphViewWindow = None
+
 
 		self._doc = DTDocument()
 		self._doc.show()
 
-		if self._bBuildGraphView:
-			self._graphView = SheetGraphView( self._p_graphViewCreateLink, self._p_graphViewEraseLink )
-			self._graphView.show()
 
 		self.setGraph( graph, rootNode )
 
 
-		if self._bBuildGraphView:
-			showGraphViewButton = gtk.Button( 'Show graph view' )
-			showGraphViewButton.show()
-			showGraphViewButton.connect( 'clicked', self._p_onShowGraphView )
+		showGraphViewButton = gtk.Button( 'Show graph view' )
+		showGraphViewButton.show()
+		showGraphViewButton.connect( 'clicked', self._p_onShowGraphView )
 
 
 		oneToOneButton = gtk.Button( '1:1' )
@@ -86,8 +89,7 @@ class MainApp (object):
 		buttonBox.pack_end( executeDebugButton, False, False, 0 )
 		buttonBox.pack_end( executeButton, False, False, 0 )
 		buttonBox.pack_end( oneToOneButton, False, False, 0 )
-		if bBuildGraphView:
-			buttonBox.pack_end( showGraphViewButton, False, False, 0 )
+		buttonBox.pack_end( showGraphViewButton, False, False, 0 )
 		buttonBox.show()
 
 
@@ -152,17 +154,6 @@ class MainApp (object):
 
 
 
-		# Graph window
-		if self._bBuildGraphView:
-			self._graphViewWindow = gtk.Window( gtk.WINDOW_TOPLEVEL );
-			self._graphViewWindow.connect( 'delete-event', self._p_onGraphViewDeleteEvent )
-			self._graphViewWindow.set_border_width( 10 )
-			self._graphViewWindow.set_size_request( 800, 600 )
-
-
-
-			self._graphViewWindow.add( graphView )
-
 
 
 
@@ -190,9 +181,6 @@ class MainApp (object):
 		self._doc.child = self._viewRoot.widget
 		self._view.setDocument( self._doc )
 
-		if self._bBuildGraphView:
-			graphViewDisplayTable = SheetGraphViewDisplayTable()
-			self._graphView.attachGraph( self._graph, graphViewDisplayTable )
 
 
 
@@ -225,7 +213,40 @@ class MainApp (object):
 
 
 	def _p_onShowGraphView(self, widget):
-		self._graphViewWindow.show()
+		if self._graphView is None:
+			self._graphViewDisplayTable = SheetGraphViewDisplayTable()
+
+			self._graphView = SheetGraphView( self._p_graphViewCreateLink, self._p_graphViewEraseLink )
+			self._graphView.attachGraph( self._graph, self._graphViewDisplayTable )
+			self._graphView.show()
+
+			self._graphViewLayout = SheetGraphViewLayout()
+			self._graphViewLayout.attachGraph( self._graph, self._graphView, self._graphViewDisplayTable )
+
+			self._graphViewWindow = gtk.Window( gtk.WINDOW_TOPLEVEL );
+			self._graphViewWindow.connect( 'delete-event', self._p_onGraphViewDeleteEvent )
+			self._graphViewWindow.set_border_width( 10 )
+			self._graphViewWindow.set_size_request( 800, 600 )
+
+			self._graphViewWindow.add( self._graphView )
+
+			self._graphViewWindow.show()
+
+
+	def _p_onGraphViewDeleteEvent(self, widget, event, data=None):
+		self._graphViewLayout.detachGraph()
+		self._graphView.detachGraph()
+
+		self._graphViewWindow.destroy()
+
+		self._graphViewWindow = None
+		self._graphViewLayout = None
+		self._graphView = None
+		self._graphViewDisplayTable = None
+
+		return True
+
+
 
 
 	def _p_onCommandHistoryChanged(self, commandHistory):
@@ -343,11 +364,6 @@ class MainApp (object):
 	def _p_onDestroy(self, widget, data=None):
 		gtk.main_quit()
 
-
-
-	def _p_onGraphViewDeleteEvent(self, widget, event, data=None):
-		self._graphViewWindow.hide()
-		return True
 
 
 

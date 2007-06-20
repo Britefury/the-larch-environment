@@ -1013,11 +1013,15 @@ class SheetGraphNode (Sheet):
 	def _p_getInputNodes(self):
 		return self._inputNodes
 
+	def _p_getOutputNodes(self):
+		return self._outputNodes
+
 
 	sinks = property( _p_getSinks )
 	sources = property( _p_getSources )
 	graph = property( _p_getGraph )
 	inputNodes = property( _p_getInputNodes )
+	outputNodes = property( _p_getOutputNodes )
 
 
 

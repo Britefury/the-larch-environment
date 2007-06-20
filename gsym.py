@@ -28,10 +28,6 @@ if __name__ == '__main__':
 
 	i18n.initialise()
 
-	bBuildGraphView = '--with-graph-view'  in  sys.argv
-
-
-
 	graph = SheetGraph()
 
 	# main module
@@ -44,6 +40,6 @@ if __name__ == '__main__':
 	# connect module -> block
 	mainModule.block.append( mainBlock.parent )
 
-	app = MainApp( graph, mainModule, bBuildGraphView )
+	app = MainApp( graph, mainModule )
 
 	gtk.main()
