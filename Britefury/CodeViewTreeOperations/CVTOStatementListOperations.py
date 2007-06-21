@@ -9,6 +9,7 @@ from Britefury.CodeGraph.CGReturn import *
 from Britefury.CodeGraph.CGNullExpression import *
 from Britefury.CodeGraph.CGVar import *
 from Britefury.CodeGraph.CGLocalVarDeclaration import *
+from Britefury.CodeGraph.CGWhile import *
 from Britefury.CodeGraph.CGDef import *
 from Britefury.CodeGraph.CGParameters import *
 from Britefury.CodeGraph.CGBlock import *
@@ -23,7 +24,7 @@ def cvto_addReturnStatement(treeNode, position):
 	treeNode.graph.nodes.append( nullExp )
 	rtn.value.append( nullExp.parent )
 	treeNode.graphNode.statements.insert( position, rtn.parent )
-	return treeNode.statementNodes[position ]
+	return treeNode.statementNodes[position]
 
 
 
@@ -35,7 +36,22 @@ def cvto_addLocalVarStatement(treeNode, position):
 	treeNode.graph.nodes.append( decl )
 	decl.variable.append( var.declaration )
 	treeNode.graphNode.statements.insert( position, decl.parent )
-	return treeNode.statementNodes[position ]
+	return treeNode.statementNodes[position]
+
+
+
+
+def cvto_addWhileStatement(treeNode, position):
+	whileStmt = CGWhile()
+	nullExp = CGNullExpression()
+	block = CGBlock()
+	treeNode.graph.nodes.append( whileStmt )
+	treeNode.graph.nodes.append( nullExp )
+	treeNode.graph.nodes.append( block )
+	whileStmt.whileExpr.append( nullExp.parent )
+	whileStmt.block.append( block.parent )
+	treeNode.graphNode.statements.insert( position, whileStmt.parent )
+	return treeNode.statementNodes[position]
 
 
 
@@ -53,7 +69,7 @@ def cvto_addDefStatement(treeNode, position):
 	defStmt.parameters.append( params.parent )
 	defStmt.block.append( block.parent )
 	treeNode.graphNode.statements.insert( position, defStmt.parent )
-	return treeNode.statementNodes[position ]
+	return treeNode.statementNodes[position]
 
 
 
@@ -68,4 +84,4 @@ def cvto_addClassStatement(treeNode, position):
 	classStmt.declVar.append( declVar.declaration )
 	classStmt.block.append( block.parent )
 	treeNode.graphNode.statements.insert( position, classStmt.parent )
-	return treeNode.statementNodes[position ]
+	return treeNode.statementNodes[position]

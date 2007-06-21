@@ -49,6 +49,17 @@ class CVBCreateExpressionBehavior (CodeViewBehavior):
 		return True
 
 
+	@CVBAccelInputHandlerMethod( '<alt>n' )
+	def _replaceWithNot(self, viewNode, receivingNodePath, widget, event):
+		viewNode._f_commandHistoryFreeze()
+		notCVT = cvto_insertNot( viewNode.treeNode, [ node.treeNode  for node in receivingNodePath ] )
+		viewNode._view.refresh()
+		notCV = viewNode._view.getViewNodeForTreeNode( notCVT )
+		notCV.startEditingExpression()
+		viewNode._f_commandHistoryThaw()
+		return True
+
+
 	@CVBAccelInputHandlerMethod( '<alt>l' )
 	def _replaceWithLambda(self, viewNode, receivingNodePath, widget, event):
 		viewNode._f_commandHistoryFreeze()

@@ -9,6 +9,8 @@ import pygtk
 pygtk.require( '2.0' )
 import gtk
 
+from Britefury.Math.Math import Colour3f
+
 from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
@@ -93,7 +95,7 @@ class CVLocalVarDeclaration (CVStatement):
 	def __init__(self, treeNode, view):
 		super( CVLocalVarDeclaration, self ).__init__( treeNode, view )
 		self._box = DTBox( spacing=10.0 )
-		self._box.append( DTLabel( 'var', font='Sans bold 11' ) )
+		self._box.append( DTLabel( markup='V<span size="small">AR</span>', font='Sans bold 11', colour=Colour3f( 0.0, 0.5, 0.0 ) ) )
 		self._box.append( DTLabel( 'nil' ) )
 		self.widget.child = self._box
 

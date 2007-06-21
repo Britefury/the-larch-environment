@@ -65,11 +65,6 @@ class MainApp (object):
 		self.setGraph( graph, rootNode )
 
 
-		showGraphViewButton = gtk.Button( 'Show graph view' )
-		showGraphViewButton.show()
-		showGraphViewButton.connect( 'clicked', self._p_onShowGraphView )
-
-
 		oneToOneButton = gtk.Button( '1:1' )
 		oneToOneButton.show()
 		oneToOneButton.connect( 'clicked', self._p_onOneToOne )
@@ -89,7 +84,6 @@ class MainApp (object):
 		buttonBox.pack_end( executeDebugButton, False, False, 0 )
 		buttonBox.pack_end( executeButton, False, False, 0 )
 		buttonBox.pack_end( oneToOneButton, False, False, 0 )
-		buttonBox.pack_end( showGraphViewButton, False, False, 0 )
 		buttonBox.show()
 
 
@@ -120,16 +114,27 @@ class MainApp (object):
 		editMenu.append( redoItem )
 
 
+		graphViewItem = gtk.MenuItem( 'Show graph view' )
+		graphViewItem.connect( 'activate', self._p_onShowGraphView )
+
+		debugMenu = gtk.Menu()
+		debugMenu.append( graphViewItem )
+
+
 		fileMenuItem = gtk.MenuItem( 'File' )
 		fileMenuItem.set_submenu( fileMenu )
 
 		editMenuItem = gtk.MenuItem( 'Edit' )
 		editMenuItem.set_submenu( editMenu )
 
+		debugMenuItem = gtk.MenuItem( 'Debug' )
+		debugMenuItem.set_submenu( debugMenu )
+
 
 		menuBar = gtk.MenuBar()
 		menuBar.append( fileMenuItem )
 		menuBar.append( editMenuItem )
+		menuBar.append( debugMenuItem )
 		menuBar.show_all()
 
 
