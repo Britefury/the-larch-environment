@@ -5,28 +5,17 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
-import CodeView
-import CVArguments
-import CVAttrName
-import CVBlockStatements
-import CVCall
-import CVClass
-import CVClassBases
-import CVDef
-import CVExpression
-import CVGetAttr
-import CVIntLiteral
-import CVLambda
-import CVAssignment
-import CVLocalRef
-import CVLocalVarDeclaration
-import CVModule
-import CVNot
-import CVNullExpression
-import CVParameters
-import CVReturn
-import CVStatement
-import CVStringLiteral
-import CVUnboundRef
-import CVVar
-import CVWhile
+from Britefury.CodeGraph.CGExpression import CGExpression
+from Britefury.Sheet.Sheet import *
+from Britefury.SemanticGraph.SemanticGraph import *
+
+
+
+class CGNot (CGExpression):
+	expr = SemanticGraphSinkSingleSubtreeField( 'Expression', 'Expression that evaluates to a boolean to invert' )
+
+
+
+
+	def generatePyCode(self):
+		return 'not ' + self.expr[0].node.generatePyCode()

@@ -18,6 +18,7 @@ from Britefury.CodeView.CVBorderNode import *
 
 from Britefury.CodeViewBehavior.CVBWrapInCallBehavior import *
 from Britefury.CodeViewBehavior.CVBWrapInGetAttrBehavior import *
+from Britefury.CodeViewBehavior.CVBWrapInNotBehavior import *
 
 
 
@@ -28,7 +29,7 @@ class CVExpression (CVBorderNode):
 	treeNode = SheetRefField( CVTExpression )
 
 
-	behaviors = [ CVBWrapInCallBehavior(), CVBWrapInGetAttrBehavior() ]
+	behaviors = [ CVBWrapInCallBehavior(), CVBWrapInGetAttrBehavior(), CVBWrapInNotBehavior()  ]
 
 
 
@@ -45,3 +46,9 @@ class CVExpression (CVBorderNode):
 		getAttrCV = self._view.getViewNodeForTreeNode( getAttrCVT )
 		getAttrCV.startEditingAttrName()
 
+
+	def wrapInNot(self):
+		notCVT = self.treeNode.wrapInNot()
+		self._view.refresh()
+		notCV = self._view.getViewNodeForTreeNode( notCVT )
+		notCV.startEditingAttrName()

@@ -21,6 +21,7 @@ import CVTAssignment
 import CVTLocalRef
 import CVTLocalVarDeclaration
 import CVTModule
+import CVTNot
 import CVTNullExpression
 import CVTParameters
 import CVTReturn
@@ -28,3 +29,4 @@ import CVTStatement
 import CVTStringLiteral
 import CVTUnboundRef
 import CVTVar
+import CVTWhile

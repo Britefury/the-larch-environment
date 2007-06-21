@@ -8,6 +8,7 @@
 from Britefury.CodeGraph.CGStringLiteral import *
 from Britefury.CodeGraph.CGIntLiteral import *
 from Britefury.CodeGraph.CGUnboundRef import *
+from Britefury.CodeGraph.CGNot import *
 from Britefury.CodeGraph.CGLambda import *
 from Britefury.CodeGraph.CGParameters import *
 from Britefury.CodeGraph.CGNullExpression import *
@@ -32,6 +33,19 @@ def cvto_insertUnboundRef(treeNode, treeNodePath):
 	ref = CGUnboundRef()
 	treeNode.graph.nodes.append( ref )
 	return treeNode.insertNode( ref, treeNodePath )
+
+
+
+def cvto_insertNot(treeNode, treeNodePath):
+	lambdaNode = CGNot()
+	treeNode.graph.nodes.append( lambdaNode )
+
+	nullExpression = CGNullExpression()
+	treeNode.graph.nodes.append( nullExpression )
+
+	lambdaNode.expr.append( nullExpression.parent )
+
+	return treeNode.insertNode( lambdaNode, treeNodePath )
 
 
 
