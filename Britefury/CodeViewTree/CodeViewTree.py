@@ -9,8 +9,89 @@ from weakref import WeakKeyDictionary
 
 
 
+
+
+class CVTRuleTable (object):
+	def __init__(self):
+		super( CVTRuleTable, self ).__init__()
+		self._graphNodeClassToRule = {}
+
+
+	def registerRule(self, rule, priority=0):
+		if rule.graphNodeClass is None:
+			raise ValueError, 'rule %s does not have a graph node class' % ( rule.__name__, )
+
+		try:
+			rules = self._graphNodeClassToRule[rule.graphNodeClass]
+		except KeyError:
+			rules = []
+			self._graphNodeClassToRule[rule.graphNodeClass] = rules
+
+		rules.append( ( rule, priority ) )
+		rules.sort( key=lambda x: x[1] )
+
+
+	def getRuleForGraphNode(self, graphNode):
+		try:
+			rules = self._graphNodeClassToRule[graphNode.__class__ ]
+		except KeyError:
+			return None
+
+		for rule, priority in rules:
+			if rule.isApplicableTo( graphNode ):
+				return rule
+
+		return None
+
+
+
+
+
+
+
+class CVTRule (object):
+	graphNodeClass = None
+
+
+	@classmethod
+	def isApplicableTo(cls, graphNode):
+		return False
+
+
+	@classmethod
+	def buildCVT(cls, tree, graphNode):
+		raise ValueError, 'rule not applicable'
+
+
+	@classmethod
+	def register(cls, priority=0):
+		CodeViewTree.registerRule( cls, priority )
+
+
+
+
+class CVTRuleSimple (CVTRule):
+	graphNodeClass = None
+	cvtNodeClass = None
+
+
+	@classmethod
+	def isApplicableTo(cls, graphNode):
+		return True
+
+
+	@classmethod
+	def buildCVT(cls, tree, graphNode):
+		node = cls.cvtNodeClass( graphNode, tree )
+		return node
+
+
+
+
+
 class CodeViewTree (object):
-	_nodeClassTable = {}
+	_ruleTable = CVTRuleTable()
+
 
 	def __init__(self, graph, rootGraphNode):
 		super( CodeViewTree, self ).__init__()
@@ -21,17 +102,15 @@ class CodeViewTree (object):
 
 
 
-	def buildNode(self, graphNode, nodeClass=None):
+	def buildNode(self, graphNode, rule=None):
 		if graphNode is None:
 			return None
 		else:
-			graphNodeClass = graphNode.__class__
+			if rule is None:
+				rule = self._ruleTable.getRuleForGraphNode( graphNode )
 
-			if nodeClass is None:
-				try:
-					nodeClass = self._nodeClassTable[graphNodeClass]
-				except KeyError:
-					raise TypeError, 'could not get tree node class for graph node class %s'  %  ( graphNodeClass.__name__, )
+				if rule is None:
+					raise ValueError, 'could not getrule for graph node %s'  %  ( graphNode, )
 
 			try:
 				subTable = self._nodeTable[graphNode]
@@ -40,12 +119,19 @@ class CodeViewTree (object):
 				self._nodeTable[graphNode] = subTable
 
 			try:
-				treeNode = subTable[nodeClass]
+				treeNode = subTable[rule]
 			except KeyError:
-				treeNode = nodeClass( graphNode, self )
-				subTable[nodeClass] = treeNode
+				treeNode = rule.buildCVT( self, graphNode )
+				subTable[rule] = treeNode
 
 			return treeNode
+
+
+
+	@classmethod
+	def registerRule(cls, rule, priority=0):
+		cls._ruleTable.registerRule( rule, priority )
+
 
 
 	def getGraph(self):

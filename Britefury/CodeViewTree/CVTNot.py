@@ -12,15 +12,13 @@ from Britefury.CodeGraph.CGNot import CGNot
 
 from Britefury.CodeViewTree.CVTExpression import CVTExpression
 from Britefury.CodeViewTree.CVTAttrName import CVTAttrName
+from Britefury.CodeViewTree.CodeViewTree import *
 
 from Britefury.CodeViewTreeOperations.CVTOWrapInAssignment import cvto_wrapInAssignment
 
 
 
 class CVTNot (CVTExpression):
-	graphNodeClass = CGNot
-
-
 	graphNode = SheetRefField( CGNot )
 
 
@@ -43,4 +41,13 @@ class CVTNot (CVTExpression):
 		parentCGSink.replace( self.graphNode.parent, exprSource )
 
 		self.graphNode.destroySubtree()
+
+
+
+
+class CVTRuleNot (CVTRuleSimple):
+	graphNodeClass = CGNot
+	cvtNodeClass = CVTNot
+
+CVTRuleNot.register()
 

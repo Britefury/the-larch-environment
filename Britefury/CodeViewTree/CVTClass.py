@@ -11,14 +11,12 @@ from Britefury.SheetGraph.SheetGraph import *
 from Britefury.CodeGraph.CGClass import CGClass
 
 from Britefury.CodeViewTree.CVTStatement import CVTStatement
-from Britefury.CodeViewTree.CVTClassBases import CVTClassBases
+from Britefury.CodeViewTree.CVTClassBases import *
+from Britefury.CodeViewTree.CodeViewTree import *
 
 
 
 class CVTClass (CVTStatement):
-	graphNodeClass = CGClass
-
-
 	graphNode = SheetRefField( CGClass )
 
 
@@ -31,10 +29,17 @@ class CVTClass (CVTStatement):
 
 	@FunctionRefField
 	def basesNode(self):
-		return self._tree.buildNode( self.graphNode, CVTClassBases )
+		return self._tree.buildNode( self.graphNode, CVTRuleClassBases )
 
 	@FunctionField
 	def statementsNode(self):
 		return self._tree.buildNode( self.graphNode.block[0].node )
 
+
+
+class CVTRuleClass (CVTRuleSimple):
+	graphNodeClass = CGClass
+	cvtNodeClass = CVTClass
+
+CVTRuleClass.register()
 

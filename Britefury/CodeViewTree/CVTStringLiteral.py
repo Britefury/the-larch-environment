@@ -11,13 +11,20 @@ from Britefury.SheetGraph.SheetGraph import *
 from Britefury.CodeGraph.CGStringLiteral import CGStringLiteral
 
 from Britefury.CodeViewTree.CVTExpression import CVTExpression
+from Britefury.CodeViewTree.CodeViewTree import *
 
 
 
 class CVTStringLiteral (CVTExpression):
-	graphNodeClass = CGStringLiteral
-
-
 	graphNode = SheetRefField( CGStringLiteral )
 
 	stringValue = FieldProxy( graphNode.value )
+
+
+
+class CVTRuleStringLiteral (CVTRuleSimple):
+	graphNodeClass = CGStringLiteral
+	cvtNodeClass = CVTStringLiteral
+
+CVTRuleStringLiteral.register()
+

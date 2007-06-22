@@ -11,12 +11,11 @@ from Britefury.SheetGraph.SheetGraph import *
 from Britefury.CodeGraph.CGAssignment import CGAssignment
 
 from Britefury.CodeViewTree.CVTNode import CVTNode
+from Britefury.CodeViewTree.CodeViewTree import *
 
 
 
 class CVTAssignment (CVTNode):
-	graphNodeClass = CGAssignment
-
 	graphNode = SheetRefField( CGAssignment )
 
 
@@ -43,3 +42,13 @@ class CVTAssignment (CVTNode):
 		self.graphNode.destroySubtree()
 
 		return valueCGSource.node
+
+
+
+class CVTRuleAssignment (CVTRuleSimple):
+	graphNodeClass = CGAssignment
+	cvtNodeClass = CVTAssignment
+
+CVTRuleAssignment.register()
+
+

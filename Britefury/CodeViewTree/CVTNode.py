@@ -17,23 +17,7 @@ from Britefury.CodeGraph.CGNode import CGNode
 
 
 
-class CVTNodeClass (SheetClass):
-	def __init__(cls, clsName, clsBases, clsDict):
-		super( CVTNodeClass, cls ).__init__( clsName, clsBases, clsDict )
-
-		try:
-			graphNodeClass = clsDict['graphNodeClass']
-		except KeyError:
-			pass
-		else:
-			CodeViewTree._nodeClassTable[graphNodeClass] = cls
-
-
-
-
 class CVTNode (Sheet):
-	__metaclass__ = CVTNodeClass
-
 	graphNode = SheetRefField( CGNode )
 
 

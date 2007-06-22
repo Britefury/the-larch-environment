@@ -11,15 +11,13 @@ from Britefury.SheetGraph.SheetGraph import *
 from Britefury.CodeGraph.CGUnboundRef import CGUnboundRef
 
 from Britefury.CodeViewTree.CVTExpression import CVTExpression
+from Britefury.CodeViewTree.CodeViewTree import *
 
 from Britefury.CodeViewTreeOperations.CVTOWrapInAssignment import cvto_wrapInAssignment
 
 
 
 class CVTUnboundRef (CVTExpression):
-	graphNodeClass = CGUnboundRef
-
-
 	graphNode = SheetRefField( CGUnboundRef )
 
 	targetName = FieldProxy( graphNode.targetName )
@@ -43,3 +41,13 @@ class CVTUnboundRef (CVTExpression):
 
 	def wrapInAssignment(self):
 		return cvto_wrapInAssignment( self )
+
+
+
+
+class CVTRuleUnboundRef (CVTRuleSimple):
+	graphNodeClass = CGUnboundRef
+	cvtNodeClass = CVTUnboundRef
+
+CVTRuleUnboundRef.register()
+

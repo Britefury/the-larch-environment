@@ -11,13 +11,11 @@ from Britefury.SheetGraph.SheetGraph import *
 from Britefury.CodeGraph.CGCall import CGCall
 
 from Britefury.CodeViewTree.CVTExpression import CVTExpression
+from Britefury.CodeViewTree.CodeViewTree import *
 
 
 
 class CVTCall (CVTExpression):
-	graphNodeClass = CGCall
-
-
 	graphNode = SheetRefField( CGCall )
 
 
@@ -46,3 +44,12 @@ class CVTCall (CVTExpression):
 		parentCGSink.replace( self.graphNode.parent, targetObjectSource )
 
 		self.graphNode.destroySubtree()
+
+
+
+class CVTRuleCall (CVTRuleSimple):
+	graphNodeClass = CGCall
+	cvtNodeClass = CVTCall
+
+CVTRuleCall.register()
+
