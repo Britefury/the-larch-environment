@@ -10,6 +10,7 @@ from Britefury.SheetGraph.SheetGraph import *
 
 from Britefury.CodeGraph.CGCall import CGCall
 
+from Britefury.CodeViewTree.CVTNode import *
 from Britefury.CodeViewTree.CVTExpression import CVTExpression
 from Britefury.CodeViewTree.CodeViewTree import *
 
@@ -20,18 +21,8 @@ class CVTCall (CVTExpression):
 
 
 
-	@FunctionRefField
-	def targetObjectNode(self):
-		if len( self.graphNode.targetObject ) > 0:
-			return self._tree.buildNode( self.graphNode.targetObject[0].node )
-		else:
-			return None
-
-
-	@FunctionRefField
-	def argumentsNode(self):
-		return self._tree.buildNode( self.graphNode.arguments[0].node )
-
+	targetObjectNode = CVTSimpleSinkProductionSingleField( CGCall.targetObject )
+	argumentsNode = CVTSimpleSinkProductionSingleField( CGCall.arguments )
 
 
 

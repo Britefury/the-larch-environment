@@ -10,7 +10,7 @@ from Britefury.SheetGraph.SheetGraph import *
 
 from Britefury.CodeGraph.CGAssignment import CGAssignment
 
-from Britefury.CodeViewTree.CVTNode import CVTNode
+from Britefury.CodeViewTree.CVTNode import *
 from Britefury.CodeViewTree.CodeViewTree import *
 
 
@@ -19,13 +19,8 @@ class CVTAssignment (CVTNode):
 	graphNode = SheetRefField( CGAssignment )
 
 
-	@FunctionRefField
-	def targetRefNode(self):
-		return self._tree.buildNode( self.graphNode.targetRef[0].node )
-
-	@FunctionRefField
-	def valueNode(self):
-		return self._tree.buildNode( self.graphNode.value[0].node )
+	targetRefNode = CVTSimpleSinkProductionSingleField( CGAssignment.targetRef )
+	valueNode = CVTSimpleSinkProductionSingleField( CGAssignment.value )
 
 
 

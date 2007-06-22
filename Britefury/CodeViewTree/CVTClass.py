@@ -10,6 +10,7 @@ from Britefury.SheetGraph.SheetGraph import *
 
 from Britefury.CodeGraph.CGClass import CGClass
 
+from Britefury.CodeViewTree.CVTNode import *
 from Britefury.CodeViewTree.CVTStatement import CVTStatement
 from Britefury.CodeViewTree.CVTClassBases import *
 from Britefury.CodeViewTree.CodeViewTree import *
@@ -20,20 +21,10 @@ class CVTClass (CVTStatement):
 	graphNode = SheetRefField( CGClass )
 
 
-	@FunctionRefField
-	def declVarNode(self):
-		if len( self.graphNode.declVar ) > 0:
-			return self._tree.buildNode( self.graphNode.declVar[0].node )
-		else:
-			return None
+	declVarNode = CVTSimpleSinkProductionSingleField( CGClass.declVar )
+	basesNode = CVTSimpleNodeProductionSingleField( CVTRuleClassBases )
+	statementsNode = CVTSimpleSinkProductionSingleField( CGClass.block )
 
-	@FunctionRefField
-	def basesNode(self):
-		return self._tree.buildNode( self.graphNode, CVTRuleClassBases )
-
-	@FunctionField
-	def statementsNode(self):
-		return self._tree.buildNode( self.graphNode.block[0].node )
 
 
 

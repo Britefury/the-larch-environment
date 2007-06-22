@@ -11,7 +11,7 @@ from Britefury.SheetGraph.SheetGraph import *
 from Britefury.CodeGraph.CGParameters import CGParameters
 from Britefury.CodeGraph.CGVar import CGVar
 
-from Britefury.CodeViewTree.CVTNode import CVTNode
+from Britefury.CodeViewTree.CVTNode import *
 from Britefury.CodeViewTree.CodeViewTree import *
 
 
@@ -20,18 +20,8 @@ class CVTParameters (CVTNode):
 	graphNode = SheetRefField( CGParameters )
 
 
-	def _paramNodes(self):
-		return [ self._tree.buildNode( paramSource.node )   for paramSource in self.graphNode.params ]
-
-	def _expandParamNode(self):
-		if len( self.graphNode.expandParam ) > 0:
-			return self._tree.buildNode( self.graphNode.expandParam[0].node )
-		else:
-			return None
-
-
-	paramNodes = FunctionField( _paramNodes )
-	expandParamNode = FunctionRefField( _expandParamNode )
+	paramNodes = CVTSimpleSinkProductionMultipleField( CGParameters.params )
+	expandParamNode = CVTSimpleSinkProductionOptionalField( CGParameters.expandParam )
 
 
 

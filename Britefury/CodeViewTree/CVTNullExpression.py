@@ -10,7 +10,7 @@ from Britefury.SheetGraph.SheetGraph import *
 
 from Britefury.CodeGraph.CGNullExpression import CGNullExpression
 
-from Britefury.CodeViewTree.CVTNode import CVTNode
+from Britefury.CodeViewTree.CVTNode import *
 from Britefury.CodeViewTree.CodeViewTree import *
 
 

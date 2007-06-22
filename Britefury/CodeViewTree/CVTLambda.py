@@ -10,6 +10,7 @@ from Britefury.SheetGraph.SheetGraph import *
 
 from Britefury.CodeGraph.CGLambda import CGLambda
 
+from Britefury.CodeViewTree.CVTNode import *
 from Britefury.CodeViewTree.CVTExpression import CVTExpression
 from Britefury.CodeViewTree.CodeViewTree import *
 
@@ -19,13 +20,9 @@ class CVTLambda (CVTExpression):
 	graphNode = SheetRefField( CGLambda )
 
 
-	@FunctionRefField
-	def paramsNode(self):
-		return self._tree.buildNode( self.graphNode.parameters[0].node )
+	paramsNode = CVTSimpleSinkProductionSingleField( CGLambda.parameters )
+	valueExprNode = CVTSimpleSinkProductionSingleField( CGLambda.valueExpr )
 
-	@FunctionRefField
-	def valueExprNode(self):
-		return self._tree.buildNode( self.graphNode.valueExpr[0].node )
 
 
 

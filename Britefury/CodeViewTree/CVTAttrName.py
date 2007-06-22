@@ -10,7 +10,7 @@ from Britefury.SheetGraph.SheetGraph import *
 
 from Britefury.CodeGraph.CGGetAttr import CGGetAttr
 
-from Britefury.CodeViewTree.CVTNode import CVTNode
+from Britefury.CodeViewTree.CVTNode import *
 from Britefury.CodeViewTree.CodeViewTree import *
 
 

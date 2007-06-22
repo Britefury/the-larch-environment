@@ -10,6 +10,7 @@ from Britefury.SheetGraph.SheetGraph import *
 
 from Britefury.CodeGraph.CGGetAttr import CGGetAttr
 
+from Britefury.CodeViewTree.CVTNode import *
 from Britefury.CodeViewTree.CVTExpression import CVTExpression
 from Britefury.CodeViewTree.CVTAttrName import *
 from Britefury.CodeViewTree.CodeViewTree import *
@@ -22,18 +23,8 @@ class CVTGetAttr (CVTExpression):
 	graphNode = SheetRefField( CGGetAttr )
 
 
-	@FunctionRefField
-	def targetObjectNode(self):
-		if len( self.graphNode.targetObject ) > 0:
-			return self._tree.buildNode( self.graphNode.targetObject[0].node )
-		else:
-			return None
-
-
-	@FunctionRefField
-	def attrNameNode(self):
-		return self._tree.buildNode( self.graphNode, CVTRuleAttrName )
-
+	targetObjectNode = CVTSimpleSinkProductionSingleField( CGGetAttr.targetObject )
+	attrNameNode = CVTSimpleNodeProductionSingleField( CVTRuleAttrName )
 
 
 

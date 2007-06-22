@@ -13,6 +13,7 @@ from Britefury.CodeGraph.CGUnboundRef import CGUnboundRef
 from Britefury.CodeGraph.CGAssignment import CGAssignment
 from Britefury.CodeGraph.CGNullExpression import CGNullExpression
 
+from Britefury.CodeViewTree.CVTNode import *
 from Britefury.CodeViewTree.CVTExpression import CVTExpression
 from Britefury.CodeViewTree.CodeViewTree import *
 
@@ -24,15 +25,17 @@ class CVTLocalRef (CVTExpression):
 	graphNode = SheetRefField( CGLocalRef )
 
 
+	varNode = CVTSimpleSinkProductionSingleField( CGLocalRef.variable )
+
+
 	@FunctionField
 	def varName(self):
-		return self.graphNode.variable[0].node.name
+		if len( self.graphNode.variable ) > 0:
+			return self.graphNode.variable[0].node.name
+		else:
+			return ''
 
 
-
-	@FunctionRefField
-	def varNode(self):
-		return self._tree.buildNode( self.graphNode.variable[0].node )
 
 
 

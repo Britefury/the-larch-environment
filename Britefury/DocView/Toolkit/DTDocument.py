@@ -74,8 +74,25 @@ class DTDocument (gtk.DrawingArea, DTBin):
 
 
 	def oneToOne(self):
+		# We want to scale about the centre of the document, not the top left corner
+		centre = self._documentSize * 0.5
+		centreInDocSpace = ( centre - self._docOffset )  *  ( 1.0 / self._docScale )
+		self._docScale = 1.0
+		newCentreInDocSpace = ( centre - self._docOffset )  *  ( 1.0 / self._docScale )
+
+		self._docOffset += ( newCentreInDocSpace - centreInDocSpace ) * self._docScale
+
+		self.childScale = self._docScale
+		self._o_queueResize()
+
+	def reset(self):
+		self._docOffset = Vector2()
 		self._docScale = 1.0
 		self.childScale = self._docScale
+		self._o_queueResize()
+
+
+
 
 
 	def _o_queueRedraw(self, localPos, localSize):

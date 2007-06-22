@@ -17,6 +17,64 @@ from Britefury.CodeGraph.CGNode import CGNode
 
 
 
+
+class CVTSimpleSinkProductionOptionalField (FunctionRefField):
+	def __init__(self, sinkField, rule=None, doc=''):
+		def _function(cvtNode):
+			pin = sinkField._f_getPinFromInstance( cvtNode.graphNode )
+			if len( pin ) > 0:
+				return cvtNode._tree.buildNode( pin[0].node, rule )
+			else:
+				return None
+		super( CVTSimpleSinkProductionOptionalField, self ).__init__( _function, doc )
+
+
+
+
+class CVTSimpleSinkProductionSingleField (FunctionRefField):
+	def __init__(self, sinkField, rule=None, doc=''):
+		def _function(cvtNode):
+			pin = sinkField._f_getPinFromInstance( cvtNode.graphNode )
+			if len( pin ) > 0:
+				return cvtNode._tree.buildNode( pin[0].node, rule )
+			else:
+				return CVTNodeInvalid( None, cvtNode._tree )
+		super( CVTSimpleSinkProductionSingleField, self ).__init__( _function, doc )
+
+
+
+
+
+class CVTSimpleSinkProductionMultipleField (FunctionField):
+	def __init__(self, sinkField, rule=None, doc=''):
+		def _function(cvtNode):
+			pin = sinkField._f_getPinFromInstance( cvtNode.graphNode )
+			return [ cvtNode._tree.buildNode( source.node )   for source in pin ]
+		super( CVTSimpleSinkProductionMultipleField, self ).__init__( _function, doc )
+
+
+
+
+
+
+class CVTSimpleNodeProductionSingleField (FunctionRefField):
+	def __init__(self, rule, doc=''):
+		def _function(cvtNode):
+			return cvtNode._tree.buildNode( cvtNode.graphNode, rule )
+		super( CVTSimpleNodeProductionSingleField, self ).__init__( _function, doc )
+
+
+
+
+
+
+
+
+
+
+
+
+
 class CVTNode (Sheet):
 	graphNode = SheetRefField( CGNode )
 
@@ -44,4 +102,9 @@ class CVTNode (Sheet):
 	tree = property( getTree )
 	graph = property( getGraph )
 
+
+
+
+class CVTNodeInvalid (CVTNode):
+		pass
 

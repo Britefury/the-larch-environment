@@ -11,6 +11,7 @@ from Britefury.SheetGraph.SheetGraph import *
 from Britefury.CodeGraph.CGLocalVarDeclaration import CGLocalVarDeclaration
 from Britefury.CodeGraph.CGNullExpression import CGNullExpression
 
+from Britefury.CodeViewTree.CVTNode import *
 from Britefury.CodeViewTree.CVTStatement import CVTStatement
 from Britefury.CodeViewTree.CodeViewTree import *
 
@@ -20,19 +21,9 @@ class CVTLocalVarDeclaration (CVTStatement):
 	graphNode = SheetRefField( CGLocalVarDeclaration )
 
 
-	@FunctionRefField
-	def varNode(self):
-		if len( self.graphNode.variable ) > 0:
-			return self._tree.buildNode( self.graphNode.variable[0].node )
-		else:
-			return None
+	varNode = CVTSimpleSinkProductionSingleField( CGLocalVarDeclaration.variable )
+	valueNode = CVTSimpleSinkProductionOptionalField( CGLocalVarDeclaration.value )
 
-	@FunctionRefField
-	def valueNode(self):
-		if len( self.graphNode.value ) > 0:
-			return self._tree.buildNode( self.graphNode.value[0].node )
-		else:
-			return None
 
 
 

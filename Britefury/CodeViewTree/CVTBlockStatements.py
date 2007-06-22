@@ -10,7 +10,7 @@ from Britefury.SheetGraph.SheetGraph import *
 
 from Britefury.CodeGraph.CGBlock import CGBlock
 
-from Britefury.CodeViewTree.CVTNode import CVTNode
+from Britefury.CodeViewTree.CVTNode import *
 from Britefury.CodeViewTree.CodeViewTree import *
 
 
@@ -19,9 +19,7 @@ class CVTBlockStatements (CVTNode):
 	graphNode = SheetRefField( CGBlock )
 
 
-	@FunctionField
-	def statementNodes(self):
-		return [ self._tree.buildNode( statementSource.node )   for statementSource in self.graphNode.statements ]
+	statementNodes = CVTSimpleSinkProductionMultipleField( CGBlock.statements )
 
 
 

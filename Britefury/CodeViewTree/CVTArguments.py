@@ -11,7 +11,7 @@ from Britefury.SheetGraph.SheetGraph import *
 from Britefury.CodeGraph.CGArguments import CGArguments
 from Britefury.CodeGraph.CGNullExpression import CGNullExpression
 
-from Britefury.CodeViewTree.CVTNode import CVTNode
+from Britefury.CodeViewTree.CVTNode import *
 from Britefury.CodeViewTree.CodeViewTree import *
 
 
@@ -21,17 +21,8 @@ class CVTArguments (CVTNode):
 
 
 
-	@FunctionField
-	def argNodes(self):
-		return [ self._tree.buildNode( argSource.node )   for argSource in self.graphNode.args ]
-
-
-	@FunctionRefField
-	def expandArgNode(self):
-		if len( self.graphNode.expandArg ) > 0:
-			return self._tree.buildNode( self.graphNode.expandArg[0].node )
-		else:
-			return None
+	argNodes = CVTSimpleSinkProductionMultipleField( CGArguments.args )
+	expandArgNode = CVTSimpleSinkProductionOptionalField( CGArguments.expandArg )
 
 
 

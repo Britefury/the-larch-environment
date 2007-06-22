@@ -65,6 +65,10 @@ class MainApp (object):
 		self.setGraph( graph, rootNode )
 
 
+		resetButton = gtk.Button( 'Reset' )
+		resetButton.show()
+		resetButton.connect( 'clicked', self._p_onReset )
+
 		oneToOneButton = gtk.Button( '1:1' )
 		oneToOneButton.show()
 		oneToOneButton.connect( 'clicked', self._p_onOneToOne )
@@ -84,6 +88,7 @@ class MainApp (object):
 		buttonBox.pack_end( executeDebugButton, False, False, 0 )
 		buttonBox.pack_end( executeButton, False, False, 0 )
 		buttonBox.pack_end( oneToOneButton, False, False, 0 )
+		buttonBox.pack_end( resetButton, False, False, 0 )
 		buttonBox.show()
 
 
@@ -212,6 +217,9 @@ class MainApp (object):
 		exec( text )
 
 
+
+	def _p_onReset(self, widget):
+		self._doc.reset()
 
 	def _p_onOneToOne(self, widget):
 		self._doc.oneToOne()

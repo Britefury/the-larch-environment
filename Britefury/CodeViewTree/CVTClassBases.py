@@ -11,18 +11,16 @@ from Britefury.SheetGraph.SheetGraph import *
 from Britefury.CodeGraph.CGClass import CGClass
 from Britefury.CodeGraph.CGNullExpression import CGNullExpression
 
-from Britefury.CodeViewTree.CVTStatement import CVTStatement
+from Britefury.CodeViewTree.CVTNode import *
 from Britefury.CodeViewTree.CodeViewTree import *
 
 
 
-class CVTClassBases (CVTStatement):
+class CVTClassBases (CVTNode):
 	graphNode = SheetRefField( CGClass )
 
 
-	@FunctionField
-	def baseNodes(self):
-		return [ self._tree.buildNode( baseSource.node )   for baseSource in self.graphNode.bases ]
+	baseNodes = CVTSimpleSinkProductionMultipleField( CGClass.bases )
 
 
 
