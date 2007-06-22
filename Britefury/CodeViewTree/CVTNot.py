@@ -10,6 +10,7 @@ from Britefury.SheetGraph.SheetGraph import *
 
 from Britefury.CodeGraph.CGNot import CGNot
 
+from Britefury.CodeViewTree.CVTNode import *
 from Britefury.CodeViewTree.CVTExpression import CVTExpression
 from Britefury.CodeViewTree.CVTAttrName import CVTAttrName
 from Britefury.CodeViewTree.CodeViewTree import *
@@ -22,12 +23,8 @@ class CVTNot (CVTExpression):
 	graphNode = SheetRefField( CGNot )
 
 
-	@FunctionRefField
-	def exprNode(self):
-		if len( self.graphNode.expr ) > 0:
-			return self._tree.buildNode( self.graphNode.expr[0].node )
-		else:
-			return None
+	exprNode = CVTSimpleSinkProductionSingleField( CGNot.expr )
+
 
 
 

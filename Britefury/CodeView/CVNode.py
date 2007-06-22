@@ -21,12 +21,14 @@ from Britefury.SheetGraph.SheetGraph import *
 from Britefury.CodeViewBehavior.CVBMovementBehavior import CVBMovementBehavior
 from Britefury.CodeViewBehavior.CVBDeleteNodeBehavior import CVBDeleteNodeBehavior
 
-from Britefury.CodeViewTree.CVTNode import CVTNode
+from Britefury.CodeViewTree.CVTNode import CVTNode, CVTNodeInvalid
 
 from Britefury.CodeView.CodeView import CodeView
 from Britefury.CodeView.MoveFocus import MoveFocus
 
 from Britefury.DocView.Toolkit.DTWidget import *
+from Britefury.DocView.Toolkit.DTBorder import *
+from Britefury.DocView.Toolkit.DTLabel import *
 
 
 
@@ -397,3 +399,29 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 	def startEditingOnRight(self):
 		self.makeCurrent()
 
+
+
+
+
+
+
+class CVNodeInvalid (CVNode):
+	treeNodeClass = CVTNodeInvalid
+
+
+	treeNode = SheetRefField( CVTNodeInvalid )
+
+
+	@FunctionField
+	def refreshCell(self):
+		pass
+
+
+
+
+	def __init__(self, treeNode, view):
+		super( CVReturn, self ).__init__( treeNode, view )
+		self._label = DT
+		self.widget = DTBorder( background=Colour3f( 1.0, 0.0, 0.0 ) )
+		self.widget.allMargins = 2.0
+		self.widget.child = DTLabel( 'return', font='Sans bold 11', colour=Colour3f( 1.0, 1.0, 1.0 ) )

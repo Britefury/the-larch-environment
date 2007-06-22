@@ -10,6 +10,7 @@ from Britefury.SheetGraph.SheetGraph import *
 
 from Britefury.CodeGraph.CGWhile import CGWhile
 
+from Britefury.CodeViewTree.CVTNode import *
 from Britefury.CodeViewTree.CVTStatement import CVTStatement
 from Britefury.CodeViewTree.CodeViewTree import *
 
@@ -19,16 +20,9 @@ class CVTWhile (CVTStatement):
 	graphNode = SheetRefField( CGWhile )
 
 
-	@FunctionRefField
-	def whileExprNode(self):
-		if len( self.graphNode.whileExpr ) > 0:
-			return self._tree.buildNode( self.graphNode.whileExpr[0].node )
-		else:
-			return None
+	whileExprNode = CVTSimpleSinkProductionSingleField( CGWhile.whileExpr )
+	statementsNode = CVTSimpleSinkProductionSingleField( CGWhile.block )
 
-	@FunctionField
-	def statementsNode(self):
-		return self._tree.buildNode( self.graphNode.block[0].node )
 
 
 

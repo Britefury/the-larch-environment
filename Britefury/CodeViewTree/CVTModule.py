@@ -11,7 +11,7 @@ from Britefury.SheetGraph.SheetGraph import *
 from Britefury.CodeGraph.CGModule import CGModule
 from Britefury.CodeGraph.CGVar import CGVar
 
-from Britefury.CodeViewTree.CVTNode import CVTNode
+from Britefury.CodeViewTree.CVTNode import *
 from Britefury.CodeViewTree.CodeViewTree import *
 
 
@@ -20,10 +20,8 @@ class CVTModule (CVTNode):
 	graphNode = SheetRefField( CGModule )
 
 
+	statementsNode = CVTSimpleSinkProductionSingleField( CGModule.block )
 
-	@FunctionField
-	def statementsNode(self):
-		return self._tree.buildNode( self.graphNode.block[0].node )
 
 
 
