@@ -11,13 +11,11 @@ from Britefury.SheetGraph.SheetGraph import *
 from Britefury.CodeGraph.CGWhile import CGWhile
 
 from Britefury.CodeViewTree.CVTStatement import CVTStatement
+from Britefury.CodeViewTree.CodeViewTree import *
 
 
 
 class CVTWhile (CVTStatement):
-	graphNodeClass = CGWhile
-
-
 	graphNode = SheetRefField( CGWhile )
 
 
@@ -32,4 +30,12 @@ class CVTWhile (CVTStatement):
 	def statementsNode(self):
 		return self._tree.buildNode( self.graphNode.block[0].node )
 
+
+
+
+class CVTRuleWhile (CVTRuleSimple):
+	graphNodeClass = CGWhile
+	cvtNodeClass = CVTWhile
+
+CVTRuleWhile.register()
 

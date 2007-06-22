@@ -14,15 +14,13 @@ from Britefury.CodeGraph.CGAssignment import CGAssignment
 from Britefury.CodeGraph.CGNullExpression import CGNullExpression
 
 from Britefury.CodeViewTree.CVTExpression import CVTExpression
+from Britefury.CodeViewTree.CodeViewTree import *
 
 from Britefury.CodeViewTreeOperations.CVTOWrapInAssignment import cvto_wrapInAssignment
 
 
 
 class CVTLocalRef (CVTExpression):
-	graphNodeClass = CGLocalRef
-
-
 	graphNode = SheetRefField( CGLocalRef )
 
 
@@ -58,4 +56,13 @@ class CVTLocalRef (CVTExpression):
 
 	def wrapInAssignment(self):
 		return cvto_wrapInAssignment( self )
+
+
+
+
+class CVTRuleLocalRef (CVTRuleSimple):
+	graphNodeClass = CGLocalRef
+	cvtNodeClass = CVTLocalRef
+
+CVTRuleLocalRef.register()
 

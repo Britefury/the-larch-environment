@@ -11,12 +11,11 @@ from Britefury.SheetGraph.SheetGraph import *
 from Britefury.CodeGraph.CGBlock import CGBlock
 
 from Britefury.CodeViewTree.CVTNode import CVTNode
+from Britefury.CodeViewTree.CodeViewTree import *
 
 
 
 class CVTBlockStatements (CVTNode):
-	graphNodeClass = CGBlock
-
 	graphNode = SheetRefField( CGBlock )
 
 
@@ -45,3 +44,12 @@ class CVTBlockStatements (CVTNode):
 		if statement.graphNode.parent in self.graphNode.statements:
 			self.graphNode.statements.remove( statement.graphNode.parent )
 			statement.graphNode.destroySubtree()
+
+
+
+class CVTRuleBlockStatements (CVTRuleSimple):
+	graphNodeClass = CGBlock
+	cvtNodeClass = CVTBlockStatements
+
+CVTRuleBlockStatements.register()
+

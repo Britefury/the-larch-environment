@@ -12,12 +12,11 @@ from Britefury.CodeGraph.CGParameters import CGParameters
 from Britefury.CodeGraph.CGVar import CGVar
 
 from Britefury.CodeViewTree.CVTNode import CVTNode
+from Britefury.CodeViewTree.CodeViewTree import *
 
 
 
 class CVTParameters (CVTNode):
-	graphNodeClass = CGParameters
-
 	graphNode = SheetRefField( CGParameters )
 
 
@@ -50,3 +49,13 @@ class CVTParameters (CVTNode):
 		if param.graphNode.declaration in self.graphNode.params:
 			self.graphNode.params.remove( param.graphNode.declaration )
 			param.graphNode.destroySubtree()
+
+
+
+
+class CVTRuleParameters (CVTRuleSimple):
+	graphNodeClass = CGParameters
+	cvtNodeClass = CVTParameters
+
+CVTRuleParameters.register()
+

@@ -11,12 +11,11 @@ from Britefury.SheetGraph.SheetGraph import *
 from Britefury.CodeGraph.CGLambda import CGLambda
 
 from Britefury.CodeViewTree.CVTExpression import CVTExpression
+from Britefury.CodeViewTree.CodeViewTree import *
 
 
 
 class CVTLambda (CVTExpression):
-	graphNodeClass = CGLambda
-
 	graphNode = SheetRefField( CGLambda )
 
 
@@ -27,4 +26,12 @@ class CVTLambda (CVTExpression):
 	@FunctionRefField
 	def valueExprNode(self):
 		return self._tree.buildNode( self.graphNode.valueExpr[0].node )
+
+
+
+class CVTRuleLambda (CVTRuleSimple):
+	graphNodeClass = CGLambda
+	cvtNodeClass = CVTLambda
+
+CVTRuleLambda.register()
 

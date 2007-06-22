@@ -11,6 +11,7 @@ from Britefury.SheetGraph.SheetGraph import *
 from Britefury.CodeGraph.CGGetAttr import CGGetAttr
 
 from Britefury.CodeViewTree.CVTNode import CVTNode
+from Britefury.CodeViewTree.CodeViewTree import *
 
 
 
@@ -19,4 +20,10 @@ class CVTAttrName (CVTNode):
 
 
 	name = FieldProxy( graphNode.attrName )
+
+
+
+class CVTRuleAttrName (CVTRuleSimple):
+	graphNodeClass = CGGetAttr
+	cvtNodeClass = CVTAttrName
 

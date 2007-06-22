@@ -11,13 +11,11 @@ from Britefury.SheetGraph.SheetGraph import *
 from Britefury.CodeGraph.CGNullExpression import CGNullExpression
 
 from Britefury.CodeViewTree.CVTNode import CVTNode
+from Britefury.CodeViewTree.CodeViewTree import *
 
 
 
 class CVTNullExpression (CVTNode):
-	graphNodeClass = CGNullExpression
-
-
 	graphNode = SheetRefField( CGNullExpression )
 
 
@@ -29,4 +27,13 @@ class CVTNullExpression (CVTNode):
 		self.graphNode.destroySubtree()
 		return self._tree.buildNode( graphNodeToInsert )
 
+
+
+
+
+class CVTRuleNullExpression (CVTRuleSimple):
+	graphNodeClass = CGNullExpression
+	cvtNodeClass = CVTNullExpression
+
+CVTRuleNullExpression.register()
 

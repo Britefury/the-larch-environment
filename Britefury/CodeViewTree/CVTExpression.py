@@ -16,13 +16,11 @@ from Britefury.CodeGraph.CGNot import CGNot
 from Britefury.CodeGraph.CGNullExpression import CGNullExpression
 
 from Britefury.CodeViewTree.CVTStatement import CVTStatement
+from Britefury.CodeViewTree.CodeViewTree import *
 
 
 
 class CVTExpression (CVTStatement):
-	graphNodeClass = CGExpression
-
-
 	graphNode = SheetRefField( CGExpression )
 
 
@@ -60,3 +58,12 @@ class CVTExpression (CVTStatement):
 		parentCGSink.replace( self.graphNode.parent, nullExpression.parent )
 		self.graphNode.destroySubtree()
 		return self._tree.buildNode( nullExpression )
+
+
+
+class CVTRuleExpression (CVTRuleSimple):
+	graphNodeClass = CGExpression
+	cvtNodeClass = CVTExpression
+
+CVTRuleExpression.register()
+

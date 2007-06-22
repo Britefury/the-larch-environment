@@ -12,12 +12,11 @@ from Britefury.CodeGraph.CGArguments import CGArguments
 from Britefury.CodeGraph.CGNullExpression import CGNullExpression
 
 from Britefury.CodeViewTree.CVTNode import CVTNode
+from Britefury.CodeViewTree.CodeViewTree import *
 
 
 
 class CVTArguments (CVTNode):
-	graphNodeClass = CGArguments
-
 	graphNode = SheetRefField( CGArguments )
 
 
@@ -62,3 +61,13 @@ class CVTArguments (CVTNode):
 				position = n
 		self.graphNode.args.insert( position, graphNodeToInsert.parent )
 		return self._tree.buildNode( graphNodeToInsert )
+
+
+
+
+class CVTRuleArguments (CVTRuleSimple):
+	graphNodeClass = CGArguments
+	cvtNodeClass = CVTArguments
+
+CVTRuleArguments.register()
+

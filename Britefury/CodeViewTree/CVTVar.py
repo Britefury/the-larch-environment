@@ -11,14 +11,22 @@ from Britefury.SheetGraph.SheetGraph import *
 from Britefury.CodeGraph.CGVar import CGVar
 
 from Britefury.CodeViewTree.CVTNode import CVTNode
+from Britefury.CodeViewTree.CodeViewTree import *
 
 
 
 class CVTVar (CVTNode):
-	graphNodeClass = CGVar
-
-
 	graphNode = SheetRefField( CGVar )
 
 	varName = FieldProxy( graphNode.name )
+
+
+
+
+
+class CVTRuleVar (CVTRuleSimple):
+	graphNodeClass = CGVar
+	cvtNodeClass = CVTVar
+
+CVTRuleVar.register()
 

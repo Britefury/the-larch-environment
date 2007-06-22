@@ -12,6 +12,7 @@ from Britefury.CodeGraph.CGClass import CGClass
 from Britefury.CodeGraph.CGNullExpression import CGNullExpression
 
 from Britefury.CodeViewTree.CVTStatement import CVTStatement
+from Britefury.CodeViewTree.CodeViewTree import *
 
 
 
@@ -51,3 +52,9 @@ class CVTClassBases (CVTStatement):
 				position = n
 		self.graphNode.bases.insert( position, graphNodeToInsert.parent )
 		return self._tree.buildNode( graphNodeToInsert )
+
+
+
+class CVTRuleClassBases (CVTRuleSimple):
+	graphNodeClass = CGClass
+	cvtNodeClass = CVTClassBases

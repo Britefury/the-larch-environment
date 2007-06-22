@@ -12,13 +12,11 @@ from Britefury.CodeGraph.CGLocalVarDeclaration import CGLocalVarDeclaration
 from Britefury.CodeGraph.CGNullExpression import CGNullExpression
 
 from Britefury.CodeViewTree.CVTStatement import CVTStatement
+from Britefury.CodeViewTree.CodeViewTree import *
 
 
 
 class CVTLocalVarDeclaration (CVTStatement):
-	graphNodeClass = CGLocalVarDeclaration
-
-
 	graphNode = SheetRefField( CGLocalVarDeclaration )
 
 
@@ -50,3 +48,13 @@ class CVTLocalVarDeclaration (CVTStatement):
 			valueNode = self.graphNode.value[0].node
 			del self.graphNode.value[0]
 			valueNode.destroySubtree()
+
+
+
+
+class CVTRuleLocalVarDeclaration (CVTRuleSimple):
+	graphNodeClass = CGLocalVarDeclaration
+	cvtNodeClass = CVTLocalVarDeclaration
+
+CVTRuleLocalVarDeclaration.register()
+

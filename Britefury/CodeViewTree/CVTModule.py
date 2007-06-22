@@ -12,13 +12,11 @@ from Britefury.CodeGraph.CGModule import CGModule
 from Britefury.CodeGraph.CGVar import CGVar
 
 from Britefury.CodeViewTree.CVTNode import CVTNode
+from Britefury.CodeViewTree.CodeViewTree import *
 
 
 
 class CVTModule (CVTNode):
-	graphNodeClass = CGModule
-
-
 	graphNode = SheetRefField( CGModule )
 
 
@@ -27,4 +25,11 @@ class CVTModule (CVTNode):
 	def statementsNode(self):
 		return self._tree.buildNode( self.graphNode.block[0].node )
 
+
+
+class CVTRuleModule (CVTRuleSimple):
+	graphNodeClass = CGModule
+	cvtNodeClass = CVTModule
+
+CVTRuleModule.register()
 

@@ -11,16 +11,14 @@ from Britefury.SheetGraph.SheetGraph import *
 from Britefury.CodeGraph.CGGetAttr import CGGetAttr
 
 from Britefury.CodeViewTree.CVTExpression import CVTExpression
-from Britefury.CodeViewTree.CVTAttrName import CVTAttrName
+from Britefury.CodeViewTree.CVTAttrName import *
+from Britefury.CodeViewTree.CodeViewTree import *
 
 from Britefury.CodeViewTreeOperations.CVTOWrapInAssignment import cvto_wrapInAssignment
 
 
 
 class CVTGetAttr (CVTExpression):
-	graphNodeClass = CGGetAttr
-
-
 	graphNode = SheetRefField( CGGetAttr )
 
 
@@ -34,7 +32,7 @@ class CVTGetAttr (CVTExpression):
 
 	@FunctionRefField
 	def attrNameNode(self):
-		return self._tree.buildNode( self.graphNode, CVTAttrName )
+		return self._tree.buildNode( self.graphNode, CVTRuleAttrName )
 
 
 
@@ -53,3 +51,12 @@ class CVTGetAttr (CVTExpression):
 
 	def wrapInAssignment(self):
 		return cvto_wrapInAssignment( self )
+
+
+
+class CVTRuleGetAttr (CVTRuleSimple):
+	graphNodeClass = CGGetAttr
+	cvtNodeClass = CVTGetAttr
+
+CVTRuleGetAttr.register()
+
