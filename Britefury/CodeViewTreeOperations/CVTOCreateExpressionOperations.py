@@ -15,28 +15,28 @@ from Britefury.CodeGraph.CGNullExpression import *
 
 
 
-def cvto_insertStringLiteral(treeNode, treeNodePath):
+def cvto_insertStringLiteral(treeNode, position):
 	strLit = CGStringLiteral()
 	treeNode.graph.nodes.append( strLit )
-	return treeNode.insertNode( strLit, treeNodePath )
+	return treeNode.insertNode( strLit, position )
 
 
 
-def cvto_insertIntLiteral(treeNode, treeNodePath):
+def cvto_insertIntLiteral(treeNode, position):
 	intLit = CGIntLiteral()
 	treeNode.graph.nodes.append( intLit )
-	return treeNode.insertNode( intLit, treeNodePath )
+	return treeNode.insertNode( intLit, position )
 
 
 
-def cvto_insertUnboundRef(treeNode, treeNodePath):
+def cvto_insertUnboundRef(treeNode, position):
 	ref = CGUnboundRef()
 	treeNode.graph.nodes.append( ref )
-	return treeNode.insertNode( ref, treeNodePath )
+	return treeNode.insertNode( ref, position )
 
 
 
-def cvto_insertNot(treeNode, treeNodePath):
+def cvto_insertNot(treeNode, position):
 	lambdaNode = CGNot()
 	treeNode.graph.nodes.append( lambdaNode )
 
@@ -45,11 +45,11 @@ def cvto_insertNot(treeNode, treeNodePath):
 
 	lambdaNode.expr.append( nullExpression.parent )
 
-	return treeNode.insertNode( lambdaNode, treeNodePath )
+	return treeNode.insertNode( lambdaNode, position )
 
 
 
-def cvto_insertLambda(treeNode, treeNodePath):
+def cvto_insertLambda(treeNode, position):
 	lambdaNode = CGLambda()
 	treeNode.graph.nodes.append( lambdaNode )
 
@@ -62,4 +62,4 @@ def cvto_insertLambda(treeNode, treeNodePath):
 	lambdaNode.parameters.append( paramsNode.parent )
 	lambdaNode.valueExpr.append( nullExpression.parent )
 
-	return treeNode.insertNode( lambdaNode, treeNodePath )
+	return treeNode.insertNode( lambdaNode, position )

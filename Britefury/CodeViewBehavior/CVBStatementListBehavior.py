@@ -13,10 +13,7 @@ from Britefury.CodeViewTreeOperations.CVTOStatementListOperations import *
 class CVBStatementListBehavior (CodeViewBehavior):
 	@staticmethod
 	def _p_getPosition(viewNode, receivingNodePath):
-		if len( receivingNodePath ) > 1:
-			return viewNode.treeNode.statementNodes.index( receivingNodePath[1].treeNode )
-		else:
-			return len( viewNode.treeNode.statementNodes )
+		return viewNode.getInsertPosition( receivingNodePath )
 
 
 	@CVBAccelInputHandlerMethod( '<alt>r' )

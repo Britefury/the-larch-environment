@@ -104,3 +104,13 @@ class CVClassBases (CVBorderNode):
 	def _o_isExtendable(self):
 		return True
 
+
+
+	def getInsertPosition(self, receivingNodePath):
+		if len( receivingNodePath ) > 1:
+			child = receivingNodePath[1]
+			try:
+				return self.baseNodes.index( child )
+			except ValueError:
+				return 0
+		return 0

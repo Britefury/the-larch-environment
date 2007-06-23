@@ -401,6 +401,11 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 
 
 
+	def getInsertPosition(self, receivingNodePath):
+		return 0
+
+
+
 
 
 
