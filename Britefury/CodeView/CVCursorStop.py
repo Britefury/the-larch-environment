@@ -9,18 +9,24 @@ import pygtk
 pygtk.require( '2.0' )
 import gtk
 
+from Britefury.Math.Math import Colour3f
+
 from Britefury.CodeView.CVNode import *
 
 from Britefury.DocView.Toolkit.DTActiveBorder import DTActiveBorder
 
 
 
-class CVBorderNode (CVNode):
-	def __init__(self, treeNode, view):
-		super( CVBorderNode, self ).__init__( treeNode, view )
+class CVCursorStop (CVNode):
+	def __init__(self, view, parent):
+		super( CVCursorStop, self ).__init__( None, view )
 		self.widget = DTActiveBorder()
 		self.widget.keyHandler = self
-		self.widget.topMargin = self.widget.bottomMargin = 1.0
+		self.widget.leftMargin = self.widget.rightMargin = 20.0
+		self.widget.topMargin = self.widget.bottomMargin = 4.0
+		self.widget.borderColour = None
+		self.widget.prelitColour = Colour3f( 0.5, 0.5, 0.5 )
+		self._parent = parent
 
 
 

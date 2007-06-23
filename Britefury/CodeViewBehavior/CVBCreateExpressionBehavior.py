@@ -17,7 +17,8 @@ class CVBCreateExpressionBehavior (CodeViewBehavior):
 	@CVBCharInputHandlerMethod( '\'' )
 	def _replaceWithStringLiteral(self, viewNode, receivingNodePath, widget, event):
 		viewNode._f_commandHistoryFreeze()
-		strLitCVT = cvto_insertStringLiteral( viewNode.treeNode, [ node.treeNode  for node in receivingNodePath ] )
+		insertPosition = viewNode.getInsertPosition( receivingNodePath )
+		strLitCVT = cvto_insertStringLiteral( viewNode.treeNode, insertPosition )
 		viewNode._view.refresh()
 		strLitCV = viewNode._view.getViewNodeForTreeNode( strLitCVT )
 		strLitCV.stringValueWidget.startEditing()
@@ -28,7 +29,8 @@ class CVBCreateExpressionBehavior (CodeViewBehavior):
 	@CVBCharInputHandlerMethod( string.digits )
 	def _replaceWithIntLiteral(self, viewNode, receivingNodePath, widget, event):
 		viewNode._f_commandHistoryFreeze()
-		intLitCVT = cvto_insertIntLiteral( viewNode.treeNode, [ node.treeNode  for node in receivingNodePath ] )
+		insertPosition = viewNode.getInsertPosition( receivingNodePath )
+		intLitCVT = cvto_insertIntLiteral( viewNode.treeNode, insertPosition )
 		intLitCVT.strValue = event.keyString
 		viewNode._view.refresh()
 		intLitCV = viewNode._view.getViewNodeForTreeNode( intLitCVT )
@@ -40,7 +42,8 @@ class CVBCreateExpressionBehavior (CodeViewBehavior):
 	@CVBCharInputHandlerMethod( string.ascii_letters + '_' )
 	def _replaceWithRef(self, viewNode, receivingNodePath, widget, event):
 		viewNode._f_commandHistoryFreeze()
-		unboundRefCVT = cvto_insertUnboundRef( viewNode.treeNode, [ node.treeNode  for node in receivingNodePath ] )
+		insertPosition = viewNode.getInsertPosition( receivingNodePath )
+		unboundRefCVT = cvto_insertUnboundRef( viewNode.treeNode, insertPosition )
 		unboundRefCVT.targetName = event.keyString
 		viewNode._view.refresh()
 		unboundRefCV = viewNode._view.getViewNodeForTreeNode( unboundRefCVT )
@@ -52,7 +55,8 @@ class CVBCreateExpressionBehavior (CodeViewBehavior):
 	@CVBAccelInputHandlerMethod( '<alt>n' )
 	def _replaceWithNot(self, viewNode, receivingNodePath, widget, event):
 		viewNode._f_commandHistoryFreeze()
-		notCVT = cvto_insertNot( viewNode.treeNode, [ node.treeNode  for node in receivingNodePath ] )
+		insertPosition = viewNode.getInsertPosition( receivingNodePath )
+		notCVT = cvto_insertNot( viewNode.treeNode, insertPosition )
 		viewNode._view.refresh()
 		notCV = viewNode._view.getViewNodeForTreeNode( notCVT )
 		notCV.startEditingExpression()
@@ -63,7 +67,8 @@ class CVBCreateExpressionBehavior (CodeViewBehavior):
 	@CVBAccelInputHandlerMethod( '<alt>l' )
 	def _replaceWithLambda(self, viewNode, receivingNodePath, widget, event):
 		viewNode._f_commandHistoryFreeze()
-		lambdaCVT = cvto_insertLambda( viewNode.treeNode, [ node.treeNode  for node in receivingNodePath ] )
+		insertPosition = viewNode.getInsertPosition( receivingNodePath )
+		lambdaCVT = cvto_insertLambda( viewNode.treeNode, insertPosition )
 		viewNode._view.refresh()
 		lambdaCV = viewNode._view.getViewNodeForTreeNode( lambdaCVT )
 		lambdaCV.startEditingParameters()

@@ -15,6 +15,7 @@ from Britefury.SheetGraph.SheetGraph import *
 from Britefury.CodeViewTree.CVTBlockStatements import CVTBlockStatements
 
 from Britefury.CodeView.CVBorderNode import *
+from Britefury.CodeView.CVCursorStop import *
 
 from Britefury.CodeViewBehavior.CVBStatementListBehavior import *
 from Britefury.CodeViewBehavior.CVBCreateExpressionBehavior import *
@@ -46,16 +47,17 @@ class CVBlockStatements (CVBorderNode):
 
 	@FunctionField
 	def refreshCell(self):
-		self._box[:] = self.statementWidgets
+		self._box[:] = [ self._startCursor.widget ]  +  self.statementWidgets  +  [ self._endCursor.widget ]
 
 
 
 
 	def __init__(self, treeNode, view):
 		super( CVBlockStatements, self ).__init__( treeNode, view )
+		self._startCursor = CVCursorStop( view, self )
+		self._endCursor = CVCursorStop( view, self )
 		self._box = DTBox( DTDirection.TOP_TO_BOTTOM, minorDirectionAlignment=DTBox.ALIGN_TOPLEFT, spacing=4.0 )
 		self.widget.child = self._box
-		self.widget.bottomMargin = 10.0
 
 
 
@@ -69,7 +71,7 @@ class CVBlockStatements (CVBorderNode):
 		return self.verticalNavigationList()
 
 	def verticalNavigationList(self):
-		return self.statementNodes
+		return [ self._startCursor ]  +  self.statementNodes  +  [ self._endCursor ]
 
 
 
@@ -82,3 +84,19 @@ class CVBlockStatements (CVBorderNode):
 
 	def _o_isExtendable(self):
 		return True
+
+
+
+	def getInsertPosition(self, receivingNodePath):
+		if len( receivingNodePath ) > 1:
+			child = receivingNodePath[1]
+			if child is self._startCursor:
+				return 0
+			elif child is self._endCursor:
+				return len( self.statementNodes )
+			else:
+				try:
+					return self.statementNodes.index( child )
+				except ValueError:
+					return 0
+		return 0

@@ -56,19 +56,27 @@ class DTBin (DTContainer):
 
 
 	def _o_getRequiredWidth(self):
-		self._childRequisition.x = self._child._f_getRequisitionWidth()
+		if self._child is not None:
+			self._childRequisition.x = self._child._f_getRequisitionWidth()
+		else:
+			self._childRequisition.x = 0.0
 		return self._childRequisition.x
 
 	def _o_getRequiredHeight(self):
-		self._childRequisition.y = self._child._f_getRequisitionHeight()
+		if self._child is not None:
+			self._childRequisition.y = self._child._f_getRequisitionHeight()
+		else:
+			self._childRequisition.x = 0.0
 		return self._childRequisition.y
 
 
 	def _o_onAllocateX(self, allocation):
-		self._o_allocateChildX( self._child, 0.0, allocation )
+		if self._child is not None:
+			self._o_allocateChildX( self._child, 0.0, allocation )
 
 	def _o_onAllocateY(self, allocation):
-		self._o_allocateChildY( self._child, 0.0, allocation )
+		if self._child is not None:
+			self._o_allocateChildY( self._child, 0.0, allocation )
 
 
 	def _o_onChildResizeRequest(self, child):
@@ -76,7 +84,8 @@ class DTBin (DTContainer):
 
 
 	def _f_refreshScale(self, scale, rootScale):
-		self._child._f_setScale( self._childScale, rootScale * self._childScale )
+		if self._child is not None:
+			self._child._f_setScale( self._childScale, rootScale * self._childScale )
 
 
 

@@ -39,15 +39,7 @@ class CVTClassBases (CVTNode):
 
 
 
-	def insertNode(self, graphNodeToInsert, treeNodePath):
-		position = len( self.baseNodes )
-		if len( treeNodePath ) > 1:
-			try:
-				n = self.baseNodes.index( treeNodePath[1] )
-			except ValueError:
-				pass
-			else:
-				position = n
+	def insertNode(self, graphNodeToInsert, position):
 		self.graphNode.bases.insert( position, graphNodeToInsert.parent )
 		return self._tree.buildNode( graphNodeToInsert )
 

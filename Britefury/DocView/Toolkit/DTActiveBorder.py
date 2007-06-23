@@ -107,33 +107,42 @@ class DTActiveBorder (DTBorder):
 
 
 	def _o_draw(self, context):
-		if self._bHasFocus  or  self._bPrelit  or  self._borderColour is not None:
-			if self._bHasFocus:
-				b = self._highlightedBorderWidth
-			else:
-				b = self._borderWidth
+		if self._bHasFocus:
+			b = self._highlightedBorderWidth
+		else:
+			b = self._borderWidth
 
+		# Get the colours
+		if self._bHasFocus:
+			backgroundColour = self._highlightedBackgroundColour
+			borderColour = self._highlightedBorderColour
+		else:
+			backgroundColour = self._backgroundColour
+
+			if self._bPrelit:
+				borderColour = self._prelitBorderColour
+			else:
+				borderColour = self._borderColour
+
+
+
+		if backgroundColour is not None   or   borderColour is not None:
 			# Background
 			context.rectangle( b * 0.5, b * 0.5, self._allocation.x - b, self._allocation.y - b )
 
-			# Border
-			context.set_line_width( b )
-			if self._bHasFocus:
-				if self._highlightedBackgroundColour is not None:
-					context.set_source_rgb( self._highlightedBackgroundColour.r, self._highlightedBackgroundColour.g, self._highlightedBackgroundColour.b )
-					context.fill_preserve()
 
-				context.set_source_rgb( self._highlightedBorderColour.r, self._highlightedBorderColour.g, self._highlightedBorderColour.b )
-			else:
-				if self._backgroundColour is not None:
-					context.set_source_rgb( self._backgroundColour.r, self._backgroundColour.g, self._backgroundColour.b )
-					context.fill_preserve()
+			if backgroundColour is not None:
+				context.set_source_rgb( backgroundColour.r, backgroundColour.g, backgroundColour.b )
 
-				if self._bPrelit:
-					context.set_source_rgb( self._prelitBorderColour.r, self._prelitBorderColour.g, self._prelitBorderColour.b )
+				if borderColour is not None:
+					context.fill_preserve()
 				else:
-					context.set_source_rgb( self._borderColour.r, self._borderColour.g, self._borderColour.b )
-			context.stroke()
+					context.fill()
+
+			if borderColour is not None:
+				context.set_source_rgb( borderColour.r, borderColour.g, borderColour.b )
+				context.stroke()
+
 
 		super( DTActiveBorder, self )._o_draw( context )
 

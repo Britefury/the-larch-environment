@@ -62,19 +62,27 @@ class DTBorder (DTBin):
 
 
 	def _o_getRequiredWidth(self):
-		self._childRequisition.x = self._child._f_getRequisitionWidth()
+		if self._child is not None:
+			self._childRequisition.x = self._child._f_getRequisitionWidth()
+		else:
+			self._childRequisition.x = 0.0
 		return self._childRequisition.x + self._leftMargin + self._rightMargin
 
 	def _o_getRequiredHeight(self):
-		self._childRequisition.y = self._child._f_getRequisitionHeight()
+		if self._child is not None:
+			self._childRequisition.y = self._child._f_getRequisitionHeight()
+		else:
+			self._childRequisition.x = 0.0
 		return self._childRequisition.y + self._topMargin + self._bottomMargin
 
 
 	def _o_onAllocateX(self, allocation):
-		self._o_allocateChildX( self._child, self._leftMargin, allocation - self._leftMargin - self._rightMargin )
+		if self._child is not None:
+			self._o_allocateChildX( self._child, self._leftMargin, allocation - self._leftMargin - self._rightMargin )
 
 	def _o_onAllocateY(self, allocation):
-		self._o_allocateChildY( self._child, self._topMargin, allocation - self._topMargin - self._bottomMargin )
+		if self._child is not None:
+			self._o_allocateChildY( self._child, self._topMargin, allocation - self._topMargin - self._bottomMargin )
 
 
 
