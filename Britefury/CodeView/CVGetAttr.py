@@ -88,7 +88,7 @@ class CVGetAttr (CVExpression):
 
 	def __init__(self, treeNode, view):
 		super( CVGetAttr, self ).__init__( treeNode, view )
-		self._box = DTBox( spacing=5.0 )
+		self._box = DTBox()
 		self._box.append( DTLabel( 'nil' ) )
 		self._box.append( DTLabel( '.' ) )
 		self._box.append( DTLabel( 'nil' ) )

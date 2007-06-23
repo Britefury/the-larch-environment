@@ -99,11 +99,6 @@ class CVParameters (CVBorderNode):
 
 
 
-	def _o_isExtendable(self):
-		return True
-
-
-
 	def getInsertPosition(self, receivingNodePath):
 		if len( receivingNodePath ) > 1:
 			child = receivingNodePath[1]

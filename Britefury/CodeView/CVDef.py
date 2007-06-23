@@ -40,6 +40,16 @@ class CVDef (CVStatement):
 
 
 	@FunctionRefField
+	def docNode(self):
+		return self._view.buildView( self.treeNode.docNode, self )
+
+	@FunctionRefField
+	def docWidget(self):
+		return self.docNode.widget
+
+
+
+	@FunctionRefField
 	def declVarNode(self):
 		return self._view.buildView( self.treeNode.declVarNode, self )
 
@@ -70,6 +80,10 @@ class CVDef (CVStatement):
 
 
 	@FunctionField
+	def _refreshDoc(self):
+		self._box[0] = self.docWidget
+
+	@FunctionField
 	def _refreshDeclVar(self):
 		self._declBox[1] = self.declVarWidget
 
@@ -84,6 +98,7 @@ class CVDef (CVStatement):
 
 	@FunctionField
 	def refreshCell(self):
+		self._refreshDoc
 		self._refreshDeclVar
 		self._refreshParams
 		self._refreshStatements
@@ -97,11 +112,12 @@ class CVDef (CVStatement):
 		self._declBox.append( DTLabel( markup='D<span size="small">EF</span>', font='Sans bold 11', colour=Colour3f( 0.0, 0.5, 0.0 ) ) )
 		self._declBox.append( DTLabel( 'nil' ) )
 		self._declBox.append( DTLabel( 'nil' ) )
-		self._declBox.append( DTLabel( ':' ) )
+		self._declBox.append( DTLabel( ':', font='Sans bold 11' ) )
 		self._declBox.backgroundColour = Colour3f( 0.825, 0.925, 0.825 )
 		self._statementsBorder = DTBorder( leftMargin=30.0 )
 		self._statementsBorder.child = DTLabel( 'nil' )
 		self._box = DTBox( spacing=5.0, direction=DTDirection.TOP_TO_BOTTOM, minorDirectionAlignment=DTBox.ALIGN_EXPAND )
+		self._box.append( DTLabel( 'nil' ) )
 		self._box.append( self._declBox )
 		self._box.append( self._statementsBorder )
 		self.widget.child = self._box
@@ -122,10 +138,10 @@ class CVDef (CVStatement):
 
 
 	def horizontalNavigationList(self):
-		return [ self.declVarNode, self.paramsNode, self.statementsNode ]
+		return [ self.docNode, self.declVarNode, self.paramsNode, self.statementsNode ]
 
 	def verticalNavigationList(self):
-		return [ self.declVarNode, self.statementsNode ]
+		return [ self.docNode, self.declVarNode, self.statementsNode ]
 
 
 

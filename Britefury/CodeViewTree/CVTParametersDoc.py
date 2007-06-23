@@ -8,30 +8,32 @@
 from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
-from Britefury.CodeGraph.CGDef import CGDef
+from Britefury.CodeGraph.CGParameters import CGParameters
 
 from Britefury.CodeViewTree.CVTNode import *
-from Britefury.CodeViewTree.CVTStatement import CVTStatement
-from Britefury.CodeViewTree.CVTDefDoc import CVTRuleDefDoc
 from Britefury.CodeViewTree.CodeViewTree import *
+from Britefury.CodeViewTree.CVTParameterDoc import *
 
 
 
-class CVTDef (CVTStatement):
-	graphNode = SheetRefField( CGDef )
+class CVTParametersDoc (CVTNode):
+	graphNode = SheetRefField( CGParameters )
 
 
-	docNode = CVTSimpleNodeProductionSingleField( CVTRuleDefDoc )
-	declVarNode = CVTSimpleSinkProductionSingleField( CGDef.declVar )
-	paramsNode = CVTSimpleSinkProductionSingleField( CGDef.parameters )
-	statementsNode = CVTSimpleSinkProductionSingleField( CGDef.block )
+	paramDocNodes = CVTSimpleSinkProductionMultipleField( CGParameters.params, rule=CVTRuleParameterDoc )
+	expandParamDocNode = CVTSimpleSinkProductionOptionalField( CGParameters.expandParam, rule=CVTRuleParameterDoc )
+
+
+	def __init__(self, graphNode, tree):
+		super( CVTParametersDoc, self ).__init__( graphNode, tree )
 
 
 
 
-class CVTRuleDef (CVTRuleSimple):
-	graphNodeClass = CGDef
-	cvtNodeClass = CVTDef
 
-CVTRuleDef.register()
+
+class CVTRuleParametersDoc (CVTRuleSimple):
+	graphNodeClass = CGParameters
+	cvtNodeClass = CVTParametersDoc
+
 

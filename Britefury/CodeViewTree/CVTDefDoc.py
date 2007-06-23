@@ -10,28 +10,24 @@ from Britefury.SheetGraph.SheetGraph import *
 
 from Britefury.CodeGraph.CGDef import CGDef
 
-from Britefury.CodeViewTree.CVTNode import *
-from Britefury.CodeViewTree.CVTStatement import CVTStatement
-from Britefury.CodeViewTree.CVTDefDoc import CVTRuleDefDoc
+from Britefury.CodeViewTree.CVTNode import CVTNode
 from Britefury.CodeViewTree.CodeViewTree import *
+from Britefury.CodeViewTree.CVTParametersDoc import *
 
 
 
-class CVTDef (CVTStatement):
+class CVTDefDoc (CVTNode):
 	graphNode = SheetRefField( CGDef )
 
-
-	docNode = CVTSimpleNodeProductionSingleField( CVTRuleDefDoc )
-	declVarNode = CVTSimpleSinkProductionSingleField( CGDef.declVar )
-	paramsNode = CVTSimpleSinkProductionSingleField( CGDef.parameters )
-	statementsNode = CVTSimpleSinkProductionSingleField( CGDef.block )
+	functionName = FieldProxy( graphNode.functionName )
+	paramsDocNode = CVTSimpleSinkProductionSingleField( CGDef.parameters, rule=CVTRuleParametersDoc )
+	functionDoc = FieldProxy( graphNode.functionDoc )
 
 
 
 
-class CVTRuleDef (CVTRuleSimple):
+
+class CVTRuleDefDoc (CVTRuleSimple):
 	graphNodeClass = CGDef
-	cvtNodeClass = CVTDef
-
-CVTRuleDef.register()
+	cvtNodeClass = CVTDefDoc
 

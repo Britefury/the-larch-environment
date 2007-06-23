@@ -97,7 +97,7 @@ class CVClass (CVStatement):
 		self._declBox.append( DTLabel( markup='C<span size="small">LASS</span>', font='Sans bold 11', colour=Colour3f( 0.1, 0.3, 0.5 ) ) )
 		self._declBox.append( DTLabel( 'nil' ) )
 		self._declBox.append( DTLabel( 'nil' ) )
-		self._declBox.append( DTLabel( ':' ) )
+		self._declBox.append( DTLabel( ':', font='Sans bold 11' ) )
 		self._declBox.backgroundColour = Colour3f( 0.8, 0.825, 0.85 )
 		self._statementsBorder = DTBorder( leftMargin=30.0 )
 		self._statementsBorder.child = DTLabel( 'nil' )

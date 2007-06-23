@@ -13,6 +13,7 @@ import CVCall
 import CVClass
 import CVClassBases
 import CVDef
+import CVDefDoc
 import CVExpression
 import CVGetAttr
 import CVIntLiteral
@@ -23,7 +24,10 @@ import CVLocalVarDeclaration
 import CVModule
 import CVNot
 import CVNullExpression
+import CVParameterDoc
 import CVParameters
+import CVParametersDoc
+import CVParameterVar
 import CVReturn
 import CVStatement
 import CVStringLiteral

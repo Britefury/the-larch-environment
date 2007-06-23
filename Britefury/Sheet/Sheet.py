@@ -378,7 +378,7 @@ class SheetRefField (FieldBaseWithXml):
 
 
 			# Get the external sheet reference cell
-			sheetRefCell = self._ownerField._f_getCellFromInstance( instance )
+			sheetRefCell = getattr( instance.cells, self._ownerField._name )
 
 
 			# Create the reference cell; this cell returns a reference to the target cell
@@ -388,7 +388,7 @@ class SheetRefField (FieldBaseWithXml):
 				if sheet is None:
 					return None
 				else:
-					return self._targetField._f_getCellFromInstance( sheet )
+					return getattr( sheet.cells, self._targetField._name )
 
 			targetCellRefCell = CellRefCell()
 			targetCellRefCell.function = refCellFunction
@@ -449,13 +449,13 @@ class SheetRefField (FieldBaseWithXml):
 		if not ( isinstance( targetSheetClass, SheetClass )  and  issubclass( targetSheetClass, Sheet ) ):
 			raise TypeError, 'targetSheetClass must be an instance of SheetClass and a subclass of Sheet'
 		self._targetSheetClass = targetSheetClass
-		self._targetFieldToRefTable = {}
+		self._targetFieldNameToRefTable = {}
 
 
 
 	def _f_metaMember_initMetaMember(self, cls, name):
 		super( SheetRefField, self )._f_metaMember_initMetaMember( cls, name )
-		for ref in self._targetFieldToRefTable.values():
+		for ref in self._targetFieldNameToRefTable.values():
 			ref._f_initMetaMember()
 
 
@@ -491,13 +491,13 @@ class SheetRefField (FieldBaseWithXml):
 			raise AttributeError, 'Sheet class \'%s\' has no attribute named \'%s\'' % ( self._targetSheetClass.__name__, name )
 		else:
 			try:
-				memberRef = self._targetFieldToRefTable[targetField]
+				memberRef = self._targetFieldNameToRefTable[name]
 			except KeyError:
 				if isinstance( targetField, FieldInterface ):
 					memberRef = SheetRefField._SheetMemberRef( self, targetField )
 				else:
 					raise TypeError, 'Attempting to access member of class \'%s\'; it is not an instance of \'FieldInterface\''  %  ( self._targetSheetClass.__name__, )
-				self._targetFieldToRefTable[targetField] = memberRef
+				self._targetFieldNameToRefTable[targetField] = memberRef
 			return memberRef
 
 
@@ -1384,10 +1384,17 @@ if __name__ == '__main__':
 		b = Field( float, 3.14 )
 		c = Field( bool, False )
 
+	class SheetA2 (SheetA):
+		d = Field( int, 10 )
+
 
 	class SheetB (Sheet):
 		s = SheetRefField( SheetA )
 		sa = FieldProxy( s.a )
+
+	class SheetB2 (SheetB):
+		s = SheetRefField( SheetA2 )
+		sd = FieldProxy( s.d )
 
 
 	class SheetC (Sheet):
@@ -1397,6 +1404,8 @@ if __name__ == '__main__':
 		s1a = FieldProxy( s1.a )
 		s2a = FieldProxy( s2.a )
 		s3a = FieldProxy( s3.sa )
+
+
 
 
 	class CellTest (unittest.TestCase):
@@ -1449,6 +1458,33 @@ if __name__ == '__main__':
 
 			b.s = a2
 
+			self.assert_( b.sa == 3 )
+			self.assert_( cellX.value == 12 )
+
+
+		def testInheritedRef(self):
+			a1 = SheetA2()
+			a2 = SheetA2()
+
+			def f():
+				return b.sa * 4
+
+			cellX = Cell()
+			cellX.function = f
+
+			a2.a = 3
+			a2.d = 23
+
+			b = SheetB2()
+			b.s = a1
+
+			self.assert_( b.sd == 10 )
+			self.assert_( b.sa == 0 )
+			self.assert_( cellX.value == 0 )
+
+			b.s = a2
+
+			self.assert_( b.sd == 23 )
 			self.assert_( b.sa == 3 )
 			self.assert_( cellX.value == 12 )
 

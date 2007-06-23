@@ -49,7 +49,7 @@ class CVTSimpleSinkProductionMultipleField (FunctionField):
 	def __init__(self, sinkField, rule=None, doc=''):
 		def _function(cvtNode):
 			pin = sinkField._f_getPinFromInstance( cvtNode.graphNode )
-			return [ cvtNode._tree.buildNode( source.node )   for source in pin ]
+			return [ cvtNode._tree.buildNode( source.node, rule )   for source in pin ]
 		super( CVTSimpleSinkProductionMultipleField, self ).__init__( _function, doc )
 
 

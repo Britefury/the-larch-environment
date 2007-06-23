@@ -11,20 +11,8 @@ from Britefury.Sheet.Sheet import *
 from Britefury.SemanticGraph.SemanticGraph import *
 
 from Britefury.CodeGraph.CGNode import CGNode
-from Britefury.CodeGraph.CGLocalRef import CGLocalRef
+from Britefury.CodeGraph.CGVar import CGVar
 
 
-class CGVar (CGNode):
-	name = Field( str, '', doc='Variable name' )
-	references = SemanticGraphSourceField( 'References', 'All references to this local variable' )
-	declaration = SemanticGraphSourceField( 'Declaraion', 'The variable declaration' )
-
-
-	def generatePyCode(self):
-		return self.name
-
-
-	def createRefNode(self):
-		refNode = CGLocalRef()
-		refNode.variable.append( self.references )
-		return refNode
+class CGParameterVar (CGVar):
+	paramDoc = Field( str, '', doc='Parameter documentation' )

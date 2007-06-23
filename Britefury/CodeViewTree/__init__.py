@@ -13,6 +13,7 @@ import CVTCall
 import CVTClass
 import CVTClassBases
 import CVTDef
+import CVTDefDoc
 import CVTExpression
 import CVTGetAttr
 import CVTIntLiteral
@@ -23,7 +24,10 @@ import CVTLocalVarDeclaration
 import CVTModule
 import CVTNot
 import CVTNullExpression
+import CVTParameterDoc
 import CVTParameters
+import CVTParametersDoc
+import CVTParameterVar
 import CVTReturn
 import CVTStatement
 import CVTStringLiteral

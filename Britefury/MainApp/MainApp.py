@@ -79,13 +79,13 @@ class MainApp (object):
 		executeButton.connect( 'clicked', self._p_onExecuteCode )
 
 
-		executeDebugButton = gtk.Button( 'Execute with debug' )
-		executeDebugButton.show()
-		executeDebugButton.connect( 'clicked', self._p_onExecuteCodeWithDebug )
+		executeDevelButton = gtk.Button( 'Execute with devel' )
+		executeDevelButton.show()
+		executeDevelButton.connect( 'clicked', self._p_onExecuteCodeWithDevel )
 
 
 		buttonBox = gtk.HBox( spacing=20 )
-		buttonBox.pack_end( executeDebugButton, False, False, 0 )
+		buttonBox.pack_end( executeDevelButton, False, False, 0 )
 		buttonBox.pack_end( executeButton, False, False, 0 )
 		buttonBox.pack_end( oneToOneButton, False, False, 0 )
 		buttonBox.pack_end( resetButton, False, False, 0 )
@@ -122,8 +122,8 @@ class MainApp (object):
 		graphViewItem = gtk.MenuItem( 'Show graph view' )
 		graphViewItem.connect( 'activate', self._p_onShowGraphView )
 
-		debugMenu = gtk.Menu()
-		debugMenu.append( graphViewItem )
+		develMenu = gtk.Menu()
+		develMenu.append( graphViewItem )
 
 
 		fileMenuItem = gtk.MenuItem( 'File' )
@@ -132,14 +132,14 @@ class MainApp (object):
 		editMenuItem = gtk.MenuItem( 'Edit' )
 		editMenuItem.set_submenu( editMenu )
 
-		debugMenuItem = gtk.MenuItem( 'Debug' )
-		debugMenuItem.set_submenu( debugMenu )
+		develMenuItem = gtk.MenuItem( 'Devel' )
+		develMenuItem.set_submenu( develMenu )
 
 
 		menuBar = gtk.MenuBar()
 		menuBar.append( fileMenuItem )
 		menuBar.append( editMenuItem )
-		menuBar.append( debugMenuItem )
+		menuBar.append( develMenuItem )
 		menuBar.show_all()
 
 
@@ -210,7 +210,7 @@ class MainApp (object):
 
 
 
-	def _p_onExecuteCodeWithDebug(self, widget):
+	def _p_onExecuteCodeWithDevel(self, widget):
 		pyCodeBlock = self._graphRoot.generatePyCodeBlock()
 		text = pyCodeBlock.asText()
 		print text
