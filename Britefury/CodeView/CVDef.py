@@ -105,11 +105,7 @@ class CVDef (CVStatement):
 		self._box.append( self._declBox )
 		self._box.append( self._statementsBorder )
 		self.widget.child = self._box
-		#self.widget.borderWidth = 5.0
-		#self.widget.highlightedBorderWidth = 7.0
-		#self.widget.borderColour = Colour3f( 0.6, 1.0, 0.6 )
-		#self.widget.prelitBorderColour = Colour3f( 0.1, 0.5, 0.1 )
-		#self.widget.allMargins = 8.0
+		self.widget.borderColour = Colour3f( 0.6, 0.8, 0.6 )
 
 
 
