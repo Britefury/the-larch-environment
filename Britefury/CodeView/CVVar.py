@@ -72,6 +72,10 @@ class CVVar (CVNode):
 		self.nameWidget.startEditingOnRight()
 
 
+	def makeCurrent(self):
+		self.startEditing()
+
+
 	def isNameEmpty(self):
 		return self.nameWidget.text == ''
 
