@@ -19,6 +19,15 @@ class CGDef (CGStatement):
 	declVar = SemanticGraphSinkSingleSubtreeField( 'Variable', 'Name variable' )
 	parameters = SemanticGraphSinkSingleSubtreeField( 'Parameters', 'Parameters' )
 	block = SemanticGraphSinkSingleSubtreeField( 'Block', 'Code block' )
+	functionDoc = Field( str, '', doc='Function documentation' )
+
+
+	@FunctionField
+	def functionName(self):
+		if len( self.declVar ) > 0:
+			return self.declVar[0].node.name
+		else:
+			return ''
 
 
 

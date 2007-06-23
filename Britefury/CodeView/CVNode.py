@@ -226,21 +226,6 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 		return None
 
 
-	def _o_isExtendable(self):
-		return False
-
-
-	def _f_cursorToParent(self):
-		if self._o_isExtendable():
-			self.makeCurrent()
-			return True
-		elif self._parent is not None:
-			return self._parent._f_cursorToParent()
-		else:
-			raise CVNode._CouldNotFindNextChildError
-			return True
-
-
 	def _f_cursorLeftFromChild(self, child, bItemStep):
 		navList = self.horizontalNavigationList()
 		leftChild = self._p_prevNavListItem( navList, child )

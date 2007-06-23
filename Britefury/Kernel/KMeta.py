@@ -118,7 +118,26 @@ class KClass (type):
 		# Get the list of meta-members, and sort it into dependency-order
 		metaMembers = [ value   for value in clsDict.values()   if isinstance( value, KMetaMember ) ]
 		dependencySortedMetaMembers = KMetaMember._f_computeDependencySortedList( metaMembers )
-		cls._dependencySortedMetaMembers.extend( dependencySortedMetaMembers )
+
+
+
+		# Replace overloaded meta-members in @cls._dependencySortedMetaMembers (meta-members from base classes) with the new meta-members from @cls
+		def _getOverload(existingMember):
+			name = existingMember._name
+			try:
+				newMember = clsDict[name]
+			except KeyError:
+				pass
+			else:
+				if isinstance( newMember, KMetaMember ):
+					return newMember
+			return existingMember
+
+		cls._dependencySortedMetaMembers = [ _getOverload( member )   for member in cls._dependencySortedMetaMembers ]
+
+
+		cls._dependencySortedMetaMembers.extend( [ member   for member in dependencySortedMetaMembers   if member not in cls._dependencySortedMetaMembers ] )
+
 
 
 		# Initialise and register meta members
@@ -129,6 +148,8 @@ class KClass (type):
 
 				# Register meta-member under its name
 				cls._metaMembers[name] = value
+
+
 
 
 		# Process any overloading, and initialise the class
