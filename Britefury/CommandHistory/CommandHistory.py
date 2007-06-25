@@ -42,6 +42,7 @@ class CommandHistory (object):
 		self._future = []
 		self._bCommandsBlocked = False
 		self._bFrozen = False
+		self._freezeCount = 0
 		self._trackers = {}
 		self._trackedObjects = set()
 
@@ -100,8 +101,11 @@ class CommandHistory (object):
 
 	def freeze(self):
 		"Freeze the command history"
-		self._past.append( [] )
+		if not self._bFrozen:
+			if self.top() != []:
+				self._past.append( [] )
 		self._bFrozen = True
+		self._freezeCount += 1
 
 	def freezeJoin(self):
 		"Freeze the command history, joining onto previous command"
@@ -114,9 +118,13 @@ class CommandHistory (object):
 
 	def thaw(self):
 		"Thaw the command history"
-		if len( self._past[-1] ) == 0:
-			self._past.pop()
-		self._bFrozen = False
+		self._freezeCount -= 1
+		if self._freezeCount == 0:
+			if len( self._past[-1] ) == 0:
+				self._past.pop()
+			self._bFrozen = False
+
+		self._freezeCount = max( self._freezeCount, 0 )
 
 
 

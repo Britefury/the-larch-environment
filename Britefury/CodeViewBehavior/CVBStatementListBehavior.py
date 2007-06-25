@@ -38,6 +38,17 @@ class CVBStatementListBehavior (CodeViewBehavior):
 		return True
 
 
+	@CVBAccelInputHandlerMethod( '<alt>i' )
+	def _addIf(self, viewNode, receivingNodePath, widget, event):
+		position = CVBStatementListBehavior._p_getPosition( viewNode, receivingNodePath )
+		viewNode._f_commandHistoryFreeze()
+		cvto_addIfStatement( viewNode.treeNode, position )
+		ifCV = viewNode.statementNodes[position]
+		ifCV.startEditing()
+		viewNode._f_commandHistoryThaw()
+		return True
+
+
 	@CVBAccelInputHandlerMethod( '<alt>w' )
 	def _addWhile(self, viewNode, receivingNodePath, widget, event):
 		position = CVBStatementListBehavior._p_getPosition( viewNode, receivingNodePath )

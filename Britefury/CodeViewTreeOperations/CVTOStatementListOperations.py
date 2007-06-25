@@ -9,6 +9,8 @@ from Britefury.CodeGraph.CGReturn import *
 from Britefury.CodeGraph.CGNullExpression import *
 from Britefury.CodeGraph.CGVar import *
 from Britefury.CodeGraph.CGLocalVarDeclaration import *
+from Britefury.CodeGraph.CGIf import *
+from Britefury.CodeGraph.CGIfBlock import *
 from Britefury.CodeGraph.CGWhile import *
 from Britefury.CodeGraph.CGDef import *
 from Britefury.CodeGraph.CGParameters import *
@@ -36,6 +38,26 @@ def cvto_addLocalVarStatement(treeNode, position):
 	treeNode.graph.nodes.append( decl )
 	decl.variable.append( var.declaration )
 	treeNode.graphNode.statements.insert( position, decl.parent )
+	return treeNode.statementNodes[position]
+
+
+
+
+def cvto_addIfStatement(treeNode, position):
+	ifStmt = CGIf()
+	ifBlock = CGIfBlock()
+	nullExp = CGNullExpression()
+	block = CGBlock()
+	treeNode.graph.nodes.append( ifStmt )
+	treeNode.graph.nodes.append( ifBlock )
+	treeNode.graph.nodes.append( nullExp )
+	treeNode.graph.nodes.append( block )
+
+	ifBlock.condition.append( nullExp.parent )
+	ifBlock.block.append( block.parent )
+	ifStmt.ifBlock.append( ifBlock.ifStatement )
+
+	treeNode.graphNode.statements.insert( position, ifStmt.parent )
 	return treeNode.statementNodes[position]
 
 

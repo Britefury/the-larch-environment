@@ -12,6 +12,8 @@ from Britefury.CodeGraph.CGNot import *
 from Britefury.CodeGraph.CGLambda import *
 from Britefury.CodeGraph.CGParameters import *
 from Britefury.CodeGraph.CGNullExpression import *
+from Britefury.CodeGraph.CGTuple import *
+from Britefury.CodeGraph.CGList import *
 
 
 
@@ -63,3 +65,21 @@ def cvto_insertLambda(treeNode, position):
 	lambdaNode.valueExpr.append( nullExpression.parent )
 
 	return treeNode.insertNode( lambdaNode, position )
+
+
+
+
+def cvto_insertTuple(treeNode, position):
+	tup = CGTuple()
+	treeNode.graph.nodes.append( tup )
+	return treeNode.insertNode( tup, position )
+
+
+
+
+def cvto_insertList(treeNode, position):
+	ls = CGList()
+	treeNode.graph.nodes.append( ls )
+	return treeNode.insertNode( ls, position )
+
+

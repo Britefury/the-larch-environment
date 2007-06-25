@@ -14,10 +14,15 @@ import CVTClass
 import CVTClassBases
 import CVTDef
 import CVTDefDoc
+import CVTElseBlock
+import CVTElseIfBlock
 import CVTExpression
 import CVTGetAttr
+import CVTIf
+import CVTIfBlock
 import CVTIntLiteral
 import CVTLambda
+import CVTList
 import CVTAssignment
 import CVTLocalRef
 import CVTLocalVarDeclaration
@@ -31,6 +36,7 @@ import CVTParameterVar
 import CVTReturn
 import CVTStatement
 import CVTStringLiteral
+import CVTTuple
 import CVTUnboundRef
 import CVTVar
 import CVTWhile

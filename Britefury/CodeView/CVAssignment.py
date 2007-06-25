@@ -83,11 +83,11 @@ class CVAssignment (CVBorderNode):
 				self.valueNode.startEditing()
 			else:
 				child._o_moveFocus( moveFocus )
-				self.treeNode.removeAssignment()
+				self.treeNode.replaceAssigmentWithTarget()
 				self._view.refresh()
 		elif child is self.targetRefNode:
 			child._o_moveFocus( moveFocus )
-			self.treeNode.removeAssignment()
+			self.treeNode.replaceAssignmentWithValue()
 			self._view.refresh()
 
 

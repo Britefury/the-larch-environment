@@ -5,17 +5,23 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
-from Britefury.CodeGraph.CGStatement import CGStatement
+from Britefury.CodeGraph.CGNode import *
+from Britefury.CodeGraph.CGExpression import *
 from Britefury.Sheet.Sheet import *
 from Britefury.SemanticGraph.SemanticGraph import *
 
 
 
-class CGAssignment (CGStatement):
-	targetRef = SemanticGraphSinkSingleSubtreeField( 'Target', 'Target reference' )
-	value = SemanticGraphSinkSingleSubtreeField( 'Value', 'Value' )
+class CGTuple (CGExpression):
+	args = SemanticGraphSinkMultipleSubtreeField( 'Arguments', 'Tuple arguments' )
+
 
 
 
 	def generatePyCode(self):
-		return self.targetRef[0].node.generatePyCode() + ' = ' + self.value[0].node.generatePyCode()
+		if len( self.args ) == 0:
+			return '()'
+		elif len( self.args ) == 1:
+			return '( ' + self.args[0].node.generatePyCode() + ', )'
+		else:
+			return '( ' + ', '.join( [ argSource.node.generatePyCode()   for argSource in self.args ] ) + ' )'

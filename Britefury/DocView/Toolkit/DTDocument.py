@@ -115,7 +115,8 @@ class DTDocument (gtk.DrawingArea, DTBin):
 			reqWidth = self._f_getRequisitionWidth()
 			self._f_allocateX( self._documentSize.x * self._docScale )
 			reqHeight = self._f_getRequisitionHeight()
-			self._f_allocateY( self._documentSize.y * self._docScale )
+			yAlloc = max( self._documentSize.y * self._docScale, reqHeight )
+			self._f_allocateY( yAlloc )
 			self._bAllocationRequired = False
 
 

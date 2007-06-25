@@ -66,7 +66,7 @@ class DTBin (DTContainer):
 		if self._child is not None:
 			self._childRequisition.y = self._child._f_getRequisitionHeight()
 		else:
-			self._childRequisition.x = 0.0
+			self._childRequisition.y = 0.0
 		return self._childRequisition.y
 
 

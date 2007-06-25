@@ -29,6 +29,13 @@ class PyCodeBlock (object):
 		return ''.join( [ line + '\n'   for line in self._lines ] )
 
 
+	def __getitem__(self, n):
+		return self._lines[n]
+
+	def __setitem__(self, n, x):
+		self._lines[n] = x
+
+
 	def __iadd__(self, block):
 		self.extend( block )
 		return self

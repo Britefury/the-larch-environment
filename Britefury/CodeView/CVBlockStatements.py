@@ -56,7 +56,7 @@ class CVBlockStatements (CVBorderNode):
 		super( CVBlockStatements, self ).__init__( treeNode, view )
 		self._startCursor = CVCursorStop( view, self )
 		self._endCursor = CVCursorStop( view, self )
-		self._box = DTBox( DTDirection.TOP_TO_BOTTOM, minorDirectionAlignment=DTBox.ALIGN_TOPLEFT, spacing=4.0 )
+		self._box = DTBox( DTDirection.TOP_TO_BOTTOM, minorDirectionAlignment=DTBox.ALIGN_LEFT, spacing=4.0 )
 		self.widget.child = self._box
 
 

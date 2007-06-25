@@ -397,8 +397,8 @@ class DTEntry (DTWidget):
 
 		# Not handle it ourselves
 		if not bHandled:
+			modKeys = event.state & _modKeysMask
 			if event.keyVal == gtk.keysyms.Left:
-				modKeys = event.state & _modKeysMask
 				if modKeys == gtk.gdk.SHIFT_MASK  or  modKeys == 0:
 					if self._cursorLocation > 0:
 						self._p_moveCursor( ( event.state & gtk.gdk.SHIFT_MASK ) != 0, self._cursorLocation - 1 )
@@ -407,7 +407,6 @@ class DTEntry (DTWidget):
 						# Handled if shift pressed
 						bHandled = event.state & gtk.gdk.SHIFT_MASK  !=  0
 			elif event.keyVal == gtk.keysyms.Right:
-				modKeys = event.state & _modKeysMask
 				if modKeys == gtk.gdk.SHIFT_MASK  or  modKeys == 0:
 					if self._cursorLocation  <  len( self._text ):
 						self._p_moveCursor( ( event.state & gtk.gdk.SHIFT_MASK ) != 0, self._cursorLocation + 1 )
@@ -463,7 +462,7 @@ class DTEntry (DTWidget):
 						bHandled = len( text ) != 0
 					self._p_onTextModified()
 					# Event not handled if text was empty
-			elif event.keyString != ''  and  self.bEditable:
+			elif event.keyString != ''  and  ( modKeys == 0  or  modKeys == gtk.gdk.SHIFT_MASK )  and  self.bEditable:
 				bTextOk = True
 
 				if self._regexp is not None:

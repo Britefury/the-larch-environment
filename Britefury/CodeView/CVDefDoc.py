@@ -60,8 +60,7 @@ class CVDefDoc (CVNode):
 
 	@FunctionField
 	def _refreshName(self):
-		pass
-		#self._functionBox[1] = ( self.nameWidget, True, True, True, 0.0 )
+		self._functionBox[1] = ( self.nameWidget, False, False, True, DTBox.ALIGN_EXPAND, 0.0 )
 
 	@FunctionField
 	def _refreshParams(self):
@@ -69,7 +68,7 @@ class CVDefDoc (CVNode):
 
 	@FunctionField
 	def _refreshFunctionDoc(self):
-		self._functionDocBox[1] = ( self.functionDocWidget, True, True, True, 0.0 )
+		self._functionDocBox[1] = ( self.functionDocWidget, True, True, True, DTBox.ALIGN_EXPAND, 0.0 )
 
 
 	@FunctionField
@@ -83,7 +82,7 @@ class CVDefDoc (CVNode):
 
 	def __init__(self, treeNode, view):
 		super( CVDefDoc, self ).__init__( treeNode, view )
-		self._functionBox = DTBox( spacing=25.0, minorDirectionAlignment=DTBox.ALIGN_EXPAND )
+		self._functionBox = DTBox( spacing=25.0 )
 		self._functionBox.append( DTLabel( markup='F<span size="small">UNCTION</span>', font='Sans 11' ), False, False )
 		self._functionBox.append( DTLabel( '<nil>' ), True, True )
 		self._functionDocBox = DTBox( spacing=10.0 )
@@ -93,7 +92,7 @@ class CVDefDoc (CVNode):
 		self.widget.append( self._functionBox )
 		self.widget.append( DTLabel( '<nil>' ) )
 		self.widget.append( self._functionDocBox )
-		self.widget.backgroundColour = Colour3f( 0.85, 0.85, 0.85 )
+		self.widget.backgroundColour = Colour3f( 0.9, 0.9, 0.9 )
 
 
 

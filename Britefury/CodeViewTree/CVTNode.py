@@ -58,7 +58,7 @@ class CVTSimpleSinkProductionMultipleField (FunctionField):
 
 
 class CVTSimpleNodeProductionSingleField (FunctionRefField):
-	def __init__(self, rule, doc=''):
+	def __init__(self, rule=None, doc=''):
 		def _function(cvtNode):
 			return cvtNode._tree.buildNode( cvtNode.graphNode, rule )
 		super( CVTSimpleNodeProductionSingleField, self ).__init__( _function, doc )

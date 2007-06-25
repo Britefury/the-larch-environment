@@ -79,13 +79,13 @@ class MainApp (object):
 		executeButton.connect( 'clicked', self._p_onExecuteCode )
 
 
-		executeDevelButton = gtk.Button( 'Execute with devel' )
-		executeDevelButton.show()
-		executeDevelButton.connect( 'clicked', self._p_onExecuteCodeWithDevel )
+		executeWithSourceButton = gtk.Button( 'Execute with source' )
+		executeWithSourceButton.show()
+		executeWithSourceButton.connect( 'clicked', self._p_onExecuteCodeWithSource )
 
 
 		buttonBox = gtk.HBox( spacing=20 )
-		buttonBox.pack_end( executeDevelButton, False, False, 0 )
+		buttonBox.pack_end( executeWithSourceButton, False, False, 0 )
 		buttonBox.pack_end( executeButton, False, False, 0 )
 		buttonBox.pack_end( oneToOneButton, False, False, 0 )
 		buttonBox.pack_end( resetButton, False, False, 0 )
@@ -210,7 +210,7 @@ class MainApp (object):
 
 
 
-	def _p_onExecuteCodeWithDevel(self, widget):
+	def _p_onExecuteCodeWithSource(self, widget):
 		pyCodeBlock = self._graphRoot.generatePyCodeBlock()
 		text = pyCodeBlock.asText()
 		print text

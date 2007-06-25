@@ -38,7 +38,7 @@ class CVParameterDoc (CVNode):
 
 	@FunctionRefField
 	def paramDocWidget(self):
-		entry = DVCStringCellEditEntryLabel( regexp=RegExpStrings.identifier )
+		entry = DVCStringCellEditEntryLabel()
 		entry.keyHandler = self
 		entry.attachCell( self.treeNode.cells.paramDoc )
 		return entry.entry
@@ -50,7 +50,7 @@ class CVParameterDoc (CVNode):
 
 	@FunctionField
 	def _refreshParamDoc(self):
-		self.widget[2] = ( self.paramDocWidget, True, True, True, 0.0 )
+		self.widget[2] = ( self.paramDocWidget, True, True, True, DTBox.ALIGN_CENTRE, 0.0 )
 
 	@FunctionField
 	def refreshCell(self):
