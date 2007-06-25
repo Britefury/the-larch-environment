@@ -536,9 +536,12 @@ class SheetGraphNodeSinkSingle (SheetGraphNodeSink):
 
 	def _f_extend(self, sources):
 		assert self._input is None, 'input already set'
-		assert len( sources ) == 1, 'too many inputs'
+		assert len( sources ) < 2, 'too many inputs (%d)'  %  ( len( sources ), )
 		oldIn = self._input
-		self._input = sources[0]
+		newIn = None
+		if len( sources ) > 0:
+			newIn = sources[0]
+		self._input = newIn
 		self.evaluatorSignal.emit( self._p_inputAsList( oldIn ), self._p_inputAsList( self._input ) )
 		self._o_changed()
 
@@ -564,7 +567,7 @@ class SheetGraphNodeSinkSingle (SheetGraphNodeSink):
 		self._o_changed()
 
 	def _f_set(self, contents):
-		assert len( contents ) < 2, 'too many inputs'
+		assert len( contents ) < 2, 'too many inputs (%d)'  %  ( len( contents ), )
 		oldIn = self._input
 		if len( contents ) == 1:
 			self._input = contents[0]

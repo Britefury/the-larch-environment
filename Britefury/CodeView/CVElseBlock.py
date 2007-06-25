@@ -14,11 +14,9 @@ from Britefury.Math.Math import Colour3f
 from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
-from Britefury.CodeViewTree.CVTWhile import CVTWhile
+from Britefury.CodeViewTree.CVTElseBlock import CVTElseBlock
 
-from Britefury.CodeView.CVStatement import *
-
-from Britefury.CodeViewBehavior.CVBWhileBehavior import *
+from Britefury.CodeView.CVBorderNode import *
 
 from Britefury.DocView.Toolkit.DTBox import DTBox
 from Britefury.DocView.Toolkit.DTLabel import DTLabel
@@ -28,24 +26,12 @@ from Britefury.DocView.CellEdit.DVCStringCellEditEntryLabel import DVCStringCell
 
 
 
-class CVWhile (CVStatement):
-	treeNodeClass = CVTWhile
+class CVElseBlock (CVBorderNode):
+	treeNodeClass = CVTElseBlock
 
 
-	treeNode = SheetRefField( CVTWhile )
+	treeNode = SheetRefField( CVTElseBlock )
 
-
-	behaviors = [ CVBWhileBehavior() ]
-
-
-
-	@FunctionRefField
-	def whileExprNode(self):
-		return self._view.buildView( self.treeNode.whileExprNode, self )
-
-	@FunctionRefField
-	def whileExprWidget(self):
-		return self.whileExprNode.widget
 
 
 
@@ -60,34 +46,27 @@ class CVWhile (CVStatement):
 
 
 	@FunctionField
-	def _refreshWhileExpr(self):
-		self._whileBox[1] = self.whileExprWidget
-
-	@FunctionField
 	def _refreshStatements(self):
 		self._statementsBorder.child = self.statementsWidget
 
 
 	@FunctionField
 	def refreshCell(self):
-		self._refreshWhileExpr
 		self._refreshStatements
 
 
 
 
 	def __init__(self, treeNode, view):
-		super( CVWhile, self ).__init__( treeNode, view )
-		self._whileBox = DTBox( spacing=5.0 )
-		self._whileBox.append( DTLabel( markup='W<span size="small">HILE</span>', font='Sans bold 11', colour=Colour3f( 0.0, 0.5, 0.0 ) ) )
-		self._whileBox.append( DTLabel( 'nil' ) )
-		self._whileBox.append( DTLabel( ':' ) )
-		self._whileBox.backgroundColour = Colour3f( 1.0, 1.0, 0.75 )
+		super( CVElseBlock, self ).__init__( treeNode, view )
+		self._elseBin = DTBin()
+		self._elseBin.child = DTLabel( markup='E<span size="small">LSE:</span>', font='Sans bold 11', colour=Colour3f( 0.0, 0.5, 0.0 ) )
+		self._elseBin.backgroundColour = Colour3f( 1.0, 1.0, 0.75 )
 		self._statementsBorder = DTBorder( leftMargin=30.0 )
 		self._statementsBorder.child = DTLabel( 'nil' )
-		self._box = DTBox( spacing=5.0, direction=DTDirection.TOP_TO_BOTTOM, minorDirectionAlignment=DTBox.ALIGN_EXPAND )
-		self._box.append( self._whileBox )
-		self._box.append( self._statementsBorder )
+		self._box = DTBox( spacing=5.0, direction=DTDirection.TOP_TO_BOTTOM )
+		self._box.append( self._elseBin, minorDirectionAlignment=DTBox.ALIGN_LEFT )
+		self._box.append( self._statementsBorder, minorDirectionAlignment=DTBox.ALIGN_EXPAND )
 		self.widget.child = self._box
 
 
@@ -96,24 +75,14 @@ class CVWhile (CVStatement):
 		self.statementsNode.startEditing()
 
 
-	def startEditing(self):
-		self.whileExprNode.startEditing()
-
 
 	def horizontalNavigationList(self):
-		return [ self.whileExprNode, self.statementsNode ]
-
-	def verticalNavigationList(self):
-		return [ self.whileExprNode, self.statementsNode ]
+		return [ self.statementsNode ]
 
 
 
 	def deleteChild(self, child, moveFocus):
-		if child is self.whileExprNode:
-			self.whileExprNode.treeNode.replaceWithNullExpression()
-			self._view.refresh()
-			self.whileExprNode.startEditing()
-
-
+		if child is self.statementsNode:
+			self.deleteNode( moveFocus )
 
 

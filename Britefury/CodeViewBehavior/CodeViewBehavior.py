@@ -112,10 +112,11 @@ class CodeViewBehavior (Sheet):
 		try:
 			inputHandler = self._keyToInputHandler[key]
 		except KeyError:
-			try:
-				inputHandler = self._charToInputHandler[char]
-			except KeyError:
-				pass
+			if state == 0  or  state == gtk.gdk.SHIFT_MASK:
+				try:
+					inputHandler = self._charToInputHandler[char]
+				except KeyError:
+					pass
 
 
 		if inputHandler is not None:

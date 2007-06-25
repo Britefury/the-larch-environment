@@ -24,7 +24,7 @@ class CVTAssignment (CVTNode):
 
 
 
-	def removeAssignment(self):
+	def replaceAssignmentWithValue(self):
 		targetRefCG = self.graphNode.targetRef[0].node
 
 		valueCGSource = self.graphNode.value[0]
@@ -37,6 +37,22 @@ class CVTAssignment (CVTNode):
 		self.graphNode.destroySubtree()
 
 		return valueCGSource.node
+
+
+
+	def replaceAssigmentWithTarget(self):
+		valueCG = self.graphNode.value[0].node
+
+		targetCGSource = self.graphNode.targetRef[0]
+
+		parentCGSink = self.graphNode.parent[0]
+
+		del self.graphNode.targetRef[0]
+		parentCGSink.replace( self.graphNode.parent, targetCGSource )
+
+		self.graphNode.destroySubtree()
+
+		return targetCGSource.node
 
 
 

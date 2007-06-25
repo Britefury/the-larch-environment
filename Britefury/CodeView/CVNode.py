@@ -141,9 +141,9 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 
 	def _o_moveFocus(self, moveFocus):
 		if moveFocus == MoveFocus.LEFT:
-			self.cursorLeft()
+			self.cursorLeft( True )
 		else:
-			self.cursorRight()
+			self.cursorRight( True )
 
 
 	def deleteChild(self, child, moveFocus):

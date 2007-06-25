@@ -75,3 +75,26 @@ class CVBCreateExpressionBehavior (CodeViewBehavior):
 		viewNode._f_commandHistoryThaw()
 		return True
 
+
+	@CVBAccelInputHandlerMethod( '<alt>t' )
+	def _replaceWithTuple(self, viewNode, receivingNodePath, widget, event):
+		viewNode._f_commandHistoryFreeze()
+		insertPosition = viewNode.getInsertPosition( receivingNodePath )
+		tupleCVT = cvto_insertTuple( viewNode.treeNode, insertPosition )
+		viewNode._view.refresh()
+		tupleCV = viewNode._view.getViewNodeForTreeNode( tupleCVT )
+		tupleCV.startEditing()
+		viewNode._f_commandHistoryThaw()
+		return True
+
+
+	@CVBCharInputHandlerMethod( '[' )
+	def _replaceWithList(self, viewNode, receivingNodePath, widget, event):
+		viewNode._f_commandHistoryFreeze()
+		insertPosition = viewNode.getInsertPosition( receivingNodePath )
+		listCVT = cvto_insertList( viewNode.treeNode, insertPosition )
+		viewNode._view.refresh()
+		listCV = viewNode._view.getViewNodeForTreeNode( listCVT )
+		listCV.startEditing()
+		viewNode._f_commandHistoryThaw()
+		return True

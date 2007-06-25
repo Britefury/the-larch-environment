@@ -14,10 +14,15 @@ import CVClass
 import CVClassBases
 import CVDef
 import CVDefDoc
+import CVElseBlock
+import CVElseIfBlock
 import CVExpression
 import CVGetAttr
+import CVIf
+import CVIfBlock
 import CVIntLiteral
 import CVLambda
+import CVList
 import CVAssignment
 import CVLocalRef
 import CVLocalVarDeclaration
@@ -31,6 +36,7 @@ import CVParameterVar
 import CVReturn
 import CVStatement
 import CVStringLiteral
+import CVTuple
 import CVUnboundRef
 import CVVar
 import CVWhile

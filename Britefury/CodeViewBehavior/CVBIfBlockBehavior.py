@@ -5,17 +5,15 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
-from Britefury.CodeGraph.CGStatement import CGStatement
-from Britefury.Sheet.Sheet import *
-from Britefury.SemanticGraph.SemanticGraph import *
+from Britefury.CodeViewBehavior.CodeViewBehavior import *
 
 
+class CVBIfBlockBehavior (CodeViewBehavior):
+	@CVBCharInputHandlerMethod( ':' )
+	def _gotoStatements(self, viewNode, receivingNodePath, widget, event):
+		viewNode._f_commandHistoryFreeze()
+		viewNode.startEditingStatements()
+		viewNode._f_commandHistoryThaw()
+		return True
 
-class CGAssignment (CGStatement):
-	targetRef = SemanticGraphSinkSingleSubtreeField( 'Target', 'Target reference' )
-	value = SemanticGraphSinkSingleSubtreeField( 'Value', 'Value' )
 
-
-
-	def generatePyCode(self):
-		return self.targetRef[0].node.generatePyCode() + ' = ' + self.value[0].node.generatePyCode()

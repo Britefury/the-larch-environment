@@ -195,3 +195,67 @@ class DTLabel (DTWidget):
 	colour = property( getColour, setColour )
 	hAlign = property( getHAlign, setHAlign )
 	vAlign = property( getVAlign, setVAlign )
+
+
+
+
+
+
+
+
+
+
+if __name__ == '__main__':
+	import pygtk
+	pygtk.require( '2.0' )
+	import gtk
+
+
+	from Britefury.DocView.Toolkit.DTBox import DTBox
+	from Britefury.DocView.Toolkit.DTDirection import DTDirection
+	from Britefury.DocView.Toolkit.DTDocument import DTDocument
+	import cairo
+	from Britefury.Math.Math import Colour3f
+	import traceback
+
+	def onDeleteEvent(widget, event, data=None):
+		return False
+
+	def onDestroy(widget, data=None):
+		gtk.main_quit()
+
+
+	def makeButton(text, response):
+		button = gtk.Button( text )
+		button.connect( 'clicked', response )
+		button.show()
+		return button
+
+
+	window = gtk.Window( gtk.WINDOW_TOPLEVEL );
+	window.connect( 'delete-event', onDeleteEvent )
+	window.connect( 'destroy', onDestroy )
+	window.set_border_width( 10 )
+	window.set_size_request( 300, 100 )
+
+	doc = DTDocument()
+	doc.show()
+
+	vbox = DTBox( DTDirection.TOP_TO_BOTTOM, minorDirectionAlignment=DTBox.ALIGN_EXPAND )
+	vbox.spacing = 10.0
+	vbox.backgroundColour = Colour3f( 0.8, 0.8, 0.8 )
+
+	for i in xrange( 0, 4 ):
+		hbox = DTBox()
+		for j in xrange( i*64, i*64+64 ):
+			hbox.append( DTLabel( chr( j ) ) )
+		vbox.append( hbox )
+
+
+	doc.child = vbox
+
+
+	window.add( doc )
+	window.show()
+
+	gtk.main()

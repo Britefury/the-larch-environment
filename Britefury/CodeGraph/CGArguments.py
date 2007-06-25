@@ -20,7 +20,10 @@ class CGArguments (CGNode):
 
 
 	def generatePyCode(self):
-		p = ', '.join( [ argSource.node.generatePyCode()   for argSource in self.args ] )
+		if len( self.args ) == 0:
+			p = '()'
+		else:
+			p = ', '.join( [ argSource.node.generatePyCode()   for argSource in self.args ] )
 		if len( self.expandArg ) > 0:
 			p += ', *(' + self.expandArg[0].node.generatePyCode() + ')'
 		return p
