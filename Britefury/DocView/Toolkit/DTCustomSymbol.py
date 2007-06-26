@@ -92,6 +92,7 @@ class DTCustomSymbol (DTWidget):
 	def _o_draw(self, context):
 		super( DTCustomSymbol, self )._o_draw( context )
 		context.save()
+		self._o_clipIfAllocationInsufficient( context )
 		context.set_source_rgb( self._colour.r, self._colour.g, self._colour.b )
 		context.translate( self._symbolPosition.x, self._symbolPosition.y )
 		self._o_drawSymbol( context )

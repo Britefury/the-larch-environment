@@ -508,6 +508,8 @@ class DTEntry (DTWidget):
 		super( DTEntry, self )._o_draw( context )
 		b = self._borderWidth
 
+		self._o_clipIfAllocationInsufficient( context )
+
 		self._p_refreshLayout()
 
 

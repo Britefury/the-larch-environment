@@ -42,6 +42,7 @@ class DTWidget (object):
 		self._scale = 1.0
 		self._rootScale = 1.0
 		self._allocation = Vector2()
+		self._requiredSize = Vector2()
 
 
 
@@ -160,6 +161,14 @@ class DTWidget (object):
 
 
 
+	def _o_clip(self, context):
+		context.new_path()
+		context.rectangle( 0, 0, self._allocation.x, self._allocation.y )
+		context.clip()
+
+	def _o_clipIfAllocationInsufficient(self, context):
+		if self._requiredSize.x > self._allocation.x  or  self._requiredSize.y > self._allocation.y:
+			self._o_clip( context )
 
 
 	def _o_queueResize(self):
@@ -237,12 +246,14 @@ class DTWidget (object):
 		requisition = self._o_getRequiredWidth()  *  self._scale
 		if self._sizeRequest.x != -1:
 			requisition = self._sizeRequest.x
+		self._requiredSize.x = requisition
 		return requisition
 
 	def _f_getRequisitionHeight(self):
 		requisition = self._o_getRequiredHeight()  *  self._scale
 		if self._sizeRequest.y != -1:
 			requisition = self._sizeRequest.y
+		self._requiredSize.y = requisition
 		return requisition
 
 	def _f_allocateX(self, allocation):
