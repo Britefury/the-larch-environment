@@ -386,8 +386,16 @@ class CVNodeInvalid (CVNode):
 
 
 	def __init__(self, treeNode, view):
-		super( CVReturn, self ).__init__( treeNode, view )
-		self._label = DT
-		self.widget = DTBorder( background=Colour3f( 1.0, 0.0, 0.0 ) )
+		super( CVNodeInvalid, self ).__init__( treeNode, view )
+		self.widget = DTBorder()
 		self.widget.allMargins = 2.0
-		self.widget.child = DTLabel( 'return', font='Sans bold 11', colour=Colour3f( 1.0, 1.0, 1.0 ) )
+		self.widget.child = DTLabel( '<invalid>', font='Sans bold italic 11', colour=Colour3f( 1.0, 1.0, 1.0 ) )
+		self.widget.backgroundColour = Colour3f( 1.0, 0.0, 0.0 )
+
+
+
+	def startEditing(self):
+		self.makeCurrent()
+
+
+

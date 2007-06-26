@@ -9,6 +9,7 @@ from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
 from Britefury.CodeGraph.CGNot import CGNot
+from Britefury.CodeGraph.CGNullExpression import CGNullExpression
 
 from Britefury.CodeViewTree.CVTNode import *
 from Britefury.CodeViewTree.CVTExpression import CVTExpression
@@ -32,10 +33,11 @@ class CVTNot (CVTExpression):
 	def unwrapNot(self):
 		parentCGSink = self.graphNode.parent[0]
 		exprSource = self.graphNode.expr[0]
-
-		self.graphNode.expr.remove( exprSource )
-
-		parentCGSink.replace( self.graphNode.parent, exprSource )
+		if isinstance( exprSource.node, CGNullExpression ):
+			parentCGSink.remove( self.graphNode.parent )
+		else:
+			self.graphNode.expr.remove( exprSource )
+			parentCGSink.replace( self.graphNode.parent, exprSource )
 
 		self.graphNode.destroySubtree()
 

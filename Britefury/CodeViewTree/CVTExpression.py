@@ -14,6 +14,8 @@ from Britefury.CodeGraph.CGArguments import CGArguments
 from Britefury.CodeGraph.CGGetAttr import CGGetAttr
 from Britefury.CodeGraph.CGNot import CGNot
 from Britefury.CodeGraph.CGNullExpression import CGNullExpression
+from Britefury.CodeGraph.CGTuple import CGTuple
+from Britefury.CodeGraph.CGList import CGList
 
 from Britefury.CodeViewTree.CVTStatement import CVTStatement
 from Britefury.CodeViewTree.CodeViewTree import *
@@ -49,6 +51,22 @@ class CVTExpression (CVTStatement):
 		self.graph.nodes.append( notCG )
 		parentCGSink.splitLinkWithNode( self.graphNode.parent, notCG.expr, notCG.parent )
 		return self._tree.buildNode( notCG )
+
+
+	def wrapInTuple(self):
+		parentCGSink = self.graphNode.parent[0]
+		tupleCG = CGTuple()
+		self.graph.nodes.append( tupleCG )
+		parentCGSink.splitLinkWithNode( self.graphNode.parent, tupleCG.args, tupleCG.parent )
+		return self._tree.buildNode( tupleCG )
+
+
+	def wrapInList(self):
+		parentCGSink = self.graphNode.parent[0]
+		listCG = CGList()
+		self.graph.nodes.append( listCG )
+		parentCGSink.splitLinkWithNode( self.graphNode.parent, listCG.args, listCG.parent )
+		return self._tree.buildNode( listCG )
 
 
 	def replaceWithNullExpression(self):

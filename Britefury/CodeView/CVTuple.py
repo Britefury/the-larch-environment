@@ -32,7 +32,7 @@ from Britefury.DocView.CellEdit.DVCStringCellEditEntryLabel import DVCStringCell
 
 class _TupleOpen (DTCustomSymbol):
 	def _o_getSymbolSizeRequest(self):
-		return Vector2( self._size*1.25, self._size*1.25 )
+		return Vector2( self._size*1.25*0.8, self._size*1.25 )
 
 	def _o_drawSymbol(self, context):
 		context.set_line_width( 1.0 / (11.0*1.25) )
@@ -41,10 +41,10 @@ class _TupleOpen (DTCustomSymbol):
 		context.line_to( 0.1, 0.5 )
 		context.line_to( 0.4, 1.0 )
 
-		context.move_to( 0.8, 0.0 )
-		context.line_to( 0.6, 0.333 )
-		context.line_to( 0.6, 0.667 )
-		context.line_to( 0.8, 1.0 )
+		context.move_to( 0.7, 0.0 )
+		context.line_to( 0.5, 0.333 )
+		context.line_to( 0.5, 0.667 )
+		context.line_to( 0.7, 1.0 )
 		context.stroke()
 
 
@@ -52,19 +52,19 @@ class _TupleOpen (DTCustomSymbol):
 
 class _TupleClose (DTCustomSymbol):
 	def _o_getSymbolSizeRequest(self):
-		return Vector2( self._size*1.25, self._size*1.25 )
+		return Vector2( self._size*1.25*0.8, self._size*1.25 )
 
 	def _o_drawSymbol(self, context):
 		context.set_line_width( 1.0 / (11.0*1.25) )
 		context.scale( self._size*1.25, self._size*1.25 )
-		context.move_to( 0.2, 0.0 )
-		context.line_to( 0.4, 0.333 )
-		context.line_to( 0.4, 0.667 )
-		context.line_to( 0.2, 1.0 )
+		context.move_to( 0.1, 0.0 )
+		context.line_to( 0.3, 0.333 )
+		context.line_to( 0.3, 0.667 )
+		context.line_to( 0.1, 1.0 )
 
-		context.move_to( 0.6, 0.0 )
-		context.line_to( 0.9, 0.5 )
-		context.line_to( 0.6, 1.0 )
+		context.move_to( 0.4, 0.0 )
+		context.line_to( 0.7, 0.5 )
+		context.line_to( 0.4, 1.0 )
 		context.stroke()
 
 
