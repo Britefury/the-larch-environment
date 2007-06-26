@@ -133,6 +133,7 @@ class DTLabel (DTWidget):
 
 	def _o_draw(self, context):
 		super( DTLabel, self )._o_draw( context )
+		self._o_clipIfAllocationInsufficient( context )
 		self._p_refreshLayout()
 		context.set_source_rgb( self._colour.r, self._colour.g, self._colour.b )
 		context.move_to( self._textPosition.x, self._textPosition.y )

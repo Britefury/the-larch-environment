@@ -336,9 +336,6 @@ class DTContainer (DTWidget):
 		for childId in widgets:
 			entry = self._childIdToEntry[childId]
 			context.save()
-			context.new_path()
-			context.rectangle( entry.box.getLower().x, entry.box.getLower().y, entry.box.getWidth(), entry.box.getHeight() )
-			context.clip()
 			context.translate( entry.xform.translation.x, entry.xform.translation.y )
 			context.scale( entry.xform.scale, entry.xform.scale )
 			entry.child._f_draw( context, areaBox * entry.invXform )
