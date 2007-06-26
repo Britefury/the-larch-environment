@@ -77,7 +77,8 @@ class CVBlockStatements (CVBorderNode):
 
 	def deleteChild(self, child, moveFocus):
 		child._o_moveFocus( moveFocus )
-		self.treeNode.deleteStatement( child.treeNode )
+		if child is not self._startCursor  and  child is not self._endCursor:
+			self.treeNode.deleteStatement( child.treeNode )
 		return True
 
 

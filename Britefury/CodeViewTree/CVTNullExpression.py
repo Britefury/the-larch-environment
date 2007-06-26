@@ -28,6 +28,10 @@ class CVTNullExpression (CVTNode):
 		return self._tree.buildNode( graphNodeToInsert )
 
 
+	def replaceWithNullExpression(self):
+		return self
+
+
 
 
 

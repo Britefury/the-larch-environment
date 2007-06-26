@@ -74,7 +74,7 @@ class CVNot (CVExpression):
 
 
 	def deleteChild(self, child, moveFocus):
-		if child is self.targetObjectNode:
+		if child is self.exprNode:
 			self.exprNode.treeNode.replaceWithNullExpression()
 			self._view.refresh()
 			self.exprNode.startEditing()
