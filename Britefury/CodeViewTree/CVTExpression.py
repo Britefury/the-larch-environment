@@ -53,6 +53,17 @@ class CVTExpression (CVTStatement):
 		return self._tree.buildNode( notCG )
 
 
+	def wrapInBinaryOperator(self, graphNodeClass):
+		parentCGSink = self.graphNode.parent[0]
+		binOpCG = graphNodeClass()
+		nullExpr = CGNullExpression()
+		self.graph.nodes.append( binOpCG )
+		self.graph.nodes.append( nullExpr )
+		parentCGSink.splitLinkWithNode( self.graphNode.parent, binOpCG.left, binOpCG.parent )
+		binOpCG.right.append( nullExpr.parent )
+		return self._tree.buildNode( binOpCG )
+
+
 	def wrapInTuple(self):
 		parentCGSink = self.graphNode.parent[0]
 		tupleCG = CGTuple()
