@@ -17,8 +17,7 @@ from Britefury.PyCodeGen.PyCodeGen import *
 
 
 class CGIf (CGStatement):
-	ifBlock = SemanticGraphSinkSingleSubtreeField( 'If', 'If block' )
-	elseIfBlocks = SemanticGraphSinkMultipleSubtreeField( 'ElseIf', 'Else if blocks' )
+	ifBlocks = SemanticGraphSinkMultipleSubtreeField( 'If', 'If block' )
 	elseBlock = SemanticGraphSinkSingleSubtreeField( 'ElseBlock', 'Else block' )
 
 

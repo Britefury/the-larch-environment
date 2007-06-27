@@ -55,7 +55,7 @@ def cvto_addIfStatement(treeNode, position):
 
 	ifBlock.condition.append( nullExp.parent )
 	ifBlock.block.append( block.parent )
-	ifStmt.ifBlock.append( ifBlock.ifStatement )
+	ifStmt.ifBlocks.append( ifBlock.ifStatement )
 
 	treeNode.graphNode.statements.insert( position, ifStmt.parent )
 	return treeNode.statementNodes[position]
