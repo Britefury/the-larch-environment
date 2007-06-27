@@ -38,7 +38,7 @@ class CVTSimpleSinkProductionSingleField (FunctionRefField):
 			if len( pin ) > 0:
 				return cvtNode._tree.buildNode( pin[0].node, rule )
 			else:
-				return CVTNodeInvalid( None, cvtNode._tree )
+				return cvtNode._f_makeInvalidNode()
 		super( CVTSimpleSinkProductionSingleField, self ).__init__( _function, doc )
 
 
@@ -97,6 +97,11 @@ class CVTNode (Sheet):
 
 	def getGraph(self):
 		return self._tree.graph
+
+
+
+	def _f_makeInvalidNode(self):
+		return CVTNodeInvalid( None, self._tree )
 
 
 	tree = property( getTree )

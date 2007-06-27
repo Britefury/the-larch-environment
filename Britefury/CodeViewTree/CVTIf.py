@@ -26,8 +26,21 @@ class CVTIf (CVTStatement):
 	graphNode = SheetRefField( CGIf )
 
 
-	ifBlockNode = CVTSimpleSinkProductionSingleField( CGIf.ifBlock )
-	elseIfBlockNodes = CVTSimpleSinkProductionMultipleField( CGIf.elseIfBlocks, rule=CVTRuleElseIfBlock )
+	@FunctionRefField
+	def ifBlockNode(self):
+		if len( self.graphNode.ifBlocks ) > 0:
+			return self._tree.buildNode( self.graphNode.ifBlocks[0].node )
+		else:
+			return self._f_makeInvalidNode()
+
+
+	@FunctionField
+	def elseIfBlockNodes(self):
+		if len( self.graphNode.ifBlocks ) > 1:
+			return [ self._tree.buildNode( ifBlockSource.node, rule=CVTRuleElseIfBlock )   for ifBlockSource in self.graphNode.ifBlocks[1:] ]
+		else:
+			return []
+
 	elseStatementsNode = CVTSimpleSinkProductionOptionalField( CGIf.elseBlock, rule=CVTRuleElseBlock )
 
 
@@ -43,7 +56,7 @@ class CVTIf (CVTStatement):
 
 		elseIfBlockCG.condition.append( nullExpr.parent )
 		elseIfBlockCG.block.append( block.parent )
-		self.graphNode.elseIfBlocks.insert( position, elseIfBlockCG.ifStatement )
+		self.graphNode.ifBlocks.insert( position + 1, elseIfBlockCG.ifStatement )
 
 		return self._tree.buildNode( elseIfBlockCG )
 
@@ -66,25 +79,15 @@ class CVTIf (CVTStatement):
 
 
 	def removeIf(self):
-		# Get the if block
-		ifCG = self.graphNode.ifBlock[0].node
-		# Get the first else-if block
-		elseIf0CG = self.graphNode.elseIfBlocks[0].node
-
-		# Remove the if block
-		del self.graphNode.ifBlock[0]
-		# Remove the first else-if block
-		del self.graphNode.elseIfBlocks[0]
-		# Replace the if block with the else-if block
-		self.graphNode.ifBlock.append( elseIf0CG.ifStatement )
-
-		ifCG.destroySubtree()
+		ifBlockCG = self.graphNode.ifBlocks[0].node
+		del self.graphNode.ifBlocks[0]
+		ifBlockCG.destroySubtree()
 
 
 
 	def removeElseIf(self, elseIfCVT):
 		elseIfCG = elseIfCVT.graphNode
-		self.graphNode.elseIfBlocks.remove( elseIfCG.ifStatement )
+		self.graphNode.ifBlocks.remove( elseIfCG.ifStatement )
 		elseIfCG.destroySubtree()
 
 
