@@ -7,6 +7,18 @@
 ##-*************************
 from Britefury.CodeViewBehavior.CodeViewBehavior import *
 
+from Britefury.CodeGraph.CGBinaryOperator import *
+
+
+
+def _makeBinOpWrapFunction(graphNodeClass):
+	def _wrapInBinOp(self, viewNode, receivingNodePath, widget, event):
+		viewNode._f_commandHistoryFreeze()
+		viewNode.wrapInBinaryOperator( graphNodeClass )
+		viewNode._f_commandHistoryThaw()
+		return True
+	return _wrapInBinOp
+
 
 class CVBWrapExpressionBehavior (CodeViewBehavior):
 	@CVBCharInputHandlerMethod( '(' )
@@ -47,4 +59,21 @@ class CVBWrapExpressionBehavior (CodeViewBehavior):
 		viewNode.wrapInList()
 		viewNode._f_commandHistoryThaw()
 		return True
+
+
+	_wrapInAdd = CVBCharInputHandlerMethod( '+' )( _makeBinOpWrapFunction( CGBinOpAdd ) )
+	_wrapInSub = CVBCharInputHandlerMethod( '-' )( _makeBinOpWrapFunction( CGBinOpSub ) )
+	_wrapInMul = CVBCharInputHandlerMethod( '*' )( _makeBinOpWrapFunction( CGBinOpMul ) )
+	_wrapInDiv = CVBCharInputHandlerMethod( '/' )( _makeBinOpWrapFunction( CGBinOpDiv ) )
+	_wrapInPow = CVBAccelInputHandlerMethod( '<alt>8' )( _makeBinOpWrapFunction( CGBinOpPow ) )
+	_wrapInMod = CVBCharInputHandlerMethod( '%' )( _makeBinOpWrapFunction( CGBinOpMod ) )
+	_wrapInBitAnd = CVBCharInputHandlerMethod( '&' )( _makeBinOpWrapFunction( CGBinOpBitAnd ) )
+	_wrapInBitOr = CVBCharInputHandlerMethod( '|' )( _makeBinOpWrapFunction( CGBinOpBitOr ) )
+	_wrapInBitXor = CVBCharInputHandlerMethod( '^' )( _makeBinOpWrapFunction( CGBinOpBitXor ) )
+	_wrapInEq = CVBAccelInputHandlerMethod( '<alt>equal' )( _makeBinOpWrapFunction( CGBinOpEq ) )
+	_wrapInNEq = CVBAccelInputHandlerMethod( '<alt>1' )( _makeBinOpWrapFunction( CGBinOpNEq ) )
+	_wrapInLT = CVBCharInputHandlerMethod( '<' )( _makeBinOpWrapFunction( CGBinOpLT ) )
+	_wrapInGT = CVBCharInputHandlerMethod( '>' )( _makeBinOpWrapFunction( CGBinOpGT ) )
+	_wrapInLTE = CVBAccelInputHandlerMethod( '<alt>comma' )( _makeBinOpWrapFunction( CGBinOpLTE ) )
+	_wrapInGTE = CVBAccelInputHandlerMethod( '<alt>period' )( _makeBinOpWrapFunction( CGBinOpGTE ) )
 

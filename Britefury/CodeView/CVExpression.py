@@ -52,6 +52,13 @@ class CVExpression (CVBorderNode):
 		notCV.makeCurrent()
 
 
+	def wrapInBinaryOperator(self, graphNodeClass):
+		binOpCVT = self.treeNode.wrapInBinaryOperator( graphNodeClass )
+		self._view.refresh()
+		binOpCV = self._view.getViewNodeForTreeNode( binOpCVT )
+		binOpCV.startEditingRight()
+
+
 	def wrapInTuple(self):
 		tupleCVT = self.treeNode.wrapInTuple()
 		self._view.refresh()

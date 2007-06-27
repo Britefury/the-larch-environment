@@ -8,6 +8,7 @@
 import CodeView
 import CVArguments
 import CVAttrName
+import CVBinaryOperator
 import CVBlockStatements
 import CVCall
 import CVClass

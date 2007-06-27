@@ -8,6 +8,7 @@
 import CodeViewTree
 import CVTArguments
 import CVTAttrName
+import CVTBinaryOperator
 import CVTBlockStatements
 import CVTCall
 import CVTClass
