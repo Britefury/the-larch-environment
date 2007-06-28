@@ -37,6 +37,14 @@ class CVBWrapExpressionBehavior (CodeViewBehavior):
 		return True
 
 
+	@CVBAccelInputHandlerMethod( '<alt>minus' )
+	def _wrapInNegate(self, viewNode, receivingNodePath, widget, event):
+		viewNode._f_commandHistoryFreeze()
+		viewNode.wrapInNegate()
+		viewNode._f_commandHistoryThaw()
+		return True
+
+
 	@CVBAccelInputHandlerMethod( '<alt>n' )
 	def _wrapInNot(self, viewNode, receivingNodePath, widget, event):
 		viewNode._f_commandHistoryFreeze()

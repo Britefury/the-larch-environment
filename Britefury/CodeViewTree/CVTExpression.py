@@ -12,6 +12,7 @@ from Britefury.CodeGraph.CGExpression import CGExpression
 from Britefury.CodeGraph.CGCall import CGCall
 from Britefury.CodeGraph.CGArguments import CGArguments
 from Britefury.CodeGraph.CGGetAttr import CGGetAttr
+from Britefury.CodeGraph.CGNegate import CGNegate
 from Britefury.CodeGraph.CGNot import CGNot
 from Britefury.CodeGraph.CGNullExpression import CGNullExpression
 from Britefury.CodeGraph.CGTuple import CGTuple
@@ -43,6 +44,14 @@ class CVTExpression (CVTStatement):
 		self.graph.nodes.append( getAttrCG )
 		parentCGSink.splitLinkWithNode( self.graphNode.parent, getAttrCG.targetObject, getAttrCG.parent )
 		return self._tree.buildNode( getAttrCG )
+
+
+	def wrapInNegate(self):
+		parentCGSink = self.graphNode.parent[0]
+		negateCG = CGNegate()
+		self.graph.nodes.append( negateCG )
+		parentCGSink.splitLinkWithNode( self.graphNode.parent, negateCG.expr, negateCG.parent )
+		return self._tree.buildNode( negateCG )
 
 
 	def wrapInNot(self):
