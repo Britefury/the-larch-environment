@@ -28,6 +28,7 @@ import CVTAssignment
 import CVTLocalRef
 import CVTLocalVarDeclaration
 import CVTModule
+import CVTNegate
 import CVTNot
 import CVTNullExpression
 import CVTParameterDoc

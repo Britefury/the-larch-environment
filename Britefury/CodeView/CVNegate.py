@@ -16,7 +16,7 @@ from Britefury.Util import RegExpStrings
 from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
-from Britefury.CodeViewTree.CVTNot import CVTNot
+from Britefury.CodeViewTree.CVTNegate import CVTNegate
 
 from Britefury.CodeView.CVExpression import *
 
@@ -26,11 +26,11 @@ from Britefury.DocView.Toolkit.DTLabel import DTLabel
 
 
 
-class CVNot (CVExpression):
-	treeNodeClass = CVTNot
+class CVNegate (CVExpression):
+	treeNodeClass = CVTNegate
 
 
-	treeNode = SheetRefField( CVTNot )
+	treeNode = SheetRefField( CVTNegate )
 
 
 
@@ -67,9 +67,9 @@ class CVNot (CVExpression):
 
 
 	def __init__(self, treeNode, view):
-		super( CVNot, self ).__init__( treeNode, view )
+		super( CVNegate, self ).__init__( treeNode, view )
 		self._box = DTBox( spacing=5.0 )
-		self._box.append( DTLabel( 'not', font='Sans bold 11', colour=Colour3f( 0.0, 0.6, 0.0 ) ) )
+		self._box.append( DTLabel( '-', font='Sans bold 11', colour=Colour3f( 0.0, 0.6, 0.0 ) ) )
 		self._box.append( DTLabel( 'nil' ) )
 		self.widget.child = self._box
 
@@ -83,7 +83,7 @@ class CVNot (CVExpression):
 
 
 	def deleteNode(self, moveFocus):
-		self.treeNode.unwrapNot()
+		self.treeNode.unwrapNegate()
 		self._view.refresh()
 		self.exprNode.startEditing()
 

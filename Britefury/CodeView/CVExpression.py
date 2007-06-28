@@ -45,6 +45,13 @@ class CVExpression (CVBorderNode):
 		getAttrCV.startEditingAttrName()
 
 
+	def wrapInNegate(self):
+		negateCVT = self.treeNode.wrapInNegate()
+		self._view.refresh()
+		negateCV = self._view.getViewNodeForTreeNode( negateCVT )
+		negateCV.makeCurrent()
+
+
 	def wrapInNot(self):
 		notCVT = self.treeNode.wrapInNot()
 		self._view.refresh()

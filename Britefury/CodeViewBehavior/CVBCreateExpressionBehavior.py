@@ -52,6 +52,18 @@ class CVBCreateExpressionBehavior (CodeViewBehavior):
 		return True
 
 
+	@CVBAccelInputHandlerMethod( '<alt>minus' )
+	def _replaceWithNegate(self, viewNode, receivingNodePath, widget, event):
+		viewNode._f_commandHistoryFreeze()
+		insertPosition = viewNode.getInsertPosition( receivingNodePath )
+		negateCVT = cvto_insertNegate( viewNode.treeNode, insertPosition )
+		viewNode._view.refresh()
+		negateCV = viewNode._view.getViewNodeForTreeNode( negateCVT )
+		negateCV.startEditingExpression()
+		viewNode._f_commandHistoryThaw()
+		return True
+
+
 	@CVBAccelInputHandlerMethod( '<alt>n' )
 	def _replaceWithNot(self, viewNode, receivingNodePath, widget, event):
 		viewNode._f_commandHistoryFreeze()

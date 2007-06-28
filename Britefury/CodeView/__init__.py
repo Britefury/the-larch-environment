@@ -28,6 +28,7 @@ import CVAssignment
 import CVLocalRef
 import CVLocalVarDeclaration
 import CVModule
+import CVNegate
 import CVNot
 import CVNullExpression
 import CVParameterDoc
