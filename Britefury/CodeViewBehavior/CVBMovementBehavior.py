@@ -42,6 +42,23 @@ class CVBMovementBehavior (CodeViewBehavior):
 
 
 
+	@CVBAccelInputHandlerMethod( '<alt>Left' )
+	def _leftParent(self, viewNode, receivingNodePath, widget, event):
+		viewNode._f_commandHistoryFreeze()
+		result = viewNode.cursorToLeftParent()
+		viewNode._f_commandHistoryThaw()
+		return result
+
+	@CVBAccelInputHandlerMethod( '<alt>Right' )
+	def _rightParent(self, viewNode, receivingNodePath, widget, event):
+		viewNode._f_commandHistoryFreeze()
+		result = viewNode.cursorToRightParent()
+		viewNode._f_commandHistoryThaw()
+		return result
+
+
+
+
 	@CVBAccelInputHandlerMethod( 'Left' )
 	def _left(self, viewNode, receivingNodePath, widget, event):
 		viewNode._f_commandHistoryFreeze()

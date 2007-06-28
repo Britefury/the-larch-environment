@@ -25,7 +25,7 @@ class CGBinaryOperatorSimple (CGBinaryOperator):
 
 	def generatePyCode(self):
 		assert self.pyOperatorString is not None
-		return self.left[0].node.generatePyCode() + ' ' + self.pyOperatorString + ' ' + self.right[0].node.generatePyCode()
+		return '( ' + self.left[0].node.generatePyCode() + ' ' + self.pyOperatorString + ' ' + self.right[0].node.generatePyCode() + ' )'
 
 
 

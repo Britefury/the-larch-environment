@@ -180,6 +180,20 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 
 
 
+	def cursorToLeftParent(self):
+		if self._parent is not None:
+			return self._parent._f_cursorLeftFromChildStop( self )
+		else:
+			return True
+
+	def cursorToRightParent(self, bItemStep=False):
+		if self._parent is not None:
+			return self._parent._f_cursorRightFromChildStop( self )
+		else:
+			return True
+
+
+
 	def cursorUp(self):
 		if self._parent is not None:
 			return self._parent._f_cursorUpFromChild( self )
@@ -246,6 +260,27 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 		elif self._parent is not None:
 			return self._parent._f_cursorRightFromChild( self, bItemStep )
 		else:
+			return True
+
+
+	def _f_cursorLeftFromChildStop(self, child):
+		navList = self.horizontalNavigationList()
+		leftChild = self._p_prevNavListItem( navList, child )
+		if leftChild is not None:
+			leftChild._f_cursorEnterFromRight( self, False )
+			return True
+		else:
+			self.makeCurrent()
+			return True
+
+	def _f_cursorRightFromChildStop(self, child):
+		navList = self.horizontalNavigationList()
+		rightChild = self._p_nextNavListItem( navList, child )
+		if rightChild is not None:
+			rightChild._f_cursorEnterFromLeft( self, False )
+			return True
+		else:
+			self.makeCurrent()
 			return True
 
 

@@ -20,6 +20,7 @@ from Britefury.CodeView.CVExpression import *
 
 from Britefury.DocView.Toolkit.DTWrappedLine import DTWrappedLine
 from Britefury.DocView.Toolkit.DTBox import DTBox
+from Britefury.DocView.Toolkit.DTScript import DTScript
 from Britefury.DocView.Toolkit.DTDirection import DTDirection
 from Britefury.DocView.Toolkit.DTLabel import DTLabel
 from Britefury.DocView.Toolkit.DTHLine import DTHLine
@@ -70,16 +71,16 @@ class CVBinaryOperator (CVExpression):
 	@FunctionField
 	def _refreshLeft(self):
 		if self.leftWidget is not None:
-			self._box[0] = self.leftWidget
+			self._o_setLeftChildWidget( self._container, self.leftWidget )
 		else:
-			self._box[0] = DTLabel( 'nil' )
+			self._o_setLeftChildWidget( self._container, DTLabel( '<nil>' ) )
 
 	@FunctionField
 	def _refreshRight(self):
-		if self.leftWidget is not None:
-			self._box[2] = self.rightWidget
+		if self.rightWidget is not None:
+			self._o_setRightChildWidget( self._container, self.rightWidget )
 		else:
-			self._box[2] = DTLabel( 'nil' )
+			self._o_setRightChildWidget( self._container, DTLabel( '<nil>' ) )
 
 	@FunctionField
 	def refreshCell(self):
@@ -93,11 +94,8 @@ class CVBinaryOperator (CVExpression):
 
 	def __init__(self, treeNode, view):
 		super( CVBinaryOperator, self ).__init__( treeNode, view )
-		self._box = self._o_makeBox()
-		self._box.append( DTLabel( 'nil' ) )
-		self._o_packOperatorWidget( self._box )
-		self._box.append( DTLabel( 'nil' ) )
-		self.widget.child = self._box
+		self._container = self._o_makeContainer()
+		self.widget.child = self._container
 
 
 	def deleteChild(self, child, moveFocus):
@@ -122,19 +120,68 @@ class CVBinaryOperator (CVExpression):
 		return [ self.leftNode, self.rightNode ]
 
 
+	def _o_setLeftChildWidget(self, container, child):
+		raise TypeError, 'abstract'
 
-	def _o_makeBox(self):
-		return DTBox()
+	def _o_setRightChildWidget(self, container, child):
+		raise TypeError, 'abstract'
 
 
-	def _o_packOperatorWidget(self, box):
+
+	def _o_makeContainer(self):
 		raise TypeError, 'abstract'
 
 
 
 
 
-class CVBinaryOperatorSimple (CVBinaryOperator):
+class CVBinaryOperatorBox (CVBinaryOperator):
+	treeNodeClass = CVTBinaryOperator
+	treeNode = SheetRefField( CVTBinaryOperator )
+	operatorCharacterString = None
+
+
+	def _o_makeContainer(self):
+		box = self._o_makeBox()
+		box.append( DTLabel( 'nil' ) )
+		self._o_packOperatorWidget( box )
+		box.append( DTLabel( 'nil' ) )
+		return box
+
+	def _o_makeBox(self):
+		return DTBox( spacing=2.0 )
+
+	def _o_packOperatorWidget(self, box):
+		assert self.operatorCharacterString is not None
+		box.append( DTLabel( self.operatorCharacterString, font='Sans bold 11', colour=Colour3f( 0.0, 0.6, 0.0 ) ) )
+
+
+	def _o_setLeftChildWidget(self, container, child):
+		container[0] = child
+
+	def _o_setRightChildWidget(self, container, child):
+		container[2] = child
+
+
+
+class CVBinaryOperatorScript (CVBinaryOperator):
+	treeNodeClass = CVTBinaryOperator
+	treeNode = SheetRefField( CVTBinaryOperator )
+	scriptMode = DTScript.SUPERSCRIPT
+
+
+	def _o_makeContainer(self):
+		return DTScript( self.scriptMode )
+
+	def _o_setLeftChildWidget(self, container, child):
+		container.leftChild = child
+
+	def _o_setRightChildWidget(self, container, child):
+		container.rightChild = child
+
+
+
+class CVBinaryOperatorSimple (CVBinaryOperatorBox):
 	treeNodeClass = CVTBinaryOperator
 	treeNode = SheetRefField( CVTBinaryOperator )
 	operatorCharacterString = None
@@ -162,7 +209,7 @@ class CVBinOpMul (CVBinaryOperatorSimple):
 	operatorCharacterString = '*'
 
 
-class CVBinOpDiv (CVBinaryOperator):
+class CVBinOpDiv (CVBinaryOperatorBox):
 	treeNodeClass = CVTBinOpDiv
 	treeNode = SheetRefField( CVTBinOpDiv )
 
@@ -173,10 +220,10 @@ class CVBinOpDiv (CVBinaryOperator):
 		box.append( DTHLine( 2.0, colour=Colour3f( 0.0, 0.6, 0.0 ) ), minorDirectionAlignment=DTBox.ALIGN_EXPAND )
 
 
-class CVBinOpPow (CVBinaryOperatorSimple):
+class CVBinOpPow (CVBinaryOperatorScript):
 	treeNodeClass = CVTBinOpPow
 	treeNode = SheetRefField( CVTBinOpPow )
-	operatorCharacterString = '**'
+	scriptMode = DTScript.SUPERSCRIPT
 
 class CVBinOpMod (CVBinaryOperatorSimple):
 	treeNodeClass = CVTBinOpMod
