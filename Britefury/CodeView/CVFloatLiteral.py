@@ -33,7 +33,7 @@ from Britefury.DocView.CellEdit.DVCStringCellEditEntryLabel import DVCStringCell
 
 def _floatMarkup(text):
 	if text.endswith( 'e' ):
-		return text.replace( 'e', '' ):
+		return text.replace( 'e', '' )
 	elif 'e' in text:
 		return text.replace( 'e', '*10<sup>' ) + '</sup>'
 	else:
