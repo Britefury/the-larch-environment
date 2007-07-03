@@ -11,15 +11,15 @@ import gtk
 
 from Britefury.Math.Math import Colour3f
 
+from Britefury.Util import RegExpStrings
+
 from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
-from Britefury.CodeViewTree.CVTIntLiteral import CVTIntLiteral
+from Britefury.CodeViewTree.CVTFloatLiteral import CVTFloatLiteral
 
 from Britefury.CodeView.CVExpression import *
 from Britefury.CodeView.MoveFocus import *
-
-from Britefury.CodeViewBehavior.CVBIntLiteralBehavior import CVBIntLiteralBehavior
 
 from Britefury.DocView.Toolkit.DTBox import DTBox
 from Britefury.DocView.Toolkit.DTLabel import DTLabel
@@ -31,22 +31,28 @@ from Britefury.DocView.CellEdit.DVCStringCellEditEntryLabel import DVCStringCell
 
 
 
+def _floatMarkup(text):
+	if text.endswith( 'e' ):
+		return text.replace( 'e', '' ):
+	elif 'e' in text:
+		return text.replace( 'e', '*10<sup>' ) + '</sup>'
+	else:
+		return text
 
-class CVIntLiteral (CVExpression):
-	treeNodeClass = CVTIntLiteral
 
 
-	treeNode = SheetRefField( CVTIntLiteral )
+class CVFloatLiteral (CVExpression):
+	treeNodeClass = CVTFloatLiteral
 
 
-	behaviors = [ CVBIntLiteralBehavior() ]
+	treeNode = SheetRefField( CVTFloatLiteral )
 
 
 
 
 	@FunctionRefField
 	def stringValueWidget(self):
-		entry = DVCStringCellEditEntryLabel( regexp='-?[0-9]*' )
+		entry = DVCStringCellEditEntryLabel( labelFilter=_floatMarkup, bLabelMarkup=True, regexp=RegExpStrings.floatRegex )
 		entry.entry.textColour=Colour3f( 0.0, 0.0, 0.75 )
 		entry.keyHandler = self
 		entry.attachCell( self.treeNode.cells.strValue )
@@ -65,7 +71,7 @@ class CVIntLiteral (CVExpression):
 
 
 	def __init__(self, treeNode, view):
-		super( CVIntLiteral, self ).__init__( treeNode, view )
+		super( CVFloatLiteral, self ).__init__( treeNode, view )
 		self.widget.child = DTLabel( '<nil>' )
 
 

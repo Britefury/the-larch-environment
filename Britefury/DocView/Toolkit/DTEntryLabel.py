@@ -59,12 +59,16 @@ class DTEntryLabel (DTBin):
 
 
 
-	def __init__(self, text='', font=None, textColour=Colour3f( 0.0, 0.0, 0.0 ), regexp=None):
+	def __init__(self, text='', labelFilter=None, bLabelMarkup=False, font=None, textColour=Colour3f( 0.0, 0.0, 0.0 ), regexp=None):
 		super( DTEntryLabel, self ).__init__()
 
 		self._text = text
 
+		self._labelFilter = labelFilter
+		self._bLabelMarkup = bLabelMarkup
+
 		self._label = self._Label( self, text, None, font, textColour )
+		self._p_refreshLabel()
 		self._entry = self._Entry( self, text, font, textColour=textColour, regexp=regexp )
 		self._entry.textInsertedSignal.connect( self._p_onEntryTextInserted )
 		self._entry.textDeletedSignal.connect( self._p_onEntryTextDeleted )
@@ -81,7 +85,7 @@ class DTEntryLabel (DTBin):
 
 	def setText(self, text):
 		self._text = text
-		self._label.text = text
+		self._p_refreshLabel()
 		self._entry.text = text
 
 
@@ -132,6 +136,18 @@ class DTEntryLabel (DTBin):
 
 
 
+	def _p_refreshLabel(self):
+		labelText = self._text
+		if self._labelFilter is not None:
+			labelText = self._labelFilter( labelText )
+
+		if self._bLabelMarkup:
+			self._label.markup = labelText
+		else:
+			self._label.text = labelText
+
+
+
 	def _p_onLabelClicked(self):
 		self.startEditing()
 
@@ -139,12 +155,12 @@ class DTEntryLabel (DTBin):
 	def _p_onEntryTextInserted(self, entry, position, bAppended, textInserted):
 		self.textInsertedSignal.emit( self, position, bAppended, textInserted )
 		self._text = self._entry.text
-		self._label.text = self._text
+		self._p_refreshLabel()
 
 	def _p_onEntryTextDeleted(self, entry, start, end, textDeleted):
 		self.textDeletedSignal.emit( self, start, end, textDeleted )
 		self._text = self._entry.text
-		self._label.text = self._text
+		self._p_refreshLabel()
 
 	def _p_onEntryReturn(self):
 		self._p_finishEditing( True )

@@ -18,6 +18,7 @@ import CVDefDoc
 import CVElseBlock
 import CVElseIfBlock
 import CVExpression
+import CVFloatLiteral
 import CVGetAttr
 import CVIf
 import CVIfBlock

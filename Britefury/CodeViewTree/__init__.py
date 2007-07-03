@@ -18,6 +18,7 @@ import CVTDefDoc
 import CVTElseBlock
 import CVTElseIfBlock
 import CVTExpression
+import CVTFloatLiteral
 import CVTGetAttr
 import CVTIf
 import CVTIfBlock

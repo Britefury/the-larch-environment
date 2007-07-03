@@ -26,7 +26,7 @@ class CVBCreateExpressionBehavior (CodeViewBehavior):
 		return True
 
 
-	@CVBCharInputHandlerMethod( string.digits )
+	@CVBCharInputHandlerMethod( '-' + string.digits )
 	def _replaceWithIntLiteral(self, viewNode, receivingNodePath, widget, event):
 		viewNode._f_commandHistoryFreeze()
 		insertPosition = viewNode.getInsertPosition( receivingNodePath )
