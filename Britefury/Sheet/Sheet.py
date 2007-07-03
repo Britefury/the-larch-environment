@@ -450,11 +450,13 @@ class SheetRefField (FieldBaseWithXml):
 			raise TypeError, 'targetSheetClass must be an instance of SheetClass and a subclass of Sheet'
 		self._targetSheetClass = targetSheetClass
 		self._targetFieldNameToRefTable = {}
+		self._bInitialised = False
 
 
 
 	def _f_metaMember_initMetaMember(self, cls, name):
 		super( SheetRefField, self )._f_metaMember_initMetaMember( cls, name )
+		self._bInitialised = True
 		for ref in self._targetFieldNameToRefTable.values():
 			ref._f_initMetaMember()
 
@@ -495,9 +497,11 @@ class SheetRefField (FieldBaseWithXml):
 			except KeyError:
 				if isinstance( targetField, FieldInterface ):
 					memberRef = SheetRefField._SheetMemberRef( self, targetField )
+					if self._bInitialised:
+						memberRef._f_initMetaMember()
 				else:
 					raise TypeError, 'Attempting to access member of class \'%s\'; it is not an instance of \'FieldInterface\''  %  ( self._targetSheetClass.__name__, )
-				self._targetFieldNameToRefTable[targetField] = memberRef
+				self._targetFieldNameToRefTable[name] = memberRef
 			return memberRef
 
 

@@ -121,6 +121,15 @@ class KClass (type):
 
 
 
+		# Initialise meta members
+		for name, value in clsDict.items():
+			if isinstance( value, KMetaMember ):
+				# Initialise the meta-member
+				value._f_metaMember_initMetaMember( cls, name )
+
+
+
+
 		# Replace overloaded meta-members in @cls._dependencySortedMetaMembers (meta-members from base classes) with the new meta-members from @cls
 		def _getOverload(existingMember):
 			name = existingMember._name
@@ -140,12 +149,9 @@ class KClass (type):
 
 
 
-		# Initialise and register meta members
+		# Register meta members
 		for name, value in clsDict.items():
 			if isinstance( value, KMetaMember ):
-				# Initialise the meta-member
-				value._f_metaMember_initMetaMember( cls, name )
-
 				# Register meta-member under its name
 				cls._metaMembers[name] = value
 

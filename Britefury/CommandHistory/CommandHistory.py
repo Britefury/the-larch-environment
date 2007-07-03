@@ -113,6 +113,7 @@ class CommandHistory (object):
 			if not isinstance( self._past[-1], list ):
 				self._past[-1] = [ self._past[-1] ]
 			self._bFrozen = True
+			self._freezeCount += 1
 		else:
 			self.freeze()
 

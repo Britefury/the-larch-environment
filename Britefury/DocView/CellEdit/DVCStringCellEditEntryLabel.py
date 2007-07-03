@@ -25,9 +25,9 @@ class DVCStringCellEditEntryLabel (DVCBasicWidgetSingleCellEdit):
 	__valueclass__ = str
 
 
-	def __init__(self, regexp=None):
+	def __init__(self, labelFilter=None, bLabelMarkup=False, regexp=None):
 		super( DVCStringCellEditEntryLabel, self ).__init__()
-		self.entry = DTEntryLabel( regexp=regexp )
+		self.entry = DTEntryLabel( labelFilter=labelFilter, bLabelMarkup=bLabelMarkup, regexp=regexp )
 		self.entry.finishEditingSignal.connect( self._p_onEntry )
 
 

@@ -5,8 +5,22 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
+from Britefury.VirtualMachine.vcls_string import pyStrToVString
+from Britefury.CodeGraph.CGExpression import CGExpression
+from Britefury.Sheet.Sheet import *
+from Britefury.SemanticGraph.SemanticGraph import *
 
 
-identifier = r'[a-zA-Z_][a-zA-Z0-9_]*'
 
-floatRegex = r'-?[0-9]+.[0-9]*(e-?[0-9]*)?'
+class CGFloatLiteral (CGExpression):
+	strValue = Field( str, '' )
+
+
+	@FunctionField
+	def intValue(self):
+		return int( self.strValue )
+
+
+	def generatePyCode(self):
+		return self.strValue
+

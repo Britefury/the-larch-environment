@@ -8,7 +8,6 @@
 from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
-from Britefury.CodeGraph.CGIntLiteral import CGIntLiteral
 from Britefury.CodeGraph.CGFloatLiteral import CGFloatLiteral
 
 from Britefury.CodeViewTree.CVTExpression import CVTExpression
@@ -16,30 +15,16 @@ from Britefury.CodeViewTree.CodeViewTree import *
 
 
 
-class CVTIntLiteral (CVTExpression):
-	graphNode = SheetRefField( CGIntLiteral )
+class CVTFloatLiteral (CVTExpression):
+	graphNode = SheetRefField( CGFloatLiteral )
 
 	strValue = FieldProxy( graphNode.strValue )
 
 
 
-	def convertToFloat(self):
-		floatCG = CGFloatLiteral()
-		self.graph.nodes.append( floatCG )
+class CVTRuleFloatLiteral (CVTRuleSimple):
+	graphNodeClass = CGFloatLiteral
+	cvtNodeClass = CVTFloatLiteral
 
-		floatCG.strValue = self.strValue
-
-		self.graphNode.parent[0].replace( self.graphNode.parent, floatCG.parent )
-
-		self.graphNode.destroySubtree()
-
-		return self._tree.buildNode( floatCG )
-
-
-
-class CVTRuleIntLiteral (CVTRuleSimple):
-	graphNodeClass = CGIntLiteral
-	cvtNodeClass = CVTIntLiteral
-
-CVTRuleIntLiteral.register()
+CVTRuleFloatLiteral.register()
 
