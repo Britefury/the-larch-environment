@@ -14,11 +14,11 @@ from Britefury.Util import RegExpStrings
 from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
-from Britefury.CodeViewTree.CVTGetItem import *
+from Britefury.CodeViewTree.CVTSubscript import *
 
 from Britefury.CodeView.CVExpression import *
 
-from Britefury.CodeViewBehavior.CVBGetItemBehavior import *
+from Britefury.CodeViewBehavior.CVBSubscriptBehavior import *
 from Britefury.CodeViewBehavior.CVBWrapInAssignmentBehavior import *
 
 from Britefury.DocView.Toolkit.DTWrappedLine import DTWrappedLine
@@ -31,15 +31,15 @@ from Britefury.DocView.CellEdit.DVCStringCellEditEntryLabel import DVCStringCell
 
 
 
-class CVGetItem (CVExpression):
-	treeNodeClass = CVTGetItem
+class CVSubscript (CVExpression):
+	treeNodeClass = CVTSubscript
 
 
-	treeNode = SheetRefField( CVTGetItem )
+	treeNode = SheetRefField( CVTSubscript )
 
 
 
-	behaviors = [ CVBGetItemBehavior(), CVBWrapInAssignmentBehavior() ]
+	behaviors = [ CVBSubscriptBehavior(), CVBWrapInAssignmentBehavior() ]
 
 
 
@@ -100,7 +100,7 @@ class CVGetItem (CVExpression):
 
 
 	def __init__(self, treeNode, view):
-		super( CVGetItem, self ).__init__( treeNode, view )
+		super( CVSubscript, self ).__init__( treeNode, view )
 		self._keyBox = DTBox()
 		self._keyBox.append( DTLabel( '[', font='Sans 11', colour=Colour3f( 0.5, 0.5, 0.5 ) ) )
 		self._keyBox.append( DTLabel( '<nil>' ) )
@@ -112,7 +112,7 @@ class CVGetItem (CVExpression):
 
 	def deleteChild(self, child, moveFocus):
 		if child is self.attrNameNode:
-			self.treeNode.unwrapGetItem()
+			self.treeNode.unwrapSubscript()
 			self._view.refresh()
 			self.targetObjectNode.startEditing()
 		elif child is self.targetObjectNode:

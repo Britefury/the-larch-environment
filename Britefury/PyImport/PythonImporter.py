@@ -10,15 +10,25 @@ from compiler import ast
 
 from Britefury.SheetGraph.SheetGraph import SheetGraph
 
+from Britefury.CodeGraph.CGArguments import CGArguments
 from Britefury.CodeGraph.CGAssignment import CGAssignment
+from Britefury.CodeGraph.CGBinaryOperator import *
 from Britefury.CodeGraph.CGBlock import CGBlock
+from Britefury.CodeGraph.CGCall import CGCall
 from Britefury.CodeGraph.CGClass import CGClass
 from Britefury.CodeGraph.CGDef import CGDef
+from Britefury.CodeGraph.CGFloatLiteral import CGFloatLiteral
 from Britefury.CodeGraph.CGGetAttr import CGGetAttr
+from Britefury.CodeGraph.CGIf import CGIf
+from Britefury.CodeGraph.CGIfBlock import CGIfBlock
+from Britefury.CodeGraph.CGIntLiteral import CGIntLiteral
 from Britefury.CodeGraph.CGModule import CGModule
 from Britefury.CodeGraph.CGParameters import CGParameters
 from Britefury.CodeGraph.CGParameterVar import CGParameterVar
 from Britefury.CodeGraph.CGReturn import CGReturn
+from Britefury.CodeGraph.CGSubscript import CGSubscript
+from Britefury.CodeGraph.CGStringLiteral import CGStringLiteral
+from Britefury.CodeGraph.CGTuple import CGTuple
 from Britefury.CodeGraph.CGUnboundRef import CGUnboundRef
 from Britefury.CodeGraph.CGVar import CGVar
 
@@ -26,16 +36,20 @@ from Britefury.CodeGraph.CGVar import CGVar
 
 
 def _processNode(graph, node):
-	nodeClass = node.__class__
-	try:
-		procFunc = _nodeClassToProcFunction[nodeClass]
-	except KeyError:
-		print nodeClass
-		print dir( node )
-		print list( node )
-		return None
+	if node is not None:
+		nodeClass = node.__class__
+		try:
+			procFunc = _nodeClassToProcFunction[nodeClass]
+		except KeyError:
+			print nodeClass
+			print dir( node )
+			print list( node )
+			print node
+			return None
+		else:
+			return procFunc( graph, node )
 	else:
-		return procFunc( graph, node )
+		return None
 
 
 
@@ -118,6 +132,10 @@ def _processClass(graph, node):
 		return clsCG
 
 
+def _processDiscard(graph, node):
+	return _processNode( graph, node.expr )
+
+
 def _processReturn(graph, node):
 	rtn = CGReturn()
 	graph.nodes.append( rtn )
@@ -135,6 +153,23 @@ def _processName(graph, node):
 	return ref
 
 
+def _processConst(graph, node):
+	value = node.value
+	if isinstance( value, int ):
+		g = CGIntLiteral()
+		g.strValue = str( value )
+	elif isinstance( value, float ):
+		g = CGFloatLiteral()
+		g.strValue = str( value )
+	elif isinstance( value, str ):
+		g = CGStringLiteral()
+		g.value = str( value )
+	else:
+		raise TypeError, 'constant type not supported'
+	graph.nodes.append( g )
+	return g
+
+
 def _processGetAttr(graph, node):
 	attr = CGGetAttr()
 	graph.nodes.append( attr )
@@ -146,6 +181,92 @@ def _processGetAttr(graph, node):
 	attr.attrName = node.attrname
 
 	return attr
+
+
+def _processSubscript(graph, node):
+	subs = CGSubscript()
+	graph.nodes.append( subs )
+
+
+	g = _processNode( graph, node.expr )
+	if g is not None:
+		subs.target.append( g.parent )
+
+	if len( node.subs ) == 1:
+		g = _processNode( graph, node.subs[0] )
+		if g is not None:
+			subs.key.append( g.parent )
+	else:
+		tup = CGTuple()
+		graph.nodes.append( tup )
+		for n in node.subs:
+			g = _processNode( graph, n )
+			if g is not None:
+				tup.args.append( g.parent )
+		subs.key.append( tup.parent )
+
+	return subs
+
+
+def _makeBinOpProcessFunction(cgNodeClass):
+	def _processBinOp(graph, node):
+		binop = cgNodeClass()
+		graph.nodes.append( binop )
+
+
+		g = _processNode( graph, node.left )
+		if g is not None:
+			binop.left.append( g.parent )
+
+		g = _processNode( graph, node.right )
+		if g is not None:
+			binop.right.append( g.parent )
+
+		return binop
+	return _processBinOp
+
+
+def _processCompare(graph, node):
+	if len( node.ops ) > 1:
+		raise TypeError, 'compare node has more than 1 child'
+	operator, testValue = node.ops[0]
+	try:
+		binop = _compareSymbolToGraphNodeClass[operator]()
+	except KeyError:
+		raise TypeError, 'unknown compare operator'
+
+	graph.nodes.append( binop )
+
+	g = _processNode( graph, node.expr )
+	if g is not None:
+		binop.left.append( g.parent )
+
+	g = _processNode( graph, testValue )
+	if g is not None:
+		binop.right.append( g.parent )
+
+	return binop
+
+
+def _processCallFunc(graph, node):
+	call = CGCall()
+	graph.nodes.append( call )
+
+	args = CGArguments()
+	graph.nodes.append( args )
+
+	call.arguments.append( args.parent )
+
+	g = _processNode( graph, node.node )
+	if g is not None:
+		call.targetObject.append( g.parent )
+
+	for n in node.args:
+		g = _processNode( graph, n )
+		if g is not None:
+			args.args.append( g.parent )
+
+	return call
 
 
 def _processAssign(graph, node):
@@ -165,6 +286,32 @@ def _processAssign(graph, node):
 	return assign
 
 
+def _processIf(graph, node):
+	ifCG = CGIf()
+	graph.nodes.append( ifCG )
+
+	for condition, code in node.tests:
+		ifBlock = CGIfBlock()
+		graph.nodes.append( ifBlock )
+
+		g = _processNode( graph, condition )
+		if g is not None:
+			ifBlock.condition.append( g.parent )
+
+		g = _processNode( graph, code )
+		if g is not None:
+			ifBlock.block.append( g.parent )
+
+		ifCG.ifBlocks.append( ifBlock.ifStatement )
+
+
+	g = _processNode( graph, node.else_ )
+	if g is not None:
+		ifCG.elseBlock.append( g.parent )
+
+	return ifCG
+
+
 
 
 
@@ -173,13 +320,40 @@ _nodeClassToProcFunction = {
 	ast.Stmt : _processStmt,
 	ast.Function : _processFunction,
 	ast.Class : _processClass,
+	ast.Discard : _processDiscard,
 	ast.Return : _processReturn,
 	ast.Name : _processName,
 	ast.AssName : _processName,
+	ast.Const : _processConst,
 	ast.Getattr : _processGetAttr,
+	ast.Subscript : _processSubscript,
+	ast.Add : _makeBinOpProcessFunction( CGBinOpAdd ),
+	ast.Sub : _makeBinOpProcessFunction( CGBinOpSub ),
+	ast.Mul : _makeBinOpProcessFunction( CGBinOpMul ),
+	ast.Div : _makeBinOpProcessFunction( CGBinOpDiv ),
+	ast.Power : _makeBinOpProcessFunction( CGBinOpPow ),
+	ast.Mod : _makeBinOpProcessFunction( CGBinOpMod ),
+	ast.Bitand : _makeBinOpProcessFunction( CGBinOpBitAnd ),
+	ast.Bitor : _makeBinOpProcessFunction( CGBinOpBitOr ),
+	ast.Bitxor : _makeBinOpProcessFunction( CGBinOpBitXor ),
+	ast.Compare : _processCompare,
+	ast.CallFunc : _processCallFunc,
 	ast.AssAttr : _processGetAttr,
 	ast.Assign : _processAssign,
+	ast.If : _processIf,
 }
+
+
+
+_compareSymbolToGraphNodeClass = {
+	'==' : CGBinOpEq,
+	'!=' : CGBinOpNEq,
+	'<' : CGBinOpLT,
+	'>' : CGBinOpGT,
+	'<=' : CGBinOpLTE,
+	'>=' : CGBinOpGTE,
+}
+
 
 
 

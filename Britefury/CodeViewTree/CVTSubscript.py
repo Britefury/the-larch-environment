@@ -8,7 +8,7 @@
 from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
-from Britefury.CodeGraph.CGGetItem import *
+from Britefury.CodeGraph.CGSubscript import *
 
 from Britefury.CodeViewTree.CVTNode import *
 from Britefury.CodeViewTree.CVTExpression import CVTExpression
@@ -19,12 +19,12 @@ from Britefury.CodeViewTreeOperations.CVTOWrapInAssignment import cvto_wrapInAss
 
 
 
-class CVTGetItem (CVTExpression):
-	graphNode = SheetRefField( CGGetItem )
+class CVTSubscript (CVTExpression):
+	graphNode = SheetRefField( CGSubscript )
 
 
-	targetNode = CVTSimpleSinkProductionSingleField( CGGetItem.target )
-	keyNode = CVTSimpleSinkProductionSingleField( CGGetItem.key )
+	targetNode = CVTSimpleSinkProductionSingleField( CGSubscript.target )
+	keyNode = CVTSimpleSinkProductionSingleField( CGSubscript.key )
 
 
 
@@ -56,11 +56,11 @@ class CVTGetItem (CVTExpression):
 
 
 
-class CVTRuleGetItem (CVTRuleSimple):
-	graphNodeClass = CGGetItem
-	cvtNodeClass = CVTGetItem
+class CVTRuleSubscript (CVTRuleSimple):
+	graphNodeClass = CGSubscript
+	cvtNodeClass = CVTSubscript
 
-CVTRuleGetItem.register()
+CVTRuleSubscript.register()
 
 
 
