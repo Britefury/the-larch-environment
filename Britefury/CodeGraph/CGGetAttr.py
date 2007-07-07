@@ -20,3 +20,8 @@ class CGGetAttr (CGExpression):
 
 	def generatePyCode(self):
 		return self.targetObject[0].node.generatePyCode() + '.' + self.attrName
+
+
+	def isAssignable(self):
+		return True
+

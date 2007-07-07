@@ -99,7 +99,7 @@ class CodeViewBehavior (Sheet):
 
 
 	def handleKeyPress(self, fromNode, receivingNodePath, widget, keyPressEvent):
-		state = keyPressEvent.state  &  ( gtk.gdk.SHIFT_MASK | gtk.gdk.CONTROL_MASK | gtk.gdk.MOD1_MASK )
+		state = keyPressEvent.state
 		keyVal = keyPressEvent.keyVal
 		key = keyVal, state
 		char = keyPressEvent.keyString

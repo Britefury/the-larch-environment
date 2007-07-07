@@ -8,18 +8,19 @@
 from Britefury.CodeGraph.CGExpression import CGExpression
 from Britefury.Sheet.Sheet import *
 from Britefury.SemanticGraph.SemanticGraph import *
-from Britefury.LowLevelCodeTree.LLCTLoadLocalExp import LLCTLoadLocalExp
 
 
 
-class CGUnboundRef (CGExpression):
-	targetName = Field( str, '' )
+class CGGetItem (CGExpression):
+	target = SemanticGraphSinkSingleSubtreeField( 'Target', 'Target expression' )
+	key = SemanticGraphSinkSingleSubtreeField( 'Key', 'Key expression' )
 
 
 	def generatePyCode(self):
-		return self.targetName
+		return self.target[0].node.generatePyCode() + '[' + self.key[0].node.generatePyCode() + ']'
 
 
 	def isAssignable(self):
 		return True
+
 

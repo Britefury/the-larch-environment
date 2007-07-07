@@ -62,9 +62,9 @@ class CVBWrapExpressionBehavior (CodeViewBehavior):
 
 
 	@CVBCharInputHandlerMethod( '[' )
-	def _wrapInList(self, viewNode, receivingNodePath, widget, event):
+	def _wrapInGetItem(self, viewNode, receivingNodePath, widget, event):
 		viewNode._f_commandHistoryFreeze()
-		viewNode.wrapInList()
+		viewNode.wrapInGetItem()
 		viewNode._f_commandHistoryThaw()
 		return True
 

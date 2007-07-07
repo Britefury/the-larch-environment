@@ -8,19 +8,17 @@
 from Britefury.CodeViewBehavior.CodeViewBehavior import *
 
 
-class CVBIfBehavior (CodeViewBehavior):
-	@CVBAccelInputHandlerMethod( '<alt>e' )
-	def _addElse(self, viewNode, receivingNodePath, widget, event):
+class CVBAssignmentBehavior (CodeViewBehavior):
+	@CVBCharInputHandlerMethod( '=' )
+	def _moveValueToTarget(self, viewNode, receivingNodePath, widget, event):
 		viewNode._f_commandHistoryFreeze()
-		viewNode.addElse()
-		viewNode._f_commandHistoryThaw()
+		assignCVT = viewNode.treeNode
+		if assignCVT.moveValueToTarget():
+			viewNode._view.refresh()
+			assignCV = viewNode._view.getViewNodeForTreeNode( assignCVT )
+			assignCV.startEditingValue()
+			viewNode._f_commandHistoryThaw()
 		return True
 
-	@CVBAccelInputHandlerMethod( '<alt><shift>e' )
-	def _addElseIf(self, viewNode, receivingNodePath, widget, event):
-		viewNode._f_commandHistoryFreeze()
-		viewNode.addElseIf( receivingNodePath )
-		viewNode._f_commandHistoryThaw()
-		return True
 
 

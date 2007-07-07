@@ -15,8 +15,6 @@ from Britefury.CodeViewTree.CVTExpression import CVTExpression
 from Britefury.CodeViewTree.CVTAttrName import *
 from Britefury.CodeViewTree.CodeViewTree import *
 
-from Britefury.CodeViewTreeOperations.CVTOWrapInAssignment import cvto_wrapInAssignment
-
 
 
 class CVTBinaryOperator (CVTExpression):

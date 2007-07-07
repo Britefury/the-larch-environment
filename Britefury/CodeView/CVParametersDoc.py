@@ -63,12 +63,12 @@ class CVParametersDoc (CVNode):
 
 
 	def horizontalNavigationList(self):
-		return self.verticalNaviationList()
+		return self.verticalNavigationList()
 
 
 	def verticalNavigationList(self):
 		expandParamDocNode = self.expandParamDocNode
 		if expandParamDocNode is not None:
-			return self.paramNodes + [ expandParamDocNode ]
+			return self.paramDocNodes + [ expandParamDocNode ]
 		else:
-			return self.paramNodes
+			return self.paramDocNodes

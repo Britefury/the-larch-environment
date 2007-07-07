@@ -7,6 +7,7 @@
 ##-*************************
 import CodeView
 import CVArguments
+import CVAssignment
 import CVAttrName
 import CVBinaryOperator
 import CVBlockStatements
@@ -20,12 +21,12 @@ import CVElseIfBlock
 import CVExpression
 import CVFloatLiteral
 import CVGetAttr
+import CVGetItem
 import CVIf
 import CVIfBlock
 import CVIntLiteral
 import CVLambda
 import CVList
-import CVAssignment
 import CVLocalRef
 import CVLocalVarDeclaration
 import CVModule

@@ -12,4 +12,5 @@ from Britefury.CodeGraph.CGStatement import CGStatement
 
 
 class CGExpression (CGStatement):
-	pass
+	def isAssignable(self):
+		return False

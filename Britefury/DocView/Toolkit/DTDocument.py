@@ -15,6 +15,8 @@ import gtk
 import gobject
 import cairo
 
+from Britefury.Util.SignalSlot import *
+
 from Britefury.Event.QueuedEvent import queueEvent
 
 from Britefury.Math.Math import Vector2, Point2, BBox2
@@ -23,8 +25,15 @@ from Britefury.DocView.Toolkit.DTBin import DTBin
 
 
 
+_undoAccel = gtk.accelerator_parse( '<control>z' )
+_redoAccel = gtk.accelerator_parse( '<control><shift>z' )
+
+
 
 class DTDocument (gtk.DrawingArea, DTBin):
+	undoSignal = ClassSignal()
+	redoSignal = ClassSignal()
+
 	def __init__(self, bCanGrabFocus=True):
 		gtk.DrawingArea.__init__( self )
 		DTBin.__init__( self )
@@ -264,19 +273,33 @@ class DTDocument (gtk.DrawingArea, DTBin):
 
 
         def do_key_press_event(self, event):
-		if self._keyboardFocusChild is not None:
-			self._keyboardFocusChild._o_onKeyPress( DTKeyEvent( event ) )
+		keyEvent = DTKeyEvent( event )
+		key = keyEvent.keyVal, keyEvent.state
+		if key == _undoAccel:
+			self.undoSignal.emit( self )
+			return True
+		elif key == _redoAccel:
+			self.redoSignal.emit( self )
 			return True
 		else:
-			return False
+			if self._keyboardFocusChild is not None:
+				self._keyboardFocusChild._o_onKeyPress( keyEvent )
+				return True
+			else:
+				return False
 
 
         def do_key_release_event(self, event):
-		if self._keyboardFocusChild is not None:
-			self._keyboardFocusChild._o_onKeyRelease( DTKeyEvent( event ) )
+		keyEvent = DTKeyEvent( event )
+		key = keyEvent.keyVal, keyEvent.state
+		if key == _undoAccel  or  key == _redoAccel:
 			return True
 		else:
-			return False
+			if self._keyboardFocusChild is not None:
+				self._keyboardFocusChild._o_onKeyRelease( keyEvent )
+				return True
+			else:
+				return False
 
 
 

@@ -13,7 +13,6 @@ from Britefury.SemanticGraph.SemanticGraph import *
 
 
 class CGParameters (CGNode):
-	name = Field( str, '' )
 	parent = SemanticGraphSourceField( 'Parent node', 'Parent node' )
 	params = SemanticGraphSinkMultipleSubtreeField( 'Parameters', 'Parameters' )
 	expandParam = SemanticGraphSinkSingleSubtreeField( 'Expand parameter', 'Expand parameter' )
