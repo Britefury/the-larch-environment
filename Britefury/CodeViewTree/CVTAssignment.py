@@ -9,6 +9,7 @@ from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
 from Britefury.CodeGraph.CGAssignment import CGAssignment
+from Britefury.CodeGraph.CGNullExpression import CGNullExpression
 
 from Britefury.CodeViewTree.CVTNode import *
 from Britefury.CodeViewTree.CodeViewTree import *
@@ -19,40 +20,84 @@ class CVTAssignment (CVTNode):
 	graphNode = SheetRefField( CGAssignment )
 
 
-	targetRefNode = CVTSimpleSinkProductionSingleField( CGAssignment.targetRef )
+	targetNodes = CVTSimpleSinkProductionMultipleField( CGAssignment.targets )
 	valueNode = CVTSimpleSinkProductionSingleField( CGAssignment.value )
 
 
 
-	def replaceAssignmentWithValue(self):
-		targetRefCG = self.graphNode.targetRef[0].node
+	def removeTarget(self, target):
+		assert len( self.graphNode.targets ) > 0
+		if len( self.graphNode.targets ) == 1:
+			# Replace with value
+			valueCGSource = self.graphNode.value[0]
 
-		valueCGSource = self.graphNode.value[0]
+			parentCGSink = self.graphNode.parent[0]
 
-		parentCGSink = self.graphNode.parent[0]
+			del self.graphNode.value[0]
+			parentCGSink.replace( self.graphNode.parent, valueCGSource )
 
-		del self.graphNode.value[0]
-		parentCGSink.replace( self.graphNode.parent, valueCGSource )
-
-		self.graphNode.destroySubtree()
-
-		return valueCGSource.node
-
+			self.graphNode.destroySubtree()
+		else:
+			targetCG = target.graphNode
+			self.graphNode.targets.remove( target )
+			targetCG.destroySubtree()
 
 
-	def replaceAssigmentWithTarget(self):
+
+	def removeValue(self):
+		assert len( self.graphNode.targets ) > 0
+		if len( self.graphNode.targets ) == 1:
+			# Replace with target
+			targetCGSource = self.graphNode.targets[0]
+
+			parentCGSink = self.graphNode.parent[0]
+
+			del self.graphNode.targets[0]
+			parentCGSink.replace( self.graphNode.parent, targetCGSource )
+
+			self.graphNode.destroySubtree()
+		else:
+			# Destroy value subtree, and replace with the last target subtree
+			valueCG = self.graphNode.value[0].node
+			valueCG.destroySubtree()
+
+			targetCGSource = self.graphNode.targets[-1]
+			del self.graphNode.targets[-1]
+
+			self.graphNode.value[0] = targetCGSource
+
+
+	def assign(self, targetCVT):
+		if targetCVT is self.valueNode:
+			if self.moveValueToTarget():
+				return self
+			else:
+				return None
+		elif targetCVT in self.targetNodes:
+			index = self.targetNodes.index( targetCVT ) + 1
+			nullExpression = CGNullExpression()
+			self.graph.nodes.append( nullExpression )
+
+			self.graphNode.targets.insert( index, nullExpression.parent )
+
+			return self._tree.buildNode( nullExpression )
+		else:
+			assert False, 'error, invalid assignment target'
+
+
+	def moveValueToTarget(self):
 		valueCG = self.graphNode.value[0].node
+		if valueCG.isAssignable():
+			nullExpression = CGNullExpression()
+			self.graph.nodes.append( nullExpression )
 
-		targetCGSource = self.graphNode.targetRef[0]
+			self.graphNode.value[0] = nullExpression.parent
 
-		parentCGSink = self.graphNode.parent[0]
+			self.graphNode.targets.append( valueCG.parent )
+			return True
+		else:
+			return False
 
-		del self.graphNode.targetRef[0]
-		parentCGSink.replace( self.graphNode.parent, targetCGSource )
-
-		self.graphNode.destroySubtree()
-
-		return targetCGSource.node
 
 
 

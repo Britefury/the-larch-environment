@@ -30,6 +30,7 @@ from Britefury.LowLevelCodeTree.LowLevelCodeTree import LowLevelCodeTree
 from Britefury.DocView.Toolkit.DTDocument import DTDocument
 
 from Britefury.CodeGraph.CGModule import CGModule
+from Britefury.CodeGraph.CGBlock import CGBlock
 
 from Britefury.CodeViewTree.CodeViewTree import CodeViewTree
 
@@ -39,10 +40,23 @@ from Britefury.GraphView.SheetGraphView import SheetGraphView
 from Britefury.GraphView.SheetGraphViewDisplayTable import SheetGraphViewDisplayTable
 from Britefury.GraphView.SheetGraphViewLayout import SheetGraphViewLayout
 
+from Britefury.PyImport import PythonImporter
+
 
 
 
 class MainApp (object):
+	class _Output (object):
+		def __init__(self, textBuffer, tagName, backupOut):
+			self._textBuffer = textBuffer
+			self._tagName = tagName
+			self._backupOut = backupOut
+
+		def write(self, text):
+			pos = self._textBuffer.get_iter_at_mark( self._textBuffer.get_insert() )
+			self._textBuffer.insert_with_tags_by_name( pos, text, self._tagName )
+
+
 	def __init__(self, graph, rootNode):
 		self._graph = None
 		self._graphRoot = None
@@ -59,6 +73,8 @@ class MainApp (object):
 
 
 		self._doc = DTDocument()
+		self._doc.undoSignal.connect( self._p_onUndo )
+		self._doc.redoSignal.connect( self._p_onRedo )
 		self._doc.show()
 
 
@@ -74,19 +90,7 @@ class MainApp (object):
 		oneToOneButton.connect( 'clicked', self._p_onOneToOne )
 
 
-		executeButton = gtk.Button( 'Execute' )
-		executeButton.show()
-		executeButton.connect( 'clicked', self._p_onExecuteCode )
-
-
-		executeWithSourceButton = gtk.Button( 'Execute with source' )
-		executeWithSourceButton.show()
-		executeWithSourceButton.connect( 'clicked', self._p_onExecuteCodeWithSource )
-
-
 		buttonBox = gtk.HBox( spacing=20 )
-		buttonBox.pack_end( executeWithSourceButton, False, False, 0 )
-		buttonBox.pack_end( executeButton, False, False, 0 )
 		buttonBox.pack_end( oneToOneButton, False, False, 0 )
 		buttonBox.pack_end( resetButton, False, False, 0 )
 		buttonBox.show()
@@ -102,10 +106,14 @@ class MainApp (object):
 		saveItem = gtk.MenuItem( 'Save' )
 		saveItem.connect( 'activate', self._p_onSave )
 
+		importPyItem = gtk.MenuItem( 'Import Python source' )
+		importPyItem.connect( 'activate', self._p_onImportPy )
+
 		fileMenu = gtk.Menu()
 		fileMenu.append( newItem )
 		fileMenu.append( openItem )
 		fileMenu.append( saveItem )
+		fileMenu.append( importPyItem )
 
 
 		undoItem = gtk.MenuItem( 'Undo' )
@@ -117,6 +125,17 @@ class MainApp (object):
 		editMenu = gtk.Menu()
 		editMenu.append( undoItem )
 		editMenu.append( redoItem )
+
+
+		executeItem = gtk.MenuItem( 'Execute' )
+		executeItem.connect( 'activate', self._p_onExecute )
+
+		showCodeItem = gtk.MenuItem( 'Show code' )
+		showCodeItem.connect( 'activate', self._p_onShowCode )
+
+		runMenu = gtk.Menu()
+		runMenu.append( executeItem )
+		runMenu.append( showCodeItem )
 
 
 		graphViewItem = gtk.MenuItem( 'Show graph view' )
@@ -132,6 +151,9 @@ class MainApp (object):
 		editMenuItem = gtk.MenuItem( 'Edit' )
 		editMenuItem.set_submenu( editMenu )
 
+		runMenuItem = gtk.MenuItem( 'Run' )
+		runMenuItem.set_submenu( runMenu )
+
 		develMenuItem = gtk.MenuItem( 'Devel' )
 		develMenuItem.set_submenu( develMenu )
 
@@ -139,6 +161,7 @@ class MainApp (object):
 		menuBar = gtk.MenuBar()
 		menuBar.append( fileMenuItem )
 		menuBar.append( editMenuItem )
+		menuBar.append( runMenuItem )
 		menuBar.append( develMenuItem )
 		menuBar.show_all()
 
@@ -192,6 +215,11 @@ class MainApp (object):
 		self._view.setDocument( self._doc )
 
 
+		if self._graphViewWindow is not None:
+			self._p_hideGraphView()
+			self._p_showGraphView()
+
+
 
 
 	def _p_refreshCodeView(self):
@@ -203,29 +231,64 @@ class MainApp (object):
 
 
 
-	def _p_onExecuteCode(self, widget):
-		pyCodeBlock = self._graphRoot.generatePyCodeBlock()
-		text = pyCodeBlock.asText()
-		exec( text )
+	def _p_executeCode(self, source):
+		textView = gtk.TextView()
+		textBuffer = textView.get_buffer()
+		textView.set_wrap_mode( gtk.WRAP_WORD )
+		textView.set_editable( False )
+		textView.set_cursor_visible( True )
+		textView.show()
+
+		stdoutTag = textBuffer.create_tag( 'stdout', foreground="#006000")
+		stderrTag = textBuffer.create_tag( 'stderr', foreground="#006000")
+
+		scrolledWindow = gtk.ScrolledWindow()
+		scrolledWindow.set_policy( gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC )
+		scrolledWindow.add( textView )
+		scrolledWindow.set_size_request( 640, 480 )
+		scrolledWindow.show()
+
+		textViewWindow = gtk.Window( gtk.WINDOW_TOPLEVEL )
+		textViewWindow.set_transient_for( self._window )
+		textViewWindow.add( scrolledWindow )
+		textViewWindow.set_title( 'Output' )
+
+		textViewWindow.show()
+
+		savedStdout, savedStderr = sys.stdout, sys.stderr
+		sys.stdout = self._Output( textBuffer, 'stdout', savedStdout )
+		sys.stderr = self._Output( textBuffer, 'stderr', savedStderr )
+		exec( source )
+		sys.stdout, sys.stderr = savedStdout, savedStderr
 
 
 
-	def _p_onExecuteCodeWithSource(self, widget):
-		pyCodeBlock = self._graphRoot.generatePyCodeBlock()
-		text = pyCodeBlock.asText()
-		print text
-		exec( text )
+
+	def _p_makeSourceWindow(self, text):
+		textView = gtk.TextView()
+		textView.get_buffer().set_text( text )
+		textView.set_wrap_mode( gtk.WRAP_WORD )
+		textView.set_editable( False )
+		textView.set_cursor_visible( False )
+		textView.show()
+
+		scrolledWindow = gtk.ScrolledWindow()
+		scrolledWindow.set_policy( gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC )
+		scrolledWindow.add( textView )
+		scrolledWindow.set_size_request( 640, 480 )
+		scrolledWindow.show()
+
+		textViewWindow = gtk.Window( gtk.WINDOW_TOPLEVEL )
+		textViewWindow.set_transient_for( self._window )
+		textViewWindow.add( scrolledWindow )
+		textViewWindow.set_title( 'Python source' )
+
+		textViewWindow.show()
 
 
 
-	def _p_onReset(self, widget):
-		self._doc.reset()
 
-	def _p_onOneToOne(self, widget):
-		self._doc.oneToOne()
-
-
-	def _p_onShowGraphView(self, widget):
+	def _p_showGraphView(self):
 		if self._graphView is None:
 			self._graphViewDisplayTable = SheetGraphViewDisplayTable()
 
@@ -246,7 +309,7 @@ class MainApp (object):
 			self._graphViewWindow.show()
 
 
-	def _p_onGraphViewDeleteEvent(self, widget, event, data=None):
+	def _p_hideGraphView(self):
 		self._graphViewLayout.detachGraph()
 		self._graphView.detachGraph()
 
@@ -257,7 +320,14 @@ class MainApp (object):
 		self._graphView = None
 		self._graphViewDisplayTable = None
 
-		return True
+
+
+	def _p_onReset(self, widget):
+		self._doc.reset()
+
+	def _p_onOneToOne(self, widget):
+		self._doc.oneToOne()
+
 
 
 
@@ -273,9 +343,7 @@ class MainApp (object):
 		if self._bUnsavedData:
 			bProceed = confirmDialog( _( 'New project' ), _( 'You have not saved your work. Proceed?' ), gtk.STOCK_NEW, gtk.STOCK_CANCEL, 'y', 'n', True, self._window )
 		if bProceed:
-			graph = SheetGraph()
-			mainModule = CGModule()
-			graph.nodes.append( mainModule )
+			graph, mainModule = self.makeBlankModuleGraph()
 			self.setGraph( graph, mainModule )
 
 
@@ -349,6 +417,32 @@ class MainApp (object):
 			return False
 
 
+
+	def _p_onImportPy(self, widget):
+		bProceed = True
+		if self._bUnsavedData:
+			bProceed = confirmDialog( _( 'New project' ), _( 'You have not saved your work. Proceed?' ), gtk.STOCK_NEW, gtk.STOCK_CANCEL, 'y', 'n', True, self._window )
+		if bProceed:
+			pyFilter = gtk.FileFilter()
+			pyFilter.set_name( _( 'Python source (*.py)' ) )
+			pyFilter.add_pattern( '*.py' )
+
+			openDialog = gtk.FileChooserDialog( _( 'Import' ), self._window, gtk.FILE_CHOOSER_ACTION_OPEN,
+											( gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_OK, gtk.RESPONSE_OK ) )
+			openDialog.add_filter( pyFilter )
+			openDialog.show()
+			response = openDialog.run()
+			filename = openDialog.get_filename()
+			openDialog.destroy()
+			if response == gtk.RESPONSE_OK:
+				if filename is not None:
+					f = open( filename, 'r' )
+					if f is not None:
+						graph, root = self.importPythonSource( f.read() )
+						if graph is not None  and  root is not None:
+							self.setGraph( graph, root )
+
+
 	def _p_writeFile(self, filename):
 		doc = OutputXmlDocument()
 		doc.getContentNode().addChild( 'graph' ).writeObject( self._graph )
@@ -360,13 +454,37 @@ class MainApp (object):
 			self._bUnsavedData = False
 
 
-	def _p_onUndo(self, widget):
-		self._commandHistory.undo()
+	def _p_onUndo(self, sender):
+		if self._commandHistory.canUndo():
+			self._commandHistory.undo()
 
-	def _p_onRedo(self, widget):
-		self._commandHistory.redo()
+	def _p_onRedo(self, sender):
+		if self._commandHistory.canRedo():
+			self._commandHistory.redo()
 
 
+
+	def _p_onExecute(self, widget):
+		pyCodeBlock = self._graphRoot.generatePyCodeBlock()
+		text = pyCodeBlock.asText()
+		self._p_executeCode( text )
+
+
+	def _p_onShowCode(self, widget):
+		pyCodeBlock = self._graphRoot.generatePyCodeBlock()
+		text = pyCodeBlock.asText()
+		self._p_makeSourceWindow( text )
+
+
+
+
+
+	def _p_onShowGraphView(self, widget):
+		self._p_showGraphView()
+
+
+	def _p_onGraphViewDeleteEvent(self, widget, event, data=None):
+		self._p_hideGraphView()
 
 
 
@@ -385,4 +503,27 @@ class MainApp (object):
 
 	def _p_graphViewEraseLink(source, sink):
 		pass
+
+
+
+	@staticmethod
+	def makeBlankModuleGraph():
+		graph = SheetGraph()
+
+		# main module
+		mainModule = CGModule()
+		graph.nodes.append( mainModule )
+
+		mainBlock = CGBlock()
+		graph.nodes.append( mainBlock )
+
+		# connect module -> block
+		mainModule.block.append( mainBlock.parent )
+
+		return graph, mainModule
+
+
+	@staticmethod
+	def importPythonSource(source):
+		return PythonImporter.importPythonSource( source )
 

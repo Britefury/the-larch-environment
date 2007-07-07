@@ -100,6 +100,9 @@ class CVDefDoc (CVNode):
 		self.paramsNode.startEditing()
 
 
+	def horizontalNavigationList(self):
+		return [ self.paramsNode ]
+
 	def verticalNavigationList(self):
 		return [ self.paramsNode ]
 

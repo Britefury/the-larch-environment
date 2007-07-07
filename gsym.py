@@ -9,9 +9,6 @@ import sys
 
 from Britefury.SheetGraph.SheetGraph import *
 
-from Britefury.CodeGraph.CGModule import CGModule
-from Britefury.CodeGraph.CGBlock import CGBlock
-
 from Britefury.MainApp.MainApp import MainApp
 
 
@@ -28,17 +25,7 @@ if __name__ == '__main__':
 
 	i18n.initialise()
 
-	graph = SheetGraph()
-
-	# main module
-	mainModule = CGModule()
-	graph.nodes.append( mainModule )
-
-	mainBlock = CGBlock()
-	graph.nodes.append( mainBlock )
-
-	# connect module -> block
-	mainModule.block.append( mainBlock.parent )
+	graph, mainModule = MainApp.makeBlankModuleGraph()
 
 	app = MainApp( graph, mainModule )
 

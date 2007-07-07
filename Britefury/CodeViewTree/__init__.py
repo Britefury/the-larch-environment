@@ -7,6 +7,7 @@
 ##-*************************
 import CodeViewTree
 import CVTArguments
+import CVTAssignment
 import CVTAttrName
 import CVTBinaryOperator
 import CVTBlockStatements
@@ -20,12 +21,12 @@ import CVTElseIfBlock
 import CVTExpression
 import CVTFloatLiteral
 import CVTGetAttr
+import CVTGetItem
 import CVTIf
 import CVTIfBlock
 import CVTIntLiteral
 import CVTLambda
 import CVTList
-import CVTAssignment
 import CVTLocalRef
 import CVTLocalVarDeclaration
 import CVTModule

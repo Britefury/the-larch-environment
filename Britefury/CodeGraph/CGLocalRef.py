@@ -18,3 +18,9 @@ class CGLocalRef (CGExpression):
 
 	def generatePyCode(self):
 		return self.variable[0].node.generatePyCode()
+
+
+	def isAssignable(self):
+		return True
+
+

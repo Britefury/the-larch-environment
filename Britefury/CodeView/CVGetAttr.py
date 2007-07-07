@@ -18,7 +18,6 @@ from Britefury.CodeViewTree.CVTGetAttr import CVTGetAttr
 
 from Britefury.CodeView.CVExpression import *
 
-from Britefury.CodeViewBehavior.CVBGetAttrBehavior import *
 from Britefury.CodeViewBehavior.CVBWrapInAssignmentBehavior import *
 
 from Britefury.DocView.Toolkit.DTWrappedLine import DTWrappedLine
@@ -37,7 +36,7 @@ class CVGetAttr (CVExpression):
 
 
 
-	behaviors = [ CVBGetAttrBehavior(), CVBWrapInAssignmentBehavior() ]
+	behaviors = [ CVBWrapInAssignmentBehavior() ]
 
 
 	@FunctionRefField

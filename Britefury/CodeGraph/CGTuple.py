@@ -25,3 +25,11 @@ class CGTuple (CGExpression):
 			return '( ' + self.args[0].node.generatePyCode() + ', )'
 		else:
 			return '( ' + ', '.join( [ argSource.node.generatePyCode()   for argSource in self.args ] ) + ' )'
+
+
+
+	def isAssignable(self):
+		for argSource in self.args:
+			if not argSource.node.isAssignable():
+				return False
+		return True
