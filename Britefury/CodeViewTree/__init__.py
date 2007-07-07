@@ -21,7 +21,6 @@ import CVTElseIfBlock
 import CVTExpression
 import CVTFloatLiteral
 import CVTGetAttr
-import CVTGetItem
 import CVTIf
 import CVTIfBlock
 import CVTIntLiteral
@@ -40,6 +39,7 @@ import CVTParameterVar
 import CVTReturn
 import CVTStatement
 import CVTStringLiteral
+import CVTSubscript
 import CVTTuple
 import CVTUnboundRef
 import CVTVar

@@ -11,7 +11,7 @@ from Britefury.SemanticGraph.SemanticGraph import *
 
 
 
-class CGGetItem (CGExpression):
+class CGSubscript (CGExpression):
 	target = SemanticGraphSinkSingleSubtreeField( 'Target', 'Target expression' )
 	key = SemanticGraphSinkSingleSubtreeField( 'Key', 'Key expression' )
 

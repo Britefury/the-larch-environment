@@ -21,7 +21,6 @@ import CVElseIfBlock
 import CVExpression
 import CVFloatLiteral
 import CVGetAttr
-import CVGetItem
 import CVIf
 import CVIfBlock
 import CVIntLiteral
@@ -40,6 +39,7 @@ import CVParameterVar
 import CVReturn
 import CVStatement
 import CVStringLiteral
+import CVSubscript
 import CVTuple
 import CVUnboundRef
 import CVVar
