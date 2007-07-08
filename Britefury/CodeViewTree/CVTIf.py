@@ -77,7 +77,7 @@ class CVTIf (CVTStatement):
 
 
 	def hasElseIfs(self):
-		return len( self.graphNode.elseIfBlocks ) > 0
+		return len( self.graphNode.ifBlocks ) > 1
 
 
 

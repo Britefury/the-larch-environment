@@ -84,4 +84,6 @@ class CVBWrapExpressionBehavior (CodeViewBehavior):
 	_wrapInGT = CVBCharInputHandlerMethod( '>' )( _makeBinOpWrapFunction( CGBinOpGT ) )
 	_wrapInLTE = CVBAccelInputHandlerMethod( '<alt>comma' )( _makeBinOpWrapFunction( CGBinOpLTE ) )
 	_wrapInGTE = CVBAccelInputHandlerMethod( '<alt>period' )( _makeBinOpWrapFunction( CGBinOpGTE ) )
+	_wrapInLShift = CVBAccelInputHandlerMethod( '<alt><shift>less' )( _makeBinOpWrapFunction( CGBinOpLShift ) )
+	_wrapInRShift = CVBAccelInputHandlerMethod( '<alt><shift>greater' )( _makeBinOpWrapFunction( CGBinOpRShift ) )
 
