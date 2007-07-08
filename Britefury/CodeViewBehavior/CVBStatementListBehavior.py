@@ -21,8 +21,8 @@ class CVBStatementListBehavior (CodeViewBehavior):
 		position = CVBStatementListBehavior._p_getPosition( viewNode, receivingNodePath )
 		viewNode._f_commandHistoryFreeze()
 		cvto_addReturnStatement( viewNode.treeNode, position )
-		localVarCV = viewNode.statementNodes[position]
-		localVarCV.startEditing()
+		stmtCV = viewNode.statementNodes[position]
+		stmtCV.startEditing()
 		viewNode._f_commandHistoryThaw()
 		return True
 
@@ -32,8 +32,8 @@ class CVBStatementListBehavior (CodeViewBehavior):
 		position = CVBStatementListBehavior._p_getPosition( viewNode, receivingNodePath )
 		viewNode._f_commandHistoryFreeze()
 		cvto_addLocalVarStatement( viewNode.treeNode, position )
-		localVarCV = viewNode.statementNodes[position]
-		localVarCV.startEditing()
+		stmtCV = viewNode.statementNodes[position]
+		stmtCV.startEditing()
 		viewNode._f_commandHistoryThaw()
 		return True
 
@@ -43,8 +43,8 @@ class CVBStatementListBehavior (CodeViewBehavior):
 		position = CVBStatementListBehavior._p_getPosition( viewNode, receivingNodePath )
 		viewNode._f_commandHistoryFreeze()
 		cvto_addIfStatement( viewNode.treeNode, position )
-		ifCV = viewNode.statementNodes[position]
-		ifCV.startEditing()
+		stmtCV = viewNode.statementNodes[position]
+		stmtCV.startEditing()
 		viewNode._f_commandHistoryThaw()
 		return True
 
@@ -54,8 +54,30 @@ class CVBStatementListBehavior (CodeViewBehavior):
 		position = CVBStatementListBehavior._p_getPosition( viewNode, receivingNodePath )
 		viewNode._f_commandHistoryFreeze()
 		cvto_addWhileStatement( viewNode.treeNode, position )
-		whileCV = viewNode.statementNodes[position]
-		whileCV.startEditing()
+		stmtCV = viewNode.statementNodes[position]
+		stmtCV.startEditing()
+		viewNode._f_commandHistoryThaw()
+		return True
+
+
+	@CVBAccelInputHandlerMethod( '<alt>b' )
+	def _addBreak(self, viewNode, receivingNodePath, widget, event):
+		position = CVBStatementListBehavior._p_getPosition( viewNode, receivingNodePath )
+		viewNode._f_commandHistoryFreeze()
+		cvto_addBreakStatement( viewNode.treeNode, position )
+		stmtCV = viewNode.statementNodes[position]
+		stmtCV.startEditing()
+		viewNode._f_commandHistoryThaw()
+		return True
+
+
+	@CVBAccelInputHandlerMethod( '<alt>o' )
+	def _addContinue(self, viewNode, receivingNodePath, widget, event):
+		position = CVBStatementListBehavior._p_getPosition( viewNode, receivingNodePath )
+		viewNode._f_commandHistoryFreeze()
+		cvto_addContinueStatement( viewNode.treeNode, position )
+		stmtCV = viewNode.statementNodes[position]
+		stmtCV.startEditing()
 		viewNode._f_commandHistoryThaw()
 		return True
 
@@ -65,8 +87,8 @@ class CVBStatementListBehavior (CodeViewBehavior):
 		position = CVBStatementListBehavior._p_getPosition( viewNode, receivingNodePath )
 		viewNode._f_commandHistoryFreeze()
 		cvto_addDefStatement( viewNode.treeNode, position )
-		defCV = viewNode.statementNodes[position]
-		defCV.startEditing()
+		stmtCV = viewNode.statementNodes[position]
+		stmtCV.startEditing()
 		viewNode._f_commandHistoryThaw()
 		return True
 
@@ -76,7 +98,7 @@ class CVBStatementListBehavior (CodeViewBehavior):
 		position = CVBStatementListBehavior._p_getPosition( viewNode, receivingNodePath )
 		viewNode._f_commandHistoryFreeze()
 		cvto_addClassStatement( viewNode.treeNode, position )
-		defCV = viewNode.statementNodes[position]
-		defCV.startEditing()
+		stmtCV = viewNode.statementNodes[position]
+		stmtCV.startEditing()
 		viewNode._f_commandHistoryThaw()
 		return True

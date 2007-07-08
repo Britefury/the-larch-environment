@@ -36,23 +36,23 @@ class CVElseBlock (CVBorderNode):
 
 
 	@FunctionRefField
-	def statementsNode(self):
-		return self._view.buildView( self.treeNode.statementsNode, self )
+	def blockNode(self):
+		return self._view.buildView( self.treeNode.blockNode, self )
 
 	@FunctionRefField
-	def statementsWidget(self):
-		return self.statementsNode.widget
+	def blockWidget(self):
+		return self.blockNode.widget
 
 
 
 	@FunctionField
-	def _refreshStatements(self):
-		self._statementsBorder.child = self.statementsWidget
+	def _refreshBlock(self):
+		self._blockBorder.child = self.blockWidget
 
 
 	@FunctionField
 	def refreshCell(self):
-		self._refreshStatements
+		self._refreshBlock
 
 
 
@@ -62,27 +62,27 @@ class CVElseBlock (CVBorderNode):
 		self._elseBin = DTBin()
 		self._elseBin.child = DTLabel( markup=_( 'E<span size="small">LSE:</span>' ), font='Sans bold 11', colour=Colour3f( 0.0, 0.5, 0.0 ) )
 		self._elseBin.backgroundColour = Colour3f( 1.0, 1.0, 0.75 )
-		self._statementsBorder = DTBorder( leftMargin=30.0 )
-		self._statementsBorder.child = DTLabel( 'nil' )
+		self._blockBorder = DTBorder( leftMargin=30.0 )
+		self._blockBorder.child = DTLabel( 'nil' )
 		self._box = DTBox( spacing=5.0, direction=DTDirection.TOP_TO_BOTTOM )
 		self._box.append( self._elseBin, minorDirectionAlignment=DTBox.ALIGN_LEFT )
-		self._box.append( self._statementsBorder, minorDirectionAlignment=DTBox.ALIGN_EXPAND )
+		self._box.append( self._blockBorder, minorDirectionAlignment=DTBox.ALIGN_EXPAND )
 		self.widget.child = self._box
 
 
 
-	def startEditingStatements(self):
-		self.statementsNode.startEditing()
+	def startEditingBlock(self):
+		self.blockNode.startEditing()
 
 
 
 	def horizontalNavigationList(self):
-		return [ self.statementsNode ]
+		return [ self.blockNode ]
 
 
 
 	def deleteChild(self, child, moveFocus):
-		if child is self.statementsNode:
+		if child is self.blockNode:
 			self.deleteNode( moveFocus )
 
 

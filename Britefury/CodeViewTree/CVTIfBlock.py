@@ -20,7 +20,7 @@ class CVTIfBlock (CVTNode):
 
 
 	conditionNode = CVTSimpleSinkProductionSingleField( CGIfBlock.condition )
-	statementsNode = CVTSimpleSinkProductionSingleField( CGIfBlock.block )
+	blockNode = CVTSimpleSinkProductionSingleField( CGIfBlock.block )
 
 
 

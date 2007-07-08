@@ -22,24 +22,28 @@ class CVTWhile (CVTStatement):
 
 
 	whileExprNode = CVTSimpleSinkProductionSingleField( CGWhile.whileExpr )
-	statementsNode = CVTSimpleSinkProductionSingleField( CGWhile.block )
-	elseStatementsNode = CVTSimpleSinkProductionOptionalField( CGWhile.elseBlock, rule=CVTRuleElseBlock )
+	blockNode = CVTSimpleSinkProductionSingleField( CGWhile.block )
+	elseBlockNode = CVTSimpleSinkProductionOptionalField( CGWhile.elseBlock, rule=CVTRuleElseBlock )
 
 
 
 	def addElse(self):
-		elseBlockCG = CGBlock()
-		self.graph.nodes.append( elseBlockCG )
+		if len( self.graphNode.elseBlock ) == 0:
+			elseBlockCG = CGBlock()
+			self.graph.nodes.append( elseBlockCG )
 
-		self.graphNode.elseBlock.append( elseBlockCG.parent )
+			self.graphNode.elseBlock.append( elseBlockCG.parent )
 
-		return self._tree.buildNode( elseBlockCG )
+			return self._tree.buildNode( elseBlockCG )
+		else:
+			return self._tree.buildNode( self.graphNode.elseBlock[0].node )
 
 
 	def removeElse(self):
-		elseCG = self.graphNode.elseBlock[0].node
-		del self.graphNode.elseBlock[0]
-		elseCG.destroySubtree()
+		if len( self.graphNode.elseBlock ) == 1:
+			elseCG = self.graphNode.elseBlock[0].node
+			del self.graphNode.elseBlock[0]
+			elseCG.destroySubtree()
 
 
 

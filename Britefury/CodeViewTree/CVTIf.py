@@ -41,7 +41,7 @@ class CVTIf (CVTStatement):
 		else:
 			return []
 
-	elseStatementsNode = CVTSimpleSinkProductionOptionalField( CGIf.elseBlock, rule=CVTRuleElseBlock )
+	elseBlockNode = CVTSimpleSinkProductionOptionalField( CGIf.elseBlock, rule=CVTRuleElseBlock )
 
 
 
@@ -63,12 +63,15 @@ class CVTIf (CVTStatement):
 
 
 	def addElse(self):
-		elseBlockCG = CGBlock()
-		self.graph.nodes.append( elseBlockCG )
+		if len( self.graphNode.elseBlock ) == 0:
+			elseBlockCG = CGBlock()
+			self.graph.nodes.append( elseBlockCG )
 
-		self.graphNode.elseBlock.append( elseBlockCG.parent )
+			self.graphNode.elseBlock.append( elseBlockCG.parent )
 
-		return self._tree.buildNode( elseBlockCG )
+			return self._tree.buildNode( elseBlockCG )
+		else:
+			return self._tree.buildNode( self.graphNode.elseBlock[0].node )
 
 
 
@@ -92,9 +95,10 @@ class CVTIf (CVTStatement):
 
 
 	def removeElse(self):
-		elseCG = self.graphNode.elseBlock[0].node
-		del self.graphNode.elseBlock[0]
-		elseCG.destroySubtree()
+		if len( self.graphNode.elseBlock ) == 1:
+			elseCG = self.graphNode.elseBlock[0].node
+			del self.graphNode.elseBlock[0]
+			elseCG.destroySubtree()
 
 
 

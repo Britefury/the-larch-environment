@@ -70,12 +70,12 @@ class CVDef (CVStatement):
 
 
 	@FunctionRefField
-	def statementsNode(self):
-		return self._view.buildView( self.treeNode.statementsNode, self )
+	def blockNode(self):
+		return self._view.buildView( self.treeNode.blockNode, self )
 
 	@FunctionRefField
-	def statementsWidget(self):
-		return self.statementsNode.widget
+	def blockWidget(self):
+		return self.blockNode.widget
 
 
 
@@ -92,8 +92,8 @@ class CVDef (CVStatement):
 		self._declBox[2] = self.paramsWidget
 
 	@FunctionField
-	def _refreshStatements(self):
-		self._statementsBorder.child = self.statementsWidget
+	def _refreshBlock(self):
+		self._blockBorder.child = self.blockWidget
 
 
 	@FunctionField
@@ -101,7 +101,7 @@ class CVDef (CVStatement):
 		self._refreshDoc
 		self._refreshDeclVar
 		self._refreshParams
-		self._refreshStatements
+		self._refreshBlock
 
 
 
@@ -114,12 +114,12 @@ class CVDef (CVStatement):
 		self._declBox.append( DTLabel( 'nil' ) )
 		self._declBox.append( DTLabel( ':', font='Sans bold 11' ) )
 		self._declBox.backgroundColour = Colour3f( 0.825, 0.925, 0.825 )
-		self._statementsBorder = DTBorder( leftMargin=30.0 )
-		self._statementsBorder.child = DTLabel( 'nil' )
+		self._blockBorder = DTBorder( leftMargin=30.0 )
+		self._blockBorder.child = DTLabel( 'nil' )
 		self._box = DTBox( spacing=5.0, direction=DTDirection.TOP_TO_BOTTOM, minorDirectionAlignment=DTBox.ALIGN_EXPAND )
 		self._box.append( DTLabel( 'nil' ) )
 		self._box.append( self._declBox )
-		self._box.append( self._statementsBorder )
+		self._box.append( self._blockBorder )
 		self.widget.child = self._box
 		self.widget.borderColour = Colour3f( 0.6, 0.8, 0.6 )
 
@@ -129,8 +129,8 @@ class CVDef (CVStatement):
 		self.declVarNode.finishEditing()
 		self.paramsNode.startEditing()
 
-	def startEditingStatements(self):
-		self.statementsNode.startEditing()
+	def startEditingBlock(self):
+		self.blockNode.startEditing()
 
 
 	def startEditing(self):
@@ -138,10 +138,10 @@ class CVDef (CVStatement):
 
 
 	def horizontalNavigationList(self):
-		return [ self.docNode, self.declVarNode, self.paramsNode, self.statementsNode ]
+		return [ self.docNode, self.declVarNode, self.paramsNode, self.blockNode ]
 
 	def verticalNavigationList(self):
-		return [ self.docNode, self.declVarNode, self.statementsNode ]
+		return [ self.docNode, self.declVarNode, self.blockNode ]
 
 
 

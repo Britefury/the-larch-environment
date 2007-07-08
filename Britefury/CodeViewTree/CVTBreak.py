@@ -8,23 +8,23 @@
 from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
-from Britefury.CodeGraph.CGBlock import CGBlock
+from Britefury.CodeGraph.CGBreak import CGBreak
 
-from Britefury.CodeViewTree.CVTNode import *
-from Britefury.CodeViewTree.CVTBlock import *
+from Britefury.CodeViewTree.CVTNode import CVTNode
+from Britefury.CodeViewTree.CVTStatement import CVTStatement
 from Britefury.CodeViewTree.CodeViewTree import *
 
 
 
-class CVTElseBlock (CVTNode):
-	graphNodeClass = CGBlock
-
-	blockNode = CVTSimpleNodeProductionSingleField()
+class CVTBreak (CVTStatement):
+	graphNode = SheetRefField( CGBreak )
 
 
 
 
-class CVTRuleElseBlock (CVTRuleSimple):
-	graphNodeClass = CGBlock
-	cvtNodeClass = CVTElseBlock
+class CVTRuleBreak (CVTRuleSimple):
+	graphNodeClass = CGBreak
+	cvtNodeClass = CVTBreak
+
+CVTRuleBreak.register()
 

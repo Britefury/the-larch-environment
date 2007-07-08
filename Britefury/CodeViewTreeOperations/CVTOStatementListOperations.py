@@ -6,6 +6,8 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
 from Britefury.CodeGraph.CGReturn import *
+from Britefury.CodeGraph.CGBreak import *
+from Britefury.CodeGraph.CGContinue import *
 from Britefury.CodeGraph.CGNullExpression import *
 from Britefury.CodeGraph.CGVar import *
 from Britefury.CodeGraph.CGLocalVarDeclaration import *
@@ -73,6 +75,24 @@ def cvto_addWhileStatement(treeNode, position):
 	whileStmt.whileExpr.append( nullExp.parent )
 	whileStmt.block.append( block.parent )
 	treeNode.graphNode.statements.insert( position, whileStmt.parent )
+	return treeNode.statementNodes[position]
+
+
+
+
+def cvto_addBreakStatement(treeNode, position):
+	brk = CGBreak()
+	treeNode.graph.nodes.append( brk )
+	treeNode.graphNode.statements.insert( position, brk.parent )
+	return treeNode.statementNodes[position]
+
+
+
+
+def cvto_addContinueStatement(treeNode, position):
+	cont = CGContinue()
+	treeNode.graph.nodes.append( cont )
+	treeNode.graphNode.statements.insert( position, cont.parent )
 	return treeNode.statementNodes[position]
 
 
