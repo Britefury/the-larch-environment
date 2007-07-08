@@ -99,4 +99,6 @@ CVTBinOpLT, CVTRuleBinOpLT = _makeSimpleBinOpCVT( CGBinOpLT, 'CVTBinOpLT', 'CVTR
 CVTBinOpGT, CVTRuleBinOpGT = _makeSimpleBinOpCVT( CGBinOpGT, 'CVTBinOpGT', 'CVTRuleBinOpGT' )
 CVTBinOpLTE, CVTRuleBinOpLTE = _makeSimpleBinOpCVT( CGBinOpLTE, 'CVTBinOpLTE', 'CVTRuleBinOpLTE' )
 CVTBinOpGTE, CVTRuleBinOpGTE = _makeSimpleBinOpCVT( CGBinOpGTE, 'CVTBinOpGTE', 'CVTRuleBinOpGTE' )
+CVTBinOpLShift, CVTRuleBinOpLShift = _makeSimpleBinOpCVT( CGBinOpLShift, 'CVTBinOpLShift', 'CVTRuleBinOpLShift' )
+CVTBinOpRShift, CVTRuleBinOpRShift = _makeSimpleBinOpCVT( CGBinOpRShift, 'CVTBinOpRShift', 'CVTRuleBinOpRShift' )
 

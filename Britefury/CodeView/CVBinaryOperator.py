@@ -11,6 +11,8 @@ import gtk
 
 from Britefury.Util import RegExpStrings
 
+from Britefury.Kernel.Enum import *
+
 from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
@@ -27,8 +29,24 @@ from Britefury.DocView.Toolkit.DTHLine import DTHLine
 from Britefury.DocView.CellEdit.DVCStringCellEditEntryLabel import DVCStringCellEditEntryLabel
 
 
+class _CVBinaryOperatorPrecedence (Enum):
+	NONE = -1
+	CMP = 1
+	BIT_OR = 2
+	BIT_XOR = 3
+	BIT_AND = 4
+	SHIFT = 5
+	ADD_SUB = 6
+	MUL_DIV_MOD = 7
+	POW = 8
+
+
+
 
 class CVBinaryOperator (CVExpression):
+	precedence = _CVBinaryOperatorPrecedence.NONE
+	disableLeftChildParens = False
+	disableRightChildParens = False
 	treeNodeClass = CVTBinaryOperator
 
 
@@ -39,7 +57,16 @@ class CVBinaryOperator (CVExpression):
 	@FunctionRefField
 	def leftNode(self):
 		if self.treeNode.leftNode is not None:
-			return self._view.buildView( self.treeNode.leftNode, self )
+			left = self._view.buildView( self.treeNode.leftNode, self )
+			if isinstance( left, CVBinaryOperator ):
+				if self.disableLeftChildParens:
+					left._p_hideParens()
+				else:
+					if self.precedence > left.precedence:
+						left._p_showParens()
+					else:
+						left._p_hideParens()
+			return left
 		else:
 			return None
 
@@ -55,7 +82,16 @@ class CVBinaryOperator (CVExpression):
 	@FunctionRefField
 	def rightNode(self):
 		if self.treeNode.rightNode is not None:
-			return self._view.buildView( self.treeNode.rightNode, self )
+			right = self._view.buildView( self.treeNode.rightNode, self )
+			if isinstance( right, CVBinaryOperator ):
+				if self.disableRightChildParens:
+					right._p_hideParens()
+				else:
+					if self.precedence >= right.precedence:
+						right._p_showParens()
+					else:
+						right._p_hideParens()
+			return right
 		else:
 			return None
 
@@ -94,8 +130,25 @@ class CVBinaryOperator (CVExpression):
 
 	def __init__(self, treeNode, view):
 		super( CVBinaryOperator, self ).__init__( treeNode, view )
+		self._bShowParens = False
+		self._parensBox = DTBox()
+		self._parensBox.append( DTLabel( '(', font='Sans bold 11' ) )
+		self._parensBox.append( DTLabel( 'nil' ) )
+		self._parensBox.append( DTLabel( ')', font='Sans bold 11' ) )
 		self._container = self._o_makeContainer()
 		self.widget.child = self._container
+
+
+	def _p_showParens(self):
+		if not self._bShowParens:
+			self._bShowParens = True
+			self._parensBox[1] = self._container
+			self.widget.child = self._parensBox
+
+	def _p_hideParens(self):
+		if self._bShowParens:
+			self._bShowParens = False
+			self.widget.child = self._container
 
 
 	def deleteChild(self, child, moveFocus):
@@ -194,22 +247,28 @@ class CVBinaryOperatorSimple (CVBinaryOperatorBox):
 
 
 class CVBinOpAdd (CVBinaryOperatorSimple):
+	precedence = _CVBinaryOperatorPrecedence.ADD_SUB
 	treeNodeClass = CVTBinOpAdd
 	treeNode = SheetRefField( CVTBinOpAdd )
 	operatorCharacterString = '+'
 
 class CVBinOpSub (CVBinaryOperatorSimple):
+	precedence = _CVBinaryOperatorPrecedence.ADD_SUB
 	treeNodeClass = CVTBinOpSub
 	treeNode = SheetRefField( CVTBinOpSub )
 	operatorCharacterString = '-'
 
 class CVBinOpMul (CVBinaryOperatorSimple):
+	precedence = _CVBinaryOperatorPrecedence.MUL_DIV_MOD
 	treeNodeClass = CVTBinOpMul
 	treeNode = SheetRefField( CVTBinOpMul )
 	operatorCharacterString = '*'
 
 
 class CVBinOpDiv (CVBinaryOperatorBox):
+	precedence = _CVBinaryOperatorPrecedence.MUL_DIV_MOD
+	disableLeftChildParens = True
+	disableRightChildParens = True
 	treeNodeClass = CVTBinOpDiv
 	treeNode = SheetRefField( CVTBinOpDiv )
 
@@ -221,56 +280,81 @@ class CVBinOpDiv (CVBinaryOperatorBox):
 
 
 class CVBinOpPow (CVBinaryOperatorScript):
+	precedence = _CVBinaryOperatorPrecedence.POW
+	disableRightChildParens = True
 	treeNodeClass = CVTBinOpPow
 	treeNode = SheetRefField( CVTBinOpPow )
 	scriptMode = DTScript.SUPERSCRIPT
 
 class CVBinOpMod (CVBinaryOperatorSimple):
+	precedence = _CVBinaryOperatorPrecedence.MUL_DIV_MOD
 	treeNodeClass = CVTBinOpMod
 	treeNode = SheetRefField( CVTBinOpMod )
 	operatorCharacterString = '%'
 
 class CVBinOpBitAnd (CVBinaryOperatorSimple):
+	precedence = _CVBinaryOperatorPrecedence.BIT_AND
 	treeNodeClass = CVTBinOpBitAnd
 	treeNode = SheetRefField( CVTBinOpBitAnd )
 	operatorCharacterString = '&'
 
 class CVBinOpBitOr (CVBinaryOperatorSimple):
+	precedence = _CVBinaryOperatorPrecedence.BIT_OR
 	treeNodeClass = CVTBinOpBitOr
 	treeNode = SheetRefField( CVTBinOpBitOr )
 	operatorCharacterString = '|'
 
 class CVBinOpBitXor (CVBinaryOperatorSimple):
+	precedence = _CVBinaryOperatorPrecedence.BIT_XOR
 	treeNodeClass = CVTBinOpBitXor
 	treeNode = SheetRefField( CVTBinOpBitXor )
 	operatorCharacterString = '^'
 
 class CVBinOpEq (CVBinaryOperatorSimple):
+	precedence = _CVBinaryOperatorPrecedence.CMP
 	treeNodeClass = CVTBinOpEq
 	treeNode = SheetRefField( CVTBinOpEq )
 	operatorCharacterString = '=='
 
 class CVBinOpNEq (CVBinaryOperatorSimple):
+	precedence = _CVBinaryOperatorPrecedence.CMP
 	treeNodeClass = CVTBinOpNEq
 	treeNode = SheetRefField( CVTBinOpNEq )
 	operatorCharacterString = '!='
 
 class CVBinOpLT (CVBinaryOperatorSimple):
+	precedence = _CVBinaryOperatorPrecedence.CMP
 	treeNodeClass = CVTBinOpLT
 	treeNode = SheetRefField( CVTBinOpLT )
 	operatorCharacterString = '<'
 
 class CVBinOpGT (CVBinaryOperatorSimple):
+	precedence = _CVBinaryOperatorPrecedence.CMP
 	treeNodeClass = CVTBinOpGT
 	treeNode = SheetRefField( CVTBinOpGT )
 	operatorCharacterString = '>'
 
 class CVBinOpLTE (CVBinaryOperatorSimple):
+	precedence = _CVBinaryOperatorPrecedence.CMP
 	treeNodeClass = CVTBinOpLTE
 	treeNode = SheetRefField( CVTBinOpLTE )
 	operatorCharacterString = '<='
 
 class CVBinOpGTE (CVBinaryOperatorSimple):
+	precedence = _CVBinaryOperatorPrecedence.CMP
 	treeNodeClass = CVTBinOpGTE
 	treeNode = SheetRefField( CVTBinOpGTE )
 	operatorCharacterString = '>='
+
+class CVBinOpLShift (CVBinaryOperatorSimple):
+	precedence = _CVBinaryOperatorPrecedence.SHIFT
+	treeNodeClass = CVTBinOpLShift
+	treeNode = SheetRefField( CVTBinOpLShift )
+	operatorCharacterString = '<<'
+
+class CVBinOpRShift (CVBinaryOperatorSimple):
+	precedence = _CVBinaryOperatorPrecedence.SHIFT
+	treeNodeClass = CVTBinOpRShift
+	treeNode = SheetRefField( CVTBinOpRShift )
+	operatorCharacterString = '>>'
+

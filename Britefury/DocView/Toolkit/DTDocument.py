@@ -26,7 +26,7 @@ from Britefury.DocView.Toolkit.DTBin import DTBin
 
 
 _undoAccel = gtk.accelerator_parse( '<control>z' )
-_redoAccel = gtk.accelerator_parse( '<control><shift>z' )
+_redoAccel = gtk.accelerator_parse( '<control><shift>Z' )
 
 
 

@@ -74,4 +74,10 @@ class CGBinOpLTE (CGBinaryOperatorSimple):
 class CGBinOpGTE (CGBinaryOperatorSimple):
 	pyOperatorString = '>='
 
+class CGBinOpLShift (CGBinaryOperatorSimple):
+	pyOperatorString = '<<'
+
+class CGBinOpRShift (CGBinaryOperatorSimple):
+	pyOperatorString = '>>'
+
 

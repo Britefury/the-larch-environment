@@ -14,8 +14,10 @@ from Britefury.CodeGraph.CGArguments import CGArguments
 from Britefury.CodeGraph.CGAssignment import CGAssignment
 from Britefury.CodeGraph.CGBinaryOperator import *
 from Britefury.CodeGraph.CGBlock import CGBlock
+from Britefury.CodeGraph.CGBreak import CGBreak
 from Britefury.CodeGraph.CGCall import CGCall
 from Britefury.CodeGraph.CGClass import CGClass
+from Britefury.CodeGraph.CGContinue import CGContinue
 from Britefury.CodeGraph.CGDef import CGDef
 from Britefury.CodeGraph.CGFloatLiteral import CGFloatLiteral
 from Britefury.CodeGraph.CGGetAttr import CGGetAttr
@@ -391,6 +393,18 @@ def _processIf(graph, node):
 	return ifCG
 
 
+def _processBreak(graph, node):
+	breakCG = CGBreak()
+	graph.nodes.append( breakCG )
+	return breakCG
+
+
+def _processContinue(graph, node):
+	continueCG = CGContinue()
+	graph.nodes.append( continueCG )
+	return continueCG
+
+
 def _processWhile(graph, node):
 	whileCG = CGWhile()
 	graph.nodes.append( whileCG )
@@ -445,6 +459,8 @@ _nodeClassToProcFunction = {
 	ast.AssAttr : _processGetAttr,
 	ast.Assign : _processAssign,
 	ast.If : _processIf,
+	ast.Break : _processBreak,
+	ast.Continue : _processContinue,
 	ast.While : _processWhile,
 }
 
