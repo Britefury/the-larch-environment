@@ -15,7 +15,7 @@ from Britefury.CodeViewTree.CodeViewTree import *
 
 
 
-class CVTBlockStatements (CVTNode):
+class CVTBlock (CVTNode):
 	graphNode = SheetRefField( CGBlock )
 
 
@@ -37,9 +37,9 @@ class CVTBlockStatements (CVTNode):
 
 
 
-class CVTRuleBlockStatements (CVTRuleSimple):
+class CVTRuleBlock (CVTRuleSimple):
 	graphNodeClass = CGBlock
-	cvtNodeClass = CVTBlockStatements
+	cvtNodeClass = CVTBlock
 
-CVTRuleBlockStatements.register()
+CVTRuleBlock.register()
 

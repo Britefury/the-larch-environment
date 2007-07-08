@@ -60,16 +60,16 @@ class CVIf (CVStatement):
 
 
 	@FunctionRefField
-	def elseStatementsNode(self):
-		if self.treeNode.elseStatementsNode is not None:
-			return self._view.buildView( self.treeNode.elseStatementsNode, self )
+	def elseBlockNode(self):
+		if self.treeNode.elseBlockNode is not None:
+			return self._view.buildView( self.treeNode.elseBlockNode, self )
 		else:
 			return None
 
 	@FunctionRefField
-	def elseStatementsWidget(self):
-		if self.elseStatementsNode is not None:
-			return self.elseStatementsNode.widget
+	def elseBlockWidget(self):
+		if self.elseBlockNode is not None:
+			return self.elseBlockNode.widget
 		else:
 			return None
 
@@ -84,10 +84,10 @@ class CVIf (CVStatement):
 		self._box[1:-1] = self.elseIfBlockWidgets
 
 	@FunctionField
-	def _refreshElseStatements(self):
-		elseStatements = self.elseStatementsWidget
-		if elseStatements is not None:
-			self._elseBin.child = elseStatements
+	def _refreshElseBlock(self):
+		elseBlock = self.elseBlockWidget
+		if elseBlock is not None:
+			self._elseBin.child = elseBlock
 		else:
 			self._elseBin.child = None
 
@@ -96,7 +96,7 @@ class CVIf (CVStatement):
 	def refreshCell(self):
 		self._refreshIfBlock
 		self._refreshElseIfs
-		self._refreshElseStatements
+		self._refreshElseBlock
 
 
 
@@ -118,7 +118,10 @@ class CVIf (CVStatement):
 
 
 	def verticalNavigationList(self):
-		return [ self.ifBlockNode ]  +  self.elseIfBlockNodes  +  [ self.elseStatementsNode ]
+		if self.elseBlockNode is not None:
+			return [ self.ifBlockNode ]  +  self.elseIfBlockNodes  +  [ self.elseBlockNode ]
+		else:
+			return [ self.ifBlockNode ]  +  self.elseIfBlockNodes
 
 
 
@@ -144,7 +147,7 @@ class CVIf (CVStatement):
 
 
 	def deleteChild(self, child, moveFocus):
-		if child is self.elseStatementsNode:
+		if child is self.elseBlockNode:
 			self._o_moveFocus( moveFocus )
 			self.treeNode.removeElse()
 		elif child is self.ifBlockNode:

@@ -20,7 +20,7 @@ class CVTModule (CVTNode):
 	graphNode = SheetRefField( CGModule )
 
 
-	statementsNode = CVTSimpleSinkProductionSingleField( CGModule.block )
+	blockNode = CVTSimpleSinkProductionSingleField( CGModule.block )
 
 
 

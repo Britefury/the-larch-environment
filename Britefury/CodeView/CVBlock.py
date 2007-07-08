@@ -12,7 +12,7 @@ import gtk
 from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
-from Britefury.CodeViewTree.CVTBlockStatements import CVTBlockStatements
+from Britefury.CodeViewTree.CVTBlock import CVTBlock
 
 from Britefury.CodeView.CVBorderNode import *
 from Britefury.CodeView.CVCursorStop import *
@@ -26,11 +26,11 @@ from Britefury.DocView.Toolkit.DTDirection import DTDirection
 
 
 
-class CVBlockStatements (CVBorderNode):
-	treeNodeClass = CVTBlockStatements
+class CVBlock (CVBorderNode):
+	treeNodeClass = CVTBlock
 
 
-	treeNode = SheetRefField( CVTBlockStatements )
+	treeNode = SheetRefField( CVTBlock )
 
 
 	behaviors = [ CVBStatementListBehavior(), CVBCreateExpressionBehavior() ]
@@ -53,7 +53,7 @@ class CVBlockStatements (CVBorderNode):
 
 
 	def __init__(self, treeNode, view):
-		super( CVBlockStatements, self ).__init__( treeNode, view )
+		super( CVBlock, self ).__init__( treeNode, view )
 		self._startCursor = CVCursorStop( view, self )
 		self._endCursor = CVCursorStop( view, self )
 		self._box = DTBox( DTDirection.TOP_TO_BOTTOM, minorDirectionAlignment=DTBox.ALIGN_LEFT, spacing=4.0 )

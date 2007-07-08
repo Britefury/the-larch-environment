@@ -24,7 +24,7 @@ class CVTDef (CVTStatement):
 	docNode = CVTSimpleNodeProductionSingleField( CVTRuleDefDoc )
 	declVarNode = CVTSimpleSinkProductionSingleField( CGDef.declVar )
 	paramsNode = CVTSimpleSinkProductionSingleField( CGDef.parameters )
-	statementsNode = CVTSimpleSinkProductionSingleField( CGDef.block )
+	blockNode = CVTSimpleSinkProductionSingleField( CGDef.block )
 
 
 

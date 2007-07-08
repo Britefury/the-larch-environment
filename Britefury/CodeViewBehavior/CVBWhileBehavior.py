@@ -12,7 +12,7 @@ class CVBWhileBehavior (CodeViewBehavior):
 	@CVBCharInputHandlerMethod( ':' )
 	def _gotoStatements(self, viewNode, receivingNodePath, widget, event):
 		viewNode._f_commandHistoryFreeze()
-		viewNode.startEditingStatements()
+		viewNode.startEditingBlock()
 		viewNode._f_commandHistoryThaw()
 		return True
 

@@ -5,26 +5,12 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
+from Britefury.CodeGraph.CGStatement import CGStatement
 from Britefury.Sheet.Sheet import *
-from Britefury.SheetGraph.SheetGraph import *
-
-from Britefury.CodeGraph.CGBlock import CGBlock
-
-from Britefury.CodeViewTree.CVTNode import *
-from Britefury.CodeViewTree.CVTBlock import *
-from Britefury.CodeViewTree.CodeViewTree import *
+from Britefury.SemanticGraph.SemanticGraph import *
 
 
 
-class CVTElseBlock (CVTNode):
-	graphNodeClass = CGBlock
-
-	blockNode = CVTSimpleNodeProductionSingleField()
-
-
-
-
-class CVTRuleElseBlock (CVTRuleSimple):
-	graphNodeClass = CGBlock
-	cvtNodeClass = CVTElseBlock
-
+class CGBreak (CGStatement):
+	def generatePyCode(self):
+		return 'break'

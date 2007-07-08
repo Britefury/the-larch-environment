@@ -50,12 +50,12 @@ class CVIfBlock (CVBorderNode):
 
 
 	@FunctionRefField
-	def statementsNode(self):
-		return self._view.buildView( self.treeNode.statementsNode, self )
+	def blockNode(self):
+		return self._view.buildView( self.treeNode.blockNode, self )
 
 	@FunctionRefField
-	def statementsWidget(self):
-		return self.statementsNode.widget
+	def blockWidget(self):
+		return self.blockNode.widget
 
 
 
@@ -64,14 +64,14 @@ class CVIfBlock (CVBorderNode):
 		self._ifBox[1] = self.conditionWidget
 
 	@FunctionField
-	def _refreshStatements(self):
-		self._statementsBorder.child = self.statementsWidget
+	def _refreshBlock(self):
+		self._blockBorder.child = self.blockWidget
 
 
 	@FunctionField
 	def refreshCell(self):
 		self._refreshCondition
-		self._refreshStatements
+		self._refreshBlock
 
 
 
@@ -83,17 +83,17 @@ class CVIfBlock (CVBorderNode):
 		self._ifBox.append( DTLabel( 'nil' ) )
 		self._ifBox.append( DTLabel( ':', font='Sans bold 11' ) )
 		self._ifBox.backgroundColour = Colour3f( 1.0, 1.0, 0.75 )
-		self._statementsBorder = DTBorder( leftMargin=30.0 )
-		self._statementsBorder.child = DTLabel( 'nil' )
+		self._blockBorder = DTBorder( leftMargin=30.0 )
+		self._blockBorder.child = DTLabel( 'nil' )
 		self._box = DTBox( spacing=5.0, direction=DTDirection.TOP_TO_BOTTOM, minorDirectionAlignment=DTBox.ALIGN_EXPAND )
 		self._box.append( self._ifBox )
-		self._box.append( self._statementsBorder )
+		self._box.append( self._blockBorder )
 		self.widget.child = self._box
 
 
 
-	def startEditingStatements(self):
-		self.statementsNode.startEditing()
+	def startEditingBlock(self):
+		self.blockNode.startEditing()
 
 
 	def startEditing(self):
@@ -101,7 +101,7 @@ class CVIfBlock (CVBorderNode):
 
 
 	def horizontalNavigationList(self):
-		return [ self.conditionNode, self.statementsNode ]
+		return [ self.conditionNode, self.blockNode ]
 
 
 

@@ -34,15 +34,15 @@ class CVModule (CVBorderNode):
 
 
 	@FunctionRefField
-	def statementsNode(self):
-		return self._view.buildView( self.treeNode.statementsNode, self )
+	def blockNode(self):
+		return self._view.buildView( self.treeNode.blockNode, self )
 
 	@FunctionRefField
-	def statementsWidget(self):
-		return self.statementsNode.widget
+	def blockWidget(self):
+		return self.blockNode.widget
 
 	def _refreshCell(self):
-		self.widget.child = self.statementsWidget
+		self.widget.child = self.blockWidget
 
 	refreshCell = FunctionField( _refreshCell )
 
@@ -62,7 +62,7 @@ class CVModule (CVBorderNode):
 		return self.verticalNavigationList()
 
 	def verticalNavigationList(self):
-		return [ self.statementsNode ]
+		return [ self.blockNode ]
 
 
 

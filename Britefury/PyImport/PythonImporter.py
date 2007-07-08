@@ -440,6 +440,7 @@ _nodeClassToProcFunction = {
 	ast.CallFunc : _processCallFunc,
 	ast.List : _processList,
 	ast.Tuple : _processTuple,
+	ast.AssTuple : _processTuple,
 	ast.Lambda : _processLambda,
 	ast.AssAttr : _processGetAttr,
 	ast.Assign : _processAssign,

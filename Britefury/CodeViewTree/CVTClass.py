@@ -23,7 +23,7 @@ class CVTClass (CVTStatement):
 
 	declVarNode = CVTSimpleSinkProductionSingleField( CGClass.declVar )
 	basesNode = CVTSimpleNodeProductionSingleField( CVTRuleClassBases )
-	statementsNode = CVTSimpleSinkProductionSingleField( CGClass.block )
+	blockNode = CVTSimpleSinkProductionSingleField( CGClass.block )
 
 
 
