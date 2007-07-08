@@ -16,4 +16,11 @@ class CVBWhileBehavior (CodeViewBehavior):
 		viewNode._f_commandHistoryThaw()
 		return True
 
+	@CVBAccelInputHandlerMethod( '<alt>e' )
+	def _addElse(self, viewNode, receivingNodePath, widget, event):
+		viewNode._f_commandHistoryFreeze()
+		viewNode.addElse()
+		viewNode._f_commandHistoryThaw()
+		return True
+
 

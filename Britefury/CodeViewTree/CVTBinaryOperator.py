@@ -36,6 +36,8 @@ class CVTBinaryOperator (CVTExpression):
 
 		self.graphNode.destroySubtree()
 
+		return self._tree.buildNode( rightSource.node )
+
 
 
 	def removeRight(self):
@@ -47,6 +49,8 @@ class CVTBinaryOperator (CVTExpression):
 		parentCGSink.replace( self.graphNode.parent, leftSource )
 
 		self.graphNode.destroySubtree()
+
+		return self._tree.buildNode( leftSource.node )
 
 
 

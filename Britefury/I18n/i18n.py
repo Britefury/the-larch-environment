@@ -9,4 +9,4 @@ import gettext
 
 
 def initialise():
-	gettext.install( 'gSculpt', 'locale' )
+	gettext.install( 'gSym', 'locale' )

@@ -69,7 +69,7 @@ class CVNot (CVExpression):
 	def __init__(self, treeNode, view):
 		super( CVNot, self ).__init__( treeNode, view )
 		self._box = DTBox( spacing=5.0 )
-		self._box.append( DTLabel( 'not', font='Sans bold 11', colour=Colour3f( 0.0, 0.6, 0.0 ) ) )
+		self._box.append( DTLabel( _( 'not' ), font='Sans bold 11', colour=Colour3f( 0.0, 0.6, 0.0 ) ) )
 		self._box.append( DTLabel( 'nil' ) )
 		self.widget.child = self._box
 

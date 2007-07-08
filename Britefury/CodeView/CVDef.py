@@ -109,7 +109,7 @@ class CVDef (CVStatement):
 	def __init__(self, treeNode, view):
 		super( CVDef, self ).__init__( treeNode, view )
 		self._declBox = DTBox( spacing=5.0 )
-		self._declBox.append( DTLabel( markup='D<span size="small">EF</span>', font='Sans bold 11', colour=Colour3f( 0.0, 0.5, 0.0 ) ) )
+		self._declBox.append( DTLabel( markup=_( 'D<span size="small">EF</span>' ), font='Sans bold 11', colour=Colour3f( 0.0, 0.5, 0.0 ) ) )
 		self._declBox.append( DTLabel( 'nil' ) )
 		self._declBox.append( DTLabel( 'nil' ) )
 		self._declBox.append( DTLabel( ':', font='Sans bold 11' ) )

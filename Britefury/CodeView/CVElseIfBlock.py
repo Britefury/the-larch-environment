@@ -31,7 +31,7 @@ class CVElseIfBlock (CVIfBlock):
 
 
 	def _o_makeTitleLabel(self):
-		return DTLabel( markup='E<span size="small">LIF</span>', font='Sans bold 11', colour=Colour3f( 0.0, 0.5, 0.0 ) )
+		return DTLabel( markup=_( 'E<span size="small">LIF</span>' ), font='Sans bold 11', colour=Colour3f( 0.0, 0.5, 0.0 ) )
 
 
 

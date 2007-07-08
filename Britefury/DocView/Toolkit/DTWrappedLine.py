@@ -192,11 +192,21 @@ class DTWrappedLine (DTContainer):
 
 	def _o_onAllocateY(self, allocation):
 		i = 0
-		y = 0.0
+		lineHeights = []
 		for lineLength in self._lineLengths:
-			lineHeight = max( [ entry._reqHeight   for entry in self._childEntries[i:i+lineLength] ] )
+			lineHeights.append( max( [ entry._reqHeight   for entry in self._childEntries[i:i+lineLength] ] ) )
+			i += lineLength
+
+		totalLineHeights = sum( lineHeights )
+
+		i = 0
+		y = ( allocation - totalLineHeights ) * 0.5
+		y = max( y, 0.0 )
+
+		for lineLength, lineHeight in zip( self._lineLengths, lineHeights ):
 			for entry in self._childEntries[i:i+lineLength]:
-				self._o_allocateChildY( entry.child, y, lineHeight )
+				offset = ( lineHeight - entry._reqHeight ) * 0.5
+				self._o_allocateChildY( entry.child, y + offset, entry._reqHeight )
 			i += lineLength
 			y += lineHeight
 

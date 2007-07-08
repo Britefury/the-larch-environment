@@ -9,6 +9,8 @@ import pygtk
 pygtk.require( '2.0' )
 import gtk
 
+from Britefury.Math.Math import Colour3f
+
 from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
@@ -39,7 +41,9 @@ class CVLambda (CVExpression):
 	@FunctionRefField
 	def lambdaLabelNode(self):
 		label = self._view.buildView( self.treeNode, self, CVLabel )
-		label.setText( 'lambda' )
+		label.setMarkup( 'L<span size="small">AMBDA</span>' )
+		label.setColour( Colour3f( 0.0, 0.6, 0.0 ) )
+		label.setFont( 'Sans bold 11' )
 		return label
 
 	@FunctionRefField
@@ -49,7 +53,9 @@ class CVLambda (CVExpression):
 
 	@FunctionRefField
 	def paramsNode(self):
-		return self._view.buildView( self.treeNode.paramsNode, self )
+		paramsView = self._view.buildView( self.treeNode.paramsNode, self )
+		paramsView.disableParens()
+		return paramsView
 
 	@FunctionRefField
 	def paramsWidget(self):
@@ -89,7 +95,7 @@ class CVLambda (CVExpression):
 
 	def __init__(self, treeNode, view):
 		super( CVLambda, self ).__init__( treeNode, view )
-		self._lambdaBox = DTBox( spacing=1.0 )
+		self._lambdaBox = DTBox( spacing=1.0, minorDirectionAlignment=DTBox.ALIGN_EXPAND )
 		self._lambdaBox.append( DTLabel( 'nil' ) )
 		self._lambdaBox.append( DTLabel( 'nil' ) )
 		self._lambdaBox.append( DTLabel( ':' ) )

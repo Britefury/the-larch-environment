@@ -60,7 +60,7 @@ class CVElseBlock (CVBorderNode):
 	def __init__(self, treeNode, view):
 		super( CVElseBlock, self ).__init__( treeNode, view )
 		self._elseBin = DTBin()
-		self._elseBin.child = DTLabel( markup='E<span size="small">LSE:</span>', font='Sans bold 11', colour=Colour3f( 0.0, 0.5, 0.0 ) )
+		self._elseBin.child = DTLabel( markup=_( 'E<span size="small">LSE:</span>' ), font='Sans bold 11', colour=Colour3f( 0.0, 0.5, 0.0 ) )
 		self._elseBin.backgroundColour = Colour3f( 1.0, 1.0, 0.75 )
 		self._statementsBorder = DTBorder( leftMargin=30.0 )
 		self._statementsBorder.child = DTLabel( 'nil' )

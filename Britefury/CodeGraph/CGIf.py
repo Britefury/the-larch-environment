@@ -25,9 +25,9 @@ class CGIf (CGStatement):
 	def generatePyCodeBlock(self):
 		codeBlock = PyCodeBlock()
 
-		codeBlock += self.ifBlock.node.generatePyCodeBlock( False )
+		codeBlock += self.ifBlocks[0].node.generatePyCodeBlock( False )
 
-		for elseIfBlockSource in self.elseIfBlocks:
+		for elseIfBlockSource in self.ifBlocks[1:]:
 			codeBlock += elseIfBlockSource.node.generatePyCodeBlock( True )
 
 		if len( self.elseBlock ) > 0:
