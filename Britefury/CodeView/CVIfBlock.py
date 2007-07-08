@@ -112,5 +112,5 @@ class CVIfBlock (CVBorderNode):
 
 
 	def _o_makeTitleLabel(self):
-		return DTLabel( markup='I<span size="small">F</span>', font='Sans bold 11', colour=Colour3f( 0.0, 0.5, 0.0 ) )
+		return DTLabel( markup=_( 'I<span size="small">F</span>' ), font='Sans bold 11', colour=Colour3f( 0.0, 0.5, 0.0 ) )
 

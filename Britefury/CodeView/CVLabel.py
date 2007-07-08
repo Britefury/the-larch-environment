@@ -41,3 +41,12 @@ class CVLabel (CVBorderNode):
 
 	def setText(self, text):
 		self._label.setText( text )
+
+	def setMarkup(self, markup):
+		self._label.setMarkup( markup )
+
+	def setColour(self, colour):
+		self._label.setColour( colour )
+
+	def setFont(self, font):
+		self._label.setFont( font )

@@ -59,6 +59,22 @@ class CVWhile (CVStatement):
 
 
 
+	@FunctionRefField
+	def elseStatementsNode(self):
+		if self.treeNode.elseStatementsNode is not None:
+			return self._view.buildView( self.treeNode.elseStatementsNode, self )
+		else:
+			return None
+
+	@FunctionRefField
+	def elseStatementsWidget(self):
+		if self.elseStatementsNode is not None:
+			return self.elseStatementsNode.widget
+		else:
+			return None
+
+
+
 	@FunctionField
 	def _refreshWhileExpr(self):
 		self._whileBox[1] = self.whileExprWidget
@@ -67,19 +83,30 @@ class CVWhile (CVStatement):
 	def _refreshStatements(self):
 		self._statementsBorder.child = self.statementsWidget
 
+	@FunctionField
+	def _refreshElseStatements(self):
+		elseStatements = self.elseStatementsWidget
+		if elseStatements is not None:
+			self._elseBin.child = elseStatements
+		else:
+			self._elseBin.child = None
+
 
 	@FunctionField
 	def refreshCell(self):
 		self._refreshWhileExpr
 		self._refreshStatements
+		self._refreshElseStatements
 
 
 
 
 	def __init__(self, treeNode, view):
 		super( CVWhile, self ).__init__( treeNode, view )
+		self._elseBin = DTBin()
+
 		self._whileBox = DTBox( spacing=5.0 )
-		self._whileBox.append( DTLabel( markup='W<span size="small">HILE</span>', font='Sans bold 11', colour=Colour3f( 0.0, 0.5, 0.0 ) ) )
+		self._whileBox.append( DTLabel( markup=_( 'W<span size="small">HILE</span>' ), font='Sans bold 11', colour=Colour3f( 0.0, 0.5, 0.0 ) ) )
 		self._whileBox.append( DTLabel( 'nil' ) )
 		self._whileBox.append( DTLabel( ':' ) )
 		self._whileBox.backgroundColour = Colour3f( 1.0, 1.0, 0.75 )
@@ -88,6 +115,7 @@ class CVWhile (CVStatement):
 		self._box = DTBox( spacing=5.0, direction=DTDirection.TOP_TO_BOTTOM, minorDirectionAlignment=DTBox.ALIGN_EXPAND )
 		self._box.append( self._whileBox )
 		self._box.append( self._statementsBorder )
+		self._box.append( self._elseBin )
 		self.widget.child = self._box
 
 
@@ -100,11 +128,11 @@ class CVWhile (CVStatement):
 		self.whileExprNode.startEditing()
 
 
-	def horizontalNavigationList(self):
-		return [ self.whileExprNode, self.statementsNode ]
-
 	def verticalNavigationList(self):
-		return [ self.whileExprNode, self.statementsNode ]
+		if self.elseStatementsNode is not None:
+			return [ self.whileExprNode, self.statementsNode, self.elseStatementsNode ]
+		else:
+			return [ self.whileExprNode, self.statementsNode ]
 
 
 
@@ -113,7 +141,16 @@ class CVWhile (CVStatement):
 			self.whileExprNode.treeNode.replaceWithNullExpression()
 			self._view.refresh()
 			self.whileExprNode.startEditing()
+		elif child is self.elseStatementsNode:
+			self._o_moveFocus( moveFocus )
+			self.treeNode.removeElse()
 
+
+
+	def addElse(self):
+		elseBlockCVT = self.treeNode.addElse()
+		elseBlockCV = self._view.buildView( elseBlockCVT, self )
+		elseBlockCV.startEditing()
 
 
 

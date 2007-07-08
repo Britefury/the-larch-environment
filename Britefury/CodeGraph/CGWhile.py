@@ -18,6 +18,7 @@ from Britefury.PyCodeGen.PyCodeGen import *
 class CGWhile (CGStatement):
 	whileExpr = SemanticGraphSinkSingleSubtreeField( 'While exp', 'While expression' )
 	block = SemanticGraphSinkSingleSubtreeField( 'Block', 'Code block' )
+	elseBlock = SemanticGraphSinkSingleSubtreeField( 'ElseBlock', 'Else block' )
 
 
 
@@ -30,5 +31,12 @@ class CGWhile (CGStatement):
 		innerBlock = self.block[0].node.generatePyCodeBlock()
 		innerBlock.indent()
 		codeBlock += innerBlock
+
+		if len( self.elseBlock ) > 0:
+			codeBlock.append( 'else:' )
+			elseCode = self.elseBlock[0].node.generatePyCodeBlock()
+			elseCode.indent()
+			codeBlock += elseCode
+
 		return codeBlock
 

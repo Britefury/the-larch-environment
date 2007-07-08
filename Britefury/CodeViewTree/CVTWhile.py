@@ -13,6 +13,7 @@ from Britefury.CodeGraph.CGWhile import CGWhile
 from Britefury.CodeViewTree.CVTNode import *
 from Britefury.CodeViewTree.CVTStatement import CVTStatement
 from Britefury.CodeViewTree.CodeViewTree import *
+from Britefury.CodeViewTree.CVTElseBlock import *
 
 
 
@@ -22,6 +23,23 @@ class CVTWhile (CVTStatement):
 
 	whileExprNode = CVTSimpleSinkProductionSingleField( CGWhile.whileExpr )
 	statementsNode = CVTSimpleSinkProductionSingleField( CGWhile.block )
+	elseStatementsNode = CVTSimpleSinkProductionOptionalField( CGWhile.elseBlock, rule=CVTRuleElseBlock )
+
+
+
+	def addElse(self):
+		elseBlockCG = CGBlock()
+		self.graph.nodes.append( elseBlockCG )
+
+		self.graphNode.elseBlock.append( elseBlockCG.parent )
+
+		return self._tree.buildNode( elseBlockCG )
+
+
+	def removeElse(self):
+		elseCG = self.graphNode.elseBlock[0].node
+		del self.graphNode.elseBlock[0]
+		elseCG.destroySubtree()
 
 
 

@@ -27,7 +27,7 @@ class CGIfBlock (CGNode):
 			prefix = 'elif'
 		else:
 			prefix = 'if'
-		return prefix + ' ' + self.condition[0].node.generatePyCode() + '(' + self.parameters[0].node.generatePyCode() + '):'
+		return prefix + ' ' + self.condition[0].node.generatePyCode() + ':'
 
 	def generatePyCodeBlock(self, bElseIf):
 		codeBlock = PyCodeBlock()
@@ -39,5 +39,11 @@ class CGIfBlock (CGNode):
 
 
 
+	def getReferenceableNodeByName(self, targetName, sourceNode=None):
+		return self.ifStatement[0].node.getReferenceableNodeByName( targetName, self )
+
+
+	def buildReferenceableNodeTable(self, nodeTable):
+		pass
 
 

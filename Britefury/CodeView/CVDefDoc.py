@@ -83,7 +83,7 @@ class CVDefDoc (CVNode):
 	def __init__(self, treeNode, view):
 		super( CVDefDoc, self ).__init__( treeNode, view )
 		self._functionBox = DTBox( spacing=25.0 )
-		self._functionBox.append( DTLabel( markup='F<span size="small">UNCTION</span>', font='Sans 11' ), False, False )
+		self._functionBox.append( DTLabel( markup=_( 'F<span size="small">UNCTION</span>' ), font='Sans 11' ), False, False )
 		self._functionBox.append( DTLabel( '<nil>' ), True, True )
 		self._functionDocBox = DTBox( spacing=10.0 )
 		self._functionDocBox.append( DTLabel( 'DESCRIPTION:' ) )

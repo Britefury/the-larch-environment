@@ -99,14 +99,14 @@ class CVBinaryOperator (CVExpression):
 
 
 	def deleteChild(self, child, moveFocus):
-		if child is self.attrNameNode:
-			self.treeNode.unwrapBinaryOperator()
+		if child is self.leftNode:
+			right = self.treeNode.removeLeft()
 			self._view.refresh()
-			self.targetObjectNode.startEditing()
-		elif child is self.targetObjectNode:
-			self.targetObjectNode.treeNode.replaceWithNullExpression()
+			self._view.buildView( right, self._parent ).startEditing()
+		elif child is self.rightNode:
+			left = self.treeNode.removeRight()
 			self._view.refresh()
-			self.targetObjectNode.startEditing()
+			self._view.buildView( left, self._parent ).startEditing()
 
 
 	def startEditingLeft(self):

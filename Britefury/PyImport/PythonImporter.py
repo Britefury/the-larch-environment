@@ -22,7 +22,11 @@ from Britefury.CodeGraph.CGGetAttr import CGGetAttr
 from Britefury.CodeGraph.CGIf import CGIf
 from Britefury.CodeGraph.CGIfBlock import CGIfBlock
 from Britefury.CodeGraph.CGIntLiteral import CGIntLiteral
+from Britefury.CodeGraph.CGLambda import CGLambda
+from Britefury.CodeGraph.CGList import CGList
 from Britefury.CodeGraph.CGModule import CGModule
+from Britefury.CodeGraph.CGNegate import CGNegate
+from Britefury.CodeGraph.CGNot import CGNot
 from Britefury.CodeGraph.CGParameters import CGParameters
 from Britefury.CodeGraph.CGParameterVar import CGParameterVar
 from Britefury.CodeGraph.CGReturn import CGReturn
@@ -31,6 +35,7 @@ from Britefury.CodeGraph.CGStringLiteral import CGStringLiteral
 from Britefury.CodeGraph.CGTuple import CGTuple
 from Britefury.CodeGraph.CGUnboundRef import CGUnboundRef
 from Britefury.CodeGraph.CGVar import CGVar
+from Britefury.CodeGraph.CGWhile import CGWhile
 
 
 
@@ -106,7 +111,8 @@ def _processFunction(graph, node):
 	block = _processNode( graph, node.code )
 	if block is not None:
 		func.block.append( block.parent )
-		return func
+
+	return func
 
 
 def _processClass(graph, node):
@@ -129,7 +135,8 @@ def _processClass(graph, node):
 	block = _processNode( graph, node.code )
 	if block is not None:
 		clsCG.block.append( block.parent )
-		return clsCG
+
+	return clsCG
 
 
 def _processDiscard(graph, node):
@@ -208,6 +215,28 @@ def _processSubscript(graph, node):
 	return subs
 
 
+def _processNot(graph, node):
+	notCG = CGNot()
+	graph.nodes.append( notCG )
+
+	g = _processNode( graph, node.expr )
+	if g is not None:
+		notCG.expr.append( g.parent )
+
+	return notCG
+
+
+def _processUnarySub(graph, node):
+	negateCG = CGNegate()
+	graph.nodes.append( negateCG )
+
+	g = _processNode( graph, node.expr )
+	if g is not None:
+		negateCG.expr.append( g.parent )
+
+	return negateCG
+
+
 def _makeBinOpProcessFunction(cgNodeClass):
 	def _processBinOp(graph, node):
 		binop = cgNodeClass()
@@ -269,6 +298,56 @@ def _processCallFunc(graph, node):
 	return call
 
 
+def _processTuple(graph, node):
+	tupCG = CGTuple()
+	graph.nodes.append( tupCG )
+
+	for n in node.nodes:
+		g = _processNode( graph, n )
+		if g is not None:
+			tupCG.args.append( g.parent )
+
+	return tupCG
+
+
+def _processList(graph, node):
+	lsCG = CGList()
+	graph.nodes.append( lsCG )
+
+	for n in node.nodes:
+		g = _processNode( graph, n )
+		if g is not None:
+			lsCG.args.append( g.parent )
+
+	return lsCG
+
+
+def _processLambda(graph, node):
+	lambdaCG = CGLambda()
+	graph.nodes.append( lambdaCG )
+
+	params = CGParameters()
+	graph.nodes.append( params )
+
+	lambdaCG.parameters.append( params.parent )
+
+
+	for argname in node.argnames:
+		p = CGVar()
+		graph.nodes.append( p )
+
+		params.params.append( p.declaration )
+
+		p.name = argname
+
+
+	expr = _processNode( graph, node.code )
+	if expr is not None:
+		lambdaCG.valueExpr.append( expr.parent )
+
+	return lambdaCG
+
+
 def _processAssign(graph, node):
 	assign = CGAssignment()
 	graph.nodes.append( assign )
@@ -312,6 +391,25 @@ def _processIf(graph, node):
 	return ifCG
 
 
+def _processWhile(graph, node):
+	whileCG = CGWhile()
+	graph.nodes.append( whileCG )
+
+	g = _processNode( graph, node.test )
+	if g is not None:
+		whileCG.whileExpr.append( g.parent )
+
+	g = _processNode( graph, node.body )
+	if g is not None:
+		whileCG.block.append( g.parent )
+
+	g = _processNode( graph, node.else_ )
+	if g is not None:
+		whileCG.elseBlock.append( g.parent )
+
+	return whileCG
+
+
 
 
 
@@ -327,6 +425,8 @@ _nodeClassToProcFunction = {
 	ast.Const : _processConst,
 	ast.Getattr : _processGetAttr,
 	ast.Subscript : _processSubscript,
+	ast.Not : _processNot,
+	ast.UnarySub : _processUnarySub,
 	ast.Add : _makeBinOpProcessFunction( CGBinOpAdd ),
 	ast.Sub : _makeBinOpProcessFunction( CGBinOpSub ),
 	ast.Mul : _makeBinOpProcessFunction( CGBinOpMul ),
@@ -338,9 +438,13 @@ _nodeClassToProcFunction = {
 	ast.Bitxor : _makeBinOpProcessFunction( CGBinOpBitXor ),
 	ast.Compare : _processCompare,
 	ast.CallFunc : _processCallFunc,
+	ast.List : _processList,
+	ast.Tuple : _processTuple,
+	ast.Lambda : _processLambda,
 	ast.AssAttr : _processGetAttr,
 	ast.Assign : _processAssign,
 	ast.If : _processIf,
+	ast.While : _processWhile,
 }
 
 

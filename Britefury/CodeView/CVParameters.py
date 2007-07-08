@@ -68,7 +68,21 @@ class CVParameters (CVBorderNode):
 		self._box.append( DTLabel( '(' ) )
 		self._box.append( self._line )
 		self._box.append( DTLabel( ')' ) )
+		self._bParensEnabled = True
 		self.widget.child = self._box
+
+
+	def enableParens(self):
+		if not self._bParensEnabled:
+			self._bParensEnabled = True
+			self._box[1] = self._line
+			self.widget.child = self._box
+
+
+	def disableParens(self):
+		if self._bParensEnabled:
+			self._bParensEnabled = False
+			self.widget.child = self._line
 
 
 

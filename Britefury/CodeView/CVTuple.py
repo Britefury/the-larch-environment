@@ -9,6 +9,8 @@ import pygtk
 pygtk.require( '2.0' )
 import gtk
 
+from Britefury.Math.Math import Colour3f
+
 from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
@@ -109,9 +111,9 @@ class CVTuple (CVExpression):
 		super( CVTuple, self ).__init__( treeNode, view )
 		self._argsLine = DTWrappedLineWithSeparators( spacing=5.0 )
 		self._box = DTBox()
-		self._box.append( _TupleOpen() )
+		self._box.append( _TupleOpen( colour=Colour3f( 0.0, 0.6, 0.0 ) ) )
 		self._box.append( self._argsLine )
-		self._box.append( _TupleClose() )
+		self._box.append( _TupleClose( colour=Colour3f( 0.0, 0.6, 0.0 ) ) )
 		self.widget.child = self._box
 
 

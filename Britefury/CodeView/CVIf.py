@@ -117,7 +117,7 @@ class CVIf (CVStatement):
 		self.ifBlockNode.startEditing()
 
 
-	def horizontalNavigationList(self):
+	def verticalNavigationList(self):
 		return [ self.ifBlockNode ]  +  self.elseIfBlockNodes  +  [ self.elseStatementsNode ]
 
 
