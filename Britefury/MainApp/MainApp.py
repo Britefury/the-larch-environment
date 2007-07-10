@@ -34,7 +34,7 @@ from Britefury.CodeGraph.CGBlock import CGBlock
 
 from Britefury.CodeViewTree.CodeViewTree import CodeViewTree
 
-from Britefury.CodeView.CodeView import CodeView
+from Britefury.CodeView.CodeView import *
 
 from Britefury.GraphView.SheetGraphView import SheetGraphView
 from Britefury.GraphView.SheetGraphViewDisplayTable import SheetGraphViewDisplayTable
@@ -138,6 +138,47 @@ class MainApp (object):
 		runMenu.append( showCodeItem )
 
 
+		viewTuplesWithSpecialCharsItem = gtk.MenuItem( 'With special characters' )
+		viewTuplesWithSpecialCharsItem.connect( 'activate', self._p_onViewTuplesWithSpecialChars )
+
+		viewTuplesWithParensItem = gtk.MenuItem( 'With parens' )
+		viewTuplesWithParensItem.connect( 'activate', self._p_onViewTuplesWithParens )
+
+		viewTuplesMenu = gtk.Menu()
+		viewTuplesMenu.append( viewTuplesWithSpecialCharsItem )
+		viewTuplesMenu.append( viewTuplesWithParensItem )
+
+
+		viewFunctionsNormalItem = gtk.MenuItem( 'Normal' )
+		viewFunctionsNormalItem.connect( 'activate', self._p_onViewFunctionsNormal )
+
+		viewFunctionsAPIItem = gtk.MenuItem( 'API' )
+		viewFunctionsAPIItem.connect( 'activate', self._p_onViewFunctionsAPI )
+
+		viewFunctionsCodeItem = gtk.MenuItem( 'Code' )
+		viewFunctionsCodeItem.connect( 'activate', self._p_onViewFunctionsCode )
+
+		viewFunctionsOverviewItem = gtk.MenuItem( 'Overview' )
+		viewFunctionsOverviewItem.connect( 'activate', self._p_onViewFunctionsOverview )
+
+		viewFunctionsMenu = gtk.Menu()
+		viewFunctionsMenu.append( viewFunctionsNormalItem )
+		viewFunctionsMenu.append( viewFunctionsAPIItem )
+		viewFunctionsMenu.append( viewFunctionsCodeItem )
+		viewFunctionsMenu.append( viewFunctionsOverviewItem )
+
+
+		viewTuplesItem = gtk.MenuItem( 'Tuples' )
+		viewTuplesItem.set_submenu( viewTuplesMenu )
+
+		viewFunctionsItem = gtk.MenuItem( 'Functions' )
+		viewFunctionsItem.set_submenu( viewFunctionsMenu )
+
+		viewMenu = gtk.Menu()
+		viewMenu.append( viewTuplesItem )
+		viewMenu.append( viewFunctionsItem )
+
+
 		graphViewItem = gtk.MenuItem( 'Show graph view' )
 		graphViewItem.connect( 'activate', self._p_onShowGraphView )
 
@@ -154,6 +195,9 @@ class MainApp (object):
 		runMenuItem = gtk.MenuItem( 'Run' )
 		runMenuItem.set_submenu( runMenu )
 
+		viewMenuItem = gtk.MenuItem( 'View' )
+		viewMenuItem.set_submenu( viewMenu )
+
 		develMenuItem = gtk.MenuItem( 'Devel' )
 		develMenuItem.set_submenu( develMenu )
 
@@ -162,6 +206,7 @@ class MainApp (object):
 		menuBar.append( fileMenuItem )
 		menuBar.append( editMenuItem )
 		menuBar.append( runMenuItem )
+		menuBar.append( viewMenuItem )
 		menuBar.append( develMenuItem )
 		menuBar.show_all()
 
@@ -258,7 +303,7 @@ class MainApp (object):
 		savedStdout, savedStderr = sys.stdout, sys.stderr
 		sys.stdout = self._Output( textBuffer, 'stdout', savedStdout )
 		sys.stderr = self._Output( textBuffer, 'stderr', savedStderr )
-		exec( source )
+		exec source in {}
 		sys.stdout, sys.stderr = savedStdout, savedStderr
 
 
@@ -477,6 +522,30 @@ class MainApp (object):
 
 
 
+
+	def _p_onViewTuplesWithSpecialChars(self, widget):
+		codeViewSettings.bRenderTuplesUsingParens = False
+
+	def _p_onViewTuplesWithParens(self, widget):
+		codeViewSettings.bRenderTuplesUsingParens = True
+
+
+
+	def _p_onViewFunctionsNormal(self, widget):
+		codeViewSettings.bShowDoc = True
+		codeViewSettings.bShowCode = True
+
+	def _p_onViewFunctionsAPI(self, widget):
+		codeViewSettings.bShowDoc = True
+		codeViewSettings.bShowCode = False
+
+	def _p_onViewFunctionsCode(self, widget):
+		codeViewSettings.bShowDoc = False
+		codeViewSettings.bShowCode = True
+
+	def _p_onViewFunctionsOverview(self, widget):
+		codeViewSettings.bShowDoc = False
+		codeViewSettings.bShowCode = False
 
 
 	def _p_onShowGraphView(self, widget):

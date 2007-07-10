@@ -73,8 +73,8 @@ class CVExpression (CVBorderNode):
 		tupleCV.makeCurrent()
 
 
-	def wrapInGetItem(self):
-		getItemCVT = self.treeNode.wrapInGetItem()
+	def wrapInSubscript(self):
+		getItemCVT = self.treeNode.wrapInSubscript()
 		self._view.refresh()
 		getItemCV = self._view.getViewNodeForTreeNode( getItemCVT )
 		getItemCV.startEditingKey()

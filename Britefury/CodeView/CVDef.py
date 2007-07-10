@@ -17,6 +17,7 @@ from Britefury.SheetGraph.SheetGraph import *
 from Britefury.CodeViewTree.CVTDef import CVTDef
 
 from Britefury.CodeView.CVStatement import *
+from Britefury.CodeView.CodeView import *
 
 from Britefury.CodeViewBehavior.CVBDefBehavior import *
 
@@ -79,9 +80,9 @@ class CVDef (CVStatement):
 
 
 
-	@FunctionField
-	def _refreshDoc(self):
-		self._box[0] = self.docWidget
+	#@FunctionField
+	#def _refreshDoc(self):
+	#	self._box[0] = self.docWidget
 
 	@FunctionField
 	def _refreshDeclVar(self):
@@ -98,10 +99,18 @@ class CVDef (CVStatement):
 
 	@FunctionField
 	def refreshCell(self):
-		self._refreshDoc
+		#self._refreshDoc
 		self._refreshDeclVar
 		self._refreshParams
 		self._refreshBlock
+
+		boxContents = []
+		if codeViewSettings.bShowDoc:
+			boxContents.append( self.docWidget )
+		boxContents.append( self._declBox )
+		if codeViewSettings.bShowCode:
+			boxContents.append( self._blockBorder )
+		self._box[:] = boxContents
 
 
 
