@@ -102,3 +102,14 @@ class CVBStatementListBehavior (CodeViewBehavior):
 		stmtCV.startEditing()
 		viewNode._f_commandHistoryThaw()
 		return True
+
+
+	@CVBAccelInputHandlerMethod( '<alt>m' )
+	def _addImport(self, viewNode, receivingNodePath, widget, event):
+		position = CVBStatementListBehavior._p_getPosition( viewNode, receivingNodePath )
+		viewNode._f_commandHistoryFreeze()
+		cvto_addImportStatement( viewNode.treeNode, position )
+		stmtCV = viewNode.statementNodes[position]
+		stmtCV.startEditingOnLeft()
+		viewNode._f_commandHistoryThaw()
+		return True

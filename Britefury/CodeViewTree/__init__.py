@@ -25,6 +25,7 @@ import CVTFloatLiteral
 import CVTGetAttr
 import CVTIf
 import CVTIfBlock
+import CVTImport
 import CVTIntLiteral
 import CVTLambda
 import CVTList

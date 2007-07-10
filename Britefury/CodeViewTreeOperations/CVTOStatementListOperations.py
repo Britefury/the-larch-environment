@@ -6,6 +6,7 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
 from Britefury.CodeGraph.CGReturn import *
+from Britefury.CodeGraph.CGImport import *
 from Britefury.CodeGraph.CGBreak import *
 from Britefury.CodeGraph.CGContinue import *
 from Britefury.CodeGraph.CGNullExpression import *
@@ -127,3 +128,16 @@ def cvto_addClassStatement(treeNode, position):
 	classStmt.block.append( block.parent )
 	treeNode.graphNode.statements.insert( position, classStmt.parent )
 	return treeNode.statementNodes[position]
+
+
+
+
+def cvto_addImportStatement(treeNode, position):
+	imp = CGImport()
+	treeNode.graph.nodes.append( imp )
+	treeNode.graphNode.statements.insert( position, imp.parent )
+	return treeNode.statementNodes[position]
+
+
+
+

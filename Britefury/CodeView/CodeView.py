@@ -9,6 +9,9 @@ from weakref import WeakKeyDictionary
 
 from Britefury.Cell.Cell import Cell
 
+from Britefury.Sheet.Sheet import *
+
+
 
 class CodeView (object):
 	_nodeClassTable = {}
@@ -118,3 +121,16 @@ class CodeView (object):
 	def _f_commandHistoryThaw(self):
 		if self._commandHistory is not None:
 			self._commandHistory.thaw()
+
+
+
+
+
+class CodeViewSettings (Sheet):
+	bRenderTuplesUsingParens = Field( bool, False )
+	bShowDoc = Field( bool, True )
+	bShowCode = Field( bool, True )
+
+
+
+codeViewSettings = CodeViewSettings()

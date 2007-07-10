@@ -16,6 +16,7 @@ from Britefury.SheetGraph.SheetGraph import *
 
 from Britefury.CodeViewTree.CVTTuple import CVTTuple
 
+from Britefury.CodeView.CodeView import *
 from Britefury.CodeView.CVNode import *
 from Britefury.CodeView.CVExpression import *
 
@@ -102,6 +103,12 @@ class CVTuple (CVExpression):
 
 	@FunctionField
 	def refreshCell(self):
+		if codeViewSettings.bRenderTuplesUsingParens:
+			self._box[0] = DTLabel( '(', font='Sans bold 11', colour=Colour3f( 0.0, 0.6, 0.0 ) )
+			self._box[2] = DTLabel( ')', font='Sans bold 11', colour=Colour3f( 0.0, 0.6, 0.0 ) )
+		else:
+			self._box[0] = _TupleOpen( colour=Colour3f( 0.0, 0.6, 0.0 ) )
+			self._box[2] = _TupleClose( colour=Colour3f( 0.0, 0.6, 0.0 ) )
 		self._refreshArgs
 
 
@@ -111,9 +118,9 @@ class CVTuple (CVExpression):
 		super( CVTuple, self ).__init__( treeNode, view )
 		self._argsLine = DTWrappedLineWithSeparators( spacing=5.0 )
 		self._box = DTBox()
-		self._box.append( _TupleOpen( colour=Colour3f( 0.0, 0.6, 0.0 ) ) )
+		self._box.append( DTLabel( 'nil' ) )
 		self._box.append( self._argsLine )
-		self._box.append( _TupleClose( colour=Colour3f( 0.0, 0.6, 0.0 ) ) )
+		self._box.append( DTLabel( 'nil' ) )
 		self.widget.child = self._box
 
 

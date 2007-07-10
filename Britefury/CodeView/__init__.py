@@ -25,6 +25,7 @@ import CVFloatLiteral
 import CVGetAttr
 import CVIf
 import CVIfBlock
+import CVImport
 import CVIntLiteral
 import CVLambda
 import CVList

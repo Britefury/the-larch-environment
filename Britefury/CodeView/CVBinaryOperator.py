@@ -87,7 +87,7 @@ class CVBinaryOperator (CVExpression):
 				if self.disableRightChildParens:
 					right._p_hideParens()
 				else:
-					if self.precedence >= right.precedence:
+					if self.precedence > right.precedence:
 						right._p_showParens()
 					else:
 						right._p_hideParens()
