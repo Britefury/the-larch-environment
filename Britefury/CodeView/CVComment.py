@@ -50,7 +50,7 @@ class CVComment (CVStatement):
 	@FunctionField
 	def refreshCell(self):
 		self.widget.child = self.textWidget
-		self.widget.backgroundColour = Colour3f( 0.85, 0.85, 0.85 )
+		self.widget.backgroundColour = Colour3f( 0.9, 0.9, 0.9 )
 
 
 
@@ -58,6 +58,8 @@ class CVComment (CVStatement):
 	def __init__(self, treeNode, view):
 		super( CVComment, self ).__init__( treeNode, view )
 		self.widget.child = DTLabel( 'nil' )
+		self.widget.leftMargin = self.widget.rightMargin = 20.0
+		self.widget.topMargin = self.widget.bottomMargin = 10.0
 
 
 	def startEditing(self):
