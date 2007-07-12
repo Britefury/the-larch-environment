@@ -10,6 +10,8 @@ from Britefury.Sheet.Sheet import *
 from Britefury.SemanticGraph.SemanticGraph import *
 from Britefury.LowLevelCodeTree.LLCTLoadLocalExp import LLCTLoadLocalExp
 
+from Britefury.PyCodeGen.PyCodeGen import *
+
 
 
 class CGUnboundRef (CGExpression):
@@ -23,3 +25,8 @@ class CGUnboundRef (CGExpression):
 	def isAssignable(self):
 		return True
 
+
+	bTexLeaf = True
+
+	def generateTexLeafParamsString(self):
+		return  self.targetName

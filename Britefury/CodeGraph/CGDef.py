@@ -59,3 +59,19 @@ class CGDef (CGStatement):
 
 
 
+	def generateTexParameters(self):
+		texBlock = PyCodeBlock()
+		texBlock.append( '{' + self.declVar[0].node.name + '}% function name' )
+		texBlock.append( '{' )
+		paramsBlock = self.parameters[0].node.generateTex()
+		paramsBlock.indent()
+		texBlock += paramsBlock
+		texBlock.append( '}%  parameters' )
+		return texBlock
+
+
+	def generateTexBody(self):
+		return self.block[0].node.generateTex()
+
+
+

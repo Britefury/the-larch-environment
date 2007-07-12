@@ -22,6 +22,12 @@ class CGClass (CGStatement):
 
 
 
+	def buildReferenceableNodeTable(self, nodeTable):
+		nodeTable[self.declVar[0].node.name] = self.declVar[0].node
+
+
+
+
 	def generatePyCode(self):
 		if len( self.bases ) == 0:
 			return 'class ' + self.declVar[0].node.name + ':'
@@ -38,9 +44,22 @@ class CGClass (CGStatement):
 
 
 
+	def generateTexParameters(self):
+		texBlock = PyCodeBlock()
+		texBlock.append( '{' + self.declVar[0].node.name + '}% class name' )
+		texBlock.append( '{' )
+		basesBlock = PyCodeBlock()
+		for baseSource in self.bases:
+			baseBlock = baseSource.node.generateTex()
+			basesBlock += baseBlock
+		basesBlock.indent()
+		texBlock += basesBlock
+		texBlock.append( '}%  bases' )
+		return texBlock
 
-	def buildReferenceableNodeTable(self, nodeTable):
-		nodeTable[self.declVar[0].node.name] = self.declVar[0].node
+
+	def generateTexBody(self):
+		return self.block[0].node.generateTex()
 
 
 

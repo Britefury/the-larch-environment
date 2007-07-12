@@ -21,20 +21,6 @@ class CGBlock (CGNode):
 
 
 
-	def generatePyCodeBlock(self):
-		codeBlock = PyCodeBlock()
-
-		if len( self.statements ) > 0:
-			for statementSource in self.statements:
-				codeBlock += statementSource.node.generatePyCodeBlock()
-		else:
-			codeBlock.append( 'pass' )
-
-		return codeBlock
-
-
-
-
 	def getReferenceableNodeByName(self, targetName, sourceNode=None):
 		if sourceNode is not None:
 			n = self.statements.index( sourceNode.parent )
@@ -47,3 +33,30 @@ class CGBlock (CGNode):
 				pass
 
 		return self.parent[0].node.getReferenceableNodeByName( targetName, self )
+
+
+
+	def generatePyCodeBlock(self):
+		codeBlock = PyCodeBlock()
+
+		if len( self.statements ) > 0:
+			for statementSource in self.statements:
+				codeBlock += statementSource.node.generatePyCodeBlock()
+		else:
+			codeBlock.append( 'pass' )
+
+		return codeBlock
+
+
+	def generateTexBody(self):
+		codeBlock = PyCodeBlock()
+
+		if len( self.statements ) > 0:
+			for statementSource in self.statements:
+				codeBlock += statementSource.node.generateTex()
+		else:
+			codeBlock.append( '\\gSymPass' )
+
+		return codeBlock
+
+

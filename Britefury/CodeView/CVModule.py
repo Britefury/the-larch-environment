@@ -63,6 +63,3 @@ class CVModule (CVBorderNode):
 
 	def verticalNavigationList(self):
 		return [ self.blockNode ]
-
-
-

@@ -10,6 +10,9 @@ from Britefury.CodeGraph.CGVar import CGVar
 from Britefury.Sheet.Sheet import *
 from Britefury.SemanticGraph.SemanticGraph import *
 
+from Britefury.PyCodeGen.PyCodeGen import *
+
+
 
 
 class CGParameters (CGNode):
@@ -37,3 +40,15 @@ class CGParameters (CGNode):
 				return self.expandParam[0].node
 
 		return None
+
+
+
+
+	def generateTexBody(self):
+		texBlock = PyCodeBlock()
+		for paramSource in self.params:
+			paramBlock = paramSource.node.generateTex()
+			texBlock += paramBlock
+		return texBlock
+
+

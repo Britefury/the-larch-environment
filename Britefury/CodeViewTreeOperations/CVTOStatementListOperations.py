@@ -8,6 +8,7 @@
 from Britefury.CodeGraph.CGReturn import *
 from Britefury.CodeGraph.CGImport import *
 from Britefury.CodeGraph.CGBreak import *
+from Britefury.CodeGraph.CGComment import *
 from Britefury.CodeGraph.CGContinue import *
 from Britefury.CodeGraph.CGNullExpression import *
 from Britefury.CodeGraph.CGVar import *
@@ -19,6 +20,15 @@ from Britefury.CodeGraph.CGDef import *
 from Britefury.CodeGraph.CGParameters import *
 from Britefury.CodeGraph.CGBlock import *
 from Britefury.CodeGraph.CGClass import *
+
+
+
+def cvto_addComment(treeNode, position):
+	comment = CGComment()
+	treeNode.graph.nodes.append( comment )
+	treeNode.graphNode.statements.insert( position, comment.parent )
+	return treeNode.statementNodes[position]
+
 
 
 

@@ -5,22 +5,26 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
-from Britefury.CodeGraph.CGNode import CGNode
 from Britefury.Sheet.Sheet import *
-from Britefury.SemanticGraph.SemanticGraph import *
-from Britefury.VirtualMachine.vcls_string import pyStrToVString
+from Britefury.SheetGraph.SheetGraph import *
+
+from Britefury.CodeGraph.CGComment import CGComment
+
+from Britefury.CodeViewTree.CVTStatement import CVTStatement
+from Britefury.CodeViewTree.CodeViewTree import *
 
 
 
-class CGModule (CGNode):
-	name = Field( str, '' )
-	block = SemanticGraphSinkSingleSubtreeField( 'Block', 'Block' )
+class CVTComment (CVTStatement):
+	graphNode = SheetRefField( CGComment )
+
+	text = FieldProxy( graphNode.text )
 
 
 
-	def generatePyCodeBlock(self):
-		return self.block[0].node.generatePyCodeBlock()
+class CVTRuleComment (CVTRuleSimple):
+	graphNodeClass = CGComment
+	cvtNodeClass = CVTComment
 
+CVTRuleComment.register()
 
-	def generateTexBody(self):
-		return self.block[0].node.generateTex()

@@ -15,6 +15,7 @@ import CVBreak
 import CVCall
 import CVClass
 import CVClassBases
+import CVComment
 import CVContinue
 import CVDef
 import CVDefDoc
