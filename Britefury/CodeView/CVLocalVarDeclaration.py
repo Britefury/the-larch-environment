@@ -15,6 +15,7 @@ from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
 from Britefury.CodeViewTree.CVTLocalVarDeclaration import CVTLocalVarDeclaration
+from Britefury.CodeViewTree.CVTNullExpression import CVTNullExpression
 
 from Britefury.CodeView.CVStatement import *
 
@@ -106,8 +107,12 @@ class CVLocalVarDeclaration (CVStatement):
 			if self._parent is not None:
 				self._parent.deleteChild( self, moveFocus )
 		elif child is self.valueNode:
-			self._o_moveFocus( moveFocus )
-			self.treeNode.deleteValue()
+			if isinstance( child.treeNode, CVTNullExpression ):
+				self._o_moveFocus( moveFocus )
+				self.treeNode.deleteValue()
+			else:
+				nullExpCVT = child.treeNode.replaceWithNullExpression()
+				self._view.buildView( nullExpCVT, self ).startEditing()
 			return True
 		return False
 

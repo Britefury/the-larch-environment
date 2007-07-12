@@ -17,6 +17,7 @@ from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
 from Britefury.CodeViewTree.CVTBinaryOperator import *
+from Britefury.CodeViewTree.CVTNullExpression import *
 
 from Britefury.CodeView.CVExpression import *
 
@@ -152,14 +153,18 @@ class CVBinaryOperator (CVExpression):
 
 
 	def deleteChild(self, child, moveFocus):
-		if child is self.leftNode:
-			right = self.treeNode.removeLeft()
-			self._view.refresh()
-			self._view.buildView( right, self._parent ).startEditing()
-		elif child is self.rightNode:
-			left = self.treeNode.removeRight()
-			self._view.refresh()
-			self._view.buildView( left, self._parent ).startEditing()
+		if isinstance( child.treeNode, CVTNullExpression ):
+			if child is self.leftNode:
+				right = self.treeNode.removeLeft()
+				self._view.refresh()
+				self._view.buildView( right, self._parent ).makeCurrent()
+			elif child is self.rightNode:
+				left = self.treeNode.removeRight()
+				self._view.refresh()
+				self._view.buildView( left, self._parent ).makeCurrent()
+		elif child is self.leftNode  or  child is self.rightNode:
+			nullExpCVT = child.treeNode.replaceWithNullExpression()
+			self._view.buildView( nullExpCVT, self ).startEditing()
 
 
 	def startEditingLeft(self):
@@ -277,6 +282,9 @@ class CVBinOpDiv (CVBinaryOperatorBox):
 
 	def _o_packOperatorWidget(self, box):
 		box.append( DTHLine( 2.0, colour=Colour3f( 0.0, 0.6, 0.0 ) ), minorDirectionAlignment=DTBox.ALIGN_EXPAND )
+
+	def verticalNavigationList(self):
+		return self.horizontalNavigationList()
 
 
 class CVBinOpPow (CVBinaryOperatorScript):

@@ -10,6 +10,8 @@ from Britefury.CodeGraph.CGStatement import CGStatement
 from Britefury.Sheet.Sheet import *
 from Britefury.SemanticGraph.SemanticGraph import *
 
+from Britefury.PyCodeGen.PyCodeGen import *
+
 
 
 class CGComment (CGStatement):
