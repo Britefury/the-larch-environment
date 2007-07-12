@@ -16,3 +16,9 @@ from Britefury.CodeGraph.CGVar import CGVar
 
 class CGParameterVar (CGVar):
 	paramDoc = Field( str, '', doc='Parameter documentation' )
+
+
+	bTexLeaf = True
+
+	def generateTexLeafParamsString(self):
+		return  self.name

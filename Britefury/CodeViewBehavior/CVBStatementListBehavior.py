@@ -16,6 +16,17 @@ class CVBStatementListBehavior (CodeViewBehavior):
 		return viewNode.getInsertPosition( receivingNodePath )
 
 
+	@CVBCharInputHandlerMethod( '#' )
+	def _addComment(self, viewNode, receivingNodePath, widget, event):
+		position = CVBStatementListBehavior._p_getPosition( viewNode, receivingNodePath )
+		viewNode._f_commandHistoryFreeze()
+		cvto_addComment( viewNode.treeNode, position )
+		stmtCV = viewNode.statementNodes[position]
+		stmtCV.startEditing()
+		viewNode._f_commandHistoryThaw()
+		return True
+
+
 	@CVBAccelInputHandlerMethod( '<alt>r' )
 	def _addReturn(self, viewNode, receivingNodePath, widget, event):
 		position = CVBStatementListBehavior._p_getPosition( viewNode, receivingNodePath )

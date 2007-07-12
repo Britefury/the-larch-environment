@@ -109,11 +109,16 @@ class MainApp (object):
 		importPyItem = gtk.MenuItem( 'Import Python source' )
 		importPyItem.connect( 'activate', self._p_onImportPy )
 
+		exportTeXItem = gtk.MenuItem( 'Export TeX document' )
+		exportTeXItem.connect( 'activate', self._p_onExportTeX )
+
+
 		fileMenu = gtk.Menu()
 		fileMenu.append( newItem )
 		fileMenu.append( openItem )
 		fileMenu.append( saveItem )
 		fileMenu.append( importPyItem )
+		fileMenu.append( exportTeXItem )
 
 
 		undoItem = gtk.MenuItem( 'Undo' )
@@ -488,6 +493,45 @@ class MainApp (object):
 							self.setGraph( graph, root )
 
 
+
+	def _p_onExportTeX(self, widget):
+		filename = None
+		bFinished = False
+		while not bFinished:
+			texFilter = gtk.FileFilter()
+			texFilter.set_name( _( 'TeX document (*.tex)' ) )
+			texFilter.add_pattern( '*.tex' )
+
+			saveAsDialog = gtk.FileChooserDialog( _( 'Export TeX' ), self._window, gtk.FILE_CHOOSER_ACTION_SAVE,
+										( gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_OK, gtk.RESPONSE_OK ) )
+			saveAsDialog.add_filter( texFilter )
+			saveAsDialog.show()
+			response = saveAsDialog.run()
+			filenameFromDialog = saveAsDialog.get_filename()
+			saveAsDialog.destroy()
+			if response == gtk.RESPONSE_OK:
+				if filenameFromDialog is not None:
+					if os.path.exists( filenameFromDialog ):
+						if confirmOverwriteFileDialog( filenameFromDialog, self._window ):
+							filename = filenameFromDialog
+							bFinished = True
+						else:
+							bFinished = False
+					else:
+						filename = filenameFromDialog
+						bFinished = True
+				else:
+					bFinished = True
+			else:
+				bFinished = True
+
+		if filename is not None:
+			self._p_exportTeX( filename )
+			return True
+		else:
+			return False
+
+
 	def _p_writeFile(self, filename):
 		doc = OutputXmlDocument()
 		doc.getContentNode().addChild( 'graph' ).writeObject( self._graph )
@@ -497,6 +541,10 @@ class MainApp (object):
 			doc.writeFile( f )
 			f.close()
 			self._bUnsavedData = False
+
+
+	def _p_exportTeX(self, filename):
+		open( filename, 'w' ).write( self._graphRoot.generateTex().asText() )
 
 
 	def _p_onUndo(self, sender):

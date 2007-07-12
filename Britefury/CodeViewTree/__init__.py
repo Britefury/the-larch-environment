@@ -15,6 +15,7 @@ import CVTBreak
 import CVTCall
 import CVTClass
 import CVTClassBases
+import CVTComment
 import CVTContinue
 import CVTDef
 import CVTDefDoc

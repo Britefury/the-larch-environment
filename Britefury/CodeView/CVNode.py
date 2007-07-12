@@ -405,7 +405,6 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 
 
 
-
 class CVNodeInvalid (CVNode):
 	treeNodeClass = CVTNodeInvalid
 

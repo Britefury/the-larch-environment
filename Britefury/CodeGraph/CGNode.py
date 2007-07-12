@@ -7,7 +7,39 @@
 ##-*************************
 from Britefury.Sheet.Sheet import *
 from Britefury.SemanticGraph.SemanticGraph import *
+from Britefury.PyCodeGen.PyCodeGen import *
 
 
 class CGNode (SemanticGraphNode):
-	pass
+	def generateTexParameters(self):
+		return PyCodeBlock()
+
+	def generateTexLeafParamsString(self):
+		return ''
+
+	def generateTexBody(self):
+		return PyCodeBlock()
+		#return ''
+
+
+	texBegin = '\\gSymBegin%s'
+	texEnd = '\\gSymEnd%s'
+	texCommand = '\\gSym%s {%s}'
+	bTexLeaf = False
+
+	def generateTex(self):
+		if self.bTexLeaf:
+			texBlock = PyCodeBlock()
+			texBlock.append( self.texCommand  %  ( self.__class__.__name__[2:], self.generateTexLeafParamsString() ) )
+			return texBlock
+		else:
+			texBlock = PyCodeBlock()
+			texBlock.append( self.texBegin  %  ( self.__class__.__name__[2:] ) )
+			paramsBlock = self.generateTexParameters()
+			paramsBlock.indent()
+			texBlock += paramsBlock
+			bodyBlock = self.generateTexBody()
+			bodyBlock.indent()
+			texBlock += bodyBlock
+			texBlock.append( self.texEnd  %  ( self.__class__.__name__[2:], ) )
+			return texBlock

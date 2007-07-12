@@ -5,34 +5,20 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
+from Britefury.VirtualMachine.vcls_string import pyStrToVString
+from Britefury.CodeGraph.CGStatement import CGStatement
 from Britefury.Sheet.Sheet import *
 from Britefury.SemanticGraph.SemanticGraph import *
-from Britefury.CodeGraph.CGNode import CGNode
-
-from Britefury.PyCodeGen.PyCodeGen import *
 
 
 
-class CGStatement (CGNode):
-	parent = SemanticGraphSourceField( 'Parent node', 'Parent node' )
-
-
-	def generatePyCode(self):
-		return ''
+class CGComment (CGStatement):
+	text = Field( str, '' )
 
 
 	def generatePyCodeBlock(self):
 		codeBlock = PyCodeBlock()
-		codeBlock.append( self.generatePyCode() )
+		for line in self.text.split( '\n' ):
+			codeBlock.append( '# ' + line )
 		return codeBlock
-
-
-	def getReferenceableNodeByName(self, targetName, sourceNode=None):
-		return self.parent[0].node.getReferenceableNodeByName( targetName, self )
-
-
-	def buildReferenceableNodeTable(self, nodeTable):
-		pass
-
-
 
