@@ -17,7 +17,7 @@ class CVBStatementListBehavior (CodeViewBehavior):
 
 	@staticmethod
 	def _p_refreshAndGetCV(viewNode, stmtCVT):
-		viewNode._view.refresh()
+		viewNode.refresh()
 		return viewNode._o_getViewNode( stmtCVT )
 
 
