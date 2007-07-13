@@ -15,6 +15,7 @@ from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
 from Britefury.CodeViewTree.CVTLambda import CVTLambda
+from Britefury.CodeViewTree.CVTNullExpression import CVTNullExpression
 
 from Britefury.CodeView.CVExpression import *
 from Britefury.CodeView.CVLabel import *
@@ -107,9 +108,12 @@ class CVLambda (CVExpression):
 		if child is self.lambdaLabelNode:
 			self.deleteNode( moveFocus )
 		elif child is self.valueExprNode:
-			self.valueExprNode.treeNode.replaceWithNullExpression()
-			self._view.refresh()
-			self.valueExprNode.startEditing()
+			if isinstance( child.treeNode, CVTNullExpression ):
+				self.deleteNode( moveFocus )
+			else:
+				self.valueExprNode.treeNode.replaceWithNullExpression()
+				self._view.refresh()
+				self.valueExprNode.startEditing()
 
 
 	def horizontalNavigationList(self):

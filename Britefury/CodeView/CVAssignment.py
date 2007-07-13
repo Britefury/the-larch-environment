@@ -15,6 +15,7 @@ from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
 from Britefury.CodeViewTree.CVTAssignment import CVTAssignment
+from Britefury.CodeViewTree.CVTNullExpression import CVTNullExpression
 
 from Britefury.CodeView.CVBorderNode import *
 
@@ -93,14 +94,14 @@ class CVAssignment (CVBorderNode):
 
 	def deleteChild(self, child, moveFocus):
 		if child is self.valueNode:
-			if moveFocus == MoveFocus.RIGHT:
-				self.valueNode.treeNode.replaceWithNullExpression()
-				self._view.refresh()
-				self.valueNode.startEditing()
-			else:
+			if isinstance( child.treeNode, CVTNullExpression ):
 				child._o_moveFocus( moveFocus )
 				self.treeNode.removeValue()
 				self._view.refresh()
+			else:
+				self.valueNode.treeNode.replaceWithNullExpression()
+				self._view.refresh()
+				self.valueNode.startEditing()
 		elif child in self.targetNodes:
 			child._o_moveFocus( moveFocus )
 			self.treeNode.removeTarget( child.treeNode )

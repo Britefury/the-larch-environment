@@ -15,6 +15,7 @@ from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
 from Britefury.CodeViewTree.CVTSubscript import *
+from Britefury.CodeViewTree.CVTNullExpression import CVTNullExpression
 
 from Britefury.CodeView.CVExpression import *
 
@@ -111,14 +112,18 @@ class CVSubscript (CVExpression):
 
 
 	def deleteChild(self, child, moveFocus):
-		if child is self.attrNameNode:
-			self.treeNode.unwrapSubscript()
-			self._view.refresh()
-			self.targetObjectNode.startEditing()
-		elif child is self.targetObjectNode:
-			self.targetObjectNode.treeNode.replaceWithNullExpression()
-			self._view.refresh()
-			self.targetObjectNode.startEditing()
+		if isinstance( child.treeNode, CVTNullExpression ):
+			if child is self.targetNode:
+				right = self.treeNode.removeTarget()
+				self._view.refresh()
+				self.keyNode.startEditing()
+			elif child is self.keyNode:
+				right = self.treeNode.removeKey()
+				self._view.refresh()
+				self.targetNode.startEditing()
+		elif child is self.targetNode  or  child is self.keyNode:
+			nullExpCVT = child.treeNode.replaceWithNullExpression()
+			self._view.buildView( nullExpCVT, self ).startEditing()
 
 
 	def startEditingTarget(self):
