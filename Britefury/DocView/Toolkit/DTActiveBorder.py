@@ -84,6 +84,13 @@ class DTActiveBorder (DTBorder):
 			self.grabFocus()
 			return True
 		elif button == 3:
+			return True
+		else:
+			return False
+
+	def _o_onButtonUp(self, localPos, button, state):
+		super( DTActiveBorder, self )._o_onButtonUp( localPos, button, state )
+		if button == 3:
 			self.grabFocus()
 			self.contextSignal.emit( self )
 			return True

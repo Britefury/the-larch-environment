@@ -24,7 +24,7 @@ class CGUnaryOperatorSimple (CGUnaryOperator):
 
 	def generatePyCode(self):
 		assert self.pyOperatorString is not None
-		return self.pyOperatorString + ' ' + self.right[0].node.generatePyCode()
+		return self.pyOperatorString + ' ' + self.expr[0].node.generatePyCode()
 
 
 
