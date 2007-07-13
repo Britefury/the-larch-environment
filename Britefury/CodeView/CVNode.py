@@ -180,17 +180,39 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 
 
 
-	def cursorToLeftParent(self):
+	def cursorToLeftSibling(self):
 		if self._parent is not None:
-			return self._parent._f_cursorLeftFromChildStop( self )
+			return self._parent._f_cursorLeftFromChildToSibling( self )
 		else:
 			return True
 
-	def cursorToRightParent(self, bItemStep=False):
+	def cursorToRightSibling(self):
 		if self._parent is not None:
-			return self._parent._f_cursorRightFromChildStop( self )
+			return self._parent._f_cursorRightFromChildToSibling( self )
 		else:
 			return True
+
+
+
+	def cursorToParent(self):
+		if self._parent is not None:
+			self._parent.makeCurrent()
+
+		return True
+
+
+
+	def cursorToLeftChild(self):
+		navList = self.horizontalNavigationList()
+		if navList != []:
+			navList[0].makeCurrent()
+		return True
+
+	def cursorToRightChild(self):
+		navList = self.horizontalNavigationList()
+		if navList != []:
+			navList[-1].makeCurrent()
+		return True
 
 
 
@@ -263,24 +285,24 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 			return True
 
 
-	def _f_cursorLeftFromChildStop(self, child):
+	def _f_cursorLeftFromChildToSibling(self, child):
 		navList = self.horizontalNavigationList()
 		leftChild = self._p_prevNavListItem( navList, child )
 		if leftChild is not None:
-			leftChild._f_cursorEnterFromRight( self, False )
+			leftChild.makeCurrent()
 			return True
 		else:
-			self.makeCurrent()
+			#self.makeCurrent()
 			return True
 
-	def _f_cursorRightFromChildStop(self, child):
+	def _f_cursorRightFromChildToSibling(self, child):
 		navList = self.horizontalNavigationList()
 		rightChild = self._p_nextNavListItem( navList, child )
 		if rightChild is not None:
-			rightChild._f_cursorEnterFromLeft( self, False )
+			rightChild.makeCurrent()
 			return True
 		else:
-			self.makeCurrent()
+			#self.makeCurrent()
 			return True
 
 

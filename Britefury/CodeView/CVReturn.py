@@ -13,6 +13,7 @@ from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
 from Britefury.CodeViewTree.CVTReturn import CVTReturn
+from Britefury.CodeViewTree.CVTNullExpression import CVTNullExpression
 
 from Britefury.CodeView.CVStatement import *
 
@@ -60,3 +61,14 @@ class CVReturn (CVStatement):
 
 	def horizontalNavigationList(self):
 		return [ self.valueNode ]
+
+
+
+	def deleteChild(self, child, moveFocus):
+		if child is self.valueNode:
+			if isinstance( child.treeNode, CVTNullExpression ):
+				self.deleteNode( moveFocus )
+			else:
+				self.valueNode.treeNode.replaceWithNullExpression()
+				self._view.refresh()
+				self.valueNode.startEditing()

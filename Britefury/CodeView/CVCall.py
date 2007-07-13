@@ -15,6 +15,7 @@ from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
 from Britefury.CodeViewTree.CVTCall import CVTCall
+from Britefury.CodeViewTree.CVTNullExpression import CVTNullExpression
 
 from Britefury.CodeView.CVExpression import *
 
@@ -100,9 +101,10 @@ class CVCall (CVExpression):
 			self.treeNode.unwrapCall()
 			self._view.refresh()
 		elif child is self.targetObjectNode:
-			self.targetObjectNode.treeNode.replaceWithNullExpression()
-			self._view.refresh()
-			self.targetObjectNode.startEditing()
+			if not isinstance( child.treeNode, CVTNullExpression ):
+				self.targetObjectNode.treeNode.replaceWithNullExpression()
+				self._view.refresh()
+				self.targetObjectNode.startEditing()
 
 
 	def startEditingArguments(self):

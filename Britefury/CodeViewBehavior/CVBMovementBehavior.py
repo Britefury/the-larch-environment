@@ -25,6 +25,21 @@ class CVBMovementBehavior (CodeViewBehavior):
 
 
 
+	@CVBAccelInputHandlerMethod( 'Left' )
+	def _left(self, viewNode, receivingNodePath, widget, event):
+		viewNode._f_commandHistoryFreeze()
+		result = viewNode.cursorLeft()
+		viewNode._f_commandHistoryThaw()
+		return result
+
+	@CVBAccelInputHandlerMethod( 'Right' )
+	def _right(self, viewNode, receivingNodePath, widget, event):
+		viewNode._f_commandHistoryFreeze()
+		result = viewNode.cursorRight()
+		viewNode._f_commandHistoryThaw()
+		return result
+
+
 	@CVBAccelInputHandlerMethod( '<control>Left' )
 	def _itemToLeft(self, viewNode, receivingNodePath, widget, event):
 		viewNode._f_commandHistoryFreeze()
@@ -42,36 +57,46 @@ class CVBMovementBehavior (CodeViewBehavior):
 
 
 
-	@CVBAccelInputHandlerMethod( '<alt>Left' )
+	@CVBAccelInputHandlerMethod( '<alt><control>Left' )
+	def _leftSibling(self, viewNode, receivingNodePath, widget, event):
+		viewNode._f_commandHistoryFreeze()
+		result = viewNode.cursorToLeftSibling()
+		viewNode._f_commandHistoryThaw()
+		return result
+
+	@CVBAccelInputHandlerMethod( '<alt><control>Right' )
+	def _rightSibling(self, viewNode, receivingNodePath, widget, event):
+		viewNode._f_commandHistoryFreeze()
+		result = viewNode.cursorToRightSibling()
+		viewNode._f_commandHistoryThaw()
+		return result
+
+
+	@CVBAccelInputHandlerMethod( [ '<alt>Up', '<alt><control>Up' ] )
 	def _leftParent(self, viewNode, receivingNodePath, widget, event):
 		viewNode._f_commandHistoryFreeze()
-		result = viewNode.cursorToLeftParent()
+		result = viewNode.cursorToParent()
+		viewNode._f_commandHistoryThaw()
+		return result
+
+
+
+
+	@CVBAccelInputHandlerMethod( '<alt>Left' )
+	def _leftChild(self, viewNode, receivingNodePath, widget, event):
+		viewNode._f_commandHistoryFreeze()
+		result = viewNode.cursorToLeftChild()
 		viewNode._f_commandHistoryThaw()
 		return result
 
 	@CVBAccelInputHandlerMethod( '<alt>Right' )
-	def _rightParent(self, viewNode, receivingNodePath, widget, event):
+	def _rightChild(self, viewNode, receivingNodePath, widget, event):
 		viewNode._f_commandHistoryFreeze()
-		result = viewNode.cursorToRightParent()
+		result = viewNode.cursorToRightChild()
 		viewNode._f_commandHistoryThaw()
 		return result
 
 
-
-
-	@CVBAccelInputHandlerMethod( 'Left' )
-	def _left(self, viewNode, receivingNodePath, widget, event):
-		viewNode._f_commandHistoryFreeze()
-		result = viewNode.cursorLeft()
-		viewNode._f_commandHistoryThaw()
-		return result
-
-	@CVBAccelInputHandlerMethod( 'Right' )
-	def _right(self, viewNode, receivingNodePath, widget, event):
-		viewNode._f_commandHistoryFreeze()
-		result = viewNode.cursorRight()
-		viewNode._f_commandHistoryThaw()
-		return result
 
 
 
