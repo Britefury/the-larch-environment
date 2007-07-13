@@ -102,9 +102,6 @@ class CodeView (object):
 
 
 	def _p_refresh(self):
-		#for subTable in self._nodeTable.values():
-			#for viewNode in subTable.values():
-				#viewNode.refresh()
 		self.buildView( self._tree.getRootNode(), None )
 
 

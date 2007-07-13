@@ -15,13 +15,18 @@ class CVBStatementListBehavior (CodeViewBehavior):
 	def _p_getPosition(viewNode, receivingNodePath):
 		return viewNode.getInsertPosition( receivingNodePath )
 
+	@staticmethod
+	def _p_refreshAndGetCV(viewNode, stmtCVT):
+		viewNode._view.refresh()
+		return viewNode._o_getViewNode( stmtCVT )
+
 
 	@CVBCharInputHandlerMethod( '#' )
 	def _addComment(self, viewNode, receivingNodePath, widget, event):
 		position = CVBStatementListBehavior._p_getPosition( viewNode, receivingNodePath )
 		viewNode._f_commandHistoryFreeze()
-		cvto_addComment( viewNode.treeNode, position )
-		stmtCV = viewNode.statementNodes[position]
+		stmtCVT = cvto_addComment( viewNode.treeNode, position )
+		stmtCV = CVBStatementListBehavior._p_refreshAndGetCV( viewNode, stmtCVT )
 		stmtCV.startEditing()
 		viewNode._f_commandHistoryThaw()
 		return True
@@ -31,8 +36,8 @@ class CVBStatementListBehavior (CodeViewBehavior):
 	def _addReturn(self, viewNode, receivingNodePath, widget, event):
 		position = CVBStatementListBehavior._p_getPosition( viewNode, receivingNodePath )
 		viewNode._f_commandHistoryFreeze()
-		cvto_addReturnStatement( viewNode.treeNode, position )
-		stmtCV = viewNode.statementNodes[position]
+		stmtCVT = cvto_addReturnStatement( viewNode.treeNode, position )
+		stmtCV = CVBStatementListBehavior._p_refreshAndGetCV( viewNode, stmtCVT )
 		stmtCV.startEditing()
 		viewNode._f_commandHistoryThaw()
 		return True
@@ -42,9 +47,10 @@ class CVBStatementListBehavior (CodeViewBehavior):
 	def _addLocalVar(self, viewNode, receivingNodePath, widget, event):
 		position = CVBStatementListBehavior._p_getPosition( viewNode, receivingNodePath )
 		viewNode._f_commandHistoryFreeze()
-		cvto_addLocalVarStatement( viewNode.treeNode, position )
-		stmtCV = viewNode.statementNodes[position]
+		stmtCVT = cvto_addLocalVarStatement( viewNode.treeNode, position )
+		stmtCV = CVBStatementListBehavior._p_refreshAndGetCV( viewNode, stmtCVT )
 		stmtCV.startEditing()
+		viewNode._view.refresh()
 		viewNode._f_commandHistoryThaw()
 		return True
 
@@ -53,8 +59,8 @@ class CVBStatementListBehavior (CodeViewBehavior):
 	def _addIf(self, viewNode, receivingNodePath, widget, event):
 		position = CVBStatementListBehavior._p_getPosition( viewNode, receivingNodePath )
 		viewNode._f_commandHistoryFreeze()
-		cvto_addIfStatement( viewNode.treeNode, position )
-		stmtCV = viewNode.statementNodes[position]
+		stmtCVT = cvto_addIfStatement( viewNode.treeNode, position )
+		stmtCV = CVBStatementListBehavior._p_refreshAndGetCV( viewNode, stmtCVT )
 		stmtCV.startEditing()
 		viewNode._f_commandHistoryThaw()
 		return True
@@ -64,8 +70,8 @@ class CVBStatementListBehavior (CodeViewBehavior):
 	def _addWhile(self, viewNode, receivingNodePath, widget, event):
 		position = CVBStatementListBehavior._p_getPosition( viewNode, receivingNodePath )
 		viewNode._f_commandHistoryFreeze()
-		cvto_addWhileStatement( viewNode.treeNode, position )
-		stmtCV = viewNode.statementNodes[position]
+		stmtCVT = cvto_addWhileStatement( viewNode.treeNode, position )
+		stmtCV = CVBStatementListBehavior._p_refreshAndGetCV( viewNode, stmtCVT )
 		stmtCV.startEditing()
 		viewNode._f_commandHistoryThaw()
 		return True
@@ -75,8 +81,8 @@ class CVBStatementListBehavior (CodeViewBehavior):
 	def _addBreak(self, viewNode, receivingNodePath, widget, event):
 		position = CVBStatementListBehavior._p_getPosition( viewNode, receivingNodePath )
 		viewNode._f_commandHistoryFreeze()
-		cvto_addBreakStatement( viewNode.treeNode, position )
-		stmtCV = viewNode.statementNodes[position]
+		stmtCVT = cvto_addBreakStatement( viewNode.treeNode, position )
+		stmtCV = CVBStatementListBehavior._p_refreshAndGetCV( viewNode, stmtCVT )
 		stmtCV.startEditing()
 		viewNode._f_commandHistoryThaw()
 		return True
@@ -86,8 +92,8 @@ class CVBStatementListBehavior (CodeViewBehavior):
 	def _addContinue(self, viewNode, receivingNodePath, widget, event):
 		position = CVBStatementListBehavior._p_getPosition( viewNode, receivingNodePath )
 		viewNode._f_commandHistoryFreeze()
-		cvto_addContinueStatement( viewNode.treeNode, position )
-		stmtCV = viewNode.statementNodes[position]
+		stmtCVT = cvto_addContinueStatement( viewNode.treeNode, position )
+		stmtCV = CVBStatementListBehavior._p_refreshAndGetCV( viewNode, stmtCVT )
 		stmtCV.startEditing()
 		viewNode._f_commandHistoryThaw()
 		return True
@@ -97,8 +103,8 @@ class CVBStatementListBehavior (CodeViewBehavior):
 	def _addDef(self, viewNode, receivingNodePath, widget, event):
 		position = CVBStatementListBehavior._p_getPosition( viewNode, receivingNodePath )
 		viewNode._f_commandHistoryFreeze()
-		cvto_addDefStatement( viewNode.treeNode, position )
-		stmtCV = viewNode.statementNodes[position]
+		stmtCVT = cvto_addDefStatement( viewNode.treeNode, position )
+		stmtCV = CVBStatementListBehavior._p_refreshAndGetCV( viewNode, stmtCVT )
 		stmtCV.startEditing()
 		viewNode._f_commandHistoryThaw()
 		return True
@@ -108,8 +114,8 @@ class CVBStatementListBehavior (CodeViewBehavior):
 	def _addClass(self, viewNode, receivingNodePath, widget, event):
 		position = CVBStatementListBehavior._p_getPosition( viewNode, receivingNodePath )
 		viewNode._f_commandHistoryFreeze()
-		cvto_addClassStatement( viewNode.treeNode, position )
-		stmtCV = viewNode.statementNodes[position]
+		stmtCVT = cvto_addClassStatement( viewNode.treeNode, position )
+		stmtCV = CVBStatementListBehavior._p_refreshAndGetCV( viewNode, stmtCVT )
 		stmtCV.startEditing()
 		viewNode._f_commandHistoryThaw()
 		return True
@@ -119,8 +125,8 @@ class CVBStatementListBehavior (CodeViewBehavior):
 	def _addImport(self, viewNode, receivingNodePath, widget, event):
 		position = CVBStatementListBehavior._p_getPosition( viewNode, receivingNodePath )
 		viewNode._f_commandHistoryFreeze()
-		cvto_addImportStatement( viewNode.treeNode, position )
-		stmtCV = viewNode.statementNodes[position]
+		stmtCVT = cvto_addImportStatement( viewNode.treeNode, position )
+		stmtCV = CVBStatementListBehavior._p_refreshAndGetCV( viewNode, stmtCVT )
 		stmtCV.startEditingOnLeft()
 		viewNode._f_commandHistoryThaw()
 		return True
