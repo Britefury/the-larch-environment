@@ -97,10 +97,12 @@ class CVExpression (CVBorderNode):
 		refactorMenu.add_item( extractToVariableItem )
 
 		menu = PieMenu( header='Expression', header_font='Sans bold 11', fixed_radius=60, ring_radius=50 )
+		okItem = PieItem( label='OK', label_font='Sans 11' )
 		deleteItem = PieItem( label='Delete', label_font='Sans 11' )
 		refactorItem = PieItem( label='Refactor', label_font='Sans 11', sub_pie=refactorMenu )
 		refactorItem.sub_menu = refactorMenu
 
+		menu.add_item( okItem )
 		menu.add_item( deleteItem )
 		menu.add_item( refactorItem )
 
