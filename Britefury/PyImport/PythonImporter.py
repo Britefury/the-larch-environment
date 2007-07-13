@@ -423,6 +423,28 @@ def _processWhile(graph, node):
 	return whileCG
 
 
+def _processPrintnl(graph, node):
+	ref = CGUnboundRef()
+	graph.nodes.append( ref )
+
+	call = CGCall()
+	graph.nodes.append( call )
+
+	args = CGArguments()
+	graph.nodes.append( args )
+
+	ref.targetName = 'print'
+	call.arguments.append( args.parent )
+	call.targetObject.append( ref.parent )
+
+	for n in node.nodes:
+		g = _processNode( graph, n )
+		if g is not None:
+			args.args.append( g.parent )
+
+	return call
+
+
 
 
 
@@ -461,6 +483,7 @@ _nodeClassToProcFunction = {
 	ast.Break : _processBreak,
 	ast.Continue : _processContinue,
 	ast.While : _processWhile,
+	ast.Printnl : _processPrintnl,
 }
 
 
