@@ -2167,13 +2167,10 @@ class PieMenu(gtk.Window):
 
 
     def handle_key_press_event(self, widget, event, *args):
-        print "handle_key_press_event", self, widget, event, args
-        print help(event)
         pass
 
 
     def handle_key_release_event(self, widget, event, *args):
-        print "handle_key_release_event", self, widget, event, args
         pass
 
 

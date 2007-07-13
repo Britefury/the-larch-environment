@@ -112,12 +112,16 @@ class CVExpression (CVBorderNode):
 
 
 	def _p_onMenuDelete(self, menu, item):
+		self._f_commandHistoryFreeze()
 		self.deleteNode( MoveFocus.RIGHT )
+		self._f_commandHistoryThaw()
 
 
 	def _p_onMenuExtractToVariable(self, menu, item):
+		self._f_commandHistoryFreeze()
 		varDeclCVT = self.treeNode.extractToVariable()
 		self._view.refresh()
 		varDeclCV = self._o_getViewNode( varDeclCVT.varNode )
 		varDeclCV.startEditing()
+		self._f_commandHistoryThaw()
 
