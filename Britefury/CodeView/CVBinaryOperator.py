@@ -156,11 +156,11 @@ class CVBinaryOperator (CVExpression):
 		if isinstance( child.treeNode, CVTNullExpression ):
 			if child is self.leftNode:
 				right = self.treeNode.removeLeft()
-				self._parent.refresh()
+				self.refreshFromParent()
 				self._o_getViewNode( right ).makeCurrent()
 			elif child is self.rightNode:
 				left = self.treeNode.removeRight()
-				self._parent.refresh()
+				self.refreshFromParent()
 				self._o_getViewNode( left ).makeCurrent()
 		elif child is self.leftNode  or  child is self.rightNode:
 			nullExpCVT = child.treeNode.replaceWithNullExpression()

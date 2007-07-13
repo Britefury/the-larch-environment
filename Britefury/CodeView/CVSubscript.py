@@ -116,12 +116,12 @@ class CVSubscript (CVExpression):
 			if child is self.targetNode:
 				keyNode = self.keyNode
 				self.treeNode.removeTarget()
-				self._parent.refresh()
+				self.refreshFromParent()
 				keyNode.startEditing()
 			elif child is self.keyNode:
 				targetNode = self.targetNode
 				self.treeNode.removeKey()
-				self._parent.refresh()
+				self.refreshFromParent()
 				targetNode.startEditing()
 		elif child is self.targetNode  or  child is self.keyNode:
 			nullExpCVT = child.treeNode.replaceWithNullExpression()

@@ -9,11 +9,13 @@ from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
 from Britefury.CodeGraph.CGUnboundRef import CGUnboundRef
+from Britefury.CodeGraph.CGBlock import CGBlock
 
 from Britefury.CodeViewTree.CVTExpression import CVTExpression
 from Britefury.CodeViewTree.CodeViewTree import *
 
 from Britefury.CodeViewTreeOperations.CVTOWrapInAssignment import cvto_wrapInAssignment
+from Britefury.CodeViewTreeOperations.CVTOStatementListOperations import *
 
 
 
@@ -39,8 +41,53 @@ class CVTUnboundRef (CVTExpression):
 
 
 
+	# Replace with @graphNodeToInsert
+	def insertNode(self, graphNodeToInsert, position):
+		parentCGSink = self.graphNode.parent[0]
+		parentCGSink.replace( self.graphNode.parent, graphNodeToInsert.parent )
+		self.graphNode.destroySubtree()
+		return self._tree.buildNode( graphNodeToInsert )
+
+
+
 	def wrapInAssignment(self):
 		return cvto_wrapInAssignment( self )
+
+
+
+	def replaceWithStatement(self, subgraphFunction):
+		if isinstance( self.graphNode.parent[0].node, CGBlock ):
+			subgraph = subgraphFunction( self )
+			self.graphNode.parent[0].replace( self.graphNode.parent, subgraph.parent )
+			self.graphNode.destroySubtree()
+			return self._tree.buildNode( subgraph )
+		else:
+			return None
+
+
+	def replaceWithReturn(self):
+		return self.replaceWithStatement( cvto_createReturnSubgraph )
+
+	def replaceWithIf(self):
+		return self.replaceWithStatement( cvto_createIfSubgraph )
+
+	def replaceWithWhile(self):
+		return self.replaceWithStatement( cvto_createWhileSubgraph )
+
+	def replaceWithBreak(self):
+		return self.replaceWithStatement( cvto_createBreakSubgraph )
+
+	def replaceWithContinue(self):
+		return self.replaceWithStatement( cvto_createContinueSubgraph )
+
+	def replaceWithDef(self):
+		return self.replaceWithStatement( cvto_createDefSubgraph )
+
+	def replaceWithClass(self):
+		return self.replaceWithStatement( cvto_createClassSubgraph )
+
+	def replaceWithImport(self):
+		return self.replaceWithStatement( cvto_createImportSubgraph )
 
 
 

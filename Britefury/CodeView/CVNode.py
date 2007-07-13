@@ -137,6 +137,10 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 		self.refreshCell
 
 
+	def refreshFromParent(self):
+		self._parent.refresh()
+
+
 
 
 

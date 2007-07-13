@@ -23,40 +23,53 @@ from Britefury.CodeGraph.CGClass import *
 
 
 
-def cvto_addComment(treeNode, position):
+
+def cvto_createCommentSubgraph(treeNode):
 	comment = CGComment()
 	treeNode.graph.nodes.append( comment )
-	treeNode.graphNode.statements.insert( position, comment.parent )
+	return comment
+
+def cvto_addComment(treeNode, position):
+	subgraph = cvto_createCommentSubgraph( treeNode )
+	treeNode.graphNode.statements.insert( position, subgraph.parent )
 	return treeNode.statementNodes[position]
 
 
 
 
-def cvto_addReturnStatement(treeNode, position):
+def cvto_createReturnSubgraph(treeNode):
 	rtn = CGReturn()
 	nullExp = CGNullExpression()
 	treeNode.graph.nodes.append( rtn )
 	treeNode.graph.nodes.append( nullExp )
 	rtn.value.append( nullExp.parent )
-	treeNode.graphNode.statements.insert( position, rtn.parent )
+	return rtn
+
+def cvto_addReturnStatement(treeNode, position):
+	subgraph = cvto_createReturnSubgraph( treeNode )
+	treeNode.graphNode.statements.insert( position, subgraph.parent )
 	return treeNode.statementNodes[position]
 
 
 
+
+def cvto_createLocalVarSubgraph(treeNode):
+	decl = CGLocalVarDeclaration()
+	var = CGVar()
+	treeNode.graph.nodes.append( decl )
+	treeNode.graph.nodes.append( var )
+	decl.variable.append( var.declaration )
+	return decl
 
 def cvto_addLocalVarStatement(treeNode, position):
-	var = CGVar()
-	decl = CGLocalVarDeclaration()
-	treeNode.graph.nodes.append( var )
-	treeNode.graph.nodes.append( decl )
-	decl.variable.append( var.declaration )
-	treeNode.graphNode.statements.insert( position, decl.parent )
+	subgraph = cvto_createLocalVarSubgraph( treeNode )
+	treeNode.graphNode.statements.insert( position, subgraph.parent )
 	return treeNode.statementNodes[position]
 
 
 
 
-def cvto_addIfStatement(treeNode, position):
+def cvto_createIfSubgraph(treeNode):
 	ifStmt = CGIf()
 	ifBlock = CGIfBlock()
 	nullExp = CGNullExpression()
@@ -69,14 +82,17 @@ def cvto_addIfStatement(treeNode, position):
 	ifBlock.condition.append( nullExp.parent )
 	ifBlock.block.append( block.parent )
 	ifStmt.ifBlocks.append( ifBlock.ifStatement )
+	return ifStmt
 
-	treeNode.graphNode.statements.insert( position, ifStmt.parent )
+def cvto_addIfStatement(treeNode, position):
+	subgraph = cvto_createIfSubgraph( treeNode )
+	treeNode.graphNode.statements.insert( position, subgraph.parent )
 	return treeNode.statementNodes[position]
 
 
 
 
-def cvto_addWhileStatement(treeNode, position):
+def cvto_createWhileSubgraph(treeNode):
 	whileStmt = CGWhile()
 	nullExp = CGNullExpression()
 	block = CGBlock()
@@ -85,31 +101,43 @@ def cvto_addWhileStatement(treeNode, position):
 	treeNode.graph.nodes.append( block )
 	whileStmt.whileExpr.append( nullExp.parent )
 	whileStmt.block.append( block.parent )
-	treeNode.graphNode.statements.insert( position, whileStmt.parent )
+	return whileStmt
+
+def cvto_addWhileStatement(treeNode, position):
+	subgraph = cvto_createWhileSubgraph( treeNode )
+	treeNode.graphNode.statements.insert( position, subgraph.parent )
 	return treeNode.statementNodes[position]
 
 
 
 
-def cvto_addBreakStatement(treeNode, position):
+def cvto_createBreakSubgraph(treeNode):
 	brk = CGBreak()
 	treeNode.graph.nodes.append( brk )
-	treeNode.graphNode.statements.insert( position, brk.parent )
+	return brk
+
+def cvto_addBreakStatement(treeNode, position):
+	subgraph = cvto_createBreakSubgraph( treeNode )
+	treeNode.graphNode.statements.insert( position, subgraph.parent )
 	return treeNode.statementNodes[position]
 
 
 
 
-def cvto_addContinueStatement(treeNode, position):
+def cvto_createContinueSubgraph(treeNode):
 	cont = CGContinue()
 	treeNode.graph.nodes.append( cont )
-	treeNode.graphNode.statements.insert( position, cont.parent )
+	return cont
+
+def cvto_addContinueStatement(treeNode, position):
+	subgraph = cvto_createContinueSubgraph( treeNode )
+	treeNode.graphNode.statements.insert( position, subgraph.parent )
 	return treeNode.statementNodes[position]
 
 
 
 
-def cvto_addDefStatement(treeNode, position):
+def cvto_createDefSubgraph(treeNode):
 	defStmt = CGDef()
 	declVar = CGVar()
 	params = CGParameters()
@@ -121,13 +149,17 @@ def cvto_addDefStatement(treeNode, position):
 	defStmt.declVar.append( declVar.declaration )
 	defStmt.parameters.append( params.parent )
 	defStmt.block.append( block.parent )
-	treeNode.graphNode.statements.insert( position, defStmt.parent )
+	return defStmt
+
+def cvto_addDefStatement(treeNode, position):
+	subgraph = cvto_createDefSubgraph( treeNode )
+	treeNode.graphNode.statements.insert( position, subgraph.parent )
 	return treeNode.statementNodes[position]
 
 
 
 
-def cvto_addClassStatement(treeNode, position):
+def cvto_createClassSubgraph(treeNode):
 	classStmt = CGClass()
 	declVar = CGVar()
 	block = CGBlock()
@@ -136,16 +168,24 @@ def cvto_addClassStatement(treeNode, position):
 	treeNode.graph.nodes.append( block )
 	classStmt.declVar.append( declVar.declaration )
 	classStmt.block.append( block.parent )
-	treeNode.graphNode.statements.insert( position, classStmt.parent )
+	return classStmt
+
+def cvto_addClassStatement(treeNode, position):
+	subgraph = cvto_createClassSubgraph( treeNode )
+	treeNode.graphNode.statements.insert( position, subgraph.parent )
 	return treeNode.statementNodes[position]
 
 
 
 
-def cvto_addImportStatement(treeNode, position):
+def cvto_createImportSubgraph(treeNode):
 	imp = CGImport()
 	treeNode.graph.nodes.append( imp )
-	treeNode.graphNode.statements.insert( position, imp.parent )
+	return imp
+
+def cvto_addImportStatement(treeNode, position):
+	subgraph = cvto_createImportSubgraph( treeNode )
+	treeNode.graphNode.statements.insert( position, subgraph.parent )
 	return treeNode.statementNodes[position]
 
 
