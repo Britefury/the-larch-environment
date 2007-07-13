@@ -9,6 +9,8 @@ import pygtk
 pygtk.require( '2.0' )
 import gtk
 
+import traceback
+
 from Britefury.Math.Math import Colour3f
 
 from Britefury.Sheet.Sheet import *
@@ -96,16 +98,16 @@ class CVAssignment (CVBorderNode):
 		if child is self.valueNode:
 			if isinstance( child.treeNode, CVTNullExpression ):
 				child._o_moveFocus( moveFocus )
-				self.treeNode.removeValue()
-				self._view.refresh()
+				resultCVT = self.treeNode.removeValue()
+				resultCV = self._o_getViewNode( resultCVT )
+				resultCV.startEditing()
 			else:
 				self.valueNode.treeNode.replaceWithNullExpression()
-				self._view.refresh()
+				self.refresh()
 				self.valueNode.startEditing()
 		elif child in self.targetNodes:
 			child._o_moveFocus( moveFocus )
 			self.treeNode.removeTarget( child.treeNode )
-			self._view.refresh()
 
 
 

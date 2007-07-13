@@ -27,6 +27,7 @@ class CVTAssignment (CVTNode):
 
 	def removeTarget(self, target):
 		assert len( self.graphNode.targets ) > 0
+		assert target in self.targetNodes
 		if len( self.graphNode.targets ) == 1:
 			# Replace with value
 			valueCGSource = self.graphNode.value[0]
@@ -39,7 +40,7 @@ class CVTAssignment (CVTNode):
 			self.graphNode.destroySubtree()
 		else:
 			targetCG = target.graphNode
-			self.graphNode.targets.remove( target )
+			self.graphNode.targets.remove( targetCG.parent )
 			targetCG.destroySubtree()
 
 
@@ -57,14 +58,17 @@ class CVTAssignment (CVTNode):
 
 			self.graphNode.destroySubtree()
 		else:
-			# Destroy value subtree, and replace with the last target subtree
+			# Replace value with last target, and destroy value subtree
 			valueCG = self.graphNode.value[0].node
-			valueCG.destroySubtree()
 
 			targetCGSource = self.graphNode.targets[-1]
 			del self.graphNode.targets[-1]
 
 			self.graphNode.value[0] = targetCGSource
+
+			valueCG.destroySubtree()
+
+		return self._tree.buildNode( targetCGSource.node )
 
 
 	def assign(self, targetCVT):

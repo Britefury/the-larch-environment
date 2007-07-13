@@ -9,28 +9,32 @@ import pygtk
 pygtk.require( '2.0' )
 import gtk
 
-from Britefury.Math.Math import Colour3f
-
 from Britefury.Util import RegExpStrings
+
+from Britefury.Kernel.Enum import *
 
 from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
-from Britefury.CodeViewTree.CVTNegate import CVTNegate
+from Britefury.CodeViewTree.CVTUnaryOperator import *
+from Britefury.CodeViewTree.CVTNullExpression import *
 
 from Britefury.CodeView.CVExpression import *
 
+from Britefury.DocView.Toolkit.DTWrappedLine import DTWrappedLine
 from Britefury.DocView.Toolkit.DTBox import DTBox
+from Britefury.DocView.Toolkit.DTScript import DTScript
 from Britefury.DocView.Toolkit.DTDirection import DTDirection
 from Britefury.DocView.Toolkit.DTLabel import DTLabel
+from Britefury.DocView.Toolkit.DTHLine import DTHLine
+from Britefury.DocView.CellEdit.DVCStringCellEditEntryLabel import DVCStringCellEditEntryLabel
 
 
+class CVUnaryOperator (CVExpression):
+	treeNodeClass = CVTUnaryOperator
 
-class CVNegate (CVExpression):
-	treeNodeClass = CVTNegate
 
-
-	treeNode = SheetRefField( CVTNegate )
+	treeNode = SheetRefField( CVTUnaryOperator )
 
 
 
@@ -67,9 +71,9 @@ class CVNegate (CVExpression):
 
 
 	def __init__(self, treeNode, view):
-		super( CVNegate, self ).__init__( treeNode, view )
+		super( CVUnaryOperator, self ).__init__( treeNode, view )
 		self._box = DTBox( spacing=5.0 )
-		self._box.append( DTLabel( '-', font='Sans bold 11', colour=Colour3f( 0.0, 0.6, 0.0 ) ) )
+		self._box.append( self._o_makeUnaryOperatorWidget() )
 		self._box.append( DTLabel( 'nil' ) )
 		self.widget.child = self._box
 
@@ -77,15 +81,12 @@ class CVNegate (CVExpression):
 
 	def deleteChild(self, child, moveFocus):
 		if child is self.exprNode:
-			self.exprNode.treeNode.replaceWithNullExpression()
-			self._view.refresh()
-			self.exprNode.startEditing()
-
-
-	def deleteNode(self, moveFocus):
-		self.treeNode.unwrapNegate()
-		self._view.refresh()
-		self.exprNode.startEditing()
+			if isinstance( child.treeNode, CVTNullExpression ):
+				self.deleteNode( moveFocus )
+			else:
+				self.exprNode.treeNode.replaceWithNullExpression()
+				self.refresh()
+				self.exprNode.startEditing()
 
 
 
@@ -96,3 +97,32 @@ class CVNegate (CVExpression):
 
 	def horizontalNavigationList(self):
 		return [ self.exprNode ]
+
+
+
+	def _o_makeUnaryOperatorWidget(self):
+		raise TypeError, 'abstract'
+
+
+
+
+class CVUnaryOperatorSimple (CVUnaryOperator):
+	treeNodeClass = CVTUnaryOperator
+	operatorCharacterString = None
+
+
+	def _o_makeUnaryOperatorWidget(self):
+		return DTLabel( self.operatorCharacterString, font='Sans bold 11', colour=Colour3f( 0.0, 0.6, 0.0 ) )
+
+
+
+class CVNegate (CVUnaryOperatorSimple):
+	treeNodeClass = CVTNegate
+	treeNode = SheetRefField( CVTNegate )
+	operatorCharacterString = '-'
+
+class CVNot (CVUnaryOperatorSimple):
+	treeNodeClass = CVTNot
+	treeNode = SheetRefField( CVTNot )
+	operatorCharacterString = 'not'
+

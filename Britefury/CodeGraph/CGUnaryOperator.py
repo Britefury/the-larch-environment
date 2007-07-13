@@ -11,11 +11,26 @@ from Britefury.SemanticGraph.SemanticGraph import *
 
 
 
-class CGNegate (CGExpression):
-	expr = SemanticGraphSinkSingleSubtreeField( 'Expression', 'Expression to be negated' )
+class CGUnaryOperator (CGExpression):
+	expr = SemanticGraphSinkSingleSubtreeField( 'Expr', 'Sub-expression' )
 
 
+
+
+
+class CGUnaryOperatorSimple (CGUnaryOperator):
+	pyOperatorString = None
 
 
 	def generatePyCode(self):
-		return '- ' + self.expr[0].node.generatePyCode()
+		assert self.pyOperatorString is not None
+		return self.pyOperatorString + ' ' + self.right[0].node.generatePyCode()
+
+
+
+class CGNegate (CGUnaryOperatorSimple):
+	pyOperatorString = '-'
+
+class CGNot (CGUnaryOperatorSimple):
+	pyOperatorString = 'not'
+

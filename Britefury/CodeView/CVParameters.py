@@ -98,14 +98,13 @@ class CVParameters (CVBorderNode):
 
 	def addParameter(self, name):
 		paramCVT = self.treeNode.addParameter( name )
-		self._view.refresh()
-		paramCVT = self._view.getViewNodeForTreeNode( paramCVT )
-		paramCVT.startEditing()
+		self.refresh()
+		paramCV = self._o_getViewNode( paramCVT )
+		paramCV.startEditing()
 
 	def deleteChild(self, child, moveFocus):
 		child._o_moveFocus( moveFocus )
 		self.treeNode.deleteParameter( child.treeNode )
-		self._view.refresh()
 
 
 	def startEditing(self):

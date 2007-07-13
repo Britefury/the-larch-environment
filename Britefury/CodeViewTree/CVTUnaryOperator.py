@@ -8,29 +8,24 @@
 from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
-from Britefury.CodeGraph.CGNot import CGNot
-from Britefury.CodeGraph.CGNullExpression import CGNullExpression
+from Britefury.CodeGraph.CGUnaryOperator import *
 
 from Britefury.CodeViewTree.CVTNode import *
 from Britefury.CodeViewTree.CVTExpression import CVTExpression
-from Britefury.CodeViewTree.CVTAttrName import CVTAttrName
+from Britefury.CodeViewTree.CVTAttrName import *
 from Britefury.CodeViewTree.CodeViewTree import *
 
-from Britefury.CodeViewTreeOperations.CVTOWrapInAssignment import cvto_wrapInAssignment
+
+
+class CVTUnaryOperator (CVTExpression):
+	graphNode = SheetRefField( CGUnaryOperator )
+
+
+	exprNode = CVTSimpleSinkProductionSingleField( CGUnaryOperator.expr )
 
 
 
-class CVTNot (CVTExpression):
-	graphNode = SheetRefField( CGNot )
-
-
-	exprNode = CVTSimpleSinkProductionSingleField( CGNot.expr )
-
-
-
-
-
-	def unwrapNot(self):
+	def unwrapUnaryOperator(self):
 		parentCGSink = self.graphNode.parent[0]
 		exprSource = self.graphNode.expr[0]
 		if isinstance( exprSource.node, CGNullExpression ):
@@ -43,10 +38,36 @@ class CVTNot (CVTExpression):
 
 
 
+class CVTRuleUnaryOperator (CVTRuleSimple):
+	graphNodeClass = CGUnaryOperator
+	cvtNodeClass = CVTUnaryOperator
 
-class CVTRuleNot (CVTRuleSimple):
-	graphNodeClass = CGNot
-	cvtNodeClass = CVTNot
+CVTRuleUnaryOperator.register()
 
-CVTRuleNot.register()
+
+
+
+def _makeSimpleUnaryOpCVT(unaryOpGraphNodeClass, cvtClassName, ruleClassName):
+	class _CVTUnaryOp (CVTUnaryOperator):
+		graphNode = SheetRefField( unaryOpGraphNodeClass )
+
+
+	_CVTUnaryOp.__name__ = cvtClassName
+
+
+	class _CVTRuleUnaryOp (CVTRuleSimple):
+		graphNodeClass = unaryOpGraphNodeClass
+		cvtNodeClass = _CVTUnaryOp
+
+
+	_CVTRuleUnaryOp.__name__ = ruleClassName
+
+	_CVTRuleUnaryOp.register()
+
+	return _CVTUnaryOp, _CVTRuleUnaryOp
+
+
+
+CVTNegate, CVTRuleNegate = _makeSimpleUnaryOpCVT( CGNegate, 'CVTNegate', 'CVTRuleNegate' )
+CVTNot, CVTRuleNot = _makeSimpleUnaryOpCVT( CGNot, 'CVTNot', 'CVTRuleNot' )
 

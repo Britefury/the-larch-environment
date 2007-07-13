@@ -27,14 +27,13 @@ from Britefury.CodeGraph.CGIntLiteral import CGIntLiteral
 from Britefury.CodeGraph.CGLambda import CGLambda
 from Britefury.CodeGraph.CGList import CGList
 from Britefury.CodeGraph.CGModule import CGModule
-from Britefury.CodeGraph.CGNegate import CGNegate
-from Britefury.CodeGraph.CGNot import CGNot
 from Britefury.CodeGraph.CGParameters import CGParameters
 from Britefury.CodeGraph.CGParameterVar import CGParameterVar
 from Britefury.CodeGraph.CGReturn import CGReturn
 from Britefury.CodeGraph.CGSubscript import CGSubscript
 from Britefury.CodeGraph.CGStringLiteral import CGStringLiteral
 from Britefury.CodeGraph.CGTuple import CGTuple
+from Britefury.CodeGraph.CGUnaryOperator import CGNegate, CGNot
 from Britefury.CodeGraph.CGUnboundRef import CGUnboundRef
 from Britefury.CodeGraph.CGVar import CGVar
 from Britefury.CodeGraph.CGWhile import CGWhile

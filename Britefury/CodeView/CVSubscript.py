@@ -114,16 +114,19 @@ class CVSubscript (CVExpression):
 	def deleteChild(self, child, moveFocus):
 		if isinstance( child.treeNode, CVTNullExpression ):
 			if child is self.targetNode:
-				right = self.treeNode.removeTarget()
-				self._view.refresh()
-				self.keyNode.startEditing()
+				keyNode = self.keyNode
+				self.treeNode.removeTarget()
+				self._parent.refresh()
+				keyNode.startEditing()
 			elif child is self.keyNode:
-				right = self.treeNode.removeKey()
-				self._view.refresh()
-				self.targetNode.startEditing()
+				targetNode = self.targetNode
+				self.treeNode.removeKey()
+				self._parent.refresh()
+				targetNode.startEditing()
 		elif child is self.targetNode  or  child is self.keyNode:
 			nullExpCVT = child.treeNode.replaceWithNullExpression()
-			self._view.buildView( nullExpCVT, self ).startEditing()
+			self.refresh()
+			self._o_getViewNode( nullExpCVT ).startEditing()
 
 
 	def startEditingTarget(self):

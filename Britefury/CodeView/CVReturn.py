@@ -70,5 +70,5 @@ class CVReturn (CVStatement):
 				self.deleteNode( moveFocus )
 			else:
 				self.valueNode.treeNode.replaceWithNullExpression()
-				self._view.refresh()
+				self.refresh()
 				self.valueNode.startEditing()
