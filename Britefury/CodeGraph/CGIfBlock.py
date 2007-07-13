@@ -17,7 +17,7 @@ from Britefury.PyCodeGen.PyCodeGen import *
 
 
 class CGIfBlock (CGNode):
-	ifStatement = SemanticGraphSourceField( 'IfStmt', 'If statement' )
+	parent = SemanticGraphSourceField( 'Parent', 'Parent if statement' )
 	condition = SemanticGraphSinkSingleSubtreeField( 'Condition', 'Else-if condition' )
 	block = SemanticGraphSinkSingleSubtreeField( 'Block', 'Code block' )
 
@@ -40,7 +40,7 @@ class CGIfBlock (CGNode):
 
 
 	def getReferenceableNodeByName(self, targetName, sourceNode=None):
-		return self.ifStatement[0].node.getReferenceableNodeByName( targetName, self )
+		return self.parent[0].node.getReferenceableNodeByName( targetName, self )
 
 
 	def buildReferenceableNodeTable(self, nodeTable):

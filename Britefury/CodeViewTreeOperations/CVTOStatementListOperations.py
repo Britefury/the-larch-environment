@@ -81,7 +81,7 @@ def cvto_createIfSubgraph(treeNode):
 
 	ifBlock.condition.append( nullExp.parent )
 	ifBlock.block.append( block.parent )
-	ifStmt.ifBlocks.append( ifBlock.ifStatement )
+	ifStmt.ifBlocks.append( ifBlock.parent )
 	return ifStmt
 
 def cvto_addIfStatement(treeNode, position):

@@ -56,7 +56,7 @@ class CVTIf (CVTStatement):
 
 		elseIfBlockCG.condition.append( nullExpr.parent )
 		elseIfBlockCG.block.append( block.parent )
-		self.graphNode.ifBlocks.insert( position + 1, elseIfBlockCG.ifStatement )
+		self.graphNode.ifBlocks.insert( position + 1, elseIfBlockCG.parent )
 
 		return self._tree.buildNode( elseIfBlockCG )
 
@@ -90,7 +90,7 @@ class CVTIf (CVTStatement):
 
 	def removeElseIf(self, elseIfCVT):
 		elseIfCG = elseIfCVT.graphNode
-		self.graphNode.ifBlocks.remove( elseIfCG.ifStatement )
+		self.graphNode.ifBlocks.remove( elseIfCG.parent )
 		elseIfCG.destroySubtree()
 
 
