@@ -2233,8 +2233,6 @@ class PieMenuTarget(gtk.Button):
 
         x, y = event.get_root_coords()
 
-	print x, y
-
         #print "ROOT", x, y
 
         pie.popup(x, y, False)
