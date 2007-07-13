@@ -22,6 +22,7 @@ from Britefury.CodeView.CVExpression import *
 from Britefury.CodeView.MoveFocus import *
 
 from Britefury.CodeViewBehavior.CVBWrapInAssignmentBehavior import *
+from Britefury.CodeViewBehavior.CVBUnboundRefBehavior import *
 
 from Britefury.DocView.Toolkit.DTBox import DTBox
 from Britefury.DocView.Toolkit.DTLabel import DTLabel
@@ -32,13 +33,27 @@ from Britefury.DocView.CellEdit.DVCStringCellEditEntryLabel import DVCStringCell
 
 
 class CVUnboundRef (CVExpression):
+	keywordToMethod =	\
+	{
+		'return' : CVTUnboundRef.replaceWithReturn,
+		'if' : CVTUnboundRef.replaceWithIf,
+		'while' : CVTUnboundRef.replaceWithWhile,
+		'break' : CVTUnboundRef.replaceWithBreak,
+		'continue' : CVTUnboundRef.replaceWithContinue,
+		'def' : CVTUnboundRef.replaceWithDef,
+		'class' : CVTUnboundRef.replaceWithClass,
+		'import' : CVTUnboundRef.replaceWithImport,
+	}
+
+
+
 	treeNodeClass = CVTUnboundRef
 
 
 	treeNode = SheetRefField( CVTUnboundRef )
 
 
-	behaviors = [ CVBWrapInAssignmentBehavior() ]
+	behaviors = [ CVBWrapInAssignmentBehavior(), CVBUnboundRefBehavior() ]
 
 
 	@FunctionRefField
@@ -62,6 +77,12 @@ class CVUnboundRef (CVExpression):
 
 
 
+	def __init__(self, treeNode, view):
+		super( CVUnboundRef, self ).__init__( treeNode, view )
+		self._bReplaced = False
+
+
+
 	def startEditing(self):
 		self.targetNameWidget.startEditing()
 
@@ -73,15 +94,39 @@ class CVUnboundRef (CVExpression):
 		self.targetNameWidget.startEditingOnRight()
 
 
+	def keywordCheck(self):
+		text = self.targetNameWidget.text
+
+		try:
+			method = self.keywordToMethod[text]
+		except KeyError:
+			return False
+		else:
+			self._bReplaced = True
+			self._f_commandHistoryFreeze()
+			stmtCVT = method( self.treeNode )
+			self.refreshFromParent()
+			self._o_getViewNode( stmtCVT ).startEditing()
+			self._f_commandHistoryThaw()
+			return True
+
+
+
+
 	def _p_onEntryFinish(self, entry, text, bUserEvent):
+		if bUserEvent  and  not self._bReplaced:
+			if self.keywordCheck():
+				return
+		self._f_commandHistoryFreeze()
+		if bUserEvent:
+			self.cursorRight()
 		if text == '':
 			self.deleteNode( MoveFocus.RIGHT )
 		else:
-			if bUserEvent:
-				self.cursorRight()
-			self._f_commandHistoryFreeze()
-			self._replaceWithRef()
-			self._f_commandHistoryThaw()
+			if not self._bReplaced:
+				self._bReplaced = True
+				self._replaceWithRef()
+		self._f_commandHistoryThaw()
 
 
 	def _replaceWithRef(self):

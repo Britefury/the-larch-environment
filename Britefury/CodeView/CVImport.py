@@ -39,6 +39,7 @@ class CVImport (CVStatement):
 		entry.entry.font = 'Sans bold 11'
 		entry.keyHandler = self
 		entry.attachCell( self.treeNode.cells.moduleName )
+		entry.finishSignal.connect( self._p_onEntryFinish )
 		return entry.entry
 
 
@@ -57,6 +58,9 @@ class CVImport (CVStatement):
 		self.widget.child = self._box
 
 
+
+	def startEditing(self):
+		self.moduleNameWidget.startEditing()
 
 	def startEditingOnLeft(self):
 		self.moduleNameWidget.startEditingOnLeft()

@@ -71,14 +71,14 @@ class CVLocalRef (CVExpression):
 
 
 	def _p_onEntryFinish(self, entry, text, bUserEvent):
+		self._f_commandHistoryFreeze()
+		if bUserEvent:
+			self.cursorRight()
 		if text == '':
 			self.deleteNode( MoveFocus.RIGHT )
 		else:
-			if bUserEvent:
-				self.cursorRight()
-			self._f_commandHistoryFreeze()
 			self._rebind( text )
-			self._f_commandHistoryThaw()
+		self._f_commandHistoryThaw()
 
 
 
