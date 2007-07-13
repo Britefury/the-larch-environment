@@ -135,7 +135,6 @@ class CVDef (CVStatement):
 
 
 	def startEditingParameters(self):
-		self.declVarNode.finishEditing()
 		self.paramsNode.startEditing()
 
 	def startEditingBlock(self):
