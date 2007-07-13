@@ -116,7 +116,13 @@ class DTEditableMultilineLabel (DTMultilineLabel):
 			self._editWindow.set_title( 'Python source' )
 			self._editWindow.set_border_width( 20 )
 
+			finishAccel = gtk.accelerator_parse( '<control>Return' )
+			accelGroup = gtk.AccelGroup()
+			accelGroup.connect_group( finishAccel[0], finishAccel[1], gtk.ACCEL_VISIBLE, self._p_onEditorFinishAccel )
+			self._editWindow.add_accel_group( accelGroup )
+
 			self._editWindow.show()
+
 
 			self._bEditWindowVisible = True
 
@@ -139,6 +145,9 @@ class DTEditableMultilineLabel (DTMultilineLabel):
 
 
 	def _p_onEditWindowOk(self, widget):
+		self._p_hideEditorWindow()
+
+	def _p_onEditorFinishAccel(self, accelGroup, widget, key, modifier):
 		self._p_hideEditorWindow()
 
 

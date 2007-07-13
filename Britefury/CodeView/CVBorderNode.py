@@ -21,6 +21,17 @@ class CVBorderNode (CVNode):
 		self.widget = DTActiveBorder()
 		self.widget.keyHandler = self
 		self.widget.topMargin = self.widget.bottomMargin = 1.0
+		self.widget.contextSignal.connect( self._p_onContext )
+		self._pieMenu = self._o_createPieMenu()
 
 
+	def _p_onContext(self, widget):
+		if self._pieMenu is not None:
+			# Get the default display, and the pointer position
+			display = gtk.gdk.display_get_default()
+			screen, x, y, mods = display.get_pointer()
+			self._pieMenu.popup( x, y, False )
 
+
+	def _o_createPieMenu(self):
+		return None

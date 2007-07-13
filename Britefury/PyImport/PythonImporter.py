@@ -382,7 +382,7 @@ def _processIf(graph, node):
 		if g is not None:
 			ifBlock.block.append( g.parent )
 
-		ifCG.ifBlocks.append( ifBlock.ifStatement )
+		ifCG.ifBlocks.append( ifBlock.parent )
 
 
 	g = _processNode( graph, node.else_ )

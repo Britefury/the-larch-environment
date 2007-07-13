@@ -16,7 +16,7 @@ class CVBMovementBehavior (CodeViewBehavior):
 		viewNode._f_commandHistoryThaw()
 		return result
 
-	@CVBAccelInputHandlerMethod( 'Down' )
+	@CVBAccelInputHandlerMethod( [ 'Down', 'Return' ] )
 	def _down(self, viewNode, receivingNodePath, widget, event):
 		viewNode._f_commandHistoryFreeze()
 		result = viewNode.cursorDown()

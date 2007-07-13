@@ -9,12 +9,15 @@ import pygtk
 pygtk.require( '2.0' )
 import gtk
 
+from Britefury.extlibs.piemenu.piemenu import *
+
 from Britefury.Sheet.Sheet import *
 from Britefury.SheetGraph.SheetGraph import *
 
 from Britefury.CodeViewTree.CVTExpression import CVTExpression
 
 from Britefury.CodeView.CVBorderNode import *
+from Britefury.CodeView.MoveFocus import *
 
 from Britefury.CodeViewBehavior.CVBWrapExpressionBehavior import *
 
@@ -85,4 +88,34 @@ class CVExpression (CVBorderNode):
 		parent.refresh()
 		getItemCV = self._o_getViewNode( getItemCVT )
 		getItemCV.startEditingKey()
+
+
+
+	def _o_createPieMenu(self):
+		refactorMenu = PieMenu( header='Refactor', header_font='Sans bold 11', fixed_radius=60, ring_radius=50 )
+		extractToVariableItem = PieItem( label='Extract var', label_font='Sans 11' )
+		refactorMenu.add_item( extractToVariableItem )
+
+		menu = PieMenu( header='Expression', header_font='Sans bold 11', fixed_radius=60, ring_radius=50 )
+		deleteItem = PieItem( label='Delete', label_font='Sans 11' )
+		refactorItem = PieItem( label='Refactor', label_font='Sans 11', sub_pie=refactorMenu )
+		refactorItem.sub_menu = refactorMenu
+
+		menu.add_item( deleteItem )
+		menu.add_item( refactorItem )
+
+		deleteItem.activateSignal.connect( self._p_onMenuDelete )
+		extractToVariableItem.activateSignal.connect( self._p_onMenuExtractToVariable )
+		return menu
+
+
+	def _p_onMenuDelete(self, menu, item):
+		self.deleteNode( MoveFocus.RIGHT )
+
+
+	def _p_onMenuExtractToVariable(self, menu, item):
+		varDeclCVT = self.treeNode.extractToVariable()
+		self._view.refresh()
+		varDeclCV = self._o_getViewNode( varDeclCVT.varNode )
+		varDeclCV.startEditing()
 

@@ -16,6 +16,10 @@ from Britefury.CodeGraph.CGUnaryOperator import CGNegate, CGNot
 from Britefury.CodeGraph.CGNullExpression import CGNullExpression
 from Britefury.CodeGraph.CGTuple import CGTuple
 from Britefury.CodeGraph.CGSubscript import CGSubscript
+from Britefury.CodeGraph.CGBlock import CGBlock
+from Britefury.CodeGraph.CGLocalVarDeclaration import CGLocalVarDeclaration
+from Britefury.CodeGraph.CGVar import CGVar
+from Britefury.CodeGraph.CGLocalRef import CGLocalRef
 
 from Britefury.CodeViewTree.CVTStatement import CVTStatement
 from Britefury.CodeViewTree.CodeViewTree import *
@@ -98,6 +102,37 @@ class CVTExpression (CVTStatement):
 		parentCGSink.replace( self.graphNode.parent, nullExpression.parent )
 		self.graphNode.destroySubtree()
 		return self._tree.buildNode( nullExpression )
+
+
+	def extractToVariable(self):
+		exprCG = self.graphNode
+		blockCG = exprCG
+		blockChildCG = exprCG
+		while not isinstance( blockCG, CGBlock ):
+			blockChildCG = blockCG
+			blockCG = blockCG.parent[0].node
+		position = blockCG.statements.index( blockChildCG.parent )
+
+		graph = exprCG.graph
+
+		localVarCG = CGLocalVarDeclaration()
+		varCG = CGVar()
+		graph.nodes.append( localVarCG )
+		graph.nodes.append( varCG )
+		localVarCG.variable.append( varCG.declaration )
+
+		blockCG.statements.insert( position, localVarCG.parent )
+
+		refCG = CGLocalRef()
+		graph.nodes.append( refCG )
+		refCG.variable.append( varCG.references )
+
+		exprCG.parent[0].replace( exprCG.parent, refCG.parent )
+
+		localVarCG.value.append( exprCG.parent )
+
+		return self._tree.buildNode( localVarCG )
+
 
 
 
