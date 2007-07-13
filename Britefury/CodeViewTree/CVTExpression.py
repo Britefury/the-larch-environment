@@ -12,8 +12,7 @@ from Britefury.CodeGraph.CGExpression import CGExpression
 from Britefury.CodeGraph.CGCall import CGCall
 from Britefury.CodeGraph.CGArguments import CGArguments
 from Britefury.CodeGraph.CGGetAttr import CGGetAttr
-from Britefury.CodeGraph.CGNegate import CGNegate
-from Britefury.CodeGraph.CGNot import CGNot
+from Britefury.CodeGraph.CGUnaryOperator import CGNegate, CGNot
 from Britefury.CodeGraph.CGNullExpression import CGNullExpression
 from Britefury.CodeGraph.CGTuple import CGTuple
 from Britefury.CodeGraph.CGSubscript import CGSubscript

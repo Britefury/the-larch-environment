@@ -8,8 +8,7 @@
 from Britefury.CodeGraph.CGStringLiteral import *
 from Britefury.CodeGraph.CGIntLiteral import *
 from Britefury.CodeGraph.CGUnboundRef import *
-from Britefury.CodeGraph.CGNegate import *
-from Britefury.CodeGraph.CGNot import *
+from Britefury.CodeGraph.CGUnaryOperator import CGNegate, CGNot
 from Britefury.CodeGraph.CGLambda import *
 from Britefury.CodeGraph.CGParameters import *
 from Britefury.CodeGraph.CGNullExpression import *

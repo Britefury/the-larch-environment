@@ -112,7 +112,7 @@ class CVLambda (CVExpression):
 				self.deleteNode( moveFocus )
 			else:
 				self.valueExprNode.treeNode.replaceWithNullExpression()
-				self._view.refresh()
+				self.refresh()
 				self.valueExprNode.startEditing()
 
 

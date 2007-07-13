@@ -69,6 +69,9 @@ class CVIntLiteral (CVExpression):
 		self.widget.child = DTLabel( '<nil>' )
 
 
+	def startEditing(self):
+		self.stringValueWidget.startEditing()
+
 	def startEditingOnLeft(self):
 		self.stringValueWidget.startEditingOnLeft()
 

@@ -79,7 +79,7 @@ class CVClassBases (CVBorderNode):
 
 	def addBase(self):
 		baseCVT = self.treeNode.addBase()
-		self._view.refresh()
+		self.refresh()
 		baseCV = self._view.getViewNodeForTreeNode( baseCVT )
 		baseCV.startEditing()
 
@@ -87,8 +87,6 @@ class CVClassBases (CVBorderNode):
 	def deleteChild(self, child, moveFocus):
 		child._o_moveFocus( moveFocus )
 		self.treeNode.deleteBase( child.treeNode )
-		self._view.refresh()
-		return True
 
 
 

@@ -17,6 +17,7 @@ from Britefury.SheetGraph.SheetGraph import *
 from Britefury.CodeViewTree.CVTGetAttr import CVTGetAttr
 
 from Britefury.CodeView.CVExpression import *
+from Britefury.CodeView.MoveFocus import *
 
 from Britefury.CodeViewBehavior.CVBWrapInAssignmentBehavior import *
 
@@ -96,12 +97,18 @@ class CVGetAttr (CVExpression):
 
 	def deleteChild(self, child, moveFocus):
 		if child is self.attrNameNode:
-			self.treeNode.unwrapGetAttr()
-			self._view.refresh()
-			self.targetObjectNode.startEditing()
+			if moveFocus == MoveFocus.LEFT:
+				targetObject = self.targetObjectNode
+				parent = self._parent
+				self.treeNode.unwrapGetAttr()
+				parent.refresh()
+				targetObject.startEditing()
+			else:
+				self._o_moveFocus( moveFocus )
+				self.treeNode.unwrapGetAttr()
 		elif child is self.targetObjectNode:
 			self.targetObjectNode.treeNode.replaceWithNullExpression()
-			self._view.refresh()
+			self.refresh()
 			self.targetObjectNode.startEditing()
 
 

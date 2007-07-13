@@ -99,11 +99,12 @@ class CVCall (CVExpression):
 		if child is self.argumentsNode:
 			self.targetObjectNode.makeCurrent()
 			self.treeNode.unwrapCall()
-			self._view.refresh()
 		elif child is self.targetObjectNode:
-			if not isinstance( child.treeNode, CVTNullExpression ):
+			if isinstance( child.treeNode, CVTNullExpression ):
+				self.deleteNode( moveFocus )
+			else:
 				self.targetObjectNode.treeNode.replaceWithNullExpression()
-				self._view.refresh()
+				self.refresh()
 				self.targetObjectNode.startEditing()
 
 

@@ -33,8 +33,6 @@ import CVTList
 import CVTLocalRef
 import CVTLocalVarDeclaration
 import CVTModule
-import CVTNegate
-import CVTNot
 import CVTNullExpression
 import CVTParameterDoc
 import CVTParameters
@@ -45,6 +43,7 @@ import CVTStatement
 import CVTStringLiteral
 import CVTSubscript
 import CVTTuple
+import CVTUnaryOperator
 import CVTUnboundRef
 import CVTVar
 import CVTWhile

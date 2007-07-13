@@ -32,50 +32,57 @@ class CVExpression (CVBorderNode):
 
 
 	def wrapInCall(self):
+		parent = self._parent
 		callCVT = self.treeNode.wrapInCall()
-		self._view.refresh()
-		callCV = self._view.getViewNodeForTreeNode( callCVT )
+		parent.refresh()
+		callCV = self._o_getViewNode( callCVT )
 		callCV.startEditingArguments()
 
 
 	def wrapInGetAttr(self):
+		parent = self._parent
 		getAttrCVT = self.treeNode.wrapInGetAttr()
-		self._view.refresh()
-		getAttrCV = self._view.getViewNodeForTreeNode( getAttrCVT )
+		parent.refresh()
+		getAttrCV = self._o_getViewNode( getAttrCVT )
 		getAttrCV.startEditingAttrName()
 
 
 	def wrapInNegate(self):
+		parent = self._parent
 		negateCVT = self.treeNode.wrapInNegate()
-		self._view.refresh()
-		negateCV = self._view.getViewNodeForTreeNode( negateCVT )
+		parent.refresh()
+		negateCV = self._o_getViewNode( negateCVT )
 		negateCV.makeCurrent()
 
 
 	def wrapInNot(self):
+		parent = self._parent
 		notCVT = self.treeNode.wrapInNot()
-		self._view.refresh()
-		notCV = self._view.getViewNodeForTreeNode( notCVT )
+		parent.refresh()
+		notCV = self._o_getViewNode( notCVT )
 		notCV.makeCurrent()
 
 
 	def wrapInBinaryOperator(self, graphNodeClass):
+		parent = self._parent
 		binOpCVT = self.treeNode.wrapInBinaryOperator( graphNodeClass )
-		self._view.refresh()
-		binOpCV = self._view.getViewNodeForTreeNode( binOpCVT )
+		parent.refresh()
+		binOpCV = self._o_getViewNode( binOpCVT )
 		binOpCV.startEditingRight()
 
 
 	def wrapInTuple(self):
+		parent = self._parent
 		tupleCVT = self.treeNode.wrapInTuple()
-		self._view.refresh()
-		tupleCV = self._view.getViewNodeForTreeNode( tupleCVT )
+		parent.refresh()
+		tupleCV = self._o_getViewNode( tupleCVT )
 		tupleCV.makeCurrent()
 
 
 	def wrapInSubscript(self):
+		parent = self._parent
 		getItemCVT = self.treeNode.wrapInSubscript()
-		self._view.refresh()
-		getItemCV = self._view.getViewNodeForTreeNode( getItemCVT )
+		parent.refresh()
+		getItemCV = self._o_getViewNode( getItemCVT )
 		getItemCV.startEditingKey()
 

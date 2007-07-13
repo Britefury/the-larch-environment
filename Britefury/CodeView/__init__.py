@@ -33,8 +33,6 @@ import CVList
 import CVLocalRef
 import CVLocalVarDeclaration
 import CVModule
-import CVNegate
-import CVNot
 import CVNullExpression
 import CVParameterDoc
 import CVParameters
@@ -45,6 +43,7 @@ import CVStatement
 import CVStringLiteral
 import CVSubscript
 import CVTuple
+import CVUnaryOperator
 import CVUnboundRef
 import CVVar
 import CVWhile

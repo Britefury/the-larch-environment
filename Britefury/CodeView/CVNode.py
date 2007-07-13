@@ -129,6 +129,7 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 		self.treeNode = treeNode
 		self._view = view
 		self._parent = None
+		self._bDeleting = False
 
 
 
@@ -150,10 +151,16 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 		pass
 
 
-	def deleteNode(self, moveFocus):
+	def _o_deleteNode(self, moveFocus):
 		if self._parent is not None:
 			self._parent.deleteChild( self, moveFocus )
 
+
+	def deleteNode(self, moveFocus):
+		if not self._bDeleting:
+			self._bDeleting = True
+			self._o_deleteNode( moveFocus )
+			self._bDeleting = False
 
 
 
@@ -292,7 +299,6 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 			leftChild.makeCurrent()
 			return True
 		else:
-			#self.makeCurrent()
 			return True
 
 	def _f_cursorRightFromChildToSibling(self, child):
@@ -302,7 +308,6 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 			rightChild.makeCurrent()
 			return True
 		else:
-			#self.makeCurrent()
 			return True
 
 
@@ -421,6 +426,13 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 
 	def getInsertPosition(self, receivingNodePath):
 		return 0
+
+
+	def _o_buildViewForChild(self, cvtNode, viewNodeClass=None):
+		return self._view.buildView( cvtNode, self, viewNodeClass )
+
+	def _o_getViewNode(self, cvtNode, viewNodeClass=None):
+		return self._view.getViewNodeForTreeNode( cvtNode, viewNodeClass )
 
 
 

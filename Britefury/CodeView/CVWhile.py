@@ -139,7 +139,7 @@ class CVWhile (CVStatement):
 	def deleteChild(self, child, moveFocus):
 		if child is self.whileExprNode:
 			self.whileExprNode.treeNode.replaceWithNullExpression()
-			self._view.refresh()
+			self.refresh()
 			self.whileExprNode.startEditing()
 		elif child is self.elseBlockNode:
 			self._o_moveFocus( moveFocus )
