@@ -75,14 +75,41 @@ class DTAutoCompleteDropDown (DTPopupDocument):
 
 
 
-	def __init__(self, autoCompleteList):
+	class _ACBorder (DTBorder):
+		def __init__(self, acDropDown, leftMargin=0.0, rightMargin=0.0, topMargin=0.0, bottomMargin=0.0, backgroundColour=None):
+			super( DTAutoCompleteDropDown._ACBorder, self ).__init__( leftMargin, rightMargin, topMargin, bottomMargin, backgroundColour )
+			self._acDropDown = acDropDown
+			self.grabFocus()
+
+		def _o_onKeyPress(self, keyEvent):
+			if keyEvent.keyVal == gtk.keysyms.Down:
+				self._acDropDown.nextEntry()
+				return True
+			elif keyEvent.keyVal == gtk.keysyms.Up:
+				self._acDropDown.prevEntry()
+				return True
+			elif keyEvent.keyVal == gtk.keysyms.Tab:
+				text = self._acDropDown.getHighlightedText()
+				if text is not None:
+					self._acDropDown.autoCompleteSignal.emit( self._acDropDown, text )
+				return True
+			else:
+				if self._acDropDown._owner is not None:
+					self._acDropDown._owner._o_onKeyPress( keyEvent )
+
+
+
+
+
+	def __init__(self, autoCompleteList, owner=None):
 		super( DTAutoCompleteDropDown, self ).__init__( False )
 
 		self._autoCompleteList = autoCompleteList
+		self._owner = owner
 		self._labels = []
 		self._highlightIndex = 0
 		self._bUserSelection = False
-		self._border = DTBorder( 2.0, 2.0, 2.0, 2.0 )
+		self._border = self._ACBorder( self, 2.0, 2.0, 2.0, 2.0 )
 		self.child = self._border
 
 
@@ -164,25 +191,10 @@ class DTAutoCompleteDropDown (DTPopupDocument):
 
 
 
+	def _o_onEscapeClose(self):
+		self.autoCompleteDismissedSignal.emit( self )
 
-	def handleKeyPressEvent(self, event):
-		if event.keyVal == gtk.keysyms.Escape:
-			self.hide()
-			self.autoCompleteDismissedSignal.emit( self )
-			return True
-		elif event.keyVal == gtk.keysyms.Down:
-			self.nextEntry()
-			return True
-		elif event.keyVal == gtk.keysyms.Up:
-			self.prevEntry()
-			return True
-		elif event.keyVal == gtk.keysyms.Tab:
-			text = self.getHighlightedText()
-			if text is not None:
-				self.autoCompleteSignal.emit( self, text )
-				return True
-			else:
-				return False
+
 
 
 	def _o_draw(self, context):

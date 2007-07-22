@@ -7,6 +7,8 @@
 ##-*************************
 import sys
 
+from Britefury.FileIO.IOXml import *
+
 from Britefury.SheetGraph.SheetGraph import *
 
 from Britefury.MainApp.MainApp import MainApp
@@ -25,8 +27,26 @@ if __name__ == '__main__':
 
 	i18n.initialise()
 
-	graph, mainModule = MainApp.makeBlankModuleGraph()
+	graph, root = None, None
 
-	app = MainApp( graph, mainModule )
+	if len( sys.argv ) == 2:
+		filename = sys.argv[1]
+
+		f = open( filename, 'r' )
+		if f is not None:
+			doc = InputXmlDocument()
+			doc.parseFile( f )
+			contentNode = doc.getContentNode()
+			if contentNode.isValid():
+				graphXmlNode = contentNode.getChild( 'graph' )
+				rootXmlNode = contentNode.getChild( 'root' )
+				if graphXmlNode.isValid()  and  rootXmlNode.isValid():
+					graph = graphXmlNode.readObject()
+					root = rootXmlNode.readObject()
+
+	if graph is None  or  root is None:
+		graph, root = MainApp.makeBlankModuleGraph()
+
+	app = MainApp( graph, root )
 
 	gtk.main()

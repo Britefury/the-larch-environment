@@ -30,7 +30,7 @@ class CVBorderNode (CVNode):
 			# Get the default display, and the pointer position
 			display = gtk.gdk.display_get_default()
 			screen, x, y, mods = display.get_pointer()
-			self._pieMenu.popup( x, y, False )
+			self._pieMenu.popup( x, y, True )
 
 
 	def _o_createPieMenu(self):

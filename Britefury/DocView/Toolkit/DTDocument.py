@@ -272,6 +272,11 @@ class DTDocument (gtk.DrawingArea, DTBin):
 
 
 
+	def _o_handleDocumentKey(self, keyEvent):
+		return False
+
+
+
         def do_key_press_event(self, event):
 		keyEvent = DTKeyEvent( event )
 		key = keyEvent.keyVal, keyEvent.state
@@ -280,6 +285,8 @@ class DTDocument (gtk.DrawingArea, DTBin):
 			return True
 		elif key == _redoAccel:
 			self.redoSignal.emit( self )
+			return True
+		elif self._o_handleDocumentKey( keyEvent ):
 			return True
 		else:
 			if self._keyboardFocusChild is not None:
