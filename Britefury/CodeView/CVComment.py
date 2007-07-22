@@ -63,14 +63,17 @@ class CVComment (CVStatement):
 
 
 	def startEditing(self):
-		self.textWidget.startEditing()
+		#self.textWidget.startEditing()
+		self.makeCurrent()
 
 
 	def startEditingOnLeft(self):
-		self.textWidget.startEditingOnLeft()
+		#self.textWidget.startEditingOnLeft()
+		self.makeCurrent()
 
 	def startEditingOnRight(self):
-		self.textWidget.startEditingOnRight()
+		#self.textWidget.startEditingOnRight()
+		self.makeCurrent()
 
 
 
