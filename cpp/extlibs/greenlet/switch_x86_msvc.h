@@ -1,10 +1,3 @@
-//##************************
-//##* This program is free software; you can use it, redistribute it and/or modify it
-//##* under the terms of the GNU General Public License version 2 as published by the
-//##* Free Software Foundation. The full text of the GNU General Public License
-//##* version 2 can be found in the file named 'COPYING' that accompanies this
-//##* program. This source code is (C)copyright Geoffrey French 1999-2007.
-//##************************
 /*
  * this is the internal transfer function.
  *
@@ -75,6 +68,6 @@ static int IS_ON_STACK(void*p)
     int stackref;
     int stackbase = ((int)&stackref) & 0xfffff000;
     return (int)p >= stackbase && (int)p < stackbase + 0x00100000;
-} 
+}
 
 #endif

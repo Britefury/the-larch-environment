@@ -1,10 +1,3 @@
-//##************************
-//##* This program is free software; you can use it, redistribute it and/or modify it
-//##* under the terms of the GNU General Public License version 2 as published by the
-//##* Free Software Foundation. The full text of the GNU General Public License
-//##* version 2 can be found in the file named 'COPYING' that accompanies this
-//##* program. This source code is (C)copyright Geoffrey French 1999-2007.
-//##************************
 /*
  * this is the internal transfer function.
  *
@@ -54,7 +47,7 @@ slp_switch(void)
            This cannot be done later, because the stack
            might be overwritten again just after SLP_RESTORE_STATE
            has finished. BTW: All other registers (l0-l7 and i0-i5)
-           might be clobbered too. 
+           might be clobbered too.
          */
         __asm__ volatile (
         "ld [%0+60], %%i7\n\t"
@@ -75,7 +68,7 @@ slp_switch(void)
          */
         __asm__ volatile ( "ta %0" : : "i" (ST_CLEAN_WINDOWS));
         return 0;
-    } 
+    }
 }
 
 #endif
