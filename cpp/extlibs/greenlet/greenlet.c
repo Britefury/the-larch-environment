@@ -177,6 +177,7 @@ static int g_save(PyGreenlet* g, char* stop)
 	 */
 	long sz1 = g->stack_saved;
 	long sz2 = stop - g->stack_start;
+	assert(g->stack_start != NULL);
 	if (sz2 > sz1) {
 		char* c = PyMem_Realloc(g->stack_copy, sz2);
 		if (!c) {
@@ -193,7 +194,7 @@ static int g_save(PyGreenlet* g, char* stop)
 static void slp_restore_state(void)
 {
 	PyGreenlet* g = ts_target;
-
+	
 	/* Restore the heap copy back into the C stack */
 	if (g->stack_saved != 0) {
 		memcpy(g->stack_start, g->stack_copy, g->stack_saved);
@@ -216,7 +217,7 @@ static int slp_save_state(char* stackref)
 		ts_current = ts_current->stack_prev;  /* not saved if dying */
 	else
 		ts_current->stack_start = stackref;
-
+	
 	while (ts_current->stack_stop < target_stop) {
 		/* ts_current is entierely within the area to free */
 		if (g_save(ts_current, ts_current->stack_stop))
@@ -330,6 +331,33 @@ static PyObject* g_switch(PyGreenlet* target, PyObject* args)
 	}
 }
 
+static PyObject *g_handle_exit(PyObject *result)
+{
+	if (result == NULL &&
+	    PyErr_ExceptionMatches(PyExc_GreenletExit)) {
+		/* catch and ignore GreenletExit */
+		PyObject *exc, *val, *tb;
+		PyErr_Fetch(&exc, &val, &tb);
+		if (val == NULL) {
+			Py_INCREF(Py_None);
+			val = Py_None;
+		}
+		result = val;
+		Py_DECREF(exc);
+		Py_XDECREF(tb);
+	}
+	if (result != NULL) {
+		/* package the result into a 1-tuple */
+		PyObject* r = result;
+		result = PyTuple_New(1);
+		if (result)
+			PyTuple_SET_ITEM(result, 0, r);
+		else
+			Py_DECREF(r);
+	}
+	return result;
+}
+
 static void g_initialstub(void* mark)
 {
 	int err;
@@ -351,7 +379,10 @@ static void g_initialstub(void* mark)
 	/* start the greenlet */
 	ts_target->stack_start = NULL;
 	ts_target->stack_stop = (char*) mark;
-	ts_target->stack_prev = ts_current;
+	if (ts_current->stack_start == NULL)    /* ts_current is dying */
+		ts_target->stack_prev = ts_current->stack_prev;
+	else
+		ts_target->stack_prev = ts_current;
 	ts_target->top_frame = NULL;
 	ts_target->recursion_depth = PyThreadState_GET()->recursion_depth;
 	err = _PyGreen_switchstack();
@@ -363,7 +394,8 @@ static void g_initialstub(void* mark)
 		/* in the new greenlet */
 		PyObject* args;
 		PyObject* result;
-		ts_current->stack_start = (char*) 1;  /* running */
+		PyGreenlet* ts_self = ts_current;
+		ts_self->stack_start = (char*) 1;  /* running */
 
 		args = ts_passaround;
 		if (args == NULL)    /* pending exception */
@@ -374,33 +406,13 @@ static void g_initialstub(void* mark)
 			Py_DECREF(args);
 		}
 		Py_DECREF(run);
-		if (result == NULL &&
-		    PyErr_ExceptionMatches(PyExc_GreenletExit)) {
-			/* catch and ignore GreenletExit */
-			PyObject *exc, *val, *tb;
-			PyErr_Fetch(&exc, &val, &tb);
-			if (val == NULL) {
-				Py_INCREF(Py_None);
-				val = Py_None;
-			}
-			result = val;
-			Py_DECREF(exc);
-			Py_XDECREF(tb);
-		}
-		if (result != NULL) {
-			/* package the result into a 1-tuple */
-			PyObject* r = result;
-			result = PyTuple_New(1);
-			if (result)
-				PyTuple_SET_ITEM(result, 0, r);
-			else
-				Py_DECREF(r);
-		}
+		result = g_handle_exit(result);
 		/* jump back to parent */
-		ts_current->stack_start = NULL;  /* dead */
-		g_switch(ts_current->parent, result);
+		ts_self->stack_start = NULL;  /* dead */
+		g_switch(ts_self->parent, result);
 		/* must not return from here! */
-		Py_FatalError("XXX memory exhausted at a very bad moment");
+		PyErr_WriteUnraisable((PyObject*) ts_self);
+		Py_FatalError("greenlets cannot continue");
 	}
 	/* back in the parent */
 }
@@ -414,7 +426,7 @@ static PyObject* green_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 	PyObject* o;
 	if (!STATE_OK)
 		return NULL;
-
+	
 	o = type->tp_alloc(type, 0);
 	if (o != NULL) {
 		Py_INCREF(ts_current);
@@ -453,6 +465,8 @@ static int kill_greenlet(PyGreenlet* self)
 		   because the 'parent' field chain would hold a
 		   reference */
 		PyObject* result;
+		if (!STATE_OK)
+			return -1;
 		Py_INCREF(ts_current);
 		self->parent = ts_current;
 		/* Send the greenlet a GreenletExit exception. */
@@ -553,8 +567,13 @@ static PyObject *
 throw_greenlet(PyGreenlet* self, PyObject* typ, PyObject* val, PyObject* tb)
 {
 	/* Note: _consumes_ a reference to typ, val, tb */
+	PyObject *result = NULL;
 	PyErr_Restore(typ, val, tb);
-	return single_result(g_switch(self, NULL));
+	if (PyGreen_STARTED(self) && !PyGreen_ACTIVE(self)) {
+		/* dead greenlet: turn GreenletExit into a regular return */
+		result = g_handle_exit(result);
+	}
+	return single_result(g_switch(self, result));
 }
 
 PyDoc_STRVAR(switch_doc,
@@ -587,8 +606,7 @@ static PyObject* green_throw(PyGreenlet* self, PyObject* args)
 	PyObject *typ = PyExc_GreenletExit;
 	PyObject *val = NULL;
 	PyObject *tb = NULL;
-//	PyObject *ret = NULL;
-
+	
 	if (!PyArg_ParseTuple(args, "|OOO:throw", &typ, &val, &tb))
 		return NULL;
 
@@ -753,12 +771,16 @@ PyObject* PyGreen_Current(void)
 
 PyObject* PyGreen_Switch(PyObject* g, PyObject* value)
 {
+	PyGreenlet *self;
 	if (!PyGreen_Check(g)) {
 		PyErr_BadInternalCall();
 		return NULL;
 	}
+	self = (PyGreenlet*) g;
 	Py_XINCREF(value);
-	return single_result(g_switch((PyGreenlet*) g, value));
+	if (PyGreen_STARTED(self) && !PyGreen_ACTIVE(self))
+		value = g_handle_exit(value);
+	return single_result(g_switch(self, value));
 }
 
 int PyGreen_SetParent(PyObject* g, PyObject* nparent)
@@ -827,7 +849,10 @@ PyTypeObject PyGreen_Type = {
 	0,					/* tp_setattro */
 	0,					/* tp_as_buffer*/
 	Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,  /* tp_flags */
-	0,					/* tp_doc */
+	"greenlet(run=None, parent=None)\n\
+Create a new greenlet object (without running it).  \"run\" is the\n\
+callable to invoke, and \"parent\" is the parent greenlet, which\n\
+defaults to the current greenlet.",		/* tp_doc */
  	0,					/* tp_traverse */
 	0,					/* tp_clear */
 	0,					/* tp_richcompare */
@@ -858,17 +883,25 @@ static PyObject* mod_getcurrent(PyObject* self)
 }
 
 static PyMethodDef GreenMethods[] = {
-	{"getcurrent", (PyCFunction)mod_getcurrent, METH_NOARGS, /*XXX*/ NULL},
-	{NULL,     NULL}        /* Sentinel */
+	{"getcurrent", (PyCFunction)mod_getcurrent, METH_NOARGS,
+	"greenlet.getcurrent()\n\
+Returns the current greenlet (i.e. the one which called this\n\
+function)."},
+	{NULL,     NULL}	/* Sentinel */
 };
 
 static char* copy_on_greentype[] = {
 	"getcurrent", "error", "GreenletExit", NULL
 };
 
-_DllExport_ void initgreenlet(void)
+GS_DllExport void initgreenlet(void)
 {
 	PyObject* m;
+	PyObject* greenletexit_doc;
+	PyObject* greenletexit_dict;
+	PyObject* greenleterror_doc;
+	PyObject* greenleterror_dict;
+	int error;
 	char** p;
 	_PyGreen_switchstack = g_switchstack;
 	_PyGreen_slp_switch = slp_switch;
@@ -881,11 +914,49 @@ _DllExport_ void initgreenlet(void)
 		return;
 	if (PyType_Ready(&PyGreen_Type) < 0)
 		return;
-	PyExc_GreenletError = PyErr_NewException("greenlet.error", NULL, NULL);
+
+        greenleterror_dict = PyDict_New();
+	if (greenleterror_dict == NULL)
+		return;
+	greenleterror_doc = PyString_FromString("internal greenlet error");
+	if (greenleterror_doc == NULL) {
+                Py_DECREF(greenleterror_dict);
+		return;
+        }
+
+        error = PyDict_SetItemString(greenleterror_dict, "__doc__", greenleterror_doc);
+	Py_DECREF(greenleterror_doc);
+	if (error == -1) {
+                Py_DECREF(greenleterror_dict);
+		return;
+        }
+
+	PyExc_GreenletError = PyErr_NewException("py.magic.greenlet.error", NULL, greenleterror_dict);
+        Py_DECREF(greenleterror_dict);
 	if (PyExc_GreenletError == NULL)
 		return;
-	PyExc_GreenletExit = PyErr_NewException("greenlet.GreenletExit",
-						NULL, NULL);
+
+        greenletexit_dict = PyDict_New();
+	if (greenletexit_dict == NULL)
+		return;
+	greenletexit_doc = PyString_FromString("greenlet.GreenletExit\n\
+This special exception does not propagate to the parent greenlet; it\n\
+can be used to kill a single greenlet.\n");
+	if (greenletexit_doc == NULL) {
+                Py_DECREF(greenletexit_dict);
+		return;
+        }
+
+        error = PyDict_SetItemString(greenletexit_dict, "__doc__", greenletexit_doc);
+	Py_DECREF(greenletexit_doc);
+	if (error == -1) {
+                Py_DECREF(greenletexit_dict);
+		return;
+        }
+
+	PyExc_GreenletExit = PyErr_NewException("py.magic.greenlet.GreenletExit",
+						NULL, greenletexit_dict);
+        Py_DECREF(greenletexit_dict);
 	if (PyExc_GreenletExit == NULL)
 		return;
 
@@ -900,7 +971,7 @@ _DllExport_ void initgreenlet(void)
 	Py_INCREF(PyExc_GreenletExit);
 	PyModule_AddObject(m, "GreenletExit", PyExc_GreenletExit);
 
-        /* also publish module-level data as attributes of the greentype. */
+	/* also publish module-level data as attributes of the greentype. */
 	for (p=copy_on_greentype; *p; p++) {
 		PyObject* o = PyObject_GetAttrString(m, *p);
 		if (!o) continue;

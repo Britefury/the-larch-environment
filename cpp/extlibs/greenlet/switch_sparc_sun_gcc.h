@@ -47,7 +47,7 @@ slp_switch(void)
            This cannot be done later, because the stack
            might be overwritten again just after SLP_RESTORE_STATE
            has finished. BTW: All other registers (l0-l7 and i0-i5)
-           might be clobbered too.
+           might be clobbered too. 
          */
         __asm__ volatile (
         "ld [%0+60], %%i7\n\t"
@@ -68,7 +68,7 @@ slp_switch(void)
          */
         __asm__ volatile ( "ta %0" : : "i" (ST_CLEAN_WINDOWS));
         return 0;
-    }
+    } 
 }
 
 #endif

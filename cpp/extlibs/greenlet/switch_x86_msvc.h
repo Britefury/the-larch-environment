@@ -68,6 +68,6 @@ static int IS_ON_STACK(void*p)
     int stackref;
     int stackbase = ((int)&stackref) & 0xfffff000;
     return (int)p >= stackbase && (int)p < stackbase + 0x00100000;
-}
+} 
 
 #endif
