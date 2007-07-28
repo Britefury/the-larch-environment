@@ -82,6 +82,12 @@ class CVStringLiteral (CVExpression):
 	def startEditingOnRight(self):
 		self.stringValueWidget.startEditingOnRight()
 
+	def startEditingAtPosition(self, pos):
+		widgetPos = self.widget.getPointRelativeTo( self.stringValueWidget, pos )
+		self.stringValueWidget.startEditingAtPositionX( widgetPos.x )
+
+	def getCursorPosition(self):
+		return self.stringValueWidget.getPointRelativeTo( self.widget, self.stringValueWidget.getCursorPosition() )
 
 
 	def _p_onEntryFinish(self, entry, text, bUserEvent):

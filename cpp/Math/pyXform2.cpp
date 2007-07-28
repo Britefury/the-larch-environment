@@ -27,7 +27,8 @@ void export_Xform2()
 
 		.def( Vector2() * self )
 		.def( Point2() * self )
-		.def( Segment2() * self );
+		.def( Segment2() * self )
+		.def( self * self );
 }
 
 

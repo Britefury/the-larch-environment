@@ -105,6 +105,19 @@ inline Segment2 & _DllExport_ operator*=(Segment2 &v, const Xform2 &x)
 	return v;
 }
 
+inline Xform2 _DllExport_ operator*(const Xform2 &a, const Xform2 &b)
+{
+	return Xform2( a.scale * b.scale, a.translation * b.scale + b.translation );
+}
+
+inline Xform2 & _DllExport_ operator*=(Xform2 &a, const Xform2 &b)
+{
+	a.scale *= b.scale;
+	a.translation *= b.scale;
+	a.translation += b.translation;
+	return a;
+}
+
 
 
 

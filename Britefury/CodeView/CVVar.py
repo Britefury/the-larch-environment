@@ -71,6 +71,13 @@ class CVVar (CVNode):
 	def startEditingOnRight(self):
 		self.nameWidget.startEditingOnRight()
 
+	def startEditingAtPosition(self, pos):
+		widgetPos = self.widget.getPointRelativeTo( self.nameWidget, pos )
+		self.nameWidget.startEditingAtPositionX( widgetPos.x )
+
+	def getCursorPosition(self):
+		return self.nameWidget.getPointRelativeTo( self.widget, self.nameWidget.getCursorPosition() )
+
 
 	def makeCurrent(self):
 		self.startEditing()

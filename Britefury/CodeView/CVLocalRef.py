@@ -69,6 +69,13 @@ class CVLocalRef (CVExpression):
 	def startEditingOnRight(self):
 		self.nameWidget.startEditingOnRight()
 
+	def startEditingAtPosition(self, pos):
+		widgetPos = self.widget.getPointRelativeTo( self.nameWidget, pos )
+		self.nameWidget.startEditingAtPositionX( widgetPos.x )
+
+	def getCursorPosition(self):
+		return self.nameWidget.getPointRelativeTo( self.widget, self.nameWidget.getCursorPosition() )
+
 
 	def _p_onEntryFinish(self, entry, text, bUserEvent):
 		self._f_commandHistoryFreeze()

@@ -80,6 +80,13 @@ class CVParameterDoc (CVNode):
 	def startEditingOnRight(self):
 		self.paramDocWidget.startEditingOnRight()
 
+	def startEditingAtPosition(self, pos):
+		widgetPos = self.widget.getPointRelativeTo( self.paramDocWidget, pos )
+		self.paramDocWidget.startEditingAtPositionX( widgetPos.x )
+
+	def getCursorPosition(self):
+		return self.paramDocWidget.getPointRelativeTo( self.widget, self.paramDocWidget.getCursorPosition() )
+
 
 	def makeCurrent(self):
 		self.startEditing()

@@ -194,7 +194,7 @@ static int g_save(PyGreenlet* g, char* stop)
 static void slp_restore_state(void)
 {
 	PyGreenlet* g = ts_target;
-	
+
 	/* Restore the heap copy back into the C stack */
 	if (g->stack_saved != 0) {
 		memcpy(g->stack_start, g->stack_copy, g->stack_saved);
@@ -217,7 +217,7 @@ static int slp_save_state(char* stackref)
 		ts_current = ts_current->stack_prev;  /* not saved if dying */
 	else
 		ts_current->stack_start = stackref;
-	
+
 	while (ts_current->stack_stop < target_stop) {
 		/* ts_current is entierely within the area to free */
 		if (g_save(ts_current, ts_current->stack_stop))
@@ -426,7 +426,7 @@ static PyObject* green_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 	PyObject* o;
 	if (!STATE_OK)
 		return NULL;
-	
+
 	o = type->tp_alloc(type, 0);
 	if (o != NULL) {
 		Py_INCREF(ts_current);
@@ -606,7 +606,7 @@ static PyObject* green_throw(PyGreenlet* self, PyObject* args)
 	PyObject *typ = PyExc_GreenletExit;
 	PyObject *val = NULL;
 	PyObject *tb = NULL;
-	
+
 	if (!PyArg_ParseTuple(args, "|OOO:throw", &typ, &val, &tb))
 		return NULL;
 
@@ -894,7 +894,7 @@ static char* copy_on_greentype[] = {
 	"getcurrent", "error", "GreenletExit", NULL
 };
 
-GS_DllExport void initgreenlet(void)
+_DllExport_ void initgreenlet(void)
 {
 	PyObject* m;
 	PyObject* greenletexit_doc;

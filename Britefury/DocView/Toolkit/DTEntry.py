@@ -183,6 +183,31 @@ class DTEntry (DTWidget):
 		return layoutPoint + self._textPosition
 
 
+
+	def getCharacterIndexAt(self, point):
+		pointInLayout = point - self._textPosition
+		index, trailing = self._layout.xy_to_index( int( pointInLayout.x * pango.SCALE ), int( pointInLayout.y * pango.SCALE ) )
+		return index
+
+
+	def getCharacterIndexAtX(self, x):
+		y = self._textPosition.y + self._layout.get_pixel_size() * 0.5
+		return self.getCharacterIndexAt( Point2( x, y ) )
+
+
+	def getCursorPositionAt(self, point):
+		pointInLayout = point - self._textPosition
+		index, trailing = self._layout.xy_to_index( int( pointInLayout.x * pango.SCALE ), int( pointInLayout.y * pango.SCALE ) )
+		return index + trailing
+
+
+	def getCursorPositionAtX(self, x):
+		y = self._textPosition.y + self._layout.get_pixel_size() * 0.5
+		return self.getCursorPositionAt( Point2( x, y ) )
+
+
+
+
 	def setAutoCompleteList(self, autoCompleteList):
 		self._autoCompleteList = autoCompleteList
 

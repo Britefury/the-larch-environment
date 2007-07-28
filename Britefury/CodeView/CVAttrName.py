@@ -61,3 +61,10 @@ class CVAttrName (CVNode):
 	def startEditingOnRight(self):
 		self.widget.startEditingOnRight()
 
+	def startEditingAtPosition(self, pos):
+		widgetPos = self.widget.getPointRelativeTo( self.nameWidget, pos )
+		self.nameWidget.startEditingAtPositionX( widgetPos.x )
+
+	def getCursorPosition(self):
+		return self.nameWidget.getPointRelativeTo( self.widget, self.nameWidget.getCursorPosition() )
+
