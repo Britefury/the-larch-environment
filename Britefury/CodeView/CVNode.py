@@ -178,16 +178,21 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 
 
 	def cursorLeft(self, bItemStep=False):
-		if self._parent is not None:
-			return self._parent._f_cursorLeftFromChild( self, bItemStep )
-		else:
-			return True
+		left = self._p_getLeafToLeft()
+		if left is not None:
+			if bItemStep:
+				left.makeCurrent()
+			else:
+				left.startEditingOnRight()
+
 
 	def cursorRight(self, bItemStep=False):
-		if self._parent is not None:
-			return self._parent._f_cursorRightFromChild( self, bItemStep )
-		else:
-			return True
+		right = self._p_getLeafToRight()
+		if right is not None:
+			if bItemStep:
+				right.makeCurrent()
+			else:
+				right.startEditingOnLeft()
 
 
 
@@ -273,29 +278,6 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 		return None
 
 
-	def _f_cursorLeftFromChild(self, child, bItemStep):
-		navList = self.horizontalNavigationList()
-		leftChild = self._p_prevNavListItem( navList, child )
-		if leftChild is not None:
-			leftChild._f_cursorEnterFromRight( self, bItemStep )
-			return True
-		elif self._parent is not None:
-			return self._parent._f_cursorLeftFromChild( self, bItemStep )
-		else:
-			return True
-
-	def _f_cursorRightFromChild(self, child, bItemStep):
-		navList = self.horizontalNavigationList()
-		rightChild = self._p_nextNavListItem( navList, child )
-		if rightChild is not None:
-			rightChild._f_cursorEnterFromLeft( self, bItemStep )
-			return True
-		elif self._parent is not None:
-			return self._parent._f_cursorRightFromChild( self, bItemStep )
-		else:
-			return True
-
-
 	def _f_cursorLeftFromChildToSibling(self, child):
 		navList = self.horizontalNavigationList()
 		leftChild = self._p_prevNavListItem( navList, child )
@@ -341,28 +323,6 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 
 
 
-	def _f_cursorEnterFromLeft(self, parent, bItemStep):
-		navList = self.horizontalNavigationList()
-		if navList != []:
-			navList[0]._f_cursorEnterFromLeft( self, bItemStep )
-		else:
-			if bItemStep:
-				self.makeCurrent()
-			else:
-				self.startEditingOnLeft()
-
-	def _f_cursorEnterFromRight(self, parent, bItemStep):
-		navList = self.horizontalNavigationList()
-		if navList != []:
-			navList[-1]._f_cursorEnterFromRight( self, bItemStep )
-		else:
-			if bItemStep:
-				self.makeCurrent()
-			else:
-				self.startEditingOnRight()
-
-
-
 	def _f_cursorEnterFromAbove(self, parent):
 		navList = self.verticalNavigationList()
 		if navList != []:
@@ -376,6 +336,64 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 			navList[-1]._f_cursorEnterFromBelow( self )
 		else:
 			self.makeCurrent()
+
+
+
+
+
+
+	def _p_getLeafToLeft(self):
+		if self._parent is not None:
+			return self._parent._p_getLeafToLeftFromChild( self )
+		else:
+			return None
+
+	def _p_getLeafToRight(self):
+		if self._parent is not None:
+			return self._parent._p_getLeafToRightFromChild( self )
+		else:
+			return None
+
+
+	def _p_getLeafToLeftFromChild(self, child):
+		navList = self.horizontalNavigationList()
+		leftChild = self._p_prevNavListItem( navList, child )
+		if leftChild is not None:
+			return leftChild._p_getRightLeaf()
+		elif self._parent is not None:
+			return self._parent._p_getLeafToLeftFromChild( self )
+		else:
+			return None
+
+	def _p_getLeafToRightFromChild(self, child):
+		navList = self.horizontalNavigationList()
+		rightChild = self._p_nextNavListItem( navList, child )
+		if rightChild is not None:
+			return rightChild._p_getLeftLeaf()
+		elif self._parent is not None:
+			return self._parent._p_getLeafToRightFromChild( self )
+		else:
+			return None
+
+
+	def _p_getLeftLeaf(self):
+		navList = self.horizontalNavigationList()
+		if navList != []:
+			return navList[0]._p_getLeftLeaf()
+		else:
+			return self
+
+	def _p_getRightLeaf(self):
+		navList = self.horizontalNavigationList()
+		if navList != []:
+			return navList[-1]._p_getRightLeaf()
+		else:
+			return self
+
+
+
+
+
 
 
 
@@ -437,6 +455,13 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 
 	def _o_getViewNode(self, cvtNode, viewNodeClass=None):
 		return self._view.getViewNodeForTreeNode( cvtNode, viewNodeClass )
+
+
+
+
+
+
+
 
 
 
