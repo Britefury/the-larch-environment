@@ -110,6 +110,29 @@ class DTLabel (DTWidget):
 		return self._vAlign
 
 
+	def getCharacterIndexAt(self, point):
+		self._p_refreshLayout()
+		pointInLayout = point - self._textPosition
+		index, trailing = self._layout.xy_to_index( int( pointInLayout.x * pango.SCALE ), int( pointInLayout.y * pango.SCALE ) )
+		return index
+
+
+	def getCharacterIndexAtX(self, x):
+		y = self._textPosition.y + self._textSize.y * 0.5
+		return self.getCharacterIndexAt( Point2( x, y ) )
+
+
+	def getCursorPositionAt(self, point):
+		self._p_refreshLayout()
+		pointInLayout = point - self._textPosition
+		index, trailing = self._layout.xy_to_index( int( pointInLayout.x * pango.SCALE ), int( pointInLayout.y * pango.SCALE ) )
+		return index + trailing
+
+
+	def getCursorPositionAtX(self, x):
+		y = self._textPosition.y + self._textSize.y * 0.5
+		return self.getCursorPositionAt( Point2( x, y ) )
+
 
 	def _p_refreshLayout(self):
 		if self._bLayoutNeedsRefresh  and  self._layout is not None:

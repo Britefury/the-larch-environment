@@ -170,6 +170,18 @@ class DTEntry (DTWidget):
 		self._cursorLocation = len( self._text )
 		self._o_queueFullRedraw()
 
+	def setCursorLocation(self, loc):
+		self._cursorLocation = loc
+		self._o_queueFullRedraw()
+
+	def getCursorLocation(self):
+		return self._cursorLocation
+
+	def getCursorPosition(self):
+		charRect = self._layout.index_to_pos( self._cursorLocation )
+		layoutPoint = Point2( float( charRect[0] ) / pango.SCALE,  ( float( charRect[1] )  +  float( charRect[3] ) * 0.5 )  /  pango.SCALE )
+		return layoutPoint + self._textPosition
+
 
 	def setAutoCompleteList(self, autoCompleteList):
 		self._autoCompleteList = autoCompleteList
@@ -244,23 +256,11 @@ class DTEntry (DTWidget):
 
 
 	def _p_textPosToTextLocation(self, textX):
-		lowerX = 0.0
-		upperX = self._layout.index_to_pos( len( self._text ) )[0]  /  pango.SCALE
-		lowerLoc = 0
-		upperLoc = len( self._text )
-		while upperLoc  >  ( lowerLoc + 1 ):
-			midLoc = ( lowerLoc + upperLoc ) >> 1
-			midX = self._layout.index_to_pos( midLoc )[0]  /  pango.SCALE
-			if textX < midX:
-				upperLoc = midLoc
-				upperX = midX
-			else:
-				lowerLoc = midLoc
-				lowerX = midX
-		if ( upperX - textX )  >  ( textX - lowerX ):
-			return lowerLoc
-		else:
-			return upperLoc
+		layoutSize = self._layout.get_pixel_size()
+		textY = layoutSize[1] * 0.5
+		index, trailing = self._layout.xy_to_index( int( textX * pango.SCALE ), int( textY * pango.SCALE ) )
+		return index + trailing
+
 
 
 	def _p_localPosToTextLocation(self, localPos):

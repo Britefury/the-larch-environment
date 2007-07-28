@@ -38,7 +38,7 @@ class DTEntryLabel (DTBin):
 		def _o_onButtonUp(self, localPos, button, state):
 			super( DTEntryLabel._Label, self )._o_onButtonUp( localPos, button, state )
 			if button == 1:
-				self._entryLabel._p_onLabelClicked()
+				self._entryLabel._p_onLabelClicked( localPos )
 				return True
 			else:
 				return False
@@ -137,6 +137,21 @@ class DTEntryLabel (DTBin):
 
 
 
+	def getCursorLocation(self):
+		if self.getChild() is self._entry:
+			return self._entry.getCursorLocation()
+		else:
+			return None
+
+	def getCursorPosition(self):
+		if self.getChild() is self._entry:
+			return self._entry.getCursorPosition()
+		else:
+			return None
+
+
+
+
 	def _p_refreshLabel(self):
 		labelText = self._text
 		if self._labelFilter is not None:
@@ -149,8 +164,10 @@ class DTEntryLabel (DTBin):
 
 
 
-	def _p_onLabelClicked(self):
+	def _p_onLabelClicked(self, localPos):
 		self.startEditing()
+		index = self._label.getCursorPositionAt( localPos )
+		self._entry.setCursorLocation( index )
 
 
 	def _p_onEntryTextInserted(self, entry, position, bAppended, textInserted):
