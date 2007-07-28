@@ -8,7 +8,6 @@
 from Britefury.CodeGraph.CGNode import CGNode
 from Britefury.Sheet.Sheet import *
 from Britefury.SemanticGraph.SemanticGraph import *
-from Britefury.VirtualMachine.vcls_string import pyStrToVString
 
 
 

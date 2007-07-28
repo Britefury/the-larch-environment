@@ -23,10 +23,6 @@ from Britefury.CommandHistory.CommandHistory import CommandHistory
 
 from Britefury.SheetGraph.SheetGraph import *
 
-from Britefury.VirtualMachine.VMMachine import *
-
-from Britefury.LowLevelCodeTree.LowLevelCodeTree import LowLevelCodeTree
-
 from Britefury.DocView.Toolkit.DTDocument import DTDocument
 
 from Britefury.CodeGraph.CGModule import CGModule
