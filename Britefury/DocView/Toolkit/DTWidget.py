@@ -8,7 +8,7 @@
 from copy import copy
 
 
-from Britefury.Math.Math import Point2, Vector2, Xform2
+from Britefury.Math.Math import Point2, Vector2, Xform2, BBox2
 
 from Britefury.Kernel.Abstract import *
 
@@ -63,11 +63,49 @@ class DTWidget (object):
 		return self._allocation
 
 
-	def getPositionRelativeToDocument(self, pos):
-		if self._parent is not None:
-			return self._parent._f_getChildPositionRelativeToDocument( self, pos )
+	def getBoundingBox(self):
+		return BBox2( Point2(), Point2( self._allocation ) )
+
+
+	def getTransformRelativeToDocument(self, x=Xform2()):
+		return self.getTransformRelativeToAncestor( None, x )
+
+	def getTransformRelativeToAncestor(self, ancestor, x=Xform2()):
+		if ancestor is self:
+			return x
+		elif self._parent is not None:
+			return self._parent._f_getChildTransformRelativeToAncestor( self, ancestor, x )
 		else:
-			return pos
+			if ancestor is not None:
+				raise ValueError, '@ancestor is not and ancestor of the target widget'
+			return x
+
+	def getTransformRelativeTo(self, toWidget, x=Xform2()):
+		myXform = self.getTransformRelativeToDocument()
+		toWidgetXform = toWidget.getTransformRelativeToDocument()
+		return myXform * toWidgetXform.inverse()
+
+
+	def getPointRelativeToDocument(self, point):
+		return self.getPointRelativeToAncestor( None, point )
+
+	def getPointRelativeToAncestor(self, ancestor, point):
+		if ancestor is self:
+			return point
+		elif self._parent is not None:
+			return self._parent._f_getChildPointRelativeToAncestor( self, ancestor, point )
+		else:
+			if ancestor is not None:
+				raise ValueError, '@ancestor is not and ancestor of the target widget'
+			return point
+
+	def getPointRelativeTo(self, toWidget, point):
+		pointInDoc = self.getPointRelativeToDocument( point )
+		toWidgetXform = toWidget.getTransformRelativeToDocument()
+		return pointInDoc * toWidgetXform.inverse()
+
+
+
 
 
 	def getRootDocument(self):
