@@ -28,31 +28,31 @@ class CVBMovementBehavior (CodeViewBehavior):
 	@CVBAccelInputHandlerMethod( 'Left' )
 	def _left(self, viewNode, receivingNodePath, widget, event):
 		viewNode._f_commandHistoryFreeze()
-		result = viewNode.cursorLeft()
+		viewNode.cursorLeft()
 		viewNode._f_commandHistoryThaw()
-		return result
+		return True
 
 	@CVBAccelInputHandlerMethod( 'Right' )
 	def _right(self, viewNode, receivingNodePath, widget, event):
 		viewNode._f_commandHistoryFreeze()
-		result = viewNode.cursorRight()
+		viewNode.cursorRight()
 		viewNode._f_commandHistoryThaw()
-		return result
+		return True
 
 
 	@CVBAccelInputHandlerMethod( '<control>Left' )
 	def _itemToLeft(self, viewNode, receivingNodePath, widget, event):
 		viewNode._f_commandHistoryFreeze()
-		result = viewNode.cursorLeft( True )
+		viewNode.cursorLeft( True )
 		viewNode._f_commandHistoryThaw()
-		return result
+		return True
 
 	@CVBAccelInputHandlerMethod( '<control>Right' )
 	def _itemToRight(self, viewNode, receivingNodePath, widget, event):
 		viewNode._f_commandHistoryFreeze()
-		result = viewNode.cursorRight( True )
+		viewNode.cursorRight( True )
 		viewNode._f_commandHistoryThaw()
-		return result
+		return True
 
 
 
