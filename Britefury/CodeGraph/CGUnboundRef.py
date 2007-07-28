@@ -8,7 +8,6 @@
 from Britefury.CodeGraph.CGExpression import CGExpression
 from Britefury.Sheet.Sheet import *
 from Britefury.SemanticGraph.SemanticGraph import *
-from Britefury.LowLevelCodeTree.LLCTLoadLocalExp import LLCTLoadLocalExp
 
 from Britefury.PyCodeGen.PyCodeGen import *
 
