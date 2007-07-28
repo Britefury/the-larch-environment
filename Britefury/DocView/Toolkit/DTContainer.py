@@ -74,11 +74,15 @@ class DTContainer (DTWidget):
 		return False
 
 
-	def _f_getChildPositionRelativeToDocument(self, child, pos):
+	def _f_getChildTransformRelativeToAncestor(self, child, ancestor, x):
 		entry = self._childToEntry[child]
-		localPos = pos * entry.xform
-		return self.getPositionRelativeToDocument( localPos )
+		localX = x * entry.xform
+		return self.getTransformRelativeToAncestor( ancestor, localX )
 
+	def _f_getChildPointRelativeToAncestor(self, child, ancestor, point):
+		entry = self._childToEntry[child]
+		localPoint = point * entry.xform
+		return self.getPointRelativeToAncestor( ancestor, localPoint )
 
 
 

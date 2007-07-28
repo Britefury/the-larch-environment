@@ -12,16 +12,16 @@ class CVBMovementBehavior (CodeViewBehavior):
 	@CVBAccelInputHandlerMethod( 'Up' )
 	def _up(self, viewNode, receivingNodePath, widget, event):
 		viewNode._f_commandHistoryFreeze()
-		result = viewNode.cursorUp()
+		viewNode.cursorUp()
 		viewNode._f_commandHistoryThaw()
-		return result
+		return True
 
 	@CVBAccelInputHandlerMethod( [ 'Down', 'Return' ] )
 	def _down(self, viewNode, receivingNodePath, widget, event):
 		viewNode._f_commandHistoryFreeze()
-		result = viewNode.cursorDown()
+		viewNode.cursorDown()
 		viewNode._f_commandHistoryThaw()
-		return result
+		return True
 
 
 
@@ -56,45 +56,26 @@ class CVBMovementBehavior (CodeViewBehavior):
 
 
 
-
-	@CVBAccelInputHandlerMethod( '<alt><control>Left' )
-	def _leftSibling(self, viewNode, receivingNodePath, widget, event):
-		viewNode._f_commandHistoryFreeze()
-		result = viewNode.cursorToLeftSibling()
-		viewNode._f_commandHistoryThaw()
-		return result
-
-	@CVBAccelInputHandlerMethod( '<alt><control>Right' )
-	def _rightSibling(self, viewNode, receivingNodePath, widget, event):
-		viewNode._f_commandHistoryFreeze()
-		result = viewNode.cursorToRightSibling()
-		viewNode._f_commandHistoryThaw()
-		return result
-
-
-	@CVBAccelInputHandlerMethod( [ '<alt>Up', '<alt><control>Up' ] )
-	def _leftParent(self, viewNode, receivingNodePath, widget, event):
-		viewNode._f_commandHistoryFreeze()
-		result = viewNode.cursorToParent()
-		viewNode._f_commandHistoryThaw()
-		return result
-
-
-
-
 	@CVBAccelInputHandlerMethod( '<alt>Left' )
 	def _leftChild(self, viewNode, receivingNodePath, widget, event):
 		viewNode._f_commandHistoryFreeze()
-		result = viewNode.cursorToLeftChild()
+		viewNode.cursorToLeftChild()
 		viewNode._f_commandHistoryThaw()
-		return result
+		return True
 
 	@CVBAccelInputHandlerMethod( '<alt>Right' )
 	def _rightChild(self, viewNode, receivingNodePath, widget, event):
 		viewNode._f_commandHistoryFreeze()
-		result = viewNode.cursorToRightChild()
+		viewNode.cursorToRightChild()
 		viewNode._f_commandHistoryThaw()
-		return result
+		return True
+
+	@CVBAccelInputHandlerMethod( '<alt>Up' )
+	def _toParent(self, viewNode, receivingNodePath, widget, event):
+		viewNode._f_commandHistoryFreeze()
+		viewNode.cursorToParent()
+		viewNode._f_commandHistoryThaw()
+		return True
 
 
 
