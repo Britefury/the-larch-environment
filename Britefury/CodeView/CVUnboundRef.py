@@ -93,6 +93,13 @@ class CVUnboundRef (CVExpression):
 	def startEditingOnRight(self):
 		self.targetNameWidget.startEditingOnRight()
 
+	def startEditingAtPosition(self, pos):
+		widgetPos = self.widget.getPointRelativeTo( self.targetNameWidget, pos )
+		self.targetNameWidget.startEditingAtPositionX( widgetPos.x )
+
+	def getCursorPosition(self):
+		return self.targetNameWidget.getPointRelativeTo( self.widget, self.targetNameWidget.getCursorPosition() )
+
 
 	def keywordCheck(self):
 		text = self.targetNameWidget.text

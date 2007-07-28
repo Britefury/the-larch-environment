@@ -12,7 +12,7 @@ import cairo
 import pango
 import pangocairo
 
-from Britefury.Math.Math import Colour3f, Vector2
+from Britefury.Math.Math import Colour3f, Vector2, Point2
 
 from Britefury.DocView.Toolkit.DTWidget import DTWidget
 

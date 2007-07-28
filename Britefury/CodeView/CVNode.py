@@ -217,12 +217,16 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 	def cursorUp(self):
 		above = self.getNodeAbove()
 		if above is not None:
-			above.makeCurrent()
+			cursorPosInAbove = self.widget.getPointRelativeTo( above.widget, self.getCursorPosition() )
+			#above.makeCurrent()
+			above.startEditingAtPosition( cursorPosInAbove )
 
 	def cursorDown(self):
 		below = self.getNodeBelow()
 		if below is not None:
-			below.makeCurrent()
+			cursorPosInBelow = self.widget.getPointRelativeTo( below.widget, self.getCursorPosition() )
+			#below.makeCurrent()
+			below.startEditingAtPosition( cursorPosInBelow )
 
 
 
@@ -430,6 +434,10 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 
 
 	def startEditingOnRight(self):
+		self.makeCurrent()
+
+
+	def startEditingAtPosition(self, pos):
 		self.makeCurrent()
 
 

@@ -68,6 +68,13 @@ class CVImport (CVStatement):
 	def startEditingOnRight(self):
 		self.moduleNameWidget.startEditingOnRight()
 
+	def startEditingAtPosition(self, pos):
+		widgetPos = self.widget.getPointRelativeTo( self.moduleNameWidget, pos )
+		self.moduleNameWidget.startEditingAtPositionX( widgetPos.x )
+
+	def getCursorPosition(self):
+		return self.moduleNameWidget.getPointRelativeTo( self.widget, self.moduleNameWidget.getCursorPosition() )
+
 
 
 	def _p_onEntryFinish(self, entry, text, bUserEvent):

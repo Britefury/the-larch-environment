@@ -75,6 +75,11 @@ class CVComment (CVStatement):
 		#self.textWidget.startEditingOnRight()
 		self.makeCurrent()
 
+	def startEditingAtPosition(self, pos):
+		self.makeCurrent()
+
+	#def getCursorPosition(self):
+		#return self.stringValueWidget.getPointRelativeTo( self.widget, self.stringValueWidget.getCursorPosition() )
 
 
 	def _p_onEntryFinish(self, entry, text):
