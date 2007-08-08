@@ -248,7 +248,7 @@ class DTBox (DTContainer):
 			for entry in childEntryIter:
 				childAlloc = entry._reqWidth
 				childWidth = entry._reqWidth
-				childX = x
+				childX = x + entry.padding
 				if entry.bExpand:
 					childAlloc += expandPerChild
 					if entry.bFill:
@@ -296,7 +296,7 @@ class DTBox (DTContainer):
 			for entry in childEntryIter:
 				childAlloc = entry._reqHeight
 				childHeight = entry._reqHeight
-				childY = y
+				childY = y + entry.padding
 				if entry.bExpand:
 					childAlloc += expandPerChild
 					if entry.bFill:

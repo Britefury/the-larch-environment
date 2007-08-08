@@ -39,6 +39,14 @@ class DTDocument (gtk.DrawingArea, DTBin):
 		DTBin.__init__( self )
 
 
+		# Set the document to self
+		self._document = self
+
+		self._dndSource = None
+		self._dndButton = None
+		self._dndInProgress = False
+
+
 		self._docOffset = Vector2()
 		self._docScale = 1.0
 		self._docDragStartPos = Point2()
@@ -76,10 +84,6 @@ class DTDocument (gtk.DrawingArea, DTBin):
 		if bCanGrabFocus:
 			self.set_flags( gtk.CAN_FOCUS )
 
-
-
-	def getRootDocument(self):
-		return self
 
 
 	def oneToOne(self):
@@ -164,6 +168,16 @@ class DTDocument (gtk.DrawingArea, DTBin):
 
 
 
+	def _f_setParent(self, parent, document):
+		pass
+
+
+	def _f_unparent(self):
+		pass
+
+
+
+
 
 	def _p_configureEvent(self, widget, event):
 		docSize = Vector2( event.width, event.height )
@@ -189,6 +203,11 @@ class DTDocument (gtk.DrawingArea, DTBin):
 		x, y, state = event.x, event.y, event.state
 		localPos = Point2( x, y )
 		if event.state & gtk.gdk.MOD1_MASK  ==  0:
+			if event.type == gtk.gdk.BUTTON_PRESS  and  self._dndSource is None:
+				self._dndSource = self._f_evDndButtonDown( localPos, event.button, state )
+				self._dndButton = event.button
+				self._dndInProgress = False
+
 			if event.type == gtk.gdk.BUTTON_PRESS:
 				self._f_evButtonDown( localPos, event.button, state )
 			elif event.type == gtk.gdk._2BUTTON_PRESS:
@@ -203,6 +222,14 @@ class DTDocument (gtk.DrawingArea, DTBin):
 	def _p_buttonReleaseEvent(self, widget, event):
 		x, y, state = event.x, event.y, event.state
 		localPos = Point2( x, y )
+		if self._dndSource is not None  and  self._dndInProgress  and  self._dndButton == event.button:
+			# Ensure that @self._dndSource is still part of this document
+			if self._dndSource.document is self:
+				self._f_evDndButtonUp( localPos, event.button, state, self._dndSource )
+			self._dndSource = None
+			self._dndButton = None
+			self._dndInProgress = False
+
 		if self._docDragButton is None:
 			self._f_evButtonUp( localPos, event.button, state )
 		else:
@@ -218,7 +245,11 @@ class DTDocument (gtk.DrawingArea, DTBin):
 		localPos = Point2( x, y )
 
 		if self._docDragButton is None:
-			self._f_evMotion( localPos )
+			if self._dndSource is not None  and  not self._dndInProgress:
+				self._dndSource._f_evDndBegin()
+				self._dndInProgress = True
+			else:
+				self._f_evMotion( localPos )
 		else:
 			delta = localPos - self._docDragStartPos
 			bModified = False
@@ -332,6 +363,8 @@ gobject.type_register( DTDocument )
 
 if __name__ == '__main__':
 	from Britefury.DocView.Toolkit.DTLabel import DTLabel
+	from Britefury.DocView.Toolkit.DTBox import DTBox
+	from Britefury.DocView.Toolkit.DTDirection import DTDirection
 	import cairo
 	from Britefury.Math.Math import Colour3f
 	import traceback
@@ -370,6 +403,79 @@ if __name__ == '__main__':
 			self.colour = self._savedColour
 
 
+	# test label
+	label = MyLabel( 'Hello world' )
+
+
+	class DndOp (object):
+		pass
+
+
+	op = DndOp()
+
+
+
+
+	# Dnd test stuff
+
+	dndTitleLabel = DTLabel( '--- Drag and drop test ---' )
+
+	dndSourceLabels = [ DTLabel( 'Source %d'  %  ( i, ) )    for i in xrange( 0, 3 ) ]
+	dndDestLabels = [ DTLabel( 'Dest %d'  %  ( i, ) )    for i in xrange( 0, 3 ) ]
+
+
+	def dndBeginCallback(dndSource, localPos, button, state):
+		print 'dndBeginCallback: ', dndSource, localPos, button, state
+
+	def dndCanDragToCallback(dndSource, dndDest, localPos, button, state):
+		print 'dndCanDragToCallback: ', dndSource, dndDest, localPos, button, state
+		return True
+
+	def dndCanDropFromCallback(dndSource, dndDest, localPos, button, state):
+		print 'dndCanDropFromCallback: ', dndSource, dndDest, localPos, button, state
+		return True
+
+	def dndDragToCallback(dndSource, dndDest, localPos, button, state):
+		print 'dndDragToCallback: ', dndSource, dndDest, localPos, button, state
+		return dndSource.text
+
+	def dndDropFromCallback(dndSource, dndDest, dndData, localPos, button, state):
+		print 'dndDropFromCallback: ', dndSource, dndDest, dndData, localPos, button, state
+
+
+	for srcLabel in dndSourceLabels:
+		srcLabel.addDndSourceOp( op )
+		srcLabel.dndBeginCallback = dndBeginCallback
+		srcLabel.dndCanDragToCallback = dndCanDragToCallback
+		srcLabel.dndDragToCallback = dndDragToCallback
+
+	for dstLabel in dndDestLabels:
+		dstLabel.addDndDestOp( op )
+		dstLabel.dndCanDropFromCallback = dndCanDropFromCallback
+		dstLabel.dndDropFromCallback = dndDropFromCallback
+
+
+	dndSourceBox = DTBox( spacing=20.0 )
+	dndSourceBox[:] = dndSourceLabels
+
+	dndDestBox = DTBox( spacing=20.0 )
+	dndDestBox[:] = dndDestLabels
+
+	dndBox = DTBox( direction=DTDirection.TOP_TO_BOTTOM, spacing=10.0 )
+	dndBox.append( dndSourceBox )
+	dndBox.append( dndDestBox )
+
+
+
+
+	docBox = DTBox( direction=DTDirection.TOP_TO_BOTTOM )
+	docBox.append( label )
+	docBox.append( dndBox, bExpand=True, bFill=True, padding=20.0 )
+
+
+
+
+
 	window = gtk.Window( gtk.WINDOW_TOPLEVEL );
 	window.connect( 'delete-event', onDeleteEvent )
 	window.connect( 'destroy', onDestroy )
@@ -379,8 +485,7 @@ if __name__ == '__main__':
 	doc = DTDocument()
 	doc.show()
 
-	label = MyLabel( 'Hello world' )
-	doc.child = label
+	doc.child = docBox
 
 
 	textButton = makeButton( 'Change text', onChangeText )

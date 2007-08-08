@@ -12,13 +12,20 @@ from Britefury.Cell.CellEvaluator import CellEvaluator
 
 
 class CellEvaluatorFunction (CellEvaluator):
+	"""Cell evaluator - function
+
+	Uses a function (supplied to the constructor) to compute the value for a cell
+	"""
 	__slots__ = [ '_function' ]
 
 
 	def __init__(self, function):
+		"""Constructor
+		@function - the function used to compute the cell value"""
 		super( CellEvaluatorFunction, self ).__init__()
 		self._function = function
 
 
 	def evaluate(self, cell):
+		"""Compute the value for a cell"""
 		return self._function()
