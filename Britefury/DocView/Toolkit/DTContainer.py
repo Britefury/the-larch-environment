@@ -238,15 +238,15 @@ class DTContainer (DTWidget):
 			return False
 
 
-	def _f_evDndMotion(self, localPos, dndButton, state, dndSource):
+	def _f_evDndMotion(self, localPos, dndButton, state, dndSource, dndCache):
 		widgetId = self._widgetBoxTable.getWidgetAtPoint( localPos )
 		if widgetId != -1:
 			childEntry = self._childIdToEntry[widgetId]
-			dndDest = childEntry.child._f_evDndMotion( childEntry.containerToChildSpace( localPos ), dndButton, state, dndSource )
+			dndDest = childEntry.child._f_evDndMotion( childEntry.containerToChildSpace( localPos ), dndButton, state, dndSource, dndCache )
 			if dndDest is not None:
-				return dndSource
+				return dndDest
 			else:
-				return self._o_onDndMotion( localPos, dndButton, state, dndSource )
+				return self._o_onDndMotion( localPos, dndButton, state, dndSource, dndCache )
 		else:
 			return None
 

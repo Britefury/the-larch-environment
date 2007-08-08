@@ -169,6 +169,51 @@ class DTBox (DTContainer):
 		self._o_queueResize()
 
 
+	def getInsertPosition(self, localPos):
+		"""Return the index at which an item could be inserted.
+		localPos is checked against the contents of the box in order to determine the insert index"""
+
+		if len( self ) == 0:
+			return 0
+
+		if self._direction == DTDirection.LEFT_TO_RIGHT  or  self._direction == DTDirection.RIGHT_TO_LEFT:
+			pos = localPos.x
+		elif self._direction == DTDirection.TOP_TO_BOTTOM  or  self._direction == DTDirection.BOTTOM_TO_TOP:
+			pos = localPos.y
+
+		if self._direction == DTDirection.LEFT_TO_RIGHT  or  self._direction == DTDirection.TOP_TO_BOTTOM:
+			bReversed = False
+		elif self._direction == DTDirection.RIGHT_TO_LEFT  or  self._direction == DTDirection.BOTTOM_TO_TOP:
+			bReversed = True
+
+		if self._direction == DTDirection.LEFT_TO_RIGHT  or  self._direction == DTDirection.RIGHT_TO_LEFT:
+			midPoints  =  [ childEntry._xPos  +  childEntry._width * 0.5   for childEntry in self._childEntries ]
+		elif self._direction == DTDirection.TOP_TO_BOTTOM  or  self._direction == DTDirection.BOTTOM_TO_TOP:
+			midPoints  =  [ childEntry._yPos  +  childEntry._height * 0.5   for childEntry in self._childEntries ]
+
+		if bReversed:
+			if pos > midPoints[0]:
+				return 0
+			elif pos < midPoints[-1]:
+				return len( self )
+			else:
+				for i, ( upper, lower )  in  enumerate( zip( midPoints[:-1], midPoints[1:] ) ):
+					if pos >= lower  and  pos  <=  upper:
+						return i + 1
+		else:
+			if pos < midPoints[0]:
+				return 0
+			elif pos > midPoints[-1]:
+				return len( self )
+			else:
+				for i, ( lower, upper )  in  enumerate( zip( midPoints[:-1], midPoints[1:] ) ):
+					if pos >= lower  and  pos  <=  upper:
+						return i + 1
+
+		raise ValueError, 'Could not determine insert position'
+
+
+
 
 	def _f_removeChild(self, child):
 		entry = self._childToEntry[child]
