@@ -245,9 +245,11 @@ class DTDocument (gtk.DrawingArea, DTBin):
 		localPos = Point2( x, y )
 
 		if self._docDragButton is None:
-			if self._dndSource is not None  and  not self._dndInProgress:
-				self._dndSource._f_evDndBegin()
-				self._dndInProgress = True
+			if self._dndSource is not None:
+				if not self._dndInProgress:
+					self._dndSource._f_evDndBegin()
+					self._dndInProgress = True
+				self._f_evDndMotion( localPos, self._dndButton, state, self._dndSource )
 			else:
 				self._f_evMotion( localPos )
 		else:
@@ -427,6 +429,9 @@ if __name__ == '__main__':
 	def dndBeginCallback(dndSource, localPos, button, state):
 		print 'dndBeginCallback: ', dndSource, localPos, button, state
 
+	def dndMotionCallback(dndSource, dndDest, localPos, button, state):
+		print 'dndMotionCallback: ', dndSource, dndDest, localPos, button, state
+
 	def dndCanDragToCallback(dndSource, dndDest, localPos, button, state):
 		print 'dndCanDragToCallback: ', dndSource, dndDest, localPos, button, state
 		return True
@@ -451,6 +456,7 @@ if __name__ == '__main__':
 
 	for dstLabel in dndDestLabels:
 		dstLabel.addDndDestOp( op )
+		dstLabel.dndMotionCallback = dndMotionCallback
 		dstLabel.dndCanDropFromCallback = dndCanDropFromCallback
 		dstLabel.dndDropFromCallback = dndDropFromCallback
 

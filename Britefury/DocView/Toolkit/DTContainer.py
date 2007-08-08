@@ -53,6 +53,7 @@ class DTContainer (DTWidget):
 		self._pressGrabChildEntry = None
 		self._pressGrabButton = None
 		self._pointerChildEntry = None
+		self._pointerDndChildEntry = None
 		self._backgroundColour = backgroundColour
 
 
@@ -235,6 +236,19 @@ class DTContainer (DTWidget):
 				return self._o_onDndButtonUp( localPos, button, state, dndSource )
 		else:
 			return False
+
+
+	def _f_evDndMotion(self, localPos, dndButton, state, dndSource):
+		widgetId = self._widgetBoxTable.getWidgetAtPoint( localPos )
+		if widgetId != -1:
+			childEntry = self._childIdToEntry[widgetId]
+			dndDest = childEntry.child._f_evDndMotion( childEntry.containerToChildSpace( localPos ), dndButton, state, dndSource )
+			if dndDest is not None:
+				return dndSource
+			else:
+				return self._o_onDndMotion( localPos, dndButton, state, dndSource )
+		else:
+			return None
 
 
 	def _f_evButtonDown(self, localPos, button, state):

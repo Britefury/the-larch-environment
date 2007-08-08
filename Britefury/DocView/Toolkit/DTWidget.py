@@ -34,28 +34,35 @@ class DTWidget (object):
 
 	dndBeginCallback  :   f(dndSource, localpos, button, state)						->		None
 		dndSource: source widget
-		localPos: pointer position at start of drag
+		localPos: pointer position in source widget
+		button: button used to initiate drag
+		state: control key state at drag
+
+	dndMotionCallback  :   f(dndSource, dndDest, localpos, button, state)					->		None
+		dndSource: source widget
+		dndDest: destination widget
+		localPos: pointer position in destination widet
 		button: button used to initiate drag
 		state: control key state at drag
 
 	dndCanDragToCallback  :   f(dndSource, dndDest, localPos, button, state)			->		True or False			All drags will be accepted if not defined
 		dndSource: source widget
 		dndDest: destination widget
-		localPos: pointer position at start of drag
+		localPos: pointer position in source widget
 		button: button used to initiate drag
 		state: control key state at drag
 
 	dndCanDropFromCallback  :   f(dndSource, dndDest, localPos, button, state)		->		True or False			All drops will be accepted if not defined
 		dndSource: source widget
 		dndDest: destination widget
-		localPos: pointer position at drop
+		localPos: pointer position in destination widet
 		button: button used to initiate drag
 		state: control key state at drop
 
 	dndDragToCallback  :   f(dndSource, dndDest, localPos, button, state)				->		Dnd data or None		Can be undefined
 		dndSource: source widget
 		dndDest: destination widget
-		localPos: pointer position at start of drag
+		localPos: pointer position in source widget
 		button: button used to initiate drag
 		state: control key state at drag
 
@@ -63,7 +70,7 @@ class DTWidget (object):
 		dndSource: source widget
 		dndDest: destination widget
 		dndData: result of the dndDragToCallback invoked against the DnD source, or None if dndDragToCallback not set
-		localPos: pointer position at drop
+		localPos: pointer position in destination widet
 		button: button used to initiate drag
 		state: control key state at drop
 	"""
@@ -90,6 +97,7 @@ class DTWidget (object):
 
 
 		self.dndBeginCallback = None
+		self.dndMotionCallback = None
 		self.dndCanDragToCallback = None
 		self.dndCanDropFromCallback = None
 		self.dndDragToCallback = None
@@ -234,6 +242,18 @@ class DTWidget (object):
 		return False
 
 
+	def _o_onDndMotion(self, localPos, dndButton, state, dndSource):
+		for op in self._dndDestOps:
+			if op in dndSource._dndSourceOps:
+				bCanDrag = dndSource._f_dndCanDragTo( self )
+				bCanDrop = self._f_dndCanDropFrom( dndSource, localPos, dndButton, state )
+				if bCanDrag  and  bCanDrop:
+					if self.dndMotionCallback is not None:
+						self.dndMotionCallback( dndSource, self, localPos, dndButton, state )
+					return self
+		return None
+
+
 	def _o_onDndBegin(self, localPos, button, state):
 		if self.dndBeginCallback is not None:
 			self.dndBeginCallback( self, localPos, button, state )
@@ -335,6 +355,11 @@ class DTWidget (object):
 
 	def _f_evDndButtonUp(self, localPos, button, state, dndSource):
 		return self._o_onDndButtonUp( localPos, button, state, dndSource )
+
+	def _f_evDndMotion(self, localPos, dndButton, state, dndSource):
+		return self._o_onDndMotion( localPos, dndButton, state, dndSource )
+
+
 
 	def _f_evDndBegin(self):
 		self._o_onDndBegin( self._dndLocalPos, self._dndButton, self._dndState )
