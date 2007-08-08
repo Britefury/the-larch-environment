@@ -29,10 +29,50 @@ class DTWidgetKeyHandlerInterface (object):
 
 
 class DTWidget (object):
+	"""DTWidget dnd information
+
+
+	dndBeginCallback  :   f(dndSource, localpos, button, state)						->		None
+		dndSource: source widget
+		localPos: pointer position at start of drag
+		button: button used to initiate drag
+		state: control key state at drag
+
+	dndCanDragToCallback  :   f(dndSource, dndDest, localPos, button, state)			->		True or False			All drags will be accepted if not defined
+		dndSource: source widget
+		dndDest: destination widget
+		localPos: pointer position at start of drag
+		button: button used to initiate drag
+		state: control key state at drag
+
+	dndCanDropFromCallback  :   f(dndSource, dndDest, localPos, button, state)		->		True or False			All drops will be accepted if not defined
+		dndSource: source widget
+		dndDest: destination widget
+		localPos: pointer position at drop
+		button: button used to initiate drag
+		state: control key state at drop
+
+	dndDragToCallback  :   f(dndSource, dndDest, localPos, button, state)				->		Dnd data or None		Can be undefined
+		dndSource: source widget
+		dndDest: destination widget
+		localPos: pointer position at start of drag
+		button: button used to initiate drag
+		state: control key state at drag
+
+	dndDropFromCallback  :   f(dndSource, dndDest, dndData, localPos, button, state)	->		None				Can be undefined
+		dndSource: source widget
+		dndDest: destination widget
+		dndData: result of the dndDragToCallback invoked against the DnD source, or None if dndDragToCallback not set
+		localPos: pointer position at drop
+		button: button used to initiate drag
+		state: control key state at drop
+	"""
+
 	def __init__(self):
 		super( DTWidget, self ).__init__()
 
 		self._parent = None
+		self._document = None
 		self._bHasFocus = False
 		self._bFocusGrabbed = False
 		self._realiseContext = None
@@ -43,6 +83,21 @@ class DTWidget (object):
 		self._rootScale = 1.0
 		self._allocation = Vector2()
 		self._requiredSize = Vector2()
+
+		self._dndLocalPos = None
+		self._dndButton = None
+		self._dndState = None
+
+
+		self.dndBeginCallback = None
+		self.dndCanDragToCallback = None
+		self.dndCanDropFromCallback = None
+		self.dndDragToCallback = None
+		self.dndDropFromCallback = None
+
+
+		self._dndSourceOps = []
+		self._dndDestOps = []
 
 
 
@@ -108,11 +163,8 @@ class DTWidget (object):
 
 
 
-	def getRootDocument(self):
-		if self._parent is not None:
-			return self._parent.getRootDocument()
-		else:
-			return None
+	def getDocument(self):
+		return self._document
 
 
 
@@ -133,6 +185,58 @@ class DTWidget (object):
 		self._bFocusGrabbed = False
 
 
+
+	def addDndSourceOp(self, op):
+		if op in self._dndSourceOps:
+			raise ValueError, 'dnd op already in source ops list'
+		self._dndSourceOps.append( op )
+
+	def removeDndSourceOp(self, op):
+		if op not in self._dndSourceOps:
+			raise ValueError, 'dnd op not in source ops list'
+		self._dndSourceOps.remove( op )
+
+
+	def addDndDestOp(self, op):
+		if op in self._dndDestOps:
+			raise ValueError, 'dnd op already in dest ops list'
+		self._dndDestOps.append( op )
+
+	def removeDndSourceOp(self, op):
+		if op not in self._dndDestOps:
+			raise ValueError, 'dnd op not in dest ops list'
+		self._dndDestOps.remove( op )
+
+
+
+
+	def _o_onDndButtonDown(self, localPos, button, state):
+		if len( self._dndSourceOps ) > 0:
+			self._dndLocalPos = localPos
+			self._dndButton = button
+			self._dndState = state
+			return self
+		else:
+			return None
+
+	def _o_onDndButtonUp(self, localPos, button, state, dndSource):
+		self._dndLocalPos = None
+		self._dndButton = None
+		self._dndState = None
+		for op in self._dndDestOps:
+			if op in dndSource._dndSourceOps:
+				bCanDrag = dndSource._f_dndCanDragTo( self )
+				bCanDrop = self._f_dndCanDropFrom( dndSource, localPos, button, state )
+				if bCanDrag  and  bCanDrop:
+					dndData = dndSource._f_dndDragTo( self )
+					self._f_dndDropFrom( dndSource, dndData, localPos, button, state )
+					return True
+		return False
+
+
+	def _o_onDndBegin(self, localPos, button, state):
+		if self.dndBeginCallback is not None:
+			self.dndBeginCallback( self, localPos, button, state )
 
 
 	def _o_onButtonDown(self, localPos, button, state):
@@ -225,6 +329,40 @@ class DTWidget (object):
 
 
 
+
+	def _f_evDndButtonDown(self, localPos, button, state):
+		return self._o_onDndButtonDown( localPos, button, state )
+
+	def _f_evDndButtonUp(self, localPos, button, state, dndSource):
+		return self._o_onDndButtonUp( localPos, button, state, dndSource )
+
+	def _f_evDndBegin(self):
+		self._o_onDndBegin( self._dndLocalPos, self._dndButton, self._dndState )
+
+
+	def _f_dndCanDragTo(self, dndDest):
+		if self.dndCanDragToCallback is not None:
+			return self.dndCanDragToCallback( self, dndDest, self._dndLocalPos, self._dndButton, self._dndState )
+		else:
+			return True
+
+	def _f_dndCanDropFrom(self, dndSource, localPos, button, state):
+		if self.dndCanDropFromCallback is not None:
+			return self.dndCanDropFromCallback( dndSource, self, localPos, button, state )
+		else:
+			return True
+
+	def _f_dndDragTo(self, dndDest):
+		if self.dndDragToCallback is not None:
+			return self.dndDragToCallback( self, dndDest, self._dndLocalPos, self._dndButton, self._dndState )
+		else:
+			return None
+
+	def _f_dndDropFrom(self, dndSource, dndData, localPos, button, state):
+		if self.dndDropFromCallback is not None:
+			return self.dndDropFromCallback( dndSource, self, dndData, localPos, button, state )
+
+
 	def _f_evButtonDown(self, localPos, button, state):
 		return self._o_onButtonDown( localPos, button, state )
 
@@ -309,13 +447,19 @@ class DTWidget (object):
 	def _p_getParent(self):
 		return self._parent
 
-	def _f_setParent(self, parent):
+	def _f_setParent(self, parent, document):
 		self._parent = parent
+		self._f_setDocument( document )
 
 
 	def _f_unparent(self):
 		if self._parent is not None:
 			self._parent._f_removeChild( self )
+		self._docuement = None
+
+
+	def _f_setDocument(self, document):
+		self._document = document
 
 
 
@@ -328,6 +472,7 @@ class DTWidget (object):
 
 
 	parent = property( _p_getParent )
+	document = property( getDocument )
 	allocation = property( getAllocation )
 	sizeRequest = property( getSizeRequest, setSizeRequest )
 

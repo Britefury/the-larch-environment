@@ -93,7 +93,7 @@ class DTContainer (DTWidget):
 
 		child._f_unparent()
 
-		child._f_setParent( self )
+		child._f_setParent( self, self._document )
 
 		if self._realiseContext is not None:
 			child._f_evRealise( self._realiseContext, self._pangoContext )
@@ -107,7 +107,7 @@ class DTContainer (DTWidget):
 		if self._realiseContext is not None:
 			child._f_evUnrealise()
 
-		child._f_setParent( None )
+		child._f_setParent( None, None )
 
 		del self._childToEntry[child]
 
@@ -209,6 +209,32 @@ class DTContainer (DTWidget):
 
 
 
+
+
+	def _f_evDndButtonDown(self, localPos, button, state):
+		widgetId = self._widgetBoxTable.getWidgetAtPoint( localPos )
+		if widgetId != -1:
+			childEntry = self._childIdToEntry[widgetId]
+			dndSource = childEntry.child._f_evDndButtonDown( childEntry.containerToChildSpace( localPos ), button, state )
+			if dndSource is not None:
+				return dndSource
+			else:
+				return self._o_onDndButtonDown( localPos, button, state )
+		else:
+			return None
+
+
+	def _f_evDndButtonUp(self, localPos, button, state, dndSource):
+		widgetId = self._widgetBoxTable.getWidgetAtPoint( localPos )
+		if widgetId != -1:
+			childEntry = self._childIdToEntry[widgetId]
+			bDropped = childEntry.child._f_evDndButtonUp( childEntry.containerToChildSpace( localPos ), button, state, dndSource )
+			if bDropped:
+				return True
+			else:
+				return self._o_onDndButtonUp( localPos, button, state, dndSource )
+		else:
+			return False
 
 
 	def _f_evButtonDown(self, localPos, button, state):
@@ -344,6 +370,16 @@ class DTContainer (DTWidget):
 			context.scale( entry.xform.scale, entry.xform.scale )
 			entry.child._f_draw( context, areaBox * entry.invXform )
 			context.restore()
+
+
+
+	def _f_setDocument(self, document):
+		super( DTContainer, self )._f_setDocument( document )
+
+		for childEntry in self._childEntries:
+			childEntry.child._f_setDocument( document )
+
+
 
 
 	backgroundColour = property( getBackgroundColour, setBackgroundColour )

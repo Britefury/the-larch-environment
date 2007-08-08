@@ -5,6 +5,15 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
+
+"""
+Define LiteralCell and its metaclass
+
+Literal cells are restricted such that they can only contain a literal value.
+Attempting to set the evaluator to anythin except a literal value will result in a TypeError being raised.
+"""
+
+
 from copy import *
 
 import weakref

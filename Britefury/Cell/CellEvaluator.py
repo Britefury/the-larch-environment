@@ -5,6 +5,11 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
+
+"""
+Defines the CellEvaluator interface, and metaclass
+"""
+
 from Britefury.FileIO.IOXml import *
 
 
@@ -15,6 +20,7 @@ class CellEvaluationError (Exception):
 
 
 class CellEvaluatorClass (type):
+	"""CellEvaluator metaclass"""
 	def __init__(cls, clsName, clsBases, clsDict):
 		super( CellEvaluatorClass, cls ).__init__( clsName, clsBases, clsDict )
 
@@ -24,6 +30,12 @@ class CellEvaluatorClass (type):
 
 
 class CellEvaluator (object):
+	"""Cell evaluator
+
+	Calling the evaluate() method computes the value for a cell
+
+	bSerialisable - Determines if instances of this class can be serialised
+	"""
 	__metaclass__ = CellEvaluatorClass
 
 
@@ -31,6 +43,7 @@ class CellEvaluator (object):
 
 
 	def evalute(self):
+		"""Compute the value for a cell"""
 		assert False, 'abstract'
 
 

@@ -33,7 +33,7 @@ class DTPopupDocument (DTDocument):
 
 
 	def popupAtWidget(self, widget, posInWidget, size, popupMode):
-		widgetDocument = widget.getRootDocument()
+		widgetDocument = widget.getDocument()
 		pos = widget.getPointRelativeToDocument( posInWidget )
 		self._popupWindow.popupAtWidget( widgetDocument, int( pos.x ), int( pos.y ), int( math.ceil( size.x ) ), int( math.ceil( size.y ) ), popupMode )
 
