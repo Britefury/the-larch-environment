@@ -45,17 +45,15 @@ class DTWidget (object):
 		button: button used to initiate drag
 		state: control key state at drag
 
-	dndCanDragToCallback  :   f(dndSource, dndDest, localPos, button, state)			->		True or False			All drags will be accepted if not defined
+	dndCanDragToCallback  :   f(dndSource, dndDest, button, state)				->		True or False			All drags will be accepted if not defined
 		dndSource: source widget
 		dndDest: destination widget
-		localPos: pointer position in source widget
 		button: button used to initiate drag
 		state: control key state at drag
 
-	dndCanDropFromCallback  :   f(dndSource, dndDest, localPos, button, state)		->		True or False			All drops will be accepted if not defined
+	dndCanDropFromCallback  :   f(dndSource, dndDest, button, state)			->		True or False			All drops will be accepted if not defined
 		dndSource: source widget
 		dndDest: destination widget
-		localPos: pointer position in destination widet
 		button: button used to initiate drag
 		state: control key state at drop
 
@@ -94,7 +92,6 @@ class DTWidget (object):
 		self._dndLocalPos = None
 		self._dndButton = None
 		self._dndState = None
-
 
 		self.dndBeginCallback = None
 		self.dndMotionCallback = None
@@ -234,7 +231,7 @@ class DTWidget (object):
 		for op in self._dndDestOps:
 			if op in dndSource._dndSourceOps:
 				bCanDrag = dndSource._f_dndCanDragTo( self )
-				bCanDrop = self._f_dndCanDropFrom( dndSource, localPos, button, state )
+				bCanDrop = self._f_dndCanDropFrom( dndSource, button, state )
 				if bCanDrag  and  bCanDrop:
 					dndData = dndSource._f_dndDragTo( self )
 					self._f_dndDropFrom( dndSource, dndData, localPos, button, state )
@@ -242,16 +239,25 @@ class DTWidget (object):
 		return False
 
 
-	def _o_onDndMotion(self, localPos, dndButton, state, dndSource):
-		for op in self._dndDestOps:
-			if op in dndSource._dndSourceOps:
-				bCanDrag = dndSource._f_dndCanDragTo( self )
-				bCanDrop = self._f_dndCanDropFrom( dndSource, localPos, dndButton, state )
-				if bCanDrag  and  bCanDrop:
-					if self.dndMotionCallback is not None:
-						self.dndMotionCallback( dndSource, self, localPos, dndButton, state )
-					return self
-		return None
+	def _o_onDndMotion(self, localPos, dndButton, state, dndSource, dndCache):
+		key = self, state
+		try:
+			bResult = dndCache[key]
+		except KeyError:
+			bResult = False
+			for op in self._dndDestOps:
+				if op in dndSource._dndSourceOps:
+					bCanDrag = dndSource._f_dndCanDragTo( self )
+					bCanDrop = self._f_dndCanDropFrom( dndSource, dndButton, state )
+					bResult = bCanDrag  and  bCanDrop
+			dndCache[key] = bResult
+
+		if bResult:
+			if self.dndMotionCallback is not None:
+				self.dndMotionCallback( dndSource, self, localPos, dndButton, state )
+			return self
+		else:
+			return None
 
 
 	def _o_onDndBegin(self, localPos, button, state):
@@ -356,8 +362,11 @@ class DTWidget (object):
 	def _f_evDndButtonUp(self, localPos, button, state, dndSource):
 		return self._o_onDndButtonUp( localPos, button, state, dndSource )
 
-	def _f_evDndMotion(self, localPos, dndButton, state, dndSource):
-		return self._o_onDndMotion( localPos, dndButton, state, dndSource )
+	def _f_evDndMotion(self, localPos, dndButton, state, dndSource, dndCache):
+		return self._o_onDndMotion( localPos, dndButton, state, dndSource, dndCache )
+
+	def _f_evDndLeave(self):
+		return self._o_onDndLeave()
 
 
 
@@ -367,13 +376,13 @@ class DTWidget (object):
 
 	def _f_dndCanDragTo(self, dndDest):
 		if self.dndCanDragToCallback is not None:
-			return self.dndCanDragToCallback( self, dndDest, self._dndLocalPos, self._dndButton, self._dndState )
+			return self.dndCanDragToCallback( self, dndDest, self._dndButton, self._dndState )
 		else:
 			return True
 
-	def _f_dndCanDropFrom(self, dndSource, localPos, button, state):
+	def _f_dndCanDropFrom(self, dndSource, button, state):
 		if self.dndCanDropFromCallback is not None:
-			return self.dndCanDropFromCallback( dndSource, self, localPos, button, state )
+			return self.dndCanDropFromCallback( dndSource, self, button, state )
 		else:
 			return True
 

@@ -43,6 +43,7 @@ class DTDocument (gtk.DrawingArea, DTBin):
 		self._document = self
 
 		self._dndSource = None
+		self._dndCache = {}
 		self._dndButton = None
 		self._dndInProgress = False
 
@@ -205,6 +206,7 @@ class DTDocument (gtk.DrawingArea, DTBin):
 		if event.state & gtk.gdk.MOD1_MASK  ==  0:
 			if event.type == gtk.gdk.BUTTON_PRESS  and  self._dndSource is None:
 				self._dndSource = self._f_evDndButtonDown( localPos, event.button, state )
+				self._dndCache = {}
 				self._dndButton = event.button
 				self._dndInProgress = False
 
@@ -227,6 +229,7 @@ class DTDocument (gtk.DrawingArea, DTBin):
 			if self._dndSource.document is self:
 				self._f_evDndButtonUp( localPos, event.button, state, self._dndSource )
 			self._dndSource = None
+			self._dndCache = {}
 			self._dndButton = None
 			self._dndInProgress = False
 
@@ -249,7 +252,7 @@ class DTDocument (gtk.DrawingArea, DTBin):
 				if not self._dndInProgress:
 					self._dndSource._f_evDndBegin()
 					self._dndInProgress = True
-				self._f_evDndMotion( localPos, self._dndButton, state, self._dndSource )
+				self._f_evDndMotion( localPos, self._dndButton, state, self._dndSource, self._dndCache )
 			else:
 				self._f_evMotion( localPos )
 		else:
@@ -409,16 +412,17 @@ if __name__ == '__main__':
 	label = MyLabel( 'Hello world' )
 
 
+
+
+
+	# Dnd test
+
 	class DndOp (object):
 		pass
 
 
 	op = DndOp()
 
-
-
-
-	# Dnd test stuff
 
 	dndTitleLabel = DTLabel( '--- Drag and drop test ---' )
 
@@ -432,13 +436,14 @@ if __name__ == '__main__':
 	def dndMotionCallback(dndSource, dndDest, localPos, button, state):
 		print 'dndMotionCallback: ', dndSource, dndDest, localPos, button, state
 
-	def dndCanDragToCallback(dndSource, dndDest, localPos, button, state):
-		print 'dndCanDragToCallback: ', dndSource, dndDest, localPos, button, state
+	def dndCanDragToCallback(dndSource, dndDest, button, state):
+		print 'dndCanDragToCallback: ', dndSource, dndDest, button, state
 		return True
 
-	def dndCanDropFromCallback(dndSource, dndDest, localPos, button, state):
-		print 'dndCanDropFromCallback: ', dndSource, dndDest, localPos, button, state
-		return True
+	def dndCanDropFromCallback(dndSource, dndDest, button, state):
+		print 'dndCanDropFromCallback: ', dndSource, dndDest, button, state
+		#return True
+		return dndSourceLabels.index( dndSource )  ==  dndDestLabels.index( dndDest )
 
 	def dndDragToCallback(dndSource, dndDest, localPos, button, state):
 		print 'dndDragToCallback: ', dndSource, dndDest, localPos, button, state
