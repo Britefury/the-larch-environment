@@ -225,28 +225,28 @@ class DTContainer (DTWidget):
 			return None
 
 
-	def _f_evDndButtonUp(self, localPos, button, state, dndSource):
+	def _f_evDndButtonUp(self, localPos, button, state, dndSource, dndBeginData):
 		widgetId = self._widgetBoxTable.getWidgetAtPoint( localPos )
 		if widgetId != -1:
 			childEntry = self._childIdToEntry[widgetId]
-			bDropped = childEntry.child._f_evDndButtonUp( childEntry.containerToChildSpace( localPos ), button, state, dndSource )
+			bDropped = childEntry.child._f_evDndButtonUp( childEntry.containerToChildSpace( localPos ), button, state, dndSource, dndBeginData )
 			if bDropped:
 				return True
 			else:
-				return self._o_onDndButtonUp( localPos, button, state, dndSource )
+				return self._o_onDndButtonUp( localPos, button, state, dndSource, dndBeginData )
 		else:
 			return False
 
 
-	def _f_evDndMotion(self, localPos, dndButton, state, dndSource, dndCache):
+	def _f_evDndMotion(self, localPos, dndButton, state, dndSource, dndBeginData, dndCache):
 		widgetId = self._widgetBoxTable.getWidgetAtPoint( localPos )
 		if widgetId != -1:
 			childEntry = self._childIdToEntry[widgetId]
-			dndDest = childEntry.child._f_evDndMotion( childEntry.containerToChildSpace( localPos ), dndButton, state, dndSource, dndCache )
+			dndDest = childEntry.child._f_evDndMotion( childEntry.containerToChildSpace( localPos ), dndButton, state, dndSource, dndBeginData, dndCache )
 			if dndDest is not None:
 				return dndDest
 			else:
-				return self._o_onDndMotion( localPos, dndButton, state, dndSource, dndCache )
+				return self._o_onDndMotion( localPos, dndButton, state, dndSource, dndBeginData, dndCache )
 		else:
 			return None
 
