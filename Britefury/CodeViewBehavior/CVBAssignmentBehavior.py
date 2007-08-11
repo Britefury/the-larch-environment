@@ -17,7 +17,7 @@ class CVBAssignmentBehavior (CodeViewBehavior):
 			viewNode._view.refresh()
 			assignCV = viewNode._view.getViewNodeForTreeNode( assignCVT )
 			assignCV.startEditingValue()
-			viewNode._f_commandHistoryThaw()
+		viewNode._f_commandHistoryThaw()
 		return True
 
 

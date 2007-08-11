@@ -57,6 +57,9 @@ class CVBlock (CVBorderNode):
 		self._startCursor = CVCursorStop( view, self )
 		self._endCursor = CVCursorStop( view, self )
 		self._box = DTBox( DTDirection.TOP_TO_BOTTOM, minorDirectionAlignment=DTBox.ALIGN_LEFT, spacing=4.0 )
+		self._box.addDndDestOp( self._cvNodeDndOp )
+		self._box.dndCanDropFromCallback = self._dndCanDropFromCallback
+		self._box.dndDropFromCallback = self._dndDropFromCallback
 		self.widget.child = self._box
 
 
@@ -96,3 +99,19 @@ class CVBlock (CVBorderNode):
 				except ValueError:
 					return 0
 		return 0
+
+
+
+
+	def _dndCanDropFromCallback(self, dndSource, dndDest, dndBeginData, button, state):
+		sourceNode = dndBeginData
+		#return sourceNode.isDescendantOf( self )
+		return sourceNode._parent is self
+
+
+	def _dndDropFromCallback(self, dndSource, dndDest, dndData, localPos, button, state):
+		sourceNode = dndData
+		insertIndex = self._box.getInsertIndex( localPos ) - 1			# Take the start cursor stop point into account
+		self._f_commandHistoryFreeze()
+		self.treeNode.moveStatement( sourceNode.treeNode, insertIndex )
+		self._f_commandHistoryThaw()

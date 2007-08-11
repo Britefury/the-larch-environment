@@ -142,6 +142,14 @@ class CVNode (Sheet, DTWidgetKeyHandlerInterface):
 
 
 
+	def isDescendantOf(self, node):
+		n = self
+		while n is not None:
+			if n is node:
+				return True
+			n = n._parent
+		return False
+
 
 
 	def _o_moveFocus(self, moveFocus):

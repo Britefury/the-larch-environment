@@ -15,13 +15,24 @@ from Britefury.DocView.Toolkit.DTActiveBorder import DTActiveBorder
 
 
 
+class _CVNodeDndOp (object):
+	pass
+
+
+
+
 class CVBorderNode (CVNode):
+	_cvNodeDndOp = _CVNodeDndOp()
+
 	def __init__(self, treeNode, view):
 		super( CVBorderNode, self ).__init__( treeNode, view )
 		self.widget = DTActiveBorder()
 		self.widget.keyHandler = self
 		self.widget.topMargin = self.widget.bottomMargin = 1.0
 		self.widget.contextSignal.connect( self._p_onContext )
+		self.widget.addDndSourceOp( self._cvNodeDndOp )
+		self.widget.dndBeginCallback = self._dndBeginCallback
+		self.widget.dndDragToCallback = self._dndDragToCallback
 		self._pieMenu = self._o_createPieMenu()
 
 
@@ -35,3 +46,12 @@ class CVBorderNode (CVNode):
 
 	def _o_createPieMenu(self):
 		return None
+
+
+
+	def _dndBeginCallback(self, dndSource, localpos, button, state):
+		return self
+
+
+	def _dndDragToCallback(self, dndSource, dndDest, localPos, button, state):
+		return self

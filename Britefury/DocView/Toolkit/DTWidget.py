@@ -29,14 +29,42 @@ class DTWidgetKeyHandlerInterface (object):
 
 
 class DTWidget (object):
-	"""DTWidget dnd information
+	"""DTWidget Drag and drop information
 
 
-	dndBeginCallback  :   f(dndSource, localpos, button, state)						->		Dnd begin data or None
+	To enable drag and drop:
+
+		To allow a widget to be dragged:
+
+			call:
+				widget.addDndSourceOp( operation ) to add a drag and drop operation
+				remove using widget.removeDndSourceOp( operation )
+
+		To allow drops:
+
+			call:
+				widget.addDndDestOp( operation ) to add an operation
+				remove using widget.removeDndDestOp( operation )
+
+
+		Operations should be comparable using ==
+
+		They are some sort of application defined identifier.
+
+		DnD can only happen if the source and destination widgets have at lease ONE operation in common with one another.
+
+		If a widget has no DnD operations defined, its parents/ancestors are checked until a widget that supports DnD is found.
+
+
+
+	To work the DnD, set the foloowing callbacks:
+
+	dndBeginCallback  :   f(dndSource, localpos, button, state)											->		Dnd begin data or None
 		dndSource: source widget
 		localPos: pointer position in source widget
 		button: button used to initiate drag
-		state: control key state at drag
+		state: modifier key state at drag
+	Called when a drag is initiated from a widget.
 
 	dndMotionCallback  :   f(dndSource, dndDest, dndBeginData, localpos, button, state)					->		None
 		dndSource: source widget
@@ -44,29 +72,33 @@ class DTWidget (object):
 		dndBeginData: the result of the dndBeginCallback invoked against the DnD source, or None if dndBeginCallback not set
 		localPos: pointer position in destination widet
 		button: button used to initiate drag
-		state: control key state at drag
+		state: modifier key state at drag
+	Called when the pointer hovers over a potential target.
 
-	dndCanDropFromCallback  :   f(dndSource, dndDest, dndBeginData, button, state)			->		True or False			All drops will be accepted if not defined
+	dndCanDropFromCallback  :   f(dndSource, dndDest, dndBeginData, button, state)						->		True or False			All drops will be accepted if not defined
 		dndSource: source widget
 		dndDest: destination widget
 		dndBeginData: the result of the dndBeginCallback invoked against the DnD source, or None if dndBeginCallback not set
 		button: button used to initiate drag
-		state: control key state at drop
+		state: modifier key state at drop
+	Called to determine if a target will accept a drop from the source.
 
-	dndDragToCallback  :   f(dndSource, dndDest, localPos, button, state)				->		Dnd data or None		Can be undefined
+	dndDragToCallback  :   f(dndSource, dndDest, localPos, button, state)									->		Dnd data or None		Can be undefined
 		dndSource: source widget
 		dndDest: destination widget
 		localPos: pointer position in source widget
 		button: button used to initiate drag
-		state: control key state at drag
+		state: modifier key state at drag
+	Invoked against source to get drag data to send to the destination.
 
-	dndDropFromCallback  :   f(dndSource, dndDest, dndData, localPos, button, state)	->		None				Can be undefined
+	dndDropFromCallback  :   f(dndSource, dndDest, dndData, localPos, button, state)						->		None				Can be undefined
 		dndSource: source widget
 		dndDest: destination widget
 		dndData: result of the dndDragToCallback invoked against the DnD source, or None if dndDragToCallback not set
 		localPos: pointer position in destination widet
 		button: button used to initiate drag
-		state: control key state at drop
+		state: modifier key state at drop
+	Invoked against the destination to send drag data.
 	"""
 
 	def __init__(self):

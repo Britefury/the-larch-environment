@@ -37,6 +37,17 @@ class CVTBlock (CVTNode):
 
 
 
+	def moveStatement(self, statement, index):
+		statenentSource = statement.graphNode.parent
+		if statenentSource in self.graphNode.statements:
+			x = self.graphNode.statements.index( statenentSource )
+			del self.graphNode.statements[x]
+			if x < index:
+				index -= 1
+			self.graphNode.statements.insert( index, statenentSource )
+
+
+
 class CVTRuleBlock (CVTRuleSimple):
 	graphNodeClass = CGBlock
 	cvtNodeClass = CVTBlock

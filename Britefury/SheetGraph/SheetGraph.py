@@ -314,7 +314,7 @@ class SheetGraphNodeSink (SheetGraphNodePin):
 		try:
 			index = self.index( beforeSource )
 		except ValueError:
-			self.append( source ):
+			self.append( source )
 		else:
 			self.insert( index, source )
 
@@ -322,7 +322,7 @@ class SheetGraphNodeSink (SheetGraphNodePin):
 		try:
 			index = self.index( beforeSource )
 		except ValueError:
-			self.append( source ):
+			self.append( source )
 		else:
 			self.insert( index + 1, source )
 
