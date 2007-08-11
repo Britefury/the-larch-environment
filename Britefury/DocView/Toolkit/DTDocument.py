@@ -46,6 +46,7 @@ class DTDocument (gtk.DrawingArea, DTBin):
 		self._dndCache = {}
 		self._dndButton = None
 		self._dndInProgress = False
+		self._dndBeginData = None
 
 
 		self._docOffset = Vector2()
@@ -209,6 +210,7 @@ class DTDocument (gtk.DrawingArea, DTBin):
 				self._dndCache = {}
 				self._dndButton = event.button
 				self._dndInProgress = False
+				self._dndBeginData = None
 
 			if event.type == gtk.gdk.BUTTON_PRESS:
 				self._f_evButtonDown( localPos, event.button, state )
@@ -227,11 +229,13 @@ class DTDocument (gtk.DrawingArea, DTBin):
 		if self._dndSource is not None  and  self._dndInProgress  and  self._dndButton == event.button:
 			# Ensure that @self._dndSource is still part of this document
 			if self._dndSource.document is self:
-				self._f_evDndButtonUp( localPos, event.button, state, self._dndSource )
+				self._f_evDndButtonUp( localPos, event.button, state, self._dndSource, self._dndBeginData )
 			self._dndSource = None
 			self._dndCache = {}
 			self._dndButton = None
 			self._dndInProgress = False
+			self._dndBeginData = None
+			self.window.set_cursor( None )
 
 		if self._docDragButton is None:
 			self._f_evButtonUp( localPos, event.button, state )
@@ -250,9 +254,10 @@ class DTDocument (gtk.DrawingArea, DTBin):
 		if self._docDragButton is None:
 			if self._dndSource is not None:
 				if not self._dndInProgress:
-					self._dndSource._f_evDndBegin()
+					self._dndBeginData = self._dndSource._f_evDndBegin()
 					self._dndInProgress = True
-				self._f_evDndMotion( localPos, self._dndButton, state, self._dndSource, self._dndCache )
+					self.window.set_cursor( gtk.gdk.Cursor( gtk.gdk.HAND2 ) )
+				self._f_evDndMotion( localPos, self._dndButton, state, self._dndSource, self._dndBeginData, self._dndCache )
 			else:
 				self._f_evMotion( localPos )
 		else:
@@ -432,16 +437,13 @@ if __name__ == '__main__':
 
 	def dndBeginCallback(dndSource, localPos, button, state):
 		print 'dndBeginCallback: ', dndSource, localPos, button, state
+		return 123
 
-	def dndMotionCallback(dndSource, dndDest, localPos, button, state):
-		print 'dndMotionCallback: ', dndSource, dndDest, localPos, button, state
+	def dndMotionCallback(dndSource, dndDest, dndBeginData, localPos, button, state):
+		print 'dndMotionCallback: ', dndSource, dndDest, dndBeginData, localPos, button, state
 
-	def dndCanDragToCallback(dndSource, dndDest, button, state):
-		print 'dndCanDragToCallback: ', dndSource, dndDest, button, state
-		return True
-
-	def dndCanDropFromCallback(dndSource, dndDest, button, state):
-		print 'dndCanDropFromCallback: ', dndSource, dndDest, button, state
+	def dndCanDropFromCallback(dndSource, dndDest, dndBeginData, button, state):
+		print 'dndCanDropFromCallback: ', dndSource, dndDest, dndBeginData, button, state
 		#return True
 		return dndSourceLabels.index( dndSource )  ==  dndDestLabels.index( dndDest )
 
@@ -456,7 +458,6 @@ if __name__ == '__main__':
 	for srcLabel in dndSourceLabels:
 		srcLabel.addDndSourceOp( op )
 		srcLabel.dndBeginCallback = dndBeginCallback
-		srcLabel.dndCanDragToCallback = dndCanDragToCallback
 		srcLabel.dndDragToCallback = dndDragToCallback
 
 	for dstLabel in dndDestLabels:

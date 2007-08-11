@@ -310,6 +310,22 @@ class SheetGraphNodeSink (SheetGraphNodePin):
 		self._node._o_onAddInputSource( source )
 		self._node._f_sinkModified( self )
 
+	def insertBefore(self, source, beforeSource):
+		try:
+			index = self.index( beforeSource )
+		except ValueError:
+			self.append( source ):
+		else:
+			self.insert( index, source )
+
+	def insertAfter(self, source, afterSource):
+		try:
+			index = self.index( beforeSource )
+		except ValueError:
+			self.append( source ):
+		else:
+			self.insert( index + 1, source )
+
 	def remove(self, source):
 		assert isinstance( source, SheetGraphNodeSource )
 		assert self._node is not None, 'no node'

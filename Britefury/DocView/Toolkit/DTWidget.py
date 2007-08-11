@@ -32,28 +32,24 @@ class DTWidget (object):
 	"""DTWidget dnd information
 
 
-	dndBeginCallback  :   f(dndSource, localpos, button, state)						->		None
+	dndBeginCallback  :   f(dndSource, localpos, button, state)						->		Dnd begin data or None
 		dndSource: source widget
 		localPos: pointer position in source widget
 		button: button used to initiate drag
 		state: control key state at drag
 
-	dndMotionCallback  :   f(dndSource, dndDest, localpos, button, state)					->		None
+	dndMotionCallback  :   f(dndSource, dndDest, dndBeginData, localpos, button, state)					->		None
 		dndSource: source widget
 		dndDest: destination widget
+		dndBeginData: the result of the dndBeginCallback invoked against the DnD source, or None if dndBeginCallback not set
 		localPos: pointer position in destination widet
 		button: button used to initiate drag
 		state: control key state at drag
 
-	dndCanDragToCallback  :   f(dndSource, dndDest, button, state)				->		True or False			All drags will be accepted if not defined
+	dndCanDropFromCallback  :   f(dndSource, dndDest, dndBeginData, button, state)			->		True or False			All drops will be accepted if not defined
 		dndSource: source widget
 		dndDest: destination widget
-		button: button used to initiate drag
-		state: control key state at drag
-
-	dndCanDropFromCallback  :   f(dndSource, dndDest, button, state)			->		True or False			All drops will be accepted if not defined
-		dndSource: source widget
-		dndDest: destination widget
+		dndBeginData: the result of the dndBeginCallback invoked against the DnD source, or None if dndBeginCallback not set
 		button: button used to initiate drag
 		state: control key state at drop
 
@@ -95,7 +91,6 @@ class DTWidget (object):
 
 		self.dndBeginCallback = None
 		self.dndMotionCallback = None
-		self.dndCanDragToCallback = None
 		self.dndCanDropFromCallback = None
 		self.dndDragToCallback = None
 		self.dndDropFromCallback = None
@@ -224,37 +219,34 @@ class DTWidget (object):
 		else:
 			return None
 
-	def _o_onDndButtonUp(self, localPos, button, state, dndSource):
+	def _o_onDndButtonUp(self, localPos, button, state, dndSource, dndBeginData):
 		self._dndLocalPos = None
 		self._dndButton = None
 		self._dndState = None
 		for op in self._dndDestOps:
 			if op in dndSource._dndSourceOps:
-				bCanDrag = dndSource._f_dndCanDragTo( self )
-				bCanDrop = self._f_dndCanDropFrom( dndSource, button, state )
-				if bCanDrag  and  bCanDrop:
+				bCanDrop = self._f_dndCanDropFrom( dndSource, dndBeginData, button, state )
+				if bCanDrop:
 					dndData = dndSource._f_dndDragTo( self )
 					self._f_dndDropFrom( dndSource, dndData, localPos, button, state )
 					return True
 		return False
 
 
-	def _o_onDndMotion(self, localPos, dndButton, state, dndSource, dndCache):
+	def _o_onDndMotion(self, localPos, dndButton, state, dndSource, dndBeginData, dndCache):
 		key = self, state
 		try:
-			bResult = dndCache[key]
+			bCanDrop = dndCache[key]
 		except KeyError:
-			bResult = False
+			bCanDrop = False
 			for op in self._dndDestOps:
 				if op in dndSource._dndSourceOps:
-					bCanDrag = dndSource._f_dndCanDragTo( self )
-					bCanDrop = self._f_dndCanDropFrom( dndSource, dndButton, state )
-					bResult = bCanDrag  and  bCanDrop
-			dndCache[key] = bResult
+					bCanDrop = self._f_dndCanDropFrom( dndSource, dndBeginData, dndButton, state )
+			dndCache[key] = bCanDrop
 
-		if bResult:
+		if bCanDrop:
 			if self.dndMotionCallback is not None:
-				self.dndMotionCallback( dndSource, self, localPos, dndButton, state )
+				self.dndMotionCallback( dndSource, self, dndBeginData, localPos, dndButton, state )
 			return self
 		else:
 			return None
@@ -262,7 +254,9 @@ class DTWidget (object):
 
 	def _o_onDndBegin(self, localPos, button, state):
 		if self.dndBeginCallback is not None:
-			self.dndBeginCallback( self, localPos, button, state )
+			return self.dndBeginCallback( self, localPos, button, state )
+		else:
+			return None
 
 
 	def _o_onButtonDown(self, localPos, button, state):
@@ -359,11 +353,11 @@ class DTWidget (object):
 	def _f_evDndButtonDown(self, localPos, button, state):
 		return self._o_onDndButtonDown( localPos, button, state )
 
-	def _f_evDndButtonUp(self, localPos, button, state, dndSource):
-		return self._o_onDndButtonUp( localPos, button, state, dndSource )
+	def _f_evDndButtonUp(self, localPos, button, state, dndSource, dndBeginData):
+		return self._o_onDndButtonUp( localPos, button, state, dndSource, dndBeginData )
 
-	def _f_evDndMotion(self, localPos, dndButton, state, dndSource, dndCache):
-		return self._o_onDndMotion( localPos, dndButton, state, dndSource, dndCache )
+	def _f_evDndMotion(self, localPos, dndButton, state, dndSource, dndBeginData, dndCache):
+		return self._o_onDndMotion( localPos, dndButton, state, dndSource, dndBeginData, dndCache )
 
 	def _f_evDndLeave(self):
 		return self._o_onDndLeave()
@@ -371,18 +365,12 @@ class DTWidget (object):
 
 
 	def _f_evDndBegin(self):
-		self._o_onDndBegin( self._dndLocalPos, self._dndButton, self._dndState )
+		return self._o_onDndBegin( self._dndLocalPos, self._dndButton, self._dndState )
 
 
-	def _f_dndCanDragTo(self, dndDest):
-		if self.dndCanDragToCallback is not None:
-			return self.dndCanDragToCallback( self, dndDest, self._dndButton, self._dndState )
-		else:
-			return True
-
-	def _f_dndCanDropFrom(self, dndSource, button, state):
+	def _f_dndCanDropFrom(self, dndSource, dndBeginData, button, state):
 		if self.dndCanDropFromCallback is not None:
-			return self.dndCanDropFromCallback( dndSource, self, button, state )
+			return self.dndCanDropFromCallback( dndSource, self, dndBeginData, button, state )
 		else:
 			return True
 
