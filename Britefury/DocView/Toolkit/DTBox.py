@@ -169,7 +169,7 @@ class DTBox (DTContainer):
 		self._o_queueResize()
 
 
-	def getInsertPosition(self, localPos):
+	def getInsertIndex(self, localPos):
 		"""Return the index at which an item could be inserted.
 		localPos is checked against the contents of the box in order to determine the insert index"""
 
