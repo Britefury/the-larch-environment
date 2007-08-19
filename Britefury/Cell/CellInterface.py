@@ -152,6 +152,12 @@ class CellInterface (object):
 				dep._o_changed()
 
 
+
+	def getDependents(self):
+		return self._dependents.keys()
+
+
+
 	bValid = property( isValid, None )
 
 	evaluator = property( getEvaluator, setEvaluator )
@@ -160,3 +166,5 @@ class CellInterface (object):
 
 	value = property( getValue )
 	immutableValue = property( getImmutableValue )
+
+	dependents = property( getDependents )

@@ -13,7 +13,7 @@ from Britefury.Math.Math import Colour3f
 
 from Britefury.CodeView.CVNode import *
 
-from Britefury.DocView.Toolkit.DTActiveBorder import DTActiveBorder
+from Britefury.DocPresent.Toolkit.DTActiveBorder import DTActiveBorder
 
 
 

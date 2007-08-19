@@ -23,7 +23,7 @@ from Britefury.CommandHistory.CommandHistory import CommandHistory
 
 from Britefury.SheetGraph.SheetGraph import *
 
-from Britefury.DocView.Toolkit.DTDocument import DTDocument
+from Britefury.DocPresent.Toolkit.DTDocument import DTDocument
 
 from Britefury.CodeGraph.CGModule import CGModule
 from Britefury.CodeGraph.CGBlock import CGBlock

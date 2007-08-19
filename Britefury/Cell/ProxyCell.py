@@ -668,7 +668,7 @@ if __name__ == '__main__':
 			self.assert_( pCell.value == 1 )
 			self.assert_( fCell.value == 5 )
 
-			self.assert_( fCell._dependencies.keys() == [ pCell ] )
+			self.assert_( fCell.dependencies == [ pCell ] )
 
 			pCellTarget.literalValue = cell2
 

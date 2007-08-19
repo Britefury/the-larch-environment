@@ -18,10 +18,10 @@ from Britefury.CodeViewTree.CVTImport import CVTImport
 
 from Britefury.CodeView.CVStatement import *
 
-from Britefury.DocView.Toolkit.DTBox import DTBox
-from Britefury.DocView.Toolkit.DTLabel import DTLabel
-from Britefury.DocView.Toolkit.DTDirection import DTDirection
-from Britefury.DocView.CellEdit.DVCStringCellEditEntryLabel import DVCStringCellEditEntryLabel
+from Britefury.DocPresent.Toolkit.DTBox import DTBox
+from Britefury.DocPresent.Toolkit.DTLabel import DTLabel
+from Britefury.DocPresent.Toolkit.DTDirection import DTDirection
+from Britefury.DocPresent.CellEdit.DPCStringCellEditEntryLabel import DPCStringCellEditEntryLabel
 
 
 
@@ -34,7 +34,7 @@ class CVImport (CVStatement):
 
 	@FunctionRefField
 	def moduleNameWidget(self):
-		entry = DVCStringCellEditEntryLabel( regexp=RegExpStrings.identifier )
+		entry = DPCStringCellEditEntryLabel( regexp=RegExpStrings.identifier )
 		entry.entry.textColour = Colour3f( 0.0, 0.0, 0.0 )
 		entry.entry.font = 'Sans bold 11'
 		entry.keyHandler = self

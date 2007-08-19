@@ -8,5 +8,5 @@
 
 def abstractmethod(method):
 	def abstract(self, *args, **kwargs):
-		raise TypeError, 'Method %s.%s is abstract'  %  ( type(self), f.__name__ )
+		raise TypeError, 'Method %s.%s is abstract'  %  ( type(self), method.__name__ )
 	return abstract

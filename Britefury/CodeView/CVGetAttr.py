@@ -21,11 +21,11 @@ from Britefury.CodeView.MoveFocus import *
 
 from Britefury.CodeViewBehavior.CVBWrapInAssignmentBehavior import *
 
-from Britefury.DocView.Toolkit.DTWrappedLine import DTWrappedLine
-from Britefury.DocView.Toolkit.DTBox import DTBox
-from Britefury.DocView.Toolkit.DTDirection import DTDirection
-from Britefury.DocView.Toolkit.DTLabel import DTLabel
-from Britefury.DocView.CellEdit.DVCStringCellEditEntryLabel import DVCStringCellEditEntryLabel
+from Britefury.DocPresent.Toolkit.DTWrappedLine import DTWrappedLine
+from Britefury.DocPresent.Toolkit.DTBox import DTBox
+from Britefury.DocPresent.Toolkit.DTDirection import DTDirection
+from Britefury.DocPresent.Toolkit.DTLabel import DTLabel
+from Britefury.DocPresent.CellEdit.DPCStringCellEditEntryLabel import DPCStringCellEditEntryLabel
 
 
 

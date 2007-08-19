@@ -20,9 +20,9 @@ from Britefury.CodeView.CVCursorStop import *
 from Britefury.CodeViewBehavior.CVBStatementListBehavior import *
 from Britefury.CodeViewBehavior.CVBCreateExpressionBehavior import *
 
-from Britefury.DocView.Toolkit.DTBox import DTBox
-from Britefury.DocView.Toolkit.DTLabel import DTLabel
-from Britefury.DocView.Toolkit.DTDirection import DTDirection
+from Britefury.DocPresent.Toolkit.DTBox import DTBox
+from Britefury.DocPresent.Toolkit.DTLabel import DTLabel
+from Britefury.DocPresent.Toolkit.DTDirection import DTDirection
 
 
 
