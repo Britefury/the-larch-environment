@@ -18,10 +18,10 @@ from Britefury.CodeViewTree.CVTComment import CVTComment
 
 from Britefury.CodeView.CVStatement import *
 
-from Britefury.DocView.Toolkit.DTBox import DTBox
-from Britefury.DocView.Toolkit.DTLabel import DTLabel
-from Britefury.DocView.Toolkit.DTDirection import DTDirection
-from Britefury.DocView.CellEdit.DVCStringCellEditMultilineLabel import DVCStringCellEditMultilineLabel
+from Britefury.DocPresent.Toolkit.DTBox import DTBox
+from Britefury.DocPresent.Toolkit.DTLabel import DTLabel
+from Britefury.DocPresent.Toolkit.DTDirection import DTDirection
+from Britefury.DocPresent.CellEdit.DPCStringCellEditMultilineLabel import DPCStringCellEditMultilineLabel
 
 
 
@@ -38,7 +38,7 @@ class CVComment (CVStatement):
 
 	@FunctionRefField
 	def textWidget(self):
-		entry = DVCStringCellEditMultilineLabel( bMarkup=True )
+		entry = DPCStringCellEditMultilineLabel( bMarkup=True )
 		entry.attachCell( self.treeNode.cells.text )
 		entry.finishSignal.connect( self._p_onEntryFinish )
 		return entry.entry

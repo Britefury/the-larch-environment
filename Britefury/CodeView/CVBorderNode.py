@@ -11,7 +11,7 @@ import gtk
 
 from Britefury.CodeView.CVNode import *
 
-from Britefury.DocView.Toolkit.DTActiveBorder import DTActiveBorder
+from Britefury.DocPresent.Toolkit.DTActiveBorder import DTActiveBorder
 
 
 

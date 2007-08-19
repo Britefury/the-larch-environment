@@ -18,11 +18,11 @@ from Britefury.CodeViewTree.CVTElseBlock import CVTElseBlock
 
 from Britefury.CodeView.CVBorderNode import *
 
-from Britefury.DocView.Toolkit.DTBox import DTBox
-from Britefury.DocView.Toolkit.DTLabel import DTLabel
-from Britefury.DocView.Toolkit.DTBorder import DTBorder
-from Britefury.DocView.Toolkit.DTDirection import DTDirection
-from Britefury.DocView.CellEdit.DVCStringCellEditEntryLabel import DVCStringCellEditEntryLabel
+from Britefury.DocPresent.Toolkit.DTBox import DTBox
+from Britefury.DocPresent.Toolkit.DTLabel import DTLabel
+from Britefury.DocPresent.Toolkit.DTBorder import DTBorder
+from Britefury.DocPresent.Toolkit.DTDirection import DTDirection
+from Britefury.DocPresent.CellEdit.DPCStringCellEditEntryLabel import DPCStringCellEditEntryLabel
 
 
 

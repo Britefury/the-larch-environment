@@ -8,6 +8,7 @@
 from copy import *
 
 import weakref
+import gc
 
 from Britefury.Util.SignalSlot import ClassSignal
 
@@ -140,7 +141,7 @@ class Cell (CellInterface):
 			# Add @self to the global dependency list if it exists; this ensures that any cell that
 			# is recomputing its value will know that the @value of self is required
 			if CellInterface._cellDependencies is not None:
-				CellInterface._cellDependencies[self] = 0
+				CellInterface._cellDependencies[self] = None
 
 			if self._bRefreshRequired != False:
 				if isinstance( self._evaluator, CellEvaluator ):
@@ -197,6 +198,21 @@ class Cell (CellInterface):
 			raise
 
 		self._cycleLock = False
+
+
+
+	def dependsOn(self, cell):
+		if self._dependencies is None:
+			return False
+		else:
+			return cell in self._dependencies
+
+
+	def getDependencies(self):
+		if self._dependencies is None:
+			return []
+		else:
+			return self._dependencies.keys()
 
 
 
@@ -270,6 +286,8 @@ class Cell (CellInterface):
 
 	value = property( getValue )
 	immutableValue = property( getImmutableValue )
+
+	dependencies = property( getDependencies )
 
 
 
@@ -357,287 +375,311 @@ class CellRefCell (RefCell):
 
 
 
+import unittest
+
+
+class _TestCellValue (object):
+	def __init__(self, x):
+		self.x = x
+
+
+class _TestCell (Cell):
+	valueClass = _TestCellValue
+	bAllowNone = False
+
+
+class TestCase_Cell (unittest.TestCase):
+	def setUp(self):
+		self._sigs = {}
+
+	def tearDown(self):
+		self._sigs = {}
+
+	def received(self, name):
+		return self._sigs.get( name, 0 )
+
+	def makeListener(self, name):
+		def listener(*args, **kwargs):
+			self._sigs[name] = self._sigs.get( name, 0 ) + 1
+		return listener
+
+
+	def testValidity(self):
+		cell = IntCell( 1 )
+		self.assert_( cell.isValid() )
+
+
+	def testSimpleValue(self):
+		cell = IntCell( 1 )
+
+		self.assert_( cell.value == 1 )
+		self.assert_( cell.immutableValue == 1 )
+		self.assert_( cell._evaluator == 1 )
+
+		cell.literalValue = 20
+
+		self.assert_( cell.value == 20 )
+		self.assert_( cell.immutableValue == 20 )
+		self.assert_( cell._evaluator == 20 )
+
+
+	def testMutable(self):
+		cell = _TestCell( _TestCellValue( 1 ) )
+
+		self.assert_( cell.value.x == 1 )
+		self.assert_( cell.immutableValue.x == 1 )
+		self.assert_( cell.value is not cell.immutableValue )
+
+		cell.literalValue = _TestCellValue( 20 )
+
+		self.assert_( cell.value.x == 20 )
+		self.assert_( cell.immutableValue.x == 20 )
+		self.assert_( cell.value is not cell.immutableValue )
+
+		cell.value.x = 50
+
+		self.assert_( cell.value.x == 20 )
+		self.assert_( cell.immutableValue.x == 20 )
+
+		cell.value.x = 50
+
+		self.assert_( cell.value.x == 20 )
+		self.assert_( cell.immutableValue.x == 20 )
+
+
+	def testLiteral(self):
+		cell = IntCell( 1 )
+
+		self.assert_( cell._evaluator == 1 )
+
+		cell.literalValue = 20
+
+		self.assert_( cell._evaluator == 20 )
+
+
+	def testEvaluatorSignal(self):
+		self.assert_( self.received( 'evaluator' ) == 0 )
+
+		cell = IntCell( 1 )
+		cell.evaluatorSignal.connect( self.makeListener( 'evaluator' ) )
+		cell.literalValue = 20
+		self.assert_( self.received( 'evaluator' ) == 1 )
+
+
+	def testChangedSignal(self):
+		self.assert_( self.received( 'changed' ) == 0 )
+
+		cell = IntCell( 1 )
+		cell.changedSignal.connect( self.makeListener( 'changed' ) )
+		self.assert_( cell.value == 1 )
+		cell.literalValue = 20
+		self.assert_( self.received( 'changed' ) == 1 )
+
+
+	def testFunction(self):
+		def f():
+			return 20
+		cell = IntCell( 1 )
+		cell.function = f
+
+		self.assert_( cell.value == 20 )
+		self.assert_( cell._evaluator._function is f )
+
+
+	def testCache(self):
+		callCount = [ 0 ]
+
+		def f():
+			callCount[0] += 1
+			return cell1.value * 3
+
+		cell1 = IntCell( 1 )
+		cell2 = IntCell( 0 )
+		cell2.function = f
+
+		self.assert_( callCount[0] == 0 )
+		self.assert_( cell1.value == 1 )
+		self.assert_( cell2.value == 3 )
+		self.assert_( callCount[0] == 1 )
+		self.assert_( cell2.value == 3 )
+		self.assert_( callCount[0] == 1 )
+		cell1.literalValue = 12
+		self.assert_( cell2.value == 36 )
+		self.assert_( callCount[0] == 2 )
+		self.assert_( cell2.value == 36 )
+		self.assert_( callCount[0] == 2 )
+
+
+
+	def testChangedSignalWithFunctions(self):
+		self.assert_( self.received( 'changed' ) == 0 )
+
+		def f():
+			return cell1.value * 3
+
+		def g():
+			return cell2.value * 2
+
+		cell1 = IntCell( 1 )
+		cell2 = IntCell( 0 )
+		cell3 = IntCell( 0 )
+		cell2.function = f
+		cell3.function = g
+		cell3.changedSignal.connect( self.makeListener( 'changed' ) )
+
+		self.assert_( cell1.value == 1 )
+		self.assert_( cell2.value == 3 )
+		self.assert_( cell3.value == 6 )
+		self.assert_( self.received( 'changed' ) == 0 )
+		cell1.literalValue = 12
+		self.assert_( cell1.value == 12 )
+		self.assert_( cell2.value == 36 )
+		self.assert_( cell3.value == 72 )
+		self.assert_( self.received( 'changed' ) == 1 )
+		cell3.function = f
+		self.assert_( cell1.value == 12 )
+		self.assert_( cell2.value == 36 )
+		self.assert_( cell3.value == 36 )
+		self.assert_( self.received( 'changed' ) == 2 )
+
+
+
+
+	def testDeps(self):
+		cell1 = IntCell( 1 )
+		cell2 = IntCell( 2 )
+		cellB = IntCell( 0 )
+
+
+		def f():
+			return cell1.value * 3
+
+		def g():
+			return cell2.value * 4
+
+		cellB.function = f
+		self.assert_( cellB._evaluator._function is f )
+
+		self.assert_( cell1.value == 1 )
+		self.assert_( cellB.value == 3 )
+		self.assert_( cellB.dependencies ==  [ cell1 ] )
+		self.assert_( cell1.dependents == [ cellB ] )
+		self.assert_( cell2.dependents == [] )
+
+		cell1.literalValue = 7
+
+		self.assert_( cell1.value == 7 )
+		self.assert_( cellB.value == 21 )
+		self.assert_( cellB.value == 21 )
+		self.assert_( cellB.dependencies == [ cell1 ] )
+		self.assert_( cell1.dependents == [ cellB ] )
+		self.assert_( cell2.dependents == [] )
+
+		cellB.function = g
+
+		self.assert_( cellB.value == 8 )
+		cell2.literalValue = 12
+		self.assert_( cellB.value == 48 )
+		cell1.literalValue = 5
+		self.assert_( cellB.value == 48 )
+		self.assert_( cellB.dependencies == [ cell2 ] )
+		self.assert_( cell1.dependents == [] )
+		self.assert_( cell2.dependents == [ cellB ] )
+
+
+
+		cell2.function = f
+
+		self.assert_( cell1.value == 5 )
+		self.assert_( cell2.value == 15 )
+		self.assert_( cellB.value == 60 )
+		self.assert_( cellB.dependencies == [ cell2 ] )
+		self.assert_( cell2.dependencies == [ cell1 ] )
+		self.assert_( cell1.dependents == [ cell2 ] )
+		self.assert_( cell2.dependents == [ cellB ] )
+		cell1.literalValue = 3
+		self.assert_( cell1.value == 3 )
+		self.assert_( cell2.value == 9 )
+		self.assert_( cellB.value == 36 )
+		self.assert_( cellB.dependencies == [ cell2 ] )
+		self.assert_( cell2.dependencies == [ cell1 ] )
+		self.assert_( cell1.dependents == [ cell2 ] )
+		self.assert_( cell2.dependents == [ cellB ] )
+
+
+	def testXml(self):
+		cell1 = IntCell( 20 )
+
+		cell2 = IntCell( 1 )
+
+		docOut = OutputXmlDocument()
+		docOut.getContentNode()  <<  cell1
+		xml = docOut.writeString()
+
+		docIn = InputXmlDocument()
+		docIn.parse( xml )
+
+		docIn.getContentNode()  >>  cell2
+
+		self.assert_( cell2.value == 20 )
+
+		docOut2 = OutputXmlDocument()
+		docOut2.getContentNode()  <<  cell2
+		xml2 = docOut2.writeString()
+
+		self.assert_( xml == xml2 )
+
+
+	def testCopy(self):
+		cell1 = IntCell( 20 )
+
+		self.assert_( cell1.value == 20 )
+
+		cell2 = copy( cell1 )
+
+		self.assert_( cell2.value == 20 )
+
+
+
+	def testCopyFrom(self):
+		cell1 = IntCell( 20 )
+		cell2 = IntCell( 30 )
+
+		self.assert_( cell1.value == 20 )
+		self.assert_( cell2.value == 30 )
+
+		cell2.copyFrom( cell1 )
+
+		self.assert_( cell2.value == 20 )
+
+
+
+	def testGC(self):
+		cell1 = IntCell( 13 )
+		cell2 = Cell( 1 )
+
+
+		def c2f():
+			return cell1.value * 20
+
+		cell2.function = c2f
+
+
+		self.assert_( cell1.value == 13 )
+		self.assert_( cell2.value == 260 )
+		self.assert_( cell2.dependencies == [ cell1 ] )
+		self.assert_( cell1.dependents == [ cell2 ] )
+
+		del cell2
+
+		gc.collect()
+
+		self.assert_( cell1.dependents == [] )
+
+
+
+
 if __name__ == '__main__':
-	import unittest
-
-
-	class CellValue (object):
-		def __init__(self, x):
-			self.x = x
-
-
-	class TestCell (Cell):
-		valueClass = CellValue
-		bAllowNone = False
-
-
-	class CellTest (unittest.TestCase):
-		def setUp(self):
-			self._sigs = {}
-
-		def tearDown(self):
-			self._sigs = {}
-
-		def received(self, name):
-			return self._sigs.get( name, 0 )
-
-		def makeListener(self, name):
-			def listener(*args, **kwargs):
-				self._sigs[name] = self._sigs.get( name, 0 ) + 1
-			return listener
-
-
-		def testValidity(self):
-			cell = IntCell( 1 )
-			self.assert_( cell.isValid() )
-
-
-		def testSimpleValue(self):
-			cell = IntCell( 1 )
-
-			self.assert_( cell.value == 1 )
-			self.assert_( cell.immutableValue == 1 )
-			self.assert_( cell._evaluator == 1 )
-
-			cell.literalValue = 20
-
-			self.assert_( cell.value == 20 )
-			self.assert_( cell.immutableValue == 20 )
-			self.assert_( cell._evaluator == 20 )
-
-
-		def testMutable(self):
-			cell = TestCell( CellValue( 1 ) )
-
-			self.assert_( cell.value.x == 1 )
-			self.assert_( cell.immutableValue.x == 1 )
-			self.assert_( cell.value is not cell.immutableValue )
-
-			cell.literalValue = CellValue( 20 )
-
-			self.assert_( cell.value.x == 20 )
-			self.assert_( cell.immutableValue.x == 20 )
-			self.assert_( cell.value is not cell.immutableValue )
-
-			cell.value.x = 50
-
-			self.assert_( cell.value.x == 20 )
-			self.assert_( cell.immutableValue.x == 20 )
-
-			cell.value.x = 50
-
-			self.assert_( cell.value.x == 20 )
-			self.assert_( cell.immutableValue.x == 20 )
-
-
-		def testLiteral(self):
-			cell = IntCell( 1 )
-
-			self.assert_( cell._evaluator == 1 )
-
-			cell.literalValue = 20
-
-			self.assert_( cell._evaluator == 20 )
-
-
-		def testEvaluatorSignal(self):
-			self.assert_( self.received( 'evaluator' ) == 0 )
-
-			cell = IntCell( 1 )
-			cell.evaluatorSignal.connect( self.makeListener( 'evaluator' ) )
-			cell.literalValue = 20
-			self.assert_( self.received( 'evaluator' ) == 1 )
-
-
-		def testChangedSignal(self):
-			self.assert_( self.received( 'changed' ) == 0 )
-
-			cell = IntCell( 1 )
-			cell.changedSignal.connect( self.makeListener( 'changed' ) )
-			self.assert_( cell.value == 1 )
-			cell.literalValue = 20
-			self.assert_( self.received( 'changed' ) == 1 )
-
-
-		def testFunction(self):
-			def f():
-				return 20
-			cell = IntCell( 1 )
-			cell.function = f
-
-			self.assert_( cell.value == 20 )
-			self.assert_( cell._evaluator._function is f )
-
-
-		def testCache(self):
-			callCount = [ 0 ]
-
-			def f():
-				callCount[0] += 1
-				return cell1.value * 3
-
-			cell1 = IntCell( 1 )
-			cell2 = IntCell( 0 )
-			cell2.function = f
-
-			self.assert_( callCount[0] == 0 )
-			self.assert_( cell1.value == 1 )
-			self.assert_( cell2.value == 3 )
-			self.assert_( callCount[0] == 1 )
-			self.assert_( cell2.value == 3 )
-			self.assert_( callCount[0] == 1 )
-			cell1.literalValue = 12
-			self.assert_( cell2.value == 36 )
-			self.assert_( callCount[0] == 2 )
-			self.assert_( cell2.value == 36 )
-			self.assert_( callCount[0] == 2 )
-
-
-
-		def testChangedSignalWithFunctions(self):
-			self.assert_( self.received( 'changed' ) == 0 )
-
-			def f():
-				return cell1.value * 3
-
-			def g():
-				return cell2.value * 2
-
-			cell1 = IntCell( 1 )
-			cell2 = IntCell( 0 )
-			cell3 = IntCell( 0 )
-			cell2.function = f
-			cell3.function = g
-			cell3.changedSignal.connect( self.makeListener( 'changed' ) )
-
-			self.assert_( cell1.value == 1 )
-			self.assert_( cell2.value == 3 )
-			self.assert_( cell3.value == 6 )
-			self.assert_( self.received( 'changed' ) == 0 )
-			cell1.literalValue = 12
-			self.assert_( cell1.value == 12 )
-			self.assert_( cell2.value == 36 )
-			self.assert_( cell3.value == 72 )
-			self.assert_( self.received( 'changed' ) == 1 )
-			cell3.function = f
-			self.assert_( cell1.value == 12 )
-			self.assert_( cell2.value == 36 )
-			self.assert_( cell3.value == 36 )
-			self.assert_( self.received( 'changed' ) == 2 )
-
-
-
-
-		def testDeps(self):
-			cell1 = IntCell( 1 )
-			cell2 = IntCell( 2 )
-			cellB = IntCell( 0 )
-
-
-			def f():
-				return cell1.value * 3
-
-			def g():
-				return cell2.value * 4
-
-			cellB.function = f
-			self.assert_( cellB._evaluator._function is f )
-
-			self.assert_( cell1.value == 1 )
-			self.assert_( cellB.value == 3 )
-			self.assert_( cellB._dependencies.keys() ==  [ cell1 ] )
-			self.assert_( cell1._dependents.keys() == [ cellB ] )
-			self.assert_( cell2._dependents.keys() == [] )
-
-			cell1.literalValue = 7
-
-			self.assert_( cell1.value == 7 )
-			self.assert_( cellB.value == 21 )
-			self.assert_( cellB.value == 21 )
-			self.assert_( cellB._dependencies.keys() == [ cell1 ] )
-			self.assert_( cell1._dependents.keys() == [ cellB ] )
-			self.assert_( cell2._dependents.keys() == [] )
-
-			cellB.function = g
-
-			self.assert_( cellB.value == 8 )
-			cell2.literalValue = 12
-			self.assert_( cellB.value == 48 )
-			cell1.literalValue = 5
-			self.assert_( cellB.value == 48 )
-			self.assert_( cellB._dependencies.keys() == [ cell2 ] )
-			self.assert_( cell1._dependents.keys() == [] )
-			self.assert_( cell2._dependents.keys() == [ cellB ] )
-
-
-
-			cell2.function = f
-
-			self.assert_( cell1.value == 5 )
-			self.assert_( cell2.value == 15 )
-			self.assert_( cellB.value == 60 )
-			self.assert_( cellB._dependencies.keys() == [ cell2 ] )
-			self.assert_( cell2._dependencies.keys() == [ cell1 ] )
-			self.assert_( cell1._dependents.keys() == [ cell2 ] )
-			self.assert_( cell2._dependents.keys() == [ cellB ] )
-			cell1.literalValue = 3
-			self.assert_( cell1.value == 3 )
-			self.assert_( cell2.value == 9 )
-			self.assert_( cellB.value == 36 )
-			self.assert_( cellB._dependencies.keys() == [ cell2 ] )
-			self.assert_( cell2._dependencies.keys() == [ cell1 ] )
-			self.assert_( cell1._dependents.keys() == [ cell2 ] )
-			self.assert_( cell2._dependents.keys() == [ cellB ] )
-
-
-		def testXml(self):
-			cell1 = IntCell( 20 )
-
-			cell2 = IntCell( 1 )
-
-			docOut = OutputXmlDocument()
-			docOut.getContentNode()  <<  cell1
-			xml = docOut.writeString()
-
-			docIn = InputXmlDocument()
-			docIn.parse( xml )
-
-			docIn.getContentNode()  >>  cell2
-
-			self.assert_( cell2.value == 20 )
-
-			docOut2 = OutputXmlDocument()
-			docOut2.getContentNode()  <<  cell2
-			xml2 = docOut2.writeString()
-
-			self.assert_( xml == xml2 )
-
-
-		def testCopy(self):
-			cell1 = IntCell( 20 )
-
-			self.assert_( cell1.value == 20 )
-
-			cell2 = copy( cell1 )
-
-			self.assert_( cell2.value == 20 )
-
-
-
-		def testCopyFrom(self):
-			cell1 = IntCell( 20 )
-			cell2 = IntCell( 30 )
-
-			self.assert_( cell1.value == 20 )
-			self.assert_( cell2.value == 30 )
-
-			cell2.copyFrom( cell1 )
-
-			self.assert_( cell2.value == 20 )
-
-
-
-
 	unittest.main()
 
 

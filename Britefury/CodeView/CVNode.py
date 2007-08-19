@@ -26,9 +26,9 @@ from Britefury.CodeViewTree.CVTNode import CVTNode, CVTNodeInvalid
 from Britefury.CodeView.CodeView import CodeView
 from Britefury.CodeView.MoveFocus import MoveFocus
 
-from Britefury.DocView.Toolkit.DTWidget import *
-from Britefury.DocView.Toolkit.DTBorder import *
-from Britefury.DocView.Toolkit.DTLabel import *
+from Britefury.DocPresent.Toolkit.DTWidget import *
+from Britefury.DocPresent.Toolkit.DTBorder import *
+from Britefury.DocPresent.Toolkit.DTLabel import *
 
 
 

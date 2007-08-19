@@ -21,10 +21,10 @@ from Britefury.CodeView.MoveFocus import *
 
 from Britefury.CodeViewBehavior.CVBIntLiteralBehavior import CVBIntLiteralBehavior
 
-from Britefury.DocView.Toolkit.DTBox import DTBox
-from Britefury.DocView.Toolkit.DTLabel import DTLabel
-from Britefury.DocView.Toolkit.DTDirection import DTDirection
-from Britefury.DocView.CellEdit.DVCStringCellEditEntryLabel import DVCStringCellEditEntryLabel
+from Britefury.DocPresent.Toolkit.DTBox import DTBox
+from Britefury.DocPresent.Toolkit.DTLabel import DTLabel
+from Britefury.DocPresent.Toolkit.DTDirection import DTDirection
+from Britefury.DocPresent.CellEdit.DPCStringCellEditEntryLabel import DPCStringCellEditEntryLabel
 
 
 
@@ -46,7 +46,7 @@ class CVIntLiteral (CVExpression):
 
 	@FunctionRefField
 	def stringValueWidget(self):
-		entry = DVCStringCellEditEntryLabel( regexp='-?[0-9]*' )
+		entry = DPCStringCellEditEntryLabel( regexp='-?[0-9]*' )
 		entry.entry.textColour=Colour3f( 0.0, 0.0, 0.75 )
 		entry.keyHandler = self
 		entry.attachCell( self.treeNode.cells.strValue )

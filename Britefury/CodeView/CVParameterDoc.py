@@ -18,10 +18,10 @@ from Britefury.CodeViewTree.CVTParameterDoc import CVTParameterDoc
 
 from Britefury.CodeView.CVNode import *
 
-from Britefury.DocView.Toolkit.DTBox import DTBox
-from Britefury.DocView.Toolkit.DTLabel import DTLabel
-from Britefury.DocView.Toolkit.DTDirection import DTDirection
-from Britefury.DocView.CellEdit.DVCStringCellEditEntryLabel import DVCStringCellEditEntryLabel
+from Britefury.DocPresent.Toolkit.DTBox import DTBox
+from Britefury.DocPresent.Toolkit.DTLabel import DTLabel
+from Britefury.DocPresent.Toolkit.DTDirection import DTDirection
+from Britefury.DocPresent.CellEdit.DPCStringCellEditEntryLabel import DPCStringCellEditEntryLabel
 
 
 
@@ -38,7 +38,7 @@ class CVParameterDoc (CVNode):
 
 	@FunctionRefField
 	def paramDocWidget(self):
-		entry = DVCStringCellEditEntryLabel()
+		entry = DPCStringCellEditEntryLabel()
 		entry.keyHandler = self
 		entry.attachCell( self.treeNode.cells.paramDoc )
 		return entry.entry

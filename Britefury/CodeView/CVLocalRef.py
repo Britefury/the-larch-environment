@@ -21,9 +21,9 @@ from Britefury.CodeView.MoveFocus import *
 
 from Britefury.CodeViewBehavior.CVBWrapInAssignmentBehavior import *
 
-from Britefury.DocView.Toolkit.DTBox import DTBox
-from Britefury.DocView.Toolkit.DTLabel import DTLabel
-from Britefury.DocView.Toolkit.DTEntryLabel import DTEntryLabel
+from Britefury.DocPresent.Toolkit.DTBox import DTBox
+from Britefury.DocPresent.Toolkit.DTLabel import DTLabel
+from Britefury.DocPresent.Toolkit.DTEntryLabel import DTEntryLabel
 
 
 

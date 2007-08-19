@@ -17,7 +17,7 @@ from Britefury.CodeViewTree.CVTElseIfBlock import CVTElseIfBlock
 from Britefury.CodeView.CVStatement import *
 from Britefury.CodeView.CVIfBlock import *
 
-from Britefury.DocView.Toolkit.DTLabel import DTLabel
+from Britefury.DocPresent.Toolkit.DTLabel import DTLabel
 
 
 
