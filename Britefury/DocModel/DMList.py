@@ -22,7 +22,7 @@ class DMList (object):
 		if op is None:
 			self._cell.literalValue = []
 		else:
-			self._cell.function = op
+			self._cell.function = op.evaluate
 
 
 	def append(self, x):
@@ -33,14 +33,39 @@ class DMList (object):
 		else:
 			self._op.append( x )
 
-	def extend(self, x):
+	def extend(self, xs):
 		if self._op is None:
 			v = self._cell.literalValue
-			v.extend( x )
+			v.extend( xs )
 			self._cell.literalValue = v
 		else:
-			self._op.extend( x )
+			self._op.extend( xs )
 
+	def insertBefore(self, before, x):
+		if self._op is None:
+			v = self._cell.literalValue
+			i = v.index( before )
+			v.insert( i, x )
+			self._cell.literalValue = v
+		else:
+			self._op.insertBefore( before, x )
+
+	def insertAfter(self, after, x):
+		if self._op is None:
+			v = self._cell.literalValue
+			i = v.index( after )
+			v.insert( i + 1, x )
+			self._cell.literalValue = v
+		else:
+			self._op.insertAfter( after, x )
+
+	def remove(self, x):
+		if self._op is None:
+			v = self._cell.literalValue
+			v.remove( x )
+			self._cell.literalValue = v
+		else:
+			self._op.remove( x )
 
 	def __setitem__(self, i, x):
 		if self._op is None:
@@ -54,8 +79,21 @@ class DMList (object):
 	def __getitem__(self, i):
 		return self._cell.value[i]
 
+	def __contains__(self, x):
+		return x in self._cell.value
+
 	def __iter__(self):
 		return iter( self._cell.value )
+
+	def __add__(self, xs):
+		return self._cell.value + xs
+
+	def __len__(self):
+		return len( self._cell.value )
+
+	def index(self, x):
+		return self._cell.value.index( x )
+
 
 
 
@@ -71,13 +109,20 @@ class TestCase_List (unittest.TestCase):
 
 
 
+	def testLiteralIter(self):
+		x = DMList()
+		x.extend( [ 1, 2, 3 ] )
+		q = [ p   for p in x ]
+		self.assert_( q == [ 1, 2, 3 ] )
+
+
 	def testLiteralAppend(self):
 		x = DMList()
 		x.append( 1 )
 		self.assert_( x[0] == 1 )
 
 
-	def testLiteralAppend(self):
+	def testLiteralExtend(self):
 		x = DMList()
 		x.extend( [ 1, 2, 3 ] )
 		self.assert_( x[0] == 1 )
@@ -86,11 +131,28 @@ class TestCase_List (unittest.TestCase):
 		self.assert_( x[:] == [ 1, 2, 3 ] )
 
 
-	def testLiteralIter(self):
+	def testLiteralInsertBefore(self):
 		x = DMList()
-		x.extend( [ 1, 2, 3 ] )
-		q = [ p   for p in x ]
-		self.assert_( q == [ 1, 2, 3 ] )
+		x.extend( [ 1, 2, 3, 4, 5 ] )
+		self.assert_( x[:] == [ 1, 2, 3, 4, 5 ] )
+		x.insertBefore( 3, 12 )
+		self.assert_( x[:] == [ 1, 2, 12, 3, 4, 5 ] )
+
+
+	def testLiteralInsertAfter(self):
+		x = DMList()
+		x.extend( [ 1, 2, 3, 4, 5 ] )
+		self.assert_( x[:] == [ 1, 2, 3, 4, 5 ] )
+		x.insertAfter( 3, 12 )
+		self.assert_( x[:] == [ 1, 2, 3, 12, 4, 5 ] )
+
+
+	def testLiteralRemove(self):
+		x = DMList()
+		x.extend( [ 1, 2, 3, 4, 5 ] )
+		self.assert_( x[:] == [ 1, 2, 3, 4, 5 ] )
+		x.remove( 3 )
+		self.assert_( x[:] == [ 1, 2, 4, 5 ] )
 
 
 	def testLiteralSet(self):
@@ -116,6 +178,18 @@ class TestCase_List (unittest.TestCase):
 		y[1:3] = [ 100, 200, 300, 400 ]
 		self.assert_( y[:] == [ 10, 100, 200, 300, 400, 40 ] )
 		self.assert_( x[:] == [ 1, 10, 20, 30, 40, 4 ] )
+		y.extend( [ 600, 700 ] )
+		self.assert_( y[:] == [ 10, 100, 200, 300, 400, 40, 600, 700 ] )
+		self.assert_( x[:] == [ 1, 10, 20, 30, 40, 4, 60, 70 ] )
+		y.insertBefore( 200, 220 )
+		self.assert_( y[:] == [ 10, 100, 220, 200, 300, 400, 40, 600, 700 ] )
+		self.assert_( x[:] == [ 1, 10, 22, 20, 30, 40, 4, 60, 70 ] )
+		y.insertAfter( 200, 310 )
+		self.assert_( y[:] == [ 10, 100, 220, 200, 310, 300, 400, 40, 600, 700 ] )
+		self.assert_( x[:] == [ 1, 10, 22, 20, 31, 30, 40, 4, 60, 70 ] )
+		y.remove( 600 )
+		self.assert_( y[:] == [ 10, 100, 220, 200, 310, 300, 400, 40, 700 ] )
+		self.assert_( x[:] == [ 1, 10, 22, 20, 31, 30, 40, 4, 70 ] )
 
 
 
