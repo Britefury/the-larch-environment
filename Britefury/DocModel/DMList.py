@@ -10,7 +10,7 @@ from copy import copy
 
 from Britefury.Cell.Cell import RefCell
 
-from Britefury.DocModel.DMListOperator import DMListOpMap, DMListOpSlice, DMListOpWrap
+from Britefury.DocModel.DMListOperator import DMListOpMap, DMListOpSlice, DMListOpWrap, DMListOpNop
 
 
 
@@ -18,7 +18,8 @@ from Britefury.DocModel.DMListOperator import DMListOpMap, DMListOpSlice, DMList
 
 
 class DocModelLayer (object):
-	def __init__(self, layerFunction=lambda x: copy( x )):
+	def __init__(self, layerFunction=lambda x, y: copy( x )):
+		"""layerFunction signature:    layerFunction(sourceList, destLayer)"""
 		self._layerFunction = layerFunction
 
 		self._srcListToDestCell = WeakKeyDictionary()
@@ -31,7 +32,7 @@ class DocModelLayer (object):
 			destCell = self._srcListToDestCell[srcList]
 		except KeyError:
 			def _cellFunc():
-				return self._layerFunction( srcList )
+				return self._layerFunction( srcList, self )
 
 			destCell = RefCell()
 			destCell.function = _cellFunc
@@ -140,11 +141,11 @@ class DMList (object):
 		return self._layer
 
 
-	def getDestList(self):
-		return self._layer.getDestList( self )
+	def getDestList(self, layer):
+		return layer.getDestList( self )
 
-	def getSrcList(self):
-		return self._layer.getSrcList( self )
+	def getSrcList(self, layer):
+		return layer.getSrcList( self )
 
 
 
@@ -238,7 +239,7 @@ class TestCase_List (unittest.TestCase):
 		x = DMList( layer1 )
 		x.extend( [ 1, 2, 3 ] )
 
-		y = DMList( layer2, DMListOpMap( x, lambda x: x * 10, lambda x: x / 10 ) )
+		y = DMList( layer2, DMListOpMap( layer2, x, lambda x: x * 10, lambda x: x / 10 ) )
 		self.assert_( y[0] == 10 )
 		self.assert_( y[:] == [ 10, 20, 30 ] )
 		y.append( 40 )
@@ -268,7 +269,7 @@ class TestCase_List (unittest.TestCase):
 		x = DMList( layer1 )
 		x.extend( [ 1, 2, 3 ] )
 
-		y = DMList( layer2, DMListOpSlice( x, 1, -1 ) )
+		y = DMList( layer2, DMListOpSlice( layer2, x, 1, -1 ) )
 		self.assert_( y[:] == [ 2 ] )
 		y.append( 4 )
 		self.assert_( y[:] == [ 2, 4 ] )
@@ -296,7 +297,7 @@ class TestCase_List (unittest.TestCase):
 		layer2 = DocModelLayer()
 		x = DMList( layer1 )
 
-		y = DMList( layer2, DMListOpWrap( x, [ -1 ], [ -2 ] ) )
+		y = DMList( layer2, DMListOpWrap( layer2, x, [ -1 ], [ -2 ] ) )
 		self.assert_( y[:] == [ -1, -2 ] )
 		x.append( 4 )
 		self.assert_( y[:] == [ -1, 4, -2 ] )
@@ -320,7 +321,49 @@ class TestCase_List (unittest.TestCase):
 
 
 
+	def testLayers(self):
+		def layerFunction(ls, layer):
+			if ls[0] == 'plus2':
+				return DMList( layer, DMListOpWrap( layer, DMListOpMap( layer, DMListOpSlice( layer, ls, 1, None ), lambda x: x + 2, lambda x: x - 2 ), [ 'plus2b' ], [] ) )
+			elif ls[0] == 'times2':
+				return DMList( layer, DMListOpWrap( layer, DMListOpMap( layer, DMListOpSlice( layer, ls, 1, None ), lambda x: x * 2, lambda x: x / 2 ), [ 'times2b' ], [] ) )
+			else:
+				return copy( ls )
+
+		layer1 = DocModelLayer()
+		layer2 = DocModelLayer( layerFunction )
+
+		x = DMList( layer1 )
+		x.extend( [ 1, 2, 3 ] )
+		xx1 = DMList( layer1 )
+		xx1.extend( [ 'plus2', 5, 6, 7 ] )
+		x.append( xx1 )
+		xx2 = DMList( layer1 )
+		xx2.extend( [ 'times2', 11, 12, 13 ] )
+		x.append( xx2 )
 
 
+		y = DMList( layer2, DMListOpNop( layer2, x ) )
+
+
+		self.assert_( y[0:3] == [ 1, 2, 3 ] )
+		self.assert_( y[3][:] == [ 'plus2b', 7, 8, 9 ] )
+		self.assert_( y[4][:] == [ 'times2b', 22, 24, 26 ] )
+
+		xx1[2] = 8
+		self.assert_( x[3][:] == [ 'plus2', 5, 8, 7 ] )
+		self.assert_( y[3][:] == [ 'plus2b', 7, 10, 9 ] )
+		xx1[0] = 'times2'
+		self.assert_( x[3][:] == [ 'times2', 5, 8, 7 ] )
+		self.assert_( y[3][:] == [ 'times2b', 10, 16, 14 ] )
+		xx1[0] = 'plus2'
+		self.assert_( x[3][:] == [ 'plus2', 5, 8, 7 ] )
+		self.assert_( y[3][:] == [ 'plus2b', 7, 10, 9 ] )
+
+
+
+
+
+1
 if __name__ == '__main__':
 	unittest.main()
