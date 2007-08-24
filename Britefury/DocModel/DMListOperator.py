@@ -51,6 +51,48 @@ class DMListOperator (object):
 		return self.evaluate()[i]
 
 
+	@abstractmethod
+	def _f_getEvaluationContext(self):
+		pass
+
+
+
+
+
+class DMListOpNop (object):
+	def __init__(self, src):
+		self._src = src
+
+
+	def evaluate(self):
+		return self._src[:]
+
+
+
+	def append(self, x):
+		self._src.append( x )
+
+	def extend(self, xs):
+		self._src.extend( xs )
+
+	def insertBefore(self, before, x):
+		self._src.insertBefore( before, x )
+
+	def insertAfter(self, after, x):
+		self._src.insertAfter( after, x )
+
+	def remove(self, x):
+		self._src.remove( x )
+
+
+	def __setitem__(self, i, x):
+		self._src[i] = x
+
+
+	def _f_getEvaluationContext(self):
+		return self._src
+
+
 
 
 
@@ -85,6 +127,11 @@ class DMListOpMap (object):
 
 
 
+	def _f_getEvaluationContext(self):
+		return self._src
+
+
+
 class DMListOpSlice (object):
 	def __init__(self, src, start, stop):
 		self._src = src
@@ -116,7 +163,7 @@ class DMListOpSlice (object):
 
 	def __setitem__(self, i, x):
 		if isinstance( i, slice ):
-			assert i.step == 1, 'step must be 1'
+			assert i.step is None, 'step must be 1'
 			start = i.start
 			stop = i.stop
 			if start < 0:
@@ -134,63 +181,84 @@ class DMListOpSlice (object):
 			else:
 				self._src[self._start+i] = x
 
+	def _f_getEvaluationContext(self):
+		return self._src
 
 
 
 
-class DMListOpJoin (object):
-	def __init__(self, srcs):
-		self._srcs = srcs
-		self._endIndices = [ 0 ]  *  len( srcs )
+
+class DMListOpWrap (object):
+	def __init__(self, src, prefix, suffix):
+		self._src = src
+		self._prefix = prefix
+		self._suffix = suffix
+		self._pre = []
+		self._suf = []
+		self._prefixLen = 0
+		self._suffixLen = 0
 
 
 	def evaluate(self):
-		res = []
-		self._endIndices = []
-		l = 0
-		for src in self._srcs:
-			res += src
-			l += len( src )
-			self._endIndices.append( l )
-		return res
+		if isinstance( self._prefix, list ):
+			self._pre = self._prefix
+		else:
+			self._pre = self._prefix()
+		self._prefixLen = len( self._pre )
+
+		if isinstance( self._suffix, list ):
+			self._suf = self._suffix
+		else:
+			self._suf = self._suffix()
+		self._suffixLen = len( self._suf )
+
+		return self._pre + self._src[:] + self._suf
 
 
 	def append(self, x):
-		if len( self._srcs ) > 0:
-			self._srcs[-1].append( x )
+		if self._suffix is None:
+			self._src.append( x )
 
 	def extend(self, xs):
-		if len( self._srcs ) > 0:
-			self._srcs[-1].extend( x )
+		if self._suffix is None:
+			self._src.extend( x )
 
-	#def insertBefore(self, before, x):
-		#self._src.insertBefore( before, x )
+	def insertBefore(self, before, x):
+		if before not in self._pre:
+			if before not in self._suf   or   ( len( self._suf ) > 0  and  before is self._suf[0] ):
+				self._src.insertBefore( before, x )
 
-	#def insertAfter(self, after, x):
-		#self._src.insertAfter( after, x )
+	def insertAfter(self, after, x):
+		if after not in self._suf:
+			if after not in self._pre   or   ( len( self._pre ) > 0  and  after is self._pre[-1] ):
+				self._src.insertAfter( after, x )
 
-	#def remove(self, x):
-		#self._src.remove( x )
+	def remove(self, x):
+		if x not in self._pre  and  x not in self._suf:
+			self._src.remove( x )
 
-	#def __setitem__(self, i, x):
-		#if isinstance( i, slice ):
-			#assert i.step == 1, 'step must be 1'
-			#start = i.start
-			#stop = i.stop
-			#if start < 0:
-				#start += self._stop
-			#else:
-				#start += self._start
-			#if stop < 0:
-				#stop += self._stop
-			#else:
-				#stop += self._start
-			#self._src[start:stop] = x
-		#else:
-			#if i < 0:
-				#self._src[self._stop+i] = x
-			#else:
-				#self._src[self._start+i] = x
+	def __setitem__(self, i, x):
+		if isinstance( i, slice ):
+			assert i.step is None, 'step must be 1'
+			start = i.start
+			stop = i.stop
+			if start < 0:
+				start += self._suffixLen
+			else:
+				start -= self._prefixLen
+			if stop < 0:
+				stop += self._suffixLen
+			else:
+				stop -= self._prefixLen
+			self._src[start:stop] = x
+		else:
+			if i < 0:
+				self._src[i+self._suffixLen] = x
+			else:
+				self._src[i-self._prefixLen] = x
+
+	def _f_getEvaluationContext(self):
+		return self._src
 
 
 
