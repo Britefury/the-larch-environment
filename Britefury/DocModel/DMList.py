@@ -5,6 +5,9 @@
 ##-* version 2 can be found in the file valued 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
+from weakref import WeakKeyDictionary
+from copy import copy
+
 from Britefury.Cell.Cell import RefCell
 
 from Britefury.DocModel.DMListOperator import DMListOpMap, DMListOpSlice, DMListOpWrap
@@ -14,15 +17,48 @@ from Britefury.DocModel.DMListOperator import DMListOpMap, DMListOpSlice, DMList
 
 
 
-class DMListEvaluationContext (object):
-	pass
+class DocModelLayer (object):
+	def __init__(self, layerFunction=lambda x: copy( x )):
+		self._layerFunction = layerFunction
+
+		self._srcListToDestCell = WeakKeyDictionary()
+		self._destListToSrcList = WeakKeyDictionary()
+
+
+
+	def getDestList(self, srcList):
+		try:
+			destCell = self._srcListToDestCell[srcList]
+		except KeyError:
+			def _cellFunc():
+				return self._layerFunction( srcList )
+
+			destCell = RefCell()
+			destCell.function = _cellFunc
+
+			self._srcListToDestCell[srcList] = destCell
+
+		destList = destCell.getValue()
+		self._destListToSrcList[destList] = srcList
+
+		return destList
+
+
+
+	def getSrcList(self, destList):
+		return self._destListToSrcList[destList]
+
+
+
+
+
 
 
 class DMList (object):
-	def __init__(self, evaluationContext, op=None):
+	def __init__(self, layer, op=None):
 		self._op = op
 		self._cell = RefCell()
-		self._evaluationContext = evaluationContext
+		self._layer = layer
 
 		if op is None:
 			self._cell.literalValue = []
@@ -100,8 +136,23 @@ class DMList (object):
 		return self._cell.value.index( x )
 
 
-	def _f_getEvaluationContext(self):
-		return self._evaluationContext
+	def getLayer(self):
+		return self._layer
+
+
+	def getDestList(self):
+		return self._layer.getDestList( self )
+
+	def getSrcList(self):
+		return self._layer.getSrcList( self )
+
+
+
+	def __copy__(self):
+		c = DMList( self._layer, self._op )
+		if self._op is None:
+			c[:] = self[:]
+		return c
 
 
 
@@ -113,25 +164,29 @@ import unittest
 
 class TestCase_List (unittest.TestCase):
 	def testListCtor(self):
-		x = DMList( DMListEvaluationContext() )
+		layer = DocModelLayer()
+		x = DMList( layer )
 
 
 
 	def testLiteralIter(self):
-		x = DMList( DMListEvaluationContext() )
+		layer = DocModelLayer()
+		x = DMList( layer )
 		x.extend( [ 1, 2, 3 ] )
 		q = [ p   for p in x ]
 		self.assert_( q == [ 1, 2, 3 ] )
 
 
 	def testLiteralAppend(self):
-		x = DMList( DMListEvaluationContext() )
+		layer = DocModelLayer()
+		x = DMList( layer )
 		x.append( 1 )
 		self.assert_( x[0] == 1 )
 
 
 	def testLiteralExtend(self):
-		x = DMList( DMListEvaluationContext() )
+		layer = DocModelLayer()
+		x = DMList( layer )
 		x.extend( [ 1, 2, 3 ] )
 		self.assert_( x[0] == 1 )
 		self.assert_( x[1] == 2 )
@@ -140,7 +195,8 @@ class TestCase_List (unittest.TestCase):
 
 
 	def testLiteralInsertBefore(self):
-		x = DMList( DMListEvaluationContext() )
+		layer = DocModelLayer()
+		x = DMList( layer )
 		x.extend( [ 1, 2, 3, 4, 5 ] )
 		self.assert_( x[:] == [ 1, 2, 3, 4, 5 ] )
 		x.insertBefore( 3, 12 )
@@ -148,7 +204,8 @@ class TestCase_List (unittest.TestCase):
 
 
 	def testLiteralInsertAfter(self):
-		x = DMList( DMListEvaluationContext() )
+		layer = DocModelLayer()
+		x = DMList( layer )
 		x.extend( [ 1, 2, 3, 4, 5 ] )
 		self.assert_( x[:] == [ 1, 2, 3, 4, 5 ] )
 		x.insertAfter( 3, 12 )
@@ -156,7 +213,8 @@ class TestCase_List (unittest.TestCase):
 
 
 	def testLiteralRemove(self):
-		x = DMList( DMListEvaluationContext() )
+		layer = DocModelLayer()
+		x = DMList( layer )
 		x.extend( [ 1, 2, 3, 4, 5 ] )
 		self.assert_( x[:] == [ 1, 2, 3, 4, 5 ] )
 		x.remove( 3 )
@@ -164,7 +222,8 @@ class TestCase_List (unittest.TestCase):
 
 
 	def testLiteralSet(self):
-		x = DMList( DMListEvaluationContext() )
+		layer = DocModelLayer()
+		x = DMList( layer )
 		x.extend( [ 1, 2, 3, 4, 5 ] )
 		self.assert_( x[:] == [ 1, 2, 3, 4, 5 ] )
 		x[4] = 12
@@ -174,10 +233,12 @@ class TestCase_List (unittest.TestCase):
 
 
 	def testOpMap(self):
-		x = DMList( DMListEvaluationContext() )
+		layer1 = DocModelLayer()
+		layer2 = DocModelLayer()
+		x = DMList( layer1 )
 		x.extend( [ 1, 2, 3 ] )
 
-		y = DMList( DMListEvaluationContext(), DMListOpMap( x, lambda x: x * 10, lambda x: x / 10 ) )
+		y = DMList( layer2, DMListOpMap( x, lambda x: x * 10, lambda x: x / 10 ) )
 		self.assert_( y[0] == 10 )
 		self.assert_( y[:] == [ 10, 20, 30 ] )
 		y.append( 40 )
@@ -202,10 +263,12 @@ class TestCase_List (unittest.TestCase):
 
 
 	def testOpSlice(self):
-		x = DMList( DMListEvaluationContext() )
+		layer1 = DocModelLayer()
+		layer2 = DocModelLayer()
+		x = DMList( layer1 )
 		x.extend( [ 1, 2, 3 ] )
 
-		y = DMList( DMListEvaluationContext(), DMListOpSlice( x, 1, -1 ) )
+		y = DMList( layer2, DMListOpSlice( x, 1, -1 ) )
 		self.assert_( y[:] == [ 2 ] )
 		y.append( 4 )
 		self.assert_( y[:] == [ 2, 4 ] )
@@ -229,9 +292,11 @@ class TestCase_List (unittest.TestCase):
 
 
 	def testOpWrap(self):
-		x = DMList( DMListEvaluationContext() )
+		layer1 = DocModelLayer()
+		layer2 = DocModelLayer()
+		x = DMList( layer1 )
 
-		y = DMList( DMListEvaluationContext(), DMListOpWrap( x, [ -1 ], [ -2 ] ) )
+		y = DMList( layer2, DMListOpWrap( x, [ -1 ], [ -2 ] ) )
 		self.assert_( y[:] == [ -1, -2 ] )
 		x.append( 4 )
 		self.assert_( y[:] == [ -1, 4, -2 ] )
