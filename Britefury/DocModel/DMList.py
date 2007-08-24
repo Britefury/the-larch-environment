@@ -7,17 +7,22 @@
 ##-*************************
 from Britefury.Cell.Cell import RefCell
 
-from Britefury.DocModel.DMListOperator import DMListOpMap
+from Britefury.DocModel.DMListOperator import DMListOpMap, DMListOpSlice, DMListOpWrap
 
 
 
 
+
+
+class DMListEvaluationContext (object):
+	pass
 
 
 class DMList (object):
-	def __init__(self, op=None):
+	def __init__(self, evaluationContext, op=None):
 		self._op = op
 		self._cell = RefCell()
+		self._evaluationContext = evaluationContext
 
 		if op is None:
 			self._cell.literalValue = []
@@ -95,6 +100,9 @@ class DMList (object):
 		return self._cell.value.index( x )
 
 
+	def _f_getEvaluationContext(self):
+		return self._evaluationContext
+
 
 
 
@@ -105,25 +113,25 @@ import unittest
 
 class TestCase_List (unittest.TestCase):
 	def testListCtor(self):
-		x = DMList()
+		x = DMList( DMListEvaluationContext() )
 
 
 
 	def testLiteralIter(self):
-		x = DMList()
+		x = DMList( DMListEvaluationContext() )
 		x.extend( [ 1, 2, 3 ] )
 		q = [ p   for p in x ]
 		self.assert_( q == [ 1, 2, 3 ] )
 
 
 	def testLiteralAppend(self):
-		x = DMList()
+		x = DMList( DMListEvaluationContext() )
 		x.append( 1 )
 		self.assert_( x[0] == 1 )
 
 
 	def testLiteralExtend(self):
-		x = DMList()
+		x = DMList( DMListEvaluationContext() )
 		x.extend( [ 1, 2, 3 ] )
 		self.assert_( x[0] == 1 )
 		self.assert_( x[1] == 2 )
@@ -132,7 +140,7 @@ class TestCase_List (unittest.TestCase):
 
 
 	def testLiteralInsertBefore(self):
-		x = DMList()
+		x = DMList( DMListEvaluationContext() )
 		x.extend( [ 1, 2, 3, 4, 5 ] )
 		self.assert_( x[:] == [ 1, 2, 3, 4, 5 ] )
 		x.insertBefore( 3, 12 )
@@ -140,7 +148,7 @@ class TestCase_List (unittest.TestCase):
 
 
 	def testLiteralInsertAfter(self):
-		x = DMList()
+		x = DMList( DMListEvaluationContext() )
 		x.extend( [ 1, 2, 3, 4, 5 ] )
 		self.assert_( x[:] == [ 1, 2, 3, 4, 5 ] )
 		x.insertAfter( 3, 12 )
@@ -148,7 +156,7 @@ class TestCase_List (unittest.TestCase):
 
 
 	def testLiteralRemove(self):
-		x = DMList()
+		x = DMList( DMListEvaluationContext() )
 		x.extend( [ 1, 2, 3, 4, 5 ] )
 		self.assert_( x[:] == [ 1, 2, 3, 4, 5 ] )
 		x.remove( 3 )
@@ -156,7 +164,7 @@ class TestCase_List (unittest.TestCase):
 
 
 	def testLiteralSet(self):
-		x = DMList()
+		x = DMList( DMListEvaluationContext() )
 		x.extend( [ 1, 2, 3, 4, 5 ] )
 		self.assert_( x[:] == [ 1, 2, 3, 4, 5 ] )
 		x[4] = 12
@@ -165,11 +173,11 @@ class TestCase_List (unittest.TestCase):
 		self.assert_( x[:] == [ 1, 20, 21, 22, 4, 12 ] )
 
 
-	def testMap(self):
-		x = DMList()
+	def testOpMap(self):
+		x = DMList( DMListEvaluationContext() )
 		x.extend( [ 1, 2, 3 ] )
 
-		y = DMList( DMListOpMap( x, lambda x: x * 10, lambda x: x / 10 ) )
+		y = DMList( DMListEvaluationContext(), DMListOpMap( x, lambda x: x * 10, lambda x: x / 10 ) )
 		self.assert_( y[0] == 10 )
 		self.assert_( y[:] == [ 10, 20, 30 ] )
 		y.append( 40 )
@@ -192,6 +200,57 @@ class TestCase_List (unittest.TestCase):
 		self.assert_( x[:] == [ 1, 10, 22, 20, 31, 30, 40, 4, 70 ] )
 
 
+
+	def testOpSlice(self):
+		x = DMList( DMListEvaluationContext() )
+		x.extend( [ 1, 2, 3 ] )
+
+		y = DMList( DMListEvaluationContext(), DMListOpSlice( x, 1, -1 ) )
+		self.assert_( y[:] == [ 2 ] )
+		y.append( 4 )
+		self.assert_( y[:] == [ 2, 4 ] )
+		self.assert_( x[:] == [ 1, 2, 4, 3 ] )
+		y[1:2] = [ 10, 20, 30, 40 ]
+		self.assert_( y[:] == [ 2, 10, 20, 30, 40 ] )
+		self.assert_( x[:] == [ 1, 2, 10, 20, 30, 40, 3 ] )
+		y.extend( [ 60, 70 ] )
+		self.assert_( y[:] == [ 2, 10, 20, 30, 40, 60, 70 ] )
+		self.assert_( x[:] == [ 1, 2, 10, 20, 30, 40, 60, 70, 3 ] )
+		y.insertBefore( 20, 22 )
+		self.assert_( y[:] == [ 2, 10, 22, 20, 30, 40, 60, 70 ] )
+		self.assert_( x[:] == [ 1, 2, 10, 22, 20, 30, 40, 60, 70, 3 ] )
+		y.insertAfter( 20, 31 )
+		self.assert_( y[:] == [ 2, 10, 22, 20, 31, 30, 40, 60, 70 ] )
+		self.assert_( x[:] == [ 1, 2, 10, 22, 20, 31, 30, 40, 60, 70, 3 ] )
+		y.remove( 60 )
+		self.assert_( y[:] == [ 2, 10, 22, 20, 31, 30, 40, 70 ] )
+		self.assert_( x[:] == [ 1, 2, 10, 22, 20, 31, 30, 40, 70, 3 ] )
+
+
+
+	def testOpWrap(self):
+		x = DMList( DMListEvaluationContext() )
+
+		y = DMList( DMListEvaluationContext(), DMListOpWrap( x, [ -1 ], [ -2 ] ) )
+		self.assert_( y[:] == [ -1, -2 ] )
+		x.append( 4 )
+		self.assert_( y[:] == [ -1, 4, -2 ] )
+		self.assert_( x[:] == [ 4 ] )
+		x.extend( [ 1, 2 ] )
+		self.assert_( y[:] == [ -1, 4, 1, 2, -2 ] )
+		self.assert_( x[:] == [ 4, 1, 2 ] )
+		y[2:3] = [ 6, 7, 8 ]
+		self.assert_( y[:] == [ -1, 4, 6, 7, 8, 2, -2 ] )
+		self.assert_( x[:] == [ 4, 6, 7, 8, 2 ] )
+		y.insertBefore( 7, 13 )
+		self.assert_( y[:] == [ -1, 4, 6, 13, 7, 8, 2, -2 ] )
+		self.assert_( x[:] == [ 4, 6, 13, 7, 8, 2 ] )
+		y.insertAfter( 7, 15 )
+		self.assert_( y[:] == [ -1, 4, 6, 13, 7, 15, 8, 2, -2 ] )
+		self.assert_( x[:] == [ 4, 6, 13, 7, 15, 8, 2 ] )
+		y.remove( 7 )
+		self.assert_( y[:] == [ -1, 4, 6, 13, 15, 8, 2, -2 ] )
+		self.assert_( x[:] == [ 4, 6, 13, 15, 8, 2 ] )
 
 
 
