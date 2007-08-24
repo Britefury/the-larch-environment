@@ -52,10 +52,28 @@ class DMListOperator (object):
 
 
 	@abstractmethod
-	def _f_getEvaluationContext(self):
+	def getLayer(self):
 		pass
 
 
+
+
+def _dest(x):
+	try:
+		getDestList = x.getDestList
+	except AttributeError:
+		return x
+	else:
+		return getDestList()
+
+
+def _src(x):
+	try:
+		getSrcList = x.getSrcList
+	except AttributeError:
+		return x
+	else:
+		return getSrcList()
 
 
 
@@ -65,32 +83,33 @@ class DMListOpNop (object):
 
 
 	def evaluate(self):
-		return self._src[:]
+		return [ _dest( x )   for x in self._src ]
 
 
 
 	def append(self, x):
-		self._src.append( x )
+		self._src.append( _src( x ) )
 
 	def extend(self, xs):
-		self._src.extend( xs )
+		self._src.extend( [ _src( x )   for x in xs ] )
 
 	def insertBefore(self, before, x):
-		self._src.insertBefore( before, x )
+		self._src.insertBefore( _src( before ), _src( x ) )
 
 	def insertAfter(self, after, x):
-		self._src.insertAfter( after, x )
+		after = _src( after )
+		self._src.insertAfter( _src( after ), _src( x ) )
 
 	def remove(self, x):
-		self._src.remove( x )
+		self._src.remove( _src( x ) )
 
 
 	def __setitem__(self, i, x):
-		self._src[i] = x
+		self._src[i] = [ _src( y )   for y in x ]
 
 
-	def _f_getEvaluationContext(self):
-		return self._src
+	def getLayer(self):
+		return self._src.getLayer()
 
 
 
@@ -103,32 +122,50 @@ class DMListOpMap (object):
 		self._invF = invF
 
 
+	def _p_dest(self, x):
+		try:
+			getDestList = x.getDestList
+		except AttributeError:
+			return self._f( x )
+		else:
+			return getDestList()
+
+
+	def _p_src(self, x):
+		try:
+			getSrcList = x.getSrcList
+		except AttributeError:
+			return self._invF( x )
+		else:
+			return getSrcList()
+
+
 	def evaluate(self):
-		return [ self._f( x )   for x in self._src ]
+		return [ self._p_dest( x )   for x in self._src ]
 
 
 	def append(self, x):
-		self._src.append( self._invF( x ) )
+		self._src.append( self._p_src( x ) )
 
 	def extend(self, xs):
-		self._src.extend( [ self._invF( p )   for p in xs ] )
+		self._src.extend( [ self._p_src( p )   for p in xs ] )
 
 	def insertBefore(self, before, x):
-		self._src.insertBefore( self._invF( before ),  self._invF( x ) )
+		self._src.insertBefore( self._p_src( before ),  self._p_src( x ) )
 
 	def insertAfter(self, after, x):
-		self._src.insertAfter( self._invF( after ),  self._invF( x ) )
+		self._src.insertAfter( self._p_src( after ),  self._p_src( x ) )
 
 	def remove(self, x):
-		self._src.remove( self._invF( x ) )
+		self._src.remove( self._p_src( x ) )
 
 	def __setitem__(self, i, x):
-		self._src[i] = [ self._invF( p )   for p in x ]
+		self._src[i] = [ self._p_src( p )   for p in x ]
 
 
 
-	def _f_getEvaluationContext(self):
-		return self._src
+	def getLayer(self):
+		return self._src.getLayer()
 
 
 
@@ -140,26 +177,26 @@ class DMListOpSlice (object):
 
 
 	def evaluate(self):
-		return self._src[self._start:self._stop]
+		return [ _dest( x )   for x in self._src[self._start:self._stop] ]
 
 
 	def append(self, x):
-		self._src.insertAfter( self._src[self._stop-1], x )
+		self._src.insertAfter( self._src[self._stop-1], _src( x ) )
 
 	def extend(self, xs):
 		after = self._src[self._stop-1]
 		for x in xs:
-			self._src.insertAfter( after, x )
+			self._src.insertAfter( after, _src( x ) )
 			after = x
 
 	def insertBefore(self, before, x):
-		self._src.insertBefore( before, x )
+		self._src.insertBefore( _src( before ), _src( x ) )
 
 	def insertAfter(self, after, x):
-		self._src.insertAfter( after, x )
+		self._src.insertAfter( _src( after ), _src( x ) )
 
 	def remove(self, x):
-		self._src.remove( x )
+		self._src.remove( _src( x ) )
 
 	def __setitem__(self, i, x):
 		if isinstance( i, slice ):
@@ -174,15 +211,15 @@ class DMListOpSlice (object):
 				stop += self._stop
 			else:
 				stop += self._start
-			self._src[start:stop] = x
+			self._src[start:stop] = [ _src( p )   for p in x ]
 		else:
 			if i < 0:
-				self._src[self._stop+i] = x
+				self._src[self._stop+i] = _src( x )
 			else:
-				self._src[self._start+i] = x
+				self._src[self._start+i] = _src( x )
 
-	def _f_getEvaluationContext(self):
-		return self._src
+	def getLayer(self):
+		return self._src.getLayer()
 
 
 
@@ -212,30 +249,30 @@ class DMListOpWrap (object):
 			self._suf = self._suffix()
 		self._suffixLen = len( self._suf )
 
-		return self._pre + self._src[:] + self._suf
+		return self._pre + [ _dest( x )   for x in self._src ] + self._suf
 
 
 	def append(self, x):
 		if self._suffix is None:
-			self._src.append( x )
+			self._src.append( _src( x ) )
 
 	def extend(self, xs):
 		if self._suffix is None:
-			self._src.extend( x )
+			self._src.extend( [ _src( x )   for x in xs ] )
 
 	def insertBefore(self, before, x):
 		if before not in self._pre:
 			if before not in self._suf   or   ( len( self._suf ) > 0  and  before is self._suf[0] ):
-				self._src.insertBefore( before, x )
+				self._src.insertBefore( _src( before ), _src( x ) )
 
 	def insertAfter(self, after, x):
 		if after not in self._suf:
 			if after not in self._pre   or   ( len( self._pre ) > 0  and  after is self._pre[-1] ):
-				self._src.insertAfter( after, x )
+				self._src.insertAfter( _src( after ), _src( x ) )
 
 	def remove(self, x):
 		if x not in self._pre  and  x not in self._suf:
-			self._src.remove( x )
+			self._src.remove( _src( x ) )
 
 	def __setitem__(self, i, x):
 		if isinstance( i, slice ):
@@ -250,15 +287,15 @@ class DMListOpWrap (object):
 				stop += self._suffixLen
 			else:
 				stop -= self._prefixLen
-			self._src[start:stop] = x
+			self._src[start:stop] = [ _src( p )   for p in x ]
 		else:
 			if i < 0:
-				self._src[i+self._suffixLen] = x
+				self._src[i+self._suffixLen] = _src( x )
 			else:
-				self._src[i-self._prefixLen] = x
+				self._src[i-self._prefixLen] = _src( x )
 
-	def _f_getEvaluationContext(self):
-		return self._src
+	def getLayer(self):
+		return self._src.getLayer()
 
 
 
