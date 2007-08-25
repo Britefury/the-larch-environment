@@ -61,6 +61,15 @@ class DMListOperator (object):
 	def remove(self, x):
 		pass
 
+	@abstractmethod
+	def replace(self, a, x):
+		pass
+
+	@abstractmethod
+	def replaceRange(self, a, b, xs):
+		"""Replaces the range (a,b) inclusive with the contents of xs"""
+		pass
+
 
 	@abstractmethod
 	def __setitem__(self, i, x):
@@ -102,6 +111,12 @@ class DMListOpNop (DMListOperator):
 
 	def remove(self, x):
 		self._src.remove( self._p_src( x ) )
+
+	def replace(self, a, x):
+		self._src.replace( self._p_src( a ), self._p_src( x ) )
+
+	def replaceRange(self, a, b, xs):
+		self._src.replaceRange( self._p_src( a ), self._p_src( b ), [ self._p_src( x )  for x in xs ] )
 
 
 	def __setitem__(self, i, x):
@@ -160,6 +175,13 @@ class DMListOpMap (DMListOperator):
 	def remove(self, x):
 		self._src.remove( self._p_src( x ) )
 
+	def replace(self, a, x):
+		self._src.replace( self._p_src( a ), self._p_src( x ) )
+
+	def replaceRange(self, a, b, xs):
+		self._src.replaceRange( self._p_src( a ), self._p_src( b ), [ self._p_src( x )  for x in xs ] )
+
+
 	def __setitem__(self, i, x):
 		if isinstance( i, slice ):
 			self._src[i] = [ self._p_src( p )   for p in x ]
@@ -204,6 +226,13 @@ class DMListOpSlice (DMListOperator):
 
 	def remove(self, x):
 		self._src.remove( self._p_src( x ) )
+
+	def replace(self, a, x):
+		self._src.replace( self._p_src( a ), self._p_src( x ) )
+
+	def replaceRange(self, a, b, xs):
+		self._src.replaceRange( self._p_src( a ), self._p_src( b ), [ self._p_src( x )  for x in xs ] )
+
 
 	def __setitem__(self, i, x):
 		if isinstance( i, slice ):
@@ -291,6 +320,18 @@ class DMListOpWrap (DMListOperator):
 	def remove(self, x):
 		if x not in self._pre  and  x not in self._suf:
 			self._src.remove( self._p_src( x ) )
+
+	def replace(self, a, x):
+		if a not in self._pre  and  a not in self._suf:
+			self._src.replace( self._p_src( a ), self._p_src( x ) )
+
+	def replaceRange(self, a, b, xs):
+		if a in self._pre:
+			a = self[0]
+		if b in self._suf:
+			b = self[-1]
+		self._src.replaceRange( self._p_src( a ), self._p_src( b ), [ self._p_src( x )  for x in xs ] )
+
 
 	def __setitem__(self, i, x):
 		if isinstance( i, slice ):

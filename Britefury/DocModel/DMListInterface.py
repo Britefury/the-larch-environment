@@ -34,6 +34,15 @@ class DMListInterface (DMNode):
 		pass
 
 	@abstractmethod
+	def replace(self, a, x):
+		pass
+
+	@abstractmethod
+	def replaceRange(self, a, b, xs):
+		"""Replaces the range (a,b) inclusive with the contents of xs"""
+		pass
+
+	@abstractmethod
 	def __setitem__(self, i, x):
 		pass
 
