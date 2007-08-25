@@ -270,156 +270,156 @@ class LiteralStringCell (LiteralCell):
 
 
 
+import unittest
+
+
+class _CellValue (object):
+	def __init__(self, x):
+		self.x = x
+
+
+class _TestLiteralCell (LiteralCell):
+	valueClass = _CellValue
+	bAllowNone = False
+
+
+class TestCase_LiteralCell (unittest.TestCase):
+	def setUp(self):
+		self._sigs = {}
+
+	def tearDown(self):
+		self._sigs = {}
+
+	def received(self, name):
+		return self._sigs.get( name, 0 )
+
+	def makeListener(self, name):
+		def listener(*args, **kwargs):
+			self._sigs[name] = self._sigs.get( name, 0 ) + 1
+		return listener
+
+
+	def testValidity(self):
+		cell = LiteralIntCell( 1 )
+		self.assert_( cell.isValid() )
+
+
+	def testSimpleValue(self):
+		cell = LiteralIntCell( 1 )
+
+		self.assert_( cell.value == 1 )
+		self.assert_( cell.immutableValue == 1 )
+		self.assert_( cell._value == 1 )
+
+		cell.literalValue = 20
+
+		self.assert_( cell.value == 20 )
+		self.assert_( cell.immutableValue == 20 )
+		self.assert_( cell._value == 20 )
+
+
+	def testMutable(self):
+		cell = _TestLiteralCell( _CellValue( 1 ) )
+
+		self.assert_( cell.value.x == 1 )
+		self.assert_( cell.immutableValue.x == 1 )
+		self.assert_( cell.value is not cell.immutableValue )
+
+		cell.literalValue = _CellValue( 20 )
+
+		self.assert_( cell.value.x == 20 )
+		self.assert_( cell.immutableValue.x == 20 )
+		self.assert_( cell.value is not cell.immutableValue )
+
+		cell.value.x = 50
+
+		self.assert_( cell.value.x == 20 )
+		self.assert_( cell.immutableValue.x == 20 )
+
+		cell.value.x = 50
+
+		self.assert_( cell.value.x == 20 )
+		self.assert_( cell.immutableValue.x == 20 )
+
+
+	def testLiteral(self):
+		cell = LiteralIntCell( 1 )
+
+		self.assert_( cell._value == 1 )
+
+		cell.literalValue = 20
+
+		self.assert_( cell._value == 20 )
+
+
+	def testEvaluatorSignal(self):
+		self.assert_( self.received( 'evaluator' ) == 0 )
+
+		cell = LiteralIntCell( 1 )
+		cell.evaluatorSignal.connect( self.makeListener( 'evaluator' ) )
+		cell.literalValue = 20
+		self.assert_( self.received( 'evaluator' ) == 1 )
+
+
+	def testChangedSignal(self):
+		self.assert_( self.received( 'changed' ) == 0 )
+
+		cell = LiteralIntCell( 1 )
+		cell.changedSignal.connect( self.makeListener( 'changed' ) )
+		self.assert_( cell.value == 1 )
+		cell.literalValue = 20
+		self.assert_( self.received( 'changed' ) == 1 )
+
+
+	def testXml(self):
+		cell1 = LiteralIntCell( 20 )
+
+		cell2 = LiteralIntCell( 1 )
+
+		docOut = OutputXmlDocument()
+		docOut.getContentNode()  <<  cell1
+		xml = docOut.writeString()
+
+		docIn = InputXmlDocument()
+		docIn.parse( xml )
+
+		docIn.getContentNode()  >>  cell2
+
+		self.assert_( cell2.value == 20 )
+
+		docOut2 = OutputXmlDocument()
+		docOut2.getContentNode()  <<  cell2
+		xml2 = docOut2.writeString()
+
+		self.assert_( xml == xml2 )
+
+
+	def testCopy(self):
+		cell1 = LiteralIntCell( 20 )
+
+		self.assert_( cell1.value == 20 )
+
+		cell2 = copy( cell1 )
+
+		self.assert_( cell2.value == 20 )
+
+
+
+	def testCopyFrom(self):
+		cell1 = LiteralIntCell( 20 )
+		cell2 = LiteralIntCell( 30 )
+
+		self.assert_( cell1.value == 20 )
+		self.assert_( cell2.value == 30 )
+
+		cell2.copyFrom( cell1 )
+
+		self.assert_( cell2.value == 20 )
+
+
+
+
 if __name__ == '__main__':
-	import unittest
-
-
-	class CellValue (object):
-		def __init__(self, x):
-			self.x = x
-
-
-	class TestLiteralCell (LiteralCell):
-		valueClass = CellValue
-		bAllowNone = False
-
-
-	class CellTest (unittest.TestCase):
-		def setUp(self):
-			self._sigs = {}
-
-		def tearDown(self):
-			self._sigs = {}
-
-		def received(self, name):
-			return self._sigs.get( name, 0 )
-
-		def makeListener(self, name):
-			def listener(*args, **kwargs):
-				self._sigs[name] = self._sigs.get( name, 0 ) + 1
-			return listener
-
-
-		def testValidity(self):
-			cell = LiteralIntCell( 1 )
-			self.assert_( cell.isValid() )
-
-
-		def testSimpleValue(self):
-			cell = LiteralIntCell( 1 )
-
-			self.assert_( cell.value == 1 )
-			self.assert_( cell.immutableValue == 1 )
-			self.assert_( cell._value == 1 )
-
-			cell.literalValue = 20
-
-			self.assert_( cell.value == 20 )
-			self.assert_( cell.immutableValue == 20 )
-			self.assert_( cell._value == 20 )
-
-
-		def testMutable(self):
-			cell = TestLiteralCell( CellValue( 1 ) )
-
-			self.assert_( cell.value.x == 1 )
-			self.assert_( cell.immutableValue.x == 1 )
-			self.assert_( cell.value is not cell.immutableValue )
-
-			cell.literalValue = CellValue( 20 )
-
-			self.assert_( cell.value.x == 20 )
-			self.assert_( cell.immutableValue.x == 20 )
-			self.assert_( cell.value is not cell.immutableValue )
-
-			cell.value.x = 50
-
-			self.assert_( cell.value.x == 20 )
-			self.assert_( cell.immutableValue.x == 20 )
-
-			cell.value.x = 50
-
-			self.assert_( cell.value.x == 20 )
-			self.assert_( cell.immutableValue.x == 20 )
-
-
-		def testLiteral(self):
-			cell = LiteralIntCell( 1 )
-
-			self.assert_( cell._value == 1 )
-
-			cell.literalValue = 20
-
-			self.assert_( cell._value == 20 )
-
-
-		def testEvaluatorSignal(self):
-			self.assert_( self.received( 'evaluator' ) == 0 )
-
-			cell = LiteralIntCell( 1 )
-			cell.evaluatorSignal.connect( self.makeListener( 'evaluator' ) )
-			cell.literalValue = 20
-			self.assert_( self.received( 'evaluator' ) == 1 )
-
-
-		def testChangedSignal(self):
-			self.assert_( self.received( 'changed' ) == 0 )
-
-			cell = LiteralIntCell( 1 )
-			cell.changedSignal.connect( self.makeListener( 'changed' ) )
-			self.assert_( cell.value == 1 )
-			cell.literalValue = 20
-			self.assert_( self.received( 'changed' ) == 1 )
-
-
-		def testXml(self):
-			cell1 = LiteralIntCell( 20 )
-
-			cell2 = LiteralIntCell( 1 )
-
-			docOut = OutputXmlDocument()
-			docOut.getContentNode()  <<  cell1
-			xml = docOut.writeString()
-
-			docIn = InputXmlDocument()
-			docIn.parse( xml )
-
-			docIn.getContentNode()  >>  cell2
-
-			self.assert_( cell2.value == 20 )
-
-			docOut2 = OutputXmlDocument()
-			docOut2.getContentNode()  <<  cell2
-			xml2 = docOut2.writeString()
-
-			self.assert_( xml == xml2 )
-
-
-		def testCopy(self):
-			cell1 = LiteralIntCell( 20 )
-
-			self.assert_( cell1.value == 20 )
-
-			cell2 = copy( cell1 )
-
-			self.assert_( cell2.value == 20 )
-
-
-
-		def testCopyFrom(self):
-			cell1 = LiteralIntCell( 20 )
-			cell2 = LiteralIntCell( 30 )
-
-			self.assert_( cell1.value == 20 )
-			self.assert_( cell2.value == 30 )
-
-			cell2.copyFrom( cell1 )
-
-			self.assert_( cell2.value == 20 )
-
-
-
-
 	unittest.main()
 
 

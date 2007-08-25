@@ -312,22 +312,3 @@ class DMListOpWrap (DMListOperator):
 			else:
 				self._src[i-self._prefixLen] = self._p_src( x )
 
-
-
-
-
-import unittest
-
-
-
-class TestCase_String (unittest.TestCase):
-	def testStringCtor(self):
-		x = DMString( 'x' )
-
-		self.assert_( x.getValue() == 'x' )
-		self.assert_( x.value == 'x' )
-
-
-
-if __name__ == '__main__':
-	unittest.main()

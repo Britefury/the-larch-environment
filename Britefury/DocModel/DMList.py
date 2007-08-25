@@ -86,69 +86,13 @@ class DMList (DMListInterface):
 
 
 
+	def setOp(self, op):
+		self._op = op
+		self._cell.function = self._op.evaluate
 
 
+	op = property( None, setOp )
 
-
-class DMProxyList (DMListInterface):
-	def __init__(self, layer, src):
-		self._layer = layer
-		self._src = src
-
-
-
-	def append(self, x):
-		self._src.append( x )
-
-	def extend(self, xs):
-		self._src.extend( xs )
-
-	def insertBefore(self, before, x):
-		self._src.insertBefore( before, x )
-
-	def insertAfter(self, after, x):
-		self._src.insertAfter( after, x )
-
-	def remove(self, x):
-		self._src.remove( x )
-
-	def __setitem__(self, i, x):
-		self._src[i] = x
-
-
-	def __getitem__(self, i):
-		return self._src[i]
-
-	def __contains__(self, x):
-		return x in self._src
-
-	def __iter__(self):
-		return iter( self._src )
-
-	def __add__(self, xs):
-		return self._src + xs
-
-	def __len__(self):
-		return len( self._src )
-
-	def index(self, x):
-		return self._src.index( x )
-
-
-	def getLayer(self):
-		return self._layer
-
-
-	def getDestList(self, layer):
-		return layer.getDestList( self )
-
-	def getSrcList(self, layer):
-		return layer.getSrcList( self )
-
-
-
-	def __copy__(self):
-		return DMProxyList( self._layer, self._src )
 
 
 
@@ -248,16 +192,25 @@ class TestCase_List (unittest.TestCase):
 
 
 	def testLayers(self):
-		def layerFunction(ls, layer):
+		def opPlus2(ls, layer):
+			return DMListOpWrap( layer, DMListOpMap( layer, DMListOpSlice( layer, ls, 1, None ), lambda x: x + 2, lambda x: x - 2 ), [ 'plus2b' ], [] )
+
+		def opTimes2(ls, layer):
+			return DMListOpWrap( layer, DMListOpMap( layer, DMListOpSlice( layer, ls, 1, None ), lambda x: x * 2, lambda x: x / 2 ), [ 'times2b' ], [] )
+
+		def opNop(ls, layer):
+			return DMListOpNop( layer, ls )
+
+		def layerOpFunctionGenerator(ls, layer):
 			if ls[0] == 'plus2':
-				return DMList( layer, DMListOpWrap( layer, DMListOpMap( layer, DMListOpSlice( layer, ls, 1, None ), lambda x: x + 2, lambda x: x - 2 ), [ 'plus2b' ], [] ) )
+				return opPlus2
 			elif ls[0] == 'times2':
-				return DMList( layer, DMListOpWrap( layer, DMListOpMap( layer, DMListOpSlice( layer, ls, 1, None ), lambda x: x * 2, lambda x: x / 2 ), [ 'times2b' ], [] ) )
+				return opTimes2
 			else:
-				return copy( ls )
+				return opNop
 
 		layer1 = DocModelLayer()
-		layer2 = DocModelLayer( layerFunction )
+		layer2 = DocModelLayer( layerOpFunctionGenerator )
 
 		x = DMLiteralList( layer1 )
 		x.extend( [ 1, 2, 3 ] )

@@ -9,14 +9,17 @@ from weakref import WeakKeyDictionary
 
 from Britefury.Cell.Cell import RefCell
 
+import Britefury.DocModel.DMList
+
 
 
 class DocModelLayer (object):
-	def __init__(self, layerFunction=lambda x, y: copy( x )):
-		"""layerFunction signature:    layerFunction(sourceList, destLayer)"""
-		self._layerFunction = layerFunction
+	def __init__(self, layerOpFunctionGenerator=lambda x, y: lambda x, y: copy( x )):
+		"""layerFunctionGenerator signature:    layerOpFunctionGenerator(sourceList, destLayer)  ->  layerOpFunction(sourceList, destLayer)"""
+		self._layerOpFunctionGenerator = layerOpFunctionGenerator
 
 		self._srcListToDestCell = WeakKeyDictionary()
+		self._srcListToLayerOpFunctionToDestList = WeakKeyDictionary()
 		self._destListToSrcList = WeakKeyDictionary()
 
 
@@ -26,12 +29,28 @@ class DocModelLayer (object):
 			destCell = self._srcListToDestCell[srcList]
 		except KeyError:
 			def _cellFunc():
-				return self._layerFunction( srcList, self )
+				layerOpFunction = self._layerOpFunctionGenerator( srcList, self )
+
+				try:
+					layerOpFunctionToDestList = self._srcListToLayerOpFunctionToDestList[srcList]
+				except KeyError:
+					layerOpFunctionToDestList = WeakKeyDictionary()
+					self._srcListToLayerOpFunctionToDestList[srcList] = layerOpFunctionToDestList
+
+				try:
+					destList = layerOpFunctionToDestList[layerOpFunction]
+				except KeyError:
+					destList = Britefury.DocModel.DMList.DMList( self, layerOpFunction( srcList, self ) )
+					layerOpFunctionToDestList[layerOpFunction] = destList
+
+				return destList
+
 
 			destCell = RefCell()
 			destCell.function = _cellFunc
 
 			self._srcListToDestCell[srcList] = destCell
+
 
 		destList = destCell.getValue()
 		self._destListToSrcList[destList] = srcList
@@ -42,10 +61,6 @@ class DocModelLayer (object):
 
 	def getSrcList(self, destList):
 		return self._destListToSrcList[destList]
-
-
-
-
 
 
 
