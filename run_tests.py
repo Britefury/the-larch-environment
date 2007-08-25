@@ -7,6 +7,15 @@
 ##-*************************
 import unittest
 
+from Britefury.Cell import CellEvaluatorFunction
+from Britefury.Cell import CellEvaluator
+from Britefury.Cell import CellEvaluatorPythonExpression
+from Britefury.Cell import CellInterface
+from Britefury.Cell import Cell
+from Britefury.Cell import LiteralCell
+from Britefury.Cell import ProxyCell
+
+
 from Britefury.DocModel import DMNode
 from Britefury.DocModel import DMSymbol
 from Britefury.DocModel import DMString
@@ -18,17 +27,8 @@ from Britefury.DocModel import DMProxyList
 from Britefury.DocModel import DocModelLayer
 
 
-from Britefury.Cell import CellEvaluatorFunction
-from Britefury.Cell import CellEvaluator
-from Britefury.Cell import CellEvaluatorPythonExpression
-from Britefury.Cell import CellInterface
-from Britefury.Cell import Cell
-from Britefury.Cell import LiteralCell
-from Britefury.Cell import ProxyCell
-
-
-testModules = [ DMNode, DMSymbol, DMString, DMListOperator, DMListInterface, DMList, DMLiteralList, DMProxyList, DocModelLayer,
-				CellEvaluatorFunction, CellEvaluator, CellEvaluatorPythonExpression, CellInterface, Cell, LiteralCell, ProxyCell ]
+testModules = [ CellEvaluatorFunction, CellEvaluator, CellEvaluatorPythonExpression, CellInterface, Cell, LiteralCell, ProxyCell,
+				DMNode, DMSymbol, DMString, DMListOperator, DMListInterface, DMList, DMLiteralList, DMProxyList, DocModelLayer ]
 
 
 if __name__ == '__main__':
