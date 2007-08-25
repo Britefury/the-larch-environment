@@ -20,8 +20,7 @@ from Britefury.DocModel.DMLiteralList import DMLiteralList
 
 
 class DMProxyList (DMListInterface):
-	def __init__(self, layer, src):
-		self._layer = layer
+	def __init__(self, src):
 		self._src = src
 
 
@@ -64,10 +63,6 @@ class DMProxyList (DMListInterface):
 		return self._src.index( x )
 
 
-	def getLayer(self):
-		return self._layer
-
-
 	def getDestList(self, layer):
 		return layer.getDestList( self )
 
@@ -77,11 +72,11 @@ class DMProxyList (DMListInterface):
 
 
 	def __copy__(self):
-		return DMProxyList( self._layer, self._src )
+		return DMProxyList( self._src )
 
 
 	def __deepcopy__(self, memo):
-		return DMProxyList( self._layer, self._src )
+		return DMProxyList( self._src )
 
 
 
@@ -95,12 +90,10 @@ import unittest
 
 class TestCase_ProxyList (unittest.TestCase):
 	def testProxy(self):
-		layer1 = DocModelLayer()
-		layer2 = DocModelLayer()
-		x = DMLiteralList( layer1 )
+		x = DMLiteralList()
 		x.extend( [ 1, 2, 3 ] )
 
-		y = DMProxyList( layer2, x )
+		y = DMProxyList( x )
 		self.assert_( x[:] == [ 1, 2, 3 ] )
 		self.assert_( y[:] == [ 1, 2, 3 ] )
 		x[1] = 4

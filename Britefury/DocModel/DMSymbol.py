@@ -5,13 +5,27 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
+from Britefury.FileIO.IOXml import ioXmlReadStringProp, ioXmlWriteStringProp, ioObjectFactoryRegister, ioReadObjectFromString, ioWriteObjectAsString
+
 from Britefury.DocModel.DMNode import DMNode
 
 
 
 class DMSymbol (DMNode):
-	def __init__(self, name):
+	def __init__(self, name='_'):
 		self._name = intern( name )
+
+
+	def __readxml__(self, xmlNode):
+		if xmlNode.isValid():
+			self._name = ioXmlReadStringProp( xmlNode.property( 'name' ), '_' )
+		else:
+			self._name = '_'
+
+
+	def __writexml__(self, xmlNode):
+		if xmlNode.isValid():
+			ioXmlWriteStringProp( xmlNode.property( 'name' ), self._name )
 
 
 	def __cmp__(self, x):
@@ -21,12 +35,24 @@ class DMSymbol (DMNode):
 			return cmp( self._name, x )
 
 
+	def __hash__(self):
+		return hash( self._value )
+
+
 
 	def getName(self):
 		return self._name
 
 
+
+
+
+
 	name = property( getName )
+
+
+
+ioObjectFactoryRegister( 'DMSymbol', DMSymbol )
 
 
 
@@ -64,6 +90,16 @@ class TestCase_Symbol (unittest.TestCase):
 
 		self.assert_( x == 'x' )
 		self.assert_( x != 'y' )
+
+
+
+	def testIOXml(self):
+		x = DMSymbol( 'x' )
+
+		s = ioWriteObjectAsString( x )
+		y = ioReadObjectFromString( s )
+
+		self.assert_( x == y )
 
 
 
