@@ -5,43 +5,8 @@
 ##-* version 2 can be found in the file valued 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
-from Britefury.DocModel.DMNode import DMNode
 
 
 
-class DMString (DMNode):
-	def __init__(self, value):
-		self._value = value
-
-
-
-	def getValue(self):
-		return self._value
-
-
-	value = property( getValue )
-
-
-
-
-
-
-
-
-
-
-import unittest
-
-
-
-class TestCase_String (unittest.TestCase):
-	def testStringCtor(self):
-		x = DMString( 'x' )
-
-		self.assert_( x.getValue() == 'x' )
-		self.assert_( x.value == 'x' )
-
-
-
-if __name__ == '__main__':
-	unittest.main()
+class DMNode (object):
+	pass

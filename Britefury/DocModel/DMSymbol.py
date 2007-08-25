@@ -5,10 +5,11 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
+from Britefury.DocModel.DMNode import DMNode
 
 
 
-class DMSymbol (object):
+class DMSymbol (DMNode):
 	def __init__(self, name):
 		self._name = intern( name )
 
