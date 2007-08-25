@@ -16,6 +16,7 @@ class ProxyCell (CellInterface):
 
 
 	def __init__(self, targetSourceCell=None):
+		"""targetSourceCell is a higher order cell; its value is a reference to a cell, whose value is the target"""
 		super( ProxyCell, self ).__init__()
 
 		self._targetSourceCell = None

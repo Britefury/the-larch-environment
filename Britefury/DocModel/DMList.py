@@ -8,7 +8,8 @@
 from weakref import WeakKeyDictionary
 from copy import copy
 
-from Britefury.Cell.Cell import RefCell
+from Britefury.Cell.Cell import RefCell, CellRefCell
+from Britefury.Cell.ProxyCell import ProxyCell
 
 from Britefury.DocModel.DMListOperator import DMListOpMap, DMListOpSlice, DMListOpWrap, DMListOpNop
 
@@ -154,6 +155,71 @@ class DMList (object):
 		if self._op is None:
 			c[:] = self[:]
 		return c
+
+
+
+
+
+
+class DMProxyList (object):
+	def __init__(self, layer, src):
+		self._layer = layer
+		self._src = src
+
+
+
+	def append(self, x):
+		self._src.append( x )
+
+	def extend(self, xs):
+		self._src.extend( xs )
+
+	def insertBefore(self, before, x):
+		self._src.insertBefore( before, x )
+
+	def insertAfter(self, after, x):
+		self._src.insertAfter( after, x )
+
+	def remove(self, x):
+		self._src.remove( x )
+
+	def __setitem__(self, i, x):
+		self._src[i] = x
+
+
+	def __getitem__(self, i):
+		return self._src[i]
+
+	def __contains__(self, x):
+		return x in self._src
+
+	def __iter__(self):
+		return iter( self._src )
+
+	def __add__(self, xs):
+		return self._src + xs
+
+	def __len__(self):
+		return len( self._src )
+
+	def index(self, x):
+		return self._src.index( x )
+
+
+	def getLayer(self):
+		return self._layer
+
+
+	def getDestList(self, layer):
+		return layer.getDestList( self )
+
+	def getSrcList(self, layer):
+		return layer.getSrcList( self )
+
+
+
+	def __copy__(self):
+		return DMProxyList( self._layer, self._src )
 
 
 
@@ -327,6 +393,8 @@ class TestCase_List (unittest.TestCase):
 				return DMList( layer, DMListOpWrap( layer, DMListOpMap( layer, DMListOpSlice( layer, ls, 1, None ), lambda x: x + 2, lambda x: x - 2 ), [ 'plus2b' ], [] ) )
 			elif ls[0] == 'times2':
 				return DMList( layer, DMListOpWrap( layer, DMListOpMap( layer, DMListOpSlice( layer, ls, 1, None ), lambda x: x * 2, lambda x: x / 2 ), [ 'times2b' ], [] ) )
+			elif ls[0] == 'proxy':
+				return DMProxyList( layer, ls )
 			else:
 				return copy( ls )
 
@@ -341,6 +409,9 @@ class TestCase_List (unittest.TestCase):
 		xx2 = DMList( layer1 )
 		xx2.extend( [ 'times2', 11, 12, 13 ] )
 		x.append( xx2 )
+		xx3 = DMList( layer1 )
+		xx3.extend( [ 'proxy', -1, -2, -3 ] )
+		x.append( xx3 )
 
 
 		y = DMList( layer2, DMListOpNop( layer2, x ) )
@@ -349,6 +420,7 @@ class TestCase_List (unittest.TestCase):
 		self.assert_( y[0:3] == [ 1, 2, 3 ] )
 		self.assert_( y[3][:] == [ 'plus2b', 7, 8, 9 ] )
 		self.assert_( y[4][:] == [ 'times2b', 22, 24, 26 ] )
+		self.assert_( y[5][:] == [ 'proxy', -1, -2, -3 ] )
 
 		xx1[2] = 8
 		self.assert_( x[3][:] == [ 'plus2', 5, 8, 7 ] )
@@ -359,6 +431,25 @@ class TestCase_List (unittest.TestCase):
 		xx1[0] = 'plus2'
 		self.assert_( x[3][:] == [ 'plus2', 5, 8, 7 ] )
 		self.assert_( y[3][:] == [ 'plus2b', 7, 10, 9 ] )
+		y[3][2] = 8
+		self.assert_( x[3][:] == [ 'plus2', 5, 6, 7 ] )
+		self.assert_( y[3][:] == [ 'plus2b', 7, 8, 9 ] )
+		y[3][2] = 8
+		self.assert_( x[3][:] == [ 'plus2', 5, 6, 7 ] )
+		self.assert_( y[3][:] == [ 'plus2b', 7, 8, 9 ] )
+		self.assert_( x[4][:] == [ 'times2', 11, 12, 13 ] )
+		self.assert_( y[4][:] == [ 'times2b', 22, 24, 26 ] )
+		y[4][2] = 8
+		self.assert_( x[3][:] == [ 'plus2', 5, 6, 7 ] )
+		self.assert_( y[3][:] == [ 'plus2b', 7, 8, 9 ] )
+		self.assert_( x[4][:] == [ 'times2', 11, 4, 13 ] )
+		self.assert_( y[4][:] == [ 'times2b', 22, 8, 26 ] )
+		x[5][2] = -4
+		self.assert_( x[5][:] == [ 'proxy', -1, -4, -3 ] )
+		self.assert_( y[5][:] == [ 'proxy', -1, -4, -3 ] )
+		y[5][2] = -5
+		self.assert_( x[5][:] == [ 'proxy', -1, -5, -3 ] )
+		self.assert_( y[5][:] == [ 'proxy', -1, -5, -3 ] )
 
 
 
