@@ -221,477 +221,477 @@ class ProxyCell (CellInterface):
 
 
 
+import unittest
+
+from Britefury.Cell.Cell import Cell, IntCell, CellRefCell
+
+
+
+class TestCase_ProxyCell (unittest.TestCase):
+	def setUp(self):
+		self._sigs = {}
+
+	def tearDown(self):
+		self._sigs = {}
+
+	def received(self, name):
+		return self._sigs.get( name, 0 )
+
+	def receivedAndReset(self, name):
+		return self._sigs.pop( name, 0 )
+
+	def wasReceivedAndReset(self, name):
+		return self._sigs.pop( name, 0 ) != 0
+
+	def reset(self, name):
+		self._sigs.pop( name, 0 )
+
+	def makeListener(self, name):
+		def listener(*args, **kwargs):
+			self._sigs[name] = self._sigs.get( name, 0 ) + 1
+		return listener
+
+
+
+
+	def testCellValidity(self):
+		cell = IntCell( 1 )
+		self.assert_( cell.isValid() )
+
+
+
+
+	def testProxyCellValidity(self):
+		cell = IntCell( 1 )
+		pCellTarget = CellRefCell( None, cell )
+		pCell = ProxyCell( pCellTarget )
+		qCellTarget = CellRefCell( None, pCell )
+		qCell = ProxyCell( qCellTarget )
+
+		self.assert_( cell.isValid() )
+		self.assert_( pCell.isValid() )
+		self.assert_( qCell.isValid() )
+
+		pCellTarget.literalValue = None
+
+		self.assert_( not pCell.isValid() )
+		self.assert_( not qCell.isValid() )
+
+		pCellTarget.literalValue = cell
+
+		self.assert_( pCell.isValid() )
+		self.assert_( qCell.isValid() )
+
+		qCellTarget.literalValue = None
+
+		self.assert_( pCell.isValid() )
+		self.assert_( not qCell.isValid() )
+
+		qCellTarget.literalValue = cell
+
+		self.assert_( pCell.isValid() )
+		self.assert_( qCell.isValid() )
+
+		qCellTarget.literalValue = pCell
+
+		self.assert_( pCell.isValid() )
+		self.assert_( qCell.isValid() )
+
+
+
+
+	def testProxyCellValidity2nd(self):
+		cell = IntCell( 1 )
+		atCell = CellRefCell( None, cell )
+		pCell = ProxyCell( atCell )
+		atPCell = CellRefCell( None, pCell )
+		qCellTarget = CellRefCell( None, pCell )
+		qCell = ProxyCell( atPCell )
+
+
+		self.assert_( cell.isValid() )
+		self.assert_( pCell.isValid() )
+		self.assert_( qCell.isValid() )
+
+		pCell.targetSourceCell = None
+
+		self.assert_( not pCell.isValid() )
+		self.assert_( not qCell.isValid() )
+
+		pCell.targetSourceCell = atCell
+
+		self.assert_( pCell.isValid() )
+		self.assert_( qCell.isValid() )
+
+		qCell.targetSourceCell = None
+
+		self.assert_( pCell.isValid() )
+		self.assert_( not qCell.isValid() )
+
+		qCell.targetSourceCell = atCell
+
+		self.assert_( pCell.isValid() )
+		self.assert_( qCell.isValid() )
+
+		qCell.targetSourceCell = atPCell
+
+		self.assert_( pCell.isValid() )
+		self.assert_( qCell.isValid() )
+
+		qCell.targetSourceCell = qCellTarget
+
+		self.assert_( pCell.isValid() )
+		self.assert_( qCell.isValid() )
+
+		qCellTarget.literalValue = None
+
+		self.assert_( pCell.isValid() )
+		self.assert_( not qCell.isValid() )
+
+		qCellTarget.literalValue = cell
+
+		self.assert_( pCell.isValid() )
+		self.assert_( qCell.isValid() )
+
+		qCellTarget.literalValue = pCell
+
+		self.assert_( pCell.isValid() )
+		self.assert_( qCell.isValid() )
+
+
+
+
+	def testProxyCellValiditySignal(self):
+		cell = IntCell( 1 )
+		pCellTarget = CellRefCell( None, cell )
+		pCell = ProxyCell( pCellTarget )
+		qCellTarget = CellRefCell( None, pCell )
+		qCell = ProxyCell( qCellTarget )
+
+		qCell.validitySignal.connect( self.makeListener( 'validity' ) )
+
+		self.assert_( pCell.isValid() )
+		self.assert_( qCell.isValid() )
+		self.assert_( self.wasReceivedAndReset( 'validity' ) == False )
+
+		pCellTarget.literalValue = None
+
+		self.assert_( not pCell.isValid() )
+		self.assert_( not qCell.isValid() )
+		self.assert_( self.wasReceivedAndReset( 'validity' ) == True )
+
+		pCellTarget.literalValue = cell
+
+		self.assert_( pCell.isValid() )
+		self.assert_( qCell.isValid() )
+		self.assert_( self.wasReceivedAndReset( 'validity' ) == True )
+
+		qCellTarget.literalValue = None
+
+		self.assert_( pCell.isValid() )
+		self.assert_( not qCell.isValid() )
+		self.assert_( self.wasReceivedAndReset( 'validity' ) == True )
+
+		qCellTarget.literalValue = cell
+
+		self.assert_( pCell.isValid() )
+		self.assert_( qCell.isValid() )
+		self.assert_( self.wasReceivedAndReset( 'validity' ) == True )
+
+		qCellTarget.literalValue = pCell
+
+		self.assert_( pCell.isValid() )
+		self.assert_( qCell.isValid() )
+		self.reset( 'validity' )
+
+
+
+
+	def testProxyCellValiditySignal2nd(self):
+		cell = IntCell( 1 )
+		atCell = CellRefCell( None, cell )
+		pCell = ProxyCell( atCell )
+		atPCell = CellRefCell( None, pCell )
+		qCellTarget = CellRefCell( None, pCell )
+		qCell = ProxyCell( atPCell )
+
+		qCell.validitySignal.connect( self.makeListener( 'validity' ) )
+
+		self.assert_( pCell.isValid() )
+		self.assert_( qCell.isValid() )
+		self.assert_( self.wasReceivedAndReset( 'validity' ) == False )
+
+		pCell.targetSourceCell = None
+
+		self.assert_( not pCell.isValid() )
+		self.assert_( not qCell.isValid() )
+		self.assert_( self.wasReceivedAndReset( 'validity' ) == True )
+
+		pCell.targetSourceCell = atCell
+
+		self.assert_( pCell.isValid() )
+		self.assert_( qCell.isValid() )
+		self.assert_( self.wasReceivedAndReset( 'validity' ) == True )
+
+		qCell.targetSourceCell = None
+
+		self.assert_( pCell.isValid() )
+		self.assert_( not qCell.isValid() )
+		self.assert_( self.wasReceivedAndReset( 'validity' ) == True )
+
+		qCell.targetSourceCell = atCell
+
+		self.assert_( pCell.isValid() )
+		self.assert_( qCell.isValid() )
+		self.assert_( self.wasReceivedAndReset( 'validity' ) == True )
+
+		qCell.targetSourceCell = atPCell
+
+		self.assert_( pCell.isValid() )
+		self.assert_( qCell.isValid() )
+		self.reset( 'validity' )
+
+		qCell.targetSourceCell = qCellTarget
+
+		self.assert_( pCell.isValid() )
+		self.assert_( qCell.isValid() )
+		self.reset( 'validity' )
+
+		qCellTarget.literalValue = None
+
+		self.assert_( pCell.isValid() )
+		self.assert_( not qCell.isValid() )
+		self.assert_( self.wasReceivedAndReset( 'validity' ) == True )
+
+		qCellTarget.literalValue = cell
+
+		self.assert_( pCell.isValid() )
+		self.assert_( qCell.isValid() )
+		self.assert_( self.wasReceivedAndReset( 'validity' ) == True )
+
+		qCellTarget.literalValue = pCell
+
+		self.assert_( pCell.isValid() )
+		self.assert_( qCell.isValid() )
+		self.reset( 'validity' )
+
+
+
+	def testProxyCellLiteralValue(self):
+		cell1 = IntCell( 1 )
+		cell2 = IntCell( 2 )
+		pCellTarget = CellRefCell( None, cell1 )
+		pCell = ProxyCell( pCellTarget )
+
+		self.assert_( cell1.value == 1 )
+		self.assert_( cell2.value == 2 )
+		self.assert_( pCell.value == 1 )
+
+		pCellTarget.literalValue = cell2
+
+		self.assert_( pCell.value == 2 )
+
+		pCell.literalValue = 20
+
+		self.assert_( pCell.value == 20 )
+		self.assert_( cell2.value == 20 )
+
+		pCellTarget.literalValue = cell1
+
+		self.assert_( pCell.value == 1 )
+		self.assert_( cell2.value == 20 )
+
+
+	def testProxyCellLiteralValue2nd(self):
+		cell1 = IntCell( 1 )
+		atCell1 = CellRefCell( None, cell1 )
+		cell2 = IntCell( 2 )
+		atCell2 = CellRefCell( None, cell2 )
+		pCellTarget = CellRefCell( None, cell2 )
+		pCell = ProxyCell( atCell1 )
+
+		self.assert_( cell1.value == 1 )
+		self.assert_( cell2.value == 2 )
+		self.assert_( pCell.value == 1 )
+
+		pCell.targetSourceCell = atCell2
+
+		self.assert_( pCell.value == 2 )
+
+		pCell.literalValue = 20
+
+		self.assert_( cell1.value == 1 )
+		self.assert_( cell2.value == 20 )
+		self.assert_( pCell.value == 20 )
+
+		pCell.targetSourceCell = atCell1
+
+		self.assert_( cell1.value == 1 )
+		self.assert_( cell2.value == 20 )
+		self.assert_( pCell.value == 1 )
+
+		pCell.targetSourceCell = pCellTarget
+
+		self.assert_( cell1.value == 1 )
+		self.assert_( cell2.value == 20 )
+		self.assert_( pCell.value == 20 )
+
+		pCellTarget.literalValue = cell1
+
+		self.assert_( cell1.value == 1 )
+		self.assert_( cell2.value == 20 )
+		self.assert_( pCell.value == 1 )
+
+		pCell.literalValue = 30
+
+		self.assert_( cell1.value == 30 )
+		self.assert_( cell2.value == 20 )
+		self.assert_( pCell.value == 30 )
+
+
+
+	def testProxyCellChangedSignal(self):
+		cell1 = IntCell( 1 )
+		cell2 = IntCell( 2 )
+		pCellTarget = CellRefCell( None, cell1 )
+		pCell = ProxyCell( pCellTarget )
+
+		pCell.changedSignal.connect( self.makeListener( 'changed' ) )
+
+		self.assert_( cell1.value == 1 )
+		self.assert_( cell2.value == 2 )
+		self.assert_( pCell.value == 1 )
+		self.assert_( self.received( 'changed' ) == 0 )
+
+		pCellTarget.literalValue = cell2
+
+		self.assert_( cell1.value == 1 )
+		self.assert_( cell2.value == 2 )
+		self.assert_( pCell.value == 2 )
+		self.assert_( self.received( 'changed' ) == 1 )
+
+		cell2.literalValue = 20
+
+		self.assert_( cell1.value == 1 )
+		self.assert_( cell2.value == 20 )
+		self.assert_( pCell.value == 20 )
+		self.assert_( self.received( 'changed' ) == 2 )
+
+		pCellTarget.literalValue = cell1
+
+		self.assert_( cell1.value == 1 )
+		self.assert_( cell2.value == 20 )
+		self.assert_( pCell.value == 1 )
+		self.assert_( self.received( 'changed' ) == 3 )
+
+
+
+
+
+	def testProxyCellChangedSignal2nd(self):
+		cell1 = IntCell( 1 )
+		atCell1 = CellRefCell( None, cell1 )
+		cell2 = IntCell( 2 )
+		atCell2 = CellRefCell( None, cell2 )
+		pCellTarget = CellRefCell( None, cell2 )
+		pCell = ProxyCell( atCell1 )
+
+		pCell.changedSignal.connect( self.makeListener( 'changed' ) )
+
+		self.assert_( cell1.value == 1 )
+		self.assert_( cell2.value == 2 )
+		self.assert_( pCell.value == 1 )
+		self.assert_( self.received( 'changed' ) == 0 )
+
+		pCell.targetSourceCell = atCell2
+
+		self.assert_( cell1.value == 1 )
+		self.assert_( cell2.value == 2 )
+		self.assert_( pCell.value == 2 )
+		self.assert_( self.received( 'changed' ) == 1 )
+
+		cell2.literalValue = 20
+
+		self.assert_( cell1.value == 1 )
+		self.assert_( cell2.value == 20 )
+		self.assert_( pCell.value == 20 )
+		self.assert_( self.received( 'changed' ) == 2 )
+
+		pCell.targetSourceCell = atCell1
+
+		self.assert_( cell1.value == 1 )
+		self.assert_( cell2.value == 20 )
+		self.assert_( pCell.value == 1 )
+		self.assert_( self.received( 'changed' ) == 3 )
+
+		pCell.targetSourceCell = pCellTarget
+
+		self.assert_( cell1.value == 1 )
+		self.assert_( cell2.value == 20 )
+		self.assert_( pCell.value == 20 )
+		self.assert_( self.received( 'changed' ) == 4 )
+
+		pCellTarget.literalValue = cell1
+
+		self.assert_( cell1.value == 1 )
+		self.assert_( cell2.value == 20 )
+		self.assert_( pCell.value == 1 )
+		self.assert_( self.received( 'changed' ) == 5 )
+
+		pCell.literalValue = 30
+
+		self.assert_( cell1.value == 30 )
+		self.assert_( cell2.value == 20 )
+		self.assert_( pCell.value == 30 )
+		self.assert_( self.received( 'changed' ) == 6 )
+
+
+
+	def testFunctionOfProxyCell(self):
+		cell1 = IntCell( 1 )
+		cell2 = IntCell( 3 )
+		pCellTarget = CellRefCell( None, cell1 )
+		pCell = ProxyCell( pCellTarget )
+		fCell = IntCell( 0 )
+
+
+		def f():
+			return pCell.value * 5
+
+		fCell.function = f
+
+		fCell.changedSignal.connect( self.makeListener( 'changed' ) )
+
+		self.assert_( self.received( 'changed' ) == 0 )
+		self.assert_( cell1.value == 1 )
+		self.assert_( cell2.value == 3 )
+		self.assert_( pCell.value == 1 )
+		self.assert_( fCell.value == 5 )
+
+		self.assert_( fCell.dependencies == [ pCell ] )
+
+		pCellTarget.literalValue = cell2
+
+		self.assert_( self.received( 'changed' ) == 1 )
+		self.assert_( cell1.value == 1 )
+		self.assert_( cell2.value == 3 )
+		self.assert_( pCell.value == 3 )
+		self.assert_( fCell.value == 15 )
+
+
+		pCell.literalValue = 4
+
+		self.assert_( self.received( 'changed' ) == 2 )
+		self.assert_( cell1.value == 1 )
+		self.assert_( cell2.value == 4 )
+		self.assert_( pCell.value == 4 )
+		self.assert_( fCell.value == 20 )
+
+
+
+
+
+
 if __name__ == '__main__':
-	import unittest
-
-	from Britefury.Cell.Cell import Cell, IntCell, CellRefCell
-
-
-
-	class ProxyCellTest (unittest.TestCase):
-		def setUp(self):
-			self._sigs = {}
-
-		def tearDown(self):
-			self._sigs = {}
-
-		def received(self, name):
-			return self._sigs.get( name, 0 )
-
-		def receivedAndReset(self, name):
-			return self._sigs.pop( name, 0 )
-
-		def wasReceivedAndReset(self, name):
-			return self._sigs.pop( name, 0 ) != 0
-
-		def reset(self, name):
-			self._sigs.pop( name, 0 )
-
-		def makeListener(self, name):
-			def listener(*args, **kwargs):
-				self._sigs[name] = self._sigs.get( name, 0 ) + 1
-			return listener
-
-
-
-
-		def testCellValidity(self):
-			cell = IntCell( 1 )
-			self.assert_( cell.isValid() )
-
-
-
-
-		def testProxyCellValidity(self):
-			cell = IntCell( 1 )
-			pCellTarget = CellRefCell( None, cell )
-			pCell = ProxyCell( pCellTarget )
-			qCellTarget = CellRefCell( None, pCell )
-			qCell = ProxyCell( qCellTarget )
-
-			self.assert_( cell.isValid() )
-			self.assert_( pCell.isValid() )
-			self.assert_( qCell.isValid() )
-
-			pCellTarget.literalValue = None
-
-			self.assert_( not pCell.isValid() )
-			self.assert_( not qCell.isValid() )
-
-			pCellTarget.literalValue = cell
-
-			self.assert_( pCell.isValid() )
-			self.assert_( qCell.isValid() )
-
-			qCellTarget.literalValue = None
-
-			self.assert_( pCell.isValid() )
-			self.assert_( not qCell.isValid() )
-
-			qCellTarget.literalValue = cell
-
-			self.assert_( pCell.isValid() )
-			self.assert_( qCell.isValid() )
-
-			qCellTarget.literalValue = pCell
-
-			self.assert_( pCell.isValid() )
-			self.assert_( qCell.isValid() )
-
-
-
-
-		def testProxyCellValidity2nd(self):
-			cell = IntCell( 1 )
-			atCell = CellRefCell( None, cell )
-			pCell = ProxyCell( atCell )
-			atPCell = CellRefCell( None, pCell )
-			qCellTarget = CellRefCell( None, pCell )
-			qCell = ProxyCell( atPCell )
-
-
-			self.assert_( cell.isValid() )
-			self.assert_( pCell.isValid() )
-			self.assert_( qCell.isValid() )
-
-			pCell.targetSourceCell = None
-
-			self.assert_( not pCell.isValid() )
-			self.assert_( not qCell.isValid() )
-
-			pCell.targetSourceCell = atCell
-
-			self.assert_( pCell.isValid() )
-			self.assert_( qCell.isValid() )
-
-			qCell.targetSourceCell = None
-
-			self.assert_( pCell.isValid() )
-			self.assert_( not qCell.isValid() )
-
-			qCell.targetSourceCell = atCell
-
-			self.assert_( pCell.isValid() )
-			self.assert_( qCell.isValid() )
-
-			qCell.targetSourceCell = atPCell
-
-			self.assert_( pCell.isValid() )
-			self.assert_( qCell.isValid() )
-
-			qCell.targetSourceCell = qCellTarget
-
-			self.assert_( pCell.isValid() )
-			self.assert_( qCell.isValid() )
-
-			qCellTarget.literalValue = None
-
-			self.assert_( pCell.isValid() )
-			self.assert_( not qCell.isValid() )
-
-			qCellTarget.literalValue = cell
-
-			self.assert_( pCell.isValid() )
-			self.assert_( qCell.isValid() )
-
-			qCellTarget.literalValue = pCell
-
-			self.assert_( pCell.isValid() )
-			self.assert_( qCell.isValid() )
-
-
-
-
-		def testProxyCellValiditySignal(self):
-			cell = IntCell( 1 )
-			pCellTarget = CellRefCell( None, cell )
-			pCell = ProxyCell( pCellTarget )
-			qCellTarget = CellRefCell( None, pCell )
-			qCell = ProxyCell( qCellTarget )
-
-			qCell.validitySignal.connect( self.makeListener( 'validity' ) )
-
-			self.assert_( pCell.isValid() )
-			self.assert_( qCell.isValid() )
-			self.assert_( self.wasReceivedAndReset( 'validity' ) == False )
-
-			pCellTarget.literalValue = None
-
-			self.assert_( not pCell.isValid() )
-			self.assert_( not qCell.isValid() )
-			self.assert_( self.wasReceivedAndReset( 'validity' ) == True )
-
-			pCellTarget.literalValue = cell
-
-			self.assert_( pCell.isValid() )
-			self.assert_( qCell.isValid() )
-			self.assert_( self.wasReceivedAndReset( 'validity' ) == True )
-
-			qCellTarget.literalValue = None
-
-			self.assert_( pCell.isValid() )
-			self.assert_( not qCell.isValid() )
-			self.assert_( self.wasReceivedAndReset( 'validity' ) == True )
-
-			qCellTarget.literalValue = cell
-
-			self.assert_( pCell.isValid() )
-			self.assert_( qCell.isValid() )
-			self.assert_( self.wasReceivedAndReset( 'validity' ) == True )
-
-			qCellTarget.literalValue = pCell
-
-			self.assert_( pCell.isValid() )
-			self.assert_( qCell.isValid() )
-			self.reset( 'validity' )
-
-
-
-
-		def testProxyCellValiditySignal2nd(self):
-			cell = IntCell( 1 )
-			atCell = CellRefCell( None, cell )
-			pCell = ProxyCell( atCell )
-			atPCell = CellRefCell( None, pCell )
-			qCellTarget = CellRefCell( None, pCell )
-			qCell = ProxyCell( atPCell )
-
-			qCell.validitySignal.connect( self.makeListener( 'validity' ) )
-
-			self.assert_( pCell.isValid() )
-			self.assert_( qCell.isValid() )
-			self.assert_( self.wasReceivedAndReset( 'validity' ) == False )
-
-			pCell.targetSourceCell = None
-
-			self.assert_( not pCell.isValid() )
-			self.assert_( not qCell.isValid() )
-			self.assert_( self.wasReceivedAndReset( 'validity' ) == True )
-
-			pCell.targetSourceCell = atCell
-
-			self.assert_( pCell.isValid() )
-			self.assert_( qCell.isValid() )
-			self.assert_( self.wasReceivedAndReset( 'validity' ) == True )
-
-			qCell.targetSourceCell = None
-
-			self.assert_( pCell.isValid() )
-			self.assert_( not qCell.isValid() )
-			self.assert_( self.wasReceivedAndReset( 'validity' ) == True )
-
-			qCell.targetSourceCell = atCell
-
-			self.assert_( pCell.isValid() )
-			self.assert_( qCell.isValid() )
-			self.assert_( self.wasReceivedAndReset( 'validity' ) == True )
-
-			qCell.targetSourceCell = atPCell
-
-			self.assert_( pCell.isValid() )
-			self.assert_( qCell.isValid() )
-			self.reset( 'validity' )
-
-			qCell.targetSourceCell = qCellTarget
-
-			self.assert_( pCell.isValid() )
-			self.assert_( qCell.isValid() )
-			self.reset( 'validity' )
-
-			qCellTarget.literalValue = None
-
-			self.assert_( pCell.isValid() )
-			self.assert_( not qCell.isValid() )
-			self.assert_( self.wasReceivedAndReset( 'validity' ) == True )
-
-			qCellTarget.literalValue = cell
-
-			self.assert_( pCell.isValid() )
-			self.assert_( qCell.isValid() )
-			self.assert_( self.wasReceivedAndReset( 'validity' ) == True )
-
-			qCellTarget.literalValue = pCell
-
-			self.assert_( pCell.isValid() )
-			self.assert_( qCell.isValid() )
-			self.reset( 'validity' )
-
-
-
-		def testProxyCellLiteralValue(self):
-			cell1 = IntCell( 1 )
-			cell2 = IntCell( 2 )
-			pCellTarget = CellRefCell( None, cell1 )
-			pCell = ProxyCell( pCellTarget )
-
-			self.assert_( cell1.value == 1 )
-			self.assert_( cell2.value == 2 )
-			self.assert_( pCell.value == 1 )
-
-			pCellTarget.literalValue = cell2
-
-			self.assert_( pCell.value == 2 )
-
-			pCell.literalValue = 20
-
-			self.assert_( pCell.value == 20 )
-			self.assert_( cell2.value == 20 )
-
-			pCellTarget.literalValue = cell1
-
-			self.assert_( pCell.value == 1 )
-			self.assert_( cell2.value == 20 )
-
-
-		def testProxyCellLiteralValue2nd(self):
-			cell1 = IntCell( 1 )
-			atCell1 = CellRefCell( None, cell1 )
-			cell2 = IntCell( 2 )
-			atCell2 = CellRefCell( None, cell2 )
-			pCellTarget = CellRefCell( None, cell2 )
-			pCell = ProxyCell( atCell1 )
-
-			self.assert_( cell1.value == 1 )
-			self.assert_( cell2.value == 2 )
-			self.assert_( pCell.value == 1 )
-
-			pCell.targetSourceCell = atCell2
-
-			self.assert_( pCell.value == 2 )
-
-			pCell.literalValue = 20
-
-			self.assert_( cell1.value == 1 )
-			self.assert_( cell2.value == 20 )
-			self.assert_( pCell.value == 20 )
-
-			pCell.targetSourceCell = atCell1
-
-			self.assert_( cell1.value == 1 )
-			self.assert_( cell2.value == 20 )
-			self.assert_( pCell.value == 1 )
-
-			pCell.targetSourceCell = pCellTarget
-
-			self.assert_( cell1.value == 1 )
-			self.assert_( cell2.value == 20 )
-			self.assert_( pCell.value == 20 )
-
-			pCellTarget.literalValue = cell1
-
-			self.assert_( cell1.value == 1 )
-			self.assert_( cell2.value == 20 )
-			self.assert_( pCell.value == 1 )
-
-			pCell.literalValue = 30
-
-			self.assert_( cell1.value == 30 )
-			self.assert_( cell2.value == 20 )
-			self.assert_( pCell.value == 30 )
-
-
-
-		def testProxyCellChangedSignal(self):
-			cell1 = IntCell( 1 )
-			cell2 = IntCell( 2 )
-			pCellTarget = CellRefCell( None, cell1 )
-			pCell = ProxyCell( pCellTarget )
-
-			pCell.changedSignal.connect( self.makeListener( 'changed' ) )
-
-			self.assert_( cell1.value == 1 )
-			self.assert_( cell2.value == 2 )
-			self.assert_( pCell.value == 1 )
-			self.assert_( self.received( 'changed' ) == 0 )
-
-			pCellTarget.literalValue = cell2
-
-			self.assert_( cell1.value == 1 )
-			self.assert_( cell2.value == 2 )
-			self.assert_( pCell.value == 2 )
-			self.assert_( self.received( 'changed' ) == 1 )
-
-			cell2.literalValue = 20
-
-			self.assert_( cell1.value == 1 )
-			self.assert_( cell2.value == 20 )
-			self.assert_( pCell.value == 20 )
-			self.assert_( self.received( 'changed' ) == 2 )
-
-			pCellTarget.literalValue = cell1
-
-			self.assert_( cell1.value == 1 )
-			self.assert_( cell2.value == 20 )
-			self.assert_( pCell.value == 1 )
-			self.assert_( self.received( 'changed' ) == 3 )
-
-
-
-
-
-		def testProxyCellChangedSignal2nd(self):
-			cell1 = IntCell( 1 )
-			atCell1 = CellRefCell( None, cell1 )
-			cell2 = IntCell( 2 )
-			atCell2 = CellRefCell( None, cell2 )
-			pCellTarget = CellRefCell( None, cell2 )
-			pCell = ProxyCell( atCell1 )
-
-			pCell.changedSignal.connect( self.makeListener( 'changed' ) )
-
-			self.assert_( cell1.value == 1 )
-			self.assert_( cell2.value == 2 )
-			self.assert_( pCell.value == 1 )
-			self.assert_( self.received( 'changed' ) == 0 )
-
-			pCell.targetSourceCell = atCell2
-
-			self.assert_( cell1.value == 1 )
-			self.assert_( cell2.value == 2 )
-			self.assert_( pCell.value == 2 )
-			self.assert_( self.received( 'changed' ) == 1 )
-
-			cell2.literalValue = 20
-
-			self.assert_( cell1.value == 1 )
-			self.assert_( cell2.value == 20 )
-			self.assert_( pCell.value == 20 )
-			self.assert_( self.received( 'changed' ) == 2 )
-
-			pCell.targetSourceCell = atCell1
-
-			self.assert_( cell1.value == 1 )
-			self.assert_( cell2.value == 20 )
-			self.assert_( pCell.value == 1 )
-			self.assert_( self.received( 'changed' ) == 3 )
-
-			pCell.targetSourceCell = pCellTarget
-
-			self.assert_( cell1.value == 1 )
-			self.assert_( cell2.value == 20 )
-			self.assert_( pCell.value == 20 )
-			self.assert_( self.received( 'changed' ) == 4 )
-
-			pCellTarget.literalValue = cell1
-
-			self.assert_( cell1.value == 1 )
-			self.assert_( cell2.value == 20 )
-			self.assert_( pCell.value == 1 )
-			self.assert_( self.received( 'changed' ) == 5 )
-
-			pCell.literalValue = 30
-
-			self.assert_( cell1.value == 30 )
-			self.assert_( cell2.value == 20 )
-			self.assert_( pCell.value == 30 )
-			self.assert_( self.received( 'changed' ) == 6 )
-
-
-
-		def testFunctionOfProxyCell(self):
-			cell1 = IntCell( 1 )
-			cell2 = IntCell( 3 )
-			pCellTarget = CellRefCell( None, cell1 )
-			pCell = ProxyCell( pCellTarget )
-			fCell = IntCell( 0 )
-
-
-			def f():
-				return pCell.value * 5
-
-			fCell.function = f
-
-			fCell.changedSignal.connect( self.makeListener( 'changed' ) )
-
-			self.assert_( self.received( 'changed' ) == 0 )
-			self.assert_( cell1.value == 1 )
-			self.assert_( cell2.value == 3 )
-			self.assert_( pCell.value == 1 )
-			self.assert_( fCell.value == 5 )
-
-			self.assert_( fCell.dependencies == [ pCell ] )
-
-			pCellTarget.literalValue = cell2
-
-			self.assert_( self.received( 'changed' ) == 1 )
-			self.assert_( cell1.value == 1 )
-			self.assert_( cell2.value == 3 )
-			self.assert_( pCell.value == 3 )
-			self.assert_( fCell.value == 15 )
-
-
-			pCell.literalValue = 4
-
-			self.assert_( self.received( 'changed' ) == 2 )
-			self.assert_( cell1.value == 1 )
-			self.assert_( cell2.value == 4 )
-			self.assert_( pCell.value == 4 )
-			self.assert_( fCell.value == 20 )
-
-
 	unittest.main()
-
-
-
-
 
