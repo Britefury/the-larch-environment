@@ -105,7 +105,10 @@ class DMListOpNop (DMListOperator):
 
 
 	def __setitem__(self, i, x):
-		self._src[i] = [ self._p_src( y )   for y in x ]
+		if isinstance( i, slice ):
+			self._src[i] = [ self._p_src( p )   for p in x ]
+		else:
+			self._src[i] = self._p_src( x )
 
 
 
@@ -158,7 +161,10 @@ class DMListOpMap (DMListOperator):
 		self._src.remove( self._p_src( x ) )
 
 	def __setitem__(self, i, x):
-		self._src[i] = [ self._p_src( p )   for p in x ]
+		if isinstance( i, slice ):
+			self._src[i] = [ self._p_src( p )   for p in x ]
+		else:
+			self._src[i] = self._p_src( x )
 
 
 
