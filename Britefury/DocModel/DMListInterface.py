@@ -64,11 +64,6 @@ class DMListInterface (DMNode):
 
 
 	@abstractmethod
-	def getLayer(self):
-		pass
-
-
-	@abstractmethod
 	def getDestList(self, layer):
 		pass
 

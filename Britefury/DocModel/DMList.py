@@ -20,10 +20,9 @@ from Britefury.DocModel.DMLiteralList import DMLiteralList
 
 
 class DMList (DMListInterface):
-	def __init__(self, layer, op):
+	def __init__(self, op):
 		self._op = op
 		self._cell = RefCell()
-		self._layer = layer
 
 		self._cell.function = self._op.evaluate
 
@@ -66,10 +65,6 @@ class DMList (DMListInterface):
 		return self._cell.value.index( x )
 
 
-	def getLayer(self):
-		return self._layer
-
-
 	def getDestList(self, layer):
 		return layer.getDestList( self )
 
@@ -79,10 +74,10 @@ class DMList (DMListInterface):
 
 
 	def __copy__(self):
-		return DMList( self._layer, self._op )
+		return DMList( self._op )
 
 	def __deepcopy__(self, memo):
-		return DMList( self._layer, self._op )
+		return DMList( self._op )
 
 
 
@@ -106,10 +101,10 @@ class TestCase_List (unittest.TestCase):
 	def testOpMap(self):
 		layer1 = DocModelLayer()
 		layer2 = DocModelLayer()
-		x = DMLiteralList( layer1 )
+		x = DMLiteralList()
 		x.extend( [ 1, 2, 3 ] )
 
-		y = DMList( layer2, DMListOpMap( layer2, x, lambda x: x * 10, lambda x: x / 10 ) )
+		y = DMList( DMListOpMap( layer2, x, lambda x: x * 10, lambda x: x / 10 ) )
 		self.assert_( y[0] == 10 )
 		self.assert_( y[:] == [ 10, 20, 30 ] )
 		y.append( 40 )
@@ -136,10 +131,10 @@ class TestCase_List (unittest.TestCase):
 	def testOpSlice(self):
 		layer1 = DocModelLayer()
 		layer2 = DocModelLayer()
-		x = DMLiteralList( layer1 )
+		x = DMLiteralList()
 		x.extend( [ 1, 2, 3 ] )
 
-		y = DMList( layer2, DMListOpSlice( layer2, x, 1, -1 ) )
+		y = DMList( DMListOpSlice( layer2, x, 1, -1 ) )
 		self.assert_( y[:] == [ 2 ] )
 		y.append( 4 )
 		self.assert_( y[:] == [ 2, 4 ] )
@@ -165,9 +160,9 @@ class TestCase_List (unittest.TestCase):
 	def testOpWrap(self):
 		layer1 = DocModelLayer()
 		layer2 = DocModelLayer()
-		x = DMLiteralList( layer1 )
+		x = DMLiteralList()
 
-		y = DMList( layer2, DMListOpWrap( layer2, x, [ -1 ], [ -2 ] ) )
+		y = DMList( DMListOpWrap( layer2, x, [ -1 ], [ -2 ] ) )
 		self.assert_( y[:] == [ -1, -2 ] )
 		x.append( 4 )
 		self.assert_( y[:] == [ -1, 4, -2 ] )
@@ -212,17 +207,17 @@ class TestCase_List (unittest.TestCase):
 		layer1 = DocModelLayer()
 		layer2 = DocModelLayer( layerOpFunctionGenerator )
 
-		x = DMLiteralList( layer1 )
+		x = DMLiteralList()
 		x.extend( [ 1, 2, 3 ] )
-		xx1 = DMLiteralList( layer1 )
+		xx1 = DMLiteralList()
 		xx1.extend( [ 'plus2', 5, 6, 7 ] )
 		x.append( xx1 )
-		xx2 = DMLiteralList( layer1 )
+		xx2 = DMLiteralList()
 		xx2.extend( [ 'times2', 11, 12, 13 ] )
 		x.append( xx2 )
 
 
-		y = DMList( layer2, DMListOpNop( layer2, x ) )
+		y = DMList( DMListOpNop( layer2, x ) )
 
 
 		self.assert_( y[0:3] == [ 1, 2, 3 ] )

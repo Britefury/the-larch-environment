@@ -886,6 +886,18 @@ def isXmlWriteable(objectOrClass):
 
 
 
+def ioReadObjectFromString(s):
+	inDoc = InputXmlDocument()
+	inDoc.parse( s )
+	return inDoc.getContentNode().readObject()
+
+
+
+def ioWriteObjectAsString(obj):
+	outDoc = OutputXmlDocument()
+	outDoc.getContentNode()  <<  obj
+	return outDoc.writeString()
+
 
 
 
@@ -939,17 +951,15 @@ if __name__ == '__main__':
 	r = MyObject( 'r', 5, 6, p, None )
 	obj = MyObject( 'obj', 7, 8, q, r )
 
-	outputStream = cStringIO.StringIO()
 	outDoc = OutputXmlDocument()
 	outDoc.getContentNode()  <<  obj
-	outDoc.writeFile( outputStream )
+	outStr = outDoc.writeString()
 
-	print outputStream.getvalue()
+	print outStr
 
 
-	inputStream = cStringIO.StringIO( outputStream.getvalue() )
 	inDoc = InputXmlDocument()
-	inDoc.parseFile( inputStream )
+	inDoc.parse( outStr )
 
 	obj2 = MyObject( 3, 4, None, None )
 	inDoc.getContentNode()  >>  obj2

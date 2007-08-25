@@ -40,7 +40,7 @@ class DocModelLayer (object):
 				try:
 					destList = layerOpFunctionToDestList[layerOpFunction]
 				except KeyError:
-					destList = Britefury.DocModel.DMList.DMList( self, layerOpFunction( srcList, self ) )
+					destList = Britefury.DocModel.DMList.DMList( layerOpFunction( srcList, self ) )
 					layerOpFunctionToDestList[layerOpFunction] = destList
 
 				return destList
