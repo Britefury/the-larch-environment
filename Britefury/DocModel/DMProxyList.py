@@ -40,6 +40,12 @@ class DMProxyList (DMListInterface):
 	def remove(self, x):
 		self._src.remove( x )
 
+	def replace(self, a, x):
+		self._src.replace( a, x )
+
+	def replaceRange(self, a, b, xs):
+		self._src.replaceRange( a, b, xs )
+
 	def __setitem__(self, i, x):
 		self._src[i] = x
 

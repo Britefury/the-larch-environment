@@ -73,6 +73,19 @@ class DMLiteralList (DMListInterface):
 		v.remove( x )
 		self._cell.literalValue = v
 
+	def replace(self, a, x):
+		v = self._cell.literalValue
+		index = v.index( a )
+		v[index] =x
+		self._cell.literalValue = v
+
+	def replaceRange(self, a, b, xs):
+		v = self._cell.literalValue
+		start = v.index( a )
+		stop = v.index( b )
+		v[start:stop+1] = xs
+		self._cell.literalValue = v
+
 	def __setitem__(self, i, x):
 		v = self._cell.literalValue
 		v[i] = x
@@ -177,6 +190,22 @@ class TestCase_LiteralList (unittest.TestCase):
 		self.assert_( x[:] == [ 1, 2, 3, 4, 5 ] )
 		x.remove( 3 )
 		self.assert_( x[:] == [ 1, 2, 4, 5 ] )
+
+
+	def testLiteralReplace(self):
+		x = DMLiteralList()
+		x.extend( [ 1, 2, 3, 4, 5 ] )
+		self.assert_( x[:] == [ 1, 2, 3, 4, 5 ] )
+		x.replace( 3, 8 )
+		self.assert_( x[:] == [ 1, 2, 8, 4, 5 ] )
+
+
+	def testLiteralReplaceRange(self):
+		x = DMLiteralList()
+		x.extend( [ 1, 2, 3, 4, 5 ] )
+		self.assert_( x[:] == [ 1, 2, 3, 4, 5 ] )
+		x.replaceRange( 2, 4, [ 7, 8, 9 ] )
+		self.assert_( x[:] == [ 1, 7, 8, 9, 5 ] )
 
 
 	def testLiteralSet(self):

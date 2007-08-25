@@ -42,6 +42,12 @@ class DMList (DMListInterface):
 	def remove(self, x):
 		self._op.remove( x )
 
+	def replace(self, a, x):
+		self._op.replace( a, x )
+
+	def replaceRange(self, a, b, xs):
+		self._op.replaceRange( a, b, xs )
+
 	def __setitem__(self, i, x):
 		self._op[i] = x
 
@@ -108,23 +114,29 @@ class TestCase_List (unittest.TestCase):
 		self.assert_( y[0] == 10 )
 		self.assert_( y[:] == [ 10, 20, 30 ] )
 		y.append( 40 )
-		self.assert_( y[:] == [ 10, 20, 30, 40 ] )
 		self.assert_( x[:] == [ 1, 2, 3, 4 ] )
+		self.assert_( y[:] == [ 10, 20, 30, 40 ] )
 		y[1:3] = [ 100, 200, 300, 400 ]
-		self.assert_( y[:] == [ 10, 100, 200, 300, 400, 40 ] )
 		self.assert_( x[:] == [ 1, 10, 20, 30, 40, 4 ] )
+		self.assert_( y[:] == [ 10, 100, 200, 300, 400, 40 ] )
 		y.extend( [ 600, 700 ] )
-		self.assert_( y[:] == [ 10, 100, 200, 300, 400, 40, 600, 700 ] )
 		self.assert_( x[:] == [ 1, 10, 20, 30, 40, 4, 60, 70 ] )
+		self.assert_( y[:] == [ 10, 100, 200, 300, 400, 40, 600, 700 ] )
 		y.insertBefore( 200, 220 )
-		self.assert_( y[:] == [ 10, 100, 220, 200, 300, 400, 40, 600, 700 ] )
 		self.assert_( x[:] == [ 1, 10, 22, 20, 30, 40, 4, 60, 70 ] )
+		self.assert_( y[:] == [ 10, 100, 220, 200, 300, 400, 40, 600, 700 ] )
 		y.insertAfter( 200, 310 )
-		self.assert_( y[:] == [ 10, 100, 220, 200, 310, 300, 400, 40, 600, 700 ] )
 		self.assert_( x[:] == [ 1, 10, 22, 20, 31, 30, 40, 4, 60, 70 ] )
+		self.assert_( y[:] == [ 10, 100, 220, 200, 310, 300, 400, 40, 600, 700 ] )
 		y.remove( 600 )
-		self.assert_( y[:] == [ 10, 100, 220, 200, 310, 300, 400, 40, 700 ] )
 		self.assert_( x[:] == [ 1, 10, 22, 20, 31, 30, 40, 4, 70 ] )
+		self.assert_( y[:] == [ 10, 100, 220, 200, 310, 300, 400, 40, 700 ] )
+		y.replace( 200, 210 )
+		self.assert_( x[:] == [ 1, 10, 22, 21, 31, 30, 40, 4, 70 ] )
+		self.assert_( y[:] == [ 10, 100, 220, 210, 310, 300, 400, 40, 700 ] )
+		y.replaceRange( 310, 40, [ 980, 990 ] )
+		self.assert_( x[:] == [ 1, 10, 22, 21, 98, 99, 70 ] )
+		self.assert_( y[:] == [ 10, 100, 220, 210, 980, 990, 700 ] )
 
 
 
@@ -140,20 +152,26 @@ class TestCase_List (unittest.TestCase):
 		self.assert_( y[:] == [ 2, 4 ] )
 		self.assert_( x[:] == [ 1, 2, 4, 3 ] )
 		y[1:2] = [ 10, 20, 30, 40 ]
-		self.assert_( y[:] == [ 2, 10, 20, 30, 40 ] )
 		self.assert_( x[:] == [ 1, 2, 10, 20, 30, 40, 3 ] )
+		self.assert_( y[:] == [ 2, 10, 20, 30, 40 ] )
 		y.extend( [ 60, 70 ] )
-		self.assert_( y[:] == [ 2, 10, 20, 30, 40, 60, 70 ] )
 		self.assert_( x[:] == [ 1, 2, 10, 20, 30, 40, 60, 70, 3 ] )
+		self.assert_( y[:] == [ 2, 10, 20, 30, 40, 60, 70 ] )
 		y.insertBefore( 20, 22 )
-		self.assert_( y[:] == [ 2, 10, 22, 20, 30, 40, 60, 70 ] )
 		self.assert_( x[:] == [ 1, 2, 10, 22, 20, 30, 40, 60, 70, 3 ] )
+		self.assert_( y[:] == [ 2, 10, 22, 20, 30, 40, 60, 70 ] )
 		y.insertAfter( 20, 31 )
-		self.assert_( y[:] == [ 2, 10, 22, 20, 31, 30, 40, 60, 70 ] )
 		self.assert_( x[:] == [ 1, 2, 10, 22, 20, 31, 30, 40, 60, 70, 3 ] )
+		self.assert_( y[:] == [ 2, 10, 22, 20, 31, 30, 40, 60, 70 ] )
 		y.remove( 60 )
-		self.assert_( y[:] == [ 2, 10, 22, 20, 31, 30, 40, 70 ] )
 		self.assert_( x[:] == [ 1, 2, 10, 22, 20, 31, 30, 40, 70, 3 ] )
+		self.assert_( y[:] == [ 2, 10, 22, 20, 31, 30, 40, 70 ] )
+		y.replace( 20, 21 )
+		self.assert_( x[:] == [ 1, 2, 10, 22, 21, 31, 30, 40, 70, 3 ] )
+		self.assert_( y[:] == [ 2, 10, 22, 21, 31, 30, 40, 70 ] )
+		y.replaceRange( 31, 40, [ 98, 99 ] )
+		self.assert_( x[:] == [ 1, 2, 10, 22, 21, 98, 99, 70, 3 ] )
+		self.assert_( y[:] == [ 2, 10, 22, 21, 98, 99, 70 ] )
 
 
 
@@ -165,23 +183,29 @@ class TestCase_List (unittest.TestCase):
 		y = DMList( DMListOpWrap( layer2, x, [ -1 ], [ -2 ] ) )
 		self.assert_( y[:] == [ -1, -2 ] )
 		x.append( 4 )
-		self.assert_( y[:] == [ -1, 4, -2 ] )
 		self.assert_( x[:] == [ 4 ] )
+		self.assert_( y[:] == [ -1, 4, -2 ] )
 		x.extend( [ 1, 2 ] )
-		self.assert_( y[:] == [ -1, 4, 1, 2, -2 ] )
 		self.assert_( x[:] == [ 4, 1, 2 ] )
+		self.assert_( y[:] == [ -1, 4, 1, 2, -2 ] )
 		y[2:3] = [ 6, 7, 8 ]
-		self.assert_( y[:] == [ -1, 4, 6, 7, 8, 2, -2 ] )
 		self.assert_( x[:] == [ 4, 6, 7, 8, 2 ] )
+		self.assert_( y[:] == [ -1, 4, 6, 7, 8, 2, -2 ] )
 		y.insertBefore( 7, 13 )
-		self.assert_( y[:] == [ -1, 4, 6, 13, 7, 8, 2, -2 ] )
 		self.assert_( x[:] == [ 4, 6, 13, 7, 8, 2 ] )
+		self.assert_( y[:] == [ -1, 4, 6, 13, 7, 8, 2, -2 ] )
 		y.insertAfter( 7, 15 )
-		self.assert_( y[:] == [ -1, 4, 6, 13, 7, 15, 8, 2, -2 ] )
 		self.assert_( x[:] == [ 4, 6, 13, 7, 15, 8, 2 ] )
+		self.assert_( y[:] == [ -1, 4, 6, 13, 7, 15, 8, 2, -2 ] )
 		y.remove( 7 )
-		self.assert_( y[:] == [ -1, 4, 6, 13, 15, 8, 2, -2 ] )
 		self.assert_( x[:] == [ 4, 6, 13, 15, 8, 2 ] )
+		self.assert_( y[:] == [ -1, 4, 6, 13, 15, 8, 2, -2 ] )
+		y.replace( 13, 17 )
+		self.assert_( x[:] == [ 4, 6, 17, 15, 8, 2 ] )
+		self.assert_( y[:] == [ -1, 4, 6, 17, 15, 8, 2, -2 ] )
+		y.replaceRange( 15, 2, [ 98, 99 ] )
+		self.assert_( x[:] == [ 4, 6, 17, 98, 99 ] )
+		self.assert_( y[:] == [ -1, 4, 6, 17, 98, 99, -2 ] )
 
 
 
