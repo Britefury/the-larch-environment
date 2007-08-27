@@ -56,6 +56,11 @@ class DMLiteralList (DMListInterface):
 		v.extend( xs )
 		self._cell.literalValue = v
 
+	def insert(self, i, x):
+		v = self._cell.literalValue
+		v.insert( i, x )
+		self._cell.literalValue = v
+
 	def insertBefore(self, before, x):
 		v = self._cell.literalValue
 		i = v.index( before )
@@ -89,6 +94,11 @@ class DMLiteralList (DMListInterface):
 	def __setitem__(self, i, x):
 		v = self._cell.literalValue
 		v[i] = x
+		self._cell.literalValue = v
+
+	def __delitem__(self, i):
+		v = self._cell.literalValue
+		del v[i]
 		self._cell.literalValue = v
 
 
@@ -146,20 +156,20 @@ class TestCase_LiteralList (unittest.TestCase):
 
 
 
-	def testLiteralIter(self):
+	def testIter(self):
 		x = DMLiteralList()
 		x.extend( [ 1, 2, 3 ] )
 		q = [ p   for p in x ]
 		self.assert_( q == [ 1, 2, 3 ] )
 
 
-	def testLiteralAppend(self):
+	def testAppend(self):
 		x = DMLiteralList()
 		x.append( 1 )
 		self.assert_( x[0] == 1 )
 
 
-	def testLiteralExtend(self):
+	def testExtend(self):
 		x = DMLiteralList()
 		x.extend( [ 1, 2, 3 ] )
 		self.assert_( x[0] == 1 )
@@ -168,7 +178,15 @@ class TestCase_LiteralList (unittest.TestCase):
 		self.assert_( x[:] == [ 1, 2, 3 ] )
 
 
-	def testLiteralInsertBefore(self):
+	def testInsert(self):
+		x = DMLiteralList()
+		x.extend( [ 1, 2, 3, 4, 5 ] )
+		self.assert_( x[:] == [ 1, 2, 3, 4, 5 ] )
+		x.insert( 2, 12 )
+		self.assert_( x[:] == [ 1, 2, 12, 3, 4, 5 ] )
+
+
+	def testInsertBefore(self):
 		x = DMLiteralList()
 		x.extend( [ 1, 2, 3, 4, 5 ] )
 		self.assert_( x[:] == [ 1, 2, 3, 4, 5 ] )
@@ -176,7 +194,7 @@ class TestCase_LiteralList (unittest.TestCase):
 		self.assert_( x[:] == [ 1, 2, 12, 3, 4, 5 ] )
 
 
-	def testLiteralInsertAfter(self):
+	def testInsertAfter(self):
 		x = DMLiteralList()
 		x.extend( [ 1, 2, 3, 4, 5 ] )
 		self.assert_( x[:] == [ 1, 2, 3, 4, 5 ] )
@@ -184,7 +202,7 @@ class TestCase_LiteralList (unittest.TestCase):
 		self.assert_( x[:] == [ 1, 2, 3, 12, 4, 5 ] )
 
 
-	def testLiteralRemove(self):
+	def testRemove(self):
 		x = DMLiteralList()
 		x.extend( [ 1, 2, 3, 4, 5 ] )
 		self.assert_( x[:] == [ 1, 2, 3, 4, 5 ] )
@@ -192,7 +210,7 @@ class TestCase_LiteralList (unittest.TestCase):
 		self.assert_( x[:] == [ 1, 2, 4, 5 ] )
 
 
-	def testLiteralReplace(self):
+	def testReplace(self):
 		x = DMLiteralList()
 		x.extend( [ 1, 2, 3, 4, 5 ] )
 		self.assert_( x[:] == [ 1, 2, 3, 4, 5 ] )
@@ -200,7 +218,7 @@ class TestCase_LiteralList (unittest.TestCase):
 		self.assert_( x[:] == [ 1, 2, 8, 4, 5 ] )
 
 
-	def testLiteralReplaceRange(self):
+	def testReplaceRange(self):
 		x = DMLiteralList()
 		x.extend( [ 1, 2, 3, 4, 5 ] )
 		self.assert_( x[:] == [ 1, 2, 3, 4, 5 ] )
@@ -208,7 +226,7 @@ class TestCase_LiteralList (unittest.TestCase):
 		self.assert_( x[:] == [ 1, 7, 8, 9, 5 ] )
 
 
-	def testLiteralSet(self):
+	def testSet(self):
 		x = DMLiteralList()
 		x.extend( [ 1, 2, 3, 4, 5 ] )
 		self.assert_( x[:] == [ 1, 2, 3, 4, 5 ] )
@@ -216,6 +234,16 @@ class TestCase_LiteralList (unittest.TestCase):
 		self.assert_( x[:] == [ 1, 2, 3, 4, 12 ] )
 		x[1:3] = [ 20, 21, 22 ]
 		self.assert_( x[:] == [ 1, 20, 21, 22, 4, 12 ] )
+
+
+	def testDel(self):
+		x = DMLiteralList()
+		x.extend( range( 0, 10 ) )
+		self.assert_( x[:] == [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ] )
+		del x[4]
+		self.assert_( x[:] == [ 0, 1, 2, 3, 5, 6, 7, 8, 9 ] )
+		del x[3:6]
+		self.assert_( x[:] == [ 0, 1, 2, 7, 8, 9 ] )
 
 
 
