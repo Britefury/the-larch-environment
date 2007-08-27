@@ -31,6 +31,9 @@ class DMProxyList (DMListInterface):
 	def extend(self, xs):
 		self._src.extend( xs )
 
+	def insert(self, index, x):
+		self._src.insert( i, x)
+
 	def insertBefore(self, before, x):
 		self._src.insertBefore( before, x )
 
@@ -48,6 +51,9 @@ class DMProxyList (DMListInterface):
 
 	def __setitem__(self, i, x):
 		self._src[i] = x
+
+	def __delitem__(self, i):
+		del self._src[i]
 
 
 	def __getitem__(self, i):

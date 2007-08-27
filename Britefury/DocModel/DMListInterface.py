@@ -22,6 +22,10 @@ class DMListInterface (DMNode):
 		pass
 
 	@abstractmethod
+	def insert(self, i, x):
+		pass
+
+	@abstractmethod
 	def insertBefore(self, before, x):
 		pass
 
@@ -44,6 +48,10 @@ class DMListInterface (DMNode):
 
 	@abstractmethod
 	def __setitem__(self, i, x):
+		pass
+
+	@abstractmethod
+	def __delitem__(self, i):
 		pass
 
 
