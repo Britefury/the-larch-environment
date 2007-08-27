@@ -384,13 +384,22 @@ class TestCase_List_Slice (unittest.TestCase):
 
 	def _testSet(self, index, value, xRes, yRes, xRes0, yRes0):
 		if isinstance( index, tuple ):
-			start, stop = index
-			self.ypp[start:stop] = value
-			self.ypn[start:stop] = value
-			self.ynp[start:stop] = value
-			self.ynn[start:stop] = value
-			self.yp0[start:stop] = value
-			self.yn0[start:stop] = value
+			if len( index ) == 2:
+				start, stop = index
+				self.ypp[start:stop] = value
+				self.ypn[start:stop] = value
+				self.ynp[start:stop] = value
+				self.ynn[start:stop] = value
+				self.yp0[start:stop] = value
+				self.yn0[start:stop] = value
+			elif len( index ) == 3:
+				start, stop, step = index
+				self.ypp[start:stop:step] = value
+				self.ypn[start:stop:step] = value
+				self.ynp[start:stop:step] = value
+				self.ynn[start:stop:step] = value
+				self.yp0[start:stop:step] = value
+				self.yn0[start:stop:step] = value
 		else:
 			self.ypp[index] = value
 			self.ypn[index] = value
@@ -444,6 +453,9 @@ class TestCase_List_Slice (unittest.TestCase):
 	def testSet00(self):
 		self._testSet( (None,None), [11,13],   [ 0, 11, 13, 9 ],   [ 11, 13 ],    [ 0, 11, 13 ],   [ 11, 13 ] )
 
+	def testSetStep(self):
+		self._testSet( (2,6,2), [11,13],   [ 0, 1, 2, 11, 4, 13, 6, 7, 8, 9 ],   [ 1, 2, 11, 4, 13, 6, 7, 8 ],    [ 0, 1, 2, 11, 4, 13, 6, 7, 8, 9 ],   [ 1, 2, 11, 4, 13, 6, 7, 8, 9 ] )
+
 
 
 
@@ -451,13 +463,22 @@ class TestCase_List_Slice (unittest.TestCase):
 
 	def _testDel(self, index, xRes, yRes, xRes0, yRes0):
 		if isinstance( index, tuple ):
-			start, stop = index
-			del self.ypp[start:stop]
-			del self.ypn[start:stop]
-			del self.ynp[start:stop]
-			del self.ynn[start:stop]
-			del self.yp0[start:stop]
-			del self.yn0[start:stop]
+			if len( index ) == 2:
+				start, stop = index
+				del self.ypp[start:stop]
+				del self.ypn[start:stop]
+				del self.ynp[start:stop]
+				del self.ynn[start:stop]
+				del self.yp0[start:stop]
+				del self.yn0[start:stop]
+			elif len( index ) == 3:
+				start, stop, step = index
+				del self.ypp[start:stop:step]
+				del self.ypn[start:stop:step]
+				del self.ynp[start:stop:step]
+				del self.ynn[start:stop:step]
+				del self.yp0[start:stop:step]
+				del self.yn0[start:stop:step]
 		else:
 			del self.ypp[index]
 			del self.ypn[index]
@@ -511,6 +532,9 @@ class TestCase_List_Slice (unittest.TestCase):
 
 	def testDel00(self):
 		self._testDel( (None,None),   [ 0, 9 ],   [  ],    [ 0,  ],   [  ] )
+
+	def testDelStep(self):
+		self._testDel( (2,6,2),   [ 0, 1, 2, 4, 6, 7, 8, 9 ],   [ 1, 2, 4, 6, 7, 8 ],    [ 0, 1, 2, 4, 6, 7, 8, 9 ],   [ 1, 2, 4, 6, 7, 8, 9 ] )
 
 
 

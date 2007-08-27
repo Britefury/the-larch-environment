@@ -303,9 +303,9 @@ class DMListOpSlice (DMListOperator):
 
 	def __setitem__(self, i, x):
 		if isinstance( i, slice ):
-			assert i.step is None  or  i.step == 1, 'step must be 1'
 			start = i.start
 			stop = i.stop
+			step = i.step
 
 			if start is None:
 				start = self._start
@@ -328,7 +328,7 @@ class DMListOpSlice (DMListOperator):
 				stop += self._start
 
 			oldLen = len( self._src )
-			self._src[start:stop] = [ self._p_src( p )   for p in x ]
+			self._src[start:stop:step] = [ self._p_src( p )   for p in x ]
 			newLen = len( self._src )
 			changeInLength = newLen - oldLen
 			if self._start < 0:
@@ -349,9 +349,9 @@ class DMListOpSlice (DMListOperator):
 
 	def __delitem__(self, i):
 		if isinstance( i, slice ):
-			assert i.step is None  or  i.step == 1, 'step must be 1'
 			start = i.start
 			stop = i.stop
+			step = i.step
 
 			if start is None:
 				start = self._start
@@ -374,7 +374,7 @@ class DMListOpSlice (DMListOperator):
 				stop += self._start
 
 			oldLen = len( self._src )
-			del self._src[start:stop]
+			del self._src[start:stop:step]
 			newLen = len( self._src )
 			changeInLength = newLen - oldLen
 			if self._start < 0:
