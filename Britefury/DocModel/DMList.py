@@ -538,41 +538,258 @@ class TestCase_List_Slice (unittest.TestCase):
 
 
 
+	def testDelAppend(self):
+		del self.ypp[:]
+		del self.ypn[:]
+		del self.ynp[:]
+		del self.ynn[:]
+		del self.yp0[:]
+		del self.yn0[:]
+		self.assert_( self.xpp[:] == [ 0, 9 ] )
+		self.assert_( self.ypp[:] == [] )
+		self.assert_( self.xpn[:] == [ 0, 9 ] )
+		self.assert_( self.ypn[:] == [] )
+		self.assert_( self.xnp[:] == [ 0, 9 ] )
+		self.assert_( self.ynp[:] == [] )
+		self.assert_( self.xnn[:] == [ 0, 9 ] )
+		self.assert_( self.ynn[:] == [] )
+		self.assert_( self.xp0[:] == [ 0 ] )
+		self.assert_( self.yp0[:] == [] )
+		self.assert_( self.xn0[:] == [ 0 ] )
+		self.assert_( self.yn0[:] == [] )
+		self.ypp.append( 11 )
+		self.ypn.append( 11 )
+		self.ynp.append( 11 )
+		self.ynn.append( 11 )
+		self.yp0.append( 11 )
+		self.yn0.append( 11 )
+		self.assert_( self.xpp[:] == [ 0, 11, 9 ] )
+		self.assert_( self.ypp[:] == [ 11 ] )
+		self.assert_( self.xpn[:] == [ 0, 11, 9 ] )
+		self.assert_( self.ypn[:] == [ 11 ] )
+		self.assert_( self.xnp[:] == [ 0, 11, 9 ] )
+		self.assert_( self.ynp[:] == [ 11 ] )
+		self.assert_( self.xnn[:] == [ 0, 11, 9 ] )
+		self.assert_( self.ynn[:] == [ 11 ] )
+		self.assert_( self.xp0[:] == [ 0, 11 ] )
+		self.assert_( self.yp0[:] == [ 11 ] )
+		self.assert_( self.xn0[:] == [ 0, 11 ] )
+		self.assert_( self.yn0[:] == [ 11 ] )
+
+
+
+
+	def testDelInsert(self):
+		del self.ypp[:]
+		del self.ypn[:]
+		del self.ynp[:]
+		del self.ynn[:]
+		del self.yp0[:]
+		del self.yn0[:]
+		self.assert_( self.xpp[:] == [ 0, 9 ] )
+		self.assert_( self.ypp[:] == [] )
+		self.assert_( self.xpn[:] == [ 0, 9 ] )
+		self.assert_( self.ypn[:] == [] )
+		self.assert_( self.xnp[:] == [ 0, 9 ] )
+		self.assert_( self.ynp[:] == [] )
+		self.assert_( self.xnn[:] == [ 0, 9 ] )
+		self.assert_( self.ynn[:] == [] )
+		self.assert_( self.xp0[:] == [ 0 ] )
+		self.assert_( self.yp0[:] == [] )
+		self.assert_( self.xn0[:] == [ 0 ] )
+		self.assert_( self.yn0[:] == [] )
+		self.ypp.insert( 0, 11 )
+		self.ypn.insert( 0, 11 )
+		self.ynp.insert( 0, 11 )
+		self.ynn.insert( 0, 11 )
+		self.yp0.insert( 0, 11 )
+		self.yn0.insert( 0, 11 )
+		self.assert_( self.xpp[:] == [ 0, 11, 9 ] )
+		self.assert_( self.ypp[:] == [ 11 ] )
+		self.assert_( self.xpn[:] == [ 0, 11, 9 ] )
+		self.assert_( self.ypn[:] == [ 11 ] )
+		self.assert_( self.xnp[:] == [ 0, 11, 9 ] )
+		self.assert_( self.ynp[:] == [ 11 ] )
+		self.assert_( self.xnn[:] == [ 0, 11, 9 ] )
+		self.assert_( self.ynn[:] == [ 11 ] )
+		self.assert_( self.xp0[:] == [ 0, 11 ] )
+		self.assert_( self.yp0[:] == [ 11 ] )
+		self.assert_( self.xn0[:] == [ 0, 11 ] )
+		self.assert_( self.yn0[:] == [ 11 ] )
+
+
+
+
+
+
+
+
+class TestCase_List_Wrap (unittest.TestCase):
+	def setUp(self):
+		self.layer1 = DocModelLayer()
+		self.layer2 = DocModelLayer()
+		self.x00 = DMLiteralList()
+		self.x00.extend( range( 0, 10 ) )
+		self.x01 = DMLiteralList()
+		self.x01.extend( range( 0, 10 ) )
+		self.x10 = DMLiteralList()
+		self.x10.extend( range( 0, 10 ) )
+		self.x11 = DMLiteralList()
+		self.x11.extend( range( 0, 10 ) )
+
+		self.y00 = DMList( DMListOpWrap( self.layer2, self.x00, [], [] ) )
+		self.y01 = DMList( DMListOpWrap( self.layer2, self.x01, [], [ -2, -2 ] ) )
+		self.y10 = DMList( DMListOpWrap( self.layer2, self.x10, [ -1, -1 ], [] ) )
+		self.y11 = DMList( DMListOpWrap( self.layer2, self.x11, [ -1, -1 ], [ -2, -2 ] ) )
+
+	def tearDown(self):
+		del self.layer1
+		del self.layer2
+		del self.x00
+		del self.x01
+		del self.x10
+		del self.x11
+		del self.y00
+		del self.y01
+		del self.y10
+		del self.y11
+
+
+	def _doTestOp(self, function, args, x00Res, x01Res, x10Res, x11Res):
+		function( self.y00, *args )
+		function( self.y01, *args )
+		function( self.y10, *args )
+		function( self.y11, *args )
+		self.assert_( self.x00[:] == x00Res, ( self.x00[:], x00Res, self.y00[:], x00Res ) )
+		self.assert_( self.y00[:] == x00Res, ( self.x00[:], x00Res, self.y00[:], x00Res ) )
+		self.assert_( self.x01[:] == x01Res, ( self.x01[:], x01Res, self.y01[:], x01Res + [ -2,-2 ] ) )
+		self.assert_( self.y01[:] == x01Res + [ -2,-2 ], ( self.x01[:], x01Res, self.y01[:], x01Res + [ -2,-2 ] ) )
+		self.assert_( self.x10[:] == x10Res, ( self.x10[:], x10Res, self.y10[:], [-1,-1] + x10Res ) )
+		self.assert_( self.y10[:] == [ -1,-1 ] + x10Res, ( self.x10[:], x10Res, self.y10[:], [-1,-1] + x10Res ) )
+		self.assert_( self.x11[:] == x11Res, ( self.x11[:], x11Res, self.y11[:], [-1,-1] + x11Res + [-2,-2] ) )
+		self.assert_( self.y11[:] == [ -1,-1 ] + x11Res + [-2,-2], ( self.x11[:], x11Res, self.y11[:], [-1,-1] + x11Res + [-2,-2] ) )
+
+
+	def _doTestOp2(self, function, args00, args01, args10, args11, x00Res, x01Res, x10Res, x11Res):
+		function( self.y00, *args00 )
+		function( self.y01, *args01 )
+		function( self.y10, *args10 )
+		function( self.y11, *args11 )
+		self.assert_( self.x00[:] == x00Res, ( self.x00[:], x00Res, self.y00[:], x00Res ) )
+		self.assert_( self.y00[:] == x00Res, ( self.x00[:], x00Res, self.y00[:], x00Res ) )
+		self.assert_( self.x01[:] == x01Res, ( self.x01[:], x01Res, self.y01[:], x01Res + [ -2,-2 ] ) )
+		self.assert_( self.y01[:] == x01Res + [ -2,-2 ], ( self.x01[:], x01Res, self.y01[:], x01Res + [ -2,-2 ] ) )
+		self.assert_( self.x10[:] == x10Res, ( self.x10[:], x10Res, self.y10[:], [-1,-1] + x10Res ) )
+		self.assert_( self.y10[:] == [ -1,-1 ] + x10Res, ( self.x10[:], x10Res, self.y10[:], [-1,-1] + x10Res ) )
+		self.assert_( self.x11[:] == x11Res, ( self.x11[:], x11Res, self.y11[:], [-1,-1] + x11Res + [-2,-2] ) )
+		self.assert_( self.y11[:] == [ -1,-1 ] + x11Res + [-2,-2], ( self.x11[:], x11Res, self.y11[:], [-1,-1] + x11Res + [-2,-2] ) )
+
+
+	def testFunction(self):
+		self.assert_( self.x00[:] == [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ] )
+		self.assert_( self.x01[:] == [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ] )
+		self.assert_( self.x10[:] == [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ] )
+		self.assert_( self.x11[:] == [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ] )
+		self.assert_( self.y00[:] == [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ] )
+		self.assert_( self.y01[:] == [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -2, -2 ] )
+		self.assert_( self.y10[:] == [ -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ] )
+		self.assert_( self.y11[:] == [ -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -2, -2 ] )
+
+	def testAppend(self):
+		self._doTestOp( DMList.append, ( 11, ),   range(0,10)+[11],   range(0,10),   range(0,10)+[11],   range(0,10) )
+
+	def testExtend(self):
+		self._doTestOp( DMList.extend, ( [ 11, 12, 13 ], ),   range(0,10)+[11,12,13],   range(0,10),   range(0,10)+[11,12,13],   range(0,10) )
+
+
+	def testInsertPB(self):
+		self._doTestOp( DMList.insert, ( 1, 21, ),   [ 0,21,1,2,3,4,5,6,7,8,9 ], [ 0,21,1,2,3,4,5,6,7,8,9 ], [ 0,1,2,3,4,5,6,7,8,9 ], [ 0,1,2,3,4,5,6,7,8,9 ]  )
+
+	def testInsertPM(self):
+		self._doTestOp( DMList.insert, ( 4, 21, ),   [ 0,1,2,3,21,4,5,6,7,8,9 ], [ 0,1,2,3,21,4,5,6,7,8,9 ], [ 0,1,21,2,3,4,5,6,7,8,9 ], [ 0,1,21,2,3,4,5,6,7,8,9 ]  )
+
+	def testInsertPE(self):
+		self._doTestOp2( DMList.insert, (9,21), (11,21), (11,21), (13,21),   [ 0,1,2,3,4,5,6,7,8,21,9 ], [ 0,1,2,3,4,5,6,7,8,9 ], [ 0,1,2,3,4,5,6,7,8,21,9 ], [ 0,1,2,3,4,5,6,7,8,9 ]  )
+
+
+	def testInsertNB(self):
+		self._doTestOp2( DMList.insert, (-9,21), (-11,21), (-11,21), (-13,21),   [ 0,21,1,2,3,4,5,6,7,8,9 ], [ 0,21,1,2,3,4,5,6,7,8,9 ], [ 0,1,2,3,4,5,6,7,8,9 ], [ 0,1,2,3,4,5,6,7,8,9 ]  )
+
+	def testInsertNM(self):
+		self._doTestOp( DMList.insert, ( -4, 21, ),   [ 0,1,2,3,4,5,21,6,7,8,9 ], [ 0,1,2,3,4,5,6,7,21,8,9 ], [ 0,1,2,3,4,5,21,6,7,8,9 ], [ 0,1,2,3,4,5,6,7,21,8,9 ]  )
+
+	def testInsertNE(self):
+		self._doTestOp( DMList.insert, ( -1, 21, ),   [ 0,1,2,3,4,5,6,7,8,21,9 ], [ 0,1,2,3,4,5,6,7,8,9 ], [ 0,1,2,3,4,5,6,7,8,21,9 ], [ 0,1,2,3,4,5,6,7,8,9 ]  )
+
+
+	def testRemoveB(self):
+		self.y11.remove( -1 )
+		self.assert_( self.x11[:] == range( 0, 10 ) )
+		self.assert_( self.y11[:] == [-1,-1] + range( 0, 10 ) + [ -2,-2 ] )
+
+	def testRemoveM(self):
+		self.y11.remove( 5 )
+		self.assert_( self.x11[:] == range( 0, 5 ) + range(6,10)  )
+		self.assert_( self.y11[:] == [-1,-1] + range( 0, 5 ) + range(6,10) + [ -2,-2 ] )
+
+	def testRemoveE(self):
+		self.y11.remove( -2 )
+		self.assert_( self.x11[:] == range( 0, 10 ) )
+		self.assert_( self.y11[:] == [-1,-1] + range( 0, 10 ) + [ -2,-2 ] )
+
+
+	#def testSet(self):
+		#self.y[2] = 220
+		#self.assert_( self.x[:] == [ 0, 1, 22, 3, 4, 5, 6, 7, 8, 9 ] )
+		#self.assert_( self.y[:] == [ 0, 10, 220, 30, 40, 50, 60, 70, 80, 90 ] )
+		#self.y[2:4] = [ 220, 230, 240 ]
+		#self.assert_( self.x[:] == [ 0, 1, 22, 23, 24, 4, 5, 6, 7, 8, 9 ] )
+		#self.assert_( self.y[:] == [ 0, 10, 220, 230, 240, 40, 50, 60, 70, 80, 90 ] )
+
+	#def testDel(self):
+		#del self.y[2]
+		#self.assert_( self.x[:] == [ 0, 1, 3, 4, 5, 6, 7, 8, 9 ] )
+		#self.assert_( self.y[:] == [ 0, 10, 30, 40, 50, 60, 70, 80, 90 ] )
+		#del self.y[2:4]
+		#self.assert_( self.x[:] == [ 0, 1, 5, 6, 7, 8, 9 ] )
+		#self.assert_( self.y[:] == [ 0, 10, 50, 60, 70, 80, 90 ] )
+
+
 
 
 
 class TestCase_List (unittest.TestCase):
-	def testOpWrap(self):
-		layer1 = DocModelLayer()
-		layer2 = DocModelLayer()
-		x = DMLiteralList()
+	#def testOpWrap(self):
+		#layer1 = DocModelLayer()
+		#layer2 = DocModelLayer()
+		#x = DMLiteralList()
 
-		y = DMList( DMListOpWrap( layer2, x, [ -1 ], [ -2 ] ) )
-		self.assert_( y[:] == [ -1, -2 ] )
-		x.append( 4 )
-		self.assert_( x[:] == [ 4 ] )
-		self.assert_( y[:] == [ -1, 4, -2 ] )
-		x.extend( [ 1, 2 ] )
-		self.assert_( x[:] == [ 4, 1, 2 ] )
-		self.assert_( y[:] == [ -1, 4, 1, 2, -2 ] )
-		y[2:3] = [ 6, 7, 8 ]
-		self.assert_( x[:] == [ 4, 6, 7, 8, 2 ] )
-		self.assert_( y[:] == [ -1, 4, 6, 7, 8, 2, -2 ] )
-		y.insertBefore( 7, 13 )
-		self.assert_( x[:] == [ 4, 6, 13, 7, 8, 2 ] )
-		self.assert_( y[:] == [ -1, 4, 6, 13, 7, 8, 2, -2 ] )
-		y.insertAfter( 7, 15 )
-		self.assert_( x[:] == [ 4, 6, 13, 7, 15, 8, 2 ] )
-		self.assert_( y[:] == [ -1, 4, 6, 13, 7, 15, 8, 2, -2 ] )
-		y.remove( 7 )
-		self.assert_( x[:] == [ 4, 6, 13, 15, 8, 2 ] )
-		self.assert_( y[:] == [ -1, 4, 6, 13, 15, 8, 2, -2 ] )
-		y.replace( 13, 17 )
-		self.assert_( x[:] == [ 4, 6, 17, 15, 8, 2 ] )
-		self.assert_( y[:] == [ -1, 4, 6, 17, 15, 8, 2, -2 ] )
-		y.replaceRange( 15, 2, [ 98, 99 ] )
-		self.assert_( x[:] == [ 4, 6, 17, 98, 99 ] )
-		self.assert_( y[:] == [ -1, 4, 6, 17, 98, 99, -2 ] )
+		#y = DMList( DMListOpWrap( layer2, x, [ -1 ], [ -2 ] ) )
+		#self.assert_( y[:] == [ -1, -2 ] )
+		#x.append( 4 )
+		#self.assert_( x[:] == [ 4 ] )
+		#self.assert_( y[:] == [ -1, 4, -2 ] )
+		#x.extend( [ 1, 2 ] )
+		#self.assert_( x[:] == [ 4, 1, 2 ] )
+		#self.assert_( y[:] == [ -1, 4, 1, 2, -2 ] )
+		#y[2:3] = [ 6, 7, 8 ]
+		#self.assert_( x[:] == [ 4, 6, 7, 8, 2 ] )
+		#self.assert_( y[:] == [ -1, 4, 6, 7, 8, 2, -2 ] )
+		#y.insertBefore( 7, 13 )
+		#self.assert_( x[:] == [ 4, 6, 13, 7, 8, 2 ] )
+		#self.assert_( y[:] == [ -1, 4, 6, 13, 7, 8, 2, -2 ] )
+		#y.insertAfter( 7, 15 )
+		#self.assert_( x[:] == [ 4, 6, 13, 7, 15, 8, 2 ] )
+		#self.assert_( y[:] == [ -1, 4, 6, 13, 7, 15, 8, 2, -2 ] )
+		#y.remove( 7 )
+		#self.assert_( x[:] == [ 4, 6, 13, 15, 8, 2 ] )
+		#self.assert_( y[:] == [ -1, 4, 6, 13, 15, 8, 2, -2 ] )
+		#y.replace( 13, 17 )
+		#self.assert_( x[:] == [ 4, 6, 17, 15, 8, 2 ] )
+		#self.assert_( y[:] == [ -1, 4, 6, 17, 15, 8, 2, -2 ] )
+		#y.replaceRange( 15, 2, [ 98, 99 ] )
+		#self.assert_( x[:] == [ 4, 6, 17, 98, 99 ] )
+		#self.assert_( y[:] == [ -1, 4, 6, 17, 98, 99, -2 ] )
 
 
 
