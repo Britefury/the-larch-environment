@@ -738,6 +738,12 @@ class TestCase_List_Wrap (unittest.TestCase):
 		self.assert_( self.y11[:] == [-1,-1] + range( 0, 10 ) + [ -2,-2 ] )
 
 
+	def testSetB(self):
+		self._doTestOp( DMList.__setitem__,  ( 1, 21 ),   [0,21]+range(2,10),   [0,21]+range(2,10),   range(0,10),   range(0,10) )
+
+	def testSetb(self):
+		self._doTestOp2( DMList.__setitem__,  ( -9, 21 ), ( -11, 21 ), ( -11, 21 ), ( -13, 21 ),   [0,21]+range(2,10),   [0,21]+range(2,10),   range(0,10),   range(0,10) )
+
 	#def testSet(self):
 		#self.y[2] = 220
 		#self.assert_( self.x[:] == [ 0, 1, 22, 3, 4, 5, 6, 7, 8, 9 ] )
