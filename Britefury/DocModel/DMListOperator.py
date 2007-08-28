@@ -303,34 +303,20 @@ class DMListOpSlice (DMListOperator):
 
 	def __setitem__(self, i, x):
 		if isinstance( i, slice ):
-			start = i.start
-			stop = i.stop
-			step = i.step
+			srcLen = len( self._src )
+			srcStart, srcStop, srcStep = slice( self._start, self._stop ).indices( srcLen )
+			myLen = srcStop - srcStart
+			start, stop, step = i.indices( myLen )
 
-			if start is None:
-				start = self._start
-			elif start < 0:
-				if self._stop is None:
-					start += len( self._src )
-				else:
-					start += self._stop
+			start += srcStart
+			stop += srcStart
+
+			if step == 1:
+				self._src[start:stop] = [ self._p_src( p )   for p in x ]
 			else:
-				start += self._start
-
-			if stop is None:
-				stop = self._stop
-			elif stop < 0:
-				if self._stop is None:
-					stop += len( self._src )
-				else:
-					stop += self._stop
-			else:
-				stop += self._start
-
-			oldLen = len( self._src )
-			self._src[start:stop:step] = [ self._p_src( p )   for p in x ]
+				self._src[start:stop:step] = [ self._p_src( p )   for p in x ]
 			newLen = len( self._src )
-			changeInLength = newLen - oldLen
+			changeInLength = newLen - srcLen
 			if self._start < 0:
 				self._start -= changeInLength
 				if self._start == 0:
@@ -349,34 +335,17 @@ class DMListOpSlice (DMListOperator):
 
 	def __delitem__(self, i):
 		if isinstance( i, slice ):
-			start = i.start
-			stop = i.stop
-			step = i.step
+			srcLen = len( self._src )
+			srcStart, srcStop, srcStep = slice( self._start, self._stop ).indices( srcLen )
+			myLen = srcStop - srcStart
+			start, stop, step = i.indices( myLen )
 
-			if start is None:
-				start = self._start
-			elif start < 0:
-				if self._stop is None:
-					start += len( self._src )
-				else:
-					start += self._stop
-			else:
-				start += self._start
+			start += srcStart
+			stop += srcStart
 
-			if stop is None:
-				stop = self._stop
-			elif stop < 0:
-				if self._stop is None:
-					stop += len( self._src )
-				else:
-					stop += self._stop
-			else:
-				stop += self._start
-
-			oldLen = len( self._src )
 			del self._src[start:stop:step]
 			newLen = len( self._src )
-			changeInLength = newLen - oldLen
+			changeInLength = newLen - srcLen
 			if self._start < 0:
 				self._start -= changeInLength
 				if self._start == 0:
@@ -401,21 +370,9 @@ class DMListOpSlice (DMListOperator):
 
 
 	def __len__(self):
-		if self._stop is None:
-			if self._start < 0:
-				return -self._start
-			else:
-				return len( self._src ) - self._start
-		elif self._stop < 0:
-			if self._start < 0:
-				return self._stop - self._start
-			else:
-				return len( self._src ) + self._stop - self._start
-		else:
-			if self._start < 0:
-				return self._stop  -  ( len( self._src ) + self._start )
-			else:
-				return self._stop - self._start
+		srcLen = len( self._src )
+		start, stop, step = slice( self._start, self._stop ).indices( srcLen )
+		return stop - start
 
 
 
@@ -468,18 +425,27 @@ class DMListOpWrap (DMListOperator):
 			stop -= self._prefixLen
 
 			newItems = ( stop - start )  /  step
-
 			diff = newItems - numItems
 
 			if diff != 0:
-				self._src[start:stop:step] = [ self._p_src( p )   for p in x[:-diff] ]
+				if step == 1:
+					self._src[start:stop] = [ self._p_src( p )   for p in x[:diff] ]
+				else:
+					self._src[start:stop:step] = [ self._p_src( p )   for p in x[:diff] ]
 			else:
-				self._src[start:stop:step] = [ self._p_src( p )   for p in x ]
+				if step == 1:
+					self._src[start:stop] = [ self._p_src( p )   for p in x ]
+				else:
+					self._src[start:stop:step] = [ self._p_src( p )   for p in x ]
 		else:
 			if i < 0:
-				self._src[i+self._suffixLen] = self._p_src( x )
+				ii = i + self._suffixLen
+				if ii < 0:
+					print ii, self._suffixLen, self._pre, self._suf
+					self._src[ii] = self._p_src( x )
 			else:
-				self._src[i-self._prefixLen] = self._p_src( x )
+				if i >= self._prefixLen:
+					self._src[i-self._prefixLen] = self._p_src( x )
 
 
 
