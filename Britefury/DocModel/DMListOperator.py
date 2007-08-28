@@ -421,84 +421,85 @@ class DMListOpSlice (DMListOperator):
 
 
 class DMListOpWrap (DMListOperator):
-	def __init__(self, layer, src, prefix, suffix):
+	def __init__(self, layer, src, prefix=[], suffix=[]):
 		super( DMListOpWrap, self ).__init__( layer )
+		assert isinstance( prefix, list )
+		assert isinstance( suffix, list )
 		self._src = src
-		self._prefix = prefix
-		self._suffix = suffix
-		self._pre = []
-		self._suf = []
-		self._prefixLen = 0
-		self._suffixLen = 0
+		self._pre = prefix
+		self._suf = suffix
+		self._prefixLen = len( prefix )
+		self._suffixLen = len( suffix )
 
 
 	def evaluate(self):
-		if isinstance( self._prefix, list ):
-			self._pre = self._prefix
-		else:
-			self._pre = self._prefix()
-		self._prefixLen = len( self._pre )
-
-		if isinstance( self._suffix, list ):
-			self._suf = self._suffix
-		else:
-			self._suf = self._suffix()
-		self._suffixLen = len( self._suf )
-
 		return self._pre + [ self._p_dest( x )   for x in self._src ] + self._suf
 
 
 	def append(self, x):
-		if self._suffix is None:
+		if self._suffixLen == 0:
 			self._src.append( self._p_src( x ) )
 
 	def extend(self, xs):
-		if self._suffix is None:
+		if self._suffixLen == 0:
 			self._src.extend( [ self._p_src( x )   for x in xs ] )
 
-	def insertBefore(self, before, x):
-		if before not in self._pre:
-			if before not in self._suf   or   ( len( self._suf ) > 0  and  before is self._suf[0] ):
-				self._src.insertBefore( self._p_src( before ), self._p_src( x ) )
-
-	def insertAfter(self, after, x):
-		if after not in self._suf:
-			if after not in self._pre   or   ( len( self._pre ) > 0  and  after is self._pre[-1] ):
-				self._src.insertAfter( self._p_src( after ), self._p_src( x ) )
+	def insert(self, i, x):
+		if i < 0:
+			relativeI = i + self._suffixLen
+			if relativeI < 0  and  relativeI >= -len( self._src ):
+				self._src.insert( relativeI, self._p_src( x ) )
+		else:
+			relativeI = i - self._prefixLen
+			if relativeI >= 0  and  relativeI <= len( self._src ):
+				self._src.insert( relativeI, self._p_src( x ) )
 
 	def remove(self, x):
 		if x not in self._pre  and  x not in self._suf:
 			self._src.remove( self._p_src( x ) )
 
-	def replace(self, a, x):
-		if a not in self._pre  and  a not in self._suf:
-			self._src.replace( self._p_src( a ), self._p_src( x ) )
-
-	def replaceRange(self, a, b, xs):
-		if a in self._pre:
-			a = self[0]
-		if b in self._suf:
-			b = self[-1]
-		self._src.replaceRange( self._p_src( a ), self._p_src( b ), [ self._p_src( x )  for x in xs ] )
-
-
 	def __setitem__(self, i, x):
 		if isinstance( i, slice ):
-			assert i.step is None, 'step must be 1'
-			start = i.start
-			stop = i.stop
-			if start < 0:
-				start += self._suffixLen
+			start, stop, step = i.indices( len( self ) )
+
+			numItems = ( stop - start )  /  step
+
+			start -= self._prefixLen
+			stop -= self._prefixLen
+
+			newItems = ( stop - start )  /  step
+
+			diff = newItems - numItems
+
+			if diff != 0:
+				self._src[start:stop:step] = [ self._p_src( p )   for p in x[:-diff] ]
 			else:
-				start -= self._prefixLen
-			if stop < 0:
-				stop += self._suffixLen
-			else:
-				stop -= self._prefixLen
-			self._src[start:stop] = [ self._p_src( p )   for p in x ]
+				self._src[start:stop:step] = [ self._p_src( p )   for p in x ]
 		else:
 			if i < 0:
 				self._src[i+self._suffixLen] = self._p_src( x )
 			else:
 				self._src[i-self._prefixLen] = self._p_src( x )
+
+
+
+	def __delitem__(self, i):
+		if isinstance( i, slice ):
+			start, stop, step = i.indices( len( self ) )
+
+			numItems = ( stop - start )  /  step
+
+			start -= self._prefixLen
+			stop -= self._prefixLen
+
+			del self._src[start:stop:step]
+		else:
+			del self._src[i]
+
+
+
+	def __len__(self):
+		return self._prefixLen + len( self._src ) + self._suffixLen
+
+
 
