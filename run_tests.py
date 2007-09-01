@@ -22,6 +22,8 @@ from Britefury.DocModel import DMString
 from Britefury.DocModel import DMListOperator
 from Britefury.DocModel import DMListOpNop
 from Britefury.DocModel import DMListOpMap
+from Britefury.DocModel import DMListOpSlice
+from Britefury.DocModel import DMListOpWrap
 from Britefury.DocModel import DMListInterface
 from Britefury.DocModel import DMList
 from Britefury.DocModel import DMLiteralList
