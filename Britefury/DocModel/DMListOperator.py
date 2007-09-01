@@ -143,8 +143,8 @@ class TestCase_DMListOperator_base (unittest.TestCase):
 			expectedValue = expectedValueFunc( testList )
 			expectedLiteralValue = expectedLiteralValueFunc( testList )
 
-			self.assert_( x[:] == expectedLiteralValue, ( opDescription, x[:], y[:], expectedLiteralValue, expectedValue ) )
-			self.assert_( y[:] == expectedValue, ( opDescription, x[:], y[:], expectedLiteralValue, expectedValue ) )
+			self.assert_( x[:] == expectedLiteralValue, ( opDescription, x[:], y[:], testList, expectedLiteralValue, expectedValue ) )
+			self.assert_( y[:] == expectedValue, ( opDescription, x[:], y[:], testList, expectedLiteralValue, expectedValue ) )
 
 
 
