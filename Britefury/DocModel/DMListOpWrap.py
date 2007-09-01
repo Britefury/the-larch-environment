@@ -39,14 +39,29 @@ class DMListOpWrap (DMListOperator):
 			self._src.extend( [ self._p_src( x )   for x in xs ] )
 
 	def insert(self, i, x):
+		srcLen = len( self._src )
 		if i < 0:
 			relativeI = i + self._suffixLen
-			if relativeI < 0  and  relativeI >= -len( self._src ):
-				self._src.insert( relativeI, self._p_src( x ) )
+			if relativeI == 0:
+				self._src.insert( srcLen, self._p_src( x ) )
+			elif relativeI < 0:
+				if relativeI < -srcLen:
+					if self._prefixLen == 0:
+						relativeI = -srcLen
+					else:
+						relativeI = None
+				if relativeI is not None:
+					self._src.insert( relativeI, self._p_src( x ) )
 		else:
 			relativeI = i - self._prefixLen
-			if relativeI >= 0  and  relativeI <= len( self._src ):
-				self._src.insert( relativeI, self._p_src( x ) )
+			if relativeI >= 0:
+				if relativeI > srcLen:
+					if self._suffixLen == 0:
+						relativeI = srcLen
+					else:
+						relativeI = None
+				if relativeI is not None:
+					self._src.insert( relativeI, self._p_src( x ) )
 
 	def remove(self, x):
 		if x not in self._pre  and  x not in self._suf:
@@ -77,6 +92,9 @@ class DMListOpWrap (DMListOperator):
 				else:
 					self._src[start:stop:step] = [ self._p_src( p )   for p in x ]
 		else:
+			selfLen = len( self )
+			if i < -selfLen  or  i >= selfLen:
+				raise IndexError, 'index out of bounds'
 			if i < 0:
 				ii = i + self._suffixLen
 				if ii < 0  and  ii >= -len( self._src ):
@@ -173,58 +191,89 @@ class TestCase_DMListOpWrap (TestCase_DMListOperator_base):
 		self.assert_( self.y11[:] == [ -1,-1 ] + x11Res + [-2,-2], ( self.x11[:], x11Res, self.y11[:], [-1,-1] + x11Res + [-2,-2] ) )
 
 
+	def _p_makeLayerListp00(self, layer, literalList):
+		return DMList( DMListOpWrap( layer, literalList, [], [] ) )
+
+	def _p_makeLayerListp01(self, layer, literalList):
+		return DMList( DMListOpWrap( layer, literalList, [], [ -2, -2 ] ) )
+
+	def _p_makeLayerListp10(self, layer, literalList):
+		return DMList( DMListOpWrap( layer, literalList, [ -1, -1 ], [] ) )
+
+	def _p_makeLayerListp11(self, layer, literalList):
+		return DMList( DMListOpWrap( layer, literalList, [ -1, -1 ], [ -2, -2 ] ) )
+
+
+	def _p_expectedValueStrip(self, xs):
+		try:
+			end = xs.index( -2 )
+		except ValueError:
+			end = None
+
+		try:
+			start = len( xs )  -  list( reversed( xs ) ).index( -1 )
+		except ValueError:
+			start = None
+
+		return xs[start:end]
+
+	def _p_expectedValue00(self, xs):
+		return self._p_expectedValueStrip( xs )
+
+	def _p_expectedValue01(self, xs):
+		return self._p_expectedValueStrip( xs ) + [ -2, -2 ]
+
+	def _p_expectedValue10(self, xs):
+		return [ -1, -1 ] + self._p_expectedValueStrip( xs )
+
+	def _p_expectedValue11(self, xs):
+		return [ -1, -1 ] + self._p_expectedValueStrip( xs ) + [ -2, -2 ]
+
+	def _p_expectedLiteralValue(self, xs):
+		return self._p_expectedValueStrip( xs )
+
+
+	def _wrapTestCase(self, operationFunc, opDescription):
+		self._p_testCaseParam( operationFunc, opDescription, self._p_makeLayerListp00, self._p_expectedValue00, self._p_expectedLiteralValue )
+		self._p_testCaseParam( operationFunc, opDescription, self._p_makeLayerListp01, self._p_expectedValue01, self._p_expectedLiteralValue )
+		self._p_testCaseParam( operationFunc, opDescription, self._p_makeLayerListp10, self._p_expectedValue10, self._p_expectedLiteralValue )
+		self._p_testCaseParam( operationFunc, opDescription, self._p_makeLayerListp11, self._p_expectedValue11, self._p_expectedLiteralValue )
+
+
 	def testFunction(self):
-		self.assert_( self.x00[:] == [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ] )
-		self.assert_( self.x01[:] == [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ] )
-		self.assert_( self.x10[:] == [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ] )
-		self.assert_( self.x11[:] == [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ] )
-		self.assert_( self.y00[:] == [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ] )
-		self.assert_( self.y01[:] == [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -2, -2 ] )
-		self.assert_( self.y10[:] == [ -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ] )
-		self.assert_( self.y11[:] == [ -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -2, -2 ] )
+		def _f(xs):
+			pass
+		self._wrapTestCase( _f, 'function' )
 
 	def testAppend(self):
-		self._doTestOp( DMList.append, ( 11, ),   range(0,10)+[11],   range(0,10),   range(0,10)+[11],   range(0,10) )
+		def _f(xs):
+			xs.append( 11 )
+		self._wrapTestCase( _f, 'append' )
 
 	def testExtend(self):
-		self._doTestOp( DMList.extend, ( [ 11, 12, 13 ], ),   range(0,10)+[11,12,13],   range(0,10),   range(0,10)+[11,12,13],   range(0,10) )
+		def _f(xs):
+			xs.extend( [ 11, 12, 13 ] )
+		self._wrapTestCase( _f, 'extend' )
 
 
-	def testInsertPB(self):
-		self._doTestOp( DMList.insert, ( 1, 21, ),   [ 0,21,1,2,3,4,5,6,7,8,9 ], [ 0,21,1,2,3,4,5,6,7,8,9 ], [ 0,1,2,3,4,5,6,7,8,9 ], [ 0,1,2,3,4,5,6,7,8,9 ]  )
+	def testInsert(self):
+		for i in xrange( -14, 14 ):
+			def _f(xs):
+				xs.insert( i, 50 )
+			self._wrapTestCase( _f, 'insert %d' % (i, ) )
 
-	def testInsertPM(self):
-		self._doTestOp( DMList.insert, ( 4, 21, ),   [ 0,1,2,3,21,4,5,6,7,8,9 ], [ 0,1,2,3,21,4,5,6,7,8,9 ], [ 0,1,21,2,3,4,5,6,7,8,9 ], [ 0,1,21,2,3,4,5,6,7,8,9 ]  )
-
-	def testInsertPE(self):
-		self._doTestOp2( DMList.insert, (9,21), (11,21), (11,21), (13,21),   [ 0,1,2,3,4,5,6,7,8,21,9 ], [ 0,1,2,3,4,5,6,7,8,9 ], [ 0,1,2,3,4,5,6,7,8,21,9 ], [ 0,1,2,3,4,5,6,7,8,9 ]  )
-
-
-	def testInsertNB(self):
-		self._doTestOp2( DMList.insert, (-9,21), (-11,21), (-11,21), (-13,21),   [ 0,21,1,2,3,4,5,6,7,8,9 ], [ 0,21,1,2,3,4,5,6,7,8,9 ], [ 0,1,2,3,4,5,6,7,8,9 ], [ 0,1,2,3,4,5,6,7,8,9 ]  )
-
-	def testInsertNM(self):
-		self._doTestOp( DMList.insert, ( -4, 21, ),   [ 0,1,2,3,4,5,21,6,7,8,9 ], [ 0,1,2,3,4,5,6,7,21,8,9 ], [ 0,1,2,3,4,5,21,6,7,8,9 ], [ 0,1,2,3,4,5,6,7,21,8,9 ]  )
-
-	def testInsertNE(self):
-		self._doTestOp( DMList.insert, ( -1, 21, ),   [ 0,1,2,3,4,5,6,7,8,21,9 ], [ 0,1,2,3,4,5,6,7,8,9 ], [ 0,1,2,3,4,5,6,7,8,21,9 ], [ 0,1,2,3,4,5,6,7,8,9 ]  )
+	def testRemove(self):
+		for i in xrange( -3, 11 ):
+			def _f(xs):
+				xs.remove( i )
+			self._wrapTestCase( _f, 'remove %d' % (i, ) )
 
 
-	def testRemoveB(self):
-		self.y11.remove( -1 )
-		self.assert_( self.x11[:] == range( 0, 10 ) )
-		self.assert_( self.y11[:] == [-1,-1] + range( 0, 10 ) + [ -2,-2 ] )
-
-	def testRemoveM(self):
-		self.y11.remove( 5 )
-		self.assert_( self.x11[:] == range( 0, 5 ) + range(6,10)  )
-		self.assert_( self.y11[:] == [-1,-1] + range( 0, 5 ) + range(6,10) + [ -2,-2 ] )
-
-	def testRemoveE(self):
-		self.y11.remove( -2 )
-		self.assert_( self.x11[:] == range( 0, 10 ) )
-		self.assert_( self.y11[:] == [-1,-1] + range( 0, 10 ) + [ -2,-2 ] )
-
+	def testSet(self):
+		for i in xrange( -14, 14 ):
+			def _f(xs):
+				xs[i] = 50
+			self._wrapTestCase( _f, 'set %d' % (i, ) )
 
 	def testSetB(self):
 		self._doTestOp( DMList.__setitem__,  ( 1, 21 ),   [0,21]+range(2,10),   [0,21]+range(2,10),   range(0,10),   range(0,10) )
