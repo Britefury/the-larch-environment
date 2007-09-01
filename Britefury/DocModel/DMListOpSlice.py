@@ -107,7 +107,7 @@ class DMListOpSlice (DMListOperator):
 			start += srcStart
 			stop += srcStart
 
-			if step == 1:
+			if i.step is None:
 				self._src[start:stop] = [ self._p_src( p )   for p in x ]
 			else:
 				self._src[start:stop:step] = [ self._p_src( p )   for p in x ]
@@ -152,6 +152,9 @@ class DMListOpSlice (DMListOperator):
 			if self._stop >= 0:
 				self._stop += changeInLength
 		else:
+			selfLen = len( self )
+			if i < -selfLen  or  i >= selfLen:
+				raise IndexError, 'index out of range'
 			if i < 0:
 				stop = self._stop
 				if stop is None:
@@ -180,7 +183,7 @@ class DMListOpSlice (DMListOperator):
 
 
 
-class TestCase_List_Slice (TestCase_DMListOperator_base):
+class TestCase_DMListOpSlice (TestCase_DMListOperator_base):
 	def setUp(self):
 		self.layer1 = DocModelLayer()
 		self.layer2 = DocModelLayer()
@@ -294,265 +297,60 @@ class TestCase_List_Slice (TestCase_DMListOperator_base):
 		for i in xrange( -11, 11 ):
 			for j in xrange( -11, 11 ):
 				def _set(xs):
-					xs[i:j] = range( 50, 54 )
+					xs[i:j] = range( 50, 55 )
+				def _set2(xs):
+					xs[i:j] = range( 50, 75 )
 				self._sliceTestCase( _set, 'set %d:%d' % (i,j, ) )
+				self._sliceTestCase( _set2, 'set2 %d:%d' % (i,j, ) )
 
 	def testSetSliceStep(self):
 		for i in xrange( -11, 11 ):
 			for j in xrange( -11, 11 ):
 				for k in xrange( -3, 3 ):
 					def _set(xs):
-						xs[i:j:k] = range( 50, 54 )
+						xs[i:j:k] = range( 50, 55 )
+					def _set2(xs):
+						xs[i:j:k] = range( 50, 75 )
 					self._sliceTestCase( _set, 'set %d:%d:%d' % (i,j,k, ) )
+					self._sliceTestCase( _set2, 'set2 %d:%d:%d' % (i,j,k, ) )
 
+	def testDel(self):
+		for i in xrange( -11, 11 ):
+			def _del(xs):
+				del xs[i]
+			self._sliceTestCase( _del, 'del %d' % (i, ) )
 
+	def testDelSlice(self):
+		for i in xrange( -11, 11 ):
+			for j in xrange( -11, 11 ):
+				def _del(xs):
+					del xs[i:j]
+				self._sliceTestCase( _del, 'del %d:%d' % (i,j, ) )
 
-
-	def _testSet(self, index, value, xRes, yRes, xRes0, yRes0):
-		if isinstance( index, tuple ):
-			if len( index ) == 2:
-				start, stop = index
-				self.ypp[start:stop] = value
-				self.ypn[start:stop] = value
-				self.ynp[start:stop] = value
-				self.ynn[start:stop] = value
-				self.yp0[start:stop] = value
-				self.yn0[start:stop] = value
-			elif len( index ) == 3:
-				start, stop, step = index
-				self.ypp[start:stop:step] = value
-				self.ypn[start:stop:step] = value
-				self.ynp[start:stop:step] = value
-				self.ynn[start:stop:step] = value
-				self.yp0[start:stop:step] = value
-				self.yn0[start:stop:step] = value
-		else:
-			self.ypp[index] = value
-			self.ypn[index] = value
-			self.ynp[index] = value
-			self.ynn[index] = value
-			self.yp0[index] = value
-			self.yn0[index] = value
-		self.assert_( self.xpp[:] == xRes, ( self.xpp[:], xRes ) )
-		self.assert_( self.ypp[:] == yRes, ( self.ypp[:], yRes ) )
-		self.assert_( self.xpn[:] == xRes, ( self.xpn[:], xRes ) )
-		self.assert_( self.ypn[:] == yRes, ( self.ypn[:], yRes ) )
-		self.assert_( self.xnp[:] == xRes, ( self.xnp[:], xRes ) )
-		self.assert_( self.ynp[:] == yRes, ( self.ynp[:], yRes ) )
-		self.assert_( self.xnn[:] == xRes, ( self.xnn[:], xRes ) )
-		self.assert_( self.ynn[:] == yRes, ( self.ynn[:], yRes ) )
-		self.assert_( self.xp0[:] == xRes0, ( self.xp0[:], xRes0 ) )
-		self.assert_( self.yp0[:] == yRes0, ( self.yp0[:], yRes0 ) )
-		self.assert_( self.xn0[:] == xRes0, ( self.xn0[:], xRes0 ) )
-		self.assert_( self.yn0[:] == yRes0, ( self.yn0[:], yRes0 ) )
-
-	def testSetP(self):
-		self._testSet( 4, 11,   [ 0, 1, 2, 3, 4, 11, 6, 7, 8, 9 ],   [ 1, 2, 3, 4, 11, 6, 7, 8 ],    [ 0, 1, 2, 3, 4, 11, 6, 7, 8, 9 ],   [ 1, 2, 3, 4, 11, 6, 7, 8, 9 ] )
-
-	def testSetN(self):
-		self._testSet( -4, 11,   [ 0, 1, 2, 3, 4, 11, 6, 7, 8, 9 ],   [ 1, 2, 3, 4, 11, 6, 7, 8 ],    [ 0, 1, 2, 3, 4, 5, 11, 7, 8, 9 ],   [ 1, 2, 3, 4, 5, 11, 7, 8, 9 ] )
-
-	def testSetPP(self):
-		self._testSet( (2,6), [11,13],   [ 0, 1, 2, 11, 13, 7, 8, 9 ],   [ 1, 2, 11, 13, 7, 8 ],    [ 0, 1, 2, 11, 13, 7, 8, 9 ],   [ 1, 2, 11, 13, 7, 8, 9 ] )
-
-	def testSetPN(self):
-		self._testSet( (2,-2), [11,13],   [ 0, 1, 2, 11, 13, 7, 8, 9 ],   [ 1, 2, 11, 13, 7, 8 ],    [ 0, 1, 2, 11, 13, 8, 9 ],   [ 1, 2, 11, 13, 8, 9 ] )
-
-	def testSetP0(self):
-		self._testSet( (2,None), [11,13],   [ 0, 1, 2, 11, 13, 9 ],   [ 1, 2, 11, 13 ],    [ 0, 1, 2, 11, 13 ],   [ 1, 2, 11, 13 ] )
-
-	def testSetNP(self):
-		self._testSet( (-6,6), [11,13],   [ 0, 1, 2, 11, 13, 7, 8, 9 ],   [ 1, 2, 11, 13, 7, 8 ],    [ 0, 1, 2, 3, 11, 13, 7, 8, 9 ],   [ 1, 2, 3, 11, 13, 7, 8, 9 ] )
-
-	def testSetNN(self):
-		self._testSet( (-6,-2), [11,13],   [ 0, 1, 2, 11, 13, 7, 8, 9 ],   [ 1, 2, 11, 13, 7, 8 ],    [ 0, 1, 2, 3, 11, 13, 8, 9 ],   [ 1, 2, 3, 11, 13, 8, 9 ] )
-
-	def testSetN0(self):
-		self._testSet( (-6,None), [11,13],   [ 0, 1, 2, 11, 13, 9 ],   [ 1, 2, 11, 13 ],    [ 0, 1, 2, 3, 11, 13 ],   [ 1, 2, 3, 11, 13 ] )
-
-	def testSet0P(self):
-		self._testSet( (None,6), [11,13],   [ 0, 11, 13, 7, 8, 9 ],   [ 11, 13, 7, 8 ],    [ 0, 11, 13, 7, 8, 9 ],   [ 11, 13, 7, 8, 9 ] )
-
-	def testSet0N(self):
-		self._testSet( (None,-2), [11,13],   [ 0, 11, 13, 7, 8, 9 ],   [ 11, 13, 7, 8 ],    [ 0, 11, 13, 8, 9 ],   [ 11, 13, 8, 9 ] )
-
-	def testSet00(self):
-		self._testSet( (None,None), [11,13],   [ 0, 11, 13, 9 ],   [ 11, 13 ],    [ 0, 11, 13 ],   [ 11, 13 ] )
-
-	def testSetStep(self):
-		self._testSet( (2,6,2), [11,13],   [ 0, 1, 2, 11, 4, 13, 6, 7, 8, 9 ],   [ 1, 2, 11, 4, 13, 6, 7, 8 ],    [ 0, 1, 2, 11, 4, 13, 6, 7, 8, 9 ],   [ 1, 2, 11, 4, 13, 6, 7, 8, 9 ] )
-
-	def testSetSpecial1(self):
-		self._testSet( (2,6), range(10,20),   [ 0,1,2,10,11,12,13,14,15,16,17,18,19,7,8,9 ], [ 1,2,10,11,12,13,14,15,16,17,18,19,7,8 ],   [ 0,1,2,10,11,12,13,14,15,16,17,18,19,7,8,9 ], [ 1,2,10,11,12,13,14,15,16,17,18,19,7,8,9 ] )
-
-	def testSetSpecial2(self):
-		self._testSet( (2,16), range(10,20),   [ 0,1,2,10,11,12,13,14,15,16,17,18,19,9 ], [ 1,2,10,11,12,13,14,15,16,17,18,19 ],   [ 0,1,2,10,11,12,13,14,15,16,17,18,19 ], [ 1,2,10,11,12,13,14,15,16,17,18,19 ] )
-
-	def testSetSpecial3(self):
-		self._testSet( (2,8), range(10,20),   [ 0,1,2,10,11,12,13,14,15,16,17,18,19,9 ], [ 1,2,10,11,12,13,14,15,16,17,18,19 ],   [ 0,1,2,10,11,12,13,14,15,16,17,18,19,9 ], [ 1,2,10,11,12,13,14,15,16,17,18,19,9 ] )
-
-	def testSetSpecial4(self):
-		self._testSet( (2,9), range(10,20),   [ 0,1,2,10,11,12,13,14,15,16,17,18,19,9 ], [ 1,2,10,11,12,13,14,15,16,17,18,19 ],   [ 0,1,2,10,11,12,13,14,15,16,17,18,19 ], [ 1,2,10,11,12,13,14,15,16,17,18,19 ] )
-
-
-
-
-
-	def _testDel(self, index, xRes, yRes, xRes0, yRes0):
-		if isinstance( index, tuple ):
-			if len( index ) == 2:
-				start, stop = index
-				del self.ypp[start:stop]
-				del self.ypn[start:stop]
-				del self.ynp[start:stop]
-				del self.ynn[start:stop]
-				del self.yp0[start:stop]
-				del self.yn0[start:stop]
-			elif len( index ) == 3:
-				start, stop, step = index
-				del self.ypp[start:stop:step]
-				del self.ypn[start:stop:step]
-				del self.ynp[start:stop:step]
-				del self.ynn[start:stop:step]
-				del self.yp0[start:stop:step]
-				del self.yn0[start:stop:step]
-		else:
-			del self.ypp[index]
-			del self.ypn[index]
-			del self.ynp[index]
-			del self.ynn[index]
-			del self.yp0[index]
-			del self.yn0[index]
-		self.assert_( self.xpp[:] == xRes, ( self.xpp[:], xRes, self.ypp[:], yRes ) )
-		self.assert_( self.ypp[:] == yRes, ( self.xpp[:], xRes, self.ypp[:], yRes ) )
-		self.assert_( self.xpn[:] == xRes, ( self.xpn[:], xRes, self.ypn[:], yRes ) )
-		self.assert_( self.ypn[:] == yRes, ( self.xpn[:], xRes, self.ypn[:], yRes ) )
-		self.assert_( self.xnp[:] == xRes, ( self.xnp[:], xRes, self.ynp[:], yRes ) )
-		self.assert_( self.ynp[:] == yRes, ( self.xnp[:], xRes, self.ynp[:], yRes ) )
-		self.assert_( self.xnn[:] == xRes, ( self.xnn[:], xRes, self.ynn[:], yRes ) )
-		self.assert_( self.ynn[:] == yRes, ( self.xnn[:], xRes, self.ynn[:], yRes ) )
-		self.assert_( self.xp0[:] == xRes0, ( self.xp0[:], xRes0, self.yp0[:], yRes0 ) )
-		self.assert_( self.yp0[:] == yRes0, ( self.xp0[:], xRes0, self.yp0[:], yRes0 ) )
-		self.assert_( self.xn0[:] == xRes0, ( self.xn0[:], xRes0, self.yn0[:], yRes0 ) )
-		self.assert_( self.yn0[:] == yRes0, ( self.xn0[:], xRes0, self.yn0[:], yRes0 ) )
-
-
-	def testDelP(self):
-		self._testDel( 4,   [ 0, 1, 2, 3, 4, 6, 7, 8, 9 ],   [ 1, 2, 3, 4, 6, 7, 8 ],    [ 0, 1, 2, 3, 4, 6, 7, 8, 9 ],   [ 1, 2, 3, 4, 6, 7, 8, 9 ] )
-
-	def testDelN(self):
-		self._testDel( -4,   [ 0, 1, 2, 3, 4, 6, 7, 8, 9 ],   [ 1, 2, 3, 4, 6, 7, 8 ],    [ 0, 1, 2, 3, 4, 5, 7, 8, 9 ],   [ 1, 2, 3, 4, 5, 7, 8, 9 ] )
-
-	def testDelPP(self):
-		self._testDel( (2,6),   [ 0, 1, 2, 7, 8, 9 ],   [ 1, 2, 7, 8 ],    [ 0, 1, 2, 7, 8, 9 ],   [ 1, 2, 7, 8, 9 ] )
-
-	def testDelPN(self):
-		self._testDel( (2,-2),   [ 0, 1, 2, 7, 8, 9 ],   [ 1, 2, 7, 8 ],    [ 0, 1, 2, 8, 9 ],   [ 1, 2, 8, 9 ] )
-
-	def testDelP0(self):
-		self._testDel( (2,None),   [ 0, 1, 2, 9 ],   [ 1, 2,  ],    [ 0, 1, 2,  ],   [ 1, 2,  ] )
-
-	def testDelNP(self):
-		self._testDel( (-6,6),   [ 0, 1, 2, 7, 8, 9 ],   [ 1, 2, 7, 8 ],    [ 0, 1, 2, 3, 7, 8, 9 ],   [ 1, 2, 3, 7, 8, 9 ] )
-
-	def testDelNN(self):
-		self._testDel( (-6,-2),   [ 0, 1, 2, 7, 8, 9 ],   [ 1, 2, 7, 8 ],    [ 0, 1, 2, 3, 8, 9 ],   [ 1, 2, 3, 8, 9 ] )
-
-	def testDelN0(self):
-		self._testDel( (-6,None),   [ 0, 1, 2, 9 ],   [ 1, 2,  ],    [ 0, 1, 2, 3,  ],   [ 1, 2, 3,  ] )
-
-	def testDel0P(self):
-		self._testDel( (None,6),   [ 0, 7, 8, 9 ],   [ 7, 8 ],    [ 0, 7, 8, 9 ],   [ 7, 8, 9 ] )
-
-	def testDel0N(self):
-		self._testDel( (None,-2),   [ 0, 7, 8, 9 ],   [ 7, 8 ],    [ 0, 8, 9 ],   [ 8, 9 ] )
-
-	def testDel00(self):
-		self._testDel( (None,None),   [ 0, 9 ],   [  ],    [ 0,  ],   [  ] )
-
-	def testDelStep(self):
-		self._testDel( (2,6,2),   [ 0, 1, 2, 4, 6, 7, 8, 9 ],   [ 1, 2, 4, 6, 7, 8 ],    [ 0, 1, 2, 4, 6, 7, 8, 9 ],   [ 1, 2, 4, 6, 7, 8, 9 ] )
+	def testDelSliceStep(self):
+		for i in xrange( -11, 11 ):
+			for j in xrange( -11, 11 ):
+				for k in xrange( -3, 3 ):
+					def _del(xs):
+						del xs[i:j:k]
+					self._sliceTestCase( _del, 'del %d:%d:%d' % (i,j,k, ) )
 
 
 
 	def testDelAppend(self):
-		del self.ypp[:]
-		del self.ypn[:]
-		del self.ynp[:]
-		del self.ynn[:]
-		del self.yp0[:]
-		del self.yn0[:]
-		self.assert_( self.xpp[:] == [ 0, 9 ] )
-		self.assert_( self.ypp[:] == [] )
-		self.assert_( self.xpn[:] == [ 0, 9 ] )
-		self.assert_( self.ypn[:] == [] )
-		self.assert_( self.xnp[:] == [ 0, 9 ] )
-		self.assert_( self.ynp[:] == [] )
-		self.assert_( self.xnn[:] == [ 0, 9 ] )
-		self.assert_( self.ynn[:] == [] )
-		self.assert_( self.xp0[:] == [ 0 ] )
-		self.assert_( self.yp0[:] == [] )
-		self.assert_( self.xn0[:] == [ 0 ] )
-		self.assert_( self.yn0[:] == [] )
-		self.ypp.append( 11 )
-		self.ypn.append( 11 )
-		self.ynp.append( 11 )
-		self.ynn.append( 11 )
-		self.yp0.append( 11 )
-		self.yn0.append( 11 )
-		self.assert_( self.xpp[:] == [ 0, 11, 9 ] )
-		self.assert_( self.ypp[:] == [ 11 ] )
-		self.assert_( self.xpn[:] == [ 0, 11, 9 ] )
-		self.assert_( self.ypn[:] == [ 11 ] )
-		self.assert_( self.xnp[:] == [ 0, 11, 9 ] )
-		self.assert_( self.ynp[:] == [ 11 ] )
-		self.assert_( self.xnn[:] == [ 0, 11, 9 ] )
-		self.assert_( self.ynn[:] == [ 11 ] )
-		self.assert_( self.xp0[:] == [ 0, 11 ] )
-		self.assert_( self.yp0[:] == [ 11 ] )
-		self.assert_( self.xn0[:] == [ 0, 11 ] )
-		self.assert_( self.yn0[:] == [ 11 ] )
-
-
-
+		def _delappend(xs):
+			del sx[:]
+			xs.append( 11 )
+		self._sliceTestCase( _delappend, 'delappend' )
 
 	def testDelInsert(self):
-		del self.ypp[:]
-		del self.ypn[:]
-		del self.ynp[:]
-		del self.ynn[:]
-		del self.yp0[:]
-		del self.yn0[:]
-		self.assert_( self.xpp[:] == [ 0, 9 ] )
-		self.assert_( self.ypp[:] == [] )
-		self.assert_( self.xpn[:] == [ 0, 9 ] )
-		self.assert_( self.ypn[:] == [] )
-		self.assert_( self.xnp[:] == [ 0, 9 ] )
-		self.assert_( self.ynp[:] == [] )
-		self.assert_( self.xnn[:] == [ 0, 9 ] )
-		self.assert_( self.ynn[:] == [] )
-		self.assert_( self.xp0[:] == [ 0 ] )
-		self.assert_( self.yp0[:] == [] )
-		self.assert_( self.xn0[:] == [ 0 ] )
-		self.assert_( self.yn0[:] == [] )
-		self.ypp.insert( 0, 11 )
-		self.ypn.insert( 0, 11 )
-		self.ynp.insert( 0, 11 )
-		self.ynn.insert( 0, 11 )
-		self.yp0.insert( 0, 11 )
-		self.yn0.insert( 0, 11 )
-		self.assert_( self.xpp[:] == [ 0, 11, 9 ] )
-		self.assert_( self.ypp[:] == [ 11 ] )
-		self.assert_( self.xpn[:] == [ 0, 11, 9 ] )
-		self.assert_( self.ypn[:] == [ 11 ] )
-		self.assert_( self.xnp[:] == [ 0, 11, 9 ] )
-		self.assert_( self.ynp[:] == [ 11 ] )
-		self.assert_( self.xnn[:] == [ 0, 11, 9 ] )
-		self.assert_( self.ynn[:] == [ 11 ] )
-		self.assert_( self.xp0[:] == [ 0, 11 ] )
-		self.assert_( self.yp0[:] == [ 11 ] )
-		self.assert_( self.xn0[:] == [ 0, 11 ] )
-		self.assert_( self.yn0[:] == [ 11 ] )
+		for i in xrange( -11, 11 ):
+			def _delinsert(xs):
+				del sx[:]
+				xs.insert( i, 50 )
+			self._sliceTestCase( _delinsert, 'delinsert %d' % (i, ) )
+
+
 
 
 

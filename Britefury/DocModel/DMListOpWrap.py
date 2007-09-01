@@ -112,7 +112,7 @@ class DMListOpWrap (DMListOperator):
 
 
 
-class TestCase_List_Wrap (TestCase_DMListOperator_base):
+class TestCase_DMListOpWrap (TestCase_DMListOperator_base):
 	def setUp(self):
 		self.layer1 = DocModelLayer()
 		self.layer2 = DocModelLayer()

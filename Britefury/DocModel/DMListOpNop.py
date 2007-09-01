@@ -70,7 +70,7 @@ class DMListOpNop (DMListOperator):
 
 
 
-class TestCase_List_Nop (TestCase_DMListOperator_base):
+class TestCase_DMListOpNop (TestCase_DMListOperator_base):
 	def setUp(self):
 		self.layer1 = DocModelLayer()
 		self.layer2 = DocModelLayer()
@@ -132,7 +132,10 @@ class TestCase_List_Nop (TestCase_DMListOperator_base):
 			for j in xrange( -12, 13 ):
 				def _set(xs):
 					xs[i:j] = range( 50, 55 )
+				def _set2(xs):
+					xs[i:j] = range( 50, 75 )
 				self._p_testCase( _set, 'set %d:%d' % (i,j, ) )
+				self._p_testCase( _set2, 'set2 %d:%d' % (i,j, ) )
 
 	def testSetRangeStep(self):
 		for i in xrange( -12, 13 ):
@@ -140,7 +143,10 @@ class TestCase_List_Nop (TestCase_DMListOperator_base):
 				for k in xrange( -3, 3 ):
 					def _set(xs):
 						xs[i:j:k] = range( 50, 55 )
-					self._p_testCase( _set, 'set %d:%d:%d' % (i,j,k, ) )
+					def _set2(xs):
+						xs[i:j:k] = range( 50, 75 )
+				self._p_testCase( _set, 'set %d:%d' % (i,j, ) )
+				self._p_testCase( _set2, 'set2 %d:%d' % (i,j, ) )
 
 	def testDelSingle(self):
 		for i in xrange( -12, 13 ):
