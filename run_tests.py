@@ -32,7 +32,7 @@ from Britefury.DocModel import DocModelLayer
 
 
 testModules = [ CellEvaluatorFunction, CellEvaluator, CellEvaluatorPythonExpression, CellInterface, Cell, LiteralCell, ProxyCell,
-				DMNode, DMSymbol, DMString, DMListOperator, DMListInterface, DMList, DMLiteralList, DMProxyList, DocModelLayer, DMListOpNop, DMListOpMap, DMListOpSlice, DMlistOpJoin ]
+				DMNode, DMSymbol, DMString, DMListOperator, DMListInterface, DMList, DMLiteralList, DMProxyList, DocModelLayer, DMListOpNop, DMListOpMap, DMListOpSlice, DMListOpJoin ]
 
 
 if __name__ == '__main__':
