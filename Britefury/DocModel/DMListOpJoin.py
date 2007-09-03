@@ -62,17 +62,27 @@ class DMListOpJoin (DMListOperator):
 			start, stop, step = i.indices( lenSelf )
 
 			if i.step is None:
-				if start <= lenA:
-					if stop <= lenA:
-						self._srcA[start:stop] = [ self._p_src( p )   for p in x ]
+				if stop == -1  or  stop < start:
+					if start <= lenA:
+						self._srcA[start:start] = [ self._p_src( p )   for p in x ]
 					else:
-						a = lenA - start
-						self._srcA[start:lenA] = [ self._p_src( p )   for p in x[:a] ]
-						self._srcB[0:stop-lenA] = [ self._p_src( p )   for p in x[a:] ]
+						start -= lenA
+						self._srcB[start:start] = [ self._p_src( p )   for p in x ]
 				else:
-					self._srcB[start-lenA:stop-lenA] = [ self._p_src( p )   for p in x ]
+					if start <= lenA:
+						if stop <= lenA:
+							self._srcA[start:stop] = [ self._p_src( p )   for p in x ]
+						else:
+							a = lenA - start
+							self._srcA[start:lenA] = [ self._p_src( p )   for p in x[:a] ]
+							self._srcB[0:stop-lenA] = [ self._p_src( p )   for p in x[a:] ]
+					else:
+						self._srcB[start-lenA:stop-lenA] = [ self._p_src( p )   for p in x ]
 			else:
-				for i, p in zip( xrange( start, stop, step ), x ):
+				indices = xrange( start, stop, step )
+				if len( indices )  !=  len( x ):
+					raise ValueError, 'attempt to assign sequence of size %d to to extended slice of size %d'  %  ( len( x ), len( indices ) )
+				for i, p in zip( indices, x ):
 					self[i] = self._p_src( p )
 		else:
 			if i < 0:
@@ -97,20 +107,26 @@ class DMListOpJoin (DMListOperator):
 			start, stop, step = i.indices( lenSelf )
 
 			if i.step is None:
-				if start <= lenA:
-					if stop <= lenA:
-						del self._srcA[start:stop]
+				if stop == -1  or  stop < start:
+					if start <= lenA:
+						del self._srcA[start:start]
 					else:
-						a = lenA - start
-						del self._srcA[start:lenA]
-						del self._srcB[0:stop-lenA]
+						start -= lenA
+						del self._srcB[start:start]
 				else:
-					del self._srcB[start-lenA:stop-lenA]
+					if start <= lenA:
+						if stop <= lenA:
+							del self._srcA[start:stop]
+						else:
+							del self._srcA[start:lenA]
+							del self._srcB[0:stop-lenA]
+					else:
+						del self._srcB[start-lenA:stop-lenA]
 			else:
+				indices = xrange( start, stop, step )
 				if step > 0:
-					start, stop = stop, start
-					step = -step
-				for i, p in zip( xrange( start, stop, step ), x ):
+					indices = reversed( indices )
+				for i in indices:
 					del self[i]
 		else:
 			if i < 0:
@@ -139,7 +155,7 @@ class DMListOpJoin (DMListOperator):
 
 
 class TestCase_DMListOpJoin (TestCase_DMListOperator_base):
-	def _p_joinTestCase(self, operationFunc, opDescription):
+	def _p_joinTestCase(self, operationFunc, opDescription, checkFunction=None):
 		"""
 		operationFunc :				f( xs )
 		"""
@@ -177,98 +193,111 @@ class TestCase_DMListOpJoin (TestCase_DMListOperator_base):
 
 			self.assert_( ( len(xa) + len(xb) )  ==  len( y ),  ( opDescription, xa[:], xb[:], y[:], testList ) )
 			self.assert_( xa[:] == testList[:len(xa)],  ( opDescription, xa[:], xb[:], y[:], testList ) )
-			self.assert_( xa[:] == testList[:-len(xb)],  ( opDescription, xa[:], xb[:], y[:], testList ) )
+			if len(xb) > 0:
+				self.assert_( xa[:] == testList[:-len(xb)],  ( opDescription, xa[:], xb[:], y[:], testList ) )
 			self.assert_( xb[:] == testList[len(xa):],  ( opDescription, xa[:], xb[:], y[:], testList ) )
-			self.assert_( xb[:] == testList[-len(xb):],  ( opDescription, xa[:], xb[:], y[:], testList ) )
+			if len(xb) > 0:
+				self.assert_( xb[:] == testList[-len(xb):],  ( opDescription, xa[:], xb[:], y[:], testList ) )
+
+			if checkFunction is not None:
+				self.assert_( checkFunction( xa, xb, y, testList ),  ( opDescription, xa[:], xb[:], y[:], testList ) )
 
 
 	def testFunction(self):
 		self._p_joinTestCase( lambda x: x, 'function' )
 
-	#def testAppend(self):
-		#def _append(xs):
-			#xs.append( 11 )
-		#self._sliceTestCase( _append, 'append' )
+	def testAppend(self):
+		def _append(xs):
+			xs.append( 11 )
+		def _check(xa, xb, y, testList):
+			return xa[:] == range(0,5)  and  xb[:] == range(5,10)+[11]
+		self._p_joinTestCase( _append, 'append', _check )
 
-	#def testExtend(self):
-		#def _extend(xs):
-			#xs.extend( [11,12,13] )
-		#self._sliceTestCase( _extend, 'extend' )
+	def testExtend(self):
+		def _extend(xs):
+			xs.extend( [11,12,13] )
+		def _check(xa, xb, y, testList):
+			return xa[:] == range(0,5)  and  xb[:] == range(5,10)+[11,12,13]
+		self._p_joinTestCase( _extend, 'extend', _check )
 
-	#def testInsert(self):
-		#for i in xrange( -11, 11 ):
-			#def _insert(xs):
-				#xs.insert( i, 50 )
-			#self._sliceTestCase( _insert, 'insert %d' % (i, ) )
+	def testInsert(self):
+		for i in xrange( -11, 11 ):
+			def _insert(xs):
+				xs.insert( i, 50 )
+			def _check(xa, xb, y, testList):
+				return 50 in y  and  ( 50 in xa  or  50 in xb )  and  not ( 50 in xa and 50 in xb )
+			self._p_joinTestCase( _insert, 'insert %d' % (i, ), _check )
 
-	#def testRemove(self):
-		#for i in xrange( -11, 11 ):
-			#def _remove(xs):
-				#xs.remove( i, 50 )
-			#self._sliceTestCase( _remove, 'remove %d' % (i, ) )
+	def testRemove(self):
+		for i in xrange( -11, 11 ):
+			def _remove(xs):
+				xs.remove( i, 50 )
+			def _check(xa, xb, y, testList):
+				return 50 not in y  and  50 not in xa  and  50 not in xb
+			self._p_joinTestCase( _remove, 'remove %d' % (i, ), _check )
 
-	#def testSet(self):
-		#for i in xrange( -11, 11 ):
-			#def _set(xs):
-				#xs[i] = 50
-			#self._sliceTestCase( _set, 'set %d' % (i, ) )
+	def testSet(self):
+		for i in xrange( -11, 11 ):
+			def _set(xs):
+				xs[i] = 50
+			self._p_joinTestCase( _set, 'set %d' % (i, ) )
 
-	#def testSetSlice(self):
-		#for i in xrange( -11, 11 ):
-			#for j in xrange( -11, 11 ):
-				#def _set(xs):
-					#xs[i:j] = range( 50, 55 )
-				#def _set2(xs):
-					#xs[i:j] = range( 50, 75 )
-				#self._sliceTestCase( _set, 'set %d:%d' % (i,j, ) )
-				#self._sliceTestCase( _set2, 'set2 %d:%d' % (i,j, ) )
+	def testSetSlice(self):
+		for i in xrange( -11, 11 ):
+			for j in xrange( -11, 11 ):
+				def _set(xs):
+					xs[i:j] = range( 50, 55 )
+				def _set2(xs):
+					xs[i:j] = range( 50, 75 )
+				self._p_joinTestCase( _set, 'set %d:%d' % (i,j, ) )
+				self._p_joinTestCase( _set2, 'set2 %d:%d' % (i,j, ) )
 
-	#def testSetSliceStep(self):
-		#for i in xrange( -11, 11 ):
-			#for j in xrange( -11, 11 ):
-				#for k in xrange( -3, 3 ):
-					#def _set(xs):
-						#xs[i:j:k] = range( 50, 55 )
-					#def _set2(xs):
-						#xs[i:j:k] = range( 50, 75 )
-					#self._sliceTestCase( _set, 'set %d:%d:%d' % (i,j,k, ) )
-					#self._sliceTestCase( _set2, 'set2 %d:%d:%d' % (i,j,k, ) )
+	def testSetSliceStep(self):
+		for i in xrange( -11, 11 ):
+			for j in xrange( -11, 11 ):
+				for k in xrange( -3, 3 ):
+					def _set(xs):
+						xs[i:j:k] = range( 50, 55 )
+					def _set2(xs):
+						xs[i:j:k] = range( 50, 75 )
+					self._p_joinTestCase( _set, 'set %d:%d:%d' % (i,j,k, ) )
+					self._p_joinTestCase( _set2, 'set2 %d:%d:%d' % (i,j,k, ) )
 
-	#def testDel(self):
-		#for i in xrange( -11, 11 ):
-			#def _del(xs):
-				#del xs[i]
-			#self._sliceTestCase( _del, 'del %d' % (i, ) )
+	def testDel(self):
+		for i in xrange( -11, 11 ):
+			def _del(xs):
+				del xs[i]
+			self._p_joinTestCase( _del, 'del %d' % (i, ) )
 
-	#def testDelSlice(self):
-		#for i in xrange( -11, 11 ):
-			#for j in xrange( -11, 11 ):
-				#def _del(xs):
-					#del xs[i:j]
-				#self._sliceTestCase( _del, 'del %d:%d' % (i,j, ) )
+	def testDelSlice(self):
+		for i in xrange( -11, 11 ):
+			for j in xrange( -11, 11 ):
+				def _del(xs):
+					del xs[i:j]
+				self._p_joinTestCase( _del, 'del %d:%d' % (i,j, ) )
 
-	#def testDelSliceStep(self):
-		#for i in xrange( -11, 11 ):
-			#for j in xrange( -11, 11 ):
-				#for k in xrange( -3, 3 ):
-					#def _del(xs):
-						#del xs[i:j:k]
-					#self._sliceTestCase( _del, 'del %d:%d:%d' % (i,j,k, ) )
+	def testDelSliceStep(self):
+		for i in xrange( -11, 11 ):
+			for j in xrange( -11, 11 ):
+				for k in xrange( -3, 3 ):
+					def _del(xs):
+						del xs[i:j:k]
+					self._p_joinTestCase( _del, 'del %d:%d:%d' % (i,j,k, ) )
 
 
 
-	#def testDelAppend(self):
-		#def _delappend(xs):
-			#del sx[:]
-			#xs.append( 11 )
-		#self._sliceTestCase( _delappend, 'delappend' )
+	def testDelAppend(self):
+		def _delappend(xs):
+			del sx[:]
+			xs.append( 11 )
+		self._p_joinTestCase( _delappend, 'delappend' )
 
-	#def testDelInsert(self):
-		#for i in xrange( -11, 11 ):
-			#def _delinsert(xs):
-				#del sx[:]
-				#xs.insert( i, 50 )
-			#self._sliceTestCase( _delinsert, 'delinsert %d' % (i, ) )
+	def testDelInsert(self):
+		for i in xrange( -11, 11 ):
+			def _delinsert(xs):
+				del sx[:]
+				xs.insert( i, 50 )
+			self._p_joinTestCase( _delinsert, 'delinsert %d' % (i, ) )
 
 
 
