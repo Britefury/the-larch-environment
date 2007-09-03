@@ -62,15 +62,15 @@ class DMListOpSlice (DMListOperator):
 		if i < 0:
 			i = max( i, -len( self ) )
 			if self._stop is None:
-				self._src.insert( len( self._src ) + i, x )
+				self._src.insert( len( self._src ) + i, self._p_src( x ) )
 			else:
-				self._src.insert( i + self._stop, x )
+				self._src.insert( i + self._stop, self._p_src( x ) )
 		else:
 			start = self._start
 			if start < 0:
 				start += len( self._src )
 			ii = min( i, len( self ) )
-			self._src.insert( ii + start, x )
+			self._src.insert( ii + start, self._p_src( x ) )
 		if self._start < 0:
 			self._start -= 1
 		if self._stop >= 0  and  self._stop is not None:

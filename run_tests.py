@@ -23,7 +23,7 @@ from Britefury.DocModel import DMListOperator
 from Britefury.DocModel import DMListOpNop
 from Britefury.DocModel import DMListOpMap
 from Britefury.DocModel import DMListOpSlice
-from Britefury.DocModel import DMListOpWrap
+from Britefury.DocModel import DMListOpJoin
 from Britefury.DocModel import DMListInterface
 from Britefury.DocModel import DMList
 from Britefury.DocModel import DMLiteralList
@@ -32,7 +32,7 @@ from Britefury.DocModel import DocModelLayer
 
 
 testModules = [ CellEvaluatorFunction, CellEvaluator, CellEvaluatorPythonExpression, CellInterface, Cell, LiteralCell, ProxyCell,
-				DMNode, DMSymbol, DMString, DMListOperator, DMListInterface, DMList, DMLiteralList, DMProxyList, DocModelLayer ]
+				DMNode, DMSymbol, DMString, DMListOperator, DMListInterface, DMList, DMLiteralList, DMProxyList, DocModelLayer, DMListOpNop, DMListOpMap, DMListOpSlice, DMlistOpJoin ]
 
 
 if __name__ == '__main__':
