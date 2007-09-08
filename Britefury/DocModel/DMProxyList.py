@@ -34,20 +34,8 @@ class DMProxyList (DMListInterface):
 	def insert(self, index, x):
 		self._src.insert( i, x)
 
-	def insertBefore(self, before, x):
-		self._src.insertBefore( before, x )
-
-	def insertAfter(self, after, x):
-		self._src.insertAfter( after, x )
-
 	def remove(self, x):
 		self._src.remove( x )
-
-	def replace(self, a, x):
-		self._src.replace( a, x )
-
-	def replaceRange(self, a, b, xs):
-		self._src.replaceRange( a, b, xs )
 
 	def __setitem__(self, i, x):
 		self._src[i] = x

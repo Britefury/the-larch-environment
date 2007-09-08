@@ -14,9 +14,14 @@ import Britefury.DocModel.DMList
 
 
 class DocModelLayer (object):
-	def __init__(self, layerOpFunctionGenerator=lambda x, y: lambda x, y: copy( x )):
-		"""layerFunctionGenerator signature:    layerOpFunctionGenerator(sourceList, destLayer)  ->  layerOpFunction(sourceList, destLayer)"""
+	def __init__(self, layerOpFunctionGenerator=lambda x, y: lambda x, y: copy( x ), layerOpInvFunctionGenerator=lambda x, y: lambda x, y: copy( x )):
+		"""
+		layerFunctionGenerator signature:    layerOpFunctionGenerator(sourceList, destLayer)  ->  layerOpFunction(sourceList, destLayer)  ->  destList
+		layerOpInvFunctionGenerator signature:    layerOpInvFunctionGenerator(destList, destLayer)  ->  layerOpInvFunction(destList, destLayer)  ->  sourceList
+		"""
 		self._layerOpFunctionGenerator = layerOpFunctionGenerator
+		self._layerOpInvFunctionGenerator = layerOpInvFunctionGenerator
+
 
 		self._srcListToDestCell = WeakKeyDictionary()
 		self._srcListToLayerOpFunctionToDestList = WeakKeyDictionary()
@@ -60,7 +65,11 @@ class DocModelLayer (object):
 
 
 	def getSrcList(self, destList):
-		return self._destListToSrcList[destList]
+		try:
+			return self._destListToSrcList[destList]
+		except KeyError:
+			layerOpInvFunction = self._layerOpInvFunctionGenerator( destList, self )
+			return layerOpFunction( destList, self )
 
 
 

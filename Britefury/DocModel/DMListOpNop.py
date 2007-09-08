@@ -28,27 +28,17 @@ class DMListOpNop (DMListOperator):
 	def append(self, x):
 		self._src.append( self._p_src( x ) )
 
+
 	def extend(self, xs):
 		self._src.extend( [ self._p_src( x )   for x in xs ] )
+
 
 	def insert(self, i, x):
 		self._src.insert( i, self._p_src( x ) )
 
-	def insertBefore(self, before, x):
-		self._src.insertBefore( self._p_src( before ), self._p_src( x ) )
-
-	def insertAfter(self, after, x):
-		after = self._p_src( after )
-		self._src.insertAfter( self._p_src( after ), self._p_src( x ) )
 
 	def remove(self, x):
 		self._src.remove( self._p_src( x ) )
-
-	def replace(self, a, x):
-		self._src.replace( self._p_src( a ), self._p_src( x ) )
-
-	def replaceRange(self, a, b, xs):
-		self._src.replaceRange( self._p_src( a ), self._p_src( b ), [ self._p_src( x )  for x in xs ] )
 
 
 	def __setitem__(self, i, x):
@@ -57,8 +47,10 @@ class DMListOpNop (DMListOperator):
 		else:
 			self._src[i] = self._p_src( x )
 
+
 	def __delitem__(self, i):
 		del self._src[i]
+
 
 
 	def __len__(self):
@@ -88,14 +80,16 @@ class TestCase_DMListOpNop (TestCase_DMListOperator_base):
 
 
 
-	def _p_makeLayerList(self, layer, literalList):
-		return DMList( DMListOpNop( layer, literalList ) )
-
 	def _p_expectedValue(self, xs):
 		return xs
 
 	def _p_expectedLiteralValue(self, xs):
 		return xs
+
+
+	def _p_testCase(self, operationFunc, opDescription):
+		self.x[:] = range( 0, 10 )
+		return self._p_testCaseCheckInPlace( self.x, self.y, operationFunc, opDescription )
 
 
 
@@ -104,22 +98,26 @@ class TestCase_DMListOpNop (TestCase_DMListOperator_base):
 		self.assert_( self.y[:] == [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ] )
 
 	def testAppend(self):
-		self.y.append( 11 )
-		self.assert_( self.x[:] == [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11 ] )
-		self.assert_( self.x[:] == [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11 ] )
+		def _append(xs):
+			xs.append( 11 )
+		self._p_testCase( _append, 'append' )
 
 	def testExtend(self):
-		self.y.extend( range( 20, 23 ) )
-		self.assert_( self.x[:] == [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 20, 21, 22 ] )
-		self.assert_( self.x[:] == [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 20, 21, 22 ] )
+		def _extend(xs):
+			xs.extend( [ 11, 12, 13 ] )
+		self._p_testCase( _extend, 'extend' )
 
 	def testInsert(self):
 		for i in xrange( -12, 13 ):
-			self._p_testCase( lambda xs: xs.insert( i, 34 ), 'insert %d' % (i, ) )
+			def _insert(xs):
+				xs.insert( i, 34 )
+			self._p_testCase( _insert, 'insert %d' % (i, ) )
 
 	def testRemove(self):
 		for i in xrange( -12, 13 ):
-			self._p_testCase( lambda xs: xs.remove( i ), 'remove %d' % (i, ) )
+			def _remove(xs):
+				xs.remove( i )
+			self._p_testCase( _remove, 'remove %d' % (i, ) )
 
 	def testSetSingle(self):
 		for i in xrange( -12, 13 ):
@@ -145,8 +143,8 @@ class TestCase_DMListOpNop (TestCase_DMListOperator_base):
 						xs[i:j:k] = range( 50, 55 )
 					def _set2(xs):
 						xs[i:j:k] = range( 50, 75 )
-				self._p_testCase( _set, 'set %d:%d' % (i,j, ) )
-				self._p_testCase( _set2, 'set2 %d:%d' % (i,j, ) )
+					self._p_testCase( _set, 'set %d:%d:%d' % (i,j,k ) )
+					self._p_testCase( _set2, 'set2 %d:%d:%d' % (i,j,k ) )
 
 	def testDelSingle(self):
 		for i in xrange( -12, 13 ):

@@ -25,12 +25,14 @@ class DMListOpJoin (DMListOperator):
 		return self._srcA[:] + self._srcB[:]
 
 
+
 	def append(self, x):
 		self._srcB.append( x )
 
 
 	def extend(self, xs):
 		self._srcB.extend( xs )
+
 
 	def insert(self, i, x):
 		if i < 0:
@@ -155,25 +157,37 @@ class DMListOpJoin (DMListOperator):
 
 
 class TestCase_DMListOpJoin (TestCase_DMListOperator_base):
+	def setUp(self):
+		self.layer1 = DocModelLayer()
+		self.layer2 = DocModelLayer()
+		self.xa = DMLiteralList()
+		self.xa.extend( range( 0, 5 ) )
+		self.xb = DMLiteralList()
+		self.xb.extend( range( 5, 10 ) )
+
+		self.y = DMList( DMListOpJoin( self.layer2, self.xa, self.xb ) )
+
+	def tearDown(self):
+		del self.layer1
+		del self.layer2
+		del self.xa
+		del self.xb
+		del self.y
+
+
 	def _p_joinTestCase(self, operationFunc, opDescription, checkFunction=None):
 		"""
 		operationFunc :				f( xs )
 		"""
-		layer1 = DocModelLayer()
-		layer2 = DocModelLayer()
-		xa = DMLiteralList()
-		xa.extend( range( 0, 5 ) )
-		xb = DMLiteralList()
-		xb.extend( range( 5, 10 ) )
-
-		y = DMListOpJoin( layer2, xa, xb )
+		self.xa[:] = range(0,5)
+		self.xb[:] = range(5,10)
 
 		expectedError = None
 		expectedErrorClass = None
 		error = None
 		errorClass = None
 
-		testList = y[:]
+		testList = self.y[:]
 		try:
 			operationFunc( testList )
 		except Exception, e:
@@ -181,7 +195,7 @@ class TestCase_DMListOpJoin (TestCase_DMListOperator_base):
 			expectedErrorClass = e.__class__
 
 		try:
-			operationFunc( y )
+			operationFunc( self.y )
 		except Exception, e:
 			error = e
 			errorClass = e.__class__
@@ -189,18 +203,18 @@ class TestCase_DMListOpJoin (TestCase_DMListOperator_base):
 		self.assert_( expectedErrorClass == errorClass, ( opDescription, expectedError, error ) )
 
 		if error is None:
-			self.assert_( y[:] == testList, ( opDescription, xa[:], xb[:], y[:], testList ) )
+			self.assert_( self.y[:] == testList, ( opDescription, self.xa[:], self.xb[:], self.y[:], testList ) )
 
-			self.assert_( ( len(xa) + len(xb) )  ==  len( y ),  ( opDescription, xa[:], xb[:], y[:], testList ) )
-			self.assert_( xa[:] == testList[:len(xa)],  ( opDescription, xa[:], xb[:], y[:], testList ) )
-			if len(xb) > 0:
-				self.assert_( xa[:] == testList[:-len(xb)],  ( opDescription, xa[:], xb[:], y[:], testList ) )
-			self.assert_( xb[:] == testList[len(xa):],  ( opDescription, xa[:], xb[:], y[:], testList ) )
-			if len(xb) > 0:
-				self.assert_( xb[:] == testList[-len(xb):],  ( opDescription, xa[:], xb[:], y[:], testList ) )
+			self.assert_( ( len(self.xa) + len(self.xb) )  ==  len( self.y ),  ( opDescription, self.xa[:], self.xb[:], self.y[:], testList ) )
+			self.assert_( self.xa[:] == testList[:len(self.xa)],  ( opDescription, self.xa[:], self.xb[:], self.y[:], testList ) )
+			if len(self.xb) > 0:
+				self.assert_( self.xa[:] == testList[:-len(self.xb)],  ( opDescription, self.xa[:], self.xb[:], self.y[:], testList ) )
+			self.assert_( self.xb[:] == testList[len(self.xa):],  ( opDescription, self.xa[:], self.xb[:], self.y[:], testList ) )
+			if len(self.xb) > 0:
+				self.assert_( self.xb[:] == testList[-len(self.xb):],  ( opDescription, self.xa[:], self.xb[:], self.y[:], testList ) )
 
 			if checkFunction is not None:
-				self.assert_( checkFunction( xa, xb, y, testList ),  ( opDescription, xa[:], xb[:], y[:], testList ) )
+				self.assert_( checkFunction( self.xa, self.xb, self.y, testList ),  ( opDescription, self.xa[:], self.xb[:], self.y[:], testList ) )
 
 
 	def testFunction(self):

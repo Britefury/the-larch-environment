@@ -28,6 +28,7 @@ class DMListOpSlice (DMListOperator):
 		return [ self._p_dest( x )   for x in self._src[self._start:self._stop] ]
 
 
+
 	def append(self, x):
 		if self._stop is None:
 			self._src.append( self._p_src( x ) )
@@ -58,6 +59,7 @@ class DMListOpSlice (DMListOperator):
 			if self._stop >= 0  and  self._stop is not None:
 				self._stop += len( xs )
 
+
 	def insert(self, i, x):
 		if i < 0:
 			i = max( i, -len( self ) )
@@ -76,11 +78,6 @@ class DMListOpSlice (DMListOperator):
 		if self._stop >= 0  and  self._stop is not None:
 			self._stop += 1
 
-	def insertBefore(self, before, x):
-		self._src.insertBefore( self._p_src( before ), self._p_src( x ) )
-
-	def insertAfter(self, after, x):
-		self._src.insertAfter( self._p_src( after ), self._p_src( x ) )
 
 	def remove(self, x):
 		self._src.remove( self._p_src( x ) )
@@ -91,11 +88,6 @@ class DMListOpSlice (DMListOperator):
 		if self._stop >= 0  and  self._stop is not None:
 			self._stop -= 1
 
-	def replace(self, a, x):
-		self._src.replace( self._p_src( a ), self._p_src( x ) )
-
-	def replaceRange(self, a, b, xs):
-		self._src.replaceRange( self._p_src( a ), self._p_src( b ), [ self._p_src( x )  for x in xs ] )
 
 	def __setitem__(self, i, x):
 		if isinstance( i, slice ):
@@ -254,12 +246,31 @@ class TestCase_DMListOpSlice (TestCase_DMListOperator_base):
 
 
 	def _sliceTestCase(self, operationFunc, opDescription):
-		self._p_testCaseParam( operationFunc, opDescription, self._p_makeLayerListpp, self._p_expectedValue, self._p_expectedLiteralValue )
-		self._p_testCaseParam( operationFunc, opDescription, self._p_makeLayerListpn, self._p_expectedValue, self._p_expectedLiteralValue )
-		self._p_testCaseParam( operationFunc, opDescription, self._p_makeLayerListnp, self._p_expectedValue, self._p_expectedLiteralValue )
-		self._p_testCaseParam( operationFunc, opDescription, self._p_makeLayerListnn, self._p_expectedValue, self._p_expectedLiteralValue )
-		self._p_testCaseParam( operationFunc, opDescription, self._p_makeLayerListp0, self._p_expectedValue, self._p_expectedLiteralValue0 )
-		self._p_testCaseParam( operationFunc, opDescription, self._p_makeLayerListn0, self._p_expectedValue, self._p_expectedLiteralValue0 )
+		#self._p_testCaseParam( operationFunc, opDescription, self._p_makeLayerListpp, self._p_expectedValue, self._p_expectedLiteralValue )
+		#self._p_testCaseParam( operationFunc, opDescription, self._p_makeLayerListpn, self._p_expectedValue, self._p_expectedLiteralValue )
+		#self._p_testCaseParam( operationFunc, opDescription, self._p_makeLayerListnp, self._p_expectedValue, self._p_expectedLiteralValue )
+		#self._p_testCaseParam( operationFunc, opDescription, self._p_makeLayerListnn, self._p_expectedValue, self._p_expectedLiteralValue )
+		#self._p_testCaseParam( operationFunc, opDescription, self._p_makeLayerListp0, self._p_expectedValue, self._p_expectedLiteralValue0 )
+		#self._p_testCaseParam( operationFunc, opDescription, self._p_makeLayerListn0, self._p_expectedValue, self._p_expectedLiteralValue0 )
+		self.xpp[:] = range(0,10)
+		self.xpn[:] = range(0,10)
+		self.xnp[:] = range(0,10)
+		self.xnn[:] = range(0,10)
+		self.xp0[:] = range(0,10)
+		self.xn0[:] = range(0,10)
+		self.ypp.op = DMListOpSlice( self.layer2, self.xpp, 1, 9 )
+		self.ypn.op = DMListOpSlice( self.layer2, self.xpn, 1, -1 )
+		self.ynp.op = DMListOpSlice( self.layer2, self.xnp, -9, 9 )
+		self.ynn.op = DMListOpSlice( self.layer2, self.xnn, -9, -1 )
+		self.yp0.op = DMListOpSlice( self.layer2, self.xp0, 1 )
+		self.yn0.op = DMListOpSlice( self.layer2, self.xn0, -9 )
+
+		self._p_testCaseCheckInPlaceParam( self.xpp, self.ypp, operationFunc, opDescription, self._p_expectedValue, self._p_expectedLiteralValue )
+		self._p_testCaseCheckInPlaceParam( self.xpn, self.ypn, operationFunc, opDescription, self._p_expectedValue, self._p_expectedLiteralValue )
+		self._p_testCaseCheckInPlaceParam( self.xnp, self.ynp, operationFunc, opDescription, self._p_expectedValue, self._p_expectedLiteralValue )
+		self._p_testCaseCheckInPlaceParam( self.xnn, self.ynn, operationFunc, opDescription, self._p_expectedValue, self._p_expectedLiteralValue )
+		self._p_testCaseCheckInPlaceParam( self.xp0, self.yp0, operationFunc, opDescription, self._p_expectedValue, self._p_expectedLiteralValue0 )
+		self._p_testCaseCheckInPlaceParam( self.xn0, self.yn0, operationFunc, opDescription, self._p_expectedValue, self._p_expectedLiteralValue0 )
 
 
 	def testFunction(self):

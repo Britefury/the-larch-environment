@@ -26,24 +26,7 @@ class DMListInterface (DMNode):
 		pass
 
 	@abstractmethod
-	def insertBefore(self, before, x):
-		pass
-
-	@abstractmethod
-	def insertAfter(self, after, x):
-		pass
-
-	@abstractmethod
 	def remove(self, x):
-		pass
-
-	@abstractmethod
-	def replace(self, a, x):
-		pass
-
-	@abstractmethod
-	def replaceRange(self, a, b, xs):
-		"""Replaces the range (a,b) inclusive with the contents of xs"""
 		pass
 
 	@abstractmethod
@@ -97,3 +80,10 @@ class DMListInterface (DMNode):
 	@abstractmethod
 	def __deepcopy__(self, memo):
 		pass
+
+
+	def __cmp__(self, x):
+		if isinstance( x, DMListInterface ):
+			return cmp( self[:], x[:] )
+		else:
+			return cmp( self[:], x )
