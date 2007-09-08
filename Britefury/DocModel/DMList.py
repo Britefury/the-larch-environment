@@ -33,20 +33,8 @@ class DMList (DMListInterface):
 	def insert(self, i, x):
 		self._op.insert( i, x)
 
-	def insertBefore(self, before, x):
-		self._op.insertBefore( before, x )
-
-	def insertAfter(self, after, x):
-		self._op.insertAfter( after, x )
-
 	def remove(self, x):
 		self._op.remove( x )
-
-	def replace(self, a, x):
-		self._op.replace( a, x )
-
-	def replaceRange(self, a, b, xs):
-		self._op.replaceRange( a, b, xs )
 
 	def __setitem__(self, i, x):
 		self._op[i] = x
@@ -130,41 +118,6 @@ class DMList (DMListInterface):
 
 
 #class TestCase_List (unittest.TestCase):
-	##def testOpWrap(self):
-		##layer1 = DocModelLayer()
-		##layer2 = DocModelLayer()
-		##x = DMLiteralList()
-
-		##y = DMList( DMListOpWrap( layer2, x, [ -1 ], [ -2 ] ) )
-		##self.assert_( y[:] == [ -1, -2 ] )
-		##x.append( 4 )
-		##self.assert_( x[:] == [ 4 ] )
-		##self.assert_( y[:] == [ -1, 4, -2 ] )
-		##x.extend( [ 1, 2 ] )
-		##self.assert_( x[:] == [ 4, 1, 2 ] )
-		##self.assert_( y[:] == [ -1, 4, 1, 2, -2 ] )
-		##y[2:3] = [ 6, 7, 8 ]
-		##self.assert_( x[:] == [ 4, 6, 7, 8, 2 ] )
-		##self.assert_( y[:] == [ -1, 4, 6, 7, 8, 2, -2 ] )
-		##y.insertBefore( 7, 13 )
-		##self.assert_( x[:] == [ 4, 6, 13, 7, 8, 2 ] )
-		##self.assert_( y[:] == [ -1, 4, 6, 13, 7, 8, 2, -2 ] )
-		##y.insertAfter( 7, 15 )
-		##self.assert_( x[:] == [ 4, 6, 13, 7, 15, 8, 2 ] )
-		##self.assert_( y[:] == [ -1, 4, 6, 13, 7, 15, 8, 2, -2 ] )
-		##y.remove( 7 )
-		##self.assert_( x[:] == [ 4, 6, 13, 15, 8, 2 ] )
-		##self.assert_( y[:] == [ -1, 4, 6, 13, 15, 8, 2, -2 ] )
-		##y.replace( 13, 17 )
-		##self.assert_( x[:] == [ 4, 6, 17, 15, 8, 2 ] )
-		##self.assert_( y[:] == [ -1, 4, 6, 17, 15, 8, 2, -2 ] )
-		##y.replaceRange( 15, 2, [ 98, 99 ] )
-		##self.assert_( x[:] == [ 4, 6, 17, 98, 99 ] )
-		##self.assert_( y[:] == [ -1, 4, 6, 17, 98, 99, -2 ] )
-
-
-
-
 	#def testLayers(self):
 		#def opPlus2(ls, layer):
 			#return DMListOpWrap( layer, DMListOpMap( layer, DMListOpSlice( layer, ls, 1, None ), lambda x: x + 2, lambda x: x - 2 ), [ 'plus2b' ], [] )

@@ -25,6 +25,8 @@ class DMLiteralList (DMListInterface):
 		self._cell = LiteralRefCell()
 		if value is None:
 			value = []
+		else:
+			value = [ self._p_coerce( x )   for x in value ]
 		self._cell.literalValue = value
 
 
@@ -46,31 +48,29 @@ class DMLiteralList (DMListInterface):
 				child.writeObject( x )
 
 
+	def _p_coerce(self, x):
+		if isinstance( x, list )  or  isinstance( x, tuple ):
+			return DMLiteralList( copy( x ) )
+		else:
+			return x
+
+
 	def append(self, x):
 		v = self._cell.literalValue
+		x = self._p_coerce( x )
 		v.append( x )
 		self._cell.literalValue = v
 
 	def extend(self, xs):
 		v = self._cell.literalValue
+		xs = [ self._p_coerce( x )   for x in xs ]
 		v.extend( xs )
 		self._cell.literalValue = v
 
 	def insert(self, i, x):
 		v = self._cell.literalValue
+		x = self._p_coerce( x )
 		v.insert( i, x )
-		self._cell.literalValue = v
-
-	def insertBefore(self, before, x):
-		v = self._cell.literalValue
-		i = v.index( before )
-		v.insert( i, x )
-		self._cell.literalValue = v
-
-	def insertAfter(self, after, x):
-		v = self._cell.literalValue
-		i = v.index( after )
-		v.insert( i + 1, x )
 		self._cell.literalValue = v
 
 	def remove(self, x):
@@ -78,21 +78,12 @@ class DMLiteralList (DMListInterface):
 		v.remove( x )
 		self._cell.literalValue = v
 
-	def replace(self, a, x):
-		v = self._cell.literalValue
-		index = v.index( a )
-		v[index] =x
-		self._cell.literalValue = v
-
-	def replaceRange(self, a, b, xs):
-		v = self._cell.literalValue
-		start = v.index( a )
-		stop = v.index( b )
-		v[start:stop+1] = xs
-		self._cell.literalValue = v
-
 	def __setitem__(self, i, x):
 		v = self._cell.literalValue
+		if isinstance( i, slice ):
+			x = [ self._p_coerce( p )   for p in x ]
+		else:
+			x = self._p_coerce( x )
 		v[i] = x
 		self._cell.literalValue = v
 
@@ -151,6 +142,12 @@ import unittest
 
 
 class TestCase_LiteralList (unittest.TestCase):
+	def _p_checkListFormat(self, xs):
+		self.assert_( not isinstance( xs, list )  and not isinstance( xs, tuple ) )
+		if isinstance( xs, DMLiteralList ):
+			for x in xs:
+				self._p_checkListFormat( x )
+
 	def testLiteralListCtor(self):
 		x = DMLiteralList()
 
@@ -167,6 +164,14 @@ class TestCase_LiteralList (unittest.TestCase):
 		x = DMLiteralList()
 		x.append( 1 )
 		self.assert_( x[0] == 1 )
+		x.append( [ 10, 20 ] )
+		self.assert_( x[1][:] == [ 10, 20 ] )
+		self.assert_( isinstance( x[1], DMListInterface ) )
+		x.append( [ [ 40, 50 ], [ 50, [ 60, 70 ] ] ] )
+		self.assert_( x[2][0][:] == [ 40, 50 ] )
+		self.assert_( x[2][1][0] == 50 )
+		self.assert_( x[2][1][1][:] == [ 60, 70 ] )
+		self._p_checkListFormat( x )
 
 
 	def testExtend(self):
@@ -176,6 +181,11 @@ class TestCase_LiteralList (unittest.TestCase):
 		self.assert_( x[1] == 2 )
 		self.assert_( x[2] == 3 )
 		self.assert_( x[:] == [ 1, 2, 3 ] )
+		x.extend( [ [ 10 ], [ 20 ], [ 30 ] ] )
+		self.assert_( x[3][0] == 10 )
+		self.assert_( x[4][0] == 20 )
+		self.assert_( x[5][0] == 30 )
+		self._p_checkListFormat( x )
 
 
 	def testInsert(self):
@@ -184,22 +194,10 @@ class TestCase_LiteralList (unittest.TestCase):
 		self.assert_( x[:] == [ 1, 2, 3, 4, 5 ] )
 		x.insert( 2, 12 )
 		self.assert_( x[:] == [ 1, 2, 12, 3, 4, 5 ] )
+		x.insert( 2, [ 13 ] )
+		self.assert_( x == [ 1, 2, [ 13 ], 12, 3, 4, 5 ] )
+		self._p_checkListFormat( x )
 
-
-	def testInsertBefore(self):
-		x = DMLiteralList()
-		x.extend( [ 1, 2, 3, 4, 5 ] )
-		self.assert_( x[:] == [ 1, 2, 3, 4, 5 ] )
-		x.insertBefore( 3, 12 )
-		self.assert_( x[:] == [ 1, 2, 12, 3, 4, 5 ] )
-
-
-	def testInsertAfter(self):
-		x = DMLiteralList()
-		x.extend( [ 1, 2, 3, 4, 5 ] )
-		self.assert_( x[:] == [ 1, 2, 3, 4, 5 ] )
-		x.insertAfter( 3, 12 )
-		self.assert_( x[:] == [ 1, 2, 3, 12, 4, 5 ] )
 
 
 	def testRemove(self):
@@ -208,22 +206,9 @@ class TestCase_LiteralList (unittest.TestCase):
 		self.assert_( x[:] == [ 1, 2, 3, 4, 5 ] )
 		x.remove( 3 )
 		self.assert_( x[:] == [ 1, 2, 4, 5 ] )
+		self._p_checkListFormat( x )
 
 
-	def testReplace(self):
-		x = DMLiteralList()
-		x.extend( [ 1, 2, 3, 4, 5 ] )
-		self.assert_( x[:] == [ 1, 2, 3, 4, 5 ] )
-		x.replace( 3, 8 )
-		self.assert_( x[:] == [ 1, 2, 8, 4, 5 ] )
-
-
-	def testReplaceRange(self):
-		x = DMLiteralList()
-		x.extend( [ 1, 2, 3, 4, 5 ] )
-		self.assert_( x[:] == [ 1, 2, 3, 4, 5 ] )
-		x.replaceRange( 2, 4, [ 7, 8, 9 ] )
-		self.assert_( x[:] == [ 1, 7, 8, 9, 5 ] )
 
 
 	def testSet(self):
@@ -234,6 +219,7 @@ class TestCase_LiteralList (unittest.TestCase):
 		self.assert_( x[:] == [ 1, 2, 3, 4, 12 ] )
 		x[1:3] = [ 20, 21, 22 ]
 		self.assert_( x[:] == [ 1, 20, 21, 22, 4, 12 ] )
+		self._p_checkListFormat( x )
 
 
 	def testDel(self):
@@ -244,6 +230,7 @@ class TestCase_LiteralList (unittest.TestCase):
 		self.assert_( x[:] == [ 0, 1, 2, 3, 5, 6, 7, 8, 9 ] )
 		del x[3:6]
 		self.assert_( x[:] == [ 0, 1, 2, 7, 8, 9 ] )
+		self._p_checkListFormat( x )
 
 
 

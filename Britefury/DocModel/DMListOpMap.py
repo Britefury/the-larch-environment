@@ -7,6 +7,7 @@
 ##-*************************
 
 from Britefury.DocModel.DocModelLayer import DocModelLayer
+from Britefury.DocModel.DMListInterface import DMListInterface
 from Britefury.DocModel.DMListOperator import DMListOperator, TestCase_DMListOperator_base
 from Britefury.DocModel.DMLiteralList import DMLiteralList
 from Britefury.DocModel.DMList import DMList
@@ -22,22 +23,12 @@ class DMListOpMap (DMListOperator):
 		self._invF = invF
 
 
-	def _p_dest(self, x):
-		try:
-			getDestList = x.getDestList
-		except AttributeError:
-			return self._f( x )
-		else:
-			return getDestList( self._layer )
+	def _p_srcToDest(self, x):
+		return self._f( x )
 
+	def _p_destToSrc(self, x):
+		return self._invF( x )
 
-	def _p_src(self, x):
-		try:
-			getSrcList = x.getSrcList
-		except AttributeError:
-			return self._invF( x )
-		else:
-			return getSrcList( self._layer )
 
 
 	def evaluate(self):
@@ -47,26 +38,17 @@ class DMListOpMap (DMListOperator):
 	def append(self, x):
 		self._src.append( self._p_src( x ) )
 
+
 	def extend(self, xs):
 		self._src.extend( [ self._p_src( p )   for p in xs ] )
+
 
 	def insert(self, i, x):
 		self._src.insert( i, self._p_src( x ) )
 
-	def insertBefore(self, before, x):
-		self._src.insertBefore( self._p_src( before ),  self._p_src( x ) )
-
-	def insertAfter(self, after, x):
-		self._src.insertAfter( self._p_src( after ),  self._p_src( x ) )
 
 	def remove(self, x):
 		self._src.remove( self._p_src( x ) )
-
-	def replace(self, a, x):
-		self._src.replace( self._p_src( a ), self._p_src( x ) )
-
-	def replaceRange(self, a, b, xs):
-		self._src.replaceRange( self._p_src( a ), self._p_src( b ), [ self._p_src( x )  for x in xs ] )
 
 
 	def __setitem__(self, i, x):
@@ -78,6 +60,8 @@ class DMListOpMap (DMListOperator):
 
 	def __delitem__(self, i):
 		del self._src[i]
+
+
 
 	def __len__(self):
 		return len( self._src )
@@ -112,6 +96,11 @@ class TestCase_DMListOpMap (TestCase_DMListOperator_base):
 
 	def _p_expectedLiteralValue(self, xs):
 		return [ x / 10   for x in xs ]
+
+
+	def _p_testCase(self, operationFunc, opDescription):
+		self.x[:] = range( 0, 10 )
+		return self._p_testCaseCheckInPlace( self.x, self.y, operationFunc, opDescription )
 
 
 	def testFunction(self):
