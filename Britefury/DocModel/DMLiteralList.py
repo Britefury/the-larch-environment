@@ -20,7 +20,7 @@ from Britefury.DocModel.DMListInterface import DMListInterface
 
 
 
-class DMLiteralList (DMListInterface):
+class DMList (DMListInterface):
 	def __init__(self, value=None):
 		self._cell = LiteralRefCell()
 		if value is None:
@@ -50,7 +50,7 @@ class DMLiteralList (DMListInterface):
 
 	def _p_coerce(self, x):
 		if isinstance( x, list )  or  isinstance( x, tuple ):
-			return DMLiteralList( copy( x ) )
+			return DMList( copy( x ) )
 		else:
 			return x
 
@@ -121,18 +121,18 @@ class DMLiteralList (DMListInterface):
 
 
 	def __copy__(self):
-		c = DMLiteralList()
+		c = DMList()
 		c._cell.literalValue = self._cell.literalValue
 		return c
 
 	def __deepcopy__(self, memo):
-		c = DMLiteralList()
+		c = DMList()
 		c._cell.literalValue = deepcopy( self._cell.literalValue, memo )
 		return c
 
 
 
-ioObjectFactoryRegister( 'DMLiteralList', DMLiteralList )
+ioObjectFactoryRegister( 'DMList', DMList )
 
 
 
@@ -144,24 +144,24 @@ import unittest
 class TestCase_LiteralList (unittest.TestCase):
 	def _p_checkListFormat(self, xs):
 		self.assert_( not isinstance( xs, list )  and not isinstance( xs, tuple ) )
-		if isinstance( xs, DMLiteralList ):
+		if isinstance( xs, DMList ):
 			for x in xs:
 				self._p_checkListFormat( x )
 
 	def testLiteralListCtor(self):
-		x = DMLiteralList()
+		x = DMList()
 
 
 
 	def testIter(self):
-		x = DMLiteralList()
+		x = DMList()
 		x.extend( [ 1, 2, 3 ] )
 		q = [ p   for p in x ]
 		self.assert_( q == [ 1, 2, 3 ] )
 
 
 	def testAppend(self):
-		x = DMLiteralList()
+		x = DMList()
 		x.append( 1 )
 		self.assert_( x[0] == 1 )
 		x.append( [ 10, 20 ] )
@@ -175,7 +175,7 @@ class TestCase_LiteralList (unittest.TestCase):
 
 
 	def testExtend(self):
-		x = DMLiteralList()
+		x = DMList()
 		x.extend( [ 1, 2, 3 ] )
 		self.assert_( x[0] == 1 )
 		self.assert_( x[1] == 2 )
@@ -189,7 +189,7 @@ class TestCase_LiteralList (unittest.TestCase):
 
 
 	def testInsert(self):
-		x = DMLiteralList()
+		x = DMList()
 		x.extend( [ 1, 2, 3, 4, 5 ] )
 		self.assert_( x[:] == [ 1, 2, 3, 4, 5 ] )
 		x.insert( 2, 12 )
@@ -201,7 +201,7 @@ class TestCase_LiteralList (unittest.TestCase):
 
 
 	def testRemove(self):
-		x = DMLiteralList()
+		x = DMList()
 		x.extend( [ 1, 2, 3, 4, 5 ] )
 		self.assert_( x[:] == [ 1, 2, 3, 4, 5 ] )
 		x.remove( 3 )
@@ -212,7 +212,7 @@ class TestCase_LiteralList (unittest.TestCase):
 
 
 	def testSet(self):
-		x = DMLiteralList()
+		x = DMList()
 		x.extend( [ 1, 2, 3, 4, 5 ] )
 		self.assert_( x[:] == [ 1, 2, 3, 4, 5 ] )
 		x[4] = 12
@@ -223,7 +223,7 @@ class TestCase_LiteralList (unittest.TestCase):
 
 
 	def testDel(self):
-		x = DMLiteralList()
+		x = DMList()
 		x.extend( range( 0, 10 ) )
 		self.assert_( x[:] == [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ] )
 		del x[4]
@@ -237,13 +237,13 @@ class TestCase_LiteralList (unittest.TestCase):
 
 
 	def testIOXml(self):
-		xxa = DMLiteralList( [ 'a', 'b', 'c' ] )
+		xxa = DMList( [ 'a', 'b', 'c' ] )
 
-		x = DMLiteralList( [ 1, 2, 3 ] )
-		xx1 = DMLiteralList( [ 'plus2', 5, 6, 7 ] )
+		x = DMList( [ 1, 2, 3 ] )
+		xx1 = DMList( [ 'plus2', 5, 6, 7 ] )
 		xx1.append( xxa )
 		x.append( xx1 )
-		xx2 = DMLiteralList( [ 'times2', 11, 12, 13 ] )
+		xx2 = DMList( [ 'times2', 11, 12, 13 ] )
 		xx2.append( xxa )
 		x.append( xx2 )
 

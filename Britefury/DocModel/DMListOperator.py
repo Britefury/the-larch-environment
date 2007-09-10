@@ -9,7 +9,7 @@ from Britefury.Kernel.Abstract import abstractmethod
 
 from Britefury.DocModel.DocModelLayer import DocModelLayer
 from Britefury.DocModel.DMListInterface import DMListInterface
-from Britefury.DocModel.DMLiteralList import DMLiteralList
+from Britefury.DocModel.DMList import DMList
 
 
 
@@ -122,7 +122,7 @@ class TestCase_DMListOperator_base (unittest.TestCase):
 		"""
 		layer1 = DocModelLayer()
 		layer2 = DocModelLayer()
-		x = DMLiteralList()
+		x = DMList()
 		x.extend( range( 0, 10 ) )
 
 		y = makeLayerListFunc( layer2, x )

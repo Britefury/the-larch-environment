@@ -8,8 +8,8 @@
 
 from Britefury.DocModel.DocModelLayer import DocModelLayer
 from Britefury.DocModel.DMListOperator import DMListOperator, TestCase_DMListOperator_base
-from Britefury.DocModel.DMLiteralList import DMLiteralList
 from Britefury.DocModel.DMList import DMList
+from Britefury.DocModel.DMVirtualList import DMVirtualList
 
 
 
@@ -179,25 +179,25 @@ class TestCase_DMListOpSlice (TestCase_DMListOperator_base):
 	def setUp(self):
 		self.layer1 = DocModelLayer()
 		self.layer2 = DocModelLayer()
-		self.xpp = DMLiteralList()
+		self.xpp = DMList()
 		self.xpp.extend( range( 0, 10 ) )
-		self.xpn = DMLiteralList()
+		self.xpn = DMList()
 		self.xpn.extend( range( 0, 10 ) )
-		self.xnp = DMLiteralList()
+		self.xnp = DMList()
 		self.xnp.extend( range( 0, 10 ) )
-		self.xnn = DMLiteralList()
+		self.xnn = DMList()
 		self.xnn.extend( range( 0, 10 ) )
-		self.xp0 = DMLiteralList()
+		self.xp0 = DMList()
 		self.xp0.extend( range( 0, 10 ) )
-		self.xn0 = DMLiteralList()
+		self.xn0 = DMList()
 		self.xn0.extend( range( 0, 10 ) )
 
-		self.ypp = DMList( DMListOpSlice( self.layer2, self.xpp, 1, 9 ) )
-		self.ypn = DMList( DMListOpSlice( self.layer2, self.xpn, 1, -1 ) )
-		self.ynp = DMList( DMListOpSlice( self.layer2, self.xnp, -9, 9 ) )
-		self.ynn = DMList( DMListOpSlice( self.layer2, self.xnn, -9, -1 ) )
-		self.yp0 = DMList( DMListOpSlice( self.layer2, self.xp0, 1 ) )
-		self.yn0 = DMList( DMListOpSlice( self.layer2, self.xn0, -9 ) )
+		self.ypp = DMVirtualList( DMListOpSlice( self.layer2, self.xpp, 1, 9 ) )
+		self.ypn = DMVirtualList( DMListOpSlice( self.layer2, self.xpn, 1, -1 ) )
+		self.ynp = DMVirtualList( DMListOpSlice( self.layer2, self.xnp, -9, 9 ) )
+		self.ynn = DMVirtualList( DMListOpSlice( self.layer2, self.xnn, -9, -1 ) )
+		self.yp0 = DMVirtualList( DMListOpSlice( self.layer2, self.xp0, 1 ) )
+		self.yn0 = DMVirtualList( DMListOpSlice( self.layer2, self.xn0, -9 ) )
 
 	def tearDown(self):
 		del self.layer1
@@ -217,22 +217,22 @@ class TestCase_DMListOpSlice (TestCase_DMListOperator_base):
 
 
 	def _p_makeLayerListpp(self, layer, literalList):
-		return DMList( DMListOpSlice( layer, literalList, 1, 9 ) )
+		return DMVirtualList( DMListOpSlice( layer, literalList, 1, 9 ) )
 
 	def _p_makeLayerListpn(self, layer, literalList):
-		return DMList( DMListOpSlice( layer, literalList, 1, -1 ) )
+		return DMVirtualList( DMListOpSlice( layer, literalList, 1, -1 ) )
 
 	def _p_makeLayerListnp(self, layer, literalList):
-		return DMList( DMListOpSlice( layer, literalList, -9, 9 ) )
+		return DMVirtualList( DMListOpSlice( layer, literalList, -9, 9 ) )
 
 	def _p_makeLayerListnn(self, layer, literalList):
-		return DMList( DMListOpSlice( layer, literalList, -9, -1 ) )
+		return DMVirtualList( DMListOpSlice( layer, literalList, -9, -1 ) )
 
 	def _p_makeLayerListp0(self, layer, literalList):
-		return DMList( DMListOpSlice( layer, literalList, 1 ) )
+		return DMVirtualList( DMListOpSlice( layer, literalList, 1 ) )
 
 	def _p_makeLayerListn0(self, layer, literalList):
-		return DMList( DMListOpSlice( layer, literalList, -9 ) )
+		return DMVirtualList( DMListOpSlice( layer, literalList, -9 ) )
 
 
 	def _p_expectedValue(self, xs):
