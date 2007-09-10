@@ -12,7 +12,7 @@ from Britefury.Cell.Cell import RefCell
 
 from Britefury.DocModel.DocModelLayer import DocModelLayer
 from Britefury.DocModel.DMListInterface import DMListInterface
-from Britefury.DocModel.DMLiteralList import DMLiteralList
+from Britefury.DocModel.DMList import DMList
 
 
 
@@ -90,7 +90,7 @@ import unittest
 
 class TestCase_ProxyList (unittest.TestCase):
 	def testProxy(self):
-		x = DMLiteralList()
+		x = DMList()
 		x.extend( [ 1, 2, 3 ] )
 
 		y = DMProxyList( x )

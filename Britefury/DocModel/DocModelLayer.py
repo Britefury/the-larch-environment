@@ -9,7 +9,7 @@ from weakref import WeakKeyDictionary
 
 from Britefury.Cell.Cell import RefCell
 
-import Britefury.DocModel.DMList
+import Britefury.DocModel.DMVirtualList
 
 
 
@@ -45,7 +45,7 @@ class DocModelLayer (object):
 				try:
 					destList = layerOpFunctionToDestList[layerOpFunction]
 				except KeyError:
-					destList = Britefury.DocModel.DMList.DMList( layerOpFunction( srcList, self ) )
+					destList = Britefury.DocModel.DMVirtualList.DMVirtualList( layerOpFunction( srcList, self ) )
 					layerOpFunctionToDestList[layerOpFunction] = destList
 
 				return destList

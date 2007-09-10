@@ -9,8 +9,8 @@
 from Britefury.DocModel.DocModelLayer import DocModelLayer
 from Britefury.DocModel.DMListInterface import DMListInterface
 from Britefury.DocModel.DMListOperator import DMListOperator, TestCase_DMListOperator_base
-from Britefury.DocModel.DMLiteralList import DMLiteralList
 from Britefury.DocModel.DMList import DMList
+from Britefury.DocModel.DMVirtualList import DMVirtualList
 
 
 
@@ -76,10 +76,10 @@ class TestCase_DMListOpMap (TestCase_DMListOperator_base):
 	def setUp(self):
 		self.layer1 = DocModelLayer()
 		self.layer2 = DocModelLayer()
-		self.x = DMLiteralList()
+		self.x = DMList()
 		self.x.extend( range( 0, 10 ) )
 
-		self.y = DMList( DMListOpMap( self.layer2, self.x, lambda x: x * 10, lambda x: x / 10 ) )
+		self.y = DMVirtualList( DMListOpMap( self.layer2, self.x, lambda x: x * 10, lambda x: x / 10 ) )
 
 	def tearDown(self):
 		del self.layer1
@@ -89,7 +89,7 @@ class TestCase_DMListOpMap (TestCase_DMListOperator_base):
 
 
 	def _p_makeLayerList(self, layer, literalList):
-		return DMList( DMListOpMap( layer, literalList, lambda x: x * 10, lambda x: x / 10 ) )
+		return DMVirtualList( DMListOpMap( layer, literalList, lambda x: x * 10, lambda x: x / 10 ) )
 
 	def _p_expectedValue(self, xs):
 		return xs

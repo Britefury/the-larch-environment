@@ -5,10 +5,14 @@
 ##-* version 2 can be found in the file valued 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
-from copy import copy
+from weakref import WeakKeyDictionary
+from copy import copy, deepcopy
 
-from Britefury.Cell.Cell import RefCell
+from Britefury.FileIO.IOXml import ioObjectFactoryRegister, ioReadObjectFromString, ioWriteObjectAsString
 
+from Britefury.Cell.LiteralCell import LiteralRefCell
+
+from Britefury.DocModel.DocModelLayer import DocModelLayer
 from Britefury.DocModel.DMListInterface import DMListInterface
 
 
@@ -17,30 +21,76 @@ from Britefury.DocModel.DMListInterface import DMListInterface
 
 
 class DMList (DMListInterface):
-	def __init__(self, op):
-		self._op = op
-		self._cell = RefCell()
+	def __init__(self, value=None):
+		self._cell = LiteralRefCell()
+		if value is None:
+			value = []
+		else:
+			value = [ self._p_coerce( x )   for x in value ]
+		self._cell.literalValue = value
 
-		self._cell.function = self._op.evaluate
+
+	def __readxml__(self, xmlNode):
+		xs = []
+		if xmlNode.isValid():
+			for child in xmlNode.childrenNamed( 'item' ):
+				item = child.readObject()
+				if item is not None:
+					xs.append( item )
+		self._cell.literalValue = xs
+
+
+	def __writexml__(self, xmlNode):
+		if xmlNode.isValid():
+			xs = self._cell.literalValue
+			for x in xs:
+				child = xmlNode.addChild( 'item' )
+				child.writeObject( x )
+
+
+	def _p_coerce(self, x):
+		if isinstance( x, list )  or  isinstance( x, tuple ):
+			return DMList( copy( x ) )
+		else:
+			return x
 
 
 	def append(self, x):
-		self._op.append( x )
+		v = self._cell.literalValue
+		x = self._p_coerce( x )
+		v.append( x )
+		self._cell.literalValue = v
 
 	def extend(self, xs):
-		self._op.extend( xs )
+		v = self._cell.literalValue
+		xs = [ self._p_coerce( x )   for x in xs ]
+		v.extend( xs )
+		self._cell.literalValue = v
 
 	def insert(self, i, x):
-		self._op.insert( i, x)
+		v = self._cell.literalValue
+		x = self._p_coerce( x )
+		v.insert( i, x )
+		self._cell.literalValue = v
 
 	def remove(self, x):
-		self._op.remove( x )
+		v = self._cell.literalValue
+		v.remove( x )
+		self._cell.literalValue = v
 
 	def __setitem__(self, i, x):
-		self._op[i] = x
+		v = self._cell.literalValue
+		if isinstance( i, slice ):
+			x = [ self._p_coerce( p )   for p in x ]
+		else:
+			x = self._p_coerce( x )
+		v[i] = x
+		self._cell.literalValue = v
 
 	def __delitem__(self, i):
-		del self._op[i]
+		v = self._cell.literalValue
+		del v[i]
+		self._cell.literalValue = v
 
 
 	def __getitem__(self, i):
@@ -71,117 +121,148 @@ class DMList (DMListInterface):
 
 
 	def __copy__(self):
-		return DMList( self._op )
+		c = DMList()
+		c._cell.literalValue = self._cell.literalValue
+		return c
 
 	def __deepcopy__(self, memo):
-		return DMList( self._op )
+		c = DMList()
+		c._cell.literalValue = deepcopy( self._cell.literalValue, memo )
+		return c
 
 
 
-	def setOp(self, op):
-		self._op = op
-		self._cell.function = self._op.evaluate
-
-
-	op = property( None, setOp )
-
+ioObjectFactoryRegister( 'DMList', DMList )
 
 
 
 
+import unittest
+
+
+
+class TestCase_LiteralList (unittest.TestCase):
+	def _p_checkListFormat(self, xs):
+		self.assert_( not isinstance( xs, list )  and not isinstance( xs, tuple ) )
+		if isinstance( xs, DMList ):
+			for x in xs:
+				self._p_checkListFormat( x )
+
+	def testLiteralListCtor(self):
+		x = DMList()
+
+
+
+	def testIter(self):
+		x = DMList()
+		x.extend( [ 1, 2, 3 ] )
+		q = [ p   for p in x ]
+		self.assert_( q == [ 1, 2, 3 ] )
+
+
+	def testAppend(self):
+		x = DMList()
+		x.append( 1 )
+		self.assert_( x[0] == 1 )
+		x.append( [ 10, 20 ] )
+		self.assert_( x[1][:] == [ 10, 20 ] )
+		self.assert_( isinstance( x[1], DMListInterface ) )
+		x.append( [ [ 40, 50 ], [ 50, [ 60, 70 ] ] ] )
+		self.assert_( x[2][0][:] == [ 40, 50 ] )
+		self.assert_( x[2][1][0] == 50 )
+		self.assert_( x[2][1][1][:] == [ 60, 70 ] )
+		self._p_checkListFormat( x )
+
+
+	def testExtend(self):
+		x = DMList()
+		x.extend( [ 1, 2, 3 ] )
+		self.assert_( x[0] == 1 )
+		self.assert_( x[1] == 2 )
+		self.assert_( x[2] == 3 )
+		self.assert_( x[:] == [ 1, 2, 3 ] )
+		x.extend( [ [ 10 ], [ 20 ], [ 30 ] ] )
+		self.assert_( x[3][0] == 10 )
+		self.assert_( x[4][0] == 20 )
+		self.assert_( x[5][0] == 30 )
+		self._p_checkListFormat( x )
+
+
+	def testInsert(self):
+		x = DMList()
+		x.extend( [ 1, 2, 3, 4, 5 ] )
+		self.assert_( x[:] == [ 1, 2, 3, 4, 5 ] )
+		x.insert( 2, 12 )
+		self.assert_( x[:] == [ 1, 2, 12, 3, 4, 5 ] )
+		x.insert( 2, [ 13 ] )
+		self.assert_( x == [ 1, 2, [ 13 ], 12, 3, 4, 5 ] )
+		self._p_checkListFormat( x )
+
+
+
+	def testRemove(self):
+		x = DMList()
+		x.extend( [ 1, 2, 3, 4, 5 ] )
+		self.assert_( x[:] == [ 1, 2, 3, 4, 5 ] )
+		x.remove( 3 )
+		self.assert_( x[:] == [ 1, 2, 4, 5 ] )
+		self._p_checkListFormat( x )
+
+
+
+
+	def testSet(self):
+		x = DMList()
+		x.extend( [ 1, 2, 3, 4, 5 ] )
+		self.assert_( x[:] == [ 1, 2, 3, 4, 5 ] )
+		x[4] = 12
+		self.assert_( x[:] == [ 1, 2, 3, 4, 12 ] )
+		x[1:3] = [ 20, 21, 22 ]
+		self.assert_( x[:] == [ 1, 20, 21, 22, 4, 12 ] )
+		self._p_checkListFormat( x )
+
+
+	def testDel(self):
+		x = DMList()
+		x.extend( range( 0, 10 ) )
+		self.assert_( x[:] == [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ] )
+		del x[4]
+		self.assert_( x[:] == [ 0, 1, 2, 3, 5, 6, 7, 8, 9 ] )
+		del x[3:6]
+		self.assert_( x[:] == [ 0, 1, 2, 7, 8, 9 ] )
+		self._p_checkListFormat( x )
+
+
+
+
+
+	def testIOXml(self):
+		xxa = DMList( [ 'a', 'b', 'c' ] )
+
+		x = DMList( [ 1, 2, 3 ] )
+		xx1 = DMList( [ 'plus2', 5, 6, 7 ] )
+		xx1.append( xxa )
+		x.append( xx1 )
+		xx2 = DMList( [ 'times2', 11, 12, 13 ] )
+		xx2.append( xxa )
+		x.append( xx2 )
+
+
+		s = ioWriteObjectAsString( x )
+		y = ioReadObjectFromString( s )
+
+		self.assert_( y[0:3] == [ 1, 2, 3 ] )
+		self.assert_( y[3][:-1] == [ 'plus2', 5, 6, 7 ] )
+		self.assert_( y[4][:-1] == [ 'times2', 11, 12, 13 ] )
+		self.assert_( y[3][-1] is y[4][-1] )
+		self.assert_( y[3][-1][:] == [ 'a', 'b', 'c' ] )
+		self.assert_( y[4][-1][:] == [ 'a', 'b', 'c' ] )
 
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#class TestCase_List (unittest.TestCase):
-	#def testLayers(self):
-		#def opPlus2(ls, layer):
-			#return DMListOpWrap( layer, DMListOpMap( layer, DMListOpSlice( layer, ls, 1, None ), lambda x: x + 2, lambda x: x - 2 ), [ 'plus2b' ], [] )
-
-		#def opTimes2(ls, layer):
-			#return DMListOpWrap( layer, DMListOpMap( layer, DMListOpSlice( layer, ls, 1, None ), lambda x: x * 2, lambda x: x / 2 ), [ 'times2b' ], [] )
-
-		#def opNop(ls, layer):
-			#return DMListOpNop( layer, ls )
-
-		#def layerOpFunctionGenerator(ls, layer):
-			#if ls[0] == 'plus2':
-				#return opPlus2
-			#elif ls[0] == 'times2':
-				#return opTimes2
-			#else:
-				#return opNop
-
-		#layer1 = DocModelLayer()
-		#layer2 = DocModelLayer( layerOpFunctionGenerator )
-
-		#x = DMLiteralList()
-		#x.extend( [ 1, 2, 3 ] )
-		#xx1 = DMLiteralList()
-		#xx1.extend( [ 'plus2', 5, 6, 7 ] )
-		#x.append( xx1 )
-		#xx2 = DMLiteralList()
-		#xx2.extend( [ 'times2', 11, 12, 13 ] )
-		#x.append( xx2 )
-
-
-		#y = DMList( DMListOpNop( layer2, x ) )
-
-
-		#self.assert_( y[0:3] == [ 1, 2, 3 ] )
-		#self.assert_( y[3][:] == [ 'plus2b', 7, 8, 9 ] )
-		#self.assert_( y[4][:] == [ 'times2b', 22, 24, 26 ] )
-
-		#xx1[2] = 8
-		#self.assert_( x[3][:] == [ 'plus2', 5, 8, 7 ] )
-		#self.assert_( y[3][:] == [ 'plus2b', 7, 10, 9 ] )
-		#xx1[0] = 'times2'
-		#self.assert_( x[3][:] == [ 'times2', 5, 8, 7 ] )
-		#self.assert_( y[3][:] == [ 'times2b', 10, 16, 14 ] )
-		#xx1[0] = 'plus2'
-		#self.assert_( x[3][:] == [ 'plus2', 5, 8, 7 ] )
-		#self.assert_( y[3][:] == [ 'plus2b', 7, 10, 9 ] )
-		#y[3][2] = 8
-		#self.assert_( x[3][:] == [ 'plus2', 5, 6, 7 ] )
-		#self.assert_( y[3][:] == [ 'plus2b', 7, 8, 9 ] )
-		#y[3][2] = 8
-		#self.assert_( x[3][:] == [ 'plus2', 5, 6, 7 ] )
-		#self.assert_( y[3][:] == [ 'plus2b', 7, 8, 9 ] )
-		#self.assert_( x[4][:] == [ 'times2', 11, 12, 13 ] )
-		#self.assert_( y[4][:] == [ 'times2b', 22, 24, 26 ] )
-		#y[4][2] = 8
-		#self.assert_( x[3][:] == [ 'plus2', 5, 6, 7 ] )
-		#self.assert_( y[3][:] == [ 'plus2b', 7, 8, 9 ] )
-		#self.assert_( x[4][:] == [ 'times2', 11, 4, 13 ] )
-		#self.assert_( y[4][:] == [ 'times2b', 22, 8, 26 ] )
-
-
-
-
-
+1
 if __name__ == '__main__':
 	unittest.main()

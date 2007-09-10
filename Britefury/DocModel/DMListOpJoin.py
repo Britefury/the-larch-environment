@@ -8,8 +8,8 @@
 
 from Britefury.DocModel.DocModelLayer import DocModelLayer
 from Britefury.DocModel.DMListOperator import DMListOperator, TestCase_DMListOperator_base
-from Britefury.DocModel.DMLiteralList import DMLiteralList
 from Britefury.DocModel.DMList import DMList
+from Britefury.DocModel.DMVirtualList import DMVirtualList
 
 
 
@@ -160,12 +160,12 @@ class TestCase_DMListOpJoin (TestCase_DMListOperator_base):
 	def setUp(self):
 		self.layer1 = DocModelLayer()
 		self.layer2 = DocModelLayer()
-		self.xa = DMLiteralList()
+		self.xa = DMList()
 		self.xa.extend( range( 0, 5 ) )
-		self.xb = DMLiteralList()
+		self.xb = DMList()
 		self.xb.extend( range( 5, 10 ) )
 
-		self.y = DMList( DMListOpJoin( self.layer2, self.xa, self.xb ) )
+		self.y = DMVirtualList( DMListOpJoin( self.layer2, self.xa, self.xb ) )
 
 	def tearDown(self):
 		del self.layer1
