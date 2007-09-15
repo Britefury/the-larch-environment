@@ -14,6 +14,13 @@ from Britefury.Cell.LiteralCell import LiteralRefCell
 
 from Britefury.DocModel.DocModelLayer import DocModelLayer
 from Britefury.DocModel.DMListInterface import DMListInterface
+from Britefury.DocModel import DMListCommandTracker
+
+
+
+
+
+
 
 
 
@@ -21,13 +28,24 @@ from Britefury.DocModel.DMListInterface import DMListInterface
 
 
 class DMList (DMListInterface):
+	__slots__ = [ '_commandTracker_', '_cell' ]
+
+	trackerClass = DMListCommandTracker.DMListCommandTracker
+
+
+
 	def __init__(self, value=None):
+		super( DMList, self ).__init__()
+
+
 		self._cell = LiteralRefCell()
 		if value is None:
 			value = []
 		else:
 			value = [ self._p_coerce( x )   for x in value ]
 		self._cell.literalValue = value
+
+		self._commandTracker_ = None
 
 
 	def __readxml__(self, xmlNode):
@@ -60,37 +78,52 @@ class DMList (DMListInterface):
 		x = self._p_coerce( x )
 		v.append( x )
 		self._cell.literalValue = v
+		if self._commandTracker_ is not None:
+			self._commandTracker_._f_onAppended( self, x )
+
 
 	def extend(self, xs):
 		v = self._cell.literalValue
 		xs = [ self._p_coerce( x )   for x in xs ]
 		v.extend( xs )
 		self._cell.literalValue = v
+		if self._commandTracker_ is not None:
+			self._commandTracker_._f_onExtended( self, xs )
 
 	def insert(self, i, x):
 		v = self._cell.literalValue
 		x = self._p_coerce( x )
 		v.insert( i, x )
 		self._cell.literalValue = v
+		if self._commandTracker_ is not None:
+			self._commandTracker_._f_onInserted( self, i, x )
 
 	def remove(self, x):
+		if self._commandTracker_ is not None:
+			self._commandTracker_._f_onRemove( self, x )
 		v = self._cell.literalValue
 		v.remove( x )
 		self._cell.literalValue = v
 
 	def __setitem__(self, i, x):
 		v = self._cell.literalValue
+		oldV = copy( v )
 		if isinstance( i, slice ):
 			x = [ self._p_coerce( p )   for p in x ]
 		else:
 			x = self._p_coerce( x )
 		v[i] = x
 		self._cell.literalValue = v
+		if self._commandTracker_ is not None:
+			self._commandTracker_._f_onSet( self, oldV, v )
 
 	def __delitem__(self, i):
 		v = self._cell.literalValue
+		oldV = copy( v )
 		del v[i]
 		self._cell.literalValue = v
+		if self._commandTracker_ is not None:
+			self._commandTracker_._f_onSet( self, oldV, v )
 
 
 	def __getitem__(self, i):
@@ -138,6 +171,7 @@ ioObjectFactoryRegister( 'DMList', DMList )
 
 
 import unittest
+from Britefury.CommandHistory import CommandHistory
 
 
 
@@ -257,6 +291,62 @@ class TestCase_LiteralList (unittest.TestCase):
 		self.assert_( y[3][-1] is y[4][-1] )
 		self.assert_( y[3][-1][:] == [ 'a', 'b', 'c' ] )
 		self.assert_( y[4][-1][:] == [ 'a', 'b', 'c' ] )
+
+
+
+	def _testUndo(self, opFunc):
+		ch = CommandHistory.CommandHistory()
+		dmxs = DMList( range( 0, 10 ) )
+		ch.track( dmxs )
+
+		xs = range( 0, 10 )
+		xxs = range( 0, 10 )
+
+		opFunc( dmxs )
+		opFunc( xs )
+
+		self.assert_( dmxs == xs )
+
+		ch.undo()
+
+		self.assert_( dmxs == xxs )
+
+
+	def testAppendUndo(self):
+		def _append(xs):
+			xs.append( 23 )
+		self._testUndo( _append )
+
+
+	def testExtendUndo(self):
+		def _extend(xs):
+			xs.extend( range( 20, 25 ) )
+		self._testUndo( _extend )
+
+
+	def testInsertUndo(self):
+		def _insert(xs):
+			xs.insert( 5, 20 )
+		self._testUndo( _insert )
+
+
+	def testRemoveUndo(self):
+		def _remove(xs):
+			xs.remove( 7 )
+		self._testUndo( _remove )
+
+
+	def testSetUndo(self):
+		def _set(xs):
+			xs[3:5] = range( 20, 30 )
+		self._testUndo( _set )
+
+
+	def testDelUndo(self):
+		def _del(xs):
+			del xs[3:5]
+		self._testUndo( _del )
+
 
 
 

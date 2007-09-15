@@ -27,7 +27,7 @@ class Command (object):
 		return False
 
 	def joinWith(self, command):
-		"Join @command with @self"
+		"Join @command with @self, where @command took place after @self, and the result should go into @self"
 		assert False, 'abstract'
 
 
@@ -211,6 +211,20 @@ class CommandHistory (object):
 
 			self._trackedObjects.remove( obj )
 			tracker.stopTracking( obj )
+
+
+	def canTrack(self, obj):
+		try:
+			trackerClass = obj.trackerClass
+		except AttributeError:
+			return False
+
+		if trackerClass is None:
+			return False
+		if not isinstance( trackerClass, type ):
+			return False
+
+		return True
 
 
 

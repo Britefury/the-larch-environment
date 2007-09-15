@@ -17,6 +17,9 @@ from Britefury.DocModel.DMListInterface import DMListInterface
 
 
 class DMVirtualList (DMListInterface):
+	__slots__ = [ '_op', '_cell' ]
+
+
 	def __init__(self, op):
 		self._op = op
 		self._cell = RefCell()
