@@ -12,6 +12,9 @@ from Britefury.DocModel.DMNode import DMNode
 
 
 class DMSymbol (DMNode):
+	__slots__ = [ '_name' ]
+
+
 	def __init__(self, name='_'):
 		self._name = intern( name )
 

@@ -15,6 +15,9 @@ from Britefury.DocModel.DMVirtualList import DMVirtualList
 
 
 class DMListOpNop (DMListOperator):
+	__slots__ = [ '_src' ]
+
+
 	def __init__(self, layer, src):
 		super( DMListOpNop, self ).__init__( layer )
 		self._src = src

@@ -16,6 +16,8 @@ from Britefury.DocModel.DMList import DMList
 
 
 class DMListOperator (object):
+	__slots__ = [ '_layer' ]
+
 	def __init__(self, layer):
 		self._layer = layer
 
