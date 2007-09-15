@@ -15,6 +15,9 @@ from Britefury.DocModel.DMVirtualList import DMVirtualList
 
 
 class DMListOpJoin (DMListOperator):
+	__slots__ = [ '_srcA', '_srcB' ]
+
+
 	def __init__(self, layer, srcA, srcB):
 		super( DMListOpJoin, self ).__init__( layer )
 		self._srcA = srcA

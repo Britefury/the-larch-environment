@@ -12,6 +12,9 @@ from Britefury.DocModel.DMNode import DMNode
 
 
 class DMString (DMNode):
+	__slots__ = [ '_value' ]
+
+
 	def __init__(self, value=''):
 		self._value = value
 

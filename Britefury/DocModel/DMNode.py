@@ -9,4 +9,5 @@
 
 
 class DMNode (object):
-	pass
+	__slots__ = []
+
