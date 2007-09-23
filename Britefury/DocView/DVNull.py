@@ -33,16 +33,8 @@ class DVNull (DVBorderNode):
 
 
 
-	def _refreshCell(self):
-		pass
-
-	refreshCell = FunctionField( _refreshCell )
-
-
-
-
-	def __init__(self, docNode, view, parentDocNode, index):
-		super( DVNull, self ).__init__( docNode, view, parentDocNode, index )
+	def __init__(self, docNode, view, parentDocNode, indexInParent):
+		super( DVNull, self ).__init__( docNode, view, parentDocNode, indexInParent )
 		self.widget.child = DTLabel( '<null>', font='Sans italic 11', colour=Colour3f( 0.7, 0.0, 0.0 ) )
 
 

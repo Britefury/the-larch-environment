@@ -77,15 +77,27 @@ class DVList (DVBorderNode):
 	def _refreshElements(self):
 		self._elementsLine[:] = [ node.widget   for node in self.elementNodes ]
 
-	@FunctionField
-	def refreshCell(self):
+
+	def _o_refreshNode(self):
+		super( DVList, self )._o_refreshNode()
 		self._refreshElements
 
 
 
 
-	def __init__(self, docNode, view, parentDocNode, index):
-		super( DVList, self ).__init__( docNode, view, parentDocNode, index )
+	def _o_styleSheetChanged(self):
+		super( DVList, self )._o_styleSheetChanged()
+		self._elementsLine = self._styleSheet.elementsContainer()
+		self._elementsLine[:] = [ node.widget   for node in self._elementNodes ]
+		self._box = self._styleSheet.overallContainer( self._elementsLine )
+		self.widget.child = self._box
+
+
+
+
+
+	def __init__(self, docNode, view, parentDocNode, indexInParent):
+		super( DVList, self ).__init__( docNode, view, parentDocNode, indexInParent )
 		self._elementNodes = []
 		self._elementsLine = DTWrappedLineWithSeparators( spacing=5.0 )
 		self._box = DTBox()
