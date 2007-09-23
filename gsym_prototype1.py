@@ -11,7 +11,7 @@ from Britefury.FileIO.IOXml import *
 
 from Britefury.SheetGraph.SheetGraph import *
 
-from Britefury.MainApp.MainApp import MainApp
+from Britefury.MainApp.Prototype1 import MainApp
 
 
 
@@ -27,7 +27,7 @@ if __name__ == '__main__':
 
 	i18n.initialise()
 
-	documentRoot = None
+	graph, root = None, None
 
 	if len( sys.argv ) == 2:
 		filename = sys.argv[1]
@@ -38,13 +38,15 @@ if __name__ == '__main__':
 			doc.parseFile( f )
 			contentNode = doc.getContentNode()
 			if contentNode.isValid():
-				rootXmlNode = contentNode.getChild( 'doc_root' )
-				if rootXmlNode.isValid():
-					documentRoot = rootXmlNode.readObject()
+				graphXmlNode = contentNode.getChild( 'graph' )
+				rootXmlNode = contentNode.getChild( 'root' )
+				if graphXmlNode.isValid()  and  rootXmlNode.isValid():
+					graph = graphXmlNode.readObject()
+					root = rootXmlNode.readObject()
 
-	if documentRoot is None:
-		documentRoot = MainApp.makeEmptyDocument()
+	if graph is None  or  root is None:
+		graph, root = MainApp.makeBlankModuleGraph()
 
-	app = MainApp( documentRoot )
+	app = MainApp( graph, root )
 
 	gtk.main()
