@@ -16,8 +16,28 @@ from Britefury.DocPresent.Toolkit.DTActiveBorder import DTActiveBorder
 
 
 class DVBorderNode (DVNode):
-	def __init__(self, docNode, view, parentDocNode, index):
-		super( DVBorderNode, self ).__init__( docNode, view, parentDocNode, index )
+	def _o_styleSheetChanged(self):
+		super( DVBorderNode, self )._o_styleSheetChanged()
+		self.widget.leftMargin = self._styleSheet.leftMargin
+		self.widget.rightMargin = self._styleSheet.rightMargin
+		self.widget.topMargin = self._styleSheet.topMargin
+		self.widget.bottomMargin = self._styleSheet.bottomMargin
+
+		self.widget.borderWidth = self._styleSheet.borderWidth
+		self.widget.highlightedBorderWidth = self._styleSheet.highlightedBorderWidth
+
+		self.widget.borderColour = self._styleSheet.borderColour
+		self.widget.prelitBorderColour = self._styleSheet.prelitBorderColour
+		self.widget.highlightedBorderColour = self._styleSheet.highlightedBorderColour
+
+		self.widget.backgroundColour = self._styleSheet.backgroundColour
+		self.widget.highlightedBackgroundColour = self._styleSheet.highlightedBackgroundColour
+
+
+
+
+	def __init__(self, docNode, view, parentDocNode, indexInParent):
+		super( DVBorderNode, self ).__init__( docNode, view, parentDocNode, indexInParent )
 		self.widget = DTActiveBorder()
 		self.widget.keyHandler = self
 		self.widget.topMargin = self.widget.bottomMargin = 1.0

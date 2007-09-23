@@ -15,6 +15,8 @@ from Britefury.Util.SignalSlot import ClassSignal
 
 from Britefury.Kernel import KMeta
 
+from Britefury.Cell.Cell import RefCell
+
 from Britefury.Sheet.Sheet import Sheet, SheetClass, FunctionRefField, FunctionField
 
 from Britefury.DocViewBehavior.DVBMovementBehavior import DVBMovementBehavior
@@ -122,26 +124,52 @@ class DVNode (Sheet, DTWidgetKeyHandlerInterface):
 
 
 
-	def __init__(self, docNode, view, parentDocNode, index):
+
+	@FunctionRefField
+	def _node_styleSheet(self):
+		if self._parent is None:
+			return self._view._f_getStyleSheet( self.docNode, None, -1 )
+		else:
+			return self._view._f_getStyleSheet( self.docNode, self._parent._styleSheet, self._indexInParent )
+
+
+	def _o_refreshNode(self):
+		styleSheet = self._node_styleSheet
+		if styleSheet is not self._styleSheet:
+			self._styleSheet = styleSheet
+			self._o_styleSheetChanged()
+
+
+	def _o_styleSheetChanged(self):
+		pass
+
+
+
+	def __init__(self, docNode, view, parentDocNode, indexInParent):
 		super( DVNode, self ).__init__()
 		self.docNode = docNode
 		self._view = view
-		self._index = None
 		self._bDeleting = False
 		self._parent = None
 		self._parentDocNode = parentDocNode
-		self._index = index
+		self._indexInParent = indexInParent
+		self._styleSheet = None
+		self.refreshCell = RefCell()
+		self.refreshCell.function = self._o_refreshNode
 
 
-	def _f_setParentAndIndex(self, parent, parentDocNode, index):
+
+	def _f_setParentAndIndex(self, parent, parentDocNode, indexInParent):
 		self._parent = parent
 		self._parentDocNode = parentDocNode
-		self._index = index
+		self._indexInParent = indexInParent
+		# Force refreshCell to require recomputation due to potential style sheet change
+		self.refreshCell.function = self._o_refreshNode
 
 
 
 	def refresh(self):
-		self.refreshCell
+		self.refreshCell.immutableValue
 
 
 	def refreshFromParent(self):

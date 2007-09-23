@@ -9,6 +9,11 @@ from weakref import WeakKeyDictionary
 
 from Britefury.Cell.Cell import Cell
 
+from Britefury.DocModel.DMListInterface import DMListInterface
+
+from Britefury.DocView.StyleSheet.DVBorderStyleSheet import DVBorderStyleSheet
+from Britefury.DocView.StyleSheet.DVListSExpressionStyleSheet import DVListSExpressionStyleSheet
+
 
 
 class DocView (object):
@@ -38,7 +43,7 @@ class DocView (object):
 
 
 
-	def buildView(self, docNode, parentNode, index):
+	def buildView(self, docNode, parentNode, indexInParent):
 		if docNode is None:
 			return None
 		else:
@@ -54,7 +59,7 @@ class DocView (object):
 			if parentNode is not None:
 				parentDocNode = parentNode.docNode
 
-			viewNode = nodeClass( docNode, self, parentDocNode, index )
+			viewNode = nodeClass( docNode, self, parentDocNode, indexInParent )
 			viewNode.refresh()
 
 			return viewNode
@@ -70,6 +75,14 @@ class DocView (object):
 	def refresh(self):
 		self.refreshCell.immutableValue
 		#self.rootView.refresh()
+
+
+
+	def _f_getStyleSheet(self, docNode, parentStyleSheet, indexInParent):
+		if isinstance( docNode, DMListInterface ):
+			return DVListSExpressionStyleSheet.singleton
+		else:
+			return DVBorderStyleSheet.singleton
 
 
 
