@@ -10,8 +10,10 @@ from weakref import WeakKeyDictionary
 from Britefury.Cell.Cell import Cell
 
 from Britefury.DocModel.DMListInterface import DMListInterface
+from Britefury.DocModel.DMSymbol import DMSymbol
 
 from Britefury.DocView.StyleSheet.DVBorderStyleSheet import DVBorderStyleSheet
+from Britefury.DocView.StyleSheet.DVSymbolStyleSheet import DVSymbolStyleSheet
 from Britefury.DocView.StyleSheet.DVListSExpressionStyleSheet import DVListSExpressionStyleSheet
 
 
@@ -81,6 +83,8 @@ class DocView (object):
 	def _f_getStyleSheet(self, docNode, parentStyleSheet, indexInParent):
 		if isinstance( docNode, DMListInterface ):
 			return DVListSExpressionStyleSheet.singleton
+		elif isinstance( docNode, DMSymbol ):
+			return DVSymbolStyleSheet.singleton
 		else:
 			return DVBorderStyleSheet.singleton
 

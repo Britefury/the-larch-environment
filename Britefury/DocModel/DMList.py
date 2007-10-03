@@ -34,7 +34,7 @@ class DMList (DMListInterface):
 
 
 
-	def __init__(self, value=None):
+	def __init__(self, value=None, _p_memo={}):
 		super( DMList, self ).__init__()
 
 
@@ -42,10 +42,20 @@ class DMList (DMListInterface):
 		if value is None:
 			value = []
 		else:
-			value = [ self._p_coerce( x )   for x in value ]
+			value = [ self._p_coerce( x, _p_memo )   for x in value ]
 		self._cell.literalValue = value
 
 		self._commandTracker_ = None
+
+
+	def __writesx__(self, stream):
+		stream.write( '(' )
+		if len( self ) > 0:
+			for v in self[:-1]:
+				v.__writesx__( stream )
+				stream.write( ' ' )
+			self[-1].__writesx__( stream )
+		stream.write( ')' )
 
 
 	def __readxml__(self, xmlNode):
@@ -66,9 +76,23 @@ class DMList (DMListInterface):
 				child.writeObject( x )
 
 
-	def _p_coerce(self, x):
+	def __str__(self):
+		return '(' + ' '.join( [ str( v )  for v in self._cell.literalValue ] ) + ')'
+
+
+	def _p_coerce(self, x, _p_memo=None):
 		if isinstance( x, list )  or  isinstance( x, tuple ):
-			return DMList( copy( x ) )
+			if _p_memo is None:
+				_p_memo = {}
+			else:
+				try:
+					return _p_memo[id(x)]
+				except KeyError:
+					pass
+			y = DMList( x, _p_memo )
+			if _p_memo is not None:
+				_p_memo[id(x)] = y
+			return y
 		else:
 			return x
 
@@ -83,8 +107,9 @@ class DMList (DMListInterface):
 
 
 	def extend(self, xs):
+		memo = {}
 		v = self._cell.literalValue
-		xs = [ self._p_coerce( x )   for x in xs ]
+		xs = [ self._p_coerce( x, memo )   for x in xs ]
 		v.extend( xs )
 		self._cell.literalValue = v
 		if self._commandTracker_ is not None:
@@ -109,7 +134,8 @@ class DMList (DMListInterface):
 		v = self._cell.literalValue
 		oldV = copy( v )
 		if isinstance( i, slice ):
-			x = [ self._p_coerce( p )   for p in x ]
+			memo = {}
+			x = [ self._p_coerce( p, memo )   for p in x ]
 		else:
 			x = self._p_coerce( x )
 		v[i] = x
@@ -351,8 +377,27 @@ class TestCase_LiteralList (unittest.TestCase):
 
 
 
+	def testDiamondStructure(self):
+		sourceA = [ 1, 2, 3 ]
+		sourceB = [ 5, 6, sourceA, 7, 8, sourceA, 9, 10 ]
+		b = DMList( sourceB )
+		self.assert_( b[2] is b[5] )
 
 
-1
+	def testDiamondStructure2(self):
+		sourceA = [ 1, 2, 3 ]
+		sourceB = [ 5, 6, sourceA, 7, 8, sourceA, 9, 10 ]
+		b = DMList()
+		b.extend( sourceB )
+		b.append( sourceB )
+		self.assert_( b[2] is b[5] )
+		self.assert_( b[-1][2] is b[-1][5] )
+		b[2:5] = [ sourceA, sourceA ]
+		self.assert_( b[2] is b[3] )
+
+
+
+
+
 if __name__ == '__main__':
 	unittest.main()

@@ -12,6 +12,10 @@ from Britefury.DocModel.DMNode import DMNode
 
 
 class DMNull (DMNode):
+	def __writesx__(self, stream):
+		stream.write( '`null`' )
+
+
 	def __readxml__(self, xmlNode):
 		pass
 
@@ -21,7 +25,10 @@ class DMNull (DMNode):
 
 
 	def __cmp__(self, x):
-		return isinstance( x, DMNull )
+		if isinstance( x, DMNull ):
+			return 0
+		else:
+			return -1
 
 
 

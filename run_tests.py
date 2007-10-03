@@ -17,6 +17,9 @@ from Britefury.Cell import ProxyCell
 
 
 from Britefury.DocModel import DMNode
+from Britefury.DocModel import DMAtom
+from Britefury.DocModel import DMNull
+from Britefury.DocModel import DMNode
 from Britefury.DocModel import DMSymbol
 from Britefury.DocModel import DMString
 from Britefury.DocModel import DMListOperator
@@ -29,10 +32,13 @@ from Britefury.DocModel import DMVirtualList
 from Britefury.DocModel import DMList
 from Britefury.DocModel import DMProxyList
 from Britefury.DocModel import DocModelLayer
+from Britefury.DocModel import DMInterpreter
+from Britefury.DocModel import DMIO
 
 
 testModules = [ CellEvaluatorFunction, CellEvaluator, CellEvaluatorPythonExpression, CellInterface, Cell, LiteralCell, ProxyCell,
-				DMNode, DMSymbol, DMString, DMListOperator, DMListInterface, DMVirtualList, DMList, DMProxyList, DocModelLayer, DMListOpNop, DMListOpMap, DMListOpSlice, DMListOpJoin ]
+				DMNode, DMAtom, DMNull, DMSymbol, DMString, DMListOperator, DMListInterface, DMVirtualList, DMList, DMProxyList, DocModelLayer, DMListOpNop, DMListOpMap, DMListOpSlice, DMListOpJoin,
+				DMInterpreter, DMIO ]
 
 
 if __name__ == '__main__':

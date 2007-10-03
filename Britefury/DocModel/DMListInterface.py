@@ -6,7 +6,6 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
 from Britefury.Kernel.Abstract import abstractmethod
-
 from Britefury.DocModel.DMNode import DMNode
 
 
