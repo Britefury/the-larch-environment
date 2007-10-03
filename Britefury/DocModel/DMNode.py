@@ -11,3 +11,17 @@
 class DMNode (object):
 	__slots__ = []
 
+
+	def __writesx__(self, stream):
+		pass
+
+
+
+	def __readxml__(self, xmlNode):
+		pass
+
+
+	def __writexml__(self, xmlNode):
+		pass
+
+

@@ -5,18 +5,29 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
+import string
+
+
 from Britefury.FileIO.IOXml import ioXmlReadStringProp, ioXmlWriteStringProp, ioObjectFactoryRegister, ioReadObjectFromString, ioWriteObjectAsString
 
-from Britefury.DocModel.DMNode import DMNode
+from Britefury.DocModel.DMAtom import DMAtom
 
 
 
-class DMSymbol (DMNode):
+class DMSymbol (DMAtom):
 	__slots__ = [ '_name' ]
+
+
+	symbolChars = string.ascii_letters + string.digits + '_+-*/%^&|!$@<>='
+
 
 
 	def __init__(self, name='_'):
 		self._name = intern( name )
+
+
+	def __writesx__(self, stream):
+		stream.write( str( self ) )
 
 
 	def __readxml__(self, xmlNode):
@@ -31,6 +42,10 @@ class DMSymbol (DMNode):
 			ioXmlWriteStringProp( xmlNode.property( 'name' ), self._name )
 
 
+	def __str__(self):
+		return self._name
+
+
 	def __cmp__(self, x):
 		if isinstance( x, DMSymbol ):
 			return cmp( self._name, x._name )
@@ -39,7 +54,7 @@ class DMSymbol (DMNode):
 
 
 	def __hash__(self):
-		return hash( self._value )
+		return hash( self._name )
 
 
 

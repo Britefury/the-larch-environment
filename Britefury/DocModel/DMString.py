@@ -7,17 +7,33 @@
 ##-*************************
 from Britefury.FileIO.IOXml import ioXmlReadStringProp, ioXmlWriteStringProp, ioObjectFactoryRegister, ioReadObjectFromString, ioWriteObjectAsString
 
-from Britefury.DocModel.DMNode import DMNode
+from Britefury.DocModel.DMAtom import DMAtom
 
 
 
-class DMString (DMNode):
-	__slots__ = [ '_value' ]
+class DMString (DMAtom):
+	__slots__ = [ '_value', '_format' ]
+
+	formatInt = 'i'
+	formatLong = 'l'
+	formatFloat = 'f'
+	formatSingle = "'"
+	formatDouble = '"'
 
 
-	def __init__(self, value=''):
+	def __init__(self, value='', format="'"):
 		self._value = value
+		self._format = format
 
+
+
+	def __writesx__(self, stream):
+		if self._format == self.formatInt  or  self._format == self.formatFloat  or  self._format == self.formatLong:
+			stream.write( self._value )
+		else:
+			s = self._value
+			s = s.replace( '"', '\\"' ).replace( "'", "\\'" ).replace( '\\', '\\\\' )
+			stream.write( self._format + s + self._format )
 
 
 	def __readxml__(self, xmlNode):
@@ -33,10 +49,16 @@ class DMString (DMNode):
 
 
 	def __cmp__(self, x):
-		if isinstance( x, DMSymbol ):
+		if isinstance( x, DMString ):
 			return cmp( self._value, x._value )
 		else:
 			return cmp( self._value, x )
+
+	def __str__(self):
+		if self._format == self.formatInt  or  self._format == self.formatFloat  or  self._format == self.formatLong:
+			return self._value
+		else:
+			return self._format + self._value + self._format
 
 
 
