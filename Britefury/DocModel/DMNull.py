@@ -12,7 +12,7 @@ from Britefury.DocModel.DMNode import DMNode
 
 
 class DMNull (DMNode):
-	def __writesx__(self, stream):
+	def __writecontentsx__(self, stream, nodeToIndex):
 		stream.write( '`null`' )
 
 
