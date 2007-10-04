@@ -12,7 +12,16 @@ class DMNode (object):
 	__slots__ = []
 
 
-	def __writesx__(self, stream):
+	def __writesx__(self, stream, nodeToIndex):
+		try:
+			index = nodeToIndex[self]
+			stream.write( '{%d}'  %  ( index, ) )
+		except KeyError:
+			self.__writecontentsx__( stream, nodeToIndex )
+			nodeToIndex[self] = len( nodeToIndex )
+
+
+	def __writecontentsx__(self, stream, nodeToIndex):
 		pass
 
 

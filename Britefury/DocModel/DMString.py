@@ -27,7 +27,7 @@ class DMString (DMAtom):
 
 
 
-	def __writesx__(self, stream):
+	def __writecontentsx__(self, stream, nodeToIndex):
 		if self._format == self.formatInt  or  self._format == self.formatFloat  or  self._format == self.formatLong:
 			stream.write( self._value )
 		else:

@@ -48,13 +48,13 @@ class DMList (DMListInterface):
 		self._commandTracker_ = None
 
 
-	def __writesx__(self, stream):
+	def __writecontentsx__(self, stream, nodeToIndex):
 		stream.write( '(' )
 		if len( self ) > 0:
 			for v in self[:-1]:
-				v.__writesx__( stream )
+				v.__writesx__( stream, nodeToIndex )
 				stream.write( ' ' )
-			self[-1].__writesx__( stream )
+			self[-1].__writesx__( stream, nodeToIndex )
 		stream.write( ')' )
 
 
@@ -379,9 +379,9 @@ class TestCase_LiteralList (unittest.TestCase):
 
 	def testDiamondStructure(self):
 		sourceA = [ 1, 2, 3 ]
-		sourceB = [ 5, 6, sourceA, 7, 8, sourceA, 9, 10 ]
+		sourceB = [ 5, 6, sourceA, 7, [ 8, [ sourceA, 9 ], 10 ] ]
 		b = DMList( sourceB )
-		self.assert_( b[2] is b[5] )
+		self.assert_( b[2] is b[4][1][0] )
 
 
 	def testDiamondStructure2(self):

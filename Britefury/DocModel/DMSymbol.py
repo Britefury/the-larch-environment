@@ -26,7 +26,7 @@ class DMSymbol (DMAtom):
 		self._name = intern( name )
 
 
-	def __writesx__(self, stream):
+	def __writecontentsx__(self, stream, nodeToIndex):
 		stream.write( str( self ) )
 
 
