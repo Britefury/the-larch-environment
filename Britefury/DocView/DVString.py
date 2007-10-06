@@ -15,8 +15,6 @@ from Britefury.Math.Math import Colour3f
 
 from Britefury.Sheet.Sheet import *
 
-from Britefury.DocView.DVAtom import DVAtom
-
 #from Britefury.DocViewBehavior.DVBCreateExpressionBehavior import *
 
 from Britefury.DocPresent.Toolkit.DTBox import DTBox
@@ -27,8 +25,8 @@ from Britefury.DocPresent.Toolkit.DTParsedEntryLabel import DTParsedEntryLabel
 
 
 
-class DVSymbol (DVAtom):
-	docNodeClass = DMSymbol
+class DVString (DVAtom):
+	docNodeClass = DMString
 
 
 	#behaviors = [ CVBWrapInAssignmentBehavior(), CVBUnboundRefBehavior() ]
@@ -47,7 +45,7 @@ class DVSymbol (DVAtom):
 		self.widget.child = self.targetNameWidget
 
 	def _o_refreshNode(self):
-		super( DVSymbol, self )._o_refreshNode()
+		super( DVString, self )._o_refreshNode()
 		self._refreshTargetName
 
 
@@ -78,7 +76,7 @@ class DVSymbol (DVAtom):
 		if text == '':
 			self.deleteNode( MoveFocus.RIGHT )
 		else:
-			self._parentDocNode[self._indexInParent] = DMSymbol( text )
+			self._parentDocNode[self._indexInParent] = DMString( text )
 		self._f_commandHistoryThaw()
 
 

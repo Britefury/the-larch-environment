@@ -13,7 +13,7 @@ from Britefury.DocModel.DMListInterface import DMListInterface
 from Britefury.DocModel.DMSymbol import DMSymbol
 
 from Britefury.DocView.StyleSheet.DVBorderStyleSheet import DVBorderStyleSheet
-from Britefury.DocView.StyleSheet.DVSymbolStyleSheet import DVSymbolStyleSheet
+from Britefury.DocView.StyleSheet.DVStringStyleSheet import DVStringStyleSheet
 from Britefury.DocView.StyleSheet.DVListSExpressionStyleSheet import DVListSExpressionStyleSheet
 
 

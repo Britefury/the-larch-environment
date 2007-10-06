@@ -7,15 +7,34 @@
 ##-*************************
 import pyparsing
 
-from Britefury.DocModel.DMSymbol import DMSymbol
+from Britefury.DocModel.DMString import DMString
 
 from Britefury.DocView.StyleSheet.DVAtomStyleSheet import DVAtomStyleSheet
 
 
 
 
-class DVSymbolStyleSheet (DVAtomStyleSheet):
+class DVStringStyleSheet (DVAtomStyleSheet):
 	parser = pyparsing.ZeroOrMore( pyparsing.Word( pyparsing.alphas + '_', pyparsing.alphanums + '_' ) | pyparsing.Literal('(') | pyparsing.Literal(')') | pyparsing.Word( ' \t') )
 
+	def _f_handleTokenList(self, nodeView, tokens, parentDocNode, indexInParent):
+		pass
+
+	def _f_handleText(self, nodeView, text, parentDocNode, indexInParent, bUserEvent):
+		nodeView._f_commandHistoryFreeze()
+		if bUserEvent:
+			nodeView.cursorRight()
+		if text == '':
+			nodeView.deleteNode( MoveFocus.RIGHT )
+		else:
+			parentDocNode[indexInParent] = self._f_textToNode( text )
+		nodeView._f_commandHistoryThaw()
+
+
+	@abstractmethod
 	def _f_textToNode(self, text):
-		return DMSymbol( text )
+		pass
+
+
+	def _f_textToNode(self, text):
+		return DMString( text )
