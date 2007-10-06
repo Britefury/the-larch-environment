@@ -10,11 +10,11 @@ import string
 
 from Britefury.FileIO.IOXml import ioXmlReadStringProp, ioXmlWriteStringProp, ioObjectFactoryRegister, ioReadObjectFromString, ioWriteObjectAsString
 
-from Britefury.DocModel.DMAtom import DMAtom
+from Britefury.DocModel.DMNode import DMNode
 
 
 
-class DMSymbol (DMAtom):
+class DMSymbol (DMNode):
 	__slots__ = [ '_name' ]
 
 
