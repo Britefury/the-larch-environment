@@ -7,33 +7,36 @@
 ##-*************************
 from Britefury.FileIO.IOXml import ioXmlReadStringProp, ioXmlWriteStringProp, ioObjectFactoryRegister, ioReadObjectFromString, ioWriteObjectAsString
 
-from Britefury.DocModel.DMAtom import DMAtom
+from Britefury.DocModel.DMNode import DMNode
 
 
 
-class DMString (DMAtom):
+
+def needsQuotes(s):
+	return ' ' in s  or  '\t' in s  or  '\n' in s  or  '\r' in s  or  '\x0b' in s  or  '\x0c' in s  or  '(' in s  or  ')' in s  or  '`' in s  or  '{' in s  or  '}' in s  or  '\'' in s
+
+def escape(s):
+	return s.replace( '\'', '\\\'' ).replace( '"', '\\"' ).replace( '\\', '\\\\' ).replace( '\t', '\\t' ).replace( '\n', '\\n' ).replace( '\r', '\\r' ).replace( '\x0b', '\\x0b' ).replace( '\x0c', '\\x0c' )
+
+def unescape(s):
+	return s.replace( '\\\'', '\'' ).replace( '\\"', '"' ).replace( '\\t', '\t' ).replace( '\\n', '\n' ).replace( '\\r', '\r' ).replace( '\\x0b', '\x0b' ).replace( '\\x0c', '\x0c' ).replace( '\\', '\\\\' )
+
+
+
+class DMString (DMNode):
 	__slots__ = [ '_value', '_format' ]
 
-	formatInt = 'i'
-	formatLong = 'l'
-	formatFloat = 'f'
-	formatSingle = "'"
-	formatDouble = '"'
-
-
-	def __init__(self, value='', format="'"):
+	def __init__(self, value='_'):
 		self._value = value
-		self._format = format
 
 
 
 	def __writecontentsx__(self, stream, nodeToIndex):
-		if self._format == self.formatInt  or  self._format == self.formatFloat  or  self._format == self.formatLong:
-			stream.write( self._value )
+		s = self._value
+		if _needsQuotes( self._value ):
+			stream.write( escape( self._value ) )
 		else:
-			s = self._value
-			s = s.replace( '"', '\\"' ).replace( "'", "\\'" ).replace( '\\', '\\\\' )
-			stream.write( self._format + s + self._format )
+			stream.write( self._value )
 
 
 	def __readxml__(self, xmlNode):
@@ -54,11 +57,13 @@ class DMString (DMAtom):
 		else:
 			return cmp( self._value, x )
 
+
+	def __hash__(self):
+		return hash( self._name )
+
+
 	def __str__(self):
-		if self._format == self.formatInt  or  self._format == self.formatFloat  or  self._format == self.formatLong:
-			return self._value
-		else:
-			return self._format + self._value + self._format
+		return self._format + self._value + self._format
 
 
 
@@ -82,8 +87,6 @@ ioObjectFactoryRegister( 'DMString', DMString )
 
 import unittest
 
-
-
 class TestCase_String (unittest.TestCase):
 	def testStringCtor(self):
 		x = DMString( 'x' )
@@ -99,6 +102,15 @@ class TestCase_String (unittest.TestCase):
 		y = ioReadObjectFromString( s )
 
 		self.assert_( x.value == y.value )
+
+
+
+	def _testEscape(self, s, s2):
+		self.assert_( escape( s ) == s2 )
+
+	def testEscape(self):
+		self._testEscape( 'a', 'a' )
+		self._testEscape( """\t\n""", """\\t\\n""" )
 
 
 

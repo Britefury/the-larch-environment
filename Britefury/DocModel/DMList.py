@@ -15,6 +15,7 @@ from Britefury.Cell.LiteralCell import LiteralRefCell
 from Britefury.DocModel.DocModelLayer import DocModelLayer
 from Britefury.DocModel.DMListInterface import DMListInterface
 from Britefury.DocModel import DMListCommandTracker
+from Britefury.DocModel.DMIOWrite import __writesx__
 
 
 
@@ -52,9 +53,11 @@ class DMList (DMListInterface):
 		stream.write( '(' )
 		if len( self ) > 0:
 			for v in self[:-1]:
-				v.__writesx__( stream, nodeToIndex )
+				#v.__writesx__( stream, nodeToIndex )
+				__writesx__( stream, nodeToIndex, v )
 				stream.write( ' ' )
-			self[-1].__writesx__( stream, nodeToIndex )
+			#self[-1].__writesx__( stream, nodeToIndex )
+			__writesx__( stream, nodeToIndex, self[-1] )
 		stream.write( ')' )
 
 
