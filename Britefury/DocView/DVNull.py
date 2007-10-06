@@ -14,8 +14,6 @@ from Britefury.Math.Math import Colour3f
 
 from Britefury.Sheet.Sheet import *
 
-from Britefury.DocModel.DMNull import DMNull
-
 from Britefury.DocView.DVBorderNode import *
 
 from Britefury.DocPresent.Toolkit.DTBox import DTBox
@@ -26,7 +24,7 @@ from Britefury.DocPresent.Toolkit.DTDirection import DTDirection
 
 
 class DVNull (DVBorderNode):
-	docNodeClass = DMNull
+	docNodeClass = type( None )
 
 
 	#behaviors = [ DVBCreateExpressionBehavior() ]

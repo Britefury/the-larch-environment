@@ -83,8 +83,8 @@ class DocView (object):
 	def _f_getStyleSheet(self, docNode, parentStyleSheet, indexInParent):
 		if isinstance( docNode, DMListInterface ):
 			return DVListSExpressionStyleSheet.singleton
-		elif isinstance( docNode, DMSymbol ):
-			return DVSymbolStyleSheet.singleton
+		elif isinstance( docNode, str ):
+			return DVStringStyleSheet.singleton
 		else:
 			return DVBorderStyleSheet.singleton
 
