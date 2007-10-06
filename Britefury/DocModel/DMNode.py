@@ -25,12 +25,3 @@ class DMNode (object):
 		pass
 
 
-
-	def __readxml__(self, xmlNode):
-		pass
-
-
-	def __writexml__(self, xmlNode):
-		pass
-
-
