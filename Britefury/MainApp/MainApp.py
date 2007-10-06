@@ -24,8 +24,6 @@ from Britefury.CommandHistory.CommandHistory import CommandHistory
 from Britefury.DocPresent.Toolkit.DTDocument import DTDocument
 
 from Britefury.DocModel.DMList import DMList
-from Britefury.DocModel.DMNull import DMNull
-from Britefury.DocModel.DMSymbol import DMSymbol
 
 from Britefury.DocView.DocView import DocView
 
@@ -469,7 +467,7 @@ class MainApp (object):
 	@staticmethod
 	def makeEmptyDocument():
 		xs = DMList()
-		xs.extend( [ DMSymbol( 'a' ), DMSymbol( 'b' ), DMSymbol( 'c' ) ] )
+		xs.extend( [ 'a', 'b', 'c' ] )
 		return xs
 
 

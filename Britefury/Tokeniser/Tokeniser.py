@@ -8,8 +8,6 @@
 import re
 from copy import copy
 
-from Britefury.DocModel.DMSymbol import DMSymbol
-from Britefury.DocModel.DMString import DMString
 from Britefury.DocModel.DMInterpreter import DMInterpreterEnv
 
 
@@ -102,11 +100,7 @@ class Tokeniser (object):
 
 def _tokenDefList(env, *tokenDefs):
 	def _tokenDef(env, tokenClassName, regex):
-		if not isinstance( tokenClassName, DMSymbol ):
-			raise TypeError, 'token definition token class name must be a symbol, it is a %s' % ( type( tokenClassName ), )
-		if not isinstance( regex, DMString ):
-			raise TypeError, 'token definition regex must be a string, it is a %s' % ( type( regex ), )
-		td = TokenDefinition( tokenClassName.name, regex.value )
+		td = TokenDefinition( tokenClassName, regex )
 		defList.defineToken( td )
 
 

@@ -7,7 +7,6 @@
 ##-*************************
 from copy import copy
 
-from Britefury.DocModel.DMSymbol import DMSymbol
 from Britefury.DocModel.DMListInterface import DMListInterface
 
 
@@ -40,12 +39,11 @@ class DMInterpreterEnv (object):
 		assert len( xs ) > 0, 'empty list'
 
 		funcName = xs[0]
-		assert isinstance( funcName, DMSymbol ), 'function name is not a symbol'
 
 		try:
-			func = self._env[funcName.name]
+			func = self._env[funcName]
 		except KeyError:
-			raise KeyError, 'no function called %s' % ( funcName.name, )
+			raise KeyError, 'no function called %s' % ( funcName, )
 		return func( self, *xs[1:] )
 
 
@@ -54,7 +52,6 @@ class DMInterpreterEnv (object):
 
 import unittest
 from Britefury.DocModel.DMList import DMList
-from Britefury.DocModel.DMString import DMString
 
 
 
@@ -68,20 +65,20 @@ class TestCase_DMInterpreter (unittest.TestCase):
 		def _concat(env, *strings):
 			res = ''
 			for x in strings:
-				res += env.dmEval( x ).value
-			return DMString( res )
+				res += env.dmEval( x )
+			return res
 
 		env = env.funcs( [ _string, _concat ] )
 
 		program = DMList()
-		program.append( DMSymbol( 'concat' ) )
-		program.append( DMList( [ DMSymbol( 'string' ), DMString( 'a' ) ] ) )
-		program.append( DMList( [ DMSymbol( 'string' ), DMString( 'b' ) ] ) )
-		program.append( DMList( [ DMSymbol( 'string' ), DMString( 'c' ) ] ) )
+		program.append( 'concat' )
+		program.append( DMList( [ 'string', 'a' ] ) )
+		program.append( DMList( [ 'string', 'b' ] ) )
+		program.append( DMList( [ 'string', 'c' ] ) )
 
 		res = env.dmEval( program )
 
-		self.assert_( res.value == 'abc' )
+		self.assert_( res == 'abc' )
 
 
 
