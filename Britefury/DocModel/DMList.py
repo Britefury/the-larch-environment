@@ -61,24 +61,6 @@ class DMList (DMListInterface):
 		stream.write( ')' )
 
 
-	def __readxml__(self, xmlNode):
-		xs = []
-		if xmlNode.isValid():
-			for child in xmlNode.childrenNamed( 'item' ):
-				item = child.readObject()
-				if item is not None:
-					xs.append( item )
-		self._cell.literalValue = xs
-
-
-	def __writexml__(self, xmlNode):
-		if xmlNode.isValid():
-			xs = self._cell.literalValue
-			for x in xs:
-				child = xmlNode.addChild( 'item' )
-				child.writeObject( x )
-
-
 	def __str__(self):
 		return '(' + ' '.join( [ str( v )  for v in self._cell.literalValue ] ) + ')'
 
