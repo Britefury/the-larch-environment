@@ -15,7 +15,6 @@ from Britefury.Sheet.Sheet import *
 
 from Britefury.DocModel.DMList import DMList
 from Britefury.DocModel.DMVirtualList import DMVirtualList
-from Britefury.DocModel.DMNull import DMNull
 
 from Britefury.DocView.DVNode import *
 from Britefury.DocView.DVBorderNode import DVBorderNode
@@ -109,7 +108,7 @@ class DVList (DVBorderNode):
 
 
 	def addElement(self):
-		element = DMNull()
+		element = None
 		self.docNode.append( element )
 		self.refresh()
 		elemDV = self.elementNodes[-1]
