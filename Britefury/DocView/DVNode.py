@@ -130,7 +130,7 @@ class DVNode (Sheet, DTWidgetKeyHandlerInterface):
 		if self._parent is None:
 			return self._view._f_getStyleSheet( self.docNode, None, -1 )
 		else:
-			return self._view._f_getStyleSheet( self.docNode, self._parent._styleSheet, self._indexInParent )
+			return self._view._f_getStyleSheet( self.docNode, self._parentDocNode, self._indexInParent )
 
 
 	def _o_refreshNode(self):

@@ -20,13 +20,15 @@ from Britefury.Sheet.Sheet import *
 from Britefury.DocPresent.Toolkit.DTBox import DTBox
 from Britefury.DocPresent.Toolkit.DTLabel import DTLabel
 from Britefury.DocPresent.Toolkit.DTDirection import DTDirection
-from Britefury.DocPresent.Toolkit.DTParsedEntryLabel import DTParsedEntryLabel
+from Britefury.DocPresent.Toolkit.DTTokenisedEntryLabel import DTTokenisedEntryLabel
+
+from Britefury.DocView.DVBorderNode import DVBorderNode
 
 
 
 
-class DVString (DVAtom):
-	docNodeClass = DMString
+class DVString (DVBorderNode):
+	docNodeClass = str
 
 
 	#behaviors = [ CVBWrapInAssignmentBehavior(), CVBUnboundRefBehavior() ]
@@ -34,9 +36,9 @@ class DVString (DVAtom):
 
 	@FunctionRefField
 	def targetNameWidget(self):
-		entry = DTParsedEntryLabel( self._styleSheet.parser, text=self.docNode.name )
+		entry = DTTokenisedEntryLabel( self._styleSheet.tokeniser, text=self.docNode )
 		entry.keyHandler = self
-		self._o_listenToParsedEntryLabel( entry )
+		self._o_listenToTokenisedEntryLabel( entry )
 		return entry
 
 
@@ -69,14 +71,23 @@ class DVString (DVAtom):
 
 
 
-	def _p_onEntryFinish(self, entry, text, bUserEvent):
-		self._f_commandHistoryFreeze()
-		if bUserEvent:
-			self.cursorRight()
-		if text == '':
-			self.deleteNode( MoveFocus.RIGHT )
-		else:
-			self._parentDocNode[self._indexInParent] = DMString( text )
-		self._f_commandHistoryThaw()
+	def _p_onTokenisedEntryTextModified(self, entry, text, tokens):
+		if tokens is not None:
+			if len( tokens ) > 1:
+				self._f_handleTokenList( tokens, self._parentDocNode, self._indexInParent, self._parent._styleSheet, False )
 
+	def _p_onTokenisedEntryFinishEditing(self, entry, text, tokens, bUserEvent):
+		if tokens is not None:
+			self._f_handleTokenList( tokens, self._parentDocNode, self._indexInParent, self._parent._styleSheet, bUserEvent )
+
+
+
+	def _o_listenToTokenisedEntryLabel(self, entry):
+		entry.textModifiedSignal.connect( self._p_onTokenisedEntryTextModified )
+		entry.finishEditingSignal.connect( self._p_onTokenisedEntryFinishEditing )
+
+
+
+	def _f_handleTokenList(self, tokens, parentDocNode, indexInParent, parentStyleSheet, bDirectEvent):
+		self._styleSheet._f_handleTokenList( self, tokens, self._parentDocNode, self._indexInParent, parentStyleSheet, bDirectEvent )
 

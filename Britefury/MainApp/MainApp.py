@@ -27,6 +27,8 @@ from Britefury.DocModel.DMList import DMList
 
 from Britefury.DocView.DocView import DocView
 
+from Britefury.Languages.Lisp.Lisp import makeLispDocView
+
 #from Britefury.PyImport import PythonImporter
 
 
@@ -178,7 +180,7 @@ class MainApp (object):
 		self._commandHistory.changedSignal.connect( self._p_onCommandHistoryChanged )
 		self._bUnsavedData = False
 
-		self._view = DocView( documentRoot, self._commandHistory )
+		self._view = makeLispDocView( documentRoot, self._commandHistory )
 		self._viewRoot = self._view.rootView
 
 		self._view.refreshCell.changedSignal.connect( self._p_queueRefresh )

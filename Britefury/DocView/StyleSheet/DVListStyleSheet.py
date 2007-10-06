@@ -20,3 +20,11 @@ class DVListStyleSheet (DVBorderStyleSheet):
 	@abstractmethod
 	def overallContainer(self, elementsContainer):
 		pass
+
+
+	def deleteChildByIndex(self, docNode, index):
+		select = docNode
+		if len( docNode ) > 1  and  index < ( len( docNode ) - 1 ):
+			select = docNode[index+1]
+		del docNode[index]
+		return select
