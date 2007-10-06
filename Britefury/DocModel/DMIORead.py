@@ -9,9 +9,6 @@ import pyparsing
 import string
 
 from Britefury.DocModel import DMList
-from Britefury.DocModel.DMString import DMString, unescape
-from Britefury.DocModel.DMNull import DMNull
-from Britefury.DocModel.DMNode import DMNode
 
 
 """gSym document model IO
