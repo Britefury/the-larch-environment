@@ -11,7 +11,8 @@ import string
 from Britefury.DocModel import DMList
 
 
-"""gSym document model IO
+"""
+gSym document model IO
 
 
 Uses basic S-expressions
@@ -25,16 +26,28 @@ tokens inside are:
 	reference: see below
 	another list
 
+tokens can be preceeded by a tag, see below
+
 
 references:
 	{identifier}
 
 	identifier can be an index:
-	 	an index is used to identify the entity being referenced. Indices are assigned to items in the order that they appear, with a list taking an index after its contents.
+	 	an index is used to identify the entity being referenced. Indices are assigned to lists in the order that they appear, with a list taking an index after its contents.
 		e.g.
 				(a (b c d) e)
-				(0 (1 2 3)<-4 5)<-6
+				(. (. . .)0 .)1
 
+	identifier can be a name:  [a-zA-Z_] [a-zA-Z0-9]*
+	 	the name must match a previously encountered tag
+
+
+
+tags:
+	{:identifier}
+
+	identifier is a name:  [a-zA-Z_] [a-zA-Z0-9]*
+		the token/item following the tag can be referenced using this name
 """
 
 

@@ -10,24 +10,22 @@ from weakref import WeakKeyDictionary
 from Britefury.Cell.Cell import Cell
 
 from Britefury.DocModel.DMListInterface import DMListInterface
-from Britefury.DocModel.DMSymbol import DMSymbol
 
-from Britefury.DocView.StyleSheet.DVBorderStyleSheet import DVBorderStyleSheet
-from Britefury.DocView.StyleSheet.DVStringStyleSheet import DVStringStyleSheet
-from Britefury.DocView.StyleSheet.DVListSExpressionStyleSheet import DVListSExpressionStyleSheet
 
 
 
 class DocView (object):
 	_nodeClassTable = {}
 
-	def __init__(self, root, commandHistory):
+	def __init__(self, root, commandHistory, styleSheetDispatcher):
 		super( DocView, self ).__init__()
 
 		self._root = root
 
 		self._document = None
 		self._commandHistory = commandHistory
+
+		self._styleSheetDispatcher = styleSheetDispatcher
 
 		self.refreshCell = Cell()
 		self.refreshCell.function = self._p_refresh
@@ -80,13 +78,8 @@ class DocView (object):
 
 
 
-	def _f_getStyleSheet(self, docNode, parentStyleSheet, indexInParent):
-		if isinstance( docNode, DMListInterface ):
-			return DVListSExpressionStyleSheet.singleton
-		elif isinstance( docNode, str ):
-			return DVStringStyleSheet.singleton
-		else:
-			return DVBorderStyleSheet.singleton
+	def _f_getStyleSheet(self, docNode, parentDocNode, indexInParent):
+		return self._styleSheetDispatcher.getStyleSheetForNode( docNode, parentDocNode, indexInParent )
 
 
 
