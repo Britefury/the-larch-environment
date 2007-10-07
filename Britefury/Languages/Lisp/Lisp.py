@@ -15,7 +15,7 @@ from Britefury.DocPresent.Toolkit.DTLabel import DTLabel
 from Britefury.DocView.DocView import DocView
 from Britefury.DocView.DocViewTokeniser import DocViewTokenDefinition, DocViewTokeniser
 
-from Britefury.DocView.StyleSheet.DVStyleSheet import DVStyleSheetSetValueAction, DVStyleSheetTokenHandler
+from Britefury.DocView.StyleSheet.DVStyleSheet import DVStyleSheetSetValueAction, DVStyleSheetDeleteAction, DVStyleSheetTokenHandler, DVStyleSheetEmptyHandler
 
 from Britefury.DocView.StyleSheet.StyleSheetDispatcher import StyleSheetDispatcher
 from Britefury.DocView.StyleSheet.DVStringStyleSheet import DVStringStyleSheet
@@ -42,17 +42,16 @@ _whitespace = DocViewTokenDefinition( 'whitespace', pyparsing.Word( string.white
 class LispStringStyleSheet (DVStringStyleSheet):
 	tokeniser = DocViewTokeniser( [ _string, _openParen, _closeParen, _whitespace ] )
 
-	def _setValueNode(text):
+	@DVStyleSheetSetValueAction
+	def _setValueAction(text):
 		return text
 
-	def _setValueEmpty(token, parentDocNode, indexInParent, parentStyleSheet):
-		parentStyleSheet.deleteChildByIndex( parentDocNode, indexInParent )
-
-	_setValueAction = DVStyleSheetSetValueAction( _setValueNode, '', _setValueEmpty )
-
-
-
 	_setValueTokenHandler = DVStyleSheetTokenHandler( 'string', _setValueAction )
+
+
+	_deleteAction = DVStyleSheetDeleteAction()
+	_emptyHandler = DVStyleSheetEmptyHandler( _deleteAction )
+
 
 
 

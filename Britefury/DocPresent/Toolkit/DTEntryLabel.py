@@ -157,6 +157,18 @@ class DTEntryLabel (DTBin):
 		else:
 			return None
 
+	def isCursorAtStart(self):
+		if self.getChild() is self._entry:
+			return self._entry.isCursorAtStart()
+		else:
+			return False
+
+	def isCursorAtEnd(self):
+		if self.getChild() is self._entry:
+			return self._entry.isCursorAtEnd()
+		else:
+			return False
+
 
 
 
