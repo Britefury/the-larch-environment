@@ -160,11 +160,18 @@ class DVNode (Sheet, DTWidgetKeyHandlerInterface):
 
 
 	def _f_setParentAndIndex(self, parent, parentDocNode, indexInParent):
-		self._parent = parent
-		self._parentDocNode = parentDocNode
-		self._indexInParent = indexInParent
-		# Force refreshCell to require recomputation due to potential style sheet change
-		self.refreshCell.function = self._o_refreshNode
+		if parent is not self._parent  or  parentDocNode is not self._parentDocNode  or  indexInParent != self._indexInParent:
+			self._parent = parent
+			self._parentDocNode = parentDocNode
+			self._indexInParent = indexInParent
+			# Force refreshCell to require recomputation due to potential style sheet change
+			self.refreshCell.function = self._o_refreshNode
+
+
+
+	def getDocView(self):
+		return self._view
+
 
 
 
@@ -177,6 +184,9 @@ class DVNode (Sheet, DTWidgetKeyHandlerInterface):
 
 
 
+	def getParentNodeView(self):
+		return self._parent
+
 	def isDescendantOf(self, node):
 		n = self
 		while n is not None:
@@ -185,6 +195,19 @@ class DVNode (Sheet, DTWidgetKeyHandlerInterface):
 			n = n._parent
 		return False
 
+
+
+
+	def getChildViewNodeForChildDocNode(self, childDocNode):
+		if childDocNode is not None:
+			print 'NOTHING TO SEARCH'
+			raise KeyError
+		else:
+			return None
+
+
+	def isForDocNode(self, docNode):
+		return docNode is self.docNode
 
 
 	def _o_moveFocus(self, moveFocus):
@@ -494,8 +517,3 @@ class DVNode (Sheet, DTWidgetKeyHandlerInterface):
 		return 0
 
 
-	def _o_buildViewForChild(self, docNode, viewNodeClass=None):
-		return self._view.buildView( docNode, self, viewNodeClass )
-
-	def _o_getViewNode(self, docNode, viewNodeClass=None):
-		return self._view.getViewNodeForDocNode( docNode, viewNodeClass )

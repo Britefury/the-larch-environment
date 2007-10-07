@@ -52,6 +52,11 @@ class DVString (DVBorderNode):
 
 
 
+	def isForDocNode(self, docNode):
+		return docNode == self.docNode
+
+
+
 	def startEditing(self):
 		self.targetNameWidget.startEditing()
 
@@ -73,7 +78,7 @@ class DVString (DVBorderNode):
 
 	def _p_onTokenisedEntryTextModified(self, entry, text, tokens):
 		if tokens is not None:
-			if len( tokens ) > 1:
+			if len( tokens ) > 1  and  entry.isCursorAtEnd():
 				self._f_handleTokenList( tokens, self._parentDocNode, self._indexInParent, self._parent._styleSheet, False )
 
 	def _p_onTokenisedEntryFinishEditing(self, entry, text, tokens, bUserEvent):
@@ -89,5 +94,5 @@ class DVString (DVBorderNode):
 
 
 	def _f_handleTokenList(self, tokens, parentDocNode, indexInParent, parentStyleSheet, bDirectEvent):
-		self._styleSheet._f_handleTokenList( self, tokens, self._parentDocNode, self._indexInParent, parentStyleSheet, bDirectEvent )
+		self._view._f_handleTokenList( self, tokens, self._parentDocNode, self._indexInParent, parentStyleSheet, bDirectEvent )
 

@@ -177,6 +177,12 @@ class DTEntry (DTWidget):
 	def getCursorLocation(self):
 		return self._cursorLocation
 
+	def isCursorAtStart(self):
+		return self._cursorLocation == 0
+
+	def isCursorAtEnd(self):
+		return self._cursorLocation == len( self._text )
+
 	def getCursorPosition(self):
 		charRect = self._layout.index_to_pos( self._cursorLocation )
 		layoutPoint = Point2( float( charRect[0] ) / pango.SCALE,  ( float( charRect[1] )  +  float( charRect[3] ) * 0.5 )  /  pango.SCALE )

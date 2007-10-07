@@ -61,9 +61,9 @@ class DVList (DVBorderNode):
 				try:
 					viewNode = viewNodes.pop()
 				except IndexError:
-					viewNode = self._view.buildView( docChildNode, self, index )
+					viewNode = self._view._f_buildView( docChildNode, self, index )
 			except KeyError:
-				viewNode = self._view.buildView( docChildNode, self, index )
+				viewNode = self._view._f_buildView( docChildNode, self, index )
 			viewNode._f_setParentAndIndex( self, self.docNode, index )
 			self._elementNodes.append( viewNode )
 
@@ -104,6 +104,18 @@ class DVList (DVBorderNode):
 		self._box.append( self._elementsLine )
 		self._box.append( DTLabel( ']', font='Sans bold 11', colour=Colour3f( 0.0, 0.6, 0.0 ) ) )
 		self.widget.child = self._box
+
+
+
+	def getChildViewNodeForChildDocNode(self, childDocNode):
+		if childDocNode is not None:
+			for node in self._elementNodes:
+				if node.isForDocNode( childDocNode ):
+					return node
+			raise KeyError
+		else:
+			return None
+
 
 
 

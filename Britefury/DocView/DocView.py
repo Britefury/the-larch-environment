@@ -5,11 +5,11 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
-from weakref import WeakKeyDictionary
-
 from Britefury.Cell.Cell import Cell
 
 from Britefury.DocModel.DMListInterface import DMListInterface
+
+from Britefury.DocView.SelectPath import SelectPath
 
 
 
@@ -30,7 +30,7 @@ class DocView (object):
 		self.refreshCell = Cell()
 		self.refreshCell.function = self._p_refresh
 
-		self.rootView = self.buildView( self._root, None, 0 )
+		self.rootView = self._f_buildView( self._root, None, 0 )
 
 
 
@@ -43,12 +43,11 @@ class DocView (object):
 
 
 
-	def buildView(self, docNode, parentNode, indexInParent):
+	def _f_buildView(self, docNode, parentViewNode, indexInParent):
 		if docNode is None:
 			return None
 		else:
 			docNodeClass = docNode.__class__
-			bNodeTableChanged = False
 
 			try:
 				nodeClass = self._nodeClassTable[docNodeClass]
@@ -56,13 +55,14 @@ class DocView (object):
 				raise TypeError, 'could not get view node class for doc node class %s'  %  ( docNodeClass.__name__, )
 
 			parentDocNode = None
-			if parentNode is not None:
-				parentDocNode = parentNode.docNode
+			if parentViewNode is not None:
+				parentDocNode = parentViewNode.docNode
 
 			viewNode = nodeClass( docNode, self, parentDocNode, indexInParent )
 			viewNode.refresh()
 
 			return viewNode
+
 
 
 
@@ -80,6 +80,51 @@ class DocView (object):
 
 	def _f_getStyleSheet(self, docNode, parentDocNode, indexInParent):
 		return self._styleSheetDispatcher.getStyleSheetForNode( docNode, parentDocNode, indexInParent )
+
+
+
+
+	def _p_handleSelectPath(self, nodeView, selectPath, parentDocNode, indexInParent):
+		if selectPath is None:
+			if indexInParent < len( parentDocNode ):
+				selectPath = SelectPath( parentDocNode, [ parentDocNode[indexInParent] ] )
+			else:
+				selectPath = SelectPath( parentDocNode, [] )
+
+		nodeView.getDocView()
+
+		# Travel to the ancestor
+		while nodeView.docNode is not selectPath.ancestor:
+			nodeView = nodeView.getParentNodeView()
+			if nodeView is None:
+				raise ValueError, 'reached root while following select path'
+
+		# Trigger a rebuild
+		self.refresh()
+
+		for child in selectPath.children:
+			try:
+				nodeView.refresh()
+				nodeView = nodeView.getChildViewNodeForChildDocNode( child )
+			except KeyError:
+				raise ValueError, 'could not follow select path children, nodeView=%s, docNode=%s, docNode[:]=%s, child=%s'  %  ( nodeView, nodeView.docNode, nodeView.docNode[:], child )
+
+		nodeView.makeCurrent()
+
+		return nodeView
+
+
+	def _f_handleTokenList(self, nodeView, tokens, parentDocNode, indexInParent, parentStyleSheet, bDirectEvent):
+		if len( tokens ) == 0:
+			selectPath = nodeView._styleSheet._f_handleEmpty( nodeView, parentDocNode, indexInParent, parentStyleSheet, bDirectEvent )
+			self._p_handleSelectPath( nodeView, selectPath, parentDocNode, indexInParent )
+		elif len( tokens ) == 1  and  bDirectEvent:
+			selectPath = nodeView._styleSheet._f_handleToken( nodeView, tokens[0], parentDocNode, indexInParent, parentStyleSheet, True )
+			self._p_handleSelectPath( nodeView, selectPath, parentDocNode, indexInParent )
+		else:
+			for token in tokens:
+				selectPath = nodeView._styleSheet._f_handleToken( nodeView, token, parentDocNode, indexInParent, parentStyleSheet, False )
+				nodeView = self._p_handleSelectPath( nodeView, selectPath, parentDocNode, indexInParent )
 
 
 
