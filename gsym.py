@@ -7,6 +7,11 @@
 ##-*************************
 import sys
 
+from Britefury.I18n import i18n
+i18n.initialise()
+
+
+
 from Britefury.FileIO.IOXml import *
 
 from Britefury.SheetGraph.SheetGraph import *
@@ -23,9 +28,6 @@ if __name__ == '__main__':
 	import gtk
 
 
-	from Britefury.I18n import i18n
-
-	i18n.initialise()
 
 	documentRoot = None
 

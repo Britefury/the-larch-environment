@@ -117,6 +117,8 @@ class DTWidget (object):
 		self._allocation = Vector2()
 		self._requiredSize = Vector2()
 
+		self._waitingImmediateEvents = []
+
 		self._dndLocalPos = None
 		self._dndButton = None
 		self._dndState = None
@@ -203,14 +205,14 @@ class DTWidget (object):
 	def grabFocus(self):
 		if not self._bFocusGrabbed:
 			self._bFocusGrabbed = True
-			if self._parent is not None:
-				self._parent._f_childGrabFocus( self )
+			if self._document is not None:
+				self._document._f_widgetGrabFocus( self )
 
 	def ungrabFocus(self):
 		if self._bFocusGrabbed:
 			self._bFocusGrabbed = False
-			if self._parent is not None:
-				self._parent._f_childUngrabFocus( self )
+			if self._document is not None:
+				self._document._f_widgetUngrabFocus( self )
 
 
 	def _f_clearFocusGrab(self):
@@ -239,6 +241,14 @@ class DTWidget (object):
 			raise ValueError, 'dnd op not in dest ops list'
 		self._dndDestOps.remove( op )
 
+
+
+
+	def queueImmediateEvent(self, f):
+		if self._document is None:
+			self._waitingImmediateEvents.append( f )
+		else:
+			self._document.queueImmediateEvent( f )
 
 
 
@@ -446,12 +456,12 @@ class DTWidget (object):
 		self._pangoContext = pangoContext
 		self._o_onRealise( context, pangoContext )
 		self._o_queueResize()
-		if self._bFocusGrabbed  and  self._parent is not None:
-			self._parent._f_childGrabFocus( self )
+		if self._bFocusGrabbed  and  self._document is not None:
+			self._document._f_widgetAcquireFocus( self )
 
 	def _f_evUnrealise(self):
-		if self._bFocusGrabbed  and  self._parent is not None:
-			self._parent._f_childUngrabFocus( self )
+		if self._bFocusGrabbed  and  self._document is not None:
+			self._document._f_widgetRelinquishFocus( self )
 		self._o_onUnrealise()
 		self._realiseContext = None
 
@@ -514,6 +524,23 @@ class DTWidget (object):
 
 	def _f_setDocument(self, document):
 		self._document = document
+		if self._document is not None:
+			for event in self._waitingImmediateEvents:
+				self._document.queueImmediateEvent( event )
+			self._waitingImmediateEvents = []
+
+
+	def _dbg_getWidgetsWithFocus(self):
+		if self._bHasFocus:
+			return [ self ]
+		else:
+			return []
+
+	def _dbg_getWidgetsWithFocusGrab(self):
+		if self._bFocusGrabbed:
+			return [ self ]
+		else:
+			return []
 
 
 

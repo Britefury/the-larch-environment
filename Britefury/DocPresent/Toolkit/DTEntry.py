@@ -692,6 +692,10 @@ class DTEntry (DTWidget):
 			self._p_computeTextSize()
 
 
+	def __repr__(self):
+		return super( DTEntry, self ).__repr__()  +  '(\'%s\')'  %  ( self._text, )
+
+
 
 
 

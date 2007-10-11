@@ -9,7 +9,7 @@ from Britefury.Cell.Cell import Cell
 
 from Britefury.DocModel.DMListInterface import DMListInterface
 
-from Britefury.DocView.SelectPath import SelectPath
+from Britefury.DocView.DocViewNodeTable import DocViewNodeTable, DocNodeKey
 
 
 
@@ -30,7 +30,10 @@ class DocView (object):
 		self.refreshCell = Cell()
 		self.refreshCell.function = self._p_refresh
 
+		self._nodeTable = DocViewNodeTable()
+
 		self.rootView = self._f_buildView( self._root, None, 0 )
+
 
 
 
@@ -41,6 +44,11 @@ class DocView (object):
 	def documentUngrab(self):
 		self._document.removeFocusGrab()
 
+
+
+	def _f_nodeChangeKey(self, viewNode, oldKey, newKey):
+		del self._nodeTable[oldKey]
+		self._nodeTable[newKey] = viewNode
 
 
 	def _f_buildView(self, docNode, parentViewNode, indexInParent):
@@ -58,10 +66,22 @@ class DocView (object):
 			if parentViewNode is not None:
 				parentDocNode = parentViewNode.docNode
 
-			viewNode = nodeClass( docNode, self, parentDocNode, indexInParent )
+			key = DocNodeKey( docNode, parentDocNode, indexInParent )
+
+			try:
+				viewNode = self._nodeTable[key]
+			except KeyError:
+				viewNode = nodeClass( docNode, self, key )
+				self._nodeTable[key] = viewNode
+
 			viewNode.refresh()
 
 			return viewNode
+
+
+	def getViewNodeForDocNodeKey(self, key):
+		return self._nodeTable[key]
+
 
 
 
@@ -78,53 +98,36 @@ class DocView (object):
 
 
 
-	def _f_getStyleSheet(self, docNode, parentDocNode, indexInParent):
-		return self._styleSheetDispatcher.getStyleSheetForNode( docNode, parentDocNode, indexInParent )
+	def _f_getStyleSheet(self, key):
+		return self._styleSheetDispatcher.getStyleSheetForNode( key )
 
 
 
 
-	def _p_handleSelectPath(self, nodeView, selectPath, parentDocNode, indexInParent):
-		if selectPath is None:
-			if indexInParent < len( parentDocNode ):
-				selectPath = SelectPath( parentDocNode, [ parentDocNode[indexInParent] ] )
-			else:
-				selectPath = SelectPath( parentDocNode, [] )
-
-		nodeView.getDocView()
-
-		# Travel to the ancestor
-		while nodeView.docNode is not selectPath.ancestor:
-			nodeView = nodeView.getParentNodeView()
-			if nodeView is None:
-				raise ValueError, 'reached root while following select path'
-
+	def _p_handleSelectNode(self, nodeView, selectNodeKey):
 		# Trigger a rebuild
 		self.refresh()
 
-		for child in selectPath.children:
-			try:
-				nodeView.refresh()
-				nodeView = nodeView.getChildViewNodeForChildDocNode( child )
-			except KeyError:
-				raise ValueError, 'could not follow select path children, nodeView=%s, docNode=%s, docNode[:]=%s, child=%s'  %  ( nodeView, nodeView.docNode, nodeView.docNode[:], child )
+		# Get the view node
+		nodeView = self.getViewNodeForDocNodeKey( selectNodeKey )
 
 		nodeView.makeCurrent()
 
 		return nodeView
 
 
-	def _f_handleTokenList(self, nodeView, tokens, parentDocNode, indexInParent, parentStyleSheet, bDirectEvent):
+
+	def _f_handleTokenList(self, nodeView, tokens, key, parentStyleSheet, bDirectEvent):
 		if len( tokens ) == 0:
-			selectPath = nodeView._styleSheet._f_handleEmpty( nodeView, parentDocNode, indexInParent, parentStyleSheet, bDirectEvent )
-			self._p_handleSelectPath( nodeView, selectPath, parentDocNode, indexInParent )
+			selectNodeKey = nodeView._styleSheet._f_handleEmpty( nodeView, key, parentStyleSheet, bDirectEvent )
+			self._p_handleSelectNode( nodeView, selectNodeKey )
 		elif len( tokens ) == 1  and  bDirectEvent:
-			selectPath = nodeView._styleSheet._f_handleToken( nodeView, tokens[0], parentDocNode, indexInParent, parentStyleSheet, True )
-			self._p_handleSelectPath( nodeView, selectPath, parentDocNode, indexInParent )
+			selectNodeKey = nodeView._styleSheet._f_handleToken( nodeView, tokens[0], key, parentStyleSheet, True )
+			self._p_handleSelectNode( nodeView, selectNodeKey )
 		else:
 			for token in tokens:
-				selectPath = nodeView._styleSheet._f_handleToken( nodeView, token, parentDocNode, indexInParent, parentStyleSheet, False )
-				nodeView = self._p_handleSelectPath( nodeView, selectPath, parentDocNode, indexInParent )
+				selectNodeKey = nodeView._styleSheet._f_handleToken( nodeView, token, key, parentStyleSheet, False )
+				nodeView = self._p_handleSelectNode( nodeView, selectNodeKey )
 
 
 

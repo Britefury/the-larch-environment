@@ -8,8 +8,6 @@
 from weakref import WeakKeyDictionary
 from copy import copy, deepcopy
 
-from Britefury.FileIO.IOXml import ioObjectFactoryRegister, ioReadObjectFromString, ioWriteObjectAsString
-
 from Britefury.Cell.LiteralCell import LiteralRefCell
 
 from Britefury.DocModel.DocModelLayer import DocModelLayer
@@ -35,7 +33,7 @@ class DMList (DMListInterface):
 
 
 
-	def __init__(self, value=None, _p_memo={}):
+	def __init__(self, value=None):
 		super( DMList, self ).__init__()
 
 
@@ -43,21 +41,19 @@ class DMList (DMListInterface):
 		if value is None:
 			value = []
 		else:
-			value = [ self._p_coerce( x, _p_memo )   for x in value ]
+			value = [ self._p_coerce( x )   for x in value ]
 		self._cell.literalValue = value
 
 		self._commandTracker_ = None
 
 
-	def __writecontentsx__(self, stream, nodeToIndex):
+	def __writesx__(self, stream):
 		stream.write( '(' )
 		if len( self ) > 0:
 			for v in self[:-1]:
-				#v.__writesx__( stream, nodeToIndex )
-				__writesx__( stream, nodeToIndex, v )
+				__writesx__( stream, v )
 				stream.write( ' ' )
-			#self[-1].__writesx__( stream, nodeToIndex )
-			__writesx__( stream, nodeToIndex, self[-1] )
+			__writesx__( stream, self[-1] )
 		stream.write( ')' )
 
 
@@ -65,19 +61,11 @@ class DMList (DMListInterface):
 		return '(' + ' '.join( [ str( v )  for v in self._cell.literalValue ] ) + ')'
 
 
-	def _p_coerce(self, x, _p_memo=None):
+	def _p_coerce(self, x):
 		if isinstance( x, list )  or  isinstance( x, tuple ):
-			if _p_memo is None:
-				_p_memo = {}
-			else:
-				try:
-					return _p_memo[id(x)]
-				except KeyError:
-					pass
-			y = DMList( x, _p_memo )
-			if _p_memo is not None:
-				_p_memo[id(x)] = y
-			return y
+			return DMList( x )
+		elif isinstance( x, str ):
+			return intern( x )
 		else:
 			return x
 
@@ -92,9 +80,8 @@ class DMList (DMListInterface):
 
 
 	def extend(self, xs):
-		memo = {}
 		v = self._cell.literalValue
-		xs = [ self._p_coerce( x, memo )   for x in xs ]
+		xs = [ self._p_coerce( x )   for x in xs ]
 		v.extend( xs )
 		self._cell.literalValue = v
 		if self._commandTracker_ is not None:
@@ -119,8 +106,7 @@ class DMList (DMListInterface):
 		v = self._cell.literalValue
 		oldV = copy( v )
 		if isinstance( i, slice ):
-			memo = {}
-			x = [ self._p_coerce( p, memo )   for p in x ]
+			x = [ self._p_coerce( p )   for p in x ]
 		else:
 			x = self._p_coerce( x )
 		v[i] = x
@@ -175,8 +161,6 @@ class DMList (DMListInterface):
 		return c
 
 
-
-ioObjectFactoryRegister( 'DMList', DMList )
 
 
 
@@ -281,30 +265,6 @@ class TestCase_LiteralList (unittest.TestCase):
 
 
 
-	def testIOXml(self):
-		xxa = DMList( [ 'a', 'b', 'c' ] )
-
-		x = DMList( [ 1, 2, 3 ] )
-		xx1 = DMList( [ 'plus2', 5, 6, 7 ] )
-		xx1.append( xxa )
-		x.append( xx1 )
-		xx2 = DMList( [ 'times2', 11, 12, 13 ] )
-		xx2.append( xxa )
-		x.append( xx2 )
-
-
-		s = ioWriteObjectAsString( x )
-		y = ioReadObjectFromString( s )
-
-		self.assert_( y[0:3] == [ 1, 2, 3 ] )
-		self.assert_( y[3][:-1] == [ 'plus2', 5, 6, 7 ] )
-		self.assert_( y[4][:-1] == [ 'times2', 11, 12, 13 ] )
-		self.assert_( y[3][-1] is y[4][-1] )
-		self.assert_( y[3][-1][:] == [ 'a', 'b', 'c' ] )
-		self.assert_( y[4][-1][:] == [ 'a', 'b', 'c' ] )
-
-
-
 	def _testUndo(self, opFunc):
 		ch = CommandHistory.CommandHistory()
 		dmxs = DMList( range( 0, 10 ) )
@@ -360,25 +320,6 @@ class TestCase_LiteralList (unittest.TestCase):
 
 
 
-
-
-	def testDiamondStructure(self):
-		sourceA = [ 1, 2, 3 ]
-		sourceB = [ 5, 6, sourceA, 7, [ 8, [ sourceA, 9 ], 10 ] ]
-		b = DMList( sourceB )
-		self.assert_( b[2] is b[4][1][0] )
-
-
-	def testDiamondStructure2(self):
-		sourceA = [ 1, 2, 3 ]
-		sourceB = [ 5, 6, sourceA, 7, 8, sourceA, 9, 10 ]
-		b = DMList()
-		b.extend( sourceB )
-		b.append( sourceB )
-		self.assert_( b[2] is b[5] )
-		self.assert_( b[-1][2] is b[-1][5] )
-		b[2:5] = [ sourceA, sourceA ]
-		self.assert_( b[2] is b[3] )
 
 
 
