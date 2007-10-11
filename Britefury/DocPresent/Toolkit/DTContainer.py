@@ -200,16 +200,6 @@ class DTContainer (DTWidget):
 		self._o_queueRedraw( localPos, localSize )
 
 
-	def _f_childGrabFocus(self, child):
-		if self._parent is not None:
-			self._parent._f_childGrabFocus( child )
-
-	def _f_childUngrabFocus(self, child):
-		if self._parent is not None:
-			self._parent._f_childUngrabFocus( child )
-
-
-
 
 
 	def _f_evDndButtonDown(self, localPos, button, state):
@@ -392,6 +382,21 @@ class DTContainer (DTWidget):
 
 		for childEntry in self._childEntries:
 			childEntry.child._f_setDocument( document )
+
+
+
+	def _dbg_getWidgetsWithFocus(self):
+		widgets = super( DTContainer, self )._dbg_getWidgetsWithFocus()
+		for childEntry in self._childEntries:
+			widgets += childEntry.child._dbg_getWidgetsWithFocus()
+		return widgets
+
+
+	def _dbg_getWidgetsWithFocusGrab(self):
+		widgets = super( DTContainer, self )._dbg_getWidgetsWithFocusGrab()
+		for childEntry in self._childEntries:
+			widgets += childEntry.child._dbg_getWidgetsWithFocusGrab()
+		return widgets
 
 
 

@@ -58,7 +58,6 @@ class DTEntryLabel (DTBin):
 
 
 
-
 	def __init__(self, text='', labelFilter=None, bLabelMarkup=False, font=None, textColour=Colour3f( 0.0, 0.0, 0.0 ), regexp=None):
 		super( DTEntryLabel, self ).__init__()
 

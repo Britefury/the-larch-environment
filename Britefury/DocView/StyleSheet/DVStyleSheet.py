@@ -9,39 +9,37 @@ from Britefury.Kernel.KMeta import KMetaMember, KClass, KObject
 
 from Britefury.DocView.MoveFocus import MoveFocus
 from Britefury.DocView.DocViewTokeniser import DocViewTokeniser
-from Britefury.DocView.SelectPath import SelectPath
+from Britefury.DocView.DocViewNodeTable import DocNodeKey
 
 
 
 
 class DVStyleSheetAction (object):
-	def handleToken(self, nodeView, token, parentDocNode, indexInParent, parentStyleSheet, bMoveCursor):
-		selectedNode = None
+	def handleToken(self, nodeView, token, key, parentStyleSheet, bMoveCursor):
 		nodeView._f_commandHistoryFreeze()
 		if bMoveCursor:
 			nodeView.cursorRight()
-		selectPath = self._o_tokenAction( token, parentDocNode, indexInParent, parentStyleSheet )
+		selectNodeKey = self._o_tokenAction( nodeView.docView, token, key, parentStyleSheet )
 		nodeView._f_commandHistoryThaw()
-		return selectPath
+		return selectNodeKey
 
 
 
-	def handleEmpty(self, nodeView, parentDocNode, indexInParent, parentStyleSheet, bMoveCursor):
-		selectedNode = None
+	def handleEmpty(self, nodeView, key, parentStyleSheet, bMoveCursor):
 		nodeView._f_commandHistoryFreeze()
 		if bMoveCursor:
 			nodeView.cursorRight()
-		selectPath = self._o_emptyAction( parentDocNode, indexInParent, parentStyleSheet )
+		selectNodeKey = self._o_emptyAction( nodeView.docView, key, parentStyleSheet )
 		nodeView._f_commandHistoryThaw()
-		return selectPath
+		return selectNodeKey
 
 
 
 	# Should return select path
-	def _o_tokenAction(self, token, parentDocNode, indexInParent, parentStyleSheet):
+	def _o_tokenAction(self, docView, token, key, parentStyleSheet):
 		pass
 
-	def _o_emptyAction(self, parentDocNode, indexInParent, parentStyleSheet):
+	def _o_emptyAction(self, docView, key, parentStyleSheet):
 		pass
 
 
@@ -52,22 +50,27 @@ class DVStyleSheetSetValueAction (DVStyleSheetAction):
 		self._textToNode = textToNode
 
 
-	def _o_tokenAction(self, token, parentDocNode, indexInParent, parentStyleSheet):
+	def _o_tokenAction(self, docView, token, key, parentStyleSheet):
 		tokenClassName, text = token
-		parentDocNode[indexInParent] = self._textToNode( text )
-		return SelectPath( parentDocNode, [ parentDocNode[indexInParent] ] )
+		parentDocNode = key.parentDocNode
+		indexInParent = key.index
+		node = self._textToNode( text )
+		parentDocNode[indexInParent] = node
+		return DocNodeKey( node, parentDocNode, indexInParent )
 
 
 
 
 
 class DVStyleSheetDeleteAction (DVStyleSheetAction):
-	def _o_emptyAction(self, parentDocNode, indexInParent, parentStyleSheet):
+	def _o_emptyAction(self, docView, key, parentStyleSheet):
+		parentDocNode = key.parentDocNode
+		indexInParent = key.index
 		del parentDocNode[indexInParent]
 		if len( parentDocNode ) > indexInParent:
-			return SelectPath( parentDocNode, [ parentDocNode[indexInParent] ] )
+			return DocNodeKey( parentDocNode[indexInParent], parentDocNode, indexInParent )
 		else:
-			return SelectPath( parentDocNode, [] )
+			return docView.parentNodeView.key
 
 
 
@@ -85,8 +88,8 @@ class DVStyleSheetTokenHandler (KMetaMember):
 
 
 
-	def handleToken(self, nodeView, token, parentDocNode, indexInParent, parentStyleSheet, bMoveCursor):
-		return self._action.handleToken( nodeView, token, parentDocNode, indexInParent, parentStyleSheet, bMoveCursor )
+	def handleToken(self, nodeView, token, key, parentStyleSheet, bMoveCursor):
+		return self._action.handleToken( nodeView, token, key, parentStyleSheet, bMoveCursor )
 
 
 
@@ -104,8 +107,8 @@ class DVStyleSheetEmptyHandler (KMetaMember):
 
 
 
-	def handleEmpty(self, nodeView, parentDocNode, indexInParent, parentStyleSheet, bMoveCursor):
-		return self._action.handleEmpty( nodeView, parentDocNode, indexInParent, parentStyleSheet, bMoveCursor )
+	def handleEmpty(self, nodeView, key, parentStyleSheet, bMoveCursor):
+		return self._action.handleEmpty( nodeView, key, parentStyleSheet, bMoveCursor )
 
 
 
@@ -135,16 +138,16 @@ class DVStyleSheet (KObject):
 
 
 
-	def _f_handleToken(self, nodeView, token, parentDocNode, indexInParent, parentStyleSheet, bMoveCursor):
+	def _f_handleToken(self, nodeView, token, key, parentStyleSheet, bMoveCursor):
 		tokenClassName, text = token
 		try:
 			handler = self._tokenClassNameToHandler[tokenClassName]
 		except KeyError:
 			handler = None
 		if handler is not None:
-			return handler.handleToken( nodeView, token, parentDocNode, indexInParent, parentStyleSheet, bMoveCursor )
+			return handler.handleToken( nodeView, token, key, parentStyleSheet, bMoveCursor )
 
 
-	def _f_handleEmpty(self, nodeView, parentDocNode, indexInParent, parentStyleSheet, bMoveCursor):
+	def _f_handleEmpty(self, nodeView, key, parentStyleSheet, bMoveCursor):
 		if self._emptyHandler is not None:
-			return self._emptyHandler.handleEmpty( nodeView, parentDocNode, indexInParent, parentStyleSheet, bMoveCursor )
+			return self._emptyHandler.handleEmpty( nodeView, key, parentStyleSheet, bMoveCursor )

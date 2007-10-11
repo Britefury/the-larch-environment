@@ -127,10 +127,7 @@ class DVNode (Sheet, DTWidgetKeyHandlerInterface):
 
 	@FunctionRefField
 	def _node_styleSheet(self):
-		if self._parent is None:
-			return self._view._f_getStyleSheet( self.docNode, None, -1 )
-		else:
-			return self._view._f_getStyleSheet( self.docNode, self._parentDocNode, self._indexInParent )
+		return self._view._f_getStyleSheet( self._key )
 
 
 	def _o_refreshNode(self):
@@ -145,25 +142,25 @@ class DVNode (Sheet, DTWidgetKeyHandlerInterface):
 
 
 
-	def __init__(self, docNode, view, parentDocNode, indexInParent):
+	def __init__(self, docNode, view, key):
 		super( DVNode, self ).__init__()
 		self.docNode = docNode
 		self._view = view
 		self._bDeleting = False
 		self._parent = None
-		self._parentDocNode = parentDocNode
-		self._indexInParent = indexInParent
+		self._key = key
 		self._styleSheet = None
 		self.refreshCell = RefCell()
 		self.refreshCell.function = self._o_refreshNode
 
 
 
-	def _f_setParentAndIndex(self, parent, parentDocNode, indexInParent):
-		if parent is not self._parent  or  parentDocNode is not self._parentDocNode  or  indexInParent != self._indexInParent:
+	def _f_setParentAndKey(self, parent, key):
+		if parent is not self._parent  or  key != self._key:
 			self._parent = parent
-			self._parentDocNode = parentDocNode
-			self._indexInParent = indexInParent
+			oldKey = self._key
+			self._key = key
+			self._view._f_nodeChangeKey( self, self._key, key )
 			# Force refreshCell to require recomputation due to potential style sheet change
 			self.refreshCell.function = self._o_refreshNode
 
@@ -171,6 +168,9 @@ class DVNode (Sheet, DTWidgetKeyHandlerInterface):
 
 	def getDocView(self):
 		return self._view
+
+	def getKey(self):
+		return self._key
 
 
 
@@ -200,7 +200,6 @@ class DVNode (Sheet, DTWidgetKeyHandlerInterface):
 
 	def getChildViewNodeForChildDocNode(self, childDocNode):
 		if childDocNode is not None:
-			print 'NOTHING TO SEARCH'
 			raise KeyError
 		else:
 			return None
@@ -246,6 +245,8 @@ class DVNode (Sheet, DTWidgetKeyHandlerInterface):
 	def cursorLeft(self, bItemStep=False):
 		left = self.getLeafToLeft()
 		if left is not None:
+			# Must finish editing first, or we get problems with events invoking one another through the presentation system
+			self.finishEditing()
 			if bItemStep:
 				left.makeCurrent()
 			else:
@@ -255,6 +256,8 @@ class DVNode (Sheet, DTWidgetKeyHandlerInterface):
 	def cursorRight(self, bItemStep=False):
 		right = self.getLeafToRight()
 		if right is not None:
+			# Must finish editing first, or we get problems with events invoking one another through the presentation system
+			self.finishEditing()
 			if bItemStep:
 				right.makeCurrent()
 			else:
@@ -265,16 +268,22 @@ class DVNode (Sheet, DTWidgetKeyHandlerInterface):
 	def cursorToLeftChild(self):
 		navList = self.horizontalNavigationList()
 		if navList != []:
+			# Must finish editing first, or we get problems with events invoking one another through the presentation system
+			self.finishEditing()
 			navList[0].makeCurrent()
 
 	def cursorToRightChild(self):
 		navList = self.horizontalNavigationList()
 		if navList != []:
+			# Must finish editing first, or we get problems with events invoking one another through the presentation system
+			self.finishEditing()
 			navList[-1].makeCurrent()
 
 
 	def cursorToParent(self):
 		if self._parent is not None:
+			# Must finish editing first, or we get problems with events invoking one another through the presentation system
+			self.finishEditing()
 			self._parent.makeCurrent()
 
 
@@ -284,14 +293,16 @@ class DVNode (Sheet, DTWidgetKeyHandlerInterface):
 		above = self.getNodeAbove()
 		if above is not None:
 			cursorPosInAbove = self.widget.getPointRelativeTo( above.widget, self.getCursorPosition() )
-			#above.makeCurrent()
+			# Must finish editing first, or we get problems with events invoking one another through the presentation system
+			self.finishEditing()
 			above.startEditingAtPosition( cursorPosInAbove )
 
 	def cursorDown(self):
 		below = self.getNodeBelow()
 		if below is not None:
 			cursorPosInBelow = self.widget.getPointRelativeTo( below.widget, self.getCursorPosition() )
-			#below.makeCurrent()
+			# Must finish editing first, or we get problems with events invoking one another through the presentation system
+			self.finishEditing()
 			below.startEditingAtPosition( cursorPosInBelow )
 
 
@@ -507,6 +518,11 @@ class DVNode (Sheet, DTWidgetKeyHandlerInterface):
 		self.makeCurrent()
 
 
+	def finishEditing(self):
+		self.widget.ungrabFocus()
+
+
+
 
 	def getCursorPosition(self):
 		return Point2( self.widget.getAllocation() * 0.5 )
@@ -517,3 +533,7 @@ class DVNode (Sheet, DTWidgetKeyHandlerInterface):
 		return 0
 
 
+
+	parentNodeView = property( getParentNodeView )
+	docView = property( getDocView )
+	key = property( getKey )

@@ -18,6 +18,7 @@ from Britefury.DocModel.DMVirtualList import DMVirtualList
 
 from Britefury.DocView.DVNode import *
 from Britefury.DocView.DVBorderNode import DVBorderNode
+from Britefury.DocView.DocViewNodeTable import DocNodeKey
 
 from Britefury.DocViewBehavior.DVBListBehavior import DVBListBehavior
 #from Britefury.DocViewBehavior.DVBCreateExpressionBehavior import DVBCreateExpressionBehavior
@@ -64,7 +65,7 @@ class DVList (DVBorderNode):
 					viewNode = self._view._f_buildView( docChildNode, self, index )
 			except KeyError:
 				viewNode = self._view._f_buildView( docChildNode, self, index )
-			viewNode._f_setParentAndIndex( self, self.docNode, index )
+			viewNode._f_setParentAndKey( self, DocNodeKey( docChildNode, self.docNode, index ) )
 			self._elementNodes.append( viewNode )
 
 		return self._elementNodes
@@ -95,8 +96,8 @@ class DVList (DVBorderNode):
 
 
 
-	def __init__(self, docNode, view, parentDocNode, indexInParent):
-		super( DVList, self ).__init__( docNode, view, parentDocNode, indexInParent )
+	def __init__(self, docNode, view, key):
+		super( DVList, self ).__init__( docNode, view, key )
 		self._elementNodes = []
 		self._elementsLine = DTWrappedLineWithSeparators( spacing=5.0 )
 		self._box = DTBox()

@@ -36,8 +36,8 @@ class DVBorderNode (DVNode):
 
 
 
-	def __init__(self, docNode, view, parentDocNode, indexInParent):
-		super( DVBorderNode, self ).__init__( docNode, view, parentDocNode, indexInParent )
+	def __init__(self, docNode, view, key):
+		super( DVBorderNode, self ).__init__( docNode, view, key )
 		self.widget = DTActiveBorder()
 		self.widget.keyHandler = self
 		self.widget.topMargin = self.widget.bottomMargin = 1.0

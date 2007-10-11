@@ -12,6 +12,8 @@ import pygtk
 pygtk.require( '2.0' )
 import gtk
 
+from Britefury.extlibs.pyconsole.pyconsole import Console
+
 from Britefury.Event.QueuedEvent import queueEvent
 
 from Britefury.UI.ConfirmDialog import *
@@ -30,6 +32,23 @@ from Britefury.DocView.DocView import DocView
 from Britefury.Languages.Lisp.Lisp import makeLispDocView
 
 #from Britefury.PyImport import PythonImporter
+
+
+
+
+class GSymScriptEnvironment (object):
+	def __init__(self, app):
+		self._app = app
+
+
+	def _p_getApp(self):
+		return self._app
+
+	app = property( _p_getApp, doc=_( 'The gSym app (a Britefury.MainApp.MainApp)' ) )
+
+	__doc__ = _( """gSym Scripting Environment
+	GSymScriptEnvironment(app) -> scripting environment with @app as the app""" )
+
 
 
 
@@ -104,6 +123,7 @@ class MainApp (object):
 		fileMenu.append( exportTeXItem )
 
 
+
 		undoItem = gtk.MenuItem( 'Undo' )
 		undoItem.connect( 'activate', self._p_onUndo )
 
@@ -128,6 +148,16 @@ class MainApp (object):
 		runMenu.append( showCodeItem )
 
 
+
+		scriptWindowItem = gtk.MenuItem( _( 'Script window' ) )
+		scriptWindowItem.connect( 'activate', self._p_onScriptWindowMenuItem )
+
+
+		scriptMenu = gtk.Menu()
+		scriptMenu.append( scriptWindowItem )
+
+
+
 		fileMenuItem = gtk.MenuItem( 'File' )
 		fileMenuItem.set_submenu( fileMenu )
 
@@ -137,11 +167,15 @@ class MainApp (object):
 		runMenuItem = gtk.MenuItem( 'Run' )
 		runMenuItem.set_submenu( runMenu )
 
+		scriptMenuItem = gtk.MenuItem( _( 'Script' ) )
+		scriptMenuItem.set_submenu( scriptMenu )
+
 
 		menuBar = gtk.MenuBar()
 		menuBar.append( fileMenuItem )
 		menuBar.append( editMenuItem )
 		menuBar.append( runMenuItem )
+		menuBar.append( scriptMenuItem )
 		menuBar.show_all()
 
 
@@ -162,6 +196,28 @@ class MainApp (object):
 		self._window.set_size_request( 640, 480 )
 		self._window.add( box )
 		self._window.show()
+
+
+
+		scriptBanner = _( "gSym scripting console (uses pyconsole by Yevgen Muntyan)\nPython %s\nType help(object) for help on an object\nThe gSym scripting environment is available via the local variable 'gsym'\n" ) % ( sys.version, )
+		self._scriptEnv = GSymScriptEnvironment( self )
+		self._scriptConsole = Console( locals = { 'gsym' : self._scriptEnv }, banner=scriptBanner, use_rlcompleter=False )
+		self._scriptConsole.connect( 'command', self._p_onScriptPreCommand )
+		self._scriptConsole.connect_after( 'command', self._p_onScriptPostCommand )
+		self._scriptConsole.show()
+
+		self._scriptScrolledWindow = gtk.ScrolledWindow()
+		self._scriptScrolledWindow.set_policy( gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC )
+		self._scriptScrolledWindow.add( self._scriptConsole )
+		self._scriptScrolledWindow.set_size_request( 640, 480 )
+		self._scriptScrolledWindow.show()
+
+		self._scriptWindow = gtk.Window( gtk.WINDOW_TOPLEVEL )
+		self._scriptWindow.set_transient_for( self._window )
+		self._scriptWindow.add( self._scriptScrolledWindow )
+		self._scriptWindow.connect( 'delete-event', self._p_onScriptWindowDelete )
+		self._scriptWindow.set_title( _( 'gSym Script Window' ) )
+		self._bScriptWindowVisible = False
 
 
 
@@ -462,6 +518,28 @@ class MainApp (object):
 
 	def _p_onDestroy(self, widget, data=None):
 		gtk.main_quit()
+
+
+
+
+	def _p_onScriptWindowDelete(self, window, event):
+		window.hide()
+		self._bScriptWindowVisible = False
+		return True
+
+	def _p_onScriptWindowMenuItem(self, widget):
+		self._bScriptWindowVisible = not self._bScriptWindowVisible
+		if self._bScriptWindowVisible:
+			self._scriptWindow.show()
+		else:
+			self._scriptWindow.hide()
+
+
+	def _p_onScriptPreCommand(self, console, code):
+		self._commandHistory.freeze()
+
+	def _p_onScriptPostCommand(self, console, code):
+		self._commandHistory.thaw()
 
 
 

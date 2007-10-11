@@ -15,6 +15,8 @@ import gtk
 import gobject
 import cairo
 
+from copy import copy
+
 from Britefury.Util.SignalSlot import *
 
 from Britefury.Event.QueuedEvent import queueEvent
@@ -58,6 +60,9 @@ class DTDocument (gtk.DrawingArea, DTBin):
 		self._bAllocationRequired = False
 		self._keyboardFocusChild = None
 		self._keyboardFocusGrabChild = None
+
+		# Immediate event queue
+		self._immediateEvents = []
 
 		# Connect signals
 		self.connect_after( 'configure-event', self._p_configureEvent )
@@ -108,6 +113,18 @@ class DTDocument (gtk.DrawingArea, DTBin):
 
 
 
+	def queueImmediateEvent(self, f):
+		self._immediateEvents.append( f )
+
+
+	def _p_emitImmediateEvents(self):
+		events = copy( self._immediateEvents )
+		for event in events:
+			event()
+		self._immediateEvents = []
+
+
+
 
 
 	def _o_queueRedraw(self, localPos, localSize):
@@ -143,24 +160,91 @@ class DTDocument (gtk.DrawingArea, DTBin):
 
 
 
-	def _f_childGrabFocus(self, child):
-		if child is not self._keyboardFocusChild:
-			if self._keyboardFocusGrabChild is not None  and  child is not None  and  child is not self._keyboardFocusGrabChild:
+	#def _f_widgetGrabFocus(self, child):
+		#if child is not self._keyboardFocusChild:
+			#if self._keyboardFocusGrabChild is not None  and  child is not None  and  child is not self._keyboardFocusGrabChild:
+				#self._keyboardFocusGrabChild._f_clearFocusGrab()
+			#if self._keyboardFocusChild is not None  and  child is not None:
+				#self._keyboardFocusChild._o_onLoseFocus()
+			#self._keyboardFocusChild = child
+			#if self._keyboardFocusChild is not None:
+				#self._keyboardFocusChild._o_onGainFocus()
+				#self._keyboardFocusGrabChild = child
+
+
+
+	#def _f_widgetUngrabFocus(self, child):
+		#if child is self._keyboardFocusChild:
+			#if self._keyboardFocusChild is not None:
+				#self._keyboardFocusChild._o_onLoseFocus()
+			#self._keyboardFocusChild = None
+
+
+
+
+	def _f_widgetGrabFocus(self, child):
+		assert child is not None
+
+		# If there is already a widget that has grabbed the keyboard focus, then clear its grab, and replace it with @child
+		if child is not self._keyboardFocusGrabChild:
+			if self._keyboardFocusGrabChild is not None:
 				self._keyboardFocusGrabChild._f_clearFocusGrab()
-			if self._keyboardFocusChild is not None  and  child is not None:
-				self._keyboardFocusChild._o_onLoseFocus()
+			self._keyboardFocusGrabChild = child
+
+		# If @child is different from the widget that has focus at the moment, switch
+		if child is not self._keyboardFocusChild:
+			if self._keyboardFocusChild is not None:
+				keyboardFocusChild = self._keyboardFocusChild
+				self._keyboardFocusChild = None
+				keyboardFocusChild._o_onLoseFocus()
 			self._keyboardFocusChild = child
-			if self._keyboardFocusChild is not None:
-				self._keyboardFocusChild._o_onGainFocus()
-				self._keyboardFocusGrabChild = child
+			self._keyboardFocusChild._o_onGainFocus()
 
 
 
-	def _f_childUngrabFocus(self, child):
+	def _f_widgetUngrabFocus(self, child):
+		assert child is not None
+
+		if child is self._keyboardFocusGrabChild:
+			self._keyboardFocusGrabChild = None
+
 		if child is self._keyboardFocusChild:
-			if self._keyboardFocusChild is not None:
-				self._keyboardFocusChild._o_onLoseFocus()
+			keyboardFocusChild = self._keyboardFocusChild
 			self._keyboardFocusChild = None
+			keyboardFocusChild._o_onLoseFocus()
+
+
+
+
+
+	def _f_widgetAcquireFocus(self, child):
+		assert child is not None
+
+		# If there is already a widget that has grabbed the keyboard focus, then clear the focus grab on @child
+		if child is not self._keyboardFocusGrabChild  and  self_f_clearFocusGrab._keyboardFocusGrabChild is not None:
+			child._f_clearFocusGrab()
+		else:
+			# If @child is different from the widget that has focus at the moment, switch
+			if child is not self._keyboardFocusChild:
+				if self._keyboardFocusChild is not None:
+					keyboardFocusChild = self._keyboardFocusChild
+					self._keyboardFocusChild = None
+					keyboardFocusChild._o_onLoseFocus()
+				self._keyboardFocusChild = child
+				self._keyboardFocusChild._o_onGainFocus()
+
+
+
+	def _f_widgetRelinquishFocus(self, child):
+		assert child is not None
+
+		if child is self._keyboardFocusChild:
+			keyboardFocusChild = self._keyboardFocusChild
+			self._keyboardFocusChild = None
+			keyboardFocusChild._o_onLoseFocus()
+
+
+
 
 
 	def removeFocusGrab(self):
@@ -186,6 +270,7 @@ class DTDocument (gtk.DrawingArea, DTBin):
 		if docSize != self._documentSize:
 			self._documentSize = docSize
 			self._bAllocationRequired = True
+		self._p_emitImmediateEvents()
 
 
 	def _p_exposeEvent(self, widget, event):
@@ -197,6 +282,7 @@ class DTDocument (gtk.DrawingArea, DTBin):
 		context.fill()
 		context.new_path()
 		self._f_draw( context, BBox2( Point2( event.area.x, event.area.y ), Point2( event.area.x + event.area.width, event.area.y + event.area.height ) ) )
+		self._p_emitImmediateEvents()
 		return False
 
 
@@ -222,6 +308,8 @@ class DTDocument (gtk.DrawingArea, DTBin):
 			if self._docDragButton is None:
 				self._docDragButton = event.button
 				self._docDragStartPos = localPos
+		self._p_emitImmediateEvents()
+
 
 	def _p_buttonReleaseEvent(self, widget, event):
 		x, y, state = event.x, event.y, event.state
@@ -241,6 +329,7 @@ class DTDocument (gtk.DrawingArea, DTBin):
 			self._f_evButtonUp( localPos, event.button, state )
 		else:
 			self._docDragButton = None
+		self._p_emitImmediateEvents()
 
 
 
@@ -284,6 +373,7 @@ class DTDocument (gtk.DrawingArea, DTBin):
 			self._docDragStartPos = localPos
 			if bModified:
 				self._o_queueResize()
+		self._p_emitImmediateEvents()
 
 
 	def _p_enterNotifyEvent(self, widget, event):
@@ -291,6 +381,7 @@ class DTDocument (gtk.DrawingArea, DTBin):
 		localPos = Point2( x, y )
 		if self._docDragButton is None:
 			self._f_evEnter( localPos )
+		self._p_emitImmediateEvents()
 
 
 	def _p_leaveNotifyEvent(self, widget, event):
@@ -298,6 +389,7 @@ class DTDocument (gtk.DrawingArea, DTBin):
 		localPos = Point2( x, y )
 		if self._docDragButton is None:
 			self._f_evLeave( localPos )
+		self._p_emitImmediateEvents()
 
 
 	def _p_scrollEvent(self, widget, event):
@@ -310,6 +402,7 @@ class DTDocument (gtk.DrawingArea, DTBin):
 		elif event.direction == gtk.gdk.SCROLL_RIGHT:
 			scroll = Vector2( 1.0, 0.0 )
 		self._f_evScroll( scroll )
+		self._p_emitImmediateEvents()
 
 
 
@@ -323,17 +416,22 @@ class DTDocument (gtk.DrawingArea, DTBin):
 		key = keyEvent.keyVal, keyEvent.state
 		if key == _undoAccel:
 			self.undoSignal.emit( self )
+			self._p_emitImmediateEvents()
 			return True
 		elif key == _redoAccel:
 			self.redoSignal.emit( self )
+			self._p_emitImmediateEvents()
 			return True
 		elif self._o_handleDocumentKey( keyEvent ):
+			self._p_emitImmediateEvents()
 			return True
 		else:
 			if self._keyboardFocusChild is not None:
 				self._keyboardFocusChild._o_onKeyPress( keyEvent )
+				self._p_emitImmediateEvents()
 				return True
 			else:
+				self._p_emitImmediateEvents()
 				return False
 
 
@@ -341,12 +439,15 @@ class DTDocument (gtk.DrawingArea, DTBin):
 		keyEvent = DTKeyEvent( event )
 		key = keyEvent.keyVal, keyEvent.state
 		if key == _undoAccel  or  key == _redoAccel:
+			self._p_emitImmediateEvents()
 			return True
 		else:
 			if self._keyboardFocusChild is not None:
 				self._keyboardFocusChild._o_onKeyRelease( keyEvent )
+				self._p_emitImmediateEvents()
 				return True
 			else:
+				self._p_emitImmediateEvents()
 				return False
 
 
@@ -355,9 +456,11 @@ class DTDocument (gtk.DrawingArea, DTBin):
 		context = widget.window.cairo_create()
 		pangoContext = widget.get_pango_context()
 		self._f_evRealise( context, pangoContext )
+		self._p_emitImmediateEvents()
 
 	def _p_unrealiseEvent(self, widget):
 		self._f_evUnrealise()
+		self._p_emitImmediateEvents()
 
 
 
