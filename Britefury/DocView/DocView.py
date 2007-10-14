@@ -47,7 +47,10 @@ class DocView (object):
 
 
 	def _f_nodeChangeKey(self, viewNode, oldKey, newKey):
-		del self._nodeTable[oldKey]
+		try:
+			del self._nodeTable[oldKey]
+		except KeyError:
+			pass
 		self._nodeTable[newKey] = viewNode
 
 
@@ -104,7 +107,7 @@ class DocView (object):
 
 
 
-	def _p_handleSelectNode(self, nodeView, selectNodeKey):
+	def _f_handleSelectNode(self, nodeView, selectNodeKey):
 		# Trigger a rebuild
 		self.refresh()
 
@@ -120,14 +123,14 @@ class DocView (object):
 	def _f_handleTokenList(self, nodeView, tokens, key, parentStyleSheet, bDirectEvent):
 		if len( tokens ) == 0:
 			selectNodeKey = nodeView._styleSheet._f_handleEmpty( nodeView, key, parentStyleSheet, bDirectEvent )
-			self._p_handleSelectNode( nodeView, selectNodeKey )
+			self._f_handleSelectNode( nodeView, selectNodeKey )
 		elif len( tokens ) == 1  and  bDirectEvent:
 			selectNodeKey = nodeView._styleSheet._f_handleToken( nodeView, tokens[0], key, parentStyleSheet, True )
-			self._p_handleSelectNode( nodeView, selectNodeKey )
+			self._f_handleSelectNode( nodeView, selectNodeKey )
 		else:
 			for token in tokens:
 				selectNodeKey = nodeView._styleSheet._f_handleToken( nodeView, token, key, parentStyleSheet, False )
-				nodeView = self._p_handleSelectNode( nodeView, selectNodeKey )
+				nodeView = self._f_handleSelectNode( nodeView, selectNodeKey )
 
 
 

@@ -12,10 +12,12 @@ from Britefury.Math.Math import Colour3f
 
 from Britefury.DocPresent.Toolkit.DTLabel import DTLabel
 
+from Britefury.DocModel.DMListInterface import DMListInterface
+
 from Britefury.DocView.DocView import DocView
 from Britefury.DocView.DocViewTokeniser import DocViewTokenDefinition, DocViewTokeniser
 
-from Britefury.DocView.StyleSheet.DVStyleSheet import DVStyleSheetSetValueAction, DVStyleSheetDeleteAction, DVStyleSheetTokenHandler, DVStyleSheetEmptyHandler
+from Britefury.DocView.StyleSheet.DVStyleSheet import *
 
 from Britefury.DocView.StyleSheet.StyleSheetDispatcher import StyleSheetDispatcher
 from Britefury.DocView.StyleSheet.DVStringStyleSheet import DVStringStyleSheet
@@ -38,20 +40,59 @@ _whitespace = DocViewTokenDefinition( 'whitespace', pyparsing.Word( string.white
 
 
 
+@DVStyleSheetSetValueAction
+def _setValueTokenAction(text):
+	return text
+
+
+
+def _getInsertPosition(receivingDocNodePathKeys):
+	docNodeKey = receivingDocNodePathKeys[0]
+	if isinstance( docNodeKey.docNode, DMListInterface ):
+		return docNodeKey.docNode, 0
+	else:
+		return docNodeKey.parentDocNode, docNodeKey.index
+
+
+
+class LispAddListAction (DVStyleSheetAction):
+	def _o_keyAction(self, receivingViewNodePath, receivingDocNodePathKeys, keyPressEvent, parentStyleSheet):
+		#docNodeKey = receivingDocNodePathKeys[0]
+		parentDocNode, indexInParent = _getInsertPosition( receivingDocNodePathKeys )
+		#parentDocNode = docNodeKey.parentDocNode
+		#indexInParent = docNodeKey.index
+		parentDocNode.insert( indexInParent, [] )
+		return DocNodeKey( parentDocNode[indexInParent], parentDocNode, indexInParent )
+_addListAction = LispAddListAction()
+
+
+
+
+class LispAddStringAction (DVStyleSheetAction):
+	def _o_keyAction(self, receivingViewNodePath, receivingDocNodePathKeys, keyPressEvent, parentStyleSheet):
+		#docNodeKey = receivingDocNodePathKeys[0]
+		parentDocNode, indexInParent = _getInsertPosition( receivingDocNodePathKeys )
+		#parentDocNode = docNodeKey.parentDocNode
+		#indexInParent = docNodeKey.index
+		parentDocNode.insert( indexInParent, keyPressEvent.keyString )
+		return DocNodeKey( parentDocNode[indexInParent], parentDocNode, indexInParent )
+_addStringAction = LispAddStringAction()
+
+
+
 
 class LispStringStyleSheet (DVStringStyleSheet):
 	tokeniser = DocViewTokeniser( [ _string, _openParen, _closeParen, _whitespace ] )
 
-	@DVStyleSheetSetValueAction
-	def _setValueAction(text):
-		return text
 
-	_setValueTokenHandler = DVStyleSheetTokenHandler( 'string', _setValueAction )
+	_setValueTokenHandler = DVStyleSheetTokenHandler( 'string', _setValueTokenAction )
 
 
 	_deleteAction = DVStyleSheetDeleteAction()
 	_emptyHandler = DVStyleSheetEmptyHandler( _deleteAction )
 
+	_addListHandler = DVStyleSheetCharHandler( '(', _addListAction )
+	_addStringHandler = DVStyleSheetCharHandler( _unquotedStringChars, _addStringAction )
 
 
 
@@ -67,6 +108,9 @@ class DVListSExpressionStyleSheet (DVListWrappedLineStyleSheet):
 
 	def endDelimiter(self):
 		return DTLabel( ')', font='Sans bold 11', colour=Colour3f( 0.0, 0.6, 0.0 ) )
+
+	_addHandler = DVStyleSheetCharHandler( '(', _addListAction )
+	_addStringHandler = DVStyleSheetCharHandler( _unquotedStringChars, _addStringAction )
 
 
 
