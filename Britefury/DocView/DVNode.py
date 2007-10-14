@@ -32,63 +32,13 @@ from Britefury.DocPresent.Toolkit.DTLabel import *
 
 
 
-class DVChildNodeSlotFunctionField (FunctionRefField):
-	def __init__(self, doc=''):
-		super( DVChildNodeSlotFunctionField, self ).__init__( doc )
-		self._behaviors = []
-
-
-	def _f_metaMember_initClass(self):
-		super( DVChildNodeSlotFunctionField, self )._f_metaMember_initClass()
-		self._cls._nodeSlots.append( self )
-
-
-	def _f_containsNode(self, instance, node):
-		return node is self._f_getImmutableValueFromInstance( instance )
-
-
-	def setBehaviors(self, behaviors):
-		self._behaviors = behaviors
-
-
-
-
-
-
-class DVChildNodeListSlotFunctionField (FunctionField):
-	def __init__(self, doc=''):
-		super( DVChildNodeListSlotFunctionField, self ).__init__( doc )
-		self._behaviors = []
-
-
-	def _f_metaMember_initClass(self):
-		super( DVChildNodeListSlotFunctionField, self )._f_metaMember_initClass()
-		self._cls._nodeSlots.append( self )
-
-
-	def _f_containsNode(self, instance, node):
-		return node in self._f_getImmutableValueFromInstance( instance )
-
-
-	def setBehaviors(self, behaviors):
-		self._behaviors = behaviors
-
-
-
-
-
-
-
 class DVNodeClass (SheetClass):
 	def __init__(cls, clsName, clsBases, clsDict):
 		cls.behaviors = []
-		cls._nodeSlots = []
 
 		for base in clsBases:
 			if hasattr( base, 'behaviors' ):
 				cls.behaviors = base.behaviors  +  [ b   for b in cls.behaviors   if b not in base.behaviors ]
-			if hasattr( base, '_nodeSlots' ):
-				cls._nodeSlots = base._nodeSlots  +  [ s   for s in cls._nodeSlots   if s not in base._nodeSlots ]
 		try:
 			myBehaviors = clsDict['behaviors']
 		except KeyError:
@@ -109,6 +59,7 @@ class DVNodeClass (SheetClass):
 					DocView._nodeClassTable[c] = cls
 			else:
 				DocView._nodeClassTable[docNodeClass] = cls
+
 
 
 
@@ -466,7 +417,7 @@ class DVNode (Sheet, DTWidgetKeyHandlerInterface):
 
 
 
-	def _o_handleKeyPress(self, receivingNodePath, widget, keyPressEvent):
+	def _o_handleKeyPress(self, receivingViewNodePath, widget, keyPressEvent):
 		state = keyPressEvent.state
 		keyVal = keyPressEvent.keyVal
 		key = keyVal, state
@@ -474,31 +425,34 @@ class DVNode (Sheet, DTWidgetKeyHandlerInterface):
 
 		inputHandler = None
 
-		receivingNodePath = ( self, )  +  receivingNodePath
-
-		# Try to get the node slot input handler
-		if len( receivingNodePath ) > 1:
-			nodeSlot = None
-			for slot in self._nodeSlots:
-				if slot._f_containsNode( self, receivingNodePath[1] ):
-					for behavior in slot._behaviors:
-						if behavior.handleKeyPress( self, receivingNodePath, widget, keyPressEvent ):
-							return True
-
+		receivingViewNodePath = ( self, )  +  receivingViewNodePath
 
 		for behavior in self.behaviors:
-			if behavior.handleKeyPress( self, receivingNodePath, widget, keyPressEvent ):
+			if behavior.handleKeyPress( self, receivingViewNodePath, widget, keyPressEvent ):
 				return True
+
+		parentStyleSheet = None
+		if self._parent is not None:
+			parentStyleSheet = self._parent._styleSheet
+
+		result = self._styleSheet._f_handleKeyPress( receivingViewNodePath, [ nodeView._key   for nodeView in receivingViewNodePath ], widget, keyPressEvent, parentStyleSheet )
+		if result is not False:
+			return result
 
 		# Pass to the parent node
 		if self._parent is not None:
-			return self._parent._o_handleKeyPress( ( self, ) + receivingNodePath, widget, keyPressEvent )
+			return self._parent._o_handleKeyPress( ( self, ) + receivingViewNodePath, widget, keyPressEvent )
 		else:
 			return False
 
 
 	def _f_handleKeyPress(self, widget, keyPressEvent):
-		return self._o_handleKeyPress( (), widget, keyPressEvent)
+		result = self._o_handleKeyPress( (), widget, keyPressEvent)
+		if result is False  or  result is True:
+			return result
+		elif result is not None:
+			self._view._f_handleSelectNode( self, result )
+		return True
 
 
 	def makeCurrent(self):
