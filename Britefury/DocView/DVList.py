@@ -75,6 +75,8 @@ class DVList (DVBorderNode):
 
 	@FunctionField
 	def _refreshElements(self):
+		for node in self.elementNodes:
+			node.refresh()
 		self._elementsLine[:] = [ node.widget   for node in self.elementNodes ]
 
 
@@ -96,8 +98,8 @@ class DVList (DVBorderNode):
 
 
 
-	def __init__(self, docNode, view, key):
-		super( DVList, self ).__init__( docNode, view, key )
+	def __init__(self, docNode, view, docNodeKey):
+		super( DVList, self ).__init__( docNode, view, docNodeKey )
 		self._elementNodes = []
 		self._elementsLine = DTWrappedLineWithSeparators( spacing=5.0 )
 		self._box = DTBox()

@@ -15,8 +15,8 @@ class StyleSheetDispatcher (object):
 		self._nameToSheet = nameToSheet
 
 
-	def getStyleSheetForNode(self, key):
-		docNode = key.docNode
+	def getStyleSheetForNode(self, docNodeKey):
+		docNode = docNodeKey.docNode
 		if isinstance( docNode, str ):
 			sheet = self._stringSheet
 		else:
@@ -30,7 +30,7 @@ class StyleSheetDispatcher (object):
 				sheet = self._listSheet
 
 		if callable( sheet ):
-			return sheet( key )
+			return sheet( docNodeKey )
 		else:
 			return sheet
 

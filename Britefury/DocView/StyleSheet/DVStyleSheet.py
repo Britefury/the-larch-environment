@@ -19,44 +19,47 @@ from Britefury.DocView.DocViewNodeTable import DocNodeKey
 
 
 class DVStyleSheetAction (object):
-	def handleToken(self, nodeView, token, docNodeKey, parentStyleSheet, bMoveCursor):
-		nodeView._f_commandHistoryFreeze()
+	def handleKeyPress(self, event, parentStyleSheet):
+		event.nodeView._f_commandHistoryFreeze()
+		selectNodeKey = self._o_keyAction( event, parentStyleSheet )
+		event.nodeView._f_commandHistoryThaw()
+		return selectNodeKey
+
+
+
+	def handleEmpty(self, event, parentStyleSheet, bMoveCursor):
+		event.nodeView._f_commandHistoryFreeze()
 		if bMoveCursor:
-			nodeView.cursorRight()
-		selectNodeKey = self._o_tokenAction( nodeView, token, docNodeKey, parentStyleSheet )
-		nodeView._f_commandHistoryThaw()
-		return selectNodeKey
+			event.nodeView.cursorRight()
+		selectedNode = self._o_emptyAction( event, parentStyleSheet )
+		event.nodeView._f_commandHistoryThaw()
+		return selectedNode
 
 
-
-	def handleEmpty(self, nodeView, docNodeKey, parentStyleSheet, bMoveCursor):
-		nodeView._f_commandHistoryFreeze()
+	def handleToken(self, event, parentStyleSheet, bMoveCursor):
+		event.nodeView._f_commandHistoryFreeze()
 		if bMoveCursor:
-			nodeView.cursorRight()
-		selectNodeKey = self._o_emptyAction( nodeView, docNodeKey, parentStyleSheet )
-		nodeView._f_commandHistoryThaw()
-		return selectNodeKey
+			event.nodeView.cursorRight()
+		selectedNode = self._o_tokenAction( event, parentStyleSheet )
+		event.nodeView._f_commandHistoryThaw()
+		return selectedNode
 
 
 
-	def handleKeyPress(self, receivingViewNodePath, receivingDocNodePathKeys, widget, keyPressEvent, parentStyleSheet):
-		nodeView = receivingViewNodePath[0]
-		nodeView._f_commandHistoryFreeze()
-		selectNodeKey = self._o_keyAction( receivingViewNodePath, receivingDocNodePathKeys, keyPressEvent, parentStyleSheet )
-		nodeView._f_commandHistoryThaw()
-		return selectNodeKey
 
 
-
-	# Should return select path
-	def _o_tokenAction(self, nodeView, token, docNodeKey, parentStyleSheet):
+	def _o_keyAction(self, event, parentStyleSheet):
 		pass
 
-	def _o_emptyAction(self, nodeView, docNodeKey, parentStyleSheet):
+	# Should return currently selected node view
+	def _o_emptyAction(self, event, parentStyleSheet):
 		pass
 
-	def _o_keyAction(self, receivingViewNodePath, receivingDocNodePathKeys, keyPressEvent, parentStyleSheet):
+	# Should return currently selected node view
+	def _o_tokenAction(self, event, parentStyleSheet):
 		pass
+
+
 
 
 
@@ -67,65 +70,32 @@ class DVStyleSheetSetValueAction (DVStyleSheetAction):
 		self._textToNode = textToNode
 
 
-	def _o_tokenAction(self, nodeView, token, docNodeKey, parentStyleSheet):
-		tokenClassName, text = token
-		parentDocNode = docNodeKey.parentDocNode
-		indexInParent = docNodeKey.index
-		node = self._textToNode( text )
+	def _o_tokenAction(self, event, parentStyleSheet):
+		parentDocNode = event.docNodeKey.parentDocNode
+		indexInParent = event.docNodeKey.index
+		node = self._textToNode( event.token.text )
 		parentDocNode[indexInParent] = node
-		return DocNodeKey( node, parentDocNode, indexInParent )
+		v = event.nodeView.docView.refreshAndGetViewNodeForDocNodeKey( DocNodeKey( node, parentDocNode, indexInParent ) )
+		v.makeCurrent()
+		return v
 
 
 
 
 
 class DVStyleSheetDeleteAction (DVStyleSheetAction):
-	def _o_emptyAction(self, nodeView, docNodeKey, parentStyleSheet):
-		parentDocNode = docNodeKey.parentDocNode
-		indexInParent = docNodeKey.index
+	def _o_emptyAction(self, event, parentStyleSheet):
+		parentDocNode = event.docNodeKey.parentDocNode
+		indexInParent = event.docNodeKey.index
 		del parentDocNode[indexInParent]
 		if len( parentDocNode ) > indexInParent:
-			return DocNodeKey( parentDocNode[indexInParent], parentDocNode, indexInParent )
+			v = nodeView.docView.refreshAndGetViewNodeForDocNodeKey( DocNodeKey( parentDocNode[indexInParent], parentDocNode, indexInParent ) )
+			v.makeCurrent()
+			return v
 		else:
-			return nodeView.parentNodeView.key
+			event.nodeView.parentNodeView.makeCurrent()
+			return event.nodeView.parentNodeView
 
-
-
-
-class DVStyleSheetTokenHandler (KMetaMember):
-	def __init__(self, tokenClassName, action):
-		super( DVStyleSheetTokenHandler, self ).__init__()
-		self._tokenClassName = tokenClassName
-		self._action = action
-
-
-
-	def _f_metaMember_initInstance(self, instance, srcInstance=None):
-		instance._tokenClassNameToHandler[self._tokenClassName] = self
-
-
-
-	def handleToken(self, nodeView, token, docNodeKey, parentStyleSheet, bMoveCursor):
-		return self._action.handleToken( nodeView, token, docNodeKey, parentStyleSheet, bMoveCursor )
-
-
-
-
-
-class DVStyleSheetEmptyHandler (KMetaMember):
-	def __init__(self, action):
-		super( DVStyleSheetEmptyHandler, self ).__init__()
-		self._action = action
-
-
-
-	def _f_metaMember_initInstance(self, instance, srcInstance=None):
-		instance._emptyHandler = self
-
-
-
-	def handleEmpty(self, nodeView, docNodeKey, parentStyleSheet, bMoveCursor):
-		return self._action.handleEmpty( nodeView, docNodeKey, parentStyleSheet, bMoveCursor )
 
 
 
@@ -143,11 +113,8 @@ class DVStyleSheetKeyHandler (KMetaMember):
 
 
 
-	def handleKeyPress(self, receivingViewNodePath, receivingDocNodePathKeys, widget, keyPressEvent, parentStyleSheet):
-		return self._action.handleKeyPress( receivingViewNodePath, receivingDocNodePathKeys, widget, keyPressEvent, parentStyleSheet )
-
-
-
+	def handleKeyPress(self, event, parentStyleSheet):
+		return self._action.handleKeyPress( event, parentStyleSheet )
 
 
 
@@ -166,8 +133,6 @@ class DVStyleSheetAccelHandler (DVStyleSheetKeyHandler):
 
 
 
-
-
 class DVStyleSheetCharHandler (DVStyleSheetKeyHandler):
 	def __init__(self, chars, action):
 		super( DVStyleSheetCharHandler, self ).__init__( action )
@@ -177,6 +142,45 @@ class DVStyleSheetCharHandler (DVStyleSheetKeyHandler):
 	def _f_metaMember_initInstance(self, instance, srcInstance=None):
 		for char in self._chars:
 			instance._charToHandler[char] = self
+
+
+
+
+
+class DVStyleSheetEmptyHandler (KMetaMember):
+	def __init__(self, action):
+		super( DVStyleSheetEmptyHandler, self ).__init__()
+		self._action = action
+
+
+	def _f_metaMember_initInstance(self, instance, srcInstance=None):
+		instance._emptyHandler = self
+
+
+	def handleEmpty(self, event, parentStyleSheet, bMoveCursor):
+		return self._action.handleEmpty( event, parentStyleSheet, bMoveCursor )
+
+
+
+
+
+class DVStyleSheetTokenHandler (KMetaMember):
+	def __init__(self, tokenClassName, action):
+		super( DVStyleSheetTokenHandler, self ).__init__()
+		self._tokenClassName = tokenClassName
+		self._action = action
+
+
+
+	def _f_metaMember_initInstance(self, instance, srcInstance=None):
+		instance._tokenClassNameToHandler[self._tokenClassName] = self
+
+
+
+	def handleToken(self, event, parentStyleSheet, bMoveCursor):
+		return self._action.handleToken( event, parentStyleSheet, bMoveCursor )
+
+
 
 
 
@@ -207,27 +211,11 @@ class DVStyleSheet (KObject):
 
 
 
-	def _f_handleToken(self, nodeView, token, docNodeKey, parentStyleSheet, bMoveCursor):
-		tokenClassName, text = token
-		try:
-			handler = self._tokenClassNameToHandler[tokenClassName]
-		except KeyError:
-			handler = None
-		if handler is not None:
-			return handler.handleToken( nodeView, token, docNodeKey, parentStyleSheet, bMoveCursor )
-
-
-	def _f_handleEmpty(self, nodeView, docNodeKey, parentStyleSheet, bMoveCursor):
-		if self._emptyHandler is not None:
-			return self._emptyHandler.handleEmpty( nodeView, docNodeKey, parentStyleSheet, bMoveCursor )
-
-
-
-	def _f_handleKeyPress(self, receivingViewNodePath, recreceivingDocNodePathKeys, widget, keyPressEvent, parentStyleSheet):
-		state = keyPressEvent.state
-		keyVal = keyPressEvent.keyVal
+	def _f_handleKeyPress(self, event, parentStyleSheet):
+		state = event.keyPressEvent.state
+		keyVal = event.keyPressEvent.keyVal
 		key = keyVal, state
-		char = keyPressEvent.keyString
+		char = event.keyPressEvent.keyString
 
 		# Look up the key handler
 		keyHandler = None
@@ -242,32 +230,30 @@ class DVStyleSheet (KObject):
 
 
 		if keyHandler is not None:
-			return keyHandler.handleKeyPress( receivingViewNodePath, recreceivingDocNodePathKeys, widget, keyPressEvent, parentStyleSheet )
+			return keyHandler.handleKeyPress( event, parentStyleSheet )
 		else:
 			return False
 
 
 
+	def _f_handleEmpty(self, event, parentStyleSheet, bMoveCursor):
+		if self._emptyHandler is not None:
+			return self._emptyHandler.handleEmpty( event, parentStyleSheet, bMoveCursor )
+		else:
+			return None
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	def _f_handleToken(self, event, parentStyleSheet, bMoveCursor):
+		tokenClassName = event.token.tokenClassName
+		try:
+			handler = self._tokenClassNameToHandler[tokenClassName]
+		except KeyError:
+			handler = None
+		if handler is not None:
+			return handler.handleToken( event, parentStyleSheet, bMoveCursor )
+		else:
+			return None
 
 
 

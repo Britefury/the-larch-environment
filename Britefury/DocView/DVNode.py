@@ -24,6 +24,7 @@ from Britefury.DocViewBehavior.DVBDeleteNodeBehavior import DVBDeleteNodeBehavio
 
 from Britefury.DocView.DocView import DocView
 from Britefury.DocView.MoveFocus import MoveFocus
+from Britefury.DocView.DocViewEvent import DocViewEventKey, DocViewEventEmpty, DocViewEventToken
 
 from Britefury.DocPresent.Toolkit.DTWidget import *
 from Britefury.DocPresent.Toolkit.DTBorder import *
@@ -78,7 +79,7 @@ class DVNode (Sheet, DTWidgetKeyHandlerInterface):
 
 	@FunctionRefField
 	def _node_styleSheet(self):
-		return self._view._f_getStyleSheet( self._key )
+		return self._view._f_getStyleSheet( self._docNodeKey )
 
 
 	def _o_refreshNode(self):
@@ -88,40 +89,45 @@ class DVNode (Sheet, DTWidgetKeyHandlerInterface):
 			self._o_styleSheetChanged()
 
 
+	def _o_reset(self):
+		pass
+
+
 	def _o_styleSheetChanged(self):
 		pass
 
 
 
-	def __init__(self, docNode, view, key):
+	def __init__(self, docNode, view, docNodeKey):
 		super( DVNode, self ).__init__()
 		self.docNode = docNode
 		self._view = view
 		self._bDeleting = False
 		self._parent = None
-		self._key = key
+		self._docNodeKey = docNodeKey
 		self._styleSheet = None
 		self.refreshCell = RefCell()
 		self.refreshCell.function = self._o_refreshNode
 
 
 
-	def _f_setParentAndKey(self, parent, key):
-		if parent is not self._parent  or  key != self._key:
+	def _f_setParentAndKey(self, parent, docNodeKey):
+		if parent is not self._parent  or  docNodeKey != self._docNodeKey:
 			self._parent = parent
-			oldKey = self._key
-			self._key = key
-			self._view._f_nodeChangeKey( self, self._key, key )
+			oldKey = self._docNodeKey
+			self._docNodeKey = docNodeKey
+			self._view._f_nodeChangeKey( self, oldKey, docNodeKey )
 			# Force refreshCell to require recomputation due to potential style sheet change
 			self.refreshCell.function = self._o_refreshNode
+		self._o_reset()
 
 
 
 	def getDocView(self):
 		return self._view
 
-	def getKey(self):
-		return self._key
+	def getDocNodeKey(self):
+		return self._docNodeKey
 
 
 
@@ -425,7 +431,7 @@ class DVNode (Sheet, DTWidgetKeyHandlerInterface):
 
 		inputHandler = None
 
-		receivingViewNodePath = ( self, )  +  receivingViewNodePath
+		receivingViewNodePath = [ self ]  +  receivingViewNodePath
 
 		for behavior in self.behaviors:
 			if behavior.handleKeyPress( self, receivingViewNodePath, widget, keyPressEvent ):
@@ -435,24 +441,60 @@ class DVNode (Sheet, DTWidgetKeyHandlerInterface):
 		if self._parent is not None:
 			parentStyleSheet = self._parent._styleSheet
 
-		result = self._styleSheet._f_handleKeyPress( receivingViewNodePath, [ nodeView._key   for nodeView in receivingViewNodePath ], widget, keyPressEvent, parentStyleSheet )
+		result = self._styleSheet._f_handleKeyPress( DocViewEventKey( receivingViewNodePath, keyPressEvent ), parentStyleSheet )
 		if result is not False:
 			return result
 
 		# Pass to the parent node
 		if self._parent is not None:
-			return self._parent._o_handleKeyPress( ( self, ) + receivingViewNodePath, widget, keyPressEvent )
+			return self._parent._o_handleKeyPress( receivingViewNodePath, widget, keyPressEvent )
 		else:
 			return False
 
 
+	# Called by DocPresent widgets
 	def _f_handleKeyPress(self, widget, keyPressEvent):
-		result = self._o_handleKeyPress( (), widget, keyPressEvent)
-		if result is False  or  result is True:
+		return self._o_handleKeyPress( [], widget, keyPressEvent)
+
+
+
+
+	def _f_handleEmpty(self, receivingViewNodePath, bDirectEvent):
+		parentStyleSheet = None
+		if self._parent is not None:
+			parentStyleSheet = self._parent._styleSheet
+
+		receivingViewNodePath = [ self ]  +  receivingViewNodePath
+
+		result = self._styleSheet._f_handleEmpty( DocViewEventEmpty( receivingViewNodePath ), parentStyleSheet, bDirectEvent )
+		if result is not None:
 			return result
-		elif result is not None:
-			self._view._f_handleSelectNode( self, result )
-		return True
+
+		# Pass to the parent node
+		if self._parent is not None:
+			return self._parent._f_handleEmpty( receivingViewNodePath, bDirectEvent )
+		else:
+			return None
+
+
+	def _f_handleToken(self, receivingViewNodePath, token, tokenIndex, numTokens, bDirectEvent):
+		parentStyleSheet = None
+		if self._parent is not None:
+			parentStyleSheet = self._parent._styleSheet
+
+		receivingViewNodePath = [ self ]  +  receivingViewNodePath
+
+		result = self._styleSheet._f_handleToken( DocViewEventToken( receivingViewNodePath, token, tokenIndex, numTokens ), parentStyleSheet, bDirectEvent )
+		if result is not None:
+			return result
+
+		# Pass to the parent node
+		if self._parent is not None:
+			return self._parent._f_handleToken( receivingViewNodePath, token, tokenIndex, bDirectEvent )
+		else:
+			return None
+
+
 
 
 	def makeCurrent(self):
@@ -490,4 +532,4 @@ class DVNode (Sheet, DTWidgetKeyHandlerInterface):
 
 	parentNodeView = property( getParentNodeView )
 	docView = property( getDocView )
-	key = property( getKey )
+	docNodeKey = property( getDocNodeKey )
