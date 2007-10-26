@@ -10,6 +10,17 @@ import pyparsing
 
 
 
+class DocViewToken (object):
+	def __init__(self, tokenClassName, text):
+		self.tokenClassName = tokenClassName
+		self.text = text
+
+
+	def __repr__(self):
+		return 'DocViewToken( %s, %s )'  %  ( self.tokenClassName, self.text )
+
+
+
 class DocViewTokenDefinition (object):
 	def __init__(self, tokenClassName, parser):
 		self._tokenClassName = tokenClassName
@@ -17,7 +28,7 @@ class DocViewTokenDefinition (object):
 
 
 	def _p_parseAction(self, tokens):
-		return self._tokenClassName, tokens[0]
+		return DocViewToken( self._tokenClassName, tokens[0] )
 
 
 
@@ -38,5 +49,5 @@ class DocViewTokeniser (object):
 		if self._parser is not None:
 			return self._parser.parseString( text ).asList()
 		else:
-			return [ ( '', text ) ]
+			return [ DocViewToken( '', text ) ]
 

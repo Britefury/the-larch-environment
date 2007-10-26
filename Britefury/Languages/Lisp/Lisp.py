@@ -46,8 +46,8 @@ def _setValueTokenAction(text):
 
 
 
-def _getInsertPosition(receivingDocNodePathKeys):
-	docNodeKey = receivingDocNodePathKeys[0]
+def _getInsertPosition(receivingDocNodeKeyPath):
+	docNodeKey = receivingDocNodeKeyPath[0]
 	if isinstance( docNodeKey.docNode, DMListInterface ):
 		return docNodeKey.docNode, 0
 	else:
@@ -56,26 +56,56 @@ def _getInsertPosition(receivingDocNodePathKeys):
 
 
 class LispAddListAction (DVStyleSheetAction):
-	def _o_keyAction(self, receivingViewNodePath, receivingDocNodePathKeys, keyPressEvent, parentStyleSheet):
-		#docNodeKey = receivingDocNodePathKeys[0]
-		parentDocNode, indexInParent = _getInsertPosition( receivingDocNodePathKeys )
-		#parentDocNode = docNodeKey.parentDocNode
-		#indexInParent = docNodeKey.index
+	def _p_insertList(self, event, bAfter):
+		if bAfter:
+			parentDocNode, indexInParent = event.receivingDocNodeKeyPath[0].parentDocNode, event.receivingDocNodeKeyPath[0].index + 1
+		else:
+			parentDocNode, indexInParent = _getInsertPosition( event.receivingDocNodeKeyPath )
 		parentDocNode.insert( indexInParent, [] )
-		return DocNodeKey( parentDocNode[indexInParent], parentDocNode, indexInParent )
+		v = event.nodeView.docView.refreshAndGetViewNodeForDocNodeKey( DocNodeKey( parentDocNode[indexInParent], parentDocNode, indexInParent ) )
+		v.makeCurrent()
+		return v
+
+	def _p_replaceWithList(self, event):
+		parentDocNode, indexInParent = event.docNodeKey.parentDocNode, event.docNodeKey.index
+		parentDocNode[indexInParent] = []
+		v = event.nodeView.docView.refreshAndGetViewNodeForDocNodeKey( DocNodeKey( parentDocNode[indexInParent], parentDocNode, indexInParent ) )
+		v.makeCurrent()
+		return v
+
+	def _o_keyAction(self, event, parentStyleSheet):
+		return self._p_insertList( event, False )
+
+	def _o_tokenAction (self, event, parentStyleSheet):
+		if event.bFirst:
+			return self._p_replaceWithList( event )
+		else:
+			return self._p_insertList( event, True )
+
 _addListAction = LispAddListAction()
 
 
 
 
 class LispAddStringAction (DVStyleSheetAction):
-	def _o_keyAction(self, receivingViewNodePath, receivingDocNodePathKeys, keyPressEvent, parentStyleSheet):
-		#docNodeKey = receivingDocNodePathKeys[0]
-		parentDocNode, indexInParent = _getInsertPosition( receivingDocNodePathKeys )
-		#parentDocNode = docNodeKey.parentDocNode
-		#indexInParent = docNodeKey.index
-		parentDocNode.insert( indexInParent, keyPressEvent.keyString )
-		return DocNodeKey( parentDocNode[indexInParent], parentDocNode, indexInParent )
+	def _o_keyAction(self, event, parentStyleSheet):
+		parentDocNode, indexInParent = _getInsertPosition( event.receivingDocNodeKeyPath )
+		parentDocNode.insert( indexInParent, event.keyPressEvent.keyString )
+		v = event.nodeView.docView.refreshAndGetViewNodeForDocNodeKey( DocNodeKey( parentDocNode[indexInParent], parentDocNode, indexInParent ) )
+		v.startEditing()
+		return v
+
+	def _o_tokenAction (self, event, parentStyleSheet):
+		parentDocNode, indexInParent = _getInsertPosition( event.receivingDocNodeKeyPath )
+		parentDocNode.insert( indexInParent, event.token.text )
+		v = event.nodeView.docView.refreshAndGetViewNodeForDocNodeKey( DocNodeKey( parentDocNode[indexInParent], parentDocNode, indexInParent ) )
+		#v.startEditing()
+		if event.bLast:
+			v.startEditing()
+		else:
+			v.makeCurrent()
+		return v
+
 _addStringAction = LispAddStringAction()
 
 
@@ -86,13 +116,14 @@ class LispStringStyleSheet (DVStringStyleSheet):
 
 
 	_setValueTokenHandler = DVStyleSheetTokenHandler( 'string', _setValueTokenAction )
+	_addListTokenHandler = DVStyleSheetTokenHandler( 'openParen', _addListAction )
 
 
 	_deleteAction = DVStyleSheetDeleteAction()
 	_emptyHandler = DVStyleSheetEmptyHandler( _deleteAction )
 
-	_addListHandler = DVStyleSheetCharHandler( '(', _addListAction )
-	_addStringHandler = DVStyleSheetCharHandler( _unquotedStringChars, _addStringAction )
+	_addListKeyHandler = DVStyleSheetCharHandler( '(', _addListAction )
+	_addStringKeyHandler = DVStyleSheetCharHandler( _unquotedStringChars, _addStringAction )
 
 
 
@@ -110,7 +141,8 @@ class DVListSExpressionStyleSheet (DVListWrappedLineStyleSheet):
 		return DTLabel( ')', font='Sans bold 11', colour=Colour3f( 0.0, 0.6, 0.0 ) )
 
 	_addHandler = DVStyleSheetCharHandler( '(', _addListAction )
-	_addStringHandler = DVStyleSheetCharHandler( _unquotedStringChars, _addStringAction )
+	_addStringKeyHandler = DVStyleSheetCharHandler( _unquotedStringChars, _addStringAction )
+	_addStringTokenHandler = DVStyleSheetTokenHandler( 'string', _addStringAction )
 
 
 

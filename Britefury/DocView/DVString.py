@@ -51,6 +51,17 @@ class DVString (DVBorderNode):
 		self._refreshTargetName
 
 
+	def _o_reset(self):
+		super( DVString, self )._o_reset()
+		self.targetNameWidget.text = self.docNode
+
+
+
+	def __init__(self, docNode, view, docNodeKey):
+		super( DVString, self ).__init__( docNode, view, docNodeKey )
+		self._bHandlingModifiedEvent = False
+
+
 
 	def isForDocNode(self, docNode):
 		return docNode == self.docNode
@@ -85,11 +96,14 @@ class DVString (DVBorderNode):
 	def _p_onTokenisedEntryTextModified(self, entry, text, tokens):
 		if tokens is not None:
 			if len( tokens ) > 1  and  entry.isCursorAtEnd():
+				self._bHandlingModifiedEvent = True
 				self._f_handleTokenList( tokens, self._parent._styleSheet, False )
+				self._bHandlingModifiedEvent = False
 
 	def _p_onTokenisedEntryFinishEditing(self, entry, text, tokens, bUserEvent):
-		if tokens is not None:
-			self._f_handleTokenList( tokens, self._parent._styleSheet, bUserEvent )
+		if not self._bHandlingModifiedEvent:
+			if tokens is not None:
+				self._f_handleTokenList( tokens, self._parent._styleSheet, bUserEvent )
 
 
 
@@ -100,5 +114,5 @@ class DVString (DVBorderNode):
 
 
 	def _f_handleTokenList(self, tokens, parentStyleSheet, bDirectEvent):
-		self._view._f_handleTokenList( self, tokens, self._key, parentStyleSheet, bDirectEvent )
+		self._view._f_handleTokenList( self, self._docNodeKey, tokens, parentStyleSheet, bDirectEvent )
 

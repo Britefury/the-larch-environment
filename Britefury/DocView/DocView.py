@@ -69,23 +69,28 @@ class DocView (object):
 			if parentViewNode is not None:
 				parentDocNode = parentViewNode.docNode
 
-			key = DocNodeKey( docNode, parentDocNode, indexInParent )
+			docNodeKey = DocNodeKey( docNode, parentDocNode, indexInParent )
 
 			try:
-				viewNode = self._nodeTable[key]
+				viewNode = self._nodeTable[docNodeKey]
 			except KeyError:
-				viewNode = nodeClass( docNode, self, key )
-				self._nodeTable[key] = viewNode
+				viewNode = nodeClass( docNode, self, docNodeKey )
+				self._nodeTable[docNodeKey] = viewNode
 
 			viewNode.refresh()
 
 			return viewNode
 
 
-	def getViewNodeForDocNodeKey(self, key):
-		return self._nodeTable[key]
+	def getViewNodeForDocNodeKey(self, docNodeKey):
+		return self._nodeTable[docNodeKey]
 
 
+
+
+	def refreshAndGetViewNodeForDocNodeKey(self, docNodeKey):
+		self.refresh()
+		return self._nodeTable[docNodeKey]
 
 
 
@@ -101,8 +106,8 @@ class DocView (object):
 
 
 
-	def _f_getStyleSheet(self, key):
-		return self._styleSheetDispatcher.getStyleSheetForNode( key )
+	def _f_getStyleSheet(self, docNodeKey):
+		return self._styleSheetDispatcher.getStyleSheetForNode( docNodeKey )
 
 
 
@@ -120,17 +125,18 @@ class DocView (object):
 
 
 
-	def _f_handleTokenList(self, nodeView, tokens, key, parentStyleSheet, bDirectEvent):
+	def _f_handleTokenList(self, nodeView, docNodeKey, tokens, parentStyleSheet, bDirectEvent):
 		if len( tokens ) == 0:
-			selectNodeKey = nodeView._styleSheet._f_handleEmpty( nodeView, key, parentStyleSheet, bDirectEvent )
-			self._f_handleSelectNode( nodeView, selectNodeKey )
+			nodeView._f_handleEmpty( [], bDirectEvent )
 		elif len( tokens ) == 1  and  bDirectEvent:
-			selectNodeKey = nodeView._styleSheet._f_handleToken( nodeView, tokens[0], key, parentStyleSheet, True )
-			self._f_handleSelectNode( nodeView, selectNodeKey )
+			nodeView._f_handleToken( [], tokens[0], 0, True )
 		else:
-			for token in tokens:
-				selectNodeKey = nodeView._styleSheet._f_handleToken( nodeView, token, key, parentStyleSheet, False )
-				nodeView = self._f_handleSelectNode( nodeView, selectNodeKey )
+			numTokens = len( tokens )
+			for i, token in enumerate( tokens ):
+				print 'DocView._f_handleTokenList: Handling %s; sending it to %s'  %  ( token, nodeView.docNode )
+				nodeView = nodeView._f_handleToken( [], token, i, numTokens, False )
+				if nodeView is None:
+					break
 
 
 

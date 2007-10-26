@@ -31,8 +31,8 @@ class DVNull (DVBorderNode):
 
 
 
-	def __init__(self, docNode, view, key):
-		super( DVNull, self ).__init__( docNode, view, key )
+	def __init__(self, docNode, view, docNodeKey):
+		super( DVNull, self ).__init__( docNode, view, docNodeKey )
 		self.widget.child = DTLabel( '<null>', font='Sans italic 11', colour=Colour3f( 0.7, 0.0, 0.0 ) )
 
 
