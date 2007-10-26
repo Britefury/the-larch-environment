@@ -1,0 +1,13 @@
+							GSYM DEVELOPMENT NOTES
+
+
+Some useful information about gSym.
+
+
+
+
+Multiple Widgets Having Focus at Once
+	This can sometimes occur, despite the fact that is it not supposed to.
+	It happens due to the following:
+		The widget tree is modified, or a widget focused or de-focused. This triggers a gain/lose focus event. This event is picked up by the application which make further changes to the widget tree, or widget focus,
+		This results in a focus event causing another focus event (recursive events), which results in incorrect operation, due to one event being initiated before the first is finished.

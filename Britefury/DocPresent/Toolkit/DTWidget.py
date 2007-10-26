@@ -553,6 +553,7 @@ class DTWidget (object):
 
 
 	parent = property( _p_getParent )
+	bRealised = property( isRealised )
 	document = property( getDocument )
 	allocation = property( getAllocation )
 	sizeRequest = property( getSizeRequest, setSizeRequest )
