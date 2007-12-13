@@ -1,0 +1,1 @@
+python win32build\insertmanifest.py
