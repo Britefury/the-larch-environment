@@ -107,7 +107,6 @@ if platform == PLATFORM_WIN32:
 
 	pyLibs = [ 'python%s%s'  %  ( sys.version_info[0], sys.version_info[1] ) ]
 	boostPyLibs = [ 'boost_python' ]
-	glLibs = [ 'OpenGL32', 'GLU32' ]
 	ccFlags = [ '/nologo', '/EHsc', '/DLL', '/MD', '"/D_DllExport_=__declspec(dllexport)"', '/D_PLATFORM_WIN32_', '/D_FPU_X86_' ]
 	linkFlags = [ '/NOLOGO' ]
 
@@ -128,7 +127,6 @@ elif platform == PLATFORM_LINUX:
 
 	pyLibs = [ 'python%s'  %  ( _pythonVersion, ) ]
 	boostPyLibs = [ 'boost_python' ]
-	glLibs = [ 'GL', 'GLU' ]
 	ccFlags = [ '-Wall', '-Werror', '-ffast-math', '-g', '-D_DllExport_=', '-D_PLATFORM_POSIX_', '-D_FPU_X86_' ]
 	linkFlags = [ '-g' ]
 
@@ -139,7 +137,7 @@ elif platform == PLATFORM_LINUX:
 incPaths = localIncPaths + pyIncPaths + boostPyIncPaths + standardIncPaths
 libPaths = localLibPaths + pyLibPaths + boostPyLibPaths + standardLibPaths
 
-extLibs = pyLibs + boostPyLibs + glLibs
+extLibs = pyLibs + boostPyLibs
 
 
 
