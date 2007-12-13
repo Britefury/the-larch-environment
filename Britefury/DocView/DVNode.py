@@ -490,7 +490,7 @@ class DVNode (Sheet, DTWidgetKeyHandlerInterface):
 
 		# Pass to the parent node
 		if self._parent is not None:
-			return self._parent._f_handleToken( receivingViewNodePath, token, tokenIndex, bDirectEvent )
+			return self._parent._f_handleToken( receivingViewNodePath, token, tokenIndex, numTokens, bDirectEvent )
 		else:
 			return None
 

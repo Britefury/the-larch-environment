@@ -129,11 +129,10 @@ class DocView (object):
 		if len( tokens ) == 0:
 			nodeView._f_handleEmpty( [], bDirectEvent )
 		elif len( tokens ) == 1  and  bDirectEvent:
-			nodeView._f_handleToken( [], tokens[0], 0, True )
+			nodeView._f_handleToken( [], tokens[0], 0, 1, True )
 		else:
 			numTokens = len( tokens )
 			for i, token in enumerate( tokens ):
-				print 'DocView._f_handleTokenList: Handling %s; sending it to %s'  %  ( token, nodeView.docNode )
 				nodeView = nodeView._f_handleToken( [], token, i, numTokens, False )
 				if nodeView is None:
 					break
