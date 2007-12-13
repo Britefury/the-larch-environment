@@ -393,16 +393,38 @@ class DTDocument (gtk.DrawingArea, DTBin):
 
 
 	def _p_scrollEvent(self, widget, event):
-		if event.direction == gtk.gdk.SCROLL_UP:
-			scroll = Vector2( 0.0, -1.0 )
-		elif event.direction == gtk.gdk.SCROLL_DOWN:
-			scroll = Vector2( 0.0, 1.0 )
-		elif event.direction == gtk.gdk.SCROLL_LEFT:
-			scroll = Vector2( -1.0, 0.0 )
-		elif event.direction == gtk.gdk.SCROLL_RIGHT:
-			scroll = Vector2( 1.0, 0.0 )
-		self._f_evScroll( scroll )
-		self._p_emitImmediateEvents()
+		if event.state  &  ( gtk.gdk.MOD1_MASK | gtk.gdk.SHIFT_MASK | gtk.gdk.CONTROL_MASK )  !=  0:
+			if event.direction == gtk.gdk.SCROLL_UP:
+				scroll = Vector2( 0.0, -1.0 )
+			elif event.direction == gtk.gdk.SCROLL_DOWN:
+				scroll = Vector2( 0.0, 1.0 )
+			elif event.direction == gtk.gdk.SCROLL_LEFT:
+				scroll = Vector2( -1.0, 0.0 )
+			elif event.direction == gtk.gdk.SCROLL_RIGHT:
+				scroll = Vector2( 1.0, 0.0 )
+			self._f_evScroll( scroll )
+			self._p_emitImmediateEvents()
+		else:
+			if event.direction == gtk.gdk.SCROLL_UP:
+				delta = 1.0
+			elif event.direction == gtk.gdk.SCROLL_DOWN:
+				delta = -1.0
+			
+			scaleDelta = 2.0  **  ( delta / 2.0 )
+
+			# We want to scale about the pointer position, not the top left corner
+			centre = Vector2( event.x, event.y )
+			centreInDocSpace = ( centre - self._docOffset )  *  ( 1.0 / self._docScale )
+			self._docScale *= scaleDelta
+			newCentreInDocSpace = ( centre - self._docOffset )  *  ( 1.0 / self._docScale )
+
+			self._docOffset += ( newCentreInDocSpace - centreInDocSpace ) * self._docScale
+
+
+			self.childScale = self._docScale
+			bModified = True
+			self._o_queueResize()
+			
 
 
 
