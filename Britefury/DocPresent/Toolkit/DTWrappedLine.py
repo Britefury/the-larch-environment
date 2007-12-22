@@ -6,12 +6,12 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
 from Britefury.Math.Math import Point2, Vector2
-from Britefury.DocPresent.Toolkit.DTContainer import DTContainer
+from Britefury.DocPresent.Toolkit.DTContainerList import DTContainerList
 
 
 
-class DTWrappedLine (DTContainer):
-	class ChildEntry (DTContainer.ChildEntry):
+class DTWrappedLine (DTContainerList):
+	class ChildEntry (DTContainerList.ChildEntry):
 		def __init__(self, child, padding):
 			super( DTWrappedLine.ChildEntry, self ).__init__( child )
 			self.padding = padding
@@ -48,89 +48,23 @@ class DTWrappedLine (DTContainer):
 
 
 
-	def __len__(self):
-		return len( self._childEntries )
-
-	def __getitem__(self, index):
-		entry = self._childEntries[index]
-		if isinstance( entry, list ):
-			return [ e.child   for e in entry ]
-		else:
-			return entry.child
-
-	def __setitem__(self, index, item):
-		if isinstance( index, slice ):
-			oldEntrySet = set( self._childEntries )
-			self._childEntries[index] = [ self._p_itemToChildEntry( x )  for x in item ]
-			newEntrySet = set( self._childEntries )
-
-			removed = oldEntrySet.difference( newEntrySet )
-			added = newEntrySet.difference( oldEntrySet )
-
-			for entry in removed:
-				self._o_unregisterChildEntry( entry )
-
-			for entry in added:
-				self._o_registerChildEntry( entry )
-
-			self._o_queueResize()
-		else:
-			newEntry = self._p_itemToChildEntry( item )
-			oldEntry = self._childEntries[index]
-			self._o_unregisterChildEntry( oldEntry )
-			self._childEntries[index] = newEntry
-			self._o_registerChildEntry( newEntry )
-			self._o_queueResize()
-
-	def __delitem__(self, index):
-		entry = self._childEntries[index]
-		del self._childEntries[index]
-		if isinstance( entry, list ):
-			for e in entry:
-				self._o_unregisterChildEntry( entry )
-		else:
-			self._o_unregisterChildEntry( entry )
-		self._o_queueResize()
-
-
-	def append(self, child, padding=None):
-		assert not self.hasChild( child ), 'child already present'
+	def _p_buildEntry(self, child, padding=None):
 		if padding is None:
 			padding = self._padding
-		entry = self.ChildEntry( child, padding )
-		self._childEntries.append( entry )
-		self._o_registerChildEntry( entry )
-		self._o_queueResize()
+		return self.ChildEntry( child, padding )
+
+	def append(self, child, padding=None):
+		entry = self._p_buildEntry( child, padding )
+		self._o_appendEntry( entry )
 
 	def extend(self, children):
 		entries = [ self.ChildEntry( child, self._padding )   for child in children ]
-		self._childEntries.extend( entries )
-		for entry in entries:
-			self._o_registerChildEntry( entry )
-		self._o_queueResize()
+		self._o_extendEntries( entries )
 
 	def insert(self, index, child, padding=None):
 		assert not self.hasChild( child ), 'child already present'
-		if padding is None:
-			padding = self._padding
-		entry = self.ChildEntry( child, padding )
-		self._childEntries.insert( index, entry )
-		self._o_registerChildEntry( entry )
-		self._o_queueResize()
-
-
-	def remove(self, child):
-		assert self.hasChild( child ), 'child not present'
-		entry = self._childToEntry[child]
-		self._childEntries.remove( entry )
-		self._o_unregisterChildEntry( entry )
-		self._o_queueResize()
-
-
-	def _f_removeChild(self, child):
-		entry = self._childToEntry[child]
-		index = self._childEntries.index( entry )
-		self[index] = DTBin()
+		entry = self._p_buildEntry( child, padding )
+		self._o_insertEntry( index, entry )
 
 
 	def _o_getRequiredWidth(self):

@@ -6,13 +6,13 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
 from Britefury.Math.Math import Point2, Vector2
-from Britefury.DocPresent.Toolkit.DTContainer import DTContainer
+from Britefury.DocPresent.Toolkit.DTContainerList import DTContainerList
 from Britefury.DocPresent.Toolkit.DTDirection import DTDirection
 from Britefury.DocPresent.Toolkit.DTBin import DTBin
 
 
 
-class DTBox (DTContainer):
+class DTBox (DTContainerList):
 	ALIGN_LEFT = 0
 	ALIGN_TOP = 0
 	ALIGN_CENTRE = 1
@@ -23,7 +23,7 @@ class DTBox (DTContainer):
 	_ALIGN_BOTTOMRIGHT = 2
 
 
-	class ChildEntry (DTContainer.ChildEntry):
+	class ChildEntry (DTContainerList.ChildEntry):
 		def __init__(self, child, bExpand, bFill, bShrink, minorDirectionAlignment, padding):
 			super( DTBox.ChildEntry, self ).__init__( child )
 			self.bExpand = bExpand
@@ -70,56 +70,7 @@ class DTBox (DTContainer):
 			return self.ChildEntry( item, self._bExpand, self._bFill, self._bShrink, self._minorDirectionAlignment, self._padding )
 
 
-	def __len__(self):
-		return len( self._childEntries )
-
-	def __getitem__(self, index):
-		entry = self._childEntries[index]
-		if isinstance( entry, list ):
-			return [ e.child   for e in entry ]
-		else:
-			return entry.child
-
-	def __setitem__(self, index, item):
-		if isinstance( index, slice ):
-			oldEntrySet = set( self._childEntries )
-			self._childEntries[index] = [ self._p_itemToChildEntry( x )  for x in item ]
-			newEntrySet = set( self._childEntries )
-
-			removed = oldEntrySet.difference( newEntrySet )
-			added = newEntrySet.difference( oldEntrySet )
-
-			for entry in removed:
-				self._o_unregisterChildEntry( entry )
-
-			for entry in added:
-				self._o_registerChildEntry( entry )
-
-			self._p_childListModified()
-			self._o_queueResize()
-		else:
-			newEntry = self._p_itemToChildEntry( item )
-			oldEntry = self._childEntries[index]
-			self._o_unregisterChildEntry( oldEntry )
-			self._childEntries[index] = newEntry
-			self._o_registerChildEntry( newEntry )
-			self._p_childListModified()
-			self._o_queueResize()
-
-	def __delitem__(self, index):
-		entry = self._childEntries[index]
-		del self._childEntries[index]
-		if isinstance( entry, list ):
-			for e in entry:
-				self._o_unregisterChildEntry( e )
-		else:
-			self._o_unregisterChildEntry( entry )
-		self._p_childListModified()
-		self._o_queueResize()
-
-
-	def append(self, child, bExpand=None, bFill=None, bShrink=None, minorDirectionAlignment=None, padding=None):
-		assert not self.hasChild( child ), 'child already present'
+	def _p_buildEntry(self, child, bExpand=None, bFill=None, bShrink=None, minorDirectionAlignment=None, padding=None):
 		if bExpand is None:
 			bExpand = self._bExpand
 		if bFill is None:
@@ -130,43 +81,22 @@ class DTBox (DTContainer):
 			minorDirectionAlignment = self._minorDirectionAlignment
 		if padding is None:
 			padding = self._padding
-		entry = self.ChildEntry( child, bExpand, bFill, bShrink, minorDirectionAlignment, padding )
-		self._childEntries.append( entry )
-		self._o_registerChildEntry( entry )
-		self._p_childListModified()
-		self._o_queueResize()
+		return self.ChildEntry( child, bExpand, bFill, bShrink, minorDirectionAlignment, padding )
+
+
+	def append(self, child, bExpand=None, bFill=None, bShrink=None, minorDirectionAlignment=None, padding=None):
+		entry = self._p_buildEntry( child, bExpand, bFill, bShrink, minorDirectionAlignment, padding )
+		self._o_appendEntry( entry )
 
 	def extend(self, children):
-		for child in children:
-			self.append( child )
+		entries = [ self.ChildEntry( child, self._bExpand, self._bFill, self._bShrink, self._minorDirectionAlignment, self._padding )   for child in children ]
+		self._o_extendEntries( entries )
 
 
 	def insert(self, index, child, bExpand=None, bFill=None, bShrink=None, minorDirectionAlignment=None, padding=None):
 		assert not self.hasChild( child ), 'child already present'
-		if bExpand is None:
-			bExpand = self._bExpand
-		if bFill is None:
-			bFill = self._bFill
-		if bShrink is None:
-			bShrink = self._bShrink
-		if minorDirectionAlignment is None:
-			minorDirectionAlignment = self._minorDirectionAlignment
-		if padding is None:
-			padding = self._padding
-		entry = self.ChildEntry( child, bExpand, bFill, bShrink, minorDirectionAlignment, padding )
-		self._childEntries.insert( index, entry )
-		self._o_registerChildEntry( entry )
-		self._p_childListModified()
-		self._o_queueResize()
-
-
-	def remove(self, child):
-		assert self.hasChild( child ), 'child not present'
-		entry = self._childToEntry[child]
-		self._childEntries.remove( entry )
-		self._o_unregisterChildEntry( entry )
-		self._p_childListModified()
-		self._o_queueResize()
+		entry = self._p_buildEntry( child, bExpand, bFill, bShrink, minorDirectionAlignment, padding )
+		self._o_insertEntry( index, entry )
 
 
 	def getInsertIndex(self, localPos):
@@ -213,12 +143,6 @@ class DTBox (DTContainer):
 		raise ValueError, 'Could not determine insert position'
 
 
-
-
-	def _f_removeChild(self, child):
-		entry = self._childToEntry[child]
-		index = self._childEntries.index( entry )
-		self[index] = DTBin()
 
 
 	def _p_childListModified(self):
@@ -367,6 +291,11 @@ class DTBox (DTContainer):
 
 	def _o_onChildResizeRequest(self, child):
 		self._o_queueResize()
+
+
+
+	def isOrderReversed(self):
+		return self._direction == DTDirection.RIGHT_TO_LEFT  or  self._direction == DTDirection.BOTTOM_TO_TOP
 
 
 

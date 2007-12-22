@@ -7,6 +7,8 @@
 ##-*************************
 from Britefury.Math.Math import BBox2, Point2, Vector2, Xform2
 
+from Britefury.Kernel.Abstract import abstractmethod
+
 from Britefury.DocPresent.Toolkit.DTWidget import DTWidget
 from Britefury.DocViewHelper.DocViewHelper import DocViewBoxTable
 
@@ -382,8 +384,51 @@ class DTContainer (DTWidget):
 
 		for childEntry in self._childEntries:
 			childEntry.child._f_setDocument( document )
+			
+			
+			
+	#
+	# CURSOR NAVIGATION METHODS
+	#
+	
+	def _f_getPrevCursorEntityBeforeChild(self, child):
+		e = self._o_getPrevCursorEntityBeforeChild( child )
+		if e is not None:
+			return e
+		else:
+			p = self.parent
+			if p is not None:
+				return p._f_getPrevCursorEntityBeforeChild( self )
+			else:
+				return None
+		
+	def _f_getNextCursorEntityAfterChild(self, child):
+		e = self._o_getNextCursorEntityAfterChild( child )
+		if e is not None:
+			return e
+		else:
+			p = self.parent
+			if p is not None:
+				return p._f_getNextCursorEntityAfterChild( self )
+			else:
+				return None
+			
 
 
+	@abstractmethod
+	def _o_getPrevCursorEntityBeforeChild(self, child):
+		return None
+		
+	@abstractmethod
+	def _o_getNextCursorEntityAfterChild(self, child):
+		return None
+
+
+
+
+	#
+	# DEBUG METHODS
+	#
 
 	def _dbg_getWidgetsWithFocus(self):
 		widgets = super( DTContainer, self )._dbg_getWidgetsWithFocus()
