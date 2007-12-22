@@ -78,15 +78,15 @@ class DTDocument (gtk.DrawingArea, DTBin):
 
 		# Tell the widget to send these events
 		self.add_events( gtk.gdk.EXPOSURE_MASK |
-					gtk.gdk.BUTTON_PRESS_MASK |
-					gtk.gdk.BUTTON_RELEASE_MASK |
-					gtk.gdk.POINTER_MOTION_MASK |
-					gtk.gdk.POINTER_MOTION_HINT_MASK |
-					gtk.gdk.ENTER_NOTIFY_MASK |
-					gtk.gdk.LEAVE_NOTIFY_MASK |
-					gtk.gdk.SCROLL_MASK |
-					gtk.gdk.KEY_PRESS_MASK |
-					gtk.gdk.KEY_RELEASE_MASK )
+				 gtk.gdk.BUTTON_PRESS_MASK |
+				 gtk.gdk.BUTTON_RELEASE_MASK |
+				 gtk.gdk.POINTER_MOTION_MASK |
+				 gtk.gdk.POINTER_MOTION_HINT_MASK |
+				 gtk.gdk.ENTER_NOTIFY_MASK |
+				 gtk.gdk.LEAVE_NOTIFY_MASK |
+				 gtk.gdk.SCROLL_MASK |
+				 gtk.gdk.KEY_PRESS_MASK |
+				 gtk.gdk.KEY_RELEASE_MASK )
 
 		if bCanGrabFocus:
 			self.set_flags( gtk.CAN_FOCUS )
@@ -409,8 +409,8 @@ class DTDocument (gtk.DrawingArea, DTBin):
 				delta = 1.0
 			elif event.direction == gtk.gdk.SCROLL_DOWN:
 				delta = -1.0
-			
-			scaleDelta = 2.0  **  ( delta / 2.0 )
+
+			scaleDelta = 2.0  **  ( delta / 1.5 )
 
 			# We want to scale about the pointer position, not the top left corner
 			centre = Vector2( event.x, event.y )
@@ -424,7 +424,7 @@ class DTDocument (gtk.DrawingArea, DTBin):
 			self.childScale = self._docScale
 			bModified = True
 			self._o_queueResize()
-			
+
 
 
 
@@ -433,7 +433,7 @@ class DTDocument (gtk.DrawingArea, DTBin):
 
 
 
-        def do_key_press_event(self, event):
+	def do_key_press_event(self, event):
 		keyEvent = DTKeyEvent( event )
 		key = keyEvent.keyVal, keyEvent.state
 		if key == _undoAccel:
@@ -457,7 +457,7 @@ class DTDocument (gtk.DrawingArea, DTBin):
 				return False
 
 
-        def do_key_release_event(self, event):
+	def do_key_release_event(self, event):
 		keyEvent = DTKeyEvent( event )
 		key = keyEvent.keyVal, keyEvent.state
 		if key == _undoAccel  or  key == _redoAccel:
@@ -483,6 +483,24 @@ class DTDocument (gtk.DrawingArea, DTBin):
 	def _p_unrealiseEvent(self, widget):
 		self._f_evUnrealise()
 		self._p_emitImmediateEvents()
+
+
+
+	def _p_getCursorWidget(self):
+		pass
+
+
+	def _p_cursorLeft(self):
+		self._p_getCursor
+		
+	def _p_cursorRight(self):
+		pass
+	
+	def _p_cursorUp(self):
+		pass
+	
+	def _p_cursorDown(self):
+		pass
 
 
 

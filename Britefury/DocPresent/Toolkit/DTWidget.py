@@ -10,7 +10,7 @@ from copy import copy
 
 from Britefury.Math.Math import Point2, Vector2, Xform2, BBox2
 
-from Britefury.Kernel.Abstract import *
+from Britefury.Kernel.Abstract import abstractmethod
 
 from Britefury.DocPresent.Toolkit.DTKeyEvent import DTKeyEvent
 
@@ -504,6 +504,38 @@ class DTWidget (object):
 		self._bResizeQueued = False
 		self._allocation.y = allocation
 		self._o_onAllocateY( allocation )
+
+
+
+
+	@abstractmethod
+	def getFirstCursorEntity(self):
+		pass
+	
+	@abstractmethod
+	def getLastCursorEntity(self):
+		pass
+
+
+	def getPrevCursorEntity(self):
+		first = self.getFirstCursorEntity()
+		if first is not None:
+			return first.prev
+		else:
+			if self._parent is not None:
+				return self._parent._f_getPrevCursorEntityBeforeChild( self )
+			else:
+				return None
+
+	def getNextCursorEntity(self):
+		last = self.getLastCursorEntity()
+		if last is not None:
+			return last.next
+		else:
+			if self._parent is not None:
+				return self._parent._f_getNextCursorEntityAfterChild( self )
+			else:
+				return None
 
 
 
