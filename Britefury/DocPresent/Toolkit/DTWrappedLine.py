@@ -6,12 +6,12 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
 from Britefury.Math.Math import Point2, Vector2
-from Britefury.DocPresent.Toolkit.DTContainerList import DTContainerList
+from Britefury.DocPresent.Toolkit.DTContainerSequence import DTContainerSequence
 
 
 
-class DTWrappedLine (DTContainerList):
-	class ChildEntry (DTContainerList.ChildEntry):
+class DTWrappedLine (DTContainerSequence):
+	class ChildEntry (DTContainerSequence.ChildEntry):
 		def __init__(self, child, padding):
 			super( DTWrappedLine.ChildEntry, self ).__init__( child )
 			self.padding = padding
@@ -35,6 +35,11 @@ class DTWrappedLine (DTContainerList):
 	def setSpacing(self, spacing):
 		self._spacing = spacing
 		self._o_queueResize()
+		
+		
+		
+	def remove(self, child):
+		self._o_remove( child )
 
 
 

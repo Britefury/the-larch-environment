@@ -89,6 +89,25 @@ class DTBin (DTContainer):
 
 
 
+	#
+	# CURSOR NAVIGATION METHODS
+	#
+
+	def getFirstCursorEntity(self):
+		return self._child.getFirstCursorEntity()
+
+
+	def getLastCursorEntity(self):
+		return self._child.getLastCursorEntity()
+
+	
+	def _o_getPrevCursorEntityBeforeChild(self, child):
+		return None
+		
+	def _o_getNextCursorEntityAfterChild(self, child):
+		return None
+
+
 
 	child = property( getChild, setChild )
 	childScale = property( getChildScale, setChildScale )
