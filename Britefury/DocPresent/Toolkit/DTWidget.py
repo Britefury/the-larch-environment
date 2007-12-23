@@ -508,6 +508,10 @@ class DTWidget (object):
 
 
 
+	#
+	# CURSOR NAVIGATION METHODS
+	#
+
 	@abstractmethod
 	def getFirstCursorEntity(self):
 		pass

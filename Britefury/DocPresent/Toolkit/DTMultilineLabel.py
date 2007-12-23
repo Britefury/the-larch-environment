@@ -14,11 +14,11 @@ import pangocairo
 
 from Britefury.Math.Math import Colour3f, Vector2
 
-from Britefury.DocPresent.Toolkit.DTWidget import DTWidget
+from Britefury.DocPresent.Toolkit.DTSimpleStaticWidget import DTSimpleStaticWidget
 
 
 
-class DTMultilineLabel (DTWidget):
+class DTMultilineLabel (DTSimpleStaticWidget):
 	HALIGN_LEFT = 0
 	HALIGN_CENTRE = 1
 	HALIGN_RIGHT = 2
