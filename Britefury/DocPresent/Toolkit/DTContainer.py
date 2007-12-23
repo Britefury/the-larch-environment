@@ -417,11 +417,11 @@ class DTContainer (DTWidget):
 
 	@abstractmethod
 	def _o_getPrevCursorEntityBeforeChild(self, child):
-		return None
+		pass
 		
 	@abstractmethod
 	def _o_getNextCursorEntityAfterChild(self, child):
-		return None
+		pass
 
 
 

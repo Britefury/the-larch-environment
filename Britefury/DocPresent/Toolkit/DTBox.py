@@ -6,13 +6,13 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
 from Britefury.Math.Math import Point2, Vector2
-from Britefury.DocPresent.Toolkit.DTContainerList import DTContainerList
+from Britefury.DocPresent.Toolkit.DTContainerSequence import DTContainerSequence
 from Britefury.DocPresent.Toolkit.DTDirection import DTDirection
 from Britefury.DocPresent.Toolkit.DTBin import DTBin
 
 
 
-class DTBox (DTContainerList):
+class DTBox (DTContainerSequence):
 	ALIGN_LEFT = 0
 	ALIGN_TOP = 0
 	ALIGN_CENTRE = 1
@@ -23,7 +23,7 @@ class DTBox (DTContainerList):
 	_ALIGN_BOTTOMRIGHT = 2
 
 
-	class ChildEntry (DTContainerList.ChildEntry):
+	class ChildEntry (DTContainerSequence.ChildEntry):
 		def __init__(self, child, bExpand, bFill, bShrink, minorDirectionAlignment, padding):
 			super( DTBox.ChildEntry, self ).__init__( child )
 			self.bExpand = bExpand
@@ -59,6 +59,10 @@ class DTBox (DTContainerList):
 		self._spacing = spacing
 		self._o_queueResize()
 
+
+
+	def remove(self, child):
+		self._o_remove( child )
 
 
 
