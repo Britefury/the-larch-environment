@@ -14,11 +14,11 @@ import pangocairo
 
 from Britefury.Math.Math import Colour3f, Vector2
 
-from Britefury.DocPresent.Toolkit.DTWidget import DTWidget
+from Britefury.DocPresent.Toolkit.DTSimpleStaticWidget import DTSimpleStaticWidget
 
 
 
-class DTHLine (DTWidget):
+class DTHLine (DTSimpleStaticWidget):
 	def __init__(self, thickness=1.0, colour=Colour3f( 0.0, 0.0, 0.0)):
 		super( DTHLine, self ).__init__()
 

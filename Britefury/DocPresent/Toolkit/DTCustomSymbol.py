@@ -14,11 +14,12 @@ import pangocairo
 
 from Britefury.Math.Math import Colour3f, Vector2
 
-from Britefury.DocPresent.Toolkit.DTWidget import DTWidget
+from Britefury.DocPresent.Toolkit.DTCursorEntity import DTCursorEntity
+from Britefury.DocPresent.Toolkit.DTWidget import DTSimpleStaticWidget
 
 
 
-class DTCustomSymbol (DTWidget):
+class DTCustomSymbol (DTSimpleStaticWidget):
 	HALIGN_LEFT = 0
 	HALIGN_CENTRE = 1
 	HALIGN_RIGHT = 2
@@ -37,6 +38,8 @@ class DTCustomSymbol (DTWidget):
 		self._vAlign = vAlign
 		self._symbolPosition = Vector2()
 		self._symbolSize = None
+		
+		self._symbolCusorEntity = DTCursorEntity( self )
 
 		self._o_queueResize()
 

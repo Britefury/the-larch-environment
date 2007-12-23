@@ -6,6 +6,8 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
 from Britefury.Math.Math import Point2, Vector2
+
+from Britefury.DocPresent.Toolkit.DTCursorEntity import DTCursorEntity
 from Britefury.DocPresent.Toolkit.DTContainer import DTContainer
 
 
@@ -40,11 +42,13 @@ class DTScript (DTContainer):
 				entry = self._childToEntry[self._leftChild]
 				self._childEntries.remove( entry )
 				self._o_unregisterChildEntry( entry )
+				DTCursorEntity.remove( self._leftChild.getFirstCursorEntity(), self._leftChild.getLastCursorEntity() )
 			self._leftChild = child
 			if self._leftChild is not None:
 				entry = self.ChildEntry( self._leftChild )
 				self._childEntries.append( entry )
 				self._o_registerChildEntry( entry )
+				DTCursorEntity.splice( self._f_getPrevCursorEntityBeforeChild( self._leftChild ), self._f_getNextCursorEntityAfterChild( self._leftChild ), self._leftChild.getFirstCursorEntity(), self._leftChild.getLastCursorEntity() )
 
 			self._o_queueResize()
 
@@ -60,11 +64,13 @@ class DTScript (DTContainer):
 				entry = self._childToEntry[self._rightChild]
 				self._childEntries.remove( entry )
 				self._o_unregisterChildEntry( entry )
+				DTCursorEntity.remove( self._rightChild.getFirstCursorEntity(), self._rightChild.getLastCursorEntity() )
 			self._rightChild = child
 			if self._rightChild is not None:
 				entry = self.ChildEntry( self._rightChild )
 				self._childEntries.append( entry )
 				self._o_registerChildEntry( entry )
+				DTCursorEntity.splice( self._f_getPrevCursorEntityBeforeChild( self._rightChild ), self._f_getNextCursorEntityAfterChild( self._rightChild ), self._rightChild.getFirstCursorEntity(), self._rightChild.getLastCursorEntity() )
 
 			self._o_queueResize()
 
@@ -158,6 +164,46 @@ class DTScript (DTContainer):
 		if self._rightChild is not None:
 			self._rightChild._f_setScale( self._childScale, rootScale * self._childScale )
 
+
+
+
+	#
+	# CURSOR NAVIGATION METHODS
+	#
+
+	def getFirstCursorEntity(self):
+		if self._leftChild is not None:
+			return self._leftChild.getFirstCursorEntity()
+		elif self._rightChild is not None:
+			return self._rightChild.getFirstCursorEntity()
+		else:
+			return None
+
+
+	def getLastCursorEntity(self):
+		if self._rightChild is not None:
+			return self._rightChild.getLastCursorEntity()
+		elif self._leftChild is not None:
+			return self._leftChild.getLastCursorEntity()
+		else:
+			return None
+		
+		
+	
+	def _o_getPrevCursorEntityBeforeChild(self, child):
+		if child is self._rightChild  and  self._leftChild is not None:
+			return self._leftChild.getLastCursorEntity()
+		else:
+			return None
+	
+		
+	def _o_getNextCursorEntityAfterChild(self, child):
+		if child is self._leftChild  and  self._rightChild is not None:
+			return self._rightChild.getFirstCursorEntity()
+		else:
+			return None
+	
+	
 
 
 
