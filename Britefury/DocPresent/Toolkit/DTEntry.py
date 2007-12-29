@@ -19,7 +19,8 @@ from Britefury.Math.Math import Colour3f, Vector2, Point2
 
 from Britefury.Util.SignalSlot import *
 
-from Britefury.DocPresent.Toolkit.DTWidget import DTWidget
+#HACK
+from Britefury.DocPresent.Toolkit.DTSimpleStaticWidget import DTSimpleStaticWidget
 from Britefury.DocPresent.Toolkit.DTAutoCompleteDropDown import DTAutoCompleteDropDown
 
 
@@ -30,7 +31,8 @@ _modKeysMask = ( gtk.gdk.SHIFT_MASK | gtk.gdk.CONTROL_MASK | gtk.gdk.MOD1_MASK )
 
 
 
-class DTEntry (DTWidget):
+# HACK; derive from DTWidget
+class DTEntry (DTSimpleStaticWidget):
 	returnSignal = ClassSignal()       				# ( entry )
 	textInsertedSignal = ClassSignal()				# ( entry, position, bAppended, textInserted )
 	textDeletedSignal = ClassSignal()				# ( entry, startIndex, endIndex, textDeleted )
