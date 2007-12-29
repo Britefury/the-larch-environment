@@ -96,6 +96,8 @@ class DMList (DMListInterface):
 			self._commandTracker_._f_onInserted( self, i, x )
 
 	def remove(self, x):
+		if x not in self:
+			raise ValueError
 		if self._commandTracker_ is not None:
 			self._commandTracker_._f_onRemove( self, x )
 		v = self._cell.literalValue

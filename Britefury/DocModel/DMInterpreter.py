@@ -5,80 +5,247 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
+import sys
+import types
 from copy import copy
 
 from Britefury.DocModel.DMListInterface import DMListInterface
 
 
+class DMINameError (Exception):
+	pass
+
+class DMIMethodError (Exception):
+	pass
+
+
+
+
+_dmiMethodNameMap = {
+	'+' : '__add__',
+	'-' : '__sub__',
+	'*' : '__mul__',
+	'/' : '__div__',
+	'%' : '__mod__',
+	'**' : '__pow__',
+	'<<' : '__lshift__',
+	'>>' : '__rshift__',
+	'&' : '__and__',
+	'|' : '__or__',
+	'^' : '__xor__',
+	'<' : lambda x, y: x < y,
+	'<=' : lambda x, y: x <= y,
+	'==' : lambda x, y: x == y,
+	'!=' : lambda x, y: x != y,
+	'>' : lambda x, y: x > y,
+	'>=' : lambda x, y: x >= y,
+	}
+
+
+
+
+class macro (object):
+	def __init__(self, f):
+		self._f = f
+	
+	def invoke(self, obj, env, xs):
+		return self._f( obj, xs )
+	
+
+
+
+
+
+#class DMIClass (type):
+	#def __init__(cls, clsName, clsBases, clsDict):
+		#super( DMIClass, cls ).__init__( cls, clsName, clsBases, clsDict )
+		
+		#for key, value in clsDict.items():
+			#if isinstance( value, types.FunctionType ):
+				#setattr( cls, key, method( value ) )
+
+
+
+class DMIObject (object):
+	#__metaclass__ = DMIClass
+	pass
+
+
+
+class DMSys (DMIObject):
+	def __init__(self, stdout=sys.stdout):
+		super( DMSys, self ).__init__()
+		self._stdout = stdout
+
+	def stdout(self, s):
+		self._stdout.write( s )
+		
 
 
 class DMInterpreterEnv (object):
-	def __init__(self, env={}):
-		super( DMInterpreterEnv, self ).__init__()
-
+	def __init__(self, **env):
 		self._env = copy( env )
-
-
-	def update(self, env):
-		e2 = DMInterpreterEnv( self._env )
-		e2._env.update( env )
-		return e2
-
-	def funcs(self, funcs):
-		e2 = DMInterpreterEnv( self._env )
-		for f in funcs:
-			name = f.__name__
-			if name.startswith( '_' ):
-				name = name[1:]
-			e2._env[name] = f
-		return e2
-
-
+		
+		
+	def _p_interpretLiteral(self, xs):
+		if xs[0] == '@':
+			varName = xs[1:]
+			try:
+				return self._env[varName]
+			except KeyError:
+				raise DMINameError, '%s not bound'  %  ( varName, )
+		elif xs[0] == '#':
+			value = xs[1:]
+			if value == 'False':
+				return False
+			elif value == 'True':
+				return True
+			elif value == 'None':
+				return None
+			elif value.isdigit():
+				return int( value )
+			else:
+				return None
+		else:
+			return xs
+		
+		
+		
 	def dmEval(self, xs):
-		assert isinstance( xs, DMListInterface )
-		assert len( xs ) > 0, 'empty list'
+		if xs is None:
+			return None
+		elif isinstance( xs, DMListInterface ):
+			x0 = xs[0]
+			if x0 == '=':
+				# Assignment
+				target = xs[1]
+				value = xs[2]
+				if target[0] != '@':
+					raise DMINameError, 'var name %s must start with @'  %  ( target, )
+				target = target[1:]
+				if isinstance( value, str ):
+					self._env[target] = value
+				else:
+					self._env[target] = DMInterpreterEnv( **self._env ).dmEval( value )
+				return None
+			else:
+				if isinstance( x0, DMListInterface ):
+					target = DMInterpreterEnv( **self._env ).dmEval( x0 )
+				else:
+					target = self._p_interpretLiteral( x0 )
+				
+				methodName = xs[1]
+				methodName = _dmiMethodNameMap.get( methodName, methodName )
+				
+				if isinstance( methodName, str ):
+					try:
+						method = getattr( target, methodName )
+					except AttributeError:
+						raise DMIMethodError, '%s has no method %s' % ( target, methodName )
+				elif isinstance( methodName, types.LambdaType ):
+					arg1 = DMInterpreterEnv( **self._env ).dmEval( xs[2] )
+					return methodName( target, arg1 )
+				
+				if isinstance( method, macro ):
+					return method.invoke( target, self, xs )
+				else:
+					args = [ DMInterpreterEnv( **self._env ).dmEval( dmarg )   for dmarg in xs[2:] ]
+					return method( *args )
+					
+		else:
+			return self._p_interpretLiteral( xs )
 
-		funcName = xs[0]
 
-		try:
-			func = self._env[funcName]
-		except KeyError:
-			raise KeyError, 'no function called %s' % ( funcName, )
-		return func( self, *xs[1:] )
-
-
-
+	def dmExec(self, xs):
+		if isinstance( xs, DMListInterface ):
+			if len( xs ) > 0:
+				if isinstance( xs[0], DMListInterface ):
+					for x in xs:
+						self.dmEval( x )
+				else:
+					self.dmEval( xs )
+		else:
+			self.dmEval( xs )
+		
+		
 
 
 import unittest
 from Britefury.DocModel.DMList import DMList
+from Britefury.DocModel.DMIO import readSX
+import cStringIO
 
 
 
 class TestCase_DMInterpreter (unittest.TestCase):
-	def testInterp(self):
-		env = DMInterpreterEnv()
+	def setUp(self):
+		self.stdout = cStringIO.StringIO()
+		
+	def tearDown(self):
+		self.stdout.close()
 
-		def _string(env, value):
-			return value
-
-		def _concat(env, *strings):
-			res = ''
-			for x in strings:
-				res += env.dmEval( x )
-			return res
-
-		env = env.funcs( [ _string, _concat ] )
-
-		program = DMList()
-		program.append( 'concat' )
-		program.append( DMList( [ 'string', 'a' ] ) )
-		program.append( DMList( [ 'string', 'b' ] ) )
-		program.append( DMList( [ 'string', 'c' ] ) )
-
-		res = env.dmEval( program )
-
-		self.assert_( res == 'abc' )
+	def dmExec(self, programText):
+		sys = DMSys( self.stdout )
+		return DMInterpreterEnv( sys=sys ).dmExec( readSX( programText ) )
+	
+	def dmEval(self, programText):
+		sys = DMSys()
+		return DMInterpreterEnv().dmEval( readSX( programText ) )
+	
+	
+	def testStdout(self):
+		self.dmExec( '(@sys stdout a)' )
+		self.assert_( self.stdout.getvalue() == 'a' )
+		
+	def testVars(self):
+		src = """
+		((= @a test)
+		(@sys stdout @a))"""
+		self.dmExec( src )
+		self.assert_( self.stdout.getvalue() == 'test' )
+		
+	def testBooleans(self):
+		self.assert_( self.dmEval( '#False' )  ==  False )
+		self.assert_( self.dmEval( '#True' )  ==  True)
+		
+	def testNone(self):
+		self.assert_( self.dmEval( '#None' )  ==  None )
+		self.assert_( self.dmEval( '`null`' )  ==  None)
+		
+	def testInt(self):
+		self.assert_( self.dmEval( '#123' ) == 123 )
+		
+	def testMath(self):
+		self.assert_( self.dmEval( '(#10 + #2)' ) == 12 )
+		self.assert_( self.dmEval( '(#10 - #2)' ) == 8 )
+		self.assert_( self.dmEval( '(#10 * #2)' ) == 20 )
+		self.assert_( self.dmEval( '(#10 / #2)' ) == 5 )
+		self.assert_( self.dmEval( '(#10 % #3)' ) == 1 )
+		self.assert_( self.dmEval( '(#10 ** #2)' ) == 100 )
+		self.assert_( self.dmEval( '(#10 << #2)' ) == 40 )
+		self.assert_( self.dmEval( '(#10 >> #2)' ) == 2 )
+		self.assert_( self.dmEval( '(#3 & #6)' ) == 2 )
+		self.assert_( self.dmEval( '(#3 | #6)' ) == 7 )
+		self.assert_( self.dmEval( '(#3 ^ #6)' ) == 5 )
+		self.assert_( self.dmEval( '(#3 < #6)' ) == True )
+		self.assert_( self.dmEval( '(#3 <= #6)' ) == True )
+		self.assert_( self.dmEval( '(#3 == #6)' ) == False )
+		self.assert_( self.dmEval( '(#3 != #6)' ) == True )
+		self.assert_( self.dmEval( '(#3 > #6)' ) == False )
+		self.assert_( self.dmEval( '(#3 >= #6)' ) == False )
+		self.assert_( self.dmEval( '(#6 < #3)' ) == False )
+		self.assert_( self.dmEval( '(#6 <= #3)' ) == False )
+		self.assert_( self.dmEval( '(#6 == #3)' ) == False )
+		self.assert_( self.dmEval( '(#6 != #3)' ) == True )
+		self.assert_( self.dmEval( '(#6 > #3)' ) == True )
+		self.assert_( self.dmEval( '(#6 >= #3)' ) == True )
+		self.assert_( self.dmEval( '(#3 < #3)' ) == False )
+		self.assert_( self.dmEval( '(#3 <= #3)' ) == True )
+		self.assert_( self.dmEval( '(#3 == #3)' ) == True )
+		self.assert_( self.dmEval( '(#3 != #3)' ) == False )
+		self.assert_( self.dmEval( '(#3 > #3)' ) == False )
+		self.assert_( self.dmEval( '(#3 >= #3)' ) == True )
+		
 
 
 

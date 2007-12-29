@@ -94,11 +94,17 @@ class DTBin (DTContainer):
 	#
 
 	def getFirstCursorEntity(self):
-		return self._child.getFirstCursorEntity()
+		if self._child is not None:
+			return self._child.getFirstCursorEntity()
+		else:
+			return None
 
 
 	def getLastCursorEntity(self):
-		return self._child.getLastCursorEntity()
+		if self._child is not None:
+			return self._child.getLastCursorEntity()
+		else:
+			return None
 
 	
 	def _o_getPrevCursorEntityBeforeChild(self, child):

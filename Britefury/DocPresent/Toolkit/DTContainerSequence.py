@@ -5,7 +5,12 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
+from Britefury.Kernel.Abstract import abstractmethod
+
+from Britefury.DocPresent.Toolkit.DTCursorEntity import DTCursorEntity
+
 from Britefury.DocPresent.Toolkit.DTContainer import DTContainer
+from Britefury.DocPresent.Toolkit.DTBin import DTBin
 
 
 

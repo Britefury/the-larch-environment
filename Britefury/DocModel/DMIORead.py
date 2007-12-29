@@ -19,7 +19,7 @@ Uses basic S-expressions
 
 lists are (...) as normal
 tokens inside are:
-	atom:   A-Z a-z 0.9 _+-*/%^&|!$@.,<>=[]~
+	atom:   A-Z a-z 0-9 _+-*/%^&|!$@.,<>=[]~
 	null:		`null`
 	quoted string
 	another list

@@ -25,7 +25,16 @@ from Britefury.DocView.StyleSheet.DVListWrappedLineStyleSheet import DVListWrapp
 
 
 
+"""
+(
+(= unquotedStringChars 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!"#$%&*+,-./:;<=>?@[\]^_|~ )
 
+(= stringTok (gsym defineToken string ((gsym parserWord @unquotedStringChars)  |  (gsym parserQuotedString))))
+(= openParen (gsym defineToken openParen (gsym parserLiteral '(')))
+(= closeParen (gsym defineToken closeParen (gsym parserLiteral ')')))
+(= whitespace (gsym defineToken whitespace (gsym parserWord (gsym whitespace))))
+)
+"""
 
 _unquotedStringChars = ( string.digits + string.letters + string.punctuation ).replace( '(', '' ).replace( ')', '' ).replace( '\'', '' ).replace( '`', '' ).replace( '{', '' ).replace( '}', '' )
 
@@ -49,7 +58,7 @@ def _setValueTokenAction(text):
 def _getInsertPosition(receivingDocNodeKeyPath):
 	docNodeKey = receivingDocNodeKeyPath[0]
 	if isinstance( docNodeKey.docNode, DMListInterface ):
-		return docNodeKey.docNode, 0
+		return docNodeKey.docNode, len( docNodeKey.docNode )
 	else:
 		return docNodeKey.parentDocNode, docNodeKey.index
 
@@ -111,12 +120,39 @@ _addStringAction = LispAddStringAction()
 
 
 
+class LispNextSiblingAction (DVStyleSheetAction):
+	def _o_keyAction(self, event, parentStyleSheet):
+		return self._p_action( event, parentStyleSheet )
+			
+	def _o_tokenAction (self, event, parentStyleSheet):
+		return self._p_action( event, parentStyleSheet )
+		
+		
+	def _p_action(self, event, parentStyleSheet):
+		docNodeKey = event.receivingDocNodeKeyPath[0]
+		parentDocNode, indexInParent = docNodeKey.parentDocNode, docNodeKey.index
+		if indexInParent  <  len( parentDocNode ) - 1:
+			indexInParent += 1
+			v = event.nodeView.docView.getViewNodeForDocNodeKey( DocNodeKey( parentDocNode[indexInParent], parentDocNode, indexInParent ) )
+			v.makeCurrent()
+			return v
+		else:
+			v = event.nodeView.docView.getViewNodeForDocNodeKey( DocNodeKey( parentDocNode[indexInParent], parentDocNode, indexInParent ) )
+			v.makeCurrent()
+			return v
+
+_nextSiblingAction = LispNextSiblingAction()
+
+
+
+
 class LispStringStyleSheet (DVStringStyleSheet):
 	tokeniser = DocViewTokeniser( [ _string, _openParen, _closeParen, _whitespace ] )
 
 
 	_setValueTokenHandler = DVStyleSheetTokenHandler( 'string', _setValueTokenAction )
 	_addListTokenHandler = DVStyleSheetTokenHandler( 'openParen', _addListAction )
+	_nextSiblingTokenHandler = DVStyleSheetTokenHandler( 'whitespace', _nextSiblingAction )
 
 
 	_deleteAction = DVStyleSheetDeleteAction()
@@ -124,6 +160,8 @@ class LispStringStyleSheet (DVStringStyleSheet):
 
 	_addListKeyHandler = DVStyleSheetCharHandler( '(', _addListAction )
 	_addStringKeyHandler = DVStyleSheetCharHandler( _unquotedStringChars, _addStringAction )
+	_nextSiblingKeyHandler = DVStyleSheetCharHandler( ' ', _nextSiblingAction )
+	
 
 
 
