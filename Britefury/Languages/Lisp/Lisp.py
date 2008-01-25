@@ -28,37 +28,14 @@ from Britefury.DocView.StyleSheet.DVListWrappedLineStyleSheet import DVListWrapp
 
 
 
-"""
-(
-(= @TokenDefinition (@ml TokenDefinition))
-(= @whitespace ((@ml string) whitespace))
-(= @quotedString ((@ml parser) quotedString))
-(= @ParserWord ((@ml parser) Word))
-(= @ParserLiteral ((@ml parser) Literal))
-
-(= @unquotedStringChars 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!"#$%&*+,-./:;<=>?@[\]^_|~ )
-
-(= @stringTok (@TokenDefinition new string ((@ParserWord new @unquotedStringChars)  |  @quotedString)))
-(= @openParenTok (@TokenDefinition new openParen (@ParserLiteral new '(')))
-(= @closeParenTok (@TokenDefinition new closeParen (@ParserLiteral new ')')))
-(= @whitespaceTok (@TokenDefinition new whitespace (@ParserWord new @whitespace)))
-)
-"""
-
 lispDef = """
 (
-(= @TokenDefinition (@ml TokenDefinition))
-(= @whitespace ((@ml string) whitespace))
-(= @quotedString ((@ml parser) quotedString))
-(= @ParserWord ((@ml parser) Word))
-(= @ParserLiteral ((@ml parser) Literal))
-
 (= @unquotedStringChars 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!"#$%&*+,-./:;<=>?@[\]^_|~ )
 
-(= @stringTok (@TokenDefinition new string ((@ParserWord new @unquotedStringChars)  |  @quotedString)))
-(= @openParenTok (@TokenDefinition new openParen (@ParserLiteral new '(')))
-(= @closeParenTok (@TokenDefinition new closeParen (@ParserLiteral new ')')))
-(= @whitespaceTok (@TokenDefinition new whitespace (@ParserWord new @whitespace)))
+(= @stringTok (@tokeniser defineToken string (@tokeniser combineOr (@tokeniser wordSubtoken @unquotedStringChars) (@tokeniser quotedString))))
+(= @openParenTok (@tokeniser defineToken openParen (@tokeniser literalSubtoken '(')))
+(= @closeParenTok (@tokeniser defineToken closeParen (@tokeniser literalSubtoken ')')))
+(= @whitespaceTok (@tokeniser defineToken whitespace (@tokeniser wordSubtoken (@tokeniser whitespace))))
 )
 """
 
