@@ -15,46 +15,44 @@ from Britefury.DocView.DocViewTokeniser import DocViewTokenDefinition, DocViewTo
 
 
 
-class GSymString (object):
+class GLispTokeniser (object):
+	def __init__(self):
+		pass
+	
+	
+	# Define a token
+	def defineToken(self, name, parser):
+		return DocViewTokenDefinition( name, parser )
+	
+	
+	# Literal and word
+	def literalSubtoken(self, matchString):
+		return pyparsing.Literal( matchString)
+	
+	def wordSubtoken(self, initChars):
+		return pyparsing.Word( initChars )
+	
+	
+	# Combine
+	def combineOr(self, x, y):
+		return x | y
+	
+	
+	# Constants
+	def quotedString(self):
+		return pyparsing.quotedString
+	
 	def whitespace(self):
 		return string.whitespace
 	
 
-	
-class GSymParser (object):
-	def quotedString(self):
-		return pyparsing.quotedString
-	
-	def Word(self):
-		return pyparsing.Word
-	
-	def Literal(self):
-		return pyparsing.Literal
 
-
-
-class GSymMetaLanguage (object):
-	def __init__(self):
-		self._string = GSymString()
-		self._parser = GSymParser()
-
-		
-	def TokenDefinition(self):
-		return DocViewTokenDefinition
-	
-	def string(self):
-		return self._string
-
-	def parser(self):
-		return self._parser
-	
-	
 
 
 def gSymGLispEnvironment():
-	ml = GSymMetaLanguage()
+	tokeniser = GLispTokeniser()
 	
-	return DMInterpreterEnv( ml=ml )
+	return DMInterpreterEnv( tokeniser=tokeniser )
 
 
 
