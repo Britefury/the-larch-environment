@@ -33,12 +33,13 @@ _dmiMethodNameMap = {
 	'&' : '__and__',
 	'|' : '__or__',
 	'^' : '__xor__',
-	'<' : lambda x, y: x < y,
-	'<=' : lambda x, y: x <= y,
-	'==' : lambda x, y: x == y,
-	'!=' : lambda x, y: x != y,
-	'>' : lambda x, y: x > y,
-	'>=' : lambda x, y: x >= y,
+	'new' : lambda x, args: x( *args ),
+	'<' : lambda x, args: x < args[0],
+	'<=' : lambda x,args: x <= args[0],
+	'==' : lambda x, args: x ==args[0],
+	'!=' : lambda x, args: x !=args[0],
+	'>' : lambda x, args: x > args[0],
+	'>=' : lambda x, args: x >= args[0],
 	}
 
 
@@ -56,23 +57,7 @@ class macro (object):
 
 
 
-#class DMIClass (type):
-	#def __init__(cls, clsName, clsBases, clsDict):
-		#super( DMIClass, cls ).__init__( cls, clsName, clsBases, clsDict )
-		
-		#for key, value in clsDict.items():
-			#if isinstance( value, types.FunctionType ):
-				#setattr( cls, key, method( value ) )
-
-
-
-class DMIObject (object):
-	#__metaclass__ = DMIClass
-	pass
-
-
-
-class DMSys (DMIObject):
+class DMSys (object):
 	def __init__(self, stdout=sys.stdout):
 		super( DMSys, self ).__init__()
 		self._stdout = stdout
@@ -121,7 +106,7 @@ class DMInterpreterEnv (object):
 				target = xs[1]
 				value = xs[2]
 				if target[0] != '@':
-					raise DMINameError, 'var name %s must start with @'  %  ( target, )
+					raise DMINameError, 'var name %s must start with @ in %s'  %  ( target, xs )
 				target = target[1:]
 				if isinstance( value, str ):
 					self._env[target] = value
@@ -141,16 +126,26 @@ class DMInterpreterEnv (object):
 					try:
 						method = getattr( target, methodName )
 					except AttributeError:
-						raise DMIMethodError, '%s has no method %s' % ( target, methodName )
+						raise DMIMethodError, '%s has no method %s, in %s' % ( target, methodName, xs )
 				elif isinstance( methodName, types.LambdaType ):
-					arg1 = DMInterpreterEnv( **self._env ).dmEval( xs[2] )
-					return methodName( target, arg1 )
+					args = [ DMInterpreterEnv( **self._env ).dmEval( dmarg )   for dmarg in xs[2:] ]
+					try:
+						return methodName( target, args )
+					except Exception:
+						print '*** Internal error in %s'  %  ( xs, )
+						raise
+				else:
+					raise TypeError, 'methodName is invalid in %s'  %  ( xs, )
 				
 				if isinstance( method, macro ):
 					return method.invoke( target, self, xs )
 				else:
 					args = [ DMInterpreterEnv( **self._env ).dmEval( dmarg )   for dmarg in xs[2:] ]
-					return method( *args )
+					try:
+						return method( *args )
+					except Exception:
+						print '*** Internal error in %s'  %  ( xs, )
+						raise
 					
 		else:
 			return self._p_interpretLiteral( xs )

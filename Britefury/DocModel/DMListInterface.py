@@ -86,3 +86,6 @@ class DMListInterface (DMNode):
 			return cmp( self[:], x[:] )
 		else:
 			return cmp( self[:], x )
+		
+		
+		

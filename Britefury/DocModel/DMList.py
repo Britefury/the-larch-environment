@@ -161,6 +161,8 @@ class DMList (DMListInterface):
 		c = DMList()
 		c._cell.literalValue = deepcopy( self._cell.literalValue, memo )
 		return c
+	
+	
 
 
 
