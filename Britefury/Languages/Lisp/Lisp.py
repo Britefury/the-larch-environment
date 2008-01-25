@@ -14,6 +14,9 @@ from Britefury.DocPresent.Toolkit.DTLabel import DTLabel
 
 from Britefury.DocModel.DMListInterface import DMListInterface
 
+from Britefury.gLisp.gLisp import glisp
+from Britefury.DocModel.DMIO import readSX
+
 from Britefury.DocView.DocView import DocView
 from Britefury.DocView.DocViewTokeniser import DocViewTokenDefinition, DocViewTokeniser
 
@@ -27,14 +30,41 @@ from Britefury.DocView.StyleSheet.DVListWrappedLineStyleSheet import DVListWrapp
 
 """
 (
-(= unquotedStringChars 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!"#$%&*+,-./:;<=>?@[\]^_|~ )
+(= @TokenDefinition (@ml TokenDefinition))
+(= @whitespace ((@ml string) whitespace))
+(= @quotedString ((@ml parser) quotedString))
+(= @ParserWord ((@ml parser) Word))
+(= @ParserLiteral ((@ml parser) Literal))
 
-(= stringTok (gsym defineToken string ((gsym parserWord @unquotedStringChars)  |  (gsym parserQuotedString))))
-(= openParen (gsym defineToken openParen (gsym parserLiteral '(')))
-(= closeParen (gsym defineToken closeParen (gsym parserLiteral ')')))
-(= whitespace (gsym defineToken whitespace (gsym parserWord (gsym whitespace))))
+(= @unquotedStringChars 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!"#$%&*+,-./:;<=>?@[\]^_|~ )
+
+(= @stringTok (@TokenDefinition new string ((@ParserWord new @unquotedStringChars)  |  @quotedString)))
+(= @openParenTok (@TokenDefinition new openParen (@ParserLiteral new '(')))
+(= @closeParenTok (@TokenDefinition new closeParen (@ParserLiteral new ')')))
+(= @whitespaceTok (@TokenDefinition new whitespace (@ParserWord new @whitespace)))
 )
 """
+
+lispDef = """
+(
+(= @TokenDefinition (@ml TokenDefinition))
+(= @whitespace ((@ml string) whitespace))
+(= @quotedString ((@ml parser) quotedString))
+(= @ParserWord ((@ml parser) Word))
+(= @ParserLiteral ((@ml parser) Literal))
+
+(= @unquotedStringChars 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!"#$%&*+,-./:;<=>?@[\]^_|~ )
+
+(= @stringTok (@TokenDefinition new string ((@ParserWord new @unquotedStringChars)  |  @quotedString)))
+(= @openParenTok (@TokenDefinition new openParen (@ParserLiteral new '(')))
+(= @closeParenTok (@TokenDefinition new closeParen (@ParserLiteral new ')')))
+(= @whitespaceTok (@TokenDefinition new whitespace (@ParserWord new @whitespace)))
+)
+"""
+
+
+_test = glisp.dmExec( readSX( lispDef ) )
+
 
 _unquotedStringChars = ( string.digits + string.letters + string.punctuation ).replace( '(', '' ).replace( ')', '' ).replace( '\'', '' ).replace( '`', '' ).replace( '{', '' ).replace( '}', '' )
 
