@@ -27,7 +27,7 @@ class GLispTokeniser (object):
 	
 	# Literal and word
 	def literalSubtoken(self, matchString):
-		return pyparsing.Literal( matchString)
+		return pyparsing.Literal( matchString )
 	
 	def wordSubtoken(self, initChars):
 		return pyparsing.Word( initChars )
@@ -57,3 +57,50 @@ def gSymGLispEnvironment():
 
 
 glisp = gSymGLispEnvironment()
+
+
+
+
+import unittest
+from Britefury.DocModel.DMIO import readSX
+from Britefury.DocView.DocViewTokeniser import DocViewToken
+
+
+
+class TestCase_gLisp (unittest.TestCase):
+	def gLispExec(self, programText):
+		return gSymGLispEnvironment().dmExec( readSX( programText ) )
+	
+	def gLispEval(self, programText):
+		return gSymGLispEnvironment().dmEval( readSX( programText ) )
+	
+	
+	def testTokeniser(self):
+		self.assert_( isinstance( self.gLispEval( '@tokeniser' ), GLispTokeniser ) )
+		
+	def testTokWhitespace(self):
+		self.assert_( self.gLispEval( '(@tokeniser whitespace)' )  ==  string.whitespace )
+
+	def testTokQuotedString(self):
+		self.assert_( self.gLispEval( '(@tokeniser quotedString)' )  ==  pyparsing.quotedString )
+		
+	def testTokLiteralSub(self):
+		self.assert_( self.gLispEval( '(@tokeniser literalSubtoken test)' ).parseString( 'test' ).asList() == [ 'test' ] )
+
+	def testTokWordSub(self):
+		self.assert_( self.gLispEval( '(@tokeniser wordSubtoken abc)' ).parseString( 'aabbccbbaa' ).asList() == [ 'aabbccbbaa' ] )
+
+	def testTokCombineOr(self):
+		parser = self.gLispEval( '(@tokeniser combineOr (@tokeniser literalSubtoken test) (@tokeniser wordSubtoken abc))' )
+		self.assert_( parser.parseString( 'test' ).asList() == [ 'test' ] )
+		self.assert_( parser.parseString( 'aabbccbbaa' ).asList() == [ 'aabbccbbaa' ] )
+		
+	def testDefineToken(self):
+		definition = self.gLispEval( '(@tokeniser defineToken testToken (@tokeniser wordSubtoken abc))' )
+		self.assert_( definition._tokenClassName == 'testToken' )
+		self.assert_( definition._parser.parseString( 'aabbccbbaa' ).asList() == [ DocViewToken( 'testToken', 'aabbccbbaa' ) ] )
+
+
+
+if __name__ == '__main__':
+	unittest.main()

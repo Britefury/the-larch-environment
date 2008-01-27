@@ -14,6 +14,10 @@ class DocViewToken (object):
 	def __init__(self, tokenClassName, text):
 		self.tokenClassName = tokenClassName
 		self.text = text
+		
+		
+	def __cmp__(self, x):
+		return cmp(  ( self.tokenClassName, self.text ),  ( x.tokenClassName, x.text )  )
 
 
 	def __repr__(self):

@@ -40,7 +40,7 @@ lispDef = """
 """
 
 
-_test = glisp.dmExec( readSX( lispDef ) )
+glisp.dmExec( readSX( lispDef ) )
 
 
 _unquotedStringChars = ( string.digits + string.letters + string.punctuation ).replace( '(', '' ).replace( ')', '' ).replace( '\'', '' ).replace( '`', '' ).replace( '{', '' ).replace( '}', '' )
