@@ -156,11 +156,12 @@ class DMInterpreterEnv (object):
 			if len( xs ) > 0:
 				if isinstance( xs[0], DMListInterface ):
 					for x in xs:
-						self.dmEval( x )
+						res = self.dmEval( x )
+					return res
 				else:
-					self.dmEval( xs )
+					return self.dmEval( xs )
 		else:
-			self.dmEval( xs )
+			return self.dmEval( xs )
 		
 		
 
