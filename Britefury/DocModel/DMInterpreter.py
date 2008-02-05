@@ -45,7 +45,7 @@ _dmiMethodNameMap = {
 
 
 
-class macro (object):
+class specialform (object):
 	def __init__(self, f):
 		self._f = f
 	
@@ -137,7 +137,7 @@ class DMInterpreterEnv (object):
 				else:
 					raise TypeError, 'methodName is invalid in %s'  %  ( xs, )
 				
-				if isinstance( method, macro ):
+				if isinstance( method, specialform ):
 					return method.invoke( target, self, xs )
 				else:
 					args = [ DMInterpreterEnv( **self._env ).dmEval( dmarg )   for dmarg in xs[2:] ]
@@ -162,6 +162,10 @@ class DMInterpreterEnv (object):
 					return self.dmEval( xs )
 		else:
 			return self.dmEval( xs )
+		
+		
+	def __getitem__(self, key):
+		return self._env[key]
 		
 		
 

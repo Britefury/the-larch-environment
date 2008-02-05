@@ -28,6 +28,19 @@ from Britefury.DocView.StyleSheet.DVListWrappedLineStyleSheet import DVListWrapp
 
 
 
+#_unquotedStringChars = ( string.digits + string.letters + string.punctuation ).replace( '(', '' ).replace( ')', '' ).replace( '\'', '' ).replace( '`', '' ).replace( '{', '' ).replace( '}', '' )
+#_string = DocViewTokenDefinition( 'string', pyparsing.Word( _unquotedStringChars )  |  pyparsing.quotedString )
+#_openParen = DocViewTokenDefinition( 'openParen', pyparsing.Literal( '(' ) )
+#_closeParen = DocViewTokenDefinition( 'closeParen', pyparsing.Literal( ')' ) )
+#_whitespace = DocViewTokenDefinition( 'whitespace', pyparsing.Word( string.whitespace ) )
+
+#@DVStyleSheetSetValueAction
+#def _setValueTokenAction(text):
+#	return text
+
+
+
+
 lispDef = """
 (
 (= @unquotedStringChars 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!"#$%&*+,-./:;<=>?@[\]^_|~ )
@@ -36,6 +49,10 @@ lispDef = """
 (= @openParenTok (@tokeniser defineToken openParen (@tokeniser literalSubtoken '(')))
 (= @closeParenTok (@tokeniser defineToken closeParen (@tokeniser literalSubtoken ')')))
 (= @whitespaceTok (@tokeniser defineToken whitespace (@tokeniser wordSubtoken (@tokeniser whitespace))))
+
+
+(= @setValueTokenAction (@styleSheet defineSetValueAction setValueTokenAction (text)
+						(@text)))
 )
 """
 
@@ -43,22 +60,16 @@ lispDef = """
 glisp.dmExec( readSX( lispDef ) )
 
 
-_unquotedStringChars = ( string.digits + string.letters + string.punctuation ).replace( '(', '' ).replace( ')', '' ).replace( '\'', '' ).replace( '`', '' ).replace( '{', '' ).replace( '}', '' )
+_unquotedStringChars = glisp['unquotedStringChars']
 
 
-_string = DocViewTokenDefinition( 'string', pyparsing.Word( _unquotedStringChars )  |  pyparsing.quotedString )
-_openParen = DocViewTokenDefinition( 'openParen', pyparsing.Literal( '(' ) )
-_closeParen = DocViewTokenDefinition( 'closeParen', pyparsing.Literal( ')' ) )
-_whitespace = DocViewTokenDefinition( 'whitespace', pyparsing.Word( string.whitespace ) )
+_string = glisp['stringTok']
+_openParen = glisp['openParenTok']
+_closeParen = glisp['closeParenTok']
+_whitespace = glisp['whitespaceTok']
 
 
-
-
-
-
-@DVStyleSheetSetValueAction
-def _setValueTokenAction(text):
-	return text
+_setValueTokenAction = glisp['setValueTokenAction']
 
 
 
