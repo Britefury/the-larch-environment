@@ -72,6 +72,10 @@ def compileSimpleGLispExprToPy(x):
 		return compileSubExpression( x[0] )
 	else:
 		method = x[1]
+		if method == '[]'  and  len(x) == 3:
+			return '%s[%s]'  %  ( compileSubExpression( x[0] ), compileSubExpression( x[2] ) )
+		if method == '[]='  and  len(x) == 4:
+			return '%s[%s] = %s'  %  ( compileSubExpression( x[0] ), compileSubExpression( x[2] ), compileSubExpression( x[3] ) )
 		if method in [ '+', '-', '*', '/', '%', '**', '<<', '>>', '&', '|', '^', '<', '<=', '==', '!=', '>=', '>' ]   and   len(x) == 3:
 			return '%s %s %s'  %  ( compileSubExpression( x[0] ), method, compileSubExpression( x[2] ) )
 		else:
@@ -185,6 +189,8 @@ class TestCase_gLisp (unittest.TestCase):
 		self.assert_( compileSimpleGLispExprToPy( readSX( '()' ) )  ==  'None' )
 		self.assert_( compileSimpleGLispExprToPy( readSX( '(@test)' ) )  ==  'test' )
 		self.assert_( compileSimpleGLispExprToPy( readSX( '(@a + @b)' ) )  ==  'a + b' )
+		self.assert_( compileSimpleGLispExprToPy( readSX( '(@a [] @b)' ) )  ==  'a[b]' )
+		self.assert_( compileSimpleGLispExprToPy( readSX( '(@a []= @b @c)' ) )  ==  'a[b] = c' )
 		self.assert_( compileSimpleGLispExprToPy( readSX( '(@a + (@b * @c))' ) )  ==  'a + (b * c)' )
 		self.assert_( compileSimpleGLispExprToPy( readSX( '(@a + (@b func @c))' ) )  ==  'a + (b.func(c))' )
 		self.assert_( compileSimpleGLispExprToPy( readSX( '(@a + (@b func @c @d (@e * @f)))' ) )  ==  'a + (b.func(c, d, (e * f)))' )

@@ -33,6 +33,8 @@ _dmiMethodNameMap = {
 	'&' : '__and__',
 	'|' : '__or__',
 	'^' : '__xor__',
+	'[]' : '__getitem__',
+	'[]=' : '__setitem__',
 	'new' : lambda x, args: x( *args ),
 	'<' : lambda x, args: x < args[0],
 	'<=' : lambda x,args: x <= args[0],
