@@ -73,8 +73,8 @@ _setValueTokenAction = glisp['setValueTokenAction']
 
 
 
-def _getInsertPosition(receivingDocNodeKeyPath):
-	docNodeKey = receivingDocNodeKeyPath[0]
+def _getInsertPosition(event):
+	docNodeKey = event.receivingDocNodeKeyPath[0]
 	if isinstance( docNodeKey.docNode, DMListInterface ):
 		return docNodeKey.docNode, len( docNodeKey.docNode )
 	else:
@@ -87,7 +87,7 @@ class LispAddListAction (DVStyleSheetAction):
 		if bAfter:
 			parentDocNode, indexInParent = event.receivingDocNodeKeyPath[0].parentDocNode, event.receivingDocNodeKeyPath[0].index + 1
 		else:
-			parentDocNode, indexInParent = _getInsertPosition( event.receivingDocNodeKeyPath )
+			parentDocNode, indexInParent = _getInsertPosition( event )
 		parentDocNode.insert( indexInParent, [] )
 		v = event.nodeView.docView.refreshAndGetViewNodeForDocNodeKey( DocNodeKey( parentDocNode[indexInParent], parentDocNode, indexInParent ) )
 		v.makeCurrent()
@@ -116,14 +116,14 @@ _addListAction = LispAddListAction()
 
 class LispAddStringAction (DVStyleSheetAction):
 	def _o_keyAction(self, event, parentStyleSheet):
-		parentDocNode, indexInParent = _getInsertPosition( event.receivingDocNodeKeyPath )
+		parentDocNode, indexInParent = _getInsertPosition( event )
 		parentDocNode.insert( indexInParent, event.keyPressEvent.keyString )
 		v = event.nodeView.docView.refreshAndGetViewNodeForDocNodeKey( DocNodeKey( parentDocNode[indexInParent], parentDocNode, indexInParent ) )
 		v.startEditing()
 		return v
 
 	def _o_tokenAction (self, event, parentStyleSheet):
-		parentDocNode, indexInParent = _getInsertPosition( event.receivingDocNodeKeyPath )
+		parentDocNode, indexInParent = _getInsertPosition( event )
 		parentDocNode.insert( indexInParent, event.token.text )
 		v = event.nodeView.docView.refreshAndGetViewNodeForDocNodeKey( DocNodeKey( parentDocNode[indexInParent], parentDocNode, indexInParent ) )
 		#v.startEditing()
