@@ -18,6 +18,16 @@ from Britefury.DocView.StyleSheet.DVStyleSheet import *
 
 
 
+
+class GSymEnvironment (object):
+	def __init__(self):
+		pass
+	
+	
+	def importLanguage(self, name, vendor, version):
+
+
+
 class GLispTokeniser (object):
 	def __init__(self):
 		pass
@@ -32,8 +42,8 @@ class GLispTokeniser (object):
 	def literalSubtoken(self, matchString):
 		return pyparsing.Literal( matchString )
 	
-	def wordSubtoken(self, initChars):
-		return pyparsing.Word( initChars )
+	def wordSubtoken(self, initChars, bodyChars=None):
+		return pyparsing.Word( initChars, bodyChars )
 	
 	
 	# Combine

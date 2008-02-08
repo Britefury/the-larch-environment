@@ -1,0 +1,9 @@
+(
+	(= @py (@gsym importLanguage 'gsym-python' 'Britefury' '2.5'))
+	
+	(@gsym document
+		(
+			(@py add (@py localLocal a) (@py localLocal b))
+		)
+	)
+)

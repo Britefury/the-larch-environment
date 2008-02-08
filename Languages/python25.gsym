@@ -1,0 +1,21 @@
+(
+	(= @ml (@gsym importLanguage 'gsym-metalanguage' 'Britefury' '1.0'))
+	
+	(@gsym document
+		(
+			(@ml language 'gsym-python' 'Britefury' '2.5'
+				(
+					(@ml charClassificationSection
+						(@ml defineCharClassification alphaCharClass ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_)
+						(@ml defineCharClassification alphaNumCharClass ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_)
+					)
+					
+					(@ml tokeniserSection			
+						(@ml defineToken identifierTok (@tokeniser wordSubtoken (@tokeniser getCharClassification alphaCharClass) (@tokeniser getCharClassification alphaNumCharClass)))
+						(@ml defineToken addTok (@tokeniser literalSubtoken '+'))
+					)
+				)
+			)
+		)
+	)
+)
