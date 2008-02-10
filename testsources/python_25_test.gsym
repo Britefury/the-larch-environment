@@ -1,7 +1,8 @@
 (
-	(= @py (@gsym importLanguage 'gsym-python' 'Britefury' '2.5'))
+	(= @pyLang (@gsym importLanguage 'gsym-python' 'Britefury' '2.5'))
+	(= @py (@pyLang getLanguageInterface))
 	
-	(@gsym document
+	(@pyLang document
 		(
 			(@py add (@py localLocal a) (@py localLocal b))
 		)

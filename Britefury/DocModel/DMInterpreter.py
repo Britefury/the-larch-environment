@@ -52,7 +52,7 @@ class specialform (object):
 		self._f = f
 	
 	def invoke(self, obj, env, xs):
-		return self._f( obj, xs )
+		return self._f( obj, env, xs )
 	
 
 
