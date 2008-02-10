@@ -6,6 +6,8 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
 
+from Britefury.DocModel.DMListInterface import DMListInterface
+
 #
 # Guard expression format:
 #
@@ -31,17 +33,17 @@
 
 _stringType = str
 _stringTypeSrc = 'str'
-_listType = list
-_listTypeSrc = 'list'
+_listType = DMListInterface
+_listTypeSrc = 'DMListInterface'
 
 
-class BindError (Exception):
+class GuardError (Exception):
 	pass
 
 def _bind(result, name, value):
 	existingValue = result.setdefault( name, value )
 	if existingValue is not value:
-		raise BindError
+		raise GuardError
 	
 		
 def _compileGuardList(xs, inputName):
@@ -57,7 +59,7 @@ def _compileGuardList(xs, inputName):
 		#no remainder variable; fixed length
 		result.extend( [
 			'if len( %s ) != %d:'  %  ( inputName, len( xs ) ),
-			'\traise BindError'
+			'\traise GuardError'
 			] )
 		
 	#guardItem*
@@ -76,7 +78,7 @@ def _compileGuardItem(xs, inputName):
 	if isinstance( xs, _listType ):
 		return [ 'if isinstance( %s, %s ):'  %  ( inputName, _listTypeSrc, ) ]  +  [ '\t' + x   for x in _compileGuardList( xs, inputName ) ] + [
 			'else:',
-			'\traise BindError'
+			'\traise GuardError'
 			]
 	else:
 		# constant or var or ignore
@@ -86,7 +88,7 @@ def _compileGuardItem(xs, inputName):
 				'if isinstance( %s, %s ):'  %  ( inputName, _stringTypeSrc ),
 				'\t_bind( result, \'%s\', %s )'  %  ( xs[1:], inputName ),
 				'else:',
-				'\traise BindError'
+				'\traise GuardError'
 			]
 		elif xs[0] == '*':
 			#listVar
@@ -94,7 +96,7 @@ def _compileGuardItem(xs, inputName):
 				'if isinstance( %s, %s ):'  %  ( inputName, _listTypeSrc ),
 				'\t_bind( result, \'%s\', %s )'  %  ( xs[1:], inputName ),
 				'else:',
-				'\traise BindError'
+				'\traise GuardError'
 			]
 		elif xs[0] == '$':
 			#anyVar
@@ -107,12 +109,15 @@ def _compileGuardItem(xs, inputName):
 			#constant
 			return [
 				'if %s != \'%s\':'  %  ( inputName, xs ),
-				'\traise BindError'
+				'\traise GuardError'
 			]
 
 		
 def compileGuardExpression(xs, functionName='guard'):
 	pySrcHdr = 'def %s(xs):\n'  %  ( functionName, )
+	
+	if not isinstance( xs, _listType ):
+		raise ValueError, 'need a list'
 	
 	
 	result = []
@@ -121,14 +126,14 @@ def compileGuardExpression(xs, functionName='guard'):
 		result.extend( [ '\tresult = {}' ] )
 		result.extend( [ '\t' + x   for x in _compileGuardItem( guard, 'xs' ) ] )
 		result.extend( [ '\treturn result' ] )
-		result.extend( [ 'except BindError:', '\tpass', '' ] )
-	result.extend( [ 'raise BindError' ] )
+		result.extend( [ 'except GuardError:', '\tpass', '' ] )
+	result.extend( [ 'raise GuardError' ] )
 	
 	result = [ '\t' + x  for x in result ]
 	
 	src = pySrcHdr + '\n'.join( result )
 	
-	lcl = { '_bind' : _bind, 'BindError' : BindError }
+	lcl = { '_bind' : _bind, 'GuardError' : GuardError, '%s' % ( _listTypeSrc, )  :  _listType }
 	
 	exec src in lcl
 	
@@ -136,15 +141,16 @@ def compileGuardExpression(xs, functionName='guard'):
 
 
 
-#print compileGuardExpression( [ 'hi', 'there', '!a', '*b', '$c', [ 'q' ], '_' ] )
-#print compileGuardExpression(  )
+import unittest
+from Britefury.DocModel.DMIO import readSX
 
-guardExpression = [ [ 'hi', 'there', '!a', '*b', '$c', [ 'q', 'r', '!a', ':p' ], '_' ] ]
-testData = [ 'hi', 'there', 'foo', [ 'x', 'y', 'z' ], [ 'abc' ], [ 'q', 'r', 'foo', 'i', 'j', [ 'k' ] ], '4' ]
-testData2 = [ 'hi', 'there', 'foo', [ 'x', 'y', 'z' ], [ 'abc' ], [ 'q', 'r', 'bar', 'i', 'j', [ 'k' ] ], '4' ]
-print compileGuardExpression( guardExpression )( testData )
-print compileGuardExpression( guardExpression )( testData2 )
-
+class TestCase_GuardExpression (unittest.TestCase):
+	def _guardTest(self, guardSrc, dataSrc, expected):
+		if expected is GuardError:
+			self.failUnlessRaises( GuardError, lambda: compileGuardExpression( readSX( guardSrc ) )( readSX( dataSrc ) ), )
+		else:
+			result = compileGuardExpression( readSX( guardSrc ) )( readSX( dataSrc ) )
+			self.assert_( result == expected )
 
 # ( guard0 guard1 ... guardN )
 #
@@ -160,4 +166,53 @@ print compileGuardExpression( guardExpression )( testData2 )
 #     guardList := (guardItem* listRemainderVar?)
 #     listRemainderVar := ':'<name>
 
+	def testEmpty(self):
+		self._guardTest( '()', '()', GuardError )
+
+	def testIgnore(self):
+		self._guardTest( '(_)', 'a', {} ) 
+		self._guardTest( '(_)', 'b', {} ) 
 	
+	def testConstant(self):
+		self._guardTest( '(a)', 'a', {} ) 
+		self._guardTest( '(a)', 'b', GuardError ) 
+	
+	def testStringVar(self):
+		self._guardTest( '(!a)', 'test', { 'a' : 'test' } ) 
+		self._guardTest( '(!a)', '(a b c)', GuardError ) 
+
+	def testListVar(self):
+		self._guardTest( '(*a)', '(a b c)', { 'a' : ['a', 'b', 'c'] } ) 
+		self._guardTest( '(*a)', 'test', GuardError ) 
+
+	def testAnyVar(self):
+		self._guardTest( '($a)', 'test', { 'a' : 'test' } ) 
+		self._guardTest( '($a)', '(a b c)', { 'a' : ['a', 'b', 'c'] } )
+		
+	def testList(self):
+		self._guardTest( '((a b c))', '(a b c)', {} ) 
+		self._guardTest( '((a b c))', '(a b c d)', GuardError ) 
+
+	def testListWithVars(self):
+		self._guardTest( '((a !foo *bar $doh))', '(a b (c d e) f)', { 'foo' : 'b', 'bar' : [ 'c', 'd', 'e' ], 'doh' : 'f' } ) 
+		self._guardTest( '((a !foo *bar $doh))', '(a b (c d e) (f g h))', { 'foo' : 'b', 'bar' : [ 'c', 'd', 'e' ], 'doh' : [ 'f', 'g', 'h' ] } ) 
+
+	def testListRemainder(self):
+		self._guardTest( '((a !foo *bar $doh :re))', '(a b (c d e) f g h (i j k) l)', { 'foo' : 'b', 'bar' : [ 'c', 'd', 'e' ], 'doh' : 'f', 're' : [ 'g', 'h', [ 'i', 'j', 'k' ], 'l' ] } )
+		self._guardTest( '((a !foo *bar $doh :re))', '(a b (c d e) f g h (i j k) l m)', { 'foo' : 'b', 'bar' : [ 'c', 'd', 'e' ], 'doh' : 'f', 're' : [ 'g', 'h', [ 'i', 'j', 'k' ], 'l', 'm' ] } )
+		
+	def testMultiBind(self):
+		self._guardTest( '((a !foo (x y !foo z w)))', '(a b (x y b z w))', { 'foo' : 'b' } )
+		self._guardTest( '((a !foo (x y !foo z w)))', '(a b (x y q z w))', GuardError )
+		
+	def testMultiGuard(self):
+		self._guardTest( '((a !a) (b !b) (c !c) (d !d))', '(a x)', { 'a' : 'x' } )
+		self._guardTest( '((a !a) (b !b) (c !c) (d !d))', '(b x)', { 'b' : 'x' } )
+		self._guardTest( '((a !a) (b !b) (c !c) (d !d))', '(c x)', { 'c' : 'x' } )
+		self._guardTest( '((a !a) (b !b) (c !c) (d !d))', '(d x)', { 'd' : 'x' } )
+		self._guardTest( '((a !a) (b !b) (c !c) (d !d))', '(e x)', GuardError )
+	
+
+
+if __name__ == '__main__':
+	unittest.main()
