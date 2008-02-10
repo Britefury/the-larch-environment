@@ -15,6 +15,41 @@ import cStringIO
 """
 XML based serialisation system
 
+Primitive types have XML serialisation handers set up for them by IOXml.
+
+Quick read and write
+ioReadObjectFromString(s)  ->  object    # read an object from a string
+ioReadObjectFromFile(f)      ->  object    # read an object from a file
+ioWriteObjectAsString(obj)  ->  string    # write an object to a string
+ioWriteObjectToFile(f, obj)  ->  None     # write an object to a file
+
+
+To handle more complex documents:
+input:
+  create a document:
+    document = InputXmlDocument()
+  read the data from a string:
+    document.parse(s)
+  OR read the data from a file:
+    document.parseFile( f )
+  get the document content node:
+    node = document.getContentNode()
+  -- handle the XML node tree
+
+output:
+  create a document:
+    document = OutputXmlDocument()
+  get the document content node:
+    node = document.getContentNode()
+  -- manipulate the XML node tree
+  to write to a file:
+    document.writeFile( f )                  # write to a file f
+  OR to write to a string:
+    document.writeString() -> string    # write to a string
+
+
+
+
 Classes can define the following:
 
 __readxml__ and __writexml__
@@ -29,6 +64,9 @@ __ioxml_can_delegate__ = True
 			 __readxml__ is called as normal to read the node
 		else:
 			type checking and reference linking is skipped and __readxml__ is called directly; this allows a class to handle all types
+			
+			
+call ioObjectFactoryRegister(name, cls)   for each class that is to be XML serialisable
 """
 
 
@@ -891,6 +929,11 @@ def ioReadObjectFromString(s):
 	inDoc.parse( s )
 	return inDoc.getContentNode().readObject()
 
+def ioReadObjectFromFile(f):
+	inDoc = InputXmlDocument()
+	inDoc.parseFile( s )
+	return inDoc.getContentNode().readObject()
+
 
 
 def ioWriteObjectAsString(obj):
@@ -898,6 +941,10 @@ def ioWriteObjectAsString(obj):
 	outDoc.getContentNode()  <<  obj
 	return outDoc.writeString()
 
+def ioWriteObjectToFile(f, obj):
+	outDoc = OutputXmlDocument()
+	outDoc.getContentNode()  <<  obj
+	outDoc.writeFile( f )
 
 
 

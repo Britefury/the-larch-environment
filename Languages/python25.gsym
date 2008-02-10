@@ -1,7 +1,8 @@
 (
-	(= @ml (@gsym importLanguage 'gsym-metalanguage' 'Britefury' '1.0'))
+	(= @mlLang (@gsym importLanguage 'gsym-metalanguage' 'Britefury' '1.0'))
+	(= @ml (@mlLang getLanguageInterface))
 	
-	(@gsym document
+	(@mlLang document
 		(
 			(@ml language 'gsym-python' 'Britefury' '2.5'
 				(
@@ -11,8 +12,40 @@
 					)
 					
 					(@ml tokeniserSection			
-						(@ml defineToken identifierTok (@tokeniser wordSubtoken (@tokeniser getCharClassification alphaCharClass) (@tokeniser getCharClassification alphaNumCharClass)))
-						(@ml defineToken addTok (@tokeniser literalSubtoken '+'))
+						(@ml defineToken identifierTok (@ml wordSubtoken (@tokeniser getCharClassification alphaCharClass) (@ml getCharClassification alphaNumCharClass)))
+						(@ml defineToken addTok (@ml literalSubtoken '+'))
+					)
+					
+					(@ml layersSection
+						(@ml defineLayer 'python-2.5-layer')
+						(@ml defineLayer 'python-2.5-display-layer')
+					)
+					
+					(@ml transformationsSection
+						(= @displayXform (@ml defineTransformation 'python-2.5-display-xform' 'python-2.5-layer' 'python-2.5-display-layer'))
+					)
+					
+					(@ml buildSection
+						(@ml defineBuildAction 'compile' 'python-2.5-layer')
+					)
+					
+					(@ml nodesSection
+						(@ml defineNode 'loadLocal'
+							(@ml nodeBuildAction 'compile' (
+									( (_ loadLocal @x) (@x) )
+								)
+							)
+							
+							(@ml nodeXform 'python-2.5-display-xform' (
+									( (_ loadLocal @x) (@ml 
+								)
+							)
+						)
+						
+						(@ml defineNode 'add'
+							(@ml buildAction 'compile' (
+									( (_ add @x @y) ( (x + ' + ') + y ) )
+						)
 					)
 				)
 			)

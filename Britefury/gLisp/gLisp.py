@@ -20,19 +20,32 @@ from Britefury.DocView.StyleSheet.DVStyleSheet import *
 
 
 class GSymEnvironment (object):
-	def __init__(self):
+	def importLanguage(self, name, vendor, version):
+		pass
+
+	
+	
+class GSymLanguageControlInterface (object):
+	@specialform
+	def document(self, env, xs):
 		pass
 	
 	
-	def importLanguage(self, name, vendor, version):
+	def getLanguageInterface(self):
+		return self._language
+	
+	
+	
+class GSymLanguage (object):
+	pass
+
+
+class GSymLanguageFactory (object):
+	pass
 
 
 
 class GLispTokeniser (object):
-	def __init__(self):
-		pass
-	
-	
 	# Define a token
 	def defineToken(self, name, parser):
 		return DocViewTokenDefinition( name, parser )
@@ -130,7 +143,7 @@ class GLispStyleSheet (object):
 		pass
 	
 	@specialform
-	def defineSetValueAction(self, xs):
+	def defineSetValueAction(self, env, xs):
 		if len(xs) < 4:
 			raise TypeError, 'GLispStyleSheet.defineSetValueAction: needs a function name and a parameter list'
 		
