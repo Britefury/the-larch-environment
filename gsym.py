@@ -12,9 +12,7 @@ i18n.initialise()
 
 
 
-from Britefury.FileIO.IOXml import *
-
-from Britefury.SheetGraph.SheetGraph import *
+from Britefury.gSym.gSymEnvironment import initGSymEnvironment, shutdownGSymEnvironment
 
 from Britefury.MainApp.MainApp import MainApp
 
@@ -27,22 +25,24 @@ if __name__ == '__main__':
 	pygtk.require( '2.0' )
 	import gtk
 
+	
+	initGSymEnvironment()
 
 
 	documentRoot = None
 
-	if len( sys.argv ) == 2:
-		filename = sys.argv[1]
+	#if len( sys.argv ) == 2:
+		#filename = sys.argv[1]
 
-		f = open( filename, 'r' )
-		if f is not None:
-			doc = InputXmlDocument()
-			doc.parseFile( f )
-			contentNode = doc.getContentNode()
-			if contentNode.isValid():
-				rootXmlNode = contentNode.getChild( 'doc_root' )
-				if rootXmlNode.isValid():
-					documentRoot = rootXmlNode.readObject()
+		#f = open( filename, 'r' )
+		#if f is not None:
+			#doc = InputXmlDocument()
+			#doc.parseFile( f )
+			#contentNode = doc.getContentNode()
+			#if contentNode.isValid():
+				#rootXmlNode = contentNode.getChild( 'doc_root' )
+				#if rootXmlNode.isValid():
+					#documentRoot = rootXmlNode.readObject()
 
 	if documentRoot is None:
 		documentRoot = MainApp.makeEmptyDocument()
@@ -50,3 +50,5 @@ if __name__ == '__main__':
 	app = MainApp( documentRoot )
 
 	gtk.main()
+	
+	shutdownGSymEnvironment()
