@@ -66,10 +66,18 @@ class LanguageRegistry (object):
 		k = self._p_key( name, vendor, version )
 		self._languages[k] = self._Entry( filename )
 		
+	
+	def hasLanguage(self, name, vendor, version):
+		return self._p_key( name, vendor, version )  in  self._languages
+		
+		
 		
 	def getLanguageFactory(self, name, vendor, version):
 		k = self._p_key( name, vendor, version )
-		entry = self._languages[k]
+		try:
+			entry = self._languages[k]
+		except KeyError:
+			return None
 		return entry.getLanguageFactory()
 
 		

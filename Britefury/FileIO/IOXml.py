@@ -18,8 +18,10 @@ XML based serialisation system
 Primitive types have XML serialisation handers set up for them by IOXml.
 
 Quick read and write
-ioReadObjectFromString(s)  ->  object    # read an object from a string
-ioReadObjectFromFile(f)      ->  object    # read an object from a file
+ioReadObjectFromString(s)  ->  object    # read an object from a string s
+ioReadIntoObjectFromString(obj, s)  ->  object    # read an object from a string, into obj
+ioReadObjectFromFile(f)      ->  object    # read an object from a file f
+ioReadIntoObjectFromFile(obj, f)      ->  object    # read an object from a file f, into obj
 ioWriteObjectAsString(obj)  ->  string    # write an object to a string
 ioWriteObjectToFile(f, obj)  ->  None     # write an object to a file
 
@@ -929,10 +931,20 @@ def ioReadObjectFromString(s):
 	inDoc.parse( s )
 	return inDoc.getContentNode().readObject()
 
+def ioReadIntoObjectFromString(o, s):
+	inDoc = InputXmlDocument()
+	inDoc.parse( s )
+	return inDoc.getContentNode()  >>  o
+
 def ioReadObjectFromFile(f):
 	inDoc = InputXmlDocument()
-	inDoc.parseFile( s )
+	inDoc.parseFile( f )
 	return inDoc.getContentNode().readObject()
+
+def ioReadIntoObjectFromFile(o, f):
+	inDoc = InputXmlDocument()
+	inDoc.parseFile( f )
+	return inDoc.getContentNode()  >>  o
 
 
 
