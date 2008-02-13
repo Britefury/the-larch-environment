@@ -27,22 +27,6 @@ class LanguageNotFoundError (Exception):
 #
 #
 
-_settingsDir = os.path.expanduser( '~/.gsym' )
-_languageRegistryPath = os.path.join( _settingsDir, 'languageregistry.xml' )
-
-
-
-_languageRegistry = LanguageRegistry( _languageLoader )
-
-
-
-def _initSettingsDir():
-	if not os.path.exists( _settingsDir ):
-		os.mkdir( _settingsDir )
-
-
-
-
 def _languageLoader(filename):
 	"""Loads the language in the specified file, and returns a language factory"""
 	doc = readSX( file( filename, 'r' ) )
@@ -63,6 +47,26 @@ def _languageLoader(filename):
 	# TODO
 	# TODO
 	pass
+
+
+
+
+_settingsDir = os.path.expanduser( '~/.gsym' )
+_languageRegistryPath = os.path.join( _settingsDir, 'languageregistry.xml' )
+
+
+
+_languageRegistry = LanguageRegistry( _languageLoader )
+
+
+
+def _initSettingsDir():
+	if not os.path.exists( _settingsDir ):
+		os.mkdir( _settingsDir )
+
+
+
+
 
 
 
