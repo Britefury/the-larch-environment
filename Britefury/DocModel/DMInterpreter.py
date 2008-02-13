@@ -59,15 +59,6 @@ class specialform (object):
 
 
 
-class DMSys (object):
-	def __init__(self, stdout=sys.stdout):
-		super( DMSys, self ).__init__()
-		self._stdout = stdout
-
-	def stdout(self, s):
-		self._stdout.write( s )
-		
-
 
 class DMInterpreterEnv (object):
 	def __init__(self, **env):
@@ -180,6 +171,15 @@ import cStringIO
 
 
 class TestCase_DMInterpreter (unittest.TestCase):
+	class _OutputWriter (object):
+		def __init__(self, stdout=sys.stdout):
+			super( DMSys, self ).__init__()
+			self._stdout = stdout
+	
+		def stdout(self, s):
+			self._stdout.write( s )
+			
+	
 	def setUp(self):
 		self.stdout = cStringIO.StringIO()
 		
@@ -187,11 +187,10 @@ class TestCase_DMInterpreter (unittest.TestCase):
 		self.stdout.close()
 
 	def dmExec(self, programText):
-		sys = DMSys( self.stdout )
+		sys = self._OutputWriter( self.stdout )
 		return DMInterpreterEnv( sys=sys ).dmExec( readSX( programText ) )
 	
 	def dmEval(self, programText):
-		sys = DMSys()
 		return DMInterpreterEnv().dmEval( readSX( programText ) )
 	
 	
