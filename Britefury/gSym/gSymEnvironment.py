@@ -11,12 +11,14 @@ from Britefury.FileIO.IOXml import ioReadIntoObjectFromFile, ioWriteObjectToFile
 
 from Britefury.DocModel.DMIO import readSX
 
-from Britefury.gSym.LanguageRegistry import LanguageRegistry
+from Britefury.GLisp.GLispInterpreter import GLispInterpreterEnv, specialform
+from Britefury.GLisp.GLispModule import GLispModule
+from Britefury.GLisp.ModuleRegistry import ModuleRegistry
 
 
 
-class LanguageNotFoundError (Exception):
-	pass
+#class LanguageNotFoundError (Exception):
+	#pass
 
 
 #
@@ -27,36 +29,30 @@ class LanguageNotFoundError (Exception):
 #
 #
 
-def _languageLoader(filename):
-	"""Loads the language in the specified file, and returns a language factory"""
+def _moduleLoader(filename):
+	"""Loads the specified module, and return it"""
+	module = GLispModule()
+	env = GLispInterpreterEnv(module )
 	doc = readSX( file( filename, 'r' ) )
-	# TODO
-	# TODO
-	# TODO
-	# TODO
-	# TODO
-	# TODO
-	# TODO
-	# TODO
-	# TODO
-	# TODO
-	# TODO
-	# TODO
-	# TODO
-	# TODO
-	# TODO
-	# TODO
-	pass
+	env.execute( doc )
+	return module	
+
+
+#def _languageLoader(filename):
+	#"""Loads the language in the specified file, and returns a language factory"""
+	#doc = readSX( file( filename, 'r' ) )
+	## TODO
 
 
 
 
 _settingsDir = os.path.expanduser( '~/.gsym' )
-_languageRegistryPath = os.path.join( _settingsDir, 'languageregistry.xml' )
+#_languageRegistryPath = os.path.join( _settingsDir, 'languageregistry.xml' )
 
 
 
-_languageRegistry = LanguageRegistry( _languageLoader )
+#_languageRegistry = LanguageRegistry( _languageLoader )
+_moduleRegistry = ModuleRegistry( _moduleLoader )
 
 
 
@@ -81,20 +77,20 @@ def _initSettingsDir():
 
 
 def initGSymEnvironment():
-	global _languageRegistry
+	#global _languageRegistry
 	_initSettingsDir()
 	
-	if os.path.exists( _languageRegistryPath ):
-		ioReadIntoObjectFromFile( _languageRegistry, file( _languageRegistryPath, 'r' ) )
-	else:
-		print 'Could not read language registry'
+	#if os.path.exists( _languageRegistryPath ):
+		#ioReadIntoObjectFromFile( _languageRegistry, file( _languageRegistryPath, 'r' ) )
+	#else:
+		#print 'Could not read language registry'
 
 
 def shutdownGSymEnvironment():
-	if os.path.exists( _settingsDir ):
-		ioWriteObjectToFile( file( _languageRegistryPath, 'w' ), _languageRegistry )
-	else:
-		print 'Could not write language registry'
+	#if os.path.exists( _settingsDir ):
+		#ioWriteObjectToFile( file( _languageRegistryPath, 'w' ), _languageRegistry )
+	#else:
+		#print 'Could not write language registry'
 
 		
 
@@ -111,12 +107,34 @@ def shutdownGSymEnvironment():
 		
 
 class GSymEnvironment (object):
-	def importLanguage(self, name, vendor, version):
-		languageFactory = _languageRegistry.getLanguageFactory( name, vendor, version )
-		if languageFactory is not None:
-			return languageFactory.createLanguageInstance()
-		else:
-			raise LanguageNotFoundError
+	@specialform
+	def importModule(self, env, xs):
+		if len( xs ) < 3:
+			raise TypeError, 'insufficient arguments for GSymEnvironment#importModule'
+
+		name = xs[2]
+		imports = xs[3:]
+		
+		path = name.replace( '.', '/' )
+		
+		module = _moduleRegistry.getModule( path )
+		
+		for i in imports:
+			env[i] = module[i]
+			
+		return module
+		
+		
+		
+		
+		
+		
+	#def importLanguage(self, name, vendor, version):
+		#languageFactory = _languageRegistry.getLanguageFactory( name, vendor, version )
+		#if languageFactory is not None:
+			#return languageFactory.createLanguageInstance()
+		#else:
+			#raise LanguageNotFoundError
 		
 
 		

@@ -9,6 +9,8 @@ from copy import copy
 
 from Britefury.DocModel.DMListInterface import DMListInterface
 
+from Britefury.GLisp.GLispFrame import GLispFrame
+
 
 
 class GLispNameError (Exception):
@@ -60,15 +62,18 @@ class specialform (object):
 
 
 class GLispInterpreterEnv (object):
-	def __init__(self, **env):
-		self._env = copy( env )
+	def __init__(self, frame=None):
+		if frame is None:
+			self._frame = GLispFrame()
+		else:
+			self._frame = frame
 		
 		
 	def _p_interpretLiteral(self, xs):
 		if xs[0] == '@':
 			varName = xs[1:]
 			try:
-				return self._env[varName]
+				return self._frame._env[varName]
 			except KeyError:
 				raise DMINameError, '%s not bound'  %  ( varName, )
 		elif xs[0] == '#':
@@ -101,9 +106,9 @@ class GLispInterpreterEnv (object):
 					raise DMINameError, 'var name %s must start with @ in %s'  %  ( target, xs )
 				target = target[1:]
 				if isinstance( value, str ):
-					self._env[target] = value
+					self._frame._env[target] = value
 				else:
-					self._env[target] = self.evaluate( value )
+					self._frame._env[target] = self.evaluate( value )
 				return None
 			else:
 				if isinstance( x0, DMListInterface ):
@@ -157,7 +162,10 @@ class GLispInterpreterEnv (object):
 		
 		
 	def __getitem__(self, key):
-		return self._env[key]
+		return self._frame[key]
+		
+	def __setitem__(self, key, value):
+		self._frame[key] = value
 		
 		
 
@@ -190,7 +198,7 @@ class TestCase_GLispInterpreter (unittest.TestCase):
 
 	def execute(self, programText):
 		sys = self._OutputWriter( self.stdout )
-		return GLispInterpreterEnv( sys=sys ).execute( readSX( programText ) )
+		return GLispInterpreterEnv( GLispFrame( sys=sys ) ).execute( readSX( programText ) )
 	
 	def evaluate(self, programText):
 		return GLispInterpreterEnv().evaluate( readSX( programText ) )
