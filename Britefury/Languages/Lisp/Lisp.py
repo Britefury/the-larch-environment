@@ -14,8 +14,8 @@ from Britefury.DocPresent.Toolkit.DTLabel import DTLabel
 
 from Britefury.DocModel.DMListInterface import DMListInterface
 
-from Britefury.gLisp.gLisp import glisp
-from Britefury.DocModel.DMIO import readSX
+#from Britefury.gLisp.gLisp import glisp
+#from Britefury.DocModel.DMIO import readSX
 
 from Britefury.DocView.DocView import DocView
 from Britefury.DocView.DocViewTokeniser import DocViewTokenDefinition, DocViewTokeniser
@@ -28,48 +28,52 @@ from Britefury.DocView.StyleSheet.DVListWrappedLineStyleSheet import DVListWrapp
 
 
 
-#_unquotedStringChars = ( string.digits + string.letters + string.punctuation ).replace( '(', '' ).replace( ')', '' ).replace( '\'', '' ).replace( '`', '' ).replace( '{', '' ).replace( '}', '' )
-#_string = DocViewTokenDefinition( 'string', pyparsing.Word( _unquotedStringChars )  |  pyparsing.quotedString )
-#_openParen = DocViewTokenDefinition( 'openParen', pyparsing.Literal( '(' ) )
-#_closeParen = DocViewTokenDefinition( 'closeParen', pyparsing.Literal( ')' ) )
-#_whitespace = DocViewTokenDefinition( 'whitespace', pyparsing.Word( string.whitespace ) )
 
-#@DVStyleSheetSetValueAction
-#def _setValueTokenAction(text):
-#	return text
+#lispDef = """
+#(
+#(= @unquotedStringChars 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!"#$%&*+,-./:;<=>?@[\]^_|~ )
 
-
+#(= @stringTok (@tokeniser defineToken string (@tokeniser combineOr (@tokeniser wordSubtoken @unquotedStringChars) (@tokeniser quotedString))))
+#(= @openParenTok (@tokeniser defineToken openParen (@tokeniser literalSubtoken '(')))
+#(= @closeParenTok (@tokeniser defineToken closeParen (@tokeniser literalSubtoken ')')))
+#(= @whitespaceTok (@tokeniser defineToken whitespace (@tokeniser wordSubtoken (@tokeniser whitespace))))
 
 
-lispDef = """
-(
-(= @unquotedStringChars 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!"#$%&*+,-./:;<=>?@[\]^_|~ )
-
-(= @stringTok (@tokeniser defineToken string (@tokeniser combineOr (@tokeniser wordSubtoken @unquotedStringChars) (@tokeniser quotedString))))
-(= @openParenTok (@tokeniser defineToken openParen (@tokeniser literalSubtoken '(')))
-(= @closeParenTok (@tokeniser defineToken closeParen (@tokeniser literalSubtoken ')')))
-(= @whitespaceTok (@tokeniser defineToken whitespace (@tokeniser wordSubtoken (@tokeniser whitespace))))
+#(= @setValueTokenAction (@styleSheet defineSetValueAction setValueTokenAction (text)
+						#(@text)))
+#)
+#"""
 
 
-(= @setValueTokenAction (@styleSheet defineSetValueAction setValueTokenAction (text)
-						(@text)))
-)
-"""
+#glisp.execute( readSX( lispDef ) )
 
 
-glisp.dmExec( readSX( lispDef ) )
+#_unquotedStringChars = glisp['unquotedStringChars']
 
 
-_unquotedStringChars = glisp['unquotedStringChars']
+#_string = glisp['stringTok']
+#_openParen = glisp['openParenTok']
+#_closeParen = glisp['closeParenTok']
+#_whitespace = glisp['whitespaceTok']
 
 
-_string = glisp['stringTok']
-_openParen = glisp['openParenTok']
-_closeParen = glisp['closeParenTok']
-_whitespace = glisp['whitespaceTok']
+#_setValueTokenAction = glisp['setValueTokenAction']
 
 
-_setValueTokenAction = glisp['setValueTokenAction']
+
+_unquotedStringChars = ( string.digits + string.letters + string.punctuation ).replace( '(', '' ).replace( ')', '' ).replace( '\'', '' ).replace( '`', '' ).replace( '{', '' ).replace( '}', '' )
+_string = DocViewTokenDefinition( 'string', pyparsing.Word( _unquotedStringChars )  |  pyparsing.quotedString )
+_openParen = DocViewTokenDefinition( 'openParen', pyparsing.Literal( '(' ) )
+_closeParen = DocViewTokenDefinition( 'closeParen', pyparsing.Literal( ')' ) )
+_whitespace = DocViewTokenDefinition( 'whitespace', pyparsing.Word( string.whitespace ) )
+
+@DVStyleSheetSetValueAction
+def _setValueTokenAction(text):
+	return text
+
+
+
+
 
 
 
