@@ -19,6 +19,9 @@ class GLispNameError (Exception):
 class GLispMethodError (Exception):
 	pass
 
+class GLispKeywordError (Exception):
+	pass
+
 
 
 
@@ -62,20 +65,27 @@ class specialform (object):
 
 
 class GLispInterpreterEnv (object):
+	__slots__ = [ '_frame' ]
+
+	
 	def __init__(self, frame=None):
 		if frame is None:
 			self._frame = GLispFrame()
 		else:
 			self._frame = frame
+			
+			
+	def innerScope(self):
+		return GLispInterpreterEnv( self._frame.innerScope() )
 		
 		
 	def _p_interpretLiteral(self, xs):
 		if xs[0] == '@':
 			varName = xs[1:]
 			try:
-				return self._frame._env[varName]
+				return self._frame[varName]
 			except KeyError:
-				raise DMINameError, '%s not bound'  %  ( varName, )
+				raise GLispNameError, '%s not bound'  %  ( varName, )
 		elif xs[0] == '#':
 			value = xs[1:]
 			if value == 'False':
@@ -98,18 +108,14 @@ class GLispInterpreterEnv (object):
 			return None
 		elif isinstance( xs, DMListInterface ):
 			x0 = xs[0]
-			if x0 == '=':
-				# Assignment
-				target = xs[1]
-				value = xs[2]
-				if target[0] != '@':
-					raise DMINameError, 'var name %s must start with @ in %s'  %  ( target, xs )
-				target = target[1:]
-				if isinstance( value, str ):
-					self._frame._env[target] = value
-				else:
-					self._frame._env[target] = self.evaluate( value )
-				return None
+			if x0[0] == '$':
+				# keyword
+				keyword = x0[1:]
+				try:
+					method = getattr( self, '_keyword_' + keyword )
+				except AttributeError:
+					raise GLispKeywordError, keyword
+				return method( xs )
 			else:
 				if isinstance( x0, DMListInterface ):
 					target = self.evaluate( x0 )
@@ -123,7 +129,7 @@ class GLispInterpreterEnv (object):
 					try:
 						method = getattr( target, methodName )
 					except AttributeError:
-						raise DMIMethodError, '%s has no method %s, in %s' % ( target, methodName, xs )
+						raise GLispMethodError, '%s has no method %s, in %s' % ( target, methodName, xs )
 				elif callable( methodName ):
 					args = [ self.evaluate( dmarg )   for dmarg in xs[2:] ]
 					try:
@@ -149,7 +155,7 @@ class GLispInterpreterEnv (object):
 
 
 	def execute(self, xs):
-		if isinstance( xs, DMListInterface ):
+		if isinstance( xs, DMListInterface )  or  isinstance( xs, list ):
 			if len( xs ) > 0:
 				if isinstance( xs[0], DMListInterface ):
 					for x in xs:
@@ -161,6 +167,29 @@ class GLispInterpreterEnv (object):
 			return self.evaluate( xs )
 		
 		
+	def _keyword_let(self, xs):
+		if len( xs ) < 2:
+			raise ValueError, '$let must have have at least 1 parameter; the binding list'
+	
+		bindings = xs[1]
+		expressions = xs[2:]
+		
+		if not isinstance( bindings, DMListInterface ):
+			raise ValueError, '$let bindings must be a list of pairs'
+		
+		newEnv = self.innerScope()
+		for binding in bindings:
+			if not isinstance( binding, DMListInterface )  or  len( binding ) != 2:
+				raise ValueError, '$let binding must be a name value pair'
+			
+			if binding[0][0] != '@':
+				raise ValueError, '$let binding name must start with @'
+			
+			newEnv._frame[binding[0][1:]] = newEnv.evaluate( binding[1] )
+			
+		return newEnv.execute( expressions )
+
+	
 	def __getitem__(self, key):
 		return self._frame[key]
 		
@@ -208,13 +237,14 @@ class TestCase_GLispInterpreter (unittest.TestCase):
 		self.execute( '(@sys stdout a)' )
 		self.assert_( self.stdout.getvalue() == 'a' )
 		
-	def testVars(self):
-		src = """
-		((= @a test)
-		(@sys stdout @a))"""
+	def testLet(self):
+		src = """($let ((@a #4) (@b (@a + #5)) (@c test) (@d (@c * @b)))
+		(@c split)
+		(@sys stdout @d)
+		)"""
 		self.execute( src )
-		self.assert_( self.stdout.getvalue() == 'test' )
-		
+		self.assert_( self.stdout.getvalue() == 'test' * 9 )
+
 	def testBooleans(self):
 		self.assert_( self.evaluate( '#False' )  ==  False )
 		self.assert_( self.evaluate( '#True' )  ==  True)

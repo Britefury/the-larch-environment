@@ -6,6 +6,8 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
 
+from Britefury.Kernel.Abstract import abstractmethod
+
 from Britefury.DocModel.DMListInterface import DMListInterface
 
 
@@ -18,83 +20,213 @@ _listTypeSrc = 'DMListInterface'
 class GuardError (Exception):
 	pass
 
+
+def _indent(self, src):
+	return [ '\t' + s   for s in src ]
+
+
+
 def _bind(result, name, value):
 	existingValue = result.setdefault( name, value )
 	if existingValue is not value:
 		raise GuardError
+
 	
+class  _GuardMatch (object):
+	def __init__(self):
+		super( _GuardItem, self ).__init__()
+		self.bindName = None
 		
-def _compileGuardList(xs, inputName):
-	result = []
+		
+	@abstractmethod
+	def emitSourceAndVarNames(self, valueSrc, varNames):
+		pass
+
 	
-	varNames = set()
-
-	#detect listRemainderVar
-	last = None
-	if xs[-1][0] == ':':
-		last = -1
-		
-	#check length
-	if last is None:
-		#no remainder variable; fixed length
-		result.extend( [
-			'if len( %s ) != %d:'  %  ( inputName, len( xs ) ),
-			'\traise GuardError'
-			] )
-		
-	#guardItem*
-	for i, item in enumerate( xs[:last] ):
-		itemName = '%s[%d]'  %  ( inputName, i )
-		itemSrc, itemVarNames = _compileGuardItem( item, itemName )
-		varNames = varNames | itemVarNames
-		result.extend( itemSrc )
-
-	#listRemainderVar
-	if last == -1:
-		result.extend( [ '_bind( result, \'%s\', %s[%d:] )'  %  ( xs[-1][1:], inputName, len( xs ) - 1 ) ] )
-		varNames.add( xs[-1][1:] )
-
-	return result, varNames
-		
-
-def _compileGuardItem(xs, inputName):
-	if isinstance( xs, _listType ):
-		guardListSrc, guardListVarNames = _compileGuardList( xs, inputName )
-		return [ 'if isinstance( %s, %s ):'  %  ( inputName, _listTypeSrc, ) ]  +  [ '\t' + x   for x in guardListSrc ] + [
-			'else:',
-			'\traise GuardError'
-			], guardListVarNames
-	else:
-		# constant or var or ignore
-		if xs[0] == '!':
-			#stringVar
-			return [
-				'if isinstance( %s, %s ):'  %  ( inputName, _stringTypeSrc ),
-				'\t_bind( result, \'%s\', %s )'  %  ( xs[1:], inputName ),
-				'else:',
-				'\traise GuardError'
-			], set( [ xs[1:] ] )
-		elif xs[0] == '*':
-			#listVar
-			return [
-				'if isinstance( %s, %s ):'  %  ( inputName, _listTypeSrc ),
-				'\t_bind( result, \'%s\', %s )'  %  ( xs[1:], inputName ),
-				'else:',
-				'\traise GuardError'
-			], set( [ xs[1:] ] )
-		elif xs[0] == '$':
-			#anyVar
-			return [ '_bind( result, \'%s\', %s )'  %  ( xs[1:], inputName )
-			 ], set( [ xs[1:] ] )
-		elif xs == '_':
-			#ignore
-			return [], set()
+	def _p_emitMatchFailed(self):
+		return [ 'raise GuardError' ]
+	
+	def _p_emitBind(self, valueSrc, varNames):
+		if self.bindName is not None:
+			varNames.add( self.bindName )
+			return [ '_bind( result, \'%s\', %s )'  %  ( self.bindName, valueSrc ) ]
 		else:
-			#constant
-			return [
-				'if %s != \'%s\':'  %  ( inputName, xs ),
-				'\traise GuardError'
-			], set()
+			return [], set()
+		
+
+
+class _GuardMatchAnything (_GuardMatch):
+	def emitSourceAndVarNames(self, valueSrc, varNames):
+		return self._p_emitBind( valueSrc )
+	
+class _GuardMatchAnyString (_GuardMatch):
+	def emitSourceAndVarNames(self, valueSrc, varNames):
+		return [ 'if isinstance( %s, %s ):'  %  ( valueSrc, _stringTypeSrc ) ]  +  \
+			_indent( self._p_emitBind( valueSrc, varNames ) )  +  \
+			[ 'else:' ]  +  \
+			_indent( self._p_emitMatchFailed()  )
+	
+class _GuardMatchAnyList (_GuardMatch):
+	def emitSourceAndVarNames(self, valueSrc, varNames):
+		return [ 'if isinstance( %s, %s ):'  %  ( valueSrc, _listTypeSrc ) ]  +  \
+			_indent( self._p_emitBind( valueSrc, varNames ) )  +  \
+			[ 'else:' ]  +  \
+			_indent( self._p_emitMatchFailed()  )
+
+class _GuardMatchString (_GuardMatch):
+	def __init__(self, constant):
+		super( _GuardMatchString, self ).__init__()
+		self._constant = constant
+
+	def emitSourceAndVarNames(self, valueSrc, varNames):
+		return [ 'if %s == \'%s\':'  %  ( valueSrc, self._constant ) ]  +  \
+			_indent( self._p_emitBind( valueSrc, varNames ) )  +  \
+			[ 'else:' ]  +  \
+			_indent( self._p_emitMatchFailed()  )
+
+class _GuardMatchList (_GuardMatch):
+	def __init__(self, subMatches):
+		internalIndex = None
+		for i, m in enumerate( subMatches ):
+			if isinstance( m, _GuardMatchListInternal ):
+				if internalIndex is not None:
+					raise ValueError, 'only one _GuardMatchListInternal inside a guard match list'
+				internalIndex = i
+
+		if internalIndex is not None:
+			self._front = subMatches[:internalIndex]
+			self._back = subMatches[internalIndex+1:]
+			self._internal = subMatches[internalIndex]
+		else:
+			self._front = subMatches
+			self._back = []
+			self._internal = None
+			
+		if self._internal is not None:
+			self._minLength = len( self._front ) + len( self._back ) + self._internal.min
+			if self._internal.max is not None:
+				self._maxLength = len( self._front ) + len( self._back ) + self._internal.max
+			else:
+				self._maxLength = None
+		else:
+			self._minLength = self._maxLength = len( self._front )
+		
+	def emitSourceAndVarNames(self, valueSrc, varNames):
+		# Check the lengths
+		src = []
+		if self._minLength == self._maxLength:
+			# min and max length the same; only one length permissable
+			src.append( 'if len( %s )  !=  %d:'  %  ( valueSrc, self._minLength ) )
+			src.append( _indent( self._p_emitMatchFailed() ) )
+			src.append( '' )
+		elif self._minLength == 0  and  self._maxLength is not None:
+			# no min length, a max length
+			src.append( 'if len( %s )  >  %d:'  %  ( valueSrc, self._maxLength ) )
+			src.append( _indent( self._p_emitMatchFailed() ) )
+			src.append( '' )
+		elif self._minLength > 0:
+			# there is a min length
+			if self._maxLength is None:
+				# no max length
+				src.append( 'if len( %s )  <  %d:'  %  ( valueSrc, self._minLength ) )
+				src.append( _indent( self._p_emitMatchFailed() ) )
+				src.append( '' )
+			else:
+				# no max length
+				src.append( 'if len( %s )  <  %d   or   len( %s )  >  %d:'  %  ( valueSrc, self._minLength, valueSrc, self._maxLength ) )
+				src.append( _indent( self._p_emitMatchFailed() ) )
+				src.append( '' )
+				
+	#guardItem*  (front)
+	for i, item in enumerate( self._front ):
+		itemNameSrc = '%s[%d]'  %  ( valueSrc, i )
+		itemSrc = item.emitSourceAndVarNames( itemNameSrc, varNames )
+		src.extend( itemSrc )
+				
+	#guardItem*  (back)
+	for i, item in enumerate( reversed( self._back ) ):
+		itemNameSrc = '%s[-%d]'  %  ( valueSrc, i )
+		itemSrc = item.emitSourceAndVarNames( itemNameSrc, varNames )
+		src.extend( itemSrc )
+		
+	if self._internal is not None:
+		self._internal.emitSourceAndVarNames( '%s[%d:-%d]'  %  ( valueSrc, len( self._front ), len( self._back ) ), varNames )
+
+		
+		
+class _GuardMatchListInternal (_GuardMatch):
+	def __init__(self, min=0, max=None):
+		super( _GuardMatchListInternal, self ).__init__()
+		self.min = min
+		self.max = max
+		
+	def emitSourceAndVarNames(self, valueSrc, varNames):
+		self._p_emitBind( valueSrc, varNames )
+		
+	
+
+"""
+bind(x)  :=  [':' <var_name> x]  |  x
+
+guardX := guardItem
+guardItem := anything | anyString | anyList | constantString | list
+anything := bind( '!' )
+anyString := bind( '^' )
+anyList := bind( '/' )
+constantString := bind( <string> )
+list := bind( [guardItem* listInternal? guardItem*] )
+listInternal := bind( '+'  |  '*'  |  ['-' #min #max] )
+
+The characters : ! - / + * are assigned special meaning, so use :: !! -- // ++ ** to get the characters as constants
+"""
+	
+	
+		
+def _buildMatchForGuardList(xs):
+	def _processItem(xs):
+		if xs == '+':
+			return _GuardMatchListInternal( 1, None )
+		elif xs == '*':
+			return _GuardMatchListInternal( 0, None )
+		elif isinstance( xs, _listTypeSrc )  and  len( xs ) == 3  and  xs[0] == '-':
+			if xs[1][0] != '#'  or  xs[2][0] != '#':
+				raise ValueError, 'range numbers must start with #'
+			return _GuardMatchListInternal( int( xs[1][1:] ), int( xs[2][1:] ) )
+		else:
+			return _buildMatchForGuardItem( xs )
+	
+	# guardItem*
+	return _GuardMatchList( [ _processItem( x )   for x in xs ] )
+
+
+
+def _buildMatchForGuardItem(xs):
+	if isinstance( xs, _listType ):
+		if xs[0] == ':':
+			# Bind
+			if xs[1][0] != '@':
+				raise ValueError, 'variable names (to be bound) must start with @'
+			varName = xs[1][1:]
+			match = _buildMatchForGuardItem( xs[2] )
+			match.bindName = varName
+		else:
+			match = _buildMatchForGuardList( xs )
+		return match
+	else:
+		if xs == '!':
+			# match anything
+			return _GuardMatchAnything()
+		elif xs == '^':
+			# match any string
+			return _GuardMatchAnyString()
+		elif xs == '/':
+			# match any list
+			return _GuardMatchAnyList()
+		else:
+			# match a constant
+			constant = xs.replace( '!!', '!' ).replace( '^^', '^' ).replace( '//', '/' ).replace( '++', '+' ).replace( '**', '*' ).replace( '--', '-' ).replace( '::', ':' )
+			return _GuardMatchString( constant )
+
 
 		
 def compileGuardExpression(xs, guardIndirection=[], functionName='guard'):

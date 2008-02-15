@@ -12,6 +12,7 @@ from Britefury.DocModel.DMListInterface import DMListInterface
 
 from Britefury.GLisp.GLispFrame import GLispFrame
 from Britefury.GLisp.GLispInterpreter import GLispInterpreterEnv, specialform
+from Britefury.GLisp.GLispCompiler import compileGLispFunctionToPy
 
 from Britefury.DocView.DocViewTokeniser import DocViewTokenDefinition, DocViewTokeniser
 
@@ -49,68 +50,6 @@ class GLispTokeniser (object):
 	
 
 	
-def compileGLispExpressionToPy(x, compileGLispExpr):
-	if not isinstance( x, DMListInterface ):
-		raise TypeError, 'Error compiling gLisp expression: input should be a list'
-	
-	return compileGLispExpr( x )
-
-
-def compileSimpleGLispExprToPy(x):
-	def compileSubExpression(sub):
-		if isinstance( sub, DMListInterface ):
-			return '(' + compileSimpleGLispExprToPy( sub ) + ')'
-		else:
-			if sub[0] != '@':
-				raise ValueError, 'variable access must be proceeded by @'
-			return sub[1:]
-	
-	if len(x) == 0:
-		return 'None'
-	elif len(x) == 1:
-		return compileSubExpression( x[0] )
-	else:
-		method = x[1]
-		if method == '[]'  and  len(x) == 3:
-			return '%s[%s]'  %  ( compileSubExpression( x[0] ), compileSubExpression( x[2] ) )
-		if method == '[]='  and  len(x) == 4:
-			return '%s[%s] = %s'  %  ( compileSubExpression( x[0] ), compileSubExpression( x[2] ), compileSubExpression( x[3] ) )
-		if method in [ '+', '-', '*', '/', '%', '**', '<<', '>>', '&', '|', '^', '<', '<=', '==', '!=', '>=', '>' ]   and   len(x) == 3:
-			return '%s %s %s'  %  ( compileSubExpression( x[0] ), method, compileSubExpression( x[2] ) )
-		else:
-			return '%s.%s(%s)'  %  ( compileSubExpression( x[0] ), method, ', '.join( [ compileSubExpression( ex )   for ex in x[2:] ] ) )
-		
-
-def compileGLispFunctionToPy(xs, compileGLispExpr, functionName):
-	if len(xs) < 2:
-		raise TypeError, 'Error compiling gLisp function: needs at least a parameter list'
-	
-	params = xs[0]
-	source = xs[1:]
-	
-	if not isinstance( params, DMListInterface ):
-		raise TypeError, 'Error compiling gLisp function: first parameter must be a list of variable names'
-	
-	pySrcHdr = 'def %s(%s):\n'  %  ( functionName, ', '.join( params[:] ) )
-	pyLines = [ compileGLispExpressionToPy( srcLine, compileGLispExpr ) + '\n'   for srcLine in source ]
-	if len( pyLines ) == 0:
-		pyLines = [ 'pass\n' ]
-	else:
-		pyLines[-1] = 'return ' + pyLines[-1]
-	pyLines = [ '   ' + l   for l in pyLines ]
-	
-	pySrc = pySrcHdr + ''.join( pyLines )
-	
-	lcl = {}
-	exec pySrc in lcl
-	return lcl[functionName]
-	
-	
-	
-	
-	
-	
-		
 
 
 
@@ -184,24 +123,6 @@ class TestCase_gLisp (unittest.TestCase):
 		self.assert_( definition._parser.parseString( 'aabbccbbaa' ).asList() == [ DocViewToken( 'testToken', 'aabbccbbaa' ) ] )
 		
 		
-	def testCompileSimpleGLispExprToPy(self):
-		self.assert_( compileSimpleGLispExprToPy( readSX( '()' ) )  ==  'None' )
-		self.assert_( compileSimpleGLispExprToPy( readSX( '(@test)' ) )  ==  'test' )
-		self.assert_( compileSimpleGLispExprToPy( readSX( '(@a + @b)' ) )  ==  'a + b' )
-		self.assert_( compileSimpleGLispExprToPy( readSX( '(@a [] @b)' ) )  ==  'a[b]' )
-		self.assert_( compileSimpleGLispExprToPy( readSX( '(@a []= @b @c)' ) )  ==  'a[b] = c' )
-		self.assert_( compileSimpleGLispExprToPy( readSX( '(@a + (@b * @c))' ) )  ==  'a + (b * c)' )
-		self.assert_( compileSimpleGLispExprToPy( readSX( '(@a + (@b func @c))' ) )  ==  'a + (b.func(c))' )
-		self.assert_( compileSimpleGLispExprToPy( readSX( '(@a + (@b func @c @d (@e * @f)))' ) )  ==  'a + (b.func(c, d, (e * f)))' )
-		
-		
-	def testCompileGLispFunctionToPy(self):
-		def makeFunc(src):
-			return compileGLispFunctionToPy( readSX( src ), compileSimpleGLispExprToPy, 'test' )
-		
-		self.assert_( makeFunc( '( (a b c) (@a lower) ((@a upper) + (@b * @c)) )' )('x', 'y', 3)  ==  'Xyyy' )
-
-
 
 if __name__ == '__main__':
 	unittest.main()
