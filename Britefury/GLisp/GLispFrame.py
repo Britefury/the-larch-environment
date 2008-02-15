@@ -9,11 +9,26 @@ from copy import copy
 
 
 class GLispFrame (object):
+	__slots__ = [ '_env', '_outerScope' ]
+
 	def __init__(self, **env):
 		self._env = copy( env )
+		self._outerScope = None
 
 	def __getitem__(self, key):
-		return self._env[key]
+		try:
+			return self._env[key]
+		except KeyError:
+			if self._outerScope is not None:
+				return self._outerScope[key]
+			else:
+				raise
 
 	def __setitem__(self, key, value):
 		self._env[key] = value
+		
+		
+	def innerScope(self):
+		f = GLispFrame()
+		f._outerScope = self
+		return f
