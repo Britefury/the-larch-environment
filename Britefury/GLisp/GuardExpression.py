@@ -271,6 +271,18 @@ def compileGuardExpression(xs, guardIndirection=[], functionName='guard', bSrc=F
 			listInternal := bind( '+'  |  '*'  |  ['-' #min #max] )
 			
 			The characters : ! - / + * are assigned special meaning, so use :: !! -- // ++ ** to get the characters as constants
+			
+		Example:
+			((a b c))  =>  matches (a b c)
+			((a b c) (d e f)  =>  matches (a b c)  or  (d e f)
+			((a ! ^ /))  =>  matches (a <anything> <any_string> <any_list>)
+			((a ! ^ (x y /))  =>  matches (a <anything> <any_string> (x y <any_list>))
+			((a * z))  =>  matches (a ... z)   where ... consists of 0 or more elements
+			((a + z))  =>  matches (a ... z)   where ... consists of 1 or more elements
+			((a (- #2 #4) z))  =>  matches (a ... z)   where ... consists of 2 to 4 elements
+			((a (: @a ^) z))  =>  matches (a [a]<any_string> z)   [a] indicates that the expression that follows is bound to the variable a
+			((a (: @a (i j (: @b ^))) z))  =>  matches (a [a](i j [b]<any_string>) z)   where 'a' is bound to (i j [b]<any_string>)   and 'b' is bound to the string
+			((:: !! -- // ++ **))  =>  matches (: ! - / + *)
 	"""
 	
 	pySrcHdr = 'def %s(xs):\n'  %  ( functionName, )
@@ -409,6 +421,15 @@ class TestCase_GuardExpression (unittest.TestCase):
 		self._guardTest( '((a b (: @a *) x y))', '(a b i j k x y)', { 'a': ['i','j','k'] } )
 		
 		
+	def testMatchListWithInteriorPlus(self):
+		self._guardTest( '((a b + x y))', '(a b x y)', GuardError )
+		self._guardTest( '((a b + x y))', '(a b i j k x y)', {} )
+	
+	def testMatchListWithInteriorPlusBind(self):
+		self._guardTest( '((a b (: @a +) x y))', '(a b x y)', GuardError)
+		self._guardTest( '((a b (: @a +) x y))', '(a b i j k x y)', { 'a': ['i','j','k'] } )
+
+		
 	def testMatchListLengths(self):
 		# A: fixed length
 		self._guardTest( '((: @a (a b c d)))', '(a b c d)', { 'a': ['a','b','c','d'] } )
@@ -453,6 +474,9 @@ class TestCase_GuardExpression (unittest.TestCase):
 		result = compileGuardExpression( readSX( '((a (: @foo !) (: @bar ^) (: @doh /) (: @re *)))' ) )[1]
 		self.assert_( result[0] == set( [ 'foo', 'bar', 'doh', 're' ] ) )
 
+	def testSpecials(self):
+		self._guardTest( '((:: !! -- // ++ **))', '(: ! - / + *)', {} )
+		self._guardTest( '((::a:: !!a!! --a-- //a// ++a++ **a**))', '(:a: !a! -a- /a/ +a+ *a*)', {} )
 
 
 if __name__ == '__main__':
