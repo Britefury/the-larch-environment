@@ -479,5 +479,6 @@ class TestCase_GuardExpression (unittest.TestCase):
 		self._guardTest( '((::a:: !!a!! --a-- //a// ++a++ **a**))', '(:a: !a! -a- /a/ +a+ *a*)', {} )
 
 
+		
 if __name__ == '__main__':
 	unittest.main()
