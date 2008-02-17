@@ -9,8 +9,6 @@ from copy import copy
 
 from Britefury.DocModel.DMListInterface import DMListInterface
 
-from Britefury.GLisp.GLispFrame import GLispFrame
-
 
 
 class GLispNameError (Exception):
@@ -64,26 +62,26 @@ class specialform (object):
 
 
 
-class GLispInterpreterEnv (object):
-	__slots__ = [ '_frame' ]
+class GLispFrame (object):
+	__slots__ = [ '_env', '_outerFrame' ]
 
 	
-	def __init__(self, frame=None):
-		if frame is None:
-			self._frame = GLispFrame()
-		else:
-			self._frame = frame
+	def __init__(self, **env):
+		self._env = copy( env )
+		self._outerFrame = None
 			
 			
 	def innerScope(self):
-		return GLispInterpreterEnv( self._frame.innerScope() )
+		f = GLispFrame()
+		f._outerFrame = self
+		return f
 		
 		
 	def _p_interpretLiteral(self, xs):
 		if xs[0] == '@':
 			varName = xs[1:]
 			try:
-				return self._frame[varName]
+				return self[varName]
 			except KeyError:
 				raise GLispNameError, '%s not bound'  %  ( varName, )
 		elif xs[0] == '#':
@@ -185,16 +183,22 @@ class GLispInterpreterEnv (object):
 			if binding[0][0] != '@':
 				raise ValueError, '$let binding name must start with @'
 			
-			newEnv._frame[binding[0][1:]] = newEnv.evaluate( binding[1] )
+			newEnv._env[binding[0][1:]] = newEnv.evaluate( binding[1] )
 			
 		return newEnv.execute( expressions )
 
 	
 	def __getitem__(self, key):
-		return self._frame[key]
+		try:
+			return self._env[key]
+		except KeyError:
+			if self._outerFrame is not None:
+				return self._outerFrame[key]
+			else:
+				raise
 		
 	def __setitem__(self, key, value):
-		self._frame[key] = value
+		self._env[key] = value
 		
 		
 
@@ -227,10 +231,10 @@ class TestCase_GLispInterpreter (unittest.TestCase):
 
 	def execute(self, programText):
 		sys = self._OutputWriter( self.stdout )
-		return GLispInterpreterEnv( GLispFrame( sys=sys ) ).execute( readSX( programText ) )
+		return GLispFrame( sys=sys ).execute( readSX( programText ) )
 	
 	def evaluate(self, programText):
-		return GLispInterpreterEnv().evaluate( readSX( programText ) )
+		return GLispFrame().evaluate( readSX( programText ) )
 	
 	
 	def testStdout(self):

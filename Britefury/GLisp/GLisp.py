@@ -11,7 +11,7 @@ import pyparsing
 from Britefury.DocModel.DMListInterface import DMListInterface
 
 from Britefury.GLisp.GLispFrame import GLispFrame
-from Britefury.GLisp.GLispInterpreter import GLispInterpreterEnv, specialform
+from Britefury.GLisp.GLispInterpreter import GLispFrame, specialform
 from Britefury.GLisp.GLispCompiler import compileGLispFunctionToPy
 
 from Britefury.DocView.DocViewTokeniser import DocViewTokenDefinition, DocViewTokeniser
@@ -75,7 +75,7 @@ def gSymGLispEnvironment():
 	tokeniser = GLispTokeniser()
 	styleSheet = GLispStyleSheet()
 	
-	return GLispInterpreterEnv( GLispFrame( tokeniser=tokeniser, styleSheet=styleSheet ) )
+	return GLispFrame( tokeniser=tokeniser, styleSheet=styleSheet )
 
 
 
