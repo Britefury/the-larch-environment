@@ -10,6 +10,8 @@ from copy import copy
 from Britefury.DocModel.DMListInterface import DMListInterface
 from Britefury.DocModel.DMIO import readSX
 
+from Britefury.GLisp.GLispEnvironment import getGLispModulePath
+
 
 
 #
@@ -60,7 +62,9 @@ class ModuleRegistry (object):
 			realpath = os.path.realpath( path )
 			
 			# Read in the document from the file, and execute it, in the context of the module
-			doc = readSX( file( filename, 'r' ) )
+			modulePath = getGLispModulePath( path )
+			
+			doc = readSX( file( modulePath, 'r' ) )
 			module.execute( doc )
 						
 			return m
@@ -282,6 +286,9 @@ class GLispFrame (object):
 				raise ValueError, '$importModule module name must either be a string, or a list of two items; the name and the name to import as'
 			name = moduleName[0]
 			targetName = moduleName[1]
+			if targetName[0] != '@':
+				raise ValueError, '$importModule \'import as name\' must start with a @'
+			targetName = targetName[1:]
 		
 		module = self.moduleRegistry[name]
 		
@@ -297,8 +304,6 @@ class GLispFrame (object):
 		($importModule module (item0 item1 ... itemN) (expressions_to_execute))
 		
 		itemX :=
-			name
-			OR
 			(name import_as_name)
 		"""
 		if len( xs ) < 3:
@@ -326,6 +331,10 @@ class GLispFrame (object):
 			name = item[0]
 			asName = item[1]
 			
+			if asName[0] != '@':
+				raise ValueError, '$importModuleContents \'import as name\' must start with a @'
+			asName = asName[1:]
+
 			newEnv[asName] = module[name]	
 
 		return newEnv.evaluate( expressions )
@@ -479,7 +488,7 @@ class TestCase_GLispInterpreter (unittest.TestCase):
 		module = GLispModule()
 		module['a'] = 123
 		src = """
-		($importModule (testModule test)
+		($importModule (testModule @test)
 		(@test [] a)
 		)"""
 		result = self.evaluateWithModules( src, testModule=module )
@@ -489,7 +498,7 @@ class TestCase_GLispInterpreter (unittest.TestCase):
 		module = GLispModule()
 		module['a'] = 123
 		src = """
-		($importModuleContents testModule ((a test))
+		($importModuleContents testModule ((a @test))
 		@test
 		)"""
 		result = self.evaluateWithModules( src, testModule=module )

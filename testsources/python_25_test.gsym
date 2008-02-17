@@ -1,10 +1,13 @@
 (
-	(= @pyLang (@gsym importLanguage 'gsym-python' 'Britefury' '2.5'))
-	(= @py (@pyLang getLanguageInterface))
-	
-	(@pyLang document
-		(
-			(@py add (@py localLocal a) (@py localLocal b))
+	($importModuleContents Languages.python25 ((language pyLang))
+
+		($let ((@py (@pyLang getLanguageInterface)))
+
+			(@pyLang document
+				(
+					(@py add (@py localLocal a) (@py localLocal b))
+				)
+			)
 		)
 	)
 )
