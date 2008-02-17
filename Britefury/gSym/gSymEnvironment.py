@@ -25,18 +25,7 @@ from Britefury.GLisp.ModuleRegistry import ModuleRegistry
 #
 #
 
-def _moduleLoader(filename):
-	"""Loads the specified module, and return it"""
-	module = GLispModule()
-	doc = readSX( file( filename, 'r' ) )
-	module.execute( doc )
-	return module	
-
-
 _settingsDir = os.path.expanduser( '~/.gsym' )
-
-
-_moduleRegistry = ModuleRegistry( _moduleLoader )
 
 
 
@@ -82,24 +71,7 @@ def shutdownGSymEnvironment():
 		
 
 class GSymEnvironment (object):
-	@specialform
-	def importModule(self, env, xs):
-		if len( xs ) < 3:
-			raise TypeError, 'insufficient arguments for GSymEnvironment#importModule'
-
-		name = xs[2]
-		imports = xs[3:]
-		
-		path = name.split( '.' )
-		path = os.path.join( path ) + '.gsym'
-		
-		module = _moduleRegistry.getModule( path )
-		
-		for i in imports:
-			env[i] = module[i]
-			
-		return module
-		
+	pass
 		
 		
 	
