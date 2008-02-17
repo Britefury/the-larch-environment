@@ -11,7 +11,7 @@ from Britefury.FileIO.IOXml import ioReadIntoObjectFromFile, ioWriteObjectToFile
 
 from Britefury.DocModel.DMIO import readSX
 
-from Britefury.GLisp.GLispInterpreter import GLispInterpreterEnv, specialform
+from Britefury.GLisp.GLispInterpreter import GLispFrame, specialform
 from Britefury.GLisp.GLispModule import GLispModule
 from Britefury.GLisp.ModuleRegistry import ModuleRegistry
 
@@ -32,9 +32,8 @@ from Britefury.GLisp.ModuleRegistry import ModuleRegistry
 def _moduleLoader(filename):
 	"""Loads the specified module, and return it"""
 	module = GLispModule()
-	env = GLispInterpreterEnv(module )
 	doc = readSX( file( filename, 'r' ) )
-	env.execute( doc )
+	module.execute( doc )
 	return module	
 
 
