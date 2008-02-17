@@ -5,45 +5,91 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
+from copy import copy
+
 from Britefury.DocModel.DMListInterface import DMListInterface
 
 
-def compileGLispExpressionToPy(x, compileGLispExpr):
-	if not isinstance( x, DMListInterface ):
-		raise TypeError, 'Error compiling gLisp expression: input should be a list'
+
+
+
+
+def _compileGLispExprToPySrcAndPrecedence(x):
+	_binaryOperatorPrecedenceTable = {
+		'**' : 1,
+		'*' : 4,
+		'/' : 4,
+		'%' : 4,
+		'+' : 5,
+		'-' : 5,
+		'<<' : 6,
+		'>>' : 6,
+		'&' : 7,
+		'^' : 8,
+		'|' : 9,
+		'<' : 10,
+		'<=' : 10,
+		'==' : 10,
+		'!=' : 10,
+		'>=' : 10,
+		'>' : 10,
+		'is' : 11,
+		'in' : 12,
+		'and' : 14,
+		'or' : 15,
+	}
 	
-	return compileGLispExpr( x )
-
-
-def compileSimpleGLispExprToPySrc(x):
-	def compileSubExpression(sub):
-		if isinstance( sub, DMListInterface ):
-			return '(' + compileSimpleGLispExprToPySrc( sub ) + ')'
+	_unaryOperatorPrecedenceTable = {
+		'~' : ( 2, False ),
+		'-' : ( 3, False ),
+		'not' : ( 13, True ),
+	}
+	
+	def compileSubExpression(sub, outerPrecedence):
+		src, innerPrecedence = _compileGLispExprToPySrcAndPrecedence( sub )
+		if outerPrecedence is not None  and  innerPrecedence is not None  and  outerPrecedence <=innerPrecedence:
+			return '(' + src + ')'
 		else:
-			if sub[0] == '@':
-				return sub[1:]
-			elif sub[0] == '#':
-				return sub[1:]
-			else:
-				return '\'' + sub + '\''
-	
-	if len(x) == 0:
-		return 'None'
-	elif len(x) == 1:
-		return compileSubExpression( x[0] )
+			return src
+
+	if x is None:
+		return 'None', None
+	elif isinstance( x, str ):
+		if x[0] == '@':
+			return x[1:], None
+		elif x[0] == '#':
+			return x[1:], None
+		else:
+			return '\'' + x + '\'', None
 	else:
-		method = x[1]
-		if method == '[]'  and  len(x) == 3:
-			return '%s[%s]'  %  ( compileSubExpression( x[0] ), compileSubExpression( x[2] ) )
-		elif method == '.'  and  len(x) == 3:
-			return '%s.%s'  %  ( compileSubExpression( x[0] ), compileSubExpression( x[2] ) )
-		elif method in [ '+', '-', '*', '/', '%', '**', '<<', '>>', '&', '|', '^', '<', '<=', '==', '!=', '>=', '>' ]   and   len(x) == 3:
-			return '%s %s %s'  %  ( compileSubExpression( x[0] ), method, compileSubExpression( x[2] ) )
+		if len(x) == 0:
+			return 'None', None
+		elif len(x) == 1:
+			return compileSubExpression( x[0], None ), None
 		else:
-			return '%s.%s(%s)'  %  ( compileSubExpression( x[0] ), method, ', '.join( [ compileSubExpression( ex )   for ex in x[2:] ] ) )
-		
+			method = x[1]
+			if method == '[]'  and  len(x) == 3:
+				return '%s[%s]'  %  ( compileSubExpression( x[0], None ), compileSubExpression( x[2], None ) ), None
+			elif method == '.'  and  len(x) == 3:
+				return '%s.%s'  %  ( compileSubExpression( x[0], None ), x[2], None ), None
+			elif method in _binaryOperatorPrecedenceTable   and   len(x) == 3:
+				precedence = _binaryOperatorPrecedenceTable[method]
+				return '%s %s %s'  %  ( compileSubExpression( x[0], precedence ), method, compileSubExpression( x[2], precedence ) ), precedence
+			elif method in _unaryOperatorPrecedenceTable   and   len(x) == 2:
+				precedence, bUseSpace = _unaryOperatorPrecedenceTable[method]
+				space = ''
+				if bUseSpace:
+					space = ' '
+				return '%s%s%s'  %  ( method, space, compileSubExpression( x[0], precedence ) ), precedence
+			else:
+				return '%s.%s(%s)'  %  ( compileSubExpression( x[0], None ), method, ', '.join( [ compileSubExpression( ex, None )   for ex in x[2:] ] ) ), None
 
-def compileGLispFunctionToPySrc(xs, compileGLispExpr, functionName):
+
+def compileGLispExprToPySrc(x):
+	return _compileGLispExprToPySrcAndPrecedence(x)[0]
+
+
+def compileGLispFunctionToPySrc(xs, functionName):
 	if len(xs) < 2:
 		raise TypeError, 'Error compiling gLisp function: needs at least a parameter list'
 	
@@ -54,7 +100,7 @@ def compileGLispFunctionToPySrc(xs, compileGLispExpr, functionName):
 		raise TypeError, 'Error compiling gLisp function: first parameter must be a list of variable names'
 	
 	pySrcHdr = 'def %s(%s):\n'  %  ( functionName, ', '.join( params[:] ) )
-	pyLines = [ compileGLispExpressionToPy( srcLine, compileGLispExpr ) + '\n'   for srcLine in source ]
+	pyLines = [ compileGLispExprToPySrc( srcLine ) + '\n'   for srcLine in source ]
 	if len( pyLines ) == 0:
 		pyLines = [ 'pass\n' ]
 	else:
@@ -64,12 +110,10 @@ def compileGLispFunctionToPySrc(xs, compileGLispExpr, functionName):
 	return pySrcHdr + ''.join( pyLines )
 	
 
-
-
-def compileGLispFunctionToPy(xs, compileGLispExpr, functionName):
-	pySrc = compileGLispFunctionToPySrc( xs, compileGLispExpr, functionName )
+def compileGLispFunctionToPy(xs, functionName, locals={}):
+	pySrc = compileGLispFunctionToPySrc( xs, functionName )
 	
-	lcl = {}
+	lcl = copy( locals )
 	exec pySrc in lcl
 	return lcl[functionName]
 
@@ -81,58 +125,57 @@ from Britefury.DocModel.DMIO import readSX
 
 
 class TestCase_gLisp (unittest.TestCase):
-	def gLispExec(self, programText):
-		return gSymGLispEnvironment().execute( readSX( programText ) )
+	def testCompileGLispExprToPy_empty(self):
+		self.assert_( compileGLispExprToPySrc( readSX( '()' ) )  ==  'None' )
+
+	def testCompileGLispExprToPy_variable(self):
+		self.assert_( compileGLispExprToPySrc( readSX( '(@test)' ) )  ==  'test' )
+
+	def testCompileGLispExprToPy_var_add(self):
+		self.assert_( compileGLispExprToPySrc( readSX( '(@a + @b)' ) )  ==  'a + b' )
+
+	def testCompileGLispExprToPy_var_index(self):
+		self.assert_( compileGLispExprToPySrc( readSX( '(@a [] @b)' ) )  ==  'a[b]' )
+
+	def testCompileGLispExprToPy_var_subexp(self):
+		self.assert_( compileGLispExprToPySrc( readSX( '(@a + (@b * @c))' ) )  ==  'a + b * c' )
+
+	def testCompileGLispExprToPy_var_func_subexp(self):
+		self.assert_( compileGLispExprToPySrc( readSX( '(@a + (@b func @c))' ) )  ==  'a + b.func(c)' )
 	
-	def gLispEval(self, programText):
-		return gSymGLispEnvironment().evaluate( readSX( programText ) )
-	
-	
-	def testCompileSimpleGLispExprToPy_empty(self):
-		self.assert_( compileSimpleGLispExprToPySrc( readSX( '()' ) )  ==  'None' )
+	def testCompileGLispExprToPy_var_func_subexp_2(self):
+		self.assert_( compileGLispExprToPySrc( readSX( '(@a + (@b func @c @d (@e * @f)))' ) )  ==  'a + b.func(c, d, e * f)' )
 
-	def testCompileSimpleGLispExprToPy_variable(self):
-		self.assert_( compileSimpleGLispExprToPySrc( readSX( '(@test)' ) )  ==  'test' )
-
-	def testCompileSimpleGLispExprToPy_var_add(self):
-		self.assert_( compileSimpleGLispExprToPySrc( readSX( '(@a + @b)' ) )  ==  'a + b' )
-
-	def testCompileSimpleGLispExprToPy_var_index(self):
-		self.assert_( compileSimpleGLispExprToPySrc( readSX( '(@a [] @b)' ) )  ==  'a[b]' )
-
-	def testCompileSimpleGLispExprToPy_var_subexp(self):
-		self.assert_( compileSimpleGLispExprToPySrc( readSX( '(@a + (@b * @c))' ) )  ==  'a + (b * c)' )
-
-	def testCompileSimpleGLispExprToPy_var_func_subexp(self):
-		self.assert_( compileSimpleGLispExprToPySrc( readSX( '(@a + (@b func @c))' ) )  ==  'a + (b.func(c))' )
-	
-	def testCompileSimpleGLispExprToPy_var_func_subexp_2(self):
-		self.assert_( compileSimpleGLispExprToPySrc( readSX( '(@a + (@b func @c @d (@e * @f)))' ) )  ==  'a + (b.func(c, d, (e * f)))' )
-
-	def testCompileSimpleGLispExprToPy_strings(self):
-		self.assert_( compileSimpleGLispExprToPySrc( readSX( '(a + b)' ) )  ==  '\'a\' + \'b\'' )
+	def testCompileGLispExprToPy_strings(self):
+		self.assert_( compileGLispExprToPySrc( readSX( '(a + b)' ) )  ==  '\'a\' + \'b\'' )
 		
-	def testCompileSimpleGLispExprToPy_numbers(self):
-		self.assert_( compileSimpleGLispExprToPySrc( readSX( '(#1 + #2)' ) )  ==  '1 + 2' )
+	def testCompileGLispExprToPy_numbers(self):
+		self.assert_( compileGLispExprToPySrc( readSX( '(#1 + #2)' ) )  ==  '1 + 2' )
+		
+	def testCompileGLispExprToPy_precedence(self):
+		self.assert_( compileGLispExprToPySrc( readSX( '(@a + (@b * @c))' ) )  ==  'a + b * c' )
+		self.assert_( compileGLispExprToPySrc( readSX( '((@a + @b) * @c)' ) )  ==  '(a + b) * c' )
+		self.assert_( compileGLispExprToPySrc( readSX( '(@a + (@b + @c))' ) )  ==  'a + (b + c)' )
+		self.assert_( compileGLispExprToPySrc( readSX( '((@a + @b) + @c)' ) )  ==  '(a + b) + c' )
 		
 		
 	def testCompileGLispFunctionToPy(self):
 		def makeFunc(src):
-			return compileGLispFunctionToPy( readSX( src ), compileSimpleGLispExprToPySrc, 'test' )
+			return compileGLispFunctionToPy( readSX( src ), 'test' )
 
 		def makeFuncSrc(src):
-			return compileGLispFunctionToPySrc( readSX( src ), compileSimpleGLispExprToPySrc, 'test' )
+			return compileGLispFunctionToPySrc( readSX( src ), 'test' )
 
 		glispSrc = '( (a b c) (@a lower) ((@a upper) + (@b * @c)) )'
 		pySrc = \
 		      'def test(a, b, c):\n'  +  \
 		      '   a.lower()\n'  +  \
-		      '   return (a.upper()) + (b * c)\n'
+		      '   return a.upper() + b * c\n'
 		
 		self.assert_( makeFuncSrc( glispSrc ) == pySrc )
 		self.assert_( makeFunc( glispSrc )('x', 'y', 3)  ==  'Xyyy' )
-
-
+		
+		
 
 if __name__ == '__main__':
 	unittest.main()

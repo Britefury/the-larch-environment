@@ -17,10 +17,6 @@ from Britefury.GLisp.ModuleRegistry import ModuleRegistry
 
 
 
-#class LanguageNotFoundError (Exception):
-	#pass
-
-
 #
 #
 #
@@ -37,20 +33,9 @@ def _moduleLoader(filename):
 	return module	
 
 
-#def _languageLoader(filename):
-	#"""Loads the language in the specified file, and returns a language factory"""
-	#doc = readSX( file( filename, 'r' ) )
-	## TODO
-
-
-
-
 _settingsDir = os.path.expanduser( '~/.gsym' )
-#_languageRegistryPath = os.path.join( _settingsDir, 'languageregistry.xml' )
 
 
-
-#_languageRegistry = LanguageRegistry( _languageLoader )
 _moduleRegistry = ModuleRegistry( _moduleLoader )
 
 
@@ -76,20 +61,11 @@ def _initSettingsDir():
 
 
 def initGSymEnvironment():
-	#global _languageRegistry
 	_initSettingsDir()
-	
-	#if os.path.exists( _languageRegistryPath ):
-		#ioReadIntoObjectFromFile( _languageRegistry, file( _languageRegistryPath, 'r' ) )
-	#else:
-		#print 'Could not read language registry'
 
 
 def shutdownGSymEnvironment():
-	#if os.path.exists( _settingsDir ):
-		#ioWriteObjectToFile( file( _languageRegistryPath, 'w' ), _languageRegistry )
-	#else:
-		#print 'Could not write language registry'
+	pass
 
 		
 
@@ -114,7 +90,8 @@ class GSymEnvironment (object):
 		name = xs[2]
 		imports = xs[3:]
 		
-		path = name.replace( '.', '/' )
+		path = name.split( '.' )
+		path = os.path.join( path ) + '.gsym'
 		
 		module = _moduleRegistry.getModule( path )
 		
@@ -125,22 +102,13 @@ class GSymEnvironment (object):
 		
 		
 		
-		
-		
-		
-	#def importLanguage(self, name, vendor, version):
-		#languageFactory = _languageRegistry.getLanguageFactory( name, vendor, version )
-		#if languageFactory is not None:
-			#return languageFactory.createLanguageInstance()
-		#else:
-			#raise LanguageNotFoundError
-		
+	
 
 		
 def createGSymGLispEnvironment():
 	gsym = GSymEnvironment()
 	
-	return DMInterpreterEnv( gsym=gsym )
+	return GLispModule( gsym=gsym )
 
 
 
