@@ -1,30 +1,4 @@
 (
-	(= @mlLang (@gsym importLanguage 'gsym-metalanguage' 'Britefury' '1.0'))
-	(= @ml (@mlLang getLanguageInterface))
-	
-	(@mlLang document
-		(
-			(@ml language 'gsym-metalanguage' 'Britefury' '0.1'
-				(
-					(@ml charClassificationSection
-					)
-					
-					(@ml tokeniserSection			
-					)
-					
-					(@ml layersSection
-					)
-					
-					(@ml transformationsSection
-					)
-					
-					(@ml buildSection
-					)
-					
-					(@ml nodesSection
-					)
-				)
-			)
-		)
+	($importModuleContents Languages.metalanguage ((language mlLang))
 	)
 )
