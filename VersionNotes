@@ -1,0 +1,18 @@
+gSym Version Notes
+===============
+
+
+
+The version numbers correspond to SVN revision numbers
+
+
+Revision 83:
+	Original prototype, includes old virtual machine
+
+Revision 95:
+	Original prototype, old system, with graphing, DnD
+	*** Usable; will need modifications to build script to compile on Windows platform
+	
+Revision 176:
+	New document model system
+	Old LanguageRegistry system still present, but unused
