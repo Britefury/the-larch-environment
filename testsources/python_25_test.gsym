@@ -1,9 +1,7 @@
 (
 	($importModuleContents Languages.python25 ((language pyLang))
-
 		($let ((@py (@pyLang getLanguageInterface)))
-
-			(@pyLang document
+			(@pyLang content
 				(
 					(@py add (@py localLocal a) (@py localLocal b))
 				)
