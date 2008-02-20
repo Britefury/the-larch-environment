@@ -1,4 +1,6 @@
 (
-	($importModuleContents Languages.metalanguage ((language mlLang))
+	(@gsym internalMetaLanguage @mlLang @ml
+		(@mlLang content
+		)
 	)
 )

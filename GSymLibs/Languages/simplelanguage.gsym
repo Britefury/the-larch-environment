@@ -1,0 +1,8 @@
+(
+	($importModuleContents Languages.metalanguage ((languageFactory @mlLangFac))
+		($let ((@mlLang (@mlLangFac createLanguageControlInterface))  (@ml (@mlLang getLanguageInterface)))
+			(@mlLang content
+			)
+		)
+	)
+)

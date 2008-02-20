@@ -11,9 +11,9 @@ from Britefury.FileIO.IOXml import ioReadIntoObjectFromFile, ioWriteObjectToFile
 
 from Britefury.DocModel.DMIO import readSX
 
-from Britefury.GLisp.GLispInterpreter import GLispFrame, specialform
-from Britefury.GLisp.GLispModule import GLispModule
-from Britefury.GLisp.ModuleRegistry import ModuleRegistry
+from Britefury.GLisp.GLispInterpreter import specialform, GLispFrame, GLispModule, ModuleRegistry, _moduleRegistry
+
+from Britefury.gSym.MetaLanguage import metaLanguageFactory
 
 
 
@@ -71,7 +71,37 @@ def shutdownGSymEnvironment():
 		
 
 class GSymEnvironment (object):
-	pass
+	@specialform
+	def internalMetaLanguage(self, env, xs):
+		if len( xs ) < 4:
+			raise ValueError, 'GSymEnvironment::internalMetaLanguage: requires at least 2 parameter (control interface target variable, and language target variable)'
+		
+		ctlVarName = xs[2]
+		varName = xs[3]
+		expressions = xs[4:]
+		
+		
+		if not isinstance( ctlVarName, str ):
+			raise ValueError, 'GSymEnvironment::internalMetaLanguage: first parameter (control interface target variable) must be a string'
+		
+		if ctlVarName[0] != '@':
+			raise ValueError, 'GSymEnvironment::internalMetaLanguage: first parameter (control interface target variable) must be a @'
+	
+		
+		if not isinstance( varName, str ):
+			raise ValueError, 'GSymEnvironment::internalMetaLanguage: first parameter (language target variable) must be a string'
+		
+		if varName[0] != '@':
+			raise ValueError, 'GSymEnvironment::internalMetaLanguage: first parameter (language target variable) must be a @'
+		
+		
+		metaLanguageControlInterface = metaLanguageFactory.createLanguageControlInterface()
+		metaLanguageInterface = metaLanguageControlInterface.getLanguageInterface()
+		env[ctlVarName[1:]] = metaLanguageControlInterface
+		env[varName[1:]] = metaLanguageInterface
+		
+		return env.evaluate( expressions )	
+			
 		
 		
 	
@@ -82,5 +112,8 @@ def createGSymGLispEnvironment():
 	
 	return GLispModule( gsym=gsym )
 
+
+
+_moduleRegistry.moduleFactory = createGSymGLispEnvironment
 
 

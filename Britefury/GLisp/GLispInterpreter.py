@@ -7,6 +7,8 @@
 ##-*************************
 from copy import copy
 
+import os
+
 from Britefury.DocModel.DMListInterface import DMListInterface
 from Britefury.DocModel.DMIO import readSX
 
@@ -47,6 +49,7 @@ class GLispKeywordError (Exception):
 class ModuleRegistry (object):
 	def __init__(self):
 		self._modules = {}
+		self.moduleFactory = GLispModule
 			
 
 	def __getitem__(self, name):
@@ -54,8 +57,9 @@ class ModuleRegistry (object):
 			return self._modules[name]
 		except KeyError:
 			# Create the module, and register it
-			m = GLispModule()
+			m = self.moduleFactory()
 			self._modules[name] = m
+			m.name = name
 
 			# Generate the module path
 			path = os.path.join( *name.split( '.' ) )  +  '.gsym'
@@ -65,7 +69,7 @@ class ModuleRegistry (object):
 			modulePath = getGLispModulePath( path )
 			
 			doc = readSX( file( modulePath, 'r' ) )
-			module.execute( doc )
+			m.evaluate( doc )
 						
 			return m
 		
@@ -75,8 +79,6 @@ class ModuleRegistry (object):
 		
 		
 		
-_moduleRegistry = ModuleRegistry()
-
 
 
 
@@ -137,22 +139,44 @@ class GLispFrame (object):
 		self._env = copy( env )
 		self._outerFrame = None
 		self.moduleRegistry = _moduleRegistry
-		self.bDebug = False
 			
 			
 	def innerScope(self):
 		f = GLispFrame()
 		f._outerFrame = self
 		return f
+
+	
+	def rootScope(self):
+		s = self
+		while s._outerFrame is not None:
+			s = s._outerFrame
+		assert isinstance( s, GLispModule ), 'root scope should be a module'
+		return s
+	
+	
+	def glispError(self, exceptionClass, src, reason):
+		def srcToStr(x, level):
+			if isinstance( x, str ):
+				return x
+			elif isinstance( x, list )  or  isinstance( x, DMListInterface ):
+				if level == 0:
+					return '(...)'
+				else:
+					return '(' + ' '.join( [ srcToStr( v, level - 1 )  for v in x ] ) + ')'
+			else:
+				raise TypeError, 'cannot process %s'  %  ( x, )
+
+		raise exceptionClass, self.rootScope().name + ': ' + reason  +  '   ::   '  +  srcToStr( src, 3 )
 		
-		
+
 	def _p_interpretLiteral(self, xs):
 		if xs[0] == '@':
 			varName = xs[1:]
 			try:
 				return self[varName]
 			except KeyError:
-				raise GLispNameError, '%s not bound'  %  ( varName, )
+				self.glispError( GLispNameError, xs, '%s not bound'  %  ( varName ) )
 		elif xs[0] == '#':
 			value = xs[1:]
 			if value == 'False':
@@ -174,6 +198,9 @@ class GLispFrame (object):
 		if xs is None:
 			return None
 		elif isinstance( xs, DMListInterface )  or  isinstance( xs, list ):
+			if len( xs ) == 0:
+				return None
+	
 			x0 = xs[0]
 			if x0[0] == '$':
 				# keyword
@@ -212,7 +239,7 @@ class GLispFrame (object):
 							try:
 								method = getattr( target, methodName )
 							except AttributeError:
-								raise GLispMethodError, '%s has no method %s, in %s' % ( target, methodName, xs )
+								self.glispError( GLispMethodError, xs, '%s has no method %s' % ( target, methodName ) )
 						elif callable( methodName ):
 							# method name is callable; call it
 							args = [ self.evaluate( dmarg )   for dmarg in xs[2:] ]
@@ -222,7 +249,7 @@ class GLispFrame (object):
 								print '*** Internal error in %s'  %  ( xs, )
 								raise
 						else:
-							raise TypeError, 'methodName is invalid in %s'  %  ( xs, )
+							self.glispError( TypeError, xs, 'methodName is invalid' )
 						
 						if isinstance( method, specialform ):
 							# Special form; pass the list onto the method, along with the frame
@@ -245,21 +272,21 @@ class GLispFrame (object):
 		($let ((name0 value0) (name1 value1) ... (nameN valueN)) (expressions_to_execute))
 		"""
 		if len( xs ) < 2:
-			raise ValueError, '$let must have have at least 1 parameter; the binding list'
+			self.glispError( ValueError, xs, '$let must have have at least 1 parameter; the binding list' )
 	
 		bindings = xs[1]
 		expressions = xs[2:]
 		
 		if not isinstance( bindings, DMListInterface ):
-			raise ValueError, '$let bindings must be a list of pairs'
+			self.glispError( ValueError, xs, '$let bindings must be a list of pairs' )
 		
 		newEnv = self.innerScope()
 		for binding in bindings:
 			if not isinstance( binding, DMListInterface )  or  len( binding ) != 2:
-				raise ValueError, '$let binding must be a name value pair'
+				self.glispError( ValueError, xs, '$let binding must be a name value pair' )
 			
 			if binding[0][0] != '@':
-				raise ValueError, '$let binding name must start with @'
+				self.glispError( ValueError, xs, '$let binding name must start with @' )
 			
 			newEnv._env[binding[0][1:]] = newEnv.evaluate( binding[1] )
 			
@@ -273,7 +300,7 @@ class GLispFrame (object):
 		($importModule (module as_name) (expressions_to_execute))
 		"""
 		if len( xs ) < 2:
-			raise TypeError, '$importModule must have at least 1 parameter; the module to import'
+			self.glispError( TypeError, xs, '$importModule must have at least 1 parameter; the module to import' )
 
 		moduleName = xs[1]
 		expressions = xs[2:]
@@ -283,11 +310,11 @@ class GLispFrame (object):
 			targetName = name
 		else:
 			if len( moduleName ) != 2:
-				raise ValueError, '$importModule module name must either be a string, or a list of two items; the name and the name to import as'
+				self.glispError( ValueError, xs, '$importModule module name must either be a string, or a list of two items; the name and the name to import as' )
 			name = moduleName[0]
 			targetName = moduleName[1]
 			if targetName[0] != '@':
-				raise ValueError, '$importModule \'import as name\' must start with a @'
+				self.glispError( ValueError, xs, '$importModule \'import as name\' must start with a @' )
 			targetName = targetName[1:]
 		
 		module = self.moduleRegistry[name]
@@ -307,7 +334,7 @@ class GLispFrame (object):
 			(name import_as_name)
 		"""
 		if len( xs ) < 3:
-			raise TypeError, '$importModuleContents must have at least 2 parameter; the module to import, and the items to import'
+			self.glispError( TypeError, xs, '$importModuleContents must have at least 2 parameter; the module to import, and the items to import' )
 
 		name = xs[1]
 		items = xs[2]
@@ -318,21 +345,21 @@ class GLispFrame (object):
 		module = self.moduleRegistry[name]
 
 		if not isinstance( name , str ):
-			raise ValueError, '$importModuleContents module path should be a string'
+			self.glispError( ValueError, xs, '$importModuleContents module path should be a string' )
 		
 
 		if not isinstance( items, DMListInterface ):
-			raise ValueError, '$importModuleContents items should be a list'
+			self.glispError( ValueError, xs, '$importModuleContents items should be a list' )
 		
 		for item in items:
 			if not isinstance( item, DMListInterface ):
-				raise ValueError, '$importModuleContents item should be a list'
+				self.glispError( ValueError, xs, '$importModuleContents item should be a list' )
 		
 			name = item[0]
 			asName = item[1]
 			
 			if asName[0] != '@':
-				raise ValueError, '$importModuleContents \'import as name\' must start with a @'
+				self.glispError( ValueError, xs, '$importModuleContents \'import as name\' must start with a @' )
 			asName = asName[1:]
 
 			newEnv[asName] = module[name]	
@@ -360,6 +387,7 @@ class GLispModule (GLispFrame):
 	def __init__(self, **env):
 		super( GLispModule, self ).__init__( **env )
 		self._env['__module__'] = self
+		self.name = ''
 
 	def get(self, key):
 		return self._env[key]
@@ -368,6 +396,11 @@ class GLispModule (GLispFrame):
 		self._env[key] = value
 
 		
+
+		
+		
+_moduleRegistry = ModuleRegistry()
+
 
 	
 	
