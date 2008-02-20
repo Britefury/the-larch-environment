@@ -9,12 +9,18 @@ from copy import copy
 
 from Britefury.DocModel.DMListInterface import DMListInterface
 
+from Britefury.GLisp.GLispInterpreter import isGLispList
 
 
 
 
+class GLispCompilerError (Exception):
+	pass
 
-def _compileGLispExprToPySrcAndPrecedence(x):
+
+
+
+def _compileGLispExprToPySrcAndPrecedence(x, compileSpecial):
 	_binaryOperatorPrecedenceTable = {
 		'**' : 1,
 		'*' : 4,
@@ -46,7 +52,7 @@ def _compileGLispExprToPySrcAndPrecedence(x):
 	}
 	
 	def compileSubExpression(sub, outerPrecedence):
-		src, innerPrecedence = _compileGLispExprToPySrcAndPrecedence( sub )
+		src, innerPrecedence = _compileGLispExprToPySrcAndPrecedence( sub, compileSpecial )
 		if outerPrecedence is not None  and  innerPrecedence is not None  and  outerPrecedence <=innerPrecedence:
 			return '(' + src + ')'
 		else:
@@ -64,6 +70,8 @@ def _compileGLispExprToPySrcAndPrecedence(x):
 	else:
 		if len(x) == 0:
 			return 'None', None
+		elif isinstance( x[0], str )  and  x[0][0] == '/'  and  compileSpecial is not None:
+			return compileSpecial( x ), None
 		elif len(x) == 1:
 			return compileSubExpression( x[0], None ), None
 		else:
@@ -85,22 +93,22 @@ def _compileGLispExprToPySrcAndPrecedence(x):
 				return '%s.%s(%s)'  %  ( compileSubExpression( x[0], None ), method, ', '.join( [ compileSubExpression( ex, None )   for ex in x[2:] ] ) ), None
 
 
-def compileGLispExprToPySrc(x):
-	return _compileGLispExprToPySrcAndPrecedence(x)[0]
+def compileGLispExprToPySrc(x, compileSpecial=None):
+	return _compileGLispExprToPySrcAndPrecedence(x, compileSpecial)[0]
 
 
-def compileGLispFunctionToPySrc(xs, functionName):
+def compileGLispFunctionToPySrc(xs, functionName, compileSpecial=None):
 	if len(xs) < 2:
 		raise TypeError, 'Error compiling gLisp function: needs at least a parameter list'
 	
 	params = xs[0]
 	source = xs[1:]
 	
-	if not isinstance( params, DMListInterface ):
+	if not isGLispList( params ):
 		raise TypeError, 'Error compiling gLisp function: first parameter must be a list of variable names'
 	
 	pySrcHdr = 'def %s(%s):\n'  %  ( functionName, ', '.join( params[:] ) )
-	pyLines = [ compileGLispExprToPySrc( srcLine ) + '\n'   for srcLine in source ]
+	pyLines = [ compileGLispExprToPySrc( srcLine, compileSpecial ) + '\n'   for srcLine in source ]
 	if len( pyLines ) == 0:
 		pyLines = [ 'pass\n' ]
 	else:
@@ -110,8 +118,29 @@ def compileGLispFunctionToPySrc(xs, functionName):
 	return pySrcHdr + ''.join( pyLines )
 	
 
-def compileGLispFunctionToPy(xs, functionName, locals={}):
-	pySrc = compileGLispFunctionToPySrc( xs, functionName )
+def compileGLispFunctionToPy(xs, functionName, compileSpecial=None, locals={}):
+	pySrc = compileGLispFunctionToPySrc( xs, functionName, compileSpecial )
+	
+	lcl = copy( locals )
+	exec pySrc in lcl
+	return lcl[functionName]
+
+
+
+def compileGLispCustomFunctionToPySrc(xs, functionName, params=[], compileSpecial=None):
+	pySrcHdr = 'def %s(%s):\n'  %  ( functionName, ', '.join( params ) )
+	pyLines = [ compileGLispExprToPySrc( srcLine, compileSpecial ) + '\n'   for srcLine in xs ]
+	if len( pyLines ) == 0:
+		pyLines = [ 'pass\n' ]
+	else:
+		pyLines[-1] = 'return ' + pyLines[-1]
+	pyLines = [ '   ' + l   for l in pyLines ]
+	
+	return pySrcHdr + ''.join( pyLines )
+	
+
+def compileGLispCustomFunctionToPy(xs, functionName, params=[], compileSpecial=None, locals={}):
+	pySrc = compileGLispCustomFunctionToPySrc( xs, functionName, params, compileSpecial )
 	
 	lcl = copy( locals )
 	exec pySrc in lcl
