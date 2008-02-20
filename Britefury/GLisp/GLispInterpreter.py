@@ -19,6 +19,29 @@ from Britefury.GLisp.GLispEnvironment import getGLispModulePath
 #
 #
 #
+# GLisp utility functions
+#
+#
+#
+
+def isGLispList(xs):
+	return isinstance( xs, list )  or  isinstance( xs, DMListInterface )
+
+def gLispSrcToString(x, level=3):
+	if isinstance( x, str ):
+		return x
+	elif isGLispList( x ):
+		if level == 0:
+			return '(...)'
+		else:
+			return '(' + ' '.join( [ gLispSrcToString( v, level - 1 )  for v in x ] ) + ')'
+	else:
+		raise TypeError, 'cannot process %s'  %  ( x, )
+
+
+#
+#
+#
 # GLisp exceptions
 #
 #
@@ -156,18 +179,7 @@ class GLispFrame (object):
 	
 	
 	def glispError(self, exceptionClass, src, reason):
-		def srcToStr(x, level):
-			if isinstance( x, str ):
-				return x
-			elif isinstance( x, list )  or  isinstance( x, DMListInterface ):
-				if level == 0:
-					return '(...)'
-				else:
-					return '(' + ' '.join( [ srcToStr( v, level - 1 )  for v in x ] ) + ')'
-			else:
-				raise TypeError, 'cannot process %s'  %  ( x, )
-
-		raise exceptionClass, self.rootScope().name + ': ' + reason  +  '   ::   '  +  srcToStr( src, 3 )
+		raise exceptionClass, self.rootScope().name + ': ' + reason  +  '   ::   '  +  gLispSrcToString( src, 3 )
 		
 
 	def _p_interpretLiteral(self, xs):
@@ -197,7 +209,7 @@ class GLispFrame (object):
 	def evaluate(self, xs):
 		if xs is None:
 			return None
-		elif isinstance( xs, DMListInterface )  or  isinstance( xs, list ):
+		elif isGLispList( xs ):
 			if len( xs ) == 0:
 				return None
 	
@@ -277,12 +289,12 @@ class GLispFrame (object):
 		bindings = xs[1]
 		expressions = xs[2:]
 		
-		if not isinstance( bindings, DMListInterface ):
+		if not isGLispList( bindings ):
 			self.glispError( ValueError, xs, '$let bindings must be a list of pairs' )
 		
 		newEnv = self.innerScope()
 		for binding in bindings:
-			if not isinstance( binding, DMListInterface )  or  len( binding ) != 2:
+			if not isGLispList( binding )  or  len( binding ) != 2:
 				self.glispError( ValueError, xs, '$let binding must be a name value pair' )
 			
 			if binding[0][0] != '@':
@@ -348,21 +360,26 @@ class GLispFrame (object):
 			self.glispError( ValueError, xs, '$importModuleContents module path should be a string' )
 		
 
-		if not isinstance( items, DMListInterface ):
+		if not isGLispList( items ):
 			self.glispError( ValueError, xs, '$importModuleContents items should be a list' )
 		
 		for item in items:
-			if not isinstance( item, DMListInterface ):
+			if not isGLispList( item ):
 				self.glispError( ValueError, xs, '$importModuleContents item should be a list' )
 		
-			name = item[0]
-			asName = item[1]
+			srcName = item[0]
+			destName = item[1]
 			
-			if asName[0] != '@':
-				self.glispError( ValueError, xs, '$importModuleContents \'import as name\' must start with a @' )
-			asName = asName[1:]
+			if destName[0] != '@':
+				self.glispError( ValueError, xs, '$importModuleContents destination name must start with a @' )
+			destName = destName[1:]
 
-			newEnv[asName] = module[name]	
+			try:
+				moduleAttribute = module[srcName]
+			except KeyError:
+				self.glispError( ValueError, xs, '$importModuleContents: module %s has no attribute %s'  %  ( name, srcName ) )
+			
+			newEnv[destName] = moduleAttribute
 
 		return newEnv.evaluate( expressions )
 

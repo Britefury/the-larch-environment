@@ -1,6 +1,6 @@
 (
-	(@gsym internalMetaLanguage @mlLang @ml
-		(@mlLang content
+	(@gsym withInternalMetaLanguage @mlLang @ml
+		(@mlLang defineLanguage
 		)
 	)
 )

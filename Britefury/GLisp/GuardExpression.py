@@ -9,6 +9,7 @@
 from Britefury.Kernel.Abstract import abstractmethod
 
 from Britefury.DocModel.DMListInterface import DMListInterface
+from Britefury.GLisp.GLispInterpreter import isGLispList
 
 
 _stringType = str
@@ -193,7 +194,7 @@ def _buildMatchForGuardList(xs):
 
 
 def _buildMatchForGuardItem(xs, bInsideList=False):
-	if isinstance( xs, _listType ):
+	if isGLispList( xs ):
 		if xs[0] == ':':
 			# Bind
 			if len( xs ) != 3:
@@ -239,7 +240,7 @@ def _buildMatchForGuardItem(xs, bInsideList=False):
 def compileGuardExpression(xs, guardIndirection=[], functionName='guard', bSrc=False):
 	"""
 	compileGuardExpression(xs, guardIndirection=[], functionName='guard')   ->   fn, varNames
-		xs is a list of guard expressions. It is of type @_listType (normally DMListInterface).
+		xs is a list of guard expressions. It is a GLisp list (a list or a DMListInterface)
 		guardIndirection is a list that specifies the indrection necessary to get the guard expression from each item in xs
 			Examples:
 				(guard0 guard1 ... guardN)    ->     [] (no indirection)
@@ -287,13 +288,13 @@ def compileGuardExpression(xs, guardIndirection=[], functionName='guard', bSrc=F
 	
 	pySrcHdr = 'def %s(xs):\n'  %  ( functionName, )
 	
-	if not isinstance( xs, _listType ):
+	if not isGLispList( xs ):
 		raise ValueError, 'need a list'
 	
 	
 	result = []
 	varNames = []
-	for guard in xs:
+	for index, guard in enumerate( xs ):
 		guardItemVarNames = set()
 		for i in guardIndirection:
 			guard = guard[i]
@@ -302,7 +303,7 @@ def compileGuardExpression(xs, guardIndirection=[], functionName='guard', bSrc=F
 		result.extend( [ 'try:' ] )
 		result.extend( [ '\tresult = {}' ] )
 		result.extend( _indent( guardItemSrc ) )
-		result.extend( [ '\treturn result' ] )
+		result.extend( [ '\treturn result, %d'  %  ( index, ) ] )
 		result.extend( [ 'except GuardError:', '\tpass', '' ] )
 		varNames.append( guardItemVarNames )
 	result.extend( [ 'raise GuardError' ] )
@@ -336,8 +337,16 @@ class TestCase_GuardExpression (unittest.TestCase):
 		if expected is GuardError:
 			self.failUnlessRaises( GuardError, lambda: compileGuardExpression( readSX( guardSrc ) )[0]( readSX( dataSrc ) ), )
 		else:
-			result = compileGuardExpression( readSX( guardSrc ), indirection )[0]( readSX( dataSrc ) )
+			result, index = compileGuardExpression( readSX( guardSrc ), indirection )[0]( readSX( dataSrc ) )
 			self.assert_( result == expected )
+
+	def _guardTestCheckIndex(self, guardSrc, dataSrc, expected, expectedIndex, indirection=[]):
+		if expected is GuardError:
+			self.failUnlessRaises( GuardError, lambda: compileGuardExpression( readSX( guardSrc ) )[0]( readSX( dataSrc ) ), )
+		else:
+			result, index = compileGuardExpression( readSX( guardSrc ), indirection )[0]( readSX( dataSrc ) )
+			self.assert_( result == expected )
+			self.assert_( index == expectedIndex )
 
 	def testEmpty(self):
 		self._guardTest( '()', '()', GuardError )
@@ -461,11 +470,11 @@ class TestCase_GuardExpression (unittest.TestCase):
 		self._guardTest( '((a b (: @a !) x y (: @a !)))', '(a b (i j) x y (i j))', { 'a': ['i','j'] } )
 		
 	def testMultiGuard(self):
-		self._guardTest( '((a (: @a ^))  (b (: @b ^))  (c (: @c ^))  (d (: @d ^)))', '(a x)', { 'a' : 'x' } )
-		self._guardTest( '((a (: @a ^))  (b (: @b ^))  (c (: @c ^))  (d (: @d ^)))', '(b x)', { 'b' : 'x' } )
-		self._guardTest( '((a (: @a ^))  (b (: @b ^))  (c (: @c ^))  (d (: @d ^)))', '(c x)', { 'c' : 'x' } )
-		self._guardTest( '((a (: @a ^))  (b (: @b ^))  (c (: @c ^))  (d (: @d ^)))', '(d x)', { 'd' : 'x' } )
-		self._guardTest( '((a (: @a ^))  (b (: @b ^))  (c (: @c ^))  (d (: @d ^)))', '(e x)', GuardError )
+		self._guardTestCheckIndex( '((a (: @a ^))  (b (: @b ^))  (c (: @c ^))  (d (: @d ^)))', '(a x)', { 'a' : 'x' }, 0 )
+		self._guardTestCheckIndex( '((a (: @a ^))  (b (: @b ^))  (c (: @c ^))  (d (: @d ^)))', '(b x)', { 'b' : 'x' }, 1 )
+		self._guardTestCheckIndex( '((a (: @a ^))  (b (: @b ^))  (c (: @c ^))  (d (: @d ^)))', '(c x)', { 'c' : 'x' }, 2 )
+		self._guardTestCheckIndex( '((a (: @a ^))  (b (: @b ^))  (c (: @c ^))  (d (: @d ^)))', '(d x)', { 'd' : 'x' }, 3 )
+		self._guardTestCheckIndex( '((a (: @a ^))  (b (: @b ^))  (c (: @c ^))  (d (: @d ^)))', '(e x)', GuardError, None )
 		
 	def testIndirection(self):
 		self._guardTest( '(((a (: @a ^)))  ((b (: @b ^)))  ((c (: @c ^)))  ((d (: @d ^))))', '(a x)', { 'a' : 'x' }, [0] )
