@@ -19,6 +19,33 @@ from Britefury.GLisp.GLispEnvironment import getGLispModulePath
 #
 #
 #
+# GLisp exceptions
+#
+#
+#
+
+class GLispNameError (Exception):
+	pass
+
+class GLispMethodError (Exception):
+	pass
+
+class GLispKeywordError (Exception):
+	pass
+
+class GLispParameterListError (Exception):
+	pass
+
+class GLispItemTypeError (Exception):
+	pass
+
+
+
+
+
+#
+#
+#
 # GLisp utility functions
 #
 #
@@ -37,27 +64,6 @@ def gLispSrcToString(x, level=3):
 			return '(' + ' '.join( [ gLispSrcToString( v, level - 1 )  for v in x ] ) + ')'
 	else:
 		raise TypeError, 'cannot process %s'  %  ( x, )
-
-
-#
-#
-#
-# GLisp exceptions
-#
-#
-#
-
-class GLispNameError (Exception):
-	pass
-
-class GLispMethodError (Exception):
-	pass
-
-class GLispKeywordError (Exception):
-	pass
-
-
-
 
 
 #

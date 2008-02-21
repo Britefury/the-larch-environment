@@ -8,8 +8,9 @@
 from Britefury.GLisp.GLispInterpreter import specialform
 
 
-class GSymLanguageCompilerTest (object):
-	def __init__(self, compileFunction):
+class GSymLanguageCompilerDefinition (object):
+	def __init__(self, targetName, compileFunction):
+		self.targetName = targetName
 		self._compileFunction = compileFunction
 		
 	def testCompile(self, xs):
@@ -42,7 +43,7 @@ class GSymLanguageInstanceControlInterface (object):
 	
 	
 	@specialform
-	def documentContent(self, env, xs):
+	def content(self, env, xs):
 		return self._factory._compilerTest.testCompile( xs[2:] )
 
 
@@ -62,7 +63,7 @@ class GSymLanguageFactory (object):
 				if isinstance( l, t ):
 					return l
 			return None
-		self._compilerTest = getParamOfType( GSymLanguageCompilerTest )
+		self._compilerTest = getParamOfType( GSymLanguageCompilerDefinition )
 	
 	
 	def createLanguageInstanceControlInterface(self):

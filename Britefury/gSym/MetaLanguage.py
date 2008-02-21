@@ -7,9 +7,9 @@
 ##-*************************
 from Britefury.DocModel.DMListInterface import DMListInterface
 
-from Britefury.gSym.gSymLanguage import GSymLanguageInstanceInterface, GSymLanguageInstanceControlInterface, GSymLanguageFactory, GSymLanguageCompilerTest
+from Britefury.gSym.gSymLanguage import GSymLanguageInstanceInterface, GSymLanguageInstanceControlInterface, GSymLanguageFactory, GSymLanguageCompilerDefinition
 
-from Britefury.GLisp.GLispInterpreter import specialform, isGLispList, gLispSrcToString
+from Britefury.GLisp.GLispInterpreter import specialform, isGLispList, gLispSrcToString, GLispParameterListError, GLispItemTypeError
 from Britefury.GLisp.GLispCompiler import compileGLispCustomFunctionToPy, GLispCompilerError
 from Britefury.GLisp.GuardExpression import compileGuardExpression, GuardError
 
@@ -19,8 +19,16 @@ class MetaLanguageInstanceInterface (GSymLanguageInstanceInterface):
 	"""Created in a language document
 	The language document describes a language content via this"""
 	@specialform
-	def compileTest(self, env, xs):
-		spec = xs[2:]
+	def compilerDefinition(self, env, xs):
+		if len( xs ) < 3:
+			env.glispError( GLispParameterListError, xs, 'MetaLanguageInstanceInterface#compilerDefinition: needs at least 1 parameter; the target name' )
+		
+		targetName = xs[2]
+		spec = xs[3:]
+		
+		if not isinstance( targetName, str ):
+			env.glispError( GLispItemTypeError, xs, 'MetaLanguageInstanceInterface#compilerDefinition: first parameter (target name) must be a string' )
+			
 		
 		def compileSpecial(src):
 			if src[0] == '/eval':
@@ -43,7 +51,7 @@ class MetaLanguageInstanceInterface (GSymLanguageInstanceInterface):
 
 		compileExprFunctions = [ generateExprFunction( guardAndCompileExpr, i, varNamesSet )   for i, ( guardAndCompileExpr, varNamesSet ) in enumerate( zip( spec, varNamesByGuard ) ) ]
 		
-		return GSymLanguageCompilerTest( _compileEval )
+		return GSymLanguageCompilerDefinition( targetName, _compileEval )
 
 
 		
@@ -58,7 +66,7 @@ class MetaLanguageInstanceControlInterface (GSymLanguageInstanceControlInterface
 	languageInterfaceClass = MetaLanguageInstanceInterface
 
 	@specialform
-	def defineLanguage(self, env, xs):
+	def content(self, env, xs):
 		languageDefinition = [ env.evaluate( x )   for x in xs[2:] ]
 		languageFactory = GSymLanguageFactory( *languageDefinition )
 		env.rootScope()['languageFactory'] = languageFactory
