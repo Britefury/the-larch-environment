@@ -1,7 +1,7 @@
 (
 	($importModuleContents Languages.simpleLanguage ((languageFactory @smLangFac))
 		($let ((@smLang (@smLangFac createLanguageInstanceControlInterface))  (@sm (@smLang getLanguageInstanceInterface)))
-			(@smLang documentContent
+			(@smLang content
 				(mul (pow (add (loadLocal a) (loadLocal b)) (loadLocal c)) (sub (loadLocal d) (loadLocal e)))
 			)
 		)

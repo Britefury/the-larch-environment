@@ -1,8 +1,8 @@
 (
 	($importModuleContents Languages.metalanguage ((languageFactory @mlLangFac))
 		($let ((@mlLang (@mlLangFac createLanguageInstanceControlInterface))  (@ml (@mlLang getLanguageInstanceInterface)))
-			(@mlLang defineLanguage
-				(@ml compileTest
+			(@mlLang content
+				(@ml compilerDefinition python25
 					( (add (: @x !) (: @y !))   (  (((('(' + (/eval @x)) + ' + ') + (/eval @y)) + ')')  ) )
 					( (sub (: @x !) (: @y !))   (  (((('(' + (/eval @x)) + ' - ') + (/eval @y)) + ')')  ) )
 					( (mul (: @x !) (: @y !))   (  (((('(' + (/eval @x)) + ' * ') + (/eval @y)) + ')')  ) )

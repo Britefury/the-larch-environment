@@ -11,7 +11,7 @@ from Britefury.GLisp.GLispInterpreter import specialform, isGLispList
 from Britefury.GLisp.GLispCompiler import compileGLispCustomFunctionToPy, GLispCompilerError
 from Britefury.GLisp.GuardExpression import compileGuardExpression
 
-from Britefury.gSym.gSymLanguage import GSymLanguageInstanceInterface, GSymLanguageInstanceControlInterface, GSymLanguageFactory, GSymLanguageCompilerTest
+from Britefury.gSym.gSymLanguage import GSymLanguageInstanceInterface, GSymLanguageInstanceControlInterface, GSymLanguageFactory
 from Britefury.gSym.MetaLanguage import GSymLanguageInstanceInterface, GSymLanguageInstanceControlInterface, MetaLanguageFactory
 
 
@@ -35,7 +35,7 @@ class MetaMetaLanguageInstanceControlInterface (GSymLanguageInstanceControlInter
 	languageInterfaceClass = MetaMetaLanguageInstanceInterface
 
 	@specialform
-	def defineLanguage(self, env, xs):
+	def content(self, env, xs):
 		languageDefinition = [ env.evaluate( x )   for x in xs[2:] ]
 		languageFactory = MetaLanguageFactory( *languageDefinition )
 		env.rootScope()['languageFactory'] = languageFactory
