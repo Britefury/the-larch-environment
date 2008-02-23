@@ -118,6 +118,9 @@ class DTWidget (object):
 		self._requiredSize = Vector2()
 
 		self._waitingImmediateEvents = []
+		
+		self._bCursorBlocked = False
+		self._cursor = None
 
 		self._dndLocalPos = None
 		self._dndButton = None
@@ -511,13 +514,38 @@ class DTWidget (object):
 	#
 	# CURSOR NAVIGATION METHODS
 	#
+	
+	def setCursorBlocked(self, bBlocked):
+		if bBlocked != self._bCursorBlocked:
+			self._bCursorBlocked = bBlocked
+			if self._parent is not None:
+				self._parent._f_childCursorBlocked( self )
+			else:
+				self._parent._f_childCursorUnblocked( self )
+			
+	def isCursorBlocked(self):
+		return self._bCursorBlocked
+
+	
+	def getFirstCursorEntity(self):
+		if self._bCursorBlocked:
+			return None
+		else:
+			return self._o_getFirstCursorEntity()
+	
+	def getLastCursorEntity(self):
+		if self._bCursorBlocked:
+			return None
+		else:
+			return self._o_getLastCursorEntity()
+
 
 	@abstractmethod
-	def getFirstCursorEntity(self):
+	def _o_getFirstCursorEntity(self):
 		pass
 	
 	@abstractmethod
-	def getLastCursorEntity(self):
+	def _o_getLastCursorEntity(self):
 		pass
 
 
@@ -540,10 +568,22 @@ class DTWidget (object):
 				return self._parent._f_getNextCursorEntityAfterChild( self )
 			else:
 				return None
+			
+			
+			
+	def _f_cursorNotify(self, cursor, bCurrent):
+		if bCurrent:
+			self._cursor = cursor
+		else:
+			self._cursor = None
 
 
 
 
+	#
+	# HIERARCHY METHODS
+	#
+	
 	def _p_getParent(self):
 		return self._parent
 

@@ -171,7 +171,7 @@ class DTScript (DTContainer):
 	# CURSOR NAVIGATION METHODS
 	#
 
-	def getFirstCursorEntity(self):
+	def _o_getFirstCursorEntity(self):
 		if self._leftChild is not None:
 			return self._leftChild.getFirstCursorEntity()
 		elif self._rightChild is not None:
@@ -180,7 +180,7 @@ class DTScript (DTContainer):
 			return None
 
 
-	def getLastCursorEntity(self):
+	def _o_getLastCursorEntity(self):
 		if self._rightChild is not None:
 			return self._rightChild.getLastCursorEntity()
 		elif self._leftChild is not None:

@@ -18,10 +18,14 @@ class DTSimpleStaticWidget (DTWidget):
 
 
 
-	def getFirstCursorEntity(self):
+	#
+	# CURSOR NAVIGATION METHODS
+	#
+	
+	def _o_getFirstCursorEntity(self):
 		return self._cursorEntity
 	
-	def getLastCursorEntity(self):
+	def _o_getLastCursorEntity(self):
 		return self._cursorEntity
 
 

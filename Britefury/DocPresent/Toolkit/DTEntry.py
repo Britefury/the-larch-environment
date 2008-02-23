@@ -19,8 +19,8 @@ from Britefury.Math.Math import Colour3f, Vector2, Point2
 
 from Britefury.Util.SignalSlot import *
 
-#HACK
-from Britefury.DocPresent.Toolkit.DTSimpleStaticWidget import DTSimpleStaticWidget
+from Britefury.DocPresent.Toolkit.DTCursorEntity import DTCursorEntity
+from Britefury.DocPresent.Toolkit.DTWidget import DTWidget
 from Britefury.DocPresent.Toolkit.DTAutoCompleteDropDown import DTAutoCompleteDropDown
 
 
@@ -31,8 +31,7 @@ _modKeysMask = ( gtk.gdk.SHIFT_MASK | gtk.gdk.CONTROL_MASK | gtk.gdk.MOD1_MASK )
 
 
 
-# HACK; derive from DTWidget
-class DTEntry (DTSimpleStaticWidget):
+class DTEntry (DTWidget):
 	returnSignal = ClassSignal()       				# ( entry )
 	textInsertedSignal = ClassSignal()				# ( entry, position, bAppended, textInserted )
 	textDeletedSignal = ClassSignal()				# ( entry, startIndex, endIndex, textDeleted )
@@ -81,6 +80,9 @@ class DTEntry (DTSimpleStaticWidget):
 		self._autoCompleteDropDown.autoCompleteSignal.connect( self._p_onAutoComplete )
 		self._autoCompleteDropDown.autoCompleteDismissedSignal.connect( self._p_onAutoCompleteDismissed )
 		self._bAutoCompleteDisabled = False
+		
+		self._p_rebuildCursorEntityList()
+		
 
 		if regexp is None:
 			self._regexp = None
@@ -94,6 +96,7 @@ class DTEntry (DTSimpleStaticWidget):
 	def setText(self, text):
 		if text != self._text:
 			self._text = text
+			self._p_rebuildCursorEntityList()
 			if self._bHasFocus:
 				self._cursorLocation = len( self._text )
 			self._p_textChanged()
@@ -280,10 +283,16 @@ class DTEntry (DTSimpleStaticWidget):
 	def _p_deleteSelection(self):
 		start = min( self._selectionBounds )
 		end = max( self._selectionBounds )
-		textDeleted = self._text[start:end]
-		self._text = self._text[:start] + self._text[end:]
-		self._cursorLocation = start
-		self.textDeletedSignal.emit( self, start, end, textDeleted )
+		if end > start:
+			textDeleted = self._text[start:end]
+			self._text = self._text[:start] + self._text[end:]
+			# Update cursor entities
+			# de-link cursor entities in range
+			DTCursorEntity.remove( self._cursorEntities[start], self._cursorEntities[end-1] )
+			# remove from list
+			del self._cursorEntities[start:end]
+			self._cursorLocation = start
+			self.textDeletedSignal.emit( self, start, end, textDeleted )
 		self._p_setSelectionBounds( None )
 
 
@@ -337,6 +346,7 @@ class DTEntry (DTSimpleStaticWidget):
 		deletedText = self._text
 		self._text = text
 		self._p_setSelectionBounds( None )
+		self._p_rebuildCursorEntityList()
 		self.textDeletedSignal.emit( self, 0, len( deletedText ), deletedText )
 		self._cursorLocation = len( self._text )
 		self.textInsertedSignal.emit( self, 0, True, text )
@@ -461,15 +471,20 @@ class DTEntry (DTSimpleStaticWidget):
 			if bCanDelete:
 				if self._selectionBounds is not None:
 					self._p_deleteSelection()
-					bHandled = True
+					self._p_onTextModified()
 				elif self._cursorLocation > 0:
+					DTCursorEntity.remove( self._cursorEntities[self._cursorLocation-1], self._cursorEntities[self._cursorLocation-1] )
+					del self._cursorEntities[self._cursorLocation-1]
 					textDeleted = self._text[self._cursorLocation-1:self._cursorLocation]
 					self._text = self._text[:self._cursorLocation-1] + self._text[self._cursorLocation:]
 					self._cursorLocation -= 1
 					self.textDeletedSignal.emit( self, self._cursorLocation, self._cursorLocation+1, textDeleted )
-					# Event handled
-					bHandled = True
-				self._p_onTextModified()
+					self._p_onTextModified()
+				else:
+					# leave the entry
+					self.returnSignal.emit( self )
+					self.ungrabFocus()
+			bHandled = True
 		elif event.keyVal == gtk.keysyms.Delete  and  self.bEditable:
 			bCanDelete = True
 			if self._regexp is not None:
@@ -481,14 +496,19 @@ class DTEntry (DTSimpleStaticWidget):
 				text = self._text
 				if self._selectionBounds is not None:
 					self._p_deleteSelection()
-					bHandled = True
+					self._p_onTextModified()
 				elif self._cursorLocation < len( self._text ):
+					DTCursorEntity.remove( self._cursorEntities[self._cursorLocation], self._cursorEntities[self._cursorLocation] )
+					del self._cursorEntities[self._cursorLocation]
 					textDeleted = self._text[self._cursorLocation:self._cursorLocation+1]
 					self._text = self._text[:self._cursorLocation] + self._text[self._cursorLocation+1:]
 					self.textDeletedSignal.emit( self, self._cursorLocation, self._cursorLocation+1, textDeleted )
-					bHandled = len( text ) != 0
-				self._p_onTextModified()
-				# Event not handled if text was empty
+					self._p_onTextModified()
+				else:
+					# leave the entry
+					self.returnSignal.emit( self )
+					self.ungrabFocus()
+			bHandled = True
 		elif event.keyString != ''  and  ( modKeys == 0  or  modKeys == gtk.gdk.SHIFT_MASK )  and  self.bEditable:
 			bTextOk = True
 
@@ -501,8 +521,25 @@ class DTEntry (DTSimpleStaticWidget):
 					self._p_deleteSelection()
 				position = self._cursorLocation
 				bAppended = position == len( self._text )
+
+				keyStringCursorEntities = [ DTCursorEntity( self )   for character in event.keyString ]
+				DTCursorEntity.buildListLinks( keyStringCursorEntities )
+				
+				if self._cursorLocation > 0:
+					prev = self._cursorEntities[self._cursorLocation-1]
+				else:
+					prev = self._cursorEntities[0].prev
+				if self._cursorLocation < len( self._text ):
+					next = self._cursorEntities[self._cursorLocation]
+				else:
+					next = self._cursorEntities[-1].next
+
+				DTCursorEntity.splice( prev, next, keyStringCursorEntities[0], keyStringCursorEntities[-1] )
+				self._cursorEntities[self._cursorLocation:self._cursorLocation] = keyStringCursorEntities
+				
 				self._text = self._text[:self._cursorLocation] + event.keyString + self._text[self._cursorLocation:]
 				self._cursorLocation += len( event.keyString )
+
 				self.textInsertedSignal.emit( self, position, bAppended, event.keyString )
 				self._p_onTextModified()
 				bHandled = True
@@ -694,10 +731,41 @@ class DTEntry (DTSimpleStaticWidget):
 			self._p_computeTextSize()
 
 
+
+	#
+	# CURSOR NAVIGATION METHODS
+	#
+	
+	def _o_getFirstCursorEntity(self):
+		try:
+			return self._cursorEntities[0]
+		except IndexError:
+			return None
+
+
+	def _o_getLastCursorEntity(self):
+		try:
+			return self._cursorEntities[-1]
+		except IndexError:
+			return None
+
+
+	def _p_rebuildCursorEntityList(self):
+		self._cursorEntities = [ DTCursorEntity( self )   for character in self._text ]
+		DTCursorEntity.buildListLinks( self._cursorEntities )
+
+	
+	
+	#
+	# DEBUG __repr__
+	#
+	
 	def __repr__(self):
 		return super( DTEntry, self ).__repr__()  +  '(\'%s\')'  %  ( self._text, )
 
 
+	
+	
 
 
 

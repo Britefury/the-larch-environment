@@ -89,7 +89,7 @@ class DVStyleSheetDeleteAction (DVStyleSheetAction):
 		indexInParent = event.docNodeKey.index
 		del parentDocNode[indexInParent]
 		if len( parentDocNode ) > indexInParent:
-			v = nodeView.docView.refreshAndGetViewNodeForDocNodeKey( DocNodeKey( parentDocNode[indexInParent], parentDocNode, indexInParent ) )
+			v = event.nodeView.docView.refreshAndGetViewNodeForDocNodeKey( DocNodeKey( parentDocNode[indexInParent], parentDocNode, indexInParent ) )
 			v.makeCurrent()
 			return v
 		else:

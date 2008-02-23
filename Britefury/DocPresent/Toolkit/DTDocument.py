@@ -63,6 +63,9 @@ class DTDocument (gtk.DrawingArea, DTBin):
 
 		# Immediate event queue
 		self._immediateEvents = []
+		
+		# Cursor management
+		self._currentCursor = None
 
 		# Connect signals
 		self.connect_after( 'configure-event', self._p_configureEvent )
@@ -483,12 +486,31 @@ class DTDocument (gtk.DrawingArea, DTBin):
 	def _p_unrealiseEvent(self, widget):
 		self._f_evUnrealise()
 		self._p_emitImmediateEvents()
+		
+		
+	
+		
+	
+	#
+	# CURSOR NAVIGATION METHOD
+	#
+	
+	def _f_makeCursorCurrent(self, cursor):
+		if self._currentCursor is not cursor:
+			if self._currentCursor is not None:
+				self._currentCursor.setCurrent( False )
+			self._currentCursor = cursor
+			if self._currentCursor is not None:
+				self._currentCursor.setCurrent( True )
+	
 
-
-
-	def _p_getCursorWidget(self):
-		pass
-
+	def _f_cursorNotify(self, cursor, bCurrent):
+		entity = cursor.entity
+		if entity is not None:
+			widget = entity.widget
+			assert widget is not None, 'cursor entity has no widget'
+			widget._f_cursorNotify( cursor, bCurrent )
+			
 
 	def _p_cursorLeft(self):
 		self._p_getCursor

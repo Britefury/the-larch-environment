@@ -93,14 +93,14 @@ class DTBin (DTContainer):
 	# CURSOR NAVIGATION METHODS
 	#
 
-	def getFirstCursorEntity(self):
+	def _o_getFirstCursorEntity(self):
 		if self._child is not None:
 			return self._child.getFirstCursorEntity()
 		else:
 			return None
 
 
-	def getLastCursorEntity(self):
+	def _o_getLastCursorEntity(self):
 		if self._child is not None:
 			return self._child.getLastCursorEntity()
 		else:
