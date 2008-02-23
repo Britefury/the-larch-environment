@@ -39,8 +39,6 @@ class DTCustomSymbol (DTSimpleStaticWidget):
 		self._symbolPosition = Vector2()
 		self._symbolSize = None
 		
-		self._symbolCusorEntity = DTCursorEntity( self )
-
 		self._o_queueResize()
 
 

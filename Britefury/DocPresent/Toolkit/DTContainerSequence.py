@@ -155,11 +155,15 @@ class DTContainerSequence (DTContainer):
 	
 	
 	
+	#
+	# CURSOR NAVIGATION METHODS
+	#
+
 	def isOrderReversed(self):
 		return False
 	
 	
-	def getFirstCursorEntity(self):
+	def _o_getFirstCursorEntity(self):
 		entries = self._childEntries
 		if self.isOrderReversed():
 			entries = reversed( entries )
@@ -171,7 +175,7 @@ class DTContainerSequence (DTContainer):
 		return None
 
 
-	def getLastCursorEntity(self):
+	def _o_getLastCursorEntity(self):
 		entries = self._childEntries
 		if not self.isOrderReversed():
 			entries = reversed( entries )

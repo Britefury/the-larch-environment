@@ -7,11 +7,11 @@
 ##-*************************
 from Britefury.DocModel.DMListInterface import DMListInterface
 
-from Britefury.gSym.gSymLanguage import GSymLanguageInstanceInterface, GSymLanguageInstanceControlInterface, GSymLanguageFactory, GSymLanguageCompilerDefinition
+from Britefury.gSym.gSymLanguage import GSymLanguageInstanceInterface, GSymLanguageInstanceControlInterface, GSymLanguageFactory
 
 from Britefury.GLisp.GLispInterpreter import specialform, isGLispList, gLispSrcToString, GLispParameterListError, GLispItemTypeError
-from Britefury.GLisp.GLispCompiler import compileGLispCustomFunctionToPy, GLispCompilerError
-from Britefury.GLisp.GuardExpression import compileGuardExpression, GuardError
+
+from Britefury.gSym.gSymCompiler import defineCompiler
 
 
 
@@ -20,39 +20,67 @@ class MetaLanguageInstanceInterface (GSymLanguageInstanceInterface):
 	The language document describes a language content via this"""
 	@specialform
 	def compilerDefinition(self, env, xs):
-		if len( xs ) < 3:
-			env.glispError( GLispParameterListError, xs, 'MetaLanguageInstanceInterface#compilerDefinition: needs at least 1 parameter; the target name' )
+		if len( xs ) < 5:
+			env.glispError( GLispParameterListError, xs, 'MetaLanguageInstanceInterface#compilerDefinition: needs at least 3 parameters; the name, the source format, and the target format' )
 		
-		targetName = xs[2]
-		spec = xs[3:]
+		name = xs[2]
+		sourceFormat = xs[3]
+		targetFormat = xs[4]
+		spec = xs[5:]
 		
-		if not isinstance( targetName, str ):
-			env.glispError( GLispItemTypeError, xs, 'MetaLanguageInstanceInterface#compilerDefinition: first parameter (target name) must be a string' )
+		if not isinstance( name, str ):
+			env.glispError( GLispItemTypeError, xs, 'MetaLanguageInstanceInterface#compilerDefinition: 1st parameter (name) must be a string' )
+			
+		if not isinstance( sourceFormat, str ):
+			env.glispError( GLispItemTypeError, xs, 'MetaLanguageInstanceInterface#compilerDefinition: 2nd parameter (source format) must be a string' )
+			
+		if not isinstance( targetFormat, str ):
+			env.glispError( GLispItemTypeError, xs, 'MetaLanguageInstanceInterface#compilerDefinition: 3rd parameter (target format) must be a string' )
+			
+		return defineCompiler( env, xs, name, sourceFormat, targetFormat, spec )
+
+
+	
+	
+	@specialform
+	def displayDefinition(self, env, xs):
+		if len( xs ) < 4:
+			env.glispError( GLispParameterListError, xs, 'MetaLanguageInstanceInterface#displayDefinition: needs at least 2 parameters; the name, and the document format' )
+		
+		name = xs[2]
+		docFormat = xs[3]
+		spec = xs[4:]
+		
+		if not isinstance( name, str ):
+			env.glispError( GLispItemTypeError, xs, 'MetaLanguageInstanceInterface#compilerDefinition: 1st parameter (compiler name) must be a string' )
+			
+		if not isinstance( docFormat, str ):
+			env.glispError( GLispItemTypeError, xs, 'MetaLanguageInstanceInterface#compilerDefinition: 2nd parameter (document format) must be a string' )
 			
 		
-		def compileSpecial(src):
-			if src[0] == '/eval':
-				return '_compileEval( %s )'  %  ( src[1][1:], )
-			else:
-				env.glispError( GLispCompilerError, xs, 'cannot compile special \'%s\''  %  ( src[0], ) )
+		#def compileSpecial(src):
+			#if src[0] == '/viewEval':
+				#return '_buildView( %s )'  %  ( src[1][1:], )
+			#else:
+				#env.glispError( GLispCompilerError, xs, 'cannot compile special \'%s\''  %  ( src[0], ) )
 		
-		def _compileEval(source):
-			try:
-				varValues, index = guardFunction( source )
-			except GuardError:
-				raise
-			f = compileExprFunctions[index]
-			return f( **varValues )
+		#def _buildView(source):
+			#try:
+				#varValues, index = guardFunction( source )
+			#except GuardError:
+				#raise
+			#f = compileExprFunctions[index]
+			#return f( **varValues )
 
-		guardFunction, varNamesByGuard = compileGuardExpression( spec, [0], 'compileTest' )
+		#guardFunction, varNamesByGuard = compileGuardExpression( spec, [0], 'compileTest' )
 		
-		def generateExprFunction(guardAndCompileExpr, i, varNamesSet):
-			return compileGLispCustomFunctionToPy( guardAndCompileExpr[1], 'compileExpr%d' % ( i, ), list( varNamesSet ), compileSpecial, { '_compileEval' : _compileEval } )
+		#def generateExprFunction(guardAndCompileExpr, i, varNamesSet):
+			#return compileGLispCustomFunctionToPy( guardAndCompileExpr[1], 'buildViewExpr%d' % ( i, ), list( varNamesSet ), compileSpecial, { '_buildView' : _buildView } )
 
-		compileExprFunctions = [ generateExprFunction( guardAndCompileExpr, i, varNamesSet )   for i, ( guardAndCompileExpr, varNamesSet ) in enumerate( zip( spec, varNamesByGuard ) ) ]
+		#compileExprFunctions = [ generateExprFunction( guardAndCompileExpr, i, varNamesSet )   for i, ( guardAndCompileExpr, varNamesSet ) in enumerate( zip( spec, varNamesByGuard ) ) ]
 		
-		return GSymLanguageCompilerDefinition( targetName, _compileEval )
-
+		#return GSymLanguageCompilerDefinition( compilerName, sourceFormat, targetFormat, _compileEval )
+		return None
 
 		
 		

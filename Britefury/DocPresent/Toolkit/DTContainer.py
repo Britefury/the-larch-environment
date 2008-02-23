@@ -9,6 +9,7 @@ from Britefury.Math.Math import BBox2, Point2, Vector2, Xform2
 
 from Britefury.Kernel.Abstract import abstractmethod
 
+from Britefury.DocPresent.Toolkit.DTCursorEntity import DTCursorEntity
 from Britefury.DocPresent.Toolkit.DTWidget import DTWidget
 from Britefury.DocViewHelper.DocViewHelper import DocViewBoxTable
 
@@ -390,6 +391,15 @@ class DTContainer (DTWidget):
 	#
 	# CURSOR NAVIGATION METHODS
 	#
+	
+	def _f_childCursorBlocked(self, child):
+		DTCursorEntity.remove( child.getFirstCursorEntity(), child.getLastCursorEntity() )
+		
+	def _f_childCursorUnblocked(self, child):
+		prev = self._f_getPrevCursorEntityBeforeChild( child )
+		next = self._f_getNextCursorEntityAfterChild( child )
+		DTCursorEntity.splice( prev, next, child.getFirstCursorEntity(), child.getLastCursorEntity() )
+	
 	
 	def _f_getPrevCursorEntityBeforeChild(self, child):
 		e = self._o_getPrevCursorEntityBeforeChild( child )

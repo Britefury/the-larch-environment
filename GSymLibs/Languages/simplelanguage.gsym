@@ -2,13 +2,18 @@
 	($importModuleContents Languages.metalanguage ((languageFactory @mlLangFac))
 		($let ((@mlLang (@mlLangFac createLanguageInstanceControlInterface))  (@ml (@mlLang getLanguageInstanceInterface)))
 			(@mlLang content
-				(@ml compilerDefinition python25
-					( (add (: @x !) (: @y !))   (  (((('(' + (/eval @x)) + ' + ') + (/eval @y)) + ')')  ) )
-					( (sub (: @x !) (: @y !))   (  (((('(' + (/eval @x)) + ' - ') + (/eval @y)) + ')')  ) )
-					( (mul (: @x !) (: @y !))   (  (((('(' + (/eval @x)) + ' * ') + (/eval @y)) + ')')  ) )
-					( (div (: @x !) (: @y !))   (  (((('(' + (/eval @x)) + ' / ') + (/eval @y)) + ')')  ) )
-					( (pow (: @x !) (: @y !))   (  (((('(' + (/eval @x)) + ' ** ') + (/eval @y)) + ')')  ) )
+				(@ml compilerDefinition asciiCompiler python25 python25_ascii
+					( (add (: @x !) (: @y !))   (  (((('(' + (/compileEval @x)) + ' + ') + (/compileEval @y)) + ')')  ) )
+					( (sub (: @x !) (: @y !))   (  (((('(' + (/compileEval @x)) + ' - ') + (/compileEval @y)) + ')')  ) )
+					( (mul (: @x !) (: @y !))   (  (((('(' + (/compileEval @x)) + ' * ') + (/compileEval @y)) + ')')  ) )
+					( (div (: @x !) (: @y !))   (  (((('(' + (/compileEval @x)) + ' / ') + (/compileEval @y)) + ')')  ) )
+					( (pow (: @x !) (: @y !))   (  (((('(' + (/compileEval @x)) + ' ** ') + (/compileEval @y)) + ')')  ) )
 					( (loadLocal (: @x ^))   ((@x)) )
+				)
+				
+				(@ml displayDefinition python25Display python25
+					( (add (: @x !) (: @y !))   (  (/activeBorder (/hbox ( (/viewEval @x) (/label '+') (/viewEval @y))))  ) )
+					( (loadLocal (: @x ^))   (  (/entryLabel @x)  ) )
 				)
 			)
 		)

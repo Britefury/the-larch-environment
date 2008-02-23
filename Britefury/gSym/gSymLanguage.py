@@ -7,16 +7,7 @@
 ##-*************************
 from Britefury.GLisp.GLispInterpreter import specialform
 
-
-class GSymLanguageCompilerDefinition (object):
-	def __init__(self, targetName, compileFunction):
-		self.targetName = targetName
-		self._compileFunction = compileFunction
-		
-	def testCompile(self, xs):
-		return [ self._compileFunction( x )   for x in xs ]
-		
-
+from Britefury.gSym.gSymCompiler import GSymCompilerDefinition
 
 
 class GSymLanguageInstanceInterface (object):
@@ -63,7 +54,7 @@ class GSymLanguageFactory (object):
 				if isinstance( l, t ):
 					return l
 			return None
-		self._compilerTest = getParamOfType( GSymLanguageCompilerDefinition )
+		self._compilerTest = getParamOfType( GSymCompilerDefinition )
 	
 	
 	def createLanguageInstanceControlInterface(self):
