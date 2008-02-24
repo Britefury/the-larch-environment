@@ -73,7 +73,7 @@ class MetaLanguageInstanceControlInterface (GSymLanguageInstanceControlInterface
 
 	@specialform
 	def content(self, env, xs):
-		languageDefinition = [ env.evaluate( x )   for x in xs[2:] ]
+		languageDefinition = [ env.evaluate( x )   for x in xs[2] ]
 		languageFactory = GSymLanguageFactory( *languageDefinition )
 		env.rootScope()['languageFactory'] = languageFactory
 		return languageFactory

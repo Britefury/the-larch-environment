@@ -17,8 +17,8 @@ class GSymCompilerDefinition (object):
 		self.targetFormat = targetFormat
 		self._compileFunction = compileFunction
 		
-	def testCompile(self, xs):
-		return [ self._compileFunction( x )   for x in xs ]
+	def compileContent(self, xs):
+		return self._compileFunction( xs )
 
 	
 	
@@ -33,7 +33,7 @@ def defineCompiler(env, xs, name, sourceFormat, targetFormat, spec):
 		try:
 			varValues, index = guardFunction( content )
 		except GuardError:
-			raise
+			env.glispError( GuardError, xs, 'compileEval: cannot process; no suitable guard expression found' )
 		f = compileExprFunctions[index]
 		return f( **varValues )
 
