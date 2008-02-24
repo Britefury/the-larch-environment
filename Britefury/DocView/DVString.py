@@ -28,9 +28,6 @@ from Britefury.DocView.DVBorderNode import DVBorderNode
 
 
 class DVString (DVBorderNode):
-	docNodeClass = str
-
-
 	#behaviors = [ CVBWrapInAssignmentBehavior(), CVBUnboundRefBehavior() ]
 
 

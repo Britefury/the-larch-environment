@@ -24,9 +24,6 @@ from Britefury.DocPresent.Toolkit.DTDirection import DTDirection
 
 
 class DVNull (DVBorderNode):
-	docNodeClass = type( None )
-
-
 	#behaviors = [ DVBCreateExpressionBehavior() ]
 
 

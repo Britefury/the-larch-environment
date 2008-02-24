@@ -5,7 +5,7 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
-from Britefury.GLisp.GLispCompiler import compileGLispCustomFunctionToPy, GLispCompilerError
+from Britefury.GLisp.GLispCompiler import compileGLispCustomFunctionToPy, compileGLispExprToPySrc, GLispCompilerError, filterIdentifierForPy
 from Britefury.GLisp.GuardExpression import compileGuardExpression, GuardError
 
 
@@ -25,23 +25,24 @@ class GSymCompilerDefinition (object):
 def defineCompiler(env, xs, name, sourceFormat, targetFormat, spec):
 	def compileSpecial(src):
 		if src[0] == '/compileEval':
-			return '_compileEval( %s )'  %  ( src[1][1:], )
+			return '_compileEval( %s )'  %  ( compileGLispExprToPySrc( src[1], compileSpecial ), )
 		else:
 			env.glispError( GLispCompilerError, xs, 'cannot compile special \'%s\''  %  ( src[0], ) )
 	
-	def _compileEval(source):
+	def _compileEval(content):
 		try:
-			varValues, index = guardFunction( source )
+			varValues, index = guardFunction( content )
 		except GuardError:
 			raise
 		f = compileExprFunctions[index]
 		return f( **varValues )
 
-	guardFunction, varNamesByGuard = compileGuardExpression( spec, [0], 'compileTest' )
+	guardFunction, varNameToValueIndirectionByGuard = compileGuardExpression( spec, [0], filterIdentifierForPy( 'compiler_guard_%s'  %  ( name, ) ) )
 	
 	def generateExprFunction(guardAndCompileExpr, i, varNamesSet):
-		return compileGLispCustomFunctionToPy( guardAndCompileExpr[1], 'compileExpr%d' % ( i, ), list( varNamesSet ), compileSpecial, { '_compileEval' : _compileEval } )
+		functionName = filterIdentifierForPy( 'compiler_expr_%s_%d'  %  ( name, i ) )
+		return compileGLispCustomFunctionToPy( guardAndCompileExpr[1], functionName, list( varNamesSet ), compileSpecial, { '_compileEval' : _compileEval } )
 
-	compileExprFunctions = [ generateExprFunction( guardAndCompileExpr, i, varNamesSet )   for i, ( guardAndCompileExpr, varNamesSet ) in enumerate( zip( spec, varNamesByGuard ) ) ]
+	compileExprFunctions = [ generateExprFunction( guardAndCompileExpr, i, varNamesToValueIndirection.keys() )   for i, ( guardAndCompileExpr, varNamesToValueIndirection ) in enumerate( zip( spec, varNameToValueIndirectionByGuard ) ) ]
 	
 	return GSymCompilerDefinition( name, sourceFormat, targetFormat, _compileEval )

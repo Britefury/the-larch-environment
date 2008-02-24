@@ -50,18 +50,6 @@ class DVNodeClass (SheetClass):
 		super( DVNodeClass, cls ).__init__( clsName, clsBases, clsDict )
 
 
-		try:
-			docNodeClass = clsDict['docNodeClass']
-		except KeyError:
-			pass
-		else:
-			if isinstance( docNodeClass, tuple )  or  isinstance( docNodeClass, list ):
-				for c in docNodeClass:
-					DocView._nodeClassTable[c] = cls
-			else:
-				DocView._nodeClassTable[docNodeClass] = cls
-
-
 
 
 class DVNode (Sheet, DTWidgetKeyHandlerInterface):
@@ -108,7 +96,7 @@ class DVNode (Sheet, DTWidgetKeyHandlerInterface):
 		self._styleSheet = None
 		self.refreshCell = RefCell()
 		self.refreshCell.function = self._o_refreshNode
-
+		
 
 
 	def _f_setParentAndKey(self, parent, docNodeKey):
@@ -120,6 +108,10 @@ class DVNode (Sheet, DTWidgetKeyHandlerInterface):
 			# Force refreshCell to require recomputation due to potential style sheet change
 			self.refreshCell.function = self._o_refreshNode
 		self._o_reset()
+		
+		
+	def _o_resetRefreshCell(self):
+		self.refreshCell.function = self._o_refreshNode
 
 
 

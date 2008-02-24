@@ -47,9 +47,9 @@ class  _GuardMatch (object):
 	def _p_emitMatchFailed(self):
 		return [ 'raise GuardError' ]
 	
-	def _p_emitBind(self, valueSrc, varNames):
+	def _p_emitBind(self, valueSrc, valueIndirection, varNameToValueIndirection):
 		if self.bindName is not None:
-			varNames.add( self.bindName )
+			varNameToValueIndirection.setdefault( self.bindName, valueIndirection )
 			return [ '_bind( result, \'%s\', %s )'  %  ( self.bindName, valueSrc ) ]
 		else:
 			return []
@@ -58,22 +58,22 @@ class  _GuardMatch (object):
 
 
 class _GuardMatchAnything (_GuardMatch):
-	def emitSourceAndVarNames(self, valueSrc, varNames):
-		return self._p_emitBind( valueSrc, varNames )
+	def emitSourceAndVarNames(self, valueSrc, valueIndirection, varNameToValueIndirection):
+		return self._p_emitBind( valueSrc, valueIndirection, varNameToValueIndirection )
 
 
 class _GuardMatchAnyString (_GuardMatch):
-	def emitSourceAndVarNames(self, valueSrc, varNames):
+	def emitSourceAndVarNames(self, valueSrc, valueIndirection, varNameToValueIndirection):
 		return [ 'if not isinstance( %s, %s ):'  %  ( valueSrc, _stringTypeSrc ) ]  +  \
 		       _indent( self._p_emitMatchFailed()  )  +  \
-		       self._p_emitBind( valueSrc, varNames )
+		       self._p_emitBind( valueSrc, valueIndirection, varNameToValueIndirection )
 
 
 class _GuardMatchAnyList (_GuardMatch):
-	def emitSourceAndVarNames(self, valueSrc, varNames):
+	def emitSourceAndVarNames(self, valueSrc, valueIndirection, varNameToValueIndirection):
 		return [ 'if not isinstance( %s, %s ):'  %  ( valueSrc, _listTypeSrc ) ]  +  \
 		       _indent( self._p_emitMatchFailed()  )  +  \
-		       self._p_emitBind( valueSrc, varNames )
+		       self._p_emitBind( valueSrc, valueIndirection, varNameToValueIndirection )
 
 
 class _GuardMatchString (_GuardMatch):
@@ -81,10 +81,10 @@ class _GuardMatchString (_GuardMatch):
 		super( _GuardMatchString, self ).__init__()
 		self._constant = constant
 
-	def emitSourceAndVarNames(self, valueSrc, varNames):
+	def emitSourceAndVarNames(self, valueSrc, valueIndirection, varNameToValueIndirection):
 		return [ 'if %s != \'%s\':'  %  ( valueSrc, self._constant ) ]  +  \
 		       _indent( self._p_emitMatchFailed()  )  +  \
-		       self._p_emitBind( valueSrc, varNames )
+		       self._p_emitBind( valueSrc, valueIndirection, varNameToValueIndirection )
 
 
 class _GuardMatchList (_GuardMatch):
@@ -115,7 +115,7 @@ class _GuardMatchList (_GuardMatch):
 		else:
 			self._minLength = self._maxLength = len( self._front )
 		
-	def emitSourceAndVarNames(self, valueSrc, varNames):
+	def emitSourceAndVarNames(self, valueSrc, valueIndirection, varNameToValueIndirection):
 		# Check the lengths
 		src = []
 		
@@ -149,25 +149,26 @@ class _GuardMatchList (_GuardMatch):
 		#guardItem*  (front)
 		for i, item in enumerate( self._front ):
 			itemNameSrc = '%s[%d]'  %  ( valueSrc, i )
-			itemSrc = item.emitSourceAndVarNames( itemNameSrc, varNames )
+			itemSrc = item.emitSourceAndVarNames( itemNameSrc, valueIndirection + [ i ], varNameToValueIndirection )
 			src.extend( itemSrc )
 					
 		#guardItem*  (back)
 		for i, item in enumerate( reversed( self._back ) ):
 			itemNameSrc = '%s[-%d]'  %  ( valueSrc, i + 1 )
-			itemSrc = item.emitSourceAndVarNames( itemNameSrc, varNames )
+			itemSrc = item.emitSourceAndVarNames( itemNameSrc, valueIndirection + [ -(i+1) ], varNameToValueIndirection )
 			src.extend( itemSrc )
 			
 		if self._internal is not None:
 			src.append( '' )
 			start = len( self._front )
-			if len( self._back ) > 0:
-				src.extend( self._internal.emitSourceAndVarNames( '%s[%d:-%d]'  %  ( valueSrc, len( self._front ), len( self._back ) ), varNames ) )
+			end = len( self._back )
+			if end  > 0:
+				src.extend( self._internal.emitSourceAndVarNames( '%s[%d:%d]'  %  ( valueSrc, start, -end ), valueIndirection + [ (start,-end) ], varNameToValueIndirection ) )
 			else:
-				src.extend( self._internal.emitSourceAndVarNames( '%s[%d:]'  %  ( valueSrc, len( self._front ) ), varNames ) )
+				src.extend( self._internal.emitSourceAndVarNames( '%s[%d:]'  %  ( valueSrc, start ), valueIndirection + [ (start,None) ], varNameToValueIndirection ) )
 		
 		src.append( '' )
-		src.extend( self._p_emitBind( valueSrc, varNames ) )
+		src.extend( self._p_emitBind( valueSrc, valueIndirection, varNameToValueIndirection ) )
 		
 		return src
 
@@ -179,8 +180,8 @@ class _GuardMatchListInternal (_GuardMatch):
 		self.min = min
 		self.max = max
 		
-	def emitSourceAndVarNames(self, valueSrc, varNames):
-		return self._p_emitBind( valueSrc, varNames )
+	def emitSourceAndVarNames(self, valueSrc, valueIndirection, varNameToValueIndirection):
+		return self._p_emitBind( valueSrc, valueIndirection, varNameToValueIndirection )
 		
 	
 
@@ -255,7 +256,11 @@ def compileGuardExpression(xs, guardIndirection=[], functionName='guard', bSrc=F
 					returns:
 						vars: a dictionary mapping variable name (specified in the gaurd expression) to value
 						index: the index of the guard expression that was matched
-			varNames: a list of sets; one for each guard expression. Each set contains the names of the variables generated by the corresponding guard expression
+			varNameToValueIndirectionTable: a list of dictionaties; one for each guard expression. Each dictionary maps the names of the variables generated by the corresponding guard expression,
+			        to a list representing the indirection required to get from the root to the corresponding expression that is bound to the variable name
+				for example, if 'a' is bound to xs[1][3][6], then the dictionary will contain { 'a' : [1,3,6] }.
+				Where a 'listInternal' (+, *, (- #min #max); see below) is in the guard expression, an entry will contain a tuple which represents the sublist. For example [1,3,(2,4)] means xs[1][3][2:4]
+				Since 'listInternal' entries cannot be processed further by a guard expression, the tuple would always be the last entry on the list.
 	   
 	   
 		Guard expression format:
@@ -293,19 +298,19 @@ def compileGuardExpression(xs, guardIndirection=[], functionName='guard', bSrc=F
 	
 	
 	result = []
-	varNames = []
+	varNameToValueIndirectionTable = []
 	for index, guard in enumerate( xs ):
-		guardItemVarNames = set()
+		guardItemVarNameToValueIndirection = {}
 		for i in guardIndirection:
 			guard = guard[i]
 		match = _buildMatchForGuardItem( guard )
-		guardItemSrc = match.emitSourceAndVarNames( 'xs', guardItemVarNames )
+		guardItemSrc = match.emitSourceAndVarNames( 'xs', [], guardItemVarNameToValueIndirection )
 		result.extend( [ 'try:' ] )
 		result.extend( [ '\tresult = {}' ] )
 		result.extend( _indent( guardItemSrc ) )
 		result.extend( [ '\treturn result, %d'  %  ( index, ) ] )
 		result.extend( [ 'except GuardError:', '\tpass', '' ] )
-		varNames.append( guardItemVarNames )
+		varNameToValueIndirectionTable.append( guardItemVarNameToValueIndirection )
 	result.extend( [ 'raise GuardError' ] )
 	
 	result = [ '\t' + x  for x in result ]
@@ -319,7 +324,7 @@ def compileGuardExpression(xs, guardIndirection=[], functionName='guard', bSrc=F
 		
 		exec src in lcl
 		
-		return lcl[functionName], varNames
+		return lcl[functionName], varNameToValueIndirectionTable
 
 
 
