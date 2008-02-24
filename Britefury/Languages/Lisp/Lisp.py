@@ -225,10 +225,16 @@ def lispNodeFactory(docNode, view, docNodeKey ):
 	
 	
 
+def makeLispStyleSheetDispatcher():
+	return StyleSheetDispatcher( LispStringStyleSheet(), DVListSExpressionStyleSheet() )
+
+
 def makeLispDocView(root, commandHistory):
-	disp = StyleSheetDispatcher( LispStringStyleSheet(), DVListSExpressionStyleSheet() )
+	disp = makeLispStyleSheetDispatcher()
 	view = DocView( root, commandHistory, disp, lispNodeFactory )
 	return view
+
+
 
 
 

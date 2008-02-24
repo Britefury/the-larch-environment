@@ -27,9 +27,11 @@ from Britefury.DocPresent.Toolkit.DTDocument import DTDocument
 
 from Britefury.DocModel.DMList import DMList
 
+from Britefury.gSym.gSymEnvironment import createGSymGLispEnvironment
+
 from Britefury.DocView.DocView import DocView
 
-from Britefury.Languages.Lisp.Lisp import makeLispDocView
+from Britefury.Languages.Lisp.Lisp import makeLispDocView, makeLispStyleSheetDispatcher
 
 #from Britefury.PyImport import PythonImporter
 
@@ -65,20 +67,20 @@ class MainApp (object):
 			self._textBuffer.insert_with_tags_by_name( pos, text, self._tagName )
 
 
-	def __init__(self, documentRoot):
+	def __init__(self, documentRoot, bEvaluate):
 		self._documentRoot = None
 		self._view = None
 		self._viewRoot = None
 		self._commandHistory = None
 		self._bUnsavedData = False
+		
+		self._env = None
+		self._appInterface = None
 
 		self._doc = DTDocument()
 		self._doc.undoSignal.connect( self._p_onUndo )
 		self._doc.redoSignal.connect( self._p_onRedo )
 		self._doc.show()
-
-
-		self.setDocument( documentRoot )
 
 
 		resetButton = gtk.Button( 'Reset' )
@@ -96,7 +98,9 @@ class MainApp (object):
 		buttonBox.show()
 
 
-
+		
+		# FILE MENU
+		
 		newItem = gtk.MenuItem( 'New' )
 		newItem.connect( 'activate', self._p_onNew )
 
@@ -124,6 +128,8 @@ class MainApp (object):
 
 
 
+		# EDIT MENU
+		
 		undoItem = gtk.MenuItem( 'Undo' )
 		undoItem.connect( 'activate', self._p_onUndo )
 
@@ -135,6 +141,9 @@ class MainApp (object):
 		editMenu.append( redoItem )
 
 
+		
+		# EXECUTE MENU
+		
 		executeItem = gtk.MenuItem( 'Execute' )
 		executeItem.connect( 'activate', self._p_onExecute )
 		executeItem.set_sensitive( False )
@@ -149,6 +158,14 @@ class MainApp (object):
 
 
 
+		# ACTIONS MENU
+		
+		self._actionsMenu = gtk.Menu()
+
+
+
+		# SCRIPT MENU
+		
 		scriptWindowItem = gtk.MenuItem( _( 'Script window' ) )
 		scriptWindowItem.connect( 'activate', self._p_onScriptWindowMenuItem )
 
@@ -166,6 +183,9 @@ class MainApp (object):
 
 		runMenuItem = gtk.MenuItem( 'Run' )
 		runMenuItem.set_submenu( runMenu )
+		
+		self._actionsMenuItem = gtk.MenuItem( 'Actions' )
+		self._actionsMenuItem.set_submenu( self._actionsMenu )
 
 		scriptMenuItem = gtk.MenuItem( _( 'Script' ) )
 		scriptMenuItem.set_submenu( scriptMenu )
@@ -175,6 +195,7 @@ class MainApp (object):
 		menuBar.append( fileMenuItem )
 		menuBar.append( editMenuItem )
 		menuBar.append( runMenuItem )
+		menuBar.append( self._actionsMenuItem )
 		menuBar.append( scriptMenuItem )
 		menuBar.show_all()
 
@@ -197,6 +218,9 @@ class MainApp (object):
 		self._window.add( box )
 		self._window.show()
 
+
+
+		self.setDocument( documentRoot, bEvaluate )
 
 
 		scriptBanner = _( "gSym scripting console (uses pyconsole by Yevgen Muntyan)\nPython %s\nType help(object) for help on an object\nThe gSym scripting environment is available via the local variable 'gsym'\n" ) % ( sys.version, )
@@ -228,15 +252,43 @@ class MainApp (object):
 
 
 
-	def setDocument(self, documentRoot):
+	def setDocument(self, documentRoot, bEvaluate):
 		self._documentRoot = documentRoot
 
 		self._commandHistory = CommandHistory()
 		self._commandHistory.track( self._documentRoot )
 		self._commandHistory.changedSignal.connect( self._p_onCommandHistoryChanged )
 		self._bUnsavedData = False
-
-		self._view = makeLispDocView( documentRoot, self._commandHistory )
+		
+	
+		self._actionsMenu = gtk.Menu()
+		self._actionsMenuItem.set_submenu( self._actionsMenu )
+		
+		if bEvaluate:
+			self._env = createGSymGLispEnvironment()
+			self._env.name = '<document>'
+			
+			self._appInterface = self._env.evaluate( documentRoot )
+			
+			for name, actionFunction in self._appInterface.actions:
+				def runAction(menuItem):
+					print actionFunction()
+				actionItem = gtk.MenuItem( name )
+				actionItem.connect( 'activate', runAction )
+				actionItem.show()
+				self._actionsMenu.append( actionItem )
+			self._actionsMenu.show()
+				
+			
+			assert len( self._appInterface.views ) > 0
+			v = self._appInterface.views[0]
+			self._view = v( self._commandHistory, makeLispStyleSheetDispatcher() )
+				
+		else:
+			self._env = None
+			self._appInterface = None
+			self._view = makeLispDocView( documentRoot, self._commandHistory )
+	
 		self._viewRoot = self._view.rootView
 
 		self._view.refreshCell.changedSignal.connect( self._p_queueRefresh )

@@ -31,7 +31,13 @@ class _Key (object):
 
 		self._index = index
 		self._d = d
-		self._hash = hash( ( docNode, parent, index ) )
+		try:
+			self._hash = hash( ( docNode, parent, index ) )
+		except TypeError:
+			print docNode
+			print parent
+			print index
+			raise
 
 
 	def _p_remove(self, weak):

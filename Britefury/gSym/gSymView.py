@@ -15,19 +15,13 @@ from Britefury.DocPresent.Toolkit.DTBox import DTBox
 
 from Britefury.DocView.DVNode import DVNode
 from Britefury.DocView.DVCustomNode import DVCustomNode
+from Britefury.DocView.DocView import DocView
 
 
 from Britefury.GLisp.GLispInterpreter import GLispParameterListError, GLispItemTypeError, isGLispList
 from Britefury.GLisp.GLispCompiler import compileGLispCustomFunctionToPy, compileGLispExprToPySrc, GLispCompilerError, filterIdentifierForPy
 from Britefury.GLisp.GuardExpression import compileGuardExpression, GuardError
 
-
-
-class _ViewNodeAndIndrection (object):
-	"""A helper class for storing the results of view computations"""
-	def __init__(self, viewNode, indirection):
-		self.viewNode = viewNode
-		self.indirection = indirection
 
 
 class GSymViewDefinition (object):
@@ -43,6 +37,13 @@ class GSymViewDefinition (object):
 
 
 
+class _ViewNodeAndIndrection (object):
+	"""A helper class for storing the results of view computations"""
+	def __init__(self, viewNode, indirection):
+		self.viewNode = viewNode
+		self.indirection = indirection
+
+
 def _runtime_buildRefreshCellAndRegister(viewNodeInstance, refreshFunction):
 	"""Builds a refresh cell, and registers it by appending it to @refreshCells"""
 	cell = Cell()
@@ -51,15 +52,19 @@ def _runtime_buildRefreshCellAndRegister(viewNodeInstance, refreshFunction):
 
 def _runtime_binRefreshCell(viewNodeInstance, bin, child):
 	"""Builds and registers a refresh cell (if necessary) for a widget that is an instance of DTBin"""
-	if isinstance( child, _ViewNodeAndIndrection ):
+	if isinstance( child, _ViewNodeAndIndrection )  or  isinstance( child, DVNode ):
+		if isinstance( child, _ViewNodeAndIndrection ):
+			chNode = child.viewNode
+		else:
+			chNode = child
 		def _binRefresh():
-			child.viewNode.refresh()
-			bin.child = child.viewNode.widget
+			chNode.refresh()
+			bin.child = chNode.widget
 		_runtime_buildRefreshCellAndRegister( viewNodeInstance, _binRefresh )
 	elif isinstance( child, DTWidget ):
 		bin.child = child
 	else:
-		viewNodeInstance.env.glispError( TypeError, xs, '_GSymNodeViewInstance._binRefreshCell: could not process child of type %s'  %  ( type( child ).__name__, ) )
+		viewNodeInstance.env.glispError( TypeError, viewNodeInstance.xs, '_GSymNodeViewInstance._binRefreshCell: could not process child of type %s'  %  ( type( child ).__name__, ) )
 
 def _runtime_boxRefreshCell(viewNodeInstance, widget, children):
 	"""Builds and registers a refresh cell (if necessary) for a widget that is an instance of DTBox"""
@@ -69,10 +74,13 @@ def _runtime_boxRefreshCell(viewNodeInstance, widget, children):
 			if isinstance( child, _ViewNodeAndIndrection ):
 				child.viewNode.refresh()
 				widgets.append( child.viewNode.widget )
+			elif isinstance( child, DVNode ):
+				child.refresh()
+				widgets.append( child.widget )
 			elif isinstance( child, DTWidget ):
 				widgets.append( child )
 			else:
-				viewNodeInstance.env.glispError( TypeError, xs, 'defineView: _boxRefreshCell: could not process child of type %s'  %  ( type( child ).__name__, ) )
+				viewNodeInstance.env.glispError( TypeError, viewNodeInstance.xs, 'defineView: _boxRefreshCell: could not process child of type %s'  %  ( type( child ).__name__, ) )
 		widget[:] = widgets
 	_runtime_buildRefreshCellAndRegister( viewNodeInstance, _boxRefresh )
 
@@ -86,6 +94,8 @@ def _runtime_activeBorder(viewNodeInstance, child, styleSheets):
 
 def _runtime_label(viewNodeInstance, text, styleSheets):
 	"""Builds a DTLabel widget"""
+	if isinstance( text, _ViewNodeAndIndrection ):
+		text = text.viewNode
 	widget = DTLabel(text)
 	for sheet in styleSheets:
 		sheet.apply()
@@ -93,6 +103,8 @@ def _runtime_label(viewNodeInstance, text, styleSheets):
 
 def _runtime_entry(viewNodeInstance, text, styleSheets):
 	"""Builds a DTEntryLabel widget"""
+	if isinstance( text, _ViewNodeAndIndrection ):
+		text = text.viewNode
 	widget = DTEntryLabel(text)
 	for sheet in styleSheets:
 		sheet.apply()
@@ -136,13 +148,13 @@ class _GSymNodeViewInstance (object):
 		try:
 			varValues, index = self.viewFactory.guardFunction( content )
 		except GuardError:
-			raise
+			self.env.glispError( GuardError, content, 'buildViewContents: cannot process; no suitable guard expression found' )
 		#2. Get the view expression function from the table, along with the varName->valueIndirection table for that function
 		f, varNameToValueIndirection = self.viewFactory.viewExprFunctionAndVarNameToIndirectionPairs[index]
 		
 		#3. Mix the variable values with value indirection
 		varValuesWithIndireciton = {}
-		for varName, viewNode in varValues:
+		for varName, viewNode in varValues.items():
 			varValuesWithIndireciton[varName] = _ViewNodeAndIndrection( viewNode, varNameToValueIndirection[varName] )
 		
 		#4. Call the view expression function
@@ -177,7 +189,7 @@ class _GSymViewInstance (object):
 	def _p_buildNodeContents(self, viewNode, docNodeKey):
 		nodeViewInstance = _GSymNodeViewInstance( self.env, docNodeKey.docNode, self.view, self, self.viewFactory, viewNode )
 		viewContents = nodeViewInstance._runtime_buildViewContents( docNodeKey.docNode )
-		viewNode.setRefreshCells( nodeViewInstance.refreshCells )
+		viewNode._f_setRefreshCells( nodeViewInstance.refreshCells )
 		return viewContents
 	
 	
@@ -214,22 +226,22 @@ class _GSymViewFactory (object):
 	def _runtime_buildView(self, viewNodeInstance, content):
 		if not isinstance( content, _ViewNodeAndIndrection ):
 			self.env.glispError( TypeError, None, '_GSymViewFactory._runtime_buildView: content is not a _ViewNodeAndIndrection' )
-		xs, indirection = content
+		xs, indirection = content.viewNode, content.indirection
 		parentViewNode = viewNodeInstance.viewNode
 		indexInParentDocNode = indirection[-1]
-		return view._f_buildView( xs, parentViewNode, indexInParentDocNode )
+		return viewNodeInstance.view._f_buildView( xs, parentViewNode, indexInParentDocNode )
 		
 	def _runtime_buildViewForMap(self, viewNodeInstance, content, index):
 		if not isinstance( content, _ViewNodeAndIndrection ):
 			self.env.glispError( TypeError, None, '_GSymViewFactory._runtime_buildViewForMap: content is not a _ViewNodeAndIndrection' )
-		xs, indirection = content
+		xs, indirection = content.viewNode, content.indirection
 		parentViewNode = viewNodeInstance.viewNode
 		lastIndirection = indirection[-1]
 		if isinstance( lastIndirection, tuple ):
 			indexInParentDocNode = lastIndirection[0] + index
 		else:
 			indexInParentDocNode = index
-		return view._f_buildView( xs, parentViewNode, indexInParentDocNode )
+		return viewNodeInstance.view._f_buildView( xs, parentViewNode, indexInParentDocNode )
 
 		
 	
@@ -256,7 +268,7 @@ class _GSymViewFactory (object):
 				self.env.glispError( GLispParameterListError, src, 'defineView: /label needs at least 1 parameter; the text' )
 			return '_label( __view_node_instance__, %s, %s )'  %  ( self._p_compileSubExp( src[1] ), self._p_compileStylesheetAccess( src[2:] ) )
 		elif name == '/entry':
-			#(/label text styleSheet*)
+			#(/entry text styleSheet*)
 			if len( src ) < 2:
 				self.env.glispError( GLispParameterListError, src, 'defineView: /entry needs at least 1 parameter; the text' )
 			return '_entry( __view_node_instance__, %s, %s )'  %  ( self._p_compileSubExp( src[1] ), self._p_compileStylesheetAccess( src[2:] ) )

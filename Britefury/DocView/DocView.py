@@ -31,8 +31,14 @@ class DocView (object):
 		self.refreshCell.function = self._p_refresh
 
 		self._nodeTable = DocViewNodeTable()
+		
+		self._rootView = None
 
-		self.rootView = self._f_buildView( self._root, None, 0 )
+		
+	def _p_getRootView(self):
+		if self._rootView is None:
+			self._rootView = self._f_buildView( self._root, None, 0 )
+		return self._rootView
 
 
 
@@ -141,4 +147,7 @@ class DocView (object):
 	def _f_commandHistoryThaw(self):
 		if self._commandHistory is not None:
 			self._commandHistory.thaw()
+			
+			
+	rootView = property( _p_getRootView )
 

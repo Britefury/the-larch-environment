@@ -12,6 +12,8 @@ i18n.initialise()
 
 
 
+from Britefury.DocModel.DMIO import readSX
+
 from Britefury.gSym.gSymEnvironment import initGSymEnvironment, shutdownGSymEnvironment
 
 from Britefury.MainApp.MainApp import MainApp
@@ -27,27 +29,20 @@ if __name__ == '__main__':
 
 	
 	initGSymEnvironment()
+	
 
+	documentRoot = readSX( '(a b c)' )
+	bEvaluate = False
+	
+	if len( sys.argv ) == 2:
+		filename = sys.argv[1]
+		try:
+			documentRoot = readSX( file( filename, 'r' ) )
+			bEvaluate = True
+		except IOError:
+			pass
 
-	documentRoot = None
-
-	#if len( sys.argv ) == 2:
-		#filename = sys.argv[1]
-
-		#f = open( filename, 'r' )
-		#if f is not None:
-			#doc = InputXmlDocument()
-			#doc.parseFile( f )
-			#contentNode = doc.getContentNode()
-			#if contentNode.isValid():
-				#rootXmlNode = contentNode.getChild( 'doc_root' )
-				#if rootXmlNode.isValid():
-					#documentRoot = rootXmlNode.readObject()
-
-	if documentRoot is None:
-		documentRoot = MainApp.makeEmptyDocument()
-
-	app = MainApp( documentRoot )
+	app = MainApp( documentRoot, bEvaluate )
 
 	gtk.main()
 	

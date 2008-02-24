@@ -144,6 +144,8 @@ class Cell (CellInterface):
 				CellInterface._cellDependencies[self] = None
 
 			if self._bRefreshRequired != False:
+				# IS THIS CORRECT
+				self._bRefreshRequired = False
 				if isinstance( self._evaluator, CellEvaluator ):
 					# Save the existing global dependency list
 					oldCellDeps = CellInterface._cellDependencies
@@ -191,7 +193,8 @@ class Cell (CellInterface):
 						self._dependencies.clear()
 
 
-				self._bRefreshRequired = False
+				# IS THIS CORRECT?
+				#self._bRefreshRequired = False
 
 		except:
 			self._cycleLock = False

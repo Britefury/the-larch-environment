@@ -19,7 +19,7 @@ scriptFilename = sys.argv[1]
 result = env.evaluate( readSX( file( scriptFilename, 'r' ) ) )
 
 print 'RESULT:'
-print result
+print result.actions[0][1]()
 
 
 
