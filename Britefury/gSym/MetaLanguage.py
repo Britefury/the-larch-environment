@@ -12,6 +12,7 @@ from Britefury.gSym.gSymLanguage import GSymLanguageInstanceInterface, GSymLangu
 from Britefury.GLisp.GLispInterpreter import specialform, isGLispList, gLispSrcToString, GLispParameterListError, GLispItemTypeError
 
 from Britefury.gSym.gSymCompiler import defineCompiler
+from Britefury.gSym.gSymView import defineView
 
 
 
@@ -57,30 +58,7 @@ class MetaLanguageInstanceInterface (GSymLanguageInstanceInterface):
 		if not isinstance( docFormat, str ):
 			env.glispError( GLispItemTypeError, xs, 'MetaLanguageInstanceInterface#compilerDefinition: 2nd parameter (document format) must be a string' )
 			
-		
-		#def compileSpecial(src):
-			#if src[0] == '/viewEval':
-				#return '_buildView( %s )'  %  ( src[1][1:], )
-			#else:
-				#env.glispError( GLispCompilerError, xs, 'cannot compile special \'%s\''  %  ( src[0], ) )
-		
-		#def _buildView(source):
-			#try:
-				#varValues, index = guardFunction( source )
-			#except GuardError:
-				#raise
-			#f = compileExprFunctions[index]
-			#return f( **varValues )
-
-		#guardFunction, varNamesByGuard = compileGuardExpression( spec, [0], 'compileTest' )
-		
-		#def generateExprFunction(guardAndCompileExpr, i, varNamesSet):
-			#return compileGLispCustomFunctionToPy( guardAndCompileExpr[1], 'buildViewExpr%d' % ( i, ), list( varNamesSet ), compileSpecial, { '_buildView' : _buildView } )
-
-		#compileExprFunctions = [ generateExprFunction( guardAndCompileExpr, i, varNamesSet )   for i, ( guardAndCompileExpr, varNamesSet ) in enumerate( zip( spec, varNamesByGuard ) ) ]
-		
-		#return GSymLanguageCompilerDefinition( compilerName, sourceFormat, targetFormat, _compileEval )
-		return None
+		return defineView( env, xs, name, docFormat, spec )
 
 		
 		

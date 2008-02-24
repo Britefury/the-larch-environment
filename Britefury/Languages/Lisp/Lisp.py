@@ -20,6 +20,10 @@ from Britefury.DocModel.DMListInterface import DMListInterface
 from Britefury.DocView.DocView import DocView
 from Britefury.DocView.DocViewTokeniser import DocViewTokenDefinition, DocViewTokeniser
 
+from Britefury.DocView.DVNull import DVNull
+from Britefury.DocView.DVString import DVString
+from Britefury.DocView.DVList import DVList
+
 from Britefury.DocView.StyleSheet.DVStyleSheet import *
 
 from Britefury.DocView.StyleSheet.StyleSheetDispatcher import StyleSheetDispatcher
@@ -206,10 +210,24 @@ class DVListSExpressionStyleSheet (DVListWrappedLineStyleSheet):
 
 
 
+	
+def lispNodeFactory(docNode, view, docNodeKey ):	
+	if isinstance( docNode, str ):
+		nodeClass = DVString
+	elif isinstance( docNode, DMListInterface ):
+		nodeClass = DVList
+	elif docNode is None:
+		nodeClass = DVNull
+	else:
+		nodeClass = DVNull
+
+	return nodeClass( docNode, view, docNodeKey )
+	
+	
 
 def makeLispDocView(root, commandHistory):
 	disp = StyleSheetDispatcher( LispStringStyleSheet(), DVListSExpressionStyleSheet() )
-	view = DocView( root, commandHistory, disp )
+	view = DocView( root, commandHistory, disp, lispNodeFactory )
 	return view
 
 

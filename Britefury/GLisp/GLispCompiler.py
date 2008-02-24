@@ -6,6 +6,7 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
 from copy import copy
+import string
 
 from Britefury.DocModel.DMListInterface import DMListInterface
 
@@ -72,6 +73,8 @@ def _compileGLispExprToPySrcAndPrecedence(x, compileSpecial):
 			return 'None', None
 		elif isinstance( x[0], str )  and  x[0][0] == '/'  and  compileSpecial is not None:
 			return compileSpecial( x ), None
+		elif x[0] == '$list':
+			return '[ %s ]'  %  ( ', '.join( [ compileSubExpression( e, None )   for e in x[1:] ] ), ), None
 		elif len(x) == 1:
 			return compileSubExpression( x[0], None ), None
 		else:
@@ -149,6 +152,12 @@ def compileGLispCustomFunctionToPy(xs, functionName, params=[], compileSpecial=N
 
 
 
+_pyIdentifierChars = string.ascii_letters + string.digits + '_'
+def filterIdentifierForPy(identifier):
+	return ''.join( [ c  for c in identifier   if c in _pyIdentifierChars ] )
+
+
+
 import unittest
 from Britefury.DocModel.DMIO import readSX
 
@@ -188,6 +197,10 @@ class TestCase_gLisp (unittest.TestCase):
 		self.assert_( compileGLispExprToPySrc( readSX( '((@a + @b) + @c)' ) )  ==  '(a + b) + c' )
 		
 		
+	def testCompileGLispExprToPy_list(self):
+		self.assert_( compileGLispExprToPySrc( readSX( '($list (@a + (@b * @c)) #1 #2 @d)' ) )  ==  '[ a + b * c, 1, 2, d ]' )
+		
+
 	def testCompileGLispFunctionToPy(self):
 		def makeFunc(src):
 			return compileGLispFunctionToPy( readSX( src ), 'test' )
@@ -203,6 +216,7 @@ class TestCase_gLisp (unittest.TestCase):
 		
 		self.assert_( makeFuncSrc( glispSrc ) == pySrc )
 		self.assert_( makeFunc( glispSrc )('x', 'y', 3)  ==  'Xyyy' )
+		
 		
 		
 

@@ -15,9 +15,7 @@ from Britefury.DocView.DocViewNodeTable import DocViewNodeTable, DocNodeKey
 
 
 class DocView (object):
-	_nodeClassTable = {}
-
-	def __init__(self, root, commandHistory, styleSheetDispatcher):
+	def __init__(self, root, commandHistory, styleSheetDispatcher, nodeFactory):
 		super( DocView, self ).__init__()
 
 		self._root = root
@@ -26,6 +24,8 @@ class DocView (object):
 		self._commandHistory = commandHistory
 
 		self._styleSheetDispatcher = styleSheetDispatcher
+		
+		self._nodeFactory = nodeFactory
 
 		self.refreshCell = Cell()
 		self.refreshCell.function = self._p_refresh
@@ -54,27 +54,20 @@ class DocView (object):
 		self._nodeTable[newKey] = viewNode
 
 
-	def _f_buildView(self, docNode, parentViewNode, indexInParent):
+	def _f_buildView(self, docNode, parentViewNode, indexInParentDocNode):
 		if docNode is None:
 			return None
 		else:
-			docNodeClass = docNode.__class__
-
-			try:
-				nodeClass = self._nodeClassTable[docNodeClass]
-			except KeyError:
-				raise TypeError, 'could not get view node class for doc node class %s'  %  ( docNodeClass.__name__, )
-
 			parentDocNode = None
 			if parentViewNode is not None:
 				parentDocNode = parentViewNode.docNode
 
-			docNodeKey = DocNodeKey( docNode, parentDocNode, indexInParent )
+			docNodeKey = DocNodeKey( docNode, parentDocNode, indexInParentDocNode )
 
 			try:
 				viewNode = self._nodeTable[docNodeKey]
 			except KeyError:
-				viewNode = nodeClass( docNode, self, docNodeKey )
+				viewNode = self._nodeFactory( docNode, self, docNodeKey )
 				self._nodeTable[docNodeKey] = viewNode
 
 			viewNode.refresh()

@@ -33,9 +33,6 @@ from Britefury.DocPresent.Toolkit.DTLabel import DTLabel
 
 
 class DVList (DVBorderNode):
-	docNodeClass = DMList, DMVirtualList
-
-
 #	behaviors = [ DVBListBehavior(), DVBCreateExpressionBehavior() ]
 	behaviors = [ DVBListBehavior() ]
 

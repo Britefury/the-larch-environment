@@ -12,8 +12,12 @@
 				)
 				
 				(@ml displayDefinition python25Display python25
-					( (add (: @x !) (: @y !))   (  (/activeBorder (/hbox ( (/viewEval @x) (/label '+') (/viewEval @y))))  ) )
-					( (loadLocal (: @x ^))   (  (/entryLabel @x)  ) )
+					( (add (: @x !) (: @y !))   (  (/activeBorder (/hbox ($list (/viewEval @x) (/label '+') (/viewEval @y))))  ) )
+					( (sub (: @x !) (: @y !))   (  (/activeBorder (/hbox ($list (/viewEval @x) (/label '-') (/viewEval @y))))  ) )
+					( (mul (: @x !) (: @y !))   (  (/activeBorder (/hbox ($list (/viewEval @x) (/label '*') (/viewEval @y))))  ) )
+					( (div (: @x !) (: @y !))   (  (/activeBorder (/hbox ($list (/viewEval @x) (/label '/') (/viewEval @y))))  ) )
+					( (pow (: @x !) (: @y !))   (  (/activeBorder (/hbox ($list (/viewEval @x) (/label '**') (/viewEval @y))))  ) )
+					( (loadLocal (: @x ^))   (  (/activeBorder (/entry @x))  ) )
 				)
 			)
 		)

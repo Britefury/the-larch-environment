@@ -55,7 +55,9 @@ def isGLispList(xs):
 	return isinstance( xs, list )  or  isinstance( xs, DMListInterface )
 
 def gLispSrcToString(x, level=3):
-	if isinstance( x, str ):
+	if x is None:
+		return 'None'
+	elif isinstance( x, str ):
 		return x
 	elif isGLispList( x ):
 		if level == 0:
