@@ -32,6 +32,22 @@ _redoAccel = gtk.accelerator_parse( '<control><shift>Z' )
 
 
 
+
+class _GtkPresentationArea (gtk.DrawingArea):
+	"""This helper class is declared, since the do_key_press_event() method of a gtk.DrawingArea must be overridden in order to receive keyboard events.
+	We cannot derive our main class from gtk.DrawingArea, otherwise the DTWidget and gtk.DrawingArea 'parent' attributed will collide, resulting in problems.
+	This help class overrides the do_key_press_event() method and passes its arguments along."""
+	def __init__(self, presentationArea):
+		gtk.DrawingArea.__init__( self )
+		self._presentationArea = presentationArea
+		
+	def do_key_press_event(self, event):
+		self._presentationArea.do_key_press_event( event )
+		
+gobject.type_register( _GtkPresentationArea )
+
+
+
 class DTDocument (DTBin):
 	undoSignal = ClassSignal()
 	redoSignal = ClassSignal()
@@ -40,7 +56,7 @@ class DTDocument (DTBin):
 		DTBin.__init__( self )
 		
 		
-		self._drawingArea = gtk.DrawingArea()
+		self._drawingArea = _GtkPresentationArea( self )
 
 
 		# Set the document to self

@@ -136,12 +136,16 @@ def _runtime_boxRefreshCell(viewNodeInstance, widget, children):
 		widget[:] = widgets
 	_runtime_buildRefreshCellAndRegister( viewNodeInstance, _boxRefresh )
 
+	
+	
+	
 def _runtime_activeBorder(viewNodeInstance, child, styleSheets):
 	"""
 	Runtime - called by compiled code at run-time
 	Builds a DTActiveBorder widget, with child, builds and registers a refresh cell
 	"""
 	widget = DTActiveBorder()
+	widget.keyHandler = viewNodeInstance.viewNode
 	_runtime_binRefreshCell( viewNodeInstance, widget, child )
 	for sheet in styleSheets:
 		sheet.apply()
@@ -164,6 +168,7 @@ def _runtime_entry(viewNodeInstance, text, styleSheets):
 	if isinstance( text, _ViewNodeAndIndrection ):
 		text = text.viewNode
 	widget = DTEntryLabel(text)
+	widget.keyHandler = viewNodeInstance.viewNode
 	for sheet in styleSheets:
 		sheet.apply()
 	return widget
