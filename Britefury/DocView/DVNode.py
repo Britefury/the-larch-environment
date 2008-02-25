@@ -422,7 +422,7 @@ class DVNode (Sheet, DTWidgetKeyHandlerInterface):
 		char = keyPressEvent.keyString
 
 		inputHandler = None
-
+		
 		receivingViewNodePath = [ self ]  +  receivingViewNodePath
 
 		for behavior in self.behaviors:

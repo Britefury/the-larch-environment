@@ -30,7 +30,6 @@ class DVCustomNode (DVNode):
 		for cell in self._cellsToRefresh:
 			cell.getImmutableValue()
 		contents = self._contentsCell.getImmutableValue()
-		contents.keyHandler = self
 		self.widget.child = contents
 		
 

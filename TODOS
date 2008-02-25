@@ -4,93 +4,11 @@ TODOS:
 Move cursor handling to presentation toolkit.
 
 
-INVESTIGATE THE FOLLOWING:
-
-Load the testsources/simplelanguage_test.gsym document
-Use the script window:
->>> from Britefury.GLisp.GLispInterpreter import gLispSrcToString as gls
->>> doc = gsym.app._documentRoot
->>> c = doc[0][3][2][2]
-
-c is now the content of the document.
-change the content so that the names of variables and functions change.
-
-Should result in the traceback below:
-
-For some reason, _f_getPrevCursorEntityBeforeChild is being invoked against
-a gtk.VBox()
-
-Maybe due to root docment node deriving from a gtk node, that also has a parent
-property?
+We need to think about cursor management.
+Two solutions:
+	1. Stay with the current system for now, in which case the view builder needs a way of informing the view nodes of the cursor navigation policy for
+	child view nodes
+	
+	2. Move over to the new cursor handling system
 
 
-
-
-Traceback (most recent call last):
-  File "C:\code\gsym\trunk\Britefury\Event\QueuedEvent.py", line 49, in _queuedE
-ventIdleFunction
-    event()
-  File "C:\code\gsym\trunk\Britefury\MainApp\MainApp.py", line 305, in _p_refres
-hCodeView
-    self._view.refresh()
-  File "C:\code\gsym\trunk\Britefury\DocView\DocView.py", line 103, in refresh
-    self.refreshCell.immutableValue
-  File "c:\code\gsym\trunk\Britefury\Cell\Cell.py", line 112, in getImmutableVal
-ue
-    self._p_refreshValue()
-  File "c:\code\gsym\trunk\Britefury\Cell\Cell.py", line 156, in _p_refreshValue
-
-    self._valueCache = self._evaluator.evaluate( self )
-  File "C:\code\gsym\trunk\Britefury\Cell\CellEvaluatorFunction.py", line 31, in
- evaluate
-    return self._function()
-  File "C:\code\gsym\trunk\Britefury\DocView\DocView.py", line 99, in _p_refresh
-
-    self.rootView.refresh()
-  File "C:\code\gsym\trunk\Britefury\DocView\DVNode.py", line 128, in refresh
-    self.refreshCell.immutableValue
-  File "c:\code\gsym\trunk\Britefury\Cell\Cell.py", line 112, in getImmutableVal
-ue
-    self._p_refreshValue()
-  File "c:\code\gsym\trunk\Britefury\Cell\Cell.py", line 156, in _p_refreshValue
-
-    self._valueCache = self._evaluator.evaluate( self )
-  File "C:\code\gsym\trunk\Britefury\Cell\CellEvaluatorFunction.py", line 31, in
- evaluate
-    return self._function()
-  File "C:\code\gsym\trunk\Britefury\DocView\DVCustomNode.py", line 31, in _o_re
-freshNode
-    cell.getImmutableValue()
-  File "c:\code\gsym\trunk\Britefury\Cell\Cell.py", line 112, in getImmutableVal
-ue
-    self._p_refreshValue()
-  File "c:\code\gsym\trunk\Britefury\Cell\Cell.py", line 156, in _p_refreshValue
-
-    self._valueCache = self._evaluator.evaluate( self )
-  File "C:\code\gsym\trunk\Britefury\Cell\CellEvaluatorFunction.py", line 31, in
- evaluate
-    return self._function()
-  File "C:\code\gsym\trunk\Britefury\gSym\gSymView.py", line 126, in _boxRefresh
-
-    widget[:] = widgets
-  File "C:\code\gsym\trunk\Britefury\DocPresent\Toolkit\DTContainerSequence.py",
- line 49, in __setitem__
-    self._p_linkChildEntryCursorEntity( entry )
-  File "C:\code\gsym\trunk\Britefury\DocPresent\Toolkit\DTContainerSequence.py",
- line 135, in _p_linkChildEntryCursorEntity
-    prevCursorEntity = self._f_getPrevCursorEntityBeforeChild( childEntry.child
-)
-  File "C:\code\gsym\trunk\Britefury\DocPresent\Toolkit\DTContainer.py", line 41
-1, in _f_getPrevCursorEntityBeforeChild
-    return p._f_getPrevCursorEntityBeforeChild( self )
-  File "C:\code\gsym\trunk\Britefury\DocPresent\Toolkit\DTContainer.py", line 41
-1, in _f_getPrevCursorEntityBeforeChild
-    return p._f_getPrevCursorEntityBeforeChild( self )
-  File "C:\code\gsym\trunk\Britefury\DocPresent\Toolkit\DTContainer.py", line 41
-1, in _f_getPrevCursorEntityBeforeChild
-    return p._f_getPrevCursorEntityBeforeChild( self )
-  File "C:\code\gsym\trunk\Britefury\DocPresent\Toolkit\DTContainer.py", line 41
-1, in _f_getPrevCursorEntityBeforeChild
-    return p._f_getPrevCursorEntityBeforeChild( self )
-AttributeError: 'gtk.VBox' object has no attribute '_f_getPrevCursorEntityBefore
-Child'
