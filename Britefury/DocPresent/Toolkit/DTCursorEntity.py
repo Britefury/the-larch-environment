@@ -112,9 +112,12 @@ class DTCursorEntity (object):
 	@staticmethod
 	def buildListLinks(xs):
 		"""Builds the links between an ordered list of entities"""
-		for a, b in zip( xs[:-1], xs[1:] ):
-			a.next = b
-		return xs[0], xs[-1]
+		if len( xs ) > 0:
+			for a, b in zip( xs[:-1], xs[1:] ):
+				a.next = b
+			return xs[0], xs[-1]
+		else:
+			return None, None
 	
 	
 	

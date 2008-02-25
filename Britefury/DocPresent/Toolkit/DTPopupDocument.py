@@ -25,10 +25,10 @@ class DTPopupDocument (DTDocument):
 	def __init__(self, bCanGrabFocus=True):
 		super( DTPopupDocument, self ).__init__( bCanGrabFocus )
 
-		self.show()
+		self.getGtkWidget().show()
 
 		self._popupWindow = SimplePopupWindow()
-		self._popupWindow.contents = self
+		self._popupWindow.contents = self.getGtkWidget()
 
 
 
@@ -47,7 +47,7 @@ class DTPopupDocument (DTDocument):
 
 
 	def hide(self):
-		self.grab_remove()
+		self.getGtkWidget().grab_remove()
 
 		self._popupWindow.hide()
 
@@ -60,10 +60,11 @@ class DTPopupDocument (DTDocument):
 
 
 	def _p_popup(self):
-		self.grab_add()
-		self.grab_focus()
+		gtkw = self.getGtkWidget()
+		gtkw.grab_add()
+		gtkw.grab_focus()
 
-		gtk.gdk.keyboard_grab( self.window, owner_events=True )
+		gtk.gdk.keyboard_grab( gtkw.window, owner_events=True )
 
 
 
@@ -74,7 +75,7 @@ class DTPopupDocument (DTDocument):
 
 	def _o_handleDocumentKey(self, keyEvent):
 		if keyEvent.keyVal == gtk.keysyms.Escape:
-			self.hide()
+			self.getGtkWidget().hide()
 			self._o_onEscapeClose()
 			return True
 		else:

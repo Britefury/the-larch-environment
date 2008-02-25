@@ -119,7 +119,7 @@ if __name__ == '__main__':
 	window.set_size_request( 300, 100 )
 
 	doc = DTDocument()
-	doc.show()
+	doc.getGtkWidget().show()
 
 	label1 = MyLabel( 'Click me' )
 
@@ -127,7 +127,7 @@ if __name__ == '__main__':
 
 
 	box = gtk.VBox()
-	box.pack_start( doc )
+	box.pack_start( doc.getGtkWidget() )
 	box.show_all()
 
 	window.add( box )

@@ -32,13 +32,15 @@ _redoAccel = gtk.accelerator_parse( '<control><shift>Z' )
 
 
 
-class DTDocument (gtk.DrawingArea, DTBin):
+class DTDocument (DTBin):
 	undoSignal = ClassSignal()
 	redoSignal = ClassSignal()
 
 	def __init__(self, bCanGrabFocus=True):
-		gtk.DrawingArea.__init__( self )
 		DTBin.__init__( self )
+		
+		
+		self._drawingArea = gtk.DrawingArea()
 
 
 		# Set the document to self
@@ -68,32 +70,35 @@ class DTDocument (gtk.DrawingArea, DTBin):
 		self._currentCursor = None
 
 		# Connect signals
-		self.connect_after( 'configure-event', self._p_configureEvent )
-		self.connect( 'expose-event', self._p_exposeEvent )
-		self.connect( 'button-press-event', self._p_buttonPressEvent )
-		self.connect( 'button-release-event', self._p_buttonReleaseEvent )
-		self.connect( 'motion-notify-event', self._p_motionNotifyEvent )
-		self.connect( 'enter-notify-event', self._p_enterNotifyEvent )
-		self.connect( 'leave-notify-event', self._p_leaveNotifyEvent )
-		self.connect( 'scroll-event', self._p_scrollEvent )
-		self.connect_after( 'realize', self._p_realiseEvent )
-		self.connect( 'unrealize', self._p_unrealiseEvent )
+		self._drawingArea.connect_after( 'configure-event', self._p_configureEvent )
+		self._drawingArea.connect( 'expose-event', self._p_exposeEvent )
+		self._drawingArea.connect( 'button-press-event', self._p_buttonPressEvent )
+		self._drawingArea.connect( 'button-release-event', self._p_buttonReleaseEvent )
+		self._drawingArea.connect( 'motion-notify-event', self._p_motionNotifyEvent )
+		self._drawingArea.connect( 'enter-notify-event', self._p_enterNotifyEvent )
+		self._drawingArea.connect( 'leave-notify-event', self._p_leaveNotifyEvent )
+		self._drawingArea.connect( 'scroll-event', self._p_scrollEvent )
+		self._drawingArea.connect_after( 'realize', self._p_realiseEvent )
+		self._drawingArea.connect( 'unrealize', self._p_unrealiseEvent )
 
 		# Tell the widget to send these events
-		self.add_events( gtk.gdk.EXPOSURE_MASK |
-				 gtk.gdk.BUTTON_PRESS_MASK |
-				 gtk.gdk.BUTTON_RELEASE_MASK |
-				 gtk.gdk.POINTER_MOTION_MASK |
-				 gtk.gdk.POINTER_MOTION_HINT_MASK |
-				 gtk.gdk.ENTER_NOTIFY_MASK |
-				 gtk.gdk.LEAVE_NOTIFY_MASK |
-				 gtk.gdk.SCROLL_MASK |
-				 gtk.gdk.KEY_PRESS_MASK |
-				 gtk.gdk.KEY_RELEASE_MASK )
+		self._drawingArea.add_events( gtk.gdk.EXPOSURE_MASK |
+					      gtk.gdk.BUTTON_PRESS_MASK |
+					      gtk.gdk.BUTTON_RELEASE_MASK |
+					      gtk.gdk.POINTER_MOTION_MASK |
+					      gtk.gdk.POINTER_MOTION_HINT_MASK |
+					      gtk.gdk.ENTER_NOTIFY_MASK |
+					      gtk.gdk.LEAVE_NOTIFY_MASK |
+					      gtk.gdk.SCROLL_MASK |
+					      gtk.gdk.KEY_PRESS_MASK |
+					      gtk.gdk.KEY_RELEASE_MASK )
 
 		if bCanGrabFocus:
-			self.set_flags( gtk.CAN_FOCUS )
+			self._drawingArea.set_flags( gtk.CAN_FOCUS )
 
+			
+	def getGtkWidget(self):
+		return self._drawingArea
 
 
 	def oneToOne(self):
@@ -134,12 +139,12 @@ class DTDocument (gtk.DrawingArea, DTBin):
 		self._p_invalidateRect( localPos, localSize )
 
 	def _p_invalidateRect(self, pos, size):
-		self.queue_draw_area( int( pos.x ), int( pos.y ), int( math.ceil( size.x ) ), int( math.ceil( size.y ) ) )
+		self._drawingArea.queue_draw_area( int( pos.x ), int( pos.y ), int( math.ceil( size.x ) ), int( math.ceil( size.y ) ) )
 
 
 	def _o_queueResize(self):
 		self._bAllocationRequired = True
-		self.queue_draw()
+		self._drawingArea.queue_draw()
 
 
 
@@ -290,7 +295,7 @@ class DTDocument (gtk.DrawingArea, DTBin):
 
 
 	def _p_buttonPressEvent(self, widget, event):
-		self.grab_focus()
+		self._drawingArea.grab_focus()
 		x, y, state = event.x, event.y, event.state
 		localPos = Point2( x, y )
 		if event.state & gtk.gdk.MOD1_MASK  ==  0:
@@ -326,7 +331,7 @@ class DTDocument (gtk.DrawingArea, DTBin):
 			self._dndButton = None
 			self._dndInProgress = False
 			self._dndBeginData = None
-			self.window.set_cursor( None )
+			self._drawingArea.window.set_cursor( None )
 
 		if self._docDragButton is None:
 			self._f_evButtonUp( localPos, event.button, state )
@@ -348,7 +353,7 @@ class DTDocument (gtk.DrawingArea, DTBin):
 				if not self._dndInProgress:
 					self._dndBeginData = self._dndSource._f_evDndBegin()
 					self._dndInProgress = True
-					self.window.set_cursor( gtk.gdk.Cursor( gtk.gdk.HAND2 ) )
+					self._drawingArea.window.set_cursor( gtk.gdk.Cursor( gtk.gdk.HAND2 ) )
 				self._f_evDndMotion( localPos, self._dndButton, state, self._dndSource, self._dndBeginData, self._dndCache )
 			else:
 				self._f_evMotion( localPos )
@@ -530,10 +535,6 @@ class DTDocument (gtk.DrawingArea, DTBin):
 
 
 
-gobject.type_register( DTDocument )
-
-
-
 
 
 if __name__ == '__main__':
@@ -660,7 +661,7 @@ if __name__ == '__main__':
 	window.set_size_request( 300, 100 )
 
 	doc = DTDocument()
-	doc.show()
+	doc.getGtkWidget().show()
 
 	doc.child = docBox
 
@@ -677,7 +678,7 @@ if __name__ == '__main__':
 	buttonBox.show_all()
 
 	box = gtk.VBox()
-	box.pack_start( doc )
+	box.pack_start( doc.getGtkWidget() )
 	box.pack_start( gtk.HSeparator(), False, False, 10 )
 	box.pack_start( buttonBox, False, False, 10 )
 	box.show_all()
