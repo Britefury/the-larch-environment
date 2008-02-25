@@ -80,7 +80,7 @@ class MainApp (object):
 		self._doc = DTDocument()
 		self._doc.undoSignal.connect( self._p_onUndo )
 		self._doc.redoSignal.connect( self._p_onRedo )
-		self._doc.show()
+		self._doc.getGtkWidget().show()
 
 
 		resetButton = gtk.Button( 'Reset' )
@@ -204,7 +204,7 @@ class MainApp (object):
 
 		box = gtk.VBox()
 		box.pack_start( menuBar, False, False )
-		box.pack_start( self._doc )
+		box.pack_start( self._doc.getGtkWidget() )
 		box.pack_start( gtk.HSeparator(), False, False, 10 )
 		box.pack_start( buttonBox, False, False, 10 )
 		box.show_all()
