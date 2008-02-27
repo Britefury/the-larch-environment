@@ -760,7 +760,7 @@ class DTEntry (DTWidget):
 				edge = DTCursorLocation.EDGE_TRAILING
 			return cursor, index, edge
 
-		cursorsIndicesAndEdges = [ ( cursor, self._cursorEntities.index( cursor.location.cursorEntity ), cursor.location.edge )   for cursor in self._cursors ]
+		cursorsIndicesAndEdges = [ ( cursor, self._cursorEntities.index( cursor.location.cursorEntity ), cursor.location.edge )   for cursor in self._cursors.keys() ]
 		
 		self._cursorEntities = [ DTCursorEntity( self )   for character in self._text ]
 		DTCursorEntity.buildListLinks( self._cursorEntities )
