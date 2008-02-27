@@ -38,8 +38,8 @@ class DTContainer (DTWidget):
 		def containerToChildSpace(self, p):
 			return p * self.invXform
 
-		def containerToChildSpace(self, p):
-			return p * self.invXform
+		def childToContainerSpace(self, p):
+			return p * self.xform
 
 
 
@@ -361,9 +361,10 @@ class DTContainer (DTWidget):
 
 
 	def _f_evUnrealise(self):
-		super( DTContainer, self )._f_evUnrealise()
+		# Unrealise children first
 		for entry in self._childEntries:
 			entry.child._f_evUnrealise()
+		super( DTContainer, self )._f_evUnrealise()
 
 
 	def _f_draw(self, context, areaBox):
@@ -389,7 +390,7 @@ class DTContainer (DTWidget):
 			
 			
 	#
-	# CURSOR NAVIGATION METHODS
+	# CURSOR ENTITY METHODS
 	#
 	
 	def _f_childCursorBlocked(self, child):

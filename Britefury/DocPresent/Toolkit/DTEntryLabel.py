@@ -138,7 +138,7 @@ class DTEntryLabel (DTBin):
 		self._entry.moveCursorToEnd()
 
 	def startEditingAtPositionX(self, x):
-		index = self.getChild().getCursorPositionAtX( x )
+		index = self.getChild().getCursorLocationAtX( x )
 		self.startEditing()
 		self._entry.setCursorLocation( index )
 

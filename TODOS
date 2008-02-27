@@ -10,5 +10,19 @@ Two solutions:
 	child view nodes
 	
 	2. Move over to the new cursor handling system
+	
+	
+	
+	
+IMPLEMENT CURSOR LOCATION METHODS FOR:
+DTHLine
+DTScript
+DTWrappedLine
+DTWrappedLineWithSeparators
+
+TEST CURSOR LOCATION METHODS FOR:
+DTBox
+DTEntry
+
 
 

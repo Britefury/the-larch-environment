@@ -19,7 +19,7 @@ class DTSimpleStaticWidget (DTWidget):
 
 
 	#
-	# CURSOR NAVIGATION METHODS
+	# CURSOR ENTITY METHODS
 	#
 	
 	def _o_getFirstCursorEntity(self):

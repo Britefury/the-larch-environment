@@ -128,14 +128,15 @@ _glispInterpreterMethodNameMap = {
 	'^' : intern( '__xor__' ),
 	'[]' : intern( '__getitem__' ),
 	'[]=' : intern( '__setitem__' ),
-	'new' : lambda x, args: x( *args ),
-	'<' : lambda x, args: x < args[0],
-	'<=' : lambda x,args: x <= args[0],
-	'==' : lambda x, args: x ==args[0],
-	'!=' : lambda x, args: x !=args[0],
-	'>' : lambda x, args: x > args[0],
-	'>=' : lambda x, args: x >= args[0],
-	'.' : lambda x, args: getattr( x, args[0] )
+	'is' : lambda x, y: x is y,
+	'new' : lambda x, *args: x( *args ),
+	'<' : lambda x, y: x < y,
+	'<=' : lambda x,y: x <= y,
+	'==' : lambda x, y: x == y,
+	'!=' : lambda x, y: x != y,
+	'>' : lambda x, y: x > y,
+	'>=' : lambda x, y: x >= y,
+	'.' : lambda x, y: getattr( x, y )
 	}
 
 
@@ -264,7 +265,7 @@ class GLispFrame (object):
 							# method name is callable; call it
 							args = [ self.evaluate( dmarg )   for dmarg in xs[2:] ]
 							try:
-								return methodName( target, args )
+								return methodName( target, *args )
 							except Exception:
 								print '*** Internal error in %s'  %  ( xs, )
 								raise

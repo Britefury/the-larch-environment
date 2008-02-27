@@ -168,7 +168,7 @@ class DTScript (DTContainer):
 
 
 	#
-	# CURSOR NAVIGATION METHODS
+	# CURSOR ENTITY METHODS
 	#
 
 	def _o_getFirstCursorEntity(self):

@@ -5,37 +5,48 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
-import weakref
+class DTCursorLocation (object):
+	EDGE_LEADING = 0
+	EDGE_TRAILING = 1
+	
+	def __init__(self, cursorEntity, edge):
+		self.cursorEntity = cursorEntity
+		self.edge = edge
 
 
 
 class DTCursor (object):
-	BEFORE = 0
-	AFTER = 1
-	
-	def __init__(self, document, entity, location):
+	def __init__(self, document, location):
 		self._document = document
-		self.entity = entity
-		self.location = location
-		self._bCurrent = False
+		self._location = location
+
+		if self._location is not None:
+			self._location.cursorEntity.widget._f_registerCursor( self )
 		
 		
-	def setPosition(self, entity, location):
-		self.entity = entity
-		self.location = location
-		if self._bCurrent:
-			self._document._f_cursorNotify( self, True )
+	def getLocation(self):
+		return self._location
+	
+	def setLocation(self, location):
+		if self._location is not None:
+			self._location.cursorEntity.widget._f_unregisterCursor( self )
+		self._location = location
+		if self._location is not None:
+			self._location.cursorEntity.widget._f_registerCursor( self )
+		if self._bCurrent  and  self._document is not None:
+			self._document._f_cursorLocationNotify( self, True )
 	
 			
-	def setCurrent(self, bCurrent):
-		if bCurrent != self._bCurrent:
-			self._bCurrent = bCurrent
-			self._document._f_cursorNotify( self, self._bCurrent )
+	def _f_widgetNotifyOfLocationChange(self, location):
+		self._location = location
+		if self._bCurrent  and  self._document is not None:
+			self._document._f_cursorLocationNotify( self, True )
 			
-			
-			
-	def makeCurrent(self):
-		self._document._f_makeCursorCurrent( self )
+	def _f_widgetUnrealiseNotify(self):
+		self._document._f_cursorUnrealiseNotify( self )
+		
+		
+	location = property( getLocation, setLocation )
 		
 		
 		

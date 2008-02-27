@@ -12,8 +12,9 @@ import cairo
 import pango
 import pangocairo
 
-from Britefury.Math.Math import Colour3f, Vector2, Point2
+from Britefury.Math.Math import Colour3f, Vector2, Point2, Segment2
 
+from Britefury.DocPresent.Toolkit.DTCursor import DTCursorLocation
 from Britefury.DocPresent.Toolkit.DTSimpleStaticWidget import DTSimpleStaticWidget
 
 
@@ -122,16 +123,16 @@ class DTLabel (DTSimpleStaticWidget):
 		return self.getCharacterIndexAt( Point2( x, y ) )
 
 
-	def getCursorPositionAt(self, point):
+	def getCursorLocationAt(self, point):
 		self._p_refreshLayout()
 		pointInLayout = point - self._textPosition
 		index, trailing = self._layout.xy_to_index( int( pointInLayout.x * pango.SCALE ), int( pointInLayout.y * pango.SCALE ) )
 		return index + trailing
 
 
-	def getCursorPositionAtX(self, x):
+	def getCursorLocationAtX(self, x):
 		y = self._textPosition.y + self._textSize.y * 0.5
-		return self.getCursorPositionAt( Point2( x, y ) )
+		return self.getCursorLocationAt( Point2( x, y ) )
 
 
 	def _p_refreshLayout(self):
@@ -212,6 +213,32 @@ class DTLabel (DTSimpleStaticWidget):
 		self._o_queueResize()
 
 
+		
+		
+	#
+	# CURSOR POSITIONING METHODS
+	#
+	
+	def getCursorSegment(self, cursorLocation):
+		assert cursorLocation.cursorEntity is self._cursorEntity
+		if cursorLocation.edge == DTCursorLocation.EDGE_LEADING:
+			x = self._textPosition.x
+		elif cursorLocation.edge == DTCursorLocation.EDGE_TRAILING:
+			x = self._textPosition.x + self._textSize.x
+		
+		pos = Point2( x, self._textPosition.y )
+		return Segment2( pos, pos + Vector2( 0.0, self._textSize.y ) )
+	
+	
+	def _o_getCursorLocationAtPosition(self, localPosition):
+		if localPosition.x  <  ( self._textPosition.x  +  self._textSize.x * 0.5 ):
+			return DTCursorLocation( self._cursorEntity, DTCursorLocation.EDGE_LEADING )
+		else:
+			return DTCursorLocation( self._cursorEntity, DTCursorLocation.EDGE_TRAILING )
+		
+		
+		
+		
 
 	text = property( getText, setText )
 	markup = property( getMarkup, setMarkup )
