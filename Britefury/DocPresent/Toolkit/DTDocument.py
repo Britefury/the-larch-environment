@@ -21,7 +21,7 @@ from Britefury.Util.SignalSlot import *
 
 from Britefury.Event.QueuedEvent import queueEvent
 
-from Britefury.Math.Math import Vector2, Point2, BBox2
+from Britefury.Math.Math import Vector2, Point2, BBox2, Segment2
 
 from Britefury.DocPresent.Toolkit.DTCursorEntity import DTCursorEntity
 from Britefury.DocPresent.Toolkit.DTCursor import DTCursorLocation, DTCursor
@@ -32,6 +32,9 @@ from Britefury.DocPresent.Toolkit.DTBin import DTBin
 
 _undoAccel = gtk.accelerator_parse( '<control>z' )
 _redoAccel = gtk.accelerator_parse( '<control><shift>Z' )
+
+
+_CURSOR_HEIGHT = 11.0
 
 
 
@@ -94,6 +97,10 @@ class DTDocument (DTBin):
 		self._mainCursor = DTCursor( self, DTCursorLocation( self._firstCursorEntity, DTCursorLocation.EDGE_TRAILING ) )
 		self._prevCursor = None
 		self._nextCursor = None
+		self._oldCursorSegment = None
+		self._cursorSegment = None
+		self._bCursorRequiresUpdate = False
+		self._bCursorSegmentRequiresUpdate = True
 
 		# Connect signals
 		self._drawingArea.connect_after( 'configure-event', self._p_configureEvent )
@@ -316,6 +323,7 @@ class DTDocument (DTBin):
 		context.fill()
 		context.new_path()
 		self._f_draw( context, BBox2( Point2( event.area.x, event.area.y ), Point2( event.area.x + event.area.width, event.area.y + event.area.height ) ) )
+		self._p_drawCursor()
 		self._p_emitImmediateEvents()
 		return False
 
@@ -547,19 +555,106 @@ class DTDocument (DTBin):
 	#
 
 	def _f_cursorLocationNotify(self, cursor, bCurrent):
-		entity = cursor.entity
-		if entity is not None:
-			widget = entity.widget
-			assert widget is not None, 'cursor entity has no widget'
-			widget._f_cursorNotify( cursor, bCurrent )
+		if cursor is self._mainCursor  or  cursor is self._prevCursor  or  cursor is self._nextCursor:
+			self._p_cursorSegmentChanged()
 			
 	def _f_cursorUnrealiseNotify(self, cursor):
-		pass
+		if cursor is not self._firstCursorEntity  and  cursor is not self._lastCursorEntity:
+			widget = cursor.location.cursorEntity.widget
+			parent = widget.parent
+			assert parent is not None
+	
+			if cursor is self._mainCursor:
+				self._prevCursor = parent._f_getPrevCursorEntityBeforeChild( widget )
+				self._nextCursor = parent._f_getNextCursorEntityBeforeChild( widget )
+				self._p_mainCursorChanged()
+			elif cursor is self._prevCursor:
+				self._prevCursor = parent._f_getPrevCursorEntityBeforeChild( widget )
+			elif cursor is self._nextCursor:
+				self._nextCursor = parent._f_getPrevCursorEntityBeforeChild( widget )
+			
+			
+		
 			
 
 	
 	
+	#
+	# CURSOR UPDATING
+	#
 	
+	def _p_updateCursors(self):
+		if self._bCursorRequiresUpdate:
+			widget = self._mainCursor.location.cursorEntity.widget
+			if widget.isRealised():
+				# main cursor is valid; no need for prev and next cursors
+				self._prevCursor = None
+				self._nextCursor = None
+			else:
+				self._mainCursor = self._prevCursor
+				self._prevCursor = None
+				self._nextCursor = None
+			self._bCursorRequiresUpdate = False
+			self._p_cursorSegmentChanged()
+			
+	def _p_mainCursorChanged(self):
+		self._bCursorRequiresUpdate = True
+			
+		
+		
+	def _p_updateCursorSegment(self):
+		if self._bCursorSegmentRequiresUpdate:
+			self._p_updateCursors()
+			widget = self._mainCursor.location.cursorEntity.widget
+			self._cursorSegment = widget.getCursorSegment( self._mainCursor.location )
+			self._oldCursorSegment = None
+			self._bCursorSegmentRequiresUpdate = False
+			
+	def _p_cursorSegmentChanged(self):
+		self._oldCursorSegment = self._cursorSegment
+		if self._oldCursorSegment is not None:
+			self._o_queueRedraw( self._oldCursorSegment.a - Vector2( -1.0, -1.0 ), self._oldCursorSegment.b - self._oldCursorSegment.a  +  Vector2( 2.0, 2.0 ) )
+		self._bCursorSegmentRequiresUpdate = True
+		
+	
+	def _p_drawCursor(self, context):
+		self._p_updateCursorSegment()
+		if self._cursorSegment is not None:
+			context.set_line_width( 1.0 )
+			context.set_source_rgb( 0.0, 0.0, 0.0 )
+			context.move_to( self._cursorSegment.a.x, self._cursorSegment.a.y )
+			context.line_to( self._cursorSegment.b.x, self._cursorSegment.b.y )
+			context.stroke()
+
+	
+	
+	
+	#
+	# CURSOR POSITIONING METHODS
+	#
+	
+	def getCursorSegment(self, cursorLocation):
+		assert cursorLocation.cursorEntity is self._firstCursorEntity  or  cursorLocation.cursorEntity is self._lastCursorEntity
+		entry = self._childEntries[0]
+		if cursorLocation.cursorEntity is self._firstCursorEntity:
+			return Segment2( Point2( entry._xPos, entry._yPos ), Point2( entry._xPos, entry._yPos + _CURSOR_HEIGHT ) )
+		else:
+			x = entry._xPos + entry._width
+			y = entry._yPos + entry._height
+			return Segment2( Point2( x, y - _CURSOR_HEIGHT ), Point2( x, y ) )
+	
+	
+	def _o_getCursorLocationAtPosition(self, localPosition):
+		entry = self._childEntries[0]
+		midX = entry._xPos  +  _entry._width * 0.5
+		if localPosition.x < midX:
+			return DTCursorLocation( self._firstCursorEntity, DTCursorLocation.EDGE_TRAILING )
+		else:
+			return DTCursorLocation( self._lastCursorEntity, DTCursorLocation.EDGE_LEADING )
+
+		
+		
+		
 	#
 	# CURSOR NAVIGATION METHODS
 	#

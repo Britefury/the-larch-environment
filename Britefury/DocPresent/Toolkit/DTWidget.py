@@ -7,6 +7,8 @@
 ##-*************************
 from copy import copy
 
+import weakref
+
 
 from Britefury.Math.Math import Point2, Vector2, Xform2, BBox2
 
@@ -120,7 +122,7 @@ class DTWidget (object):
 		self._waitingImmediateEvents = []
 		
 		self._bCursorBlocked = False
-		self._cursors = set()
+		self._cursors = weakref.WeakKeyDictionary()
 
 		self._dndLocalPos = None
 		self._dndButton = None
@@ -463,7 +465,7 @@ class DTWidget (object):
 			self._document._f_widgetAcquireFocus( self )
 
 	def _f_evUnrealise(self):
-		for cursor in self._cursors:
+		for cursor in self._cursors.keys():
 			cursor._f_widgetUnrealiseNotify()
 		if self._bFocusGrabbed  and  self._document is not None:
 			self._document._f_widgetRelinquishFocus( self )
@@ -597,10 +599,10 @@ class DTWidget (object):
 	#
 	
 	def _f_registerCursor(self, cursor):
-		self._cursors.add( cursor )
+		self._cursors[cursor] = 0
 	
 	def _f_unregisterCursor(self, cursor):
-		self._cursors.remove( cursor )
+		del self._cursors[cursor]
 	
 	
 	
