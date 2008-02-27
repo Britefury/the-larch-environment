@@ -120,7 +120,7 @@ class DTWidget (object):
 		self._waitingImmediateEvents = []
 		
 		self._bCursorBlocked = False
-		self._cursor = None
+		self._cursors = set()
 
 		self._dndLocalPos = None
 		self._dndButton = None
@@ -169,11 +169,11 @@ class DTWidget (object):
 			return self._parent._f_getChildTransformRelativeToAncestor( self, ancestor, x )
 		else:
 			if ancestor is not None:
-				raise ValueError, '@ancestor is not and ancestor of the target widget'
+				raise ValueError, '@ancestor is not an ancestor of the target widget'
 			return x
 
 	def getTransformRelativeTo(self, toWidget, x=Xform2()):
-		myXform = self.getTransformRelativeToDocument()
+		myXform = self.getTransformRelativeToDocument( x )
 		toWidgetXform = toWidget.getTransformRelativeToDocument()
 		return myXform * toWidgetXform.inverse()
 
@@ -463,6 +463,8 @@ class DTWidget (object):
 			self._document._f_widgetAcquireFocus( self )
 
 	def _f_evUnrealise(self):
+		for cursor in self._cursors:
+			cursor._f_widgetUnrealiseNotify()
 		if self._bFocusGrabbed  and  self._document is not None:
 			self._document._f_widgetRelinquishFocus( self )
 		self._o_onUnrealise()
@@ -512,7 +514,7 @@ class DTWidget (object):
 
 
 	#
-	# CURSOR NAVIGATION METHODS
+	# CURSOR ENTITY METHODS
 	#
 	
 	def setCursorBlocked(self, bBlocked):
@@ -571,15 +573,38 @@ class DTWidget (object):
 			
 			
 			
-	def _f_cursorNotify(self, cursor, bCurrent):
-		if bCurrent:
-			self._cursor = cursor
-		else:
-			self._cursor = None
+			
+	
+	#
+	# CURSOR POSITIONING METHODS
+	#
+	
+	def getCursorSegment(self, cursorLocation):
+		raise TypeError, 'Widets of type \'%s\' have no cursor entities'  %  ( type( self ).__name__, )
+	
+	
+	def getCursorLocationAtPosition(self, localPosition):
+		return self._o_getCursorLocationAtPosition( localPosition )
+
+	def _o_getCursorLocationAtPosition(self, localPosition):
+		return None
 
 
 
 
+	#
+	# CURSOR MANAGEMENT METHODS
+	#
+	
+	def _f_registerCursor(self, cursor):
+		self._cursors.add( cursor )
+	
+	def _f_unregisterCursor(self, cursor):
+		self._cursors.remove( cursor )
+	
+	
+	
+	
 	#
 	# HIERARCHY METHODS
 	#

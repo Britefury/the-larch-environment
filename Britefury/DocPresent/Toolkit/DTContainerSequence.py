@@ -156,7 +156,7 @@ class DTContainerSequence (DTContainer):
 	
 	
 	#
-	# CURSOR NAVIGATION METHODS
+	# CURSOR ENTITY METHODS
 	#
 
 	def isOrderReversed(self):

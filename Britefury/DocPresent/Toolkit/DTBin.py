@@ -90,7 +90,7 @@ class DTBin (DTContainer):
 
 
 	#
-	# CURSOR NAVIGATION METHODS
+	# CURSOR ENTITY METHODS
 	#
 
 	def _o_getFirstCursorEntity(self):
@@ -114,6 +114,20 @@ class DTBin (DTContainer):
 		return None
 
 
+	
+	#
+	# CURSOR POSITIONING METHODS
+	#
+	
+	def _o_getCursorLocationAtPosition(self, localPosition):
+		if self._child is not None:
+			entry = self._childToEntry[self._child]
+			return self._child.getCursorLocationAtPosition( entry.containerToChildSpace( localPosition ) )
+		else:
+			return None
+	
+
+	
 
 	child = property( getChild, setChild )
 	childScale = property( getChildScale, setChildScale )

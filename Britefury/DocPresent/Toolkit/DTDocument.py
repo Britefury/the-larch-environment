@@ -22,6 +22,9 @@ from Britefury.Util.SignalSlot import *
 from Britefury.Event.QueuedEvent import queueEvent
 
 from Britefury.Math.Math import Vector2, Point2, BBox2
+
+from Britefury.DocPresent.Toolkit.DTCursorEntity import DTCursorEntity
+from Britefury.DocPresent.Toolkit.DTCursor import DTCursorLocation, DTCursor
 from Britefury.DocPresent.Toolkit.DTKeyEvent import DTKeyEvent
 from Britefury.DocPresent.Toolkit.DTBin import DTBin
 
@@ -82,8 +85,15 @@ class DTDocument (DTBin):
 		# Immediate event queue
 		self._immediateEvents = []
 		
+		# Cursor entities for the start and end of the document
+		self._firstCursorEntity = DTCursorEntity( self )
+		self._lastCursorEntity = DTCursorEntity( self )
+		self._firstCursorEntity.next = self._lastCursorEntity
+		
 		# Cursor management
-		self._currentCursor = None
+		self._mainCursor = DTCursor( self, DTCursorLocation( self._firstCursorEntity, DTCursorLocation.EDGE_TRAILING ) )
+		self._prevCursor = None
+		self._nextCursor = None
 
 		# Connect signals
 		self._drawingArea.connect_after( 'configure-event', self._p_configureEvent )
@@ -513,28 +523,49 @@ class DTDocument (DTBin):
 		
 	
 	#
-	# CURSOR NAVIGATION METHOD
+	# CURSOR ENTITY METHODS
 	#
 	
-	def _f_makeCursorCurrent(self, cursor):
-		if self._currentCursor is not cursor:
-			if self._currentCursor is not None:
-				self._currentCursor.setCurrent( False )
-			self._currentCursor = cursor
-			if self._currentCursor is not None:
-				self._currentCursor.setCurrent( True )
-	
+	def _o_getFirstCursorEntity(self):
+		return self._firstCursorEntity
 
-	def _f_cursorNotify(self, cursor, bCurrent):
+	def _o_getLastCursorEntity(self):
+		return self._lastCursorEntity
+
+	def _f_getPrevCursorEntityBeforeChild(self, child):
+		assert child is self._child
+		return self._firstCursorEntity
+		
+	def _f_getNextCursorEntityAfterChild(self, child):
+		assert child is self._child
+		return self._lastCursorEntity
+
+
+
+	#
+	# CURSOR NOTIFICATION METHODS
+	#
+
+	def _f_cursorLocationNotify(self, cursor, bCurrent):
 		entity = cursor.entity
 		if entity is not None:
 			widget = entity.widget
 			assert widget is not None, 'cursor entity has no widget'
 			widget._f_cursorNotify( cursor, bCurrent )
 			
+	def _f_cursorUnrealiseNotify(self, cursor):
+		pass
+			
 
+	
+	
+	
+	#
+	# CURSOR NAVIGATION METHODS
+	#
+	
 	def _p_cursorLeft(self):
-		self._p_getCursor
+		pass
 		
 	def _p_cursorRight(self):
 		pass

@@ -5,7 +5,10 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
+import bisect
+
 from Britefury.Math.Math import Point2, Vector2
+from Britefury.DocPresent.Toolkit.DTCursor import DTCursorLocation
 from Britefury.DocPresent.Toolkit.DTContainerSequence import DTContainerSequence
 from Britefury.DocPresent.Toolkit.DTDirection import DTDirection
 from Britefury.DocPresent.Toolkit.DTBin import DTBin
@@ -103,6 +106,11 @@ class DTBox (DTContainerSequence):
 		self._o_insertEntry( index, entry )
 
 
+			
+			
+
+		
+		
 	def getInsertIndex(self, localPos):
 		"""Return the index at which an item could be inserted.
 		localPos is checked against the contents of the box in order to determine the insert index"""
@@ -303,6 +311,70 @@ class DTBox (DTContainerSequence):
 
 
 
+	#
+	# CURSOR POSITIONING METHODS
+	#
+	
+	def _o_getCursorLocationAtPosition(self, localPos):
+		"""Return the index of the child that is closest to @localPos, and a flag which indicates whether @localPos
+		is closest to the leading or trailing edge."""
+		childEntries = [ entry   for entry in self._childEntries   if not entry.child.isCursorBlocked()  and  entry.child.getFirstCursorEntity() is not None  and  entry.child.getLastCursorEntity() is not None ]
+		
+		if len( childEntries ) == 0:
+			return None
+		else:
+			if self._direction == DTDirection.LEFT_TO_RIGHT  or  self._direction == DTDirection.RIGHT_TO_LEFT:
+				pos = localPos.x
+			elif self._direction == DTDirection.TOP_TO_BOTTOM  or  self._direction == DTDirection.BOTTOM_TO_TOP:
+				pos = localPos.y
+
+			if len( self ) == 1:
+				childIndex = 0
+			else:		
+				class _BoundaryPoints (object):
+					def __init__(self, box):
+						self._l = len( childEntries ) - 1
+						self._bOrderReversed = box._direction == DTDirection.RIGHT_TO_LEFT  or  box._direction == DTDirection.BOTTOM_TO_TOP
+						self._bX = box._direction == DTDirection.LEFT_TO_RIGHT  or  box._direction == DTDirectionRIGHT_TO_LEFT
+						
+					def __len__(self):
+						return self._l
+					
+					def __getitem__(self, i):
+						if self._bOrderReversed:
+							c0 = childEntries[(self._l - i) - 1]
+							c1 = childEntries[self._l - i]
+						else:
+							c0 = childEntries[i]
+							c1 = childEntries[i+1]
+							
+						if self._bX:
+							return  ( c0._xPos + c0._width  +  c1._xPos )  *  0.5
+						else:
+							return  ( c0._yPos + c0._height  +  c1._yPos )  *  0.5
+				
+				
+				childIndex = bisect.bisect_right( _BoundaryPoints( self ), pos )
+	
+				
+			# Child index computed
+			childEntry = childEntries[childInded]
+			
+			# leading or trailing edge?
+			if self._direction == DTDirection.LEFT_TO_RIGHT  or  self._direction == DTDirection.RIGHT_TO_LEFT:
+				mid = childEntry._xPos + childEntry._width * 0.5
+			elif self._direction == DTDirection.TOP_TO_BOTTOM  or  self._direction == DTDirection.BOTTOM_TO_TOP:
+				mid = childEntry._yPos + childEntry._height * 0.5
+				
+			if pos <= mid:
+				return DTCursorLocation( childEntry.child.getFirstCursorEntity(), DTCursorLocation.EDGE_LEADING )
+			else:
+				return DTCursorLocation( childEntry.child.getLastCursorEntity(), DTCursorLocation.EDGE_TRAILING )
+
+	
+	
+	
+	
 	spacing = property( getSpacing, setSpacing )
 
 

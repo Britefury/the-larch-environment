@@ -15,10 +15,11 @@ import cairo
 import pango
 import pangocairo
 
-from Britefury.Math.Math import Colour3f, Vector2, Point2
+from Britefury.Math.Math import Colour3f, Vector2, Point2, Segment2
 
 from Britefury.Util.SignalSlot import *
 
+from Britefury.DocPresent.Toolkit.DTCursor import DTCursorLocation
 from Britefury.DocPresent.Toolkit.DTCursorEntity import DTCursorEntity
 from Britefury.DocPresent.Toolkit.DTWidget import DTWidget
 from Britefury.DocPresent.Toolkit.DTAutoCompleteDropDown import DTAutoCompleteDropDown
@@ -81,6 +82,7 @@ class DTEntry (DTWidget):
 		self._autoCompleteDropDown.autoCompleteDismissedSignal.connect( self._p_onAutoCompleteDismissed )
 		self._bAutoCompleteDisabled = False
 		
+		self._cursorEntities = []
 		self._p_rebuildCursorEntityList()
 		
 
@@ -206,15 +208,15 @@ class DTEntry (DTWidget):
 		return self.getCharacterIndexAt( Point2( x, y ) )
 
 
-	def getCursorPositionAt(self, point):
+	def getCursorLocationAt(self, point):
 		pointInLayout = point - self._textPosition
 		index, trailing = self._layout.xy_to_index( int( pointInLayout.x * pango.SCALE ), int( pointInLayout.y * pango.SCALE ) )
 		return index + trailing
 
 
-	def getCursorPositionAtX(self, x):
+	def getCursorLocationAtX(self, x):
 		y = self._textPosition.y + self._layout.get_pixel_size() * 0.5
-		return self.getCursorPositionAt( Point2( x, y ) )
+		return self.getCursorLocationAt( Point2( x, y ) )
 
 
 
@@ -733,7 +735,7 @@ class DTEntry (DTWidget):
 
 
 	#
-	# CURSOR NAVIGATION METHODS
+	# CURSOR ENTITY METHODS
 	#
 	
 	def _o_getFirstCursorEntity(self):
@@ -751,11 +753,58 @@ class DTEntry (DTWidget):
 
 
 	def _p_rebuildCursorEntityList(self):
+		def _fixCursorIndexAndEdge(cie):
+			cursor, index, edge = cie
+			if index >= len( self._cursorEntities ):
+				index = len( self._cursorEntities ) - 1
+				edge = DTCursorLocation.EDGE_TRAILING
+			return cursor, index, edge
+
+		cursorsIndicesAndEdges = [ ( cursor, self._cursorEntities.index( cursor.location.cursorEntity ), cursor.location.edge )   for cursor in self._cursors ]
+		
 		self._cursorEntities = [ DTCursorEntity( self )   for character in self._text ]
 		DTCursorEntity.buildListLinks( self._cursorEntities )
+		
+		cursorsIndicesAndEdges = [ _fixCursorIndexAndEdge( cie )   for cie in cursorsIndicesAndEdges ]
+		
+		for cursor, index, edge in cursorsIndicesAndEdges:
+			cursor._f_widgetNotifyOfLocationChange( DTCursorLocation( self._cursorEntities[index], edge ) )
 
 	
 	
+	#
+	# CURSOR POSITIONING METHODS
+	#
+	
+	def getCursorSegment(self, cursorLocation):
+		try:
+			cursorIndex = self._cursorEntities.index( cursorLocation.cursorEntity )
+		except ValueError:
+			raise ValueError, 'cursor entity not in this widget'
+		
+		if cursorLocation.edge == DTCursorLocation.EDGE_TRAILING:
+			cursorIndex += 1
+		
+		space = self._layout.index_to_pos( cursorIndex )[0]  /  pango.SCALE
+		cursorPositionX = self._textRoot.x + space
+
+		pos = Point2( cursorPositionX, self._entryPosition.y + self._borderWidth )
+		return Segment2( pos, pos + Vector2( 0.0, self._textSize.y ) )
+
+	
+	def _o_getCursorLocationAtPosition(self, localPosition):
+		pointInLayout = localPosition - self._textPosition
+		index, trailing = self._layout.xy_to_index( int( pointInLayout.x * pango.SCALE ), int( pointInLayout.y * pango.SCALE ) )
+		
+		if trailing == 0:
+			return DTCursorLocation( self._cursorEntities[index], DTCursorLocation.EDGE_LEADING )
+		else:
+			return DTCursorLocation( self._cursorEntities[index], DTCursorLocation.EDGE_TRAILING )
+
+		
+		
+		
+		
 	#
 	# DEBUG __repr__
 	#
