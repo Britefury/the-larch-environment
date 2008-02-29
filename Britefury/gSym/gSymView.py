@@ -19,7 +19,7 @@ from Britefury.DocView.DocView import DocView
 
 
 from Britefury.GLisp.GLispInterpreter import GLispParameterListError, GLispItemTypeError, isGLispList
-from Britefury.GLisp.GLispCompiler import compileGLispCustomFunctionToPy, compileGLispExprToPySrc, GLispCompilerError, filterIdentifierForPy
+from Britefury.GLisp.GLispCompiler import compileGLispFunctionToPy, compileGLispExprToPySrc, GLispCompilerError, filterIdentifierForPy
 from Britefury.GLisp.PatternMatch import compileMatchExpression, NoMatchError
 
 
@@ -308,7 +308,7 @@ class _GSymViewFactory (object):
 			 '_label' : _runtime_label,
 			 '_entry' : _runtime_entry,
 			 '_hbox' : _runtime_hbox, }
-		return compileGLispCustomFunctionToPy( matchAndViewExpr[1], functionName, paramNames, self._p_compileSpecial, lcls  ), varNameToValueIndirection
+		return compileGLispFunctionToPy( matchAndViewExpr[1], functionName, paramNames, self._p_compileSpecial, lcls  ), varNameToValueIndirection
 	
 	
 	def _runtime_buildView(self, viewNodeInstance, content):

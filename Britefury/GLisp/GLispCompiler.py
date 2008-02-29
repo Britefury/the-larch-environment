@@ -21,7 +21,7 @@ class GLispCompilerError (Exception):
 
 
 
-def _compileGLispExprToPySrcAndPrecedence(x, compileSpecial):
+def _compileGLispExprToPySrcAndPrecedence(x, compileSpecialExpr):
 	_binaryOperatorPrecedenceTable = {
 		'**' : 1,
 		'*' : 4,
@@ -53,7 +53,7 @@ def _compileGLispExprToPySrcAndPrecedence(x, compileSpecial):
 	}
 	
 	def compileSubExpression(sub, outerPrecedence):
-		src, innerPrecedence = _compileGLispExprToPySrcAndPrecedence( sub, compileSpecial )
+		src, innerPrecedence = _compileGLispExprToPySrcAndPrecedence( sub, compileSpecialExpr )
 		if outerPrecedence is not None  and  innerPrecedence is not None  and  outerPrecedence <=innerPrecedence:
 			return '(' + src + ')'
 		else:
@@ -71,10 +71,10 @@ def _compileGLispExprToPySrcAndPrecedence(x, compileSpecial):
 	else:
 		if len(x) == 0:
 			return 'None', None
-		elif isinstance( x[0], str )  and  x[0][0] == '/'  and  compileSpecial is not None:
-			return compileSpecial( x ), None
-		elif x[0] == '$list':
+		elif x[0] == '/list':
 			return '[ %s ]'  %  ( ', '.join( [ compileSubExpression( e, None )   for e in x[1:] ] ), ), None
+		elif isinstance( x[0], str )  and  x[0][0] == '/'  and  compileSpecialExpr is not None:
+			return compileSpecialExpr( x ), None
 		elif len(x) == 1:
 			return compileSubExpression( x[0], None ), None
 		else:
@@ -96,54 +96,86 @@ def _compileGLispExprToPySrcAndPrecedence(x, compileSpecial):
 				return '%s.%s(%s)'  %  ( compileSubExpression( x[0], None ), method, ', '.join( [ compileSubExpression( ex, None )   for ex in x[2:] ] ) ), None
 
 
-def compileGLispExprToPySrc(x, compileSpecial=None):
-	return _compileGLispExprToPySrcAndPrecedence(x, compileSpecial)[0]
-
-
-def compileGLispFunctionToPySrc(xs, functionName, compileSpecial=None):
-	if len(xs) < 2:
-		raise TypeError, 'Error compiling gLisp function: needs at least a parameter list'
-	
-	params = xs[0]
-	source = xs[1:]
-	
-	if not isGLispList( params ):
-		raise TypeError, 'Error compiling gLisp function: first parameter must be a list of variable names'
-	
-	pySrcHdr = 'def %s(%s):\n'  %  ( functionName, ', '.join( params[:] ) )
-	pyLines = [ compileGLispExprToPySrc( srcLine, compileSpecial ) + '\n'   for srcLine in source ]
-	if len( pyLines ) == 0:
-		pyLines = [ 'pass\n' ]
-	else:
-		pyLines[-1] = 'return ' + pyLines[-1]
-	pyLines = [ '   ' + l   for l in pyLines ]
-	
-	return pySrcHdr + ''.join( pyLines )
-	
-
-def compileGLispFunctionToPy(xs, functionName, compileSpecial=None, locals={}):
-	pySrc = compileGLispFunctionToPySrc( xs, functionName, compileSpecial )
-	
-	lcl = copy( locals )
-	exec pySrc in lcl
-	return lcl[functionName]
+def compileGLispExprToPySrc(x, compileSpecialExpr=None):
+	return _compileGLispExprToPySrcAndPrecedence(x, compileSpecialExpr)[0]
 
 
 
-def compileGLispCustomFunctionToPySrc(xs, functionName, params=[], compileSpecial=None):
+def _compileWhere(xs, compileSpecialExpr):
+	"""
+	($where ((name0 value0) (name1 value1) ... (nameN valueN)) (statements_to_execute))
+	"""
+	if len( xs ) < 2:
+		raise GLispCompilerError, '$where must have have at least 1 parameter; the binding list'
+
+	bindings = xs[1]
+	statements = xs[2:]
+	
+	if not isGLispList( bindings ):
+		raise GLispCompilerError, '$where bindings must be a list of pairs'
+	
+	pyLines = []
+	
+	boundNames = set()
+	for binding in bindings:
+		if not isGLispList( binding )  or  len( binding ) != 2:
+			raise GLispCompilerError, '$where binding must be a name value pair'
+		
+		if binding[0][0] != '@':
+			raise GLispCompilerError, '$where binding name must start with @'
+		
+		name = binding[0][1:]
+		valueExpr = binding[1]
+		if name in boundNames:
+			raise GLispCompilerError, '$where cannot bind variable \'%d\' more than once'  %  ( binding[0], )
+		
+		valueExprPySrc = compileGLispExprToPySrc( valueExpr, compileSpecialExpr )
+		
+		pyLines.append( '%s = %s'  %  ( name, valueExprPySrc ) )
+		
+		boundNames.add( name )
+		
+	for srcLine in statements:
+		pyLines.extend( compileGLispStatementToPySrc( srcLine, compileSpecialExpr ) )
+
+	return pyLines
+
+
+
+def compileGLispStatementToPySrc(x, compileSpecialExpr=None):
+	if isGLispList( x ):
+		if len( x ) >= 1:
+			if x[0] == '$where':
+				return _compileWhere( x, compileSpecialExpr )
+				
+	
+	return [ compileGLispExprToPySrc( x, compileSpecialExpr ) ]
+
+
+def compileGLispFunctionToPySrc(xs, functionName, params, compileSpecialExpr=None):
+	"""
+	Compile a GLisp function to Python source code
+	compileGLispFunctionToPySrc( xs, functionName, params, compileSpecialExpr=None )  ->  <source_text>
+	
+	Compiles the GLisp content in @xs into Python source code.
+	A function is defined. It is given the name passed in @functionName. Its parameter list is taken from @params.
+	@compileSpecialExpr can be used to customise the compilation of special expressions (start with a /).
+	"""
 	pySrcHdr = 'def %s(%s):\n'  %  ( functionName, ', '.join( params ) )
-	pyLines = [ compileGLispExprToPySrc( srcLine, compileSpecial ) + '\n'   for srcLine in xs ]
+	pyLines = []
+	for srcLine in xs:
+		pyLines.extend( compileGLispStatementToPySrc( srcLine, compileSpecialExpr ) )
 	if len( pyLines ) == 0:
-		pyLines = [ 'pass\n' ]
+		pyLines = [ 'pass' ]
 	else:
 		pyLines[-1] = 'return ' + pyLines[-1]
-	pyLines = [ '   ' + l   for l in pyLines ]
+	pyLines = [ '  ' + l + '\n'   for l in pyLines ]
 	
 	return pySrcHdr + ''.join( pyLines )
 	
 
-def compileGLispCustomFunctionToPy(xs, functionName, params=[], compileSpecial=None, locals={}):
-	pySrc = compileGLispCustomFunctionToPySrc( xs, functionName, params, compileSpecial )
+def compileGLispFunctionToPy(xs, functionName, params, compileSpecialExpr=None, locals={}):
+	pySrc = compileGLispFunctionToPySrc( xs, functionName, params, compileSpecialExpr )
 	
 	lcl = copy( locals )
 	exec pySrc in lcl
@@ -198,27 +230,53 @@ class TestCase_gLisp (unittest.TestCase):
 		
 		
 	def testCompileGLispExprToPy_list(self):
-		self.assert_( compileGLispExprToPySrc( readSX( '($list (@a + (@b * @c)) #1 #2 @d)' ) )  ==  '[ a + b * c, 1, 2, d ]' )
+		self.assert_( compileGLispExprToPySrc( readSX( '(/list (@a + (@b * @c)) #1 #2 @d)' ) )  ==  '[ a + b * c, 1, 2, d ]' )
 		
 
 	def testCompileGLispFunctionToPy(self):
-		def makeFunc(src):
-			return compileGLispFunctionToPy( readSX( src ), 'test' )
+		def makeFunc(src, params):
+			return compileGLispFunctionToPy( readSX( src ), 'test', params )
 
-		def makeFuncSrc(src):
-			return compileGLispFunctionToPySrc( readSX( src ), 'test' )
+		def makeFuncSrc(src, params):
+			return compileGLispFunctionToPySrc( readSX( src ), 'test', params )
 
-		glispSrc = '( (a b c) (@a lower) ((@a upper) + (@b * @c)) )'
+		glispSrc = '( (@a lower) ((@a upper) + (@b * @c)) )'
 		pySrc = \
 		      'def test(a, b, c):\n'  +  \
-		      '   a.lower()\n'  +  \
-		      '   return a.upper() + b * c\n'
-		
-		self.assert_( makeFuncSrc( glispSrc ) == pySrc )
-		self.assert_( makeFunc( glispSrc )('x', 'y', 3)  ==  'Xyyy' )
+		      '  a.lower()\n'  +  \
+		      '  return a.upper() + b * c\n'
+		self.assert_( makeFuncSrc( glispSrc, [ 'a', 'b', 'c' ] ) == pySrc )
+		self.assert_( makeFunc( glispSrc, [ 'a', 'b', 'c' ] )('x', 'y', 3)  ==  'Xyyy' )
 		
 		
 		
 
+	def testCompileGLispFunctionToPy_where(self):
+		def makeFunc(src, params):
+			return compileGLispFunctionToPy( readSX( src ), 'test', params )
+
+		def makeFuncSrc(src, params):
+			return compileGLispFunctionToPySrc( readSX( src ), 'test', params )
+
+		glispSrc = """
+		(
+		  ($where
+		    ( (@p (@a + @b))  (@q  (@b + @c)) )
+		  
+		    (@p * @q)
+		  )
+		)
+		"""
+		pySrc = \
+		      'def test(a, b, c):\n'  +  \
+		      '  p = a + b\n'  +  \
+		      '  q = b + c\n'  +  \
+		      '  return p * q\n'
+		
+		print makeFuncSrc( glispSrc, [ 'a', 'b', 'c' ] )
+		self.assert_( makeFuncSrc( glispSrc, [ 'a', 'b', 'c' ] ) == pySrc )
+		self.assert_( makeFunc( glispSrc, [ 'a', 'b', 'c' ] )(3, 5, 7)  ==  96 )
+		
+		
 if __name__ == '__main__':
 	unittest.main()

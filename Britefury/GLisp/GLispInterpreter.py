@@ -288,26 +288,26 @@ class GLispFrame (object):
 			return self._p_interpretLiteral( xs )
 
 	
-	def _keyword_let(self, xs):
+	def _keyword_where(self, xs):
 		"""
-		($let ((name0 value0) (name1 value1) ... (nameN valueN)) (expressions_to_execute))
+		($where ((name0 value0) (name1 value1) ... (nameN valueN)) (expressions_to_execute))
 		"""
 		if len( xs ) < 2:
-			self.glispError( ValueError, xs, '$let must have have at least 1 parameter; the binding list' )
+			self.glispError( ValueError, xs, '$where must have have at least 1 parameter; the binding list' )
 	
 		bindings = xs[1]
 		expressions = xs[2:]
 		
 		if not isGLispList( bindings ):
-			self.glispError( ValueError, xs, '$let bindings must be a list of pairs' )
+			self.glispError( ValueError, xs, '$where bindings must be a list of pairs' )
 		
 		newEnv = self.innerScope()
 		for binding in bindings:
 			if not isGLispList( binding )  or  len( binding ) != 2:
-				self.glispError( ValueError, xs, '$let binding must be a name value pair' )
+				self.glispError( ValueError, xs, '$where binding must be a name value pair' )
 			
 			if binding[0][0] != '@':
-				self.glispError( ValueError, xs, '$let binding name must start with @' )
+				self.glispError( ValueError, xs, '$where binding name must start with @' )
 			
 			newEnv._env[binding[0][1:]] = newEnv.evaluate( binding[1] )
 			
@@ -525,8 +525,8 @@ class TestCase_GLispInterpreter (unittest.TestCase):
 	def testGetAttr(self):
 		self.assert_( self.evaluate( '(@tester . stdout)' )  is  self.stdout )
 		
-	def testLet(self):
-		src = """($let ((@a #4) (@b (@a + #5)) (@c test) (@d (@c * @b)))
+	def testWhere(self):
+		src = """($where ((@a #4) (@b (@a + #5)) (@c test) (@d (@c * @b)))
 		(@c split)
 		(@sys stdout @d)
 		)"""
