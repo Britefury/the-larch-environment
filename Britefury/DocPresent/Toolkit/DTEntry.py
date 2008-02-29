@@ -72,7 +72,7 @@ class DTEntry (DTWidget):
 		self._entryPosition = Vector2()
 		self._textRoot = Vector2()
 		self._textPosition = Vector2()
-		self._cursorLocation = 0
+		self._cursorIndex = 0
 		self._selectionBounds = None
 		self._bButtonPressed = False
 
@@ -83,6 +83,7 @@ class DTEntry (DTWidget):
 		self._bAutoCompleteDisabled = False
 		
 		self._cursorEntities = []
+		self._endCursorEntity = DTCursorEntity( self )
 		self._p_rebuildCursorEntityList()
 		
 
@@ -100,7 +101,7 @@ class DTEntry (DTWidget):
 			self._text = text
 			self._p_rebuildCursorEntityList()
 			if self._bHasFocus:
-				self._cursorLocation = len( self._text )
+				self._cursorIndex = min( self._cursorIndex, len( self._text ) )
 			self._p_textChanged()
 			self._o_queueResize()
 
@@ -170,28 +171,37 @@ class DTEntry (DTWidget):
 
 
 	def moveCursorToStart(self):
-		self._cursorLocation = 0
+		#if len( self._cursorEntities ) > 0:
+			#self._cursor.location = DTCursorLocation( self._cursorEntities[0], DTCursorLocation.EDGE_LEADING )
+		#else:
+			#self._cursor.location = DTCursorLocation( self._endCursorEntity, DTCursorLocation.EDGE_LEADING )
+		self._cursorIndex = 0
 		self._o_queueFullRedraw()
 
 	def moveCursorToEnd(self):
-		self._cursorLocation = len( self._text )
+		#self._cursor.location = DTCursorLocation( self._endCursorEntity, DTCursorLocation.EDGE_LEADING )
+		self._cursorIndex = len( self._text )
 		self._o_queueFullRedraw()
 
-	def setCursorLocation(self, loc):
-		self._cursorLocation = loc
+	def setCursorIndex(self, index):
+		#if index < len( self._text ):
+			#self._cursor.location = DTCursorLocation( self._cursorEntities[index], DTCursorLocation.EDGE_LEADING )
+		#else:
+			#self._cursor.location = DTCursorLocation( self._endCursorEntity, DTCursorLocation.EDGE_LEADING )
+		self._cursorIndex = index
 		self._o_queueFullRedraw()
 
-	def getCursorLocation(self):
-		return self._cursorLocation
+	def getCursorIndex(self):
+		return self._cursorIndex
 
 	def isCursorAtStart(self):
-		return self._cursorLocation == 0
+		return self._cursorIndex == 0
 
 	def isCursorAtEnd(self):
-		return self._cursorLocation == len( self._text )
+		return self._cursorIndex == len( self._text )
 
 	def getCursorPosition(self):
-		charRect = self._layout.index_to_pos( self._cursorLocation )
+		charRect = self._layout.index_to_pos( self._cursorIndex )
 		layoutPoint = Point2( float( charRect[0] ) / pango.SCALE,  ( float( charRect[1] )  +  float( charRect[3] ) * 0.5 )  /  pango.SCALE )
 		return layoutPoint + self._textPosition
 
@@ -208,15 +218,15 @@ class DTEntry (DTWidget):
 		return self.getCharacterIndexAt( Point2( x, y ) )
 
 
-	def getCursorLocationAt(self, point):
+	def getCursorIndexAt(self, point):
 		pointInLayout = point - self._textPosition
 		index, trailing = self._layout.xy_to_index( int( pointInLayout.x * pango.SCALE ), int( pointInLayout.y * pango.SCALE ) )
 		return index + trailing
 
 
-	def getCursorLocationAtX(self, x):
+	def getCursorIndexAtX(self, x):
 		y = self._textPosition.y + self._layout.get_pixel_size() * 0.5
-		return self.getCursorLocationAt( Point2( x, y ) )
+		return self.getCursorIndexAt( Point2( x, y ) )
 
 
 
@@ -265,7 +275,7 @@ class DTEntry (DTWidget):
 		if bDragSelection:
 			# Extend the selection
 			if self._selectionBounds is None:
-				bounds = self._cursorLocation, location
+				bounds = self._cursorIndex, location
 			else:
 				first, second = self._selectionBounds
 				if first != location:
@@ -278,7 +288,7 @@ class DTEntry (DTWidget):
 
 		self._p_setSelectionBounds( bounds )
 
-		self._cursorLocation = location
+		self._cursorIndex = location
 		self._o_queueFullRedraw()
 
 
@@ -293,7 +303,7 @@ class DTEntry (DTWidget):
 			DTCursorEntity.remove( self._cursorEntities[start], self._cursorEntities[end-1] )
 			# remove from list
 			del self._cursorEntities[start:end]
-			self._cursorLocation = start
+			self._cursorIndex = start
 			self.textDeletedSignal.emit( self, start, end, textDeleted )
 		self._p_setSelectionBounds( None )
 
@@ -325,7 +335,7 @@ class DTEntry (DTWidget):
 		super( DTEntry, self )._o_onButtonDown2( localPos, button, state )
 		if button == 1:
 			self._p_setSelectionBounds( ( 0, len( self._text ) ) )
-			self._cursorLocation = self._selectionBounds[1]
+			self._cursorIndex = self._selectionBounds[1]
 			self._o_queueFullRedraw()
 		return True
 
@@ -350,7 +360,7 @@ class DTEntry (DTWidget):
 		self._p_setSelectionBounds( None )
 		self._p_rebuildCursorEntityList()
 		self.textDeletedSignal.emit( self, 0, len( deletedText ), deletedText )
-		self._cursorLocation = len( self._text )
+		self._cursorIndex = len( self._text )
 		self.textInsertedSignal.emit( self, 0, True, text )
 		self._p_onTextModified()
 
@@ -371,7 +381,7 @@ class DTEntry (DTWidget):
 
 	def _p_computeTextAfterDelete(self):
 		text = self._text
-		cursorLoc = self._cursorLocation
+		cursorLoc = self._cursorIndex
 		if self._selectionBounds is not None:
 			i = min( self._selectionBounds )
 			j = max( self._selectionBounds )
@@ -388,7 +398,7 @@ class DTEntry (DTWidget):
 
 	def _p_computeTextAfterBackspace(self):
 		text = self._text
-		cursorLoc = self._cursorLocation
+		cursorLoc = self._cursorIndex
 		if self._selectionBounds is not None:
 			i = min( self._selectionBounds )
 			j = max( self._selectionBounds )
@@ -405,7 +415,7 @@ class DTEntry (DTWidget):
 
 	def _p_computeTextAfterReplacingSelection(self, replacement):
 		text = self._text
-		cursorLoc = self._cursorLocation
+		cursorLoc = self._cursorIndex
 		if self._selectionBounds is not None:
 			i = min( self._selectionBounds )
 			j = max( self._selectionBounds )
@@ -430,25 +440,21 @@ class DTEntry (DTWidget):
 
 
 
-	def _o_onKeyPress(self, event):
-		super( DTEntry, self )._o_onKeyPress( event )
-
-		# Flag to determine if the key event has been handled
+	def _f_handleMotionKeyPress(self, event):
 		bHandled = False
-
 		modKeys = event.state & _modKeysMask
 		if event.keyVal == gtk.keysyms.Left:
 			if modKeys == gtk.gdk.SHIFT_MASK  or  modKeys == 0:
-				if self._cursorLocation > 0:
-					self._p_moveCursor( ( event.state & gtk.gdk.SHIFT_MASK ) != 0, self._cursorLocation - 1 )
+				if self._cursorIndex > 0:
+					self._p_moveCursor( ( event.state & gtk.gdk.SHIFT_MASK ) != 0, self._cursorIndex - 1 )
 					bHandled = True
 				else:
 					# Handled if shift pressed
 					bHandled = event.state & gtk.gdk.SHIFT_MASK  !=  0
 		elif event.keyVal == gtk.keysyms.Right:
 			if modKeys == gtk.gdk.SHIFT_MASK  or  modKeys == 0:
-				if self._cursorLocation  <  len( self._text ):
-					self._p_moveCursor( ( event.state & gtk.gdk.SHIFT_MASK ) != 0, self._cursorLocation + 1 )
+				if self._cursorIndex  <  len( self._text ):
+					self._p_moveCursor( ( event.state & gtk.gdk.SHIFT_MASK ) != 0, self._cursorIndex + 1 )
 					bHandled = True
 				else:
 					# Handled if shift pressed
@@ -459,7 +465,18 @@ class DTEntry (DTWidget):
 		elif event.keyVal == gtk.keysyms.End:
 			self._p_moveCursor( ( event.state & gtk.gdk.SHIFT_MASK ) != 0, len( self._text ) )
 			bHandled = True
-		elif event.keyVal == gtk.keysyms.Return:
+		return bHandled
+
+	
+	
+	def _o_onKeyPress(self, event):
+		super( DTEntry, self )._o_onKeyPress( event )
+
+		# Flag to determine if the key event has been handled
+		bHandled = False
+
+		modKeys = event.state & _modKeysMask
+		if event.keyVal == gtk.keysyms.Return:
 			self.returnSignal.emit( self )
 			self.ungrabFocus()
 			bHandled = True
@@ -474,13 +491,13 @@ class DTEntry (DTWidget):
 				if self._selectionBounds is not None:
 					self._p_deleteSelection()
 					self._p_onTextModified()
-				elif self._cursorLocation > 0:
-					DTCursorEntity.remove( self._cursorEntities[self._cursorLocation-1], self._cursorEntities[self._cursorLocation-1] )
-					del self._cursorEntities[self._cursorLocation-1]
-					textDeleted = self._text[self._cursorLocation-1:self._cursorLocation]
-					self._text = self._text[:self._cursorLocation-1] + self._text[self._cursorLocation:]
-					self._cursorLocation -= 1
-					self.textDeletedSignal.emit( self, self._cursorLocation, self._cursorLocation+1, textDeleted )
+				elif self._cursorIndex > 0:
+					DTCursorEntity.remove( self._cursorEntities[self._cursorIndex-1], self._cursorEntities[self._cursorIndex-1] )
+					del self._cursorEntities[self._cursorIndex-1]
+					textDeleted = self._text[self._cursorIndex-1:self._cursorIndex]
+					self._text = self._text[:self._cursorIndex-1] + self._text[self._cursorIndex:]
+					self._cursorIndex -= 1
+					self.textDeletedSignal.emit( self, self._cursorIndex, self._cursorIndex+1, textDeleted )
 					self._p_onTextModified()
 				else:
 					# leave the entry
@@ -499,12 +516,12 @@ class DTEntry (DTWidget):
 				if self._selectionBounds is not None:
 					self._p_deleteSelection()
 					self._p_onTextModified()
-				elif self._cursorLocation < len( self._text ):
-					DTCursorEntity.remove( self._cursorEntities[self._cursorLocation], self._cursorEntities[self._cursorLocation] )
-					del self._cursorEntities[self._cursorLocation]
-					textDeleted = self._text[self._cursorLocation:self._cursorLocation+1]
-					self._text = self._text[:self._cursorLocation] + self._text[self._cursorLocation+1:]
-					self.textDeletedSignal.emit( self, self._cursorLocation, self._cursorLocation+1, textDeleted )
+				elif self._cursorIndex < len( self._text ):
+					DTCursorEntity.remove( self._cursorEntities[self._cursorIndex], self._cursorEntities[self._cursorIndex] )
+					del self._cursorEntities[self._cursorIndex]
+					textDeleted = self._text[self._cursorIndex:self._cursorIndex+1]
+					self._text = self._text[:self._cursorIndex] + self._text[self._cursorIndex+1:]
+					self.textDeletedSignal.emit( self, self._cursorIndex, self._cursorIndex+1, textDeleted )
 					self._p_onTextModified()
 				else:
 					# leave the entry
@@ -521,26 +538,26 @@ class DTEntry (DTWidget):
 			if bTextOk:
 				if self._selectionBounds is not None:
 					self._p_deleteSelection()
-				position = self._cursorLocation
+				position = self._cursorIndex
 				bAppended = position == len( self._text )
 
 				keyStringCursorEntities = [ DTCursorEntity( self )   for character in event.keyString ]
 				DTCursorEntity.buildListLinks( keyStringCursorEntities )
 				
-				if self._cursorLocation > 0:
-					prev = self._cursorEntities[self._cursorLocation-1]
+				if self._cursorIndex > 0:
+					prev = self._cursorEntities[self._cursorIndex-1]
 				else:
 					prev = self._cursorEntities[0].prev
-				if self._cursorLocation < len( self._text ):
-					next = self._cursorEntities[self._cursorLocation]
+				if self._cursorIndex < len( self._text ):
+					next = self._cursorEntities[self._cursorIndex]
 				else:
 					next = self._cursorEntities[-1].next
 
 				DTCursorEntity.splice( prev, next, keyStringCursorEntities[0], keyStringCursorEntities[-1] )
-				self._cursorEntities[self._cursorLocation:self._cursorLocation] = keyStringCursorEntities
+				self._cursorEntities[self._cursorIndex:self._cursorIndex] = keyStringCursorEntities
 				
-				self._text = self._text[:self._cursorLocation] + event.keyString + self._text[self._cursorLocation:]
-				self._cursorLocation += len( event.keyString )
+				self._text = self._text[:self._cursorIndex] + event.keyString + self._text[self._cursorIndex:]
+				self._cursorIndex += len( event.keyString )
 
 				self.textInsertedSignal.emit( self, position, bAppended, event.keyString )
 				self._p_onTextModified()
@@ -559,7 +576,7 @@ class DTEntry (DTWidget):
 
 	def _o_onGainFocus(self):
 		super( DTEntry, self )._o_onGainFocus()
-		self._cursorLocation = len( self._text )
+		self._cursorIndex = len( self._text )
 		self._bAutoCompleteDisabled = False
 		self._o_queueFullRedraw()
 
@@ -569,7 +586,27 @@ class DTEntry (DTWidget):
 		self._o_queueFullRedraw()
 
 
+	#def _o_onCursorEnter(self, cursor):
+		#super( DTEntry, self )._o_onCursorEnter( cursor )
+		#self._o_refreshCursorIndex( cursor )
 
+	#def _o_onCursorLeave(self):
+		#super( DTEntry, self )._o_onCursorLeave()
+		#self._o_queueFullRedraw()
+
+	#def _o_onCursorMotion(self, cursor):
+		#super( DTEntry, self )._o_onCursorMotion( cursor )
+		#self._o_refreshCursorIndex( cursor )
+		
+		
+	#def _o_refreshCursorIndex(self, cursor):
+		#loc = cursor.location
+		#self._cursorIndex = self._cursorEntities.index( loc.cursorEntity )
+		#if loc.edge == DTCursorLocation.EDGE_TRAILING:
+			#self._cursorIndex += 1
+		#self._o_queueFullRedraw()
+
+	
 	def _o_draw(self, context):
 		super( DTEntry, self )._o_draw( context )
 		b = self._borderWidth
@@ -627,7 +664,7 @@ class DTEntry (DTWidget):
 
 		# Cursor
 		if self._bHasFocus:
-			space = self._layout.index_to_pos( self._cursorLocation )[0]  /  pango.SCALE
+			space = self._layout.index_to_pos( self._cursorIndex )[0]  /  pango.SCALE
 			cursorPositionX = self._textRoot.x + space
 			context.set_line_width( 1.0 )
 			context.set_source_rgb( 0.0, 0.0, 0.0 )
@@ -746,10 +783,7 @@ class DTEntry (DTWidget):
 
 
 	def _o_getLastCursorEntity(self):
-		try:
-			return self._cursorEntities[-1]
-		except IndexError:
-			return None
+		return self._endCursorEntity
 
 
 	def _p_rebuildCursorEntityList(self):
@@ -764,6 +798,8 @@ class DTEntry (DTWidget):
 		
 		self._cursorEntities = [ DTCursorEntity( self )   for character in self._text ]
 		DTCursorEntity.buildListLinks( self._cursorEntities )
+		if len( self._cursorEntities ) > 0:
+			self._cursorEntities[-1].next = self._endCursorEntity
 		
 		cursorsIndicesAndEdges = [ _fixCursorIndexAndEdge( cie )   for cie in cursorsIndicesAndEdges ]
 		
@@ -805,6 +841,36 @@ class DTEntry (DTWidget):
 		
 		
 		
+	#
+	# FOCUS NAVIGATION METHODS
+	#
+	
+	def _o_isFocusTarget(self):
+		return True
+
+	
+	def startEditing(self):
+		self.grabFocus()
+		
+	def startEditingOnLeft(self):
+		self.startEditing()
+		self.moveCursorToStart()
+		
+	def startEditingOnRight(self):
+		self.startEditing()
+		self.moveCursorToEnd()
+		
+	def startEditingAtPosition(self, pos):
+		index = self.getCursorIndexAt( pos )
+		self.startEditing()
+		self.setCursorIndex( index )
+		
+	def finishEditing(self):
+		self.returnSignal.emit( self )
+		self.ungrabFocus()
+
+	
+	
 	#
 	# DEBUG __repr__
 	#

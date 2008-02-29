@@ -33,7 +33,7 @@ class DTCursor (object):
 		self._location = location
 		if self._location is not None:
 			self._location.cursorEntity.widget._f_registerCursor( self )
-		if self._bCurrent  and  self._document is not None:
+		if self._document is not None:
 			self._document._f_cursorLocationNotify( self, True )
 	
 			

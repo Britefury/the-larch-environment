@@ -34,7 +34,7 @@ _undoAccel = gtk.accelerator_parse( '<control>z' )
 _redoAccel = gtk.accelerator_parse( '<control><shift>Z' )
 
 
-_CURSOR_HEIGHT = 11.0
+_CURSOR_HEIGHT = 22.0
 
 
 
@@ -97,6 +97,7 @@ class DTDocument (DTBin):
 		self._mainCursor = DTCursor( self, DTCursorLocation( self._firstCursorEntity, DTCursorLocation.EDGE_TRAILING ) )
 		self._prevCursor = None
 		self._nextCursor = None
+		self._cursorWidget = None
 		self._oldCursorSegment = None
 		self._cursorSegment = None
 		self._bCursorRequiresUpdate = False
@@ -262,7 +263,7 @@ class DTDocument (DTBin):
 		assert child is not None
 
 		# If there is already a widget that has grabbed the keyboard focus, then clear the focus grab on @child
-		if child is not self._keyboardFocusGrabChild  and  self_f_clearFocusGrab._keyboardFocusGrabChild is not None:
+		if child is not self._keyboardFocusGrabChild  and  self._keyboardFocusGrabChild is not None:
 			child._f_clearFocusGrab()
 		else:
 			# If @child is different from the widget that has focus at the moment, switch
@@ -323,7 +324,7 @@ class DTDocument (DTBin):
 		context.fill()
 		context.new_path()
 		self._f_draw( context, BBox2( Point2( event.area.x, event.area.y ), Point2( event.area.x + event.area.width, event.area.y + event.area.height ) ) )
-		self._p_drawCursor()
+		#self._p_drawCursor( context )
 		self._p_emitImmediateEvents()
 		return False
 
@@ -470,11 +471,6 @@ class DTDocument (DTBin):
 
 
 
-	def _o_handleDocumentKey(self, keyEvent):
-		return False
-
-
-
 	def do_key_press_event(self, event):
 		keyEvent = DTKeyEvent( event )
 		key = keyEvent.keyVal, keyEvent.state
@@ -527,7 +523,21 @@ class DTDocument (DTBin):
 		self._p_emitImmediateEvents()
 		
 		
+
+		
+	#
+	# SPACE ALLOCATION METHODS
+	#
 	
+	def _o_onAllocateX(self, allocation):
+		if self._child is not None:
+			self._o_allocateChildX( self._child, 0.0, min( self._childRequisition.x, allocation ) )
+
+	def _o_onAllocateY(self, allocation):
+		if self._child is not None:
+			self._o_allocateChildY( self._child, 0.0, min( self._childRequisition.y, allocation ) )
+		
+		
 		
 	
 	#
@@ -557,10 +567,15 @@ class DTDocument (DTBin):
 	def _f_cursorLocationNotify(self, cursor, bCurrent):
 		if cursor is self._mainCursor  or  cursor is self._prevCursor  or  cursor is self._nextCursor:
 			self._p_cursorSegmentChanged()
+		if cursor is self._mainCursor:
+			self._p_sendCursorWidgetEvents()
+
+
 			
 	def _f_cursorUnrealiseNotify(self, cursor):
-		if cursor is not self._firstCursorEntity  and  cursor is not self._lastCursorEntity:
-			widget = cursor.location.cursorEntity.widget
+		cursorEntity = cursor.location.cursorEntity
+		if cursorEntity is not self._firstCursorEntity  and  cursorEntity is not self._lastCursorEntity:
+			widget = cursorEntity.widget
 			parent = widget.parent
 			assert parent is not None
 	
@@ -586,6 +601,7 @@ class DTDocument (DTBin):
 	def _p_updateCursors(self):
 		if self._bCursorRequiresUpdate:
 			widget = self._mainCursor.location.cursorEntity.widget
+			bMainCursorModified = False
 			if widget.isRealised():
 				# main cursor is valid; no need for prev and next cursors
 				self._prevCursor = None
@@ -594,11 +610,27 @@ class DTDocument (DTBin):
 				self._mainCursor = self._prevCursor
 				self._prevCursor = None
 				self._nextCursor = None
+				bMainCursorModified = True
 			self._bCursorRequiresUpdate = False
 			self._p_cursorSegmentChanged()
+			if bMainCursorModified:
+				self._p_sendCursorWidgetEvents()
 			
 	def _p_mainCursorChanged(self):
 		self._bCursorRequiresUpdate = True
+		
+		
+	def _p_sendCursorWidgetEvents(self):
+		widget = self._mainCursor.location.cursorEntity.widget
+		if widget is not self._cursorWidget:
+			if self._cursorWidget is not None:
+				self._cursorWidget._f_evCursorLeave()
+			self._cursorWidget = widget
+			if self._cursorWidget is not None:
+				self._cursorWidget._f_evCursorEnter( self._mainCursor )
+		else:
+			widget._f_evCursorMotion( self._mainCursor )
+		
 			
 		
 		
@@ -606,14 +638,22 @@ class DTDocument (DTBin):
 		if self._bCursorSegmentRequiresUpdate:
 			self._p_updateCursors()
 			widget = self._mainCursor.location.cursorEntity.widget
-			self._cursorSegment = widget.getCursorSegment( self._mainCursor.location )
+			xform = widget.getTransformRelativeToDocument()
+			self._cursorSegment = widget.getCursorSegment( self._mainCursor.location )  *  xform
 			self._oldCursorSegment = None
 			self._bCursorSegmentRequiresUpdate = False
 			
 	def _p_cursorSegmentChanged(self):
 		self._oldCursorSegment = self._cursorSegment
-		if self._oldCursorSegment is not None:
-			self._o_queueRedraw( self._oldCursorSegment.a - Vector2( -1.0, -1.0 ), self._oldCursorSegment.b - self._oldCursorSegment.a  +  Vector2( 2.0, 2.0 ) )
+		#if self._oldCursorSegment is not None:
+		#	self._o_queueRedraw( self._oldCursorSegment.a - Vector2( -1.0, -1.0 ), self._oldCursorSegment.b - self._oldCursorSegment.a  +  Vector2( 2.0, 2.0 ) )
+		# HACK
+		# HACK
+		# HACK
+		#self._drawingArea.queue_draw()
+		# HACK
+		# HACK
+		# HACK
 		self._bCursorSegmentRequiresUpdate = True
 		
 	
@@ -656,14 +696,26 @@ class DTDocument (DTBin):
 		
 		
 	#
-	# CURSOR NAVIGATION METHODS
+	# FOCUS NAVIGATION METHODS
 	#
 	
 	def _p_cursorLeft(self):
-		pass
+		self._p_updateCursors()
+		loc = self._mainCursor.location
+		if loc.edge == DTCursorLocation.EDGE_TRAILING:
+			self._mainCursor.location = DTCursorLocation( loc.cursorEntity, DTCursorLocation.EDGE_LEADING )
+		else:
+			if loc.cursorEntity is not self._firstCursorEntity:
+				self._mainCursor.location = DTCursorLocation( loc.cursorEntity.prev, DTCursorLocation.EDGE_LEADING )
 		
 	def _p_cursorRight(self):
-		pass
+		self._p_updateCursors()
+		loc = self._mainCursor.location
+		if loc.edge == DTCursorLocation.EDGE_LEADING:
+			self._mainCursor.location = DTCursorLocation( loc.cursorEntity, DTCursorLocation.EDGE_TRAILING )
+		else:
+			if loc.cursorEntity is not self._lastCursorEntity:
+				self._mainCursor.location = DTCursorLocation( loc.cursorEntity.next, DTCursorLocation.EDGE_TRAILING )
 	
 	def _p_cursorUp(self):
 		pass
@@ -673,6 +725,21 @@ class DTDocument (DTBin):
 
 
 
+	def _o_handleDocumentKey(self, event):
+		if event.keyVal in [ gtk.keysyms.Left, gtk.keysyms.Right, gtk.keysyms.Up, gtk.keysyms.Down, gtk.keysyms.Home, gtk.keysyms.End ]:
+			if self._keyboardFocusChild is not None:
+				if self._keyboardFocusChild._f_handleMotionKeyPress( event ):
+					return True
+				else:
+					if event.keyVal == gtk.keysyms.Left:
+						self._keyboardFocusChild.cursorLeft()
+					elif event.keyVal == gtk.keysyms.Right:
+						self._keyboardFocusChild.cursorRight()
+					elif event.keyVal == gtk.keysyms.Up:
+						self._keyboardFocusChild.cursorUp()
+					elif event.keyVal == gtk.keysyms.Down:
+						self._keyboardFocusChild.cursorDown()
+		return False
 
 
 

@@ -373,6 +373,25 @@ class DTBox (DTContainerSequence):
 
 	
 	
+	#
+	# FOCUS NAVIGATION METHODS
+	#
+	
+	def horizontalNavigationList(self):
+		if self._direction == DTDirection.LEFT_TO_RIGHT  or  self._direction == DTDirection.TOP_TO_BOTTOM:
+			return [ e.child   for e in self._childEntries ]
+		else:
+			return [ e.child   for e in reversed( self._childEntries ) ]
+
+	def verticalNavigationList(self):
+		if elf._direction == DTDirection.TOP_TO_BOTTOM:
+			return [ e.child   for e in self._childEntries ]
+		elif self._direction == DTDirection.BOTTOM_TO_TOP:
+			return [ e.child   for e in reversed( self._childEntries ) ]
+		else:
+			return []
+
+	
 	
 	
 	spacing = property( getSpacing, setSpacing )

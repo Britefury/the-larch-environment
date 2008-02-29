@@ -158,6 +158,14 @@ class DTActiveBorder (DTBorder):
 		super( DTActiveBorder, self )._o_draw( context )
 
 
+		
+	#
+	# FOCUS NAVIGATION METHODS
+	#
+	
+	def _o_isFocusTarget(self):
+		return True
+		
 
 	borderWidth = property( getBorderWidth, setBorderWidth )
 	highlightedBorderWidth = property( getHighlightedBorderWidth, setHighlightedBorderWidth )

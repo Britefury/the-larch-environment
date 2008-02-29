@@ -8,6 +8,8 @@
 from Britefury.Math.Math import Point2, Vector2
 from Britefury.DocPresent.Toolkit.DTContainer import DTContainer
 
+from Britefury.DocPresent.Toolkit.DTCursorEntity import DTCursorEntity
+
 
 
 class DTBin (DTContainer):
@@ -29,6 +31,7 @@ class DTBin (DTContainer):
 				child._f_unparent()
 			if self._child is not None:
 				entry = self._childToEntry[self._child]
+				self._o_unlinkChildEntryCursorEntity( entry )
 				self._childEntries.remove( entry )
 				self._o_unregisterChildEntry( entry )
 			self._child = child
@@ -36,6 +39,7 @@ class DTBin (DTContainer):
 				entry = self.ChildEntry( self._child )
 				self._childEntries.append( entry )
 				self._o_registerChildEntry( entry )
+				self._o_linkChildEntryCursorEntity( entry )
 
 			self._o_queueResize()
 
@@ -114,7 +118,17 @@ class DTBin (DTContainer):
 		return None
 
 
-	
+	def _o_linkChildEntryCursorEntity(self, childEntry):
+		prevCursorEntity = self._f_getPrevCursorEntityBeforeChild( childEntry.child )
+		nextCursorEntity = self._f_getNextCursorEntityAfterChild( childEntry.child )
+		DTCursorEntity.splice( prevCursorEntity, nextCursorEntity, childEntry.child.getFirstCursorEntity(), childEntry.child.getLastCursorEntity() )
+
+	def _o_unlinkChildEntryCursorEntity(self, childEntry):
+		DTCursorEntity.remove( childEntry.child.getFirstCursorEntity(), childEntry.child.getLastCursorEntity() )
+
+
+		
+		
 	#
 	# CURSOR POSITIONING METHODS
 	#
@@ -126,6 +140,21 @@ class DTBin (DTContainer):
 		else:
 			return None
 	
+
+		
+	#
+	# FOCUS NAVIGATION METHODS
+	#
+	
+	def horizontalNavigationList(self):
+		if self._child is not None:
+			return [ self._child ]
+		else:
+			return []
+
+	def verticalNavigationList(self):
+		return []
+
 
 	
 

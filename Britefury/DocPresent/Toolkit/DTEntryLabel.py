@@ -43,7 +43,32 @@ class DTEntryLabel (DTBin):
 			else:
 				return False
 
+			
+		#
+		# FOCUS NAVIGATION METHODS
+		#
+		
+		def _o_isFocusTarget(self):
+			return True
+			
 
+		def startEditing(self):
+			self._entryLabel.startEditing()
+			
+		def startEditingOnLeft(self):
+			self._entryLabel.startEditingOnLeft()
+			
+		def startEditingOnRight(self):
+			self._entryLabel.startEditingOnRight()
+			
+		def startEditingAtPosition(self, pos):
+			self._entryLabel.startEditingAtPosition( pos )
+			
+		def finishEditing(self):
+			self._entryLabel.finishEditing()
+
+	
+	
 	class _Entry (DTEntry):
 		def __init__(self, entryLabel, text, font=None, borderWidth=2.0, backgroundColour=Colour3f( 0.9, 0.95, 0.9 ), highlightedBackgroundColour=Colour3f( 0.0, 0.0, 0.5 ), textColour=Colour3f( 0.0, 0.0, 0.0 ), highlightedTextColour=Colour3f( 1.0, 1.0, 1.0 ), borderColour=Colour3f( 0.6, 0.8, 0.6 ), regexp=None):
 			super( DTEntryLabel._Entry, self ).__init__( text, font, borderWidth, backgroundColour, highlightedBackgroundColour, textColour, highlightedTextColour, borderColour, regexp=regexp )
@@ -109,8 +134,21 @@ class DTEntryLabel (DTBin):
 	def startEditing(self):
 		if self.getChild() is not self._entry:
 			self.setChild( self._entry )
-			self._entry.grabFocus()
+			self._entry.startEditing()
 			self.startEditingSignal.emit( self, self.text )
+
+	def startEditingOnLeft(self):
+		self.startEditing()
+		self._entry.moveCursorToStart()
+
+	def startEditingOnRight(self):
+		self.startEditing()
+		self._entry.moveCursorToEnd()
+
+	def startEditingAtPosition(self, pos):
+		index = self.getChild().getCursorIndexAt( pos )
+		self.startEditing()
+		self._entry.setCursorIndex( index )
 
 	def finishEditing(self):
 		self._p_finishEditing( False )
@@ -129,24 +167,11 @@ class DTEntryLabel (DTBin):
 
 
 
-	def startEditingOnLeft(self):
-		self.startEditing()
-		self._entry.moveCursorToStart()
-
-	def startEditingOnRight(self):
-		self.startEditing()
-		self._entry.moveCursorToEnd()
-
-	def startEditingAtPositionX(self, x):
-		index = self.getChild().getCursorLocationAtX( x )
-		self.startEditing()
-		self._entry.setCursorLocation( index )
 
 
-
-	def getCursorLocation(self):
+	def getCursorIndex(self):
 		if self.getChild() is self._entry:
-			return self._entry.getCursorLocation()
+			return self._entry.getCursorIndex()
 		else:
 			return None
 
@@ -185,8 +210,8 @@ class DTEntryLabel (DTBin):
 
 	def _p_onLabelClicked(self, localPos):
 		self.startEditing()
-		index = self._label.getCursorPositionAt( localPos )
-		self._entry.setCursorLocation( index )
+		index = self._label.getCursorIndexAt( localPos )
+		self._entry.setCursorIndex( index )
 
 
 	def _p_onEntryTextInserted(self, entry, position, bAppended, textInserted):
@@ -222,6 +247,34 @@ class DTEntryLabel (DTBin):
 	def _p_setBEditable(self, bEditable):
 		self._entry.bEditable = bEditable
 
+		
+
+
+	#
+	# CURSOR ENTITY METHODS
+	#
+
+	def _o_getFirstCursorEntity(self):
+		return self._entry.getFirstCursorEntity()
+	
+	def _o_getLastCursorEntity(self):
+		return self._entry.getLastCursorEntity()
+
+	
+	def _o_linkChildEntryCursorEntity(self, childEntry):
+		# Prevent the DTBin superclass from linking in anything other than the entry
+		pass
+		#prevCursorEntity = self._f_getPrevCursorEntityBeforeChild( childEntry.child )
+		#nextCursorEntity = self._f_getNextCursorEntityAfterChild( childEntry.child )
+		#DTCursorEntity.splice( prevCursorEntity, nextCursorEntity, childEntry.child.getFirstCursorEntity(), childEntry.child.getLastCursorEntity() )
+
+	def _o_unlinkChildEntryCursorEntity(self, childEntry):
+		# Prevent the DTBin superclass from unlinking in anything other than the entry
+		pass
+		#DTCursorEntity.remove( childEntry.child.getFirstCursorEntity(), childEntry.child.getLastCursorEntity() )
+		
+		
+		
 
 	text = property( getText, setText )
 	font = property( getFont, setFont )
