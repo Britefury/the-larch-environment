@@ -20,7 +20,7 @@ from Britefury.DocView.DocView import DocView
 
 from Britefury.GLisp.GLispInterpreter import GLispParameterListError, GLispItemTypeError, isGLispList
 from Britefury.GLisp.GLispCompiler import compileGLispCustomFunctionToPy, compileGLispExprToPySrc, GLispCompilerError, filterIdentifierForPy
-from Britefury.GLisp.GuardExpression import compileGuardExpression, GuardError
+from Britefury.GLisp.PatternMatch import compileMatchExpression, NoMatchError
 
 
 
@@ -29,13 +29,13 @@ from Britefury.GLisp.GuardExpression import compileGuardExpression, GuardError
 A bried explanation as to how this module works.
 
 
-The view is specified as a gaurd expression.
-Each guard is matched with a view expression that is compiled into Python source which is executed to create the contents of a view node.
+The view is specified as a pattern match expression.
+Each match is matched with a view expression that is compiled into Python source which is executed to create the contents of a view node.
 
 
 The code that is executed to create a view is split into two parts:
   - compiled code
-    - guard expressions
+    - match expressions
     - view expressions
   - non-compiled code
     - made available to compiled code
@@ -214,11 +214,11 @@ class _GSymNodeViewInstance (object):
 	
 	def _runtime_buildViewContents(self, content):
 		"""Runtime - build the contents of a view node"""
-		#1. Ese the guard function in the factory to determine which view expression to apply it
+		#1. Ese the match function in the factory to determine which view expression to apply it
 		try:
-			varValues, index = self.viewFactory.guardFunction( content )
-		except GuardError:
-			self.env.glispError( GuardError, content, 'buildViewContents: cannot process; no suitable guard expression found' )
+			varValues, index = self.viewFactory.matchFunction( content )
+		except NoMatchError:
+			self.env.glispError( NoMatchError, content, 'buildViewContents: cannot process; no suitable match expression found' )
 		#2. Get the view expression function from the table, along with the varName->valueIndirection table for that function
 		f, varNameToValueIndirection = self.viewFactory.viewExprFunctionAndVarNameToIndirectionPairs[index]
 		
@@ -283,12 +283,12 @@ class _GSymViewFactory (object):
 		self.env = env
 		self.name = name
 		
-		# Build the guard expression
-		self.guardFunction, varNameToValueIndirectionByGuard = compileGuardExpression( spec, [0], filterIdentifierForPy( 'view_guard_%s'  %  ( self.name, ) ) )
+		# Build the match expression
+		self.matchFunction, varNameToValueIndirectionByMatch = compileMatchExpression( spec, [0], filterIdentifierForPy( 'view_match_%s'  %  ( self.name, ) ) )
 		
-		# Build the view-expressions that create the view contents (1 for each guard expression)
-		self.viewExprFunctionAndVarNameToIndirectionPairs = [ self._p_generateExprFunctionAndValueIndirection( guardAndViewExpr, i, varNameToValueIndir )
-					   for i, ( guardAndViewExpr, varNameToValueIndir ) in enumerate( zip( spec, varNameToValueIndirectionByGuard ) ) ]
+		# Build the view-expressions that create the view contents (1 for each match expression)
+		self.viewExprFunctionAndVarNameToIndirectionPairs = [ self._p_generateExprFunctionAndValueIndirection( matchAndViewExpr, i, varNameToValueIndir )
+					   for i, ( matchAndViewExpr, varNameToValueIndir ) in enumerate( zip( spec, varNameToValueIndirectionByMatch ) ) ]
 		
 		
 	def createInstance(self, xs, commandHistory, styleSheetDispatcher):
@@ -297,7 +297,7 @@ class _GSymViewFactory (object):
 
 
 	
-	def _p_generateExprFunctionAndValueIndirection(self, guardAndViewExpr, i, varNameToValueIndirection):
+	def _p_generateExprFunctionAndValueIndirection(self, matchAndViewExpr, i, varNameToValueIndirection):
 		"""Helper function for the constructor
 		Compiles a GLisp view-expression to a python function"""
 		functionName = filterIdentifierForPy( 'view_expr_%s_%d'  %  ( self.name, i ) )
@@ -308,7 +308,7 @@ class _GSymViewFactory (object):
 			 '_label' : _runtime_label,
 			 '_entry' : _runtime_entry,
 			 '_hbox' : _runtime_hbox, }
-		return compileGLispCustomFunctionToPy( guardAndViewExpr[1], functionName, paramNames, self._p_compileSpecial, lcls  ), varNameToValueIndirection
+		return compileGLispCustomFunctionToPy( matchAndViewExpr[1], functionName, paramNames, self._p_compileSpecial, lcls  ), varNameToValueIndirection
 	
 	
 	def _runtime_buildView(self, viewNodeInstance, content):
