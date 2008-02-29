@@ -273,7 +273,6 @@ class TestCase_gLisp (unittest.TestCase):
 		      '  q = b + c\n'  +  \
 		      '  return p * q\n'
 		
-		print makeFuncSrc( glispSrc, [ 'a', 'b', 'c' ] )
 		self.assert_( makeFuncSrc( glispSrc, [ 'a', 'b', 'c' ] ) == pySrc )
 		self.assert_( makeFunc( glispSrc, [ 'a', 'b', 'c' ] )(3, 5, 7)  ==  96 )
 		
