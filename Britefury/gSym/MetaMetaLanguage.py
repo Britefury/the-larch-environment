@@ -8,7 +8,6 @@
 from Britefury.DocModel.DMListInterface import DMListInterface
 
 from Britefury.GLisp.GLispInterpreter import specialform, isGLispList
-from Britefury.GLisp.GLispCompiler import compileGLispCustomFunctionToPy, GLispCompilerError
 
 from Britefury.gSym.gSymLanguage import GSymLanguageInstanceInterface, GSymLanguageInstanceControlInterface, GSymLanguageFactory
 from Britefury.gSym.MetaLanguage import GSymLanguageInstanceInterface, GSymLanguageInstanceControlInterface, MetaLanguageFactory

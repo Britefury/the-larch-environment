@@ -1,6 +1,6 @@
 (
 	($importModuleContents Languages.python25 ((language pyLang))
-		($let ((@py (@pyLang getLanguageInterface)))
+		($where ((@py (@pyLang getLanguageInterface)))
 			(@pyLang content
 				(
 					(@py add (@py localLocal a) (@py localLocal b))

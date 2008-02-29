@@ -53,29 +53,10 @@ class GLispTokeniser (object):
 
 
 
-class GLispStyleSheet (object):
-	def __init__(self):
-		pass
-	
-	@specialform
-	def defineSetValueAction(self, env, xs):
-		if len(xs) < 4:
-			raise TypeError, 'GLispStyleSheet.defineSetValueAction: needs a function name and a parameter list'
-		
-		name = xs[2]
-		pyFunc = compileGLispFunctionToPy( xs[3:], compileSimpleGLispExprToPy, name )
-		
-		return DVStyleSheetSetValueAction( pyFunc )
-	
-
-
-
-
 def gSymGLispEnvironment():
 	tokeniser = GLispTokeniser()
-	styleSheet = GLispStyleSheet()
 	
-	return GLispFrame( tokeniser=tokeniser, styleSheet=styleSheet )
+	return GLispFrame( tokeniser=tokeniser )
 
 
 
