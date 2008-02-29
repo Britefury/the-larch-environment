@@ -204,6 +204,20 @@ class DTScript (DTContainer):
 			return None
 	
 	
+	#
+	# FOCUS NAVIGATION METHODS
+	#
+	
+	def horizontalNavigationList(self):
+		children = []
+		if self._leftChild is not None:
+			children.append( self._leftChild )
+		if self._rightChild is not None:
+			children.append( self._rightChild )
+		return children
+
+	def verticalNavigationList(self):
+		return []
 
 
 

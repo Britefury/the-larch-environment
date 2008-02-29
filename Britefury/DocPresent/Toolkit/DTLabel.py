@@ -123,16 +123,16 @@ class DTLabel (DTSimpleStaticWidget):
 		return self.getCharacterIndexAt( Point2( x, y ) )
 
 
-	def getCursorLocationAt(self, point):
+	def getCursorIndexAt(self, point):
 		self._p_refreshLayout()
 		pointInLayout = point - self._textPosition
 		index, trailing = self._layout.xy_to_index( int( pointInLayout.x * pango.SCALE ), int( pointInLayout.y * pango.SCALE ) )
 		return index + trailing
 
 
-	def getCursorLocationAtX(self, x):
+	def getCursorIndexAtX(self, x):
 		y = self._textPosition.y + self._textSize.y * 0.5
-		return self.getCursorLocationAt( Point2( x, y ) )
+		return self.getCursorIndexAt( Point2( x, y ) )
 
 
 	def _p_refreshLayout(self):

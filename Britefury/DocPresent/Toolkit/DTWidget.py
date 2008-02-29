@@ -109,6 +109,7 @@ class DTWidget (object):
 		self._parent = None
 		self._document = None
 		self._bHasFocus = False
+		self._cursor = None
 		self._bFocusGrabbed = False
 		self._realiseContext = None
 		self._pangoContext = None
@@ -342,6 +343,15 @@ class DTWidget (object):
 	def _o_onLoseFocus(self):
 		self._bHasFocus = False
 
+	def _o_onCursorEnter(self, cursor):
+		self._cursor = cursor
+
+	def _o_onCursorLeave(self):
+		self._cursor = None
+
+	def _o_onCursorMotion(self, cursor):
+		pass
+
 	def _o_onRealise(self, context, pangoContext):
 		pass
 
@@ -456,6 +466,15 @@ class DTWidget (object):
 	def _f_evScroll(self, scroll):
 		self._o_onScroll( scroll )
 
+	def _f_evCursorEnter(self, cursor):
+		self._o_onCursorEnter( cursor )
+
+	def _f_evCursorLeave(self):
+		self._o_onCursorLeave()
+
+	def _f_evCursorMotion(self, cursor):
+		self._o_onCursorMotion( cursor )
+
 	def _f_evRealise(self, context, pangoContext):
 		self._realiseContext = context
 		self._pangoContext = pangoContext
@@ -474,7 +493,8 @@ class DTWidget (object):
 
 	def _f_draw(self, context, areaBox):
 		self._o_draw( context )
-
+		
+	
 
 
 
@@ -603,8 +623,296 @@ class DTWidget (object):
 	
 	def _f_unregisterCursor(self, cursor):
 		del self._cursors[cursor]
+		
+		
+		
+		
+	#
+	# FOCUS NAVIGATION METHODS
+	#
+	
+	def _f_handleMotionKeyPress(self, keyEvent):
+		return False
+	
+	def horizontalNavigationList(self):
+		return []
+
+	def verticalNavigationList(self):
+		return []
+
+	def _o_isFocusTarget(self):
+		return False
+
+	def getCursorPosition(self):
+		return Point2( self.widget.getAllocation() * 0.5 )
 	
 	
+	
+	def startEditing(self):
+		self.makeCurrent()
+		
+	def startEditingOnLeft(self):
+		self.makeCurrent()
+		
+	def startEditingOnRight(self):
+		self.makeCurrent()
+		
+	def startEditingAtPosition(self, pos):
+		self.makeCurrent()
+		
+	def finishEditing(self):
+		pass
+
+	
+	
+	def makeCurrent(self):
+		self.grabFocus()
+		
+
+	
+	
+	def cursorLeft(self, bItemStep=False):
+		left = self.getFocusLeafToLeft()
+		if left is not None:
+			# Must finish editing first, or we get problems with events invoking one another through the presentation system
+			self.finishEditing()
+			if bItemStep:
+				left.makeCurrent()
+			else:
+				left.startEditingOnRight()
+
+
+	def cursorRight(self, bItemStep=False):
+		right = self.getFocusLeafToRight()
+		if right is not None:
+			# Must finish editing first, or we get problems with events invoking one another through the presentation system
+			self.finishEditing()
+			if bItemStep:
+				right.makeCurrent()
+			else:
+				right.startEditingOnLeft()
+
+
+
+	def cursorToLeftChild(self):
+		navList = self.horizontalNavigationList()
+		if navList != []:
+			# Must finish editing first, or we get problems with events invoking one another through the presentation system
+			self.finishEditing()
+			navList[0].makeCurrent()
+
+	def cursorToRightChild(self):
+		navList = self.horizontalNavigationList()
+		if navList != []:
+			# Must finish editing first, or we get problems with events invoking one another through the presentation system
+			self.finishEditing()
+			navList[-1].makeCurrent()
+
+
+	def cursorToParent(self):
+		if self._parent is not None:
+			# Must finish editing first, or we get problems with events invoking one another through the presentation system
+			self.finishEditing()
+			self._parent.makeCurrent()
+
+
+
+
+	def cursorUp(self):
+		above = self.getFocusLeafAbove()
+		if above is not None:
+			cursorPosInAbove = self.getPointRelativeTo( widget, self.getCursorPosition() )
+			# Must finish editing first, or we get problems with events invoking one another through the presentation system
+			self.finishEditing()
+			above.startEditingAtPosition( cursorPosInAbove )
+
+	def cursorDown(self):
+		below = self.getFocusLeafBelow()
+		if below is not None:
+			cursorPosInBelow = self.getPointRelativeTo( widget, self.getCursorPosition() )
+			# Must finish editing first, or we get problems with events invoking one another through the presentation system
+			self.finishEditing()
+			below.startEditingAtPosition( cursorPosInBelow )
+	
+	
+	
+	
+	
+	def _p_prevNavListItems(self, navList, item):
+		if navList != []:
+			try:
+				index = navList.index( item )
+			except ValueError:
+				pass
+			else:
+				if index > 0:
+					return navList[:index]
+		return []
+
+	def _p_nextNavListItems(self, navList, item):
+		if navList != []:
+			try:
+				index = navList.index( item )
+			except ValueError:
+				pass
+			else:
+				if index < len( navList ) - 1:
+					return navList[index+1:]
+		return []
+
+
+	
+	
+	
+	def getLeftFocusLeaf(self):
+		navList = self.horizontalNavigationList()
+		for widget in navList:
+			l = widget.getLeftFocusLeaf()
+			if l is not None:
+				return l
+		if self._o_isFocusTarget():
+			return self
+		else:
+			return None
+
+	def getRightFocusLeaf(self):
+		navList = self.horizontalNavigationList()
+		for widget in reversed( navList ):
+			l = widget.getRightFocusLeaf()
+			if l is not None:
+				return l
+		if self._o_isFocusTarget():
+			return self
+		else:
+			return None
+
+		
+
+		
+	def getFocusLeafToLeft(self):
+		if self._parent is not None:
+			return self._parent._p_getFocusLeafToLeftFromChild( self )
+		else:
+			return None
+
+	def getFocusLeafToRight(self):
+		if self._parent is not None:
+			return self._parent._p_getFocusLeafToRightFromChild( self )
+		else:
+			return None
+
+
+
+	def _p_getFocusLeafToLeftFromChild(self, child):
+		navList = self.horizontalNavigationList()
+		leftChildren = self._p_prevNavListItems( navList, child )
+		for c in reversed( leftChildren ):
+			l = c.getRightFocusLeaf()
+			if l is not None:
+				return l
+		if self._parent is not None:
+			return self._parent._p_getFocusLeafToLeftFromChild( self )
+		else:
+			return None
+
+	def _p_getFocusLeafToRightFromChild(self, child):
+		navList = self.horizontalNavigationList()
+		rightChildren = self._p_nextNavListItems( navList, child )
+		for c in rightChildren:
+			l = c.getLeftFocusLeaf()
+			if l is not None:
+				return l
+		if self._parent is not None:
+			return self._parent._p_getFocusLeafToRightFromChild( self )
+		else:
+			return None
+
+
+
+
+
+	def getFocusLeafAbove(self):
+		return self.getFocusLeafAboveOrBelow( False )
+
+	def getFocusLeafBelow(self):
+		return self.getFocusLeafAboveOrBelow( True )
+
+	def getFocusLeafAboveOrBelow(self, bBelow):
+		if self._parent is not None:
+			return self._parent._p_getFocusLeafAboveOrBelowFromChild( self, bBelow, self.getCursorPosition() )
+		else:
+			return None
+
+	def _p_getFocusLeafAboveOrBelowFromChild(self, child, bBelow, localCursorPos):
+		navList = self.verticalNavigationList()
+		searchList = None
+		if bBelow:
+			searchList = self._p_nextNavListItems( navList, child )
+		else:
+			searchList = reversed( self._p_prevNavListItems( navList, child ) )
+		for item in searchList:
+			cursorPosInDocSpace = getPointRelativeToDocument( localCursorPos )
+			l = item._p_getTopOrBottomFocusLeaf( not bBelow, cursorPosInDocSpace )
+			if l is not None:
+				return l
+
+		if self._parent is not None:
+			return self._parent._p_getFocusLeafAboveOrBelowFromChild( self, bBelow, self.getPointRelativeToAncestor( self._parent, localCursorPos ) )
+		else:
+			return None
+
+	def _p_getTopOrBottomFocusLeaf(self, bBottom, cursorPosInDocSpace):
+		navList = self.verticalNavigationList()
+		if navList != []:
+			if bBottom:
+				nav = reversed( navList )
+			else:
+				nav = navList
+			for item in nav:
+				l = item._p_getTopOrBottomFocusLeaf( bBottom, cursorPosInDocSpace )
+				if l is not None:
+					return l
+			return None
+		else:
+			navList = self.horizontalNavigationList()
+			if navList != []:
+				closestDistance = None
+				closestNode = None
+				for item in navList:
+					bounds = item.getBoundingBox()
+					lower = item.getPointRelativeToDocument( bounds.getLower() ).x
+					upper = item.getPointRelativeToDocument( bounds.getUpper() ).x
+					if cursorPosInDocSpace.x >= lower  and  cursorPosInDocSpace.x <= upper:
+						l = item._p_getTopOrBottomFocusLeaf( bBottom, cursorPosInDocSpace )
+						if l is not None:
+							return l
+					else:
+						distance = None
+						if cursorPosInDocSpace.x < lower:
+							distance = lower - cursorPosInDocSpace.x
+						elif cursorPosInDocSpace.x > upper:
+							distance = cursorPosInDocSpace.x - upper
+						if distance is not None:
+							if closestDistance is None  or  distance < closestDistance:
+								closestDistance = distance
+								closestNode = item
+
+				if closestNode is not None:
+					l = closestNode._p_getTopOrBottomFocusLeaf( bBottom, cursorPosInDocSpace )
+					if l is not None:
+						return l
+			if self._o_isFocusTarget():
+				return self
+			else:
+				return None
+
+
+		
+		
+		
+		
+		
+		
 	
 	
 	#

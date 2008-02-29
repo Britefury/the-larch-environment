@@ -155,6 +155,18 @@ class DTWrappedLine (DTContainerSequence):
 
 
 
+	#
+	# FOCUS NAVIGATION METHODS
+	#
+	
+	def horizontalNavigationList(self):
+		return [ e.child   for e in self._childEntries ]
+
+	def verticalNavigationList(self):
+		return []
+
+	
+	
 	spacing = property( getSpacing, setSpacing )
 
 
