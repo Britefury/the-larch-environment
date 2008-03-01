@@ -5,99 +5,75 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
-from copy import copy
-import string
-
-from Britefury.DocModel.DMListInterface import DMListInterface
-
-from Britefury.GLisp.GLispInterpreter import isGLispList
+from Britefury.GLisp.PyCodeGen import PyCodeGenError, PySrc, PyVar, PyLiteral, PyListLiteral, PyGetAttr, PyGetItem, PyAssign_SideEffects, PyUnOp, PyBinOp, PyCall, PyMethodCall, PyReturn, PyIf, PyDef
 
 
 
 
-class GLispCompilerError (Exception):
+class GLispCompilerError (PyCodeGenError):
+	pass
+
+class GLispCompilerCouldNotCompileSpecial (PyCodeGenError):
+	pass
+
+class GLispCompilerVariableNameMustStartWithAt (PyCodeGenError):
 	pass
 
 
-
-
-def _compileGLispExprToPySrcAndPrecedence(x, compileSpecialExpr):
-	_binaryOperatorPrecedenceTable = {
-		'**' : 1,
-		'*' : 4,
-		'/' : 4,
-		'%' : 4,
-		'+' : 5,
-		'-' : 5,
-		'<<' : 6,
-		'>>' : 6,
-		'&' : 7,
-		'^' : 8,
-		'|' : 9,
-		'<' : 10,
-		'<=' : 10,
-		'==' : 10,
-		'!=' : 10,
-		'>=' : 10,
-		'>' : 10,
-		'is' : 11,
-		'in' : 12,
-		'and' : 14,
-		'or' : 15,
-	}
-	
-	_unaryOperatorPrecedenceTable = {
-		'~' : ( 2, False ),
-		'-' : ( 3, False ),
-		'not' : ( 13, True ),
-	}
-	
-	def compileSubExpression(sub, outerPrecedence):
-		src, innerPrecedence = _compileGLispExprToPySrcAndPrecedence( sub, compileSpecialExpr )
-		if outerPrecedence is not None  and  innerPrecedence is not None  and  outerPrecedence <=innerPrecedence:
-			return '(' + src + ')'
+def compileGLispExprToPyTree(xs, compileSpecialExpr=None):
+	if xs is None:
+		return PyLiteral( 'None', dbgSrc=xs )
+	elif isinstance( xs, str ):
+		if xs[0] == '@':
+			return PyVar( xs[1:], dbgSrc=xs )
+		elif xs[0] == '#':
+			return PyLiteral( xs[1:], dbgSrc=xs )
 		else:
-			return src
-
-	if x is None:
-		return 'None', None
-	elif isinstance( x, str ):
-		if x[0] == '@':
-			return x[1:], None
-		elif x[0] == '#':
-			return x[1:], None
-		else:
-			return '\'' + x + '\'', None
+			return PyLiteral( '\'' + xs.replace( '\'', '\\\'' ) + '\'', dbgSrc=xs )
 	else:
-		if len(x) == 0:
-			return 'None', None
-		elif x[0] == '/list':
-			return '[ %s ]'  %  ( ', '.join( [ compileSubExpression( e, None )   for e in x[1:] ] ), ), None
-		elif isinstance( x[0], str )  and  x[0][0] == '/'  and  compileSpecialExpr is not None:
-			return compileSpecialExpr( x ), None
-		elif len(x) == 1:
-			return compileSubExpression( x[0], None ), None
-		else:
-			method = x[1]
-			if method == '[]'  and  len(x) == 3:
-				return '%s[%s]'  %  ( compileSubExpression( x[0], None ), compileSubExpression( x[2], None ) ), None
-			elif method == '.'  and  len(x) == 3:
-				return '%s.%s'  %  ( compileSubExpression( x[0], None ), x[2], None ), None
-			elif method in _binaryOperatorPrecedenceTable   and   len(x) == 3:
-				precedence = _binaryOperatorPrecedenceTable[method]
-				return '%s %s %s'  %  ( compileSubExpression( x[0], precedence ), method, compileSubExpression( x[2], precedence ) ), precedence
-			elif method in _unaryOperatorPrecedenceTable   and   len(x) == 2:
-				precedence, bUseSpace = _unaryOperatorPrecedenceTable[method]
-				space = ''
-				if bUseSpace:
-					space = ' '
-				return '%s%s%s'  %  ( method, space, compileSubExpression( x[0], precedence ) ), precedence
+		if len(xs) == 0:
+			return PyLiteral( 'None', dbgSrc=xs )
+		elif xs[0] == '/list':
+			return PyListLiteral( [ _compileGLispExprToPyNode( e, compileSpecialExpr )   for e in xs[1:] ], dbgSrc=xs )
+		elif isinstance( xs[0], str )  and  xs[0][0] == '/'  and  compileSpecialExpr is not None:
+			res = compileSpecialExpr( xs )
+			if res is not None:
+				return res
 			else:
-				return '%s.%s(%s)'  %  ( compileSubExpression( x[0], None ), method, ', '.join( [ compileSubExpression( ex, None )   for ex in x[2:] ] ) ), None
+				raise GLispCompilerCouldNotCompileSpecial( xs )
+		elif len(xs) == 1:
+			return _compileGLispExprToPyNode( xs[0], compileSpecialExpr )
+		else:
+			method = xs[1]
+			if method == '.'  and  len(xs) == 3:
+				return PyGetAttr( _compileGLispExprToPyNode( xs[0], compileSpecialExpr ), xs[2], dbgSrc=xs )
+			elif method == '[]'  and  len(xs) == 3:
+				return PyGetItem( _compileGLispExprToPyNode( xs[0], compileSpecialExpr ), _compileGLispExprToPyNode( xs[2], compileSpecialExpr ), dbgSrc=xs )
+			elif method == '[:]'  and  len(xs) == 4:
+				return PyGetItem( _compileGLispExprToPyNode( xs[0], compileSpecialExpr ), _compileGLispExprToPyNode( xs[2], compileSpecialExpr ), _compileGLispExprToPyNode( xs[3], compileSpecialExpr ), dbgSrc=xs )
+			elif method in PyUnOp.operators   and   len(xs) == 2:
+				return PyUnOp( xs[1], _compileGLispExprToPyNode( xs[0], compileSpecialExpr ), dbgSrc=xs )
+			elif method in PyBinOp.operators   and   len(xs) == 3:
+				return PyBinOp( _compileGLispExprToPyNode( xs[0], compileSpecialExpr ), xs[1], _compileGLispExprToPyNode( xs[2], compileSpecialExpr ), dbgSrc=xs )
+			elif method == '-<>':
+				return PyCall( _compileGLispExprToPyNode( xs[0], compileSpecialExpr ), [ _compileGLispExprToPyNode( e, compileSpecialExpr )   for e in xs[2:] ], dbgSrc=xs )
+			else:
+				return PyMethodCall( _compileGLispExprToPyNode( xs[0], compileSpecialExpr ), xs[1], [ _compileGLispExprToPyNode( e, compileSpecialExpr )   for e in xs[2:] ], dbgSrc=xs )
 
 
-def compileGLispExprToPySrc(x, compileSpecialExpr=None):
-	return _compileGLispExprToPySrcAndPrecedence(x, compileSpecialExpr)[0]
+			
+			
+class GLispCompilerWhereStmtParamListInsufficient (PyCodeGenError):
+	pass
+
+class GLispCompilerWhereStmtInvalidBindingListType (PyCodeGenError):
+	pass
+
+class GLispCompilerWhereStmtInvalidBindingListFormat (PyCodeGenError):
+	pass
+
+class GLispCompilerWhereStmtCannotRebindVariable (PyCodeGenError):
+	pass
 
 
 
@@ -106,32 +82,32 @@ def _compileWhere(xs, compileSpecialExpr):
 	($where ((name0 value0) (name1 value1) ... (nameN valueN)) (statements_to_execute))
 	"""
 	if len( xs ) < 2:
-		raise GLispCompilerError, '$where must have have at least 1 parameter; the binding list'
+		raise GLispCompilerWhereStmtParamListInsufficient( xs )
 
 	bindings = xs[1]
 	statements = xs[2:]
 	
 	if not isGLispList( bindings ):
-		raise GLispCompilerError, '$where bindings must be a list of pairs'
+		raise GLispCompilerWhereStmtInvalidBindingListType( xs )
 	
-	pyLines = []
+	assignments = []
 	
 	boundNames = set()
 	for binding in bindings:
 		if not isGLispList( binding )  or  len( binding ) != 2:
-			raise GLispCompilerError, '$where binding must be a name value pair'
+			raise GLispCompilerWhereStmtInvalidBindingListFormat( binding )
 		
 		if binding[0][0] != '@':
-			raise GLispCompilerError, '$where binding name must start with @'
+			raise GLispCompilerVariableNameMustStartWithAt( binding[0] )
 		
 		name = binding[0][1:]
 		valueExpr = binding[1]
 		if name in boundNames:
-			raise GLispCompilerError, '$where cannot bind variable \'%d\' more than once'  %  ( binding[0], )
+			raise GLispCompilerWhereStmtCannotRebindVariable( binding )
 		
-		valueExprPySrc = compileGLispExprToPySrc( valueExpr, compileSpecialExpr )
-		
-		pyLines.append( '%s = %s'  %  ( name, valueExprPySrc ) )
+		valueExprPyTree = compileGLispExprToPyTree( valueExpr, compileSpecialExpr )
+		assignmentPyTree = PyAssign_SideEffects( PyVar( name ), valueExprPyTree, binding )
+		assignments.append( assignmentPyTree )
 		
 		boundNames.add( name )
 		
@@ -139,143 +115,81 @@ def _compileWhere(xs, compileSpecialExpr):
 		pyLines.extend( compileGLispStatementToPySrc( srcLine, compileSpecialExpr ) )
 
 	return pyLines
-
-
-
-def compileGLispStatementToPySrc(x, compileSpecialExpr=None):
-	if isGLispList( x ):
-		if len( x ) >= 1:
-			if x[0] == '$where':
-				return _compileWhere( x, compileSpecialExpr )
-				
+			
 	
-	return [ compileGLispExprToPySrc( x, compileSpecialExpr ) ]
-
-
-def compileGLispFunctionToPySrc(xs, functionName, params, compileSpecialExpr=None):
-	"""
-	Compile a GLisp function to Python source code
-	compileGLispFunctionToPySrc( xs, functionName, params, compileSpecialExpr=None )  ->  <source_text>
-	
-	Compiles the GLisp content in @xs into Python source code.
-	A function is defined. It is given the name passed in @functionName. Its parameter list is taken from @params.
-	@compileSpecialExpr can be used to customise the compilation of special expressions (start with a /).
-	"""
-	pySrcHdr = 'def %s(%s):\n'  %  ( functionName, ', '.join( params ) )
-	pyLines = []
-	for srcLine in xs:
-		pyLines.extend( compileGLispStatementToPySrc( srcLine, compileSpecialExpr ) )
-	if len( pyLines ) == 0:
-		pyLines = [ 'pass' ]
-	else:
-		pyLines[-1] = 'return ' + pyLines[-1]
-	pyLines = [ '  ' + l + '\n'   for l in pyLines ]
-	
-	return pySrcHdr + ''.join( pyLines )
-	
-
-def compileGLispFunctionToPy(xs, functionName, params, compileSpecialExpr=None, locals={}):
-	pySrc = compileGLispFunctionToPySrc( xs, functionName, params, compileSpecialExpr )
-	
-	lcl = copy( locals )
-	exec pySrc in lcl
-	return lcl[functionName]
-
-
-
-
-_pyIdentifierChars = string.ascii_letters + string.digits + '_'
-def filterIdentifierForPy(identifier):
-	return ''.join( [ c  for c in identifier   if c in _pyIdentifierChars ] )
-
 
 
 import unittest
 from Britefury.DocModel.DMIO import readSX
 
 
-class TestCase_gLisp (unittest.TestCase):
-	def testCompileGLispExprToPy_empty(self):
-		self.assert_( compileGLispExprToPySrc( readSX( '()' ) )  ==  'None' )
+class TestCase_GLispCompiler_compileGLispExprToPyNode (unittest.TestCase):
+	def _compileTest(self, srcText, expectedValue, compileSpecialExpr=None):
+		if isinstance( expectedValue, str ):
+			self.assert_( compileGLispExprToPyTree( readSX( srcText ), compileSpecialExpr ).compileAsExpr()  ==  expectedValue )
+		else:
+			self.assertRaises( expectedValue, lambda: compileGLispExprToPyTree( readSX( srcText ), compileSpecialExpr ).compileAsExpr() )
 
-	def testCompileGLispExprToPy_variable(self):
-		self.assert_( compileGLispExprToPySrc( readSX( '(@test)' ) )  ==  'test' )
+	def _printCompileTest(self, srcText, expectedValue, compileSpecialExpr=None):
+		print compileGLispExprToPyTree( readSX( srcText ), compileSpecialExpr ).compileAsExpr()
 
-	def testCompileGLispExprToPy_var_add(self):
-		self.assert_( compileGLispExprToPySrc( readSX( '(@a + @b)' ) )  ==  'a + b' )
+	def testNone(self):
+		self._compileTest( '`nil`', 'None' )
 
-	def testCompileGLispExprToPy_var_index(self):
-		self.assert_( compileGLispExprToPySrc( readSX( '(@a [] @b)' ) )  ==  'a[b]' )
+	def testVar(self):
+		self._compileTest( '@a', 'a' )
 
-	def testCompileGLispExprToPy_var_subexp(self):
-		self.assert_( compileGLispExprToPySrc( readSX( '(@a + (@b * @c))' ) )  ==  'a + b * c' )
+	def testNumLit(self):
+		self._compileTest( '#1', '1' )
 
-	def testCompileGLispExprToPy_var_func_subexp(self):
-		self.assert_( compileGLispExprToPySrc( readSX( '(@a + (@b func @c))' ) )  ==  'a + b.func(c)' )
-	
-	def testCompileGLispExprToPy_var_func_subexp_2(self):
-		self.assert_( compileGLispExprToPySrc( readSX( '(@a + (@b func @c @d (@e * @f)))' ) )  ==  'a + b.func(c, d, e * f)' )
+	def testStrLit(self):
+		self._compileTest( 'a', '\'a\'' )
 
-	def testCompileGLispExprToPy_strings(self):
-		self.assert_( compileGLispExprToPySrc( readSX( '(a + b)' ) )  ==  '\'a\' + \'b\'' )
+
+
+
+	def testEmptyList(self):
+		self._compileTest( '()', 'None' )
+
+	def testSingleElementList(self):
+		self._compileTest( '(@a)', 'a' )
+		self._compileTest( '((@a))', 'a' )
+
+	def testListLiteral(self):
+		self._compileTest( '(/list @a @b @c)', '[ a, b, c ]' )
 		
-	def testCompileGLispExprToPy_numbers(self):
-		self.assert_( compileGLispExprToPySrc( readSX( '(#1 + #2)' ) )  ==  '1 + 2' )
-		
-	def testCompileGLispExprToPy_precedence(self):
-		self.assert_( compileGLispExprToPySrc( readSX( '(@a + (@b * @c))' ) )  ==  'a + b * c' )
-		self.assert_( compileGLispExprToPySrc( readSX( '((@a + @b) * @c)' ) )  ==  '(a + b) * c' )
-		self.assert_( compileGLispExprToPySrc( readSX( '(@a + (@b + @c))' ) )  ==  'a + (b + c)' )
-		self.assert_( compileGLispExprToPySrc( readSX( '((@a + @b) + @c)' ) )  ==  '(a + b) + c' )
-		
-		
-	def testCompileGLispExprToPy_list(self):
-		self.assert_( compileGLispExprToPySrc( readSX( '(/list (@a + (@b * @c)) #1 #2 @d)' ) )  ==  '[ a + b * c, 1, 2, d ]' )
-		
+	def testCompileSpecial(self):
+		def compileSpecialExpr(xs):
+			if xs[0] == '/special':
+				return PySrc( 'special' )
+			return None
+		self._compileTest( '(/special)', 'special', compileSpecialExpr )
+		self._compileTest( '(/abc123)', GLispCompilerCouldNotCompileSpecialError, compileSpecialExpr )
 
-	def testCompileGLispFunctionToPy(self):
-		def makeFunc(src, params):
-			return compileGLispFunctionToPy( readSX( src ), 'test', params )
+	def testGetAttr(self):
+		self._compileTest( '(@a . b)', 'a.b' )
 
-		def makeFuncSrc(src, params):
-			return compileGLispFunctionToPySrc( readSX( src ), 'test', params )
+	def testGetItem(self):
+		self._compileTest( '(@a [] @b)', 'a[b]' )
+		self._compileTest( '(@a [:] @b @c) ', 'a[b:c]' )
 
-		glispSrc = '( (@a lower) ((@a upper) + (@b * @c)) )'
-		pySrc = \
-		      'def test(a, b, c):\n'  +  \
-		      '  a.lower()\n'  +  \
-		      '  return a.upper() + b * c\n'
-		self.assert_( makeFuncSrc( glispSrc, [ 'a', 'b', 'c' ] ) == pySrc )
-		self.assert_( makeFunc( glispSrc, [ 'a', 'b', 'c' ] )('x', 'y', 3)  ==  'Xyyy' )
-		
-		
-		
+	def testUnOp(self):
+		self._compileTest( '(@a -)', '-a' )
+		self._compileTest( '(@a ~)', '~a' )
+		self._compileTest( '(@a not)', 'not a' )
 
-	def testCompileGLispFunctionToPy_where(self):
-		def makeFunc(src, params):
-			return compileGLispFunctionToPy( readSX( src ), 'test', params )
+	def testBinOp(self):
+		for op in PyBinOp.operators:
+			self._compileTest( '(@a %s @b)'  %  ( op, ),   'a %s b'  %  ( op, ) )
 
-		def makeFuncSrc(src, params):
-			return compileGLispFunctionToPySrc( readSX( src ), 'test', params )
+	def testCall(self):
+		self._compileTest( '(@a -<>)', 'a()' )
+		self._compileTest( '(@a -<> @b @c)', 'a( b, c )' )
 
-		glispSrc = """
-		(
-		  ($where
-		    ( (@p (@a + @b))  (@q  (@b + @c)) )
-		  
-		    (@p * @q)
-		  )
-		)
-		"""
-		pySrc = \
-		      'def test(a, b, c):\n'  +  \
-		      '  p = a + b\n'  +  \
-		      '  q = b + c\n'  +  \
-		      '  return p * q\n'
-		
-		self.assert_( makeFuncSrc( glispSrc, [ 'a', 'b', 'c' ] ) == pySrc )
-		self.assert_( makeFunc( glispSrc, [ 'a', 'b', 'c' ] )(3, 5, 7)  ==  96 )
-		
-		
+	def testMethodCall(self):
+		self._compileTest( '(@a foo)', 'a.foo()' )
+		self._compileTest( '(@a foo @b @c)', 'a.foo( b, c )' )
+
+
 if __name__ == '__main__':
 	unittest.main()

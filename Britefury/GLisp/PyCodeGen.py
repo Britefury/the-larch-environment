@@ -153,7 +153,7 @@ class PyNode (object):
 		if type( self )  is  type( x ):
 			return self._o_compareWith( x )
 		else:
-			return False
+			return 1
 		
 	def _o_compareWith(self, x):
 		return 0
@@ -237,16 +237,20 @@ class PyGetAttr (PyNode):
 	
 
 class PyGetItem (PyNode):
-	def __init__(self, a, key, dbgSrc=None):
+	def __init__(self, a, start, end=None, dbgSrc=None):
 		super( PyGetItem, self ).__init__( dbgSrc )
 		self.a = a
-		self.key = key
+		self.start = start
+		self.end = end
 		
 	def _o_compileAsExpr(self):
-		return '%s[%s]'  %  ( self.a.compileAsExpr(), self.key.compileAsExpr() )
+		if self.end is not None:
+			return '%s[%s:%s]'  %  ( self.a.compileAsExpr(), self.start.compileAsExpr(), self.end.compileAsExpr() )
+		else:
+			return '%s[%s]'  %  ( self.a.compileAsExpr(), self.start.compileAsExpr() )
 	
 	def _o_compareWith(self, x):
-		return cmp( ( self.a, self.key ),  ( x.a, x.key ) )
+		return cmp( ( self.a, self.start, self.end ),  ( x.a, x.start, x.end ) )
 
 	
 	
@@ -267,12 +271,14 @@ class PyAssign_SideEffects (PyNode):
 	
 	
 class PyUnOp (PyNode):
-	def __init__(self, a, op, dbgSrc=None):
+	operators = _unaryOperatorPrecedenceTable.keys()
+	
+	def __init__(self, op, a, dbgSrc=None):
 		super( PyUnOp, self ).__init__( dbgSrc )
 		if op not in _unaryOperatorPrecedenceTable:
 			self.error( PyInvalidUnaryOperatorError, op )
-		self.a = a
 		self.op = op
+		self.a = a
 		
 	def _o_getPrecedence(self):
 		return _unaryOperatorPrecedenceTable[self.op][0]
@@ -291,13 +297,15 @@ class PyUnOp (PyNode):
 	
 		
 class PyBinOp (PyNode):
-	def __init__(self, a, b, op, dbgSrc=None):
+	operators = _binaryOperatorPrecedenceTable.keys()
+	
+	def __init__(self, a, op, b, dbgSrc=None):
 		super( PyBinOp, self ).__init__( dbgSrc )
 		if op not in _binaryOperatorPrecedenceTable:
 			self.error( PyInvalidBinaryOperatorError, op )
 		self.a = a
-		self.b = b
 		self.op = op
+		self.b = b
 		
 	def _o_getPrecedence(self):
 		return _binaryOperatorPrecedenceTable[self.op]
@@ -319,7 +327,10 @@ class PyCall (PyNode):
 		self.params = params
 		
 	def _o_compileAsExpr(self):
-		return '%s( %s )'  %  ( self.a.compileAsExpr(), ', '.join( [ p.compileAsExpr()   for p in self.params ] ) )
+		if len( self.params ) == 0:
+			return '%s()'  %  ( self.a.compileAsExpr(), )
+		else:
+			return '%s( %s )'  %  ( self.a.compileAsExpr(), ', '.join( [ p.compileAsExpr()   for p in self.params ] ) )
 		
 	def _o_compareWith(self, x):
 		return cmp( ( self.a, self.params ),  ( x.a, x.params ) )
@@ -337,7 +348,10 @@ class PyMethodCall (PyNode):
 		self.params = params
 		
 	def _o_compileAsExpr(self):
-		return '%s.%s( %s )'  %  ( self.a.compileAsExpr(), self.methodName, ', '.join( [ p.compileAsExpr()   for p in self.params ] ) )
+		if len( self.params ) == 0:
+			return '%s.%s()'  %  ( self.a.compileAsExpr(), self.methodName )
+		else:
+			return '%s.%s( %s )'  %  ( self.a.compileAsExpr(), self.methodName, ', '.join( [ p.compileAsExpr()   for p in self.params ] ) )
 	
 	def _o_compareWith(self, x):
 		return cmp( ( self.a, self.methodName, self.params ),  ( x.a, x.methodName, x.params ) )
@@ -396,7 +410,7 @@ class PyIf (PyNode):
 				
 
 	def _o_compareWith(self, x):
-		return -1
+		return 1
 
 
 	def _p_compileIfBlock(self, t, bElif):
@@ -445,7 +459,7 @@ class PyDef (PyNode):
 		return [ 'def %s(%s):'  %  ( self.name, ', '.join( self.argNames ) ) ]  +  _indent( stmtSrc )
 	
 	def _o_compareWith(self, x):
-		return -1
+		return 1
 
 
 
@@ -499,14 +513,14 @@ class TestCase_PyCodeGen_Node_check (unittest.TestCase):
 		
 	def test_PyUnOp(self):
 		self.assertRaises( PyInvalidUnaryOperatorError, lambda: PyUnOp( PySrc( 'a' ), '$' ) )
-		PyUnOp( PySrc( 'a' ), '-' )
-		PyUnOp( PySrc( 'a' ), '~' )
-		PyUnOp( PySrc( 'a' ), 'not' )
+		PyUnOp( '-', PySrc( 'a' ) )
+		PyUnOp( '~', PySrc( 'a' ) )
+		PyUnOp( 'not', PySrc( 'a' ) )
 		
 	def test_PyBinOp(self):
 		self.assertRaises( PyInvalidBinaryOperatorError, lambda: PyBinOp( PySrc( 'a' ), PySrc( 'b' ), '$' ) )
 		for op in _binaryOperatorPrecedenceTable.keys():
-			PyBinOp( PySrc( 'a' ), PySrc( 'b' ), op )
+			PyBinOp( PySrc( 'a' ), op, PySrc( 'b' ) )
 
 	def test_PyMethodCall(self):
 		self.assertRaises( PyInvalidMethodNameError, lambda: PyMethodCall( PySrc( 'a' ), '$', [ PySrc( 'b' ), PySrc( 'c' ) ] ) )
@@ -553,6 +567,11 @@ class TestCase_PyCodeGen_Node_cmp (unittest.TestCase):
 		self.assert_( PyGetItem( PySrc( 'a' ), PySrc( '1' ) ) ==  PyGetItem( PySrc( 'a' ), PySrc( '1' ) ) )
 		self.assert_( PyGetItem( PySrc( 'a' ), PySrc( '1' ) ) !=  PyGetItem( PySrc( 'b' ), PySrc( '1' ) ) )
 		self.assert_( PyGetItem( PySrc( 'a' ), PySrc( '1' ) ) !=  PyGetItem( PySrc( 'a' ), PySrc( '2' ) ) )
+		self.assert_( PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ) ) ==  PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ) ) )
+		self.assert_( PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ) ) !=  PyGetItem( PySrc( 'a' ), PySrc( '1' ) ) )
+		self.assert_( PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ) ) !=  PyGetItem( PySrc( 'b' ), PySrc( '1' ), PySrc( '2' ) ) )
+		self.assert_( PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ) ) !=  PyGetItem( PySrc( 'a' ), PySrc( '2' ), PySrc( '2' ) ) )
+		self.assert_( PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ) ) !=  PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '3' ) ) )
 
 	def test_PyAssign_SideEffects(self):
 		self.assert_( PyAssign_SideEffects( PySrc( 'a' ), PySrc( '1' ) ) ==  PyAssign_SideEffects( PySrc( 'a' ), PySrc( '1' ) ) )
@@ -560,17 +579,17 @@ class TestCase_PyCodeGen_Node_cmp (unittest.TestCase):
 		self.assert_( PyAssign_SideEffects( PySrc( 'a' ), PySrc( '1' ) ) !=  PyAssign_SideEffects( PySrc( 'a' ), PySrc( '2' ) ) )
 
 	def test_PyUnOp(self):
-		self.assert_( PyUnOp( PySrc( 'a' ), '-' ) ==  PyUnOp( PySrc( 'a' ), '-' ) )
-		self.assert_( PyUnOp( PySrc( 'a' ), '-' ) !=  PyUnOp( PySrc( 'b' ), '-' ) )
-		self.assert_( PyUnOp( PySrc( 'a' ), '-' ) !=  PyUnOp( PySrc( 'a' ), '~' ) )
+		self.assert_( PyUnOp( '-', PySrc( 'a' ) ) ==  PyUnOp( '-', PySrc( 'a' ) ) )
+		self.assert_( PyUnOp( '-', PySrc( 'a' ) ) !=  PyUnOp( '-', PySrc( 'b' ) ) )
+		self.assert_( PyUnOp( '-', PySrc( 'a' ) ) !=  PyUnOp( '~', PySrc( 'a' ) ) )
 
 	def test_PyBinOp(self):
 		for op in _binaryOperatorPrecedenceTable.keys():
-			self.assert_( PyBinOp( PySrc( 'a' ), PySrc( 'b' ), op )  ==  PyBinOp( PySrc( 'a' ), PySrc( 'b' ), op ) )
-		self.assert_( PyBinOp( PySrc( 'a' ), PySrc( 'b' ), '+' )  ==  PyBinOp( PySrc( 'a' ), PySrc( 'b' ), '+' ) )
-		self.assert_( PyBinOp( PySrc( 'a' ), PySrc( 'b' ), '+' )  !=  PyBinOp( PySrc( 'x' ), PySrc( 'b' ), '+' ) )
-		self.assert_( PyBinOp( PySrc( 'a' ), PySrc( 'b' ), '+' )  !=  PyBinOp( PySrc( 'a' ), PySrc( 'y' ), '+' ) )
-		self.assert_( PyBinOp( PySrc( 'a' ), PySrc( 'b' ), '+' )  !=  PyBinOp( PySrc( 'a' ), PySrc( 'b' ), '-' ) )
+			self.assert_( PyBinOp( PySrc( 'a' ), op, PySrc( 'b' ) )  ==  PyBinOp( PySrc( 'a' ), op, PySrc( 'b' ) ) )
+		self.assert_( PyBinOp( PySrc( 'a' ), '+', PySrc( 'b' ) )  ==  PyBinOp( PySrc( 'a' ), '+', PySrc( 'b' ) ) )
+		self.assert_( PyBinOp( PySrc( 'a' ), '+', PySrc( 'b' ) )  !=  PyBinOp( PySrc( 'x' ), '+', PySrc( 'b' ) ) )
+		self.assert_( PyBinOp( PySrc( 'a' ), '+', PySrc( 'b' ) )  !=  PyBinOp( PySrc( 'a' ), '+', PySrc( 'y' ) ) )
+		self.assert_( PyBinOp( PySrc( 'a' ), '+', PySrc( 'b' ) )  !=  PyBinOp( PySrc( 'a' ), '-', PySrc( 'b' ) ) )
 
 	def test_PyCall(self):
 		self.assert_( PyCall( PySrc( 'a' ), [ PySrc( 'b' ), PySrc( 'c' ) ] ) ==  PyCall( PySrc( 'a' ), [ PySrc( 'b' ), PySrc( 'c' ) ] ) )
@@ -617,24 +636,33 @@ class TestCase_PyCodeGen_Node_compile (unittest.TestCase):
 		
 	def test_PyGetItem(self):
 		self.assert_( PyGetItem( PySrc( 'a' ), PySrc( '1' ) ).compileAsExpr()  ==  'a[1]' )
+		self.assert_( PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ) ).compileAsExpr()  ==  'a[1:2]' )
 		
 	def test_PyAssign_SideEffects(self):
 		self.assert_( PyAssign_SideEffects( PySrc( 'a' ), PySrc( '1' ) ).compileAsStmt()  ==  [ 'a = 1' ] )
 
 	def test_PyUnOp(self):
-		self.assert_( PyUnOp( PySrc( 'a' ), '-' ).compileAsExpr()  ==  '-a' )
-		self.assert_( PyUnOp( PySrc( 'a' ), '~' ).compileAsExpr()  ==  '~a' )
-		self.assert_( PyUnOp( PySrc( 'a' ), 'not' ).compileAsExpr()  ==  'not a' )
+		self.assert_( PyUnOp( '-', PySrc( 'a' ) ).compileAsExpr()  ==  '-a' )
+		self.assert_( PyUnOp( '~', PySrc( 'a' ) ).compileAsExpr()  ==  '~a' )
+		self.assert_( PyUnOp( 'not', PySrc( 'a' ) ).compileAsExpr()  ==  'not a' )
 
 	def test_PyBinOp(self):
 		for op in _binaryOperatorPrecedenceTable.keys():
-			self.assert_( PyBinOp( PySrc( 'a' ), PySrc( 'b' ), op ).compileAsExpr()  ==  'a %s b'  %  ( op, ) )
+			self.assert_( PyBinOp( PySrc( 'a' ), op, PySrc( 'b' ) ).compileAsExpr()  ==  'a %s b'  %  ( op, ) )
+		
+	def test_PyBinOp_precedence(self):
+		self.assert_( PyBinOp( PySrc( 'a' ), '+', PyBinOp( PySrc( 'b' ), '+', PySrc( 'c' ) ) ).compileAsExpr()  ==  'a + (b + c)' )
+		self.assert_( PyBinOp( PyBinOp( PySrc( 'a' ), '+', PySrc( 'b' ) ), '+', PySrc( 'c' ) ).compileAsExpr()  ==  '(a + b) + c' )
+		self.assert_( PyBinOp( PySrc( 'a' ), '*', PyBinOp( PySrc( 'b' ), '+', PySrc( 'c' ) ) ).compileAsExpr()  ==  'a * (b + c)' )
+		self.assert_( PyBinOp( PyBinOp( PySrc( 'a' ), '*', PySrc( 'b' ) ), '+', PySrc( 'c' ) ).compileAsExpr()  ==  'a * b + c' )
 		
 	def test_PyCall(self):
+		self.assert_( PyCall( PySrc( 'a' ), [] ).compileAsExpr()  ==  'a()' )
 		self.assert_( PyCall( PySrc( 'a' ), [ PySrc( 'b' ), PySrc( 'c' ) ] ).compileAsExpr()  ==  'a( b, c )' )
 		self.assert_( PyCall( PySrc( 'a' ), [ PySrc( 'b' ), PySrc( 'c' ), PySrc( 'd' ) ] ).compileAsExpr()  ==  'a( b, c, d )' )
 
 	def test_PyMethodCall(self):
+		self.assert_( PyMethodCall( PySrc( 'a' ), 'b', [] ).compileAsExpr()  ==  'a.b()' )
 		self.assert_( PyMethodCall( PySrc( 'a' ), 'b', [ PySrc( 'c' ), PySrc( 'd' ) ] ).compileAsExpr()  ==  'a.b( c, d )' )
 		self.assert_( PyMethodCall( PySrc( 'a' ), 'b', [ PySrc( 'c' ), PySrc( 'd' ), PySrc( 'e' ) ] ).compileAsExpr()  ==  'a.b( c, d, e )' )
 		
@@ -686,3 +714,6 @@ class TestCase_PyCodeGen_Node_compile (unittest.TestCase):
 		self.assert_( PyDef( 'foo', [ 'a', 'b' ], [ PySrc( 'pass' ) ] ).compileAsStmt()  ==  pysrc2 )
 		self.assert_( PyDef( 'foo', [ 'a', 'b' ], [] ).compileAsStmt()  ==  pysrc2 )
 
+		
+if __name__ == '__main__':
+	unittest.main()
