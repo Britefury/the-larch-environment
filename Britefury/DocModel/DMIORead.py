@@ -20,7 +20,7 @@ Uses basic S-expressions
 lists are (...) as normal
 tokens inside are:
 	atom:   A-Z a-z 0-9 _+-*/%^&|!$@.,<>=[]~
-	null:		`null`
+	nil:		`nil`
 	quoted string
 	another list
 """
@@ -33,7 +33,7 @@ def _unquotedStringParseAction(tokens):
 	return str( tokens[0] )
 
 
-def _nullParseAction(tokens):
+def _nilParseAction(tokens):
 	return [ None ]
 
 
@@ -53,9 +53,9 @@ _unquotedStringChars = ( string.digits + string.letters + string.punctuation ).r
 
 _unquotedString = pyparsing.Word( _unquotedStringChars ).setParseAction( _unquotedStringParseAction )
 _quotedString = pyparsing.quotedString.setParseAction( _quotedStringParseAction )
-_null = pyparsing.Literal( '`null`' ).setParseAction( _nullParseAction )
+_nil = pyparsing.Literal( '`nil`' ).setParseAction( _nilParseAction )
 
-_item = _unquotedString | _quotedString | _null
+_item = _unquotedString | _quotedString | _nil
 
 _sxp = pyparsing.Forward()
 _sxList = pyparsing.Group( pyparsing.Suppress( '(' )  +  pyparsing.ZeroOrMore( _sxp )  +  pyparsing.Suppress( ')' ) ).setParseAction( _listParseAction )
@@ -94,7 +94,7 @@ class TestCase_DMIO (unittest.TestCase):
 		self._testRead( 'abc', 'abc' )
 
 	def testReadNull(self):
-		self._testRead( '`null`', None )
+		self._testRead( '`nil`', None )
 
 	def testReadQuotedString(self):
 		self._testRead( "'abc 123'", 'abc 123' )
