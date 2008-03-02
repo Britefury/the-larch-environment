@@ -255,21 +255,6 @@ class PyGetItem (PyNode):
 	
 	
 	
-class PyAssign_SideEffects (PyNode):
-	def __init__(self, target, value, dbgSrc=None):
-		super( PyAssign_SideEffects, self ).__init__( dbgSrc )
-		self.target = target
-		self.value =value
-		
-	def compileAsStmt(self):
-		return [ '%s = %s'  %  ( self.target.compileAsExpr(), self.value.compileAsExpr() ) ]
-	
-	def _o_compareWith(self, x):
-		return cmp( ( self.target, self.value ),  ( x.target, x.value ) )
-
-	
-	
-	
 class PyUnOp (PyNode):
 	operators = _unaryOperatorPrecedenceTable.keys()
 	
@@ -462,6 +447,35 @@ class PyDef (PyNode):
 		return 1
 
 
+	
+	
+	
+class PyAssign_SideEffects (PyNode):
+	def __init__(self, target, value, dbgSrc=None):
+		super( PyAssign_SideEffects, self ).__init__( dbgSrc )
+		self.target = target
+		self.value =value
+		
+	def compileAsStmt(self):
+		return [ '%s = %s'  %  ( self.target.compileAsExpr(), self.value.compileAsExpr() ) ]
+	
+	def _o_compareWith(self, x):
+		return cmp( ( self.target, self.value ),  ( x.target, x.value ) )
+
+	
+	
+	
+class PyDel_SideEffects (PyNode):
+	def __init__(self, target, dbgSrc=None):
+		super( PyDel_SideEffects, self ).__init__( dbgSrc )
+		self.target = target
+		
+	def compileAsStmt(self):
+		return [ 'del %s'  %  ( self.target.compileAsExpr(), ) ]
+	
+	def _o_compareWith(self, x):
+		return cmp( self.target, x.target )
+
 
 
 	
@@ -573,11 +587,6 @@ class TestCase_PyCodeGen_Node_cmp (unittest.TestCase):
 		self.assert_( PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ) ) !=  PyGetItem( PySrc( 'a' ), PySrc( '2' ), PySrc( '2' ) ) )
 		self.assert_( PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ) ) !=  PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '3' ) ) )
 
-	def test_PyAssign_SideEffects(self):
-		self.assert_( PyAssign_SideEffects( PySrc( 'a' ), PySrc( '1' ) ) ==  PyAssign_SideEffects( PySrc( 'a' ), PySrc( '1' ) ) )
-		self.assert_( PyAssign_SideEffects( PySrc( 'a' ), PySrc( '1' ) ) !=  PyAssign_SideEffects( PySrc( 'b' ), PySrc( '1' ) ) )
-		self.assert_( PyAssign_SideEffects( PySrc( 'a' ), PySrc( '1' ) ) !=  PyAssign_SideEffects( PySrc( 'a' ), PySrc( '2' ) ) )
-
 	def test_PyUnOp(self):
 		self.assert_( PyUnOp( '-', PySrc( 'a' ) ) ==  PyUnOp( '-', PySrc( 'a' ) ) )
 		self.assert_( PyUnOp( '-', PySrc( 'a' ) ) !=  PyUnOp( '-', PySrc( 'b' ) ) )
@@ -616,6 +625,15 @@ class TestCase_PyCodeGen_Node_cmp (unittest.TestCase):
 	def test_PyDef(self):
 		self.assert_( PyDef( 'foo', [ 'a', 'b' ], [] )  !=  PyDef( 'foo', [ 'a', 'b' ], [] ) )
 
+	def test_PyAssign_SideEffects(self):
+		self.assert_( PyAssign_SideEffects( PySrc( 'a' ), PySrc( '1' ) ) ==  PyAssign_SideEffects( PySrc( 'a' ), PySrc( '1' ) ) )
+		self.assert_( PyAssign_SideEffects( PySrc( 'a' ), PySrc( '1' ) ) !=  PyAssign_SideEffects( PySrc( 'b' ), PySrc( '1' ) ) )
+		self.assert_( PyAssign_SideEffects( PySrc( 'a' ), PySrc( '1' ) ) !=  PyAssign_SideEffects( PySrc( 'a' ), PySrc( '2' ) ) )
+
+	def test_PyDel_SideEffects(self):
+		self.assert_( PyDel_SideEffects( PySrc( 'a' ) ) ==  PyDel_SideEffects( PySrc( 'a' ) ) )
+		self.assert_( PyDel_SideEffects( PySrc( 'a' ) ) !=  PyDel_SideEffects( PySrc( 'b' ) ) )
+
 
 		
 class TestCase_PyCodeGen_Node_compile (unittest.TestCase):
@@ -638,9 +656,6 @@ class TestCase_PyCodeGen_Node_compile (unittest.TestCase):
 		self.assert_( PyGetItem( PySrc( 'a' ), PySrc( '1' ) ).compileAsExpr()  ==  'a[1]' )
 		self.assert_( PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ) ).compileAsExpr()  ==  'a[1:2]' )
 		
-	def test_PyAssign_SideEffects(self):
-		self.assert_( PyAssign_SideEffects( PySrc( 'a' ), PySrc( '1' ) ).compileAsStmt()  ==  [ 'a = 1' ] )
-
 	def test_PyUnOp(self):
 		self.assert_( PyUnOp( '-', PySrc( 'a' ) ).compileAsExpr()  ==  '-a' )
 		self.assert_( PyUnOp( '~', PySrc( 'a' ) ).compileAsExpr()  ==  '~a' )
@@ -714,6 +729,15 @@ class TestCase_PyCodeGen_Node_compile (unittest.TestCase):
 		self.assert_( PyDef( 'foo', [ 'a', 'b' ], [ PySrc( 'pass' ) ] ).compileAsStmt()  ==  pysrc2 )
 		self.assert_( PyDef( 'foo', [ 'a', 'b' ], [] ).compileAsStmt()  ==  pysrc2 )
 
+	def test_PyAssign_SideEffects(self):
+		self.assert_( PyAssign_SideEffects( PySrc( 'a' ), PySrc( '1' ) ).compileAsStmt()  ==  [ 'a = 1' ] )
+
+	def test_PyDel_SideEffects(self):
+		self.assert_( PyDel_SideEffects( PySrc( 'a' ) ).compileAsStmt()  ==  [ 'del a' ] )
+
+
+		
+		
 		
 if __name__ == '__main__':
 	unittest.main()
