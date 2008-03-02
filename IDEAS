@@ -1,0 +1,18 @@
+gSym ideas log:
+	
+	
+Current plans:
+	
+ML style pattern matching for compilation and viewing.
+Currently in separate phases.
+Live documents.
+
+
+
+
+Future plans:
+
+02/Mar/2008
+Discovered the STEPS project, run by Alan Kay.
+Looking into OMeta; the meta-language that combines pattern matching with object-orientation
+with a view to describing languages.
