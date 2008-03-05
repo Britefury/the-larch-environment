@@ -16,3 +16,27 @@ Future plans:
 Discovered the STEPS project, run by Alan Kay.
 Looking into OMeta; the meta-language that combines pattern matching with object-orientation
 with a view to describing languages.
+
+
+03/Mar/2008
+The following Photoshop tutorial contains information on creating a Vista-inspired menu.
+http://psdtuts.com/interface-tutorials/how-to-create-a-stunning-vista-inspired-menu/
+And the same in SVG:
+http://my.opera.com/MacDev_ed/blog/2008/02/05/how-to-do-photoshop-like-effects-in-svg
+
+
+05/Mar/2008
+Considering how to edit a gSym structured document.
+Realised a possible link with Geoffrey Bantle's Blender Mesh system;
+his system uses primitive/atomic mesh edit operations;
+- make vertex, destroy vertex
+  make edge, destroy edge, split edge create vertex, merge edges destroy vertex
+  make face, destroy face, split face create edge, merge faces destroy edge
+A similar system of atomic edits to lists could help in gSym:
+- add child x
+- remove child x
+- replace child x with y
+- split list
+- merge lists
+- insert range i:j
+- remove range i:j
