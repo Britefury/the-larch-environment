@@ -76,9 +76,12 @@ def _compileExpressionListToPyTreeStatements(expressions, context, bNeedResult, 
 	if bNeedResult  and  len( expressions ) > 0:
 		initialExpressions = expressions[:-1]
 		lastExpression = expressions[-1]
+		bHasLastExpression = True
 	else:
 		initialExpressions = expressions
 		lastExpression = None
+		bHasLastExpression = False
+		
 		
 	trees = []
 	wrappedResultTree = None
@@ -88,7 +91,7 @@ def _compileExpressionListToPyTreeStatements(expressions, context, bNeedResult, 
 		trees.extend( exprContext.body )
 		if exprTree is not None:
 			trees.append( exprTree )
-	if lastExpression is not None:
+	if bHasLastExpression:
 		exprContext = context.innerContext()
 		wrappedResultTree = buildResultHandlerTreeNode( _compileGLispExprToPyTree( lastExpression, exprContext, True, compileSpecial ), lastExpression )
 		trees.extend( exprContext.body )
@@ -265,7 +268,7 @@ def _compileIf(xs, context, bNeedResult=False, compileSpecial=None):
 		codePyTrees, wrappedResultTree = _compileExpressionListToPyTreeStatements( codeXs, context, bNeedResult, compileSpecial, lambda t, x: PyAssign_SideEffects( PyVar( resultVarName, dbgSrc=x ), t, dbgSrc=x ) )
 		
 		if wrappedResultTree is None  and  bNeedResult:
-			codePyTrees.append( PyAssign_SideEffects( PyVar( resultVarName, dbgSrc=conditionAndCodeXs ), PyLiteral( 'None' ), dbgSrc=conditionAndCodeXs ) )
+			codePyTrees.append( PyAssign_SideEffects( PyVar( resultVarName, dbgSrc=conditionAndCodeXs ), PyLiteral( 'None', dbgSrc=conditionAndCodeXs ), dbgSrc=conditionAndCodeXs ) )
 			
 		return conditionPyTree, codePyTrees
 		
@@ -275,7 +278,7 @@ def _compileIf(xs, context, bNeedResult=False, compileSpecial=None):
 		codePyTrees, wrappedResultTree = _compileExpressionListToPyTreeStatements( codeXs, context, bNeedResult, compileSpecial, lambda t, x: PyAssign_SideEffects( PyVar( resultVarName, dbgSrc=x ), t, dbgSrc=x ) )
 		
 		if wrappedResultTree is None  and  bNeedResult:
-			codePyTrees.append( PyAssign_SideEffects( PyVar( resultVarName, dbgSrc=elseCodeXs ), PyLiteral( 'None' ), dbgSrc=elseCodeXs ) )
+			codePyTrees.append( PyAssign_SideEffects( PyVar( resultVarName, dbgSrc=elseCodeXs ), PyLiteral( 'None', dbgSrc=elseCodeXs ), dbgSrc=elseCodeXs ) )
 
 		return codePyTrees
 
@@ -284,6 +287,8 @@ def _compileIf(xs, context, bNeedResult=False, compileSpecial=None):
 	elseSpecs = None
 	if elseXs is not None:
 		elseSpecs = _elseCodeXsToPyTree( elseXs )
+	else:
+		context.body.append( PyAssign_SideEffects( PyVar( resultVarName, dbgSrc=xs ), PyLiteral( 'None', dbgSrc=xs ), dbgSrc=xs ) )
 	context.body.append( PyIf( ifElifSpecs, elseSpecs, dbgSrc=xs ) )
 	
 	if bNeedResult:
@@ -450,6 +455,44 @@ def compileGLispExprToPySrc(xs, compileSpecial=None):
 
 
 
+def compileGLispExprToPyFunctionPyTree(functionName, argNames, xs, compileSpecial=None):
+	"""
+	compileGLispExprToPyFunctionPyTree( functionName, argNames, xs, compileSpecial=None )  ->  PyTree
+	
+	Compile the expression @xs into a PyTree that represents a function that returns the result of @xs.
+	   @functionName - the name of the function that will be defined
+	   @argNames - the names of the function arguments
+	   @xs - the GLisp source
+	   @compileSpecial - function( xs, compileSpecial )  ->  PyNode tree
+	      A function used to compile special expressions
+	      A special expression is an expression where the first element of the GLisp node is a string starting with '/'
+	         @xs is the GLisp tree to be compiled by compileSpecial
+		 @compileSpecial is the value passed to _compileGLispExprToPyTree
+	"""
+	context = _CompilationContext( _PyScope() )
+	
+	fnBodyPyTrees, wrappedResultTree = _compileExpressionListToPyTreeStatements( [ xs ], context, True, compileSpecial, lambda t, x: PyReturn( t, dbgSrc=x ) )
+	
+	return PyDef( functionName, argNames, fnBodyPyTrees, dbgSrc=xs )
+
+
+
+def compileGLispExprToPyFunctionSrc(functionName, argNames, xs, compileSpecial=None):
+	"""
+	compileGLispExprToPyFunctionSrc( functionName, argNames, xs, compileSpecial=None )  ->  python source
+	
+	Compile the expression @xs into python source code that describes a function that returns the result of @xs.
+	   @functionName - the name of the function that will be defined
+	   @argNames - the names of the function arguments
+	   @xs - the GLisp source
+	   @compileSpecial - function( xs, compileSpecial )  ->  PyNode tree
+	      A function used to compile special expressions
+	      A special expression is an expression where the first element of the GLisp node is a string starting with '/'
+	         @xs is the GLisp tree to be compiled by compileSpecial
+		 @compileSpecial is the value passed to _compileGLispExprToPyTree
+	"""
+	tree = compileGLispExprToPyFunctionPyTree( functionName, argNames, xs, compileSpecial )
+	return '\n'.join( tree.compileAsStmt() )  +  '\n'
 
 
 
@@ -469,6 +512,20 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 			self.assert_( compileGLispExprToPySrc( readSX( srcText ), compileSpecial ) ==  expectedValue )
 		else:
 			self.assertRaises( expectedValue, lambda: compileGLispExprToPySrc( readSX( srcText ), compileSpecial ) )
+			
+	def _evalTest(self, srcText, expectedResult, argValuePairs=[], compileSpecial=None):
+		argNames = [ p[0]   for p in argValuePairs ]
+		argValues = [ p[1]   for p in argValuePairs ]
+		src = compileGLispExprToPyFunctionSrc( 'test', argNames, readSX( srcText ), compileSpecial )
+		lcls = {}
+		exec src in lcls
+		result = lcls['test']( *argValues )
+		if result != expectedResult:
+			print 'RESULT = ', result
+			print 'EXPECTED RESULT = ', expectedResult
+			print 'SOURCE'
+			print src
+		self.assert_( result == expectedResult )
 
 	def _printCompileTest(self, srcText, expectedValue, compileSpecialExpr=None):
 		if isinstance( expectedValue, list ):
@@ -493,16 +550,20 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 
 	def testNone(self):
 		self._compileTest( '`nil`', 'None' )
+		self._evalTest( '`nil`', None )
 
 	def testVar(self):
 		self._compileTest( '@a', 'a' )
+		self._evalTest( '@a', 2, [ ( 'a', 2 ) ] )
 
 	def testNumLit(self):
 		self._compileTest( '#1', '1' )
+		self._evalTest( '#1', 1 )
 
 	def testStrLit(self):
 		self._compileTest( 'a', '\'a\'' )
 		self._compileTest( '1', '\'1\'' )
+		self._evalTest( 'a', 'a' )
 
 
 
@@ -510,13 +571,16 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 
 	def testEmptyList(self):
 		self._compileTest( '()', 'None' )
+		self._evalTest( '()', None )
 
 	def testSingleElementList(self):
 		self._compileTest( '(@a)', 'a' )
 		self._compileTest( '((@a))', 'a' )
+		self._evalTest( '(#1)', 1 )
 
 	def testListLiteral(self):
 		self._compileTest( '($list @a @b @c)', '[ a, b, c ]' )
+		self._evalTest( '($list #1 #2 #3)', [ 1, 2, 3 ] )
 		
 	def testCompileSpecial(self):
 		def compileSpecialExpr(xs, compileSpecial):
@@ -525,30 +589,45 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 			return None
 		self._compileTest( '($special)', 'special', compileSpecialExpr )
 		self._compileTest( '($abc123)', GLispCompilerCouldNotCompileSpecial, compileSpecialExpr )
+		self._evalTest( '($special)', 123, [ ( 'special', 123 ) ], compileSpecialExpr )
 
 	def testGetAttr(self):
+		class _C (object):
+			def __init__(self, b):
+				self.b = b
 		self._compileTest( '(@a . b)', 'a.b' )
+		self._evalTest( '(@a . b)', 123, [ ( 'a', _C( 123 ) ) ] )
 
 	def testGetItem(self):
 		self._compileTest( '(@a [] @b)', 'a[b]' )
 		self._compileTest( '(@a [:] @b @c) ', 'a[b:c]' )
+		self._evalTest( '(@a [] #5)', 5, [ ( 'a', range(0,10) ) ] )
+		self._evalTest( '(@a [:] #1 #5)', range(1,5), [ ( 'a', range(0,10) ) ] )
 
 	def testUnOp(self):
 		self._compileTest( '(@a -)', '-a' )
 		self._compileTest( '(@a ~)', '~a' )
 		self._compileTest( '(@a not)', 'not a' )
+		self._evalTest( '(#5 -)', -5 )
+		self._evalTest( '(#5 ~)', -6 )
+		self._evalTest( '(#True not)', False )
 
 	def testBinOp(self):
 		for op in PyBinOp.operators:
 			self._compileTest( '(@a %s @b)'  %  ( op, ),   'a %s b'  %  ( op, ) )
+		self._evalTest( '(#7 * #5)', 35 )
 
 	def testCall(self):
+		def _f(x):
+			return x + 3
 		self._compileTest( '(@a <->)', 'a()' )
 		self._compileTest( '(@a <-> @b @c)', 'a( b, c )' )
+		self._evalTest( '(@f <-> #5)', 8, [ ( 'f', _f ) ] )
 
 	def testMethodCall(self):
 		self._compileTest( '(@a foo)', 'a.foo()' )
 		self._compileTest( '(@a foo @b @c)', 'a.foo( b, c )' )
+		self._evalTest( '(f upper)', 'F' )
 
 
 	def test_Where(self):
@@ -629,6 +708,9 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 		self._compileTest( '($where   (  (@a #1) (@b    ($where ( (@x abc) (@y def) )   (@x + @y)   )  )   )   (@a + #1) (@b split) )', pysrc3 )
 		self._compileTest( '($where   (  (@a #1) (@b test)  )   )', pysrc4 )
 		self._compileTest( '(@x + ($where   (  (@a #1) (@b #2)  )   (@a + @b)))', pysrc5 )
+		self._evalTest( '($where   (  (@a hi) (@b there)  )   @a )', 'hi' )
+		self._evalTest( '($where   (  (@a hi) (@b there)  )   @b )', 'there' )
+		self._evalTest( '($where   (  (@a hi) (@b there)  )   ((@a + @b) upper))', 'HITHERE' )
 
 
 		
@@ -636,6 +718,7 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 		
 	def test_If(self):
 		pysrc1 = [
+			'__gsym__temp_0 = None',
 			'if a == \'Hi\':',
 			'  __gsym__temp_0 = a.split()',
 			'__gsym__temp_0',
@@ -650,6 +733,7 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 		]
 		
 		pysrc3 = [
+			'__gsym__temp_0 = None',
 			'if a == \'Hi\':',
 			'  __gsym__temp_0 = a.split()',
 			'elif b == \'There\':',
@@ -671,6 +755,9 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 		self._compileTest( '($if   ( (@a == Hi)  (@a split) )   ( $else (@c split) )  )', pysrc2 )
 		self._compileTest( '($if   ( (@a == Hi)  (@a split) )   ( (@b == There) (@b split) )  )', pysrc3 )
 		self._compileTest( '($if   ( (@a == Hi)  (@a split) )   ( (@b == There) (@b split) )   ( $else (@c split) )  )', pysrc4 )
+		self._printCompileTest( '($if   ( (@a == #1)  hi)   ( (@a == #2) there) )', 'hi' )
+		self._evalTest( '($if   ( (@a == #1)  hi)   ( (@a == #2) there) )', 'hi', [ ( 'a', 1 ) ] )
+		self._evalTest( '($if   ( (@a == #1)  hi)   ( (@a == #2) there) )', None, [ ( 'a', 4 ) ] )
 
 	
 	def test_Lambda(self):
@@ -683,6 +770,7 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 
 		
 		self._compileTest( '($lambda   (@x @y @z)  (@x split) (@x + (@y + @z))  )', pysrc1 )
+		self._evalTest( '( ($lambda   (@x @y @z)  (@x + (@y + @z))  ) <-> @a @b @c)', 6, [ ( 'a', 1 ), ( 'b', 2 ), ( 'c', 3 ) ] )
 
 	
 	def test_Where_If_Lambda(self):
@@ -713,6 +801,7 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 		pysrc1 = [
 			'a = 1',
 			'b = 23',
+			'__gsym__temp_0 = None',
 			'if q == 1:',
 			'  __gsym__temp_0 = 5',
 			'elif q == 2:',
