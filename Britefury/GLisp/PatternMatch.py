@@ -10,6 +10,7 @@ from Britefury.Kernel.Abstract import abstractmethod
 
 from Britefury.DocModel.DMListInterface import DMListInterface
 from Britefury.GLisp.GLispInterpreter import isGLispList
+from Britefury.GLisp.PyCodeGen import PyCodeGenError, PySrc, PyVar, PyLiteral, PyListLiteral, PyGetAttr, PyGetItem, PyUnOp, PyBinOp, PyCall, PyMethodCall, PyReturn, PyIf, PySimpleIf, PyDef, PyAssign_SideEffects, PyDel_SideEffects
 
 
 _stringType = str
@@ -22,54 +23,34 @@ class NoMatchError (Exception):
 	pass
 
 
-def _indent(src):
-	return [ '  ' + s   for s in src ]
-
-def _indentN(src, n):
-	return [ '  ' * n  +  s   for s in src ]
-
-
-
-
-class _SrcBuilder (object):
-	def __init__(self):
-		self.src = []
-		self._indentation = 0
-		
-		
-	def append(self, line):
-		self.src.append( '  ' * self._indentation  +  line )
-	
-	def extend(self, src):
-		self.src.extend( [ '  ' * self._indentation  +  s   for s in src ] )
-	
-	def condition(self, conditionExprSrc):
-		self.append( 'if %s:'  %  ( conditionExprSrc, ) )
-		self._indentation += 1
-
 
 class  _MatchNode (object):
-	def __init__(self):
+	def __init__(self, srcXs):
 		super( _MatchNode, self ).__init__()
 		self.bindName = None
+		self.srcXs = srcXs
 		
 		
 	@abstractmethod
-	def emitSourceVarNamesAndBindings(self, src, valueSrc, valueIndirection, varNameToValueIndirection, bindings):
+	def emitSourceVarNamesAndBindings(self, outerTreeFactory, valueSrc, valueIndirection, varNameToValueIndirection, bindings):
 		pass
 	
-	def handleBinding(self, src, valueSrc, valueIndirection, varNameToValueIndirection, bindings):
+	def handleBinding(self, outerTreeFactory, valueSrc, valueIndirection, varNameToValueIndirection, bindings):
 		if self.bindName is not None:
 			varNameToValueIndirection.setdefault( self.bindName, valueIndirection )
 			if self.bindName in bindings:
-				src.condition( '%s == %s'  %  ( valueSrc, bindings[self.bindName] ) )
+				return self._p_conditionWrap( outerTreeFactory, '%s == %s'  %  ( valueSrc, bindings[self.bindName] ) )
 			else:
 				bindings[self.bindName] = valueSrc
-		return []
+				return outerTreeFactory
+		return outerTreeFactory
 	
 	def _p_emitMatchFailed(self):
 		return [ 'raise NoMatchError' ]
 	
+	
+	def _p_conditionWrap(self, outerTreeFactory, conditionSrc):
+		return lambda innerTree: outerTreeFactory( PySimpleIf( PySrc( conditionSrc ), [ innerTree ], dbgSrc=self.srcXs ) )
 		
 		
 		
@@ -77,36 +58,36 @@ class  _MatchNode (object):
 
 
 class _MatchAnything (_MatchNode):
-	def emitSourceVarNamesAndBindings(self, src, valueSrc, valueIndirection, varNameToValueIndirection, bindings):
-		self.handleBinding( src, valueSrc, valueIndirection, varNameToValueIndirection, bindings )
+	def emitSourceVarNamesAndBindings(self, outerTreeFactory, valueSrc, valueIndirection, varNameToValueIndirection, bindings):
+		return self.handleBinding( outerTreeFactory, valueSrc, valueIndirection, varNameToValueIndirection, bindings )
 	
 
 class _MatchTerminal (_MatchNode):
-	def emitSourceVarNamesAndBindings(self, src, valueSrc, valueIndirection, varNameToValueIndirection, bindings):
-		src.condition( 'not __isGLispList__( %s )'  %  ( valueSrc, ) )
-		self.handleBinding( src, valueSrc, valueIndirection, varNameToValueIndirection, bindings )
+	def emitSourceVarNamesAndBindings(self, outerTreeFactory, valueSrc, valueIndirection, varNameToValueIndirection, bindings):
+		conditionTreeFactory = self._p_conditionWrap( outerTreeFactory, 'not __isGLispList__( %s )'  %  ( valueSrc, ) )
+		return self.handleBinding( conditionTreeFactory, valueSrc, valueIndirection, varNameToValueIndirection, bindings )
 	
 
 
 class _MatchNonTerminal (_MatchNode):
-	def emitSourceVarNamesAndBindings(self, src, valueSrc, valueIndirection, varNameToValueIndirection, bindings):
-		src.condition( '__isGLispList__( %s )'  %  ( valueSrc, ) )
-		self.handleBinding( src, valueSrc, valueIndirection, varNameToValueIndirection, bindings )
+	def emitSourceVarNamesAndBindings(self, outerTreeFactory, valueSrc, valueIndirection, varNameToValueIndirection, bindings):
+		conditionTreeFactory = self._p_conditionWrap( outerTreeFactory, '__isGLispList__( %s )'  %  ( valueSrc, ) )
+		return self.handleBinding( conditionTreeFactory, valueSrc, valueIndirection, varNameToValueIndirection, bindings )
 
 	
 class _MatchConstant (_MatchNode):
-	def __init__(self, constant):
-		super( _MatchConstant, self ).__init__()
+	def __init__(self, constant, srcXs):
+		super( _MatchConstant, self ).__init__( srcXs=srcXs )
 		self._constant = constant
 
-	def emitSourceVarNamesAndBindings(self, src, valueSrc, valueIndirection, varNameToValueIndirection, bindings):
-		src.condition( '%s == \'%s\''  %  ( valueSrc, self._constant ))
-		self.handleBinding( src, valueSrc, valueIndirection, varNameToValueIndirection, bindings )
+	def emitSourceVarNamesAndBindings(self, outerTreeFactory, valueSrc, valueIndirection, varNameToValueIndirection, bindings):
+		conditionTreeFactory = self._p_conditionWrap( outerTreeFactory, '%s == \'%s\''  %  ( valueSrc, self._constant ) )
+		return self.handleBinding( conditionTreeFactory, valueSrc, valueIndirection, varNameToValueIndirection, bindings )
 
 
 class _MatchList (_MatchNode):
-	def __init__(self, subMatches):
-		super( _MatchList, self ).__init__()
+	def __init__(self, subMatches, srcXs):
+		super( _MatchList, self ).__init__( srcXs=srcXs )
 		internalIndex = None
 		for i, m in enumerate( subMatches ):
 			if isinstance( m, _MatchSublist ):
@@ -132,56 +113,60 @@ class _MatchList (_MatchNode):
 		else:
 			self._minLength = self._maxLength = len( self._front )
 		
-	def emitSourceVarNamesAndBindings(self, src, valueSrc, valueIndirection, varNameToValueIndirection, bindings):
-		# Check the lengths
-		src.condition( '__isGLispList__( %s )'  %  ( valueSrc, ) )
+	def emitSourceVarNamesAndBindings(self, outerTreeFactory, valueSrc, valueIndirection, varNameToValueIndirection, bindings):
+		treeFac = outerTreeFactory
+		# Check type
+		treeFac = self._p_conditionWrap( treeFac, '__isGLispList__( %s )'  %  ( valueSrc, ) )
 
+		# Check the lengths
 		if self._minLength == self._maxLength:
 			# min and max length the same; only one length permissable
-			src.condition( 'len( %s )  ==  %d'  %  ( valueSrc, self._minLength ) )
+			treeFac = self._p_conditionWrap( treeFac, 'len( %s )  ==  %d'  %  ( valueSrc, self._minLength ) )
 		elif self._minLength == 0  and  self._maxLength is not None:
 			# no min length, a max length
-			src.condition( 'len( %s )  <=  %d'  %  ( valueSrc, self._maxLength ) )
+			treeFac = self._p_conditionWrap( treeFac, 'len( %s )  <=  %d'  %  ( valueSrc, self._maxLength ) )
 		elif self._minLength > 0:
 			# there is a min length
 			if self._maxLength is None:
 				# no max length
-				src.condition( 'len( %s )  >=  %d'  %  ( valueSrc, self._minLength ) )
+				treeFac = self._p_conditionWrap( treeFac, 'len( %s )  >=  %d'  %  ( valueSrc, self._minLength ) )
 			else:
 				# max length
-				src.condition( 'len( %s )  >=  %d   and   len( %s )  <=  %d'  %  ( valueSrc, self._minLength, valueSrc, self._maxLength ) )
+				treeFac = self._p_conditionWrap( treeFac, 'len( %s )  >=  %d   and   len( %s )  <=  %d'  %  ( valueSrc, self._minLength, valueSrc, self._maxLength ) )
 				
 		#matchItem*  (front)
 		for i, item in enumerate( self._front ):
 			itemNameSrc = '%s[%d]'  %  ( valueSrc, i )
-			item.emitSourceVarNamesAndBindings( src, itemNameSrc, valueIndirection + [ i ], varNameToValueIndirection, bindings )
+			treeFac = item.emitSourceVarNamesAndBindings( treeFac, itemNameSrc, valueIndirection + [ i ], varNameToValueIndirection, bindings )
 					
 		#matchItem*  (back)
 		for i, item in enumerate( reversed( self._back ) ):
 			itemNameSrc = '%s[-%d]'  %  ( valueSrc, i + 1 )
-			item.emitSourceVarNamesAndBindings( src, itemNameSrc, valueIndirection + [ -(i+1) ], varNameToValueIndirection, bindings )
+			treeFac = item.emitSourceVarNamesAndBindings( treeFac, itemNameSrc, valueIndirection + [ -(i+1) ], varNameToValueIndirection, bindings )
 			
+		#internal sublist
 		if self._internal is not None:
 			start = len( self._front )
 			end = len( self._back )
 			if end  > 0:
-				self._internal.emitSourceVarNamesAndBindings( src, '%s[%d:%d]'  %  ( valueSrc, start, -end ), valueIndirection + [ (start,-end) ], varNameToValueIndirection, bindings )
+				treeFac = self._internal.emitSourceVarNamesAndBindings( treeFac, '%s[%d:%d]'  %  ( valueSrc, start, -end ), valueIndirection + [ (start,-end) ], varNameToValueIndirection, bindings )
 			else:
-				self._internal.emitSourceVarNamesAndBindings( src, '%s[%d:]'  %  ( valueSrc, start ), valueIndirection + [ (start,None) ], varNameToValueIndirection, bindings )
+				treeFac = self._internal.emitSourceVarNamesAndBindings( treeFac, '%s[%d:]'  %  ( valueSrc, start ), valueIndirection + [ (start,None) ], varNameToValueIndirection, bindings )
 		
-		self.handleBinding( src, valueSrc, valueIndirection, varNameToValueIndirection, bindings )
+		#binding
+		treeFac = self.handleBinding( treeFac, valueSrc, valueIndirection, varNameToValueIndirection, bindings )
 		
-		return src
+		return treeFac
 
 	
 class _MatchSublist (_MatchNode):
-	def __init__(self, min=0, max=None):
-		super( _MatchSublist, self ).__init__()
+	def __init__(self, min, max, srcXs):
+		super( _MatchSublist, self ).__init__( srcXs=srcXs )
 		self.min = min
 		self.max = max
 		
-	def emitSourceVarNamesAndBindings(self, src, valueSrc, valueIndirection, varNameToValueIndirection, bindings):
-		self.handleBinding( src, valueSrc, valueIndirection, varNameToValueIndirection, bindings )
+	def emitSourceVarNamesAndBindings(self, outerTreeFactory, valueSrc, valueIndirection, varNameToValueIndirection, bindings):
+		return self.handleBinding( outerTreeFactory, valueSrc, valueIndirection, varNameToValueIndirection, bindings )
 		
 	
 
@@ -190,7 +175,7 @@ class _MatchSublist (_MatchNode):
 		
 def _buildMatchNodeForMatchList(xs):
 	# matchItem*
-	return _MatchList( [ _buildMatchNodeForMatchItem( x, True )   for x in xs ] )
+	return _MatchList( [ _buildMatchNodeForMatchItem( x, True )   for x in xs ], srcXs=xs )
 
 
 
@@ -211,30 +196,30 @@ def _buildMatchNodeForMatchItem(xs, bInsideList=False):
 				raise ValueError, 'match expressions: list interior range expression must take the form (- <#min> <#max>)'
 			if xs[1][0] != '#'  or  xs[2][0] != '#':
 				raise ValueError, 'match expressions: list interior range numbers must start with #'
-			return _MatchSublist( int( xs[1][1:] ), int( xs[2][1:] ) )
+			return _MatchSublist( int( xs[1][1:] ), int( xs[2][1:] ), srcXs=xs )
 		else:
 			match = _buildMatchNodeForMatchList( xs )
 		return match
 	else:
 		if xs == '^':
 			# match anything
-			return _MatchAnything()
+			return _MatchAnything( srcXs=xs )
 		elif xs == '!':
 			# match any terminal
-			return _MatchTerminal()
+			return _MatchTerminal( srcXs=xs )
 		elif xs == '/':
 			# match any non-terminal
-			return _MatchNonTerminal()
+			return _MatchNonTerminal( srcXs=xs )
 		elif xs == '+'  and  bInsideList:
 			# sub-list +
-			return _MatchSublist( 1, None )
+			return _MatchSublist( 1, None, srcXs=xs )
 		elif xs == '*'  and  bInsideList:
 			# sub-list *
-			return _MatchSublist( 0, None )
+			return _MatchSublist( 0, None, srcXs=xs )
 		else:
 			# match a constant
 			constant = xs.replace( '!!', '!' ).replace( '^^', '^' ).replace( '//', '/' ).replace( '++', '+' ).replace( '**', '*' ).replace( '--', '-' ).replace( '::', ':' )
-			return _MatchConstant( constant )
+			return _MatchConstant( constant, srcXs=xs )
 
 
 		
@@ -298,34 +283,34 @@ def compileMatchExpression(xs, exprIndirection=[], functionName='match', bSrc=Fa
 			((:: !! -- // ++ **))  =>  matches (: ! - / + *)
 	"""
 	
-	pySrcHdr = 'def %s(xs):\n'  %  ( functionName, )
-	
 	if not isGLispList( xs ):
 		raise ValueError, 'need a list'
 	
 	
-	result = []
+	functionBodyTrees = []
 	varNameToValueIndirectionTable = []
 	for index, match in enumerate( xs ):
 		for i in exprIndirection:
 			match = match[i]
 		matchNode = _buildMatchNodeForMatchItem( match )
 
-		src = _SrcBuilder()
 		matchItemVarNameToValueIndirection = {}
 		bindings = {}
-		matchNode.emitSourceVarNamesAndBindings( src, 'xs', [], matchItemVarNameToValueIndirection, bindings)
+		matchTreeFac = matchNode.emitSourceVarNamesAndBindings( lambda innerTree: innerTree, 'xs', [], matchItemVarNameToValueIndirection, bindings)
 		
-		src.append( 'return '  +  _bindingMapToBindingDictSrc( bindings )  +  ', %d'  %  ( index, ) )
-
+		resultTree = PySrc( 'return '  +  _bindingMapToBindingDictSrc( bindings )  +  ', %d'  %  ( index, ), dbgSrc=xs )
+		
+		matchTree = matchTreeFac( resultTree )
+		
 		varNameToValueIndirectionTable.append( matchItemVarNameToValueIndirection )
 		
-		result += src.src
-	result.extend( [ 'raise NoMatchError' ] )
+		functionBodyTrees.append( matchTree )
+	functionBodyTrees.extend( [ PySrc( 'raise NoMatchError' ) ] )
 	
-	result = _indent( result )
+	defTree = PyDef( functionName, [ 'xs' ], functionBodyTrees, dbgSrc=xs )
 	
-	src = pySrcHdr + '\n'.join( result )
+	src = defTree.compileAsStmt()
+	src = '\n'.join( src )  +  '\n'
 	
 	if bSrc:
 		return src, varNameToValueIndirectionTable

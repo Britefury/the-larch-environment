@@ -439,6 +439,12 @@ class PyIf (PyNode):
 
 	
 	
+class PySimpleIf (PyIf):
+	def __init__(self, condition, statements, dbgSrc=None):
+		super( PySimpleIf, self ).__init__( [ ( condition, statements ) ], None, dbgSrc=dbgSrc )
+
+
+
 class PyDef (PyNode):
 	def __init__(self, name, argNames, statements, dbgSrc=None):
 		super( PyDef, self ).__init__( dbgSrc )
@@ -723,6 +729,15 @@ class TestCase_PyCodeGen_Node_compile (unittest.TestCase):
 		self.assert_( PyIf( [ ( PySrc( 'True' ),  [ PySrc( 'pass' ) ] ),   ( PySrc( 'False' ),  [] ) ] ).compileAsStmt()  ==  pysrc2 )
 		self.assert_( PyIf( [ ( PySrc( 'True' ),  [ PySrc( 'pass' ) ] ),   ( PySrc( 'False' ),  [ PySrc( 'pass' ) ] ) ],   [ PySrc( 'pass' ) ]  ).compileAsStmt()  ==  pysrc3 )
 		self.assert_( PyIf( [ ( PySrc( 'True' ),  [ PySrc( 'pass' ) ] ),   ( PySrc( 'False' ),  [ PySrc( 'pass' ) ] ) ],   []  ).compileAsStmt()  ==  pysrc3 )
+
+	def test_PySimpleIf(self):
+		pysrc1 = [
+			'if True:',
+			'  pass'
+		]
+
+		self.assert_( PySimpleIf( PySrc( 'True' ),  [ PySrc( 'pass' ) ] ).compileAsStmt()  ==  pysrc1 )
+		self.assert_( PySimpleIf( PySrc( 'True' ),  [] ).compileAsStmt()  ==  pysrc1 )
 
 	def test_PyDef(self):
 		pysrc1 = [
