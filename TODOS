@@ -1,16 +1,18 @@
 TODOS:
 
 
-Move cursor handling to presentation toolkit.
+
+WHERE, IF, and LAMBDA STATEMENTS:
+Each binding expression could create body-code; this needs to be interleaved correctly;
+it should come just before the binding, since it may use values from previous bindings.
 
 
-We need to think about cursor management.
-Two solutions:
-	1. Stay with the current system for now, in which case the view builder needs a way of informing the view nodes of the cursor navigation policy for
-	child view nodes
-	
-	2. Move over to the new cursor handling system
-	
+
+
+Cursor handling:
+The cursor handling currently uses the focus system, rather than an ever-present cursor.
+It is now handled by the presentation toolkit, rather than by the document view.
+
 	
 	
 	
