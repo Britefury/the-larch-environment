@@ -55,35 +55,40 @@ class PyInvalidBinaryOperatorError (PyCodeGenError):
 		self.op = op
 
 
-
+_callPrecedence = 1
+_methodCallPrecedence = 1
+_subscriptPrecedence = 2
+_attributePrecedence = 3
+		
+		
 _binaryOperatorPrecedenceTable = {
-	'**' : 1,
-	'*' : 4,
-	'/' : 4,
-	'%' : 4,
-	'+' : 5,
-	'-' : 5,
-	'<<' : 6,
-	'>>' : 6,
-	'&' : 7,
-	'^' : 8,
-	'|' : 9,
-	'<' : 10,
-	'<=' : 10,
-	'==' : 10,
-	'!=' : 10,
-	'>=' : 10,
-	'>' : 10,
-	'is' : 11,
-	'in' : 12,
-	'and' : 14,
-	'or' : 15,
+	'**' : 4,
+	'*' : 7,
+	'/' : 7,
+	'%' : 7,
+	'+' : 8,
+	'-' : 8,
+	'<<' : 9,
+	'>>' : 9,
+	'&' : 10,
+	'^' : 11,
+	'|' : 12,
+	'<' : 13,
+	'<=' : 13,
+	'==' : 13,
+	'!=' : 13,
+	'>=' : 13,
+	'>' : 13,
+	'is' : 14,
+	'in' : 15,
+	'and' : 17,
+	'or' : 18,
 }
 
 _unaryOperatorPrecedenceTable = {
-	'~' : ( 2, False ),
-	'-' : ( 3, False ),
-	'not' : ( 13, True ),
+	'~' : ( 5, False ),
+	'-' : ( 6, False ),
+	'not' : ( 16, True ),
 }
 
 
@@ -228,7 +233,10 @@ class PyGetAttr (PyNode):
 		self.attrName = attrName
 
 	def _o_compileAsExpr(self):
-		return '%s.%s'  %  ( self.a.compileAsExpr(), self.attrName )
+		return '%s.%s'  %  ( self.a.compileAsExpr( _attributePrecedence ), self.attrName )
+	
+	def _o_getPrecedence(self):
+		return _attributePrecedence
 	
 	def _o_compareWith(self, x):
 		return cmp( ( self.a, self.attrName ),  ( x.a, x.attrName ) )
@@ -245,9 +253,12 @@ class PyGetItem (PyNode):
 		
 	def _o_compileAsExpr(self):
 		if self.end is not None:
-			return '%s[%s:%s]'  %  ( self.a.compileAsExpr(), self.start.compileAsExpr(), self.end.compileAsExpr() )
+			return '%s[%s:%s]'  %  ( self.a.compileAsExpr( _subscriptPrecedence ), self.start.compileAsExpr(), self.end.compileAsExpr() )
 		else:
-			return '%s[%s]'  %  ( self.a.compileAsExpr(), self.start.compileAsExpr() )
+			return '%s[%s]'  %  ( self.a.compileAsExpr( _subscriptPrecedence ), self.start.compileAsExpr() )
+	
+	def _o_getPrecedence(self):
+		return _subscriptPrecedence
 	
 	def _o_compareWith(self, x):
 		return cmp( ( self.a, self.start, self.end ),  ( x.a, x.start, x.end ) )
@@ -265,9 +276,6 @@ class PyUnOp (PyNode):
 		self.op = op
 		self.a = a
 		
-	def _o_getPrecedence(self):
-		return _unaryOperatorPrecedenceTable[self.op][0]
-
 	def _o_compileAsExpr(self):
 		thisPrecedence, bUseSpace = _unaryOperatorPrecedenceTable[self.op]
 		space = ''
@@ -275,6 +283,9 @@ class PyUnOp (PyNode):
 			space = ' '
 		return '%s%s%s'  %  ( self.op, space, self.a.compileAsExpr( thisPrecedence ) )
 	
+	def _o_getPrecedence(self):
+		return _unaryOperatorPrecedenceTable[self.op][0]
+
 	def _o_compareWith(self, x):
 		return cmp( ( self.a, self.op ),  ( x.a, x.op ) )
 
@@ -292,13 +303,13 @@ class PyBinOp (PyNode):
 		self.op = op
 		self.b = b
 		
-	def _o_getPrecedence(self):
-		return _binaryOperatorPrecedenceTable[self.op]
-
 	def _o_compileAsExpr(self):
 		thisPrecedence = _binaryOperatorPrecedenceTable[self.op]
 		return '%s %s %s'  %  ( self.a.compileAsExpr( thisPrecedence ), self.op, self.b.compileAsExpr( thisPrecedence ) )
 	
+	def _o_getPrecedence(self):
+		return _binaryOperatorPrecedenceTable[self.op]
+
 	def _o_compareWith(self, x):
 		return cmp( ( self.a, self.b, self.op ),  ( x.a, x.b, x.op ) )
 
@@ -313,10 +324,13 @@ class PyCall (PyNode):
 		
 	def _o_compileAsExpr(self):
 		if len( self.params ) == 0:
-			return '%s()'  %  ( self.a.compileAsExpr(), )
+			return '%s()'  %  ( self.a.compileAsExpr( _callPrecedence ), )
 		else:
-			return '%s( %s )'  %  ( self.a.compileAsExpr(), ', '.join( [ p.compileAsExpr()   for p in self.params ] ) )
+			return '%s( %s )'  %  ( self.a.compileAsExpr( _callPrecedence ), ', '.join( [ p.compileAsExpr()   for p in self.params ] ) )
 		
+	def _o_getPrecedence(self):
+		return _callPrecedence
+	
 	def _o_compareWith(self, x):
 		return cmp( ( self.a, self.params ),  ( x.a, x.params ) )
 
@@ -334,9 +348,12 @@ class PyMethodCall (PyNode):
 		
 	def _o_compileAsExpr(self):
 		if len( self.params ) == 0:
-			return '%s.%s()'  %  ( self.a.compileAsExpr(), self.methodName )
+			return '%s.%s()'  %  ( self.a.compileAsExpr( _methodCallPrecedence ), self.methodName )
 		else:
-			return '%s.%s( %s )'  %  ( self.a.compileAsExpr(), self.methodName, ', '.join( [ p.compileAsExpr()   for p in self.params ] ) )
+			return '%s.%s( %s )'  %  ( self.a.compileAsExpr( _methodCallPrecedence ), self.methodName, ', '.join( [ p.compileAsExpr()   for p in self.params ] ) )
+	
+	def _o_getPrecedence(self):
+		return _methodCallPrecedence
 	
 	def _o_compareWith(self, x):
 		return cmp( ( self.a, self.methodName, self.params ),  ( x.a, x.methodName, x.params ) )
@@ -665,12 +682,6 @@ class TestCase_PyCodeGen_Node_compile (unittest.TestCase):
 		for op in _binaryOperatorPrecedenceTable.keys():
 			self.assert_( PyBinOp( PySrc( 'a' ), op, PySrc( 'b' ) ).compileAsExpr()  ==  'a %s b'  %  ( op, ) )
 		
-	def test_PyBinOp_precedence(self):
-		self.assert_( PyBinOp( PySrc( 'a' ), '+', PyBinOp( PySrc( 'b' ), '+', PySrc( 'c' ) ) ).compileAsExpr()  ==  'a + (b + c)' )
-		self.assert_( PyBinOp( PyBinOp( PySrc( 'a' ), '+', PySrc( 'b' ) ), '+', PySrc( 'c' ) ).compileAsExpr()  ==  '(a + b) + c' )
-		self.assert_( PyBinOp( PySrc( 'a' ), '*', PyBinOp( PySrc( 'b' ), '+', PySrc( 'c' ) ) ).compileAsExpr()  ==  'a * (b + c)' )
-		self.assert_( PyBinOp( PyBinOp( PySrc( 'a' ), '*', PySrc( 'b' ) ), '+', PySrc( 'c' ) ).compileAsExpr()  ==  'a * b + c' )
-		
 	def test_PyCall(self):
 		self.assert_( PyCall( PySrc( 'a' ), [] ).compileAsExpr()  ==  'a()' )
 		self.assert_( PyCall( PySrc( 'a' ), [ PySrc( 'b' ), PySrc( 'c' ) ] ).compileAsExpr()  ==  'a( b, c )' )
@@ -734,6 +745,15 @@ class TestCase_PyCodeGen_Node_compile (unittest.TestCase):
 
 	def test_PyDel_SideEffects(self):
 		self.assert_( PyDel_SideEffects( PySrc( 'a' ) ).compileAsStmt()  ==  [ 'del a' ] )
+		
+		
+	def test_precedence(self):
+		self.assert_( PyBinOp( PySrc( 'a' ), '+', PyBinOp( PySrc( 'b' ), '+', PySrc( 'c' ) ) ).compileAsExpr()  ==  'a + (b + c)' )
+		self.assert_( PyBinOp( PyBinOp( PySrc( 'a' ), '+', PySrc( 'b' ) ), '+', PySrc( 'c' ) ).compileAsExpr()  ==  '(a + b) + c' )
+		self.assert_( PyBinOp( PySrc( 'a' ), '*', PyBinOp( PySrc( 'b' ), '+', PySrc( 'c' ) ) ).compileAsExpr()  ==  'a * (b + c)' )
+		self.assert_( PyBinOp( PyBinOp( PySrc( 'a' ), '*', PySrc( 'b' ) ), '+', PySrc( 'c' ) ).compileAsExpr()  ==  'a * b + c' )
+		self.assert_( PyMethodCall( PyBinOp( PySrc( 'a' ), '+', PySrc( 'b' ) ), 'upper', [] ).compileAsExpr()  ==  '(a + b).upper()' )
+		
 
 
 		

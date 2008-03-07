@@ -48,22 +48,12 @@ class _SrcBuilder (object):
 		self._indentation += 1
 
 
-def _bind(result, name, value):
-	existingValue = result.setdefault( name, value )
-	if existingValue != value:
-		raise NoMatchError
-
-	
 class  _MatchNode (object):
 	def __init__(self):
 		super( _MatchNode, self ).__init__()
 		self.bindName = None
 		
 		
-	@abstractmethod
-	def emitSourceAndVarNames(self, valueSrc, valueIndirection, varNameToValueIndirection):
-		pass
-
 	@abstractmethod
 	def emitSourceVarNamesAndBindings(self, src, valueSrc, valueIndirection, varNameToValueIndirection, bindings):
 		pass
@@ -80,12 +70,6 @@ class  _MatchNode (object):
 	def _p_emitMatchFailed(self):
 		return [ 'raise NoMatchError' ]
 	
-	def _p_emitBind(self, valueSrc, valueIndirection, varNameToValueIndirection):
-		if self.bindName is not None:
-			varNameToValueIndirection.setdefault( self.bindName, valueIndirection )
-			return [ '_bind( result, \'%s\', %s )'  %  ( self.bindName, valueSrc ) ]
-		else:
-			return []
 		
 		
 		
@@ -93,19 +77,11 @@ class  _MatchNode (object):
 
 
 class _MatchAnything (_MatchNode):
-	def emitSourceAndVarNames(self, valueSrc, valueIndirection, varNameToValueIndirection):
-		return self._p_emitBind( valueSrc, valueIndirection, varNameToValueIndirection )
-
 	def emitSourceVarNamesAndBindings(self, src, valueSrc, valueIndirection, varNameToValueIndirection, bindings):
 		self.handleBinding( src, valueSrc, valueIndirection, varNameToValueIndirection, bindings )
 	
 
 class _MatchTerminal (_MatchNode):
-	def emitSourceAndVarNames(self, valueSrc, valueIndirection, varNameToValueIndirection):
-		return [ 'if not isinstance( %s, %s ):'  %  ( valueSrc, _stringTypeSrc ) ]  +  \
-		       _indent( self._p_emitMatchFailed()  )  +  \
-		       self._p_emitBind( valueSrc, valueIndirection, varNameToValueIndirection )
-
 	def emitSourceVarNamesAndBindings(self, src, valueSrc, valueIndirection, varNameToValueIndirection, bindings):
 		src.condition( 'not __isGLispList__( %s )'  %  ( valueSrc, ) )
 		self.handleBinding( src, valueSrc, valueIndirection, varNameToValueIndirection, bindings )
@@ -113,11 +89,6 @@ class _MatchTerminal (_MatchNode):
 
 
 class _MatchNonTerminal (_MatchNode):
-	def emitSourceAndVarNames(self, valueSrc, valueIndirection, varNameToValueIndirection):
-		return [ 'if not isinstance( %s, %s ):'  %  ( valueSrc, _listTypeSrc ) ]  +  \
-		       _indent( self._p_emitMatchFailed()  )  +  \
-		       self._p_emitBind( valueSrc, valueIndirection, varNameToValueIndirection )
-
 	def emitSourceVarNamesAndBindings(self, src, valueSrc, valueIndirection, varNameToValueIndirection, bindings):
 		src.condition( '__isGLispList__( %s )'  %  ( valueSrc, ) )
 		self.handleBinding( src, valueSrc, valueIndirection, varNameToValueIndirection, bindings )
@@ -127,11 +98,6 @@ class _MatchConstant (_MatchNode):
 	def __init__(self, constant):
 		super( _MatchConstant, self ).__init__()
 		self._constant = constant
-
-	def emitSourceAndVarNames(self, valueSrc, valueIndirection, varNameToValueIndirection):
-		return [ 'if %s != \'%s\':'  %  ( valueSrc, self._constant ) ]  +  \
-		       _indent( self._p_emitMatchFailed()  )  +  \
-		       self._p_emitBind( valueSrc, valueIndirection, varNameToValueIndirection )
 
 	def emitSourceVarNamesAndBindings(self, src, valueSrc, valueIndirection, varNameToValueIndirection, bindings):
 		src.condition( '%s == \'%s\''  %  ( valueSrc, self._constant ))
@@ -166,64 +132,6 @@ class _MatchList (_MatchNode):
 		else:
 			self._minLength = self._maxLength = len( self._front )
 		
-	def emitSourceAndVarNames(self, valueSrc, valueIndirection, varNameToValueIndirection):
-		# Check the lengths
-		src = []
-		
-		src.append( 'if not isinstance( %s, %s ):'  %  ( valueSrc, _listTypeSrc ) )
-		src.extend( _indent( self._p_emitMatchFailed() ) )
-		src.append( '' )
-
-		if self._minLength == self._maxLength:
-			# min and max length the same; only one length permissable
-			src.append( 'if len( %s )  !=  %d:'  %  ( valueSrc, self._minLength ) )
-			src.extend( _indent( self._p_emitMatchFailed() ) )
-			src.append( '' )
-		elif self._minLength == 0  and  self._maxLength is not None:
-			# no min length, a max length
-			src.append( 'if len( %s )  >  %d:'  %  ( valueSrc, self._maxLength ) )
-			src.extend( _indent( self._p_emitMatchFailed() ) )
-			src.append( '' )
-		elif self._minLength > 0:
-			# there is a min length
-			if self._maxLength is None:
-				# no max length
-				src.append( 'if len( %s )  <  %d:'  %  ( valueSrc, self._minLength ) )
-				src.extend( _indent( self._p_emitMatchFailed() ) )
-				src.append( '' )
-			else:
-				# max length
-				src.append( 'if len( %s )  <  %d   or   len( %s )  >  %d:'  %  ( valueSrc, self._minLength, valueSrc, self._maxLength ) )
-				src.extend( _indent( self._p_emitMatchFailed() ) )
-				src.append( '' )
-				
-		#matchItem*  (front)
-		for i, item in enumerate( self._front ):
-			itemNameSrc = '%s[%d]'  %  ( valueSrc, i )
-			itemSrc = item.emitSourceAndVarNames( itemNameSrc, valueIndirection + [ i ], varNameToValueIndirection )
-			src.extend( itemSrc )
-					
-		#matchItem*  (back)
-		for i, item in enumerate( reversed( self._back ) ):
-			itemNameSrc = '%s[-%d]'  %  ( valueSrc, i + 1 )
-			itemSrc = item.emitSourceAndVarNames( itemNameSrc, valueIndirection + [ -(i+1) ], varNameToValueIndirection )
-			src.extend( itemSrc )
-			
-		if self._internal is not None:
-			src.append( '' )
-			start = len( self._front )
-			end = len( self._back )
-			if end  > 0:
-				src.extend( self._internal.emitSourceAndVarNames( '%s[%d:%d]'  %  ( valueSrc, start, -end ), valueIndirection + [ (start,-end) ], varNameToValueIndirection ) )
-			else:
-				src.extend( self._internal.emitSourceAndVarNames( '%s[%d:]'  %  ( valueSrc, start ), valueIndirection + [ (start,None) ], varNameToValueIndirection ) )
-		
-		src.append( '' )
-		src.extend( self._p_emitBind( valueSrc, valueIndirection, varNameToValueIndirection ) )
-		
-		return src
-
-	
 	def emitSourceVarNamesAndBindings(self, src, valueSrc, valueIndirection, varNameToValueIndirection, bindings):
 		# Check the lengths
 		src.condition( '__isGLispList__( %s )'  %  ( valueSrc, ) )
@@ -422,7 +330,7 @@ def compileMatchExpression(xs, exprIndirection=[], functionName='match', bSrc=Fa
 	if bSrc:
 		return src, varNameToValueIndirectionTable
 	else:	
-		lcl = { '__isGLispList__'  :  isGLispList, '_bind' : _bind, 'NoMatchError' : NoMatchError, '%s' % ( _listTypeSrc, )  :  _listType }
+		lcl = { '__isGLispList__'  :  isGLispList, 'NoMatchError' : NoMatchError, '%s' % ( _listTypeSrc, )  :  _listType }
 		
 		exec src in lcl
 		
