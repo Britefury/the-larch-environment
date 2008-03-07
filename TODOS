@@ -3,8 +3,8 @@ TODOS:
 
 
 WHERE, IF, and LAMBDA STATEMENTS:
-Each binding expression could create body-code; this needs to be interleaved correctly;
-it should come just before the binding, since it may use values from previous bindings.
+LAMBDA STATEMENTS:
+Do not bind var names
 
 
 
