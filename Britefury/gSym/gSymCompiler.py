@@ -36,12 +36,12 @@ def defineCompiler(env, compilerXs, name, sourceFormat, targetFormat, spec):
 	
 	def compileSpecial(srcXs, context, bNeedResult, compileSpecial, compileGLispExprToPyTree):
 		if srcXs[0] == '$compileEval':
-			return PyCall( PyVar( '_compileEval', dbgSrc=srcXs ), [ compileGLispExprToPyTree(srcXs[1], context, bNeedResult, compileSpecial ) ], dbgSrc=srcXs )
+			return PyCall( PyVar( '_compileEval', dbgSrc=srcXs ), [ compileGLispExprToPyTree(srcXs[1], context, True, compileSpecial ) ], dbgSrc=srcXs )
 		else:
 			return None
 		
 		
-	compilerFunctionName = filterIdentifierForPy( 'compiler_%s'  %  ( name, ) )
+	compilerFunctionName = filterIdentifierForPy( 'compilerFactory_%s'  %  ( name, ) )
 	
 	compilerFactory = compileGLispExprToPyFunction( compilerFunctionName, [], spec, compileSpecial, lcls={ '_compileEval' : _compileEval } )
 	compilerFunction = compilerFactory()

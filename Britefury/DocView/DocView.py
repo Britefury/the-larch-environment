@@ -60,14 +60,10 @@ class DocView (object):
 		self._nodeTable[newKey] = viewNode
 
 
-	def _f_buildView(self, docNode, parentViewNode, indexInParentDocNode):
+	def _f_buildView(self, docNode, parentDocNode, indexInParentDocNode):
 		if docNode is None:
 			return None
 		else:
-			parentDocNode = None
-			if parentViewNode is not None:
-				parentDocNode = parentViewNode.docNode
-
 			docNodeKey = DocNodeKey( docNode, parentDocNode, indexInParentDocNode )
 
 			try:

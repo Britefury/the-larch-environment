@@ -144,6 +144,24 @@ class PyNode (object):
 		raise exceptionClass( self._dbgSrc, *args )
 		
 
+	def __cmp__(self, x):
+		if type( self )  is  type( x ):
+			return self._o_compareWith( x )
+		else:
+			return 1
+		
+	def _o_compareWith(self, x):
+		return 0
+	
+	
+	
+class PyStatement (PyNode):
+	def compileAsStmt(self):
+		return [ self.compileAsExpr() ]
+	
+
+
+class PyExpression (PyStatement):
 	def compileAsExpr(self, outerPredecence=None):
 		thisPrecedence = self._o_getPrecedence()
 		src = self._o_compileAsExpr()
@@ -159,22 +177,13 @@ class PyNode (object):
 	def _o_getPrecedence(self):
 		return None
 	
-	def compileAsStmt(self):
-		return [ self.compileAsExpr() ]
-	
-	def __cmp__(self, x):
-		if type( self )  is  type( x ):
-			return self._o_compareWith( x )
-		else:
-			return 1
-		
-	def _o_compareWith(self, x):
-		return 0
+
+
 	
 	
 	
 	
-class PySrc (PyNode):
+class PySrc (PyExpression):
 	def __init__(self, src, dbgSrc=None):
 		super( PySrc, self ).__init__( dbgSrc )
 		self.src = src
@@ -188,7 +197,7 @@ class PySrc (PyNode):
 	
 	
 	
-class PyVar (PyNode):
+class PyVar (PyExpression):
 	def __init__(self, varName, dbgSrc=None):
 		super( PyVar, self ).__init__( dbgSrc )
 		if not _isPyDottedIdentifier( varName ):
@@ -204,7 +213,7 @@ class PyVar (PyNode):
 	
 	
 	
-class PyLiteral (PyNode):
+class PyLiteral (PyExpression):
 	def __init__(self, value, dbgSrc=None):
 		super( PyLiteral, self ).__init__( dbgSrc )
 		self.value = value
@@ -218,9 +227,11 @@ class PyLiteral (PyNode):
 	
 	
 	
-class PyListLiteral (PyNode):
+class PyListLiteral (PyExpression):
 	def __init__(self, subexps, dbgSrc=None):
 		super( PyListLiteral, self ).__init__( dbgSrc )
+		for e in subexps:
+			assert isinstance( e, PyExpression )
 		self.subexps = subexps
 		
 	def _o_compileAsExpr(self):
@@ -232,9 +243,35 @@ class PyListLiteral (PyNode):
 	
 	
 	
-class PyGetAttr (PyNode):
+class PyListComprehension (PyExpression):
+	def __init__(self, itemExpr, itemName, srcIterableExpr, filterExpr=None, dbgSrc=None):
+		super( PyListComprehension, self ).__init__( dbgSrc )
+		assert isinstance( itemExpr, PyExpression )
+		assert isinstance( srcIterableExpr, PyExpression )
+		assert isinstance( itemName, str )
+		assert filterExpr is None  or  isinstance( filterExpr, PyExpression )
+
+		self.itemExpr = itemExpr
+		self.itemName = itemName
+		self.srcIterableExpr = srcIterableExpr
+		self.filterExpr = filterExpr
+		
+	def _o_compileAsExpr(self):
+		if self.filterExpr is None:
+			return '[ %s   for %s in %s ]'  %  ( self.itemExpr.compileAsExpr(), self.itemName, self.srcIterableExpr.compileAsExpr() )
+		else:
+			return '[ %s   for %s in %s   if %s ]'  %  ( self.itemExpr.compileAsExpr(), self.itemName, self.srcIterableExpr.compileAsExpr(), self.filterExpr.compileAsExpr() )
+		
+	def _o_compareWith(self, x):
+		return cmp( ( self.itemExpr, self.itemName, self.srcIterableExpr, self.filterExpr ),  ( x.itemExpr, x.itemName, x.srcIterableExpr, x.filterExpr ) )
+	
+	
+	
+	
+class PyGetAttr (PyExpression):
 	def __init__(self, a, attrName, dbgSrc=None):
 		super( PyGetAttr, self ).__init__( dbgSrc )
+		assert isinstance( a, PyExpression )
 		if not _isPyIdentifier( attrName ):
 			self.error( PyInvalidAttrNameError, attrName )
 		self.a = a
@@ -252,9 +289,12 @@ class PyGetAttr (PyNode):
 	
 	
 
-class PyGetItem (PyNode):
+class PyGetItem (PyExpression):
 	def __init__(self, a, start, end=None, dbgSrc=None):
 		super( PyGetItem, self ).__init__( dbgSrc )
+		assert isinstance( a, PyExpression )
+		assert isinstance( start, PyExpression )
+		assert end is None  or  isinstance( end, PyExpression )
 		self.a = a
 		self.start = start
 		self.end = end
@@ -274,11 +314,12 @@ class PyGetItem (PyNode):
 	
 	
 	
-class PyUnOp (PyNode):
+class PyUnOp (PyExpression):
 	operators = _unaryOperatorPrecedenceTable.keys()
 	
 	def __init__(self, op, a, dbgSrc=None):
 		super( PyUnOp, self ).__init__( dbgSrc )
+		assert isinstance( a, PyExpression )
 		if op not in _unaryOperatorPrecedenceTable:
 			self.error( PyInvalidUnaryOperatorError, op )
 		self.op = op
@@ -300,11 +341,13 @@ class PyUnOp (PyNode):
 	
 	
 		
-class PyBinOp (PyNode):
+class PyBinOp (PyExpression):
 	operators = _binaryOperatorPrecedenceTable.keys()
 	
 	def __init__(self, a, op, b, dbgSrc=None):
 		super( PyBinOp, self ).__init__( dbgSrc )
+		assert isinstance( a, PyExpression )
+		assert isinstance( b, PyExpression )
 		if op not in _binaryOperatorPrecedenceTable:
 			self.error( PyInvalidBinaryOperatorError, op )
 		self.a = a
@@ -324,9 +367,12 @@ class PyBinOp (PyNode):
 	
 	
 	
-class PyCall (PyNode):
+class PyCall (PyExpression):
 	def __init__(self, a, params, dbgSrc=None):
 		super( PyCall, self ).__init__( dbgSrc )
+		assert isinstance( a, PyExpression )
+		for p in params:
+			assert isinstance( p, PyExpression )
 		self.a = a
 		self.params = params
 		
@@ -345,9 +391,12 @@ class PyCall (PyNode):
 	
 	
 
-class PyMethodCall (PyNode):
+class PyMethodCall (PyExpression):
 	def __init__(self, a, methodName, params, dbgSrc=None):
 		super( PyMethodCall, self ).__init__( dbgSrc )
+		assert isinstance( a, PyExpression )
+		for p in params:
+			assert isinstance( p, PyExpression )
 		if not _isPyIdentifier( methodName ):
 			self.error( PyInvalidMethodNameError, methodName )
 		self.a = a
@@ -369,9 +418,10 @@ class PyMethodCall (PyNode):
 
 	
 	
-class PyReturn (PyNode):
+class PyReturn (PyStatement):
 	def __init__(self, value, dbgSrc=None):
 		super( PyReturn, self ).__init__( dbgSrc )
+		assert isinstance( value, PyExpression )
 		self.value =value
 		
 	def compileAsStmt(self):
@@ -382,7 +432,7 @@ class PyReturn (PyNode):
 
 
 
-class PyIf (PyNode):
+class PyIf (PyStatement):
 	def __init__(self, ifElifSpecs, elseStatements=None, dbgSrc=None):
 		"""
 		ifElifSpecs is a list of tuples
@@ -399,6 +449,7 @@ class PyIf (PyNode):
 		for i in ifElifSpecs:
 			assert isinstance( i, tuple ), 'PyIf: if-specification must be a tuple (condition, [statement*]); not a tuple'
 			assert len( i ) == 2, 'PyIf: if-specification must be a tuple (condition, [statement*]); length != 2'
+			assert isinstance( i[0], PyExpression )
 			assert isinstance( i[1], list ), 'PyIf: if-specification must be a tuple (condition, [statement*]); second element not a list'
 			
 		self.ifElifSpecs = ifElifSpecs
@@ -455,7 +506,7 @@ class PySimpleIf (PyIf):
 
 
 
-class PyDef (PyNode):
+class PyDef (PyStatement):
 	def __init__(self, name, argNames, statements, dbgSrc=None):
 		super( PyDef, self ).__init__( dbgSrc )
 		if not _isPyIdentifier( name ):
@@ -483,9 +534,11 @@ class PyDef (PyNode):
 	
 	
 	
-class PyAssign_SideEffects (PyNode):
+class PyAssign_SideEffects (PyStatement):
 	def __init__(self, target, value, dbgSrc=None):
 		super( PyAssign_SideEffects, self ).__init__( dbgSrc )
+		assert isinstance( target, PyExpression )
+		assert isinstance( value, PyExpression )
 		self.target = target
 		self.value =value
 		
@@ -498,9 +551,10 @@ class PyAssign_SideEffects (PyNode):
 	
 	
 	
-class PyDel_SideEffects (PyNode):
+class PyDel_SideEffects (PyStatement):
 	def __init__(self, target, dbgSrc=None):
 		super( PyDel_SideEffects, self ).__init__( dbgSrc )
+		assert isinstance( target, PyExpression )
 		self.target = target
 		
 	def compileAsStmt(self):
@@ -559,13 +613,13 @@ class TestCase_PyCodeGen_Node_check (unittest.TestCase):
 		self.assertRaises( PyInvalidAttrNameError, lambda: PyGetAttr( PySrc( 'a' ), '$test' ) )
 		
 	def test_PyUnOp(self):
-		self.assertRaises( PyInvalidUnaryOperatorError, lambda: PyUnOp( PySrc( 'a' ), '$' ) )
+		self.assertRaises( PyInvalidUnaryOperatorError, lambda: PyUnOp( '$', PySrc( 'a' ) ) )
 		PyUnOp( '-', PySrc( 'a' ) )
 		PyUnOp( '~', PySrc( 'a' ) )
 		PyUnOp( 'not', PySrc( 'a' ) )
 		
 	def test_PyBinOp(self):
-		self.assertRaises( PyInvalidBinaryOperatorError, lambda: PyBinOp( PySrc( 'a' ), PySrc( 'b' ), '$' ) )
+		self.assertRaises( PyInvalidBinaryOperatorError, lambda: PyBinOp( PySrc( 'a' ), '$', PySrc( 'b' ) ) )
 		for op in _binaryOperatorPrecedenceTable.keys():
 			PyBinOp( PySrc( 'a' ), op, PySrc( 'b' ) )
 
@@ -605,6 +659,18 @@ class TestCase_PyCodeGen_Node_cmp (unittest.TestCase):
 		self.assert_( PyListLiteral( [ PySrc( 'a' ), PySrc( 'b' ) ] )  ==  PyListLiteral( [ PySrc( 'a' ), PySrc( 'b' ) ] ) )
 		self.assert_( PyListLiteral( [ PySrc( 'a' ), PySrc( 'b' ) ] )  !=  PyListLiteral( [ PySrc( 'a' ), PySrc( 'c' ) ] ) )
 
+	def test_PyListComprehension(self):
+		self.assert_( PyListComprehension( PySrc( 'a' ), 'a', PySrc( 'x' ), None )  ==  PyListComprehension( PySrc( 'a' ), 'a', PySrc( 'x' ), None ) )
+		self.assert_( PyListComprehension( PySrc( 'a' ), 'a', PySrc( 'x' ), None )  !=  PyListComprehension( PySrc( 'b' ), 'a', PySrc( 'x' ), None ) )
+		self.assert_( PyListComprehension( PySrc( 'a' ), 'a', PySrc( 'x' ), None )  !=  PyListComprehension( PySrc( 'a' ), 'b', PySrc( 'x' ), None ) )
+		self.assert_( PyListComprehension( PySrc( 'a' ), 'a', PySrc( 'x' ), None )  !=  PyListComprehension( PySrc( 'a' ), 'a', PySrc( 'y' ), None ) )
+		self.assert_( PyListComprehension( PySrc( 'a' ), 'a', PySrc( 'x' ), PySrc( 'True' ) )  ==  PyListComprehension( PySrc( 'a' ), 'a', PySrc( 'x' ),PySrc( 'True' ) ) )
+		self.assert_( PyListComprehension( PySrc( 'a' ), 'a', PySrc( 'x' ), PySrc( 'True' ))  !=  PyListComprehension( PySrc( 'b' ), 'a', PySrc( 'x' ), PySrc( 'True' ) ) )
+		self.assert_( PyListComprehension( PySrc( 'a' ), 'a', PySrc( 'x' ), PySrc( 'True' ) )  !=  PyListComprehension( PySrc( 'a' ), 'b', PySrc( 'x' ), PySrc( 'True' ) ) )
+		self.assert_( PyListComprehension( PySrc( 'a' ), 'a', PySrc( 'x' ), PySrc( 'True' ) )  !=  PyListComprehension( PySrc( 'a' ), 'a', PySrc( 'y' ), PySrc( 'True' ) ) )
+		self.assert_( PyListComprehension( PySrc( 'a' ), 'a', PySrc( 'x' ), PySrc( 'True' ) )  !=  PyListComprehension( PySrc( 'a' ), 'a', PySrc( 'x' ), PySrc( 'False' ) ) )
+		self.assert_( PyListComprehension( PySrc( 'a' ), 'a', PySrc( 'x' ), PySrc( 'True' ) )  !=  PyListComprehension( PySrc( 'a' ), 'a', PySrc( 'x' ), None ) )
+		
 	def test_PyGetAttr(self):
 		self.assert_( PyGetAttr( PySrc( 'a' ), 'test' ) ==  PyGetAttr( PySrc( 'a' ), 'test' ) )
 		self.assert_( PyGetAttr( PySrc( 'a' ), 'test' ) !=  PyGetAttr( PySrc( 'b' ), 'test' ) )
@@ -681,6 +747,10 @@ class TestCase_PyCodeGen_Node_compile (unittest.TestCase):
 
 	def test_PyListLiteral(self):
 		self.assert_( PyListLiteral( [ PySrc( 'a' ), PySrc( 'b' ) ] ).compileAsExpr()  ==  '[ a, b ]' )
+		
+	def test_PyListComprehension(self):
+		self.assert_( PyListComprehension( PySrc( 'a' ), 'a', PySrc( 'x' ), None ).compileAsExpr()  ==  '[ a   for a in x ]' )
+		self.assert_( PyListComprehension( PySrc( 'a' ), 'a', PySrc( 'x' ), PySrc( 'True' ) ).compileAsExpr()  ==  '[ a   for a in x   if True ]' )
 		
 	def test_PyGetAttr(self):
 		self.assert_( PyGetAttr( PySrc( 'a' ), 'test' ).compileAsExpr()  ==  'a.test' )
