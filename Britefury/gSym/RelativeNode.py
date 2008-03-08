@@ -72,16 +72,16 @@ class RelativeList (RelativeNode, DMListInterface):
 
 	def __getitem__(self, i):
 		if isinstance( i, slice ):
-			return [ relative( x, self, j )   for j, x in zip( i.indices( self._rln_node ), self._rln_node[i] ) ]
+			return [ relative( x, self._rln_node, j )   for j, x in zip( i.indices( self._rln_node ), self._rln_node[i] ) ]
 		else:
-			return relative( self._rln_node[i], self, i )
+			return relative( self._rln_node[i], self._rln_node, i )
 
 	def __contains__(self, x):
 		return x in self._rln_node
 
 	def __iter__(self):
 		for i, x in enumerate( self._rln_node ):
-			yield relative( x, self, i )
+			yield relative( x, self._rln_node, i )
 
 	def __add__(self, xs):
 		if isinstance( xs, RelativeList ):
@@ -107,16 +107,16 @@ class RelativeList (RelativeNode, DMListInterface):
 class RelativeString (RelativeNode):
 	def __getitem__(self, i):
 		if isinstance( i, slice ):
-			return [ relative( x, self, j )   for j, x in zip( i.indices( self._rln_node ), self._rln_node[i] ) ]
+			return [ relative( x, self._rln_node, j )   for j, x in zip( i.indices( self._rln_node ), self._rln_node[i] ) ]
 		else:
-			return relative( self._rln_node[i], self, i )
+			return relative( self._rln_node[i], self._rln_node, i )
 
 	def __contains__(self, x):
 		return x in self._rln_node
 
 	def __iter__(self):
 		for i, x in enumerate( self._rln_node ):
-			yield relative( x, self, i )
+			yield relative( x, self._rln_node, i )
 
 	def __add__(self, xs):
 		if isinstance( xs, RelativeList ):
@@ -155,7 +155,7 @@ class TestCase_RelativeNode (unittest.TestCase):
 		n_a = relative( a, None, 0 )
 		n_5 = n_a[5]
 		self.assert_( n_5 == 5 )
-		self.assert_( n_5.parent is n_a )
+		self.assert_( n_5.parent is a )
 		self.assert_( n_5.indexInParent == 5 )
 
 	def testWrapStrRange(self):
@@ -163,7 +163,7 @@ class TestCase_RelativeNode (unittest.TestCase):
 		n_a = relative( a, None, 0 )
 		n_5 = n_a[5]
 		self.assert_( n_5 == '5' )
-		self.assert_( n_5.parent is n_a )
+		self.assert_( n_5.parent is a )
 		self.assert_( n_5.indexInParent == 5 )
 
 	def testWrapUnicodeRange(self):
@@ -171,5 +171,5 @@ class TestCase_RelativeNode (unittest.TestCase):
 		n_a = relative( a, None, 0 )
 		n_5 = n_a[5]
 		self.assert_( n_5 == u'5' )
-		self.assert_( n_5.parent is n_a )
+		self.assert_( n_5.parent is a )
 		self.assert_( n_5.indexInParent == 5 )

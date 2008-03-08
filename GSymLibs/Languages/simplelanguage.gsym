@@ -19,11 +19,11 @@
 					(@ml displayDefinition simleLanguageDisplay simleLanguage
 						($lambda (@node)
 							($match @node
-								( (add (: @x ^) (: @y ^))   (  ($activeBorder ($hbox (/list ($viewEval @x) ($label '+') ($viewEval @y))))  ) )
-								( (sub (: @x ^) (: @y ^))   (  ($activeBorder ($hbox (/list ($viewEval @x) ($label '-') ($viewEval @y))))  ) )
-								( (mul (: @x ^) (: @y ^))   (  ($activeBorder ($hbox (/list ($viewEval @x) ($label '*') ($viewEval @y))))  ) )
-								( (div (: @x ^) (: @y ^))   (  ($activeBorder ($hbox (/list ($viewEval @x) ($label '/') ($viewEval @y))))  ) )
-								( (pow (: @x ^) (: @y ^))   (  ($activeBorder ($hbox (/list ($viewEval @x) ($label '**') ($viewEval @y))))  ) )
+								( (add (: @x ^) (: @y ^))   (  ($activeBorder ($hbox ($list ($viewEval @x) ($label '+') ($viewEval @y))))  ) )
+								( (sub (: @x ^) (: @y ^))   (  ($activeBorder ($hbox ($list ($viewEval @x) ($label '-') ($viewEval @y))))  ) )
+								( (mul (: @x ^) (: @y ^))   (  ($activeBorder ($hbox ($list ($viewEval @x) ($label '*') ($viewEval @y))))  ) )
+								( (div (: @x ^) (: @y ^))   (  ($activeBorder ($hbox ($list ($viewEval @x) ($label '/') ($viewEval @y))))  ) )
+								( (pow (: @x ^) (: @y ^))   (  ($activeBorder ($hbox ($list ($viewEval @x) ($label '**') ($viewEval @y))))  ) )
 								( (loadLocal (: @x !))   (  ($activeBorder ($entry @x))  ) )
 							)
 						)

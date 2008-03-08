@@ -20,10 +20,9 @@ from Britefury.DocView.DocView import DocView
 
 from Britefury.GLisp.GLispInterpreter import GLispParameterListError, GLispItemTypeError, isGLispList
 from Britefury.GLisp.GLispCompiler import compileGLispExprToPyFunction
-from Britefury.GLisp.PyCodeGen import filterIdentifierForPy, PyCodeGenError, PySrc, PyVar, PyLiteral, PyListLiteral, PyGetAttr, PyGetItem, PyUnOp, PyBinOp, PyCall, PyMethodCall, PyReturn, PyIf, PyDef, PyAssign_SideEffects, PyDel_SideEffects
-#from Britefury.GLisp.GLispCompiler import compileGLispFunctionToPy, compileGLispExprToPySrc, GLispCompilerError, filterIdentifierForPy
-#from Britefury.GLisp.PatternMatch import compileMatchExpression, NoMatchError
+from Britefury.GLisp.PyCodeGen import filterIdentifierForPy, PyCodeGenError, PySrc, PyVar, PyLiteral, PyListLiteral, PyListComprehension, PyGetAttr, PyGetItem, PyUnOp, PyBinOp, PyCall, PyMethodCall, PyReturn, PyIf, PyDef, PyAssign_SideEffects, PyDel_SideEffects
 
+from Britefury.gSym.RelativeNode import RelativeNode, relative
 
 
 
@@ -82,13 +81,6 @@ class GSymViewDefinition (object):
 
 
 
-class _ViewNodeAndIndrection (object):
-	"""A helper class for storing the results of view computations"""
-	def __init__(self, viewNode, indirection):
-		self.viewNode = viewNode
-		self.indirection = indirection
-
-
 def _runtime_buildRefreshCellAndRegister(viewNodeInstance, refreshFunction):
 	"""
 	Runtime - called by compiled code at run-time
@@ -103,11 +95,8 @@ def _runtime_binRefreshCell(viewNodeInstance, bin, child):
 	Runtime - called by compiled code at run-time
 	Builds and registers a refresh cell (if necessary) for a widget that is an instance of DTBin
 	"""
-	if isinstance( child, _ViewNodeAndIndrection )  or  isinstance( child, DVNode ):
-		if isinstance( child, _ViewNodeAndIndrection ):
-			chNode = child.viewNode
-		else:
-			chNode = child
+	if isinstance( child, DVNode ):
+		chNode = child
 		def _binRefresh():
 			chNode.refresh()
 			bin.child = chNode.widget
@@ -125,10 +114,7 @@ def _runtime_boxRefreshCell(viewNodeInstance, widget, children):
 	def _boxRefresh():
 		widgets = []
 		for child in children:
-			if isinstance( child, _ViewNodeAndIndrection ):
-				child.viewNode.refresh()
-				widgets.append( child.viewNode.widget )
-			elif isinstance( child, DVNode ):
+			if isinstance( child, DVNode ):
 				child.refresh()
 				widgets.append( child.widget )
 			elif isinstance( child, DTWidget ):
@@ -158,8 +144,8 @@ def _runtime_label(viewNodeInstance, text, styleSheets):
 	Runtime - called by compiled code at run-time
 	Builds a DTLabel widget
 	"""
-	if isinstance( text, _ViewNodeAndIndrection ):
-		text = text.viewNode
+	if isinstance( text, RelativeNode ):
+		text = text.node
 	widget = DTLabel(text)
 	for sheet in styleSheets:
 		sheet.apply()
@@ -167,8 +153,8 @@ def _runtime_label(viewNodeInstance, text, styleSheets):
 
 def _runtime_entry(viewNodeInstance, text, styleSheets):
 	"""Builds a DTEntryLabel widget"""
-	if isinstance( text, _ViewNodeAndIndrection ):
-		text = text.viewNode
+	if isinstance( text, RelativeNode ):
+		text = text.node
 	widget = DTEntryLabel(text)
 	widget.keyHandler = viewNodeInstance.viewNode
 	for sheet in styleSheets:
@@ -216,23 +202,16 @@ class _GSymNodeViewInstance (object):
 	
 	def _runtime_buildViewContents(self, content):
 		"""Runtime - build the contents of a view node"""
-		#1. Ese the match function in the factory to determine which view expression to apply it
-		try:
-			varValues, index = self.viewFactory.matchFunction( content )
-		except NoMatchError:
-			self.env.glispError( NoMatchError, content, 'buildViewContents: cannot process; no suitable match expression found' )
-		#2. Get the view expression function from the table, along with the varName->valueIndirection table for that function
-		f, varNameToValueIndirection = self.viewFactory.viewExprFunctionAndVarNameToIndirectionPairs[index]
+		#1. Get the view function factory from the view factory
+		viewFunctionFactory = self.viewFactory.viewFunctionFactory
 		
-		#3. Mix the variable values with value indirection
-		varValuesWithIndireciton = {}
-		for varName, viewNode in varValues.items():
-			varValuesWithIndireciton[varName] = _ViewNodeAndIndrection( viewNode, varNameToValueIndirection[varName] )
+		#2. Create the view function. (the first parameter is the view instance; self)
+		viewFunction = viewFunctionFactory( self )
 		
-		#4. Call the view expression function
-		viewContents = f( self, self.refreshCells, **varValuesWithIndireciton )
+		#3. Call the view function to create the view contents
+		viewContents = viewFunction( content )
 		
-		#5. Return the view contents
+		#4. Return the view contents
 		return viewContents
 		
 		
@@ -267,8 +246,9 @@ class _GSymViewInstance (object):
 	def _p_buildNodeContents(self, viewNode, docNodeKey):
 		# Create the node view instance
 		nodeViewInstance = _GSymNodeViewInstance( self.env, docNodeKey.docNode, self.view, self, self.viewFactory, viewNode )
+		relativeNode = relative( docNodeKey.docNode, docNodeKey.parentDocNode, docNodeKey.index )
 		# Build the contents
-		viewContents = nodeViewInstance._runtime_buildViewContents( docNodeKey.docNode )
+		viewContents = nodeViewInstance._runtime_buildViewContents( relativeNode )
 		# Get the refresh cells that need to be monitored, and hand them to the DVNode
 		viewNode._f_setRefreshCells( nodeViewInstance.refreshCells )
 		# Return the contents
@@ -285,12 +265,15 @@ class _GSymViewFactory (object):
 		self.env = env
 		self.name = name
 		
-		# Build the match expression
-		self.matchFunction, varNameToValueIndirectionByMatch = compileMatchExpression( spec, [0], filterIdentifierForPy( 'view_match_%s'  %  ( self.name, ) ) )
+		viewFunctionName = filterIdentifierForPy( 'viewFactory_%s'  %  ( name, ) )
 		
-		# Build the view-expressions that create the view contents (1 for each match expression)
-		self.viewExprFunctionAndVarNameToIndirectionPairs = [ self._p_generateExprFunctionAndValueIndirection( matchAndViewExpr, i, varNameToValueIndir )
-					   for i, ( matchAndViewExpr, varNameToValueIndir ) in enumerate( zip( spec, varNameToValueIndirectionByMatch ) ) ]
+		lcls = { '_buildView': self._runtime_buildView,
+			 '_activeBorder' : _runtime_activeBorder,
+			 '_label' : _runtime_label,
+			 '_entry' : _runtime_entry,
+			 '_hbox' : _runtime_hbox, }
+		self.viewFunctionFactory = compileGLispExprToPyFunction( viewFunctionName, [ '__view_node_instance__' ], spec, self._p_compileSpecial, lcls=lcls )
+		
 		
 		
 	def createInstance(self, xs, commandHistory, styleSheetDispatcher):
@@ -299,100 +282,68 @@ class _GSymViewFactory (object):
 
 
 	
-	def _p_generateExprFunctionAndValueIndirection(self, matchAndViewExpr, i, varNameToValueIndirection):
-		"""Helper function for the constructor
-		Compiles a GLisp view-expression to a python function"""
-		functionName = filterIdentifierForPy( 'view_expr_%s_%d'  %  ( self.name, i ) )
-		paramNames = [ '__view_node_instance__', '__refreshCells__' ]  +  list( varNameToValueIndirection.keys() )
-		lcls = { '_buildView': self._runtime_buildView,
-			 '_buildViewForMap' : self._runtime_buildViewForMap,
-			 '_activeBorder' : _runtime_activeBorder,
-			 '_label' : _runtime_label,
-			 '_entry' : _runtime_entry,
-			 '_hbox' : _runtime_hbox, }
-		return compileGLispFunctionToPy( matchAndViewExpr[1], functionName, paramNames, self._p_compileSpecial, lcls  ), varNameToValueIndirection
-	
-	
 	def _runtime_buildView(self, viewNodeInstance, content):
 		"""Build a view for a document subtree (@content)"""
-		if not isinstance( content, _ViewNodeAndIndrection ):
-			self.env.glispError( TypeError, None, '_GSymViewFactory._runtime_buildView: content is not a _ViewNodeAndIndrection' )
-		# Need the indirection to get parentage; used by DocNode._f_buildView
-		xs, indirection = content.viewNode, content.indirection
-		parentViewNode = viewNodeInstance.viewNode
-		indexInParentDocNode = indirection[-1]
+		if not isinstance( content, RelativeNode ):
+			self.env.glispError( TypeError, None, '_GSymViewFactory._runtime_buildView: content is not a RelativeNode' )
 		# A call to DocNode._f_buildView builds the view, and puts it in the DocView's table
-		return viewNodeInstance.view._f_buildView( xs, parentViewNode, indexInParentDocNode )
-		
-	def _runtime_buildViewForMap(self, viewNodeInstance, content, index):
-		"""Build a view for a document subtree (@content)
-		Like the above, but when applied to a list"""
-		if not isinstance( content, _ViewNodeAndIndrection ):
-			self.env.glispError( TypeError, None, '_GSymViewFactory._runtime_buildViewForMap: content is not a _ViewNodeAndIndrection' )
-		# Need the indirection to get parentage; used by DocNode._f_buildView
-		xs, indirection = content.viewNode, content.indirection
-		parentViewNode = viewNodeInstance.viewNode
-		lastIndirection = indirection[-1]
-		if isinstance( lastIndirection, tuple ):
-			indexInParentDocNode = lastIndirection[0] + index
-		else:
-			indexInParentDocNode = index
-		# A call to DocNode._f_buildView builds the view, and puts it in the DocView's table
-		return viewNodeInstance.view._f_buildView( xs, parentViewNode, indexInParentDocNode )
-
+		return viewNodeInstance.view._f_buildView( content.node, content.parent, content.indexInParent )
 		
 	
-	def _p_compileStylesheetAccess(self, src):
+	
+	def _p_compileStylesheetAccess(self, srcXs, context, bNeedResult, compileSpecial, compileGLispExprToPyTree):
 		"""Compile style-sheet access
 		TODO"""
-		return '[]'
+		return PyListLiteral( [], dbgSrc=srcXs )
 	
 	def _p_compileSubExp(self, src):
 		"""Helper for compiling a sub-expression"""
 		return compileGLispExprToPySrc( src, self._p_compileSpecial )
 	
-	def _p_compileSpecial(self, src):
+	def _p_compileSpecial(self, srcXs, context, bNeedResult, compileSpecial, compileGLispExprToPyTree):
 		"""Compile special statements specific to view expressions"""
-		name = src[0]
-		if name == '/viewEval':
-			# (/viewEval <document-subtree>)
-			return '_buildView( __view_node_instance__, %s )'  %  ( self._p_compileSubExp( src[1] ), )
-		elif name == '/mapViewEval':
-			# (/mapViewEval <document-subtree>)
-			return '[ _buildViewForMap( __view_node_instance__, x, i )   for i, x in enumerate( %s ) ]'  %  ( self._p_compileSubExp( src[1] ), )
-		elif name == '/activeBorder':
-			#(/activeBorder <child> styleSheet*)
-			if len( src ) < 2:
+		name = srcXs[0]
+
+		compileSubExp = lambda xs: compileGLispExprToPyTree( xs, context, True, compileSpecial )
+		compileStyleSheetAccess = lambda xs: self._p_compileStylesheetAccess( xs, context, True, compileSpecial, compileGLispExprToPyTree )
+	
+		if name == '$viewEval':
+			# ($viewEval <document-subtree>)
+			return PyCall( PyVar( '_buildView', dbgSrc=srcXs ), [ PyVar( '__view_node_instance__', dbgSrc=srcXs ), compileSubExp( srcXs[1] ) ], dbgSrc=srcXs )
+		elif name == '$mapViewEval':
+			# ($mapViewEval <document-subtree>)
+			itemExpr = PyCall( PyVar( '_buildView', dbgSrc=srcXs ), [ PyVar( '__view_node_instance__', dbgSrc=srcXs ), PyVar( 'x', dbgSrc=srcXs ) ], dbgSrc=srcXs )
+			return PyListComprehension( itemExpr, 'x', compileSubExp( srcXs[1] ), None, dbgSrc=srcXs )
+		elif name == '$activeBorder':
+			#($activeBorder <child> styleSheet*)
+			if len( srcXs ) < 2:
 				self.env.glispError( GLispParameterListError, src, 'defineView: /activeBorder needs at least 1 parameter; the child content' )
-			return '_activeBorder( __view_node_instance__, %s, %s )'  %  ( self._p_compileSubExp( src[1] ), self._p_compileStylesheetAccess( src[2:] ) )
-		elif name == '/label':
-			#(/label text styleSheet*)
-			if len( src ) < 2:
+			return PyCall( PyVar( '_activeBorder', dbgSrc=srcXs ), [ PyVar( '__view_node_instance__', dbgSrc=srcXs ), compileSubExp( srcXs[1] ), compileStyleSheetAccess( srcXs[2:]) ], dbgSrc=srcXs )
+		elif name == '$label':
+			#($label text styleSheet*)
+			if len( srcXs ) < 2:
 				self.env.glispError( GLispParameterListError, src, 'defineView: /label needs at least 1 parameter; the text' )
-			return '_label( __view_node_instance__, %s, %s )'  %  ( self._p_compileSubExp( src[1] ), self._p_compileStylesheetAccess( src[2:] ) )
-		elif name == '/entry':
-			#(/entry text styleSheet*)
-			if len( src ) < 2:
+			return PyCall( PyVar( '_label', dbgSrc=srcXs ), [ PyVar( '__view_node_instance__', dbgSrc=srcXs ), compileSubExp( srcXs[1] ), compileStyleSheetAccess( srcXs[2:]) ], dbgSrc=srcXs )
+		elif name == '$entry':
+			#($entry text styleSheet*)
+			if len( srcXs ) < 2:
 				self.env.glispError( GLispParameterListError, src, 'defineView: /entry needs at least 1 parameter; the text' )
-			return '_entry( __view_node_instance__, %s, %s )'  %  ( self._p_compileSubExp( src[1] ), self._p_compileStylesheetAccess( src[2:] ) )
-		elif name == '/hbox':
-			#(/hbox (child*) styleSheet*)
-			if len( src ) < 2:
+			return PyCall( PyVar( '_entry', dbgSrc=srcXs ), [ PyVar( '__view_node_instance__', dbgSrc=srcXs ), compileSubExp( srcXs[1] ), compileStyleSheetAccess( srcXs[2:]) ], dbgSrc=srcXs )
+		elif name == '$hbox':
+			#($hbox (child*) styleSheet*)
+			if len( srcXs ) < 2:
 				self.env.glispError( GLispParameterListError, src, 'defineView: /hbox needs at least 1 parameter; the children' )
-			return '_hbox( __view_node_instance__, %s, %s )'  %  ( self._p_compileSubExp( src[1] ), self._p_compileStylesheetAccess( src[2:] ) )
+			return PyCall( PyVar( '_hbox', dbgSrc=srcXs ), [ PyVar( '__view_node_instance__', dbgSrc=srcXs ), compileSubExp( srcXs[1] ), compileStyleSheetAccess( srcXs[2:]) ], dbgSrc=srcXs )
 		else:
-			self.env.glispError( GLispCompilerError, src, 'cannot compile special \'%s\''  %  ( src[0], ) )
+			return None
 		
 
 			
 			
 			
 def defineView(env, xs, name, docFormat, spec):
-	#viewFactory = _GSymViewFactory( env, name, spec )
-	viewFactory = None
+	viewFactory = _GSymViewFactory( env, name, spec )
+	#viewFactory = None
 	
 	return GSymViewDefinition( name, docFormat, viewFactory )
 
-# WE NEED TO COMPILE:
-# Node contents factory factory
-#        nodeContentsFactoryFactory( xs )  ->  nodeContentsFactory()  ->  the contents for a DVCustomNode
