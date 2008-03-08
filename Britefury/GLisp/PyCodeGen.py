@@ -391,7 +391,7 @@ class PyIf (PyNode):
 		for i in ifElifSpecs:
 			assert isinstance( i, tuple ), 'PyIf: if-specification must be a tuple (condition, [statement*]); not a tuple'
 			assert len( i ) == 2, 'PyIf: if-specification must be a tuple (condition, [statement*]); length != 2'
-			assert isinstance( i[1], list ), 'PyIf: if-specification must be a tuple (condition, [statement*]); second element not a lit'
+			assert isinstance( i[1], list ), 'PyIf: if-specification must be a tuple (condition, [statement*]); second element not a list'
 			
 		self.ifElifSpecs = ifElifSpecs
 		self.elseStatements = elseStatements
@@ -441,6 +441,8 @@ class PyIf (PyNode):
 	
 class PySimpleIf (PyIf):
 	def __init__(self, condition, statements, dbgSrc=None):
+		assert isinstance( condition, PyNode ), 'PySimpleIf condition must be a PyNode'
+		assert isinstance( statements,list ), 'PySimpleIf statement list must be a list'
 		super( PySimpleIf, self ).__init__( [ ( condition, statements ) ], None, dbgSrc=dbgSrc )
 
 

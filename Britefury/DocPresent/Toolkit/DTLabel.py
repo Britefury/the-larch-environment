@@ -290,7 +290,7 @@ if __name__ == '__main__':
 	window.set_size_request( 300, 100 )
 
 	doc = DTDocument()
-	doc.show()
+	doc.getGtkWidget().show()
 
 	vbox = DTBox( DTDirection.TOP_TO_BOTTOM, minorDirectionAlignment=DTBox.ALIGN_EXPAND )
 	vbox.spacing = 10.0
@@ -301,12 +301,19 @@ if __name__ == '__main__':
 		for j in xrange( i*64, i*64+64 ):
 			hbox.append( DTLabel( chr( j ) ) )
 		vbox.append( hbox )
+		
+	chars = [ u"\u03bb" ]
+	hbox = DTBox()
+	for c in chars:
+		hbox.append( DTLabel( c ) )
+	vbox.append( hbox )
+		
 
 
 	doc.child = vbox
 
 
-	window.add( doc )
+	window.add( doc.getGtkWidget() )
 	window.show()
 
 	gtk.main()

@@ -2,29 +2,26 @@ TODOS:
 
 
 
-WHERE, IF, and LAMBDA STATEMENTS:
-LAMBDA STATEMENTS:
-Do not bind var names
 
+	
+	
+	
 
-
-
-Cursor handling:
+CURSOR HANDLING SYSTEM STATUS:
 The cursor handling currently uses the focus system, rather than an ever-present cursor.
 It is now handled by the presentation toolkit, rather than by the document view.
 
-	
-	
-	
-IMPLEMENT CURSOR LOCATION METHODS FOR:
-DTHLine
-DTScript
-DTWrappedLine
-DTWrappedLineWithSeparators
 
-TEST CURSOR LOCATION METHODS FOR:
-DTBox
-DTEntry
+ALTERNATE CURSOR MANAGEMENT SYSTEM:
+Implement cursor location methods for:
+- DTHLine
+- DTScript
+- DTWrappedLine
+- DTWrappedLineWithSeparators
+Test cursor location methods for:
+- DTBox
+- DTEntry
+
 
 
 
