@@ -301,12 +301,12 @@ class MainApp (object):
 
 
 
-	def _p_refreshCodeView(self):
+	def _p_refreshView(self):
 		self._view.refresh()
 
 
 	def _p_queueRefresh(self):
-		queueEvent( self._p_refreshCodeView )
+		queueEvent( self._p_refreshView )
 
 
 

@@ -8,35 +8,6 @@
 import compiler
 from compiler import ast
 
-from Britefury.SheetGraph.SheetGraph import SheetGraph
-
-from Britefury.CodeGraph.CGArguments import CGArguments
-from Britefury.CodeGraph.CGAssignment import CGAssignment
-from Britefury.CodeGraph.CGBinaryOperator import *
-from Britefury.CodeGraph.CGBlock import CGBlock
-from Britefury.CodeGraph.CGBreak import CGBreak
-from Britefury.CodeGraph.CGCall import CGCall
-from Britefury.CodeGraph.CGClass import CGClass
-from Britefury.CodeGraph.CGContinue import CGContinue
-from Britefury.CodeGraph.CGDef import CGDef
-from Britefury.CodeGraph.CGFloatLiteral import CGFloatLiteral
-from Britefury.CodeGraph.CGGetAttr import CGGetAttr
-from Britefury.CodeGraph.CGIf import CGIf
-from Britefury.CodeGraph.CGIfBlock import CGIfBlock
-from Britefury.CodeGraph.CGIntLiteral import CGIntLiteral
-from Britefury.CodeGraph.CGLambda import CGLambda
-from Britefury.CodeGraph.CGList import CGList
-from Britefury.CodeGraph.CGModule import CGModule
-from Britefury.CodeGraph.CGParameters import CGParameters
-from Britefury.CodeGraph.CGParameterVar import CGParameterVar
-from Britefury.CodeGraph.CGReturn import CGReturn
-from Britefury.CodeGraph.CGSubscript import CGSubscript
-from Britefury.CodeGraph.CGStringLiteral import CGStringLiteral
-from Britefury.CodeGraph.CGTuple import CGTuple
-from Britefury.CodeGraph.CGUnaryOperator import CGNegate, CGNot
-from Britefury.CodeGraph.CGUnboundRef import CGUnboundRef
-from Britefury.CodeGraph.CGVar import CGVar
-from Britefury.CodeGraph.CGWhile import CGWhile
 
 
 
