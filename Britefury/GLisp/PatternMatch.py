@@ -13,12 +13,6 @@ from Britefury.GLisp.GLispInterpreter import isGLispList
 from Britefury.GLisp.PyCodeGen import PyCodeGenError, PySrc, PyVar, PyLiteral, PyListLiteral, PyGetAttr, PyGetItem, PyUnOp, PyBinOp, PyCall, PyMethodCall, PyReturn, PyIf, PySimpleIf, PyDef, PyAssign_SideEffects, PyDel_SideEffects
 
 
-_stringType = str
-_stringTypeSrc = 'str'
-_listType = DMListInterface
-_listTypeSrc = 'DMListInterface'
-
-
 class NoMatchError (Exception):
 	pass
 
@@ -50,7 +44,7 @@ class  _MatchNode (object):
 	
 	
 	def _p_conditionWrap(self, outerTreeFactory, conditionSrc):
-		return lambda innerTree: outerTreeFactory( PySimpleIf( PySrc( conditionSrc ), [ innerTree ], dbgSrc=self.srcXs ) )
+		return lambda innerTrees: outerTreeFactory( [ PySimpleIf( PySrc( conditionSrc ), innerTrees, dbgSrc=self.srcXs ) ] )
 		
 		
 		
@@ -158,6 +152,7 @@ class _MatchList (_MatchNode):
 		
 		return treeFac
 
+
 	
 class _MatchSublist (_MatchNode):
 	def __init__(self, min, max, srcXs):
@@ -230,9 +225,9 @@ def _bindingMapToBindingDictSrc(bindings):
 	
 	
 		
-def compileMatchExpression(xs, exprIndirection=[], functionName='match', bSrc=False):
+def compileMatchExpressionToPyFunction(xs, exprIndirection=[], functionName='match', bSrc=False):
 	"""
-	compileMatchExpression(xs, exprIndirection=[], functionName='match', bSrc=False)   ->   fn, varNames
+	compileMatchExpressionToPyFunction(xs, exprIndirection=[], functionName='match', bSrc=False)   ->   fn, varNameToValueIndirectionTable
 		xs is a list of match expressions. It is a GLisp list (a list or a DMListInterface)
 		exprIndirection is a list that specifies the indrection necessary to get the match expression from each item in xs
 			Examples:
@@ -257,7 +252,7 @@ def compileMatchExpression(xs, exprIndirection=[], functionName='match', bSrc=Fa
 	   
 		Match expression format:
 	   
-			bind(x)  :=  [':' <var_name> x]  |  x
+			bind(x)  :=  [':' @<var_name> x]  |  x
 			
 			matchX := matchItem
 			matchItem := anything | terminal | nonTerminal | constant | list
@@ -273,13 +268,13 @@ def compileMatchExpression(xs, exprIndirection=[], functionName='match', bSrc=Fa
 		Example:
 			((a b c))  =>  matches (a b c)
 			((a b c) (d e f)  =>  matches (a b c)  or  (d e f)
-			((a ! ^ /))  =>  matches (a <anything> <terminal> <nonTerminal>)
-			((a ! ^ (x y /))  =>  matches (a <anything> <terminal> (x y <nonTerminal>))
+			((a ^ ! /))  =>  matches (a <anything> <terminal> <nonTerminal>)
+			((a ^ ! (x y /))  =>  matches (a <anything> <terminal> (x y <nonTerminal>))
 			((a * z))  =>  matches (a ... z)   where ... consists of 0 or more elements
 			((a + z))  =>  matches (a ... z)   where ... consists of 1 or more elements
 			((a (- #2 #4) z))  =>  matches (a ... z)   where ... consists of 2 to 4 elements
-			((a (: @a ^) z))  =>  matches (a [a]<terminal> z)   [a] indicates that the expression that follows is bound to the variable a
-			((a (: @a (i j (: @b ^))) z))  =>  matches (a [a](i j [b]<terminal>) z)   where 'a' is bound to (i j [b]<any_string>)   and 'b' is bound to the string
+			((a (: @a !) z))  =>  matches (a [a]<terminal> z)   [a] indicates that the expression that follows is bound to the variable a
+			((a (: @a (i j (: @b !))) z))  =>  matches (a [a](i j [b]<terminal>) z)   where 'a' is bound to (i j [b]<any_string>)   and 'b' is bound to the string
 			((:: !! -- // ++ **))  =>  matches (: ! - / + *)
 	"""
 	
@@ -296,15 +291,15 @@ def compileMatchExpression(xs, exprIndirection=[], functionName='match', bSrc=Fa
 
 		matchItemVarNameToValueIndirection = {}
 		bindings = {}
-		matchTreeFac = matchNode.emitSourceVarNamesAndBindings( lambda innerTree: innerTree, 'xs', [], matchItemVarNameToValueIndirection, bindings)
+		matchTreeFac = matchNode.emitSourceVarNamesAndBindings( lambda innerTrees: innerTrees, 'xs', [], matchItemVarNameToValueIndirection, bindings)
 		
 		resultTree = PySrc( 'return '  +  _bindingMapToBindingDictSrc( bindings )  +  ', %d'  %  ( index, ), dbgSrc=xs )
 		
-		matchTree = matchTreeFac( resultTree )
+		matchTrees = matchTreeFac( [ resultTree ] )
 		
 		varNameToValueIndirectionTable.append( matchItemVarNameToValueIndirection )
 		
-		functionBodyTrees.append( matchTree )
+		functionBodyTrees.extend( matchTrees )
 	functionBodyTrees.extend( [ PySrc( 'raise NoMatchError' ) ] )
 	
 	defTree = PyDef( functionName, [ 'xs' ], functionBodyTrees, dbgSrc=xs )
@@ -315,29 +310,152 @@ def compileMatchExpression(xs, exprIndirection=[], functionName='match', bSrc=Fa
 	if bSrc:
 		return src, varNameToValueIndirectionTable
 	else:	
-		lcl = { '__isGLispList__'  :  isGLispList, 'NoMatchError' : NoMatchError, '%s' % ( _listTypeSrc, )  :  _listType }
+		lcl = { '__isGLispList__'  :  isGLispList, 'NoMatchError' : NoMatchError }
 		
 		exec src in lcl
 		
 		return lcl[functionName], varNameToValueIndirectionTable
 
 
+	
+	
+class MatchBlockInvalidType (PyCodeGenError):
+	pass
+
+class MatchExprInvalidType (PyCodeGenError):
+	pass
+
+class MatchExprNoPattern (PyCodeGenError):
+	pass
+
+def compileMatchBlockToPyTrees(matchXs, xs, context, bNeedResult, dataVarName, compileActionBlock):
+	"""
+	compileMatchBlockToPyTrees(matchXs, xs, context, bNeedResult, dataVarName, compileActionBlock)  ->  [PyTree]
+	
+	@matchXs - the overall match expression (for debug information)
+	@xs - GLisp expressions to compile
+	@context - the compilation context
+	@bNeedResult - True if the result is required
+	@dataVarName - the name of the variable containing the data that is to be matched to the patterns supplied in @xs
+	@compileActionBlock - the function used to compile an action
+	   compileActionBlock(actionXs, context, bindings, resultVarName)  ->  [PyTree]
+	     @matchXs - GLisp match expression (pattern and actions)
+	     @actionXs - GLisp action expression
+	     @context - the compilation context
+	     @bindings - a dictionary mapping variable name to value source code
+	     @resultVarName - The name of the variable in which to place the result
+	
+	FORMAT:
+	(pattern_expr0 action_expr0)
+	(pattern_expr1 action_expr1)
+	...
+	(pattern_exprN action_exprN)
+	
+		Pattern expression format:
+	   
+			bind(x)  :=  [':' @<var_name> x]  |  x
+			
+			matchX := matchItem
+			matchItem := anything | terminal | nonTerminal | constant | list
+			anything := bind( '^' )
+			terminal := bind( '!' )
+			nonTerminal := bind( '/' )
+			constant := bind( <string> )
+			list := bind( [matchItem* listInternal? matchItem*] )
+			listInternal := bind( '+'  |  '*'  |  ['-' #min #max] )
+			
+			The characters : ! - / + * are assigned special meaning, so use :: !! -- // ++ ** to get the characters as constants
+			
+		Example:
+			((a b c))  =>  matches (a b c)
+			((a b c) (d e f)  =>  matches (a b c)  or  (d e f)
+			((a ^ ! /))  =>  matches (a <anything> <terminal> <nonTerminal>)
+			((a ^ ! (x y /))  =>  matches (a <anything> <terminal> (x y <nonTerminal>))
+			((a * z))  =>  matches (a ... z)   where ... consists of 0 or more elements
+			((a + z))  =>  matches (a ... z)   where ... consists of 1 or more elements
+			((a (- #2 #4) z))  =>  matches (a ... z)   where ... consists of 2 to 4 elements
+			((a (: @a !) z))  =>  matches (a [a]<terminal> z)   [a] indicates that the expression that follows is bound to the variable a
+			((a (: @a (i j (: @b !))) z))  =>  matches (a [a](i j [b]<terminal>) z)   where 'a' is bound to (i j [b]<any_string>)   and 'b' is bound to the string
+			((:: !! -- // ++ **))  =>  matches (: ! - / + *)
+	"""
+	
+	if not isGLispList( xs ):
+		raise MatchBlockInvalidType( xs )
+	
+	bMatchedName = context.temps.allocateTempName( 'match_bMatched' )
+	if bNeedResult:
+		resultName = context.temps.allocateTempName( 'match_result' )
+		
+	context.body.append( PyAssign_SideEffects( PyVar( bMatchedName, dbgSrc=matchXs ), PyLiteral( 'False', dbgSrc=matchXs ), dbgSrc=matchXs ) )
+	
+	matchTrees = []
+	bFirst = True
+	for match in xs:
+		if not isGLispList( match ):
+			raise MatchExprInvalidType( match )
+		
+		if len( match )  <  1:
+			raise MatchExprNoPattern( match )
+			
+		# Get the pattern, and actions
+		pattern = match[0]
+		actions = match[1:]
+		
+		# Build the matching nodes for the pattern
+		patternNode = _buildMatchNodeForMatchItem( pattern )
+
+		# Build the pattern tree factory
+		matchItemVarNameToValueIndirection = {}
+		bindings = {}
+		patternTreeFac = patternNode.emitSourceVarNamesAndBindings( lambda innerTrees: innerTrees, dataVarName, [], matchItemVarNameToValueIndirection, bindings)
+		
+		actionContext = context.innerContext()
+		# compileActionBlock() is defined in a context such that is knows if the result is needed, and if so will assign the result to the appropriate variable
+		actionTrees = [ PyAssign_SideEffects( PyVar( bMatchedName, dbgSrc=match ), PyLiteral( 'True', dbgSrc=match ) ) ]  +  compileActionBlock( match, actions, actionContext, bindings, resultName )
+
+		matchItemTrees = patternTreeFac( actionTrees )
+		
+		if not bFirst:
+			matchItemTrees = [ PySimpleIf( PySrc( 'not %s'  %  ( bMatchedName, ), dbgSrc=match ), matchItemTrees, dbgSrc=match ) ]
+			
+		matchTrees.extend( matchItemTrees )
+		
+		bFirst = False
+
+	# Raise NoMatchError if no match found
+	matchTrees.append( PySimpleIf( PySrc( 'not %s'  %  ( bMatchedName, ), dbgSrc=xs ), [ PySrc( 'raise NoMatchError', dbgSrc=xs ) ], dbgSrc=xs ) )
+	# Delete the @bMatchedName variable
+	matchTrees.append( PyDel_SideEffects( PyVar( bMatchedName, dbgSrc=xs ), dbgSrc=xs ) )
+	
+	if bNeedResult:
+		resultTree = PyVar( resultName, dbgSrc=matchXs )
+	else:
+		resultTree = None
+	return matchTrees, resultTree
+
+
+
+
+	
+	
+	
+	
 
 import unittest
 from Britefury.DocModel.DMIO import readSX
 
 class TestCase_MatchExpression (unittest.TestCase):
 	def _printSrc(self, matchSrc):
-		print compileMatchExpression( readSX( matchSrc ), bSrc=True )
+		print compileMatchExpressionToPyFunction( readSX( matchSrc ), bSrc=True )
 
 	def _printResult(self, matchSrc, dataSrc):
-		print compileMatchExpression( readSX( matchSrc ) )[0]( readSX( dataSrc ) )
+		print compileMatchExpressionToPyFunction( readSX( matchSrc ) )[0]( readSX( dataSrc ) )
 
 	def _matchTest(self, matchSrc, dataSrc, expected, indirection=[]):
 		if expected is NoMatchError:
-			self.failUnlessRaises( NoMatchError, lambda: compileMatchExpression( readSX( matchSrc ) )[0]( readSX( dataSrc ) ) )
+			self.failUnlessRaises( NoMatchError, lambda: compileMatchExpressionToPyFunction( readSX( matchSrc ) )[0]( readSX( dataSrc ) ) )
 		else:
-			result, index = compileMatchExpression( readSX( matchSrc ), indirection )[0]( readSX( dataSrc ) )
+			result, index = compileMatchExpressionToPyFunction( readSX( matchSrc ), indirection )[0]( readSX( dataSrc ) )
 			self.assert_( result == expected )
 
 	def _failurePrintSrc(self, reason, matchSrc, dataSrc):
@@ -346,16 +464,16 @@ class TestCase_MatchExpression (unittest.TestCase):
 		print matchSrc
 		print dataSrc
 		print '#######################'
-		print compileMatchExpression( readSX( matchSrc ), bSrc=True )[0]
+		print compileMatchExpressionToPyFunction( readSX( matchSrc ), bSrc=True )[0]
 		print '#######################'
 		print ''
 			
 
 	def _matchTestCheckIndex(self, matchSrc, dataSrc, expected, expectedIndex, indirection=[]):
 		if expected is NoMatchError:
-			self.failUnlessRaises( NoMatchError, lambda: compileMatchExpression( readSX( matchSrc ) )[0]( readSX( dataSrc ) ) )
+			self.failUnlessRaises( NoMatchError, lambda: compileMatchExpressionToPyFunction( readSX( matchSrc ) )[0]( readSX( dataSrc ) ) )
 		else:
-			result, index = compileMatchExpression( readSX( matchSrc ), indirection )[0]( readSX( dataSrc ) )
+			result, index = compileMatchExpressionToPyFunction( readSX( matchSrc ), indirection )[0]( readSX( dataSrc ) )
 			self.assert_( result == expected )
 			self.assert_( index == expectedIndex )
 
@@ -491,7 +609,7 @@ class TestCase_MatchExpression (unittest.TestCase):
 		self._matchTest( '(((a (: @a !)))  ((b (: @b !)))  ((c (: @c !)))  ((d (: @d !))))', '(a x)', { 'a' : 'x' }, [0] )
 		
 	def testVarNames(self):
-		result = compileMatchExpression( readSX( '((a (: @foo ^) (: @bar !) (: @doh /) (: @re *)))' ) )[1]
+		result = compileMatchExpressionToPyFunction( readSX( '((a (: @foo ^) (: @bar !) (: @doh /) (: @re *)))' ) )[1]
 		varNamesToIndirection = result[0]
 		varNames = set( varNamesToIndirection.keys() )
 		self.assert_( varNames == set( [ 'foo', 'bar', 'doh', 're' ] ) )
