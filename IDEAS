@@ -40,3 +40,17 @@ A similar system of atomic edits to lists could help in gSym:
 - merge lists
 - insert range i:j
 - remove range i:j
+
+
+07/Mar/2008
+Unicode supports Greek characters; useful for mathematics.
+GTK/cairo supports unicode characters.
+The DTLabel test code uses the python source:
+u"\u03bb"
+To display the lambda character.
+http://www.unicode.org   and   http://www.unicode.org/charts
+contain information on using unicode to get these characters.
+
+
+
+
