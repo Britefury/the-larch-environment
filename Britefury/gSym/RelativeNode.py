@@ -15,7 +15,7 @@ from Britefury.GLisp.GLispInterpreter import isGLispList
 
 
 
-def relative(x, parent=None, index=0):
+def relative(x, parent, index):
 	if isGLispList( x ):
 		return RelativeList( x, parent, index )
 	elif isinstance( x, unicode ):
@@ -152,7 +152,7 @@ import unittest
 class TestCase_RelativeNode (unittest.TestCase):
 	def testWrapRange(self):
 		a = range( 0, 10 )
-		n_a = relative( a )
+		n_a = relative( a, None, 0 )
 		n_5 = n_a[5]
 		self.assert_( n_5 == 5 )
 		self.assert_( n_5.parent is n_a )
@@ -160,7 +160,7 @@ class TestCase_RelativeNode (unittest.TestCase):
 
 	def testWrapStrRange(self):
 		a = [ str( i )   for i in range( 0, 10 ) ]
-		n_a = relative( a )
+		n_a = relative( a, None, 0 )
 		n_5 = n_a[5]
 		self.assert_( n_5 == '5' )
 		self.assert_( n_5.parent is n_a )
@@ -168,7 +168,7 @@ class TestCase_RelativeNode (unittest.TestCase):
 
 	def testWrapUnicodeRange(self):
 		a = [ unicode( i )   for i in range( 0, 10 ) ]
-		n_a = relative( a )
+		n_a = relative( a, None, 0 )
 		n_5 = n_a[5]
 		self.assert_( n_5 == u'5' )
 		self.assert_( n_5.parent is n_a )
