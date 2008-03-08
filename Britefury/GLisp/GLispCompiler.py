@@ -12,6 +12,7 @@ from Britefury.GLisp.PatternMatch import NoMatchError, compileMatchBlockToPyTree
 
 
 
+
 _TEMP_PREFIX = '__gsym__'
 
 
@@ -441,11 +442,14 @@ def _compileGLispExprToPyTree(xs, context, bNeedResult=False, compileSpecial=Non
 	   @xs - GLisp tree
 	   @context - the context in which to compile @xs
 	   @bNeedResult - True if the result is required for further computation
-	   @compileSpecial - function( xs, compileSpecial )  ->  PyNode tree
+	   @compileSpecial - function( xs, context, bNeedResult, compileSpecial, compileGLispExprToPyTree )  ->  PyNode tree
 	      A function used to compile special expressions
 	      A special expression is an expression where the first element of the GLisp node is a string starting with '/'
 	         @xs is the GLisp tree to be compiled by compileSpecial
+	         @context is the compilation context
+		 @bNeedResult - True if the result is required for further computation
 		 @compileSpecial is the value passed to _compileGLispExprToPyTree
+		 @compileGLispExprToPyTree is the function to call (will be passed _compileGLispExprToPyTree) to compile sub-expressions
 
 	"""
 	if xs is None:
@@ -471,7 +475,7 @@ def _compileGLispExprToPyTree(xs, context, bNeedResult=False, compileSpecial=Non
 		elif xs[0] == '$match':
 			return _compileMatch( xs, context, bNeedResult, compileSpecial )
 		elif isinstance( xs[0], str )  and  xs[0][0] == '$'  and  compileSpecial is not None:
-			res = compileSpecial( xs, compileSpecial )
+			res = compileSpecial( xs, context, bNeedResult, compileSpecial, _compileGLispExprToPyTree )
 			if res is not None:
 				return res
 			else:
@@ -680,7 +684,7 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 		self._evalTest( '($list #1 #2 #3)', [ 1, 2, 3 ] )
 		
 	def testCompileSpecial(self):
-		def compileSpecialExpr(xs, compileSpecial):
+		def compileSpecialExpr(xs, context, bNeedResult, compileSpecial, compileGLispExprToPyTree):
 			if xs[0] == '$special':
 				return PySrc( 'special' )
 			return None

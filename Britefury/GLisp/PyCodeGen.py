@@ -114,6 +114,14 @@ def _isPyDottedIdentifier(i):
 	return True
 
 
+def filterIdentifierForPy(identifier):
+	result = ''
+	for c in identifier:
+		if _isPyIdentifier( result + c ):
+			result += c
+	return result
+
+
 
 
 def _indent(pysrc):

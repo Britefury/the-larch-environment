@@ -19,14 +19,16 @@ from Britefury.DocView.DocView import DocView
 
 
 from Britefury.GLisp.GLispInterpreter import GLispParameterListError, GLispItemTypeError, isGLispList
-from Britefury.GLisp.GLispCompiler import compileGLispFunctionToPy, compileGLispExprToPySrc, GLispCompilerError, filterIdentifierForPy
-from Britefury.GLisp.PatternMatch import compileMatchExpression, NoMatchError
+from Britefury.GLisp.GLispCompiler import compileGLispExprToPyFunction
+from Britefury.GLisp.PyCodeGen import filterIdentifierForPy, PyCodeGenError, PySrc, PyVar, PyLiteral, PyListLiteral, PyGetAttr, PyGetItem, PyUnOp, PyBinOp, PyCall, PyMethodCall, PyReturn, PyIf, PyDef, PyAssign_SideEffects, PyDel_SideEffects
+#from Britefury.GLisp.GLispCompiler import compileGLispFunctionToPy, compileGLispExprToPySrc, GLispCompilerError, filterIdentifierForPy
+#from Britefury.GLisp.PatternMatch import compileMatchExpression, NoMatchError
 
 
 
 
 """
-A bried explanation as to how this module works.
+A brief explanation as to how this module works.
 
 
 The view is specified as a pattern match expression.
@@ -386,7 +388,8 @@ class _GSymViewFactory (object):
 			
 			
 def defineView(env, xs, name, docFormat, spec):
-	viewFactory = _GSymViewFactory( env, name, spec )
+	#viewFactory = _GSymViewFactory( env, name, spec )
+	viewFactory = None
 	
 	return GSymViewDefinition( name, docFormat, viewFactory )
 

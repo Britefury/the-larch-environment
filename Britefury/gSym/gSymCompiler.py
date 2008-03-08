@@ -5,8 +5,15 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
-from Britefury.GLisp.GLispCompiler import compileGLispCustomFunctionToPy, compileGLispExprToPySrc, GLispCompilerError, filterIdentifierForPy
-from Britefury.GLisp.PatternMatch import compileMatchExpression, NoMatchError
+##-*************************
+##-* This program is free software; you can use it, redistribute it and/or modify it
+##-* under the terms of the GNU General Public License version 2 as published by the
+##-* Free Software Foundation. The full text of the GNU General Public License
+##-* version 2 can be found in the file named 'COPYING' that accompanies this
+##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
+##-*************************
+from Britefury.GLisp.GLispCompiler import compileGLispExprToPyFunction
+from Britefury.GLisp.PyCodeGen import filterIdentifierForPy, PyCodeGenError, PySrc, PyVar, PyLiteral, PyListLiteral, PyGetAttr, PyGetItem, PyUnOp, PyBinOp, PyCall, PyMethodCall, PyReturn, PyIf, PyDef, PyAssign_SideEffects, PyDel_SideEffects
 
 
 
@@ -22,27 +29,21 @@ class GSymCompilerDefinition (object):
 
 	
 	
-def defineCompiler(env, xs, name, sourceFormat, targetFormat, spec):
-	def compileSpecial(src):
-		if src[0] == '/compileEval':
-			return '_compileEval( %s )'  %  ( compileGLispExprToPySrc( src[1], compileSpecial ), )
-		else:
-			env.glispError( GLispCompilerError, xs, 'cannot compile special \'%s\''  %  ( src[0], ) )
-	
+def defineCompiler(env, compilerXs, name, sourceFormat, targetFormat, spec):
 	def _compileEval(content):
-		try:
-			varValues, index = matchFunction( content )
-		except NoMatchError:
-			env.glispError( NoMatchError, xs, 'compileEval: cannot process; no suitable match expression found' )
-		f = compileExprFunctions[index]
-		return f( **varValues )
+		return compilerFunction( content )
 
-	matchFunction, varNameToValueIndirectionByMatch = compileMatchExpression( spec, [0], filterIdentifierForPy( 'compiler_match_%s'  %  ( name, ) ) )
 	
-	def generateExprFunction(matchAndCompileExpr, i, varNamesSet):
-		functionName = filterIdentifierForPy( 'compiler_expr_%s_%d'  %  ( name, i ) )
-		return compileGLispCustomFunctionToPy( matchAndCompileExpr[1], functionName, list( varNamesSet ), compileSpecial, { '_compileEval' : _compileEval } )
-
-	compileExprFunctions = [ generateExprFunction( matchAndCompileExpr, i, varNamesToValueIndirection.keys() )   for i, ( matchAndCompileExpr, varNamesToValueIndirection ) in enumerate( zip( spec, varNameToValueIndirectionByMatch ) ) ]
+	def compileSpecial(srcXs, context, bNeedResult, compileSpecial, compileGLispExprToPyTree):
+		if srcXs[0] == '$compileEval':
+			return PyCall( PyVar( '_compileEval', dbgSrc=srcXs ), [ compileGLispExprToPyTree(srcXs[1], context, bNeedResult, compileSpecial ) ], dbgSrc=srcXs )
+		else:
+			return None
+		
+		
+	compilerFunctionName = filterIdentifierForPy( 'compiler_%s'  %  ( name, ) )
 	
-	return GSymCompilerDefinition( name, sourceFormat, targetFormat, _compileEval )
+	compilerFactory = compileGLispExprToPyFunction( compilerFunctionName, [], spec, compileSpecial, lcls={ '_compileEval' : _compileEval } )
+	compilerFunction = compilerFactory()
+	
+	return GSymCompilerDefinition( name, sourceFormat, targetFormat, compilerFunction )
