@@ -43,9 +43,6 @@ pyMathFiles = cppPrefixPaths( 'Math', [ 'pyAxis.cpp', 'pyBBox2.cpp', 'pyBezier2U
 cppDocViewHelperFiles = cppPrefixPaths( 'DocViewHelper', [ 'DocViewBoxTable.cpp' ] )
 pyDocViewHelperFiles = cppPrefixPaths( 'DocViewHelper', [ 'pyDocViewBoxTable.cpp', 'pyDocViewHelper.cpp' ] )
 
-cppGraphViewHelperFiles = cppPrefixPaths( 'GraphViewHelper', [ 'GraphViewWidgetBoxTable.cpp', 'GraphViewLinkCurveTable.cpp' ] )
-pyGraphViewHelperFiles = cppPrefixPaths( 'GraphViewHelper', [ 'pyGraphViewWidgetBoxTable.cpp', 'pyGraphViewLinkCurveTable.cpp', 'pyGraphViewHelper.cpp' ] )
-
 cppGreenletFiles = cppPrefixPaths( os.path.join( 'extlibs', 'greenlet' ), [ 'greenlet.c' ] )
 
 
@@ -186,13 +183,11 @@ if envPath is not None:
 
 cppMathLib = env.SharedLibrary( 'Math', cppMathFiles, LIBPATH=libPaths, LIBS=extLibs+[] )
 cppDocViewHelperLib = env.SharedLibrary( 'DocViewHelper', cppDocViewHelperFiles, LIBPATH=libPaths, LIBS=extLibs+[ 'Math' ] )
-cppGraphViewHelperLib = env.SharedLibrary( 'GraphViewHelper', cppGraphViewHelperFiles, LIBPATH=libPaths, LIBS=extLibs + shLibsForShLib( [ 'Math' ] ) )
 
-cppLibs = [ 'Math', 'DocViewHelper', 'GraphViewHelper' ]
+cppLibs = [ 'Math', 'DocViewHelper' ]
 
 
 pyMathLib = env.SharedLibrary( os.path.join( 'Britefury', 'Math', 'Math' ), pyMathFiles, LIBS=extLibs + cppLibs, LIBPATH=libPaths, SHLIBPREFIX='', SHLIBSUFFIX=pyExtSuffix  )
 pyDocViewHelperLib = env.SharedLibrary( os.path.join( 'Britefury', 'DocViewHelper', 'DocViewHelper' ), pyDocViewHelperFiles, LIBS=extLibs + cppLibs, LIBPATH=libPaths, SHLIBPREFIX='', SHLIBSUFFIX=pyExtSuffix  )
-pyGraphViewHelperLib = env.SharedLibrary( os.path.join( 'Britefury', 'GraphView', 'GraphViewHelper' ), pyGraphViewHelperFiles, LIBS=extLibs + cppLibs, LIBPATH=libPaths, SHLIBPREFIX='', SHLIBSUFFIX=pyExtSuffix  )
 pyGreenletLib = env.SharedLibrary( os.path.join( 'Britefury', 'extlibs', 'greenlet', 'greenlet' ), cppGreenletFiles, LIBS=pyLibs, LIBPATH=libPaths, SHLIBPREFIX='', SHLIBSUFFIX=pyExtSuffix )
 
