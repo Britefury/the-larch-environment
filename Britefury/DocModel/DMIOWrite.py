@@ -51,6 +51,8 @@ def __writesx__(stream, content):
 					stream.write( repr( content ) )
 				else:
 					stream.write( content )
+			elif isinstance( content, unicode ):
+				stream.write( repr( content ) )
 		else:
 			w( stream )
 

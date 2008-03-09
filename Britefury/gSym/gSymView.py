@@ -13,6 +13,8 @@ from Britefury.DocPresent.Toolkit.DTLabel import DTLabel
 from Britefury.DocPresent.Toolkit.DTEntryLabel import DTEntryLabel
 from Britefury.DocPresent.Toolkit.DTBox import DTBox
 
+from Britefury.DocPresent.Toolkit.DTDirection import DTDirection
+
 from Britefury.DocView.DVNode import DVNode
 from Britefury.DocView.DVCustomNode import DVCustomNode
 from Britefury.DocView.DocView import DocView
@@ -172,6 +174,17 @@ def _runtime_hbox(viewNodeInstance, children, styleSheets):
 		sheet.apply()
 	return widget
 
+def _runtime_vbox(viewNodeInstance, children, styleSheets):
+	"""
+	Runtime - called by compiled code at run-time
+	Builds a vertical DTBox widget, with child, builds and registers a refresh cell
+	"""
+	widget = DTBox( direction=DTDirection.TOP_TO_BOTTOM )
+	_runtime_boxRefreshCell( viewNodeInstance, widget, children )
+	for sheet in styleSheets:
+		sheet.apply()
+	return widget
+
 
 
 
@@ -279,13 +292,15 @@ class _GSymViewFactory (object):
 		self.name = name
 		
 		viewFunctionName = filterIdentifierForPy( 'viewFactory_%s'  %  ( name, ) )
+		viewModuleName = filterIdentifierForPy( 'viewFactoryModule_%s'  %  ( name, ) )
 		
 		lcls = { '_buildView': self._runtime_buildView,
 			 '_activeBorder' : _runtime_activeBorder,
 			 '_label' : _runtime_label,
 			 '_entry' : _runtime_entry,
-			 '_hbox' : _runtime_hbox, }
-		self.makeViewFunctionAndViewNodeInstanceStack = compileGLispExprToPyFunction( viewFunctionName, [], spec, self._p_compileSpecial, lcls,
+			 '_hbox' : _runtime_hbox,
+			 '_vbox' : _runtime_vbox, }
+		self.makeViewFunctionAndViewNodeInstanceStack = compileGLispExprToPyFunction( viewModuleName, viewFunctionName, [], spec, self._p_compileSpecial, lcls,
 								 [ PySrc( '__view_node_instance__ = []' ) ],
 								 lambda tree, xs: PyListLiteral( [ tree, PyVar( '__view_node_instance__', dbgSrc=xs ) ], dbgSrc=xs ) )
 		
@@ -369,6 +384,11 @@ class _GSymViewFactory (object):
 			if len( srcXs ) < 2:
 				self.env.glispError( GLispParameterListError, src, 'defineView: $hbox needs at least 1 parameter; the children' )
 			return PyCall( PyVar( '_hbox', dbgSrc=srcXs ), [ PySrc( '__view_node_instance__[-1]', dbgSrc=srcXs ), compileSubExp( srcXs[1] ), compileStyleSheetAccess( srcXs[2:]) ], dbgSrc=srcXs )
+		elif name == '$vbox':
+			#($vbox (child*) styleSheet*)
+			if len( srcXs ) < 2:
+				self.env.glispError( GLispParameterListError, src, 'defineView: $vbox needs at least 1 parameter; the children' )
+			return PyCall( PyVar( '_vbox', dbgSrc=srcXs ), [ PySrc( '__view_node_instance__[-1]', dbgSrc=srcXs ), compileSubExp( srcXs[1] ), compileStyleSheetAccess( srcXs[2:]) ], dbgSrc=srcXs )
 		else:
 			return None
 		

@@ -6,6 +6,7 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
 from Britefury.GLisp.GLispInterpreter import isGLispList
+from Britefury.GLisp.GLispDebug import gLispSrcToString
 from Britefury.GLisp.PyCodeGen import PyCodeGenError, PySrc, PyVar, PyLiteral, PyListLiteral, PyGetAttr, PyGetItem, PyUnOp, PyBinOp, PyCall, PyMethodCall, PyReturn, PyIf, PyDef, PyAssign_SideEffects, PyDel_SideEffects
 from Britefury.GLisp.PatternMatch import NoMatchError, compileMatchBlockToPyTrees
 
@@ -14,6 +15,11 @@ from Britefury.GLisp.PatternMatch import NoMatchError, compileMatchBlockToPyTree
 
 
 _TEMP_PREFIX = '__gsym__'
+
+
+def _log(x):
+	print x
+	return x
 
 
 class _TempNameAllocator (object):
@@ -454,7 +460,7 @@ def _compileGLispExprToPyTree(xs, context, bNeedResult=False, compileSpecial=Non
 	"""
 	if xs is None:
 		return PyLiteral( 'None', dbgSrc=xs )
-	elif isinstance( xs, str ):
+	elif isinstance( xs, str )  or  isinstance( xs, unicode ):
 		if xs[0] == '@':
 			return PyVar( xs[1:], dbgSrc=xs )
 		elif xs[0] == '#':
@@ -587,11 +593,12 @@ def compileGLispExprToPyFunctionSrc(functionName, argNames, xs, compileSpecial=N
 
 
 
-def compileGLispExprToPyFunction(functionName, argNames, xs, compileSpecial=None, lcls={}, prefixTrees=[], resultPyTreePostProcess=lambda tree, xs: tree):
+def compileGLispExprToPyFunction(moduleName, functionName, argNames, xs, compileSpecial=None, lcls={}, prefixTrees=[], resultPyTreePostProcess=lambda tree, xs: tree):
 	"""
-	compileGLispExprToPyFunctionSrc( functionName, argNames, xs, compileSpecial=None )  ->  python source
+	compileGLispExprToPyFunctionSrc( moduleName, functionName, argNames, xs, compileSpecial=None )  ->  python source
 	
 	Compile the expression @xs into python source code that describes a function that returns the result of @xs.
+	   @moduleName - the name of the module that will be built
 	   @functionName - the name of the function that will be defined
 	   @argNames - the names of the function arguments
 	   @xs - the GLisp source
@@ -604,7 +611,10 @@ def compileGLispExprToPyFunction(functionName, argNames, xs, compileSpecial=None
 	src = compileGLispExprToPyFunctionSrc( functionName, argNames, xs, compileSpecial, prefixTrees, resultPyTreePostProcess )
 	lcls['__isGLispList__'] = isGLispList
 	lcls['NoMatchError'] = NoMatchError
-	exec src in lcls
+	lcls['gLispAsString'] = gLispSrcToString
+	lcls['log'] = _log
+	codeObject = compile( src, moduleName, 'exec' )
+	exec codeObject in lcls
 	return lcls[functionName]
 
 
@@ -628,7 +638,7 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 	def _evalTest(self, srcText, expectedResult, argValuePairs=[], compileSpecial=None, lcls={}):
 		argNames = [ p[0]   for p in argValuePairs ]
 		argValues = [ p[1]   for p in argValuePairs ]
-		fn = compileGLispExprToPyFunction( 'test', argNames, readSX( srcText ), compileSpecial, lcls=lcls )
+		fn = compileGLispExprToPyFunction( 'testModule', 'test', argNames, readSX( srcText ), compileSpecial, lcls=lcls )
 		result = fn( *argValues )
 		self.assert_( result == expectedResult )
 
@@ -1005,6 +1015,33 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 			'x + __gsym__where_result_0',
 		]
 		self._compileTest( xssrc1, pysrc1 )
+
+
+
+	def test_Where_Lambda(self):
+		xssrc1 = """
+		(@x +
+		  ($where
+	             (
+		       (@a #1)
+		       (@b #23)
+		     )
+		     ($lambda () (@a + @b))
+		  )
+		)
+		"""
+		pysrc1 = [
+			'a = 1',
+			'b = 23',
+			'def __gsym__lambda_0():',
+			'  return a + b',
+			'__gsym__where_result_0 = __gsym__lambda_0',
+			'del b',
+			'del a',
+			'x + __gsym__where_result_0',
+		]
+		self._compileTest( xssrc1, pysrc1 )
+		self._evalTest( xssrc1, 26, [ ( 'x', 2 ) ] )
 
 
 

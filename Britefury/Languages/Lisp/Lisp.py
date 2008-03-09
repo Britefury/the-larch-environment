@@ -212,7 +212,7 @@ class DVListSExpressionStyleSheet (DVListWrappedLineStyleSheet):
 
 	
 def lispNodeFactory(docNode, view, docNodeKey ):	
-	if isinstance( docNode, str ):
+	if isinstance( docNode, str )  or  isinstance( docNode, unicode ):
 		nodeClass = DVString
 	elif isinstance( docNode, DMListInterface ):
 		nodeClass = DVList

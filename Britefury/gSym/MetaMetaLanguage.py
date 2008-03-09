@@ -9,8 +9,10 @@ from Britefury.DocModel.DMListInterface import DMListInterface
 
 from Britefury.GLisp.GLispInterpreter import specialform, isGLispList
 
-from Britefury.gSym.gSymLanguage import GSymLanguageInstanceInterface, GSymLanguageInstanceControlInterface, GSymLanguageFactory
+from Britefury.gSym.gSymLanguage import GSymLanguageApplicationInterface, GSymLanguageInstanceInterface, GSymLanguageInstanceControlInterface, GSymLanguageFactory
 from Britefury.gSym.MetaLanguage import GSymLanguageInstanceInterface, GSymLanguageInstanceControlInterface, MetaLanguageFactory
+
+from Britefury.gSym.gSymView import defineView
 
 
 
@@ -18,7 +20,22 @@ from Britefury.gSym.MetaLanguage import GSymLanguageInstanceInterface, GSymLangu
 class MetaMetaLanguageInstanceInterface (GSymLanguageInstanceInterface):
 	"""Created in a meta-language document
 	The meta-language document describes a meta-language via this"""
-	pass
+	@specialform
+	def displayDefinition(self, env, xs):
+		if len( xs ) < 4:
+			env.glispError( GLispParameterListError, xs, 'MetaMetaLanguageInstanceInterface#displayDefinition: needs at least 2 parameters; the name, and the document format' )
+		
+		name = xs[2]
+		docFormat = xs[3]
+		spec = xs[4:]
+		
+		if not isinstance( name, str ):
+			env.glispError( GLispItemTypeError, xs, 'MetaMetaLanguageInstanceInterface#compilerDefinition: 1st parameter (compiler name) must be a string' )
+			
+		if not isinstance( docFormat, str ):
+			env.glispError( GLispItemTypeError, xs, 'MetaMetaLanguageInstanceInterface#compilerDefinition: 2nd parameter (document format) must be a string' )
+			
+		return defineView( env, xs, name, docFormat, spec )
 
 
 		
@@ -37,7 +54,7 @@ class MetaMetaLanguageInstanceControlInterface (GSymLanguageInstanceControlInter
 		languageDefinition = [ env.evaluate( x )   for x in xs[2] ]
 		languageFactory = MetaLanguageFactory( *languageDefinition )
 		env.rootScope()['languageFactory'] = languageFactory
-		return languageFactory
+		return GSymLanguageApplicationInterface( self._factory, xs )
 	
 	
 		

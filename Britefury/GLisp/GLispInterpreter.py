@@ -54,18 +54,6 @@ class GLispItemTypeError (Exception):
 def isGLispList(xs):
 	return isinstance( xs, list )  or  isinstance( xs, DMListInterface )
 
-def gLispSrcToString(x, level=3):
-	if x is None:
-		return 'None'
-	elif isinstance( x, str ):
-		return x
-	elif isGLispList( x ):
-		if level == 0:
-			return '(...)'
-		else:
-			return '(' + ' '.join( [ gLispSrcToString( v, level - 1 )  for v in x ] ) + ')'
-	else:
-		raise TypeError, 'cannot process %s'  %  ( x, )
 
 
 #
@@ -242,7 +230,7 @@ class GLispFrame (object):
 					# List with 2 or more elements
 					x1 = xs[1]
 					
-					if not isinstance( x1, str ):
+					if not isinstance( x1, str )  and  not isinstance( x1, unicode ):
 						# Second element not a string  ->  treat as expression list; evaluate in turn, return result of last expression
 						for x in xs:
 							res = self.evaluate( x )
@@ -255,7 +243,7 @@ class GLispFrame (object):
 						# This is for methods such as +, -, ., [], <, etc
 						methodName = _glispInterpreterMethodNameMap.get( x1, x1 )
 						
-						if isinstance( methodName, str ):
+						if isinstance( methodName, str )  or  isinstance( methodName, unicode ):
 							# method name is string; get the method by looking it up in the target object
 							try:
 								method = getattr( target, methodName )
@@ -326,7 +314,7 @@ class GLispFrame (object):
 		moduleName = xs[1]
 		expressions = xs[2:]
 		
-		if isinstance( moduleName, str ):
+		if isinstance( moduleName, str )  or  isinstance( moduleName, unicode ):
 			name = moduleName
 			targetName = name
 		else:
@@ -365,7 +353,7 @@ class GLispFrame (object):
 
 		module = self.moduleRegistry[name]
 
-		if not isinstance( name , str ):
+		if not isinstance( name , str )  and  not isinstance( name, unicode ):
 			self.glispError( ValueError, xs, '$importModuleContents module path should be a string' )
 		
 

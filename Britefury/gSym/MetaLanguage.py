@@ -7,9 +7,9 @@
 ##-*************************
 from Britefury.DocModel.DMListInterface import DMListInterface
 
-from Britefury.gSym.gSymLanguage import GSymLanguageInstanceInterface, GSymLanguageInstanceControlInterface, GSymLanguageFactory
+from Britefury.gSym.gSymLanguage import GSymLanguageApplicationInterface, GSymLanguageInstanceInterface, GSymLanguageInstanceControlInterface, GSymLanguageFactory
 
-from Britefury.GLisp.GLispInterpreter import specialform, isGLispList, gLispSrcToString, GLispParameterListError, GLispItemTypeError
+from Britefury.GLisp.GLispInterpreter import specialform, isGLispList, GLispParameterListError, GLispItemTypeError
 
 from Britefury.gSym.gSymCompiler import defineCompiler
 from Britefury.gSym.gSymView import defineView
@@ -76,7 +76,7 @@ class MetaLanguageInstanceControlInterface (GSymLanguageInstanceControlInterface
 		languageDefinition = [ env.evaluate( x )   for x in xs[2] ]
 		languageFactory = GSymLanguageFactory( *languageDefinition )
 		env.rootScope()['languageFactory'] = languageFactory
-		return languageFactory
+		return GSymLanguageApplicationInterface( self._factory, xs )
 	
 	
 		

@@ -66,6 +66,8 @@ class DMList (DMListInterface):
 			return DMList( x )
 		elif isinstance( x, str ):
 			return intern( x )
+		elif isinstance( x, unicode ):
+			return x
 		else:
 			return x
 
