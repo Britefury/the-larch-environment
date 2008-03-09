@@ -502,7 +502,7 @@ def _compileGLispExprToPyTree(xs, context, bNeedResult=False, compileSpecial=Non
 				return PyMethodCall( _compileGLispExprToPyTree( xs[0], context, True, compileSpecial ), xs[1], [ _compileGLispExprToPyTree( e, context, True, compileSpecial )   for e in xs[2:] ], dbgSrc=xs )
 
 
-def compileGLispExprToPyTrees(xs, compileSpecial=None):
+def compileGLispExprToPyTrees(xs, compileSpecial=None, ):
 	"""
 	compileGLispExprToPyTrees( xs, compileSpecial )  ->  trees, resultTree
 	
@@ -540,7 +540,7 @@ def compileGLispExprToPySrc(xs, compileSpecial=None):
 
 
 
-def compileGLispExprToPyFunctionPyTree(functionName, argNames, xs, compileSpecial=None):
+def compileGLispExprToPyFunctionPyTree(functionName, argNames, xs, compileSpecial=None, prefixTrees=[], resultPyTreePostProcess=lambda tree, xs: tree):
 	"""
 	compileGLispExprToPyFunctionPyTree( functionName, argNames, xs, compileSpecial=None )  ->  PyTree
 	
@@ -553,16 +553,22 @@ def compileGLispExprToPyFunctionPyTree(functionName, argNames, xs, compileSpecia
 	      A special expression is an expression where the first element of the GLisp node is a string starting with '/'
 	         @xs is the GLisp tree to be compiled by compileSpecial
 		 @compileSpecial is the value passed to _compileGLispExprToPyTree
+	   @prefixTrees - a list of PyTrees that should be compiled
+           @resultPyTreePostProcess - function( tree, xs )  ->  PyNode tree
+	      A function used to post process the result tree
+	         @tree - the result tree (to be post-processed or wrapped)
+		 @xs - the GLisp source
 	"""
 	context = _CompilationContext( _TempNameAllocator(), _PyScope() )
 	
-	fnBodyPyTrees, wrappedResultTree = _compileExpressionListToPyTreeStatements( [ xs ], context, True, compileSpecial, lambda t, x: PyReturn( t, dbgSrc=x ) )
+	fnBodyPyTrees, wrappedResultTree = _compileExpressionListToPyTreeStatements( [ xs ], context, True, compileSpecial, lambda t, x: PyReturn( resultPyTreePostProcess( t, x ), dbgSrc=x ) )
+	fnBodyPyTrees = prefixTrees + fnBodyPyTrees
 	
 	return PyDef( functionName, argNames, fnBodyPyTrees, dbgSrc=xs )
 
 
 
-def compileGLispExprToPyFunctionSrc(functionName, argNames, xs, compileSpecial=None):
+def compileGLispExprToPyFunctionSrc(functionName, argNames, xs, compileSpecial=None, prefixTrees=[], resultPyTreePostProcess=lambda tree, xs: tree):
 	"""
 	compileGLispExprToPyFunctionSrc( functionName, argNames, xs, compileSpecial=None )  ->  python source
 	
@@ -576,12 +582,12 @@ def compileGLispExprToPyFunctionSrc(functionName, argNames, xs, compileSpecial=N
 	         @xs is the GLisp tree to be compiled by compileSpecial
 		 @compileSpecial is the value passed to _compileGLispExprToPyTree
 	"""
-	tree = compileGLispExprToPyFunctionPyTree( functionName, argNames, xs, compileSpecial )
+	tree = compileGLispExprToPyFunctionPyTree( functionName, argNames, xs, compileSpecial, prefixTrees, resultPyTreePostProcess )
 	return '\n'.join( tree.compileAsStmt() )  +  '\n'
 
 
 
-def compileGLispExprToPyFunction(functionName, argNames, xs, compileSpecial=None, lcls={}):
+def compileGLispExprToPyFunction(functionName, argNames, xs, compileSpecial=None, lcls={}, prefixTrees=[], resultPyTreePostProcess=lambda tree, xs: tree):
 	"""
 	compileGLispExprToPyFunctionSrc( functionName, argNames, xs, compileSpecial=None )  ->  python source
 	
@@ -595,7 +601,7 @@ def compileGLispExprToPyFunction(functionName, argNames, xs, compileSpecial=None
 	         @xs is the GLisp tree to be compiled by compileSpecial
 		 @compileSpecial is the value passed to _compileGLispExprToPyTree
 	"""
-	src = compileGLispExprToPyFunctionSrc( functionName, argNames, xs, compileSpecial )
+	src = compileGLispExprToPyFunctionSrc( functionName, argNames, xs, compileSpecial, prefixTrees, resultPyTreePostProcess )
 	lcls['__isGLispList__'] = isGLispList
 	lcls['NoMatchError'] = NoMatchError
 	exec src in lcls
