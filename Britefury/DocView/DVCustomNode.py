@@ -57,5 +57,12 @@ class DVCustomNode (DVNode):
 		self._cellsToRefresh = cells
 		self._o_resetRefreshCell()
 		
+		
+	def _f_setContentsFactory(self, contentsFactory):
+		if contentsFactory is not self._contentsFactory:
+			self._contentsFactory = contentsFactory
+			self._contentsCell.function = self._p_computeContents
+			
+		
 
 
