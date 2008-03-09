@@ -3,7 +3,7 @@
 		($where ((@mlLang (@mlLangFac createLanguageInstanceControlInterface))  (@ml (@mlLang getLanguageInstanceInterface)))
 			(@mlLang content
 				(
-					(@ml compilerDefinition asciiCompiler simleLanguage python25_ascii
+					(@ml compilerDefinition asciiCompiler simpleLanguage python25_ascii
 						($lambda (@node)
 							($match @node
 								( (add (: @x ^) (: @y ^))   (  (((('(' + ($compileEval @x)) + ' + ') + ($compileEval @y)) + ')')  ) )
@@ -16,7 +16,7 @@
 						)
 					)
 					
-					(@ml displayDefinition simleLanguageDisplay simleLanguage
+					(@ml displayDefinition simpleLanguageDisplay simpleLanguage
 						($lambda (@node)
 							($match @node
 								( (add (: @x ^) (: @y ^))   (  ($activeBorder ($hbox ($list ($viewEval @x) ($label '+') ($viewEval @y))))  ) )

@@ -52,10 +52,10 @@ _unquotedStringChars = ( string.digits + string.letters + string.punctuation ).r
 
 
 _unquotedString = pyparsing.Word( _unquotedStringChars ).setParseAction( _unquotedStringParseAction )
-_quotedString = pyparsing.quotedString.setParseAction( _quotedStringParseAction )
+_quotedString = ( pyparsing.unicodeString  |  pyparsing.quotedString  |  pyparsing.dblQuotedString ).setParseAction( _quotedStringParseAction )
 _nil = pyparsing.Literal( '`nil`' ).setParseAction( _nilParseAction )
 
-_item = _unquotedString | _quotedString | _nil
+_item = _quotedString | _nil | _unquotedString
 
 _sxp = pyparsing.Forward()
 _sxList = pyparsing.Group( pyparsing.Suppress( '(' )  +  pyparsing.ZeroOrMore( _sxp )  +  pyparsing.Suppress( ')' ) ).setParseAction( _listParseAction )
@@ -63,7 +63,7 @@ _sxp << ( _item | _sxList )
 
 
 def readSX(source):
-	if isinstance( source, str ):
+	if isinstance( source, str )  or  isinstance( source, unicode ):
 		parseResult = _sxp.parseString( source )
 	else:
 		parseResult = _sxp.parseFile( source )

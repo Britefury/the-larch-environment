@@ -42,8 +42,9 @@ def defineCompiler(env, compilerXs, name, sourceFormat, targetFormat, spec):
 		
 		
 	compilerFunctionName = filterIdentifierForPy( 'compilerFactory_%s'  %  ( name, ) )
+	compilerModuleName = filterIdentifierForPy( 'compilerFactoryModule_%s'  %  ( name, ) )
 	
-	compilerFactory = compileGLispExprToPyFunction( compilerFunctionName, [], spec, compileSpecial, lcls={ '_compileEval' : _compileEval } )
+	compilerFactory = compileGLispExprToPyFunction( compilerModuleName, compilerFunctionName, [], spec, compileSpecial, lcls={ '_compileEval' : _compileEval } )
 	compilerFunction = compilerFactory()
 	
 	return GSymCompilerDefinition( name, sourceFormat, targetFormat, compilerFunction )
