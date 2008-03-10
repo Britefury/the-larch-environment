@@ -1,14 +1,13 @@
 TODOS:
 
 
-COMPILER:
-Major problem:
-$where and $match assign variables; then delete them.
-This causes a major problem;
-If functions/lambdas that are defined here make use of these variables from an inner scope;
-these variables would no longer be available; hence the python compiler refuses to handle this.
-This is now revealed in the GLispCompiler test_Where_Lambda unit test.
 
+- Fix the language system so that the Meta-language can display itself.
+- Generate debug information for compiled code
+- Handle debug information
+- GLisp (compiled to Python) code can generate bad data; check the sanity before processing it
+- Ensure that the build contents function can return a DVNode; if it does not generate a widget, this causes an error,
+since this widget is passed straight through to the node above/outside
 
 	
 	
