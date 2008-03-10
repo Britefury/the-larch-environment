@@ -60,16 +60,19 @@ class DocView (object):
 		self._nodeTable[newKey] = viewNode
 
 
-	def _f_buildView(self, docNode, parentDocNode, indexInParentDocNode):
+	def _f_buildView(self, docNode, parentDocNode, indexInParentDocNode, nodeFactory=None):
 		if docNode is None:
 			return None
 		else:
 			docNodeKey = DocNodeKey( docNode, parentDocNode, indexInParentDocNode )
 
+			if nodeFactory is None:
+				nodeFactory = self._nodeFactory
+			
 			try:
 				viewNode = self._nodeTable[docNodeKey]
 			except KeyError:
-				viewNode = self._nodeFactory( docNode, self, docNodeKey )
+				viewNode = nodeFactory( docNode, self, docNodeKey )
 				self._nodeTable[docNodeKey] = viewNode
 
 			viewNode.refresh()

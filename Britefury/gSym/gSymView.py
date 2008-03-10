@@ -20,7 +20,8 @@ from Britefury.DocView.DVCustomNode import DVCustomNode
 from Britefury.DocView.DocView import DocView
 
 
-from Britefury.GLisp.GLispInterpreter import GLispParameterListError, GLispItemTypeError, isGLispList
+from Britefury.GLisp.GLispUtil import isGLispList, gLispSrcToString
+from Britefury.GLisp.GLispInterpreter import GLispParameterListError, GLispItemTypeError
 from Britefury.GLisp.GLispCompiler import compileGLispExprToPyFunction
 from Britefury.GLisp.PyCodeGen import filterIdentifierForPy, PyCodeGenError, PySrc, PyVar, PyLiteral, PyListLiteral, PyListComprehension, PyGetAttr, PyGetItem, PyUnOp, PyBinOp, PyCall, PyMethodCall, PyReturn, PyIf, PyDef, PyAssign_SideEffects, PyDel_SideEffects
 
@@ -191,7 +192,7 @@ def _runtime_vbox(viewNodeInstance, children, styleSheets):
 
 
 
-
+_buildViewContentsRecursionLockSet = set()
 	
 
 class _GSymNodeViewInstance (object):
@@ -213,14 +214,20 @@ class _GSymNodeViewInstance (object):
 		
 
 	
-	def _runtime_buildViewContents(self, content):
+	def _runtime_buildViewContents(self, content, nodeViewFunction=None):
 		"""Runtime - build the contents of a view node"""
+		if nodeViewFunction is None:
+			nodeViewFunction = self.viewInstance.generalNodeViewFunction
+			fnName = 'default'
+		else:
+			fnName = nodeViewFunction.__name__
+
 		#1. Push @self onto the view instance's view node instance stack
 		# This is done so that the functions that have been compiled can get a reference to @this
 		self.viewInstance.viewNodeInstanceStack.append( self )
 		
 		#2. Create the view contents
-		viewContents = self.viewInstance.viewFunction( content )
+		viewContents = nodeViewFunction( content )
 		
 		#3. Push @self from the view instance's view node instance stack
 		self.viewInstance.viewNodeInstanceStack.pop()
@@ -245,26 +252,40 @@ class _GSymViewInstance (object):
 		self.env = env
 		self.xs = xs
 		self.viewFactory = viewFactory
-		self.viewFunction, self.viewNodeInstanceStack = self.viewFactory.makeViewFunctionAndViewNodeInstanceStack()
+		self.viewNodeInstanceStack = []
+		self.generalNodeViewFunction = self.viewFactory.makeViewFunction( self.viewNodeInstanceStack )
 		# self._p_buildDVNode is a factory that builds DVNode instances for document subtrees
-		self.view = DocView( self.xs, commandHistory, styleSheetDispatcher, self._p_buildDVNode )
+		self.view = DocView( self.xs, commandHistory, styleSheetDispatcher, self._p_rootNodeFactory )
 		
 		self._nodeContentsFactories = {}
 		
 	
-	def _p_buildDVNode(self, docNode, view, docNodeKey):
-		# Build a DVNode for the document subtree at @docNode
-		# self._p_buildNodeContents is a factory that builds the contents withing the DVNode
-		return DVCustomNode( docNode, view, docNodeKey, self._f_makeNodeContentsFactory() )
+	def _f_makeNodeFactory(self, nodeViewFunction):
+		def _nodeFactory(docNode, view, docNodeKey):
+			# Build a DVNode for the document subtree at @docNode
+			# self._p_buildNodeContents is a factory that builds the contents withing the DVNode
+			node = DVCustomNode( docNode, view, docNodeKey )
+			node._f_setContentsFactory( self._f_makeNodeContentsFactory( nodeViewFunction ) )
+			return node
+		return _nodeFactory
 	
 
-	def _f_makeNodeContentsFactory(self, viewFunction=None):
+	def _p_rootNodeFactory(self, docNode, view, docNodeKey):
+		# Build a DVNode for the document subtree at @docNode
+		# self._p_buildNodeContents is a factory that builds the contents withing the DVNode
+		node = DVCustomNode( docNode, view, docNodeKey )
+		node._f_setContentsFactory( self._f_makeNodeContentsFactory() )
+		return node
+	
+
+
+	def _f_makeNodeContentsFactory(self, nodeViewFunction=None):
 		def _buildNodeContents(viewNode, docNodeKey):
 			# Create the node view instance
 			nodeViewInstance = _GSymNodeViewInstance( self.env, docNodeKey.docNode, self.view, self, self.viewFactory, viewNode )
 			relativeNode = relative( docNodeKey.docNode, docNodeKey.parentDocNode, docNodeKey.index )
 			# Build the contents
-			viewContents = nodeViewInstance._runtime_buildViewContents( relativeNode )
+			viewContents = nodeViewInstance._runtime_buildViewContents( relativeNode, nodeViewFunction )
 			# Get the refresh cells that need to be monitored, and hand them to the DVNode
 			viewNode._f_setRefreshCells( nodeViewInstance.refreshCells )
 			# Return the contents
@@ -272,10 +293,10 @@ class _GSymViewInstance (object):
 		
 		#Memoise the contents factory; keyed by @viewFunction
 		try:
-			return self._nodeContentsFactories[viewFunction]
+			return self._nodeContentsFactories[nodeViewFunction]
 		except KeyError:
 			factory = _buildNodeContents
-			self._nodeContentsFactories[viewFunction] = factory
+			self._nodeContentsFactories[nodeViewFunction] = factory
 			return factory
 		
 	
@@ -300,9 +321,7 @@ class _GSymViewFactory (object):
 			 '_entry' : _runtime_entry,
 			 '_hbox' : _runtime_hbox,
 			 '_vbox' : _runtime_vbox, }
-		self.makeViewFunctionAndViewNodeInstanceStack = compileGLispExprToPyFunction( viewModuleName, viewFunctionName, [], spec, self._p_compileSpecial, lcls,
-								 [ PySrc( '__view_node_instance__ = []' ) ],
-								 lambda tree, xs: PyListLiteral( [ tree, PyVar( '__view_node_instance__', dbgSrc=xs ) ], dbgSrc=xs ) )
+		self.makeViewFunction = compileGLispExprToPyFunction( viewModuleName, viewFunctionName, [ '__view_node_instance_stack__' ], spec, self._p_compileSpecial, lcls )
 		
 		
 		
@@ -312,14 +331,16 @@ class _GSymViewFactory (object):
 
 
 	
-	def _runtime_buildView(self, viewNodeInstance, content, viewFunction=None):
+	def _runtime_buildView(self, viewNodeInstance, content, nodeViewFunction=None):
 		"""Build a view for a document subtree (@content)"""
 		if not isinstance( content, RelativeNode ):
 			self.env.glispError( TypeError, None, '_GSymViewFactory._runtime_buildView: content is not a RelativeNode' )
-
+			
 		# A call to DocNode._f_buildView builds the view, and puts it in the DocView's table
-		viewNode = viewNodeInstance.view._f_buildView( content.node, content.parent, content.indexInParent )
-		viewNode._f_setContentsFactory( viewNodeInstance.viewInstance._f_makeNodeContentsFactory( viewFunction ) )
+		viewInstance = viewNodeInstance.viewInstance
+		nodeFactory = viewInstance._f_makeNodeFactory( nodeViewFunction )
+		viewNode = viewNodeInstance.view._f_buildView( content.node, content.parent, content.indexInParent, nodeFactory )
+		viewNode._f_setContentsFactory( viewNodeInstance.viewInstance._f_makeNodeContentsFactory( nodeViewFunction ) )
 		viewNode.refresh()
 		
 		return viewNode
@@ -346,19 +367,19 @@ class _GSymViewFactory (object):
 		compileStyleSheetAccess = lambda xs: self._p_compileStylesheetAccess( xs, context, True, compileSpecial, compileGLispExprToPyTree )
 	
 		if name == '$viewEval':
-			# ($viewEval <document-subtree> ?<view-function>)
+			# ($viewEval <document-subtree> ?<node-view-function>)
 			if len( srcXs ) < 2:
 				self.env.glispError( GLispParameterListError, src, 'defineView: $viewEval needs at least 1 parameter; the document subtree' )
-			params = [ PySrc( '__view_node_instance__[-1]', dbgSrc=srcXs ), compileSubExp( srcXs[1] ) ]
+			params = [ PySrc( '__view_node_instance_stack__[-1]', dbgSrc=srcXs ), compileSubExp( srcXs[1] ) ]
 			# View function
 			if len( srcXs ) == 3:
 				params.append( compileSubExp( srcXs[2] ) )
 			return PyCall( PyVar( '_buildView', dbgSrc=srcXs ), params, dbgSrc=srcXs )
 		elif name == '$mapViewEval':
-			# ($mapViewEval <document-subtree> ?<view-function>)
+			# ($mapViewEval <document-subtree> ?<node-view-function>)
 			if len( srcXs ) < 2:
 				self.env.glispError( GLispParameterListError, src, 'defineView: $mapViewEval needs at least 1 parameter; the document subtree' )
-			params = [ PySrc( '__view_node_instance__[-1]', dbgSrc=srcXs ), PyVar( 'x', dbgSrc=srcXs ) ]
+			params = [ PySrc( '__view_node_instance_stack__[-1]', dbgSrc=srcXs ), PyVar( 'x', dbgSrc=srcXs ) ]
 			# View function
 			if len( srcXs ) == 3:
 				params.append( compileSubExp( srcXs[2] ) )
@@ -368,27 +389,27 @@ class _GSymViewFactory (object):
 			#($activeBorder <child> styleSheet*)
 			if len( srcXs ) < 2:
 				self.env.glispError( GLispParameterListError, src, 'defineView: $activeBorder needs at least 1 parameter; the child content' )
-			return PyCall( PyVar( '_activeBorder', dbgSrc=srcXs ), [ PySrc( '__view_node_instance__[-1]', dbgSrc=srcXs ), compileSubExp( srcXs[1] ), compileStyleSheetAccess( srcXs[2:]) ], dbgSrc=srcXs )
+			return PyCall( PyVar( '_activeBorder', dbgSrc=srcXs ), [ PySrc( '__view_node_instance_stack__[-1]', dbgSrc=srcXs ), compileSubExp( srcXs[1] ), compileStyleSheetAccess( srcXs[2:]) ], dbgSrc=srcXs )
 		elif name == '$label':
 			#($label text styleSheet*)
 			if len( srcXs ) < 2:
 				self.env.glispError( GLispParameterListError, src, 'defineView: $label needs at least 1 parameter; the text' )
-			return PyCall( PyVar( '_label', dbgSrc=srcXs ), [ PySrc( '__view_node_instance__[-1]', dbgSrc=srcXs ), compileSubExp( srcXs[1] ), compileStyleSheetAccess( srcXs[2:]) ], dbgSrc=srcXs )
+			return PyCall( PyVar( '_label', dbgSrc=srcXs ), [ PySrc( '__view_node_instance_stack__[-1]', dbgSrc=srcXs ), compileSubExp( srcXs[1] ), compileStyleSheetAccess( srcXs[2:]) ], dbgSrc=srcXs )
 		elif name == '$entry':
 			#($entry text styleSheet*)
 			if len( srcXs ) < 2:
 				self.env.glispError( GLispParameterListError, src, 'defineView: $entry needs at least 1 parameter; the text' )
-			return PyCall( PyVar( '_entry', dbgSrc=srcXs ), [ PySrc( '__view_node_instance__[-1]', dbgSrc=srcXs ), compileSubExp( srcXs[1] ), compileStyleSheetAccess( srcXs[2:]) ], dbgSrc=srcXs )
+			return PyCall( PyVar( '_entry', dbgSrc=srcXs ), [ PySrc( '__view_node_instance_stack__[-1]', dbgSrc=srcXs ), compileSubExp( srcXs[1] ), compileStyleSheetAccess( srcXs[2:]) ], dbgSrc=srcXs )
 		elif name == '$hbox':
 			#($hbox (child*) styleSheet*)
 			if len( srcXs ) < 2:
 				self.env.glispError( GLispParameterListError, src, 'defineView: $hbox needs at least 1 parameter; the children' )
-			return PyCall( PyVar( '_hbox', dbgSrc=srcXs ), [ PySrc( '__view_node_instance__[-1]', dbgSrc=srcXs ), compileSubExp( srcXs[1] ), compileStyleSheetAccess( srcXs[2:]) ], dbgSrc=srcXs )
+			return PyCall( PyVar( '_hbox', dbgSrc=srcXs ), [ PySrc( '__view_node_instance_stack__[-1]', dbgSrc=srcXs ), compileSubExp( srcXs[1] ), compileStyleSheetAccess( srcXs[2:]) ], dbgSrc=srcXs )
 		elif name == '$vbox':
 			#($vbox (child*) styleSheet*)
 			if len( srcXs ) < 2:
 				self.env.glispError( GLispParameterListError, src, 'defineView: $vbox needs at least 1 parameter; the children' )
-			return PyCall( PyVar( '_vbox', dbgSrc=srcXs ), [ PySrc( '__view_node_instance__[-1]', dbgSrc=srcXs ), compileSubExp( srcXs[1] ), compileStyleSheetAccess( srcXs[2:]) ], dbgSrc=srcXs )
+			return PyCall( PyVar( '_vbox', dbgSrc=srcXs ), [ PySrc( '__view_node_instance_stack__[-1]', dbgSrc=srcXs ), compileSubExp( srcXs[1] ), compileStyleSheetAccess( srcXs[2:]) ], dbgSrc=srcXs )
 		else:
 			return None
 		

@@ -12,6 +12,7 @@ import os
 from Britefury.DocModel.DMListInterface import DMListInterface
 from Britefury.DocModel.DMIO import readSX
 
+from Britefury.GLisp.GLispUtil import isGLispList, gLispSrcToString
 from Britefury.GLisp.GLispEnvironment import getGLispModulePath
 
 
@@ -41,18 +42,6 @@ class GLispItemTypeError (Exception):
 
 
 
-
-
-#
-#
-#
-# GLisp utility functions
-#
-#
-#
-
-def isGLispList(xs):
-	return isinstance( xs, list )  or  isinstance( xs, DMListInterface )
 
 
 

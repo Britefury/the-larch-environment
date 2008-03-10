@@ -10,6 +10,10 @@ from Britefury.DocModel.DMNode import DMNode
 
 
 
+def isDMListCompatible(xs):
+	return isinstance( xs, list )  or  isinstance( xs, DMListInterface )
+
+
 
 class DMListInterface (DMNode):
 	@abstractmethod
