@@ -140,6 +140,9 @@ class GLispCompilerWhereExprInvalidBindingListFormat (PyCodeGenError):
 class GLispCompilerWhereExprCannotRebindVariable (PyCodeGenError):
 	pass
 
+class GLispCompilerWhereExprCannotRebindVariableFromOuterScope (PyCodeGenError):
+	pass
+
 def _compileWhere(xs, context, bNeedResult=False, compileSpecial=None):
 	"""
 	($where ((name0 value0) (name1 value1) ... (nameN valueN)) (expressions_to_execute))
@@ -159,9 +162,12 @@ def _compileWhere(xs, context, bNeedResult=False, compileSpecial=None):
 	
 	whereTrees = []
 	
+
+	whereFnName = context.temps.allocateTempName( 'where_fn' )
+
+	
 	# Make binding code
 	boundNames = []
-	backupNames = {}
 	for binding in bindings:
 		bindingContext = context.innerContext()
 		if not isGLispList( binding )  or  len( binding ) != 2:
@@ -175,15 +181,10 @@ def _compileWhere(xs, context, bNeedResult=False, compileSpecial=None):
 		if name in boundNames:
 			raise GLispCompilerWhereExprCannotRebindVariable( binding )
 		
-		# If this name is already bound in thise scope, we need to back it up first
 		if context.scope.isLocalBound( name ):
-			backupName = context.temps.allocateTempName( 'where_backup_' + name )
-			backupPyTree = PyAssign_SideEffects( PyVar( backupName, dbgSrc=binding ), PyVar( name, dbgSrc=binding ), dbgSrc=binding )
-			whereTrees.append( backupPyTree )
-			backupNames[name] = backupName
-		else:
-			context.scope.bindLocal( name )
-
+			raise GLispCompilerWhereExprCannotRebindVariableFromOuterScope( binding )
+		
+		# If this name is already bound in thise scope, we need to back it up first
 		valueExprPyTree = _compileGLispExprToPyTree( valueExpr, bindingContext, True, compileSpecial )
 		assignmentPyTree = PyAssign_SideEffects( PyVar( name, dbgSrc=binding ), valueExprPyTree, dbgSrc=binding )
 		
@@ -197,42 +198,18 @@ def _compileWhere(xs, context, bNeedResult=False, compileSpecial=None):
 
 	
 	# Where expression code
-	if bNeedResult:
-		valueName = context.temps.allocateTempName( 'where_result' )
-	trees, resultStorePyTree = _compileExpressionListToPyTreeStatements( expressions, context, bNeedResult, compileSpecial, lambda tree, x: PyAssign_SideEffects( PyVar( valueName, dbgSrc=x ), tree, dbgSrc=x ) )
+	trees, resultStorePyTree = _compileExpressionListToPyTreeStatements( expressions, context, True, compileSpecial, lambda tree, x: PyReturn( tree, dbgSrc=x ) )
 	whereTrees.extend( trees )
 	
-		
-		
+	
+	# Turn it into a function (def)
+	fnTree = PyDef( whereFnName, [], whereTrees, dbgSrc=xs )
 
-	# Restore/delete the bound variables
-	for binding in reversed( bindings ):
-		name = binding[0][1:]
-		try:
-			backupName = backupNames[name]
-		except KeyError:
-			# This name is not backed up; delete it
-			delPyTree = PyDel_SideEffects( PyVar( name, dbgSrc=binding ), dbgSrc=binding )
-			whereTrees.append( delPyTree )
-			context.scope.unbindLocal( name )
-		else:
-			# This name is backed up: restore it
-			restorePyTree = PyAssign_SideEffects( PyVar( name, dbgSrc=binding ), PyVar( backupName, dbgSrc=binding ), dbgSrc=binding )
-			# Delete the backup name
-			delPyTree = PyDel_SideEffects( PyVar( backupName, dbgSrc=binding ), dbgSrc=binding )
-			whereTrees.append( restorePyTree )
-			whereTrees.append( delPyTree )
+	context.body.append( fnTree )
+	
+	callTree = PyCall( PyVar( whereFnName, dbgSrc=xs ), [], dbgSrc=xs )
 			
-			
-	context.body.extend( whereTrees )
-			
-	if resultStorePyTree is not None:
-		return PyVar( valueName, dbgSrc=xs )
-	else:
-		if bNeedResult:
-			return PyLiteral( 'None', dbgSrc=xs )
-		else:
-			return None
+	return callTree
 
 
 
@@ -382,40 +359,27 @@ def _compileMatch(xs, context, bNeedResult, compileSpecial):
 	)
 	"""
 	def compileActionBlock(matchXs, actionXs, context, bindings, resultVarName):
+		actionFnName = context.temps.allocateTempName( 'match_fn' )
+
+		
 		# Build the action tree
-		actionContext = context.innerContext()
-		# Bind variables (in order sorted by name)
-		backupNames = {}
+		actionContext = context.functionInnerContext()
+		# Bind variables (in order sorted by name of variable source; this should sort them in pattern order)
 		bindingPairs = bindings.items()
-		bindingPairs.sort( lambda x, y: cmp( x[0], y[0] ) )
+		bindingPairs.sort( lambda x, y: cmp( x[1], y[1] ) )
 		for varName, valueSrc in bindingPairs:
-			if actionContext.scope.isLocalBound( varName ):
-				backupName = actionContext.temps.allocateTempName( 'match_binding_backup_' + varName )
-				backupNames[varName] = backupName
-				actionContext.body.append( PyAssign_SideEffects( PyVar( backupName, dbgSrc=matchXs ), PyVar( varName, dbgSrc=matchXs ), dbgSrc=matchXs ) )
-			else:
-				actionContext.scope.bindLocal( varName )
-			actionContext.body.append( PyAssign_SideEffects( PyVar( varName, dbgSrc=matchXs ), PySrc( valueSrc, dbgSrc=matchXs ), dbgSrc=matchXs ) )
+			actionContext.scope.bindLocal( varName )
 		
 		# Action expression code
-		trees, resultStorePyTree = _compileExpressionListToPyTreeStatements( actionXs, actionContext, bNeedResult, compileSpecial, lambda tree, x: PyAssign_SideEffects( PyVar( resultVarName, dbgSrc=x ), tree, dbgSrc=x ) )
+		trees, resultStorePyTree = _compileExpressionListToPyTreeStatements( actionXs, actionContext, bNeedResult, compileSpecial, lambda tree, x: PyReturn( tree, dbgSrc=x ) )
 		actionContext.body.extend( trees )
 		
-		# Unbind variables
-		for varName, valueSrc in reversed( bindingPairs ):
-			try:
-				backupName = backupNames[varName]
-			except KeyError:
-				# not backed up; just delete the variable
-				actionContext.body.append( PyDel_SideEffects( PyVar( varName, dbgSrc=matchXs ), dbgSrc=matchXs ) )
-				actionContext.scope.unbindLocal( varName )
-			else:
-				# restore the variable
-				actionContext.body.append( PyAssign_SideEffects( PyVar( varName, dbgSrc=matchXs ), PyVar( backupName, dbgSrc=matchXs ), dbgSrc=matchXs ) )
-				# delete the backup
-				actionContext.body.append( PyDel_SideEffects( PyVar( backupName, dbgSrc=matchXs ), dbgSrc=matchXs ) )
+		# Make a function define
+		actionFnTree = PyDef( actionFnName, [ pair[0]   for pair in bindingPairs ], actionContext.body, dbgSrc=matchXs )
+		_actionFnCallTree = PyCall( PyVar( actionFnName, dbgSrc=actionXs ), [ PySrc( pair[1], dbgSrc=actionXs )   for pair in bindingPairs ], dbgSrc=matchXs )
+		actionResultAssignTree = PyAssign_SideEffects( PyVar( resultVarName, dbgSrc=matchXs ), _actionFnCallTree, dbgSrc=matchXs )
 		
-		return actionContext.body
+		return [ actionFnTree, actionResultAssignTree ]
 	
 	
 	if len( xs ) < 2:
@@ -748,83 +712,145 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 
 
 	def test_Where(self):
+		xssrc1 = """
+		($where
+		  (
+		    (@a #1)
+		    (@b test)
+	          )
+		  (@b split)
+		  (@a + #1)
+		)
+		"""
+		
 		pysrc1 = [
-			'a = 1',
-			'b = \'test\'',
-			'b.split()',
-			'__gsym__where_result_0 = a + 1',
-			'del b',
-			'del a',
-
-			'__gsym__where_result_0',
-		]
-
-		pysrc2 = [
-			'a = \'1\'',
-			'b = \'test\'',
+			'def __gsym__where_fn_0():',
+			'  a = 1',
+			'  b = \'test\'',
 			
-			'b.split()',
-			
-			'__gsym__where_backup_a_0 = a',
-			'a = 1',
-			'__gsym__where_backup_b_0 = b',
-			'b = \'test\'',
-			'b.split()',
-			'b = __gsym__where_backup_b_0',
-			'del __gsym__where_backup_b_0',
-			'a = __gsym__where_backup_a_0',
-			'del __gsym__where_backup_a_0',
-			
-			'__gsym__where_result_0 = a.split()',		
+			'  b.split()',
+			'  return a + 1',
 
-			'del b',
-			'del a',
-
-			'__gsym__where_result_0',
+			'__gsym__where_fn_0()',
 		]
 		
-		pysrc3 = [
-			'a = 1',
-			
-			'x = \'abc\'',
-			'y = \'def\'',
-			'__gsym__where_result_0 = x + y',
-			'del y',
-			'del x',
-			
-			'b = __gsym__where_result_0',
-			'a + 1',
-			'__gsym__where_result_1 = b.split()',
-			'del b',
-			'del a',
+		
+		
+		xssrc2 = """
+		($where
+		  (
+		    (@a 1)
+		    (@b test)
+		  )
+		  (@b split)
+		  ($where
+		    (
+		      (@c #1)
+		      (@d test)
+		    )
+		    (@d split)
+		  )
+		  (@a split)
+		)
+		"""
 
-			'__gsym__where_result_1',
+		pysrc2 = [
+			'def __gsym__where_fn_0():',
+			'  a = \'1\'',
+			'  b = \'test\'',
+			
+			'  b.split()',
+			'  def __gsym__where_fn_1():',
+			'    c = 1',
+			'    d = \'test\'',
+			
+			'    return d.split()',
+			'  __gsym__where_fn_1()',
+			'  return a.split()',
+			'__gsym__where_fn_0()',
 		]
+		
+
+		
+		xssrc3 = """
+		($where
+		  (
+		    (@a #1)
+		    (@b
+		      ($where
+		        (
+			  (@x abc)
+			  (@y def)
+			)
+			(@x + @y)
+		      )
+		    )
+		  )
+		  (@a + #1)
+		  (@b split)
+		)
+		"""
+		
+		pysrc3 = [
+			'def __gsym__where_fn_0():',
+			'  a = 1',
+			'  def __gsym__where_fn_1():',
+			'    x = \'abc\'',
+			'    y = \'def\'',
+			'    return x + y',
+			'  b = __gsym__where_fn_1()',
+			
+			'  a + 1',
+			'  return b.split()',
+			'__gsym__where_fn_0()',
+		]
+
+
+
+		xssrc4 = """
+		($where
+		  (
+		    (@a #1)
+		    (@b test)
+		  )
+		)
+		"""
 
 		pysrc4 = [
-			'a = 1',
-			'b = \'test\'',
-			'del b',
-			'del a',
-
-			'None',
+			'def __gsym__where_fn_0():',
+			'  a = 1',
+			'  b = \'test\'',
+			'__gsym__where_fn_0()',
 		]
 
+		
+		
+		xssrc5 = """
+		(@x + 
+		  ($where
+		    (
+		      (@a #1)
+		      (@b #2)
+		    )
+		    (@a + @b)
+		  )
+		)
+		"""
+		
 		pysrc5 = [
-			'a = 1',
-			'b = 2',
-			'__gsym__where_result_0 = a + b',
-			'del b',
-			'del a',
-
-			'x + __gsym__where_result_0',
+			'def __gsym__where_fn_0():',
+			'  a = 1',
+			'  b = 2',
+			'  return a + b',
+			
+			'x + __gsym__where_fn_0()',
 		]
 
-		self._compileTest( '($where   (  (@a #1) (@b test)  )   (@b split) (@a + #1))', pysrc1 )
-		self._compileTest( '($where   (  (@a 1) (@b test)  )   (@b split)  ($where   (  (@a #1) (@b test)  )   (@b split))  (@a split)   )', pysrc2 )
-		self._compileTest( '($where   (  (@a #1) (@b    ($where ( (@x abc) (@y def) )   (@x + @y)   )  )   )   (@a + #1) (@b split) )', pysrc3 )
-		self._compileTest( '($where   (  (@a #1) (@b test)  )   )', pysrc4 )
-		self._compileTest( '(@x + ($where   (  (@a #1) (@b #2)  )   (@a + @b)))', pysrc5 )
+		self._compileTest( xssrc1, pysrc1 )
+		self._compileTest( xssrc2, pysrc2 )
+		self._compileTest( xssrc3, pysrc3 )
+		self._compileTest( xssrc4, pysrc4 )
+		self._compileTest( xssrc5, pysrc5 )
 		self._evalTest( '($where   (  (@a hi) (@b there)  )   @a )', 'hi' )
 		self._evalTest( '($where   (  (@a hi) (@b there)  )   @b )', 'there' )
 		self._evalTest( '($where   (  (@a hi) (@b there)  )   ((@a + @b) upper))', 'HITHERE' )
@@ -913,13 +939,9 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 			"        if not __isGLispList__( __gsym__match_data_0[2] ):",
 			"          if not __isGLispList__( __gsym__match_data_0[3] ):",
 			"            __gsym__match_bMatched_0 = True",
-			"            a = __gsym__match_data_0[2]",
-			"            b = __gsym__match_data_0[3]",
-			"            c = __gsym__match_data_0[4:]",
-			"            __gsym__match_result_0 = [ a, b, c ]",
-			"            del c",
-			"            del b",
-			"            del a",
+			"            def __gsym__match_fn_0(a, b, c):",
+			"              return [ a, b, c ]",
+			"            __gsym__match_result_0 = __gsym__match_fn_0( __gsym__match_data_0[2], __gsym__match_data_0[3], __gsym__match_data_0[4:] )",
 			"if not __gsym__match_bMatched_0:",
 			"  raise NoMatchError",
 			"del __gsym__match_bMatched_0",
@@ -936,13 +958,9 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 			"        if not __isGLispList__( __gsym__match_data_0[2] ):",
 			"          if not __isGLispList__( __gsym__match_data_0[3] ):",
 			"            __gsym__match_bMatched_0 = True",
-			"            a = __gsym__match_data_0[2]",
-			"            b = __gsym__match_data_0[3]",
-			"            c = __gsym__match_data_0[4:]",
-			"            __gsym__match_result_0 = [ a, b, c ]",
-			"            del c",
-			"            del b",
-			"            del a",
+			"            def __gsym__match_fn_0(a, b, c):",
+			"              return [ a, b, c ]",
+			"            __gsym__match_result_0 = __gsym__match_fn_0( __gsym__match_data_0[2], __gsym__match_data_0[3], __gsym__match_data_0[4:] )",
 			"if not __gsym__match_bMatched_0:",
 			"  if __isGLispList__( __gsym__match_data_0 ):",
 			"    if len( __gsym__match_data_0 )  >=  4:",
@@ -951,13 +969,9 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 			"          if not __isGLispList__( __gsym__match_data_0[2] ):",
 			"            if not __isGLispList__( __gsym__match_data_0[3] ):",
 			"              __gsym__match_bMatched_0 = True",
-			"              a = __gsym__match_data_0[2]",
-			"              b = __gsym__match_data_0[3]",
-			"              c = __gsym__match_data_0[4:]",
-			"              __gsym__match_result_0 = [ a, b, c ]",
-			"              del c",
-			"              del b",
-			"              del a",
+			"              def __gsym__match_fn_1(a, b, c):",
+			"                return [ a, b, c ]",
+			"              __gsym__match_result_0 = __gsym__match_fn_1( __gsym__match_data_0[2], __gsym__match_data_0[3], __gsym__match_data_0[4:] )",
 			"if not __gsym__match_bMatched_0:",
 			"  raise NoMatchError",
 			"del __gsym__match_bMatched_0",
@@ -994,25 +1008,22 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 		)
 		"""
 		pysrc1 = [
-			'a = 1',
-			'b = 23',
-			'__gsym__if_result_0 = None',
-			'if q == 1:',
-			'  __gsym__if_result_0 = 5',
-			'elif q == 2:',
-			'  __gsym__if_result_0 = 6',
-			'elif q == 3:',
-			'  __gsym__if_result_0 = 7',
-			'c = __gsym__if_result_0',
-			'def __gsym__lambda_0(i, j, k):',
-			'  return i + (j + k)',
-			'd = __gsym__lambda_0',
-			'__gsym__where_result_0 = d( a, b, c )',
-			'del d',
-			'del c',
-			'del b',
-			'del a',
-			'x + __gsym__where_result_0',
+			'def __gsym__where_fn_0():',
+			'  a = 1',
+			'  b = 23',
+			'  __gsym__if_result_0 = None',
+			'  if q == 1:',
+			'    __gsym__if_result_0 = 5',
+			'  elif q == 2:',
+			'    __gsym__if_result_0 = 6',
+			'  elif q == 3:',
+			'    __gsym__if_result_0 = 7',
+			'  c = __gsym__if_result_0',
+			'  def __gsym__lambda_0(i, j, k):',
+			'    return i + (j + k)',
+			'  d = __gsym__lambda_0',
+			'  return d( a, b, c )',
+			'x + __gsym__where_fn_0()',
 		]
 		self._compileTest( xssrc1, pysrc1 )
 
@@ -1020,7 +1031,7 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 
 	def test_Where_Lambda(self):
 		xssrc1 = """
-		(@x +
+		(
 		  ($where
 	             (
 		       (@a #1)
@@ -1028,20 +1039,20 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 		     )
 		     ($lambda () (@a + @b))
 		  )
+		  <->
 		)
 		"""
 		pysrc1 = [
-			'a = 1',
-			'b = 23',
-			'def __gsym__lambda_0():',
-			'  return a + b',
-			'__gsym__where_result_0 = __gsym__lambda_0',
-			'del b',
-			'del a',
-			'x + __gsym__where_result_0',
+			'def __gsym__where_fn_0():',
+			'  a = 1',
+			'  b = 23',
+			'  def __gsym__lambda_0():',
+			'    return a + b',
+			'  return __gsym__lambda_0',
+			'__gsym__where_fn_0()()'
 		]
 		self._compileTest( xssrc1, pysrc1 )
-		self._evalTest( xssrc1, 26, [ ( 'x', 2 ) ] )
+		self._evalTest( xssrc1, 24, [] )
 
 
 
@@ -1061,24 +1072,41 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 		  <-> #1 #2 #3
 		)
 		"""
-		pysrc1 = [
+		
+		xssrc2 = """
+		(
+		  ($lambda (@a @b @c)
+		    ($where
+		      (
+		        (@x (@a + @b))
+			(@y (@b + @c))
+		      )
+		      (@a + (@x + @y))
+		    )
+		  )
+		  <-> #1 #2 #3
+		)
+		"""
+		
+		pysrc2 = [
 			'def __gsym__lambda_0(a, b, c):',
-			'  x = a + b',
-			'  y = b + c',
-			'  __gsym__where_backup_a_0 = a',
-			'  a = x + y',
-			'  __gsym__where_result_0 = a + (x + y)',
-			'  a = __gsym__where_backup_a_0',
-			'  del __gsym__where_backup_a_0',
-			'  del y',
-			'  del x',
-			'  return __gsym__where_result_0',
+			'  def __gsym__where_fn_0():',
+			'    x = a + b',
+			'    y = b + c',
+			'    return a + (x + y)',
+			'  return __gsym__where_fn_0()',
 			'__gsym__lambda_0( 1, 2, 3 )',
 		]
-		self._compileTest( xssrc1, pysrc1 )
-		self._evalTest( xssrc1, 16, [] )
+		
+		
+		self._compileTest( xssrc1, GLispCompilerWhereExprCannotRebindVariableFromOuterScope )
+		self._compileTest( xssrc2, pysrc2 )
+		self._evalTest( xssrc2, 9, [] )
 
-
+		
+		
+		
+		
 	def test_Where_Match(self):
 		xssrc1 = """
 		($where
@@ -1094,35 +1122,26 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 		
 		
 		pysrc1 = [
-			"a = [ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' ]",
-			"b = 2",
-			"__gsym__match_data_0 = a",
-			"__gsym__match_bMatched_0 = False",
-			"if __isGLispList__( __gsym__match_data_0 ):",
-			"  if len( __gsym__match_data_0 )  >=  4:",
-			"    if __gsym__match_data_0[0] == 'a':",
-			"      if __gsym__match_data_0[1] == 'b':",
-			"        if not __isGLispList__( __gsym__match_data_0[2] ):",
-			"          if not __isGLispList__( __gsym__match_data_0[3] ):",
-			"            __gsym__match_bMatched_0 = True",
-			"            __gsym__match_binding_backup_a_0 = a",
-			"            a = __gsym__match_data_0[2]",
-			"            __gsym__match_binding_backup_b_0 = b",
-			"            b = __gsym__match_data_0[3]",
-			"            c = __gsym__match_data_0[4:]",
-			"            __gsym__match_result_0 = [ a, b, c ]",
-			"            del c",
-			"            b = __gsym__match_binding_backup_b_0",
-		        "            del __gsym__match_binding_backup_b_0",
-			"            a = __gsym__match_binding_backup_a_0",
-		        "            del __gsym__match_binding_backup_a_0",
-			"if not __gsym__match_bMatched_0:",
-			"  raise NoMatchError",
-			"del __gsym__match_bMatched_0",
-			"__gsym__where_result_0 = __gsym__match_result_0",
-			"del b",
-			"del a",
-			"__gsym__where_result_0",
+			"def __gsym__where_fn_0():",
+			"  a = [ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' ]",
+			"  b = 2",
+			"  __gsym__match_data_0 = a",
+			"  __gsym__match_bMatched_0 = False",
+			"  if __isGLispList__( __gsym__match_data_0 ):",
+			"    if len( __gsym__match_data_0 )  >=  4:",
+			"      if __gsym__match_data_0[0] == 'a':",
+			"        if __gsym__match_data_0[1] == 'b':",
+			"          if not __isGLispList__( __gsym__match_data_0[2] ):",
+			"            if not __isGLispList__( __gsym__match_data_0[3] ):",
+			"              __gsym__match_bMatched_0 = True",
+			"              def __gsym__match_fn_0(a, b, c):",
+			"                return [ a, b, c ]",
+			"              __gsym__match_result_0 = __gsym__match_fn_0( __gsym__match_data_0[2], __gsym__match_data_0[3], __gsym__match_data_0[4:] )",
+			"  if not __gsym__match_bMatched_0:",
+			"    raise NoMatchError",
+			"  del __gsym__match_bMatched_0",
+			"  return __gsym__match_result_0",
+			"__gsym__where_fn_0()",
 		]
 
 
@@ -1137,9 +1156,9 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 		   (   (a b (: @a !) (: @b !) (: @c *))
 		       ($where
 		         (
-			   (@a ($list @a @b))
+			   (@x ($list @a @b))
 			 )
-			 ($list @a @c)
+			 ($list @x @c)
 		       )
 		   )
 		)
@@ -1156,18 +1175,12 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 			"        if not __isGLispList__( __gsym__match_data_0[2] ):",
 			"          if not __isGLispList__( __gsym__match_data_0[3] ):",
 			"            __gsym__match_bMatched_0 = True",
-			"            a = __gsym__match_data_0[2]",
-			"            b = __gsym__match_data_0[3]",
-			"            c = __gsym__match_data_0[4:]",
-			"            __gsym__where_backup_a_0 = a",
-			"            a = [ a, b ]",
-			"            __gsym__where_result_0 = [ a, c ]",
-			"            a = __gsym__where_backup_a_0",
-			"            del __gsym__where_backup_a_0",
-			"            __gsym__match_result_0 = __gsym__where_result_0",
-			"            del c",
-			"            del b",
-			"            del a",
+			"            def __gsym__match_fn_0(a, b, c):",
+			"              def __gsym__where_fn_0():",
+			"                x = [ a, b ]",
+			"                return [ x, c ]",
+			"              return __gsym__where_fn_0()",
+			"            __gsym__match_result_0 = __gsym__match_fn_0( __gsym__match_data_0[2], __gsym__match_data_0[3], __gsym__match_data_0[4:] )",
 			"if not __gsym__match_bMatched_0:",
 			"  raise NoMatchError",
 			"del __gsym__match_bMatched_0",

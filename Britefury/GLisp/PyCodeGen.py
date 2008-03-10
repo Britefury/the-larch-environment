@@ -382,8 +382,8 @@ class PyCall (PyExpression):
 		else:
 			return '%s( %s )'  %  ( self.a.compileAsExpr( _callPrecedence ), ', '.join( [ p.compileAsExpr()   for p in self.params ] ) )
 		
-	def _o_getPrecedence(self):
-		return _callPrecedence
+	#def _o_getPrecedence(self):
+	#	return _callPrecedence
 	
 	def _o_compareWith(self, x):
 		return cmp( ( self.a, self.params ),  ( x.a, x.params ) )
@@ -848,6 +848,8 @@ class TestCase_PyCodeGen_Node_compile (unittest.TestCase):
 		self.assert_( PyBinOp( PySrc( 'a' ), '*', PyBinOp( PySrc( 'b' ), '+', PySrc( 'c' ) ) ).compileAsExpr()  ==  'a * (b + c)' )
 		self.assert_( PyBinOp( PyBinOp( PySrc( 'a' ), '*', PySrc( 'b' ) ), '+', PySrc( 'c' ) ).compileAsExpr()  ==  'a * b + c' )
 		self.assert_( PyMethodCall( PyBinOp( PySrc( 'a' ), '+', PySrc( 'b' ) ), 'upper', [] ).compileAsExpr()  ==  '(a + b).upper()' )
+		self.assert_( PyCall( PyBinOp( PySrc( 'a' ), '+', PySrc( 'b' ) ), [] ).compileAsExpr()  ==  '(a + b)()' )
+		self.assert_( PyCall( PyCall( PySrc( 'a' ), [] ), [] ).compileAsExpr()  ==  'a()()' )
 		
 
 
