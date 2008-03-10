@@ -5,13 +5,97 @@
 				(@ml displayDefinition metaLanguageDisplay metaLanguage
 					($where
 						(
+							(@viewCompilerSpecial
+								($lambda (@node)
+								)
+							)
+
+							(@viewViewSpecial
+								($lambda (@node)
+								)
+							)
+							
+							(@viewLambdaParam
+								($lambda (@node)
+									($activeBorder ($label @node))
+								)
+							)
+							
+							(@viewLambdaParamList
+								($lambda (@node)
+									($activeBorder
+										($hbox ((($list ($label "("))  +  ($mapViewEval @node @viewLambdaParam))  +  ($list ($label ")"))))
+									)
+								)
+							)
+
+							(@viewMatchPairFactory
+								($lambda (@viewSpecial)
+									($lambda (@node)
+										($match @node
+											(  ((: @pattern ^) (: @expressions *))
+												($activeBorder ($hbox ($list ($label "PATTERN") ($label ":") ($vbox ($mapViewEval @expressions (@viewExpressionFactory <-> @viewSpecial)) ))))
+											)
+										)
+									)
+								)
+							)
+
+							(@viewExpressionFactory
+								($lambda (@viewSpecial)
+									($lambda (@node)
+										($match @node
+											( ($lambda (: @params /) (: @expressions *))
+												($activeBorder
+													($vbox (($list
+														($hbox ($list ($label u"\u03bb") ($viewEval @params @viewLambdaParamList) ($label "=") ) )
+														)  +  ($mapViewEval @expressions (@viewExpressionFactory <-> @viewSpecial)))
+													)
+												)
+											)
+
+											( ($match (: @expression ^) (: @matchPairs *))
+												($activeBorder
+													($vbox (($list
+														($hbox ($list ($label "MATCH") ($viewEval @expression (@viewExpressionFactory <-> @viewSpecial)) ($label ":") ) )
+														)  +  ($mapViewEval @matchPairs (@viewMatchPairFactory <-> @viewSpecial)))
+													)
+												)
+											)
+											
+											( (: @stringValue !) ($activeBorder ($label @stringValue)) )
+											
+											( ((: @x /))   ($activeBorder ($viewEval @x (@viewExpressionFactory <-> @viewSpecial))))
+
+											( (: @x ^)  (@log <-> (@gLispAsString <-> @x)) ($label "<ERROR>") )
+										)
+									)
+								)
+							)
+							
 							(@viewDefinitionNode
 								($lambda (@node)
 									($match @node
-										( (! compilerDefinition (: @name !) (: @sourceFormat !) (: @targetFormat !) (: @specification ^))   
-											(  ($activeBorder ($hbox ($list ($label "Compiler definition") ($label @name) ($label @sourceFormat) ($label "To:") ($label @targetFormat)))) )  )
-										( (! displayDefinition (: @name !) (: @format !) (: @specification ^))   
-											(  ($activeBorder ($hbox ($list ($label "View definition") ($label @name) ($label "For:") ($label @format)))) )  )
+										( (! compilerDefinition (: @name !) (: @sourceFormat !) (: @targetFormat !) (: @specification *))
+											(
+												($activeBorder
+													($vbox (($list
+														($hbox ($list ($label "Compiler definition") ($label @name) ($label @sourceFormat) ($label "To:") ($label @targetFormat)))
+														)  +  ($mapViewEval @specification (@viewExpressionFactory <-> @viewCompilerSpecial)))
+													)
+												)
+											)
+										)
+										( (! displayDefinition (: @name !) (: @format !) (: @specification *))
+											(
+												($activeBorder
+													($vbox (($list
+														($hbox ($list ($label "View definition") ($label @name) ($label "For:") ($label @format)))
+														)  +  ($mapViewEval @specification (@viewExpressionFactory <-> @viewViewSpecial)))
+													)
+												)
+											)
+										)
 									)
 								)
 							)
