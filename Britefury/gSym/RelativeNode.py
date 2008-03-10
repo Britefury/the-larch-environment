@@ -9,14 +9,12 @@ from copy import copy, deepcopy
 
 from Britefury.Kernel.Abstract import abstractmethod
 from Britefury.DocModel.DMNode import DMNode
-from Britefury.DocModel.DMListInterface import DMListInterface
-
-from Britefury.GLisp.GLispInterpreter import isGLispList
+from Britefury.DocModel.DMListInterface import DMListInterface, isDMListCompatible
 
 
 
 def relative(x, parent, index):
-	if isGLispList( x ):
+	if isDMListCompatible( x ):
 		return RelativeList( x, parent, index )
 	elif isinstance( x, unicode ):
 		return RelativeUnicode( x, parent, index )

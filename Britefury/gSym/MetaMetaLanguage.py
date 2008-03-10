@@ -7,7 +7,8 @@
 ##-*************************
 from Britefury.DocModel.DMListInterface import DMListInterface
 
-from Britefury.GLisp.GLispInterpreter import specialform, isGLispList
+from Britefury.GLisp.GLispUtil import isGLispList
+from Britefury.GLisp.GLispInterpreter import specialform
 
 from Britefury.gSym.gSymLanguage import GSymLanguageApplicationInterface, GSymLanguageInstanceInterface, GSymLanguageInstanceControlInterface, GSymLanguageFactory
 from Britefury.gSym.MetaLanguage import GSymLanguageInstanceInterface, GSymLanguageInstanceControlInterface, MetaLanguageFactory

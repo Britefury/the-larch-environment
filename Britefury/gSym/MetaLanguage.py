@@ -9,7 +9,8 @@ from Britefury.DocModel.DMListInterface import DMListInterface
 
 from Britefury.gSym.gSymLanguage import GSymLanguageApplicationInterface, GSymLanguageInstanceInterface, GSymLanguageInstanceControlInterface, GSymLanguageFactory
 
-from Britefury.GLisp.GLispInterpreter import specialform, isGLispList, GLispParameterListError, GLispItemTypeError
+from Britefury.GLisp.GLispUtil import isGLispList
+from Britefury.GLisp.GLispInterpreter import specialform, GLispParameterListError, GLispItemTypeError
 
 from Britefury.gSym.gSymCompiler import defineCompiler
 from Britefury.gSym.gSymView import defineView

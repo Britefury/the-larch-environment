@@ -5,8 +5,7 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
-from Britefury.GLisp.GLispInterpreter import isGLispList
-from Britefury.GLisp.GLispDebug import gLispSrcToString
+from Britefury.GLisp.GLispUtil import isGLispList, gLispSrcToString
 from Britefury.GLisp.PyCodeGen import PyCodeGenError, PySrc, PyVar, PyLiteral, PyListLiteral, PyGetAttr, PyGetItem, PyUnOp, PyBinOp, PyCall, PyMethodCall, PyReturn, PyIf, PyDef, PyAssign_SideEffects, PyDel_SideEffects
 from Britefury.GLisp.PatternMatch import NoMatchError, compileMatchBlockToPyTrees
 

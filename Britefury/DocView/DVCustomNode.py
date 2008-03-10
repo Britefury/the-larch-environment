@@ -36,11 +36,11 @@ class DVCustomNode (DVNode):
 
 
 
-	def __init__(self, docNode, view, docNodeKey, contentsFactory):
+	def __init__(self, docNode, view, docNodeKey):
 		super( DVCustomNode, self ).__init__( docNode, view, docNodeKey )
 		self.widget = DTBin()
 		
-		self._contentsFactory = contentsFactory
+		self._contentsFactory = None
 		
 		self._contentsCell = RefCell()
 		self._contentsCell.function = self._p_computeContents
@@ -49,7 +49,10 @@ class DVCustomNode (DVNode):
 	
 		
 	def _p_computeContents(self):
-		contents = self._contentsFactory( self, self._docNodeKey )
+		if self._contentsFactory is not None:
+			contents = self._contentsFactory( self, self._docNodeKey )
+		else:
+			contents = None
 		return contents
 	
 
