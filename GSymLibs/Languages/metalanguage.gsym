@@ -65,9 +65,10 @@
 											
 											( (: @stringValue !) ($activeBorder ($label @stringValue)) )
 											
-											( ((: @x /))   ($activeBorder ($viewEval @x (@viewExpressionFactory <-> @viewSpecial))))
+											( ((: @x /))   ((@viewExpressionFactory <-> @viewSpecial) <-> @x) )
+											( ((: @x /))   ($activeBorder ($viewEval @x (@viewExpressionFactory <-> @viewSpecial))) )
 
-											( (: @x ^)  (@log <-> (@gLispAsString <-> @x)) ($label "<ERROR>") )
+											( (: @x ^)  (@log <-> (@gLispAsString <-> @x)) ($activeBorder ($label "<ERROR>")) )
 										)
 									)
 								)
