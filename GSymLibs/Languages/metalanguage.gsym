@@ -29,6 +29,10 @@
 								($lambda (@viewSpecial)
 									($lambda (@node)
 										($match @node
+											( ($# (: @comment !))
+												(@viewComment <-> @comment)
+											)
+										
 											( ((: @varName !) (: @expression ^))
 												($activeBorder ($hbox ($list ($label @varName) ($label "=") ($viewEval @expression (@viewExpressionFactory <-> @viewSpecial)))))
 											)
@@ -146,8 +150,8 @@
 												($activeBorder
 													($vbox
 														((($list ($label "WHERE"))  +
-														 ($mapViewEval @matchPairs (@viewWhereBindingFactory <-> @viewSpecial)))  +
-														 ($hbox ($list ($label "=") ($vbox ($mapViewEval @expressions (@viewExpressionFactory <-> @viewSpecial))))))
+														 ($mapViewEval @bindings (@viewWhereBindingFactory <-> @viewSpecial)))  +
+														 ($list ($hbox ($list ($label "=") ($vbox ($mapViewEval @expressions (@viewExpressionFactory <-> @viewSpecial)))))))
 													)
 												)
 											)
