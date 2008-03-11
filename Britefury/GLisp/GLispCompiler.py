@@ -5,7 +5,7 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
-from Britefury.GLisp.GLispUtil import isGLispList, gLispSrcToString
+from Britefury.GLisp.GLispUtil import isGLispList, stripGLispComments, gLispSrcToString
 from Britefury.GLisp.PyCodeGen import PyCodeGenError, PySrc, PyVar, PyLiteral, PyListLiteral, PyGetAttr, PyGetItem, PyUnOp, PyBinOp, PyCall, PyMethodCall, PyReturn, PyIf, PyDef, PyAssign_SideEffects, PyDel_SideEffects
 from Britefury.GLisp.PatternMatch import NoMatchError, compileMatchBlockToPyTrees
 
@@ -83,6 +83,8 @@ def _compileExpressionListToPyTreeStatements(expressions, context, bNeedResult, 
 	trees - a list of Py Tree nodes
 	wrappedResultTree - the result node wrapped in the node created by buildResultHandlerTreeNode()
 	"""
+	expressions = stripGLispComments( expressions )
+	
 	# Expression code
 	if bNeedResult  and  len( expressions ) > 0:
 		initialExpressions = expressions[:-1]
@@ -167,6 +169,7 @@ def _compileWhere(xs, context, bNeedResult=False, compileSpecial=None):
 	
 	# Make binding code
 	boundNames = []
+	bindings = stripGLispComments( bindings )
 	for binding in bindings:
 		bindingContext = context.innerContext()
 		if not isGLispList( binding )  or  len( binding ) != 2:
@@ -426,7 +429,7 @@ def _compileGLispExprToPyTree(xs, context, bNeedResult=False, compileSpecial=Non
 	elif isinstance( xs, str )  or  isinstance( xs, unicode ):
 		if xs[0] == '@':
 			return PyVar( xs[1:], dbgSrc=xs )
-		elif xs[0] == '#':
+		elif xs[0] == '#'  and  xs != '#':
 			return PyLiteral( xs[1:], dbgSrc=xs )
 		else:
 			return PyLiteral( '\'' + xs.replace( '\'', '\\\'' ) + '\'', dbgSrc=xs )
@@ -435,6 +438,8 @@ def _compileGLispExprToPyTree(xs, context, bNeedResult=False, compileSpecial=Non
 			return PyLiteral( 'None', dbgSrc=xs )
 		elif xs[0] == '$list':
 			return PyListLiteral( [ _compileGLispExprToPyTree( e, context, True, compileSpecial )   for e in xs[1:] ], dbgSrc=xs )
+		elif xs[0] == '$set':
+			return PyCall( PyVar( 'set', dbgSrc=xs ), [ PyListLiteral( [ _compileGLispExprToPyTree( e, context, True, compileSpecial )   for e in xs[1:] ], dbgSrc=xs ) ], dbgSrc=xs )
 		elif xs[0] == '$where':
 			return _compileWhere( xs, context, bNeedResult, compileSpecial )
 		elif xs[0] == '$if':

@@ -88,6 +88,12 @@ class RelativeList (RelativeNode, DMListInterface):
 		else:
 			return self._rln_node + xs
 
+	def __radd__(self, xs):
+		if isinstance( xs, RelativeList ):
+			return RelativeList( xs._rln_node + self._rln_node )
+		else:
+			return xs + self._rln_node
+
 	def __len__(self):
 		return len( self._rln_node )
 
@@ -118,10 +124,16 @@ class RelativeString (RelativeNode):
 			yield relative( x, self._rln_node, i )
 
 	def __add__(self, xs):
-		if isinstance( xs, RelativeList ):
+		if isinstance( xs, RelativeString ):
 			return self._rln_node + xs._rln_node
 		else:
 			return self._rln_node + xs
+
+	def __radd__(self, xs):
+		if isinstance( xs, RelativeString ):
+			return xs._rln_node  +  self._rln_node
+		else:
+			return xs  +  self._rln_node
 
 	def __mul__(self, i):
 		return self._rln_node * i

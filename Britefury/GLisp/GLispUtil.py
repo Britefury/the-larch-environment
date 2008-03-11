@@ -15,6 +15,14 @@ def isGLispList(xs):
 	return isinstance( xs, list )  or  isinstance( xs, DMListInterface )  or  isinstance( xs, RelativeList )
 
 
+def isGLispComment(xs):
+	return isGLispList( xs )  and  len( xs ) >= 1  and  xs[0] == '$#'
+
+
+def stripGLispComments(xs):
+	return [ x   for x in xs   if not isGLispComment( x ) ]
+
+
 
 def gLispSrcToString(x, level=3):
 	if isinstance( x, RelativeNode ):
@@ -30,4 +38,4 @@ def gLispSrcToString(x, level=3):
 		else:
 			return '(' + ' '.join( [ gLispSrcToString( v, level - 1 )  for v in x ] ) + ')'
 	else:
-		raise TypeError
+		raise TypeError, '%s'  %  ( x.__class__, )

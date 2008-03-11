@@ -9,7 +9,7 @@
 from Britefury.Kernel.Abstract import abstractmethod
 
 from Britefury.DocModel.DMListInterface import DMListInterface
-from Britefury.GLisp.GLispUtil import isGLispList
+from Britefury.GLisp.GLispUtil import isGLispList, isGLispComment, stripGLispComments
 from Britefury.GLisp.PyCodeGen import PyCodeGenError, PySrc, PyVar, PyLiteral, PyListLiteral, PyGetAttr, PyGetItem, PyUnOp, PyBinOp, PyCall, PyMethodCall, PyReturn, PyIf, PySimpleIf, PyDef, PyAssign_SideEffects, PyDel_SideEffects
 
 
@@ -176,7 +176,7 @@ def _buildMatchNodeForMatchList(xs):
 
 def _buildMatchNodeForMatchItem(xs, bInsideList=False):
 	if isGLispList( xs ):
-		if xs[0] == ':':
+		if len( xs ) > 0  and  xs[0] == ':':
 			# Bind
 			if len( xs ) != 3:
 				raise ValueError, 'match expressions: bind expression must take the form (: <var_name> sub_exp)'
@@ -185,7 +185,7 @@ def _buildMatchNodeForMatchItem(xs, bInsideList=False):
 			varName = xs[1][1:]
 			match = _buildMatchNodeForMatchItem( xs[2], bInsideList )
 			match.bindName = varName
-		elif xs[0] == '-'  and  bInsideList:
+		elif  len( xs ) > 0  and  xs[0] == '-'  and  bInsideList:
 			# Sub-list range
 			if len( xs ) != 3:
 				raise ValueError, 'match expressions: list interior range expression must take the form (- <#min> <#max>)'
@@ -285,21 +285,22 @@ def compileMatchExpressionToPyFunction(xs, exprIndirection=[], functionName='mat
 	functionBodyTrees = []
 	varNameToValueIndirectionTable = []
 	for index, match in enumerate( xs ):
-		for i in exprIndirection:
-			match = match[i]
-		matchNode = _buildMatchNodeForMatchItem( match )
-
-		matchItemVarNameToValueIndirection = {}
-		bindings = {}
-		matchTreeFac = matchNode.emitSourceVarNamesAndBindings( lambda innerTrees: innerTrees, 'xs', [], matchItemVarNameToValueIndirection, bindings)
-		
-		resultTree = PySrc( 'return '  +  _bindingMapToBindingDictSrc( bindings )  +  ', %d'  %  ( index, ), dbgSrc=xs )
-		
-		matchTrees = matchTreeFac( [ resultTree ] )
-		
-		varNameToValueIndirectionTable.append( matchItemVarNameToValueIndirection )
-		
-		functionBodyTrees.extend( matchTrees )
+		if not isGLispComment( match ):
+			for i in exprIndirection:
+				match = match[i]
+			matchNode = _buildMatchNodeForMatchItem( match )
+	
+			matchItemVarNameToValueIndirection = {}
+			bindings = {}
+			matchTreeFac = matchNode.emitSourceVarNamesAndBindings( lambda innerTrees: innerTrees, 'xs', [], matchItemVarNameToValueIndirection, bindings)
+			
+			resultTree = PySrc( 'return '  +  _bindingMapToBindingDictSrc( bindings )  +  ', %d'  %  ( index, ), dbgSrc=xs )
+			
+			matchTrees = matchTreeFac( [ resultTree ] )
+			
+			varNameToValueIndirectionTable.append( matchItemVarNameToValueIndirection )
+			
+			functionBodyTrees.extend( matchTrees )
 	functionBodyTrees.extend( [ PySrc( 'raise NoMatchError' ) ] )
 	
 	defTree = PyDef( functionName, [ 'xs' ], functionBodyTrees, dbgSrc=xs )
@@ -388,6 +389,7 @@ def compileMatchBlockToPyTrees(matchXs, xs, context, bNeedResult, dataVarName, c
 		
 	context.body.append( PyAssign_SideEffects( PyVar( bMatchedName, dbgSrc=matchXs ), PyLiteral( 'False', dbgSrc=matchXs ), dbgSrc=matchXs ) )
 	
+	xs = stripGLispComments( xs )
 	matchTrees = []
 	bFirst = True
 	for match in xs:
