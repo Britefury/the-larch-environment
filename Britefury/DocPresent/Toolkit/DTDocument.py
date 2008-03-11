@@ -189,16 +189,18 @@ class DTDocument (DTBin):
 			reqWidth = self._f_getRequisitionWidth()
 			self._f_allocateX( self._documentSize.x * self._docScale )
 			reqHeight = self._f_getRequisitionHeight()
-			yAlloc = max( self._documentSize.y * self._docScale, reqHeight )
+			yAlloc = reqHeight / self._docScale
 			self._f_allocateY( yAlloc )
 			self._bAllocationRequired = False
 
 
 	def _o_onAllocateX(self, allocation):
-		self._o_allocateChildX( self._child, self._docOffset.x, allocation )
+		if self._child is not None:
+			self._o_allocateChildX( self._child, self._docOffset.x, min( self._childRequisition.x, allocation ) )
 
 	def _o_onAllocateY(self, allocation):
-		self._o_allocateChildY( self._child, self._docOffset.y, allocation )
+		if self._child is not None:
+			self._o_allocateChildY( self._child, self._docOffset.y, allocation )
 
 
 
@@ -524,19 +526,6 @@ class DTDocument (DTBin):
 		
 		
 
-		
-	#
-	# SPACE ALLOCATION METHODS
-	#
-	
-	def _o_onAllocateX(self, allocation):
-		if self._child is not None:
-			self._o_allocateChildX( self._child, 0.0, min( self._childRequisition.x, allocation ) )
-
-	def _o_onAllocateY(self, allocation):
-		if self._child is not None:
-			self._o_allocateChildY( self._child, 0.0, min( self._childRequisition.y, allocation ) )
-		
 		
 		
 	

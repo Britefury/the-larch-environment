@@ -12,8 +12,8 @@ from Britefury.GLisp.GLispInterpreter import specialform
 
 from Britefury.gSym.gSymLanguage import GSymLanguageApplicationInterface, GSymLanguageInstance, GSymLanguageFactory
 from Britefury.gSym.MetaLanguage import MetaLanguageFactory
-
-from Britefury.gSym.gSymView import defineView
+from Britefury.gSym.gSymCompiler import GSymCompilerDefinition
+from Britefury.gSym.gSymView import GSymViewDefinition, defineView
 
 
 
@@ -44,6 +44,10 @@ class MetaMetaLanguageInstance (GSymLanguageInstance):
 		languageDefinition = [ env.evaluate( x )   for x in xs[2] ]
 		languageFactory = MetaLanguageFactory( *languageDefinition )
 		env.rootScope()['languageFactory'] = languageFactory
+		
+		# Insert the language definition into our own factory
+		self._factory.insertLanguageDefinition( *languageDefinition )
+
 		return GSymLanguageApplicationInterface( self._factory, xs )
 
 		
@@ -57,6 +61,17 @@ class MetaMetaLanguageFactory (GSymLanguageFactory):
 	Used to create a meta-meta-language instance; to which the meta-language document supplies a meta-language description"""
 	languageInstanceClass = MetaMetaLanguageInstance
 
+
+	
+	def insertLanguageDefinition(self, *languageDefinition):
+		self._languageDefinition = languageDefinition
+		def getParamOfType(t):
+			for l in languageDefinition:
+				if isinstance( l, t ):
+					return l
+			return None
+		self._compilerTest = getParamOfType( GSymCompilerDefinition )
+		self._viewTest = getParamOfType( GSymViewDefinition )
 
 
 
