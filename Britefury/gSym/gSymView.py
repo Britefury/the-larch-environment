@@ -180,7 +180,7 @@ def _runtime_vbox(viewNodeInstance, children, styleSheets):
 	Runtime - called by compiled code at run-time
 	Builds a vertical DTBox widget, with child, builds and registers a refresh cell
 	"""
-	widget = DTBox( direction=DTDirection.TOP_TO_BOTTOM )
+	widget = DTBox( direction=DTDirection.TOP_TO_BOTTOM, minorDirectionAlignment=DTBox.ALIGN_LEFT )
 	_runtime_boxRefreshCell( viewNodeInstance, widget, children )
 	for sheet in styleSheets:
 		sheet.apply()

@@ -28,13 +28,55 @@
 									)
 								)
 							)
+							
+							(@viewMatchPattern
+								($lambda (@node)
+									($match @node
+										( !!
+											($activeBorder ($label "!"))
+										)
+										
+										( //
+											($activeBorder ($label "(..)"))
+										)
+										
+										( ^^
+											($activeBorder ($label "^"))
+										)
+										
+										( **
+											($activeBorder ($label "..*"))
+										)
+
+										( ++
+											($activeBorder ($label "..+"))
+										)
+										
+										( (: @constantValue !)
+											($activeBorder ($label @constantValue))
+										)
+										
+										( (-- (: @min !) (: @max !))
+											($activeBorder ($label (((".." + @min) + "-") + @max)))
+										)
+										
+										( (:: (: @varName !) (: @subPattern ^))
+											($activeBorder ($hbox ($list ($label @varName) ($label ":") ($viewEval @subPattern @viewMatchPattern))))
+										)
+										
+										( (: @listPattern /)
+											($activeBorder ($hbox ((($list ($label "(")) + ($mapViewEval @listPattern @viewMatchPattern)) + ($list ($label ")"))) ) )
+										)
+									)
+								)
+							)
 
 							(@viewMatchPairFactory
 								($lambda (@viewSpecial)
 									($lambda (@node)
 										($match @node
 											(  ((: @pattern ^) (: @expressions *))
-												($activeBorder ($hbox ($list ($label "PATTERN") ($label ":") ($vbox ($mapViewEval @expressions (@viewExpressionFactory <-> @viewSpecial)) ))))
+												($activeBorder ($hbox ($list ($viewEval @pattern @viewMatchPattern) ($label ":") ($vbox ($mapViewEval @expressions (@viewExpressionFactory <-> @viewSpecial)) ))))
 											)
 										)
 									)
