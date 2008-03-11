@@ -73,20 +73,12 @@ def shutdownGSymEnvironment():
 class GSymEnvironment (object):
 	@specialform
 	def withInternalMetaLanguage(self, env, xs):
-		if len( xs ) < 4:
-			env.glispError( ValueError, xs, 'GSymEnvironment::internalMetaLanguage: requires at least 2 parameters (control interface target variable, and language target variable)' )
+		if len( xs ) < 3:
+			env.glispError( ValueError, xs, 'GSymEnvironment::internalMetaLanguage: requires at least 1 parameters (language instance target variable)' )
 		
-		ctlVarName = xs[2]
-		varName = xs[3]
-		expressions = xs[4:]
+		varName = xs[2]
+		expressions = xs[3:]
 		
-		
-		if not isinstance( ctlVarName, str ):
-			env.glispError( ValueError, xs, 'GSymEnvironment::internalMetaLanguage: first parameter (control interface target variable) must be a string' )
-		
-		if ctlVarName[0] != '@':
-			env.glispError( ValueError, xs, 'GSymEnvironment::internalMetaLanguage: first parameter (control interface target variable) must start with a @' )
-	
 		
 		if not isinstance( varName, str ):
 			env.glispError( ValueError, xs, 'GSymEnvironment::internalMetaLanguage: second parameter (language target variable) must be a string' )
@@ -95,10 +87,8 @@ class GSymEnvironment (object):
 			env.glispError( ValueError, xs, 'GSymEnvironment::internalMetaLanguage: second parameter (language target variable) must start with a @' )
 		
 		
-		metaMetaLanguageControlInterface = metaMetaLanguageFactory.createLanguageInstanceControlInterface()
-		metaMetaLanguageInterface = metaMetaLanguageControlInterface.getLanguageInstanceInterface()
-		env[ctlVarName[1:]] = metaMetaLanguageControlInterface
-		env[varName[1:]] = metaMetaLanguageInterface
+		metaMetaLanguageInstance = metaMetaLanguageFactory.createLanguageInstance()
+		env[varName[1:]] = metaMetaLanguageInstance
 		
 		return env.evaluate( expressions )	
 			

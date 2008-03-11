@@ -1,7 +1,7 @@
 (
 	($importModuleContents Languages.metalanguage ((languageFactory @mlLangFac))
-		($where ((@mlLang (@mlLangFac createLanguageInstanceControlInterface))  (@ml (@mlLang getLanguageInstanceInterface)))
-			(@mlLang content
+		($where ((@ml (@mlLangFac createLanguageInstance)))
+			(@ml content
 				(
 					(@ml compilerDefinition asciiCompiler simpleLanguage python25_ascii
 						($lambda (@node)
