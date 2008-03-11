@@ -321,7 +321,11 @@ class _GSymViewFactory (object):
 			 '_entry' : _runtime_entry,
 			 '_hbox' : _runtime_hbox,
 			 '_vbox' : _runtime_vbox, }
-		self.makeViewFunction = compileGLispExprToPyFunction( viewModuleName, viewFunctionName, [ '__view_node_instance_stack__' ], spec, self._p_compileSpecial, lcls )
+		try:
+			self.makeViewFunction = compileGLispExprToPyFunction( viewModuleName, viewFunctionName, [ '__view_node_instance_stack__' ], spec, self._p_compileSpecial, lcls )
+		except PyCodeGenError, e:
+			print e.args
+			raise
 		
 		
 		

@@ -6,6 +6,7 @@
 					(@ml compilerDefinition asciiCompiler simpleLanguage python25_ascii
 						($lambda (@node)
 							($match @node
+								($# addition)
 								( (add (: @x ^) (: @y ^))   (  (((('(' + ($compileEval @x)) + ' + ') + ($compileEval @y)) + ')')  ) )
 								( (sub (: @x ^) (: @y ^))   (  (((('(' + ($compileEval @x)) + ' - ') + ($compileEval @y)) + ')')  ) )
 								( (mul (: @x ^) (: @y ^))   (  (((('(' + ($compileEval @x)) + ' * ') + ($compileEval @y)) + ')')  ) )

@@ -5,22 +5,46 @@
 				(@ml displayDefinition metaLanguageDisplay metaLanguage
 					($where
 						(
+							($# "View special expressions for a compiler definition")
 							(@viewCompilerSpecial
 								($lambda (@node)
 								)
 							)
 
+							($# "View special expressions for a view definition")
 							(@viewViewSpecial
 								($lambda (@node)
 								)
 							)
 							
+							($# "View a comment")
+							(@viewComment
+								($lambda (@comment)
+									($activeBorder ($label ("#" + @comment)))
+								)
+							)
+							
+							($# "View a where binding; factory dependent on special function")
+							(@viewWhereBindingFactory
+								($lambda (@viewSpecial)
+									($lambda (@node)
+										($match @node
+											( ((: @varName !) (: @expression ^))
+												($activeBorder ($hbox ($list ($label @varName) ($label "=") ($viewEval @expression (@viewExpressionFactory <-> @viewSpecial)))))
+											)
+										)
+									)
+								)
+							)
+
+							($# "View a lambda parameter")
 							(@viewLambdaParam
 								($lambda (@node)
 									($activeBorder ($label @node))
 								)
 							)
 							
+							($# "View a lambda parameter list")
 							(@viewLambdaParamList
 								($lambda (@node)
 									($activeBorder
@@ -29,6 +53,7 @@
 								)
 							)
 							
+							($# "View a match pattern")
 							(@viewMatchPattern
 								($lambda (@node)
 									($match @node
@@ -71,10 +96,15 @@
 								)
 							)
 
+							($# "View a match pair; factory dependent on special function")
 							(@viewMatchPairFactory
 								($lambda (@viewSpecial)
 									($lambda (@node)
 										($match @node
+											( ($# (: @comment !))
+												(@viewComment <-> @comment)
+											)
+										
 											(  ((: @pattern ^) (: @expressions *))
 												($activeBorder ($hbox ($list ($viewEval @pattern @viewMatchPattern) ($label ":") ($vbox ($mapViewEval @expressions (@viewExpressionFactory <-> @viewSpecial)) ))))
 											)
@@ -83,10 +113,45 @@
 								)
 							)
 
+							($# "View an expression; factory dependent on special function")
 							(@viewExpressionFactory
 								($lambda (@viewSpecial)
 									($lambda (@node)
 										($match @node
+											( (: @stringValue !)
+												($activeBorder ($label @stringValue))
+											)
+											
+											( ()
+												($activeBorder ($label "None"))
+											)
+
+											( ($# @comment)
+												(@viewComment <-> @comment)
+											)
+											
+											( ($list (: @elements *))
+												($activeBorder
+													($hbox ((($list ($label "["))  +  ($mapViewEval @elements (@viewExpressionFactory <-> @viewSpecial)))  +  ($list ($label "]"))))
+												)
+											)
+
+											( ($set (: @elements *))
+												($activeBorder
+													($hbox ((($list ($label "SET("))  +  ($mapViewEval @elements (@viewExpressionFactory <-> @viewSpecial)))  +  ($list ($label ")"))))
+												)
+											)
+
+											( ($where (: @bindings /) (: @expressions *))
+												($activeBorder
+													($vbox
+														((($list ($label "WHERE"))  +
+														 ($mapViewEval @matchPairs (@viewWhereBindingFactory <-> @viewSpecial)))  +
+														 ($hbox ($list ($label "=") ($vbox ($mapViewEval @expressions (@viewExpressionFactory <-> @viewSpecial))))))
+													)
+												)
+											)
+											
 											( ($lambda (: @params /) (: @expressions *))
 												($activeBorder
 													($vbox (($list
@@ -105,10 +170,7 @@
 												)
 											)
 											
-											( (: @stringValue !) ($activeBorder ($label @stringValue)) )
-											
-											( ((: @x /))   ((@viewExpressionFactory <-> @viewSpecial) <-> @x) )
-											( ((: @x /))   ($activeBorder ($viewEval @x (@viewExpressionFactory <-> @viewSpecial))) )
+											( ((: @x ^))   ((@viewExpressionFactory <-> @viewSpecial) <-> @x) )
 
 											( (: @x ^)  (@log <-> (@gLispAsString <-> @x)) ($activeBorder ($label "<ERROR>")) )
 										)
@@ -116,6 +178,7 @@
 								)
 							)
 							
+							($# "View an language definition subtree")
 							(@viewDefinitionNode
 								($lambda (@node)
 									($match @node
@@ -143,6 +206,7 @@
 								)
 							)
 							
+							($# "View an language definition")
 							(@viewLanguageNode
 								($lambda (@node)
 									($activeBorder ($vbox ($mapViewEval @node @viewDefinitionNode)))
