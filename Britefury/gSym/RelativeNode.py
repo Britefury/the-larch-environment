@@ -70,7 +70,8 @@ class RelativeList (RelativeNode, DMListInterface):
 
 	def __getitem__(self, i):
 		if isinstance( i, slice ):
-			return [ relative( x, self._rln_node, j )   for j, x in zip( i.indices( len( self._rln_node ) ), self._rln_node[i] ) ]
+			indices = xrange( *i.indices( len( self._rln_node ) ) )
+			return [ relative( x, self._rln_node, j )   for j, x in zip( indices, self._rln_node[i] ) ]
 		else:
 			return relative( self._rln_node[i], self._rln_node, i )
 
