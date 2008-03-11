@@ -45,32 +45,19 @@ class GSymLanguageApplicationInterface (object):
 
 
 
-class GSymLanguageInstanceInterface (object):
+class GSymLanguageInstance (object):
 	"""Created in a document
 	The document supplies content via this"""
-	def __init__(self, controlInterface):
-		super( GSymLanguageInstanceInterface, self ).__init__()
-		self._controlInterface = controlInterface
-
-
-
-class GSymLanguageInstanceControlInterface (object):
-	"""Created in a document
-	The document supplies content to this"""
-	languageInterfaceClass = GSymLanguageInstanceInterface
-	
 	def __init__(self, factory):
-		super( GSymLanguageInstanceControlInterface, self ).__init__()
+		super( GSymLanguageInstance, self ).__init__()
 		self._factory = factory
-		self._languageInterface = self.languageInterfaceClass( self )
-		
-	def getLanguageInstanceInterface(self):
-		return self._languageInterface
-	
-	
+
 	@specialform
 	def content(self, env, xs):
 		return GSymLanguageApplicationInterface( self._factory, xs )
+
+
+
 
 
 
@@ -78,7 +65,7 @@ class GSymLanguageFactory (object):
 	"""Generated in a language document
 	Imported into documents
 	Used to create a language instance; to which the document supplies content"""
-	languageControlInterfaceClass = GSymLanguageInstanceControlInterface
+	languageInstanceClass = GSymLanguageInstance
 	
 	
 	
@@ -94,7 +81,7 @@ class GSymLanguageFactory (object):
 		self._viewTest = getParamOfType( GSymViewDefinition )
 	
 	
-	def createLanguageInstanceControlInterface(self):
-		return self.languageControlInterfaceClass( self )
+	def createLanguageInstance(self):
+		return self.languageInstanceClass( self )
 
 

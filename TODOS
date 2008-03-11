@@ -1,7 +1,22 @@
 TODOS:
 
 
+FILE: testSource
+FILE: testLanguage
+FILE: metaLanguage
 
+testSource imports testLanguage factory and asks for interface
+testSource hands content to testLanguage interface, which creates testSource view
+
+testLanguage imports metaLanguage factory and asks for interface
+testSource hands content to metaLanguage interface, which creates testLanguage view
+
+metaLanguage must create its factory, and then use this factory to create an interface
+metaLanguage must hand content to the interface, so as to create a meteLanguage view
+
+
+
+- FIx scroll-wheel zooming
 - Fix the language system so that the Meta-language can display itself.
 - Add filter expressions to the pattern matching system; this is going to be more complicated than I thought.
 - Generate debug information for compiled code

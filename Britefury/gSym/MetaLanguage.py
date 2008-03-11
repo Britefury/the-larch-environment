@@ -7,7 +7,7 @@
 ##-*************************
 from Britefury.DocModel.DMListInterface import DMListInterface
 
-from Britefury.gSym.gSymLanguage import GSymLanguageApplicationInterface, GSymLanguageInstanceInterface, GSymLanguageInstanceControlInterface, GSymLanguageFactory
+from Britefury.gSym.gSymLanguage import GSymLanguageApplicationInterface, GSymLanguageInstance, GSymLanguageFactory
 
 from Britefury.GLisp.GLispUtil import isGLispList
 from Britefury.GLisp.GLispInterpreter import specialform, GLispParameterListError, GLispItemTypeError
@@ -17,7 +17,7 @@ from Britefury.gSym.gSymView import defineView
 
 
 
-class MetaLanguageInstanceInterface (GSymLanguageInstanceInterface):
+class MetaLanguageInstance (GSymLanguageInstance):
 	"""Created in a language document
 	The language document describes a language content via this"""
 	@specialform
@@ -63,23 +63,15 @@ class MetaLanguageInstanceInterface (GSymLanguageInstanceInterface):
 
 		
 		
-		
-
-
-
-class MetaLanguageInstanceControlInterface (GSymLanguageInstanceControlInterface):
-	"""Created in a language document
-	The language document describes a language to this"""
-	languageInterfaceClass = MetaLanguageInstanceInterface
-
 	@specialform
 	def content(self, env, xs):
 		languageDefinition = [ env.evaluate( x )   for x in xs[2] ]
 		languageFactory = GSymLanguageFactory( *languageDefinition )
 		env.rootScope()['languageFactory'] = languageFactory
 		return GSymLanguageApplicationInterface( self._factory, xs )
-	
-	
+		
+
+
 		
 		
 	
@@ -87,5 +79,5 @@ class MetaLanguageFactory (GSymLanguageFactory):
 	"""Generated in a meta-language document
 	Imported into language documents
 	Used to create a meta-language instance; to which the language document supplies a language description"""
-	languageControlInterfaceClass = MetaLanguageInstanceControlInterface
+	languageInstanceClass = MetaLanguageInstance
 

@@ -10,15 +10,15 @@ from Britefury.DocModel.DMListInterface import DMListInterface
 from Britefury.GLisp.GLispUtil import isGLispList
 from Britefury.GLisp.GLispInterpreter import specialform
 
-from Britefury.gSym.gSymLanguage import GSymLanguageApplicationInterface, GSymLanguageInstanceInterface, GSymLanguageInstanceControlInterface, GSymLanguageFactory
-from Britefury.gSym.MetaLanguage import GSymLanguageInstanceInterface, GSymLanguageInstanceControlInterface, MetaLanguageFactory
+from Britefury.gSym.gSymLanguage import GSymLanguageApplicationInterface, GSymLanguageInstance, GSymLanguageFactory
+from Britefury.gSym.MetaLanguage import MetaLanguageFactory
 
 from Britefury.gSym.gSymView import defineView
 
 
 
 
-class MetaMetaLanguageInstanceInterface (GSymLanguageInstanceInterface):
+class MetaMetaLanguageInstance (GSymLanguageInstance):
 	"""Created in a meta-language document
 	The meta-language document describes a meta-language via this"""
 	@specialform
@@ -39,33 +39,23 @@ class MetaMetaLanguageInstanceInterface (GSymLanguageInstanceInterface):
 		return defineView( env, xs, name, docFormat, spec )
 
 
-		
-		
-		
-
-
-
-class MetaMetaLanguageInstanceControlInterface (GSymLanguageInstanceControlInterface):
-	"""Created in a meta-language document
-	The meta-language document describes a meta-language to this"""
-	languageInterfaceClass = MetaMetaLanguageInstanceInterface
-
 	@specialform
 	def content(self, env, xs):
 		languageDefinition = [ env.evaluate( x )   for x in xs[2] ]
 		languageFactory = MetaLanguageFactory( *languageDefinition )
 		env.rootScope()['languageFactory'] = languageFactory
 		return GSymLanguageApplicationInterface( self._factory, xs )
-	
-	
+
 		
 		
-	
+
+
+
 class MetaMetaLanguageFactory (GSymLanguageFactory):
 	"""Created internally
 	Imported into meta-language documents
 	Used to create a meta-meta-language instance; to which the meta-language document supplies a meta-language description"""
-	languageControlInterfaceClass = MetaMetaLanguageInstanceControlInterface
+	languageInstanceClass = MetaMetaLanguageInstance
 
 
 
