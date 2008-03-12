@@ -7,7 +7,7 @@
 ##-*************************
 from Britefury.GLisp.GLispUtil import isGLispList, stripGLispComments, gLispSrcToString
 from Britefury.GLisp.PyCodeGen import PyCodeGenError, PySrc, PyVar, PyLiteral, PyListLiteral, PyGetAttr, PyGetItem, PyUnOp, PyBinOp, PyCall, PyMethodCall, PyReturn, PyIf, PyDef, PyAssign_SideEffects, PyDel_SideEffects
-from Britefury.GLisp.PatternMatch import NoMatchError, compileMatchBlockToPyTrees
+import Britefury.GLisp.PatternMatch
 
 
 
@@ -360,30 +360,6 @@ def _compileMatch(xs, context, bNeedResult, compileSpecial):
 	  (patternN actionN...)
 	)
 	"""
-	def compileActionBlock(matchXs, actionXs, context, bindings, resultVarName):
-		actionFnName = context.temps.allocateTempName( 'match_fn' )
-
-		
-		# Build the action tree
-		actionContext = context.functionInnerContext()
-		# Bind variables (in order sorted by name of variable source; this should sort them in pattern order)
-		bindingPairs = bindings.items()
-		bindingPairs.sort( lambda x, y: cmp( x[1], y[1] ) )
-		for varName, valueSrc in bindingPairs:
-			actionContext.scope.bindLocal( varName )
-		
-		# Action expression code
-		trees, resultStorePyTree = _compileExpressionListToPyTreeStatements( actionXs, actionContext, bNeedResult, compileSpecial, lambda tree, x: PyReturn( tree, dbgSrc=x ) )
-		actionContext.body.extend( trees )
-		
-		# Make a function define
-		actionFnTree = PyDef( actionFnName, [ pair[0]   for pair in bindingPairs ], actionContext.body, dbgSrc=matchXs )
-		_actionFnCallTree = PyCall( PyVar( actionFnName, dbgSrc=actionXs ), [ PySrc( pair[1], dbgSrc=actionXs )   for pair in bindingPairs ], dbgSrc=matchXs )
-		actionResultAssignTree = PyAssign_SideEffects( PyVar( resultVarName, dbgSrc=matchXs ), _actionFnCallTree, dbgSrc=matchXs )
-		
-		return [ actionFnTree, actionResultAssignTree ]
-	
-	
 	if len( xs ) < 2:
 		raise GLispCompilerMatchExprParamListInsufficient( xs )
 	
@@ -395,7 +371,7 @@ def _compileMatch(xs, context, bNeedResult, compileSpecial):
 	dataVarName = context.temps.allocateTempName( 'match_data' )
 	context.body.append( PyAssign_SideEffects( PyVar( dataVarName, dbgSrc=xs ), _compileGLispExprToPyTree( dataExprXs, context, True, compileSpecial ), dbgSrc=xs ) )
 	
-	matchTrees, resultTree = compileMatchBlockToPyTrees( xs, matchBlockXs, context, bNeedResult, dataVarName, compileActionBlock )
+	matchTrees, resultTree = Britefury.GLisp.PatternMatch.compileMatchBlockToPyTrees( xs, matchBlockXs, context, bNeedResult, dataVarName, compileSpecial )
 	
 	context.body.extend( matchTrees )
 	
@@ -578,7 +554,7 @@ def compileGLispExprToPyFunction(moduleName, functionName, argNames, xs, compile
 	"""
 	src = compileGLispExprToPyFunctionSrc( functionName, argNames, xs, compileSpecial, prefixTrees, resultPyTreePostProcess )
 	lcls['__isGLispList__'] = isGLispList
-	lcls['NoMatchError'] = NoMatchError
+	lcls['NoMatchError'] = Britefury.GLisp.PatternMatch.NoMatchError
 	lcls['gLispAsString'] = gLispSrcToString
 	lcls['log'] = _log
 	codeObject = compile( src, moduleName, 'exec' )
@@ -933,58 +909,86 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 		)
 		"""
 		
+		xssrc3 = """
+		($match ($list a b c deadbeef e f g h)
+		   (   (a b (: @a !) (? @x (@x startswith dead) (: @b !)) (: @c *))   ($list @a @b @c)   )
+		)
+		"""
+		
 		pysrc1 = [
 			"__gsym__match_data_0 = [ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' ]",
-			"__gsym__match_bMatched_0 = False",
+			"__gsym__match_bMatched_0 = [ False ]",
 			"if __isGLispList__( __gsym__match_data_0 ):",
 			"  if len( __gsym__match_data_0 )  >=  4:",
 			"    if __gsym__match_data_0[0] == 'a':",
 			"      if __gsym__match_data_0[1] == 'b':",
 			"        if not __isGLispList__( __gsym__match_data_0[2] ):",
 			"          if not __isGLispList__( __gsym__match_data_0[3] ):",
-			"            __gsym__match_bMatched_0 = True",
 			"            def __gsym__match_fn_0(a, b, c):",
+			"              __gsym__match_bMatched_0[0] = True",
 			"              return [ a, b, c ]",
 			"            __gsym__match_result_0 = __gsym__match_fn_0( __gsym__match_data_0[2], __gsym__match_data_0[3], __gsym__match_data_0[4:] )",
-			"if not __gsym__match_bMatched_0:",
+			"if not __gsym__match_bMatched_0[0]:",
 			"  raise NoMatchError",
-			"del __gsym__match_bMatched_0",
 			"__gsym__match_result_0",
 		]
 
 		pysrc2 = [
 			"__gsym__match_data_0 = [ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' ]",
-			"__gsym__match_bMatched_0 = False",
+			"__gsym__match_bMatched_0 = [ False ]",
 			"if __isGLispList__( __gsym__match_data_0 ):",
 			"  if len( __gsym__match_data_0 )  >=  4:",
 			"    if __gsym__match_data_0[0] == 'a':",
 			"      if __gsym__match_data_0[1] == 'b':",
 			"        if not __isGLispList__( __gsym__match_data_0[2] ):",
 			"          if not __isGLispList__( __gsym__match_data_0[3] ):",
-			"            __gsym__match_bMatched_0 = True",
 			"            def __gsym__match_fn_0(a, b, c):",
+			"              __gsym__match_bMatched_0[0] = True",
 			"              return [ a, b, c ]",
 			"            __gsym__match_result_0 = __gsym__match_fn_0( __gsym__match_data_0[2], __gsym__match_data_0[3], __gsym__match_data_0[4:] )",
-			"if not __gsym__match_bMatched_0:",
+			"if not __gsym__match_bMatched_0[0]:",
 			"  if __isGLispList__( __gsym__match_data_0 ):",
 			"    if len( __gsym__match_data_0 )  >=  4:",
 			"      if __gsym__match_data_0[0] == 'x':",
 			"        if __gsym__match_data_0[1] == 'b':",
 			"          if not __isGLispList__( __gsym__match_data_0[2] ):",
 			"            if not __isGLispList__( __gsym__match_data_0[3] ):",
-			"              __gsym__match_bMatched_0 = True",
 			"              def __gsym__match_fn_1(a, b, c):",
+			"                __gsym__match_bMatched_0[0] = True",
 			"                return [ a, b, c ]",
 			"              __gsym__match_result_0 = __gsym__match_fn_1( __gsym__match_data_0[2], __gsym__match_data_0[3], __gsym__match_data_0[4:] )",
-			"if not __gsym__match_bMatched_0:",
+			"if not __gsym__match_bMatched_0[0]:",
 			"  raise NoMatchError",
-			"del __gsym__match_bMatched_0",
+			"__gsym__match_result_0",
+		]
+
+		pysrc3 = [
+			"__gsym__match_data_0 = [ 'a', 'b', 'c', 'deadbeef', 'e', 'f', 'g', 'h' ]",
+			"__gsym__match_bMatched_0 = [ False ]",
+			"if __isGLispList__( __gsym__match_data_0 ):",
+			"  if len( __gsym__match_data_0 )  >=  4:",
+			"    if __gsym__match_data_0[0] == 'a':",
+			"      if __gsym__match_data_0[1] == 'b':",
+			"        if not __isGLispList__( __gsym__match_data_0[2] ):",
+			"          if not __isGLispList__( __gsym__match_data_0[3] ):",
+			"            def __gsym__match_fn_0(a, b, c):",
+			"              def __gsym__match_condition_fn_0(x):",
+			"                return x.startswith( 'dead' )",
+			"              if not __gsym__match_condition_fn_0( __gsym__match_data_0[3] ):",
+			"                return None",
+			"              __gsym__match_bMatched_0[0] = True",
+			"              return [ a, b, c ]",
+			"            __gsym__match_result_0 = __gsym__match_fn_0( __gsym__match_data_0[2], __gsym__match_data_0[3], __gsym__match_data_0[4:] )",
+			"if not __gsym__match_bMatched_0[0]:",
+			"  raise NoMatchError",
 			"__gsym__match_result_0",
 		]
 
 		self._compileTest( xssrc1, pysrc1 )
 		self._compileTest( xssrc2, pysrc2 )
+		self._compileTest( xssrc3, pysrc3 )
 		self._evalTest( xssrc1, [ 'c', 'd', [ 'e', 'f', 'g', 'h' ] ], [] )
+		self._evalTest( xssrc3, [ 'c', 'deadbeef', [ 'e', 'f', 'g', 'h' ] ], [] )
 
 
 	def test_Where_If_Lambda(self):
@@ -1130,20 +1134,19 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 			"  a = [ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' ]",
 			"  b = 2",
 			"  __gsym__match_data_0 = a",
-			"  __gsym__match_bMatched_0 = False",
+			"  __gsym__match_bMatched_0 = [ False ]",
 			"  if __isGLispList__( __gsym__match_data_0 ):",
 			"    if len( __gsym__match_data_0 )  >=  4:",
 			"      if __gsym__match_data_0[0] == 'a':",
 			"        if __gsym__match_data_0[1] == 'b':",
 			"          if not __isGLispList__( __gsym__match_data_0[2] ):",
 			"            if not __isGLispList__( __gsym__match_data_0[3] ):",
-			"              __gsym__match_bMatched_0 = True",
 			"              def __gsym__match_fn_0(a, b, c):",
+			"                __gsym__match_bMatched_0[0] = True",
 			"                return [ a, b, c ]",
 			"              __gsym__match_result_0 = __gsym__match_fn_0( __gsym__match_data_0[2], __gsym__match_data_0[3], __gsym__match_data_0[4:] )",
-			"  if not __gsym__match_bMatched_0:",
+			"  if not __gsym__match_bMatched_0[0]:",
 			"    raise NoMatchError",
-			"  del __gsym__match_bMatched_0",
 			"  return __gsym__match_result_0",
 			"__gsym__where_fn_0()",
 		]
@@ -1171,23 +1174,22 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 		
 		pysrc1 = [
 			"__gsym__match_data_0 = [ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' ]",
-			"__gsym__match_bMatched_0 = False",
+			"__gsym__match_bMatched_0 = [ False ]",
 			"if __isGLispList__( __gsym__match_data_0 ):",
 			"  if len( __gsym__match_data_0 )  >=  4:",
 			"    if __gsym__match_data_0[0] == 'a':",
 			"      if __gsym__match_data_0[1] == 'b':",
 			"        if not __isGLispList__( __gsym__match_data_0[2] ):",
 			"          if not __isGLispList__( __gsym__match_data_0[3] ):",
-			"            __gsym__match_bMatched_0 = True",
 			"            def __gsym__match_fn_0(a, b, c):",
+			"              __gsym__match_bMatched_0[0] = True",
 			"              def __gsym__where_fn_0():",
 			"                x = [ a, b ]",
 			"                return [ x, c ]",
 			"              return __gsym__where_fn_0()",
 			"            __gsym__match_result_0 = __gsym__match_fn_0( __gsym__match_data_0[2], __gsym__match_data_0[3], __gsym__match_data_0[4:] )",
-			"if not __gsym__match_bMatched_0:",
+			"if not __gsym__match_bMatched_0[0]:",
 			"  raise NoMatchError",
-			"del __gsym__match_bMatched_0",
 			"__gsym__match_result_0",
 		]
 

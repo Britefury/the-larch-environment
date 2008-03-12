@@ -1,7 +1,6 @@
 TODOS:
 
 
-- Add filter expressions to the pattern matching system; this is going to be more complicated than I thought.
 - Generate debug information for compiled code
 - Handle debug information
 - GLisp (compiled to Python) code can generate bad data; check the sanity before processing it

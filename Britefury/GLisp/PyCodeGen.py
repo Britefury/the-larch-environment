@@ -418,6 +418,22 @@ class PyMethodCall (PyExpression):
 
 	
 	
+class PyGlobal (PyStatement):
+	def __init__(self, varNames, dbgSrc=None):
+		super( PyGlobal, self ).__init__( dbgSrc )
+		for varName in varNames:
+			if not _isPyDottedIdentifier( varName ):
+				self.error( PyInvalidVarNameError, methodName )
+		self.varNames =varNames
+		
+	def compileAsStmt(self):
+		return [ 'global %s'  %  ( ', '.join( self.varNames ) ) ]
+	
+	def _o_compareWith(self, x):
+		return cmp( self.valuvarNamese, x.varNames )
+
+
+
 class PyReturn (PyStatement):
 	def __init__(self, value, dbgSrc=None):
 		super( PyReturn, self ).__init__( dbgSrc )
