@@ -179,7 +179,7 @@ def _compileWhere(xs, context, bNeedResult=False, compileSpecial=None):
 		
 		# If this name is already bound in thise scope, we need to back it up first
 		valueExprPyTree = _compileGLispExprToPyTree( valueExpr, bindingContext, True, compileSpecial )
-		assignmentPyTree = PyAssign_SideEffects( PyVar( name, dbgSrc=binding ), valueExprPyTree, dbgSrc=binding )
+		assignmentPyTree = valueExprPyTree.assignToVar_sideEffects( name ).debug( binding )
 		
 		whereTrees.extend( bindingContext.body )
 		whereTrees.append( assignmentPyTree )
@@ -198,7 +198,7 @@ def _compileWhere(xs, context, bNeedResult=False, compileSpecial=None):
 
 	context.body.append( fnTree )
 	
-	callTree = PyCall( PyVar( whereFnName, dbgSrc=xs ), [], dbgSrc=xs )
+	callTree = PyVar( whereFnName )().debug( xs )
 			
 	return callTree
 
@@ -267,7 +267,7 @@ def _compileIf(xs, context, bNeedResult=False, compileSpecial=None):
 	if elseXs is not None:
 		elseSpecs = _elseCodeXsToPyTree( elseXs )
 	else:
-		context.body.append( PyAssign_SideEffects( PyVar( resultVarName, dbgSrc=xs ), PyLiteral( 'None', dbgSrc=xs ), dbgSrc=xs ) )
+		context.body.append( PyVar( resultVarName ).assign_sideEffects( None ).debug( xs ) )
 	context.body.append( PyIf( ifElifSpecs, elseSpecs, dbgSrc=xs ) )
 	
 	if bNeedResult:
@@ -358,7 +358,7 @@ def _compileMatch(xs, context, bNeedResult, compileSpecial):
 	
 	# Compile the data expression
 	dataVarName = context.temps.allocateTempName( 'match_data' )
-	context.body.append( PyAssign_SideEffects( PyVar( dataVarName, dbgSrc=xs ), _compileGLispExprToPyTree( dataExprXs, context, True, compileSpecial ), dbgSrc=xs ) )
+	context.body.append( PyVar( dataVarName ).assign_sideEffects( _compileGLispExprToPyTree( dataExprXs, context, True, compileSpecial ) ).debug( xs ) )
 	
 	matchTrees, resultTree = Britefury.GLisp.PatternMatch.compileMatchBlockToPyTrees( xs, matchBlockXs, context, bNeedResult, dataVarName, compileSpecial )
 	
