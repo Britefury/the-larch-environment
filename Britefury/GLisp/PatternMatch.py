@@ -10,13 +10,17 @@ from Britefury.Kernel.Abstract import abstractmethod
 
 from Britefury.DocModel.DMListInterface import DMListInterface
 from Britefury.GLisp.GLispUtil import isGLispList, isGLispComment, stripGLispComments
-from Britefury.GLisp.PyCodeGen import PyCodeGenError, PySrc, PyVar, PyLiteral, PyListLiteral, PyGetAttr, PyGetItem, PyUnOp, PyBinOp, PyCall, PyMethodCall, PyReturn, PyIf, PySimpleIf, PyDef, PyAssign_SideEffects, PyDel_SideEffects
+from Britefury.GLisp.PyCodeGen import pyt_coerce, PyCodeGenError, PySrc, PyVar, PyLiteral, PyListLiteral, PyGetAttr, PyGetItem, PyUnOp, PyBinOp, PyCall, PyMethodCall, PyReturn, PyIf, PySimpleIf, PyDef, PyAssign_SideEffects, PyDel_SideEffects
 import Britefury.GLisp.GLispCompiler
 
 
 class NoMatchError (Exception):
 	pass
 
+
+
+def _pyt_isGLispList(py_expression):
+	return PyVar( '__isGLispList__' )( py_expression )
 
 
 
@@ -30,31 +34,30 @@ class  _MatchNode (object):
 		
 		
 	@abstractmethod
-	def emitSourceVarNamesAndBindings(self, outerTreeFactory, valueSrc, valueIndirection, varNameToValueIndirection, bindings):
+	def emitPyTreeAndBindings(self, outerTreeFactory, py_value, bindings):
 		pass
 	
-	def handleBinding(self, outerTreeFactory, valueSrc, valueIndirection, varNameToValueIndirection, bindings):
+	def handleBinding(self, outerTreeFactory, py_value, bindings):
 		if self.bindName is not None:
-			varNameToValueIndirection.setdefault( self.bindName, valueIndirection )
 			if self.bindName in bindings:
-				return self._p_conditionWrap( outerTreeFactory, '%s == %s'  %  ( valueSrc, bindings[self.bindName] ) )
+				return self._p_conditionWrap( outerTreeFactory, py_value == bindings[self.bindName] )
 			else:
-				bindings[self.bindName] = valueSrc
+				bindings[self.bindName] = py_value
 				return outerTreeFactory
 		return outerTreeFactory
 	
-	def gatherConditions(self, valueSrc):
+	def gatherConditions(self, py_value):
 		if self.conditionVarName is None:
 			return []
 		else:
-			return [ ( valueSrc, self.conditionVarName, self.conditionExprXs ) ]
+			return [ ( py_value, self.conditionVarName, self.conditionExprXs ) ]
 	
 	def _p_emitMatchFailed(self):
 		return [ 'raise NoMatchError' ]
 	
 	
-	def _p_conditionWrap(self, outerTreeFactory, conditionSrc):
-		return lambda innerTrees: outerTreeFactory( [ PySimpleIf( PySrc( conditionSrc ), innerTrees, dbgSrc=self.srcXs ) ] )
+	def _p_conditionWrap(self, outerTreeFactory, py_condition):
+		return lambda innerTrees: outerTreeFactory( [ py_condition.ifTrue( innerTrees ).debug( self.srcXs ) ] )
 		
 		
 		
@@ -62,21 +65,21 @@ class  _MatchNode (object):
 
 
 class _MatchAnything (_MatchNode):
-	def emitSourceVarNamesAndBindings(self, outerTreeFactory, valueSrc, valueIndirection, varNameToValueIndirection, bindings):
-		return self.handleBinding( outerTreeFactory, valueSrc, valueIndirection, varNameToValueIndirection, bindings )
+	def emitPyTreeAndBindings(self, outerTreeFactory, py_value, bindings):
+		return self.handleBinding( outerTreeFactory, py_value, bindings )
 	
 
 class _MatchTerminal (_MatchNode):
-	def emitSourceVarNamesAndBindings(self, outerTreeFactory, valueSrc, valueIndirection, varNameToValueIndirection, bindings):
-		conditionTreeFactory = self._p_conditionWrap( outerTreeFactory, 'not __isGLispList__( %s )'  %  ( valueSrc, ) )
-		return self.handleBinding( conditionTreeFactory, valueSrc, valueIndirection, varNameToValueIndirection, bindings )
+	def emitPyTreeAndBindings(self, outerTreeFactory, py_value, bindings):
+		conditionTreeFactory = self._p_conditionWrap( outerTreeFactory, _pyt_isGLispList( py_value ).not_() )
+		return self.handleBinding( conditionTreeFactory, py_value, bindings )
 	
 
 
 class _MatchNonTerminal (_MatchNode):
-	def emitSourceVarNamesAndBindings(self, outerTreeFactory, valueSrc, valueIndirection, varNameToValueIndirection, bindings):
-		conditionTreeFactory = self._p_conditionWrap( outerTreeFactory, '__isGLispList__( %s )'  %  ( valueSrc, ) )
-		return self.handleBinding( conditionTreeFactory, valueSrc, valueIndirection, varNameToValueIndirection, bindings )
+	def emitPyTreeAndBindings(self, outerTreeFactory, py_value, bindings):
+		conditionTreeFactory = self._p_conditionWrap( outerTreeFactory, _pyt_isGLispList( py_value ) )
+		return self.handleBinding( conditionTreeFactory, py_value, bindings )
 
 	
 class _MatchConstant (_MatchNode):
@@ -84,9 +87,9 @@ class _MatchConstant (_MatchNode):
 		super( _MatchConstant, self ).__init__( srcXs=srcXs )
 		self._constant = constant
 
-	def emitSourceVarNamesAndBindings(self, outerTreeFactory, valueSrc, valueIndirection, varNameToValueIndirection, bindings):
-		conditionTreeFactory = self._p_conditionWrap( outerTreeFactory, '%s == \'%s\''  %  ( valueSrc, self._constant ) )
-		return self.handleBinding( conditionTreeFactory, valueSrc, valueIndirection, varNameToValueIndirection, bindings )
+	def emitPyTreeAndBindings(self, outerTreeFactory, py_value, bindings):
+		conditionTreeFactory = self._p_conditionWrap( outerTreeFactory, py_value == self._constant )
+		return self.handleBinding( conditionTreeFactory, py_value, bindings )
 
 
 class _MatchList (_MatchNode):
@@ -117,73 +120,69 @@ class _MatchList (_MatchNode):
 		else:
 			self._minLength = self._maxLength = len( self._front )
 		
-	def emitSourceVarNamesAndBindings(self, outerTreeFactory, valueSrc, valueIndirection, varNameToValueIndirection, bindings):
+	def emitPyTreeAndBindings(self, outerTreeFactory, py_value, bindings):
 		treeFac = outerTreeFactory
 		# Check type
-		treeFac = self._p_conditionWrap( treeFac, '__isGLispList__( %s )'  %  ( valueSrc, ) )
+		treeFac = self._p_conditionWrap( treeFac, _pyt_isGLispList( py_value ) )
 
 		# Check the lengths
 		if self._minLength == self._maxLength:
 			# min and max length the same; only one length permissable
-			treeFac = self._p_conditionWrap( treeFac, 'len( %s )  ==  %d'  %  ( valueSrc, self._minLength ) )
+			treeFac = self._p_conditionWrap( treeFac, py_value.len_() == self._minLength )
 		elif self._minLength == 0  and  self._maxLength is not None:
 			# no min length, a max length
-			treeFac = self._p_conditionWrap( treeFac, 'len( %s )  <=  %d'  %  ( valueSrc, self._maxLength ) )
+			treeFac = self._p_conditionWrap( treeFac, py_value.len_() <= self._maxLength )
 		elif self._minLength > 0:
 			# there is a min length
 			if self._maxLength is None:
 				# no max length
-				treeFac = self._p_conditionWrap( treeFac, 'len( %s )  >=  %d'  %  ( valueSrc, self._minLength ) )
+				treeFac = self._p_conditionWrap( treeFac, py_value.len_() >= self._minLength )
 			else:
 				# max length
-				treeFac = self._p_conditionWrap( treeFac, 'len( %s )  >=  %d   and   len( %s )  <=  %d'  %  ( valueSrc, self._minLength, valueSrc, self._maxLength ) )
+				treeFac = self._p_conditionWrap( treeFac, ( py_value.len_() >= self._minLength ).and_( py_value.len_() <= self._maxLength ) )
 				
 		#matchItem*  (front)
 		for i, item in enumerate( self._front ):
-			itemNameSrc = '%s[%d]'  %  ( valueSrc, i )
-			treeFac = item.emitSourceVarNamesAndBindings( treeFac, itemNameSrc, valueIndirection + [ i ], varNameToValueIndirection, bindings )
+			treeFac = item.emitPyTreeAndBindings( treeFac, py_value[i], bindings )
 					
 		#matchItem*  (back)
 		for i, item in enumerate( reversed( self._back ) ):
-			itemNameSrc = '%s[-%d]'  %  ( valueSrc, i + 1 )
-			treeFac = item.emitSourceVarNamesAndBindings( treeFac, itemNameSrc, valueIndirection + [ -(i+1) ], varNameToValueIndirection, bindings )
+			treeFac = item.emitPyTreeAndBindings( treeFac, py_value[-(i+1)], bindings )
 			
 		#internal sublist
 		if self._internal is not None:
 			start = len( self._front )
 			end = len( self._back )
-			if end  > 0:
-				treeFac = self._internal.emitSourceVarNamesAndBindings( treeFac, '%s[%d:%d]'  %  ( valueSrc, start, -end ), valueIndirection + [ (start,-end) ], varNameToValueIndirection, bindings )
+			if end  >  0:
+				treeFac = self._internal.emitPyTreeAndBindings( treeFac, py_value[start:-end], bindings )
 			else:
-				treeFac = self._internal.emitSourceVarNamesAndBindings( treeFac, '%s[%d:]'  %  ( valueSrc, start ), valueIndirection + [ (start,None) ], varNameToValueIndirection, bindings )
+				treeFac = self._internal.emitPyTreeAndBindings( treeFac, py_value[start:], bindings )
 		
 		#binding
-		treeFac = self.handleBinding( treeFac, valueSrc, valueIndirection, varNameToValueIndirection, bindings )
+		treeFac = self.handleBinding( treeFac, py_value, bindings )
 		
 		return treeFac
 
 	
-	def gatherConditions(self, valueSrc):
-		conditions = super( _MatchList, self ).gatherConditions( valueSrc )
+	def gatherConditions(self, py_value):
+		conditions = super( _MatchList, self ).gatherConditions( py_value )
 
 		#front
 		for i, item in enumerate( self._front ):
-			itemNameSrc = '%s[%d]'  %  ( valueSrc, i )
-			conditions.extend( item.gatherConditions( itemNameSrc ) )
+			conditions.extend( item.gatherConditions( py_value[i] ) )
 
 		#back
 		for i, item in enumerate( reversed( self._back ) ):
-			itemNameSrc = '%s[-%d]'  %  ( valueSrc, i + 1 )
-			conditions.extend( item.gatherConditions( itemNameSrc ) )
+			conditions.extend( item.gatherConditions( py_value[-(i+1)] ) )
 
 		#internal sublist
 		if self._internal is not None:
 			start = len( self._front )
 			end = len( self._back )
 			if end  > 0:
-				conditions.extend( self._internal.gatherConditions( '%s[%d:%d]'  %  ( valueSrc, start, -end ) ) )
+				conditions.extend( self._internal.gatherConditions( py_value[start:-end] ) )
 			else:
-				conditions.extend( self._internal.gatherConditions( '%s[%d:]'  %  ( valueSrc, start ) ) )
+				conditions.extend( self._internal.gatherConditions( py_value[start:] ) )
 		
 		return conditions
 		
@@ -197,8 +196,8 @@ class _MatchSublist (_MatchNode):
 		self.min = min
 		self.max = max
 		
-	def emitSourceVarNamesAndBindings(self, outerTreeFactory, valueSrc, valueIndirection, varNameToValueIndirection, bindings):
-		return self.handleBinding( outerTreeFactory, valueSrc, valueIndirection, varNameToValueIndirection, bindings )
+	def emitPyTreeAndBindings(self, outerTreeFactory, py_value, bindings):
+		return self.handleBinding( outerTreeFactory, py_value, bindings )
 		
 	
 
@@ -267,10 +266,6 @@ def _buildMatchNodeForMatchItem(xs, bInsideList=False):
 
 		
 		
-def _bindingMapToBindingDictSrc(bindings):
-	return '{ '  +  ', '.join( [ '\'%s\' : %s'  %  ( name, valueSrc )   for name, valueSrc in bindings.items() ] )  +  ' }'
-	
-	
 	
 		
 class MatchBlockInvalidType (PyCodeGenError):
@@ -335,7 +330,7 @@ def compileMatchBlockToPyTrees(matchXs, xs, context, bNeedResult, dataVarName, c
 	if bNeedResult:
 		resultVarName = context.temps.allocateTempName( 'match_result' )
 		
-	context.body.append( PyAssign_SideEffects( PyVar( bMatchedName, dbgSrc=matchXs ), PySrc ( '[ False ]', dbgSrc=matchXs ), dbgSrc=matchXs ) )
+	context.body.append( PyVar( bMatchedName ).assign_sideEffects( [ False ] ).debug( matchXs ) )
 	
 	xs = stripGLispComments( xs )
 	matchTrees = []
@@ -355,12 +350,11 @@ def compileMatchBlockToPyTrees(matchXs, xs, context, bNeedResult, dataVarName, c
 		patternNode = _buildMatchNodeForMatchItem( pattern )
 
 		# Build the pattern tree factory
-		matchItemVarNameToValueIndirection = {}
 		bindings = {}
-		patternTreeFac = patternNode.emitSourceVarNamesAndBindings( lambda innerTrees: innerTrees, dataVarName, [], matchItemVarNameToValueIndirection, bindings)
+		patternTreeFac = patternNode.emitPyTreeAndBindings( lambda innerTrees: innerTrees, PyVar( dataVarName ), bindings)
 		
-		# Gather the condition pairs
-		conditionPairs = patternNode.gatherConditions( dataVarName )
+		# Gather the conditions
+		conditions = patternNode.gatherConditions( PyVar( dataVarName ) )
 		
 		actionContext = context.innerContext()
 
@@ -369,21 +363,21 @@ def compileMatchBlockToPyTrees(matchXs, xs, context, bNeedResult, dataVarName, c
 
 		# Build the action tree
 		actionFnContext = context.innerContext()
-		# Bind variables (in order sorted by name of variable source; this should sort them in pattern order)
+		# Bind variables (in alphabetical order)
 		bindingPairs = bindings.items()
-		bindingPairs.sort( lambda x, y: cmp( x[1], y[1] ) )
+		bindingPairs.sort( lambda x, y: cmp( x[0], y[0] ) )
 			
 		# Process the conditions
-		for valueSrc, conditionVarName, conditionExprXs in conditionPairs:
+		for py_value, conditionVarName, conditionExprXs in conditions:
 			conditionFnName = actionFnContext.temps.allocateTempName( 'match_condition_fn' )
 			conditionFnTree = Britefury.GLisp.GLispCompiler.compileGLispExprToPyFunctionPyTree( conditionFnName, [ conditionVarName ], conditionExprXs, compileSpecial )
-			_conditionFnCallTree = PyCall( PyVar( conditionFnName, dbgSrc=conditionExprXs ), [ PySrc( valueSrc, dbgSrc=conditionExprXs ) ], dbgSrc=conditionExprXs )
-			conditionIfTree = PyIf( [ ( PyUnOp( 'not', _conditionFnCallTree, dbgSrc=conditionExprXs ), [ PyReturn( PyLiteral( 'None', dbgSrc=conditionExprXs ), dbgSrc=conditionExprXs ) ] ) ], dbgSrc=conditionExprXs )
+			_conditionFnCallTree = PyVar( conditionFnName )( py_value ).debug( conditionExprXs )
+			conditionIfTree = _conditionFnCallTree.not_().ifTrue( [ pyt_coerce( None ).return_() ] ).debug( conditionExprXs )
 			actionFnContext.body.append( conditionFnTree )
 			actionFnContext.body.append( conditionIfTree )		
 		
 		# Matched
-		matchedTrueTree = PyAssign_SideEffects( PySrc( bMatchedName + '[0]', dbgSrc=match ), PyLiteral( 'True', dbgSrc=match ) )
+		matchedTrueTree = pyt_coerce( True ).assignTo_sideEffects( PyVar( bMatchedName )[0] ).debug( match )
 		actionFnContext.body.append( matchedTrueTree )
 		
 		# Action expression code
@@ -392,7 +386,7 @@ def compileMatchBlockToPyTrees(matchXs, xs, context, bNeedResult, dataVarName, c
 		
 		# Make a function define
 		actionFnTree = PyDef( actionFnName, [ pair[0]   for pair in bindingPairs ], actionFnContext.body, dbgSrc=matchXs )
-		_actionFnCallTree = PyCall( PyVar( actionFnName, dbgSrc=actionXs ), [ PySrc( pair[1], dbgSrc=actionXs )   for pair in bindingPairs ], dbgSrc=matchXs )
+		_actionFnCallTree = PyVar( actionFnName, dbgSrc=actionXs )( *[ pair[1].debug( actionXs )   for pair in bindingPairs ] ).debug( matchXs )
 		actionResultAssignTree = PyAssign_SideEffects( PyVar( resultVarName, dbgSrc=matchXs ), _actionFnCallTree, dbgSrc=matchXs )
 		
 		actionTrees = [ actionFnTree,  actionResultAssignTree ]
@@ -401,17 +395,17 @@ def compileMatchBlockToPyTrees(matchXs, xs, context, bNeedResult, dataVarName, c
 		matchItemTrees = patternTreeFac( actionTrees )
 		
 		if not bFirst:
-			matchItemTrees = [ PySimpleIf( PySrc( 'not %s[0]'  %  ( bMatchedName, ), dbgSrc=match ), matchItemTrees, dbgSrc=match ) ]
+			matchItemTrees = [ PySimpleIf( PyVar( bMatchedName )[0].not_(), matchItemTrees ).debug( match ) ]
 			
 		matchTrees.extend( matchItemTrees )
 		
 		bFirst = False
 
 	# Raise NoMatchError if no match found
-	matchTrees.append( PySimpleIf( PySrc( 'not %s[0]'  %  ( bMatchedName, ), dbgSrc=xs ), [ PySrc( 'raise NoMatchError', dbgSrc=xs ) ], dbgSrc=xs ) )
+	matchTrees.append( PySimpleIf( PyVar( bMatchedName )[0].not_(), [ PySrc( 'raise NoMatchError', dbgSrc=xs ) ] ).debug( xs ) )
 	
 	if bNeedResult:
-		resultTree = PyVar( resultVarName, dbgSrc=matchXs )
+		resultTree = PyVar( resultVarName ).debug( matchXs )
 	else:
 		resultTree = None
 	return matchTrees, resultTree
