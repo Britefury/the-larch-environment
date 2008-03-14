@@ -6,7 +6,7 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
 from Britefury.GLisp.GLispUtil import isGLispList, stripGLispComments, gLispSrcToString
-from Britefury.GLisp.PyCodeGen import PyCodeGenError, PySrc, PyVar, PyLiteral, PyListLiteral, PyGetAttr, PyGetItem, PyUnOp, PyBinOp, PyCall, PyMethodCall, PyReturn, PyIf, PyDef, PyAssign_SideEffects, PyDel_SideEffects
+from Britefury.GLisp.PyCodeGen import PyCodeGenError, PySrc, PyVar, PyLiteral, PyListLiteral, PyGetAttr, PyGetItem, PyGetSlice, PyUnOp, PyBinOp, PyCall, PyMethodCall, PyReturn, PyIf, PyDef, PyAssign_SideEffects, PyDel_SideEffects
 import Britefury.GLisp.PatternMatch
 
 
@@ -428,7 +428,7 @@ def _compileGLispExprToPyTree(xs, context, bNeedResult=False, compileSpecial=Non
 			elif method == '[]'  and  len(xs) == 3:
 				return PyGetItem( _compileGLispExprToPyTree( xs[0], context, True, compileSpecial ), _compileGLispExprToPyTree( xs[2], context, True, compileSpecial ), dbgSrc=xs )
 			elif method == '[:]'  and  len(xs) == 4:
-				return PyGetItem( _compileGLispExprToPyTree( xs[0], context, True, compileSpecial ),
+				return PyGetSlice( _compileGLispExprToPyTree( xs[0], context, True, compileSpecial ),
 						  _compileGLispExprToPyTree( xs[2], context, True, compileSpecial ),
 						  _compileGLispExprToPyTree( xs[3], context, True, compileSpecial ), dbgSrc=xs )
 			elif method in PyUnOp.operators   and   len(xs) == 2:
@@ -908,7 +908,7 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 			"__gsym__match_data_0 = [ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' ]",
 			"__gsym__match_bMatched_0 = [ False ]",
 			"if __isGLispList__( __gsym__match_data_0 ):",
-			"  if len( __gsym__match_data_0 )  >=  4:",
+			"  if len( __gsym__match_data_0 ) >= 4:",
 			"    if __gsym__match_data_0[0] == 'a':",
 			"      if __gsym__match_data_0[1] == 'b':",
 			"        if not __isGLispList__( __gsym__match_data_0[2] ):",
@@ -926,7 +926,7 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 			"__gsym__match_data_0 = [ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' ]",
 			"__gsym__match_bMatched_0 = [ False ]",
 			"if __isGLispList__( __gsym__match_data_0 ):",
-			"  if len( __gsym__match_data_0 )  >=  4:",
+			"  if len( __gsym__match_data_0 ) >= 4:",
 			"    if __gsym__match_data_0[0] == 'a':",
 			"      if __gsym__match_data_0[1] == 'b':",
 			"        if not __isGLispList__( __gsym__match_data_0[2] ):",
@@ -937,7 +937,7 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 			"            __gsym__match_result_0 = __gsym__match_fn_0( __gsym__match_data_0[2], __gsym__match_data_0[3], __gsym__match_data_0[4:] )",
 			"if not __gsym__match_bMatched_0[0]:",
 			"  if __isGLispList__( __gsym__match_data_0 ):",
-			"    if len( __gsym__match_data_0 )  >=  4:",
+			"    if len( __gsym__match_data_0 ) >= 4:",
 			"      if __gsym__match_data_0[0] == 'x':",
 			"        if __gsym__match_data_0[1] == 'b':",
 			"          if not __isGLispList__( __gsym__match_data_0[2] ):",
@@ -955,7 +955,7 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 			"__gsym__match_data_0 = [ 'a', 'b', 'c', 'deadbeef', 'e', 'f', 'g', 'h' ]",
 			"__gsym__match_bMatched_0 = [ False ]",
 			"if __isGLispList__( __gsym__match_data_0 ):",
-			"  if len( __gsym__match_data_0 )  >=  4:",
+			"  if len( __gsym__match_data_0 ) >= 4:",
 			"    if __gsym__match_data_0[0] == 'a':",
 			"      if __gsym__match_data_0[1] == 'b':",
 			"        if not __isGLispList__( __gsym__match_data_0[2] ):",
@@ -1108,7 +1108,7 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 			"  __gsym__match_data_0 = a",
 			"  __gsym__match_bMatched_0 = [ False ]",
 			"  if __isGLispList__( __gsym__match_data_0 ):",
-			"    if len( __gsym__match_data_0 )  >=  4:",
+			"    if len( __gsym__match_data_0 ) >= 4:",
 			"      if __gsym__match_data_0[0] == 'a':",
 			"        if __gsym__match_data_0[1] == 'b':",
 			"          if not __isGLispList__( __gsym__match_data_0[2] ):",
@@ -1148,7 +1148,7 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 			"__gsym__match_data_0 = [ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' ]",
 			"__gsym__match_bMatched_0 = [ False ]",
 			"if __isGLispList__( __gsym__match_data_0 ):",
-			"  if len( __gsym__match_data_0 )  >=  4:",
+			"  if len( __gsym__match_data_0 ) >= 4:",
 			"    if __gsym__match_data_0[0] == 'a':",
 			"      if __gsym__match_data_0[1] == 'b':",
 			"        if not __isGLispList__( __gsym__match_data_0[2] ):",

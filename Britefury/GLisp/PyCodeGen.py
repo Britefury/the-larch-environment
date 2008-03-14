@@ -328,10 +328,14 @@ class PyExpression (PyStatement):
 	
 	def __getitem__(self, i):
 		if isinstance( i, slice ):
-			if i.step is None:
-				return PyGetItem( self, pyt_coerce( i.start ), pyt_coerce( i.stop ) )
-			else:
-				return PyGetItem( self, pyt_coerce( i.start ), pyt_coerce( i.stop ), pyt_coerce( i.step ) )
+			start = stop = step = None
+			if i.start is not None:
+				start = pyt_coerce( i.start )
+			if i.stop is not None:
+				stop = pyt_coerce( i.stop )
+			if i.step is not None:
+				step = pyt_coerce( i.step )
+			return PyGetSlice( self, start, stop, step )
 		else:
 			return PyGetItem( self, pyt_coerce( i ) )
 		
@@ -354,6 +358,14 @@ class PyExpression (PyStatement):
 	# If
 	def ifTrue(self, statements):
 		return PySimpleIf( self, statements )
+	
+	
+	# Assignment
+	def assignTo_sideEffects(self, target):
+		return PyAssign_SideEffects( target, self )
+	
+	def assignToVar_sideEffects(self, varName):
+		return PyAssign_SideEffects( PyVar( varName ), self )
 
 	
 
@@ -391,7 +403,7 @@ class PyVar (PyExpression):
 	
 	
 	def assign_sideEffects(self, value):
-		return PyAssign_SideEffects( self, value )
+		return PyAssign_SideEffects( self, pyt_coerce( value ) )
 	
 	def del_sideEffects(self):
 		return PyDel_SideEffects( self )
@@ -501,10 +513,32 @@ class PyGetAttr (PyExpression):
 	
 
 class PyGetItem (PyExpression):
-	def __init__(self, a, start, stop=None, step=None, dbgSrc=None):
+	def __init__(self, a, key, dbgSrc=None):
 		super( PyGetItem, self ).__init__( dbgSrc )
 		assert isinstance( a, PyExpression )
-		assert isinstance( start, PyExpression )
+		assert isinstance( key, PyExpression )
+		self.a = a
+		self.key = key
+		
+	def _o_compileAsExpr(self):
+		return '%s[%s]'  %  ( self.a.compileAsExpr( _subscriptPrecedence ), self.key.compileAsExpr( _subscriptPrecedence ) )
+	
+	def _o_getPrecedence(self):
+		return _subscriptPrecedence
+	
+	def _o_compareWith(self, x):
+		return pyt_compare( self.a, x.a )  and  pyt_compare( self.key, x.key )
+
+	def getChildren(self):
+		return [ self.a, self.key ]
+	
+	
+	
+class PyGetSlice (PyExpression):
+	def __init__(self, a, start, stop=None, step=None, dbgSrc=None):
+		super( PyGetSlice, self ).__init__( dbgSrc )
+		assert isinstance( a, PyExpression )
+		assert start is None  or  isinstance( start, PyExpression )
 		assert stop is None  or  isinstance( stop, PyExpression )
 		assert step is None  or  isinstance( step, PyExpression )
 		self.a = a
@@ -513,13 +547,22 @@ class PyGetItem (PyExpression):
 		self.step = step
 		
 	def _o_compileAsExpr(self):
-		if self.stop is not None  and  not pyt_compare( self.stop, pyt_coerce( None ) ):
-			if self.step is not None  and  not pyt_compare( self.step, pyt_coerce( None ) ):
-				return '%s[%s:%s:%s]'  %  ( self.a.compileAsExpr( _subscriptPrecedence ), self.start.compileAsExpr(), self.stop.compileAsExpr(), self.step.compileAsExpr() )
+		start = stop = step = ''
+		a = self.a.compileAsExpr( _subscriptPrecedence )
+		if self.start is not None:
+			start = self.start.compileAsExpr()
+		if self.stop is not None:
+			stop = self.stop.compileAsExpr()
+		if self.step is not None:
+			step = self.step.compileAsExpr()
+			
+		if self.step is None:
+			if self.stop is None:
+				return '%s[%s:]'  %  ( a, start )
 			else:
-				return '%s[%s:%s]'  %  ( self.a.compileAsExpr( _subscriptPrecedence ), self.start.compileAsExpr(), self.stop.compileAsExpr() )
+				return '%s[%s:%s]'  %  ( a, start, stop )
 		else:
-			return '%s[%s]'  %  ( self.a.compileAsExpr( _subscriptPrecedence ), self.start.compileAsExpr() )
+			return '%s[%s:%s:%s]'  %  ( a, start, stop, step )
 	
 	def _o_getPrecedence(self):
 		return _subscriptPrecedence
@@ -528,13 +571,14 @@ class PyGetItem (PyExpression):
 		return pyt_compare( self.a, x.a )  and  pyt_compare( self.start, x.start)  and  pyt_compare( self.stop, x.stop)  and  pyt_compare( self.step, x.step)
 
 	def getChildren(self):
+		children = [ self.a ]
+		if self.start is not None:
+			children.append( self.start )
 		if self.stop is not None:
-			if self.step is not None:
-				return [ self.a, self.start, self.stop, self.step ]
-			else:
-				return [ self.a, self.start, self.stop ]
-		else:
-			return [ self.a, self.start ]
+			children.append( self.stop )
+		if self.step is not None:
+			children.append( self.step )
+		return children
 	
 	
 	
@@ -950,20 +994,25 @@ class TestCase_PyCodeGen_Node_cmp (unittest.TestCase):
 		self.assert_( pyt_compare( PyGetItem( PySrc( 'a' ), PySrc( '1' ) ),   PyGetItem( PySrc( 'a' ), PySrc( '1' ) ) ) )
 		self.assert_( not pyt_compare( PyGetItem( PySrc( 'a' ), PySrc( '1' ) ),   PyGetItem( PySrc( 'b' ), PySrc( '1' ) ) ) )
 		self.assert_( not pyt_compare( PyGetItem( PySrc( 'a' ), PySrc( '1' ) ),   PyGetItem( PySrc( 'a' ), PySrc( '2' ) ) ) )
+		
+	def test_PyGetSlice(self):
+		self.assert_( pyt_compare( PyGetSlice( PySrc( 'a' ), PySrc( '1' ) ),   PyGetSlice( PySrc( 'a' ), PySrc( '1' ) ) ) )
+		self.assert_( not pyt_compare( PyGetSlice( PySrc( 'a' ), PySrc( '1' ) ),   PyGetSlice( PySrc( 'b' ), PySrc( '1' ) ) ) )
+		self.assert_( not pyt_compare( PyGetSlice( PySrc( 'a' ), PySrc( '1' ) ),   PyGetSlice( PySrc( 'a' ), PySrc( '2' ) ) ) )
 
-		self.assert_( pyt_compare( PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ) ),   PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ) ) ) )
-		self.assert_( not pyt_compare( PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ) ),   PyGetItem( PySrc( 'a' ), PySrc( '1' ) ) ) )
-		self.assert_( not pyt_compare( PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ) ),   PyGetItem( PySrc( 'b' ), PySrc( '1' ), PySrc( '2' ) ) ) )
-		self.assert_( not pyt_compare( PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ) ),   PyGetItem( PySrc( 'a' ), PySrc( '2' ), PySrc( '2' ) ) ) )
-		self.assert_( not pyt_compare( PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ) ),   PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '3' ) ) ) )
+		self.assert_( pyt_compare( PyGetSlice( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ) ),   PyGetSlice( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ) ) ) )
+		self.assert_( not pyt_compare( PyGetSlice( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ) ),   PyGetSlice( PySrc( 'a' ), PySrc( '1' ) ) ) )
+		self.assert_( not pyt_compare( PyGetSlice( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ) ),   PyGetSlice( PySrc( 'b' ), PySrc( '1' ), PySrc( '2' ) ) ) )
+		self.assert_( not pyt_compare( PyGetSlice( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ) ),   PyGetSlice( PySrc( 'a' ), PySrc( '2' ), PySrc( '2' ) ) ) )
+		self.assert_( not pyt_compare( PyGetSlice( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ) ),   PyGetSlice( PySrc( 'a' ), PySrc( '1' ), PySrc( '3' ) ) ) )
 
-		self.assert_( pyt_compare( PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ), PySrc( '3' ) ),   PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ), PySrc( '3' ) ) ) )
-		self.assert_( not pyt_compare( PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ), PySrc( '3' ) ),   PyGetItem( PySrc( 'b' ), PySrc( '1' ), PySrc( '2' ), PySrc( '3' ) ) ) )
-		self.assert_( not pyt_compare( PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ), PySrc( '3' ) ),   PyGetItem( PySrc( 'a' ), PySrc( '2' ), PySrc( '2' ), PySrc( '3' ) ) ) )
-		self.assert_( not pyt_compare( PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ), PySrc( '3' ) ),   PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '3' ), PySrc( '3' ) ) ) )
-		self.assert_( not pyt_compare( PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ), PySrc( '3' ) ),   PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ), PySrc( '4' ) ) ) )
-		self.assert_( not pyt_compare( PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ), PySrc( '3' ) ),   PyGetItem( PySrc( 'a' ), PySrc( '1' ) ) ) )
-		self.assert_( not pyt_compare( PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ), PySrc( '3' ) ),   PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ) ) ) )
+		self.assert_( pyt_compare( PyGetSlice( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ), PySrc( '3' ) ),   PyGetSlice( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ), PySrc( '3' ) ) ) )
+		self.assert_( not pyt_compare( PyGetSlice( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ), PySrc( '3' ) ),   PyGetSlice( PySrc( 'b' ), PySrc( '1' ), PySrc( '2' ), PySrc( '3' ) ) ) )
+		self.assert_( not pyt_compare( PyGetSlice( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ), PySrc( '3' ) ),   PyGetSlice( PySrc( 'a' ), PySrc( '2' ), PySrc( '2' ), PySrc( '3' ) ) ) )
+		self.assert_( not pyt_compare( PyGetSlice( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ), PySrc( '3' ) ),   PyGetSlice( PySrc( 'a' ), PySrc( '1' ), PySrc( '3' ), PySrc( '3' ) ) ) )
+		self.assert_( not pyt_compare( PyGetSlice( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ), PySrc( '3' ) ),   PyGetSlice( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ), PySrc( '4' ) ) ) )
+		self.assert_( not pyt_compare( PyGetSlice( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ), PySrc( '3' ) ),   PyGetSlice( PySrc( 'a' ), PySrc( '1' ) ) ) )
+		self.assert_( not pyt_compare( PyGetSlice( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ), PySrc( '3' ) ),   PyGetSlice( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ) ) ) )
 		
 	def test_PyUnOp(self):
 		self.assert_( pyt_compare( PyUnOp( '-', PySrc( 'a' ) ),   PyUnOp( '-', PySrc( 'a' ) ) ) )
@@ -1040,7 +1089,15 @@ class TestCase_PyCodeGen_Node_compile (unittest.TestCase):
 		
 	def test_PyGetItem(self):
 		self.assert_( PyGetItem( PySrc( 'a' ), PySrc( '1' ) ).compileAsExpr()  ==  'a[1]' )
-		self.assert_( PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ) ).compileAsExpr()  ==  'a[1:2]' )
+		
+	def test_PyGetSlice(self):
+		self.assert_( PyGetSlice( PySrc( 'a' ), PySrc( '1' ) ).compileAsExpr()  ==  'a[1:]' )
+		self.assert_( PyGetSlice( PySrc( 'a' ), None, PySrc( '1' ) ).compileAsExpr()  ==  'a[:1]' )
+		self.assert_( PyGetSlice( PySrc( 'a' ), None, None, PySrc( '1' ) ).compileAsExpr()  ==  'a[::1]' )
+		self.assert_( PyGetSlice( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ) ).compileAsExpr()  ==  'a[1:2]' )
+		self.assert_( PyGetSlice( PySrc( 'a' ), PySrc( '1' ), None, PySrc( '2' ) ).compileAsExpr()  ==  'a[1::2]' )
+		self.assert_( PyGetSlice( PySrc( 'a' ), None, PySrc( '1' ), PySrc( '2' ) ).compileAsExpr()  ==  'a[:1:2]' )
+		self.assert_( PyGetSlice( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ), PySrc( '3' ) ).compileAsExpr()  ==  'a[1:2:3]' )
 		
 	def test_PyUnOp(self):
 		self.assert_( PyUnOp( '-', PySrc( 'a' ) ).compileAsExpr()  ==  '-a' )
@@ -1137,7 +1194,7 @@ class TestCase_PyCodeGen_Node_compile (unittest.TestCase):
 		
 
 
-class TestCase_PyCodeGen_Node_coerce (unittest.TestCase):
+class TestCase_PyCodeGen_build (unittest.TestCase):
 	def _compileExprTest(self, tree, expectedResult):
 		self.assert_( tree.compileAsExpr() == expectedResult )
 	
@@ -1197,7 +1254,12 @@ class TestCase_PyCodeGen_Node_coerce (unittest.TestCase):
 		self._compileExprTest( PyVar( 'x' ).len_(),   'len( x )' )
 		self._compileExprTest( PyVar( 'x' ).in_( PyVar( 'y' ) ),   'x in y' )
 		self._compileExprTest( PyVar( 'x' )[0],   'x[0]' )
+		self._compileExprTest( PyVar( 'x' )[0:],   'x[0:]' )
+		self._compileExprTest( PyVar( 'x' )[:0],   'x[:0]' )
+		self._compileExprTest( PyVar( 'x' )[::0],   'x[::0]' )
 		self._compileExprTest( PyVar( 'x' )[0:2],   'x[0:2]' )
+		self._compileExprTest( PyVar( 'x' )[0::2],   'x[0::2]' )
+		self._compileExprTest( PyVar( 'x' )[:0:2],   'x[:0:2]' )
 		self._compileExprTest( PyVar( 'x' )[0:2:1],   'x[0:2:1]' )
 
 	
@@ -1210,6 +1272,8 @@ class TestCase_PyCodeGen_Node_coerce (unittest.TestCase):
 
 	def test_assign(self):
 		self._compileStmtTest( PyVar( 'x' ).assign_sideEffects( pyt_coerce( 1 ) ),   [ 'x = 1' ] )
+		self._compileStmtTest( pyt_coerce( 1 ).assignTo_sideEffects( PyVar( 'x' ) ),   [ 'x = 1' ] )
+		self._compileStmtTest( pyt_coerce( 1 ).assignToVar_sideEffects( 'x' ),   [ 'x = 1' ] )
 
 	def test_del(self):
 		self._compileStmtTest( PyVar( 'x' ).del_sideEffects(),   [ 'del x' ] )
