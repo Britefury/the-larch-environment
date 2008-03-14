@@ -368,12 +368,10 @@ def compileMatchBlockToPyTrees(matchXs, xs, context, bNeedResult, dataVarName, c
 		actionFnName = actionContext.temps.allocateTempName( 'match_fn' )
 
 		# Build the action tree
-		actionFnContext = context.functionInnerContext()
+		actionFnContext = context.innerContext()
 		# Bind variables (in order sorted by name of variable source; this should sort them in pattern order)
 		bindingPairs = bindings.items()
 		bindingPairs.sort( lambda x, y: cmp( x[1], y[1] ) )
-		for varName, valueSrc in bindingPairs:
-			actionFnContext.scope.bindLocal( varName )
 			
 		# Process the conditions
 		for valueSrc, conditionVarName, conditionExprXs in conditionPairs:

@@ -216,6 +216,13 @@ class PyNode (object):
 		return self
 	
 	
+	def getVariablesAccessed(self):
+		vars = set()
+		for child in self.getChildren():
+			vars = vars.union( child.getVariablesAccessed() )
+		return vars
+	
+	
 	
 class PyStatement (PyNode):
 	@abstractmethod
@@ -389,7 +396,10 @@ class PyVar (PyExpression):
 	def del_sideEffects(self):
 		return PyDel_SideEffects( self )
 	
-	
+
+	def getVariablesAccessed(self):
+		return set( [ self.varName ] )
+
 	
 	
 class PyLiteral (PyExpression):

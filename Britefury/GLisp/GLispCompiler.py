@@ -38,17 +38,14 @@ class _TempNameAllocator (object):
 class _PyScope (object):
 	def __init__(self):
 		super( _PyScope, self ).__init__()
-		self._boundLocals = set()
+		self._visibleArguments = set()
 
 
-	def isLocalBound(self, name):
-		return name in self._boundLocals
-	
-	def bindLocal(self, name):
-		self._boundLocals.add( name )
+	def registerArgument(self, name):
+		self._visibleArguments.add( name )
 		
-	def unbindLocal(self, name):
-		self._boundLocals.remove( name )
+	def getVisibleArguments(self):
+		return self._visibleArguments
 		
 
 
@@ -141,9 +138,6 @@ class GLispCompilerWhereExprInvalidBindingListFormat (PyCodeGenError):
 class GLispCompilerWhereExprCannotRebindVariable (PyCodeGenError):
 	pass
 
-class GLispCompilerWhereExprCannotRebindVariableFromOuterScope (PyCodeGenError):
-	pass
-
 def _compileWhere(xs, context, bNeedResult=False, compileSpecial=None):
 	"""
 	($where ((name0 value0) (name1 value1) ... (nameN valueN)) (expressions_to_execute))
@@ -183,17 +177,12 @@ def _compileWhere(xs, context, bNeedResult=False, compileSpecial=None):
 		if name in boundNames:
 			raise GLispCompilerWhereExprCannotRebindVariable( binding )
 		
-		if context.scope.isLocalBound( name ):
-			raise GLispCompilerWhereExprCannotRebindVariableFromOuterScope( binding )
-		
 		# If this name is already bound in thise scope, we need to back it up first
 		valueExprPyTree = _compileGLispExprToPyTree( valueExpr, bindingContext, True, compileSpecial )
 		assignmentPyTree = PyAssign_SideEffects( PyVar( name, dbgSrc=binding ), valueExprPyTree, dbgSrc=binding )
 		
 		whereTrees.extend( bindingContext.body )
 		whereTrees.append( assignmentPyTree )
-		
-		context.scope.bindLocal( name )
 		
 		boundNames.append( name )
 		
@@ -333,7 +322,7 @@ def _compileLambda(xs, context, bNeedResult=False, compileSpecial=None):
 	
 	fnBodyContext = context.functionInnerContext()
 	for argName in argNames:
-		fnBodyContext.scope.bindLocal( argName )
+		fnBodyContext.scope.registerArgument( argName )
 	fnBodyPyTrees, wrappedResultTree = _compileExpressionListToPyTreeStatements( codeXs, fnBodyContext, True, compileSpecial, lambda t, x: PyReturn( t, dbgSrc=x ) )
 	
 	context.body.append( PyDef( functionName, argNames, fnBodyPyTrees, dbgSrc=xs ) )
@@ -1072,7 +1061,6 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 		      (
 		        (@x (@a + @b))
 			(@y (@b + @c))
-			(@a (@x + @y))
 		      )
 		      (@a + (@x + @y))
 		    )
@@ -1081,22 +1069,7 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 		)
 		"""
 		
-		xssrc2 = """
-		(
-		  ($lambda (@a @b @c)
-		    ($where
-		      (
-		        (@x (@a + @b))
-			(@y (@b + @c))
-		      )
-		      (@a + (@x + @y))
-		    )
-		  )
-		  <-> #1 #2 #3
-		)
-		"""
-		
-		pysrc2 = [
+		pysrc1 = [
 			'def __gsym__lambda_0(a, b, c):',
 			'  def __gsym__where_fn_0():',
 			'    x = a + b',
@@ -1107,9 +1080,8 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 		]
 		
 		
-		self._compileTest( xssrc1, GLispCompilerWhereExprCannotRebindVariableFromOuterScope )
-		self._compileTest( xssrc2, pysrc2 )
-		self._evalTest( xssrc2, 9, [] )
+		self._compileTest( xssrc1, pysrc1 )
+		self._evalTest( xssrc1, 9, [] )
 
 		
 		
