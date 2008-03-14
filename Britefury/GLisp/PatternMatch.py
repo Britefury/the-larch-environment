@@ -238,7 +238,12 @@ def _buildMatchNodeForMatchItem(xs, bInsideList=False):
 				raise ValueError, 'match expressions: list interior range expression must take the form (- <#min> <#max>)'
 			if xs[1][0] != '#'  or  xs[2][0] != '#':
 				raise ValueError, 'match expressions: list interior range numbers must start with #'
-			return _MatchSublist( int( xs[1][1:] ), int( xs[2][1:] ), srcXs=xs )
+			min = int( xs[1][1:] )
+			if xs[2] == '#None':
+				max = None
+			else:
+				max = int( xs[2][1:] )
+			return _MatchSublist( min, max, srcXs=xs )
 		else:
 			match = _buildMatchNodeForMatchList( xs )
 		return match

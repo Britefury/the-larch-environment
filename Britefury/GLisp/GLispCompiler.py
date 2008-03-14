@@ -393,9 +393,15 @@ def _compileGLispExprToPyTree(xs, context, bNeedResult=False, compileSpecial=Non
 		return PyLiteral( 'None', dbgSrc=xs )
 	elif isinstance( xs, str )  or  isinstance( xs, unicode ):
 		if xs[0] == '@':
-			return PyVar( xs[1:], dbgSrc=xs )
+			if xs[1] == '@':
+				return PyLiteralValue( xs[1:] )
+			else:
+				return PyVar( xs[1:], dbgSrc=xs )
 		elif xs[0] == '#'  and  xs != '#':
-			return PyLiteral( xs[1:], dbgSrc=xs )
+			if xs[1] == '#':
+				return PyLiteralValue( xs[1:] )
+			else:
+				return PyLiteral( xs[1:], dbgSrc=xs )
 		else:
 			return PyLiteral( '\'' + xs.replace( '\'', '\\\'' ) + '\'', dbgSrc=xs )
 	else:
