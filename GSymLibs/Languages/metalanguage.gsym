@@ -8,12 +8,65 @@
 							($# "View special expressions for a compiler definition")
 							(@viewCompilerSpecial
 								($lambda (@node)
+									($match @node
+										($# "Unknown")
+										( (: @x ^)  (@log <-> (@gLispAsString <-> @x)) ($activeBorder ($label "<SPECIAL-ERROR>")) )
+									)
 								)
 							)
 
 							($# "View special expressions for a view definition")
 							(@viewViewSpecial
 								($lambda (@node)
+									($match @node
+										($# "View eval, no factory")
+										( ($viewEval (: @x ^))
+											($activeBorder ($hbox ($list ($label "ViewEval(") ($viewEval @x (@viewExpressionFactory <-> @viewViewSpecial)) ($label ")"))))
+										)
+										
+										($# "View eval, with factory")
+										( ($viewEval (: @x ^) (: @fac ^))
+											($activeBorder ($hbox ($list ($label "ViewEval(") ($viewEval @x (@viewExpressionFactory <-> @viewViewSpecial)) ($label "WITH") ($viewEval @fac (@viewExpressionFactory <-> @viewViewSpecial)) ($label ")"))))
+										)
+										
+										($# "Map View eval, no factory")
+										( ($mapViewEval (: @x ^))
+											($activeBorder ($hbox ($list ($label "MapViewEval(") ($viewEval @x (@viewExpressionFactory <-> @viewViewSpecial)) ($label ")"))))
+										)
+										
+										($# "Map View eval, with factory")
+										( ($mapViewEval (: @x ^) (: @fac ^))
+											($activeBorder ($hbox ($list ($label "MapViewEval(") ($viewEval @x (@viewExpressionFactory <-> @viewViewSpecial)) ($label "WITH") ($viewEval @fac (@viewExpressionFactory <-> @viewViewSpecial)) ($label ")"))))
+										)
+										
+										($# "Active border")
+										( ($activeBorder (: @x ^))
+											($activeBorder ($hbox ($list ($label "ActiveBorder(") ($viewEval @x (@viewExpressionFactory <-> @viewViewSpecial)) ($label ")"))))
+										)
+										
+										($# "Label")
+										( ($label (: @x ^))
+											($activeBorder ($hbox ($list ($label "Label(") ($viewEval @x (@viewExpressionFactory <-> @viewViewSpecial)) ($label ")"))))
+										)
+										
+										($# "Entry")
+										( ($entry (: @x ^))
+											($activeBorder ($hbox ($list ($label "Entry(") ($viewEval @x (@viewExpressionFactory <-> @viewViewSpecial)) ($label ")"))))
+										)
+										
+										($# "HBox")
+										( ($hbox (: @x ^))
+											($hbox ($hbox ($list ($label "HBox(") ($viewEval @x (@viewExpressionFactory <-> @viewViewSpecial)) ($label ")"))))
+										)
+										
+										($# "VBox")
+										( ($vbox (: @x ^))
+											($vbox ($hbox ($list ($label "VBox(") ($viewEval @x (@viewExpressionFactory <-> @viewViewSpecial)) ($label ")"))))
+										)
+										
+										($# "Unknown")
+										( (: @x ^)  (@log <-> (@gLispAsString <-> @x)) ($activeBorder ($label "<SPECIAL-ERROR>")) )
+									)
 								)
 							)
 							
@@ -61,38 +114,47 @@
 							(@viewMatchPattern
 								($lambda (@node)
 									($match @node
+										($# "Any non-list")
 										( !!
 											($activeBorder ($label "!"))
 										)
 										
+										($# "Any list")
 										( //
 											($activeBorder ($label "(..)"))
 										)
 										
+										($# "Anything")
 										( ^^
 											($activeBorder ($label "^"))
 										)
 										
+										($# "List internal 0+")
 										( **
 											($activeBorder ($label "..*"))
 										)
 
+										($# "List internal 1+")
 										( ++
 											($activeBorder ($label "..+"))
 										)
 										
+										($# "Constant")
 										( (: @constantValue !)
 											($activeBorder ($label @constantValue))
 										)
 										
+										($# "List internal min to max")
 										( (-- (: @min !) (: @max !))
 											($activeBorder ($label (((".." + @min) + "-") + @max)))
 										)
 										
+										($# "Bind")
 										( (:: (: @varName !) (: @subPattern ^))
 											($activeBorder ($hbox ($list ($label @varName) ($label ":") ($viewEval @subPattern @viewMatchPattern))))
 										)
 										
+										($# "List pattern")
 										( (: @listPattern /)
 											($activeBorder ($hbox ((($list ($label "(")) + ($mapViewEval @listPattern @viewMatchPattern)) + ($list ($label ")"))) ) )
 										)
@@ -122,30 +184,36 @@
 								($lambda (@viewSpecial)
 									($lambda (@node)
 										($match @node
+											($# "Literal")
 											( (: @stringValue !)
 												($activeBorder ($label @stringValue))
 											)
 											
+											($# "Empty list")
 											( ()
 												($activeBorder ($label "None"))
 											)
 
+											($# "Comment")
 											( ($# @comment)
 												(@viewComment <-> @comment)
 											)
 											
+											($# "List literal")
 											( ($list (: @elements *))
 												($activeBorder
 													($hbox ((($list ($label "["))  +  ($mapViewEval @elements (@viewExpressionFactory <-> @viewSpecial)))  +  ($list ($label "]"))))
 												)
 											)
 
+											($# "Set literal")
 											( ($set (: @elements *))
 												($activeBorder
 													($hbox ((($list ($label "SET("))  +  ($mapViewEval @elements (@viewExpressionFactory <-> @viewSpecial)))  +  ($list ($label ")"))))
 												)
 											)
 
+											($# "Where expression")
 											( ($where (: @bindings /) (: @expressions *))
 												($activeBorder
 													($vbox
@@ -156,7 +224,18 @@
 												)
 											)
 											
+											($# "Lambda expression, with 0 or 1 expressions")
 											( ($lambda (: @params /) (: @expressions *))
+												($activeBorder
+													($hbox (($list
+														($hbox ($list ($label u"\u03bb") ($viewEval @params @viewLambdaParamList) ($label "=") ) )
+														)  +  ($mapViewEval @expressions (@viewExpressionFactory <-> @viewSpecial)))
+													)
+												)
+											)
+
+											($# "Lambda expression 2 or more expressions")
+											( ($lambda (: @params /) (: @expressions (- #2 #None)))
 												($activeBorder
 													($vbox (($list
 														($hbox ($list ($label u"\u03bb") ($viewEval @params @viewLambdaParamList) ($label "=") ) )
@@ -165,6 +244,7 @@
 												)
 											)
 
+											($# "Pattern match expression")
 											( ($match (: @expression ^) (: @matchPairs *))
 												($activeBorder
 													($vbox (($list
@@ -174,8 +254,39 @@
 												)
 											)
 											
+											($# "Single element list")
 											( ((: @x ^))   ((@viewExpressionFactory <-> @viewSpecial) <-> @x) )
+											
+											($# "Special")
+											( (: @s((? @x (@x startswith $) !) *))
+												(@viewSpecial <-> @s)
+											)
+											
+											($# "Get attribute")
+											( ( (: @a ^) . (: @attr !) )
+												($activeBorder
+													($hbox ($list ($viewEval @a (@viewExpressionFactory <-> @viewSpecial)) ($label ".") ($label @attr)))
+												)
+											)
 
+											($# "Addition")
+											( ( (: @a ^) + (: @b ^) )
+												($activeBorder
+													($hbox ($list ($viewEval @a (@viewExpressionFactory <-> @viewSpecial)) ($label "+") ($viewEval @b (@viewExpressionFactory <-> @viewSpecial))))
+												)
+											)
+
+											($# "Call")
+											( ( (: @a ^) "<->" (: @params *) )
+												($activeBorder
+													($hbox
+														((($list ($viewEval @a (@viewExpressionFactory <-> @viewSpecial)) ($label "("))  +  ($mapViewEval @params (@viewExpressionFactory <-> @viewSpecial))) +
+															($list ($label ")")))
+													)
+												)
+											)
+
+											($# "Unknown")
 											( (: @x ^)  (@log <-> (@gLispAsString <-> @x)) ($activeBorder ($label "<ERROR>")) )
 										)
 									)
