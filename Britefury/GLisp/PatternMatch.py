@@ -10,7 +10,7 @@ from Britefury.Kernel.Abstract import abstractmethod
 
 from Britefury.DocModel.DMListInterface import DMListInterface
 from Britefury.GLisp.GLispUtil import isGLispList, isGLispComment, stripGLispComments
-from Britefury.GLisp.PyCodeGen import PyCodeGenError, PySrc, PyVar, PyLiteral, PyListLiteral, PyGetAttr, PyGetItem, PyUnOp, PyBinOp, PyCall, PyMethodCall, PyGlobal, PyReturn, PyIf, PySimpleIf, PyDef, PyAssign_SideEffects, PyDel_SideEffects
+from Britefury.GLisp.PyCodeGen import PyCodeGenError, PySrc, PyVar, PyLiteral, PyListLiteral, PyGetAttr, PyGetItem, PyUnOp, PyBinOp, PyCall, PyMethodCall, PyReturn, PyIf, PySimpleIf, PyDef, PyAssign_SideEffects, PyDel_SideEffects
 import Britefury.GLisp.GLispCompiler
 
 

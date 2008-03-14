@@ -1,6 +1,12 @@
 TODOS:
 
 
+
+Refactor PyCodeGen so it is of the form:
+expression.methodCall( methodName, params ).debug( xs ) + expression2
+
+
+
 - Generate debug information for compiled code
 - Handle debug information
 - GLisp (compiled to Python) code can generate bad data; check the sanity before processing it

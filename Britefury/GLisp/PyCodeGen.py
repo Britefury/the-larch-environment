@@ -133,6 +133,57 @@ def _passBlock(pysrc):
 	else:
 		return pysrc
 
+	
+
+	
+	
+	
+	
+#
+#
+#
+# Coerce and Compare
+#
+#
+#
+	
+def pyt_coerce(x):
+	if isinstance( x, PyNode ):
+		return x
+	elif x is None  or  isinstance( x, bool )  or  isinstance( x, int )  or  isinstance( x, long )  or  isinstance( x, float )  or  isinstance( x, str )  or  isinstance( x, unicode ):
+		return PyLiteralValue( x )
+	elif isinstance( x, list ):
+		return PyListLiteral( [ pyt_coerce( item )   for item in x ] )
+	else:
+		raise TypeError, 'could not coerce into PyNode'
+	
+	
+def pyt_compare(x, y):
+	if isinstance( x, PyNode )  and  isinstance( y, PyNode ):
+		return x.compare( y )
+	elif isinstance( x, list )  and  isinstance( y, list ):
+		if len( x ) != len( y ):
+			return False
+		for a, b in zip( x, y ):
+			if not pyt_compare( a, b ):
+				return False
+		return True
+	elif not isinstance( x, PyNode )  and  not isinstance( y, PyNode ):
+		return x == y
+	else:
+		return False
+
+	
+	
+
+#
+#
+#
+# Node classes
+#
+#
+#
+
 
 
 class PyNode (object):
@@ -144,20 +195,32 @@ class PyNode (object):
 		raise exceptionClass( self._dbgSrc, *args )
 		
 
-	def __cmp__(self, x):
+	def compare(self, x):
 		if type( self )  is  type( x ):
 			return self._o_compareWith( x )
 		else:
-			return 1
+			return False
 		
 	def _o_compareWith(self, x):
-		return 0
+		return True
+	
+	def getChildren(self):
+		return []
+	
+	
+	def debug(self, dbgSrc):
+		if self._dbgSrc is None:
+			self._dbgSrc = dbgSrc
+			for child in self.getChildren():
+				child.debug( dbgSrc )
+		return self
 	
 	
 	
 class PyStatement (PyNode):
+	@abstractmethod
 	def compileAsStmt(self):
-		return [ self.compileAsExpr() ]
+		pass
 	
 
 
@@ -177,6 +240,115 @@ class PyExpression (PyStatement):
 	def _o_getPrecedence(self):
 		return None
 	
+	
+	def compileAsStmt(self):
+		return [ self.compileAsExpr() ]
+
+	
+	# Get attribute
+	def attr(self, name):
+		return PyGetAttr( self, name )
+	
+	
+	# Identity test
+	def is_(self, x):
+		return PyBinOp( self, 'is', pyt_coerce( x ) )
+		
+	
+	# Boolean operators
+	def and_(self, x):
+		return PyBinOp( self, 'and', pyt_coerce( x ) )
+
+	def or_(self, x):
+		return PyBinOp( self, 'or', pyt_coerce( x ) )
+		
+	def not_(self):
+		return PyUnOp( 'not', self )
+
+	
+	# Unary operators
+	def __neg__(self):
+		return PyUnOp( '-', self )
+	def __invert__(self):
+		return PyUnOp( '~', self )
+	
+	# Binary operators
+	def __add__(self, x):
+		return PyBinOp( self, '+', pyt_coerce( x ) )
+	def __sub__(self, x):
+		return PyBinOp( self, '-', pyt_coerce( x ) )
+	def __mul__(self, x):
+		return PyBinOp( self, '*', pyt_coerce( x ) )
+	def __div__(self, x):
+		return PyBinOp( self, '/', pyt_coerce( x ) )
+	def __mod__(self, x):
+		return PyBinOp( self, '%', pyt_coerce( x ) )
+	def __pow__(self, x):
+		return PyBinOp( self, '**', pyt_coerce( x ) )
+	def __lshift__(self, x):
+		return PyBinOp( self, '<<', pyt_coerce( x ) )
+	def __rshift__(self, x):
+		return PyBinOp( self, '>>', pyt_coerce( x ) )
+	def __and__(self, x):
+		return PyBinOp( self, '&', pyt_coerce( x ) )
+	def __or__(self, x):
+		return PyBinOp( self, '|', pyt_coerce( x ) )
+	def __xor__(self, x):
+		return PyBinOp( self, '^', pyt_coerce( x ) )
+	
+	
+	# Comparison operators
+	def __lt__(self, x):
+		return PyBinOp( self, '<', pyt_coerce( x ) )
+	def __le__(self, x):
+		return PyBinOp( self, '<=', pyt_coerce( x ) )
+	def __eq__(self, x):
+		return PyBinOp( self, '==', pyt_coerce( x ) )
+	def __ne__(self, x):
+		return PyBinOp( self, '!=', pyt_coerce( x ) )
+	def __gt__(self, x):
+		return PyBinOp( self, '>', pyt_coerce( x ) )
+	def __ge__(self, x):
+		return PyBinOp( self, '>=', pyt_coerce( x ) )
+
+	
+	# Container operators
+	def len_(self):
+		return PyCall( PyVar( 'len' ), [ self ] )
+	
+	def in_(self, x):
+		return PyBinOp( self, 'in', pyt_coerce( x ) )
+	
+	def __getitem__(self, i):
+		if isinstance( i, slice ):
+			if i.step is None:
+				return PyGetItem( self, pyt_coerce( i.start ), pyt_coerce( i.stop ) )
+			else:
+				return PyGetItem( self, pyt_coerce( i.start ), pyt_coerce( i.stop ), pyt_coerce( i.step ) )
+		else:
+			return PyGetItem( self, pyt_coerce( i ) )
+		
+		
+	# Call
+	def __call__(self, *args):
+		return PyCall( self, [ pyt_coerce( arg )   for arg in args ] )
+	
+	
+	# Method call
+	def methodCall_(self, methodName, *args):
+		return PyMethodCall( self, methodName, [ pyt_coerce( arg )   for arg in args ] )
+	
+	
+	# Return
+	def return_(self):
+		return PyReturn( self )
+	
+	
+	# If
+	def ifTrue(self, statements):
+		return PySimpleIf( self, statements )
+
+	
 
 
 	
@@ -192,7 +364,7 @@ class PySrc (PyExpression):
 		return self.src
 		
 	def _o_compareWith(self, x):
-		return cmp( self.src, x.src )
+		return self.src == x.src
 	
 	
 	
@@ -208,7 +380,14 @@ class PyVar (PyExpression):
 		return self.varName
 		
 	def _o_compareWith(self, x):
-		return cmp( self.varName, x.varName )
+		return self.varName == x.varName
+	
+	
+	def assign_sideEffects(self, value):
+		return PyAssign_SideEffects( self, value )
+	
+	def del_sideEffects(self):
+		return PyDel_SideEffects( self )
 	
 	
 	
@@ -222,11 +401,24 @@ class PyLiteral (PyExpression):
 		return self.value
 		
 	def _o_compareWith(self, x):
-		return cmp( self.value, x.value )
+		return self.value == x.value	
+	
+
 	
 	
-	
-	
+class PyLiteralValue (PyExpression):
+	def __init__(self, value, dbgSrc=None):
+		super( PyLiteralValue, self ).__init__( dbgSrc )
+		self.value = value
+		
+	def _o_compileAsExpr(self):
+		return repr( self.value )
+		
+	def _o_compareWith(self, x):
+		return self.value == x.value
+
+
+
 class PyListLiteral (PyExpression):
 	def __init__(self, subexps, dbgSrc=None):
 		super( PyListLiteral, self ).__init__( dbgSrc )
@@ -238,8 +430,10 @@ class PyListLiteral (PyExpression):
 		return '[ ' + ', '.join( [ x.compileAsExpr()   for x in self.subexps ] )  +  ' ]'
 		
 	def _o_compareWith(self, x):
-		return cmp( self.subexps, x.subexps )
+		return pyt_compare( self.subexps, x.subexps )
 	
+	def getChildren(self):
+		return self.subexps
 	
 	
 	
@@ -263,9 +457,14 @@ class PyListComprehension (PyExpression):
 			return '[ %s   for %s in %s   if %s ]'  %  ( self.itemExpr.compileAsExpr(), self.itemName, self.srcIterableExpr.compileAsExpr(), self.filterExpr.compileAsExpr() )
 		
 	def _o_compareWith(self, x):
-		return cmp( ( self.itemExpr, self.itemName, self.srcIterableExpr, self.filterExpr ),  ( x.itemExpr, x.itemName, x.srcIterableExpr, x.filterExpr ) )
+		return pyt_compare( self.itemExpr, x.itemExpr )  and  pyt_compare( self.srcIterableExpr, x.srcIterableExpr )  and  pyt_compare( self.filterExpr, x.filterExpr )  and  self.itemName == x.itemName
 	
-	
+	def getChildren(self):
+		if self.filterExpr is None:
+			return [ self.itemExpr, self.srcIterableExpr ]
+		else:
+			return [ self.itemExpr, self.srcIterableExpr, self.filterExpr ]
+
 	
 	
 class PyGetAttr (PyExpression):
@@ -284,24 +483,31 @@ class PyGetAttr (PyExpression):
 		return _attributePrecedence
 	
 	def _o_compareWith(self, x):
-		return cmp( ( self.a, self.attrName ),  ( x.a, x.attrName ) )
+		return pyt_compare( self.a, x.a )  and  self.attrName == x.attrName
 		
+	def getChildren(self):
+		return [ self.a ]
 	
 	
 
 class PyGetItem (PyExpression):
-	def __init__(self, a, start, end=None, dbgSrc=None):
+	def __init__(self, a, start, stop=None, step=None, dbgSrc=None):
 		super( PyGetItem, self ).__init__( dbgSrc )
 		assert isinstance( a, PyExpression )
 		assert isinstance( start, PyExpression )
-		assert end is None  or  isinstance( end, PyExpression )
+		assert stop is None  or  isinstance( stop, PyExpression )
+		assert step is None  or  isinstance( step, PyExpression )
 		self.a = a
 		self.start = start
-		self.end = end
+		self.stop = stop
+		self.step = step
 		
 	def _o_compileAsExpr(self):
-		if self.end is not None:
-			return '%s[%s:%s]'  %  ( self.a.compileAsExpr( _subscriptPrecedence ), self.start.compileAsExpr(), self.end.compileAsExpr() )
+		if self.stop is not None  and  not pyt_compare( self.stop, pyt_coerce( None ) ):
+			if self.step is not None  and  not pyt_compare( self.step, pyt_coerce( None ) ):
+				return '%s[%s:%s:%s]'  %  ( self.a.compileAsExpr( _subscriptPrecedence ), self.start.compileAsExpr(), self.stop.compileAsExpr(), self.step.compileAsExpr() )
+			else:
+				return '%s[%s:%s]'  %  ( self.a.compileAsExpr( _subscriptPrecedence ), self.start.compileAsExpr(), self.stop.compileAsExpr() )
 		else:
 			return '%s[%s]'  %  ( self.a.compileAsExpr( _subscriptPrecedence ), self.start.compileAsExpr() )
 	
@@ -309,8 +515,16 @@ class PyGetItem (PyExpression):
 		return _subscriptPrecedence
 	
 	def _o_compareWith(self, x):
-		return cmp( ( self.a, self.start, self.end ),  ( x.a, x.start, x.end ) )
+		return pyt_compare( self.a, x.a )  and  pyt_compare( self.start, x.start)  and  pyt_compare( self.stop, x.stop)  and  pyt_compare( self.step, x.step)
 
+	def getChildren(self):
+		if self.stop is not None:
+			if self.step is not None:
+				return [ self.a, self.start, self.stop, self.step ]
+			else:
+				return [ self.a, self.start, self.stop ]
+		else:
+			return [ self.a, self.start ]
 	
 	
 	
@@ -336,8 +550,10 @@ class PyUnOp (PyExpression):
 		return _unaryOperatorPrecedenceTable[self.op][0]
 
 	def _o_compareWith(self, x):
-		return cmp( ( self.a, self.op ),  ( x.a, x.op ) )
+		return pyt_compare( self.a, x.a )  and  self.op == x.op
 
+	def getChildren(self):
+		return [ self.a ]
 	
 	
 		
@@ -362,8 +578,10 @@ class PyBinOp (PyExpression):
 		return _binaryOperatorPrecedenceTable[self.op]
 
 	def _o_compareWith(self, x):
-		return cmp( ( self.a, self.b, self.op ),  ( x.a, x.b, x.op ) )
+		return pyt_compare( self.a, x.a )  and  pyt_compare( self.b, x.b )  and  self.op == x.op
 
+	def getChildren(self):
+		return [ self.a, self.b ]
 	
 	
 	
@@ -382,12 +600,11 @@ class PyCall (PyExpression):
 		else:
 			return '%s( %s )'  %  ( self.a.compileAsExpr( _callPrecedence ), ', '.join( [ p.compileAsExpr()   for p in self.params ] ) )
 		
-	#def _o_getPrecedence(self):
-	#	return _callPrecedence
-	
 	def _o_compareWith(self, x):
-		return cmp( ( self.a, self.params ),  ( x.a, x.params ) )
+		return pyt_compare( self.a, x.a )  and  pyt_compare( self.params, x.params )
 
+	def getChildren(self):
+		return [ self.a ]  +  self.params
 	
 	
 
@@ -413,27 +630,13 @@ class PyMethodCall (PyExpression):
 		return _methodCallPrecedence
 	
 	def _o_compareWith(self, x):
-		return cmp( ( self.a, self.methodName, self.params ),  ( x.a, x.methodName, x.params ) )
+		return pyt_compare( self.a, x.a )  and  pyt_compare( self.params, x.params )  and  self.methodName == x.methodName
 
+	def getChildren(self):
+		return [ self.a ]  +  self.params
 
 	
 	
-class PyGlobal (PyStatement):
-	def __init__(self, varNames, dbgSrc=None):
-		super( PyGlobal, self ).__init__( dbgSrc )
-		for varName in varNames:
-			if not _isPyDottedIdentifier( varName ):
-				self.error( PyInvalidVarNameError, methodName )
-		self.varNames =varNames
-		
-	def compileAsStmt(self):
-		return [ 'global %s'  %  ( ', '.join( self.varNames ) ) ]
-	
-	def _o_compareWith(self, x):
-		return cmp( self.valuvarNamese, x.varNames )
-
-
-
 class PyReturn (PyStatement):
 	def __init__(self, value, dbgSrc=None):
 		super( PyReturn, self ).__init__( dbgSrc )
@@ -444,8 +647,10 @@ class PyReturn (PyStatement):
 		return [ 'return %s'  %  ( self.value.compileAsExpr(), ) ]
 	
 	def _o_compareWith(self, x):
-		return cmp( self.value, x.value )
+		return pyt_compare( self.value, x.value )
 
+	def getChildren(self):
+		return [ self.value ]
 
 
 class PyIf (PyStatement):
@@ -487,9 +692,29 @@ class PyIf (PyStatement):
 				
 
 	def _o_compareWith(self, x):
-		return 1
+		return False
 
+	def getChildren(self):
+		children = []
+		for ifBlock in self.ifElifSpecs:
+			children.append( ifBlock[0] )
+			children.extend( ifBlock[1] )
+		if self.elseStatements is not None:
+			children.extend( self.elseStatements )
+		return children
+	
+	
+	
+	def elif_(self, condition, statements):
+		return PyIf( self.ifElifSpecs + [ ( condition, statements ) ], self.elseStatements )
 
+	def else_(self, statements):
+		if self.elseStatements is None:
+			return PyIf( self.ifElifSpecs, statements )
+		else:
+			return PyIf( self.ifElifSpecs, self.elseStatements + statements )
+
+	
 	def _p_compileIfBlock(self, t, bElif):
 		condition, statements = t
 		stmtSrc = []
@@ -544,8 +769,10 @@ class PyDef (PyStatement):
 		return [ 'def %s(%s):'  %  ( self.name, ', '.join( self.argNames ) ) ]  +  _indent( stmtSrc )
 	
 	def _o_compareWith(self, x):
-		return 1
+		return False
 
+	def getChildren(self):
+		return self.statements
 
 	
 	
@@ -562,7 +789,10 @@ class PyAssign_SideEffects (PyStatement):
 		return [ '%s = %s'  %  ( self.target.compileAsExpr(), self.value.compileAsExpr() ) ]
 	
 	def _o_compareWith(self, x):
-		return cmp( ( self.target, self.value ),  ( x.target, x.value ) )
+		return pyt_compare( self.target, x.target )  and  pyt_compare( self.value, x.value )
+
+	def getChildren(self):
+		return [ self.target, self.value ]
 
 	
 	
@@ -577,12 +807,22 @@ class PyDel_SideEffects (PyStatement):
 		return [ 'del %s'  %  ( self.target.compileAsExpr(), ) ]
 	
 	def _o_compareWith(self, x):
-		return cmp( self.target, x.target )
+		return pyt_compare( self.target, x.target )
 
+	def getChildren(self):
+		return [ self.target ]
 
 
 	
-	
+
+
+#
+#
+#
+# Unit tests
+#
+#
+#
 
 
 	
@@ -660,95 +900,109 @@ class TestCase_PyCodeGen_Node_check (unittest.TestCase):
 		
 class TestCase_PyCodeGen_Node_cmp (unittest.TestCase):
 	def test_PySrc(self):
-		self.assert_( PySrc( 'a' )  ==  PySrc( 'a' ) )
-		self.assert_( PySrc( 'a' )  !=  PySrc( 'b' ) )
+		self.assert_( pyt_compare( PySrc( 'a' ),  PySrc( 'a' ) ) )
+		self.assert_( not pyt_compare( PySrc( 'a' ),  PySrc( 'b' ) ) )
 	
 	def test_PyVar(self):
-		self.assert_( PyVar( 'a' )  ==  PyVar( 'a' ) )
-		self.assert_( PyVar( 'a' )  !=  PyVar( 'b' ) )
+		self.assert_( pyt_compare( PyVar( 'a' ),  PyVar( 'a' ) ) )
+		self.assert_( not pyt_compare( PyVar( 'a' ),  PyVar( 'b' ) ) )
 
 	def test_PyLiteral(self):
-		self.assert_( PyLiteral( '1' )  ==  PyLiteral( '1' ) )
-		self.assert_( PyLiteral( '1' )  !=  PyLiteral( '2' ) )
+		self.assert_( pyt_compare( PyLiteral( '1' ),  PyLiteral( '1' ) ) )
+		self.assert_( not pyt_compare( PyLiteral( '1' ),  PyLiteral( '2' ) ) )
+		
+	def test_PyLiteralValue(self):
+		self.assert_( pyt_compare( PyLiteralValue( '1' ),  PyLiteralValue( '1' ) ) )
+		self.assert_( not pyt_compare( PyLiteralValue( '1' ),  PyLiteralValue( '2' ) ) )
 		
 	def test_PyListLiteral(self):
-		self.assert_( PyListLiteral( [ PySrc( 'a' ), PySrc( 'b' ) ] )  ==  PyListLiteral( [ PySrc( 'a' ), PySrc( 'b' ) ] ) )
-		self.assert_( PyListLiteral( [ PySrc( 'a' ), PySrc( 'b' ) ] )  !=  PyListLiteral( [ PySrc( 'a' ), PySrc( 'c' ) ] ) )
+		self.assert_( pyt_compare( PyListLiteral( [ PySrc( 'a' ), PySrc( 'b' ) ] ),  PyListLiteral( [ PySrc( 'a' ), PySrc( 'b' ) ] ) ) )
+		self.assert_( not pyt_compare( PyListLiteral( [ PySrc( 'a' ), PySrc( 'b' ) ] ),  PyListLiteral( [ PySrc( 'a' ), PySrc( 'c' ) ] ) ) )
 
 	def test_PyListComprehension(self):
-		self.assert_( PyListComprehension( PySrc( 'a' ), 'a', PySrc( 'x' ), None )  ==  PyListComprehension( PySrc( 'a' ), 'a', PySrc( 'x' ), None ) )
-		self.assert_( PyListComprehension( PySrc( 'a' ), 'a', PySrc( 'x' ), None )  !=  PyListComprehension( PySrc( 'b' ), 'a', PySrc( 'x' ), None ) )
-		self.assert_( PyListComprehension( PySrc( 'a' ), 'a', PySrc( 'x' ), None )  !=  PyListComprehension( PySrc( 'a' ), 'b', PySrc( 'x' ), None ) )
-		self.assert_( PyListComprehension( PySrc( 'a' ), 'a', PySrc( 'x' ), None )  !=  PyListComprehension( PySrc( 'a' ), 'a', PySrc( 'y' ), None ) )
-		self.assert_( PyListComprehension( PySrc( 'a' ), 'a', PySrc( 'x' ), PySrc( 'True' ) )  ==  PyListComprehension( PySrc( 'a' ), 'a', PySrc( 'x' ),PySrc( 'True' ) ) )
-		self.assert_( PyListComprehension( PySrc( 'a' ), 'a', PySrc( 'x' ), PySrc( 'True' ))  !=  PyListComprehension( PySrc( 'b' ), 'a', PySrc( 'x' ), PySrc( 'True' ) ) )
-		self.assert_( PyListComprehension( PySrc( 'a' ), 'a', PySrc( 'x' ), PySrc( 'True' ) )  !=  PyListComprehension( PySrc( 'a' ), 'b', PySrc( 'x' ), PySrc( 'True' ) ) )
-		self.assert_( PyListComprehension( PySrc( 'a' ), 'a', PySrc( 'x' ), PySrc( 'True' ) )  !=  PyListComprehension( PySrc( 'a' ), 'a', PySrc( 'y' ), PySrc( 'True' ) ) )
-		self.assert_( PyListComprehension( PySrc( 'a' ), 'a', PySrc( 'x' ), PySrc( 'True' ) )  !=  PyListComprehension( PySrc( 'a' ), 'a', PySrc( 'x' ), PySrc( 'False' ) ) )
-		self.assert_( PyListComprehension( PySrc( 'a' ), 'a', PySrc( 'x' ), PySrc( 'True' ) )  !=  PyListComprehension( PySrc( 'a' ), 'a', PySrc( 'x' ), None ) )
+		self.assert_( pyt_compare( PyListComprehension( PySrc( 'a' ), 'a', PySrc( 'x' ), None ),  PyListComprehension( PySrc( 'a' ), 'a', PySrc( 'x' ), None ) ) )
+		self.assert_( not pyt_compare( PyListComprehension( PySrc( 'a' ), 'a', PySrc( 'x' ), None ),  PyListComprehension( PySrc( 'b' ), 'a', PySrc( 'x' ), None ) ) )
+		self.assert_( not pyt_compare( PyListComprehension( PySrc( 'a' ), 'a', PySrc( 'x' ), None ),  PyListComprehension( PySrc( 'a' ), 'b', PySrc( 'x' ), None ) ) )
+		self.assert_( not pyt_compare( PyListComprehension( PySrc( 'a' ), 'a', PySrc( 'x' ), None ),  PyListComprehension( PySrc( 'a' ), 'a', PySrc( 'y' ), None ) ) )
+		self.assert_( pyt_compare( PyListComprehension( PySrc( 'a' ), 'a', PySrc( 'x' ), PySrc( 'True' ) ),  PyListComprehension( PySrc( 'a' ), 'a', PySrc( 'x' ),PySrc( 'True' ) ) ) )
+		self.assert_( not pyt_compare( PyListComprehension( PySrc( 'a' ), 'a', PySrc( 'x' ), PySrc( 'True' )),  PyListComprehension( PySrc( 'b' ), 'a', PySrc( 'x' ), PySrc( 'True' ) ) ) )
+		self.assert_( not pyt_compare( PyListComprehension( PySrc( 'a' ), 'a', PySrc( 'x' ), PySrc( 'True' ) ),  PyListComprehension( PySrc( 'a' ), 'b', PySrc( 'x' ), PySrc( 'True' ) ) ) )
+		self.assert_( not pyt_compare( PyListComprehension( PySrc( 'a' ), 'a', PySrc( 'x' ), PySrc( 'True' ) ),  PyListComprehension( PySrc( 'a' ), 'a', PySrc( 'y' ), PySrc( 'True' ) ) ) )
+		self.assert_( not pyt_compare( PyListComprehension( PySrc( 'a' ), 'a', PySrc( 'x' ), PySrc( 'True' ) ),  PyListComprehension( PySrc( 'a' ), 'a', PySrc( 'x' ), PySrc( 'False' ) ) ) )
+		self.assert_( not pyt_compare( PyListComprehension( PySrc( 'a' ), 'a', PySrc( 'x' ), PySrc( 'True' ) ),  PyListComprehension( PySrc( 'a' ), 'a', PySrc( 'x' ), None ) ) )
 		
 	def test_PyGetAttr(self):
-		self.assert_( PyGetAttr( PySrc( 'a' ), 'test' ) ==  PyGetAttr( PySrc( 'a' ), 'test' ) )
-		self.assert_( PyGetAttr( PySrc( 'a' ), 'test' ) !=  PyGetAttr( PySrc( 'b' ), 'test' ) )
-		self.assert_( PyGetAttr( PySrc( 'a' ), 'test' ) !=  PyGetAttr( PySrc( 'a' ), 'foo' ) )
+		self.assert_( pyt_compare( PyGetAttr( PySrc( 'a' ), 'test' ),   PyGetAttr( PySrc( 'a' ), 'test' ) ) )
+		self.assert_( not pyt_compare( PyGetAttr( PySrc( 'a' ), 'test' ),   PyGetAttr( PySrc( 'b' ), 'test' ) ) )
+		self.assert_( not pyt_compare( PyGetAttr( PySrc( 'a' ), 'test' ),   PyGetAttr( PySrc( 'a' ), 'foo' ) ) )
 
 	def test_PyGetItem(self):
-		self.assert_( PyGetItem( PySrc( 'a' ), PySrc( '1' ) ) ==  PyGetItem( PySrc( 'a' ), PySrc( '1' ) ) )
-		self.assert_( PyGetItem( PySrc( 'a' ), PySrc( '1' ) ) !=  PyGetItem( PySrc( 'b' ), PySrc( '1' ) ) )
-		self.assert_( PyGetItem( PySrc( 'a' ), PySrc( '1' ) ) !=  PyGetItem( PySrc( 'a' ), PySrc( '2' ) ) )
-		self.assert_( PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ) ) ==  PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ) ) )
-		self.assert_( PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ) ) !=  PyGetItem( PySrc( 'a' ), PySrc( '1' ) ) )
-		self.assert_( PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ) ) !=  PyGetItem( PySrc( 'b' ), PySrc( '1' ), PySrc( '2' ) ) )
-		self.assert_( PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ) ) !=  PyGetItem( PySrc( 'a' ), PySrc( '2' ), PySrc( '2' ) ) )
-		self.assert_( PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ) ) !=  PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '3' ) ) )
+		self.assert_( pyt_compare( PyGetItem( PySrc( 'a' ), PySrc( '1' ) ),   PyGetItem( PySrc( 'a' ), PySrc( '1' ) ) ) )
+		self.assert_( not pyt_compare( PyGetItem( PySrc( 'a' ), PySrc( '1' ) ),   PyGetItem( PySrc( 'b' ), PySrc( '1' ) ) ) )
+		self.assert_( not pyt_compare( PyGetItem( PySrc( 'a' ), PySrc( '1' ) ),   PyGetItem( PySrc( 'a' ), PySrc( '2' ) ) ) )
 
+		self.assert_( pyt_compare( PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ) ),   PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ) ) ) )
+		self.assert_( not pyt_compare( PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ) ),   PyGetItem( PySrc( 'a' ), PySrc( '1' ) ) ) )
+		self.assert_( not pyt_compare( PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ) ),   PyGetItem( PySrc( 'b' ), PySrc( '1' ), PySrc( '2' ) ) ) )
+		self.assert_( not pyt_compare( PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ) ),   PyGetItem( PySrc( 'a' ), PySrc( '2' ), PySrc( '2' ) ) ) )
+		self.assert_( not pyt_compare( PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ) ),   PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '3' ) ) ) )
+
+		self.assert_( pyt_compare( PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ), PySrc( '3' ) ),   PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ), PySrc( '3' ) ) ) )
+		self.assert_( not pyt_compare( PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ), PySrc( '3' ) ),   PyGetItem( PySrc( 'b' ), PySrc( '1' ), PySrc( '2' ), PySrc( '3' ) ) ) )
+		self.assert_( not pyt_compare( PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ), PySrc( '3' ) ),   PyGetItem( PySrc( 'a' ), PySrc( '2' ), PySrc( '2' ), PySrc( '3' ) ) ) )
+		self.assert_( not pyt_compare( PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ), PySrc( '3' ) ),   PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '3' ), PySrc( '3' ) ) ) )
+		self.assert_( not pyt_compare( PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ), PySrc( '3' ) ),   PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ), PySrc( '4' ) ) ) )
+		self.assert_( not pyt_compare( PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ), PySrc( '3' ) ),   PyGetItem( PySrc( 'a' ), PySrc( '1' ) ) ) )
+		self.assert_( not pyt_compare( PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ), PySrc( '3' ) ),   PyGetItem( PySrc( 'a' ), PySrc( '1' ), PySrc( '2' ) ) ) )
+		
 	def test_PyUnOp(self):
-		self.assert_( PyUnOp( '-', PySrc( 'a' ) ) ==  PyUnOp( '-', PySrc( 'a' ) ) )
-		self.assert_( PyUnOp( '-', PySrc( 'a' ) ) !=  PyUnOp( '-', PySrc( 'b' ) ) )
-		self.assert_( PyUnOp( '-', PySrc( 'a' ) ) !=  PyUnOp( '~', PySrc( 'a' ) ) )
+		self.assert_( pyt_compare( PyUnOp( '-', PySrc( 'a' ) ),   PyUnOp( '-', PySrc( 'a' ) ) ) )
+		self.assert_( not pyt_compare( PyUnOp( '-', PySrc( 'a' ) ),   PyUnOp( '-', PySrc( 'b' ) ) ) )
+		self.assert_( not pyt_compare( PyUnOp( '-', PySrc( 'a' ) ),   PyUnOp( '~', PySrc( 'a' ) ) ) )
 
 	def test_PyBinOp(self):
 		for op in _binaryOperatorPrecedenceTable.keys():
-			self.assert_( PyBinOp( PySrc( 'a' ), op, PySrc( 'b' ) )  ==  PyBinOp( PySrc( 'a' ), op, PySrc( 'b' ) ) )
-		self.assert_( PyBinOp( PySrc( 'a' ), '+', PySrc( 'b' ) )  ==  PyBinOp( PySrc( 'a' ), '+', PySrc( 'b' ) ) )
-		self.assert_( PyBinOp( PySrc( 'a' ), '+', PySrc( 'b' ) )  !=  PyBinOp( PySrc( 'x' ), '+', PySrc( 'b' ) ) )
-		self.assert_( PyBinOp( PySrc( 'a' ), '+', PySrc( 'b' ) )  !=  PyBinOp( PySrc( 'a' ), '+', PySrc( 'y' ) ) )
-		self.assert_( PyBinOp( PySrc( 'a' ), '+', PySrc( 'b' ) )  !=  PyBinOp( PySrc( 'a' ), '-', PySrc( 'b' ) ) )
+			self.assert_( pyt_compare( PyBinOp( PySrc( 'a' ), op, PySrc( 'b' ) ),  PyBinOp( PySrc( 'a' ), op, PySrc( 'b' ) ) ) )
+		self.assert_( pyt_compare( PyBinOp( PySrc( 'a' ), '+', PySrc( 'b' ) ),  PyBinOp( PySrc( 'a' ), '+', PySrc( 'b' ) ) ) )
+		self.assert_( not pyt_compare( PyBinOp( PySrc( 'a' ), '+', PySrc( 'b' ) ),  PyBinOp( PySrc( 'x' ), '+', PySrc( 'b' ) ) ) )
+		self.assert_( not pyt_compare( PyBinOp( PySrc( 'a' ), '+', PySrc( 'b' ) ),  PyBinOp( PySrc( 'a' ), '+', PySrc( 'y' ) ) ) )
+		self.assert_( not pyt_compare( PyBinOp( PySrc( 'a' ), '+', PySrc( 'b' ) ),  PyBinOp( PySrc( 'a' ), '-', PySrc( 'b' ) ) ) )
 
 	def test_PyCall(self):
-		self.assert_( PyCall( PySrc( 'a' ), [ PySrc( 'b' ), PySrc( 'c' ) ] ) ==  PyCall( PySrc( 'a' ), [ PySrc( 'b' ), PySrc( 'c' ) ] ) )
-		self.assert_( PyCall( PySrc( 'a' ), [ PySrc( 'b' ), PySrc( 'c' ) ] ) !=  PyCall( PySrc( 'x' ), [ PySrc( 'b' ), PySrc( 'c' ) ] ) )
-		self.assert_( PyCall( PySrc( 'a' ), [ PySrc( 'b' ), PySrc( 'c' ) ] ) !=  PyCall( PySrc( 'a' ), [ PySrc( 'y' ), PySrc( 'c' ) ] ) )
-		self.assert_( PyCall( PySrc( 'a' ), [ PySrc( 'b' ), PySrc( 'c' ) ] ) !=  PyCall( PySrc( 'a' ), [ PySrc( 'b' ), PySrc( 'z' ) ] ) )
-		self.assert_( PyCall( PySrc( 'a' ), [ PySrc( 'b' ), PySrc( 'c' ) ] ) !=  PyCall( PySrc( 'a' ), [ PySrc( 'b' ), PySrc( 'c' ), PySrc( 'w' ) ] ) )
+		self.assert_( pyt_compare( PyCall( PySrc( 'a' ), [ PySrc( 'b' ), PySrc( 'c' ) ] ),   PyCall( PySrc( 'a' ), [ PySrc( 'b' ), PySrc( 'c' ) ] ) ) )
+		self.assert_( not pyt_compare( PyCall( PySrc( 'a' ), [ PySrc( 'b' ), PySrc( 'c' ) ] ),   PyCall( PySrc( 'x' ), [ PySrc( 'b' ), PySrc( 'c' ) ] ) ) )
+		self.assert_( not pyt_compare( PyCall( PySrc( 'a' ), [ PySrc( 'b' ), PySrc( 'c' ) ] ),   PyCall( PySrc( 'a' ), [ PySrc( 'y' ), PySrc( 'c' ) ] ) ) )
+		self.assert_( not pyt_compare( PyCall( PySrc( 'a' ), [ PySrc( 'b' ), PySrc( 'c' ) ] ),   PyCall( PySrc( 'a' ), [ PySrc( 'b' ), PySrc( 'z' ) ] ) ) )
+		self.assert_( not pyt_compare( PyCall( PySrc( 'a' ), [ PySrc( 'b' ), PySrc( 'c' ) ] ),   PyCall( PySrc( 'a' ), [ PySrc( 'b' ), PySrc( 'c' ), PySrc( 'w' ) ] ) ) )
 
 	def test_PyMethodCall(self):
-		self.assert_( PyMethodCall( PySrc( 'a' ), 'b', [ PySrc( 'c' ), PySrc( 'd' ) ] ) ==  PyMethodCall( PySrc( 'a' ), 'b', [ PySrc( 'c' ), PySrc( 'd' ) ] ) )
-		self.assert_( PyMethodCall( PySrc( 'a' ), 'b', [ PySrc( 'c' ), PySrc( 'd' ) ] ) !=  PyMethodCall( PySrc( 'x' ), 'b', [ PySrc( 'c' ), PySrc( 'd' ) ] ) )
-		self.assert_( PyMethodCall( PySrc( 'a' ), 'b', [ PySrc( 'c' ), PySrc( 'd' ) ] ) !=  PyMethodCall( PySrc( 'a' ), 'x', [ PySrc( 'c' ), PySrc( 'd' ) ] ) )
-		self.assert_( PyMethodCall( PySrc( 'a' ), 'b', [ PySrc( 'c' ), PySrc( 'd' ) ] ) !=  PyMethodCall( PySrc( 'a' ), 'b', [ PySrc( 'x' ), PySrc( 'd' ) ] ) )
-		self.assert_( PyMethodCall( PySrc( 'a' ), 'b', [ PySrc( 'c' ), PySrc( 'd' ) ] ) !=  PyMethodCall( PySrc( 'a' ), 'b', [ PySrc( 'c' ), PySrc( 'x' ) ] ) )
-		self.assert_( PyMethodCall( PySrc( 'a' ), 'b', [ PySrc( 'c' ), PySrc( 'd' ) ] ) !=  PyMethodCall( PySrc( 'a' ), 'b', [ PySrc( 'c' ), PySrc( 'd' ), PySrc( 'x' ) ] ) )
+		self.assert_( pyt_compare( PyMethodCall( PySrc( 'a' ), 'b', [ PySrc( 'c' ), PySrc( 'd' ) ] ),   PyMethodCall( PySrc( 'a' ), 'b', [ PySrc( 'c' ), PySrc( 'd' ) ] ) ) )
+		self.assert_( not pyt_compare( PyMethodCall( PySrc( 'a' ), 'b', [ PySrc( 'c' ), PySrc( 'd' ) ] ),   PyMethodCall( PySrc( 'x' ), 'b', [ PySrc( 'c' ), PySrc( 'd' ) ] ) ) )
+		self.assert_( not pyt_compare( PyMethodCall( PySrc( 'a' ), 'b', [ PySrc( 'c' ), PySrc( 'd' ) ] ),   PyMethodCall( PySrc( 'a' ), 'x', [ PySrc( 'c' ), PySrc( 'd' ) ] ) ) )
+		self.assert_( not pyt_compare( PyMethodCall( PySrc( 'a' ), 'b', [ PySrc( 'c' ), PySrc( 'd' ) ] ),   PyMethodCall( PySrc( 'a' ), 'b', [ PySrc( 'x' ), PySrc( 'd' ) ] ) ) )
+		self.assert_( not pyt_compare( PyMethodCall( PySrc( 'a' ), 'b', [ PySrc( 'c' ), PySrc( 'd' ) ] ),   PyMethodCall( PySrc( 'a' ), 'b', [ PySrc( 'c' ), PySrc( 'x' ) ] ) ) )
+		self.assert_( not pyt_compare( PyMethodCall( PySrc( 'a' ), 'b', [ PySrc( 'c' ), PySrc( 'd' ) ] ),   PyMethodCall( PySrc( 'a' ), 'b', [ PySrc( 'c' ), PySrc( 'd' ), PySrc( 'x' ) ] ) ) )
 		
 	def test_PyReturn(self):
-		self.assert_( PyReturn( PySrc( '1' ) )  ==  PyReturn( PySrc( '1' ) ) )
-		self.assert_( PyReturn( PySrc( '1' ) )  !=  PyReturn( PySrc( '2' ) ) )
+		self.assert_( pyt_compare( PyReturn( PySrc( '1' ) ),  PyReturn( PySrc( '1' ) ) ) )
+		self.assert_( not pyt_compare( PyReturn( PySrc( '1' ) ),  PyReturn( PySrc( '2' ) ) ) )
 
 	def test_PyIf(self):
-		self.assert_( PyIf( [ ( PySrc( 'True' ), [ PySrc( '1' ) ] ) ] )  !=  PyIf( [ ( PySrc( 'True' ), [ PySrc( 'pass' ) ] ) ] ) )
+		self.assert_( not pyt_compare( PyIf( [ ( PySrc( 'True' ), [ PySrc( '1' ) ] ) ] ),  PyIf( [ ( PySrc( 'True' ), [ PySrc( 'pass' ) ] ) ] ) ) )
 		
 	def test_PyDef(self):
-		self.assert_( PyDef( 'foo', [ 'a', 'b' ], [] )  !=  PyDef( 'foo', [ 'a', 'b' ], [] ) )
+		self.assert_( not pyt_compare( PyDef( 'foo', [ 'a', 'b' ], [] ),  PyDef( 'foo', [ 'a', 'b' ], [] ) ) )
 
 	def test_PyAssign_SideEffects(self):
-		self.assert_( PyAssign_SideEffects( PySrc( 'a' ), PySrc( '1' ) ) ==  PyAssign_SideEffects( PySrc( 'a' ), PySrc( '1' ) ) )
-		self.assert_( PyAssign_SideEffects( PySrc( 'a' ), PySrc( '1' ) ) !=  PyAssign_SideEffects( PySrc( 'b' ), PySrc( '1' ) ) )
-		self.assert_( PyAssign_SideEffects( PySrc( 'a' ), PySrc( '1' ) ) !=  PyAssign_SideEffects( PySrc( 'a' ), PySrc( '2' ) ) )
+		self.assert_( pyt_compare( PyAssign_SideEffects( PySrc( 'a' ), PySrc( '1' ) ),   PyAssign_SideEffects( PySrc( 'a' ), PySrc( '1' ) ) ) )
+		self.assert_( not pyt_compare( PyAssign_SideEffects( PySrc( 'a' ), PySrc( '1' ) ),   PyAssign_SideEffects( PySrc( 'b' ), PySrc( '1' ) ) ) )
+		self.assert_( not pyt_compare( PyAssign_SideEffects( PySrc( 'a' ), PySrc( '1' ) ),   PyAssign_SideEffects( PySrc( 'a' ), PySrc( '2' ) ) ) )
 
 	def test_PyDel_SideEffects(self):
-		self.assert_( PyDel_SideEffects( PySrc( 'a' ) ) ==  PyDel_SideEffects( PySrc( 'a' ) ) )
-		self.assert_( PyDel_SideEffects( PySrc( 'a' ) ) !=  PyDel_SideEffects( PySrc( 'b' ) ) )
+		self.assert_( pyt_compare( PyDel_SideEffects( PySrc( 'a' ) ),   PyDel_SideEffects( PySrc( 'a' ) ) ) )
+		self.assert_( not pyt_compare( PyDel_SideEffects( PySrc( 'a' ) ),   PyDel_SideEffects( PySrc( 'b' ) ) ) )
 
+	
 
 		
 class TestCase_PyCodeGen_Node_compile (unittest.TestCase):
@@ -760,6 +1014,9 @@ class TestCase_PyCodeGen_Node_compile (unittest.TestCase):
 
 	def test_PyLiteral(self):
 		self.assert_( PyLiteral( '1' ).compileAsExpr()  ==  '1' )
+
+	def test_PyLiteralValue(self):
+		self.assert_( PyLiteralValue( 1 ).compileAsExpr()  ==  '1' )
 
 	def test_PyListLiteral(self):
 		self.assert_( PyListLiteral( [ PySrc( 'a' ), PySrc( 'b' ) ] ).compileAsExpr()  ==  '[ a, b ]' )
@@ -866,11 +1123,198 @@ class TestCase_PyCodeGen_Node_compile (unittest.TestCase):
 		self.assert_( PyMethodCall( PyBinOp( PySrc( 'a' ), '+', PySrc( 'b' ) ), 'upper', [] ).compileAsExpr()  ==  '(a + b).upper()' )
 		self.assert_( PyCall( PyBinOp( PySrc( 'a' ), '+', PySrc( 'b' ) ), [] ).compileAsExpr()  ==  '(a + b)()' )
 		self.assert_( PyCall( PyCall( PySrc( 'a' ), [] ), [] ).compileAsExpr()  ==  'a()()' )
+	
 		
 
 
+class TestCase_PyCodeGen_Node_coerce (unittest.TestCase):
+	def _compileExprTest(self, tree, expectedResult):
+		self.assert_( tree.compileAsExpr() == expectedResult )
+	
+	def _compileStmtTest(self, tree, expectedResult):
+		self.assert_( tree.compileAsStmt() == expectedResult )
+
+		
+
+	def test_coerce(self):
+		self.assert_( pyt_compare( pyt_coerce( None ), PyLiteralValue( None ) ) )
+		self.assert_( pyt_compare( pyt_coerce( False ), PyLiteralValue( False ) ) )
+		self.assert_( pyt_compare( pyt_coerce( True ), PyLiteralValue( True ) ) )
+		self.assert_( pyt_compare( pyt_coerce( 1 ), PyLiteralValue( 1 ) ) )
+		self.assert_( pyt_compare( pyt_coerce( 2L ), PyLiteralValue( 2L ) ) )
+		self.assert_( pyt_compare( pyt_coerce( 3.141 ), PyLiteralValue( 3.141 ) ) )
+		self.assert_( pyt_compare( pyt_coerce( 'hi' ), PyLiteralValue( 'hi' ) ) )
+		self.assert_( pyt_compare( pyt_coerce( u'hi' ), PyLiteralValue( u'hi' ) ) )
+		
+	def test_getattr(self):
+		self._compileExprTest( PyVar( 'abc' ).attr( 'x' ),  'abc.x' )
+		
+	def test_identity(self):
+		self._compileExprTest( PyVar( 'abc' ).is_( PyVar( 'xyz' ) ),  'abc is xyz' )
+		
+	def test_boolean(self):
+		self._compileExprTest( PyVar( 'abc' ).and_( PyVar( 'xyz' ) ),  'abc and xyz' )
+		self._compileExprTest( PyVar( 'abc' ).or_( PyVar( 'xyz' ) ),  'abc or xyz' )
+		self._compileExprTest( PyVar( 'abc' ).not_(),  'not abc' )
+		
+	def test_unary(self):
+		self._compileExprTest( -PyVar( 'abc' ),  '-abc' )
+		self._compileExprTest( ~PyVar( 'abc' ),  '~abc' )
+		
+	def test_binary(self):
+		self._compileExprTest( PyVar( 'x' )  +  PyVar( 'y' ),   'x + y' )
+		self._compileExprTest( PyVar( 'x' )  -  PyVar( 'y' ),   'x - y' )
+		self._compileExprTest( PyVar( 'x' )  *  PyVar( 'y' ),   'x * y' )
+		self._compileExprTest( PyVar( 'x' )  /  PyVar( 'y' ),   'x / y' )
+		self._compileExprTest( PyVar( 'x' )  %  PyVar( 'y' ),   'x % y' )
+		self._compileExprTest( PyVar( 'x' )  **  PyVar( 'y' ),   'x ** y' )
+		self._compileExprTest( PyVar( 'x' )  <<  PyVar( 'y' ),   'x << y' )
+		self._compileExprTest( PyVar( 'x' )  >>  PyVar( 'y' ),   'x >> y' )
+		self._compileExprTest( PyVar( 'x' )  &  PyVar( 'y' ),   'x & y' )
+		self._compileExprTest( PyVar( 'x' )  |  PyVar( 'y' ),   'x | y' )
+		self._compileExprTest( PyVar( 'x' )  ^  PyVar( 'y' ),   'x ^ y' )
+		
+	def test_comparison(self):
+		self._compileExprTest( PyVar( 'x' )  <  PyVar( 'y' ),   'x < y' )
+		self._compileExprTest( PyVar( 'x' )  <=  PyVar( 'y' ),   'x <= y' )
+		self._compileExprTest( PyVar( 'x' )  ==  PyVar( 'y' ),   'x == y' )
+		self._compileExprTest( PyVar( 'x' )  !=  PyVar( 'y' ),   'x != y' )
+		self._compileExprTest( PyVar( 'x' )  >  PyVar( 'y' ),   'x > y' )
+		self._compileExprTest( PyVar( 'x' )  >=  PyVar( 'y' ),   'x >= y' )
+		
+
+	def test_container(self):
+		self._compileExprTest( PyVar( 'x' ).len_(),   'len( x )' )
+		self._compileExprTest( PyVar( 'x' ).in_( PyVar( 'y' ) ),   'x in y' )
+		self._compileExprTest( PyVar( 'x' )[0],   'x[0]' )
+		self._compileExprTest( PyVar( 'x' )[0:2],   'x[0:2]' )
+		self._compileExprTest( PyVar( 'x' )[0:2:1],   'x[0:2:1]' )
+
+	
+	def test_call(self):
+		self._compileExprTest( PyVar( 'x' )(1,2,3),   'x( 1, 2, 3 )' )
+		
+		
+	def test_return(self):
+		self._compileStmtTest( PyVar( 'x' ).return_(),   [ 'return x' ] )
+
+	def test_assign(self):
+		self._compileStmtTest( PyVar( 'x' ).assign_sideEffects( pyt_coerce( 1 ) ),   [ 'x = 1' ] )
+
+	def test_del(self):
+		self._compileStmtTest( PyVar( 'x' ).del_sideEffects(),   [ 'del x' ] )
+		
+	def test_ifTrue(self):
+		self._compileStmtTest( PyVar( 'a' ).ifTrue( [ PyVar( 'x' )() ] ),   [ 'if a:', '  x()' ] )
+		
+	def test_elif(self):
+		self._compileStmtTest( PyVar( 'a' ).ifTrue( [ PyVar( 'x' )() ] ).elif_( PyVar( 'b' ), [ PyVar( 'y' )() ] ),   [ 'if a:', '  x()', 'elif b:', '  y()' ] )
+
+	def test_else(self):
+		self._compileStmtTest( PyVar( 'a' ).ifTrue( [ PyVar( 'x' )() ] ).elif_( PyVar( 'b' ), [ PyVar( 'y' )() ] ).else_( [ PyVar( 'z' )() ] ),   [ 'if a:', '  x()', 'elif b:', '  y()', 'else:', '  z()' ] )
+
 		
 		
 		
+class TestCase_PyCodeGen_Node_children (unittest.TestCase):
+	def _childrenTest(self, tree, expectedResult):
+		children = tree.getChildren()
+		self.assert_( len( children )  ==  len( expectedResult ) )
+		for a, b in zip( children, expectedResult ):
+			if a is not b:
+				self.fail()
+		
+		
+	
+	def test_PySrc(self):
+		self._childrenTest( PySrc( 'a' ), [] )
+	
+	def test_PyVar(self):
+		self._childrenTest( PyVar( 'a' ), [] )
+
+	def test_PyLiteral(self):
+		self._childrenTest( PyLiteral( '1' ), [] )
+
+	def test_PyLiteralValue(self):
+		self._childrenTest( PyLiteralValue( 1 ), [] )
+
+	def test_PyListLiteral(self):
+		subs = [ pyt_coerce( x )   for x in xrange( 0, 5 ) ]
+		self._childrenTest( PyListLiteral( subs ), subs  )
+		
+	def test_PyListComprehension(self):
+		itemExpr = PyVar( 'a' ).attr( 'x' )
+		itemName = 'a'
+		srcIterableExpr = PyVar( 'x' ).attr( 'items' )()
+		filterExpr = pyt_coerce( True )
+		self._childrenTest( PyListComprehension( itemExpr, itemName, srcIterableExpr, None ), [ itemExpr, srcIterableExpr ] )
+		self._childrenTest( PyListComprehension( itemExpr, itemName, srcIterableExpr, filterExpr ), [ itemExpr, srcIterableExpr, filterExpr ] )
+		
+	def test_PyGetAttr(self):
+		x = PyVar( 'x' )
+		self._childrenTest( x.attr( 'abc' ), [ x ] )
+		
+	def test_PyGetItem(self):
+		x = PyVar( 'x' )
+		a, b, c = [ pyt_coerce( i )   for i in xrange( 0, 3 ) ]
+		self._childrenTest( x[a], [ x, a ] )
+		self._childrenTest( x[a:b], [ x, a, b ] )
+		self._childrenTest( x[a:b:c], [ x, a, b, c ] )
+		
+	def test_PyUnOp(self):
+		x = PyVar( 'x' )
+		self._childrenTest( -x, [x] )
+		self._childrenTest( ~x, [x] )
+		self._childrenTest( x.not_(), [x] )
+
+	def test_PyBinOp(self):
+		x = PyVar( 'x' )
+		y = PyVar( 'y' )
+		self._childrenTest( x + y, [ x, y ] )
+		
+	def test_PyCall(self):
+		x = PyVar( 'x' )
+		y = PyVar( 'y' )
+		self._childrenTest( x( y ), [ x, y ] )
+
+	def test_PyMethodCall(self):
+		x = PyVar( 'x' )
+		y = PyVar( 'y' )
+		self._childrenTest( x.methodCall_( 'test', y ), [ x, y ] )
+		
+	def test_PyReturn(self):
+		x = PyVar( 'x' )
+		self._childrenTest( PyReturn( x ), [x] )
+
+	def test_PyIf(self):
+		a = PyVar( 'a' )
+		b = PyVar( 'b' )
+		x = PyVar( 'x' )()
+		y = PyVar( 'y' )()
+		z = PyVar( 'z' )()
+		
+		self._childrenTest( a.ifTrue( [ x ] ), [ a, x ] )
+		self._childrenTest( a.ifTrue( [ x ] ).elif_( b, [ y ] ), [ a, x, b, y ] )
+		self._childrenTest( a.ifTrue( [ x ] ).elif_( b, [ y ] ).else_( [ z ] ), [ a, x, b, y, z ] )
+
+
+
+	def test_PyDef(self):
+		x = PyVar( 'x' )()
+		self._childrenTest( PyDef( 'foo', [], [ x ] ),  [ x ] )
+
+		
+	def test_PyAssign_SideEffects(self):
+		a = PyVar( 'a' )
+		b = PyVar( 'b' )
+		self._childrenTest( a.assign_sideEffects( b ),  [ a, b ] )
+
+	def test_PyDel_SideEffects(self):
+		a = PyVar( 'a' )
+		self._childrenTest( a.del_sideEffects(),  [ a ] )
+		
+		
+		
+
 if __name__ == '__main__':
 	unittest.main()
