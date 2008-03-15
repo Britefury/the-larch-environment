@@ -27,6 +27,7 @@ from Britefury.DocPresent.Toolkit.DTCursorEntity import DTCursorEntity
 from Britefury.DocPresent.Toolkit.DTCursor import DTCursorLocation, DTCursor
 from Britefury.DocPresent.Toolkit.DTKeyEvent import DTKeyEvent
 from Britefury.DocPresent.Toolkit.DTBin import DTBin
+from Britefury.DocPresent.Toolkit.DTContainer import DTContainer
 
 
 
@@ -75,9 +76,9 @@ class DTDocument (DTBin):
 		self._dndBeginData = None
 
 
-		self._docOffset = Vector2()
-		self._docScale = 1.0
-		self._docDragStartPos = Point2()
+		self._docWindowTopLeftCornerInDocSpace = Vector2( 50.0, 50.0 )
+		self._docScaleInWindowCoords = 1.0
+		self._docDragStartPosWindowSpace = Point2()
 		self._docDragButton = None
 
 		self._documentSize = Vector2()
@@ -133,25 +134,38 @@ class DTDocument (DTBin):
 			
 	def getGtkWidget(self):
 		return self._drawingArea
+	
+	
+	def _p_windowSpaceToDocSpace(self, w):
+		if isinstance( w, Point2 ):
+			w = w.toVector2()
+		return Point2( ( w  *  ( 1.0 / self._docScaleInWindowCoords ) )  +  self._docWindowTopLeftCornerInDocSpace )
 
+	def _p_docSpaceToWindowSpace(self, d):
+		if isinstance( d, Point2 ):
+			d = d.toVector2()
+		return Point2( ( d - self._docWindowTopLeftCornerInDocSpace )  *  self._docScaleInWindowCoords )
 
+	
+	def _p_windowSpaceSizeToDocSpace(self, w):
+		return w  *  ( 1.0 / self._docScaleInWindowCoords )
+
+	def _p_docSpaceSizeToWindowSpace(self, d):
+		return d  *  self._docScaleInWindowCoords
+	
+	
 	def oneToOne(self):
 		# We want to scale about the centre of the document, not the top left corner
-		centre = self._documentSize * 0.5
-		centreInDocSpace = ( centre - self._docOffset )  *  ( 1.0 / self._docScale )
-		self._docScale = 1.0
-		newCentreInDocSpace = ( centre - self._docOffset )  *  ( 1.0 / self._docScale )
-
-		self._docOffset += ( newCentreInDocSpace - centreInDocSpace ) * self._docScale
-
-		self.childScale = self._docScale
-		self._o_queueResize()
+		centreInWindowSpace = self._documentSize * 0.5
+		centreInDocSpace = self._p_windowSpaceToDocSpace( centreInWindowSpace )
+		self._docScaleInWindowCoords = 1.0
+		self._docWindowTopLeftCornerInDocSpace = centreInDocSpace  -  centreInWindowSpace
+		self._p_queueFullRedraw()
 
 	def reset(self):
-		self._docOffset = Vector2()
-		self._docScale = 1.0
-		self.childScale = self._docScale
-		self._o_queueResize()
+		self._docWindowTopLeftCornerInDocSpace = Vector2()
+		self._docScaleInWindowCoords = 1.0
+		self._p_queueFullRedraw()
 
 
 
@@ -168,12 +182,14 @@ class DTDocument (DTBin):
 
 
 
+	def _p_queueFullRedraw(self):
+		self._drawingArea.queue_draw()
 
 	def _o_queueRedraw(self, localPos, localSize):
-		self._p_invalidateRect( localPos, localSize )
+		self._p_invalidateRect( self._p_docSpaceToWindowSpace( localPos ), self._p_docSpaceSizeToWindowSpace( localSize ) )
 
-	def _p_invalidateRect(self, pos, size):
-		self._drawingArea.queue_draw_area( int( pos.x ), int( pos.y ), int( math.ceil( size.x ) ), int( math.ceil( size.y ) ) )
+	def _p_invalidateRect(self, posInWindowSpace, sizeInWindowSpace):
+		self._drawingArea.queue_draw_area( int( posInWindowSpace.x ), int( posInWindowSpace.y ), int( math.ceil( sizeInWindowSpace.x ) ), int( math.ceil( sizeInWindowSpace.y ) ) )
 
 
 	def _o_queueResize(self):
@@ -185,22 +201,21 @@ class DTDocument (DTBin):
 
 	def _p_performAllocation(self):
 		if self._bAllocationRequired:
-			self._f_setScale( self._docScale, self._docScale )
 			reqWidth = self._f_getRequisitionWidth()
-			self._f_allocateX( self._documentSize.x * self._docScale )
+			self._f_allocateX( self._documentSize.x / self._docScaleInWindowCoords )
 			reqHeight = self._f_getRequisitionHeight()
-			yAlloc = reqHeight / self._docScale
-			self._f_allocateY( yAlloc )
+			self._f_allocateY( reqHeight )
 			self._bAllocationRequired = False
+					
 
 
 	def _o_onAllocateX(self, allocation):
 		if self._child is not None:
-			self._o_allocateChildX( self._child, self._docOffset.x, min( self._childRequisition.x, allocation ) )
+			self._o_allocateChildX( self._child, 0.0, min( self._childRequisition.x, allocation ) )
 
 	def _o_onAllocateY(self, allocation):
 		if self._child is not None:
-			self._o_allocateChildY( self._child, self._docOffset.y, allocation )
+			self._o_allocateChildY( self._child, 0.0, allocation )
 
 
 
@@ -325,8 +340,18 @@ class DTDocument (DTBin):
 		context.set_source_rgb( 1.0, 1.0, 1.0 )
 		context.fill()
 		context.new_path()
-		self._f_draw( context, BBox2( Point2( event.area.x, event.area.y ), Point2( event.area.x + event.area.width, event.area.y + event.area.height ) ) )
+		topLeftDocSpace = self._p_windowSpaceToDocSpace( Point2( event.area.x, event.area.y ) )
+		bottomRightDocSpace = self._p_windowSpaceToDocSpace( Point2( event.area.x + event.area.width, event.area.y + event.area.height ) )
+
+		context.save()
+		context.scale( self._docScaleInWindowCoords, self._docScaleInWindowCoords )
+		context.translate( -self._docWindowTopLeftCornerInDocSpace.x, -self._docWindowTopLeftCornerInDocSpace.y )
+
+		self._f_draw( context, BBox2( topLeftDocSpace, bottomRightDocSpace ) )
 		#self._p_drawCursor( context )
+		
+		context.restore()
+		
 		self._p_emitImmediateEvents()
 		return False
 
@@ -334,7 +359,8 @@ class DTDocument (DTBin):
 	def _p_buttonPressEvent(self, widget, event):
 		self._drawingArea.grab_focus()
 		x, y, state = event.x, event.y, event.state
-		localPos = Point2( x, y )
+		windowPos = Point2( x, y )
+		localPos = self._p_windowSpaceToDocSpace( windowPos )
 		if event.state & gtk.gdk.MOD1_MASK  ==  0:
 			if event.type == gtk.gdk.BUTTON_PRESS  and  self._dndSource is None:
 				self._dndSource = self._f_evDndButtonDown( localPos, event.button, state )
@@ -352,13 +378,13 @@ class DTDocument (DTBin):
 		else:
 			if self._docDragButton is None:
 				self._docDragButton = event.button
-				self._docDragStartPos = localPos
+				self._docDragStartPosWindowSpace = windowPos
 		self._p_emitImmediateEvents()
 
 
 	def _p_buttonReleaseEvent(self, widget, event):
 		x, y, state = event.x, event.y, event.state
-		localPos = Point2( x, y )
+		localPos = self._p_windowSpaceToDocSpace( Point2( x, y ) )
 		if self._dndSource is not None  and  self._dndInProgress  and  self._dndButton == event.button:
 			# Ensure that @self._dndSource is still part of this document
 			if self._dndSource.document is self:
@@ -383,7 +409,8 @@ class DTDocument (DTBin):
 			x, y, state = event.window.get_pointer()
 		else:
 			x, y, state = event.x, event.y, event.state
-		localPos = Point2( x, y )
+		windowPos = Point2( x, y )
+		localPos = self._p_windowSpaceToDocSpace( windowPos )
 
 		if self._docDragButton is None:
 			if self._dndSource is not None:
@@ -395,35 +422,32 @@ class DTDocument (DTBin):
 			else:
 				self._f_evMotion( localPos )
 		else:
-			delta = localPos - self._docDragStartPos
+			delta = windowPos - self._docDragStartPosWindowSpace
+			self._docDragStartPosWindowSpace = windowPos
 			bModified = False
 			if self._docDragButton == 1  or  self._docDragButton == 2:
-				self._docOffset += delta
+				self._docWindowTopLeftCornerInDocSpace -= self._p_windowSpaceSizeToDocSpace( delta )
 				bModified = True
 			elif self._docDragButton == 3:
 				scaleDeltaPixels = delta.x + delta.y
 				scaleDelta = 2.0  **  ( scaleDeltaPixels / 200.0 )
 
 				# We want to scale about the centre of the document, not the top left corner
-				centre = self._documentSize * 0.5
-				centreInDocSpace = ( centre - self._docOffset )  *  ( 1.0 / self._docScale )
-				self._docScale *= scaleDelta
-				newCentreInDocSpace = ( centre - self._docOffset )  *  ( 1.0 / self._docScale )
-
-				self._docOffset += ( newCentreInDocSpace - centreInDocSpace ) * self._docScale
-
-
-				self.childScale = self._docScale
+				centreInWindowSpace = self._documentSize * 0.5
+				centreInDocSpace = self._p_windowSpaceToDocSpace( centreInWindowSpace )
+				self._docScaleInWindowCoords *= scaleDelta
+				newCentreInDocSpace = self._p_windowSpaceToDocSpace( centreInWindowSpace )
+				self._docWindowTopLeftCornerInDocSpace -= ( newCentreInDocSpace - centreInDocSpace )
+		
 				bModified = True
-			self._docDragStartPos = localPos
 			if bModified:
-				self._o_queueResize()
+				self._p_queueFullRedraw()
 		self._p_emitImmediateEvents()
 
 
 	def _p_enterNotifyEvent(self, widget, event):
 		x, y, state = event.window.get_pointer()
-		localPos = Point2( x, y )
+		localPos = self._p_windowSpaceToDocSpace( Point2( x, y ) )
 		if self._docDragButton is None:
 			self._f_evEnter( localPos )
 		self._p_emitImmediateEvents()
@@ -431,7 +455,7 @@ class DTDocument (DTBin):
 
 	def _p_leaveNotifyEvent(self, widget, event):
 		x, y, state = event.window.get_pointer()
-		localPos = Point2( x, y )
+		localPos = self._p_windowSpaceToDocSpace( Point2( x, y ) )
 		if self._docDragButton is None:
 			self._f_evLeave( localPos )
 		self._p_emitImmediateEvents()
@@ -458,17 +482,13 @@ class DTDocument (DTBin):
 			scaleDelta = 2.0  **  ( delta / 1.5 )
 
 			# We want to scale about the pointer position, not the top left corner
-			centre = Vector2( event.x, event.y )
-			centreInDocSpace = ( centre - self._docOffset )  *  ( 1.0 / self._docScale )
-			self._docScale *= scaleDelta
-			newCentreInDocSpace = ( centre - self._docOffset )  *  ( 1.0 / self._docScale )
+			centreInWindowSpace = Vector2( event.x, event.y )
+			centreInDocSpace = self._p_windowSpaceToDocSpace( centreInWindowSpace )
+			self._docScaleInWindowCoords *= scaleDelta
+			newCentreInDocSpace = self._p_windowSpaceToDocSpace( centreInWindowSpace )
+			self._docWindowTopLeftCornerInDocSpace -= ( newCentreInDocSpace - centreInDocSpace )
 
-			self._docOffset += ( newCentreInDocSpace - centreInDocSpace ) * self._docScale
-
-
-			self.childScale = self._docScale
-			bModified = True
-			self._o_queueResize()
+			self._p_queueFullRedraw()
 
 
 
