@@ -26,6 +26,7 @@ from Britefury.CommandHistory.CommandHistory import CommandHistory
 from Britefury.DocPresent.Toolkit.DTDocument import DTDocument
 
 from Britefury.DocModel.DMList import DMList
+from Britefury.DocModel.DMIO import readSX, writeSX
 
 from Britefury.gSym.gSymEnvironment import createGSymGLispEnvironment
 
@@ -388,8 +389,8 @@ class MainApp (object):
 		if self._bUnsavedData:
 			bProceed = confirmDialog( _( 'New project' ), _( 'You have not saved your work. Proceed?' ), gtk.STOCK_NEW, gtk.STOCK_CANCEL, 'y', 'n', True, self._window )
 		if bProceed:
-			graph, mainModule = self.makeBlankModuleGraph()
-			self.setGraph( graph, mainModule )
+			documentRoot = self.makeEmptyDocument()
+			self.setDocument( documentRoot, False )
 
 
 	def _p_onOpen(self, widget):
@@ -412,14 +413,11 @@ class MainApp (object):
 				if filename is not None:
 					f = open( filename, 'r' )
 					if f is not None:
-						doc = InputXmlDocument()
-						doc.parseFile( f )
-						contentNode = doc.getContentNode()
-						if contentNode.isValid():
-							rootXmlNode = contentNode.getChild( 'doc_root' )
-							if rootXmlNode.isValid():
-								root = rootXmlNode.readObject()
-								self.setDocument( root )
+						try:
+							documentRoot = readSX( file( filename, 'r' ) )
+							self.setDocument( documentRoot, True )
+						except IOError:
+							pass
 
 
 	def _p_onSave(self, widget):
@@ -528,11 +526,9 @@ class MainApp (object):
 
 
 	def _p_writeFile(self, filename):
-		doc = OutputXmlDocument()
-		doc.getContentNode().addChild( 'doc_root' ).writeObject( self._documentRoot )
 		f = open( filename, 'w' )
 		if f is not None:
-			doc.writeFile( f )
+			writeSX( f, self._documentRoot )
 			f.close()
 			self._bUnsavedData = False
 
