@@ -167,10 +167,11 @@ class DTLabel (DTSimpleStaticWidget):
 
 	def _o_onSetScale(self, scale, rootScale):
 		context = self._realiseContext
-		context.save()
-		context.scale( rootScale, rootScale )
-		context.update_layout( self._layout )
-		context.restore()
+		if context is not None:
+			context.save()
+			context.scale( rootScale, rootScale )
+			context.update_layout( self._layout )
+			context.restore()
 
 
 	def _o_getRequiredWidth(self):

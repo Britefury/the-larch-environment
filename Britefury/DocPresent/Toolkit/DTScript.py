@@ -35,7 +35,7 @@ class DTScript (DTContainer):
 		self._subscriptOverlap = 0.0
 		self._spacing = spacing
 
-		self._childScale = 1.0
+		self._childScale = 0.6
 
 
 
@@ -57,6 +57,8 @@ class DTScript (DTContainer):
 				entry = self.ChildEntry( child)
 				self._childEntries.append( entry )
 				self._o_registerChildEntry( entry )
+				if slot != self.MAIN:
+					child._f_setScale( self._childScale, self._rootScale * self._childScale )
 				DTCursorEntity.splice( self._f_getPrevCursorEntityBeforeChild( child ), self._f_getNextCursorEntityAfterChild( child ), child.getFirstCursorEntity(), child.getLastCursorEntity() )
 
 			self._o_queueResize()
@@ -105,12 +107,8 @@ class DTScript (DTContainer):
 
 
 	def _f_removeChild(self, child):
-		if child is self._leftChild:
-			self.setLeftChild( None )
-		elif child is self._rightChild:
-			self.setRightChild( None )
-		else:
-			raise ValueError, 'cannot remove child'
+		slot = self._children.index( child )
+		self.setChild( slot, None )
 
 
 
@@ -219,8 +217,9 @@ class DTScript (DTContainer):
 
 	def _f_refreshScale(self, scale, rootScale):
 		for slot in self.childSlots:
-			if self._children[slot] is not None:
-				self._children[slot]._f_setScale( self._childScale, rootScale * self._childScale )
+			if slot != self.MAIN:
+				if self._children[slot] is not None:
+					self._children[slot]._f_setScale( self._childScale, rootScale * self._childScale )
 
 
 
