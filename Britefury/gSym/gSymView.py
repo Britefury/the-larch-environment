@@ -12,6 +12,7 @@ from Britefury.DocPresent.Toolkit.DTActiveBorder import DTActiveBorder
 from Britefury.DocPresent.Toolkit.DTLabel import DTLabel
 from Britefury.DocPresent.Toolkit.DTEntryLabel import DTEntryLabel
 from Britefury.DocPresent.Toolkit.DTBox import DTBox
+from Britefury.DocPresent.Toolkit.DTScript import DTScript
 
 from Britefury.DocPresent.Toolkit.DTDirection import DTDirection
 
@@ -127,7 +128,25 @@ def _runtime_boxRefreshCell(viewNodeInstance, widget, children):
 		widget[:] = widgets
 	_runtime_buildRefreshCellAndRegister( viewNodeInstance, _boxRefresh )
 
-	
+def _runtime_scriptRefreshCell(viewNodeInstance, script, child, childSlotAttrName):
+	"""
+	Runtime - called by compiled code at run-time
+	Builds and registers a refresh cell (if necessary) for a widget that is an instance of DTBin
+	"""
+	if isinstance( child, DVNode ):
+		chNode = child
+		def _scriptRefresh():
+			chNode.refresh()
+			#script.mainChild = chNode.widget
+			setattr( script, childSlotAttrName, chNode.widget )
+		_runtime_buildRefreshCellAndRegister( viewNodeInstance, _scriptRefresh )
+	elif isinstance( child, DTWidget ):
+		#script.mainChild = child
+		setattr( script, childSlotAttrName, child)
+	else:
+		viewNodeInstance.env.glispError( TypeError, viewNodeInstance.xs, '_GSymNodeViewInstance._runtime_scriptRefreshCell: could not process child of type %s'  %  ( type( child ).__name__, ) )
+
+
 	
 	
 def _runtime_activeBorder(viewNodeInstance, child, styleSheets):
@@ -182,6 +201,26 @@ def _runtime_vbox(viewNodeInstance, children, styleSheets):
 	"""
 	widget = DTBox( direction=DTDirection.TOP_TO_BOTTOM, minorDirectionAlignment=DTBox.ALIGN_LEFT )
 	_runtime_boxRefreshCell( viewNodeInstance, widget, children )
+	for sheet in styleSheets:
+		sheet.apply()
+	return widget
+
+def _runtime_script(viewNodeInstance, mainChild, leftSuperChild, leftSubChild, rightSuperChild, rightSubChild, styleSheets):
+	"""
+	Runtime - called by compiled code at run-time
+	Builds a DTActiveBorder widget, with child, builds and registers a refresh cell
+	"""
+	widget = DTScript()
+	
+	_runtime_scriptRefreshCell( viewNodeInstance, widget, mainChild, 'mainChild' )
+	if leftSuperChild is not None:
+		_runtime_scriptRefreshCell( viewNodeInstance, widget, leftSuperChild, 'leftSuperscriptChild' )
+	if leftSubChild is not None:
+		_runtime_scriptRefreshCell( viewNodeInstance, widget, leftSubChild, 'leftSubscriptChild' )
+	if rightSuperChild is not None:
+		_runtime_scriptRefreshCell( viewNodeInstance, widget, rightSuperChild, 'rightSuperscriptChild' )
+	if rightSubChild is not None:
+		_runtime_scriptRefreshCell( viewNodeInstance, widget, rightSubChild, 'rightSubscriptChild' )
 	for sheet in styleSheets:
 		sheet.apply()
 	return widget
@@ -320,7 +359,9 @@ class _GSymViewFactory (object):
 			 '_label' : _runtime_label,
 			 '_entry' : _runtime_entry,
 			 '_hbox' : _runtime_hbox,
-			 '_vbox' : _runtime_vbox, }
+			 '_vbox' : _runtime_vbox,
+			 '_script' : _runtime_script,
+			 }
 		try:
 			self.makeViewFunction = compileGLispExprToPyFunction( viewModuleName, viewFunctionName, [ '__view_node_instance_stack__' ], spec, self._p_compileSpecial, lcls )
 		except PyCodeGenError, e:
@@ -414,6 +455,36 @@ class _GSymViewFactory (object):
 			if len( srcXs ) < 2:
 				self.env.glispError( GLispParameterListError, src, 'defineView: $vbox needs at least 1 parameter; the children' )
 			return PyCall( PyVar( '_vbox', dbgSrc=srcXs ), [ PySrc( '__view_node_instance_stack__[-1]', dbgSrc=srcXs ), compileSubExp( srcXs[1] ), compileStyleSheetAccess( srcXs[2:]) ], dbgSrc=srcXs )
+		elif name == '$script':
+			#($script <mainChild> <leftSuperChild> <leftSubChild> <rightSuperChild> <rightSubChild> styleSheet*)
+			if len( srcXs ) < 6:
+				self.env.glispError( GLispParameterListError, src, 'defineView: $script needs at least 5 parameters; the main, left-super, left-sub, right-super, and right-sub children' )
+			return PyVar( '_script' )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[1] ), compileSubExp( srcXs[2] ), compileSubExp( srcXs[3] ), compileSubExp( srcXs[4] ), compileSubExp( srcXs[5] ),
+						   compileStyleSheetAccess( srcXs[6:]) ).debug( srcXs )
+		elif name == '$scriptLSuper':
+			#($scriptLSuper <mainChild> <scriptChild> styleSheet*)
+			if len( srcXs ) < 3:
+				self.env.glispError( GLispParameterListError, src, 'defineView: $scriptLSuper needs at least 2 parameters; the main child, and the script child' )
+			return PyVar( '_script' )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[1] ), compileSubExp( srcXs[2] ), None, None, None,
+						   compileStyleSheetAccess( srcXs[6:]) ).debug( srcXs )
+		elif name == '$scriptLSub':
+			#($scriptLSub <mainChild> <scriptChild> styleSheet*)
+			if len( srcXs ) < 3:
+				self.env.glispError( GLispParameterListError, src, 'defineView: $scriptLSub needs at least 2 parameters; the main child, and the script child' )
+			return PyVar( '_script' )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[1] ), None, compileSubExp( srcXs[2] ), None, None,
+						   compileStyleSheetAccess( srcXs[6:]) ).debug( srcXs )
+		elif name == '$scriptRSuper':
+			#($scriptRSuper <mainChild> <scriptChild> styleSheet*)
+			if len( srcXs ) < 3:
+				self.env.glispError( GLispParameterListError, src, 'defineView: $scriptRSuper needs at least 2 parameters; the main child, and the script child' )
+			return PyVar( '_script' )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[1] ), None, None, compileSubExp( srcXs[2] ), None,
+						   compileStyleSheetAccess( srcXs[6:]) ).debug( srcXs )
+		elif name == '$scriptRSub':
+			#($scriptRSub <mainChild> <scriptChild> styleSheet*)
+			if len( srcXs ) < 3:
+				self.env.glispError( GLispParameterListError, src, 'defineView: $scriptRSub needs at least 2 parameters; the main child, and the script child' )
+			return PyVar( '_script' )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[1] ), None, None, None, compileSubExp( srcXs[2] ),
+						   compileStyleSheetAccess( srcXs[6:]) ).debug( srcXs )
 		else:
 			return None
 		
