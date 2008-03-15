@@ -6,7 +6,7 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
 from Britefury.GLisp.GLispUtil import isGLispList, stripGLispComments, gLispSrcToString
-from Britefury.GLisp.PyCodeGen import PyCodeGenError, PySrc, PyVar, PyLiteral, PyListLiteral, PyGetAttr, PyGetItem, PyGetSlice, PyUnOp, PyBinOp, PyCall, PyMethodCall, PyReturn, PyIf, PyDef, PyAssign_SideEffects, PyDel_SideEffects
+from Britefury.GLisp.PyCodeGen import PyCodeGenError, PySrc, PyVar, PyLiteral, PyLiteralValue, PyListLiteral, PyGetAttr, PyGetItem, PyGetSlice, PyUnOp, PyBinOp, PyCall, PyMethodCall, PyReturn, PyIf, PyDef, PyAssign_SideEffects, PyDel_SideEffects
 import Britefury.GLisp.PatternMatch
 
 
@@ -371,6 +371,9 @@ def _compileMatch(xs, context, bNeedResult, compileSpecial):
 
 
 
+class GLispCompilerInvalidLiteral (PyCodeGenError):
+	pass
+
 def _compileGLispExprToPyTree(xs, context, bNeedResult=False, compileSpecial=None):
 	"""
 	_compileGLispExprToPyTree( xs, context, bNeedResult=False, compileSpecial=None )  ->  PyNode tree
@@ -397,13 +400,21 @@ def _compileGLispExprToPyTree(xs, context, bNeedResult=False, compileSpecial=Non
 				return PyLiteralValue( xs[1:] )
 			else:
 				return PyVar( xs[1:], dbgSrc=xs )
-		elif xs[0] == '#'  and  xs != '#':
-			if xs[1] == '#':
-				return PyLiteralValue( xs[1:] )
+		elif xs[0] == '#':
+			value = xs[1:]
+			if value == 'None'  or  value == 'False'  or  value == 'True':
+				return PyLiteral( value )
+			elif value.startswith( "'" ):
+				return PyLiteralValue( value[1:] )
 			else:
-				return PyLiteral( xs[1:], dbgSrc=xs )
-		else:
-			return PyLiteral( '\'' + xs.replace( '\'', '\\\'' ) + '\'', dbgSrc=xs )
+				try:
+					return PyLiteralValue( int( value ) )
+				except ValueError:
+					try:
+						return PyLiteralValue( float( value ) )
+					except ValueError:
+						pass
+			raise GLispCompilerInvalidLiteral( xs )
 	else:
 		if len(xs) == 0:
 			return PyLiteral( 'None', dbgSrc=xs )
@@ -441,7 +452,7 @@ def _compileGLispExprToPyTree(xs, context, bNeedResult=False, compileSpecial=Non
 				return PyUnOp( xs[1], _compileGLispExprToPyTree( xs[0], context, True, compileSpecial ), dbgSrc=xs )
 			elif method in PyBinOp.operators   and   len(xs) == 3:
 				return PyBinOp( _compileGLispExprToPyTree( xs[0], context, True, compileSpecial ), xs[1], _compileGLispExprToPyTree( xs[2], context, True, compileSpecial ), dbgSrc=xs )
-			elif method == '<->':
+			elif method == '<-':
 				return PyCall( _compileGLispExprToPyTree( xs[0], context, True, compileSpecial ), [ _compileGLispExprToPyTree( e, context, True, compileSpecial )   for e in xs[2:] ], dbgSrc=xs )
 			else:
 				return PyMethodCall( _compileGLispExprToPyTree( xs[0], context, True, compileSpecial ), xs[1], [ _compileGLispExprToPyTree( e, context, True, compileSpecial )   for e in xs[2:] ], dbgSrc=xs )
@@ -676,9 +687,9 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 	def testCall(self):
 		def _f(x):
 			return x + 3
-		self._compileTest( '(@a <->)', 'a()' )
-		self._compileTest( '(@a <-> @b @c)', 'a( b, c )' )
-		self._evalTest( '(@f <-> #5)', 8, [ ( 'f', _f ) ] )
+		self._compileTest( '(@a <-)', 'a()' )
+		self._compileTest( '(@a <- @b @c)', 'a( b, c )' )
+		self._evalTest( '(@f <- #5)', 8, [ ( 'f', _f ) ] )
 
 	def testMethodCall(self):
 		self._compileTest( '(@a foo)', 'a.foo()' )
@@ -887,7 +898,7 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 
 		
 		self._compileTest( '($lambda   (@x @y @z)  (@x split) (@x + (@y + @z))  )', pysrc1 )
-		self._evalTest( '( ($lambda   (@x @y @z)  (@x + (@y + @z))  ) <-> @a @b @c)', 6, [ ( 'a', 1 ), ( 'b', 2 ), ( 'c', 3 ) ] )
+		self._evalTest( '( ($lambda   (@x @y @z)  (@x + (@y + @z))  ) <- @a @b @c)', 6, [ ( 'a', 1 ), ( 'b', 2 ), ( 'c', 3 ) ] )
 
 		
 	def test_Match(self):
@@ -1006,7 +1017,7 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 			 )
 		       )
 		     )
-		     (@d <-> @a @b @c)
+		     (@d <- @a @b @c)
 		  )
 		)
 		"""
@@ -1042,7 +1053,7 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 		     )
 		     ($lambda () (@a + @b))
 		  )
-		  <->
+		  <-
 		)
 		"""
 		pysrc1 = [
@@ -1071,7 +1082,7 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 		      (@a + (@x + @y))
 		    )
 		  )
-		  <-> #1 #2 #3
+		  <- #1 #2 #3
 		)
 		"""
 		

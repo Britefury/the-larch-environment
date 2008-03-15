@@ -168,7 +168,7 @@ def _runtime_label(viewNodeInstance, text, styleSheets):
 	"""
 	if isinstance( text, RelativeNode ):
 		text = text.node
-	widget = DTLabel(text)
+	widget = DTLabel( text )
 	for sheet in styleSheets:
 		sheet.apply()
 	return widget
