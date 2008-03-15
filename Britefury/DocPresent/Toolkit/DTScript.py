@@ -35,7 +35,7 @@ class DTScript (DTContainer):
 		self._subscriptOverlap = 0.0
 		self._spacing = spacing
 
-		self._childScale = 0.6
+		self._childScale = 0.7
 
 
 

@@ -434,7 +434,7 @@ class TestCase_MatchExpression (unittest.TestCase):
 		...
 		)
 		"""
-		actionXs = [ '@locals', '<->' ]
+		actionXs = [ '@locals', '<-' ]
 		if isinstance( matchSrc, list ):
 			return [ '$match', '@xs', ]  +  [ [ readSX( m ), actionXs ]   for m in matchSrc ]
 		else:

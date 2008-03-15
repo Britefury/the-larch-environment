@@ -667,7 +667,7 @@ class PyMethodCall (PyExpression):
 		super( PyMethodCall, self ).__init__( dbgSrc )
 		assert isinstance( a, PyExpression )
 		for p in params:
-			assert isinstance( p, PyExpression )
+			assert isinstance( p, PyExpression ), '%s: %s'  %  ( methodName, p )
 		if not _isPyIdentifier( methodName ):
 			self.error( PyInvalidMethodNameError, methodName )
 		self.a = a

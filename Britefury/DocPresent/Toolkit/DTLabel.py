@@ -56,6 +56,7 @@ class DTLabel (DTSimpleStaticWidget):
 
 	def setText(self, text):
 		self._text = text
+		self._markup = None
 		self._bLayoutNeedsRefresh = True
 		self._o_queueResize()
 

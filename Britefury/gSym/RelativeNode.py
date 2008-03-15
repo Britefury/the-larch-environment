@@ -6,6 +6,7 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
 from copy import copy, deepcopy
+import sys
 
 from Britefury.Kernel.Abstract import abstractmethod
 from Britefury.DocModel.DMNode import DMNode
@@ -111,10 +112,7 @@ class RelativeList (RelativeNode, DMListInterface):
 
 class RelativeString (RelativeNode):
 	def __getitem__(self, i):
-		if isinstance( i, slice ):
-			return [ relative( x, self._rln_node, j )   for j, x in zip( i.indices( self._rln_node ), self._rln_node[i] ) ]
-		else:
-			return relative( self._rln_node[i], self._rln_node, i )
+		return self._rln_node[i]
 
 	def __contains__(self, x):
 		return x in self._rln_node
