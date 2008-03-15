@@ -76,7 +76,7 @@ class DTDocument (DTBin):
 		self._dndBeginData = None
 
 
-		self._docWindowTopLeftCornerInDocSpace = Vector2( 50.0, 50.0 )
+		self._docWindowTopLeftCornerInDocSpace = Vector2()
 		self._docScaleInWindowCoords = 1.0
 		self._docDragStartPosWindowSpace = Point2()
 		self._docDragButton = None

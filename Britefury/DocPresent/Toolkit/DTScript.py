@@ -13,68 +13,89 @@ from Britefury.DocPresent.Toolkit.DTContainer import DTContainer
 
 
 class DTScript (DTContainer):
-	SUBSCRIPT = 0
-	SUPERSCRIPT = 1
+	LEFTSUPER = 0
+	LEFTSUB = 1
+	MAIN = 2
+	RIGHTSUPER = 3
+	RIGHTSUB = 4
+	childSlots = [ LEFTSUPER, LEFTSUB, MAIN, RIGHTSUPER, RIGHTSUB ]
 
-	def __init__(self, mode, spacing=1.0, backgroundColour=None):
+	def __init__(self, spacing=1.0, backgroundColour=None):
 		super( DTScript, self ).__init__( backgroundColour )
 
-		self._mode = mode
-		self._leftChild = None
-		self._leftChildRequisition = Vector2()
-		self._rightChild = None
-		self._rightChildRequisition = Vector2()
-		self._overlap = 0.0
-		self._spacing=1.0
+		self._children = [ None ] * 5
+		self._childRequisitions = [ Vector2()  for i in xrange( 0, 5 ) ]
+		self._leftRequisitionWidth = 0.0
+		self._mainRequisitionWidth = 0.0
+		self._rightRequisitionWidth = 0.0
+		self._superscriptRequisitionHeight = 0.0
+		self._mainRequisitionHeight = 0.0
+		self._subscriptRequisitionHeight = 0.0
+		self._superscriptOverlap = 0.0
+		self._subscriptOverlap = 0.0
+		self._spacing = spacing
 
 		self._childScale = 1.0
 
 
 
-	def getLeftChild(self):
-		return self._leftChild
-
-	def setLeftChild(self, child):
-		if child is not self._leftChild:
+	def getChild(self, slot):
+		return self._children[slot]
+	
+	def setChild(self, slot, child):
+		existingChild = self._children[slot]
+		if child is not existingChild:
 			if child is not None:
 				child._f_unparent()
-			if self._leftChild is not None:
-				entry = self._childToEntry[self._leftChild]
+			if existingChild is not None:
+				entry = self._childToEntry[existingChild]
 				self._childEntries.remove( entry )
 				self._o_unregisterChildEntry( entry )
-				DTCursorEntity.remove( self._leftChild.getFirstCursorEntity(), self._leftChild.getLastCursorEntity() )
-			self._leftChild = child
-			if self._leftChild is not None:
-				entry = self.ChildEntry( self._leftChild )
-				self._childEntries.append( entry )
-				self._o_registerChildEntry( entry )
-				DTCursorEntity.splice( self._f_getPrevCursorEntityBeforeChild( self._leftChild ), self._f_getNextCursorEntityAfterChild( self._leftChild ), self._leftChild.getFirstCursorEntity(), self._leftChild.getLastCursorEntity() )
-
-			self._o_queueResize()
-
-
-	def getRightChild(self):
-		return self._rightChild
-
-	def setRightChild(self, child):
-		if child is not self._rightChild:
+				DTCursorEntity.remove( existingChild.getFirstCursorEntity(), existingChild.getLastCursorEntity() )
+			self._children[slot] = child
 			if child is not None:
-				child._f_unparent()
-			if self._rightChild is not None:
-				entry = self._childToEntry[self._rightChild]
-				self._childEntries.remove( entry )
-				self._o_unregisterChildEntry( entry )
-				DTCursorEntity.remove( self._rightChild.getFirstCursorEntity(), self._rightChild.getLastCursorEntity() )
-			self._rightChild = child
-			if self._rightChild is not None:
-				entry = self.ChildEntry( self._rightChild )
+				entry = self.ChildEntry( child)
 				self._childEntries.append( entry )
 				self._o_registerChildEntry( entry )
-				DTCursorEntity.splice( self._f_getPrevCursorEntityBeforeChild( self._rightChild ), self._f_getNextCursorEntityAfterChild( self._rightChild ), self._rightChild.getFirstCursorEntity(), self._rightChild.getLastCursorEntity() )
+				DTCursorEntity.splice( self._f_getPrevCursorEntityBeforeChild( child ), self._f_getNextCursorEntityAfterChild( child ), child.getFirstCursorEntity(), child.getLastCursorEntity() )
 
 			self._o_queueResize()
+	
+	
+	def getMainChild(self):
+		return self.getChild( self.MAIN )
+	
+	def getLeftSuperscriptChild(self):
+		return self.getChild( self.LEFTSUPER )
+	
+	def getLeftSubscriptChild(self):
+		return self.getChild( self.LEFTSUB )
+	
+	def getRightSuperscriptChild(self):
+		return self.getChild( self.RIGHTSUPER )
+	
+	def getRightSubscriptChild(self):
+		return self.getChild( self.RIGHTSUB )
+	
 
+	
+	def setMainChild(self, child):
+		return self.setChild( self.MAIN, child )
+	
+	def setLeftSuperscriptChild(self, child):
+		return self.setChild( self.LEFTSUPER, child )
+	
+	def setLeftSubscriptChild(self, child):
+		return self.setChild( self.LEFTSUB, child )
+	
+	def setRightSuperscriptChild(self, child):
+		return self.setChild( self.RIGHTSUPER, child )
+	
+	def setRightSubscriptChild(self, child):
+		return self.setChild( self.RIGHTSUB, child )
 
+	
+	
 	def getChildScale(self):
 		return self._childScale
 
@@ -95,63 +116,101 @@ class DTScript (DTContainer):
 
 
 	def _o_getRequiredWidth(self):
-		if self._leftChild is not None:
-			self._leftChildRequisition.x = self._leftChild._f_getRequisitionWidth()
-		else:
-			self._leftChildRequisition.x = 0.0
+		for slot in self.childSlots:
+			if self._children[slot] is not None:
+				self._childRequisitions[slot].x = self._children[slot]._f_getRequisitionWidth()
+			else:
+				self._childRequisitions[slot].x = 0
+				
+		self._leftRequisitionWidth = max( self._childRequisitions[self.LEFTSUB].x, self._childRequisitions[self.LEFTSUPER].x )
+		self._mainRequisitionWidth = self._childRequisitions[self.MAIN].x
+		self._rightRequisitionWidth = max( self._childRequisitions[self.RIGHTSUB].x, self._childRequisitions[self.RIGHTSUPER].x )
+		
+		count = 0
+		for w in [ self._leftRequisitionWidth, self._mainRequisitionWidth, self._rightRequisitionWidth ]:
+			if w > 0.0:
+				count += 1
+		spacing = self._spacing  *  ( count - 1 )
 
-		if self._rightChild is not None:
-			self._rightChildRequisition.x = self._rightChild._f_getRequisitionWidth()
-		else:
-			self._rightChildRequisition.x = 0.0
-
-		return self._leftChildRequisition.x + self._rightChildRequisition.x + self._spacing
+		return self._leftRequisitionWidth + self._mainRequisitionWidth + self._rightRequisitionWidth + spacing
 
 
 	def _o_getRequiredHeight(self):
-		if self._leftChild is not None:
-			self._leftChildRequisition.y = self._leftChild._f_getRequisitionHeight()
-		else:
-			self._leftChildRequisition.y = 0.0
+		for slot in self.childSlots:
+			if self._children[slot] is not None:
+				self._childRequisitions[slot].y = self._children[slot]._f_getRequisitionHeight()
+			else:
+				self._childRequisitions[slot].y = 0
+				
+		self._superscriptRequisitionHeight = max( self._childRequisitions[self.LEFTSUPER].y, self._childRequisitions[self.RIGHTSUPER].y )
+		self._mainRequisitionHeight  = self._childRequisitions[self.MAIN].y
+		self._subscriptRequisitionHeight = max( self._childRequisitions[self.LEFTSUB].y, self._childRequisitions[self.RIGHTSUB].y )
+		
+		self._superscriptOverlap = min( self._superscriptRequisitionHeight, self._mainRequisitionHeight ) / 3.0
+		self._subscriptOverlap = min( self._subscriptRequisitionHeight, self._mainRequisitionHeight ) / 3.0
 
-		if self._rightChild is not None:
-			self._rightChildRequisition.y = self._rightChild._f_getRequisitionHeight()
-		else:
-			self._rightChildRequisition.y = 0.0
-
-		self._overlap = min( self._leftChildRequisition.y, self._rightChildRequisition.y ) / 3.0
-
-		return self._leftChildRequisition.y + max( self._overlap, self._rightChildRequisition.y - self._overlap )
+		return max( self._superscriptOverlap, self._superscriptRequisitionHeight - self._superscriptOverlap )  +  self._mainRequisitionHeight  +  max( self._subscriptOverlap, self._subscriptRequisitionHeight - self._subscriptOverlap )
 
 
 	def _o_onAllocateX(self, allocation):
-		padding = max( ( allocation - self._requiredSize.x ) * 0.5, 0.0 )
+		padding = max( ( allocation - self._requiredSize.x )  *  0.5, 0.0 )
 		x = padding
-		if self._leftChild is not None:
-			self._o_allocateChildX( self._leftChild, x, self._leftChildRequisition.x )
-			x += self._leftChildRequisition.x
+		
+		# Allocate left children
+		bSpaceNext = False
+		if self._children[self.LEFTSUPER] is not None:
+			self._o_allocateChildX( self._children[self.LEFTSUPER], x  +  ( self._leftRequisitionWidth - self._childRequisitions[self.LEFTSUPER].x ), self._childRequisitions[self.LEFTSUPER].x )
+			bSpaceNext = True
+		if self._children[self.LEFTSUB] is not None:
+			self._o_allocateChildX( self._children[self.LEFTSUB], x  +  ( self._leftRequisitionWidth - self._childRequisitions[self.LEFTSUB].x ), self._childRequisitions[self.LEFTSUB].x )
+			bSpaceNext = True
+		
+		x += self._leftRequisitionWidth
 
-		if self._rightChild is not None:
-			x += self._spacing
-			self._o_allocateChildX( self._rightChild, x, self._rightChildRequisition.x )
+		# Allocate main child
+		if self._children[self.MAIN] is not None:
+			if bSpaceNext:
+				x += self._spacing
+			self._o_allocateChildX( self._children[self.MAIN], x, self._mainRequisitionWidth )
+			bSpaceNext = True
+			
+		x += self._mainRequisitionWidth
+
+		# Allocate right children
+		if self._children[self.RIGHTSUPER] is not None:
+			if bSpaceNext:
+				x += self._spacing
+				bSpaceNext = False
+			self._o_allocateChildX( self._children[self.RIGHTSUPER], x, self._childRequisitions[self.RIGHTSUPER].x )
+		if self._children[self.RIGHTSUB] is not None:
+			if bSpaceNext:
+				x += self._spacing
+				bSpaceNext = False
+			self._o_allocateChildX( self._children[self.RIGHTSUB], x, self._childRequisitions[self.RIGHTSUB].x )
 
 
 	def _o_onAllocateY(self, allocation):
 		padding = max( ( allocation - self._requiredSize.y ) * 0.5, 0.0 )
-
-		if self._mode == self.SUPERSCRIPT:
-			rightY = padding
-			leftY = padding + self._rightChildRequisition.y - self._overlap
-		elif self._mode == self.SUBSCRIPT:
-			leftY = padding
-			rightY = padding + self._leftChildRequisition.y - self._overlap
-
-		if self._leftChild is not None:
-			self._o_allocateChildY( self._leftChild, leftY, self._leftChildRequisition.y )
-
-		if self._rightChild is not None:
-			self._o_allocateChildY( self._rightChild, rightY, self._rightChildRequisition.y )
-
+		
+		
+		# Allocate superscript children
+		y = padding
+		if self._children[self.LEFTSUPER] is not None:
+			self._o_allocateChildY( self._children[self.LEFTSUPER], y  +  ( self._superscriptRequisitionHeight - self._childRequisitions[self.LEFTSUPER].y ), self._childRequisitions[self.LEFTSUPER].y )
+		if self._children[self.RIGHTSUPER] is not None:
+			self._o_allocateChildY( self._children[self.RIGHTSUPER], y  +  ( self._superscriptRequisitionHeight - self._childRequisitions[self.RIGHTSUPER].y ), self._childRequisitions[self.RIGHTSUPER].y )
+			
+		# Allocate main children
+		y = padding  +  self._superscriptRequisitionHeight - self._superscriptOverlap
+		if self._children[self.MAIN] is not None:
+			self._o_allocateChildY( self._children[self.MAIN], y, self._childRequisitions[self.MAIN].y )
+		
+		# Allocate subscript children
+		y = padding  +  ( self._superscriptRequisitionHeight - self._superscriptOverlap )  +  ( self._mainRequisitionHeight - self._subscriptOverlap )
+		if self._children[self.LEFTSUB] is not None:
+			self._o_allocateChildY( self._children[self.LEFTSUB], y, self._childRequisitions[self.LEFTSUB].y )
+		if self._children[self.RIGHTSUB] is not None:
+			self._o_allocateChildY( self._children[self.RIGHTSUB], y, self._childRequisitions[self.RIGHTSUB].y )
 
 
 	def _o_onChildResizeRequest(self, child):
@@ -159,10 +218,9 @@ class DTScript (DTContainer):
 
 
 	def _f_refreshScale(self, scale, rootScale):
-		if self._leftChild is not None:
-			self._leftChild._f_setScale( self._childScale, rootScale * self._childScale )
-		if self._rightChild is not None:
-			self._rightChild._f_setScale( self._childScale, rootScale * self._childScale )
+		for slot in self.childSlots:
+			if self._children[slot] is not None:
+				self._children[slot]._f_setScale( self._childScale, rootScale * self._childScale )
 
 
 
@@ -172,36 +230,36 @@ class DTScript (DTContainer):
 	#
 
 	def _o_getFirstCursorEntity(self):
-		if self._leftChild is not None:
-			return self._leftChild.getFirstCursorEntity()
-		elif self._rightChild is not None:
-			return self._rightChild.getFirstCursorEntity()
-		else:
-			return None
+		for slot in self.childSlots:
+			if self._children[slot] is not None:
+				return self._children[slot].getFirstCursorEntity()
+		return None
 
 
 	def _o_getLastCursorEntity(self):
-		if self._rightChild is not None:
-			return self._rightChild.getLastCursorEntity()
-		elif self._leftChild is not None:
-			return self._leftChild.getLastCursorEntity()
-		else:
-			return None
+		for slot in reversed( self.childSlots ):
+			if self._children[slot] is not None:
+				return self._children[slot].getFirstCursorEntity()
+		return None
 		
 		
 	
 	def _o_getPrevCursorEntityBeforeChild(self, child):
-		if child is self._rightChild  and  self._leftChild is not None:
-			return self._leftChild.getLastCursorEntity()
-		else:
-			return None
+		index = self._children.index( child )
+		if index != self.RIGHTSUB:
+			for slot in reversed( self.childSlots[:index] ):
+				if self._children[slot] is not None:
+					return self._children[slot].getLastCursorEntity()
+		return None
 	
 		
 	def _o_getNextCursorEntityAfterChild(self, child):
-		if child is self._leftChild  and  self._rightChild is not None:
-			return self._rightChild.getFirstCursorEntity()
-		else:
-			return None
+		index = self._children.index( child )
+		if index != self.RIGHTSUB:
+			for slot in self.childSlots[index+1:]:
+				if self._children[slot] is not None:
+					return self._children[slot].getFirstCursorEntity()
+		return None
 	
 	
 	#
@@ -209,20 +267,18 @@ class DTScript (DTContainer):
 	#
 	
 	def horizontalNavigationList(self):
-		children = []
-		if self._leftChild is not None:
-			children.append( self._leftChild )
-		if self._rightChild is not None:
-			children.append( self._rightChild )
-		return children
+		return [ child   for child in self._children   if child is not None ]
 
 	def verticalNavigationList(self):
 		return []
 
 
 
-	leftChild = property( getLeftChild, setLeftChild )
-	rightChild = property( getRightChild, setRightChild )
+	leftSuperscriptChild = property( getLeftSuperscriptChild, setLeftSuperscriptChild )
+	leftSubscriptChild = property( getLeftSubscriptChild, setLeftSubscriptChild )
+	mainChild = property( getMainChild, setMainChild )
+	rightSuperscriptChild = property( getRightSuperscriptChild, setRightSuperscriptChild )
+	rightSubscriptChild = property( getRightSubscriptChild, setRightSubscriptChild )
 	childScale = property( getChildScale, setChildScale )
 
 
@@ -238,6 +294,9 @@ if __name__ == '__main__':
 
 	from Britefury.DocPresent.Toolkit.DTLabel import DTLabel
 	from Britefury.DocPresent.Toolkit.DTDocument import DTDocument
+	from Britefury.DocPresent.Toolkit.DTBox import DTBox
+	from Britefury.DocPresent.Toolkit.DTDirection import DTDirection
+	from Britefury.DocPresent.Toolkit.DTActiveBorder import DTActiveBorder
 	import cairo
 	from Britefury.Math.Math import Colour3f
 	import traceback
@@ -255,23 +314,61 @@ if __name__ == '__main__':
 	window.set_size_request( 300, 100 )
 
 	doc = DTDocument()
-	doc.show()
+	doc.getGtkWidget().show()
+	
+	
+	def makeScriptWidget(mainText, leftSuperText, leftSubText, rightSuperText, rightSubText):
+		main = DTLabel( mainText )
+		script = DTScript()
+		
+		script.mainChild = main
+		
+		if leftSuperText is not None:
+			script.leftSuperscriptChild = DTLabel( leftSuperText )
+		if leftSubText is not None:
+			script.leftSubscriptChild = DTLabel( leftSubText )
+		if rightSuperText is not None:
+			script.rightSuperscriptChild = DTLabel( rightSuperText )
+		if rightSubText is not None:
+			script.rightSubscriptChild = DTLabel( rightSubText )
+		
+		border = DTActiveBorder()
+		border.child = script
+			
+		return border
+	
+	
+	box = DTBox( DTDirection.TOP_TO_BOTTOM )
+	for i in xrange( 0, 16 ):
+		if ( i & 1 )  !=  0:
+			leftSuperText = 'left super'
+		else:
+			leftSuperText = None
+		
+		if ( i & 2 )  !=  0:
+			leftSubText = 'left sub'
+		else:
+			leftSubText = None
 
-	label1 = DTLabel( 'x' )
-	label2 = DTLabel( '2' )
-	label3 = DTLabel( '\'Hi\'' )
+		if ( i & 4 )  !=  0:
+			rightSuperText = 'right super'
+		else:
+			rightSuperText = None
 
-	script1 = DTScript( DTScript.SUPERSCRIPT )
-	script1.leftChild = label1
-	script1.rightChild = label2
-	script2 = DTScript( DTScript.SUBSCRIPT )
-	script2.leftChild = script1
-	script2.rightChild = label3
+		if ( i & 8 )  !=  0:
+			rightSubText = 'right sub'
+		else:
+			rightSubText = None
+			
+		script = makeScriptWidget( 'MAIN%d'  %  ( i, ), leftSuperText, leftSubText, rightSuperText, rightSubText )
+		
+		box.append( script )
 
-	doc.child = script2
+
+	doc.child = box
 
 
-	window.add( doc )
+	window.add( doc.getGtkWidget() )
 	window.show_all()
 
 	gtk.main()
