@@ -56,12 +56,90 @@
 										
 										($# "HBox")
 										( ($hbox (: @x ^))
-											($hbox ($hbox ($list ($label "HBox(") ($viewEval @x (@viewExpressionFactory <-> @viewViewSpecial)) ($label ")"))))
+											($activeBorder
+												($vbox ($list
+													($label "HBox")
+													($viewEval @x (@viewExpressionFactory <-> @viewViewSpecial))
+												))
+											)
 										)
 										
 										($# "VBox")
 										( ($vbox (: @x ^))
-											($vbox ($hbox ($list ($label "VBox(") ($viewEval @x (@viewExpressionFactory <-> @viewViewSpecial)) ($label ")"))))
+											($activeBorder
+												($vbox ($list
+													($label "VBox")
+													($viewEval @x (@viewExpressionFactory <-> @viewViewSpecial))
+												))
+											)
+										)
+
+										($# "Script")
+										( ($script (: @main ^) (: @lsuper ^) (: @lsub ^) (: @rsuper ^) (: @rsub ^))
+											($activeBorder
+												($vbox ($list
+													($label "Script")
+													($script
+														($viewEval @main (@viewExpressionFactory <-> @viewViewSpecial))
+														($viewEval @lsuper (@viewExpressionFactory <-> @viewViewSpecial))
+														($viewEval @lsub (@viewExpressionFactory <-> @viewViewSpecial))
+														($viewEval @rsuper (@viewExpressionFactory <-> @viewViewSpecial))
+														($viewEval @rsub (@viewExpressionFactory <-> @viewViewSpecial))
+													)
+												))
+											)
+										)
+										
+										($# "Script left superscript")
+										( ($scriptLSuper (: @main ^) (: @scriptChild ^))
+											($activeBorder
+												($vbox ($list
+													($label "Script - left super")
+													($scriptLSuper
+														($viewEval @main (@viewExpressionFactory <-> @viewViewSpecial))
+														($viewEval @scriptChild (@viewExpressionFactory <-> @viewViewSpecial))
+													)
+												))
+											)
+										)
+										
+										($# "Script left subscript")
+										( ($scriptLSub (: @main ^) (: @scriptChild ^))
+											($activeBorder
+												($vbox ($list
+													($label "Script - left sub")
+													($scriptLSub
+														($viewEval @main (@viewExpressionFactory <-> @viewViewSpecial))
+														($viewEval @scriptChild (@viewExpressionFactory <-> @viewViewSpecial))
+													)
+												))
+											)
+										)
+										
+										($# "Script right superscript")
+										( ($scriptRSuper (: @main ^) (: @scriptChild ^))
+											($activeBorder
+												($vbox ($list
+													($label "Script - right super")
+													($scriptRSuper
+														($viewEval @main (@viewExpressionFactory <-> @viewViewSpecial))
+														($viewEval @scriptChild (@viewExpressionFactory <-> @viewViewSpecial))
+													)
+												))
+											)
+										)
+										
+										($# "Script right subscript")
+										( ($scriptRSub (: @main ^) (: @scriptChild ^))
+											($activeBorder
+												($vbox ($list
+													($label "Script - right sub")
+													($scriptRSub
+														($viewEval @main (@viewExpressionFactory <-> @viewViewSpecial))
+														($viewEval @scriptChild (@viewExpressionFactory <-> @viewViewSpecial))
+													)
+												))
+											)
 										)
 										
 										($# "Unknown")
@@ -111,52 +189,69 @@
 							)
 							
 							($# "View a match pattern")
-							(@viewMatchPattern
-								($lambda (@node)
-									($match @node
-										($# "Any non-list")
-										( !!
-											($activeBorder ($label "!"))
-										)
-										
-										($# "Any list")
-										( //
-											($activeBorder ($label "(..)"))
-										)
-										
-										($# "Anything")
-										( ^^
-											($activeBorder ($label "^"))
-										)
-										
-										($# "List internal 0+")
-										( **
-											($activeBorder ($label "..*"))
-										)
-
-										($# "List internal 1+")
-										( ++
-											($activeBorder ($label "..+"))
-										)
-										
-										($# "Constant")
-										( (: @constantValue !)
-											($activeBorder ($label @constantValue))
-										)
-										
-										($# "List internal min to max")
-										( (-- (: @min !) (: @max !))
-											($activeBorder ($label (((".." + @min) + "-") + @max)))
-										)
-										
-										($# "Bind")
-										( (:: (: @varName !) (: @subPattern ^))
-											($activeBorder ($hbox ($list ($label @varName) ($label ":") ($viewEval @subPattern @viewMatchPattern))))
-										)
-										
-										($# "List pattern")
-										( (: @listPattern /)
-											($activeBorder ($hbox ((($list ($label "(")) + ($mapViewEval @listPattern @viewMatchPattern)) + ($list ($label ")"))) ) )
+							(@viewMatchPatternFactory
+								($lambda (@viewSpecial)
+									($lambda (@node)
+										($match @node
+											($# "Any non-list")
+											( !!
+												($activeBorder ($label "!"))
+											)
+											
+											($# "Any list")
+											( //
+												($activeBorder ($label "(..)"))
+											)
+											
+											($# "Anything")
+											( ^^
+												($activeBorder ($label "^"))
+											)
+											
+											($# "List internal 0+")
+											( **
+												($activeBorder ($scriptRSuper ($label "..") ($label "*")))
+											)
+	
+											($# "List internal 1+")
+											( ++
+												($activeBorder ($scriptRSuper ($label "..") ($label "+")))
+											)
+											
+											($# "Constant")
+											( (: @constantValue !)
+												($activeBorder ($label @constantValue))
+											)
+											
+											($# "List internal min to max")
+											( (-- (: @min !) (: @max !))
+												($activeBorder ($scriptRSuper ($label "..") ($label ((@min + "-") + @max))))
+											)
+											
+											($# "Bind")
+											( (:: (: @varName !) (: @subPattern ^))
+												($activeBorder ($scriptLSub ($viewEval @subPattern (@viewMatchPatternFactory <-> @viewSpecial)) ($label @varName)))
+											)
+											
+											($# "Condition")
+											( (?? (: @varName !) (: @conditionExpr ^) (: @subPattern ^))
+												($activeBorder
+													($scriptRSub
+														($viewEval @subPattern (@viewMatchPatternFactory <-> @viewSpecial))
+														($hbox
+															($list
+																($label "?(") ($label @varName) ($label ")=")
+																($viewEval @conditionExpr (@viewExpressionFactory <-> @viewSpecial))
+															)
+														)
+													)
+												)
+											)
+											
+											($# "List pattern")
+											( (: @listPattern /)
+												($activeBorder ($hbox ((($list ($label "(")) + ($mapViewEval @listPattern (@viewMatchPatternFactory <-> @viewSpecial))) + ($list ($label ")"))) ) )
+											)
 										)
 									)
 								)
@@ -172,7 +267,7 @@
 											)
 										
 											(  ((: @pattern ^) (: @expressions *))
-												($activeBorder ($hbox ($list ($viewEval @pattern @viewMatchPattern) ($label ":") ($vbox ($mapViewEval @expressions (@viewExpressionFactory <-> @viewSpecial)) ))))
+												($activeBorder ($hbox ($list ($viewEval @pattern (@viewMatchPatternFactory <-> @viewSpecial)) ($label ":") ($vbox ($mapViewEval @expressions (@viewExpressionFactory <-> @viewSpecial)) ))))
 											)
 										)
 									)
@@ -270,7 +365,7 @@
 											)
 
 											($# "Addition")
-											( ( (: @a ^) + (: @b ^) )
+											( ( (: @a ^) "++" (: @b ^) )
 												($activeBorder
 													($hbox ($list ($viewEval @a (@viewExpressionFactory <-> @viewSpecial)) ($label "+") ($viewEval @b (@viewExpressionFactory <-> @viewSpecial))))
 												)
@@ -281,6 +376,16 @@
 												($activeBorder
 													($hbox
 														((($list ($viewEval @a (@viewExpressionFactory <-> @viewSpecial)) ($label "("))  +  ($mapViewEval @params (@viewExpressionFactory <-> @viewSpecial))) +
+															($list ($label ")")))
+													)
+												)
+											)
+
+											($# "Method call")
+											( ( (: @a ^) (: @methodName !) (: @params *) )
+												($activeBorder
+													($hbox
+														((($list ($viewEval @a (@viewExpressionFactory <-> @viewSpecial)) ($label ".") ($label @methodName) ($label "("))  +  ($mapViewEval @params (@viewExpressionFactory <-> @viewSpecial))) +
 															($list ($label ")")))
 													)
 												)
