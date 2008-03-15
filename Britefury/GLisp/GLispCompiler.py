@@ -371,6 +371,9 @@ def _compileMatch(xs, context, bNeedResult, compileSpecial):
 
 
 
+class GLispCompilerSyntaxError (PyCodeGenError):
+	pass
+
 class GLispCompilerInvalidLiteral (PyCodeGenError):
 	pass
 
@@ -456,6 +459,7 @@ def _compileGLispExprToPyTree(xs, context, bNeedResult=False, compileSpecial=Non
 				return PyCall( _compileGLispExprToPyTree( xs[0], context, True, compileSpecial ), [ _compileGLispExprToPyTree( e, context, True, compileSpecial )   for e in xs[2:] ], dbgSrc=xs )
 			else:
 				return PyMethodCall( _compileGLispExprToPyTree( xs[0], context, True, compileSpecial ), xs[1], [ _compileGLispExprToPyTree( e, context, True, compileSpecial )   for e in xs[2:] ], dbgSrc=xs )
+	raise GLispCompilerSyntaxError( xs )
 
 
 def compileGLispExprToPyTrees(xs, compileSpecial=None, ):
@@ -615,22 +619,35 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 			print 'FULL RESULT'
 			print result
 
-	def testNone(self):
-		self._compileTest( '`nil`', 'None' )
-		self._evalTest( '`nil`', None )
+	def testSyntaxError(self):
+		self._compileTest( 'a', GLispCompilerSyntaxError )
 
 	def testVar(self):
 		self._compileTest( '@a', 'a' )
 		self._evalTest( '@a', 2, [ ( 'a', 2 ) ] )
 
-	def testNumLit(self):
+	def testNone(self):
+		self._compileTest( '#None', 'None' )
+		self._evalTest( '#None', None )
+
+	def testBool(self):
+		self._compileTest( '#False', 'False' )
+		self._compileTest( '#True', 'True' )
+		self._evalTest( '#False', False )
+		self._evalTest( '#True', True )
+
+	def testIntLit(self):
 		self._compileTest( '#1', '1' )
 		self._evalTest( '#1', 1 )
 
+	def testFloatLit(self):
+		self._compileTest( '#1.1', repr( 1.1 ) )
+		self._evalTest( '#1.1', 1.1 )
+
 	def testStrLit(self):
-		self._compileTest( 'a', '\'a\'' )
-		self._compileTest( '1', '\'1\'' )
-		self._evalTest( 'a', 'a' )
+		self._compileTest( "\"#'a\"", '\'a\'' )
+		self._compileTest( "\"#'1\"", '\'1\'' )
+		self._evalTest( "\"#'a\"", 'a' )
 
 
 
@@ -694,7 +711,7 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 	def testMethodCall(self):
 		self._compileTest( '(@a foo)', 'a.foo()' )
 		self._compileTest( '(@a foo @b @c)', 'a.foo( b, c )' )
-		self._evalTest( '(f upper)', 'F' )
+		self._evalTest( "(\"#'f\" upper)", 'F' )
 
 
 	def test_Where(self):
@@ -702,7 +719,7 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 		($where
 		  (
 		    (@a #1)
-		    (@b test)
+		    (@b "#'test")
 	          )
 		  (@b split)
 		  (@a + #1)
@@ -725,14 +742,14 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 		xssrc2 = """
 		($where
 		  (
-		    (@a 1)
-		    (@b test)
+		    (@a "#'1")
+		    (@b "#'test")
 		  )
 		  (@b split)
 		  ($where
 		    (
 		      (@c #1)
-		      (@d test)
+		      (@d "#'test")
 		    )
 		    (@d split)
 		  )
@@ -765,8 +782,8 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 		    (@b
 		      ($where
 		        (
-			  (@x abc)
-			  (@y def)
+			  (@x "#'abc")
+			  (@y "#'def")
 			)
 			(@x + @y)
 		      )
@@ -797,7 +814,7 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 		($where
 		  (
 		    (@a #1)
-		    (@b test)
+		    (@b "#'test")
 		  )
 		)
 		"""
@@ -837,9 +854,9 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 		self._compileTest( xssrc3, pysrc3 )
 		self._compileTest( xssrc4, pysrc4 )
 		self._compileTest( xssrc5, pysrc5 )
-		self._evalTest( '($where   (  (@a hi) (@b there)  )   @a )', 'hi' )
-		self._evalTest( '($where   (  (@a hi) (@b there)  )   @b )', 'there' )
-		self._evalTest( '($where   (  (@a hi) (@b there)  )   ((@a + @b) upper))', 'HITHERE' )
+		self._evalTest( """($where   (  (@a "#'hi") (@b "#'there")  )   @a )""", 'hi' )
+		self._evalTest( """($where   (  (@a "#'hi") (@b "#'there")  )   @b )""", 'there' )
+		self._evalTest( """($where   (  (@a "#'hi") (@b "#'there")  )   ((@a + @b) upper))2""", 'HITHERE' )
 
 
 		
@@ -880,12 +897,12 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 			'__gsym__if_result_0',
 		]
 		
-		self._compileTest( '($if   ( (@a == Hi)  (@a split) )  )', pysrc1 )
-		self._compileTest( '($if   ( (@a == Hi)  (@a split) )   ( $else (@c split) )  )', pysrc2 )
-		self._compileTest( '($if   ( (@a == Hi)  (@a split) )   ( (@b == There) (@b split) )  )', pysrc3 )
-		self._compileTest( '($if   ( (@a == Hi)  (@a split) )   ( (@b == There) (@b split) )   ( $else (@c split) )  )', pysrc4 )
-		self._evalTest( '($if   ( (@a == #1)  hi)   ( (@a == #2) there) )', 'hi', [ ( 'a', 1 ) ] )
-		self._evalTest( '($if   ( (@a == #1)  hi)   ( (@a == #2) there) )', None, [ ( 'a', 4 ) ] )
+		self._compileTest( '($if   ( (@a == "#\'Hi")  (@a split) )  )', pysrc1 )
+		self._compileTest( '($if   ( (@a == "#\'Hi")  (@a split) )   ( $else (@c split) )  )', pysrc2 )
+		self._compileTest( '($if   ( (@a == "#\'Hi")  (@a split) )   ( (@b == "#\'There") (@b split) )  )', pysrc3 )
+		self._compileTest( '($if   ( (@a == "#\'Hi")  (@a split) )   ( (@b == "#\'There") (@b split) )   ( $else (@c split) )  )', pysrc4 )
+		self._evalTest( '($if   ( (@a == #1)  "#\'hi")   ( (@a == #2) "#\'there") )', 'hi', [ ( 'a', 1 ) ] )
+		self._evalTest( '($if   ( (@a == #1)  "#\'hi")   ( (@a == #2) "#\'there") )', None, [ ( 'a', 4 ) ] )
 
 	
 	def test_Lambda(self):
@@ -903,21 +920,21 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 		
 	def test_Match(self):
 		xssrc1 = """
-		($match ($list a b c d e f g h)
+		($match ($list "#'a" "#'b" "#'c" "#'d" "#'e" "#'f" "#'g" "#'h")
 		   (   (a b (: @a !) (: @b !) (: @c *))   ($list @a @b @c)   )
 		)
 		"""
 		
 		xssrc2 = """
-		($match ($list a b c d e f g h)
+		($match ($list "#'a" "#'b" "#'c" "#'d" "#'e" "#'f" "#'g" "#'h")
 		   (   (a b (: @a !) (: @b !) (: @c *))   ($list @a @b @c)   )
 		   (   (x b (: @a !) (: @b !) (: @c *))   ($list @a @b @c)   )
 		)
 		"""
 		
 		xssrc3 = """
-		($match ($list a b c deadbeef e f g h)
-		   (   (a b (: @a !) (? @x (@x startswith dead) (: @b !)) (: @c *))   ($list @a @b @c)   )
+		($match ($list "#'a" "#'b" "#'c" "#'deadbeef" "#'e" "#'f" "#'g" "#'h")
+		   (   (a b (: @a !) (? @x (@x startswith "#\'dead") (: @b !)) (: @c *))   ($list @a @b @c)   )
 		)
 		"""
 		
@@ -1108,7 +1125,7 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 		xssrc1 = """
 		($where
 		  (
-		    (@a ($list a b c d e f g h))
+		    (@a ($list "#'a" "#'b" "#'c" "#'d" "#'e" "#'f" "#'g" "#'h"))
 		    (@b #2)
 		  )
 		  ($match @a
@@ -1148,7 +1165,7 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 		
 	def test_Match_Where(self):
 		xssrc1 = """
-		($match ($list a b c d e f g h)
+		($match ($list "#'a" "#'b" "#'c" "#'d" "#'e" "#'f" "#'g" "#'h")
 		   (   (a b (: @a !) (: @b !) (: @c *))
 		       ($where
 		         (

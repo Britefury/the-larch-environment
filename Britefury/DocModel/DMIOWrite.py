@@ -19,7 +19,6 @@ Uses basic S-expressions
 lists are (...) as normal
 tokens inside are:
 	atom:   A-Z a-z 0.9 _+-*/%^&|!$@.,<>=[]~
-	nil:		`nil`
 	quoted string
 	double quoted string
 	another list
@@ -40,21 +39,18 @@ def needsQuotes(s):
 ## WRITING FUNCTIONS
 
 def __writesx__(stream, content):
-	if content is None:
-		stream.write( '`nil`' )
-	else:
-		try:
-			w = content.__writesx__
-		except AttributeError:
-			if isinstance( content, str ):
-				if needsQuotes( content ):
-					stream.write( repr( content ) )
-				else:
-					stream.write( content )
-			elif isinstance( content, unicode ):
+	try:
+		w = content.__writesx__
+	except AttributeError:
+		if isinstance( content, str ):
+			if needsQuotes( content ):
 				stream.write( repr( content ) )
-		else:
-			w( stream )
+			else:
+				stream.write( content )
+		elif isinstance( content, unicode ):
+			stream.write( repr( content ) )
+	else:
+		w( stream )
 
 
 def writeSX(stream, content):
@@ -86,11 +82,11 @@ class TestCase_DMIOWrite (unittest.TestCase):
 		g = DMList()
 		g.extend( [ 'g', h, 'Hi ' ] )
 		f = DMList()
-		f.extend( [ 'f', g, ' There', None ] )
+		f.extend( [ 'f', g, ' There' ] )
 
 		stream = cStringIO.StringIO()
 		writeSX( stream, f )
-		self.assert_( stream.getvalue() == '(f (g (h 1 2L 3.0) \'Hi \') \' There\' `nil`)' )
+		self.assert_( stream.getvalue() == '(f (g (h 1 2L 3.0) \'Hi \') \' There\')' )
 
 
 
