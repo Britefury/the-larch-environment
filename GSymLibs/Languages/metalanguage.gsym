@@ -10,7 +10,7 @@
 								($lambda (@node)
 									($match @node
 										($# "Unknown")
-										( (: @x ^)  (@log <- (@gLispAsString <- @x)) ($activeBorder ($label "#'#SPECIAL-ERROR#")) )
+										( (: @x ^)  (@log <- (@gLispAsString <- @x)) ($activeBorder ($label u"#'\u2620 SPECIAL-ERROR \u2620")) )
 									)
 								)
 							)
@@ -143,7 +143,7 @@
 										)
 										
 										($# "Unknown")
-										( (: @x ^)  (@log <- (@gLispAsString <- @x)) ($activeBorder ($label "#'SPECIAL-ERROR>")) )
+										( (: @x ^)  (@log <- (@gLispAsString <- @x)) ($activeBorder ($label u"#'\u2620 SPECIAL-ERROR \u2620")) )
 									)
 								)
 							)
@@ -267,7 +267,7 @@
 											)
 										
 											(  ((: @pattern ^) (: @expressions *))
-												($activeBorder ($hbox ($list ($viewEval @pattern (@viewMatchPatternFactory <- @viewSpecial)) ($label "#':") ($vbox ($mapViewEval @expressions (@viewExpressionFactory <- @viewSpecial)) ))))
+												($activeBorder ($hbox ($list ($viewEval @pattern (@viewMatchPatternFactory <- @viewSpecial)) ($label u"#'\u21d2") ($vbox ($mapViewEval @expressions (@viewExpressionFactory <- @viewSpecial)) ))))
 											)
 										)
 									)
@@ -423,7 +423,7 @@
 											)
 
 											($# "Unknown")
-											( (: @x ^)  (@log <- (@gLispAsString <- @x)) ($activeBorder ($label "#'<ERROR>")) )
+											( (: @x ^)  (@log <- (@gLispAsString <- @x)) ($activeBorder ($label u"#'\u2620 ERROR \u2620")) )
 										)
 									)
 								)
