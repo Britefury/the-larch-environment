@@ -21,37 +21,80 @@
 									($match @node
 										($# "View eval, no factory")
 										( ($viewEval (: @x ^))
-											($activeBorder ($hbox ($list ($label "#'ViewEval(") ($viewEval @x (@viewExpressionFactory <- @viewViewSpecial)) ($label "#')"))))
+											($activeBorder
+												($hbox ($list
+													($label "#'ViewEval(")
+													($viewEval @x (@viewExpressionFactory <- @viewViewSpecial))
+													($label "#')")
+												))
+											)
 										)
 										
 										($# "View eval, with factory")
 										( ($viewEval (: @x ^) (: @fac ^))
-											($activeBorder ($hbox ($list ($label "#'ViewEval(") ($viewEval @x (@viewExpressionFactory <- @viewViewSpecial)) ($label "#'WITH") ($viewEval @fac (@viewExpressionFactory <- @viewViewSpecial)) ($label "#')"))))
+											($activeBorder
+												($hbox ($list
+													($label "#'ViewEval(")
+													($viewEval @x (@viewExpressionFactory <- @viewViewSpecial))
+													($label "#'WITH")
+													($viewEval @fac (@viewExpressionFactory <- @viewViewSpecial))
+													($label "#')")
+												))
+											)
 										)
 										
 										($# "Map View eval, no factory")
 										( ($mapViewEval (: @x ^))
-											($activeBorder ($hbox ($list ($label "#'MapViewEval(") ($viewEval @x (@viewExpressionFactory <- @viewViewSpecial)) ($label "#')"))))
+											($activeBorder
+												($hbox ($list
+													($label "#'MapViewEval(")
+													($viewEval @x (@viewExpressionFactory <- @viewViewSpecial))
+													($label "#')")
+												))
+											)
 										)
 										
 										($# "Map View eval, with factory")
 										( ($mapViewEval (: @x ^) (: @fac ^))
-											($activeBorder ($hbox ($list ($label "#'MapViewEval(") ($viewEval @x (@viewExpressionFactory <- @viewViewSpecial)) ($label "#'WITH") ($viewEval @fac (@viewExpressionFactory <- @viewViewSpecial)) ($label "#')"))))
+											($activeBorder
+												($hbox ($list
+													($label "#'MapViewEval(")
+													($viewEval @x (@viewExpressionFactory <- @viewViewSpecial))
+													($label "#'WITH")
+													($viewEval @fac (@viewExpressionFactory <- @viewViewSpecial))
+													($label "#')")
+												))
+											)
 										)
 										
 										($# "Active border")
 										( ($activeBorder (: @x ^))
-											($activeBorder ($hbox ($list ($label "#'ActiveBorder(") ($viewEval @x (@viewExpressionFactory <- @viewViewSpecial)) ($label "#')"))))
+											($activeBorder
+												($vbox ($list
+													($label "#'ActiveBorder")
+													($viewEval @x (@viewExpressionFactory <- @viewViewSpecial))
+												))
+											)
 										)
 										
 										($# "Label")
 										( ($label (: @x ^))
-											($activeBorder ($hbox ($list ($label "#'Label(") ($viewEval @x (@viewExpressionFactory <- @viewViewSpecial)) ($label "#')"))))
+											($activeBorder
+												($vbox ($list
+													($label "#'Label")
+													($viewEval @x (@viewExpressionFactory <- @viewViewSpecial))
+												))
+											)
 										)
 										
 										($# "Entry")
 										( ($entry (: @x ^))
-											($activeBorder ($hbox ($list ($label "#'Entry(") ($viewEval @x (@viewExpressionFactory <- @viewViewSpecial)) ($label "#')"))))
+											($activeBorder
+												($vbox ($list
+													($label "#'Entry")
+													($viewEval @x (@viewExpressionFactory <- @viewViewSpecial))
+												))
+											)
 										)
 										
 										($# "HBox")
@@ -165,7 +208,13 @@
 											)
 										
 											( ((: @varName !) (: @expression ^))
-												($activeBorder ($hbox ($list ($label @varName) ($label "#'=") ($viewEval @expression (@viewExpressionFactory <- @viewSpecial)))))
+												($activeBorder
+													($hbox ($list
+														($label @varName)
+														($label "#'=")
+														($viewEval @expression (@viewExpressionFactory <- @viewSpecial))
+													))
+												)
 											)
 										)
 									)
@@ -183,7 +232,9 @@
 							(@viewLambdaParamList
 								($lambda (@node)
 									($activeBorder
-										($hbox ((($list ($label "#'("))  +  ($mapViewEval @node @viewLambdaParam))  +  ($list ($label "#')"))))
+										($hbox
+											((($list ($label "#'("))  +  ($mapViewEval @node @viewLambdaParam))  +  ($list ($label "#')")))
+										)
 									)
 								)
 							)
@@ -238,19 +289,21 @@
 												($activeBorder
 													($scriptRSub
 														($viewEval @subPattern (@viewMatchPatternFactory <- @viewSpecial))
-														($hbox
-															($list
-																($label "#'?(") ($label (@varName [:] #1 #None)) ($label "#') =")
-																($viewEval @conditionExpr (@viewExpressionFactory <- @viewSpecial))
-															)
-														)
+														($hbox ($list
+															($label "#'?(") ($label (@varName [:] #1 #None)) ($label "#') =")
+															($viewEval @conditionExpr (@viewExpressionFactory <- @viewSpecial))
+														))
 													)
 												)
 											)
 											
 											($# "List pattern")
 											( (: @listPattern /)
-												($activeBorder ($hbox ((($list ($label "#'[")) + ($mapViewEval @listPattern (@viewMatchPatternFactory <- @viewSpecial))) + ($list ($label "#']"))) ) )
+												($activeBorder
+													($hbox
+														((($list ($label "#'[")) + ($mapViewEval @listPattern (@viewMatchPatternFactory <- @viewSpecial))) + ($list ($label "#']")))
+													)
+												)
 											)
 										)
 									)
@@ -267,7 +320,15 @@
 											)
 										
 											(  ((: @pattern ^) (: @expressions *))
-												($activeBorder ($hbox ($list ($viewEval @pattern (@viewMatchPatternFactory <- @viewSpecial)) ($label u"#'\u21d2") ($vbox ($mapViewEval @expressions (@viewExpressionFactory <- @viewSpecial)) ))))
+												($activeBorder
+													($hbox ($list
+														($viewEval @pattern (@viewMatchPatternFactory <- @viewSpecial))
+														($label u"#'\u21d2")
+														($vbox
+															($mapViewEval @expressions (@viewExpressionFactory <- @viewSpecial))
+														)
+													))
+												)
 											)
 										)
 									)
@@ -307,14 +368,18 @@
 											($# "List literal")
 											( ($list (: @elements *))
 												($activeBorder
-													($hbox ((($list ($label "#'["))  +  ($mapViewEval @elements (@viewExpressionFactory <- @viewSpecial)))  +  ($list ($label "#']"))))
+													($hbox
+														((($list ($label "#'["))  +  ($mapViewEval @elements (@viewExpressionFactory <- @viewSpecial)))  +  ($list ($label "#']")))
+													)
 												)
 											)
 
 											($# "Set literal")
 											( ($set (: @elements *))
 												($activeBorder
-													($hbox ((($list ($label "#'SET("))  +  ($mapViewEval @elements (@viewExpressionFactory <- @viewSpecial)))  +  ($list ($label "#')"))))
+													($hbox
+														((($list ($label "#'SET("))  +  ($mapViewEval @elements (@viewExpressionFactory <- @viewSpecial)))  +  ($list ($label "#')")))
+													)
 												)
 											)
 
@@ -323,8 +388,8 @@
 												($activeBorder
 													($vbox
 														((($list ($label "#'WHERE"))  +
-														 ($mapViewEval @bindings (@viewWhereBindingFactory <- @viewSpecial)))  +
-														 ($list ($hbox ($list ($label "#'=") ($vbox ($mapViewEval @expressions (@viewExpressionFactory <- @viewSpecial)))))))
+														($mapViewEval @bindings (@viewWhereBindingFactory <- @viewSpecial)))  +
+														($list ($hbox ($list ($label "#'=") ($vbox ($mapViewEval @expressions (@viewExpressionFactory <- @viewSpecial)))))))
 													)
 												)
 											)
@@ -332,9 +397,18 @@
 											($# "Lambda expression, with 0 or 1 expressions")
 											( ($lambda (: @params /) (: @expressions *))
 												($activeBorder
-													($hbox (($list
-														($hbox ($list ($label u"#'\u03bb") ($viewEval @params @viewLambdaParamList) ($label "#'=") ) )
-														)  +  ($mapViewEval @expressions (@viewExpressionFactory <- @viewSpecial)))
+													($hbox
+														(
+															($list
+																($hbox ($list
+																	($label u"#'\u03bb")
+																	($viewEval @params @viewLambdaParamList)
+																	($label "#'=")
+																))
+															)
+															+
+															($mapViewEval @expressions (@viewExpressionFactory <- @viewSpecial))
+														)
 													)
 												)
 											)
@@ -342,9 +416,18 @@
 											($# "Lambda expression 2 or more expressions")
 											( ($lambda (: @params /) (: @expressions (- #2 #None)))
 												($activeBorder
-													($vbox (($list
-														($hbox ($list ($label u"#'\u03bb") ($viewEval @params @viewLambdaParamList) ($label "#'=") ) )
-														)  +  ($mapViewEval @expressions (@viewExpressionFactory <- @viewSpecial)))
+													($vbox
+														(
+															($list
+																($hbox ($list
+																	($label u"#'\u03bb")
+																	($viewEval @params @viewLambdaParamList)
+																	($label "#'=")
+																))
+															)
+															+
+															($mapViewEval @expressions (@viewExpressionFactory <- @viewSpecial))
+														)
 													)
 												)
 											)
@@ -352,9 +435,18 @@
 											($# "Pattern match expression")
 											( ($match (: @expression ^) (: @matchPairs *))
 												($activeBorder
-													($vbox (($list
-														($hbox ($list ($label "#'MATCH") ($viewEval @expression (@viewExpressionFactory <- @viewSpecial)) ($label "#':") ) )
-														)  +  ($mapViewEval @matchPairs (@viewMatchPairFactory <- @viewSpecial)))
+													($vbox
+														(
+															($list
+																($hbox ($list
+																	($label "#'MATCH")
+																	($viewEval @expression (@viewExpressionFactory <- @viewSpecial))
+																	($label "#':")
+																))
+															)
+															+
+															($mapViewEval @matchPairs (@viewMatchPairFactory <- @viewSpecial))
+														)
 													)
 												)
 											)
@@ -370,14 +462,23 @@
 											($# "Get attribute")
 											( ( (: @a ^) . (: @attr !) )
 												($activeBorder
-													($hbox ($list ($viewEval @a (@viewExpressionFactory <- @viewSpecial)) ($label "#'.") ($label @attr)))
+													($hbox ($list
+														($viewEval @a (@viewExpressionFactory <- @viewSpecial))
+														($label "#'.")
+														($label @attr)
+													))
 												)
 											)
 
 											($# "Get item")
 											( ( (: @a ^) [] (: @key !) )
 												($activeBorder
-													($hbox ($list ($viewEval @a (@viewExpressionFactory <- @viewSpecial)) ($label "#'[") ($viewEval @key (@viewExpressionFactory <- @viewSpecial)) ($label "#']")))
+													($hbox ($list
+														($viewEval @a (@viewExpressionFactory <- @viewSpecial))
+														($label "#'[")
+														($viewEval @key (@viewExpressionFactory <- @viewSpecial))
+														($label "#']")
+													))
 												)
 											)
 
@@ -398,7 +499,11 @@
 											($# "Addition")
 											( ( (: @a ^) "++" (: @b ^) )
 												($activeBorder
-													($hbox ($list ($viewEval @a (@viewExpressionFactory <- @viewSpecial)) ($label "#'+") ($viewEval @b (@viewExpressionFactory <- @viewSpecial))))
+													($hbox ($list
+														($viewEval @a (@viewExpressionFactory <- @viewSpecial))
+														($label "#'+")
+														($viewEval @b (@viewExpressionFactory <- @viewSpecial))
+													))
 												)
 											)
 
@@ -406,8 +511,18 @@
 											( ( (: @a ^) "<-" (: @params *) )
 												($activeBorder
 													($hbox
-														((($list ($viewEval @a (@viewExpressionFactory <- @viewSpecial)) ($label "#'("))  +  ($mapViewEval @params (@viewExpressionFactory <- @viewSpecial))) +
-															($list ($label "#')")))
+														(
+															(
+																($list
+																	($viewEval @a (@viewExpressionFactory <- @viewSpecial))
+																	($label "#'(")
+																)
+																+
+																($mapViewEval @params (@viewExpressionFactory <- @viewSpecial))
+															)
+															+
+															($list ($label "#')"))
+														)
 													)
 												)
 											)
@@ -416,8 +531,20 @@
 											( ( (: @a ^) (: @methodName !) (: @params *) )
 												($activeBorder
 													($hbox
-														((($list ($viewEval @a (@viewExpressionFactory <- @viewSpecial)) ($label "#'.") ($label @methodName) ($label "#'("))  +  ($mapViewEval @params (@viewExpressionFactory <- @viewSpecial))) +
-															($list ($label "#')")))
+														(
+															(
+																($list
+																	($viewEval @a (@viewExpressionFactory <- @viewSpecial))
+																	($label "#'.")
+																	($label @methodName)
+																	($label "#'(")
+																)
+																+
+																($mapViewEval @params (@viewExpressionFactory <- @viewSpecial))
+															)
+															+
+															($list ($label "#')"))
+														)
 													)
 												)
 											)
@@ -436,9 +563,20 @@
 										( (! compilerDefinition (: @name !) (: @sourceFormat !) (: @targetFormat !) (: @specification *))
 											(
 												($activeBorder
-													($vbox (($list
-														($hbox ($list ($label "#'Compiler definition") ($label @name) ($label @sourceFormat) ($label "#'To:") ($label @targetFormat)))
-														)  +  ($mapViewEval @specification (@viewExpressionFactory <- @viewCompilerSpecial)))
+													($vbox
+														(
+															($list
+																($hbox ($list
+																	($label "#'Compiler definition")
+																	($label @name)
+																	($label @sourceFormat)
+																	($label "#'To:")
+																	($label @targetFormat)
+																))
+															)
+															+
+															($mapViewEval @specification (@viewExpressionFactory <- @viewCompilerSpecial))
+														)
 													)
 												)
 											)
@@ -446,9 +584,19 @@
 										( (! displayDefinition (: @name !) (: @format !) (: @specification *))
 											(
 												($activeBorder
-													($vbox (($list
-														($hbox ($list ($label "#'View definition") ($label @name) ($label "#'For:") ($label @format)))
-														)  +  ($mapViewEval @specification (@viewExpressionFactory <- @viewViewSpecial)))
+													($vbox
+														(
+															($list
+																($hbox ($list
+																	($label "#'View definition")
+																	($label @name)
+																	($label "#'For:")
+																	($label @format)
+																))
+															)
+															+
+															($mapViewEval @specification (@viewExpressionFactory <- @viewViewSpecial))
+														)
 													)
 												)
 											)
@@ -460,7 +608,9 @@
 							($# "View an language definition")
 							(@viewLanguageNode
 								($lambda (@node)
-									($activeBorder ($vbox ($mapViewEval @node @viewDefinitionNode)))
+									($activeBorder
+										($vbox ($mapViewEval @node @viewDefinitionNode))
+									)
 								)
 							)
 						)
