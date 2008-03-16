@@ -76,7 +76,7 @@ class DTDocument (DTBin):
 		self._dndBeginData = None
 
 
-		self._docWindowTopLeftCornerInDocSpace = Vector2()
+		self._docWindowTopLeftCornerInDocSpace = Point2()
 		self._docScaleInWindowCoords = 1.0
 		self._docDragStartPosWindowSpace = Point2()
 		self._docDragButton = None
@@ -139,12 +139,12 @@ class DTDocument (DTBin):
 	def _p_windowSpaceToDocSpace(self, w):
 		if isinstance( w, Point2 ):
 			w = w.toVector2()
-		return Point2( ( w  *  ( 1.0 / self._docScaleInWindowCoords ) )  +  self._docWindowTopLeftCornerInDocSpace )
+		return Point2( ( w  *  ( 1.0 / self._docScaleInWindowCoords ) )  +  self._docWindowTopLeftCornerInDocSpace.toVector2() )
 
 	def _p_docSpaceToWindowSpace(self, d):
 		if isinstance( d, Point2 ):
 			d = d.toVector2()
-		return Point2( ( d - self._docWindowTopLeftCornerInDocSpace )  *  self._docScaleInWindowCoords )
+		return Point2( ( d - self._docWindowTopLeftCornerInDocSpace.toVector2() )  *  self._docScaleInWindowCoords )
 
 	
 	def _p_windowSpaceSizeToDocSpace(self, w):
@@ -156,14 +156,11 @@ class DTDocument (DTBin):
 	
 	def oneToOne(self):
 		# We want to scale about the centre of the document, not the top left corner
-		centreInWindowSpace = self._documentSize * 0.5
-		centreInDocSpace = self._p_windowSpaceToDocSpace( centreInWindowSpace )
 		self._docScaleInWindowCoords = 1.0
-		self._docWindowTopLeftCornerInDocSpace = centreInDocSpace  -  centreInWindowSpace
 		self._p_queueFullRedraw()
 
 	def reset(self):
-		self._docWindowTopLeftCornerInDocSpace = Vector2()
+		self._docWindowTopLeftCornerInDocSpace = Point2()
 		self._docScaleInWindowCoords = 1.0
 		self._p_queueFullRedraw()
 
