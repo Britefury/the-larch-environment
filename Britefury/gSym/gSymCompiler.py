@@ -12,7 +12,7 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
-from Britefury.GLisp.GLispCompiler import compileGLispExprToPyFunction
+from Britefury.GLisp.GLispCompiler import compileGLispExprToPyFunction, GLispCompilerCouldNotCompileSpecial
 from Britefury.GLisp.PyCodeGen import filterIdentifierForPy, PyCodeGenError, PySrc, PyVar, PyLiteral, PyListLiteral, PyGetAttr, PyGetItem, PyUnOp, PyBinOp, PyCall, PyMethodCall, PyReturn, PyIf, PyDef, PyAssign_SideEffects, PyDel_SideEffects
 
 
@@ -38,7 +38,7 @@ def defineCompiler(env, compilerXs, name, sourceFormat, targetFormat, spec):
 		if srcXs[0] == '$compileEval':
 			return PyCall( PyVar( '_compileEval', dbgSrc=srcXs ), [ compileGLispExprToPyTree(srcXs[1], context, True, compileSpecial ) ], dbgSrc=srcXs )
 		else:
-			return None
+			raise GLispCompilerCouldNotCompileSpecial( srcXs )
 		
 		
 	compilerFunctionName = filterIdentifierForPy( 'compilerFactory_%s'  %  ( name, ) )

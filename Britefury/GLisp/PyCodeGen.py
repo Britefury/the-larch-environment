@@ -346,7 +346,7 @@ class PyExpression (PyStatement):
 	
 	
 	# Method call
-	def methodCall_(self, methodName, *args):
+	def methodCall(self, methodName, *args):
 		return PyMethodCall( self, methodName, [ pyt_coerce( arg )   for arg in args ] )
 	
 	
@@ -1267,6 +1267,10 @@ class TestCase_PyCodeGen_build (unittest.TestCase):
 		self._compileExprTest( PyVar( 'x' )(1,2,3),   'x( 1, 2, 3 )' )
 		
 		
+	def test_methodCall(self):
+		self._compileExprTest( PyVar( 'x' ).methodCall( 'x', 1,2,3),   'x.x( 1, 2, 3 )' )
+		
+		
 	def test_return(self):
 		self._compileStmtTest( PyVar( 'x' ).return_(),   [ 'return x' ] )
 
@@ -1354,7 +1358,7 @@ class TestCase_PyCodeGen_Node_children (unittest.TestCase):
 	def test_PyMethodCall(self):
 		x = PyVar( 'x' )
 		y = PyVar( 'y' )
-		self._childrenTest( x.methodCall_( 'test', y ), [ x, y ] )
+		self._childrenTest( x.methodCall( 'test', y ), [ x, y ] )
 		
 	def test_PyReturn(self):
 		x = PyVar( 'x' )

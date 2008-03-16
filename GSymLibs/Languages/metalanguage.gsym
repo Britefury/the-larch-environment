@@ -5,6 +5,28 @@
 				(@ml displayDefinition metaLanguageDisplay metaLanguage
 					($where
 						(
+							($# "STYLE SHEETS")
+							($# "Label background")
+							(@labelBackgroundStyle
+								($style
+									(:backgroundColour ($colour #0.9 #1.0 #0.9))
+									(:borderColour ($colour #0.0 #0.8 #0.0))
+									(:borderWidth #2.0)
+									(:allMargins #2.0)
+								)
+							)
+						
+							($# "Container background")
+							(@containerBackgroundStyle
+								($style
+									(:backgroundColour ($colour #1.0 #1.0 #0.9))
+									(:borderColour ($colour #1.0 #0.5 #0.0))
+									(:borderWidth #2.0)
+									(:allMargins #2.0)
+								)
+							)
+						
+							($# "VIEW LAMBDAS")							
 							($# "View special expressions for a compiler definition")
 							(@viewCompilerSpecial
 								($lambda (@node)
@@ -67,6 +89,61 @@
 											)
 										)
 										
+										($# "Colour")
+										( ($colour (: @red ^) (: @green ^) (: @blue ^))
+											($activeBorder
+												($vbox ($list
+													($label "#'Colour")
+													($hbox ($list
+														($label "#'Red:")
+														($viewEval @red (@viewExpressionFactory <- @viewViewSpecial))
+														($label "#'Grn:")
+														($viewEval @green (@viewExpressionFactory <- @viewViewSpecial))
+														($label "#'Blu:")
+														($viewEval @blue (@viewExpressionFactory <- @viewViewSpecial))
+													))
+												))
+											)
+										)
+										
+										($# "Style")
+										( ($style (: @pairs *))
+											($where
+												(
+													( @viewStylePair
+														($lambda (@node)
+															($activeBorder
+																($hbox ($list
+																	($label ((@node [] #0 ) [:] #1 #None))
+																	($label "#'=")
+																	($viewEval (@node [] #1 ) (@viewExpressionFactory <- @viewViewSpecial))
+																))
+															)
+														)
+													)
+												)
+												($activeBorder
+													($vbox ($list
+														($label "#'Style")
+														($vbox ($mapViewEval @pairs @viewStylePair))
+													))
+												)
+											)
+										)
+										
+										($# "Apply style")
+										( ($applyStyle (: @style ^) (: @x ^))
+											($activeBorder
+												($vbox ($list
+													($hbox ($list
+														($label "#'ApplyStyle")
+														($viewEval @style (@viewExpressionFactory <- @viewViewSpecial))
+													))
+													($viewEval @x (@viewExpressionFactory <- @viewViewSpecial))
+												))
+											)
+										)
+										
 										($# "Active border")
 										( ($activeBorder (: @x ^))
 											($activeBorder
@@ -74,6 +151,7 @@
 													($label "#'ActiveBorder")
 													($viewEval @x (@viewExpressionFactory <- @viewViewSpecial))
 												))
+												@containerBackgroundStyle
 											)
 										)
 										
@@ -84,6 +162,7 @@
 													($label "#'Label")
 													($viewEval @x (@viewExpressionFactory <- @viewViewSpecial))
 												))
+												@labelBackgroundStyle
 											)
 										)
 										

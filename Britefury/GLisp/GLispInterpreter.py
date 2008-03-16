@@ -40,6 +40,9 @@ class GLispParameterListError (Exception):
 class GLispItemTypeError (Exception):
 	pass
 
+class GLispItemError (Exception):
+	pass
+
 
 
 

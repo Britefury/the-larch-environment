@@ -5,6 +5,10 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
+import sys
+
+from Britefury.Math.Math import Colour3f
+
 from Britefury.Cell.Cell import Cell
 
 from Britefury.DocPresent.Toolkit.DTWidget import DTWidget
@@ -22,9 +26,11 @@ from Britefury.DocView.DocView import DocView
 
 
 from Britefury.GLisp.GLispUtil import isGLispList, gLispSrcToString
-from Britefury.GLisp.GLispInterpreter import GLispParameterListError, GLispItemTypeError
-from Britefury.GLisp.GLispCompiler import compileGLispExprToPyFunction
-from Britefury.GLisp.PyCodeGen import filterIdentifierForPy, PyCodeGenError, PySrc, PyVar, PyLiteral, PyListLiteral, PyListComprehension, PyGetAttr, PyGetItem, PyUnOp, PyBinOp, PyCall, PyMethodCall, PyReturn, PyIf, PyDef, PyAssign_SideEffects, PyDel_SideEffects
+from Britefury.GLisp.GLispInterpreter import GLispParameterListError, GLispItemTypeError, GLispItemError
+from Britefury.GLisp.GLispCompiler import compileGLispExprToPyFunction, GLispCompilerCouldNotCompileSpecial
+from Britefury.GLisp.PyCodeGen import filterIdentifierForPy, pyt_coerce, PyCodeGenError, PySrc, PyVar, PyLiteral, PyListLiteral, PyListComprehension, PyGetAttr, PyGetItem, PyUnOp, PyBinOp, PyCall, PyMethodCall, PyReturn, PyIf, PyDef, PyAssign_SideEffects, PyDel_SideEffects
+
+from Britefury.gSym.gSymStyleSheet import GSymStyleSheet
 
 from Britefury.gSym.RelativeNode import RelativeNode, relative
 
@@ -93,7 +99,7 @@ def _runtime_buildRefreshCellAndRegister(viewNodeInstance, refreshFunction):
 	cell = Cell()
 	cell.function = refreshFunction
 	viewNodeInstance.refreshCells.append( cell )
-
+	
 def _runtime_binRefreshCell(viewNodeInstance, bin, child):
 	"""
 	Runtime - called by compiled code at run-time
@@ -149,6 +155,16 @@ def _runtime_scriptRefreshCell(viewNodeInstance, script, child, childSlotAttrNam
 
 	
 	
+def _runtime_applyStyleSheetStack(viewNodeInstance, widget):
+	for styleSheet in viewNodeInstance.styleSheetStack:
+		styleSheet.applyToWidget( widget )
+
+def _runtime_applyStyleSheetList(styleSheets, widget):
+	for styleSheet in styleSheets:
+		styleSheet.applyToWidget( widget )
+
+
+
 def _runtime_activeBorder(viewNodeInstance, child, styleSheets):
 	"""
 	Runtime - called by compiled code at run-time
@@ -157,8 +173,8 @@ def _runtime_activeBorder(viewNodeInstance, child, styleSheets):
 	widget = DTActiveBorder()
 	widget.keyHandler = viewNodeInstance.viewNode
 	_runtime_binRefreshCell( viewNodeInstance, widget, child )
-	for sheet in styleSheets:
-		sheet.apply()
+	_runtime_applyStyleSheetStack( viewNodeInstance, widget )
+	_runtime_applyStyleSheetList( styleSheets, widget )
 	return widget
 
 def _runtime_label(viewNodeInstance, text, styleSheets):
@@ -169,8 +185,8 @@ def _runtime_label(viewNodeInstance, text, styleSheets):
 	if isinstance( text, RelativeNode ):
 		text = text.node
 	widget = DTLabel( text )
-	for sheet in styleSheets:
-		sheet.apply()
+	_runtime_applyStyleSheetStack( viewNodeInstance, widget )
+	_runtime_applyStyleSheetList( styleSheets, widget )
 	return widget
 
 def _runtime_entry(viewNodeInstance, text, styleSheets):
@@ -179,8 +195,8 @@ def _runtime_entry(viewNodeInstance, text, styleSheets):
 		text = text.node
 	widget = DTEntryLabel(text)
 	widget.keyHandler = viewNodeInstance.viewNode
-	for sheet in styleSheets:
-		sheet.apply()
+	_runtime_applyStyleSheetStack( viewNodeInstance, widget )
+	_runtime_applyStyleSheetList( styleSheets, widget )
 	return widget
 
 def _runtime_hbox(viewNodeInstance, children, styleSheets):
@@ -190,8 +206,8 @@ def _runtime_hbox(viewNodeInstance, children, styleSheets):
 	"""
 	widget = DTBox()
 	_runtime_boxRefreshCell( viewNodeInstance, widget, children )
-	for sheet in styleSheets:
-		sheet.apply()
+	_runtime_applyStyleSheetStack( viewNodeInstance, widget )
+	_runtime_applyStyleSheetList( styleSheets, widget )
 	return widget
 
 def _runtime_vbox(viewNodeInstance, children, styleSheets):
@@ -201,8 +217,8 @@ def _runtime_vbox(viewNodeInstance, children, styleSheets):
 	"""
 	widget = DTBox( direction=DTDirection.TOP_TO_BOTTOM, minorDirectionAlignment=DTBox.ALIGN_LEFT )
 	_runtime_boxRefreshCell( viewNodeInstance, widget, children )
-	for sheet in styleSheets:
-		sheet.apply()
+	_runtime_applyStyleSheetStack( viewNodeInstance, widget )
+	_runtime_applyStyleSheetList( styleSheets, widget )
 	return widget
 
 def _runtime_script(viewNodeInstance, mainChild, leftSuperChild, leftSubChild, rightSuperChild, rightSubChild, styleSheets):
@@ -221,9 +237,11 @@ def _runtime_script(viewNodeInstance, mainChild, leftSuperChild, leftSubChild, r
 		_runtime_scriptRefreshCell( viewNodeInstance, widget, rightSuperChild, 'rightSuperscriptChild' )
 	if rightSubChild is not None:
 		_runtime_scriptRefreshCell( viewNodeInstance, widget, rightSubChild, 'rightSubscriptChild' )
-	for sheet in styleSheets:
-		sheet.apply()
+	_runtime_applyStyleSheetStack( viewNodeInstance, widget )
+	_runtime_applyStyleSheetList( styleSheets, widget )
 	return widget
+
+
 
 
 
@@ -239,7 +257,7 @@ class _GSymNodeViewInstance (object):
 	Manages state that concerns a view of a specific sub-tree of a document
 	"""
 	
-	__slots__ = [ 'env', 'xs', 'view', 'viewInstance', 'viewFactory', 'refreshCells', 'viewNode' ]
+	__slots__ = [ 'env', 'xs', 'view', 'viewInstance', 'viewFactory', 'refreshCells', 'viewNode', 'styleSheetStack' ]
 
 	def __init__(self, env, xs, view, viewInstance, viewFactory, viewNode):
 		self.env = env
@@ -248,6 +266,7 @@ class _GSymNodeViewInstance (object):
 		self.viewInstance = viewInstance
 		self.viewFactory = viewFactory
 		self.viewNode = viewNode
+		self.styleSheetStack = []
 		self.refreshCells = []
 
 		
@@ -361,6 +380,8 @@ class _GSymViewFactory (object):
 			 '_hbox' : _runtime_hbox,
 			 '_vbox' : _runtime_vbox,
 			 '_script' : _runtime_script,
+			 '_GSymStyleSheet' : GSymStyleSheet,
+			 '_Colour3f' : Colour3f,
 			 }
 		try:
 			self.makeViewFunction = compileGLispExprToPyFunction( viewModuleName, viewFunctionName, [ '__view_node_instance_stack__' ], spec, self._p_compileSpecial, lcls )
@@ -409,7 +430,7 @@ class _GSymViewFactory (object):
 		name = srcXs[0]
 
 		compileSubExp = lambda xs: compileGLispExprToPyTree( xs, context, True, compileSpecial )
-		compileStyleSheetAccess = lambda xs: self._p_compileStylesheetAccess( xs, context, True, compileSpecial, compileGLispExprToPyTree )
+		compileStyleSheetAccess = lambda xs: PyListLiteral( [ compileSubExp( x )  for x in xs ] )
 	
 		if name == '$viewEval':
 			# ($viewEval <document-subtree> ?<node-view-function>)
@@ -430,11 +451,48 @@ class _GSymViewFactory (object):
 				params.append( compileSubExp( srcXs[2] ) )
 			itemExpr = PyCall( PyVar( '_buildView', dbgSrc=srcXs ), params, dbgSrc=srcXs )
 			return PyListComprehension( itemExpr, 'x', compileSubExp( srcXs[1] ), None, dbgSrc=srcXs )
+		elif name == '$colour':
+			#($colour <red> <green> <blue>)
+			if len( srcXs ) != 4:
+				self.env.glispError( GLispParameterListError, src, 'defineView: $colour needs 3 parameters; red, green, and blue' )
+			return PyVar( '_Colour3f' )( compileSubExp( srcXs[1] ), compileSubExp( srcXs[2] ), compileSubExp( srcXs[3] ) ).debug( srcXs )
+		elif name == '$style':
+			#($style <settings_pairs>)
+			#settings pair: (:key <value>)
+			def _settingsPair(pairXs):
+				if len( pairXs ) != 2:
+					self.env.glispError( GLispParameterListError, src, 'defineView: $style settings pair needs 2 parameters; the key and the value' )
+				if not isinstance( pairXs[0], str )  and  not isinstance( pairXs[0], unicode ):
+					self.env.glispError( GLispItemTypeError, src, 'defineView: $style settings pair key must be a string' )
+				if pairXs[0][0] != ':':
+					self.env.glispError( GLispItemError, src, 'defineView: $style settings pair key must start with a :' )
+				return pyt_coerce( [ pairXs[0][1:], compileSubExp( pairXs[1] ) ] )
+			return PyVar( '_GSymStyleSheet' )( pyt_coerce( [ _settingsPair( pairXs )   for pairXs in srcXs[1:] ] ) ).debug( srcXs )
+		elif name == '$applyStyle':
+			#($applyStyle <stylesheet> <child>)
+			if len( srcXs ) != 3:
+				self.env.glispError( GLispParameterListError, src, 'defineView: $applyStyle needs 2 parameters; the style and the child content' )
+			childResVarName = None
+			py_stylePush = PyVar( '__view_node_instance_stack__' )[-1].attr( 'styleSheetStack' ).methodCall( 'append', compileSubExp( srcXs[1] ) ).debug( srcXs )
+			py_childResult = compileSubExp( srcXs[2] )
+			if bNeedResult:
+				childResVarName = context.temps.allocateTempName( 'view_special_child_result' )
+				py_childResult = PyVar( childResVarName ).assign_sideEffects( py_childResult ).debug( srcXs )
+			py_stylePop = PyVar( '__view_node_instance_stack__' )[-1].attr( 'styleSheetStack' ).methodCall( 'pop' )
+			
+			context.body.append( py_stylePush )
+			context.body.append( py_childResult )
+			context.body.append( py_stylePop )
+			
+			if bNeedResult:
+				return PyVar( childResVarName ).debug( srcXs )
+			else:
+				return None
 		elif name == '$activeBorder':
 			#($activeBorder <child> styleSheet*)
 			if len( srcXs ) < 2:
-				self.env.glispError( GLispParameterListError, src, 'defineView: $activeBorder needs at least 1 parameter; the child content' )
-			return PyCall( PyVar( '_activeBorder', dbgSrc=srcXs ), [ PySrc( '__view_node_instance_stack__[-1]', dbgSrc=srcXs ), compileSubExp( srcXs[1] ), compileStyleSheetAccess( srcXs[2:]) ], dbgSrc=srcXs )
+				self.env.glispError( GLispParameterListError, src, 'defineView: $activeBorder needs at least 1 parameters; the child content' )
+			return PyVar( '_activeBorder' )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[1] ), compileStyleSheetAccess( srcXs[2:]) ).debug( srcXs )
 		elif name == '$label':
 			#($label text styleSheet*)
 			if len( srcXs ) < 2:
@@ -486,7 +544,7 @@ class _GSymViewFactory (object):
 			return PyVar( '_script' )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[1] ), None, None, None, compileSubExp( srcXs[2] ),
 						   compileStyleSheetAccess( srcXs[6:]) ).debug( srcXs )
 		else:
-			return None
+			raise GLispCompilerCouldNotCompileSpecial( srcXs )
 		
 
 			
