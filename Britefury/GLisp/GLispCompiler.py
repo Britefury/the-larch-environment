@@ -433,12 +433,11 @@ def _compileGLispExprToPyTree(xs, context, bNeedResult=False, compileSpecial=Non
 			return _compileLambda( xs, context, bNeedResult, compileSpecial )
 		elif xs[0] == '$match':
 			return _compileMatch( xs, context, bNeedResult, compileSpecial )
-		elif isinstance( xs[0], str )  and  xs[0][0] == '$'  and  compileSpecial is not None:
-			res = compileSpecial( xs, context, bNeedResult, compileSpecial, _compileGLispExprToPyTree )
-			if res is not None:
-				return res
-			else:
+		elif isinstance( xs[0], str )  and  xs[0][0] == '$':
+			if compileSpecial is None:
 				raise GLispCompilerCouldNotCompileSpecial( xs )
+			else:
+				return compileSpecial( xs, context, bNeedResult, compileSpecial, _compileGLispExprToPyTree )
 		elif len(xs) == 1:
 			return _compileGLispExprToPyTree( xs[0], context, bNeedResult, compileSpecial )
 		else:
@@ -670,7 +669,8 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 		def compileSpecialExpr(xs, context, bNeedResult, compileSpecial, compileGLispExprToPyTree):
 			if xs[0] == '$special':
 				return PySrc( 'special' )
-			return None
+			else:
+				raise GLispCompilerCouldNotCompileSpecial( xs )
 		self._compileTest( '($special)', 'special', compileSpecialExpr )
 		self._compileTest( '($abc123)', GLispCompilerCouldNotCompileSpecial, compileSpecialExpr )
 		self._evalTest( '($special)', 123, [ ( 'special', 123 ) ], compileSpecialExpr )
