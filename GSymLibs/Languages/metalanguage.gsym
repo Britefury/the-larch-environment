@@ -18,8 +18,6 @@
 								($style
 									(:backgroundColour ($colour #0.9 #1.0 #0.9))
 									(:borderColour ($colour #0.0 #0.8 #0.0))
-									(:borderWidth #2.0)
-									(:allMargins #2.0)
 								)
 							)
 						
@@ -27,19 +25,42 @@
 							(@containerBackgroundStyle
 								($style
 									(:backgroundColour ($colour #1.0 #1.0 #0.9))
-									(:borderColour ($colour #1.0 #0.5 #0.0))
-									(:borderWidth #2.0)
-									(:allMargins #2.0)
+									(:borderColour ($colour #1.0 #0.75 #0.5))
 								)
 							)
 						
+							($# "Style background")
+							(@styleBackgroundStyle
+								($style
+									(:backgroundColour ($colour #1.0 #0.95 #1.0))
+									(:borderColour ($colour #1.0 #0.65 #1.0))
+								)
+							)
+						
+							($# "View evaluation background")
+							(@viewEvalBackgroundStyle
+								($style
+									(:backgroundColour ($colour #0.95 #0.95 #1.0))
+									(:borderColour ($colour #0.7 #0.7 #1.0))
+								)
+							)
+						
+							($# "Title vbox")
+							(@titleVBoxStyle
+								($style
+									(:alignment (@DTBox . ALIGN_CENTRE))
+								)
+							)
+						
+							
+							
 							($# "VIEW LAMBDAS")							
 							($# "View special expressions for a compiler definition")
 							(@viewCompilerSpecial
 								($lambda (@node)
 									($match @node
 										($# "Unknown")
-										( (: @x ^)  (@log <- (@gLispAsString <- @x)) ($activeBorder ($label "#'\u2620 SPECIAL-ERROR \u2620")) )
+										( (: @x ^)  (@log <- (@gLispAsString <- @x)) ($activeBorder ($label u"#'\u2620 SPECIAL-ERROR \u2620")) )
 									)
 								)
 							)
@@ -80,6 +101,7 @@
 													($viewEval @x (@viewExpressionFactory <- @viewViewSpecial))
 													($label "#')")
 												))
+												@viewEvalBackgroundStyle
 											)
 										)
 										
@@ -93,6 +115,7 @@
 													($viewEval @fac (@viewExpressionFactory <- @viewViewSpecial))
 													($label "#')")
 												))
+												@viewEvalBackgroundStyle
 											)
 										)
 										
@@ -104,6 +127,7 @@
 													($viewEval @x (@viewExpressionFactory <- @viewViewSpecial))
 													($label "#')")
 												))
+												@viewEvalBackgroundStyle
 											)
 										)
 										
@@ -117,6 +141,7 @@
 													($viewEval @fac (@viewExpressionFactory <- @viewViewSpecial))
 													($label "#')")
 												))
+												@viewEvalBackgroundStyle
 											)
 										)
 										
@@ -157,7 +182,8 @@
 													($vbox ($list
 														($label "#'Style")
 														($vbox ($mapViewEval @pairs @viewStylePair))
-													))
+													) @titleVBoxStyle)
+													@styleBackgroundStyle
 												)
 											)
 										)
@@ -187,7 +213,7 @@
 															(@viewStyleList <- @styles)
 														)
 													)
-												))
+												) @titleVBoxStyle)
 												@containerBackgroundStyle
 											)
 										)
@@ -204,7 +230,7 @@
 															(@viewStyleList <- @styles)
 														)
 													)
-												))
+												)  @titleVBoxStyle)
 												@containerBackgroundStyle
 											)
 										)
@@ -214,8 +240,8 @@
 											($activeBorder
 												($vbox ($list
 													($hbox ($list
-														($hbox ($list
-															($label "#'Indent by")
+														($vbox ($list
+															($label "#'Indent")
 															($viewEval @indentation (@viewExpressionFactory <- @viewViewSpecial))
 														))
 														($vbox
@@ -226,7 +252,7 @@
 															)
 														)
 													))
-												))
+												)  @titleVBoxStyle)
 												@containerBackgroundStyle
 											)
 										)
@@ -237,7 +263,7 @@
 												($vbox ($list
 													($label "#'Label")
 													($viewEval @x (@viewExpressionFactory <- @viewViewSpecial))
-												))
+												)  @titleVBoxStyle)
 												@labelBackgroundStyle
 											)
 										)
@@ -248,7 +274,7 @@
 												($vbox ($list
 													($label "#'Entry")
 													($viewEval @x (@viewExpressionFactory <- @viewViewSpecial))
-												))
+												)  @titleVBoxStyle)
 											)
 										)
 										
@@ -264,7 +290,8 @@
 															(@viewStyleList <- @styles)
 														)
 													)
-												))
+												)  @titleVBoxStyle)
+												@containerBackgroundStyle
 											)
 										)
 										
@@ -280,7 +307,8 @@
 															(@viewStyleList <- @styles)
 														)
 													)
-												))
+												)  @titleVBoxStyle)
+												@containerBackgroundStyle
 											)
 										)
 
@@ -304,7 +332,8 @@
 															(@viewStyleList <- @styles)
 														)
 													)
-												))
+												) @titleVBoxStyle)
+												@containerBackgroundStyle
 											)
 										)
 										
@@ -325,7 +354,8 @@
 															(@viewStyleList <- @styles)
 														)
 													)
-												))
+												) @titleVBoxStyle)
+												@containerBackgroundStyle
 											)
 										)
 										
@@ -346,7 +376,8 @@
 															(@viewStyleList <- @styles)
 														)
 													)
-												))
+												) @titleVBoxStyle)
+												@containerBackgroundStyle
 											)
 										)
 										
@@ -367,7 +398,8 @@
 															(@viewStyleList <- @styles)
 														)
 													)
-												))
+												) @titleVBoxStyle)
+												@containerBackgroundStyle
 											)
 										)
 										
@@ -388,7 +420,8 @@
 															(@viewStyleList <- @styles)
 														)
 													)
-												))
+												) @titleVBoxStyle)
+												@containerBackgroundStyle
 											)
 										)
 										
@@ -487,7 +520,7 @@
 											( ((: @varName !) (: @expression ^))
 												($activeBorder
 													($hbox ($list
-														($label @varName)
+														($label (@varName [:] #1 #None))
 														($label "#'=")
 														($viewEval @expression (@viewExpressionFactory <- @viewSpecial))
 													))

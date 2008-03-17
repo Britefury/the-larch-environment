@@ -116,7 +116,7 @@ class DTActiveBorder (DTBorder):
 		self._o_queueFullRedraw()
 
 
-	def _o_draw(self, context):
+	def _o_drawBackground(self, context):
 		if self._bHasFocus:
 			b = self._highlightedBorderWidth
 		else:
@@ -136,26 +136,16 @@ class DTActiveBorder (DTBorder):
 
 
 
-		if backgroundColour is not None   or   borderColour is not None:
-			# Background
+		if backgroundColour is not None:
+			context.rectangle( 0.0, 0.0, self._allocation.x, self._allocation.y )
+			context.set_source_rgb( backgroundColour.r, backgroundColour.g, backgroundColour.b )
+			context.fill()
+
+		if borderColour is not None:
 			context.rectangle( b * 0.5, b * 0.5, self._allocation.x - b, self._allocation.y - b )
-
-
-			if backgroundColour is not None:
-				context.set_source_rgb( backgroundColour.r, backgroundColour.g, backgroundColour.b )
-
-				if borderColour is not None:
-					context.fill_preserve()
-				else:
-					context.fill()
-
-			if borderColour is not None:
-				context.set_line_width( b )
-				context.set_source_rgb( borderColour.r, borderColour.g, borderColour.b )
-				context.stroke()
-
-
-		super( DTActiveBorder, self )._o_draw( context )
+			context.set_line_width( b )
+			context.set_source_rgb( borderColour.r, borderColour.g, borderColour.b )
+			context.stroke()
 
 
 		

@@ -37,7 +37,7 @@ class DTEntryDropDown (DTPopupDocument):
 		self.entry.returnSignal.connect( self._p_onEntryReturn )
 
 
-		self._box = DTBox( direction=DTDirection.TOP_TO_BOTTOM, minorDirectionAlignment=DTBox.ALIGN_LEFT )
+		self._box = DTBox( direction=DTDirection.TOP_TO_BOTTOM, alignment=DTBox.ALIGN_LEFT )
 
 		if bShowLabel:
 			self._box.append( self.label )
