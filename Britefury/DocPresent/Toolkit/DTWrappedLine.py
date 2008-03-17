@@ -17,6 +17,7 @@ class DTWrappedLine (DTContainerSequence):
 			self.padding = padding
 			self._reqWidth = 0.0
 			self._reqHeight = 0.0
+			self._baseline = 0.0
 
 
 
@@ -83,13 +84,18 @@ class DTWrappedLine (DTContainerSequence):
 			spacing = self._spacing  *  ( len( self._childEntries ) - 1 )
 		return requisition + spacing
 
-	def _o_getRequiredHeight(self):
-		requisition = 0.0
+	def _o_getRequiredHeightAndBaseline(self):
+		aboveBaseline = 0.0
+		baseline = 0.0
 		for entry in self._childEntries:
-			req = entry.child._f_getRequisitionHeight()
+			req, bas = entry.child._f_getRequisitionHeightAndBaseline()
+			abv = req - bas
 			entry._reqHeight = req
-			requisition = max( requisition, req )
-		return requisition
+			entry._baseline = bas
+			aboveBaseline = max( aboveBaseline, abv )
+			baseline = max( baseline, bas )
+		requisition = aboveBaseline + baseline
+		return requisition, baseline
 
 
 	def _o_onAllocateX(self, allocation):

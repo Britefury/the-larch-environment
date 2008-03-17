@@ -200,7 +200,7 @@ class DTDocument (DTBin):
 		if self._bAllocationRequired:
 			reqWidth = self._f_getRequisitionWidth()
 			self._f_allocateX( self._documentSize.x / self._docScaleInWindowCoords )
-			reqHeight = self._f_getRequisitionHeight()
+			reqHeight, reqBaseline = self._f_getRequisitionHeightAndBaseline()
 			self._f_allocateY( reqHeight )
 			self._bAllocationRequired = False
 					

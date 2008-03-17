@@ -2,6 +2,10 @@ TODOS:
 
 
 
+- Typesetting:
+     - Add baseline alignment to DTWrappedLine
+     - Provide different hboxes in the view code; an aligned one, and an unaligned one
+- Check out the Psyco optimiser, since it works on Linux and Windows.
 - GSym will screw up if the system attempts to render two views of the same document node:
      The pattern matcher matches a pattern
      binds one subtree to @a, the other to @b

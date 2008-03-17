@@ -22,6 +22,7 @@ class DTBox (DTContainerSequence):
 	ALIGN_RIGHT = 2
 	ALIGN_BOTTOM = 2
 	ALIGN_EXPAND = 3
+	ALIGN_BASELINES = 4
 	_ALIGN_TOPLEFT = 0
 	_ALIGN_BOTTOMRIGHT = 2
 
@@ -36,6 +37,7 @@ class DTBox (DTContainerSequence):
 			self.padding = padding
 			self._reqWidth = 0.0
 			self._reqHeight = 0.0
+			self._reqBaseline = 0.0
 
 
 
@@ -50,6 +52,7 @@ class DTBox (DTContainerSequence):
 		self._alignment = alignment
 		self._padding = padding
 		self._childrenRequisition = Vector2()
+		self._childrenBaseline = 0.0
 		self._numExpand = 0
 		self._numShrink = 0
 
@@ -229,22 +232,35 @@ class DTBox (DTContainerSequence):
 		self._childrenRequisition.x = requisition + spacing
 		return requisition + spacing
 
-	def _o_getRequiredHeight(self):
-		requisition = 0.0
+	def _o_getRequiredHeightAndBaseline(self):
+		aboveBaseline = 0.0
+		baseline = 0.0
+		height = 0.0
 		for entry in self._childEntries:
-			req = entry.child._f_getRequisitionHeight()
+			req, bas = entry.child._f_getRequisitionHeightAndBaseline()
 			if self._direction == DTDirection.LEFT_TO_RIGHT  or  self._direction == DTDirection.RIGHT_TO_LEFT:
-				entry._reqHeight = req
-				requisition = max( requisition, req )
+				if entry.alignment == self.ALIGN_BASELINES:
+					abv = req - bas
+					entry._reqHeight = req
+					entry._reqBaseline = bas
+					aboveBaseline = max( aboveBaseline, abv )
+					baseline = max( baseline, bas )
+				else:
+					entry._reqHeight = req
+					entry._reqBaseline = 0.0
+					height = max( height, req )
 			elif self._direction == DTDirection.TOP_TO_BOTTOM  or  self._direction == DTDirection.BOTTOM_TO_TOP:
 				entry._reqHeight = req + entry.padding * 2.0
-				requisition += entry._reqHeight
-		spacing = 0.0
+				entry._reqBaseline = 0.0
+				height += entry._reqHeight
+		height = max( height, baseline + aboveBaseline )
+		requisition = height
 		if self._direction == DTDirection.TOP_TO_BOTTOM  or  self._direction == DTDirection.BOTTOM_TO_TOP:
 			if len( self._childEntries ) > 0:
-				spacing = self._spacing  *  ( len( self._childEntries ) - 1 )
-		self._childrenRequisition.y = requisition + spacing
-		return requisition + spacing
+				requisition += self._spacing  *  ( len( self._childEntries ) - 1 )
+		self._childrenRequisition.y = requisition
+		self._childrenBaseline = baseline
+		return requisition, baseline
 
 
 	def _o_onAllocateX(self, allocation):
@@ -341,6 +357,9 @@ class DTBox (DTContainerSequence):
 					self._o_allocateChildY( entry.child, allocation - entry._reqHeight, entry._reqHeight )
 				elif entry.alignment == self.ALIGN_EXPAND:
 					self._o_allocateChildY( entry.child, 0.0, allocation )
+				elif entry.alignment == self.ALIGN_BASELINES:
+					y = allocation - self._childrenBaseline + entry._reqBaseline - entry._reqHeight
+					self._o_allocateChildY( entry.child, y, entry._reqHeight )
 
 
 	def _o_onChildResizeRequest(self, child):

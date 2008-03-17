@@ -18,6 +18,7 @@ class DTBin (DTContainer):
 
 		self._child = None
 		self._childRequisition = Vector2()
+		self._childBaseline = 0.0
 		self._childScale = 1.0
 
 
@@ -66,12 +67,13 @@ class DTBin (DTContainer):
 			self._childRequisition.x = 0.0
 		return self._childRequisition.x
 
-	def _o_getRequiredHeight(self):
+	def _o_getRequiredHeightAndBaseline(self):
 		if self._child is not None:
-			self._childRequisition.y = self._child._f_getRequisitionHeight()
+			self._childRequisition.y, self._childBaseline = self._child._f_getRequisitionHeightAndBaseline()
 		else:
 			self._childRequisition.y = 0.0
-		return self._childRequisition.y
+			self._childBaseline = 0.0
+		return self._childRequisition.y, self._childBaseline
 
 
 	def _o_onAllocateX(self, allocation):

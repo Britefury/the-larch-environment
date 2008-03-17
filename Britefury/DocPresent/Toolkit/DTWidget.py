@@ -114,11 +114,11 @@ class DTWidget (object):
 		self._realiseContext = None
 		self._pangoContext = None
 		self._bResizeQueued = False
-		self._sizeRequest = Vector2( -1, -1 )
 		self._scale = 1.0
 		self._rootScale = 1.0
 		self._allocation = Vector2()
 		self._requiredSize = Vector2()
+		self._requiredBaseline = 0.0
 
 		self._waitingImmediateEvents = []
 		
@@ -143,15 +143,6 @@ class DTWidget (object):
 
 	def isRealised(self):
 		return self._realiseContext is not None
-
-
-	def getSizeRequest(self):
-		return self._sizeRequest
-
-	def setSizeRequest(self, size):
-		if size != self._sizeRequest:
-			self._sizeRequest = copy( size )
-			self._o_queueResize()
 
 
 	def getAllocation(self):
@@ -368,7 +359,7 @@ class DTWidget (object):
 	def _o_getRequiredWidth(self):
 		pass
 
-	def _o_getRequiredHeight(self):
+	def _o_getRequiredHeightAndBaseline(self):
 		pass
 
 	def _o_onAllocateX(self, allocation):
@@ -511,17 +502,18 @@ class DTWidget (object):
 
 	def _f_getRequisitionWidth(self):
 		requisition = self._o_getRequiredWidth()  *  self._scale
-		if self._sizeRequest.x != -1:
-			requisition = self._sizeRequest.x
 		self._requiredSize.x = requisition
 		return requisition
 
-	def _f_getRequisitionHeight(self):
-		requisition = self._o_getRequiredHeight()  *  self._scale
-		if self._sizeRequest.y != -1:
-			requisition = self._sizeRequest.y
-		self._requiredSize.y = requisition
-		return requisition
+	def _f_getRequisitionHeightAndBaseline(self):
+		req, baseline = self._o_getRequiredHeightAndBaseline()
+		if self._scale != 1.0:
+			req *= self._scale
+			if baseline is not None:
+				baseline *= self._scale
+		self._requiredSize.y = req
+		self._requiredBaseline = baseline
+		return req, baseline
 
 	def _f_allocateX(self, allocation):
 		self._allocation.x = allocation
@@ -967,5 +959,4 @@ class DTWidget (object):
 	bRealised = property( isRealised )
 	document = property( getDocument )
 	allocation = property( getAllocation )
-	sizeRequest = property( getSizeRequest, setSizeRequest )
 

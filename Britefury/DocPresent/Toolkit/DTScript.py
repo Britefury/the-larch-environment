@@ -11,6 +11,12 @@ from Britefury.DocPresent.Toolkit.DTCursorEntity import DTCursorEntity
 from Britefury.DocPresent.Toolkit.DTContainer import DTContainer
 
 
+_superOffset = 0.333
+_subOffset = 0.333
+
+_superOffsetFraction = _superOffset  /  ( _superOffset + _subOffset )
+_subOffsetFraction = _subOffset  /  ( _superOffset + _subOffset )
+
 
 class DTScript (DTContainer):
 	LEFTSUPER = 0
@@ -20,20 +26,30 @@ class DTScript (DTContainer):
 	RIGHTSUB = 4
 	childSlots = [ LEFTSUPER, LEFTSUB, MAIN, RIGHTSUPER, RIGHTSUB ]
 
-	def __init__(self, spacing=1.0, backgroundColour=None):
+	def __init__(self, spacing=1.0, scriptSpacing=1.0, backgroundColour=None):
 		super( DTScript, self ).__init__( backgroundColour )
 
 		self._children = [ None ] * 5
 		self._childRequisitions = [ Vector2()  for i in xrange( 0, 5 ) ]
+		self._childAboveBaselines = [ 0.0   for i in xrange( 0, 5 ) ]
 		self._leftRequisitionWidth = 0.0
 		self._mainRequisitionWidth = 0.0
 		self._rightRequisitionWidth = 0.0
-		self._superscriptRequisitionHeight = 0.0
-		self._mainRequisitionHeight = 0.0
-		self._subscriptRequisitionHeight = 0.0
-		self._superscriptOverlap = 0.0
-		self._subscriptOverlap = 0.0
+		self._Ma = 0.0
+		self._Mb = 0.0
+		self._Mh = 0.0
+		self._Pa = 0.0
+		self._Pb = 0.0
+		self._Ph = 0.0
+		self._Ba = 0.0
+		self._Bb = 0.0
+		self._Bh = 0.0
+		self._superBaseFromTop = 0.0
+		self._mainBaseFromTop = 0.0
+		self._subBaseFromTop = 0.0
+
 		self._spacing = spacing
+		self._scriptSpacing = scriptSpacing
 
 		self._childScale = 0.7
 
@@ -133,21 +149,160 @@ class DTScript (DTContainer):
 		return self._leftRequisitionWidth + self._mainRequisitionWidth + self._rightRequisitionWidth + spacing
 
 
-	def _o_getRequiredHeight(self):
+	def _o_getRequiredHeightAndBaseline(self):
+		childBaselines = [ 0.0   for i in xrange( 0, 5 ) ]
+
 		for slot in self.childSlots:
 			if self._children[slot] is not None:
-				self._childRequisitions[slot].y = self._children[slot]._f_getRequisitionHeight()
+				self._childRequisitions[slot].y, childBaselines[slot] = self._children[slot]._f_getRequisitionHeightAndBaseline()
 			else:
-				self._childRequisitions[slot].y = 0
+				self._childRequisitions[slot].y = 0.0
+				childBaselines[slot] = 0.0
+			self._childAboveBaselines[slot] = self._childRequisitions[slot].y - childBaselines[slot]
 				
-		self._superscriptRequisitionHeight = max( self._childRequisitions[self.LEFTSUPER].y, self._childRequisitions[self.RIGHTSUPER].y )
-		self._mainRequisitionHeight  = self._childRequisitions[self.MAIN].y
-		self._subscriptRequisitionHeight = max( self._childRequisitions[self.LEFTSUB].y, self._childRequisitions[self.RIGHTSUB].y )
+		self._Ma  = self._childAboveBaselines[self.MAIN]
+		self._Mb  = childBaselines[self.MAIN]
+		self._Mh  = self._childRequisitions[self.MAIN].y
 		
-		self._superscriptOverlap = min( self._superscriptRequisitionHeight, self._mainRequisitionHeight ) / 3.0
-		self._subscriptOverlap = min( self._subscriptRequisitionHeight, self._mainRequisitionHeight ) / 3.0
+		self._Pa = max( self._childAboveBaselines[self.LEFTSUPER], self._childAboveBaselines[self.RIGHTSUPER] )
+		self._Pb = max( childBaselines[self.LEFTSUPER], childBaselines[self.RIGHTSUPER] )
+		self._Ph = max( self._childRequisitions[self.LEFTSUPER].y, self._childRequisitions[self.RIGHTSUPER].y )
 
-		return max( self._superscriptOverlap, self._superscriptRequisitionHeight - self._superscriptOverlap )  +  self._mainRequisitionHeight  +  max( self._subscriptOverlap, self._subscriptRequisitionHeight - self._subscriptOverlap )
+		self._Ba = max( self._childAboveBaselines[self.LEFTSUB], self._childAboveBaselines[self.RIGHTSUB] )
+		self._Bb = max( childBaselines[self.LEFTSUB], childBaselines[self.RIGHTSUB] )
+		self._Bh = max( self._childRequisitions[self.LEFTSUB].y, self._childRequisitions[self.RIGHTSUB].y )
+		
+		
+		# top: TOP
+		# a: super top
+		# b: main top
+		# c: super baseline
+		# d: super bottom
+		# e: sub top
+		# f: main baseline
+		# g: main bottom
+		# h: sub baseline
+		# i: sub bottom
+		# bottom: BOTTOM
+		#
+		# q: spacing between super bottom and sub top
+		# r: min distance between super baseline and main baseline (1/3 of Mh)
+		# s: min distance between main baseline and sub baseline (1/3 of Mh)
+		# r and s can be thought of as springs
+		
+		if self._Ph > 0.0  and  self._Bh > 0.0:
+			q = self._scriptSpacing
+		
+			# Start with f = 0
+			f = 0.0
+			
+			# We can compute b and g immediately
+			b = f - self._Ma
+			g = f + self._Mb
+			
+			# Next compute c and h
+			# The distance between c and h is max( Pb + Ba + q, r + s )
+			r = self._Mh * _superOffset
+			s = self._Mh * _subOffset
+			cToH = max( self._Pb + self._Ba + q,   r + s )
+		
+			# Divide cToH between r and s according to their proportion
+			r = cToH  *  _superOffsetFraction
+			s = cToH  *  _subOffsetFraction
+			
+			# We can now compute c and h
+			c = f - r
+			h = f + s
+			
+			# We can compute a and d
+			a = c - self._Pa
+			d = c + self._Pb
+			
+			# We can compute i and e
+			e = h - self._Ba
+			i = h + self._Bb
+			
+			# We can now compute the top and the bottom
+			top = min( b, a )
+			bottom = max( g, i )
+			
+			self._superBaseFromTop = c - top
+			self._mainBaseFromTop = f - top
+			self._subBaseFromTop = h - top
+		elif self._Ph > 0.0:
+			# Start with f = 0
+			f = 0.0
+			
+			# We can compute b and g immediately
+			b = f - self._Ma
+			g = f + self._Mb
+			
+			# R
+			r = self._Mh * _superOffset
+			
+			# C
+			c = f - r
+
+			# We can compute a and d
+			a = c - self._Pa
+			d = c + self._Pb
+			
+			# We can now compute the top and the bottom
+			top = min( b, a )
+			bottom = max( g, d )
+			
+			self._superBaseFromTop = c - top
+			self._mainBaseFromTop = f - top
+			self._subBaseFromTop = f - top
+		elif self._Bh > 0.0:
+			# Start with f = 0
+			f = 0.0
+			
+			# We can compute b and g immediately
+			b = f - self._Ma
+			g = f + self._Mb
+			
+			# Next compute h
+			s = self._Mh * _subOffset
+			
+			# We can now compute h
+			h = f + s
+			
+			# We can compute i and e
+			e = h - self._Ba
+			i = h + self._Bb
+			
+			# We can now compute the top and the bottom
+			top = min( b, e )
+			bottom = max( g, i )
+			
+			self._superBaseFromTop = f - top
+			self._mainBaseFromTop = f - top
+			self._subBaseFromTop = h - top
+		else:
+			f = 0.0
+			
+			top = -self._Ma
+			bottom = self._Mb
+			
+			self._superBaseFromTop = f - top
+			self._mainBaseFromTop = f - top
+			self._subBaseFromTop = f - top
+			
+		height = bottom - top
+		
+		#print self._Ma, self._Mb, self._Mh
+		#print self._Pa, self._Pb, self._Ph
+		#print self._Ba, self._Bb, self._Bh
+		#print self._superBaseFromTop, self._mainBaseFromTop, self._subBaseFromTop
+		#print top, bottom
+		#print ''
+
+		
+		return height, self._mainBaseFromTop
+		
+		
+		
 
 
 	def _o_onAllocateX(self, allocation):
@@ -192,25 +347,26 @@ class DTScript (DTContainer):
 		
 		
 		# Allocate superscript children
-		y = padding
+		y = padding + self._superBaseFromTop
 		if self._children[self.LEFTSUPER] is not None:
-			self._o_allocateChildY( self._children[self.LEFTSUPER], y  +  ( self._superscriptRequisitionHeight - self._childRequisitions[self.LEFTSUPER].y ), self._childRequisitions[self.LEFTSUPER].y )
+			self._o_allocateChildY( self._children[self.LEFTSUPER], y - self._childAboveBaselines[self.LEFTSUPER], self._childRequisitions[self.LEFTSUPER].y )
 		if self._children[self.RIGHTSUPER] is not None:
-			self._o_allocateChildY( self._children[self.RIGHTSUPER], y  +  ( self._superscriptRequisitionHeight - self._childRequisitions[self.RIGHTSUPER].y ), self._childRequisitions[self.RIGHTSUPER].y )
+			self._o_allocateChildY( self._children[self.RIGHTSUPER], y - self._childAboveBaselines[self.RIGHTSUPER], self._childRequisitions[self.RIGHTSUPER].y )
 			
 		# Allocate main children
-		y = padding  +  self._superscriptRequisitionHeight - self._superscriptOverlap
+		y = padding + self._mainBaseFromTop
 		if self._children[self.MAIN] is not None:
-			self._o_allocateChildY( self._children[self.MAIN], y, self._childRequisitions[self.MAIN].y )
+			self._o_allocateChildY( self._children[self.MAIN], y - self._childAboveBaselines[self.MAIN], self._childRequisitions[self.MAIN].y )
 		
 		# Allocate subscript children
-		y = padding  +  ( self._superscriptRequisitionHeight - self._superscriptOverlap )  +  ( self._mainRequisitionHeight - self._subscriptOverlap )
+		y = padding + self._subBaseFromTop
 		if self._children[self.LEFTSUB] is not None:
-			self._o_allocateChildY( self._children[self.LEFTSUB], y, self._childRequisitions[self.LEFTSUB].y )
+			self._o_allocateChildY( self._children[self.LEFTSUB], y - self._childAboveBaselines[self.LEFTSUB], self._childRequisitions[self.LEFTSUB].y )
 		if self._children[self.RIGHTSUB] is not None:
-			self._o_allocateChildY( self._children[self.RIGHTSUB], y, self._childRequisitions[self.RIGHTSUB].y )
+			self._o_allocateChildY( self._children[self.RIGHTSUB], y - self._childAboveBaselines[self.RIGHTSUB], self._childRequisitions[self.RIGHTSUB].y )
 
 
+			
 	def _o_onChildResizeRequest(self, child):
 		self._o_queueResize()
 
@@ -337,7 +493,7 @@ if __name__ == '__main__':
 		return border
 	
 	
-	box = DTBox( DTDirection.TOP_TO_BOTTOM )
+	box = DTBox( DTDirection.TOP_TO_BOTTOM, spacing=20.0 )
 	for i in xrange( 0, 16 ):
 		if ( i & 1 )  !=  0:
 			leftSuperText = 'left super'

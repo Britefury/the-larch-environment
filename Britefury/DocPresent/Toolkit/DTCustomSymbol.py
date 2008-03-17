@@ -104,9 +104,9 @@ class DTCustomSymbol (DTSimpleStaticWidget):
 		self._o_refreshSymbolSize()
 		return self._symbolSize.x + 2.0
 
-	def _o_getRequiredHeight(self):
+	def _o_getRequiredHeightAndBaseline(self):
 		self._o_refreshSymbolSize()
-		return self._symbolSize.y + 2.0
+		return self._symbolSize.y + 2.0,  0.0
 
 
 	def _o_onAllocateY(self, allocation):

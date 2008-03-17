@@ -179,9 +179,11 @@ class DTLabel (DTSimpleStaticWidget):
 		self._p_refreshLayout()
 		return self._layout.get_pixel_size()[0]  +  2.0
 
-	def _o_getRequiredHeight(self):
+	def _o_getRequiredHeightAndBaseline(self):
 		self._p_refreshLayout()
-		return self._layout.get_pixel_size()[1]  +  2.0
+		height = self._layout.get_pixel_size()[1]
+		baseline = height  -  self._layout.get_iter().get_baseline() / float(pango.SCALE)
+		return height  +  2.0,  baseline + 1.0
 
 
 	def _o_onAllocateY(self, allocation):

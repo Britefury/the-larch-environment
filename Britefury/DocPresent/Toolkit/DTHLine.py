@@ -62,8 +62,8 @@ class DTHLine (DTSimpleStaticWidget):
 	def _o_getRequiredWidth(self):
 		return 0.0
 
-	def _o_getRequiredHeight(self):
-		return self._thickness
+	def _o_getRequiredHeightAndBaseline(self):
+		return self._thickness, 0.0
 
 
 
