@@ -155,8 +155,8 @@ class DTMultilineLabel (DTSimpleStaticWidget):
 		self._p_refreshLayout()
 		return self._layout.get_pixel_size()[0]  +  2.0
 
-	def _o_getRequiredHeight(self):
-		return self._layout.get_pixel_size()[1]  +  2.0
+	def _o_getRequiredHeightAndBaseline(self):
+		return self._layout.get_pixel_size()[1]  +  2.0,  0.0
 
 
 	def _o_onAllocateX(self, allocation):

@@ -706,9 +706,9 @@ class DTEntry (DTWidget):
 		self._p_refreshTextSize()
 		return self._entrySize.x
 
-	def _o_getRequiredHeight(self):
+	def _o_getRequiredHeightAndBaseline(self):
 		self._p_refreshTextSize()
-		return self._entrySize.y
+		return self._entrySize.y,  0.0
 
 
 	def _o_onAllocateX(self, allocation):
