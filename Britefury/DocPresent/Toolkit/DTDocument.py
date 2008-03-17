@@ -459,18 +459,7 @@ class DTDocument (DTBin):
 
 
 	def _p_scrollEvent(self, widget, event):
-		if event.state  &  ( gtk.gdk.MOD1_MASK | gtk.gdk.SHIFT_MASK | gtk.gdk.CONTROL_MASK )  !=  0:
-			if event.direction == gtk.gdk.SCROLL_UP:
-				scroll = Vector2( 0.0, -1.0 )
-			elif event.direction == gtk.gdk.SCROLL_DOWN:
-				scroll = Vector2( 0.0, 1.0 )
-			elif event.direction == gtk.gdk.SCROLL_LEFT:
-				scroll = Vector2( -1.0, 0.0 )
-			elif event.direction == gtk.gdk.SCROLL_RIGHT:
-				scroll = Vector2( 1.0, 0.0 )
-			self._f_evScroll( scroll )
-			self._p_emitImmediateEvents()
-		else:
+		if event.state  &  ( gtk.gdk.MOD1_MASK | gtk.gdk.SHIFT_MASK | gtk.gdk.CONTROL_MASK )  ==  gtk.gdk.MOD1_MASK:
 			if event.direction == gtk.gdk.SCROLL_UP:
 				delta = 1.0
 			elif event.direction == gtk.gdk.SCROLL_DOWN:
@@ -486,6 +475,27 @@ class DTDocument (DTBin):
 			self._docWindowTopLeftCornerInDocSpace -= ( newCentreInDocSpace - centreInDocSpace )
 
 			self._p_queueFullRedraw()
+		else:
+			if event.state  &  ( gtk.gdk.MOD1_MASK | gtk.gdk.SHIFT_MASK | gtk.gdk.CONTROL_MASK )  !=  0:
+				if event.direction == gtk.gdk.SCROLL_UP:
+					scroll = Vector2( 0.0, -1.0 )
+				elif event.direction == gtk.gdk.SCROLL_DOWN:
+					scroll = Vector2( 0.0, 1.0 )
+				elif event.direction == gtk.gdk.SCROLL_LEFT:
+					scroll = Vector2( -1.0, 0.0 )
+				elif event.direction == gtk.gdk.SCROLL_RIGHT:
+					scroll = Vector2( 1.0, 0.0 )
+				self._f_evScroll( scroll )
+				self._p_emitImmediateEvents()
+			else:
+				if event.direction == gtk.gdk.SCROLL_UP:
+					delta = -1.0
+				elif event.direction == gtk.gdk.SCROLL_DOWN:
+					delta = 1.0
+					
+				self._docWindowTopLeftCornerInDocSpace += self._p_windowSpaceSizeToDocSpace( Vector2( 0.0, delta  *  150.0 ) )
+
+				self._p_queueFullRedraw()
 
 
 
