@@ -41,7 +41,7 @@ class DVListWrappedLineStyleSheet (DVListStyleSheet):
 		return DTWrappedLineWithSeparators( separatorFactory=self.separator, spacing=self.elementSpacing, padding=self.elementPadding )
 
 	def overallContainer(self, elementsContainer):
-		box = DTBox( direction=self.overallDirection, spacing=self.overallSpacing, bExpand=self.overallExpand, bFill=self.overallFill, bShrink=self.overallShrink, minorDirectionAlignment=self.overallMinorDirectionAlignment, padding=self.overallPadding )
+		box = DTBox( direction=self.overallDirection, spacing=self.overallSpacing, bExpand=self.overallExpand, bFill=self.overallFill, bShrink=self.overallShrink, alignment=self.overallMinorDirectionAlignment, padding=self.overallPadding )
 		begin = self.beginDelimiter()
 		if begin is not None:
 			box.append( begin )

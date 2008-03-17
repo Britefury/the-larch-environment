@@ -241,7 +241,7 @@ def _runtime_vbox(viewNodeInstance, children, styleSheets):
 	Runtime - called by compiled code at run-time
 	Builds a vertical DTBox widget, with child, builds and registers a refresh cell
 	"""
-	widget = DTBox( direction=DTDirection.TOP_TO_BOTTOM, minorDirectionAlignment=DTBox.ALIGN_LEFT )
+	widget = DTBox( direction=DTDirection.TOP_TO_BOTTOM, alignment=DTBox.ALIGN_LEFT )
 	_runtime_boxRefreshCell( viewNodeInstance, widget, children )
 	_runtime_applyStyleSheetStack( viewNodeInstance, widget )
 	_runtime_applyStyleSheetList( styleSheets, widget )
@@ -410,6 +410,8 @@ class _GSymViewFactory (object):
 			 '_script' : _runtime_script,
 			 '_GSymStyleSheet' : GSymStyleSheet,
 			 '_Colour3f' : Colour3f,
+			 'DTDirection' : DTDirection,
+			 'DTBox' : DTBox,
 			 }
 		try:
 			self.makeViewFunction = compileGLispExprToPyFunction( viewModuleName, viewFunctionName, [ '__view_node_instance_stack__' ], spec, self._p_compileSpecial, lcls )

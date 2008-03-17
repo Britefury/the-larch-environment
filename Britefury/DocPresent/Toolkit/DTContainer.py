@@ -368,8 +368,8 @@ class DTContainer (DTWidget):
 
 
 	def _f_draw(self, context, areaBox):
-		super( DTContainer, self )._f_draw( context, areaBox )
 		self._o_drawBackground( context )
+		super( DTContainer, self )._f_draw( context, areaBox )
 		widgets = self._widgetBoxTable.getIntersectingWidgetList( areaBox )
 		for childId in widgets:
 			entry = self._childIdToEntry[childId]

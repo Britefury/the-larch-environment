@@ -27,19 +27,19 @@ class DTBox (DTContainerSequence):
 
 
 	class ChildEntry (DTContainerSequence.ChildEntry):
-		def __init__(self, child, bExpand, bFill, bShrink, minorDirectionAlignment, padding):
+		def __init__(self, child, bExpand, bFill, bShrink, alignment, padding):
 			super( DTBox.ChildEntry, self ).__init__( child )
 			self.bExpand = bExpand
 			self.bFill = bFill
 			self.bShrink = bShrink
-			self.minorDirectionAlignment = minorDirectionAlignment
+			self.alignment = alignment
 			self.padding = padding
 			self._reqWidth = 0.0
 			self._reqHeight = 0.0
 
 
 
-	def __init__(self, direction=DTDirection.LEFT_TO_RIGHT, spacing=0.0, bExpand=False, bFill=False, bShrink=False, minorDirectionAlignment=ALIGN_CENTRE, padding=0.0, backgroundColour=None):
+	def __init__(self, direction=DTDirection.LEFT_TO_RIGHT, spacing=0.0, bExpand=False, bFill=False, bShrink=False, alignment=ALIGN_CENTRE, padding=0.0, backgroundColour=None):
 		super( DTBox, self ).__init__( backgroundColour )
 
 		self._direction = direction
@@ -47,7 +47,7 @@ class DTBox (DTContainerSequence):
 		self._bExpand = bExpand
 		self._bFill = bFill
 		self._bShrink = bShrink
-		self._minorDirectionAlignment = minorDirectionAlignment
+		self._alignment = alignment
 		self._padding = padding
 		self._childrenRequisition = Vector2()
 		self._numExpand = 0
@@ -55,11 +55,53 @@ class DTBox (DTContainerSequence):
 
 
 
+	def getDirection(self):
+		return self._direction
+
+	def setDirection(self, direction):
+		self._direction = direction
+		self._o_queueResize()
+
 	def getSpacing(self):
 		return self._spacing
 
 	def setSpacing(self, spacing):
 		self._spacing = spacing
+		self._o_queueResize()
+
+	def getBExpand(self):
+		return self._bExpand
+
+	def setBExpand(self, bExpand):
+		self._bExpand = bExpand
+		self._o_queueResize()
+
+	def getBFill(self):
+		return self._bFill
+
+	def setBFill(self, bFill):
+		self._bFill = bFill
+		self._o_queueResize()
+
+	def getBShrink(self):
+		return self._bShrink
+
+	def setBShrink(self, bShrink):
+		self._bShrink = bShrink
+		self._o_queueResize()
+
+	def getAlignment(self):
+		return self._alignment
+
+	def setAlignment(self, alignment):
+		self._alignment = alignment
+		self._o_queueResize()
+
+	def getPadding(self):
+		return self._padding
+
+	def setPadding(self, padding):
+		self._padding = padding
 		self._o_queueResize()
 
 
@@ -71,38 +113,38 @@ class DTBox (DTContainerSequence):
 
 	def _p_itemToChildEntry(self, item):
 		if isinstance( item, tuple ):
-			child, bExpand, bFill, bShrink, minorDirectionAlignment, padding = item
-			return self.ChildEntry( child, bExpand, bFill, bShrink, minorDirectionAlignment, padding )
+			child, bExpand, bFill, bShrink, alignment, padding = item
+			return self.ChildEntry( child, bExpand, bFill, bShrink, alignment, padding )
 		else:
-			return self.ChildEntry( item, self._bExpand, self._bFill, self._bShrink, self._minorDirectionAlignment, self._padding )
+			return self.ChildEntry( item, self._bExpand, self._bFill, self._bShrink, self._alignment, self._padding )
 
 
-	def _p_buildEntry(self, child, bExpand=None, bFill=None, bShrink=None, minorDirectionAlignment=None, padding=None):
+	def _p_buildEntry(self, child, bExpand=None, bFill=None, bShrink=None, alignment=None, padding=None):
 		if bExpand is None:
 			bExpand = self._bExpand
 		if bFill is None:
 			bFill = self._bFill
 		if bShrink is None:
 			bShrink = self._bShrink
-		if minorDirectionAlignment is None:
-			minorDirectionAlignment = self._minorDirectionAlignment
+		if alignment is None:
+			alignment = self._alignment
 		if padding is None:
 			padding = self._padding
-		return self.ChildEntry( child, bExpand, bFill, bShrink, minorDirectionAlignment, padding )
+		return self.ChildEntry( child, bExpand, bFill, bShrink, alignment, padding )
 
 
-	def append(self, child, bExpand=None, bFill=None, bShrink=None, minorDirectionAlignment=None, padding=None):
-		entry = self._p_buildEntry( child, bExpand, bFill, bShrink, minorDirectionAlignment, padding )
+	def append(self, child, bExpand=None, bFill=None, bShrink=None, alignment=None, padding=None):
+		entry = self._p_buildEntry( child, bExpand, bFill, bShrink, alignment, padding )
 		self._o_appendEntry( entry )
 
 	def extend(self, children):
-		entries = [ self.ChildEntry( child, self._bExpand, self._bFill, self._bShrink, self._minorDirectionAlignment, self._padding )   for child in children ]
+		entries = [ self.ChildEntry( child, self._bExpand, self._bFill, self._bShrink, self._alignment, self._padding )   for child in children ]
 		self._o_extendEntries( entries )
 
 
-	def insert(self, index, child, bExpand=None, bFill=None, bShrink=None, minorDirectionAlignment=None, padding=None):
+	def insert(self, index, child, bExpand=None, bFill=None, bShrink=None, alignment=None, padding=None):
 		assert not self.hasChild( child ), 'child already present'
-		entry = self._p_buildEntry( child, bExpand, bFill, bShrink, minorDirectionAlignment, padding )
+		entry = self._p_buildEntry( child, bExpand, bFill, bShrink, alignment, padding )
 		self._o_insertEntry( index, entry )
 
 
@@ -243,13 +285,13 @@ class DTBox (DTContainerSequence):
 				x += childAlloc + self._spacing
 		else:
 			for entry in self._childEntries:
-				if entry.minorDirectionAlignment == self._ALIGN_TOPLEFT:
+				if entry.alignment == self._ALIGN_TOPLEFT:
 					self._o_allocateChildX( entry.child, 0.0, entry._reqWidth )
-				elif entry.minorDirectionAlignment == self.ALIGN_CENTRE:
+				elif entry.alignment == self.ALIGN_CENTRE:
 					self._o_allocateChildX( entry.child, ( allocation - entry._reqWidth )  *  0.5, entry._reqWidth )
-				elif entry.minorDirectionAlignment == self._ALIGN_BOTTOMRIGHT:
+				elif entry.alignment == self._ALIGN_BOTTOMRIGHT:
 					self._o_allocateChildX( entry.child, allocation - entry._reqWidth, entry._reqWidth )
-				elif entry.minorDirectionAlignment == self.ALIGN_EXPAND:
+				elif entry.alignment == self.ALIGN_EXPAND:
 					self._o_allocateChildX( entry.child, 0.0, allocation )
 
 
@@ -291,13 +333,13 @@ class DTBox (DTContainerSequence):
 				y += childAlloc + self._spacing
 		else:
 			for entry in self._childEntries:
-				if entry.minorDirectionAlignment == self._ALIGN_TOPLEFT:
+				if entry.alignment == self._ALIGN_TOPLEFT:
 					self._o_allocateChildY( entry.child, 0.0, entry._reqHeight )
-				elif entry.minorDirectionAlignment == self.ALIGN_CENTRE:
+				elif entry.alignment == self.ALIGN_CENTRE:
 					self._o_allocateChildY( entry.child, ( allocation - entry._reqHeight )  *  0.5, entry._reqHeight )
-				elif entry.minorDirectionAlignment == self._ALIGN_BOTTOMRIGHT:
+				elif entry.alignment == self._ALIGN_BOTTOMRIGHT:
 					self._o_allocateChildY( entry.child, allocation - entry._reqHeight, entry._reqHeight )
-				elif entry.minorDirectionAlignment == self.ALIGN_EXPAND:
+				elif entry.alignment == self.ALIGN_EXPAND:
 					self._o_allocateChildY( entry.child, 0.0, allocation )
 
 
@@ -392,9 +434,14 @@ class DTBox (DTContainerSequence):
 			return []
 
 	
-	
-	
+	direction = property( getDirection, setDirection )
 	spacing = property( getSpacing, setSpacing )
+	bExpand = property( getBExpand, setBExpand )
+	bFill = property( getBFill, setBFill )
+	bShrink = property( getBShrink, setBShrink )
+	alignment = property( getAlignment, setAlignment )
+	padding = property( getPadding, setPadding )
+
 
 
 
@@ -469,7 +516,7 @@ if __name__ == '__main__':
 	hbox.spacing = 5.0
 	hbox.backgroundColour = Colour3f( 0.6, 0.6, 0.6 )
 
-	vbox = DTBox( DTDirection.TOP_TO_BOTTOM, minorDirectionAlignment=DTBox.ALIGN_EXPAND )
+	vbox = DTBox( DTDirection.TOP_TO_BOTTOM, alignment=DTBox.ALIGN_EXPAND )
 	vbox.append( hbox, False )
 	vbox.append( label4, False )
 	vbox.spacing = 10.0

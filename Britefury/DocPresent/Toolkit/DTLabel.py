@@ -294,7 +294,7 @@ if __name__ == '__main__':
 	doc = DTDocument()
 	doc.getGtkWidget().show()
 
-	vbox = DTBox( DTDirection.TOP_TO_BOTTOM, minorDirectionAlignment=DTBox.ALIGN_EXPAND )
+	vbox = DTBox( DTDirection.TOP_TO_BOTTOM, alignment=DTBox.ALIGN_EXPAND )
 	vbox.spacing = 10.0
 	vbox.backgroundColour = Colour3f( 0.8, 0.8, 0.8 )
 

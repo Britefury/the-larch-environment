@@ -116,7 +116,7 @@ if __name__ == '__main__':
 	doc = DTDocument()
 	doc.show()
 
-	vbox = DTBox( direction=DTDirection.TOP_TO_BOTTOM, minorDirectionAlignment=DTBox.ALIGN_EXPAND )
+	vbox = DTBox( direction=DTDirection.TOP_TO_BOTTOM, alignment=DTBox.ALIGN_EXPAND )
 	vbox.spacing = 10.0
 	vbox.append( DTHLine() )
 	vbox.append( DTHLine() )
