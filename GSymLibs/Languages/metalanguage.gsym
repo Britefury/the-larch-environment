@@ -6,6 +6,13 @@
 					($where
 						(
 							($# "STYLE SHEETS")
+							($# "Error background")
+							(@errorBackgroundStyle
+								($style
+									(:backgroundColour ($colour #1.0 #0.5 #0.5))
+								)
+							)
+						
 							($# "Label background")
 							(@labelBackgroundStyle
 								($style
@@ -32,7 +39,31 @@
 								($lambda (@node)
 									($match @node
 										($# "Unknown")
-										( (: @x ^)  (@log <- (@gLispAsString <- @x)) ($activeBorder ($label u"#'\u2620 SPECIAL-ERROR \u2620")) )
+										( (: @x ^)  (@log <- (@gLispAsString <- @x)) ($activeBorder ($label "#'\u2620 SPECIAL-ERROR \u2620")) )
+									)
+								)
+							)
+							
+							($# "View style list; returns a list containing the box, or an empty list")
+							(@viewStyleList
+								($lambda (@styles)
+									($if
+										( ((@len <- @styles)  >  #0 )
+											($list
+												($hbox
+													(
+														($list
+															($label "#'STYLES:")
+														)
+														+
+														($mapViewEval @styles (@viewExpressionFactory <- @viewViewSpecial))
+													)
+												)
+											)
+										)
+										( $else
+											($list)
+										)
 									)
 								)
 							)
@@ -145,11 +176,56 @@
 										)
 										
 										($# "Active border")
-										( ($activeBorder (: @x ^))
+										( ($activeBorder (: @x ^) (: @styles *))
 											($activeBorder
 												($vbox ($list
 													($label "#'ActiveBorder")
-													($viewEval @x (@viewExpressionFactory <- @viewViewSpecial))
+													($vbox
+														(
+															($list ($viewEval @x (@viewExpressionFactory <- @viewViewSpecial)))
+															+
+															(@viewStyleList <- @styles)
+														)
+													)
+												))
+												@containerBackgroundStyle
+											)
+										)
+										
+										($# "Border")
+										( ($border (: @x ^) (: @styles *))
+											($activeBorder
+												($vbox ($list
+													($label "#'Border")
+													($vbox
+														(
+															($list ($viewEval @x (@viewExpressionFactory <- @viewViewSpecial)))
+															+
+															(@viewStyleList <- @styles)
+														)
+													)
+												))
+												@containerBackgroundStyle
+											)
+										)
+										
+										($# "Indent")
+										( ($indent (: @indentation ^) (: @x ^) (: @styles *))
+											($activeBorder
+												($vbox ($list
+													($hbox ($list
+														($hbox ($list
+															($label "#'Indent by")
+															($viewEval @indentation (@viewExpressionFactory <- @viewViewSpecial))
+														))
+														($vbox
+															(
+																($list ($viewEval @x (@viewExpressionFactory <- @viewViewSpecial)))
+																+
+																(@viewStyleList <- @styles)
+															)
+														)
+													))
 												))
 												@containerBackgroundStyle
 											)
@@ -177,88 +253,140 @@
 										)
 										
 										($# "HBox")
-										( ($hbox (: @x ^))
+										( ($hbox (: @x ^) (: @styles *))
 											($activeBorder
 												($vbox ($list
 													($label "#'HBox")
-													($viewEval @x (@viewExpressionFactory <- @viewViewSpecial))
+													($vbox
+														(
+															($list ($viewEval @x (@viewExpressionFactory <- @viewViewSpecial)))
+															+
+															(@viewStyleList <- @styles)
+														)
+													)
 												))
 											)
 										)
 										
 										($# "VBox")
-										( ($vbox (: @x ^))
+										( ($vbox (: @x ^) (: @styles *))
 											($activeBorder
 												($vbox ($list
 													($label "#'VBox")
-													($viewEval @x (@viewExpressionFactory <- @viewViewSpecial))
+													($vbox
+														(
+															($list ($viewEval @x (@viewExpressionFactory <- @viewViewSpecial)))
+															+
+															(@viewStyleList <- @styles)
+														)
+													)
 												))
 											)
 										)
 
 										($# "Script")
-										( ($script (: @main ^) (: @lsuper ^) (: @lsub ^) (: @rsuper ^) (: @rsub ^))
+										( ($script (: @main ^) (: @lsuper ^) (: @lsub ^) (: @rsuper ^) (: @rsub ^) (: @styles *))
 											($activeBorder
 												($vbox ($list
 													($label "#'Script")
-													($script
-														($viewEval @main (@viewExpressionFactory <- @viewViewSpecial))
-														($viewEval @lsuper (@viewExpressionFactory <- @viewViewSpecial))
-														($viewEval @lsub (@viewExpressionFactory <- @viewViewSpecial))
-														($viewEval @rsuper (@viewExpressionFactory <- @viewViewSpecial))
-														($viewEval @rsub (@viewExpressionFactory <- @viewViewSpecial))
+													($vbox
+														(
+															($list
+																($script
+																	($viewEval @main (@viewExpressionFactory <- @viewViewSpecial))
+																	($viewEval @lsuper (@viewExpressionFactory <- @viewViewSpecial))
+																	($viewEval @lsub (@viewExpressionFactory <- @viewViewSpecial))
+																	($viewEval @rsuper (@viewExpressionFactory <- @viewViewSpecial))
+																	($viewEval @rsub (@viewExpressionFactory <- @viewViewSpecial))
+																)
+															)
+															+
+															(@viewStyleList <- @styles)
+														)
 													)
 												))
 											)
 										)
 										
 										($# "Script left superscript")
-										( ($scriptLSuper (: @main ^) (: @scriptChild ^))
+										( ($scriptLSuper (: @main ^) (: @scriptChild ^) (: @styles *))
 											($activeBorder
 												($vbox ($list
 													($label "#'Script - left super")
-													($scriptLSuper
-														($viewEval @main (@viewExpressionFactory <- @viewViewSpecial))
-														($viewEval @scriptChild (@viewExpressionFactory <- @viewViewSpecial))
+													($vbox
+														(
+															($list
+																($scriptLSuper
+																	($viewEval @main (@viewExpressionFactory <- @viewViewSpecial))
+																	($viewEval @scriptChild (@viewExpressionFactory <- @viewViewSpecial))
+																)
+															)
+															+
+															(@viewStyleList <- @styles)
+														)
 													)
 												))
 											)
 										)
 										
 										($# "Script left subscript")
-										( ($scriptLSub (: @main ^) (: @scriptChild ^))
+										( ($scriptLSub (: @main ^) (: @scriptChild ^) (: @styles *))
 											($activeBorder
 												($vbox ($list
 													($label "#'Script - left sub")
-													($scriptLSub
-														($viewEval @main (@viewExpressionFactory <- @viewViewSpecial))
-														($viewEval @scriptChild (@viewExpressionFactory <- @viewViewSpecial))
+													($vbox
+														(
+															($list
+																($scriptLSub
+																	($viewEval @main (@viewExpressionFactory <- @viewViewSpecial))
+																	($viewEval @scriptChild (@viewExpressionFactory <- @viewViewSpecial))
+																)
+															)
+															+
+															(@viewStyleList <- @styles)
+														)
 													)
 												))
 											)
 										)
 										
 										($# "Script right superscript")
-										( ($scriptRSuper (: @main ^) (: @scriptChild ^))
+										( ($scriptRSuper (: @main ^) (: @scriptChild ^) (: @styles *))
 											($activeBorder
 												($vbox ($list
 													($label "#'Script - right super")
-													($scriptRSuper
-														($viewEval @main (@viewExpressionFactory <- @viewViewSpecial))
-														($viewEval @scriptChild (@viewExpressionFactory <- @viewViewSpecial))
+													($vbox
+														(
+															($list
+																($scriptRSuper
+																	($viewEval @main (@viewExpressionFactory <- @viewViewSpecial))
+																	($viewEval @scriptChild (@viewExpressionFactory <- @viewViewSpecial))
+																)
+															)
+															+
+															(@viewStyleList <- @styles)
+														)
 													)
 												))
 											)
 										)
 										
 										($# "Script right subscript")
-										( ($scriptRSub (: @main ^) (: @scriptChild ^))
+										( ($scriptRSub (: @main ^) (: @scriptChild ^) (: @styles *))
 											($activeBorder
 												($vbox ($list
 													($label "#'Script - right sub")
-													($scriptRSub
-														($viewEval @main (@viewExpressionFactory <- @viewViewSpecial))
-														($viewEval @scriptChild (@viewExpressionFactory <- @viewViewSpecial))
+													($vbox
+														(
+															($list
+																($scriptRSub
+																	($viewEval @main (@viewExpressionFactory <- @viewViewSpecial))
+																	($viewEval @scriptChild (@viewExpressionFactory <- @viewViewSpecial))
+																)
+															)
+															+
+															(@viewStyleList <- @styles)
+														)
 													)
 												))
 											)
@@ -277,6 +405,76 @@
 								)
 							)
 							
+							($# "View a lambda parameter")
+							(@viewLambdaParam
+								($lambda (@node)
+									($activeBorder ($label (@node [:] #1 #None)))
+								)
+							)
+							
+							($# "View a lambda parameter list")
+							(@viewLambdaParamList
+								($lambda (@node)
+									($activeBorder
+										($hbox
+											((($list ($label "#'("))  +  ($mapViewEval @node @viewLambdaParam))  +  ($list ($label "#')")))
+										)
+									)
+								)
+							)
+							
+							($# "View an if pair; factory dependent on special function and bIf")
+							(@viewIfPairFactory
+								($lambda (@viewSpecial @bIf)
+									($lambda (@node)
+										($match @node
+											( ($# (: @comment !))
+												(@viewComment <- @comment)
+											)
+											
+											( ($else (: @expressions *))
+												($activeBorder
+													($vbox ($list
+														($label "#'ELSE:")
+														($indent #40.0
+															($vbox
+																($mapViewEval @expressions (@viewExpressionFactory <- @viewSpecial))
+															)
+														)
+													))
+												)
+											)
+
+											( ((: @condition ^) (: @expressions *))
+												($activeBorder
+													($vbox ($list
+														($hbox ($list
+															($if
+																( @bIf
+																	($label "#'IF:")
+																)
+																( $else
+																	($label "#'ELIF:")
+																)
+															)
+															($viewEval @condition (@viewExpressionFactory <- @viewSpecial))
+														))
+														($indent #40.0
+															($vbox
+																($mapViewEval @expressions (@viewExpressionFactory <- @viewSpecial))
+															)
+														)
+													))
+												)
+											)
+
+											($# "Unknown")
+											( (: @x ^)  (@log <- (@gLispAsString <- @x)) ($activeBorder ($label u"#'\u2620 IF-ERROR \u2620")) )
+										)
+									)
+								)
+							)
+
 							($# "View a where binding; factory dependent on special function")
 							(@viewWhereBindingFactory
 								($lambda (@viewSpecial)
@@ -300,24 +498,6 @@
 								)
 							)
 
-							($# "View a lambda parameter")
-							(@viewLambdaParam
-								($lambda (@node)
-									($activeBorder ($label @node))
-								)
-							)
-							
-							($# "View a lambda parameter list")
-							(@viewLambdaParamList
-								($lambda (@node)
-									($activeBorder
-										($hbox
-											((($list ($label "#'("))  +  ($mapViewEval @node @viewLambdaParam))  +  ($list ($label "#')")))
-										)
-									)
-								)
-							)
-							
 							($# "View a match pattern")
 							(@viewMatchPatternFactory
 								($lambda (@viewSpecial)
@@ -462,36 +642,6 @@
 												)
 											)
 
-											($# "Where expression")
-											( ($where (: @bindings /) (: @expressions *))
-												($activeBorder
-													($vbox
-														((($list ($label "#'WHERE"))  +
-														($mapViewEval @bindings (@viewWhereBindingFactory <- @viewSpecial)))  +
-														($list ($hbox ($list ($label "#'=") ($vbox ($mapViewEval @expressions (@viewExpressionFactory <- @viewSpecial)))))))
-													)
-												)
-											)
-											
-											($# "Lambda expression, with 0 or 1 expressions")
-											( ($lambda (: @params /) (: @expressions *))
-												($activeBorder
-													($hbox
-														(
-															($list
-																($hbox ($list
-																	($label u"#'\u03bb")
-																	($viewEval @params @viewLambdaParamList)
-																	($label "#'=")
-																))
-															)
-															+
-															($mapViewEval @expressions (@viewExpressionFactory <- @viewSpecial))
-														)
-													)
-												)
-											)
-
 											($# "Lambda expression 2 or more expressions")
 											( ($lambda (: @params /) (: @expressions (- #2 #None)))
 												($activeBorder
@@ -511,22 +661,72 @@
 												)
 											)
 
-											($# "Pattern match expression")
-											( ($match (: @expression ^) (: @matchPairs *))
+											($# "Lambda expression, with 0 or 1 expressions")
+											( ($lambda (: @params /) (: @expressions *))
+												($activeBorder
+													($hbox
+														(
+															($list
+																($hbox ($list
+																	($label u"#'\u03bb")
+																	($viewEval @params @viewLambdaParamList)
+																	($label "#'=")
+																))
+															)
+															+
+															($mapViewEval @expressions (@viewExpressionFactory <- @viewSpecial))
+														)
+													)
+												)
+											)
+
+											($# "If expression")
+											( ($if (: @ifPair ^) (: @elifElsePairs *))
 												($activeBorder
 													($vbox
 														(
 															($list
-																($hbox ($list
-																	($label "#'MATCH")
-																	($viewEval @expression (@viewExpressionFactory <- @viewSpecial))
-																	($label "#':")
-																))
+																($viewEval @ifPair (@viewIfPairFactory <- @viewSpecial #True))
 															)
 															+
-															($mapViewEval @matchPairs (@viewMatchPairFactory <- @viewSpecial))
+															($mapViewEval @elifElsePairs (@viewIfPairFactory <- @viewSpecial #False))
 														)
 													)
+												)
+											)
+											
+											($# "Where expression")
+											( ($where (: @bindings /) (: @expressions *))
+												($activeBorder
+													($vbox ($list
+														($label "#'WHERE")
+														($indent #50.0 ($vbox ($mapViewEval @bindings (@viewWhereBindingFactory <- @viewSpecial))))
+														($indent #20.0
+															($hbox ($list
+																($label u"#'\u2192")
+																	($vbox
+																		($mapViewEval @expressions (@viewExpressionFactory <- @viewSpecial))
+																	)
+															))
+														)
+													))
+												)
+											)
+											
+											($# "Pattern match expression")
+											( ($match (: @expression ^) (: @matchPairs *))
+												($activeBorder
+													($vbox ($list
+														($hbox ($list
+															($label "#'MATCH")
+															($viewEval @expression (@viewExpressionFactory <- @viewSpecial))
+															($label "#':")
+														))
+														
+														($indent #30.0
+															($vbox ($mapViewEval @matchPairs (@viewMatchPairFactory <- @viewSpecial)))
+														)
+													))
 												)
 											)
 											

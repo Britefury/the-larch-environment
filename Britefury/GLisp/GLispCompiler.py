@@ -425,12 +425,12 @@ def _compileGLispExprToPyTree(xs, context, bNeedResult=False, compileSpecial=Non
 			return PyListLiteral( [ _compileGLispExprToPyTree( e, context, True, compileSpecial )   for e in xs[1:] ], dbgSrc=xs )
 		elif xs[0] == '$set':
 			return PyCall( PyVar( 'set', dbgSrc=xs ), [ PyListLiteral( [ _compileGLispExprToPyTree( e, context, True, compileSpecial )   for e in xs[1:] ], dbgSrc=xs ) ], dbgSrc=xs )
-		elif xs[0] == '$where':
-			return _compileWhere( xs, context, bNeedResult, compileSpecial )
-		elif xs[0] == '$if':
-			return _compileIf( xs, context, bNeedResult, compileSpecial )
 		elif xs[0] == '$lambda':
 			return _compileLambda( xs, context, bNeedResult, compileSpecial )
+		elif xs[0] == '$if':
+			return _compileIf( xs, context, bNeedResult, compileSpecial )
+		elif xs[0] == '$where':
+			return _compileWhere( xs, context, bNeedResult, compileSpecial )
 		elif xs[0] == '$match':
 			return _compileMatch( xs, context, bNeedResult, compileSpecial )
 		elif isinstance( xs[0], str )  and  xs[0][0] == '$':
