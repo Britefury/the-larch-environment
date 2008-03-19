@@ -6,7 +6,6 @@
 					(@ml compilerDefinition asciiCompiler simpleLanguage python25_ascii
 						($lambda (@node)
 							($match @node
-								($# addition)
 								( (add (: @x ^) (: @y ^))   (  (((("#'(" + ($compileEval @x)) + "#' + ") + ($compileEval @y)) + "#')")  ) )
 								( (sub (: @x ^) (: @y ^))   (  (((("#'(" + ($compileEval @x)) + "#' - ") + ($compileEval @y)) + "#')")  ) )
 								( (mul (: @x ^) (: @y ^))   (  (((("#'(" + ($compileEval @x)) + "#' * ") + ($compileEval @y)) + "#')")  ) )
@@ -18,14 +17,23 @@
 					)
 					
 					(@ml displayDefinition simpleLanguageDisplay simpleLanguage
-						($lambda (@node)
-							($match @node
-								( (add (: @x ^) (: @y ^))   (  ($activeBorder ($hbox ($list ($viewEval @x) ($label "#'+") ($viewEval @y))))  ) )
-								( (sub (: @x ^) (: @y ^))   (  ($activeBorder ($hbox ($list ($viewEval @x) ($label "#'-") ($viewEval @y))))  ) )
-								( (mul (: @x ^) (: @y ^))   (  ($activeBorder ($hbox ($list ($viewEval @x) ($label "#'*") ($viewEval @y))))  ) )
-								( (div (: @x ^) (: @y ^))   (  ($activeBorder ($hbox ($list ($viewEval @x) ($label "#'/") ($viewEval @y))))  ) )
-								( (pow (: @x ^) (: @y ^))   (  ($activeBorder ($hbox ($list ($viewEval @x) ($label "#'**") ($viewEval @y))))  ) )
-								( (loadLocal (: @x !))   (  ($activeBorder ($entry @x))  ) )
+						($where
+							(
+								(@divBoxStyle
+									($style
+										(:alignment (@DTBox . ALIGN_EXPAND))
+									)
+								)
+							)
+							($lambda (@node)
+								($match @node
+									( (add (: @x ^) (: @y ^))   (  ($activeBorder ($hbox ($list ($viewEval @x) ($label "#'+") ($viewEval @y))))  ) )
+									( (sub (: @x ^) (: @y ^))   (  ($activeBorder ($hbox ($list ($viewEval @x) ($label "#'-") ($viewEval @y))))  ) )
+									( (mul (: @x ^) (: @y ^))   (  ($activeBorder ($hbox ($list ($viewEval @x) ($label "#'*") ($viewEval @y))))  ) )
+									( (div (: @x ^) (: @y ^))   (  ($activeBorder ($vbox ($list ($viewEval @x) ($hline) ($viewEval @y)) @divBoxStyle))  ) )
+									( (pow (: @x ^) (: @y ^))   (  ($activeBorder ($scriptRSuper ($viewEval @x)($viewEval @y)))  )  )
+									( (loadLocal (: @x !))   (  ($activeBorder ($entry @x))  ) )
+								)
 							)
 						)
 					)
