@@ -257,12 +257,35 @@
 											)
 										)
 										
+										($# "H-Line")
+										( ($hline (: @styles *))
+											($activeBorder
+												($vbox ($list
+													($label "#'H-Line")
+													($vbox
+														(
+															($list ($viewEval @x (@viewExpressionFactory <- @viewViewSpecial)))
+															+
+															(@viewStyleList <- @styles)
+														)
+													)
+												)  @titleVBoxStyle)
+												@labelBackgroundStyle
+											)
+										)
+										
 										($# "Label")
-										( ($label (: @x ^))
+										( ($label (: @x ^) (: @styles *))
 											($activeBorder
 												($vbox ($list
 													($label "#'Label")
-													($viewEval @x (@viewExpressionFactory <- @viewViewSpecial))
+													($vbox
+														(
+															($list ($viewEval @x (@viewExpressionFactory <- @viewViewSpecial)))
+															+
+															(@viewStyleList <- @styles)
+														)
+													)
 												)  @titleVBoxStyle)
 												@labelBackgroundStyle
 											)
@@ -275,6 +298,7 @@
 													($label "#'Entry")
 													($viewEval @x (@viewExpressionFactory <- @viewViewSpecial))
 												)  @titleVBoxStyle)
+												@labelBackgroundStyle
 											)
 										)
 										

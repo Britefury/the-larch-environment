@@ -14,9 +14,10 @@ from Britefury.Cell.Cell import Cell
 from Britefury.DocPresent.Toolkit.DTWidget import DTWidget
 from Britefury.DocPresent.Toolkit.DTActiveBorder import DTActiveBorder
 from Britefury.DocPresent.Toolkit.DTBorder import DTBorder
-from Britefury.DocPresent.Toolkit.DTLabel import DTLabel
-from Britefury.DocPresent.Toolkit.DTEntryLabel import DTEntryLabel
 from Britefury.DocPresent.Toolkit.DTBox import DTBox
+from Britefury.DocPresent.Toolkit.DTEntryLabel import DTEntryLabel
+from Britefury.DocPresent.Toolkit.DTHLine import DTHLine
+from Britefury.DocPresent.Toolkit.DTLabel import DTLabel
 from Britefury.DocPresent.Toolkit.DTScript import DTScript
 
 from Britefury.DocPresent.Toolkit.DTDirection import DTDirection
@@ -199,6 +200,16 @@ def _runtime_indent(viewNodeInstance, child, indentation, styleSheets):
 	widget.leftMargin = indentation
 	widget.keyHandler = viewNodeInstance.viewNode
 	_runtime_binRefreshCell( viewNodeInstance, widget, child )
+	_runtime_applyStyleSheetStack( viewNodeInstance, widget )
+	_runtime_applyStyleSheetList( styleSheets, widget )
+	return widget
+
+def _runtime_hline(viewNodeInstance, styleSheets):
+	"""
+	Runtime - called by compiled code at run-time
+	Builds a DTLabel widget
+	"""
+	widget = DTHLine()
 	_runtime_applyStyleSheetStack( viewNodeInstance, widget )
 	_runtime_applyStyleSheetList( styleSheets, widget )
 	return widget
@@ -403,6 +414,7 @@ class _GSymViewFactory (object):
 			 '_activeBorder' : _runtime_activeBorder,
 			 '_border' : _runtime_border,
 			 '_indent' : _runtime_indent,
+			 '_hline' : _runtime_hline,
 			 '_label' : _runtime_label,
 			 '_entry' : _runtime_entry,
 			 '_hbox' : _runtime_hbox,
@@ -527,12 +539,15 @@ class _GSymViewFactory (object):
 			#($border <child> styleSheet*)
 			if len( srcXs ) < 2:
 				self.env.glispError( GLispParameterListError, src, 'defineView: $border needs at least 1 parameters; the child content' )
-			return PyVar( '_border' )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[1] ), compileStyleSheetAccess( srcXs[2:]) ).debug( srcXs )
+			return PyVar( '_border' )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[1] ), compileStyleSheetAccess( srcXs[1:]) ).debug( srcXs )
 		elif name == '$indent':
 			#($indent <indentation> <child> styleSheet*)
 			if len( srcXs ) < 3:
 				self.env.glispError( GLispParameterListError, src, 'defineView: $border needs at least 2 parameters; the indentation and the child content' )
 			return PyVar( '_indent' )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[2] ), compileSubExp( srcXs[1] ), compileStyleSheetAccess( srcXs[3:]) ).debug( srcXs )
+		elif name == '$hline':
+			#($hline styleSheet*)
+			return PyCall( PyVar( '_hline', dbgSrc=srcXs ), [ PySrc( '__view_node_instance_stack__[-1]', dbgSrc=srcXs ), compileStyleSheetAccess( srcXs[2:]) ], dbgSrc=srcXs )
 		elif name == '$label':
 			#($label text styleSheet*)
 			if len( srcXs ) < 2:
