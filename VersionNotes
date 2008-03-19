@@ -9,10 +9,17 @@ The version numbers correspond to SVN revision numbers
 Revision 83:
 	Original prototype, includes old virtual machine
 
-Revision 95:
+Revision 95 - PROTOTYPE 1:
 	Original prototype, old system, with graphing, DnD
+	Demonstrated at Europython 2007.
 	*** Usable; will need modifications to build script to compile on Windows platform
 	
 Revision 176:
 	New document model system
 	Old LanguageRegistry system still present, but unused
+
+Revision 242 - PROTOTYPE 2
+	Contains the beginnings of the metalanguage.
+	GSymLibs/Languages/metalanguage.gsym - defines how the gSym meta-language is viewed
+	GSymLibs/Languages/simplelanguage.gsym - defines a simple language. This definition is viewed by importing the view definition found in the metalanguage
+	testsources/simlplelanguage_test.gym contains some test source code, viewed using the view definition foudn in simplelanguage
