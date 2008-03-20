@@ -167,7 +167,7 @@ class GLispFrame (object):
 		return s
 	
 	
-	def glispError(self, exceptionClass, src, reason):
+	def raiseError(self, exceptionClass, src, reason):
 		raise exceptionClass, self.rootScope().name + ': ' + reason  +  '   ::   '  +  gLispSrcToString( src, 3 )
 		
 
@@ -177,7 +177,7 @@ class GLispFrame (object):
 			try:
 				return self[varName]
 			except KeyError:
-				self.glispError( GLispNameError, xs, '%s not bound'  %  ( varName ) )
+				self.raiseError( GLispNameError, xs, '%s not bound'  %  ( varName ) )
 		elif xs[0] == '#':
 			value = xs[1:]
 			if value == 'False':
@@ -240,7 +240,7 @@ class GLispFrame (object):
 							try:
 								method = getattr( target, methodName )
 							except AttributeError:
-								self.glispError( GLispMethodError, xs, '%s has no method %s' % ( target, methodName ) )
+								self.raiseError( GLispMethodError, xs, '%s has no method %s' % ( target, methodName ) )
 						elif callable( methodName ):
 							# method name is callable; call it
 							args = [ self.evaluate( dmarg )   for dmarg in xs[2:] ]
@@ -250,7 +250,7 @@ class GLispFrame (object):
 								print '*** Internal error in %s'  %  ( xs, )
 								raise
 						else:
-							self.glispError( TypeError, xs, 'methodName is invalid' )
+							self.raiseError( TypeError, xs, 'methodName is invalid' )
 						
 						if isinstance( method, specialform ):
 							# Special form; pass the list onto the method, along with the frame
@@ -273,21 +273,21 @@ class GLispFrame (object):
 		($where ((name0 value0) (name1 value1) ... (nameN valueN)) (expressions_to_execute))
 		"""
 		if len( xs ) < 2:
-			self.glispError( ValueError, xs, '$where must have have at least 1 parameter; the binding list' )
+			self.raiseError( ValueError, xs, '$where must have have at least 1 parameter; the binding list' )
 	
 		bindings = xs[1]
 		expressions = xs[2:]
 		
 		if not isGLispList( bindings ):
-			self.glispError( ValueError, xs, '$where bindings must be a list of pairs' )
+			self.raiseError( ValueError, xs, '$where bindings must be a list of pairs' )
 		
 		newEnv = self.innerScope()
 		for binding in bindings:
 			if not isGLispList( binding )  or  len( binding ) != 2:
-				self.glispError( ValueError, xs, '$where binding must be a name value pair' )
+				self.raiseError( ValueError, xs, '$where binding must be a name value pair' )
 			
 			if binding[0][0] != '@':
-				self.glispError( ValueError, xs, '$where binding name must start with @' )
+				self.raiseError( ValueError, xs, '$where binding name must start with @' )
 			
 			newEnv._env[binding[0][1:]] = newEnv.evaluate( binding[1] )
 			
@@ -301,7 +301,7 @@ class GLispFrame (object):
 		($importModule (module as_name) (expressions_to_execute))
 		"""
 		if len( xs ) < 2:
-			self.glispError( TypeError, xs, '$importModule must have at least 1 parameter; the module to import' )
+			self.raiseError( TypeError, xs, '$importModule must have at least 1 parameter; the module to import' )
 
 		moduleName = xs[1]
 		expressions = xs[2:]
@@ -311,11 +311,11 @@ class GLispFrame (object):
 			targetName = name
 		else:
 			if len( moduleName ) != 2:
-				self.glispError( ValueError, xs, '$importModule module name must either be a string, or a list of two items; the name and the name to import as' )
+				self.raiseError( ValueError, xs, '$importModule module name must either be a string, or a list of two items; the name and the name to import as' )
 			name = moduleName[0]
 			targetName = moduleName[1]
 			if targetName[0] != '@':
-				self.glispError( ValueError, xs, '$importModule \'import as name\' must start with a @' )
+				self.raiseError( ValueError, xs, '$importModule \'import as name\' must start with a @' )
 			targetName = targetName[1:]
 		
 		module = self.moduleRegistry[name]
@@ -335,7 +335,7 @@ class GLispFrame (object):
 			(name import_as_name)
 		"""
 		if len( xs ) < 3:
-			self.glispError( TypeError, xs, '$importModuleContents must have at least 2 parameter; the module to import, and the items to import' )
+			self.raiseError( TypeError, xs, '$importModuleContents must have at least 2 parameter; the module to import, and the items to import' )
 
 		name = xs[1]
 		items = xs[2]
@@ -346,27 +346,27 @@ class GLispFrame (object):
 		module = self.moduleRegistry[name]
 
 		if not isinstance( name , str )  and  not isinstance( name, unicode ):
-			self.glispError( ValueError, xs, '$importModuleContents module path should be a string' )
+			self.raiseError( ValueError, xs, '$importModuleContents module path should be a string' )
 		
 
 		if not isGLispList( items ):
-			self.glispError( ValueError, xs, '$importModuleContents items should be a list' )
+			self.raiseError( ValueError, xs, '$importModuleContents items should be a list' )
 		
 		for item in items:
 			if not isGLispList( item ):
-				self.glispError( ValueError, xs, '$importModuleContents item should be a list' )
+				self.raiseError( ValueError, xs, '$importModuleContents item should be a list' )
 		
 			srcName = item[0]
 			destName = item[1]
 			
 			if destName[0] != '@':
-				self.glispError( ValueError, xs, '$importModuleContents destination name must start with a @' )
+				self.raiseError( ValueError, xs, '$importModuleContents destination name must start with a @' )
 			destName = destName[1:]
 
 			try:
 				moduleAttribute = module[srcName]
 			except KeyError:
-				self.glispError( ValueError, xs, '$importModuleContents: module %s has no attribute %s'  %  ( name, srcName ) )
+				self.raiseError( ValueError, xs, '$importModuleContents: module %s has no attribute %s'  %  ( name, srcName ) )
 			
 			newEnv[destName] = moduleAttribute
 

@@ -24,17 +24,17 @@ class MetaMetaLanguageInstance (GSymLanguageInstance):
 	@specialform
 	def displayDefinition(self, env, xs):
 		if len( xs ) < 4:
-			env.glispError( GLispParameterListError, xs, 'MetaMetaLanguageInstanceInterface#displayDefinition: needs at least 2 parameters; the name, and the document format' )
+			env.raiseError( GLispParameterListError, xs, 'MetaMetaLanguageInstanceInterface#displayDefinition: needs at least 2 parameters; the name, and the document format' )
 		
 		name = xs[2]
 		docFormat = xs[3]
 		spec = xs[4:]
 		
 		if not isinstance( name, str ):
-			env.glispError( GLispItemTypeError, xs, 'MetaMetaLanguageInstanceInterface#compilerDefinition: 1st parameter (compiler name) must be a string' )
+			env.raiseError( GLispItemTypeError, xs, 'MetaMetaLanguageInstanceInterface#compilerDefinition: 1st parameter (compiler name) must be a string' )
 			
 		if not isinstance( docFormat, str ):
-			env.glispError( GLispItemTypeError, xs, 'MetaMetaLanguageInstanceInterface#compilerDefinition: 2nd parameter (document format) must be a string' )
+			env.raiseError( GLispItemTypeError, xs, 'MetaMetaLanguageInstanceInterface#compilerDefinition: 2nd parameter (document format) must be a string' )
 			
 		return defineView( env, xs, name, docFormat, spec )
 
