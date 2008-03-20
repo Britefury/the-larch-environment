@@ -10,6 +10,14 @@
 					)
 				)
 			
+				($# "Comment background")
+				(@commentBackgroundStyle
+					($style
+						(:backgroundColour ($colour #0.95 #0.95 #0.95))
+						(:borderColour ($colour #0.8 #0.8 #0.8))
+					)
+				)
+			
 				($# "Label background")
 				(@labelBackgroundStyle
 					($style
@@ -51,17 +59,7 @@
 			
 				
 				
-				($# "VIEW LAMBDAS")							
-				($# "View special expressions for a compiler definition")
-				(@viewCompilerSpecial
-					($lambda (@node)
-						($match @node
-							($# "Unknown")
-							( (: @x ^)  (@log <- (@gLispAsString <- @x)) ($activeBorder ($label u"#'\u2620 SPECIAL-ERROR \u2620")) )
-						)
-					)
-				)
-				
+				($# "VIEW FUNCTIONS")							
 				($# "View style list; returns a list containing the box, or an empty list")
 				(@viewStyleList
 					($lambda (@styles)
@@ -455,7 +453,7 @@
 				($# "View a comment")
 				(@viewComment
 					($lambda (@comment)
-						($activeBorder ($label ("#'#" + @comment)))
+						($activeBorder ($label ("#'#" + @comment)) @commentBackgroundStyle)
 					)
 				)
 				
@@ -888,66 +886,8 @@
 						)
 					)
 				)
-				
-				($# "View an language definition subtree")
-				(@viewDefinitionNode
-					($lambda (@node)
-						($match @node
-							( (! compilerDefinition (: @name !) (: @sourceFormat !) (: @targetFormat !) (: @specification *))
-								(
-									($activeBorder
-										($vbox
-											(
-												($list
-													($hbox ($list
-														($label "#'Compiler definition")
-														($label @name)
-														($label @sourceFormat)
-														($label "#'To:")
-														($label @targetFormat)
-													))
-												)
-												+
-												($mapViewEval @specification (@viewExpressionFactory <- @viewCompilerSpecial))
-											)
-										)
-									)
-								)
-							)
-							( (! displayDefinition (: @name !) (: @format !) (: @specification *))
-								(
-									($activeBorder
-										($vbox
-											(
-												($list
-													($hbox ($list
-														($label "#'View definition")
-														($label @name)
-														($label "#'For:")
-														($label @format)
-													))
-												)
-												+
-												($mapViewEval @specification (@viewExpressionFactory <- @viewViewSpecial))
-											)
-										)
-									)
-								)
-							)
-						)
-					)
-				)
-				
-				($# "View an language definition")
-				(@viewLanguageNode
-					($lambda (@node)
-						($activeBorder
-							($vbox ($mapViewEval @node @viewDefinitionNode))
-						)
-					)
-				)
 			)
-			@viewLanguageNode
+			(@viewExpressionFactory <- @viewViewSpecial)
 		)
 	)
 )

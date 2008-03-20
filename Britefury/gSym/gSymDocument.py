@@ -45,16 +45,14 @@ class GSymDocumentExecuteContentHandler (GSymDocumentContentHandler):
 
 
 class GSymDocumentViewContentHandler (GSymDocumentContentHandler):
-	def __init__(self, viewHandler, commandHistory, stylesheetDispatcher):
+	def __init__(self, commandHistory, stylesheetDispatcher):
 		super( GSymDocumentViewContentHandler, self ).__init__()
-		self._viewHandler = viewHandler
 		self._commandHistory = commandHistory 
 		self._stylesheetDispatcher = stylesheetDispatcher 
 	
 	def metaLanguage(self, env, name, xs):
 		metaLang = env._f_getMetaLanguageViewDefinition()
-		view = metaLang.createDocumentView( xs, self._commandHistory, self._stylesheetDispatcher )
-		self._viewHandler( view )
+		return metaLang.createDocumentView( xs, self._commandHistory, self._stylesheetDispatcher )
 	
 	def singlePage(self, env, xs):
 		pass
@@ -101,7 +99,7 @@ def loadDocument(env, xs, contentHandler):
 	
 	header = xs[0]
 	version = xs[1]
-	content = xs[2]
+	docXs = xs[2]
 	
 	if header != "$gSymDocument":
 		raise GSymDocumentInvalidHeader
@@ -118,39 +116,39 @@ def loadDocument(env, xs, contentHandler):
 	
 	
 	
-	if not isGLispList( xs ):
+	if not isGLispList( docXs ):
 		raise GSymDocumentContentInvalidStructure
 	
-	if len( xs ) < 1:
+	if len( docXs ) < 1:
 		raise GSymDocumentContentInvalidStructure
 	
 	
-	if xs[0] == '$metaLanguage':
+	if docXs[0] == '$metaLanguage':
 		"""
 		($metaLanguage <name> <view_definition>)
 		"""
-		if len( xs ) != 3:
+		if len( docXs ) != 3:
 			raise GSymDocumentContentInvalidStructure
 		
-		return contentHandler.metaLanguage( env, xs[1], xs[2] )
-	elif xs[0] == '$singlePage':
+		return contentHandler.metaLanguage( env,docXs[1], docXs[2] )
+	elif docXs[0] == '$singlePage':
 		"""
 		($singlePage <content>)
 		"""
-		if len( xs ) != 2:
+		if len( docXs ) != 2:
 			raise GSymDocumentContentInvalidStructure
 	
-		return contentHandler.singlePage( env, xs[1] )
-	elif xs[0] == '$use':
+		return contentHandler.singlePage( env, docXs[1] )
+	elif docXs[0] == '$use':
 		"""
 		($use <import> <content>)
 		"""
-		if len( xs ) != 3:
+		if len( docXs ) != 3:
 			raise GSymDocumentContentInvalidStructure
 		
-		importName = xs[1]
+		importName = docXs[1]
 		
-		return contentHandler.use( importName, env, xs[2] )
+		return contentHandler.use( importName, env,docXs[2] )
 	else:
 		raise GSymDocumentContentInvalidType
 

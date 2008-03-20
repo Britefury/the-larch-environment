@@ -28,7 +28,8 @@ from Britefury.DocPresent.Toolkit.DTDocument import DTDocument
 from Britefury.DocModel.DMList import DMList
 from Britefury.DocModel.DMIO import readSX, writeSX
 
-from Britefury.gSym.gSymEnvironment import createGSymGLispEnvironment
+from Britefury.gSym.gSymEnvironment import GSymEnvironment
+from Britefury.gSym.gSymDocument import loadDocument, GSymDocumentExecuteContentHandler, GSymDocumentViewContentHandler
 
 from Britefury.DocView.DocView import DocView
 
@@ -75,8 +76,7 @@ class MainApp (object):
 		self._commandHistory = None
 		self._bUnsavedData = False
 		
-		self._env = None
-		self._appInterface = None
+		self._env = GSymEnvironment()
 
 		self._doc = DTDocument()
 		self._doc.undoSignal.connect( self._p_onUndo )
@@ -209,6 +209,9 @@ class MainApp (object):
 		box.pack_start( gtk.HSeparator(), False, False, 10 )
 		box.pack_start( buttonBox, False, False, 10 )
 		box.show_all()
+		
+		
+		self._p_initialise()
 
 
 		self._window = gtk.Window( gtk.WINDOW_TOPLEVEL );
@@ -250,7 +253,11 @@ class MainApp (object):
 
 
 
-
+	def _p_initialise(self):
+		doc = readSX( file( os.path.join( 'GSymCore', 'Core', 'gMeta.gsym' ), 'r' ) )
+		contentHandler = GSymDocumentExecuteContentHandler()
+		loadDocument( self._env, doc, contentHandler )
+		
 
 
 	def setDocument(self, documentRoot, bEvaluate):
@@ -266,28 +273,9 @@ class MainApp (object):
 		self._actionsMenuItem.set_submenu( self._actionsMenu )
 		
 		if bEvaluate:
-			self._env = createGSymGLispEnvironment()
-			self._env.name = '<document>'
-			
-			self._appInterface = self._env.evaluate( documentRoot )
-			
-			for name, actionFunction in self._appInterface.actions:
-				def runAction(menuItem):
-					print actionFunction()
-				actionItem = gtk.MenuItem( name )
-				actionItem.connect( 'activate', runAction )
-				actionItem.show()
-				self._actionsMenu.append( actionItem )
-			self._actionsMenu.show()
-				
-			
-			assert len( self._appInterface.views ) > 0
-			v = self._appInterface.views[0]
-			self._view = v( self._commandHistory, makeLispStyleSheetDispatcher() )
-				
+			contentHandler = GSymDocumentViewContentHandler( self._commandHistory, makeLispStyleSheetDispatcher() )
+			self._view = loadDocument( self._env, documentRoot, contentHandler )
 		else:
-			self._env = None
-			self._appInterface = None
 			self._view = makeLispDocView( documentRoot, self._commandHistory )
 	
 		self._viewRoot = self._view.rootView
