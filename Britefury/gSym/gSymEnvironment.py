@@ -11,6 +11,7 @@ from Britefury.FileIO.IOXml import ioReadIntoObjectFromFile, ioWriteObjectToFile
 
 from Britefury.DocModel.DMIO import readSX
 
+from Britefury.GLisp.GLispUtil import gLispSrcToString
 from Britefury.GLisp.GLispInterpreter import specialform, GLispFrame, GLispModule, ModuleRegistry, _moduleRegistry
 
 from Britefury.gSym.MetaMetaLanguage import metaMetaLanguageFactory
@@ -71,20 +72,24 @@ def shutdownGSymEnvironment():
 		
 
 class GSymEnvironment (object):
+	def __init__(self):
+		super( GSymEnvironment, self ).__init__()
+		self._metaLanguageViewDefinition = None
+	
 	@specialform
 	def withInternalMetaLanguage(self, env, xs):
 		if len( xs ) < 3:
-			env.glispError( ValueError, xs, 'GSymEnvironment::internalMetaLanguage: requires at least 1 parameters (language instance target variable)' )
+			env.raiseError( ValueError, xs, 'GSymEnvironment::internalMetaLanguage: requires at least 1 parameters (language instance target variable)' )
 		
 		varName = xs[2]
 		expressions = xs[3:]
 		
 		
 		if not isinstance( varName, str ):
-			env.glispError( ValueError, xs, 'GSymEnvironment::internalMetaLanguage: second parameter (language target variable) must be a string' )
+			env.raiseError( ValueError, xs, 'GSymEnvironment::internalMetaLanguage: second parameter (language target variable) must be a string' )
 		
 		if varName[0] != '@':
-			env.glispError( ValueError, xs, 'GSymEnvironment::internalMetaLanguage: second parameter (language target variable) must start with a @' )
+			env.raiseError( ValueError, xs, 'GSymEnvironment::internalMetaLanguage: second parameter (language target variable) must start with a @' )
 		
 		
 		metaMetaLanguageInstance = metaMetaLanguageFactory.createLanguageInstance()
@@ -93,6 +98,15 @@ class GSymEnvironment (object):
 		return env.evaluate( expressions )	
 			
 		
+	def raiseError(self, exceptionClass, src, reason):
+		raise exceptionClass, reason  +  '   ::   '  +  gLispSrcToString( src, 3 )
+	
+	
+	def _f_getMetaLanguageViewDefinition(self):
+		return self._metaLanguageViewDefinition
+
+	def _f_setMetaLanguageViewDefinition(self, m):
+		self._metaLanguageViewDefinition = m
 		
 	
 

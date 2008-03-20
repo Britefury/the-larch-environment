@@ -78,21 +78,6 @@ The hierarchy of document view nodes is respected however.
 
 
 
-class GSymViewDefinition (object):
-	"""The language view definition
-	An instance of GSymViewDefinition is created and returned by defineView()"""
-	def __init__(self, name, docFormat, viewFactory):
-		self.name = name
-		self.docFormat = docFormat
-		self._viewFactory = viewFactory
-		
-
-	def createDocumentView(self, xs, commandHistory, styleSheetDispatcher):
-		viewInstance = self._viewFactory.createInstance( xs, commandHistory, styleSheetDispatcher )
-		return viewInstance.view
-
-
-
 def _runtime_buildRefreshCellAndRegister(viewNodeInstance, refreshFunction):
 	"""
 	Runtime - called by compiled code at run-time
@@ -116,7 +101,7 @@ def _runtime_binRefreshCell(viewNodeInstance, bin, child):
 	elif isinstance( child, DTWidget ):
 		bin.child = child
 	else:
-		viewNodeInstance.env.glispError( TypeError, viewNodeInstance.xs, '_GSymNodeViewInstance._binRefreshCell: could not process child of type %s'  %  ( type( child ).__name__, ) )
+		viewNodeInstance.env.raiseError( TypeError, viewNodeInstance.xs, '_GSymNodeViewInstance._binRefreshCell: could not process child of type %s'  %  ( type( child ).__name__, ) )
 
 def _runtime_boxRefreshCell(viewNodeInstance, widget, children):
 	"""
@@ -132,7 +117,7 @@ def _runtime_boxRefreshCell(viewNodeInstance, widget, children):
 			elif isinstance( child, DTWidget ):
 				widgets.append( child )
 			else:
-				viewNodeInstance.env.glispError( TypeError, viewNodeInstance.xs, 'defineView: _boxRefreshCell: could not process child of type %s'  %  ( type( child ).__name__, ) )
+				viewNodeInstance.env.raiseError( TypeError, viewNodeInstance.xs, 'defineView: _boxRefreshCell: could not process child of type %s'  %  ( type( child ).__name__, ) )
 		widget[:] = widgets
 	_runtime_buildRefreshCellAndRegister( viewNodeInstance, _boxRefresh )
 
@@ -152,7 +137,7 @@ def _runtime_scriptRefreshCell(viewNodeInstance, script, child, childSlotAttrNam
 		#script.mainChild = child
 		setattr( script, childSlotAttrName, child)
 	else:
-		viewNodeInstance.env.glispError( TypeError, viewNodeInstance.xs, '_GSymNodeViewInstance._runtime_scriptRefreshCell: could not process child of type %s'  %  ( type( child ).__name__, ) )
+		viewNodeInstance.env.raiseError( TypeError, viewNodeInstance.xs, '_GSymNodeViewInstance._runtime_scriptRefreshCell: could not process child of type %s'  %  ( type( child ).__name__, ) )
 
 
 	
@@ -294,45 +279,20 @@ class _GSymNodeViewInstance (object):
 	Manages state that concerns a view of a specific sub-tree of a document
 	"""
 	
-	__slots__ = [ 'env', 'xs', 'view', 'viewInstance', 'viewFactory', 'refreshCells', 'viewNode', 'styleSheetStack' ]
+	__slots__ = [ 'env', 'xs', 'view', 'viewInstance', 'viewNode', 'refreshCells', 'styleSheetStack' ]
 
-	def __init__(self, env, xs, view, viewInstance, viewFactory, viewNode):
+	def __init__(self, env, xs, view, viewInstance, viewNode):
 		self.env = env
 		self.xs = xs
 		self.view = view
 		self.viewInstance = viewInstance
-		self.viewFactory = viewFactory
 		self.viewNode = viewNode
-		self.styleSheetStack = []
 		self.refreshCells = []
+		self.styleSheetStack = []
 
 		
 
-	
-	def _runtime_buildViewContents(self, content, nodeViewFunction=None):
-		"""Runtime - build the contents of a view node"""
-		if nodeViewFunction is None:
-			nodeViewFunction = self.viewInstance.generalNodeViewFunction
-			fnName = 'default'
-		else:
-			fnName = nodeViewFunction.__name__
 
-		#1. Push @self onto the view instance's view node instance stack
-		# This is done so that the functions that have been compiled can get a reference to @this
-		self.viewInstance.viewNodeInstanceStack.append( self )
-		
-		#2. Create the view contents
-		viewContents = nodeViewFunction( content )
-		
-		#3. Push @self from the view instance's view node instance stack
-		self.viewInstance.viewNodeInstanceStack.pop()
-		
-		#4. Return the view contents
-		return viewContents
-		
-
-
-	
 	
 	
 	
@@ -346,9 +306,8 @@ class _GSymViewInstance (object):
 	def __init__(self, env, xs, viewFactory, commandHistory, styleSheetDispatcher):
 		self.env = env
 		self.xs = xs
-		self.viewFactory = viewFactory
 		self.viewNodeInstanceStack = []
-		self.generalNodeViewFunction = self.viewFactory.makeViewFunction( self.viewNodeInstanceStack )
+		self.generalNodeViewFunction = viewFactory.makeViewFunction( self.viewNodeInstanceStack )
 		# self._p_buildDVNode is a factory that builds DVNode instances for document subtrees
 		self.view = DocView( self.xs, commandHistory, styleSheetDispatcher, self._p_rootNodeFactory )
 		
@@ -377,10 +336,10 @@ class _GSymViewInstance (object):
 	def _f_makeNodeContentsFactory(self, nodeViewFunction=None):
 		def _buildNodeContents(viewNode, docNodeKey):
 			# Create the node view instance
-			nodeViewInstance = _GSymNodeViewInstance( self.env, docNodeKey.docNode, self.view, self, self.viewFactory, viewNode )
+			nodeViewInstance = _GSymNodeViewInstance( self.env, docNodeKey.docNode, self.view, self, viewNode )
 			relativeNode = relative( docNodeKey.docNode, docNodeKey.parentDocNode, docNodeKey.index )
 			# Build the contents
-			viewContents = nodeViewInstance._runtime_buildViewContents( relativeNode, nodeViewFunction )
+			viewContents = self._runtime_buildNodeViewContents( nodeViewInstance, relativeNode, nodeViewFunction )
 			# Get the refresh cells that need to be monitored, and hand them to the DVNode
 			viewNode._f_setRefreshCells( nodeViewInstance.refreshCells )
 			# Return the contents
@@ -395,6 +354,23 @@ class _GSymViewInstance (object):
 			return factory
 		
 	
+	def _runtime_buildNodeViewContents(self, nodeViewInstance, content, nodeViewFunction=None):
+		"""Runtime - build the contents of a view node"""
+		if nodeViewFunction is None:
+			nodeViewFunction = self.generalNodeViewFunction
+
+		#1. Push @nodeViewInstance onto the view instance's view node instance stack
+		# This is done so that the functions that have been compiled can get a reference to @this
+		self.viewNodeInstanceStack.append( nodeViewInstance )
+		
+		#2. Create the view contents
+		viewContents = nodeViewFunction( content )
+		
+		#3. Push @self from the view instance's view node instance stack
+		self.viewNodeInstanceStack.pop()
+		
+		#4. Return the view contents
+		return viewContents
 	
 	
 	
@@ -433,16 +409,10 @@ class _GSymViewFactory (object):
 		
 		
 		
-	def createInstance(self, xs, commandHistory, styleSheetDispatcher):
-		"""Create a view instance"""
-		return _GSymViewInstance( self.env, xs, self, commandHistory, styleSheetDispatcher )
-
-
-	
 	def _runtime_buildView(self, viewNodeInstance, content, nodeViewFunction=None):
 		"""Build a view for a document subtree (@content)"""
 		if not isinstance( content, RelativeNode ):
-			self.env.glispError( TypeError, None, '_GSymViewFactory._runtime_buildView: content is not a RelativeNode' )
+			self.env.raiseError( TypeError, None, '_GSymViewFactory._runtime_buildView: content is not a RelativeNode' )
 			
 		# A call to DocNode._f_buildView builds the view, and puts it in the DocView's table
 		viewInstance = viewNodeInstance.viewInstance
@@ -477,7 +447,7 @@ class _GSymViewFactory (object):
 		if name == '$viewEval':
 			# ($viewEval <document-subtree> ?<node-view-function>)
 			if len( srcXs ) < 2:
-				self.env.glispError( GLispParameterListError, src, 'defineView: $viewEval needs at least 1 parameter; the document subtree' )
+				self.env.raiseError( GLispParameterListError, src, 'defineView: $viewEval needs at least 1 parameter; the document subtree' )
 			params = [ PySrc( '__view_node_instance_stack__[-1]', dbgSrc=srcXs ), compileSubExp( srcXs[1] ) ]
 			# View function
 			if len( srcXs ) == 3:
@@ -486,7 +456,7 @@ class _GSymViewFactory (object):
 		elif name == '$mapViewEval':
 			# ($mapViewEval <document-subtree> ?<node-view-function>)
 			if len( srcXs ) < 2:
-				self.env.glispError( GLispParameterListError, src, 'defineView: $mapViewEval needs at least 1 parameter; the document subtree' )
+				self.env.raiseError( GLispParameterListError, src, 'defineView: $mapViewEval needs at least 1 parameter; the document subtree' )
 			params = [ PySrc( '__view_node_instance_stack__[-1]', dbgSrc=srcXs ), PyVar( 'x', dbgSrc=srcXs ) ]
 			# View function
 			if len( srcXs ) == 3:
@@ -496,24 +466,24 @@ class _GSymViewFactory (object):
 		elif name == '$colour':
 			#($colour <red> <green> <blue>)
 			if len( srcXs ) != 4:
-				self.env.glispError( GLispParameterListError, src, 'defineView: $colour needs 3 parameters; red, green, and blue' )
+				self.env.raiseError( GLispParameterListError, src, 'defineView: $colour needs 3 parameters; red, green, and blue' )
 			return PyVar( '_Colour3f' )( compileSubExp( srcXs[1] ), compileSubExp( srcXs[2] ), compileSubExp( srcXs[3] ) ).debug( srcXs )
 		elif name == '$style':
 			#($style <settings_pairs>)
 			#settings pair: (:key <value>)
 			def _settingsPair(pairXs):
 				if len( pairXs ) != 2:
-					self.env.glispError( GLispParameterListError, src, 'defineView: $style settings pair needs 2 parameters; the key and the value' )
+					self.env.raiseError( GLispParameterListError, src, 'defineView: $style settings pair needs 2 parameters; the key and the value' )
 				if not isinstance( pairXs[0], str )  and  not isinstance( pairXs[0], unicode ):
-					self.env.glispError( GLispItemTypeError, src, 'defineView: $style settings pair key must be a string' )
+					self.env.raiseError( GLispItemTypeError, src, 'defineView: $style settings pair key must be a string' )
 				if pairXs[0][0] != ':':
-					self.env.glispError( GLispItemError, src, 'defineView: $style settings pair key must start with a :' )
+					self.env.raiseError( GLispItemError, src, 'defineView: $style settings pair key must start with a :' )
 				return pyt_coerce( [ pairXs[0][1:], compileSubExp( pairXs[1] ) ] )
 			return PyVar( '_GSymStyleSheet' )( pyt_coerce( [ _settingsPair( pairXs )   for pairXs in srcXs[1:] ] ) ).debug( srcXs )
 		elif name == '$applyStyle':
 			#($applyStyle <stylesheet> <child>)
 			if len( srcXs ) != 3:
-				self.env.glispError( GLispParameterListError, src, 'defineView: $applyStyle needs 2 parameters; the style and the child content' )
+				self.env.raiseError( GLispParameterListError, src, 'defineView: $applyStyle needs 2 parameters; the style and the child content' )
 			childResVarName = None
 			py_stylePush = PyVar( '__view_node_instance_stack__' )[-1].attr( 'styleSheetStack' ).methodCall( 'append', compileSubExp( srcXs[1] ) ).debug( srcXs )
 			py_childResult = compileSubExp( srcXs[2] )
@@ -533,17 +503,17 @@ class _GSymViewFactory (object):
 		elif name == '$activeBorder':
 			#($activeBorder <child> styleSheet*)
 			if len( srcXs ) < 2:
-				self.env.glispError( GLispParameterListError, src, 'defineView: $activeBorder needs at least 1 parameters; the child content' )
+				self.env.raiseError( GLispParameterListError, src, 'defineView: $activeBorder needs at least 1 parameters; the child content' )
 			return PyVar( '_activeBorder' )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[1] ), compileStyleSheetAccess( srcXs[2:]) ).debug( srcXs )
 		elif name == '$border':
 			#($border <child> styleSheet*)
 			if len( srcXs ) < 2:
-				self.env.glispError( GLispParameterListError, src, 'defineView: $border needs at least 1 parameters; the child content' )
+				self.env.raiseError( GLispParameterListError, src, 'defineView: $border needs at least 1 parameters; the child content' )
 			return PyVar( '_border' )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[1] ), compileStyleSheetAccess( srcXs[1:]) ).debug( srcXs )
 		elif name == '$indent':
 			#($indent <indentation> <child> styleSheet*)
 			if len( srcXs ) < 3:
-				self.env.glispError( GLispParameterListError, src, 'defineView: $border needs at least 2 parameters; the indentation and the child content' )
+				self.env.raiseError( GLispParameterListError, src, 'defineView: $border needs at least 2 parameters; the indentation and the child content' )
 			return PyVar( '_indent' )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[2] ), compileSubExp( srcXs[1] ), compileStyleSheetAccess( srcXs[3:]) ).debug( srcXs )
 		elif name == '$hline':
 			#($hline styleSheet*)
@@ -551,51 +521,51 @@ class _GSymViewFactory (object):
 		elif name == '$label':
 			#($label text styleSheet*)
 			if len( srcXs ) < 2:
-				self.env.glispError( GLispParameterListError, src, 'defineView: $label needs at least 1 parameter; the text' )
+				self.env.raiseError( GLispParameterListError, src, 'defineView: $label needs at least 1 parameter; the text' )
 			return PyCall( PyVar( '_label', dbgSrc=srcXs ), [ PySrc( '__view_node_instance_stack__[-1]', dbgSrc=srcXs ), compileSubExp( srcXs[1] ), compileStyleSheetAccess( srcXs[2:]) ], dbgSrc=srcXs )
 		elif name == '$entry':
 			#($entry text styleSheet*)
 			if len( srcXs ) < 2:
-				self.env.glispError( GLispParameterListError, src, 'defineView: $entry needs at least 1 parameter; the text' )
+				self.env.raiseError( GLispParameterListError, src, 'defineView: $entry needs at least 1 parameter; the text' )
 			return PyCall( PyVar( '_entry', dbgSrc=srcXs ), [ PySrc( '__view_node_instance_stack__[-1]', dbgSrc=srcXs ), compileSubExp( srcXs[1] ), compileStyleSheetAccess( srcXs[2:]) ], dbgSrc=srcXs )
 		elif name == '$hbox':
 			#($hbox (child*) styleSheet*)
 			if len( srcXs ) < 2:
-				self.env.glispError( GLispParameterListError, src, 'defineView: $hbox needs at least 1 parameter; the children' )
+				self.env.raiseError( GLispParameterListError, src, 'defineView: $hbox needs at least 1 parameter; the children' )
 			return PyCall( PyVar( '_hbox', dbgSrc=srcXs ), [ PySrc( '__view_node_instance_stack__[-1]', dbgSrc=srcXs ), compileSubExp( srcXs[1] ), compileStyleSheetAccess( srcXs[2:]) ], dbgSrc=srcXs )
 		elif name == '$vbox':
 			#($vbox (child*) styleSheet*)
 			if len( srcXs ) < 2:
-				self.env.glispError( GLispParameterListError, src, 'defineView: $vbox needs at least 1 parameter; the children' )
+				self.env.raiseError( GLispParameterListError, src, 'defineView: $vbox needs at least 1 parameter; the children' )
 			return PyCall( PyVar( '_vbox', dbgSrc=srcXs ), [ PySrc( '__view_node_instance_stack__[-1]', dbgSrc=srcXs ), compileSubExp( srcXs[1] ), compileStyleSheetAccess( srcXs[2:]) ], dbgSrc=srcXs )
 		elif name == '$script':
 			#($script <mainChild> <leftSuperChild> <leftSubChild> <rightSuperChild> <rightSubChild> styleSheet*)
 			if len( srcXs ) < 6:
-				self.env.glispError( GLispParameterListError, src, 'defineView: $script needs at least 5 parameters; the main, left-super, left-sub, right-super, and right-sub children' )
+				self.env.raiseError( GLispParameterListError, src, 'defineView: $script needs at least 5 parameters; the main, left-super, left-sub, right-super, and right-sub children' )
 			return PyVar( '_script' )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[1] ), compileSubExp( srcXs[2] ), compileSubExp( srcXs[3] ), compileSubExp( srcXs[4] ), compileSubExp( srcXs[5] ),
 						   compileStyleSheetAccess( srcXs[6:]) ).debug( srcXs )
 		elif name == '$scriptLSuper':
 			#($scriptLSuper <mainChild> <scriptChild> styleSheet*)
 			if len( srcXs ) < 3:
-				self.env.glispError( GLispParameterListError, src, 'defineView: $scriptLSuper needs at least 2 parameters; the main child, and the script child' )
+				self.env.raiseError( GLispParameterListError, src, 'defineView: $scriptLSuper needs at least 2 parameters; the main child, and the script child' )
 			return PyVar( '_script' )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[1] ), compileSubExp( srcXs[2] ), None, None, None,
 						   compileStyleSheetAccess( srcXs[6:]) ).debug( srcXs )
 		elif name == '$scriptLSub':
 			#($scriptLSub <mainChild> <scriptChild> styleSheet*)
 			if len( srcXs ) < 3:
-				self.env.glispError( GLispParameterListError, src, 'defineView: $scriptLSub needs at least 2 parameters; the main child, and the script child' )
+				self.env.raiseError( GLispParameterListError, src, 'defineView: $scriptLSub needs at least 2 parameters; the main child, and the script child' )
 			return PyVar( '_script' )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[1] ), None, compileSubExp( srcXs[2] ), None, None,
 						   compileStyleSheetAccess( srcXs[6:]) ).debug( srcXs )
 		elif name == '$scriptRSuper':
 			#($scriptRSuper <mainChild> <scriptChild> styleSheet*)
 			if len( srcXs ) < 3:
-				self.env.glispError( GLispParameterListError, src, 'defineView: $scriptRSuper needs at least 2 parameters; the main child, and the script child' )
+				self.env.raiseError( GLispParameterListError, src, 'defineView: $scriptRSuper needs at least 2 parameters; the main child, and the script child' )
 			return PyVar( '_script' )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[1] ), None, None, compileSubExp( srcXs[2] ), None,
 						   compileStyleSheetAccess( srcXs[6:]) ).debug( srcXs )
 		elif name == '$scriptRSub':
 			#($scriptRSub <mainChild> <scriptChild> styleSheet*)
 			if len( srcXs ) < 3:
-				self.env.glispError( GLispParameterListError, src, 'defineView: $scriptRSub needs at least 2 parameters; the main child, and the script child' )
+				self.env.raiseError( GLispParameterListError, src, 'defineView: $scriptRSub needs at least 2 parameters; the main child, and the script child' )
 			return PyVar( '_script' )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[1] ), None, None, None, compileSubExp( srcXs[2] ),
 						   compileStyleSheetAccess( srcXs[6:]) ).debug( srcXs )
 		else:
@@ -603,11 +573,28 @@ class _GSymViewFactory (object):
 		
 
 			
-			
+
+		
+
+class GSymViewDefinition (object):
+	"""The language view definition
+	An instance of GSymViewDefinition is created and returned by defineView()"""
+	def __init__(self, env, name, spec):
+		self._env = env
+		self._viewFactory = _GSymViewFactory( env, name, spec )
+		
+
+	def createDocumentView(self, xs, commandHistory, styleSheetDispatcher):
+		viewInstance = _GSymViewInstance( self._env, xs, self._viewFactory, commandHistory, styleSheetDispatcher )
+		return viewInstance.view
+
+
+	
+
+		
+		
+		
 			
 def defineView(env, xs, name, docFormat, spec):
-	viewFactory = _GSymViewFactory( env, name, spec )
-	#viewFactory = None
-	
-	return GSymViewDefinition( name, docFormat, viewFactory )
+	return GSymViewDefinition( env, name, spec )
 

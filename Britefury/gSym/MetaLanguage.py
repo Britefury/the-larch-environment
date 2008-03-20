@@ -23,7 +23,7 @@ class MetaLanguageInstance (GSymLanguageInstance):
 	@specialform
 	def compilerDefinition(self, env, xs):
 		if len( xs ) < 5:
-			env.glispError( GLispParameterListError, xs, 'MetaLanguageInstanceInterface#compilerDefinition: needs at least 3 parameters; the name, the source format, and the target format' )
+			env.raiseError( GLispParameterListError, xs, 'MetaLanguageInstanceInterface#compilerDefinition: needs at least 3 parameters; the name, the source format, and the target format' )
 		
 		name = xs[2]
 		sourceFormat = xs[3]
@@ -31,13 +31,13 @@ class MetaLanguageInstance (GSymLanguageInstance):
 		spec = xs[5:]
 		
 		if not isinstance( name, str ):
-			env.glispError( GLispItemTypeError, xs, 'MetaLanguageInstanceInterface#compilerDefinition: 1st parameter (name) must be a string' )
+			env.raiseError( GLispItemTypeError, xs, 'MetaLanguageInstanceInterface#compilerDefinition: 1st parameter (name) must be a string' )
 			
 		if not isinstance( sourceFormat, str ):
-			env.glispError( GLispItemTypeError, xs, 'MetaLanguageInstanceInterface#compilerDefinition: 2nd parameter (source format) must be a string' )
+			env.raiseError( GLispItemTypeError, xs, 'MetaLanguageInstanceInterface#compilerDefinition: 2nd parameter (source format) must be a string' )
 			
 		if not isinstance( targetFormat, str ):
-			env.glispError( GLispItemTypeError, xs, 'MetaLanguageInstanceInterface#compilerDefinition: 3rd parameter (target format) must be a string' )
+			env.raiseError( GLispItemTypeError, xs, 'MetaLanguageInstanceInterface#compilerDefinition: 3rd parameter (target format) must be a string' )
 			
 		return defineCompiler( env, xs, name, sourceFormat, targetFormat, spec )
 
@@ -47,17 +47,17 @@ class MetaLanguageInstance (GSymLanguageInstance):
 	@specialform
 	def displayDefinition(self, env, xs):
 		if len( xs ) < 4:
-			env.glispError( GLispParameterListError, xs, 'MetaLanguageInstanceInterface#displayDefinition: needs at least 2 parameters; the name, and the document format' )
+			env.raiseError( GLispParameterListError, xs, 'MetaLanguageInstanceInterface#displayDefinition: needs at least 2 parameters; the name, and the document format' )
 		
 		name = xs[2]
 		docFormat = xs[3]
 		spec = xs[4:]
 		
 		if not isinstance( name, str ):
-			env.glispError( GLispItemTypeError, xs, 'MetaLanguageInstanceInterface#compilerDefinition: 1st parameter (compiler name) must be a string' )
+			env.raiseError( GLispItemTypeError, xs, 'MetaLanguageInstanceInterface#compilerDefinition: 1st parameter (compiler name) must be a string' )
 			
 		if not isinstance( docFormat, str ):
-			env.glispError( GLispItemTypeError, xs, 'MetaLanguageInstanceInterface#compilerDefinition: 2nd parameter (document format) must be a string' )
+			env.raiseError( GLispItemTypeError, xs, 'MetaLanguageInstanceInterface#compilerDefinition: 2nd parameter (document format) must be a string' )
 			
 		return defineView( env, xs, name, docFormat, spec )
 
