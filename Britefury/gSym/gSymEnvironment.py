@@ -76,28 +76,6 @@ class GSymEnvironment (object):
 		super( GSymEnvironment, self ).__init__()
 		self._metaLanguageViewDefinition = None
 	
-	@specialform
-	def withInternalMetaLanguage(self, env, xs):
-		if len( xs ) < 3:
-			env.raiseError( ValueError, xs, 'GSymEnvironment::internalMetaLanguage: requires at least 1 parameters (language instance target variable)' )
-		
-		varName = xs[2]
-		expressions = xs[3:]
-		
-		
-		if not isinstance( varName, str ):
-			env.raiseError( ValueError, xs, 'GSymEnvironment::internalMetaLanguage: second parameter (language target variable) must be a string' )
-		
-		if varName[0] != '@':
-			env.raiseError( ValueError, xs, 'GSymEnvironment::internalMetaLanguage: second parameter (language target variable) must start with a @' )
-		
-		
-		metaMetaLanguageInstance = metaMetaLanguageFactory.createLanguageInstance()
-		env[varName[1:]] = metaMetaLanguageInstance
-		
-		return env.evaluate( expressions )	
-			
-		
 	def raiseError(self, exceptionClass, src, reason):
 		raise exceptionClass, reason  +  '   ::   '  +  gLispSrcToString( src, 3 )
 	
@@ -111,13 +89,4 @@ class GSymEnvironment (object):
 	
 
 		
-def createGSymGLispEnvironment():
-	gsym = GSymEnvironment()
-	
-	return GLispModule( gsym=gsym )
-
-
-
-_moduleRegistry.moduleFactory = createGSymGLispEnvironment
-
 
