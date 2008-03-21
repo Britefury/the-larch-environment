@@ -11,6 +11,9 @@ from Britefury.gSym.RelativeNode import RelativeNode, RelativeList
 
 
 
+def isGLispString(xs):
+	return isinstance( xs, str )  or  isinstance( xs, unicode )
+
 def isGLispList(xs):
 	return isinstance( xs, list )  or  isinstance( xs, DMListInterface )  or  isinstance( xs, RelativeList )
 
