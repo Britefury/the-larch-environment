@@ -62,30 +62,36 @@ def shutdownGSymEnvironment():
 
 		
 		
+
+
+
 #
 #
 #
-# GSYM GLISP ENVIRONMENT
+# GSYM ENVIRONMENT
 #
 #
 #
 		
 
 class GSymEnvironment (object):
-	def __init__(self):
+	def __init__(self, world, moduleName):
 		super( GSymEnvironment, self ).__init__()
-		self._metaLanguageViewDefinition = None
-	
+		self._world = world
+		self._moduleName = moduleName
+
+
 	def raiseError(self, exceptionClass, src, reason):
 		raise exceptionClass, reason  +  '   ::   '  +  gLispSrcToString( src, 3 )
 	
 	
-	def _f_getMetaLanguageViewDefinition(self):
-		return self._metaLanguageViewDefinition
-
-	def _f_setMetaLanguageViewDefinition(self, m):
-		self._metaLanguageViewDefinition = m
-		
+	def registerViewDefinition(self, name, viewDefinition):
+		worldName = self._p_moduleAttributeNameToWorldAttributeName( name )
+		self._world[worldName] = viewDefinition
+	
+	
+	def _p_moduleAttributeNameToWorldAttributeName(self, name):
+		return '.'.join( [ self._moduleName, name ] )
 	
 
 		
