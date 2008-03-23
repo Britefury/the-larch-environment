@@ -183,13 +183,13 @@ def _compileLambda(xs, context, bNeedResult=False, compileSpecial=None):
 	
 	
 	
-class GLispCompilerMapFExprParamListInvalid (PyCodeGenError):
+class GLispCompilerMapExprParamListInvalid (PyCodeGenError):
 	pass
 
 
-def _compileMapF(xs, context, bNeedResult=False, compileSpecial=None):
+def _compileMap(xs, context, bNeedResult=False, compileSpecial=None):
 	"""
-	( $mapf function list )
+	( $map function list )
 	"""
 	if len( xs ) != 3:
 		raise GLispCompilerMapFExprParamListInvalid( xs )
@@ -197,7 +197,7 @@ def _compileMapF(xs, context, bNeedResult=False, compileSpecial=None):
 	functionXs = xs[1]
 	listXs = xs[2]
 	
-	itemVarName = context.temps.allocateTempName( 'mapf_item' )
+	itemVarName = context.temps.allocateTempName( 'map_item' )
 	py_itemExpr = _compileGLispExprToPyTree( functionXs, context, True, compileSpecial )( PyVar( itemVarName, dbgSrc=xs ) )
 	py_listExpr = _compileGLispExprToPyTree( listXs, context, True, compileSpecial )
 	
@@ -210,7 +210,7 @@ def _compileMapF(xs, context, bNeedResult=False, compileSpecial=None):
 
 
 
-class GLispCompilerMapFExprParamListInvalid (PyCodeGenError):
+class GLispCompilerMapXExprParamListInvalid (PyCodeGenError):
 	pass
 
 
@@ -219,7 +219,7 @@ def _compileMapX(xs, context, bNeedResult=False, compileSpecial=None):
 	( $mapx item_expression varname list )
 	"""
 	if len( xs ) != 4:
-		raise GLispCompilerMapFExprParamListInvalid( xs )
+		raise GLispCompilerMapXExprParamListInvalid( xs )
 
 	itemExprXs = xs[1]
 	varNameXs = xs[2]
@@ -241,6 +241,106 @@ def _compileMapX(xs, context, bNeedResult=False, compileSpecial=None):
 			return PyListComprehension( PyVar( funName )( PyVar( varName ) ).debug( xs ), varName, py_listExpr, dbgSrc=xs )
 		else:
 			return PyListComprehension( py_itemExpr, varName, py_listExpr, dbgSrc=xs )
+	else:
+		return None
+
+
+
+
+
+class GLispCompilerFilterExprParamListInvalid (PyCodeGenError):
+	pass
+
+
+def _compileFilter(xs, context, bNeedResult=False, compileSpecial=None):
+	"""
+	( $filter function list )
+	"""
+	if len( xs ) != 3:
+		raise GLispCompilerFilterFExprParamListInvalid( xs )
+
+	functionXs = xs[1]
+	listXs = xs[2]
+	
+	itemVarName = context.temps.allocateTempName( 'filter_item' )
+	py_itemExpr = _compileGLispExprToPyTree( functionXs, context, True, compileSpecial )( PyVar( itemVarName, dbgSrc=xs ) )
+	py_listExpr = _compileGLispExprToPyTree( listXs, context, True, compileSpecial )
+	
+	if bNeedResult:
+		return PyListComprehension( PyVar( itemVarName, dbgSrc=xs), itemVarName, py_listExpr, py_itemExpr, dbgSrc=xs )
+	else:
+		return None
+
+
+
+
+
+class GLispCompilerFilterXExprParamListInvalid (PyCodeGenError):
+	pass
+
+
+def _compileFilterX(xs, context, bNeedResult=False, compileSpecial=None):
+	"""
+	( $filterx item_expression varname list )
+	"""
+	if len( xs ) != 4:
+		raise GLispCompilerFilterXExprParamListInvalid( xs )
+
+	filterExprXs = xs[1]
+	varNameXs = xs[2]
+	listXs = xs[3]
+	
+	if varNameXs[0] != '@':
+		raise GLispCompilerVariableNameMustStartWithAt( varNameXs )
+	varName = varNameXs[1:]
+	
+	filterExprContext = context.innerContext()
+	py_filterExpr = _compileGLispExprToPyTree( filterExprXs, filterExprContext, True, compileSpecial )
+	py_listExpr = _compileGLispExprToPyTree( listXs, context, True, compileSpecial )
+	
+	if bNeedResult:
+		if len( filterExprContext.body )  >  0:
+			funName = context.temps.allocateTempName( 'filterx_fn' )
+			py_fun = PyDef( funName, varName, filterExprContext.body  +  [ py_filterExpr.return_().debug( xs ) ], dbgSrc=xs )
+			context.body.append( py_fun )
+			return PyListComprehension( PyVar( varName, dbgSrc=xs), varName, py_listExpr, PyVar( funName )( PyVar( varName ) ).debug( xs ), dbgSrc=xs )
+		else:
+			return PyListComprehension( PyVar( varName, dbgSrc=xs), varName, py_listExpr, py_filterExpr, dbgSrc=xs )
+	else:
+		return None
+
+
+
+
+
+class GLispCompilerReduceExprParamListInvalid (PyCodeGenError):
+	pass
+
+
+def _compileReduce(xs, context, bNeedResult=False, compileSpecial=None):
+	"""
+	( $reduce function list initialiser? )
+	"""
+	if len( xs ) < 3  or  len( xs ) > 4:
+		raise GLispCompilerMapFExprParamListInvalid( xs )
+
+	functionXs = xs[1]
+	listXs = xs[2]
+	initialiserXs = None
+	if len( xs ) == 4:
+		initialiserXs = xs[3]
+	
+	py_func = _compileGLispExprToPyTree( functionXs, context, True, compileSpecial )
+	py_list = _compileGLispExprToPyTree( listXs, context, True, compileSpecial )
+	py_initialiser = None
+	if initialiserXs is not None:
+		py_initialiser = _compileGLispExprToPyTree( initialiserXs, context, True, compileSpecial )
+	
+	if bNeedResult:
+		if initialiserXs is not None:
+			return PyVar( 'reduce', dbgSrc=xs )( py_func, py_list, py_initialiser )
+		else:
+			return PyVar( 'reduce', dbgSrc=xs )( py_func, py_list )
 	else:
 		return None
 
@@ -492,10 +592,16 @@ def _compileGLispExprToPyTree(xs, context, bNeedResult=False, compileSpecial=Non
 			return PyCall( PyVar( 'set', dbgSrc=xs ), [ PyListLiteral( [ _compileGLispExprToPyTree( e, context, True, compileSpecial )   for e in xs[1:] ], dbgSrc=xs ) ], dbgSrc=xs )
 		elif xs[0] == '$lambda':
 			return _compileLambda( xs, context, bNeedResult, compileSpecial )
-		elif xs[0] == '$mapf':
-			return _compileMapF( xs, context, bNeedResult, compileSpecial )
+		elif xs[0] == '$map':
+			return _compileMap( xs, context, bNeedResult, compileSpecial )
 		elif xs[0] == '$mapx':
 			return _compileMapX( xs, context, bNeedResult, compileSpecial )
+		elif xs[0] == '$filter':
+			return _compileFilter( xs, context, bNeedResult, compileSpecial )
+		elif xs[0] == '$filterx':
+			return _compileFilterX( xs, context, bNeedResult, compileSpecial )
+		elif xs[0] == '$reduce':
+			return _compileReduce( xs, context, bNeedResult, compileSpecial )
 		elif xs[0] == '$if':
 			return _compileIf( xs, context, bNeedResult, compileSpecial )
 		elif xs[0] == '$where':
@@ -796,14 +902,14 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 		self._evalTest( '( ($lambda   (@x @y @z)  (@x + (@y + @z))  ) <- @a @b @c)', 6, [ ( 'a', 1 ), ( 'b', 2 ), ( 'c', 3 ) ] )
 		
 		
-	def test_mapF(self):
+	def test_map(self):
 		xssrc1 = """
-		($mapf ($lambda (@x) (@x + #2)) ($list #1 #2 #3 #4 #5))
+		($map ($lambda (@x) (@x + #2)) ($list #1 #2 #3 #4 #5))
 		"""
 		pysrc1 = [
 			'def __gsym__lambda_0(x):',
 			'  return x + 2',
-			'[ __gsym__lambda_0( __gsym__mapf_item_0 )   for __gsym__mapf_item_0 in [ 1, 2, 3, 4, 5 ] ]',
+			'[ __gsym__lambda_0( __gsym__map_item_0 )   for __gsym__map_item_0 in [ 1, 2, 3, 4, 5 ] ]',
 		]
 
 		self._compileTest( xssrc1, pysrc1 )
@@ -820,6 +926,56 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 
 		self._compileTest( xssrc1, pysrc1 )
 		self._evalTest( xssrc1, [ 3, 4, 5, 6, 7 ] )
+		
+		
+	def test_filter(self):
+		xssrc1 = """
+		($filter ($lambda (@x) (@x > #2)) ($list #1 #2 #3 #4 #5))
+		"""
+		pysrc1 = [
+			'def __gsym__lambda_0(x):',
+			'  return x > 2',
+			'[ __gsym__filter_item_0   for __gsym__filter_item_0 in [ 1, 2, 3, 4, 5 ]   if __gsym__lambda_0( __gsym__filter_item_0 ) ]',
+		]
+
+		self._compileTest( xssrc1, pysrc1 )
+		self._evalTest( xssrc1, [ 3, 4, 5 ] )
+		
+		
+	def test_filterX(self):
+		xssrc1 = """
+		($filterx (@x > #2) @x ($list #1 #2 #3 #4 #5))
+		"""
+		pysrc1 = [
+			'[ x   for x in [ 1, 2, 3, 4, 5 ]   if x > 2 ]',
+		]
+
+		self._compileTest( xssrc1, pysrc1 )
+		self._evalTest( xssrc1, [ 3, 4, 5 ] )
+		
+		
+	def test_reduce(self):
+		xssrc1 = """
+		($reduce ($lambda (@x @y) (@x + @y)) ($list #1 #2 #3 #4 #5))
+		"""
+		xssrc2 = """
+		($reduce ($lambda (@x @y) (@x + @y)) ($list #1 #2 #3 #4 #5) #12)
+		"""
+		pysrc1 = [
+			'def __gsym__lambda_0(x, y):',
+			'  return x + y',
+			'reduce( __gsym__lambda_0, [ 1, 2, 3, 4, 5 ] )',
+		]
+		pysrc2 = [
+			'def __gsym__lambda_0(x, y):',
+			'  return x + y',
+			'reduce( __gsym__lambda_0, [ 1, 2, 3, 4, 5 ], 12 )',
+		]
+
+		self._compileTest( xssrc1, pysrc1 )
+		self._compileTest( xssrc2, pysrc2 )
+		self._evalTest( xssrc1, 15 )
+		self._evalTest( xssrc2, 27 )
 		
 		
 	def test_If(self):
@@ -1150,6 +1306,49 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 
 		self._compileTest( xssrc1, pysrc1 )
 		self._evalTest( xssrc1, [ 1, 2, 3, 2, 1 ] )
+		
+		
+	def test_filterX_Match(self):
+		xssrc1 = """
+		($filterx
+		  ($match @x
+		    ( a  #False )
+		    ( b  #True )
+		    ( c  #True )
+		  )
+		  @x
+		  ($list "#'a" "#'b" "#'c" "#'b" "#'a")
+		)
+		"""
+		pysrc1 = [
+			"def __gsym__filterx_fn_0(x):",
+			"  __gsym__match_data_0 = x",
+			"  __gsym__match_bMatched_0 = [ False ]",
+			"  if __gsym__match_data_0 == 'a':",
+			"    def __gsym__match_fn_0():",
+			"      __gsym__match_bMatched_0[0] = True",
+			"      return False",
+			"    __gsym__match_result_0 = __gsym__match_fn_0()",
+			"  if not __gsym__match_bMatched_0[0]:",
+			"    if __gsym__match_data_0 == 'b':",
+			"      def __gsym__match_fn_1():",
+			"        __gsym__match_bMatched_0[0] = True",
+			"        return True",
+			"      __gsym__match_result_0 = __gsym__match_fn_1()",
+			"  if not __gsym__match_bMatched_0[0]:",
+			"    if __gsym__match_data_0 == 'c':",
+			"      def __gsym__match_fn_2():",
+			"        __gsym__match_bMatched_0[0] = True",
+			"        return True",
+			"      __gsym__match_result_0 = __gsym__match_fn_2()",
+			"  if not __gsym__match_bMatched_0[0]:",
+			"    raise NoMatchError",
+			"  return __gsym__match_result_0",
+			"[ x   for x in [ 'a', 'b', 'c', 'b', 'a' ]   if __gsym__filterx_fn_0( x ) ]",
+		]
+
+		self._compileTest( xssrc1, pysrc1 )
+		self._evalTest( xssrc1, [ 'b', 'c', 'b' ] )
 		
 		
 	def test_Where_If_Lambda(self):

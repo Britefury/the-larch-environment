@@ -12,60 +12,121 @@ from Britefury.gSymConfig.gSymVersion import compareVersions, gSymVersion
 
 from Britefury.gSym.gSymView import GSymViewDefinition
 from Britefury.gSym.gSymEnvironment import GSymEnvironment
+from Britefury.gSym.gSymFormat import GSymFormat
+
+
+
+
+
+
+
+
+
+
+class GSymDocumentInvalidLocation (Exception):
+	pass
+
+class GSymDocumentInvalidType (Exception):
+	pass
+
+class GSymDocumentInvalidStructure (Exception):
+	pass
+
+class GSymDocumentUnknownForm (Exception):
+	pass
+
+class GSymDocumentInvalidFormStructure (Exception):
+	pass
+
+
+
+class GSymDocumentLocationResolver (object):
+	def defineFormat(self, env, xs, name, title, *forms):
+		return name, forms
+	
+	def defineDefaultView(self, env, xs, *forms):
+		return 'defineDefaultView', []
+	
+	def content(self, env, xs, *forms):
+		return None, forms
+	
+
+	def _f_resolve(self, location, env, xs):
+		if not isGLispList( xs ):
+			raise GSymDocumentInvalidType
+		
+		if len( xs ) < 1:
+			raise GSymDocumentInvalidStructure
+		
+		funcNameXs = xs[0]
+
+		if funcNameXs[0] != '$':
+			raise GSymDocumentInvalidStructure
+		
+		funcName = funcNameXs[1:]
+		
+		try:
+			func = getattr( self, funcName )
+		except AttributeError:
+			raise GSymDocumentUnknownForm
+		else:
+			formName, subForms = func( env, xs, *xs[1:] )
+			
+			if formName is not None:
+				locationName = location[0]
+				subLocation = location[1:]
+			else:
+				locationName = None
+				subLocation = location
+			
+			if locationName == formName:
+				for form in subForms:
+					try:
+						return self._f_resolve( subLocation, env, form )
+					except GSymDocumentInvalidLocation:
+						pass
+			
+			raise GSymDocumentInvalidLocation
 
 
 
 
 
 class GSymDocumentFormHandler (object):
-	@abstractmethod
-	def defineView(self, env, xs, name, title, spec):
-		pass
-	
-	@abstractmethod
-	def defineStructure(self, env, xs, name, title, spec):
-		pass
-	
-	@abstractmethod
-	def document(self, env, xs, contentHandler):
-		pass
-
-	
-	
-	
-class GSymDocumentFormHandlerBoot (GSymDocumentFormHandler):
-	def defineView(self, env, xs, name, title, spec):
-		viewDefinition = GSymViewDefinition( env, name, content )
-		env.registerViewDefinition( name, viewDefinition )
-		return viewDefinition
-
-	def defineStructure(self, env, xs, name, title, spec):
-		pass
-
-	def document(self, env, xs, contentHandler):
-		pass
-
-	
-
-class GSymDocumentFormHandlerView (GSymDocumentFormHandler):
-	def defineView(self, env, xs, name, title, spec):
-		pass
-
-	def defineStructure(self, env, xs, name, title, spec):
-		pass
-	
-	def document(self, env, xs, contentHandler):
-		pass
-
-	
-	
-
-class GSymDocumentContentHandler (object):
-	def __init__(self, formHandler):
-		super( GSymDocumentContentHandler, self ).__init__()
-		self.formHandler = formHandler
-
+	def handleForm(self, env, xs):
+		if not isGLispList( xs ):
+			raise GSymDocumentInvalidType
 		
+		if len( xs ) < 1:
+			raise GSymDocumentInvalidStructure
+		
+		funcNameXs = xs[0]
+		
+		if funcNameXs[0] != '$':
+			raise GSymDocumentInvalidStructure
+		
+		funcName = funcNameXs[1:]
+		
+		try:
+			func = getattr( self, funcName )
+		except AttributeError:
+			raise GSymDocumentUnknownForm
+		else:
+			try:
+				return func( env, xs, *xs[1:] )
+			except TypeError:
+				raise GSymDocumentInvalidFormStructure
+
+			
+			
+
+
+	
+			
+
+
+
+
 		
 		
 		
@@ -86,19 +147,11 @@ class GSymDocumentUnknownItemType (Exception):
 	pass
 
 
-class GSymDocumentContentInvalidStructure (Exception):
-	pass
-
-class GSymDocumentContentInvalidType (Exception):
-	pass
 
 
-
-
-
-def loadDocument(env, xs, contentHandler):
+def loadDocument(env, xs, formHandler):
 	"""
-	($gSymDocument <gsym_version> <content_header>)
+	($gSymDocument <gsym_version> <content>)
 	"""
 	if not isGLispList( xs ):
 		raise GSymDocumentInvalidStructure
@@ -108,7 +161,7 @@ def loadDocument(env, xs, contentHandler):
 	
 	header = xs[0]
 	version = xs[1]
-	contentHeaderXs = xs[2]
+	contentXs = xs[2]
 	
 	if header != "$gSymDocument":
 		raise GSymDocumentInvalidHeader
@@ -124,204 +177,68 @@ def loadDocument(env, xs, contentHandler):
 		raise GSymDocumentUnsupportedVersion
 	
 	
-	return _processContentHeader( env, contentHeaderXs, contentHandler )
-	
+	return formHandler.handleForm( env, contentXs )
 
 
 
 
-class GSymDocumentContentHeaderInvalidStructure (Exception):
-	pass
-
-class GSymDocumentContentHeaderInvalidType (Exception):
-	pass
 
 
-def _processContentHeader(env, xs, contentHandler):
-	"""
-	($content <boot> <content>)
-	or
-	($content <content>)
-	"""
-	
-	if not isGLispList( xs ):
-		raise GSymDocumentContentHeaderInvalidType
-	
-	if len( xs )  <  2  or  len( xs )  >  3:
-		raise GSymDocumentContentHeaderInvalidStructure
-	
-	if xs[0] != '$content':
-		raise GSymDocumentContentHeaderInvalidStructure
+
+
+
+class DefineFormatFormHandler (GSymDocumentFormHandler):
+	def __init__(self, format):
+		super( GSymDefineFormatFormHandler, self ).__init__()
+		self._format = format
+
+	def defineDefaultView(self, env, xs, contentXs):
+		"""
+		($defineDefaultView <content>)
+		"""
+		formatName = self._format.name
+		viewDefinition = GSymViewDefinition( env, formatName, contentXs )
+		self._format.defaultViewDefinition = viewDefinition
+		return viewDefinition
+
+
 	
 	
-	if len( xs ) == 3:
-		_processBoot( env, xs[1], contentHandler )
-		return _processDocumentContent( env, xs[2], contentHandler )
-	else:
-		return _processDocumentContent( env, xs[1], contentHandler )
+class ContentFormHandler (GSymDocumentFormHandler):
+	defineFormatFormHandlerClass = DefineFormatFormHandler
+
+	def defineFormat(self, env, xs, name, title, *content):
+		"""
+		($defineFormat <name> <title> <content...>)
+		"""
+		fomat = GSymFormat( name, title )
+		env.registerFormat( name, format )
 		
+		defineFormatFormHandler = self.defineFormatFormHandlerClass( format )
+		
+		for form in content:
+			defineFormatFormHandler.handleForm( env, form )
 
-	
-
-class GSymDocumentBootInvalidStructure (Exception):
-	pass
-
-class GSymDocumentBootInvalidType (Exception):
-	pass
-
-
-def _processBoot(env, xs, contentHandler):
-	"""
-	($boot <boot_code...>)
-	"""
-	if not isGLispList( xs ):
-		raise GSymDocumentBootInvalidType
-	
-	
-	if len( xs ) < 1:
-		raise GSymDocumentBootInvalidStructure
-	
-	if xs[0] != '$boot':
-		raise GSymDocumentBootInvalidStructure
-	
-	
-	bootCode = xs[1:]
-	
-	result = None
-	for x in bootCode:
-		result = _executeForm( env, x, contentHandler )
-	return result
-	
-
-
-
-def _processDocumentContent(env, xs, contentHandler):
-	return _executeForm( env, xs, contentHandler )
-
+		return format
 	
 	
 
 
-class GSymDocumentContentInvalidStructure (Exception):
-	pass
+class DocumentFormHandler (GSymDocumentFormHandler):
+	contentFormHandlerClass = ContentFormHandler
 
-class GSymDocumentContentInvalidType (Exception):
-	pass
+	def content(self, env, xs, *forms):
+		"""
+		($content <forms...>)
+		"""
+		contentFormHandler = self.contentFormHandlerClass()
 
-class GSymDocumentContentInvalidForm (Exception):
-	pass
+		for form in forms:
+			result = contentFormHandler.handleForm( env, formXs )
 
 
-def _executeForm(env, xs, contentHandler):
-	if not isGLispList( xs ):
-		raise GSymDocumentContentInvalidType
+			
+			
 	
-	if len( xs ) < 1:
-		raise GSymDocumentContentInvalidStructure
-
-	# Determine the type of form
-	if xs[0] == '$defineView':
-		return _defineView( env, xs, contentHandler )
-	elif xs[0] == '$defineStructure':
-		return _defineStructure( env, xs, contentHandler )
-	elif xs[0] == 'document':
-		return _document( env, xs, contentHandler )
-	else:
-		raise GSymDocumentContentInvalidForm
-
-
-	
-	
-	
-class GSymDocumentDefineViewInvalidStructure (Exception):
-	pass
-
-class GSymDocumentDefineViewInvalidType (Exception):
-	pass
-
-
-def _defineView(env, xs, contentHandler):
-	"""
-	($defineView <identifier> <title> <content>)
-	"""
-	assert xs[0] == '$defineView'
-	
-	if len( xs ) != 4:
-		raise GSymDocumentDefineVuewInvalidStructure
-	
-	name = xs[1]
-	title = xs[2]
-	spec = xs[3]
-	
-	
-	if not isGLispString( name ):
-		raise GSymDocumentDefineViewInvalidType
-	
-	if not isGLispString( title ):
-		raise GSymDocumentDefineViewInvalidType
-	
-	return contentHandler.formHandler.defineView( env, xs, name, title, spec )
-
-
-
-
-
-class GSymDocumentDefineStructureInvalidStructure (Exception):
-	pass
-
-class GSymDocumentDefineStructureInvalidType (Exception):
-	pass
-
-
-def _defineStructure(env, xs, contentHandler):
-	"""
-	($defineStructure <identifier> <title> <content>)
-	"""
-	assert xs[0] == '$defineStructure'
-	
-	if len( xs ) != 4:
-		raise GSymDocumentDefineStructureInvalidStructure
-	
-	name = xs[1]
-	title = xs[2]
-	spec = xs[3]
-	
-	
-	if not isGLispString( name ):
-		raise GSymDocumentDefineStructureInvalidType
-	
-	if not isGLispString( title ):
-		raise GSymDocumentDefineStructureInvalidType
-	
-	return contentHandler.formHandler.defineStructure( env, xs, name, title, spec )
-
-
-
-
-class GSymDocumentDocFormInvalidStructure (Exception):
-	pass
-
-class GSymDocumentDocFormInvalidType (Exception):
-	pass
-
-
-def _document(env, xs, contentHandler):
-	"""
-	($document <format> <content>)
-	"""
-	assert xs[0] == '$document'
-	
-	if len( xs ) != 3:
-		raise GSymDocumentDocFormInvalidStructure
-	
-	name = xs[1]
-	spec = xs[2]
-	
-	
-	if not isGLispString( name ):
-		raise GSymDocumentDocFormInvalidType
-	
-	return contentHandler.formHandler.document( env, xs, name, spec )
-
-
+		
 

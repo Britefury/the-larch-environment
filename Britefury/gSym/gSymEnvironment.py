@@ -14,8 +14,6 @@ from Britefury.DocModel.DMIO import readSX
 from Britefury.GLisp.GLispUtil import gLispSrcToString
 from Britefury.GLisp.GLispInterpreter import specialform, GLispFrame, GLispModule, ModuleRegistry, _moduleRegistry
 
-from Britefury.gSym.MetaMetaLanguage import metaMetaLanguageFactory
-
 
 
 #

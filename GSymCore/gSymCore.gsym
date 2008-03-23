@@ -1,7 +1,7 @@
 ($gSymDocument "0.1-alpha"
 	($content
-		($boot
-			($defineView $metaLanguage "gMeta meta-language"
+		($defineFormat $metaLanguageView "gMeta meta-language"
+			($defineDefaultView
 				($where
 					(
 						($# "STYLE SHEETS")
@@ -889,60 +889,92 @@
 							)
 						)
 					)
-					(@viewExpressionFactory <- @viewViewSpecial)
-				)
-			)
-			
-			
-			($defineStructure BasicDocument "Basic document structure"
-				($where
-					(
-						($# "Resolve a location for a basic document node")
-						(@basicDocNodeResolve
-							($lambda (@document @location)
-								($match @document
-									($# "Root node"
-									( ($basicDocument (: @title !) (: @content *))
-										a
-									)
-								)
-							)
-						)
-						
-						($# "Resolve a location for a basic document root node")
-						(@basicDocRootNodeResolve
-							($lambda (@document @location)
-								($match @document
-									($# "Root node"
-									( ($basicDocument (: @title !) (: @content *))
-										($mapx (@basicDocNodeResolve <- @x @location) @x @content)
-									)
-									
-									( (: @x ^)  (@log <- (@gLispAsString <- @x)) #None )
-								)
-							)
-						)
-					)
 					
-					@basicDocRootNodeResolve
+					
+					
+					($lambda (@parentLocation)
+						(@viewExpressionFactory <- @viewViewSpecial)
+					)
 				)
 			)
 		)
-		
-		
-		($document gSymCore.BasicDocument
-			($basicDocument "gSym Core"
-				($section gMeta "The gMeta Language"
-					($page gMetaWhatIs "What is gMeta"
-						($p "gMeta is a functional language, implemented as a thin layer over Python. Operations that would result in side-effects (such as assignment) are not present in gMeta. However, due to the nature
-						of its implementation, it is possible to invoke methods of objects, that will result in side-effects. Doing this is not recommended.")
+				
+				
+		($defineStructureView $gSymStructureView "Document index structure view"
+			($where
+				(
+					($# "View page")
+					(@viewStructureFactory
+						($lambda (@parentLocation)
+							($lambda (@node)
+								($match @node
+									($# "Default view definition")
+									( ($defineDefaultView (: @content ^))
+										($link "#'Default view definition" (@parentLocation + "#'.defineDefaultView"))
+									)
+	
+									($# "Format definition")
+									( ($defineFormat (: @name !) (: @title !) (: @content *))
+										($vbox ($list
+											($hbox ($list ($label "#'Format definition: ") ($link @title (@parentLocation + ("#'." + @name)))))
+											($indent #30.0
+												($vbox
+													($mapViewEval @content (@viewStructureFactory <- (@parentLocation + ("#'." + @name))))
+												)
+											)
+										))
+									)
+
+									($# "Structure view definition")
+									( ($defineStructureView (: @name !) (: @title !) (: @content ^))
+										($hbox ($list ($label "#'Structure view definition: ") ($link @title (@parentLocation + ("#'." + @name)))))
+									)
+
+									($# "Document view selector definition")
+									( ($defineDocumentViewSelector (: @name !) (: @title !) (: @content ^))
+										($hbox ($list ($label "#'Document view selector definition: ") ($link @title (@parentLocation + ("#'." + @name)))))
+									)
+
+									($# "Unknown")
+									( (: @x ^)  (@log <- (@gLispAsString <- @x)) ($activeBorder ($label u"#'\u2620 STRUCTURE ERROR \u2620")) )
+								)
+							)
+						)
 					)
-					($link "$self/$boot/$metaLanguage" "The gMeta source code")
 				)
+				
+				@viewStructureFactory
+			)
+		)
 			
-				($section sturcture "Basic document structure"
-					($link "$self/$boot/$BasicDocument" "The basic document structure source code")
+			
+		($defineDocumentViewSelector $gSymDocumentViewSelector "Basic document view selector"
+			($where
+				(
+					($# "View page")
+					(@viewPage
+						($lambda (@node @location)
+							($match @node
+								($# "Default view definition")
+								( ($defineDefaultView (: @content ^))
+									"#'$metaLanguageView" )
+
+								($# "Structure view definition")
+								( ($defineStructureView (: @name !) (: @title !) (: @content ^))
+									"#'$metaLanguageView" )
+
+								($# "Document view selector definition")
+								( ($defineDocumentViewSelector (: @name !) (: @title !) (: @content ^))
+									"#'$metaLanguageView" )
+									
+								( ^
+									"#'$gSymStructureView" )
+							)
+						)
+					)
 				)
+				
+				@viewPage
 			)
 		)
 	)
