@@ -232,6 +232,17 @@ def _runtime_hbox(viewNodeInstance, children, styleSheets):
 	_runtime_applyStyleSheetList( styleSheets, widget )
 	return widget
 
+def _runtime_ahbox(viewNodeInstance, children, styleSheets):
+	"""
+	Runtime - called by compiled code at run-time
+	Builds a horizontal DTBox widget, with child, builds and registers a refresh cell
+	"""
+	widget = DTBox( alignment=DTBox.ALIGN_BASELINES )
+	_runtime_boxRefreshCell( viewNodeInstance, widget, children )
+	_runtime_applyStyleSheetStack( viewNodeInstance, widget )
+	_runtime_applyStyleSheetList( styleSheets, widget )
+	return widget
+
 def _runtime_vbox(viewNodeInstance, children, styleSheets):
 	"""
 	Runtime - called by compiled code at run-time
@@ -394,6 +405,7 @@ class _GSymViewFactory (object):
 			 '_label' : _runtime_label,
 			 '_entry' : _runtime_entry,
 			 '_hbox' : _runtime_hbox,
+			 '_ahbox' : _runtime_ahbox,
 			 '_vbox' : _runtime_vbox,
 			 '_script' : _runtime_script,
 			 '_GSymStyleSheet' : GSymStyleSheet,
@@ -533,6 +545,11 @@ class _GSymViewFactory (object):
 			if len( srcXs ) < 2:
 				self.env.raiseError( GLispParameterListError, src, 'defineView: $hbox needs at least 1 parameter; the children' )
 			return PyCall( PyVar( '_hbox', dbgSrc=srcXs ), [ PySrc( '__view_node_instance_stack__[-1]', dbgSrc=srcXs ), compileSubExp( srcXs[1] ), compileStyleSheetAccess( srcXs[2:]) ], dbgSrc=srcXs )
+		elif name == '$ahbox':
+			#($ahbox (child*) styleSheet*)
+			if len( srcXs ) < 2:
+				self.env.raiseError( GLispParameterListError, src, 'defineView: $ahbox needs at least 1 parameter; the children' )
+			return PyCall( PyVar( '_ahbox', dbgSrc=srcXs ), [ PySrc( '__view_node_instance_stack__[-1]', dbgSrc=srcXs ), compileSubExp( srcXs[1] ), compileStyleSheetAccess( srcXs[2:]) ], dbgSrc=srcXs )
 		elif name == '$vbox':
 			#($vbox (child*) styleSheet*)
 			if len( srcXs ) < 2:

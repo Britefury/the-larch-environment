@@ -28,6 +28,7 @@ from Britefury.DocPresent.Toolkit.DTDocument import DTDocument
 from Britefury.DocModel.DMList import DMList
 from Britefury.DocModel.DMIO import readSX, writeSX
 
+from Britefury.gSym.gSymWorld import GSymWorld
 from Britefury.gSym.gSymEnvironment import GSymEnvironment
 from Britefury.gSym.gSymDocument import loadDocument, GSymDocumentExecuteContentHandler, GSymDocumentViewContentHandler
 
@@ -76,7 +77,7 @@ class MainApp (object):
 		self._commandHistory = None
 		self._bUnsavedData = False
 		
-		self._env = GSymEnvironment()
+		self._world = GSymWorld()
 
 		self._doc = DTDocument()
 		self._doc.undoSignal.connect( self._p_onUndo )
@@ -224,7 +225,7 @@ class MainApp (object):
 
 
 
-		self.setDocument( documentRoot, bEvaluate )
+		self.setDocument( '', documentRoot, bEvaluate )
 
 
 		scriptBanner = _( "gSym scripting console (uses pyconsole by Yevgen Muntyan)\nPython %s\nType help(object) for help on an object\nThe gSym scripting environment is available via the local variable 'gsym'\n" ) % ( sys.version, )
@@ -256,11 +257,12 @@ class MainApp (object):
 	def _p_initialise(self):
 		doc = readSX( file( os.path.join( 'GSymCore', 'Core', 'gMeta.gsym' ), 'r' ) )
 		contentHandler = GSymDocumentExecuteContentHandler()
-		loadDocument( self._env, doc, contentHandler )
+		env = GSymEnvironment( self._world, 'Core.gMeta' )
+		loadDocument( env, doc, contentHandler )
 		
 
 
-	def setDocument(self, documentRoot, bEvaluate):
+	def setDocument(self, moduleName, documentRoot, bEvaluate):
 		self._documentRoot = documentRoot
 
 		self._commandHistory = CommandHistory()
@@ -274,7 +276,8 @@ class MainApp (object):
 		
 		if bEvaluate:
 			contentHandler = GSymDocumentViewContentHandler( self._commandHistory, makeLispStyleSheetDispatcher() )
-			self._view = loadDocument( self._env, documentRoot, contentHandler )
+			env = GSymEnvironment( self._world, moduleName )
+			self._view = loadDocument( env, documentRoot, contentHandler )
 		else:
 			self._view = makeLispDocView( documentRoot, self._commandHistory )
 	
@@ -378,7 +381,7 @@ class MainApp (object):
 			bProceed = confirmDialog( _( 'New project' ), _( 'You have not saved your work. Proceed?' ), gtk.STOCK_NEW, gtk.STOCK_CANCEL, 'y', 'n', True, self._window )
 		if bProceed:
 			documentRoot = self.makeEmptyDocument()
-			self.setDocument( documentRoot, False )
+			self.setDocument( '', documentRoot, False )
 
 
 	def _p_onOpen(self, widget):
@@ -403,7 +406,7 @@ class MainApp (object):
 					if f is not None:
 						try:
 							documentRoot = readSX( file( filename, 'r' ) )
-							self.setDocument( documentRoot, True )
+							self.setDocument( self._world.filenameToModuleName( filename ), documentRoot, True )
 						except IOError:
 							pass
 

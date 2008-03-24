@@ -7,129 +7,60 @@
 ##-*************************
 from Britefury.Kernel.Abstract import abstractmethod
 
-from Britefury.GLisp.GLispUtil import isGLispList, isGLispString
+from Britefury.GLisp.GLispUtil import isGLispList
 from Britefury.gSymConfig.gSymVersion import compareVersions, gSymVersion
 
 from Britefury.gSym.gSymView import GSymViewDefinition
 from Britefury.gSym.gSymEnvironment import GSymEnvironment
-from Britefury.gSym.gSymFormat import GSymFormat
 
 
 
 
 
-
-
-
-
-
-class GSymDocumentInvalidLocation (Exception):
-	pass
-
-class GSymDocumentInvalidType (Exception):
-	pass
-
-class GSymDocumentInvalidStructure (Exception):
-	pass
-
-class GSymDocumentUnknownForm (Exception):
-	pass
-
-class GSymDocumentInvalidFormStructure (Exception):
-	pass
-
-
-
-class GSymDocumentLocationResolver (object):
-	def defineFormat(self, env, xs, name, title, *forms):
-		return name, forms
+class GSymDocumentContentHandler (object):
+	@abstractmethod
+	def metaLanguage(self, env, name, xs):
+		pass
 	
-	def defineDefaultView(self, env, xs, *forms):
-		return 'defineDefaultView', []
+	@abstractmethod
+	def singlePage(self, env, xs):
+		pass
 	
-	def content(self, env, xs, *forms):
-		return None, forms
+	@abstractmethod
+	def use(self, importName, env, xs):
+		pass
+
+
+
+class GSymDocumentExecuteContentHandler (GSymDocumentContentHandler):
+	def metaLanguage(self, env, name, xs):
+		env._f_setMetaLanguageViewDefinition( GSymViewDefinition( env, name, xs ) )
 	
-
-	def _f_resolve(self, location, env, xs):
-		if not isGLispList( xs ):
-			raise GSymDocumentInvalidType
-		
-		if len( xs ) < 1:
-			raise GSymDocumentInvalidStructure
-		
-		funcNameXs = xs[0]
-
-		if funcNameXs[0] != '$':
-			raise GSymDocumentInvalidStructure
-		
-		funcName = funcNameXs[1:]
-		
-		try:
-			func = getattr( self, funcName )
-		except AttributeError:
-			raise GSymDocumentUnknownForm
-		else:
-			formName, subForms = func( env, xs, *xs[1:] )
-			
-			if formName is not None:
-				locationName = location[0]
-				subLocation = location[1:]
-			else:
-				locationName = None
-				subLocation = location
-			
-			if locationName == formName:
-				for form in subForms:
-					try:
-						return self._f_resolve( subLocation, env, form )
-					except GSymDocumentInvalidLocation:
-						pass
-			
-			raise GSymDocumentInvalidLocation
-
-
-
-
-
-class GSymDocumentFormHandler (object):
-	def handleForm(self, env, xs):
-		if not isGLispList( xs ):
-			raise GSymDocumentInvalidType
-		
-		if len( xs ) < 1:
-			raise GSymDocumentInvalidStructure
-		
-		funcNameXs = xs[0]
-		
-		if funcNameXs[0] != '$':
-			raise GSymDocumentInvalidStructure
-		
-		funcName = funcNameXs[1:]
-		
-		try:
-			func = getattr( self, funcName )
-		except AttributeError:
-			raise GSymDocumentUnknownForm
-		else:
-			try:
-				return func( env, xs, *xs[1:] )
-			except TypeError:
-				raise GSymDocumentInvalidFormStructure
-
-			
-			
-
-
+	def singlePage(self, env, xs):
+		pass
 	
-			
+	def use(self, importName, env, xs):
+		pass
 
 
 
+class GSymDocumentViewContentHandler (GSymDocumentContentHandler):
+	def __init__(self, commandHistory, stylesheetDispatcher):
+		super( GSymDocumentViewContentHandler, self ).__init__()
+		self._commandHistory = commandHistory 
+		self._stylesheetDispatcher = stylesheetDispatcher 
+	
+	def metaLanguage(self, env, name, xs):
+		metaLang = env._f_getMetaLanguageViewDefinition()
+		return metaLang.createDocumentView( xs, self._commandHistory, self._stylesheetDispatcher )
+	
+	def singlePage(self, env, xs):
+		pass
+	
+	def use(self, importName, env, xs):
+		pass
 
-		
-		
-		
+
 
 class GSymDocumentInvalidStructure (Exception):
 	pass
@@ -147,21 +78,28 @@ class GSymDocumentUnknownItemType (Exception):
 	pass
 
 
+class GSymDocumentContentInvalidStructure (Exception):
+	pass
+
+class GSymDocumentContentInvalidType (Exception):
+	pass
 
 
-def loadDocument(env, xs, formHandler):
+
+
+def loadDocument(env, xs, contentHandler):
 	"""
-	($gSymDocument <gsym_version> <content>)
+	($gSymDocument <gsym_version> <module>)
 	"""
 	if not isGLispList( xs ):
 		raise GSymDocumentInvalidStructure
 	
-	if len( xs ) != 3:
+	if len( xs ) < 3:
 		raise GSymDocumentInvalidStructure
 	
 	header = xs[0]
 	version = xs[1]
-	contentXs = xs[2]
+	moduleXs = xs[2]
 	
 	if header != "$gSymDocument":
 		raise GSymDocumentInvalidHeader
@@ -177,68 +115,64 @@ def loadDocument(env, xs, formHandler):
 		raise GSymDocumentUnsupportedVersion
 	
 	
-	return formHandler.handleForm( env, contentXs )
-
-
-
-
-
-
-
-
-
-class DefineFormatFormHandler (GSymDocumentFormHandler):
-	def __init__(self, format):
-		super( GSymDefineFormatFormHandler, self ).__init__()
-		self._format = format
-
-	def defineDefaultView(self, env, xs, contentXs):
-		"""
-		($defineDefaultView <content>)
-		"""
-		formatName = self._format.name
-		viewDefinition = GSymViewDefinition( env, formatName, contentXs )
-		self._format.defaultViewDefinition = viewDefinition
-		return viewDefinition
-
-
+	
+	if not isGLispList( moduleXs ):
+		raise GSymDocumentInvalidStructure
+	
+	if len( moduleXs ) < 1:
+		raise GSymDocumentInvalidStructure
 	
 	
-class ContentFormHandler (GSymDocumentFormHandler):
-	defineFormatFormHandlerClass = DefineFormatFormHandler
-
-	def defineFormat(self, env, xs, name, title, *content):
-		"""
-		($defineFormat <name> <title> <content...>)
-		"""
-		fomat = GSymFormat( name, title )
-		env.registerFormat( name, format )
-		
-		defineFormatFormHandler = self.defineFormatFormHandlerClass( format )
-		
-		for form in content:
-			defineFormatFormHandler.handleForm( env, form )
-
-		return format
+	"""
+	($module <content>)
+	"""
+	if moduleXs[0] != '$module':
+		raise GSymDocumentInvalidStructure
+	
+	docXs = moduleXs[1]
 	
 	
-
-
-class DocumentFormHandler (GSymDocumentFormHandler):
-	contentFormHandlerClass = ContentFormHandler
-
-	def content(self, env, xs, *forms):
-		"""
-		($content <forms...>)
-		"""
-		contentFormHandler = self.contentFormHandlerClass()
-
-		for form in forms:
-			result = contentFormHandler.handleForm( env, formXs )
-
-
-			
-			
+	
+	
+	if not isGLispList( docXs ):
+		raise GSymDocumentInvalidStructure
+	
+	if len( docXs ) < 1:
+		raise GSymDocumentInvalidStructure
 	
 		
+		
+	if docXs[0] == '$metaLanguage':
+		"""
+		($metaLanguage <name> <view_definition>)
+		"""
+		if len( docXs ) != 3:
+			raise GSymDocumentContentInvalidStructure
+		
+		return contentHandler.metaLanguage( env,docXs[1], docXs[2] )
+	elif docXs[0] == '$singlePage':
+		"""
+		($singlePage <content>)
+		"""
+		if len( docXs ) != 2:
+			raise GSymDocumentContentInvalidStructure
+	
+		return contentHandler.singlePage( env, docXs[1] )
+	elif docXs[0] == '$use':
+		"""
+		($use <import> <content>)
+		"""
+		if len( docXs ) != 3:
+			raise GSymDocumentContentInvalidStructure
+		
+		importName = docXs[1]
+		
+		return contentHandler.use( importName, env,docXs[2] )
+	else:
+		raise GSymDocumentContentInvalidType
+
+
+
+
+
 
