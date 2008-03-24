@@ -520,7 +520,7 @@ if __name__ == '__main__':
 	window.set_size_request( 300, 100 )
 
 	doc = DTDocument()
-	doc.show()
+	doc.getGtkWidget().show()
 
 	label1 = MyLabel( 'Hello world' )
 	label2 = MyLabel( 'Hello world 2' )
@@ -534,10 +534,25 @@ if __name__ == '__main__':
 	hbox.append( label3, False )
 	hbox.spacing = 5.0
 	hbox.backgroundColour = Colour3f( 0.6, 0.6, 0.6 )
+	
+	labelA = MyLabel( 'Label A yYgGjJpPqQ' )
+	labelB = MyLabel( 'Label B yYgGjJpPqQ' )
+	labelC = MyLabel( 'Label C yYgGjJpPqQ' )
+	labelA.font = 'Sans 11'
+	labelB.font = 'Sans 21'
+	labelC.font = 'Sans 15'
+
+	hbox2 = DTBox( DTDirection.LEFT_TO_RIGHT, alignment=DTBox.ALIGN_BASELINES )
+	hbox2.append( labelA )
+	hbox2.append( labelB )
+	hbox2.append( labelC )
+	hbox2.spacing = 5.0
+	hbox2.backgroundColour = Colour3f( 0.6, 0.6, 0.6 )
 
 	vbox = DTBox( DTDirection.TOP_TO_BOTTOM, alignment=DTBox.ALIGN_EXPAND )
 	vbox.append( hbox, False )
 	vbox.append( label4, False )
+	vbox.append( hbox2, False )
 	vbox.spacing = 10.0
 	vbox.backgroundColour = Colour3f( 0.8, 0.8, 0.8 )
 
@@ -556,7 +571,7 @@ if __name__ == '__main__':
 	buttonBox.show_all()
 
 	box = gtk.VBox()
-	box.pack_start( doc )
+	box.pack_start( doc.getGtkWidget() )
 	box.pack_start( gtk.HSeparator(), False, False, 10 )
 	box.pack_start( buttonBox, False, False, 10 )
 	box.show_all()

@@ -83,13 +83,13 @@ class GSymEnvironment (object):
 		raise exceptionClass, reason  +  '   ::   '  +  gLispSrcToString( src, 3 )
 	
 	
-	def registerViewDefinition(self, name, viewDefinition):
-		worldName = self._p_moduleAttributeNameToWorldAttributeName( name )
-		self._world[worldName] = viewDefinition
+	def _f_setMetaLanguageViewDefinition(self, viewDef):
+		self._world._f_setMetaLanguageViewDefinition( viewDef )
+		
+	def _f_getMetaLanguageViewDefinition(self):
+		return self._world._f_getMetaLanguageViewDefinition()
 	
 	
-	def _p_moduleAttributeNameToWorldAttributeName(self, name):
-		return '.'.join( [ self._moduleName, name ] )
 	
 
 		

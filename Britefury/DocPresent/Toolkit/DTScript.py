@@ -299,7 +299,7 @@ class DTScript (DTContainer):
 		#print ''
 
 		
-		return height, self._mainBaseFromTop
+		return height, height - self._mainBaseFromTop
 		
 		
 		
@@ -489,8 +489,19 @@ if __name__ == '__main__':
 		
 		border = DTActiveBorder()
 		border.child = script
+		
+		
+		labelA = DTLabel( 'Label A yYgGjJpPqQ', font='Sans 8' )
+		labelB = DTLabel( 'Label B yYgGjJpPqQ', font='Sans 18' )
+		box = DTBox( alignment=DTBox.ALIGN_BASELINES, spacing=15.0 )
+		box.append( labelA )
+		box.append( border )
+		box.append( labelB )
 			
-		return border
+		border2 = DTActiveBorder()
+		border2.child = box
+
+		return border2
 	
 	
 	box = DTBox( DTDirection.TOP_TO_BOTTOM, spacing=20.0 )

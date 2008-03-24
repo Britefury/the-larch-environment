@@ -5,6 +5,7 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
+import os
 
 
 #
@@ -20,6 +21,7 @@ class GSymWorld (object):
 		super( GSymWorld, self ).__init__()
 		
 		self._worldTable = {}
+		self._metaLanguageViewDef = None
 		
 		
 	def __getitem__(self, key):
@@ -27,3 +29,18 @@ class GSymWorld (object):
 	
 	def __setitem__(self, key, value):
 		self._worldTable[key] = value
+
+		
+	def _f_setMetaLanguageViewDefinition(self, viewDef):
+		self._metaLanguageViewDef = viewDef
+		
+	def _f_getMetaLanguageViewDefinition(self):
+		return self._metaLanguageViewDef
+	
+	
+	@staticmethod
+	def filenameToModuleName(filename):
+		return os.path.splitext( os.path.split( filename )[1] )[0]
+		
+
+	
