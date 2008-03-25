@@ -78,6 +78,14 @@ The hierarchy of document view nodes is respected however.
 
 
 
+class _InteractWrapper (object):
+	def __init__(self, child, interact):
+		self.child = child
+		self.interact = interact
+
+
+
+
 def _runtime_buildRefreshCellAndRegister(viewNodeInstance, refreshFunction):
 	"""
 	Runtime - called by compiled code at run-time
@@ -585,10 +593,32 @@ class _GSymViewFactory (object):
 				self.env.raiseError( GLispParameterListError, src, 'defineView: $scriptRSub needs at least 2 parameters; the main child, and the script child' )
 			return PyVar( '_script' )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[1] ), None, None, None, compileSubExp( srcXs[2] ),
 						   compileStyleSheetAccess( srcXs[6:]) ).debug( srcXs )
+		elif name == '$interactor':
+			#($interactor ....)
+			return self._p_compileInteractor( srcXs, context, bNeedResult, compileSpecial, compileGLispExprToPyTree )
 		else:
 			raise GLispCompilerCouldNotCompileSpecial( srcXs )
 		
 
+		
+	def _p_compileInteractor(self, srcXs, context, bNeedResult, compileSpecial, compileGLispExprToPyTree):
+		#
+		#( $interactor <interactor_specs...> )
+		#
+		# interactor_pair:
+		# ( <event_spec>  <actions...> )
+		#
+		# event_spec:
+		# key:
+		# ( $key <key_value> <mods...> )    - key event
+		# tokens:
+		# ( $tokens <token_specs...> )     - token list; consumes the tokens specified in the list
+		#
+		# token_spec:
+		# token_type_id        - the token type id
+		# or:
+		# (: @var token_type_id)     - look for a token with the specified type, and bind the value to a variable called 'var'
+		return Interactor
 			
 
 		
