@@ -66,27 +66,35 @@ import unittest
 
 
 class TestCase_DMIOWrite (unittest.TestCase):
-	def _testRead(self, source, result):
-		x = readSX( source )
-		self.assert_( x == result )
-
-
-
-
-	def testWrite(self):
+	def _testWrite(self, data, result):
 		import cStringIO
-		from Britefury.DocModel.DMList import DMList
+		stream = cStringIO.StringIO()
+		writeSX( stream, data )
+		self.assert_( stream.getvalue() == result )
 
+
+
+	def testUnquotedString(self):
+		self._testWrite( 'x', 'x' )
+		
+	def testQuotedString(self):
+		self._testWrite( 'x y', '\'x y\'' )
+		
+	def testUnicodeString(self):
+		from Britefury.DocModel.DMList import DMList
+		self._testWrite( u'\u0107', 'u\'\\u0107\'' )
+		
+
+	def testWriteList(self):
+		from Britefury.DocModel.DMList import DMList
 		h = DMList()
 		h.extend( [ 'h', '1', '2L', '3.0' ] )
 		g = DMList()
 		g.extend( [ 'g', h, 'Hi ' ] )
 		f = DMList()
-		f.extend( [ 'f', g, ' There' ] )
-
-		stream = cStringIO.StringIO()
-		writeSX( stream, f )
-		self.assert_( stream.getvalue() == '(f (g (h 1 2L 3.0) \'Hi \') \' There\')' )
+		f.extend( [ 'f', g, ' There', u'\u0107' ] )
+		
+		self._testWrite( f, '(f (g (h 1 2L 3.0) \'Hi \') \' There\' u\'\\u0107\')' )
 
 
 

@@ -10,7 +10,7 @@ from Britefury.Kernel.Abstract import abstractmethod
 from Britefury.GLisp.GLispUtil import isGLispList
 from Britefury.gSymConfig.gSymVersion import compareVersions, gSymVersion
 
-from Britefury.gSym.gSymView import GSymViewDefinition
+from Britefury.gSym.View.gSymView import GSymViewDefinition
 from Britefury.gSym.gSymEnvironment import GSymEnvironment
 
 

@@ -386,12 +386,12 @@ def compileMatchBlockToPyTrees(matchXs, xs, context, bNeedResult, dataVarName, c
 		actionFnContext.body.append( matchedTrueTree )
 		
 		# Action expression code
-		trees, resultStorePyTree = Britefury.GLisp.GLispCompiler._compileExpressionListToPyTreeStatements( actionXs, actionFnContext, True, compileSpecial, lambda tree, x: PyReturn( tree, dbgSrc=x ) )
+		trees, resultStorePyTree = Britefury.GLisp.GLispCompiler.compileExpressionListToPyTreeStatements( actionXs, actionFnContext, True, compileSpecial, lambda tree, x: PyReturn( tree, dbgSrc=x ) )
 		actionFnContext.body.extend( trees )
 		
 		# Make a function define
 		actionFnTree = PyDef( actionFnName, [ pair[0]   for pair in bindingPairs ], actionFnContext.body, dbgSrc=matchXs )
-		_actionFnCallTree = PyVar( actionFnName, dbgSrc=actionXs )( *[ pair[1].debug( actionXs )   for pair in bindingPairs ] ).debug( matchXs )
+		_actionFnCallTree = PyVar( actionFnName, dbgSrc=matchXs )( *[ pair[1].debug( matchXs )   for pair in bindingPairs ] ).debug( matchXs )
 		actionResultAssignTree = PyAssign_SideEffects( PyVar( resultVarName, dbgSrc=matchXs ), _actionFnCallTree, dbgSrc=matchXs )
 		
 		actionTrees = [ actionFnTree,  actionResultAssignTree ]
