@@ -2,6 +2,8 @@ TODOS:
 
 
 
+- Use the following presentation on unicode in Python to check gSym over:
+    http://farmdev.com/talks/unicode/
 
 - Literate programming style
   1. Define document structure and presentation in another document; a meta-document

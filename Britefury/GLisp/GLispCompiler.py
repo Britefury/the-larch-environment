@@ -66,9 +66,9 @@ class _CompilationContext (object):
 		
 		
 
-def _compileExpressionListToPyTreeStatements(expressions, context, bNeedResult, compileSpecial, buildResultHandlerTreeNode):
+def compileExpressionListToPyTreeStatements(expressions, context, bNeedResult, compileSpecial, buildResultHandlerTreeNode=lambda t, xs: t):
 	"""Compiles an expression list to a list of statements
-	_compileExpressionListToPyTreeStatements( expressions, context, bNeedResult, compileSpecial, buildResultHandlerTreeNode)  ->  trees, wrappedResultTree
+	compileExpressionListToPyTreeStatements( expressions, context, bNeedResult, compileSpecial, buildResultHandlerTreeNode)  ->  trees, wrappedResultTree
 	
 	expressions - the list of expressions to compile
 	context - the compilation context
@@ -124,6 +124,9 @@ class GLispCompilerCouldNotCompileSpecial (PyCodeGenError):
 class GLispCompilerVariableNameMustStartWithAt (PyCodeGenError):
 	pass
 
+class GLispCompilerInvalidFormType (PyCodeGenError):
+	pass
+
 
 
 class GLispCompilerLambdaExprParamListInsufficient (PyCodeGenError):
@@ -170,7 +173,7 @@ def _compileLambda(xs, context, bNeedResult=False, compileSpecial=None):
 	fnBodyContext = context.functionInnerContext()
 	for argName in argNames:
 		fnBodyContext.scope.registerArgument( argName )
-	fnBodyPyTrees, wrappedResultTree = _compileExpressionListToPyTreeStatements( codeXs, fnBodyContext, True, compileSpecial, lambda t, x: PyReturn( t, dbgSrc=x ) )
+	fnBodyPyTrees, wrappedResultTree = compileExpressionListToPyTreeStatements( codeXs, fnBodyContext, True, compileSpecial, lambda t, x: PyReturn( t, dbgSrc=x ) )
 	
 	context.body.append( PyDef( functionName, argNames, fnBodyPyTrees, dbgSrc=xs ) )
 	
@@ -386,7 +389,7 @@ def _compileIf(xs, context, bNeedResult=False, compileSpecial=None):
 		codeXs = conditionAndCodeXs[1:]
 		conditionPyTree = _compileGLispExprToPyTree( conditionXs, context, True, compileSpecial )
 		
-		codePyTrees, wrappedResultTree = _compileExpressionListToPyTreeStatements( codeXs, context, bNeedResult, compileSpecial, lambda t, x: PyAssign_SideEffects( PyVar( resultVarName, dbgSrc=x ), t, dbgSrc=x ) )
+		codePyTrees, wrappedResultTree = compileExpressionListToPyTreeStatements( codeXs, context, bNeedResult, compileSpecial, lambda t, x: PyAssign_SideEffects( PyVar( resultVarName, dbgSrc=x ), t, dbgSrc=x ) )
 		
 		if wrappedResultTree is None  and  bNeedResult:
 			codePyTrees.append( PyAssign_SideEffects( PyVar( resultVarName, dbgSrc=conditionAndCodeXs ), PyLiteral( 'None', dbgSrc=conditionAndCodeXs ), dbgSrc=conditionAndCodeXs ) )
@@ -396,7 +399,7 @@ def _compileIf(xs, context, bNeedResult=False, compileSpecial=None):
 	
 	def _elseCodeXsToPyTree(elseCodeXs):
 		codeXs = elseCodeXs[1:]
-		codePyTrees, wrappedResultTree = _compileExpressionListToPyTreeStatements( codeXs, context, bNeedResult, compileSpecial, lambda t, x: PyAssign_SideEffects( PyVar( resultVarName, dbgSrc=x ), t, dbgSrc=x ) )
+		codePyTrees, wrappedResultTree = compileExpressionListToPyTreeStatements( codeXs, context, bNeedResult, compileSpecial, lambda t, x: PyAssign_SideEffects( PyVar( resultVarName, dbgSrc=x ), t, dbgSrc=x ) )
 		
 		if wrappedResultTree is None  and  bNeedResult:
 			codePyTrees.append( PyAssign_SideEffects( PyVar( resultVarName, dbgSrc=elseCodeXs ), PyLiteral( 'None', dbgSrc=elseCodeXs ), dbgSrc=elseCodeXs ) )
@@ -484,7 +487,7 @@ def _compileWhere(xs, context, bNeedResult=False, compileSpecial=None):
 
 	
 	# Where expression code
-	trees, resultStorePyTree = _compileExpressionListToPyTreeStatements( expressions, context, True, compileSpecial, lambda tree, x: PyReturn( tree, dbgSrc=x ) )
+	trees, resultStorePyTree = compileExpressionListToPyTreeStatements( expressions, context, True, compileSpecial, lambda tree, x: PyReturn( tree, dbgSrc=x ) )
 	whereTrees.extend( trees )
 	
 	
@@ -695,7 +698,7 @@ def compileGLispExprToPyFunctionPyTree(functionName, argNames, xs, compileSpecia
 	"""
 	context = _CompilationContext( _TempNameAllocator(), _PyScope() )
 	
-	fnBodyPyTrees, wrappedResultTree = _compileExpressionListToPyTreeStatements( [ xs ], context, True, compileSpecial, lambda t, x: PyReturn( resultPyTreePostProcess( t, x ), dbgSrc=x ) )
+	fnBodyPyTrees, wrappedResultTree = compileExpressionListToPyTreeStatements( [ xs ], context, True, compileSpecial, lambda t, x: PyReturn( resultPyTreePostProcess( t, x ), dbgSrc=x ) )
 	fnBodyPyTrees = prefixTrees + fnBodyPyTrees
 	
 	return PyDef( functionName, argNames, fnBodyPyTrees, dbgSrc=xs )

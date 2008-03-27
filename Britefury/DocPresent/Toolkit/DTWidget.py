@@ -134,6 +134,9 @@ class DTWidget (object):
 		self.dndCanDropFromCallback = None
 		self.dndDragToCallback = None
 		self.dndDropFromCallback = None
+		
+		
+		self.docEventHandler = None
 
 
 		self._dndSourceOps = []
@@ -944,6 +947,28 @@ class DTWidget (object):
 			return [ self ]
 		else:
 			return []
+		
+		
+	
+	
+	#
+	#
+	#
+	# DOCUMENT EVENTS
+	#
+	#
+	#
+	
+	def sendDocEvent(self, event):
+		if self.docEventHandler is not None:
+			event = self.docEventHandler( event )
+			if event is None:
+				return event
+		if self._parent is not None:
+			event = self._parent.sendDocEvent( event )
+		return event
+		
+		
 
 
 

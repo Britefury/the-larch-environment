@@ -350,6 +350,10 @@ class PyExpression (PyStatement):
 		return PyMethodCall( self, methodName, [ pyt_coerce( arg )   for arg in args ] )
 	
 	
+	def isinstance_(self, typ):
+		return PyIsInstance( self, typ )
+	
+	
 	# Return
 	def return_(self):
 		return PyReturn( self )
@@ -691,6 +695,25 @@ class PyMethodCall (PyExpression):
 
 	
 	
+class PyIsInstance (PyExpression):
+	def __init__(self, value, typ, dbgSrc=None):
+		super( PyIsInstance, self ).__init__( dbgSrc )
+		assert isinstance( value, PyExpression )
+		assert isinstance( typ, PyExpression )
+		self.value = value
+		self.typ = typ
+		
+	def _o_compileAsExpr(self):
+		return 'isinstance( %s, %s )'  %  ( self.value.compileAsExpr(), self.typ.compileAsExpr() )
+		
+	def _o_compareWith(self, x):
+		return pyt_compare( self.value, x.value )  and  pyt_compare( self.typ, x.typ )
+
+	def getChildren(self):
+		return [ self.value, self.typ ]
+	
+	
+
 class PyReturn (PyStatement):
 	def __init__(self, value, dbgSrc=None):
 		super( PyReturn, self ).__init__( dbgSrc )
@@ -1042,6 +1065,11 @@ class TestCase_PyCodeGen_Node_cmp (unittest.TestCase):
 		self.assert_( not pyt_compare( PyMethodCall( PySrc( 'a' ), 'b', [ PySrc( 'c' ), PySrc( 'd' ) ] ),   PyMethodCall( PySrc( 'a' ), 'b', [ PySrc( 'c' ), PySrc( 'x' ) ] ) ) )
 		self.assert_( not pyt_compare( PyMethodCall( PySrc( 'a' ), 'b', [ PySrc( 'c' ), PySrc( 'd' ) ] ),   PyMethodCall( PySrc( 'a' ), 'b', [ PySrc( 'c' ), PySrc( 'd' ), PySrc( 'x' ) ] ) ) )
 		
+	def test_PyIsInstance(self):
+		self.assert_( pyt_compare( PyIsInstance( PySrc( 'a' ), PySrc( 'b' ) ),   PyIsInstance( PySrc( 'a' ), PySrc( 'b' ) ) ) )
+		self.assert_( not pyt_compare( PyIsInstance( PySrc( 'a' ), PySrc( 'b' ) ),   PyIsInstance( PySrc( 'c' ), PySrc( 'b' ) ) ) )
+		self.assert_( not pyt_compare( PyIsInstance( PySrc( 'a' ), PySrc( 'b' ) ),   PyIsInstance( PySrc( 'a' ), PySrc( 'c' ) ) ) )
+
 	def test_PyReturn(self):
 		self.assert_( pyt_compare( PyReturn( PySrc( '1' ) ),  PyReturn( PySrc( '1' ) ) ) )
 		self.assert_( not pyt_compare( PyReturn( PySrc( '1' ) ),  PyReturn( PySrc( '2' ) ) ) )
@@ -1118,6 +1146,9 @@ class TestCase_PyCodeGen_Node_compile (unittest.TestCase):
 		self.assert_( PyMethodCall( PySrc( 'a' ), 'b', [ PySrc( 'c' ), PySrc( 'd' ) ] ).compileAsExpr()  ==  'a.b( c, d )' )
 		self.assert_( PyMethodCall( PySrc( 'a' ), 'b', [ PySrc( 'c' ), PySrc( 'd' ), PySrc( 'e' ) ] ).compileAsExpr()  ==  'a.b( c, d, e )' )
 		
+	def test_PyIsInstance(self):
+		self.assert_( PyIsInstance( PySrc( 'a' ), PySrc( 'b' ) ).compileAsExpr()  ==  'isinstance( a, b )' )
+
 	def test_PyReturn(self):
 		self.assert_( PyReturn( PySrc( '1' ) ).compileAsStmt()  ==  [ 'return 1' ] )
 
@@ -1271,6 +1302,10 @@ class TestCase_PyCodeGen_build (unittest.TestCase):
 		self._compileExprTest( PyVar( 'x' ).methodCall( 'x', 1,2,3),   'x.x( 1, 2, 3 )' )
 		
 		
+	def test_isinstance(self):
+		self._compileExprTest( PyVar( 'x' ).isinstance_( PyVar( 'y' ) ),   'isinstance( x, y )' )
+		
+		
 	def test_return(self):
 		self._compileStmtTest( PyVar( 'x' ).return_(),   [ 'return x' ] )
 
@@ -1360,6 +1395,11 @@ class TestCase_PyCodeGen_Node_children (unittest.TestCase):
 		y = PyVar( 'y' )
 		self._childrenTest( x.methodCall( 'test', y ), [ x, y ] )
 		
+	def test_PyIsInstance(self):
+		x = PyVar( 'x' )
+		y = PyVar( 'y' )
+		self._childrenTest( x.isinstance_( y ), [ x, y ] )
+
 	def test_PyReturn(self):
 		x = PyVar( 'x' )
 		self._childrenTest( PyReturn( x ), [x] )

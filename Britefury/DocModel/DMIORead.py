@@ -57,7 +57,7 @@ _sxp << ( _item | _sxList )
 
 
 def readSX(source):
-	if isinstance( source, str )  or  isinstance( source, unicode ):
+	if isinstance( source, str ):
 		parseResult = _sxp.parseString( source )
 	else:
 		parseResult = _sxp.parseFile( source )
@@ -90,9 +90,12 @@ class TestCase_DMIO (unittest.TestCase):
 	def testReadQuotedString(self):
 		self._testRead( "'abc 123'", 'abc 123' )
 
+	def testReadUnicodeString(self):
+		self._testRead( "u'\\u0107'", u'\u0107' )
+
 	def testReadList(self):
-		source = '(f (g (h 1 2L 3.0) \'Hi \') \' There\')'
-		self._testRead( source,  [ 'f', [ 'g', [ 'h', '1', '2L', '3.0' ], 'Hi ' ], ' There' ] )
+		source = '(f (g (h 1 2L 3.0) \'Hi \') \' There\' u\'\\u0107\')'
+		self._testRead( source,  [ 'f', [ 'g', [ 'h', '1', '2L', '3.0' ], 'Hi ' ], ' There', u'\u0107' ] )
 
 
 
