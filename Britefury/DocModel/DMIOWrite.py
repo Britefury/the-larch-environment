@@ -8,6 +8,8 @@
 import pyparsing
 import string
 
+from Britefury.DocModel.DMListInterface import DMListInterface
+
 
 
 """
@@ -29,7 +31,7 @@ tokens inside are:
 ## String IO helpers
 
 def needsQuotes(s):
-	return ' ' in s  or  '\t' in s  or  '\n' in s  or  '\r' in s  or  '\x0b' in s  or  '\x0c' in s  or  '(' in s  or  ')' in s  or  '`' in s  or  '{' in s  or  '}' in s  or  '\'' in s
+	return ' ' in s  or  '\t' in s  or  '\n' in s  or  '\r' in s  or  '\x0b' in s  or  '\x0c' in s  or  '(' in s  or  ')' in s  or  '`' in s  or  '{' in s  or  '}' in s  or  '\'' in s  or  len( s ) == 0
 
 
 
@@ -38,19 +40,28 @@ def needsQuotes(s):
 
 ## WRITING FUNCTIONS
 
+def _writeList(stream, content):
+	stream.write( '(' )
+	if len( content ) > 0:
+		for v in content[:-1]:
+			__writesx__( stream, v )
+			stream.write( ' ' )
+		__writesx__( stream, content[-1] )
+	stream.write( ')' )
+
+
 def __writesx__(stream, content):
-	try:
-		w = content.__writesx__
-	except AttributeError:
-		if isinstance( content, str ):
-			if needsQuotes( content ):
-				stream.write( repr( content ) )
-			else:
-				stream.write( content )
-		elif isinstance( content, unicode ):
+	if isinstance( content, str ):
+		if needsQuotes( content ):
 			stream.write( repr( content ) )
-	else:
-		w( stream )
+		else:
+			stream.write( content )
+	elif isinstance( content, unicode ):
+		stream.write( repr( content ) )
+	elif isinstance( content, list ):
+		_writeList( stream, content )
+	elif isinstance( content, DMListInterface ):
+		_writeList( stream, content )
 
 
 def writeSX(stream, content):
@@ -70,7 +81,13 @@ class TestCase_DMIOWrite (unittest.TestCase):
 		import cStringIO
 		stream = cStringIO.StringIO()
 		writeSX( stream, data )
-		self.assert_( stream.getvalue() == result )
+		value = stream.getvalue()
+		if value != result:
+			print 'ACTUAL RESULT:'
+			print value
+			print 'EXPECTED RESULT:'
+			print result
+		self.assert_( value == result )
 
 
 
@@ -83,6 +100,9 @@ class TestCase_DMIOWrite (unittest.TestCase):
 	def testUnicodeString(self):
 		from Britefury.DocModel.DMList import DMList
 		self._testWrite( u'\u0107', 'u\'\\u0107\'' )
+		
+	def testEmptyString(self):
+		self._testWrite( [ '' ], "('')" )
 		
 
 	def testWriteList(self):
