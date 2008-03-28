@@ -12,7 +12,3 @@ class DMNode (object):
 	__slots__ = [ '__weakref__' ]
 
 
-	def __writesx__(self, stream):
-		pass
-
-

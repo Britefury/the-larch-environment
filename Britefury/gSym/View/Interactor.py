@@ -12,9 +12,9 @@ from Britefury.Kernel.Abstract import abstractmethod
 
 from Britefury.GLisp.GLispUtil import isGLispList
 from Britefury.GLisp.GLispCompiler import GLispCompilerInvalidFormType, GLispCompilerVariableNameMustStartWithAt, compileExpressionListToPyTreeStatements
-from Britefury.GLisp.PyCodeGen import PyCodeGenError, PySrc, PyVar, PyLiteral, PyLiteralValue, PyListLiteral, PyListComprehension, PyGetAttr, PyGetItem, PyGetSlice, PyUnOp, PyBinOp, PyCall, PyMethodCall, PyIsInstance, PyReturn, PyIf, PyDef, PyAssign_SideEffects, PyDel_SideEffects
+from Britefury.GLisp.PyCodeGen import pyt_compare, PyCodeGenError, PySrc, PyVar, PyLiteral, PyLiteralValue, PyListLiteral, PyListComprehension, PyGetAttr, PyGetItem, PyGetSlice, PyUnOp, PyBinOp, PyCall, PyMethodCall, PyIsInstance, PyReturn, PyIf, PyDef, PyAssign_SideEffects, PyDel_SideEffects
 
-from Britefury.gSym.View.InteractorEvent import InteractorEvent, InteractorEventKey, InteractorEventTokens
+from Britefury.gSym.View.InteractorEvent import InteractorEvent, InteractorEventKey, InteractorEventTokenList
 
 
 class InvalidKeySpecification (PyCodeGenError):
@@ -104,7 +104,7 @@ class _TokenListEventSpec (_EventSpec):
 				if xs[1][0] != '@':
 					raise GLispCompilerVariableNameMustStartWithAt( token )
 				varName = xs[1][1:]
-				self.bindName = varName,
+				self.bindName = varName
 				self.tokenClass = xs[2]
 			else:
 				self.bindName = None
@@ -118,7 +118,7 @@ class _TokenListEventSpec (_EventSpec):
 		def compileToPyTreeFactory(self, py_eventTokenExpr, outerTreeFactory, bindings):
 			if self.bindName is not None:
 				bindings[self.bindName] = py_eventTokenExpr.attr( 'value' )
-			return self._p_conditionWrap( outerTreeFactory, py_eventTokenExpr.attr( 'tokenClass' ) == PyLiteral( self.tokenClass ) )
+			return self._p_conditionWrap( outerTreeFactory, py_eventTokenExpr.attr( 'tokenClass' ) == PyLiteralValue( self.tokenClass ) )
 
 
 		
@@ -133,6 +133,9 @@ class _TokenListEventSpec (_EventSpec):
 		
 		# Check the event type
 		treeFac = self._p_conditionWrap( treeFac, py_eventExpr.isinstance_( PyVar( '_InteractorEventTokenList' ) ) )
+		
+		# Check the event size
+		treeFac = self._p_conditionWrap( treeFac, py_eventExpr.attr( 'tokens' ).len_()  >=  len( self.tokenSpecs ) )
 		
 		# Check the tokens
 		for i, tokenSpec in enumerate( self.tokenSpecs ):
@@ -252,4 +255,110 @@ def compileInteractor(srcXs, context, bNeedResult, compileSpecial, compileGLispE
 	else:
 		return None
 
+
 	
+	
+import unittest
+from Britefury.DocModel.DMIO import readSX
+from Britefury.GLisp.GLispUtil import gLispSrcToString
+
+class TestCase_Interactor (unittest.TestCase):
+	def _compilePyTreeTest(self, py_trees, expectedValue):
+		srcLines = []
+		for t in py_trees:
+			srcLines.extend( t.compileAsStmt() )
+		result = '\n'.join( srcLines )  +  '\n'
+
+		if isinstance( expectedValue, list ):
+			expectedValue = '\n'.join( expectedValue )  +  '\n'
+		if isinstance( expectedValue, str ):
+			if len( expectedValue ) == 0  or  expectedValue[-1] != '\n':
+				expectedValue += '\n'
+			if result != expectedValue:
+				e = min( len( result ), len( expectedValue ) )
+				for i in xrange( e, 0, -1 ):
+					if result.startswith( expectedValue[:i] ):
+						print ''
+						print 'First %d characters match (result/expected)'  %  ( i, )
+						print result[:i+1]
+						print ''
+						print expectedValue[:i+1]
+						print ''
+						break
+				print 'FULL RESULT'
+				print result
+			self.assert_( result ==  expectedValue )
+	
+	
+	def _compilePyTreeFactoryTest(self, py_treeFactory, expectedValue):
+		py_trees = py_treeFactory( [] )
+		return self._compilePyTreeTest( py_trees, expectedValue )
+
+			
+	def test_KeyEventSpec(self):
+		spec = _KeyEventSpec( readSX( '($key a ctrl shift)' ) )
+		
+		self.assert_( spec.keyValue == gtk.keysyms.a )
+		self.assert_( spec.mods == gtk.gdk.CONTROL_MASK | gtk.gdk.SHIFT_MASK )
+		
+		bindings = {}
+		
+		
+		pysrc1 = [
+			'if isinstance( event, _InteractorEventKey ):',
+			'  if event.keyValue == %d and event.mods == %d:'  %  ( spec.keyValue, spec.mods ),
+			'    pass',
+		]
+		
+		self._compilePyTreeFactoryTest( spec.compileToPyTreeFactory( PyVar( 'event' ), lambda innerTrees: innerTrees, bindings ), pysrc1 )
+		
+		self.assert_( bindings == {} )
+
+
+	def test_TokenEventSpec(self):
+		spec1 = _TokenListEventSpec.TokenEventSpec( readSX( 'identifier' ) )
+		spec2 = _TokenListEventSpec.TokenEventSpec( readSX( '(: @x literal)' ) )
+		
+		self.assert_( spec1.tokenClass == 'identifier' )
+		self.assert_( spec1.bindName == None )
+
+		self.assert_( spec2.tokenClass == 'literal' )
+		self.assert_( spec2.bindName == 'x' )
+
+		bindings1 = {}
+		bindings2 = {}
+		
+		
+		pysrc1 = [
+			"if event.tokenClass == 'identifier':",
+			"  pass",
+		]
+		
+		pysrc2 = [
+			"if event.tokenClass == 'literal':",
+			"  pass",
+		]
+		
+		self._compilePyTreeFactoryTest( spec1.compileToPyTreeFactory( PyVar( 'event' ), lambda innerTrees: innerTrees, bindings1 ), pysrc1 )
+		self._compilePyTreeFactoryTest( spec2.compileToPyTreeFactory( PyVar( 'event' ), lambda innerTrees: innerTrees, bindings2 ), pysrc2 )
+
+		self.assert_( bindings1 == {} )
+		self.assert_( pyt_compare( bindings2['x'], PyVar( 'event' ).attr( 'value' ) ) )
+
+		
+		
+	def test_TokenListEventSpec(self):
+		spec = _TokenListEventSpec( readSX( '($tokens identifier (: @x literal) (: @y identifier))' ) )
+		
+		bindings = {}
+		
+		pysrc1 = [
+			"if isinstance( event, _InteractorEventTokenList ):",
+			"  if len( event.tokens ) >= 3:",
+			"    if event.tokens[0].tokenClass == 'identifier':",
+			"      if event.tokens[1].tokenClass == 'literal':",
+			"        if event.tokens[2].tokenClass == 'identifier':",
+			"          pass",
+		]
+		
+		self._compilePyTreeFactoryTest( spec.compileToPyTreeFactory( PyVar( 'event' ), lambda innerTrees: innerTrees, bindings ), pysrc1 )

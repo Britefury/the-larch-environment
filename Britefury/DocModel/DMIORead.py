@@ -93,6 +93,9 @@ class TestCase_DMIO (unittest.TestCase):
 	def testReadUnicodeString(self):
 		self._testRead( "u'\\u0107'", u'\u0107' )
 
+	def testReadEmptyString(self):
+		self._testRead( '""', '' )
+
 	def testReadList(self):
 		source = '(f (g (h 1 2L 3.0) \'Hi \') \' There\' u\'\\u0107\')'
 		self._testRead( source,  [ 'f', [ 'g', [ 'h', '1', '2L', '3.0' ], 'Hi ' ], ' There', u'\u0107' ] )
