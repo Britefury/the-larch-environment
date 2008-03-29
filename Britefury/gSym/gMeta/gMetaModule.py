@@ -35,22 +35,22 @@ def _getGMetaModulePath(path):
 
 
 
-class GMetaModule (object):
-	def __init__(self, path, realpath):
-		super( _GMetaModule, self ).__init__()
-		self.path = path
-		self.realpath = realpath
-		
-		self.xs = readSX( open( realpath, 'r' ) )
-		
-		self.factoryFunction = compileGMeta( path, self.xs )
 
 
 
 
 
-
-class GMetaModuleRegistry (object):
+class GMetaModuleImporter (object):
+	class _Module (object):
+		def __init__(self, path, realpath):
+			super( _GMetaModule, self ).__init__()
+			self.path = path
+			self.realpath = realpath
+			
+			self.xs = readSX( open( realpath, 'r' ) )
+			
+			self.factoryFunction = compileGMeta( path, self.xs )
+	
 	def __init__(self):
 		super( GMetaModuleRegistry, self ).__init__()
 		self._modules = {}
@@ -61,7 +61,7 @@ class GMetaModuleRegistry (object):
 		try:
 			module = self._modules[realpath]
 		except KeyError:
-			module = _GMetaModule( path, realpath )
+			module = self._Module( path, realpath )
 			self._modules[realpath] = module
 		return module
 	
