@@ -23,11 +23,11 @@ class GSymDocumentContentHandler (object):
 		pass
 	
 	@abstractmethod
-	def singlePage(self, env, xs):
+	def language(self, env, name, xs):
 		pass
 	
 	@abstractmethod
-	def use(self, importName, env, xs):
+	def page(self, env, importLanguage, xs):
 		pass
 
 
@@ -36,10 +36,10 @@ class GSymDocumentExecuteContentHandler (GSymDocumentContentHandler):
 	def metaLanguage(self, env, name, xs):
 		env._f_setMetaLanguageViewDefinition( GSymViewDefinition( env, name, xs ) )
 	
-	def singlePage(self, env, xs):
+	def language(self, env, name, xs):
 		pass
 	
-	def use(self, importName, env, xs):
+	def page(self, env, importLanguage, xs):
 		pass
 
 
@@ -54,10 +54,10 @@ class GSymDocumentViewContentHandler (GSymDocumentContentHandler):
 		metaLang = env._f_getMetaLanguageViewDefinition()
 		return metaLang.createDocumentView( xs, self._commandHistory, self._stylesheetDispatcher )
 	
-	def singlePage(self, env, xs):
+	def language(self, env, name, xs):
 		pass
 	
-	def use(self, importName, env, xs):
+	def page(self, env, importLanguage, xs):
 		pass
 
 
@@ -150,24 +150,26 @@ def loadDocument(env, xs, contentHandler):
 			raise GSymDocumentContentInvalidStructure
 		
 		return contentHandler.metaLanguage( env,docXs[1], docXs[2] )
-	elif docXs[0] == '$singlePage':
+	elif docXs[0] == '$language':
 		"""
-		($singlePage <content>)
-		"""
-		if len( docXs ) != 2:
-			raise GSymDocumentContentInvalidStructure
-	
-		return contentHandler.singlePage( env, docXs[1] )
-	elif docXs[0] == '$use':
-		"""
-		($use <import> <content>)
+		($language <name> <content>)
 		"""
 		if len( docXs ) != 3:
 			raise GSymDocumentContentInvalidStructure
 		
-		importName = docXs[1]
+		languageName = docXs[1]
+	
+		return contentHandler.language( env, languageName, docXs[2] )
+	elif docXs[0] == '$use':
+		"""
+		($page <language_import> <content>)
+		"""
+		if len( docXs ) != 3:
+			raise GSymDocumentContentInvalidStructure
 		
-		return contentHandler.use( importName, env,docXs[2] )
+		languageImport = docXs[1]
+		
+		return contentHandler.page( env, languageImport, docXs[2] )
 	else:
 		raise GSymDocumentContentInvalidType
 

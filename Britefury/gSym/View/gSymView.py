@@ -28,9 +28,8 @@ from Britefury.DocView.DocView import DocView
 
 
 from Britefury.GLisp.GLispUtil import isGLispList, gLispSrcToString
-from Britefury.GLisp.GLispInterpreter import GLispParameterListError, GLispItemTypeError, GLispItemError
-from Britefury.GLisp.GLispCompiler import compileGLispExprToPyFunction, GLispCompilerCouldNotCompileSpecial
-from Britefury.GLisp.PyCodeGen import filterIdentifierForPy, pyt_coerce, PyCodeGenError, PySrc, PyVar, PyLiteral, PyListLiteral, PyListComprehension, PyGetAttr, PyGetItem, PyUnOp, PyBinOp, PyCall, PyMethodCall, PyReturn, PyIf, PyDef, PyAssign_SideEffects, PyDel_SideEffects
+from Britefury.GLisp.GLispCompiler import raiseCompilerError, compileGLispExprToPyFunction, GLispCompilerCouldNotCompileSpecial, GLispCompilerInvalidFormType, GLispCompilerInvalidFormLength, GLispCompilerInvalidItem
+from Britefury.GLisp.PyCodeGen import filterIdentifierForPy, pyt_coerce, PyCodeGenError, PyVar, PyLiteral, PyListLiteral, PyListComprehension, PyGetAttr, PyGetItem, PyUnOp, PyBinOp, PyCall, PyMethodCall, PyReturn, PyIf, PyDef, PyAssign_SideEffects, PyDel_SideEffects
 
 from Britefury.gSym.gSymStyleSheet import GSymStyleSheet
 
@@ -286,6 +285,20 @@ def _runtime_script(viewNodeInstance, mainChild, leftSuperChild, leftSubChild, r
 
 
 
+def _runtime_buildView(viewNodeInstance, content, nodeViewFunction=None):
+	"""Build a view for a document subtree (@content)"""
+	if not isinstance( content, RelativeNode ):
+		raise TypeError, '_runtime_buildView: content is not a RelativeNode'
+		
+	# A call to DocNode._f_buildView builds the view, and puts it in the DocView's table
+	viewInstance = viewNodeInstance.viewInstance
+	nodeFactory = viewInstance._f_makeNodeFactory( nodeViewFunction )
+	viewNode = viewNodeInstance.view._f_buildView( content.node, content.parent, content.indexInParent, nodeFactory )
+	viewNode._f_setContentsFactory( viewNodeInstance.viewInstance._f_makeNodeContentsFactory( nodeViewFunction ) )
+	viewNode.refresh()
+	
+	return viewNode
+
 
 
 
@@ -405,7 +418,7 @@ class _GSymViewFactory (object):
 		viewFunctionName = filterIdentifierForPy( 'viewFactory_%s'  %  ( name, ) )
 		viewModuleName = filterIdentifierForPy( 'viewFactoryModule_%s'  %  ( name, ) )
 		
-		lcls = { '_buildView': self._runtime_buildView,
+		lcls = { '_buildView' : _runtime_buildView,
 			 '_activeBorder' : _runtime_activeBorder,
 			 '_border' : _runtime_border,
 			 '_indent' : _runtime_indent,
@@ -429,33 +442,11 @@ class _GSymViewFactory (object):
 		
 		
 		
-	def _runtime_buildView(self, viewNodeInstance, content, nodeViewFunction=None):
-		"""Build a view for a document subtree (@content)"""
-		if not isinstance( content, RelativeNode ):
-			self.env.raiseError( TypeError, None, '_GSymViewFactory._runtime_buildView: content is not a RelativeNode' )
-			
-		# A call to DocNode._f_buildView builds the view, and puts it in the DocView's table
-		viewInstance = viewNodeInstance.viewInstance
-		nodeFactory = viewInstance._f_makeNodeFactory( nodeViewFunction )
-		viewNode = viewNodeInstance.view._f_buildView( content.node, content.parent, content.indexInParent, nodeFactory )
-		viewNode._f_setContentsFactory( viewNodeInstance.viewInstance._f_makeNodeContentsFactory( nodeViewFunction ) )
-		viewNode.refresh()
-		
-		return viewNode
 
 		
 
 	
 	
-	
-	def _p_compileStylesheetAccess(self, srcXs, context, bNeedResult, compileSpecial, compileGLispExprToPyTree):
-		"""Compile style-sheet access
-		TODO"""
-		return PyListLiteral( [], dbgSrc=srcXs )
-	
-	def _p_compileSubExp(self, src):
-		"""Helper for compiling a sub-expression"""
-		return compileGLispExprToPySrc( src, self._p_compileSpecial )
 	
 	def _p_compileSpecial(self, srcXs, context, bNeedResult, compileSpecial, compileGLispExprToPyTree):
 		"""Compile special statements specific to view expressions"""
@@ -467,8 +458,8 @@ class _GSymViewFactory (object):
 		if name == '$viewEval':
 			# ($viewEval <document-subtree> ?<node-view-function>)
 			if len( srcXs ) < 2:
-				self.env.raiseError( GLispParameterListError, src, 'defineView: $viewEval needs at least 1 parameter; the document subtree' )
-			params = [ PySrc( '__view_node_instance_stack__[-1]', dbgSrc=srcXs ), compileSubExp( srcXs[1] ) ]
+				raiseCompilerError( GLispCompilerInvalidFormLength, src, 'defineView: $viewEval needs at least 1 parameter; the document subtree' )
+			params = [ PyVar( '__view_node_instance_stack__' )[-1].debug( srcXs ), compileSubExp( srcXs[1] ) ]
 			# View function
 			if len( srcXs ) == 3:
 				params.append( compileSubExp( srcXs[2] ) )
@@ -476,8 +467,8 @@ class _GSymViewFactory (object):
 		elif name == '$mapViewEval':
 			# ($mapViewEval <document-subtree> ?<node-view-function>)
 			if len( srcXs ) < 2:
-				self.env.raiseError( GLispParameterListError, src, 'defineView: $mapViewEval needs at least 1 parameter; the document subtree' )
-			params = [ PySrc( '__view_node_instance_stack__[-1]', dbgSrc=srcXs ), PyVar( 'x', dbgSrc=srcXs ) ]
+				raiseCompilerError( GLispCompilerInvalidFormLength, src, 'defineView: $mapViewEval needs at least 1 parameter; the document subtree' )
+			params = [ PyVar( '__view_node_instance_stack__' )[-1].debug( srcXs ), PyVar( 'x', dbgSrc=srcXs ) ]
 			# View function
 			if len( srcXs ) == 3:
 				params.append( compileSubExp( srcXs[2] ) )
@@ -486,24 +477,24 @@ class _GSymViewFactory (object):
 		elif name == '$colour':
 			#($colour <red> <green> <blue>)
 			if len( srcXs ) != 4:
-				self.env.raiseError( GLispParameterListError, src, 'defineView: $colour needs 3 parameters; red, green, and blue' )
+				raiseCompilerError( GLispCompilerInvalidFormLength, src, 'defineView: $colour needs 3 parameters; red, green, and blue' )
 			return PyVar( '_Colour3f' )( compileSubExp( srcXs[1] ), compileSubExp( srcXs[2] ), compileSubExp( srcXs[3] ) ).debug( srcXs )
 		elif name == '$style':
 			#($style <settings_pairs>)
 			#settings pair: (:key <value>)
 			def _settingsPair(pairXs):
 				if len( pairXs ) != 2:
-					self.env.raiseError( GLispParameterListError, src, 'defineView: $style settings pair needs 2 parameters; the key and the value' )
+					raiseCompilerError( GLispCompilerInvalidFormLength, src, 'defineView: $style settings pair needs 2 parameters; the key and the value' )
 				if not isinstance( pairXs[0], str )  and  not isinstance( pairXs[0], unicode ):
-					self.env.raiseError( GLispItemTypeError, src, 'defineView: $style settings pair key must be a string' )
+					raiseCompilerError( GLispCompilerInvalidFormType, src, 'defineView: $style settings pair key must be a string' )
 				if pairXs[0][0] != ':':
-					self.env.raiseError( GLispItemError, src, 'defineView: $style settings pair key must start with a :' )
+					raiseCompilerError( GLispCompilerInvalidItem, src, 'defineView: $style settings pair key must start with a :' )
 				return pyt_coerce( [ pairXs[0][1:], compileSubExp( pairXs[1] ) ] )
 			return PyVar( '_GSymStyleSheet' )( pyt_coerce( [ _settingsPair( pairXs )   for pairXs in srcXs[1:] ] ) ).debug( srcXs )
 		elif name == '$applyStyle':
 			#($applyStyle <stylesheet> <child>)
 			if len( srcXs ) != 3:
-				self.env.raiseError( GLispParameterListError, src, 'defineView: $applyStyle needs 2 parameters; the style and the child content' )
+				raiseCompilerError( GLispCompilerInvalidFormLength, src, 'defineView: $applyStyle needs 2 parameters; the style and the child content' )
 			childResVarName = None
 			py_stylePush = PyVar( '__view_node_instance_stack__' )[-1].attr( 'styleSheetStack' ).methodCall( 'append', compileSubExp( srcXs[1] ) ).debug( srcXs )
 			py_childResult = compileSubExp( srcXs[2] )
@@ -523,74 +514,74 @@ class _GSymViewFactory (object):
 		elif name == '$activeBorder':
 			#($activeBorder <child> styleSheet*)
 			if len( srcXs ) < 2:
-				self.env.raiseError( GLispParameterListError, src, 'defineView: $activeBorder needs at least 1 parameters; the child content' )
+				raiseCompilerError( GLispCompilerInvalidFormLength, src, 'defineView: $activeBorder needs at least 1 parameters; the child content' )
 			return PyVar( '_activeBorder' )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[1] ), compileStyleSheetAccess( srcXs[2:]) ).debug( srcXs )
 		elif name == '$border':
 			#($border <child> styleSheet*)
 			if len( srcXs ) < 2:
-				self.env.raiseError( GLispParameterListError, src, 'defineView: $border needs at least 1 parameters; the child content' )
+				raiseCompilerError( GLispCompilerInvalidFormLength, src, 'defineView: $border needs at least 1 parameters; the child content' )
 			return PyVar( '_border' )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[1] ), compileStyleSheetAccess( srcXs[1:]) ).debug( srcXs )
 		elif name == '$indent':
 			#($indent <indentation> <child> styleSheet*)
 			if len( srcXs ) < 3:
-				self.env.raiseError( GLispParameterListError, src, 'defineView: $border needs at least 2 parameters; the indentation and the child content' )
+				raiseCompilerError( GLispCompilerInvalidFormLength, src, 'defineView: $border needs at least 2 parameters; the indentation and the child content' )
 			return PyVar( '_indent' )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[2] ), compileSubExp( srcXs[1] ), compileStyleSheetAccess( srcXs[3:]) ).debug( srcXs )
 		elif name == '$hline':
 			#($hline styleSheet*)
-			return PyCall( PyVar( '_hline', dbgSrc=srcXs ), [ PySrc( '__view_node_instance_stack__[-1]', dbgSrc=srcXs ), compileStyleSheetAccess( srcXs[2:]) ], dbgSrc=srcXs )
+			return PyCall( PyVar( '_hline', dbgSrc=srcXs ), [ PyVar( '__view_node_instance_stack__' )[-1].debug( srcXs ), compileStyleSheetAccess( srcXs[2:]) ], dbgSrc=srcXs )
 		elif name == '$label':
 			#($label text styleSheet*)
 			if len( srcXs ) < 2:
-				self.env.raiseError( GLispParameterListError, src, 'defineView: $label needs at least 1 parameter; the text' )
-			return PyCall( PyVar( '_label', dbgSrc=srcXs ), [ PySrc( '__view_node_instance_stack__[-1]', dbgSrc=srcXs ), compileSubExp( srcXs[1] ), compileStyleSheetAccess( srcXs[2:]) ], dbgSrc=srcXs )
+				raiseCompilerError( GLispCompilerInvalidFormLength, src, 'defineView: $label needs at least 1 parameter; the text' )
+			return PyCall( PyVar( '_label', dbgSrc=srcXs ), [ PyVar( '__view_node_instance_stack__' )[-1].debug( srcXs ), compileSubExp( srcXs[1] ), compileStyleSheetAccess( srcXs[2:]) ], dbgSrc=srcXs )
 		elif name == '$entry':
 			#($entry text styleSheet*)
 			if len( srcXs ) < 2:
-				self.env.raiseError( GLispParameterListError, src, 'defineView: $entry needs at least 1 parameter; the text' )
-			return PyCall( PyVar( '_entry', dbgSrc=srcXs ), [ PySrc( '__view_node_instance_stack__[-1]', dbgSrc=srcXs ), compileSubExp( srcXs[1] ), compileStyleSheetAccess( srcXs[2:]) ], dbgSrc=srcXs )
+				raiseCompilerError( GLispCompilerInvalidFormLength, src, 'defineView: $entry needs at least 1 parameter; the text' )
+			return PyCall( PyVar( '_entry', dbgSrc=srcXs ), [ PyVar( '__view_node_instance_stack__' )[-1].debug( srcXs ), compileSubExp( srcXs[1] ), compileStyleSheetAccess( srcXs[2:]) ], dbgSrc=srcXs )
 		elif name == '$hbox':
 			#($hbox (child*) styleSheet*)
 			if len( srcXs ) < 2:
-				self.env.raiseError( GLispParameterListError, src, 'defineView: $hbox needs at least 1 parameter; the children' )
-			return PyCall( PyVar( '_hbox', dbgSrc=srcXs ), [ PySrc( '__view_node_instance_stack__[-1]', dbgSrc=srcXs ), compileSubExp( srcXs[1] ), compileStyleSheetAccess( srcXs[2:]) ], dbgSrc=srcXs )
+				raiseCompilerError( GLispCompilerInvalidFormLength, src, 'defineView: $hbox needs at least 1 parameter; the children' )
+			return PyCall( PyVar( '_hbox', dbgSrc=srcXs ), [ PyVar( '__view_node_instance_stack__' )[-1].debug( srcXs ), compileSubExp( srcXs[1] ), compileStyleSheetAccess( srcXs[2:]) ], dbgSrc=srcXs )
 		elif name == '$ahbox':
 			#($ahbox (child*) styleSheet*)
 			if len( srcXs ) < 2:
-				self.env.raiseError( GLispParameterListError, src, 'defineView: $ahbox needs at least 1 parameter; the children' )
-			return PyCall( PyVar( '_ahbox', dbgSrc=srcXs ), [ PySrc( '__view_node_instance_stack__[-1]', dbgSrc=srcXs ), compileSubExp( srcXs[1] ), compileStyleSheetAccess( srcXs[2:]) ], dbgSrc=srcXs )
+				raiseCompilerError( GLispCompilerInvalidFormLength, src, 'defineView: $ahbox needs at least 1 parameter; the children' )
+			return PyCall( PyVar( '_ahbox', dbgSrc=srcXs ), [ PyVar( '__view_node_instance_stack__' )[-1].debug( srcXs ), compileSubExp( srcXs[1] ), compileStyleSheetAccess( srcXs[2:]) ], dbgSrc=srcXs )
 		elif name == '$vbox':
 			#($vbox (child*) styleSheet*)
 			if len( srcXs ) < 2:
-				self.env.raiseError( GLispParameterListError, src, 'defineView: $vbox needs at least 1 parameter; the children' )
-			return PyCall( PyVar( '_vbox', dbgSrc=srcXs ), [ PySrc( '__view_node_instance_stack__[-1]', dbgSrc=srcXs ), compileSubExp( srcXs[1] ), compileStyleSheetAccess( srcXs[2:]) ], dbgSrc=srcXs )
+				raiseCompilerError( GLispCompilerInvalidFormLength, src, 'defineView: $vbox needs at least 1 parameter; the children' )
+			return PyCall( PyVar( '_vbox', dbgSrc=srcXs ), [ PyVar( '__view_node_instance_stack__' )[-1].debug( srcXs ), compileSubExp( srcXs[1] ), compileStyleSheetAccess( srcXs[2:]) ], dbgSrc=srcXs )
 		elif name == '$script':
 			#($script <mainChild> <leftSuperChild> <leftSubChild> <rightSuperChild> <rightSubChild> styleSheet*)
 			if len( srcXs ) < 6:
-				self.env.raiseError( GLispParameterListError, src, 'defineView: $script needs at least 5 parameters; the main, left-super, left-sub, right-super, and right-sub children' )
+				raiseCompilerError( GLispCompilerInvalidFormLength, src, 'defineView: $script needs at least 5 parameters; the main, left-super, left-sub, right-super, and right-sub children' )
 			return PyVar( '_script' )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[1] ), compileSubExp( srcXs[2] ), compileSubExp( srcXs[3] ), compileSubExp( srcXs[4] ), compileSubExp( srcXs[5] ),
 						   compileStyleSheetAccess( srcXs[6:]) ).debug( srcXs )
 		elif name == '$scriptLSuper':
 			#($scriptLSuper <mainChild> <scriptChild> styleSheet*)
 			if len( srcXs ) < 3:
-				self.env.raiseError( GLispParameterListError, src, 'defineView: $scriptLSuper needs at least 2 parameters; the main child, and the script child' )
+				raiseCompilerError( GLispCompilerInvalidFormLength, src, 'defineView: $scriptLSuper needs at least 2 parameters; the main child, and the script child' )
 			return PyVar( '_script' )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[1] ), compileSubExp( srcXs[2] ), None, None, None,
 						   compileStyleSheetAccess( srcXs[6:]) ).debug( srcXs )
 		elif name == '$scriptLSub':
 			#($scriptLSub <mainChild> <scriptChild> styleSheet*)
 			if len( srcXs ) < 3:
-				self.env.raiseError( GLispParameterListError, src, 'defineView: $scriptLSub needs at least 2 parameters; the main child, and the script child' )
+				raiseCompilerError( GLispCompilerInvalidFormLength, src, 'defineView: $scriptLSub needs at least 2 parameters; the main child, and the script child' )
 			return PyVar( '_script' )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[1] ), None, compileSubExp( srcXs[2] ), None, None,
 						   compileStyleSheetAccess( srcXs[6:]) ).debug( srcXs )
 		elif name == '$scriptRSuper':
 			#($scriptRSuper <mainChild> <scriptChild> styleSheet*)
 			if len( srcXs ) < 3:
-				self.env.raiseError( GLispParameterListError, src, 'defineView: $scriptRSuper needs at least 2 parameters; the main child, and the script child' )
+				raiseCompilerError( GLispCompilerInvalidFormLength, src, 'defineView: $scriptRSuper needs at least 2 parameters; the main child, and the script child' )
 			return PyVar( '_script' )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[1] ), None, None, compileSubExp( srcXs[2] ), None,
 						   compileStyleSheetAccess( srcXs[6:]) ).debug( srcXs )
 		elif name == '$scriptRSub':
 			#($scriptRSub <mainChild> <scriptChild> styleSheet*)
 			if len( srcXs ) < 3:
-				self.env.raiseError( GLispParameterListError, src, 'defineView: $scriptRSub needs at least 2 parameters; the main child, and the script child' )
+				raiseCompilerError( GLispCompilerInvalidFormLength, src, 'defineView: $scriptRSub needs at least 2 parameters; the main child, and the script child' )
 			return PyVar( '_script' )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[1] ), None, None, None, compileSubExp( srcXs[2] ),
 						   compileStyleSheetAccess( srcXs[6:]) ).debug( srcXs )
 		elif name == '$interactor':
@@ -644,4 +635,174 @@ class GSymViewDefinition (object):
 			
 def defineView(env, xs, name, docFormat, spec):
 	return GSymViewDefinition( env, name, spec )
+
+
+
+
+
+
+
+
+
+
+
+
+def compileViewSpecial(srcXs, context, bNeedResult, compileSpecial, compileGLispExprToPyTree):
+	"""Compile special statements specific to view expressions"""
+	name = srcXs[0]
+
+	compileSubExp = lambda xs: compileGLispExprToPyTree( xs, context, True, compileSpecial )
+	compileStyleSheetAccess = lambda xs: PyListLiteral( [ compileSubExp( x )  for x in xs ] )
+
+	if name == '$viewEval':
+		# ($viewEval <document-subtree> ?<node-view-function>)
+		if len( srcXs ) < 2:
+			raiseCompilerError( GLispParameterListError, src, 'defineView: $viewEval needs at least 1 parameter; the document subtree' )
+		params = [ PyVar( '__view_node_instance_stack__' )[-1].debug( srcXs ), compileSubExp( srcXs[1] ) ]
+		# View function
+		if len( srcXs ) == 3:
+			params.append( compileSubExp( srcXs[2] ) )
+		return PyCall( PyVar( '_buildView', dbgSrc=srcXs ), params, dbgSrc=srcXs )
+	elif name == '$mapViewEval':
+		# ($mapViewEval <document-subtree> ?<node-view-function>)
+		if len( srcXs ) < 2:
+			raiseCompilerError( GLispParameterListError, src, 'defineView: $mapViewEval needs at least 1 parameter; the document subtree' )
+		params = [ PyVar( '__view_node_instance_stack__' )[-1].debug( srcXs ), PyVar( 'x', dbgSrc=srcXs ) ]
+		# View function
+		if len( srcXs ) == 3:
+			params.append( compileSubExp( srcXs[2] ) )
+		itemExpr = PyCall( PyVar( '_buildView', dbgSrc=srcXs ), params, dbgSrc=srcXs )
+		return PyListComprehension( itemExpr, 'x', compileSubExp( srcXs[1] ), None, dbgSrc=srcXs )
+	elif name == '$colour':
+		#($colour <red> <green> <blue>)
+		if len( srcXs ) != 4:
+			raiseCompilerError( GLispParameterListError, src, 'defineView: $colour needs 3 parameters; red, green, and blue' )
+		return PyVar( '_Colour3f' )( compileSubExp( srcXs[1] ), compileSubExp( srcXs[2] ), compileSubExp( srcXs[3] ) ).debug( srcXs )
+	elif name == '$style':
+		#($style <settings_pairs>)
+		#settings pair: (:key <value>)
+		def _settingsPair(pairXs):
+			if len( pairXs ) != 2:
+				raiseCompilerError( GLispParameterListError, src, 'defineView: $style settings pair needs 2 parameters; the key and the value' )
+			if not isinstance( pairXs[0], str )  and  not isinstance( pairXs[0], unicode ):
+				raiseCompilerError( GLispItemTypeError, src, 'defineView: $style settings pair key must be a string' )
+			if pairXs[0][0] != ':':
+				raiseCompilerError( GLispItemError, src, 'defineView: $style settings pair key must start with a :' )
+			return pyt_coerce( [ pairXs[0][1:], compileSubExp( pairXs[1] ) ] )
+		return PyVar( '_GSymStyleSheet' )( pyt_coerce( [ _settingsPair( pairXs )   for pairXs in srcXs[1:] ] ) ).debug( srcXs )
+	elif name == '$applyStyle':
+		#($applyStyle <stylesheet> <child>)
+		if len( srcXs ) != 3:
+			raiseCompilerError( GLispParameterListError, src, 'defineView: $applyStyle needs 2 parameters; the style and the child content' )
+		childResVarName = None
+		py_stylePush = PyVar( '__view_node_instance_stack__' )[-1].attr( 'styleSheetStack' ).methodCall( 'append', compileSubExp( srcXs[1] ) ).debug( srcXs )
+		py_childResult = compileSubExp( srcXs[2] )
+		if bNeedResult:
+			childResVarName = context.temps.allocateTempName( 'view_special_child_result' )
+			py_childResult = PyVar( childResVarName ).assign_sideEffects( py_childResult ).debug( srcXs )
+		py_stylePop = PyVar( '__view_node_instance_stack__' )[-1].attr( 'styleSheetStack' ).methodCall( 'pop' )
+		
+		context.body.append( py_stylePush )
+		context.body.append( py_childResult )
+		context.body.append( py_stylePop )
+		
+		if bNeedResult:
+			return PyVar( childResVarName ).debug( srcXs )
+		else:
+			return None
+	elif name == '$activeBorder':
+		#($activeBorder <child> styleSheet*)
+		if len( srcXs ) < 2:
+			raiseCompilerError( GLispParameterListError, src, 'defineView: $activeBorder needs at least 1 parameters; the child content' )
+		return PyVar( '_activeBorder' )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[1] ), compileStyleSheetAccess( srcXs[2:]) ).debug( srcXs )
+	elif name == '$border':
+		#($border <child> styleSheet*)
+		if len( srcXs ) < 2:
+			raiseCompilerError( GLispParameterListError, src, 'defineView: $border needs at least 1 parameters; the child content' )
+		return PyVar( '_border' )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[1] ), compileStyleSheetAccess( srcXs[1:]) ).debug( srcXs )
+	elif name == '$indent':
+		#($indent <indentation> <child> styleSheet*)
+		if len( srcXs ) < 3:
+			raiseCompilerError( GLispParameterListError, src, 'defineView: $border needs at least 2 parameters; the indentation and the child content' )
+		return PyVar( '_indent' )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[2] ), compileSubExp( srcXs[1] ), compileStyleSheetAccess( srcXs[3:]) ).debug( srcXs )
+	elif name == '$hline':
+		#($hline styleSheet*)
+		return PyCall( PyVar( '_hline', dbgSrc=srcXs ), [ PyVar( '__view_node_instance_stack__' )[-1].debug( srcXs ), compileStyleSheetAccess( srcXs[2:]) ], dbgSrc=srcXs )
+	elif name == '$label':
+		#($label text styleSheet*)
+		if len( srcXs ) < 2:
+			raiseCompilerError( GLispParameterListError, src, 'defineView: $label needs at least 1 parameter; the text' )
+		return PyCall( PyVar( '_label', dbgSrc=srcXs ), [ PyVar( '__view_node_instance_stack__' )[-1].debug( srcXs ), compileSubExp( srcXs[1] ), compileStyleSheetAccess( srcXs[2:]) ], dbgSrc=srcXs )
+	elif name == '$entry':
+		#($entry text styleSheet*)
+		if len( srcXs ) < 2:
+			raiseCompilerError( GLispParameterListError, src, 'defineView: $entry needs at least 1 parameter; the text' )
+		return PyCall( PyVar( '_entry', dbgSrc=srcXs ), [ PyVar( '__view_node_instance_stack__' )[-1].debug( srcXs ), compileSubExp( srcXs[1] ), compileStyleSheetAccess( srcXs[2:]) ], dbgSrc=srcXs )
+	elif name == '$hbox':
+		#($hbox (child*) styleSheet*)
+		if len( srcXs ) < 2:
+			raiseCompilerError( GLispParameterListError, src, 'defineView: $hbox needs at least 1 parameter; the children' )
+		return PyCall( PyVar( '_hbox', dbgSrc=srcXs ), [ PyVar( '__view_node_instance_stack__' )[-1].debug( srcXs ), compileSubExp( srcXs[1] ), compileStyleSheetAccess( srcXs[2:]) ], dbgSrc=srcXs )
+	elif name == '$ahbox':
+		#($ahbox (child*) styleSheet*)
+		if len( srcXs ) < 2:
+			raiseCompilerError( GLispParameterListError, src, 'defineView: $ahbox needs at least 1 parameter; the children' )
+		return PyCall( PyVar( '_ahbox', dbgSrc=srcXs ), [ PyVar( '__view_node_instance_stack__' )[-1].debug( srcXs ), compileSubExp( srcXs[1] ), compileStyleSheetAccess( srcXs[2:]) ], dbgSrc=srcXs )
+	elif name == '$vbox':
+		#($vbox (child*) styleSheet*)
+		if len( srcXs ) < 2:
+			raiseCompilerError( GLispParameterListError, src, 'defineView: $vbox needs at least 1 parameter; the children' )
+		return PyCall( PyVar( '_vbox', dbgSrc=srcXs ), [ PyVar( '__view_node_instance_stack__' )[-1].debug( srcXs ), compileSubExp( srcXs[1] ), compileStyleSheetAccess( srcXs[2:]) ], dbgSrc=srcXs )
+	elif name == '$script':
+		#($script <mainChild> <leftSuperChild> <leftSubChild> <rightSuperChild> <rightSubChild> styleSheet*)
+		if len( srcXs ) < 6:
+			raiseCompilerError( GLispParameterListError, src, 'defineView: $script needs at least 5 parameters; the main, left-super, left-sub, right-super, and right-sub children' )
+		return PyVar( '_script' )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[1] ), compileSubExp( srcXs[2] ), compileSubExp( srcXs[3] ), compileSubExp( srcXs[4] ), compileSubExp( srcXs[5] ),
+					   compileStyleSheetAccess( srcXs[6:]) ).debug( srcXs )
+	elif name == '$scriptLSuper':
+		#($scriptLSuper <mainChild> <scriptChild> styleSheet*)
+		if len( srcXs ) < 3:
+			raiseCompilerError( GLispParameterListError, src, 'defineView: $scriptLSuper needs at least 2 parameters; the main child, and the script child' )
+		return PyVar( '_script' )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[1] ), compileSubExp( srcXs[2] ), None, None, None,
+					   compileStyleSheetAccess( srcXs[6:]) ).debug( srcXs )
+	elif name == '$scriptLSub':
+		#($scriptLSub <mainChild> <scriptChild> styleSheet*)
+		if len( srcXs ) < 3:
+			raiseCompilerError( GLispParameterListError, src, 'defineView: $scriptLSub needs at least 2 parameters; the main child, and the script child' )
+		return PyVar( '_script' )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[1] ), None, compileSubExp( srcXs[2] ), None, None,
+					   compileStyleSheetAccess( srcXs[6:]) ).debug( srcXs )
+	elif name == '$scriptRSuper':
+		#($scriptRSuper <mainChild> <scriptChild> styleSheet*)
+		if len( srcXs ) < 3:
+			raiseCompilerError( GLispParameterListError, src, 'defineView: $scriptRSuper needs at least 2 parameters; the main child, and the script child' )
+		return PyVar( '_script' )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[1] ), None, None, compileSubExp( srcXs[2] ), None,
+					   compileStyleSheetAccess( srcXs[6:]) ).debug( srcXs )
+	elif name == '$scriptRSub':
+		#($scriptRSub <mainChild> <scriptChild> styleSheet*)
+		if len( srcXs ) < 3:
+			raiseCompilerError( GLispParameterListError, src, 'defineView: $scriptRSub needs at least 2 parameters; the main child, and the script child' )
+		return PyVar( '_script' )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[1] ), None, None, None, compileSubExp( srcXs[2] ),
+					   compileStyleSheetAccess( srcXs[6:]) ).debug( srcXs )
+	else:
+		raise GLispCompilerCouldNotCompileSpecial( srcXs )
+	
+
+	
+compileViewLocals = {
+	'_buildView' : _runtime_buildView,
+	 '_activeBorder' : _runtime_activeBorder,
+	 '_border' : _runtime_border,
+	 '_indent' : _runtime_indent,
+	 '_hline' : _runtime_hline,
+	 '_label' : _runtime_label,
+	 '_entry' : _runtime_entry,
+	 '_hbox' : _runtime_hbox,
+	 '_ahbox' : _runtime_ahbox,
+	 '_vbox' : _runtime_vbox,
+	 '_script' : _runtime_script,
+	 '_GSymStyleSheet' : GSymStyleSheet,
+	 '_Colour3f' : Colour3f,
+	 'DTDirection' : DTDirection,
+	 'DTBox' : DTBox,
+	 }
 

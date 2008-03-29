@@ -10,7 +10,7 @@ from Britefury.Kernel.Abstract import abstractmethod
 
 from Britefury.DocModel.DMListInterface import DMListInterface
 from Britefury.GLisp.GLispUtil import isGLispList, isGLispComment, stripGLispComments
-from Britefury.GLisp.PyCodeGen import pyt_coerce, PyCodeGenError, PySrc, PyVar, PyLiteral, PyListLiteral, PyGetAttr, PyGetItem, PyUnOp, PyBinOp, PyCall, PyMethodCall, PyReturn, PyIf, PySimpleIf, PyDef, PyAssign_SideEffects, PyDel_SideEffects
+from Britefury.GLisp.PyCodeGen import pyt_coerce, PyCodeGenError, PyVar, PyLiteral, PyListLiteral, PyGetAttr, PyGetItem, PyUnOp, PyBinOp, PyCall, PyMethodCall, PyReturn, PyRaise, PyTry, PyIf, PySimpleIf, PyDef, PyAssign_SideEffects, PyDel_SideEffects
 import Britefury.GLisp.GLispCompiler
 
 
@@ -407,7 +407,7 @@ def compileMatchBlockToPyTrees(matchXs, xs, context, bNeedResult, dataVarName, c
 		bFirst = False
 
 	# Raise NoMatchError if no match found
-	matchTrees.append( PySimpleIf( PyVar( bMatchedName )[0].not_(), [ PySrc( 'raise NoMatchError', dbgSrc=xs ) ] ).debug( xs ) )
+	matchTrees.append( PySimpleIf( PyVar( bMatchedName )[0].not_(), [ PyRaise( PyVar( 'NoMatchError' ) ).debug( xs ) ] ).debug( xs ) )
 	
 	if bNeedResult:
 		resultTree = PyVar( resultVarName ).debug( matchXs )
