@@ -7,6 +7,9 @@
 ##-*************************
 import os
 
+from Britefury.gSym.gMeta.gMetaModule import GMetaModuleRegistry
+
+
 
 #
 #
@@ -21,6 +24,7 @@ class GSymWorld (object):
 		super( GSymWorld, self ).__init__()
 		
 		self._worldTable = {}
+		self._moduleRegistry = GMetaModuleRegistry()
 		self._metaLanguageViewDef = None
 		
 		
@@ -36,6 +40,10 @@ class GSymWorld (object):
 		
 	def _f_getMetaLanguageViewDefinition(self):
 		return self._metaLanguageViewDef
+	
+	
+	def getModuleRegistry(self):
+		return self._moduleRegistry
 	
 	
 	@staticmethod

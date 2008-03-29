@@ -34,7 +34,7 @@ class GSymDocumentContentHandler (object):
 
 class GSymDocumentExecuteContentHandler (GSymDocumentContentHandler):
 	def metaLanguage(self, env, name, xs):
-		env._f_setMetaLanguageViewDefinition( GSymViewDefinition( env, name, xs ) )
+		env._f_setMetaLanguageViewDefinition( GSymViewDefinition( name, xs ) )
 	
 	def language(self, env, name, xs):
 		pass

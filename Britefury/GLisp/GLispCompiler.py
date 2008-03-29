@@ -6,7 +6,7 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
 from Britefury.GLisp.GLispUtil import isGLispList, stripGLispComments, gLispSrcToString
-from Britefury.GLisp.PyCodeGen import PyCodeGenError, PyVar, PyLiteral, PyLiteralValue, PyListLiteral, PyListComprehension, PyGetAttr, PyGetItem, PyGetSlice, PyUnOp, PyBinOp, PyCall, PyMethodCall, PyReturn, PyIf, PyDef, PyAssign_SideEffects, PyDel_SideEffects
+from Britefury.GLisp.PyCodeGen import PyCodeGenError, PyVar, PyLiteral, PyLiteralValue, PyListLiteral, PyDictLiteral, PyListComprehension, PyGetAttr, PyGetItem, PyGetSlice, PyUnOp, PyBinOp, PyCall, PyMethodCall, PyReturn, PyIf, PyDef, PyAssign_SideEffects, PyDel_SideEffects
 import Britefury.GLisp.PatternMatch
 
 
@@ -74,6 +74,18 @@ class _CompilationContext (object):
 		
 		
 		
+
+
+
+class GLispModule (object):
+	def __init__(self, bindings):
+		super( GLispModule, self ).__init__()
+		self.__dict__.update( bindings )
+
+
+
+
+
 
 def compileExpressionListToPyTreeStatements(expressions, context, bNeedResult, compileSpecial, buildResultHandlerTreeNode=lambda t, xs: t):
 	"""Compiles an expression list to a list of statements
@@ -600,10 +612,9 @@ def _compileModule(xs, context, bNeedResult=False, compileSpecial=None):
 		boundNames.append( name )
 		
 
-	#context.
-	# Module expression code
-	trees, resultStorePyTree = compileExpressionListToPyTreeStatements( expressions, context, True, compileSpecial, lambda tree, x: PyReturn( tree, dbgSrc=x ) )
-	moduleTrees.extend( trees )
+	# Build and return the module object
+	py_module = PyReturn( PyVar( 'GLispModule' )( PyDictLiteral( [ ( PyLiteralValue( name ), PyVar( name ) )   for name in boundNames ] ) ) ).debug( xs )
+	moduleTrees.append( py_module )
 	
 	
 	# Turn it into a function (def)
@@ -691,6 +702,8 @@ def _compileGLispExprToPyTree(xs, context, bNeedResult=False, compileSpecial=Non
 			return _compileWhere( xs, context, bNeedResult, compileSpecial )
 		elif xs[0] == '$match':
 			return _compileMatch( xs, context, bNeedResult, compileSpecial )
+		elif xs[0] == '$module':
+			return _compileModule( xs, context, bNeedResult, compileSpecial )
 		elif isinstance( xs[0], str )  and  xs[0][0] == '$':
 			if compileSpecial is None:
 				raise GLispCompilerCouldNotCompileSpecial( xs )
@@ -842,39 +855,31 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 		if isinstance( expectedValue, str ):
 			if len( expectedValue ) == 0  or  expectedValue[-1] != '\n':
 				expectedValue += '\n'
-			self.assert_( compileGLispExprToPySrc( readSX( srcText ), compileSpecial ) ==  expectedValue )
+		if isinstance( expectedValue, str ):
+			result = compileGLispExprToPySrc( readSX( srcText ), compileSpecial )
+			if result != expectedValue:
+				e = min( len( result ), len( expectedValue ) )
+				for i in xrange( e, 0, -1 ):
+					if result.startswith( expectedValue[:i] ):
+						print ''
+						print 'First %d characters match (result/expected)'  %  ( i, )
+						print result[:i+1]
+						print ''
+						print expectedValue[:i+1]
+						print ''
+						break
+				print 'FULL RESULT'
+				print result
+			self.assert_( result ==  expectedValue )
 		else:
 			self.assertRaises( expectedValue, lambda: compileGLispExprToPySrc( readSX( srcText ), compileSpecial ) )
-			
+
 	def _evalTest(self, srcText, expectedResult, argValuePairs=[], compileSpecial=None, lcls={}):
 		argNames = [ p[0]   for p in argValuePairs ]
 		argValues = [ p[1]   for p in argValuePairs ]
 		fn = compileGLispExprToPyFunction( 'testModule', 'test', argNames, readSX( srcText ), compileSpecial, lcls=lcls )
 		result = fn( *argValues )
 		self.assert_( result == expectedResult )
-
-	def _printCompileTest(self, srcText, expectedValue, compileSpecialExpr=None):
-		if isinstance( expectedValue, list ):
-			expectedValue = '\n'.join( expectedValue )  +  '\n'
-		if isinstance( expectedValue, str ):
-			if len( expectedValue ) == 0  or  expectedValue[-1] != '\n':
-				expectedValue += '\n'
-		result = compileGLispExprToPySrc( readSX( srcText ), compileSpecialExpr )
-		if result == expectedValue:
-			print result
-		else:
-			e = min( len( result ), len( expectedValue ) )
-			for i in xrange( e, 0, -1 ):
-				if result.startswith( expectedValue[:i] ):
-					print ''
-					print 'First %d characters match (result/expected)'  %  ( i, )
-					print result[:i+1]
-					print ''
-					print expectedValue[:i+1]
-					print ''
-					break
-			print 'FULL RESULT'
-			print result
 
 	def testSyntaxError(self):
 		self._compileTest( 'a', GLispCompilerSyntaxError )
@@ -1348,6 +1353,29 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 		self._evalTest( xssrc3, [ 'c', 'deadbeef', [ 'e', 'f', 'g', 'h' ] ], [] )
 
 
+	def test_Module(self):
+		xssrc1 = """
+		($module
+		  (@a #1)
+		  (@b "#'test")
+		)
+		"""
+		
+		pysrc1 = [
+			"def __gsym__module_fn_0():",
+			"  a = 1",
+			"  b = 'test'",
+			"  return GLispModule( { 'a' : a, 'b' : b } )",
+			
+			"__gsym__module_fn_0()",
+		]
+		
+		self._compileTest( xssrc1, pysrc1 )
+
+
+		
+		
+		
 	def test_mapX_Match(self):
 		xssrc1 = """
 		($mapx
