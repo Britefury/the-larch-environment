@@ -12,7 +12,6 @@ from Britefury.FileIO.IOXml import ioReadIntoObjectFromFile, ioWriteObjectToFile
 from Britefury.DocModel.DMIO import readSX
 
 from Britefury.GLisp.GLispUtil import gLispSrcToString
-from Britefury.GLisp.GLispInterpreter import specialform, GLispFrame, GLispModule, ModuleRegistry, _moduleRegistry
 
 
 

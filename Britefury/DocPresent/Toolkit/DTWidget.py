@@ -136,7 +136,7 @@ class DTWidget (object):
 		self.dndDropFromCallback = None
 		
 		
-		self.docEventHandler = None
+		self._docEventHandlers = []
 
 
 		self._dndSourceOps = []
@@ -959,9 +959,15 @@ class DTWidget (object):
 	#
 	#
 	
+	def addDocEventHandler(self, handler):
+		self._docEventHandlers.append( handler )
+		
+	def removeDocEventHandler(self, handler):
+		self._docEventHandlers.remove( handler )
+	
 	def sendDocEvent(self, event):
-		if self.docEventHandler is not None:
-			event = self.docEventHandler( event )
+		for handler in self._docEventHandlers:
+			event = handler( event )
 			if event is None:
 				return event
 		if self._parent is not None:

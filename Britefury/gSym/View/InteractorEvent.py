@@ -30,6 +30,14 @@ class InteractorEventTokenList (InteractorEvent):
 	def __init__(self, tokens=[]):
 		super( InteractorEventKey, self ).__init__()
 		self.tokens = []
+		
+
+	def tailEvent(self, fromIndex):
+		tok = self.tokens[fromIndex:]
+		if len( tok ) == 0:
+			return None
+		else:
+			return InteractorEventTokenList( tok )
 	
 
 

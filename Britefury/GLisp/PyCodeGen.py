@@ -368,6 +368,11 @@ class PyExpression (PyStatement):
 		return PyReturn( self )
 	
 	
+	# Raise
+	def raise_(self):
+		return PyRaise( self )
+	
+	
 	# If
 	def ifTrue(self, statements):
 		return PySimpleIf( self, statements )
@@ -739,6 +744,124 @@ class PyReturn (PyStatement):
 		return [ self.value ]
 
 
+class PyRaise (PyStatement):
+	def __init__(self, exception, dbgSrc=None):
+		super( PyRaise, self ).__init__( dbgSrc )
+		assert isinstance( exception, PyExpression )
+		self.exception = exception
+		
+	def compileAsStmt(self):
+		return [ 'raise %s'  %  ( self.exception.compileAsExpr(), ) ]
+	
+	def _o_compareWith(self, x):
+		return pyt_compare( self.exception, x.exception )
+
+	def getChildren(self):
+		return [ self.exception ]
+
+
+class PyTry (PyStatement):
+	def __init__(self, tryStatements, exceptSpecs=[], elseStatements=None, finallyStatements=None, dbgSrc=None):
+		"""
+		tryStatements is a list of statements
+		exceptSpecsis a list of tuples
+		each tuple is a (exception, statement-list) pair
+		
+		elseStatements is a list of statements for the else clause, or None if one is not desired
+		finallyStatements is a list of statements for the finally clause, or None if one is not desired
+		"""
+		super( PyTry, self ).__init__( dbgSrc )
+		
+		assert isinstance( tryStatements, list ), 'PyTry: try statements must be a list'
+		assert isinstance( exceptSpecs, list ), 'PyTry: except specs must be a list'
+		if elseStatements is not None:
+			assert isinstance( elseStatements, list ), 'PyTry: else statements must be a list'
+		if finallyStatements is not None:
+			assert isinstance( finallyStatements, list ), 'PyTry: finally statements must be a list'
+		for i in exceptSpecs:
+			assert isinstance( i, tuple ), 'PyTry: except-specification must be a tuple (exception, [statement*]); not a tuple'
+			assert len( i ) == 2, 'PyTry: except-specification must be a tuple (exception, [statement*]); length != 2'
+			assert isinstance( i[0], PyExpression ), 'PyTry: except-specification must be a tuple (exception, [statement*]); first element not an expression'
+			assert isinstance( i[1], list ), 'PyTry: except-specification must be a tuple (exception, [statement*]); second element not a list'
+			
+		self.tryStatements = tryStatements
+		self.exceptSpecs = exceptSpecs
+		self.elseStatements = elseStatements
+		self.finallyStatements = finallyStatements
+		
+		
+	def compileAsStmt(self):
+		trySrc = []
+		
+		trySrc.extend( self._p_compileKeywordBlock( 'try', self.tryStatements ) )
+		
+		for i in self.exceptSpecs:
+			trySrc.extend( self._p_compileExceptBlock( i ) )
+			
+		if self.elseStatements is not None:
+			trySrc.extend( self._p_compileKeywordBlock( 'else', self.elseStatements ) )
+			
+		if self.finallyStatements is not None:
+			trySrc.extend( self._p_compileKeywordBlock( 'finally', self.finallyStatements ) )
+			
+		return trySrc
+				
+
+	def _o_compareWith(self, x):
+		return False
+
+	def getChildren(self):
+		children = []
+		children.extend( self.tryStatements )
+		for exceptBlock in self.exceptSpecs:
+			children.append( exceptBlock[0] )
+			children.extend( exceptBlock[1] )
+		if self.elseStatements is not None:
+			children.extend( self.elseStatements )
+		if self.finallyStatements is not None:
+			children.extend( self.finallyStatements )
+		return children
+	
+	
+	
+	def except_(self, exception, statements):
+		return PyTry( self.tryStatements, self.exceptSpecs + [ ( exception, statements ) ], self.elseStatements, self.finallyStatements )
+
+	def else_(self, statements):
+		if self.elseStatements is None:
+			return PyTry( self.tryStatements, self.exceptSpecs, statements, self.finallyStatements )
+		else:
+			return PyTry( self.tryStatements, self.exceptSpecs, self.elseStatements + statements, self.finallyStatements )
+
+	def finally_(self, statements):
+		if self.finallyStatements is None:
+			return PyTry( self.tryStatements, self.exceptSpecs, self.elseStatements, statements )
+		else:
+			return PyTry( self.tryStatements, self.exceptSpecs, self.elseStatements, self.finallyStatements + statements )
+	
+		
+	def _p_compileKeywordBlock(self, keyword, statements):
+		stmtSrc = []
+		for s in statements:
+			stmtSrc.extend( s.compileAsStmt() )
+		stmtSrc = _passBlock( stmtSrc )
+		return [ keyword + ':' ]  +  _indent( stmtSrc )
+	
+
+	def _p_compileExceptBlock(self, t):
+		exception, statements = t
+		stmtSrc = []
+		for s in statements:
+			stmtSrc.extend( s.compileAsStmt() )
+		stmtSrc = _passBlock( stmtSrc )
+		
+		return [ 'except %s:'  %  ( exception.compileAsExpr() ) ]  +  _indent( stmtSrc )
+	
+
+	
+
+	
+
 class PyIf (PyStatement):
 	def __init__(self, ifElifSpecs, elseStatements=None, dbgSrc=None):
 		"""
@@ -756,7 +879,7 @@ class PyIf (PyStatement):
 		for i in ifElifSpecs:
 			assert isinstance( i, tuple ), 'PyIf: if-specification must be a tuple (condition, [statement*]); not a tuple'
 			assert len( i ) == 2, 'PyIf: if-specification must be a tuple (condition, [statement*]); length != 2'
-			assert isinstance( i[0], PyExpression )
+			assert isinstance( i[0], PyExpression ), 'PyIf: if-specification must be a tuple (condition, [statement*]); first element not an expression'
 			assert isinstance( i[1], list ), 'PyIf: if-specification must be a tuple (condition, [statement*]); second element not a list'
 			
 		self.ifElifSpecs = ifElifSpecs
@@ -1083,6 +1206,13 @@ class TestCase_PyCodeGen_Node_cmp (unittest.TestCase):
 		self.assert_( pyt_compare( PyReturn( PySrc( '1' ) ),  PyReturn( PySrc( '1' ) ) ) )
 		self.assert_( not pyt_compare( PyReturn( PySrc( '1' ) ),  PyReturn( PySrc( '2' ) ) ) )
 
+	def test_PyRaise(self):
+		self.assert_( pyt_compare( PyRaise( PySrc( 'ValueError' ) ),  PyRaise( PySrc( 'ValueError' ) ) ) )
+		self.assert_( not pyt_compare( PyRaise( PySrc( 'ValueError' ) ),  PyRaise( PySrc( 'TypeError' ) ) ) )
+
+	def test_PyTry(self):
+		self.assert_( not pyt_compare( PyTry( [ PySrc( 'x' ) ] ),  PyTry( [ PySrc( 'x' ) ] ) ) )
+		
 	def test_PyIf(self):
 		self.assert_( not pyt_compare( PyIf( [ ( PySrc( 'True' ), [ PySrc( '1' ) ] ) ] ),  PyIf( [ ( PySrc( 'True' ), [ PySrc( 'pass' ) ] ) ] ) ) )
 		
@@ -1160,6 +1290,75 @@ class TestCase_PyCodeGen_Node_compile (unittest.TestCase):
 
 	def test_PyReturn(self):
 		self.assert_( PyReturn( PySrc( '1' ) ).compileAsStmt()  ==  [ 'return 1' ] )
+
+	def test_PyRaise(self):
+		self.assert_( PyRaise( PySrc( 'ValueError' ) ).compileAsStmt()  ==  [ 'raise ValueError' ] )
+
+	def test_PyTry(self):
+		pysrc1 = [
+			"try:",
+			"  a",
+		]
+
+		pysrc2 = [
+			"try:",
+			"  a",
+			"except ValueError:",
+			"  b",
+		]
+
+		pysrc3 = [
+			"try:",
+			"  a",
+			"except ValueError:",
+			"  b",
+			"except TypeError:",
+			"  c",
+		]
+
+		pysrc4 = [
+			"try:",
+			"  a",
+			"except ValueError:",
+			"  b",
+			"except TypeError:",
+			"  c",
+			"else:",
+			"  d",
+		]
+
+		pysrc5 = [
+			"try:",
+			"  a",
+			"except ValueError:",
+			"  b",
+			"except TypeError:",
+			"  c",
+			"else:",
+			"  d",
+			"finally:",
+			"  e",
+		]
+
+		pysrc6 = [
+			"try:",
+			"  a",
+			"except ValueError:",
+			"  b",
+			"except TypeError:",
+			"  c",
+			"finally:",
+			"  e",
+		]
+
+		
+		self.assert_( PyTry( [ PyVar( 'a' ) ] ).compileAsStmt()  ==  pysrc1 )
+		self.assert_( PyTry( [ PyVar( 'a' ) ],  [ ( PyVar( 'ValueError' ), [ PyVar( 'b' ) ] ) ] ).compileAsStmt()  ==  pysrc2 )
+		self.assert_( PyTry( [ PyVar( 'a' ) ],  [ ( PyVar( 'ValueError' ), [ PyVar( 'b' ) ] ), ( PyVar( 'TypeError' ), [ PyVar( 'c' ) ] ) ] ).compileAsStmt()  ==  pysrc3 )
+		self.assert_( PyTry( [ PyVar( 'a' ) ],  [ ( PyVar( 'ValueError' ), [ PyVar( 'b' ) ] ), ( PyVar( 'TypeError' ), [ PyVar( 'c' ) ] ) ], [ PyVar( 'd' ) ] ).compileAsStmt()  ==  pysrc4 )
+		self.assert_( PyTry( [ PyVar( 'a' ) ],  [ ( PyVar( 'ValueError' ), [ PyVar( 'b' ) ] ), ( PyVar( 'TypeError' ), [ PyVar( 'c' ) ] ) ], [ PyVar( 'd' ) ], [ PyVar( 'e' ) ] ).compileAsStmt()  ==  pysrc5 )
+		self.assert_( PyTry( [ PyVar( 'a' ) ],  [ ( PyVar( 'ValueError' ), [ PyVar( 'b' ) ] ), ( PyVar( 'TypeError' ), [ PyVar( 'c' ) ] ) ], finallyStatements=[ PyVar( 'e' ) ] ).compileAsStmt()  ==  pysrc6 )
+
 
 	def test_PyIf(self):
 		pysrc1 = [
@@ -1328,6 +1527,74 @@ class TestCase_PyCodeGen_build (unittest.TestCase):
 	def test_return(self):
 		self._compileStmtTest( PyVar( 'x' ).return_(),   [ 'return x' ] )
 
+	def test_raise(self):
+		self._compileStmtTest( PyVar( 'ValueError' ).raise_(),   [ 'raise ValueError' ] )
+
+	def test_try(self):
+		pysrc1 = [
+			"try:",
+			"  a",
+		]
+
+		pysrc2 = [
+			"try:",
+			"  a",
+			"except ValueError:",
+			"  b",
+		]
+
+		pysrc3 = [
+			"try:",
+			"  a",
+			"except ValueError:",
+			"  b",
+			"except TypeError:",
+			"  c",
+		]
+
+		pysrc4 = [
+			"try:",
+			"  a",
+			"except ValueError:",
+			"  b",
+			"except TypeError:",
+			"  c",
+			"else:",
+			"  d",
+		]
+
+		pysrc5 = [
+			"try:",
+			"  a",
+			"except ValueError:",
+			"  b",
+			"except TypeError:",
+			"  c",
+			"else:",
+			"  d",
+			"finally:",
+			"  e",
+		]
+
+		pysrc6 = [
+			"try:",
+			"  a",
+			"except ValueError:",
+			"  b",
+			"except TypeError:",
+			"  c",
+			"finally:",
+			"  e",
+		]
+
+		
+		self.assert_( PyTry( [ PyVar( 'a' ) ] ).compileAsStmt()  ==  pysrc1 )
+		self.assert_( PyTry( [ PyVar( 'a' ) ] ).except_( PyVar( 'ValueError' ), [ PyVar( 'b' ) ] ).compileAsStmt()  ==  pysrc2 )
+		self.assert_( PyTry( [ PyVar( 'a' ) ] ).except_( PyVar( 'ValueError' ), [ PyVar( 'b' ) ] ).except_( PyVar( 'TypeError' ), [ PyVar( 'c' ) ] ).compileAsStmt()  ==  pysrc3 )
+		self.assert_( PyTry( [ PyVar( 'a' ) ] ).except_( PyVar( 'ValueError' ), [ PyVar( 'b' ) ] ).except_( PyVar( 'TypeError' ), [ PyVar( 'c' ) ] ).else_( [ PyVar( 'd' ) ] ).compileAsStmt()  ==  pysrc4 )
+		self.assert_( PyTry( [ PyVar( 'a' ) ] ).except_( PyVar( 'ValueError' ), [ PyVar( 'b' ) ] ).except_( PyVar( 'TypeError' ), [ PyVar( 'c' ) ] ).else_( [ PyVar( 'd' ) ] ).finally_( [ PyVar( 'e' ) ] ).compileAsStmt()  ==  pysrc5 )
+		self.assert_( PyTry( [ PyVar( 'a' ) ] ).except_( PyVar( 'ValueError' ), [ PyVar( 'b' ) ] ).except_( PyVar( 'TypeError' ), [ PyVar( 'c' ) ] ).finally_( [ PyVar( 'e' ) ] ).compileAsStmt()  ==  pysrc6 )
+
 	def test_assign(self):
 		self._compileStmtTest( PyVar( 'x' ).assign_sideEffects( pyt_coerce( 1 ) ),   [ 'x = 1' ] )
 		self._compileStmtTest( pyt_coerce( 1 ).assignTo_sideEffects( PyVar( 'x' ) ),   [ 'x = 1' ] )
@@ -1422,6 +1689,25 @@ class TestCase_PyCodeGen_Node_children (unittest.TestCase):
 	def test_PyReturn(self):
 		x = PyVar( 'x' )
 		self._childrenTest( PyReturn( x ), [x] )
+
+	def test_PyRaise(self):
+		x = PyVar( 'x' )
+		self._childrenTest( PyRaise( x ), [x] )
+
+	def test_PyTry(self):
+		a = PyVar( 'a' )
+		b = PyVar( 'b' )
+		c = PyVar( 'c' )
+		d = PyVar( 'd' )
+		e = PyVar( 'e' )
+		f = PyVar( 'f' )
+		g = PyVar( 'g' )
+		
+		self._childrenTest( PyTry( [ a ] ),    [ a ] )
+		self._childrenTest( PyTry( [ a ] ).except_( b, [c] ),    [ a, b, c ] )
+		self._childrenTest( PyTry( [ a ] ).except_( b, [c] ).except_( d, [e] ),    [ a, b, c, d, e ] )
+		self._childrenTest( PyTry( [ a ] ).except_( b, [c] ).except_( d, [e] ).else_( [f] ),    [ a, b, c, d, e, f ] )
+		self._childrenTest( PyTry( [ a ] ).except_( b, [c] ).except_( d, [e] ).else_( [f] ).finally_( [g] ),    [ a, b, c, d, e, f, g ] )
 
 	def test_PyIf(self):
 		a = PyVar( 'a' )

@@ -6,9 +6,8 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
 from Britefury.GLisp.GLispUtil import isGLispList, stripGLispComments, gLispSrcToString
-from Britefury.GLisp.PyCodeGen import PyCodeGenError, PySrc, PyVar, PyLiteral, PyLiteralValue, PyListLiteral, PyListComprehension, PyGetAttr, PyGetItem, PyGetSlice, PyUnOp, PyBinOp, PyCall, PyMethodCall, PyReturn, PyIf, PyDef, PyAssign_SideEffects, PyDel_SideEffects
+from Britefury.GLisp.PyCodeGen import PyCodeGenError, PyVar, PyLiteral, PyLiteralValue, PyListLiteral, PyListComprehension, PyGetAttr, PyGetItem, PyGetSlice, PyUnOp, PyBinOp, PyCall, PyMethodCall, PyReturn, PyIf, PyDef, PyAssign_SideEffects, PyDel_SideEffects
 import Britefury.GLisp.PatternMatch
-
 
 
 
@@ -16,9 +15,15 @@ import Britefury.GLisp.PatternMatch
 _TEMP_PREFIX = '__gsym__'
 
 
+def raiseCompilerError(exceptionClass, src, reason):
+	raise exceptionClass, reason  +  '   ::   '  +  gLispSrcToString( src, 3 )
+
+
+
 def _log(x):
 	print x
 	return x
+
 
 
 class _TempNameAllocator (object):
@@ -51,7 +56,11 @@ class _PyScope (object):
 
 
 class _CompilationContext (object):
-	def __init__(self, temps, scope):
+	def __init__(self, temps=None, scope=None):
+		if temps is None:
+			temps = _TempNameAllocator()
+		if scope is None:
+			scope = _PyScope()
 		self.temps = temps
 		self.scope = scope
 		self.body = []
@@ -125,6 +134,12 @@ class GLispCompilerVariableNameMustStartWithAt (PyCodeGenError):
 	pass
 
 class GLispCompilerInvalidFormType (PyCodeGenError):
+	pass
+
+class GLispCompilerInvalidFormLength (PyCodeGenError):
+	pass
+
+class GLispCompilerInvalidItem (PyCodeGenError):
 	pass
 
 
@@ -449,10 +464,6 @@ def _compileWhere(xs, context, bNeedResult=False, compileSpecial=None):
 	if not isGLispList( bindings ):
 		raise GLispCompilerWhereExprInvalidBindingListType( xs )
 	
-	contentTrees = []
-	valueName = None
-	exitTrees = []
-	
 	whereTrees = []
 	
 
@@ -536,6 +547,75 @@ def _compileMatch(xs, context, bNeedResult, compileSpecial):
 	
 	
 							     
+
+
+
+class GLispCompilerModuleExprInvalidBindingListType (PyCodeGenError):
+	pass
+
+class GLispCompilerModuleExprInvalidBindingListFormat (PyCodeGenError):
+	pass
+
+class GLispCompilerModuleExprCannotRebindVariable (PyCodeGenError):
+	pass
+
+def _compileModule(xs, context, bNeedResult=False, compileSpecial=None):
+	"""
+	($module (name0 value0) (name1 value1) ... (nameN valueN))
+	"""
+	bindings = xs[1:]
+	
+	if not isGLispList( bindings ):
+		raise GLispCompilerModuleExprInvalidBindingListType( xs )
+	
+	moduleTrees = []
+	
+
+	moduleFnName = context.temps.allocateTempName( 'module_fn' )
+
+	
+	# Make binding code
+	boundNames = []
+	bindings = stripGLispComments( bindings )
+	for binding in bindings:
+		bindingContext = context.innerContext()
+		if not isGLispList( binding )  or  len( binding ) != 2:
+			raise GLispCompilerModuleExprInvalidBindingListFormat( binding )
+		
+		if binding[0][0] != '@':
+			raise GLispCompilerVariableNameMustStartWithAt( binding[0] )
+		
+		name = binding[0][1:]
+		valueExpr = binding[1]
+		if name in boundNames:
+			raise GLispCompilerModuleExprCannotRebindVariable( binding )
+		
+		# If this name is already bound in thise scope, we need to back it up first
+		valueExprPyTree = _compileGLispExprToPyTree( valueExpr, bindingContext, True, compileSpecial )
+		assignmentPyTree = valueExprPyTree.assignToVar_sideEffects( name ).debug( binding )
+		
+		moduleTrees.extend( bindingContext.body )
+		moduleTrees.append( assignmentPyTree )
+		
+		boundNames.append( name )
+		
+
+	#context.
+	# Module expression code
+	trees, resultStorePyTree = compileExpressionListToPyTreeStatements( expressions, context, True, compileSpecial, lambda tree, x: PyReturn( tree, dbgSrc=x ) )
+	moduleTrees.extend( trees )
+	
+	
+	# Turn it into a function (def)
+	fnTree = PyDef( moduleFnName, [], moduleTrees, dbgSrc=xs )
+
+	context.body.append( fnTree )
+	
+	callTree = PyVar( moduleFnName )().debug( xs )
+			
+	return callTree
+
+
 
 
 
@@ -846,7 +926,7 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 	def testCompileSpecial(self):
 		def compileSpecialExpr(xs, context, bNeedResult, compileSpecial, compileGLispExprToPyTree):
 			if xs[0] == '$special':
-				return PySrc( 'special' )
+				return PyVar( 'special' )
 			else:
 				raise GLispCompilerCouldNotCompileSpecial( xs )
 		self._compileTest( '($special)', 'special', compileSpecialExpr )

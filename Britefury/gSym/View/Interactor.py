@@ -12,9 +12,11 @@ from Britefury.Kernel.Abstract import abstractmethod
 
 from Britefury.GLisp.GLispUtil import isGLispList
 from Britefury.GLisp.GLispCompiler import GLispCompilerInvalidFormType, GLispCompilerVariableNameMustStartWithAt, compileExpressionListToPyTreeStatements
-from Britefury.GLisp.PyCodeGen import pyt_compare, PyCodeGenError, PySrc, PyVar, PyLiteral, PyLiteralValue, PyListLiteral, PyListComprehension, PyGetAttr, PyGetItem, PyGetSlice, PyUnOp, PyBinOp, PyCall, PyMethodCall, PyIsInstance, PyReturn, PyIf, PyDef, PyAssign_SideEffects, PyDel_SideEffects
+from Britefury.GLisp.PyCodeGen import pyt_compare, pyt_coerce, PyCodeGenError, PyVar, PyLiteral, PyLiteralValue, PyListLiteral, PyListComprehension, PyGetAttr, PyGetItem, PyGetSlice, PyUnOp, PyBinOp, PyCall, PyMethodCall, PyIsInstance, PyReturn, PyRaise, PyTry, PyIf, PySimpleIf, PyDef, PyAssign_SideEffects, PyDel_SideEffects
 
 from Britefury.gSym.View.InteractorEvent import InteractorEvent, InteractorEventKey, InteractorEventTokenList
+
+
 
 
 class InvalidKeySpecification (PyCodeGenError):
@@ -34,6 +36,10 @@ class InvalidEventType (PyCodeGenError):
 
 
 
+class NoEventMatch (Exception):
+	pass
+
+
 class _EventSpec (object):
 	def __init__(self, xs):
 		super( _EventSpec, self ).__init__()
@@ -43,10 +49,17 @@ class _EventSpec (object):
 	def _p_conditionWrap(self, outerTreeFactory, py_condition):
 		return lambda innerTrees: outerTreeFactory( [ py_condition.ifTrue( innerTrees ).debug( self.srcXs ) ] )
 
+	def _p_prependWrap(self, outerTreeFactory, py_xs):
+		return lambda innerTrees: outerTreeFactory( py_xs + innerTrees )
+
+
 	@abstractmethod
 	def compileToPyTree(self, py_eventExpr, py_actionStatements, bindings):
 		pass
 
+	@abstractmethod
+	def compileResultEvent(self, py_eventExpr):
+		pass
 
 
 
@@ -87,6 +100,9 @@ class _KeyEventSpec (_EventSpec):
 		treeFac = self._p_conditionWrap( treeFac, ( py_eventExpr.attr( 'keyValue' )  ==  self.keyValue ).and_( py_eventExpr.attr( 'mods' )  ==  self.mods ) )
 		
 		return treeFac
+	
+	def compileResultEvent(self, py_eventExpr):
+		return pyt_coerce( None )
 		
 
 		
@@ -143,12 +159,29 @@ class _TokenListEventSpec (_EventSpec):
 			
 		return treeFac
 		
+	def compileResultEvent(self, py_eventExpr):
+		return py_eventExpr.methodCall( 'tailEvent', len( self.tokenSpecs ) )
 		
 		
 
+	
+
+class Interactor (object):
+	def __init__(self, onEventFunction):
+		super( Interactor, self ).__init__()
+		self._onEventFunction = onEventFunction
+		
+	
+	def handleEvent(self, event):
+		try:
+			return self._onEventFunction( event )
+		except NoEventMatch:
+			return event
+	
 
 
-def _compileInteractorMatch(srcXs, context, bNeedResult, compileSpecial, compileGLispExprToPyTree, bMatchedName, py_eventExpr, bFirst):
+
+def _compileInteractorMatch(srcXs, context, bNeedResult, compileSpecial, compileGLispExprToPyTree, py_eventExpr):
 	eventSpecXs = srcXs[0]
 	actionXs = srcXs[1:]
 	bindings = {}
@@ -184,24 +217,19 @@ def _compileInteractorMatch(srcXs, context, bNeedResult, compileSpecial, compile
 	bindingPairs.sort( lambda x, y: cmp( x[0], y[0] ) )
 		
 	# Action expression code
-	py_actionStmts, py_actionResultStore = compileExpressionListToPyTreeStatements( actionXs, actionFnContext, False, compileSpecial )
+	py_actionStmts, py_actionResultStore = compileExpressionListToPyTreeStatements( actionXs, actionFnContext, True, compileSpecial, lambda t, xs: t.return_().debug( xs ) )
 	actionFnContext.body.extend( py_actionStmts )
 	
 	# Make a function define
 	py_actionFn = PyDef( actionFnName, [ pair[0]   for pair in bindingPairs ], actionFnContext.body, dbgSrc=srcXs )
 	py_actionFnCall = PyVar( actionFnName, dbgSrc=srcXs )( *[ pair[1].debug( srcXs )   for pair in bindingPairs ] ).debug( srcXs )
+	py_resultEvent = PyReturn( spec.compileResultEvent( py_eventExpr ) ).debug( srcXs )
 	
-	# Matched
-	py_matchedTrue = pyt_coerce( True ).assignTo_sideEffects( PyVar( bMatchedName )[0] ).debug( srcXs )
-	
-	py_action = [ py_actionFn,  py_actionFnCall,  py_matchedTrue ]
+	py_action = [ py_actionFn,  py_actionFnCall, py_resultEvent ]
 	
 	
 	py_match = matchTreeFac( py_action )
 	
-	if not bFirst:
-		py_match = [ PySimpleIf( PyVar( bMatchedName )[0].not_(), py_match ).debug( srcXs ) ]
-		
 	return py_match
 
 
@@ -226,27 +254,24 @@ def compileInteractor(srcXs, context, bNeedResult, compileSpecial, compileGLispE
 	#    (: @var token_class)     - look for a token with the specified class, and bind the value to a variable called 'var'
 	assert srcXs[0] == '$interactor'
 	
-	onEventFnName = context.temps.allocateTempName( 'interactor_on_event_fn' )
+	# A event respone function will be built
+	onEventFnName = context.temps.allocateTempName( 'interactor_onEventFn' )
 	eventName = context.temps.allocateTempName( 'interactor_event' )
 	
 	py_interactor = []
 
 	
-	bMatchedName = context.temps.allocateTempName( 'interactor_bMatched' )
-	py_initBMatched = PyVar( bMatchedName ).assign_sideEffects( [ False ] ).debug( matchXs )
-	py_interactor.append( py_initBMatched )
-
-	bFirst = True
 	for xs in srcXs[1:]:
-		py_match = _compileInteractorMatch( xs, context, bNeedResult, compileSpecial, compileGLispExprToPyTree, bMatchedName, PyVar( eventName ).debug( srcXS ), bFirst )
+		py_match = _compileInteractorMatch( xs, context, bNeedResult, compileSpecial, compileGLispExprToPyTree, PyVar( eventName ).debug( srcXs ) )
 		py_interactor.extend( py_match )
-		bFirst = False
+		
+	py_interactor.append( PyRaise( PyVar( 'NoEventMatch' ) ).debug( srcXs ) )
 	
 	py_interactorOnEventFn = PyDef( onEventFnName, [ eventName ], py_interactor ).debug( srcXs )
 	
 
-	interactorFactoryFnName = context.temps.allocateTempName( 'interactor_factory_fn' )
-	py_interactorFactoryFn = PyDef( interactorFactoryFnName, [], [ py_interactorOnEventFn, PyVar( onEventFnName ).return_().debug( srcXs ) ] ).debug( srcXs )
+	interactorFactoryFnName = context.temps.allocateTempName( 'interactor_factoryFn' )
+	py_interactorFactoryFn = PyDef( interactorFactoryFnName, [], [ py_interactorOnEventFn, PyVar( '_Interactor' )( PyVar( onEventFnName ) ).return_().debug( srcXs ) ] ).debug( srcXs )
 	
 	context.body.append( py_interactorFactoryFn )
 	
@@ -254,6 +279,14 @@ def compileInteractor(srcXs, context, bNeedResult, compileSpecial, compileGLispE
 		return PyVar( interactorFactoryFnName )().debug( srcXs )
 	else:
 		return None
+	
+	
+	
+interactorCompilationLocals = {
+	'_InteractorEventKey' : InteractorEventKey,
+	'_InteractorEventTokenList' : InteractorEventTokenList,
+	'_Interactor' : Interactor
+	}
 
 
 	
@@ -261,6 +294,7 @@ def compileInteractor(srcXs, context, bNeedResult, compileSpecial, compileGLispE
 import unittest
 from Britefury.DocModel.DMIO import readSX
 from Britefury.GLisp.GLispUtil import gLispSrcToString
+from Britefury.GLisp.GLispCompiler import _CompilationContext
 
 class TestCase_Interactor (unittest.TestCase):
 	def _compilePyTreeTest(self, py_trees, expectedValue):
@@ -362,3 +396,45 @@ class TestCase_Interactor (unittest.TestCase):
 		]
 		
 		self._compilePyTreeFactoryTest( spec.compileToPyTreeFactory( PyVar( 'event' ), lambda innerTrees: innerTrees, bindings ), pysrc1 )
+
+		
+	def test_compileInteractor(self):
+		xssrc1 = """
+		($interactor
+		  ( ($key a ctrl shift)
+		    (@x y @z)
+		  )
+		  
+		  ( ($tokens (: @x identifier) (: @y literal))
+		    (@a b @c)
+		  )
+		)
+		"""
+
+		pysrc1 = [
+			"def __gsym__interactor_factoryFn_0():",
+			"  def __gsym__interactor_onEventFn_0(__gsym__interactor_event_0):",
+			"    if isinstance( __gsym__interactor_event_0, _InteractorEventKey ):",
+			"      if __gsym__interactor_event_0.keyValue == 97 and __gsym__interactor_event_0.mods == 5:",
+			"        def __gsym__interactor_fn_0():",
+			"          return x.y( z )",
+			"        __gsym__interactor_fn_0()",
+			"        return None",
+			"    if isinstance( __gsym__interactor_event_0, _InteractorEventTokenList ):",
+			"      if len( __gsym__interactor_event_0.tokens ) >= 2:",
+			"        if __gsym__interactor_event_0.tokens[0].tokenClass == 'identifier':",
+			"          if __gsym__interactor_event_0.tokens[1].tokenClass == 'literal':",
+			"            def __gsym__interactor_fn_1(x, y):",
+			"              return a.b( c )",
+			"            __gsym__interactor_fn_1( __gsym__interactor_event_0.tokens[0].value, __gsym__interactor_event_0.tokens[1].value )",
+			"            return __gsym__interactor_event_0.tailEvent( 2 )",
+			"    raise NoEventMatch",
+			"  return _Interactor( __gsym__interactor_onEventFn_0 )",
+			"__gsym__interactor_factoryFn_0()",
+		]
+
+		context = _CompilationContext()
+		py_interactor = compileInteractor( readSX( xssrc1 ), context, True, None, None )
+		
+		self._compilePyTreeTest( context.body + [ py_interactor ], pysrc1 )
+
