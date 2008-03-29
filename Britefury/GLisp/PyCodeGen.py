@@ -477,6 +477,28 @@ class PyListLiteral (PyExpression):
 	
 	
 	
+class PyDictLiteral (PyExpression):
+	def __init__(self, keyValuePairs, dbgSrc=None):
+		super( PyDictLiteral, self ).__init__( dbgSrc )
+		for key, value in keyValuePairs:
+			assert isinstance( key, PyExpression )
+			assert isinstance( value, PyExpression )
+		self.keyValuePairs = keyValuePairs
+		
+	def _o_compileAsExpr(self):
+		return '{ ' + ', '.join( [ key.compileAsExpr() + ' : ' + value.compileAsExpr()   for key, value in self.keyValuePairs ] )  +  ' }'
+		
+	def _o_compareWith(self, x):
+		return pyt_compare( self.keyValuePairs, x.keyValuePairs )
+	
+	def getChildren(self):
+		children = []
+		for kv in self.keyValuePairs:
+			children.extend( kv )
+		return children
+	
+	
+	
 class PyListComprehension (PyExpression):
 	def __init__(self, itemExpr, itemName, srcIterableExpr, filterExpr=None, dbgSrc=None):
 		super( PyListComprehension, self ).__init__( dbgSrc )
@@ -1128,6 +1150,12 @@ class TestCase_PyCodeGen_Node_cmp (unittest.TestCase):
 		self.assert_( pyt_compare( PyListLiteral( [ PySrc( 'a' ), PySrc( 'b' ) ] ),  PyListLiteral( [ PySrc( 'a' ), PySrc( 'b' ) ] ) ) )
 		self.assert_( not pyt_compare( PyListLiteral( [ PySrc( 'a' ), PySrc( 'b' ) ] ),  PyListLiteral( [ PySrc( 'a' ), PySrc( 'c' ) ] ) ) )
 
+	def test_PyDictLiteral(self):
+		self.assert_( pyt_compare( PyDictLiteral( [ ( PyLiteralValue( 'a' ), PyLiteralValue( 1 ) ),  ( PyLiteralValue( 'b' ), PyLiteralValue( 2 ) ) ] ),
+					   PyDictLiteral( [ ( PyLiteralValue( 'a' ), PyLiteralValue( 1 ) ),  ( PyLiteralValue( 'b' ), PyLiteralValue( 2 ) ) ] ) ) )
+		self.assert_( pyt_compare( PyDictLiteral( [ ( PyLiteralValue( 'a' ), PyLiteralValue( 1 ) ),  ( PyLiteralValue( 'b' ), PyLiteralValue( 2 ) ) ] ),
+					   PyDictLiteral( [ ( PyLiteralValue( 'a' ), PyLiteralValue( 1 ) ),  ( PyLiteralValue( 'b' ), PyLiteralValue( 3 ) ) ] ) ) )
+
 	def test_PyListComprehension(self):
 		self.assert_( pyt_compare( PyListComprehension( PySrc( 'a' ), 'a', PySrc( 'x' ), None ),  PyListComprehension( PySrc( 'a' ), 'a', PySrc( 'x' ), None ) ) )
 		self.assert_( not pyt_compare( PyListComprehension( PySrc( 'a' ), 'a', PySrc( 'x' ), None ),  PyListComprehension( PySrc( 'b' ), 'a', PySrc( 'x' ), None ) ) )
@@ -1247,6 +1275,9 @@ class TestCase_PyCodeGen_Node_compile (unittest.TestCase):
 	def test_PyListLiteral(self):
 		self.assert_( PyListLiteral( [ PySrc( 'a' ), PySrc( 'b' ) ] ).compileAsExpr()  ==  '[ a, b ]' )
 		
+	def test_PyDictLiteral(self):
+		self.assert_( PyDictLiteral( [ ( PyLiteralValue( 'a' ), PyLiteralValue( 1 ) ),  ( PyLiteralValue( 'b' ), PyLiteralValue( 2 ) ) ] ).compileAsExpr()  ==  "{ 'a' : 1, 'b' : 2 }" )
+
 	def test_PyListComprehension(self):
 		self.assert_( PyListComprehension( PySrc( 'a' ), 'a', PySrc( 'x' ), None ).compileAsExpr()  ==  '[ a   for a in x ]' )
 		self.assert_( PyListComprehension( PySrc( 'a' ), 'a', PySrc( 'x' ), PySrc( 'True' ) ).compileAsExpr()  ==  '[ a   for a in x   if True ]' )

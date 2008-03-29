@@ -76,6 +76,7 @@ class GSymEnvironment (object):
 		super( GSymEnvironment, self ).__init__()
 		self._world = world
 		self._moduleName = moduleName
+		self._moduleToModuleInstance = {}
 
 
 	def raiseError(self, exceptionClass, src, reason):
@@ -87,6 +88,16 @@ class GSymEnvironment (object):
 		
 	def _f_getMetaLanguageViewDefinition(self):
 		return self._world._f_getMetaLanguageViewDefinition()
+	
+	
+	def _f_instantiateModule(self, path, moduleGlobals):
+		module = self._world.getModuleRegistry().getModule( path )
+		try:
+			instance = self._moduleToModuleInstance[module]
+		except KeyError:
+			instance = module.factoryFunction( moduleGlobals )
+			self._moduleToModuleInstance[module] = instance
+		return instance
 	
 	
 	

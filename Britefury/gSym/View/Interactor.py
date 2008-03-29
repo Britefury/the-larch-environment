@@ -11,8 +11,10 @@ import gtk
 from Britefury.Kernel.Abstract import abstractmethod
 
 from Britefury.GLisp.GLispUtil import isGLispList
-from Britefury.GLisp.GLispCompiler import GLispCompilerInvalidFormType, GLispCompilerVariableNameMustStartWithAt, compileExpressionListToPyTreeStatements
+from Britefury.GLisp.GLispCompiler import GLispCompilerInvalidFormType, GLispCompilerVariableNameMustStartWithAt, GLispCompilerCouldNotCompileSpecial, compileExpressionListToPyTreeStatements
 from Britefury.GLisp.PyCodeGen import pyt_compare, pyt_coerce, PyCodeGenError, PyVar, PyLiteral, PyLiteralValue, PyListLiteral, PyListComprehension, PyGetAttr, PyGetItem, PyGetSlice, PyUnOp, PyBinOp, PyCall, PyMethodCall, PyIsInstance, PyReturn, PyRaise, PyTry, PyIf, PySimpleIf, PyDef, PyAssign_SideEffects, PyDel_SideEffects
+
+from Britefury.gSym.gMeta.GMetaComponent import GMetaComponent
 
 from Britefury.gSym.View.InteractorEvent import InteractorEvent, InteractorEventKey, InteractorEventTokenList
 
@@ -281,13 +283,30 @@ def compileInteractor(srcXs, context, bNeedResult, compileSpecial, compileGLispE
 		return None
 	
 	
-	
-interactorCompilationLocals = {
-	'_InteractorEventKey' : InteractorEventKey,
-	'_InteractorEventTokenList' : InteractorEventTokenList,
-	'_Interactor' : Interactor
-	}
 
+	
+
+class GMetaComponentInteractor (GMetaComponent):
+	def compileSpecial(self, srcXs, context, bNeedResult, compileSpecial, compileGLispExprToPyTree):
+		name = srcXs[0]
+		
+		if name == '$interactor':
+			"""
+			($interactor ...)      (see compileInteractor)
+			"""
+			return compileInteractor(srcXs, context, bNeedResult, compileSpecial, compileGLispExprToPyTree )
+	
+		raise GLispCompilerCouldNotCompileSpecial( srcXs )
+
+
+	def getConstants(self):
+		return {
+			'_InteractorEventKey' : InteractorEventKey,
+			'_InteractorEventTokenList' : InteractorEventTokenList,
+			'_Interactor' : Interactor
+			}
+	
+	
 
 	
 	
