@@ -1,0 +1,78 @@
+($gSymDocument "0.1-alpha"
+	($unit
+		($gMetaModule
+			($module
+				($# "STYLE SHEETS")
+
+				($# "Error background")
+				(@errorBackground
+					($style
+						(:backgroundColour ($colour #1.0 #0.5 #0.5))
+					)
+				)
+			
+				($# "Comment background")
+				(@commentBackground
+					($style
+						(:backgroundColour ($colour #0.95 #0.95 #0.95))
+						(:borderColour ($colour #0.8 #0.8 #0.8))
+					)
+				)
+
+				($# "Label background")
+				(@labelBackground
+					($style
+						(:backgroundColour ($colour #0.9 #1.0 #0.9))
+						(:borderColour ($colour #0.0 #0.8 #0.0))
+					)
+				)
+			
+				($# "Container background")
+				(@containerBackground
+					($style
+						(:backgroundColour ($colour #1.0 #1.0 #0.9))
+						(:borderColour ($colour #1.0 #0.75 #0.5))
+					)
+				)
+			
+				($# "Style background")
+				(@styleBackground
+					($style
+						(:backgroundColour ($colour #1.0 #0.95 #1.0))
+						(:borderColour ($colour #1.0 #0.65 #1.0))
+					)
+				)
+			
+				($# "View evaluation background")
+				(@viewEvalBackground
+					($style
+						(:backgroundColour ($colour #0.95 #0.95 #1.0))
+						(:borderColour ($colour #0.7 #0.7 #1.0))
+					)
+				)
+			
+				($# "Title vbox")
+				(@titleVBox
+					($style
+						(:alignment (@DTBox . ALIGN_CENTRE))
+					)
+				)
+				
+				($# "Match pattern constant")
+				(@matchPatternConstant
+					($style
+						(:colour ($colour #0.0 #0.5 #0.0))
+					)
+				)
+			
+				($# "Keyword")
+				(@keyword
+					($style
+						(:colour ($colour #0.0 #0.0 #0.5))
+						(:font "#'Sans 11 bold")
+					)
+				)
+			)
+		)
+	)
+)
