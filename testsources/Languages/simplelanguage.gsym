@@ -1,41 +1,50 @@
 ($gSymDocument "0.1-alpha"
 	($unit
 		($gMetaModule
-			(@compilers
-				($compilerCollection
-					($defineCompiler python2.5 ascii
-						($lambda (@node)
-							($match @node
-								( (add (: @x ^) (: @y ^))   (  (((("#'(" + ($compileEval @x)) + "#' + ") + ($compileEval @y)) + "#')")  ) )
-								( (sub (: @x ^) (: @y ^))   (  (((("#'(" + ($compileEval @x)) + "#' - ") + ($compileEval @y)) + "#')")  ) )
-								( (mul (: @x ^) (: @y ^))   (  (((("#'(" + ($compileEval @x)) + "#' * ") + ($compileEval @y)) + "#')")  ) )
-								( (div (: @x ^) (: @y ^))   (  (((("#'(" + ($compileEval @x)) + "#' / ") + ($compileEval @y)) + "#')")  ) )
-								( (pow (: @x ^) (: @y ^))   (  (((("#'(" + ($compileEval @x)) + "#' ** ") + ($compileEval @y)) + "#')")  ) )
-								( (loadLocal (: @x !))   ((@x)) )
+			($module
+				(@compilers
+					($compilerCollection
+						($defineCompiler python2.5 ascii
+							($where
+								(
+									(@compileNode
+										($lambda (@node)
+											($match @node
+												( (add (: @x ^) (: @y ^))   (  (((("#'(" + (@compileNode <- @x)) + "#' + ") + (@compileNode <- @y)) + "#')")  ) )
+												( (sub (: @x ^) (: @y ^))   (  (((("#'(" + (@compileNode <- @x)) + "#' - ") + (@compileNode <- @y)) + "#')")  ) )
+												( (mul (: @x ^) (: @y ^))   (  (((("#'(" + (@compileNode <- @x)) + "#' * ") + (@compileNode <- @y)) + "#')")  ) )
+												( (div (: @x ^) (: @y ^))   (  (((("#'(" + (@compileNode <- @x)) + "#' / ") + (@compileNode <- @y)) + "#')")  ) )
+												( (pow (: @x ^) (: @y ^))   (  (((("#'(" + (@compileNode <- @x)) + "#' ** ") + (@compileNode <- @y)) + "#')")  ) )
+												( (loadLocal (: @x !))   ((@x)) )
+											)
+										)
+									)
+								)
+								@compileNode
 							)
 						)
 					)
 				)
-			)
-			
-			
-			(@viewNodeFunction
-				($where
-					(
-						(@divBoxStyle
-							($style
-								(:alignment (@DTBox . ALIGN_EXPAND))
+				
+				
+				(@nodeViewFunction
+					($where
+						(
+							(@divBoxStyle
+								($style
+									(:alignment (@DTBox . ALIGN_EXPAND))
+								)
 							)
 						)
-					)
-					($lambda (@node)
-						($match @node
-							( (add (: @x ^) (: @y ^))   (  ($activeBorder ($hbox ($list ($viewEval @x) ($label "#'+") ($viewEval @y))))  ) )
-							( (sub (: @x ^) (: @y ^))   (  ($activeBorder ($hbox ($list ($viewEval @x) ($label "#'-") ($viewEval @y))))  ) )
-							( (mul (: @x ^) (: @y ^))   (  ($activeBorder ($hbox ($list ($viewEval @x) ($label "#'*") ($viewEval @y))))  ) )
-							( (div (: @x ^) (: @y ^))   (  ($activeBorder ($vbox ($list ($viewEval @x) ($hline) ($viewEval @y)) @divBoxStyle))  ) )
-							( (pow (: @x ^) (: @y ^))   (  ($activeBorder ($scriptRSuper ($viewEval @x)($viewEval @y)))  )  )
-							( (loadLocal (: @x !))   (  ($activeBorder ($entry @x))  ) )
+						($lambda (@node)
+							($match @node
+								( (add (: @x ^) (: @y ^))   (  ($activeBorder ($hbox ($list ($viewEval @x) ($label "#'+") ($viewEval @y))))  ) )
+								( (sub (: @x ^) (: @y ^))   (  ($activeBorder ($hbox ($list ($viewEval @x) ($label "#'-") ($viewEval @y))))  ) )
+								( (mul (: @x ^) (: @y ^))   (  ($activeBorder ($hbox ($list ($viewEval @x) ($label "#'*") ($viewEval @y))))  ) )
+								( (div (: @x ^) (: @y ^))   (  ($activeBorder ($vbox ($list ($viewEval @x) ($hline) ($viewEval @y)) @divBoxStyle))  ) )
+								( (pow (: @x ^) (: @y ^))   (  ($activeBorder ($scriptRSuper ($viewEval @x)($viewEval @y)))  )  )
+								( (loadLocal (: @x !))   (  ($activeBorder ($entry @x))  ) )
+							)
 						)
 					)
 				)

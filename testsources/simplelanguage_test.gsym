@@ -1,9 +1,7 @@
-(
-	($importModuleContents Languages.simpleLanguage ((languageFactory @smLangFac))
-		($where ((@sm (@smLangFac createLanguageInstance)))
-			(@sm content
-				(mul (add(pow (loadLocal varA) (loadLocal varB)) (loadLocal varC)) (div (loadLocal varD) (loadLocal varE)))
-			)
+($gSymDocument "0.1-alpha"
+	($unit
+		($withLanguageModule testsources/Languages/simplelanguage
+			(mul (add(pow (loadLocal varA) (loadLocal varB)) (loadLocal varC)) (div (loadLocal varD) (loadLocal varE)))
 		)
 	)
 )

@@ -6,6 +6,7 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
 import os.path
+import sys
 
 from Britefury.FileIO.IOXml import ioReadIntoObjectFromFile, ioWriteObjectToFile
 
@@ -83,12 +84,12 @@ class GSymEnvironment (object):
 		raise exceptionClass, reason  +  '   ::   '  +  gLispSrcToString( src, 3 )
 	
 	
-	def _f_importModule(self, path, moduleGlobals):
-		module = self.world.getModuleImporter().getModule( path )
+	def _f_instantiateImportedModule(self, path, moduleGlobals):
+		module = self.world.getModule( path )
 		try:
 			instance = self._moduleToModuleInstance[module]
 		except KeyError:
-			instance = module.factoryFunction( moduleGlobals )
+			instance = module.instantiate( self.world, moduleGlobals )
 			self._moduleToModuleInstance[module] = instance
 		return instance
 	

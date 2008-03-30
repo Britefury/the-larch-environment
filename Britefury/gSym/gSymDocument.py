@@ -12,8 +12,14 @@ from Britefury.gSymConfig.gSymVersion import compareVersions, gSymVersion
 
 from Britefury.gSym.View.gSymView import GSymViewFactory
 from Britefury.gSym.gSymEnvironment import GSymEnvironment
-from Britefury.gSym.gMeta.gMeta import GMetaModuleFactory
 
+
+
+class GSymRequireMetaLanguageDefinition (Exception):
+	pass
+
+class GSymRequireGMetaModule (Exception):
+	pass
 
 
 
@@ -22,10 +28,7 @@ class GSymDocumentContentHandler (object):
 	def gMetaModule(self, world, xs):
 		pass
 	
-	def language(self, world, name, xs):
-		pass
-	
-	def page(self, world, importLanguage, xs):
+	def withLanguageModule(self, world, importLanguage, xs):
 		pass
 
 
@@ -34,11 +37,17 @@ class GSymDocumentImportContentHandler (GSymDocumentContentHandler):
 	def gMetaModule(self, world, xs):
 		return xs
 
+	def withLanguageModule(self, world, importLanguage, xs):
+		raise GSymRequireGMetaModule
+
 
 class GSymDocumentInitMetaLanguageContentHandler (GSymDocumentContentHandler):
 	def gMetaModule(self, world, xs):
-		moduleFactory = GMetaModuleFactory( 'metalanguage', xs )
+		moduleFactory = world.createModule( 'metalanguage', xs )
 		world._f_setMetaLanguageViewFactory( GSymViewFactory( world, 'metalanguage', moduleFactory ) )
+		
+	def withLanguageModule(self, world, importLanguage, xs):
+		raise GSymRequireMetaLanguageDefinition
 
 
 class GSymDocumentViewContentHandler (GSymDocumentContentHandler):
@@ -48,9 +57,15 @@ class GSymDocumentViewContentHandler (GSymDocumentContentHandler):
 		self._stylesheetDispatcher = stylesheetDispatcher 
 	
 	def gMetaModule(self, world, xs):
-		metaLang = world._f_getMetaLanguageViewFactory()
-		return metaLang.createDocumentView( xs, self._commandHistory, self._stylesheetDispatcher )
+		metaLanguageViewFactory = world._f_getMetaLanguageViewFactory()
+		return metaLanguageViewFactory.createDocumentView( xs, self._commandHistory, self._stylesheetDispatcher )
 
+	def withLanguageModule(self, world, importLanguage, xs):
+		languageModuleFactory = world.getModule( importLanguage )
+		languageViewFactory = GSymViewFactory( world, importLanguage, languageModuleFactory )
+		return languageViewFactory.createDocumentView( xs, self._commandHistory, self._stylesheetDispatcher )
+		
+		
 
 
 class GSymDocumentInvalidStructure (Exception):
@@ -141,26 +156,16 @@ def loadDocument(world, xs, contentHandler):
 			raise GSymDocumentContentInvalidStructure
 		
 		return contentHandler.gMetaModule( world, docXs[1] )
-	elif docXs[0] == '$language':
+	elif docXs[0] == '$withLanguageModule':
 		"""
-		($language <name> <content>)
-		"""
-		if len( docXs ) != 3:
-			raise GSymDocumentContentInvalidStructure
-		
-		languageName = docXs[1]
-	
-		return contentHandler.language( world, languageName, docXs[2] )
-	elif docXs[0] == '$use':
-		"""
-		($page <language_import> <content>)
+		($withLanguageModule <language_module_to_import> <content>)
 		"""
 		if len( docXs ) != 3:
 			raise GSymDocumentContentInvalidStructure
 		
 		languageImport = docXs[1]
 		
-		return contentHandler.page( world, languageImport, docXs[2] )
+		return contentHandler.withLanguageModule( world, languageImport, docXs[2] )
 	else:
 		raise GSymDocumentContentInvalidType
 
