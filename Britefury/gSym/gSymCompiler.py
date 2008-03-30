@@ -50,4 +50,6 @@ class GMetaComponentCompiler (GMetaComponent):
 			}
 	
 	
+	def getGlobalNames(self):
+		return []
 
