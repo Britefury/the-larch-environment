@@ -22,9 +22,6 @@ class GSymDocumentContentHandler (object):
 	def gMetaModule(self, world, xs):
 		pass
 	
-	def metaLanguage(self, world, name, xs):
-		pass
-	
 	def language(self, world, name, xs):
 		pass
 	
@@ -38,12 +35,10 @@ class GSymDocumentImportContentHandler (GSymDocumentContentHandler):
 		return xs
 
 
-
-class GSymDocumentExecuteContentHandler (GSymDocumentContentHandler):
-	def metaLanguage(self, world, name, xs):
-		moduleFactory = GMetaModuleFactory( name, xs )
-		world._f_setMetaLanguageViewFactory( GSymViewFactory( world, name, moduleFactory ) )
-
+class GSymDocumentInitMetaLanguageContentHandler (GSymDocumentContentHandler):
+	def gMetaModule(self, world, xs):
+		moduleFactory = GMetaModuleFactory( 'metalanguage', xs )
+		world._f_setMetaLanguageViewFactory( GSymViewFactory( world, 'metalanguage', moduleFactory ) )
 
 
 class GSymDocumentViewContentHandler (GSymDocumentContentHandler):
@@ -52,7 +47,7 @@ class GSymDocumentViewContentHandler (GSymDocumentContentHandler):
 		self._commandHistory = commandHistory 
 		self._stylesheetDispatcher = stylesheetDispatcher 
 	
-	def metaLanguage(self, world, name, xs):
+	def gMetaModule(self, world, xs):
 		metaLang = world._f_getMetaLanguageViewFactory()
 		return metaLang.createDocumentView( xs, self._commandHistory, self._stylesheetDispatcher )
 
@@ -146,14 +141,6 @@ def loadDocument(world, xs, contentHandler):
 			raise GSymDocumentContentInvalidStructure
 		
 		return contentHandler.gMetaModule( world, docXs[1] )
-	if docXs[0] == '$metaLanguage':
-		"""
-		($metaLanguage <name> <view_definition>)
-		"""
-		if len( docXs ) != 3:
-			raise GSymDocumentContentInvalidStructure
-		
-		return contentHandler.metaLanguage( world,docXs[1], docXs[2] )
 	elif docXs[0] == '$language':
 		"""
 		($language <name> <content>)

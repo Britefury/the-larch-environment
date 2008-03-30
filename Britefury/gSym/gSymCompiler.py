@@ -23,7 +23,14 @@ class GSymCompiler (object):
 	def compileCode(self, node):
 		return self._compilerFunction( node )
 
+	
+class GSymCompilerCollection (object):
+	def __init__(self, compilers):
+		super( GSymCompilerCollection, self ).__init__()
+		self.compilers = compilers
 
+
+		
 
 class GMetaComponentCompiler (GMetaComponent):
 	def compileSpecial(self, srcXs, context, bNeedResult, compileSpecial, compileGLispExprToPyTree):
@@ -31,15 +38,22 @@ class GMetaComponentCompiler (GMetaComponent):
 		
 		if name == '$defineCompiler':
 			"""
-			($defineCompiler <target_format> <function>)
+			($defineCompiler <target_language> <target_format> <function>)
 			"""
 			
-			if len( srcXs )  !=  3:
+			if len( srcXs )  !=  4:
 				raise GLispCompilerInvalidFormLength( srcXs )
 			
-			targetFormat = srcXs[1]
+			targetLanguage = srcXs[1]
+			targetFormat = srcXs[2]
 		
-			return PyVar( '_GSymCompiler' )( targetFormat, compileGLispExprToPyTree( srcXs[2], context, True, compileSpecial ) ).debug( srcXs )
+			return PyVar( '_GSymCompiler' )( targetFormat, compileGLispExprToPyTree( srcXs[3], context, True, compileSpecial ) ).debug( srcXs )
+		elif name == '$compilerCollection':
+			"""
+			($compilerCollection <compilers...>)
+			"""
+			
+			return PyVar( '_GSymCompilerCollection' )( [ compileGLispExprToPyTree( x, context, True, compileSpecial )   for x in srcXs[1:] ] ).debug( srcXs )
 	
 		raise GLispCompilerCouldNotCompileSpecial( srcXs )
 
@@ -47,6 +61,7 @@ class GMetaComponentCompiler (GMetaComponent):
 	def getConstants(self):
 		return {
 			'_GSymCompiler' : GSymCompiler,
+			'_GSymCompilerCollection' : GSymCompilerCollection,
 			}
 	
 	

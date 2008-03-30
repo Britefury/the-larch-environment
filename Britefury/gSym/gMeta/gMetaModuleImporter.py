@@ -7,6 +7,8 @@
 ##-*************************
 import os
 
+from Britefury.DocModel.DMIO import readSX
+
 from Britefury.gSym.gMeta.gMeta import _compileGMeta
 
 
@@ -22,6 +24,9 @@ _coreDir = 'GSymCore'
 
 
 def _getGMetaModulePath(path):
+	if not path.lower().endswith( '.gsym' ):
+		path = path + '.gsym'
+	path = os.path.join( *path.split( '/') )
 	realpath = os.path.realpath( path )
 	
 	if not os.path.exists( realpath ):
@@ -43,7 +48,7 @@ def _getGMetaModulePath(path):
 class GMetaModuleImporter (object):
 	class _Module (object):
 		def __init__(self, importer, path, realpath):
-			super( _GMetaModule, self ).__init__()
+			super( GMetaModuleImporter._Module, self ).__init__()
 			self.path = path
 			self.realpath = realpath
 			

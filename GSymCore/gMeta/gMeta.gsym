@@ -1,82 +1,14 @@
 ($gSymDocument "0.1-alpha"
 	($unit
-		($metaLanguage gMeta
+		($gMetaModule
 			($module
-				( @nodeViewFunction
+				(@gMetaStyles
+					($import gMeta/Styles)
+				)
+				
+				(@nodeViewFunction
 					($where
 						(
-							($# "STYLE SHEETS")
-							($# "Error background")
-							(@errorBackgroundStyle
-								($style
-									(:backgroundColour ($colour #1.0 #0.5 #0.5))
-								)
-							)
-						
-							($# "Comment background")
-							(@commentBackgroundStyle
-								($style
-									(:backgroundColour ($colour #0.95 #0.95 #0.95))
-									(:borderColour ($colour #0.8 #0.8 #0.8))
-								)
-							)
-						
-							($# "Label background")
-							(@labelBackgroundStyle
-								($style
-									(:backgroundColour ($colour #0.9 #1.0 #0.9))
-									(:borderColour ($colour #0.0 #0.8 #0.0))
-								)
-							)
-						
-							($# "Container background")
-							(@containerBackgroundStyle
-								($style
-									(:backgroundColour ($colour #1.0 #1.0 #0.9))
-									(:borderColour ($colour #1.0 #0.75 #0.5))
-								)
-							)
-						
-							($# "Style background")
-							(@styleBackgroundStyle
-								($style
-									(:backgroundColour ($colour #1.0 #0.95 #1.0))
-									(:borderColour ($colour #1.0 #0.65 #1.0))
-								)
-							)
-						
-							($# "View evaluation background")
-							(@viewEvalBackgroundStyle
-								($style
-									(:backgroundColour ($colour #0.95 #0.95 #1.0))
-									(:borderColour ($colour #0.7 #0.7 #1.0))
-								)
-							)
-						
-							($# "Title vbox")
-							(@titleVBoxStyle
-								($style
-									(:alignment (@DTBox . ALIGN_CENTRE))
-								)
-							)
-							
-							($# "Match pattern constant")
-							(@matchPatternConstantStyle
-								($style
-									(:colour ($colour #0.0 #0.5 #0.0))
-								)
-							)
-						
-							($# "Keyword")
-							(@keywordStyle
-								($style
-									(:colour ($colour #0.0 #0.0 #0.5))
-									(:font "#'Sans 11 bold")
-								)
-							)
-						
-							
-							
 							($# "VIEW FUNCTIONS")							
 							($# "View style list; returns a list containing the box, or an empty list")
 							(@viewStyleList
@@ -110,12 +42,12 @@
 										( ($viewEval (: @x ^))
 											($activeBorder
 												($ahbox ($list
-													($label "#'ViewEval" @keywordStyle)
+													($label "#'ViewEval" (@gMetaStyles . keyword))
 													($label "#'(")
 													($viewEval @x (@viewExpressionFactory <- @viewViewSpecial))
 													($label "#')")
 												))
-												@viewEvalBackgroundStyle
+												(@gMetaStyles . viewEvalBackground)
 											)
 										)
 										
@@ -123,14 +55,14 @@
 										( ($viewEval (: @x ^) (: @fac ^))
 											($activeBorder
 												($ahbox ($list
-													($label "#'ViewEval" @keywordStyle)
+													($label "#'ViewEval" (@gMetaStyles . keyword))
 													($label "#'(")
 													($viewEval @x (@viewExpressionFactory <- @viewViewSpecial))
 													($label "#'WITH")
 													($viewEval @fac (@viewExpressionFactory <- @viewViewSpecial))
 													($label "#')")
 												))
-												@viewEvalBackgroundStyle
+												(@gMetaStyles . viewEvalBackground)
 											)
 										)
 										
@@ -138,12 +70,12 @@
 										( ($mapViewEval (: @x ^))
 											($activeBorder
 												($ahbox ($list
-													($label "#'MapViewEval" @keywordStyle)
+													($label "#'MapViewEval" (@gMetaStyles . keyword))
 													($label "#'(")
 													($viewEval @x (@viewExpressionFactory <- @viewViewSpecial))
 													($label "#')")
 												))
-												@viewEvalBackgroundStyle
+												(@gMetaStyles . viewEvalBackground)
 											)
 										)
 										
@@ -151,14 +83,14 @@
 										( ($mapViewEval (: @x ^) (: @fac ^))
 											($activeBorder
 												($ahbox ($list
-													($label "#'MapViewEval" @keywordStyle)
+													($label "#'MapViewEval" (@gMetaStyles . keyword))
 													($label "#'(")
 													($viewEval @x (@viewExpressionFactory <- @viewViewSpecial))
 													($label "#'WITH")
 													($viewEval @fac (@viewExpressionFactory <- @viewViewSpecial))
 													($label "#')")
 												))
-												@viewEvalBackgroundStyle
+												(@gMetaStyles . viewEvalBackground)
 											)
 										)
 										
@@ -166,7 +98,7 @@
 										( ($colour (: @red ^) (: @green ^) (: @blue ^))
 											($activeBorder
 												($vbox ($list
-													($label "#'Colour" @keywordStyle)
+													($label "#'Colour" (@gMetaStyles . keyword))
 													($ahbox ($list
 														($label "#'Red:")
 														($viewEval @red (@viewExpressionFactory <- @viewViewSpecial))
@@ -197,10 +129,10 @@
 												)
 												($activeBorder
 													($vbox ($list
-														($label "#'Style" @keywordStyle)
+														($label "#'Style" (@gMetaStyles . keyword))
 														($vbox ($mapViewEval @pairs @viewStylePair))
-													) @titleVBoxStyle)
-													@styleBackgroundStyle
+													) (@gMetaStyles . titleVBox))
+													(@gMetaStyles . styleBackground)
 												)
 											)
 										)
@@ -210,7 +142,7 @@
 											($activeBorder
 												($vbox ($list
 													($ahbox ($list
-														($label "#'ApplyStyle" @keywordStyle)
+														($label "#'ApplyStyle" (@gMetaStyles . keyword))
 														($viewEval @style (@viewExpressionFactory <- @viewViewSpecial))
 													))
 													($viewEval @x (@viewExpressionFactory <- @viewViewSpecial))
@@ -222,7 +154,7 @@
 										( ($activeBorder (: @x ^) (: @styles *))
 											($activeBorder
 												($vbox ($list
-													($label "#'ActiveBorder" @keywordStyle)
+													($label "#'ActiveBorder" (@gMetaStyles . keyword))
 													($vbox
 														(
 															($list ($viewEval @x (@viewExpressionFactory <- @viewViewSpecial)))
@@ -230,8 +162,8 @@
 															(@viewStyleList <- @styles)
 														)
 													)
-												) @titleVBoxStyle)
-												@containerBackgroundStyle
+												) (@gMetaStyles . titleVBox))
+												(@gMetaStyles . containerBackground)
 											)
 										)
 										
@@ -239,7 +171,7 @@
 										( ($border (: @x ^) (: @styles *))
 											($activeBorder
 												($vbox ($list
-													($label "#'Border" @keywordStyle)
+													($label "#'Border" (@gMetaStyles . keyword))
 													($vbox
 														(
 															($list ($viewEval @x (@viewExpressionFactory <- @viewViewSpecial)))
@@ -247,8 +179,8 @@
 															(@viewStyleList <- @styles)
 														)
 													)
-												)  @titleVBoxStyle)
-												@containerBackgroundStyle
+												)  (@gMetaStyles . titleVBox))
+												(@gMetaStyles . containerBackground)
 											)
 										)
 										
@@ -258,7 +190,7 @@
 												($vbox ($list
 													($hbox ($list
 														($vbox ($list
-															($label "#'Indent" @keywordStyle)
+															($label "#'Indent" (@gMetaStyles . keyword))
 															($viewEval @indentation (@viewExpressionFactory <- @viewViewSpecial))
 														))
 														($vbox
@@ -269,8 +201,8 @@
 															)
 														)
 													))
-												)  @titleVBoxStyle)
-												@containerBackgroundStyle
+												)  (@gMetaStyles . titleVBox))
+												(@gMetaStyles . containerBackground)
 											)
 										)
 										
@@ -278,7 +210,7 @@
 										( ($hline (: @styles *))
 											($activeBorder
 												($vbox ($list
-													($label "#'H-Line" @keywordStyle)
+													($label "#'H-Line" (@gMetaStyles . keyword))
 													($vbox
 														(
 															($list ($viewEval @x (@viewExpressionFactory <- @viewViewSpecial)))
@@ -286,8 +218,8 @@
 															(@viewStyleList <- @styles)
 														)
 													)
-												)  @titleVBoxStyle)
-												@labelBackgroundStyle
+												)  (@gMetaStyles . titleVBox))
+												(@gMetaStyles . labelBackground)
 											)
 										)
 										
@@ -295,7 +227,7 @@
 										( ($label (: @x ^) (: @styles *))
 											($activeBorder
 												($vbox ($list
-													($label "#'Label" @keywordStyle)
+													($label "#'Label" (@gMetaStyles . keyword))
 													($vbox
 														(
 															($list ($viewEval @x (@viewExpressionFactory <- @viewViewSpecial)))
@@ -303,8 +235,8 @@
 															(@viewStyleList <- @styles)
 														)
 													)
-												)  @titleVBoxStyle)
-												@labelBackgroundStyle
+												)  (@gMetaStyles . titleVBox))
+												(@gMetaStyles . labelBackground)
 											)
 										)
 										
@@ -312,10 +244,10 @@
 										( ($entry (: @x ^))
 											($activeBorder
 												($vbox ($list
-													($label "#'Entry" @keywordStyle)
+													($label "#'Entry" (@gMetaStyles . keyword))
 													($viewEval @x (@viewExpressionFactory <- @viewViewSpecial))
-												)  @titleVBoxStyle)
-												@labelBackgroundStyle
+												)  (@gMetaStyles . titleVBox))
+												(@gMetaStyles . labelBackground)
 											)
 										)
 										
@@ -323,7 +255,7 @@
 										( ($hbox (: @x ^) (: @styles *))
 											($activeBorder
 												($vbox ($list
-													($label "#'HBox" @keywordStyle)
+													($label "#'HBox" (@gMetaStyles . keyword))
 													($vbox
 														(
 															($list ($viewEval @x (@viewExpressionFactory <- @viewViewSpecial)))
@@ -331,8 +263,8 @@
 															(@viewStyleList <- @styles)
 														)
 													)
-												)  @titleVBoxStyle)
-												@containerBackgroundStyle
+												)  (@gMetaStyles . titleVBox))
+												(@gMetaStyles . containerBackground)
 											)
 										)
 										
@@ -340,7 +272,7 @@
 										( ($ahbox (: @x ^) (: @styles *))
 											($activeBorder
 												($vbox ($list
-													($label "#'AHBox" @keywordStyle)
+													($label "#'AHBox" (@gMetaStyles . keyword))
 													($vbox
 														(
 															($list ($viewEval @x (@viewExpressionFactory <- @viewViewSpecial)))
@@ -348,8 +280,8 @@
 															(@viewStyleList <- @styles)
 														)
 													)
-												)  @titleVBoxStyle)
-												@containerBackgroundStyle
+												)  (@gMetaStyles . titleVBox))
+												(@gMetaStyles . containerBackground)
 											)
 										)
 										
@@ -357,7 +289,7 @@
 										( ($vbox (: @x ^) (: @styles *))
 											($activeBorder
 												($vbox ($list
-													($label "#'VBox" @keywordStyle)
+													($label "#'VBox" (@gMetaStyles . keyword))
 													($vbox
 														(
 															($list ($viewEval @x (@viewExpressionFactory <- @viewViewSpecial)))
@@ -365,8 +297,8 @@
 															(@viewStyleList <- @styles)
 														)
 													)
-												)  @titleVBoxStyle)
-												@containerBackgroundStyle
+												)  (@gMetaStyles . titleVBox))
+												(@gMetaStyles . containerBackground)
 											)
 										)
 				
@@ -374,7 +306,7 @@
 										( ($script (: @main ^) (: @lsuper ^) (: @lsub ^) (: @rsuper ^) (: @rsub ^) (: @styles *))
 											($activeBorder
 												($vbox ($list
-													($label "#'Script" @keywordStyle)
+													($label "#'Script" (@gMetaStyles . keyword))
 													($vbox
 														(
 															($list
@@ -390,8 +322,8 @@
 															(@viewStyleList <- @styles)
 														)
 													)
-												) @titleVBoxStyle)
-												@containerBackgroundStyle
+												) (@gMetaStyles . titleVBox))
+												(@gMetaStyles . containerBackground)
 											)
 										)
 										
@@ -399,7 +331,7 @@
 										( ($scriptLSuper (: @main ^) (: @scriptChild ^) (: @styles *))
 											($activeBorder
 												($vbox ($list
-													($label "#'Script - left super" @keywordStyle)
+													($label "#'Script - left super" (@gMetaStyles . keyword))
 													($vbox
 														(
 															($list
@@ -412,8 +344,8 @@
 															(@viewStyleList <- @styles)
 														)
 													)
-												) @titleVBoxStyle)
-												@containerBackgroundStyle
+												) (@gMetaStyles . titleVBox))
+												(@gMetaStyles . containerBackground)
 											)
 										)
 										
@@ -421,7 +353,7 @@
 										( ($scriptLSub (: @main ^) (: @scriptChild ^) (: @styles *))
 											($activeBorder
 												($vbox ($list
-													($label "#'Script - left sub" @keywordStyle)
+													($label "#'Script - left sub" (@gMetaStyles . keyword))
 													($vbox
 														(
 															($list
@@ -434,8 +366,8 @@
 															(@viewStyleList <- @styles)
 														)
 													)
-												) @titleVBoxStyle)
-												@containerBackgroundStyle
+												) (@gMetaStyles . titleVBox))
+												(@gMetaStyles . containerBackground)
 											)
 										)
 										
@@ -443,7 +375,7 @@
 										( ($scriptRSuper (: @main ^) (: @scriptChild ^) (: @styles *))
 											($activeBorder
 												($vbox ($list
-													($label "#'Script - right super" @keywordStyle)
+													($label "#'Script - right super" (@gMetaStyles . keyword))
 													($vbox
 														(
 															($list
@@ -456,8 +388,8 @@
 															(@viewStyleList <- @styles)
 														)
 													)
-												) @titleVBoxStyle)
-												@containerBackgroundStyle
+												) (@gMetaStyles . titleVBox))
+												(@gMetaStyles . containerBackground)
 											)
 										)
 										
@@ -465,7 +397,7 @@
 										( ($scriptRSub (: @main ^) (: @scriptChild ^) (: @styles *))
 											($activeBorder
 												($vbox ($list
-													($label "#'Script - right sub" @keywordStyle)
+													($label "#'Script - right sub" (@gMetaStyles . keyword))
 													($vbox
 														(
 															($list
@@ -478,8 +410,8 @@
 															(@viewStyleList <- @styles)
 														)
 													)
-												) @titleVBoxStyle)
-												@containerBackgroundStyle
+												) (@gMetaStyles . titleVBox))
+												(@gMetaStyles . containerBackground)
 											)
 										)
 										
@@ -492,7 +424,7 @@
 							($# "View a comment")
 							(@viewComment
 								($lambda (@comment)
-									($activeBorder ($label ("#'#" + @comment)) @commentBackgroundStyle)
+									($activeBorder ($label ("#'#" + @comment)) (@gMetaStyles . commentBackground))
 								)
 							)
 							
@@ -526,7 +458,7 @@
 											( ($else (: @expressions *))
 												($activeBorder
 													($vbox ($list
-														($label "#'ELSE:" @keywordStyle)
+														($label "#'ELSE:" (@gMetaStyles . keyword))
 														($indent #40.0
 															($vbox
 																($mapViewEval @expressions (@viewExpressionFactory <- @viewSpecial))
@@ -542,10 +474,10 @@
 														($ahbox ($list
 															($if
 																( @bIf
-																	($label "#'IF:" @keywordStyle)
+																	($label "#'IF:" (@gMetaStyles . keyword))
 																)
 																( $else
-																	($label "#'ELIF:" @keywordStyle)
+																	($label "#'ELIF:" (@gMetaStyles . keyword))
 																)
 															)
 															($viewEval @condition (@viewExpressionFactory <- @viewSpecial))
@@ -566,8 +498,8 @@
 								)
 							)
 				
-							($# "View a where binding; factory dependent on special function")
-							(@viewWhereBindingFactory
+							($# "View a binding; factory dependent on special function")
+							(@viewBindingFactory
 								($lambda (@viewSpecial)
 									($lambda (@node)
 										($match @node
@@ -621,7 +553,7 @@
 											
 											($# "Constant")
 											( (: @constantValue !)
-												($activeBorder ($label @constantValue @matchPatternConstantStyle))
+												($activeBorder ($label @constantValue (@gMetaStyles . matchPatternConstant)))
 											)
 											
 											($# "List internal min to max")
@@ -728,7 +660,7 @@
 											( ($set (: @elements *))
 												($activeBorder
 													($ahbox
-														((($list ($label "#'SET" @keywordStyle) ($label "#'("))  +  ($mapViewEval @elements (@viewExpressionFactory <- @viewSpecial)))  +  ($list ($label "#')")))
+														((($list ($label "#'SET" (@gMetaStyles . keyword)) ($label "#'("))  +  ($mapViewEval @elements (@viewExpressionFactory <- @viewSpecial)))  +  ($list ($label "#')")))
 													)
 												)
 											)
@@ -740,7 +672,7 @@
 														(
 															($list
 																($ahbox ($list
-																	($label u"#'\u03bb" @keywordStyle)
+																	($label u"#'\u03bb" (@gMetaStyles . keyword))
 																	($viewEval @params @viewLambdaParamList)
 																	($label "#'=")
 																))
@@ -759,7 +691,7 @@
 														(
 															($list
 																($ahbox ($list
-																	($label u"#'\u03bb" @keywordStyle)
+																	($label u"#'\u03bb" (@gMetaStyles . keyword))
 																	($viewEval @params @viewLambdaParamList)
 																	($label "#'=")
 																))
@@ -790,8 +722,8 @@
 											( ($where (: @bindings /) (: @expressions *))
 												($activeBorder
 													($vbox ($list
-														($label "#'WHERE" @keywordStyle)
-														($indent #50.0 ($vbox ($mapViewEval @bindings (@viewWhereBindingFactory <- @viewSpecial))))
+														($label "#'WHERE" (@gMetaStyles . keyword))
+														($indent #50.0 ($vbox ($mapViewEval @bindings (@viewBindingFactory <- @viewSpecial))))
 														($indent #20.0
 															($hbox ($list
 																($label u"#'\u2192")
@@ -809,7 +741,7 @@
 												($activeBorder
 													($vbox ($list
 														($ahbox ($list
-															($label "#'MATCH" @keywordStyle)
+															($label "#'MATCH" (@gMetaStyles . keyword))
 															($viewEval @expression (@viewExpressionFactory <- @viewSpecial))
 															($label "#':")
 														))
@@ -821,6 +753,25 @@
 												)
 											)
 											
+											($# "Module expression")
+											( ($module (: @bindings *))
+												($activeBorder
+													($vbox ($list
+														($label "#'MODULE" (@gMetaStyles . keyword))
+														($indent #50.0 ($vbox ($mapViewEval @bindings (@viewBindingFactory <- @viewSpecial))))
+													))
+												)
+											)
+											
+											($# "Import expression")
+											( ($import (: @importModule !))
+												($activeBorder
+													($ahbox ($list
+														($label "#'import" (@gMetaStyles . keyword)) ($label @importModule)
+													))
+												)
+											)
+				
 											($# "Single element list")
 											( ((: @x ^))   ((@viewExpressionFactory <- @viewSpecial) <- @x) )
 											
