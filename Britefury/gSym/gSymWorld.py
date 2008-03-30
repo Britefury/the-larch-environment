@@ -23,17 +23,9 @@ class GSymWorld (object):
 	def __init__(self, moduleImportContent):
 		super( GSymWorld, self ).__init__()
 		
-		self._worldTable = {}
 		self._moduleImporter = GMetaModuleImporter( self, moduleImportContent )
 		self._metaLanguageViewFactory = None
 		
-		
-	def __getitem__(self, key):
-		return self._worldTable[key]
-	
-	def __setitem__(self, key, value):
-		self._worldTable[key] = value
-
 		
 	def _f_setMetaLanguageViewFactory(self, viewFactory):
 		self._metaLanguageViewFactory = viewFactory
@@ -44,6 +36,12 @@ class GSymWorld (object):
 	
 	def getModuleImporter(self):
 		return self._moduleImporter
+	
+	def getModule(self, path):
+		return self._moduleImporter.getModule( path )
+	
+	def createModule(self, name, xs):
+		return self._moduleImporter.createModule( name, xs )
 	
 	
 	@staticmethod

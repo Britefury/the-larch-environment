@@ -5,17 +5,20 @@
 				($# "STYLE SHEETS")
 
 				($# "Error background")
-				(@errorBackground
+				(@error
 					($style
-						(:backgroundColour ($colour #1.0 #0.5 #0.5))
+						(:backgroundColour ($colour #1.0 #0.85 #0.85))
+						(:font "#'Sans bold italic 11")
+						(:colour ($colour #1.0 #0.0 #0.0))
 					)
 				)
 			
 				($# "Comment background")
-				(@commentBackground
+				(@comment
 					($style
 						(:backgroundColour ($colour #0.95 #0.95 #0.95))
 						(:borderColour ($colour #0.8 #0.8 #0.8))
+						(:colour ($colour #0.3 #0.0 #0.5))
 					)
 				)
 

@@ -7,8 +7,11 @@
 ##-*************************
 import os
 
+from copy import copy
+
 from Britefury.DocModel.DMIO import readSX
 
+from Britefury.gSym import gSymEnvironment
 from Britefury.gSym.gMeta.gMeta import _compileGMeta
 
 
@@ -42,23 +45,29 @@ def _getGMetaModulePath(path):
 
 
 
+class GMetaModuleFactory (object):
+	def __init__(self, importer, name, xs):
+		super( GMetaModuleFactory, self ).__init__()
+		self._importer = importer
 
+		self.name = name
+		self.xs = xs
+		
+		self.factoryFunction = _compileGMeta( name, self.xs )
+		
+		
+	def instantiate(self, world, moduleGlobals):
+		env = gSymEnvironment.GSymEnvironment( self._importer._world, self.name )
 
+		g = copy( moduleGlobals )
+		g['__gsym__env__'] = env
+		g['__gsym__globals__'] = g
+		
+		return self.factoryFunction( g )
 
+		
+		
 class GMetaModuleImporter (object):
-	class _Module (object):
-		def __init__(self, importer, path, realpath):
-			super( GMetaModuleImporter._Module, self ).__init__()
-			self.path = path
-			self.realpath = realpath
-			
-			docXs = readSX( open( realpath, 'r' ) )
-			self.xs = importer._moduleImportContent( importer._world, docXs )
-			
-			self.factoryFunction = _compileGMeta( path, self.xs )
-			
-		
-		
 	def __init__(self, world, moduleImportContent):
 		super( GMetaModuleImporter, self ).__init__()
 		self._world = world
@@ -71,9 +80,22 @@ class GMetaModuleImporter (object):
 		try:
 			module = self._modules[realpath]
 		except KeyError:
-			module = self._Module( self, path, realpath )
+			xs = self._p_readModuleXs( path, realpath )
+			module = GMetaModuleFactory( self, path, xs )
 			self._modules[realpath] = module
 		return module
+	
+	
+	def createModule(self, name, xs):
+		module = GMetaModuleFactory( self, name, xs )
+		self._modules[name] = module
+		return module
+	
+	
+	def _p_readModuleXs(self, path, realpath):
+		docXs = readSX( open( realpath, 'r' ) )
+		xs = self._moduleImportContent( self._world, docXs )
+		return xs
 	
 
 

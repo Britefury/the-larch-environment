@@ -38,6 +38,40 @@
 							(@viewViewSpecial
 								($lambda (@node)
 									($match @node
+										($# "COMPILER SPECIALS")
+										($# "Compiler collection")
+										( ($compilerCollection (: @x *))
+											($activeBorder
+												($vbox ($list
+													($label "#'Compiler Collection" (@gMetaStyles . keyword))
+													($indent #20.0
+														($vbox ($mapViewEval @x (@viewExpressionFactory <- @viewViewSpecial)))
+													)
+												))
+											)
+										)
+										
+										($# "Compiler definition")
+										( ($defineCompiler (: @targetLanguage !) (: @targetFormat !) (: @x ^))
+											($activeBorder
+												($vbox ($list
+													($hbox ($list
+														($label "#'Compiler:" (@gMetaStyles . keyword))
+														($label "#'for:")
+														($label @targetLanguage)
+														($label "#'format:")
+														($label @targetFormat)
+													))
+													($indent #20.0
+														($viewEval @x (@viewExpressionFactory <- @viewViewSpecial))
+													)
+												))
+											)
+										)
+										
+
+										
+										($# "VIEW SPECIALS")
 										($# "View eval, no factory")
 										( ($viewEval (: @x ^))
 											($activeBorder
@@ -416,7 +450,7 @@
 										)
 										
 										($# "Unknown")
-										( (: @x ^)  (@log <- (@gLispAsString <- @x)) ($activeBorder ($label u"#'\u2620 SPECIAL-ERROR \u2620")) )
+										( (: @x ^)  (@log <- (@gLispAsString <- @x)) ($activeBorder ($label "#'<error>" (@gMetaStyles . error)) (@gMetaStyles . error)) )
 									)
 								)
 							)
@@ -424,7 +458,7 @@
 							($# "View a comment")
 							(@viewComment
 								($lambda (@comment)
-									($activeBorder ($label ("#'#" + @comment)) (@gMetaStyles . commentBackground))
+									($activeBorder ($label ("#'#" + @comment) (@gMetaStyles . comment)) (@gMetaStyles . comment))
 								)
 							)
 							
@@ -492,7 +526,7 @@
 											)
 				
 											($# "Unknown")
-											( (: @x ^)  (@log <- (@gLispAsString <- @x)) ($activeBorder ($label u"#'\u2620 IF-ERROR \u2620")) )
+											( (: @x ^)  (@log <- (@gLispAsString <- @x)) ($activeBorder ($label "#'<error>" (@gMetaStyles . error)) (@gMetaStyles . error)) )
 										)
 									)
 								)
@@ -871,7 +905,7 @@
 											)
 				
 											($# "Unknown")
-											( (: @x ^)  (@log <- (@gLispAsString <- @x)) ($activeBorder ($label u"#'\u2620 ERROR \u2620")) )
+											( (: @x ^)  (@log <- (@gLispAsString <- @x)) ($activeBorder ($label "#'<error>" (@gMetaStyles . error)) (@gMetaStyles . error)) )
 										)
 									)
 								)
