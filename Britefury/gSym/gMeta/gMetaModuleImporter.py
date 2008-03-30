@@ -7,7 +7,7 @@
 ##-*************************
 import os
 
-from Britefury.gSym.gMeta.gMeta import compileGMeta
+from Britefury.gSym.gMeta.gMeta import _compileGMeta
 
 
 
@@ -42,18 +42,23 @@ def _getGMetaModulePath(path):
 
 class GMetaModuleImporter (object):
 	class _Module (object):
-		def __init__(self, path, realpath):
+		def __init__(self, importer, path, realpath):
 			super( _GMetaModule, self ).__init__()
 			self.path = path
 			self.realpath = realpath
 			
-			self.xs = readSX( open( realpath, 'r' ) )
+			docXs = readSX( open( realpath, 'r' ) )
+			self.xs = importer._moduleImportContent( importer._world, docXs )
 			
-			self.factoryFunction = compileGMeta( path, self.xs )
-	
-	def __init__(self):
-		super( GMetaModuleRegistry, self ).__init__()
+			self.factoryFunction = _compileGMeta( path, self.xs )
+			
+		
+		
+	def __init__(self, world, moduleImportContent):
+		super( GMetaModuleImporter, self ).__init__()
+		self._world = world
 		self._modules = {}
+		self._moduleImportContent = moduleImportContent
 		
 		
 	def getModule(self, path):
@@ -61,13 +66,9 @@ class GMetaModuleImporter (object):
 		try:
 			module = self._modules[realpath]
 		except KeyError:
-			module = self._Module( path, realpath )
+			module = self._Module( self, path, realpath )
 			self._modules[realpath] = module
 		return module
-	
-	def getModuleFactoryFunction(self, path):
-		module = self.getModule( path )
-		return module.factoryFunction
 	
 
 

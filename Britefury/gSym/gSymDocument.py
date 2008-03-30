@@ -10,37 +10,39 @@ from Britefury.Kernel.Abstract import abstractmethod
 from Britefury.GLisp.GLispUtil import isGLispList
 from Britefury.gSymConfig.gSymVersion import compareVersions, gSymVersion
 
-from Britefury.gSym.View.gSymView import GSymViewDefinition
+from Britefury.gSym.View.gSymView import GSymViewFactory
 from Britefury.gSym.gSymEnvironment import GSymEnvironment
+from Britefury.gSym.gMeta.gMeta import GMetaModuleFactory
 
 
 
 
 
 class GSymDocumentContentHandler (object):
-	@abstractmethod
-	def metaLanguage(self, env, name, xs):
+	def gMetaModule(self, world, xs):
 		pass
 	
-	@abstractmethod
-	def language(self, env, name, xs):
+	def metaLanguage(self, world, name, xs):
 		pass
 	
-	@abstractmethod
-	def page(self, env, importLanguage, xs):
+	def language(self, world, name, xs):
 		pass
+	
+	def page(self, world, importLanguage, xs):
+		pass
+
+
+
+class GSymDocumentImportContentHandler (GSymDocumentContentHandler):
+	def gMetaModule(self, world, xs):
+		return xs
 
 
 
 class GSymDocumentExecuteContentHandler (GSymDocumentContentHandler):
-	def metaLanguage(self, env, name, xs):
-		env._f_setMetaLanguageViewDefinition( GSymViewDefinition( name, xs ) )
-	
-	def language(self, env, name, xs):
-		pass
-	
-	def page(self, env, importLanguage, xs):
-		pass
+	def metaLanguage(self, world, name, xs):
+		moduleFactory = GMetaModuleFactory( name, xs )
+		world._f_setMetaLanguageViewFactory( GSymViewFactory( world, name, moduleFactory ) )
 
 
 
@@ -50,15 +52,9 @@ class GSymDocumentViewContentHandler (GSymDocumentContentHandler):
 		self._commandHistory = commandHistory 
 		self._stylesheetDispatcher = stylesheetDispatcher 
 	
-	def metaLanguage(self, env, name, xs):
-		metaLang = env._f_getMetaLanguageViewDefinition()
+	def metaLanguage(self, world, name, xs):
+		metaLang = world._f_getMetaLanguageViewFactory()
 		return metaLang.createDocumentView( xs, self._commandHistory, self._stylesheetDispatcher )
-	
-	def language(self, env, name, xs):
-		pass
-	
-	def page(self, env, importLanguage, xs):
-		pass
 
 
 
@@ -87,7 +83,7 @@ class GSymDocumentContentInvalidType (Exception):
 
 
 
-def loadDocument(env, xs, contentHandler):
+def loadDocument(world, xs, contentHandler):
 	"""
 	($gSymDocument <gsym_version> <module>)
 	"""
@@ -99,7 +95,7 @@ def loadDocument(env, xs, contentHandler):
 	
 	header = xs[0]
 	version = xs[1]
-	moduleXs = xs[2]
+	unitXs = xs[2]
 	
 	if header != "$gSymDocument":
 		raise GSymDocumentInvalidHeader
@@ -116,20 +112,20 @@ def loadDocument(env, xs, contentHandler):
 	
 	
 	
-	if not isGLispList( moduleXs ):
+	if not isGLispList( unitXs ):
 		raise GSymDocumentInvalidStructure
 	
-	if len( moduleXs ) < 1:
+	if len( unitXs ) < 1:
 		raise GSymDocumentInvalidStructure
 	
 	
 	"""
-	($module <content>)
+	($unit <content>)
 	"""
-	if moduleXs[0] != '$module':
+	if unitXs[0] != '$unit':
 		raise GSymDocumentInvalidStructure
 	
-	docXs = moduleXs[1]
+	docXs = unitXs[1]
 	
 	
 	
@@ -142,6 +138,14 @@ def loadDocument(env, xs, contentHandler):
 	
 		
 		
+	if docXs[0] == '$gMetaModule':
+		"""
+		($gMetaModule <content>)
+		"""
+		if len( docXs ) != 2:
+			raise GSymDocumentContentInvalidStructure
+		
+		return contentHandler.gMetaModule( world, docXs[1] )
 	if docXs[0] == '$metaLanguage':
 		"""
 		($metaLanguage <name> <view_definition>)
@@ -149,7 +153,7 @@ def loadDocument(env, xs, contentHandler):
 		if len( docXs ) != 3:
 			raise GSymDocumentContentInvalidStructure
 		
-		return contentHandler.metaLanguage( env,docXs[1], docXs[2] )
+		return contentHandler.metaLanguage( world,docXs[1], docXs[2] )
 	elif docXs[0] == '$language':
 		"""
 		($language <name> <content>)
@@ -159,7 +163,7 @@ def loadDocument(env, xs, contentHandler):
 		
 		languageName = docXs[1]
 	
-		return contentHandler.language( env, languageName, docXs[2] )
+		return contentHandler.language( world, languageName, docXs[2] )
 	elif docXs[0] == '$use':
 		"""
 		($page <language_import> <content>)
@@ -169,12 +173,14 @@ def loadDocument(env, xs, contentHandler):
 		
 		languageImport = docXs[1]
 		
-		return contentHandler.page( env, languageImport, docXs[2] )
+		return contentHandler.page( world, languageImport, docXs[2] )
 	else:
 		raise GSymDocumentContentInvalidType
 
 
 
+_importContentHandler = GSymDocumentImportContentHandler()
 
-
+def importDocumentContent(world, xs):
+	return loadDocument( world, xs, _importContentHandler )
 

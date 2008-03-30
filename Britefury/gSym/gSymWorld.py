@@ -7,7 +7,7 @@
 ##-*************************
 import os
 
-from Britefury.gSym.gMeta.gMetaModule import GMetaModuleRegistry
+from Britefury.gSym.gMeta.gMetaModuleImporter import GMetaModuleImporter
 
 
 
@@ -20,12 +20,12 @@ from Britefury.gSym.gMeta.gMetaModule import GMetaModuleRegistry
 #
 
 class GSymWorld (object):
-	def __init__(self):
+	def __init__(self, moduleImportContent):
 		super( GSymWorld, self ).__init__()
 		
 		self._worldTable = {}
-		self._moduleRegistry = GMetaModuleRegistry()
-		self._metaLanguageViewDef = None
+		self._moduleImporter = GMetaModuleImporter( self, moduleImportContent )
+		self._metaLanguageViewFactory = None
 		
 		
 	def __getitem__(self, key):
@@ -35,15 +35,15 @@ class GSymWorld (object):
 		self._worldTable[key] = value
 
 		
-	def _f_setMetaLanguageViewDefinition(self, viewDef):
-		self._metaLanguageViewDef = viewDef
+	def _f_setMetaLanguageViewFactory(self, viewFactory):
+		self._metaLanguageViewFactory = viewFactory
 		
-	def _f_getMetaLanguageViewDefinition(self):
-		return self._metaLanguageViewDef
+	def _f_getMetaLanguageViewFactory(self):
+		return self._metaLanguageViewFactory
 	
 	
-	def getModuleRegistry(self):
-		return self._moduleRegistry
+	def getModuleImporter(self):
+		return self._moduleImporter
 	
 	
 	@staticmethod

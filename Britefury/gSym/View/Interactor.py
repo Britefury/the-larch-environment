@@ -307,6 +307,9 @@ class GMetaComponentInteractor (GMetaComponent):
 			}
 	
 	
+	def getGlobalNames(self):
+		return []
+
 
 	
 	

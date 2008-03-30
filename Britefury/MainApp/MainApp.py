@@ -30,7 +30,7 @@ from Britefury.DocModel.DMIO import readSX, writeSX
 
 from Britefury.gSym.gSymWorld import GSymWorld
 from Britefury.gSym.gSymEnvironment import GSymEnvironment
-from Britefury.gSym.gSymDocument import loadDocument, GSymDocumentExecuteContentHandler, GSymDocumentViewContentHandler
+from Britefury.gSym.gSymDocument import loadDocument, importDocumentContent, GSymDocumentExecuteContentHandler, GSymDocumentViewContentHandler
 
 from Britefury.DocView.DocView import DocView
 
@@ -77,7 +77,7 @@ class MainApp (object):
 		self._commandHistory = None
 		self._bUnsavedData = False
 		
-		self._world = GSymWorld()
+		self._world = GSymWorld( importDocumentContent )
 
 		self._doc = DTDocument()
 		self._doc.undoSignal.connect( self._p_onUndo )
@@ -255,10 +255,9 @@ class MainApp (object):
 
 
 	def _p_initialise(self):
-		doc = readSX( file( os.path.join( 'GSymCore', 'Core', 'gMeta.gsym' ), 'r' ) )
+		doc = readSX( file( os.path.join( 'GSymCore', 'gMeta', 'gMeta.gsym' ), 'r' ) )
 		contentHandler = GSymDocumentExecuteContentHandler()
-		env = GSymEnvironment( self._world, 'Core.gMeta' )
-		loadDocument( env, doc, contentHandler )
+		loadDocument( self._world, doc, contentHandler )
 		
 
 
@@ -276,8 +275,7 @@ class MainApp (object):
 		
 		if bEvaluate:
 			contentHandler = GSymDocumentViewContentHandler( self._commandHistory, makeLispStyleSheetDispatcher() )
-			env = GSymEnvironment( self._world, moduleName )
-			self._view = loadDocument( env, documentRoot, contentHandler )
+			self._view = loadDocument( self._world, documentRoot, contentHandler )
 		else:
 			self._view = makeLispDocView( documentRoot, self._commandHistory )
 	

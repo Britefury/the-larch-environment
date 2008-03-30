@@ -42,6 +42,12 @@ class PyInvalidFunctionNameError (PyInvalidNameError):
 class PyInvalidArgNameError (PyInvalidNameError):
 	pass
 
+class PyXArgMustFollowNormalArgsError (PyInvalidNameError):
+	pass
+
+class PyKWArgMustBeLastError (PyInvalidNameError):
+	pass
+
 
 class PyInvalidUnaryOperatorError (PyCodeGenError):
 	def __init__(self, dbgSrc, op):
@@ -983,9 +989,25 @@ class PyDef (PyStatement):
 		super( PyDef, self ).__init__( dbgSrc )
 		if not _isPyIdentifier( name ):
 			self.error( PyInvalidFunctionNameError, name )
+		bXArg = False
+		bKWArg = False
 		for argName in argNames:
-			if not _isPyIdentifier(argName ):
-				self.error( PyInvalidArgNameError, name )
+			if argName.startswith( '**' ):
+				n = argName[2:]
+				bKWArg = True
+			elif argName.startswith( '*' ):
+				if bKWArg:
+					raise PyKWArgMustBeLastError( argName )
+				n = argName[1:]
+				bXArg = True
+			else:
+				if bXArg:
+					raise PyXArgMustFollowNormalArgsError( argName )
+				if bKWArg:
+					raise PyKWArgMustBeLastError( argName )
+				n = argName
+			if not _isPyIdentifier( n ):
+				self.error( PyInvalidArgNameError, n )
 		self.name = name
 		self.argNames = argNames
 		self.statements = statements

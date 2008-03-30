@@ -74,7 +74,7 @@ def shutdownGSymEnvironment():
 class GSymEnvironment (object):
 	def __init__(self, world, moduleName):
 		super( GSymEnvironment, self ).__init__()
-		self._world = world
+		self.world = world
 		self._moduleName = moduleName
 		self._moduleToModuleInstance = {}
 
@@ -83,15 +83,8 @@ class GSymEnvironment (object):
 		raise exceptionClass, reason  +  '   ::   '  +  gLispSrcToString( src, 3 )
 	
 	
-	def _f_setMetaLanguageViewDefinition(self, viewDef):
-		self._world._f_setMetaLanguageViewDefinition( viewDef )
-		
-	def _f_getMetaLanguageViewDefinition(self):
-		return self._world._f_getMetaLanguageViewDefinition()
-	
-	
-	def _f_instantiateModule(self, path, moduleGlobals):
-		module = self._world.getModuleRegistry().getModule( path )
+	def _f_importModule(self, path, moduleGlobals):
+		module = self.world.getModuleImporter().getModule( path )
 		try:
 			instance = self._moduleToModuleInstance[module]
 		except KeyError:
