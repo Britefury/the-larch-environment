@@ -23,3 +23,13 @@ Revision 242 - PROTOTYPE 2
 	GSymLibs/Languages/metalanguage.gsym - defines how the gSym meta-language is viewed
 	GSymLibs/Languages/simplelanguage.gsym - defines a simple language. This definition is viewed by importing the view definition found in the metalanguage
 	testsources/simlplelanguage_test.gym contains some test source code, viewed using the view definition foudn in simplelanguage
+	
+Revision 260:
+	Supports the metalanguage.
+	Can import gMeta modules from external modules; these modules can contain functions, constants, etc, which can be imported into a final module.
+	A gMeta may define a language. This can be viewed.  FORM: ($gMetaModule)
+	A document may use a gMeta module to define the language in which the document is written. FORM: ($withLanguageModule)
+	There are only two types of module;
+		$gMetaModule; the document contains gMeta source which can be used to define a language, define the meta-language, or define functions or constants to be imported into another gMeta module
+		$withLanguageModule; the document contains content whose format is determined by the specified module
+	
