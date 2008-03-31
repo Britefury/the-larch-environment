@@ -49,7 +49,19 @@ class _GtkPresentationArea (gtk.DrawingArea):
 		self._presentationArea = presentationArea
 		
 	def do_key_press_event(self, event):
-		self._presentationArea.do_key_press_event( event )
+		bHandled = self._presentationArea.do_key_press_event( event )
+		if bHandled:
+			return True
+		else:
+			return super( _GtkPresentationArea, self ).do_key_press_event( event )
+		
+	def do_key_release_event(self, event):
+		bHandled = self._presentationArea.do_key_release_event( event )
+		if bHandled:
+			return True
+		else:
+			#return super( _GtkPresentationArea, self ).do_key_release_event( event )
+			return gtk.DrawingArea.do_key_release_event( self, event )
 		
 gobject.type_register( _GtkPresentationArea )
 
@@ -511,7 +523,7 @@ class DTDocument (DTBin):
 			self.redoSignal.emit( self )
 			self._p_emitImmediateEvents()
 			return True
-		elif self._o_handleDocumentKey( keyEvent ):
+		elif self._o_handleDocumentKeyPress( keyEvent ):
 			self._p_emitImmediateEvents()
 			return True
 		else:
@@ -528,6 +540,9 @@ class DTDocument (DTBin):
 		keyEvent = DTKeyEvent( event )
 		key = keyEvent.keyVal, keyEvent.state
 		if key == _undoAccel  or  key == _redoAccel:
+			self._p_emitImmediateEvents()
+			return True
+		elif self._o_handleDocumentKeyRelease( keyEvent ):
 			self._p_emitImmediateEvents()
 			return True
 		else:
@@ -741,7 +756,7 @@ class DTDocument (DTBin):
 
 
 
-	def _o_handleDocumentKey(self, event):
+	def _o_handleDocumentKeyPress(self, event):
 		if event.keyVal in [ gtk.keysyms.Left, gtk.keysyms.Right, gtk.keysyms.Up, gtk.keysyms.Down, gtk.keysyms.Home, gtk.keysyms.End ]:
 			if self._keyboardFocusChild is not None:
 				if self._keyboardFocusChild._f_handleMotionKeyPress( event ):
@@ -755,9 +770,17 @@ class DTDocument (DTBin):
 						self._keyboardFocusChild.cursorUp()
 					elif event.keyVal == gtk.keysyms.Down:
 						self._keyboardFocusChild.cursorDown()
-		return False
+					return True
+			return True
+		else:
+			return False
 
 
+	def _o_handleDocumentKeyRelease(self, event):
+		if event.keyVal in [ gtk.keysyms.Left, gtk.keysyms.Right, gtk.keysyms.Up, gtk.keysyms.Down, gtk.keysyms.Home, gtk.keysyms.End ]:
+			return True
+		else:
+			return False
 
 
 

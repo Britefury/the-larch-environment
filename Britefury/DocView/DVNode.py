@@ -60,7 +60,8 @@ class DVNode (Sheet, DTWidgetKeyHandlerInterface):
 		pass
 
 
-	behaviors = [ DVBMovementBehavior(), DVBDeleteNodeBehavior() ]
+	#behaviors = [ DVBMovementBehavior(), DVBDeleteNodeBehavior() ]
+	behaviors = []
 
 
 

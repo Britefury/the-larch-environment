@@ -69,6 +69,9 @@ def _compileGMeta(name, xs):
 	for name in globalNames:
 		_py_setGlobal = PyVar( name ).assign_sideEffects( PyVar( '__gsym__globals__' ).methodCall( 'get', PyLiteralValue( name ) ) ).debug( xs )
 		py_prefix.append( _py_setGlobal )
+		
+	for component in _components:
+		py_prefix.extend( component.getPrefixTrees() )
 	
 	return compileGLispExprToPyFunction( gMetaModuleName, gMetaFunctionName, [ '__gsym__globals__' ], xs, _compileSpecial, lcls, py_prefix )
 

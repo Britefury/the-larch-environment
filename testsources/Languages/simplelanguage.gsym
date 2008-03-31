@@ -35,6 +35,14 @@
 									(:alignment (@DTBox . ALIGN_EXPAND))
 								)
 							)
+							
+							(@loadLocalInteractor
+								($interactor
+									( ($key "+")
+										(@log <- "#'PLUS")
+									)
+								)
+							)
 						)
 						($lambda (@node)
 							($match @node
@@ -43,7 +51,7 @@
 								( (mul (: @x ^) (: @y ^))   (  ($activeBorder ($hbox ($list ($viewEval @x) ($label "#'*") ($viewEval @y))))  ) )
 								( (div (: @x ^) (: @y ^))   (  ($activeBorder ($vbox ($list ($viewEval @x) ($hline) ($viewEval @y)) @divBoxStyle))  ) )
 								( (pow (: @x ^) (: @y ^))   (  ($activeBorder ($scriptRSuper ($viewEval @x)($viewEval @y)))  )  )
-								( (loadLocal (: @x !))   (  ($activeBorder ($entry @x))  ) )
+								( (loadLocal (: @x !))   (  ($interact ($activeBorder ($label @x)) @loadLocalInteractor)  )  )
 							)
 						)
 					)

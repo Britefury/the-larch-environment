@@ -187,6 +187,9 @@ def pyt_compare(x, y):
 	
 	
 
+
+
+
 #
 #
 #
@@ -235,6 +238,19 @@ class PyNode (object):
 	
 	
 	
+
+class PyKWParam (PyNode):
+	def __init__(self, name, value):
+		assert isinstance( name, str )
+		assert _isPyIdentifier( name )
+		self.name = name
+		self.value = value
+
+	def _o_compareWith(self, x):
+		return self.name == x.name  and  pyt_compare( self.value, x.value )
+
+
+
 class PyStatement (PyNode):
 	@abstractmethod
 	def compileAsStmt(self):
@@ -356,13 +372,13 @@ class PyExpression (PyStatement):
 		
 		
 	# Call
-	def __call__(self, *args):
-		return PyCall( self, [ pyt_coerce( arg )   for arg in args ] )
+	def __call__(self, *params):
+		return PyCall( self, [ self._p_coerceCallParam( p )   for p in params ] )
 	
 	
 	# Method call
-	def methodCall(self, methodName, *args):
-		return PyMethodCall( self, methodName, [ pyt_coerce( arg )   for arg in args ] )
+	def methodCall(self, methodName, *params):
+		return PyMethodCall( self, methodName, [ self._p_coerceCallParam( p )   for p in params ] )
 	
 	
 	def isinstance_(self, typ):
@@ -390,6 +406,13 @@ class PyExpression (PyStatement):
 	
 	def assignToVar_sideEffects(self, varName):
 		return PyAssign_SideEffects( PyVar( varName ), self )
+	
+	
+	def _p_coerceCallParam(self, p):
+		if isinstance( p, PyKWParam ):
+			return PyKWParam( p.name, pyt_coerce( p.value ) )
+		else:
+			return pyt_coerce( p )
 
 	
 
@@ -685,12 +708,23 @@ class PyBinOp (PyExpression):
 	
 	
 	
+
+def _checkCallParamList(params):
+	bKeywordParam = False
+	for p in params:
+		if isinstance( p, PyKWParam ):
+			assert isinstance( p.value, PyExpression )
+			bKeywordParam = True
+		else:
+			assert isinstance( p, PyExpression )
+			assert not bKeywordParam
+	
+
 class PyCall (PyExpression):
 	def __init__(self, a, params, dbgSrc=None):
 		super( PyCall, self ).__init__( dbgSrc )
 		assert isinstance( a, PyExpression )
-		for p in params:
-			assert isinstance( p, PyExpression )
+		_checkCallParamList( params )
 		self.a = a
 		self.params = params
 		
@@ -698,23 +732,29 @@ class PyCall (PyExpression):
 		if len( self.params ) == 0:
 			return '%s()'  %  ( self.a.compileAsExpr( _callPrecedence, _LEFT ), )
 		else:
-			return '%s( %s )'  %  ( self.a.compileAsExpr( _callPrecedence, _LEFT ), ', '.join( [ p.compileAsExpr()   for p in self.params ] ) )
+			return '%s( %s )'  %  ( self.a.compileAsExpr( _callPrecedence, _LEFT ), ', '.join( [ self._p_compileParam( p )   for p in self.params ] ) )
 		
 	def _o_compareWith(self, x):
 		return pyt_compare( self.a, x.a )  and  pyt_compare( self.params, x.params )
-
+	
 	def getChildren(self):
 		return [ self.a ]  +  self.params
 	
+	def _p_compileParam(self, p):
+		if isinstance( p, PyKWParam ):
+			return '%s=%s'  %  ( p.name, p.value.compileAsExpr() )
+		else:
+			return p.compileAsExpr()
+
 	
 
 class PyMethodCall (PyExpression):
 	def __init__(self, a, methodName, params, dbgSrc=None):
 		super( PyMethodCall, self ).__init__( dbgSrc )
 		assert isinstance( a, PyExpression )
-		for p in params:
-			assert isinstance( p, PyExpression ), '%s: %s'  %  ( methodName, p )
+		_checkCallParamList( params )
 		if not _isPyIdentifier( methodName ):
+			print methodName
 			self.error( PyInvalidMethodNameError, methodName )
 		self.a = a
 		self.methodName = methodName
@@ -724,7 +764,7 @@ class PyMethodCall (PyExpression):
 		if len( self.params ) == 0:
 			return '%s.%s()'  %  ( self.a.compileAsExpr( _methodCallPrecedence, _LEFT ), self.methodName )
 		else:
-			return '%s.%s( %s )'  %  ( self.a.compileAsExpr( _methodCallPrecedence, _LEFT ), self.methodName, ', '.join( [ p.compileAsExpr()   for p in self.params ] ) )
+			return '%s.%s( %s )'  %  ( self.a.compileAsExpr( _methodCallPrecedence, _LEFT ), self.methodName, ', '.join( [ self._p_compileParam( p )   for p in self.params ] ) )
 	
 	def _o_getPrecedence(self):
 		return _methodCallPrecedence
@@ -734,6 +774,12 @@ class PyMethodCall (PyExpression):
 
 	def getChildren(self):
 		return [ self.a ]  +  self.params
+
+	def _p_compileParam(self, p):
+		if isinstance( p, PyKWParam ):
+			return '%s=%s'  %  ( p.name, p.value.compileAsExpr() )
+		else:
+			return p.compileAsExpr()
 
 	
 	
@@ -753,6 +799,23 @@ class PyIsInstance (PyExpression):
 
 	def getChildren(self):
 		return [ self.value, self.typ ]
+	
+	
+	
+class PyMultilineSrc (PyStatement):
+	def __init__(self, srcText, dbgSrc=None):
+		self.srcLines = srcText.split( '\n' )
+		if len( srcText ) > 0:
+			if srcText[-1] == '\n'  and  self.srcLines[-1] == '':
+				del self.srcLines[-1]
+		
+	def compileAsStmt(self):
+		return self.srcLines
+	
+	def _o_compareWith(self, x):
+		return self.srcLines == x.srcLines
+	
+	
 	
 	
 
@@ -1132,9 +1195,6 @@ class TestCase_PyCodeGen_Node_check (unittest.TestCase):
 		for op in _binaryOperatorPrecedenceTable.keys():
 			PyBinOp( PySrc( 'a' ), op, PySrc( 'b' ) )
 
-	def test_PyMethodCall(self):
-		self.assertRaises( PyInvalidMethodNameError, lambda: PyMethodCall( PySrc( 'a' ), '$', [ PySrc( 'b' ), PySrc( 'c' ) ] ) )
-
 	def test_PyIf(self):
 		self.assertRaises( AssertionError, lambda: PyIf( 1 ) )
 		self.assertRaises( AssertionError, lambda: PyIf( [],  ) )
@@ -1148,10 +1208,30 @@ class TestCase_PyCodeGen_Node_check (unittest.TestCase):
 	def test_PyDef(self):
 		self.assertRaises( PyInvalidFunctionNameError, lambda: PyDef( 'a.b', [], [] ) )
 		self.assertRaises( PyInvalidArgNameError, lambda: PyDef( 'a', [ 'b.c' ], [] ) )
+		
+	def test_PyKWParam(self):
+		self.assertRaises( AssertionError, lambda: PyKWParam( None, PyVar( 'a' ) ) )
+		self.assertRaises( AssertionError, lambda: PyKWParam( ':', PyVar( 'a' ) ) )
+		
+	def test_PyCall(self):
+		self.assertRaises( AssertionError, lambda: PyCall( PyVar( 'a' ), [ None ] ) )
+		self.assertRaises( AssertionError, lambda: PyCall( PyVar( 'a' ), [ PyKWParam( 'b', None ) ] ) )
+		self.assertRaises( AssertionError, lambda: PyCall( PyVar( 'a' ), [ PyKWParam( 'b', PyLiteralValue( 1 ) ), PyLiteralValue( 2 ) ] ) )
+
+	def test_PyMethodCall(self):
+		self.assertRaises( PyInvalidMethodNameError, lambda: PyMethodCall( PySrc( 'a' ), '$', [ PySrc( 'b' ), PySrc( 'c' ) ] ) )
+		self.assertRaises( AssertionError, lambda: PyMethodCall( PyVar( 'a' ), 'm', [ None ] ) )
+		self.assertRaises( AssertionError, lambda: PyMethodCall( PyVar( 'a' ), 'm', [ PyKWParam( 'b', None ) ] ) )
+		self.assertRaises( AssertionError, lambda: PyMethodCall( PyVar( 'a' ), 'm', [ PyKWParam( 'b', PyLiteralValue( 1 ) ), PyLiteralValue( 2 ) ] ) )
 
 
 		
 class TestCase_PyCodeGen_Node_cmp (unittest.TestCase):
+	def test_PyKWParam(self):
+		self.assert_( pyt_compare( PyKWParam( 'a', PyVar( 'x' ) ),  PyKWParam( 'a', PyVar( 'x' ) ) ) )
+		self.assert_( not pyt_compare( PyKWParam( 'a', PyVar( 'x' ) ),  PyKWParam( 'b', PyVar( 'x' ) ) ) )
+		self.assert_( not pyt_compare( PyKWParam( 'a', PyVar( 'x' ) ),  PyKWParam( 'a', PyVar( 'y' ) ) ) )
+	
 	def test_PySrc(self):
 		self.assert_( pyt_compare( PySrc( 'a' ),  PySrc( 'a' ) ) )
 		self.assert_( not pyt_compare( PySrc( 'a' ),  PySrc( 'b' ) ) )
@@ -1252,6 +1332,20 @@ class TestCase_PyCodeGen_Node_cmp (unittest.TestCase):
 		self.assert_( not pyt_compare( PyIsInstance( PySrc( 'a' ), PySrc( 'b' ) ),   PyIsInstance( PySrc( 'c' ), PySrc( 'b' ) ) ) )
 		self.assert_( not pyt_compare( PyIsInstance( PySrc( 'a' ), PySrc( 'b' ) ),   PyIsInstance( PySrc( 'a' ), PySrc( 'c' ) ) ) )
 
+	def test_PyMultilineSrc(self):
+		src1 = """
+		a
+		b
+		c
+		"""
+		src2 = """
+		d
+		e
+		f
+		"""
+		self.assert_( pyt_compare( PyMultilineSrc( src1 ),  PyMultilineSrc( src1 ) ) )
+		self.assert_( not pyt_compare( PyMultilineSrc( src1 ),  PyMultilineSrc( src2 ) ) )
+		
 	def test_PyReturn(self):
 		self.assert_( pyt_compare( PyReturn( PySrc( '1' ) ),  PyReturn( PySrc( '1' ) ) ) )
 		self.assert_( not pyt_compare( PyReturn( PySrc( '1' ) ),  PyReturn( PySrc( '2' ) ) ) )
@@ -1332,15 +1426,21 @@ class TestCase_PyCodeGen_Node_compile (unittest.TestCase):
 		self.assert_( PyCall( PySrc( 'a' ), [] ).compileAsExpr()  ==  'a()' )
 		self.assert_( PyCall( PySrc( 'a' ), [ PySrc( 'b' ), PySrc( 'c' ) ] ).compileAsExpr()  ==  'a( b, c )' )
 		self.assert_( PyCall( PySrc( 'a' ), [ PySrc( 'b' ), PySrc( 'c' ), PySrc( 'd' ) ] ).compileAsExpr()  ==  'a( b, c, d )' )
+		self.assert_( PyCall( PySrc( 'a' ), [ PySrc( 'b' ), PyKWParam( 'x', PySrc( 'c' ) ) ] ).compileAsExpr()  ==  'a( b, x=c )' )
 
 	def test_PyMethodCall(self):
 		self.assert_( PyMethodCall( PySrc( 'a' ), 'b', [] ).compileAsExpr()  ==  'a.b()' )
 		self.assert_( PyMethodCall( PySrc( 'a' ), 'b', [ PySrc( 'c' ), PySrc( 'd' ) ] ).compileAsExpr()  ==  'a.b( c, d )' )
 		self.assert_( PyMethodCall( PySrc( 'a' ), 'b', [ PySrc( 'c' ), PySrc( 'd' ), PySrc( 'e' ) ] ).compileAsExpr()  ==  'a.b( c, d, e )' )
+		self.assert_( PyMethodCall( PySrc( 'a' ), 'b', [ PySrc( 'b' ), PyKWParam( 'x', PySrc( 'c' ) ) ] ).compileAsExpr()  ==  'a.b( b, x=c )' )
 		
 	def test_PyIsInstance(self):
 		self.assert_( PyIsInstance( PySrc( 'a' ), PySrc( 'b' ) ).compileAsExpr()  ==  'isinstance( a, b )' )
-
+		
+	def test_PyMultilineSrc(self):
+		src1 = "a()\nb()\nreturn 1\n"
+		self.assert_( PyMultilineSrc( src1 ).compileAsStmt()  ==  [ 'a()', 'b()', 'return 1' ] )
+		
 	def test_PyReturn(self):
 		self.assert_( PyReturn( PySrc( '1' ) ).compileAsStmt()  ==  [ 'return 1' ] )
 
@@ -1567,10 +1667,12 @@ class TestCase_PyCodeGen_build (unittest.TestCase):
 	
 	def test_call(self):
 		self._compileExprTest( PyVar( 'x' )(1,2,3),   'x( 1, 2, 3 )' )
+		self._compileExprTest( PyVar( 'x' )(1,2,3,PyKWParam('a',12)),   'x( 1, 2, 3, a=12 )' )
 		
 		
 	def test_methodCall(self):
 		self._compileExprTest( PyVar( 'x' ).methodCall( 'x', 1,2,3),   'x.x( 1, 2, 3 )' )
+		self._compileExprTest( PyVar( 'x' ).methodCall( 'x', 1,2,3,PyKWParam('a',12)),   'x.x( 1, 2, 3, a=12 )' )
 		
 		
 	def test_isinstance(self):

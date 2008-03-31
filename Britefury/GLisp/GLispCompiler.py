@@ -5,8 +5,8 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
-from Britefury.GLisp.GLispUtil import isGLispList, stripGLispComments, gLispSrcToString
-from Britefury.GLisp.PyCodeGen import PyCodeGenError, PyVar, PyLiteral, PyLiteralValue, PyListLiteral, PyDictLiteral, PyListComprehension, PyGetAttr, PyGetItem, PyGetSlice, PyUnOp, PyBinOp, PyCall, PyMethodCall, PyReturn, PyIf, PyDef, PyAssign_SideEffects, PyDel_SideEffects
+from Britefury.GLisp.GLispUtil import isGLispList, isGLispString, stripGLispComments, gLispSrcToString
+from Britefury.GLisp.PyCodeGen import PyCodeGenError, PyKWParam, PyVar, PyLiteral, PyLiteralValue, PyListLiteral, PyDictLiteral, PyListComprehension, PyGetAttr, PyGetItem, PyGetSlice, PyUnOp, PyBinOp, PyCall, PyMethodCall, PyReturn, PyIf, PyDef, PyAssign_SideEffects, PyDel_SideEffects
 import Britefury.GLisp.PatternMatch
 
 
@@ -630,6 +630,20 @@ def _compileModule(xs, context, bNeedResult=False, compileSpecial=None):
 
 
 
+def compileGLispCallParamToPyTree(xs, context, compileSpecial):
+	"""
+	Compile a call parameter to a PyNode tree; handles keyword parameters
+	
+	(:name <value>)    results in a keyword parameter
+	anything else is intrepreted as a value
+	"""
+	if isGLispList( xs ):
+		if len( xs ) == 2:
+			if isGLispString( xs[0] ):
+				if xs[0][0] == ':':
+					return PyKWParam( xs[0][1:], _compileGLispExprToPyTree( xs[1], context, True, compileSpecial ) )
+	return _compileGLispExprToPyTree( xs, context, True, compileSpecial )
+
 
 class GLispCompilerSyntaxError (PyCodeGenError):
 	pass
@@ -727,9 +741,9 @@ def _compileGLispExprToPyTree(xs, context, bNeedResult=False, compileSpecial=Non
 			elif method in PyBinOp.operators   and   len(xs) == 3:
 				return PyBinOp( _compileGLispExprToPyTree( xs[0], context, True, compileSpecial ), xs[1], _compileGLispExprToPyTree( xs[2], context, True, compileSpecial ), dbgSrc=xs )
 			elif method == '<-':
-				return PyCall( _compileGLispExprToPyTree( xs[0], context, True, compileSpecial ), [ _compileGLispExprToPyTree( e, context, True, compileSpecial )   for e in xs[2:] ], dbgSrc=xs )
+				return PyCall( _compileGLispExprToPyTree( xs[0], context, True, compileSpecial ), [ compileGLispCallParamToPyTree( e, context, compileSpecial )   for e in xs[2:] ], dbgSrc=xs )
 			else:
-				return PyMethodCall( _compileGLispExprToPyTree( xs[0], context, True, compileSpecial ), xs[1], [ _compileGLispExprToPyTree( e, context, True, compileSpecial )   for e in xs[2:] ], dbgSrc=xs )
+				return PyMethodCall( _compileGLispExprToPyTree( xs[0], context, True, compileSpecial ), xs[1], [ compileGLispCallParamToPyTree( e, context, compileSpecial )   for e in xs[2:] ], dbgSrc=xs )
 	raise GLispCompilerSyntaxError( xs )
 
 
@@ -975,11 +989,13 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 			return x + 3
 		self._compileTest( '(@a <-)', 'a()' )
 		self._compileTest( '(@a <- @b @c)', 'a( b, c )' )
+		self._compileTest( '(@a <- @b (:x @c))', 'a( b, x=c )' )
 		self._evalTest( '(@f <- #5)', 8, [ ( 'f', _f ) ] )
 
 	def testMethodCall(self):
 		self._compileTest( '(@a foo)', 'a.foo()' )
 		self._compileTest( '(@a foo @b @c)', 'a.foo( b, c )' )
+		self._compileTest( '(@a foo @b (:x @c))', 'a.foo( b, x=c )' )
 		self._evalTest( "(\"#'f\" upper)", 'F' )
 
 
