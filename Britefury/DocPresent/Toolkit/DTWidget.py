@@ -639,7 +639,7 @@ class DTWidget (object):
 		return False
 
 	def getCursorPosition(self):
-		return Point2( self.widget.getAllocation() * 0.5 )
+		return Point2( self.getAllocation() * 0.5 )
 	
 	
 	
@@ -716,7 +716,7 @@ class DTWidget (object):
 	def cursorUp(self):
 		above = self.getFocusLeafAbove()
 		if above is not None:
-			cursorPosInAbove = self.getPointRelativeTo( widget, self.getCursorPosition() )
+			cursorPosInAbove = self.getPointRelativeTo( above, self.getCursorPosition() )
 			# Must finish editing first, or we get problems with events invoking one another through the presentation system
 			self.finishEditing()
 			above.startEditingAtPosition( cursorPosInAbove )
@@ -724,7 +724,7 @@ class DTWidget (object):
 	def cursorDown(self):
 		below = self.getFocusLeafBelow()
 		if below is not None:
-			cursorPosInBelow = self.getPointRelativeTo( widget, self.getCursorPosition() )
+			cursorPosInBelow = self.getPointRelativeTo( below, self.getCursorPosition() )
 			# Must finish editing first, or we get problems with events invoking one another through the presentation system
 			self.finishEditing()
 			below.startEditingAtPosition( cursorPosInBelow )
@@ -834,7 +834,8 @@ class DTWidget (object):
 
 	def getFocusLeafAboveOrBelow(self, bBelow):
 		if self._parent is not None:
-			return self._parent._p_getFocusLeafAboveOrBelowFromChild( self, bBelow, self.getCursorPosition() )
+			localCursorPos = self.getCursorPosition()
+			return self._parent._p_getFocusLeafAboveOrBelowFromChild( self, bBelow, self.getPointRelativeToAncestor( self._parent, localCursorPos ) )
 		else:
 			return None
 
@@ -845,8 +846,8 @@ class DTWidget (object):
 			searchList = self._p_nextNavListItems( navList, child )
 		else:
 			searchList = reversed( self._p_prevNavListItems( navList, child ) )
+		cursorPosInDocSpace = self.getPointRelativeToDocument( localCursorPos )
 		for item in searchList:
-			cursorPosInDocSpace = getPointRelativeToDocument( localCursorPos )
 			l = item._p_getTopOrBottomFocusLeaf( not bBelow, cursorPosInDocSpace )
 			if l is not None:
 				return l

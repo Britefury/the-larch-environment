@@ -25,6 +25,10 @@ class GMetaComponent (object):
 		return []
 	
 	
+	def getPrefixTrees(self):
+		return []
+	
+	
 	
 	
 	

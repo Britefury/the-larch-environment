@@ -14,12 +14,23 @@ class InteractorEvent (object):
 
 
 class InteractorEventKey (InteractorEvent):
-	def __init__(self, keyValue, mods):
+	def __init__(self, keyString, keyValue, mods):
 		super( InteractorEventKey, self ).__init__()
+		self.keyString = keyString
 		self.keyValue = keyValue
 		self.mods = mods
+		
+
+	@staticmethod
+	def fromDTKeyEvent(widget, event):
+		return InteractorEventKey( event.keyString, event.keyVal, event.state )
+
+	
+	def __repr__(self):
+		return 'KEY: %s, %d-%d'  %  ( self.keyString, self.keyValue, self.mods )
 	
 		
+	
 class InteractorEventTokenList (InteractorEvent):
 	class Token (object):
 		def __init__(self, tokenClass, value):

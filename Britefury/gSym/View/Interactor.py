@@ -10,7 +10,7 @@ import gtk
 
 from Britefury.Kernel.Abstract import abstractmethod
 
-from Britefury.GLisp.GLispUtil import isGLispList
+from Britefury.GLisp.GLispUtil import isGLispList, stripGLispComments
 from Britefury.GLisp.GLispCompiler import GLispCompilerInvalidFormType, GLispCompilerVariableNameMustStartWithAt, GLispCompilerCouldNotCompileSpecial, compileExpressionListToPyTreeStatements
 from Britefury.GLisp.PyCodeGen import pyt_compare, pyt_coerce, PyCodeGenError, PyVar, PyLiteral, PyLiteralValue, PyListLiteral, PyListComprehension, PyGetAttr, PyGetItem, PyGetSlice, PyUnOp, PyBinOp, PyCall, PyMethodCall, PyIsInstance, PyReturn, PyRaise, PyTry, PyIf, PySimpleIf, PyDef, PyAssign_SideEffects, PyDel_SideEffects
 
@@ -24,10 +24,13 @@ from Britefury.gSym.View.InteractorEvent import InteractorEvent, InteractorEvent
 class InvalidKeySpecification (PyCodeGenError):
 	pass
 
-class InvalidKeySymbol (PyCodeGenError):
+class InvalidAccelSpecification (PyCodeGenError):
 	pass
 
-class InvalidKeyModifier (PyCodeGenError):
+class InvalidAccelKeySymbol (PyCodeGenError):
+	pass
+
+class InvalidAccelKeyModifier (PyCodeGenError):
 	pass
 
 class InvalidTokenSpecifier (PyCodeGenError):
@@ -66,6 +69,37 @@ class _EventSpec (object):
 
 
 class _KeyEventSpec (_EventSpec):
+	def __init__(self, xs):
+		"""
+		( $key <key_string>)
+		"""
+		super( _KeyEventSpec, self ).__init__( xs )
+		assert isGLispList( xs )
+		
+		if len( xs ) != 2:
+			raise InvalidKeySpecification( xs )
+		
+		self.keyString = xs[1]
+		
+		
+	def compileToPyTreeFactory(self, py_eventExpr, outerTreeFactory, bindings):
+		treeFac = outerTreeFactory
+
+		# Check the event type
+		treeFac = self._p_conditionWrap( treeFac, py_eventExpr.isinstance_( PyVar( '__gsym__InteractorEventKey__' ) ) )
+		
+		# Check the key value and modifiers
+		treeFac = self._p_conditionWrap( treeFac, ( py_eventExpr.attr( 'keyString' )  ==  self.keyString ) )
+		
+		return treeFac
+	
+	def compileResultEvent(self, py_eventExpr):
+		return pyt_coerce( None )
+		
+
+		
+		
+class _AccelEventSpec (_EventSpec):
 	_modTable = { 'control' : gtk.gdk.CONTROL_MASK, 
 		      'ctrl' : gtk.gdk.CONTROL_MASK, 
 		      'shift' : gtk.gdk.SHIFT_MASK, 
@@ -74,18 +108,25 @@ class _KeyEventSpec (_EventSpec):
 	
 	def __init__(self, xs):
 		"""
-		( $key <key_value> <mods...> )
+		( $accel <key_value> <mods...> )
 		"""
-		super( _KeyEventSpec, self ).__init__( xs )
+		super( _AccelEventSpec, self ).__init__( xs )
 		assert isGLispList( xs )
 		
 		if len( xs ) < 2:
-			raise InvalidKeySpecification( xs )
+			raise InvalidAccelSpecification( xs )
 		
 		try:
 			self.keyValue = getattr( gtk.keysyms, xs[1] )
 		except AttributeError:
-			raise InvalidKeySymbol( xs )
+			raise InvalidAccelKeySymbol( xs )
+		
+		mods = []
+		for mod in xs[2:]:
+			try:
+				mods.append( self._modTable[mod] )
+			except KeyError:
+				raise InvalidAccelModSymbol( xs )
 		
 		mods = [ self._modTable.get( mod )   for mod in xs[2:] ]
 		mods = [ mod   for mod in mods   if mod is not None ]
@@ -96,7 +137,7 @@ class _KeyEventSpec (_EventSpec):
 		treeFac = outerTreeFactory
 
 		# Check the event type
-		treeFac = self._p_conditionWrap( treeFac, py_eventExpr.isinstance_( PyVar( '_InteractorEventKey' ) ) )
+		treeFac = self._p_conditionWrap( treeFac, py_eventExpr.isinstance_( PyVar( '__gsym__InteractorEventKey__' ) ) )
 		
 		# Check the key value and modifiers
 		treeFac = self._p_conditionWrap( treeFac, ( py_eventExpr.attr( 'keyValue' )  ==  self.keyValue ).and_( py_eventExpr.attr( 'mods' )  ==  self.mods ) )
@@ -150,7 +191,7 @@ class _TokenListEventSpec (_EventSpec):
 		treeFac = outerTreeFactory
 		
 		# Check the event type
-		treeFac = self._p_conditionWrap( treeFac, py_eventExpr.isinstance_( PyVar( '_InteractorEventTokenList' ) ) )
+		treeFac = self._p_conditionWrap( treeFac, py_eventExpr.isinstance_( PyVar( '__gsym__InteractorEventTokenList__' ) ) )
 		
 		# Check the event size
 		treeFac = self._p_conditionWrap( treeFac, py_eventExpr.attr( 'tokens' ).len_()  >=  len( self.tokenSpecs ) )
@@ -197,6 +238,8 @@ def _compileInteractorMatch(srcXs, context, bNeedResult, compileSpecial, compile
 	
 	if eventSpecXs[0] == '$key':
 		spec = _KeyEventSpec( eventSpecXs )
+	elif eventSpecXs[0] == '$accel':
+		spec = _AccelEventSpec( eventSpecXs )
 	elif eventSpecXs[0] == '$tokens':
 		spec = _TokenListEventSpec( eventSpecXs )
 	else:
@@ -246,7 +289,9 @@ def compileInteractor(srcXs, context, bNeedResult, compileSpecial, compileGLispE
 	#
 	# event_spec:
 	# key:
-	#    ( $key <key_value> <mods...> )    - key event
+	#    ( $key <key_string>)    - key event
+	# keyAccel:
+	#    ( $accel <key_value> <mods...> )    - acccelerator event
 	# tokens:
 	#    ( $tokens <token_specs...> )     - token list; consumes the tokens specified in the list
 	#
@@ -261,9 +306,9 @@ def compileInteractor(srcXs, context, bNeedResult, compileSpecial, compileGLispE
 	eventName = context.temps.allocateTempName( 'interactor_event' )
 	
 	py_interactor = []
-
 	
-	for xs in srcXs[1:]:
+
+	for xs in stripGLispComments( srcXs[1:] ):
 		py_match = _compileInteractorMatch( xs, context, bNeedResult, compileSpecial, compileGLispExprToPyTree, PyVar( eventName ).debug( srcXs ) )
 		py_interactor.extend( py_match )
 		
@@ -273,7 +318,7 @@ def compileInteractor(srcXs, context, bNeedResult, compileSpecial, compileGLispE
 	
 
 	interactorFactoryFnName = context.temps.allocateTempName( 'interactor_factoryFn' )
-	py_interactorFactoryFn = PyDef( interactorFactoryFnName, [], [ py_interactorOnEventFn, PyVar( '_Interactor' )( PyVar( onEventFnName ) ).return_().debug( srcXs ) ] ).debug( srcXs )
+	py_interactorFactoryFn = PyDef( interactorFactoryFnName, [], [ py_interactorOnEventFn, PyVar( '__gsym__Interactor__' )( PyVar( onEventFnName ) ).return_().debug( srcXs ) ] ).debug( srcXs )
 	
 	context.body.append( py_interactorFactoryFn )
 	
@@ -301,9 +346,10 @@ class GMetaComponentInteractor (GMetaComponent):
 
 	def getConstants(self):
 		return {
-			'_InteractorEventKey' : InteractorEventKey,
-			'_InteractorEventTokenList' : InteractorEventTokenList,
-			'_Interactor' : Interactor
+			'__gsym__InteractorEventKey__' : InteractorEventKey,
+			'__gsym__InteractorEventTokenList__' : InteractorEventTokenList,
+			'__gsym__Interactor__' : Interactor,
+			'NoEventMatch' : NoEventMatch,
 			}
 	
 	
@@ -352,7 +398,26 @@ class TestCase_Interactor (unittest.TestCase):
 
 			
 	def test_KeyEventSpec(self):
-		spec = _KeyEventSpec( readSX( '($key a ctrl shift)' ) )
+		spec = _KeyEventSpec( readSX( '($key a)' ) )
+		
+		self.assert_( spec.keyString == 'a' )
+		
+		bindings = {}
+		
+		
+		pysrc1 = [
+			"if isinstance( event, __gsym__InteractorEventKey__ ):",
+			"  if event.keyString == 'a':",
+			"    pass",
+		]
+		
+		self._compilePyTreeFactoryTest( spec.compileToPyTreeFactory( PyVar( 'event' ), lambda innerTrees: innerTrees, bindings ), pysrc1 )
+		
+		self.assert_( bindings == {} )
+
+
+	def test_AccelEventSpec(self):
+		spec = _AccelEventSpec( readSX( '($accel a ctrl shift)' ) )
 		
 		self.assert_( spec.keyValue == gtk.keysyms.a )
 		self.assert_( spec.mods == gtk.gdk.CONTROL_MASK | gtk.gdk.SHIFT_MASK )
@@ -361,7 +426,7 @@ class TestCase_Interactor (unittest.TestCase):
 		
 		
 		pysrc1 = [
-			'if isinstance( event, _InteractorEventKey ):',
+			'if isinstance( event, __gsym__InteractorEventAccel__ ):',
 			'  if event.keyValue == %d and event.mods == %d:'  %  ( spec.keyValue, spec.mods ),
 			'    pass',
 		]
@@ -409,7 +474,7 @@ class TestCase_Interactor (unittest.TestCase):
 		bindings = {}
 		
 		pysrc1 = [
-			"if isinstance( event, _InteractorEventTokenList ):",
+			"if isinstance( event, __gsym__InteractorEventTokenList__ ):",
 			"  if len( event.tokens ) >= 3:",
 			"    if event.tokens[0].tokenClass == 'identifier':",
 			"      if event.tokens[1].tokenClass == 'literal':",
@@ -423,7 +488,11 @@ class TestCase_Interactor (unittest.TestCase):
 	def test_compileInteractor(self):
 		xssrc1 = """
 		($interactor
-		  ( ($key a ctrl shift)
+		  ( ($key +)
+		    (@i j @k)
+		  )
+		  
+		  ( ($accel a ctrl shift)
 		    (@x y @z)
 		  )
 		  
@@ -436,22 +505,28 @@ class TestCase_Interactor (unittest.TestCase):
 		pysrc1 = [
 			"def __gsym__interactor_factoryFn_0():",
 			"  def __gsym__interactor_onEventFn_0(__gsym__interactor_event_0):",
-			"    if isinstance( __gsym__interactor_event_0, _InteractorEventKey ):",
-			"      if __gsym__interactor_event_0.keyValue == 97 and __gsym__interactor_event_0.mods == 5:",
+			"    if isinstance( __gsym__interactor_event_0, __gsym__InteractorEventKey__ ):",
+			"      if __gsym__interactor_event_0.keyString == '+':",
 			"        def __gsym__interactor_fn_0():",
-			"          return x.y( z )",
+			"          return i.j( k )",
 			"        __gsym__interactor_fn_0()",
 			"        return None",
-			"    if isinstance( __gsym__interactor_event_0, _InteractorEventTokenList ):",
+			"    if isinstance( __gsym__interactor_event_0, __gsym__InteractorEventAccel__ ):",
+			"      if __gsym__interactor_event_0.keyValue == 97 and __gsym__interactor_event_0.mods == 5:",
+			"        def __gsym__interactor_fn_1():",
+			"          return x.y( z )",
+			"        __gsym__interactor_fn_1()",
+			"        return None",
+			"    if isinstance( __gsym__interactor_event_0, __gsym__InteractorEventTokenList__ ):",
 			"      if len( __gsym__interactor_event_0.tokens ) >= 2:",
 			"        if __gsym__interactor_event_0.tokens[0].tokenClass == 'identifier':",
 			"          if __gsym__interactor_event_0.tokens[1].tokenClass == 'literal':",
-			"            def __gsym__interactor_fn_1(x, y):",
+			"            def __gsym__interactor_fn_2(x, y):",
 			"              return a.b( c )",
-			"            __gsym__interactor_fn_1( __gsym__interactor_event_0.tokens[0].value, __gsym__interactor_event_0.tokens[1].value )",
+			"            __gsym__interactor_fn_2( __gsym__interactor_event_0.tokens[0].value, __gsym__interactor_event_0.tokens[1].value )",
 			"            return __gsym__interactor_event_0.tailEvent( 2 )",
 			"    raise NoEventMatch",
-			"  return _Interactor( __gsym__interactor_onEventFn_0 )",
+			"  return __gsym__Interactor__( __gsym__interactor_onEventFn_0 )",
 			"__gsym__interactor_factoryFn_0()",
 		]
 

@@ -445,7 +445,7 @@ class DTBox (DTContainerSequence):
 			return [ e.child   for e in reversed( self._childEntries ) ]
 
 	def verticalNavigationList(self):
-		if elf._direction == DTDirection.TOP_TO_BOTTOM:
+		if self._direction == DTDirection.TOP_TO_BOTTOM:
 			return [ e.child   for e in self._childEntries ]
 		elif self._direction == DTDirection.BOTTOM_TO_TOP:
 			return [ e.child   for e in reversed( self._childEntries ) ]
