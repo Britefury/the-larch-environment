@@ -53,7 +53,7 @@ class _GtkPresentationArea (gtk.DrawingArea):
 		if bHandled:
 			return True
 		else:
-			return super( _GtkPresentationArea, self ).do_key_press_event( event )
+			return gtk.DrawingArea.do_key_press_event( self, event )
 		
 	def do_key_release_event(self, event):
 		bHandled = self._presentationArea.do_key_release_event( event )

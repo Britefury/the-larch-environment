@@ -31,6 +31,9 @@ class DTLabel (DTSimpleStaticWidget):
 
 	def __init__(self, text='', markup=None, font=None, colour=Colour3f( 0.0, 0.0, 0.0), hAlign=HALIGN_CENTRE, vAlign=VALIGN_CENTRE):
 		super( DTLabel, self ).__init__()
+		
+		assert text is None  or  isinstance( text, str )  or  isinstance( text, unicode )
+		assert markup is None  or  isinstance( markup, str )  or  isinstance( markup, unicode )
 
 		if font is None:
 			font = 'Sans 11'
@@ -55,6 +58,7 @@ class DTLabel (DTSimpleStaticWidget):
 
 
 	def setText(self, text):
+		assert text is None  or  isinstance( text, str )  or  isinstance( text, unicode )
 		self._text = text
 		self._markup = None
 		self._bLayoutNeedsRefresh = True
@@ -65,6 +69,7 @@ class DTLabel (DTSimpleStaticWidget):
 
 
 	def setMarkup(self, markup):
+		assert markup is None  or  isinstance( markup, str )  or  isinstance( markup, unicode )
 		self._markup = markup
 		self._text = markup
 		self._bLayoutNeedsRefresh = True

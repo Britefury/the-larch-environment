@@ -45,7 +45,9 @@ TODOS:
 since this widget is passed straight through to the node above/outside
 
 
-	
+HANDLE/CORRECT THE FOLLOWING ERRORS IN THE VIEW:
+if the view function directly returns the result of a $viewEval; a DTWidget is expected, a DVNode causes a crash
+
 	
 	
 
