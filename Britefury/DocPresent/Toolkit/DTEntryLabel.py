@@ -26,8 +26,8 @@ class DTEntryLabel (DTBin):
 
 
 	class _Label (DTLabel):
-		def __init__(self, entryLabel, text, markup=None, font=None, colour=Colour3f( 0.0, 0.0, 0.0 )):
-			super( DTEntryLabel._Label, self ).__init__( text, markup, font, colour )
+		def __init__(self, entryLabel, text, bUseMarkup=None, font=None, colour=Colour3f( 0.0, 0.0, 0.0 )):
+			super( DTEntryLabel._Label, self ).__init__( text, bUseMarkup, font, colour )
 			self._entryLabel = entryLabel
 
 
@@ -70,8 +70,8 @@ class DTEntryLabel (DTBin):
 	
 	
 	class _Entry (DTEntry):
-		def __init__(self, entryLabel, text, font=None, borderWidth=2.0, backgroundColour=Colour3f( 0.9, 0.95, 0.9 ), highlightedBackgroundColour=Colour3f( 0.0, 0.0, 0.5 ), textColour=Colour3f( 0.0, 0.0, 0.0 ), highlightedTextColour=Colour3f( 1.0, 1.0, 1.0 ), borderColour=Colour3f( 0.6, 0.8, 0.6 ), regexp=None):
-			super( DTEntryLabel._Entry, self ).__init__( text, font, borderWidth, backgroundColour, highlightedBackgroundColour, textColour, highlightedTextColour, borderColour, regexp=regexp )
+		def __init__(self, entryLabel, text, font=None, borderWidth=2.0, backgroundColour=Colour3f( 0.9, 0.95, 0.9 ), highlightedBackgroundColour=Colour3f( 0.0, 0.0, 0.5 ), textColour=Colour3f( 0.0, 0.0, 0.0 ), highlightedTextColour=Colour3f( 1.0, 1.0, 1.0 ), borderColour=Colour3f( 0.6, 0.8, 0.6 )):
+			super( DTEntryLabel._Entry, self ).__init__( text, font, borderWidth, backgroundColour, highlightedBackgroundColour, textColour, highlightedTextColour, borderColour )
 			self._entryLabel = entryLabel
 
 		def _o_onLoseFocus(self):
@@ -83,17 +83,18 @@ class DTEntryLabel (DTBin):
 
 
 
-	def __init__(self, text='', labelFilter=None, bLabelMarkup=False, font=None, textColour=Colour3f( 0.0, 0.0, 0.0 ), regexp=None):
+	def __init__(self, labelText='', entryText=None, bLabelUseMarkup=False, font=None, textColour=Colour3f( 0.0, 0.0, 0.0 )):
 		super( DTEntryLabel, self ).__init__()
 
-		self._text = text
+		self._labelText = labelText
+		self._entryText = entryText
+		
+		self._bLabelUseMarkup = bLabelUseMarkup
 
-		self._labelFilter = labelFilter
-		self._bLabelMarkup = bLabelMarkup
-
-		self._label = self._Label( self, text, None, font, textColour )
-		self._p_refreshLabel()
-		self._entry = self._Entry( self, text, font, textColour=textColour, regexp=regexp )
+		self._label = self._Label( self, labelText, bLabelUseMarkup, font, textColour )
+		if entryText is None:
+			entryText = labelText
+		self._entry = self._Entry( self, entryText, font )
 		self._entry.textInsertedSignal.connect( self._p_onEntryTextInserted )
 		self._entry.textDeletedSignal.connect( self._p_onEntryTextDeleted )
 		self._entry.returnSignal.connect( self._p_onEntryReturn )
@@ -104,13 +105,39 @@ class DTEntryLabel (DTBin):
 
 
 
-	def getText(self):
-		return self._text
+	def getLabelText(self):
+		return self._labelText
 
-	def setText(self, text):
-		self._text = text
-		self._p_refreshLabel()
-		self._entry.text = text
+	def setLabelText(self, text):
+		self._labelText = text
+		self._label.text = tex
+		if self._entryText is None:
+			self._entry.text = text
+
+
+	def getEntryText(self):
+		return self._entryText
+
+	def setEntryText(self, text):
+		self._entryText = text
+		if text is None:
+			self._entry.text = self._labelText
+		else:
+			self._entry.text = text
+		
+		
+	def getText(self):
+		if self._entryText is None:
+			return self._labelText
+		else:
+			return self._entryText
+
+
+	def getLabelUseMarkup(self):
+		return self._label.getUseMarkup()
+	
+	def setLabelUseMarkup(self, bUseMarkup):
+		self._label.setUseMarkup( bUseMarkup )
 
 
 
@@ -135,7 +162,7 @@ class DTEntryLabel (DTBin):
 		if self.getChild() is not self._entry:
 			self.setChild( self._entry )
 			self._entry.startEditing()
-			self.startEditingSignal.emit( self, self.text )
+			self.startEditingSignal.emit( self, self._entryText )
 
 	def startEditingOnLeft(self):
 		self.startEditing()
@@ -163,7 +190,10 @@ class DTEntryLabel (DTBin):
 			self._o_emitFinishEditing( bUserEvent )
 
 	def _o_emitFinishEditing(self, bUserEvent):
-		self.finishEditingSignal.emit( self, self.text, bUserEvent )
+		if self._entryText is None:
+			self.finishEditingSignal.emit( self, self._labelText, bUserEvent )
+		else:
+			self.finishEditingSignal.emit( self, self._entryText, bUserEvent )
 
 
 
@@ -196,33 +226,32 @@ class DTEntryLabel (DTBin):
 
 
 
-	def _p_refreshLabel(self):
-		labelText = self._text
-		if self._labelFilter is not None:
-			labelText = self._labelFilter( labelText )
-
-		if self._bLabelMarkup:
-			self._label.markup = labelText
-		else:
-			self._label.text = labelText
-
-
-
 	def _p_onLabelClicked(self, localPos):
 		self.startEditing()
 		index = self._label.getCursorIndexAt( localPos )
+		if self._entryText is not None:
+			proportion = float( index )  /  float( len( self._labelText ) )
+			index = int( float( len( self._entryText ) )  *  proportion  +  0.5 )
 		self._entry.setCursorIndex( index )
 
 
 	def _p_onEntryTextInserted(self, entry, position, bAppended, textInserted):
-		self._text = self._entry.text
+		text = self._entry.text
 		self._o_emitTextInserted( position, bAppended, textInserted )
-		self._p_refreshLabel()
+		if self._entryText is None:
+			self._labelText = text
+			self._label.text = text
+		else:
+			self._entryText = text
 
 	def _p_onEntryTextDeleted(self, entry, start, end, textDeleted):
-		self._text = self._entry.text
+		text = self._entry.text
 		self._o_emitTextDeleted( start, end, textDeleted )
-		self._p_refreshLabel()
+		if self._entryText is None:
+			self._labelText = text
+			self._label.text = text
+		else:
+			self._entryText = text
 
 	def _o_emitTextInserted(self, position, bAppended, textInserted):
 		self.textInsertedSignal.emit( self, position, bAppended, textInserted )
@@ -276,7 +305,10 @@ class DTEntryLabel (DTBin):
 		
 		
 
-	text = property( getText, setText )
+	labelText = property( getLabelText, setLabelText )
+	entryText = property( getEntryText, setEntryText )
+	text = property( getText )
+	bLabelUseMarkup = property( getLabelUseMarkup, setLabelUseMarkup )
 	font = property( getFont, setFont )
 	textColour = property( getTextColour, setTextColour )
 
@@ -297,7 +329,9 @@ if __name__ == '__main__':
 	import gtk
 	import cairo
 
+	from Britefury.DocPresent.Toolkit.DTDirection import DTDirection
 	from Britefury.DocPresent.Toolkit.DTDocument import DTDocument
+	from Britefury.DocPresent.Toolkit.DTBox import DTBox
 	from Britefury.Math.Math import Colour3f
 	import traceback
 
@@ -321,15 +355,24 @@ if __name__ == '__main__':
 	window.set_size_request( 300, 100 )
 
 	doc = DTDocument()
-	doc.show()
+	doc.getGtkWidget().show()
+	
+	box = DTBox( direction=DTDirection.TOP_TO_BOTTOM, spacing=10.0 )
 
-	entry = DTEntryLabel( 'Hello world' )
-	doc.child = entry
-	entry.textInsertedSignal.connect( onInserted )
-	entry.textDeletedSignal.connect( onDeleted )
+	entry1 = DTEntryLabel( 'Hello world' )
+	box.append( entry1 )
+	entry1.textInsertedSignal.connect( onInserted )
+	entry1.textDeletedSignal.connect( onDeleted )
+
+	entry2 = DTEntryLabel( 'Hello world', 'Hi there' )
+	box.append( entry2 )
+	entry2.textInsertedSignal.connect( onInserted )
+	entry2.textDeletedSignal.connect( onDeleted )
+
+	doc.child = box
 
 
-	window.add( doc )
+	window.add( doc.getGtkWidget() )
 	window.show()
 
 	gtk.main()

@@ -44,11 +44,39 @@
 								)
 							)
 							
-							(@loadLocalInteractor
+							(@identifierInitChars
+								((@string . letters)  +  "#'_")
+							)
+							
+							(@identifierBodyChars
+								(@identifierInitChars  +  (@string . digits))
+							)
+							
+							(@tokeniser
+								($tokeniser
+									(identifier ($tokWord @identifierInitChars @identifierBodyChars))
+									(plus ($tokLiteral "#'+"))
+								)
+							)
+							
+							(@exprInteractor
 								($lambda (@node)
 									($interactor
 										( ($key "+")
 											($replace @node ($! (add ($< @node) (undefinedExpr))))
+										)
+										( ($tokens plus)
+											($replace @node ($! (add ($< @node) (undefinedExpr))))
+										)
+									)
+								)
+							)
+
+							(@loadlLocalInteractor
+								($lambda (@node)
+									($interactor
+										( ($tokens (: @name identifier))
+											($replace @node ($! (loadLocal ($< @name))))
 										)
 									)
 								)
@@ -61,7 +89,7 @@
 								( (mul (: @x ^) (: @y ^))   (  ($activeBorder ($hbox ($list ($viewEval @x) ($label "#'*") ($viewEval @y))))  ) )
 								( (div (: @x ^) (: @y ^))   (  ($activeBorder ($vbox ($list ($viewEval @x) ($hline) ($viewEval @y)) @divBoxStyle))  ) )
 								( (pow (: @x ^) (: @y ^))   (  ($activeBorder ($scriptRSuper ($viewEval @x)($viewEval @y)))  )  )
-								( (loadLocal (: @x !))   (  ($interact ($activeBorder ($label @x)) (@loadLocalInteractor <- @node))  )  )
+								( (loadLocal (: @x !))   (  ($interact ($activeBorder ($entry @x @x @tokeniser)) (@loadlLocalInteractor <- @node) (@exprInteractor <- @node))  )  )
 								( (undefinedExpr)   (  ($activeBorder ($label "#'<expr>" @undefinedStyle))  )  )
 							)
 						)

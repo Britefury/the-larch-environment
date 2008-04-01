@@ -29,10 +29,10 @@ class DTEntryDropDown (DTPopupDocument):
 	cancelSignal = ClassSignal()
 
 
-	def __init__(self, entryText='', bShowLabel=False, labelText='', labelMarkup=None, labelFont=None):
+	def __init__(self, entryText='', bShowLabel=False, labelText='', bLabelUseMarkup=None, labelFont=None):
 		super( DTEntryDropDown, self ).__init__( False )
 
-		self.label = DTLabel( text=labelText, markup=labelMarkup, font=labelFont, hAlign=DTLabel.HALIGN_LEFT )
+		self.label = DTLabel( text=labelText, bUseMarkup=bLabelUseMarkup, font=labelFont, hAlign=DTLabel.HALIGN_LEFT )
 		self.entry = DTEntry( text=entryText )
 		self.entry.returnSignal.connect( self._p_onEntryReturn )
 

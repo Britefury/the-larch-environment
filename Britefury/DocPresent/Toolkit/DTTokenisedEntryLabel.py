@@ -24,8 +24,8 @@ class DTTokenisedEntryLabel (DTEntryLabel):
 
 
 
-	def __init__(self, tokeniser, text='', labelFilter=None, bLabelMarkup=False, font=None, textColour=Colour3f( 0.0, 0.0, 0.0 )):
-		super( DTTokenisedEntryLabel, self ).__init__( text, labelFilter, bLabelMarkup, font, textColour )
+	def __init__(self, tokeniser, labelText='', entryText=None, bLabelUseMarkup=False, font=None, textColour=Colour3f( 0.0, 0.0, 0.0 )):
+		super( DTTokenisedEntryLabel, self ).__init__( labelText, entryText, bLabelUseMarkup, font, textColour )
 
 		self._tokeniser = tokeniser
 
@@ -62,23 +62,26 @@ if __name__ == '__main__':
 	import cairo
 
 	from Britefury.DocPresent.Toolkit.DTDocument import DTDocument
-	from Britefury.DocView.DocViewTokeniser import DocViewTokeniser, DocViewTokenDefinition
+	from Britefury.gSym.View.Tokeniser import TokenDefinition, Tokeniser
 	from Britefury.Math.Math import Colour3f
 	import traceback
 	import string
 	import pyparsing
 
-	word = DocViewTokenDefinition( 'word', pyparsing.Word( pyparsing.alphas ) )
-	whitespace = DocViewTokenDefinition( 'whitespace', pyparsing.Word( string.whitespace ) )
-	dot = DocViewTokenDefinition( 'dot', pyparsing.Literal( '.' ) )
+	word = TokenDefinition( 'word', pyparsing.Word( pyparsing.alphas ) )
+	whitespace = TokenDefinition( 'whitespace', pyparsing.Word( string.whitespace ) )
+	dot = TokenDefinition( 'dot', pyparsing.Literal( '.' ) )
 
-	tokeniser = DocViewTokeniser( [ word, whitespace, dot ] )
+	tokeniser = Tokeniser( [ word, whitespace, dot ] )
 
 	def onDeleteEvent(widget, event, data=None):
 		return False
 
 	def onDestroy(widget, data=None):
 		gtk.main_quit()
+
+	def onFinish(entry, text, parseResult, bUserEvent):
+		print 'FINISHED: ', text, parseResult
 
 	def onModified(entry, text, parseResult):
 		print 'MODIFIED: ', text, parseResult
@@ -91,14 +94,15 @@ if __name__ == '__main__':
 	window.set_size_request( 300, 100 )
 
 	doc = DTDocument()
-	doc.show()
+	doc.getGtkWidget().show()
 
 	entry = DTTokenisedEntryLabel( tokeniser, 'Hello world' )
 	doc.child = entry
+	entry.finishEditingSignal.connect( onFinish )
 	entry.textModifiedSignal.connect( onModified )
 
 
-	window.add( doc )
+	window.add( doc.getGtkWidget() )
 	window.show()
 
 	gtk.main()

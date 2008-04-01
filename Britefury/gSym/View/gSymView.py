@@ -11,12 +11,12 @@ from Britefury.Math.Math import Colour3f
 
 from Britefury.Cell.Cell import Cell
 
-from Britefury.DocPresent.Toolkit.DTWidget import DTWidget, DTWidgetKeyHandlerInterface
+from Britefury.DocPresent.Toolkit.DTWidget import DTWidget
 from Britefury.DocPresent.Toolkit.DTActiveBorder import DTActiveBorder
 from Britefury.DocPresent.Toolkit.DTBin import DTBin 
 from Britefury.DocPresent.Toolkit.DTBorder import DTBorder
 from Britefury.DocPresent.Toolkit.DTBox import DTBox
-from Britefury.DocPresent.Toolkit.DTEntryLabel import DTEntryLabel
+from Britefury.DocPresent.Toolkit.DTTokenisedEntryLabel import DTTokenisedEntryLabel
 from Britefury.DocPresent.Toolkit.DTHLine import DTHLine
 from Britefury.DocPresent.Toolkit.DTLabel import DTLabel
 from Britefury.DocPresent.Toolkit.DTScript import DTScript
@@ -35,7 +35,7 @@ from Britefury.GLisp.PyCodeGen import filterIdentifierForPy, pyt_coerce, PyCodeG
 from Britefury.gSym.gMeta.GMetaComponent import GMetaComponent
 from Britefury.gSym.gSymStyleSheet import GSymStyleSheet
 from Britefury.gSym.View.Interactor import Interactor, NoEventMatch
-from Britefury.gSym.View.InteractorEvent import InteractorEventKey
+from Britefury.gSym.View.InteractorEvent import InteractorEventKey, InteractorEventTokenList
 
 from Britefury.gSym.RelativeNode import RelativeNode, relative
 
@@ -176,17 +176,14 @@ def _sendDocEventToWidget(widget, event):
 		return True
 
 
-class _GSymViewKeyHandler (DTWidgetKeyHandlerInterface):
-	def _f_handleKeyPress(self, widget, keyPressEvent):
-		event = InteractorEventKey.fromDTKeyEvent( widget, keyPressEvent )
-		return _sendDocEventToWidget( widget, event )
+def _handleKeyPress(widget, keyPressEvent):
+	event = InteractorEventKey.fromDTKeyEvent( widget, True, keyPressEvent )
+	return _sendDocEventToWidget( widget, event )
 			
 	
-_keyHandler = _GSymViewKeyHandler()
-
 
 def _runtime_setKeyHandler(viewNodeInstance, widget):
-	widget.keyHandler = _keyHandler
+	widget.keyHandler = _handleKeyPress
 
 
 def _runtime_activeBorder(viewNodeInstance, child, styleSheets=None):
@@ -246,12 +243,57 @@ def _runtime_label(viewNodeInstance, text, styleSheets=None):
 	_runtime_applyStyleSheets( styleSheets, widget )
 	return widget
 
-def _runtime_entry(viewNodeInstance, text, styleSheets=None):
-	"""Builds a DTEntryLabel widget"""
+def _runtime_markupLabel(viewNodeInstance, text, styleSheets=None):
+	"""
+	Runtime - called by compiled code at run-time
+	Builds a markup DTLabel widget
+	"""
 	if isinstance( text, RelativeNode ):
 		text = text.node
-	widget = DTEntryLabel( text )
-	_runtime_setKeyHandler( viewNodeInstance, widget )
+	widget = DTLabel( text )
+	widget.bUseMarkup = True
+	_runtime_applyStyleSheetStack( viewNodeInstance, widget )
+	_runtime_applyStyleSheets( styleSheets, widget )
+	return widget
+
+
+
+def _sendTokenListDocEvent(widget, tokens):
+	event = InteractorEventTokenList( True, tokens )
+	return _sendDocEventToWidget( widget, event )
+
+def _onEntryModifed(widget, text, tokens):
+	if len( tokens ) > 1:
+		_sendTokenListDocEvent( widget, tokens )
+
+def _onEntryFinished(widget, text, tokens, bUserEvent):
+	if bUserEvent:
+		_sendTokenListDocEvent( widget, tokens )
+
+
+def _runtime_entry(viewNodeInstance, labelText, entryText, tokeniser, styleSheets=None):
+	"""Builds a DTEntryLabel widget"""
+	if isinstance( labelText, RelativeNode ):
+		labelText = labelText.node
+	if isinstance( entryText, RelativeNode ):
+		entryText = entryText.node
+	widget = DTTokenisedEntryLabel( tokeniser, labelText, entryText )
+	widget.textModifiedSignal.connect( _onEntryModifed )
+	widget.finishEditingSignal.connect( _onEntryFinished )
+	_runtime_applyStyleSheetStack( viewNodeInstance, widget )
+	_runtime_applyStyleSheets( styleSheets, widget )
+	return widget
+
+def _runtime_markupEntry(viewNodeInstance, labelText, entryText, tokeniser, styleSheets=None):
+	"""Builds a DTEntryLabel widget"""
+	if isinstance( labelText, RelativeNode ):
+		labelText = labelText.node
+	if isinstance( entryText, RelativeNode ):
+		entryText = entryText.node
+	widget = DTTokenisedEntryLabel( tokeniser, labelText, entryText )
+	widget.textModifiedSignal.connect( _onEntryModifed )
+	widget.finishEditingSignal.connect( _onEntryFinished )
+	widget.bLabelUseMarkup = True
 	_runtime_applyStyleSheetStack( viewNodeInstance, widget )
 	_runtime_applyStyleSheets( styleSheets, widget )
 	return widget
@@ -530,17 +572,17 @@ class GMetaComponentView (GMetaComponent):
 			# View function
 			if len( srcXs ) == 3:
 				params.append( compileSubExp( srcXs[2] ) )
-			return PyCall( PyVar( '__gsym__buildView__', dbgSrc=srcXs ), params, dbgSrc=srcXs )
+			return PyCall( PyVar( '__gsym__buildView__' ).debug( srcXs ), params, dbgSrc=srcXs )
 		elif name == '$mapViewEval':
 			# ($mapViewEval <document-subtree> ?<node-view-function>)
 			if len( srcXs ) < 2:
 				raiseCompilerError( GLispParameterListError, src, 'defineView: $mapViewEval needs at least 1 parameter; the document subtree' )
-			params = [ PyVar( '__view_node_instance_stack__' )[-1].debug( srcXs ), PyVar( 'x', dbgSrc=srcXs ) ]
+			params = [ PyVar( '__view_node_instance_stack__' )[-1].debug( srcXs ), PyVar( 'x' ).debug( srcXs ) ]
 			# View function
 			if len( srcXs ) == 3:
 				params.append( compileSubExp( srcXs[2] ) )
-			itemExpr = PyCall( PyVar( '__gsym__buildView__', dbgSrc=srcXs ), params, dbgSrc=srcXs )
-			return PyListComprehension( itemExpr, 'x', compileSubExp( srcXs[1] ), None, dbgSrc=srcXs )
+			itemExpr = PyCall( PyVar( '__gsym__buildView__' ), params ).debug( srcXs )
+			return PyListComprehension( itemExpr, 'x', compileSubExp( srcXs[1] ), None ).debug( srcXs )
 		elif name == '$style':
 			#($style <settings_pairs>)
 			#settings pair: (:key <value>)
@@ -574,83 +616,93 @@ class GMetaComponentView (GMetaComponent):
 			else:
 				return None
 		elif name == '$activeBorder':
-			#($activeBorder <child> [<styleSheet>] [<interact>])
+			#($activeBorder <child> [<styleSheet>])
 			if len( srcXs ) < 2:
 				raiseCompilerError( GLispParameterListError, src, 'defineView: $activeBorder needs at least 1 parameters; the child content' )
 			return PyVar( '__gsym__activeBorder__' )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[1] ), *compileWidgetParams( srcXs[2:]) ).debug( srcXs )
 		elif name == '$border':
-			#($border <child> [<styleSheet>] [<interact>])
+			#($border <child> [<styleSheet>])
 			if len( srcXs ) < 2:
 				raiseCompilerError( GLispParameterListError, src, 'defineView: $border needs at least 1 parameters; the child content' )
 			return PyVar( '__gsym__border__' )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[1] ), *compileWidgetParams( srcXs[2:]) ).debug( srcXs )
 		elif name == '$indent':
-			#($indent <indentation> <child> [<styleSheet>] [<interact>])
+			#($indent <indentation> <child> [<styleSheet>])
 			if len( srcXs ) < 3:
 				raiseCompilerError( GLispParameterListError, src, 'defineView: $border needs at least 2 parameters; the indentation and the child content' )
 			return PyVar( '__gsym__indent__' )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[2] ), compileSubExp( srcXs[1] ), *compileWidgetParams( srcXs[3:]) ).debug( srcXs )
 		elif name == '$hline':
-			#($hline [<styleSheet>] [<interact>])
-			return PyVar( '__gsym__hline__', dbgSrc=srcXs )( PyVar( '__view_node_instance_stack__' )[-1].debug( srcXs ), *compileWidgetParams( srcXs[1:]) ).debug( srcXs )
+			#($hline [<styleSheet>])
+			return PyVar( '__gsym__hline__', dbgSrc=srcXs )( PyVar( '__view_node_instance_stack__' )[-1], *compileWidgetParams( srcXs[1:]) ).debug( srcXs )
 		elif name == '$label':
-			#($label text [<styleSheet>] [<interact>])
+			#($label text [<styleSheet>])
 			if len( srcXs ) < 2:
 				raiseCompilerError( GLispParameterListError, src, 'defineView: $label needs at least 1 parameter; the text' )
-			return PyVar( '__gsym__label__', dbgSrc=srcXs )( PyVar( '__view_node_instance_stack__' )[-1].debug( srcXs ), compileSubExp( srcXs[1] ), *compileWidgetParams( srcXs[2:]) ).debug( srcXs )
-		elif name == '$entry':
-			#($entry text [<styleSheet>] [<interact>])
+			return PyVar( '__gsym__label__', dbgSrc=srcXs )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[1] ), *compileWidgetParams( srcXs[2:]) ).debug( srcXs )
+		elif name == '$markupLabel':
+			#($markupLabel text [<styleSheet>])
 			if len( srcXs ) < 2:
-				raiseCompilerError( GLispParameterListError, src, 'defineView: $entry needs at least 1 parameter; the text' )
-			return PyVar( '__gsym__entry__', dbgSrc=srcXs )( PyVar( '__view_node_instance_stack__' )[-1].debug( srcXs ), compileSubExp( srcXs[1] ), *compileWidgetParams( srcXs[2:]) ).debug( srcXs )
+				raiseCompilerError( GLispParameterListError, src, 'defineView: $label needs at least 1 parameter; the text' )
+			return PyVar( '__gsym__markupLabel__', dbgSrc=srcXs )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[1] ), *compileWidgetParams( srcXs[2:]) ).debug( srcXs )
+		elif name == '$entry':
+			#($entry <label_text> <entry_text> <tokeniser> [<styleSheet>])
+			if len( srcXs ) < 2:
+				raiseCompilerError( GLispParameterListError, src, 'defineView: $entry needs at least 3 parameters; the label text, the entry text, and the tokeniser' )
+			return PyVar( '__gsym__entry__', dbgSrc=srcXs )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[1] ), compileSubExp( srcXs[2] ), compileSubExp( srcXs[3] ), *compileWidgetParams( srcXs[4:]) ).debug( srcXs )
+		elif name == '$markupEntry':
+			#($markupEntry <label_text> <entry_text> <tokeniser> [<styleSheet>])
+			if len( srcXs ) < 2:
+				raiseCompilerError( GLispParameterListError, src, 'defineView: $markupEntry needs at least 3 parameters; the label text, the entry text, and the tokeniser' )
+			return PyVar( '__gsym__markupEntry__', dbgSrc=srcXs )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[1] ), compileSubExp( srcXs[2] ), compileSubExp( srcXs[3] ), *compileWidgetParams( srcXs[4:]) ).debug( srcXs )
 		elif name == '$hbox':
-			#($hbox (child*) [<styleSheet>] [<interact>])
+			#($hbox (child*) [<styleSheet>])
 			if len( srcXs ) < 2:
 				raiseCompilerError( GLispParameterListError, src, 'defineView: $hbox needs at least 1 parameter; the children' )
-			return PyVar( '__gsym__hbox__', dbgSrc=srcXs )( PyVar( '__view_node_instance_stack__' )[-1].debug( srcXs ), compileSubExp( srcXs[1] ), *compileWidgetParams( srcXs[2:]) ).debug( srcXs )
+			return PyVar( '__gsym__hbox__', dbgSrc=srcXs )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[1] ), *compileWidgetParams( srcXs[2:]) ).debug( srcXs )
 		elif name == '$ahbox':
-			#($ahbox (child*) [<styleSheet>] [<interact>])
+			#($ahbox (child*) [<styleSheet>])
 			if len( srcXs ) < 2:
 				raiseCompilerError( GLispParameterListError, src, 'defineView: $ahbox needs at least 1 parameter; the children' )
-			return PyVar( '__gsym__ahbox__', dbgSrc=srcXs )( PyVar( '__view_node_instance_stack__' )[-1].debug( srcXs ), compileSubExp( srcXs[1] ), *compileWidgetParams( srcXs[2:]) ).debug( srcXs )
+			return PyVar( '__gsym__ahbox__', dbgSrc=srcXs )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[1] ), *compileWidgetParams( srcXs[2:]) ).debug( srcXs )
 		elif name == '$vbox':
-			#($vbox (child*) [<styleSheet>] [<interact>])
+			#($vbox (child*) [<styleSheet>])
 			if len( srcXs ) < 2:
 				raiseCompilerError( GLispParameterListError, src, 'defineView: $vbox needs at least 1 parameter; the children' )
-			return PyVar( '__gsym__vbox__', dbgSrc=srcXs )( PyVar( '__view_node_instance_stack__' )[-1].debug( srcXs ), compileSubExp( srcXs[1] ), *compileWidgetParams( srcXs[2:]) ).debug( srcXs )
+			return PyVar( '__gsym__vbox__', dbgSrc=srcXs )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[1] ), *compileWidgetParams( srcXs[2:]) ).debug( srcXs )
 		elif name == '$script':
-			#($script <mainChild> <leftSuperChild> <leftSubChild> <rightSuperChild> <rightSubChild> [<styleSheet>] [<interact>])
+			#($script <mainChild> <leftSuperChild> <leftSubChild> <rightSuperChild> <rightSubChild> [<styleSheet>])
 			if len( srcXs ) < 6:
 				raiseCompilerError( GLispParameterListError, src, 'defineView: $script needs at least 5 parameters; the main, left-super, left-sub, right-super, and right-sub children' )
 			return PyVar( '__gsym__script__' )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[1] ), compileSubExp( srcXs[2] ), compileSubExp( srcXs[3] ), compileSubExp( srcXs[4] ), compileSubExp( srcXs[5] ),
 						   *compileWidgetParams( srcXs[6:]) ).debug( srcXs )
 		elif name == '$scriptLSuper':
-			#($scriptLSuper <mainChild> <scriptChild> [<styleSheet>] [<interact>])
+			#($scriptLSuper <mainChild> <scriptChild> [<styleSheet>])
 			if len( srcXs ) < 3:
 				raiseCompilerError( GLispParameterListError, src, 'defineView: $scriptLSuper needs at least 2 parameters; the main child, and the script child' )
 			return PyVar( '__gsym__script__' )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[1] ), compileSubExp( srcXs[2] ), None, None, None,
 						   *compileWidgetParams( srcXs[3:]) ).debug( srcXs )
 		elif name == '$scriptLSub':
-			#($scriptLSub <mainChild> <scriptChild> [<styleSheet>] [<interact>])
+			#($scriptLSub <mainChild> <scriptChild> [<styleSheet>])
 			if len( srcXs ) < 3:
 				raiseCompilerError( GLispParameterListError, src, 'defineView: $scriptLSub needs at least 2 parameters; the main child, and the script child' )
 			return PyVar( '__gsym__script__' )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[1] ), None, compileSubExp( srcXs[2] ), None, None,
 						   *compileWidgetParams( srcXs[3:]) ).debug( srcXs )
 		elif name == '$scriptRSuper':
-			#($scriptRSuper <mainChild> <scriptChild> [<styleSheet>] [<interact>])
+			#($scriptRSuper <mainChild> <scriptChild> [<styleSheet>])
 			if len( srcXs ) < 3:
 				raiseCompilerError( GLispParameterListError, src, 'defineView: $scriptRSuper needs at least 2 parameters; the main child, and the script child' )
 			return PyVar( '__gsym__script__' )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[1] ), None, None, compileSubExp( srcXs[2] ), None,
 						   *compileWidgetParams( srcXs[3:]) ).debug( srcXs )
 		elif name == '$scriptRSub':
-			#($scriptRSub <mainChild> <scriptChild> [<styleSheet>] [<interact>])
+			#($scriptRSub <mainChild> <scriptChild> [<styleSheet>])
 			if len( srcXs ) < 3:
 				raiseCompilerError( GLispParameterListError, src, 'defineView: $scriptRSub needs at least 2 parameters; the main child, and the script child' )
 			return PyVar( '__gsym__script__' )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[1] ), None, None, None, compileSubExp( srcXs[2] ),
 						   *compileWidgetParams( srcXs[3:]) ).debug( srcXs )
 		elif name == '$interact':
-			#($interact <child> <interactors>)
+			#($interact <child> <interactors*>)
 			if len( srcXs ) < 3:
 				raiseCompilerError( GLispParameterListError, src, 'defineView: $interact needs at least 2 parameters; the child, and the interactor(s)' )
-			return PyVar( '__gsym__interact__' )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[1] ), compileSubExp( srcXs[2] ) ).debug( srcXs )
+			return PyVar( '__gsym__interact__' )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[1] ), PyListLiteral( [ compileSubExp( x )   for x in srcXs[2:] ] ) ).debug( srcXs )
 		else:
 			raise GLispCompilerCouldNotCompileSpecial( srcXs )
 
@@ -667,7 +719,9 @@ class GMetaComponentView (GMetaComponent):
 			'__gsym__indent__' : _runtime_indent,
 			'__gsym__hline__' : _runtime_hline,
 			'__gsym__label__' : _runtime_label,
+			'__gsym__markupLabel__' : _runtime_markupLabel,
 			'__gsym__entry__' : _runtime_entry,
+			'__gsym__markupEntry__' : _runtime_markupEntry,
 			'__gsym__hbox__' : _runtime_hbox,
 			'__gsym__ahbox__' : _runtime_ahbox,
 			'__gsym__vbox__' : _runtime_vbox,
@@ -679,7 +733,7 @@ class GMetaComponentView (GMetaComponent):
 			'__gsym__DTBorder__' : DTBorder,
 			'__gsym__DTHLine__' : DTHLine,
 			'__gsym__DTLabel__' : DTLabel,
-			'__gsym__DTEntryLabel__' : DTEntryLabel,
+			'__gsym__DTTokenisedEntryLabel__' : DTTokenisedEntryLabel,
 			'__gsym__DTBox__' : DTBox,
 			'__gsym__DTScript__' : DTScript,
 			'__gsym__runtime_setKeyHandler__' : _runtime_setKeyHandler,

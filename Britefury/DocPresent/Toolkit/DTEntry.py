@@ -38,7 +38,7 @@ class DTEntry (DTWidget):
 	textDeletedSignal = ClassSignal()				# ( entry, startIndex, endIndex, textDeleted )
 
 
-	def __init__(self, text='', font=None, borderWidth=2.0, backgroundColour=Colour3f( 0.9, 0.95, 0.9 ), highlightedBackgroundColour=Colour3f( 0.0, 0.0, 0.5 ), textColour=Colour3f( 0.0, 0.0, 0.0 ), highlightedTextColour=Colour3f( 1.0, 1.0, 1.0 ), borderColour=Colour3f( 0.6, 0.8, 0.6 ), autoCompleteList=None, regexp=None):
+	def __init__(self, text='', font=None, borderWidth=2.0, backgroundColour=Colour3f( 0.9, 0.95, 0.9 ), highlightedBackgroundColour=Colour3f( 0.0, 0.0, 0.5 ), textColour=Colour3f( 0.0, 0.0, 0.0 ), highlightedTextColour=Colour3f( 1.0, 1.0, 1.0 ), borderColour=Colour3f( 0.6, 0.8, 0.6 ), autoCompleteList=None):
 		super( DTEntry, self ).__init__()
 
 		if font is None:
@@ -86,11 +86,6 @@ class DTEntry (DTWidget):
 		self._endCursorEntity = DTCursorEntity( self )
 		self._p_rebuildCursorEntityList()
 		
-
-		if regexp is None:
-			self._regexp = None
-		else:
-			self._regexp = re.compile( regexp )
 
 		self._o_queueResize()
 
@@ -184,6 +179,7 @@ class DTEntry (DTWidget):
 		self._o_queueFullRedraw()
 
 	def setCursorIndex(self, index):
+		index = min( max( index, 0 ), len( self._text ) )
 		#if index < len( self._text ):
 			#self._cursor.location = DTCursorLocation( self._cursorEntities[index], DTCursorLocation.EDGE_LEADING )
 		#else:
@@ -426,19 +422,6 @@ class DTEntry (DTWidget):
 		return text[:cursorLoc] + replacement + text[cursorLoc:]
 
 
-	def _p_checkText(self, text):
-		if self._regexp is not None:
-			# Match to the regexp
-			if text == '':
-				return True
-			else:
-				match = self._regexp.match( text )
-				if match is not None:
-					return match.span( 0 )  ==  ( 0, len( text ) )
-				else:
-					return None
-
-
 
 	def _f_handleMotionKeyPress(self, event):
 		bHandled = False
@@ -481,92 +464,76 @@ class DTEntry (DTWidget):
 			self.ungrabFocus()
 			bHandled = True
 		elif event.keyVal == gtk.keysyms.BackSpace  and  self.bEditable:
-			bCanDelete = True
-			if self._regexp is not None:
-				text = self._p_computeTextAfterBackspace()
-				if not self._p_checkText( text ):
-					bCanDelete = False
-
-			if bCanDelete:
-				if self._selectionBounds is not None:
-					self._p_deleteSelection()
-					self._p_onTextModified()
-				elif self._cursorIndex > 0:
-					DTCursorEntity.remove( self._cursorEntities[self._cursorIndex-1], self._cursorEntities[self._cursorIndex-1] )
-					del self._cursorEntities[self._cursorIndex-1]
-					textDeleted = self._text[self._cursorIndex-1:self._cursorIndex]
-					self._text = self._text[:self._cursorIndex-1] + self._text[self._cursorIndex:]
-					self._cursorIndex -= 1
-					self.textDeletedSignal.emit( self, self._cursorIndex, self._cursorIndex+1, textDeleted )
-					self._p_onTextModified()
-				else:
-					# leave the entry
-					self.returnSignal.emit( self )
-					self.ungrabFocus()
+			if self._selectionBounds is not None:
+				self._p_deleteSelection()
+				self._p_onTextModified()
+			elif self._cursorIndex > 0:
+				DTCursorEntity.remove( self._cursorEntities[self._cursorIndex-1], self._cursorEntities[self._cursorIndex-1] )
+				del self._cursorEntities[self._cursorIndex-1]
+				textDeleted = self._text[self._cursorIndex-1:self._cursorIndex]
+				self._text = self._text[:self._cursorIndex-1] + self._text[self._cursorIndex:]
+				self._cursorIndex -= 1
+				self.textDeletedSignal.emit( self, self._cursorIndex, self._cursorIndex+1, textDeleted )
+				self._p_onTextModified()
+			else:
+				# leave the entry
+				self.returnSignal.emit( self )
+				self.ungrabFocus()
 			bHandled = True
 		elif event.keyVal == gtk.keysyms.Delete  and  self.bEditable:
-			bCanDelete = True
-			if self._regexp is not None:
-				text = self._p_computeTextAfterDelete()
-				if not self._p_checkText( text ):
-					bCanDelete = False
-
-			if bCanDelete:
-				text = self._text
-				if self._selectionBounds is not None:
-					self._p_deleteSelection()
-					self._p_onTextModified()
-				elif self._cursorIndex < len( self._text ):
-					DTCursorEntity.remove( self._cursorEntities[self._cursorIndex], self._cursorEntities[self._cursorIndex] )
-					del self._cursorEntities[self._cursorIndex]
-					textDeleted = self._text[self._cursorIndex:self._cursorIndex+1]
-					self._text = self._text[:self._cursorIndex] + self._text[self._cursorIndex+1:]
-					self.textDeletedSignal.emit( self, self._cursorIndex, self._cursorIndex+1, textDeleted )
-					self._p_onTextModified()
-				else:
-					# leave the entry
-					self.returnSignal.emit( self )
-					self.ungrabFocus()
+			text = self._text
+			if self._selectionBounds is not None:
+				self._p_deleteSelection()
+				self._p_onTextModified()
+			elif self._cursorIndex < len( self._text ):
+				DTCursorEntity.remove( self._cursorEntities[self._cursorIndex], self._cursorEntities[self._cursorIndex] )
+				del self._cursorEntities[self._cursorIndex]
+				textDeleted = self._text[self._cursorIndex:self._cursorIndex+1]
+				self._text = self._text[:self._cursorIndex] + self._text[self._cursorIndex+1:]
+				self.textDeletedSignal.emit( self, self._cursorIndex, self._cursorIndex+1, textDeleted )
+				self._p_onTextModified()
+			else:
+				# leave the entry
+				self.returnSignal.emit( self )
+				self.ungrabFocus()
 			bHandled = True
 		elif event.keyString != ''  and  ( modKeys == 0  or  modKeys == gtk.gdk.SHIFT_MASK )  and  self.bEditable:
-			bTextOk = True
+			if self._selectionBounds is not None:
+				self._p_deleteSelection()
+			position = self._cursorIndex
+			bAppended = position == len( self._text )
 
-			if self._regexp is not None:
-				text = self._p_computeTextAfterReplacingSelection( event.keyString )
-				bTextOk = self._p_checkText( text )
-
-			if bTextOk:
-				if self._selectionBounds is not None:
-					self._p_deleteSelection()
-				position = self._cursorIndex
-				bAppended = position == len( self._text )
-
-				keyStringCursorEntities = [ DTCursorEntity( self )   for character in event.keyString ]
-				DTCursorEntity.buildListLinks( keyStringCursorEntities )
-				
+			keyStringCursorEntities = [ DTCursorEntity( self )   for character in event.keyString ]
+			DTCursorEntity.buildListLinks( keyStringCursorEntities )
+			
+			if len( self._cursorEntities ) == 0:
+				prev = self.getPrevCursorEntity()
+				next = self.getNextCursorEntity()
+			else:
 				if self._cursorIndex > 0:
 					prev = self._cursorEntities[self._cursorIndex-1]
 				else:
 					prev = self._cursorEntities[0].prev
+
 				if self._cursorIndex < len( self._text ):
 					next = self._cursorEntities[self._cursorIndex]
 				else:
 					next = self._cursorEntities[-1].next
 
-				DTCursorEntity.splice( prev, next, keyStringCursorEntities[0], keyStringCursorEntities[-1] )
-				self._cursorEntities[self._cursorIndex:self._cursorIndex] = keyStringCursorEntities
-				
-				self._text = self._text[:self._cursorIndex] + event.keyString + self._text[self._cursorIndex:]
-				self._cursorIndex += len( event.keyString )
+			DTCursorEntity.splice( prev, next, keyStringCursorEntities[0], keyStringCursorEntities[-1] )
+			self._cursorEntities[self._cursorIndex:self._cursorIndex] = keyStringCursorEntities
+			
+			self._text = self._text[:self._cursorIndex] + event.keyString + self._text[self._cursorIndex:]
+			self._cursorIndex += len( event.keyString )
 
-				self.textInsertedSignal.emit( self, position, bAppended, event.keyString )
-				self._p_onTextModified()
-				bHandled = True
+			self.textInsertedSignal.emit( self, position, bAppended, event.keyString )
+			self._p_onTextModified()
+			bHandled = True
 
 		# Not handled; pass to the key handler, if there is one
 		if not bHandled:
 			if self.keyHandler is not None:
-				bHandled = self.keyHandler._f_handleKeyPress( self, event )
+				bHandled = self.keyHandler( self, event )
 
 
 	def _o_onKeyRelease(self, event):
