@@ -474,6 +474,9 @@
 															)
 														)
 													)
+
+													($# "Unknown")
+													( (: @x ^)  (@log <- (@gLispAsString <- @x)) ($activeBorder ($label "#'<error>" (@gMetaStyles . error)) (@gMetaStyles . error)) )
 												)
 											)
 										)
@@ -482,10 +485,20 @@
 											($lambda (@node)
 												($match @node
 													($# "Key")
-													( ($key (: @keyValue !) (: @mods *))
+													( ($key (: @keyString !))
 														($activeBorder
 															($hbox ($list
 																($label "#'key:" (@gMetaStyles . keyword))
+																($label @keyString)
+															))
+														)
+													)
+													
+													($# "Accelerator")
+													( ($accel (: @keyValue !) (: @mods *))
+														($activeBorder
+															($hbox ($list
+																($label "#'accel:" (@gMetaStyles . keyword))
 																($label (@keyValue + ("#'+" join @mods)))
 															))
 														)
@@ -502,6 +515,9 @@
 															))
 														)
 													)
+													
+													($# "Unknown")
+													( (: @x ^)  (@log <- (@gLispAsString <- @x)) ($activeBorder ($label "#'<error>" (@gMetaStyles . error)) (@gMetaStyles . error)) )
 												)
 											)
 										)
@@ -524,6 +540,9 @@
 															))
 														)
 													)
+													
+													($# "Unknown")
+													( (: @x ^)  (@log <- (@gLispAsString <- @x)) ($activeBorder ($label "#'<error>" (@gMetaStyles . error)) (@gMetaStyles . error)) )
 												)
 											)
 										)
@@ -538,6 +557,26 @@
 								)
 							)
 							
+							
+							($# "EDIT OPERATIONS")
+							($# "Replace")
+							( ($replace (: @x ^) (: @y ^))
+								($activeBorder
+									($vbox ($list
+										($label "#'replace" (@gMetaStyles . keyword))
+										($vbox ($list
+											($viewEval @x @viewForm)
+											($hbox ($list
+												($label "#'with:" (@gMetaStyles . keyword))
+												($viewEval @y @viewForm)
+											))
+										))
+									) (@gMetaStyles . titleVBox))
+									(@gMetaStyles . editOperationBackground)
+								)
+							)
+							
+
 							
 							($# "Unknown")
 							( (: @x ^)  (@log <- (@gLispAsString <- @x)) ($activeBorder ($label "#'<error>" (@gMetaStyles . error)) (@gMetaStyles . error)) )
@@ -639,6 +678,9 @@
 									))
 								)
 							)
+
+							($# "Unknown")
+							( (: @x ^)  (@log <- (@gLispAsString <- @x)) ($activeBorder ($label "#'<error>" (@gMetaStyles . error)) (@gMetaStyles . error)) )
 						)
 					)
 				)
@@ -704,7 +746,7 @@
 							( (: @listPattern /)
 								($activeBorder
 									($ahbox
-										((($list ($label "#'[")) + ($mapViewEval @listPattern @viewMatchPattern)) + ($list ($label "#']")))
+										((($list ($label "#'(")) + ($mapViewEval @listPattern @viewMatchPattern)) + ($list ($label "#')")))
 									)
 								)
 							)
@@ -731,6 +773,43 @@
 									))
 								)
 							)
+						)
+					)
+				)
+				
+				($# "View a quoted form")
+				(@viewQuotedForm
+					($lambda (@node)
+						($match @node
+							($# "String")
+							( (: @x !)
+								($activeBorder ($label @x))
+							)
+							
+							($# "Unquote")
+							( ($< (: @x ^))
+								($ahbox ($list ($viewEval @x @viewForm) ))
+							)
+
+							($# "List")
+							( (: @x /)
+								($activeBorder
+									($ahbox
+										(
+											(
+												($list ($label "#'(" (@gMetaStyles . keyword)))
+												+
+												($mapViewEval @x @viewQuotedForm)
+											)
+											+
+											($list ($label "#')" (@gMetaStyles . keyword)))
+										)
+									)
+								)
+							)
+
+							($# "Unknown")
+							( (: @x ^)  (@log <- (@gLispAsString <- @x)) ($activeBorder ($label "#'<error>" (@gMetaStyles . error)) (@gMetaStyles . error)) )
 						)
 					)
 				)
@@ -779,6 +858,17 @@
 									($ahbox
 										((($list ($label "#'SET" (@gMetaStyles . keyword)) ($label "#'("))  +  ($mapViewEval @elements @viewForm))  +  ($list ($label "#')")))
 									)
+								)
+							)
+
+							($# "Quote")
+							( ($!! (: @x ^))
+								($activeBorder
+									($ahbox ($list
+										($label "#'\"")
+										($viewEval @x @viewQuotedForm)
+										($label "#'\"")
+									))
 								)
 							)
 

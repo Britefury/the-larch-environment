@@ -19,6 +19,9 @@ _TEMP_PREFIX = '__gsym__'
 def raiseCompilerError(exceptionClass, src, reason):
 	raise exceptionClass, reason  +  '   ::   '  +  gLispSrcToString( src, 3 )
 
+def raiseRuntimeError(exceptionClass, src, reason):
+	raise exceptionClass, reason  +  '   ::   '  +  gLispSrcToString( src, 3 )
+
 
 
 def _log(x):
@@ -155,6 +158,43 @@ class GLispCompilerInvalidFormLength (PyCodeGenError):
 class GLispCompilerInvalidItem (PyCodeGenError):
 	pass
 
+
+
+def _compileQuoted(xs, context, compileSpecial=None):
+	if isGLispString( xs ):
+		return PyLiteralValue( xs )
+	elif isGLispList( xs ):
+		if len( xs ) >= 1:
+			if xs[0] == '$<':
+				if len( xs ) == 2:
+					return _compileGLispExprToPyTree( xs[1], context, True, compileSpecial )
+				else:
+					raise GLispCompilerInvalidFormLength( xs )
+		return PyListLiteral( [ _compileQuoted( x, context, compileSpecial )   for x in xs ] )
+
+
+def _compileQuote(xs, context, bNeedResult=False, compileSpecial=None):
+	"""
+	( $! <form> )
+	
+	The gLisp structure of form is maintained
+	
+	If within <form>, gLisp finds:
+	( $< <form> )
+	then <form> will be compiled as normal
+	"""
+	if len( xs ) != 2:
+		raise GLispCompilerInvalidFormLength( xs )
+	
+	if bNeedResult:
+		return _compileQuoted( xs[1], context, compileSpecial )
+	else:
+		return None
+
+	
+	
+	
+	
 
 
 class GLispCompilerLambdaExprParamListInsufficient (PyCodeGenError):
@@ -699,6 +739,8 @@ def _compileGLispExprToPyTree(xs, context, bNeedResult=False, compileSpecial=Non
 			return PyListLiteral( [ _compileGLispExprToPyTree( e, context, True, compileSpecial )   for e in xs[1:] ], dbgSrc=xs )
 		elif xs[0] == '$set':
 			return PyCall( PyVar( 'set', dbgSrc=xs ), [ PyListLiteral( [ _compileGLispExprToPyTree( e, context, True, compileSpecial )   for e in xs[1:] ], dbgSrc=xs ) ], dbgSrc=xs )
+		elif xs[0] == '$!':
+			return _compileQuote( xs, context, bNeedResult, compileSpecial )
 		elif xs[0] == '$lambda':
 			return _compileLambda( xs, context, bNeedResult, compileSpecial )
 		elif xs[0] == '$map':
@@ -997,6 +1039,12 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 		self._compileTest( '(@a foo @b @c)', 'a.foo( b, c )' )
 		self._compileTest( '(@a foo @b (:x @c))', 'a.foo( b, x=c )' )
 		self._evalTest( "(\"#'f\" upper)", 'F' )
+		
+		
+	def test_Quote(self):
+		self._compileTest( "($! (a b c))",  "[ 'a', 'b', 'c' ]" )
+		self._compileTest( "($! (a b c (d e f)))",  "[ 'a', 'b', 'c', [ 'd', 'e', 'f' ] ]" )
+		self._compileTest( "($! (a b c (d e f ($< @x))))",  "[ 'a', 'b', 'c', [ 'd', 'e', 'f', x ] ]" )
 
 
 	def test_Lambda(self):

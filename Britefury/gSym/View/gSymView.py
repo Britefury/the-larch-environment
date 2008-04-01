@@ -29,7 +29,7 @@ from Britefury.DocView.DocView import DocView
 
 
 from Britefury.GLisp.GLispUtil import isGLispList, gLispSrcToString
-from Britefury.GLisp.GLispCompiler import raiseCompilerError, compileGLispExprToPyFunction, compileGLispCallParamToPyTree, GLispCompilerCouldNotCompileSpecial, GLispCompilerInvalidFormType, GLispCompilerInvalidFormLength, GLispCompilerInvalidItem
+from Britefury.GLisp.GLispCompiler import raiseCompilerError, raiseRuntimeError, compileGLispExprToPyFunction, compileGLispCallParamToPyTree, GLispCompilerCouldNotCompileSpecial, GLispCompilerInvalidFormType, GLispCompilerInvalidFormLength, GLispCompilerInvalidItem
 from Britefury.GLisp.PyCodeGen import filterIdentifierForPy, pyt_coerce, PyCodeGenError, PyVar, PyLiteral, PyListLiteral, PyListComprehension, PyGetAttr, PyGetItem, PyUnOp, PyBinOp, PyCall, PyMethodCall, PyMultilineSrc, PyReturn, PyIf, PyDef, PyAssign_SideEffects, PyDel_SideEffects
 
 from Britefury.gSym.gMeta.GMetaComponent import GMetaComponent
@@ -82,11 +82,6 @@ The hierarchy of document view nodes is respected however.
 
 
 
-def _raiseRuntimeError(exceptionClass, src, reason):
-	raise exceptionClass, reason  +  '   ::   '  +  gLispSrcToString( src, 3 )
-
-
-
 def _runtime_buildRefreshCellAndRegister(viewNodeInstance, refreshFunction):
 	"""
 	Runtime - called by compiled code at run-time
@@ -110,7 +105,7 @@ def _runtime_binRefreshCell(viewNodeInstance, bin, child):
 	elif isinstance( child, DTWidget ):
 		bin.child = child
 	else:
-		_raiseRuntimeError( TypeError, viewNodeInstance.xs, '_GSymNodeViewInstance._binRefreshCell: could not process child of type %s'  %  ( type( child ).__name__, ) )
+		raiseRuntimeError( TypeError, viewNodeInstance.xs, '_GSymNodeViewInstance._binRefreshCell: could not process child of type %s'  %  ( type( child ).__name__, ) )
 
 def _runtime_boxRefreshCell(viewNodeInstance, widget, children):
 	"""
@@ -126,7 +121,7 @@ def _runtime_boxRefreshCell(viewNodeInstance, widget, children):
 			elif isinstance( child, DTWidget ):
 				widgets.append( child )
 			else:
-				_raiseRuntimeError( TypeError, viewNodeInstance.xs, 'defineView: _boxRefreshCell: could not process child of type %s'  %  ( type( child ).__name__, ) )
+				raiseRuntimeError( TypeError, viewNodeInstance.xs, 'defineView: _boxRefreshCell: could not process child of type %s'  %  ( type( child ).__name__, ) )
 		widget[:] = widgets
 	_runtime_buildRefreshCellAndRegister( viewNodeInstance, _boxRefresh )
 
@@ -146,7 +141,7 @@ def _runtime_scriptRefreshCell(viewNodeInstance, script, child, childSlotAttrNam
 		#script.mainChild = child
 		setattr( script, childSlotAttrName, child)
 	else:
-		_raiseRuntimeError( TypeError, viewNodeInstance.xs, '_GSymNodeViewInstance._runtime_scriptRefreshCell: could not process child of type %s'  %  ( type( child ).__name__, ) )
+		raiseRuntimeError( TypeError, viewNodeInstance.xs, '_GSymNodeViewInstance._runtime_scriptRefreshCell: could not process child of type %s'  %  ( type( child ).__name__, ) )
 
 
 	
@@ -255,7 +250,7 @@ def _runtime_entry(viewNodeInstance, text, styleSheets=None):
 	"""Builds a DTEntryLabel widget"""
 	if isinstance( text, RelativeNode ):
 		text = text.node
-	widget = DTEntryLabel(text)
+	widget = DTEntryLabel( text )
 	_runtime_setKeyHandler( viewNodeInstance, widget )
 	_runtime_applyStyleSheetStack( viewNodeInstance, widget )
 	_runtime_applyStyleSheets( styleSheets, widget )
@@ -349,7 +344,7 @@ def _runtime_interact(viewNodeInstance, child, interactors=None):
 		elif isinstance( c, DTWidget ):
 			c.addDocEventHandler( _DocEventHandler( interactors ) )
 		else:
-			_raiseRuntimeError( TypeError, viewNodeInstance.xs, '_runtime_interact: could not process child of type %s'  %  ( type( c ).__name__, ) )
+			raiseRuntimeError( TypeError, viewNodeInstance.xs, '_runtime_interact: could not process child of type %s'  %  ( type( c ).__name__, ) )
 			
 	if isinstance( child, list )  or  isinstance( child, tuple ):
 		for c in child:

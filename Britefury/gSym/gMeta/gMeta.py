@@ -10,10 +10,12 @@ from Britefury.DocModel.DMIO import readSX
 from Britefury.GLisp.GLispCompiler import raiseCompilerError, GLispCompilerInvalidFormLength, GLispCompilerCouldNotCompileSpecial, compileGLispExprToPyFunction
 from Britefury.GLisp.PyCodeGen import filterIdentifierForPy, PyCodeGenError, PyVar, PyLiteral, PyLiteralValue, PyListLiteral, PyDictLiteral, PyListComprehension, PyGetAttr, PyGetItem, PyGetSlice, PyUnOp, PyBinOp, PyCall, PyMethodCall, PyReturn, PyIf, PyDef, PyAssign_SideEffects, PyDel_SideEffects
 
-from Britefury.gSym.gSymCompiler import GMetaComponentCompiler
 from Britefury.gSym.gSymEnvironment import GSymEnvironment
+
+from Britefury.gSym.gSymCompiler import GMetaComponentCompiler
 from Britefury.gSym.View.gSymView import GMetaComponentView
 from Britefury.gSym.View.Interactor import GMetaComponentInteractor
+from Britefury.gSym.View.EditOperations import GMetaComponentEditOperations
 
 
 
@@ -23,6 +25,7 @@ _components = [
 	GMetaComponentCompiler(),
 	GMetaComponentView(),
 	GMetaComponentInteractor(),
+	GMetaComponentEditOperations(),
 	]
 
 

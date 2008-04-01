@@ -54,6 +54,14 @@
 					)
 				)
 			
+				($# "Edit operation")
+				(@editOperationBackground
+					($style
+						(:backgroundColour (@ColourRGB <- #0.975 #1.0 #0.95))
+						(:borderColour (@ColourRGB <- #1.0 #0.65 #1.0))
+					)
+				)
+			
 				($# "Style application")
 				(@styleApplication
 					($style
