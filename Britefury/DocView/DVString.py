@@ -34,7 +34,7 @@ class DVString (DVBorderNode):
 	@FunctionRefField
 	def targetNameWidget(self):
 		entry = DTTokenisedEntryLabel( self._styleSheet.tokeniser, text=self.docNode )
-		entry.keyHandler = self
+		entry.keyHandler = self._f_handleKeyPress
 		self._o_listenToTokenisedEntryLabel( entry )
 		return entry
 

@@ -29,17 +29,17 @@ class DTLabel (DTSimpleStaticWidget):
 	VALIGN_RIGHT = 2
 
 
-	def __init__(self, text='', markup=None, font=None, colour=Colour3f( 0.0, 0.0, 0.0), hAlign=HALIGN_CENTRE, vAlign=VALIGN_CENTRE):
+	def __init__(self, text='', bUseMarkup=False, font=None, colour=Colour3f( 0.0, 0.0, 0.0), hAlign=HALIGN_CENTRE, vAlign=VALIGN_CENTRE):
 		super( DTLabel, self ).__init__()
 		
 		assert text is None  or  isinstance( text, str )  or  isinstance( text, unicode )
-		assert markup is None  or  isinstance( markup, str )  or  isinstance( markup, unicode )
+		assert isinstance( bUseMarkup, bool )
 
 		if font is None:
 			font = 'Sans 11'
 
 		self._text = text
-		self._markup = markup
+		self._bUseMarkup = bUseMarkup
 
 		self._fontString = font
 		self._fontDescription = pango.FontDescription( font )
@@ -60,7 +60,6 @@ class DTLabel (DTSimpleStaticWidget):
 	def setText(self, text):
 		assert text is None  or  isinstance( text, str )  or  isinstance( text, unicode )
 		self._text = text
-		self._markup = None
 		self._bLayoutNeedsRefresh = True
 		self._o_queueResize()
 
@@ -68,15 +67,19 @@ class DTLabel (DTSimpleStaticWidget):
 		return self._text
 
 
-	def setMarkup(self, markup):
-		assert markup is None  or  isinstance( markup, str )  or  isinstance( markup, unicode )
-		self._markup = markup
-		self._text = markup
+	def useMarkup(self):
+		self.setUseMarkup( True )
+		
+	def usePlaintext(self):
+		self.setUseMarkup( False )
+
+	def setUseMarkup(self, bUseMarkup):
+		self._bUseMarkup = bUseMarkup
 		self._bLayoutNeedsRefresh = True
 		self._o_queueResize()
 
-	def getMarkup(self):
-		return self._markup
+	def getUseMarkup(self):
+		return self._bUseMarkup
 
 
 	def setFont(self, font):
@@ -144,8 +147,8 @@ class DTLabel (DTSimpleStaticWidget):
 	def _p_refreshLayout(self):
 		if self._bLayoutNeedsRefresh  and  self._layout is not None:
 			self._layout.set_font_description( self._fontDescription )
-			if self._markup is not None:
-				self._layout.set_markup( self._markup )
+			if self._bUseMarkup:
+				self._layout.set_markup( self._text )
 			else:
 				self._layout.set_text( self._text )
 			self._bLayoutNeedsRefresh = False
@@ -250,7 +253,7 @@ class DTLabel (DTSimpleStaticWidget):
 		
 
 	text = property( getText, setText )
-	markup = property( getMarkup, setMarkup )
+	bUseMarkup = property( getUseMarkup, setUseMarkup )
 	font = property( getFont, setFont )
 	colour = property( getColour, setColour )
 	hAlign = property( getHAlign, setHAlign )

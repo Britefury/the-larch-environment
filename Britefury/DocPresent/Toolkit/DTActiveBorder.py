@@ -104,7 +104,7 @@ class DTActiveBorder (DTBorder):
 	def _o_onKeyPress(self, event):
 		super( DTActiveBorder, self )._o_onKeyPress( event )
 		if self.keyHandler is not None:
-			self.keyHandler._f_handleKeyPress( self, event )
+			self.keyHandler( self, event )
 
 
 	def _o_onGainFocus(self):

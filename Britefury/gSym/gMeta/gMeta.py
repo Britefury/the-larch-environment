@@ -16,6 +16,7 @@ from Britefury.gSym.gSymCompiler import GMetaComponentCompiler
 from Britefury.gSym.View.gSymView import GMetaComponentView
 from Britefury.gSym.View.Interactor import GMetaComponentInteractor
 from Britefury.gSym.View.EditOperations import GMetaComponentEditOperations
+from Britefury.gSym.View.Tokeniser import GMetaComponentTokeniser
 
 
 
@@ -26,6 +27,7 @@ _components = [
 	GMetaComponentView(),
 	GMetaComponentInteractor(),
 	GMetaComponentEditOperations(),
+	GMetaComponentTokeniser(),
 	]
 
 

@@ -52,7 +52,7 @@ class DVNodeClass (SheetClass):
 
 
 
-class DVNode (Sheet, DTWidgetKeyHandlerInterface):
+class DVNode (Sheet):
 	__metaclass__ = DVNodeClass
 
 

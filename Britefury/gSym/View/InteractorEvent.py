@@ -9,21 +9,23 @@
 
 
 class InteractorEvent (object):
-	pass
+	def __init__(self, bUserEvent):
+		super( InteractorEvent, self ).__init__()
+		self.bUserEvent = bUserEvent
 
 
 
 class InteractorEventKey (InteractorEvent):
-	def __init__(self, keyString, keyValue, mods):
-		super( InteractorEventKey, self ).__init__()
+	def __init__(self, bUserEvent, keyString, keyValue, mods):
+		super( InteractorEventKey, self ).__init__( bUserEvent )
 		self.keyString = keyString
 		self.keyValue = keyValue
 		self.mods = mods
 		
 
 	@staticmethod
-	def fromDTKeyEvent(widget, event):
-		return InteractorEventKey( event.keyString, event.keyVal, event.state )
+	def fromDTKeyEvent(widget, bUserEvent, event):
+		return InteractorEventKey( bUserEvent, event.keyString, event.keyVal, event.state )
 
 	
 	def __repr__(self):
@@ -34,13 +36,16 @@ class InteractorEventKey (InteractorEvent):
 class InteractorEventTokenList (InteractorEvent):
 	class Token (object):
 		def __init__(self, tokenClass, value):
-			super( InteractorEventTokens.Token, self ).__init__()
+			super( InteractorEventTokenList.Token, self ).__init__()
 			self.tokenClass = tokenClass
 			self.value = value
 		
-	def __init__(self, tokens=[]):
-		super( InteractorEventKey, self ).__init__()
-		self.tokens = []
+		def __repr__(self):
+			return "Token( %s, '%s' )"  %  ( self.tokenClass, self.value )
+
+	def __init__(self, bUserEvent, tokens):
+		super( InteractorEventTokenList, self ).__init__( bUserEvent )
+		self.tokens = tokens
 		
 
 	def tailEvent(self, fromIndex):
@@ -48,7 +53,11 @@ class InteractorEventTokenList (InteractorEvent):
 		if len( tok ) == 0:
 			return None
 		else:
-			return InteractorEventTokenList( tok )
+			return InteractorEventTokenList( self.bUserEvent, tok )
+		
+		
+	def __repr__(self):
+		return "Tokens %s"  %  ( self.tokens, )
 	
 
 

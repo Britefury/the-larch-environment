@@ -39,7 +39,7 @@ class DVBorderNode (DVNode):
 	def __init__(self, docNode, view, docNodeKey):
 		super( DVBorderNode, self ).__init__( docNode, view, docNodeKey )
 		self.widget = DTActiveBorder()
-		self.widget.keyHandler = self
+		self.widget.keyHandler = self._f_handleKeyPress
 		self.widget.topMargin = self.widget.bottomMargin = 1.0
 		self.widget.contextSignal.connect( self._p_onContext )
 		#self.widget.addDndSourceOp( self._cvNodeDndOp )
