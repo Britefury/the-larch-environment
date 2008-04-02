@@ -29,7 +29,7 @@ def _sanitiseInputData(data):
 def _runtime_replace(data, replacement):
 	if isinstance( data, RelativeNode ):
 		if not isinstance( data.parent, DMListInterface ):
-			raise TypeError, '$replace: @data.parent must be a DMListInterface'
+			raise TypeError, '$replace: @data.parent must be a DMListInterface, not %s'  %  ( type( data.parent ), )
 		data.parent[data.indexInParent] = _sanitiseInputData( replacement )
 		return data.parent[data.indexInParent]
 	else:

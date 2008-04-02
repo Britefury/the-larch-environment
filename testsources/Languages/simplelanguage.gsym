@@ -55,7 +55,12 @@
 							(@tokeniser
 								($tokeniser
 									(identifier ($tokWord @identifierInitChars @identifierBodyChars))
-									(plus ($tokLiteral "#'+"))
+									(op_pow ($tokLiteral "#'**"))
+									(op_add ($tokLiteral "#'+"))
+									(op_sub ($tokLiteral "#'-"))
+									(op_mul ($tokLiteral "#'*"))
+									(op_div ($tokLiteral "#'/"))
+									(op_mod ($tokLiteral "#'%"))
 								)
 							)
 							
@@ -65,7 +70,7 @@
 										( ($key "+")
 											($replace @node ($! (add ($< @node) (nilExpr))))
 										)
-										( ($tokens plus)
+										( ($tokens op_add)
 											($replace @node ($! (add ($< @node) (nilExpr))))
 										)
 									)
@@ -81,14 +86,57 @@
 									)
 								)
 							)
+							
+							(@operatorInteractor
+								($lambda (@node @x @y)
+									($interactor
+										( ($tokens op_add)
+											($replace (@node [] #0 ) ($! add))
+										)
+
+										( ($tokens op_sub)
+											($replace (@node [] #0 ) ($! sub))
+										)
+
+										( ($tokens op_mul)
+											($replace (@node [] #0 ) ($! mul))
+										)
+
+										( ($tokens op_div)
+											($replace (@node [] #0 ) ($! div))
+										)
+										
+										( ($tokens op_mod)
+											($replace (@node [] #0 ) ($! mod))
+										)
+
+										( ($tokens op_pow)
+											($replace (@node [] #0 ) ($! pow))
+										)
+
+									)
+								)
+							)
+							
+							(@operatorEditor
+								($lambda (@node @x @y @op)
+									($interact
+										($activeBorder
+											($entry @op @op @tokeniser)
+										)
+										(@operatorInteractor <- @node @x @y)
+									)
+								)
+							)
 						)
 						($lambda (@node)
 							($match @node
-								( (add (: @x ^) (: @y ^))   (  ($activeBorder ($hbox ($list ($viewEval @x) ($label "#'+") ($viewEval @y))))  ) )
-								( (sub (: @x ^) (: @y ^))   (  ($activeBorder ($hbox ($list ($viewEval @x) ($label "#'-") ($viewEval @y))))  ) )
-								( (mul (: @x ^) (: @y ^))   (  ($activeBorder ($hbox ($list ($viewEval @x) ($label "#'*") ($viewEval @y))))  ) )
-								( (div (: @x ^) (: @y ^))   (  ($activeBorder ($vbox ($list ($viewEval @x) ($hline) ($viewEval @y)) @divBoxStyle))  ) )
-								( (pow (: @x ^) (: @y ^))   (  ($activeBorder ($scriptRSuper ($viewEval @x)($viewEval @y)))  )  )
+								( (add (: @x ^) (: @y ^))   (  ($activeBorder ($hbox ($list ($viewEval @x) (@operatorEditor <- @node @x @y "#'+") ($viewEval @y))))  ) )
+								( (sub (: @x ^) (: @y ^))   (  ($activeBorder ($hbox ($list ($viewEval @x) (@operatorEditor <- @node @x @y "#'-") ($viewEval @y))))  ) )
+								( (mul (: @x ^) (: @y ^))   (  ($activeBorder ($hbox ($list ($viewEval @x) (@operatorEditor <- @node @x @y "#'*") ($viewEval @y))))  ) )
+								( (div (: @x ^) (: @y ^))   (  ($activeBorder ($vbox ($list ($viewEval @x) (@operatorEditor <- @node @x @y "#'/") ($viewEval @y)) @divBoxStyle))  ) )
+								( (mod (: @x ^) (: @y ^))   (  ($activeBorder ($hbox ($list ($viewEval @x) (@operatorEditor <- @node @x @y "#'%") ($viewEval @y))))  ) )
+								( (pow (: @x ^) (: @y ^))   (  ($activeBorder ($scriptRSuper ($viewEval @x) ($hbox ($list (@operatorEditor <- @node @x @y "#'**") ($viewEval @y))) ))  )  )
 								( (loadLocal (: @x !))   (  ($interact ($activeBorder ($entry @x @x @tokeniser)) (@loadlLocalInteractor <- @node) (@exprInteractor <- @node))  )  )
 								( (nilExpr)   (  ($activeBorder ($label "#'<expr>" @undefinedStyle))  )  )
 							)
