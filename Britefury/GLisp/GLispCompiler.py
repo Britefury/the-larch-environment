@@ -6,7 +6,7 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
 from Britefury.GLisp.GLispUtil import isGLispList, isGLispString, stripGLispComments, gLispSrcToString
-from Britefury.GLisp.PyCodeGen import PyCodeGenError, PyKWParam, PyVar, PyLiteral, PyLiteralValue, PyListLiteral, PyDictLiteral, PyListComprehension, PyGetAttr, PyGetItem, PyGetSlice, PyUnOp, PyBinOp, PyCall, PyMethodCall, PyReturn, PyIf, PyDef, PyAssign_SideEffects, PyDel_SideEffects
+from Britefury.GLisp.PyCodeGen import pyt_coerce, PyCodeGenError, PyKWParam, PyVar, PyLiteral, PyLiteralValue, PyListLiteral, PyDictLiteral, PyListComprehension, PyGetAttr, PyGetItem, PyGetSlice, PyUnOp, PyBinOp, PyCall, PyMethodCall, PyTry, PyRaise, PyReturn, PyIf, PyDef, PyAssign_SideEffects, PyDel_SideEffects
 import Britefury.GLisp.PatternMatch
 
 
@@ -419,6 +419,145 @@ def _compileReduce(xs, context, bNeedResult=False, compileSpecial=None):
 
 
 
+class GLispCompilerRaiseExprParamListInvalid (PyCodeGenError):
+	pass
+
+
+def _compileRaise(xs, context, bNeedResult=False, compileSpecial=None):
+	"""
+	( $raise exception )
+	"""
+	if len( xs ) != 2:
+		raise GLispCompilerRaiseExprParamListInvalid( xs )
+
+	exceptionXs = xs[1]
+	
+	py_exception = _compileGLispExprToPyTree( exceptionXs, context, True, compileSpecial )
+	context.body.append( PyRaise( py_exception ).debug( xs ) )
+	
+	if bNeedResult:
+		return pyt_coerce( None ).debug( xs )
+	else:
+		return None
+
+
+
+
+
+class GLispCompilerTryExprParamListInsufficient (PyCodeGenError):
+	pass
+
+class GLispCompilerTryExprElseMustFollowExcept (PyCodeGenError):
+	pass
+
+class GLispCompilerTryExprFinallyMustFollowExcept (PyCodeGenError):
+	pass
+
+class GLispCompilerTryExprFinallyMustFollowElse (PyCodeGenError):
+	pass
+
+class GLispCompilerTryExprNeedsExceptClause (PyCodeGenError):
+	pass
+
+
+
+def _compileTry(xs, context, bNeedResult=False, compileSpecial=None):
+	"""
+	( $try
+	   (
+	      <try_statements...>
+	   )
+	   ( $except <exception1> <except_statements...> )   [0 or more]
+	   ( $else <else_statements...> )  [optional]
+	   ( $finally <finally_statements...> )  [optional]
+	)
+	"""
+	if len( xs ) < 2:
+		raise GLispCompilerTryExprParamListInsufficient( xs )
+	
+	tryStmtsXs = xs[1]
+	exceptBlocksXs = []
+	elseXs = None
+	finallyXs = None
+	
+	
+	
+	if bNeedResult:
+		resultVarName = context.temps.allocateTempName( 'try_result' )
+	else:
+		resultVarName = None
+		
+
+	context.body.append( PyVar( resultVarName ).assign_sideEffects( None ).debug( xs ) )
+	
+		
+	# Gather the source expressions
+	for x in xs[2:]:
+		if not isGLispList( x ):
+			raiseCompilerError( GLispCompilerInvalidFormType, x, 'try: sub-forms must be lists' )
+		if len( x ) < 1:
+			raiseCompilerError( GLispCompilerInvalidFormLength, x, 'try: sub-forms must be of length 1 or more' )
+		
+		if x[0] == '$except':
+			if elseXs is not None:
+				raiseCompilerError( GLispCompilerTryExprElseMustFollowExcept, x, 'try: else must follow except' )
+			if finallyXs is not None:
+				raiseCompilerError( GLispCompilerTryExprFinallyMustFollowExcept, x, 'try: finally must follow except' )
+			if len( x ) < 2:
+				raiseCompilerError( GLispCompilerInvalidFormLength, x, 'try: except form requires 1 parameter; the exception' )
+			exceptBlocksXs.append( x )
+		elif x[0] == '$else':
+			if len( exceptBlocksXs ) < 1:
+				raiseCompilerError( GLispCompilerTryExprNeedsExceptClause, x, 'try: must have at least 1 except clause' )
+			if finallyXs is not None:
+				raiseCompilerError( GLispCompilerTryExprFinallyMustFollowElse, x, 'try: finally must follow else' )
+			elseXs = x
+		elif x[0] == '$finally':
+			if len( exceptBlocksXs ) < 1:
+				raiseCompilerError( GLispCompilerTryExprNeedsExceptClause, x, 'try: must have at least 1 except clause' )
+			finallyXs = x
+		
+	
+
+			
+	buildResultHandleTreeNode = lambda t, x: PyAssign_SideEffects( PyVar( resultVarName, dbgSrc=x ), t, dbgSrc=x )
+
+	
+	tryContext = context.innerContext()
+	py_tryStmts, _resultTree = compileExpressionListToPyTreeStatements( tryStmtsXs, tryContext, bNeedResult  and  elseXs is None  and  finallyXs is None, compileSpecial, buildResultHandleTreeNode )
+	exceptSpecs = []
+	py_elseStmts = None
+	py_finallyStmts = None
+	
+	
+	for x in exceptBlocksXs:
+		exceptionXs = x[1]
+		exceptStmtsXs = x[2:]
+		exceptStmtsContext = context.innerContext()
+		py_exception = _compileGLispExprToPyTree( exceptionXs, context, True, compileSpecial )
+		py_exceptStmts, _resultTree = compileExpressionListToPyTreeStatements( exceptStmtsXs, exceptStmtsContext, bNeedResult  and  finallyXs is None, compileSpecial, buildResultHandleTreeNode )
+		exceptSpecs.append( ( py_exception, py_exceptStmts ) )
+		
+	if elseXs is not None:
+		elseStmtsContext = context.innerContext()
+		py_elseStmts, _resultTree = compileExpressionListToPyTreeStatements( elseXs[1:], elseStmtsContext, bNeedResult  and  finallyXs is None, compileSpecial, buildResultHandleTreeNode )
+		
+	if finallyXs is not None:
+		finallyStmtsContext = context.innerContext()
+		py_finallyStmts, _resultTree = compileExpressionListToPyTreeStatements( finallyXs[1:], finallyStmtsContext, bNeedResult, compileSpecial, buildResultHandleTreeNode )
+		
+	
+	context.body.append( PyTry( py_tryStmts, exceptSpecs, py_elseStmts, py_finallyStmts ).debug( xs ) )
+	
+	if bNeedResult:
+		return PyVar( resultVarName, dbgSrc=xs )
+	else:
+		return None
+
+
+
+
+
 class GLispCompilerIfExprParamListInsufficient (PyCodeGenError):
 	pass
 
@@ -753,6 +892,10 @@ def _compileGLispExprToPyTree(xs, context, bNeedResult=False, compileSpecial=Non
 			return _compileFilterX( xs, context, bNeedResult, compileSpecial )
 		elif xs[0] == '$reduce':
 			return _compileReduce( xs, context, bNeedResult, compileSpecial )
+		elif xs[0] == '$raise':
+			return _compileRaise( xs, context, bNeedResult, compileSpecial )
+		elif xs[0] == '$try':
+			return _compileTry( xs, context, bNeedResult, compileSpecial )
 		elif xs[0] == '$if':
 			return _compileIf( xs, context, bNeedResult, compileSpecial )
 		elif xs[0] == '$where':
@@ -942,6 +1085,12 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 		fn = compileGLispExprToPyFunction( 'testModule', 'test', argNames, readSX( srcText ), compileSpecial, lcls=lcls )
 		result = fn( *argValues )
 		self.assert_( result == expectedResult )
+
+	def _evalExceptionTest(self, srcText, expectedException, argValuePairs=[], compileSpecial=None, lcls={}):
+		argNames = [ p[0]   for p in argValuePairs ]
+		argValues = [ p[1]   for p in argValuePairs ]
+		fn = compileGLispExprToPyFunction( 'testModule', 'test', argNames, readSX( srcText ), compileSpecial, lcls=lcls )
+		self.assertRaises( expectedException, lambda: fn( *argValues ) )
 
 	def testSyntaxError(self):
 		self._compileTest( 'a', GLispCompilerSyntaxError )
@@ -1134,6 +1283,247 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 		self._compileTest( xssrc2, pysrc2 )
 		self._evalTest( xssrc1, 15 )
 		self._evalTest( xssrc2, 27 )
+		
+		
+	def test_Raise(self):
+		xssrc1 = """
+		($raise @ValueError)
+		"""
+		pysrc1 = [
+			"raise ValueError",
+			"None"
+		]
+
+		self._compileTest( xssrc1, pysrc1 )
+		self._evalExceptionTest( xssrc1, ValueError )
+		
+		
+	def test_Try(self):
+		xssrc1 = """
+		($try
+		  ()
+		  ($except @ValueError)
+		)
+		"""
+		pysrc1 = [
+			"__gsym__try_result_0 = None",
+			"try:",
+			"  pass",
+			"except ValueError:",
+			"  pass",
+			"__gsym__try_result_0",
+		]
+
+		xssrc2 = """
+		($try
+		  (
+	            ($if
+		      (#True #123)
+		      ($else #345)
+		     )
+		  )
+		  ($except @ValueError)
+		)
+		"""
+		pysrc2 = [
+			"__gsym__try_result_0 = None",
+			"try:",
+			"  if True:",
+			"    __gsym__if_result_0 = 123",
+			"  else:",
+			"    __gsym__if_result_0 = 345",
+			"  __gsym__try_result_0 = __gsym__if_result_0",
+			"except ValueError:",
+			"  pass",
+			"__gsym__try_result_0",
+		]
+
+		xssrc3 = """
+		($try
+		  (
+		    ($raise @TypeError)
+		  )
+		  ($except @ValueError)
+		)
+		"""
+		pysrc3 = [
+			"__gsym__try_result_0 = None",
+			"try:",
+			"  raise TypeError",
+			"  __gsym__try_result_0 = None",
+			"except ValueError:",
+			"  pass",
+			"__gsym__try_result_0",
+		]
+
+		xssrc4 = """
+		($try
+		  (
+		    ($raise @ValueError)
+		  )
+		  ($except @ValueError #456)
+		)
+		"""
+		pysrc4 = [
+			"__gsym__try_result_0 = None",
+			"try:",
+			"  raise ValueError",
+			"  __gsym__try_result_0 = None",
+			"except ValueError:",
+			"  __gsym__try_result_0 = 456",
+			"__gsym__try_result_0",
+		]
+
+		xssrc5 = """
+		($try
+		  (
+		    ($raise @TypeError)
+		  )
+		  ($except @ValueError #456)
+		  ($except @TypeError #123)
+		)
+		"""
+		pysrc5 = [
+			"__gsym__try_result_0 = None",
+			"try:",
+			"  raise TypeError",
+			"  __gsym__try_result_0 = None",
+			"except ValueError:",
+			"  __gsym__try_result_0 = 456",
+			"except TypeError:",
+			"  __gsym__try_result_0 = 123",
+			"__gsym__try_result_0",
+		]
+
+		xssrc6 = """
+		($try
+		  (
+		    ($raise @ValueError)
+		  )
+		  ($except @ValueError #456)
+		  ($else #789)
+		)
+		"""
+		pysrc6 = [
+			"__gsym__try_result_0 = None",
+			"try:",
+			"  raise ValueError",
+			"except ValueError:",
+			"  __gsym__try_result_0 = 456",
+			"else:",
+			"  __gsym__try_result_0 = 789",
+			"__gsym__try_result_0",
+		]
+
+		xssrc7 = """
+		($try
+		  (
+		    #123
+		  )
+		  ($except @ValueError #456)
+		  ($else #789)
+		)
+		"""
+		pysrc7 = [
+			"__gsym__try_result_0 = None",
+			"try:",
+			"  123",
+			"except ValueError:",
+			"  __gsym__try_result_0 = 456",
+			"else:",
+			"  __gsym__try_result_0 = 789",
+			"__gsym__try_result_0",
+		]
+
+		xssrc8 = """
+		($try
+		  (
+		    #123
+		  )
+		  ($except @ValueError #456)
+		  ($else #789)
+		  ($finally #1000)
+		)
+		"""
+		pysrc8 = [
+			"__gsym__try_result_0 = None",
+			"try:",
+			"  123",
+			"except ValueError:",
+			"  456",
+			"else:",
+			"  789",
+			"finally:",
+			"  __gsym__try_result_0 = 1000",
+			"__gsym__try_result_0",
+		]
+
+		xssrc9 = """
+		($try
+		  (
+		    ($raise @ValueError)
+		  )
+		  ($except @ValueError #456)
+		  ($else #789)
+		  ($finally #1000)
+		)
+		"""
+		pysrc9 = [
+			"__gsym__try_result_0 = None",
+			"try:",
+			"  raise ValueError",
+			"except ValueError:",
+			"  456",
+			"else:",
+			"  789",
+			"finally:",
+			"  __gsym__try_result_0 = 1000",
+			"__gsym__try_result_0",
+		]
+
+		xssrc10 = """
+		($try
+		  (
+		    ($raise @TypeError)
+		  )
+		  ($except @ValueError #456)
+		  ($else #789)
+		  ($finally #1000)
+		)
+		"""
+		pysrc10 = [
+			"__gsym__try_result_0 = None",
+			"try:",
+			"  raise TypeError",
+			"except ValueError:",
+			"  456",
+			"else:",
+			"  789",
+			"finally:",
+			"  __gsym__try_result_0 = 1000",
+			"__gsym__try_result_0",
+		]
+
+		self._compileTest( xssrc1, pysrc1 )
+		self._evalTest( xssrc1, None )
+		self._compileTest( xssrc2, pysrc2 )
+		self._evalTest( xssrc2, 123 )
+		self._compileTest( xssrc3, pysrc3 )
+		self._evalExceptionTest( xssrc3, TypeError )
+		self._compileTest( xssrc4, pysrc4 )
+		self._evalTest( xssrc4, 456 )
+		self._compileTest( xssrc5, pysrc5 )
+		self._evalTest( xssrc5, 123 )
+		self._compileTest( xssrc6, pysrc6 )
+		self._evalTest( xssrc6, 456 )
+		self._compileTest( xssrc7, pysrc7 )
+		self._evalTest( xssrc7, 789 )
+		self._compileTest( xssrc8, pysrc8 )
+		self._evalTest( xssrc8, 1000 )
+		self._compileTest( xssrc9, pysrc9 )
+		self._evalTest( xssrc9, 1000 )
+		self._compileTest( xssrc10, pysrc10 )
+		self._evalExceptionTest( xssrc10, TypeError )
 		
 		
 	def test_If(self):
