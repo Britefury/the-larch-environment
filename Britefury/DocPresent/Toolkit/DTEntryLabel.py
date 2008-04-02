@@ -237,21 +237,21 @@ class DTEntryLabel (DTBin):
 
 	def _p_onEntryTextInserted(self, entry, position, bAppended, textInserted):
 		text = self._entry.text
-		self._o_emitTextInserted( position, bAppended, textInserted )
 		if self._entryText is None:
 			self._labelText = text
 			self._label.text = text
 		else:
 			self._entryText = text
+		self._o_emitTextInserted( position, bAppended, textInserted )
 
 	def _p_onEntryTextDeleted(self, entry, start, end, textDeleted):
 		text = self._entry.text
-		self._o_emitTextDeleted( start, end, textDeleted )
 		if self._entryText is None:
 			self._labelText = text
 			self._label.text = text
 		else:
 			self._entryText = text
+		self._o_emitTextDeleted( start, end, textDeleted )
 
 	def _o_emitTextInserted(self, position, bAppended, textInserted):
 		self.textInsertedSignal.emit( self, position, bAppended, textInserted )

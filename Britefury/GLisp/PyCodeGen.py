@@ -865,6 +865,7 @@ class PyTry (PyStatement):
 		
 		assert isinstance( tryStatements, list ), 'PyTry: try statements must be a list'
 		assert isinstance( exceptSpecs, list ), 'PyTry: except specs must be a list'
+		assert len( exceptSpecs ) >= 1, 'PyTry: except specs must have at least 1 entry'
 		if elseStatements is not None:
 			assert isinstance( elseStatements, list ), 'PyTry: else statements must be a list'
 		if finallyStatements is not None:
