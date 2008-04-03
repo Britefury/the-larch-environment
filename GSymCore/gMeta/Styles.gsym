@@ -54,6 +54,14 @@
 					)
 				)
 			
+				($# "Tokeniser")
+				(@tokeniserBackground
+					($style
+						(:backgroundColour (@ColourRGB <- #1.0 #0.95 #1.0))
+						(:borderColour (@ColourRGB <- #1.0 #0.65 #1.0))
+					)
+				)
+			
 				($# "Edit operation")
 				(@editOperationBackground
 					($style

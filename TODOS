@@ -2,7 +2,9 @@ TODOS:
 
 
 
-- Add exception handling to GLisp
+- Computer Language Design:
+  A Tutorial on Behavioral Reflection and its Implementation
+  http://www2.parc.com/csl/groups/sda/projects/reflection96/docs/malenfant/ref96/ref96.html
 
 - Add sub-match to match
 

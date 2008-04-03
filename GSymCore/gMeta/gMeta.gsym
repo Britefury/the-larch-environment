@@ -255,12 +255,101 @@
 								)
 							)
 							
+							($# "Markup label")
+							( ($markupLabel (: @x ^) (: @styles *))
+								($activeBorder
+									($vbox ($list
+										($label "#'Markup label" (@gMetaStyles . keyword))
+										($vbox
+											(
+												($list ($viewEval @x @viewForm))
+												+
+												(@viewStyleList <- @styles)
+											)
+										)
+									)  (@gMetaStyles . titleVBox))
+									(@gMetaStyles . labelBackground)
+								)
+							)
+							
 							($# "Entry")
-							( ($entry (: @x ^))
+							( ($entry (: @labelText ^) (: @entryText ^) (: @entryTokeniser ^) (: @styles *))
 								($activeBorder
 									($vbox ($list
 										($label "#'Entry" (@gMetaStyles . keyword))
-										($viewEval @x @viewForm)
+										($vbox
+											(
+												($list
+													($hbox ($list
+														($label "#'label:" (@gMetaStyles . keyword))
+														($viewEval @labelText @viewForm)
+														($label "#'entry:" (@gMetaStyles . keyword))
+														($viewEval @entryText @viewForm)
+													))
+													($hbox ($list
+														($label "#'tokeniser:" (@gMetaStyles . keyword))
+														($viewEval @entryTokeniser @viewForm)
+													))
+												)
+												+
+												(@viewStyleList <- @styles)
+											)
+										)
+									)  (@gMetaStyles . titleVBox))
+									(@gMetaStyles . labelBackground)
+								)
+							)
+							
+							($# "Markup entry")
+							( ($markupEntry (: @labelText ^) (: @entryText ^) (: @entryTokeniser ^) (: @styles *))
+								($activeBorder
+									($vbox ($list
+										($label "#'Markup entry" (@gMetaStyles . keyword))
+										($vbox
+											(
+												($list
+													($hbox ($list
+														($label "#'label:" (@gMetaStyles . keyword))
+														($viewEval @labelText @viewForm)
+														($label "#'entry:" (@gMetaStyles . keyword))
+														($viewEval @entryText @viewForm)
+													))
+													($hbox ($list
+														($label "#'tokeniser:" (@gMetaStyles . keyword))
+														($viewEval @entryTokeniser @viewForm)
+													))
+												)
+												+
+												(@viewStyleList <- @styles)
+											)
+										)
+									)  (@gMetaStyles . titleVBox))
+									(@gMetaStyles . labelBackground)
+								)
+							)
+							
+							($# "Custom entry")
+							( ($customEntry (: @customChild ^) (: @entryText ^) (: @entryTokeniser ^) (: @styles *))
+								($activeBorder
+									($vbox ($list
+										($label "#'Custom entry" (@gMetaStyles . keyword))
+										($vbox
+											(
+												($list
+													($viewEval @customChild @viewForm)
+													($hbox ($list
+														($label "#'entry:" (@gMetaStyles . keyword))
+														($viewEval @entryText @viewForm)
+													))
+													($hbox ($list
+														($label "#'tokeniser:" (@gMetaStyles . keyword))
+														($viewEval @entryTokeniser @viewForm)
+													))
+												)
+												+
+												(@viewStyleList <- @styles)
+											)
+										)
 									)  (@gMetaStyles . titleVBox))
 									(@gMetaStyles . labelBackground)
 								)
@@ -433,9 +522,90 @@
 							
 							
 							
+							($# "TOKENISER")
+							($# "Tokeniser")
+							( ($tokeniser (: @tokenDefinitions *))
+								($where
+									(
+										(@viewTokenDefinition
+											($lambda (@node)
+												($activeBorder
+													($hbox ($list
+														($label (@node [] #0 ))
+														($label u"#'\u21d2")
+														($viewEval (@node [] #1 ))
+													))
+												)
+											)
+										)
+									)
+									($activeBorder
+										($vbox ($list
+											($label "#'Tokeniser" (@gMetaStyles . keyword))
+											($indent #30.0
+												($vbox ($mapViewEval @tokenDefinitions @viewTokenDefinition))
+											)
+										) (@gMetaStyles . titleVBox))
+										(@gMetaStyles . tokeniserBackground)
+									)
+								)
+							)
+							
+							( ($tokWord (: @initChars ^))
+								($activeBorder
+									($hbox ($list
+										($label "#'tokeniser word:" (@gMetaStyles . keyword))
+										($viewEval @initChars @viewForm)
+									))
+								)
+							)
+
+							( ($tokWord (: @initChars ^) (: @bodyChars ^))
+								($activeBorder
+									($hbox ($list
+										($label "#'tokeniser word:" (@gMetaStyles . keyword))
+										($viewEval @initChars @viewForm)
+										($viewEval @bodyChars @viewForm)
+									))
+								)
+							)
+
+							( ($tokLiteral (: @matchString ^))
+								($activeBorder
+									($hbox ($list
+										($label "#'tokeniser literal:" (@gMetaStyles . keyword))
+										($viewEval @matchString @viewForm)
+									))
+								)
+							)
+
+							( ($tokKeyword (: @matchString ^))
+								($activeBorder
+									($hbox ($list
+										($label "#'tokeniser keyword:" (@gMetaStyles . keyword))
+										($viewEval @matchString @viewForm)
+									))
+								)
+							)
+
+							( ($tokQuotedString)
+								($activeBorder
+									($label "#'tokeniser quoted string:" (@gMetaStyles . keyword))
+								)
+							)
+
+							( ($tokDblQuotedString)
+								($activeBorder
+									($label "#'tokeniser double quoted string:" (@gMetaStyles . keyword))
+								)
+							)
+
+							
+							
+							
 							($# "INTERACTION")
 							($# "Interact")
-							( ($interact (: @child ^) (: @interactor ^))
+							( ($interact (: @child ^) (: @interactors *))
 								($activeBorder
 									($vbox ($list
 										($label "#'interact" (@gMetaStyles . keyword))
@@ -443,7 +613,9 @@
 											($viewEval @child @viewForm)
 											($hbox ($list
 												($label "#'using:" (@gMetaStyles . keyword))
-												($viewEval @interactor @viewForm)
+												($hbox
+													($mapViewEval @interactors @viewForm)
+												)
 											))
 										))
 									) (@gMetaStyles . titleVBox))
@@ -480,6 +652,12 @@
 												)
 											)
 										)
+										
+										(@viewAccelMod
+											($lambda (@node)
+												($activeBorder ($label @node))
+											)
+										)
 									
 										(@viewInteractorPattern
 											($lambda (@node)
@@ -499,7 +677,13 @@
 														($activeBorder
 															($hbox ($list
 																($label "#'accel:" (@gMetaStyles . keyword))
-																($label (@keyValue + ("#'+" join @mods)))
+																($hbox
+																	(
+																		($mapViewEval @mods @viewAccelMod)
+																		+
+																		($list ($label @keyValue))
+																	)
+																)
 															))
 														)
 													)
