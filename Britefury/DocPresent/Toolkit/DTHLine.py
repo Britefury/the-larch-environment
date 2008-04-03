@@ -19,10 +19,11 @@ from Britefury.DocPresent.Toolkit.DTSimpleStaticWidget import DTSimpleStaticWidg
 
 
 class DTHLine (DTSimpleStaticWidget):
-	def __init__(self, thickness=1.0, colour=Colour3f( 0.0, 0.0, 0.0)):
+	def __init__(self, thickness=1.0, border = 2.0, colour=Colour3f( 0.0, 0.0, 0.0)):
 		super( DTHLine, self ).__init__()
 
 		self._thickness = thickness
+		self._border = border
 		self._colour = colour
 
 		self._o_queueResize()
@@ -35,6 +36,14 @@ class DTHLine (DTSimpleStaticWidget):
 
 	def getThickness(self):
 		return self._thickness
+
+
+	def setBorder(self, border):
+		self._border = border
+		self._o_queueResize()
+
+	def getBorder(self):
+		return self._border
 
 
 	def setColour(self, colour):
@@ -51,10 +60,10 @@ class DTHLine (DTSimpleStaticWidget):
 		context.save()
 		self._o_clipIfAllocationInsufficient( context )
 		context.set_source_rgb( self._colour.r, self._colour.g, self._colour.b )
-		y = self._thickness * 0.5
+		y = self._border  +  self._thickness * 0.5
 		context.set_line_width( self._thickness )
-		context.move_to( 0.0, y )
-		context.line_to( self._allocation.x, y )
+		context.move_to( self._border, y )
+		context.line_to( self._border  +  self._allocation.x, y )
 		context.stroke()
 		context.restore()
 
@@ -63,11 +72,12 @@ class DTHLine (DTSimpleStaticWidget):
 		return 0.0
 
 	def _o_getRequiredHeightAndBaseline(self):
-		return self._thickness, 0.0
+		return self._border * 2.0  +  self._thickness, 0.0
 
 
 
 	thickness = property( getThickness, setThickness )
+	border = property( getBorder, setBorder )
 	colour = property( getColour, setColour )
 
 

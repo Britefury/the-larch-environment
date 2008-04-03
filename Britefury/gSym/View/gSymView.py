@@ -17,6 +17,7 @@ from Britefury.DocPresent.Toolkit.DTBin import DTBin
 from Britefury.DocPresent.Toolkit.DTBorder import DTBorder
 from Britefury.DocPresent.Toolkit.DTBox import DTBox
 from Britefury.DocPresent.Toolkit.DTTokenisedEntryLabel import DTTokenisedEntryLabel
+from Britefury.DocPresent.Toolkit.DTTokenisedCustomEntry import DTTokenisedCustomEntry
 from Britefury.DocPresent.Toolkit.DTHLine import DTHLine
 from Britefury.DocPresent.Toolkit.DTLabel import DTLabel
 from Britefury.DocPresent.Toolkit.DTScript import DTScript
@@ -106,6 +107,22 @@ def _runtime_binRefreshCell(viewNodeInstance, bin, child):
 		bin.child = child
 	else:
 		raiseRuntimeError( TypeError, viewNodeInstance.xs, '_GSymNodeViewInstance._binRefreshCell: could not process child of type %s'  %  ( type( child ).__name__, ) )
+
+def _runtime_customEntryRefreshCell(viewNodeInstance, customEntry, child):
+	"""
+	Runtime - called by compiled code at run-time
+	Builds and registers a refresh cell (if necessary) for a widget that is an instance of DTCusomEntry
+	"""
+	if isinstance( child, DVNode ):
+		chNode = child
+		def _customEntryRefresh():
+			chNode.refresh()
+			customEntry.customChild = chNode.widget
+		_runtime_buildRefreshCellAndRegister( viewNodeInstance, _customEntryRefresh )
+	elif isinstance( child, DTWidget ):
+		customEntry.customChild = child
+	else:
+		raiseRuntimeError( TypeError, viewNodeInstance.xs, '_GSymNodeViewInstance._customEntryRefreshCell: could not process child of type %s'  %  ( type( child ).__name__, ) )
 
 def _runtime_boxRefreshCell(viewNodeInstance, widget, children):
 	"""
@@ -296,6 +313,18 @@ def _runtime_markupEntry(viewNodeInstance, labelText, entryText, tokeniser, styl
 	widget.textModifiedSignal.connect( _onEntryModifed )
 	widget.finishEditingSignal.connect( _onEntryFinished )
 	widget.bLabelUseMarkup = True
+	_runtime_applyStyleSheetStack( viewNodeInstance, widget )
+	_runtime_applyStyleSheets( styleSheets, widget )
+	return widget
+
+def _runtime_customEntry(viewNodeInstance, customChild, entryText, tokeniser, styleSheets=None):
+	"""Builds a DTEntryLabel widget"""
+	if isinstance( entryText, RelativeNode ):
+		entryText = entryText.node
+	widget = DTTokenisedCustomEntry( tokeniser, entryText )
+	widget.textModifiedSignal.connect( _onEntryModifed )
+	widget.finishEditingSignal.connect( _onEntryFinished )
+	_runtime_customEntryRefreshCell( viewNodeInstance, widget, customChild )
 	_runtime_applyStyleSheetStack( viewNodeInstance, widget )
 	_runtime_applyStyleSheets( styleSheets, widget )
 	return widget
@@ -655,6 +684,11 @@ class GMetaComponentView (GMetaComponent):
 			if len( srcXs ) < 2:
 				raiseCompilerError( GLispParameterListError, src, 'defineView: $markupEntry needs at least 3 parameters; the label text, the entry text, and the tokeniser' )
 			return PyVar( '__gsym__markupEntry__', dbgSrc=srcXs )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[1] ), compileSubExp( srcXs[2] ), compileSubExp( srcXs[3] ), *compileWidgetParams( srcXs[4:]) ).debug( srcXs )
+		elif name == '$customEntry':
+			#($customEntry <child> <entry_text> <tokeniser> [<styleSheet>])
+			if len( srcXs ) < 2:
+				raiseCompilerError( GLispParameterListError, src, 'defineView: $customEntry needs at least 3 parameters; the custom child, the entry text, and the tokeniser' )
+			return PyVar( '__gsym__customEntry__', dbgSrc=srcXs )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[1] ), compileSubExp( srcXs[2] ), compileSubExp( srcXs[3] ), *compileWidgetParams( srcXs[4:]) ).debug( srcXs )
 		elif name == '$hbox':
 			#($hbox (child*) [<styleSheet>])
 			if len( srcXs ) < 2:
@@ -724,6 +758,7 @@ class GMetaComponentView (GMetaComponent):
 			'__gsym__markupLabel__' : _runtime_markupLabel,
 			'__gsym__entry__' : _runtime_entry,
 			'__gsym__markupEntry__' : _runtime_markupEntry,
+			'__gsym__customEntry__' : _runtime_customEntry,
 			'__gsym__hbox__' : _runtime_hbox,
 			'__gsym__ahbox__' : _runtime_ahbox,
 			'__gsym__vbox__' : _runtime_vbox,
@@ -736,6 +771,7 @@ class GMetaComponentView (GMetaComponent):
 			'__gsym__DTHLine__' : DTHLine,
 			'__gsym__DTLabel__' : DTLabel,
 			'__gsym__DTTokenisedEntryLabel__' : DTTokenisedEntryLabel,
+			'__gsym__DTTokenisedCustomEntry__' : DTTokenisedCustomEntry,
 			'__gsym__DTBox__' : DTBox,
 			'__gsym__DTScript__' : DTScript,
 			'__gsym__runtime_setKeyHandler__' : _runtime_setKeyHandler,
