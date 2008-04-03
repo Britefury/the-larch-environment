@@ -128,13 +128,22 @@
 									)
 								)
 							)
+
+							(@divideEditor
+								($lambda (@node @x @y)
+									($interact
+										($customEntry ($hline) "#'/" @tokeniser)
+										(@operatorInteractor <- @node @x @y)
+									)
+								)
+							)
 						)
 						($lambda (@node)
 							($match @node
 								( (add (: @x ^) (: @y ^))   (  ($activeBorder ($hbox ($list ($viewEval @x) (@operatorEditor <- @node @x @y "#'+") ($viewEval @y))))  ) )
 								( (sub (: @x ^) (: @y ^))   (  ($activeBorder ($hbox ($list ($viewEval @x) (@operatorEditor <- @node @x @y "#'-") ($viewEval @y))))  ) )
 								( (mul (: @x ^) (: @y ^))   (  ($activeBorder ($hbox ($list ($viewEval @x) (@operatorEditor <- @node @x @y "#'*") ($viewEval @y))))  ) )
-								( (div (: @x ^) (: @y ^))   (  ($activeBorder ($vbox ($list ($viewEval @x) (@operatorEditor <- @node @x @y "#'/") ($viewEval @y)) @divBoxStyle))  ) )
+								( (div (: @x ^) (: @y ^))   (  ($activeBorder ($vbox ($list ($viewEval @x) (@divideEditor <- @node @x @y) ($viewEval @y)) @divBoxStyle))  ) )
 								( (mod (: @x ^) (: @y ^))   (  ($activeBorder ($hbox ($list ($viewEval @x) (@operatorEditor <- @node @x @y "#'%") ($viewEval @y))))  ) )
 								( (pow (: @x ^) (: @y ^))   (  ($activeBorder ($scriptRSuper ($viewEval @x) ($hbox ($list (@operatorEditor <- @node @x @y "#'**") ($viewEval @y))) ))  )  )
 								( (loadLocal (: @x !))   (  ($interact ($activeBorder ($entry @x @x @tokeniser)) (@loadlLocalInteractor <- @node) (@exprInteractor <- @node))  )  )
