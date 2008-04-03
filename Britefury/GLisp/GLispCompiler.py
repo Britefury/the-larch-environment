@@ -11,7 +11,7 @@ import Britefury.GLisp.PatternMatch
 
 
 
-_B_DEBUG_LOG_GENERATED_SOURCE = False
+_B_DEBUG_LOG_GENERATED_SOURCE = True
 
 _TEMP_PREFIX = '__gsym__'
 
