@@ -233,7 +233,7 @@ if __name__ == '__main__':
 	window.set_size_request( 300, 100 )
 
 	doc = DTDocument()
-	doc.show()
+	doc.getGtkWidget().show()
 
 
 	labelTexts = [ 'Hello world %d' % ( i, )   for i in xrange( 0, 10 ) ]  +  [ '(', ')', '\'', '"', '.' ]
@@ -260,7 +260,7 @@ if __name__ == '__main__':
 	buttonBox.show_all()
 
 	box = gtk.VBox()
-	box.pack_start( doc )
+	box.pack_start( doc.getGtkWidget() )
 	box.pack_start( gtk.HSeparator(), False, False, 10 )
 	box.pack_start( buttonBox, False, False, 10 )
 	box.show_all()

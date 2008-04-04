@@ -12,12 +12,8 @@ from Britefury.DocPresent.Toolkit.DTLabel import DTLabel
 
 import traceback
 
-def _commaFactory():
-	return DTLabel( ',' )
-
-
 class DTWrappedLineWithSeparators (DTWrappedLine):
-	def __init__(self, separatorFactory=_commaFactory, spacing=0.0, padding=0.0):
+	def __init__(self, separatorFactory=',', spacing=0.0, padding=0.0):
 		super( DTWrappedLineWithSeparators, self ).__init__( spacing, padding )
 
 		self._boxes = []
@@ -45,7 +41,7 @@ class DTWrappedLineWithSeparators (DTWrappedLine):
 
 			for box in self._boxes[:-1]:
 				if len( box ) < 2:
-					box.append( self._separatorFactory() )
+					box.append( self._p_makeSeparator() )
 			if len( self._boxes ) > 0:
 				if len( self._boxes[-1] ) > 1:
 					del self._boxes[-1][1]
@@ -70,7 +66,7 @@ class DTWrappedLineWithSeparators (DTWrappedLine):
 	def append(self, child, padding=None):
 		if len( self._boxes ) > 0:
 			# Add a separator to the last box
-			self._boxes[-1].append( self._separatorFactory() )
+			self._boxes[-1].append( self._p_makeSeparator() )
 
 		# Create and add the new box
 		self._boxes.append( DTBox() )
@@ -86,7 +82,7 @@ class DTWrappedLineWithSeparators (DTWrappedLine):
 	def extend(self, children):
 		if len( self._boxes ) > 0:
 			# Add a separator to the last box
-			self._boxes[-1].append( self._separatorFactory() )
+			self._boxes[-1].append( self._p_makeSeparator() )
 
 		# Create the new boxes
 		boxes = [ DTBox()   for child in children ]
@@ -95,7 +91,7 @@ class DTWrappedLineWithSeparators (DTWrappedLine):
 			box.append( child )
 		# Add separators too all but the last
 		for box in boxes[:-1]:
-			box.append( self._separatorFactory() )
+			box.append( self._p_makeSeparator() )
 		# Add the boxes and items to the box and item lists
 		self._boxes.extend( boxes )
 		self._items.extend( children )
@@ -110,7 +106,7 @@ class DTWrappedLineWithSeparators (DTWrappedLine):
 		else:
 			box = DTBox()
 			box.append( child )
-			box.append( self._separatorFactory() )
+			box.append( self._p_makeSeparator() )
 
 			self._boxes.insert( index, box )
 			self._items.insert( index, box )
@@ -121,6 +117,14 @@ class DTWrappedLineWithSeparators (DTWrappedLine):
 	def remove(self, child):
 		index = self._items.index( child )
 		del self[index]
+		
+		
+		
+	def _p_makeSeparator(self):
+		if isinstance( self._separatorFactory, str )  or  isinstance( self._separatorFactory, unicode ):
+			return DTLabel( self._separatorFactory )
+		else:
+			return self._separatorFactory()
 
 
 
@@ -182,7 +186,7 @@ if __name__ == '__main__':
 	window.set_size_request( 300, 100 )
 
 	doc = DTDocument()
-	doc.show()
+	doc.getGtkWidget().show()
 
 
 	labelTexts = [ 'Hello world %d' % ( i, )   for i in xrange( 0, 10 ) ]  +  [ '(', ')', '\'', '"', '.' ]
@@ -209,7 +213,7 @@ if __name__ == '__main__':
 	buttonBox.show_all()
 
 	box = gtk.VBox()
-	box.pack_start( doc )
+	box.pack_start( doc.getGtkWidget() )
 	box.pack_start( gtk.HSeparator(), False, False, 10 )
 	box.pack_start( buttonBox, False, False, 10 )
 	box.show_all()
