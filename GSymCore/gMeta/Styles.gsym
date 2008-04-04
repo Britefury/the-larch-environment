@@ -115,6 +115,21 @@
 						(:font "#'Sans 11 bold")
 					)
 				)
+				
+				($# "Paramater name")
+				(@paramName
+					($style
+						(:colour (@ColourRGB <- #0.0 #0.5 #0.5))
+					)
+				)
+				
+				($# "Structure")
+				(@structure
+					($style
+						(:colour (@ColourRGB <- #0.0 #0.25 #0.75))
+						(:font "#'Sans 11 bold")
+					)
+				)
 			)
 		)
 	)

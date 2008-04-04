@@ -227,11 +227,7 @@
 									($vbox ($list
 										($label "#'H-Line" (@gMetaStyles . keyword))
 										($vbox
-											(
-												($list ($viewEval @x @viewForm))
-												+
-												(@viewStyleList <- @styles)
-											)
+											(@viewStyleList <- @styles)
 										)
 									)  (@gMetaStyles . titleVBox))
 									(@gMetaStyles . labelBackground)
@@ -551,22 +547,18 @@
 								)
 							)
 							
-							( ($tokWord (: @initChars ^))
+							( ($tokWord (: @initChars ^) (: @bodyChars (- #0 #1 )) )
 								($activeBorder
-									($hbox ($list
-										($label "#'tokeniser word:" (@gMetaStyles . keyword))
-										($viewEval @initChars @viewForm)
-									))
-								)
-							)
-
-							( ($tokWord (: @initChars ^) (: @bodyChars ^))
-								($activeBorder
-									($hbox ($list
-										($label "#'tokeniser word:" (@gMetaStyles . keyword))
-										($viewEval @initChars @viewForm)
-										($viewEval @bodyChars @viewForm)
-									))
+									($hbox
+										(
+											($list
+												($label "#'tokeniser word:" (@gMetaStyles . keyword))
+												($viewEval @initChars @viewForm)
+											)
+											+
+											($mapViewEval @bodyChars @viewForm)
+										)
+									)
 								)
 							)
 
@@ -997,6 +989,40 @@
 						)
 					)
 				)
+				
+				($# "View a call parameter")
+				(@viewCallParam
+					($lambda (@node)
+						($match @node
+							($# "Keyword parameter")
+							( ((? @x (@x startswith "#':") (: @paramName !))  (: @value ^))
+								($activeBorder
+									($ahbox ($list
+										($label (@paramName [:] #1 #None) (@gMetaStyles . paramName))
+										($label "#'=")
+										($viewEval @value @viewForm)
+									))
+								)
+							)
+							
+							($# "Normal parameter")
+							( ^
+								(@viewForm <- @node)
+							)
+						)
+					)
+				)
+	
+				($# "View a call parameter list")
+				(@viewCallParamList
+					($lambda (@params)
+						($ahbox ($list
+							($label "#'(" (@gMetaStyles . structure))
+							($wrappedHBoxSep ($mapViewEval @params @viewCallParam))
+							($label "#')" (@gMetaStyles . structure))
+						))
+					)
+				)
 	
 				($# "View a form")
 				(@viewForm
@@ -1013,7 +1039,7 @@
 							)
 							
 							($# "Literal")
-							( (: @literalValue !)
+							( (? @x (@x startswith "#'#" ) (: @literalValue !))
 								($activeBorder ($label (@literalValue [:] #1 #None)))
 							)
 							
@@ -1163,9 +1189,6 @@
 								)
 							)
 
-							($# "Single element list")
-							( ((: @x ^))   (@viewForm <- @x) )
-							
 							($# "Special")
 							( (: @s((? @x (@x startswith "#'$") !) *))
 								(@viewSpecial <- @s)
@@ -1222,45 +1245,28 @@
 							($# "Call")
 							( ( (: @a ^) "<-" (: @params *) )
 								($activeBorder
-									($ahbox
-										(
-											(
-												($list
-													($viewEval @a @viewForm)
-													($label "#'(")
-												)
-												+
-												($mapViewEval @params @viewForm)
-											)
-											+
-											($list ($label "#')"))
-										)
-									)
+									($ahbox ($list
+										($viewEval @a @viewForm)
+										(@viewCallParamList <- @params)
+									))
 								)
 							)
 
 							($# "Method call")
 							( ( (: @a ^) (: @methodName !) (: @params *) )
 								($activeBorder
-									($ahbox
-										(
-											(
-												($list
-													($viewEval @a @viewForm)
-													($label "#'.")
-													($label @methodName)
-													($label "#'(")
-												)
-												+
-												($mapViewEval @params @viewForm)
-											)
-											+
-											($list ($label "#')"))
-										)
-									)
+									($ahbox ($list
+										($viewEval @a @viewForm)
+										($label "#'.")
+										($label @methodName)
+										(@viewCallParamList <- @params)
+									))
 								)
 							)
 
+							($# "Single element list")
+							( ((: @x ^))   (@viewForm <- @x) )
+							
 							($# "Unknown")
 							( (: @x ^)  (@log <- (@gLispAsString <- @x)) ($activeBorder ($label "#'<error>" (@gMetaStyles . error)) (@gMetaStyles . error)) )
 						)
