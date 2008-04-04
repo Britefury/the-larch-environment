@@ -6,7 +6,7 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
 from Britefury.DocPresent.Toolkit.DTBox import DTBox
-from Britefury.DocPresent.Toolkit.DTWrappedLineWithSeparators import DTWrappedLineWithSeparators
+from Britefury.DocPresent.Toolkit.DTWrappedHBoxWithSeparators import DTWrappedHBoxWithSeparators
 from Britefury.DocPresent.Toolkit.DTDirection import DTDirection
 from Britefury.DocPresent.Toolkit.DTLabel import DTLabel
 
@@ -15,7 +15,7 @@ from Britefury.DocView.StyleSheet.DVListStyleSheet import DVListStyleSheet
 
 
 
-class DVListWrappedLineStyleSheet (DVListStyleSheet):
+class DVListWrappedHBoxStyleSheet (DVListStyleSheet):
 	elementSpacing = 0.0
 	elementPadding = 0.0
 
@@ -38,7 +38,7 @@ class DVListWrappedLineStyleSheet (DVListStyleSheet):
 		return DTLabel()
 
 	def elementsContainer(self):
-		return DTWrappedLineWithSeparators( separatorFactory=self.separator, spacing=self.elementSpacing, padding=self.elementPadding )
+		return DTWrappedHBoxWithSeparators( separatorFactory=self.separator, spacing=self.elementSpacing, padding=self.elementPadding )
 
 	def overallContainer(self, elementsContainer):
 		box = DTBox( direction=self.overallDirection, spacing=self.overallSpacing, bExpand=self.overallExpand, bFill=self.overallFill, bShrink=self.overallShrink, alignment=self.overallMinorDirectionAlignment, padding=self.overallPadding )

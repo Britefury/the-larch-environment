@@ -28,7 +28,7 @@ from Britefury.DocView.StyleSheet.DVStyleSheet import *
 
 from Britefury.DocView.StyleSheet.StyleSheetDispatcher import StyleSheetDispatcher
 from Britefury.DocView.StyleSheet.DVStringStyleSheet import DVStringStyleSheet
-from Britefury.DocView.StyleSheet.DVListWrappedLineStyleSheet import DVListWrappedLineStyleSheet
+from Britefury.DocView.StyleSheet.DVListWrappedHBoxStyleSheet import DVListWrappedHBoxStyleSheet
 
 
 
@@ -194,7 +194,7 @@ class LispStringStyleSheet (DVStringStyleSheet):
 
 
 
-class DVListSExpressionStyleSheet (DVListWrappedLineStyleSheet):
+class DVListSExpressionStyleSheet (DVListWrappedHBoxStyleSheet):
 	elementSpacing = 10.0
 
 

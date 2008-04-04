@@ -22,7 +22,8 @@ from Britefury.DocPresent.Toolkit.DTLabel import DTLabel
 from Britefury.DocPresent.Toolkit.DTScript import DTScript
 from Britefury.DocPresent.Toolkit.DTTokenisedEntryLabel import DTTokenisedEntryLabel
 from Britefury.DocPresent.Toolkit.DTTokenisedCustomEntry import DTTokenisedCustomEntry
-from Britefury.DocPresent.Toolkit.DTWrappedLine import DTWrappedLine
+from Britefury.DocPresent.Toolkit.DTWrappedHBox import DTWrappedHBox
+from Britefury.DocPresent.Toolkit.DTWrappedHBoxWithSeparators import DTWrappedHBoxWithSeparators
 
 
 from Britefury.DocView.DVNode import DVNode
@@ -125,12 +126,12 @@ def _runtime_customEntryRefreshCell(viewNodeInstance, customEntry, child):
 	else:
 		raiseRuntimeError( TypeError, viewNodeInstance.xs, '_GSymNodeViewInstance._customEntryRefreshCell: could not process child of type %s'  %  ( type( child ).__name__, ) )
 
-def _runtime_boxRefreshCell(viewNodeInstance, widget, children):
+def _runtime_containerSeqRefreshCell(viewNodeInstance, widget, children):
 	"""
 	Runtime - called by compiled code at run-time
 	Builds and registers a refresh cell (if necessary) for a widget that is an instance of DTBox
 	"""
-	def _boxRefresh():
+	def _containerSeqRefresh():
 		widgets = []
 		for child in children:
 			if isinstance( child, DVNode ):
@@ -139,9 +140,9 @@ def _runtime_boxRefreshCell(viewNodeInstance, widget, children):
 			elif isinstance( child, DTWidget ):
 				widgets.append( child )
 			else:
-				raiseRuntimeError( TypeError, viewNodeInstance.xs, 'defineView: _boxRefreshCell: could not process child of type %s'  %  ( type( child ).__name__, ) )
+				raiseRuntimeError( TypeError, viewNodeInstance.xs, 'defineView: _containerSeqRefreshCell: could not process child of type %s'  %  ( type( child ).__name__, ) )
 		widget[:] = widgets
-	_runtime_buildRefreshCellAndRegister( viewNodeInstance, _boxRefresh )
+	_runtime_buildRefreshCellAndRegister( viewNodeInstance, _containerSeqRefresh )
 
 def _runtime_scriptRefreshCell(viewNodeInstance, script, child, childSlotAttrName):
 	"""
@@ -336,7 +337,7 @@ def _runtime_hbox(viewNodeInstance, children, styleSheets=None):
 	Builds a horizontal DTBox widget, with child, builds and registers a refresh cell
 	"""
 	widget = DTBox()
-	_runtime_boxRefreshCell( viewNodeInstance, widget, children )
+	_runtime_containerSeqRefreshCell( viewNodeInstance, widget, children )
 	_runtime_applyStyleSheetStack( viewNodeInstance, widget )
 	_runtime_applyStyleSheets( styleSheets, widget )
 	return widget
@@ -347,7 +348,7 @@ def _runtime_ahbox(viewNodeInstance, children, styleSheets=None):
 	Builds a horizontal DTBox widget, with child, builds and registers a refresh cell
 	"""
 	widget = DTBox( alignment=DTBox.ALIGN_BASELINES )
-	_runtime_boxRefreshCell( viewNodeInstance, widget, children )
+	_runtime_containerSeqRefreshCell( viewNodeInstance, widget, children )
 	_runtime_applyStyleSheetStack( viewNodeInstance, widget )
 	_runtime_applyStyleSheets( styleSheets, widget )
 	return widget
@@ -358,7 +359,29 @@ def _runtime_vbox(viewNodeInstance, children, styleSheets=None):
 	Builds a vertical DTBox widget, with child, builds and registers a refresh cell
 	"""
 	widget = DTBox( direction=DTDirection.TOP_TO_BOTTOM, alignment=DTBox.ALIGN_LEFT )
-	_runtime_boxRefreshCell( viewNodeInstance, widget, children )
+	_runtime_containerSeqRefreshCell( viewNodeInstance, widget, children )
+	_runtime_applyStyleSheetStack( viewNodeInstance, widget )
+	_runtime_applyStyleSheets( styleSheets, widget )
+	return widget
+
+def _runtime_wrappedHBox(viewNodeInstance, children, styleSheets=None):
+	"""
+	Runtime - called by compiled code at run-time
+	Builds a DTWrappedHBox widget, with child, builds and registers a refresh cell
+	"""
+	widget = DTWrappedHBox()
+	_runtime_containerSeqRefreshCell( viewNodeInstance, widget, children )
+	_runtime_applyStyleSheetStack( viewNodeInstance, widget )
+	_runtime_applyStyleSheets( styleSheets, widget )
+	return widget
+
+def _runtime_wrappedHBoxSep(viewNodeInstance, children, separatorFactory=',', styleSheets=None):
+	"""
+	Runtime - called by compiled code at run-time
+	Builds a DTWrappedHBoxWithSeparators widget, with child, builds and registers a refresh cell
+	"""
+	widget = DTWrappedHBoxWithSeparators( separatorFactory )
+	_runtime_containerSeqRefreshCell( viewNodeInstance, widget, children )
 	_runtime_applyStyleSheetStack( viewNodeInstance, widget )
 	_runtime_applyStyleSheets( styleSheets, widget )
 	return widget
@@ -705,6 +728,16 @@ class GMetaComponentView (GMetaComponent):
 			if len( srcXs ) < 2:
 				raiseCompilerError( GLispParameterListError, src, 'defineView: $vbox needs at least 1 parameter; the children' )
 			return PyVar( '__gsym__vbox__', dbgSrc=srcXs )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[1] ), *compileWidgetParams( srcXs[2:]) ).debug( srcXs )
+		elif name == '$wrappedHBox':
+			#($wrappedHBox (child*) [<styleSheet>])
+			if len( srcXs ) < 2:
+				raiseCompilerError( GLispParameterListError, src, 'defineView: $wrappedHBox needs at least 1 parameter; the children' )
+			return PyVar( '__gsym__wrappedHBox__', dbgSrc=srcXs )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[1] ), *compileWidgetParams( srcXs[2:]) ).debug( srcXs )
+		elif name == '$wrappedHBoxSep':
+			#($wrappedHBox (child*) [<separatorFactory>] [<styleSheet>])
+			if len( srcXs ) < 2:
+				raiseCompilerError( GLispParameterListError, src, 'defineView: $wrappedHBoxSep needs at least 1 parameter; the children' )
+			return PyVar( '__gsym__wrappedHBoxSep__', dbgSrc=srcXs )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[1] ), *compileWidgetParams( srcXs[2:]) ).debug( srcXs )
 		elif name == '$script':
 			#($script <mainChild> <leftSuperChild> <leftSubChild> <rightSuperChild> <rightSubChild> [<styleSheet>])
 			if len( srcXs ) < 6:
@@ -763,6 +796,8 @@ class GMetaComponentView (GMetaComponent):
 			'__gsym__hbox__' : _runtime_hbox,
 			'__gsym__ahbox__' : _runtime_ahbox,
 			'__gsym__vbox__' : _runtime_vbox,
+			'__gsym__wrappedHBox__' : _runtime_wrappedHBox,
+			'__gsym__wrappedHBoxSep__' : _runtime_wrappedHBoxSep,
 			'__gsym__script__' : _runtime_script,
 			'__gsym__interact__' : _runtime_interact,
 			'__gsym__GSymStyleSheet__' : GSymStyleSheet,
@@ -777,7 +812,7 @@ class GMetaComponentView (GMetaComponent):
 			'__gsym__DTScript__' : DTScript,
 			'__gsym__runtime_setKeyHandler__' : _runtime_setKeyHandler,
 			'__gsym__runtime_binRefreshCell__' : _runtime_binRefreshCell,
-			'__gsym__runtime_boxRefreshCell__' : _runtime_boxRefreshCell,
+			'__gsym__runtime_containerSeqRefreshCell__' : _runtime_containerSeqRefreshCell,
 			'__gsym__runtime_scriptRefreshCell__' : _runtime_scriptRefreshCell,
 			'__gsym__runtime_applyStyleSheetStack__' : _runtime_applyStyleSheetStack,
 			'__gsym__runtime_applyStyleSheets__' : _runtime_applyStyleSheets,
@@ -867,7 +902,7 @@ def hbox(children, styleSheets=None):
 	Builds a horizontal DTBox widget, with child, builds and registers a refresh cell
 	"""
 	widget = __gsym__DTBox__()
-	__gsym__runtime_boxRefreshCell__( __view_node_instance_stack__[-1], widget, children )
+	__gsym__runtime_containerSeqRefreshCell__( __view_node_instance_stack__[-1], widget, children )
 	__gsym__runtime_applyStyleSheetStack__( __view_node_instance_stack__[-1], widget )
 	__gsym__runtime_applyStyleSheets__( styleSheets, widget )
 	return widget
@@ -878,7 +913,7 @@ def ahbox(children, styleSheets=None):
 	Builds a horizontal DTBox widget, with child, builds and registers a refresh cell
 	"""
 	widget = __gsym__DTBox__( alignment=DTBox.ALIGN_BASELINES )
-	__gsym__runtime_boxRefreshCell__( __view_node_instance_stack__[-1], widget, children )
+	__gsym__runtime_containerSeqRefreshCell__( __view_node_instance_stack__[-1], widget, children )
 	__gsym__runtime_applyStyleSheetStack__( __view_node_instance_stack__[-1], widget )
 	__gsym__runtime_applyStyleSheets__( styleSheets, widget )
 	return widget
@@ -889,7 +924,7 @@ def vbox(children, styleSheets=None):
 	Builds a vertical DTBox widget, with child, builds and registers a refresh cell
 	"""
 	widget = __gsym__DTBox__( direction=DTDirection.TOP_TO_BOTTOM, alignment=DTBox.ALIGN_LEFT )
-	__gsym__runtime_boxRefreshCell__( __view_node_instance_stack__[-1], widget, children )
+	__gsym__runtime_containerSeqRefreshCell__( __view_node_instance_stack__[-1], widget, children )
 	__gsym__runtime_applyStyleSheetStack__( __view_node_instance_stack__[-1], widget )
 	__gsym__runtime_applyStyleSheets__( styleSheets, widget )
 	return widget

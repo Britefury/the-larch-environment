@@ -49,7 +49,7 @@ TODOS:
 - For editing languages 'live'; use the smalltalk-ish multiple worlds idea; use one world to edit a hosted world
 - Implement web-browser style user interface - urls, tabbed browsing
 - Typesetting:
-     - Add baseline alignment to DTWrappedLine
+     - Add baseline alignment to DTWrappedHBox
      - Provide different hboxes in the view code; an aligned one, and an unaligned one
 - Check out the Psyco optimiser, since it works on Linux and Windows.
 - GSym will screw up if the system attempts to render two views of the same document node:
@@ -95,8 +95,8 @@ ALTERNATE CURSOR MANAGEMENT SYSTEM:
 Implement cursor location methods for:
 - DTHLine
 - DTScript
-- DTWrappedLine
-- DTWrappedLineWithSeparators
+- DTWrappedHBox
+- DTWrappedHBoxWithSeparators
 Test cursor location methods for:
 - DTBox
 - DTEntry

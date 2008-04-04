@@ -23,7 +23,7 @@ from Britefury.DocView.DocViewNodeTable import DocNodeKey
 from Britefury.DocViewBehavior.DVBListBehavior import DVBListBehavior
 #from Britefury.DocViewBehavior.DVBCreateExpressionBehavior import DVBCreateExpressionBehavior
 
-from Britefury.DocPresent.Toolkit.DTWrappedLineWithSeparators import DTWrappedLineWithSeparators
+from Britefury.DocPresent.Toolkit.DTWrappedHBoxWithSeparators import DTWrappedHBoxWithSeparators
 from Britefury.DocPresent.Toolkit.DTBox import DTBox
 from Britefury.DocPresent.Toolkit.DTDirection import DTDirection
 from Britefury.DocPresent.Toolkit.DTLabel import DTLabel
@@ -98,7 +98,7 @@ class DVList (DVBorderNode):
 	def __init__(self, docNode, view, docNodeKey):
 		super( DVList, self ).__init__( docNode, view, docNodeKey )
 		self._elementNodes = []
-		self._elementsLine = DTWrappedLineWithSeparators( spacing=5.0 )
+		self._elementsLine = DTWrappedHBoxWithSeparators( spacing=5.0 )
 		self._box = DTBox()
 		self._box.append( DTLabel( '[', font='Sans bold 11', colour=Colour3f( 0.0, 0.6, 0.0 ) ) )
 		self._box.append( self._elementsLine )
