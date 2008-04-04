@@ -64,12 +64,6 @@
 								)
 							)
 							
-							(@callTester
-								($lambda (@x @y @z @w)
-									(@x <- @y @z (:a @w))
-								)
-							)
-							
 							(@exprInteractor
 								($lambda (@node)
 									($interactor

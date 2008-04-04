@@ -30,7 +30,7 @@ class DTWrappedHBoxWithSeparators (DTWrappedHBox):
 	def __setitem__(self, index, item):
 		if isinstance( index, slice ):
 			# Create the new boxes
-			boxes = [ DTBox()   for child in item ]
+			boxes = [ self._p_makeChildBox()   for child in item ]
 
 			# Add the items to the new boxes
 			for child, box in zip( item, boxes ):
@@ -69,7 +69,7 @@ class DTWrappedHBoxWithSeparators (DTWrappedHBox):
 			self._boxes[-1].append( self._p_makeSeparator() )
 
 		# Create and add the new box
-		self._boxes.append( DTBox() )
+		self._boxes.append( self._p_makeChildBox() )
 		# Add the item to the new box
 		self._boxes[-1].append( child )
 		# Add the item to the item list
@@ -85,7 +85,7 @@ class DTWrappedHBoxWithSeparators (DTWrappedHBox):
 			self._boxes[-1].append( self._p_makeSeparator() )
 
 		# Create the new boxes
-		boxes = [ DTBox()   for child in children ]
+		boxes = [ self._p_makeChildBox()   for child in children ]
 		# Add the items to the new boxes
 		for child, box in zip( children, boxes ):
 			box.append( child )
@@ -104,7 +104,7 @@ class DTWrappedHBoxWithSeparators (DTWrappedHBox):
 		if index == len( self._items ):
 			self.append( item, padding )
 		else:
-			box = DTBox()
+			box = self._p_makeChildBox()
 			box.append( child )
 			box.append( self._p_makeSeparator() )
 
@@ -125,6 +125,10 @@ class DTWrappedHBoxWithSeparators (DTWrappedHBox):
 			return DTLabel( self._separatorFactory )
 		else:
 			return self._separatorFactory()
+		
+		
+	def _p_makeChildBox(self):
+		return DTBox( alignment=DTBox.ALIGN_BASELINES )
 
 
 
