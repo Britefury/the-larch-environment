@@ -10,10 +10,10 @@ from Britefury.DocPresent.Toolkit.DTContainerSequence import DTContainerSequence
 
 
 
-class DTWrappedLine (DTContainerSequence):
+class DTWrappedHBox (DTContainerSequence):
 	class ChildEntry (DTContainerSequence.ChildEntry):
 		def __init__(self, child, padding):
-			super( DTWrappedLine.ChildEntry, self ).__init__( child )
+			super( DTWrappedHBox.ChildEntry, self ).__init__( child )
 			self.padding = padding
 			self._reqWidth = 0.0
 			self._reqHeight = 0.0
@@ -22,7 +22,7 @@ class DTWrappedLine (DTContainerSequence):
 
 
 	def __init__(self, spacing=0.0, padding=0.0, backgroundColour=None):
-		super( DTWrappedLine, self ).__init__( backgroundColour )
+		super( DTWrappedHBox, self ).__init__( backgroundColour )
 
 		self._spacing = spacing
 		self._padding = padding
@@ -240,7 +240,7 @@ if __name__ == '__main__':
 
 	labels = [ MyLabel( text )   for text in labelTexts ]
 
-	line = DTWrappedLine()
+	line = DTWrappedHBox()
 	for label in labels:
 		line.append( label )
 	line.spacing = 5.0
