@@ -19,7 +19,6 @@ from Britefury.DocPresent.Toolkit.DTLabel import DTLabel
 from Britefury.DocPresent.Toolkit.DTBorder import DTBorder
 from Britefury.DocPresent.Toolkit.DTBox import DTBox
 from Britefury.DocPresent.Toolkit.DTPopupDocument import DTPopupDocument
-from Britefury.DocPresent.Toolkit.DTDirection import DTDirection
 
 
 
@@ -221,7 +220,7 @@ class DTAutoCompleteDropDown (DTPopupDocument):
 
 
 	def _p_refreshContents(self):
-		box = DTBox( direction=DTDirection.TOP_TO_BOTTOM )
+		box = DTBox( direction=DTBox.TOP_TO_BOTTOM )
 
 
 		self._labels = [ self._Label( self, text )   for text in self._autoCompleteList ]

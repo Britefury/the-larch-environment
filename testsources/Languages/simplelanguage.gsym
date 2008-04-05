@@ -33,7 +33,7 @@
 						(
 							(@divBoxStyle
 								($style
-									(:alignment (@DTBox . ALIGN_EXPAND))
+									(:alignment "#'expand")
 								)
 							)
 							

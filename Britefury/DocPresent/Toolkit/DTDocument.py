@@ -788,7 +788,6 @@ class DTDocument (DTBin):
 if __name__ == '__main__':
 	from Britefury.DocPresent.Toolkit.DTLabel import DTLabel
 	from Britefury.DocPresent.Toolkit.DTBox import DTBox
-	from Britefury.DocPresent.Toolkit.DTDirection import DTDirection
 	import cairo
 	from Britefury.Math.Math import Colour3f
 	import traceback
@@ -887,14 +886,14 @@ if __name__ == '__main__':
 	dndDestBox = DTBox( spacing=20.0 )
 	dndDestBox[:] = dndDestLabels
 
-	dndBox = DTBox( direction=DTDirection.TOP_TO_BOTTOM, spacing=10.0 )
+	dndBox = DTBox( direction=DTBox.TOP_TO_BOTTOM, spacing=10.0 )
 	dndBox.append( dndSourceBox )
 	dndBox.append( dndDestBox )
 
 
 
 
-	docBox = DTBox( direction=DTDirection.TOP_TO_BOTTOM )
+	docBox = DTBox( direction=DTBox.TOP_TO_BOTTOM )
 	docBox.append( label )
 	docBox.append( dndBox, bExpand=True, bFill=True, padding=20.0 )
 

@@ -450,7 +450,6 @@ if __name__ == '__main__':
 	from Britefury.DocPresent.Toolkit.DTLabel import DTLabel
 	from Britefury.DocPresent.Toolkit.DTDocument import DTDocument
 	from Britefury.DocPresent.Toolkit.DTBox import DTBox
-	from Britefury.DocPresent.Toolkit.DTDirection import DTDirection
 	from Britefury.DocPresent.Toolkit.DTActiveBorder import DTActiveBorder
 	import cairo
 	from Britefury.Math.Math import Colour3f
@@ -504,7 +503,7 @@ if __name__ == '__main__':
 		return border2
 	
 	
-	box = DTBox( DTDirection.TOP_TO_BOTTOM, spacing=20.0 )
+	box = DTBox( DTBox.TOP_TO_BOTTOM, spacing=20.0 )
 	for i in xrange( 0, 16 ):
 		if ( i & 1 )  !=  0:
 			leftSuperText = 'left super'

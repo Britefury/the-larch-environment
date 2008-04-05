@@ -240,7 +240,8 @@ class PyNode (object):
 	
 
 class PyKWParam (PyNode):
-	def __init__(self, name, value):
+	def __init__(self, name, value, dbgSrc=None):
+		super( PyKWParam, self ).__init__( dbgSrc )
 		assert isinstance( name, str )
 		assert _isPyIdentifier( name )
 		self.name = name
@@ -496,7 +497,10 @@ class PyListLiteral (PyExpression):
 		self.subexps = subexps
 		
 	def _o_compileAsExpr(self):
-		return '[ ' + ', '.join( [ x.compileAsExpr()   for x in self.subexps ] )  +  ' ]'
+		if len( self.subexps ) == 0:
+			return '[]'
+		else:
+			return '[ ' + ', '.join( [ x.compileAsExpr()   for x in self.subexps ] )  +  ' ]'
 		
 	def _o_compareWith(self, x):
 		return pyt_compare( self.subexps, x.subexps )
@@ -865,7 +869,6 @@ class PyTry (PyStatement):
 		
 		assert isinstance( tryStatements, list ), 'PyTry: try statements must be a list'
 		assert isinstance( exceptSpecs, list ), 'PyTry: except specs must be a list'
-		assert len( exceptSpecs ) >= 1, 'PyTry: except specs must have at least 1 entry'
 		if elseStatements is not None:
 			assert isinstance( elseStatements, list ), 'PyTry: else statements must be a list'
 		if finallyStatements is not None:
@@ -883,6 +886,8 @@ class PyTry (PyStatement):
 		
 		
 	def compileAsStmt(self):
+		assert len( self.exceptSpecs ) >= 1, 'PyTry: except specs must have at least 1 entry'
+		
 		trySrc = []
 		
 		trySrc.extend( self._p_compileKeywordBlock( 'try', self.tryStatements ) )
@@ -1390,6 +1395,7 @@ class TestCase_PyCodeGen_Node_compile (unittest.TestCase):
 		self.assert_( PyLiteralValue( 1 ).compileAsExpr()  ==  '1' )
 
 	def test_PyListLiteral(self):
+		self.assert_( PyListLiteral( [] ).compileAsExpr()  ==  '[]' )
 		self.assert_( PyListLiteral( [ PySrc( 'a' ), PySrc( 'b' ) ] ).compileAsExpr()  ==  '[ a, b ]' )
 		
 	def test_PyDictLiteral(self):
@@ -1449,11 +1455,6 @@ class TestCase_PyCodeGen_Node_compile (unittest.TestCase):
 		self.assert_( PyRaise( PySrc( 'ValueError' ) ).compileAsStmt()  ==  [ 'raise ValueError' ] )
 
 	def test_PyTry(self):
-		pysrc1 = [
-			"try:",
-			"  a",
-		]
-
 		pysrc2 = [
 			"try:",
 			"  a",
@@ -1506,7 +1507,6 @@ class TestCase_PyCodeGen_Node_compile (unittest.TestCase):
 		]
 
 		
-		self.assert_( PyTry( [ PyVar( 'a' ) ] ).compileAsStmt()  ==  pysrc1 )
 		self.assert_( PyTry( [ PyVar( 'a' ) ],  [ ( PyVar( 'ValueError' ), [ PyVar( 'b' ) ] ) ] ).compileAsStmt()  ==  pysrc2 )
 		self.assert_( PyTry( [ PyVar( 'a' ) ],  [ ( PyVar( 'ValueError' ), [ PyVar( 'b' ) ] ), ( PyVar( 'TypeError' ), [ PyVar( 'c' ) ] ) ] ).compileAsStmt()  ==  pysrc3 )
 		self.assert_( PyTry( [ PyVar( 'a' ) ],  [ ( PyVar( 'ValueError' ), [ PyVar( 'b' ) ] ), ( PyVar( 'TypeError' ), [ PyVar( 'c' ) ] ) ], [ PyVar( 'd' ) ] ).compileAsStmt()  ==  pysrc4 )
@@ -1687,11 +1687,6 @@ class TestCase_PyCodeGen_build (unittest.TestCase):
 		self._compileStmtTest( PyVar( 'ValueError' ).raise_(),   [ 'raise ValueError' ] )
 
 	def test_try(self):
-		pysrc1 = [
-			"try:",
-			"  a",
-		]
-
 		pysrc2 = [
 			"try:",
 			"  a",
@@ -1744,7 +1739,6 @@ class TestCase_PyCodeGen_build (unittest.TestCase):
 		]
 
 		
-		self.assert_( PyTry( [ PyVar( 'a' ) ] ).compileAsStmt()  ==  pysrc1 )
 		self.assert_( PyTry( [ PyVar( 'a' ) ] ).except_( PyVar( 'ValueError' ), [ PyVar( 'b' ) ] ).compileAsStmt()  ==  pysrc2 )
 		self.assert_( PyTry( [ PyVar( 'a' ) ] ).except_( PyVar( 'ValueError' ), [ PyVar( 'b' ) ] ).except_( PyVar( 'TypeError' ), [ PyVar( 'c' ) ] ).compileAsStmt()  ==  pysrc3 )
 		self.assert_( PyTry( [ PyVar( 'a' ) ] ).except_( PyVar( 'ValueError' ), [ PyVar( 'b' ) ] ).except_( PyVar( 'TypeError' ), [ PyVar( 'c' ) ] ).else_( [ PyVar( 'd' ) ] ).compileAsStmt()  ==  pysrc4 )
@@ -1859,7 +1853,6 @@ class TestCase_PyCodeGen_Node_children (unittest.TestCase):
 		f = PyVar( 'f' )
 		g = PyVar( 'g' )
 		
-		self._childrenTest( PyTry( [ a ] ),    [ a ] )
 		self._childrenTest( PyTry( [ a ] ).except_( b, [c] ),    [ a, b, c ] )
 		self._childrenTest( PyTry( [ a ] ).except_( b, [c] ).except_( d, [e] ),    [ a, b, c, d, e ] )
 		self._childrenTest( PyTry( [ a ] ).except_( b, [c] ).except_( d, [e] ).else_( [f] ),    [ a, b, c, d, e, f ] )

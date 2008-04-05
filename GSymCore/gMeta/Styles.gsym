@@ -97,7 +97,7 @@
 				($# "Title vbox")
 				(@titleVBox
 					($style
-						(:alignment (@DTBox . ALIGN_CENTRE))
+						(:alignment "#'centre")
 					)
 				)
 				
@@ -128,6 +128,14 @@
 					($style
 						(:colour (@ColourRGB <- #0.0 #0.25 #0.75))
 						(:font "#'Sans 11 bold")
+					)
+				)
+				
+				($# "Pattern special")
+				(@patternSpecial
+					($style
+						(:colour (@ColourRGB <- #0.0 #0.0 #1.0))
+						(:font "#'Sans 10 bold")
 					)
 				)
 			)

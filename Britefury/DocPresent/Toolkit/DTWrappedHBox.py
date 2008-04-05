@@ -21,12 +21,13 @@ class DTWrappedHBox (DTContainerSequence):
 
 
 
-	def __init__(self, spacing=0.0, padding=0.0, backgroundColour=None):
+	def __init__(self, spacing=0.0, padding=0.0, indentation=0.0, backgroundColour=None):
 		super( DTWrappedHBox, self ).__init__( backgroundColour )
 
 		self._spacing = spacing
 		self._padding = padding
-		self._lineLengths = []
+		self._indentation = indentation
+		self._lines = []
 
 
 
@@ -35,6 +36,24 @@ class DTWrappedHBox (DTContainerSequence):
 
 	def setSpacing(self, spacing):
 		self._spacing = spacing
+		self._o_queueResize()
+		
+		
+		
+	def getPadding(self):
+		return self._padding
+
+	def setPadding(self, padding):
+		self._padding = padding
+		self._o_queueResize()
+		
+		
+		
+	def getIndentation(self):
+		return self._indentation
+
+	def setIndentation(self, indentation):
+		self._indentation = indentation
 		self._o_queueResize()
 		
 		
@@ -100,59 +119,90 @@ class DTWrappedHBox (DTContainerSequence):
 
 	def _o_onAllocateX(self, allocation):
 		x = 0.0
-		lineLength = 0
-		self._lineLengths = []
+		self._lines = []
+		currentLine = []
+		bFirstChildInLine = True
+		bFirstLine = True
 		for entry in self._childEntries:
 			childWidth = entry._reqWidth
 
 			childRight = x + childWidth
 			if childRight > allocation:
-				if x > 0.0:
-					# Terminate current line
-					self._lineLengths.append( lineLength )
-					# Put this child on a new line
-					self._o_allocateChildX( entry.child, 0.0, childWidth )
-					x = childWidth + self._spacing
-					# Continue on this line: length of this line is 1
-					lineLength = 1
-				else:
+				if bFirstChildInLine:
 					# First child in this line takes up whole line
 
 					# This line has 1 child
-					self._lineLengths.append( 1 )
-					# Put it at x=0
-					self._o_allocateChildX( entry.child, 0.0, childWidth )
+					self._lines.append( [ entry ] )
+					# Put it at the start
+					if bFirstLine:
+						x = 0.0
+					else:
+						x = self._indentation
+					# Allocate
+					self._o_allocateChildX( entry.child, x + entry.padding, childWidth )
+					
 					# Start a new line
-					lineLength = 0
-					x = 0.0
+					# Nothing in the current line
+					currentLine = []
+					# Start @x at indentation
+					x = self._indentation
+					# Not the first line in the box
+					bFirstLine = False
+					# Next child will be the first child in the new line
+					bFirstChildInLine = True
+				else:
+					# Terminate the current line, and put @entry on the next line
+					
+					# Terminate current line
+					self._lines.append( currentLine )
+					
+					# Start a new line
+					# Start with @entry in the new line
+					currentLine = [ entry ]
+					# Start @x at indentation
+					x = self._indentation
+					# Not the first line in the box
+					bFirstLine = False
+					# Next child will be the second child in the new line
+					bFirstChildInLine = False
+					
+					# Allocate
+					self._o_allocateChildX( entry.child, x, childWidth )
+					
+					# Move @x on
+					x += childWidth + self._spacing
 			else:
 				# Continue existing line
+				
+				# Allocate
 				self._o_allocateChildX( entry.child, x, childWidth )
-				lineLength += 1
-				x += childWidth + self._spacing
 
-		if lineLength > 0:
-			self._lineLengths.append( lineLength )
+				# Add @entry to the current line
+				currentLine.append( entry )
+				# Move @x on
+				x += childWidth + self._spacing
+				# Next child will not be the first child in this line
+				bFirstChildInLine = False
+				
+
+		if len( currentLine )  >  0:
+			self._lines.append( currentLine )
 
 
 	def _o_onAllocateY(self, allocation):
-		i = 0
 		lineHeights = []
-		for lineLength in self._lineLengths:
-			lineHeights.append( max( [ entry._reqHeight   for entry in self._childEntries[i:i+lineLength] ] ) )
-			i += lineLength
+		for line in self._lines:
+			lineHeights.append( max( [ entry._reqHeight   for entry in line ] ) )
 
 		totalLineHeights = sum( lineHeights )
 
-		i = 0
 		y = ( allocation - totalLineHeights ) * 0.5
 		y = max( y, 0.0 )
 
-		for lineLength, lineHeight in zip( self._lineLengths, lineHeights ):
-			for entry in self._childEntries[i:i+lineLength]:
+		for line, lineHeight in zip( self._lines, lineHeights ):
+			for entry in line:
 				offset = ( lineHeight - entry._reqHeight ) * 0.5
 				self._o_allocateChildY( entry.child, y + offset, entry._reqHeight )
-			i += lineLength
 			y += lineHeight
 
 
@@ -174,6 +224,8 @@ class DTWrappedHBox (DTContainerSequence):
 	
 	
 	spacing = property( getSpacing, setSpacing )
+	padding = property( getPadding, setPadding )
+	indentation = property( getIndentation, setIndentation )
 
 
 
@@ -240,7 +292,7 @@ if __name__ == '__main__':
 
 	labels = [ MyLabel( text )   for text in labelTexts ]
 
-	line = DTWrappedHBox()
+	line = DTWrappedHBox( indentation=30.0 )
 	for label in labels:
 		line.append( label )
 	line.spacing = 5.0

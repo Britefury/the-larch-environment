@@ -96,7 +96,6 @@ if __name__ == '__main__':
 
 
 	from Britefury.DocPresent.Toolkit.DTBox import DTBox
-	from Britefury.DocPresent.Toolkit.DTDirection import DTDirection
 	from Britefury.DocPresent.Toolkit.DTDocument import DTDocument
 	import cairo
 	from Britefury.Math.Math import Colour3f
@@ -126,7 +125,7 @@ if __name__ == '__main__':
 	doc = DTDocument()
 	doc.show()
 
-	vbox = DTBox( direction=DTDirection.TOP_TO_BOTTOM, alignment=DTBox.ALIGN_EXPAND )
+	vbox = DTBox( direction=DTBox.TOP_TO_BOTTOM, alignment=DTBox.ALIGN_EXPAND )
 	vbox.spacing = 10.0
 	vbox.append( DTHLine() )
 	vbox.append( DTHLine() )

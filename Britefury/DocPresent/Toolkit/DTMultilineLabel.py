@@ -211,7 +211,6 @@ class DTMultilineLabel (DTSimpleStaticWidget):
 
 
 multilineText = """from Britefury.DocPresent.Toolkit.DTBox import DTBox
-from Britefury.DocPresent.Toolkit.DTDirection import DTDirection
 from Britefury.DocPresent.Toolkit.DTDocument import DTDocument
 import cairo
 from Britefury.Math.Math import Colour3f
@@ -226,8 +225,6 @@ if __name__ == '__main__':
 
 
 	from Britefury.DocPresent.Toolkit.DTBox import DTBox
-	from Britefury.DocPresent.Toolkit.DTDirection import DTDirection
-	from Britefury.DocPresent.Toolkit.DTDocument import DTDocument
 	import cairo
 	from Britefury.Math.Math import Colour3f
 	import traceback
@@ -255,7 +252,7 @@ if __name__ == '__main__':
 	doc = DTDocument()
 	doc.show()
 
-	vbox = DTBox( DTDirection.TOP_TO_BOTTOM, alignment=DTBox.ALIGN_EXPAND )
+	vbox = DTBox( DTBox.TOP_TO_BOTTOM, alignment=DTBox.ALIGN_EXPAND )
 	vbox.spacing = 10.0
 	vbox.backgroundColour = Colour3f( 0.8, 0.8, 0.8 )
 

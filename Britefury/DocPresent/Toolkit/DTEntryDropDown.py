@@ -20,7 +20,6 @@ from Britefury.DocPresent.Toolkit.DTEntry import DTEntry
 from Britefury.DocPresent.Toolkit.DTBorder import DTBorder
 from Britefury.DocPresent.Toolkit.DTBox import DTBox
 from Britefury.DocPresent.Toolkit.DTPopupDocument import DTPopupDocument
-from Britefury.DocPresent.Toolkit.DTDirection import DTDirection
 
 
 
@@ -37,7 +36,7 @@ class DTEntryDropDown (DTPopupDocument):
 		self.entry.returnSignal.connect( self._p_onEntryReturn )
 
 
-		self._box = DTBox( direction=DTDirection.TOP_TO_BOTTOM, alignment=DTBox.ALIGN_LEFT )
+		self._box = DTBox( direction=DTBox.TOP_TO_BOTTOM, alignment=DTBox.ALIGN_LEFT )
 
 		if bShowLabel:
 			self._box.append( self.label )

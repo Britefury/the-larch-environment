@@ -25,7 +25,6 @@ from Britefury.DocViewBehavior.DVBListBehavior import DVBListBehavior
 
 from Britefury.DocPresent.Toolkit.DTWrappedHBoxWithSeparators import DTWrappedHBoxWithSeparators
 from Britefury.DocPresent.Toolkit.DTBox import DTBox
-from Britefury.DocPresent.Toolkit.DTDirection import DTDirection
 from Britefury.DocPresent.Toolkit.DTLabel import DTLabel
 
 

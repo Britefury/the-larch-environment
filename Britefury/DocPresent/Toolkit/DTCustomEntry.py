@@ -285,7 +285,6 @@ if __name__ == '__main__':
 	import gtk
 	import cairo
 
-	from Britefury.DocPresent.Toolkit.DTDirection import DTDirection
 	from Britefury.DocPresent.Toolkit.DTDocument import DTDocument
 	from Britefury.DocPresent.Toolkit.DTBox import DTBox
 	from Britefury.DocPresent.Toolkit.DTHLine import DTHLine
@@ -315,7 +314,7 @@ if __name__ == '__main__':
 	doc = DTDocument()
 	doc.getGtkWidget().show()
 	
-	box = DTBox( direction=DTDirection.TOP_TO_BOTTOM, spacing=10.0, alignment=DTBox.ALIGN_EXPAND )
+	box = DTBox( direction=DTBox.TOP_TO_BOTTOM, spacing=10.0, alignment=DTBox.ALIGN_EXPAND )
 
 	entry1 = DTCustomEntry( 'Hello world' )
 	entry1.setCustomChild( DTHLine() )

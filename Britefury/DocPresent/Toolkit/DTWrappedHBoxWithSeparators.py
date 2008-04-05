@@ -13,8 +13,8 @@ from Britefury.DocPresent.Toolkit.DTLabel import DTLabel
 import traceback
 
 class DTWrappedHBoxWithSeparators (DTWrappedHBox):
-	def __init__(self, separatorFactory=',', spacing=0.0, padding=0.0):
-		super( DTWrappedHBoxWithSeparators, self ).__init__( spacing, padding )
+	def __init__(self, separatorFactory=',', spacing=0.0, padding=0.0, indentation=0.0):
+		super( DTWrappedHBoxWithSeparators, self ).__init__( spacing, padding, indentation )
 
 		self._boxes = []
 		self._items = []

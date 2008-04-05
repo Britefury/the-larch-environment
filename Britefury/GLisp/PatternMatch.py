@@ -210,6 +210,13 @@ def _buildMatchNodeForMatchList(xs):
 
 
 
+def matchEscapeString(x):
+	partsBetweenBackslashes = x.split( '\\\\' )
+	partsBetweenBackslashes = [ p.replace( '\\', '' )   for p in partsBetweenBackslashes ]
+	return '\\'.join( partsBetweenBackslashes )
+		
+
+
 def _buildMatchNodeForMatchItem(xs, bInsideList=False):
 	if isGLispList( xs ):
 		if len( xs ) > 0  and  xs[0] == ':':
@@ -221,10 +228,10 @@ def _buildMatchNodeForMatchItem(xs, bInsideList=False):
 			varName = xs[1][1:]
 			match = _buildMatchNodeForMatchItem( xs[2], bInsideList )
 			match.bindName = varName
-		elif len( xs ) > 0  and  xs[0] == '?':
+		elif len( xs ) > 0  and  xs[0] == '&':
 			# Condition
 			if len( xs ) != 4:
-				raise ValueError, 'match expressions:condition expression must take the form (? <var_name> <condition_expr> sub_exp)'
+				raise ValueError, 'match expressions:condition expression must take the form (& <var_name> <condition_expr> sub_exp)'
 			if xs[1][0] != '@':
 				raise ValueError, 'match expressions: condition variable name must start with @'
 			conditionVarName = xs[1][1:]
@@ -257,6 +264,9 @@ def _buildMatchNodeForMatchItem(xs, bInsideList=False):
 		elif xs == '/':
 			# match any non-terminal
 			return _MatchNonTerminal( srcXs=xs )
+		elif xs == '?'  and  bInsideList:
+			# sub-list ?
+			return _MatchSublist( 0, 1, srcXs=xs )
 		elif xs == '+'  and  bInsideList:
 			# sub-list +
 			return _MatchSublist( 1, None, srcXs=xs )
@@ -265,7 +275,7 @@ def _buildMatchNodeForMatchItem(xs, bInsideList=False):
 			return _MatchSublist( 0, None, srcXs=xs )
 		else:
 			# match a constant
-			constant = xs.replace( '!!', '!' ).replace( '^^', '^' ).replace( '//', '/' ).replace( '++', '+' ).replace( '**', '*' ).replace( '--', '-' ).replace( '::', ':' ).replace( '??', '?' )
+			constant = matchEscapeString( xs )
 			return _MatchConstant( constant, srcXs=xs )
 
 
@@ -302,7 +312,7 @@ def compileMatchBlockToPyTrees(matchXs, xs, context, bNeedResult, dataVarName, c
 		Pattern expression format:
 	   
 			bind(x)  :=  [':' @<var_name> x]  |  x
-			condition(x)  :=  ['?' @<var_name> <condition_expression> bind(x)]  |  bind(x)
+			condition(x)  :=  ['&' @<var_name> <condition_expression> bind(x)]  |  bind(x)
 			
 			matchX := matchItem
 			matchItem := anything | terminal | nonTerminal | constant | list
@@ -311,21 +321,24 @@ def compileMatchBlockToPyTrees(matchXs, xs, context, bNeedResult, dataVarName, c
 			nonTerminal := bind( '/' )
 			constant := bind( <string> )
 			list := bind( [matchItem* listInternal? matchItem*] )
-			listInternal := bind( '+'  |  '*'  |  ['-' #min #max] )
+			listInternal := bind( '?'  Z  '+'  |  '*'  |  ['-' #min #max] )
 			
-			The characters : ? ! - / + * are assigned special meaning, so use :: ?? !! -- // ++ ** to get the characters as constants
+			The characters
+			          : & ! / ^ ? * + - \
+			  are assigned special meaning, so use \: \& \! \/ \^ \? \* \+ \- \\ to get the characters as constants
 			
 		Example:
 			(a b c)  =>  matches (a b c)
 			(a ^ ! /))  =>  matches (a <anything> <terminal> <nonTerminal>)
 			(a ^ ! (x y /))  =>  matches (a <anything> <terminal> (x y <nonTerminal>))
+			(a ? z))  =>  matches (a ... z)   where ... consists of 0 or 1 elements
 			(a * z))  =>  matches (a ... z)   where ... consists of 0 or more elements
 			(a + z))  =>  matches (a ... z)   where ... consists of 1 or more elements
 			(a (- #2 #4) z))  =>  matches (a ... z)   where ... consists of 2 to 4 elements
 			(a (: @a !) z))  =>  matches (a [a]<terminal> z)   [a] indicates that the expression that follows is bound to the variable a
 			(a (: @a (i j (: @b !))) z))  =>  matches (a [a](i j [b]<terminal>) z)   where 'a' is bound to (i j [b]<any_string>)   and 'b' is bound to the string
-			(a (? @x (@x == q) !) b))  =>  matches (a q b);  the condition binds xs[1] to @x, and evaluates (x == 'q')
-			(:: ?? !! -- // ++ **))  =>  matches (: ?? ! - / + *)
+			(a (& @x (@x == q) !) b))  =>  matches (a q b);  the condition binds xs[1] to @x, and evaluates (x == 'q')
+			(\: \& \! \/ \^ \? \* \+ \- \\))  =>  matches (: & ! / ^ ? * + - \)
 	"""
 	
 	if not isGLispList( xs ):
@@ -479,6 +492,10 @@ class TestCase_MatchExpression (unittest.TestCase):
 			#self.assert_( result == expected )
 			#self.assert_( index == expectedIndex )
 
+	def testMatchAnyTerminal(self):
+		self._matchTest( '!', 'a', {} ) 
+		self._matchTest( '!', '(a b c)', Britefury.GLisp.PatternMatch.NoMatchError ) 
+	
 	def testMatchAnything(self):
 		self._matchTest( '^', 'a', {} ) 
 		self._matchTest( '^', '(a b c)', {} ) 
@@ -487,21 +504,17 @@ class TestCase_MatchExpression (unittest.TestCase):
 		self._matchTest( '(: @a ^)', 'a', { 'a' : 'a' } ) 
 		self._matchTest( '(: @a ^)', '(a b c)', { 'a' : ['a', 'b', 'c'] } ) 
 	
-	def testMatchAnyTerminal(self):
-		self._matchTest( '!', 'a', {} ) 
-		self._matchTest( '!', '(a b c)', Britefury.GLisp.PatternMatch.NoMatchError ) 
-	
 	def testMatchAnyTerminalBind(self):
 		self._matchTest( '(: @a !)', 'a', { 'a' : 'a' } ) 
 		self._matchTest( '(: @a !)', '(a b c)', Britefury.GLisp.PatternMatch.NoMatchError ) 
 	
 	def testMatchAnyTerminalWithCondition(self):
-		self._matchTest( '(? @x (@x startswith "#\'ab") !)', 'abc', {} ) 
-		self._matchTest( '(? @x (@x startswith "#\'ab") !)', 'xyz', Britefury.GLisp.PatternMatch.NoMatchError ) 
+		self._matchTest( '(& @x (@x startswith "#\'ab") !)', 'abc', {} ) 
+		self._matchTest( '(& @x (@x startswith "#\'ab") !)', 'xyz', Britefury.GLisp.PatternMatch.NoMatchError ) 
 	
 	def testMatchAnyTerminalBindWithCondition(self):
-		self._matchTest( '(? @x (@x startswith "#\'ab") (: @a !))', 'abc', { 'a' : 'abc' } ) 
-		self._matchTest( '(? @x (@x startswith "#\'ab") (: @a !))', 'xyz', Britefury.GLisp.PatternMatch.NoMatchError ) 
+		self._matchTest( '(& @x (@x startswith "#\'ab") (: @a !))', 'abc', { 'a' : 'abc' } ) 
+		self._matchTest( '(& @x (@x startswith "#\'ab") (: @a !))', 'xyz', Britefury.GLisp.PatternMatch.NoMatchError ) 
 	
 	def testMatchAnyNonTerminal(self):
 		self._matchTest( '/', 'a', Britefury.GLisp.PatternMatch.NoMatchError ) 
@@ -557,6 +570,18 @@ class TestCase_MatchExpression (unittest.TestCase):
 		self._matchTest( '(: @a (a b c (: @b ((: @c /) e f))))', '(a b c (d e f))', Britefury.GLisp.PatternMatch.NoMatchError ) 
 		self._matchTest( '(: @a (a b c (: @b ((: @c /) e f))))', '(a b c ((x y) e f))', { 'a': ['a','b','c',[['x','y'],'e','f']], 'b': [['x','y'],'e','f'], 'c': ['x','y'] } ) 
 	
+		
+	def testMatchListWithInteriorQ(self):
+		self._matchTest( '(a b ? x y)', '(a b x y)', {} )
+		self._matchTest( '(a b ? x y)', '(a b i x y)', {} )
+		self._matchTest( '(a b ? x y)', '(a b i j k x y)', Britefury.GLisp.PatternMatch.NoMatchError )
+	
+	def testMatchListWithInteriorQBind(self):
+		self._matchTest( '(a b (: @a ?) x y)', '(a b x y)', { 'a': [] } )
+		self._matchTest( '(a b (: @a ?) x y)', '(a b i x y)', { 'a': ['i'] } )
+		self._matchTest( '(a b (: @a ?) x y)', '(a b i j k x y)', Britefury.GLisp.PatternMatch.NoMatchError )
+		
+		
 	def testMatchListWithInteriorStar(self):
 		self._matchTest( '(a b * x y)', '(a b x y)', {} )
 		self._matchTest( '(a b * x y)', '(a b i j k x y)', {} )
@@ -571,7 +596,7 @@ class TestCase_MatchExpression (unittest.TestCase):
 		self._matchTest( '(a b + x y)', '(a b i j k x y)', {} )
 	
 	def testMatchListWithInteriorPlusBind(self):
-		self._matchTest( '(a b (: @a +) x y)', '(a b x y)', Britefury.GLisp.PatternMatch.NoMatchError)
+		self._matchTest( '(a b (: @a +) x y)', '(a b x y)', Britefury.GLisp.PatternMatch.NoMatchError )
 		self._matchTest( '(a b (: @a +) x y)', '(a b i j k x y)', { 'a': ['i','j','k'] } )
 
 		
@@ -613,20 +638,20 @@ class TestCase_MatchExpression (unittest.TestCase):
 		self._matchTest( [ '(a (: @a !))',  '(b (: @b !))',  '(c (: @c !))',  '(d (: @d !))' ], '(e x)', Britefury.GLisp.PatternMatch.NoMatchError )
 		
 	def testMultiMatchWithCondition(self):
-		self._matchTest( [ '(a (? @x (@x startswith "#\'xx") (: @a !)))',  '(b (? @x (@x startswith "#\'yy") (: @b !)))',  '(c (? @x (@x startswith "#\'zz") (: @c !)))',  '(d (? @x (@x startswith "#\'ww") (: @d !)))' ], '(a xxx)', { 'a' : 'xxx' } )
-		self._matchTest( [ '(a (? @x (@x startswith "#\'xx") (: @a !)))',  '(b (? @x (@x startswith "#\'yy") (: @b !)))',  '(c (? @x (@x startswith "#\'zz") (: @c !)))',  '(d (? @x (@x startswith "#\'ww") (: @d !)))' ], '(a aaa)', Britefury.GLisp.PatternMatch.NoMatchError )
-		self._matchTest( [ '(a (? @x (@x startswith "#\'xx") (: @a !)))',  '(b (? @x (@x startswith "#\'yy") (: @b !)))',  '(c (? @x (@x startswith "#\'zz") (: @c !)))',  '(d (? @x (@x startswith "#\'ww") (: @d !)))' ], '(b yyy)', { 'b' : 'yyy' } )
-		self._matchTest( [ '(a (? @x (@x startswith "#\'xx") (: @a !)))',  '(b (? @x (@x startswith "#\'yy") (: @b !)))',  '(c (? @x (@x startswith "#\'zz") (: @c !)))',  '(d (? @x (@x startswith "#\'ww") (: @d !)))' ], '(b aaa)', Britefury.GLisp.PatternMatch.NoMatchError )
-		self._matchTest( [ '(a (? @x (@x startswith "#\'xx") (: @a !)))',  '(b (? @x (@x startswith "#\'yy") (: @b !)))',  '(c (? @x (@x startswith "#\'zz") (: @c !)))',  '(d (? @x (@x startswith "#\'ww") (: @d !)))' ], '(c zzz)', { 'c' : 'zzz' } )
-		self._matchTest( [ '(a (? @x (@x startswith "#\'xx") (: @a !)))',  '(b (? @x (@x startswith "#\'yy") (: @b !)))',  '(c (? @x (@x startswith "#\'zz") (: @c !)))',  '(d (? @x (@x startswith "#\'ww") (: @d !)))' ], '(c aaa)', Britefury.GLisp.PatternMatch.NoMatchError )
-		self._matchTest( [ '(a (? @x (@x startswith "#\'xx") (: @a !)))',  '(b (? @x (@x startswith "#\'yy") (: @b !)))',  '(c (? @x (@x startswith "#\'zz") (: @c !)))',  '(d (? @x (@x startswith "#\'ww") (: @d !)))' ], '(d www)', { 'd' : 'www' } )
-		self._matchTest( [ '(a (? @x (@x startswith "#\'xx") (: @a !)))',  '(b (? @x (@x startswith "#\'yy") (: @b !)))',  '(c (? @x (@x startswith "#\'zz") (: @c !)))',  '(d (? @x (@x startswith "#\'ww") (: @d !)))' ], '(d aaa)', Britefury.GLisp.PatternMatch.NoMatchError )
-		self._matchTest( [ '(a (? @x (@x startswith "#\'xx") (: @a !)))',  '(b (? @x (@x startswith "#\'yy") (: @b !)))',  '(c (? @x (@x startswith "#\'zz") (: @c !)))',  '(d (? @x (@x startswith "#\'ww") (: @d !)))' ], '(e www)', Britefury.GLisp.PatternMatch.NoMatchError )
-		self._matchTest( [ '(a (? @x (@x startswith "#\'xx") (: @a !)))',  '(b (? @x (@x startswith "#\'yy") (: @b !)))',  '(c (? @x (@x startswith "#\'zz") (: @c !)))',  '(d (? @x (@x startswith "#\'ww") (: @d !)))' ], '(e aaa)', Britefury.GLisp.PatternMatch.NoMatchError )
+		self._matchTest( [ '(a (& @x (@x startswith "#\'xx") (: @a !)))',  '(b (& @x (@x startswith "#\'yy") (: @b !)))',  '(c (& @x (@x startswith "#\'zz") (: @c !)))',  '(d (& @x (@x startswith "#\'ww") (: @d !)))' ], '(a xxx)', { 'a' : 'xxx' } )
+		self._matchTest( [ '(a (& @x (@x startswith "#\'xx") (: @a !)))',  '(b (& @x (@x startswith "#\'yy") (: @b !)))',  '(c (& @x (@x startswith "#\'zz") (: @c !)))',  '(d (& @x (@x startswith "#\'ww") (: @d !)))' ], '(a aaa)', Britefury.GLisp.PatternMatch.NoMatchError )
+		self._matchTest( [ '(a (& @x (@x startswith "#\'xx") (: @a !)))',  '(b (& @x (@x startswith "#\'yy") (: @b !)))',  '(c (& @x (@x startswith "#\'zz") (: @c !)))',  '(d (& @x (@x startswith "#\'ww") (: @d !)))' ], '(b yyy)', { 'b' : 'yyy' } )
+		self._matchTest( [ '(a (& @x (@x startswith "#\'xx") (: @a !)))',  '(b (& @x (@x startswith "#\'yy") (: @b !)))',  '(c (& @x (@x startswith "#\'zz") (: @c !)))',  '(d (& @x (@x startswith "#\'ww") (: @d !)))' ], '(b aaa)', Britefury.GLisp.PatternMatch.NoMatchError )
+		self._matchTest( [ '(a (& @x (@x startswith "#\'xx") (: @a !)))',  '(b (& @x (@x startswith "#\'yy") (: @b !)))',  '(c (& @x (@x startswith "#\'zz") (: @c !)))',  '(d (& @x (@x startswith "#\'ww") (: @d !)))' ], '(c zzz)', { 'c' : 'zzz' } )
+		self._matchTest( [ '(a (& @x (@x startswith "#\'xx") (: @a !)))',  '(b (& @x (@x startswith "#\'yy") (: @b !)))',  '(c (& @x (@x startswith "#\'zz") (: @c !)))',  '(d (& @x (@x startswith "#\'ww") (: @d !)))' ], '(c aaa)', Britefury.GLisp.PatternMatch.NoMatchError )
+		self._matchTest( [ '(a (& @x (@x startswith "#\'xx") (: @a !)))',  '(b (& @x (@x startswith "#\'yy") (: @b !)))',  '(c (& @x (@x startswith "#\'zz") (: @c !)))',  '(d (& @x (@x startswith "#\'ww") (: @d !)))' ], '(d www)', { 'd' : 'www' } )
+		self._matchTest( [ '(a (& @x (@x startswith "#\'xx") (: @a !)))',  '(b (& @x (@x startswith "#\'yy") (: @b !)))',  '(c (& @x (@x startswith "#\'zz") (: @c !)))',  '(d (& @x (@x startswith "#\'ww") (: @d !)))' ], '(d aaa)', Britefury.GLisp.PatternMatch.NoMatchError )
+		self._matchTest( [ '(a (& @x (@x startswith "#\'xx") (: @a !)))',  '(b (& @x (@x startswith "#\'yy") (: @b !)))',  '(c (& @x (@x startswith "#\'zz") (: @c !)))',  '(d (& @x (@x startswith "#\'ww") (: @d !)))' ], '(e www)', Britefury.GLisp.PatternMatch.NoMatchError )
+		self._matchTest( [ '(a (& @x (@x startswith "#\'xx") (: @a !)))',  '(b (& @x (@x startswith "#\'yy") (: @b !)))',  '(c (& @x (@x startswith "#\'zz") (: @c !)))',  '(d (& @x (@x startswith "#\'ww") (: @d !)))' ], '(e aaa)', Britefury.GLisp.PatternMatch.NoMatchError )
 		
 	def testSpecials(self):
-		self._matchTest( '(:: ?? !! -- // ++ **)', '(: ? ! - / + *)', {} )
-		self._matchTest( '(::a:: ??a?? !!a!! --a-- //a// ++a++ **a**)', '(:a: ?a? !a! -a- /a/ +a+ *a*)', {} )
+		self._matchTest( r'(\: \& \! \/ \^ \? \* \+ \- \\)', r'(: & ! / ^ ? * + - \)', {} )
+		self._matchTest( r'(\:a\: \&a\& \!a\! \/a\/ \^a\^ \?a\? \*a\* \+a\+ \-a\- \\a\\)', r'(:a: &a& !a! /a/ ^a^ ?a? *a* +a+ -a- \a\)', {} )
 
 
 		
