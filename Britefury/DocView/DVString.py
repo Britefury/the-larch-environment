@@ -19,7 +19,6 @@ from Britefury.Sheet.Sheet import *
 
 from Britefury.DocPresent.Toolkit.DTBox import DTBox
 from Britefury.DocPresent.Toolkit.DTLabel import DTLabel
-from Britefury.DocPresent.Toolkit.DTDirection import DTDirection
 from Britefury.DocPresent.Toolkit.DTTokenisedEntryLabel import DTTokenisedEntryLabel
 
 from Britefury.DocView.DVBorderNode import DVBorderNode
@@ -33,7 +32,7 @@ class DVString (DVBorderNode):
 
 	@FunctionRefField
 	def targetNameWidget(self):
-		entry = DTTokenisedEntryLabel( self._styleSheet.tokeniser, text=self.docNode )
+		entry = DTTokenisedEntryLabel( self._styleSheet.tokeniser, self.docNode )
 		entry.keyHandler = self._f_handleKeyPress
 		self._o_listenToTokenisedEntryLabel( entry )
 		return entry
@@ -50,7 +49,7 @@ class DVString (DVBorderNode):
 
 	def _o_reset(self):
 		super( DVString, self )._o_reset()
-		self.targetNameWidget.text = self.docNode
+		self.targetNameWidget.labelText = self.docNode
 
 
 

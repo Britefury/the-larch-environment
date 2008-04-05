@@ -110,7 +110,7 @@ class DTEntryLabel (DTBin):
 
 	def setLabelText(self, text):
 		self._labelText = text
-		self._label.text = tex
+		self._label.text = text
 		if self._entryText is None:
 			self._entry.text = text
 
@@ -329,7 +329,6 @@ if __name__ == '__main__':
 	import gtk
 	import cairo
 
-	from Britefury.DocPresent.Toolkit.DTDirection import DTDirection
 	from Britefury.DocPresent.Toolkit.DTDocument import DTDocument
 	from Britefury.DocPresent.Toolkit.DTBox import DTBox
 	from Britefury.Math.Math import Colour3f
@@ -357,7 +356,7 @@ if __name__ == '__main__':
 	doc = DTDocument()
 	doc.getGtkWidget().show()
 	
-	box = DTBox( direction=DTDirection.TOP_TO_BOTTOM, spacing=10.0 )
+	box = DTBox( direction=DTBox.TOP_TO_BOTTOM, spacing=10.0 )
 
 	entry1 = DTEntryLabel( 'Hello world' )
 	box.append( entry1 )

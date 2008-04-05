@@ -11,7 +11,7 @@ import Britefury.GLisp.PatternMatch
 
 
 
-_B_DEBUG_LOG_GENERATED_SOURCE = True
+_B_DEBUG_LOG_GENERATED_SOURCE = False
 
 _TEMP_PREFIX = '__gsym__'
 
@@ -1037,6 +1037,7 @@ def compileGLispExprToPyFunction(moduleName, functionName, argNames, xs, compile
 	lcls['NoMatchError'] = Britefury.GLisp.PatternMatch.NoMatchError
 	lcls['GLispModule'] = GLispModule
 	lcls['gLispAsString'] = gLispSrcToString
+	lcls['matchEscapeString'] = Britefury.GLisp.PatternMatch.matchEscapeString
 	lcls['log'] = _log
 	if _B_DEBUG_LOG_GENERATED_SOURCE:
 		f =open( moduleName + '.py', 'w' )
@@ -1138,6 +1139,8 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 	def testListLiteral(self):
 		self._compileTest( '($list @a @b @c)', '[ a, b, c ]' )
 		self._evalTest( '($list #1 #2 #3)', [ 1, 2, 3 ] )
+		self._compileTest( '($list)', '[]' )
+		self._evalTest( '($list)', [] )
 		
 	def testCompileSpecial(self):
 		def compileSpecialExpr(xs, context, bNeedResult, compileSpecial, compileGLispExprToPyTree):

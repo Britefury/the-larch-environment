@@ -68,7 +68,6 @@ if __name__ == '__main__':
 	from Britefury.DocPresent.Toolkit.DTHLine import DTHLine
 	from Britefury.DocPresent.Toolkit.DTLabel import DTLabel
 	from Britefury.DocPresent.Toolkit.DTBox import DTBox
-	from Britefury.DocPresent.Toolkit.DTDirection import DTDirection
 	from Britefury.gSym.View.Tokeniser import TokenDefinition, Tokeniser
 	from Britefury.Math.Math import Colour3f
 	import traceback
@@ -103,7 +102,7 @@ if __name__ == '__main__':
 	doc = DTDocument()
 	doc.getGtkWidget().show()
 	
-	box = DTBox( direction=DTDirection.TOP_TO_BOTTOM, alignment=DTBox.ALIGN_EXPAND )
+	box = DTBox( direction=DTBox.TOP_TO_BOTTOM, alignment=DTBox.ALIGN_EXPAND )
 
 	entry1 = DTTokenisedCustomEntry( tokeniser, 'Hello world' )
 	entry1.setCustomChild( DTHLine() )

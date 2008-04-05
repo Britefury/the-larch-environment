@@ -6,7 +6,6 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
 from Britefury.DocPresent.Toolkit.DTBox import DTBox
-from Britefury.DocPresent.Toolkit.DTDirection import DTDirection
 
 from Britefury.DocView.StyleSheet.DVListStyleSheet import DVListStyleSheet
 
@@ -14,7 +13,7 @@ from Britefury.DocView.StyleSheet.DVListStyleSheet import DVListStyleSheet
 
 
 class DVListBoxStyleSheet (DVListStyleSheet):
-	elementDirection = DTDirection.LEFT_TO_RIGHT
+	elementDirection = DTBox.LEFT_TO_RIGHT
 	elementSpacing = 0.0
 	elementExpand = False
 	elementFill = False
@@ -22,7 +21,7 @@ class DVListBoxStyleSheet (DVListStyleSheet):
 	elementPadding = 0.0
 	elementMinorDirectionAlignment = DTBox.ALIGN_CENTRE
 
-	overallDirection = DTDirection.LEFT_TO_RIGHT
+	overallDirection = DTBox.LEFT_TO_RIGHT
 	overallSpacing = 0.0
 	overallExpand = False
 	overallFill = False

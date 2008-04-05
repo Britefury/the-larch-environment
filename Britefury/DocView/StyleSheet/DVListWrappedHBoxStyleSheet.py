@@ -7,7 +7,6 @@
 ##-*************************
 from Britefury.DocPresent.Toolkit.DTBox import DTBox
 from Britefury.DocPresent.Toolkit.DTWrappedHBoxWithSeparators import DTWrappedHBoxWithSeparators
-from Britefury.DocPresent.Toolkit.DTDirection import DTDirection
 from Britefury.DocPresent.Toolkit.DTLabel import DTLabel
 
 from Britefury.DocView.StyleSheet.DVListStyleSheet import DVListStyleSheet
@@ -19,7 +18,7 @@ class DVListWrappedHBoxStyleSheet (DVListStyleSheet):
 	elementSpacing = 0.0
 	elementPadding = 0.0
 
-	overallDirection = DTDirection.LEFT_TO_RIGHT
+	overallDirection = DTBox.LEFT_TO_RIGHT
 	overallSpacing = 0.0
 	overallExpand = False
 	overallFill = False

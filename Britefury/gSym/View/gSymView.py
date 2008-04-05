@@ -16,7 +16,6 @@ from Britefury.DocPresent.Toolkit.DTActiveBorder import DTActiveBorder
 from Britefury.DocPresent.Toolkit.DTBin import DTBin 
 from Britefury.DocPresent.Toolkit.DTBorder import DTBorder
 from Britefury.DocPresent.Toolkit.DTBox import DTBox
-from Britefury.DocPresent.Toolkit.DTDirection import DTDirection
 from Britefury.DocPresent.Toolkit.DTHLine import DTHLine
 from Britefury.DocPresent.Toolkit.DTLabel import DTLabel
 from Britefury.DocPresent.Toolkit.DTScript import DTScript
@@ -169,13 +168,13 @@ def _runtime_applyStyleSheetStack(viewNodeInstance, widget):
 	for styleSheet in viewNodeInstance.styleSheetStack:
 		styleSheet.applyToWidget( widget )
 
-def _runtime_applyStyleSheets(styleSheets, widget):
-	if styleSheets is not None:
-		if isinstance( styleSheets, GSymStyleSheet ):
-			styleSheets.applyToWidget( widget )
+def _runtime_applyStyle(style, widget):
+	if style is not None:
+		if isinstance( style, GSymStyleSheet ):
+			style.applyToWidget( widget )
 		else:
-			for styleSheet in styleSheets:
-				styleSheet.applyToWidget( widget )
+			for s in style:
+				s.applyToWidget( widget )
 				
 				
 
@@ -205,7 +204,7 @@ def _runtime_setKeyHandler(viewNodeInstance, widget):
 	widget.keyHandler = _handleKeyPress
 
 
-def _runtime_activeBorder(viewNodeInstance, child, styleSheets=None):
+def _runtime_activeBorder(viewNodeInstance, child, style=None):
 	"""
 	Runtime - called by compiled code at run-time
 	Builds a DTActiveBorder widget, with child, builds and registers a refresh cell
@@ -214,10 +213,10 @@ def _runtime_activeBorder(viewNodeInstance, child, styleSheets=None):
 	_runtime_setKeyHandler( viewNodeInstance, widget )
 	_runtime_binRefreshCell( viewNodeInstance, widget, child )
 	_runtime_applyStyleSheetStack( viewNodeInstance, widget )
-	_runtime_applyStyleSheets( styleSheets, widget )
+	_runtime_applyStyle( style, widget )
 	return widget
 
-def _runtime_border(viewNodeInstance, child, styleSheets=None):
+def _runtime_border(viewNodeInstance, child, style=None):
 	"""
 	Runtime - called by compiled code at run-time
 	Builds a DTBorder widget, with child, builds and registers a refresh cell
@@ -225,10 +224,10 @@ def _runtime_border(viewNodeInstance, child, styleSheets=None):
 	widget = DTBorder()
 	_runtime_binRefreshCell( viewNodeInstance, widget, child )
 	_runtime_applyStyleSheetStack( viewNodeInstance, widget )
-	_runtime_applyStyleSheets( styleSheets, widget )
+	_runtime_applyStyle( style, widget )
 	return widget
 
-def _runtime_indent(viewNodeInstance, child, indentation, styleSheets=None):
+def _runtime_indent(viewNodeInstance, child, indentation, style=None):
 	"""
 	Runtime - called by compiled code at run-time
 	Builds a DTBorder widget, with child, builds and registers a refresh cell
@@ -237,20 +236,20 @@ def _runtime_indent(viewNodeInstance, child, indentation, styleSheets=None):
 	widget.leftMargin = indentation
 	_runtime_binRefreshCell( viewNodeInstance, widget, child )
 	_runtime_applyStyleSheetStack( viewNodeInstance, widget )
-	_runtime_applyStyleSheets( styleSheets, widget )
+	_runtime_applyStyle( style, widget )
 	return widget
 
-def _runtime_hline(viewNodeInstance, styleSheets=None):
+def _runtime_hline(viewNodeInstance, style=None):
 	"""
 	Runtime - called by compiled code at run-time
 	Builds a DTLabel widget
 	"""
 	widget = DTHLine()
 	_runtime_applyStyleSheetStack( viewNodeInstance, widget )
-	_runtime_applyStyleSheets( styleSheets, widget )
+	_runtime_applyStyle( style, widget )
 	return widget
 
-def _runtime_label(viewNodeInstance, text, styleSheets=None):
+def _runtime_label(viewNodeInstance, text, style=None):
 	"""
 	Runtime - called by compiled code at run-time
 	Builds a DTLabel widget
@@ -259,10 +258,10 @@ def _runtime_label(viewNodeInstance, text, styleSheets=None):
 		text = text.node
 	widget = DTLabel( text )
 	_runtime_applyStyleSheetStack( viewNodeInstance, widget )
-	_runtime_applyStyleSheets( styleSheets, widget )
+	_runtime_applyStyle( style, widget )
 	return widget
 
-def _runtime_markupLabel(viewNodeInstance, text, styleSheets=None):
+def _runtime_markupLabel(viewNodeInstance, text, style=None):
 	"""
 	Runtime - called by compiled code at run-time
 	Builds a markup DTLabel widget
@@ -272,7 +271,7 @@ def _runtime_markupLabel(viewNodeInstance, text, styleSheets=None):
 	widget = DTLabel( text )
 	widget.bUseMarkup = True
 	_runtime_applyStyleSheetStack( viewNodeInstance, widget )
-	_runtime_applyStyleSheets( styleSheets, widget )
+	_runtime_applyStyle( style, widget )
 	return widget
 
 
@@ -292,7 +291,7 @@ def _onEntryFinished(widget, text, tokens, bUserEvent):
 		_sendTokenListDocEvent( widget, tokens )
 
 
-def _runtime_entry(viewNodeInstance, labelText, entryText, tokeniser, styleSheets=None):
+def _runtime_entry(viewNodeInstance, labelText, entryText, tokeniser, style=None):
 	"""Builds a DTEntryLabel widget"""
 	if isinstance( labelText, RelativeNode ):
 		labelText = labelText.node
@@ -302,10 +301,10 @@ def _runtime_entry(viewNodeInstance, labelText, entryText, tokeniser, styleSheet
 	widget.textModifiedSignal.connect( _onEntryModifed )
 	widget.finishEditingSignal.connect( _onEntryFinished )
 	_runtime_applyStyleSheetStack( viewNodeInstance, widget )
-	_runtime_applyStyleSheets( styleSheets, widget )
+	_runtime_applyStyle( style, widget )
 	return widget
 
-def _runtime_markupEntry(viewNodeInstance, labelText, entryText, tokeniser, styleSheets=None):
+def _runtime_markupEntry(viewNodeInstance, labelText, entryText, tokeniser, style=None):
 	"""Builds a DTEntryLabel widget"""
 	if isinstance( labelText, RelativeNode ):
 		labelText = labelText.node
@@ -316,10 +315,10 @@ def _runtime_markupEntry(viewNodeInstance, labelText, entryText, tokeniser, styl
 	widget.finishEditingSignal.connect( _onEntryFinished )
 	widget.bLabelUseMarkup = True
 	_runtime_applyStyleSheetStack( viewNodeInstance, widget )
-	_runtime_applyStyleSheets( styleSheets, widget )
+	_runtime_applyStyle( style, widget )
 	return widget
 
-def _runtime_customEntry(viewNodeInstance, customChild, entryText, tokeniser, styleSheets=None):
+def _runtime_customEntry(viewNodeInstance, customChild, entryText, tokeniser, style=None):
 	"""Builds a DTEntryLabel widget"""
 	if isinstance( entryText, RelativeNode ):
 		entryText = entryText.node
@@ -328,65 +327,65 @@ def _runtime_customEntry(viewNodeInstance, customChild, entryText, tokeniser, st
 	widget.finishEditingSignal.connect( _onEntryFinished )
 	_runtime_customEntryRefreshCell( viewNodeInstance, widget, customChild )
 	_runtime_applyStyleSheetStack( viewNodeInstance, widget )
-	_runtime_applyStyleSheets( styleSheets, widget )
+	_runtime_applyStyle( style, widget )
 	return widget
 
-def _runtime_hbox(viewNodeInstance, children, styleSheets=None):
+def _runtime_hbox(viewNodeInstance, children, style=None, alignment=DTBox.ALIGN_CENTRE, spacing=0.0):
 	"""
 	Runtime - called by compiled code at run-time
 	Builds a horizontal DTBox widget, with child, builds and registers a refresh cell
 	"""
-	widget = DTBox()
+	widget = DTBox( spacing=spacing, alignment=alignment )
 	_runtime_containerSeqRefreshCell( viewNodeInstance, widget, children )
 	_runtime_applyStyleSheetStack( viewNodeInstance, widget )
-	_runtime_applyStyleSheets( styleSheets, widget )
+	_runtime_applyStyle( style, widget )
 	return widget
 
-def _runtime_ahbox(viewNodeInstance, children, styleSheets=None):
+def _runtime_ahbox(viewNodeInstance, children, style=None, spacing=0.0):
 	"""
 	Runtime - called by compiled code at run-time
 	Builds a horizontal DTBox widget, with child, builds and registers a refresh cell
 	"""
-	widget = DTBox( alignment=DTBox.ALIGN_BASELINES )
+	widget = DTBox( spacing=spacing, alignment=DTBox.ALIGN_BASELINES )
 	_runtime_containerSeqRefreshCell( viewNodeInstance, widget, children )
 	_runtime_applyStyleSheetStack( viewNodeInstance, widget )
-	_runtime_applyStyleSheets( styleSheets, widget )
+	_runtime_applyStyle( style, widget )
 	return widget
 
-def _runtime_vbox(viewNodeInstance, children, styleSheets=None):
+def _runtime_vbox(viewNodeInstance, children, style=None, alignment=DTBox.ALIGN_LEFT, spacing=0.0):
 	"""
 	Runtime - called by compiled code at run-time
 	Builds a vertical DTBox widget, with child, builds and registers a refresh cell
 	"""
-	widget = DTBox( direction=DTDirection.TOP_TO_BOTTOM, alignment=DTBox.ALIGN_LEFT )
+	widget = DTBox( direction=DTBox.TOP_TO_BOTTOM, spacing=spacing, alignment=alignment )
 	_runtime_containerSeqRefreshCell( viewNodeInstance, widget, children )
 	_runtime_applyStyleSheetStack( viewNodeInstance, widget )
-	_runtime_applyStyleSheets( styleSheets, widget )
+	_runtime_applyStyle( style, widget )
 	return widget
 
-def _runtime_wrappedHBox(viewNodeInstance, children, styleSheets=None):
+def _runtime_wrappedHBox(viewNodeInstance, children, style=None, spacing=0.0, indentation=0.0):
 	"""
 	Runtime - called by compiled code at run-time
 	Builds a DTWrappedHBox widget, with child, builds and registers a refresh cell
 	"""
-	widget = DTWrappedHBox()
+	widget = DTWrappedHBox( spacing=spacing, indentation=indentation )
 	_runtime_containerSeqRefreshCell( viewNodeInstance, widget, children )
 	_runtime_applyStyleSheetStack( viewNodeInstance, widget )
-	_runtime_applyStyleSheets( styleSheets, widget )
+	_runtime_applyStyle( style, widget )
 	return widget
 
-def _runtime_wrappedHBoxSep(viewNodeInstance, children, separatorFactory=',', styleSheets=None):
+def _runtime_wrappedHBoxSep(viewNodeInstance, children, separatorFactory=',', style=None, spacing=0.0, indentation=0.0):
 	"""
 	Runtime - called by compiled code at run-time
 	Builds a DTWrappedHBoxWithSeparators widget, with child, builds and registers a refresh cell
 	"""
-	widget = DTWrappedHBoxWithSeparators( separatorFactory )
+	widget = DTWrappedHBoxWithSeparators( separatorFactory, spacing=spacing, indentation=indentation )
 	_runtime_containerSeqRefreshCell( viewNodeInstance, widget, children )
 	_runtime_applyStyleSheetStack( viewNodeInstance, widget )
-	_runtime_applyStyleSheets( styleSheets, widget )
+	_runtime_applyStyle( style, widget )
 	return widget
 
-def _runtime_script(viewNodeInstance, mainChild, leftSuperChild, leftSubChild, rightSuperChild, rightSubChild, styleSheets=None):
+def _runtime_script(viewNodeInstance, mainChild, leftSuperChild, leftSubChild, rightSuperChild, rightSubChild, style=None):
 	"""
 	Runtime - called by compiled code at run-time
 	Builds a DTActiveBorder widget, with child, builds and registers a refresh cell
@@ -403,7 +402,7 @@ def _runtime_script(viewNodeInstance, mainChild, leftSuperChild, leftSubChild, r
 	if rightSubChild is not None:
 		_runtime_scriptRefreshCell( viewNodeInstance, widget, rightSubChild, 'rightSubscriptChild' )
 	_runtime_applyStyleSheetStack( viewNodeInstance, widget )
-	_runtime_applyStyleSheets( styleSheets, widget )
+	_runtime_applyStyle( style, widget )
 	return widget
 
 
@@ -728,12 +727,12 @@ class GMetaComponentView (GMetaComponent):
 			if len( srcXs ) < 2:
 				raiseCompilerError( GLispParameterListError, src, 'defineView: $vbox needs at least 1 parameter; the children' )
 			return PyVar( '__gsym__vbox__', dbgSrc=srcXs )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[1] ), *compileWidgetParams( srcXs[2:]) ).debug( srcXs )
-		elif name == '$wrappedHBox':
+		elif name == '$wrap':
 			#($wrappedHBox (child*) [<styleSheet>])
 			if len( srcXs ) < 2:
 				raiseCompilerError( GLispParameterListError, src, 'defineView: $wrappedHBox needs at least 1 parameter; the children' )
 			return PyVar( '__gsym__wrappedHBox__', dbgSrc=srcXs )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[1] ), *compileWidgetParams( srcXs[2:]) ).debug( srcXs )
-		elif name == '$wrappedHBoxSep':
+		elif name == '$wrapSep':
 			#($wrappedHBox (child*) [<separatorFactory>] [<styleSheet>])
 			if len( srcXs ) < 2:
 				raiseCompilerError( GLispParameterListError, src, 'defineView: $wrappedHBoxSep needs at least 1 parameter; the children' )
@@ -781,8 +780,6 @@ class GMetaComponentView (GMetaComponent):
 	def getConstants(self):
 		return {
 			'ColourRGB' : Colour3f,
-			'DTDirection' : DTDirection,
-			'DTBox' : DTBox,
 			'__gsym__buildView__' : _runtime_buildView,
 			'__gsym__activeBorder__' : _runtime_activeBorder,
 			'__gsym__border__' : _runtime_border,
@@ -815,7 +812,7 @@ class GMetaComponentView (GMetaComponent):
 			'__gsym__runtime_containerSeqRefreshCell__' : _runtime_containerSeqRefreshCell,
 			'__gsym__runtime_scriptRefreshCell__' : _runtime_scriptRefreshCell,
 			'__gsym__runtime_applyStyleSheetStack__' : _runtime_applyStyleSheetStack,
-			'__gsym__runtime_applyStyleSheets__' : _runtime_applyStyleSheets,
+			'__gsym__runtime_applyStyle__' : _runtime_applyStyle,
 			}
 	
 	
@@ -829,7 +826,7 @@ class GMetaComponentView (GMetaComponent):
 
 
 _gsymViewPrefixSrc = '''
-def activeBorder(child, styleSheets=None):
+def activeBorder(child, style=None):
 	"""
 	Runtime - called by compiled code at run-time
 	Builds a DTActiveBorder widget, with child, builds and registers a refresh cell
@@ -841,7 +838,7 @@ def activeBorder(child, styleSheets=None):
 	__gsym__runtime_applyStyleSheets__( styleSheets, widget )
 	return widget
 
-def border(child, styleSheets=None):
+def border(child, style=None):
 	"""
 	Runtime - called by compiled code at run-time
 	Builds a DTBorder widget, with child, builds and registers a refresh cell
@@ -852,7 +849,7 @@ def border(child, styleSheets=None):
 	__gsym__runtime_applyStyleSheets__( styleSheets, widget )
 	return widget
 
-def indent(child, indentation, styleSheets=None):
+def indent(child, indentation, style=None):
 	"""
 	Runtime - called by compiled code at run-time
 	Builds a DTBorder widget, with child, builds and registers a refresh cell
@@ -864,7 +861,7 @@ def indent(child, indentation, styleSheets=None):
 	__gsym__runtime_applyStyleSheets__( styleSheets, widget )
 	return widget
 
-def hline(styleSheets=None):
+def hline(style=None):
 	"""
 	Runtime - called by compiled code at run-time
 	Builds a DTLabel widget
@@ -874,7 +871,7 @@ def hline(styleSheets=None):
 	__gsym__runtime_applyStyleSheets__( styleSheets, widget )
 	return widget
 
-def label(text, styleSheets=None):
+def label(text, style=None):
 	"""
 	Runtime - called by compiled code at run-time
 	Builds a DTLabel widget
@@ -886,7 +883,7 @@ def label(text, styleSheets=None):
 	__gsym__runtime_applyStyleSheets__( styleSheets, widget )
 	return widget
 
-def entry(text, styleSheets=None):
+def entry(text, style=None):
 	"""Builds a DTEntryLabel widget"""
 	if isinstance( text, __gsym__RelativeNode__ ):
 		text = text.node
@@ -896,7 +893,7 @@ def entry(text, styleSheets=None):
 	__gsym__runtime_applyStyleSheets__( styleSheets, widget )
 	return widget
 
-def hbox(children, styleSheets=None):
+def hbox(children, style=None):
 	"""
 	Runtime - called by compiled code at run-time
 	Builds a horizontal DTBox widget, with child, builds and registers a refresh cell
@@ -907,7 +904,7 @@ def hbox(children, styleSheets=None):
 	__gsym__runtime_applyStyleSheets__( styleSheets, widget )
 	return widget
 
-def ahbox(children, styleSheets=None):
+def ahbox(children, style=None):
 	"""
 	Runtime - called by compiled code at run-time
 	Builds a horizontal DTBox widget, with child, builds and registers a refresh cell
@@ -918,18 +915,18 @@ def ahbox(children, styleSheets=None):
 	__gsym__runtime_applyStyleSheets__( styleSheets, widget )
 	return widget
 
-def vbox(children, styleSheets=None):
+def vbox(children, style=None):
 	"""
 	Runtime - called by compiled code at run-time
 	Builds a vertical DTBox widget, with child, builds and registers a refresh cell
 	"""
-	widget = __gsym__DTBox__( direction=DTDirection.TOP_TO_BOTTOM, alignment=DTBox.ALIGN_LEFT )
+	widget = __gsym__DTBox__( direction=DTBox.TOP_TO_BOTTOM, alignment=DTBox.ALIGN_LEFT )
 	__gsym__runtime_containerSeqRefreshCell__( __view_node_instance_stack__[-1], widget, children )
 	__gsym__runtime_applyStyleSheetStack__( __view_node_instance_stack__[-1], widget )
 	__gsym__runtime_applyStyleSheets__( styleSheets, widget )
 	return widget
 
-def scriptLSuper(mainChild, scriptChild, styleSheets=None):
+def scriptLSuper(mainChild, scriptChild, style=None):
 	"""
 	Runtime - called by compiled code at run-time
 	Builds a DTScript widget, with children, builds and registers refresh cells
@@ -942,7 +939,7 @@ def scriptLSuper(mainChild, scriptChild, styleSheets=None):
 	__gsym__runtime_applyStyleSheets__( styleSheets, widget )
 	return widget
 
-def scriptLSub(mainChild, scriptChild, styleSheets=None):
+def scriptLSub(mainChild, scriptChild, style=None):
 	"""
 	Runtime - called by compiled code at run-time
 	Builds a DTScript widget, with children, builds and registers refresh cells
@@ -955,7 +952,7 @@ def scriptLSub(mainChild, scriptChild, styleSheets=None):
 	__gsym__runtime_applyStyleSheets__( styleSheets, widget )
 	return widget
 
-def scriptRSuper(mainChild, scriptChild, styleSheets=None):
+def scriptRSuper(mainChild, scriptChild, style=None):
 	"""
 	Runtime - called by compiled code at run-time
 	Builds a DTScript widget, with children, builds and registers refresh cells
@@ -968,7 +965,7 @@ def scriptRSuper(mainChild, scriptChild, styleSheets=None):
 	__gsym__runtime_applyStyleSheets__( styleSheets, widget )
 	return widget
 
-def scriptRSub(mainChild, scriptChild, styleSheets=None):
+def scriptRSub(mainChild, scriptChild, style=None):
 	"""
 	Runtime - called by compiled code at run-time
 	Builds a DTScript widget, with children, builds and registers refresh cells
@@ -981,7 +978,7 @@ def scriptRSub(mainChild, scriptChild, styleSheets=None):
 	__gsym__runtime_applyStyleSheets__( styleSheets, widget )
 	return widget
 
-def script(mainChild, leftSuperChild, leftSubChild, rightSuperChild, rightSubChild, styleSheets=None):
+def script(mainChild, leftSuperChild, leftSubChild, rightSuperChild, rightSubChild, style=None):
 	"""
 	Runtime - called by compiled code at run-time
 	Builds a DTScript widget, with children, builds and registers refresh cells

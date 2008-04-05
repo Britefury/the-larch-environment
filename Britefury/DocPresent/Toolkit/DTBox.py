@@ -10,12 +10,29 @@ import bisect
 from Britefury.Math.Math import Point2, Vector2
 from Britefury.DocPresent.Toolkit.DTCursor import DTCursorLocation
 from Britefury.DocPresent.Toolkit.DTContainerSequence import DTContainerSequence
-from Britefury.DocPresent.Toolkit.DTDirection import DTDirection
 from Britefury.DocPresent.Toolkit.DTBin import DTBin
 
 
 
 class DTBox (DTContainerSequence):
+	LEFT_TO_RIGHT = 0
+	RIGHT_TO_LEFT = 1
+	TOP_TO_BOTTOM = 2
+	BOTTOM_TO_TOP = 3
+	
+	
+	_directionCoercionMap = {
+		'left-to-right'  :  LEFT_TO_RIGHT,
+		'right'  :  LEFT_TO_RIGHT,
+		'right-to-left'  :  RIGHT_TO_LEFT,
+		'left'  :  RIGHT_TO_LEFT,
+		'top-to-bottom'  :  TOP_TO_BOTTOM,
+		'down'  :  TOP_TO_BOTTOM,
+		'bottom-to-top'  :  BOTTOM_TO_TOP,
+		'up'  :  BOTTOM_TO_TOP,
+		}
+
+	
 	ALIGN_LEFT = 0
 	ALIGN_TOP = 0
 	ALIGN_CENTRE = 1
@@ -25,6 +42,32 @@ class DTBox (DTContainerSequence):
 	ALIGN_BASELINES = 4
 	_ALIGN_TOPLEFT = 0
 	_ALIGN_BOTTOMRIGHT = 2
+	
+
+	_alignmentCoercionMap = {
+		'left'  :  ALIGN_LEFT,
+		'top'  :  ALIGN_TOP,
+		'centre'  :  ALIGN_CENTRE,
+		'right'  :  ALIGN_RIGHT,
+		'bottom'  :  ALIGN_BOTTOM,
+		'expand'  :  ALIGN_EXPAND,
+		'baselines'  :  ALIGN_BASELINES,
+		}
+	
+	
+	@staticmethod
+	def _p_coerceDirection(direction):
+		if direction is None:
+			return None
+		else:
+			return DTBox._directionCoercionMap.get( direction, direction )
+
+	@staticmethod
+	def _p_coerceAlignment(alignment):
+		if alignment is None:
+			return None
+		else:
+			return DTBox._alignmentCoercionMap.get( alignment, alignment )
 
 
 	class ChildEntry (DTContainerSequence.ChildEntry):
@@ -41,15 +84,15 @@ class DTBox (DTContainerSequence):
 
 
 
-	def __init__(self, direction=DTDirection.LEFT_TO_RIGHT, spacing=0.0, bExpand=False, bFill=False, bShrink=False, alignment=ALIGN_CENTRE, padding=0.0, backgroundColour=None):
+	def __init__(self, direction=LEFT_TO_RIGHT, spacing=0.0, bExpand=False, bFill=False, bShrink=False, alignment=ALIGN_CENTRE, padding=0.0, backgroundColour=None):
 		super( DTBox, self ).__init__( backgroundColour )
 
-		self._direction = direction
+		self._direction = self._p_coerceDirection( direction )
 		self._spacing = spacing
 		self._bExpand = bExpand
 		self._bFill = bFill
 		self._bShrink = bShrink
-		self._alignment = alignment
+		self._alignment = self._p_coerceAlignment( alignment )
 		self._padding = padding
 		self._childrenRequisition = Vector2()
 		self._childrenBaseline = 0.0
@@ -62,7 +105,7 @@ class DTBox (DTContainerSequence):
 		return self._direction
 
 	def setDirection(self, direction):
-		self._direction = direction
+		self._direction = self._p_coerceDirection( direction )
 		self._o_queueResize()
 
 	def getSpacing(self):
@@ -97,7 +140,7 @@ class DTBox (DTContainerSequence):
 		return self._alignment
 
 	def setAlignment(self, alignment):
-		self._alignment = alignment
+		self._alignment = self._p_coerceAlignment( alignment )
 		self._o_queueResize()
 
 	def getPadding(self):
@@ -117,7 +160,7 @@ class DTBox (DTContainerSequence):
 	def _p_itemToChildEntry(self, item):
 		if isinstance( item, tuple ):
 			child, bExpand, bFill, bShrink, alignment, padding = item
-			return self.ChildEntry( child, bExpand, bFill, bShrink, alignment, padding )
+			return self.ChildEntry( child, bExpand, bFill, bShrink, self._p_coerceAlignment( alignment ), padding )
 		else:
 			return self.ChildEntry( item, self._bExpand, self._bFill, self._bShrink, self._alignment, self._padding )
 
@@ -137,7 +180,7 @@ class DTBox (DTContainerSequence):
 
 
 	def append(self, child, bExpand=None, bFill=None, bShrink=None, alignment=None, padding=None):
-		entry = self._p_buildEntry( child, bExpand, bFill, bShrink, alignment, padding )
+		entry = self._p_buildEntry( child, bExpand, bFill, bShrink, self._p_coerceAlignment( alignment ), padding )
 		self._o_appendEntry( entry )
 
 	def extend(self, children):
@@ -147,7 +190,7 @@ class DTBox (DTContainerSequence):
 
 	def insert(self, index, child, bExpand=None, bFill=None, bShrink=None, alignment=None, padding=None):
 		assert not self.hasChild( child ), 'child already present'
-		entry = self._p_buildEntry( child, bExpand, bFill, bShrink, alignment, padding )
+		entry = self._p_buildEntry( child, bExpand, bFill, bShrink, self._p_coerceAlignment( alignment ), padding )
 		self._o_insertEntry( index, entry )
 
 
@@ -163,19 +206,19 @@ class DTBox (DTContainerSequence):
 		if len( self ) == 0:
 			return 0
 
-		if self._direction == DTDirection.LEFT_TO_RIGHT  or  self._direction == DTDirection.RIGHT_TO_LEFT:
+		if self._direction == DTBox.LEFT_TO_RIGHT  or  self._direction == DTBox.RIGHT_TO_LEFT:
 			pos = localPos.x
-		elif self._direction == DTDirection.TOP_TO_BOTTOM  or  self._direction == DTDirection.BOTTOM_TO_TOP:
+		elif self._direction == DTBox.TOP_TO_BOTTOM  or  self._direction == DTBox.BOTTOM_TO_TOP:
 			pos = localPos.y
 
-		if self._direction == DTDirection.LEFT_TO_RIGHT  or  self._direction == DTDirection.TOP_TO_BOTTOM:
+		if self._direction == DTBox.LEFT_TO_RIGHT  or  self._direction == DTBox.TOP_TO_BOTTOM:
 			bReversed = False
-		elif self._direction == DTDirection.RIGHT_TO_LEFT  or  self._direction == DTDirection.BOTTOM_TO_TOP:
+		elif self._direction == DTBox.RIGHT_TO_LEFT  or  self._direction == DTBox.BOTTOM_TO_TOP:
 			bReversed = True
 
-		if self._direction == DTDirection.LEFT_TO_RIGHT  or  self._direction == DTDirection.RIGHT_TO_LEFT:
+		if self._direction == DTBox.LEFT_TO_RIGHT  or  self._direction == DTBox.RIGHT_TO_LEFT:
 			midPoints  =  [ childEntry._xPos  +  childEntry._width * 0.5   for childEntry in self._childEntries ]
-		elif self._direction == DTDirection.TOP_TO_BOTTOM  or  self._direction == DTDirection.BOTTOM_TO_TOP:
+		elif self._direction == DTBox.TOP_TO_BOTTOM  or  self._direction == DTBox.BOTTOM_TO_TOP:
 			midPoints  =  [ childEntry._yPos  +  childEntry._height * 0.5   for childEntry in self._childEntries ]
 
 		if bReversed:
@@ -219,14 +262,14 @@ class DTBox (DTContainerSequence):
 		requisition = 0.0
 		for entry in self._childEntries:
 			req = entry.child._f_getRequisitionWidth()
-			if self._direction == DTDirection.LEFT_TO_RIGHT  or  self._direction == DTDirection.RIGHT_TO_LEFT:
+			if self._direction == DTBox.LEFT_TO_RIGHT  or  self._direction == DTBox.RIGHT_TO_LEFT:
 				entry._reqWidth = req + entry.padding * 2.0
 				requisition += entry._reqWidth
-			elif self._direction == DTDirection.TOP_TO_BOTTOM  or  self._direction == DTDirection.BOTTOM_TO_TOP:
+			elif self._direction == DTBox.TOP_TO_BOTTOM  or  self._direction == DTBox.BOTTOM_TO_TOP:
 				entry._reqWidth = req
 				requisition = max( requisition, req )
 		spacing = 0.0
-		if self._direction == DTDirection.LEFT_TO_RIGHT  or  self._direction == DTDirection.RIGHT_TO_LEFT:
+		if self._direction == DTBox.LEFT_TO_RIGHT  or  self._direction == DTBox.RIGHT_TO_LEFT:
 			if len( self._childEntries ) > 0:
 				spacing = self._spacing  *  ( len( self._childEntries ) - 1 )
 		self._childrenRequisition.x = requisition + spacing
@@ -238,7 +281,7 @@ class DTBox (DTContainerSequence):
 		height = 0.0
 		for entry in self._childEntries:
 			req, bas = entry.child._f_getRequisitionHeightAndBaseline()
-			if self._direction == DTDirection.LEFT_TO_RIGHT  or  self._direction == DTDirection.RIGHT_TO_LEFT:
+			if self._direction == DTBox.LEFT_TO_RIGHT  or  self._direction == DTBox.RIGHT_TO_LEFT:
 				if entry.alignment == self.ALIGN_BASELINES:
 					abv = req - bas
 					entry._reqHeight = req
@@ -249,13 +292,13 @@ class DTBox (DTContainerSequence):
 					entry._reqHeight = req
 					entry._reqBaseline = 0.0
 					height = max( height, req )
-			elif self._direction == DTDirection.TOP_TO_BOTTOM  or  self._direction == DTDirection.BOTTOM_TO_TOP:
+			elif self._direction == DTBox.TOP_TO_BOTTOM  or  self._direction == DTBox.BOTTOM_TO_TOP:
 				entry._reqHeight = req + entry.padding * 2.0
 				entry._reqBaseline = 0.0
 				height += entry._reqHeight
 		height = max( height, baseline + aboveBaseline )
 		requisition = height
-		if self._direction == DTDirection.TOP_TO_BOTTOM  or  self._direction == DTDirection.BOTTOM_TO_TOP:
+		if self._direction == DTBox.TOP_TO_BOTTOM  or  self._direction == DTBox.BOTTOM_TO_TOP:
 			if len( self._childEntries ) > 0:
 				requisition += self._spacing  *  ( len( self._childEntries ) - 1 )
 		self._childrenRequisition.y = requisition
@@ -264,7 +307,7 @@ class DTBox (DTContainerSequence):
 
 
 	def _o_onAllocateX(self, allocation):
-		if self._direction == DTDirection.LEFT_TO_RIGHT  or  self._direction == DTDirection.RIGHT_TO_LEFT:
+		if self._direction == DTBox.LEFT_TO_RIGHT  or  self._direction == DTBox.RIGHT_TO_LEFT:
 			expandPerChild = 0.0
 			shrinkPerChild = 0.0
 			if allocation > self._childrenRequisition.x:
@@ -278,9 +321,9 @@ class DTBox (DTContainerSequence):
 					shrink = self._childrenRequisition.x - allocation
 					shrinkPerChild = shrink / float( self._numShrink )
 
-			if self._direction == DTDirection.LEFT_TO_RIGHT:
+			if self._direction == DTBox.LEFT_TO_RIGHT:
 				childEntryIter = self._childEntries
-			elif self._direction == DTDirection.RIGHT_TO_LEFT:
+			elif self._direction == DTBox.RIGHT_TO_LEFT:
 				childEntryIter = reversed( self._childEntries )
 
 			x = 0.0
@@ -312,7 +355,7 @@ class DTBox (DTContainerSequence):
 
 
 	def _o_onAllocateY(self, allocation):
-		if self._direction == DTDirection.TOP_TO_BOTTOM  or  self._direction == DTDirection.BOTTOM_TO_TOP:
+		if self._direction == DTBox.TOP_TO_BOTTOM  or  self._direction == DTBox.BOTTOM_TO_TOP:
 			expandPerChild = 0.0
 			shrinkPerChild = 0.0
 			if allocation > self._childrenRequisition.y:
@@ -326,9 +369,9 @@ class DTBox (DTContainerSequence):
 					shrink = self._childrenRequisition.y - allocation
 					shrinkPerChild = shrink / float( self._numShrink )
 
-			if self._direction == DTDirection.TOP_TO_BOTTOM:
+			if self._direction == DTBox.TOP_TO_BOTTOM:
 				childEntryIter = self._childEntries
-			elif self._direction == DTDirection.BOTTOM_TO_TOP:
+			elif self._direction == DTBox.BOTTOM_TO_TOP:
 				childEntryIter = reversed( self._childEntries )
 
 			y = 0.0
@@ -368,7 +411,7 @@ class DTBox (DTContainerSequence):
 
 
 	def isOrderReversed(self):
-		return self._direction == DTDirection.RIGHT_TO_LEFT  or  self._direction == DTDirection.BOTTOM_TO_TOP
+		return self._direction == DTBox.RIGHT_TO_LEFT  or  self._direction == DTBox.BOTTOM_TO_TOP
 
 
 
@@ -384,9 +427,9 @@ class DTBox (DTContainerSequence):
 		if len( childEntries ) == 0:
 			return None
 		else:
-			if self._direction == DTDirection.LEFT_TO_RIGHT  or  self._direction == DTDirection.RIGHT_TO_LEFT:
+			if self._direction == DTBox.LEFT_TO_RIGHT  or  self._direction == DTBox.RIGHT_TO_LEFT:
 				pos = localPos.x
-			elif self._direction == DTDirection.TOP_TO_BOTTOM  or  self._direction == DTDirection.BOTTOM_TO_TOP:
+			elif self._direction == DTBox.TOP_TO_BOTTOM  or  self._direction == DTBox.BOTTOM_TO_TOP:
 				pos = localPos.y
 
 			if len( self ) == 1:
@@ -395,8 +438,8 @@ class DTBox (DTContainerSequence):
 				class _BoundaryPoints (object):
 					def __init__(self, box):
 						self._l = len( childEntries ) - 1
-						self._bOrderReversed = box._direction == DTDirection.RIGHT_TO_LEFT  or  box._direction == DTDirection.BOTTOM_TO_TOP
-						self._bX = box._direction == DTDirection.LEFT_TO_RIGHT  or  box._direction == DTDirectionRIGHT_TO_LEFT
+						self._bOrderReversed = box._direction == DTBox.RIGHT_TO_LEFT  or  box._direction == DTBox.BOTTOM_TO_TOP
+						self._bX = box._direction == DTBox.LEFT_TO_RIGHT  or  box._direction == DTBox.RIGHT_TO_LEFT
 						
 					def __len__(self):
 						return self._l
@@ -422,9 +465,9 @@ class DTBox (DTContainerSequence):
 			childEntry = childEntries[childInded]
 			
 			# leading or trailing edge?
-			if self._direction == DTDirection.LEFT_TO_RIGHT  or  self._direction == DTDirection.RIGHT_TO_LEFT:
+			if self._direction == DTBox.LEFT_TO_RIGHT  or  self._direction == DTBox.RIGHT_TO_LEFT:
 				mid = childEntry._xPos + childEntry._width * 0.5
-			elif self._direction == DTDirection.TOP_TO_BOTTOM  or  self._direction == DTDirection.BOTTOM_TO_TOP:
+			elif self._direction == DTBox.TOP_TO_BOTTOM  or  self._direction == DTBox.BOTTOM_TO_TOP:
 				mid = childEntry._yPos + childEntry._height * 0.5
 				
 			if pos <= mid:
@@ -439,15 +482,15 @@ class DTBox (DTContainerSequence):
 	#
 	
 	def horizontalNavigationList(self):
-		if self._direction == DTDirection.LEFT_TO_RIGHT  or  self._direction == DTDirection.TOP_TO_BOTTOM:
+		if self._direction == DTBox.LEFT_TO_RIGHT  or  self._direction == DTBox.TOP_TO_BOTTOM:
 			return [ e.child   for e in self._childEntries ]
 		else:
 			return [ e.child   for e in reversed( self._childEntries ) ]
 
 	def verticalNavigationList(self):
-		if self._direction == DTDirection.TOP_TO_BOTTOM:
+		if self._direction == DTBox.TOP_TO_BOTTOM:
 			return [ e.child   for e in self._childEntries ]
-		elif self._direction == DTDirection.BOTTOM_TO_TOP:
+		elif self._direction == DTBox.BOTTOM_TO_TOP:
 			return [ e.child   for e in reversed( self._childEntries ) ]
 		else:
 			return []
@@ -528,7 +571,7 @@ if __name__ == '__main__':
 	label4 = MyLabel( 'Hello world 4' )
 	label4.font = 'Sans 30'
 
-	hbox = DTBox( DTDirection.LEFT_TO_RIGHT )
+	hbox = DTBox( DTBox.LEFT_TO_RIGHT )
 	hbox.append( label1, False )
 	hbox.append( label2, True, True )
 	hbox.append( label3, False )
@@ -542,14 +585,14 @@ if __name__ == '__main__':
 	labelB.font = 'Sans 21'
 	labelC.font = 'Sans 15'
 
-	hbox2 = DTBox( DTDirection.LEFT_TO_RIGHT, alignment=DTBox.ALIGN_BASELINES )
+	hbox2 = DTBox( DTBox.LEFT_TO_RIGHT, alignment=DTBox.ALIGN_BASELINES )
 	hbox2.append( labelA )
 	hbox2.append( labelB )
 	hbox2.append( labelC )
 	hbox2.spacing = 5.0
 	hbox2.backgroundColour = Colour3f( 0.6, 0.6, 0.6 )
 
-	vbox = DTBox( DTDirection.TOP_TO_BOTTOM, alignment=DTBox.ALIGN_EXPAND )
+	vbox = DTBox( DTBox.TOP_TO_BOTTOM, alignment=DTBox.ALIGN_EXPAND )
 	vbox.append( hbox, False )
 	vbox.append( label4, False )
 	vbox.append( hbox2, False )

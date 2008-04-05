@@ -31,6 +31,52 @@
 					)
 				)
 	
+				($# "View a parameter")
+				(@viewParam
+					($lambda (@node)
+						($match @node
+							($# "Keyword parameter")
+							( ((& @x (@x startswith "#':") (: @paramName !))  (: @value ^))
+								($activeBorder
+									($ahbox ($list
+										($label (@paramName [:] #1 #None) (@gMetaStyles . paramName))
+										($label "#'=")
+										($viewEval @value @viewForm)
+									))
+								)
+							)
+							
+							($# "Normal parameter")
+							( ^
+								(@viewForm <- @node)
+							)
+						)
+					)
+				)
+				
+				($# "View a widget parameter list")
+				(@viewWidgetParamList
+					($lambda (@params)
+						($wrapSep ($mapViewEval @params @viewParam))
+					)
+				)
+				
+				($# "Sequence contaier helper")
+				(@sequenceContinerViewHelper
+					($lambda (@title @children @widgetParams)
+						($activeBorder
+							($vbox ($list
+								($label "#'HBox" (@gMetaStyles . keyword))
+								($vbox ($list
+									($viewEval @children @viewForm)
+									(@viewWidgetParamList <- @widgetParams)
+								))
+							)  (@gMetaStyles . titleVBox))
+							(@gMetaStyles . containerBackground)
+						)
+					)
+				)
+								
 				($# "View special expressions for a view definition")
 				(@viewSpecial
 					($lambda (@node)
@@ -166,41 +212,35 @@
 							)
 							
 							($# "Active border")
-							( ($activeBorder (: @x ^) (: @styles *))
+							( ($activeBorder (: @x ^) (: @widgetParams *))
 								($activeBorder
 									($vbox ($list
 										($label "#'ActiveBorder" (@gMetaStyles . keyword))
-										($vbox
-											(
-												($list ($viewEval @x @viewForm))
-												+
-												(@viewStyleList <- @styles)
-											)
-										)
+										($vbox ($list
+											($viewEval @x @viewForm)
+											(@viewWidgetParamList <- @widgetParams)
+										))
 									) (@gMetaStyles . titleVBox))
 									(@gMetaStyles . containerBackground)
 								)
 							)
 							
 							($# "Border")
-							( ($border (: @x ^) (: @styles *))
+							( ($border (: @x ^) (: @widgetParams *))
 								($activeBorder
 									($vbox ($list
 										($label "#'Border" (@gMetaStyles . keyword))
-										($vbox
-											(
-												($list ($viewEval @x @viewForm))
-												+
-												(@viewStyleList <- @styles)
-											)
-										)
+										($vbox ($list
+											($viewEval @x @viewForm)
+											(@viewWidgetParamList <- @widgetParams)
+										))
 									)  (@gMetaStyles . titleVBox))
 									(@gMetaStyles . containerBackground)
 								)
 							)
 							
 							($# "Indent")
-							( ($indent (: @indentation ^) (: @x ^) (: @styles *))
+							( ($indent (: @indentation ^) (: @x ^) (: @widgetParams *))
 								($activeBorder
 									($vbox ($list
 										($hbox ($list
@@ -208,13 +248,10 @@
 												($label "#'Indent" (@gMetaStyles . keyword))
 												($viewEval @indentation @viewForm)
 											))
-											($vbox
-												(
-													($list ($viewEval @x @viewForm))
-													+
-													(@viewStyleList <- @styles)
-												)
-											)
+											($vbox ($list
+												($viewEval @x @viewForm)
+												(@viewWidgetParamList <- @widgetParams)
+											))
 										))
 									)  (@gMetaStyles . titleVBox))
 									(@gMetaStyles . containerBackground)
@@ -222,294 +259,220 @@
 							)
 							
 							($# "H-Line")
-							( ($hline (: @styles *))
+							( ($hline (: @widgetParams *))
 								($activeBorder
 									($vbox ($list
 										($label "#'H-Line" (@gMetaStyles . keyword))
-										($vbox
-											(@viewStyleList <- @styles)
-										)
+										(@viewWidgetParamList <- @widgetParams)
 									)  (@gMetaStyles . titleVBox))
 									(@gMetaStyles . labelBackground)
 								)
 							)
 							
 							($# "Label")
-							( ($label (: @x ^) (: @styles *))
+							( ($label (: @x ^) (: @widgetParams *))
 								($activeBorder
 									($vbox ($list
 										($label "#'Label" (@gMetaStyles . keyword))
-										($vbox
-											(
-												($list ($viewEval @x @viewForm))
-												+
-												(@viewStyleList <- @styles)
-											)
-										)
+										($vbox ($list
+											($viewEval @x @viewForm)
+											(@viewWidgetParamList <- @widgetParams)
+										))
 									)  (@gMetaStyles . titleVBox))
 									(@gMetaStyles . labelBackground)
 								)
 							)
 							
 							($# "Markup label")
-							( ($markupLabel (: @x ^) (: @styles *))
+							( ($markupLabel (: @x ^) (: @widgetParams *))
 								($activeBorder
 									($vbox ($list
 										($label "#'Markup label" (@gMetaStyles . keyword))
-										($vbox
-											(
-												($list ($viewEval @x @viewForm))
-												+
-												(@viewStyleList <- @styles)
-											)
-										)
+										($vbox ($list
+											($viewEval @x @viewForm)
+											(@viewWidgetParamList <- @widgetParams)
+										))
 									)  (@gMetaStyles . titleVBox))
 									(@gMetaStyles . labelBackground)
 								)
 							)
 							
 							($# "Entry")
-							( ($entry (: @labelText ^) (: @entryText ^) (: @entryTokeniser ^) (: @styles *))
+							( ($entry (: @labelText ^) (: @entryText ^) (: @entryTokeniser ^) (: @widgetParams *))
 								($activeBorder
 									($vbox ($list
 										($label "#'Entry" (@gMetaStyles . keyword))
-										($vbox
-											(
-												($list
-													($hbox ($list
-														($label "#'label:" (@gMetaStyles . keyword))
-														($viewEval @labelText @viewForm)
-														($label "#'entry:" (@gMetaStyles . keyword))
-														($viewEval @entryText @viewForm)
-													))
-													($hbox ($list
-														($label "#'tokeniser:" (@gMetaStyles . keyword))
-														($viewEval @entryTokeniser @viewForm)
-													))
-												)
-												+
-												(@viewStyleList <- @styles)
-											)
-										)
+										($vbox ($list
+											($hbox ($list
+												($label "#'label:" (@gMetaStyles . keyword))
+												($viewEval @labelText @viewForm)
+												($label "#'entry:" (@gMetaStyles . keyword))
+												($viewEval @entryText @viewForm)
+											))
+											($hbox ($list
+												($label "#'tokeniser:" (@gMetaStyles . keyword))
+												($viewEval @entryTokeniser @viewForm)
+											))
+											(@viewWidgetParamList <- @widgetParams)
+										))
 									)  (@gMetaStyles . titleVBox))
 									(@gMetaStyles . labelBackground)
 								)
 							)
 							
 							($# "Markup entry")
-							( ($markupEntry (: @labelText ^) (: @entryText ^) (: @entryTokeniser ^) (: @styles *))
+							( ($markupEntry (: @labelText ^) (: @entryText ^) (: @entryTokeniser ^) (: @widgetParams *))
 								($activeBorder
 									($vbox ($list
 										($label "#'Markup entry" (@gMetaStyles . keyword))
-										($vbox
-											(
-												($list
-													($hbox ($list
-														($label "#'label:" (@gMetaStyles . keyword))
-														($viewEval @labelText @viewForm)
-														($label "#'entry:" (@gMetaStyles . keyword))
-														($viewEval @entryText @viewForm)
-													))
-													($hbox ($list
-														($label "#'tokeniser:" (@gMetaStyles . keyword))
-														($viewEval @entryTokeniser @viewForm)
-													))
-												)
-												+
-												(@viewStyleList <- @styles)
-											)
-										)
+										($vbox ($list
+											($hbox ($list
+												($label "#'label:" (@gMetaStyles . keyword))
+												($viewEval @labelText @viewForm)
+												($label "#'entry:" (@gMetaStyles . keyword))
+												($viewEval @entryText @viewForm)
+											))
+											($hbox ($list
+												($label "#'tokeniser:" (@gMetaStyles . keyword))
+												($viewEval @entryTokeniser @viewForm)
+											))
+											(@viewWidgetParamList <- @widgetParams)
+										))
 									)  (@gMetaStyles . titleVBox))
 									(@gMetaStyles . labelBackground)
 								)
 							)
 							
 							($# "Custom entry")
-							( ($customEntry (: @customChild ^) (: @entryText ^) (: @entryTokeniser ^) (: @styles *))
+							( ($customEntry (: @customChild ^) (: @entryText ^) (: @entryTokeniser ^) (: @widgetParams *))
 								($activeBorder
 									($vbox ($list
 										($label "#'Custom entry" (@gMetaStyles . keyword))
-										($vbox
-											(
-												($list
-													($viewEval @customChild @viewForm)
-													($hbox ($list
-														($label "#'entry:" (@gMetaStyles . keyword))
-														($viewEval @entryText @viewForm)
-													))
-													($hbox ($list
-														($label "#'tokeniser:" (@gMetaStyles . keyword))
-														($viewEval @entryTokeniser @viewForm)
-													))
-												)
-												+
-												(@viewStyleList <- @styles)
-											)
-										)
+										($vbox ($list
+											($viewEval @customChild @viewForm)
+											($hbox ($list
+												($label "#'entry:" (@gMetaStyles . keyword))
+												($viewEval @entryText @viewForm)
+											))
+											($hbox ($list
+												($label "#'tokeniser:" (@gMetaStyles . keyword))
+												($viewEval @entryTokeniser @viewForm)
+											))
+											(@viewWidgetParamList <- @widgetParams)
+										))
 									)  (@gMetaStyles . titleVBox))
 									(@gMetaStyles . labelBackground)
 								)
 							)
 							
 							($# "HBox")
-							( ($hbox (: @x ^) (: @styles *))
-								($activeBorder
-									($vbox ($list
-										($label "#'HBox" (@gMetaStyles . keyword))
-										($vbox
-											(
-												($list ($viewEval @x @viewForm))
-												+
-												(@viewStyleList <- @styles)
-											)
-										)
-									)  (@gMetaStyles . titleVBox))
-									(@gMetaStyles . containerBackground)
-								)
+							( ($hbox (: @x ^) (: @widgetParams *))
+								(@sequenceContinerViewHelper <- "#'HBox" @x @widgetParams)
 							)
 							
 							($# "AHBox")
-							( ($ahbox (: @x ^) (: @styles *))
-								($activeBorder
-									($vbox ($list
-										($label "#'AHBox" (@gMetaStyles . keyword))
-										($vbox
-											(
-												($list ($viewEval @x @viewForm))
-												+
-												(@viewStyleList <- @styles)
-											)
-										)
-									)  (@gMetaStyles . titleVBox))
-									(@gMetaStyles . containerBackground)
-								)
+							( ($ahbox (: @x ^) (: @widgetParams *))
+								(@sequenceContinerViewHelper <- "#'AHBox" @x @widgetParams)
 							)
 							
 							($# "VBox")
-							( ($vbox (: @x ^) (: @styles *))
-								($activeBorder
-									($vbox ($list
-										($label "#'VBox" (@gMetaStyles . keyword))
-										($vbox
-											(
-												($list ($viewEval @x @viewForm))
-												+
-												(@viewStyleList <- @styles)
-											)
-										)
-									)  (@gMetaStyles . titleVBox))
-									(@gMetaStyles . containerBackground)
-								)
+							( ($vbox (: @x ^) (: @widgetParams *))
+								(@sequenceContinerViewHelper <- "#'VBox" @x @widgetParams)
+							)
+	
+							($# "Wrapped HBox")
+							( ($wrap (: @x ^) (: @widgetParams *))
+								(@sequenceContinerViewHelper <- "#'Wrap" @x @widgetParams)
+							)
+	
+							($# "Wrapped HBox with separators")
+							( ($wrapSep (: @x ^) (: @widgetParams *))
+								(@sequenceContinerViewHelper <- "#'Wrap-sep" @x @widgetParams)
 							)
 	
 							($# "Script")
-							( ($script (: @main ^) (: @lsuper ^) (: @lsub ^) (: @rsuper ^) (: @rsub ^) (: @styles *))
+							( ($script (: @main ^) (: @lsuper ^) (: @lsub ^) (: @rsuper ^) (: @rsub ^) (: @widgetParams *))
 								($activeBorder
 									($vbox ($list
 										($label "#'Script" (@gMetaStyles . keyword))
-										($vbox
-											(
-												($list
-													($script
-														($viewEval @main @viewForm)
-														($viewEval @lsuper @viewForm)
-														($viewEval @lsub @viewForm)
-														($viewEval @rsuper @viewForm)
-														($viewEval @rsub @viewForm)
-													)
-												)
-												+
-												(@viewStyleList <- @styles)
+										($vbox ($list
+											($script
+												($viewEval @main @viewForm)
+												($viewEval @lsuper @viewForm)
+												($viewEval @lsub @viewForm)
+												($viewEval @rsuper @viewForm)
+												($viewEval @rsub @viewForm)
 											)
-										)
+											(@viewWidgetParamList <- @widgetParams)
+										))
 									) (@gMetaStyles . titleVBox))
 									(@gMetaStyles . containerBackground)
 								)
 							)
 							
 							($# "Script left superscript")
-							( ($scriptLSuper (: @main ^) (: @scriptChild ^) (: @styles *))
+							( ($scriptLSuper (: @main ^) (: @scriptChild ^) (: @widgetParams *))
 								($activeBorder
 									($vbox ($list
 										($label "#'Script - left super" (@gMetaStyles . keyword))
-										($vbox
-											(
-												($list
-													($scriptLSuper
-														($viewEval @main @viewForm)
-														($viewEval @scriptChild @viewForm)
-													)
-												)
-												+
-												(@viewStyleList <- @styles)
+										($vbox ($list
+											($scriptLSuper
+												($viewEval @main @viewForm)
+												($viewEval @scriptChild @viewForm)
 											)
-										)
+											(@viewWidgetParamList <- @widgetParams)
+										))
 									) (@gMetaStyles . titleVBox))
 									(@gMetaStyles . containerBackground)
 								)
 							)
 							
 							($# "Script left subscript")
-							( ($scriptLSub (: @main ^) (: @scriptChild ^) (: @styles *))
+							( ($scriptLSub (: @main ^) (: @scriptChild ^) (: @widgetParams *))
 								($activeBorder
 									($vbox ($list
 										($label "#'Script - left sub" (@gMetaStyles . keyword))
-										($vbox
-											(
-												($list
-													($scriptLSub
-														($viewEval @main @viewForm)
-														($viewEval @scriptChild @viewForm)
-													)
-												)
-												+
-												(@viewStyleList <- @styles)
+										($vbox ($list
+											($scriptLSub
+												($viewEval @main @viewForm)
+												($viewEval @scriptChild @viewForm)
 											)
-										)
+											(@viewWidgetParamList <- @widgetParams)
+										))
 									) (@gMetaStyles . titleVBox))
 									(@gMetaStyles . containerBackground)
 								)
 							)
 							
 							($# "Script right superscript")
-							( ($scriptRSuper (: @main ^) (: @scriptChild ^) (: @styles *))
+							( ($scriptRSuper (: @main ^) (: @scriptChild ^) (: @widgetParams *))
 								($activeBorder
 									($vbox ($list
 										($label "#'Script - right super" (@gMetaStyles . keyword))
-										($vbox
-											(
-												($list
-													($scriptRSuper
-														($viewEval @main @viewForm)
-														($viewEval @scriptChild @viewForm)
-													)
-												)
-												+
-												(@viewStyleList <- @styles)
+										($vbox ($list
+											($scriptRSuper
+												($viewEval @main @viewForm)
+												($viewEval @scriptChild @viewForm)
 											)
-										)
+											(@viewWidgetParamList <- @widgetParams)
+										))
 									) (@gMetaStyles . titleVBox))
 									(@gMetaStyles . containerBackground)
 								)
 							)
 							
 							($# "Script right subscript")
-							( ($scriptRSub (: @main ^) (: @scriptChild ^) (: @styles *))
+							( ($scriptRSub (: @main ^) (: @scriptChild ^) (: @widgetParams *))
 								($activeBorder
 									($vbox ($list
 										($label "#'Script - right sub" (@gMetaStyles . keyword))
-										($vbox
-											(
-												($list
-													($scriptRSub
-														($viewEval @main @viewForm)
-														($viewEval @scriptChild @viewForm)
-													)
-												)
-												+
-												(@viewStyleList <- @styles)
+										($vbox ($list
+											($scriptRSub
+												($viewEval @main @viewForm)
+												($viewEval @scriptChild @viewForm)
 											)
-										)
+											(@viewWidgetParamList <- @widgetParams)
+										))
 									) (@gMetaStyles . titleVBox))
 									(@gMetaStyles . containerBackground)
 								)
@@ -851,7 +814,7 @@
 										($label (@varName [:] #1 #None))
 										($label "#'=")
 										($viewEval @expression @viewForm)
-									))
+									) (:alignment "#'top"))
 								)
 							)
 
@@ -866,52 +829,62 @@
 					($lambda (@node)
 						($match @node
 							($# "Any non-list")
-							( !!
-								($activeBorder ($label "#'!"))
+							( \!
+								($activeBorder ($label "#'S" (:style (@gMetaStyles . patternSpecial))))
 							)
 							
 							($# "Any list")
-							( //
-								($activeBorder ($label "#'(..)"))
+							( \/
+								($activeBorder ($label "#'L" (:style (@gMetaStyles . patternSpecial))))
 							)
 							
 							($# "Anything")
-							( ^^
-								($activeBorder ($label u"#'\u22c0"))
+							( \^
+								($activeBorder ($label "#'A" (:style (@gMetaStyles . patternSpecial))))
 							)
 							
+							($# "List internal 0-1")
+							( \?
+								($activeBorder ($scriptRSuper ($label u"#'\u2025") ($label "#'?")))
+							)
+
 							($# "List internal 0+")
-							( **
+							( \*
 								($activeBorder ($scriptRSuper ($label u"#'\u2025") ($label "#'*")))
 							)
 
 							($# "List internal 1+")
-							( ++
+							( \+
 								($activeBorder ($scriptRSuper ($label u"#'\u2025") ($label "#'+")))
 							)
 							
 							($# "Constant")
 							( (: @constantValue !)
-								($activeBorder ($label @constantValue (@gMetaStyles . matchPatternConstant)))
+								($activeBorder
+									($label
+										(@matchEscapeString <- @constantValue)
+										(@gMetaStyles . matchPatternConstant)
+									)
+								)
 							)
 							
 							($# "List internal min to max")
-							( (-- (: @min !) (: @max !))
+							( (\- (: @min !) (: @max !))
 								($activeBorder ($scriptRSuper ($label u"#'\u2025") ($label ((@min + "#'-") + @max))))
 							)
 							
 							($# "Bind")
-							( (:: (: @varName !) (: @subPattern ^))
+							( (\: (: @varName !) (: @subPattern ^))
 								($activeBorder ($scriptLSub ($viewEval @subPattern @viewMatchPattern) ($label (@varName [:] #1 #None))))
 							)
 							
 							($# "Condition")
-							( (?? (: @varName !) (: @conditionExpr ^) (: @subPattern ^))
+							( (\& (: @varName !) (: @conditionExpr ^) (: @subPattern ^))
 								($activeBorder
 									($scriptRSub
 										($viewEval @subPattern @viewMatchPattern)
 										($hbox ($list
-											($label "#'?(") ($label (@varName [:] #1 #None)) ($label "#') =")
+											($label "#'if(") ($label (@varName [:] #1 #None)) ($label "#') =")
 											($viewEval @conditionExpr @viewForm)
 										))
 									)
@@ -922,8 +895,16 @@
 							( (: @listPattern /)
 								($activeBorder
 									($ahbox
-										((($list ($label "#'(")) + ($mapViewEval @listPattern @viewMatchPattern)) + ($list ($label "#')")))
-									)
+										(
+											(
+												($list ($label "#'("))
+												+
+												($mapViewEval @listPattern @viewMatchPattern)
+											)
+											+
+											($list ($label "#')"))
+										)
+									(:spacing #7.0) )
 								)
 							)
 						)
@@ -970,7 +951,7 @@
 							($# "List")
 							( (: @x /)
 								($activeBorder
-									($ahbox
+									($wrap
 										(
 											(
 												($list ($label "#'(" (@gMetaStyles . keyword)))
@@ -980,7 +961,7 @@
 											+
 											($list ($label "#')" (@gMetaStyles . keyword)))
 										)
-									)
+									(:indentation #30.0) )
 								)
 							)
 
@@ -990,35 +971,12 @@
 					)
 				)
 				
-				($# "View a call parameter")
-				(@viewCallParam
-					($lambda (@node)
-						($match @node
-							($# "Keyword parameter")
-							( ((? @x (@x startswith "#':") (: @paramName !))  (: @value ^))
-								($activeBorder
-									($ahbox ($list
-										($label (@paramName [:] #1 #None) (@gMetaStyles . paramName))
-										($label "#'=")
-										($viewEval @value @viewForm)
-									))
-								)
-							)
-							
-							($# "Normal parameter")
-							( ^
-								(@viewForm <- @node)
-							)
-						)
-					)
-				)
-	
 				($# "View a call parameter list")
 				(@viewCallParamList
 					($lambda (@params)
 						($ahbox ($list
 							($label "#'(" (@gMetaStyles . structure))
-							($wrappedHBoxSep ($mapViewEval @params @viewCallParam))
+							($wrapSep ($mapViewEval @params @viewParam))
 							($label "#')" (@gMetaStyles . structure))
 						))
 					)
@@ -1029,17 +987,17 @@
 					($lambda (@node)
 						($match @node
 							($# "Variable access")
-							( (? @x (@x startswith "#'@") (: @varName !))
+							( (& @x (@x startswith "#'@") (: @varName !))
 								($activeBorder ($label (@varName [:] #1 #None)))
 							)
 							
 							($# "String literal")
-							( (? @x (@x startswith "#'#'") (: @stringValue !))
+							( (& @x (@x startswith "#'#'") (: @stringValue !))
 								($activeBorder ($label (("#'\"" + (@stringValue [:] #2 #None)) + "#'\"")))
 							)
 							
 							($# "Literal")
-							( (? @x (@x startswith "#'#" ) (: @literalValue !))
+							( (& @x (@x startswith "#'#" ) (: @literalValue !))
 								($activeBorder ($label (@literalValue [:] #1 #None)))
 							)
 							
@@ -1056,18 +1014,39 @@
 							($# "List literal")
 							( ($list (: @elements *))
 								($activeBorder
-									($ahbox
-										((($list ($label "#'["))  +  ($mapViewEval @elements @viewForm))  +  ($list ($label "#']")))
-									)
+									($wrap
+										(
+											(
+												($list ($label "#'[" (:style (@gMetaStyles . structure))))
+												+
+												($mapViewEval @elements @viewForm)
+											)
+											+
+											($list ($label "#']" (:style (@gMetaStyles . structure))))
+										)
+									(:indentation #30.0) )
 								)
 							)
 
 							($# "Set literal")
 							( ($set (: @elements *))
 								($activeBorder
-									($ahbox
-										((($list ($label "#'SET" (@gMetaStyles . keyword)) ($label "#'("))  +  ($mapViewEval @elements @viewForm))  +  ($list ($label "#')")))
-									)
+									($wrap
+										(
+											(
+												($list
+													($label "#'SET" (@gMetaStyles . keyword))
+													($label "#'(" (:style (@gMetaStyles . structure)))
+												)
+												+
+												($mapViewEval @elements @viewForm)
+											)
+											+
+											($list
+												($label "#')" (:style (@gMetaStyles . structure)))
+											)
+										)
+									(:indentation #30.0) )
 								)
 							)
 
@@ -1104,7 +1083,7 @@
 							($# "Lambda expression, with 0 or 1 expressions")
 							( ($lambda (: @args /) (: @expressions *))
 								($activeBorder
-									($hbox
+									($wrap
 										(
 											($list
 												($ahbox ($list
@@ -1116,7 +1095,7 @@
 											+
 											($mapViewEval @expressions @viewForm)
 										)
-									)
+									(:indentation #30.0) )
 								)
 							)
 
@@ -1190,7 +1169,7 @@
 							)
 
 							($# "Special")
-							( (: @s((? @x (@x startswith "#'$") !) *))
+							( (: @s((& @x (@x startswith "#'$") !) *))
 								(@viewSpecial <- @s)
 							)
 							

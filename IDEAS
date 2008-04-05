@@ -3,7 +3,6 @@ gSym ideas log:
 	
 Current plans:
 	
-ML style pattern matching for compilation and viewing.
 Currently in separate phases.
 Live documents.
 
@@ -52,5 +51,18 @@ http://www.unicode.org   and   http://www.unicode.org/charts
 contain information on using unicode to get these characters.
 
 
+04/Apr/2008
+Need a way of ensuring the data is maintained in a sane state:
+For example, take a binary operator; addition
+(add (loadLocal x) (loadLocal y))     VALID
+(add (loadLocal x) (nilExpr))     VALID
+(add (loadLocal x))      INVALID
+Other more complicated structures could be for example a Python define statement:
+(def name (params...) (body...))
+We need a way of maintain the structure in a valid state, and correct it should it stray into
+an invalid one.
 
 
+04/04/2008
+Inverse Parser: somewhat similar to what I am developing.
+http://en.wikipedia.org/wiki/Inverse_parser
