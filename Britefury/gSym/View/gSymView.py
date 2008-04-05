@@ -233,6 +233,7 @@ def _runtime_indent(viewNodeInstance, child, indentation, style=None):
 	Builds a DTBorder widget, with child, builds and registers a refresh cell
 	"""
 	widget = DTBorder()
+	widget.allMargins = 0.0
 	widget.leftMargin = indentation
 	_runtime_binRefreshCell( viewNodeInstance, widget, child )
 	_runtime_applyStyleSheetStack( viewNodeInstance, widget )

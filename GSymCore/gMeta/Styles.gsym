@@ -22,19 +22,34 @@
 					)
 				)
 
+				($# "Comment header")
+				(@commentHeader
+					($style
+						(:backgroundColour (@ColourRGB <- #0.85 #0.85 #0.85))
+					)
+				)
+
 				($# "Label background")
 				(@labelBackground
 					($style
-						(:backgroundColour (@ColourRGB <- #0.9 #1.0 #0.9))
-						(:borderColour (@ColourRGB <- #0.0 #0.8 #0.0))
+						(:backgroundColour (@ColourRGB <- #0.95 #1.0 #0.95))
+						(:borderColour (@ColourRGB <- #0.55 #1.0 #0.55))
 					)
 				)
 			
 				($# "Container background")
 				(@containerBackground
 					($style
-						(:backgroundColour (@ColourRGB <- #1.0 #1.0 #0.9))
-						(:borderColour (@ColourRGB <- #1.0 #0.75 #0.5))
+						(:backgroundColour (@ColourRGB <- #0.925 #1.0 #1.0))
+						(:borderColour (@ColourRGB <- #0.75 #0.75 #1.0))
+					)
+				)
+			
+				($# "Pattern background")
+				(@patternBackground
+					($style
+						(:backgroundColour (@ColourRGB <- #1.0 #1.0 #0.95))
+						(:borderColour (@ColourRGB <- #1.0 #0.85 #0.5))
 					)
 				)
 			
@@ -46,7 +61,7 @@
 					)
 				)
 			
-				($# "Interactor")
+				($# "Interactor background")
 				(@interactorBackground
 					($style
 						(:backgroundColour (@ColourRGB <- #1.0 #0.95 #1.0))
@@ -54,7 +69,7 @@
 					)
 				)
 			
-				($# "Tokeniser")
+				($# "Tokeniser background")
 				(@tokeniserBackground
 					($style
 						(:backgroundColour (@ColourRGB <- #1.0 #0.95 #1.0))
@@ -94,13 +109,6 @@
 					)
 				)
 			
-				($# "Title vbox")
-				(@titleVBox
-					($style
-						(:alignment "#'centre")
-					)
-				)
-				
 				($# "Match pattern constant")
 				(@matchPatternConstant
 					($style
@@ -112,7 +120,22 @@
 				(@keyword
 					($style
 						(:colour (@ColourRGB <- #0.0 #0.0 #0.5))
-						(:font "#'Sans 11 bold")
+						(:font "#'Sans 11")
+					)
+				)
+				
+				($# "Title keyword")
+				(@titleKeyword
+					($style
+						(:colour (@ColourRGB <- #0.0 #0.0 #0.5))
+						(:font "#'Sans 9")
+					)
+				)
+				
+				($# "Title background")
+				(@titleBackground
+					($style
+						(:backgroundColour (@ColourRGB <- #0.95 #0.95 #1.0))
 					)
 				)
 				
@@ -127,7 +150,7 @@
 				(@structure
 					($style
 						(:colour (@ColourRGB <- #0.0 #0.25 #0.75))
-						(:font "#'Sans 11 bold")
+						(:font "#'Sans 12 bold")
 					)
 				)
 				
@@ -135,7 +158,7 @@
 				(@patternSpecial
 					($style
 						(:colour (@ColourRGB <- #0.0 #0.0 #1.0))
-						(:font "#'Sans 10 bold")
+						(:font "#'Sans 10")
 					)
 				)
 			)
