@@ -14,15 +14,6 @@ from Britefury.DocPresent.Toolkit.DTBox import DTBox
 
 
 
-_widgetPropertiesByType = [
-	( DTContainer, [ 'backgroundColour' ] ),
-	( DTBorder, [ 'leftMargin', 'rightMargin', 'topMargin', 'bottomMargin', 'allMargins' ] ),
-	( DTActiveBorder, [ 'borderWidth', 'highlightedBorderWidth', 'borderColour', 'prelitBorderColour', 'highlightedBorderColour', 'highlightedBackgroundColour' ] ),
-	( DTLabel, [ 'font', 'colour', 'hAlign', 'vAlign' ] ),
-	( DTBox, [ 'direction', 'spacing', 'bExpand', 'bFill', 'bShrink', 'alignment', 'padding' ] ),
-	]
-
-
 class GSymStyleSheet (object):
 	def __init__(self, settingsPairs):
 		self._settings = {}
@@ -30,18 +21,12 @@ class GSymStyleSheet (object):
 			self._settings[key] = value
 		
 		
-	def _p_applyProperties(self, widget, properties):
-		for property in properties:
+	def applyToWidget(self, widget):
+		for key, value in self._settings.items():
 			try:
-				value = self._settings[property]
-			except KeyError:
+				a = getattr( widget.__class__, key )
+			except AttributeError:
 				pass
 			else:
-				setattr( widget, property, value )
-	
-
-	def applyToWidget(self, widget):
-		for widgetClass, properties in _widgetPropertiesByType:
-			if isinstance( widget, widgetClass ):
-				self._p_applyProperties( widget, properties )
+				setattr( widget, key, value )
 				

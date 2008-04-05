@@ -18,16 +18,15 @@ def relative(x, parent, index):
 	if isDMListCompatible( x ):
 		return RelativeList( x, parent, index )
 	elif isinstance( x, unicode ):
-		return RelativeUnicode( x, parent, index )
+		return RelativeUnicode._f_build( x, parent, index )
 	elif isinstance( x, str ):
-		return RelativeString( x, parent, index )
+		return RelativeString._f_build( x, parent, index )
 	else:
 		return RelativeNode( x, parent, index )
 
 
 class RelativeNode (object):
 	def __init__(self, node, parentNode, indexInParent):
-		super( RelativeNode, self ).__init__()
 		self._rln_node = node
 		self._rln_parentNode = parentNode
 		self._rln_indexInParent = indexInParent
@@ -35,6 +34,7 @@ class RelativeNode (object):
 		
 	def __getattr__(self, name):
 		return getattr( self._rln_node, name )
+
 	
 	def getNode(self):
 		return self._rln_node
@@ -110,52 +110,38 @@ class RelativeList (RelativeNode, DMListInterface):
 
 
 
-class RelativeString (RelativeNode):
-	def __getitem__(self, i):
-		return self._rln_node[i]
-
-	def __contains__(self, x):
-		return x in self._rln_node
-
-	def __iter__(self):
-		for i, x in enumerate( self._rln_node ):
-			yield relative( x, self._rln_node, i )
-
-	def __add__(self, xs):
-		if isinstance( xs, RelativeString ):
-			return self._rln_node + xs._rln_node
-		else:
-			return self._rln_node + xs
-
-	def __radd__(self, xs):
-		if isinstance( xs, RelativeString ):
-			return xs._rln_node  +  self._rln_node
-		else:
-			return xs  +  self._rln_node
-
-	def __mul__(self, i):
-		return self._rln_node * i
-
-	def __len__(self):
-		return len( self._rln_node )
-	
-	
-	def __str__(self):
-		return self._rln_node
-
-
-
-	def __copy__(self):
-		return RelativeList( copy( self._rln_node ) )
-
-	def __deepcopy__(self, memo):
-		return RelativeList( deepcopy( self._rln_node, memo ) )
-
-
+class RelativeString (str, RelativeNode):
+	def __init__(self, node):
+		str.__init__( node )
+		RelativeNode.__init__( self, node, None, -1 )
 		
 		
-class RelativeUnicode (RelativeString):
-	pass
+	@staticmethod
+	def _f_build(value, parent, indexInParent):
+		x = RelativeString( value )
+		x._rln_parentNode = parent
+		x._rln_indexInParent = indexInParent
+		return x
+
+
+
+
+class RelativeUnicode (unicode, RelativeNode):
+	def __init__(self, node):
+		str.__init__( node )
+		RelativeNode.__init__( self, node, None, -1 )
+		
+		
+	@staticmethod
+	def _f_build(value, parent, indexInParent):
+		x = RelativeUnicode( value )
+		x._rln_parentNode = parent
+		x._rln_indexInParent = indexInParent
+		return x
+
+
+
+
 
 
 
@@ -175,14 +161,20 @@ class TestCase_RelativeNode (unittest.TestCase):
 		a = [ str( i )   for i in range( 0, 10 ) ]
 		n_a = relative( a, None, 0 )
 		n_5 = n_a[5]
+		self.assert_( isinstance( n_5, RelativeString ) )
 		self.assert_( n_5 == '5' )
 		self.assert_( n_5.parent is a )
 		self.assert_( n_5.indexInParent == 5 )
+		self.assert_( ','.join( n_a )  ==  '0,1,2,3,4,5,6,7,8,9' )
 
 	def testWrapUnicodeRange(self):
 		a = [ unicode( i )   for i in range( 0, 10 ) ]
 		n_a = relative( a, None, 0 )
 		n_5 = n_a[5]
+		self.assert_( isinstance( n_5, RelativeUnicode ) )
 		self.assert_( n_5 == u'5' )
 		self.assert_( n_5.parent is a )
 		self.assert_( n_5.indexInParent == 5 )
+		self.assert_( u','.join( n_a )  ==  u'0,1,2,3,4,5,6,7,8,9' )
+		
+		
