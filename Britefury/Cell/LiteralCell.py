@@ -112,7 +112,7 @@ class LiteralCell (CellInterface):
 
 
 	def getValue(self):
-		self._bRefreshRequired = False
+		self._refreshState = self.REFRESHSTATE_REFRESH_NOT_REQUIRED
 
 		# Add @self to the global dependency list if it exists; this ensures that any cell that
 		# is recomputing its value will know that the @value of self is required
@@ -125,7 +125,7 @@ class LiteralCell (CellInterface):
 			return copy( self._value )
 
 	def getImmutableValue(self):
-		self._bRefreshRequired = False
+		self._refreshState = self.REFRESHSTATE_REFRESH_NOT_REQUIRED
 
 		# Add @self to the global dependency list if it exists; this ensures that any cell that
 		# is recomputing its value will know that the @value of self is required
@@ -218,7 +218,7 @@ class LiteralRefCell (LiteralCell):
 
 
 	def getValue(self):
-		self._bRefreshRequired = False
+		self._refreshState = self.REFRESHSTATE_REFRESH_NOT_REQUIRED
 
 		# Add @self to the global dependency list if it exists; this ensures that any cell that
 		# is recomputing its value will know that the @value of self is required

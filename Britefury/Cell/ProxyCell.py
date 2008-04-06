@@ -77,7 +77,7 @@ class ProxyCell (CellInterface):
 
 		self._p_refreshTargetCell()
 
-		self._bRefreshRequired = False
+		self._refreshState = self.REFRESHSTATE_REFRESH_NOT_REQUIRED
 
 		result = None
 		if self._targetCell is not None:
@@ -96,7 +96,7 @@ class ProxyCell (CellInterface):
 
 		self._p_refreshTargetCell()
 
-		self._bRefreshRequired = False
+		self._refreshState = self.REFRESHSTATE_REFRESH_NOT_REQUIRED
 
 		result = None
 		if self._targetCell is not None:

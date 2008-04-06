@@ -68,7 +68,20 @@ class CellInterface (object):
 	evaluatorSignal - emitted when the evaluator is changed
 	valididySignal - emitted when the cell becomes valid or invalid
 	"""
-	__slots__ = [ '__weakref__', '_bRefreshRequired', '_dependents' ]
+	
+	"""
+	The cell state:
+	Three possible values:
+	  Uninitialised: the value is not up to date; it needs to be recomputed, but the 'changed' signal should *not* be blocked
+	  Refresh required: the value is not up to date; it needs to be recomputed; but listeners do not need to be informed of value changes
+	  Refresh NOT required: the value is up to date; listeners should be informed of value changes
+	"""
+	REFRESHSTATE_UNINITIALISED = 0
+	REFRESHSTATE_REFRESH_REQUIRED = 1
+	REFRESHSTATE_REFRESH_NOT_REQUIRED = 2
+	
+	
+	__slots__ = [ '__weakref__', '_refreshState', '_dependents' ]
 
 	_cellDependencies = None
 
@@ -81,11 +94,7 @@ class CellInterface (object):
 	def __init__(self):
 		super( CellInterface, self ).__init__()
 
-		# @self._bRefreshRequired has three possible values:
-		#	True:		will result in cells refreshing their value before returning it (getValue())
-		#	False:		will prevent the changed signal from being sent
-		#	None:		will result in cells refreshing their value before returning it, AND changed signals WILL be sent
-		self._bRefreshRequired = None
+		self._refreshState = self.REFRESHSTATE_UNINITIALISED
 		self._dependents = weakref.WeakKeyDictionary()
 
 
@@ -145,8 +154,8 @@ class CellInterface (object):
 
 
 	def _o_changed(self):
-		if self._bRefreshRequired != True:
-			self._bRefreshRequired = True
+		if self._refreshState  !=  self.REFRESHSTATE_REFRESH_REQUIRED:
+			self._refreshState = self.REFRESHSTATE_REFRESH_REQUIRED
 			self.changedSignal.emit()
 			for dep in self._dependents:
 				dep._o_changed()

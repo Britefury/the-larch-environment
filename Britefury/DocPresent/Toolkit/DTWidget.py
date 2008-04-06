@@ -919,13 +919,19 @@ class DTWidget (object):
 
 
 	def _f_setDocument(self, document):
-		self._document = document
-		if self._document is not None:
-			for event in self._waitingImmediateEvents:
-				self._document.queueImmediateEvent( event )
-			self._waitingImmediateEvents = []
+		if document is not self._document:
+			self._document = document
+			if self._document is not None:
+				for event in self._waitingImmediateEvents:
+					self._document.queueImmediateEvent( event )
+				self._waitingImmediateEvents = []
+			self._o_setDocument( document )
 
+				
+	def _o_setDocument(self, document):
+		pass
 
+	
 	def _dbg_getWidgetsWithFocus(self):
 		if self._bHasFocus:
 			return [ self ]
@@ -966,6 +972,18 @@ class DTWidget (object):
 		
 		
 
+	#
+	#
+	#
+	# MISC DEBUG METHODS
+	#
+	#
+	#
+	
+	def getWidgetCount(self):
+		return 1
+	
+	
 
 
 	def __copy__(self):
