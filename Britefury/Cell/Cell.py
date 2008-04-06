@@ -45,7 +45,7 @@ class CellClass (type):
 
 
 class Cell (CellInterface):
-	__slots__ = [ '_defaultValue', '_evaluator', '_valueCache', '_bRefreshRequired', '_dependencies', '_cycleLock', 'owner' ]
+	__slots__ = [ '_defaultValue', '_evaluator', '_valueCache', '_dependencies', '_cycleLock', 'owner' ]
 
 	__metaclass__ = CellClass
 
@@ -143,9 +143,9 @@ class Cell (CellInterface):
 			if CellInterface._cellDependencies is not None:
 				CellInterface._cellDependencies[self] = None
 
-			if self._bRefreshRequired != False:
+			if self._refreshState  !=  self.REFRESHSTATE_REFRESH_NOT_REQUIRED:
 				# IS THIS CORRECT
-				self._bRefreshRequired = False
+				self._refreshState = self.REFRESHSTATE_REFRESH_NOT_REQUIRED
 				if isinstance( self._evaluator, CellEvaluator ):
 					# Save the existing global dependency list
 					oldCellDeps = CellInterface._cellDependencies
@@ -194,7 +194,7 @@ class Cell (CellInterface):
 
 
 				# IS THIS CORRECT?
-				#self._bRefreshRequired = False
+				#self._refreshState = self.REFRESHSTATE_REFRESH_NOT_REQUIRED
 
 		except:
 			self._cycleLock = False

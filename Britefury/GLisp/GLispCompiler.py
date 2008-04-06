@@ -79,6 +79,13 @@ class _CompilationContext (object):
 		
 		
 
+def _isLambdaForm(xs):
+	if isGLispList( xs ):
+		if len( xs ) >= 2:
+			return xs[0] == '$lambda'
+	return False
+	
+	
 
 
 class GLispModule (object):
@@ -136,6 +143,57 @@ def compileExpressionListToPyTreeStatements(expressions, context, bNeedResult, c
 	
 
 	
+
+
+def _compileBindings(xs, context, compileSpecial=None):
+	"""
+	Bindings compilation helper function
+	_compileBindings( xs, context, bNeedResult, compileSpecial)  ->  py_bindings, boundNames
+	  xs - list of binding pairs
+	  context - the compilation context
+	  compileSpecial - special form compilation function
+	    py_bindings - the code as py-trees
+	    boundNames - the list of names bound by this binding list
+	"""
+	py_bindings = []
+	
+	# Make binding code
+	boundNames = []
+	xs = stripGLispComments( xs )
+	for binding in xs:
+		bindingContext = context.innerContext()
+		if not isGLispList( binding )  or  len( binding ) != 2:
+			raise GLispCompilerInvalidBindingListFormat( binding )
+		
+		if binding[0][0] != '@':
+			raise GLispCompilerVariableNameMustStartWithAt( binding[0] )
+		
+		name = binding[0][1:]
+		valueExpr = binding[1]
+		if name in boundNames:
+			raise GLispCompilerCannotRebindVariable( binding )
+		
+		# If this name is already bound in thise scope, we need to back it up first
+		if _isLambdaForm( valueExpr ):
+			# The value expression is a lambda;
+			# The code is easier to debug if we simply emit a python def statement, defining the function with the correct name, instead of using an automatically
+			# generated one, and assigning this value to @name
+			# To to this, call _compileLambda(), stating that the result is *not* required. In thise case, the def statement will be placed into the @bindingContext body
+			# and pass @name as the name parameter to override the name generation.
+			valueExprPyTree = _compileLambda( valueExpr, bindingContext, False, compileSpecial, name )
+			
+			py_bindings.extend( bindingContext.body )
+		else:
+			valueExprPyTree = _compileGLispExprToPyTree( valueExpr, bindingContext, True, compileSpecial )
+			assignmentPyTree = valueExprPyTree.assignToVar_sideEffects( name ).debug( binding )
+		
+			py_bindings.extend( bindingContext.body )
+			py_bindings.append( assignmentPyTree )
+		
+		boundNames.append( name )
+		
+	return py_bindings, boundNames
+
 
 
 
@@ -214,7 +272,7 @@ class GLispCompilerLambdaExprArgMustStartWithAt (PyCodeGenError):
 
 
 
-def _compileLambda(xs, context, bNeedResult=False, compileSpecial=None):
+def _compileLambda(xs, context, bNeedResult=False, compileSpecial=None, name=None):
 	"""
 	( $lambda (arg0Name arg1Name ...) code0 code1 code2 ... )
 	"""
@@ -224,7 +282,10 @@ def _compileLambda(xs, context, bNeedResult=False, compileSpecial=None):
 	argNamesXs = xs[1]
 	codeXs = xs[2:]
 	
-	functionName = context.temps.allocateTempName( 'lambda' )
+	if name is None:
+		functionName = context.temps.allocateTempName( 'lambda' )
+	else:
+		functionName = name
 	
 	if not isGLispList( argNamesXs ):
 		raise GLispCompilerLambdaExprInvalidFunctionNameType( xs )
@@ -663,29 +724,9 @@ def _compileWhere(xs, context, bNeedResult=False, compileSpecial=None):
 
 	
 	# Make binding code
-	boundNames = []
 	bindings = stripGLispComments( bindings )
-	for binding in bindings:
-		bindingContext = context.innerContext()
-		if not isGLispList( binding )  or  len( binding ) != 2:
-			raise GLispCompilerWhereExprInvalidBindingListFormat( binding )
-		
-		if binding[0][0] != '@':
-			raise GLispCompilerVariableNameMustStartWithAt( binding[0] )
-		
-		name = binding[0][1:]
-		valueExpr = binding[1]
-		if name in boundNames:
-			raise GLispCompilerWhereExprCannotRebindVariable( binding )
-		
-		# If this name is already bound in thise scope, we need to back it up first
-		valueExprPyTree = _compileGLispExprToPyTree( valueExpr, bindingContext, True, compileSpecial )
-		assignmentPyTree = valueExprPyTree.assignToVar_sideEffects( name ).debug( binding )
-		
-		whereTrees.extend( bindingContext.body )
-		whereTrees.append( assignmentPyTree )
-		
-		boundNames.append( name )
+	py_bindings, boundNames = _compileBindings( bindings, context, compileSpecial )
+	whereTrees.extend( py_bindings )
 		
 
 	
@@ -767,31 +808,11 @@ def _compileModule(xs, context, bNeedResult=False, compileSpecial=None):
 
 	
 	# Make binding code
-	boundNames = []
 	bindings = stripGLispComments( bindings )
-	for binding in bindings:
-		bindingContext = context.innerContext()
-		if not isGLispList( binding )  or  len( binding ) != 2:
-			raise GLispCompilerModuleExprInvalidBindingListFormat( binding )
-		
-		if binding[0][0] != '@':
-			raise GLispCompilerVariableNameMustStartWithAt( binding[0] )
-		
-		name = binding[0][1:]
-		valueExpr = binding[1]
-		if name in boundNames:
-			raise GLispCompilerModuleExprCannotRebindVariable( binding )
-		
-		# If this name is already bound in thise scope, we need to back it up first
-		valueExprPyTree = _compileGLispExprToPyTree( valueExpr, bindingContext, True, compileSpecial )
-		assignmentPyTree = valueExprPyTree.assignToVar_sideEffects( name ).debug( binding )
-		
-		moduleTrees.extend( bindingContext.body )
-		moduleTrees.append( assignmentPyTree )
-		
-		boundNames.append( name )
-		
+	py_bindings, boundNames = _compileBindings( bindings, context, compileSpecial )
+	moduleTrees.extend( py_bindings )
 
+	
 	# Build and return the module object
 	py_module = PyReturn( PyVar( 'GLispModule' )( PyDictLiteral( [ ( PyLiteralValue( name ), PyVar( name ) )   for name in boundNames ] ) ) ).debug( xs )
 	moduleTrees.append( py_module )
@@ -1736,7 +1757,7 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 		
 		xssrc3 = """
 		($match ($list "#'a" "#'b" "#'c" "#'deadbeef" "#'e" "#'f" "#'g" "#'h")
-		   (   (a b (: @a !) (? @x (@x startswith "#\'dead") (: @b !)) (: @c *))   ($list @a @b @c)   )
+		   (   (a b (: @a !) (& @x (@x startswith "#\'dead") (: @b !)) (: @c *))   ($list @a @b @c)   )
 		)
 		"""
 		
@@ -1961,9 +1982,8 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 			'  elif q == 3:',
 			'    __gsym__if_result_0 = 7',
 			'  c = __gsym__if_result_0',
-			'  def __gsym__lambda_0(i, j, k):',
+			'  def d(i, j, k):',
 			'    return i + (j + k)',
-			'  d = __gsym__lambda_0',
 			'  return d( a, b, c )',
 			'x + __gsym__where_fn_0()',
 		]
@@ -1993,8 +2013,30 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 			'  return __gsym__lambda_0',
 			'__gsym__where_fn_0()()'
 		]
+
+		xssrc2 = """
+		(
+		  ($where
+	             (
+		       (@a #3)
+		       (@b ($lambda (@x @y) ((@x + @y) * @a)))
+		     )
+		     (@b <- #1 #2)
+		  )
+		)
+		"""
+		pysrc2 = [
+			'def __gsym__where_fn_0():',
+			'  a = 3',
+			'  def b(x, y):',
+			'    return (x + y) * a',
+			'  return b( 1, 2 )',
+			'__gsym__where_fn_0()'
+		]
 		self._compileTest( xssrc1, pysrc1 )
 		self._evalTest( xssrc1, 24, [] )
+		self._compileTest( xssrc2, pysrc2 )
+		self._evalTest( xssrc2, 9, [] )
 
 
 
@@ -2115,5 +2157,29 @@ class TestCase_GLispCompiler_compileGLispExprToPySrc (unittest.TestCase):
 		self._evalTest( xssrc1, [ [ 'c', 'd' ], [ 'e', 'f', 'g', 'h' ] ], [] )
 
 		
+	def test_Module_Lambda(self):
+		xssrc1 = """
+		(
+		  ($module
+		       (@a #3)
+		       (@b ($lambda (@x @y) ((@x + @y) * @a)))
+		  )
+		)
+		"""
+		pysrc1 = [
+			"def __gsym__module_fn_0():",
+			"  a = 3",
+			"  def b(x, y):",
+			"    return (x + y) * a",
+			"  return GLispModule( { 'a' : a, 'b' : b } )",
+			"__gsym__module_fn_0()"
+		]
+		self._compileTest( xssrc1, pysrc1 )
+
+
+
+
 if __name__ == '__main__':
 	unittest.main()
+	
+	

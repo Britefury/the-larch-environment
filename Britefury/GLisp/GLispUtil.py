@@ -15,7 +15,7 @@ def isGLispString(xs):
 	return isinstance( xs, str )  or  isinstance( xs, unicode )
 
 def isGLispList(xs):
-	return isinstance( xs, list )  or  isinstance( xs, DMListInterface )  or  isinstance( xs, RelativeList )
+	return isinstance( xs, tuple )  or  isinstance( xs, list )  or  isinstance( xs, DMListInterface )  or  isinstance( xs, RelativeList )
 
 
 def isGLispComment(xs):

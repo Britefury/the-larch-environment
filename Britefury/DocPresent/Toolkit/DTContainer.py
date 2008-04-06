@@ -381,8 +381,8 @@ class DTContainer (DTWidget):
 
 
 
-	def _f_setDocument(self, document):
-		super( DTContainer, self )._f_setDocument( document )
+	def _o_setDocument(self, document):
+		super( DTContainer, self )._o_setDocument( document )
 
 		for childEntry in self._childEntries:
 			childEntry.child._f_setDocument( document )
@@ -455,6 +455,16 @@ class DTContainer (DTWidget):
 		return widgets
 
 
+	#
+	#
+	#
+	# MISC DEBUG METHODS
+	#
+	#
+	#
+	
+	def getWidgetCount(self):
+		return reduce( lambda c, entry: c + entry.child.getWidgetCount(), self._childEntries, 1 )
 
 
 	backgroundColour = property( getBackgroundColour, setBackgroundColour )
