@@ -63,6 +63,21 @@ We need a way of maintain the structure in a valid state, and correct it should 
 an invalid one.
 
 
-04/04/2008
+04/Apr/2008
 Inverse Parser: somewhat similar to what I am developing.
 http://en.wikipedia.org/wiki/Inverse_parser
+
+
+06/Apr/2008
+Considering a combined typesetting-parser system.
+Parser Expression Grammars are easy to implement, and the Packrat parser system makes them fast (O(n)).
+They can be extended so that left-recursive grammars can be handled.
+The memo table in the parser would be very useful, as it would be trivial to extend a packrat parser to make an incremental parser.
+This extension would need to be applied to the left-recursion extensions.
+Each rule-application would have markers that would indicate the start and end of the range of text parsed by this rule.
+Similar to the OMeta language in the VPRI system, the grammar language / meta language would include:
+1) production rules.
+2) AST generation rules.
+3) View hints on how to typeset the text that makes up this part of the source.
+
+
