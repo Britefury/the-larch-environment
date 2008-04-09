@@ -18,7 +18,7 @@ from copy import copy
 
 
 def _parser_coerce(x):
-	if isinstance( x, Node ):
+	if isinstance( x, ParserElement ):
 		return x
 	elif isinstance( x, list )  or  isinstance( x, tuple ):
 		return Sequence( _parser_coerce( [ _parser_coerce( a )   for a in x ] ) )
@@ -27,13 +27,6 @@ def _parser_coerce(x):
 
 
 	
-class ParseResult (object):
-	def __init__(self, result, begin, end):
-		self.result = result
-		self.begin = begin
-		self.end = end
-		
-		
 		
 		
 class _MemoEntry (object):
@@ -78,23 +71,25 @@ class _Context (object):
 	
 
 		
+class ParseResult (object):
+	"""
+	Parse result
+	Members:
+	   result - the result (returned by the action function, otherwise a list/tree of strings)
+	   begin - the start index of the result, in the input string
+	   end - the end index of the result, in the input string
+	"""
+	def __init__(self, result, begin, end):
+		self.result = result
+		self.begin = begin
+		self.end = end
 		
-class Node (object):
-	def __init__(self):
-		super( Node, self ).__init__()
-		self._actionFn = None
 		
-		
-	def setAction(self, f):
-		self._actionFn = f
-		return self
-	
-		
-	#def match(self, input, start, stop, context=None):
-		#return self._o_evaluate( context, input, start, stop )
 
 
-	#def match(self, input, start, stop, context=None):
+class ParserElement (object):
+	"""Parser element base class"""
+	#def _o_match(self, input, start, stop, context=None):
 		#if context is None:
 			#context = {}
 			
@@ -111,19 +106,27 @@ class Node (object):
 			#return answer, pos
 		
 		
+	def parseString(self, input, start=0, stop=None):
+		"""
+		Parse a string
+		parseString(input, start, stop=None)  ->  ParseResult
+		   input - the input string
+		   start - the start index of the substring (of input) to parse
+		   stop - the end index of the substring (of input) to parse
+		"""
+		if stop is None:
+			stop = len( input )
+		answer, pos = self._o_match( _Context(), input, start, stop )
+		return answer
+	
 		
-	def match(self, input, start, stop=None, context=None):
+	def _o_match(self, context, input, start, stop):
 		if context is None:
 			context = _Context()
 			
 		if stop is None:
 			stop = len( input )
 
-		answer = self._p_match( context, input, start, stop )
-		return answer, context.pos
-
-	
-	def _p_match(self, context, input, start, stop):
 		memoEntry = self._p_recall( context, input, start, stop )
 		if memoEntry is None:
 			lr = _LR( None, self, None, context.lrStackTop() )
@@ -141,17 +144,17 @@ class Node (object):
 			
 			if lr.head is not None:
 				lr.seed = answer
-				return self._p_lr_answer( context, input, start, stop, memoEntry )
+				return self._p_lr_answer( context, input, start, stop, memoEntry ),  context.pos
 			else:
 				memoEntry.answer = answer
-				return answer
+				return answer,  context.pos
 		else:
 			context.pos = memoEntry.pos
 			if isinstance( memoEntry.answer, _LR ):
 				self._p_setup_lr( context, memoEntry.answer )
-				return memoEntry.answer.seed
+				return memoEntry.answer.seed,  context.pos
 			else:
-				return memoEntry.answer
+				return memoEntry.answer,  context.pos
 
 			
 			
@@ -215,12 +218,6 @@ class Node (object):
 	def _o_evaluate(self, context, input, start, stop):
 		pass
 
-	def _p_action(self, input):
-		if self._actionFn is not None:
-			return self._actionFn( input )
-		else:
-			return input
-		
 		
 	def __eq__(self, x):
 		if isinstance( x, type( self ) ):
@@ -246,16 +243,62 @@ class Node (object):
 	def _o_compare(self, x):
 		return False
 	
+
 	
 	
-class Forward (Node):
+class ConcreteParserElement (ParserElement):
+	"""Concrete (non-look ahead) parser element base class"""
+	def __init__(self):
+		super( ConcreteParserElement, self ).__init__()
+		self._actionFn = None
+		
+		
+	def setAction(self, f):
+		"""
+		Set the action function
+		This function is called when the parser expression successfully matches some text.
+		It is of the form:
+		   f(input, start, end, tokens)  ->  result
+		      input  -  the original string being parsed
+		      start, end  -  start and end indices indicating the substring of @input that was parsed
+		      tokens  -  the tokens from sub-parse-expressions
+		     result  -  is passed as @tokens to the parent parse expression action
+		"""
+		self._actionFn = f
+		return self
+	
+
+	def _p_action(self, input, start, end, tokens):
+		result = None
+		if self._actionFn is not None:
+			result = self._actionFn( input, start, end, tokens )
+		if result is None:
+			return tokens
+		else:
+			return result
+		
+
+	
+	
+	
+class Forward (ConcreteParserElement):
+	"""
+	Forward
+	Used for recursive grammars.
+	# Construct an empty forward:
+	x = Forward()
+	# Now, make something that uses @x before it is defined/implemented
+	y = Literal( 'a' ) + Optional( x )
+	# Now, define @x
+	x  <<  y
+	"""
 	def __init__(self):
 		super( Forward, self ).__init__()
 		self._subexp = None
 		
 
 	def _o_evaluate(self, context, input, start, stop):
-		return self._subexp.match( input, start, stop, context )
+		return self._subexp._o_match( context, input, start, stop )
 
 	
 	def _o_compare(self, x):
@@ -269,14 +312,30 @@ class Forward (Node):
 
 	
 
-class Group (Node):
+class Group (ConcreteParserElement):
+	"""
+	Group
+	Used to group a sub-expression
+	
+	When building expressions using '+', '|', etc, they will keep adding on.
+	E.g.:
+	a = b + c  ->  Sequence( [ b, c ] )
+	q = a + p  ->  Sequence( [ b, c, p ] )
+	
+	Use group:
+	a = Group( b + c )  ->  Group( Sequence( [ b, c ] ) )
+	q = Group( a + p )  ->  Group( Sequence( [ a, p ] ) )
+	"""
 	def __init__(self, subexp):
+		"""
+		subexp - the sub-expression in the group
+		"""
 		super( Group, self ).__init__()
 		self._subexp = subexp
 		
 
 	def _o_evaluate(self, context, input, start, stop):
-		return self._subexp.match( input, start, stop, context )
+		return self._subexp._o_match( context, input, start, stop )
 
 	
 	def _o_compare(self, x):
@@ -286,8 +345,17 @@ class Group (Node):
 
 	
 
-class Literal (Node):
+class Literal (ConcreteParserElement):
+	"""
+	Literal
+	
+	Matches a supplied string
+	"""
+	
 	def __init__(self, matchString):
+		"""
+		matchString - the string to match
+		"""
 		super( Literal, self ).__init__()
 		self._matchString = unicode( matchString )
 		
@@ -297,15 +365,24 @@ class Literal (Node):
 		if end <= stop:
 			x = input[start:end]
 			if x == self._matchString:
-				return ParseResult( self._p_action( x ), start, end ),  end
+				return ParseResult( self._p_action( input, start, end, x ), start, end ),  end
 		return None, start
 		
 	def _o_compare(self, x):
 		return self._matchString  ==  x._matchString
 
 
-class Word (Node):
+class Word (ConcreteParserElement):
+	"""
+	Word
+	
+	Matches a word composed of only the specified characters
+	"""
 	def __init__(self, initChars, bodyChars=None):
+		"""
+		Word( chars )   -   matches a word composed of characters in @chars
+		Word( initChars, bodyChars )   -   matches a word composed of characters in @bodyChars, followed by one character from @initChars
+		"""
 		super( Word, self ).__init__()
 		if bodyChars is None:
 			bodyChars = initChars
@@ -332,7 +409,7 @@ class Word (Node):
 			return None, start
 		else:
 			x = input[start:end]
-			return ParseResult( self._p_action( x ), start, end ),  end
+			return ParseResult( self._p_action( input, start, end, x ), start, end ),  end
 
 
 	def _o_compare(self, x):
@@ -341,8 +418,16 @@ class Word (Node):
 	
 	
 	
-class Sequence (Node):
+class Sequence (ConcreteParserElement):
+	"""
+	Sequence
+	
+	Matches a sequence of sub-expressions (in order)
+	"""
 	def __init__(self, subexps):
+		"""
+		subexps - the sub expressions that are to be matched (in order)
+		"""
 		super( Sequence, self ).__init__()
 		assert len( subexps ) > 0
 		self._subexps = [ _parser_coerce( x )   for x in subexps ]
@@ -353,14 +438,14 @@ class Sequence (Node):
 		
 		pos = start
 		for i, subexp in enumerate( self._subexps ):
-			res, pos = subexp.match( input, pos, stop, context )
+			res, pos = subexp._o_match( context, input, pos, stop )
 			if res is None:
 				return None, start
 			else:
 				if res.result is not None:
 					subexpResults.append( res.result )
 		
-		return ParseResult( self._p_action( subexpResults ), start, pos ),  pos
+		return ParseResult( self._p_action( input, start, pos, subexpResults ), start, pos ),  pos
 
 
 	def __add__(self, x):
@@ -372,17 +457,27 @@ class Sequence (Node):
 
 
 	
-class Choice (Node):
+	
+class Choice (ConcreteParserElement):
+	"""
+	Choice
+	
+	Matches one of a sequence of sub-expressions
+	The first sub-expression to match successfully is the one that is used.
+	"""
 	def __init__(self, subexps):
+		"""
+		subexps - the sub expressions, one of which is to be matched
+		"""
 		super( Choice, self ).__init__()
 		self._subexps = [ _parser_coerce( x )   for x in subexps ]
 		
 	
 	def _o_evaluate(self, context, input, start, stop):
 		for i, subexp in enumerate( self._subexps ):
-			res, pos = subexp.match( input, start, stop, context )
+			res, pos = subexp._o_match( context, input, start, stop )
 			if res is not None:
-				return ParseResult( self._p_action( res.result ), start, res.end ),  pos
+				return ParseResult( self._p_action( input, start, pos, res.result ), start, res.end ),  pos
 			
 		return None, start
 
@@ -396,9 +491,20 @@ class Choice (Node):
 
 
 
-class _Repetition (Node):
+class Repetition (ConcreteParserElement):
+	"""
+	Repetition
+	
+	Matches a sub-expression a number of times within a certain range
+	"""
 	def __init__(self, subexp, min, max, bSuppressIfZero=False):
-		super( _Repetition, self ).__init__()
+		"""
+		subexp - the sub expression to match
+		min - the minimum number of occurrences of @subexp to match
+		max - the maximum number of occurrences of @subexp to match
+		bSuppressIfZero - When true, will generate an empty result (The result field of the ParseResult will be None) if 0 occurrences are matched
+		"""
+		super( Repetition, self ).__init__()
 		self._subexp = _parser_coerce( subexp )
 		self._min = min
 		self._max = max
@@ -411,7 +517,7 @@ class _Repetition (Node):
 		pos = start
 		i = 0
 		while self._max is None  or  i < self._max:
-			res, pos = self._subexp.match( input, pos, stop, context )
+			res, pos = self._subexp._o_match( context, input, pos, stop )
 			if res is None:
 				break
 			else:
@@ -426,37 +532,71 @@ class _Repetition (Node):
 			if self._bSuppressIfZero  and  i == 0:
 				return ParseResult( None, start, pos ),  pos
 			else:
-				return ParseResult( self._p_action( subexpResults ), start, pos ),  pos
+				return ParseResult( self._p_action( input, start, pos, subexpResults ), start, pos ),  pos
 	
 	
 	def _o_compare(self, x):
 		return self._subexp  ==  x._subexp  and  self._min  ==  x._min  and  self._max  ==  x._max
 
 
-class Optional (_Repetition):
+class Optional (Repetition):
+	"""
+	Optional
+	
+	Optionally matches a sub-expression
+	"""
 	def __init__(self, subexp, bSuppressIfZero=True):
+		"""
+		subexp - the sub-expression to optionally match
+		bSuppressIfZero - When true, will generate an empty result (The result field of the ParseResult will be None) if no match is made
+		"""
 		super( Optional, self ).__init__( subexp, 0, 1, bSuppressIfZero )
 		
 
-class ZeroOrMore (_Repetition):
+class ZeroOrMore (Repetition):
+	"""
+	ZeroOrMore
+	
+	Matches a sub-expression 0 or more times
+	"""
 	def __init__(self, subexp, bSuppressIfZero=False):
+		"""
+		subexp - the sub-expression to match
+		bSuppressIfZero - When true, will generate an empty result (The result field of the ParseResult will be None) if 0 occurrences are matched
+		"""
 		super( ZeroOrMore, self ).__init__( subexp, 0, None, bSuppressIfZero )
 		
 
-class OneOrMore (_Repetition):
+class OneOrMore (Repetition):
+	"""
+	OneOrMore
+	
+	Matches a sub-expression 1 or more times
+	"""
 	def __init__(self, subexp):
+		"""
+		subexp - the sub-expression to match
+		"""
 		super( OneOrMore, self ).__init__( subexp, 1, None )
 		
 		
 		
-class LookAhead (Node):
+class FollowedBy (ParserElement):
+	"""
+	FollowedBy
+	
+	Matches a sub-expression but does not consume it
+	"""
 	def __init__(self, subexp):
-		super( LookAhead, self ).__init__()
+		"""
+		subexp - the sub-expression to match
+		"""
+		super( FollowedBy, self ).__init__()
 		self._subexp = _parser_coerce( subexp )
 		
 	
 	def _o_evaluate(self, context, input, start, stop):
-		res, pos = self._subexp.match( input, start, stop, context )
+		res, pos = self._subexp._o_match( context, input, start, stop )
 		if res is not None:
 			return ParseResult( None, start, start ),  start
 		else:
@@ -468,14 +608,22 @@ class LookAhead (Node):
 	
 
 
-class LookAheadNot (Node):
+class NotFollowedBy (ParserElement):
+	"""
+	NotFollowedBy
+	
+	Matches anything but a specified sub-expression but does not consume it
+	"""
 	def __init__(self, subexp):
-		super( LookAheadNot, self ).__init__()
+		"""
+		subexp - the sub-expression to not match
+		"""
+		super( NotFollowedBy, self ).__init__()
 		self._subexp = _parser_coerce( subexp )
 		
 	
 	def _o_evaluate(self, context, input, start, stop):
-		res, pos = self._subexp.match( input, start, stop, context )
+		res, pos = self._subexp._o_match( context, input, start, stop )
 		if res is None  or  res.result is None:
 			return ParseResult( None, start, start ), start
 		else:
@@ -489,7 +637,7 @@ class LookAheadNot (Node):
 	
 	
 def delimitedList(subexp, delimiter=','):
-	return ( _parser_coerce( subexp )  +  ZeroOrMore( _parser_coerce( delimiter )  +  subexp ) ).setAction( lambda x: [ x[0] ]  +  [ a[1]   for a in x[1] ] )
+	return ( _parser_coerce( subexp )  +  ZeroOrMore( _parser_coerce( delimiter )  +  subexp ) ).setAction( lambda input, begin, end, tokens: [ tokens[0] ]  +  [ x[1]   for x in tokens[1] ] )
 
 identifier = Word( string.ascii_letters  +  '_',  string.ascii_letters + string.digits + '_' )
 
@@ -500,9 +648,11 @@ import unittest
 
 class TestCase_Parser (unittest.TestCase):
 	def _matchTest(self, parser, input, expected, begin=None, end=None):
-		result, pos = parser.match( input, 0, len( input ) )
+		result = parser.parseString( input )
 		self.assert_( result is not None )
 		res = result.result
+		if ( isinstance( expected, str )  or  isinstance( expected, unicode ) )  and  isinstance( res, list )  and  len( res ) == 1  and  ( isinstance( res[0], str )  or  isinstance( res[0], unicode ) ):
+			res = res[0]
 		if res != expected:
 			print 'EXPECTED:'
 			print expected
@@ -519,7 +669,7 @@ class TestCase_Parser (unittest.TestCase):
 		
 	
 	def _matchFailTest(self, parser, input):
-		result, pos = parser.match( input, 0, len( input ) )
+		result = parser.parseString( input )
 		if result is not None:
 			print 'EXPECTED:'
 			print '<fail>'
@@ -614,10 +764,10 @@ class TestCase_Parser (unittest.TestCase):
 		self._matchTest( parser, 'abab', [ 'ab', 'ab' ], 0, 4 )
 		
 		
-	def testLookAhead(self):
-		self.assert_( LookAhead( Literal( 'ab' ) )   ==   LookAhead( 'ab' ) )
+	def testFollowedBy(self):
+		self.assert_( FollowedBy( Literal( 'ab' ) )   ==   FollowedBy( 'ab' ) )
 
-		parser = OneOrMore( Literal( 'ab' ) )  +  LookAhead( Literal( 'cd' ) )
+		parser = OneOrMore( Literal( 'ab' ) )  +  FollowedBy( Literal( 'cd' ) )
 		self._matchFailTest( parser, '' )
 		self._matchFailTest( parser, 'ab' )
 		self._matchFailTest( parser, 'abab' )
@@ -625,10 +775,10 @@ class TestCase_Parser (unittest.TestCase):
 		self._matchTest( parser, 'ababcd', [ [ 'ab', 'ab' ] ], 0, 4 )
 
 		
-	def testLookAheadNot(self):
-		self.assert_( LookAheadNot( Literal( 'ab' ) )   ==   LookAheadNot( 'ab' ) )
+	def testNotFollowedBy(self):
+		self.assert_( NotFollowedBy( Literal( 'ab' ) )   ==   NotFollowedBy( 'ab' ) )
 
-		parser = OneOrMore( Literal( 'ab' ) )  +  LookAheadNot( Literal( 'cd' ) )
+		parser = OneOrMore( Literal( 'ab' ) )  +  NotFollowedBy( Literal( 'cd' ) )
 		self._matchFailTest( parser, '' )
 		self._matchTest( parser, 'ab', [ [ 'ab' ] ], 0, 2 )
 		self._matchFailTest( parser, 'abcd' )
@@ -664,33 +814,23 @@ class TestCase_Parser (unittest.TestCase):
 		addop = plus | minus
 		mulop = star | slash
 		
-		def _flatten(x):
+		def flattenAction(input, begin, end, x):
 			y = []
 			for a in x:
 				y.extend( a )
 			return y
 			
 			
-		def makeAction(name):
-			def action(x):
-				#print name, x
-				if len( x ) == 1:
-					return x[0]
-				else:
-					#print [ x[0] ]  +  x[1]
-					return [ x[0] ]  +  x[1]
+		def action(input, start, end, x):
+			if len( x ) == 1:
+				return x[0]
+			else:
+				return [ x[0] ]  +  x[1]
 
-			def namedAction(x):
-				if len( x ) == 1:
-					return [ name, x[0] ]
-				else:
-					return [ name ]  +  [ x[0] ]  +  _flatten( x[1] )
-			
-			return action
 				
 		
-		mul = Group( ( integer  +  ZeroOrMore( mulop + integer, True ).setAction( _flatten ) ).setAction( makeAction( 'mul' ) ) )
-		add = Group( ( mul  +  ZeroOrMore( addop + mul, True ).setAction( _flatten ) ).setAction( makeAction( 'add' ) ) )
+		mul = Group( ( integer  +  ZeroOrMore( mulop + integer, True ).setAction( flattenAction ) ).setAction( action ) )
+		add = Group( ( mul  +  ZeroOrMore( addop + mul, True ).setAction( flattenAction ) ).setAction( action ) )
 		expr = add
 		
 		parser = expr
@@ -731,7 +871,7 @@ class TestCase_Parser (unittest.TestCase):
 			return y
 			
 			
-		def action(x):
+		def action(input, start, end, x):
 			if len( x ) == 1:
 				return x[0]
 			else:
@@ -779,8 +919,6 @@ class TestCase_Parser (unittest.TestCase):
 		
 		primary  <<  primaryNoNewArray
 		
-		
-
 		
 		
 		
