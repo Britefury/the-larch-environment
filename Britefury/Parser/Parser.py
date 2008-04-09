@@ -27,6 +27,17 @@ class ParseResult (object):
 		
 		
 		
+class MemoEntry (object):
+	def __init__(self, result, pos):
+		self.result = result
+		self.pos = pos
+		
+	def __hash__(self):
+		return hash( ( self.pos, self.result ) )
+		
+		
+		
+		
 		
 class Node (object):
 	def __init__(self):
@@ -45,10 +56,11 @@ class Node (object):
 
 		key = start, self
 		try:
-			return context[key]
+			return context[key].result
 		except KeyError:
 			res = self._o_match( context, input, start, stop )
-			context[key] = res
+			entry = MemoEntry( res, start )
+			context[key] = entry
 			return res
 		
 		
@@ -535,3 +547,45 @@ class TestCase_Parser (unittest.TestCase):
 		
 		self._matchTest( parser, '0+1+2*3', [ '0', '+', '1', '+', [ '2', '*', '3' ] ] )
 		self._matchTest( parser, '0*1*2+3', [ [ '0', '*', '1', '*',  '2' ], '+', '3' ] )
+		
+		
+	def testLeftRecursion(self):
+		integer = Word( string.digits )
+		plus = Literal( '+' )
+		minus = Literal( '-' )
+		star = Literal( '*' )
+		slash = Literal( '/' )
+		
+		addop = plus | minus
+		mulop = star | slash
+		
+		def _flatten(x):
+			y = []
+			for a in x:
+				y.extend( a )
+			return y
+			
+			
+		def action(x):
+			if len( x ) == 1:
+				return x[0]
+			else:
+				return [ x[0] ]  +  _flatten( x[1] )
+				
+		
+		#mul = Forward()
+		#mul  <<  ( integer  +  ZeroOrMore( mulop + integer, True ) ).setAction( action )
+		#add = ( mul  +  ZeroOrMore( addop + mul, True ) ).setAction( action )
+		#expr = add
+		
+		#parser = expr
+		
+		add = Forward()
+		add  <<  ( add + addop )  |  integer
+		
+		expr = add
+		
+		parser = expr
+		
+		self._matchTest( parser, '123', '123' )
+
