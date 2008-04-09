@@ -3,9 +3,18 @@
 ##-* under the terms of the GNU General Public License version 2 as published by the
 ##-* Free Software Foundation. The full text of the GNU General Public License
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
-##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
+##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
+
+"""
+This module is an implementation of a Packrat parser modified to handle parsing expression grammars that are directly or indirecly left-recursive.
+The interface to the system is based on the pyparsing library  (http://pyparsing.wikispaces.com).
+The code is based on the paper "Packrat Parsers Can Support Left Recursion" by Allesandro Warth, James R. Douglass, Todd Millstein; Viewpoints Research Institute.
+The test that involves a simplified part of the Java grammar is from the same paper.
+"""
+
 import string
+from copy import copy
 
 
 def _parser_coerce(x):
@@ -27,16 +36,47 @@ class ParseResult (object):
 		
 		
 		
-class MemoEntry (object):
-	def __init__(self, result, pos):
-		self.result = result
+class _MemoEntry (object):
+	def __init__(self, answer, pos):
+		self.answer = answer
 		self.pos = pos
 		
-	def __hash__(self):
-		return hash( ( self.pos, self.result ) )
+		
+
+	
+class _LR	(object):
+	def __init__(self, seed, rule, head, next):
+		self.seed = seed
+		self.rule = rule
+		self.head = head
+		self.next = next
 		
 		
+class _Head (object):
+	def __init__(self, rule, involvedSet, evalSet):
+		self.rule = rule
+		self.involvedSet = involvedSet
+		self.evalSet = evalSet
 		
+		
+	def __eq__(self, x):
+		return self.rule  is  x.rule   and  self.involvedSet  ==  x.involvedSet   and   self.evalSet  ==  x.evalSet
+		
+		
+class _Context (object):
+	def __init__(self):
+		self.memo = {}
+		self.lrStack = []
+		self.pos = 0
+		self.heads = {}
+		
+	def lrStackTop(self):
+		if len( self.lrStack ) == 0:
+			return None
+		else:
+			return self.lrStack[-1]
+	
+
 		
 		
 class Node (object):
@@ -50,22 +90,129 @@ class Node (object):
 		return self
 	
 		
-	def match(self, input, start, stop, context=None):
-		if context is None:
-			context = {}
+	#def match(self, input, start, stop, context=None):
+		#return self._o_evaluate( context, input, start, stop )
 
+
+	#def match(self, input, start, stop, context=None):
+		#if context is None:
+			#context = {}
+			
+		#key = start, self
+		#try:
+			#memoEntry = context[key]
+			#return memoEntry.answer, memoEntry.pos
+		#except KeyError:
+			#memoEntry = _MemoEntry( None, start )
+			#context[key] = memoEntry
+			#answer, pos = self._o_evaluate( context, input, start, stop )
+			#memoEntry.answer = answer
+			#memoEntry.pos = pos
+			#return answer, pos
+		
+		
+		
+	def match(self, input, start, stop=None, context=None):
+		if context is None:
+			context = _Context()
+			
+		if stop is None:
+			stop = len( input )
+
+		answer = self._p_match( context, input, start, stop )
+		return answer, context.pos
+
+	
+	def _p_match(self, context, input, start, stop):
+		memoEntry = self._p_recall( context, input, start, stop )
+		if memoEntry is None:
+			lr = _LR( None, self, None, context.lrStackTop() )
+			context.lrStack.append( lr )
+			
+			memoEntry = _MemoEntry( lr, start )
+			key = start, self
+			context.memo[key] = memoEntry
+			
+			answer, context.pos = self._o_evaluate( context, input, start, stop )
+			
+			context.lrStack.pop()
+			
+			memoEntry.pos = context.pos
+			
+			if lr.head is not None:
+				lr.seed = answer
+				return self._p_lr_answer( context, input, start, stop, memoEntry )
+			else:
+				memoEntry.answer = answer
+				return answer
+		else:
+			context.pos = memoEntry.pos
+			if isinstance( memoEntry.answer, _LR ):
+				self._p_setup_lr( context, memoEntry.answer )
+				return memoEntry.answer.seed
+			else:
+				return memoEntry.answer
+
+			
+			
+	def _p_setup_lr(self, context, l):
+		if l.head is None:
+			l.head = _Head( self, set(), set() )
+		s = context.lrStackTop()
+		while s.head != l.head:
+			s.head = l.head
+			l.head.involvedSet.add( s.rule )
+			s = s.next
+			
+	
+	def _p_lr_answer(self, context, input, start, stop, memoEntry):
+		h = memoEntry.answer.head
+		if h.rule is not self:
+			return memoEntry.answer.seed
+		else:
+			memoEntry.answer = memoEntry.answer.seed
+			if memoEntry.answer is None:
+				return None
+			else:
+				return self._p_grow_lr( context, input, start, stop, memoEntry, h )
+			
+	
+	def _p_grow_lr(self, context, input, start, stop, memoEntry, h):
+		context.heads[start] = h
+		while True:
+			context.pos = start
+			h.evalSet = copy( h.involvedSet )
+			answer, context.pos = self._o_evaluate( context, input, start, stop )
+			if answer is None  or  context.pos <= memoEntry.pos:
+				break
+			memoEntry.answer = answer
+			memoEntry.pos = context.pos
+		del context.heads[start]
+		context.pos = memoEntry.pos
+		return memoEntry.answer
+	
+	
+
+	def _p_recall(self, context, input, start, stop):
 		key = start, self
-		try:
-			return context[key].result
-		except KeyError:
-			res = self._o_match( context, input, start, stop )
-			entry = MemoEntry( res, start )
-			context[key] = entry
-			return res
+		memoEntry = context.memo.get( key )
+		h = context.heads.get( start )
+		if h is None:
+			return memoEntry
+		if memoEntry is None  and  self not in h.head  and  self not in h.involvedSet:
+			return _MemoEntry( None, start )
+		if self in h.evalSet:
+			h.evalSet.remove( self )
+			answer, context.pos = self._o_evaluate( context, input, start, stop )
+			memoEntry.answer = answer
+			memoEntry.pos = context.pos
+		return memoEntry
+		
+			
 		
 		
 		
-	def _o_match(self, context, input, start, stop):
+	def _o_evaluate(self, context, input, start, stop):
 		pass
 
 	def _p_action(self, input):
@@ -107,7 +254,7 @@ class Forward (Node):
 		self._subexp = None
 		
 
-	def _o_match(self, context, input, start, stop):
+	def _o_evaluate(self, context, input, start, stop):
 		return self._subexp.match( input, start, stop, context )
 
 	
@@ -122,19 +269,36 @@ class Forward (Node):
 
 	
 
+class Group (Node):
+	def __init__(self, subexp):
+		super( Group, self ).__init__()
+		self._subexp = subexp
+		
+
+	def _o_evaluate(self, context, input, start, stop):
+		return self._subexp.match( input, start, stop, context )
+
+	
+	def _o_compare(self, x):
+		return self._subexp  ==  x._subexp 
+	
+	
+
+	
+
 class Literal (Node):
 	def __init__(self, matchString):
 		super( Literal, self ).__init__()
 		self._matchString = unicode( matchString )
 		
 	
-	def _o_match(self, context, input, start, stop):
+	def _o_evaluate(self, context, input, start, stop):
 		end = start + len( self._matchString )
 		if end <= stop:
 			x = input[start:end]
 			if x == self._matchString:
-				return ParseResult( self._p_action( x ), start, end )
-		return None
+				return ParseResult( self._p_action( x ), start, end ),  end
+		return None, start
 		
 	def _o_compare(self, x):
 		return self._matchString  ==  x._matchString
@@ -150,11 +314,11 @@ class Word (Node):
 		self._bodyChars = bodyChars
 		
 	
-	def _o_match(self, context, input, start, stop):
+	def _o_evaluate(self, context, input, start, stop):
 		pos = start
 		if self._initChars is not None:
 			if input[start] not in self._initChars:
-				return None
+				return None, start
 			pos = pos + 1
 			
 		end = stop
@@ -165,10 +329,10 @@ class Word (Node):
 				break
 			
 		if end == start:
-			return None
+			return None, start
 		else:
 			x = input[start:end]
-			return ParseResult( self._p_action( x ), start, end )
+			return ParseResult( self._p_action( x ), start, end ),  end
 
 
 	def _o_compare(self, x):
@@ -184,20 +348,19 @@ class Sequence (Node):
 		self._subexps = [ _parser_coerce( x )   for x in subexps ]
 		
 	
-	def _o_match(self, context, input, start, stop):
+	def _o_evaluate(self, context, input, start, stop):
 		subexpResults = []
 		
 		pos = start
 		for i, subexp in enumerate( self._subexps ):
-			res = subexp.match( input, pos, stop, context )
+			res, pos = subexp.match( input, pos, stop, context )
 			if res is None:
-				return None
+				return None, start
 			else:
 				if res.result is not None:
 					subexpResults.append( res.result )
-			pos = res.end
 		
-		return ParseResult( self._p_action( subexpResults ), start, pos )
+		return ParseResult( self._p_action( subexpResults ), start, pos ),  pos
 
 
 	def __add__(self, x):
@@ -215,13 +378,13 @@ class Choice (Node):
 		self._subexps = [ _parser_coerce( x )   for x in subexps ]
 		
 	
-	def _o_match(self, context, input, start, stop):
+	def _o_evaluate(self, context, input, start, stop):
 		for i, subexp in enumerate( self._subexps ):
-			res = subexp.match( input, start, stop, context )
+			res, pos = subexp.match( input, start, stop, context )
 			if res is not None:
-				return ParseResult( self._p_action( res.result ), start, res.end )
+				return ParseResult( self._p_action( res.result ), start, res.end ),  pos
 			
-		return None
+		return None, start
 
 	
 	def __or__(self, x):
@@ -242,29 +405,28 @@ class _Repetition (Node):
 		self._bSuppressIfZero = bSuppressIfZero
 		
 	
-	def _o_match(self, context, input, start, stop):
+	def _o_evaluate(self, context, input, start, stop):
 		subexpResults = []
 		
 		pos = start
 		i = 0
 		while self._max is None  or  i < self._max:
-			res = self._subexp.match( input, pos, stop, context )
+			res, pos = self._subexp.match( input, pos, stop, context )
 			if res is None:
 				break
 			else:
 				if res.result is not None:
 					subexpResults.append( res.result )
-			pos = res.end
 			i += 1
 			
 			
 		if i < self._min  or  ( self._max is not None   and   i > self._max ):
-			return None
+			return None, start
 		else:
 			if self._bSuppressIfZero  and  i == 0:
-				return ParseResult( None, start, pos )
+				return ParseResult( None, start, pos ),  pos
 			else:
-				return ParseResult( self._p_action( subexpResults ), start, pos )
+				return ParseResult( self._p_action( subexpResults ), start, pos ),  pos
 	
 	
 	def _o_compare(self, x):
@@ -293,12 +455,12 @@ class LookAhead (Node):
 		self._subexp = _parser_coerce( subexp )
 		
 	
-	def _o_match(self, context, input, start, stop):
-		res = self._subexp.match( input, start, stop, context )
+	def _o_evaluate(self, context, input, start, stop):
+		res, pos = self._subexp.match( input, start, stop, context )
 		if res is not None:
-			return ParseResult( None, start, start )
+			return ParseResult( None, start, start ),  start
 		else:
-			return None
+			return None, start
 
 	
 	def _o_compare(self, x):
@@ -312,12 +474,12 @@ class LookAheadNot (Node):
 		self._subexp = _parser_coerce( subexp )
 		
 	
-	def _o_match(self, context, input, start, stop):
-		res = self._subexp.match( input, start, stop, context )
+	def _o_evaluate(self, context, input, start, stop):
+		res, pos = self._subexp.match( input, start, stop, context )
 		if res is None  or  res.result is None:
-			return ParseResult( None, start, start )
+			return ParseResult( None, start, start ), start
 		else:
-			return None
+			return None, start
 
 	
 	def _o_compare(self, x):
@@ -338,7 +500,7 @@ import unittest
 
 class TestCase_Parser (unittest.TestCase):
 	def _matchTest(self, parser, input, expected, begin=None, end=None):
-		result = parser.match( input, 0, len( input ) )
+		result, pos = parser.match( input, 0, len( input ) )
 		self.assert_( result is not None )
 		res = result.result
 		if res != expected:
@@ -357,13 +519,13 @@ class TestCase_Parser (unittest.TestCase):
 		
 	
 	def _matchFailTest(self, parser, input):
-		result = parser.match( input, 0, len( input ) )
+		result, pos = parser.match( input, 0, len( input ) )
 		if result is not None:
 			print 'EXPECTED:'
 			print '<fail>'
 			print ''
 			print 'RESULT:'
-			print res
+			print result
 		self.assert_( result is None )
 		
 				
@@ -492,7 +654,7 @@ class TestCase_Parser (unittest.TestCase):
 		
 	
 		
-	def testCalculator(self):
+	def testNonRecursiveCalculator(self):
 		integer = Word( string.digits )
 		plus = Literal( '+' )
 		minus = Literal( '-' )
@@ -511,22 +673,24 @@ class TestCase_Parser (unittest.TestCase):
 			
 		def makeAction(name):
 			def action(x):
+				#print name, x
 				if len( x ) == 1:
 					return x[0]
 				else:
-					return [ x[0] ]  +  _flatten( x[1] )
+					#print [ x[0] ]  +  x[1]
+					return [ x[0] ]  +  x[1]
 
 			def namedAction(x):
 				if len( x ) == 1:
 					return [ name, x[0] ]
 				else:
 					return [ name ]  +  [ x[0] ]  +  _flatten( x[1] )
+			
 			return action
 				
 		
-		mul = Forward()
-		mul  <<  ( integer  +  ZeroOrMore( mulop + integer, True ) ).setAction( makeAction( 'mul' ) )
-		add = ( mul  +  ZeroOrMore( addop + mul, True ) ).setAction( makeAction( 'add' ) )
+		mul = Group( ( integer  +  ZeroOrMore( mulop + integer, True ).setAction( _flatten ) ).setAction( makeAction( 'mul' ) ) )
+		add = Group( ( mul  +  ZeroOrMore( addop + mul, True ).setAction( _flatten ) ).setAction( makeAction( 'add' ) ) )
 		expr = add
 		
 		parser = expr
@@ -547,6 +711,7 @@ class TestCase_Parser (unittest.TestCase):
 		
 		self._matchTest( parser, '0+1+2*3', [ '0', '+', '1', '+', [ '2', '*', '3' ] ] )
 		self._matchTest( parser, '0*1*2+3', [ [ '0', '*', '1', '*',  '2' ], '+', '3' ] )
+		
 		
 		
 	def testLeftRecursion(self):
@@ -573,19 +738,58 @@ class TestCase_Parser (unittest.TestCase):
 				return [ x[0] ]  +  _flatten( x[1] )
 				
 		
-		#mul = Forward()
-		#mul  <<  ( integer  +  ZeroOrMore( mulop + integer, True ) ).setAction( action )
-		#add = ( mul  +  ZeroOrMore( addop + mul, True ) ).setAction( action )
-		#expr = add
-		
-		#parser = expr
-		
+		mul = Forward()
 		add = Forward()
-		add  <<  ( add + addop )  |  integer
+		mul  <<  Group( ( mul + mulop + integer )  |  integer )
+		add  <<  Group( ( add + addop + mul )  |  mul )
 		
 		expr = add
 		
 		parser = expr
 		
 		self._matchTest( parser, '123', '123' )
+		self._matchTest( parser, '1*2*3', [ [ '1', '*', '2' ], '*', '3' ] )
+		self._matchTest( parser, '1+2+3', [ [ '1', '+', '2' ], '+', '3' ] )
+		self._matchTest( parser, '1*2+3', [ [ '1', '*', '2' ], '+', '3' ] )
+		self._matchTest( parser, '1+2*3', [ '1', '+', [ '2', '*', '3' ] ] )
+
+		
+		
+	def testLeftRecursionJavaPrimary(self):
+		primary = Forward()
+		
+		
+		expression = Group( Literal( 'i' )  |  Literal( 'j' ) )
+		methodName = Group( Literal( 'm' )  |  Literal( 'n' ) )
+		interfaceTypeName = Group( Literal( 'I' )  |  Literal( 'J' ) )
+		className = Group( Literal( 'C' )  |  Literal( 'D' ) )
+
+		classOrInterfaceType = Group( className | interfaceTypeName )
+		
+		identifier = Group( Literal( 'x' )  |  Literal( 'y' )  |  classOrInterfaceType )
+		expressionName = Group( identifier )
+		
+		arrayAccess = Group( ( primary + '[' + expression + ']' )   |   ( expressionName + '[' + expression + ']' ) )
+		fieldAccess = Group( ( primary + '.' + identifier )   |   ( Literal( 'super' ) + '.' + identifier ) )
+		methodInvocation = Group( ( primary + '.' + methodName + '()' )   |   ( methodName + '()' ) )
+		
+		classInstanceCreationExpression = Group( ( Literal( 'new' )  +  classOrInterfaceType  +  '()' )  |  ( primary + '.' + 'new' + identifier + '()' ) )
+		
+		primaryNoNewArray = Group( classInstanceCreationExpression | methodInvocation | fieldAccess | arrayAccess | 'this' )
+		
+		primary  <<  primaryNoNewArray
+		
+		
+
+		
+		
+		
+		
+		parser = primary
+		
+		self._matchTest( parser, 'this', 'this' )
+		self._matchTest( parser, 'this.x', [ 'this', '.', 'x' ] )
+		self._matchTest( parser, 'this.x.y', [ [ 'this', '.', 'x' ], '.', 'y' ] )
+		self._matchTest( parser, 'this.x.m()', [ [ 'this', '.', 'x' ], '.', 'm', '()' ] )
+		self._matchTest( parser, 'x[i][j].y', [ [ [ 'x', '[', 'i', ']' ], '[', 'j', ']' ], '.', 'y' ] )
 
