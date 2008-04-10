@@ -392,6 +392,9 @@ class Word (ConcreteParserElement):
 		
 	
 	def _o_evaluate(self, context, input, start, stop):
+		if start >= stop:
+			return None, start
+		
 		pos = start
 		if self._initChars is not None:
 			if input[start] not in self._initChars:
@@ -438,6 +441,8 @@ class Sequence (ConcreteParserElement):
 		
 		pos = start
 		for i, subexp in enumerate( self._subexps ):
+			if pos > stop:
+				return None, start
 			res, pos = subexp._o_match( context, input, pos, stop )
 			if res is None:
 				return None, start
@@ -516,7 +521,7 @@ class Repetition (ConcreteParserElement):
 		
 		pos = start
 		i = 0
-		while self._max is None  or  i < self._max:
+		while pos <= stop  and  ( self._max is None  or  i < self._max ):
 			res, pos = self._subexp._o_match( context, input, pos, stop )
 			if res is None:
 				break
@@ -636,8 +641,14 @@ class NotFollowedBy (ParserElement):
 
 	
 	
+def _delimitedListAction(intpu, begin, end, tokens):
+	if len( tokens )  ==  0:
+		return []
+	else:
+		return [ tokens[0][0] ]  +  [ x[1]   for x in tokens[0][1] ]
+
 def delimitedList(subexp, delimiter=','):
-	return ( _parser_coerce( subexp )  +  ZeroOrMore( _parser_coerce( delimiter )  +  subexp ) ).setAction( lambda input, begin, end, tokens: [ tokens[0] ]  +  [ x[1]   for x in tokens[1] ] )
+	return ( Optional( subexp  +  ZeroOrMore( _parser_coerce( delimiter )  +  subexp ), False ) ).setAction( _delimitedListAction )
 
 identifier = Word( string.ascii_letters  +  '_',  string.ascii_letters + string.digits + '_' )
 
@@ -798,6 +809,7 @@ class TestCase_Parser (unittest.TestCase):
 		
 	def testDelimitedList(self):
 		parser = delimitedList( identifier )
+		self._matchTest( parser, '', [] )
 		self._matchTest( parser, 'ab', [ 'ab' ] )
 		self._matchTest( parser, 'cd', [ 'cd' ] )
 		self._matchTest( parser, 'ab,cd', [ 'ab', 'cd' ] )
@@ -930,4 +942,24 @@ class TestCase_Parser (unittest.TestCase):
 		self._matchTest( parser, 'this.x.y', [ [ 'this', '.', 'x' ], '.', 'y' ] )
 		self._matchTest( parser, 'this.x.m()', [ [ 'this', '.', 'x' ], '.', 'm', '()' ] )
 		self._matchTest( parser, 'x[i][j].y', [ [ [ 'x', '[', 'i', ']' ], '[', 'j', ']' ], '.', 'y' ] )
+		
+		
+	def testSimpleMessagePassingGrammar(self):
+		loadlLocal = Group( identifier )
+		messageName = Group( identifier )
+		
+		expression = Forward()
+		parameterList = Group( delimitedList( expression ) )
+		messageSend = Group( expression + '.' + messageName + '(' + parameterList + ')' )
+		expression  <<  Group( messageSend  |  loadlLocal )
+		
+		
+		parser = expression
+		
+		self._matchTest( parser, 'self', 'self' )
+		self._matchTest( parser, 'self.x()', [ 'self', '.', 'x', '(', [], ')' ] )
+		self._matchTest( parser, 'self.x(a)', [ 'self', '.', 'x', '(', [ 'a' ], ')' ] )
+		self._matchTest( parser, 'self.x(a,b.y())', [ 'self', '.', 'x', '(', [ 'a', [ 'b', '.', 'y','(', [], ')' ] ], ')' ] )
+		self._matchTest( parser, 'self.x(a,b.y()).q()', [ [ 'self', '.', 'x', '(', [ 'a', [ 'b', '.', 'y','(', [], ')' ] ], ')' ], '.', 'q', '(', [], ')' ] )
+		
 
