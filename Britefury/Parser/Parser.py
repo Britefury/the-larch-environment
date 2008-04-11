@@ -37,7 +37,7 @@ class _MemoEntry (object):
 		
 
 	
-class _LR	(object):
+class _LR (object):
 	def __init__(self, seed, rule, head, next):
 		self.seed = seed
 		self.rule = rule
