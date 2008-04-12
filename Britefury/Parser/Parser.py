@@ -56,12 +56,12 @@ class _Head (object):
 		
 		
 class _Context (object):
-	def __init__(self, suppressChars=string.whitespace):
+	def __init__(self, ignoreChars=string.whitespace):
 		self.memo = {}
 		self.lrStack = []
 		self.pos = 0
 		self.heads = {}
-		self.suppressChars = suppressChars
+		self.ignoreChars = ignoreChars
 		
 	def lrStackTop(self):
 		if len( self.lrStack ) == 0:
@@ -72,7 +72,7 @@ class _Context (object):
 
 	def chomp(self, input, start, stop):
 		for i in xrange( start, stop ):
-			if input[i] not in self.suppressChars:
+			if input[i] not in self.ignoreChars:
 				return i
 		return stop
 					
@@ -116,7 +116,7 @@ class ParserExpression (object):
 			#return answer, pos
 		
 		
-	def parseString(self, input, start=0, stop=None, suppressChars=string.whitespace):
+	def parseString(self, input, start=0, stop=None, ignoreChars=string.whitespace):
 		"""
 		Parse a string
 		parseString(input, start, stop=None)  ->  ParseResult
@@ -131,7 +131,7 @@ class ParserExpression (object):
 		"""
 		if stop is None:
 			stop = len( input )
-		context = _Context( suppressChars )
+		context = _Context( ignoreChars )
 		answer, pos = self._o_match( context, input, start, stop )
 		if answer is not None:
 			answer.end = context.chomp( input, answer.end, stop )
@@ -368,7 +368,7 @@ class Group (ParserExpressionWithAction):
 		subexp - the sub-expression in the group
 		"""
 		super( Group, self ).__init__()
-		self._subexp = subexp
+		self._subexp = _parser_coerce( subexp )
 		
 
 	def _o_evaluate(self, context, input, start, stop):
@@ -393,6 +393,34 @@ class Rule (Group):
 	pass
 	
 
+	
+
+class Suppress (ParserExpression):
+	"""
+	Suppress
+	Matches the sub-expression but returns an empty result
+	"""
+	def __init__(self, subexp):
+		"""
+		subexp - the sub-expression to be matched
+		"""
+		super( Suppress, self ).__init__()
+		self._subexp = _parser_coerce( subexp )
+		
+
+	def _o_evaluate(self, context, input, start, stop):
+		res, pos = self._subexp._o_match( context, input, start, stop )
+		if res is None:
+			return res, pos
+		else:
+			return ParseResult( None, start, pos ),  pos
+
+	
+	def _o_compare(self, x):
+		return self._subexp  ==  x._subexp 
+
+	
+	
 	
 
 class Literal (ParserExpressionWithAction):
@@ -875,8 +903,8 @@ import unittest
 
 
 class TestCase_Parser (unittest.TestCase):
-	def _matchTest(self, parser, input, expected, begin=None, end=None, suppressChars=string.whitespace):
-		result = parser.parseString( input, suppressChars=suppressChars )
+	def _matchTest(self, parser, input, expected, begin=None, end=None, ignoreChars=string.whitespace):
+		result = parser.parseString( input, ignoreChars=ignoreChars )
 		self.assert_( result is not None )
 		res = result.result
 		if ( isinstance( expected, str )  or  isinstance( expected, unicode ) )  and  isinstance( res, list )  and  len( res ) == 1  and  ( isinstance( res[0], str )  or  isinstance( res[0], unicode ) ):
@@ -896,8 +924,8 @@ class TestCase_Parser (unittest.TestCase):
 				self.assert_( end == result.end )
 		
 	
-	def _matchFailTest(self, parser, input, suppressChars=string.whitespace):
-		result = parser.parseString( input, suppressChars=suppressChars )
+	def _matchFailTest(self, parser, input, ignoreChars=string.whitespace):
+		result = parser.parseString( input, ignoreChars=ignoreChars )
 		if result is not None   and   result.end == len( input ):
 			print 'EXPECTED:'
 			print '<fail>'
@@ -945,6 +973,16 @@ class TestCase_Parser (unittest.TestCase):
 		self._matchFailTest( parser, 'abfh' )
 	
 		
+	def testSuppress(self):
+		self.assert_( Suppress( 'abc' )  ==  Suppress( 'abc' ) )
+		self.assert_( Suppress( 'abc' )  !=  Suppress( 'def' ) )
+		
+		parser = Literal( 'ab' )  +  Suppress( 'cd' )  +  Literal( 'ef' )
+		
+		self._matchTest( parser, 'abcdef', [ 'ab', 'ef' ], 0, 6 )
+		self._matchFailTest( parser, 'abef' )
+		
+
 	def testFirstOf(self):
 		self.assert_( FirstOf( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )   ==   FirstOf( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] ) )
 		self.assert_( FirstOf( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )   !=   FirstOf( [ Literal( 'ab' ), Literal( 'qw' ) ] ) )
@@ -1310,7 +1348,7 @@ class TestCase_Parser (unittest.TestCase):
 		expression  <<  Rule( add )
 		
 		
-		singleStatement = Rule( expression + ';' )
+		singleStatement = Rule( expression + Suppress( ';' ) ).setAction( lambda input, start, end, tokens: tokens[0] )
 
 		statement = Forward()
 		block = Rule( ZeroOrMore( statement ) )
@@ -1330,7 +1368,7 @@ self.y();
    a.b();
    c.d();
 		"""
-		self._matchTest( parser, indentedBlocksPrePass( src1 ), [ [ [ 'self', '.', 'x', '(', [], ')' ], ';' ] ] )
-		self._matchTest( parser, indentedBlocksPrePass( src2 ), [ [ [ 'self', '.', 'y', '(', [], ')' ], ';' ], [ [ [ 'a', '.', 'b', '(', [], ')' ], ';' ], [ [ 'c', '.', 'd', '(', [], ')' ], ';' ] ] ] )
+		self._matchTest( parser, indentedBlocksPrePass( src1 ), [ [ 'self', '.', 'x', '(', [], ')' ] ] )
+		self._matchTest( parser, indentedBlocksPrePass( src2 ), [ [ 'self', '.', 'y', '(', [], ')' ], [ [ 'a', '.', 'b', '(', [], ')' ], [ 'c', '.', 'd', '(', [], ')' ] ] ] )
 		
 
