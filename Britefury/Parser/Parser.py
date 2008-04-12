@@ -26,9 +26,8 @@ def _parser_coerce(x):
 		return Literal( x )
 
 
+
 	
-		
-		
 class _MemoEntry (object):
 	def __init__(self, answer, pos):
 		self.answer = answer
@@ -57,11 +56,12 @@ class _Head (object):
 		
 		
 class _Context (object):
-	def __init__(self):
+	def __init__(self, suppressChars=string.whitespace):
 		self.memo = {}
 		self.lrStack = []
 		self.pos = 0
 		self.heads = {}
+		self.suppressChars = suppressChars
 		
 	def lrStackTop(self):
 		if len( self.lrStack ) == 0:
@@ -69,6 +69,15 @@ class _Context (object):
 		else:
 			return self.lrStack[-1]
 	
+
+	def chomp(self, input, start, stop):
+		for i in xrange( start, stop ):
+			if input[i] not in self.suppressChars:
+				return i
+		return stop
+					
+				
+				
 
 		
 class ParseResult (object):
@@ -107,13 +116,14 @@ class ParserExpression (object):
 			#return answer, pos
 		
 		
-	def parseString(self, input, start=0, stop=None):
+	def parseString(self, input, start=0, stop=None, suppressChars=string.whitespace):
 		"""
 		Parse a string
 		parseString(input, start, stop=None)  ->  ParseResult
 		   input - the input string
 		   start - the start index of the substring (of input) to parse
 		   stop - the end index of the substring (of input) to parse
+		   bEatWhitespace - If True, whitespace will be suppressed
 		   
 		The result of parsing the expression is placed in the @result member of the ParseResult object.
 		
@@ -121,7 +131,10 @@ class ParserExpression (object):
 		"""
 		if stop is None:
 			stop = len( input )
-		answer, pos = self._o_match( _Context(), input, start, stop )
+		context = _Context( suppressChars )
+		answer, pos = self._o_match( context, input, start, stop )
+		if answer is not None:
+			answer.end = context.chomp( input, answer.end, stop )
 		return answer
 	
 		
@@ -130,12 +143,6 @@ class ParserExpression (object):
 	# To be honest, I don't really understand how they work. I transcribed their pseudo-code into Python, and it just worked.
 	# Test grammars in the unit tests seem to work okay, so its fine by me! :D
 	def _o_match(self, context, input, start, stop):
-		if context is None:
-			context = _Context()
-			
-		if stop is None:
-			stop = len( input )
-
 		memoEntry = self._p_recall( context, input, start, stop )
 		if memoEntry is None:
 			lr = _LR( None, self, None, context.lrStackTop() )
@@ -365,7 +372,11 @@ class Group (ParserExpressionWithAction):
 		
 
 	def _o_evaluate(self, context, input, start, stop):
-		return self._subexp._o_match( context, input, start, stop )
+		res, pos = self._subexp._o_match( context, input, start, stop )
+		if res is None:
+			return res, pos
+		else:
+			return ParseResult( self._p_action( input, start, pos, res.result ), start, pos ),  pos
 
 	
 	def _o_compare(self, x):
@@ -402,6 +413,8 @@ class Literal (ParserExpressionWithAction):
 		
 	
 	def _o_evaluate(self, context, input, start, stop):
+		start = context.chomp( input, start, stop )
+		
 		end = start + len( self._matchString )
 		if end <= stop:
 			x = input[start:end]
@@ -435,6 +448,8 @@ class Word (ParserExpressionWithAction):
 		
 	
 	def _o_evaluate(self, context, input, start, stop):
+		start = context.chomp( input, start, stop )
+		
 		if start >= stop:
 			return None, start
 		
@@ -778,6 +793,80 @@ def delimitedList(subexp, delimiter=','):
 	"""
 	return ( Optional( subexp  +  ZeroOrMore( _parser_coerce( delimiter )  +  subexp ), False ) ).setAction( _delimitedListAction )
 
+
+
+def _getLineIndentation(line):
+	return line[: line.index( line.strip() ) ]
+
+def _getLineWithoutIndentation(line):
+	return line[line.index( line.strip() ):]
+
+def _processIndentation(currentIndentation, indentation, indentToken, dedentToken, currentLevel):
+	if indentation != currentIndentation:
+		if indentation.startswith( currentIndentation ):
+			return indentation + indentToken, currentLevel + 1
+		elif currentIndentation.startswith( indentation ):
+			return indentation + dedentToken, currentLevel - 1
+		else:
+			raise IndentationError
+	else:
+		return indentation, currentLevel
+
+
+def indentedBlocksPrePass(text, indentToken='$<indent>$', dedentToken='$<dedent>$'):
+	"""
+	Processe text whose blocks are determined by indentation, by inserting indent and dedent tokens
+	
+	indentedBlocksPrePass(text, indentToken='$<indent>$', dedentToken='$<dedent>$')  ->  text with indent and detent tokens
+	
+	For example
+	a
+	b
+	  c
+	  d
+	e
+	f
+	
+	==>>
+	
+	a
+	b
+	  $<indent>$c
+	  d
+	$<dedent>$e
+	f	
+	"""
+	lines = text.split( '\n' )
+	
+	if len( lines ) > 0:	
+		currentIndentation = _getLineIndentation( lines[0] )
+		
+		indentationLevel = 0
+		
+		for i, line in enumerate( lines ):
+			if line.strip() != '':
+				indentation = _getLineIndentation( line )
+				content = _getLineWithoutIndentation( line )
+				
+				processedIndentation, indentationLevel = _processIndentation( currentIndentation, indentation, indentToken, dedentToken, indentationLevel )
+				lines[i] = processedIndentation +  content
+				currentIndentation = indentation
+				
+		bAppendBlankLine = indentationLevel > 0
+				
+		for i in xrange( 0, indentationLevel ):
+			lines.append( dedentToken )
+			
+		if bAppendBlankLine:
+			lines.append( '' )
+	
+	return '\n'.join( lines )
+				
+				
+			
+
+
+
 identifier = Word( string.ascii_letters  +  '_',  string.ascii_letters + string.digits + '_' )
 
 
@@ -786,8 +875,8 @@ import unittest
 
 
 class TestCase_Parser (unittest.TestCase):
-	def _matchTest(self, parser, input, expected, begin=None, end=None):
-		result = parser.parseString( input )
+	def _matchTest(self, parser, input, expected, begin=None, end=None, suppressChars=string.whitespace):
+		result = parser.parseString( input, suppressChars=suppressChars )
 		self.assert_( result is not None )
 		res = result.result
 		if ( isinstance( expected, str )  or  isinstance( expected, unicode ) )  and  isinstance( res, list )  and  len( res ) == 1  and  ( isinstance( res[0], str )  or  isinstance( res[0], unicode ) ):
@@ -807,15 +896,15 @@ class TestCase_Parser (unittest.TestCase):
 				self.assert_( end == result.end )
 		
 	
-	def _matchFailTest(self, parser, input):
-		result = parser.parseString( input )
-		if result is not None:
+	def _matchFailTest(self, parser, input, suppressChars=string.whitespace):
+		result = parser.parseString( input, suppressChars=suppressChars )
+		if result is not None   and   result.end == len( input ):
 			print 'EXPECTED:'
 			print '<fail>'
 			print ''
 			print 'RESULT:'
 			print result
-		self.assert_( result is None )
+		self.assert_( result is None  or  result.end != len( input ) )
 		
 				
 	def testLiteral(self):
@@ -959,6 +1048,65 @@ class TestCase_Parser (unittest.TestCase):
 		self._matchTest( parser, 'ab', [ 'ab' ] )
 		self._matchTest( parser, 'cd', [ 'cd' ] )
 		self._matchTest( parser, 'ab,cd', [ 'ab', 'cd' ] )
+		
+		
+	def testIndentedBlocksPrePass(self):
+		src1 = '\n'.join( [
+			"a",
+			"b",
+			"  c",
+			"  d",
+			"e",
+			"f", ] )  +  '\n'
+		
+		expected1 = '\n'.join( [
+			"a",
+			"b",
+			"  $<indent>$c",
+			"  d",
+			"$<dedent>$e",
+			"f", ] )  +  '\n'
+		
+		
+		src2 = '\n'.join( [
+			"  a",
+			"  b",
+			"    c",
+			"    d",
+			"  e",
+			"  f", ] )  +  '\n'
+		
+		expected2 = '\n'.join( [
+			"  a",
+			"  b",
+			"    $<indent>$c",
+			"    d",
+			"  $<dedent>$e",
+			"  f", ] )  +  '\n'
+		
+
+		src3 = '\n'.join( [
+			"  a",
+			"  b",
+			"    c",
+			"    d",
+			"      e",
+			"      f", ] )  +  '\n'
+		
+		expected3 = '\n'.join( [
+			"  a",
+			"  b",
+			"    $<indent>$c",
+			"    d",
+			"      $<indent>$e",
+			"      f",
+			"",
+			"$<dedent>$",
+			"$<dedent>$", ] )  +  '\n'
+		
+		self.assert_( indentedBlocksPrePass( src1 )  ==  expected1 )
+		self.assert_( indentedBlocksPrePass( src2 )  ==  expected2 )
+		self.assert_( indentedBlocksPrePass( src3 )  ==  expected3 )
 		
 	
 		
@@ -1122,15 +1270,67 @@ class TestCase_Parser (unittest.TestCase):
 		
 		self._matchTest( parser, 'self', 'self' )
 		self._matchTest( parser, 'self.x()', [ 'self', '.', 'x', '(', [], ')' ] )
-		self._matchTest( parser, 'self.x(a)', [ 'self', '.', 'x', '(', [ 'a' ], ')' ] )
-		self._matchTest( parser, 'self.x(a,b.y())', [ 'self', '.', 'x', '(', [ 'a', [ 'b', '.', 'y','(', [], ')' ] ], ')' ] )
-		self._matchTest( parser, 'self.x(a,b.y()).q()', [ [ 'self', '.', 'x', '(', [ 'a', [ 'b', '.', 'y','(', [], ')' ] ], ')' ], '.', 'q', '(', [], ')' ] )
+		self._matchTest( parser, 'self.x( a )', [ 'self', '.', 'x', '(', [ 'a' ], ')' ] )
+		self._matchTest( parser, 'self.x( a, b.y() )', [ 'self', '.', 'x', '(', [ 'a', [ 'b', '.', 'y','(', [], ')' ] ], ')' ] )
+		self._matchTest( parser, 'self.x( a, b.y() ).q()', [ [ 'self', '.', 'x', '(', [ 'a', [ 'b', '.', 'y','(', [], ')' ] ], ')' ], '.', 'q', '(', [], ')' ] )
 		self._matchTest( parser, '(self)', [ '(', 'self', ')' ] )
 		self._matchTest( parser, '(self.x())', [ '(', [ 'self', '.', 'x', '(', [], ')' ], ')' ] )
-		self._matchTest( parser, 'x+y', [ 'x', '+', 'y' ] )
-		self._matchTest( parser, 'x*y', [ 'x', '*', 'y' ] )
-		self._matchTest( parser, 'x+y*z', [ 'x', '+', [ 'y', '*', 'z' ] ] )
-		self._matchTest( parser, '(x+y*z).q()', [ [ '(', [ 'x', '+', [ 'y', '*', 'z' ] ], ')' ], '.', 'q', '(', [], ')' ] )
-		self._matchTest( parser, 'x+y.f()*z', [ 'x', '+', [ [ 'y', '.', 'f', '(', [], ')' ], '*', 'z' ] ] )
+		self._matchTest( parser, 'x + y', [ 'x', '+', 'y' ] )
+		self._matchTest( parser, 'x * y', [ 'x', '*', 'y' ] )
+		self._matchTest( parser, 'x + y * z', [ 'x', '+', [ 'y', '*', 'z' ] ] )
+		self._matchTest( parser, '(x + y * z).q()', [ [ '(', [ 'x', '+', [ 'y', '*', 'z' ] ], ')' ], '.', 'q', '(', [], ')' ] )
+		self._matchTest( parser, 'x + y.f() * z', [ 'x', '+', [ [ 'y', '.', 'f', '(', [], ')' ], '*', 'z' ] ] )
+		self._matchFailTest( parser, 'x + y.f() * z', '' )
+		
+
+
+	def testIndentedGrammar(self):
+		loadlLocal = Rule( identifier )
+		messageName = Rule( identifier )
+		plus = Literal( '+' )
+		minus = Literal( '-' )
+		star = Literal( '*' )
+		slash = Literal( '/' )
+		
+		addop = plus | minus
+		mulop = star | slash
+				
+		expression = Forward()
+		parenExpression = Rule( Literal( '(' )  +  expression  +  ')' )
+		atom = Rule( loadlLocal  |  parenExpression )
+
+		parameterList = Rule( delimitedList( expression ) )
+		messageSend = Forward()
+		messageSend  <<  Rule( ( messageSend + '.' + messageName + '(' + parameterList + ')' )  |  atom )
+
+		mul = Forward()
+		mul  <<  Rule( ( mul + mulop + messageSend )  |  messageSend )
+		add = Forward()
+		add  <<  Rule( ( add   + addop + mul )  |  mul )
+		expression  <<  Rule( add )
+		
+		
+		singleStatement = Rule( expression + ';' )
+
+		statement = Forward()
+		block = Rule( ZeroOrMore( statement ) )
+		compoundStatement = Rule( Literal( '$<indent>$' )  +  block  +  Literal( '$<dedent>$' ) ).setAction( lambda input, start, end, tokens: tokens[1] )
+		statement  <<  Rule( compoundStatement  |  singleStatement )
+		
+		
+		parser = block
+		
+		
+		src1 = """
+self.x();
+		"""
+		
+		src2 = """
+self.y();
+   a.b();
+   c.d();
+		"""
+		self._matchTest( parser, indentedBlocksPrePass( src1 ), [ [ [ 'self', '.', 'x', '(', [], ')' ], ';' ] ] )
+		self._matchTest( parser, indentedBlocksPrePass( src2 ), [ [ [ 'self', '.', 'y', '(', [], ')' ], ';' ], [ [ [ 'a', '.', 'b', '(', [], ')' ], ';' ], [ [ 'c', '.', 'd', '(', [], ')' ], ';' ] ] ] )
 		
 
