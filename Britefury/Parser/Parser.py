@@ -18,7 +18,7 @@ from copy import copy
 
 
 def _parser_coerce(x):
-	if isinstance( x, ParserElement ):
+	if isinstance( x, ParserExpression ):
 		return x
 	elif isinstance( x, list )  or  isinstance( x, tuple ):
 		return Sequence( _parser_coerce( [ _parser_coerce( a )   for a in x ] ) )
@@ -75,7 +75,8 @@ class ParseResult (object):
 	"""
 	Parse result
 	Members:
-	   result - the result (returned by the action function, otherwise a list/tree of strings)
+	   result - the result (returned by the parse expression action function, otherwise a list/tree of strings)
+	      None indicates an empty result. This is created by Peek expressions, and can be created by Repetition epxressions.
 	   begin - the start index of the result, in the input string
 	   end - the end index of the result, in the input string
 	"""
@@ -87,8 +88,8 @@ class ParseResult (object):
 		
 
 
-class ParserElement (object):
-	"""Parser element base class"""
+class ParserExpression (object):
+	"""Parser expression base class"""
 	#def _o_match(self, input, start, stop, context=None):
 		#if context is None:
 			#context = {}
@@ -113,6 +114,10 @@ class ParserElement (object):
 		   input - the input string
 		   start - the start index of the substring (of input) to parse
 		   stop - the end index of the substring (of input) to parse
+		   
+		The result of parsing the expression is placed in the @result member of the ParseResult object.
+		
+		If parseString returns None, then the parse failed.
 		"""
 		if stop is None:
 			stop = len( input )
@@ -120,6 +125,10 @@ class ParserElement (object):
 		return answer
 	
 		
+	# The next four methods; _o_match(), _p_setup_lr(), _p_grow_lr(), _p_recall() are taken from the paper
+	# "Packrat Parsers Can Support Left Recursion" by Allesandro Warth, James R. Douglass, Todd Millstein; Viewpoints Research Institute.
+	# To be honest, I don't really understand how they work. I transcribed their pseudo-code into Python, and it just worked.
+	# Test grammars in the unit tests seem to work okay, so its fine by me! :D
 	def _o_match(self, context, input, start, stop):
 		if context is None:
 			context = _Context()
@@ -237,35 +246,44 @@ class ParserElement (object):
 		return Sequence( [ self, x ] )
 	
 	def __or__(self, x):
-		return Choice( [ self, x ] )
+		return FirstOf( [ self, x ] )
+	
+	def __xor__(self, x):
+		return BestOf( [ self, x ] )
 	
 	
 	def _o_compare(self, x):
 		return False
 	
+	
+	def _o_copySettingsFrom(self, x):
+		pass
+	
 
 	
 	
-class ConcreteParserElement (ParserElement):
-	"""Concrete (non-look ahead) parser element base class"""
+class ParserExpressionWithAction (ParserExpression):
+	"""Parser expression that can take actions; base class"""
 	def __init__(self):
-		super( ConcreteParserElement, self ).__init__()
+		super( ParserExpressionWithAction, self ).__init__()
 		self._actionFn = None
 		
 		
 	def setAction(self, f):
 		"""
 		Set the action function
+		setAction( f )  ->  self
 		This function is called when the parser expression successfully matches some text.
 		It is of the form:
-		   f(input, start, end, tokens)  ->  result
+		   f(input, start, end, tokens)  ->  resultTokens
 		      input  -  the original string being parsed
 		      start, end  -  start and end indices indicating the substring of @input that was parsed
 		      tokens  -  the tokens from sub-parse-expressions
-		     result  -  is passed as @tokens to the parent parse expression action
+		     resultTokens  -  is passed as @tokens to the parent parser expression action function
 		"""
-		self._actionFn = f
-		return self
+		element = copy( self )
+		element._actionFn = f
+		return element
 	
 
 	def _p_action(self, input, start, end, tokens):
@@ -278,19 +296,28 @@ class ConcreteParserElement (ParserElement):
 			return result
 		
 
+	def _o_copySettingsFrom(self, x):
+		super( ParserExpressionWithAction, self )._o_copySettingsFrom( x )
+		self._actionFn = x._actionFn
 	
 	
 	
-class Forward (ConcreteParserElement):
+class Forward (ParserExpressionWithAction):
 	"""
 	Forward
-	Used for recursive grammars.
-	# Construct an empty forward:
-	x = Forward()
-	# Now, make something that uses @x before it is defined/implemented
-	y = Literal( 'a' ) + Optional( x )
-	# Now, define @x
-	x  <<  y
+	
+	Used for recursive grammars; ue Forward when you wish to make use of a parser expression @x in another expression, and provide
+	the definition of @x later.
+	
+	For example:
+	   # Construct an empty forward:
+	   x = Forward()
+	   # Now, make something that uses @x before it is defined/implemented
+	   y = Literal( 'a' ) + Optional( x )
+	   # Now, define @x
+	   x  <<  y
+	
+	The parse result is just the parse result of the sub-expression provided by the << operator.
 	"""
 	def __init__(self):
 		super( Forward, self ).__init__()
@@ -306,13 +333,16 @@ class Forward (ConcreteParserElement):
 	
 	
 	def __lshift__(self, subexp):
+		"""
+		Set the subexpression to be matched.
+		"""
 		self._subexp = subexp
 		return self
 
 
 	
 
-class Group (ConcreteParserElement):
+class Group (ParserExpressionWithAction):
 	"""
 	Group
 	Used to group a sub-expression
@@ -340,16 +370,27 @@ class Group (ConcreteParserElement):
 	
 	def _o_compare(self, x):
 		return self._subexp  ==  x._subexp 
+
 	
+	
+	
+class Rule (Group):
+	"""
+	Rule
+	Group a subexpression into the right hand side of a grammar rule
+	"""
+	pass
 	
 
 	
 
-class Literal (ConcreteParserElement):
+class Literal (ParserExpressionWithAction):
 	"""
 	Literal
 	
 	Matches a supplied string
+	
+	The parse result is a string.
 	"""
 	
 	def __init__(self, matchString):
@@ -372,11 +413,13 @@ class Literal (ConcreteParserElement):
 		return self._matchString  ==  x._matchString
 
 
-class Word (ConcreteParserElement):
+class Word (ParserExpressionWithAction):
 	"""
 	Word
 	
 	Matches a word composed of only the specified characters
+
+	The parse result is a string.
 	"""
 	def __init__(self, initChars, bodyChars=None):
 		"""
@@ -421,11 +464,13 @@ class Word (ConcreteParserElement):
 	
 	
 	
-class Sequence (ConcreteParserElement):
+class Sequence (ParserExpressionWithAction):
 	"""
 	Sequence
 	
 	Matches a sequence of sub-expressions (in order)
+
+	The parse result is a list of the parse results of the sub-expressions in the sequence.
 	"""
 	def __init__(self, subexps):
 		"""
@@ -454,7 +499,9 @@ class Sequence (ConcreteParserElement):
 
 
 	def __add__(self, x):
-		return Sequence( self._subexps  +  [ x ] )
+		s = Sequence( self._subexps  +  [ x ] )
+		s._o_copySettingsFrom( self )
+		return s
 	
 	
 	def _o_compare(self, x):
@@ -463,18 +510,20 @@ class Sequence (ConcreteParserElement):
 
 	
 	
-class Choice (ConcreteParserElement):
+class FirstOf (ParserExpressionWithAction):
 	"""
-	Choice
+	FirstOf
 	
-	Matches one of a sequence of sub-expressions
+	Matches one of a list of sub-expressions
 	The first sub-expression to match successfully is the one that is used.
+	
+	The parse result is the parse result of the successfully match sub-expression.
 	"""
 	def __init__(self, subexps):
 		"""
 		subexps - the sub expressions, one of which is to be matched
 		"""
-		super( Choice, self ).__init__()
+		super( FirstOf, self ).__init__()
 		self._subexps = [ _parser_coerce( x )   for x in subexps ]
 		
 	
@@ -488,7 +537,9 @@ class Choice (ConcreteParserElement):
 
 	
 	def __or__(self, x):
-		return Choice( self._subexps  +  [ x ] )
+		f = FirstOf( self._subexps  +  [ x ] )
+		f._o_copySettingsFrom( self )
+		return f
 	
 	
 	def _o_compare(self, x):
@@ -496,11 +547,61 @@ class Choice (ConcreteParserElement):
 
 
 
-class Repetition (ConcreteParserElement):
+class BestOf (ParserExpressionWithAction):
+	"""
+	BestOf
+	
+	Matches one of a list of sub-expressions
+	The sub-expression that successfully matches the most input is the one that is used.
+	
+	The parse result is the parse result of the successfully match sub-expression.
+	"""
+	def __init__(self, subexps):
+		"""
+		subexps - the sub expressions, one of which is to be matched
+		"""
+		super( BestOf, self ).__init__()
+		self._subexps = [ _parser_coerce( x )   for x in subexps ]
+		
+	
+	def _o_evaluate(self, context, input, start, stop):
+		bestResult = None
+		bestPos = start
+		for i, subexp in enumerate( self._subexps ):
+			res, pos = subexp._o_match( context, input, start, stop )
+			if res is not None  and  pos > bestPos:
+				bestResult = res
+				bestPos = pos
+		
+		if bestResult is not None:
+			return ParseResult( self._p_action( input, start, bestPos, bestResult.result ), start, bestResult.end ),  bestPos
+		else:
+			return None, start
+
+	
+	def __xor__(self, x):
+		b = BestOf( self._subexps  +  [ x ] )
+		b._o_copySettingsFrom( self )
+		return b
+	
+	
+	def _o_compare(self, x):
+		return self._subexps  ==  x._subexps
+
+
+
+class Repetition (ParserExpressionWithAction):
 	"""
 	Repetition
 	
 	Matches a sub-expression a number of times within a certain range
+	
+	The parse result is a list of the parse results of the repeated application of the sub-expression.
+	
+	If the @bSuppressIfZero argument of the constuctor is True, no result will be generated if zero occurrences of the sub-expression are matched.
+	If it is False, an empty list will be returned.
+	If @bSuppressIfZero is True, and this expression is contained within an outer expression that generates a list as a parse result (e.g. Sequence, or an outer Repetition),
+	the None parse result that is generated in the case of zero repetitions will not be present in the list generated by the outer expression.
 	"""
 	def __init__(self, subexp, min, max, bSuppressIfZero=False):
 		"""
@@ -549,6 +650,8 @@ class Optional (Repetition):
 	Optional
 	
 	Optionally matches a sub-expression
+
+	The parse result is a list of the parse results of the repeated application of the sub-expression.
 	"""
 	def __init__(self, subexp, bSuppressIfZero=True):
 		"""
@@ -563,6 +666,8 @@ class ZeroOrMore (Repetition):
 	ZeroOrMore
 	
 	Matches a sub-expression 0 or more times
+
+	The parse result is a list of the parse results of the repeated application of the sub-expression.
 	"""
 	def __init__(self, subexp, bSuppressIfZero=False):
 		"""
@@ -577,6 +682,8 @@ class OneOrMore (Repetition):
 	OneOrMore
 	
 	Matches a sub-expression 1 or more times
+
+	The parse result is a list of the parse results of the repeated application of the sub-expression.
 	"""
 	def __init__(self, subexp):
 		"""
@@ -586,17 +693,19 @@ class OneOrMore (Repetition):
 		
 		
 		
-class FollowedBy (ParserElement):
+class Peek (ParserExpression):
 	"""
-	FollowedBy
+	Peek
 	
 	Matches a sub-expression but does not consume it
+	
+	The parse result is an empty result.
 	"""
 	def __init__(self, subexp):
 		"""
 		subexp - the sub-expression to match
 		"""
-		super( FollowedBy, self ).__init__()
+		super( Peek, self ).__init__()
 		self._subexp = _parser_coerce( subexp )
 		
 	
@@ -613,17 +722,19 @@ class FollowedBy (ParserElement):
 	
 
 
-class NotFollowedBy (ParserElement):
+class PeekNot (ParserExpression):
 	"""
-	NotFollowedBy
+	PeekNot
 	
 	Matches anything but a specified sub-expression but does not consume it
+
+	The parse result is an empty result.
 	"""
 	def __init__(self, subexp):
 		"""
 		subexp - the sub-expression to not match
 		"""
-		super( NotFollowedBy, self ).__init__()
+		super( PeekNot, self ).__init__()
 		self._subexp = _parser_coerce( subexp )
 		
 	
@@ -648,6 +759,23 @@ def _delimitedListAction(intpu, begin, end, tokens):
 		return [ tokens[0][0] ]  +  [ x[1]   for x in tokens[0][1] ]
 
 def delimitedList(subexp, delimiter=','):
+	"""
+	Delimited list
+	
+	delimitedList(subexpression, delimiter=',')  ->  ParserExpression
+	
+	Creates a parser expression that will match a delimited list.
+	  subexpression - a parser expression that defines the elements of the list
+	  delimiter - a parser expression the defines the delimiter that separates list entries
+	
+	For example:
+	  delimitedList( identifier, ',' )
+	
+	will construct a parser expression that will parse:
+	   a, b, c, d
+	to:
+	   [ 'a', 'b', 'c', 'd' ]
+	"""
 	return ( Optional( subexp  +  ZeroOrMore( _parser_coerce( delimiter )  +  subexp ), False ) ).setAction( _delimitedListAction )
 
 identifier = Word( string.ascii_letters  +  '_',  string.ascii_letters + string.digits + '_' )
@@ -728,18 +856,36 @@ class TestCase_Parser (unittest.TestCase):
 		self._matchFailTest( parser, 'abfh' )
 	
 		
-	def testChoice(self):
-		self.assert_( Choice( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )   ==   Choice( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] ) )
-		self.assert_( Choice( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )   !=   Choice( [ Literal( 'ab' ), Literal( 'qw' ) ] ) )
-		self.assert_( Choice( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )   !=   Choice( [ Literal( 'qb' ), Literal( 'qw' ), Literal( 'fh' ) ] ) )
-		self.assert_( Choice( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )   ==   Literal( 'ab' )  |  Literal( 'qw' )  |  Literal( 'fh' ) )
-		self.assert_( Choice( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )   ==   Literal( 'ab' )  |  'qw'  |  'fh' )
+	def testFirstOf(self):
+		self.assert_( FirstOf( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )   ==   FirstOf( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] ) )
+		self.assert_( FirstOf( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )   !=   FirstOf( [ Literal( 'ab' ), Literal( 'qw' ) ] ) )
+		self.assert_( FirstOf( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )   !=   FirstOf( [ Literal( 'qb' ), Literal( 'qw' ), Literal( 'fh' ) ] ) )
+		self.assert_( FirstOf( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )   ==   Literal( 'ab' )  |  Literal( 'qw' )  |  Literal( 'fh' ) )
+		self.assert_( FirstOf( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )   ==   Literal( 'ab' )  |  'qw'  |  'fh' )
 
-		parser = Choice( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )
+		parser = FirstOf( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )
 		self._matchTest( parser, 'ab', 'ab', 0, 2 )
 		self._matchTest( parser, 'qw', 'qw', 0, 2 )
 		self._matchTest( parser, 'fh', 'fh', 0, 2 )
 		self._matchFailTest( parser, 'xy' )
+		self._matchTest( Literal( 'ab' )  |  Literal( 'abcd' ),   'ab', 'ab', 0, 2 )
+		self._matchTest( Literal( 'ab' )  |  Literal( 'abcd' ),   'abcd', 'ab', 0, 2 )
+		
+		
+	def testBestOf(self):
+		self.assert_( BestOf( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )   ==   BestOf( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] ) )
+		self.assert_( BestOf( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )   !=   BestOf( [ Literal( 'ab' ), Literal( 'qw' ) ] ) )
+		self.assert_( BestOf( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )   !=   BestOf( [ Literal( 'qb' ), Literal( 'qw' ), Literal( 'fh' ) ] ) )
+		self.assert_( BestOf( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )   ==   Literal( 'ab' )  ^  Literal( 'qw' )  ^  Literal( 'fh' ) )
+		self.assert_( BestOf( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )   ==   Literal( 'ab' )  ^  'qw'  ^  'fh' )
+
+		parser = BestOf( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )
+		self._matchTest( parser, 'ab', 'ab', 0, 2 )
+		self._matchTest( parser, 'qw', 'qw', 0, 2 )
+		self._matchTest( parser, 'fh', 'fh', 0, 2 )
+		self._matchFailTest( parser, 'xy' )
+		self._matchTest( Literal( 'ab' )  ^  Literal( 'abcd' ),   'ab', 'ab', 0, 2 )
+		self._matchTest( Literal( 'ab' )  ^  Literal( 'abcd' ),   'abcd', 'abcd', 0, 4 )
 		
 		
 	def testOptional(self):
@@ -776,9 +922,9 @@ class TestCase_Parser (unittest.TestCase):
 		
 		
 	def testFollowedBy(self):
-		self.assert_( FollowedBy( Literal( 'ab' ) )   ==   FollowedBy( 'ab' ) )
+		self.assert_( Peek( Literal( 'ab' ) )   ==   Peek( 'ab' ) )
 
-		parser = OneOrMore( Literal( 'ab' ) )  +  FollowedBy( Literal( 'cd' ) )
+		parser = OneOrMore( Literal( 'ab' ) )  +  Peek( Literal( 'cd' ) )
 		self._matchFailTest( parser, '' )
 		self._matchFailTest( parser, 'ab' )
 		self._matchFailTest( parser, 'abab' )
@@ -787,9 +933,9 @@ class TestCase_Parser (unittest.TestCase):
 
 		
 	def testNotFollowedBy(self):
-		self.assert_( NotFollowedBy( Literal( 'ab' ) )   ==   NotFollowedBy( 'ab' ) )
+		self.assert_( PeekNot( Literal( 'ab' ) )   ==   PeekNot( 'ab' ) )
 
-		parser = OneOrMore( Literal( 'ab' ) )  +  NotFollowedBy( Literal( 'cd' ) )
+		parser = OneOrMore( Literal( 'ab' ) )  +  PeekNot( Literal( 'cd' ) )
 		self._matchFailTest( parser, '' )
 		self._matchTest( parser, 'ab', [ [ 'ab' ] ], 0, 2 )
 		self._matchFailTest( parser, 'abcd' )
@@ -816,6 +962,7 @@ class TestCase_Parser (unittest.TestCase):
 		
 	
 		
+		
 	def testNonRecursiveCalculator(self):
 		integer = Word( string.digits )
 		plus = Literal( '+' )
@@ -841,8 +988,8 @@ class TestCase_Parser (unittest.TestCase):
 
 				
 		
-		mul = Group( ( integer  +  ZeroOrMore( mulop + integer, True ).setAction( flattenAction ) ).setAction( action ) )
-		add = Group( ( mul  +  ZeroOrMore( addop + mul, True ).setAction( flattenAction ) ).setAction( action ) )
+		mul = Rule( ( integer  +  ZeroOrMore( mulop + integer, True ).setAction( flattenAction ) ).setAction( action ) )
+		add = Rule( ( mul  +  ZeroOrMore( addop + mul, True ).setAction( flattenAction ) ).setAction( action ) )
 		expr = add
 		
 		parser = expr
@@ -863,6 +1010,7 @@ class TestCase_Parser (unittest.TestCase):
 		
 		self._matchTest( parser, '0+1+2*3', [ '0', '+', '1', '+', [ '2', '*', '3' ] ] )
 		self._matchTest( parser, '0*1*2+3', [ [ '0', '*', '1', '*',  '2' ], '+', '3' ] )
+		
 		
 		
 		
@@ -892,8 +1040,8 @@ class TestCase_Parser (unittest.TestCase):
 		
 		mul = Forward()
 		add = Forward()
-		mul  <<  Group( ( mul + mulop + integer )  |  integer )
-		add  <<  Group( ( add + addop + mul )  |  mul )
+		mul  <<  Rule( ( mul + mulop + integer )  |  integer )
+		add  <<  Rule( ( add + addop + mul )  |  mul )
 		
 		expr = add
 		
@@ -907,34 +1055,32 @@ class TestCase_Parser (unittest.TestCase):
 
 		
 		
+		
 	def testLeftRecursionJavaPrimary(self):
 		primary = Forward()
 		
 		
-		expression = Group( Literal( 'i' )  |  Literal( 'j' ) )
-		methodName = Group( Literal( 'm' )  |  Literal( 'n' ) )
-		interfaceTypeName = Group( Literal( 'I' )  |  Literal( 'J' ) )
-		className = Group( Literal( 'C' )  |  Literal( 'D' ) )
+		expression = Rule( Literal( 'i' )  |  Literal( 'j' ) )
+		methodName = Rule( Literal( 'm' )  |  Literal( 'n' ) )
+		interfaceTypeName = Rule( Literal( 'I' )  |  Literal( 'J' ) )
+		className = Rule( Literal( 'C' )  |  Literal( 'D' ) )
 
-		classOrInterfaceType = Group( className | interfaceTypeName )
+		classOrInterfaceType = Rule( className | interfaceTypeName )
 		
-		identifier = Group( Literal( 'x' )  |  Literal( 'y' )  |  classOrInterfaceType )
-		expressionName = Group( identifier )
+		identifier = Rule( Literal( 'x' )  |  Literal( 'y' )  |  classOrInterfaceType )
+		expressionName = Rule( identifier )
 		
-		arrayAccess = Group( ( primary + '[' + expression + ']' )   |   ( expressionName + '[' + expression + ']' ) )
-		fieldAccess = Group( ( primary + '.' + identifier )   |   ( Literal( 'super' ) + '.' + identifier ) )
-		methodInvocation = Group( ( primary + '.' + methodName + '()' )   |   ( methodName + '()' ) )
+		arrayAccess = Rule( ( primary + '[' + expression + ']' )   |   ( expressionName + '[' + expression + ']' ) )
+		fieldAccess = Rule( ( primary + '.' + identifier )   |   ( Literal( 'super' ) + '.' + identifier ) )
+		methodInvocation = Rule( ( primary + '.' + methodName + '()' )   |   ( methodName + '()' ) )
 		
-		classInstanceCreationExpression = Group( ( Literal( 'new' )  +  classOrInterfaceType  +  '()' )  |  ( primary + '.' + 'new' + identifier + '()' ) )
+		classInstanceCreationExpression = Rule( ( Literal( 'new' )  +  classOrInterfaceType  +  '()' )  |  ( primary + '.' + 'new' + identifier + '()' ) )
 		
-		primaryNoNewArray = Group( classInstanceCreationExpression | methodInvocation | fieldAccess | arrayAccess | 'this' )
+		primaryNoNewArray = Rule( classInstanceCreationExpression | methodInvocation | fieldAccess | arrayAccess | 'this' )
 		
 		primary  <<  primaryNoNewArray
 		
-		
-		
-		
-		
+				
 		parser = primary
 		
 		self._matchTest( parser, 'this', 'this' )
@@ -944,14 +1090,32 @@ class TestCase_Parser (unittest.TestCase):
 		self._matchTest( parser, 'x[i][j].y', [ [ [ 'x', '[', 'i', ']' ], '[', 'j', ']' ], '.', 'y' ] )
 		
 		
-	def testSimpleMessagePassingGrammar(self):
-		loadlLocal = Group( identifier )
-		messageName = Group( identifier )
 		
+		
+	def testSimpleMessagePassingGrammar(self):
+		loadlLocal = Rule( identifier )
+		messageName = Rule( identifier )
+		plus = Literal( '+' )
+		minus = Literal( '-' )
+		star = Literal( '*' )
+		slash = Literal( '/' )
+		
+		addop = plus | minus
+		mulop = star | slash
+				
 		expression = Forward()
-		parameterList = Group( delimitedList( expression ) )
-		messageSend = Group( expression + '.' + messageName + '(' + parameterList + ')' )
-		expression  <<  Group( messageSend  |  loadlLocal )
+		parenExpression = Rule( Literal( '(' )  +  expression  +  ')' )
+		atom = Rule( loadlLocal  |  parenExpression )
+
+		parameterList = Rule( delimitedList( expression ) )
+		messageSend = Forward()
+		messageSend  <<  Rule( ( messageSend + '.' + messageName + '(' + parameterList + ')' )  |  atom )
+
+		mul = Forward()
+		mul  <<  Rule( ( mul + mulop + messageSend )  |  messageSend )
+		add = Forward()
+		add  <<  Rule( ( add   + addop + mul )  |  mul )
+		expression  <<  Rule( add )
 		
 		
 		parser = expression
@@ -961,5 +1125,12 @@ class TestCase_Parser (unittest.TestCase):
 		self._matchTest( parser, 'self.x(a)', [ 'self', '.', 'x', '(', [ 'a' ], ')' ] )
 		self._matchTest( parser, 'self.x(a,b.y())', [ 'self', '.', 'x', '(', [ 'a', [ 'b', '.', 'y','(', [], ')' ] ], ')' ] )
 		self._matchTest( parser, 'self.x(a,b.y()).q()', [ [ 'self', '.', 'x', '(', [ 'a', [ 'b', '.', 'y','(', [], ')' ] ], ')' ], '.', 'q', '(', [], ')' ] )
+		self._matchTest( parser, '(self)', [ '(', 'self', ')' ] )
+		self._matchTest( parser, '(self.x())', [ '(', [ 'self', '.', 'x', '(', [], ')' ], ')' ] )
+		self._matchTest( parser, 'x+y', [ 'x', '+', 'y' ] )
+		self._matchTest( parser, 'x*y', [ 'x', '*', 'y' ] )
+		self._matchTest( parser, 'x+y*z', [ 'x', '+', [ 'y', '*', 'z' ] ] )
+		self._matchTest( parser, '(x+y*z).q()', [ [ '(', [ 'x', '+', [ 'y', '*', 'z' ] ], ')' ], '.', 'q', '(', [], ')' ] )
+		self._matchTest( parser, 'x+y.f()*z', [ 'x', '+', [ [ 'y', '.', 'f', '(', [], ')' ], '*', 'z' ] ] )
 		
 
