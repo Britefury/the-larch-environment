@@ -1344,7 +1344,7 @@ class TestCase_Parser (unittest.TestCase):
 		mul = Forward()
 		mul  <<  Rule( ( mul + mulop + messageSend )  |  messageSend )
 		add = Forward()
-		add  <<  Rule( ( add   + addop + mul )  |  mul )
+		add  <<  Rule( ( add  + addop + mul )  |  mul )
 		expression  <<  Rule( add )
 		
 		
