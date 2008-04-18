@@ -439,6 +439,10 @@ class Literal (ParserExpressionWithAction):
 		super( Literal, self ).__init__()
 		self._matchString = unicode( matchString )
 		
+		
+	def getMatchString(self):
+		return self._matchString
+		
 	
 	def _o_evaluate(self, context, input, start, stop):
 		start = context.chomp( input, start, stop )
@@ -473,6 +477,13 @@ class Word (ParserExpressionWithAction):
 			initChars = None
 		self._initChars = initChars
 		self._bodyChars = bodyChars
+		
+		
+	def getInitChars(self):
+		return self._initChars
+	
+	def getBodyChars(self):
+		return self._bodyChars
 		
 	
 	def _o_evaluate(self, context, input, start, stop):
@@ -522,6 +533,10 @@ class Sequence (ParserExpressionWithAction):
 		super( Sequence, self ).__init__()
 		assert len( subexps ) > 0
 		self._subexps = [ _parser_coerce( x )   for x in subexps ]
+		
+		
+	def getSubExpressions(self):
+		return self._subexps
 		
 	
 	def _o_evaluate(self, context, input, start, stop):
