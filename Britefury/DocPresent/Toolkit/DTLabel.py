@@ -27,6 +27,10 @@ class DTLabel (DTSimpleStaticWidget):
 	VALIGN_TOP = 0
 	VALIGN_CENTRE = 1
 	VALIGN_RIGHT = 2
+	
+	MODE_TEXT = 0
+	MODE_MARKUP = 1
+	MODE_MIXEDCAPS = 2
 
 
 	def __init__(self, text='', bUseMarkup=False, font=None, colour=Colour3f( 0.0, 0.0, 0.0), hAlign=HALIGN_CENTRE, vAlign=VALIGN_CENTRE):

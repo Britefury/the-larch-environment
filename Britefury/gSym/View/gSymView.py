@@ -279,8 +279,10 @@ def _runtime_markupLabel(viewNodeInstance, text, style=None):
 
 def _sendTokenListDocEvent(widget, tokens):
 	event = InteractorEventTokenList( True, tokens )
-	print 'gSymView._sendTokenListDocEvent: sending event %s'  %  ( event, )
-	return _sendDocEventToWidget( widget, event )
+	bHandled = _sendDocEventToWidget( widget, event )
+	if not bHandled:
+		print 'gSymView._sendTokenListDocEvent: ***unhandled event*** %s'  %  ( event, )
+	return bHandled
 
 def _onEntryModifed(widget, text, tokens):
 	print "gSymView._onEntryModifed: text='%s', tokens=%s"  %  ( text, tokens )

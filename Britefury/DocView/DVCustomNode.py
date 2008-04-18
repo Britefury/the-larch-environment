@@ -46,6 +46,7 @@ class DVCustomNode (DVNode):
 		self._contentsCell.function = self._p_computeContents
 		
 		self._cellsToRefresh = []
+		
 	
 		
 	def _p_computeContents(self):

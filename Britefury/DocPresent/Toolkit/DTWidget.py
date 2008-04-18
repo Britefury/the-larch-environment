@@ -963,11 +963,11 @@ class DTWidget (object):
 	
 	def sendDocEvent(self, event):
 		for handler in self._docEventHandlers:
-			event = handler( event )
-			if event is None:
-				return event
+			ev = handler( event )
+			if ev is not event:
+				return ev
 		if self._parent is not None:
-			event = self._parent.sendDocEvent( event )
+			return self._parent.sendDocEvent( event )
 		return event
 		
 		
