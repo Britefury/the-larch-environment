@@ -561,10 +561,15 @@ class _GSymViewInstance (object):
 		def _select():
 			assert isinstance( node, RelativeNode ), '%s'  %  ( type( node ), )
 			docNodeKey = _relativeNodeToDocNodeKey( node )
-			viewNode = self.view.getViewNodeForDocNodeKey( docNodeKey )
-			if viewNode.focus is not None:
-				viewNode.focus.makeCurrent()
-			self.focusWidget = viewNode.focus
+			try:
+				viewNode = self.view.getViewNodeForDocNodeKey( docNodeKey )
+			except KeyError:
+				self.focusWidget = None
+			else:
+				if viewNode.focus is not None:
+					#viewNode.focus.makeCurrent()
+					viewNode.focus.startEditing()
+				self.focusWidget = viewNode.focus
 		self.view.document.queueUserEvent( _select )
 		
 		
