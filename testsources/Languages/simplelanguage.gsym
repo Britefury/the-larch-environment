@@ -167,7 +167,9 @@
 								($lambda (@node @x @y @op)
 									($interact
 										($activeBorder
-											($entry @op @op @tokeniser)
+											($focus
+												($entry @op @op @tokeniser)
+											)
 										)
 										(@operatorInteractor <- @node @x @y)
 									)
@@ -177,7 +179,9 @@
 							(@divideEditor
 								($lambda (@node @x @y)
 									($interact
-										($customEntry ($hline) "#'/" @tokeniser)
+										($focus
+											($customEntry ($hline) "#'/" @tokeniser)
+										)
 										(@operatorInteractor <- @node @x @y)
 									)
 								)
@@ -191,8 +195,8 @@
 								( (div (: @x ^) (: @y ^))   (  ($interact ($activeBorder ($vbox ($list ($viewEval @x) (@divideEditor <- @node @x @y) ($viewEval @y)) @divBoxStyle)) (@exprInteractor <- @node))  ) )
 								( (mod (: @x ^) (: @y ^))   (  ($interact ($activeBorder ($hbox ($list ($viewEval @x) (@operatorEditor <- @node @x @y "#'%") ($viewEval @y)))) (@exprInteractor <- @node))  ) )
 								( (pow (: @x ^) (: @y ^))   (  ($interact ($activeBorder ($scriptRSuper ($viewEval @x) ($hbox ($list (@operatorEditor <- @node @x @y "#'**") ($viewEval @y))))) (@exprInteractor <- @node))  )  )
-								( (loadLocal (: @x !))   (  ($interact ($activeBorder ($entry @x @x @tokeniser)) (@loadlLocalInteractor <- @node) (@exprInteractor <- @node))  )  )
-								( (nilExpr)   (  ($interact ($activeBorder ($entry "#'<expr>" "#'" @tokeniser @undefinedStyle))  (@nilExprInteractor <- @node))  )  )
+								( (loadLocal (: @x !))   (  ($interact ($activeBorder ($focus ($entry @x @x @tokeniser))) (@loadlLocalInteractor <- @node) (@exprInteractor <- @node))  )  )
+								( (nilExpr)   (  ($interact ($activeBorder ($focus ($entry "#'<expr>" "#'" @tokeniser @undefinedStyle)))  (@nilExprInteractor <- @node))  )  )
 							)
 						)
 					)

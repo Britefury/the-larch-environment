@@ -12,7 +12,7 @@ from Britefury.Kernel.Abstract import abstractmethod
 
 from Britefury.GLisp.GLispUtil import isGLispList, stripGLispComments
 from Britefury.GLisp.GLispCompiler import GLispCompilerInvalidFormType, GLispCompilerVariableNameMustStartWithAt, GLispCompilerCouldNotCompileSpecial, compileExpressionListToPyTreeStatements
-from Britefury.GLisp.PyCodeGen import pyt_compare, pyt_coerce, PyCodeGenError, PyVar, PyLiteral, PyLiteralValue, PyListLiteral, PyListComprehension, PyGetAttr, PyGetItem, PyGetSlice, PyUnOp, PyBinOp, PyCall, PyMethodCall, PyIsInstance, PyReturn, PyRaise, PyTry, PyIf, PySimpleIf, PyDef, PyAssign_SideEffects, PyDel_SideEffects
+from Britefury.GLisp.PyCodeGen import pyt_compare, pyt_coerce, PyCodeGenError, PyVar, PyLiteral, PyLiteralValue, PyTupleLiteral, PyListLiteral, PyListComprehension, PyGetAttr, PyGetItem, PyGetSlice, PyUnOp, PyBinOp, PyCall, PyMethodCall, PyIsInstance, PyReturn, PyRaise, PyTry, PyIf, PySimpleIf, PyDef, PyAssign_SideEffects, PyDel_SideEffects
 
 from Britefury.gSym.gMeta.GMetaComponent import GMetaComponent
 
@@ -216,10 +216,14 @@ class Interactor (object):
 		
 	
 	def handleEvent(self, event):
+		"""
+		Handle an event
+		handleEvent( event )  ->  result, processedEvent
+		"""
 		try:
 			return self._onEventFunction( event )
 		except NoEventMatch:
-			return event
+			return None, event
 	
 
 
@@ -267,10 +271,10 @@ def _compileInteractorMatch(srcXs, context, bNeedResult, compileSpecial, compile
 	
 	# Make a function define
 	py_actionFn = PyDef( actionFnName, [ pair[0]   for pair in bindingPairs ], actionFnContext.body, dbgSrc=srcXs )
-	py_actionFnCall = PyVar( actionFnName, dbgSrc=srcXs )( *[ pair[1].debug( srcXs )   for pair in bindingPairs ] ).debug( srcXs )
-	py_resultEvent = PyReturn( spec.compileResultEvent( py_eventExpr ) ).debug( srcXs )
+	_py_actionFnCall = PyVar( actionFnName, dbgSrc=srcXs )( *[ pair[1].debug( srcXs )   for pair in bindingPairs ] ).debug( srcXs )
+	py_resultEvent = PyReturn( PyTupleLiteral( [ _py_actionFnCall, spec.compileResultEvent( py_eventExpr ) ] ) ).debug( srcXs )
 	
-	py_action = [ py_actionFn,  py_actionFnCall, py_resultEvent ]
+	py_action = [ py_actionFn, py_resultEvent ]
 	
 	
 	py_match = matchTreeFac( py_action )
@@ -426,7 +430,7 @@ class TestCase_Interactor (unittest.TestCase):
 		
 		
 		pysrc1 = [
-			'if isinstance( event, __gsym__InteractorEventAccel__ ):',
+			'if isinstance( event, __gsym__InteractorEventKey__ ):',
 			'  if event.keyValue == %d and event.mods == %d:'  %  ( spec.keyValue, spec.mods ),
 			'    pass',
 		]
@@ -509,22 +513,19 @@ class TestCase_Interactor (unittest.TestCase):
 			"      if __gsym__interactor_event_0.keyString == '+':",
 			"        def __gsym__interactor_fn_0():",
 			"          return i.j( k )",
-			"        __gsym__interactor_fn_0()",
-			"        return None",
-			"    if isinstance( __gsym__interactor_event_0, __gsym__InteractorEventAccel__ ):",
+			"        return ( __gsym__interactor_fn_0(), None, )",
+			"    if isinstance( __gsym__interactor_event_0, __gsym__InteractorEventKey__ ):",
 			"      if __gsym__interactor_event_0.keyValue == 97 and __gsym__interactor_event_0.mods == 5:",
 			"        def __gsym__interactor_fn_1():",
 			"          return x.y( z )",
-			"        __gsym__interactor_fn_1()",
-			"        return None",
+			"        return ( __gsym__interactor_fn_1(), None, )",
 			"    if isinstance( __gsym__interactor_event_0, __gsym__InteractorEventTokenList__ ):",
 			"      if len( __gsym__interactor_event_0.tokens ) >= 2:",
 			"        if __gsym__interactor_event_0.tokens[0].tokenClass == 'identifier':",
 			"          if __gsym__interactor_event_0.tokens[1].tokenClass == 'literal':",
 			"            def __gsym__interactor_fn_2(x, y):",
 			"              return a.b( c )",
-			"            __gsym__interactor_fn_2( __gsym__interactor_event_0.tokens[0].value, __gsym__interactor_event_0.tokens[1].value )",
-			"            return __gsym__interactor_event_0.tailEvent( 2 )",
+			"            return ( __gsym__interactor_fn_2( __gsym__interactor_event_0.tokens[0].value, __gsym__interactor_event_0.tokens[1].value ), __gsym__interactor_event_0.tailEvent( 2 ), )",
 			"    raise NoEventMatch",
 			"  return __gsym__Interactor__( __gsym__interactor_onEventFn_0 )",
 			"__gsym__interactor_factoryFn_0()",
