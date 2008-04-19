@@ -163,6 +163,8 @@ def pyt_coerce(x):
 		return x
 	elif x is None  or  isinstance( x, bool )  or  isinstance( x, int )  or  isinstance( x, long )  or  isinstance( x, float )  or  isinstance( x, str )  or  isinstance( x, unicode ):
 		return PyLiteralValue( x )
+	elif isinstance( x, tuple ):
+		return PyTupleLiteral( [ pyt_coerce( item )   for item in x ] )
 	elif isinstance( x, list ):
 		return PyListLiteral( [ pyt_coerce( item )   for item in x ] )
 	else:
@@ -489,6 +491,27 @@ class PyLiteralValue (PyExpression):
 
 
 
+class PyTupleLiteral (PyExpression):
+	def __init__(self, subexps, dbgSrc=None):
+		super( PyTupleLiteral, self ).__init__( dbgSrc )
+		for e in subexps:
+			assert isinstance( e, PyExpression )
+		self.subexps = subexps
+		
+	def _o_compileAsExpr(self):
+		if len( self.subexps ) == 0:
+			return '()'
+		else:
+			return '( ' + ''.join( [ x.compileAsExpr() + ', '   for x in self.subexps ] )  +  ')'
+		
+	def _o_compareWith(self, x):
+		return pyt_compare( self.subexps, x.subexps )
+	
+	def getChildren(self):
+		return self.subexps
+
+
+
 class PyListLiteral (PyExpression):
 	def __init__(self, subexps, dbgSrc=None):
 		super( PyListLiteral, self ).__init__( dbgSrc )
@@ -582,6 +605,11 @@ class PyGetAttr (PyExpression):
 		
 	def getChildren(self):
 		return [ self.a ]
+	
+	def assign_sideEffects(self, value):
+		return PyAssign_SideEffects( self, pyt_coerce( value ) )
+	
+
 	
 	
 
@@ -1254,6 +1282,10 @@ class TestCase_PyCodeGen_Node_cmp (unittest.TestCase):
 		self.assert_( pyt_compare( PyLiteralValue( '1' ),  PyLiteralValue( '1' ) ) )
 		self.assert_( not pyt_compare( PyLiteralValue( '1' ),  PyLiteralValue( '2' ) ) )
 		
+	def test_PyTupleLiteral(self):
+		self.assert_( pyt_compare( PyTupleLiteral( [ PySrc( 'a' ), PySrc( 'b' ) ] ),  PyTupleLiteral( [ PySrc( 'a' ), PySrc( 'b' ) ] ) ) )
+		self.assert_( not pyt_compare( PyTupleLiteral( [ PySrc( 'a' ), PySrc( 'b' ) ] ),  PyTupleLiteral( [ PySrc( 'a' ), PySrc( 'c' ) ] ) ) )
+
 	def test_PyListLiteral(self):
 		self.assert_( pyt_compare( PyListLiteral( [ PySrc( 'a' ), PySrc( 'b' ) ] ),  PyListLiteral( [ PySrc( 'a' ), PySrc( 'b' ) ] ) ) )
 		self.assert_( not pyt_compare( PyListLiteral( [ PySrc( 'a' ), PySrc( 'b' ) ] ),  PyListLiteral( [ PySrc( 'a' ), PySrc( 'c' ) ] ) ) )
@@ -1394,6 +1426,10 @@ class TestCase_PyCodeGen_Node_compile (unittest.TestCase):
 	def test_PyLiteralValue(self):
 		self.assert_( PyLiteralValue( 1 ).compileAsExpr()  ==  '1' )
 
+	def test_PyTupleLiteral(self):
+		self.assert_( PyTupleLiteral( [] ).compileAsExpr()  ==  '()' )
+		self.assert_( PyTupleLiteral( [ PySrc( 'a' ), PySrc( 'b' ) ] ).compileAsExpr()  ==  '( a, b, )' )
+		
 	def test_PyListLiteral(self):
 		self.assert_( PyListLiteral( [] ).compileAsExpr()  ==  '[]' )
 		self.assert_( PyListLiteral( [ PySrc( 'a' ), PySrc( 'b' ) ] ).compileAsExpr()  ==  '[ a, b ]' )
@@ -1787,6 +1823,10 @@ class TestCase_PyCodeGen_Node_children (unittest.TestCase):
 	def test_PyLiteralValue(self):
 		self._childrenTest( PyLiteralValue( 1 ), [] )
 
+	def test_PyTupleLiteral(self):
+		subs = [ pyt_coerce( x )   for x in xrange( 0, 5 ) ]
+		self._childrenTest( PyTupleLiteral( subs ), subs  )
+		
 	def test_PyListLiteral(self):
 		subs = [ pyt_coerce( x )   for x in xrange( 0, 5 ) ]
 		self._childrenTest( PyListLiteral( subs ), subs  )

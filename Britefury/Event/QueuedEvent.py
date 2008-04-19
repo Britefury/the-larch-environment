@@ -17,7 +17,7 @@ from Britefury.Util.SignalSlot import Signal
 class _EventQueue (object):
 	def __init__(self):
 		self._queuedEvents = set()
-		self._idleHandle = None
+		self._queuedEventIdleHandle = None
 
 
 	def queueEvent(self, func):
@@ -37,8 +37,9 @@ class _EventQueue (object):
 		self._queuedEventIdleHandle = gobject.idle_add( self._queuedEventIdleFunction, priority=gobject.PRIORITY_HIGH_IDLE )
 
 	def _queuedEventRemoveIdle(self):
-		gobject.source_remove( self._queuedEventIdleHandle )
-		self._queuedEventIdleHandle = None
+		if self._queuedEventIdleHandle is not None:
+			gobject.source_remove( self._queuedEventIdleHandle )
+			self._queuedEventIdleHandle = None
 
 
 	def _queuedEventIdleFunction(self):

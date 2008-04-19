@@ -11,7 +11,7 @@ from Britefury.GLisp.PyCodeGen import pyt_compare, pyt_coerce, PyCodeGenError, P
 from Britefury.GLisp.GLispCompiler import raiseCompilerError, raiseRuntimeError, compileGLispExprToPyFunction, compileGLispCallParamToPyTree, GLispCompilerCouldNotCompileSpecial, GLispCompilerInvalidFormType, GLispCompilerInvalidFormLength, GLispCompilerInvalidItem
 
 from Britefury.gSym.gMeta.GMetaComponent import GMetaComponent
-from Britefury.gSym.RelativeNode import RelativeNode, RelativeList
+from Britefury.gSym.RelativeNode import relative, RelativeNode, RelativeList
 
 
 
@@ -31,7 +31,7 @@ def _runtime_replace(data, replacement):
 		if not isinstance( data.parent, DMListInterface ):
 			raise TypeError, '$replace: @data.parent must be a DMListInterface, not %s'  %  ( type( data.parent ), )
 		data.parent[data.indexInParent] = _sanitiseInputData( replacement )
-		return data.parent[data.indexInParent]
+		return relative( data.parent[data.indexInParent], data.parent, data.indexInParent )
 	else:
 		raise TypeError, '$replace: @data must be a RelativeNode'
 

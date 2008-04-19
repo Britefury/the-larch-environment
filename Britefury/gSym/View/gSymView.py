@@ -28,6 +28,7 @@ from Britefury.DocPresent.Toolkit.DTWrappedHBoxWithSeparators import DTWrappedHB
 from Britefury.DocView.DVNode import DVNode
 from Britefury.DocView.DVCustomNode import DVCustomNode
 from Britefury.DocView.DocView import DocView
+from Britefury.DocView.DocViewNodeTable import DocNodeKey
 
 
 from Britefury.GLisp.GLispUtil import isGLispList, gLispSrcToString
@@ -79,6 +80,11 @@ Hierarchy of view-expression is ignored here;
 the node refresh cell invoked all cells from the view-expression directly (from a list).
 The hierarchy of document view nodes is respected however.
 """
+
+
+
+def _relativeNodeToDocNodeKey(node):
+	return DocNodeKey( node.node, node.parent, node.indexInParent )
 
 
 
@@ -178,30 +184,11 @@ def _runtime_applyStyle(style, widget):
 				
 				
 
-
-def _queueSendEventToFocus(event):
-	print 'gSymView._queueSendEventToFocus() ### NOT IMPLEMENTED ###'
-	
-	
-def _sendDocEventToWidget(widget, event):
-	processedEvent = widget.sendDocEvent( event )
-	if processedEvent is None:
-		return True
-	elif processedEvent is event:
-		return False
-	else:
-		_queueSendEventToFocus( processedEvent )
-		return True
-
-
-def _handleKeyPress(widget, keyPressEvent):
-	event = InteractorEventKey.fromDTKeyEvent( widget, True, keyPressEvent )
-	return _sendDocEventToWidget( widget, event )
 			
 	
 
 def _runtime_setKeyHandler(viewNodeInstance, widget):
-	widget.keyHandler = _handleKeyPress
+	widget.keyHandler = viewNodeInstance.viewInstance._runtime_handleKeyPress
 
 
 def _runtime_activeBorder(viewNodeInstance, child, style=None):
@@ -277,23 +264,6 @@ def _runtime_markupLabel(viewNodeInstance, text, style=None):
 
 
 
-def _sendTokenListDocEvent(widget, tokens):
-	event = InteractorEventTokenList( True, tokens )
-	bHandled = _sendDocEventToWidget( widget, event )
-	if not bHandled:
-		print 'gSymView._sendTokenListDocEvent: ***unhandled event*** %s'  %  ( event, )
-	return bHandled
-
-def _onEntryModifed(widget, text, tokens):
-	print "gSymView._onEntryModifed: text='%s', tokens=%s"  %  ( text, tokens )
-	if len( tokens ) > 1:
-		_sendTokenListDocEvent( widget, tokens )
-
-def _onEntryFinished(widget, text, tokens, bUserEvent):
-	if bUserEvent:
-		_sendTokenListDocEvent( widget, tokens )
-
-
 def _runtime_entry(viewNodeInstance, labelText, entryText, tokeniser, style=None):
 	"""Builds a DTEntryLabel widget"""
 	if isinstance( labelText, RelativeNode ):
@@ -301,8 +271,8 @@ def _runtime_entry(viewNodeInstance, labelText, entryText, tokeniser, style=None
 	if isinstance( entryText, RelativeNode ):
 		entryText = entryText.node
 	widget = DTTokenisedEntryLabel( tokeniser, labelText, entryText )
-	widget.textModifiedSignal.connect( _onEntryModifed )
-	widget.finishEditingSignal.connect( _onEntryFinished )
+	widget.textModifiedSignal.connect( viewNodeInstance.viewInstance._runtime_onEntryModifed )
+	widget.finishEditingSignal.connect( viewNodeInstance.viewInstance._runtime_onEntryFinished )
 	_runtime_applyStyleSheetStack( viewNodeInstance, widget )
 	_runtime_applyStyle( style, widget )
 	return widget
@@ -314,8 +284,8 @@ def _runtime_markupEntry(viewNodeInstance, labelText, entryText, tokeniser, styl
 	if isinstance( entryText, RelativeNode ):
 		entryText = entryText.node
 	widget = DTTokenisedEntryLabel( tokeniser, labelText, entryText )
-	widget.textModifiedSignal.connect( _onEntryModifed )
-	widget.finishEditingSignal.connect( _onEntryFinished )
+	widget.textModifiedSignal.connect( viewNodeInstance.viewInstance._runtime_onEntryModifed )
+	widget.finishEditingSignal.connect( viewNodeInstance.viewInstance._runtime_onEntryFinished )
 	widget.bLabelUseMarkup = True
 	_runtime_applyStyleSheetStack( viewNodeInstance, widget )
 	_runtime_applyStyle( style, widget )
@@ -326,8 +296,8 @@ def _runtime_customEntry(viewNodeInstance, customChild, entryText, tokeniser, st
 	if isinstance( entryText, RelativeNode ):
 		entryText = entryText.node
 	widget = DTTokenisedCustomEntry( tokeniser, entryText )
-	widget.textModifiedSignal.connect( _onEntryModifed )
-	widget.finishEditingSignal.connect( _onEntryFinished )
+	widget.textModifiedSignal.connect( viewNodeInstance.viewInstance._runtime_onEntryModifed )
+	widget.finishEditingSignal.connect( viewNodeInstance.viewInstance._runtime_onEntryFinished )
 	_runtime_customEntryRefreshCell( viewNodeInstance, widget, customChild )
 	_runtime_applyStyleSheetStack( viewNodeInstance, widget )
 	_runtime_applyStyle( style, widget )
@@ -412,7 +382,9 @@ def _runtime_script(viewNodeInstance, mainChild, leftSuperChild, leftSubChild, r
 
 
 class _DocEventHandler (object):
-	def __init__(self, interactors):
+	def __init__(self, viewInstance, interactors):
+		super( _DocEventHandler, self ).__init__()
+		self.viewInstance = viewInstance
 		if isinstance( interactors, Interactor ):
 			interactors = [ interactors ]
 		self.interactors = interactors
@@ -420,12 +392,13 @@ class _DocEventHandler (object):
 	def __call__(self, event):
 		for interactor in self.interactors:
 			try:
-				event = interactor.handleEvent( event )
+				nodeToSelect, ev = interactor.handleEvent( event )
 			except NoEventMatch:
 				pass
 			else:
-				if event is None:
-					break
+				if ev is not event:
+					self.viewInstance._runtime_queueRefreshAndSelect( nodeToSelect )
+					return ev
 		return event
 		
 
@@ -438,10 +411,10 @@ def _runtime_interact(viewNodeInstance, child, interactors=None):
 	def _processChild(c):
 		if isinstance( c, DVNode ):
 			widget = DTBin()
-			widget.addDocEventHandler( _DocEventHandler( interactors ) )
+			widget.addDocEventHandler( _DocEventHandler( viewNodeInstance.viewInstance, interactors ) )
 			_runtime_binRefreshCell( viewNodeInstance, widget, child )
 		elif isinstance( c, DTWidget ):
-			c.addDocEventHandler( _DocEventHandler( interactors ) )
+			c.addDocEventHandler( _DocEventHandler( viewNodeInstance.viewInstance, interactors ) )
 		else:
 			raiseRuntimeError( TypeError, viewNodeInstance.xs, '_runtime_interact: could not process child of type %s'  %  ( type( c ).__name__, ) )
 			
@@ -512,6 +485,7 @@ class _GSymViewInstance (object):
 		self.generalNodeViewFunction = viewFactory._f_createViewFunction( self.viewNodeInstanceStack )
 		# self._p_buildDVNode is a factory that builds DVNode instances for document subtrees
 		self.view = DocView( self.xs, commandHistory, styleSheetDispatcher, self._p_rootNodeFactory )
+		self.focusWidget = None
 		
 		self._nodeContentsFactories = {}
 		
@@ -576,7 +550,79 @@ class _GSymViewInstance (object):
 	
 	
 	
+	
+	def _runtime_queueRefresh(self):
+		def _refresh():
+			self.view.refresh()
+		self.view.document.queueUserEvent( _refresh )
+		
+		
+	def _runtime_queueSelect(self, node):
+		def _select():
+			assert isinstance( node, RelativeNode ), '%s'  %  ( type( node ), )
+			docNodeKey = _relativeNodeToDocNodeKey( node )
+			viewNode = self.view.getViewNodeForDocNodeKey( docNodeKey )
+			if viewNode.focus is not None:
+				viewNode.focus.makeCurrent()
+			self.focusWidget = viewNode.focus
+		self.view.document.queueUserEvent( _select )
+		
+		
+		
+		
+			
+	def _runtime_queueRefreshAndSelect(self, node):
+		self._runtime_queueRefresh()
+		self._runtime_queueSelect( node )
+		
+	
+	def _runtime_queueSendEventToFocus(self, event):
+		def _send():
+			if self.focusWidget is not None:
+				self._runtime_sendDocEventToWidget( self.focusWidget, event )
+		self.view.document.queueUserEvent( _send )
+		
+		
+	def _runtime_sendDocEventToWidget(self, widget, event):
+		self.focusWidget = widget
+		processedEvent = widget.sendDocEvent( event )
+		if processedEvent is None:
+			return True
+		elif processedEvent is event:
+			return False
+		else:
+			self._runtime_queueSendEventToFocus( processedEvent )
+			return True
+	
+	
+	def _runtime_handleKeyPress(self, widget, keyPressEvent):
+		event = InteractorEventKey.fromDTKeyEvent( widget, True, keyPressEvent )
+		return self._runtime_sendDocEventToWidget( widget, event )
 
+	
+
+	
+	def _runtime_sendTokenListDocEvent(self, widget, tokens):
+		event = InteractorEventTokenList( True, tokens )
+		bHandled = self._runtime_sendDocEventToWidget( widget, event )
+		if not bHandled:
+			print 'gSymView._sendTokenListDocEvent: ***unhandled event*** %s'  %  ( event, )
+		return bHandled
+	
+	def _runtime_onEntryModifed(self, widget, text, tokens):
+		print "gSymView._onEntryModifed: text='%s', tokens=%s"  %  ( text, tokens )
+		if len( tokens ) > 1:
+			self._runtime_sendTokenListDocEvent( widget, tokens )
+	
+	def _runtime_onEntryFinished(self, widget, text, tokens, bUserEvent):
+		if bUserEvent:
+			self._runtime_sendTokenListDocEvent( widget, tokens )
+
+
+
+		
+		
+		
 class GSymViewNoNodeViewFunction (Exception):
 	pass
 
@@ -671,6 +717,24 @@ class GMetaComponentView (GMetaComponent):
 			if bNeedResult:
 				return PyVar( childResVarName ).debug( srcXs )
 			else:
+				return None
+		elif name == '$focus':
+			#($focus <child>)
+			if len( srcXs ) != 2:
+				raiseCompilerError( GLispParameterListError, src, 'defineView: $focus needs 1 parameters; the child content' )
+			childResVarName = None
+			_py_childResult = compileSubExp( srcXs[1] )
+
+			if bNeedResult:
+				childResVarName = context.temps.allocateTempName( 'view_special_child_result' )
+				py_childResultTemp = PyVar( childResVarName ).assign_sideEffects( _py_childResult ).debug( srcXs )
+				py_focusSet = PyVar( '__view_node_instance_stack__' )[-1].attr( 'viewNode' ).attr( 'focus' ).assign_sideEffects( PyVar( childResVarName ) ).debug( srcXs )
+				context.body.append( py_childResultTemp )
+				context.body.append( py_focusSet )
+				return PyVar( childResVarName ).debug( srcXs )
+			else:
+				py_focusSet = PyVar( '__view_node_instance_stack__' )[-1].attr( 'viewNode' ).attr( 'focus' ).assign_sideEffects( _py_childResult ).debug( srcXs )
+				context.body.append( py_focusSet )
 				return None
 		elif name == '$activeBorder':
 			#($activeBorder <child> [<styleSheet>])

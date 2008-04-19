@@ -43,6 +43,9 @@ class DocView (object):
 
 
 
+	def getDocument(self):
+		return self._document
+	
 	def setDocument(self, document):
 		self._document = document
 
@@ -149,4 +152,5 @@ class DocView (object):
 			
 			
 	rootView = property( _p_getRootView )
+	document = property( getDocument, setDocument )
 

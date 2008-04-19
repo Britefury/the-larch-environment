@@ -19,7 +19,7 @@ from copy import copy
 
 from Britefury.Util.SignalSlot import *
 
-from Britefury.Event.QueuedEvent import queueEvent
+from Britefury.Event.QueuedEvent import queueEvent, dequeueEvent
 
 from Britefury.Math.Math import Vector2, Point2, BBox2, Segment2
 
@@ -98,8 +98,9 @@ class DTDocument (DTBin):
 		self._keyboardFocusChild = None
 		self._keyboardFocusGrabChild = None
 
-		# Immediate event queue
+		# Event queues
 		self._immediateEvents = []
+		self._userEvents = []
 		
 		# Cursor entities for the start and end of the document
 		self._firstCursorEntity = DTCursorEntity( self )
@@ -180,13 +181,36 @@ class DTDocument (DTBin):
 
 	def queueImmediateEvent(self, f):
 		self._immediateEvents.append( f )
+		
+	def queueUserEvent(self, f):
+		if len( self._userEvents ) == 0:
+			queueEvent( self._p_onQueuedEvent )
+		if f not in self._userEvents:
+			self._userEvents.append( f )
+			
+			
+			
+	def _p_onQueuedEvent(self):
+		self._p_emitUserEvents()
 
 
 	def _p_emitImmediateEvents(self):
+		# User events
+		dequeueEvent( self._p_onQueuedEvent )
+		self._p_emitUserEvents()
+		
 		events = copy( self._immediateEvents )
 		for event in events:
 			event()
 		self._immediateEvents = []
+		
+	
+	def _p_emitUserEvents(self):
+		while len( self._userEvents ) > 0:
+			events = copy( self._userEvents )
+			self._userEvents = []
+			for event in events:
+				event()
 
 
 
