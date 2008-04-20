@@ -20,7 +20,7 @@ from Britefury.DocPresent.Toolkit.DTEntryLabel import DTEntryLabel
 
 class DTTokenisedEntryLabel (DTEntryLabel):
 	textModifiedSignal = ClassSignal()			# ( entry, text, parseResult )
-	finishEditingSignal = ClassSignal()			# ( entry, text, parseResult, bUserEvent )
+	finishEditingSignal = ClassSignal()			# ( entry, text, parseResult, bChanged, bUserEvent )
 
 
 
@@ -31,8 +31,8 @@ class DTTokenisedEntryLabel (DTEntryLabel):
 
 
 
-	def _o_emitFinishEditing(self, bUserEvent):
-		self.finishEditingSignal.emit( self, self.text, self._p_tokeniseText( self.text ), bUserEvent )
+	def _o_emitFinishEditing(self, text, bChanged, bUserEvent):
+		self.finishEditingSignal.emit( self, text, self._p_tokeniseText( text ), bChanged, bUserEvent )
 
 	def _o_emitTextInserted(self, position, bAppended, textInserted):
 		super( DTTokenisedEntryLabel, self )._o_emitTextInserted( position, bAppended, textInserted )

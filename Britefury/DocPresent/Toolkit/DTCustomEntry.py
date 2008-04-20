@@ -21,7 +21,7 @@ class DTCustomEntry (DTBin):
 	textInsertedSignal = ClassSignal()				# ( entry, position, bAppended, textInserted )
 	textDeletedSignal = ClassSignal()				# ( entry, startIndex, endIndex, textDeleted )
 	startEditingSignal = ClassSignal()				# ( entry, text )
-	finishEditingSignal = ClassSignal()			# ( entry, text, bUserEvent )
+	finishEditingSignal = ClassSignal()			# ( entry, text, bChanged, bUserEvent )
 
 
 	class _CustomContainer (DTBin):
@@ -105,6 +105,8 @@ class DTCustomEntry (DTBin):
 		self._entry.returnSignal.connect( self._p_onEntryReturn )
 
 		self.setChild( self._custom )
+		
+		self._textAtStart = None
 
 		self._bIgnoreEntryLoseFocus = False
 		
@@ -137,6 +139,7 @@ class DTCustomEntry (DTBin):
 		if self.getChild() is not self._entry:
 			self.setChild( self._entry )
 			self._entry.startEditing()
+			self._textAtStart = self._entry.text
 			self.startEditingSignal.emit( self, self._entry.text )
 
 	def startEditingOnLeft(self):
@@ -165,10 +168,10 @@ class DTCustomEntry (DTBin):
 			self._entry.ungrabFocus()
 			self._bIgnoreEntryLoseFocus = False
 			self.setChild( self._custom )
-			self._o_emitFinishEditing( bUserEvent )
+			self._o_emitFinishEditing( self._entry.text, self._entry.text != self._textAtStart, bUserEvent )
 
-	def _o_emitFinishEditing(self, bUserEvent):
-		self.finishEditingSignal.emit( self, self._entry.text, bUserEvent )
+	def _o_emitFinishEditing(self, text, bChanged, bUserEvent):
+		self.finishEditingSignal.emit( self, text, bChanged, bUserEvent )
 
 
 
