@@ -31,9 +31,9 @@ class DTTokenisedCustomEntry (DTCustomEntry):
 
 
 
-	def _o_emitFinishEditing(self, bUserEvent):
+	def _o_emitFinishEditing(self, text, bChanged, bUserEvent):
 		text = self.getEntryText()
-		self.finishEditingSignal.emit( self, text, self._p_tokeniseText( text ), bUserEvent )
+		self.finishEditingSignal.emit( self, text, self._p_tokeniseText( text ), bChanged, bUserEvent )
 
 	def _o_emitTextInserted(self, position, bAppended, textInserted):
 		super( DTTokenisedCustomEntry, self )._o_emitTextInserted( position, bAppended, textInserted )

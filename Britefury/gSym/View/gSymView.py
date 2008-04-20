@@ -7,6 +7,8 @@
 ##-*************************
 import sys
 
+from copy import copy
+
 from Britefury.Math.Math import Colour3f
 
 from Britefury.Cell.Cell import Cell
@@ -87,6 +89,39 @@ def _relativeNodeToDocNodeKey(node):
 	return DocNodeKey( node.node, node.parent, node.indexInParent )
 
 
+
+
+class _ViewQueue (object):
+	def __init__(self, view):
+		super( _ViewQueue, self ).__init__()
+		self._events = []
+		self._view = view
+		self.final = None
+		
+		
+	def queue(self, f):
+		if f not in self._events:
+			if len( self._events ) == 0:
+				self._view.document.queueUserEvent( self._p_fire )
+			self._events.append( f )
+		
+	def dequeue(self, f):
+		if f in self._events:
+			self._events.remove( f )
+			if len( self._events ) == 0:
+				self._view.document.dequeueUserEvent( self._p_fire )
+		
+		
+	def _p_fire(self):
+		while len( self._events ) > 0:
+			events = copy( self._events )
+			self._events = []
+			for event in events:
+				event()
+		if self.final is not None:
+			self.final()
+			self.final = None
+				
 
 
 
@@ -486,6 +521,7 @@ class _GSymViewInstance (object):
 		# self._p_buildDVNode is a factory that builds DVNode instances for document subtrees
 		self.view = DocView( self.xs, commandHistory, styleSheetDispatcher, self._p_rootNodeFactory )
 		self.focusWidget = None
+		self._queue = _ViewQueue( self.view )
 		
 		self._nodeContentsFactories = {}
 		
@@ -554,11 +590,11 @@ class _GSymViewInstance (object):
 	def _runtime_queueRefresh(self):
 		def _refresh():
 			self.view.refresh()
-		self.view.document.queueUserEvent( _refresh )
+		self._queue.queue( _refresh )
 		
 		
 	def _runtime_queueSelect(self, node):
-		def _select():
+		def _focus():
 			assert isinstance( node, RelativeNode ), '%s'  %  ( type( node ), )
 			docNodeKey = _relativeNodeToDocNodeKey( node )
 			try:
@@ -566,13 +602,15 @@ class _GSymViewInstance (object):
 			except KeyError:
 				self.focusWidget = None
 			else:
-				if viewNode.focus is not None:
-					#viewNode.focus.makeCurrent()
-					viewNode.focus.startEditing()
 				self.focusWidget = viewNode.focus
-		self.view.document.queueUserEvent( _select )
+		self._queue.queue( _focus )
 		
 		
+		def _select():
+			if self.focusWidget is not None:
+				#self.focusWidget.makeCurrent()
+				self.focusWidget.startEditing()
+		self._queue.final = _select
 		
 		
 			
@@ -585,7 +623,7 @@ class _GSymViewInstance (object):
 		def _send():
 			if self.focusWidget is not None:
 				self._runtime_sendDocEventToWidget( self.focusWidget, event )
-		self.view.document.queueUserEvent( _send )
+		self._queue.queue( _send )
 		
 		
 	def _runtime_sendDocEventToWidget(self, widget, event):
@@ -619,8 +657,8 @@ class _GSymViewInstance (object):
 		if len( tokens ) > 1:
 			self._runtime_sendTokenListDocEvent( widget, tokens )
 	
-	def _runtime_onEntryFinished(self, widget, text, tokens, bUserEvent):
-		if bUserEvent:
+	def _runtime_onEntryFinished(self, widget, text, tokens, bChanged, bUserEvent):
+		if bUserEvent  and  bChanged:
 			self._runtime_sendTokenListDocEvent( widget, tokens )
 
 

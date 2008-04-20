@@ -22,7 +22,7 @@ class DTEntryLabel (DTBin):
 	textInsertedSignal = ClassSignal()				# ( entry, position, bAppended, textInserted )
 	textDeletedSignal = ClassSignal()				# ( entry, startIndex, endIndex, textDeleted )
 	startEditingSignal = ClassSignal()				# ( entry, text )
-	finishEditingSignal = ClassSignal()			# ( entry, text, bUserEvent )
+	finishEditingSignal = ClassSignal()			# ( entry, text, bChanged, bUserEvent )
 
 
 	class _Label (DTLabel):
@@ -88,6 +88,7 @@ class DTEntryLabel (DTBin):
 
 		self._labelText = labelText
 		self._entryText = entryText
+		self._textAtStart = None
 		
 		self._bLabelUseMarkup = bLabelUseMarkup
 
@@ -162,7 +163,11 @@ class DTEntryLabel (DTBin):
 		if self.getChild() is not self._entry:
 			self.setChild( self._entry )
 			self._entry.startEditing()
-			self.startEditingSignal.emit( self, self._entryText )
+			if self._entryText is None:
+				self._textAtStart = self._labelText
+			else:
+				self._textAtStart = self._entryText
+			self.startEditingSignal.emit( self, self._textAtStart )
 
 	def startEditingOnLeft(self):
 		self.startEditing()
@@ -187,13 +192,14 @@ class DTEntryLabel (DTBin):
 			self._entry.ungrabFocus()
 			self._bIgnoreEntryLoseFocus = False
 			self.setChild( self._label )
-			self._o_emitFinishEditing( bUserEvent )
+			if self._entryText is None:
+				t = self._labelText
+			else:
+				t = self._entryText
+			self._o_emitFinishEditing( t, t != self._textAtStart, bUserEvent )
 
-	def _o_emitFinishEditing(self, bUserEvent):
-		if self._entryText is None:
-			self.finishEditingSignal.emit( self, self._labelText, bUserEvent )
-		else:
-			self.finishEditingSignal.emit( self, self._entryText, bUserEvent )
+	def _o_emitFinishEditing(self, text, bChanged, bUserEvent):
+		self.finishEditingSignal.emit( self, text, bChanged, bUserEvent )
 
 
 
