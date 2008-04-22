@@ -81,3 +81,66 @@ Similar to the OMeta language in the VPRI system, the grammar language / meta la
 3) View hints on how to typeset the text that makes up this part of the source.
 
 
+
+
+22/Apr/2008
+Interaction models:
+There are three possible interaction models:
+
+1) Classic
+The classic interaction model is composed of the underlying AST data model, and a user interface that edits this
+directly. This was the interaction model used in prototype 1. It has a number of problems. It has been difficult
+to make this interaction model function reliably, due to the way in which user interface widgets are created and
+destroyed, and therefore grab/ungrab/gain/lose focus.
+Copy and paste is a big problem here. Often the meaning of an AST node is dependent on what it is contained in,
+meaning that if a node is pasted 'out of context' it will not be rendered correctly; probably completely differently.
+This will result in a very bad user experience.
++ conceptually simple
++ absolute freedom to define layout and interaction
+- huge amount of R&D to get a system with a good user experience
+
+2) Parser
+This interaction model uses a parser and serialiser specification to provide a way of converting the underlying
+AST data model to text, and parse it back to an AST again. The AST is converted to text. An incremental parser
+converts this into a parse tree. The grammar is annoted with view/edit information, which tells gSym how the UI
+should divide the text into segments, and how to style and display this text. This system would maintain an
+editable version of the document as a text stream. A cursor marker would keep track of the cursor position.
+This would eliminate the problem caused by maintaining the focus target correctly that occurs in the classic
+system.
+Navigation in this system would be much easier to implement than that of the classic system. Copy and paste
+would be the same as with a regular text editor, as it would be up to the parser to re-introduce structure.
+When editing a document, the edit operations may bring the document into a syntactically incorrect state. Due
+to the fact that the parser will no longer handle the document
++ very similar to what already exists
++ user input almost always handled sensibly
+- requires grammar design; this could be difficult for a complex language, or language in development, even
+  when left-recursive parser expression grammars are used
+- all text interaction must go through the parser, so must be specified in the grammar
+- requires R&D to develop language and technique to derive AST -> text from parser specification
+- loses styling when the document state becomes syntactically incorrect
+
+3) Markup
+The interaction model converts the AST into text delimited and separated by markup tags. These tags are not
+text tags such as those in XML or HTML. The stream is composed of a list of objects. Each object is either
+text context, a start tag, and end tag, or a general/separator tag. These tags are named by the language
+specification. Their names/identifiers allow start tags to be matched with end tags. This significantly
+simplifies parsing, as well as speeding it up (This would be a major concern with a parser written in Python,
+given a large document to parse).
+A styling system similar to CSS would allow the language specification to determine how the content
+inside/between specific tags would be viewed and edited.
+This has the advantage that when the document is brought into an inconsistent (incorrect) state via edit
+operations, the styling remains.
+Problems could exist with how a user would be able to recreate specific tags. This problem does not exist
+the the parser system, since the symbols available on the keyboard are sufficient. An example is the python
+tuple/function call use of parentheses. The markup system would use different tags for the two different
+types of parenthesis, perhaps rendering them in a different colour to differentiate them from one another.
+How do we let the user enter the closing tag? When the user enters a close-paren, which tag does the user
+desire?
++ simpler to implement than the parser system
++ does not require grammar/ast conversion
++ performance likely to be better due to not having to parse the whole document
++ document maintains style at all times during editing
+- could suffer from the same problems as word processors regarding user unfriendlyness
+- problems with how we interpret user input
+
+

@@ -61,7 +61,7 @@ if platform == PLATFORM_WIN32:
 	_vc8LibPaths = os.environ['LIB'].split( ';' )
 
 
-	# Attempt to get the boost path
+	# Attempt to get the Platform SDK path
 	try:
 		_platformSDKRootPath = os.environ['MSSDK']
 	except KeyError:
