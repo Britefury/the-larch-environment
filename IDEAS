@@ -142,5 +142,11 @@ desire?
 + document maintains style at all times during editing
 - could suffer from the same problems as word processors regarding user unfriendlyness
 - problems with how we interpret user input
+Problems and solutions:
+  - How do we determine what to apply an operation to? The classic system maintains a 'focus range' which
+     can cover a range of the document, so that when (for example) a binary operator is applied, it is applied
+     to this range of the document. The markup system maintains only a cursor.
+  + We use a precedence system. When applying an operator, we look at the current location of the cursor;
+     see which tags it is between. We place our new operator tags *outside* any tags with a higher precedence.
 
 

@@ -14,7 +14,11 @@ The test that involves a simplified part of the Java grammar is from the same pa
 """
 
 import string
+import operator
 from copy import copy
+import re
+
+from Britefury.Parser.ParserState import ParserState
 
 
 def _parser_coerce(x):
@@ -28,144 +32,6 @@ def _parser_coerce(x):
 
 
 	
-class _MemoEntry (object):
-	def __init__(self, answer, pos):
-		self.answer = answer
-		self.pos = pos
-		
-		
-
-	
-class _LR (object):
-	def __init__(self, seed, rule, head, next):
-		self.seed = seed
-		self.rule = rule
-		self.head = head
-		self.next = next
-		
-		
-class _Head (object):
-	def __init__(self, rule, involvedSet, evalSet):
-		self.rule = rule
-		self.involvedSet = involvedSet
-		self.evalSet = evalSet
-		
-		
-	def __eq__(self, x):
-		return self.rule  is  x.rule   and  self.involvedSet  ==  x.involvedSet   and   self.evalSet  ==  x.evalSet
-		
-		
-	
-	
-	
-class _Context (object):
-	def __init__(self, ignoreChars=string.whitespace):
-		self.memo = {}
-		self.lrStack = []
-		self.pos = 0
-		self.heads = {}
-		self.ignoreChars = ignoreChars
-		
-	def lrStackTop(self):
-		if len( self.lrStack ) == 0:
-			return None
-		else:
-			return self.lrStack[-1]
-	
-
-	def chomp(self, input, start, stop):
-		for i in xrange( start, stop ):
-			if input[i] not in self.ignoreChars:
-				return i
-		return stop
-					
-				
-	# The next five methods; _f_memoisedMatch(), _p_setup_lr(), _p_lr_answer(), _p_grow_lr(), _p_recall() are taken from the paper
-	# "Packrat Parsers Can Support Left Recursion" by Allesandro Warth, James R. Douglass, Todd Millstein; Viewpoints Research Institute.
-	# To be honest, I don't really understand how they work. I transcribed their pseudo-code into Python, and it just worked.
-	# Test grammars in the unit tests seem to work okay, so its fine by me! :D
-	def _f_memoisedMatch(self, expression, input, start, stop):
-		memoEntry = self._p_recall( expression, input, start, stop )
-		if memoEntry is None:
-			lr = _LR( None, expression, None, self.lrStackTop() )
-			self.lrStack.append( lr )
-			
-			memoEntry = _MemoEntry( lr, start )
-			key = start, expression
-			self.memo[key] = memoEntry
-			
-			answer, self.pos = expression._o_evaluate( self, input, start, stop )
-			
-			self.lrStack.pop()
-			
-			memoEntry.pos = self.pos
-			
-			if lr.head is not None:
-				lr.seed = answer
-				return self._p_lr_answer( expression, input, start, stop, memoEntry ),  self.pos
-			else:
-				memoEntry.answer = answer
-				return answer,  self.pos
-		else:
-			self.pos = memoEntry.pos
-			if isinstance( memoEntry.answer, _LR ):
-				self._p_setup_lr( expression, memoEntry.answer )
-				return memoEntry.answer.seed,  self.pos
-			else:
-				return memoEntry.answer,  self.pos
-
-		
-	def _p_setup_lr(self, expression, l):
-		if l.head is None:
-			l.head = _Head( expression, set(), set() )
-		s = self.lrStackTop()
-		while s.head != l.head:
-			s.head = l.head
-			l.head.involvedSet.add( s.rule )
-			s = s.next
-				
-	
-	def _p_lr_answer(self, expression, input, start, stop, memoEntry):
-		h = memoEntry.answer.head
-		if h.rule is not expression:
-			return memoEntry.answer.seed
-		else:
-			memoEntry.answer = memoEntry.answer.seed
-			if memoEntry.answer is None:
-				return None
-			else:
-				return self._p_grow_lr( expression, input, start, stop, memoEntry, h )
-
-			
-	def _p_grow_lr(self, expression, input, start, stop, memoEntry, h):
-		self.heads[start] = h
-		while True:
-			self.pos = start
-			h.evalSet = copy( h.involvedSet )
-			answer, self.pos = expression._o_evaluate( self, input, start, stop )
-			if answer is None  or  self.pos <= memoEntry.pos:
-				break
-			memoEntry.answer = answer
-			memoEntry.pos = self.pos
-		del self.heads[start]
-		self.pos = memoEntry.pos
-		return memoEntry.answer
-
-	
-	def _p_recall(self, expression, input, start, stop):
-		key = start, expression
-		memoEntry = self.memo.get( key )
-		h = self.heads.get( start )
-		if h is None:
-			return memoEntry
-		if memoEntry is None  and  expression not in h.head  and  expression not in h.involvedSet:
-			return _MemoEntry( None, start )
-		if expression in h.evalSet:
-			h.evalSet.remove( expression )
-			answer, self.pos = expression._o_evaluate( self, input, start, stop )
-			memoEntry.answer = answer
-			memoEntry.pos = self.pos
-		return memoEntry
 		
 		
 
@@ -193,18 +59,18 @@ class ParseResult (object):
 
 class ParserExpression (object):
 	"""Parser expression base class"""
-	#def _o_match(self, input, start, stop, context=None):
-		#if context is None:
-			#context = {}
+	#def _o_match(self, input, start, stop, state=None):
+		#if state is None:
+			#state = {}
 			
 		#key = start, self
 		#try:
-			#memoEntry = context[key]
+			#memoEntry = state[key]
 			#return memoEntry.answer, memoEntry.pos
 		#except KeyError:
 			#memoEntry = _MemoEntry( None, start )
-			#context[key] = memoEntry
-			#answer, pos = self._o_evaluate( context, input, start, stop )
+			#state[key] = memoEntry
+			#answer, pos = self._o_evaluate( state, input, start, stop )
 			#memoEntry.answer = answer
 			#memoEntry.pos = pos
 			#return answer, pos
@@ -225,20 +91,20 @@ class ParserExpression (object):
 		"""
 		if stop is None:
 			stop = len( input )
-		context = _Context( ignoreChars )
-		answer, pos = self._o_match( context, input, start, stop )
+		state = ParserState( ignoreChars )
+		answer, pos = self._o_match( state, input, start, stop )
 		if answer is not None:
-			answer.end = context.chomp( input, answer.end, stop )
+			answer.end = state.chomp( input, answer.end, stop )
 		return answer
 	
 
 	
-	def _o_match(self, context, input, start, stop):
-		return context._f_memoisedMatch( self, input, start, stop )
+	def _o_match(self, state, input, start, stop):
+		return state._f_memoisedMatch( self, input, start, stop )
 		
 		
 		
-	def _o_evaluate(self, context, input, start, stop):
+	def _o_evaluate(self, state, input, start, stop):
 		pass
 
 		
@@ -338,8 +204,8 @@ class Forward (ParserExpressionWithAction):
 		self._subexp = None
 		
 
-	def _o_evaluate(self, context, input, start, stop):
-		return self._subexp._o_match( context, input, start, stop )
+	def _o_evaluate(self, state, input, start, stop):
+		return self._subexp._o_match( state, input, start, stop )
 
 	
 	def _o_compare(self, x):
@@ -378,8 +244,8 @@ class Group (ParserExpressionWithAction):
 		self._subexp = _parser_coerce( subexp )
 		
 
-	def _o_evaluate(self, context, input, start, stop):
-		res, pos = self._subexp._o_match( context, input, start, stop )
+	def _o_evaluate(self, state, input, start, stop):
+		res, pos = self._subexp._o_match( state, input, start, stop )
 		if res is None:
 			return res, pos
 		else:
@@ -392,9 +258,9 @@ class Group (ParserExpressionWithAction):
 	
 	
 	
-class Rule (Group):
+class Production (Group):
 	"""
-	Rule
+	Production
 	Group a subexpression into the right hand side of a grammar rule
 	"""
 	pass
@@ -415,8 +281,8 @@ class Suppress (ParserExpression):
 		self._subexp = _parser_coerce( subexp )
 		
 
-	def _o_evaluate(self, context, input, start, stop):
-		res, pos = self._subexp._o_match( context, input, start, stop )
+	def _o_evaluate(self, state, input, start, stop):
+		res, pos = self._subexp._o_match( state, input, start, stop )
 		if res is None:
 			return res, pos
 		else:
@@ -451,8 +317,8 @@ class Literal (ParserExpressionWithAction):
 		return self._matchString
 		
 	
-	def _o_evaluate(self, context, input, start, stop):
-		start = context.chomp( input, start, stop )
+	def _o_evaluate(self, state, input, start, stop):
+		start = state.chomp( input, start, stop )
 		
 		end = start + len( self._matchString )
 		if end <= stop:
@@ -493,8 +359,8 @@ class Word (ParserExpressionWithAction):
 		return self._bodyChars
 		
 	
-	def _o_evaluate(self, context, input, start, stop):
-		start = context.chomp( input, start, stop )
+	def _o_evaluate(self, state, input, start, stop):
+		start = state.chomp( input, start, stop )
 		
 		if start >= stop:
 			return None, start
@@ -525,6 +391,48 @@ class Word (ParserExpressionWithAction):
 	
 	
 	
+class RegEx (ParserExpressionWithAction):
+	"""
+	RegEx
+	
+	Matches a regular expression
+	
+	The parse result is a string.
+	"""
+	
+	def __init__(self, pattern, flags=0, bEatWhitespace=True):
+		"""
+		pattern - the regular expression pattern
+		"""
+		super( RegEx, self ).__init__()
+		self._re = re.compile( pattern, flags )
+		self._bEatWhitespace = bEatWhitespace
+		
+		
+	def getRE(self):
+		return self._re 
+		
+	
+	def _o_evaluate(self, state, input, start, stop):
+		if self._bEatWhitespace:
+			start = state.chomp( input, start, stop )
+			
+		m = self._re.match( input, start, stop )
+		
+		if m is not None:		
+			matchString = m.group()
+			if len( matchString ) > 0:
+				end = start + len( matchString )
+				return ParseResult( self._p_action( input, start, end, matchString ), start, end ),  end
+		return None, start
+		
+	def _o_compare(self, x):
+		return self._re  ==  x._re
+
+
+	
+	
+	
 class Sequence (ParserExpressionWithAction):
 	"""
 	Sequence
@@ -546,14 +454,14 @@ class Sequence (ParserExpressionWithAction):
 		return self._subexps
 		
 	
-	def _o_evaluate(self, context, input, start, stop):
+	def _o_evaluate(self, state, input, start, stop):
 		subexpResults = []
 		
 		pos = start
 		for i, subexp in enumerate( self._subexps ):
 			if pos > stop:
 				return None, start
-			res, pos = subexp._o_match( context, input, pos, stop )
+			res, pos = subexp._o_match( state, input, pos, stop )
 			if res is None:
 				return None, start
 			else:
@@ -569,6 +477,52 @@ class Sequence (ParserExpressionWithAction):
 		return s
 	
 	
+	def _o_compare(self, x):
+		return self._subexps  ==  x._subexps
+
+
+	
+	
+class Combine (ParserExpressionWithAction):
+	"""
+	Combine
+	
+	Matches a sequence of sub-expressions (in order), and combines their results
+
+	The parse result is the result of adding the parse results of the sub-expressions in the sequence.
+	"""
+	def __init__(self, subexps):
+		"""
+		subexps - the sub expressions that are to be matched (in order)
+		"""
+		super( Combine, self ).__init__()
+		assert len( subexps ) > 0
+		self._subexps = [ _parser_coerce( x )   for x in subexps ]
+		
+		
+	def getSubExpressions(self):
+		return self._subexps
+		
+	
+	def _o_evaluate(self, state, input, start, stop):
+		subexpResults = []
+		
+		pos = start
+		for i, subexp in enumerate( self._subexps ):
+			if pos > stop:
+				return None, start
+			res, pos = subexp._o_match( state, input, pos, stop )
+			if res is None:
+				return None, start
+			else:
+				if res.result is not None:
+					subexpResults.append( res.result )
+					
+		result = reduce( operator.__add__, subexpResults )
+		
+		return ParseResult( self._p_action( input, start, pos, result ), start, pos ),  pos
+
+
 	def _o_compare(self, x):
 		return self._subexps  ==  x._subexps
 
@@ -592,9 +546,9 @@ class FirstOf (ParserExpressionWithAction):
 		self._subexps = [ _parser_coerce( x )   for x in subexps ]
 		
 	
-	def _o_evaluate(self, context, input, start, stop):
+	def _o_evaluate(self, state, input, start, stop):
 		for i, subexp in enumerate( self._subexps ):
-			res, pos = subexp._o_match( context, input, start, stop )
+			res, pos = subexp._o_match( state, input, start, stop )
 			if res is not None:
 				return ParseResult( self._p_action( input, start, pos, res.result ), start, res.end ),  pos
 			
@@ -629,11 +583,11 @@ class BestOf (ParserExpressionWithAction):
 		self._subexps = [ _parser_coerce( x )   for x in subexps ]
 		
 	
-	def _o_evaluate(self, context, input, start, stop):
+	def _o_evaluate(self, state, input, start, stop):
 		bestResult = None
 		bestPos = start
 		for i, subexp in enumerate( self._subexps ):
-			res, pos = subexp._o_match( context, input, start, stop )
+			res, pos = subexp._o_match( state, input, start, stop )
 			if res is not None  and  pos > bestPos:
 				bestResult = res
 				bestPos = pos
@@ -682,13 +636,13 @@ class Repetition (ParserExpressionWithAction):
 		self._bSuppressIfZero = bSuppressIfZero
 		
 	
-	def _o_evaluate(self, context, input, start, stop):
+	def _o_evaluate(self, state, input, start, stop):
 		subexpResults = []
 		
 		pos = start
 		i = 0
 		while pos <= stop  and  ( self._max is None  or  i < self._max ):
-			res, pos = self._subexp._o_match( context, input, pos, stop )
+			res, pos = self._subexp._o_match( state, input, pos, stop )
 			if res is None:
 				break
 			else:
@@ -774,8 +728,8 @@ class Peek (ParserExpression):
 		self._subexp = _parser_coerce( subexp )
 		
 	
-	def _o_evaluate(self, context, input, start, stop):
-		res, pos = self._subexp._o_match( context, input, start, stop )
+	def _o_evaluate(self, state, input, start, stop):
+		res, pos = self._subexp._o_match( state, input, start, stop )
 		if res is not None:
 			return ParseResult( None, start, start ),  start
 		else:
@@ -803,8 +757,8 @@ class PeekNot (ParserExpression):
 		self._subexp = _parser_coerce( subexp )
 		
 	
-	def _o_evaluate(self, context, input, start, stop):
-		res, pos = self._subexp._o_match( context, input, start, stop )
+	def _o_evaluate(self, state, input, start, stop):
+		res, pos = self._subexp._o_match( state, input, start, stop )
 		if res is None  or  res.result is None:
 			return ParseResult( None, start, start ), start
 		else:
@@ -817,7 +771,7 @@ class PeekNot (ParserExpression):
 
 	
 	
-def _delimitedListAction(intpu, begin, end, tokens):
+def _delimitedListAction(input, begin, end, tokens):
 	if len( tokens )  ==  0:
 		return []
 	else:
@@ -851,12 +805,20 @@ def _getLineIndentation(line):
 def _getLineWithoutIndentation(line):
 	return line[line.index( line.strip() ):]
 
-def _processIndentation(currentIndentation, indentation, indentToken, dedentToken, currentLevel):
-	if indentation != currentIndentation:
-		if indentation.startswith( currentIndentation ):
-			return indentation + indentToken, currentLevel + 1
-		elif currentIndentation.startswith( indentation ):
-			return indentation + dedentToken, currentLevel - 1
+def _processIndentation(indentationStack, indentation, indentToken, dedentToken, currentLevel):
+	prevIndentation = indentationStack[-1]
+	if indentation != prevIndentation:
+		if indentation.startswith( prevIndentation ):
+			indentationStack.append( indentation )
+			currentLevel += 1
+			return indentation + indentToken, currentLevel
+		elif prevIndentation.startswith( indentation ):
+			dedents = ''
+			while indentationStack[-1].startswith( indentation )  and  indentation != indentationStack[-1]:
+				del indentationStack[-1]
+				dedents += dedentToken
+				currentLevel -= 1
+			return indentation + dedents, currentLevel
 		else:
 			raise IndentationError
 	else:
@@ -888,8 +850,9 @@ def indentedBlocksPrePass(text, indentToken='$<indent>$', dedentToken='$<dedent>
 	"""
 	lines = text.split( '\n' )
 	
-	if len( lines ) > 0:	
-		currentIndentation = _getLineIndentation( lines[0] )
+	if len( lines ) > 0:
+		indentationStack = []
+		indentationStack.append( _getLineIndentation( lines[0] ) )
 		
 		indentationLevel = 0
 		
@@ -898,7 +861,7 @@ def indentedBlocksPrePass(text, indentToken='$<indent>$', dedentToken='$<dedent>
 				indentation = _getLineIndentation( line )
 				content = _getLineWithoutIndentation( line )
 				
-				processedIndentation, indentationLevel = _processIndentation( currentIndentation, indentation, indentToken, dedentToken, indentationLevel )
+				processedIndentation, indentationLevel = _processIndentation( indentationStack, indentation, indentToken, dedentToken, indentationLevel )
 				lines[i] = processedIndentation +  content
 				currentIndentation = indentation
 				
@@ -916,8 +879,17 @@ def indentedBlocksPrePass(text, indentToken='$<indent>$', dedentToken='$<dedent>
 			
 
 
+#
+# Definitions of singleQuotedString, doubleQuotedString, and quotedString taken from pyparsing, which is Copyright (c) 2003-2007  Paul T. McGuire
+#
 
-identifier = Word( string.ascii_letters  +  '_',  string.ascii_letters + string.digits + '_' )
+identifier = RegEx( "[A-Za-z_][A-Za-z0-9]*" )
+singleQuotedString = RegEx( r"'(?:[^'\n\r\\]|(?:'')|(?:\\x[0-9a-fA-F]+)|(?:\\.))*'" )
+doubleQuotedString = RegEx( r'"(?:[^"\n\r\\]|(?:"")|(?:\\x[0-9a-fA-F]+)|(?:\\.))*"' )
+quotedString = RegEx( r'''(?:"(?:[^"\n\r\\]|(?:"")|(?:\\x[0-9a-fA-F]+)|(?:\\.))*")|(?:'(?:[^'\n\r\\]|(?:'')|(?:\\x[0-9a-fA-F]+)|(?:\\.))*')''' )
+unicodeString = Combine( [ 'u', quotedString ] )
+integer = RegEx( r"[\-]?[0-9]+" )
+floatingPoint = RegEx( r"[\-]?(([0-9]+\.[0-9]*)|(\.[0-9]+))(e[\-]?[0-9]+)?" )
 
 
 
@@ -929,8 +901,6 @@ class TestCase_Parser (unittest.TestCase):
 		result = parser.parseString( input, ignoreChars=ignoreChars )
 		self.assert_( result is not None )
 		res = result.result
-		if ( isinstance( expected, str )  or  isinstance( expected, unicode ) )  and  isinstance( res, list )  and  len( res ) == 1  and  ( isinstance( res[0], str )  or  isinstance( res[0], unicode ) ):
-			res = res[0]
 		if res != expected:
 			print 'EXPECTED:'
 			print expected
@@ -983,6 +953,14 @@ class TestCase_Parser (unittest.TestCase):
 		self._matchFailTest( Word( 'abc', 'def' ), 'ddeeff' )
 
 		
+	def testRegEx(self):
+		self.assert_( RegEx( r"[A-Za-z_][A-Za-z0-9]*" )  ==  RegEx( r"[A-Za-z_][A-Za-z0-9]*" ) )
+		self.assert_( RegEx( r"[A-Za-z_][A-Za-z0-9]*" )  !=  RegEx( r"[A-Za-z_][A-Za-z0-9]*abc" ) )
+		self._matchTest( RegEx( r"[A-Za-z_][A-Za-z0-9]*" ), 'abc123', 'abc123', 0, 6 )
+		self._matchFailTest( RegEx( r"[A-Za-z_][A-Za-z0-9]*" ), '9abc' )
+		self._matchTest( RegEx( r"[A-Za-z_][A-Za-z0-9]*" ), 'abcxyz...', 'abcxyz', 0, 6 )
+		
+
 	def testSequence(self):
 		self.assert_( Sequence( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )   ==   Sequence( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] ) )
 		self.assert_( Sequence( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )   !=   Sequence( [ Literal( 'ab' ), Literal( 'qw' ) ] ) )
@@ -992,6 +970,16 @@ class TestCase_Parser (unittest.TestCase):
 
 		parser = Sequence( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )
 		self._matchTest( parser, 'abqwfh', [ 'ab', 'qw', 'fh' ], 0, 6 )
+		self._matchFailTest( parser, 'abfh' )
+	
+		
+	def testCombine(self):
+		self.assert_( Combine( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )   ==   Combine( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] ) )
+		self.assert_( Combine( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )   !=   Combine( [ Literal( 'ab' ), Literal( 'qw' ) ] ) )
+		self.assert_( Combine( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )   !=   Combine( [ Literal( 'qb' ), Literal( 'qw' ), Literal( 'fh' ) ] ) )
+
+		parser = Combine( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )
+		self._matchTest( parser, 'abqwfh', 'abqwfh', 0, 6 )
 		self._matchFailTest( parser, 'abfh' )
 	
 		
@@ -1070,7 +1058,7 @@ class TestCase_Parser (unittest.TestCase):
 		self._matchTest( parser, 'abab', [ 'ab', 'ab' ], 0, 4 )
 		
 		
-	def testFollowedBy(self):
+	def testPeek(self):
 		self.assert_( Peek( Literal( 'ab' ) )   ==   Peek( 'ab' ) )
 
 		parser = OneOrMore( Literal( 'ab' ) )  +  Peek( Literal( 'cd' ) )
@@ -1081,7 +1069,7 @@ class TestCase_Parser (unittest.TestCase):
 		self._matchTest( parser, 'ababcd', [ [ 'ab', 'ab' ] ], 0, 4 )
 
 		
-	def testNotFollowedBy(self):
+	def testPeekNot(self):
 		self.assert_( PeekNot( Literal( 'ab' ) )   ==   PeekNot( 'ab' ) )
 
 		parser = OneOrMore( Literal( 'ab' ) )  +  PeekNot( Literal( 'cd' ) )
@@ -1100,7 +1088,74 @@ class TestCase_Parser (unittest.TestCase):
 		self._matchTest( parser, 'ab12', 'ab12' )
 		self._matchFailTest( parser, '12ab' )
 		self._matchTest( parser, '_ab', '_ab' )
+		
+		
+	def testSingleQuotedString(self):
+		parser = singleQuotedString
+		self._matchTest( parser, "'abc'", "'abc'" )
+		self._matchTest( parser, r"'ab\'c'", r"'ab\'c'" )
+		self._matchTest( parser, "'abc'113", "'abc'" )
 	
+		
+	def testDoubleQuotedString(self):
+		parser = doubleQuotedString
+		self._matchTest( parser, '"abc"', '"abc"' )
+		self._matchTest( parser, r'"ab\"c"', r'"ab\"c"' )
+		self._matchTest( parser, '"abc"113', '"abc"' )
+	
+		
+	def testQuotedString(self):
+		parser = quotedString
+		self._matchTest( parser, "'abc'", "'abc'" )
+		self._matchTest( parser, r"'ab\'c'", r"'ab\'c'" )
+		self._matchTest( parser, "'abc'113", "'abc'" )
+		self._matchTest( parser, '"abc"', '"abc"' )
+		self._matchTest( parser, r'"ab\"c"', r'"ab\"c"' )
+		self._matchTest( parser, '"abc"113', '"abc"' )
+	
+		
+	def testUnicodeString(self):
+		parser = unicodeString
+		self._matchTest( parser, "u'abc'", "u'abc'" )
+		self._matchTest( parser, r"u'ab\'c'", r"u'ab\'c'" )
+		self._matchTest( parser, "u'abc'113", "u'abc'" )
+		self._matchTest( parser, 'u"abc"', 'u"abc"' )
+		self._matchTest( parser, r'u"ab\"c"', r'u"ab\"c"' )
+		self._matchTest( parser, 'u"abc"113', 'u"abc"' )
+		
+		
+	def testInteger(self):
+		parser = integer
+		self._matchTest( parser, "123", "123" )
+		self._matchTest( parser, "-123", "-123" )
+		
+		
+
+	
+		
+	def testFloatingPoint(self):
+		parser = floatingPoint
+		self._matchTest( parser, "3.14", "3.14" )
+		self._matchTest( parser, "-3.14", "-3.14" )
+		self._matchTest( parser, "3.", "3." )
+		self._matchTest( parser, "-3.", "-3." )
+		self._matchTest( parser, ".14", ".14" )
+		self._matchTest( parser, "-.14", "-.14" )
+
+		self._matchTest( parser, "3.14e5", "3.14e5" )
+		self._matchTest( parser, "3.14e-5", "3.14e-5" )
+		self._matchTest( parser, "-3.14e5", "-3.14e5" )
+		self._matchTest( parser, "-3.14e-5", "-3.14e-5" )
+		self._matchTest( parser, "3.e5", "3.e5" )
+		self._matchTest( parser, "3.e-5", "3.e-5" )
+		self._matchTest( parser, "-3.e5", "-3.e5" )
+		self._matchTest( parser, "-3.e-5", "-3.e-5" )
+		self._matchTest( parser, ".14e5", ".14e5" )
+		self._matchTest( parser, ".14e-5", ".14e-5" )
+		self._matchTest( parser, "-.14e5", "-.14e5" )
+		self._matchTest( parser, "-.14e-5", "-.14e-5" )
+
+		
 		
 	def testDelimitedList(self):
 		parser = delimitedList( identifier )
@@ -1164,9 +1219,31 @@ class TestCase_Parser (unittest.TestCase):
 			"$<dedent>$",
 			"$<dedent>$", ] )  +  '\n'
 		
+
+		src4 = '\n'.join( [
+			"  a",
+			"  b",
+			"    c",
+			"    d",
+			"      e",
+			"      f",
+			"  g",
+			"  h", ] )  +  '\n'
+		
+		expected4 = '\n'.join( [
+			"  a",
+			"  b",
+			"    $<indent>$c",
+			"    d",
+			"      $<indent>$e",
+			"      f",
+			"  $<dedent>$$<dedent>$g",
+			"  h" ] )  +  '\n'
+		
 		self.assert_( indentedBlocksPrePass( src1 )  ==  expected1 )
 		self.assert_( indentedBlocksPrePass( src2 )  ==  expected2 )
 		self.assert_( indentedBlocksPrePass( src3 )  ==  expected3 )
+		self.assert_( indentedBlocksPrePass( src4 )  ==  expected4 )
 		
 	
 		
@@ -1196,8 +1273,8 @@ class TestCase_Parser (unittest.TestCase):
 
 				
 		
-		mul = Rule( ( integer  +  ZeroOrMore( mulop + integer, True ).setAction( flattenAction ) ).setAction( action ) )
-		add = Rule( ( mul  +  ZeroOrMore( addop + mul, True ).setAction( flattenAction ) ).setAction( action ) )
+		mul = Production( ( integer  +  ZeroOrMore( mulop + integer, True ).setAction( flattenAction ) ).setAction( action ) )
+		add = Production( ( mul  +  ZeroOrMore( addop + mul, True ).setAction( flattenAction ) ).setAction( action ) )
 		expr = add
 		
 		parser = expr
@@ -1248,8 +1325,8 @@ class TestCase_Parser (unittest.TestCase):
 		
 		mul = Forward()
 		add = Forward()
-		mul  <<  Rule( ( mul + mulop + integer )  |  integer )
-		add  <<  Rule( ( add + addop + mul )  |  mul )
+		mul  <<  Production( ( mul + mulop + integer )  |  integer )
+		add  <<  Production( ( add + addop + mul )  |  mul )
 		
 		expr = add
 		
@@ -1268,23 +1345,23 @@ class TestCase_Parser (unittest.TestCase):
 		primary = Forward()
 		
 		
-		expression = Rule( Literal( 'i' )  |  Literal( 'j' ) )
-		methodName = Rule( Literal( 'm' )  |  Literal( 'n' ) )
-		interfaceTypeName = Rule( Literal( 'I' )  |  Literal( 'J' ) )
-		className = Rule( Literal( 'C' )  |  Literal( 'D' ) )
+		expression = Production( Literal( 'i' )  |  Literal( 'j' ) )
+		methodName = Production( Literal( 'm' )  |  Literal( 'n' ) )
+		interfaceTypeName = Production( Literal( 'I' )  |  Literal( 'J' ) )
+		className = Production( Literal( 'C' )  |  Literal( 'D' ) )
 
-		classOrInterfaceType = Rule( className | interfaceTypeName )
+		classOrInterfaceType = Production( className | interfaceTypeName )
 		
-		identifier = Rule( Literal( 'x' )  |  Literal( 'y' )  |  classOrInterfaceType )
-		expressionName = Rule( identifier )
+		identifier = Production( Literal( 'x' )  |  Literal( 'y' )  |  classOrInterfaceType )
+		expressionName = Production( identifier )
 		
-		arrayAccess = Rule( ( primary + '[' + expression + ']' )   |   ( expressionName + '[' + expression + ']' ) )
-		fieldAccess = Rule( ( primary + '.' + identifier )   |   ( Literal( 'super' ) + '.' + identifier ) )
-		methodInvocation = Rule( ( primary + '.' + methodName + '()' )   |   ( methodName + '()' ) )
+		arrayAccess = Production( ( primary + '[' + expression + ']' )   |   ( expressionName + '[' + expression + ']' ) )
+		fieldAccess = Production( ( primary + '.' + identifier )   |   ( Literal( 'super' ) + '.' + identifier ) )
+		methodInvocation = Production( ( primary + '.' + methodName + '()' )   |   ( methodName + '()' ) )
 		
-		classInstanceCreationExpression = Rule( ( Literal( 'new' )  +  classOrInterfaceType  +  '()' )  |  ( primary + '.' + 'new' + identifier + '()' ) )
+		classInstanceCreationExpression = Production( ( Literal( 'new' )  +  classOrInterfaceType  +  '()' )  |  ( primary + '.' + 'new' + identifier + '()' ) )
 		
-		primaryNoNewArray = Rule( classInstanceCreationExpression | methodInvocation | fieldAccess | arrayAccess | 'this' )
+		primaryNoNewArray = Production( classInstanceCreationExpression | methodInvocation | fieldAccess | arrayAccess | 'this' )
 		
 		primary  <<  primaryNoNewArray
 		
@@ -1301,8 +1378,8 @@ class TestCase_Parser (unittest.TestCase):
 		
 		
 	def testSimpleMessagePassingGrammar(self):
-		loadlLocal = Rule( identifier )
-		messageName = Rule( identifier )
+		loadlLocal = Production( identifier )
+		messageName = Production( identifier )
 		plus = Literal( '+' )
 		minus = Literal( '-' )
 		star = Literal( '*' )
@@ -1312,18 +1389,18 @@ class TestCase_Parser (unittest.TestCase):
 		mulop = star | slash
 				
 		expression = Forward()
-		parenExpression = Rule( Literal( '(' )  +  expression  +  ')' )
-		atom = Rule( loadlLocal  |  parenExpression )
+		parenExpression = Production( Literal( '(' )  +  expression  +  ')' )
+		atom = Production( loadlLocal  |  parenExpression )
 
-		parameterList = Rule( delimitedList( expression ) )
+		parameterList = Production( delimitedList( expression ) )
 		messageSend = Forward()
-		messageSend  <<  Rule( ( messageSend + '.' + messageName + '(' + parameterList + ')' )  |  atom )
+		messageSend  <<  Production( ( messageSend + '.' + messageName + '(' + parameterList + ')' )  |  atom )
 
 		mul = Forward()
-		mul  <<  Rule( ( mul + mulop + messageSend )  |  messageSend )
+		mul  <<  Production( ( mul + mulop + messageSend )  |  messageSend )
 		add = Forward()
-		add  <<  Rule( ( add   + addop + mul )  |  mul )
-		expression  <<  Rule( add )
+		add  <<  Production( ( add   + addop + mul )  |  mul )
+		expression  <<  Production( add )
 		
 		
 		parser = expression
@@ -1345,8 +1422,8 @@ class TestCase_Parser (unittest.TestCase):
 
 
 	def testIndentedGrammar(self):
-		loadlLocal = Rule( identifier )
-		messageName = Rule( identifier )
+		loadlLocal = Production( identifier )
+		messageName = Production( identifier )
 		plus = Literal( '+' )
 		minus = Literal( '-' )
 		star = Literal( '*' )
@@ -1356,26 +1433,26 @@ class TestCase_Parser (unittest.TestCase):
 		mulop = star | slash
 				
 		expression = Forward()
-		parenExpression = Rule( Literal( '(' )  +  expression  +  ')' )
-		atom = Rule( loadlLocal  |  parenExpression )
+		parenExpression = Production( Literal( '(' )  +  expression  +  ')' )
+		atom = Production( loadlLocal  |  parenExpression )
 
-		parameterList = Rule( delimitedList( expression ) )
+		parameterList = Production( delimitedList( expression ) )
 		messageSend = Forward()
-		messageSend  <<  Rule( ( messageSend + '.' + messageName + '(' + parameterList + ')' )  |  atom )
+		messageSend  <<  Production( ( messageSend + '.' + messageName + '(' + parameterList + ')' )  |  atom )
 
 		mul = Forward()
-		mul  <<  Rule( ( mul + mulop + messageSend )  |  messageSend )
+		mul  <<  Production( ( mul + mulop + messageSend )  |  messageSend )
 		add = Forward()
-		add  <<  Rule( ( add  + addop + mul )  |  mul )
-		expression  <<  Rule( add )
+		add  <<  Production( ( add  + addop + mul )  |  mul )
+		expression  <<  Production( add )
 		
 		
-		singleStatement = Rule( expression + Suppress( ';' ) ).setAction( lambda input, start, end, tokens: tokens[0] )
+		singleStatement = Production( expression + Suppress( ';' ) ).setAction( lambda input, start, end, tokens: tokens[0] )
 
 		statement = Forward()
-		block = Rule( ZeroOrMore( statement ) )
-		compoundStatement = Rule( Literal( '$<indent>$' )  +  block  +  Literal( '$<dedent>$' ) ).setAction( lambda input, start, end, tokens: tokens[1] )
-		statement  <<  Rule( compoundStatement  |  singleStatement )
+		block = Production( ZeroOrMore( statement ) )
+		compoundStatement = Production( Literal( '$<indent>$' )  +  block  +  Literal( '$<dedent>$' ) ).setAction( lambda input, start, end, tokens: tokens[1] )
+		statement  <<  Production( compoundStatement  |  singleStatement )
 		
 		
 		parser = block
