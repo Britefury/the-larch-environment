@@ -125,6 +125,9 @@ class ParserExpression (object):
 	def __add__(self, x):
 		return Sequence( [ self, x ] )
 	
+	def __sub__(self, x):
+		return Combine( [ self, x ] )
+	
 	def __or__(self, x):
 		return FirstOf( [ self, x ] )
 	
@@ -523,6 +526,12 @@ class Combine (ParserExpressionWithAction):
 		return ParseResult( self._p_action( input, start, pos, result ), start, pos ),  pos
 
 
+	def __sub__(self, x):
+		s = Combine( self._subexps  +  [ x ] )
+		s._o_copySettingsFrom( self )
+		return s
+	
+	
 	def _o_compare(self, x):
 		return self._subexps  ==  x._subexps
 
@@ -777,15 +786,19 @@ def _delimitedListAction(input, begin, end, tokens):
 	else:
 		return [ tokens[0][0] ]  +  [ x[1]   for x in tokens[0][1] ]
 
-def delimitedList(subexp, delimiter=','):
+def _delimitedListActionOneOrMore(input, begin, end, tokens):
+	return [ tokens[0] ]  +  [ x[1]   for x in tokens[1] ]
+
+def delimitedList(subexp, delimiter=',', bOneOrMore=False):
 	"""
 	Delimited list
 	
-	delimitedList(subexpression, delimiter=',')  ->  ParserExpression
+	delimitedList(subexpression, delimiter=',', bOneOrMore=False)  ->  ParserExpression
 	
 	Creates a parser expression that will match a delimited list.
 	  subexpression - a parser expression that defines the elements of the list
 	  delimiter - a parser expression the defines the delimiter that separates list entries
+	  bOneOrMore - if True, then will only match with a minimum of one sub-expression
 	
 	For example:
 	  delimitedList( identifier, ',' )
@@ -795,7 +808,10 @@ def delimitedList(subexp, delimiter=','):
 	to:
 	   [ 'a', 'b', 'c', 'd' ]
 	"""
-	return ( Optional( subexp  +  ZeroOrMore( _parser_coerce( delimiter )  +  subexp ), False ) ).setAction( _delimitedListAction )
+	if bOneOrMore:
+		return ( subexp  +  ZeroOrMore( _parser_coerce( delimiter )  +  subexp ) ).setAction( _delimitedListActionOneOrMore )
+	else:
+		return ( Optional( subexp  +  ZeroOrMore( _parser_coerce( delimiter )  +  subexp ), False ) ).setAction( _delimitedListAction )
 
 
 
@@ -1159,10 +1175,15 @@ class TestCase_Parser (unittest.TestCase):
 		
 	def testDelimitedList(self):
 		parser = delimitedList( identifier )
+		parser2 = delimitedList( identifier, bOneOrMore=True )
 		self._matchTest( parser, '', [] )
 		self._matchTest( parser, 'ab', [ 'ab' ] )
 		self._matchTest( parser, 'cd', [ 'cd' ] )
 		self._matchTest( parser, 'ab,cd', [ 'ab', 'cd' ] )
+		self._matchFailTest( parser2, '' )
+		self._matchTest( parser2, 'ab', [ 'ab' ] )
+		self._matchTest( parser2, 'cd', [ 'cd' ] )
+		self._matchTest( parser2, 'ab,cd', [ 'ab', 'cd' ] )
 		
 		
 	def testIndentedBlocksPrePass(self):
@@ -1324,8 +1345,8 @@ class TestCase_Parser (unittest.TestCase):
 				
 		
 		mul = Forward()
-		add = Forward()
 		mul  <<  Production( ( mul + mulop + integer )  |  integer )
+		add = Forward()
 		add  <<  Production( ( add + addop + mul )  |  mul )
 		
 		expr = add
@@ -1337,6 +1358,8 @@ class TestCase_Parser (unittest.TestCase):
 		self._matchTest( parser, '1+2+3', [ [ '1', '+', '2' ], '+', '3' ] )
 		self._matchTest( parser, '1*2+3', [ [ '1', '*', '2' ], '+', '3' ] )
 		self._matchTest( parser, '1+2*3', [ '1', '+', [ '2', '*', '3' ] ] )
+		self._matchTest( parser, '1*2+3*4', [ [ '1', '*', '2' ], '+', [ '3', '*', '4' ] ] )
+		self._matchTest( parser, '1+2*3+4', [ [ '1', '+', [ '2', '*', '3' ] ], '+', '4' ] )
 
 		
 		

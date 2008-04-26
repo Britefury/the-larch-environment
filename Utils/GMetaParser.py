@@ -8,8 +8,17 @@
 
 import string
 import operator
+from copy import copy
 
 from Britefury.Parser.Parser import Literal, Word, RegEx, Sequence, Combine, FirstOf, BestOf, Optional, ZeroOrMore, OneOrMore, Production, Group, Forward, Suppress, identifier, quotedString, unicodeString, integer, floatingPoint, delimitedList
+
+from Britefury.GLisp.GLispUtil import isGLispList
+
+
+
+class GMetaParserError (Exception):
+	pass
+
 
 def _p(x, *args):
 	print x, args
@@ -21,8 +30,11 @@ def _flatten(x):
 		return reduce( operator.__add__, x )
 	else:
 		return []
-
-
+	
+	
+def _unaryOpAction(input, begin, end, tokens):
+	return [ tokens[1], tokens[0] ]
+	
 
 _none = Production( Literal( 'None' ) ).setAction( lambda input, begin, end, token: '#None' )
 _false = Production( Literal( 'False' ) ).setAction( lambda input, begin, end, token: '#False' )
@@ -32,7 +44,10 @@ _intLit = Production( integer ).setAction( lambda input, begin, end, token: '#' 
 _floatLit = Production( floatingPoint ).setAction( lambda input, begin, end, token: '#' + token )
 _loadLocal = Production( identifier ).setAction( lambda input, begin, end, token: '@' + token )
 _var = Production( identifier ).setAction( lambda input, begin, end, token: '@' + token )
-_terminalExpr = Production( _floatLit | _intLit | _strLit | _none | _false | _true | _loadLocal )
+_terminalLiteral = Production( _floatLit | _intLit | _strLit | _none | _false | _true )
+_methodName = copy( identifier )
+_paramName = Production( identifier ).setAction( lambda input, begin, end, token: ':' + token )
+_attrName = copy( identifier )
 
 
 
@@ -90,7 +105,68 @@ _matchPair = Production( _matchPattern + '=>' + _compoundExpression ).setAction(
 _matchExpression = Production( Literal( 'match' ) + '(' + _expression + ')' + '{' + ZeroOrMore( _matchPair ) + '}' ).setAction( lambda input, begin, end, tokens: [ '$match', tokens[2] ]  +  tokens[5] )
 # End pattern matching
 
-_expression  <<  Production( _listLiteral | _setLiteral | _lambdaExpression | _mapExpression | _filterExpression | _reduceExpression | _raiseExpression | _tryExpression | _ifExpression | _whereExpression | _moduleExpression | _matchExpression | _terminalExpr )
+
+def _checkParams(input, begin, end, tokens):
+	bKW = False
+	for p in tokens:
+		if isGLispList( p )  and  len( p ) == 2  and  p[0][0] == ':':
+			bKW = True
+		else:
+			if bKW:
+				raise GMetaParserError, 'normal parameters must not come after keyword parameters'
+	return tokens
+
+_kwParam = Production( _paramName + Suppress( '=' ) + _expression )
+_parameterList = Production( Suppress( '(' )  -  delimitedList( _kwParam | _expression )  -  Suppress( ')' ) ).setAction( _checkParams )
+
+
+_parenExp = Production( Literal( '(' ) + _expression + ')' ).setAction( lambda input, begin, end, tokens: tokens[1] )
+
+
+_enclosure = Production( _parenExp | _listLiteral | _setLiteral )
+_special = Production( _lambdaExpression | _mapExpression | _filterExpression | _reduceExpression | _raiseExpression | _tryExpression | _ifExpression | _whereExpression | _moduleExpression | _matchExpression )
+_atom = Production( _enclosure | _special | _terminalLiteral | _loadLocal )
+ 
+_primary = Forward()
+_call = Production( ( _primary + _parameterList ).setAction( lambda input, begin, end, tokens: [ tokens[0], '<-' ] + tokens[1] ) )
+_subscript = Production( ( _primary + '[' + _expression + ']' ).setAction( lambda input, begin, end, tokens: [ tokens[0], '[]', tokens[2] ] ) )
+_slice = Production( ( _primary + '[' + _expression + ':' + _expression + ']' ).setAction( lambda input, begin, end, tokens: [ tokens[0], '[:]', tokens[2], tokens[4] ] ) )
+_getAttr = Production( _primary + '.' + _attrName )
+_primary  <<  Production( _call | _subscript | _slice | _getAttr | _atom )
+
+_power = Forward()
+_unary = Forward()
+
+_power  <<  Production( ( _primary  +  '**'  +  _unary )  |  _primary )
+_unary  <<  Production( ( ( Literal( '~' ) | '-' | 'not' )  +  _unary ).setAction( _unaryOpAction )  |  _power )
+
+_mulDivMod = Forward()
+_mulDivMod  <<  Production( ( _mulDivMod + ( Literal( '*' ) | '/' | '%' ) + _unary )  |  _unary )
+_addSub = Forward()
+_addSub  <<  Production( ( _addSub + ( Literal( '+' ) | '-' ) + _mulDivMod )  |  _mulDivMod )
+_shift = Forward()
+_shift  <<  Production( ( _shift + ( Literal( '<<' ) | '>>' ) + _addSub )  |  _addSub )
+_bitAnd = Forward()
+_bitAnd  <<  Production( ( _bitAnd + '&' + _shift )  |  _shift )
+_bitXor = Forward()
+_bitXor  <<  Production( ( _bitXor + '^' + _bitAnd )  |  _bitAnd )
+_bitOr = Forward()
+_bitOr  <<  Production( ( _bitOr + '|' + _bitXor)  |  _bitXor )
+_cmp = Forward()
+_cmp  <<  Production( ( _cmp + ( Literal( '<' ) | '<=' | '==' | '!=' | '>=' | '>' ) + _bitOr )  |  _bitOr )
+_isIn = Forward()
+_isIn  <<  Production( ( _isIn + 'is' + 'not' + _cmp ).setAction( lambda input, begin, end, tokens: [ [ tokens[0], tokens[1], tokens[3] ], 'not' ]  )  |  \
+		       ( _isIn + 'not' + 'in' + _cmp ).setAction( lambda input, begin, end, tokens: [ [ tokens[0], tokens[2], tokens[3] ], 'not' ]  )  |  \
+		     ( _isIn + 'is' + _cmp)  |  \
+		     ( _isIn + 'in' + _cmp)  |  \
+		     _cmp )
+_and = Forward()
+_and  <<  Production( ( _and + 'and' + _isIn )  |  _isIn )
+_or = Forward()
+_or  <<  Production( ( _or + 'or' + _and )  |  _and )
+
+#_expression  <<  Production( _terminalLiteral | _listLiteral | _setLiteral | _lambdaExpression | _mapExpression | _filterExpression | _reduceExpression | _raiseExpression | _tryExpression | _ifExpression | _whereExpression | _moduleExpression | _matchExpression | _loadLocal )
+_expression  <<  Production( _or )
 
 expression = _expression
 
@@ -201,11 +277,193 @@ class TestCase_GMetaParser (unittest.TestCase):
 		self._matchTest( expression, 'match (a) { (!:q&x=y; /) => {a;} }',  '($match @a (((& @x @y (: @q !)) /) @a))' )
 		self._matchTest( expression, 'match (a) { (("a" "b" "c"):q&x=y; /) => {a;} }',  '($match @a (((& @x @y (: @q (a b c))) /) @a))' )
 		
+		
+	def testCall(self):
+		self._matchTest( expression, 'a(b)',  '(@a <- @b)' )
+		self._matchTest( expression, 'a(b,c)',  '(@a <- @b @c)' )
+		self._matchTest( expression, 'a(b)(c)',  '((@a <- @b) <- @c)' )
+		self._matchTest( expression, 'a(b)(c)(d)',  '(((@a <- @b) <- @c) <- @d)' )
+		self._matchTest( expression, 'a(x=b)',  '(@a <- (:x @b))' )
+		self._matchTest( expression, 'a(x=b,y=c)',  '(@a <- (:x @b) (:y @c))' )
+		self._matchTest( expression, 'a(b,y=c)',  '(@a <- @b (:y @c))' )
+		
+	def testSubscript(self):
+		self._matchTest( expression, 'a[b]',  '(@a [] @b)' )
+		self._matchTest( expression, 'a[b][c]',  '((@a [] @b) [] @c)' )
+		self._matchTest( expression, 'a[b][c][d]',  '(((@a [] @b) [] @c) [] @d)' )
+		self._matchTest( expression, 'a[b](x)',  '((@a [] @b) <- @x)' )
+		self._matchTest( expression, 'a(x)[b]',  '((@a <- @x) [] @b)' )
+		self._matchTest( expression, 'a[b](x)[c]',  '(((@a [] @b) <- @x) [] @c)' )
+		self._matchTest( expression, 'a(x)[b](y)',  '(((@a <- @x) [] @b) <- @y)' )
+		self._matchTest( expression, 'a[b:c]',  '(@a [:] @b @c)' )
+		
 
+	def testGetAttr(self):
+		self._matchTest( expression, 'a.i',  '(@a . i)' )
+		self._matchTest( expression, 'a.i.j',  '((@a . i) . j)' )
+		self._matchTest( expression, 'a(b).i',  '((@a <- @b) . i)' )
+		self._matchTest( expression, 'a(b).i(c)',  '(((@a <- @b) . i) <- @c)' )
+		self._matchTest( expression, 'a.i(b)',  '((@a . i) <- @b)' )
+		self._matchTest( expression, 'a.i(b).j',  '(((@a . i) <- @b) . j)' )
+		self._matchTest( expression, 'a[x].i',  '((@a [] @x) . i)' )
+		self._matchTest( expression, 'a.i[x]',  '((@a . i) [] @x)' )
+		
+		
+	def testExponent(self):
+		self._matchTest( expression, 'a ** p',  '(@a ** @p)' )
+		self._matchTest( expression, 'a ** p ** q',  '(@a ** (@p ** @q))' )
+		self._matchTest( expression, 'a.i ** p',  '((@a . i) ** @p)' )
+		self._matchTest( expression, 'a.i ** p ** q',  '((@a . i) ** (@p ** @q))' )
+		self._matchTest( expression, 'a ** p.i',  '(@a ** (@p . i))' )
+		self._matchTest( expression, 'a ** p.i ** q',  '(@a ** ((@p . i) ** @q))' )
+		self._matchTest( expression, 'a ** p ** q.i',  '(@a ** (@p ** (@q . i)))' )
+		self._matchTest( expression, 'a.i ** p.j',  '((@a . i) ** (@p . j))' )
+		self._matchTest( expression, 'a ** p.j ** q',  '(@a ** ((@p . j) ** @q))' )
+		
+		
+	def testInvertNegateNot(self):
+		self._matchTest( expression, '~a',  '(@a ~)' )
+		self._matchTest( expression, '~~a',  '((@a ~) ~)' )
+		self._matchTest( expression, '~a**p',  '((@a ** @p) ~)' )
+		self._matchTest( expression, '(~a)**p',  '((@a ~) ** @p)' )
+		self._matchTest( expression, 'a**~p',  '(@a ** (@p ~))' )
+		self._matchTest( expression, '-a',  '(@a -)' )
+		self._matchTest( expression, '--a',  '((@a -) -)' )
+		self._matchTest( expression, '-~a',  '((@a ~) -)' )
+		self._matchTest( expression, '~-a',  '((@a -) ~)' )
+		self._matchTest( expression, 'a**-p',  '(@a ** (@p -))' )
+		self._matchTest( expression, 'not a',  '(@a not)' )
+		self._matchTest( expression, 'not not a',  '((@a not) not)' )
+		self._matchTest( expression, 'not ~a',  '((@a ~) not)' )
+		self._matchTest( expression, '~not a',  '((@a not) ~)' )
+		self._matchTest( expression, 'a**not p',  '(@a ** (@p not))' )
+		
+	
+	def testMulDivMod(self):
+		self._matchTest( expression, 'a*b',  '(@a * @b)' )
+		self._matchTest( expression, 'a*b*c',  '((@a * @b) * @c)' )
+		self._matchTest( expression, 'a**b*c',  '((@a ** @b) * @c)' )
+		self._matchTest( expression, 'a*b**c',  '(@a * (@b ** @c))' )
+		self._matchTest( expression, 'a**b*c**d',  '((@a ** @b) * (@c ** @d))' )
+		self._matchTest( expression, 'a*b**c*d',  '((@a * (@b ** @c)) * @d)' )
+		self._matchTest( expression, '-a*b**c*d',  '(((@a -) * (@b ** @c)) * @d)' )
+		self._matchTest( expression, 'a*-b**c*d',  '((@a * ((@b ** @c) -)) * @d)' )
+		self._matchTest( expression, 'a*b**-c*d',  '((@a * (@b ** (@c -))) * @d)' )
+		self._matchTest( expression, 'a*b**c*-d',  '((@a * (@b ** @c)) * (@d -))' )
+		self._matchTest( expression, 'a/b',  '(@a / @b)' )
+		self._matchTest( expression, 'a%b',  '(@a % @b)' )
+		
+		
+	def testAddSub(self):
+		self._matchTest( expression, 'a+b',  '(@a + @b)' )
+		self._matchTest( expression, 'a+b+c',  '((@a + @b) + @c)' )
+		self._matchTest( expression, 'a*b+c',  '((@a * @b) + @c)' )
+		self._matchTest( expression, 'a+b*c',  '(@a + (@b * @c))' )
+		self._matchTest( expression, 'a*b+c*d',  '((@a * @b) + (@c * @d))' )
+		self._matchTest( expression, 'a+b*c+d',  '((@a + (@b * @c)) + @d)' )
+
+		
+	def testIsIn(self):
+		self._matchTest( expression, 'a is b',  '(@a is @b)' )
+		self._matchTest( expression, 'a is not b',  '((@a is @b) not)' )
+		self._matchTest( expression, 'a is b+x',  '(@a is (@b + @x))' )
+		self._matchTest( expression, 'a+x is b',  '((@a + @x) is @b)' )
+		self._matchTest( expression, 'a is not b+x',  '((@a is (@b + @x)) not)' )
+		self._matchTest( expression, 'a+x is not b',  '(((@a + @x) is @b) not)' )
+		self._matchTest( expression, 'a is (not b)',  '(@a is (@b not))' )
+		self._matchTest( expression, 'not a is b',  '((@a not) is @b)' )
+
+		self._matchTest( expression, 'a in b',  '(@a in @b)' )
+		self._matchTest( expression, 'a not in b',  '((@a in @b) not)' )
+		self._matchTest( expression, 'a in b+x',  '(@a in (@b + @x))' )
+		self._matchTest( expression, 'a+x in b',  '((@a + @x) in @b)' )
+		self._matchTest( expression, 'a not in b+x',  '((@a in (@b + @x)) not)' )
+		self._matchTest( expression, 'a+x not in b',  '(((@a + @x) in @b) not)' )
+		self._matchTest( expression, 'a in (not b)',  '(@a in (@b not))' )
+		self._matchTest( expression, 'not a in b',  '((@a not) in @b)' )
+
+		self._matchTest( expression, 'a in b is x',  '((@a in @b) is @x)' )
+		self._matchTest( expression, 'a is b in x',  '((@a is @b) in @x)' )
+		self._matchTest( expression, 'a not in b is x',  '(((@a in @b) not) is @x)' )
+		self._matchTest( expression, 'a is not b in x',  '(((@a is @b) not) in @x)' )
+		self._matchTest( expression, 'a in b is not x',  '(((@a in @b) is @x) not)' )
+		self._matchTest( expression, 'a is b not in x',  '(((@a is @b) in @x) not)' )
+		self._matchTest( expression, 'a not in b is not x',  '((((@a in @b) not) is @x) not)' )
+		self._matchTest( expression, 'a is not b not in x',  '((((@a is @b) not) in @x) not)' )
+		
+		
+	def testAndOr(self):
+		self._matchTest( expression, 'a and b',  '(@a and @b)' )
+		self._matchTest( expression, 'a and b and c',  '((@a and @b)  and @c)' )
+		self._matchTest( expression, 'not a and b',  '((@a not) and @b)' )
+		self._matchTest( expression, 'a and not b',  '(@a and (@b not))' )
+		self._matchTest( expression, 'a and b in m',  '(@a and (@b in @m))' )
+		self._matchTest( expression, 'a and b not in m',  '(@a and ((@b in @m) not))' )
+		self._matchTest( expression, 'a is m and b',  '((@a is @m) and @b)' )
+		self._matchTest( expression, 'a is not m and b',  '(((@a is @m) not) and @b)' )
+		self._matchTest( expression, 'a or b',  '(@a or @b)' )
+
+		
 	def testCompoundExpression(self):
 		self._matchTest( _compoundExpression, '{ a; b; c; }', '(@a @b @c)' )
 
 	def testSingleOrCompoundExpression(self):
 		self._matchTest( _singleOrCompoundExpression, '{ a; b; c; }', '(@a @b @c)' )
 		self._matchTest( _singleOrCompoundExpression, 'a;', '(@a)' )
+
 		
+		
+if __name__ == '__main__':
+	source = \
+"""
+where
+{
+  compileNode =
+    lambda (node) =
+      {
+        match (node)
+	{
+	  ( "add" ^:x ^:y )   =>   { '(' + compileNode(x) + ' + ' + compileNode( y ) + ')'; }
+	  ( "sub" ^:x ^:y )   =>   { '(' + compileNode(x) + ' - ' + compileNode( y ) + ')'; }
+	  ( "mul" ^:x ^:y )   =>   { '(' + compileNode(x) + ' * ' + compileNode( y ) + ')'; }
+	  ( "div" ^:x ^:y )   =>   { '(' + compileNode(x) + ' / ' + compileNode( y ) + ')'; }
+	  ( "pow" ^:x ^:y )   =>   { '(' + compileNode(x) + ' ** ' + compileNode( y ) + ')'; }
+	  ( "loadLocal" !:x )   =>   { x; }
+	  ( "undefinedExpr" )   =>   { '<UNDEFINED>'; }
+	};
+      };
+}
+->
+{
+  compileNode;
+}
+"""
+	import time
+	t1 = time.time()
+	res = expression.parseString( source )
+	t2 = time.time()
+	if res is not None:
+		if res.end != len( source ):
+			print '<INCOMPLETE>'
+		else:
+			print gLispSrcToString( res.result, 100 )
+	else:
+		print '<FAIL>'
+	print 'Parsed %d bytes in %s; %s chars per second'  %  ( len( source ), t2 - t1, len(source)/(t2-t1) )
+	
+	
+	
+	lr = Forward()
+	lr  <<  Production( ( lr + '1' )  |  '1' )
+	
+	assert lr.parseString( '111111' ).end == 6
+	
+	
+	print 'SIMPLE GRAMMAR'
+	ones = '1' * 8000
+	t1 = time.time()
+	res = lr.parseString( ones )
+	t2 = time.time()
+	print 'ONES: parsed %d bytes in %s; %s chars per second'  %  ( len( ones ), t2 - t1, len(ones)/(t2-t1) )
+	
+	
