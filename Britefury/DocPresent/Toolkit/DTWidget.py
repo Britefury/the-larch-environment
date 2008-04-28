@@ -190,18 +190,27 @@ class DTWidget (object):
 		return self._document
 
 
-
-	def grabFocus(self):
+	def _p_grabFocus(self):
 		if not self._bFocusGrabbed:
 			self._bFocusGrabbed = True
 			if self._document is not None:
 				self._document._f_widgetGrabFocus( self )
 
-	def ungrabFocus(self):
+	def _p_ungrabFocus(self):
 		if self._bFocusGrabbed:
 			self._bFocusGrabbed = False
 			if self._document is not None:
 				self._document._f_widgetUngrabFocus( self )
+
+				
+	def grabFocus(self):
+		# Queue the focus grab
+		# Often, the program may respond to a widget gaining or losing focus by focusing on another widget, creating new widgets, or destroying the widget that is gaining/losing focus.
+		# By queueing these events, this ensures that they complete, before a 
+		self.queueImmediateEvent( self._p_grabFocus )
+
+	def ungrabFocus(self):
+		self.queueImmediateEvent( self._p_ungrabFocus )
 
 
 	def _f_clearFocusGrab(self):
@@ -238,6 +247,15 @@ class DTWidget (object):
 			self._waitingImmediateEvents.append( f )
 		else:
 			self._document.queueImmediateEvent( f )
+
+	def dequeueImmediateEvent(self, f):
+		if self._document is None:
+			try:
+				self._waitingImmediateEvents.remove( f )
+			except ValueError:
+				pass
+		else:
+			self._document.dequeueImmediateEvent( f )
 
 
 

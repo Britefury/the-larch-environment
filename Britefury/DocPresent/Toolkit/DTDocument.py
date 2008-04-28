@@ -31,6 +31,51 @@ from Britefury.DocPresent.Toolkit.DTContainer import DTContainer
 
 
 
+"""
+Keyboard focus handling:
+
+Here is how the document handles keyboard focus
+It maintains a reference to the grab-target and the focus-target.
+The grab-target is the last widget to grab the focus.
+The focus-target is the widget that has the focus currently, and receives all keyboard events.
+
+This is done so that situations where a widget grabs the focus, is removed from the widget tree, and then returned to the widget tree, and handled correctly.
+
+Example 1:
+1. Widget @w grabs focus:
+    The grab-target and the focus-target are both set to @w
+    @w is notified that it has gained focus
+2. @w is removed from the widget tree:
+    inside of its unrealise handler, @w relinquishes focus
+    the focus-target is cleared; @w no longer has focus
+    @w is notified that is has lost focus
+3. @w is placed back into the widget tree:
+    inside of its unrealise handler, @w asks to reacquire the focus
+    the focus-target is set to @w; @w has the focus
+    @w is notified that it has gained focus
+4. @w ungrabs focus:
+    The grab-target and the focus-target are both cleared
+    @w is notified that it has lost focus
+    
+Example 2:
+1. Widget @w grabs focus:
+    The grab-target and the focus-target are both set to @w
+    @w is notified that it has gained focus
+2. @w is removed from the widget tree:
+    inside of its unrealise handler, @w relinquishes focus
+    the focus-target is cleared; @w no longer has focus
+    @w is notified that is has lost focus
+3. *** Widget @x grabs the focus ***
+    The grab-target and the focus-target are both set to @x
+    @x is notified that it has gained focus
+4. @w is placed back into the widget tree:
+    inside of its unrealise handler, @w asks to reacquire the focus
+    since the grab-target is @x, not @w, this is refused
+    @w is told to clear its focus grab
+"""
+
+
+
 _undoAccel = gtk.accelerator_parse( '<control>z' )
 _redoAccel = gtk.accelerator_parse( '<control><shift>Z' )
 
@@ -95,12 +140,13 @@ class DTDocument (DTBin):
 
 		self._documentSize = Vector2()
 		self._bAllocationRequired = False
-		self._keyboardFocusChild = None
-		self._keyboardFocusGrabChild = None
+		
+		# Keyboard focus; the grab-target is the widget that last grabbed the focus, the focus-target is the widget that has the focus
+		self._keyboardFocusTarget = None
+		self._keyboardFocusGrabTarget = None
 
 		# Event queues
 		self._immediateEvents = []
-		self._userEvents = []
 		
 		# Cursor entities for the start and end of the document
 		self._firstCursorEntity = DTCursorEntity( self )
@@ -180,37 +226,33 @@ class DTDocument (DTBin):
 
 
 	def queueImmediateEvent(self, f):
-		self._immediateEvents.append( f )
-		
-	def queueUserEvent(self, f):
-		if len( self._userEvents ) == 0:
+		if len( self._immediateEvents ) == 0:
 			queueEvent( self._p_onQueuedEvent )
-		if f not in self._userEvents:
-			self._userEvents.append( f )
+		if f not in self._immediateEvents:
+			self._immediateEvents.append( f )
+			
+	def dequeueImmediateEvent(self, f):
+		if f in self._immediateEvents:
+			self._immediateEvents.remove( f )
+			if len( self._immediateEvents ) == 0:
+				dequeueEvent( self._p_onQueuedEvent )
 			
 			
 			
 	def _p_onQueuedEvent(self):
-		self._p_emitUserEvents()
+		self._p_emitImmediateEvents()
 
 
 	def _p_emitImmediateEvents(self):
 		# User events
 		dequeueEvent( self._p_onQueuedEvent )
-		self._p_emitUserEvents()
-		
-		events = copy( self._immediateEvents )
-		for event in events:
-			event()
-		self._immediateEvents = []
-		
-	
-	def _p_emitUserEvents(self):
-		while len( self._userEvents ) > 0:
-			events = copy( self._userEvents )
-			self._userEvents = []
+		while len( self._immediateEvents ) > 0:
+			events = copy( self._immediateEvents )
+			self._immediateEvents = []
 			for event in events:
 				event()
+		
+	
 
 
 
@@ -252,57 +294,35 @@ class DTDocument (DTBin):
 
 
 
-	#def _f_widgetGrabFocus(self, child):
-		#if child is not self._keyboardFocusChild:
-			#if self._keyboardFocusGrabChild is not None  and  child is not None  and  child is not self._keyboardFocusGrabChild:
-				#self._keyboardFocusGrabChild._f_clearFocusGrab()
-			#if self._keyboardFocusChild is not None  and  child is not None:
-				#self._keyboardFocusChild._o_onLoseFocus()
-			#self._keyboardFocusChild = child
-			#if self._keyboardFocusChild is not None:
-				#self._keyboardFocusChild._o_onGainFocus()
-				#self._keyboardFocusGrabChild = child
-
-
-
-	#def _f_widgetUngrabFocus(self, child):
-		#if child is self._keyboardFocusChild:
-			#if self._keyboardFocusChild is not None:
-				#self._keyboardFocusChild._o_onLoseFocus()
-			#self._keyboardFocusChild = None
-
-
-
-
 	def _f_widgetGrabFocus(self, child):
 		assert child is not None
 
 		# If there is already a widget that has grabbed the keyboard focus, then clear its grab, and replace it with @child
-		if child is not self._keyboardFocusGrabChild:
-			if self._keyboardFocusGrabChild is not None:
-				self._keyboardFocusGrabChild._f_clearFocusGrab()
-			self._keyboardFocusGrabChild = child
+		if child is not self._keyboardFocusGrabTarget:
+			if self._keyboardFocusGrabTarget is not None:
+				self._keyboardFocusGrabTarget._f_clearFocusGrab()
+			self._keyboardFocusGrabTarget = child
 
 		# If @child is different from the widget that has focus at the moment, switch
-		if child is not self._keyboardFocusChild:
-			if self._keyboardFocusChild is not None:
-				keyboardFocusChild = self._keyboardFocusChild
-				self._keyboardFocusChild = None
+		if child is not self._keyboardFocusTarget:
+			if self._keyboardFocusTarget is not None:
+				keyboardFocusChild = self._keyboardFocusTarget
+				self._keyboardFocusTarget = None
 				keyboardFocusChild._o_onLoseFocus()
-			self._keyboardFocusChild = child
-			self._keyboardFocusChild._o_onGainFocus()
+			self._keyboardFocusTarget = child
+			self._keyboardFocusTarget._o_onGainFocus()
 
 
 
 	def _f_widgetUngrabFocus(self, child):
 		assert child is not None
 
-		if child is self._keyboardFocusGrabChild:
-			self._keyboardFocusGrabChild = None
+		if child is self._keyboardFocusGrabTarget:
+			self._keyboardFocusGrabTarget = None
 
-		if child is self._keyboardFocusChild:
-			keyboardFocusChild = self._keyboardFocusChild
-			self._keyboardFocusChild = None
+		if child is self._keyboardFocusTarget:
+			keyboardFocusChild = self._keyboardFocusTarget
+			self._keyboardFocusTarget = None
 			keyboardFocusChild._o_onLoseFocus()
 
 
@@ -313,26 +333,26 @@ class DTDocument (DTBin):
 		assert child is not None
 
 		# If there is already a widget that has grabbed the keyboard focus, then clear the focus grab on @child
-		if child is not self._keyboardFocusGrabChild  and  self._keyboardFocusGrabChild is not None:
+		if child is not self._keyboardFocusGrabTarget  and  self._keyboardFocusGrabTarget is not None:
 			child._f_clearFocusGrab()
 		else:
 			# If @child is different from the widget that has focus at the moment, switch
-			if child is not self._keyboardFocusChild:
-				if self._keyboardFocusChild is not None:
-					keyboardFocusChild = self._keyboardFocusChild
-					self._keyboardFocusChild = None
+			if child is not self._keyboardFocusTarget:
+				if self._keyboardFocusTarget is not None:
+					keyboardFocusChild = self._keyboardFocusTarget
+					self._keyboardFocusTarget = None
 					keyboardFocusChild._o_onLoseFocus()
-				self._keyboardFocusChild = child
-				self._keyboardFocusChild._o_onGainFocus()
+				self._keyboardFocusTarget = child
+				self._keyboardFocusTarget._o_onGainFocus()
 
 
 
 	def _f_widgetRelinquishFocus(self, child):
 		assert child is not None
 
-		if child is self._keyboardFocusChild:
-			keyboardFocusChild = self._keyboardFocusChild
-			self._keyboardFocusChild = None
+		if child is self._keyboardFocusTarget:
+			keyboardFocusChild = self._keyboardFocusTarget
+			self._keyboardFocusTarget = None
 			keyboardFocusChild._o_onLoseFocus()
 
 
@@ -340,8 +360,8 @@ class DTDocument (DTBin):
 
 
 	def removeFocusGrab(self):
-		if self._keyboardFocusChild is not None:
-			self._keyboardFocusChild.ungrabFocus()
+		if self._keyboardFocusTarget is not None:
+			self._keyboardFocusTarget.ungrabFocus()
 
 
 
@@ -551,8 +571,8 @@ class DTDocument (DTBin):
 			self._p_emitImmediateEvents()
 			return True
 		else:
-			if self._keyboardFocusChild is not None:
-				self._keyboardFocusChild._o_onKeyPress( keyEvent )
+			if self._keyboardFocusTarget is not None:
+				self._keyboardFocusTarget._o_onKeyPress( keyEvent )
 				self._p_emitImmediateEvents()
 				return True
 			else:
@@ -570,8 +590,8 @@ class DTDocument (DTBin):
 			self._p_emitImmediateEvents()
 			return True
 		else:
-			if self._keyboardFocusChild is not None:
-				self._keyboardFocusChild._o_onKeyRelease( keyEvent )
+			if self._keyboardFocusTarget is not None:
+				self._keyboardFocusTarget._o_onKeyRelease( keyEvent )
 				self._p_emitImmediateEvents()
 				return True
 			else:
@@ -782,18 +802,18 @@ class DTDocument (DTBin):
 
 	def _o_handleDocumentKeyPress(self, event):
 		if event.keyVal in [ gtk.keysyms.Left, gtk.keysyms.Right, gtk.keysyms.Up, gtk.keysyms.Down, gtk.keysyms.Home, gtk.keysyms.End ]:
-			if self._keyboardFocusChild is not None:
-				if self._keyboardFocusChild._f_handleMotionKeyPress( event ):
+			if self._keyboardFocusTarget is not None:
+				if self._keyboardFocusTarget._f_handleMotionKeyPress( event ):
 					return True
 				else:
 					if event.keyVal == gtk.keysyms.Left:
-						self._keyboardFocusChild.cursorLeft()
+						self._keyboardFocusTarget.cursorLeft()
 					elif event.keyVal == gtk.keysyms.Right:
-						self._keyboardFocusChild.cursorRight()
+						self._keyboardFocusTarget.cursorRight()
 					elif event.keyVal == gtk.keysyms.Up:
-						self._keyboardFocusChild.cursorUp()
+						self._keyboardFocusTarget.cursorUp()
 					elif event.keyVal == gtk.keysyms.Down:
-						self._keyboardFocusChild.cursorDown()
+						self._keyboardFocusTarget.cursorDown()
 					return True
 			return True
 		else:

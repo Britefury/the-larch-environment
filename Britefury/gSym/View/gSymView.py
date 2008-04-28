@@ -102,14 +102,14 @@ class _ViewQueue (object):
 	def queue(self, f):
 		if f not in self._events:
 			if len( self._events ) == 0:
-				self._view.document.queueUserEvent( self._p_fire )
+				self._view.document.queueImmediateEvent( self._p_fire )
 			self._events.append( f )
 		
 	def dequeue(self, f):
 		if f in self._events:
 			self._events.remove( f )
 			if len( self._events ) == 0:
-				self._view.document.dequeueUserEvent( self._p_fire )
+				self._view.document.dequeueImmediateEvent( self._p_fire )
 		
 		
 	def _p_fire(self):

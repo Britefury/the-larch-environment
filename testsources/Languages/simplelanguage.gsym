@@ -137,32 +137,32 @@
 									($interactor
 										( ($tokens op_add)
 											($replace (@node [] #0 ) ($! add))
-											(@node [] #1 )
+											(@node [] #2 )
 										)
 
 										( ($tokens op_sub)
 											($replace (@node [] #0 ) ($! sub))
-											(@node [] #1 )
+											(@node [] #2 )
 										)
 
 										( ($tokens op_mul)
 											($replace (@node [] #0 ) ($! mul))
-											(@node [] #1 )
+											(@node [] #2 )
 										)
 
 										( ($tokens op_div)
 											($replace (@node [] #0 ) ($! div))
-											(@node [] #1 )
+											(@node [] #2 )
 										)
 										
 										( ($tokens op_mod)
 											($replace (@node [] #0 ) ($! mod))
-											(@node [] #1 )
+											(@node [] #2 )
 										)
 
 										( ($tokens op_pow)
 											($replace (@node [] #0 ) ($! pow))
-											(@node [] #1 )
+											(@node [] #2 )
 										)
 
 									)

@@ -543,7 +543,7 @@ class DTEntry (DTWidget):
 
 	def _o_onGainFocus(self):
 		super( DTEntry, self )._o_onGainFocus()
-		self._cursorIndex = len( self._text )
+		self._cursorIndex = min( max( self._cursorIndex, 0 ), len( self._text ) )
 		self._bAutoCompleteDisabled = False
 		self._o_queueFullRedraw()
 
