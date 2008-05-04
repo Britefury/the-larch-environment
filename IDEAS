@@ -118,6 +118,7 @@ to the fact that the parser will no longer handle the document
 - all text interaction must go through the parser, so must be specified in the grammar
 - requires R&D to develop language and technique to derive AST -> text from parser specification
 - loses styling when the document state becomes syntactically incorrect
++ Edit on a line-by-line basis
 
 3) Markup
 The interaction model converts the AST into text delimited and separated by markup tags. These tags are not
@@ -148,5 +149,20 @@ Problems and solutions:
      to this range of the document. The markup system maintains only a cursor.
   + We use a precedence system. When applying an operator, we look at the current location of the cursor;
      see which tags it is between. We place our new operator tags *outside* any tags with a higher precedence.
+
+4) List editing
+Instead of using a markup style system, edit 'lists'.
+E.g. Display complex nodes (in other words, not literals) as lists e.g. A + B.
+Lists can have limited lengths, such as binary operators which are limited to 2 children.
+They can have delimiters and separators.
+They can determine how they are joined with other lists.
+When joining two items that cannot correctly be joined:
+e.g. A + B *| C    (the | represents the cursor)
+the user backspaces deleting the *.
+B and C have to be joined. There is no good way of doing this, so we
+need an 'invalid join' list.
+
+The incremental computation system will continuously destroy and rebuild GUI elements.
+We need a way of ensuring that the cursor is persistent.
 
 
