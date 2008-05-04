@@ -12,13 +12,113 @@ from Britefury.DocPresent.Toolkit.DTLabel import DTLabel
 
 import traceback
 
-class DTWrappedHBoxWithSeparators (DTWrappedHBox):
-	def __init__(self, separatorFactory=',', spacing=0.0, padding=0.0, indentation=0.0):
-		super( DTWrappedHBoxWithSeparators, self ).__init__( spacing, padding, indentation )
+class DTListBase (object):
+	layoutClass = None
+	
+	
+	class _ItemBox (object):
+		def __init__(self, l, item):
+			super( DTListBase._ItemBox, self ).__init__()
+			self._l = l
+			
+			self._bBeginDelim = False
+			self._bEndDelim = False
+			self._bSep = False
+			
+			self._item = item
+			self._container = None
+			self.widget = item
+			
+			
+		def setItem(self, item):
+			self._item = item
+			if self._container is not None:
+				index = 0
+				if self._bEndDelim:
+					index = 1
+				self._container[index] = item
+			else:
+				self.widget = item
+			
+		
+		
+		def setBBeginDelim(self, bBeginDelim):
+			if self._l._beginDelimFactory is not None:
+				if bBeginDelim != self._bBeginDelim:
+					oldState = self._p_changeBegin()
+					self._bBeginDelim = bBeginDelim
+					self._p_changeEnd( oldState )
+					
+					if bBeginDelim:
+						self._container.insert( 0, self._l._f_makeBeginDelim() )
+					else:
+						if self._container is not None:
+							del self._container[0]
+			
+		def setBEndDelim(self, bEndDelim):
+			if self._l._endDelimFactory is not None:
+				if bEndDelim != self._bEndDelim:
+					oldState = self._p_changeBegin()
+					self._bEndDelim = bEndDelim
+					self._p_changeEnd( oldState )
+					
+					if bEndDelim:
+						self._container.append( self._l._f_makeEndDelim() )
+					else:
+						if self._container is not None:
+							del self._container[-1]
+			
+			
+		def setBSep(self, bSep):
+			if self._l._separatorFactory is not None:
+				if bSep != self._bSep:
+					oldState = self._p_changeBegin()
+					self._bSep = bSep
+					self._p_changeEnd( oldState )
+						
+					if self._bBeginDelim:
+						index = 2
+					else:
+						index = 1
+					if bSep:
+						self._container.insert( index, self._l._f_makeSep() )
+					else:
+						if self._container is not None:
+							del self._container[index]
+
+				
+				
+		def _p_changeBegin(self):
+			return self._bBeginDelim  or  self._bEndDelim  or  self._bSep
+		
+		def _p_changeEnd(self, oldState):
+			currentState = self._bBeginDelim  or  self._bEndDelim  or  self._bSep
+			if oldState != currentState:
+				if currentState:
+					self._container = DTBox()
+					self._container.append( self._item )
+					self.widget = self._container
+				else:
+					self.widget = self._item
+					self._container = None
+				
+			
+		
+			
+			
+		
+			
+			
+	
+	def __init__(self, beginDelimFactory='(', endDelimFactory=')', separatorFactory=','):
+		super( DTListBase, self ).__init__()
 
 		self._boxes = []
 		self._items = []
+		self._beginDelimFactory = beginDelimFactory
+		self._endDelimFactory = endDelimFactory
 		self._separatorFactory = separatorFactory
+		
 
 
 	def __getitem__(self, index):
@@ -30,88 +130,98 @@ class DTWrappedHBoxWithSeparators (DTWrappedHBox):
 	def __setitem__(self, index, item):
 		if isinstance( index, slice ):
 			# Create the new boxes
-			boxes = [ self._p_makeChildBox()   for child in item ]
-
-			# Add the items to the new boxes
-			for child, box in zip( item, boxes ):
-				box.append( child )
+			boxes = [ self._ItemBox( self, child )   for child in item ]
 
 			self._boxes[index] = boxes
 			self._items[index] = item
 
-			for box in self._boxes[:-1]:
-				if len( box ) < 2:
-					box.append( self._p_makeSeparator() )
 			if len( self._boxes ) > 0:
-				if len( self._boxes[-1] ) > 1:
-					del self._boxes[-1][1]
+				self._boxes[0].setBBeginDelim( True )
+				self._boxes[-1].setBEndDelim( True )
+				self._boxes[-1].setBSep( False )
+				for box in self._boxes[:-1]:
+					self._boxes.setBSep( True )
 
-			super( DTWrappedHBoxWithSeparators, self ).__setitem__( index, boxes )
+			self._list__setitem__( index, [ box.widget   for box in boxes ] )
 		else:
-			self._boxes[index][0] = item
+			self._boxes[index].setItem( item )
 			self._items[index] = item
 
+			self._list__setitem__( index, [ box.widget   for box in boxes ] )
 
+			
 	def __delitem__(self, index):
-		super( DTWrappedHBoxWithSeparators, self ).__delitem__( index )
+		self._f__delitem__( index )
 
 		del self._boxes[index]
 		del self._items[index]
+		
+		if len( self._boxes ) != 0:
+			if index == 0:
+				self._boxes[0].setBBeginDelim( True )
+			elif index == -1  or  index == len( self ):
+				self._boxes[index-1].setBEndDelim( True )
+				self._boxes[index-1].setBSep( False )
 
+
+	def append(self, child):
 		if len( self._boxes ) > 0:
-			if len( self._boxes[-1] ) > 1:
-				del self._boxes[-1][1]
-
-
-	def append(self, child, padding=None):
-		if len( self._boxes ) > 0:
-			# Add a separator to the last box
-			self._boxes[-1].append( self._p_makeSeparator() )
+			# Add a separator to, and remove the end delimiter from the last box
+			self._boxes[-1].setBSep( True )
+			self._boxes[-1].setBEndDelim( False )
 
 		# Create and add the new box
-		self._boxes.append( self._p_makeChildBox() )
-		# Add the item to the new box
-		self._boxes[-1].append( child )
+		box = self._ItemBox( child )
+		self._boxes.append( box )
+		# Set delimter state
+		box.setBEndDelim( True )
+		
 		# Add the item to the item list
 		self._items.append( child )
 
 		# Add the box to the container
-		super( DTWrappedHBoxWithSeparators, self ).append( self._boxes[-1], padding )
+		self._list_append( self._boxes[-1].widget, padding )
 
 
 	def extend(self, children):
 		if len( self._boxes ) > 0:
-			# Add a separator to the last box
-			self._boxes[-1].append( self._p_makeSeparator() )
+			# Add a separator to, and remove the end delimiter from the last box
+			self._boxes[-1].setBSep( True )
+			self._boxes[-1].setBEndDelim( False )
 
 		# Create the new boxes
-		boxes = [ self._p_makeChildBox()   for child in children ]
-		# Add the items to the new boxes
-		for child, box in zip( children, boxes ):
-			box.append( child )
-		# Add separators too all but the last
-		for box in boxes[:-1]:
-			box.append( self._p_makeSeparator() )
+		boxes = [ self._ItemBox( child )   for child in children ]
+		# Set separator and delimiter state
+		if len( boxes ) > 0:
+			for box in boxes[:-1]:
+				box.setBSep( True )
+			boxes[-1].setBEndDelim( True )
+			
 		# Add the boxes and items to the box and item lists
 		self._boxes.extend( boxes )
 		self._items.extend( children )
-
+			
 		# Add the new boxes to the container
-		super( DTWrappedHBoxWithSeparators, self ).extend( boxes )
+		self._list_extend( boxes )
 
 
-	def insert(self, index, child, padding=None):
+	def insert(self, index, child):
 		if index == len( self._items ):
-			self.append( child, padding )
+			self.append( item, child )
 		else:
-			box = self._p_makeChildBox()
-			box.append( child )
-			box.append( self._p_makeSeparator() )
+			# Make the box
+			box = self._ItemBox( child )
+			
+			# Set the separator and delimiter flags
+			box.setBSep( True )
+			if index == 0:
+				box.setBBeginDelim( True )
 
+			# Perform the insertion
 			self._boxes.insert( index, box )
 			self._items.insert( index, box )
 
-			super( DTWrappedHBoxWithSeparators, self ).insert( index, box )
+			self._f_insert( index, box )
 
 
 	def remove(self, child):
