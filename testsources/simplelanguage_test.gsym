@@ -1,7 +1,10 @@
 ($gSymDocument "0.1-alpha"
 	($unit
 		($withLanguageModule testsources/Languages/simplelanguage
-			(mul (add(pow (loadLocal varA) (loadLocal varB)) (loadLocal varC)) (div (loadLocal varD) (loadLocal varE)))
+			(list
+				(mul (add(pow (loadLocal varA) (loadLocal varB)) (loadLocal varC)) (div (loadLocal varD) (loadLocal varE)))
+				(mul (loadLocal varA) (loadLocal varB))
+			)
 		)
 	)
 )

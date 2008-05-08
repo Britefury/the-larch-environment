@@ -101,13 +101,13 @@ class ParserState (object):
 				return memoEntry.answer,  self.pos
 
 		
-	def _p_setup_lr(self, expression, l):
-		if l.head is None:
-			l.head = _Head( expression, set(), set() )
+	def _p_setup_lr(self, expression, lr):
+		if lr.head is None:
+			lr.head = _Head( expression, set(), set() )
 		s = self.lrStackTop()
-		while s.head != l.head:
-			s.head = l.head
-			l.head.involvedSet.add( s.rule )
+		while s.head != lr.head:
+			s.head = lr.head
+			lr.head.involvedSet.add( s.rule )
 			s = s.next
 				
 	

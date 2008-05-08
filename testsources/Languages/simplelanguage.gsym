@@ -203,6 +203,7 @@
 								( (pow (: @x ^) (: @y ^))   (  ($interact ($activeBorder ($scriptRSuper ($viewEval @x) ($hbox ($list (@operatorEditor <- @node @x @y "#'**") ($viewEval @y))))) (@exprInteractor <- @node))  )  )
 								( (loadLocal (: @x !))   (  ($interact ($activeBorder ($focus ($entry @x @x @tokeniser))) (@loadlLocalInteractor <- @node) (@exprInteractor <- @node))  )  )
 								( (nilExpr)   (  ($interact ($activeBorder ($focus ($entry "#'<expr>" "#'" @tokeniser @undefinedStyle)))  (@nilExprInteractor <- @node))  )  )
+								( (list (: @x *))   ($listView (@listViewLayoutVertical <- #0.0 #0.0 #45.0) "#'[" "#']" "#'," ($mapViewEval @x))  )
 							)
 						)
 					)
