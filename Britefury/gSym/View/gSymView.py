@@ -41,6 +41,7 @@ from Britefury.gSym.gMeta.GMetaComponent import GMetaComponent
 from Britefury.gSym.gSymStyleSheet import GSymStyleSheet
 from Britefury.gSym.View.Interactor import Interactor, NoEventMatch
 from Britefury.gSym.View.InteractorEvent import InteractorEventKey, InteractorEventTokenList
+from Britefury.gSym.View.ListView import WrappedListViewLayout, HorizontalListViewLayout, VerticalInlineListViewLayout, VerticalListViewLayout, listView
 
 from Britefury.gSym.RelativeNode import RelativeNode, relative
 
@@ -412,6 +413,21 @@ def _runtime_script(viewNodeInstance, mainChild, leftSuperChild, leftSubChild, r
 	_runtime_applyStyleSheetStack( viewNodeInstance, widget )
 	_runtime_applyStyle( style, widget )
 	return widget
+
+
+
+def _runtime_listview(viewNodeInstance, layout, beginDelim, endDelim, separatorFactory, children, style=None):
+	"""
+	Runtime - called by compiled code at run-time
+	Builds a list view.
+	@layout controls the layout
+	"""
+	widget, refreshCell = listView( viewNodeInstance.xs, children, layout, beginDelim, endDelim, separatorFactory )
+	viewNodeInstance.refreshCells.append( refreshCell )
+	_runtime_applyStyleSheetStack( viewNodeInstance, widget )
+	_runtime_applyStyle( style, widget )
+	return widget
+
 
 
 
@@ -877,6 +893,13 @@ class GMetaComponentView (GMetaComponent):
 				raiseCompilerError( GLispParameterListError, src, 'defineView: $scriptRSub needs at least 2 parameters; the main child, and the script child' )
 			return PyVar( '__gsym__script__' )( PyVar( '__view_node_instance_stack__' )[-1], compileSubExp( srcXs[1] ), None, None, None, compileSubExp( srcXs[2] ),
 						   *compileWidgetParams( srcXs[3:]) ).debug( srcXs )
+		elif name == '$listView':
+			#($listview <layout> <beginDelim> <endDelim> <separatorFactory> <child*> [<styleSheet>])
+			if len( srcXs ) < 3:
+				raiseCompilerError( GLispParameterListError, src, 'defineView: $scriptRSub needs at least 2 parameters; the main child, and the script child' )
+			return PyVar( '__gsym__listview__' )( PyVar( '__view_node_instance_stack__' )[-1],
+						compileSubExp( srcXs[1] ), compileSubExp( srcXs[2] ), compileSubExp( srcXs[3] ), compileSubExp( srcXs[4] ),
+						compileSubExp( srcXs[5] ), *compileWidgetParams( srcXs[6:]) ).debug( srcXs )
 		elif name == '$interact':
 			#($interact <child> <interactors*>)
 			if len( srcXs ) < 3:
@@ -906,6 +929,11 @@ class GMetaComponentView (GMetaComponent):
 			'__gsym__wrappedHBox__' : _runtime_wrappedHBox,
 			'__gsym__wrappedHBoxSep__' : _runtime_wrappedHBoxSep,
 			'__gsym__script__' : _runtime_script,
+			'__gsym__listview__' : _runtime_listview,
+			'listViewLayoutWrapped' : WrappedListViewLayout,
+			'listViewLayoutHorizontal' : HorizontalListViewLayout,
+			'listViewLayoutVerticalInline' : VerticalInlineListViewLayout,
+			'listViewLayoutVertical' : VerticalListViewLayout,
 			'__gsym__interact__' : _runtime_interact,
 			'__gsym__GSymStyleSheet__' : GSymStyleSheet,
 			'__gsym__RelativeNode__' : RelativeNode,
