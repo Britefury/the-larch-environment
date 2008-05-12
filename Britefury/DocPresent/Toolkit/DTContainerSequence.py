@@ -220,9 +220,9 @@ class DTContainerSequence (DTContainer):
 				return None
 		
 		for entry in entries:
-			last = entry.child.getLastCursorEntity()
-			if last is not None:
-				return last
+			first = entry.child.getFirstCursorEntity()
+			if first is not None:
+				return first
 		return None
 
 

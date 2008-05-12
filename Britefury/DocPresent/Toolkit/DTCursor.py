@@ -5,11 +5,29 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
+from Britefury.DocPresent.Toolkit.DTCursorEntity import DTCursorEntity
+
+
 class DTCursorLocation (object):
 	EDGE_LEADING = 0
 	EDGE_TRAILING = 1
 	
 	def __init__(self, cursorEntity, edge):
+		if edge == self.EDGE_LEADING:
+			if ( cursorEntity.edgeFlags & DTCursorEntity.EDGEFLAGS_LEADING )  ==  0:
+				prev = cursorEntity.prev
+				if prev is not None  and  ( prev.edgeFlags & DTCursorEntity.EDGEFLAGS_TRAILING ) != 0:
+					cursorEntity = prev
+					edge = self.EDGE_TRAILING
+		elif edge == self.EDGE_TRAILING:
+			if ( cursorEntity.edgeFlags & DTCursorEntity.EDGEFLAGS_TRAILING )  ==  0:
+				next = cursorEntity.next
+				if next is not None  and  ( next.edgeFlags & DTCursorEntity.EDGEFLAGS_LEADING ) != 0:
+					cursorEntity = next
+					edge = self.EDGE_LEADING
+		else:
+			raise ValueError, 'invalid edge'
+		
 		self.cursorEntity = cursorEntity
 		self.edge = edge
 
@@ -39,7 +57,7 @@ class DTCursor (object):
 			
 	def _f_widgetNotifyOfLocationChange(self, location):
 		self._location = location
-		if self._bCurrent  and  self._document is not None:
+		if self._document is not None:
 			self._document._f_cursorLocationNotify( self, True )
 			
 	def _f_widgetUnrealiseNotify(self):

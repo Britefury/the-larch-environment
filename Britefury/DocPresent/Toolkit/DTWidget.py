@@ -91,6 +91,11 @@ class DTWidget (object):
 		state: modifier key state at drop
 	Invoked against the destination to send drag data.
 	"""
+	
+	
+	CURSORMOVEMENT_MOVE = 1
+	CURSORMOVEMENT_DRAG = 2
+	
 
 	def __init__(self):
 		super( DTWidget, self ).__init__()
@@ -350,7 +355,7 @@ class DTWidget (object):
 	def _o_onCursorLeave(self):
 		self._cursor = None
 
-	def _o_onCursorMotion(self, cursor):
+	def _o_onCursorMotion(self, cursor, mode):
 		pass
 
 	def _o_onRealise(self, context, pangoContext):
@@ -473,8 +478,8 @@ class DTWidget (object):
 	def _f_evCursorLeave(self):
 		self._o_onCursorLeave()
 
-	def _f_evCursorMotion(self, cursor):
-		self._o_onCursorMotion( cursor )
+	def _f_evCursorMotion(self, cursor, mode):
+		self._o_onCursorMotion( cursor, mode )
 
 	def _f_evRealise(self, context, pangoContext):
 		self._realiseContext = context

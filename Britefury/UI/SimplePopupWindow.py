@@ -28,22 +28,22 @@ class SimplePopupWindow (object):
 
 
 
-	def popupAtWidget(self, atWidget, relativeX, relativeY, width, height, popupMode):
+	def popupAtWidget(self, document, relativeX, relativeY, width, height, popupMode):
 		if not self._bVisible:
-			atGtkWidget = atWidget.getGtkWidget()
+			docGtkWidget = document.getGtkWidget()
 			# Get the position of the GDK window used for @belowWidget
-			srcOriginX, srcOriginY = atGtkWidget.window.get_origin()
+			srcOriginX, srcOriginY = docGtkWidget.window.get_origin()
 
 			# Get the requested size of the popup window
 			winWidth, winHeight = self._window.size_request()
 
 			# Compute the desired position
-			posX = srcOriginX  +  atWidget.allocation.x  +  relativeX
-			posY = srcOriginY  +  atWidget.allocation.y  +  relativeY
+			posX = srcOriginX  +  relativeX
+			posY = srcOriginY  +  relativeY
 
 
 			# Get the screen from @belowWidget
-			screen = atGtkWidget.get_screen()
+			screen = docGtkWidget.get_screen()
 
 			# Get the screen dimensions
 			screenWidth = screen.get_width()
@@ -62,7 +62,7 @@ class SimplePopupWindow (object):
 				posY = max( screenHeight - winHeight, 0 )
 
 			# Position the window
-			self._window.move( posX, posY )
+			self._window.move( int( posX ), int( posY ) )
 
 
 
