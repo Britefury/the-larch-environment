@@ -31,6 +31,13 @@ from Britefury.DocPresent.Toolkit.DTContainer import DTContainer
 
 
 
+_CURSORSYSTEM_WIDGET = 1
+_CURSORSYSTEM_DOCUMENT = 2
+
+_CURSORSYSTEM = _CURSORSYSTEM_DOCUMENT
+
+
+
 """
 Keyboard focus handling:
 
@@ -149,14 +156,15 @@ class DTDocument (DTBin):
 		self._immediateEvents = []
 		
 		# Cursor entities for the start and end of the document
-		self._firstCursorEntity = DTCursorEntity( self )
-		self._lastCursorEntity = DTCursorEntity( self )
+		self._firstCursorEntity = DTCursorEntity( self, DTCursorEntity.EDGEFLAGS_TRAILING, identity='<DOCFIRST>' )
+		self._lastCursorEntity = DTCursorEntity( self, DTCursorEntity.EDGEFLAGS_LEADING, identity='<DOCLAST>' )
 		self._firstCursorEntity.next = self._lastCursorEntity
 		
 		# Cursor management
 		self._mainCursor = DTCursor( self, DTCursorLocation( self._firstCursorEntity, DTCursorLocation.EDGE_TRAILING ) )
 		self._prevCursor = None
 		self._nextCursor = None
+		self._cursorMode = self.CURSORMOVEMENT_MOVE
 		self._cursorWidget = None
 		self._oldCursorSegment = None
 		self._cursorSegment = None
@@ -211,6 +219,10 @@ class DTDocument (DTBin):
 
 	def _p_docSpaceSizeToWindowSpace(self, d):
 		return d  *  self._docScaleInWindowCoords
+	
+	
+	def getPointInWindowCoords(self, pointInDocCoords):
+		return self._p_docSpaceToWindowSpace( pointInDocCoords )
 	
 	
 	def oneToOne(self):
@@ -401,7 +413,7 @@ class DTDocument (DTBin):
 		context.translate( -self._docWindowTopLeftCornerInDocSpace.x, -self._docWindowTopLeftCornerInDocSpace.y )
 
 		self._f_draw( context, BBox2( topLeftDocSpace, bottomRightDocSpace ) )
-		#self._p_drawCursor( context )
+		self._p_drawCursor( context )
 		
 		context.restore()
 		
@@ -571,13 +583,29 @@ class DTDocument (DTBin):
 			self._p_emitImmediateEvents()
 			return True
 		else:
-			if self._keyboardFocusTarget is not None:
-				self._keyboardFocusTarget._o_onKeyPress( keyEvent )
-				self._p_emitImmediateEvents()
-				return True
+			if _CURSORSYSTEM == _CURSORSYSTEM_WIDGET:
+				if self._keyboardFocusTarget is not None:
+					self._keyboardFocusTarget._o_onKeyPress( keyEvent )
+					self._p_emitImmediateEvents()
+					return True
+				else:
+					self._p_emitImmediateEvents()
+					return False
+			elif _CURSORSYSTEM == _CURSORSYSTEM_DOCUMENT:
+				self._p_updateCursors()
+				loc = self._mainCursor.location
+				widget = loc.cursorEntity.widget
+				if widget is not None:
+					widget._o_onKeyPress( keyEvent )
+					self._p_emitImmediateEvents()
+					return True
+				else:
+					self._p_emitImmediateEvents()
+					return False
 			else:
-				self._p_emitImmediateEvents()
-				return False
+				raise ValueError
+				
+
 
 
 	def do_key_release_event(self, event):
@@ -590,13 +618,27 @@ class DTDocument (DTBin):
 			self._p_emitImmediateEvents()
 			return True
 		else:
-			if self._keyboardFocusTarget is not None:
-				self._keyboardFocusTarget._o_onKeyRelease( keyEvent )
-				self._p_emitImmediateEvents()
-				return True
+			if _CURSORSYSTEM == _CURSORSYSTEM_WIDGET:
+				if self._keyboardFocusTarget is not None:
+					self._keyboardFocusTarget._o_onKeyRelease( keyEvent )
+					self._p_emitImmediateEvents()
+					return True
+				else:
+					self._p_emitImmediateEvents()
+					return False
+			elif _CURSORSYSTEM == _CURSORSYSTEM_DOCUMENT:
+				self._p_updateCursors()
+				loc = self._mainCursor.location
+				widget = loc.cursorEntity.widget
+				if widget is not None:
+					widget._o_onKeyRelease( keyEvent )
+					self._p_emitImmediateEvents()
+					return True
+				else:
+					self._p_emitImmediateEvents()
+					return False
 			else:
-				self._p_emitImmediateEvents()
-				return False
+				raise ValueError
 
 
 
@@ -656,12 +698,12 @@ class DTDocument (DTBin):
 	
 			if cursor is self._mainCursor:
 				self._prevCursor = parent._f_getPrevCursorEntityBeforeChild( widget )
-				self._nextCursor = parent._f_getNextCursorEntityBeforeChild( widget )
+				self._nextCursor = parent._f_getNextCursorEntityAfterChild( widget )
 				self._p_mainCursorChanged()
 			elif cursor is self._prevCursor:
 				self._prevCursor = parent._f_getPrevCursorEntityBeforeChild( widget )
 			elif cursor is self._nextCursor:
-				self._nextCursor = parent._f_getPrevCursorEntityBeforeChild( widget )
+				self._nextCursor = parent._f_getNextCursorEntityAfterChild( widget )
 			
 			
 		
@@ -704,7 +746,7 @@ class DTDocument (DTBin):
 			if self._cursorWidget is not None:
 				self._cursorWidget._f_evCursorEnter( self._mainCursor )
 		else:
-			widget._f_evCursorMotion( self._mainCursor )
+			widget._f_evCursorMotion( self._mainCursor, self._cursorMode )
 		
 			
 		
@@ -725,7 +767,7 @@ class DTDocument (DTBin):
 		# HACK
 		# HACK
 		# HACK
-		#self._drawingArea.queue_draw()
+		self._drawingArea.queue_draw()
 		# HACK
 		# HACK
 		# HACK
@@ -771,51 +813,79 @@ class DTDocument (DTBin):
 		
 		
 	#
-	# FOCUS NAVIGATION METHODS
+	# CURSOR NAVIGATION METHODS
 	#
 	
-	def _p_cursorLeft(self):
+	def _p_cursorLeft(self, mode):
 		self._p_updateCursors()
 		loc = self._mainCursor.location
+		oldMode = self._cursorMode
+		self._cursorMode = mode
 		if loc.edge == DTCursorLocation.EDGE_TRAILING:
 			self._mainCursor.location = DTCursorLocation( loc.cursorEntity, DTCursorLocation.EDGE_LEADING )
 		else:
 			if loc.cursorEntity is not self._firstCursorEntity:
 				self._mainCursor.location = DTCursorLocation( loc.cursorEntity.prev, DTCursorLocation.EDGE_LEADING )
+		self._cursorMode = oldMode
 		
-	def _p_cursorRight(self):
+	def _p_cursorRight(self, mode):
 		self._p_updateCursors()
 		loc = self._mainCursor.location
+		oldMode = self._cursorMode
+		self._cursorMode = mode
 		if loc.edge == DTCursorLocation.EDGE_LEADING:
 			self._mainCursor.location = DTCursorLocation( loc.cursorEntity, DTCursorLocation.EDGE_TRAILING )
 		else:
 			if loc.cursorEntity is not self._lastCursorEntity:
 				self._mainCursor.location = DTCursorLocation( loc.cursorEntity.next, DTCursorLocation.EDGE_TRAILING )
+		self._cursorMode = oldMode
 	
-	def _p_cursorUp(self):
+	def _p_cursorUp(self, mode):
 		pass
 	
-	def _p_cursorDown(self):
+	def _p_cursorDown(self, mode):
 		pass
+	
+	
+	
+	def _f_setCursorLocation(self, loc):
+		self._mainCursor.location = loc
+		
 
 
 
+	#
+	# FOCUS NAVIGATION METHODS
+	#
+	
 	def _o_handleDocumentKeyPress(self, event):
 		if event.keyVal in [ gtk.keysyms.Left, gtk.keysyms.Right, gtk.keysyms.Up, gtk.keysyms.Down, gtk.keysyms.Home, gtk.keysyms.End ]:
-			if self._keyboardFocusTarget is not None:
-				if self._keyboardFocusTarget._f_handleMotionKeyPress( event ):
-					return True
-				else:
-					if event.keyVal == gtk.keysyms.Left:
-						self._keyboardFocusTarget.cursorLeft()
-					elif event.keyVal == gtk.keysyms.Right:
-						self._keyboardFocusTarget.cursorRight()
-					elif event.keyVal == gtk.keysyms.Up:
-						self._keyboardFocusTarget.cursorUp()
-					elif event.keyVal == gtk.keysyms.Down:
-						self._keyboardFocusTarget.cursorDown()
-					return True
-			return True
+			if _CURSORSYSTEM == _CURSORSYSTEM_WIDGET:
+				if self._keyboardFocusTarget is not None:
+					if self._keyboardFocusTarget._f_handleMotionKeyPress( event ):
+						return True
+					else:
+						if event.keyVal == gtk.keysyms.Left:
+							self._keyboardFocusTarget.cursorLeft()
+						elif event.keyVal == gtk.keysyms.Right:
+							self._keyboardFocusTarget.cursorRight()
+						elif event.keyVal == gtk.keysyms.Up:
+							self._keyboardFocusTarget.cursorUp()
+						elif event.keyVal == gtk.keysyms.Down:
+							self._keyboardFocusTarget.cursorDown()
+						return True
+				return True
+			elif _CURSORSYSTEM == _CURSORSYSTEM_DOCUMENT:
+				mode = self.CURSORMOVEMENT_DRAG   if event.state == gtk.gdk.SHIFT_MASK   else self.CURSORMOVEMENT_MOVE
+				if event.keyVal == gtk.keysyms.Left:
+					self._p_cursorLeft( mode )
+				elif event.keyVal == gtk.keysyms.Right:
+					self._p_cursorRight( mode )
+				elif event.keyVal == gtk.keysyms.Up:
+					self._p_cursorUp( mode )
+				elif event.keyVal == gtk.keysyms.Down:
+					self._p_cursorDown( mode )
+				return True
 		else:
 			return False
 
@@ -976,5 +1046,5 @@ if __name__ == '__main__':
 
 	window.add( box )
 	window.show()
-
+	
 	gtk.main()

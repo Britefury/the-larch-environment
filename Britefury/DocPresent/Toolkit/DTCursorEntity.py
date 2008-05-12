@@ -42,12 +42,18 @@ DTContainer._o_getNextCursorEntityAfterChild(child)  ->  INTERNAL HELPER METHOD;
 
 
 class DTCursorEntity (object):
-	__slots__ = [ '_prev', '_next', 'widget' ]
+	__slots__ = [ '_prev', '_next', 'widget', 'identity', 'edgeFlags' ]
 	
-	def __init__(self, widget):
+	EDGEFLAGS_LEADING = 0x1
+	EDGEFLAGS_TRAILING = 0x2
+	EDGEFLAGS_ALL_ = EDGEFLAGS_LEADING | EDGEFLAGS_TRAILING
+	
+	def __init__(self, widget, edgeFlags=EDGEFLAGS_ALL_, identity=None):
 		self._prev = None
 		self._next = None
 		self.widget = widget
+		self.edgeFlags = edgeFlags
+		self.identity = identity
 		
 		
 
@@ -118,6 +124,13 @@ class DTCursorEntity (object):
 			return xs[0], xs[-1]
 		else:
 			return None, None
+		
+		
+	def __str__(self):
+		return 'DTCursorEntity[%d](%s,%s)'  %  ( id(self), self.widget, self.identity )
+	
+	def __repr__(self):
+		return 'DTCursorEntity[%d](%s,%s)'  %  ( id(self), self.widget, self.identity )
 	
 	
 	
