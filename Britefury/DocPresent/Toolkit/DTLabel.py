@@ -17,6 +17,8 @@ from Britefury.Math.Math import Colour3f, Vector2, Point2, Segment2
 from Britefury.DocPresent.Toolkit.DTCursor import DTCursorLocation
 from Britefury.DocPresent.Toolkit.DTSimpleStaticWidget import DTSimpleStaticWidget
 
+from Britefury.DocPresent.Util.DUTextLayout import DUTextLayout
+
 
 
 class DTLabel (DTSimpleStaticWidget):
@@ -41,21 +43,14 @@ class DTLabel (DTSimpleStaticWidget):
 
 		if font is None:
 			font = 'Sans 11'
+			
+		self._layout = DUTextLayout( text, bUseMarkup, font, colour )
+		self._layout.evRequestRedraw = self._o_queueFullRedraw
+		self._layout.evRequestResize = self._p_onResizeRequest
 
-		self._text = text
-		self._bUseMarkup = bUseMarkup
-
-		self._fontString = font
-		self._fontDescription = pango.FontDescription( font )
-		self._layout = None
-		self._layoutContext = None
-
-		self._bLayoutNeedsRefresh = True
-		self._colour = colour
 		self._hAlign = hAlign
 		self._vAlign = vAlign
-		self._textPosition = Vector2()
-		self._textSize = Vector2()
+		self._textPosition = None
 
 		self._o_queueResize()
 
@@ -63,51 +58,43 @@ class DTLabel (DTSimpleStaticWidget):
 
 	def setText(self, text):
 		assert text is None  or  isinstance( text, str )  or  isinstance( text, unicode )
-		self._text = text
-		self._bLayoutNeedsRefresh = True
-		self._o_queueResize()
+		self._layout.setText( text )
 
 	def getText(self):
-		return self._text
+		return self._layout.getText()
 
 
 	def useMarkup(self):
-		self.setUseMarkup( True )
+		self._layout.useMarkup()
 		
 	def usePlaintext(self):
-		self.setUseMarkup( False )
+		self._layout.usePlaintext()
 
 	def setUseMarkup(self, bUseMarkup):
-		self._bUseMarkup = bUseMarkup
-		self._bLayoutNeedsRefresh = True
-		self._o_queueResize()
+		self._layout.setUseMarkup( bUseMarkup )
 
 	def getUseMarkup(self):
-		return self._bUseMarkup
+		return self._layout.getUseMarkup()
 
 
 	def setFont(self, font):
-		self._fontString = font
-		self._fontDescription = pango.FontDescription( font )
-		self._font = None
-		self._o_queueResize()
+		self._layout.setFont( font )
 
 	def getFont(self):
-		return self._fontString
+		return self._layout.getFont()
 
 
 	def setColour(self, colour):
-		self._colour = colour
-		self._o_queueFullRedraw()
+		self._layout.setColour( colour )
 
 	def getColour(self):
-		return self._colour
+		return self._layout.getColour()
 
 
 
 	def setHAlign(self, hAlign):
 		self._hAlign = hAlign
-		self._o_refreshTextPosition()
+		self._textPosition = None
 		self._o_queueFullRedraw()
 
 	def getHAlign(self):
@@ -117,65 +104,44 @@ class DTLabel (DTSimpleStaticWidget):
 
 	def setVAlign(self, vAlign):
 		self._vAlign = vAlign
-		self._o_refreshTextPosition()
+		self._textPosition = None
 		self._o_queueFullRedraw()
 
 	def getVAlign(self):
 		return self._vAlign
-
-
+	
+	
 	def getCharacterIndexAt(self, point):
-		self._p_refreshLayout()
-		pointInLayout = point - self._textPosition
-		index, trailing = self._layout.xy_to_index( int( pointInLayout.x * pango.SCALE ), int( pointInLayout.y * pango.SCALE ) )
-		return index
+		return self._layout.getCharacterIndexAt( point - self._p_getTextPosition() )
 
 
 	def getCharacterIndexAtX(self, x):
-		y = self._textPosition.y + self._textSize.y * 0.5
+		y = self._p_getTextPosition().y + self._textSize.y * 0.5
 		return self.getCharacterIndexAt( Point2( x, y ) )
 
 
 	def getCursorIndexAt(self, point):
-		self._p_refreshLayout()
-		pointInLayout = point - self._textPosition
-		index, trailing = self._layout.xy_to_index( int( pointInLayout.x * pango.SCALE ), int( pointInLayout.y * pango.SCALE ) )
-		return index + trailing
+		return self._layout.getCursorIndexAt( point - self._p_getTextPosition() )
 
 
 	def getCursorIndexAtX(self, x):
-		y = self._textPosition.y + self._textSize.y * 0.5
+		y = self._p_getTextPosition().y + self._textSize.y * 0.5
 		return self.getCursorIndexAt( Point2( x, y ) )
 
-
-	def _p_refreshLayout(self):
-		if self._bLayoutNeedsRefresh  and  self._layout is not None:
-			self._layout.set_font_description( self._fontDescription )
-			if self._bUseMarkup:
-				self._layout.set_markup( self._text )
-			else:
-				self._layout.set_text( self._text )
-			self._bLayoutNeedsRefresh = False
 
 
 	def _o_onRealise(self, context, pangoContext):
 		super( DTLabel, self )._o_onRealise( context, pangoContext )
-		if context is not self._layoutContext:
-			self._layoutContext = context
-			self._layout = context.create_layout()
-			self._layout.set_font_description( self._fontDescription )
-			self._bLayoutNeedsRefresh = True
+		self._layout.initialise( context )
 
 
 
 	def _o_draw(self, context):
 		super( DTLabel, self )._o_draw( context )
 		self._o_clipIfAllocationInsufficient( context )
-		self._p_refreshLayout()
-		context.set_source_rgb( self._colour.r, self._colour.g, self._colour.b )
-		context.move_to( self._textPosition.x, self._textPosition.y )
-		context.update_layout( self._layout )
-		context.show_layout( self._layout )
+		pos = self._p_getTextPosition()
+		context.move_to( pos.x, pos.y )
+		self._layout.draw( context )
 
 
 	def _o_onSetScale(self, scale, rootScale):
@@ -183,53 +149,46 @@ class DTLabel (DTSimpleStaticWidget):
 		if context is not None:
 			context.save()
 			context.scale( rootScale, rootScale )
-			context.update_layout( self._layout )
+			self._layout.update( context )
 			context.restore()
 
 
 	def _o_getRequiredWidth(self):
-		self._p_refreshLayout()
-		return self._layout.get_pixel_size()[0]  +  2.0
+		return self._layout.getSize().x + 2.0
 
 	def _o_getRequiredHeightAndBaseline(self):
-		self._p_refreshLayout()
-		height = self._layout.get_pixel_size()[1]
-		baseline = height  -  self._layout.get_iter().get_baseline() / float(pango.SCALE)
-		return height  +  2.0,  baseline + 1.0
+		return self._layout.getSize().y + 2.0, self._layout.getBaseline() + 1.0
 
-
-	def _o_onAllocateY(self, allocation):
-		super( DTLabel, self )._o_onAllocateY( allocation )
-		self._p_refreshLayout()
-
-		self._textSize = Vector2( *self._layout.get_pixel_size() )
-
-		self._o_refreshTextPosition()
-
-
-	def _o_refreshTextPosition(self):
-		if self._hAlign == self.HALIGN_LEFT:
-			x = 0.0
-		elif self._hAlign == self.HALIGN_CENTRE:
-			x = ( self._allocation.x - self._textSize.x ) * 0.5
-		elif self._hAlign == self.HALIGN_RIGHT:
-			x = self._allocation.x - self._textSize.x
-
-		if self._vAlign == self.VALIGN_TOP:
-			y = 0.0
-		elif self._vAlign == self.VALIGN_CENTRE:
-			y = ( self._allocation.y - self._textSize.y ) * 0.5
-		elif self._vAlign == self.VALIGN_BOTTOM:
-			y = self._allocation.y - self._textSize.y
-
-		self._textPosition = Vector2( x, y )  +  Vector2( 1.0, 1.0 )
-
-
-	def _p_onFontChanged(self):
-		self._o_queueResize()
 
 
 		
+	def _p_getTextPosition(self):
+		if self._textPosition is None:
+			size = self._layout.getSize()
+			if self._hAlign == self.HALIGN_LEFT:
+				x = 0.0
+			elif self._hAlign == self.HALIGN_CENTRE:
+				x = ( self._allocation.x - size.x ) * 0.5
+			elif self._hAlign == self.HALIGN_RIGHT:
+				x = self._allocation.x - size.x
+	
+			if self._vAlign == self.VALIGN_TOP:
+				y = 0.0
+			elif self._vAlign == self.VALIGN_CENTRE:
+				y = ( self._allocation.y - size.y ) * 0.5
+			elif self._vAlign == self.VALIGN_BOTTOM:
+				y = self._allocation.y - size.y
+	
+			self._textPosition = Vector2( x, y )  +  Vector2( 1.0, 1.0 )
+		return self._textPosition
+	
+	
+	def _p_onResizeRequest(self):
+		self._textPosition = None
+		self._o_queueResize()
+
+
+
 		
 	#
 	# CURSOR POSITIONING METHODS

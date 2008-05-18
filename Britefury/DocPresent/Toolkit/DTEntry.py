@@ -24,6 +24,8 @@ from Britefury.DocPresent.Toolkit.DTCursorEntity import DTCursorEntity
 from Britefury.DocPresent.Toolkit.DTWidget import DTWidget
 from Britefury.DocPresent.Toolkit.DTAutoCompleteDropDown import DTAutoCompleteDropDown
 
+from Britefury.DocPresent.Util.DUTextLayout import DUTextLayout
+
 
 
 _modKeysMask = ( gtk.gdk.SHIFT_MASK | gtk.gdk.CONTROL_MASK | gtk.gdk.MOD1_MASK )
@@ -31,6 +33,59 @@ _modKeysMask = ( gtk.gdk.SHIFT_MASK | gtk.gdk.CONTROL_MASK | gtk.gdk.MOD1_MASK )
 
 
 
+class _EntryTextSizeAllocator (object):
+	def __init__(self, layout):
+		self._layout = layout
+		self._allocatedSize = None
+		
+		self._layout.evRequestResize = self._p_onRequestResize
+		
+		self.evRequestResize = None
+		self.evRequestRedraw = None
+		
+		
+	def getSize(self):
+		if self._allocatedSize is None:
+			self._allocatedSize = self._layout.getSize()
+		return self._allocatedSize
+	
+	
+	def reset(self):
+		self._allocatedSize = None
+		if self.evRequestResize is not None:
+			self.evRequestResize()
+
+		
+		
+	def _p_onRequestResize(self):
+		bResizeRequired = False
+		if self._allocatedSize is None:
+			self._allocatedSize = self._layout.getSize()
+			bResizeRequired = True
+		else:
+			size = self._layout.getSize()
+			assert size.y == self._allocatedSize.y
+			bufferZone = size.y * 3.0
+			
+			
+			if size.x  <  self._allocatedSize.x - bufferZone * 2.0:
+				self._allocatedSize.x = size.x
+				bResizeRequired = True
+			elif size.x  >  self._allocatedSize.x:
+				self._allocatedSize.x = size.x + bufferZone
+				bResizeRequired = True
+			
+		if bResizeRequired:
+			if self.evRequestResize is not None:
+				self.evRequestResize()
+		else:
+			if self.evRequestRedraw is not None:
+				self.evRequestRedraw()
+		
+			
+
+			
+			
 
 class DTEntry (DTWidget):
 	returnSignal = ClassSignal()       				# ( entry )
@@ -46,20 +101,10 @@ class DTEntry (DTWidget):
 
 		self.keyHandler = None
 		self.bEditable = True
+		
+		
 		self._text = text
-
-		self._fontString = font
-		self._fontDescription = pango.FontDescription( font )
-
-		self._layout = None
-		self._preSelectionLayout = None
-		self._selectionLayout = None
-		self._postSelectionLayout = None
-		self._layoutContext = None
-
-		self._bLayoutNeedsRefresh = True
-		self._bSelectionLayoutsNeedRefresh = True
-
+		
 		self._borderWidth = borderWidth
 		self._backgroundColour = backgroundColour
 		self._highlightedBackgroundColour = highlightedBackgroundColour
@@ -67,11 +112,14 @@ class DTEntry (DTWidget):
 		self._highlightedTextColour = highlightedTextColour
 		self._borderColour = borderColour
 
-		self._textSize = None
-		self._entrySize = Vector2()
-		self._entryPosition = Vector2()
-		self._textRoot = Vector2()
+		self._layout = DUTextLayout( text, False, font )
+		self._sizeAllocator = _EntryTextSizeAllocator( self._layout )
+		self._layout.evRequestRedraw = self._o_queueFullRedraw
+		self._sizeAllocator.evRequestResize = self._o_queueResize
+		self._sizeAllocator.evRequestRedraw = self._o_queueFullRedraw
+
 		self._textPosition = Vector2()
+		self._entryPosition = Vector2()
 		self._cursorIndex = 0
 		self._selectionBounds = None
 		self._bButtonPressed = False
@@ -97,22 +145,19 @@ class DTEntry (DTWidget):
 			self._p_rebuildCursorEntityList()
 			if self._bHasFocus:
 				self._cursorIndex = min( self._cursorIndex, len( self._text ) )
-			self._p_textChanged()
-			self._o_queueResize()
+			self._sizeAllocator.reset()
+			self._layout.setText( text )
 
 	def getText(self):
 		return self._text
 
 
 	def setFont(self, font):
-		self._fontString = font
-		self._fontDescription = pango.FontDescription( font )
-		self._textSize = None
-		self._bLayoutNeedsRefresh = True
-		self._o_queueResize()
+		self._sizeAllocator.reset()
+		self._layout.setFont( font )
 
 	def getFont(self):
-		return self._fontString
+		return self._layout.getFont()
 
 
 
@@ -197,31 +242,26 @@ class DTEntry (DTWidget):
 		return self._cursorIndex == len( self._text )
 
 	def getCursorPosition(self):
-		charRect = self._layout.index_to_pos( self._cursorIndex )
-		layoutPoint = Point2( float( charRect[0] ) / pango.SCALE,  ( float( charRect[1] )  +  float( charRect[3] ) * 0.5 )  /  pango.SCALE )
-		return layoutPoint + self._textPosition
+		pos, size = self._layout.getCharacterRectangle( self._cursorIndex )
+		return Point2( pos.x, pos.y  +  size.y * 0.5 )
 
 
 
 	def getCharacterIndexAt(self, point):
-		pointInLayout = point - self._textPosition
-		index, trailing = self._layout.xy_to_index( int( pointInLayout.x * pango.SCALE ), int( pointInLayout.y * pango.SCALE ) )
-		return index
+		return self._layout.getCharacterIndexAt( point - self._p_getTextPosition() )
 
 
 	def getCharacterIndexAtX(self, x):
-		y = self._textPosition.y + self._layout.get_pixel_size() * 0.5
+		y = self._p_getTextPosition().y + self._textSize.y * 0.5
 		return self.getCharacterIndexAt( Point2( x, y ) )
 
 
 	def getCursorIndexAt(self, point):
-		pointInLayout = point - self._textPosition
-		index, trailing = self._layout.xy_to_index( int( pointInLayout.x * pango.SCALE ), int( pointInLayout.y * pango.SCALE ) )
-		return index + trailing
+		return self._layout.getCursorIndexAt( point - self._p_getTextPosition() )
 
 
 	def getCursorIndexAtX(self, x):
-		y = self._textPosition.y + self._layout.get_pixel_size() * 0.5
+		y = self._p_getTextPosition().y + self._textSize.y * 0.5
 		return self.getCursorIndexAt( Point2( x, y ) )
 
 
@@ -231,37 +271,39 @@ class DTEntry (DTWidget):
 		self._autoCompleteList = autoCompleteList
 
 
+		
+	def _p_setText(self, text):
+		self._text = text
+		self._layout.setText( text )
 
 
 	def _p_displayAutoComplete(self):
 		if self._autoCompleteList is not None:
 			filtered = [ text   for text in self._autoCompleteList   if text.startswith( self._text ) ]
 			bEmpty = len( filtered ) == 0
+			
+			entrySize = self._p_getEntrySize()
 
 			if bEmpty:
 				self._autoCompleteDropDown.hide()
 			else:
 				self._autoCompleteDropDown.setAutoCompleteList( filtered )
 				if not self._autoCompleteDropDown.isVisible():
-					self._autoCompleteDropDown.showAt( self, Point2( self._entryPosition.x, self._entryPosition.y + self._entrySize.y ) )
+					self._autoCompleteDropDown.showAt( self, Point2( self._entryPosition.x, self._entryPosition.y + entrySize.y ) )
 
 
 
 
+	def _p_getTextSize(self):
+		return self._sizeAllocator.getSize()
+	
+	
+	def _p_getEntrySize(self):
+		return self._p_getTextSize()  +  Vector2( self._borderWidth * 2.0, self._borderWidth * 2.0 )
+		
+
+		
 	def _p_onTextModified(self):
-		self._bLayoutNeedsRefresh = True
-		self._bSelectionLayoutsNeedRefresh = True
-		if self._textSize is None:
-			self._p_computeTextSize()
-		else:
-			self._p_refreshLayout()
-			x, y = self._layout.get_pixel_size()
-			bufferZoneWidth = y * 3.0
-			if x > self._textSize.x  or  x < ( self._textSize.x - ( bufferZoneWidth * 2.0 ) ):
-				self._textSize = Vector2( x + bufferZoneWidth,  y )
-				self._entrySize = self._textSize  +  Vector2( self._borderWidth * 2.0, self._borderWidth * 2.0 )
-				self._o_queueResize()
-		self._o_queueFullRedraw()
 		if not self._bAutoCompleteDisabled:
 			self._p_displayAutoComplete()
 
@@ -293,7 +335,7 @@ class DTEntry (DTWidget):
 		end = max( self._selectionBounds )
 		if end > start:
 			textDeleted = self._text[start:end]
-			self._text = self._text[:start] + self._text[end:]
+			self._p_setText( self._text[:start] + self._text[end:] )
 			# Update cursor entities
 			# de-link cursor entities in range
 			DTCursorEntity.remove( self._cursorEntities[start], self._cursorEntities[end-1] )
@@ -305,25 +347,13 @@ class DTEntry (DTWidget):
 
 
 
-	def _p_textPosToTextLocation(self, textX):
-		layoutSize = self._layout.get_pixel_size()
-		textY = layoutSize[1] * 0.5
-		index, trailing = self._layout.xy_to_index( int( textX * pango.SCALE ), int( textY * pango.SCALE ) )
-		return index + trailing
-
-
-
-	def _p_localPosToTextLocation(self, localPos):
-		return self._p_textPosToTextLocation( localPos.x - self._textRoot.x )
-
-
 	def _o_onButtonDown(self, localPos, button, state):
 		super( DTEntry, self )._o_onButtonDown( localPos, button, state )
 		if button == 1:
 			self.grabFocus()
 			self._bButtonPressed = True
-			loc = self._p_localPosToTextLocation( localPos )
-			self._p_moveCursor( False, loc )
+			index = self._layout.getCursorIndexAt( localPos - self._textPosition )
+			self._p_moveCursor( False, index )
 		return True
 
 
@@ -346,13 +376,13 @@ class DTEntry (DTWidget):
 	def _o_onMotion(self, localPos):
 		super( DTEntry, self )._o_onMotion( localPos )
 		if self._bButtonPressed:
-			loc = self._p_localPosToTextLocation( localPos )
-			self._p_moveCursor( True, loc )
+			index = self._layout.getCursorIndexAt( localPos - self._textPosition )
+			self._p_moveCursor( True, index )
 
 
 	def _p_onAutoComplete(self, autoComplete, text):
 		deletedText = self._text
-		self._text = text
+		self._p_setText( text )
 		self._p_setSelectionBounds( None )
 		self._p_rebuildCursorEntityList()
 		self.textDeletedSignal.emit( self, 0, len( deletedText ), deletedText )
@@ -363,63 +393,6 @@ class DTEntry (DTWidget):
 
 	def _p_onAutoCompleteDismissed(self, autoComplete):
 		self._bAutoCompleteDisabled = True
-
-
-	def _p_computeTextAfterDeletingSelection(self):
-		if self._selectionBounds is not None:
-			i = min( self._selectionBounds )
-			j = max( self._selectionBounds )
-			# Remove the selected text
-			return self._text[:i] + self._text[j:]
-		else:
-			return self._text
-
-
-	def _p_computeTextAfterDelete(self):
-		text = self._text
-		cursorLoc = self._cursorIndex
-		if self._selectionBounds is not None:
-			i = min( self._selectionBounds )
-			j = max( self._selectionBounds )
-			# Remove the selected text
-			text = text[:i] + text[j:]
-			cursorLoc = i
-		if cursorLoc  <  len( text ) - 1:
-			# Delete a character
-			return text[:cursorLoc] + text[cursorLoc+1:]
-		else:
-			return text
-
-
-
-	def _p_computeTextAfterBackspace(self):
-		text = self._text
-		cursorLoc = self._cursorIndex
-		if self._selectionBounds is not None:
-			i = min( self._selectionBounds )
-			j = max( self._selectionBounds )
-			# Remove the selected text
-			text = text[:i] + text[j:]
-			cursorLoc = i
-		if cursorLoc > 0:
-			# Delete a character
-			return text[:cursorLoc-1] + text[cursorLoc:]
-		else:
-			return text
-
-
-
-	def _p_computeTextAfterReplacingSelection(self, replacement):
-		text = self._text
-		cursorLoc = self._cursorIndex
-		if self._selectionBounds is not None:
-			i = min( self._selectionBounds )
-			j = max( self._selectionBounds )
-			# Remove the selected text
-			text = text[:i] + text[j:]
-			cursorLoc = i
-		# Insert the string
-		return text[:cursorLoc] + replacement + text[cursorLoc:]
 
 
 
@@ -471,7 +444,7 @@ class DTEntry (DTWidget):
 				DTCursorEntity.remove( self._cursorEntities[self._cursorIndex-1], self._cursorEntities[self._cursorIndex-1] )
 				del self._cursorEntities[self._cursorIndex-1]
 				textDeleted = self._text[self._cursorIndex-1:self._cursorIndex]
-				self._text = self._text[:self._cursorIndex-1] + self._text[self._cursorIndex:]
+				self._p_setText( self._text[:self._cursorIndex-1] + self._text[self._cursorIndex:] )
 				self._cursorIndex -= 1
 				self.textDeletedSignal.emit( self, self._cursorIndex, self._cursorIndex+1, textDeleted )
 				self._p_onTextModified()
@@ -489,7 +462,7 @@ class DTEntry (DTWidget):
 				DTCursorEntity.remove( self._cursorEntities[self._cursorIndex], self._cursorEntities[self._cursorIndex] )
 				del self._cursorEntities[self._cursorIndex]
 				textDeleted = self._text[self._cursorIndex:self._cursorIndex+1]
-				self._text = self._text[:self._cursorIndex] + self._text[self._cursorIndex+1:]
+				self._p_setText( self._text[:self._cursorIndex] + self._text[self._cursorIndex+1:] )
 				self.textDeletedSignal.emit( self, self._cursorIndex, self._cursorIndex+1, textDeleted )
 				self._p_onTextModified()
 			else:
@@ -523,7 +496,7 @@ class DTEntry (DTWidget):
 			DTCursorEntity.splice( prev, next, keyStringCursorEntities[0], keyStringCursorEntities[-1] )
 			self._cursorEntities[self._cursorIndex:self._cursorIndex] = keyStringCursorEntities
 			
-			self._text = self._text[:self._cursorIndex] + event.keyString + self._text[self._cursorIndex:]
+			self._p_setText( self._text[:self._cursorIndex] + event.keyString + self._text[self._cursorIndex:] )
 			self._cursorIndex += len( event.keyString )
 
 			self.textInsertedSignal.emit( self, position, bAppended, event.keyString )
@@ -545,12 +518,12 @@ class DTEntry (DTWidget):
 		super( DTEntry, self )._o_onGainFocus()
 		self._cursorIndex = min( max( self._cursorIndex, 0 ), len( self._text ) )
 		self._bAutoCompleteDisabled = False
-		self._o_queueFullRedraw()
+		self._sizeAllocator.reset()
 
 	def _o_onLoseFocus(self):
 		super( DTEntry, self )._o_onLoseFocus()
 		self._autoCompleteDropDown.hide()
-		self._o_queueFullRedraw()
+		self._sizeAllocator.reset()
 
 
 	#def _o_onCursorEnter(self, cursor):
@@ -580,11 +553,12 @@ class DTEntry (DTWidget):
 
 		self._o_clipIfAllocationInsufficient( context )
 
-		self._p_refreshLayout()
+		textSize = self._p_getTextSize()
+		entrySize = self._p_getEntrySize()
 
 
 		# Background
-		context.rectangle( self._entryPosition.x + b * 0.5, self._entryPosition.y + b * 0.5, self._entrySize.x - b, self._entrySize.y - b )
+		context.rectangle( self._entryPosition.x + b * 0.5, self._entryPosition.y + b * 0.5, entrySize.x - b, entrySize.y - b )
 
 		# Fill
 		context.set_source_rgb( self._backgroundColour.r, self._backgroundColour.g, self._backgroundColour.b )
@@ -595,48 +569,40 @@ class DTEntry (DTWidget):
 		context.set_source_rgb( self._borderColour.r, self._borderColour.g, self._borderColour.b )
 		context.stroke()
 
+		# Text without selection
+		context.set_source_rgb( self._textColour.r, self._textColour.g, self._textColour.b )
+		context.move_to( self._textPosition.x, self._textPosition.y )
+		self._layout.draw( context )
+		
 		if self._selectionBounds is not None  and  self._bHasFocus:
-			self._p_refreshSelectionLayouts()
 			# Text with selection
 			start = min( self._selectionBounds )
 			end = max( self._selectionBounds )
-
-			preSelSize = self._preSelectionLayout.get_pixel_size()
-			selSize = self._selectionLayout.get_pixel_size()
-
-			startX = self._textRoot.x  +  preSelSize[0]
-			selectionSpace = selSize[0]
-
+			
+			startPos, startSize = self._layout.getCharacterRectangle( start )
+			endPos, endSize = self._layout.getCharacterRectangle( end )
+			
 			context.set_source_rgb( self._highlightedBackgroundColour.r, self._highlightedBackgroundColour.g, self._highlightedBackgroundColour.b )
-			context.rectangle( startX, self._entryPosition.y + self._borderWidth, selectionSpace, self._textSize.y )
-			context.fill()
+			context.rectangle( self._textPosition.x + startPos.x, self._textPosition.y, endPos.x - startPos.x, textSize.y )
+			context.fill_preserve()
+			
+			context.save()
+			context.clip()
 
-			context.move_to( self._textPosition.x, self._textPosition.y )
-			context.set_source_rgb( self._textColour.r, self._textColour.g, self._textColour.b )
-			context.show_layout( self._preSelectionLayout )
-
-
-			context.move_to( self._textPosition.x + preSelSize[0], self._textPosition.y )
 			context.set_source_rgb( self._highlightedTextColour.r, self._highlightedTextColour.g, self._highlightedTextColour.b )
-			context.show_layout( self._selectionLayout )
-
-			context.move_to( self._textPosition.x + preSelSize[0] + selSize[0], self._textPosition.y )
-			context.set_source_rgb( self._textColour.r, self._textColour.g, self._textColour.b )
-			context.show_layout( self._postSelectionLayout )
-		else:
-			# Text without selection
-			context.set_source_rgb( self._textColour.r, self._textColour.g, self._textColour.b )
 			context.move_to( self._textPosition.x, self._textPosition.y )
-			context.show_layout( self._layout )
+			self._layout.draw( context )
+			
+			context.restore()
 
 		# Cursor
 		if self._bHasFocus:
-			space = self._layout.index_to_pos( self._cursorIndex )[0]  /  pango.SCALE
-			cursorPositionX = self._textRoot.x + space
+			charPos, charSize = self._layout.getCharacterRectangle( self._cursorIndex )
+			cursorPositionX = self._textPosition.x + charPos.x
 			context.set_line_width( 1.0 )
 			context.set_source_rgb( 0.0, 0.0, 0.0 )
 			context.move_to( cursorPositionX, self._entryPosition.y + self._borderWidth )
-			context.rel_line_to( 0.0, self._textSize.y )
+			context.rel_line_to( 0.0, textSize.y )
 			context.stroke()
 
 
@@ -644,38 +610,24 @@ class DTEntry (DTWidget):
 
 	def _o_onRealise(self, context, pangoContext):
 		super( DTEntry, self )._o_onRealise( context, pangoContext )
-		if context is not self._layoutContext:
-			self._layoutContext = context
-			self._layout = self._realiseContext.create_layout()
-			self._preSelectionLayout = self._realiseContext.create_layout()
-			self._selectionLayout = self._realiseContext.create_layout()
-			self._postSelectionLayout = self._realiseContext.create_layout()
-			self._layout.set_font_description( self._fontDescription )
-			self._preSelectionLayout.set_font_description( self._fontDescription )
-			self._selectionLayout.set_font_description( self._fontDescription )
-			self._postSelectionLayout.set_font_description( self._fontDescription )
-			self._bLayoutNeedsRefresh = True
-			self._bSelectionLayoutsNeedRefresh = True
+		self._layout.initialise( context )
 
 
 	def _o_onSetScale(self, scale, rootScale):
 		context = self._realiseContext
 		context.save()
 		context.scale( rootScale, rootScale )
-		context.update_layout( self._layout )
-		context.update_layout( self._preSelectionLayout )
-		context.update_layout( self._selectionLayout )
-		context.update_layout( self._postSelectionLayout )
+		self._layout.update( context )
 		context.restore()
 
 
 	def _o_getRequiredWidth(self):
-		self._p_refreshTextSize()
-		return self._entrySize.x
+		entrySize = self._p_getEntrySize()
+		return entrySize.x
 
 	def _o_getRequiredHeightAndBaseline(self):
-		self._p_refreshTextSize()
-		return self._entrySize.y,  0.0
+		entrySize = self._p_getEntrySize()
+		return entrySize.y,  0.0
 
 
 	def _o_onAllocateX(self, allocation):
@@ -683,58 +635,15 @@ class DTEntry (DTWidget):
 
 	def _o_onAllocateY(self, allocation):
 		super( DTEntry, self )._o_onAllocateY( allocation )
-		self._entryPosition = ( self._allocation - self._entrySize )  *  0.5
-		self._textRoot = self._entryPosition + Vector2( self._borderWidth + 1.0, self._borderWidth + 1.0 )
-		self._textPosition = self._textRoot
+		entrySize = self._p_getEntrySize()
+		self._entryPosition = ( self._allocation - entrySize )  *  0.5
+		self._textPosition = self._entryPosition + Vector2( self._borderWidth + 1.0, self._borderWidth + 1.0 )
 
 
-
-
-	def _p_textChanged(self):
-		self._textSize = None
-		self._bLayoutNeedsRefresh = True
-		self._bSelectionLayoutsNeedRefresh = True
 
 
 	def _p_setSelectionBounds(self, bounds):
 		self._selectionBounds = bounds
-		self._bSelectionLayoutsNeedRefresh = True
-
-
-
-	def _p_refreshLayout(self):
-		if self._bLayoutNeedsRefresh  and  self._layout is not None:
-			self._layout.set_text( self._text )
-			self._bLayoutNeedsRefresh = False
-
-
-	def _p_refreshSelectionLayouts(self):
-		if self._bSelectionLayoutsNeedRefresh  and  self._layout is not None:
-			if self._selectionBounds is None:
-				self._preSelectionLayout.set_text( self._text )
-				self._selectionLayout.set_text( '' )
-				self._postSelectionLayout.set_text( '' )
-			else:
-				start = min( self._selectionBounds )
-				end = max( self._selectionBounds )
-				self._preSelectionLayout.set_text( self._text[:start] )
-				self._selectionLayout.set_text( self._text[start:end] )
-				self._postSelectionLayout.set_text( self._text[end:] )
-			self._bSelectionLayoutsNeedRefresh = False
-
-
-
-	def _p_computeTextSize(self):
-		self._p_refreshLayout()
-		layoutSize = self._layout.get_pixel_size()
-		self._textSize = Vector2( layoutSize[0] + layoutSize[1] * 3.0  +  6.0,   layoutSize[1] + 2.0 )
-		self._entrySize = self._textSize  +  Vector2( self._borderWidth * 2.0, self._borderWidth * 2.0 )
-		self._o_queueResize()
-
-
-	def _p_refreshTextSize(self):
-		if self._textSize is None:
-			self._p_computeTextSize()
 
 
 
@@ -787,17 +696,18 @@ class DTEntry (DTWidget):
 		
 		if cursorLocation.edge == DTCursorLocation.EDGE_TRAILING:
 			cursorIndex += 1
+			
+		textSize = self._p_getTextSize()
 		
-		space = self._layout.index_to_pos( cursorIndex )[0]  /  pango.SCALE
-		cursorPositionX = self._textRoot.x + space
+		charPos, charSize = self._layout.getCharacterRectangle( cursorIndex )
+		cursorPositionX = self._textPosition.x + charPos.x
 
 		pos = Point2( cursorPositionX, self._entryPosition.y + self._borderWidth )
-		return Segment2( pos, pos + Vector2( 0.0, self._textSize.y ) )
+		return Segment2( pos, pos + Vector2( 0.0, textSize.y ) )
 
 	
 	def _o_getCursorLocationAtPosition(self, localPosition):
-		pointInLayout = localPosition - self._textPosition
-		index, trailing = self._layout.xy_to_index( int( pointInLayout.x * pango.SCALE ), int( pointInLayout.y * pango.SCALE ) )
+		index, trailing = self._layout.getCharacterIndexAndSubIndexAt( localPosition - self._textPosition )
 		
 		if trailing == 0:
 			return DTCursorLocation( self._cursorEntities[index], DTCursorLocation.EDGE_LEADING )
@@ -890,7 +800,7 @@ if __name__ == '__main__':
 	window.set_size_request( 300, 100 )
 
 	doc = DTDocument()
-	doc.show()
+	doc.getGtkWidget().show()
 
 
 	autoCompleteList = [ 'abc', 'Hello', 'Hello world', 'Hi', 'Hi world', 'Hello world 2' ]
@@ -900,7 +810,7 @@ if __name__ == '__main__':
 	entry.grabFocus()
 
 
-	window.add( doc )
+	window.add( doc.getGtkWidget() )
 	window.show()
 
 	gtk.main()
