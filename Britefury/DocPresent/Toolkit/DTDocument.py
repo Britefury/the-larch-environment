@@ -34,7 +34,7 @@ from Britefury.DocPresent.Toolkit.DTContainer import DTContainer
 _CURSORSYSTEM_WIDGET = 1
 _CURSORSYSTEM_DOCUMENT = 2
 
-_CURSORSYSTEM = _CURSORSYSTEM_DOCUMENT
+_CURSORSYSTEM = _CURSORSYSTEM_WIDGET
 
 
 
@@ -413,7 +413,9 @@ class DTDocument (DTBin):
 		context.translate( -self._docWindowTopLeftCornerInDocSpace.x, -self._docWindowTopLeftCornerInDocSpace.y )
 
 		self._f_draw( context, BBox2( topLeftDocSpace, bottomRightDocSpace ) )
-		self._p_drawCursor( context )
+		
+		if _CURSORSYSTEM == _CURSORSYSTEM_DOCUMENT:
+			self._p_drawCursor( context )
 		
 		context.restore()
 		
