@@ -38,6 +38,8 @@ def _parser_coerce(x):
 	
 		
 class ParseResult (object):
+	__slots__ = [ 'result', 'begin', 'end' ]
+	
 	"""
 	Parse result
 	Members:
@@ -904,7 +906,9 @@ singleQuotedString = RegEx( r"'(?:[^'\n\r\\]|(?:'')|(?:\\x[0-9a-fA-F]+)|(?:\\.))
 doubleQuotedString = RegEx( r'"(?:[^"\n\r\\]|(?:"")|(?:\\x[0-9a-fA-F]+)|(?:\\.))*"' )
 quotedString = RegEx( r'''(?:"(?:[^"\n\r\\]|(?:"")|(?:\\x[0-9a-fA-F]+)|(?:\\.))*")|(?:'(?:[^'\n\r\\]|(?:'')|(?:\\x[0-9a-fA-F]+)|(?:\\.))*')''' )
 unicodeString = Combine( [ 'u', quotedString ] )
-integer = RegEx( r"[\-]?[0-9]+" )
+decimalInteger = RegEx( r"[\-]?[0-9]+" )
+hexInteger = RegEx( r"0x[0-9A-Fa-f]+" )
+integer = decimalInteger  |  hexInteger
 floatingPoint = RegEx( r"[\-]?(([0-9]+\.[0-9]*)|(\.[0-9]+))(e[\-]?[0-9]+)?" )
 
 
@@ -1140,12 +1144,20 @@ class TestCase_Parser (unittest.TestCase):
 		self._matchTest( parser, 'u"abc"113', 'u"abc"' )
 		
 		
-	def testInteger(self):
-		parser = integer
+	def testDecimalInteger(self):
+		parser = decimalInteger
 		self._matchTest( parser, "123", "123" )
 		self._matchTest( parser, "-123", "-123" )
 		
 		
+	def testHexadecimalInteger(self):
+		parser = hexInteger
+		self._matchTest( parser, "0x123", "0x123" )
+		self._matchTest( parser, "0x0123456789abcdef", "0x0123456789abcdef" )
+		self._matchTest( parser, "0x0123456789ABCDEF", "0x0123456789ABCDEF" )
+		
+		
+
 
 	
 		
