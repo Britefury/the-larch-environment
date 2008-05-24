@@ -128,11 +128,12 @@ _special = Production( _lambdaExpression | _mapExpression | _filterExpression | 
 _atom = Production( _enclosure | _special | _terminalLiteral | _loadLocal )
  
 _primary = Forward()
+_specialCall = Production( ( Suppress( '$' ) + identifier + _parameterList ).setAction( lambda input, begin, end, tokens: [ '$' + tokens[0] ] + tokens[1] ) )
 _call = Production( ( _primary + _parameterList ).setAction( lambda input, begin, end, tokens: [ tokens[0], '<-' ] + tokens[1] ) )
 _subscript = Production( ( _primary + '[' + _expression + ']' ).setAction( lambda input, begin, end, tokens: [ tokens[0], '[]', tokens[2] ] ) )
 _slice = Production( ( _primary + '[' + _expression + ':' + _expression + ']' ).setAction( lambda input, begin, end, tokens: [ tokens[0], '[:]', tokens[2], tokens[4] ] ) )
 _getAttr = Production( _primary + '.' + _attrName )
-_primary  <<  Production( _call | _subscript | _slice | _getAttr | _atom )
+_primary  <<  Production( _specialCall | _call | _subscript | _slice | _getAttr | _atom )
 
 _power = Forward()
 _unary = Forward()
@@ -287,6 +288,13 @@ class TestCase_GMetaParser (unittest.TestCase):
 		self._matchTest( expression, 'a(x=b,y=c)',  '(@a <- (:x @b) (:y @c))' )
 		self._matchTest( expression, 'a(b,y=c)',  '(@a <- @b (:y @c))' )
 		
+	def testSpecialCall(self):
+		self._matchTest( expression, '$a(b)',  '($a @b)' )
+		self._matchTest( expression, '$a(b,c)',  '($a @b @c)' )
+		self._matchTest( expression, '$a(x=b)',  '($a (:x @b))' )
+		self._matchTest( expression, '$a(x=b,y=c)',  '($a (:x @b) (:y @c))' )
+		self._matchTest( expression, '$a(b,y=c)',  '($a @b (:y @c))' )
+
 	def testSubscript(self):
 		self._matchTest( expression, 'a[b]',  '(@a [] @b)' )
 		self._matchTest( expression, 'a[b][c]',  '((@a [] @b) [] @c)' )
