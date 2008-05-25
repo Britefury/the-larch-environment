@@ -10,7 +10,7 @@ import string
 import operator
 from copy import copy
 
-from Britefury.Parser.Parser import Literal, Word, RegEx, Sequence, Combine, FirstOf, BestOf, Optional, ZeroOrMore, OneOrMore, Production, Group, Forward, Suppress, identifier, quotedString, unicodeString, integer, floatingPoint, delimitedList
+from Britefury.Parser.Parser import Literal, Word, RegEx, Sequence, Combine, Choice, Optional, ZeroOrMore, OneOrMore, Production, Group, Forward, Suppress, identifier, quotedString, unicodeString, integer, floatingPoint, delimitedList
 
 from Britefury.GLisp.GLispUtil import isGLispList
 
@@ -32,81 +32,81 @@ def _flatten(x):
 		return []
 	
 	
-def _unaryOpAction(input, begin, end, tokens):
+def _unaryOpAction(input, begin, tokens):
 	return [ tokens[1], tokens[0] ]
 	
 
-_none = Production( Literal( 'None' ) ).setAction( lambda input, begin, end, token: '#None' )
-_false = Production( Literal( 'False' ) ).setAction( lambda input, begin, end, token: '#False' )
-_true = Production( Literal( 'True' ) ).setAction( lambda input, begin, end, token: '#True' )
-_strLit = Production( unicodeString | quotedString ).setAction( lambda input, begin, end, token: "#'" + eval( token ) )
-_intLit = Production( integer ).setAction( lambda input, begin, end, token: '#' + token )
-_floatLit = Production( floatingPoint ).setAction( lambda input, begin, end, token: '#' + token )
-_loadLocal = Production( identifier ).setAction( lambda input, begin, end, token: '@' + token )
-_var = Production( identifier ).setAction( lambda input, begin, end, token: '@' + token )
+_none = Production( Literal( 'None' )  >>  ( lambda input, begin, token: '#None' ) )
+_false = Production( Literal( 'False' )  >>  ( lambda input, begin, token: '#False' ) )
+_true = Production( Literal( 'True' )  >>  ( lambda input, begin, token: '#True' ) )
+_strLit = Production( ( unicodeString | quotedString )  >>  ( lambda input, begin, token: "#'" + eval( token ) ) )
+_intLit = Production( integer  >>  ( lambda input, begin, token: '#' + token ) )
+_floatLit = Production( floatingPoint  >>  ( lambda input, begin, token: '#' + token ) )
+_loadLocal = Production( identifier  >>  ( lambda input, begin, token: '@' + token ) )
+_var = Production( identifier  >>  ( lambda input, begin, token: '@' + token ) )
 _terminalLiteral = Production( _floatLit | _intLit | _strLit | _none | _false | _true )
 _methodName = copy( identifier )
-_paramName = Production( identifier ).setAction( lambda input, begin, end, token: ':' + token )
+_paramName = Production( identifier  >>  ( lambda input, begin, token: ':' + token ) )
 _attrName = copy( identifier )
 
 
 
 _expression = Forward()
 
-_compoundExpression = Production( Literal( '{' )  +  ZeroOrMore( ( _expression + Literal( ';' ) ).setAction( lambda input, begin, end, tokens: tokens[0] ) )  +  Literal( '}' ) ).setAction( lambda input, begin, end, tokens: tokens[1] )
-_singleOrCompoundExpression = Production( _compoundExpression  |  ( _expression + ';' ).setAction( lambda input, begin, end, tokens: [ tokens[0] ] ) )
+_compoundExpression = Production( Literal( '{' )  +  ZeroOrMore( ( _expression + Literal( ';' ) ).action( lambda input, begin, tokens: tokens[0] ) )  +  Literal( '}' ) ).action( lambda input, begin, tokens: tokens[1] )
+_singleOrCompoundExpression = Production( _compoundExpression  |  ( _expression + ';' ).action( lambda input, begin, tokens: [ tokens[0] ] ) )
 
-_listLiteral = Production( Literal( '[' )  +  delimitedList( _expression )  +  Literal( ']' ) ).setAction( lambda input, begin, end, tokens: [ '$list' ]  +  tokens[1] )
+_listLiteral = Production( Literal( '[' )  +  delimitedList( _expression )  +  Literal( ']' ) ).action( lambda input, begin, tokens: [ '$list' ]  +  tokens[1] )
 
-_setLiteral = Production( Literal( '[:' )  +  delimitedList( _expression )  +  Literal( ':]' ) ).setAction( lambda input, begin, end, tokens: [ '$set' ]  +  tokens[1] )
+_setLiteral = Production( Literal( '[:' )  +  delimitedList( _expression )  +  Literal( ':]' ) ).action( lambda input, begin, tokens: [ '$set' ]  +  tokens[1] )
 
-_lambdaExpression = Production( Literal( 'lambda' )  +  '('  +  delimitedList( _var )  +  ')'  +  '='  +  _compoundExpression ).setAction( lambda input, begin, end, tokens: [ '$lambda' ]  +  [ tokens[2] ] + tokens[5] )
+_lambdaExpression = Production( Literal( 'lambda' )  +  '('  +  delimitedList( _var )  +  ')'  +  '='  +  _compoundExpression ).action( lambda input, begin, tokens: [ '$lambda' ]  +  [ tokens[2] ] + tokens[5] )
 
-_mapExpression = Production( Literal( 'map' )  +  '('  +  _expression + ',' + _expression + ')' ).setAction( lambda input, begin, end, tokens: [ '$map' ]  +  [ tokens[2], tokens[4] ] )
+_mapExpression = Production( Literal( 'map' )  +  '('  +  _expression + ',' + _expression + ')' ).action( lambda input, begin, tokens: [ '$map' ]  +  [ tokens[2], tokens[4] ] )
 
-_filterExpression = Production( Literal( 'filter' )  +  '('  +  _expression + ',' + _expression + ')' ).setAction( lambda input, begin, end, tokens: [ '$filter' ]  +  [ tokens[2], tokens[4] ] )
+_filterExpression = Production( Literal( 'filter' )  +  '('  +  _expression + ',' + _expression + ')' ).action( lambda input, begin, tokens: [ '$filter' ]  +  [ tokens[2], tokens[4] ] )
 
-_reduce1Expression = Production( Literal( 'reduce' )  +  '('  +  _expression + ',' + _expression + ')' ).setAction( lambda input, begin, end, tokens: [ '$reduce' ]  +  [ tokens[2], tokens[4] ] )
-_reduce2Expression = Production( Literal( 'reduce' )  +  '('  +  _expression + ',' + _expression + ',' + _expression + ')' ).setAction( lambda input, begin, end, tokens: [ '$reduce' ]  +  [ tokens[2], tokens[4], tokens[6] ] )
+_reduce1Expression = Production( Literal( 'reduce' )  +  '('  +  _expression + ',' + _expression + ')' ).action( lambda input, begin, tokens: [ '$reduce' ]  +  [ tokens[2], tokens[4] ] )
+_reduce2Expression = Production( Literal( 'reduce' )  +  '('  +  _expression + ',' + _expression + ',' + _expression + ')' ).action( lambda input, begin, tokens: [ '$reduce' ]  +  [ tokens[2], tokens[4], tokens[6] ] )
 _reduceExpression = _reduce2Expression | _reduce1Expression
 
-_raiseExpression = Production( Literal( 'raise' )  +  '('  +  _expression + ')' ).setAction( lambda input, begin, end, tokens: [ '$raise' ]  +  [ tokens[2] ] )
+_raiseExpression = Production( Literal( 'raise' )  +  '('  +  _expression + ')' ).action( lambda input, begin, tokens: [ '$raise' ]  +  [ tokens[2] ] )
 
-_exceptBlock = Production( Literal( 'except' )  +  '('  +  _expression  +  ')'  +  _compoundExpression ).setAction( lambda input, begin, end, tokens: [ '$except' ]  +  [ tokens[2] ]  +  tokens[4] )
-_elseBlock = Production( Literal( 'else' )  +  _compoundExpression ).setAction( lambda input, begin, end, tokens: [ '$else' ]  +  tokens[1] )
-_finallyBlock = Production( Literal( 'finally' )  +  _compoundExpression ).setAction( lambda input, begin, end, tokens: [ '$finally' ]  +  tokens[1] )
-_tryExpression = Production( Literal( 'try' )  +  _compoundExpression  +  OneOrMore( _exceptBlock )  +  Optional( _elseBlock )  +  Optional( _finallyBlock ) ).setAction( lambda input, begin, end, tokens: [ '$try', tokens[1] ] + tokens[2] + _flatten( tokens[3:] ) )
+_exceptBlock = Production( Literal( 'except' )  +  '('  +  _expression  +  ')'  +  _compoundExpression ).action( lambda input, begin, tokens: [ '$except' ]  +  [ tokens[2] ]  +  tokens[4] )
+_elseBlock = Production( Literal( 'else' )  +  _compoundExpression ).action( lambda input, begin, tokens: [ '$else' ]  +  tokens[1] )
+_finallyBlock = Production( Literal( 'finally' )  +  _compoundExpression ).action( lambda input, begin, tokens: [ '$finally' ]  +  tokens[1] )
+_tryExpression = Production( Literal( 'try' )  +  _compoundExpression  +  OneOrMore( _exceptBlock )  +  Optional( _elseBlock )  +  Optional( _finallyBlock ) ).action( lambda input, begin, tokens: [ '$try', tokens[1] ] + tokens[2] + (  [tokens[3] ]   if tokens[3] is not None   else  [] ) + (  [tokens[4] ]   if tokens[4] is not None   else  [] ) )
 
-_elifBlock = Production( Literal( 'elif' )  +  '('  +  _expression  +  ')'  +  _compoundExpression ).setAction( lambda input, begin, end, tokens: [ tokens[2] ]  +  tokens[4] )
-_ifExpression = Production( Literal( 'if' )  +  '('  +  _expression  +  ')'  +  _compoundExpression  +  ZeroOrMore( _elifBlock )  +  Optional( _elseBlock ) ).setAction( lambda input, begin, end, tokens: [ '$if', [ tokens[2] ] + tokens[4] ]  +  tokens[5]  +  _flatten( tokens[6:] ) )
+_elifBlock = Production( Literal( 'elif' )  +  '('  +  _expression  +  ')'  +  _compoundExpression ).action( lambda input, begin, tokens: [ tokens[2] ]  +  tokens[4] )
+_ifExpression = Production( Literal( 'if' )  +  '('  +  _expression  +  ')'  +  _compoundExpression  +  ZeroOrMore( _elifBlock )  +  Optional( _elseBlock ) ).action( lambda input, begin, tokens: [ '$if', [ tokens[2] ] + tokens[4] ]  +  tokens[5]  +  (  [tokens[6] ]   if tokens[6] is not None   else  [] ) )
 
 _binding = Production( _var + Suppress( '=' ) + _expression + Suppress( ';' ) )
 
-_whereExpression = Production( Literal( 'where' ) + '{' + ZeroOrMore( _binding ) + '}' + '->' + _compoundExpression ).setAction( lambda input, begin, end, tokens: [ '$where', tokens[2] ] + tokens[5] )
+_whereExpression = Production( Literal( 'where' ) + '{' + ZeroOrMore( _binding ) + '}' + '->' + _compoundExpression ).action( lambda input, begin, tokens: [ '$where', tokens[2] ] + tokens[5] )
 
-_moduleExpression = Production( Literal( 'module' ) + '{' + ZeroOrMore( _binding ) + '}' ).setAction( lambda input, begin, end, tokens: [ '$module' ]  +  tokens[2] )
+_moduleExpression = Production( Literal( 'module' ) + '{' + ZeroOrMore( _binding ) + '}' ).action( lambda input, begin, tokens: [ '$module' ]  +  tokens[2] )
 
 # Pattern matching
 _matchPattern = Forward()
-_matchConstant = Production( quotedString ).setAction( lambda input, begin, end, token: eval( token ) )
+_matchConstant = Production( quotedString ).action( lambda input, begin, token: eval( token ) )
 _matchAnyString = Production( '!' )
 _matchAnyList = Production( '/' )
 _matchAnything = Production( '^' )
-_matchList = Production( Literal( '(' )  +  ZeroOrMore( _matchPattern )  +  ')' ).setAction( lambda input, begin, end, tokens: tokens[1] )
+_matchList = Production( Literal( '(' )  +  ZeroOrMore( _matchPattern )  +  ')' ).action( lambda input, begin, tokens: tokens[1] )
 _matchItemData = Production( _matchConstant | _matchAnyString | _matchAnyList | _matchAnything | _matchList )
-_matchItem = Production( ( _matchItemData + '*' ).setAction( lambda input, begin, end, tokens: [ '*', tokens[0] ] )   |   \
-			 ( _matchItemData + '+' ).setAction( lambda input, begin, end, tokens: [ '+', tokens[0] ] )   |   \
-			 ( _matchItemData + '?' ).setAction( lambda input, begin, end, tokens: [ '?', tokens[0] ] )   |   \
+_matchItem = Production( ( _matchItemData + '*' ).action( lambda input, begin, tokens: [ '*', tokens[0] ] )   |   \
+			 ( _matchItemData + '+' ).action( lambda input, begin, tokens: [ '+', tokens[0] ] )   |   \
+			 ( _matchItemData + '?' ).action( lambda input, begin, tokens: [ '?', tokens[0] ] )   |   \
 			 _matchItemData )
-_matchBind = Production( ( _matchItem + ':' + _var ).setAction( lambda input, begin, end, tokens: [ ':', tokens[2], tokens[0] ] )   |   _matchItem )
-_matchPredicate = Production( ( _matchBind + '&' + _var + '=' + _expression + ';' ).setAction( lambda input, begin, end, tokens: [ '&', tokens[2], tokens[4], tokens[0] ] )   |   _matchBind )
+_matchBind = Production( ( _matchItem + ':' + _var ).action( lambda input, begin, tokens: [ ':', tokens[2], tokens[0] ] )   |   _matchItem )
+_matchPredicate = Production( ( _matchBind + '&' + _var + '=' + _expression + ';' ).action( lambda input, begin, tokens: [ '&', tokens[2], tokens[4], tokens[0] ] )   |   _matchBind )
 _matchPattern  <<  _matchPredicate
-_matchPair = Production( _matchPattern + '=>' + _compoundExpression ).setAction( lambda input, begin, end, tokens: [ tokens[0] ]  +  tokens[2] )
-_matchExpression = Production( Literal( 'match' ) + '(' + _expression + ')' + '{' + ZeroOrMore( _matchPair ) + '}' ).setAction( lambda input, begin, end, tokens: [ '$match', tokens[2] ]  +  tokens[5] )
+_matchPair = Production( _matchPattern + '=>' + _compoundExpression ).action( lambda input, begin, tokens: [ tokens[0] ]  +  tokens[2] )
+_matchExpression = Production( Literal( 'match' ) + '(' + _expression + ')' + '{' + ZeroOrMore( _matchPair ) + '}' ).action( lambda input, begin, tokens: [ '$match', tokens[2] ]  +  tokens[5] )
 # End pattern matching
 
 
-def _checkParams(input, begin, end, tokens):
+def _checkParams(input, begin, tokens):
 	bKW = False
 	for p in tokens:
 		if isGLispList( p )  and  len( p ) == 2  and  p[0][0] == ':':
@@ -117,10 +117,10 @@ def _checkParams(input, begin, end, tokens):
 	return tokens
 
 _kwParam = Production( _paramName + Suppress( '=' ) + _expression )
-_parameterList = Production( Suppress( '(' )  -  delimitedList( _kwParam | _expression )  -  Suppress( ')' ) ).setAction( _checkParams )
+_parameterList = Production( Suppress( '(' )  -  delimitedList( _kwParam | _expression )  -  Suppress( ')' ) ).action( _checkParams )
 
 
-_parenExp = Production( Literal( '(' ) + _expression + ')' ).setAction( lambda input, begin, end, tokens: tokens[1] )
+_parenExp = Production( Literal( '(' ) + _expression + ')' ).action( lambda input, begin, tokens: tokens[1] )
 
 
 _enclosure = Production( _parenExp | _listLiteral | _setLiteral )
@@ -128,10 +128,10 @@ _special = Production( _lambdaExpression | _mapExpression | _filterExpression | 
 _atom = Production( _enclosure | _special | _terminalLiteral | _loadLocal )
  
 _primary = Forward()
-_specialCall = Production( ( Suppress( '$' ) + identifier + _parameterList ).setAction( lambda input, begin, end, tokens: [ '$' + tokens[0] ] + tokens[1] ) )
-_call = Production( ( _primary + _parameterList ).setAction( lambda input, begin, end, tokens: [ tokens[0], '<-' ] + tokens[1] ) )
-_subscript = Production( ( _primary + '[' + _expression + ']' ).setAction( lambda input, begin, end, tokens: [ tokens[0], '[]', tokens[2] ] ) )
-_slice = Production( ( _primary + '[' + _expression + ':' + _expression + ']' ).setAction( lambda input, begin, end, tokens: [ tokens[0], '[:]', tokens[2], tokens[4] ] ) )
+_specialCall = Production( ( Suppress( '$' ) + identifier + _parameterList ).action( lambda input, begin, tokens: [ '$' + tokens[0] ] + tokens[1] ) )
+_call = Production( ( _primary + _parameterList ).action( lambda input, begin, tokens: [ tokens[0], '<-' ] + tokens[1] ) )
+_subscript = Production( ( _primary + '[' + _expression + ']' ).action( lambda input, begin, tokens: [ tokens[0], '[]', tokens[2] ] ) )
+_slice = Production( ( _primary + '[' + _expression + ':' + _expression + ']' ).action( lambda input, begin, tokens: [ tokens[0], '[:]', tokens[2], tokens[4] ] ) )
 _getAttr = Production( _primary + '.' + _attrName )
 _primary  <<  Production( _specialCall | _call | _subscript | _slice | _getAttr | _atom )
 
@@ -139,7 +139,7 @@ _power = Forward()
 _unary = Forward()
 
 _power  <<  Production( ( _primary  +  '**'  +  _unary )  |  _primary )
-_unary  <<  Production( ( ( Literal( '~' ) | '-' | 'not' )  +  _unary ).setAction( _unaryOpAction )  |  _power )
+_unary  <<  Production( ( ( Literal( '~' ) | '-' | 'not' )  +  _unary ).action( _unaryOpAction )  |  _power )
 
 _mulDivMod = Forward()
 _mulDivMod  <<  Production( ( _mulDivMod + ( Literal( '*' ) | '/' | '%' ) + _unary )  |  _unary )
@@ -156,8 +156,8 @@ _bitOr  <<  Production( ( _bitOr + '|' + _bitXor)  |  _bitXor )
 _cmp = Forward()
 _cmp  <<  Production( ( _cmp + ( Literal( '<' ) | '<=' | '==' | '!=' | '>=' | '>' ) + _bitOr )  |  _bitOr )
 _isIn = Forward()
-_isIn  <<  Production( ( _isIn + 'is' + 'not' + _cmp ).setAction( lambda input, begin, end, tokens: [ [ tokens[0], tokens[1], tokens[3] ], 'not' ]  )  |  \
-		       ( _isIn + 'not' + 'in' + _cmp ).setAction( lambda input, begin, end, tokens: [ [ tokens[0], tokens[2], tokens[3] ], 'not' ]  )  |  \
+_isIn  <<  Production( ( _isIn + 'is' + 'not' + _cmp ).action( lambda input, begin, tokens: [ [ tokens[0], tokens[1], tokens[3] ], 'not' ]  )  |  \
+		       ( _isIn + 'not' + 'in' + _cmp ).action( lambda input, begin, tokens: [ [ tokens[0], tokens[2], tokens[3] ], 'not' ]  )  |  \
 		     ( _isIn + 'is' + _cmp)  |  \
 		     ( _isIn + 'in' + _cmp)  |  \
 		     _cmp )
@@ -454,24 +454,25 @@ where
 		if res.end != len( source ):
 			print '<INCOMPLETE>'
 		else:
-			print gLispSrcToString( res.result, 100 )
+			print 'OK'
+			#print gLispSrcToString( res.result, 100 )
 	else:
 		print '<FAIL>'
 	print 'Parsed %d bytes in %s; %s chars per second'  %  ( len( source ), t2 - t1, len(source)/(t2-t1) )
 	
 	
 	
-	lr = Forward()
-	lr  <<  Production( ( lr + '1' )  |  '1' )
+	#lr = Forward()
+	#lr  <<  Production( ( lr + '1' )  |  '1' )
 	
-	assert lr.parseString( '111111' ).end == 6
+	#assert lr.parseString( '111111' ).end == 6
 	
 	
-	print 'SIMPLE GRAMMAR'
-	ones = '1' * 8000
-	t1 = time.time()
-	res = lr.parseString( ones )
-	t2 = time.time()
-	print 'ONES: parsed %d bytes in %s; %s chars per second'  %  ( len( ones ), t2 - t1, len(ones)/(t2-t1) )
+	#print 'SIMPLE GRAMMAR'
+	#ones = '1' * 8000
+	#t1 = time.time()
+	#res = lr.parseString( ones )
+	#t2 = time.time()
+	#print 'ONES: parsed %d bytes in %s; %s chars per second'  %  ( len( ones ), t2 - t1, len(ones)/(t2-t1) )
 	
 	

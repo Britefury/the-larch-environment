@@ -11,6 +11,8 @@ from copy import copy
 
 
 class _MemoEntry (object):
+	__slots__ = [ 'answer', 'pos' ]
+	
 	def __init__(self, answer, pos):
 		super( _MemoEntry, self ).__init__()
 		self.answer = answer
@@ -20,6 +22,8 @@ class _MemoEntry (object):
 
 	
 class _LR (object):
+	__slots__ = [ 'seed', 'rule', 'head', 'next' ]
+	
 	def __init__(self, seed, rule, head, next):
 		super( _LR, self ).__init__()
 		self.seed = seed
@@ -29,6 +33,8 @@ class _LR (object):
 		
 		
 class _Head (object):
+	__slots__ = [ 'rule', 'involvedSet', 'evalSet' ]
+	
 	def __init__(self, rule, involvedSet, evalSet):
 		super( _Head, self ).__init__()
 		self.rule = rule
@@ -70,17 +76,16 @@ class ParserState (object):
 	# "Packrat Parsers Can Support Left Recursion" by Allesandro Warth, James R. Douglass, Todd Millstein; Viewpoints Research Institute.
 	# To be honest, I don't really understand how they work. I transcribed their pseudo-code into Python, and it just worked.
 	# Test grammars in the unit tests seem to work okay, so its fine by me! :D
-	def _f_memoisedMatch(self, expression, input, start, stop):
-		memoEntry = self._p_recall( expression, input, start, stop )
+	def _f_memoisedMatch(self, expressionKey, expressionFn, input, start, stop):
+		memoEntry = self._p_recall( expressionKey, expressionFn, input, start, stop )
 		if memoEntry is None:
-			lr = _LR( None, expression, None, self.lrStackTop() )
+			lr = _LR( None, expressionKey, None, self.lrStackTop() )
 			self.lrStack.append( lr )
 			
 			memoEntry = _MemoEntry( lr, start )
-			key = start, expression
-			self.memo[key] = memoEntry
+			self.memo[ ( start, expressionKey ) ] = memoEntry
 			
-			answer, self.pos = expression._o_evaluate( self, input, start, stop )
+			answer, self.pos = expressionFn( self, input, start, stop )
 			
 			self.lrStack.pop()
 			
@@ -88,22 +93,22 @@ class ParserState (object):
 			
 			if lr.head is not None:
 				lr.seed = answer
-				return self._p_lr_answer( expression, input, start, stop, memoEntry ),  self.pos
+				return self._p_lr_answer( expressionKey, expressionFn, input, start, stop, memoEntry ),  self.pos
 			else:
 				memoEntry.answer = answer
 				return answer,  self.pos
 		else:
 			self.pos = memoEntry.pos
 			if isinstance( memoEntry.answer, _LR ):
-				self._p_setup_lr( expression, memoEntry.answer )
+				self._p_setup_lr( expressionKey, memoEntry.answer )
 				return memoEntry.answer.seed,  self.pos
 			else:
 				return memoEntry.answer,  self.pos
 
 		
-	def _p_setup_lr(self, expression, lr):
+	def _p_setup_lr(self, expressionKey, lr):
 		if lr.head is None:
-			lr.head = _Head( expression, set(), set() )
+			lr.head = _Head( expressionKey, set(), set() )
 		s = self.lrStackTop()
 		while s.head != lr.head:
 			s.head = lr.head
@@ -111,24 +116,24 @@ class ParserState (object):
 			s = s.next
 				
 	
-	def _p_lr_answer(self, expression, input, start, stop, memoEntry):
+	def _p_lr_answer(self, expressionKey, expressionFn, input, start, stop, memoEntry):
 		h = memoEntry.answer.head
-		if h.rule is not expression:
+		if h.rule is not expressionKey:
 			return memoEntry.answer.seed
 		else:
 			memoEntry.answer = memoEntry.answer.seed
 			if memoEntry.answer is None:
 				return None
 			else:
-				return self._p_grow_lr( expression, input, start, stop, memoEntry, h )
+				return self._p_grow_lr( expressionKey, expressionFn, input, start, stop, memoEntry, h )
 
 			
-	def _p_grow_lr(self, expression, input, start, stop, memoEntry, h):
+	def _p_grow_lr(self, expressionKey, expressionFn, input, start, stop, memoEntry, h):
 		self.heads[start] = h
 		while True:
 			self.pos = start
 			h.evalSet = copy( h.involvedSet )
-			answer, self.pos = expression._o_evaluate( self, input, start, stop )
+			answer, self.pos = expressionFn( self, input, start, stop )
 			if answer is None  or  self.pos <= memoEntry.pos:
 				break
 			memoEntry.answer = answer
@@ -138,17 +143,16 @@ class ParserState (object):
 		return memoEntry.answer
 
 	
-	def _p_recall(self, expression, input, start, stop):
-		key = start, expression
-		memoEntry = self.memo.get( key )
+	def _p_recall(self, expressionKey, expressionFn, input, start, stop):
+		memoEntry = self.memo.get(  ( start, expressionKey )  )
 		h = self.heads.get( start )
 		if h is None:
 			return memoEntry
-		if memoEntry is None  and  expression not in h.head  and  expression not in h.involvedSet:
+		if memoEntry is None  and  expressionKey not in h.head  and  expressionKey not in h.involvedSet:
 			return _MemoEntry( None, start )
-		if expression in h.evalSet:
-			h.evalSet.remove( expression )
-			answer, self.pos = expression._o_evaluate( self, input, start, stop )
+		if expressionKey in h.evalSet:
+			h.evalSet.remove( expressionKey )
+			answer, self.pos = expressionFn( self, input, start, stop )
 			memoEntry.answer = answer
 			memoEntry.pos = self.pos
 		return memoEntry

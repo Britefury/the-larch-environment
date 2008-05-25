@@ -32,13 +32,8 @@ def _parser_coerce(x):
 
 
 	
-		
-		
-
-	
-		
 class ParseResult (object):
-	__slots__ = [ 'result', 'begin', 'end' ]
+	__slots__ = [ 'result', 'begin', 'end', 'bindings', 'bSuppressed' ]
 	
 	"""
 	Parse result
@@ -48,10 +43,12 @@ class ParseResult (object):
 	   begin - the start index of the result, in the input string
 	   end - the end index of the result, in the input string
 	"""
-	def __init__(self, result, begin, end):
+	def __init__(self, result, begin, end, bindings={}, bSuppressed=False):
 		self.result = result
 		self.begin = begin
 		self.end = end
+		self.bindings = bindings
+		self.bSuppressed = bSuppressed
 		
 		
 
@@ -102,7 +99,7 @@ class ParserExpression (object):
 
 	
 	def _o_match(self, state, input, start, stop):
-		return state._f_memoisedMatch( self, input, start, stop )
+		return self._o_evaluate( state, input, start, stop )
 		
 		
 		
@@ -131,10 +128,13 @@ class ParserExpression (object):
 		return Combine( [ self, x ] )
 	
 	def __or__(self, x):
-		return FirstOf( [ self, x ] )
+		return Choice( [ self, x ] )
 	
-	def __xor__(self, x):
-		return BestOf( [ self, x ] )
+	def __pow__(self, name):
+		return Bind( self, name )
+	
+	def __rshift__(self, f):
+		return Action( self, f )
 	
 	
 	def _o_compare(self, x):
@@ -144,50 +144,65 @@ class ParserExpression (object):
 	def _o_copySettingsFrom(self, x):
 		pass
 	
+	def action(self, actionFn):
+		return Action( self, actionFn )
 
 	
 	
-class ParserExpressionWithAction (ParserExpression):
-	"""Parser expression that can take actions; base class"""
-	def __init__(self):
-		super( ParserExpressionWithAction, self ).__init__()
-		self._actionFn = None
+class Bind (ParserExpression):
+	"""
+	Parser expression that binds the result of a sub-expression to a name
+	"""
+	def __init__(self, subexp, name):
+		super( Bind, self ).__init__()
+		self._subexp = _parser_coerce( subexp )
+		self._name = name
 		
 		
-	def setAction(self, f):
-		"""
-		Set the action function
-		setAction( f )  ->  self
-		This function is called when the parser expression successfully matches some text.
-		It is of the form:
-		   f(input, start, end, tokens)  ->  resultTokens
-		      input  -  the original string being parsed
-		      start, end  -  start and end indices indicating the substring of @input that was parsed
-		      tokens  -  the tokens from sub-parse-expressions
-		     resultTokens  -  is passed as @tokens to the parent parser expression action function
-		"""
-		element = copy( self )
-		element._actionFn = f
-		return element
-	
-
-	def _p_action(self, input, start, end, tokens):
-		result = None
-		if self._actionFn is not None:
-			result = self._actionFn( input, start, end, tokens )
-		if result is None:
-			return tokens
+	def _o_evaluate(self, state, input, start, stop):
+		res, pos = self._subexp._o_match( state, input, start, stop )
+		if res is not None:
+			b = copy( res.bindings )
+			b[self._name] = res.result
+			return ParseResult( res.result, start, pos, b ),  pos
 		else:
-			return result
-		
+			return res, pos
 
-	def _o_copySettingsFrom(self, x):
-		super( ParserExpressionWithAction, self )._o_copySettingsFrom( x )
-		self._actionFn = x._actionFn
+	
+	def _o_compare(self, x):
+		return self._subexp == x._subexp  and  self._name == x._name
 	
 	
 	
-class Forward (ParserExpressionWithAction):
+
+class Action (ParserExpression):
+	"""
+	Parser expression that applies an action function to the results of parsing the sub-expression
+	The function is of the form:
+	f(inputText, position, subExpResult, <bound_vars>)  ->  result
+	"""
+	def __init__(self, subexp, actionFn):
+		super( Action, self ).__init__()
+		self._subexp = _parser_coerce( subexp )
+		self._actionFn = actionFn
+		
+		
+	def _o_evaluate(self, state, input, start, stop):
+		res, pos = self._subexp._o_match( state, input, start, stop )
+		if res is not None:
+			return ParseResult( self._actionFn( input, start, res.result, **res.bindings ), start, pos ),  pos
+		else:
+			return res, pos
+
+	
+	def _o_compare(self, x):
+		return self._subexp == x._subexp  and  self._actionFn == x._actionFn
+	
+	
+	
+
+
+class Forward (ParserExpression):
 	"""
 	Forward
 	
@@ -221,13 +236,13 @@ class Forward (ParserExpressionWithAction):
 		"""
 		Set the subexpression to be matched.
 		"""
-		self._subexp = subexp
+		self._subexp = _parser_coerce( subexp )
 		return self
 
 
 	
 
-class Group (ParserExpressionWithAction):
+class Group (ParserExpression):
 	"""
 	Group
 	Used to group a sub-expression
@@ -250,11 +265,7 @@ class Group (ParserExpressionWithAction):
 		
 
 	def _o_evaluate(self, state, input, start, stop):
-		res, pos = self._subexp._o_match( state, input, start, stop )
-		if res is None:
-			return res, pos
-		else:
-			return ParseResult( self._p_action( input, start, pos, res.result ), start, pos ),  pos
+		return self._subexp._o_match( state, input, start, stop )
 
 	
 	def _o_compare(self, x):
@@ -268,7 +279,13 @@ class Production (Group):
 	Production
 	Group a subexpression into the right hand side of a grammar rule
 	"""
-	pass
+	def _o_match(self, state, input, start, stop):
+		return state._f_memoisedMatch( self, self._o_evaluate, input, start, stop )
+	
+	
+	def action(self, actionFn):
+		# Wrap the inner sub-expression in the Action expression
+		return Production( Action( self._subexp, actionFn ) )
 	
 
 	
@@ -277,6 +294,7 @@ class Suppress (ParserExpression):
 	"""
 	Suppress
 	Matches the sub-expression but returns an empty result
+	Bindings pass through.
 	"""
 	def __init__(self, subexp):
 		"""
@@ -288,10 +306,10 @@ class Suppress (ParserExpression):
 
 	def _o_evaluate(self, state, input, start, stop):
 		res, pos = self._subexp._o_match( state, input, start, stop )
-		if res is None:
-			return res, pos
+		if res is not None:
+			return ParseResult( None, start, pos, res.bindings, True ),  pos
 		else:
-			return ParseResult( None, start, pos ),  pos
+			return res, pos
 
 	
 	def _o_compare(self, x):
@@ -301,7 +319,7 @@ class Suppress (ParserExpression):
 	
 	
 
-class Literal (ParserExpressionWithAction):
+class Literal (ParserExpression):
 	"""
 	Literal
 	
@@ -327,76 +345,15 @@ class Literal (ParserExpressionWithAction):
 		
 		end = start + len( self._matchString )
 		if end <= stop:
-			x = input[start:end]
-			if x == self._matchString:
-				return ParseResult( self._p_action( input, start, end, x ), start, end ),  end
+			if input[start:end] == self._matchString:
+				return ParseResult( self._matchString, start, end ),  end
 		return None, start
 		
 	def _o_compare(self, x):
 		return self._matchString  ==  x._matchString
 
 
-class Word (ParserExpressionWithAction):
-	"""
-	Word
-	
-	Matches a word composed of only the specified characters
-
-	The parse result is a string.
-	"""
-	def __init__(self, initChars, bodyChars=None):
-		"""
-		Word( chars )   -   matches a word composed of characters in @chars
-		Word( initChars, bodyChars )   -   matches a word composed of characters in @bodyChars, followed by one character from @initChars
-		"""
-		super( Word, self ).__init__()
-		if bodyChars is None:
-			bodyChars = initChars
-			initChars = None
-		self._initChars = initChars
-		self._bodyChars = bodyChars
-		
-		
-	def getInitChars(self):
-		return self._initChars
-	
-	def getBodyChars(self):
-		return self._bodyChars
-		
-	
-	def _o_evaluate(self, state, input, start, stop):
-		start = state.chomp( input, start, stop )
-		
-		if start >= stop:
-			return None, start
-		
-		pos = start
-		if self._initChars is not None:
-			if input[start] not in self._initChars:
-				return None, start
-			pos = pos + 1
-			
-		end = stop
-		for i in xrange( pos, stop ):
-			c = input[i]
-			if c not in self._bodyChars:
-				end = i
-				break
-			
-		if end == start:
-			return None, start
-		else:
-			x = input[start:end]
-			return ParseResult( self._p_action( input, start, end, x ), start, end ),  end
-
-
-	def _o_compare(self, x):
-		return self._initChars  ==  x._initChars  and  self._bodyChars  ==  x._bodyChars
-	
-	
-	
-	
-class RegEx (ParserExpressionWithAction):
+class RegEx (ParserExpression):
 	"""
 	RegEx
 	
@@ -428,7 +385,7 @@ class RegEx (ParserExpressionWithAction):
 			matchString = m.group()
 			if len( matchString ) > 0:
 				end = start + len( matchString )
-				return ParseResult( self._p_action( input, start, end, matchString ), start, end ),  end
+				return ParseResult( matchString, start, end ),  end
 		return None, start
 		
 	def _o_compare(self, x):
@@ -438,7 +395,57 @@ class RegEx (ParserExpressionWithAction):
 	
 	
 	
-class Sequence (ParserExpressionWithAction):
+class Word (ParserExpression):
+	"""
+	Word
+	
+	Matches a word composed of only the specified characters
+
+	The parse result is a string.
+	"""
+	
+	def __init__(self, initChars, bodyChars=None):
+		"""
+		Word( chars )   -   matches a word composed of one or more characters from @chars
+		Word( initChars, bodyChars )   -   matches a word composed of one character from @initChars, followed by zero or more from @bodyChars
+		"""
+		super( RegEx, self ).__init__()
+		if bodyChars is None:
+			bodyChars = initChars
+			initChars = None
+
+		if initChars is None:
+			pattern = '[%s]+'  %  ( re.escape( bodyChars ), )
+		else:
+			pattern = '[%s][%s]*'  %  ( re.escape( initChars ), re.escape( bodyChars ) )
+		self._re = re.compile( pattern, flags )
+		self._initChars = initChars
+		self._bodyChars = bodyChars
+		
+		
+	def getInitChars(self):
+		return self._initChars
+	
+	def getBodyChars(self):
+		return self._bodyChars
+		
+		
+	def _o_evaluate(self, state, input, start, stop):
+		m = self._re.match( input, start, stop )
+		
+		if m is not None:		
+			matchString = m.group()
+			if len( matchString ) > 0:
+				end = start + len( matchString )
+				return ParseResult( matchString, start, end ),  end
+		return None, start
+		
+	def _o_compare(self, x):
+		return self._initChars  ==  x._initChars  and  self._bodyChars  ==  x._bodyChars
+
+
+
+class Sequence (ParserExpression):
 	"""
 	Sequence
 	
@@ -461,6 +468,7 @@ class Sequence (ParserExpressionWithAction):
 	
 	def _o_evaluate(self, state, input, start, stop):
 		subexpResults = []
+		bindings = {}
 		
 		pos = start
 		for i, subexp in enumerate( self._subexps ):
@@ -470,10 +478,11 @@ class Sequence (ParserExpressionWithAction):
 			if res is None:
 				return None, start
 			else:
-				if res.result is not None:
+				bindings.update( res.bindings )
+				if not res.bSuppressed:
 					subexpResults.append( res.result )
 		
-		return ParseResult( self._p_action( input, start, pos, subexpResults ), start, pos ),  pos
+		return ParseResult( subexpResults, start, pos, bindings ),  pos
 
 
 	def __add__(self, x):
@@ -488,7 +497,7 @@ class Sequence (ParserExpressionWithAction):
 
 	
 	
-class Combine (ParserExpressionWithAction):
+class Combine (ParserExpression):
 	"""
 	Combine
 	
@@ -511,6 +520,7 @@ class Combine (ParserExpressionWithAction):
 	
 	def _o_evaluate(self, state, input, start, stop):
 		subexpResults = []
+		bindings = {}
 		
 		pos = start
 		for i, subexp in enumerate( self._subexps ):
@@ -520,12 +530,13 @@ class Combine (ParserExpressionWithAction):
 			if res is None:
 				return None, start
 			else:
-				if res.result is not None:
+				bindings.update( res.bindings )
+				if not res.bSuppressed:
 					subexpResults.append( res.result )
 					
 		result = reduce( operator.__add__, subexpResults )
 		
-		return ParseResult( self._p_action( input, start, pos, result ), start, pos ),  pos
+		return ParseResult( result, start, pos, bindings ),  pos
 
 
 	def __sub__(self, x):
@@ -540,9 +551,9 @@ class Combine (ParserExpressionWithAction):
 
 	
 	
-class FirstOf (ParserExpressionWithAction):
+class Choice (ParserExpression):
 	"""
-	FirstOf
+	Choice
 	
 	Matches one of a list of sub-expressions
 	The first sub-expression to match successfully is the one that is used.
@@ -553,7 +564,7 @@ class FirstOf (ParserExpressionWithAction):
 		"""
 		subexps - the sub expressions, one of which is to be matched
 		"""
-		super( FirstOf, self ).__init__()
+		super( Choice, self ).__init__()
 		self._subexps = [ _parser_coerce( x )   for x in subexps ]
 		
 	
@@ -561,13 +572,13 @@ class FirstOf (ParserExpressionWithAction):
 		for i, subexp in enumerate( self._subexps ):
 			res, pos = subexp._o_match( state, input, start, stop )
 			if res is not None:
-				return ParseResult( self._p_action( input, start, pos, res.result ), start, res.end ),  pos
+				return res, pos
 			
 		return None, start
 
 	
 	def __or__(self, x):
-		f = FirstOf( self._subexps  +  [ x ] )
+		f = Choice( self._subexps  +  [ x ] )
 		f._o_copySettingsFrom( self )
 		return f
 	
@@ -577,50 +588,35 @@ class FirstOf (ParserExpressionWithAction):
 
 
 
-class BestOf (ParserExpressionWithAction):
+class Optional (ParserExpression):
 	"""
-	BestOf
+	Optional
 	
-	Matches one of a list of sub-expressions
-	The sub-expression that successfully matches the most input is the one that is used.
-	
-	The parse result is the parse result of the successfully match sub-expression.
+	Optionally matches a sub-expression
 	"""
-	def __init__(self, subexps):
+	def __init__(self, subexp):
 		"""
-		subexps - the sub expressions, one of which is to be matched
+		subexp - the sub expression to match
 		"""
-		super( BestOf, self ).__init__()
-		self._subexps = [ _parser_coerce( x )   for x in subexps ]
+		super( Optional, self ).__init__()
+		self._subexp = _parser_coerce( subexp )
 		
 	
 	def _o_evaluate(self, state, input, start, stop):
-		bestResult = None
-		bestPos = start
-		for i, subexp in enumerate( self._subexps ):
-			res, pos = subexp._o_match( state, input, start, stop )
-			if res is not None  and  pos > bestPos:
-				bestResult = res
-				bestPos = pos
-		
-		if bestResult is not None:
-			return ParseResult( self._p_action( input, start, bestPos, bestResult.result ), start, bestResult.end ),  bestPos
+		res, pos = self._subexp._o_match( state, input, start, stop )
+		if res is None:
+			return ParseResult( None, start, pos ),  pos
 		else:
-			return None, start
-
-	
-	def __xor__(self, x):
-		b = BestOf( self._subexps  +  [ x ] )
-		b._o_copySettingsFrom( self )
-		return b
+			return res, pos
 	
 	
 	def _o_compare(self, x):
-		return self._subexps  ==  x._subexps
+		return self._subexp  ==  x._subexp
+		
 
 
 
-class Repetition (ParserExpressionWithAction):
+class Repetition (ParserExpression):
 	"""
 	Repetition
 	
@@ -649,6 +645,7 @@ class Repetition (ParserExpressionWithAction):
 	
 	def _o_evaluate(self, state, input, start, stop):
 		subexpResults = []
+		bindings = {}
 		
 		pos = start
 		i = 0
@@ -657,7 +654,8 @@ class Repetition (ParserExpressionWithAction):
 			if res is None:
 				break
 			else:
-				if res.result is not None:
+				bindings.update( res.bindings )
+				if not res.bSuppressed:
 					subexpResults.append( res.result )
 			i += 1
 			
@@ -666,30 +664,14 @@ class Repetition (ParserExpressionWithAction):
 			return None, start
 		else:
 			if self._bSuppressIfZero  and  i == 0:
-				return ParseResult( None, start, pos ),  pos
+				return ParseResult( None, start, pos, bindings ),  pos
 			else:
-				return ParseResult( self._p_action( input, start, pos, subexpResults ), start, pos ),  pos
+				return ParseResult( subexpResults, start, pos, bindings ),  pos
 	
 	
 	def _o_compare(self, x):
 		return self._subexp  ==  x._subexp  and  self._min  ==  x._min  and  self._max  ==  x._max
 
-
-class Optional (Repetition):
-	"""
-	Optional
-	
-	Optionally matches a sub-expression
-
-	The parse result is a list of the parse results of the repeated application of the sub-expression.
-	"""
-	def __init__(self, subexp, bSuppressIfZero=True):
-		"""
-		subexp - the sub-expression to optionally match
-		bSuppressIfZero - When true, will generate an empty result (The result field of the ParseResult will be None) if no match is made
-		"""
-		super( Optional, self ).__init__( subexp, 0, 1, bSuppressIfZero )
-		
 
 class ZeroOrMore (Repetition):
 	"""
@@ -730,6 +712,8 @@ class Peek (ParserExpression):
 	Matches a sub-expression but does not consume it
 	
 	The parse result is an empty result.
+	
+	Bindings are blocked.
 	"""
 	def __init__(self, subexp):
 		"""
@@ -742,7 +726,7 @@ class Peek (ParserExpression):
 	def _o_evaluate(self, state, input, start, stop):
 		res, pos = self._subexp._o_match( state, input, start, stop )
 		if res is not None:
-			return ParseResult( None, start, start ),  start
+			return ParseResult( None, start, start, {}, True ),  start
 		else:
 			return None, start
 
@@ -759,6 +743,8 @@ class PeekNot (ParserExpression):
 	Matches anything but a specified sub-expression but does not consume it
 
 	The parse result is an empty result.
+	
+	Bindings are blocked.
 	"""
 	def __init__(self, subexp):
 		"""
@@ -770,8 +756,8 @@ class PeekNot (ParserExpression):
 	
 	def _o_evaluate(self, state, input, start, stop):
 		res, pos = self._subexp._o_match( state, input, start, stop )
-		if res is None  or  res.result is None:
-			return ParseResult( None, start, start ), start
+		if res is None:
+			return ParseResult( None, start, start, {}, True ), start
 		else:
 			return None, start
 
@@ -782,14 +768,14 @@ class PeekNot (ParserExpression):
 
 	
 	
-def _delimitedListAction(input, begin, end, tokens):
-	if len( tokens )  ==  0:
+def _delimitedListAction(input, begin, tokens):
+	if tokens is None:
 		return []
 	else:
-		return [ tokens[0][0] ]  +  [ x[1]   for x in tokens[0][1] ]
+		return [ tokens[0] ]  +  [ x[1]   for x in tokens[1] ]
 
-def _delimitedListActionOneOrMore(input, begin, end, tokens):
-	return [ tokens[0] ]  +  [ x[1]   for x in tokens[1] ]
+def _delimitedListActionOneOrMore(input, begin, tokens):
+	return [ tokens[0] ]  +  [ x[1]  for x in tokens[1] ]
 
 def delimitedList(subexp, delimiter=',', bOneOrMore=False):
 	"""
@@ -811,9 +797,9 @@ def delimitedList(subexp, delimiter=',', bOneOrMore=False):
 	   [ 'a', 'b', 'c', 'd' ]
 	"""
 	if bOneOrMore:
-		return ( subexp  +  ZeroOrMore( _parser_coerce( delimiter )  +  subexp ) ).setAction( _delimitedListActionOneOrMore )
+		return ( subexp +  ZeroOrMore( _parser_coerce( delimiter )  +  subexp ) )  >>  _delimitedListActionOneOrMore
 	else:
-		return ( Optional( subexp  +  ZeroOrMore( _parser_coerce( delimiter )  +  subexp ), False ) ).setAction( _delimitedListAction )
+		return Optional( subexp  +  ZeroOrMore( _parser_coerce( delimiter )  +  subexp ) )  >>  _delimitedListAction
 
 
 
@@ -936,6 +922,19 @@ class TestCase_Parser (unittest.TestCase):
 				self.assert_( end == result.end )
 		
 	
+	def _bindingsTest(self, parser, input, expectedBindings, ignoreChars=string.whitespace):
+		result = parser.parseString( input, ignoreChars=ignoreChars )
+		self.assert_( result is not None )
+		if result.bindings != expectedBindings:
+			print 'EXPECTED BINDINGS:'
+			print expectedBindings
+			print ''
+			print 'RESULT BINDINGS:'
+			print result.bindings
+		self.assert_( result.bindings == expectedBindings )
+		
+		
+	
 	def _matchFailTest(self, parser, input, ignoreChars=string.whitespace):
 		result = parser.parseString( input, ignoreChars=ignoreChars )
 		if result is not None   and   result.end == len( input ):
@@ -954,6 +953,16 @@ class TestCase_Parser (unittest.TestCase):
 		self._matchFailTest( Literal( 'abcxyz' ), 'qwerty' )
 		self._matchTest( Literal( 'abcxyz' ), 'abcxyz123', 'abcxyz', 0, 6 )
 		
+		
+	def testRegEx(self):
+		self.assert_( RegEx( r"[A-Za-z_][A-Za-z0-9]*" )  ==  RegEx( r"[A-Za-z_][A-Za-z0-9]*" ) )
+		self.assert_( RegEx( r"[A-Za-z_][A-Za-z0-9]*" )  !=  RegEx( r"[A-Za-z_][A-Za-z0-9]*abc" ) )
+		self._matchTest( RegEx( r"[A-Za-z_][A-Za-z0-9]*" ), 'abc123', 'abc123', 0, 6 )
+		self._matchFailTest( RegEx( r"[A-Za-z_][A-Za-z0-9]*" ), '9abc' )
+		self._matchTest( RegEx( r"[A-Za-z_][A-Za-z0-9]*" ), 'abcxyz...', 'abcxyz', 0, 6 )
+		
+		
+	
 	def testWord(self):
 		self.assert_( Word( 'abc' )  ==  Word( 'abc' ) )
 		self.assert_( Word( 'abc' )  !=  Word( 'def' ) )
@@ -972,13 +981,33 @@ class TestCase_Parser (unittest.TestCase):
 		self._matchTest( Word( 'abc', 'def' ), 'baddeeff', 'b', 0, 1 )
 		self._matchFailTest( Word( 'abc', 'def' ), 'ddeeff' )
 
+		self._matchTest( Word( 'abc', '+*[]\\' ), 'a++**[[]]\\\\', 'a++**[[]]\\\\', 0, 11 )
+
 		
-	def testRegEx(self):
-		self.assert_( RegEx( r"[A-Za-z_][A-Za-z0-9]*" )  ==  RegEx( r"[A-Za-z_][A-Za-z0-9]*" ) )
-		self.assert_( RegEx( r"[A-Za-z_][A-Za-z0-9]*" )  !=  RegEx( r"[A-Za-z_][A-Za-z0-9]*abc" ) )
-		self._matchTest( RegEx( r"[A-Za-z_][A-Za-z0-9]*" ), 'abc123', 'abc123', 0, 6 )
-		self._matchFailTest( RegEx( r"[A-Za-z_][A-Za-z0-9]*" ), '9abc' )
-		self._matchTest( RegEx( r"[A-Za-z_][A-Za-z0-9]*" ), 'abcxyz...', 'abcxyz', 0, 6 )
+	def testBind(self):
+		self.assert_( Bind( 'abc', 'x' )  ==  Bind( 'abc', 'x' ) )
+		self.assert_( Bind( 'abc', 'x' )  !=  Bind( 'def', 'x' ) )
+		self.assert_( Bind( 'abc', 'x' )  !=  Bind( 'abc', 'y' ) )
+		self.assert_( Bind( 'abc', 'x' )  ==  Literal( 'abc' )  **  'x' )
+		
+		parser = Literal( 'abc' )  **  'x'
+		
+		self._matchTest( parser, 'abc', 'abc', 0, 3 )
+		self._bindingsTest( parser, 'abc', {'x' : 'abc'} )
+		
+
+	def testAction(self):
+		f = lambda input, pos, res, x: x + x
+		g = lambda input, pos, res, y: y
+		self.assert_( Action( 'abc', f )  ==  Action( 'abc', f ) )
+		self.assert_( Action( 'abc', f )  !=  Action( 'def', f ) )
+		self.assert_( Action( 'abc', f )  !=  Action( 'abc', g ) )
+		self.assert_( Action( 'abc', f )  ==  Literal( 'abc' )  >>  f )
+		
+		parser = ( Literal( 'abc' )  **  'x' )  >>  f
+		
+		self._matchTest( parser, 'abc', 'abcabc', 0, 3 )
+		self._bindingsTest( parser, 'abc', {} )
 		
 
 	def testSequence(self):
@@ -988,9 +1017,10 @@ class TestCase_Parser (unittest.TestCase):
 		self.assert_( Sequence( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )   ==   Literal( 'ab' )  +  Literal( 'qw' )  +  Literal( 'fh' ) )
 		self.assert_( Sequence( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )   ==   Literal( 'ab' )  +  'qw'  +  'fh' )
 
-		parser = Sequence( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )
+		parser = Sequence( [ Literal( 'ab' ) ** 'x', Literal( 'qw' ) ** 'y', Literal( 'fh' ) ** 'z' ] )
 		self._matchTest( parser, 'abqwfh', [ 'ab', 'qw', 'fh' ], 0, 6 )
 		self._matchFailTest( parser, 'abfh' )
+		self._bindingsTest( parser, 'abqwfh', { 'x':'ab',  'y':'qw',  'z':'fh' } )
 	
 		
 	def testCombine(self):
@@ -998,51 +1028,40 @@ class TestCase_Parser (unittest.TestCase):
 		self.assert_( Combine( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )   !=   Combine( [ Literal( 'ab' ), Literal( 'qw' ) ] ) )
 		self.assert_( Combine( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )   !=   Combine( [ Literal( 'qb' ), Literal( 'qw' ), Literal( 'fh' ) ] ) )
 
-		parser = Combine( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )
+		parser = Combine( [ Literal( 'ab' ) ** 'x', Literal( 'qw' ) ** 'y', Literal( 'fh' ) ** 'z' ] )
 		self._matchTest( parser, 'abqwfh', 'abqwfh', 0, 6 )
 		self._matchFailTest( parser, 'abfh' )
+		self._bindingsTest( parser, 'abqwfh', { 'x':'ab',  'y':'qw',  'z':'fh' } )
 	
 		
 	def testSuppress(self):
 		self.assert_( Suppress( 'abc' )  ==  Suppress( 'abc' ) )
 		self.assert_( Suppress( 'abc' )  !=  Suppress( 'def' ) )
 		
-		parser = Literal( 'ab' )  +  Suppress( 'cd' )  +  Literal( 'ef' )
+		parser = Literal( 'ab' )  **  'x'  +  Suppress( Literal( 'cd' )  **  'y' )  +  Literal( 'ef' )  **  'z'
 		
 		self._matchTest( parser, 'abcdef', [ 'ab', 'ef' ], 0, 6 )
 		self._matchFailTest( parser, 'abef' )
+		self._bindingsTest( parser, 'abcdef', { 'x':'ab',  'y':'cd',  'z':'ef' } )
 		
 
-	def testFirstOf(self):
-		self.assert_( FirstOf( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )   ==   FirstOf( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] ) )
-		self.assert_( FirstOf( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )   !=   FirstOf( [ Literal( 'ab' ), Literal( 'qw' ) ] ) )
-		self.assert_( FirstOf( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )   !=   FirstOf( [ Literal( 'qb' ), Literal( 'qw' ), Literal( 'fh' ) ] ) )
-		self.assert_( FirstOf( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )   ==   Literal( 'ab' )  |  Literal( 'qw' )  |  Literal( 'fh' ) )
-		self.assert_( FirstOf( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )   ==   Literal( 'ab' )  |  'qw'  |  'fh' )
+	def testChoice(self):
+		self.assert_( Choice( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )   ==   Choice( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] ) )
+		self.assert_( Choice( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )   !=   Choice( [ Literal( 'ab' ), Literal( 'qw' ) ] ) )
+		self.assert_( Choice( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )   !=   Choice( [ Literal( 'qb' ), Literal( 'qw' ), Literal( 'fh' ) ] ) )
+		self.assert_( Choice( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )   ==   Literal( 'ab' )  |  Literal( 'qw' )  |  Literal( 'fh' ) )
+		self.assert_( Choice( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )   ==   Literal( 'ab' )  |  'qw'  |  'fh' )
 
-		parser = FirstOf( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )
+		parser = Choice( [ Literal( 'ab' ) ** 'x', Literal( 'qw' ) ** 'x', Literal( 'fh' ) ** 'x' ] )
 		self._matchTest( parser, 'ab', 'ab', 0, 2 )
 		self._matchTest( parser, 'qw', 'qw', 0, 2 )
 		self._matchTest( parser, 'fh', 'fh', 0, 2 )
 		self._matchFailTest( parser, 'xy' )
 		self._matchTest( Literal( 'ab' )  |  Literal( 'abcd' ),   'ab', 'ab', 0, 2 )
 		self._matchTest( Literal( 'ab' )  |  Literal( 'abcd' ),   'abcd', 'ab', 0, 2 )
-		
-		
-	def testBestOf(self):
-		self.assert_( BestOf( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )   ==   BestOf( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] ) )
-		self.assert_( BestOf( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )   !=   BestOf( [ Literal( 'ab' ), Literal( 'qw' ) ] ) )
-		self.assert_( BestOf( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )   !=   BestOf( [ Literal( 'qb' ), Literal( 'qw' ), Literal( 'fh' ) ] ) )
-		self.assert_( BestOf( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )   ==   Literal( 'ab' )  ^  Literal( 'qw' )  ^  Literal( 'fh' ) )
-		self.assert_( BestOf( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )   ==   Literal( 'ab' )  ^  'qw'  ^  'fh' )
-
-		parser = BestOf( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )
-		self._matchTest( parser, 'ab', 'ab', 0, 2 )
-		self._matchTest( parser, 'qw', 'qw', 0, 2 )
-		self._matchTest( parser, 'fh', 'fh', 0, 2 )
-		self._matchFailTest( parser, 'xy' )
-		self._matchTest( Literal( 'ab' )  ^  Literal( 'abcd' ),   'ab', 'ab', 0, 2 )
-		self._matchTest( Literal( 'ab' )  ^  Literal( 'abcd' ),   'abcd', 'abcd', 0, 4 )
+		self._bindingsTest( parser, 'ab', { 'x':'ab' } )
+		self._bindingsTest( parser, 'qw', { 'x':'qw' } )
+		self._bindingsTest( parser, 'fh', { 'x':'fh' } )
 		
 		
 	def testOptional(self):
@@ -1050,10 +1069,12 @@ class TestCase_Parser (unittest.TestCase):
 		self.assert_( Optional( Literal( 'ab' ) )   !=   Optional( Literal( 'qb' ) ) )
 		self.assert_( Optional( Literal( 'ab' ) )   ==   Optional( 'ab' ) )
 		
-		parser = Optional( Literal( 'ab' ) ) 
+		parser = Optional( Word( 'a', 'b' )  **  'x' )
 		self._matchTest( parser, '', None, 0, 0 )
-		self._matchTest( parser, 'ab', [ 'ab' ], 0, 2 )
-		self._matchTest( parser, 'abab', [ 'ab' ], 0, 2 )
+		self._matchTest( parser, 'abb', 'abb', 0, 3 )
+		self._matchTest( parser, 'abbabb', 'abb', 0, 3 )
+		self._bindingsTest( parser, '', {} )
+		self._bindingsTest( parser, 'abb', { 'x':'abb' } )
 
 		
 	def testZeroOrMore(self):
@@ -1061,10 +1082,12 @@ class TestCase_Parser (unittest.TestCase):
 		self.assert_( ZeroOrMore( Literal( 'ab' ) )   !=   ZeroOrMore( Literal( 'qb' ) ) )
 		self.assert_( ZeroOrMore( Literal( 'ab' ) )   ==   ZeroOrMore( 'ab' ) )
 		
-		parser = ZeroOrMore( Literal( 'ab' ) + Literal( 'cd' ) ) 
+		parser = ZeroOrMore( Word( 'a', 'b' ) ** 'x' + Word( 'c', 'd' ) ** 'y' )
 		self._matchTest( parser, '', [], 0, 0 )
-		self._matchTest( parser, 'abcd', [ [ 'ab', 'cd' ] ], 0, 4 )
-		self._matchTest( parser, 'abcdabcd', [ [ 'ab', 'cd' ], [ 'ab', 'cd' ] ], 0, 8 )
+		self._matchTest( parser, 'abbcdd', [ [ 'abb', 'cdd' ] ], 0, 6 )
+		self._matchTest( parser, 'abbcddabbbcddd', [ [ 'abb', 'cdd' ], [ 'abbb', 'cddd' ] ], 0, 14 )
+		self._bindingsTest( parser, '', {} )
+		self._bindingsTest( parser, 'abcdabbbcddd', { 'x':'abbb', 'y':'cddd' } )
 
 		
 	def testOneOrMore(self):
@@ -1072,27 +1095,30 @@ class TestCase_Parser (unittest.TestCase):
 		self.assert_( OneOrMore( Literal( 'ab' ) )   !=   OneOrMore( Literal( 'qb' ) ) )
 		self.assert_( OneOrMore( Literal( 'ab' ) )   ==   OneOrMore( 'ab' ) )
 		
-		parser = OneOrMore( Literal( 'ab' ) ) 
+		parser = OneOrMore( Word( 'a', 'b' )  **  'x' ) 
 		self._matchFailTest( parser, '' )
-		self._matchTest( parser, 'ab', [ 'ab' ], 0, 2 )
-		self._matchTest( parser, 'abab', [ 'ab', 'ab' ], 0, 4 )
+		self._matchTest( parser, 'abb', [ 'abb' ], 0, 3 )
+		self._matchTest( parser, 'ababb', [ 'ab', 'abb' ], 0, 5 )
+		self._bindingsTest( parser, 'ab', { 'x':'ab' } )
+		self._bindingsTest( parser, 'ababbb', { 'x':'abbb' } )
 		
 		
 	def testPeek(self):
 		self.assert_( Peek( Literal( 'ab' ) )   ==   Peek( 'ab' ) )
 
-		parser = OneOrMore( Literal( 'ab' ) )  +  Peek( Literal( 'cd' ) )
+		parser = OneOrMore( Literal( 'ab' ) )  +  Peek( Literal( 'cd' )  **  'x' )
 		self._matchFailTest( parser, '' )
 		self._matchFailTest( parser, 'ab' )
 		self._matchFailTest( parser, 'abab' )
 		self._matchTest( parser, 'abcd', [ [ 'ab' ] ], 0, 2 )
 		self._matchTest( parser, 'ababcd', [ [ 'ab', 'ab' ] ], 0, 4 )
+		self._bindingsTest( parser, 'abcd', {} )
 
 		
 	def testPeekNot(self):
 		self.assert_( PeekNot( Literal( 'ab' ) )   ==   PeekNot( 'ab' ) )
 
-		parser = OneOrMore( Literal( 'ab' ) )  +  PeekNot( Literal( 'cd' ) )
+		parser = OneOrMore( Literal( 'ab' ) )  +  PeekNot( Literal( 'cd' )  **  'x' )
 		self._matchFailTest( parser, '' )
 		self._matchTest( parser, 'ab', [ [ 'ab' ] ], 0, 2 )
 		self._matchFailTest( parser, 'abcd' )
@@ -1100,6 +1126,7 @@ class TestCase_Parser (unittest.TestCase):
 		self._matchTest( parser, 'abab', [ [ 'ab', 'ab' ] ], 0, 4 )
 		self._matchFailTest( parser, 'ababcd' )
 		self._matchTest( parser, 'ababef', [ [ 'ab', 'ab' ] ], 0, 4 )
+		self._bindingsTest( parser, 'abef', {} )
 		
 		
 	def testIIdentifier(self):
@@ -1158,9 +1185,6 @@ class TestCase_Parser (unittest.TestCase):
 		
 		
 
-
-	
-		
 	def testFloatingPoint(self):
 		parser = floatingPoint
 		self._matchTest( parser, "3.14", "3.14" )
@@ -1291,23 +1315,23 @@ class TestCase_Parser (unittest.TestCase):
 		addop = plus | minus
 		mulop = star | slash
 		
-		def flattenAction(input, begin, end, x):
+		def flattenAction(input, begin, x):
 			y = []
 			for a in x:
 				y.extend( a )
 			return y
 			
 			
-		def action(input, start, end, x):
-			if len( x ) == 1:
+		def action(input, start, x):
+			if x[1] == []:
 				return x[0]
 			else:
 				return [ x[0] ]  +  x[1]
 
 				
 		
-		mul = Production( ( integer  +  ZeroOrMore( mulop + integer, True ).setAction( flattenAction ) ).setAction( action ) )
-		add = Production( ( mul  +  ZeroOrMore( addop + mul, True ).setAction( flattenAction ) ).setAction( action ) )
+		mul = Production( ( integer  +  ( ZeroOrMore( mulop + integer )  >>  flattenAction ) )  >>  action )
+		add = Production( ( mul  +  ( ZeroOrMore( addop + mul )  >>   flattenAction ) )  >>  action )
 		expr = add
 		
 		parser = expr
@@ -1341,20 +1365,6 @@ class TestCase_Parser (unittest.TestCase):
 		
 		addop = plus | minus
 		mulop = star | slash
-		
-		def _flatten(x):
-			y = []
-			for a in x:
-				y.extend( a )
-			return y
-			
-			
-		def action(input, start, end, x):
-			if len( x ) == 1:
-				return x[0]
-			else:
-				return [ x[0] ]  +  _flatten( x[1] )
-				
 		
 		mul = Forward()
 		mul  <<  Production( ( mul + mulop + integer )  |  integer )
@@ -1482,11 +1492,11 @@ class TestCase_Parser (unittest.TestCase):
 		expression  <<  Production( add )
 		
 		
-		singleStatement = Production( expression + Suppress( ';' ) ).setAction( lambda input, start, end, tokens: tokens[0] )
+		singleStatement = Production( ( expression + Suppress( ';' ) )  >>  ( lambda input, start, tokens: tokens[0] ) )
 
 		statement = Forward()
 		block = Production( ZeroOrMore( statement ) )
-		compoundStatement = Production( Literal( '$<indent>$' )  +  block  +  Literal( '$<dedent>$' ) ).setAction( lambda input, start, end, tokens: tokens[1] )
+		compoundStatement = Production( ( Literal( '$<indent>$' )  +  block  +  Literal( '$<dedent>$' ) )  >>  ( lambda input, start, tokens: tokens[1] ) )
 		statement  <<  Production( compoundStatement  |  singleStatement )
 		
 		
