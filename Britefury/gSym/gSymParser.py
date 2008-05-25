@@ -138,18 +138,9 @@ class _PDefExpression (object):
 		super( _PDefExpression, self ).__init__()
 		self._dbgSrc = dbgSrc
 	
-	def emitPyTree(self, builder):
-		"""
-		-> class_pre,  fn_pre,  expression
-		"""
-		return [], [], None
+	def emitPyTree(self):
+		return None
 	
-	def emitAsFnPyTree(self, builder, fnName):
-		cPre, fPre, x = self.emitPyTree( builder )
-		return cPre, \
-		       fPre + [ PyDef( fnName, [ '_input', '_start' ], self._dbgSrc ) ], \
-		       PyVar( fnName )
-
 
 	def getRulesUsed(self):
 		return []
@@ -157,131 +148,106 @@ class _PDefExpression (object):
 
 
 class _PDefLiteral (_PDefExpression):
-	def __init__(self, matchString):
-		super( _PDefLiteral, self ).__init__()
+	def __init__(self, matchString, dbgSrc=None):
+		super( _PDefLiteral, self ).__init__( dbgSrc )
 		self._matchString = matchString
 
 		
-	def emitPyTree(self, builder):
-		return [], \
-		       [], \
-		       PyVar( 'self' ).attr( '_literal' )( PyVar( '_input' ), PyVar( '_start' ), PyLiteralValue( self._matchString ) )
+	def emitPyTree(self):
+		return PyVar( _literal )( self._matchString ).debug( self._dbgSrc )
+
+
+
+class _PDefRegEx (_PDefExpression):
+	def __init__(self, pattern, dbgSrc=None):
+		super( _PDefRegEx, self ).__init__( dbgSrc )
+		self._pattern = pattern
+
+	def emitPyTree(self):
+		return PyVar( _regex )( self._pattern ).debug( self._dbgSrc )
 
 
 
 class _PDefWord (_PDefExpression):
-	def __init__(self, initChars, bodyChars=None):
-		super( _PDefWord, self ).__init__()
+	def __init__(self, initChars, bodyChars=None, dbgSrc=None):
+		super( _PDefWord, self ).__init__( dbgSrc )
 		self._initChars = initChars
 		self._bodyChars = bodyChars
 
-	def emitPyTree(self, builder):
-		if self._bodyChars is None:
-			return [], \
-			       [], \
-			       PyVar( 'self' ).attr( '_word' )( PyVar( '_input' ), PyVar( '_start' ), PyLiteralValue( None ), PyLiteralValue( self._initChars ) )
-		else:
-			return [], \
-			       [], \
-			       PyVar( 'self' ).attr( '_word' )( PyVar( '_input' ), PyVar( '_start' ), PyLiteralValue( self._initChars ), PyLiteralValue( self._bodyChars ) )
-
-
-class _PDefRegEx (_PDefExpression):
-	def __init__(self, pattern):
-		super( _PDefRegEx, self ).__init__()
-		self._pattern = pattern
-
-	def emitPyTree(self, builder):
-		name = builder.allocName( 'regex' )
-		return [ PyVar( name ).assign_sideEffects( PyVar( '_re' ).attr( 'compile' )( PyLiteralValue( self._pattern ) ) ) ], \
-		       [], \
-		       PyVar( 'self' ).attr( '_regex' )( PyVar( '_input' ), PyVar( '_start' ), PyVar( 'self' ).attr( name ) )
+	def emitPyTree(self):
+		return PyVar( _word )( self._initChars, self._bodyChars ).debug( self._dbgSrc )
 
 
 
 
-class _PDefCombinatorExpr (_PDefExpression):
-	combinatorFunctionName = None
+class _PDefSubexpList (_PDefExpression):
 	combinatorName = None
-	combinatorBuilderName = None
 
-	def __init__(self, subexps):
-		super( _PDefCombinatorExpr, self ).__init__()
+	def __init__(self, subexps, dbgSrc=None):
+		super( _PDefSubexpList, self ).__init__( dbgSrc )
 		self._subexps = subexps
 
-	def emitPyTree(self, builder):
-		pre = []
-		xs = []
-		names = []
-		for subexp in self._subexps:
-			p, x, n = subexp.emitPyTree( builder )
-			pre.extend( p )
-			xs.append( x )
-			names.append( n )
-		name = builder.allocName( self.combinatorName )
-		return pre + [ PyVar( name ).assign_sideEffects( PyVar( self.combinatorBuilderName )( *[ PyVar( n )  for n in names ] ) ) ], \
-		       _matchCall( PyVar( 'self' ).attr( name ) ), \
-		       name
+	def emitPyTree(self):
+		return PyVar( self.combinatorName )( PyListLiteral( [ s.emitPyTree()   for s in self._subexps ] ) )
 
 	def getRulesUsed(self):
 		return reduce( lambda rules, x: rules + x.getRulesUsed(), self._subexps, [] )
 
 
 
-class _PDefSequence (_PDefCombinatorExpr):
-	combinatorFunctionName = '_sequence'
-	combinatorName = 'sequence'
-	combinatorBuilderName = _sequence
+class _PDefSequence (_PDefSubexpList):
+	combinatorName = _sequence
 
 
 
-class _PDefCombine (_PDefCombinatorExpr):
-	combinatorFunctionName = '_combine'
-	combinatorName = 'combine'
-	combinatorBuilderName = _combine
+class _PDefCombine (_PDefSubexpList):
+	combinatorName = _combine
 
 
 
-class _PDefChoice (_PDefCombinatorExpr):
-	combinatorFunctionName = '_choice'
-	combinatorName = 'choice'
-	combinatorBuilderName = _choice
+class _PDefChoice (_PDefSubexpList):
+	combinatorName = _choice
 
 
 
 
-class _PDefOptional (_PDefCombinatorExpr):
-	combinatorFunctionName = '_optional'
-	combinatorName = 'optional'
-	combinatorBuilderName = _optional
+class _PDefSingleSubexp (_PDefExpression):
+	combinatorName = None
+
+	def __init__(self, subexp, dbgSrc=None):
+		super( _PDefSingleSubexp, self ).__init__( dbgSrc )
+		self._subexp = subexp
+
+	def emitPyTree(self):
+		return PyVar( self.combinatorName )( self._subexp.emitPyTree() )
+
+	def getRulesUsed(self):
+		return self._subexp.getRulesUsed()
 
 
 
-class _PDefZeroOrMore (_PDefCombinatorExpr):
-	combinatorFunctionName = '_zeroOrMore'
-	combinatorName = 'zeroOrMore'
-	combinatorBuilderName = _zeroOrMore
+class _PDefOptional (_PDefSingleSubexp):
+	combinatorName = _optional
 
 
 
-class _PDefOneOrMore (_PDefCombinatorExpr):
-	combinatorFunctionName = '_oneOrMore'
-	combinatorName = 'oneOrMore'
-	combinatorBuilderName = _oneOrMore
+class _PDefZeroOrMore (_PDefSingleSubexp):
+	combinatorName = _zeroOrMore
 
 
 
-class _PDefPeek (_PDefCombinatorExpr):
-	combinatorFunctionName = '_peek'
-	combinatorName = '_peek'
-	combinatorBuilderName = _peek
+class _PDefOneOrMore (_PDefSingleSubexp):
+	combinatorName = _oneOrMore
 
 
 
-class _PDefPeekNot (_PDefCombinatorExpr):
-	combinatorFunctionName = '_peekNot'
-	combinatorName = 'peekNot'
-	combinatorBuilderName = _peekNot
+class _PDefPeek (_PDefSingleSubexp):
+	combinatorName = _peek
+
+
+
+class _PDefPeekNot (_PDefSingleSubexp):
+	combinatorName = _peekNot
 
 
 
@@ -304,86 +270,53 @@ class Test_gSymParser (unittest.TestCase):
 		self.assert_( result == pySrc )
 	
 		
+	def _testCompileAsExpr(self, pdef, pySrc):
+		result = pdef.emitPyTree().compileAsExpr()
+		if result != pySrc:
+			print 'EXPECTED:'
+			print pySrc
+			print ''
+			print 'RESULT:'
+			print result
+		self.assert_( result == pySrc )
+		
 		
 	def test_Literal(self):
-		pySrcParser = [
-			"class LP (_ParserBase):",
-			"  def _rule_literal(self, _state, _input, _start):",
-			"    return self._literal( _input, _start, 'abc' )",
-			"  def literal(self, _input, _start):",
-			"    return self._rule_literal( ParserState(), _input, _start )"
-			]
-		self._testCompileAsParser( _PDefLiteral( 'abc' ), 'literal', 'LP', pySrcParser )
-
-		
+		self._testCompileAsExpr( _PDefLiteral( 'abc' ), "Literal( 'abc' )" )
 		
 	def test_Word(self):
-		pySrcParser = [
-			"class WP (_ParserBase):",
-			"  def _rule_word(self, _state, _input, _start):",
-			"    return self._word( _input, _start, 'abc', 'xyz' )",
-			"  def word(self, _input, _start):",
-			"    return self._rule_word( ParserState(), _input, _start )"
-			]
-		self._testCompileAsParser( _PDefWord( 'abc', 'xyz' ), 'word', 'WP', pySrcParser )
+		self._testCompileAsExpr( _PDefWord( 'abc' ), "Word( 'abc', None )" )
+		self._testCompileAsExpr( _PDefWord( 'abc', 'def' ), "Word( 'abc', 'def' )" )
 
-		
-		
 	def test_RegEx(self):
-		pySrcParser = [
-			"class RP (_ParserBase):",
-			"  _gsym__parser__regex_0 = _re.compile( 'abc' )",
-			"  def _rule_regex(self, _state, _input, _start):",
-			"    return self._regex( _input, _start, self._gsym__parser__regex_0 )",
-			"  def regex(self, _input, _start):",
-			"    return self._rule_regex( ParserState(), _input, _start )"
-			]
-		self._testCompileAsParser( _PDefRegEx( 'abc' ), 'regex', 'RP', pySrcParser )
+		self._testCompileAsExpr( _PDefRegEx( 'abc' ), "RegEx( 'abc' )" )
+		
+	def test_Sequence(self):
+		self._testCompileAsExpr( _PDefSequence( [ _PDefLiteral( 'a' ), _PDefLiteral( 'b' ), _PDefLiteral( 'c' ) ] ), "Sequence( [ Literal( 'a' ), Literal( 'b' ), Literal( 'c' ) ] )" )
+		
+	def test_Sequence(self):
+		self._testCompileAsExpr( _PDefSequence( [ _PDefLiteral( 'a' ), _PDefLiteral( 'b' ), _PDefLiteral( 'c' ) ] ), "Sequence( [ Literal( 'a' ), Literal( 'b' ), Literal( 'c' ) ] )" )
+		
+	def test_Combine(self):
+		self._testCompileAsExpr( _PDefCombine( [ _PDefLiteral( 'a' ), _PDefLiteral( 'b' ), _PDefLiteral( 'c' ) ] ), "Combine( [ Literal( 'a' ), Literal( 'b' ), Literal( 'c' ) ] )" )
+		
+	def test_Choice(self):
+		self._testCompileAsExpr( _PDefChoice( [ _PDefLiteral( 'a' ), _PDefLiteral( 'b' ), _PDefLiteral( 'c' ) ] ), "Choice( [ Literal( 'a' ), Literal( 'b' ), Literal( 'c' ) ] )" )
+		
+	def test_Optional(self):
+		self._testCompileAsExpr( _PDefOptional( _PDefLiteral( 'a' ) ), "Optional( Literal( 'a' ) )" )
+		
+	def test_ZeroOrMore(self):
+		self._testCompileAsExpr( _PDefZeroOrMore( _PDefLiteral( 'a' ) ), "ZeroOrMore( Literal( 'a' ) )" )
+		
+	def test_OneOrMore(self):
+		self._testCompileAsExpr( _PDefOneOrMore( _PDefLiteral( 'a' ) ), "OneOrMore( Literal( 'a' ) )" )
+		
+	def test_Peek(self):
+		self._testCompileAsExpr( _PDefPeek( _PDefLiteral( 'a' ) ), "Peek( Literal( 'a' ) )" )
+		
+	def test_PeekNot(self):
+		self._testCompileAsExpr( _PDefPeekNot( _PDefLiteral( 'a' ) ), "PeekNot( Literal( 'a' ) )" )
 
 
-		
-	#def test_Sequence(self):
-		#pySrc = [
-			#"_gsym__parser__literal_0 = Literal( 'a' )",
-			#"_gsym__parser__literal_1 = Literal( 'b' )",
-			#"_gsym__parser__literal_2 = Literal( 'c' )",
-			#"_gsym__parser__sequence_0 = Sequence( _gsym__parser__literal_0, _gsym__parser__literal_1, _gsym__parser__literal_2 )",
-			#"self._gsym__parser__sequence_0._o_match( _state, _input, _start, _stop )"
-			#]
-		#self._testCompileAsExpr( _PDefSequence( [ _PDefLiteral( 'a' ), _PDefLiteral( 'b' ), _PDefLiteral( 'c' ) ] ), pySrc )
 
-		#pySrcRule = [
-			#"_gsym__parser__literal_0 = Literal( 'a' )",
-			#"_gsym__parser__literal_1 = Literal( 'b' )",
-			#"_gsym__parser__literal_2 = Literal( 'c' )",
-			#"_gsym__parser__sequence_0 = Sequence( _gsym__parser__literal_0, _gsym__parser__literal_1, _gsym__parser__literal_2 )",
-			#"def _rule_sequence(self, _state, _input, _start, _stop):",
-			#"  return self._gsym__parser__sequence_0._o_match( _state, _input, _start, _stop )",
-			#"def sequence(self, _input, _start, _stop):",
-			#"  return self._rule_sequence( ParserState(), _input, _start, _stop )"
-			#]
-		#self._testCompileAsRule( _PDefSequence( [ _PDefLiteral( 'a' ), _PDefLiteral( 'b' ), _PDefLiteral( 'c' ) ] ), 'sequence', pySrcRule )
-		
-	#def test_Combine(self):
-		#self._testCompileAsExpr( _PDefCombine( [ _PDefLiteral( 'a' ), _PDefLiteral( 'b' ), _PDefLiteral( 'c' ) ] ), "Combine( [ Literal( 'a' ), Literal( 'b' ), Literal( 'c' ) ] )" )
-		
-	#def test_Choice(self):
-		#self._testCompileAsExpr( _PDefChoice( [ _PDefLiteral( 'a' ), _PDefLiteral( 'b' ), _PDefLiteral( 'c' ) ] ), "Choice( [ Literal( 'a' ), Literal( 'b' ), Literal( 'c' ) ] )" )
-		
-	#def test_Optional(self):
-		#self._testCompileAsExpr( _PDefOptional( _PDefLiteral( 'a' ) ), "Optional( Literal( 'a' ) )" )
-		
-	#def test_ZeroOrMore(self):
-		#self._testCompileAsExpr( _PDefZeroOrMore( _PDefLiteral( 'a' ) ), "ZeroOrMore( Literal( 'a' ) )" )
-		
-	#def test_OneOrMore(self):
-		#self._testCompileAsExpr( _PDefOneOrMore( _PDefLiteral( 'a' ) ), "OneOrMore( Literal( 'a' ) )" )
-		
-	#def test_Peek(self):
-		#self._testCompileAsExpr( _PDefPeek( _PDefLiteral( 'a' ) ), "Peek( Literal( 'a' ) )" )
-		
-	#def test_PeekNot(self):
-		#self._testCompileAsExpr( _PDefPeekNot( _PDefLiteral( 'a' ) ), "PeekNot( Literal( 'a' ) )" )
-		
-		
-		
