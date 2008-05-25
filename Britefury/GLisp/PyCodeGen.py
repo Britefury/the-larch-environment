@@ -39,6 +39,10 @@ class PyInvalidFunctionNameError (PyInvalidNameError):
 	pass
 
 
+class PyInvalidClassNameError (PyInvalidNameError):
+	pass
+
+
 class PyInvalidArgNameError (PyInvalidNameError):
 	pass
 
@@ -786,7 +790,6 @@ class PyMethodCall (PyExpression):
 		assert isinstance( a, PyExpression )
 		_checkCallParamList( params )
 		if not _isPyIdentifier( methodName ):
-			print methodName
 			self.error( PyInvalidMethodNameError, methodName )
 		self.a = a
 		self.methodName = methodName
@@ -1127,6 +1130,38 @@ class PyDef (PyStatement):
 	
 	
 	
+class PyClass (PyStatement):
+	def __init__(self, name, bases, statements, dbgSrc=None):
+		super( PyClass , self ).__init__( dbgSrc )
+		if not _isPyIdentifier( name ):
+			self.error( PyInvalidClassNameError, name )
+		self.name = name
+		for base in bases:
+			assert isinstance( base, PyExpression )
+		self.bases = bases
+		self.statements = statements
+		
+	def compileAsStmt(self):
+		stmtSrc = []
+		
+		for statement in self.statements:
+			stmtSrc.extend( statement.compileAsStmt() )
+		stmtSrc = _passBlock( stmtSrc )
+	
+		if len( self.bases ) > 0:
+			return [ 'class %s (%s):'  %  ( self.name, ', '.join( [ base.compileAsExpr()   for base in self.bases ] ) ) ]  +  _indent( stmtSrc )
+		else:
+			return [ 'class %s (object):'  %  ( self.name, ) ]  +  _indent( stmtSrc )
+	
+	def _o_compareWith(self, x):
+		return False
+
+	def getChildren(self):
+		return self.bases + self.statements
+
+	
+	
+	
 class PyAssign_SideEffects (PyStatement):
 	def __init__(self, target, value, dbgSrc=None):
 		super( PyAssign_SideEffects, self ).__init__( dbgSrc )
@@ -1242,6 +1277,9 @@ class TestCase_PyCodeGen_Node_check (unittest.TestCase):
 	def test_PyDef(self):
 		self.assertRaises( PyInvalidFunctionNameError, lambda: PyDef( 'a.b', [], [] ) )
 		self.assertRaises( PyInvalidArgNameError, lambda: PyDef( 'a', [ 'b.c' ], [] ) )
+		
+	def test_PyClass(self):
+		self.assertRaises( PyInvalidClassNameError, lambda: PyClass( 'a.b', [], [] ) )
 		
 	def test_PyKWParam(self):
 		self.assertRaises( AssertionError, lambda: PyKWParam( None, PyVar( 'a' ) ) )
@@ -1400,6 +1438,9 @@ class TestCase_PyCodeGen_Node_cmp (unittest.TestCase):
 		
 	def test_PyDef(self):
 		self.assert_( not pyt_compare( PyDef( 'foo', [ 'a', 'b' ], [] ),  PyDef( 'foo', [ 'a', 'b' ], [] ) ) )
+
+	def test_PyClass(self):
+		self.assert_( not pyt_compare( PyClass( 'Foo', [ PyVar( 'object' ) ], [] ),  PyClass( 'Foo', [ PyVar( 'object' ) ], [] ) ) )
 
 	def test_PyAssign_SideEffects(self):
 		self.assert_( pyt_compare( PyAssign_SideEffects( PySrc( 'a' ), PySrc( '1' ) ),   PyAssign_SideEffects( PySrc( 'a' ), PySrc( '1' ) ) ) )
@@ -1603,6 +1644,22 @@ class TestCase_PyCodeGen_Node_compile (unittest.TestCase):
 		self.assert_( PyDef( 'foo', [], [] ).compileAsStmt()  ==  pysrc1 )
 		self.assert_( PyDef( 'foo', [ 'a', 'b' ], [ PySrc( 'pass' ) ] ).compileAsStmt()  ==  pysrc2 )
 		self.assert_( PyDef( 'foo', [ 'a', 'b' ], [] ).compileAsStmt()  ==  pysrc2 )
+
+	def test_PyClass(self):
+		pysrc1 = [
+			'class Foo (object):',
+			'  pass'
+		]
+
+		pysrc2 = [
+			'class Foo (a, b):',
+			'  pass'
+		]
+		
+		self.assert_( PyClass( 'Foo', [], [ PySrc( 'pass' ) ] ).compileAsStmt()  ==  pysrc1 )
+		self.assert_( PyClass( 'Foo', [], [] ).compileAsStmt()  ==  pysrc1 )
+		self.assert_( PyClass( 'Foo', [ PyVar( 'a' ), PyVar( 'b' ) ], [ PySrc( 'pass' ) ] ).compileAsStmt()  ==  pysrc2 )
+		self.assert_( PyClass( 'Foo', [ PyVar( 'a' ), PyVar( 'b' ) ], [] ).compileAsStmt()  ==  pysrc2 )
 
 	def test_PyAssign_SideEffects(self):
 		self.assert_( PyAssign_SideEffects( PySrc( 'a' ), PySrc( '1' ) ).compileAsStmt()  ==  [ 'a = 1' ] )
@@ -1916,6 +1973,13 @@ class TestCase_PyCodeGen_Node_children (unittest.TestCase):
 		self._childrenTest( PyDef( 'foo', [], [ x ] ),  [ x ] )
 
 		
+	def test_PyClass(self):
+		x = PyVar( 'x' )()
+		y = PyVar( 'y' )
+		self._childrenTest( PyClass( 'Foo', [], [ x ] ),  [ x ] )
+		self._childrenTest( PyClass( 'Foo', [ y ], [ x ] ),  [ y, x ] )
+
+
 	def test_PyAssign_SideEffects(self):
 		a = PyVar( 'a' )
 		b = PyVar( 'b' )
