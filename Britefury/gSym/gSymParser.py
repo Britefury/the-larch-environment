@@ -33,7 +33,7 @@ _peekNot = 'PeekNot'
 def _matchCall(pytree):
 	return pytree.attr( '_o_match' )( PyVar( '_state' ), PyVar( '_input' ), PyVar( '_start' ), PyVar( '_stop' ) )
 
-def _ruleMethodName(ruleName):
+def _ruleAttrName(ruleName):
 	return '_rule_' + ruleName
 
 
@@ -126,12 +126,14 @@ class _PRuleDefinition (object):
 		"""
 		->  class_pre, expression
 		"""
-		cPre, fnPre, expr = self._expression.emitPyTree( builder )
-		defName = _ruleMethodName( self._ruleName )
+		expr = self._expression.emitPyTree()
+		defName = _ruleAttrName( self._ruleName )
 		ruleDef = PyDef( defName, [ 'self', '_state', '_input', '_start' ] + self._argNames, fnPre + [ PyReturn( expr ) ], self._dbgSrc )
 		return cPre  +  [ ruleDef, ruleMethod ],  None
 
 
+	
+	
 
 class _PDefExpression (object):
 	def __init__(self, dbgSrc=None):
