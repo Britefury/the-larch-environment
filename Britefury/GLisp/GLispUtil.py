@@ -42,3 +42,56 @@ def gLispSrcToString(x, level=3):
 			return '(' + ' '.join( [ gLispSrcToString( v, level - 1 )  for v in x ] ) + ')'
 	else:
 		raise TypeError, '%s'  %  ( x.__class__, )
+	
+	
+
+def _indent(s):
+	return [ '  ' + x   for x in s ]
+
+
+def _gLispSrcToStringPretty(x):
+	if isinstance( x, RelativeNode ):
+		x = x.node
+
+	if x is None:
+		return [ 'None' ]
+	elif isinstance( x, str )  or  isinstance( x, unicode ):
+		return [ x ]
+	elif isGLispList( x ):
+		if len( x ) > 0:
+			bListContents = False
+			for v in x[1:]:
+				if isGLispList( v ):
+					bListContents = True
+			if isGLispList( x[0] ):
+				# Starts with a list
+				# All on separate lines
+				result = [ '(' ]
+				for v in x:
+					result.extend( _indent( _gLispSrcToStringPretty( v ) ) )
+				result.append( ')' )
+				return result
+			else:
+				if bListContents:
+					# 1st entry is a string, lists in remainder
+					# 1st on main line
+					# rest on own new lines
+					first = _gLispSrcToStringPretty( x[0] )
+					# @first only has 1 entry
+					assert len( first ) == 1
+					result = [ '(' + first[0] ]
+					for v in x[1:]:
+						result.extend( _indent( _gLispSrcToStringPretty( v ) ) )
+					result.append( ')' )
+					return result
+				else:
+					# All on 1 line
+					return [ '(' + ' '.join( [ gLispSrcToStringPretty( v )  for v in x ] ) + ')' ]
+		else:
+			return [ '()' ]
+	else:
+		raise TypeError, '%s'  %  ( x.__class__, )
+
+
+def gLispSrcToStringPretty(x):
+	return '\n'.join( _gLispSrcToStringPretty( x ) )

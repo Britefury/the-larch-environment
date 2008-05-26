@@ -12,7 +12,7 @@ from copy import copy
 
 from Britefury.Parser.Parser import Literal, Word, RegEx, Sequence, Combine, Choice, Optional, ZeroOrMore, OneOrMore, Production, Group, Forward, Suppress, identifier, quotedString, unicodeString, integer, floatingPoint, delimitedList
 
-from Britefury.GLisp.GLispUtil import isGLispList
+from Britefury.GLisp.GLispUtil import isGLispList, gLispSrcToStringPretty
 
 
 
@@ -60,7 +60,7 @@ _listLiteral = Production( Literal( '[' )  +  delimitedList( _expression )  +  L
 
 _setLiteral = Production( Literal( '[:' )  +  delimitedList( _expression )  +  Literal( ':]' ) ).action( lambda input, begin, tokens: [ '$set' ]  +  tokens[1] )
 
-_lambdaExpression = Production( Literal( 'lambda' )  +  '('  +  delimitedList( _var )  +  ')'  +  '='  +  _compoundExpression ).action( lambda input, begin, tokens: [ '$lambda' ]  +  [ tokens[2] ] + tokens[5] )
+_lambdaExpression = Production( Literal( 'lambda' )  +  '('  +  delimitedList( _var )  +  ')'  +  '->'  +  _compoundExpression ).action( lambda input, begin, tokens: [ '$lambda' ]  +  [ tokens[2] ] + tokens[5] )
 
 _mapExpression = Production( Literal( 'map' )  +  '('  +  _expression + ',' + _expression + ')' ).action( lambda input, begin, tokens: [ '$map' ]  +  [ tokens[2], tokens[4] ] )
 
@@ -123,9 +123,29 @@ _parameterList = Production( Suppress( '(' )  -  delimitedList( _kwParam | _expr
 _parenExp = Production( Literal( '(' ) + _expression + ')' ).action( lambda input, begin, tokens: tokens[1] )
 
 
+
+# SPECIALS
+
+_compilerCollection = Production( Literal( 'compilerCollection' )  +  _compoundExpression ).action( lambda input, begin, tokens: [ '$compilerCollection' ]  +  tokens[1] )
+_defineCompiler = Production( Literal( 'defineCompiler' )  +  identifier  +  identifier  +  Suppress( '->' )  +  _expression ).action( lambda input, begin, tokens: [ '$defineCompiler' ] + tokens[1:] )
+_tokenDefinition = Production( identifier  +  Suppress( ':=' )  +  _expression  +  Suppress( ';' ) )
+_tokeniser = Production( Literal( 'defineTokeniser' )  +  '{' +  ZeroOrMore( _tokenDefinition )  +  '}' ).action( lambda input, begin, tokens: [ '$tokeniser' ] + tokens[2] )
+
+_interactorEventKey = Production( Literal( 'key' )  +  '('  +  _expression  +  ')' ).action( lambda input, begin, tokens: [ '$key', tokens[2] ] )
+_interactorEventAccel = Production( Literal( 'accel' )  +  '('  +  _expression  +  ')' ).action( lambda input, begin, tokens: [ '$accel', tokens[2] ] )
+_interactorTokenWithBind = Production( identifier + ':' + _var ).action( lambda input, begin, tokens: [ ':', tokens[2], tokens[0] ] )
+_interactorTokenEntry = Production( _interactorTokenWithBind  |  identifier )
+_interactorEventTokens = Production( Literal( 'tokens' )  +  '('  +  delimitedList( _interactorTokenEntry )  +  ')' ).action( lambda input, begin, tokens: [ '$tokens' ]  +  tokens[2] )
+_interactorEvent = Production( _interactorEventKey  |  _interactorEventAccel  |  _interactorEventTokens )
+_interactorMatch = Production( _interactorEvent  +  Suppress( '=>' )  +  _expression  +  Suppress( ';' ) )
+_interactor = Production( Literal( 'defineInteractor' )  +  '{' +  ZeroOrMore( _interactorMatch )  +  '}' ).action( lambda input, begin, tokens: [ '$interactor' ] + tokens[2] )
+
+_special = Production( _compilerCollection | _defineCompiler | _tokeniser | _interactor )
+
+
 _enclosure = Production( _parenExp | _listLiteral | _setLiteral )
-_special = Production( _lambdaExpression | _mapExpression | _filterExpression | _reduceExpression | _raiseExpression | _tryExpression | _ifExpression | _whereExpression | _moduleExpression | _matchExpression )
-_atom = Production( _enclosure | _special | _terminalLiteral | _loadLocal )
+_keywords = Production( _lambdaExpression | _mapExpression | _filterExpression | _reduceExpression | _raiseExpression | _tryExpression | _ifExpression | _whereExpression | _moduleExpression | _matchExpression )
+_atom = Production( _enclosure | _keywords | _special | _terminalLiteral | _loadLocal )
  
 _primary = Forward()
 _specialCall = Production( ( Suppress( '$' ) + identifier + _parameterList ).action( lambda input, begin, tokens: [ '$' + tokens[0] ] + tokens[1] ) )
@@ -225,7 +245,7 @@ class TestCase_GMetaParser (unittest.TestCase):
 		self._matchTest( expression, '[: a, b, c :]', '($set @a @b @c)' )
 		
 	def testLambda(self):
-		self._matchTest( expression, 'lambda(a,b,c)={[a,b,c];}', '($lambda (@a @b @c) ($list @a @b @c))' )
+		self._matchTest( expression, 'lambda(a,b,c) -> {[a,b,c];}', '($lambda (@a @b @c) ($list @a @b @c))' )
 		
 	def testMap(self):
 		self._matchTest( expression, 'map( a, b )', '($map @a @b)' )
@@ -421,58 +441,178 @@ class TestCase_GMetaParser (unittest.TestCase):
 
 		
 		
+	def testCompilerCollection(self):
+		self._matchTest( _compilerCollection, 'compilerCollection { a; b; }',  '($compilerCollection @a @b)' )
+		
+	def testDefineCompiler(self):
+		self._matchTest( _defineCompiler, 'defineCompiler python25 ascii -> a',  '($defineCompiler python25 ascii @a)' )
+		
+	def testTokeniser(self):
+		self._matchTest( _tokeniser, 'defineTokeniser { a := b; c := d; }',  '($tokeniser (a @b) (c @d))' )
+		
+	def testInteractor(self):
+		self._matchTest( _interactor, """defineInteractor { key('a') => a; }""",  """($interactor (($key "#'a") @a))""" )
+		self._matchTest( _interactor, """defineInteractor { accel( '<ctrl>8' )  =>  e; }""",  """($interactor (($accel "#'<ctrl>8") @e))""" )
+		self._matchTest( _interactor, """defineInteractor { tokens( a, b, c ) => d; }""",  """($interactor (($tokens a b c) @d))""" )
+		self._matchTest( _interactor, """defineInteractor { tokens( a:x ) => d; }""",  """($interactor (($tokens (: @x a)) @d))""" )
+		
+		
 if __name__ == '__main__':
 	source = \
 """
-where
+module
 {
-  compileNode =
-    lambda (node) =
-      {
-        match (node)
-	{
-	  ( "add" ^:x ^:y )   =>   { '(' + compileNode(x) + ' + ' + compileNode( y ) + ')'; }
-	  ( "sub" ^:x ^:y )   =>   { '(' + compileNode(x) + ' - ' + compileNode( y ) + ')'; }
-	  ( "mul" ^:x ^:y )   =>   { '(' + compileNode(x) + ' * ' + compileNode( y ) + ')'; }
-	  ( "div" ^:x ^:y )   =>   { '(' + compileNode(x) + ' / ' + compileNode( y ) + ')'; }
-	  ( "pow" ^:x ^:y )   =>   { '(' + compileNode(x) + ' ** ' + compileNode( y ) + ')'; }
-	  ( "loadLocal" !:x )   =>   { x; }
-	  ( "undefinedExpr" )   =>   { '<UNDEFINED>'; }
+  compilers =
+    compilerCollection
+    {
+      defineCompiler simple ascii ->
+        where
+        {
+          compileNode =
+            lambda (node) ->
+              {
+                match (node)
+        	{
+        	  ( "add" ^:x ^:y )   =>   { '(' + compileNode(x) + ' + ' + compileNode( y ) + ')'; }
+        	  ( "sub" ^:x ^:y )   =>   { '(' + compileNode(x) + ' - ' + compileNode( y ) + ')'; }
+        	  ( "mul" ^:x ^:y )   =>   { '(' + compileNode(x) + ' * ' + compileNode( y ) + ')'; }
+        	  ( "div" ^:x ^:y )   =>   { '(' + compileNode(x) + ' / ' + compileNode( y ) + ')'; }
+        	  ( "pow" ^:x ^:y )   =>   { '(' + compileNode(x) + ' ** ' + compileNode( y ) + ')'; }
+        	  ( "loadLocal" !:x )   =>   { x; }
+        	  ( "undefinedExpr" )   =>   { '<UNDEFINED>'; }
+        	};
+              };
+        }
+        ->
+        {
+          compileNode;
+        };
+    };
+    
+  nodeViewFunction =
+    where
+    {
+      divBoxStyle = $style( alignment='expand' );
+      undefinedStyle = $style( colour=ColourRGB( 0.75, 0.0, 0.0 ), font='Sans 11 Italic' );
+      identifierInitChars = string.letters + '_';
+      identifierBodyChars = identifierInitChars + string.digits;
+      tokeniser = defineTokeniser
+        {
+	  identifier := $tokWord( identifierInitChars, identifierBodyChars );
+	  op_pow := $tokLiteral( '**' );
+	  op_add := $tokLiteral( '+' );
+	  op_sub := $tokLiteral( '-' );
+	  op_mul := $tokLiteral( '*' );
+	  op_div := $tokLiteral( '/' );
+	  op_mod := $tokLiteral( '%' );
+        };
+      exprInteractor = lambda (node) ->
+        {
+	  defineInteractor
+	  {
+	    key( '+' )  =>  $replace( node, [ 'add', node, [ 'nilExpr' ] ] );
+	    tokens( op_add )  =>  $replace( node, [ 'add', node, [ 'nilExpr' ] ] );
+
+	    key( '-' )  =>  $replace( node, [ 'sub', node, [ 'nilExpr' ] ] );
+	    tokens( op_sub )  =>  $replace( node, [ 'sub', node, [ 'nilExpr' ] ] );
+
+	    key( '*' )  =>  $replace( node, [ 'mul', node, [ 'nilExpr' ] ] );
+	    tokens( op_mul )  =>  $replace( node, [ 'mul', node, [ 'nilExpr' ] ] );
+
+	    key( '/' )  =>  $replace( node, [ 'div', node, [ 'nilExpr' ] ] );
+	    tokens( op_div )  =>  $replace( node, [ 'div', node, [ 'nilExpr' ] ] );
+
+	    key( '%' )  =>  $replace( node, [ 'mod', node, [ 'nilExpr' ] ] );
+	    tokens( op_mod )  =>  $replace( node, [ 'mod', node, [ 'nilExpr' ] ] );
+	    
+	    accel( '<ctrl>8' )  =>  $replace( node, [ 'pow', node, [ 'nilExpr' ] ] );
+	    tokens( op_pow )  =>  $replace( node, [ 'pow', node, [ 'nilExpr' ] ] );
+	  };
 	};
-      };
-}
-->
-{
-  compileNode;
+      loadLocalInteractor = lambda (node) ->
+        {
+	  defineInteractor
+	  {
+	    tokens( identifier:name )  =>  $replace( node, [ 'loadLocal', name ] );
+	  };
+	};
+      nilExprInteractor = lambda (node) ->
+        {
+	  defineInteractor
+	  {
+	    tokens( identifier:name )  =>  $replace( node, [ 'loadLocal', name ] );
+	  };
+	};
+      operatorEditor = lambda (node, x, y, op) ->
+        {
+	  $interact( $activeBorder( $focus( $entry( op, op, tokeniser ) ) ),  operatorInteractor( node, x, y ) );
+	};
+      divideEditor = lambda (node, x, y) ->
+        {
+	  $interact( $focus( $customEntry( $hline(), '/', tokeniser ) ),  operatorInteractor( node, x, y ) );
+	};
+    }
+    ->
+    {
+      lambda (node) ->
+        {
+	  match (node)
+	  {
+      	    ( "add" ^:x ^:y )   =>   { $interact( $activeBorder( $hbox( [ $viewEval( x ), operatorEditor( node, x, y, '+' ), $viewEval( y ) ] ) ),  exprInteractor( node ) ); }
+      	    ( "sub" ^:x ^:y )   =>   { $interact( $activeBorder( $hbox( [ $viewEval( x ), operatorEditor( node, x, y, '-' ), $viewEval( y ) ] ) ),  exprInteractor( node ) ); }
+      	    ( "mul" ^:x ^:y )   =>   { $interact( $activeBorder( $hbox( [ $viewEval( x ), operatorEditor( node, x, y, '*' ), $viewEval( y ) ] ) ),  exprInteractor( node ) ); }
+      	    ( "div" ^:x ^:y )   =>   { $interact( $activeBorder( $vbox( [ $viewEval( x ), divideEditor( node, x, y ), $viewEval( y ) ], divBoxStyle ) ),  exprInteractor( node ) ); }
+      	    ( "mod" ^:x ^:y )   =>   { $interact( $activeBorder( $hbox( [ $viewEval( x ), operatorEditor( node, x, y, '%' ), $viewEval( y ) ] ) ),  exprInteractor( node ) ); }
+      	    ( "pow" ^:x ^:y )   =>   { $interact( $activeBorder( $scriptRSuper( $viewEval( x ), $hbox( [ operatorEditor( node, x, y, '**' ), $viewEval( y ) ] ) ) ),  exprInteractor( node ) ); }
+      	    ( "loadLocal" !:x )   =>   { $interact( $activeBorder( $focus( $entry( x, x, tokeniser ))),  loadLocalInteractor( node ),  exprInteractor( node ) ); }
+      	    ( "nilExpr" )   =>   { $interact( $activeBorder( $focus( $entry( '<expr>', '', tokeniser, undefinedStyle ))),  nilExprInteractor( node ) ); }
+      	    ( "list" ^*:x )   =>   { $listView( listViewLayoutVertical( 0.0, 0.0, 45.0 ), '[', ']', ',', $mapViewEval( x ) ); }
+	  };
+	};
+    };
 }
 """
+	REPITITIONS = 1
+	
 	import time
 	t1 = time.time()
-	res = expression.parseString( source )
+	for i in xrange( 0, REPITITIONS ):
+		res = expression.parseString( source )
 	t2 = time.time()
 	if res is not None:
 		if res.end != len( source ):
-			print '<INCOMPLETE>'
+			print '<INCOMPLETE>; %d/%d'  %  ( res.end, len(source) )
 		else:
-			print 'OK'
-			#print gLispSrcToString( res.result, 100 )
+			#print gLispSrcToStringPretty( res.result )
+			pass
 	else:
 		print '<FAIL>'
-	print 'Parsed %d bytes in %s; %s chars per second'  %  ( len( source ), t2 - t1, len(source)/(t2-t1) )
+	print 'gMeta: Parsed %d chars in %s; %s chars per second'  %  ( len( source ) * REPITITIONS, t2 - t1, len(source)*REPITITIONS/(t2-t1) )
 	
 	
 	
-	#lr = Forward()
-	#lr  <<  Production( ( lr + '1' )  |  '1' )
+	SIMPLE_REPITIONS = 80
 	
-	#assert lr.parseString( '111111' ).end == 6
+	rr = Forward()
+	rr  <<  Production( ( Literal( '1' )  +  rr )  |  '1' )
+	
+	lr = Forward()
+	lr  <<  Production( ( lr + '1' )  |  '1' )
+	
+	assert rr.parseString( '111111' ).end == 6
+	assert lr.parseString( '111111' ).end == 6
 	
 	
-	#print 'SIMPLE GRAMMAR'
-	#ones = '1' * 8000
-	#t1 = time.time()
-	#res = lr.parseString( ones )
-	#t2 = time.time()
-	#print 'ONES: parsed %d bytes in %s; %s chars per second'  %  ( len( ones ), t2 - t1, len(ones)/(t2-t1) )
+	ones = '1' * 100
+	t1 = time.time()
+	for i in xrange( 0, SIMPLE_REPITIONS ):
+		res = rr.parseString( ones )
+	t2 = time.time()
+	print 'RR: parsed %d chars in %s; %s chars per second'  %  ( len( ones )*SIMPLE_REPITIONS, t2 - t1, len(ones)*SIMPLE_REPITIONS/(t2-t1) )
 	
+	t1 = time.time()
+	for i in xrange( 0, SIMPLE_REPITIONS ):
+		res = lr.parseString( ones )
+	t2 = time.time()
+	print 'LR: parsed %d chars in %s; %s chars per second'  %  ( len( ones )*SIMPLE_REPITIONS, t2 - t1, len(ones)*SIMPLE_REPITIONS/(t2-t1) )
 	

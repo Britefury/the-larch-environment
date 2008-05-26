@@ -58,23 +58,6 @@ class ParseResult (object):
 
 class ParserExpression (object):
 	"""Parser expression base class"""
-	#def _o_match(self, input, start, stop, state=None):
-		#if state is None:
-			#state = {}
-			
-		#key = start, self
-		#try:
-			#memoEntry = state[key]
-			#return memoEntry.answer, memoEntry.pos
-		#except KeyError:
-			#memoEntry = _MemoEntry( None, start )
-			#state[key] = memoEntry
-			#answer, pos = self._o_evaluate( state, input, start, stop )
-			#memoEntry.answer = answer
-			#memoEntry.pos = pos
-			#return answer, pos
-		
-		
 	def parseString(self, input, start=0, stop=None, ignoreChars=string.whitespace):
 		"""
 		Parse a string
@@ -91,19 +74,14 @@ class ParserExpression (object):
 		if stop is None:
 			stop = len( input )
 		state = ParserState( ignoreChars )
-		answer, pos = self._o_match( state, input, start, stop )
+		answer, pos = self.evaluate( state, input, start, stop )
 		if answer is not None:
 			answer.end = state.chomp( input, answer.end, stop )
 		return answer
 	
 
 	
-	def _o_match(self, state, input, start, stop):
-		return self._o_evaluate( state, input, start, stop )
-		
-		
-		
-	def _o_evaluate(self, state, input, start, stop):
+	def evaluate(self, state, input, start, stop):
 		pass
 
 		
@@ -159,8 +137,8 @@ class Bind (ParserExpression):
 		self._name = name
 		
 		
-	def _o_evaluate(self, state, input, start, stop):
-		res, pos = self._subexp._o_match( state, input, start, stop )
+	def evaluate(self, state, input, start, stop):
+		res, pos = self._subexp.evaluate( state, input, start, stop )
 		if res is not None:
 			b = copy( res.bindings )
 			b[self._name] = res.result
@@ -187,8 +165,8 @@ class Action (ParserExpression):
 		self._actionFn = actionFn
 		
 		
-	def _o_evaluate(self, state, input, start, stop):
-		res, pos = self._subexp._o_match( state, input, start, stop )
+	def evaluate(self, state, input, start, stop):
+		res, pos = self._subexp.evaluate( state, input, start, stop )
 		if res is not None:
 			return ParseResult( self._actionFn( input, start, res.result, **res.bindings ), start, pos ),  pos
 		else:
@@ -224,8 +202,8 @@ class Forward (ParserExpression):
 		self._subexp = None
 		
 
-	def _o_evaluate(self, state, input, start, stop):
-		return self._subexp._o_match( state, input, start, stop )
+	def evaluate(self, state, input, start, stop):
+		return self._subexp.evaluate( state, input, start, stop )
 
 	
 	def _o_compare(self, x):
@@ -264,8 +242,8 @@ class Group (ParserExpression):
 		self._subexp = _parser_coerce( subexp )
 		
 
-	def _o_evaluate(self, state, input, start, stop):
-		return self._subexp._o_match( state, input, start, stop )
+	def evaluate(self, state, input, start, stop):
+		return self._subexp.evaluate( state, input, start, stop )
 
 	
 	def _o_compare(self, x):
@@ -279,9 +257,10 @@ class Production (Group):
 	Production
 	Group a subexpression into the right hand side of a grammar rule
 	"""
-	def _o_match(self, state, input, start, stop):
-		return state._f_memoisedMatch( self, self._o_evaluate, input, start, stop )
-	
+	def evaluate(self, state, input, start, stop):
+		# Invoke the memoisation and left-recursion handling system
+		return state.memoisedMatch( self._subexp, input, start, stop )
+
 	
 	def action(self, actionFn):
 		# Wrap the inner sub-expression in the Action expression
@@ -304,8 +283,8 @@ class Suppress (ParserExpression):
 		self._subexp = _parser_coerce( subexp )
 		
 
-	def _o_evaluate(self, state, input, start, stop):
-		res, pos = self._subexp._o_match( state, input, start, stop )
+	def evaluate(self, state, input, start, stop):
+		res, pos = self._subexp.evaluate( state, input, start, stop )
 		if res is not None:
 			return ParseResult( None, start, pos, res.bindings, True ),  pos
 		else:
@@ -340,7 +319,7 @@ class Literal (ParserExpression):
 		return self._matchString
 		
 	
-	def _o_evaluate(self, state, input, start, stop):
+	def evaluate(self, state, input, start, stop):
 		start = state.chomp( input, start, stop )
 		
 		end = start + len( self._matchString )
@@ -375,7 +354,7 @@ class RegEx (ParserExpression):
 		return self._re 
 		
 	
-	def _o_evaluate(self, state, input, start, stop):
+	def evaluate(self, state, input, start, stop):
 		if self._bEatWhitespace:
 			start = state.chomp( input, start, stop )
 			
@@ -409,7 +388,7 @@ class Word (ParserExpression):
 		Word( chars )   -   matches a word composed of one or more characters from @chars
 		Word( initChars, bodyChars )   -   matches a word composed of one character from @initChars, followed by zero or more from @bodyChars
 		"""
-		super( RegEx, self ).__init__()
+		super( Word, self ).__init__()
 		if bodyChars is None:
 			bodyChars = initChars
 			initChars = None
@@ -418,7 +397,7 @@ class Word (ParserExpression):
 			pattern = '[%s]+'  %  ( re.escape( bodyChars ), )
 		else:
 			pattern = '[%s][%s]*'  %  ( re.escape( initChars ), re.escape( bodyChars ) )
-		self._re = re.compile( pattern, flags )
+		self._re = re.compile( pattern, 0 )
 		self._initChars = initChars
 		self._bodyChars = bodyChars
 		
@@ -430,7 +409,7 @@ class Word (ParserExpression):
 		return self._bodyChars
 		
 		
-	def _o_evaluate(self, state, input, start, stop):
+	def evaluate(self, state, input, start, stop):
 		m = self._re.match( input, start, stop )
 		
 		if m is not None:		
@@ -466,7 +445,7 @@ class Sequence (ParserExpression):
 		return self._subexps
 		
 	
-	def _o_evaluate(self, state, input, start, stop):
+	def evaluate(self, state, input, start, stop):
 		subexpResults = []
 		bindings = {}
 		
@@ -474,7 +453,7 @@ class Sequence (ParserExpression):
 		for i, subexp in enumerate( self._subexps ):
 			if pos > stop:
 				return None, start
-			res, pos = subexp._o_match( state, input, pos, stop )
+			res, pos = subexp.evaluate( state, input, pos, stop )
 			if res is None:
 				return None, start
 			else:
@@ -518,7 +497,7 @@ class Combine (ParserExpression):
 		return self._subexps
 		
 	
-	def _o_evaluate(self, state, input, start, stop):
+	def evaluate(self, state, input, start, stop):
 		subexpResults = []
 		bindings = {}
 		
@@ -526,7 +505,7 @@ class Combine (ParserExpression):
 		for i, subexp in enumerate( self._subexps ):
 			if pos > stop:
 				return None, start
-			res, pos = subexp._o_match( state, input, pos, stop )
+			res, pos = subexp.evaluate( state, input, pos, stop )
 			if res is None:
 				return None, start
 			else:
@@ -568,9 +547,9 @@ class Choice (ParserExpression):
 		self._subexps = [ _parser_coerce( x )   for x in subexps ]
 		
 	
-	def _o_evaluate(self, state, input, start, stop):
+	def evaluate(self, state, input, start, stop):
 		for i, subexp in enumerate( self._subexps ):
-			res, pos = subexp._o_match( state, input, start, stop )
+			res, pos = subexp.evaluate( state, input, start, stop )
 			if res is not None:
 				return res, pos
 			
@@ -602,8 +581,8 @@ class Optional (ParserExpression):
 		self._subexp = _parser_coerce( subexp )
 		
 	
-	def _o_evaluate(self, state, input, start, stop):
-		res, pos = self._subexp._o_match( state, input, start, stop )
+	def evaluate(self, state, input, start, stop):
+		res, pos = self._subexp.evaluate( state, input, start, stop )
 		if res is None:
 			return ParseResult( None, start, pos ),  pos
 		else:
@@ -643,14 +622,14 @@ class Repetition (ParserExpression):
 		self._bSuppressIfZero = bSuppressIfZero
 		
 	
-	def _o_evaluate(self, state, input, start, stop):
+	def evaluate(self, state, input, start, stop):
 		subexpResults = []
 		bindings = {}
 		
 		pos = start
 		i = 0
 		while pos <= stop  and  ( self._max is None  or  i < self._max ):
-			res, pos = self._subexp._o_match( state, input, pos, stop )
+			res, pos = self._subexp.evaluate( state, input, pos, stop )
 			if res is None:
 				break
 			else:
@@ -723,8 +702,8 @@ class Peek (ParserExpression):
 		self._subexp = _parser_coerce( subexp )
 		
 	
-	def _o_evaluate(self, state, input, start, stop):
-		res, pos = self._subexp._o_match( state, input, start, stop )
+	def evaluate(self, state, input, start, stop):
+		res, pos = self._subexp.evaluate( state, input, start, stop )
 		if res is not None:
 			return ParseResult( None, start, start, {}, True ),  start
 		else:
@@ -754,8 +733,8 @@ class PeekNot (ParserExpression):
 		self._subexp = _parser_coerce( subexp )
 		
 	
-	def _o_evaluate(self, state, input, start, stop):
-		res, pos = self._subexp._o_match( state, input, start, stop )
+	def evaluate(self, state, input, start, stop):
+		res, pos = self._subexp.evaluate( state, input, start, stop )
 		if res is None:
 			return ParseResult( None, start, start, {}, True ), start
 		else:
@@ -887,7 +866,7 @@ def indentedBlocksPrePass(text, indentToken='$<indent>$', dedentToken='$<dedent>
 # Definitions of singleQuotedString, doubleQuotedString, and quotedString taken from pyparsing, which is Copyright (c) 2003-2007  Paul T. McGuire
 #
 
-identifier = RegEx( "[A-Za-z_][A-Za-z0-9]*" )
+identifier = RegEx( "[A-Za-z_][A-Za-z0-9_]*" )
 singleQuotedString = RegEx( r"'(?:[^'\n\r\\]|(?:'')|(?:\\x[0-9a-fA-F]+)|(?:\\.))*'" )
 doubleQuotedString = RegEx( r'"(?:[^"\n\r\\]|(?:"")|(?:\\x[0-9a-fA-F]+)|(?:\\.))*"' )
 quotedString = RegEx( r'''(?:"(?:[^"\n\r\\]|(?:"")|(?:\\x[0-9a-fA-F]+)|(?:\\.))*")|(?:'(?:[^'\n\r\\]|(?:'')|(?:\\x[0-9a-fA-F]+)|(?:\\.))*')''' )
