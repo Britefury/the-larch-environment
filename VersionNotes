@@ -32,4 +32,7 @@ Revision 260:
 	There are only two types of module;
 		$gMetaModule; the document contains gMeta source which can be used to define a language, define the meta-language, or define functions or constants to be imported into another gMeta module
 		$withLanguageModule; the document contains content whose format is determined by the specified module
-	
+
+Revision 306:
+	Last version to use the metalanguage.
+	Supports some interaction/editing.
