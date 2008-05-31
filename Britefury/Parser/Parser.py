@@ -28,6 +28,14 @@ def _parser_coerce(x):
 		return Sequence( _parser_coerce( [ _parser_coerce( a )   for a in x ] ) )
 	else:
 		return Literal( x )
+	
+	
+	
+def getErrorLine(source, pos):
+	untilPos = source[:pos]
+	line = untilPos.count( '\n' )
+	return line,  source.split( '\n' )[line]
+	
 
 
 
@@ -77,7 +85,7 @@ class ParserExpression (object):
 		answer, pos = self.evaluate( state, input, start, stop )
 		if answer is not None:
 			answer.end = state.chomp( input, answer.end, stop )
-		return answer
+		return answer, pos
 	
 
 	
@@ -109,10 +117,13 @@ class ParserExpression (object):
 		return Choice( [ self, x ] )
 	
 	def __pow__(self, name):
-		return Bind( self, name )
+		return Bind( name, self )
 	
 	def __rshift__(self, f):
 		return Action( self, f )
+	
+	def __and__(self, f):
+		return Condition( self, f )
 	
 	
 	def _o_compare(self, x):
@@ -131,10 +142,10 @@ class Bind (ParserExpression):
 	"""
 	Parser expression that binds the result of a sub-expression to a name
 	"""
-	def __init__(self, subexp, name):
+	def __init__(self, name, subexp):
 		super( Bind, self ).__init__()
-		self._subexp = _parser_coerce( subexp )
 		self._name = name
+		self._subexp = _parser_coerce( subexp )
 		
 		
 	def evaluate(self, state, input, start, stop):
@@ -175,6 +186,36 @@ class Action (ParserExpression):
 	
 	def _o_compare(self, x):
 		return self._subexp == x._subexp  and  self._actionFn == x._actionFn
+	
+	
+	
+
+
+class Condition (ParserExpression):
+	"""
+	Parser expression that applies an condition function to the results of parsing the sub-expression
+	The function is of the form:
+	f(inputText, position, subExpResult, <bound_vars>)  ->  boolean
+	"""
+	def __init__(self, subexp, conditionFn):
+		super( Condition, self ).__init__()
+		self._subexp = _parser_coerce( subexp )
+		self._conditionFn = conditionFn
+		
+		
+	def evaluate(self, state, input, start, stop):
+		res, pos = self._subexp.evaluate( state, input, start, stop )
+		if res is not None:
+			if self._conditionFn( input, start, res.result, **res.bindings ):
+				return res, pos
+			else:
+				return None, pos
+		else:
+			return res, pos
+
+	
+	def _o_compare(self, x):
+		return self._subexp == x._subexp  and  self._conditionFn == x._conditionFn
 	
 	
 	
@@ -452,10 +493,10 @@ class Sequence (ParserExpression):
 		pos = start
 		for i, subexp in enumerate( self._subexps ):
 			if pos > stop:
-				return None, start
+				return None, pos
 			res, pos = subexp.evaluate( state, input, pos, stop )
 			if res is None:
-				return None, start
+				return None, pos
 			else:
 				bindings.update( res.bindings )
 				if not res.bSuppressed:
@@ -504,10 +545,10 @@ class Combine (ParserExpression):
 		pos = start
 		for i, subexp in enumerate( self._subexps ):
 			if pos > stop:
-				return None, start
+				return None, pos
 			res, pos = subexp.evaluate( state, input, pos, stop )
 			if res is None:
-				return None, start
+				return None, pos
 			else:
 				bindings.update( res.bindings )
 				if not res.bSuppressed:
@@ -548,12 +589,15 @@ class Choice (ParserExpression):
 		
 	
 	def evaluate(self, state, input, start, stop):
+		maxErrorPos = start
 		for i, subexp in enumerate( self._subexps ):
 			res, pos = subexp.evaluate( state, input, start, stop )
 			if res is not None:
 				return res, pos
+			else:
+				maxErrorPos = max( maxErrorPos, pos )
 			
-		return None, start
+		return None, maxErrorPos
 
 	
 	def __or__(self, x):
@@ -640,7 +684,7 @@ class Repetition (ParserExpression):
 			
 			
 		if i < self._min  or  ( self._max is not None   and   i > self._max ):
-			return None, start
+			return None, pos
 		else:
 			if self._bSuppressIfZero  and  i == 0:
 				return ParseResult( None, start, pos, bindings ),  pos
@@ -883,7 +927,7 @@ import unittest
 
 class TestCase_Parser (unittest.TestCase):
 	def _matchTest(self, parser, input, expected, begin=None, end=None, ignoreChars=string.whitespace):
-		result = parser.parseString( input, ignoreChars=ignoreChars )
+		result, pos = parser.parseString( input, ignoreChars=ignoreChars )
 		self.assert_( result is not None )
 		res = result.result
 		if res != expected:
@@ -902,7 +946,7 @@ class TestCase_Parser (unittest.TestCase):
 		
 	
 	def _bindingsTest(self, parser, input, expectedBindings, ignoreChars=string.whitespace):
-		result = parser.parseString( input, ignoreChars=ignoreChars )
+		result, pos = parser.parseString( input, ignoreChars=ignoreChars )
 		self.assert_( result is not None )
 		if result.bindings != expectedBindings:
 			print 'EXPECTED BINDINGS:'
@@ -915,7 +959,7 @@ class TestCase_Parser (unittest.TestCase):
 		
 	
 	def _matchFailTest(self, parser, input, ignoreChars=string.whitespace):
-		result = parser.parseString( input, ignoreChars=ignoreChars )
+		result, pos = parser.parseString( input, ignoreChars=ignoreChars )
 		if result is not None   and   result.end == len( input ):
 			print 'EXPECTED:'
 			print '<fail>'
@@ -964,10 +1008,10 @@ class TestCase_Parser (unittest.TestCase):
 
 		
 	def testBind(self):
-		self.assert_( Bind( 'abc', 'x' )  ==  Bind( 'abc', 'x' ) )
-		self.assert_( Bind( 'abc', 'x' )  !=  Bind( 'def', 'x' ) )
-		self.assert_( Bind( 'abc', 'x' )  !=  Bind( 'abc', 'y' ) )
-		self.assert_( Bind( 'abc', 'x' )  ==  Literal( 'abc' )  **  'x' )
+		self.assert_( Bind( 'x', 'abc' )  ==  Bind( 'x', 'abc' ) )
+		self.assert_( Bind( 'x', 'abc' )  !=  Bind( 'y', 'abc' ) )
+		self.assert_( Bind( 'x', 'abc' )  !=  Bind( 'x', 'def' ) )
+		self.assert_( Bind( 'x', 'abc' )  ==  Literal( 'abc' )  **  'x' )
 		
 		parser = Literal( 'abc' )  **  'x'
 		
@@ -987,6 +1031,20 @@ class TestCase_Parser (unittest.TestCase):
 		
 		self._matchTest( parser, 'abc', 'abcabc', 0, 3 )
 		self._bindingsTest( parser, 'abc', {} )
+		
+
+	def testCondition(self):
+		f = lambda input, pos, res: not res.startswith( 'hello' )
+		g = lambda input, pos, res: not res.startswith( 'there' )
+		self.assert_( Condition( 'abc', f )  ==  Condition( 'abc', f ) )
+		self.assert_( Condition( 'abc', f )  !=  Condition( 'def', f ) )
+		self.assert_( Condition( 'abc', f )  !=  Condition( 'abc', g ) )
+		self.assert_( Condition( 'abc', f )  ==  Literal( 'abc' )  &  f )
+		
+		parser = identifier  &  f
+		
+		self._matchTest( parser, 'abc', 'abc', 0, 3 )
+		self._matchFailTest( parser, 'helloworld' )
 		
 
 	def testSequence(self):

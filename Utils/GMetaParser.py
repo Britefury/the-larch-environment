@@ -10,7 +10,7 @@ import string
 import operator
 from copy import copy
 
-from Britefury.Parser.Parser import Literal, Word, RegEx, Sequence, Combine, Choice, Optional, ZeroOrMore, OneOrMore, Production, Group, Forward, Suppress, identifier, quotedString, unicodeString, integer, floatingPoint, delimitedList
+from Britefury.Parser.Parser import getErrorLine, Literal, Word, RegEx, Sequence, Combine, Choice, Optional, ZeroOrMore, OneOrMore, Production, Group, Forward, Suppress, identifier, quotedString, unicodeString, integer, floatingPoint, delimitedList
 
 from Britefury.GLisp.GLispUtil import isGLispList, gLispSrcToStringPretty
 
@@ -34,7 +34,14 @@ def _flatten(x):
 	
 def _unaryOpAction(input, begin, tokens):
 	return [ tokens[1], tokens[0] ]
+
+
+_gmetaKeywords = set( [ 'False', 'True', 'None', 'lambda', 'map', 'filter', 'reduce', 'try', 'except', 'finally', 'raise', 'if', 'elif', 'else', 'where', 'module', 'match', 'not', 'is', 'in', 'or', 'and', 'compilerCollection', 'defineCompiler', 'defineTokeniser',
+			'key', 'accel', 'tokens', 'defineInteractor' ] )
 	
+
+_gmetaIdentifier = identifier  &  ( lambda input, pos, result: result not in _gmetaKeywords )
+#_gmetaIdentifier = identifier
 
 _none = Production( Literal( 'None' )  >>  ( lambda input, begin, token: '#None' ) )
 _false = Production( Literal( 'False' )  >>  ( lambda input, begin, token: '#False' ) )
@@ -42,12 +49,12 @@ _true = Production( Literal( 'True' )  >>  ( lambda input, begin, token: '#True'
 _strLit = Production( ( unicodeString | quotedString )  >>  ( lambda input, begin, token: "#'" + eval( token ) ) )
 _intLit = Production( integer  >>  ( lambda input, begin, token: '#' + token ) )
 _floatLit = Production( floatingPoint  >>  ( lambda input, begin, token: '#' + token ) )
-_loadLocal = Production( identifier  >>  ( lambda input, begin, token: '@' + token ) )
-_var = Production( identifier  >>  ( lambda input, begin, token: '@' + token ) )
+_loadLocal = Production( _gmetaIdentifier  >>  ( lambda input, begin, token: '@' + token ) )
+_var = Production( _gmetaIdentifier  >>  ( lambda input, begin, token: '@' + token ) )
 _terminalLiteral = Production( _floatLit | _intLit | _strLit | _none | _false | _true )
-_methodName = copy( identifier )
-_paramName = Production( identifier  >>  ( lambda input, begin, token: ':' + token ) )
-_attrName = copy( identifier )
+_methodName = copy( _gmetaIdentifier )
+_paramName = Production( _gmetaIdentifier  >>  ( lambda input, begin, token: ':' + token ) )
+_attrName = copy( _gmetaIdentifier )
 
 
 
@@ -87,20 +94,28 @@ _whereExpression = Production( Literal( 'where' ) + '{' + ZeroOrMore( _binding )
 _moduleExpression = Production( Literal( 'module' ) + '{' + ZeroOrMore( _binding ) + '}' ).action( lambda input, begin, tokens: [ '$module' ]  +  tokens[2] )
 
 # Pattern matching
-_matchPattern = Forward()
+def _matchBindPred(item):
+	# Wraps an item in bind and predicate rules
+	bind = Production( ( item + ':' + _var ).action( lambda input, begin, tokens: [ ':', tokens[2], tokens[0] ] )   |   item )
+	pred = Production( ( bind + '&' + _var + '=' + _expression + ';' ).action( lambda input, begin, tokens: [ '&', tokens[2], tokens[4], tokens[0] ] )   |   bind )
+	return pred
+
+_matchList = Forward()
 _matchConstant = Production( quotedString ).action( lambda input, begin, token: eval( token ) )
 _matchAnyString = Production( '!' )
 _matchAnyList = Production( '/' )
 _matchAnything = Production( '^' )
-_matchList = Production( Literal( '(' )  +  ZeroOrMore( _matchPattern )  +  ')' ).action( lambda input, begin, tokens: tokens[1] )
+
+_matchSublist = Production( Literal( '?' ) | Literal( '*' ) | Literal( '+' ) )
+
+_matchListItem = Production( _matchConstant | _matchAnyString | _matchAnyList | _matchAnything | _matchList | _matchSublist )
+_matchListItemBindPred = _matchBindPred( _matchListItem )
+
+_matchList  <<  Production( Literal( '(' )  +  ZeroOrMore( _matchListItemBindPred )  +  ')' ).action( lambda input, begin, tokens: tokens[1] )
+
 _matchItemData = Production( _matchConstant | _matchAnyString | _matchAnyList | _matchAnything | _matchList )
-_matchItem = Production( ( _matchItemData + '*' ).action( lambda input, begin, tokens: [ '*', tokens[0] ] )   |   \
-			 ( _matchItemData + '+' ).action( lambda input, begin, tokens: [ '+', tokens[0] ] )   |   \
-			 ( _matchItemData + '?' ).action( lambda input, begin, tokens: [ '?', tokens[0] ] )   |   \
-			 _matchItemData )
-_matchBind = Production( ( _matchItem + ':' + _var ).action( lambda input, begin, tokens: [ ':', tokens[2], tokens[0] ] )   |   _matchItem )
-_matchPredicate = Production( ( _matchBind + '&' + _var + '=' + _expression + ';' ).action( lambda input, begin, tokens: [ '&', tokens[2], tokens[4], tokens[0] ] )   |   _matchBind )
-_matchPattern  <<  _matchPredicate
+_matchPattern = _matchBindPred( _matchItemData )
+
 _matchPair = Production( _matchPattern + '=>' + _compoundExpression ).action( lambda input, begin, tokens: [ tokens[0] ]  +  tokens[2] )
 _matchExpression = Production( Literal( 'match' ) + '(' + _expression + ')' + '{' + ZeroOrMore( _matchPair ) + '}' ).action( lambda input, begin, tokens: [ '$match', tokens[2] ]  +  tokens[5] )
 # End pattern matching
@@ -127,14 +142,14 @@ _parenExp = Production( Literal( '(' ) + _expression + ')' ).action( lambda inpu
 # SPECIALS
 
 _compilerCollection = Production( Literal( 'compilerCollection' )  +  _compoundExpression ).action( lambda input, begin, tokens: [ '$compilerCollection' ]  +  tokens[1] )
-_defineCompiler = Production( Literal( 'defineCompiler' )  +  identifier  +  identifier  +  Suppress( '->' )  +  _expression ).action( lambda input, begin, tokens: [ '$defineCompiler' ] + tokens[1:] )
-_tokenDefinition = Production( identifier  +  Suppress( ':=' )  +  _expression  +  Suppress( ';' ) )
+_defineCompiler = Production( Literal( 'defineCompiler' )  +  _gmetaIdentifier  +  _gmetaIdentifier  +  Suppress( '->' )  +  _expression ).action( lambda input, begin, tokens: [ '$defineCompiler' ] + tokens[1:] )
+_tokenDefinition = Production( _gmetaIdentifier  +  Suppress( ':=' )  +  _expression  +  Suppress( ';' ) )
 _tokeniser = Production( Literal( 'defineTokeniser' )  +  '{' +  ZeroOrMore( _tokenDefinition )  +  '}' ).action( lambda input, begin, tokens: [ '$tokeniser' ] + tokens[2] )
 
 _interactorEventKey = Production( Literal( 'key' )  +  '('  +  _expression  +  ')' ).action( lambda input, begin, tokens: [ '$key', tokens[2] ] )
 _interactorEventAccel = Production( Literal( 'accel' )  +  '('  +  _expression  +  ')' ).action( lambda input, begin, tokens: [ '$accel', tokens[2] ] )
-_interactorTokenWithBind = Production( identifier + ':' + _var ).action( lambda input, begin, tokens: [ ':', tokens[2], tokens[0] ] )
-_interactorTokenEntry = Production( _interactorTokenWithBind  |  identifier )
+_interactorTokenWithBind = Production( _gmetaIdentifier + ':' + _var ).action( lambda input, begin, tokens: [ ':', tokens[2], tokens[0] ] )
+_interactorTokenEntry = Production( _interactorTokenWithBind  |  _gmetaIdentifier )
 _interactorEventTokens = Production( Literal( 'tokens' )  +  '('  +  delimitedList( _interactorTokenEntry )  +  ')' ).action( lambda input, begin, tokens: [ '$tokens' ]  +  tokens[2] )
 _interactorEvent = Production( _interactorEventKey  |  _interactorEventAccel  |  _interactorEventTokens )
 _interactorMatch = Production( _interactorEvent  +  Suppress( '=>' )  +  _expression  +  Suppress( ';' ) )
@@ -148,7 +163,7 @@ _keywords = Production( _lambdaExpression | _mapExpression | _filterExpression |
 _atom = Production( _enclosure | _keywords | _special | _terminalLiteral | _loadLocal )
  
 _primary = Forward()
-_specialCall = Production( ( Suppress( '$' ) + identifier + _parameterList ).action( lambda input, begin, tokens: [ '$' + tokens[0] ] + tokens[1] ) )
+_specialCall = Production( ( Suppress( '$' ) + _gmetaIdentifier + _parameterList ).action( lambda input, begin, tokens: [ '$' + tokens[0] ] + tokens[1] ) )
 _call = Production( ( _primary + _parameterList ).action( lambda input, begin, tokens: [ tokens[0], '<-' ] + tokens[1] ) )
 _subscript = Production( ( _primary + '[' + _expression + ']' ).action( lambda input, begin, tokens: [ tokens[0], '[]', tokens[2] ] ) )
 _slice = Production( ( _primary + '[' + _expression + ':' + _expression + ']' ).action( lambda input, begin, tokens: [ tokens[0], '[:]', tokens[2], tokens[4] ] ) )
@@ -286,14 +301,11 @@ class TestCase_GMetaParser (unittest.TestCase):
 		self._matchTest( expression, 'match (a) { / => {a;} }',  '($match @a (/ @a))' )
 		self._matchTest( expression, 'match (a) { "abc" => {a;} }',  '($match @a (abc @a))' )
 		self._matchTest( expression, 'match (a) { (! /) => {a;} }',  '($match @a ((! /) @a))' )
-		self._matchTest( expression, 'match (a) { (!* /) => {a;} }',  '($match @a (((* !) /) @a))' )
-		self._matchTest( expression, 'match (a) { (!+ /) => {a;} }',  '($match @a (((+ !) /) @a))' )
-		self._matchTest( expression, 'match (a) { (!? /) => {a;} }',  '($match @a (((? !) /) @a))' )
-		self._matchTest( expression, 'match (a) { (("a" !)* /) => {a;} }',  '($match @a (((* (a !)) /) @a))' )
-		self._matchTest( expression, 'match (a) { (("a" !)+ /) => {a;} }',  '($match @a (((+ (a !)) /) @a))' )
-		self._matchTest( expression, 'match (a) { (("a" !)? /) => {a;} }',  '($match @a (((? (a !)) /) @a))' )
+		self._matchTest( expression, 'match (a) { (* /) => {a;} }',  '($match @a ((* /) @a))' )
+		self._matchTest( expression, 'match (a) { (+ /) => {a;} }',  '($match @a ((+ /) @a))' )
+		self._matchTest( expression, 'match (a) { (? /) => {a;} }',  '($match @a ((? /) @a))' )
 		self._matchTest( expression, 'match (a) { (!:x /) => {a;} }',  '($match @a (((: @x !) /) @a))' )
-		self._matchTest( expression, 'match (a) { (!*:x /) => {a;} }',  '($match @a (((: @x (* !)) /) @a))' )
+		self._matchTest( expression, 'match (a) { (*:x /) => {a;} }',  '($match @a (((: @x *) /) @a))' )
 		self._matchTest( expression, 'match (a) { (!&x=y; /) => {a;} }',  '($match @a (((& @x @y !) /) @a))' )
 		self._matchTest( expression, 'match (a) { (!:q&x=y; /) => {a;} }',  '($match @a (((& @x @y (: @q !)) /) @a))' )
 		self._matchTest( expression, 'match (a) { (("a" "b" "c"):q&x=y; /) => {a;} }',  '($match @a (((& @x @y (: @q (a b c))) /) @a))' )
@@ -566,27 +578,37 @@ module
       	    ( "pow" ^:x ^:y )   =>   { $interact( $activeBorder( $scriptRSuper( $viewEval( x ), $hbox( [ operatorEditor( node, x, y, '**' ), $viewEval( y ) ] ) ) ),  exprInteractor( node ) ); }
       	    ( "loadLocal" !:x )   =>   { $interact( $activeBorder( $focus( $entry( x, x, tokeniser ))),  loadLocalInteractor( node ),  exprInteractor( node ) ); }
       	    ( "nilExpr" )   =>   { $interact( $activeBorder( $focus( $entry( '<expr>', '', tokeniser, undefinedStyle ))),  nilExprInteractor( node ) ); }
-      	    ( "list" ^*:x )   =>   { $listView( listViewLayoutVertical( 0.0, 0.0, 45.0 ), '[', ']', ',', $mapViewEval( x ) ); }
+      	    ( "list" *:x )   =>   { $listView( listViewLayoutVertical( 0.0, 0.0, 45.0 ), '[', ']', ',', $mapViewEval( x ) ); }
 	  };
 	};
     };
 }
 """
+
+	
+	
+	def printError(errorName, pos, src):
+		lineIndex, lineSrc = getErrorLine( src, pos )
+		print '%s: line %d'  %  ( errorName, lineIndex + 1 )
+		print lineSrc
+		
+	
+	
 	REPITITIONS = 1
 	
 	import time
 	t1 = time.time()
 	for i in xrange( 0, REPITITIONS ):
-		res = expression.parseString( source )
+		res, pos = expression.parseString( source )
 	t2 = time.time()
 	if res is not None:
 		if res.end != len( source ):
-			print '<INCOMPLETE>; %d/%d'  %  ( res.end, len(source) )
+			printError( 'Parse error', pos, source )
 		else:
 			#print gLispSrcToStringPretty( res.result )
 			pass
 	else:
-		print '<FAIL>'
+		printError( 'Syntax error', pos, source )
 	print 'gMeta: Parsed %d chars in %s; %s chars per second'  %  ( len( source ) * REPITITIONS, t2 - t1, len(source)*REPITITIONS/(t2-t1) )
 	
 	
@@ -599,20 +621,20 @@ module
 	lr = Forward()
 	lr  <<  Production( ( lr + '1' )  |  '1' )
 	
-	assert rr.parseString( '111111' ).end == 6
-	assert lr.parseString( '111111' ).end == 6
+	assert rr.parseString( '111111' )[0].end == 6
+	assert lr.parseString( '111111' )[0].end == 6
 	
 	
 	ones = '1' * 100
 	t1 = time.time()
 	for i in xrange( 0, SIMPLE_REPITIONS ):
-		res = rr.parseString( ones )
+		res, pos = rr.parseString( ones )
 	t2 = time.time()
 	print 'RR: parsed %d chars in %s; %s chars per second'  %  ( len( ones )*SIMPLE_REPITIONS, t2 - t1, len(ones)*SIMPLE_REPITIONS/(t2-t1) )
 	
 	t1 = time.time()
 	for i in xrange( 0, SIMPLE_REPITIONS ):
-		res = lr.parseString( ones )
+		res, pos = lr.parseString( ones )
 	t2 = time.time()
 	print 'LR: parsed %d chars in %s; %s chars per second'  %  ( len( ones )*SIMPLE_REPITIONS, t2 - t1, len(ones)*SIMPLE_REPITIONS/(t2-t1) )
 	
