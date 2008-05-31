@@ -1076,6 +1076,47 @@ class PyIf (PyStatement):
 
 	
 	
+class PyFor (PyStatement):
+	def __init__(self, iterVarName, containerExpression, forStatements, dbgSrc=None):
+		"""
+		iterVarName is the name of the variable that is to receive values from containerExpression
+		containerExpression must result in a container
+		forStatements contain the statements that will be executed during the for loop
+		"""
+		super( PyFor, self ).__init__( dbgSrc )
+		
+		assert _isPyIdentifier( iterVarName ), 'PyFor: iterVarName must be a valid python identifier'
+		assert isinstance( containerExpression, PyExpression ), 'PyFor: if-specification must be a tuple (condition, [statement*]); first element not an expression'
+		assert isinstance( forStatements, list ), 'PyFor: else statements must be a list'
+			
+		self.iterVarName = iterVarName
+		self.containerExpression = containerExpression
+		self.forStatements = forStatements
+		
+		
+	def compileAsStmt(self):
+		return [ 'for %s in %s:'  %  ( self.iterVarName, self.containerExpression.compileAsExpr() ) ]   +   _indent( self._p_compileForBlock( self.forStatements ) )
+				
+
+	def _o_compareWith(self, x):
+		return False
+
+	def getChildren(self):
+		children = [ self.containerExpression ]
+		children.extend( self.forStatements )
+		return children
+	
+	
+	
+	def _p_compileForBlock(self, statements):
+		stmtSrc = []
+		for s in statements:
+			stmtSrc.extend( s.compileAsStmt() )
+		stmtSrc = _passBlock( stmtSrc )
+		return _indent( stmtSrc )
+
+	
+	
 class PySimpleIf (PyIf):
 	def __init__(self, condition, statements, dbgSrc=None):
 		assert isinstance( condition, PyNode ), 'PySimpleIf condition must be a PyNode'
