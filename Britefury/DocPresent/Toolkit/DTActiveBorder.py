@@ -80,15 +80,16 @@ class DTActiveBorder (DTBorder):
 
 	def _o_onButtonDown(self, localPos, button, state):
 		super( DTActiveBorder, self )._o_onButtonDown( localPos, button, state )
-		if button == 1  or  button == 2:
-			self.grabFocus()
-			return True
-		elif button == 3:
-			self.grabFocus()
-			self.contextSignal.emit( self )
-			return True
-		else:
-			return False
+		#if button == 1  or  button == 2:
+			#self.grabFocus()
+			#return True
+		#elif button == 3:
+			#self.grabFocus()
+			#self.contextSignal.emit( self )
+			#return True
+		#else:
+			#return False
+		return False
 
 	def _o_onEnter(self, localPos):
 		super( DTActiveBorder, self )._o_onEnter( localPos )

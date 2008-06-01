@@ -45,6 +45,6 @@ class Tokeniser (object):
 			else:
 				return []
 		else:
-			return [ DocViewToken( '', text ) ]
+			return [ InteractorEventTokenList.Token( '', text ) ]
 
 		

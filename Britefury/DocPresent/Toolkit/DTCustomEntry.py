@@ -30,25 +30,25 @@ class DTCustomEntry (DTBin):
 			self._customEntry = customEntry
 			
 			
-		def _f_evButtonDown(self, localPos, button, state):
+		def _o_onButtonDown(self, localPos, button, state):
 			if button == 1:
 				return True
 			else:
-				return super( DTCustomEntry._CustomContainer, self )._f_evButtonDown( localPos, button, state )
+				return super( DTCustomEntry._CustomContainer, self )._o_onButtonDown( localPos, button, state )
 
-		def _f_evButtonDown2(self, localPos, button, state):
+		def _o_onButtonDown2(self, localPos, button, state):
 			if button == 1:
 				return True
 			else:
-				return super( DTCustomEntry._CustomContainer, self )._f_evButtonDown2( localPos, button, state )
+				return super( DTCustomEntry._CustomContainer, self )._o_onButtonDown2( localPos, button, state )
 
-		def _f_evButtonDown3(self, localPos, button, state):
+		def _o_onButtonDown3(self, localPos, button, state):
 			if button == 1:
 				return True
 			else:
-				return super( DTCustomEntry._CustomContainer, self )._f_evButtonDown3( localPos, button, state )
+				return super( DTCustomEntry._CustomContainer, self )._o_onButtonDown3( localPos, button, state )
 
-		def _f_evButtonUp(self, localPos, button, state):
+		def _o_onButtonUp(self, localPos, button, state):
 			if button == 1:
 				self._customEntry._p_onCustomClicked( localPos )
 				return True

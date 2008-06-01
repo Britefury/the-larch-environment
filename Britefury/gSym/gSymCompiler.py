@@ -36,22 +36,22 @@ from Britefury.DocModel.DMIO import readSX
 class TestCase_GSymCompiler (unittest.TestCase):
 	def testGSymCompiler(self):
 		class Compiler (GSymCompiler):
-			def add(self, x, y):
+			def add(self, node, x, y):
 				return '( '  +  self( x )  +  ' + '  +  self( y )  +  ' )'
 			
-			def sub(self, x, y):
+			def sub(self, node, x, y):
 				return '( '  +  self( x )  +  ' - '  +  self( y )  +  ' )'
 			
-			def mul(self, x, y):
+			def mul(self, node, x, y):
 				return '( '  +  self( x )  +  ' * '  +  self( y )  +  ' )'
 			
-			def div(self, x, y):
+			def div(self, node, x, y):
 				return '( '  +  self( x )  +  ' / '  +  self( y )  +  ' )'
 			
-			def pow(self, x, y):
+			def pow(self, node, x, y):
 				return '( '  +  self( x )  +  ' ** '  +  self( y )  +  ' )'
 			
-			def loadLocal(self, name):
+			def loadLocal(self, node, name):
 				return name
 
 			

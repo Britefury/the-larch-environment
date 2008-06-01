@@ -19,7 +19,7 @@ class DispatchNameError (Exception):
 	pass
 
 
-def dispatch(target, xs):
+def dispatch(target, xs, *args):
 	if isGLispList( xs ):
 		if len( xs ) < 1:
 			raise DispatchSizeError, 'GLisp dispatch: require at least 1 element for dispatch'
@@ -28,7 +28,7 @@ def dispatch(target, xs):
 			method = getattr( target, name )
 		except AttributeError:
 			raise DispatchNameError, 'GLisp dispatch: could not find method named %s in class %s'  %  ( name, type( target ).__name__ )
-		return method( xs, *xs[1:] )
+		return method( *( list(args) + [ xs ] + xs[1:] ) )
 	else:
 		raise DispatchTypeError, 'GLisp dispatch: can only dispatch on lists'
 
