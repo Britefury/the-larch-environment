@@ -64,15 +64,18 @@ class _EntryTextSizeAllocator (object):
 			bResizeRequired = True
 		else:
 			size = self._layout.getSize()
-			assert size.y == self._allocatedSize.y
-			bufferZone = size.y * 3.0
-			
-			
-			if size.x  <  self._allocatedSize.x - bufferZone * 2.0:
-				self._allocatedSize.x = size.x
-				bResizeRequired = True
-			elif size.x  >  self._allocatedSize.x:
-				self._allocatedSize.x = size.x + bufferZone
+			if size.y == self._allocatedSize.y:
+				bufferZone = size.y * 3.0
+				
+				
+				if size.x  <  self._allocatedSize.x - bufferZone * 2.0:
+					self._allocatedSize.x = size.x
+					bResizeRequired = True
+				elif size.x  >  self._allocatedSize.x:
+					self._allocatedSize.x = size.x + bufferZone
+					bResizeRequired = True
+			else:
+				self._allocatedSize = size
 				bResizeRequired = True
 			
 		if bResizeRequired:
