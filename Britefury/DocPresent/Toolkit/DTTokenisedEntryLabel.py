@@ -44,13 +44,10 @@ class DTTokenisedEntryLabel (DTEntryLabel):
 
 
 	def _p_tokeniseText(self, text):
-		try:
-			if self._tokeniser is not None:
-				return self._tokeniser.tokenise( text )
-			else:
-				return []
-		except pyparsing.ParseException:
-			return None
+		if self._tokeniser is not None:
+			return self._tokeniser.tokenise( text )
+		else:
+			return []
 
 
 

@@ -725,7 +725,6 @@ class _GSymViewInstance (object):
 		return bHandled
 	
 	def _p_onEntryModifed(self, widget, text, tokens):
-		print "gSymView._onEntryModifed: text='%s', tokens=%s"  %  ( text, tokens )
 		if len( tokens ) > 1:
 			self._p_sendTokenListDocEvent( widget, tokens )
 	
