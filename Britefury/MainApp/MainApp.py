@@ -30,7 +30,7 @@ from Britefury.DocModel.DMIO import readSX, writeSX
 
 from Britefury.gSym.gSymWorld import GSymWorld
 from Britefury.gSym.gSymEnvironment import GSymEnvironment
-from Britefury.gSym.gSymDocument import loadDocument, importDocumentContent, GSymDocumentInitMetaLanguageContentHandler, GSymDocumentViewContentHandler
+from Britefury.gSym.gSymDocument import loadDocument, GSymDocumentViewContentHandler
 
 from Britefury.DocView.DocView import DocView
 
@@ -77,7 +77,7 @@ class MainApp (object):
 		self._commandHistory = None
 		self._bUnsavedData = False
 		
-		self._world = GSymWorld( importDocumentContent )
+		self._world = GSymWorld()
 
 		self._doc = DTDocument()
 		self._doc.undoSignal.connect( self._p_onUndo )
@@ -255,9 +255,7 @@ class MainApp (object):
 
 
 	def _p_initialise(self):
-		doc = readSX( file( os.path.join( 'GSymCore', 'gMeta', 'gMeta.gsym' ), 'r' ) )
-		contentHandler = GSymDocumentInitMetaLanguageContentHandler()
-		loadDocument( self._world, doc, contentHandler )
+		pass
 		
 
 

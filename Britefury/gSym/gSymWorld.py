@@ -7,8 +7,6 @@
 ##-*************************
 import os
 
-from Britefury.gSym.gMeta.gMetaModuleImporter import GMetaModuleImporter
-
 
 
 #
@@ -20,33 +18,17 @@ from Britefury.gSym.gMeta.gMetaModuleImporter import GMetaModuleImporter
 #
 
 class GSymWorld (object):
-	def __init__(self, moduleImportContent):
+	def __init__(self):
 		super( GSymWorld, self ).__init__()
 		
-		self._moduleImporter = GMetaModuleImporter( self, moduleImportContent )
-		self._metaLanguageViewFactory = None
 		
+	def getModuleLanguage(self, moduleName):
+		mod = __import__( moduleName )
+		components = moduleName.split( '.' )
+		for comp in components[1:]:
+			mod = getattr( mod, comp )
+		return getattr( mod, 'language' )
 		
-	def _f_setMetaLanguageViewFactory(self, viewFactory):
-		self._metaLanguageViewFactory = viewFactory
-		
-	def _f_getMetaLanguageViewFactory(self):
-		return self._metaLanguageViewFactory
-	
-	
-	def getModuleImporter(self):
-		return self._moduleImporter
-	
-	def getModule(self, path):
-		return self._moduleImporter.getModule( path )
-	
-	def createModule(self, name, xs):
-		return self._moduleImporter.createModule( name, xs )
-	
-	
-	@staticmethod
-	def filenameToModuleName(filename):
-		return os.path.splitext( os.path.split( filename )[1] )[0]
 		
 
 	

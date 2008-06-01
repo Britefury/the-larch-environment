@@ -36,3 +36,10 @@ Revision 260:
 Revision 306:
 	Last version to use the metalanguage.
 	Supports some interaction/editing.
+	
+Revision 307:
+	Uses Python instead of the meta-language.
+	GLisp compiler removed.
+	GMeta compiler removed.
+	
+	

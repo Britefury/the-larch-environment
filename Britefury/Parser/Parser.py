@@ -85,6 +85,7 @@ class ParserExpression (object):
 		answer, pos = self.evaluate( state, input, start, stop )
 		if answer is not None:
 			answer.end = state.chomp( input, answer.end, stop )
+			pos = answer.end
 		return answer, pos
 	
 

@@ -29,7 +29,7 @@ class InteractorEventKey (InteractorEvent):
 
 	
 	def __repr__(self):
-		return 'KEY: %s, %d-%d'  %  ( self.keyString, self.keyValue, self.mods )
+		return 'KEY: %s, %d:%d'  %  ( self.keyString, self.keyValue, self.mods )
 	
 		
 	

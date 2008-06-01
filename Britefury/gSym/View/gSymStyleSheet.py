@@ -15,10 +15,8 @@ from Britefury.DocPresent.Toolkit.DTBox import DTBox
 
 
 class GSymStyleSheet (object):
-	def __init__(self, settingsPairs):
-		self._settings = {}
-		for key, value in settingsPairs:
-			self._settings[key] = value
+	def __init__(self, **settings):
+		self._settings = settings
 		
 		
 	def applyToWidget(self, widget):

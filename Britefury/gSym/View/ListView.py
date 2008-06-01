@@ -16,8 +16,6 @@ from Britefury.DocPresent.Toolkit.DTWrappedHBoxWithSeparators import DTWrappedHB
 
 from Britefury.DocView.DVNode import DVNode
 
-from Britefury.GLisp.GLispCompiler import raiseRuntimeError
-
 
 
 
