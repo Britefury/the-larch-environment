@@ -15,7 +15,7 @@ from Britefury.DocView.DocViewNodeTable import DocViewNodeTable, DocNodeKey
 
 
 class DocView (object):
-	def __init__(self, root, commandHistory, styleSheetDispatcher, nodeFactory):
+	def __init__(self, root, commandHistory, nodeFactory):
 		super( DocView, self ).__init__()
 
 		self._root = root
@@ -23,8 +23,6 @@ class DocView (object):
 		self._document = None
 		self._commandHistory = commandHistory
 
-		self._styleSheetDispatcher = styleSheetDispatcher
-		
 		self._nodeFactory = nodeFactory
 
 		self.refreshCell = Cell()
@@ -104,11 +102,6 @@ class DocView (object):
 	def refresh(self):
 		self.refreshCell.immutableValue
 		#self.rootView.refresh()
-
-
-
-	def _f_getStyleSheet(self, docNodeKey):
-		return self._styleSheetDispatcher.getStyleSheetForNode( docNodeKey )
 
 
 

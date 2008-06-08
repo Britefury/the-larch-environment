@@ -14,6 +14,8 @@ import gtk
 
 from Britefury.extlibs.pyconsole.pyconsole import Console
 
+from Britefury.Math.Math import Colour3f
+
 from Britefury.Event.QueuedEvent import queueEvent
 
 from Britefury.UI.ConfirmDialog import *
@@ -24,6 +26,7 @@ from Britefury.FileIO.IOXml import *
 from Britefury.CommandHistory.CommandHistory import CommandHistory
 
 from Britefury.DocPresent.Toolkit.DTDocument import DTDocument
+from Britefury.DocPresent.Toolkit.DTLabel import DTLabel
 
 from Britefury.DocModel.DMList import DMList
 from Britefury.DocModel.DMIO import readSX, writeSX
@@ -33,8 +36,6 @@ from Britefury.gSym.gSymEnvironment import GSymEnvironment
 from Britefury.gSym.gSymDocument import loadDocument, GSymDocumentViewContentHandler
 
 from Britefury.DocView.DocView import DocView
-
-from Britefury.Languages.Lisp.Lisp import makeLispDocView, makeLispStyleSheetDispatcher
 
 #from Britefury.PyImport import PythonImporter
 
@@ -73,7 +74,6 @@ class MainApp (object):
 	def __init__(self, documentRoot, bEvaluate):
 		self._documentRoot = None
 		self._view = None
-		self._viewRoot = None
 		self._commandHistory = None
 		self._bUnsavedData = False
 		
@@ -272,25 +272,24 @@ class MainApp (object):
 		self._actionsMenuItem.set_submenu( self._actionsMenu )
 		
 		if bEvaluate:
-			contentHandler = GSymDocumentViewContentHandler( self._commandHistory, makeLispStyleSheetDispatcher() )
+			contentHandler = GSymDocumentViewContentHandler( self._commandHistory )
 			self._view = loadDocument( self._world, documentRoot, contentHandler )
+			self._view.refreshCell.changedSignal.connect( self._p_queueRefresh )
+			self._view.refresh()
+			self._doc.child = self._view.rootView.widget
+			self._view.setDocument( self._doc )
 		else:
-			self._view = makeLispDocView( documentRoot, self._commandHistory )
+			self._view = None
+			self._doc.child = DTLabel( '<empty>', font='Sans 11 bold', colour=Colour3f( 0.0, 0.0, 0.5 ) )
 	
-		self._viewRoot = self._view.rootView
 
-		self._view.refreshCell.changedSignal.connect( self._p_queueRefresh )
-
-		self._view.refresh()
-
-		self._doc.child = self._viewRoot.widget
-		self._view.setDocument( self._doc )
 
 
 
 
 	def _p_refreshView(self):
-		self._view.refresh()
+		if self._view is not None:
+			self._view.refresh()
 
 
 	def _p_queueRefresh(self):

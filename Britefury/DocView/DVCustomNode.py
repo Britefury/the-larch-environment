@@ -11,8 +11,6 @@ import gtk
 
 from Britefury.Cell.Cell import RefCell
 
-from Britefury.Sheet.Sheet import Sheet, SheetClass, FunctionRefField, FunctionField
-
 from Britefury.DocPresent.Toolkit.DTBin import DTBin
 
 from Britefury.DocView.DVNode import DVNode
@@ -20,11 +18,6 @@ from Britefury.DocView.DVNode import DVNode
 
 
 class DVCustomNode (DVNode):
-	def _o_styleSheetChanged(self):
-		# TODO
-		pass
-
-		
 	def _o_refreshNode(self):
 		super( DVCustomNode, self )._o_refreshNode()
 		for cell in self._cellsToRefresh:
@@ -53,10 +46,9 @@ class DVCustomNode (DVNode):
 		
 	def _p_computeContents(self):
 		if self._contentsFactory is not None:
-			contents = self._contentsFactory( self, self._docNodeKey )
+			return self._contentsFactory( self, self._docNodeKey )
 		else:
-			contents = None
-		return contents
+			return None
 	
 
 	def _f_setRefreshCells(self, cells):

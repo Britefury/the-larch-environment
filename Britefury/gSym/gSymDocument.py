@@ -31,15 +31,14 @@ class GSymDocumentContentHandler (object):
 
 
 class GSymDocumentViewContentHandler (GSymDocumentContentHandler):
-	def __init__(self, commandHistory, stylesheetDispatcher):
+	def __init__(self, commandHistory):
 		super( GSymDocumentViewContentHandler, self ).__init__()
 		self._commandHistory = commandHistory 
-		self._stylesheetDispatcher = stylesheetDispatcher 
 	
 	def withLanguageModule(self, world, importLanguage, xs):
 		language = world.getModuleLanguage( importLanguage )
 		languageViewFactory = GSymViewFactory( world, importLanguage, language.getViewFactory() )
-		return languageViewFactory.createDocumentView( xs, self._commandHistory, self._stylesheetDispatcher )
+		return languageViewFactory.createDocumentView( xs, self._commandHistory )
 		
 		
 
