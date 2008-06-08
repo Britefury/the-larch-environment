@@ -17,11 +17,11 @@ from Britefury.gSym.gSymUnparser import GSymUnparser
 
 from Britefury.gSym.View.Tokeniser import TokenDefinition, Tokeniser
 
-from Britefury.gSym.View.gSymView import activeBorder, border, indent, hline, label, markupLabel, entry, markupEntry, customEntry, hbox, ahbox, vbox, wrappedHBox, wrappedHBoxSep, \
+from Britefury.gSym.View.gSymView import activeBorder, border, indent, highlight, hline, label, markupLabel, entry, markupEntry, customEntry, hbox, ahbox, vbox, wrappedHBox, wrappedHBoxSep, \
      script, scriptLSuper, scriptLSub, scriptRSuper, scriptRSub, listView, interact, focus, viewEval, mapViewEval, GSymView
 from Britefury.gSym.View.ListView import WrappedListViewLayout, HorizontalListViewLayout, VerticalInlineListViewLayout, VerticalListViewLayout
 
-from Britefury.gSym.View.Interactor import keyEventMethod, accelEventMethod, tokenListEventMethod, Interactor
+from Britefury.gSym.View.Interactor import keyEventMethod, accelEventMethod, textEventMethod, tokenListEventMethod, Interactor
 
 from Britefury.gSym.View.EditOperations import replace
 
@@ -217,31 +217,8 @@ _expression  <<  Parser.Production( _addSub )
 
 
 
-class NodeInteractor (Interactor):
-	@tokenListEventMethod( '' )
-	def tokData(self, value, node):
-		res, pos = _expression.parseString( value )
-		parsed = None
-		if res is not None:
-			if pos == len( value ):
-				parsed = res.result
-			else:
-				print '<INCOMPLETE>'
-		else:
-			print '<FAIL>'
-		if parsed is not None:
-			return replace( node, parsed )
-		else:
-			print 'FULL TEXT:', value
-			print 'PARSED:', value[:pos]
-			return replace( node, [ 'UNPARSED', value ] )
-	
-	eventMethods = [ tokData ]
-
-
-
 class ParsedNodeInteractor (Interactor):
-	@tokenListEventMethod( '' )
+	@textEventMethod()
 	def tokData(self, value, node, parser):
 		res, pos = parser.parseString( value )
 		parsed = None
@@ -264,65 +241,95 @@ class ParsedNodeInteractor (Interactor):
 
 	
 
-def nodeEditor(view, node, contents):
-	return interact( customEntry( contents, unparser( node ), tokeniser ),  NodeInteractor( node ) )
+def nodeEditor(node, contents, parser=_expression):
+	if parser is None:
+		parser = _expression
+	return interact( customEntry( highlight( contents ), unparser( node ) ),  ParsedNodeInteractor( node, parser ) )
 
-def viewNode(node, parser=_expression):
-	return interact( customEntry( viewEval( node ), unparser( node ), tokeniser ),  ParsedNodeInteractor( node, parser ) )
-	
+
 
 
 class SimpleLanguageView (GSymView):
-	def kwParam(self, node, name, value):
-		return activeBorder( hbox( [ label( name ), label( '=' ), viewNode( value ) ] ) )
+	def kwParam(self, state, node, name, value):
+		return nodeEditor( node,
+				   hbox( [ label( name ), label( '=' ), viewEval( value ) ] ),
+				   state )
 
-	def call(self, node, target, *params):
+	def call(self, state, node, target, *params):
 		paramViews = []
 		if len( params ) > 0:
 			for p in params[:-1]:
-				paramViews.append( viewNode( p, _param ) )
+				paramViews.append( viewEval( p, state=_param ) )
 				paramViews.append( label( ',' ) )
-			paramViews.append( viewNode( params[-1], _param ) )
-		return activeBorder( hbox( [ viewNode( target ), label( '(' ) ]  +  paramViews  +  [ label( ')' ) ] ) )
+			paramViews.append( viewEval( params[-1], state=_param ) )
+		return nodeEditor( node,
+				   hbox( [ viewEval( target ), label( '(' ) ]  +  paramViews  +  [ label( ')' ) ] ),
+				   state )
 	
-	def subscript(self, node, target, index):
-		return activeBorder( hbox( [ viewNode( target ),  label( '[' ),  viewNode( index, _expression ),  label( ']' ) ] ) )
+	def subscript(self, state, node, target, index):
+		return nodeEditor( node,
+				   hbox( [ viewEval( target ),  label( '[' ),  viewEval( index ),  label( ']' ) ] ),
+				   state )
 	
-	def slice(self, node, target, first, second):
-		return activeBorder( hbox( [ viewNode( target ),  label( '[' ),  viewNode( first ),  label( ':' ),  viewNode( second ),  label( ']' ) ] ) )
+	def slice(self, state, node, target, first, second):
+		return nodeEditor( node,
+				   hbox( [ viewEval( target ),  label( '[' ),  viewEval( first ),  label( ':' ),  viewEval( second ),  label( ']' ) ] ),
+				   state )
 	
-	def attr(self, node, target, name):
-		return activeBorder( hbox( [ viewNode( target ),  label( '.' ),  label( name ) ] ) )
+	def attr(self, state, node, target, name):
+		return nodeEditor( node,
+				   hbox( [ viewEval( target ),  label( '.' ),  label( name ) ] ),
+				   state )
 
-	def add(self, node, x, y):
-		return activeBorder( hbox( [ viewNode( x ), label( '+' ), viewNode( y ) ] ) )
+	def add(self, state, node, x, y):
+		return nodeEditor( node,
+				   hbox( [ viewEval( x ), label( '+' ), viewEval( y ) ] ),
+				   state )
 
-	def sub(self, node, x, y):
-		return activeBorder( hbox( [ viewNode( x ), label( '-' ), viewNode( y ) ] ) )
+	def sub(self, state, node, x, y):
+		return nodeEditor( node,
+				   hbox( [ viewEval( x ), label( '-' ), viewEval( y ) ] ),
+				   state )
 	
-	def mul(self, node, x, y):
-		return activeBorder( hbox( [ viewNode( x ), label( '*' ), viewNode( y ) ] ) )
+	def mul(self, state, node, x, y):
+		return nodeEditor( node,
+				   hbox( [ viewEval( x ), label( '*' ), viewEval( y ) ] ),
+				   state )
 	
-	def div(self, node, x, y):
-		return activeBorder( vbox( [ viewNode( x ), hline(), viewNode( y ) ], divBoxStyle ) )
+	def div(self, state, node, x, y):
+		return nodeEditor( node,
+				   vbox( [ viewEval( x ), hline(), viewEval( y ) ], divBoxStyle ),
+				   state )
 	
-	def mod(self, node, x, y):
-		return activeBorder( hbox( [ viewNode( x ), label( '%' ), viewNode( y ) ] ) )
+	def mod(self, state, node, x, y):
+		return nodeEditor( node,
+				   hbox( [ viewEval( x ), label( '%' ), viewEval( y ) ] ),
+				   state )
 	
-	def pow(self, node, x, y):
-		return activeBorder( scriptRSuper( viewNode( x ), hbox( [ label( '**' ), viewNode( y ) ] ) ) )
+	def pow(self, state, node, x, y):
+		return nodeEditor( node,
+				   scriptRSuper( viewEval( x ), viewEval( y ) ),
+				   state )
 	
-	def loadLocal(self, node, name):
-		return activeBorder( label( name ) )
+	def loadLocal(self, state, node, name):
+		return nodeEditor( node,
+				   label( name ),
+				   state )
 	
-	def nilExpr(self, node):
-		return activeBorder( label( '<expr>' ) )
+	def nilExpr(self, state, node):
+		return nodeEditor( node,
+				   label( '<expr>' ),
+				   state )
 	
-	def listLiteral(self, node, *x):
-		return listView( VerticalListViewLayout( 0.0, 0.0, 45.0 ), '[', ']', ',', mapViewEval( x ) )
+	def listLiteral(self, state, node, *x):
+		return nodeEditor( node,
+			listView( VerticalListViewLayout( 0.0, 0.0, 45.0 ), '[', ']', ',', mapViewEval( x ) ),
+			state )
 	
-	def UNPARSED(self, node, value):
-		return activeBorder( label( '<' + value + '>', unparsedStyle ) )
+	def UNPARSED(self, state, node, value):
+		return nodeEditor( node,
+				   label( '<' + value + '>', unparsedStyle ),
+				   state )
 	
 	
 	

@@ -28,7 +28,7 @@ def dispatch(target, xs, *args):
 			method = getattr( target, name )
 		except AttributeError:
 			raise DispatchNameError, 'GLisp dispatch: could not find method named %s in class %s'  %  ( name, type( target ).__name__ )
-		return method( *( list(args) + [ xs ] + xs[1:] ) )
+		return method( *( args + ( xs, ) + tuple( xs[1:] ) ) )
 	else:
 		raise DispatchTypeError, 'GLisp dispatch: can only dispatch on lists'
 
