@@ -66,24 +66,13 @@ class DVNode (Sheet):
 
 
 
-	@FunctionRefField
-	def _node_styleSheet(self):
-		return self._view._f_getStyleSheet( self._docNodeKey )
-
-
 	def _o_refreshNode(self):
-		styleSheet = self._node_styleSheet
-		if styleSheet is not self._styleSheet:
-			self._styleSheet = styleSheet
-			self._o_styleSheetChanged()
+		pass
 
 
 	def _o_reset(self):
 		pass
 
-
-	def _o_styleSheetChanged(self):
-		pass
 
 
 
@@ -94,7 +83,6 @@ class DVNode (Sheet):
 		self._bDeleting = False
 		self._parent = None
 		self._docNodeKey = docNodeKey
-		self._styleSheet = None
 		self.refreshCell = RefCell()
 		self.refreshCell.function = self._o_refreshNode
 		
@@ -107,7 +95,7 @@ class DVNode (Sheet):
 			self._docNodeKey = docNodeKey
 			self._view._f_nodeChangeKey( self, oldKey, docNodeKey )
 			# Force refreshCell to require recomputation due to potential style sheet change
-			self.refreshCell.function = self._o_refreshNode
+			# self.refreshCell.function = self._o_refreshNode
 		self._o_reset()
 		
 		
@@ -430,14 +418,6 @@ class DVNode (Sheet):
 			if behavior.handleKeyPress( self, receivingViewNodePath, widget, keyPressEvent ):
 				return True
 
-		parentStyleSheet = None
-		if self._parent is not None:
-			parentStyleSheet = self._parent._styleSheet
-
-		result = self._styleSheet._f_handleKeyPress( DocViewEventKey( receivingViewNodePath, keyPressEvent ), parentStyleSheet )
-		if result is not False:
-			return result
-
 		# Pass to the parent node
 		if self._parent is not None:
 			return self._parent._o_handleKeyPress( receivingViewNodePath, widget, keyPressEvent )
@@ -453,15 +433,7 @@ class DVNode (Sheet):
 
 
 	def _f_handleEmpty(self, receivingViewNodePath, bDirectEvent):
-		parentStyleSheet = None
-		if self._parent is not None:
-			parentStyleSheet = self._parent._styleSheet
-
 		receivingViewNodePath = [ self ]  +  receivingViewNodePath
-
-		result = self._styleSheet._f_handleEmpty( DocViewEventEmpty( receivingViewNodePath ), parentStyleSheet, bDirectEvent )
-		if result is not None:
-			return result
 
 		# Pass to the parent node
 		if self._parent is not None:
@@ -471,15 +443,7 @@ class DVNode (Sheet):
 
 
 	def _f_handleToken(self, receivingViewNodePath, token, tokenIndex, numTokens, bDirectEvent):
-		parentStyleSheet = None
-		if self._parent is not None:
-			parentStyleSheet = self._parent._styleSheet
-
 		receivingViewNodePath = [ self ]  +  receivingViewNodePath
-
-		result = self._styleSheet._f_handleToken( DocViewEventToken( receivingViewNodePath, token, tokenIndex, numTokens ), parentStyleSheet, bDirectEvent )
-		if result is not None:
-			return result
 
 		# Pass to the parent node
 		if self._parent is not None:

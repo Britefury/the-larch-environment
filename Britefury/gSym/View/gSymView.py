@@ -584,12 +584,12 @@ class _GSymViewInstance (object):
 	"""
 	Manages state concerning a view of a specific document
 	"""
-	def __init__(self, xs, viewFactory, commandHistory, styleSheetDispatcher):
+	def __init__(self, xs, viewFactory, commandHistory):
 		self.xs = xs
 		self.viewNodeInstanceStack = []
 		self.generalNodeViewFunction = viewFactory._f_createViewFunction( self.viewNodeInstanceStack )
 		# self._p_buildDVNode is a factory that builds DVNode instances for document subtrees
-		self.view = DocView( self.xs, commandHistory, styleSheetDispatcher, self._p_rootNodeFactory )
+		self.view = DocView( self.xs, commandHistory, self._p_rootNodeFactory )
 		self.focusWidget = None
 		self._queue = _ViewQueue( self.view )
 		
@@ -758,8 +758,8 @@ class GSymViewFactory (object):
 		return self.viewClass()
 		
 		
-	def createDocumentView(self, xs, commandHistory, styleSheetDispatcher):
-		viewInstance = _GSymViewInstance( xs, self, commandHistory, styleSheetDispatcher )
+	def createDocumentView(self, xs, commandHistory):
+		viewInstance = _GSymViewInstance( xs, self, commandHistory )
 		return viewInstance.view
 
 
