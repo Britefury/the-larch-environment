@@ -28,7 +28,6 @@ from Britefury.DocPresent.Toolkit.DTWrappedHBoxWithSeparators import DTWrappedHB
 
 
 from Britefury.DocView.DVNode import DVNode
-from Britefury.DocView.DVCustomNode import DVCustomNode
 from Britefury.DocView.DocView import DocView
 from Britefury.DocView.DocViewNodeTable import DocNodeKey
 
@@ -600,7 +599,7 @@ class _GSymViewInstance (object):
 		def _nodeFactory(docNode, view, docNodeKey):
 			# Build a DVNode for the document subtree at @docNode
 			# self._p_buildNodeContents is a factory that builds the contents withing the DVNode
-			node = DVCustomNode( docNode, view, docNodeKey )
+			node = DVNode( docNode, view, docNodeKey )
 			node._f_setContentsFactory( self._f_makeNodeContentsFactory( nodeViewFunction ) )
 			return node
 		return _nodeFactory
@@ -609,7 +608,7 @@ class _GSymViewInstance (object):
 	def _p_rootNodeFactory(self, docNode, view, docNodeKey):
 		# Build a DVNode for the document subtree at @docNode
 		# self._p_buildNodeContents is a factory that builds the contents withing the DVNode
-		node = DVCustomNode( docNode, view, docNodeKey )
+		node = DVNode( docNode, view, docNodeKey )
 		node._f_setContentsFactory( self._f_makeNodeContentsFactory() )
 		return node
 	
