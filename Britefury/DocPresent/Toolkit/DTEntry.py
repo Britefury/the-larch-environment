@@ -247,6 +247,10 @@ class DTEntry (DTWidget):
 	def getCursorPosition(self):
 		pos, size = self._layout.getCharacterRectangle( self._cursorIndex )
 		return Point2( pos.x, pos.y  +  size.y * 0.5 )
+	
+	
+	def _p_getTextPosition(self):
+		return self._textPosition
 
 
 
@@ -786,6 +790,7 @@ if __name__ == '__main__':
 	import cairo
 
 	from Britefury.DocPresent.Toolkit.DTDocument import DTDocument
+	from Britefury.DocPresent.Toolkit.DTBox import DTBox
 	from Britefury.Math.Math import Colour3f
 	import traceback
 
@@ -807,9 +812,14 @@ if __name__ == '__main__':
 
 
 	autoCompleteList = [ 'abc', 'Hello', 'Hello world', 'Hi', 'Hi world', 'Hello world 2' ]
-
-	entry = DTEntry( 'Hello world', autoCompleteList=autoCompleteList )
-	doc.child = entry
+	vbox = DTBox( DTBox.TOP_TO_BOTTOM )
+	for y in xrange( 0, 5 ):
+		hbox = DTBox()
+		for x in xrange( 0, 5 ):
+			entry = DTEntry( 'Hello world', autoCompleteList=autoCompleteList )
+			hbox.append( entry )
+		vbox.append( hbox )
+	doc.child = vbox
 	entry.grabFocus()
 
 
