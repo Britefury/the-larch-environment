@@ -18,9 +18,12 @@ from Britefury.DocPresent.Toolkit.DTActiveBorder import DTActiveBorder
 from Britefury.DocPresent.Toolkit.DTBin import DTBin 
 from Britefury.DocPresent.Toolkit.DTBorder import DTBorder
 from Britefury.DocPresent.Toolkit.DTBox import DTBox
+from Britefury.DocPresent.Toolkit.DTHighlight import DTHighlight
 from Britefury.DocPresent.Toolkit.DTHLine import DTHLine
 from Britefury.DocPresent.Toolkit.DTLabel import DTLabel
 from Britefury.DocPresent.Toolkit.DTScript import DTScript
+from Britefury.DocPresent.Toolkit.DTEntryLabel import DTEntryLabel
+from Britefury.DocPresent.Toolkit.DTCustomEntry import DTCustomEntry
 from Britefury.DocPresent.Toolkit.DTTokenisedEntryLabel import DTTokenisedEntryLabel
 from Britefury.DocPresent.Toolkit.DTTokenisedCustomEntry import DTTokenisedCustomEntry
 from Britefury.DocPresent.Toolkit.DTWrappedHBox import DTWrappedHBox
@@ -38,8 +41,9 @@ from Britefury.GLisp.GLispDispatch import dispatch
 
 from Britefury.gSym.View.gSymStyleSheet import GSymStyleSheet
 from Britefury.gSym.View.Interactor import Interactor, NoEventMatch
-from Britefury.gSym.View.InteractorEvent import InteractorEventKey, InteractorEventTokenList
+from Britefury.gSym.View.InteractorEvent import InteractorEventKey, InteractorEventText, InteractorEventTokenList
 from Britefury.gSym.View import ListView
+from Britefury.gSym.View.UnparsedText import UnparsedText
 
 from Britefury.gSym.RelativeNode import RelativeNode, relative
 
@@ -283,6 +287,18 @@ def indent(child, indentation, style=None):
 	_applyStyle( style, widget )
 	return widget
 
+def highlight(child, style=None):
+	"""
+	Runtime - called by compiled code at run-time
+	Builds a DTHighlight widget, with child, builds and registers a refresh cell
+	"""
+	viewNodeInstance = _globalNodeViewInstanceStack[-1]
+	widget = DTHighlight()
+	_binRefreshCell( viewNodeInstance, widget, child )
+	_applyStyleSheetStack( viewNodeInstance, widget )
+	_applyStyle( style, widget )
+	return widget
+
 def hline(style=None):
 	"""
 	Runtime - called by compiled code at run-time
@@ -323,28 +339,28 @@ def markupLabel(text, style=None):
 
 
 
-def entry(labelText, entryText, tokeniser, style=None):
+def entry(labelText, entryText, style=None):
 	"""Builds a DTEntryLabel widget"""
 	viewNodeInstance = _globalNodeViewInstanceStack[-1]
 	if isinstance( labelText, RelativeNode ):
 		labelText = labelText.node
 	if isinstance( entryText, RelativeNode ):
 		entryText = entryText.node
-	widget = DTTokenisedEntryLabel( tokeniser, labelText, entryText )
+	widget = DTEntryLabel( labelText, entryText )
 	widget.textModifiedSignal.connect( viewNodeInstance.viewInstance._p_onEntryModifed )
 	widget.finishEditingSignal.connect( viewNodeInstance.viewInstance._p_onEntryFinished )
 	_applyStyleSheetStack( viewNodeInstance, widget )
 	_applyStyle( style, widget )
 	return widget
 
-def markupEntry(labelText, entryText, tokeniser, style=None):
+def markupEntry(labelText, entryText, style=None):
 	"""Builds a DTEntryLabel widget"""
 	viewNodeInstance = _globalNodeViewInstanceStack[-1]
 	if isinstance( labelText, RelativeNode ):
 		labelText = labelText.node
 	if isinstance( entryText, RelativeNode ):
 		entryText = entryText.node
-	widget = DTTokenisedEntryLabel( tokeniser, labelText, entryText )
+	widget = DTEntryLabel( labelText, entryText )
 	widget.textModifiedSignal.connect( viewNodeInstance.viewInstance._p_onEntryModifed )
 	widget.finishEditingSignal.connect( viewNodeInstance.viewInstance._p_onEntryFinished )
 	widget.bLabelUseMarkup = True
@@ -352,18 +368,68 @@ def markupEntry(labelText, entryText, tokeniser, style=None):
 	_applyStyle( style, widget )
 	return widget
 
-def customEntry(customChild, entryText, tokeniser, style=None):
+def customEntry(customChild, entryText, style=None):
 	"""Builds a DTEntryLabel widget"""
 	viewNodeInstance = _globalNodeViewInstanceStack[-1]
 	if isinstance( entryText, RelativeNode ):
 		entryText = entryText.node
-	widget = DTTokenisedCustomEntry( tokeniser, entryText )
+	elif isinstance( entryText, UnparsedText ):
+		entryText = entryText.getText()
+	widget = DTCustomEntry( entryText )
 	widget.textModifiedSignal.connect( viewNodeInstance.viewInstance._p_onEntryModifed )
 	widget.finishEditingSignal.connect( viewNodeInstance.viewInstance._p_onEntryFinished )
 	_customEntryRefreshCell( viewNodeInstance, widget, customChild )
 	_applyStyleSheetStack( viewNodeInstance, widget )
 	_applyStyle( style, widget )
 	return widget
+
+
+
+def tokEntry(labelText, entryText, tokeniser, style=None):
+	"""Builds a DTEntryLabel widget"""
+	viewNodeInstance = _globalNodeViewInstanceStack[-1]
+	if isinstance( labelText, RelativeNode ):
+		labelText = labelText.node
+	if isinstance( entryText, RelativeNode ):
+		entryText = entryText.node
+	widget = DTTokenisedEntryLabel( tokeniser, labelText, entryText )
+	widget.textModifiedSignal.connect( viewNodeInstance.viewInstance._p_onTokenisedEntryModifed )
+	widget.finishEditingSignal.connect( viewNodeInstance.viewInstance._p_onTokenisedEntryFinished )
+	_applyStyleSheetStack( viewNodeInstance, widget )
+	_applyStyle( style, widget )
+	return widget
+
+def tokMarkupEntry(labelText, entryText, tokeniser, style=None):
+	"""Builds a DTEntryLabel widget"""
+	viewNodeInstance = _globalNodeViewInstanceStack[-1]
+	if isinstance( labelText, RelativeNode ):
+		labelText = labelText.node
+	if isinstance( entryText, RelativeNode ):
+		entryText = entryText.node
+	widget = DTTokenisedEntryLabel( tokeniser, labelText, entryText )
+	widget.textModifiedSignal.connect( viewNodeInstance.viewInstance._p_onTokenisedEntryModifed )
+	widget.finishEditingSignal.connect( viewNodeInstance.viewInstance._p_onTokenisedEntryFinished )
+	widget.bLabelUseMarkup = True
+	_applyStyleSheetStack( viewNodeInstance, widget )
+	_applyStyle( style, widget )
+	return widget
+
+def tokCustomEntry(customChild, entryText, tokeniser, style=None):
+	"""Builds a DTEntryLabel widget"""
+	viewNodeInstance = _globalNodeViewInstanceStack[-1]
+	if isinstance( entryText, RelativeNode ):
+		entryText = entryText.node
+	elif isinstance( entryText, UnparsedText ):
+		entryText = entryText.getText()
+	widget = DTTokenisedCustomEntry( tokeniser, entryText )
+	widget.textModifiedSignal.connect( viewNodeInstance.viewInstance._p_onTokenisedEntryModifed )
+	widget.finishEditingSignal.connect( viewNodeInstance.viewInstance._p_onTokenisedEntryFinished )
+	_customEntryRefreshCell( viewNodeInstance, widget, customChild )
+	_applyStyleSheetStack( viewNodeInstance, widget )
+	_applyStyle( style, widget )
+	return widget
+
+
 
 def hbox(children, style=None, alignment=DTBox.ALIGN_CENTRE, spacing=0.0):
 	"""
@@ -531,7 +597,7 @@ def focus(child):
 
 
 
-def viewEval(content, nodeViewFunction=None):
+def viewEval(content, nodeViewFunction=None, state=None):
 	"""Build a view for a document subtree (@content)"""
 	viewNodeInstance = _globalNodeViewInstanceStack[-1]
 
@@ -540,16 +606,16 @@ def viewEval(content, nodeViewFunction=None):
 		
 	# A call to DocNode._f_buildView builds the view, and puts it in the DocView's table
 	viewInstance = viewNodeInstance.viewInstance
-	nodeFactory = viewInstance._f_makeNodeFactory( nodeViewFunction )
+	nodeFactory = viewInstance._f_makeNodeFactory( nodeViewFunction, state )
 	viewNode = viewNodeInstance.view._f_buildView( content.node, content.parent, content.indexInParent, nodeFactory )
-	viewNode._f_setContentsFactory( viewNodeInstance.viewInstance._f_makeNodeContentsFactory( nodeViewFunction ) )
+	viewNode._f_setContentsFactory( viewNodeInstance.viewInstance._f_makeNodeContentsFactory( nodeViewFunction, state ) )
 	viewNode.refresh()
 	
 	return viewNode
 
 
-def mapViewEval(content, nodeViewFunction=None):
-	return [ viewEval( x, nodeViewFunction )   for x in content ]
+def mapViewEval(content, nodeViewFunction=None, state=None):
+	return [ viewEval( x, nodeViewFunction, state )   for x in content ]
 
 
 
@@ -595,12 +661,12 @@ class _GSymViewInstance (object):
 		self._nodeContentsFactories = {}
 		
 	
-	def _f_makeNodeFactory(self, nodeViewFunction):
+	def _f_makeNodeFactory(self, nodeViewFunction, state):
 		def _nodeFactory(docNode, view, docNodeKey):
 			# Build a DVNode for the document subtree at @docNode
 			# self._p_buildNodeContents is a factory that builds the contents withing the DVNode
 			node = DVNode( docNode, view, docNodeKey )
-			node._f_setContentsFactory( self._f_makeNodeContentsFactory( nodeViewFunction ) )
+			node._f_setContentsFactory( self._f_makeNodeContentsFactory( nodeViewFunction, state ) )
 			return node
 		return _nodeFactory
 	
@@ -609,33 +675,34 @@ class _GSymViewInstance (object):
 		# Build a DVNode for the document subtree at @docNode
 		# self._p_buildNodeContents is a factory that builds the contents withing the DVNode
 		node = DVNode( docNode, view, docNodeKey )
-		node._f_setContentsFactory( self._f_makeNodeContentsFactory() )
+		node._f_setContentsFactory( self._f_makeNodeContentsFactory( None, None ) )
 		return node
 	
 
 
-	def _f_makeNodeContentsFactory(self, nodeViewFunction=None):
+	def _f_makeNodeContentsFactory(self, nodeViewFunction, state):
 		def _buildNodeContents(viewNode, docNodeKey):
 			# Create the node view instance
 			nodeViewInstance = _GSymNodeViewInstance( docNodeKey.docNode, self.view, self, viewNode )
 			relativeNode = relative( docNodeKey.docNode, docNodeKey.parentDocNode, docNodeKey.index )
 			# Build the contents
-			viewContents = self._p_buildNodeViewContents( nodeViewInstance, relativeNode, nodeViewFunction )
+			viewContents = self._p_buildNodeViewContents( nodeViewInstance, relativeNode, nodeViewFunction, state )
 			# Get the refresh cells that need to be monitored, and hand them to the DVNode
 			viewNode._f_setRefreshCells( nodeViewInstance.refreshCells )
 			# Return the contents
 			return viewContents
 		
-		#Memoise the contents factory; keyed by @viewFunction
+		#Memoise the contents factory; keyed by @nodeViewFunction and @state
+		key = nodeViewFunction, state
 		try:
-			return self._nodeContentsFactories[nodeViewFunction]
+			return self._nodeContentsFactories[key]
 		except KeyError:
 			factory = _buildNodeContents
-			self._nodeContentsFactories[nodeViewFunction] = factory
+			self._nodeContentsFactories[key] = factory
 			return factory
 		
 	
-	def _p_buildNodeViewContents(self, nodeViewInstance, content, nodeViewFunction=None):
+	def _p_buildNodeViewContents(self, nodeViewInstance, content, nodeViewFunction, state):
 		"""Runtime - build the contents of a view node"""
 		if nodeViewFunction is None:
 			nodeViewFunction = self.generalNodeViewFunction
@@ -646,7 +713,7 @@ class _GSymViewInstance (object):
 		_globalNodeViewInstanceStack.append( nodeViewInstance )
 		
 		#2. Create the view contents
-		viewContents = nodeViewFunction( content )
+		viewContents = nodeViewFunction( content, state )
 		
 		#3. Pop @self from the view instance's view node instance stack
 		_globalNodeViewInstanceStack.pop()
@@ -716,6 +783,22 @@ class _GSymViewInstance (object):
 	
 
 	
+	def _p_sendTextDocEvent(self, widget, text):
+		event = InteractorEventText( True, text )
+		bHandled = self._p_sendDocEventToWidget( widget, event )
+		if not bHandled:
+			print 'gSymView._sendTokenListDocEvent: ***unhandled event*** %s'  %  ( event, )
+		return bHandled
+	
+	def _p_onEntryModifed(self, widget, text):
+		pass
+	
+	def _p_onEntryFinished(self, widget, text, bChanged, bUserEvent):
+		if bUserEvent  and  bChanged:
+			self._p_sendTextDocEvent( widget, text )
+
+			
+			
 	def _p_sendTokenListDocEvent(self, widget, tokens):
 		event = InteractorEventTokenList( True, tokens )
 		bHandled = self._p_sendDocEventToWidget( widget, event )
@@ -723,11 +806,11 @@ class _GSymViewInstance (object):
 			print 'gSymView._sendTokenListDocEvent: ***unhandled event*** %s'  %  ( event, )
 		return bHandled
 	
-	def _p_onEntryModifed(self, widget, text, tokens):
+	def _p_onTokenisedEntryModifed(self, widget, text, tokens):
 		if len( tokens ) > 1:
 			self._p_sendTokenListDocEvent( widget, tokens )
 	
-	def _p_onEntryFinished(self, widget, text, tokens, bChanged, bUserEvent):
+	def _p_onTokenisedEntryFinished(self, widget, text, tokens, bChanged, bUserEvent):
 		if bUserEvent  and  bChanged:
 			self._p_sendTokenListDocEvent( widget, tokens )
 
@@ -735,8 +818,8 @@ class _GSymViewInstance (object):
 
 			
 class GSymView (object):
-	def __call__(self, xs):
-		return dispatch( self, xs )
+	def __call__(self, xs, state):
+		return dispatch( self, xs, state )
 	
 		
 		

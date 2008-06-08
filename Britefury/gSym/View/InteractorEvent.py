@@ -33,6 +33,17 @@ class InteractorEventKey (InteractorEvent):
 	
 		
 	
+class InteractorEventText (InteractorEvent):
+	def __init__(self, bUserEvent, text):
+		super( InteractorEventText, self ).__init__( bUserEvent )
+		self.text = text
+		
+
+	def __repr__(self):
+		return "Text %s"  %  ( self.text, )
+
+
+
 class InteractorEventTokenList (InteractorEvent):
 	class Token (object):
 		def __init__(self, tokenClass, value):

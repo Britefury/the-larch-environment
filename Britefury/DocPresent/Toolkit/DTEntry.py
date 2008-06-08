@@ -94,6 +94,7 @@ class DTEntry (DTWidget):
 	returnSignal = ClassSignal()       				# ( entry )
 	textInsertedSignal = ClassSignal()				# ( entry, position, bAppended, textInserted )
 	textDeletedSignal = ClassSignal()				# ( entry, startIndex, endIndex, textDeleted )
+	textModifiedSignal = ClassSignal()				# ( entry, text )
 
 
 	def __init__(self, text='', font=None, borderWidth=2.0, backgroundColour=Colour3f( 0.9, 0.95, 0.9 ), highlightedBackgroundColour=Colour3f( 0.0, 0.0, 0.5 ), textColour=Colour3f( 0.0, 0.0, 0.0 ), highlightedTextColour=Colour3f( 1.0, 1.0, 1.0 ), borderColour=Colour3f( 0.6, 0.8, 0.6 ), autoCompleteList=None):
@@ -395,6 +396,7 @@ class DTEntry (DTWidget):
 		self.textDeletedSignal.emit( self, 0, len( deletedText ), deletedText )
 		self._cursorIndex = len( self._text )
 		self.textInsertedSignal.emit( self, 0, True, text )
+		self.textModifiedSignal.emit( self, self.getText() )
 		self._p_onTextModified()
 
 
@@ -454,6 +456,7 @@ class DTEntry (DTWidget):
 				self._p_setText( self._text[:self._cursorIndex-1] + self._text[self._cursorIndex:] )
 				self._cursorIndex -= 1
 				self.textDeletedSignal.emit( self, self._cursorIndex, self._cursorIndex+1, textDeleted )
+				self.textModifiedSignal.emit( self, self.getText() )
 				self._p_onTextModified()
 			else:
 				# leave the entry
@@ -471,6 +474,7 @@ class DTEntry (DTWidget):
 				textDeleted = self._text[self._cursorIndex:self._cursorIndex+1]
 				self._p_setText( self._text[:self._cursorIndex] + self._text[self._cursorIndex+1:] )
 				self.textDeletedSignal.emit( self, self._cursorIndex, self._cursorIndex+1, textDeleted )
+				self.textModifiedSignal.emit( self, self.getText() )
 				self._p_onTextModified()
 			else:
 				# leave the entry
@@ -507,6 +511,7 @@ class DTEntry (DTWidget):
 			self._cursorIndex += len( event.keyString )
 
 			self.textInsertedSignal.emit( self, position, bAppended, event.keyString )
+			self.textModifiedSignal.emit( self, self.getText() )
 			self._p_onTextModified()
 			bHandled = True
 

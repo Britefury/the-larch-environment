@@ -8,7 +8,7 @@
 
 import gtk
 
-from Britefury.gSym.View.InteractorEvent import InteractorEvent, InteractorEventKey, InteractorEventTokenList
+from Britefury.gSym.View.InteractorEvent import InteractorEvent, InteractorEventKey, InteractorEventText, InteractorEventTokenList
 
 
 
@@ -38,6 +38,18 @@ def accelEventMethod(accelString):
 				if event.keyValue == keyValue  and  event.mods == mods:
 					nodeToSelect = method( self, event.keyValue, event.mods, *args, **kwargs )
 					return nodeToSelect, None
+			raise NoEventMatch
+		return decoratedMethod
+	return decorate
+	
+
+
+def textEventMethod():
+	def decorate(method):
+		def decoratedMethod(self, event, *args, **kwargs):
+			if isinstance( event, InteractorEventText ):
+				nodeToSelect = method( self, event.text, *args, **kwargs )
+				return nodeToSelect, None
 			raise NoEventMatch
 		return decoratedMethod
 	return decorate

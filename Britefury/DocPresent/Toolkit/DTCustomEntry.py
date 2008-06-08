@@ -20,8 +20,9 @@ from Britefury.DocPresent.Toolkit.DTEntry import DTEntry
 class DTCustomEntry (DTBin):
 	textInsertedSignal = ClassSignal()				# ( entry, position, bAppended, textInserted )
 	textDeletedSignal = ClassSignal()				# ( entry, startIndex, endIndex, textDeleted )
+	textModifiedSignal = ClassSignal()				# ( entry, text )
 	startEditingSignal = ClassSignal()				# ( entry, text )
-	finishEditingSignal = ClassSignal()			# ( entry, text, bChanged, bUserEvent )
+	finishEditingSignal = ClassSignal()				# ( entry, text, bChanged, bUserEvent )
 
 
 	class _CustomContainer (DTBin):
@@ -102,6 +103,7 @@ class DTCustomEntry (DTBin):
 		self._entry = self._Entry( self, entryText, font )
 		self._entry.textInsertedSignal.connect( self._p_onEntryTextInserted )
 		self._entry.textDeletedSignal.connect( self._p_onEntryTextDeleted )
+		self._entry.textModifiedSignal.connect( self._p_onEntryTextModified )
 		self._entry.returnSignal.connect( self._p_onEntryReturn )
 
 		self.setChild( self._custom )
@@ -215,11 +217,17 @@ class DTCustomEntry (DTBin):
 	def _p_onEntryTextDeleted(self, entry, start, end, textDeleted):
 		self._o_emitTextDeleted( start, end, textDeleted )
 
+	def _p_onEntryTextModified(self, entry, text):
+		self._o_emitTextModified( text )
+
 	def _o_emitTextInserted(self, position, bAppended, textInserted):
 		self.textInsertedSignal.emit( self, position, bAppended, textInserted )
 
 	def _o_emitTextDeleted(self, start, end, textDeleted):
 		self.textInsertedSignal.emit( self, start, end, textDeleted )
+
+	def _o_emitTextModified(self, text):
+		self.textModifiedSignal.emit( self, text )
 
 	def _p_onEntryReturn(self, entry):
 		self._p_finishEditing( True )

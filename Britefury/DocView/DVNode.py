@@ -24,6 +24,7 @@ from Britefury.DocPresent.Toolkit.DTWidget import *
 from Britefury.DocPresent.Toolkit.DTBorder import *
 from Britefury.DocPresent.Toolkit.DTLabel import *
 
+from Britefury.gSym.View.UnparsedText import UnparsedText
 
 
 
@@ -32,30 +33,17 @@ class DVNode (object):
 		pass
 
 
-	def _o_refreshNode(self):
-		for cell in self._cellsToRefresh:
-			cell.getImmutableValue()
-		contents = self._contentsCell.getImmutableValue()
-		self.widget.child = contents
-
-
-	def _o_reset(self):
-		pass
-
-
-
-
 	def __init__(self, docNode, view, docNodeKey):
 		super( DVNode, self ).__init__()
 		self.docNode = docNode
 		self._view = view
-		self._bDeleting = False
 		self._parent = None
 		self._docNodeKey = docNodeKey
 		self.refreshCell = RefCell()
 		self.refreshCell.function = self._o_refreshNode
 		
-		self.widget = DTBin()
+		self._widget = DTBin()
+		self._text = None
 		self._contentsFactory = None
 		self._contentsCell = RefCell()
 		self._contentsCell.function = self._p_computeContents
@@ -82,9 +70,6 @@ class DVNode (object):
 			oldKey = self._docNodeKey
 			self._docNodeKey = docNodeKey
 			self._view._f_nodeChangeKey( self, oldKey, docNodeKey )
-			# Force refreshCell to require recomputation due to potential style sheet change
-			# self.refreshCell.function = self._o_refreshNode
-		self._o_reset()
 		
 		
 	def getDocNodeKey(self):
@@ -97,6 +82,32 @@ class DVNode (object):
 	# REFRESH METHODS
 	#
 	
+	def _o_refreshNode(self):
+		for cell in self._cellsToRefresh:
+			cell.getImmutableValue()
+		contents = self._contentsCell.getImmutableValue()
+		if isinstance( contents, tuple ):
+			widget, text = contents
+			assert isinstance( widget, DTWidget )  or  isinstance( widget, DVNode )
+			assert isinstance( text, UnparsedText )  or  isinstance( text, str )  or  isinstance( text, unicode )
+			
+			# If the contents is a DVNode, get its widget
+			if isinstance( widget, DVNode ):
+				widget = widget.widget
+			
+			self._widget.child = widget
+			self._text = contents[1]
+		else:
+			# Contents is just a widget
+			if isinstance( contents, DTWidget ):
+				self._widget.child = contents
+			elif isinstance( contents, DVNode ):
+				self._widget.child = contents.widget
+			else:
+				raise TypeError, 'contents should be a DTWidget or a DVNode'
+			self._text = None
+
+
 	def _o_resetRefreshCell(self):
 		self.refreshCell.function = self._o_refreshNode
 
@@ -121,6 +132,21 @@ class DVNode (object):
 		if contentsFactory is not self._contentsFactory:
 			self._contentsFactory = contentsFactory
 			self._contentsCell.function = self._p_computeContents
+			
+			
+			
+	#
+	# CONTENT ACQUISITION METHODS
+	#
+	
+	def getWidget(self):
+		self.refresh()
+		return self._widget
+	
+	def getText(self):
+		self.refresh()
+		return self._text
+	
 			
 			
 			
@@ -171,3 +197,8 @@ class DVNode (object):
 	parentNodeView = property( getParentNodeView )
 	docView = property( getDocView )
 	docNodeKey = property( getDocNodeKey )
+	widget = property( getWidget )
+	text = property( getText )
+
+
+
