@@ -10,8 +10,8 @@ import string
 import operator
 from copy import copy
 
-from Britefury.Parser.Parser import getErrorLine, Literal, Word, RegEx, Sequence, Combine, Choice, Optional, ZeroOrMore, OneOrMore, Production, Group, Forward, Suppress, identifier, quotedString, unicodeString, integer, floatingPoint, delimitedList
-
+from Britefury.Parser.Parser import getErrorLine, parserCoerce, Bind, Action, Condition, Forward, Group, Production, Suppress, Literal, Keyword, RegEx, Word, Sequence, Combine, Choice, Optional, Repetition, ZeroOrMore, OneOrMore, Peek, PeekNot
+from Britefury.Parser.GrammarUtils import identifier, quotedString, unicodeString, integer, floatingPoint, separatedList
 from Britefury.GLisp.GLispUtil import isGLispList, gLispSrcToStringPretty
 
 
@@ -63,11 +63,11 @@ _expression = Forward()
 _compoundExpression = Production( Literal( '{' )  +  ZeroOrMore( ( _expression + Literal( ';' ) ).action( lambda input, begin, tokens: tokens[0] ) )  +  Literal( '}' ) ).action( lambda input, begin, tokens: tokens[1] )
 _singleOrCompoundExpression = Production( _compoundExpression  |  ( _expression + ';' ).action( lambda input, begin, tokens: [ tokens[0] ] ) )
 
-_listLiteral = Production( Literal( '[' )  +  delimitedList( _expression )  +  Literal( ']' ) ).action( lambda input, begin, tokens: [ '$list' ]  +  tokens[1] )
+_listLiteral = Production( Literal( '[' )  +  separatedList( _expression )  +  Literal( ']' ) ).action( lambda input, begin, tokens: [ '$list' ]  +  tokens[1] )
 
-_setLiteral = Production( Literal( '[:' )  +  delimitedList( _expression )  +  Literal( ':]' ) ).action( lambda input, begin, tokens: [ '$set' ]  +  tokens[1] )
+_setLiteral = Production( Literal( '[:' )  +  separatedList( _expression )  +  Literal( ':]' ) ).action( lambda input, begin, tokens: [ '$set' ]  +  tokens[1] )
 
-_lambdaExpression = Production( Literal( 'lambda' )  +  '('  +  delimitedList( _var )  +  ')'  +  '->'  +  _compoundExpression ).action( lambda input, begin, tokens: [ '$lambda' ]  +  [ tokens[2] ] + tokens[5] )
+_lambdaExpression = Production( Literal( 'lambda' )  +  '('  +  separatedList( _var )  +  ')'  +  '->'  +  _compoundExpression ).action( lambda input, begin, tokens: [ '$lambda' ]  +  [ tokens[2] ] + tokens[5] )
 
 _mapExpression = Production( Literal( 'map' )  +  '('  +  _expression + ',' + _expression + ')' ).action( lambda input, begin, tokens: [ '$map' ]  +  [ tokens[2], tokens[4] ] )
 
@@ -132,7 +132,7 @@ def _checkParams(input, begin, tokens):
 	return tokens
 
 _kwParam = Production( _paramName + Suppress( '=' ) + _expression )
-_parameterList = Production( Suppress( '(' )  -  delimitedList( _kwParam | _expression )  -  Suppress( ')' ) ).action( _checkParams )
+_parameterList = Production( Suppress( '(' )  -  separatedList( _kwParam | _expression )  -  Suppress( ')' ) ).action( _checkParams )
 
 
 _parenExp = Production( Literal( '(' ) + _expression + ')' ).action( lambda input, begin, tokens: tokens[1] )
@@ -150,7 +150,7 @@ _interactorEventKey = Production( Literal( 'key' )  +  '('  +  _expression  +  '
 _interactorEventAccel = Production( Literal( 'accel' )  +  '('  +  _expression  +  ')' ).action( lambda input, begin, tokens: [ '$accel', tokens[2] ] )
 _interactorTokenWithBind = Production( _gmetaIdentifier + ':' + _var ).action( lambda input, begin, tokens: [ ':', tokens[2], tokens[0] ] )
 _interactorTokenEntry = Production( _interactorTokenWithBind  |  _gmetaIdentifier )
-_interactorEventTokens = Production( Literal( 'tokens' )  +  '('  +  delimitedList( _interactorTokenEntry )  +  ')' ).action( lambda input, begin, tokens: [ '$tokens' ]  +  tokens[2] )
+_interactorEventTokens = Production( Literal( 'tokens' )  +  '('  +  separatedList( _interactorTokenEntry )  +  ')' ).action( lambda input, begin, tokens: [ '$tokens' ]  +  tokens[2] )
 _interactorEvent = Production( _interactorEventKey  |  _interactorEventAccel  |  _interactorEventTokens )
 _interactorMatch = Production( _interactorEvent  +  Suppress( '=>' )  +  _expression  +  Suppress( ';' ) )
 _interactor = Production( Literal( 'defineInteractor' )  +  '{' +  ZeroOrMore( _interactorMatch )  +  '}' ).action( lambda input, begin, tokens: [ '$interactor' ] + tokens[2] )
@@ -215,7 +215,7 @@ from Britefury.GLisp.GLispUtil import gLispSrcToString
 class TestCase_GMetaParser (unittest.TestCase):
 	def _matchTest(self, parser, input, expected, begin=None, end=None, ignoreChars=string.whitespace):
 		expectedXs = readSX( expected )
-		result = parser.parseString( input, ignoreChars=ignoreChars )
+		result, pos = parser.parseString( input, ignoreChars=ignoreChars )
 		self.assert_( result is not None )
 		res = result.result
 		if res != expectedXs:
@@ -234,7 +234,7 @@ class TestCase_GMetaParser (unittest.TestCase):
 		
 	
 	def _matchFailTest(self, parser, input, ignoreChars=string.whitespace):
-		result = parser.parseString( input, ignoreChars=ignoreChars )
+		result, pos = parser.parseString( input, ignoreChars=ignoreChars )
 		if result is not None   and   result.end == len( input ):
 			print 'EXPECTED:'
 			print '<fail>'
