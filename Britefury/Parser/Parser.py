@@ -21,11 +21,11 @@ import re
 from Britefury.Parser.ParserState import ParserState
 
 
-def _parser_coerce(x):
+def parserCoerce(x):
 	if isinstance( x, ParserExpression ):
 		return x
 	elif isinstance( x, list )  or  isinstance( x, tuple ):
-		return Sequence( _parser_coerce( [ _parser_coerce( a )   for a in x ] ) )
+		return Sequence( parserCoerce( [ parserCoerce( a )   for a in x ] ) )
 	else:
 		return Literal( x )
 	
@@ -146,7 +146,7 @@ class Bind (ParserExpression):
 	def __init__(self, name, subexp):
 		super( Bind, self ).__init__()
 		self._name = name
-		self._subexp = _parser_coerce( subexp )
+		self._subexp = parserCoerce( subexp )
 		
 		
 	def evaluate(self, state, input, start, stop):
@@ -173,7 +173,7 @@ class Action (ParserExpression):
 	"""
 	def __init__(self, subexp, actionFn):
 		super( Action, self ).__init__()
-		self._subexp = _parser_coerce( subexp )
+		self._subexp = parserCoerce( subexp )
 		self._actionFn = actionFn
 		
 		
@@ -200,7 +200,7 @@ class Condition (ParserExpression):
 	"""
 	def __init__(self, subexp, conditionFn):
 		super( Condition, self ).__init__()
-		self._subexp = _parser_coerce( subexp )
+		self._subexp = parserCoerce( subexp )
 		self._conditionFn = conditionFn
 		
 		
@@ -256,7 +256,7 @@ class Forward (ParserExpression):
 		"""
 		Set the subexpression to be matched.
 		"""
-		self._subexp = _parser_coerce( subexp )
+		self._subexp = parserCoerce( subexp )
 		return self
 
 
@@ -281,7 +281,7 @@ class Group (ParserExpression):
 		subexp - the sub-expression in the group
 		"""
 		super( Group, self ).__init__()
-		self._subexp = _parser_coerce( subexp )
+		self._subexp = parserCoerce( subexp )
 		
 
 	def evaluate(self, state, input, start, stop):
@@ -322,7 +322,7 @@ class Suppress (ParserExpression):
 		subexp - the sub-expression to be matched
 		"""
 		super( Suppress, self ).__init__()
-		self._subexp = _parser_coerce( subexp )
+		self._subexp = parserCoerce( subexp )
 		
 
 	def evaluate(self, state, input, start, stop):
@@ -366,12 +366,60 @@ class Literal (ParserExpression):
 		
 		end = start + len( self._matchString )
 		if end <= stop:
-			if input[start:end] == self._matchString:
-				return ParseResult( self._matchString, start, end ),  end
+			sub = input[start:end]
+			if sub == self._matchString:
+				return ParseResult( sub, start, end ),  end
 		return None, start
 		
 	def _o_compare(self, x):
 		return self._matchString  ==  x._matchString
+
+
+
+
+class Keyword (ParserExpression):
+	"""
+	Keyword
+	
+	Matches a supplied string, provided that it is not followed by a character from a specified list of characters.
+	Useful to match a keyword such as 'while' while not matching when it is followed by other alpha-numeric characters,
+	e.g. Keyword( 'while' ) would not match the first 5 characters of 'whilexyz'.
+	
+	The parse result is a string.
+	"""
+	
+	def __init__(self, keyword, disallowedSubsequentChars=( string.ascii_letters + string.digits + '_' ) ):
+		"""
+		keyword - the keyword to match
+		disallowedSubsequentChars - the list of characters that cannot follow @keyword
+		"""
+		super( Keyword, self ).__init__()
+		self._keyword = unicode( keyword )
+		self._disallowedSubsequentChars = unicode( disallowedSubsequentChars )
+		
+		
+	def getKeyword(self):
+		return self._keyword
+		
+	def getDisallowedSubsequentChars(self):
+		return self._disallowedSubsequentChars
+		
+	
+	def evaluate(self, state, input, start, stop):
+		start = state.chomp( input, start, stop )
+		
+		end = start + len( self._keyword )
+		if end <= stop:
+			sub = input[start:end]
+			if sub == self._keyword:
+				if end == stop  or  input[end] not in self._disallowedSubsequentChars:
+					return ParseResult( sub, start, end ),  end
+		return None, start
+		
+	def _o_compare(self, x):
+		return self._keyword  ==  x._keyword   and   self._disallowedSubsequentChars  ==  x._disallowedSubsequentChars
+
+
 
 
 class RegEx (ParserExpression):
@@ -480,7 +528,7 @@ class Sequence (ParserExpression):
 		"""
 		super( Sequence, self ).__init__()
 		assert len( subexps ) > 0
-		self._subexps = [ _parser_coerce( x )   for x in subexps ]
+		self._subexps = [ parserCoerce( x )   for x in subexps ]
 		
 		
 	def getSubExpressions(self):
@@ -532,7 +580,7 @@ class Combine (ParserExpression):
 		"""
 		super( Combine, self ).__init__()
 		assert len( subexps ) > 0
-		self._subexps = [ _parser_coerce( x )   for x in subexps ]
+		self._subexps = [ parserCoerce( x )   for x in subexps ]
 		
 		
 	def getSubExpressions(self):
@@ -586,7 +634,7 @@ class Choice (ParserExpression):
 		subexps - the sub expressions, one of which is to be matched
 		"""
 		super( Choice, self ).__init__()
-		self._subexps = [ _parser_coerce( x )   for x in subexps ]
+		self._subexps = [ parserCoerce( x )   for x in subexps ]
 		
 	
 	def evaluate(self, state, input, start, stop):
@@ -623,7 +671,7 @@ class Optional (ParserExpression):
 		subexp - the sub expression to match
 		"""
 		super( Optional, self ).__init__()
-		self._subexp = _parser_coerce( subexp )
+		self._subexp = parserCoerce( subexp )
 		
 	
 	def evaluate(self, state, input, start, stop):
@@ -661,7 +709,7 @@ class Repetition (ParserExpression):
 		bSuppressIfZero - When true, will generate an empty result (The result field of the ParseResult will be None) if 0 occurrences are matched
 		"""
 		super( Repetition, self ).__init__()
-		self._subexp = _parser_coerce( subexp )
+		self._subexp = parserCoerce( subexp )
 		self._min = min
 		self._max = max
 		self._bSuppressIfZero = bSuppressIfZero
@@ -744,7 +792,7 @@ class Peek (ParserExpression):
 		subexp - the sub-expression to match
 		"""
 		super( Peek, self ).__init__()
-		self._subexp = _parser_coerce( subexp )
+		self._subexp = parserCoerce( subexp )
 		
 	
 	def evaluate(self, state, input, start, stop):
@@ -775,7 +823,7 @@ class PeekNot (ParserExpression):
 		subexp - the sub-expression to not match
 		"""
 		super( PeekNot, self ).__init__()
-		self._subexp = _parser_coerce( subexp )
+		self._subexp = parserCoerce( subexp )
 		
 	
 	def evaluate(self, state, input, start, stop):
@@ -792,134 +840,6 @@ class PeekNot (ParserExpression):
 
 	
 	
-def _delimitedListAction(input, begin, tokens):
-	if tokens is None:
-		return []
-	else:
-		return [ tokens[0] ]  +  [ x[1]   for x in tokens[1] ]
-
-def _delimitedListActionOneOrMore(input, begin, tokens):
-	return [ tokens[0] ]  +  [ x[1]  for x in tokens[1] ]
-
-def delimitedList(subexp, delimiter=',', bOneOrMore=False):
-	"""
-	Delimited list
-	
-	delimitedList(subexpression, delimiter=',', bOneOrMore=False)  ->  ParserExpression
-	
-	Creates a parser expression that will match a delimited list.
-	  subexpression - a parser expression that defines the elements of the list
-	  delimiter - a parser expression the defines the delimiter that separates list entries
-	  bOneOrMore - if True, then will only match with a minimum of one sub-expression
-	
-	For example:
-	  delimitedList( identifier, ',' )
-	
-	will construct a parser expression that will parse:
-	   a, b, c, d
-	to:
-	   [ 'a', 'b', 'c', 'd' ]
-	"""
-	if bOneOrMore:
-		return ( subexp +  ZeroOrMore( _parser_coerce( delimiter )  +  subexp ) )  >>  _delimitedListActionOneOrMore
-	else:
-		return Optional( subexp  +  ZeroOrMore( _parser_coerce( delimiter )  +  subexp ) )  >>  _delimitedListAction
-
-
-
-def _getLineIndentation(line):
-	return line[: line.index( line.strip() ) ]
-
-def _getLineWithoutIndentation(line):
-	return line[line.index( line.strip() ):]
-
-def _processIndentation(indentationStack, indentation, indentToken, dedentToken, currentLevel):
-	prevIndentation = indentationStack[-1]
-	if indentation != prevIndentation:
-		if indentation.startswith( prevIndentation ):
-			indentationStack.append( indentation )
-			currentLevel += 1
-			return indentation + indentToken, currentLevel
-		elif prevIndentation.startswith( indentation ):
-			dedents = ''
-			while indentationStack[-1].startswith( indentation )  and  indentation != indentationStack[-1]:
-				del indentationStack[-1]
-				dedents += dedentToken
-				currentLevel -= 1
-			return indentation + dedents, currentLevel
-		else:
-			raise IndentationError
-	else:
-		return indentation, currentLevel
-
-
-def indentedBlocksPrePass(text, indentToken='$<indent>$', dedentToken='$<dedent>$'):
-	"""
-	Processe text whose blocks are determined by indentation, by inserting indent and dedent tokens
-	
-	indentedBlocksPrePass(text, indentToken='$<indent>$', dedentToken='$<dedent>$')  ->  text with indent and detent tokens
-	
-	For example
-	a
-	b
-	  c
-	  d
-	e
-	f
-	
-	==>>
-	
-	a
-	b
-	  $<indent>$c
-	  d
-	$<dedent>$e
-	f	
-	"""
-	lines = text.split( '\n' )
-	
-	if len( lines ) > 0:
-		indentationStack = []
-		indentationStack.append( _getLineIndentation( lines[0] ) )
-		
-		indentationLevel = 0
-		
-		for i, line in enumerate( lines ):
-			if line.strip() != '':
-				indentation = _getLineIndentation( line )
-				content = _getLineWithoutIndentation( line )
-				
-				processedIndentation, indentationLevel = _processIndentation( indentationStack, indentation, indentToken, dedentToken, indentationLevel )
-				lines[i] = processedIndentation +  content
-				currentIndentation = indentation
-				
-		bAppendBlankLine = indentationLevel > 0
-				
-		for i in xrange( 0, indentationLevel ):
-			lines.append( dedentToken )
-			
-		if bAppendBlankLine:
-			lines.append( '' )
-	
-	return '\n'.join( lines )
-				
-				
-			
-
-
-#
-# Definitions of singleQuotedString, doubleQuotedString, and quotedString taken from pyparsing, which is Copyright (c) 2003-2007  Paul T. McGuire
-#
-
-identifier = RegEx( "[A-Za-z_][A-Za-z0-9_]*" )
-singleQuotedString = RegEx( r"'(?:[^'\n\r\\]|(?:'')|(?:\\x[0-9a-fA-F]+)|(?:\\.))*'" )
-doubleQuotedString = RegEx( r'"(?:[^"\n\r\\]|(?:"")|(?:\\x[0-9a-fA-F]+)|(?:\\.))*"' )
-quotedString = RegEx( r'''(?:"(?:[^"\n\r\\]|(?:"")|(?:\\x[0-9a-fA-F]+)|(?:\\.))*")|(?:'(?:[^'\n\r\\]|(?:'')|(?:\\x[0-9a-fA-F]+)|(?:\\.))*')''' )
-unicodeString = Combine( [ 'u', quotedString ] )
-decimalInteger = RegEx( r"[\-]?[0-9]+" )
-hexInteger = RegEx( r"0x[0-9A-Fa-f]+" )
-integer = decimalInteger  |  hexInteger
-floatingPoint = RegEx( r"[\-]?(([0-9]+\.[0-9]*)|(\.[0-9]+))(e[\-]?[0-9]+)?" )
 
 
 
@@ -976,6 +896,19 @@ class TestCase_Parser (unittest.TestCase):
 		self._matchTest( Literal( 'abcxyz' ), 'abcxyz', 'abcxyz', 0, 6 )
 		self._matchFailTest( Literal( 'abcxyz' ), 'qwerty' )
 		self._matchTest( Literal( 'abcxyz' ), 'abcxyz123', 'abcxyz', 0, 6 )
+		
+		
+	def testKeyword(self):
+		self.assert_( Keyword( 'abc' )  ==  Keyword( 'abc' ) )
+		self.assert_( Keyword( 'abc' )  !=  Keyword( 'def' ) )
+		self.assert_( Keyword( 'abc', 'xyz' )  ==  Keyword( 'abc', 'xyz' ) )
+		self.assert_( Keyword( 'abc', 'xyz' )  !=  Keyword( 'def', 'xyz' ) )
+		self.assert_( Keyword( 'abc', 'xyz' )  !=  Keyword( 'abc', 'pqr' ) )
+		self._matchTest( Keyword( 'hello' ), 'hello', 'hello', 0, 5 )
+		self._matchFailTest( Keyword( 'hello' ), 'helloq' )
+		self._matchTest( Keyword( 'hello', 'abc' ), 'hello', 'hello', 0, 5 )
+		self._matchTest( Keyword( 'hello', 'abc' ), 'helloxx', 'hello', 0, 5 )
+		self._matchFailTest( Keyword( 'hello', 'abc' ), 'helloaa' )
 		
 		
 	def testRegEx(self):
@@ -1042,7 +975,7 @@ class TestCase_Parser (unittest.TestCase):
 		self.assert_( Condition( 'abc', f )  !=  Condition( 'abc', g ) )
 		self.assert_( Condition( 'abc', f )  ==  Literal( 'abc' )  &  f )
 		
-		parser = identifier  &  f
+		parser = Word( string.ascii_letters )  &  f
 		
 		self._matchTest( parser, 'abc', 'abc', 0, 3 )
 		self._matchFailTest( parser, 'helloworld' )
@@ -1167,182 +1100,6 @@ class TestCase_Parser (unittest.TestCase):
 		self._bindingsTest( parser, 'abef', {} )
 		
 		
-	def testIIdentifier(self):
-		parser = identifier
-		self._matchTest( parser, 'ab', 'ab' )
-		self._matchTest( parser, 'ab12', 'ab12' )
-		self._matchFailTest( parser, '12ab' )
-		self._matchTest( parser, '_ab', '_ab' )
-		
-		
-	def testSingleQuotedString(self):
-		parser = singleQuotedString
-		self._matchTest( parser, "'abc'", "'abc'" )
-		self._matchTest( parser, r"'ab\'c'", r"'ab\'c'" )
-		self._matchTest( parser, "'abc'113", "'abc'" )
-	
-		
-	def testDoubleQuotedString(self):
-		parser = doubleQuotedString
-		self._matchTest( parser, '"abc"', '"abc"' )
-		self._matchTest( parser, r'"ab\"c"', r'"ab\"c"' )
-		self._matchTest( parser, '"abc"113', '"abc"' )
-	
-		
-	def testQuotedString(self):
-		parser = quotedString
-		self._matchTest( parser, "'abc'", "'abc'" )
-		self._matchTest( parser, r"'ab\'c'", r"'ab\'c'" )
-		self._matchTest( parser, "'abc'113", "'abc'" )
-		self._matchTest( parser, '"abc"', '"abc"' )
-		self._matchTest( parser, r'"ab\"c"', r'"ab\"c"' )
-		self._matchTest( parser, '"abc"113', '"abc"' )
-	
-		
-	def testUnicodeString(self):
-		parser = unicodeString
-		self._matchTest( parser, "u'abc'", "u'abc'" )
-		self._matchTest( parser, r"u'ab\'c'", r"u'ab\'c'" )
-		self._matchTest( parser, "u'abc'113", "u'abc'" )
-		self._matchTest( parser, 'u"abc"', 'u"abc"' )
-		self._matchTest( parser, r'u"ab\"c"', r'u"ab\"c"' )
-		self._matchTest( parser, 'u"abc"113', 'u"abc"' )
-		
-		
-	def testDecimalInteger(self):
-		parser = decimalInteger
-		self._matchTest( parser, "123", "123" )
-		self._matchTest( parser, "-123", "-123" )
-		
-		
-	def testHexadecimalInteger(self):
-		parser = hexInteger
-		self._matchTest( parser, "0x123", "0x123" )
-		self._matchTest( parser, "0x0123456789abcdef", "0x0123456789abcdef" )
-		self._matchTest( parser, "0x0123456789ABCDEF", "0x0123456789ABCDEF" )
-		
-		
-
-	def testFloatingPoint(self):
-		parser = floatingPoint
-		self._matchTest( parser, "3.14", "3.14" )
-		self._matchTest( parser, "-3.14", "-3.14" )
-		self._matchTest( parser, "3.", "3." )
-		self._matchTest( parser, "-3.", "-3." )
-		self._matchTest( parser, ".14", ".14" )
-		self._matchTest( parser, "-.14", "-.14" )
-
-		self._matchTest( parser, "3.14e5", "3.14e5" )
-		self._matchTest( parser, "3.14e-5", "3.14e-5" )
-		self._matchTest( parser, "-3.14e5", "-3.14e5" )
-		self._matchTest( parser, "-3.14e-5", "-3.14e-5" )
-		self._matchTest( parser, "3.e5", "3.e5" )
-		self._matchTest( parser, "3.e-5", "3.e-5" )
-		self._matchTest( parser, "-3.e5", "-3.e5" )
-		self._matchTest( parser, "-3.e-5", "-3.e-5" )
-		self._matchTest( parser, ".14e5", ".14e5" )
-		self._matchTest( parser, ".14e-5", ".14e-5" )
-		self._matchTest( parser, "-.14e5", "-.14e5" )
-		self._matchTest( parser, "-.14e-5", "-.14e-5" )
-
-		
-		
-	def testDelimitedList(self):
-		parser = delimitedList( identifier )
-		parser2 = delimitedList( identifier, bOneOrMore=True )
-		self._matchTest( parser, '', [] )
-		self._matchTest( parser, 'ab', [ 'ab' ] )
-		self._matchTest( parser, 'cd', [ 'cd' ] )
-		self._matchTest( parser, 'ab,cd', [ 'ab', 'cd' ] )
-		self._matchFailTest( parser2, '' )
-		self._matchTest( parser2, 'ab', [ 'ab' ] )
-		self._matchTest( parser2, 'cd', [ 'cd' ] )
-		self._matchTest( parser2, 'ab,cd', [ 'ab', 'cd' ] )
-		
-		
-	def testIndentedBlocksPrePass(self):
-		src1 = '\n'.join( [
-			"a",
-			"b",
-			"  c",
-			"  d",
-			"e",
-			"f", ] )  +  '\n'
-		
-		expected1 = '\n'.join( [
-			"a",
-			"b",
-			"  $<indent>$c",
-			"  d",
-			"$<dedent>$e",
-			"f", ] )  +  '\n'
-		
-		
-		src2 = '\n'.join( [
-			"  a",
-			"  b",
-			"    c",
-			"    d",
-			"  e",
-			"  f", ] )  +  '\n'
-		
-		expected2 = '\n'.join( [
-			"  a",
-			"  b",
-			"    $<indent>$c",
-			"    d",
-			"  $<dedent>$e",
-			"  f", ] )  +  '\n'
-		
-
-		src3 = '\n'.join( [
-			"  a",
-			"  b",
-			"    c",
-			"    d",
-			"      e",
-			"      f", ] )  +  '\n'
-		
-		expected3 = '\n'.join( [
-			"  a",
-			"  b",
-			"    $<indent>$c",
-			"    d",
-			"      $<indent>$e",
-			"      f",
-			"",
-			"$<dedent>$",
-			"$<dedent>$", ] )  +  '\n'
-		
-
-		src4 = '\n'.join( [
-			"  a",
-			"  b",
-			"    c",
-			"    d",
-			"      e",
-			"      f",
-			"  g",
-			"  h", ] )  +  '\n'
-		
-		expected4 = '\n'.join( [
-			"  a",
-			"  b",
-			"    $<indent>$c",
-			"    d",
-			"      $<indent>$e",
-			"      f",
-			"  $<dedent>$$<dedent>$g",
-			"  h" ] )  +  '\n'
-		
-		self.assert_( indentedBlocksPrePass( src1 )  ==  expected1 )
-		self.assert_( indentedBlocksPrePass( src2 )  ==  expected2 )
-		self.assert_( indentedBlocksPrePass( src3 )  ==  expected3 )
-		self.assert_( indentedBlocksPrePass( src4 )  ==  expected4 )
-		
-	
-		
-		
 	def testNonRecursiveCalculator(self):
 		integer = Word( string.digits )
 		plus = Literal( '+' )
@@ -1461,6 +1218,18 @@ class TestCase_Parser (unittest.TestCase):
 		
 		
 	def testSimpleMessagePassingGrammar(self):
+		identifier = RegEx( "[A-Za-z_][A-Za-z0-9_]*" )
+
+		def _listAction(input, begin, tokens):
+			if tokens is None:
+				return []
+			else:
+				return [ tokens[0] ]  +  [ x[1]   for x in tokens[1] ]
+		
+		def commaSeparatedList(subexp):
+				return Optional( subexp  +  ZeroOrMore( parserCoerce( ',' )  +  subexp ) )  >>  _listAction
+		
+		
 		loadlLocal = Production( identifier )
 		messageName = Production( identifier )
 		plus = Literal( '+' )
@@ -1475,7 +1244,7 @@ class TestCase_Parser (unittest.TestCase):
 		parenExpression = Production( Literal( '(' )  +  expression  +  ')' )
 		atom = Production( loadlLocal  |  parenExpression )
 
-		parameterList = Production( delimitedList( expression ) )
+		parameterList = Production( commaSeparatedList( expression ) )
 		messageSend = Forward()
 		messageSend  <<  Production( ( messageSend + '.' + messageName + '(' + parameterList + ')' )  |  atom )
 
@@ -1503,54 +1272,4 @@ class TestCase_Parser (unittest.TestCase):
 		self._matchFailTest( parser, 'x + y.f() * z', '' )
 		
 
-
-	def testIndentedGrammar(self):
-		loadlLocal = Production( identifier )
-		messageName = Production( identifier )
-		plus = Literal( '+' )
-		minus = Literal( '-' )
-		star = Literal( '*' )
-		slash = Literal( '/' )
-		
-		addop = plus | minus
-		mulop = star | slash
-				
-		expression = Forward()
-		parenExpression = Production( Literal( '(' )  +  expression  +  ')' )
-		atom = Production( loadlLocal  |  parenExpression )
-
-		parameterList = Production( delimitedList( expression ) )
-		messageSend = Forward()
-		messageSend  <<  Production( ( messageSend + '.' + messageName + '(' + parameterList + ')' )  |  atom )
-
-		mul = Forward()
-		mul  <<  Production( ( mul + mulop + messageSend )  |  messageSend )
-		add = Forward()
-		add  <<  Production( ( add  + addop + mul )  |  mul )
-		expression  <<  Production( add )
-		
-		
-		singleStatement = Production( ( expression + Suppress( ';' ) )  >>  ( lambda input, start, tokens: tokens[0] ) )
-
-		statement = Forward()
-		block = Production( ZeroOrMore( statement ) )
-		compoundStatement = Production( ( Literal( '$<indent>$' )  +  block  +  Literal( '$<dedent>$' ) )  >>  ( lambda input, start, tokens: tokens[1] ) )
-		statement  <<  Production( compoundStatement  |  singleStatement )
-		
-		
-		parser = block
-		
-		
-		src1 = """
-self.x();
-		"""
-		
-		src2 = """
-self.y();
-   a.b();
-   c.d();
-		"""
-		self._matchTest( parser, indentedBlocksPrePass( src1 ), [ [ 'self', '.', 'x', '(', [], ')' ] ] )
-		self._matchTest( parser, indentedBlocksPrePass( src2 ), [ [ 'self', '.', 'y', '(', [], ')' ], [ [ 'a', '.', 'b', '(', [], ')' ], [ 'c', '.', 'd', '(', [], ')' ] ] ] )
-		
 
