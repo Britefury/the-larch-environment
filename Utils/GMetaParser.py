@@ -11,7 +11,8 @@ import operator
 from copy import copy
 
 from Britefury.Parser.Parser import getErrorLine, parserCoerce, Bind, Action, Condition, Forward, Group, Production, Suppress, Literal, Keyword, RegEx, Word, Sequence, Combine, Choice, Optional, Repetition, ZeroOrMore, OneOrMore, Peek, PeekNot
-from Britefury.Parser.GrammarUtils import identifier, quotedString, unicodeString, integer, floatingPoint, separatedList
+from Britefury.Parser.GrammarUtils.Tokens import identifier, quotedString, unicodeString, integer, floatingPoint
+from Britefury.Parser.GrammarUtils.SeparatedList import separatedList
 from Britefury.GLisp.GLispUtil import isGLispList, gLispSrcToStringPretty
 
 

@@ -846,7 +846,7 @@ class PeekNot (ParserExpression):
 import unittest
 
 
-class TestCase_Parser (unittest.TestCase):
+class ParserTestCase (unittest.TestCase):
 	def _matchTest(self, parser, input, expected, begin=None, end=None, ignoreChars=string.whitespace):
 		result, pos = parser.parseString( input, ignoreChars=ignoreChars )
 		self.assert_( result is not None )
@@ -866,6 +866,19 @@ class TestCase_Parser (unittest.TestCase):
 				self.assert_( end == result.end )
 		
 	
+	def _matchFailTest(self, parser, input, ignoreChars=string.whitespace):
+		result, pos = parser.parseString( input, ignoreChars=ignoreChars )
+		if result is not None   and   result.end == len( input ):
+			print 'EXPECTED:'
+			print '<fail>'
+			print ''
+			print 'RESULT:'
+			print result
+		self.assert_( result is None  or  result.end != len( input ) )
+
+
+
+class TestCase_Parser (ParserTestCase):
 	def _bindingsTest(self, parser, input, expectedBindings, ignoreChars=string.whitespace):
 		result, pos = parser.parseString( input, ignoreChars=ignoreChars )
 		self.assert_( result is not None )
@@ -876,18 +889,6 @@ class TestCase_Parser (unittest.TestCase):
 			print 'RESULT BINDINGS:'
 			print result.bindings
 		self.assert_( result.bindings == expectedBindings )
-		
-		
-	
-	def _matchFailTest(self, parser, input, ignoreChars=string.whitespace):
-		result, pos = parser.parseString( input, ignoreChars=ignoreChars )
-		if result is not None   and   result.end == len( input ):
-			print 'EXPECTED:'
-			print '<fail>'
-			print ''
-			print 'RESULT:'
-			print result
-		self.assert_( result is None  or  result.end != len( input ) )
 		
 				
 	def testLiteral(self):
