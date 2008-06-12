@@ -847,8 +847,41 @@ import unittest
 
 
 class ParserTestCase (unittest.TestCase):
-	def _matchTest(self, parser, input, expected, begin=None, end=None, ignoreChars=string.whitespace):
+	def _matchTest(self, parser, input, expected, ignoreChars=string.whitespace):
 		result, pos = parser.parseString( input, ignoreChars=ignoreChars )
+		if result is None:
+			print 'PARSE FAILURE while parsing', input
+			print 'EXPECTED:'
+			print expected
+		self.assert_( result is not None )
+		
+		res = result.result
+
+		if result.end != len( input ):
+			print 'INCOMPLETE PARSE while parsing', input
+			print 'Parsed %d/%d characters'  %  ( result.end, len( input ) )
+			print input[:result.end]
+			print 'EXPECTED:'
+			print expected
+			print 'RESULT:'
+			print res
+		
+		if res != expected:
+			print 'EXPECTED:'
+			print expected
+			print ''
+			print 'RESULT:'
+			print res
+		self.assert_( res == expected )
+		
+		
+	
+	def _matchSubTest(self, parser, input, expected, begin=None, end=None, ignoreChars=string.whitespace):
+		result, pos = parser.parseString( input, ignoreChars=ignoreChars )
+		if result is None:
+			print 'PARSE FAILURE while parsing', input
+			print 'EXPECTED:'
+			print expected
 		self.assert_( result is not None )
 		res = result.result
 		if res != expected:
@@ -894,9 +927,9 @@ class TestCase_Parser (ParserTestCase):
 	def testLiteral(self):
 		self.assert_( Literal( 'abc' )  ==  Literal( 'abc' ) )
 		self.assert_( Literal( 'abc' )  !=  Literal( 'def' ) )
-		self._matchTest( Literal( 'abcxyz' ), 'abcxyz', 'abcxyz', 0, 6 )
+		self._matchSubTest( Literal( 'abcxyz' ), 'abcxyz', 'abcxyz', 0, 6 )
 		self._matchFailTest( Literal( 'abcxyz' ), 'qwerty' )
-		self._matchTest( Literal( 'abcxyz' ), 'abcxyz123', 'abcxyz', 0, 6 )
+		self._matchSubTest( Literal( 'abcxyz' ), 'abcxyz123', 'abcxyz', 0, 6 )
 		
 		
 	def testKeyword(self):
@@ -905,41 +938,41 @@ class TestCase_Parser (ParserTestCase):
 		self.assert_( Keyword( 'abc', 'xyz' )  ==  Keyword( 'abc', 'xyz' ) )
 		self.assert_( Keyword( 'abc', 'xyz' )  !=  Keyword( 'def', 'xyz' ) )
 		self.assert_( Keyword( 'abc', 'xyz' )  !=  Keyword( 'abc', 'pqr' ) )
-		self._matchTest( Keyword( 'hello' ), 'hello', 'hello', 0, 5 )
+		self._matchSubTest( Keyword( 'hello' ), 'hello', 'hello', 0, 5 )
 		self._matchFailTest( Keyword( 'hello' ), 'helloq' )
-		self._matchTest( Keyword( 'hello', 'abc' ), 'hello', 'hello', 0, 5 )
-		self._matchTest( Keyword( 'hello', 'abc' ), 'helloxx', 'hello', 0, 5 )
+		self._matchSubTest( Keyword( 'hello', 'abc' ), 'hello', 'hello', 0, 5 )
+		self._matchSubTest( Keyword( 'hello', 'abc' ), 'helloxx', 'hello', 0, 5 )
 		self._matchFailTest( Keyword( 'hello', 'abc' ), 'helloaa' )
 		
 		
 	def testRegEx(self):
 		self.assert_( RegEx( r"[A-Za-z_][A-Za-z0-9]*" )  ==  RegEx( r"[A-Za-z_][A-Za-z0-9]*" ) )
 		self.assert_( RegEx( r"[A-Za-z_][A-Za-z0-9]*" )  !=  RegEx( r"[A-Za-z_][A-Za-z0-9]*abc" ) )
-		self._matchTest( RegEx( r"[A-Za-z_][A-Za-z0-9]*" ), 'abc123', 'abc123', 0, 6 )
+		self._matchSubTest( RegEx( r"[A-Za-z_][A-Za-z0-9]*" ), 'abc123', 'abc123', 0, 6 )
 		self._matchFailTest( RegEx( r"[A-Za-z_][A-Za-z0-9]*" ), '9abc' )
-		self._matchTest( RegEx( r"[A-Za-z_][A-Za-z0-9]*" ), 'abcxyz...', 'abcxyz', 0, 6 )
+		self._matchSubTest( RegEx( r"[A-Za-z_][A-Za-z0-9]*" ), 'abcxyz...', 'abcxyz', 0, 6 )
 		
 		
 	
 	def testWord(self):
 		self.assert_( Word( 'abc' )  ==  Word( 'abc' ) )
 		self.assert_( Word( 'abc' )  !=  Word( 'def' ) )
-		self._matchTest( Word( 'abc' ), 'aabbcc', 'aabbcc', 0, 6 )
-		self._matchTest( Word( 'abc' ), 'aabbccxx', 'aabbcc', 0, 6 )
-		self._matchTest( Word( 'abc' ), 'aabbccxxaa', 'aabbcc', 0, 6 )
-		self._matchTest( Word( 'abc' ), 'a', 'a', 0, 1 )
+		self._matchSubTest( Word( 'abc' ), 'aabbcc', 'aabbcc', 0, 6 )
+		self._matchSubTest( Word( 'abc' ), 'aabbccxx', 'aabbcc', 0, 6 )
+		self._matchSubTest( Word( 'abc' ), 'aabbccxxaa', 'aabbcc', 0, 6 )
+		self._matchSubTest( Word( 'abc' ), 'a', 'a', 0, 1 )
 		self._matchFailTest( Word( 'abc' ), 'x' )
 
 		self.assert_( Word( 'abc', 'xyz' )  ==  Word( 'abc', 'xyz' ) )
 		self.assert_( Word( 'abc', 'xyz' )  !=  Word( 'def', 'xyz' ) )
 		self.assert_( Word( 'abc', 'xyz' )  !=  Word( 'abc', 'ijk' ) )
-		self._matchTest( Word( 'abc', 'def' ), 'addeeff', 'addeeff', 0, 7 )
-		self._matchTest( Word( 'abc', 'def' ), 'addeeffxx', 'addeeff', 0, 7 )
-		self._matchTest( Word( 'abc', 'def' ), 'bddeeff', 'bddeeff', 0, 7 )
-		self._matchTest( Word( 'abc', 'def' ), 'baddeeff', 'b', 0, 1 )
+		self._matchSubTest( Word( 'abc', 'def' ), 'addeeff', 'addeeff', 0, 7 )
+		self._matchSubTest( Word( 'abc', 'def' ), 'addeeffxx', 'addeeff', 0, 7 )
+		self._matchSubTest( Word( 'abc', 'def' ), 'bddeeff', 'bddeeff', 0, 7 )
+		self._matchSubTest( Word( 'abc', 'def' ), 'baddeeff', 'b', 0, 1 )
 		self._matchFailTest( Word( 'abc', 'def' ), 'ddeeff' )
 
-		self._matchTest( Word( 'abc', '+*[]\\' ), 'a++**[[]]\\\\', 'a++**[[]]\\\\', 0, 11 )
+		self._matchSubTest( Word( 'abc', '+*[]\\' ), 'a++**[[]]\\\\', 'a++**[[]]\\\\', 0, 11 )
 
 		
 	def testBind(self):
@@ -950,7 +983,7 @@ class TestCase_Parser (ParserTestCase):
 		
 		parser = Literal( 'abc' )  **  'x'
 		
-		self._matchTest( parser, 'abc', 'abc', 0, 3 )
+		self._matchSubTest( parser, 'abc', 'abc', 0, 3 )
 		self._bindingsTest( parser, 'abc', {'x' : 'abc'} )
 		
 
@@ -964,7 +997,7 @@ class TestCase_Parser (ParserTestCase):
 		
 		parser = ( Literal( 'abc' )  **  'x' )  >>  f
 		
-		self._matchTest( parser, 'abc', 'abcabc', 0, 3 )
+		self._matchSubTest( parser, 'abc', 'abcabc', 0, 3 )
 		self._bindingsTest( parser, 'abc', {} )
 		
 
@@ -978,7 +1011,7 @@ class TestCase_Parser (ParserTestCase):
 		
 		parser = Word( string.ascii_letters )  &  f
 		
-		self._matchTest( parser, 'abc', 'abc', 0, 3 )
+		self._matchSubTest( parser, 'abc', 'abc', 0, 3 )
 		self._matchFailTest( parser, 'helloworld' )
 		
 
@@ -990,7 +1023,7 @@ class TestCase_Parser (ParserTestCase):
 		self.assert_( Sequence( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )   ==   Literal( 'ab' )  +  'qw'  +  'fh' )
 
 		parser = Sequence( [ Literal( 'ab' ) ** 'x', Literal( 'qw' ) ** 'y', Literal( 'fh' ) ** 'z' ] )
-		self._matchTest( parser, 'abqwfh', [ 'ab', 'qw', 'fh' ], 0, 6 )
+		self._matchSubTest( parser, 'abqwfh', [ 'ab', 'qw', 'fh' ], 0, 6 )
 		self._matchFailTest( parser, 'abfh' )
 		self._bindingsTest( parser, 'abqwfh', { 'x':'ab',  'y':'qw',  'z':'fh' } )
 	
@@ -1001,7 +1034,7 @@ class TestCase_Parser (ParserTestCase):
 		self.assert_( Combine( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )   !=   Combine( [ Literal( 'qb' ), Literal( 'qw' ), Literal( 'fh' ) ] ) )
 
 		parser = Combine( [ Literal( 'ab' ) ** 'x', Literal( 'qw' ) ** 'y', Literal( 'fh' ) ** 'z' ] )
-		self._matchTest( parser, 'abqwfh', 'abqwfh', 0, 6 )
+		self._matchSubTest( parser, 'abqwfh', 'abqwfh', 0, 6 )
 		self._matchFailTest( parser, 'abfh' )
 		self._bindingsTest( parser, 'abqwfh', { 'x':'ab',  'y':'qw',  'z':'fh' } )
 	
@@ -1012,7 +1045,7 @@ class TestCase_Parser (ParserTestCase):
 		
 		parser = Literal( 'ab' )  **  'x'  +  Suppress( Literal( 'cd' )  **  'y' )  +  Literal( 'ef' )  **  'z'
 		
-		self._matchTest( parser, 'abcdef', [ 'ab', 'ef' ], 0, 6 )
+		self._matchSubTest( parser, 'abcdef', [ 'ab', 'ef' ], 0, 6 )
 		self._matchFailTest( parser, 'abef' )
 		self._bindingsTest( parser, 'abcdef', { 'x':'ab',  'y':'cd',  'z':'ef' } )
 		
@@ -1025,12 +1058,12 @@ class TestCase_Parser (ParserTestCase):
 		self.assert_( Choice( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )   ==   Literal( 'ab' )  |  'qw'  |  'fh' )
 
 		parser = Choice( [ Literal( 'ab' ) ** 'x', Literal( 'qw' ) ** 'x', Literal( 'fh' ) ** 'x' ] )
-		self._matchTest( parser, 'ab', 'ab', 0, 2 )
-		self._matchTest( parser, 'qw', 'qw', 0, 2 )
-		self._matchTest( parser, 'fh', 'fh', 0, 2 )
+		self._matchSubTest( parser, 'ab', 'ab', 0, 2 )
+		self._matchSubTest( parser, 'qw', 'qw', 0, 2 )
+		self._matchSubTest( parser, 'fh', 'fh', 0, 2 )
 		self._matchFailTest( parser, 'xy' )
-		self._matchTest( Literal( 'ab' )  |  Literal( 'abcd' ),   'ab', 'ab', 0, 2 )
-		self._matchTest( Literal( 'ab' )  |  Literal( 'abcd' ),   'abcd', 'ab', 0, 2 )
+		self._matchSubTest( Literal( 'ab' )  |  Literal( 'abcd' ),   'ab', 'ab', 0, 2 )
+		self._matchSubTest( Literal( 'ab' )  |  Literal( 'abcd' ),   'abcd', 'ab', 0, 2 )
 		self._bindingsTest( parser, 'ab', { 'x':'ab' } )
 		self._bindingsTest( parser, 'qw', { 'x':'qw' } )
 		self._bindingsTest( parser, 'fh', { 'x':'fh' } )
@@ -1042,9 +1075,9 @@ class TestCase_Parser (ParserTestCase):
 		self.assert_( Optional( Literal( 'ab' ) )   ==   Optional( 'ab' ) )
 		
 		parser = Optional( Word( 'a', 'b' )  **  'x' )
-		self._matchTest( parser, '', None, 0, 0 )
-		self._matchTest( parser, 'abb', 'abb', 0, 3 )
-		self._matchTest( parser, 'abbabb', 'abb', 0, 3 )
+		self._matchSubTest( parser, '', None, 0, 0 )
+		self._matchSubTest( parser, 'abb', 'abb', 0, 3 )
+		self._matchSubTest( parser, 'abbabb', 'abb', 0, 3 )
 		self._bindingsTest( parser, '', {} )
 		self._bindingsTest( parser, 'abb', { 'x':'abb' } )
 
@@ -1055,9 +1088,9 @@ class TestCase_Parser (ParserTestCase):
 		self.assert_( ZeroOrMore( Literal( 'ab' ) )   ==   ZeroOrMore( 'ab' ) )
 		
 		parser = ZeroOrMore( Word( 'a', 'b' ) ** 'x' + Word( 'c', 'd' ) ** 'y' )
-		self._matchTest( parser, '', [], 0, 0 )
-		self._matchTest( parser, 'abbcdd', [ [ 'abb', 'cdd' ] ], 0, 6 )
-		self._matchTest( parser, 'abbcddabbbcddd', [ [ 'abb', 'cdd' ], [ 'abbb', 'cddd' ] ], 0, 14 )
+		self._matchSubTest( parser, '', [], 0, 0 )
+		self._matchSubTest( parser, 'abbcdd', [ [ 'abb', 'cdd' ] ], 0, 6 )
+		self._matchSubTest( parser, 'abbcddabbbcddd', [ [ 'abb', 'cdd' ], [ 'abbb', 'cddd' ] ], 0, 14 )
 		self._bindingsTest( parser, '', {} )
 		self._bindingsTest( parser, 'abcdabbbcddd', { 'x':'abbb', 'y':'cddd' } )
 
@@ -1069,8 +1102,8 @@ class TestCase_Parser (ParserTestCase):
 		
 		parser = OneOrMore( Word( 'a', 'b' )  **  'x' ) 
 		self._matchFailTest( parser, '' )
-		self._matchTest( parser, 'abb', [ 'abb' ], 0, 3 )
-		self._matchTest( parser, 'ababb', [ 'ab', 'abb' ], 0, 5 )
+		self._matchSubTest( parser, 'abb', [ 'abb' ], 0, 3 )
+		self._matchSubTest( parser, 'ababb', [ 'ab', 'abb' ], 0, 5 )
 		self._bindingsTest( parser, 'ab', { 'x':'ab' } )
 		self._bindingsTest( parser, 'ababbb', { 'x':'abbb' } )
 		
@@ -1082,8 +1115,8 @@ class TestCase_Parser (ParserTestCase):
 		self._matchFailTest( parser, '' )
 		self._matchFailTest( parser, 'ab' )
 		self._matchFailTest( parser, 'abab' )
-		self._matchTest( parser, 'abcd', [ [ 'ab' ] ], 0, 2 )
-		self._matchTest( parser, 'ababcd', [ [ 'ab', 'ab' ] ], 0, 4 )
+		self._matchSubTest( parser, 'abcd', [ [ 'ab' ] ], 0, 2 )
+		self._matchSubTest( parser, 'ababcd', [ [ 'ab', 'ab' ] ], 0, 4 )
 		self._bindingsTest( parser, 'abcd', {} )
 
 		
@@ -1092,12 +1125,12 @@ class TestCase_Parser (ParserTestCase):
 
 		parser = OneOrMore( Literal( 'ab' ) )  +  PeekNot( Literal( 'cd' )  **  'x' )
 		self._matchFailTest( parser, '' )
-		self._matchTest( parser, 'ab', [ [ 'ab' ] ], 0, 2 )
+		self._matchSubTest( parser, 'ab', [ [ 'ab' ] ], 0, 2 )
 		self._matchFailTest( parser, 'abcd' )
-		self._matchTest( parser, 'abef', [ [ 'ab' ] ], 0, 2 )
-		self._matchTest( parser, 'abab', [ [ 'ab', 'ab' ] ], 0, 4 )
+		self._matchSubTest( parser, 'abef', [ [ 'ab' ] ], 0, 2 )
+		self._matchSubTest( parser, 'abab', [ [ 'ab', 'ab' ] ], 0, 4 )
 		self._matchFailTest( parser, 'ababcd' )
-		self._matchTest( parser, 'ababef', [ [ 'ab', 'ab' ] ], 0, 4 )
+		self._matchSubTest( parser, 'ababef', [ [ 'ab', 'ab' ] ], 0, 4 )
 		self._bindingsTest( parser, 'abef', {} )
 		
 		
