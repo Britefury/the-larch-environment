@@ -38,45 +38,6 @@ Attempting to create a precedence level with operators of differing types will r
 
 
 
-#
-#
-#
-# TEST ACTIONS
-#
-#
-#
-
-def _infixLeftActionIterative(input, begin, tokens):
-	a = tokens[0]
-	for op, b in tokens[1]:
-		a = [ op, a, b ]
-	return a
-def _infixRightActionIterative(input, begin, tokens):
-	node = None
-	nextOp = None
-	for op, b in reversed( tokens[1] ):
-		if node is None:
-			node = b
-		else:
-			node = [ nextOp, b, node ]
-		nextOp = op
-	if node is not None:
-		return [ nextOp, tokens[0], node ]
-	else:
-		return tokens[0]
-def _prefixActionIterative(input, begin, tokens):
-	a = tokens[1]
-	for op in reversed( tokens[0] ):
-		a = [ op, a ]
-	return a
-def _suffixActionIterative(input, begin, tokens):
-	a = tokens[0]
-	for op in tokens[1]:
-		a = [ op, a ]
-	return a
-
-
-
 class OperatorParserPrecedenceLevelCannotMixOperatorTypesError (Exception):
 	pass
 
@@ -119,6 +80,16 @@ class Prefix (Operator):
 	def _defaultAction(self, input, begin, tokens):
 		return [ self._op, tokens[1] ]
 
+	def _prefixActionIterative(self, input, begin, tokens):
+		a = tokens[1]
+		if self._action is not None:
+			for op in reversed( tokens[0] ):
+				a = self._action( op, a )
+		else:
+			for op in reversed( tokens[0] ):
+				a = [ op, a ]
+		return a
+
 	def _buildParser(self, operatorTable, levelParserForwardDeclarations, thisLevel, thisLevelParser, previousLevel, previousLevelParser):
 		return self._opExpression + thisLevelParser
 
@@ -134,11 +105,21 @@ class Suffix (Operator):
 	def _defaultAction(self, input, begin, tokens):
 		return [ self._op, tokens[0] ]
 
+	def _suffixActionIterative(self, input, begin, tokens):
+		a = tokens[0]
+		if self._action is not None:
+			for op in tokens[1]:
+				a = self._action( op, a )
+		else:
+			for op in tokens[1]:
+				a = [ op, a ]
+		return a
+
 	def _buildParser(self, operatorTable, levelParserForwardDeclarations, thisLevel, thisLevelParser, previousLevel, previousLevelParser):
 		return thisLevelParser + self._opExpression
 
 
-
+	
 class InfixLeft (Operator):
 	def _buildActionFn(self):
 		return lambda input, begin, tokens: self._action( tokens[0], tokens[2] )
@@ -147,27 +128,20 @@ class InfixLeft (Operator):
 		return [ self._op, tokens[0], tokens[2] ]
 
 	def _buildParser(self, operatorTable, levelParserForwardDeclarations, thisLevel, thisLevelParser, previousLevel, previousLevelParser):
-		#return operatorTable._getPrefixParserFromLevel( thisLevel, thisLevelParser ) + self._opExpression + operatorTable._getPrefixParserFromLevel( previousLevel, previousLevelParser )
-		#return thisLevelParser + self._opExpression + previousLevelParser
-		
-		
-		#prefix = operatorTable._getUnaryParserFromLevel( thisLevel, thisLevelParser, Prefix )
-		#suffix = operatorTable._getUnaryParserFromLevel( thisLevel, thisLevelParser, Suffix )
-		
 		prefix = operatorTable._getLowestPrecedenceUnaryOperatorLevelParserAbove( levelParserForwardDeclarations, thisLevel, Prefix )
-		suffix = operatorTable._getLowestPrecedenceUnaryOperatorLevelParserAbove( levelParserForwardDeclarations, thisLevel, Suffix )
+		#suffix = operatorTable._getLowestPrecedenceUnaryOperatorLevelParserAbove( levelParserForwardDeclarations, thisLevel, Suffix )
 
-		if suffix is not None:
-			left = suffix
-		else:
-			left = thisLevelParser
+		#if suffix is not None:
+			#left = suffix
+		#else:
+			#left = thisLevelParser
 			
 		if prefix is not None:
 			right = ( previousLevelParser | prefix )
 		else:
 			right = previousLevelParser
 			
-		return left + self._opExpression + right
+		return thisLevelParser + self._opExpression + right
 
 
 
@@ -186,22 +160,22 @@ class InfixRight (Operator):
 		#suffix = operatorTable._getUnaryParserFromLevel( thisLevel, thisLevelParser, Suffix )
 		
 		prefix = operatorTable._getLowestPrecedenceUnaryOperatorLevelParserAbove( levelParserForwardDeclarations, thisLevel, Prefix )
-		suffix = operatorTable._getLowestPrecedenceUnaryOperatorLevelParserAbove( levelParserForwardDeclarations, thisLevel, Suffix )
+		#suffix = operatorTable._getLowestPrecedenceUnaryOperatorLevelParserAbove( levelParserForwardDeclarations, thisLevel, Suffix )
 
-		if suffix is not None:
-			left = suffix
-		else:
-			left = previousLevelParser
+		#if suffix is not None:
+			#left = suffix
+		#else:
+			#left = previousLevelParser
 			
 		if prefix is not None:
 			right = ( thisLevelParser | prefix )
 		else:
 			right = thisLevelParser
 			
-		return left + self._opExpression + right
+		return previousLevelParser + self._opExpression + right
 
-
-
+	
+	
 
 
 class PrecedenceLevel (object):
@@ -418,8 +392,8 @@ _unitTestSpecification = """
 	a			->			a
 	a!			->			(! a)
 	a * b * c		->			(* (* a b) c)
-	a! * b * c		->			(* (* (! a) b) c)
-	a * b! * c		->			(* (! (* a b)) c)
+	a! * b * c		->			<<ERROR>>
+	a * b! * c		->			<<ERROR>>
 	a * b * c!		->			(! (* (* a b) c))
 -- left_left :		[ [ InfixLeft( '*' ) ], [ InfixLeft( '+' ) ] ]
 	a			->			a
@@ -452,8 +426,8 @@ _unitTestSpecification = """
 	a			->			a
 	a!			->			(! a)
 	a $ b $ c		->			($ a ($ b c))
-	a! $ b $ c		->			($ (! a) ($ b c))
-	a $ b! $ c		->			($ (! ($ a b)) c)
+	a! $ b $ c		->			<<ERROR>>
+	a $ b! $ c		->			<<ERROR>>
 	a $ b $ c!		->			(! ($ a ($ b c)))
 -- right_left :		[ [ InfixRight( '$' ) ], [ InfixLeft( '*' ) ] ]
 	a			->			a
@@ -526,8 +500,8 @@ _unitTestSpecification = """
 	a * b + c * d	->			(+ (* a b) (* c d))
 	a * b! + c * d	->			(+ (! (* a b)) (* c d))
 	a * b + c * d!	->			(+ (* a b) (! (* c d)))
-	a * b * c! * d	->			(* (! (* (* a b) c)) d)
-	a + b * c! * d	->			(+ a (* (! (* b c)) d))
+	a * b * c! * d	->			<<ERROR>>
+	a + b * c! * d	->			<<ERROR>>
 	a + b * c * d!	->			(+ a (! (* (* b c) d)))
 -- left_left_suffix :	[ [ InfixLeft( '*' ) ],  [ InfixLeft( '+' ) ],  [ Suffix( '!' ) ] ]
 	a			->			a
@@ -537,8 +511,8 @@ _unitTestSpecification = """
 	a * b * c * d	->			(* (* (* a b) c) d)
 	a * b + c * d	->			(+ (* a b) (* c d))
 	a * b + c * d!	->			(! (+ (* a b) (* c d)))
-	a * b + c! * d	->			(* (! (+ (* a b) c)) d)
-	a * b! + c * d	->			(+ (! (* a b)) (* c d))
+	a * b + c! * d	->			<<ERROR>>
+	a * b! + c * d	->			<<ERROR>>
 
 
 -- prefix_right_right :	[ [ Prefix( '~' ) ],  [ InfixRight( '$' ) ],  [ InfixRight( '@' ) ] ]
@@ -590,8 +564,8 @@ _unitTestSpecification = """
 	a $ b @ c $ d	->			(@ ($ a b) ($ c d))
 	a $ b! @ c $ d	->			(@ (! ($ a b)) ($ c d))
 	a $ b @ c $ d!	->			(@ ($ a b) (! ($ c d)))
-	a $ b $ c! $ d	->			($ (! ($ a ($ b c))) d)
-	a @ b $ c! $ d	->			(@ a ($ (! ($ b c)) d))
+	a $ b $ c! $ d	->			<<ERROR>>
+	a @ b $ c! $ d	->			<<ERROR>>
 	a @ b $ c $ d!	->			(@ a (! ($ b ($ c d))))
 -- right_right_suffix :	[ [ InfixRight( '$' ) ],  [ InfixRight( '@' ) ],  [ Suffix( '!' ) ] ]
 	a			->			a
@@ -601,8 +575,8 @@ _unitTestSpecification = """
 	a $ b $ c $ d	->			($ a ($ b ($ c d)))
 	a $ b @ c $ d	->			(@ ($ a b) ($ c d))
 	a $ b @ c $ d!	->			(! (@ ($ a b) ($ c d)))
-	a $ b @ c! $ d	->			($ (! (@ ($ a b) c)) d)
-	a $ b! @ c $ d	->			(@ (! ($ a b)) ($ c d))
+	a $ b @ c! $ d	->			<<ERROR>>
+	a $ b! @ c $ d	->			<<ERROR>>
 
 	
 	
@@ -627,19 +601,19 @@ _unitTestSpecification = """
 	a * b $ c * ~d			->	($ (* a b) (* c (~ d)))
 
 	a * b $ c * d!			->	(! ($ (* a b) (* c d)))
-	a * b $ c! * d			->	(* (! ($ (* a b) c)) d)
-	a * b! $ c * d			->	($ (! ( * a b)) (* c d))
-	a! * b $ c * d			->	($ (* (! a) b) (* c d))
+	a * b $ c! * d			->	<<ERROR>>
+	a * b! $ c * d			->	<<ERROR>>
+	a! * b $ c * d			->	<<ERROR>>
 
-	a * b! $ ~c * d			->	($ (! (* a b)) (~ (* c d)))
-	a! * b $ c * ~d			->	($ (* (! a) b) (* c (~ d)))
-	a * ~b $ c! * d			->	(* (! (* a (~ ($ b c)))) d)
+	a * b! $ ~c * d			->	<<ERROR>>
+	a! * b $ c * ~d			->	<<ERROR>>
+	a * ~b $ c! * d			->	<<ERROR>>
 	a * ~b $ c * d!			->	(! (* a (~ ($ b (* c d)))))
-	~a * b $ c! * d			->	(* (! (* a (~ ($ b c)))) d)
+	~a * b $ c! * d			->	<<ERROR>>
 
 
 -- left_right_suffix_prefix :	[ [ InfixLeft( '*' ) ],  [ InfixRight( '$' ) ],  [ Suffix( '!' ) ],  [ Prefix( '~' ) ] ]
-	a * ~b $ c! * d			->	(* a (~ (* (! ($ b c)) d)))
+	a * ~b $ c! * d			->	(* (* a (~ (! ($ b c )))) d)
 """
 
 
@@ -765,11 +739,11 @@ class TestCase_Operators (ParserTestCase, TestCase_Impl):
 		infixLeft = Forward()
 		prefix = Forward()
 		
-		#infixLeft  <<  Production( ( infixLeft + '*' + ( atom | prefix ) ).action( lambda input, begin, tokens: [ '*', tokens[0], tokens[2] ] )  |  atom  )
-		#prefix  <<  Production( ( Literal( '~' )  +  prefix ).action( lambda input, begin, tokens: [ '~', tokens[1] ] )  | infixLeft )
+		infixLeft  <<  Production( ( infixLeft + '*' + ( atom | prefix ) ).action( lambda input, begin, tokens: [ '*', tokens[0], tokens[2] ] )  |  atom  )
+		prefix  <<  Production( ( Literal( '~' )  +  prefix ).action( lambda input, begin, tokens: [ '~', tokens[1] ] )  | infixLeft )
 		
-		infixLeft  <<  Production( atom  +  ZeroOrMore( Literal( '*' ) + ( atom | prefix ) ) ).action( _infixLeftActionIterative )
-		prefix  <<  Production( ZeroOrMore( Literal( '~' ) )  +  infixLeft ).action( _prefixActionIterative )
+		#infixLeft  <<  Production( atom  +  ZeroOrMore( Literal( '*' ) + ( atom | prefix ) ) ).action( _infixLeftActionIterative )
+		#prefix  <<  Production( ZeroOrMore( Literal( '~' ) )  +  infixLeft ).action( _prefixActionIterative )
 		
 
 		parser = prefix
@@ -798,18 +772,18 @@ class TestCase_Operators (ParserTestCase, TestCase_Impl):
 		infixLeft = Forward()
 		suffix = Forward()
 		
-		#infixLeft  <<  Production( ( suffix + '*' + atom ).action( lambda input, begin, tokens: [ '*', tokens[0], tokens[2] ] )  |  atom )
-		#suffix  <<  Production( ( suffix + '!' ).action( lambda input, begin, tokens: [ '!', tokens[0] ] )  |  infixLeft )
+		infixLeft  <<  Production( ( infixLeft + '*' + atom ).action( lambda input, begin, tokens: [ '*', tokens[0], tokens[2] ] )  |  atom )
+		suffix  <<  Production( ( suffix + '!' ).action( lambda input, begin, tokens: [ '!', tokens[0] ] )  |  infixLeft )
 		
-		infixLeft  <<  Production( ( suffix | atom )  +  ZeroOrMore( Literal( '*' ) + atom ) ).action( _infixLeftActionIterative )
-		suffix  <<  Production( infixLeft  +  ZeroOrMore( Literal( '!' ) ) ).action( _suffixActionIterative )
+		#infixLeft  <<  Production( atom  +  ZeroOrMore( Literal( '*' ) + atom ) ).action( _infixLeftActionIterative )
+		#suffix  <<  Production( infixLeft  +  ZeroOrMore( Literal( '!' ) ) ).action( _suffixActionIterative )
 
 		parser = suffix
 		
 		self._matchTestSX( parser, 'x * y * z',    '(* (* x y) z)' )
 		self._matchTestSX( parser, 'x * y * z!',    '(! (* (* x y) z))' )
-		self._matchTestSX( parser, 'x * y! * z',    '(* (! (* x y)) z)' )
-		self._matchTestSX( parser, 'x! * y * z',    '(* (* (! x) y) z)' )
+		self._matchFailTest( parser, 'x * y! * z' )
+		self._matchFailTest( parser, 'x! * y * z' )
 	
 
 	def testLeft_Suffix_Auto(self):
@@ -819,8 +793,8 @@ class TestCase_Operators (ParserTestCase, TestCase_Impl):
 		
 		self._matchTestSX( parser, 'x * y * z',    '(* (* x y) z)' )
 		self._matchTestSX( parser, 'x * y * z!',    '(! (* (* x y) z))' )
-		self._matchTestSX( parser, 'x * y! * z',    '(* (! (* x y)) z)' )
-		self._matchTestSX( parser, 'x! * y * z',    '(* (* (! x) y) z)' )
+		self._matchFailTest( parser, 'x * y! * z' )
+		self._matchFailTest( parser, 'x! * y * z' )
 
 		
 		
@@ -830,11 +804,11 @@ class TestCase_Operators (ParserTestCase, TestCase_Impl):
 		infixRight = Forward()
 		prefix = Forward()
 		
-		#infixRight  <<  Production( ( atom + '$' + prefix ).action( lambda input, begin, tokens: [ '$', tokens[0], tokens[2] ] )  |  atom  )
-		#prefix  <<  Production( ( Literal( '~' )  +  prefix ).action( lambda input, begin, tokens: [ '~', tokens[1] ] )  | infixRight )
+		infixRight  <<  Production( ( atom + '$' + prefix ).action( lambda input, begin, tokens: [ '$', tokens[0], tokens[2] ] )  |  atom  )
+		prefix  <<  Production( ( Literal( '~' )  +  prefix ).action( lambda input, begin, tokens: [ '~', tokens[1] ] )  | infixRight )
 		
-		infixRight  <<  Production( atom  +  ZeroOrMore( Literal( '$' ) + ( atom | prefix ) ) ).action( _infixRightActionIterative )
-		prefix  <<  Production( ZeroOrMore( Literal( '~' ) )  +  infixRight ).action( _prefixActionIterative )
+		#infixRight  <<  Production( atom  +  ZeroOrMore( Literal( '$' ) + ( atom | prefix ) ) ).action( _infixRightActionIterative )
+		#prefix  <<  Production( ZeroOrMore( Literal( '~' ) )  +  infixRight ).action( _prefixActionIterative )
 
 		parser = prefix
 		
@@ -862,19 +836,19 @@ class TestCase_Operators (ParserTestCase, TestCase_Impl):
 		infixRight = Forward()
 		suffix = Forward()
 		
-		#infixRight  <<  Production( ( suffix + '$' + infixRight ).action( lambda input, begin, tokens: [ '$', tokens[0], tokens[2] ] )  |  atom  )
-		#suffix  <<  Production( ( suffix + '!' ).action( lambda input, begin, tokens: [ '!', tokens[0] ] )  |  infixRight )
+		infixRight  <<  Production( ( atom + '$' + infixRight ).action( lambda input, begin, tokens: [ '$', tokens[0], tokens[2] ] )  |  atom  )
+		suffix  <<  Production( ( suffix + '!' ).action( lambda input, begin, tokens: [ '!', tokens[0] ] )  |  infixRight )
 		
-		infixRight  <<  Production( ( suffix | atom )  +  ZeroOrMore( Literal( '$' ) + atom ) ).action( _infixRightActionIterative )
-		suffix  <<  Production( infixRight  +  ZeroOrMore( Literal( '!' ) ) ).action( _suffixActionIterative )
+		#infixRight  <<  Production( atom  +  ZeroOrMore( Literal( '$' ) + atom ) ).action( _infixRightActionIterative )
+		#suffix  <<  Production( infixRight  +  ZeroOrMore( Literal( '!' ) ) ).action( _suffixActionIterative )
 
 		
 		parser = suffix
 		
 		self._matchTestSX( parser, 'x $ y $ z',    '($ x ($ y z))' )
 		self._matchTestSX( parser, 'x $ y $ z!',    '(! ($ x ($ y z)))' )
-		self._matchTestSX( parser, 'x $ y! $ z',    '($ (! ($ x y)) z)' )
-		self._matchTestSX( parser, 'x! $ y $ z',    '($ (! x) ($ y z))' )
+		self._matchFailTest( parser, 'x $ y! $ z' )
+		self._matchFailTest( parser, 'x! $ y $ z' )
 
 	
 	def testRight_Suffix_Auto(self):
@@ -884,8 +858,8 @@ class TestCase_Operators (ParserTestCase, TestCase_Impl):
 		
 		self._matchTestSX( parser, 'x $ y $ z',    '($ x ($ y z))' )
 		self._matchTestSX( parser, 'x $ y $ z!',    '(! ($ x ($ y z)))' )
-		self._matchTestSX( parser, 'x $ y! $ z',    '($ (! ($ x y)) z)' )
-		self._matchTestSX( parser, 'x! $ y $ z',    '($ (! x) ($ y z))' )
+		self._matchFailTest( parser, 'x $ y! $ z' )
+		self._matchFailTest( parser, 'x! $ y $ z' )
 
 
 	
@@ -898,14 +872,14 @@ class TestCase_Operators (ParserTestCase, TestCase_Impl):
 		infixRightAt = Forward()
 		prefix = Forward()
 		
-		#infixRightDollar  <<  Production( ( atom + '$' + ( infixRightDollar | prefix ) ).action( lambda input, begin, tokens: [ '$', tokens[0], tokens[2] ] )  |  atom  )
-		#infixRightAt  <<  Production( ( infixRightDollar + '@' + prefix ).action( lambda input, begin, tokens: [ '@', tokens[0], tokens[2] ] )  |  infixRightDollar  )
-		#prefix  <<  Production( ( Literal( '~' )  +  prefix ).action( lambda input, begin, tokens: [ '~', tokens[1] ] )  |  infixRightAt )
+		infixRightDollar  <<  Production( ( atom + '$' + ( infixRightDollar | prefix ) ).action( lambda input, begin, tokens: [ '$', tokens[0], tokens[2] ] )  |  atom  )
+		infixRightAt  <<  Production( ( infixRightDollar + '@' + prefix ).action( lambda input, begin, tokens: [ '@', tokens[0], tokens[2] ] )  |  infixRightDollar  )
+		prefix  <<  Production( ( Literal( '~' )  +  prefix ).action( lambda input, begin, tokens: [ '~', tokens[1] ] )  |  infixRightAt )
 		
 
-		infixRightDollar  <<  Production( atom  +  ZeroOrMore( Literal( '$' ) + ( atom | prefix ) ) ).action( _infixRightActionIterative )
-		infixRightAt  <<  Production( infixRightDollar  +  ZeroOrMore( Literal( '@' ) + ( infixRightDollar | prefix ) ) ).action( _infixRightActionIterative )
-		prefix  <<  Production( ZeroOrMore( Literal( '~' ) )  +  infixRightAt ).action( _prefixActionIterative )
+		#infixRightDollar  <<  Production( atom  +  ZeroOrMore( Literal( '$' ) + ( atom | prefix ) ) ).action( _infixRightActionIterative )
+		#infixRightAt  <<  Production( infixRightDollar  +  ZeroOrMore( Literal( '@' ) + ( infixRightDollar | prefix ) ) ).action( _infixRightActionIterative )
+		#prefix  <<  Production( ZeroOrMore( Literal( '~' ) )  +  infixRightAt ).action( _prefixActionIterative )
 		
 		
 		parser = prefix
@@ -932,49 +906,6 @@ class TestCase_Operators (ParserTestCase, TestCase_Impl):
 
 
 		
-	def testLeft_Right_Prefix_Suffix_Manual(self):
-		atom = identifier
-		
-		infixLeftMul = Forward()
-		infixLeftMulLevel = Forward()
-		infixRightDollar = Forward()
-		infixRightDollarLevel = Forward()
-		prefix = Forward()
-		prefixLevel = Forward()
-		suffix = Forward()
-		suffixLevel = Forward()
-		
-		#infixLeftMul  <<  Production( ( ( suffix | infixLeftMul ) + '*' + ( atom | prefix ) ).action( lambda input, begin, tokens: [ '*', tokens[0], tokens[2] ] )  |  atom )
-		#infixRightDollar  <<  Production( ( ( suffix | infixRightDollar ) + '$' + ( infixRightDollar | prefix ) ).action( lambda input, begin, tokens: [ '$', tokens[0], tokens[2] ] )  |  infixLeftMul  )
-		#prefix  <<  Production( ( Literal( '~' )  +  prefix ).action( lambda input, begin, tokens: [ '~', tokens[1] ] )  |  infixRightDollar )
-		#suffix  <<  Production( ( suffix + '!' ).action( lambda input, begin, tokens: [ '!', tokens[0] ] )  |  prefix )
-		
-
-
-		infixLeftMul  <<  Production( ( suffix | atom )  +   OneOrMore( Literal( '*' ) + ( atom | prefix ) ) ).action( _infixLeftActionIterative )
-		infixLeftMulLevel  <<  Production( infixLeftMul  |  atom )
-		infixRightDollar  <<  Production( ( suffix | infixLeftMulLevel )  +  OneOrMore( Literal( '$' ) + ( infixLeftMulLevel | prefix ) ) ).action( _infixRightActionIterative )
-		infixRightDollarLevel  <<  Production( infixRightDollar  |  infixLeftMulLevel )
-		prefix  <<  Production( OneOrMore( Literal( '~' ) )  +  infixRightDollarLevel ).action( _prefixActionIterative )
-		prefixLevel  <<  Production( prefix  |  infixRightDollarLevel )
-		suffix  <<  Production( prefixLevel  +  OneOrMore( Literal( '!' ) ) ).action( _suffixActionIterative )
-		suffixLevel  <<  Production( suffix  |  prefixLevel )
-
-		
-		parser = suffixLevel
-		
-		self._matchTestSX( parser, 'a * ~b $ c * d!',    '(! (* a (~ ($ b (* c d)))))' )
-		self._matchTestSX( parser, '~a * b $ c! * d',    '(* (! (* a (~ ($ b c)))) d)' )
-
-		
-	def testLeft_Right_Prefix_Suffix_Auto(self):
-		atom = identifier
-		
-		parser = buildOperatorParser( [ [ InfixLeft( '*' ) ],  [ InfixRight( '$' ) ],  [ Prefix( '~' ) ],  [ Suffix( '!' ) ] ], atom )
-		
-		self._matchTestSX( parser, 'a * ~b $ c * d!',    '(! (* a (~ ($ b (* c d)))))' )
-		self._matchTestSX( parser, '~a * b $ c! * d',    '(* (! (* a (~ ($ b c)))) d)' )
-
 		
 		
 	#def testOperators(self):
