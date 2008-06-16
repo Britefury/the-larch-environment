@@ -166,3 +166,11 @@ The incremental computation system will continuously destroy and rebuild GUI ele
 We need a way of ensuring that the cursor is persistent.
 
 
+
+
+
+14/June/2008
+Python bindings for LLVM
+http://mdevan.nfshost.com/llvm-py.html
+These bindings would be very helpful for creating compilers.
+
