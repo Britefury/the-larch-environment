@@ -1,0 +1,24 @@
+References
+
+
+Andrew Ko
+Citrus and Barista
+http://www.cs.cmu.edu/~NatProg/citrus.html
+http://faculty.washington.edu/ajko/
+Citrus is a programming language and editor designed for making editors.
+Barrista is an extension of Citrus that can be used to edit the Java language.
+
+
+
+Gilad Bracha
+Newspeak
+http://bracha.org/Site/Home.html
+Bracha uses parser combinators in his Newspeak programming language to specify grammars.
+His system represents parser expressions as objects, similar to pyparsing and gSym's parser.
+
+
+
+Paul T. McGuire
+pyparsing
+http://pyparsing.wikispaces.com/
+Used as a reference for designing the gSym parser.

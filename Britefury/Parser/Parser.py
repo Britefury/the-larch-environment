@@ -40,6 +40,13 @@ def getErrorLine(source, pos):
 
 
 	
+class _DebugNode (object):
+	def __init__(self, expression):
+		self.expression = expression
+		self.data = ''
+
+
+
 class ParseResult (object):
 	__slots__ = [ 'result', 'begin', 'end', 'bindings', 'bSuppressed' ]
 	
@@ -61,10 +68,28 @@ class ParseResult (object):
 		
 
 		
+class DebugParseResult (ParseResult):
+	__slots__ = [ 'debugNode' ]
+	
+	"""
+	Parse result
+	Members:
+	   result - the result (returned by the parse expression action function, otherwise a list/tree of strings)
+	      None indicates an empty result. This is created by Peek expressions, and can be created by Repetition epxressions.
+	   begin - the start index of the result, in the input string
+	   end - the end index of the result, in the input string
+	"""
+	def __init__(self, parseResult, debugNode):
+		super( DebugParseResult, self ).__init__( parseResult.result, parseResult.begin, parseResult.end, parseResult.bindings, parseResult.bSuppressed )
+		self.debugNode = debugNode
 		
 		
 
 class ParserExpression (object):
+	def __init__(self):
+		super( ParserExpression, self ).__init__()
+		self.debugName = None
+	
 	"""Parser expression base class"""
 	def parseString(self, input, start=0, stop=None, ignoreChars=string.whitespace):
 		"""
@@ -90,8 +115,69 @@ class ParserExpression (object):
 	
 
 	
+	def debugParseString(self, input, start=0, stop=None, ignoreChars=string.whitespace):
+		"""
+		Parse a string
+		parseString(input, start, stop=None)  ->  ParseResult
+		   input - the input string
+		   start - the start index of the substring (of input) to parse
+		   stop - the end index of the substring (of input) to parse
+		   bEatWhitespace - If True, whitespace will be suppressed
+		   
+		The result of parsing the expression is placed in the @result member of the ParseResult object.
+		
+		If parseString returns None, then the parse failed.
+		"""
+		if stop is None:
+			stop = len( input )
+		state = ParserState( ignoreChars )
+		
+		nodes = self.__getAllExpressionNodes()
+		for node in nodes:
+			node.__enableNodeDebugging()
+		
+		
+		answer, pos = self.evaluate( state, input, start, stop )
+		if answer is not None:
+			answer.end = state.chomp( input, answer.end, stop )
+			pos = answer.end
+
+		for node in nodes:
+			node.__disableNodeDebugging()
+
+		dot = \
+"""
+digraph g {
+graph [
+rankdir = "LR"
+ordering = "out"
+];
+node [
+fontsize = "11"
+shape = "ellipse"
+];
+edge [
+];
+%s
+}
+"""
+		
+		data = ''
+		for node in state.nodes:
+			data += node.data
+		for edge in state.edges:
+			data += edge
+				
+		dot = dot %  data
+		return answer, pos, dot
+
+	
+	
 	def evaluate(self, state, input, start, stop):
 		pass
+	
+	def getChildren(self):
+		return []
 
 		
 	def __eq__(self, x):
@@ -136,6 +222,100 @@ class ParserExpression (object):
 	
 	def action(self, actionFn):
 		return Action( self, actionFn )
+	
+	
+	def debug(self, debugName):
+		self.debugName = debugName
+		return self
+	
+	
+	def __enableNodeDebugging(self):
+		def makeDebugEvaluateMethod(originalEvaluate):
+			def evaluate(state, input, start, stop):
+				prev = None
+				if len( state.debugStack ) > 0:
+					prev = state.debugStack[-1]
+					
+				nodeName = 'node%d'  %  len( state.nodes )
+				if self.debugName is None:
+					nodeTitle = '[%s]'  %  type( self ).__name__
+					fontColour = "black"
+				else:
+					nodeTitle = '%s [%s]'   %  ( self.debugName, type( self ).__name__ )
+					fontColour = "blue"
+				node = _DebugNode( self )
+				
+				state.debugStack.append( node )
+				state.nodes.append( node )
+				
+				result, pos = originalEvaluate( state, input, start, stop )
+		
+				resString = str( result.result )   if result is not None   else   'FAIL'
+				colourString = 'black'  if result is not None   else   'red'
+				node.data = '"%s" [\n label = "<f0> %s | <f1> %d : %s | <f2> %d : %s"\n shape = "record"\n color = "%s"\n fontcolor="%s"\n];\n'  %  ( nodeName, nodeTitle, start, input[start:], pos - start, resString, colourString, fontColour )
+				
+				
+		
+				if prev is not None:
+					prevName = 'node%d'  %  state.nodes.index( prev )
+					edgeIndex = len( state.edges )
+					if isinstance( prev.expression, Production ):
+						colour = 'magenta'
+						style = 'dotted'
+					else:
+						colour = 'black'
+						style = 'bold'
+					state.edges.append( '"%s" -> "%s" [\nid = %d\ncolor="%s"\nstyle="%s"];\n'  %  ( prevName, nodeName, edgeIndex, colour, style ) )
+					state.callEdges.add(  ( prev, node )  )
+				state.debugStack.pop()
+				
+				if isinstance( result, DebugParseResult ):
+					fromNode = node
+					toNode = result.debugNode
+					edge = fromNode, toNode
+					if edge not in state.callEdges:
+						fromName = 'node%d'  %  state.nodes.index( fromNode )
+						toName = 'node%d'  %  state.nodes.index( toNode )
+						edgeIndex = len( state.edges )
+						if isinstance( fromNode.expression, Production ):
+							colour = 'darkgreen'
+							style = 'dotted'
+						else:
+							colour = 'red'
+							style = 'bold'
+						state.edges.append( '"%s" -> "%s" [\nid = %d\ncolor="%s"\nstyle="%s"\nconstraint="false"];\n'  %  ( fromName, toName, edgeIndex, colour, style ) )
+				
+				if result is not None:
+					outDebugResult = DebugParseResult( result, node )
+					return outDebugResult, pos
+				else:
+					return result, pos
+			return evaluate
+		oldEvaluate = self.evaluate
+		newEvaluate = makeDebugEvaluateMethod( oldEvaluate )
+		self.evaluate = newEvaluate
+		
+		
+	def __disableNodeDebugging(self):
+		del self.evaluate
+	
+		
+	def __getAllExpressionNodes(self):
+		nodes = set( [ self ] )
+		stack = [ self ]
+		while len( stack ) > 0:
+			x = stack.pop()
+			children = x.getChildren()
+			for ch in children:
+				if ch not in nodes:
+					nodes.add( ch )
+					stack.append( ch )
+		return list( nodes )
+	
+	
+	
+	def __repr__(self):
+		return 'ParserExpression()'
 
 	
 	
@@ -158,10 +338,17 @@ class Bind (ParserExpression):
 		else:
 			return res, pos
 
-	
+
+	def getChildren(self):
+		return [ self._subexp ]
+
+
 	def _o_compare(self, x):
 		return self._subexp == x._subexp  and  self._name == x._name
 	
+
+	def __repr__(self):
+		return 'Bind( \'%s\'=%s )'  %  ( self._name, self._subexp )
 	
 	
 
@@ -184,11 +371,17 @@ class Action (ParserExpression):
 		else:
 			return res, pos
 
+
+	def getChildren(self):
+		return [ self._subexp ]
+
 	
 	def _o_compare(self, x):
 		return self._subexp == x._subexp  and  self._actionFn == x._actionFn
 	
 	
+	def __repr__(self):
+		return 'Action( %s -> %s )'  %  ( self._subexp, self._actionFn )
 	
 
 
@@ -214,10 +407,17 @@ class Condition (ParserExpression):
 		else:
 			return res, pos
 
+
+	def getChildren(self):
+		return [ self._subexp ]
+
 	
 	def _o_compare(self, x):
 		return self._subexp == x._subexp  and  self._conditionFn == x._conditionFn
 	
+	def __repr__(self):
+		return 'Condition( %s when %s )'  %  ( self._subexp, self._conditionFn )
+
 	
 	
 
@@ -247,6 +447,10 @@ class Forward (ParserExpression):
 	def evaluate(self, state, input, start, stop):
 		return self._subexp.evaluate( state, input, start, stop )
 
+
+	def getChildren(self):
+		return [ self._subexp ]
+
 	
 	def _o_compare(self, x):
 		return self._subexp  ==  x._subexp 
@@ -259,6 +463,9 @@ class Forward (ParserExpression):
 		self._subexp = parserCoerce( subexp )
 		return self
 
+	
+	def __repr__(self):
+		return 'Forward( %d )'  %  id( self._subexp )
 
 	
 
@@ -287,10 +494,17 @@ class Group (ParserExpression):
 	def evaluate(self, state, input, start, stop):
 		return self._subexp.evaluate( state, input, start, stop )
 
+
+	def getChildren(self):
+		return [ self._subexp ]
+
 	
 	def _o_compare(self, x):
 		return self._subexp  ==  x._subexp 
 
+
+	def __repr__(self):
+		return 'Group( %s )'  %  self._subexp
 	
 	
 	
@@ -309,8 +523,11 @@ class Production (Group):
 		return Production( Action( self._subexp, actionFn ) )
 	
 
-	
+	def __repr__(self):
+		return 'Production( %s )'  %  self._subexp
 
+
+	
 class Suppress (ParserExpression):
 	"""
 	Suppress
@@ -332,10 +549,17 @@ class Suppress (ParserExpression):
 		else:
 			return res, pos
 
+
+	def getChildren(self):
+		return [ self._subexp ]
+
 	
 	def _o_compare(self, x):
 		return self._subexp  ==  x._subexp 
 
+
+	def __repr__(self):
+		return 'Suppress( %s )'  %  self._subexp
 	
 	
 	
@@ -375,6 +599,10 @@ class Literal (ParserExpression):
 		return self._matchString  ==  x._matchString
 
 
+	def __repr__(self):
+		return 'Literal( \'%s\' )'  %  self._matchString
+
+	
 
 
 class Keyword (ParserExpression):
@@ -419,6 +647,9 @@ class Keyword (ParserExpression):
 	def _o_compare(self, x):
 		return self._keyword  ==  x._keyword   and   self._disallowedSubsequentChars  ==  x._disallowedSubsequentChars
 
+	def __repr__(self):
+		return 'Keyword( \'%s\', \'%s\' )'  %  ( self._keyword, self._disallowedSubsequentChars )
+	
 
 
 
@@ -437,6 +668,7 @@ class RegEx (ParserExpression):
 		"""
 		super( RegEx, self ).__init__()
 		self._re = re.compile( pattern, flags )
+		self._pattern = pattern
 		self._bEatWhitespace = bEatWhitespace
 		
 		
@@ -460,6 +692,8 @@ class RegEx (ParserExpression):
 	def _o_compare(self, x):
 		return self._re  ==  x._re
 
+	def __repr__(self):
+		return 'RegEx( \'%s\' )'  %  self._pattern
 
 	
 	
@@ -512,6 +746,8 @@ class Word (ParserExpression):
 	def _o_compare(self, x):
 		return self._initChars  ==  x._initChars  and  self._bodyChars  ==  x._bodyChars
 
+	def __repr__(self):
+		return 'Word( \'%s\', \'%s\' )'  %  ( self._initChars, self._bodyChars )
 
 
 class Sequence (ParserExpression):
@@ -554,6 +790,10 @@ class Sequence (ParserExpression):
 		return ParseResult( subexpResults, start, pos, bindings ),  pos
 
 
+	def getChildren(self):
+		return self._subexps
+
+
 	def __add__(self, x):
 		s = Sequence( self._subexps  +  [ x ] )
 		s._o_copySettingsFrom( self )
@@ -563,6 +803,8 @@ class Sequence (ParserExpression):
 	def _o_compare(self, x):
 		return self._subexps  ==  x._subexps
 
+	def __repr__(self):
+		return '( ' + ' + '.join( [ str( s )  for s in self._subexps ] ) + ' )'
 
 	
 	
@@ -608,6 +850,10 @@ class Combine (ParserExpression):
 		return ParseResult( result, start, pos, bindings ),  pos
 
 
+	def getChildren(self):
+		return self._subexps
+
+
 	def __sub__(self, x):
 		s = Combine( self._subexps  +  [ x ] )
 		s._o_copySettingsFrom( self )
@@ -616,6 +862,9 @@ class Combine (ParserExpression):
 	
 	def _o_compare(self, x):
 		return self._subexps  ==  x._subexps
+
+	def __repr__(self):
+		return 'Combine( \'%s\' )'  %  self._subexps
 
 
 	
@@ -648,6 +897,10 @@ class Choice (ParserExpression):
 			
 		return None, maxErrorPos
 
+
+	def getChildren(self):
+		return self._subexps
+
 	
 	def __or__(self, x):
 		f = Choice( self._subexps  +  [ x ] )
@@ -657,6 +910,9 @@ class Choice (ParserExpression):
 	
 	def _o_compare(self, x):
 		return self._subexps  ==  x._subexps
+
+	def __repr__(self):
+		return '( ' + ' | '.join( [ str( s )  for s in self._subexps ] ) + ' )'
 
 
 
@@ -680,10 +936,17 @@ class Optional (ParserExpression):
 			return ParseResult( None, start, pos ),  pos
 		else:
 			return res, pos
-	
+
+
+	def getChildren(self):
+		return [ self._subexp ]
+
 	
 	def _o_compare(self, x):
 		return self._subexp  ==  x._subexp
+
+	def __repr__(self):
+		return '%s?'  %  self._subexp
 		
 
 
@@ -739,10 +1002,17 @@ class Repetition (ParserExpression):
 				return ParseResult( None, start, pos, bindings ),  pos
 			else:
 				return ParseResult( subexpResults, start, pos, bindings ),  pos
+
+
+	def getChildren(self):
+		return [ self._subexp ]
 	
 	
 	def _o_compare(self, x):
 		return self._subexp  ==  x._subexp  and  self._min  ==  x._min  and  self._max  ==  x._max
+
+	def __repr__(self):
+		return '%s[%d:%d]'  %  ( self._subexp, self._min, self._max )
 
 
 class ZeroOrMore (Repetition):
@@ -759,6 +1029,9 @@ class ZeroOrMore (Repetition):
 		bSuppressIfZero - When true, will generate an empty result (The result field of the ParseResult will be None) if 0 occurrences are matched
 		"""
 		super( ZeroOrMore, self ).__init__( subexp, 0, None, bSuppressIfZero )
+
+	def __repr__(self):
+		return '%s*'  %  self._subexp
 		
 
 class OneOrMore (Repetition):
@@ -775,6 +1048,8 @@ class OneOrMore (Repetition):
 		"""
 		super( OneOrMore, self ).__init__( subexp, 1, None )
 		
+	def __repr__(self):
+		return '%s+'  %  self._subexp
 		
 		
 class Peek (ParserExpression):
@@ -802,9 +1077,16 @@ class Peek (ParserExpression):
 		else:
 			return None, start
 
+
+	def getChildren(self):
+		return [ self._subexp ]
+
 	
 	def _o_compare(self, x):
 		return self._subexp  ==  x._subexp 
+
+	def __repr__(self):
+		return 'Peek( \'%s\' )'  %  self._subexp
 	
 
 
@@ -833,17 +1115,26 @@ class PeekNot (ParserExpression):
 		else:
 			return None, start
 
+
+	def getChildren(self):
+		return [ self._subexp ]
+
 	
 	def _o_compare(self, x):
 		return self._subexp  ==  x._subexp 
 	
+	def __repr__(self):
+		return 'Peek( \'%s\' )'  %  self._subexp
 
+	
 	
 	
 
 
 
 import unittest
+from Britefury.DocModel.DMIO import readSX, writeSX
+import cStringIO
 
 
 class ParserTestCase (unittest.TestCase):
@@ -876,6 +1167,41 @@ class ParserTestCase (unittest.TestCase):
 		
 		
 	
+	def _matchTestSX(self, parser, input, expectedSX, ignoreChars=string.whitespace):
+		result, pos = parser.parseString( input, ignoreChars=ignoreChars )
+		
+		expected = readSX( expectedSX )
+		
+		if result is None:
+			print 'PARSE FAILURE while parsing', input
+			print 'EXPECTED:'
+			print expectedSX
+		self.assert_( result is not None )
+		
+		res = result.result
+
+		if result.end != len( input ):
+			print 'INCOMPLETE PARSE while parsing', input
+			print 'Parsed %d/%d characters'  %  ( result.end, len( input ) )
+			print input[:result.end]
+			print 'EXPECTED:'
+			print expectedSX
+			print 'RESULT:'
+			stream = cStringIO.StringIO()
+			writeSX( stream, res )
+			print stream.getvalue()
+		
+		if res != expected:
+			print 'EXPECTED:'
+			print expectedSX
+			print ''
+			print 'RESULT:'
+			stream = cStringIO.StringIO()
+			writeSX( stream, res )
+			print stream.getvalue()
+		self.assert_( res == expected )
+		
+		
 	def _matchSubTest(self, parser, input, expected, begin=None, end=None, ignoreChars=string.whitespace):
 		result, pos = parser.parseString( input, ignoreChars=ignoreChars )
 		if result is None:
@@ -906,7 +1232,7 @@ class ParserTestCase (unittest.TestCase):
 			print '<fail>'
 			print ''
 			print 'RESULT:'
-			print result
+			print result.result
 		self.assert_( result is None  or  result.end != len( input ) )
 
 

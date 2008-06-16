@@ -57,6 +57,10 @@ class ParserState (object):
 		self.pos = 0
 		self.heads = {}
 		self.ignoreChars = ignoreChars
+		self.debugStack = []
+		self.nodes = []
+		self.edges = []
+		self.callEdges = set()
 		
 	def lrStackTop(self):
 		if len( self.lrStack ) == 0:
@@ -91,7 +95,8 @@ class ParserState (object):
 			
 			memoEntry.pos = self.pos
 			
-			if lr.head is not None:
+			#if lr.head is not None:
+			if lr.head is not None  and  isinstance( memoEntry.answer, _LR ):
 				lr.seed = answer
 				return self._p_lr_answer( expression, input, start, stop, memoEntry ),  self.pos
 			else:
@@ -110,7 +115,7 @@ class ParserState (object):
 		if lr.head is None:
 			lr.head = _Head( expression, set(), set() )
 		s = self.lrStackTop()
-		while s.head != lr.head:
+		while s is not None  and  s.head != lr.head:
 			s.head = lr.head
 			lr.head.involvedSet.add( s.rule )
 			s = s.next
