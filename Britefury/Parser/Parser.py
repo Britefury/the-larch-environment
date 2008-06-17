@@ -206,9 +206,6 @@ edge [
 	def __pow__(self, name):
 		return Bind( name, self )
 	
-	def __rshift__(self, f):
-		return Action( self, f )
-	
 	def __and__(self, f):
 		return Condition( self, f )
 	
@@ -1319,9 +1316,8 @@ class TestCase_Parser (ParserTestCase):
 		self.assert_( Action( 'abc', f )  ==  Action( 'abc', f ) )
 		self.assert_( Action( 'abc', f )  !=  Action( 'def', f ) )
 		self.assert_( Action( 'abc', f )  !=  Action( 'abc', g ) )
-		self.assert_( Action( 'abc', f )  ==  Literal( 'abc' )  >>  f )
 		
-		parser = ( Literal( 'abc' )  **  'x' )  >>  f
+		parser = ( Literal( 'abc' )  **  'x' ).action( f )
 		
 		self._matchSubTest( parser, 'abc', 'abcabc', 0, 3 )
 		self._bindingsTest( parser, 'abc', {} )
@@ -1485,8 +1481,8 @@ class TestCase_Parser (ParserTestCase):
 
 				
 		
-		mul = Production( ( integer  +  ( ZeroOrMore( mulop + integer )  >>  flattenAction ) )  >>  action )
-		add = Production( ( mul  +  ( ZeroOrMore( addop + mul )  >>   flattenAction ) )  >>  action )
+		mul = Production( ( integer  +  ( ZeroOrMore( mulop + integer ).action( flattenAction ) ) ).action( action ) )
+		add = Production( ( mul  +  ( ZeroOrMore( addop + mul ).action( flattenAction ) ) ).action( action ) )
 		expr = add
 		
 		parser = expr
@@ -1587,7 +1583,7 @@ class TestCase_Parser (ParserTestCase):
 				return [ tokens[0] ]  +  [ x[1]   for x in tokens[1] ]
 		
 		def commaSeparatedList(subexp):
-				return Optional( subexp  +  ZeroOrMore( parserCoerce( ',' )  +  subexp ) )  >>  _listAction
+				return Optional( subexp  +  ZeroOrMore( parserCoerce( ',' )  +  subexp ) ).action( _listAction )
 		
 		
 		loadlLocal = Production( identifier )
