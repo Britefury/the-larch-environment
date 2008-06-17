@@ -66,7 +66,7 @@ class Operator (object):
 	def parser(self, operatorTable, levelParserForwardDeclarations, thisLevel, thisLevelParser, previousLevel, previousLevelParser):
 		p = self._buildParser( operatorTable, levelParserForwardDeclarations, thisLevel, thisLevelParser, previousLevel, previousLevelParser )
 		if self._action is not None:
-			return p.action( self._buildActionFn )
+			return p.action( self._buildActionFn() )
 		else:
 			return p.action( self._defaultAction )
 
@@ -75,20 +75,10 @@ class Operator (object):
 
 class Prefix (Operator):
 	def _buildActionFn(self):
-		return lambda input, begin, tokens: self._action( tokens[1] )
+		return lambda input, begin, tokens: self._action( tokens[0], tokens[1] )
 
 	def _defaultAction(self, input, begin, tokens):
 		return [ self._op, tokens[1] ]
-
-	def _prefixActionIterative(self, input, begin, tokens):
-		a = tokens[1]
-		if self._action is not None:
-			for op in reversed( tokens[0] ):
-				a = self._action( op, a )
-		else:
-			for op in reversed( tokens[0] ):
-				a = [ op, a ]
-		return a
 
 	def _buildParser(self, operatorTable, levelParserForwardDeclarations, thisLevel, thisLevelParser, previousLevel, previousLevelParser):
 		return self._opExpression + thisLevelParser
@@ -100,20 +90,10 @@ class Suffix (Operator):
 	Suffix binds more tightly than prefix.
 	"""
 	def _buildActionFn(self):
-		return lambda input, begin, tokens: self._action( tokens[0] )
+		return lambda input, begin, tokens: self._action( tokens[1], tokens[0] )
 
 	def _defaultAction(self, input, begin, tokens):
 		return [ self._op, tokens[0] ]
-
-	def _suffixActionIterative(self, input, begin, tokens):
-		a = tokens[0]
-		if self._action is not None:
-			for op in tokens[1]:
-				a = self._action( op, a )
-		else:
-			for op in tokens[1]:
-				a = [ op, a ]
-		return a
 
 	def _buildParser(self, operatorTable, levelParserForwardDeclarations, thisLevel, thisLevelParser, previousLevel, previousLevelParser):
 		return thisLevelParser + self._opExpression
@@ -122,7 +102,7 @@ class Suffix (Operator):
 	
 class InfixLeft (Operator):
 	def _buildActionFn(self):
-		return lambda input, begin, tokens: self._action( tokens[0], tokens[2] )
+		return lambda input, begin, tokens: self._action( tokens[1], tokens[0], tokens[2] )
 
 	def _defaultAction(self, input, begin, tokens):
 		return [ self._op, tokens[0], tokens[2] ]
@@ -147,7 +127,7 @@ class InfixLeft (Operator):
 
 class InfixRight (Operator):
 	def _buildActionFn(self):
-		return lambda input, begin, tokens: self._action( tokens[0], tokens[2] )
+		return lambda input, begin, tokens: self._action( tokens[1], tokens[0], tokens[2] )
 
 	def _defaultAction(self, input, begin, tokens):
 		return [ self._op, tokens[0], tokens[2] ]

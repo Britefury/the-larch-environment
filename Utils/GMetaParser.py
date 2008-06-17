@@ -13,6 +13,7 @@ from copy import copy
 from Britefury.Parser.Parser import getErrorLine, parserCoerce, Bind, Action, Condition, Forward, Group, Production, Suppress, Literal, Keyword, RegEx, Word, Sequence, Combine, Choice, Optional, Repetition, ZeroOrMore, OneOrMore, Peek, PeekNot
 from Britefury.Parser.GrammarUtils.Tokens import identifier, quotedString, unicodeString, integer, floatingPoint
 from Britefury.Parser.GrammarUtils.SeparatedList import separatedList
+from Britefury.Parser.GrammarUtils.Operators import Prefix, Suffix, InfixLeft, InfixRight, buildOperatorParser
 from Britefury.GLisp.GLispUtil import isGLispList, gLispSrcToStringPretty
 
 
@@ -44,17 +45,17 @@ _gmetaKeywords = set( [ 'False', 'True', 'None', 'lambda', 'map', 'filter', 'red
 _gmetaIdentifier = identifier  &  ( lambda input, pos, result: result not in _gmetaKeywords )
 #_gmetaIdentifier = identifier
 
-_none = Production( Literal( 'None' )  >>  ( lambda input, begin, token: '#None' ) )
-_false = Production( Literal( 'False' )  >>  ( lambda input, begin, token: '#False' ) )
-_true = Production( Literal( 'True' )  >>  ( lambda input, begin, token: '#True' ) )
-_strLit = Production( ( unicodeString | quotedString )  >>  ( lambda input, begin, token: "#'" + eval( token ) ) )
-_intLit = Production( integer  >>  ( lambda input, begin, token: '#' + token ) )
-_floatLit = Production( floatingPoint  >>  ( lambda input, begin, token: '#' + token ) )
-_loadLocal = Production( _gmetaIdentifier  >>  ( lambda input, begin, token: '@' + token ) )
-_var = Production( _gmetaIdentifier  >>  ( lambda input, begin, token: '@' + token ) )
+_none = Production( Literal( 'None' ).action( lambda input, begin, token: '#None' ) )
+_false = Production( Literal( 'False' ).action( lambda input, begin, token: '#False' ) )
+_true = Production( Literal( 'True' ).action( lambda input, begin, token: '#True' ) )
+_strLit = Production( ( unicodeString | quotedString ).action( lambda input, begin, token: "#'" + eval( token ) ) )
+_intLit = Production( integer.action( lambda input, begin, token: '#' + token ) )
+_floatLit = Production( floatingPoint.action( lambda input, begin, token: '#' + token ) )
+_loadLocal = Production( _gmetaIdentifier.action( lambda input, begin, token: '@' + token ) )
+_var = Production( _gmetaIdentifier.action( lambda input, begin, token: '@' + token ) )
 _terminalLiteral = Production( _floatLit | _intLit | _strLit | _none | _false | _true )
 _methodName = copy( _gmetaIdentifier )
-_paramName = Production( _gmetaIdentifier  >>  ( lambda input, begin, token: ':' + token ) )
+_paramName = Production( _gmetaIdentifier.action( lambda input, begin, token: ':' + token ) )
 _attrName = copy( _gmetaIdentifier )
 
 
@@ -171,36 +172,62 @@ _slice = Production( ( _primary + '[' + _expression + ':' + _expression + ']' ).
 _getAttr = Production( _primary + '.' + _attrName )
 _primary  <<  Production( _specialCall | _call | _subscript | _slice | _getAttr | _atom )
 
-_power = Forward()
-_unary = Forward()
 
-_power  <<  Production( ( _primary  +  '**'  +  _unary )  |  _primary )
-_unary  <<  Production( ( ( Literal( '~' ) | '-' | 'not' )  +  _unary ).action( _unaryOpAction )  |  _power )
+def _unary(op, x):
+	return [ x, op ]
 
-_mulDivMod = Forward()
-_mulDivMod  <<  Production( ( _mulDivMod + ( Literal( '*' ) | '/' | '%' ) + _unary )  |  _unary )
-_addSub = Forward()
-_addSub  <<  Production( ( _addSub + ( Literal( '+' ) | '-' ) + _mulDivMod )  |  _mulDivMod )
-_shift = Forward()
-_shift  <<  Production( ( _shift + ( Literal( '<<' ) | '>>' ) + _addSub )  |  _addSub )
-_bitAnd = Forward()
-_bitAnd  <<  Production( ( _bitAnd + '&' + _shift )  |  _shift )
-_bitXor = Forward()
-_bitXor  <<  Production( ( _bitXor + '^' + _bitAnd )  |  _bitAnd )
-_bitOr = Forward()
-_bitOr  <<  Production( ( _bitOr + '|' + _bitXor)  |  _bitXor )
-_cmp = Forward()
-_cmp  <<  Production( ( _cmp + ( Literal( '<' ) | '<=' | '==' | '!=' | '>=' | '>' ) + _bitOr )  |  _bitOr )
-_isIn = Forward()
-_isIn  <<  Production( ( _isIn + 'is' + 'not' + _cmp ).action( lambda input, begin, tokens: [ [ tokens[0], tokens[1], tokens[3] ], 'not' ]  )  |  \
-		       ( _isIn + 'not' + 'in' + _cmp ).action( lambda input, begin, tokens: [ [ tokens[0], tokens[2], tokens[3] ], 'not' ]  )  |  \
-		     ( _isIn + 'is' + _cmp)  |  \
-		     ( _isIn + 'in' + _cmp)  |  \
-		     _cmp )
-_and = Forward()
-_and  <<  Production( ( _and + 'and' + _isIn )  |  _isIn )
-_or = Forward()
-_or  <<  Production( ( _or + 'or' + _and )  |  _and )
+def _binary(op, a, b):
+	return [ a, op, b ]
+
+
+_or = buildOperatorParser( \
+	[
+		[ InfixRight( '**', _binary ) ],
+		[ Prefix( '~', _unary ),   Prefix( '-', _unary ),   Prefix( 'not', _unary ) ],
+		[ InfixLeft( '*', _binary ),   InfixLeft( '/', _binary ),   InfixLeft( '%', _binary ) ],
+		[ InfixLeft( '+', _binary ),   InfixLeft( '-', _binary ) ],
+		[ InfixLeft( '<<', _binary ),   InfixLeft( '>>', _binary ) ],
+		[ InfixLeft( '&', _binary ) ],
+		[ InfixLeft( '^', _binary ) ],
+		[ InfixLeft( '|', _binary ) ],
+		[ InfixLeft( '<', _binary ),   InfixLeft( '<=', _binary ),   InfixLeft( '==', _binary ),   InfixLeft( '!=', _binary ),   InfixLeft( '>=', _binary ),   InfixLeft( '>', _binary ) ],
+		[ InfixLeft( Keyword( 'is' ) + Keyword( 'not' ), lambda op, a, b: [ [ a, 'is', b ], 'not' ] ),
+		  	InfixLeft( Keyword( 'not' ) + Keyword( 'in' ), lambda op, a, b: [ [ a, 'in', b ], 'not' ] ),
+			InfixLeft( 'is', _binary ),   InfixLeft( 'in', _binary ) ],
+		[ InfixLeft( 'and', _binary ) ],
+		[ InfixLeft( 'or', _binary ) ],
+	], _primary )
+
+#_power = Forward()
+#_unary = Forward()
+
+#_power  <<  Production( ( _primary  +  '**'  +  _unary )  |  _primary )
+#_unary  <<  Production( ( ( Literal( '~' ) | '-' | 'not' )  +  _unary ).action( _unaryOpAction )  |  _power )
+
+#_mulDivMod = Forward()
+#_mulDivMod  <<  Production( ( _mulDivMod + ( Literal( '*' ) | '/' | '%' ) + _unary )  |  _unary )
+#_addSub = Forward()
+#_addSub  <<  Production( ( _addSub + ( Literal( '+' ) | '-' ) + _mulDivMod )  |  _mulDivMod )
+#_shift = Forward()
+#_shift  <<  Production( ( _shift + ( Literal( '<<' ) | '>>' ) + _addSub )  |  _addSub )
+#_bitAnd = Forward()
+#_bitAnd  <<  Production( ( _bitAnd + '&' + _shift )  |  _shift )
+#_bitXor = Forward()
+#_bitXor  <<  Production( ( _bitXor + '^' + _bitAnd )  |  _bitAnd )
+#_bitOr = Forward()
+#_bitOr  <<  Production( ( _bitOr + '|' + _bitXor)  |  _bitXor )
+#_cmp = Forward()
+#_cmp  <<  Production( ( _cmp + ( Literal( '<' ) | '<=' | '==' | '!=' | '>=' | '>' ) + _bitOr )  |  _bitOr )
+#_isIn = Forward()
+#_isIn  <<  Production( ( _isIn + 'is' + 'not' + _cmp ).action( lambda input, begin, tokens: [ [ tokens[0], tokens[1], tokens[3] ], 'not' ]  )  |  \
+		       #( _isIn + 'not' + 'in' + _cmp ).action( lambda input, begin, tokens: [ [ tokens[0], tokens[2], tokens[3] ], 'not' ]  )  |  \
+		     #( _isIn + 'is' + _cmp)  |  \
+		     #( _isIn + 'in' + _cmp)  |  \
+		     #_cmp )
+#_and = Forward()
+#_and  <<  Production( ( _and + 'and' + _isIn )  |  _isIn )
+#_or = Forward()
+#_or  <<  Production( ( _or + 'or' + _and )  |  _and )
 
 #_expression  <<  Production( _terminalLiteral | _listLiteral | _setLiteral | _lambdaExpression | _mapExpression | _filterExpression | _reduceExpression | _raiseExpression | _tryExpression | _ifExpression | _whereExpression | _moduleExpression | _matchExpression | _loadLocal )
 _expression  <<  Production( _or )
