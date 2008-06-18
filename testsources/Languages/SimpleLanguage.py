@@ -15,7 +15,6 @@ from Britefury.Parser.GrammarUtils import SeparatedList
 from Britefury.GLisp.GLispDispatch import dispatch
 
 from Britefury.gSym.gSymCompiler import GSymCompiler
-from Britefury.gSym.gSymUnparser import GSymUnparser
 
 from Britefury.gSym.View.Tokeniser import TokenDefinition, Tokeniser
 
