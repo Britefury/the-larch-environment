@@ -32,15 +32,15 @@ def _flatten(x):
 		return reduce( operator.__add__, x )
 	else:
 		return []
-	
-	
+
+
 def _unaryOpAction(input, begin, tokens):
 	return [ tokens[1], tokens[0] ]
 
 
 _gmetaKeywords = set( [ 'False', 'True', 'None', 'lambda', 'map', 'filter', 'reduce', 'try', 'except', 'finally', 'raise', 'if', 'elif', 'else', 'where', 'module', 'match', 'not', 'is', 'in', 'or', 'and', 'compilerCollection', 'defineCompiler', 'defineTokeniser',
 			'key', 'accel', 'tokens', 'defineInteractor' ] )
-	
+
 
 _gmetaIdentifier = identifier  &  ( lambda input, pos, result: result not in _gmetaKeywords )
 #_gmetaIdentifier = identifier
@@ -163,7 +163,7 @@ _special = Production( _compilerCollection | _defineCompiler | _tokeniser | _int
 _enclosure = Production( _parenExp | _listLiteral | _setLiteral )
 _keywords = Production( _lambdaExpression | _mapExpression | _filterExpression | _reduceExpression | _raiseExpression | _tryExpression | _ifExpression | _whereExpression | _moduleExpression | _matchExpression )
 _atom = Production( _enclosure | _keywords | _special | _terminalLiteral | _loadLocal )
- 
+
 _primary = Forward()
 _specialCall = Production( ( Suppress( '$' ) + _gmetaIdentifier + _parameterList ).action( lambda input, begin, tokens: [ '$' + tokens[0] ] + tokens[1] ) )
 _call = Production( ( _primary + _parameterList ).action( lambda input, begin, tokens: [ tokens[0], '<-' ] + tokens[1] ) )
@@ -192,11 +192,11 @@ _or = buildOperatorParser( \
 		[ InfixLeft( '|', _binary ) ],
 		[ InfixLeft( '<', _binary ),   InfixLeft( '<=', _binary ),   InfixLeft( '==', _binary ),   InfixLeft( '!=', _binary ),   InfixLeft( '>=', _binary ),   InfixLeft( '>', _binary ) ],
 		[ InfixLeft( Keyword( 'is' ) + Keyword( 'not' ), lambda op, a, b: [ [ a, 'is', b ], 'not' ] ),
-		  	InfixLeft( Keyword( 'not' ) + Keyword( 'in' ), lambda op, a, b: [ [ a, 'in', b ], 'not' ] ),
-			InfixLeft( 'is', _binary ),   InfixLeft( 'in', _binary ) ],
+		  InfixLeft( Keyword( 'not' ) + Keyword( 'in' ), lambda op, a, b: [ [ a, 'in', b ], 'not' ] ),
+		  InfixLeft( 'is', _binary ),   InfixLeft( 'in', _binary ) ],
 		[ InfixLeft( 'and', _binary ) ],
 		[ InfixLeft( 'or', _binary ) ],
-	], _primary )
+		], _primary )
 
 #_power = Forward()
 #_unary = Forward()
@@ -220,10 +220,10 @@ _or = buildOperatorParser( \
 #_cmp  <<  Production( ( _cmp + ( Literal( '<' ) | '<=' | '==' | '!=' | '>=' | '>' ) + _bitOr )  |  _bitOr )
 #_isIn = Forward()
 #_isIn  <<  Production( ( _isIn + 'is' + 'not' + _cmp ).action( lambda input, begin, tokens: [ [ tokens[0], tokens[1], tokens[3] ], 'not' ]  )  |  \
-		       #( _isIn + 'not' + 'in' + _cmp ).action( lambda input, begin, tokens: [ [ tokens[0], tokens[2], tokens[3] ], 'not' ]  )  |  \
-		     #( _isIn + 'is' + _cmp)  |  \
-		     #( _isIn + 'in' + _cmp)  |  \
-		     #_cmp )
+			#( _isIn + 'not' + 'in' + _cmp ).action( lambda input, begin, tokens: [ [ tokens[0], tokens[2], tokens[3] ], 'not' ]  )  |  \
+			#( _isIn + 'is' + _cmp)  |  \
+			#( _isIn + 'in' + _cmp)  |  \
+			#_cmp )
 #_and = Forward()
 #_and  <<  Production( ( _and + 'and' + _isIn )  |  _isIn )
 #_or = Forward()
@@ -253,14 +253,14 @@ class TestCase_GMetaParser (unittest.TestCase):
 			print 'RESULT:'
 			print gLispSrcToString( res, 10 )
 		self.assert_( expectedXs  ==  res )
-		
+
 		if result is not None:
 			if begin is not None:
 				self.assert_( begin == result.begin )
 			if end is not None:
 				self.assert_( end == result.end )
-		
-	
+
+
 	def _matchFailTest(self, parser, input, ignoreChars=string.whitespace):
 		result, pos = parser.parseString( input, ignoreChars=ignoreChars )
 		if result is not None   and   result.end == len( input ):
@@ -271,7 +271,7 @@ class TestCase_GMetaParser (unittest.TestCase):
 			print result
 		self.assert_( result is None  or  result.end != len( input ) )
 
-		
+
 	def testTerminal(self):
 		self._matchTest( expression, 'None', '#None' )
 		self._matchTest( expression, 'False', '#False' )
@@ -280,47 +280,47 @@ class TestCase_GMetaParser (unittest.TestCase):
 		self._matchTest( expression, '123', '#123' )
 		self._matchTest( expression, '3.14', '#3.14' )
 		self._matchTest( expression, 'abc', '@abc' )
-		
+
 	def testListLiteral(self):
 		self._matchTest( expression, '[ a, b, c ]', '($list @a @b @c)' )
 
 	def testSetLiteral(self):
 		self._matchTest( expression, '[: a, b, c :]', '($set @a @b @c)' )
-		
+
 	def testLambda(self):
 		self._matchTest( expression, 'lambda(a,b,c) -> {[a,b,c];}', '($lambda (@a @b @c) ($list @a @b @c))' )
-		
+
 	def testMap(self):
 		self._matchTest( expression, 'map( a, b )', '($map @a @b)' )
-		
+
 	def testFilter(self):
 		self._matchTest( expression, 'filter( a, b )', '($filter @a @b)' )
-		
+
 	def testReduce(self):
 		self._matchTest( expression, 'reduce( a, b )', '($reduce @a @b)' )
 		self._matchTest( expression, 'reduce( a, b, c )', '($reduce @a @b @c)' )
-		
+
 	def testRaise(self):
 		self._matchTest( expression, 'raise( a )', '($raise @a)' )
-		
+
 	def testTry(self):
 		self._matchTest( expression, 'try { a; } except (b) {c;}', '($try (@a) ($except @b @c))' )
 		self._matchTest( expression, 'try { a; } except (b) {c;} except (d) {e;}', '($try (@a) ($except @b @c) ($except @d @e))' )
 		self._matchTest( expression, 'try { a; } except (b) {c;} except (d) {e;}  else {f;}', '($try (@a) ($except @b @c) ($except @d @e) ($else @f))' )
 		self._matchTest( expression, 'try { a; } except (b) {c;} except (d) {e;}  finally {f;}', '($try (@a) ($except @b @c) ($except @d @e) ($finally @f))' )
-		
+
 	def testIf(self):
 		self._matchTest( expression, 'if (a) {b;}', '($if (@a @b))' )
 		self._matchTest( expression, 'if (a) {b;} elif (c) {d;}', '($if (@a @b) (@c @d))' )
 		self._matchTest( expression, 'if (a) {b;} elif (c) {d;} else {e;}', '($if (@a @b) (@c @d) ($else @e))' )
 		self._matchTest( expression, 'if (a) {b;} else {e;}', '($if (@a @b) ($else @e))' )
-		
+
 	def testWhere(self):
 		self._matchTest( expression, 'where { a=1; b=2; } -> { a; b; }',  '($where ((@a #1) (@b #2)) @a @b)' )
 
 	def testModule(self):
 		self._matchTest( expression, 'module { a=1; b=2; }',  '($module (@a #1) (@b #2))' )
-		
+
 	def testMatch(self):
 		self._matchTest( expression, 'match (a) {}',  '($match @a)' )
 		self._matchTest( expression, 'match (a) { ! => {a;} }',  '($match @a (! @a))' )
@@ -337,8 +337,8 @@ class TestCase_GMetaParser (unittest.TestCase):
 		self._matchTest( expression, 'match (a) { (!&x=y; /) => {a;} }',  '($match @a (((& @x @y !) /) @a))' )
 		self._matchTest( expression, 'match (a) { (!:q&x=y; /) => {a;} }',  '($match @a (((& @x @y (: @q !)) /) @a))' )
 		self._matchTest( expression, 'match (a) { (("a" "b" "c"):q&x=y; /) => {a;} }',  '($match @a (((& @x @y (: @q (a b c))) /) @a))' )
-		
-		
+
+
 	def testCall(self):
 		self._matchTest( expression, 'a(b)',  '(@a <- @b)' )
 		self._matchTest( expression, 'a(b,c)',  '(@a <- @b @c)' )
@@ -347,7 +347,7 @@ class TestCase_GMetaParser (unittest.TestCase):
 		self._matchTest( expression, 'a(x=b)',  '(@a <- (:x @b))' )
 		self._matchTest( expression, 'a(x=b,y=c)',  '(@a <- (:x @b) (:y @c))' )
 		self._matchTest( expression, 'a(b,y=c)',  '(@a <- @b (:y @c))' )
-		
+
 	def testSpecialCall(self):
 		self._matchTest( expression, '$a(b)',  '($a @b)' )
 		self._matchTest( expression, '$a(b,c)',  '($a @b @c)' )
@@ -364,7 +364,7 @@ class TestCase_GMetaParser (unittest.TestCase):
 		self._matchTest( expression, 'a[b](x)[c]',  '(((@a [] @b) <- @x) [] @c)' )
 		self._matchTest( expression, 'a(x)[b](y)',  '(((@a <- @x) [] @b) <- @y)' )
 		self._matchTest( expression, 'a[b:c]',  '(@a [:] @b @c)' )
-		
+
 
 	def testGetAttr(self):
 		self._matchTest( expression, 'a.i',  '(@a . i)' )
@@ -375,8 +375,8 @@ class TestCase_GMetaParser (unittest.TestCase):
 		self._matchTest( expression, 'a.i(b).j',  '(((@a . i) <- @b) . j)' )
 		self._matchTest( expression, 'a[x].i',  '((@a [] @x) . i)' )
 		self._matchTest( expression, 'a.i[x]',  '((@a . i) [] @x)' )
-		
-		
+
+
 	def testExponent(self):
 		self._matchTest( expression, 'a ** p',  '(@a ** @p)' )
 		self._matchTest( expression, 'a ** p ** q',  '(@a ** (@p ** @q))' )
@@ -387,8 +387,8 @@ class TestCase_GMetaParser (unittest.TestCase):
 		self._matchTest( expression, 'a ** p ** q.i',  '(@a ** (@p ** (@q . i)))' )
 		self._matchTest( expression, 'a.i ** p.j',  '((@a . i) ** (@p . j))' )
 		self._matchTest( expression, 'a ** p.j ** q',  '(@a ** ((@p . j) ** @q))' )
-		
-		
+
+
 	def testInvertNegateNot(self):
 		self._matchTest( expression, '~a',  '(@a ~)' )
 		self._matchTest( expression, '~~a',  '((@a ~) ~)' )
@@ -405,8 +405,8 @@ class TestCase_GMetaParser (unittest.TestCase):
 		self._matchTest( expression, 'not ~a',  '((@a ~) not)' )
 		self._matchTest( expression, '~not a',  '((@a not) ~)' )
 		self._matchTest( expression, 'a**not p',  '(@a ** (@p not))' )
-		
-	
+
+
 	def testMulDivMod(self):
 		self._matchTest( expression, 'a*b',  '(@a * @b)' )
 		self._matchTest( expression, 'a*b*c',  '((@a * @b) * @c)' )
@@ -420,8 +420,8 @@ class TestCase_GMetaParser (unittest.TestCase):
 		self._matchTest( expression, 'a*b**c*-d',  '((@a * (@b ** @c)) * (@d -))' )
 		self._matchTest( expression, 'a/b',  '(@a / @b)' )
 		self._matchTest( expression, 'a%b',  '(@a % @b)' )
-		
-		
+
+
 	def testAddSub(self):
 		self._matchTest( expression, 'a+b',  '(@a + @b)' )
 		self._matchTest( expression, 'a+b+c',  '((@a + @b) + @c)' )
@@ -430,7 +430,7 @@ class TestCase_GMetaParser (unittest.TestCase):
 		self._matchTest( expression, 'a*b+c*d',  '((@a * @b) + (@c * @d))' )
 		self._matchTest( expression, 'a+b*c+d',  '((@a + (@b * @c)) + @d)' )
 
-		
+
 	def testIsIn(self):
 		self._matchTest( expression, 'a is b',  '(@a is @b)' )
 		self._matchTest( expression, 'a is not b',  '((@a is @b) not)' )
@@ -458,8 +458,8 @@ class TestCase_GMetaParser (unittest.TestCase):
 		self._matchTest( expression, 'a is b not in x',  '(((@a is @b) in @x) not)' )
 		self._matchTest( expression, 'a not in b is not x',  '((((@a in @b) not) is @x) not)' )
 		self._matchTest( expression, 'a is not b not in x',  '((((@a is @b) not) in @x) not)' )
-		
-		
+
+
 	def testAndOr(self):
 		self._matchTest( expression, 'a and b',  '(@a and @b)' )
 		self._matchTest( expression, 'a and b and c',  '((@a and @b)  and @c)' )
@@ -471,7 +471,7 @@ class TestCase_GMetaParser (unittest.TestCase):
 		self._matchTest( expression, 'a is not m and b',  '(((@a is @m) not) and @b)' )
 		self._matchTest( expression, 'a or b',  '(@a or @b)' )
 
-		
+
 	def testCompoundExpression(self):
 		self._matchTest( _compoundExpression, '{ a; b; c; }', '(@a @b @c)' )
 
@@ -479,151 +479,151 @@ class TestCase_GMetaParser (unittest.TestCase):
 		self._matchTest( _singleOrCompoundExpression, '{ a; b; c; }', '(@a @b @c)' )
 		self._matchTest( _singleOrCompoundExpression, 'a;', '(@a)' )
 
-		
-		
+
+
 	def testCompilerCollection(self):
 		self._matchTest( _compilerCollection, 'compilerCollection { a; b; }',  '($compilerCollection @a @b)' )
-		
+
 	def testDefineCompiler(self):
 		self._matchTest( _defineCompiler, 'defineCompiler python25 ascii -> a',  '($defineCompiler python25 ascii @a)' )
-		
+
 	def testTokeniser(self):
 		self._matchTest( _tokeniser, 'defineTokeniser { a := b; c := d; }',  '($tokeniser (a @b) (c @d))' )
-		
+
 	def testInteractor(self):
 		self._matchTest( _interactor, """defineInteractor { key('a') => a; }""",  """($interactor (($key "#'a") @a))""" )
 		self._matchTest( _interactor, """defineInteractor { accel( '<ctrl>8' )  =>  e; }""",  """($interactor (($accel "#'<ctrl>8") @e))""" )
 		self._matchTest( _interactor, """defineInteractor { tokens( a, b, c ) => d; }""",  """($interactor (($tokens a b c) @d))""" )
 		self._matchTest( _interactor, """defineInteractor { tokens( a:x ) => d; }""",  """($interactor (($tokens (: @x a)) @d))""" )
-		
-		
+
+
 if __name__ == '__main__':
 	source = \
 """
 module
 {
-  compilers =
-    compilerCollection
-    {
-      defineCompiler simple ascii ->
-        where
-        {
-          compileNode =
-            lambda (node) ->
-              {
-                match (node)
-        	{
-        	  ( "add" ^:x ^:y )   =>   { '(' + compileNode(x) + ' + ' + compileNode( y ) + ')'; }
-        	  ( "sub" ^:x ^:y )   =>   { '(' + compileNode(x) + ' - ' + compileNode( y ) + ')'; }
-        	  ( "mul" ^:x ^:y )   =>   { '(' + compileNode(x) + ' * ' + compileNode( y ) + ')'; }
-        	  ( "div" ^:x ^:y )   =>   { '(' + compileNode(x) + ' / ' + compileNode( y ) + ')'; }
-        	  ( "pow" ^:x ^:y )   =>   { '(' + compileNode(x) + ' ** ' + compileNode( y ) + ')'; }
-        	  ( "loadLocal" !:x )   =>   { x; }
-        	  ( "undefinedExpr" )   =>   { '<UNDEFINED>'; }
-        	};
-              };
-        }
-        ->
-        {
-          compileNode;
-        };
-    };
-    
-  nodeViewFunction =
-    where
-    {
-      divBoxStyle = $style( alignment='expand' );
-      undefinedStyle = $style( colour=ColourRGB( 0.75, 0.0, 0.0 ), font='Sans 11 Italic' );
-      identifierInitChars = string.letters + '_';
-      identifierBodyChars = identifierInitChars + string.digits;
-      tokeniser = defineTokeniser
-        {
-	  identifier := $tokWord( identifierInitChars, identifierBodyChars );
-	  op_pow := $tokLiteral( '**' );
-	  op_add := $tokLiteral( '+' );
-	  op_sub := $tokLiteral( '-' );
-	  op_mul := $tokLiteral( '*' );
-	  op_div := $tokLiteral( '/' );
-	  op_mod := $tokLiteral( '%' );
-        };
-      exprInteractor = lambda (node) ->
-        {
-	  defineInteractor
-	  {
-	    key( '+' )  =>  $replace( node, [ 'add', node, [ 'nilExpr' ] ] );
-	    tokens( op_add )  =>  $replace( node, [ 'add', node, [ 'nilExpr' ] ] );
+compilers =
+compilerCollection
+{
+defineCompiler simple ascii ->
+where
+{
+compileNode =
+lambda (node) ->
+{
+match (node)
+{
+( "add" ^:x ^:y )   =>   { '(' + compileNode(x) + ' + ' + compileNode( y ) + ')'; }
+( "sub" ^:x ^:y )   =>   { '(' + compileNode(x) + ' - ' + compileNode( y ) + ')'; }
+( "mul" ^:x ^:y )   =>   { '(' + compileNode(x) + ' * ' + compileNode( y ) + ')'; }
+( "div" ^:x ^:y )   =>   { '(' + compileNode(x) + ' / ' + compileNode( y ) + ')'; }
+( "pow" ^:x ^:y )   =>   { '(' + compileNode(x) + ' ** ' + compileNode( y ) + ')'; }
+( "loadLocal" !:x )   =>   { x; }
+( "undefinedExpr" )   =>   { '<UNDEFINED>'; }
+};
+};
+}
+->
+{
+compileNode;
+};
+};
 
-	    key( '-' )  =>  $replace( node, [ 'sub', node, [ 'nilExpr' ] ] );
-	    tokens( op_sub )  =>  $replace( node, [ 'sub', node, [ 'nilExpr' ] ] );
+nodeViewFunction =
+where
+{
+divBoxStyle = $style( alignment='expand' );
+undefinedStyle = $style( colour=ColourRGB( 0.75, 0.0, 0.0 ), font='Sans 11 Italic' );
+identifierInitChars = string.letters + '_';
+identifierBodyChars = identifierInitChars + string.digits;
+tokeniser = defineTokeniser
+{
+identifier := $tokWord( identifierInitChars, identifierBodyChars );
+op_pow := $tokLiteral( '**' );
+op_add := $tokLiteral( '+' );
+op_sub := $tokLiteral( '-' );
+op_mul := $tokLiteral( '*' );
+op_div := $tokLiteral( '/' );
+op_mod := $tokLiteral( '%' );
+};
+exprInteractor = lambda (node) ->
+{
+defineInteractor
+{
+key( '+' )  =>  $replace( node, [ 'add', node, [ 'nilExpr' ] ] );
+tokens( op_add )  =>  $replace( node, [ 'add', node, [ 'nilExpr' ] ] );
 
-	    key( '*' )  =>  $replace( node, [ 'mul', node, [ 'nilExpr' ] ] );
-	    tokens( op_mul )  =>  $replace( node, [ 'mul', node, [ 'nilExpr' ] ] );
+key( '-' )  =>  $replace( node, [ 'sub', node, [ 'nilExpr' ] ] );
+tokens( op_sub )  =>  $replace( node, [ 'sub', node, [ 'nilExpr' ] ] );
 
-	    key( '/' )  =>  $replace( node, [ 'div', node, [ 'nilExpr' ] ] );
-	    tokens( op_div )  =>  $replace( node, [ 'div', node, [ 'nilExpr' ] ] );
+key( '*' )  =>  $replace( node, [ 'mul', node, [ 'nilExpr' ] ] );
+tokens( op_mul )  =>  $replace( node, [ 'mul', node, [ 'nilExpr' ] ] );
 
-	    key( '%' )  =>  $replace( node, [ 'mod', node, [ 'nilExpr' ] ] );
-	    tokens( op_mod )  =>  $replace( node, [ 'mod', node, [ 'nilExpr' ] ] );
-	    
-	    accel( '<ctrl>8' )  =>  $replace( node, [ 'pow', node, [ 'nilExpr' ] ] );
-	    tokens( op_pow )  =>  $replace( node, [ 'pow', node, [ 'nilExpr' ] ] );
-	  };
-	};
-      loadLocalInteractor = lambda (node) ->
-        {
-	  defineInteractor
-	  {
-	    tokens( identifier:name )  =>  $replace( node, [ 'loadLocal', name ] );
-	  };
-	};
-      nilExprInteractor = lambda (node) ->
-        {
-	  defineInteractor
-	  {
-	    tokens( identifier:name )  =>  $replace( node, [ 'loadLocal', name ] );
-	  };
-	};
-      operatorEditor = lambda (node, x, y, op) ->
-        {
-	  $interact( $activeBorder( $focus( $entry( op, op, tokeniser ) ) ),  operatorInteractor( node, x, y ) );
-	};
-      divideEditor = lambda (node, x, y) ->
-        {
-	  $interact( $focus( $customEntry( $hline(), '/', tokeniser ) ),  operatorInteractor( node, x, y ) );
-	};
-    }
-    ->
-    {
-      lambda (node) ->
-        {
-	  match (node)
-	  {
-      	    ( "add" ^:x ^:y )   =>   { $interact( $activeBorder( $hbox( [ $viewEval( x ), operatorEditor( node, x, y, '+' ), $viewEval( y ) ] ) ),  exprInteractor( node ) ); }
-      	    ( "sub" ^:x ^:y )   =>   { $interact( $activeBorder( $hbox( [ $viewEval( x ), operatorEditor( node, x, y, '-' ), $viewEval( y ) ] ) ),  exprInteractor( node ) ); }
-      	    ( "mul" ^:x ^:y )   =>   { $interact( $activeBorder( $hbox( [ $viewEval( x ), operatorEditor( node, x, y, '*' ), $viewEval( y ) ] ) ),  exprInteractor( node ) ); }
-      	    ( "div" ^:x ^:y )   =>   { $interact( $activeBorder( $vbox( [ $viewEval( x ), divideEditor( node, x, y ), $viewEval( y ) ], divBoxStyle ) ),  exprInteractor( node ) ); }
-      	    ( "mod" ^:x ^:y )   =>   { $interact( $activeBorder( $hbox( [ $viewEval( x ), operatorEditor( node, x, y, '%' ), $viewEval( y ) ] ) ),  exprInteractor( node ) ); }
-      	    ( "pow" ^:x ^:y )   =>   { $interact( $activeBorder( $scriptRSuper( $viewEval( x ), $hbox( [ operatorEditor( node, x, y, '**' ), $viewEval( y ) ] ) ) ),  exprInteractor( node ) ); }
-      	    ( "loadLocal" !:x )   =>   { $interact( $activeBorder( $focus( $entry( x, x, tokeniser ))),  loadLocalInteractor( node ),  exprInteractor( node ) ); }
-      	    ( "nilExpr" )   =>   { $interact( $activeBorder( $focus( $entry( '<expr>', '', tokeniser, undefinedStyle ))),  nilExprInteractor( node ) ); }
-      	    ( "list" *:x )   =>   { $listView( listViewLayoutVertical( 0.0, 0.0, 45.0 ), '[', ']', ',', $mapViewEval( x ) ); }
-	  };
-	};
-    };
+key( '/' )  =>  $replace( node, [ 'div', node, [ 'nilExpr' ] ] );
+tokens( op_div )  =>  $replace( node, [ 'div', node, [ 'nilExpr' ] ] );
+
+key( '%' )  =>  $replace( node, [ 'mod', node, [ 'nilExpr' ] ] );
+tokens( op_mod )  =>  $replace( node, [ 'mod', node, [ 'nilExpr' ] ] );
+
+accel( '<ctrl>8' )  =>  $replace( node, [ 'pow', node, [ 'nilExpr' ] ] );
+tokens( op_pow )  =>  $replace( node, [ 'pow', node, [ 'nilExpr' ] ] );
+};
+};
+loadLocalInteractor = lambda (node) ->
+{
+defineInteractor
+{
+tokens( identifier:name )  =>  $replace( node, [ 'loadLocal', name ] );
+};
+};
+nilExprInteractor = lambda (node) ->
+{
+defineInteractor
+{
+tokens( identifier:name )  =>  $replace( node, [ 'loadLocal', name ] );
+};
+};
+operatorEditor = lambda (node, x, y, op) ->
+{
+$interact( $activeBorder( $focus( $entry( op, op, tokeniser ) ) ),  operatorInteractor( node, x, y ) );
+};
+divideEditor = lambda (node, x, y) ->
+{
+$interact( $focus( $customEntry( $hline(), '/', tokeniser ) ),  operatorInteractor( node, x, y ) );
+};
+}
+->
+{
+lambda (node) ->
+{
+match (node)
+{
+( "add" ^:x ^:y )   =>   { $interact( $activeBorder( $hbox( [ $viewEval( x ), operatorEditor( node, x, y, '+' ), $viewEval( y ) ] ) ),  exprInteractor( node ) ); }
+( "sub" ^:x ^:y )   =>   { $interact( $activeBorder( $hbox( [ $viewEval( x ), operatorEditor( node, x, y, '-' ), $viewEval( y ) ] ) ),  exprInteractor( node ) ); }
+( "mul" ^:x ^:y )   =>   { $interact( $activeBorder( $hbox( [ $viewEval( x ), operatorEditor( node, x, y, '*' ), $viewEval( y ) ] ) ),  exprInteractor( node ) ); }
+( "div" ^:x ^:y )   =>   { $interact( $activeBorder( $vbox( [ $viewEval( x ), divideEditor( node, x, y ), $viewEval( y ) ], divBoxStyle ) ),  exprInteractor( node ) ); }
+( "mod" ^:x ^:y )   =>   { $interact( $activeBorder( $hbox( [ $viewEval( x ), operatorEditor( node, x, y, '%' ), $viewEval( y ) ] ) ),  exprInteractor( node ) ); }
+( "pow" ^:x ^:y )   =>   { $interact( $activeBorder( $scriptRSuper( $viewEval( x ), $hbox( [ operatorEditor( node, x, y, '**' ), $viewEval( y ) ] ) ) ),  exprInteractor( node ) ); }
+( "loadLocal" !:x )   =>   { $interact( $activeBorder( $focus( $entry( x, x, tokeniser ))),  loadLocalInteractor( node ),  exprInteractor( node ) ); }
+( "nilExpr" )   =>   { $interact( $activeBorder( $focus( $entry( '<expr>', '', tokeniser, undefinedStyle ))),  nilExprInteractor( node ) ); }
+( "list" *:x )   =>   { $listView( listViewLayoutVertical( 0.0, 0.0, 45.0 ), '[', ']', ',', $mapViewEval( x ) ); }
+};
+};
+};
 }
 """
 
-	
-	
+
+
 	def printError(errorName, pos, src):
 		lineIndex, lineSrc = getErrorLine( src, pos )
 		print '%s: line %d'  %  ( errorName, lineIndex + 1 )
 		print lineSrc
-		
-	
-	
+
+
+
 	REPITITIONS = 1
-	
+
 	import time
 	t1 = time.time()
 	for i in xrange( 0, REPITITIONS ):
@@ -638,31 +638,30 @@ module
 	else:
 		printError( 'Syntax error', pos, source )
 	print 'gMeta: Parsed %d chars in %s; %s chars per second'  %  ( len( source ) * REPITITIONS, t2 - t1, len(source)*REPITITIONS/(t2-t1) )
-	
-	
-	
+
+
+
 	SIMPLE_REPITIONS = 80
-	
+
 	rr = Forward()
 	rr  <<  Production( ( Literal( '1' )  +  rr )  |  '1' )
-	
+
 	lr = Forward()
 	lr  <<  Production( ( lr + '1' )  |  '1' )
-	
+
 	assert rr.parseString( '111111' )[0].end == 6
 	assert lr.parseString( '111111' )[0].end == 6
-	
-	
+
+
 	ones = '1' * 100
 	t1 = time.time()
 	for i in xrange( 0, SIMPLE_REPITIONS ):
 		res, pos = rr.parseString( ones )
 	t2 = time.time()
 	print 'RR: parsed %d chars in %s; %s chars per second'  %  ( len( ones )*SIMPLE_REPITIONS, t2 - t1, len(ones)*SIMPLE_REPITIONS/(t2-t1) )
-	
+
 	t1 = time.time()
 	for i in xrange( 0, SIMPLE_REPITIONS ):
 		res, pos = lr.parseString( ones )
 	t2 = time.time()
 	print 'LR: parsed %d chars in %s; %s chars per second'  %  ( len( ones )*SIMPLE_REPITIONS, t2 - t1, len(ones)*SIMPLE_REPITIONS/(t2-t1) )
-	

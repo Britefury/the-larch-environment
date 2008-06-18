@@ -9,6 +9,8 @@ from Britefury.Math.Math import Colour3f
 
 
 from Britefury.Parser import Parser
+from Britefury.Parser.GrammarUtils import Tokens
+from Britefury.Parser.GrammarUtils import SeparatedList
 
 from Britefury.GLisp.GLispDispatch import dispatch
 
@@ -26,6 +28,8 @@ from Britefury.gSym.View.Interactor import keyEventMethod, accelEventMethod, tex
 from Britefury.gSym.View.EditOperations import replace
 
 from Britefury.gSym.View.gSymStyleSheet import GSymStyleSheet
+
+from Britefury.gSym.View.UnparsedText import UnparsedText
 
 from Britefury.gSym.gSymLanguage import GSymLanguage
 
@@ -78,92 +82,6 @@ class SimpleLanguageCompiler (GSymCompiler):
 	
 	
 	
-def _paren(x):
-	return '( ' + x + ' )'
-
-def _unparseBinOp(x, y, op, precedence):
-	xVal, xPrec = x
-	yVal, yPrec = y
-	if precedence is not None:
-		if xPrec > precedence:
-			xVal = _paren( xVal )
-		if yPrec >= precedence:
-			yVal = _paren( yVal )
-	return xVal + ' ' + op + ' ' + yVal,  precedence
-
-PRECEDENCE_ADDSUB = 3
-PRECEDENCE_MULDIVMOD = 2
-PRECEDENCE_POW = 1
-PRECEDENCE_LOADLOCAL = 0
-PRECEDENCE_LISTLITERAL = 0
-PRECEDENCE_CALL = 0
-PRECEDENCE_SUBSCRIPT = 0
-PRECEDENCE_SLICE = 0
-PRECEDENCE_ATTR = 0
-PRECEDENCE_KWPARAM = 0
-	
-
-class SimpleLanguageUnparser (GSymUnparser):
-	def kwParam(self, precedence, node, name, value):
-		return name  +  '='  +  self.__dispatch( value )[0],  PRECEDENCE_KWPARAM
-	
-	def call(self, precedence, node, target, *params):
-		return self.__dispatch( target )[0] + '( ' + ', '.join( [ self.__dispatch( p )[0]   for p in params ] ) + ' )',  PRECEDENCE_CALL
-	
-	def subscript(self, precedence, node, target, index):
-		return self.__dispatch( target )[0] + '[' + self.__dispatch( index )[0] + ']',  PRECEDENCE_SUBSCRIPT
-	
-	def slice(self, precedence, node, target, first, second):
-		return self.__dispatch( target )[0] + '[' + self.__dispatch( first )[0] + ':' + self.__dispatch( second )[0] + ']',  PRECEDENCE_SLICE
-	
-	def attr(self, precedence, node, target, name):
-		return self.__dispatch( target )[0] + '.' + name,  PRECEDENCE_ATTR
-	
-	
-	def add(self, precedence, node, x, y):
-		return _unparseBinOp( self.__dispatch( x ), self.__dispatch( y ), '+', PRECEDENCE_ADDSUB )
-	
-	def sub(self, precedence, node, x, y):
-		return _unparseBinOp( self.__dispatch( x ), self.__dispatch( y ), '-', PRECEDENCE_ADDSUB )
-	
-	def mul(self, precedence, node, x, y):
-		return _unparseBinOp( self.__dispatch( x ), self.__dispatch( y ), '*', PRECEDENCE_MULDIVMOD )
-	
-	def div(self, precedence, node, x, y):
-		return _unparseBinOp( self.__dispatch( x ), self.__dispatch( y ), '/', PRECEDENCE_MULDIVMOD )
-	
-	def mod(self, precedence, node, x, y):
-		return _unparseBinOp( self.__dispatch( x ), self.__dispatch( y ), '%', PRECEDENCE_MULDIVMOD )
-	
-	def pow(self, precedence, node, x, y):
-		return _unparseBinOp( self.__dispatch( x ), self.__dispatch( y ), '**', PRECEDENCE_POW )
-	
-	def loadLocal(self, precedence, node, name):
-		return name, PRECEDENCE_LOADLOCAL
-	
-	def listLiteral(self, precedence, node, *xs):
-		return '[ '  +  ', '.join( [ self.__dispatch( x )[0]   for x in xs ] )  +  ' ]',  PRECEDENCE_LISTLITERAL
-	
-	def nilExpr(self, precedence, node):
-		return '<NIL>', PRECEDENCE_LOADLOCAL
-	
-	
-	def UNPARSED(self, precedence, node, value):
-		return value, 0
-	
-	
-	def __dispatch(self, xs, precedence=None):
-		return dispatch( self, xs, precedence )
-
-	def __call__(self, xs):
-		return self.__dispatch( xs )[0]
-	
-	
-unparser = SimpleLanguageUnparser()
-		
-	
-	
-
 divBoxStyle = GSymStyleSheet( alignment='expand' )
 nilStyle = GSymStyleSheet( colour=Colour3f( 0.75, 0.0, 0.0 ), font='Sans 11 italic' )
 unparsedStyle = GSymStyleSheet( colour=Colour3f( 0.75, 0.0, 0.0 ), font='Sans 11 italic' )
@@ -172,23 +90,23 @@ unparsedStyle = GSymStyleSheet( colour=Colour3f( 0.75, 0.0, 0.0 ), font='Sans 11
 tokeniser = Tokeniser( [] )
 
 
-_paramName = Parser.Production( Parser.identifier )
-_attrName = Parser.Production( Parser.identifier )
+_paramName = Parser.Production( Tokens.identifier )
+_attrName = Parser.Production( Tokens.identifier )
 
 
 
 _expression = Parser.Forward()
 
-_loadLocal = Parser.Production( Parser.identifier ).action( lambda input, begin, xs: [ 'loadLocal', xs ] )
+_loadLocal = Parser.Production( Tokens.identifier ).action( lambda input, begin, xs: [ 'loadLocal', xs ] )
 
 _kwParam = Parser.Production( _paramName + '=' + _expression ).action( lambda input, begin, xs: [ 'kwParam', xs[0], xs[2] ] )
 _param = Parser.Production( _kwParam | _expression )
-_parameterList = Parser.Production( Parser.Suppress( '(' )  -  Parser.delimitedList( _param )  -  Parser.Suppress( ')' ) )
+_parameterList = Parser.Production( Parser.Suppress( '(' )  -  SeparatedList.separatedList( _param )  -  Parser.Suppress( ')' ) )
 
 
 
 
-_listLiteral = Parser.Production( Parser.Literal( '[' )  +  Parser.delimitedList( _expression )  +  Parser.Literal( ']' ) ).action( lambda input, begin, xs: [ 'listLiteral' ]  +  xs[1] )
+_listLiteral = Parser.Production( Parser.Literal( '[' )  +  SeparatedList.separatedList( _expression )  +  Parser.Literal( ']' ) ).action( lambda input, begin, xs: [ 'listLiteral' ]  +  xs[1] )
 
 _parenExp = Parser.Production( Parser.Literal( '(' ) + _expression + ')' ).action( lambda input, begin, xs: xs[1] )
 
@@ -241,10 +159,43 @@ class ParsedNodeInteractor (Interactor):
 
 	
 
-def nodeEditor(node, contents, parser=_expression):
+PRECEDENCE_ADDSUB = 3
+PRECEDENCE_MULDIVMOD = 2
+PRECEDENCE_POW = 1
+PRECEDENCE_LOADLOCAL = 0
+PRECEDENCE_LISTLITERAL = 0
+PRECEDENCE_CALL = 0
+PRECEDENCE_SUBSCRIPT = 0
+PRECEDENCE_SLICE = 0
+PRECEDENCE_ATTR = 0
+PRECEDENCE_KWPARAM = 0
+	
+
+def _paren(x):
+	return '( ' + x + ' )'
+
+def _unparseBinOpView(x, y, op, precedence, bRightAssociative=False):
+	xPrec = x.state
+	yPrec = y.state
+	if precedence is not None:
+		if bRightAssociative:
+			if xPrec >= precedence:
+				x = _paren( x )
+			if yPrec > precedence:
+				y = _paren( y )
+		else:
+			if xPrec > precedence:
+				x = _paren( x )
+			if yPrec >= precedence:
+				y = _paren( y )
+	return UnparsedText( x + ' ' + op + ' ' + y,  state=precedence )
+
+
+
+def nodeEditor(node, contents, text, parser=_expression):
 	if parser is None:
 		parser = _expression
-	return interact( customEntry( highlight( contents ), unparser( node ) ),  ParsedNodeInteractor( node, parser ) )
+	return interact( customEntry( highlight( contents ), text.getText() ),  ParsedNodeInteractor( node, parser ) ),   text
 
 
 
@@ -253,82 +204,133 @@ class SimpleLanguageView (GSymView):
 	def kwParam(self, state, node, name, value):
 		return nodeEditor( node,
 				   hbox( [ label( name ), label( '=' ), viewEval( value ) ] ),
+				   UnparsedText( name  +  '='  +  valueView.text,  PRECEDENCE_KWPARAM ),
 				   state )
 
 	def call(self, state, node, target, *params):
-		paramViews = []
+		targetView = viewEval( target )
+		paramViews = mapViewEval( params, _param )
+		paramWidgets = []
 		if len( params ) > 0:
-			for p in params[:-1]:
-				paramViews.append( viewEval( p, state=_param ) )
-				paramViews.append( label( ',' ) )
-			paramViews.append( viewEval( params[-1], state=_param ) )
+			for p in paramViews[:-1]:
+				paramWidgets.append( p )
+				paramWidgets.append( label( ',' ) )
+			paramWidgets.append( paramViews[-1] )
 		return nodeEditor( node,
 				   hbox( [ viewEval( target ), label( '(' ) ]  +  paramViews  +  [ label( ')' ) ] ),
+				   UnparsedText( targetView.text + '( ' + UnparsedText( ', ' ).join( [ p.text   for p in paramViews ] ) + ' )',  PRECEDENCE_CALL ),
 				   state )
 	
 	def subscript(self, state, node, target, index):
+		targetView = viewEval( target )
+		indexView = viewEval( index )
 		return nodeEditor( node,
-				   hbox( [ viewEval( target ),  label( '[' ),  viewEval( index ),  label( ']' ) ] ),
+				   hbox( [ targetView,  label( '[' ),  indexView,  label( ']' ) ] ),
+				   UnparsedText( targetView.text + '[' + indexView.text + ']',  PRECEDENCE_SUBSCRIPT ),
 				   state )
 	
 	def slice(self, state, node, target, first, second):
+		targetView = viewEval( target )
+		firstView = viewEval( first )
+		secondView = viewEval( second )
 		return nodeEditor( node,
-				   hbox( [ viewEval( target ),  label( '[' ),  viewEval( first ),  label( ':' ),  viewEval( second ),  label( ']' ) ] ),
+				   hbox( [ targetView,  label( '[' ),  firstView,  label( ':' ),  secondView,  label( ']' ) ] ),
+				   UnparsedText( targetView.text + '[' + firstView.text + ':' + secondView.text + ']',  PRECEDENCE_SUBSCRIPT ),
 				   state )
 	
 	def attr(self, state, node, target, name):
+		targetView = viewEval( target )
+		nameUnparsed = UnparsedText( name )
+		nameLabel = label( name )
+		nameUnparsed.associateWith( nameLabel )
 		return nodeEditor( node,
-				   hbox( [ viewEval( target ),  label( '.' ),  label( name ) ] ),
+				   hbox( [ viewEval( target ),  label( '.' ),  nameLabel ] ),
+				   UnparsedText( targetView.text + '.' + nameUnparsed,  PRECEDENCE_ATTR ),
 				   state )
 
 	def add(self, state, node, x, y):
+		xView = viewEval( x )
+		yView = viewEval( y )
+		unparsed = _unparseBinOpView( xView.text, yView.text, '+', PRECEDENCE_ADDSUB )
 		return nodeEditor( node,
-				   hbox( [ viewEval( x ), label( '+' ), viewEval( y ) ] ),
+				   hbox( [ xView, label( '+' ), yView ] ),
+				   unparsed,
 				   state )
 
 	def sub(self, state, node, x, y):
+		xView = viewEval( x )
+		yView = viewEval( y )
+		unparsed = _unparseBinOpView( xView.text, yView.text, '-', PRECEDENCE_ADDSUB )
 		return nodeEditor( node,
 				   hbox( [ viewEval( x ), label( '-' ), viewEval( y ) ] ),
+				   unparsed,
 				   state )
 	
 	def mul(self, state, node, x, y):
+		xView = viewEval( x )
+		yView = viewEval( y )
+		unparsed = _unparseBinOpView( xView.text, yView.text, '*', PRECEDENCE_MULDIVMOD )
 		return nodeEditor( node,
 				   hbox( [ viewEval( x ), label( '*' ), viewEval( y ) ] ),
+				   unparsed,
 				   state )
 	
 	def div(self, state, node, x, y):
+		xView = viewEval( x )
+		yView = viewEval( y )
+		unparsed = _unparseBinOpView( xView.text, yView.text, '/', PRECEDENCE_MULDIVMOD )
 		return nodeEditor( node,
 				   vbox( [ viewEval( x ), hline(), viewEval( y ) ], divBoxStyle ),
+				   unparsed,
 				   state )
 	
 	def mod(self, state, node, x, y):
+		xView = viewEval( x )
+		yView = viewEval( y )
+		unparsed = _unparseBinOpView( xView.text, yView.text, '%', PRECEDENCE_MULDIVMOD )
 		return nodeEditor( node,
 				   hbox( [ viewEval( x ), label( '%' ), viewEval( y ) ] ),
+				   unparsed,
 				   state )
 	
 	def pow(self, state, node, x, y):
+		xView = viewEval( x )
+		yView = viewEval( y )
+		unparsed = _unparseBinOpView( xView.text, yView.text, '**', PRECEDENCE_POW )
 		return nodeEditor( node,
 				   scriptRSuper( viewEval( x ), viewEval( y ) ),
+				   unparsed,
 				   state )
 	
 	def loadLocal(self, state, node, name):
+		nameUnparsed = UnparsedText( name )
+		nameLabel = label( name )
+		nameUnparsed.associateWith( nameLabel )
 		return nodeEditor( node,
-				   label( name ),
+				   nameLabel,
+				   nameUnparsed,
 				   state )
 	
 	def nilExpr(self, state, node):
 		return nodeEditor( node,
 				   label( '<expr>' ),
+				   UnparsedText( 'None' ),
 				   state )
 	
-	def listLiteral(self, state, node, *x):
+	def listLiteral(self, state, node, *xs):
+		xViews = mapViewEval( xs )
 		return nodeEditor( node,
-			listView( VerticalListViewLayout( 0.0, 0.0, 45.0 ), '[', ']', ',', mapViewEval( x ) ),
+			listView( VerticalListViewLayout( 0.0, 0.0, 45.0 ), '[', ']', ',', xViews ),
+			UnparsedText( '[ '  +  UnparsedText( ', ' ).join( [ x.text   for x in xViews ] )  +  ' ]', PRECEDENCE_LISTLITERAL ),
 			state )
 	
 	def UNPARSED(self, state, node, value):
+		valueUnparsed = UnparsedText( name )
+		valueLabel = label( '<' + value + '>', unparsedStyle )
+		valueUnparsed.associateWith( valueLabel )
 		return nodeEditor( node,
-				   label( '<' + value + '>', unparsedStyle ),
+				   valueLabel,
+				   valueUnparsed,
 				   state )
 	
 	
@@ -339,5 +341,5 @@ language = GSymLanguage()
 language.registerCompilerFactory( 'ascii', SimpleLanguageCompiler)
 language.registerViewFactory( SimpleLanguageView )
 	
-	
+
 	

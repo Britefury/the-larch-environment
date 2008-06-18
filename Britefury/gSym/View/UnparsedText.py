@@ -40,6 +40,8 @@ class UnparsedText (object):
 			
 	def __init__(self, text, state=None):
 		super( UnparsedText, self ).__init__()
+		while isinstance( text, UnparsedText ):
+			text = text._text
 		self._text = text
 		self._table = weakref.WeakKeyDictionary()
 		self.state = state
