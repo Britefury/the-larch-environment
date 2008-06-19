@@ -17,7 +17,6 @@ identifier = RegEx( "[A-Za-z_][A-Za-z0-9_]*" )
 singleQuotedString = RegEx( r"'(?:[^'\n\r\\]|(?:'')|(?:\\x[0-9a-fA-F]+)|(?:\\.))*'" )
 doubleQuotedString = RegEx( r'"(?:[^"\n\r\\]|(?:"")|(?:\\x[0-9a-fA-F]+)|(?:\\.))*"' )
 quotedString = RegEx( r'''(?:"(?:[^"\n\r\\]|(?:"")|(?:\\x[0-9a-fA-F]+)|(?:\\.))*")|(?:'(?:[^'\n\r\\]|(?:'')|(?:\\x[0-9a-fA-F]+)|(?:\\.))*')''' )
-unicodeString = Combine( [ 'u', quotedString ] )
 decimalInteger = RegEx( r"[\-]?[0-9]+" )
 hexInteger = RegEx( r"0x[0-9A-Fa-f]+" )
 integer = decimalInteger  |  hexInteger

@@ -11,7 +11,7 @@ import operator
 from copy import copy
 
 from Britefury.Parser.Parser import getErrorLine, parserCoerce, Bind, Action, Condition, Forward, Group, Production, Suppress, Literal, Keyword, RegEx, Word, Sequence, Combine, Choice, Optional, Repetition, ZeroOrMore, OneOrMore, Peek, PeekNot
-from Britefury.Parser.GrammarUtils.Tokens import identifier, quotedString, unicodeString, integer, floatingPoint
+from Britefury.Parser.GrammarUtils.Tokens import identifier, quotedString, integer, floatingPoint
 from Britefury.Parser.GrammarUtils.SeparatedList import separatedList
 from Britefury.Parser.GrammarUtils.Operators import Prefix, Suffix, InfixLeft, InfixRight, buildOperatorParser
 from Britefury.GLisp.GLispUtil import isGLispList, gLispSrcToStringPretty
@@ -45,10 +45,12 @@ _gmetaKeywords = set( [ 'False', 'True', 'None', 'lambda', 'map', 'filter', 'red
 _gmetaIdentifier = identifier  &  ( lambda input, pos, result: result not in _gmetaKeywords )
 #_gmetaIdentifier = identifier
 
+_unicodeString = Combine( [ ( Literal( 'u' )  |  Literal( 'U' ) ), quotedString ] )
+
 _none = Production( Literal( 'None' ).action( lambda input, begin, token: '#None' ) )
 _false = Production( Literal( 'False' ).action( lambda input, begin, token: '#False' ) )
 _true = Production( Literal( 'True' ).action( lambda input, begin, token: '#True' ) )
-_strLit = Production( ( unicodeString | quotedString ).action( lambda input, begin, token: "#'" + eval( token ) ) )
+_strLit = Production( ( _unicodeString | quotedString ).action( lambda input, begin, token: "#'" + eval( token ) ) )
 _intLit = Production( integer.action( lambda input, begin, token: '#' + token ) )
 _floatLit = Production( floatingPoint.action( lambda input, begin, token: '#' + token ) )
 _loadLocal = Production( _gmetaIdentifier.action( lambda input, begin, token: '@' + token ) )
