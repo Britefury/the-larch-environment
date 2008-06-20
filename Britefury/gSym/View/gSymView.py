@@ -467,7 +467,7 @@ def vbox(children, style=None, alignment=DTBox.ALIGN_LEFT, spacing=0.0):
 	_applyStyle( style, widget )
 	return widget
 
-def wrappedHBox(children, style=None, spacing=0.0, indentation=0.0):
+def flow(children, style=None, spacing=0.0, indentation=0.0):
 	"""
 	Runtime - called by compiled code at run-time
 	Builds a DTFlow widget, with child, builds and registers a refresh cell
@@ -479,7 +479,7 @@ def wrappedHBox(children, style=None, spacing=0.0, indentation=0.0):
 	_applyStyle( style, widget )
 	return widget
 
-def wrappedHBoxSep(children, separatorFactory=',', style=None, spacing=0.0, indentation=0.0):
+def flowSep(children, separatorFactory=',', style=None, spacing=0.0, indentation=0.0):
 	"""
 	Runtime - called by compiled code at run-time
 	Builds a DTFlowWithSeparators widget, with child, builds and registers a refresh cell
