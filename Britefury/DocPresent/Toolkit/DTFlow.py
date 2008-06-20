@@ -10,10 +10,10 @@ from Britefury.DocPresent.Toolkit.DTContainerSequence import DTContainerSequence
 
 
 
-class DTWrappedHBox (DTContainerSequence):
+class DTFlow (DTContainerSequence):
 	class ChildEntry (DTContainerSequence.ChildEntry):
 		def __init__(self, child, padding):
-			super( DTWrappedHBox.ChildEntry, self ).__init__( child )
+			super( DTFlow.ChildEntry, self ).__init__( child )
 			self.padding = padding
 			self._reqWidth = 0.0
 			self._reqHeight = 0.0
@@ -22,7 +22,7 @@ class DTWrappedHBox (DTContainerSequence):
 
 
 	def __init__(self, spacing=0.0, padding=0.0, indentation=0.0, backgroundColour=None):
-		super( DTWrappedHBox, self ).__init__( backgroundColour )
+		super( DTFlow, self ).__init__( backgroundColour )
 
 		self._spacing = spacing
 		self._padding = padding
@@ -105,14 +105,15 @@ class DTWrappedHBox (DTContainerSequence):
 
 	def _o_getRequiredHeightAndBaseline(self):
 		aboveBaseline = 0.0
-		baseline = 0.0
+		baseline = None
 		for entry in self._childEntries:
 			req, bas = entry.child._f_getRequisitionHeightAndBaseline()
-			abv = req - bas
-			entry._reqHeight = req
 			entry._baseline = bas
-			aboveBaseline = max( aboveBaseline, abv )
-			baseline = max( baseline, bas )
+			if bas is not None:
+				abv = req - bas
+				entry._reqHeight = req
+				aboveBaseline = max( aboveBaseline, abv )   if baseline is not None   else   abv
+				baseline = max( baseline, bas )   if baseline is not None   else   bas
 		requisition = aboveBaseline + baseline
 		return requisition, baseline
 
@@ -292,7 +293,7 @@ if __name__ == '__main__':
 
 	labels = [ MyLabel( text )   for text in labelTexts ]
 
-	line = DTWrappedHBox( indentation=30.0 )
+	line = DTFlow( indentation=30.0 )
 	for label in labels:
 		line.append( label )
 	line.spacing = 5.0

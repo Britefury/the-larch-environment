@@ -155,6 +155,8 @@ class DTScript (DTContainer):
 		for slot in self.childSlots:
 			if self._children[slot] is not None:
 				self._childRequisitions[slot].y, childBaselines[slot] = self._children[slot]._f_getRequisitionHeightAndBaseline()
+				if childBaselines[slot] is None:
+					childBaselines[slot] = 0.0
 			else:
 				self._childRequisitions[slot].y = 0.0
 				childBaselines[slot] = 0.0

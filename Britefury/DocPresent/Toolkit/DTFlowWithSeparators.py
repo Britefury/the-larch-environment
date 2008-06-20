@@ -6,15 +6,15 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
 from Britefury.Math.Math import Point2, Vector2
-from Britefury.DocPresent.Toolkit.DTWrappedHBox import DTWrappedHBox
+from Britefury.DocPresent.Toolkit.DTFlow import DTFlow
 from Britefury.DocPresent.Toolkit.DTBox import DTBox
 from Britefury.DocPresent.Toolkit.DTLabel import DTLabel
 
 import traceback
 
-class DTWrappedHBoxWithSeparators (DTWrappedHBox):
+class DTFlowWithSeparators (DTFlow):
 	def __init__(self, separatorFactory=',', spacing=0.0, padding=0.0, indentation=0.0):
-		super( DTWrappedHBoxWithSeparators, self ).__init__( spacing, padding, indentation )
+		super( DTFlowWithSeparators, self ).__init__( spacing, padding, indentation )
 
 		self._boxes = []
 		self._items = []
@@ -46,14 +46,14 @@ class DTWrappedHBoxWithSeparators (DTWrappedHBox):
 				if len( self._boxes[-1] ) > 1:
 					del self._boxes[-1][1]
 
-			super( DTWrappedHBoxWithSeparators, self ).__setitem__( index, boxes )
+			super( DTFlowWithSeparators, self ).__setitem__( index, boxes )
 		else:
 			self._boxes[index][0] = item
 			self._items[index] = item
 
 
 	def __delitem__(self, index):
-		super( DTWrappedHBoxWithSeparators, self ).__delitem__( index )
+		super( DTFlowWithSeparators, self ).__delitem__( index )
 
 		del self._boxes[index]
 		del self._items[index]
@@ -76,7 +76,7 @@ class DTWrappedHBoxWithSeparators (DTWrappedHBox):
 		self._items.append( child )
 
 		# Add the box to the container
-		super( DTWrappedHBoxWithSeparators, self ).append( self._boxes[-1], padding )
+		super( DTFlowWithSeparators, self ).append( self._boxes[-1], padding )
 
 
 	def extend(self, children):
@@ -97,7 +97,7 @@ class DTWrappedHBoxWithSeparators (DTWrappedHBox):
 		self._items.extend( children )
 
 		# Add the new boxes to the container
-		super( DTWrappedHBoxWithSeparators, self ).extend( boxes )
+		super( DTFlowWithSeparators, self ).extend( boxes )
 
 
 	def insert(self, index, child, padding=None):
@@ -111,7 +111,7 @@ class DTWrappedHBoxWithSeparators (DTWrappedHBox):
 			self._boxes.insert( index, box )
 			self._items.insert( index, box )
 
-			super( DTWrappedHBoxWithSeparators, self ).insert( index, box )
+			super( DTFlowWithSeparators, self ).insert( index, box )
 
 
 	def remove(self, child):
@@ -197,7 +197,7 @@ if __name__ == '__main__':
 
 	labels = [ MyLabel( text )   for text in labelTexts ]
 
-	line = DTWrappedHBoxWithSeparators()
+	line = DTFlowWithSeparators()
 	for label in labels:
 		line.append( label )
 	line.spacing = 5.0

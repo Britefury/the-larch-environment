@@ -23,34 +23,18 @@ TODOS:
 
 
 
-- The GLisp compiler should generate memoised lambdas; it is used in the viewIfPairFactory lambda
-
 - The following talk by Guy Steele gives information on language design that could be very useful
     http://video.google.com/videoplay?docid=-8860158196198824415&q=guy+steele&total=977&start=0&num=10&so=0&type=search&plindex=0
 
 - Use the following presentation on unicode in Python to check gSym over:
     http://farmdev.com/talks/unicode/
 
-- Literate programming style
-  1. Define document structure and presentation in another document; a meta-document
-  2. The gMeta language should be written as a literate document itself.
-  3. The first thing that gSym loads is a view definition of gMeta. Since gMeta is a literate document, gSym will
-      have no idea how to find the code that is the gMeta view definition.
-  4. The document structure definition must describe how to execute the parts of a document that provide services
-      to other documents, and to other parts of the document itself.
-  5. Proposal: '$boot' form; gSym should look for a '$boot' form and execute this. This will establish the necessary
-      code for executing the gMeta literate document in order to find the gMeta view definition, and the document
-      structure view definition, and set these up.
-  6. With this in place, the gMeta literate document will be able to be executed and viewed.
-  7. PROBLEM: assume that there is one page of the document that collects all the gMeta code together so it can be
-      compiled. Various pages throughout the document reference *parts* of this code so that it can be displayed in
-      well presented pages. What if a page references part of a where expression (e.g. one bindig) or part of a match
-      expression (e.g. a pattern - expression pair)? This poses the problem of how view state is handled.
+- Typesetting:
+   - Add baseline alignment to DTFlow
+- Document presenation toolkit:
+   - Debug DTFlow
 - For editing languages 'live'; use the smalltalk-ish multiple worlds idea; use one world to edit a hosted world
 - Implement web-browser style user interface - urls, tabbed browsing
-- Typesetting:
-     - Add baseline alignment to DTWrappedHBox
-     - Provide different hboxes in the view code; an aligned one, and an unaligned one
 - Check out the Psyco optimiser, since it works on Linux and Windows.
 - GSym will screw up if the system attempts to render two views of the same document node:
      The pattern matcher matches a pattern
@@ -95,8 +79,8 @@ ALTERNATE CURSOR MANAGEMENT SYSTEM:
 Implement cursor location methods for:
 - DTHLine
 - DTScript
-- DTWrappedHBox
-- DTWrappedHBoxWithSeparators
+- DTFlow
+- DTFlowWithSeparators
 Test cursor location methods for:
 - DTBox
 - DTEntry

@@ -9,8 +9,9 @@
 from Britefury.Parser.Parser import getErrorLine, parserCoerce, Bind, Action, Condition, Forward, Group, Production, Suppress, Literal, Keyword, RegEx, Word, Sequence, Combine, Choice, Optional, Repetition, ZeroOrMore, OneOrMore, Peek, PeekNot, ParserTestCase
 from Britefury.Parser.GrammarUtils.Tokens import identifier, decimalInteger, hexInteger, integer, singleQuotedString, doubleQuotedString, quotedString, floatingPoint
 from Britefury.Parser.GrammarUtils.SeparatedList import separatedList, delimitedSeparatedList
+from Britefury.Parser.GrammarUtils.Operators import Prefix, Suffix, InfixLeft, InfixRight, buildOperatorParser
 
-from GSymCore.Languages.Python25.Keywords import keywordsSet
+from GSymCore.Languages.Python25.Keywords import *
 
 
 pythonIdentifier = identifier  &  ( lambda input, pos, result: result not in keywordsSet )
@@ -80,13 +81,44 @@ slice = Production( ( primary + '[' + expression + ':' + expression + ']' ).acti
 attr = Production( primary + '.' + attrName ).action( lambda input, begin, tokens: [ 'attr', tokens[0], tokens[2] ] )
 primary  <<  Production( call | subscript | slice | attr | atom )
 
-power = Forward()
-power  <<  Production( ( primary  +  '**'  +  power ).action( lambda input, begin, xs: [ 'pow', xs[0], xs[2] ] )   |   primary )
 
-_symToOp = { '+' : 'add',  '-' : 'sub',  '*' : 'mul',  '/' : 'div',  '%' : 'mod' }
-mulDivMod = Forward()
-mulDivMod  <<  Production( ( mulDivMod + ( Literal( '*' ) | '/' | '%' ) + power ).action( lambda input, begin, xs:  [ _symToOp[xs[1]], xs[0], xs[2] ] )  |  power )
-addSub = Forward()
-addSub  <<  Production( ( addSub + ( Literal( '+' ) | '-' ) + mulDivMod ).action( lambda input, begin, xs: [ _symToOp[xs[1]], xs[0], xs[2] ] )  |  mulDivMod )
+
+
+#power = Forward()
+#power  <<  Production( ( primary  +  '**'  +  power ).action( lambda input, begin, xs: [ 'pow', xs[0], xs[2] ] )   |   primary )
+
+#_symToOp = { '+' : 'add',  '-' : 'sub',  '*' : 'mul',  '/' : 'div',  '%' : 'mod' }
+#mulDivMod = Forward()
+#mulDivMod  <<  Production( ( mulDivMod + ( Literal( '*' ) | '/' | '%' ) + power ).action( lambda input, begin, xs:  [ _symToOp[xs[1]], xs[0], xs[2] ] )  |  power )
+#addSub = Forward()
+#addSub  <<  Production( ( addSub + ( Literal( '+' ) | '-' ) + mulDivMod ).action( lambda input, begin, xs: [ _symToOp[xs[1]], xs[0], xs[2] ] )  |  mulDivMod )
+
+
+
+addSub = buildOperatorParser( \
+	[
+		[ InfixRight( Literal( '**' ),  lambda op, x, y: [ 'pow', x, y ] ) ],
+		[ Prefix( Literal( '~' ),  lambda op, x: [ 'invert', x ] ),   Prefix( Literal( '-' ),  lambda op, x: [ 'negate', x ] ),   Prefix( Literal( '+' ),  lambda op, x: [ 'pos', x ] ) ],
+		[ InfixLeft( Literal( '*' ),  lambda op, x, y: [ 'mul', x, y ] ),   InfixLeft( Literal( '/' ),  lambda op, x, y: [ 'div', x, y ] ),   InfixLeft( Literal( '%' ),  lambda op, x, y: [ 'mod', x, y ] ) ],
+		[ InfixLeft( Literal( '+' ),  lambda op, x, y: [ 'add', x, y ] ),   InfixLeft( Literal( '-' ),  lambda op, x, y: [ 'sub', x, y ] ) ],
+		[ InfixLeft( Literal( '<<' ),  lambda op, x, y: [ 'lshift', x, y ] ),   InfixLeft( Literal( '>>' ),  lambda op, x, y: [ 'rshift', x, y ] ) ],
+		[ InfixLeft( Literal( '&' ),  lambda op, x, y: [ 'bitAnd', x, y ] ) ],
+		[ InfixLeft( Literal( '^' ),  lambda op, x, y: [ 'bitXor', x, y ] ) ],
+		[ InfixLeft( Literal( '|' ),  lambda op, x, y: [ 'bitOr', x, y ] ) ],
+		[
+			InfixLeft( Literal( '<=' ),  lambda op, x, y: [ 'lte', x, y ] ),
+			InfixLeft( Literal( '<' ),  lambda op, x, y: [ 'lt', x, y ] ),
+			InfixLeft( Literal( '>=' ),  lambda op, x, y: [ 'gte', x, y ] ),
+			InfixLeft( Literal( '>' ),  lambda op, x, y: [ 'gt', x, y ] ),
+			InfixLeft( Literal( '==' ),  lambda op, x, y: [ 'eq', x, y ] ),
+			InfixLeft( Literal( '!=' ),  lambda op, x, y: [ 'neq', x, y ] ),
+		],
+		[ InfixLeft( Keyword( isKeyword ) + Keyword( notKeyword ),  lambda op, x, y: [ 'cmpIsNot', x, y ] ),   InfixLeft( Keyword( isKeyword ),  lambda op, x, y: [ 'cmpIs', x, y ] ) ],
+		[ InfixLeft( Keyword( notKeyword ) + Keyword( inKeyword ),  lambda op, x, y: [ 'cmpNotIn', x, y ] ),   InfixLeft( Keyword( inKeyword ),  lambda op, x, y: [ 'cmpIn', x, y ] ) ],
+		[ Prefix( Keyword( notKeyword ),  lambda op, x: [ 'boolNot', x ] ) ],
+		[ InfixLeft( Keyword( andKeyword ),  lambda op, x, y: [ 'boolAnd', x, y ] ) ],
+		[ InfixLeft( Keyword( orKeyword ),  lambda op, x, y: [ 'boolOr', x, y ] ) ],
+	],  primary )
+
 			 
 expression  <<  Production( addSub )
