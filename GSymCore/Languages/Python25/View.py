@@ -269,7 +269,7 @@ class Python25View (GSymView):
 		targetView = viewEval( target )
 		indexView = viewEval( index )
 		return nodeEditor( node,
-				ahbox( [ targetView,  label( '[' ),  indexView,  label( ']' ) ] ),
+				ahbox( [ targetView,  label( '[', punctuationStyle ),  indexView,  label( ']', punctuationStyle ) ] ),
 				UnparsedText( targetView.text + '[' + indexView.text + ']',  PRECEDENCE_SUBSCRIPT ),
 				state )
 	
@@ -278,7 +278,7 @@ class Python25View (GSymView):
 		firstView = viewEval( first )
 		secondView = viewEval( second )
 		return nodeEditor( node,
-				ahbox( [ targetView,  label( '[' ),  firstView,  label( ':' ),  secondView,  label( ']' ) ] ),
+				ahbox( [ targetView,  label( '[', punctuationStyle ),  firstView,  label( ':', punctuationStyle ),  secondView,  label( ']', punctuationStyle ) ] ),
 				UnparsedText( targetView.text + '[' + firstView.text + ':' + secondView.text + ']',  PRECEDENCE_SUBSCRIPT ),
 				state )
 	
