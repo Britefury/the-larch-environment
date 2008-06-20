@@ -23,8 +23,14 @@ class Python25CodeGenerator (GSymCodeGenerator):
 		return repr( value )
 	
 
-	def kwParam(self, node, name, value):
+	def kwArg(self, node, name, value):
 		return name + '=' + self( value )
+	
+	def argList(self, node, value):
+		return '*' + self( value )
+	
+	def kwArgList(self, node, value):
+		return '*' + self( value )
 	
 	def call(self, node, target, *params):
 		return self( target ) + '( ' + ', '.join( [ self( p )   for p in params ] ) + ' )'

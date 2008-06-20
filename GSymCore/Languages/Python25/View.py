@@ -20,7 +20,7 @@ from Britefury.gSym.View.gSymStyleSheet import GSymStyleSheet
 from Britefury.gSym.View.UnparsedText import UnparsedText
 
 
-from GSymCore.Languages.Python25.Parser import _expression, _param
+from GSymCore.Languages.Python25.Parser import expression as expressionParser, arg as argParser
 
 
 
@@ -57,7 +57,7 @@ PRECEDENCE_CALL = 0
 PRECEDENCE_SUBSCRIPT = 0
 PRECEDENCE_SLICE = 0
 PRECEDENCE_ATTR = 0
-PRECEDENCE_KWPARAM = 0
+PRECEDENCE_ARG = 0
 	
 
 divBoxStyle = GSymStyleSheet( alignment='expand' )
@@ -65,7 +65,7 @@ nilStyle = GSymStyleSheet( colour=Colour3f( 0.75, 0.0, 0.0 ), font='Sans 11 ital
 unparsedStyle = GSymStyleSheet( colour=Colour3f( 0.75, 0.0, 0.0 ), font='Sans 11 italic' )
 numericLiteralStyle = GSymStyleSheet( colour=Colour3f( 0.0, 0.5, 0.5 ), font='Sans 11' )
 literalFormatStyle = GSymStyleSheet( colour=Colour3f( 0.0, 0.0, 0.5 ), font='Sans 11' )
-stringLiteralQuotationStyle = GSymStyleSheet( colour=Colour3f( 0.0, 0.5, 0.0 ), font='Sans 11' )
+punctuationStyle = GSymStyleSheet( colour=Colour3f( 0.0, 0.5, 0.0 ), font='Sans 11' )
 
 
 
@@ -90,9 +90,9 @@ def _unparseBinOpView(x, y, op, precedence, bRightAssociative=False):
 
 
 
-def nodeEditor(node, contents, text, parser=_expression):
+def nodeEditor(node, contents, text, parser=expressionParser):
 	if parser is None:
-		parser = _expression
+		parser = expressionParser
 	return interact( customEntry( highlight( contents ), text.getText() ),  ParsedNodeInteractor( node, parser ) ),   text
 
 
@@ -118,13 +118,13 @@ class Python25View (GSymView):
 			raise ValueError, 'invalid string literal format'
 		
 		if quotation == 'single':
-			boxContents.append( label( "'", stringLiteralQuotationStyle ) )
+			boxContents.append( label( "'", punctuationStyle ) )
 			boxContents.append( None )
-			boxContents.append( label( "'", stringLiteralQuotationStyle ) )
+			boxContents.append( label( "'", punctuationStyle ) )
 		else:
-			boxContents.append( label( '"', stringLiteralQuotationStyle ) )
+			boxContents.append( label( '"', punctuationStyle ) )
 			boxContents.append( None )
-			boxContents.append( label( '"', stringLiteralQuotationStyle ) )
+			boxContents.append( label( '"', punctuationStyle ) )
 			
 		boxContents[-2] = valueLabel
 		
@@ -185,23 +185,38 @@ class Python25View (GSymView):
 	
 
 	
-	def kwParam(self, state, node, name, value):
+	def kwArg(self, state, node, name, value):
+		valueView = viewEval( value )
 		return nodeEditor( node,
-				   hbox( [ label( name ), label( '=' ), viewEval( value ) ] ),
-				   UnparsedText( name  +  '='  +  valueView.text,  PRECEDENCE_KWPARAM ),
+				   hbox( [ label( name ), label( '=', punctuationStyle ), valueView ] ),
+				   UnparsedText( name  +  '='  +  valueView.text,  PRECEDENCE_ARG ),
+				   state )
+
+	def argList(self, state, node, value):
+		valueView = viewEval( value )
+		return nodeEditor( node,
+				   hbox( [ label( '*', punctuationStyle ), valueView ] ),
+				   UnparsedText( '*'  +  valueView.text,  PRECEDENCE_ARG ),
+				   state )
+
+	def kwArgList(self, state, node, value):
+		valueView = viewEval( value )
+		return nodeEditor( node,
+				   hbox( [ label( '**', punctuationStyle ), valueView ] ),
+				   UnparsedText( '**'  +  valueView.text,  PRECEDENCE_ARG ),
 				   state )
 
 	def call(self, state, node, target, *params):
 		targetView = viewEval( target )
-		paramViews = mapViewEval( params, _param )
+		paramViews = mapViewEval( params, None, argParser )
 		paramWidgets = []
 		if len( params ) > 0:
 			for p in paramViews[:-1]:
 				paramWidgets.append( p )
-				paramWidgets.append( label( ',' ) )
+				paramWidgets.append( label( ',', punctuationStyle ) )
 			paramWidgets.append( paramViews[-1] )
 		return nodeEditor( node,
-				   hbox( [ viewEval( target ), label( '(' ) ]  +  paramViews  +  [ label( ')' ) ] ),
+				   hbox( [ viewEval( target ), label( '(', punctuationStyle ) ]  +  paramWidgets  +  [ label( ')', punctuationStyle ) ] ),
 				   UnparsedText( targetView.text + '( ' + UnparsedText( ', ' ).join( [ p.text   for p in paramViews ] ) + ' )',  PRECEDENCE_CALL ),
 				   state )
 	
