@@ -6,82 +6,87 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
 
-from Britefury.Parser import Parser
-from Britefury.Parser.GrammarUtils import Tokens
-from Britefury.Parser.GrammarUtils import SeparatedList
+from Britefury.Parser.Parser import getErrorLine, parserCoerce, Bind, Action, Condition, Forward, Group, Production, Suppress, Literal, Keyword, RegEx, Word, Sequence, Combine, Choice, Optional, Repetition, ZeroOrMore, OneOrMore, Peek, PeekNot, ParserTestCase
+from Britefury.Parser.GrammarUtils.Tokens import identifier, decimalInteger, hexInteger, integer, singleQuotedString, doubleQuotedString, quotedString, floatingPoint
+from Britefury.Parser.GrammarUtils.SeparatedList import separatedList, delimitedSeparatedList
 
 from GSymCore.Languages.Python25.Keywords import keywordsSet
 
 
-_pythonIdentifier = Tokens.identifier  &  ( lambda input, pos, result: result not in keywordsSet )
+pythonIdentifier = identifier  &  ( lambda input, pos, result: result not in keywordsSet )
 	
-_asciiStringSLiteral = Parser.Production( Tokens.singleQuotedString ).action( lambda input, pos, xs: [ 'stringLiteral', 'ascii', 'single', xs[1:-1] ] )
-_asciiStringDLiteral = Parser.Production( Tokens.doubleQuotedString ).action( lambda input, pos, xs: [ 'stringLiteral', 'ascii', 'double', xs[1:-1] ] )
-_unicodeStringSLiteral = Parser.Production( Parser.Suppress( Parser.Literal( 'u' )  |  Parser.Literal( 'U' ) ) + Tokens.singleQuotedString ).action( lambda input, pos, xs: [ 'stringLiteral', 'unicode', 'single', xs[0][1:-1] ] )
-_unicodeStringDLiteral = Parser.Production( Parser.Suppress( Parser.Literal( 'u' )  |  Parser.Literal( 'U' ) ) + Tokens.doubleQuotedString ).action( lambda input, pos, xs: [ 'stringLiteral', 'unicode', 'double', xs[0][1:-1] ] )
-_regexAsciiStringSLiteral = Parser.Production( Parser.Suppress( Parser.Literal( 'r' )  |  Parser.Literal( 'R' ) ) + Tokens.singleQuotedString ).action( lambda input, pos, xs: [ 'stringLiteral', 'ascii-regex', 'single', xs[0][1:-1] ] )
-_regexAsciiStringDLiteral = Parser.Production( Parser.Suppress( Parser.Literal( 'r' )  |  Parser.Literal( 'R' ) ) + Tokens.doubleQuotedString ).action( lambda input, pos, xs: [ 'stringLiteral', 'ascii-regex', 'double', xs[0][1:-1] ] )
-_regexUnicodeStringSLiteral = Parser.Production( Parser.Suppress( Parser.Literal( 'ur' )  |  Parser.Literal( 'uR' )  |  Parser.Literal( 'Ur' )  |  Parser.Literal( 'UR' ) ) + Tokens.singleQuotedString ).action( lambda input, pos, xs: [ 'stringLiteral', 'unicode-regex', 'single', xs[0][1:-1] ] )
-_regexUnicodeStringDLiteral = Parser.Production( Parser.Suppress( Parser.Literal( 'ur' )  |  Parser.Literal( 'uR' )  |  Parser.Literal( 'Ur' )  |  Parser.Literal( 'UR' ) ) + Tokens.singleQuotedString ).action( lambda input, pos, xs: [ 'stringLiteral', 'unicode-regex', 'double', xs[0][1:-1] ] )
-_shortStringLiteral = _asciiStringSLiteral | _asciiStringDLiteral | _unicodeStringSLiteral | _unicodeStringDLiteral |  \
-				_regexAsciiStringSLiteral | _regexAsciiStringDLiteral | _regexUnicodeStringSLiteral | _regexUnicodeStringDLiteral
+asciiStringSLiteral = Production( singleQuotedString ).action( lambda input, pos, xs: [ 'stringLiteral', 'ascii', 'single', xs[1:-1] ] )
+asciiStringDLiteral = Production( doubleQuotedString ).action( lambda input, pos, xs: [ 'stringLiteral', 'ascii', 'double', xs[1:-1] ] )
+unicodeStringSLiteral = Production( Suppress( Literal( 'u' )  |  Literal( 'U' ) ) + singleQuotedString ).action( lambda input, pos, xs: [ 'stringLiteral', 'unicode', 'single', xs[0][1:-1] ] )
+unicodeStringDLiteral = Production( Suppress( Literal( 'u' )  |  Literal( 'U' ) ) + doubleQuotedString ).action( lambda input, pos, xs: [ 'stringLiteral', 'unicode', 'double', xs[0][1:-1] ] )
+regexAsciiStringSLiteral = Production( Suppress( Literal( 'r' )  |  Literal( 'R' ) ) + singleQuotedString ).action( lambda input, pos, xs: [ 'stringLiteral', 'ascii-regex', 'single', xs[0][1:-1] ] )
+regexAsciiStringDLiteral = Production( Suppress( Literal( 'r' )  |  Literal( 'R' ) ) + doubleQuotedString ).action( lambda input, pos, xs: [ 'stringLiteral', 'ascii-regex', 'double', xs[0][1:-1] ] )
+regexUnicodeStringSLiteral = Production( Suppress( Literal( 'ur' )  |  Literal( 'uR' )  |  Literal( 'Ur' )  |  Literal( 'UR' ) ) + singleQuotedString ).action( lambda input, pos, xs: [ 'stringLiteral', 'unicode-regex', 'single', xs[0][1:-1] ] )
+regexUnicodeStringDLiteral = Production( Suppress( Literal( 'ur' )  |  Literal( 'uR' )  |  Literal( 'Ur' )  |  Literal( 'UR' ) ) + singleQuotedString ).action( lambda input, pos, xs: [ 'stringLiteral', 'unicode-regex', 'double', xs[0][1:-1] ] )
+shortStringLiteral = asciiStringSLiteral | asciiStringDLiteral | unicodeStringSLiteral | unicodeStringDLiteral |  \
+				regexAsciiStringSLiteral | regexAsciiStringDLiteral | regexUnicodeStringSLiteral | regexUnicodeStringDLiteral
 
 
 
-_decimalIntLiteral = Parser.Production( Tokens.decimalInteger ).action( lambda input, pos, xs: [ 'intLiteral', 'decimal', 'int', xs ] )
-_decimalLongLiteral = Parser.Production( Tokens.decimalInteger + Parser.Suppress( Parser.Literal( 'l' )  |  Parser.Literal( 'L' ) ) ).action( lambda input, pos, xs: [ 'intLiteral', 'decimal', 'long', xs[0] ] )
-_hexIntLiteral = Parser.Production( Tokens.hexInteger ).action( lambda input, pos, xs: [ 'intLiteral', 'hex', 'int', xs ] )
-_hexLongLiteral = Parser.Production( Tokens.hexInteger + Parser.Suppress( Parser.Literal( 'l' )  |  Parser.Literal( 'L' ) ) ).action( lambda input, pos, xs: [ 'intLiteral', 'hex', 'long', xs[0] ] )
+decimalIntLiteral = Production( decimalInteger ).action( lambda input, pos, xs: [ 'intLiteral', 'decimal', 'int', xs ] )
+decimalLongLiteral = Production( decimalInteger + Suppress( Literal( 'l' )  |  Literal( 'L' ) ) ).action( lambda input, pos, xs: [ 'intLiteral', 'decimal', 'long', xs[0] ] )
+hexIntLiteral = Production( hexInteger ).action( lambda input, pos, xs: [ 'intLiteral', 'hex', 'int', xs ] )
+hexLongLiteral = Production( hexInteger + Suppress( Literal( 'l' )  |  Literal( 'L' ) ) ).action( lambda input, pos, xs: [ 'intLiteral', 'hex', 'long', xs[0] ] )
 
-_integerLiteral = _decimalLongLiteral | _decimalIntLiteral | _hexLongLiteral | _hexIntLiteral
+integerLiteral = decimalLongLiteral | decimalIntLiteral | hexLongLiteral | hexIntLiteral
 
-_floatLiteral = Parser.Production( Tokens.floatingPoint ).action( lambda input, pos, xs: [ 'floatLiteral', xs ] )
+floatLiteral = Production( floatingPoint ).action( lambda input, pos, xs: [ 'floatLiteral', xs ] )
 
-_imaginaryLiteral = Parser.Production( Parser.Combine( [ ( Tokens.floatingPoint | Tokens.decimalInteger ), Parser.Literal( 'j' ) ] ) ).action( lambda input, pos, xs: [ 'imaginaryLiteral', xs ] )
-
-
-_literal = _shortStringLiteral | _imaginaryLiteral | _floatLiteral | _integerLiteral
+imaginaryLiteral = Production( Combine( [ ( floatingPoint | decimalInteger ), Literal( 'j' ) ] ) ).action( lambda input, pos, xs: [ 'imaginaryLiteral', xs ] )
 
 
-_paramName = Parser.Production( _pythonIdentifier )
-_attrName = Parser.Production( _pythonIdentifier )
+literal = shortStringLiteral | imaginaryLiteral | floatLiteral | integerLiteral
+
+
+argName = Production( pythonIdentifier )
+attrName = Production( pythonIdentifier )
 
 
 
-_expression = Parser.Forward()
+expression = Forward()
 
-_loadLocal = Parser.Production( _pythonIdentifier ).action( lambda input, begin, xs: [ 'var', xs ] )
-
-_kwParam = Parser.Production( _paramName + '=' + _expression ).action( lambda input, begin, xs: [ 'kwParam', xs[0], xs[2] ] )
-_param = Parser.Production( _kwParam | _expression )
-_parameterList = Parser.Production( Parser.Suppress( '(' )  -  SeparatedList.separatedList( _param )  -  Parser.Suppress( ')' ) )
+loadLocal = Production( pythonIdentifier ).action( lambda input, begin, xs: [ 'var', xs ] )
 
 
 
 
-_listDisplay = Parser.Production( Parser.Literal( '[' )  +  SeparatedList.separatedList( _expression )  +  Parser.Literal( ']' ) ).action( lambda input, begin, xs: [ 'listDisplay' ]  +  xs[1] )
 
-_parenForm = Parser.Production( Parser.Literal( '(' ) + _expression + ')' ).action( lambda input, begin, xs: xs[1] )
+listDisplay = Production( Literal( '[' )  +  separatedList( expression )  +  Literal( ']' ) ).action( lambda input, begin, xs: [ 'listDisplay' ]  +  xs[1] )
 
-_enclosure = Parser.Production( _parenForm | _listDisplay )
+parenForm = Production( Literal( '(' ) + expression + ')' ).action( lambda input, begin, xs: xs[1] )
 
-_atom = Parser.Production( _enclosure | _literal | _loadLocal )
+enclosure = Production( parenForm | listDisplay )
 
-_primary = Parser.Forward()
+atom = Production( enclosure | literal | loadLocal )
 
-_call = Parser.Production( ( _primary + _parameterList ).action( lambda input, begin, tokens: [ 'call', tokens[0] ] + tokens[1] ) )
-_subscript = Parser.Production( ( _primary + '[' + _expression + ']' ).action( lambda input, begin, tokens: [ 'subscript', tokens[0], tokens[2] ] ) )
-_slice = Parser.Production( ( _primary + '[' + _expression + ':' + _expression + ']' ).action( lambda input, begin, tokens: [ 'slice', tokens[0], tokens[2], tokens[4] ] ) )
-_attr = Parser.Production( _primary + '.' + _attrName ).action( lambda input, begin, tokens: [ 'attr', tokens[0], tokens[2] ] )
-_primary  <<  Parser.Production( _call | _subscript | _slice | _attr | _atom )
+primary = Forward()
 
-_power = Parser.Forward()
-_power  <<  Parser.Production( ( _primary  +  '**'  +  _power ).action( lambda input, begin, xs: [ 'pow', xs[0], xs[2] ] )   |   _primary )
+
+kwArg = Production( argName + '=' + expression ).action( lambda input, begin, xs: [ 'kwArg', xs[0], xs[2] ] )
+argList = Production( Literal( '*' )  +  expression ).action( lambda input, begin, xs: [ 'argList', xs[1] ] )
+kwArgList = Production( Literal( '**' )  +  expression ).action( lambda input, begin, xs: [ 'kwArgList', xs[1] ] )
+arg = Production( kwArgList | argList | kwArg | expression )
+listOfArgs = Production( Suppress( '(' )  -  separatedList( arg )  -  Suppress( ')' ) )
+call = Production( ( primary + listOfArgs ).action( lambda input, begin, tokens: [ 'call', tokens[0] ] + tokens[1] ) )
+
+
+subscript = Production( ( primary + '[' + expression + ']' ).action( lambda input, begin, tokens: [ 'subscript', tokens[0], tokens[2] ] ) )
+slice = Production( ( primary + '[' + expression + ':' + expression + ']' ).action( lambda input, begin, tokens: [ 'slice', tokens[0], tokens[2], tokens[4] ] ) )
+attr = Production( primary + '.' + attrName ).action( lambda input, begin, tokens: [ 'attr', tokens[0], tokens[2] ] )
+primary  <<  Production( call | subscript | slice | attr | atom )
+
+power = Forward()
+power  <<  Production( ( primary  +  '**'  +  power ).action( lambda input, begin, xs: [ 'pow', xs[0], xs[2] ] )   |   primary )
 
 _symToOp = { '+' : 'add',  '-' : 'sub',  '*' : 'mul',  '/' : 'div',  '%' : 'mod' }
-_mulDivMod = Parser.Forward()
-_mulDivMod  <<  Parser.Production( ( _mulDivMod + ( Parser.Literal( '*' ) | '/' | '%' ) + _power ).action( lambda input, begin, xs:  [ _symToOp[xs[1]], xs[0], xs[2] ] )  |  _power )
-_addSub = Parser.Forward()
-_addSub  <<  Parser.Production( ( _addSub + ( Parser.Literal( '+' ) | '-' ) + _mulDivMod ).action( lambda input, begin, xs: [ _symToOp[xs[1]], xs[0], xs[2] ] )  |  _mulDivMod )
+mulDivMod = Forward()
+mulDivMod  <<  Production( ( mulDivMod + ( Literal( '*' ) | '/' | '%' ) + power ).action( lambda input, begin, xs:  [ _symToOp[xs[1]], xs[0], xs[2] ] )  |  power )
+addSub = Forward()
+addSub  <<  Production( ( addSub + ( Literal( '+' ) | '-' ) + mulDivMod ).action( lambda input, begin, xs: [ _symToOp[xs[1]], xs[0], xs[2] ] )  |  mulDivMod )
 			 
-_expression  <<  Parser.Production( _addSub )
+expression  <<  Production( addSub )
