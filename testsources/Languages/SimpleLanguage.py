@@ -14,7 +14,7 @@ from Britefury.Parser.GrammarUtils import SeparatedList
 
 from Britefury.GLisp.GLispDispatch import dispatch
 
-from Britefury.gSym.gSymCompiler import GSymCompiler
+from Britefury.gSym.gSymCodeGenerator import GSymCodeGenerator
 
 from Britefury.gSym.View.Tokeniser import TokenDefinition, Tokeniser
 
@@ -33,7 +33,7 @@ from Britefury.gSym.View.UnparsedText import UnparsedText
 from Britefury.gSym.gSymLanguage import GSymLanguage
 
 
-class SimpleLanguageCompiler (GSymCompiler):
+class SimpleLanguageCodeGenerator (GSymCodeGenerator):
 	def kwParam(self, node, name, value):
 		return name + '=' + self( value )
 	
@@ -337,7 +337,7 @@ class SimpleLanguageView (GSymView):
 
 	
 language = GSymLanguage()
-language.registerCompilerFactory( 'ascii', SimpleLanguageCompiler)
+language.registerCodeGeneratorFactory( 'ascii', SimpleLanguageCodeGenerator )
 language.registerViewFactory( SimpleLanguageView )
 	
 

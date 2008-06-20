@@ -38,7 +38,7 @@ def _unaryOpAction(input, begin, tokens):
 	return [ tokens[1], tokens[0] ]
 
 
-_gmetaKeywords = set( [ 'False', 'True', 'None', 'lambda', 'map', 'filter', 'reduce', 'try', 'except', 'finally', 'raise', 'if', 'elif', 'else', 'where', 'module', 'match', 'not', 'is', 'in', 'or', 'and', 'compilerCollection', 'defineCompiler', 'defineTokeniser',
+_gmetaKeywords = set( [ 'False', 'True', 'None', 'lambda', 'map', 'filter', 'reduce', 'try', 'except', 'finally', 'raise', 'if', 'elif', 'else', 'where', 'module', 'match', 'not', 'is', 'in', 'or', 'and', 'codeGeneratorCollection', 'defineCodeGenerator', 'defineTokeniser',
 			'key', 'accel', 'tokens', 'defineInteractor' ] )
 
 
@@ -145,8 +145,8 @@ _parenExp = Production( Literal( '(' ) + _expression + ')' ).action( lambda inpu
 
 # SPECIALS
 
-_compilerCollection = Production( Literal( 'compilerCollection' )  +  _compoundExpression ).action( lambda input, begin, tokens: [ '$compilerCollection' ]  +  tokens[1] )
-_defineCompiler = Production( Literal( 'defineCompiler' )  +  _gmetaIdentifier  +  _gmetaIdentifier  +  Suppress( '->' )  +  _expression ).action( lambda input, begin, tokens: [ '$defineCompiler' ] + tokens[1:] )
+_codeGeneratorCollection = Production( Literal( 'codeGeneratorCollection' )  +  _compoundExpression ).action( lambda input, begin, tokens: [ '$codeGeneratorCollection' ]  +  tokens[1] )
+_defineCodeGenerator = Production( Literal( 'defineCodeGenerator' )  +  _gmetaIdentifier  +  _gmetaIdentifier  +  Suppress( '->' )  +  _expression ).action( lambda input, begin, tokens: [ '$defineCodeGenerator' ] + tokens[1:] )
 _tokenDefinition = Production( _gmetaIdentifier  +  Suppress( ':=' )  +  _expression  +  Suppress( ';' ) )
 _tokeniser = Production( Literal( 'defineTokeniser' )  +  '{' +  ZeroOrMore( _tokenDefinition )  +  '}' ).action( lambda input, begin, tokens: [ '$tokeniser' ] + tokens[2] )
 
@@ -159,7 +159,7 @@ _interactorEvent = Production( _interactorEventKey  |  _interactorEventAccel  | 
 _interactorMatch = Production( _interactorEvent  +  Suppress( '=>' )  +  _expression  +  Suppress( ';' ) )
 _interactor = Production( Literal( 'defineInteractor' )  +  '{' +  ZeroOrMore( _interactorMatch )  +  '}' ).action( lambda input, begin, tokens: [ '$interactor' ] + tokens[2] )
 
-_special = Production( _compilerCollection | _defineCompiler | _tokeniser | _interactor )
+_special = Production( _codeGeneratorCollection | _defineCodeGenerator | _tokeniser | _interactor )
 
 
 _enclosure = Production( _parenExp | _listLiteral | _setLiteral )
@@ -483,11 +483,11 @@ class TestCase_GMetaParser (unittest.TestCase):
 
 
 
-	def testCompilerCollection(self):
-		self._matchTest( _compilerCollection, 'compilerCollection { a; b; }',  '($compilerCollection @a @b)' )
+	def testCodeGeneratorCollection(self):
+		self._matchTest( _codeGeneratorCollection, 'codeGeneratorCollection { a; b; }',  '($codeGeneratorCollection @a @b)' )
 
-	def testDefineCompiler(self):
-		self._matchTest( _defineCompiler, 'defineCompiler python25 ascii -> a',  '($defineCompiler python25 ascii @a)' )
+	def testDefineCodeGenerator(self):
+		self._matchTest( _defineCodeGenerator, 'defineCodeGenerator python25 ascii -> a',  '($defineCodeGenerator python25 ascii @a)' )
 
 	def testTokeniser(self):
 		self._matchTest( _tokeniser, 'defineTokeniser { a := b; c := d; }',  '($tokeniser (a @b) (c @d))' )
@@ -504,10 +504,10 @@ if __name__ == '__main__':
 """
 module
 {
-compilers =
-compilerCollection
+codeGenerators =
+codeGeneratorCollection
 {
-defineCompiler simple ascii ->
+defineCodeGenerator simple ascii ->
 where
 {
 compileNode =

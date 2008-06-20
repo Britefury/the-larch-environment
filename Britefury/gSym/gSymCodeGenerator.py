@@ -11,9 +11,9 @@ from Britefury.GLisp.GLispDispatch import dispatch
 
 
 
-class GSymCompiler (object):
+class GSymCodeGenerator (object):
 	def __init__(self, targetFormat):
-		super( GSymCompiler, self ).__init__()
+		super( GSymCodeGenerator, self ).__init__()
 		self._targetFormat = targetFormat
 		
 		
@@ -22,10 +22,10 @@ class GSymCompiler (object):
 
 
 
-class GSymCompilerCollection (object):
-	def __init__(self, compilers):
-		super( GSymCompilerCollection, self ).__init__()
-		self.compilers = compilers
+class GSymCodeGeneratorCollection (object):
+	def __init__(self, codeGenerators):
+		super( GSymCodeGeneratorCollection, self ).__init__()
+		self.codeGenerators = codeGenerators
 		
 		
 		
@@ -33,9 +33,9 @@ class GSymCompilerCollection (object):
 import unittest
 from Britefury.DocModel.DMIO import readSX
 
-class TestCase_GSymCompiler (unittest.TestCase):
-	def testGSymCompiler(self):
-		class Compiler (GSymCompiler):
+class TestCase_GSymCodeGenerator (unittest.TestCase):
+	def testGSymCodeGenerator(self):
+		class CodeGenerator (GSymCodeGenerator):
 			def add(self, node, x, y):
 				return '( '  +  self( x )  +  ' + '  +  self( y )  +  ' )'
 			
@@ -55,7 +55,7 @@ class TestCase_GSymCompiler (unittest.TestCase):
 				return name
 
 			
-		c = Compiler( 'ascii' )
+		c = CodeGenerator( 'ascii' )
 		xs = readSX( '(div (add (loadLocal x) (loadLocal y))  (mul (loadLocal a) (loadLocal b)))' )
 		
 		self.assert_( c( xs )  ==  '( ( x + y ) / ( a * b ) )' )

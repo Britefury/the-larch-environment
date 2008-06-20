@@ -11,12 +11,12 @@ from Britefury.gSym.View.gSymView import GSymViewFactory
 class GSymLanguage (object):
 	def __init__(self):
 		super( GSymLanguage, self ).__init__()
-		self._compilerFactories = {}
+		self._codeGeneratorFactories = {}
 		self._viewFactory = None
 		
 		
-	def registerCompilerFactory(self, format, factory):
-		self._compilerFactories[format] = factory
+	def registerCodeGeneratorFactory(self, format, factory):
+		self._codeGeneratorFactories[format] = factory
 
 
 
@@ -25,8 +25,8 @@ class GSymLanguage (object):
 
 		
 		
-	def getCompilerFactory(self, format):
-		return self._compilerFactories[format]
+	def getCodeGeneratorFactory(self, format):
+		return self._codeGeneratorFactories[format]
 	
 	def getViewFactory(self):
 		return self._viewFactory
