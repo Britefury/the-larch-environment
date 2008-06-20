@@ -26,8 +26,8 @@ from Britefury.DocPresent.Toolkit.DTEntryLabel import DTEntryLabel
 from Britefury.DocPresent.Toolkit.DTCustomEntry import DTCustomEntry
 from Britefury.DocPresent.Toolkit.DTTokenisedEntryLabel import DTTokenisedEntryLabel
 from Britefury.DocPresent.Toolkit.DTTokenisedCustomEntry import DTTokenisedCustomEntry
-from Britefury.DocPresent.Toolkit.DTWrappedHBox import DTWrappedHBox
-from Britefury.DocPresent.Toolkit.DTWrappedHBoxWithSeparators import DTWrappedHBoxWithSeparators
+from Britefury.DocPresent.Toolkit.DTFlow import DTFlow
+from Britefury.DocPresent.Toolkit.DTFlowWithSeparators import DTFlowWithSeparators
 
 
 from Britefury.DocView.DVNode import DVNode
@@ -470,10 +470,10 @@ def vbox(children, style=None, alignment=DTBox.ALIGN_LEFT, spacing=0.0):
 def wrappedHBox(children, style=None, spacing=0.0, indentation=0.0):
 	"""
 	Runtime - called by compiled code at run-time
-	Builds a DTWrappedHBox widget, with child, builds and registers a refresh cell
+	Builds a DTFlow widget, with child, builds and registers a refresh cell
 	"""
 	viewNodeInstance = _globalNodeViewInstanceStack[-1]
-	widget = DTWrappedHBox( spacing=spacing, indentation=indentation )
+	widget = DTFlow( spacing=spacing, indentation=indentation )
 	_containerSeqRefreshCell( viewNodeInstance, widget, children )
 	_applyStyleSheetStack( viewNodeInstance, widget )
 	_applyStyle( style, widget )
@@ -482,10 +482,10 @@ def wrappedHBox(children, style=None, spacing=0.0, indentation=0.0):
 def wrappedHBoxSep(children, separatorFactory=',', style=None, spacing=0.0, indentation=0.0):
 	"""
 	Runtime - called by compiled code at run-time
-	Builds a DTWrappedHBoxWithSeparators widget, with child, builds and registers a refresh cell
+	Builds a DTFlowWithSeparators widget, with child, builds and registers a refresh cell
 	"""
 	viewNodeInstance = _globalNodeViewInstanceStack[-1]
-	widget = DTWrappedHBoxWithSeparators( separatorFactory, spacing=spacing, indentation=indentation )
+	widget = DTFlowWithSeparators( separatorFactory, spacing=spacing, indentation=indentation )
 	_containerSeqRefreshCell( viewNodeInstance, widget, children )
 	_applyStyleSheetStack( viewNodeInstance, widget )
 	_applyStyle( style, widget )

@@ -157,7 +157,7 @@ class DTLabel (DTSimpleStaticWidget):
 		return self._layout.getSize().x + 2.0
 
 	def _o_getRequiredHeightAndBaseline(self):
-		return self._layout.getSize().y + 2.0, self._layout.getBaseline() + 1.0
+		return self._layout.getSize().y + 2.0, self._layout.getSize().y - self._layout.getBaseline() + 1.0
 
 
 

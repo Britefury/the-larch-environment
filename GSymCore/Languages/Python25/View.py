@@ -48,8 +48,19 @@ class ParsedNodeInteractor (Interactor):
 
 	
 
-PRECEDENCE_ADDSUB = 3
-PRECEDENCE_MULDIVMOD = 2
+PRECEDENCE_OR = 14
+PRECEDENCE_AND = 13
+PRECEDENCE_NOT = 12
+PRECEDENCE_IN = 11
+PRECEDENCE_IS = 10
+PRECEDENCE_CMP = 9
+PRECEDENCE_BITOR = 8
+PRECEDENCE_BITXOR = 7
+PRECEDENCE_BITAND = 6
+PRECEDENCE_SHIFT = 5
+PRECEDENCE_ADDSUB = 4
+PRECEDENCE_MULDIVMOD = 3
+PRECEDENCE_INVERT_NEGATE_POS = 2
 PRECEDENCE_POW = 1
 PRECEDENCE_LOADLOCAL = 0
 PRECEDENCE_LISTLITERAL = 0
@@ -65,12 +76,20 @@ nilStyle = GSymStyleSheet( colour=Colour3f( 0.75, 0.0, 0.0 ), font='Sans 11 ital
 unparsedStyle = GSymStyleSheet( colour=Colour3f( 0.75, 0.0, 0.0 ), font='Sans 11 italic' )
 numericLiteralStyle = GSymStyleSheet( colour=Colour3f( 0.0, 0.5, 0.5 ), font='Sans 11' )
 literalFormatStyle = GSymStyleSheet( colour=Colour3f( 0.0, 0.0, 0.5 ), font='Sans 11' )
-punctuationStyle = GSymStyleSheet( colour=Colour3f( 0.0, 0.5, 0.0 ), font='Sans 11' )
+punctuationStyle = GSymStyleSheet( colour=Colour3f( 0.0, 0.0, 1.0 ), font='Sans 11' )
+operatorStyle = GSymStyleSheet( colour=Colour3f( 0.0, 0.5, 0.0 ), font='Sans 11' )
 
 
 
 def _paren(x):
 	return '( ' + x + ' )'
+
+def _unparsePrefixOpView(x, op, precedence):
+	xPrec = x.state
+	if precedence is not None:
+		if xPrec > precedence:
+			x = _paren( x )
+	return UnparsedText( op + ' ' + x,  state=precedence )
 
 def _unparseBinOpView(x, y, op, precedence, bRightAssociative=False):
 	xPrec = x.state
@@ -95,6 +114,32 @@ def nodeEditor(node, contents, text, parser=expressionParser):
 		parser = expressionParser
 	return interact( customEntry( highlight( contents ), text.getText() ),  ParsedNodeInteractor( node, parser ) ),   text
 
+
+def binOpView(state, node, x, y, unparsedOp, widgetFactory, precedence):
+	xView = viewEval( x )
+	yView = viewEval( y )
+	unparsed = _unparseBinOpView( xView.text, yView.text, unparsedOp, precedence )
+	return nodeEditor( node,
+			widgetFactory( state, node, x, y, xView, yView ),
+			unparsed,
+			state )
+
+def horizontalBinOpView(state, node, x, y, op, precedence):
+	xView = viewEval( x )
+	yView = viewEval( y )
+	unparsed = _unparseBinOpView( xView.text, yView.text, op, precedence )
+	return nodeEditor( node,
+			ahbox( [ xView, label( op, operatorStyle ), yView ] ),
+			unparsed,
+			state )
+
+def horizontalPrefixOpView(state, node, x, op, precedence):
+	xView = viewEval( x )
+	unparsed = _unparsePrefixOpView( xView.text, op, precedence )
+	return nodeEditor( node,
+			ahbox( [ label( op, operatorStyle ), xView ] ),
+			unparsed,
+			state )
 
 
 
@@ -129,9 +174,9 @@ class Python25View (GSymView):
 		boxContents[-2] = valueLabel
 		
 		return nodeEditor( node,
-				   hbox( boxContents ),
-				   valueUnparsed,
-				   state )
+				ahbox( boxContents ),
+				valueUnparsed,
+				state )
 	
 	
 	def intLiteral(self, state, node, format, numType, value):
@@ -157,9 +202,9 @@ class Python25View (GSymView):
 		valueUnparsed.associateWith( valueLabel )
 
 		return nodeEditor( node,
-				   hbox( boxContents ),
-				   valueUnparsed,
-				   state )
+				ahbox( boxContents ),
+				valueUnparsed,
+				state )
 	
 
 	
@@ -168,9 +213,9 @@ class Python25View (GSymView):
 		valueLabel = label( value, numericLiteralStyle )
 		valueUnparsed.associateWith( valueLabel )
 		return nodeEditor( node,
-				   valueLabel,
-				   valueUnparsed,
-				   state )
+				valueLabel,
+				valueUnparsed,
+				state )
 	
 
 	
@@ -179,32 +224,32 @@ class Python25View (GSymView):
 		valueLabel = label( value, numericLiteralStyle )
 		valueUnparsed.associateWith( valueLabel )
 		return nodeEditor( node,
-				   valueLabel,
-				   valueUnparsed,
-				   state )
+				valueLabel,
+				valueUnparsed,
+				state )
 	
 
 	
 	def kwArg(self, state, node, name, value):
 		valueView = viewEval( value )
 		return nodeEditor( node,
-				   hbox( [ label( name ), label( '=', punctuationStyle ), valueView ] ),
-				   UnparsedText( name  +  '='  +  valueView.text,  PRECEDENCE_ARG ),
-				   state )
+				ahbox( [ label( name ), label( '=', punctuationStyle ), valueView ] ),
+				UnparsedText( name  +  '='  +  valueView.text,  PRECEDENCE_ARG ),
+				state )
 
 	def argList(self, state, node, value):
 		valueView = viewEval( value )
 		return nodeEditor( node,
-				   hbox( [ label( '*', punctuationStyle ), valueView ] ),
-				   UnparsedText( '*'  +  valueView.text,  PRECEDENCE_ARG ),
-				   state )
+				ahbox( [ label( '*', punctuationStyle ), valueView ] ),
+				UnparsedText( '*'  +  valueView.text,  PRECEDENCE_ARG ),
+				state )
 
 	def kwArgList(self, state, node, value):
 		valueView = viewEval( value )
 		return nodeEditor( node,
-				   hbox( [ label( '**', punctuationStyle ), valueView ] ),
-				   UnparsedText( '**'  +  valueView.text,  PRECEDENCE_ARG ),
-				   state )
+				ahbox( [ label( '**', punctuationStyle ), valueView ] ),
+				UnparsedText( '**'  +  valueView.text,  PRECEDENCE_ARG ),
+				state )
 
 	def call(self, state, node, target, *params):
 		targetView = viewEval( target )
@@ -216,26 +261,26 @@ class Python25View (GSymView):
 				paramWidgets.append( label( ',', punctuationStyle ) )
 			paramWidgets.append( paramViews[-1] )
 		return nodeEditor( node,
-				   hbox( [ viewEval( target ), label( '(', punctuationStyle ) ]  +  paramWidgets  +  [ label( ')', punctuationStyle ) ] ),
-				   UnparsedText( targetView.text + '( ' + UnparsedText( ', ' ).join( [ p.text   for p in paramViews ] ) + ' )',  PRECEDENCE_CALL ),
-				   state )
+				ahbox( [ viewEval( target ), label( '(', punctuationStyle ) ]  +  paramWidgets  +  [ label( ')', punctuationStyle ) ] ),
+				UnparsedText( targetView.text + '( ' + UnparsedText( ', ' ).join( [ p.text   for p in paramViews ] ) + ' )',  PRECEDENCE_CALL ),
+				state )
 	
 	def subscript(self, state, node, target, index):
 		targetView = viewEval( target )
 		indexView = viewEval( index )
 		return nodeEditor( node,
-				   hbox( [ targetView,  label( '[' ),  indexView,  label( ']' ) ] ),
-				   UnparsedText( targetView.text + '[' + indexView.text + ']',  PRECEDENCE_SUBSCRIPT ),
-				   state )
+				ahbox( [ targetView,  label( '[' ),  indexView,  label( ']' ) ] ),
+				UnparsedText( targetView.text + '[' + indexView.text + ']',  PRECEDENCE_SUBSCRIPT ),
+				state )
 	
 	def slice(self, state, node, target, first, second):
 		targetView = viewEval( target )
 		firstView = viewEval( first )
 		secondView = viewEval( second )
 		return nodeEditor( node,
-				   hbox( [ targetView,  label( '[' ),  firstView,  label( ':' ),  secondView,  label( ']' ) ] ),
-				   UnparsedText( targetView.text + '[' + firstView.text + ':' + secondView.text + ']',  PRECEDENCE_SUBSCRIPT ),
-				   state )
+				ahbox( [ targetView,  label( '[' ),  firstView,  label( ':' ),  secondView,  label( ']' ) ] ),
+				UnparsedText( targetView.text + '[' + firstView.text + ':' + secondView.text + ']',  PRECEDENCE_SUBSCRIPT ),
+				state )
 	
 	def attr(self, state, node, target, name):
 		targetView = viewEval( target )
@@ -243,94 +288,144 @@ class Python25View (GSymView):
 		nameLabel = label( name )
 		nameUnparsed.associateWith( nameLabel )
 		return nodeEditor( node,
-				   hbox( [ viewEval( target ),  label( '.' ),  nameLabel ] ),
-				   UnparsedText( targetView.text + '.' + nameUnparsed,  PRECEDENCE_ATTR ),
-				   state )
+				ahbox( [ viewEval( target ),  label( '.' ),  nameLabel ] ),
+				UnparsedText( targetView.text + '.' + nameUnparsed,  PRECEDENCE_ATTR ),
+				state )
 
-	def add(self, state, node, x, y):
-		xView = viewEval( x )
-		yView = viewEval( y )
-		unparsed = _unparseBinOpView( xView.text, yView.text, '+', PRECEDENCE_ADDSUB )
-		return nodeEditor( node,
-				   hbox( [ xView, label( '+' ), yView ] ),
-				   unparsed,
-				   state )
-
-	def sub(self, state, node, x, y):
-		xView = viewEval( x )
-		yView = viewEval( y )
-		unparsed = _unparseBinOpView( xView.text, yView.text, '-', PRECEDENCE_ADDSUB )
-		return nodeEditor( node,
-				   hbox( [ viewEval( x ), label( '-' ), viewEval( y ) ] ),
-				   unparsed,
-				   state )
 	
-	def mul(self, state, node, x, y):
-		xView = viewEval( x )
-		yView = viewEval( y )
-		unparsed = _unparseBinOpView( xView.text, yView.text, '*', PRECEDENCE_MULDIVMOD )
-		return nodeEditor( node,
-				   hbox( [ viewEval( x ), label( '*' ), viewEval( y ) ] ),
-				   unparsed,
-				   state )
-	
-	def div(self, state, node, x, y):
-		xView = viewEval( x )
-		yView = viewEval( y )
-		unparsed = _unparseBinOpView( xView.text, yView.text, '/', PRECEDENCE_MULDIVMOD )
-		return nodeEditor( node,
-				   vbox( [ viewEval( x ), hline(), viewEval( y ) ], divBoxStyle ),
-				   unparsed,
-				   state )
-	
-	def mod(self, state, node, x, y):
-		xView = viewEval( x )
-		yView = viewEval( y )
-		unparsed = _unparseBinOpView( xView.text, yView.text, '%', PRECEDENCE_MULDIVMOD )
-		return nodeEditor( node,
-				   hbox( [ viewEval( x ), label( '%' ), viewEval( y ) ] ),
-				   unparsed,
-				   state )
 	
 	def pow(self, state, node, x, y):
-		xView = viewEval( x )
-		yView = viewEval( y )
-		unparsed = _unparseBinOpView( xView.text, yView.text, '**', PRECEDENCE_POW )
-		return nodeEditor( node,
-				   scriptRSuper( viewEval( x ), viewEval( y ) ),
-				   unparsed,
-				   state )
+		return binOpView( state, node, x, y, '**',
+				lambda state, node, x, y, xView, yView: scriptRSuper( xView, yView ),
+				PRECEDENCE_POW )
 	
+	
+	def invert(self, state, node, x):
+		return horizontalPrefixOpView( state, node, x, '~', PRECEDENCE_INVERT_NEGATE_POS )
+	
+	def negate(self, state, node, x):
+		return horizontalPrefixOpView( state, node, x, '-', PRECEDENCE_INVERT_NEGATE_POS )
+	
+	def pos(self, state, node, x):
+		return horizontalPrefixOpView( state, node, x, '+', PRECEDENCE_INVERT_NEGATE_POS )
+	
+	
+	def mul(self, state, node, x, y):
+		return horizontalBinOpView( state, node, x, y, '*', PRECEDENCE_MULDIVMOD )
+	
+	def div(self, state, node, x, y):
+		return binOpView( state, node, x, y, '/',
+				  lambda state, node, x, y, xView, yView: vbox( [ xView, hline( operatorStyle ), yView ], divBoxStyle ),
+				  PRECEDENCE_POW )
+	
+	def mod(self, state, node, x, y):
+		return horizontalBinOpView( state, node, x, y, '%', PRECEDENCE_MULDIVMOD )
+	
+	def add(self, state, node, x, y):
+		return horizontalBinOpView( state, node, x, y, '+', PRECEDENCE_ADDSUB )
+
+	def sub(self, state, node, x, y):
+		return horizontalBinOpView( state, node, x, y, '-', PRECEDENCE_ADDSUB )
+	
+	
+	def lshift(self, state, node, x, y):
+		return horizontalBinOpView( state, node, x, y, '<<', PRECEDENCE_SHIFT )
+
+	def rshift(self, state, node, x, y):
+		return horizontalBinOpView( state, node, x, y, '>>', PRECEDENCE_SHIFT )
+
+	
+	def bitAnd(self, state, node, x, y):
+		return horizontalBinOpView( state, node, x, y, '&', PRECEDENCE_BITAND )
+
+	def bitXor(self, state, node, x, y):
+		return horizontalBinOpView( state, node, x, y, '^', PRECEDENCE_BITXOR )
+
+	def bitOr(self, state, node, x, y):
+		return horizontalBinOpView( state, node, x, y, '|', PRECEDENCE_BITOR )
+
+	
+	def lte(self, state, node, x, y):
+		return horizontalBinOpView( state, node, x, y, '<=', PRECEDENCE_CMP )
+
+	def lt(self, state, node, x, y):
+		return horizontalBinOpView( state, node, x, y, '<', PRECEDENCE_CMP )
+
+	def gte(self, state, node, x, y):
+		return horizontalBinOpView( state, node, x, y, '>=', PRECEDENCE_CMP )
+
+	def gt(self, state, node, x, y):
+		return horizontalBinOpView( state, node, x, y, '>', PRECEDENCE_CMP )
+
+	def eq(self, state, node, x, y):
+		return horizontalBinOpView( state, node, x, y, '==', PRECEDENCE_CMP )
+
+	def neq(self, state, node, x, y):
+		return horizontalBinOpView( state, node, x, y, '!=', PRECEDENCE_CMP )
+
+
+	def cmpIsNot(self, state, node, x, y):
+		return horizontalBinOpView( state, node, x, y, 'is not', PRECEDENCE_IS )
+
+	def cmpIs(self, state, node, x, y):
+		return horizontalBinOpView( state, node, x, y, 'is', PRECEDENCE_IS )
+
+	def cmpNotIn(self, state, node, x, y):
+		return horizontalBinOpView( state, node, x, y, 'not in', PRECEDENCE_IN )
+
+	def cmpIn(self, state, node, x, y):
+		return horizontalBinOpView( state, node, x, y, 'in', PRECEDENCE_IN )
+
+
+	def boolNot(self, state, node, x):
+		return horizontalPrefixOpView( state, node, x, 'not', PRECEDENCE_NOT )
+	
+	def boolAnd(self, state, node, x, y):
+		return horizontalBinOpView( state, node, x, y, 'and', PRECEDENCE_AND )
+
+	def boolOr(self, state, node, x, y):
+		return horizontalBinOpView( state, node, x, y, 'or', PRECEDENCE_OR )
+
+
 	def var(self, state, node, name):
 		nameUnparsed = UnparsedText( name )
 		nameLabel = label( name )
 		nameUnparsed.associateWith( nameLabel )
 		return nodeEditor( node,
-				   nameLabel,
-				   nameUnparsed,
-				   state )
+				nameLabel,
+				nameUnparsed,
+				state )
 	
 	def nilExpr(self, state, node):
 		return nodeEditor( node,
-				   label( '<expr>' ),
-				   UnparsedText( 'None' ),
-				   state )
+				label( '<expr>' ),
+				UnparsedText( 'None' ),
+				state )
 	
 	def listDisplay(self, state, node, *xs):
 		xViews = mapViewEval( xs )
 		return nodeEditor( node,
-			listView( VerticalListViewLayout( 0.0, 0.0, 45.0 ), '[', ']', ',', xViews ),
-			UnparsedText( '[ '  +  UnparsedText( ', ' ).join( [ x.text   for x in xViews ] )  +  ' ]', PRECEDENCE_LISTLITERAL ),
-			state )
+				   listView( VerticalListViewLayout( 0.0, 0.0, 45.0 ), '[', ']', ',', xViews ),
+				   UnparsedText( '[ '  +  UnparsedText( ', ' ).join( [ x.text   for x in xViews ] )  +  ' ]', PRECEDENCE_LISTLITERAL ),
+				   state )
+
+	
+	
+	
+	def python25Document(self, state, node, content):
+		return viewEval( content )
+	
+	
+	
 	
 	def UNPARSED(self, state, node, value):
 		valueUnparsed = UnparsedText( value )
 		valueLabel = label( '<' + value + '>', unparsedStyle )
 		valueUnparsed.associateWith( valueLabel )
 		return nodeEditor( node,
-				   valueLabel,
-				   valueUnparsed,
-				   state )
+				valueLabel,
+				valueUnparsed,
+				state )
 	
 	
 	

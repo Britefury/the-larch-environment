@@ -80,7 +80,7 @@ class DTBox (DTContainerSequence):
 			self.padding = padding
 			self._reqWidth = 0.0
 			self._reqHeight = 0.0
-			self._reqBaseline = 0.0
+			self._reqBaseline = None
 
 
 
@@ -96,6 +96,7 @@ class DTBox (DTContainerSequence):
 		self._padding = padding
 		self._childrenRequisition = Vector2()
 		self._childrenBaseline = 0.0
+		self._childrenAboveBaseline = 0.0
 		self._numExpand = 0
 		self._numShrink = 0
 
@@ -277,33 +278,41 @@ class DTBox (DTContainerSequence):
 
 	def _o_getRequiredHeightAndBaseline(self):
 		aboveBaseline = 0.0
-		baseline = 0.0
+		baseline = None
 		height = 0.0
 		for entry in self._childEntries:
 			req, bas = entry.child._f_getRequisitionHeightAndBaseline()
 			if self._direction == DTBox.LEFT_TO_RIGHT  or  self._direction == DTBox.RIGHT_TO_LEFT:
-				if entry.alignment == self.ALIGN_BASELINES:
+				if entry.alignment == self.ALIGN_BASELINES  and  bas is not None:
 					abv = req - bas
 					entry._reqHeight = req
 					entry._reqBaseline = bas
-					aboveBaseline = max( aboveBaseline, abv )
-					baseline = max( baseline, bas )
+					aboveBaseline = max( aboveBaseline, abv )   if baseline is not None   else   abv
+					baseline = max( baseline, bas )   if baseline is not None   else   bas
 				else:
 					entry._reqHeight = req
-					entry._reqBaseline = 0.0
+					entry._reqBaseline = None
 					height = max( height, req )
 			elif self._direction == DTBox.TOP_TO_BOTTOM  or  self._direction == DTBox.BOTTOM_TO_TOP:
 				entry._reqHeight = req + entry.padding * 2.0
-				entry._reqBaseline = 0.0
+				entry._reqBaseline = None
 				height += entry._reqHeight
-		height = max( height, baseline + aboveBaseline )
+		if baseline is not None:
+			height = max( height, baseline + aboveBaseline )
 		requisition = height
 		if self._direction == DTBox.TOP_TO_BOTTOM  or  self._direction == DTBox.BOTTOM_TO_TOP:
 			if len( self._childEntries ) > 0:
 				requisition += self._spacing  *  ( len( self._childEntries ) - 1 )
 		self._childrenRequisition.y = requisition
-		self._childrenBaseline = baseline
-		return requisition, baseline
+		if self._direction == DTBox.LEFT_TO_RIGHT  or  self._direction == DTBox.RIGHT_TO_LEFT  and  baseline is not None:
+			alignedHeight = aboveBaseline + baseline
+			baselinePadding = ( requisition - alignedHeight )  *  0.5
+			self._childrenAboveBaseline = aboveBaseline - baselinePadding
+			self._childrenBaseline = baseline + baselinePadding
+			return requisition, self._childrenBaseline
+		else:
+			self._childrenAboveBaseline = self._childrenBaseline = None
+			return requisition,  None
 
 
 	def _o_onAllocateX(self, allocation):
@@ -391,6 +400,8 @@ class DTBox (DTContainerSequence):
 				self._o_allocateChildY( entry.child, childY, childHeight )
 				y += childAlloc + self._spacing
 		else:
+			if self._childrenBaseline is not None:
+				aboveBaseline = allocation - self._childrenBaseline
 			for entry in self._childEntries:
 				if entry.alignment == self._ALIGN_TOPLEFT:
 					self._o_allocateChildY( entry.child, 0.0, entry._reqHeight )
@@ -401,8 +412,11 @@ class DTBox (DTContainerSequence):
 				elif entry.alignment == self.ALIGN_EXPAND:
 					self._o_allocateChildY( entry.child, 0.0, allocation )
 				elif entry.alignment == self.ALIGN_BASELINES:
-					y = allocation - self._childrenBaseline + entry._reqBaseline - entry._reqHeight
-					self._o_allocateChildY( entry.child, y, entry._reqHeight )
+					if self._childrenBaseline is None  or  entry._reqBaseline is None:
+						self._o_allocateChildY( entry.child, ( allocation - entry._reqHeight )  *  0.5, entry._reqHeight )
+					else:
+						y = aboveBaseline - ( entry._reqHeight - entry._reqBaseline )
+						self._o_allocateChildY( entry.child, y, entry._reqHeight )
 
 
 	def _o_onChildResizeRequest(self, child):
@@ -514,6 +528,7 @@ if __name__ == '__main__':
 	import pygtk
 	pygtk.require( '2.0' )
 	import gtk
+	import sys
 
 
 	from Britefury.DocPresent.Toolkit.DTLabel import DTLabel
@@ -521,6 +536,8 @@ if __name__ == '__main__':
 	import cairo
 	from Britefury.Math.Math import Colour3f
 	import traceback
+	
+	bBaselineTestOnly = '--baseline' in sys.argv
 
 	def onDeleteEvent(widget, event, data=None):
 		return False
@@ -565,40 +582,66 @@ if __name__ == '__main__':
 	doc = DTDocument()
 	doc.getGtkWidget().show()
 
-	label1 = MyLabel( 'Hello world' )
-	label2 = MyLabel( 'Hello world 2' )
-	label3 = MyLabel( 'Hello world 3' )
-	label4 = MyLabel( 'Hello world 4' )
-	label4.font = 'Sans 30'
 
-	hbox = DTBox( DTBox.LEFT_TO_RIGHT )
-	hbox.append( label1, False )
-	hbox.append( label2, True, True )
-	hbox.append( label3, False )
-	hbox.spacing = 5.0
-	hbox.backgroundColour = Colour3f( 0.6, 0.6, 0.6 )
+	if not bBaselineTestOnly:
+		label1 = MyLabel( 'Hello world' )
+		label2 = MyLabel( 'Hello world 2' )
+		label3 = MyLabel( 'Hello world 3' )
 	
-	labelA = MyLabel( 'Label A yYgGjJpPqQ' )
-	labelB = MyLabel( 'Label B yYgGjJpPqQ' )
-	labelC = MyLabel( 'Label C yYgGjJpPqQ' )
-	labelA.font = 'Sans 11'
-	labelB.font = 'Sans 21'
-	labelC.font = 'Sans 15'
+		row1 = DTBox( DTBox.LEFT_TO_RIGHT )
+		row1.append( label1, False )
+		row1.append( label2, True, True )
+		row1.append( label3, False )
+		row1.spacing = 5.0
+		row1.backgroundColour = Colour3f( 0.6, 0.6, 0.6 )
+		
+	
+		largeLabel = MyLabel( 'Hello world 4' )
+		largeLabel.font = 'Sans 30'
+	
+	
+		labelA = MyLabel( 'Label A yYgGjJpPqQ' )
+		labelB = MyLabel( 'Label B yYgGjJpPqQ' )
+		labelC = MyLabel( 'Label C yYgGjJpPqQ' )
+		labelA.font = 'Sans 11'
+		labelB.font = 'Sans 21'
+		labelC.font = 'Sans 15'
+	
+		row2 = DTBox( DTBox.LEFT_TO_RIGHT, alignment=DTBox.ALIGN_BASELINES )
+		row2.append( labelA )
+		row2.append( labelB )
+		row2.append( labelC )
+		row2.spacing = 5.0
+		row2.backgroundColour = Colour3f( 0.6, 0.6, 0.6 )
+	
+	
+	
+	labelW = MyLabel( 'W' )
+	labelX = MyLabel( 'X' )
+	labelY = MyLabel( 'Y' )
+	labelZ = MyLabel( 'Z' )
+	yOverZ = DTBox( DTBox.TOP_TO_BOTTOM )
+	yOverZ.append( labelY )
+	yOverZ.append( labelZ )
+	wxyz = DTBox( DTBox.LEFT_TO_RIGHT, alignment=DTBox.ALIGN_BASELINES )
+	wxyz.append( labelW )
+	wxyz.append( labelX )
+	wxyz.append( yOverZ )
+	wxyz.backgroundColour = Colour3f( 0.9, 0.9, 0.9 )
 
-	hbox2 = DTBox( DTBox.LEFT_TO_RIGHT, alignment=DTBox.ALIGN_BASELINES )
-	hbox2.append( labelA )
-	hbox2.append( labelB )
-	hbox2.append( labelC )
-	hbox2.spacing = 5.0
-	hbox2.backgroundColour = Colour3f( 0.6, 0.6, 0.6 )
-
+	
+	
 	vbox = DTBox( DTBox.TOP_TO_BOTTOM, alignment=DTBox.ALIGN_EXPAND )
-	vbox.append( hbox, False )
-	vbox.append( label4, False )
-	vbox.append( hbox2, False )
+	if not bBaselineTestOnly:
+		vbox.append( row1, False )
+		vbox.append( largeLabel, False )
+		vbox.append( row2, False )
+	vbox.append( wxyz, False )
 	vbox.spacing = 10.0
 	vbox.backgroundColour = Colour3f( 0.8, 0.8, 0.8 )
 
+	
+	
 	doc.child = vbox
 
 

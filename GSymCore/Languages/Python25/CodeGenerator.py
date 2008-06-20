@@ -45,11 +45,19 @@ class Python25CodeGenerator (GSymCodeGenerator):
 		return self( target ) + '.' + name
 
 	
-	def add(self, node, x, y):
-		return '( '  +  self( x )  +  ' + '  +  self( y )  +  ' )'
+	def pow(self, node, x, y):
+		return '( '  +  self( x )  +  ' ** '  +  self( y )  +  ' )'
 	
-	def sub(self, node, x, y):
-		return '( '  +  self( x )  +  ' - '  +  self( y )  +  ' )'
+	
+	def invert(self, node, x):
+		return '~( '  +  self( x )  +  ' )'
+	
+	def negate(self, node, x):
+		return '-( '  +  self( x )  +  ' )'
+	
+	def pos(self, node, x):
+		return '+( '  +  self( x )  +  ' )'
+	
 	
 	def mul(self, node, x, y):
 		return '( '  +  self( x )  +  ' * '  +  self( y )  +  ' )'
@@ -60,8 +68,71 @@ class Python25CodeGenerator (GSymCodeGenerator):
 	def mod(self, node, x, y):
 		return '( '  +  self( x )  +  ' % '  +  self( y )  +  ' )'
 	
-	def pow(self, node, x, y):
-		return '( '  +  self( x )  +  ' ** '  +  self( y )  +  ' )'
+	def add(self, node, x, y):
+		return '( '  +  self( x )  +  ' + '  +  self( y )  +  ' )'
+	
+	def sub(self, node, x, y):
+		return '( '  +  self( x )  +  ' - '  +  self( y )  +  ' )'
+	
+	
+	def lshift(self, node, x, y):
+		return '( '  +  self( x )  +  ' << '  +  self( y )  +  ' )'
+	
+	def rshift(self, node, x, y):
+		return '( '  +  self( x )  +  ' >> '  +  self( y )  +  ' )'
+	
+	
+	def bitAnd(self, node, x, y):
+		return '( '  +  self( x )  +  ' & '  +  self( y )  +  ' )'
+	
+	def bitXor(self, node, x, y):
+		return '( '  +  self( x )  +  ' ^ '  +  self( y )  +  ' )'
+	
+	def bitOr(self, node, x, y):
+		return '( '  +  self( x )  +  ' | '  +  self( y )  +  ' )'
+	
+
+	def lte(self, node, x, y):
+		return '( '  +  self( x )  +  ' <= '  +  self( y )  +  ' )'
+	
+	def lt(self, node, x, y):
+		return '( '  +  self( x )  +  ' < '  +  self( y )  +  ' )'
+	
+	def gte(self, node, x, y):
+		return '( '  +  self( x )  +  ' >= '  +  self( y )  +  ' )'
+	
+	def gt(self, node, x, y):
+		return '( '  +  self( x )  +  ' > '  +  self( y )  +  ' )'
+	
+	def eq(self, node, x, y):
+		return '( '  +  self( x )  +  ' == '  +  self( y )  +  ' )'
+	
+	def neq(self, node, x, y):
+		return '( '  +  self( x )  +  ' != '  +  self( y )  +  ' )'
+	
+
+	def cmpIsNot(self, node, x, y):
+		return '( '  +  self( x )  +  ' is not '  +  self( y )  +  ' )'
+	
+	def cmpIs(self, node, x, y):
+		return '( '  +  self( x )  +  ' is '  +  self( y )  +  ' )'
+	
+	def cmpNotIn(self, node, x, y):
+		return '( '  +  self( x )  +  ' not in '  +  self( y )  +  ' )'
+	
+	def cmpIn(self, node, x, y):
+		return '( '  +  self( x )  +  ' in '  +  self( y )  +  ' )'
+
+	
+	def boolNot(self, node, x):
+		return '(not '  +  self( x )  +  ')'
+	
+	def boolAnd(self, node, x, y):
+		return '( '  +  self( x )  +  ' and '  +  self( y )  +  ' )'
+	
+	def boolOr(self, node, x, y):
+		return '( '  +  self( x )  +  ' or '  +  self( y )  +  ' )'
+	
 	
 	def var(self, node, name):
 		return name
@@ -71,3 +142,7 @@ class Python25CodeGenerator (GSymCodeGenerator):
 	
 	def listDisplay(self, node, *x):
 		return '[ '  +  ', '.join( [ self( i )   for i in x ] )  +  ' ]'
+	
+	
+	def python25Document(self, node, content):
+		return self( content )
