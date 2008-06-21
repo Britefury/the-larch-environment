@@ -44,7 +44,6 @@ imaginaryLiteral = Production( Combine( [ ( floatingPoint | decimalInteger ), Li
 literal = shortStringLiteral | imaginaryLiteral | floatLiteral | integerLiteral
 
 
-argName = Production( pythonIdentifier )
 attrName = Production( pythonIdentifier )
 
 
@@ -68,34 +67,24 @@ atom = Production( enclosure | literal | loadLocal )
 primary = Forward()
 
 
+argName = Production( pythonIdentifier )
 kwArg = Production( argName + '=' + expression ).action( lambda input, begin, xs: [ 'kwArg', xs[0], xs[2] ] )
 argList = Production( Literal( '*' )  +  expression ).action( lambda input, begin, xs: [ 'argList', xs[1] ] )
 kwArgList = Production( Literal( '**' )  +  expression ).action( lambda input, begin, xs: [ 'kwArgList', xs[1] ] )
 arg = Production( kwArgList | argList | kwArg | expression )
-listOfArgs = Production( Suppress( '(' )  -  separatedList( arg )  -  Suppress( ')' ) )
-call = Production( ( primary + listOfArgs ).action( lambda input, begin, tokens: [ 'call', tokens[0] ] + tokens[1] ) )
+listOfArgs = Production( separatedList( arg ) )
+call = Production( ( primary + Literal( '(' ) + listOfArgs + Literal( ')' ) ).action( lambda input, begin, tokens: [ 'call', tokens[0] ] + tokens[2] ) )
 
 
-subscript = Production( ( primary + '[' + expression + ']' ).action( lambda input, begin, tokens: [ 'subscript', tokens[0], tokens[2] ] ) )
-slice = Production( ( primary + '[' + expression + ':' + expression + ']' ).action( lambda input, begin, tokens: [ 'slice', tokens[0], tokens[2], tokens[4] ] ) )
+subscriptSlice = Production( ( expression + ':' + expression ).action( lambda input, begin, tokens: [ 'subscriptSlice', tokens[0], tokens[2] ] ) )
+subscriptIndex = Production( subscriptSlice  |  expression )
+subscript = Production( ( primary + '[' + subscriptIndex + ']' ).action( lambda input, begin, tokens: [ 'subscript', tokens[0], tokens[2] ] ) )
 attr = Production( primary + '.' + attrName ).action( lambda input, begin, tokens: [ 'attr', tokens[0], tokens[2] ] )
-primary  <<  Production( call | subscript | slice | attr | atom )
+primary  <<  Production( call | subscript | attr | atom )
 
 
 
-
-#power = Forward()
-#power  <<  Production( ( primary  +  '**'  +  power ).action( lambda input, begin, xs: [ 'pow', xs[0], xs[2] ] )   |   primary )
-
-#_symToOp = { '+' : 'add',  '-' : 'sub',  '*' : 'mul',  '/' : 'div',  '%' : 'mod' }
-#mulDivMod = Forward()
-#mulDivMod  <<  Production( ( mulDivMod + ( Literal( '*' ) | '/' | '%' ) + power ).action( lambda input, begin, xs:  [ _symToOp[xs[1]], xs[0], xs[2] ] )  |  power )
-#addSub = Forward()
-#addSub  <<  Production( ( addSub + ( Literal( '+' ) | '-' ) + mulDivMod ).action( lambda input, begin, xs: [ _symToOp[xs[1]], xs[0], xs[2] ] )  |  mulDivMod )
-
-
-
-addSub = buildOperatorParser( \
+boolOr = buildOperatorParser( \
 	[
 		[ InfixRight( Literal( '**' ),  lambda op, x, y: [ 'pow', x, y ] ) ],
 		[ Prefix( Literal( '~' ),  lambda op, x: [ 'invert', x ] ),   Prefix( Literal( '-' ),  lambda op, x: [ 'negate', x ] ),   Prefix( Literal( '+' ),  lambda op, x: [ 'pos', x ] ) ],
@@ -120,5 +109,15 @@ addSub = buildOperatorParser( \
 		[ InfixLeft( Keyword( orKeyword ),  lambda op, x, y: [ 'boolOr', x, y ] ) ],
 	],  primary )
 
+
+paramName = pythonIdentifier
+simpleParam = Production( pythonIdentifier.action( lambda input, begin, xs: [ 'simpleParam', xs[0] ] ) )
+defaultValueParam = Production( paramName + '=' + expression ).action( lambda input, begin, xs: [ 'defaultValueParam', xs[0], xs[2] ] )
+paramList = Production( Literal( '*' )  +  paramName ).action( lambda input, begin, xs: [ 'paramList', xs[1] ] )
+kwParamList = Production( Literal( '**' )  +  paramName ).action( lambda input, begin, xs: [ 'kwParamList', xs[1] ] )
+param = Production( kwParamList | paramList | defaultValueParam | simpleParam )
+listOfParams = Production( separatedList( arg ) )
+lambdaExpr = Production( ( Keyword( lambdaKeyword )  +  listOfParams  +  Literal( ':' )  +  expression ).action( lambda input, pos, xs: [ 'lambdaExpr', xs[1], xs[3] ] ) )
+
 			 
-expression  <<  Production( addSub )
+expression  <<  Production( lambdaExpr  |  boolOr )
