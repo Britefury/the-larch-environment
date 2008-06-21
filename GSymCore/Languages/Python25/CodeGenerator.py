@@ -38,9 +38,6 @@ class Python25CodeGenerator (GSymCodeGenerator):
 	def subscript(self, node, target, index):
 		return self( target ) + '[' + self( index ) + ']'
 	
-	def slice(self, node, target, first, second):
-		return self( target ) + '[' + self( first ) + ':' + self( second ) + ']'
-	
 	def attr(self, node, target, name):
 		return self( target ) + '.' + name
 
@@ -133,6 +130,23 @@ class Python25CodeGenerator (GSymCodeGenerator):
 	def boolOr(self, node, x, y):
 		return '( '  +  self( x )  +  ' or '  +  self( y )  +  ' )'
 	
+	
+	def simpleParam(self, node, name):
+		return name
+	
+	def defaultValueParam(self, node, name, value):
+		return name  +  ' = '  +  self( value )
+	
+	def paramList(self, node, name):
+		return '*'  +  name
+	
+	def kwParamList(self, node, name):
+		return '**'  +  name
+	
+	def lambdaExpr(self, node, params, expr):
+		return 'lambda '  +  ', '.join( [ self( p )   for p in params ] )  +  ': '  +  self( expr )
+	
+
 	
 	def var(self, node, name):
 		return name

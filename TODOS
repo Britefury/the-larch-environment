@@ -23,18 +23,13 @@ TODOS:
 
 
 
-- The following talk by Guy Steele gives information on language design that could be very useful
-    http://video.google.com/videoplay?docid=-8860158196198824415&q=guy+steele&total=977&start=0&num=10&so=0&type=search&plindex=0
-
-- Use the following presentation on unicode in Python to check gSym over:
-    http://farmdev.com/talks/unicode/
 
 - Typesetting:
    - Add baseline alignment to DTFlow
 - Document presenation toolkit:
    - Debug DTFlow
-- For editing languages 'live'; use the smalltalk-ish multiple worlds idea; use one world to edit a hosted world
-- Implement web-browser style user interface - urls, tabbed browsing
+- When a parse fails, commit the unparsed text, and then try refreshing the outer expression;
+  start with a[x]. Change the 'x' to 'x:2'. 'x:2' is not a valid expression.
 - Check out the Psyco optimiser, since it works on Linux and Windows.
 - GSym will screw up if the system attempts to render two views of the same document node:
      The pattern matcher matches a pattern
@@ -43,11 +38,9 @@ TODOS:
      ($viewEval @b)
      ($viewEval @a)
      Would cause an error, as the second view of @a would cause it to try to recreate the view of @a
-- Generate debug information for compiled code
-- Handle debug information
-- GLisp (compiled to Python) code can generate bad data; check the sanity before processing it
-- Ensure that the build contents function can return a DVNode; if it does not generate a widget, this causes an error,
-since this widget is passed straight through to the node above/outside
+- Use the following presentation on unicode in Python to check gSym over:
+    http://farmdev.com/talks/unicode/
+
 
 
 HANDLE/CORRECT THE FOLLOWING ERRORS IN THE VIEW:

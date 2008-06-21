@@ -20,7 +20,7 @@ from Britefury.gSym.View.gSymStyleSheet import GSymStyleSheet
 from Britefury.gSym.View.UnparsedText import UnparsedText
 
 
-from GSymCore.Languages.Python25.Parser import expression as expressionParser, arg as argParser
+from GSymCore.Languages.Python25.Parser import expression as expressionParser, arg as argParser, subscriptSlice as subscriptSliceParser, param as paramParser
 
 
 
@@ -66,9 +66,11 @@ PRECEDENCE_LOADLOCAL = 0
 PRECEDENCE_LISTLITERAL = 0
 PRECEDENCE_CALL = 0
 PRECEDENCE_SUBSCRIPT = 0
-PRECEDENCE_SLICE = 0
 PRECEDENCE_ATTR = 0
+
+PRECEDENCE_SUBSCRIPTSLICE = 0
 PRECEDENCE_ARG = 0
+PRECEDENCE_PARAM = 0
 	
 
 divBoxStyle = GSymStyleSheet( alignment='expand' )
@@ -78,34 +80,38 @@ numericLiteralStyle = GSymStyleSheet( colour=Colour3f( 0.0, 0.5, 0.5 ), font='Sa
 literalFormatStyle = GSymStyleSheet( colour=Colour3f( 0.0, 0.0, 0.5 ), font='Sans 11' )
 punctuationStyle = GSymStyleSheet( colour=Colour3f( 0.0, 0.0, 1.0 ), font='Sans 11' )
 operatorStyle = GSymStyleSheet( colour=Colour3f( 0.0, 0.5, 0.0 ), font='Sans 11' )
+keywordStyle = GSymStyleSheet( colour=Colour3f( 0.25, 0.0, 0.5 ), font='Sans 11' )
 
 
 
 def _paren(x):
 	return '( ' + x + ' )'
 
+def _unparsePrecedenceGT(x, outerPrecedence):
+	if outerPrecedence is not None  and  x.state is not None  and  x.state > outerPrecedence:
+		return _paren( x )
+	else:
+		return x
+
+def _unparsePrecedenceGTE(x, outerPrecedence):
+	if outerPrecedence is not None  and  x.state is not None  and  x.state >= outerPrecedence:
+		return _paren( x )
+	else:
+		return x
+
 def _unparsePrefixOpView(x, op, precedence):
-	xPrec = x.state
-	if precedence is not None:
-		if xPrec > precedence:
-			x = _paren( x )
+	x = _unparsePrecedenceGT( x, precedence )
 	return UnparsedText( op + ' ' + x,  state=precedence )
 
 def _unparseBinOpView(x, y, op, precedence, bRightAssociative=False):
-	xPrec = x.state
-	yPrec = y.state
-	if precedence is not None:
-		if bRightAssociative:
-			if xPrec >= precedence:
-				x = _paren( x )
-			if yPrec > precedence:
-				y = _paren( y )
-		else:
-			if xPrec > precedence:
-				x = _paren( x )
-			if yPrec >= precedence:
-				y = _paren( y )
+	if bRightAssociative:
+		x = _unparsePrecedenceGTE( x, precedence )
+		y = _unparsePrecedenceGT( y, precedence )
+	else:
+		x = _unparsePrecedenceGT( x, precedence )
+		y = _unparsePrecedenceGTE( y, precedence )
 	return UnparsedText( x + ' ' + op + ' ' + y,  state=precedence )
+
 
 
 
@@ -251,35 +257,34 @@ class Python25View (GSymView):
 				UnparsedText( '**'  +  valueView.text,  PRECEDENCE_ARG ),
 				state )
 
-	def call(self, state, node, target, *params):
+	def call(self, state, node, target, *args):
 		targetView = viewEval( target )
-		paramViews = mapViewEval( params, None, argParser )
-		paramWidgets = []
-		if len( params ) > 0:
-			for p in paramViews[:-1]:
-				paramWidgets.append( p )
-				paramWidgets.append( label( ',', punctuationStyle ) )
-			paramWidgets.append( paramViews[-1] )
+		argViews = mapViewEval( args, None, argParser )
+		argWidgets = []
+		if len( args ) > 0:
+			for a in argViews[:-1]:
+				argWidgets.append( a )
+				argWidgets.append( label( ',', punctuationStyle ) )
+			argWidgets.append( argViews[-1] )
 		return nodeEditor( node,
-				ahbox( [ viewEval( target ), label( '(', punctuationStyle ) ]  +  paramWidgets  +  [ label( ')', punctuationStyle ) ] ),
-				UnparsedText( targetView.text + '( ' + UnparsedText( ', ' ).join( [ p.text   for p in paramViews ] ) + ' )',  PRECEDENCE_CALL ),
+				ahbox( [ viewEval( target ), label( '(', punctuationStyle ) ]  +  argWidgets  +  [ label( ')', punctuationStyle ) ] ),
+				UnparsedText( _unparsePrecedenceGT( targetView.text, PRECEDENCE_CALL ) + '( ' + UnparsedText( ', ' ).join( [ a.text   for a in argViews ] ) + ' )',  PRECEDENCE_CALL ),
 				state )
 	
+	def subscriptSlice(self, state, node, x, y):
+		xView = viewEval( x )
+		yView = viewEval( y )
+		return nodeEditor( node,
+				ahbox( [ xView, label( ':', punctuationStyle ), yView  ] ),
+				UnparsedText( xView.text  +  ':'  +  yView.text,  PRECEDENCE_SUBSCRIPTSLICE ),
+				state )
+
 	def subscript(self, state, node, target, index):
 		targetView = viewEval( target )
-		indexView = viewEval( index )
+		indexView = viewEval( index, None, subscriptSliceParser )
 		return nodeEditor( node,
 				ahbox( [ targetView,  label( '[', punctuationStyle ),  indexView,  label( ']', punctuationStyle ) ] ),
-				UnparsedText( targetView.text + '[' + indexView.text + ']',  PRECEDENCE_SUBSCRIPT ),
-				state )
-	
-	def slice(self, state, node, target, first, second):
-		targetView = viewEval( target )
-		firstView = viewEval( first )
-		secondView = viewEval( second )
-		return nodeEditor( node,
-				ahbox( [ targetView,  label( '[', punctuationStyle ),  firstView,  label( ':', punctuationStyle ),  secondView,  label( ']', punctuationStyle ) ] ),
-				UnparsedText( targetView.text + '[' + firstView.text + ':' + secondView.text + ']',  PRECEDENCE_SUBSCRIPT ),
+				UnparsedText( _unparsePrecedenceGT( targetView.text, PRECEDENCE_SUBSCRIPT ) + '[' + indexView.text + ']',  PRECEDENCE_SUBSCRIPT ),
 				state )
 	
 	def attr(self, state, node, target, name):
@@ -289,7 +294,7 @@ class Python25View (GSymView):
 		nameUnparsed.associateWith( nameLabel )
 		return nodeEditor( node,
 				ahbox( [ viewEval( target ),  label( '.' ),  nameLabel ] ),
-				UnparsedText( targetView.text + '.' + nameUnparsed,  PRECEDENCE_ATTR ),
+				UnparsedText( _unparsePrecedenceGT( targetView.text, PRECEDENCE_ATTR ) + '.' + nameUnparsed,  PRECEDENCE_ATTR ),
 				state )
 
 	
@@ -387,6 +392,48 @@ class Python25View (GSymView):
 		return horizontalBinOpView( state, node, x, y, 'or', PRECEDENCE_OR )
 
 
+	
+	def simpleParam(self, state, node, name):
+		return nodeEditor( node,
+				label( name ),
+				UnparsedText( name,  PRECEDENCE_PARAM ),
+				state )
+
+	def defaultValueParam(self, state, node, name, value):
+		valueView = viewEval( value )
+		return nodeEditor( node,
+				ahbox( [ label( name ), label( '=', punctuationStyle ), valueView ] ),
+				UnparsedText( name  +  '='  +  valueView.text,  PRECEDENCE_PARAM ),
+				state )
+
+	def paramList(self, state, node, name):
+		return nodeEditor( node,
+				ahbox( [ label( '*', punctuationStyle ), label( name ) ] ),
+				UnparsedText( '*'  +  name,  PRECEDENCE_PARAM ),
+				state )
+
+	def kwParamList(self, state, node, name):
+		return nodeEditor( node,
+				ahbox( [ label( '**', punctuationStyle ), label( name ) ] ),
+				UnparsedText( '**'  +  name,  PRECEDENCE_PARAM ),
+				state )
+
+	def lambdaExpr(self, state, node, params, expr):
+		exprView = viewEval( expr )
+		paramViews = mapViewEval( params, None, paramParser )
+		paramWidgets = []
+		if len( params ) > 0:
+			for p in paramViews[:-1]:
+				paramWidgets.append( p )
+				paramWidgets.append( label( ',', punctuationStyle ) )
+			paramWidgets.append( paramViews[-1] )
+		return nodeEditor( node,
+				ahbox( [ label( 'lambda', keywordStyle ) ]  +  paramWidgets  +  [ label( ':', punctuationStyle ), exprView ] ),
+				UnparsedText( 'lambda ' + UnparsedText( ', ' ).join( [ p.text   for p in paramViews ] ) + ': '  +  exprView.text,  PRECEDENCE_CALL ),
+				state )
+
+	
+	
 	def var(self, state, node, name):
 		nameUnparsed = UnparsedText( name )
 		nameLabel = label( name )

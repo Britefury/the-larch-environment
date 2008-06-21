@@ -193,3 +193,11 @@ These bindings would be very helpful for creating compilers.
         well presented pages. What if a page references part of a where expression (e.g. one bindig) or part of a match
         expression (e.g. a pattern - expression pair)? This poses the problem of how view state is handled.
 
+        
+        
+21/June/2008
+- For editing languages 'live'; use the smalltalk-ish multiple worlds idea; use one world to edit a hosted world
+- Implement web-browser style user interface - urls, tabbed browsing
+- The following talk by Guy Steele gives information on language design that could be very useful
+    http://video.google.com/videoplay?docid=-8860158196198824415&q=guy+steele&total=977&start=0&num=10&so=0&type=search&plindex=0
+
