@@ -154,9 +154,12 @@ class Python25CodeGenerator (GSymCodeGenerator):
 	def nilExpr(self, node):
 		return '<NIL>'
 	
+	def blankLine(self, node):
+		return ''
+	
 	def listDisplay(self, node, *x):
 		return '[ '  +  ', '.join( [ self( i )   for i in x ] )  +  ' ]'
 	
 	
-	def python25Document(self, node, content):
-		return self( content )
+	def python25Module(self, node, *content):
+		return '\n'.join( [ self( line )   for line in content ] )

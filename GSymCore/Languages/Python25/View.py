@@ -5,43 +5,68 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
-from Britefury.Math.Math import Colour3f
-
 from Britefury.gSym.View.gSymView import activeBorder, border, indent, highlight, hline, label, markupLabel, entry, markupEntry, customEntry, hbox, ahbox, vbox, flow, flowSep, \
      script, scriptLSuper, scriptLSub, scriptRSuper, scriptRSub, listView, interact, focus, viewEval, mapViewEval, GSymView
-from Britefury.gSym.View.ListView import WrappedListViewLayout, HorizontalListViewLayout, VerticalInlineListViewLayout, VerticalListViewLayout
+from Britefury.gSym.View.ListView import FlowListViewLayout, HorizontalListViewLayout, VerticalInlineListViewLayout, VerticalListViewLayout
 
 from Britefury.gSym.View.Interactor import keyEventMethod, accelEventMethod, textEventMethod, tokenListEventMethod, Interactor
 
-from Britefury.gSym.View.EditOperations import replace
-
-from Britefury.gSym.View.gSymStyleSheet import GSymStyleSheet
+from Britefury.gSym.View.EditOperations import replace, insertAfter
 
 from Britefury.gSym.View.UnparsedText import UnparsedText
 
 
 from GSymCore.Languages.Python25.Parser import expression as expressionParser, arg as argParser, subscriptSlice as subscriptSliceParser, param as paramParser
+from GSymCore.Languages.Python25.Styles import *
 
+
+
+
+def _parseText(parser, text):
+	res, pos = parser.parseString( text )
+	if res is not None:
+		if pos == len( text ):
+			return res.result
+		else:
+			print '<INCOMPLETE>'
+			print 'FULL TEXT:', text
+			print 'PARSED:', text[:pos]
+			return None
+	else:
+		print 'FULL TEXT:', text
+		print '<FAIL>'
+		return None
 
 
 class ParsedNodeInteractor (Interactor):
 	@textEventMethod()
-	def tokData(self, value, node, parser):
-		res, pos = parser.parseString( value )
-		parsed = None
-		if res is not None:
-			if pos == len( value ):
-				parsed = res.result
+	def tokData(self, bUserEvent, bChanged, value, node, parser):
+		if bChanged:
+			parsed = _parseText( parser, value )
+			if parsed is not None:
+				return replace( node, parsed )
 			else:
-				print '<INCOMPLETE>'
-		else:
-			print '<FAIL>'
-		if parsed is not None:
-			return replace( node, parsed )
-		else:
-			print 'FULL TEXT:', value
-			print 'PARSED:', value[:pos]
-			return replace( node, [ 'UNPARSED', value ] )
+				return replace( node, [ 'UNPARSED', value ] )
+	
+	eventMethods = [ tokData ]
+
+
+	
+
+class ParsedLineInteractor (Interactor):
+	@textEventMethod()
+	def tokData(self, bUserEvent, bChanged, value, node, parser):
+		if bChanged:
+			if value.strip() == '':
+				return replace( node, [ 'blankLine' ] )
+			else:
+				parsed = _parseText( parser, value )
+				if parsed is not None:
+					return replace( node, parsed )
+				else:
+					return replace( node, [ 'UNPARSED', value ] )
+		if bUserEvent:
+			return insertAfter( node, [ 'blankLine' ] )
 	
 	eventMethods = [ tokData ]
 
@@ -73,14 +98,6 @@ PRECEDENCE_ARG = 0
 PRECEDENCE_PARAM = 0
 	
 
-divBoxStyle = GSymStyleSheet( alignment='expand' )
-nilStyle = GSymStyleSheet( colour=Colour3f( 0.75, 0.0, 0.0 ), font='Sans 11 italic' )
-unparsedStyle = GSymStyleSheet( colour=Colour3f( 0.75, 0.0, 0.0 ), font='Sans 11 italic' )
-numericLiteralStyle = GSymStyleSheet( colour=Colour3f( 0.0, 0.5, 0.5 ), font='Sans 11' )
-literalFormatStyle = GSymStyleSheet( colour=Colour3f( 0.0, 0.0, 0.5 ), font='Sans 11' )
-punctuationStyle = GSymStyleSheet( colour=Colour3f( 0.0, 0.0, 1.0 ), font='Sans 11' )
-operatorStyle = GSymStyleSheet( colour=Colour3f( 0.0, 0.5, 0.0 ), font='Sans 11' )
-keywordStyle = GSymStyleSheet( colour=Colour3f( 0.25, 0.0, 0.5 ), font='Sans 11' )
 
 
 
@@ -115,10 +132,30 @@ def _unparseBinOpView(x, y, op, precedence, bRightAssociative=False):
 
 
 
-def nodeEditor(node, contents, text, parser=expressionParser):
-	if parser is None:
+MODE_EXPRESSION = 0
+MODE_LINE = 1
+
+
+
+def python25ViewState(parser, mode=MODE_EXPRESSION):
+	return parser, mode
+
+
+
+def nodeEditor(node, contents, text, state):
+	if state is None:
 		parser = expressionParser
-	return interact( customEntry( highlight( contents ), text.getText() ),  ParsedNodeInteractor( node, parser ) ),   text
+		mode = MODE_EXPRESSION
+	else:
+		parser, mode = state
+
+	if mode == MODE_EXPRESSION:
+		return interact( customEntry( highlight( contents, 'ctrl', 'ctrl' ), text.getText(), 'ctrl', 'ctrl' ),  ParsedNodeInteractor( node, parser ) ),   text
+	elif mode == MODE_LINE:
+		return interact( customEntry( highlight( contents, style=lineEditorStyle ), text.getText() ),  ParsedLineInteractor( node, parser ) ),   text
+	else:
+		raise ValueError
+		
 
 
 def binOpView(state, node, x, y, unparsedOp, widgetFactory, precedence):
@@ -259,7 +296,7 @@ class Python25View (GSymView):
 
 	def call(self, state, node, target, *args):
 		targetView = viewEval( target )
-		argViews = mapViewEval( args, None, argParser )
+		argViews = mapViewEval( args, None, python25ViewState( argParser ) )
 		argWidgets = []
 		if len( args ) > 0:
 			for a in argViews[:-1]:
@@ -281,7 +318,7 @@ class Python25View (GSymView):
 
 	def subscript(self, state, node, target, index):
 		targetView = viewEval( target )
-		indexView = viewEval( index, None, subscriptSliceParser )
+		indexView = viewEval( index, None, python25ViewState( subscriptSliceParser ) )
 		return nodeEditor( node,
 				ahbox( [ targetView,  label( '[', punctuationStyle ),  indexView,  label( ']', punctuationStyle ) ] ),
 				UnparsedText( _unparsePrecedenceGT( targetView.text, PRECEDENCE_SUBSCRIPT ) + '[' + indexView.text + ']',  PRECEDENCE_SUBSCRIPT ),
@@ -420,7 +457,7 @@ class Python25View (GSymView):
 
 	def lambdaExpr(self, state, node, params, expr):
 		exprView = viewEval( expr )
-		paramViews = mapViewEval( params, None, paramParser )
+		paramViews = mapViewEval( params, None, mapViewEval( paramParser ) )
 		paramWidgets = []
 		if len( params ) > 0:
 			for p in paramViews[:-1]:
@@ -449,18 +486,28 @@ class Python25View (GSymView):
 				UnparsedText( 'None' ),
 				state )
 	
+	
+	def blankLine(self, state, node):
+		return nodeEditor( node,
+				label( ' ' ),
+				UnparsedText( '' ),
+				state )
+	
+	
 	def listDisplay(self, state, node, *xs):
 		xViews = mapViewEval( xs )
 		return nodeEditor( node,
-				   listView( VerticalListViewLayout( 0.0, 0.0, 45.0 ), '[', ']', ',', xViews ),
+				   #listView( VerticalListViewLayout( 0.0, 0.0, 45.0 ), '[', ']', ',', xViews ),
+				   listView( FlowListViewLayout( 10.0, 5.0 ), '[', ']', ',', xViews ),
 				   UnparsedText( '[ '  +  UnparsedText( ', ' ).join( [ x.text   for x in xViews ] )  +  ' ]', PRECEDENCE_LISTLITERAL ),
 				   state )
 
 	
 	
 	
-	def python25Document(self, state, node, content):
-		return viewEval( content )
+	def python25Module(self, state, node, *content):
+		lineViews = mapViewEval( content, None, python25ViewState( expressionParser, MODE_LINE ) )
+		return listView( VerticalListViewLayout( 0.0, 0.0, 0.0 ), None, None, None, lineViews ), ''
 	
 	
 	

@@ -30,6 +30,18 @@ def replace(data, replacement):
 		return relative( data.parent[data.indexInParent], data.parent, data.indexInParent )
 	else:
 		raise TypeError, '$replace: @data must be a RelativeNode'
+	
+	
+	
+def insertAfter(pos, data):
+	if isinstance( pos, RelativeNode ):
+		if not isinstance( pos.parent, DMListInterface ):
+			raise TypeError, '$insertAfter: @pos.parent must be a DMListInterface, not %s'  %  ( type( pos.parent ), )
+		index = pos.parent.index( pos.node ) + 1
+		pos.parent.insert( index, _sanitiseInputData( data ) )
+		return relative( pos.parent[index], pos.parent, pos.index )
+	else:
+		raise TypeError, '$insertAfter: @pos must be a RelativeNode'
 
 
 

@@ -287,13 +287,13 @@ def indent(child, indentation, style=None):
 	_applyStyle( style, widget )
 	return widget
 
-def highlight(child, style=None):
+def highlight(child, stateMask=0, stateTest=0, style=None):
 	"""
 	Runtime - called by compiled code at run-time
 	Builds a DTHighlight widget, with child, builds and registers a refresh cell
 	"""
 	viewNodeInstance = _globalNodeViewInstanceStack[-1]
-	widget = DTHighlight()
+	widget = DTHighlight( stateMask, stateTest )
 	_binRefreshCell( viewNodeInstance, widget, child )
 	_applyStyleSheetStack( viewNodeInstance, widget )
 	_applyStyle( style, widget )
@@ -368,14 +368,14 @@ def markupEntry(labelText, entryText, style=None):
 	_applyStyle( style, widget )
 	return widget
 
-def customEntry(customChild, entryText, style=None):
+def customEntry(customChild, entryText, stateMask=0, stateTest=0, style=None):
 	"""Builds a DTEntryLabel widget"""
 	viewNodeInstance = _globalNodeViewInstanceStack[-1]
 	if isinstance( entryText, RelativeNode ):
 		entryText = entryText.node
 	elif isinstance( entryText, UnparsedText ):
 		entryText = entryText.getText()
-	widget = DTCustomEntry( entryText )
+	widget = DTCustomEntry( entryText, stateMask=stateMask, stateTest=stateTest )
 	widget.textModifiedSignal.connect( viewNodeInstance.viewInstance._p_onEntryModifed )
 	widget.finishEditingSignal.connect( viewNodeInstance.viewInstance._p_onEntryFinished )
 	_customEntryRefreshCell( viewNodeInstance, widget, customChild )
@@ -534,7 +534,7 @@ def listView(layout, beginDelim, endDelim, separatorFactory, children, style=Non
 	@layout controls the layout
 	"""
 	viewNodeInstance = _globalNodeViewInstanceStack[-1]
-	widget, refreshCell = ListView.listView( viewNodeInstance.xs, children, layout, beginDelim, endDelim, separatorFactory )
+	widget, refreshCell = ListView.listView( viewNodeInstance.xs, layout, beginDelim, endDelim, separatorFactory, children )
 	viewNodeInstance.refreshCells.append( refreshCell )
 	_applyStyleSheetStack( viewNodeInstance, widget )
 	_applyStyle( style, widget )
@@ -566,7 +566,7 @@ class _DocEventHandler (object):
 def interact(child, *interactors):
 	"""
 	Runtime - called by compiled code at run-time
-	Builds a DTBorder widget, with child, builds and registers a refresh cell
+	Connects interactors
 	"""
 	
 	viewNodeInstance = _globalNodeViewInstanceStack[-1]
@@ -575,19 +575,18 @@ def interact(child, *interactors):
 		if isinstance( c, DVNode ):
 			widget = DTBin()
 			widget.addDocEventHandler( _DocEventHandler( viewNodeInstance.viewInstance, interactors ) )
-			_binRefreshCell( viewNodeInstance, widget, child )
+			_binRefreshCell( viewNodeInstance, widget, c )
+			return widget
 		elif isinstance( c, DTWidget ):
 			c.addDocEventHandler( _DocEventHandler( viewNodeInstance.viewInstance, interactors ) )
+			return c
 		else:
 			raiseRuntimeError( TypeError, viewNodeInstance.xs, 'interact: could not process child of type %s'  %  ( type( c ).__name__, ) )
 			
 	if isinstance( child, list )  or  isinstance( child, tuple ):
-		for c in child:
-			_processChild( c )
+		return [ _processChild( c )   for c in child ]
 	else:
-		_processChild( child )
-		
-	return child
+		return _processChild( child )
 		
 
 def focus(child):
@@ -783,8 +782,8 @@ class _GSymViewInstance (object):
 	
 
 	
-	def _p_sendTextDocEvent(self, widget, text):
-		event = InteractorEventText( True, text )
+	def _p_sendTextDocEvent(self, widget, bUserEvent, bChanged, text):
+		event = InteractorEventText( bUserEvent, bChanged, text )
 		bHandled = self._p_sendDocEventToWidget( widget, event )
 		if not bHandled:
 			print 'gSymView._sendTokenListDocEvent: ***unhandled event*** %s'  %  ( event, )
@@ -794,13 +793,12 @@ class _GSymViewInstance (object):
 		pass
 	
 	def _p_onEntryFinished(self, widget, text, bChanged, bUserEvent):
-		if bUserEvent  and  bChanged:
-			self._p_sendTextDocEvent( widget, text )
+		self._p_sendTextDocEvent( widget, bUserEvent, bChanged, text )
 
 			
 			
-	def _p_sendTokenListDocEvent(self, widget, tokens):
-		event = InteractorEventTokenList( True, tokens )
+	def _p_sendTokenListDocEvent(self, widget, bUserEvent, bChanged, tokens):
+		event = InteractorEventTokenList( bUserEvent, bChanged, tokens )
 		bHandled = self._p_sendDocEventToWidget( widget, event )
 		if not bHandled:
 			print 'gSymView._sendTokenListDocEvent: ***unhandled event*** %s'  %  ( event, )
@@ -808,11 +806,10 @@ class _GSymViewInstance (object):
 	
 	def _p_onTokenisedEntryModifed(self, widget, text, tokens):
 		if len( tokens ) > 1:
-			self._p_sendTokenListDocEvent( widget, tokens )
+			self._p_sendTokenListDocEvent( widget, True, True, tokens )
 	
 	def _p_onTokenisedEntryFinished(self, widget, text, tokens, bChanged, bUserEvent):
-		if bUserEvent  and  bChanged:
-			self._p_sendTokenListDocEvent( widget, tokens )
+		self._p_sendTokenListDocEvent( widget, bUserEvent, bChanged, tokens )
 
 
 
