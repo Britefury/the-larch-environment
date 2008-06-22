@@ -41,9 +41,12 @@ class ListViewLayout (object):
 		pass
 	
 	def _p_itemWithSeparator(self, item, separatorFactory):
-		b = DTBox( alignment=DTBox.ALIGN_BASELINES )
-		b[:] = [ item, separatorFactory() ]
-		return b
+		if separatorFactory is not None:
+			b = DTBox( alignment=DTBox.ALIGN_BASELINES )
+			b[:] = [ item, separatorFactory() ]
+			return b
+		else:
+			return item
 	
 	def _p_itemsInHBox(self, spacing, *items):
 		b = DTBox( alignment=DTBox.ALIGN_BASELINES, spacing=spacing )
@@ -72,9 +75,9 @@ class ListViewLayout (object):
 	
 	
 	
-class WrappedListViewLayout (ListViewLayout):
+class FlowListViewLayout (ListViewLayout):
 	def __init__(self, spacing, delimSpacing):
-		super( WrappedListViewLayout, self ).__init__()
+		super( FlowListViewLayout, self ).__init__()
 		self._spacing = spacing
 		self._contentsPadding = delimSpacing * 2.0
 		
@@ -221,7 +224,7 @@ class VerticalListViewLayout (ListViewLayout):
 		indent.child = contentsContainer
 		
 		# Wrap in delimeter container if necessary
-		if beginDelim is not None  or  endDelimFactory is not None:
+		if beginDelim is not None  or  endDelim is not None:
 			box = DTBox( direction=DTBox.TOP_TO_BOTTOM, alignment=DTBox.ALIGN_LEFT )
 			if beginDelim is not None:
 				beginDelim = _listViewCoerce( beginDelim )
@@ -239,7 +242,7 @@ class VerticalListViewLayout (ListViewLayout):
 
 		
 
-def listView(xs, contents, layout, beginDelim, endDelim, separatorFactory):
+def listView(xs, layout, beginDelim, endDelim, separatorFactory, contents):
 	return layout.layoutContents( xs, contents, beginDelim, endDelim, separatorFactory )
 
 

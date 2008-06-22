@@ -34,8 +34,9 @@ class InteractorEventKey (InteractorEvent):
 		
 	
 class InteractorEventText (InteractorEvent):
-	def __init__(self, bUserEvent, text):
+	def __init__(self, bUserEvent, bChanged, text):
 		super( InteractorEventText, self ).__init__( bUserEvent )
+		self.bChanged = bChanged
 		self.text = text
 		
 
@@ -54,8 +55,9 @@ class InteractorEventTokenList (InteractorEvent):
 		def __repr__(self):
 			return "Token( %s, '%s' )"  %  ( self.tokenClass, self.value )
 
-	def __init__(self, bUserEvent, tokens):
+	def __init__(self, bUserEvent, bChanged, tokens):
 		super( InteractorEventTokenList, self ).__init__( bUserEvent )
+		self.bChanged = bChanged
 		self.tokens = tokens
 		
 
@@ -64,7 +66,7 @@ class InteractorEventTokenList (InteractorEvent):
 		if len( tok ) == 0:
 			return None
 		else:
-			return InteractorEventTokenList( self.bUserEvent, tok )
+			return InteractorEventTokenList( self.bUserEvent, self.bChanged, tok )
 		
 		
 	def __repr__(self):

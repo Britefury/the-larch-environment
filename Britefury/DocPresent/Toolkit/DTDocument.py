@@ -122,6 +122,17 @@ gobject.type_register( _GtkPresentationArea )
 class DTDocument (DTBin):
 	undoSignal = ClassSignal()
 	redoSignal = ClassSignal()
+	
+	
+	CONTROL_MASK = gtk.gdk.CONTROL_MASK
+	SHIFT_MASK = gtk.gdk.SHIFT_MASK
+	ALT_MASK = gtk.gdk.MOD1_MASK
+	BUTTON1_MASK = gtk.gdk.BUTTON1_MASK
+	BUTTON2_MASK = gtk.gdk.BUTTON2_MASK
+	BUTTON3_MASK = gtk.gdk.BUTTON3_MASK
+	BUTTON4_MASK = gtk.gdk.BUTTON4_MASK
+	BUTTON5_MASK = gtk.gdk.BUTTON5_MASK
+	
 
 	def __init__(self, bCanGrabFocus=True):
 		DTBin.__init__( self )
@@ -147,6 +158,11 @@ class DTDocument (DTBin):
 
 		self._documentSize = Vector2()
 		self._bAllocationRequired = False
+		
+		# Pointer status
+		self._pointerPosition = Point2()
+		self._pointerState = 0
+		self._stateKeyListeners = weakref.WeakKeyDictionary()
 		
 		# Keyboard focus; the grab-target is the widget that last grabbed the focus, the focus-target is the widget that has the focus
 		self._keyboardFocusTarget = None
@@ -248,6 +264,14 @@ class DTDocument (DTBin):
 			self._immediateEvents.remove( f )
 			if len( self._immediateEvents ) == 0:
 				dequeueEvent( self._p_onQueuedEvent )
+	
+				
+				
+	def addStateKeyListener(self, listener):
+		self._stateKeyListeners[listener] = None
+		
+	def removeStateKeyListener(self, listener):
+		del self._stateKeyListeners[listener]
 			
 			
 			
@@ -426,8 +450,9 @@ class DTDocument (DTBin):
 	def _p_buttonPressEvent(self, widget, event):
 		self._drawingArea.grab_focus()
 		x, y, state = event.x, event.y, event.state
-		windowPos = Point2( x, y )
-		localPos = self._p_windowSpaceToDocSpace( windowPos )
+		self._pointerPosition = Point2( x, y )
+		self._pointerState = state
+		localPos = self._p_windowSpaceToDocSpace( self._pointerPosition )
 		if event.state & gtk.gdk.MOD1_MASK  ==  0:
 			if event.type == gtk.gdk.BUTTON_PRESS  and  self._dndSource is None:
 				self._dndSource = self._f_evDndButtonDown( localPos, event.button, state )
@@ -445,13 +470,15 @@ class DTDocument (DTBin):
 		else:
 			if self._docDragButton is None:
 				self._docDragButton = event.button
-				self._docDragStartPosWindowSpace = windowPos
+				self._docDragStartPosWindowSpace = self._pointerPosition
 		self._p_emitImmediateEvents()
 
 
 	def _p_buttonReleaseEvent(self, widget, event):
 		x, y, state = event.x, event.y, event.state
-		localPos = self._p_windowSpaceToDocSpace( Point2( x, y ) )
+		self._pointerPosition = Point2( x, y )
+		self._pointerState = state
+		localPos = self._p_windowSpaceToDocSpace( self._pointerPosition )
 		if self._dndSource is not None  and  self._dndInProgress  and  self._dndButton == event.button:
 			# Ensure that @self._dndSource is still part of this document
 			if self._dndSource.document is self:
@@ -476,8 +503,9 @@ class DTDocument (DTBin):
 			x, y, state = event.window.get_pointer()
 		else:
 			x, y, state = event.x, event.y, event.state
-		windowPos = Point2( x, y )
-		localPos = self._p_windowSpaceToDocSpace( windowPos )
+		self._pointerPosition = Point2( x, y )
+		self._pointerState = state
+		localPos = self._p_windowSpaceToDocSpace( self._pointerPosition )
 
 		if self._docDragButton is None:
 			if self._dndSource is not None:
@@ -489,8 +517,8 @@ class DTDocument (DTBin):
 			else:
 				self._f_evMotion( localPos )
 		else:
-			delta = windowPos - self._docDragStartPosWindowSpace
-			self._docDragStartPosWindowSpace = windowPos
+			delta = self._pointerPosition - self._docDragStartPosWindowSpace
+			self._docDragStartPosWindowSpace = self._pointerPosition
 			bModified = False
 			if self._docDragButton == 1  or  self._docDragButton == 2:
 				self._docWindowTopLeftCornerInDocSpace -= self._p_windowSpaceSizeToDocSpace( delta )
@@ -514,7 +542,9 @@ class DTDocument (DTBin):
 
 	def _p_enterNotifyEvent(self, widget, event):
 		x, y, state = event.window.get_pointer()
-		localPos = self._p_windowSpaceToDocSpace( Point2( x, y ) )
+		self._pointerPosition = Point2( x, y )
+		self._pointerState = state
+		localPos = self._p_windowSpaceToDocSpace( self._pointerPosition )
 		if self._docDragButton is None:
 			self._f_evEnter( localPos )
 		self._p_emitImmediateEvents()
@@ -522,13 +552,16 @@ class DTDocument (DTBin):
 
 	def _p_leaveNotifyEvent(self, widget, event):
 		x, y, state = event.window.get_pointer()
-		localPos = self._p_windowSpaceToDocSpace( Point2( x, y ) )
+		self._pointerPosition = Point2( x, y )
+		self._pointerState = state
+		localPos = self._p_windowSpaceToDocSpace( self._pointerPosition )
 		if self._docDragButton is None:
 			self._f_evLeave( localPos )
 		self._p_emitImmediateEvents()
 
 
 	def _p_scrollEvent(self, widget, event):
+		self._pointerState = event.state
 		if event.state  &  ( gtk.gdk.MOD1_MASK | gtk.gdk.SHIFT_MASK | gtk.gdk.CONTROL_MASK )  ==  gtk.gdk.MOD1_MASK:
 			if event.direction == gtk.gdk.SCROLL_UP:
 				delta = 1.0
@@ -573,6 +606,7 @@ class DTDocument (DTBin):
 	def do_key_press_event(self, event):
 		keyEvent = DTKeyEvent( event )
 		key = keyEvent.keyVal, keyEvent.state
+		self._pointerState = event.state
 		if key == _undoAccel:
 			self.undoSignal.emit( self )
 			self._p_emitImmediateEvents()
@@ -585,27 +619,31 @@ class DTDocument (DTBin):
 			self._p_emitImmediateEvents()
 			return True
 		else:
-			if _CURSORSYSTEM == _CURSORSYSTEM_WIDGET:
-				if self._keyboardFocusTarget is not None:
-					self._keyboardFocusTarget._o_onKeyPress( keyEvent )
-					self._p_emitImmediateEvents()
-					return True
-				else:
-					self._p_emitImmediateEvents()
-					return False
-			elif _CURSORSYSTEM == _CURSORSYSTEM_DOCUMENT:
-				self._p_updateCursors()
-				loc = self._mainCursor.location
-				widget = loc.cursorEntity.widget
-				if widget is not None:
-					widget._o_onKeyPress( keyEvent )
-					self._p_emitImmediateEvents()
-					return True
-				else:
-					self._p_emitImmediateEvents()
-					return False
+			if event.keyval in [ gtk.keysyms.Alt_L, gtk.keysyms.Alt_R, gtk.keysyms.Control_L, gtk.keysyms.Control_R, gtk.keysyms.Shift_L, gtk.keysyms.Shift_R ]:
+				for listener in self._stateKeyListeners.keys():
+					listener._onStateKeyPress( keyEvent )
 			else:
-				raise ValueError
+				if _CURSORSYSTEM == _CURSORSYSTEM_WIDGET:
+					if self._keyboardFocusTarget is not None:
+						self._keyboardFocusTarget._o_onKeyPress( keyEvent )
+						self._p_emitImmediateEvents()
+						return True
+					else:
+						self._p_emitImmediateEvents()
+						return False
+				elif _CURSORSYSTEM == _CURSORSYSTEM_DOCUMENT:
+					self._p_updateCursors()
+					loc = self._mainCursor.location
+					widget = loc.cursorEntity.widget
+					if widget is not None:
+						widget._o_onKeyPress( keyEvent )
+						self._p_emitImmediateEvents()
+						return True
+					else:
+						self._p_emitImmediateEvents()
+						return False
+				else:
+					raise ValueError
 				
 
 
@@ -613,6 +651,7 @@ class DTDocument (DTBin):
 	def do_key_release_event(self, event):
 		keyEvent = DTKeyEvent( event )
 		key = keyEvent.keyVal, keyEvent.state
+		self._pointerState = event.state
 		if key == _undoAccel  or  key == _redoAccel:
 			self._p_emitImmediateEvents()
 			return True
@@ -620,27 +659,31 @@ class DTDocument (DTBin):
 			self._p_emitImmediateEvents()
 			return True
 		else:
-			if _CURSORSYSTEM == _CURSORSYSTEM_WIDGET:
-				if self._keyboardFocusTarget is not None:
-					self._keyboardFocusTarget._o_onKeyRelease( keyEvent )
-					self._p_emitImmediateEvents()
-					return True
-				else:
-					self._p_emitImmediateEvents()
-					return False
-			elif _CURSORSYSTEM == _CURSORSYSTEM_DOCUMENT:
-				self._p_updateCursors()
-				loc = self._mainCursor.location
-				widget = loc.cursorEntity.widget
-				if widget is not None:
-					widget._o_onKeyRelease( keyEvent )
-					self._p_emitImmediateEvents()
-					return True
-				else:
-					self._p_emitImmediateEvents()
-					return False
+			if event.keyval in [ gtk.keysyms.Alt_L, gtk.keysyms.Alt_R, gtk.keysyms.Control_L, gtk.keysyms.Control_R, gtk.keysyms.Shift_L, gtk.keysyms.Shift_R ]:
+				for listener in self._stateKeyListeners.keys():
+					listener._onStateKeyRelease( keyEvent )
 			else:
-				raise ValueError
+				if _CURSORSYSTEM == _CURSORSYSTEM_WIDGET:
+					if self._keyboardFocusTarget is not None:
+						self._keyboardFocusTarget._o_onKeyRelease( keyEvent )
+						self._p_emitImmediateEvents()
+						return True
+					else:
+						self._p_emitImmediateEvents()
+						return False
+				elif _CURSORSYSTEM == _CURSORSYSTEM_DOCUMENT:
+					self._p_updateCursors()
+					loc = self._mainCursor.location
+					widget = loc.cursorEntity.widget
+					if widget is not None:
+						widget._o_onKeyRelease( keyEvent )
+						self._p_emitImmediateEvents()
+						return True
+					else:
+						self._p_emitImmediateEvents()
+						return False
+				else:
+					raise ValueError
 
 
 
@@ -897,6 +940,36 @@ class DTDocument (DTBin):
 			return True
 		else:
 			return False
+		
+		
+		
+		
+	# State utility functions
+	@staticmethod
+	def stateValueCoerce(state):
+		if isinstance( state, str )  or  isinstance( state, unicode ):
+			value = 0
+			state = state.lower()
+			if 'shift' in state:
+				value |= DTDocument.SHIFT_MASK
+			if 'control' in state  or  'ctrl' in state:
+				value |= DTDocument.CONTROL_MASK
+			if 'alt' in state  or  'mod1' in state:
+				value |= DTDocument.ALT_MASK
+			if 'button1' in state  or  'b1' in state:
+				value |= DTDocument.BUTTON1_MASK
+			if 'button2' in state  or  'b2' in state:
+				value |= DTDocument.BUTTON2_MASK
+			if 'button3' in state  or  'b3' in state:
+				value |= DTDocument.BUTTON3_MASK
+			if 'button4' in state  or  'b4' in state:
+				value |= DTDocument.BUTTON4_MASK
+			if 'button5' in state  or  'b5' in state:
+				value |= DTDocument.BUTTON5_MASK
+			return value
+		else:
+			return state
+		
 
 
 

@@ -48,7 +48,7 @@ def textEventMethod():
 	def decorate(method):
 		def decoratedMethod(self, event, *args, **kwargs):
 			if isinstance( event, InteractorEventText ):
-				nodeToSelect = method( self, event.text, *args, **kwargs )
+				nodeToSelect = method( self, event.bUserEvent, event.bChanged, event.text, *args, **kwargs )
 				return nodeToSelect, None
 			raise NoEventMatch
 		return decoratedMethod
@@ -68,7 +68,7 @@ def tokenListEventMethod(*tokenClasses):
 							break
 					if bEventMatched:
 						tokenValues = [ token.value   for token in event.tokens[:len(tokenClasses)] ]
-						nodeToSelect = method( self, *(tokenValues + list(args)), **kwargs )
+						nodeToSelect = method( self, event.bUserEvent, event.bChanged, *(tokenValues + list(args)), **kwargs )
 						return nodeToSelect, event.tailEvent( len( tokenClasses ) )
 			raise NoEventMatch
 		return decoratedMethod

@@ -1,10 +1,14 @@
 ($gSymDocument "0.1-alpha"
 	($unit
 		($withLanguageModule GSymCore.Languages.Python25.Python25
-			(python25Document
+			(python25Module
 				(listDisplay
 					(mul (add(pow (var varA) (var varB)) (var varC)) (div (var varD) (var varE)))
 					(mul (var varA) (var varB))
+				)
+				(listDisplay
+					(var p)
+					(var q)
 				)
 			)
 		)

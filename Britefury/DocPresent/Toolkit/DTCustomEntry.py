@@ -13,6 +13,7 @@ from Britefury.Math.Math import Colour3f
 
 from Britefury.DocPresent.Toolkit.DTBin import DTBin
 from Britefury.DocPresent.Toolkit.DTEntry import DTEntry
+from Britefury.DocPresent.Toolkit.DTDocument import DTDocument
 
 
 
@@ -32,25 +33,25 @@ class DTCustomEntry (DTBin):
 			
 			
 		def _o_onButtonDown(self, localPos, button, state):
-			if button == 1:
+			if button == 1  and  self._customEntry._testState():
 				return True
 			else:
 				return super( DTCustomEntry._CustomContainer, self )._o_onButtonDown( localPos, button, state )
 
 		def _o_onButtonDown2(self, localPos, button, state):
-			if button == 1:
+			if button == 1  and  self._customEntry._testState():
 				return True
 			else:
 				return super( DTCustomEntry._CustomContainer, self )._o_onButtonDown2( localPos, button, state )
 
 		def _o_onButtonDown3(self, localPos, button, state):
-			if button == 1:
+			if button == 1  and  self._customEntry._testState():
 				return True
 			else:
 				return super( DTCustomEntry._CustomContainer, self )._o_onButtonDown3( localPos, button, state )
 
 		def _o_onButtonUp(self, localPos, button, state):
-			if button == 1:
+			if button == 1  and  self._customEntry._testState():
 				self._customEntry._p_onCustomClicked( localPos )
 				return True
 			else:
@@ -96,8 +97,11 @@ class DTCustomEntry (DTBin):
 
 
 
-	def __init__(self, entryText='', font=None):
+	def __init__(self, entryText='', font=None, stateMask=0, stateTest=0):
 		super( DTCustomEntry, self ).__init__()
+
+		self._stateMask = DTDocument.stateValueCoerce( stateMask )
+		self._stateTest = DTDocument.stateValueCoerce( stateTest )
 
 		self._custom = self._CustomContainer( self )
 		self._entry = self._Entry( self, entryText, font )
@@ -137,6 +141,20 @@ class DTCustomEntry (DTBin):
 		return self._label.getFont()
 
 
+	def setStateMask(self, stateMask):
+		self._stateMask = DTDocument.stateValueCoerce( stateMask )
+		
+	def getStateMask(self):
+		return self._stateMask
+
+	
+	def setStateTest(self, stateTest):
+		self._stateTest = DTDocument.stateValueCoerce( stateTest )
+		
+	def getStateTest(self):
+		return self._stateTest
+
+	
 	def startEditing(self):
 		if self.getChild() is not self._entry:
 			self.setChild( self._entry )
@@ -206,6 +224,13 @@ class DTCustomEntry (DTBin):
 
 
 
+	def _testState(self):
+		if self._document is not None:
+			return self._document._pointerState & self._stateMask  ==  self._stateTest
+		else:
+			return False
+
+		
 	def _p_onCustomClicked(self, localPos):
 		self.startEditing()
 		self._entry.moveCursorToEnd()
@@ -278,6 +303,9 @@ class DTCustomEntry (DTBin):
 	customChild = property( getCustomChild, setCustomChild )
 	entryText = property( getEntryText, setEntryText )
 	font = property( getFont, setFont )
+
+	stateMask = property( getStateMask, setStateMask )
+	stateTest = property( getStateTest, setStateTest )
 
 	keyHandler = property( None, _p_setKeyHandler )
 	allowableCharacters = property( None, _p_setAllowableCharacters )
