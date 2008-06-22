@@ -7,6 +7,8 @@
 ##-*************************
 import weakref
 
+import traceback
+
 from Britefury.Util.SignalSlot import *
 
 from Britefury.Math.Math import Colour3f, Point2, Vector2
@@ -71,21 +73,28 @@ class DTHighlight (DTBin):
 			self._docToStack = weakref.WeakKeyDictionary()
 			
 		def _onEnter(self, highlight):
-			self.__getStack( highlight )._onEnter( highlight )
+			stack = self.__getStack( highlight )
+			if stack is not None:
+				stack._onEnter( highlight )
 			
 		def _onLeave(self, highlight):
-			self.__getStack( highlight )._onLeave( highlight )
+			stack = self.__getStack( highlight )
+			if stack is not None:
+				stack._onLeave( highlight )
 			
 			
 		def __getStack(self, highlight):
 			document = highlight._document
-			try:
-				return self._docToStack[document]
-			except KeyError:
-				stack = DTHighlight._HighlightStack()
-				document.addStateKeyListener( stack )
-				self._docToStack[document] = stack
-				return stack
+			if document is not None:
+				try:
+					return self._docToStack[document]
+				except KeyError:
+					stack = DTHighlight._HighlightStack()
+					document.addStateKeyListener( stack )
+					self._docToStack[document] = stack
+					return stack
+			else:
+				return None
 	
 	
 	contextSignal = ClassSignal()
