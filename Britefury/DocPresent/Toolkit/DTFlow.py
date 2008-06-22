@@ -106,15 +106,20 @@ class DTFlow (DTContainerSequence):
 	def _o_getRequiredHeightAndBaseline(self):
 		aboveBaseline = 0.0
 		baseline = None
+		height = 0.0
 		for entry in self._childEntries:
 			req, bas = entry.child._f_getRequisitionHeightAndBaseline()
 			entry._baseline = bas
+			height = max( height, req )
 			if bas is not None:
 				abv = req - bas
 				entry._reqHeight = req
 				aboveBaseline = max( aboveBaseline, abv )   if baseline is not None   else   abv
 				baseline = max( baseline, bas )   if baseline is not None   else   bas
-		requisition = aboveBaseline + baseline
+		if baseline is not None:
+			requisition = aboveBaseline + baseline
+		else:
+			requisition = height
 		return requisition, baseline
 
 

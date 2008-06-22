@@ -542,8 +542,6 @@ def listView(layout, beginDelim, endDelim, separatorFactory, children, style=Non
 
 
 
-
-
 class _DocEventHandler (object):
 	def __init__(self, viewInstance, interactors):
 		super( _DocEventHandler, self ).__init__()
@@ -557,8 +555,9 @@ class _DocEventHandler (object):
 			except NoEventMatch:
 				pass
 			else:
-				if ev is not event:
+				if nodeToSelect is not None:
 					self.viewInstance._p_queueRefreshAndSelect( nodeToSelect )
+				if ev is not event:
 					return ev
 		return event
 		

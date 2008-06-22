@@ -44,9 +44,9 @@ class ParsedNodeInteractor (Interactor):
 		if bChanged:
 			parsed = _parseText( parser, value )
 			if parsed is not None:
-				return replace( node, parsed )
+				replace( node, parsed )
 			else:
-				return replace( node, [ 'UNPARSED', value ] )
+				replace( node, [ 'UNPARSED', value ] )
 	
 	eventMethods = [ tokData ]
 
@@ -58,13 +58,13 @@ class ParsedLineInteractor (Interactor):
 	def tokData(self, bUserEvent, bChanged, value, node, parser):
 		if bChanged:
 			if value.strip() == '':
-				return replace( node, [ 'blankLine' ] )
+				node = replace( node, [ 'blankLine' ] )
 			else:
 				parsed = _parseText( parser, value )
 				if parsed is not None:
-					return replace( node, parsed )
+					node = replace( node, parsed )
 				else:
-					return replace( node, [ 'UNPARSED', value ] )
+					node = replace( node, [ 'UNPARSED', value ] )
 		if bUserEvent:
 			return insertAfter( node, [ 'blankLine' ] )
 	
@@ -150,9 +150,9 @@ def nodeEditor(node, contents, text, state):
 		parser, mode = state
 
 	if mode == MODE_EXPRESSION:
-		return interact( customEntry( highlight( contents, 'ctrl', 'ctrl' ), text.getText(), 'ctrl', 'ctrl' ),  ParsedNodeInteractor( node, parser ) ),   text
+		return interact( focus( customEntry( highlight( contents, 'ctrl', 'ctrl' ), text.getText(), 'ctrl', 'ctrl' ) ),  ParsedNodeInteractor( node, parser ) ),   text
 	elif mode == MODE_LINE:
-		return interact( customEntry( highlight( contents, style=lineEditorStyle ), text.getText() ),  ParsedLineInteractor( node, parser ) ),   text
+		return interact( focus( customEntry( highlight( contents, style=lineEditorStyle ), text.getText() ) ),  ParsedLineInteractor( node, parser ) ),   text
 	else:
 		raise ValueError
 		

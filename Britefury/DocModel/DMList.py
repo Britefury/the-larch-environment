@@ -92,7 +92,14 @@ class DMList (DMListInterface):
 		if self._commandTracker_ is not None:
 			self._commandTracker_._f_onRemove( self, x )
 		v = self._cell.literalValue
-		v.remove( x )
+		bRemoved = False
+		if isinstance( x, DMListInterface ):
+			for i, a in enumerate( v ):
+				if a is x:
+					del v[i]
+					bRemoved = True
+		if not bRemoved:
+			v.remove( x )
 		self._cell.literalValue = v
 
 	def __setitem__(self, i, x):
@@ -132,6 +139,10 @@ class DMList (DMListInterface):
 		return len( self._cell.value )
 
 	def index(self, x):
+		if isinstance( x, DMListInterface ):
+			for i, a in enumerate( self._cell.value ):
+				if a is x:
+					return i
 		return self._cell.value.index( x )
 
 
