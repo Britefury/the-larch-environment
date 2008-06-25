@@ -35,13 +35,17 @@ class DTHighlight (DTBin):
 			
 		def _onLeave(self, highlight):
 			prev = self._getCurrentHighlight()
-			self._stack.remove( highlight )
-			current = self._getCurrentHighlight()
-			if prev is not current:
-				if prev is not None:
-					prev._unhighlightBackground()
-				if current is not None:
-					current._highlightBackground()
+			try:
+				self._stack.remove( highlight )
+			except ValueError:
+				pass
+			else:
+				current = self._getCurrentHighlight()
+				if prev is not current:
+					if prev is not None:
+						prev._unhighlightBackground()
+					if current is not None:
+						current._highlightBackground()
 					
 				
 		def __onStateKeyChange(self):

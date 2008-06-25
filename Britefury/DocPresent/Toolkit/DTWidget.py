@@ -495,6 +495,8 @@ class DTWidget (object):
 			self._document._f_widgetAcquireFocus( self )
 
 	def _f_evUnrealise(self):
+		if self._pointerPosition is not None:
+			self._f_evLeave( self._pointerPosition )
 		for cursor in self._cursors.keys():
 			cursor._f_widgetUnrealiseNotify()
 		if self._bFocusGrabbed  and  self._document is not None:
