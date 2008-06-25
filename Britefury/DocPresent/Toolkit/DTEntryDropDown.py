@@ -33,7 +33,7 @@ class DTEntryDropDown (DTPopupDocument):
 
 		self.label = DTLabel( text=labelText, bUseMarkup=bLabelUseMarkup, font=labelFont, hAlign=DTLabel.HALIGN_LEFT )
 		self.entry = DTEntry( text=entryText )
-		self.entry.returnSignal.connect( self._p_onEntryReturn )
+		self.entry.commitSignal.connect( self._p_onEntryCommit )
 
 
 		self._box = DTBox( direction=DTBox.TOP_TO_BOTTOM, alignment=DTBox.ALIGN_LEFT )
@@ -73,7 +73,7 @@ class DTEntryDropDown (DTPopupDocument):
 		self.cancelSignal.emit( self )
 
 
-	def _p_onEntryReturn(self, entry):
+	def _p_onEntryCommit(self, entry):
 		self.activateSignal.emit( self )
 
 

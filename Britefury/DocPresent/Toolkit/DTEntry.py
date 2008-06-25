@@ -91,7 +91,10 @@ class _EntryTextSizeAllocator (object):
 			
 
 class DTEntry (DTWidget):
-	returnSignal = ClassSignal()       				# ( entry )
+	commitSignal = ClassSignal()       				# ( entry )		- Enter pressed; contents committed
+	finishSignal = ClassSignal()					# ( entry )		- finishEditing() called
+	backspaceStartSignal = ClassSignal()				# ( entry )		- backspace pressed when cursor at start
+	deleteEndSignal = ClassSignal()					# ( entry )		- delete pressed when cursor at end
 	textInsertedSignal = ClassSignal()				# ( entry, position, bAppended, textInserted )
 	textDeletedSignal = ClassSignal()				# ( entry, startIndex, endIndex, textDeleted )
 	textModifiedSignal = ClassSignal()				# ( entry, text )
@@ -442,7 +445,7 @@ class DTEntry (DTWidget):
 
 		modKeys = event.state & _modKeysMask
 		if event.keyVal == gtk.keysyms.Return:
-			self.returnSignal.emit( self )
+			self.commitSignal.emit( self )
 			self.ungrabFocus()
 			bHandled = True
 		elif event.keyVal == gtk.keysyms.BackSpace  and  self.bEditable:
@@ -459,9 +462,8 @@ class DTEntry (DTWidget):
 				self.textModifiedSignal.emit( self, self.getText() )
 				self._p_onTextModified()
 			else:
-				# leave the entry
-				self.returnSignal.emit( self )
-				self.ungrabFocus()
+				# Send backspace start signal
+				self.backspaceStartSignal.emit( self )
 			bHandled = True
 		elif event.keyVal == gtk.keysyms.Delete  and  self.bEditable:
 			text = self._text
@@ -477,9 +479,8 @@ class DTEntry (DTWidget):
 				self.textModifiedSignal.emit( self, self.getText() )
 				self._p_onTextModified()
 			else:
-				# leave the entry
-				self.returnSignal.emit( self )
-				self.ungrabFocus()
+				# Send delete end signal
+				self.deleteEndSignal.emit( self )
 			bHandled = True
 		elif event.keyString != ''  and  ( modKeys == 0  or  modKeys == gtk.gdk.SHIFT_MASK )  and  self.bEditable:
 			if self._selectionBounds is not None:
@@ -755,7 +756,7 @@ class DTEntry (DTWidget):
 		self.setCursorIndex( index )
 		
 	def finishEditing(self):
-		self.returnSignal.emit( self )
+		self.finishSignal.emit( self )
 		self.ungrabFocus()
 
 	

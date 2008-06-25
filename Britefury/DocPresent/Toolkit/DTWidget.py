@@ -118,6 +118,8 @@ class DTWidget (object):
 		
 		self._bCursorBlocked = False
 		self._cursors = weakref.WeakKeyDictionary()
+		
+		self._pointerPosition = None
 
 		self._dndLocalPos = None
 		self._dndButton = None
@@ -461,13 +463,16 @@ class DTWidget (object):
 		return self._o_onButtonUp( localPos, button, state )
 
 	def _f_evMotion(self, localPos):
+		self._pointerPosition = copy( localPos )
 		self._o_onMotion( localPos )
 
 	def _f_evEnter(self, localPos):
+		self._pointerPosition = copy( localPos )
 		self._o_onEnter( localPos )
 
 	def _f_evLeave(self, localPos):
 		self._o_onLeave( localPos )
+		self._pointerPosition = None
 
 	def _f_evScroll(self, scroll):
 		self._o_onScroll( scroll )

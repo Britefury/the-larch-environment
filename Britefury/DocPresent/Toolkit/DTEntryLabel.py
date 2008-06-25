@@ -24,6 +24,8 @@ class DTEntryLabel (DTBin):
 	textModifiedSignal = ClassSignal()				# ( entry, text )
 	startEditingSignal = ClassSignal()				# ( entry, text )
 	finishEditingSignal = ClassSignal()				# ( entry, text, bChanged, bUserEvent )
+	backspaceStartSignal = ClassSignal()				# ( entry )
+	deleteEndSignal = ClassSignal()					# ( entry )
 
 
 	class _Label (DTLabel):
@@ -100,7 +102,10 @@ class DTEntryLabel (DTBin):
 		self._entry.textInsertedSignal.connect( self._p_onEntryTextInserted )
 		self._entry.textDeletedSignal.connect( self._p_onEntryTextDeleted )
 		self._entry.textModifiedSignal.connect( self._p_onEntryTextModified )
-		self._entry.returnSignal.connect( self._p_onEntryReturn )
+		self._entry.commitSignal.connect( self._p_onEntryCommit )
+		self._entry.finishSignal.connect( self._p_onEntryFinish )
+		self._entry.backspaceStartSignal.connect( self._p_onEntryBackspaceStart )
+		self._entry.deleteEndSignal.connect( self._p_onEntryDeleteEnd )
 
 		self.setChild( self._label )
 
@@ -273,8 +278,17 @@ class DTEntryLabel (DTBin):
 	def _o_emitTextModified(self, text):
 		self.textModifiedSignal.emit( self, text )
 
-	def _p_onEntryReturn(self, entry):
+	def _p_onEntryCommit(self, entry):
 		self._p_finishEditing( True )
+
+	def _p_onEntryFinish(self, entry):
+		self._p_finishEditing( False )
+
+	def _p_onEntryBackspaceStart(self, entry):
+		self.backspaceStartSignal.emit( self )
+
+	def _p_onEntryDeleteEnd(self, entry):
+		self.deleteEndSignal.emit( self )
 
 	def _p_onEntryLoseFocus(self):
 		if not self._bIgnoreEntryLoseFocus:
