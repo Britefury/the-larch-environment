@@ -36,6 +36,9 @@ TODOS:
 - Use the following presentation on unicode in Python to check gSym over:
     http://farmdev.com/talks/unicode/
 
+    
+- For a web-app version, CherryPy could provide a suitable framework. (http://www.cherrypy.org)    
+    
 
 
 HANDLE/CORRECT THE FOLLOWING ERRORS IN THE VIEW:
