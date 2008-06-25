@@ -317,6 +317,11 @@ class DTDocument (DTBin):
 			reqHeight, reqBaseline = self._f_getRequisitionHeightAndBaseline()
 			self._f_allocateY( reqHeight )
 			self._bAllocationRequired = False
+		
+			# Send motion events; the pointer hasn't moved, but the widgets have.
+			localPos = self._p_windowSpaceToDocSpace( self._pointerPosition )
+			if self._docDragButton is None:
+				self._docMotion( self._pointerState, localPos )
 					
 
 
@@ -495,6 +500,18 @@ class DTDocument (DTBin):
 		else:
 			self._docDragButton = None
 		self._p_emitImmediateEvents()
+		
+		
+		
+	def _docMotion(self, state, localPos):
+		if self._dndSource is not None:
+			if not self._dndInProgress:
+				self._dndBeginData = self._dndSource._f_evDndBegin()
+				self._dndInProgress = True
+				self._drawingArea.window.set_cursor( gtk.gdk.Cursor( gtk.gdk.HAND2 ) )
+			self._f_evDndMotion( localPos, self._dndButton, state, self._dndSource, self._dndBeginData, self._dndCache )
+		else:
+			self._f_evMotion( localPos )
 
 
 
@@ -508,14 +525,7 @@ class DTDocument (DTBin):
 		localPos = self._p_windowSpaceToDocSpace( self._pointerPosition )
 
 		if self._docDragButton is None:
-			if self._dndSource is not None:
-				if not self._dndInProgress:
-					self._dndBeginData = self._dndSource._f_evDndBegin()
-					self._dndInProgress = True
-					self._drawingArea.window.set_cursor( gtk.gdk.Cursor( gtk.gdk.HAND2 ) )
-				self._f_evDndMotion( localPos, self._dndButton, state, self._dndSource, self._dndBeginData, self._dndCache )
-			else:
-				self._f_evMotion( localPos )
+			self._docMotion( state, localPos )
 		else:
 			delta = self._pointerPosition - self._docDragStartPosWindowSpace
 			self._docDragStartPosWindowSpace = self._pointerPosition

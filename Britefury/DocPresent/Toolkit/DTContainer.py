@@ -172,7 +172,7 @@ class DTContainer (DTWidget):
 		entry.xform = xform
 		entry.invXform = xform.inverse()
 		entry.box = BBox2( Point2( entry._xPos, entry._yPos ), Point2( entry._xPos + entry._width, entry._yPos + entry._height ) )
-
+		
 		try:
 			childId = self._entryToChildId[entry]
 		except KeyError:

@@ -15,6 +15,8 @@ from Britefury.gSym.View.EditOperations import replace, insertAfter
 
 from Britefury.gSym.View.UnparsedText import UnparsedText
 
+import traceback
+
 
 from GSymCore.Languages.Python25.Parser import expression as expressionParser, arg as argParser, subscriptSlice as subscriptSliceParser, param as paramParser
 from GSymCore.Languages.Python25.Styles import *
@@ -66,6 +68,8 @@ class ParsedLineInteractor (Interactor):
 				else:
 					node = replace( node, [ 'UNPARSED', value ] )
 		if bUserEvent:
+			print 'Inserting...'
+			#traceback.print_stack()
 			return insertAfter( node, [ 'blankLine' ] )
 	
 	eventMethods = [ tokData ]
