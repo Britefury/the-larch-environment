@@ -361,7 +361,12 @@ class Python25View (GSymView):
 	
 	def div(self, state, node, x, y):
 		return binOpView( state, node, x, y, '/',
-				  lambda state, node, x, y, xView, yView: vbox( [ xView, hline( operatorStyle ), yView ], divBoxStyle ),
+				  lambda state, node, x, y, xView, yView: \
+				  	vbox( [
+							vbox( [ xView ], alignment='centre' ),
+							hline( operatorStyle ),
+							vbox( [ yView ], alignment='centre' ) ],
+						alignment='expand' ),
 				  PRECEDENCE_POW )
 	
 	def mod(self, state, node, x, y):
