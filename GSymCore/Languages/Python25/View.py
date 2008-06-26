@@ -9,7 +9,7 @@ from Britefury.gSym.View.gSymView import activeBorder, border, indent, highlight
      script, scriptLSuper, scriptLSub, scriptRSuper, scriptRSub, listView, interact, focus, viewEval, mapViewEval, GSymView
 from Britefury.gSym.View.ListView import FlowListViewLayout, HorizontalListViewLayout, VerticalInlineListViewLayout, VerticalListViewLayout
 
-from Britefury.gSym.View.Interactor import keyEventMethod, accelEventMethod, textEventMethod, tokenListEventMethod, Interactor
+from Britefury.gSym.View.Interactor import keyEventMethod, accelEventMethod, textEventMethod, backspaceStartMethod, deleteEndMethod, Interactor
 
 from Britefury.gSym.View.EditOperations import replace, insertAfter
 
@@ -71,8 +71,18 @@ class ParsedLineInteractor (Interactor):
 			print 'Inserting...'
 			#traceback.print_stack()
 			return insertAfter( node, [ 'blankLine' ] )
+		
+		
+		
+	@backspaceStartMethod()
+	def backspaceStart(self, node, parser):
+		print 'Backspace start'
 	
-	eventMethods = [ tokData ]
+	@deleteEndMethod()
+	def deleteEnd(self, node, parser):
+		print 'Delete end'
+
+	eventMethods = [ tokData, backspaceStart, deleteEnd ]
 
 
 	

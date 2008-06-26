@@ -8,7 +8,7 @@
 
 import gtk
 
-from Britefury.gSym.View.InteractorEvent import InteractorEvent, InteractorEventKey, InteractorEventText, InteractorEventTokenList
+from Britefury.gSym.View.InteractorEvent import InteractorEvent, InteractorEventKey, InteractorEventText, InteractorEventBackspaceStart, InteractorEventDeleteEnd
 
 
 
@@ -17,62 +17,41 @@ class NoEventMatch (Exception):
 	pass
 
 
-def keyEventMethod(keyString):
+
+
+def eventMethodDecorator(eventClass, invokeMethod, eventTestFn=None):
 	def decorate(method):
 		def decoratedMethod(self, event, *args, **kwargs):
-			if isinstance( event, InteractorEventKey ):
-				if event.keyString == keyString:
-					nodeToSelect = method( self, event.keyString, *args, **kwargs )
+			if isinstance( event, eventClass ):
+				if eventTestFn is None   or   eventTestFn( event ):
+					nodeToSelect = invokeMethod( method, self, event, args, kwargs )
 					return nodeToSelect, None
 			raise NoEventMatch
 		return decoratedMethod
 	return decorate
+
+
+def keyEventMethod(keyString):
+	return eventMethodDecorator( InteractorEventKey, lambda method, target, event, args, kwargs: method( target, event.keyString, *args, **kwargs ), lambda event: event.keyString == keyString )
 	
 
 
 def accelEventMethod(accelString):
 	keyValue, mods = gtk.accelerator_parse( accelString )
-	def decorate(method):
-		def decoratedMethod(self, event, *args, **kwargs):
-			if isinstance( event, InteractorEventKey ):
-				if event.keyValue == keyValue  and  event.mods == mods:
-					nodeToSelect = method( self, event.keyValue, event.mods, *args, **kwargs )
-					return nodeToSelect, None
-			raise NoEventMatch
-		return decoratedMethod
-	return decorate
+	return eventMethodDecorator( InteractorEventKey, lambda method, target, event, args, kwargs: method( target, event.keyValue, event.mods, *args, **kwargs ), lambda event: event.keyValue == keyValue  and  event.mods == mods )
 	
 
 
 def textEventMethod():
-	def decorate(method):
-		def decoratedMethod(self, event, *args, **kwargs):
-			if isinstance( event, InteractorEventText ):
-				nodeToSelect = method( self, event.bUserEvent, event.bChanged, event.text, *args, **kwargs )
-				return nodeToSelect, None
-			raise NoEventMatch
-		return decoratedMethod
-	return decorate
+	return eventMethodDecorator( InteractorEventText, lambda method, target, event, args, kwargs: method( target, event.bUserEvent, event.bChanged, event.text, *args, **kwargs ), None )
+
+
+
+def backspaceStartMethod():
+	return eventMethodDecorator( InteractorEventBackspaceStart, lambda method, target, event, args, kwargs: method( target, *args, **kwargs ), None )
 	
-
-
-def tokenListEventMethod(*tokenClasses):
-	def decorate(method):
-		def decoratedMethod(self, event, *args, **kwargs):
-			if isinstance( event, InteractorEventTokenList ):
-				if len( event.tokens )  >=  len( tokenClasses ):
-					bEventMatched = True
-					for token, tokenClass  in  zip( event.tokens, tokenClasses ):
-						if token.tokenClass != tokenClass:
-							bEventMatched = False
-							break
-					if bEventMatched:
-						tokenValues = [ token.value   for token in event.tokens[:len(tokenClasses)] ]
-						nodeToSelect = method( self, event.bUserEvent, event.bChanged, *(tokenValues + list(args)), **kwargs )
-						return nodeToSelect, event.tailEvent( len( tokenClasses ) )
-			raise NoEventMatch
-		return decoratedMethod
-	return decorate
+def deleteEndMethod():
+	return eventMethodDecorator( InteractorEventDeleteEnd, lambda method, target, event, args, kwargs: method( target, *args, **kwargs ), None )
 	
 
 
