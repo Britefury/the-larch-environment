@@ -16,8 +16,6 @@ from Britefury.GLisp.GLispDispatch import dispatch
 
 from Britefury.gSym.gSymCodeGenerator import GSymCodeGenerator
 
-from Britefury.gSym.View.Tokeniser import TokenDefinition, Tokeniser
-
 from Britefury.gSym.View.gSymView import activeBorder, border, indent, highlight, hline, label, markupLabel, entry, markupEntry, customEntry, hbox, ahbox, vbox, flow, flowSep, \
      script, scriptLSuper, scriptLSub, scriptRSuper, scriptRSub, listView, interact, focus, viewEval, mapViewEval, GSymView
 from Britefury.gSym.View.ListView import WrappedListViewLayout, HorizontalListViewLayout, VerticalInlineListViewLayout, VerticalListViewLayout
@@ -84,9 +82,6 @@ class SimpleLanguageCodeGenerator (GSymCodeGenerator):
 divBoxStyle = GSymStyleSheet( alignment='expand' )
 nilStyle = GSymStyleSheet( colour=Colour3f( 0.75, 0.0, 0.0 ), font='Sans 11 italic' )
 unparsedStyle = GSymStyleSheet( colour=Colour3f( 0.75, 0.0, 0.0 ), font='Sans 11 italic' )
-
-
-tokeniser = Tokeniser( [] )
 
 
 _paramName = Parser.Production( Tokens.identifier )

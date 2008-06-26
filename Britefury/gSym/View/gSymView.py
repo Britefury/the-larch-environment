@@ -24,8 +24,6 @@ from Britefury.DocPresent.Toolkit.DTLabel import DTLabel
 from Britefury.DocPresent.Toolkit.DTScript import DTScript
 from Britefury.DocPresent.Toolkit.DTEntryLabel import DTEntryLabel
 from Britefury.DocPresent.Toolkit.DTCustomEntry import DTCustomEntry
-from Britefury.DocPresent.Toolkit.DTTokenisedEntryLabel import DTTokenisedEntryLabel
-from Britefury.DocPresent.Toolkit.DTTokenisedCustomEntry import DTTokenisedCustomEntry
 from Britefury.DocPresent.Toolkit.DTFlow import DTFlow
 from Britefury.DocPresent.Toolkit.DTFlowWithSeparators import DTFlowWithSeparators
 
@@ -41,7 +39,7 @@ from Britefury.GLisp.GLispDispatch import dispatch
 
 from Britefury.gSym.View.gSymStyleSheet import GSymStyleSheet
 from Britefury.gSym.View.Interactor import Interactor, NoEventMatch
-from Britefury.gSym.View.InteractorEvent import InteractorEventKey, InteractorEventText, InteractorEventTokenList
+from Britefury.gSym.View.InteractorEvent import InteractorEventKey, InteractorEventText, InteractorEventBackspaceStart, InteractorEventDeleteEnd
 from Britefury.gSym.View import ListView
 from Britefury.gSym.View.UnparsedText import UnparsedText
 
@@ -349,6 +347,8 @@ def entry(labelText, entryText, style=None):
 	widget = DTEntryLabel( labelText, entryText )
 	widget.textModifiedSignal.connect( viewNodeInstance.viewInstance._p_onEntryModifed )
 	widget.finishEditingSignal.connect( viewNodeInstance.viewInstance._p_onEntryFinished )
+	widget.backspaceStartSignal.connect( viewNodeInstance.viewInstance._p_onEntryBackspaceStart )
+	widget.deleteEndSignal.connect( viewNodeInstance.viewInstance._p_onEntryDeleteEnd )
 	_applyStyleSheetStack( viewNodeInstance, widget )
 	_applyStyle( style, widget )
 	return widget
@@ -363,6 +363,8 @@ def markupEntry(labelText, entryText, style=None):
 	widget = DTEntryLabel( labelText, entryText )
 	widget.textModifiedSignal.connect( viewNodeInstance.viewInstance._p_onEntryModifed )
 	widget.finishEditingSignal.connect( viewNodeInstance.viewInstance._p_onEntryFinished )
+	widget.backspaceStartSignal.connect( viewNodeInstance.viewInstance._p_onEntryBackspaceStart )
+	widget.deleteEndSignal.connect( viewNodeInstance.viewInstance._p_onEntryDeleteEnd )
 	widget.bLabelUseMarkup = True
 	_applyStyleSheetStack( viewNodeInstance, widget )
 	_applyStyle( style, widget )
@@ -378,52 +380,8 @@ def customEntry(customChild, entryText, stateMask=0, stateTest=0, style=None):
 	widget = DTCustomEntry( entryText, stateMask=stateMask, stateTest=stateTest )
 	widget.textModifiedSignal.connect( viewNodeInstance.viewInstance._p_onEntryModifed )
 	widget.finishEditingSignal.connect( viewNodeInstance.viewInstance._p_onEntryFinished )
-	_customEntryRefreshCell( viewNodeInstance, widget, customChild )
-	_applyStyleSheetStack( viewNodeInstance, widget )
-	_applyStyle( style, widget )
-	return widget
-
-
-
-def tokEntry(labelText, entryText, tokeniser, style=None):
-	"""Builds a DTEntryLabel widget"""
-	viewNodeInstance = _globalNodeViewInstanceStack[-1]
-	if isinstance( labelText, RelativeNode ):
-		labelText = labelText.node
-	if isinstance( entryText, RelativeNode ):
-		entryText = entryText.node
-	widget = DTTokenisedEntryLabel( tokeniser, labelText, entryText )
-	widget.textModifiedSignal.connect( viewNodeInstance.viewInstance._p_onTokenisedEntryModifed )
-	widget.finishEditingSignal.connect( viewNodeInstance.viewInstance._p_onTokenisedEntryFinished )
-	_applyStyleSheetStack( viewNodeInstance, widget )
-	_applyStyle( style, widget )
-	return widget
-
-def tokMarkupEntry(labelText, entryText, tokeniser, style=None):
-	"""Builds a DTEntryLabel widget"""
-	viewNodeInstance = _globalNodeViewInstanceStack[-1]
-	if isinstance( labelText, RelativeNode ):
-		labelText = labelText.node
-	if isinstance( entryText, RelativeNode ):
-		entryText = entryText.node
-	widget = DTTokenisedEntryLabel( tokeniser, labelText, entryText )
-	widget.textModifiedSignal.connect( viewNodeInstance.viewInstance._p_onTokenisedEntryModifed )
-	widget.finishEditingSignal.connect( viewNodeInstance.viewInstance._p_onTokenisedEntryFinished )
-	widget.bLabelUseMarkup = True
-	_applyStyleSheetStack( viewNodeInstance, widget )
-	_applyStyle( style, widget )
-	return widget
-
-def tokCustomEntry(customChild, entryText, tokeniser, style=None):
-	"""Builds a DTEntryLabel widget"""
-	viewNodeInstance = _globalNodeViewInstanceStack[-1]
-	if isinstance( entryText, RelativeNode ):
-		entryText = entryText.node
-	elif isinstance( entryText, UnparsedText ):
-		entryText = entryText.getText()
-	widget = DTTokenisedCustomEntry( tokeniser, entryText )
-	widget.textModifiedSignal.connect( viewNodeInstance.viewInstance._p_onTokenisedEntryModifed )
-	widget.finishEditingSignal.connect( viewNodeInstance.viewInstance._p_onTokenisedEntryFinished )
+	widget.backspaceStartSignal.connect( viewNodeInstance.viewInstance._p_onEntryBackspaceStart )
+	widget.deleteEndSignal.connect( viewNodeInstance.viewInstance._p_onEntryDeleteEnd )
 	_customEntryRefreshCell( viewNodeInstance, widget, customChild )
 	_applyStyleSheetStack( viewNodeInstance, widget )
 	_applyStyle( style, widget )
@@ -780,36 +738,24 @@ class _GSymViewInstance (object):
 
 	
 
-	
-	def _p_sendTextDocEvent(self, widget, bUserEvent, bChanged, text):
-		event = InteractorEventText( bUserEvent, bChanged, text )
+	def _sendDocEvent(self, widget, event):
 		bHandled = self._p_sendDocEventToWidget( widget, event )
 		if not bHandled:
-			print 'gSymView._sendTokenListDocEvent: ***unhandled event*** %s'  %  ( event, )
+			print 'gSymView._sendDocEvent: ***unhandled event*** %s'  %  ( event, )
 		return bHandled
 	
 	def _p_onEntryModifed(self, widget, text):
 		pass
 	
 	def _p_onEntryFinished(self, widget, text, bChanged, bUserEvent):
-		self._p_sendTextDocEvent( widget, bUserEvent, bChanged, text )
+		self._sendDocEvent( widget, InteractorEventText( bUserEvent, bChanged, text ) )
 
-			
-			
-	def _p_sendTokenListDocEvent(self, widget, bUserEvent, bChanged, tokens):
-		event = InteractorEventTokenList( bUserEvent, bChanged, tokens )
-		bHandled = self._p_sendDocEventToWidget( widget, event )
-		if not bHandled:
-			print 'gSymView._sendTokenListDocEvent: ***unhandled event*** %s'  %  ( event, )
-		return bHandled
+	def _p_onEntryBackspaceStart(self, widget):
+		self._sendDocEvent( widget, InteractorEventBackspaceStart() )
 	
-	def _p_onTokenisedEntryModifed(self, widget, text, tokens):
-		if len( tokens ) > 1:
-			self._p_sendTokenListDocEvent( widget, True, True, tokens )
+	def _p_onEntryDeleteEnd(self, widget):
+		self._sendDocEvent( widget, InteractorEventDeleteEnd() )
 	
-	def _p_onTokenisedEntryFinished(self, widget, text, tokens, bChanged, bUserEvent):
-		self._p_sendTokenListDocEvent( widget, bUserEvent, bChanged, tokens )
-
 
 
 			

@@ -21,8 +21,8 @@ class InteractorEventKey (InteractorEvent):
 		self.keyString = keyString
 		self.keyValue = keyValue
 		self.mods = mods
-		
 
+		
 	@staticmethod
 	def fromDTKeyEvent(widget, bUserEvent, event):
 		return InteractorEventKey( bUserEvent, event.keyString, event.keyVal, event.state )
@@ -38,39 +38,26 @@ class InteractorEventText (InteractorEvent):
 		super( InteractorEventText, self ).__init__( bUserEvent )
 		self.bChanged = bChanged
 		self.text = text
-		
+
 
 	def __repr__(self):
 		return "Text %s"  %  ( self.text, )
 
 
 
-class InteractorEventTokenList (InteractorEvent):
-	class Token (object):
-		def __init__(self, tokenClass, value):
-			super( InteractorEventTokenList.Token, self ).__init__()
-			self.tokenClass = tokenClass
-			self.value = value
-		
-		def __repr__(self):
-			return "Token( %s, '%s' )"  %  ( self.tokenClass, self.value )
+class InteractorEventBackspaceStart (InteractorEvent):
+	def __init__(self):
+		super( InteractorEventBackspaceStart, self ).__init__( True )
 
-	def __init__(self, bUserEvent, bChanged, tokens):
-		super( InteractorEventTokenList, self ).__init__( bUserEvent )
-		self.bChanged = bChanged
-		self.tokens = tokens
-		
 
-	def tailEvent(self, fromIndex):
-		tok = self.tokens[fromIndex:]
-		if len( tok ) == 0:
-			return None
-		else:
-			return InteractorEventTokenList( self.bUserEvent, self.bChanged, tok )
-		
-		
 	def __repr__(self):
-		return "Tokens %s"  %  ( self.tokens, )
+		return "Backspace-start"
+
 	
+class InteractorEventDeleteEnd (InteractorEvent):
+	def __init__(self):
+		super( InteractorEventDeleteEnd, self ).__init__( True )
 
 
+	def __repr__(self):
+		return "Delete-end"
