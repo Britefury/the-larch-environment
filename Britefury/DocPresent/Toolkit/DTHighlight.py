@@ -108,7 +108,7 @@ class DTHighlight (DTBin):
 
 
 
-	def __init__(self, stateMask=0, stateTest=0, borderOffset=3.0, borderWidth=1.0, highlightBorderWidth=1.0, borderColour=None, highlightBorderColour=Colour3f( 0.6, 0.6, 0.6 ), backgroundColour=None, highlightBackgroundColour=Colour3f( 0.95, 1.0, 0.95 )):
+	def __init__(self, stateMask=0, stateTest=0, borderOffset=0.0, borderWidth=1.0, highlightBorderWidth=1.0, borderColour=None, highlightBorderColour=Colour3f( 0.6, 0.6, 0.6 ), backgroundColour=None, highlightBackgroundColour=Colour3f( 0.95, 1.0, 0.95 )):
 		super( DTHighlight, self ).__init__()
 
 		self._stateMask = DTDocument.stateValueCoerce( stateMask )

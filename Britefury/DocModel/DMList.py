@@ -11,15 +11,9 @@ from copy import copy, deepcopy
 from Britefury.Cell.LiteralCell import LiteralRefCell
 
 from Britefury.DocModel.DocModelLayer import DocModelLayer
+from Britefury.DocModel.DMNode import DMNode
 from Britefury.DocModel.DMListInterface import DMListInterface
 from Britefury.DocModel import DMListCommandTracker
-
-
-
-
-
-
-
 
 
 
@@ -93,7 +87,7 @@ class DMList (DMListInterface):
 			self._commandTracker_._f_onRemove( self, x )
 		v = self._cell.literalValue
 		bRemoved = False
-		if isinstance( x, DMListInterface ):
+		if isinstance( x, DMNode ):
 			for i, a in enumerate( v ):
 				if a is x:
 					del v[i]
@@ -139,7 +133,7 @@ class DMList (DMListInterface):
 		return len( self._cell.value )
 
 	def index(self, x):
-		if isinstance( x, DMListInterface ):
+		if isinstance( x, DMNode ):
 			for i, a in enumerate( self._cell.value ):
 				if a is x:
 					return i
@@ -323,8 +317,38 @@ class TestCase_LiteralList (unittest.TestCase):
 		def _del(xs):
 			del xs[3:5]
 		self._testUndo( _del )
+		
+		
+	def testNestedListUndo(self):
+		ch = CommandHistory.CommandHistory()
+		xs = DMList( [ 0,1 ] )
+		ch.track( xs )
 
+		self.assert_( xs == [0,1] ) 
+		
+		xs.append( [0] )
+		self.assert_( xs == [0,1,[0]] )
+		a = xs[2]
+		
+		xs[2].append( [5] )
+		self.assert_( xs == [0,1,[0,[5]]] ) 
+		b = xs[2][1]
+		
+		xs[2][1].append( [4] )
+		self.assert_( xs == [0,1,[0,[5,[4]]]] ) 
+		c = xs[2][1]
+		
+		ch.undo()
+		self.assert_( xs == [0,1,[0,[5]]] ) 
+		ch.undo()
+		self.assert_( xs == [0,1,[0]] ) 
+		ch.undo()
+		self.assert_( xs == [0,1] ) 
 
+		ch.redo()
+		self.assert_( xs == [0,1,[0]] ) 
+		ch.redo()
+		self.assert_( xs == [0,1,[0,[5]]] ) 
 
 
 

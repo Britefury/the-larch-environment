@@ -67,14 +67,6 @@ class DMListOperator (object):
 		pass
 
 	@abstractmethod
-	def insertBefore(self, before, x):
-		pass
-
-	@abstractmethod
-	def insertAfter(self, after, x):
-		pass
-
-	@abstractmethod
 	def remove(self, x):
 		pass
 
@@ -105,6 +97,13 @@ class DMListOperator (object):
 		pass
 
 
+	def index(self, x):
+		xs = self.evaluate()
+		if isinstance( x, DMNode ):
+			for i, a in enumerate( xs ):
+				if a is x:
+					return i
+		return xs.index( x )
 
 
 

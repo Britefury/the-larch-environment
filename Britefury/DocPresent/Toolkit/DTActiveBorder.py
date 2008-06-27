@@ -9,6 +9,7 @@ from Britefury.Util.SignalSlot import *
 
 from Britefury.Math.Math import Colour3f
 from Britefury.DocPresent.Toolkit.DTBorder import DTBorder
+from Britefury.DocPresent.Toolkit.DTWidget import DTWidget
 
 
 
@@ -151,13 +152,14 @@ class DTActiveBorder (DTBorder):
 
 		
 	#
-	# FOCUS NAVIGATION METHODS
+	# FOCUS NAVIGATION
 	#
 	
-	def _o_isFocusTarget(self):
-		return True
-		
+	focusPolicy = DTWidget.FOCUSPOLICY_CHILDRENFIRST
+	
 
+	
+	
 	borderWidth = property( getBorderWidth, setBorderWidth )
 	highlightedBorderWidth = property( getHighlightedBorderWidth, setHighlightedBorderWidth )
 	borderColour = property( getBorderColour, setBorderColour )

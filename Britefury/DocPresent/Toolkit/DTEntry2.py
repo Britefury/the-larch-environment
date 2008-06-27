@@ -738,8 +738,7 @@ class DTEntry2 (DTWidget):
 	# FOCUS NAVIGATION METHODS
 	#
 	
-	def _o_isFocusTarget(self):
-		return True
+	focusPolicy = DTWidget.FOCUSPOLICY_CHILDRENFIRST
 
 	
 	def startEditing(self):

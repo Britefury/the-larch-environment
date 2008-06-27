@@ -14,6 +14,7 @@ from Britefury.Math.Math import Colour3f
 from Britefury.DocPresent.Toolkit.DTBin import DTBin
 from Britefury.DocPresent.Toolkit.DTLabel import DTLabel
 from Britefury.DocPresent.Toolkit.DTEntry import DTEntry
+from Britefury.DocPresent.Toolkit.DTWidget import DTWidget
 
 
 
@@ -51,8 +52,7 @@ class DTEntryLabel (DTBin):
 		# FOCUS NAVIGATION METHODS
 		#
 		
-		def _o_isFocusTarget(self):
-			return True
+		focusPolicy = DTWidget.FOCUSPOLICY_CHILDRENFIRST
 			
 
 		def startEditing(self):

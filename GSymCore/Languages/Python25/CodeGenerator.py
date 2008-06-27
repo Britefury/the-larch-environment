@@ -8,6 +8,11 @@
 from Britefury.gSym.gSymCodeGenerator import GSymCodeGenerator
 
 
+def _indent(x):
+	lines = x.split( '\n' )
+	return '\n'.join( [ '\t' + l   for l in lines ] )
+
+
 class Python25CodeGenerator (GSymCodeGenerator):
 	# STRING LITERALS
 	def stringLiteral(self, node, format, quotation, value):
@@ -145,6 +150,17 @@ class Python25CodeGenerator (GSymCodeGenerator):
 	
 	def lambdaExpr(self, node, params, expr):
 		return 'lambda '  +  ', '.join( [ self( p )   for p in params ] )  +  ': '  +  self( expr )
+	
+	
+	def assignmentStmt(self, node, varName, value):
+		return varName  +  ' = '  +  self( value )
+	
+	def returnStmt(self, node, value):
+		return 'return '  +  self( value )
+	
+	def ifStmt(self, node, value, suite):
+		suiteText = '\n'.join( [ self( line )   for line in suite ] )
+		return 'if '  +  self( value ) + ':\n'  +  _indent( suiteText )
 	
 
 	
