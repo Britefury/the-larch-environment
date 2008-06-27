@@ -100,7 +100,7 @@ class DTEntry (DTWidget):
 	textModifiedSignal = ClassSignal()				# ( entry, text )
 
 
-	def __init__(self, text='', font=None, borderWidth=2.0, backgroundColour=Colour3f( 0.9, 0.95, 0.9 ), highlightedBackgroundColour=Colour3f( 0.0, 0.0, 0.5 ), textColour=Colour3f( 0.0, 0.0, 0.0 ), highlightedTextColour=Colour3f( 1.0, 1.0, 1.0 ), borderColour=Colour3f( 0.6, 0.8, 0.6 ), autoCompleteList=None):
+	def __init__(self, text='', font=None, borderWidth=1.0, backgroundColour=Colour3f( 1.0, 1.0, 1.0 ), highlightedBackgroundColour=Colour3f( 0.0, 0.0, 0.5 ), textColour=Colour3f( 0.0, 0.0, 0.0 ), highlightedTextColour=Colour3f( 1.0, 1.0, 1.0 ), borderColour=Colour3f( 0.7, 0.85, 0.7 ), autoCompleteList=None):
 		super( DTEntry, self ).__init__()
 
 		if font is None:
@@ -735,8 +735,7 @@ class DTEntry (DTWidget):
 	# FOCUS NAVIGATION METHODS
 	#
 	
-	def _o_isFocusTarget(self):
-		return True
+	focusPolicy = DTWidget.FOCUSPOLICY_CHILDRENFIRST
 
 	
 	def startEditing(self):

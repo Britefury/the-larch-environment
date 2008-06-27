@@ -14,6 +14,7 @@ from Britefury.Math.Math import Colour3f
 from Britefury.DocPresent.Toolkit.DTBin import DTBin
 from Britefury.DocPresent.Toolkit.DTEntry import DTEntry
 from Britefury.DocPresent.Toolkit.DTDocument import DTDocument
+from Britefury.DocPresent.Toolkit.DTWidget import DTWidget
 
 
 
@@ -64,8 +65,7 @@ class DTCustomEntry (DTBin):
 		# FOCUS NAVIGATION METHODS
 		#
 		
-		def _o_isFocusTarget(self):
-			return True
+		focusPolicy = DTWidget.FOCUSPOLICY_TAKE
 			
 
 		def startEditing(self):
@@ -86,7 +86,7 @@ class DTCustomEntry (DTBin):
 	
 	
 	class _Entry (DTEntry):
-		def __init__(self, customEntry, text, font=None, borderWidth=2.0, backgroundColour=Colour3f( 0.9, 0.95, 0.9 ), highlightedBackgroundColour=Colour3f( 0.0, 0.0, 0.5 ), textColour=Colour3f( 0.0, 0.0, 0.0 ), highlightedTextColour=Colour3f( 1.0, 1.0, 1.0 ), borderColour=Colour3f( 0.6, 0.8, 0.6 )):
+		def __init__(self, customEntry, text, font=None, borderWidth=1.0, backgroundColour=Colour3f( 1.0, 1.0, 1.0 ), highlightedBackgroundColour=Colour3f( 0.0, 0.0, 0.5 ), textColour=Colour3f( 0.0, 0.0, 0.0 ), highlightedTextColour=Colour3f( 1.0, 1.0, 1.0 ), borderColour=Colour3f( 0.7, 0.85, 0.7 )):
 			super( DTCustomEntry._Entry, self ).__init__( text, font, borderWidth, backgroundColour, highlightedBackgroundColour, textColour, highlightedTextColour, borderColour )
 			self._customEntry = customEntry
 

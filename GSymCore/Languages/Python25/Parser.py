@@ -121,3 +121,11 @@ lambdaExpr = Production( ( Keyword( lambdaKeyword )  +  listOfParams  +  Literal
 
 			 
 expression  <<  Production( lambdaExpr  |  boolOr )
+
+
+assignmentStatement = Production( pythonIdentifier  +  '='  +  expression ).action( lambda input, pos, xs: [ 'assignmentStmt', xs[0], xs[2] ] )
+returnStatement = Production( Keyword( 'return' )  +  expression ).action( lambda input, pos, xs: [ 'returnStmt', xs[1] ] )
+ifStatement = Production( Keyword( 'if' )  +  expression  +  ':' ).action( lambda input, pos, xs: [ 'ifStmt', xs[1], [] ] )
+
+
+statement = Production( assignmentStatement  |  returnStatement  |  ifStatement  |  expression )

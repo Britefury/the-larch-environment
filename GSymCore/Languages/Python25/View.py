@@ -11,14 +11,14 @@ from Britefury.gSym.View.ListView import FlowListViewLayout, HorizontalListViewL
 
 from Britefury.gSym.View.Interactor import keyEventMethod, accelEventMethod, textEventMethod, backspaceStartMethod, deleteEndMethod, Interactor
 
-from Britefury.gSym.View.EditOperations import replace, insertAfter
+from Britefury.gSym.View.EditOperations import replace, append, prepend, insertBefore, insertAfter
 
 from Britefury.gSym.View.UnparsedText import UnparsedText
 
 import traceback
 
 
-from GSymCore.Languages.Python25.Parser import expression as expressionParser, arg as argParser, subscriptSlice as subscriptSliceParser, param as paramParser
+from GSymCore.Languages.Python25.Parser import expression as expressionParser, arg as argParser, subscriptSlice as subscriptSliceParser, param as paramParser, statement as statementParser
 from GSymCore.Languages.Python25.Styles import *
 
 
@@ -53,6 +53,9 @@ class ParsedNodeInteractor (Interactor):
 	eventMethods = [ tokData ]
 
 
+
+def _isSuiteStmt(node):
+	return node[0] == 'ifStmt'
 	
 
 class ParsedLineInteractor (Interactor):
@@ -64,7 +67,19 @@ class ParsedLineInteractor (Interactor):
 			else:
 				parsed = _parseText( parser, value )
 				if parsed is not None:
-					node = replace( node, parsed )
+					if _isSuiteStmt( parsed ):
+						print 'Parsed is a suite statement'
+						if _isSuiteStmt( node ):
+							print 'Original is a suite statement'
+							parsed[-1] = node[-1]
+						node = replace( node, parsed )
+						if bUserEvent:
+							print 'Inserting blankline into suite'
+							return prepend( node[-1], [ 'blankLine' ] )
+						else:
+							return node
+					else:
+						node = replace( node, parsed )
 				else:
 					node = replace( node, [ 'UNPARSED', value ] )
 		if bUserEvent:
@@ -78,6 +93,7 @@ class ParsedLineInteractor (Interactor):
 	def backspaceStart(self, node, parser):
 		print 'Backspace start'
 	
+
 	@deleteEndMethod()
 	def deleteEnd(self, node, parser):
 		print 'Delete end'
@@ -86,6 +102,8 @@ class ParsedLineInteractor (Interactor):
 
 
 	
+
+PRECEDENCE_STMT = 100
 
 PRECEDENCE_OR = 14
 PRECEDENCE_AND = 13
@@ -333,6 +351,10 @@ class Python25View (GSymView):
 	def subscript(self, state, node, target, index):
 		targetView = viewEval( target )
 		indexView = viewEval( index, None, python25ViewState( subscriptSliceParser ) )
+		#return nodeEditor( node,
+				#scriptRSub( targetView,  ahbox( [ label( '[', punctuationStyle ),  indexView,  label( ']', punctuationStyle ) ] ) ),
+				#UnparsedText( _unparsePrecedenceGT( targetView.text, PRECEDENCE_SUBSCRIPT ) + '[' + indexView.text + ']',  PRECEDENCE_SUBSCRIPT ),
+				#state )
 		return nodeEditor( node,
 				ahbox( [ targetView,  label( '[', punctuationStyle ),  indexView,  label( ']', punctuationStyle ) ] ),
 				UnparsedText( _unparsePrecedenceGT( targetView.text, PRECEDENCE_SUBSCRIPT ) + '[' + indexView.text + ']',  PRECEDENCE_SUBSCRIPT ),
@@ -476,7 +498,7 @@ class Python25View (GSymView):
 
 	def lambdaExpr(self, state, node, params, expr):
 		exprView = viewEval( expr )
-		paramViews = mapViewEval( params, None, mapViewEval( paramParser ) )
+		paramViews = mapViewEval( params, None, python25ViewState( paramParser ) )
 		paramWidgets = []
 		if len( params ) > 0:
 			for p in paramViews[:-1]:
@@ -488,6 +510,31 @@ class Python25View (GSymView):
 				UnparsedText( 'lambda ' + UnparsedText( ', ' ).join( [ p.text   for p in paramViews ] ) + ': '  +  exprView.text,  PRECEDENCE_CALL ),
 				state )
 
+	
+	
+	def assignmentStmt(self, state, node, varName, value):
+		valueView = viewEval( value )
+		return nodeEditor( node,
+				ahbox( [ label( varName ),  label( '=', punctuationStyle ),  valueView ] ),
+				UnparsedText( varName  +  ' = '  +  valueView.text,  PRECEDENCE_STMT ),
+				state )
+	
+	def returnStmt(self, state, node, value):
+		valueView = viewEval( value )
+		return nodeEditor( node,
+				ahbox( [ label( 'return', keywordStyle ),  valueView ] ),
+				UnparsedText( 'return '  +  valueView.text,  PRECEDENCE_STMT ),
+				state )
+
+	def ifStmt(self, state, node, value, suite):
+		lineViews = mapViewEval( suite, None, python25ViewState( statementParser, MODE_LINE ) )
+		suiteView = listView( VerticalListViewLayout( 0.0, 0.0, 30.0 ), '{', '}', None, lineViews )
+		
+		valueView = viewEval( value )
+		return nodeEditor( node,
+				vbox( [ ahbox( [ label( 'if', keywordStyle ),  valueView,  label( ':', punctuationStyle ) ] ),  suiteView ] ),
+				UnparsedText( 'if '  +  valueView.text  +  ':',  PRECEDENCE_STMT ),
+				state )
 	
 	
 	def var(self, state, node, name):
@@ -525,7 +572,7 @@ class Python25View (GSymView):
 	
 	
 	def python25Module(self, state, node, *content):
-		lineViews = mapViewEval( content, None, python25ViewState( expressionParser, MODE_LINE ) )
+		lineViews = mapViewEval( content, None, python25ViewState( statementParser, MODE_LINE ) )
 		return listView( VerticalListViewLayout( 0.0, 0.0, 0.0 ), None, None, None, lineViews ), ''
 	
 	

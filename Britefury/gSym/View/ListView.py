@@ -11,6 +11,7 @@ from Britefury.DocPresent.Toolkit.DTWidget import DTWidget
 from Britefury.DocPresent.Toolkit.DTLabel import DTLabel
 from Britefury.DocPresent.Toolkit.DTBorder import DTBorder
 from Britefury.DocPresent.Toolkit.DTBox import DTBox
+from Britefury.DocPresent.Toolkit.DTBin import DTBin
 from Britefury.DocPresent.Toolkit.DTFlow import DTFlow
 from Britefury.DocPresent.Toolkit.DTFlowWithSeparators import DTFlowWithSeparators
 
@@ -153,7 +154,7 @@ class VerticalInlineListViewLayout (ListViewLayout):
 		super( VerticalInlineListViewLayout, self ).__init__()
 		self._spacing = spacing
 		self._delimSpacing = delimSpacing
-		self._indentation = 0.0
+		self._indentation = indentation
 		
 		
 	def _p_indent(self, x):

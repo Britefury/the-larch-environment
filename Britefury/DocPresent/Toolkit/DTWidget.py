@@ -96,6 +96,12 @@ class DTWidget (object):
 	CURSORMOVEMENT_MOVE = 1
 	CURSORMOVEMENT_DRAG = 2
 	
+	
+	FOCUSPOLICY_IGNORE = 'ignore'
+	FOCUSPOLICY_CHILDRENFIRST = 'childrenfirst'
+	FOCUSPOLICY_TAKE = 'take'
+	
+	
 
 	def __init__(self):
 		super( DTWidget, self ).__init__()
@@ -645,6 +651,8 @@ class DTWidget (object):
 	# FOCUS NAVIGATION METHODS
 	#
 	
+	focusPolicy = FOCUSPOLICY_IGNORE
+
 	def _f_handleMotionKeyPress(self, keyEvent):
 		return False
 	
@@ -653,9 +661,6 @@ class DTWidget (object):
 
 	def verticalNavigationList(self):
 		return []
-
-	def _o_isFocusTarget(self):
-		return False
 
 	def getCursorPosition(self):
 		return Point2( self.getAllocation() * 0.5 )
@@ -779,26 +784,34 @@ class DTWidget (object):
 	
 	
 	def getLeftFocusLeaf(self):
-		navList = self.horizontalNavigationList()
-		for widget in navList:
-			l = widget.getLeftFocusLeaf()
-			if l is not None:
-				return l
-		if self._o_isFocusTarget():
+		if self.focusPolicy == DTWidget.FOCUSPOLICY_TAKE:
+			# Take the focus
 			return self
 		else:
-			return None
+			# Check the child nodes
+			navList = self.horizontalNavigationList()
+			for widget in navList:
+				l = widget.getLeftFocusLeaf()
+				if l is not None:
+					return l
+			if self.focusPolicy == DTWidget.FOCUSPOLICY_CHILDRENFIRST:
+				return self
+			else:
+				return None
 
 	def getRightFocusLeaf(self):
-		navList = self.horizontalNavigationList()
-		for widget in reversed( navList ):
-			l = widget.getRightFocusLeaf()
-			if l is not None:
-				return l
-		if self._o_isFocusTarget():
+		if self.focusPolicy == DTWidget.FOCUSPOLICY_TAKE:
 			return self
 		else:
-			return None
+			navList = self.horizontalNavigationList()
+			for widget in reversed( navList ):
+				l = widget.getRightFocusLeaf()
+				if l is not None:
+					return l
+			if self.focusPolicy == DTWidget.FOCUSPOLICY_CHILDRENFIRST:
+				return self
+			else:
+				return None
 
 		
 
@@ -877,49 +890,55 @@ class DTWidget (object):
 			return None
 
 	def _p_getTopOrBottomFocusLeaf(self, bBottom, cursorPosInDocSpace):
-		navList = self.verticalNavigationList()
-		if navList != []:
-			if bBottom:
-				nav = reversed( navList )
-			else:
-				nav = navList
-			for item in nav:
-				l = item._p_getTopOrBottomFocusLeaf( bBottom, cursorPosInDocSpace )
-				if l is not None:
-					return l
-			return None
+		if self.focusPolicy == DTWidget.FOCUSPOLICY_TAKE:
+			return self
 		else:
-			navList = self.horizontalNavigationList()
+			navList = self.verticalNavigationList()
 			if navList != []:
-				closestDistance = None
-				closestNode = None
-				for item in navList:
-					bounds = item.getBoundingBox()
-					lower = item.getPointRelativeToDocument( bounds.getLower() ).x
-					upper = item.getPointRelativeToDocument( bounds.getUpper() ).x
-					if cursorPosInDocSpace.x >= lower  and  cursorPosInDocSpace.x <= upper:
-						l = item._p_getTopOrBottomFocusLeaf( bBottom, cursorPosInDocSpace )
-						if l is not None:
-							return l
-					else:
-						distance = None
-						if cursorPosInDocSpace.x < lower:
-							distance = lower - cursorPosInDocSpace.x
-						elif cursorPosInDocSpace.x > upper:
-							distance = cursorPosInDocSpace.x - upper
-						if distance is not None:
-							if closestDistance is None  or  distance < closestDistance:
-								closestDistance = distance
-								closestNode = item
-
-				if closestNode is not None:
-					l = closestNode._p_getTopOrBottomFocusLeaf( bBottom, cursorPosInDocSpace )
+				if bBottom:
+					nav = reversed( navList )
+				else:
+					nav = navList
+				for item in nav:
+					l = item._p_getTopOrBottomFocusLeaf( bBottom, cursorPosInDocSpace )
 					if l is not None:
 						return l
-			if self._o_isFocusTarget():
-				return self
+				if self.focusPolicy == DTWidget.FOCUSPOLICY_CHILDRENFIRST:
+					return self
+				else:
+					return None
 			else:
-				return None
+				navList = self.horizontalNavigationList()
+				if navList != []:
+					closestDistance = None
+					closestNode = None
+					for item in navList:
+						bounds = item.getBoundingBox()
+						lower = item.getPointRelativeToDocument( bounds.getLower() ).x
+						upper = item.getPointRelativeToDocument( bounds.getUpper() ).x
+						if cursorPosInDocSpace.x >= lower  and  cursorPosInDocSpace.x <= upper:
+							l = item._p_getTopOrBottomFocusLeaf( bBottom, cursorPosInDocSpace )
+							if l is not None:
+								return l
+						else:
+							distance = None
+							if cursorPosInDocSpace.x < lower:
+								distance = lower - cursorPosInDocSpace.x
+							elif cursorPosInDocSpace.x > upper:
+								distance = cursorPosInDocSpace.x - upper
+							if distance is not None:
+								if closestDistance is None  or  distance < closestDistance:
+									closestDistance = distance
+									closestNode = item
+	
+					if closestNode is not None:
+						l = closestNode._p_getTopOrBottomFocusLeaf( bBottom, cursorPosInDocSpace )
+						if l is not None:
+							return l
+				if self.focusPolicy == DTWidget.FOCUSPOLICY_CHILDRENFIRST:
+					return self
+				else:
+					return None
 
 
 		

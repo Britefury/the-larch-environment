@@ -33,6 +33,32 @@ def replace(data, replacement):
 	
 	
 	
+
+def append(x, data):
+	if isinstance( x, RelativeNode ):
+		x.node.append( data )
+		return relative( x[-1], x, len( x ) - 1 )
+	else:
+		raise TypeError, '$append: @x must be a RelativeNode'
+
+def prepend(x, data):
+	if isinstance( x, RelativeNode ):
+		x.node.insert( 0, data )
+		return relative( x[0], x, 0 )
+	else:
+		raise TypeError, '$prepend: @x must be a RelativeNode'
+
+def insertBefore(x, data):
+	if isinstance( x, RelativeNode ):
+		if not isinstance( x.parent, DMListInterface ):
+			raise TypeError, '$insertBefore: @x.parent must be a DMListInterface, not %s'  %  ( type( x.parent ), )
+		index = x.parent.index( x.node )
+		x.parent.insert( index, _sanitiseInputData( data ) )
+		return relative( x.parent[index], x.parent, index )
+	else:
+		raise TypeError, '$insertBefore: @x must be a RelativeNode'
+
+
 def insertAfter(x, data):
 	if isinstance( x, RelativeNode ):
 		if not isinstance( x.parent, DMListInterface ):
