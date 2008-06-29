@@ -30,7 +30,6 @@ from Britefury.DocPresent.Toolkit.DTFlowWithSeparators import DTFlowWithSeparato
 
 from Britefury.DocView.DVNode import DVNode
 from Britefury.DocView.DocView import DocView
-from Britefury.DocView.DocViewNodeTable import DocNodeKey
 
 
 from Britefury.GLisp.GLispUtil import isGLispList, gLispSrcToString
@@ -623,19 +622,19 @@ class _GSymViewInstance (object):
 		
 	
 	def _f_makeNodeFactory(self, nodeViewFunction, state):
-		def _nodeFactory(view, treeNode, docNodeKey):
+		def _nodeFactory(view, treeNode):
 			# Build a DVNode for the document subtree at @docNode
 			# self._p_buildNodeContents is a factory that builds the contents withing the DVNode
-			node = DVNode( view, treeNode, docNodeKey )
+			node = DVNode( view, treeNode )
 			node._f_setContentsFactory( self._f_makeNodeContentsFactory( nodeViewFunction, state ) )
 			return node
 		return _nodeFactory
 	
 
-	def _p_rootNodeFactory(self, view, treeNode, docNodeKey):
+	def _p_rootNodeFactory(self, view, treeNode):
 		# Build a DVNode for the document subtree at @docNode
 		# self._p_buildNodeContents is a factory that builds the contents withing the DVNode
-		node = DVNode( view, treeNode, docNodeKey )
+		node = DVNode( view, treeNode )
 		node._f_setContentsFactory( self._f_makeNodeContentsFactory( None, None ) )
 		return node
 	
@@ -695,9 +694,8 @@ class _GSymViewInstance (object):
 	def _p_queueSelect(self, node):
 		def _focus():
 			assert isinstance( node, DocTreeNode ), 'Could not select a node of type %s'  %  ( type( node ), )
-			docNodeKey = DocNodeKey.fromTreeNode( node )
 			try:
-				viewNode = self.view.getViewNodeForDocNodeKey( docNodeKey )
+				viewNode = self.view.getViewNodeForDocTreeNode( node )
 			except KeyError:
 				self.focusWidget = None
 			else:

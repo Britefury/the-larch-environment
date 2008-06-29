@@ -10,7 +10,7 @@ from Britefury.Cell.Cell import Cell
 from Britefury.DocModel.DMListInterface import DMListInterface
 from Britefury.DocTree.DocTreeNode import DocTreeNode
 
-from Britefury.DocView.DocViewNodeTable import DocViewNodeTable, DocNodeKey
+from Britefury.DocView.DocViewNodeTable import DocViewNodeTable
 
 
 
@@ -63,31 +63,31 @@ class DocView (object):
 		if treeNode is None:
 			return None
 		else:
-			docNodeKey = DocNodeKey.fromTreeNode( treeNode )
-
 			if nodeFactory is None:
 				nodeFactory = self._nodeFactory
 			
 			try:
-				viewNode = self._nodeTable[docNodeKey]
+				viewNode = self._nodeTable[treeNode]
 			except KeyError:
-				viewNode = nodeFactory( self, treeNode, docNodeKey )
-				self._nodeTable[docNodeKey] = viewNode
+				try:
+					viewNode = self._nodeTable.takeUnusedViewNodeFor( treeNode )
+				except KeyError:
+					viewNode = nodeFactory( self, treeNode )
+					self._nodeTable[treeNode] = viewNode
 
 			viewNode.refresh()
 
 			return viewNode
 
 
-	def getViewNodeForDocNodeKey(self, docNodeKey):
-		return self._nodeTable[docNodeKey]
+	def getViewNodeForDocTreeNode(self, treeNode):
+		return self._nodeTable[treeNode]
 
 
 
-
-	def refreshAndGetViewNodeForDocNodeKey(self, docNodeKey):
+	def refreshAndGetViewNodeForDocTreeNode(self, treeNode):
 		self.refresh()
-		return self._nodeTable[docNodeKey]
+		return self._nodeTable[treeNode]
 
 
 
@@ -100,34 +100,6 @@ class DocView (object):
 	def refresh(self):
 		self.refreshCell.immutableValue
 		#self.rootView.refresh()
-
-
-
-
-	def _f_handleSelectNode(self, nodeView, selectNodeKey):
-		# Trigger a rebuild
-		self.refresh()
-
-		# Get the view node
-		nodeView = self.getViewNodeForDocNodeKey( selectNodeKey )
-
-		nodeView.makeCurrent()
-
-		return nodeView
-
-
-
-	def _f_handleTokenList(self, nodeView, docNodeKey, tokens, parentStyleSheet, bDirectEvent):
-		if len( tokens ) == 0:
-			nodeView._f_handleEmpty( [], bDirectEvent )
-		elif len( tokens ) == 1  and  bDirectEvent:
-			nodeView._f_handleToken( [], tokens[0], 0, 1, True )
-		else:
-			numTokens = len( tokens )
-			for i, token in enumerate( tokens ):
-				nodeView = nodeView._f_handleToken( [], token, i, numTokens, False )
-				if nodeView is None:
-					break
 
 
 
