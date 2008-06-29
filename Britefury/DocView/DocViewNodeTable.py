@@ -153,8 +153,11 @@ class DocNodeKey (object):
 	
 	
 	@staticmethod
-	def fromRelativeNode(relativeNode):
-		return DocNodeKey( relativeNode.node, relativeNode.parent, relativeNode.indexInParent )
+	def fromTreeNode(treeNode):
+		parent = None
+		if treeNode.parentTreeNode is not None:
+			parnet = treeNode.parentTreeNode
+		return DocNodeKey( treeNode.node, parent, treeNode.indexInParent )
 
 
 	def __cmp__(self, x):

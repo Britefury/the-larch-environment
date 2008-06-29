@@ -43,8 +43,8 @@ from Britefury.gSym.View.InteractorEvent import InteractorEventKey, InteractorEv
 from Britefury.gSym.View import ListView
 from Britefury.gSym.View.UnparsedText import UnparsedText
 
-from Britefury.DocModel.RelativeNode import RelativeNode, relative
-
+from Britefury.DocTree.DocTree import DocTree
+from Britefury.DocTree.DocTreeNode import DocTreeNode
 
 
 """
@@ -90,9 +90,6 @@ def raiseRuntimeError(exceptionClass, src, reason):
 	raise exceptionClass, reason  +  '   ::   '  +  gLispSrcToString( src, 3 )
 
 
-
-def _relativeNodeToDocNodeKey(node):
-	return DocNodeKey( node.node, node.parent, node.indexInParent )
 
 
 
@@ -314,7 +311,7 @@ def label(text, style=None):
 	Builds a DTLabel widget
 	"""
 	viewNodeInstance = _globalNodeViewInstanceStack[-1]
-	if isinstance( text, RelativeNode ):
+	if isinstance( text, DocTreeNode ):
 		text = text.node
 	widget = DTLabel( text )
 	_applyStyleSheetStack( viewNodeInstance, widget )
@@ -327,7 +324,7 @@ def markupLabel(text, style=None):
 	Builds a markup DTLabel widget
 	"""
 	viewNodeInstance = _globalNodeViewInstanceStack[-1]
-	if isinstance( text, RelativeNode ):
+	if isinstance( text, DocTreeNode ):
 		text = text.node
 	widget = DTLabel( text )
 	widget.bUseMarkup = True
@@ -340,9 +337,9 @@ def markupLabel(text, style=None):
 def entry(labelText, entryText, style=None):
 	"""Builds a DTEntryLabel widget"""
 	viewNodeInstance = _globalNodeViewInstanceStack[-1]
-	if isinstance( labelText, RelativeNode ):
+	if isinstance( labelText, DocTreeNode ):
 		labelText = labelText.node
-	if isinstance( entryText, RelativeNode ):
+	if isinstance( entryText, DocTreeNode ):
 		entryText = entryText.node
 	widget = DTEntryLabel( labelText, entryText )
 	widget.textModifiedSignal.connect( viewNodeInstance.viewInstance._p_onEntryModifed )
@@ -356,9 +353,9 @@ def entry(labelText, entryText, style=None):
 def markupEntry(labelText, entryText, style=None):
 	"""Builds a DTEntryLabel widget"""
 	viewNodeInstance = _globalNodeViewInstanceStack[-1]
-	if isinstance( labelText, RelativeNode ):
+	if isinstance( labelText, DocTreeNode ):
 		labelText = labelText.node
-	if isinstance( entryText, RelativeNode ):
+	if isinstance( entryText, DocTreeNode ):
 		entryText = entryText.node
 	widget = DTEntryLabel( labelText, entryText )
 	widget.textModifiedSignal.connect( viewNodeInstance.viewInstance._p_onEntryModifed )
@@ -373,7 +370,7 @@ def markupEntry(labelText, entryText, style=None):
 def customEntry(customChild, entryText, stateMask=0, stateTest=0, style=None):
 	"""Builds a DTEntryLabel widget"""
 	viewNodeInstance = _globalNodeViewInstanceStack[-1]
-	if isinstance( entryText, RelativeNode ):
+	if isinstance( entryText, DocTreeNode ):
 		entryText = entryText.node
 	elif isinstance( entryText, UnparsedText ):
 		entryText = entryText.getText()
@@ -557,8 +554,8 @@ def viewEval(content, nodeViewFunction=None, state=None):
 	"""Build a view for a document subtree (@content)"""
 	viewNodeInstance = _globalNodeViewInstanceStack[-1]
 
-	if not isinstance( content, RelativeNode ):
-		raise TypeError, 'buildView: content is not a RelativeNode'
+	if not isinstance( content, DocTreeNode ):
+		raise TypeError, 'buildView: content is not a DocTreeNode'
 		
 	# A call to DocNode.buildNodeView builds the view, and puts it in the DocView's table
 	viewInstance = viewNodeInstance.viewInstance
@@ -605,12 +602,13 @@ class _GSymViewInstance (object):
 	"""
 	Manages state concerning a view of a specific document
 	"""
-	def __init__(self, xs, viewFactory, commandHistory):
+	def __init__(self, tree, xs, viewFactory, commandHistory):
+		self.tree = tree
 		self.xs = xs
 		self.viewNodeInstanceStack = []
 		self.generalNodeViewFunction = viewFactory._f_createViewFunction( self.viewNodeInstanceStack )
 		# self._p_buildDVNode is a factory that builds DVNode instances for document subtrees
-		self.view = DocView( self.xs, commandHistory, self._p_rootNodeFactory )
+		self.view = DocView( self.tree, self.xs, commandHistory, self._p_rootNodeFactory )
 		self.focusWidget = None
 		self._queue = _ViewQueue( self.view )
 		
@@ -618,31 +616,31 @@ class _GSymViewInstance (object):
 		
 	
 	def _f_makeNodeFactory(self, nodeViewFunction, state):
-		def _nodeFactory(docNode, view, docNodeKey):
+		def _nodeFactory(view, treeNode, docNodeKey):
 			# Build a DVNode for the document subtree at @docNode
 			# self._p_buildNodeContents is a factory that builds the contents withing the DVNode
-			node = DVNode( docNode, view, docNodeKey )
+			node = DVNode( view, treeNode, docNodeKey )
 			node._f_setContentsFactory( self._f_makeNodeContentsFactory( nodeViewFunction, state ) )
 			return node
 		return _nodeFactory
 	
 
-	def _p_rootNodeFactory(self, docNode, view, docNodeKey):
+	def _p_rootNodeFactory(self, view, treeNode, docNodeKey):
 		# Build a DVNode for the document subtree at @docNode
 		# self._p_buildNodeContents is a factory that builds the contents withing the DVNode
-		node = DVNode( docNode, view, docNodeKey )
+		node = DVNode( view, treeNode, docNodeKey )
 		node._f_setContentsFactory( self._f_makeNodeContentsFactory( None, None ) )
 		return node
 	
 
 
 	def _f_makeNodeContentsFactory(self, nodeViewFunction, state):
-		def _buildNodeContents(viewNode, docNodeKey):
+		def _buildNodeContents(viewNode, treeNode):
 			# Create the node view instance
-			nodeViewInstance = _GSymNodeViewInstance( docNodeKey.docNode, self.view, self, viewNode )
-			relativeNode = relative( docNodeKey.docNode, docNodeKey.parentDocNode, docNodeKey.index )
+			nodeViewInstance = _GSymNodeViewInstance( treeNode.node, self.view, self, viewNode )
+			## HACK ##
 			# Build the contents
-			viewContents = self._p_buildNodeViewContents( nodeViewInstance, relativeNode, nodeViewFunction, state )
+			viewContents = self._p_buildNodeViewContents( nodeViewInstance, treeNode, nodeViewFunction, state )
 			# Get the refresh cells that need to be monitored, and hand them to the DVNode
 			viewNode._f_setRefreshCells( nodeViewInstance.refreshCells )
 			# Return the contents
@@ -689,8 +687,8 @@ class _GSymViewInstance (object):
 		
 	def _p_queueSelect(self, node):
 		def _focus():
-			assert isinstance( node, RelativeNode ), '%s'  %  ( type( node ), )
-			docNodeKey = _relativeNodeToDocNodeKey( node )
+			assert isinstance( node, DocTreeNode ), 'Could not select a node of type %s'  %  ( type( node ), )
+			docNodeKey = DocNodeKey.fromTreeNode( node )
 			try:
 				viewNode = self.view.getViewNodeForDocNodeKey( docNodeKey )
 			except KeyError:
@@ -783,8 +781,9 @@ class GSymViewFactory (object):
 		
 		
 	def createDocumentView(self, xs, commandHistory):
-		xs = relative( xs, None, 0 )
-		viewInstance = _GSymViewInstance( xs, self, commandHistory )
+		tree = DocTree()
+		txs = tree.treeNode( xs )
+		viewInstance = _GSymViewInstance( tree, txs, self, commandHistory )
 		return viewInstance.view
 
 

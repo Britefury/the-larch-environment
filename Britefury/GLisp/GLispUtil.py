@@ -7,7 +7,8 @@
 ##-*************************
 from Britefury.DocModel.DMListInterface import DMListInterface
 
-from Britefury.DocModel.RelativeNode import RelativeNode, RelativeList
+from Britefury.DocTree.DocTreeNode import DocTreeNode
+from Britefury.DocTree.DocTreeList import DocTreeList
 
 
 
@@ -15,7 +16,7 @@ def isGLispString(xs):
 	return isinstance( xs, str )  or  isinstance( xs, unicode )
 
 def isGLispList(xs):
-	return isinstance( xs, tuple )  or  isinstance( xs, list )  or  isinstance( xs, DMListInterface )  or  isinstance( xs, RelativeList )
+	return isinstance( xs, tuple )  or  isinstance( xs, list )  or  isinstance( xs, DMListInterface )  or  isinstance( xs, DocTreeList )
 
 
 def isGLispComment(xs):
@@ -28,7 +29,7 @@ def stripGLispComments(xs):
 
 
 def gLispSrcToString(x, level=3):
-	if isinstance( x, RelativeNode ):
+	if isinstance( x, DocTreeNode ):
 		x = x.node
 
 	if x is None:
@@ -50,7 +51,7 @@ def _indent(s):
 
 
 def _gLispSrcToStringPretty(x):
-	if isinstance( x, RelativeNode ):
+	if isinstance( x, DocTreeNode ):
 		x = x.node
 
 	if x is None:
