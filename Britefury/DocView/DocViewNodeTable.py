@@ -7,308 +7,477 @@
 ##-*************************
 from weakref import ref, WeakValueDictionary
 
-from Britefury.DocModel.DMNode import DMNode
 
 
 
+class _ViewTable (object):
+	def __init__(self, table, docNode):
+		self._table = table
+		self._docNode = docNode
+		
+		self._refedNodes = WeakValueDictionary()
+		self._unrefedNodes = {}
+		
+		
+		
+	def takeUnusedViewNodeFor(self, treeNode):
+		if treeNode in self._refedNodes:
+			raise KeyError
 
-class _DocNodeKeyError (Exception):
-	pass
-
-
-class _Key (object):
-	def __init__(self, docNode, parent, index, d):
-		super( _Key, self ).__init__()
-		if isinstance( docNode, DMNode ):
-			self._docNode = ref( docNode, self._p_remove )
-		else:
-			self._docNode = docNode
-
-		if isinstance( parent, DMNode ):
-			self._parent = ref( parent, self._p_remove )
-		else:
-			self._parent = parent
-
-		self._index = index
-		self._d = d
+		# Look in unref'ed nodes...
 		try:
-			self._hash = hash( ( docNode, parent, index ) )
-		except TypeError:
-			print docNode
-			print parent
-			print index
-			raise
-
-
-	def _p_remove(self, weak):
-		if self._d is not None:
-			self._d._p_remove( self )
-
-
-	def __hash__(self):
-		return self._hash
-
-	def _p_asTuple(self):
-		if isinstance( self._docNode, ref ):
-			docNode = self._docNode()
+			viewNode = self._unrefedNodes[treeNode]
+		except KeyError:
+			pass
 		else:
-			docNode = self._docNode
+			# Found an unused view node; move it into the ref'ed table
+			del self._unrefedNodes[treeNode]
+			self._refedNodes[treeNode] = viewNode
+			return viewNode
+		
+		# Still not found; re-use one of the un-ref'ed nodes
+		if len( self._unrefedNodes ) > 0:
+			key, viewNode = self._unrefedNodes.items()[0]
+			del self._unrefedNodes[key]
+			self._refedNodes[treeNode] = viewNode
+			viewNode._changeTreeNode( treeNode )
+			if len( self._unrefedNodes )  ==  0:
+				self._table._removeViewTableFromUnrefedList( self )
+			return viewNode
 
-		if isinstance( self._parent, ref ):
-			parent = self._parent()
-		else:
-			parent = self._parent
-
-		return docNode, parent, self._index
-
-
-	def __cmp__(self, x):
-		return cmp( self._p_asTuple(), x._p_asTuple() )
-
-	def __str__(self):
-		return '%s:<%s>'  %  ( type( self ), self._p_asTuple() )
-
-	def __repr__(self):
-		return '%s:<%s>'  %  ( type( self ), self._p_asTuple() )
+		raise KeyError
 
 
-	def _p_docNodeKey(self):
-		if isinstance( self._docNode, ref ):
-			docNode = self._docNode()
-		else:
-			docNode = self._docNode
+		
+	def __getitem__(self, treeNode):
+		return self._refedNodes[treeNode]
 
-		if isinstance( self._parent, ref ):
-			parent = self._parent()
-		else:
-			parent = self._parent
+	def __setitem__(self, treeNode, v):
+		self._refedNodes[treeNode] = v
 
-		return DocNodeKey( docNode, parent, self._index )
-
-
-
-
-class DocNodeKey (object):
-	def __init__(self, docNode, parentDocNode, index):
-		super( DocNodeKey, self ).__init__()
-		if isinstance( docNode, DMNode ):
-			self._docNode = ref( docNode )
-		else:
-			self._docNode = docNode
-
-		if isinstance( parentDocNode, DMNode ):
-			self._parent = ref( parentDocNode )
-		else:
-			self._parent = parentDocNode
-
-		self._index = index
-
-
-	def getDocNode(self):
-		if isinstance( self._docNode, ref ):
-			return self._docNode()
-		else:
-			return self._docNode
-
-	def getParentDocNode(self):
-		if isinstance( self._parent, ref ):
-			return self._parent()
-		else:
-			return self._parent
-
-	def getIndex(self):
-		return self._index
-
-
-	def _p_key(self, d=None):
-		if isinstance( self._docNode, ref ):
-			docNode = self._docNode()
-			if docNode is None:
-				raise _DocNodeKeyError
-		else:
-			docNode = self._docNode
-
-		if isinstance( self._parent, ref ):
-			parent = self._parent()
-			if parent is None:
-				raise _DocNodeKeyError
-		else:
-			parent = self._parent
-
-		return _Key( docNode, parent, self._index, d )
-
-
-	def _p_asTuple(self):
-		if isinstance( self._docNode, ref ):
-			docNode = self._docNode()
-		else:
-			docNode = self._docNode
-
-		if isinstance( self._parent, ref ):
-			parent = self._parent()
-		else:
-			parent = self._parent
-
-		return docNode, parent, self._index
+	def __delitem__(self, treeNode):
+		del self._refedNodes[treeNode]
+		self.__removeIfEmpty()
 	
 	
-	@staticmethod
-	def fromTreeNode(treeNode):
-		parent = None
-		if treeNode.parentTreeNode is not None:
-			parnet = treeNode.parentTreeNode
-		return DocNodeKey( treeNode.node, parent, treeNode.indexInParent )
+	def __contains__(self, treeNode):
+		return treeNode in self._refedNodes
 
+	def __len__(self):
+		return len( self._refedNodes )
+	
 
-	def __cmp__(self, x):
-		return cmp( self._p_asTuple(), x._p_asTuple() )
+	def keys(self):
+		return self._refedNodes.keys()
 
+	def values(self):
+		return self._refedNodes.values()
 
-	def __str__(self):
-		return '%s:<%s>'  %  ( type( self ), self._p_asTuple() )
+	def items(self):
+		return self._refedNodes.items()
 
-	def __repr__(self):
-		return '%s:<%s>'  %  ( type( self ), self._p_asTuple() )
+	
+	
+	
+	def refViewNode(self, viewNode):
+		treeNode = viewNode.treeNode
+		try:
+			del self._unrefedNodes[treeNode]
+		except KeyError:
+			pass
+		else:
+			if len( self._unrefedNodes ) == 0:
+				self._table._removeViewTableFromUnrefedList( self )
+		self._refedNodes[treeNode] = viewNode
 
-
-	docNode = property( getDocNode )
-	parentDocNode = property( getParentDocNode )
-	index = property( getIndex )
-
-
-
+	def unrefViewNode(self, viewNode):
+		treeNode = viewNode.treeNode
+		try:
+			del self._refedNodes[treeNode]
+		except KeyError:
+			pass
+		if len( self._unrefedNodes ) == 0:
+			self._table._addViewTableToUnrefedList( self )
+		self._unrefedNodes[treeNode] = viewNode
+		
+		
+	def clearUnrefedViewnodes(self):
+		self._unrefedNodes = {}
+		self.__removeIfEmpty()
+		
+		
+	def __removeIfEmpty(self):
+		if len( self._refedNodes ) == 0  and  len( self._unrefedNodes ) == 0:
+			self._table._remove( self._docNode )
+			
+			
 
 
 class DocViewNodeTable (object):
 	def __init__(self):
-		self._data = WeakValueDictionary()
+		self._table = {}
+		self._unrefedTables = set()
+		
+		
+	def takeUnusedViewNodeFor(self, treeNode):
+		return self._table[treeNode.node].takeUnusedViewNodeFor( treeNode )
+		
+		
+	def __getitem__(self, treeNode):
+		return self._table[treeNode.node][treeNode]
 
-
-	def _p_remove(self, _k):
+	def __setitem__(self, treeNode, v):
 		try:
-			del self._data[_k]
+			subTable = self._table[treeNode.node]
 		except KeyError:
-			pass
+			subTable = _ViewTable( self, treeNode.node )
+			self._table[treeNode.node] = subTable
+		subTable[treeNode] = v
 
-
-
-	def __getitem__(self, k):
+	def __delitem__(self, treeNode):
+		del self._table[treeNode.node][treeNode]
+	
+	def __contains__(self, treeNode):
 		try:
-			return self._data[k._p_key()]
-		except _DocNodeKeyError:
-			return None
-
-	def __setitem__(self, k, v):
-		try:
-			self._data[k._p_key(self)] = v
-		except _DocNodeKeyError:
-			pass
-
-	def __delitem__(self, k):
-		try:
-			del self._data[k._p_key()]
-		except _DocNodeKeyError:
-			pass
-
-
-	def __contains__(self, k):
-		try:
-			return k._p_key() in self._data
-		except _DocNodeKeyError:
+			return treeNode in self._table[treeNode.node]
+		except KeyError:
 			return False
-
+	
+	
 	def __len__(self):
-		return len( self._data )
+		return reduce( lambda a, b:  a + len( b ),  self._table.values(),  0 )
 
 
 	def __iter__(self):
-		return iter( [ k._p_docNodeKey()   for k in self._data ] )
+		for v in self._table.values():
+			for k in v.keys():
+				yield k
 
 	def keys(self):
-		return [ k._p_docNodeKey()   for k in self._data.keys() ]
-
+		return reduce( lambda a, b:  a + list(b.keys()),  self._table.values(),  [] )
+	
 	def values(self):
-		return self._data.values()
+		return reduce( lambda a, b:  a + list(b.values()),  self._table.values(),  [] )
 
 	def items(self):
-		return [ ( k._p_docNodeKey(), v )   for k, v in self._data.items() ]
+		return reduce( lambda a, b:  a + list(b.items()),  self._table.values(),  [] )
+	
+	
+	def refViewNodes(self, viewNodeSet):
+		for node in viewNodeSet:
+			viewTable = self._table[node.docNode]
+			viewTable.refViewNode( node )
+		
+	def unrefViewNodes(self, viewNodeSet):
+		for node in viewNodeSet:
+			viewTable = self._table[node.docNode]
+			viewTable.unrefViewNode( node )
+			
+		
+	def _remove(self, docNode):
+		del self._table[docNode]
+		
+		
+	def _addViewTableToUnrefedList(self, table):
+		self._unrefedTables.add( table )
+		
+	def _removeViewTableFromUnrefedList(self, table):
+		self._unrefedTables.remove( table )
+		
+		
+	def clearUnused(self):
+		for table in self._unrefedTables:
+			table.clearUnrefedViewnodes()
+		self._unrefedTables = set()
+		
+		
+		
 
-
-
+		
 
 import unittest
-
-
+from Britefury.DocModel.DMNode import DMNode
+from Britefury.DocModel.DMList import DMList
+from Britefury.DocTree.DocTree import DocTree
 
 class TestCase_DocViewNodeTable (unittest.TestCase):
-	def testDocNodeKey(self):
-		x = DMNode()
-		y = DMNode()
+	class _Value (object):
+		def __init__(self, docNode, treeNode, x):
+			self.docNode = docNode
+			self.treeNode = treeNode
+			self.x = x
+			
+			
+		def _changeTreeNode(self, treeNode):
+			assert treeNode.node is self.docNode
+			self.treeNode = treeNode
+		
+	
+	
+	def _buildDiamondDoc(self):
+		dd = DMList( [ 'd' ] )
+		dc = DMList( [ dd ] )
+		db = DMList( [ dd ] )
+		da = DMList( [ db, dc ] )
+		return da, db, dc, dd
+	
+	
+	def _buildDiamondTree(self):
+		da, db, dc, dd = self._buildDiamondDoc()
+		tree = DocTree()
+		ta = tree.treeNode( da )
+		return da, db, dc, dd, tree, ta
+	
+	
+	def _buildDiamondTable(self):
+		da, db, dc, dd, tree, ta = self._buildDiamondTree()
+		table = DocViewNodeTable()
+		
+		tb = ta[0]
+		tc = ta[1]
+		tbd = tb[0]
+		tcd = tc[0]
+		
+		va = self._Value( da, ta, 'a' )
+		vb = self._Value( db, tb, 'b' )
+		vc = self._Value( dc, tc, 'c' )
+		vbd = self._Value( dd, tbd, 'bd' )
+		vcd = self._Value( dd, tcd, 'cd' )
+		
+		table[ta] = va
+		table[tb] = vb
+		table[tc] = vc
+		table[tbd] = vbd
+		table[tcd] = vcd
+		
+		return da, db, dc, dd, tree, ta, tb, tc, tbd, tcd, va, vb, vc, vbd, vcd, table
+		
+	
+	
+	def testAccessors(self):
+		da, db, dc, dd, tree, ta, tb, tc, tbd, tcd, va, vb, vc, vbd, vcd, table = self._buildDiamondTable()
+		
+		self.assert_( len( table._table ) == 4 )
+		self.assert_( len( table._table[tbd.node] ) == 2 )
+		
+		self.assert_( table[ta].x  ==  'a' )
+		self.assert_( table[tb].x  ==  'b' )
+		self.assert_( table[tc].x  ==  'c' )
+		self.assert_( table[tbd].x  ==  'bd' )
+		self.assert_( table[tcd].x  ==  'cd' )
+		
+		self.assert_( ta in table )
+		self.assert_( tb in table )
+		self.assert_( tc in table )
+		self.assert_( tbd in table )
+		self.assert_( tcd in table )
+		
+		self.assert_( len( table ) == 5 )
+		self.assert_( set( iter( table ) )  ==  set( [ ta, tb, tc, tbd, tcd ] ) )
+		self.assert_( set( table.keys() )  ==  set( [ ta, tb, tc, tbd, tcd ] ) )
+		self.assert_( set( table.values() )  ==  set( [ va, vb, vc, vbd, vcd ] ) )
+		self.assert_( set( table.items() )  ==  set( [ (ta,va), (tb,vb), (tc,vc), (tbd,vbd), (tcd,vcd) ] ) )
+		
+		
+		
+	def testDel(self):
+		da, db, dc, dd, tree, ta, tb, tc, tbd, tcd, va, vb, vc, vbd, vcd, table = self._buildDiamondTable()
+		
+		del table[ta]
+		del table[tbd]
+		
+		self.assert_( len( table._table ) == 3 )
+		self.assert_( len( table._table[tbd.node] ) == 1 )
+		
+		self.assert_( table[tb].x  ==  'b' )
+		self.assert_( table[tc].x  ==  'c' )
+		self.assert_( table[tcd].x  ==  'cd' )
+		
+		self.assert_( ta not in table )
+		self.assert_( tb in table )
+		self.assert_( tc in table )
+		self.assert_( tbd not in table )
+		self.assert_( tcd in table )
+		
+		self.assert_( len( table ) == 3 )
+		self.assert_( set( iter( table ) )  ==  set( [ tb, tc, tcd ] ) )
+		self.assert_( set( table.keys() )  ==  set( [ tb, tc, tcd ] ) )
+		self.assert_( set( table.values() )  ==  set( [ vb, vc, vcd ] ) )
+		self.assert_( set( table.items() )  ==  set( [ (tb,vb), (tc,vc), (tcd,vcd) ] ) )
+	
+		
+	def testSet(self):
+		da, db, dc, dd, tree, ta, tb, tc, tbd, tcd, va, vb, vc, vbd, vcd, table = self._buildDiamondTable()
+		
+		vx = self._Value( da, ta, 'x' )
+		vy = self._Value( dd, tbd, 'y' )
+		
+		table[ta] = vx
+		table[tbd] = vy
+		
+		self.assert_( table[ta].x  ==  'x' )
+		self.assert_( table[tb].x  ==  'b' )
+		self.assert_( table[tc].x  ==  'c' )
+		self.assert_( table[tbd].x  ==  'y' )
+		self.assert_( table[tcd].x  ==  'cd' )
+		
+		self.assert_( ta in table )
+		self.assert_( tb in table )
+		self.assert_( tc in table )
+		self.assert_( tbd in table )
+		self.assert_( tcd in table )
+		
+		self.assert_( len( table ) == 5 )
+		self.assert_( set( iter( table ) )  ==  set( [ ta, tb, tc, tbd, tcd ] ) )
+		self.assert_( set( table.keys() )  ==  set( [ ta, tb, tc, tbd, tcd ] ) )
+		self.assert_( set( table.values() )  ==  set( [ vx, vb, vc, vy, vcd ] ) )
+		self.assert_( set( table.items() )  ==  set( [ (ta,vx), (tb,vb), (tc,vc), (tbd,vy), (tcd,vcd) ] ) )
 
-		k = DocNodeKey( x, y, 1 )
-		self.assert_( k.docNode is x )
-		self.assert_( k.parentDocNode is y )
-		self.assert_( k.index is 1 )
-
-
-	def testTable(self):
+		
+		
+	def testGC(self):
 		import gc
-
-
-		x = DMNode()
-		y = DMNode()
-		a = DMNode()
-
-		k = DocNodeKey( x, y, 1 )
-
-		t = DocViewNodeTable()
-
-		self.assert_( k not in t )
-		self.assert_( len( t ) == 0 )
-
-		t[k] = a
-
-		self.assert_( k in t )
-		self.assert_( len( t ) == 1 )
-		self.assert_( t[k] is a )
-
-		self.assert_( t.keys() == [ k ] )
-		self.assert_( t.values() == [ a ] )
-		self.assert_( t.items() == [ ( k, a ) ] )
-
-
-		del a
-
-		self.assert_( k not in t )
-		self.assert_( len( t ) == 0 )
-
-		a = DMNode()
-		t[k] = a
-
-		self.assert_( k in t )
-		self.assert_( len( t ) == 1 )
-		self.assert_( t[k] is a )
-
-		del x
+		da, db, dc, dd, tree, ta, tb, tc, tbd, tcd, va, vb, vc, vbd, vcd, table = self._buildDiamondTable()
+		
+		del va
+		del vbd
 		gc.collect()
+		
+		self.assert_( len( table._table ) == 4 )
+		self.assert_( len( table._table[tbd.node] ) == 1 )
+		
+		self.assert_( table[tb].x  ==  'b' )
+		self.assert_( table[tc].x  ==  'c' )
+		self.assert_( table[tcd].x  ==  'cd' )
+		
+		self.assert_( ta not in table )
+		self.assert_( tb in table )
+		self.assert_( tc in table )
+		self.assert_( tbd not in table )
+		self.assert_( tcd in table )
+		
+		self.assert_( len( table ) == 3 )
+		self.assert_( set( iter( table ) )  ==  set( [ tb, tc, tcd ] ) )
+		self.assert_( set( table.keys() )  ==  set( [ tb, tc, tcd ] ) )
+		self.assert_( set( table.values() )  ==  set( [ vb, vc, vcd ] ) )
+		self.assert_( set( table.items() )  ==  set( [ (tb,vb), (tc,vc), (tcd,vcd) ] ) )
 
-		self.assert_( len( t ) == 0 )
+		
+	def testUnref(self):
+		da, db, dc, dd, tree, ta, tb, tc, tbd, tcd, va, vb, vc, vbd, vcd, table = self._buildDiamondTable()
+		
+		table.unrefViewNodes( set( [ va, vbd ] ) )
+		
+		self.assert_( len( table._table ) == 4 )
+		self.assert_( len( table._table[tbd.node] ) == 1 )
+		self.assert_( len( table._table[ta.node]._unrefedNodes ) == 1 )
+		self.assert_( len( table._table[tbd.node]._unrefedNodes ) == 1 )
+		
+		self.assert_( table[tb].x  ==  'b' )
+		self.assert_( table[tc].x  ==  'c' )
+		self.assert_( table[tcd].x  ==  'cd' )
+		
+		self.assert_( ta not in table )
+		self.assert_( tb in table )
+		self.assert_( tc in table )
+		self.assert_( tbd not in table )
+		self.assert_( tcd in table )
+		
+		self.assert_( len( table ) == 3 )
+		self.assert_( set( iter( table ) )  ==  set( [ tb, tc, tcd ] ) )
+		self.assert_( set( table.keys() )  ==  set( [ tb, tc, tcd ] ) )
+		self.assert_( set( table.values() )  ==  set( [ vb, vc, vcd ] ) )
+		self.assert_( set( table.items() )  ==  set( [ (tb,vb), (tc,vc), (tcd,vcd) ] ) )
+		
+		table.clearUnused()
 
-		x = DMNode()
-		k = DocNodeKey( x, y, 1 )
-		t[k] = a
+		self.assert_( len( table._table ) == 3 )
+		
+		
+		
+	def testUnrefReref(self):
+		da, db, dc, dd, tree, ta, tb, tc, tbd, tcd, va, vb, vc, vbd, vcd, table = self._buildDiamondTable()
+		
+		table.unrefViewNodes( set( [ va, vbd ] ) )
+		table.refViewNodes( set( [ va, vbd ] ) )
+		
+		self.assert_( len( table._table ) == 4 )
+		self.assert_( len( table._table[tbd.node] ) == 2 )
+		
+		self.assert_( table[ta].x  ==  'a' )
+		self.assert_( table[tb].x  ==  'b' )
+		self.assert_( table[tc].x  ==  'c' )
+		self.assert_( table[tbd].x  ==  'bd' )
+		self.assert_( table[tcd].x  ==  'cd' )
+		
+		self.assert_( ta in table )
+		self.assert_( tb in table )
+		self.assert_( tc in table )
+		self.assert_( tbd in table )
+		self.assert_( tcd in table )
+		
+		self.assert_( len( table ) == 5 )
+		self.assert_( set( iter( table ) )  ==  set( [ ta, tb, tc, tbd, tcd ] ) )
+		self.assert_( set( table.keys() )  ==  set( [ ta, tb, tc, tbd, tcd ] ) )
+		self.assert_( set( table.values() )  ==  set( [ va, vb, vc, vbd, vcd ] ) )
+		self.assert_( set( table.items() )  ==  set( [ (ta,va), (tb,vb), (tc,vc), (tbd,vbd), (tcd,vcd) ] ) )
 
-		self.assert_( k in t )
-		self.assert_( len( t ) == 1 )
-		self.assert_( t[k] is a )
+		
+	def testReuseUnrefed(self):
+		da, db, dc, dd, tree, ta, tb, tc, tbd, tcd, va, vb, vc, vbd, vcd, table = self._buildDiamondTable()
+		
+		del table[tbd]
+		table.unrefViewNodes( set( [ vcd ] ) )
+		
+		self.assert_( len( table._table ) == 4 )
+		self.assert_( len( table._table[tcd.node] ) == 0 )
+		self.assert_( len( table._table[tcd.node]._refedNodes ) == 0 )
+		self.assert_( len( table._table[tcd.node]._unrefedNodes ) == 1 )
+		
+		self.assert_( table[ta].x  ==  'a' )
+		self.assert_( table[tb].x  ==  'b' )
+		self.assert_( table[tc].x  ==  'c' )
+		
+		self.assert_( ta in table )
+		self.assert_( tb in table )
+		self.assert_( tc in table )
+		self.assert_( tbd not in table )
+		self.assert_( tcd not in table )
+		
+		self.assert_( len( table ) == 3 )
+		self.assert_( set( iter( table ) )  ==  set( [ ta, tb, tc ] ) )
+		self.assert_( set( table.keys() )  ==  set( [ ta, tb, tc] ) )
+		self.assert_( set( table.values() )  ==  set( [ va, vb, vc ] ) )
+		self.assert_( set( table.items() )  ==  set( [ (ta,va), (tb,vb), (tc,vc) ] ) )
+		
+		
+		# Reuse
+		val = table.takeUnusedViewNodeFor( tcd )
+		self.assert_( val is vcd )
+		self.assert_( val.docNode is dd )
+		self.assert_( val.treeNode is tcd )
 
-		del x
-		gc.collect()
+		self.assert_( table[tcd].x  ==  'cd' )
+		self.assert_( tbd not in table )
+		self.assert_( tcd in table )
+		self.assert_( len( table ) == 4 )
+		
 
-		self.assert_( len( t ) == 0 )
+		# Unref again
+		table.unrefViewNodes( set( [ vcd ] ) )
+		self.assert_( len( table ) == 3 )
+		
+		# Reuse for a different key this time
+		val = table.takeUnusedViewNodeFor( tbd )
+		self.assert_( val is vcd )
+		self.assert_( val.docNode is dd )
+		self.assert_( val.treeNode is tbd )
 
+		self.assert_( table[tbd].x  ==  'cd' )
+		self.assert_( tbd in table )
+		self.assert_( tcd not in table )
+		self.assert_( len( table ) == 4 )
 
-
-
-if __name__ == '__main__':
-	unittest.main()
+		
+		self.assertRaises( KeyError, lambda: table.takeUnusedViewNodeFor( tbd ) )
+		

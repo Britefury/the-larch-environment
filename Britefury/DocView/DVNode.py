@@ -32,13 +32,12 @@ class DVNode (object):
 		pass
 
 
-	def __init__(self, view, treeNode, docNodeKey):
+	def __init__(self, view, treeNode):
 		super( DVNode, self ).__init__()
-		self._treeNode = treeNode
-		self._docNode = treeNode.node
+		self.treeNode = treeNode
+		self.docNode = treeNode.node
 		self._view = view
 		self._parent = None
-		self._docNodeKey = docNodeKey
 		self.refreshCell = RefCell()
 		self.refreshCell.function = self._o_refreshNode
 		
@@ -53,6 +52,13 @@ class DVNode (object):
 		self._children = set()
 		
 
+		
+		
+	def _changeTreeNode(self, treeNode):
+		assert treeNode.node is self.docNode, 'DVNode._changeTreeNode(): doc-node must remain the same'
+		self.treeNode = treeNode
+		
+		
 
 	#
 	# DOCUMENT VIEW METHODS
@@ -63,15 +69,6 @@ class DVNode (object):
 
 	
 	
-	#
-	# NODE KEY METHODS
-	#
-
-	def getDocNodeKey(self):
-		return self._docNodeKey
-
-
-
 	
 	#
 	# REFRESH METHODS
@@ -114,7 +111,7 @@ class DVNode (object):
 	def _p_computeContents(self):
 		self._children = set()
 		if self._contentsFactory is not None:
-			return self._contentsFactory( self, self._treeNode )
+			return self._contentsFactory( self, self.treeNode )
 		else:
 			return None
 	
@@ -189,7 +186,6 @@ class DVNode (object):
 
 	parentNodeView = property( getParentNodeView )
 	docView = property( getDocView )
-	docNodeKey = property( getDocNodeKey )
 	widget = property( getWidget )
 	text = property( getText )
 
