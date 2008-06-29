@@ -150,6 +150,11 @@ class DocNodeKey (object):
 			parent = self._parent
 
 		return docNode, parent, self._index
+	
+	
+	@staticmethod
+	def fromRelativeNode(relativeNode):
+		return DocNodeKey( relativeNode.node, relativeNode.parent, relativeNode.indexInParent )
 
 
 	def __cmp__(self, x):

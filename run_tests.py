@@ -21,7 +21,6 @@ from Britefury.DocModel import DMNode
 from Britefury.DocModel import DMNull
 from Britefury.DocModel import DMNode
 from Britefury.DocModel import DMSymbol
-from Britefury.DocModel import DMString
 from Britefury.DocModel import DMListOperator
 from Britefury.DocModel import DMListOpNop
 from Britefury.DocModel import DMListOpMap
@@ -38,7 +37,7 @@ from Britefury.DocModel import DMIOWrite
 
 
 testModules = [ CellEvaluatorFunction, CellEvaluator, CellEvaluatorPythonExpression, CellInterface, Cell, LiteralCell, ProxyCell,
-				DMNode, DMNull, DMSymbol, DMString, DMListOperator, DMListInterface, DMVirtualList, DMList, DMProxyList, DocModelLayer, DMListOpNop, DMListOpMap, DMListOpSlice, DMListOpJoin,
+				DMNode, DMNull, DMSymbol, DMListOperator, DMListInterface, DMVirtualList, DMList, DMProxyList, DocModelLayer, DMListOpNop, DMListOpMap, DMListOpSlice, DMListOpJoin,
 				DMInterpreter, DMIORead, DMIOWrite ]
 
 

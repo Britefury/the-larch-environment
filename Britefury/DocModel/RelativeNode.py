@@ -85,13 +85,13 @@ class RelativeList (RelativeNode, DMListInterface):
 
 	def __add__(self, xs):
 		if isinstance( xs, RelativeList ):
-			return RelativeList( self._rln_node + xs._rln_node )
+			return RelativeList( self._rln_node + xs._rln_node, None, -1 )
 		else:
 			return self._rln_node + xs
 
 	def __radd__(self, xs):
 		if isinstance( xs, RelativeList ):
-			return RelativeList( xs._rln_node + self._rln_node )
+			return RelativeList( xs._rln_node + self._rln_node, None, -1 )
 		else:
 			return xs + self._rln_node
 

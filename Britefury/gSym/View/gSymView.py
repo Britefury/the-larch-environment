@@ -43,7 +43,7 @@ from Britefury.gSym.View.InteractorEvent import InteractorEventKey, InteractorEv
 from Britefury.gSym.View import ListView
 from Britefury.gSym.View.UnparsedText import UnparsedText
 
-from Britefury.gSym.RelativeNode import RelativeNode, relative
+from Britefury.DocModel.RelativeNode import RelativeNode, relative
 
 
 
@@ -560,10 +560,10 @@ def viewEval(content, nodeViewFunction=None, state=None):
 	if not isinstance( content, RelativeNode ):
 		raise TypeError, 'buildView: content is not a RelativeNode'
 		
-	# A call to DocNode._f_buildView builds the view, and puts it in the DocView's table
+	# A call to DocNode.buildNodeView builds the view, and puts it in the DocView's table
 	viewInstance = viewNodeInstance.viewInstance
 	nodeFactory = viewInstance._f_makeNodeFactory( nodeViewFunction, state )
-	viewNode = viewNodeInstance.view._f_buildView( content.node, content.parent, content.indexInParent, nodeFactory )
+	viewNode = viewNodeInstance.view.buildNodeView( content, nodeFactory )
 	viewNode._f_setContentsFactory( viewNodeInstance.viewInstance._f_makeNodeContentsFactory( nodeViewFunction, state ) )
 	viewNode.refresh()
 	
@@ -783,6 +783,7 @@ class GSymViewFactory (object):
 		
 		
 	def createDocumentView(self, xs, commandHistory):
+		xs = relative( xs, None, 0 )
 		viewInstance = _GSymViewInstance( xs, self, commandHistory )
 		return viewInstance.view
 
