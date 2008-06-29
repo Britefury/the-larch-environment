@@ -697,6 +697,7 @@ class _GSymViewInstance (object):
 			try:
 				viewNode = self.view.getViewNodeForDocTreeNode( node )
 			except KeyError:
+				print 'gSymView:_GSymViewInstance._p_queueSelect(): Could not get widget to focus on'
 				self.focusWidget = None
 			else:
 				self.focusWidget = viewNode.focus
