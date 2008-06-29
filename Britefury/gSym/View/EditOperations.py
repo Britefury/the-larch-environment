@@ -7,12 +7,12 @@
 ##-*************************
 from Britefury.DocModel.DMListInterface import DMListInterface
 
-from Britefury.DocModel.RelativeNode import relative, RelativeNode, RelativeList
+from Britefury.DocTree.DocTreeNode import DocTreeNode
 
 
 
 def _sanitiseInputData(data):
-	if isinstance( data, RelativeNode ):
+	if isinstance( data, DocTreeNode ):
 		return _sanitiseInputData( data.node )
 	elif isinstance( data, list ):
 		return [ _sanitiseInputData( x )   for x in data ]
@@ -23,51 +23,49 @@ def _sanitiseInputData(data):
 
 
 def replace(data, replacement):
-	if isinstance( data, RelativeNode ):
-		if not isinstance( data.parent, DMListInterface ):
-			raise TypeError, '$replace: @data.parent must be a DMListInterface, not %s'  %  ( type( data.parent ), )
-		data.parent[data.indexInParent] = _sanitiseInputData( replacement )
-		return relative( data.parent[data.indexInParent], data.parent, data.indexInParent )
+	if isinstance( data, DocTreeNode ):
+		parent = data.parentTreeNode
+		parent[data.indexInParent] = _sanitiseInputData( replacement )
+		return parent[data.indexInParent]
 	else:
-		raise TypeError, '$replace: @data must be a RelativeNode'
+		raise TypeError, '$replace: @data must be a DocTreeNode'
 	
 	
 	
 
 def append(x, data):
-	if isinstance( x, RelativeNode ):
-		x.node.append( data )
-		return relative( x[-1], x, len( x ) - 1 )
+	if isinstance( x, DocTreeNode ):
+		x.append( data )
+		return x[-1]
 	else:
-		raise TypeError, '$append: @x must be a RelativeNode'
+		raise TypeError, '$append: @x must be a DocTreeNode'
 
 def prepend(x, data):
-	if isinstance( x, RelativeNode ):
-		x.node.insert( 0, data )
-		return relative( x[0], x, 0 )
+	if isinstance( x, DocTreeNode ):
+		x.insert( 0, data )
+		return x[0]
 	else:
-		raise TypeError, '$prepend: @x must be a RelativeNode'
+		raise TypeError, '$prepend: @x must be a DocTreeNode'
 
 def insertBefore(x, data):
-	if isinstance( x, RelativeNode ):
-		if not isinstance( x.parent, DMListInterface ):
-			raise TypeError, '$insertBefore: @x.parent must be a DMListInterface, not %s'  %  ( type( x.parent ), )
-		index = x.parent.index( x.node )
-		x.parent.insert( index, _sanitiseInputData( data ) )
-		return relative( x.parent[index], x.parent, index )
+	if isinstance( x, DocTreeNode ):
+		parent = x.parentTreeNode
+		index = parent.index( x.node )
+		parent.insert( index, _sanitiseInputData( data ) )
+		return parent[index]
 	else:
-		raise TypeError, '$insertBefore: @x must be a RelativeNode'
+		raise TypeError, '$insertBefore: @x must be a DocTreeNode'
 
 
 def insertAfter(x, data):
-	if isinstance( x, RelativeNode ):
-		if not isinstance( x.parent, DMListInterface ):
-			raise TypeError, '$insertAfter: @x.parent must be a DMListInterface, not %s'  %  ( type( x.parent ), )
-		index = x.parent.index( x.node ) + 1
-		x.parent.insert( index, _sanitiseInputData( data ) )
-		return relative( x.parent[index], x.parent, index )
+	if isinstance( x, DocTreeNode ):
+		parent = x.parentTreeNode
+		index = parent.node.index( x.node ) + 1
+		parent.insert( index, _sanitiseInputData( data ) )
+		return parent[index]
 	else:
-		raise TypeError, '$insertAfter: @x must be a RelativeNode'
+		raise TypeError, '$insertAfter: @x must be a DocTreeNode'
 
 
-
+	
+	

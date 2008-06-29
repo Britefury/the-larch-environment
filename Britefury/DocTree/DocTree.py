@@ -438,3 +438,27 @@ class TestCase_DocTree (unittest.TestCase):
 		self.assert_( tc2 is tc )
 		self.assert_( ted.node is tbd.node )
 		
+		
+	def testModifyTree(self):
+		data = DMList( [ 'add', [ 'ref', 'a' ], [ 'ref', 'b' ] ] )
+		tree = DocTree()
+		
+		tData = tree.treeNode( data )
+		
+		tRefA = tData[1]
+		tParent = tRefA.parentTreeNode
+		tParent[1] = [ 'unbound' ]
+		tUnbound = tParent[1]
+		
+		self.assert_( data[1] == [ 'unbound' ] )
+		self.assert_( tUnbound.node  is  data[1] )
+		self.assert_( tUnbound.parentTreeNode is tData )
+		self.assert_( tUnbound.indexInParent == 1 )
+		
+
+		
+	def testListToTree(self):
+		data = [ 'a', 'b' ]
+		tree = DocTree()
+		self.assertRaises( TypeError, lambda: tree.treeNode( data ) )
+	

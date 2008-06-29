@@ -32,9 +32,10 @@ class DVNode (object):
 		pass
 
 
-	def __init__(self, docNode, view, docNodeKey):
+	def __init__(self, view, treeNode, docNodeKey):
 		super( DVNode, self ).__init__()
-		self.docNode = docNode
+		self._treeNode = treeNode
+		self._docNode = treeNode.node
 		self._view = view
 		self._parent = None
 		self._docNodeKey = docNodeKey
@@ -63,14 +64,7 @@ class DVNode (object):
 	#
 	# NODE KEY METHODS
 	#
-	def _f_setParentAndKey(self, parent, docNodeKey):
-		if parent is not self._parent  or  docNodeKey != self._docNodeKey:
-			self._parent = parent
-			oldKey = self._docNodeKey
-			self._docNodeKey = docNodeKey
-			self._view._f_nodeChangeKey( self, oldKey, docNodeKey )
-		
-		
+
 	def getDocNodeKey(self):
 		return self._docNodeKey
 
@@ -117,7 +111,7 @@ class DVNode (object):
 
 	def _p_computeContents(self):
 		if self._contentsFactory is not None:
-			return self._contentsFactory( self, self._docNodeKey )
+			return self._contentsFactory( self, self._treeNode )
 		else:
 			return None
 	
@@ -173,12 +167,6 @@ class DVNode (object):
 			raise KeyError
 		else:
 			return None
-
-
-	def isForDocNode(self, docNode):
-		return docNode is self.docNode
-
-
 
 
 	def _f_commandHistoryFreeze(self):

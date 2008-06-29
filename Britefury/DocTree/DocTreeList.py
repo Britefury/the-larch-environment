@@ -9,7 +9,7 @@ from Britefury.DocTree.DocTreeNode import DocTreeNode
 from Britefury.DocModel.DMListInterface import DMListInterface
 
 
-class DocTreeList (DocTreeNode, DMListInterface):
+class DocTreeList (DocTreeNode):
 	def __setitem__(self, i, x):
 		self._dtn_node[i] = x
 
