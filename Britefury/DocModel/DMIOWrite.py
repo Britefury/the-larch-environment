@@ -51,7 +51,7 @@ def _writeList(stream, content):
 
 
 def __writesx__(stream, content):
-	if isinstance( content, str ):
+	if isinstance( content, str )  or  isinstance( content, unicode ):
 		if needsQuotes( content ):
 			stream.write( repr( content ) )
 		else:

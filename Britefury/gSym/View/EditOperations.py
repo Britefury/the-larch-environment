@@ -7,7 +7,7 @@
 ##-*************************
 from Britefury.DocModel.DMListInterface import DMListInterface
 
-from Britefury.gSym.RelativeNode import relative, RelativeNode, RelativeList
+from Britefury.DocModel.RelativeNode import relative, RelativeNode, RelativeList
 
 
 

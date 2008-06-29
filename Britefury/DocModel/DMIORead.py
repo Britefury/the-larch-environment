@@ -57,7 +57,7 @@ _sxp << ( _item | _sxList )
 
 
 def readSX(source):
-	if isinstance( source, str ):
+	if isinstance( source, str )  or  isinstance( source, unicode ):
 		parseResult = _sxp.parseString( source )
 	else:
 		parseResult = _sxp.parseFile( source )

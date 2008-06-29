@@ -8,6 +8,7 @@
 from Britefury.Cell.Cell import Cell
 
 from Britefury.DocModel.DMListInterface import DMListInterface
+from Britefury.DocModel.RelativeNode import RelativeNode, relative
 
 from Britefury.DocView.DocViewNodeTable import DocViewNodeTable, DocNodeKey
 
@@ -17,6 +18,8 @@ from Britefury.DocView.DocViewNodeTable import DocViewNodeTable, DocNodeKey
 class DocView (object):
 	def __init__(self, root, commandHistory, nodeFactory):
 		super( DocView, self ).__init__()
+		
+		assert isinstance( root, RelativeNode )
 
 		self._root = root
 
@@ -35,7 +38,7 @@ class DocView (object):
 		
 	def _p_getRootView(self):
 		if self._rootView is None:
-			self._rootView = self._f_buildView( self._root, None, 0 )
+			self._rootView = self.buildNodeView( self._root )
 		return self._rootView
 
 
@@ -61,11 +64,13 @@ class DocView (object):
 		self._nodeTable[newKey] = viewNode
 
 
-	def _f_buildView(self, docNode, parentDocNode, indexInParentDocNode, nodeFactory=None):
-		if docNode is None:
+	def buildNodeView(self, relativeNode, nodeFactory=None):
+		assert isinstance( relativeNode, RelativeNode )
+		
+		if relativeNode is None:
 			return None
 		else:
-			docNodeKey = DocNodeKey( docNode, parentDocNode, indexInParentDocNode )
+			docNodeKey = DocNodeKey.fromRelativeNode( relativeNode )
 
 			if nodeFactory is None:
 				nodeFactory = self._nodeFactory
@@ -73,7 +78,7 @@ class DocView (object):
 			try:
 				viewNode = self._nodeTable[docNodeKey]
 			except KeyError:
-				viewNode = nodeFactory( docNode, self, docNodeKey )
+				viewNode = nodeFactory( relativeNode.node, self, docNodeKey )
 				self._nodeTable[docNodeKey] = viewNode
 
 			viewNode.refresh()

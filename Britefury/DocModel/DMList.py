@@ -351,6 +351,11 @@ class TestCase_LiteralList (unittest.TestCase):
 		self.assert_( xs == [0,1,[0,[5]]] ) 
 
 
+	def testCoerce(self):
+		xs = DMList( [ 'a', [ 'a' ] ] )
+		
+		self.assert_( isinstance( xs[0], str ) )
+		self.assert_( isinstance( xs[1], DMList ) )
 
 
 
