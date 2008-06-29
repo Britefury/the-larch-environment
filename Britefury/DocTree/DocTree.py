@@ -191,7 +191,6 @@ class _DocTreeKey (object):
 
 class _DocTreeNodeTable (object):
 	def __init__(self):
-		#self._data = weakref.WeakValueDictionary()
 		self._data = {}
 
 
@@ -387,7 +386,7 @@ class TestCase_DocTree (unittest.TestCase):
 		
 		
 		
-	def _buildDiamond(self):
+	def _buildDiamondDoc(self):
 		dd = DMList( [ 'd' ] )
 		dc = DMList( [ dd ] )
 		db = DMList( [ dd ] )
@@ -395,23 +394,29 @@ class TestCase_DocTree (unittest.TestCase):
 		return da, db, dc, dd
 	
 	
-	def _buildTree(self):
-		da, db, dc, dd = self._buildDiamond()
+	def _buildDiamondTree(self):
+		da, db, dc, dd = self._buildDiamondDoc()
 		tree = DocTree()
 		ta = tree.treeNode( da )
 		return da, db, dc, dd, tree, ta
 		
 	
 	
+	def testListToTree(self):
+		data = [ 'a', 'b' ]
+		tree = DocTree()
+		self.assertRaises( TypeError, lambda: tree.treeNode( data ) )
+
+		
 	def testDiamond(self):
-		da, db, dc, dd = self._buildDiamond()
+		da, db, dc, dd = self._buildDiamondDoc()
 		
 		self.assert_( da[0][0][0] == 'd' )
 		self.assert_( da[0][0] is da[1][0] )
 		
 		
-	def testTree(self):
-		da, db, dc, dd, tree, ta = self._buildTree()
+	def testDiamondTree(self):
+		da, db, dc, dd, tree, ta = self._buildDiamondTree()
 		
 		tb = ta[0]
 		tc = ta[1]
@@ -440,25 +445,27 @@ class TestCase_DocTree (unittest.TestCase):
 		
 		
 	def testModifyTree(self):
-		data = DMList( [ 'add', [ 'ref', 'a' ], [ 'ref', 'b' ] ] )
+		module = DMList( [ 'module', [ 'expr', [ 'add', [ 'ref', 'a' ], [ 'ref', 'b' ] ] ] ] )
 		tree = DocTree()
 		
-		tData = tree.treeNode( data )
+		tModule = tree.treeNode( module )
 		
-		tRefA = tData[1]
+		tExpr = tModule[1]
+		tAdd = tExpr[1]
+		tRefA = tAdd[1]
 		tParent = tRefA.parentTreeNode
-		tParent[1] = [ 'unbound' ]
-		tUnbound = tParent[1]
+		tParent[1] = [ 'if', [] ]
+		tIf = tParent[1]
+		tIf[-1].insert( 0, [ 'unbound' ] )
+		tUnbound = tIf[1][0]
 		
-		self.assert_( data[1] == [ 'unbound' ] )
-		self.assert_( tUnbound.node  is  data[1] )
-		self.assert_( tUnbound.parentTreeNode is tData )
-		self.assert_( tUnbound.indexInParent == 1 )
+		self.assert_( module[1][1][1][1][0] == [ 'unbound' ] )
+		self.assert_( module == [ 'module', [ 'expr', [ 'add', [ 'if', [ [ 'unbound' ] ] ], [ 'ref', 'b' ] ] ] ] )
+		self.assert_( tUnbound.node  is  module[1][1][1][1][0] )
+		self.assert_( tModule[1][1][1][1][0] is tUnbound )
+		self.assert_( tUnbound.parentTreeNode.parentTreeNode.parentTreeNode.parentTreeNode.parentTreeNode is tModule )
+		self.assert_( tUnbound.indexInParent == 0 )
 		
 
 		
-	def testListToTree(self):
-		data = [ 'a', 'b' ]
-		tree = DocTree()
-		self.assertRaises( TypeError, lambda: tree.treeNode( data ) )
 	

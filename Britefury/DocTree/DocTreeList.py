@@ -21,6 +21,11 @@ class DocTreeList (DocTreeNode):
 			indices = xrange( *i.indices( len( self._dtn_node ) ) )
 			return [ self._dtn_tree.treeNode( x, self, j )   for j, x in zip( indices, self._dtn_node[i] ) ]
 		else:
+			# Negative indices should be converted to positive
+			# The index can be used to form a hash key. A negative index, and its positive counterpart
+			# both refer to the same element, so they should hash to the same value.
+			if i < 0:
+				i += len( self._dtn_node )
 			return self._dtn_tree.treeNode( self._dtn_node[i], self, i )
 
 	def __contains__(self, x):
