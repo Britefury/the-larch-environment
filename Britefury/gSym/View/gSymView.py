@@ -133,13 +133,16 @@ class _ViewQueue (object):
 
 def _buildRefreshCellAndRegister(viewNodeInstance, refreshFunction):
 	"""
-	Runtime - called by compiled code at run-time
 	Builds a refresh cell, and registers it by appending it to @refreshCells
 	"""
 	cell = Cell()
 	cell.function = refreshFunction
 	viewNodeInstance.refreshCells.append( cell )
-	
+
+def _registerViewNodeRelationship(viewNodeInstance, childNode):
+	viewNodeInstance.viewNode._registerChild( childNode )
+
+
 def _binRefreshCell(viewNodeInstance, bin, child):
 	"""
 	Runtime - called by compiled code at run-time
@@ -150,6 +153,7 @@ def _binRefreshCell(viewNodeInstance, bin, child):
 		def _binRefresh():
 			chNode.refresh()
 			bin.child = chNode.widget
+			_registerViewNodeRelationship( viewNodeInstance, chNode )
 		_buildRefreshCellAndRegister( viewNodeInstance, _binRefresh )
 	elif isinstance( child, DTWidget ):
 		bin.child = child
@@ -166,6 +170,7 @@ def _customEntryRefreshCell(viewNodeInstance, customEntry, child):
 		def _customEntryRefresh():
 			chNode.refresh()
 			customEntry.customChild = chNode.widget
+			_registerViewNodeRelationship( viewNodeInstance, chNode )
 		_buildRefreshCellAndRegister( viewNodeInstance, _customEntryRefresh )
 	elif isinstance( child, DTWidget ):
 		customEntry.customChild = child
@@ -183,6 +188,7 @@ def _containerSeqRefreshCell(viewNodeInstance, widget, children):
 			if isinstance( child, DVNode ):
 				child.refresh()
 				widgets.append( child.widget )
+				_registerViewNodeRelationship( viewNodeInstance, child )
 			elif isinstance( child, DTWidget ):
 				widgets.append( child )
 			else:
@@ -201,6 +207,7 @@ def _scriptRefreshCell(viewNodeInstance, script, child, childSlotAttrName):
 			chNode.refresh()
 			#script.mainChild = chNode.widget
 			setattr( script, childSlotAttrName, chNode.widget )
+			_registerViewNodeRelationship( viewNodeInstance, chNode )
 		_buildRefreshCellAndRegister( viewNodeInstance, _scriptRefresh )
 	elif isinstance( child, DTWidget ):
 		#script.mainChild = child

@@ -50,6 +50,8 @@ class DVNode (object):
 		self._cellsToRefresh = []
 		self.focus = None
 		
+		self._children = set()
+		
 
 
 	#
@@ -110,6 +112,7 @@ class DVNode (object):
 
 
 	def _p_computeContents(self):
+		self._children = set()
 		if self._contentsFactory is not None:
 			return self._contentsFactory( self, self._treeNode )
 		else:
@@ -119,6 +122,9 @@ class DVNode (object):
 	def _f_setRefreshCells(self, cells):
 		self._cellsToRefresh = cells
 		self._o_resetRefreshCell()
+		
+	def _registerChild(self, child):
+		self._children.add( child )
 		
 		
 	def _f_setContentsFactory(self, contentsFactory):
