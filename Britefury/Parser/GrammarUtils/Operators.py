@@ -133,12 +133,6 @@ class InfixRight (Operator):
 		return [ self._op, tokens[0], tokens[2] ]
 
 	def _buildParser(self, operatorTable, levelParserForwardDeclarations, thisLevel, thisLevelParser, previousLevel, previousLevelParser):
-		#return previousLevelParser + self._opExpression + operatorTable._getPrefixParserFromLevel( thisLevel, thisLevelParser )
-		#return previousLevelParser + self._opExpression + thisLevelParser
-
-		#prefix = operatorTable._getUnaryParserFromLevel( thisLevel, thisLevelParser, Prefix )
-		#suffix = operatorTable._getUnaryParserFromLevel( thisLevel, thisLevelParser, Suffix )
-		
 		prefix = operatorTable._getLowestPrecedenceUnaryOperatorLevelParserAbove( levelParserForwardDeclarations, thisLevel, Prefix )
 		#suffix = operatorTable._getLowestPrecedenceUnaryOperatorLevelParserAbove( levelParserForwardDeclarations, thisLevel, Suffix )
 
