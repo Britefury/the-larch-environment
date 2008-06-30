@@ -84,7 +84,6 @@ class ParsedLineInteractor (Interactor):
 					node = replace( node, [ 'UNPARSED', value ] )
 		if bUserEvent:
 			print 'Inserting...'
-			#traceback.print_stack()
 			return insertAfter( node, [ 'blankLine' ] )
 		
 		
