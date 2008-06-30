@@ -109,11 +109,13 @@ class DVNode (object):
 
 
 	def _p_computeContents(self):
-		self._view._nodeTable.unrefViewNodes( self._children )
+		for child in self._children:
+			self._view._nodeTable.unrefViewNode( child )
 		self._children = set()
 		if self._contentsFactory is not None:
 			contents = self._contentsFactory( self, self.treeNode )
-			self._view._nodeTable.refViewNodes( self._children )
+			for child in self._children:
+				self._view._nodeTable.refViewNode( child )
 			return contents
 		else:
 			return None

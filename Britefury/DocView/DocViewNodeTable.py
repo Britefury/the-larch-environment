@@ -163,15 +163,13 @@ class DocViewNodeTable (object):
 		return reduce( lambda a, b:  a + list(b.items()),  self._table.values(),  [] )
 	
 	
-	def refViewNodes(self, viewNodeSet):
-		for node in viewNodeSet:
-			viewTable = self._table[node.docNode]
-			viewTable.refViewNode( node )
+	def refViewNode(self, viewNode):
+		viewTable = self._table[viewNode.docNode]
+		viewTable.refViewNode( viewNode )
 		
-	def unrefViewNodes(self, viewNodeSet):
-		for node in viewNodeSet:
-			viewTable = self._table[node.docNode]
-			viewTable.unrefViewNode( node )
+	def unrefViewNode(self, viewNode):
+		viewTable = self._table[viewNode.docNode]
+		viewTable.unrefViewNode( viewNode )
 			
 		
 	def _remove(self, docNode):
@@ -189,7 +187,6 @@ class DocViewNodeTable (object):
 		for table in self._unrefedTables:
 			table.clearUnrefedViewnodes()
 		self._unrefedTables = set()
-		
 		
 		
 
