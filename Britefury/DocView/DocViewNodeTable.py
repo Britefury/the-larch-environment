@@ -363,7 +363,8 @@ class TestCase_DocViewNodeTable (unittest.TestCase):
 	def testUnref(self):
 		da, db, dc, dd, tree, ta, tb, tc, tbd, tcd, va, vb, vc, vbd, vcd, table = self._buildDiamondTable()
 		
-		table.unrefViewNodes( set( [ va, vbd ] ) )
+		table.unrefViewNode( va )
+		table.unrefViewNode( vbd )
 		
 		self.assert_( len( table._table ) == 4 )
 		self.assert_( len( table._table[tbd.node] ) == 1 )
@@ -395,8 +396,10 @@ class TestCase_DocViewNodeTable (unittest.TestCase):
 	def testUnrefReref(self):
 		da, db, dc, dd, tree, ta, tb, tc, tbd, tcd, va, vb, vc, vbd, vcd, table = self._buildDiamondTable()
 		
-		table.unrefViewNodes( set( [ va, vbd ] ) )
-		table.refViewNodes( set( [ va, vbd ] ) )
+		table.unrefViewNode( va )
+		table.unrefViewNode( vbd )
+		table.refViewNode( va )
+		table.refViewNode( vbd )
 		
 		self.assert_( len( table._table ) == 4 )
 		self.assert_( len( table._table[tbd.node] ) == 2 )
@@ -424,7 +427,7 @@ class TestCase_DocViewNodeTable (unittest.TestCase):
 		da, db, dc, dd, tree, ta, tb, tc, tbd, tcd, va, vb, vc, vbd, vcd, table = self._buildDiamondTable()
 		
 		del table[tbd]
-		table.unrefViewNodes( set( [ vcd ] ) )
+		table.unrefViewNode( vcd )
 		
 		self.assert_( len( table._table ) == 4 )
 		self.assert_( len( table._table[tcd.node] ) == 0 )
@@ -461,7 +464,7 @@ class TestCase_DocViewNodeTable (unittest.TestCase):
 		
 
 		# Unref again
-		table.unrefViewNodes( set( [ vcd ] ) )
+		table.unrefViewNode( vcd )
 		self.assert_( len( table ) == 3 )
 		
 		# Reuse for a different key this time

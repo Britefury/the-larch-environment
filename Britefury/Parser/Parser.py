@@ -930,7 +930,7 @@ class Optional (ParserExpression):
 	def evaluate(self, state, input, start, stop):
 		res, pos = self._subexp.evaluate( state, input, start, stop )
 		if res is None:
-			return ParseResult( None, start, pos ),  pos
+			return ParseResult( None, start, start ),  start
 		else:
 			return res, pos
 
@@ -980,20 +980,22 @@ class Repetition (ParserExpression):
 		bindings = {}
 		
 		pos = start
+		errorPos = start
 		i = 0
 		while pos <= stop  and  ( self._max is None  or  i < self._max ):
-			res, pos = self._subexp.evaluate( state, input, pos, stop )
+			res, errorPos = self._subexp.evaluate( state, input, pos, stop )
 			if res is None:
 				break
 			else:
 				bindings.update( res.bindings )
 				if not res.bSuppressed:
 					subexpResults.append( res.result )
-			i += 1
+				pos = errorPos
+				i += 1
 			
 			
 		if i < self._min  or  ( self._max is not None   and   i > self._max ):
-			return None, pos
+			return None, errorPos
 		else:
 			if self._bSuppressIfZero  and  i == 0:
 				return ParseResult( None, start, pos, bindings ),  pos
@@ -1230,6 +1232,7 @@ class ParserTestCase (unittest.TestCase):
 			print ''
 			print 'RESULT:'
 			print result.result
+			print 'consumed %d/%d chars'  %  ( result.end, len( input ) )
 		self.assert_( result is None  or  result.end != len( input ) )
 
 

@@ -398,7 +398,7 @@ class Python25View (GSymView):
 							hline( operatorStyle ),
 							vbox( [ yView ], alignment='centre' ) ],
 						alignment='expand' ),
-				  PRECEDENCE_POW )
+				  PRECEDENCE_MULDIVMOD )
 	
 	def mod(self, state, node, x, y):
 		return horizontalBinOpView( state, node, x, y, '%', PRECEDENCE_MULDIVMOD )
