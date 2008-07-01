@@ -2,11 +2,11 @@
 	($unit
 		($withLanguageModule GSymCore.Languages.Python25.Python25
 			(python25Module
-				(listDisplay
+				(listLiteral
 					(mul (add(pow (var varA) (var varB)) (var varC)) (div (var varD) (var varE)))
 					(mul (var varA) (var varB))
 				)
-				(listDisplay
+				(listLiteral
 					(var p)
 					(var q)
 				)

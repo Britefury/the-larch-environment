@@ -220,6 +220,9 @@ edge [
 	def action(self, actionFn):
 		return Action( self, actionFn )
 	
+	def condition(self, conditionFn):
+		return Condition( self, conditionFn )
+	
 	
 	def debug(self, debugName):
 		self.debugName = debugName
@@ -518,6 +521,10 @@ class Production (Group):
 	def action(self, actionFn):
 		# Wrap the inner sub-expression in the Action expression
 		return Production( Action( self._subexp, actionFn ) )
+	
+	def condition(self, conditionFn):
+		# Wrap the inner sub-expression in the Condition expression
+		return Production( Condition( self._subexp, conditionFn ) )
 	
 
 	def __repr__(self):

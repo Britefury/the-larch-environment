@@ -23,7 +23,7 @@ unicodeStringDLiteral = Production( Suppress( Literal( 'u' )  |  Literal( 'U' ) 
 regexAsciiStringSLiteral = Production( Suppress( Literal( 'r' )  |  Literal( 'R' ) ) + singleQuotedString ).action( lambda input, pos, xs: [ 'stringLiteral', 'ascii-regex', 'single', xs[0][1:-1] ] )
 regexAsciiStringDLiteral = Production( Suppress( Literal( 'r' )  |  Literal( 'R' ) ) + doubleQuotedString ).action( lambda input, pos, xs: [ 'stringLiteral', 'ascii-regex', 'double', xs[0][1:-1] ] )
 regexUnicodeStringSLiteral = Production( Suppress( Literal( 'ur' )  |  Literal( 'uR' )  |  Literal( 'Ur' )  |  Literal( 'UR' ) ) + singleQuotedString ).action( lambda input, pos, xs: [ 'stringLiteral', 'unicode-regex', 'single', xs[0][1:-1] ] )
-regexUnicodeStringDLiteral = Production( Suppress( Literal( 'ur' )  |  Literal( 'uR' )  |  Literal( 'Ur' )  |  Literal( 'UR' ) ) + singleQuotedString ).action( lambda input, pos, xs: [ 'stringLiteral', 'unicode-regex', 'double', xs[0][1:-1] ] )
+regexUnicodeStringDLiteral = Production( Suppress( Literal( 'ur' )  |  Literal( 'uR' )  |  Literal( 'Ur' )  |  Literal( 'UR' ) ) + doubleQuotedString ).action( lambda input, pos, xs: [ 'stringLiteral', 'unicode-regex', 'double', xs[0][1:-1] ] )
 shortStringLiteral = asciiStringSLiteral | asciiStringDLiteral | unicodeStringSLiteral | unicodeStringDLiteral |  \
 				regexAsciiStringSLiteral | regexAsciiStringDLiteral | regexUnicodeStringSLiteral | regexUnicodeStringDLiteral
 
@@ -34,7 +34,7 @@ decimalLongLiteral = Production( decimalInteger + Suppress( Literal( 'l' )  |  L
 hexIntLiteral = Production( hexInteger ).action( lambda input, pos, xs: [ 'intLiteral', 'hex', 'int', xs ] )
 hexLongLiteral = Production( hexInteger + Suppress( Literal( 'l' )  |  Literal( 'L' ) ) ).action( lambda input, pos, xs: [ 'intLiteral', 'hex', 'long', xs[0] ] )
 
-integerLiteral = decimalLongLiteral | decimalIntLiteral | hexLongLiteral | hexIntLiteral
+integerLiteral = hexLongLiteral | hexIntLiteral | decimalLongLiteral | decimalIntLiteral
 
 floatLiteral = Production( floatingPoint ).action( lambda input, pos, xs: [ 'floatLiteral', xs ] )
 
@@ -49,16 +49,60 @@ attrName = Production( pythonIdentifier )
 
 
 expression = Forward()
+oldExpression = Forward()
+subscript = Forward()
+attr = Forward()
+tupleOrExpression = Forward()
+oldTupleOrExpression = Forward()
 
+
+# Target (assignment, for-loop, ...)
+_target = Forward()
+
+singleTarget = Production( pythonIdentifier ).action( lambda input, pos, xs: [ 'singleTarget', xs ] )
+tupleTarget = Production( separatedList( _target, bNeedAtLeastOne=True, bAllowTrailingSeparator=True, bRequireTrailingSeparatorForLengthOne=True ) ).action( lambda input, pos, xs: [ 'tupleTarget' ] + xs )
+targetList = ( tupleTarget  |  _target ).debug( 'targetList' )
+
+parenTarget = Production( Literal( '(' )  +  targetList  +  Literal( ')' ) ).action( lambda input, pos, xs: xs[1] )
+listTarget = Production( delimitedSeparatedList( _target, '[', ']', bAllowTrailingSeparator=True ) ).action( lambda input, pos, xs: [ 'listTarget' ]  +  xs )
+_target  <<  ( subscript  |  attr  |  parenTarget  |  listTarget  |  singleTarget )
+
+
+
+# Load local variable
 loadLocal = Production( pythonIdentifier ).action( lambda input, begin, xs: [ 'var', xs ] )
 
 
+# Tuples
+tupleLiteral = Production( separatedList( expression, bNeedAtLeastOne=True, bAllowTrailingSeparator=True, bRequireTrailingSeparatorForLengthOne=True ) ).action( lambda input, pos, xs: [ 'tupleLiteral' ]  +  xs )
+oldTupleLiteral = Production( separatedList( expression, bNeedAtLeastOne=True, bAllowTrailingSeparator=True, bRequireTrailingSeparatorForLengthOne=True ) ).action( lambda input, pos, xs: [ 'tupleLiteral' ]  +  xs )
+
+
+# List literal
+listLiteral = Production( delimitedSeparatedList( expression, '[', ']', bAllowTrailingSeparator=True ) ).action( lambda input, begin, xs: [ 'listLiteral' ] + xs )
+
+
+# List comprehension
+def _checkListComprehension(input, pos, xs):
+	xs = xs[1]
+	tag = None
+	while isinstance( xs, list )  and  len( xs ) > 1  and  ( xs[0] == 'listFor'  or  xs[0] == 'listIf' ):
+		tag = xs[0]
+		xs = xs[1]
+	return tag == 'listFor'
+listIter = Forward()
+listFor = Production( listIter  +  Keyword( forKeyword )  +  targetList  +  Keyword( inKeyword )  +  oldTupleOrExpression ).action( lambda input, pos, xs: [ 'listFor', xs[0], xs[2], xs[4] ] )
+listIf = Production( listIter  +  Keyword( ifKeyword )  +  oldExpression ).action( lambda input, pos, xs: [ 'listIf', xs[0], xs[2] ] )
+listIter  <<  Production( listFor | listIf | expression )
+listComprehension = Production( Literal( '[' )  +  listIter  +  Literal( ']' ) ).condition( _checkListComprehension ).action( lambda input, pos, xs: [ 'listComprehension', xs[1] ] )
+
+# List display
+listDisplay = listLiteral  |  listComprehension
 
 
 
-listDisplay = Production( Literal( '[' )  +  separatedList( expression )  +  Literal( ']' ) ).action( lambda input, begin, xs: [ 'listDisplay' ]  +  xs[1] )
 
-parenForm = Production( Literal( '(' ) + expression + ')' ).action( lambda input, begin, xs: xs[1] )
+parenForm = Production( Literal( '(' ) + tupleOrExpression + ')' ).action( lambda input, begin, xs: xs[1] )
 
 enclosure = Production( parenForm | listDisplay )
 
@@ -78,13 +122,13 @@ call = Production( ( primary + Literal( '(' ) + listOfArgs + Literal( ')' ) ).ac
 
 subscriptSlice = Production( ( expression + ':' + expression ).action( lambda input, begin, tokens: [ 'subscriptSlice', tokens[0], tokens[2] ] ) )
 subscriptIndex = Production( subscriptSlice  |  expression )
-subscript = Production( ( primary + '[' + subscriptIndex + ']' ).action( lambda input, begin, tokens: [ 'subscript', tokens[0], tokens[2] ] ) )
-attr = Production( primary + '.' + attrName ).action( lambda input, begin, tokens: [ 'attr', tokens[0], tokens[2] ] )
+subscript  <<  Production( ( primary + '[' + subscriptIndex + ']' ).action( lambda input, begin, tokens: [ 'subscript', tokens[0], tokens[2] ] ) )
+attr  <<  Production( primary + '.' + attrName ).action( lambda input, begin, tokens: [ 'attr', tokens[0], tokens[2] ] )
 primary  <<  Production( call | subscript | attr | atom )
 
 
 
-boolOr = buildOperatorParser( \
+orTest = buildOperatorParser( \
 	[
 		[ InfixRight( Literal( '**' ),  lambda op, x, y: [ 'pow', x, y ] ) ],
 		[ Prefix( Literal( '~' ),  lambda op, x: [ 'invert', x ] ),   Prefix( Literal( '-' ),  lambda op, x: [ 'negate', x ] ),   Prefix( Literal( '+' ),  lambda op, x: [ 'pos', x ] ) ],
@@ -116,16 +160,119 @@ defaultValueParam = Production( paramName + '=' + expression ).action( lambda in
 paramList = Production( Literal( '*' )  +  paramName ).action( lambda input, begin, xs: [ 'paramList', xs[1] ] )
 kwParamList = Production( Literal( '**' )  +  paramName ).action( lambda input, begin, xs: [ 'kwParamList', xs[1] ] )
 param = Production( kwParamList | paramList | defaultValueParam | simpleParam )
-listOfParams = Production( separatedList( arg ) )
+listOfParams = Production( separatedList( param ) )
 lambdaExpr = Production( ( Keyword( lambdaKeyword )  +  listOfParams  +  Literal( ':' )  +  expression ).action( lambda input, pos, xs: [ 'lambdaExpr', xs[1], xs[3] ] ) )
 
 			 
-expression  <<  Production( lambdaExpr  |  boolOr )
+oldExpression  <<  Production( lambdaExpr  |  orTest )
+expression  <<  Production( lambdaExpr  |  orTest )
+
+tupleOrExpression  <<  ( tupleLiteral | expression )
+oldTupleOrExpression  <<  ( oldTupleLiteral | oldExpression )
 
 
-assignmentStatement = Production( pythonIdentifier  +  '='  +  expression ).action( lambda input, pos, xs: [ 'assignmentStmt', xs[0], xs[2] ] )
-returnStatement = Production( Keyword( 'return' )  +  expression ).action( lambda input, pos, xs: [ 'returnStmt', xs[1] ] )
+assignmentStatement = Production( pythonIdentifier  +  '='  +  tupleOrExpression ).action( lambda input, pos, xs: [ 'assignmentStmt', xs[0], xs[2] ] )
+returnStatement = Production( Keyword( 'return' )  +  tupleOrExpression ).action( lambda input, pos, xs: [ 'returnStmt', xs[1] ] )
 ifStatement = Production( Keyword( 'if' )  +  expression  +  ':' ).action( lambda input, pos, xs: [ 'ifStmt', xs[1], [] ] )
 
 
 statement = Production( assignmentStatement  |  returnStatement  |  ifStatement  |  expression )
+
+
+
+
+import unittest
+
+
+class TestCase_Python25Parser (ParserTestCase):
+	def test_shortStringLiteral(self):
+		self._matchTest( expression, '\'abc\'', [ 'stringLiteral', 'ascii', 'single', 'abc' ] )
+		self._matchTest( expression, '\"abc\"', [ 'stringLiteral', 'ascii', 'double', 'abc' ] )
+		self._matchTest( expression, 'u\'abc\'', [ 'stringLiteral', 'unicode', 'single', 'abc' ] )
+		self._matchTest( expression, 'u\"abc\"', [ 'stringLiteral', 'unicode', 'double', 'abc' ] )
+		self._matchTest( expression, 'r\'abc\'', [ 'stringLiteral', 'ascii-regex', 'single', 'abc' ] )
+		self._matchTest( expression, 'r\"abc\"', [ 'stringLiteral', 'ascii-regex', 'double', 'abc' ] )
+		self._matchTest( expression, 'ur\'abc\'', [ 'stringLiteral', 'unicode-regex', 'single', 'abc' ] )
+		self._matchTest( expression, 'ur\"abc\"', [ 'stringLiteral', 'unicode-regex', 'double', 'abc' ] )
+		
+		
+	def test_integerLiteral(self):
+		self._matchTest( expression, '123', [ 'intLiteral', 'decimal', 'int', '123' ] )
+		self._matchTest( expression, '123L', [ 'intLiteral', 'decimal', 'long', '123' ] )
+		self._matchTest( expression, '0x123', [ 'intLiteral', 'hex', 'int', '0x123' ] )
+		self._matchTest( expression, '0x123L', [ 'intLiteral', 'hex', 'long', '0x123' ] )
+	
+		
+	def test_floatLiteral(self):
+		self._matchTest( expression, '123.0', [ 'floatLiteral', '123.0' ] )
+	
+		
+	def test_imaginaryLiteral(self):
+		self._matchTest( expression, '123.0j', [ 'imaginaryLiteral', '123.0j' ] )
+	
+		
+	def testTargets(self):
+		self._matchTest( targetList, 'a', [ 'singleTarget', 'a' ] )
+		self._matchTest( targetList, '(a)', [ 'singleTarget', 'a' ] )
+		
+		self._matchTest( targetList, '(a,)', [ 'tupleTarget', [ 'singleTarget', 'a' ] ] )
+		self._matchTest( targetList, 'a,b', [ 'tupleTarget', [ 'singleTarget', 'a' ],  [ 'singleTarget', 'b' ] ] )
+		self._matchTest( targetList, '(a,b)', [ 'tupleTarget', [ 'singleTarget', 'a' ],  [ 'singleTarget', 'b' ] ] )
+		self._matchTest( targetList, '(a,b,)', [ 'tupleTarget', [ 'singleTarget', 'a' ],  [ 'singleTarget', 'b' ] ] )
+		self._matchTest( targetList, '(a,b),(c,d)', [ 'tupleTarget', [ 'tupleTarget', [ 'singleTarget', 'a' ], [ 'singleTarget', 'b' ] ], [ 'tupleTarget', [ 'singleTarget', 'c' ], [ 'singleTarget', 'd' ] ] ] )
+		
+		self._matchFailTest( targetList, '(a,) (b,)' )
+
+		self._matchTest( targetList, '[a]', [ 'listTarget', [ 'singleTarget', 'a' ] ] )
+		self._matchTest( targetList, '[a,]', [ 'listTarget', [ 'singleTarget', 'a' ] ] )
+		self._matchTest( targetList, '[a,b]', [ 'listTarget', [ 'singleTarget', 'a' ],  [ 'singleTarget', 'b' ] ] )
+		self._matchTest( targetList, '[a,b,]', [ 'listTarget', [ 'singleTarget', 'a' ],  [ 'singleTarget', 'b' ] ] )
+		self._matchTest( targetList, '[a],[b,]', [ 'tupleTarget', [ 'listTarget', [ 'singleTarget', 'a' ] ], [ 'listTarget', [ 'singleTarget', 'b' ] ] ] )
+		self._matchTest( targetList, '[(a,)],[(b,)]', [ 'tupleTarget', [ 'listTarget', [ 'tupleTarget', [ 'singleTarget', 'a' ] ] ], [ 'listTarget', [ 'tupleTarget', [ 'singleTarget', 'b' ] ] ] ] )
+		
+		
+	def testListLiteral(self):
+		self._matchTest( expression, '[a,b]', [ 'listLiteral', [ 'var', 'a' ], [ 'var', 'b' ] ] )
+		self._matchTest( expression, '[a,b,]', [ 'listLiteral', [ 'var', 'a' ], [ 'var', 'b' ] ] )
+		
+		
+	def testListComprehension(self):
+		self._matchTest( expression, '[i  for i in a]', [ 'listComprehension',
+									[ 'listFor', [ 'var', 'i' ], [ 'singleTarget', 'i' ], [ 'var', 'a' ] ] ] )
+		self._matchFailTest( expression, '[i  if x]', )
+		self._matchTest( expression, '[i  for i in a  if x]', [ 'listComprehension',
+									[ 'listIf',
+										[ 'listFor', [ 'var', 'i' ], [ 'singleTarget', 'i' ], [ 'var', 'a' ] ],
+										[ 'var', 'x' ] ] ] )
+		self._matchTest( expression, '[i  for i in a  for j in b]', [ 'listComprehension',
+									[ 'listFor',
+										[ 'listFor', [ 'var', 'i' ], [ 'singleTarget', 'i' ], [ 'var', 'a' ] ],
+										[ 'singleTarget', 'j' ], [ 'var', 'b' ] ] ] )
+		self._matchTest( expression, '[i  for i in a  if x  for j in b]', [ 'listComprehension',
+									[ 'listFor',
+										[ 'listIf',
+											[ 'listFor', [ 'var', 'i' ], [ 'singleTarget', 'i' ], [ 'var', 'a' ] ],
+										[ 'var', 'x' ] ],	
+									[ 'singleTarget', 'j' ], [ 'var', 'b' ] ] ] )
+		self._matchTest( expression, '[i  for i in a  if x  for j in b  if y]', [ 'listComprehension',
+									[ 'listIf',
+										[ 'listFor',
+											[ 'listIf',
+												[ 'listFor', [ 'var', 'i' ], [ 'singleTarget', 'i' ], [ 'var', 'a' ] ],
+											[ 'var', 'x' ] ],	
+										[ 'singleTarget', 'j' ], [ 'var', 'b' ] ],
+									[ 'var', 'y' ] ] ] )
+		
+
+		
+	def testTupleOrExpression(self):
+		self._matchTest( tupleOrExpression, 'a', [ 'var', 'a' ] )
+		self._matchTest( tupleOrExpression, 'a,b', [ 'tupleLiteral', [ 'var', 'a' ], [ 'var', 'b' ] ] )
+		self._matchTest( tupleOrExpression, 'a,2', [ 'tupleLiteral', [ 'var', 'a' ], [ 'intLiteral', 'decimal', 'int', '2' ] ] )
+		self._matchTest( tupleOrExpression, 'lambda x, y: x+y,2', [ 'tupleLiteral', [ 'lambdaExpr', [ [ 'simpleParam', 'x' ], [ 'simpleParam', 'y' ] ], [ 'add', [ 'var', 'x' ], [ 'var', 'y' ] ] ], [ 'intLiteral', 'decimal', 'int', '2' ] ] )
+
+		
+
+if __name__ == '__main__':
+	result, pos, dot = listComprehension.debugParseString( '[i  for i in a  if x]' )
+	print dot
