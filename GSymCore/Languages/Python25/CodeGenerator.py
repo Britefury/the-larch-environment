@@ -27,6 +27,24 @@ class Python25CodeGenerator (GSymCodeGenerator):
 	def imaginaryLiteral(self, node, value):
 		return repr( value )
 	
+	
+
+	def var(self, node, name):
+		return name
+	
+	def nilExpr(self, node):
+		return '<NIL>'
+	
+	def blankLine(self, node):
+		return ''
+	
+	def tupleLiteral(self, node, *x):
+		return '( '  +  ', '.join( [ self( i )   for i in x ]  +  ', ' )  +  ' )'
+
+	def listLiteral(self, node, *x):
+		return '[ '  +  ', '.join( [ self( i )   for i in x ] )  +  ' ]'
+	
+	
 
 	def kwArg(self, node, name, value):
 		return name + '=' + self( value )
@@ -163,19 +181,6 @@ class Python25CodeGenerator (GSymCodeGenerator):
 		return 'if '  +  self( value ) + ':\n'  +  _indent( suiteText )
 	
 
-	
-	def var(self, node, name):
-		return name
-	
-	def nilExpr(self, node):
-		return '<NIL>'
-	
-	def blankLine(self, node):
-		return ''
-	
-	def listDisplay(self, node, *x):
-		return '[ '  +  ', '.join( [ self( i )   for i in x ] )  +  ' ]'
-	
 	
 	def python25Module(self, node, *content):
 		return '\n'.join( [ self( line )   for line in content ] )

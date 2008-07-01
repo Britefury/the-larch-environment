@@ -118,11 +118,13 @@ PRECEDENCE_ADDSUB = 4
 PRECEDENCE_MULDIVMOD = 3
 PRECEDENCE_INVERT_NEGATE_POS = 2
 PRECEDENCE_POW = 1
-PRECEDENCE_LOADLOCAL = 0
-PRECEDENCE_LISTLITERAL = 0
 PRECEDENCE_CALL = 0
 PRECEDENCE_SUBSCRIPT = 0
 PRECEDENCE_ATTR = 0
+
+PRECEDENCE_LOADLOCAL = 0
+PRECEDENCE_LISTLITERAL = 0
+PRECEDENCE_MAKETUPLE = 0
 
 PRECEDENCE_SUBSCRIPTSLICE = 0
 PRECEDENCE_ARG = 0
@@ -303,6 +305,49 @@ class Python25View (GSymView):
 				state )
 	
 
+	
+	def var(self, state, node, name):
+		nameUnparsed = UnparsedText( name )
+		nameLabel = label( name )
+		nameUnparsed.associateWith( nameLabel )
+		return nodeEditor( node,
+				nameLabel,
+				nameUnparsed,
+				state )
+	
+	def nilExpr(self, state, node):
+		return nodeEditor( node,
+				label( '<expr>' ),
+				UnparsedText( 'None' ),
+				state )
+	
+	
+	def blankLine(self, state, node):
+		return nodeEditor( node,
+				label( ' ' ),
+				UnparsedText( '' ),
+				state )
+	
+	
+	def tupleLiteral(self, state, node, *xs):
+		xViews = mapViewEval( xs )
+		return nodeEditor( node,
+				   #listView( VerticalListViewLayout( 0.0, 0.0, 45.0 ), '[', ']', ',', xViews ),
+				   listView( FlowListViewLayout( 5.0, 0.0 ), '(', ')', ',', xViews ),
+				   UnparsedText( '[ '  +  UnparsedText( ', ' ).join( [ x.text   for x in xViews ] )  +  ' ]', PRECEDENCE_MAKETUPLE ),
+				   state )
+
+	
+	
+	def listLiteral(self, state, node, *xs):
+		xViews = mapViewEval( xs )
+		return nodeEditor( node,
+				   #listView( VerticalListViewLayout( 0.0, 0.0, 45.0 ), '[', ']', ',', xViews ),
+				   listView( FlowListViewLayout( 10.0, 5.0 ), '[', ']', ',', xViews ),
+				   UnparsedText( '[ '  +  UnparsedText( ', ' ).join( [ x.text   for x in xViews ] )  +  ' ]', PRECEDENCE_LISTLITERAL ),
+				   state )
+
+	
 	
 	def kwArg(self, state, node, name, value):
 		valueView = viewEval( value )
@@ -505,7 +550,7 @@ class Python25View (GSymView):
 				paramWidgets.append( label( ',', punctuationStyle ) )
 			paramWidgets.append( paramViews[-1] )
 		return nodeEditor( node,
-				ahbox( [ label( 'lambda', keywordStyle ) ]  +  paramWidgets  +  [ label( ':', punctuationStyle ), exprView ] ),
+				ahbox( [ markupLabel( 'L<span size="small">AMBDA</span>', keywordStyle ) ]  +  paramWidgets  +  [ label( ':', punctuationStyle ), exprView ] ),
 				UnparsedText( 'lambda ' + UnparsedText( ', ' ).join( [ p.text   for p in paramViews ] ) + ': '  +  exprView.text,  PRECEDENCE_CALL ),
 				state )
 
@@ -521,7 +566,7 @@ class Python25View (GSymView):
 	def returnStmt(self, state, node, value):
 		valueView = viewEval( value )
 		return nodeEditor( node,
-				ahbox( [ label( 'return', keywordStyle ),  valueView ] ),
+				ahbox( [ markupLabel( 'R<span size="small">ETURN</span>', keywordStyle ),  valueView ] ),
 				UnparsedText( 'return '  +  valueView.text,  PRECEDENCE_STMT ),
 				state )
 
@@ -531,43 +576,9 @@ class Python25View (GSymView):
 		
 		valueView = viewEval( value )
 		return nodeEditor( node,
-				vbox( [ ahbox( [ label( 'if', keywordStyle ),  valueView,  label( ':', punctuationStyle ) ] ),  suiteView ] ),
+				vbox( [ ahbox( [ markupLabel( 'I<span size="small">F</span>', keywordStyle ),  valueView,  label( ':', punctuationStyle ) ] ),  suiteView ] ),
 				UnparsedText( 'if '  +  valueView.text  +  ':',  PRECEDENCE_STMT ),
 				state )
-	
-	
-	def var(self, state, node, name):
-		nameUnparsed = UnparsedText( name )
-		nameLabel = label( name )
-		nameUnparsed.associateWith( nameLabel )
-		return nodeEditor( node,
-				nameLabel,
-				nameUnparsed,
-				state )
-	
-	def nilExpr(self, state, node):
-		return nodeEditor( node,
-				label( '<expr>' ),
-				UnparsedText( 'None' ),
-				state )
-	
-	
-	def blankLine(self, state, node):
-		return nodeEditor( node,
-				label( ' ' ),
-				UnparsedText( '' ),
-				state )
-	
-	
-	def listDisplay(self, state, node, *xs):
-		xViews = mapViewEval( xs )
-		return nodeEditor( node,
-				   #listView( VerticalListViewLayout( 0.0, 0.0, 45.0 ), '[', ']', ',', xViews ),
-				   listView( FlowListViewLayout( 10.0, 5.0 ), '[', ']', ',', xViews ),
-				   UnparsedText( '[ '  +  UnparsedText( ', ' ).join( [ x.text   for x in xViews ] )  +  ' ]', PRECEDENCE_LISTLITERAL ),
-				   state )
-
-	
 	
 	
 	def python25Module(self, state, node, *content):

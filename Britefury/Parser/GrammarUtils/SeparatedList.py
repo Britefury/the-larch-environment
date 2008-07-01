@@ -81,7 +81,9 @@ def delimitedSeparatedList(subexp, beginDelim, endDelim, separator=',', bNeedAtL
 	to:
 	   [ 'a', 'b', 'c', 'd' ]
 	"""
-	return ( parserCoerce( beginDelim )  +  separatedList( subexp, separator, bNeedAtLeastOne, bAllowTrailingSeparator, bRequireTrailingSeparatorForLengthOne )  +  parserCoerce( endDelim ) ).action( lambda input, begin, xs: xs[1] )
+	return ( parserCoerce( beginDelim )  +  \
+		 separatedList( subexp, separator, bNeedAtLeastOne, bAllowTrailingSeparator, bRequireTrailingSeparatorForLengthOne )  +  \
+		 parserCoerce( endDelim ) ).action( lambda input, begin, xs: xs[1] )
 
 
 
