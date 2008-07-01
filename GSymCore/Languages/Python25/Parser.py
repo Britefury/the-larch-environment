@@ -52,6 +52,7 @@ expression = Forward()
 oldExpression = Forward()
 subscript = Forward()
 attr = Forward()
+orTest = Forward()
 tupleOrExpression = Forward()
 oldTupleOrExpression = Forward()
 
@@ -83,28 +84,26 @@ listLiteral = Production( delimitedSeparatedList( expression, '[', ']', bAllowTr
 
 
 # List comprehension
-def _checkListComprehension(input, pos, xs):
-	xs = xs[1]
-	tag = None
-	while isinstance( xs, list )  and  len( xs ) > 1  and  ( xs[0] == 'listFor'  or  xs[0] == 'listIf' ):
-		tag = xs[0]
-		xs = xs[1]
-	return tag == 'listFor'
-listIter = Forward()
-listFor = Production( listIter  +  Keyword( forKeyword )  +  targetList  +  Keyword( inKeyword )  +  oldTupleOrExpression ).action( lambda input, pos, xs: [ 'listFor', xs[0], xs[2], xs[4] ] )
-listIf = Production( listIter  +  Keyword( ifKeyword )  +  oldExpression ).action( lambda input, pos, xs: [ 'listIf', xs[0], xs[2] ] )
-listIter  <<  Production( listFor | listIf | expression )
-listComprehension = Production( Literal( '[' )  +  listIter  +  Literal( ']' ) ).condition( _checkListComprehension ).action( lambda input, pos, xs: [ 'listComprehension', xs[1] ] )
+listFor = Production( Keyword( forKeyword )  +  targetList  +  Keyword( inKeyword )  +  oldTupleOrExpression ).action( lambda input, pos, xs: [ 'listFor', xs[1], xs[3] ] )
+listIf = Production( Keyword( ifKeyword )  +  oldExpression ).action( lambda input, pos, xs: [ 'listIf', xs[1] ] )
+listComprehension = Production( Literal( '[' )  +  expression  +  listFor  +  ZeroOrMore( listFor | listIf )  +  Literal( ']' ) ).action( lambda input, pos, xs: [ 'listComprehension', xs[1], xs[2] ]  +  xs[3] )
 
-# List display
-listDisplay = listLiteral  |  listComprehension
 
+# Generator expression
+genFor = Production( Keyword( forKeyword )  +  targetList  +  Keyword( inKeyword )  +  orTest ).action( lambda input, pos, xs: [ 'genFor', xs[1], xs[3] ] )
+genIf = Production( Keyword( ifKeyword )  +  oldExpression ).action( lambda input, pos, xs: [ 'genIf', xs[1] ] )
+generatorExpression = Production( Literal( '(' )  +  expression  +  genFor  +  ZeroOrMore( genFor | genIf )  +  Literal( ')' ) ).action( lambda input, pos, xs: [ 'generatorExpression', xs[1], xs[2] ]  +  xs[3] )
+
+
+# Dictionary literal
+keyValuePair = Production( expression  +  Literal( ':' )  +  expression ).action( lambda input, pos, xs: [ 'keyValuePair', xs[0], xs[2] ] )
+dictLiteral = Production( delimitedSeparatedList( keyValuePair, '{', '}', bAllowTrailingSeparator=True ) ).action( lambda input, begin, xs: [ 'dictLiteral' ] + xs )
 
 
 
 parenForm = Production( Literal( '(' ) + tupleOrExpression + ')' ).action( lambda input, begin, xs: xs[1] )
 
-enclosure = Production( parenForm | listDisplay )
+enclosure = Production( parenForm | listLiteral | listComprehension | generatorExpression | dictLiteral )
 
 atom = Production( enclosure | literal | loadLocal )
 
@@ -128,7 +127,7 @@ primary  <<  Production( call | subscript | attr | atom )
 
 
 
-orTest = buildOperatorParser( \
+orTest  <<  buildOperatorParser( \
 	[
 		[ InfixRight( Literal( '**' ),  lambda op, x, y: [ 'pow', x, y ] ) ],
 		[ Prefix( Literal( '~' ),  lambda op, x: [ 'invert', x ] ),   Prefix( Literal( '-' ),  lambda op, x: [ 'negate', x ] ),   Prefix( Literal( '+' ),  lambda op, x: [ 'pos', x ] ) ],
@@ -237,34 +236,64 @@ class TestCase_Python25Parser (ParserTestCase):
 		
 		
 	def testListComprehension(self):
-		self._matchTest( expression, '[i  for i in a]', [ 'listComprehension',
-									[ 'listFor', [ 'var', 'i' ], [ 'singleTarget', 'i' ], [ 'var', 'a' ] ] ] )
+		self._matchTest( expression, '[i  for i in a]', [ 'listComprehension', [ 'var', 'i' ],
+												[ 'listFor', [ 'singleTarget', 'i' ], [ 'var', 'a' ] ]
+										] )
 		self._matchFailTest( expression, '[i  if x]', )
-		self._matchTest( expression, '[i  for i in a  if x]', [ 'listComprehension',
-									[ 'listIf',
-										[ 'listFor', [ 'var', 'i' ], [ 'singleTarget', 'i' ], [ 'var', 'a' ] ],
-										[ 'var', 'x' ] ] ] )
-		self._matchTest( expression, '[i  for i in a  for j in b]', [ 'listComprehension',
-									[ 'listFor',
-										[ 'listFor', [ 'var', 'i' ], [ 'singleTarget', 'i' ], [ 'var', 'a' ] ],
-										[ 'singleTarget', 'j' ], [ 'var', 'b' ] ] ] )
-		self._matchTest( expression, '[i  for i in a  if x  for j in b]', [ 'listComprehension',
-									[ 'listFor',
-										[ 'listIf',
-											[ 'listFor', [ 'var', 'i' ], [ 'singleTarget', 'i' ], [ 'var', 'a' ] ],
-										[ 'var', 'x' ] ],	
-									[ 'singleTarget', 'j' ], [ 'var', 'b' ] ] ] )
-		self._matchTest( expression, '[i  for i in a  if x  for j in b  if y]', [ 'listComprehension',
-									[ 'listIf',
-										[ 'listFor',
-											[ 'listIf',
-												[ 'listFor', [ 'var', 'i' ], [ 'singleTarget', 'i' ], [ 'var', 'a' ] ],
-											[ 'var', 'x' ] ],	
-										[ 'singleTarget', 'j' ], [ 'var', 'b' ] ],
-									[ 'var', 'y' ] ] ] )
+		self._matchTest( expression, '[i  for i in a  if x]', [ 'listComprehension', [ 'var', 'i' ],
+												[ 'listFor', [ 'singleTarget', 'i' ], [ 'var', 'a' ] ],
+												[ 'listIf', [ 'var', 'x' ] ]
+										] )
+		self._matchTest( expression, '[i  for i in a  for j in b]', [ 'listComprehension', [ 'var', 'i' ],
+												[ 'listFor', [ 'singleTarget', 'i' ], [ 'var', 'a' ] ],
+												[ 'listFor', [ 'singleTarget', 'j' ], [ 'var', 'b' ] ]
+										] )
+		self._matchTest( expression, '[i  for i in a  if x  for j in b]', [ 'listComprehension', [ 'var', 'i' ],
+												[ 'listFor', [ 'singleTarget', 'i' ], [ 'var', 'a' ] ],
+												[ 'listIf', [ 'var', 'x' ] ],
+												[ 'listFor', [ 'singleTarget', 'j' ], [ 'var', 'b' ] ]
+										] )
+		self._matchTest( expression, '[i  for i in a  if x  for j in b  if y]', [ 'listComprehension', [ 'var', 'i' ],
+												[ 'listFor', [ 'singleTarget', 'i' ], [ 'var', 'a' ] ],
+												[ 'listIf', [ 'var', 'x' ] ],
+												[ 'listFor', [ 'singleTarget', 'j' ], [ 'var', 'b' ] ],
+												[ 'listIf', [ 'var', 'y' ] ]
+										] )
 		
 
 		
+	def testGeneratorExpression(self):
+		self._matchTest( expression, '(i  for i in a)', [ 'generatorExpression', [ 'var', 'i' ],
+												[ 'genFor', [ 'singleTarget', 'i' ], [ 'var', 'a' ] ]
+										] )
+		self._matchFailTest( expression, '(i  if x)', )
+		self._matchTest( expression, '(i  for i in a  if x)', [ 'generatorExpression', [ 'var', 'i' ],
+												[ 'genFor', [ 'singleTarget', 'i' ], [ 'var', 'a' ] ],
+												[ 'genIf', [ 'var', 'x' ] ]
+										] )
+		self._matchTest( expression, '(i  for i in a  for j in b)', [ 'generatorExpression', [ 'var', 'i' ],
+												[ 'genFor', [ 'singleTarget', 'i' ], [ 'var', 'a' ] ],
+												[ 'genFor', [ 'singleTarget', 'j' ], [ 'var', 'b' ] ]
+										] )
+		self._matchTest( expression, '(i  for i in a  if x  for j in b)', [ 'generatorExpression', [ 'var', 'i' ],
+												[ 'genFor', [ 'singleTarget', 'i' ], [ 'var', 'a' ] ],
+												[ 'genIf', [ 'var', 'x' ] ],
+												[ 'genFor', [ 'singleTarget', 'j' ], [ 'var', 'b' ] ]
+										] )
+		self._matchTest( expression, '(i  for i in a  if x  for j in b  if y)', [ 'generatorExpression', [ 'var', 'i' ],
+												[ 'genFor', [ 'singleTarget', 'i' ], [ 'var', 'a' ] ],
+												[ 'genIf', [ 'var', 'x' ] ],
+												[ 'genFor', [ 'singleTarget', 'j' ], [ 'var', 'b' ] ],
+												[ 'genIf', [ 'var', 'y' ] ]
+										] )
+
+		
+	def testDictLiteral(self):
+		self._matchTest( expression, '{a:x,b:y}', [ 'dictLiteral', [ 'keyValuePair', [ 'var', 'a' ], [ 'var', 'x' ] ],   [ 'keyValuePair', [ 'var', 'b' ], [ 'var', 'y' ] ] ] )
+		self._matchTest( expression, '{a:x,b:y,}', [ 'dictLiteral', [ 'keyValuePair', [ 'var', 'a' ], [ 'var', 'x' ] ],   [ 'keyValuePair', [ 'var', 'b' ], [ 'var', 'y' ] ] ] )
+		
+		
+
 	def testTupleOrExpression(self):
 		self._matchTest( tupleOrExpression, 'a', [ 'var', 'a' ] )
 		self._matchTest( tupleOrExpression, 'a,b', [ 'tupleLiteral', [ 'var', 'a' ], [ 'var', 'b' ] ] )
