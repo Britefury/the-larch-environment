@@ -51,7 +51,7 @@ attrName = Production( pythonIdentifier )
 expression = Forward()
 oldExpression = Forward()
 subscript = Forward()
-attr = Forward()
+attributeRef = Forward()
 orTest = Forward()
 tupleOrExpression = Forward()
 oldTupleOrExpression = Forward()
@@ -66,12 +66,12 @@ targetList = ( tupleTarget  |  _target ).debug( 'targetList' )
 
 parenTarget = Production( Literal( '(' )  +  targetList  +  Literal( ')' ) ).action( lambda input, pos, xs: xs[1] )
 listTarget = Production( delimitedSeparatedList( _target, '[', ']', bAllowTrailingSeparator=True ) ).action( lambda input, pos, xs: [ 'listTarget' ]  +  xs )
-_target  <<  ( subscript  |  attr  |  parenTarget  |  listTarget  |  singleTarget )
+_target  <<  ( subscript  |  attributeRef  |  parenTarget  |  listTarget  |  singleTarget )
 
 
 
 # Load local variable
-loadLocal = Production( pythonIdentifier ).action( lambda input, begin, xs: [ 'var', xs ] )
+loadLocal = Production( pythonIdentifier ).action( lambda input, pos, xs: [ 'var', xs ] )
 
 
 # Tuples
@@ -79,8 +79,12 @@ tupleLiteral = Production( separatedList( expression, bNeedAtLeastOne=True, bAll
 oldTupleLiteral = Production( separatedList( expression, bNeedAtLeastOne=True, bAllowTrailingSeparator=True, bRequireTrailingSeparatorForLengthOne=True ) ).action( lambda input, pos, xs: [ 'tupleLiteral' ]  +  xs )
 
 
+# Parentheses
+parenForm = Production( Literal( '(' ) + tupleOrExpression + ')' ).action( lambda input, pos, xs: xs[1] )
+
+
 # List literal
-listLiteral = Production( delimitedSeparatedList( expression, '[', ']', bAllowTrailingSeparator=True ) ).action( lambda input, begin, xs: [ 'listLiteral' ] + xs )
+listLiteral = Production( delimitedSeparatedList( expression, '[', ']', bAllowTrailingSeparator=True ) ).action( lambda input, pos, xs: [ 'listLiteral' ] + xs )
 
 
 # List comprehension
@@ -97,33 +101,51 @@ generatorExpression = Production( Literal( '(' )  +  expression  +  genFor  +  Z
 
 # Dictionary literal
 keyValuePair = Production( expression  +  Literal( ':' )  +  expression ).action( lambda input, pos, xs: [ 'keyValuePair', xs[0], xs[2] ] )
-dictLiteral = Production( delimitedSeparatedList( keyValuePair, '{', '}', bAllowTrailingSeparator=True ) ).action( lambda input, begin, xs: [ 'dictLiteral' ] + xs )
+dictLiteral = Production( delimitedSeparatedList( keyValuePair, '{', '}', bAllowTrailingSeparator=True ) ).action( lambda input, pos, xs: [ 'dictLiteral' ] + xs )
 
 
+# Yield expression
+yieldExpression = Production( Literal( '(' )  +  Keyword( yieldKeyword )  +  expression  +  Literal( ')' ) ).action( lambda input, pos, xs: [ 'yieldExpr', xs[2] ] )
 
-parenForm = Production( Literal( '(' ) + tupleOrExpression + ')' ).action( lambda input, begin, xs: xs[1] )
 
-enclosure = Production( parenForm | listLiteral | listComprehension | generatorExpression | dictLiteral )
+# Enclosure
+enclosure = Production( parenForm | listLiteral | listComprehension | generatorExpression | dictLiteral | yieldExpression )
 
+
+# Atom
 atom = Production( enclosure | literal | loadLocal )
 
+
+# forward def - primary
 primary = Forward()
 
 
+# Attribute ref
+attributeRef  <<  Production( primary + '.' + attrName ).action( lambda input, pos, xs: [ 'attributeRef', xs[0], xs[2] ] )
+
+
+# Subscript and slice
+subscriptSlice = Production( ( expression + ':' + expression ).action( lambda input, pos, xs: [ 'subscriptSlice', xs[0], xs[2] ] ) )
+subscriptLongSlice = Production( ( expression + ':' + expression + ':' + expression ).action( lambda input, pos, xs: [ 'subscriptLongSlice', xs[0], xs[2], xs[4] ] ) )
+subscriptEllipsis = Production( '...' ).action( lambda input, pos, xs: [ 'ellipsis' ] )
+subscriptItem = subscriptLongSlice | subscriptSlice | subscriptEllipsis | expression
+subscriptTuple = Production( separatedList( subscriptItem, bNeedAtLeastOne=True, bAllowTrailingSeparator=True, bRequireTrailingSeparatorForLengthOne=True ) ).action( lambda input, pos, xs: [ 'subscriptTuple' ]  +  xs )
+subscriptIndex = subscriptTuple  |  subscriptItem
+subscript  <<  Production( ( primary + '[' + subscriptIndex + ']' ).action( lambda input, pos, xs: [ 'subscript', xs[0], xs[2] ] ) )
+
+
+# Call
 argName = Production( pythonIdentifier )
-kwArg = Production( argName + '=' + expression ).action( lambda input, begin, xs: [ 'kwArg', xs[0], xs[2] ] )
-argList = Production( Literal( '*' )  +  expression ).action( lambda input, begin, xs: [ 'argList', xs[1] ] )
-kwArgList = Production( Literal( '**' )  +  expression ).action( lambda input, begin, xs: [ 'kwArgList', xs[1] ] )
+kwArg = Production( argName + '=' + expression ).action( lambda input, pos, xs: [ 'kwArg', xs[0], xs[2] ] )
+argList = Production( Literal( '*' )  +  expression ).action( lambda input, pos, xs: [ 'argList', xs[1] ] )
+kwArgList = Production( Literal( '**' )  +  expression ).action( lambda input, pos, xs: [ 'kwArgList', xs[1] ] )
 arg = Production( kwArgList | argList | kwArg | expression )
 listOfArgs = Production( separatedList( arg ) )
-call = Production( ( primary + Literal( '(' ) + listOfArgs + Literal( ')' ) ).action( lambda input, begin, tokens: [ 'call', tokens[0] ] + tokens[2] ) )
+call = Production( ( primary + Literal( '(' ) + listOfArgs + Literal( ')' ) ).action( lambda input, pos, xs: [ 'call', xs[0] ] + xs[2] ) )
 
 
-subscriptSlice = Production( ( expression + ':' + expression ).action( lambda input, begin, tokens: [ 'subscriptSlice', tokens[0], tokens[2] ] ) )
-subscriptIndex = Production( subscriptSlice  |  expression )
-subscript  <<  Production( ( primary + '[' + subscriptIndex + ']' ).action( lambda input, begin, tokens: [ 'subscript', tokens[0], tokens[2] ] ) )
-attr  <<  Production( primary + '.' + attrName ).action( lambda input, begin, tokens: [ 'attr', tokens[0], tokens[2] ] )
-primary  <<  Production( call | subscript | attr | atom )
+# Primary
+primary  <<  Production( call | subscript | attributeRef | atom )
 
 
 
@@ -154,10 +176,10 @@ orTest  <<  buildOperatorParser( \
 
 
 paramName = pythonIdentifier
-simpleParam = Production( pythonIdentifier.action( lambda input, begin, xs: [ 'simpleParam', xs[0] ] ) )
-defaultValueParam = Production( paramName + '=' + expression ).action( lambda input, begin, xs: [ 'defaultValueParam', xs[0], xs[2] ] )
-paramList = Production( Literal( '*' )  +  paramName ).action( lambda input, begin, xs: [ 'paramList', xs[1] ] )
-kwParamList = Production( Literal( '**' )  +  paramName ).action( lambda input, begin, xs: [ 'kwParamList', xs[1] ] )
+simpleParam = Production( pythonIdentifier.action( lambda input, pos, xs: [ 'simpleParam', xs[0] ] ) )
+defaultValueParam = Production( paramName + '=' + expression ).action( lambda input, pos, xs: [ 'defaultValueParam', xs[0], xs[2] ] )
+paramList = Production( Literal( '*' )  +  paramName ).action( lambda input, pos, xs: [ 'paramList', xs[1] ] )
+kwParamList = Production( Literal( '**' )  +  paramName ).action( lambda input, pos, xs: [ 'kwParamList', xs[1] ] )
 param = Production( kwParamList | paramList | defaultValueParam | simpleParam )
 listOfParams = Production( separatedList( param ) )
 lambdaExpr = Production( ( Keyword( lambdaKeyword )  +  listOfParams  +  Literal( ':' )  +  expression ).action( lambda input, pos, xs: [ 'lambdaExpr', xs[1], xs[3] ] ) )
@@ -291,6 +313,26 @@ class TestCase_Python25Parser (ParserTestCase):
 	def testDictLiteral(self):
 		self._matchTest( expression, '{a:x,b:y}', [ 'dictLiteral', [ 'keyValuePair', [ 'var', 'a' ], [ 'var', 'x' ] ],   [ 'keyValuePair', [ 'var', 'b' ], [ 'var', 'y' ] ] ] )
 		self._matchTest( expression, '{a:x,b:y,}', [ 'dictLiteral', [ 'keyValuePair', [ 'var', 'a' ], [ 'var', 'x' ] ],   [ 'keyValuePair', [ 'var', 'b' ], [ 'var', 'y' ] ] ] )
+		
+		
+	def testYieldExpression(self):
+		self._matchTest( expression, '(yield 2+3)', [ 'yieldExpr', [ 'add', [ 'intLiteral', 'decimal', 'int', '2' ], [ 'intLiteral', 'decimal', 'int', '3' ] ] ] )
+		
+		
+
+	def testAttributeRef(self):
+		self._matchTest( expression, 'a.b', [ 'attributeRef', [ 'var', 'a' ], 'b' ] )
+		
+		
+	def testSubscript(self):
+		self._matchTest( expression, 'a[x]', [ 'subscript', [ 'var', 'a' ], [ 'var', 'x' ] ] )
+		self._matchTest( expression, 'a[x:p]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptSlice', [ 'var', 'x' ], [ 'var', 'p' ] ] ] )
+		self._matchTest( expression, 'a[x:p:f]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptLongSlice', [ 'var', 'x' ], [ 'var', 'p' ], [ 'var', 'f' ] ] ] )
+		self._matchTest( expression, 'a[x,y]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptTuple', [ 'var', 'x' ], [ 'var', 'y' ] ] ] )
+		self._matchTest( expression, 'a[x:p,y:q]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptTuple', [ 'subscriptSlice', [ 'var', 'x' ], [ 'var', 'p' ] ], [ 'subscriptSlice', [ 'var', 'y' ], [ 'var', 'q' ] ] ] ] )
+		self._matchTest( expression, 'a[x:p:f,y:q:g]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptTuple', [ 'subscriptLongSlice', [ 'var', 'x' ], [ 'var', 'p' ], [ 'var', 'f' ] ], [ 'subscriptLongSlice', [ 'var', 'y' ], [ 'var', 'q' ], [ 'var', 'g' ] ] ] ] )
+		self._matchTest( expression, 'a[x:p:f,y:q:g,...]', [ 'subscript', [ 'var', 'a' ],
+								     [ 'subscriptTuple', [ 'subscriptLongSlice', [ 'var', 'x' ], [ 'var', 'p' ], [ 'var', 'f' ] ], [ 'subscriptLongSlice', [ 'var', 'y' ], [ 'var', 'q' ], [ 'var', 'g' ] ], [ 'ellipsis' ] ] ] )
 		
 		
 

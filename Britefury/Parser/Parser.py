@@ -1586,11 +1586,11 @@ class TestCase_Parser (ParserTestCase):
 	def testSimpleMessagePassingGrammar(self):
 		identifier = RegEx( "[A-Za-z_][A-Za-z0-9_]*" )
 
-		def _listAction(input, begin, tokens):
-			if tokens is None:
+		def _listAction(input, pos, xs):
+			if xs is None:
 				return []
 			else:
-				return [ tokens[0] ]  +  [ x[1]   for x in tokens[1] ]
+				return [ xs[0] ]  +  [ x[1]   for x in xs[1] ]
 		
 		def commaSeparatedList(subexp):
 				return Optional( subexp  +  ZeroOrMore( parserCoerce( ',' )  +  subexp ) ).action( _listAction )

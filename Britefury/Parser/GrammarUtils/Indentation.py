@@ -204,11 +204,11 @@ class TestCase_Indentation (ParserTestCase):
 		expression  <<  Production( add )
 		
 		
-		singleStatement = Production( ( expression + Suppress( ';' ) )  >>  ( lambda input, start, tokens: tokens[0] ) )
+		singleStatement = Production( ( expression + Suppress( ';' ) )  >>  ( lambda input, pos, xs: xs[0] ) )
 
 		statement = Forward()
 		block = Production( ZeroOrMore( statement ) )
-		compoundStatement = Production( ( Literal( '$<indent>$' )  +  block  +  Literal( '$<dedent>$' ) )  >>  ( lambda input, start, tokens: tokens[1] ) )
+		compoundStatement = Production( ( Literal( '$<indent>$' )  +  block  +  Literal( '$<dedent>$' ) )  >>  ( lambda input, pos, xs: xs[1] ) )
 		statement  <<  Production( compoundStatement  |  singleStatement )
 		
 		
