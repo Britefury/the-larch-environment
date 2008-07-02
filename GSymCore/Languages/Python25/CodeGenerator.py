@@ -61,7 +61,7 @@ class Python25CodeGenerator (GSymCodeGenerator):
 	def subscript(self, node, target, index):
 		return self( target ) + '[' + self( index ) + ']'
 	
-	def attr(self, node, target, name):
+	def attributeRef(self, node, target, name):
 		return self( target ) + '.' + name
 
 	

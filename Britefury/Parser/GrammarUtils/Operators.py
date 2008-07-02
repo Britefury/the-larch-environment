@@ -55,7 +55,7 @@ class Operator (object):
 		pass
 
 	@abstractmethod
-	def _defaultAction(self, input, begin, tokens):
+	def _defaultAction(self, input, pos, xs):
 		pass
 
 	@abstractmethod
@@ -75,10 +75,10 @@ class Operator (object):
 
 class Prefix (Operator):
 	def _buildActionFn(self):
-		return lambda input, begin, tokens: self._action( tokens[0], tokens[1] )
+		return lambda input, pos, xs: self._action( xs[0], xs[1] )
 
-	def _defaultAction(self, input, begin, tokens):
-		return [ self._op, tokens[1] ]
+	def _defaultAction(self, input, pos, xs):
+		return [ self._op, xs[1] ]
 
 	def _buildParser(self, operatorTable, levelParserForwardDeclarations, thisLevel, thisLevelParser, previousLevel, previousLevelParser):
 		return self._opExpression + thisLevelParser
@@ -90,10 +90,10 @@ class Suffix (Operator):
 	Suffix binds more tightly than prefix.
 	"""
 	def _buildActionFn(self):
-		return lambda input, begin, tokens: self._action( tokens[1], tokens[0] )
+		return lambda input, pos, xs: self._action( xs[1], xs[0] )
 
-	def _defaultAction(self, input, begin, tokens):
-		return [ self._op, tokens[0] ]
+	def _defaultAction(self, input, pos, xs):
+		return [ self._op, xs[0] ]
 
 	def _buildParser(self, operatorTable, levelParserForwardDeclarations, thisLevel, thisLevelParser, previousLevel, previousLevelParser):
 		return thisLevelParser + self._opExpression
@@ -102,10 +102,10 @@ class Suffix (Operator):
 	
 class InfixLeft (Operator):
 	def _buildActionFn(self):
-		return lambda input, begin, tokens: self._action( tokens[1], tokens[0], tokens[2] )
+		return lambda input, pos, xs: self._action( xs[1], xs[0], xs[2] )
 
-	def _defaultAction(self, input, begin, tokens):
-		return [ self._op, tokens[0], tokens[2] ]
+	def _defaultAction(self, input, pos, xs):
+		return [ self._op, xs[0], xs[2] ]
 
 	def _buildParser(self, operatorTable, levelParserForwardDeclarations, thisLevel, thisLevelParser, previousLevel, previousLevelParser):
 		prefix = operatorTable._getLowestPrecedenceUnaryOperatorLevelParserAbove( levelParserForwardDeclarations, thisLevel, Prefix )
@@ -127,10 +127,10 @@ class InfixLeft (Operator):
 
 class InfixRight (Operator):
 	def _buildActionFn(self):
-		return lambda input, begin, tokens: self._action( tokens[1], tokens[0], tokens[2] )
+		return lambda input, pos, xs: self._action( xs[1], xs[0], xs[2] )
 
-	def _defaultAction(self, input, begin, tokens):
-		return [ self._op, tokens[0], tokens[2] ]
+	def _defaultAction(self, input, pos, xs):
+		return [ self._op, xs[0], xs[2] ]
 
 	def _buildParser(self, operatorTable, levelParserForwardDeclarations, thisLevel, thisLevelParser, previousLevel, previousLevelParser):
 		prefix = operatorTable._getLowestPrecedenceUnaryOperatorLevelParserAbove( levelParserForwardDeclarations, thisLevel, Prefix )
@@ -713,8 +713,8 @@ class TestCase_Operators (ParserTestCase, TestCase_Impl):
 		infixLeft = Forward()
 		prefix = Forward()
 		
-		infixLeft  <<  Production( ( infixLeft + '*' + ( atom | prefix ) ).action( lambda input, begin, tokens: [ '*', tokens[0], tokens[2] ] )  |  atom  )
-		prefix  <<  Production( ( Literal( '~' )  +  prefix ).action( lambda input, begin, tokens: [ '~', tokens[1] ] )  | infixLeft )
+		infixLeft  <<  Production( ( infixLeft + '*' + ( atom | prefix ) ).action( lambda input, pos, xs: [ '*', xs[0], xs[2] ] )  |  atom  )
+		prefix  <<  Production( ( Literal( '~' )  +  prefix ).action( lambda input, pos, xs: [ '~', xs[1] ] )  | infixLeft )
 		
 		#infixLeft  <<  Production( atom  +  ZeroOrMore( Literal( '*' ) + ( atom | prefix ) ) ).action( _infixLeftActionIterative )
 		#prefix  <<  Production( ZeroOrMore( Literal( '~' ) )  +  infixLeft ).action( _prefixActionIterative )
@@ -746,8 +746,8 @@ class TestCase_Operators (ParserTestCase, TestCase_Impl):
 		infixLeft = Forward()
 		suffix = Forward()
 		
-		infixLeft  <<  Production( ( infixLeft + '*' + atom ).action( lambda input, begin, tokens: [ '*', tokens[0], tokens[2] ] )  |  atom )
-		suffix  <<  Production( ( suffix + '!' ).action( lambda input, begin, tokens: [ '!', tokens[0] ] )  |  infixLeft )
+		infixLeft  <<  Production( ( infixLeft + '*' + atom ).action( lambda input, pos, xs: [ '*', xs[0], xs[2] ] )  |  atom )
+		suffix  <<  Production( ( suffix + '!' ).action( lambda input, pos, xs: [ '!', xs[0] ] )  |  infixLeft )
 		
 		#infixLeft  <<  Production( atom  +  ZeroOrMore( Literal( '*' ) + atom ) ).action( _infixLeftActionIterative )
 		#suffix  <<  Production( infixLeft  +  ZeroOrMore( Literal( '!' ) ) ).action( _suffixActionIterative )
@@ -778,8 +778,8 @@ class TestCase_Operators (ParserTestCase, TestCase_Impl):
 		infixRight = Forward()
 		prefix = Forward()
 		
-		infixRight  <<  Production( ( atom + '$' + prefix ).action( lambda input, begin, tokens: [ '$', tokens[0], tokens[2] ] )  |  atom  )
-		prefix  <<  Production( ( Literal( '~' )  +  prefix ).action( lambda input, begin, tokens: [ '~', tokens[1] ] )  | infixRight )
+		infixRight  <<  Production( ( atom + '$' + prefix ).action( lambda input, pos, xs: [ '$', xs[0], xs[2] ] )  |  atom  )
+		prefix  <<  Production( ( Literal( '~' )  +  prefix ).action( lambda input, pos, xs: [ '~', xs[1] ] )  | infixRight )
 		
 		#infixRight  <<  Production( atom  +  ZeroOrMore( Literal( '$' ) + ( atom | prefix ) ) ).action( _infixRightActionIterative )
 		#prefix  <<  Production( ZeroOrMore( Literal( '~' ) )  +  infixRight ).action( _prefixActionIterative )
@@ -810,8 +810,8 @@ class TestCase_Operators (ParserTestCase, TestCase_Impl):
 		infixRight = Forward()
 		suffix = Forward()
 		
-		infixRight  <<  Production( ( atom + '$' + infixRight ).action( lambda input, begin, tokens: [ '$', tokens[0], tokens[2] ] )  |  atom  )
-		suffix  <<  Production( ( suffix + '!' ).action( lambda input, begin, tokens: [ '!', tokens[0] ] )  |  infixRight )
+		infixRight  <<  Production( ( atom + '$' + infixRight ).action( lambda input, pos, xs: [ '$', xs[0], xs[2] ] )  |  atom  )
+		suffix  <<  Production( ( suffix + '!' ).action( lambda input, pos, xs: [ '!', xs[0] ] )  |  infixRight )
 		
 		#infixRight  <<  Production( atom  +  ZeroOrMore( Literal( '$' ) + atom ) ).action( _infixRightActionIterative )
 		#suffix  <<  Production( infixRight  +  ZeroOrMore( Literal( '!' ) ) ).action( _suffixActionIterative )
@@ -846,9 +846,9 @@ class TestCase_Operators (ParserTestCase, TestCase_Impl):
 		infixRightAt = Forward()
 		prefix = Forward()
 		
-		infixRightDollar  <<  Production( ( atom + '$' + ( infixRightDollar | prefix ) ).action( lambda input, begin, tokens: [ '$', tokens[0], tokens[2] ] )  |  atom  )
-		infixRightAt  <<  Production( ( infixRightDollar + '@' + prefix ).action( lambda input, begin, tokens: [ '@', tokens[0], tokens[2] ] )  |  infixRightDollar  )
-		prefix  <<  Production( ( Literal( '~' )  +  prefix ).action( lambda input, begin, tokens: [ '~', tokens[1] ] )  |  infixRightAt )
+		infixRightDollar  <<  Production( ( atom + '$' + ( infixRightDollar | prefix ) ).action( lambda input, pos, xs: [ '$', xs[0], xs[2] ] )  |  atom  )
+		infixRightAt  <<  Production( ( infixRightDollar + '@' + prefix ).action( lambda input, pos, xs: [ '@', xs[0], xs[2] ] )  |  infixRightDollar  )
+		prefix  <<  Production( ( Literal( '~' )  +  prefix ).action( lambda input, pos, xs: [ '~', xs[1] ] )  |  infixRightAt )
 		
 
 		#infixRightDollar  <<  Production( atom  +  ZeroOrMore( Literal( '$' ) + ( atom | prefix ) ) ).action( _infixRightActionIterative )
@@ -877,72 +877,5 @@ class TestCase_Operators (ParserTestCase, TestCase_Impl):
 		self._matchTestSX( parser, 'x $ y @ ~z $ w',    '(@ ($ x y) (~ ($ z w)))' )
 		self._matchTestSX( parser, 'x $ ~y @ z $ w',    '($ x (~ (@ y ($ z w))))' )
 		self._matchTestSX( parser, '~x $ y @ z $ w',    '(~ (@ ($ x y) ($ z w)))' )
-
-
-		
-		
-		
-	#def testOperators(self):
-		#def _unaryOpAction(input, begin, tokens):
-			#return [ tokens[1], tokens[0] ]
-
-		#_expression = Forward()
-		#_parenForm = Production( Literal( '(' ) + _expression + ')' ).action( lambda input, begin, tokens: tokens[1] )
-		#_enclosure = Production( _parenForm )
-		#_atom = Production( identifier | _enclosure )
-
-		#_primary = Production( _atom )
-
-		#_power = Forward()
-		#_unary = Forward()
-
-		#_power  <<  Production( ( _primary  +  '**'  +  _unary )  |  _primary )
-		#_unary  <<  Production( ( ( Literal( '~' ) | '-' | 'not' )  +  _unary ).action( _unaryOpAction )  |  _power )
-
-		#_mulDivMod = Forward()
-		#_mulDivMod  <<  Production( ( _mulDivMod + ( Literal( '*' ) | '/' | '%' ) + _unary )  |  _unary )
-		#_addSub = Forward()
-		#_addSub  <<  Production( ( _addSub + ( Literal( '+' ) | '-' ) + _mulDivMod )  |  _mulDivMod )
-		#_shift = Forward()
-		#_shift  <<  Production( ( _shift + ( Literal( '<<' ) | '>>' ) + _addSub )  |  _addSub )
-		#_bitAnd = Forward()
-		#_bitAnd  <<  Production( ( _bitAnd + '&' + _shift )  |  _shift )
-		#_bitXor = Forward()
-		#_bitXor  <<  Production( ( _bitXor + '^' + _bitAnd )  |  _bitAnd )
-		#_bitOr = Forward()
-		#_bitOr  <<  Production( ( _bitOr + '|' + _bitXor)  |  _bitXor )
-		#_cmp = Forward()
-		#_cmp  <<  Production( ( _cmp + ( Literal( '<' ) | '<=' | '==' | '!=' | '>=' | '>' ) + _bitOr )  |  _bitOr )
-		#_isIn = Forward()
-		#_isIn  <<  Production( ( _isIn + 'is' + 'not' + _cmp ).action( lambda input, begin, tokens: [ [ tokens[0], tokens[1], tokens[3] ], 'not' ]  )  |  \
-					#( _isIn + 'not' + 'in' + _cmp ).action( lambda input, begin, tokens: [ [ tokens[0], tokens[2], tokens[3] ], 'not' ]  )  |  \
-					#( _isIn + 'is' + _cmp)  |  \
-					#( _isIn + 'in' + _cmp)  |  \
-					#_cmp )
-		#_and = Forward()
-		#_and  <<  Production( ( _and + 'and' + _isIn )  |  _isIn )
-		#_or = Forward()
-		#_or  <<  Production( ( _or + 'or' + _and )  |  _and )
-
-		#_expression  <<  Production( _or )
-
-
-
-#infixLeftMul = Forward()
-#infixRightDollar = Forward()
-#prefix = Forward()
-#suffix = Forward()
-
-#atom = Production( identifier ).debug( 'atom' )
-#infixLeftMul  <<  Production( ( suffix + '*' + ( atom | prefix ) ).action( lambda input, begin, tokens: [ '*', tokens[0], tokens[2] ] )  |  atom ).debug( 'left' )
-#infixRightDollar  <<  Production( ( suffix + '$' + ( infixRightDollar | prefix ) ).action( lambda input, begin, tokens: [ '$', tokens[0], tokens[2] ] )  |  infixLeftMul  ).debug( 'rght' )
-#prefix  <<  Production( ( Literal( '~' )  +  prefix ).action( lambda input, begin, tokens: [ '~', tokens[1] ] )  |  infixRightDollar ).debug( 'prfx' )
-#suffix  <<  Production( ( suffix + '!' ).action( lambda input, begin, tokens: [ '!', tokens[0] ] )  |  prefix ).debug( 'sffx' )
-
-#parser = suffix
-
-#result, pos, dot = parser.debugParseString( '~a * b $ c! * d' )
-#print dot
-
 		
 	

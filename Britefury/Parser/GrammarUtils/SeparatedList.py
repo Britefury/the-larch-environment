@@ -10,13 +10,13 @@ from Britefury.Parser.GrammarUtils.Tokens import identifier
 
 
 
-def _separatedListAction(input, begin, xs):
+def _separatedListAction(input, pos, xs):
 	if xs is None:
 		return []
 	else:
 		return [ xs[0] ]  +  [ x[1]   for x in xs[1] ]
 
-def _separatedListActionOneOrMore(input, begin, xs):
+def _separatedListActionOneOrMore(input, pos, xs):
 	return [ xs[0] ]  +  [ x[1]  for x in xs[1] ]
 
 def separatedList(subexp, separator=',', bNeedAtLeastOne=False, bAllowTrailingSeparator=False, bRequireTrailingSeparatorForLengthOne=False):
@@ -83,7 +83,7 @@ def delimitedSeparatedList(subexp, beginDelim, endDelim, separator=',', bNeedAtL
 	"""
 	return ( parserCoerce( beginDelim )  +  \
 		 separatedList( subexp, separator, bNeedAtLeastOne, bAllowTrailingSeparator, bRequireTrailingSeparatorForLengthOne )  +  \
-		 parserCoerce( endDelim ) ).action( lambda input, begin, xs: xs[1] )
+		 parserCoerce( endDelim ) ).action( lambda input, pos, xs: xs[1] )
 
 
 

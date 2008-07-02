@@ -404,7 +404,7 @@ class Python25View (GSymView):
 				UnparsedText( _unparsePrecedenceGT( targetView.text, PRECEDENCE_SUBSCRIPT ) + '[' + indexView.text + ']',  PRECEDENCE_SUBSCRIPT ),
 				state )
 	
-	def attr(self, state, node, target, name):
+	def attributeRef(self, state, node, target, name):
 		targetView = viewEval( target )
 		nameUnparsed = UnparsedText( name )
 		nameLabel = label( name )

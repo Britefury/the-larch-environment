@@ -91,18 +91,18 @@ _attrName = Parser.Production( Tokens.identifier )
 
 _expression = Parser.Forward()
 
-_loadLocal = Parser.Production( Tokens.identifier ).action( lambda input, begin, xs: [ 'loadLocal', xs ] )
+_loadLocal = Parser.Production( Tokens.identifier ).action( lambda input, pos, xs: [ 'loadLocal', xs ] )
 
-_kwParam = Parser.Production( _paramName + '=' + _expression ).action( lambda input, begin, xs: [ 'kwParam', xs[0], xs[2] ] )
+_kwParam = Parser.Production( _paramName + '=' + _expression ).action( lambda input, pos, xs: [ 'kwParam', xs[0], xs[2] ] )
 _param = Parser.Production( _kwParam | _expression )
 _parameterList = Parser.Production( Parser.Suppress( '(' )  -  SeparatedList.separatedList( _param )  -  Parser.Suppress( ')' ) )
 
 
 
 
-_listLiteral = Parser.Production( Parser.Literal( '[' )  +  SeparatedList.separatedList( _expression )  +  Parser.Literal( ']' ) ).action( lambda input, begin, xs: [ 'listLiteral' ]  +  xs[1] )
+_listLiteral = Parser.Production( Parser.Literal( '[' )  +  SeparatedList.separatedList( _expression )  +  Parser.Literal( ']' ) ).action( lambda input, pos, xs: [ 'listLiteral' ]  +  xs[1] )
 
-_parenExp = Parser.Production( Parser.Literal( '(' ) + _expression + ')' ).action( lambda input, begin, xs: xs[1] )
+_parenExp = Parser.Production( Parser.Literal( '(' ) + _expression + ')' ).action( lambda input, pos, xs: xs[1] )
 
 _enclosure = Parser.Production( _parenExp | _listLiteral )
 
@@ -110,20 +110,20 @@ _atom = Parser.Production( _enclosure | _loadLocal )
 
 _primary = Parser.Forward()
 
-_call = Parser.Production( ( _primary + _parameterList ).action( lambda input, begin, tokens: [ 'call', tokens[0] ] + tokens[1] ) )
-_subscript = Parser.Production( ( _primary + '[' + _expression + ']' ).action( lambda input, begin, tokens: [ 'subscript', tokens[0], tokens[2] ] ) )
-_slice = Parser.Production( ( _primary + '[' + _expression + ':' + _expression + ']' ).action( lambda input, begin, tokens: [ 'slice', tokens[0], tokens[2], tokens[4] ] ) )
-_attr = Parser.Production( _primary + '.' + _attrName ).action( lambda input, begin, tokens: [ 'attr', tokens[0], tokens[2] ] )
+_call = Parser.Production( ( _primary + _parameterList ).action( lambda input, pos, xs: [ 'call', xs[0] ] + xs[1] ) )
+_subscript = Parser.Production( ( _primary + '[' + _expression + ']' ).action( lambda input, pos, xs: [ 'subscript', xs[0], xs[2] ] ) )
+_slice = Parser.Production( ( _primary + '[' + _expression + ':' + _expression + ']' ).action( lambda input, pos, xs: [ 'slice', xs[0], xs[2], xs[4] ] ) )
+_attr = Parser.Production( _primary + '.' + _attrName ).action( lambda input, pos, xs: [ 'attr', xs[0], xs[2] ] )
 _primary  <<  Parser.Production( _call | _subscript | _slice | _attr | _atom )
 
 _power = Parser.Forward()
-_power  <<  Parser.Production( ( _primary  +  '**'  +  _power ).action( lambda input, begin, xs: [ 'pow', xs[0], xs[2] ] )   |   _primary )
+_power  <<  Parser.Production( ( _primary  +  '**'  +  _power ).action( lambda input, pos, xs: [ 'pow', xs[0], xs[2] ] )   |   _primary )
 
 _symToOp = { '+' : 'add',  '-' : 'sub',  '*' : 'mul',  '/' : 'div',  '%' : 'mod' }
 _mulDivMod = Parser.Forward()
-_mulDivMod  <<  Parser.Production( ( _mulDivMod + ( Parser.Literal( '*' ) | '/' | '%' ) + _power ).action( lambda input, begin, xs:  [ _symToOp[xs[1]], xs[0], xs[2] ] )  |  _power )
+_mulDivMod  <<  Parser.Production( ( _mulDivMod + ( Parser.Literal( '*' ) | '/' | '%' ) + _power ).action( lambda input, pos, xs:  [ _symToOp[xs[1]], xs[0], xs[2] ] )  |  _power )
 _addSub = Parser.Forward()
-_addSub  <<  Parser.Production( ( _addSub + ( Parser.Literal( '+' ) | '-' ) + _mulDivMod ).action( lambda input, begin, xs: [ _symToOp[xs[1]], xs[0], xs[2] ] )  |  _mulDivMod )
+_addSub  <<  Parser.Production( ( _addSub + ( Parser.Literal( '+' ) | '-' ) + _mulDivMod ).action( lambda input, pos, xs: [ _symToOp[xs[1]], xs[0], xs[2] ] )  |  _mulDivMod )
 			 
 _expression  <<  Parser.Production( _addSub )
 
