@@ -528,7 +528,8 @@ class Production (Group):
 	
 	def debug(self, debugName):
 		super( Production, self ).debug( '**' + debugName )
-		self._subexp.debug( debugName )
+		if not isinstance( self._subexp, Production ):
+			self._subexp.debug( debugName )
 		return self
 	
 
@@ -1574,7 +1575,7 @@ class TestCase_Parser (ParserTestCase):
 		
 		primaryNoNewArray = Production( classInstanceCreationExpression | methodInvocation | fieldAccess | arrayAccess | 'this' ).debug( 'primaryNoNewArray' )
 		
-		primary  <<  primaryNoNewArray
+		primary  <<  Production( primaryNoNewArray ).debug( 'primary' )
 		
 				
 		self._matchTest( primary, 'this', 'this' )
@@ -1677,7 +1678,7 @@ if __name__ == '__main__':
 	
 	primaryNoNewArray = Production( classInstanceCreationExpression | methodInvocation | fieldAccess | arrayAccess | 'this' ).debug( 'primaryNoNewArray' )
 	
-	primary  <<  primaryNoNewArray
+	primary  <<  Production( primaryNoNewArray ).debug( 'primary' )
 	
 	
 	res, pos, dot = methodInvocation.debugParseString( 'this.x.m()' )
