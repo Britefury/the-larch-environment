@@ -423,7 +423,7 @@ class Python25View (GSymView):
 	def listLiteral(self, state, node, *xs):
 		xViews = mapViewEval( xs )
 		return nodeEditor( node,
-				   listView( FlowListViewLayout( 10.0, 5.0 ), '[', ']', ',', xViews ),
+				   listView( FlowListViewLayout( 5.0, 0.0 ), '[', ']', ',', xViews ),
 				   UnparsedText( '[ '  +  UnparsedText( ', ' ).join( [ x.text   for x in xViews ] )  +  ' ]', PRECEDENCE_LISTLITERAL ),
 				   state )
 
@@ -434,7 +434,7 @@ class Python25View (GSymView):
 		targetView = viewEval( target, None, python25ViewState( targetListParser ) )
 		sourceView = viewEval( source, None, python25ViewState( oldTupleOrExpressionParser ) )
 		return nodeEditor( node,
-				   ahbox( [ markupLabel( _mixedCaps( forKeyword ), keywordStyle ), targetView, label( inKeyword, keywordStyle ), sourceView ] ),
+				   ahbox( [ markupLabel( _mixedCaps( forKeyword ), keywordStyle ), targetView, markupLabel( _mixedCaps( inKeyword ), keywordStyle ), sourceView ] ),
 				   UnparsedText( forKeyword  +  ' '  +  targetView.text  +  ' '  +  inKeyword  +  sourceView.text, PRECEDENCE_LISTCOMPREHENSION ),
 				   state )
 	
@@ -449,7 +449,7 @@ class Python25View (GSymView):
 		exprView = viewEval( expr )
 		xViews = mapViewEval( xs, None, python25ViewState( listComprehensionItemParser ) )
 		return nodeEditor( node,
-				   ahbox( [ label( '[', punctuationStyle ),  exprView ]  +  xViews  +  [ label( ']', punctuationStyle ) ] ),
+				   ahbox( [ label( '[', punctuationStyle ),  ahbox( [ exprView ]  +  xViews, spacing=15.0 ), label( ']', punctuationStyle ) ] ),
 				   UnparsedText( '[ '  +  exprView.text  +  '   '  +  UnparsedText( '   ' ).join( [ x.text   for x in xViews ] )  +  ' ]', PRECEDENCE_LISTCOMPREHENSION ),
 				   state )
 	
@@ -460,7 +460,7 @@ class Python25View (GSymView):
 		targetView = viewEval( target, None, python25ViewState( targetListParser ) )
 		sourceView = viewEval( source, None, python25ViewState( orTestParser ) )
 		return nodeEditor( node,
-				   ahbox( [ markupLabel( _mixedCaps( forKeyword ), keywordStyle ), targetView, label( inKeyword, keywordStyle ), sourceView ] ),
+				   ahbox( [ markupLabel( _mixedCaps( forKeyword ), keywordStyle ), targetView, markupLabel( _mixedCaps( inKeyword ), keywordStyle ), sourceView ] ),
 				   UnparsedText( forKeyword  +  ' '  +  targetView.text  +  ' '  +  inKeyword  +  sourceView.text, PRECEDENCE_GENERATOREXPRESSION ),
 				   state )
 	
@@ -475,7 +475,7 @@ class Python25View (GSymView):
 		exprView = viewEval( expr )
 		xViews = mapViewEval( xs, None, python25ViewState( generatorExpressionItemParser ) )
 		return nodeEditor( node,
-				   ahbox( [ label( '(', punctuationStyle ),  exprView ]  +  xViews  +  [ label( ')', punctuationStyle ) ] ),
+				   ahbox( [ label( '(', punctuationStyle ),  exprView ]  +  xViews  +  [ label( ')', punctuationStyle ) ], spacing=15.0 ),
 				   UnparsedText( '( '  +  exprView.text  +  '   '  +  UnparsedText( '   ' ).join( [ x.text   for x in xViews ] )  +  ' ]', PRECEDENCE_GENERATOREXPRESSION ),
 				   state )
 	
