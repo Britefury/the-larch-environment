@@ -69,16 +69,16 @@ class ParserState (object):
 	# "Packrat Parsers Can Support Left Recursion" by Allesandro Warth, James R. Douglass, Todd Millstein; Viewpoints Research Institute.
 	# To be honest, I don't really understand how they work. I transcribed their pseudo-code into Python, and it just worked.
 	# Test grammars in the unit tests seem to work okay, so its fine by me! :D
-	def memoisedMatch(self, expression, input, start, stop):
-		memoEntry = self.__recall( expression, input, start, stop )
+	def memoisedMatch(self, rule, expression, input, start, stop):
+		memoEntry = self.__recall( rule, expression, input, start, stop )
 		if memoEntry is None:
 			# Create a new _LR, and push it onto the rule invocation stack (implemented as a singly-linked-list of _LR objects)
-			lr = _LR( expression, self.lrStack )
+			lr = _LR( rule, self.lrStack )
 			self.lrStack = lr
 			
 			# Memoise @lr, then evaluate @expression
 			memoEntry = _MemoEntry( lr, start )
-			self.memo[ ( start, expression ) ] = memoEntry
+			self.memo[ ( start, rule ) ] = memoEntry
 			
 			answer, self.pos = expression.evaluate( self, input, start, stop )
 			
@@ -90,40 +90,41 @@ class ParserState (object):
 			#if lr.head is not None  and  isinstance( memoEntry.answer, _LR ):
 			if lr.head is not None:
 				lr.seed = answer
-				return self.__LRAnswer( expression, input, start, stop, memoEntry ),  self.pos
+				return self.__LRAnswer( rule, expression, input, start, stop, memoEntry ),  self.pos
 			else:
 				memoEntry.answer = answer
 				return answer,  self.pos
 		else:
 			self.pos = memoEntry.pos
 			if isinstance( memoEntry.answer, _LR ):
-				self.__setupLR( expression, memoEntry.answer )
+				self.__setupLR( rule, expression, memoEntry.answer )
 				return memoEntry.answer.seed,  self.pos
 			else:
 				return memoEntry.answer,  self.pos
 
 		
-	def __recall(self, expression, input, start, stop):
-		memoEntry = self.memo.get(  ( start, expression )  )
+	def __recall(self, rule, expression, input, start, stop):
+		memoEntry = self.memo.get(  ( start, rule )  )
 		h = self.heads.get( start )
 		# If not growing a seed-parse, just return what is in the memo-table
 		if h is None:
 			return memoEntry
 		
 		# Do not evaluate any rule that is not evolved in this left-recursion
-		if memoEntry is None  and  expression is not h.rule  and  expression not in h.involvedSet:
+		if memoEntry is None  and  rule  is not h.rule  and  rule not in h.involvedSet:
 			return _MemoEntry( None, start )
-		if expression in h.evalSet:
-			h.evalSet.remove( expression )
+		if rule in h.evalSet:
+			h.evalSet.remove( rule )
 			answer, self.pos = expression.evaluate( self, input, start, stop )
 			memoEntry.answer = answer
 			memoEntry.pos = self.pos
 		return memoEntry
 
 	
-	def __setupLR(self, expression, lr):
+	def __setupLR(self, rule, expression, lr):
+		print 'setupLR for %s'  %  rule.debugName
 		if lr.head is None:
-			lr.head = _Head( expression )
+			lr.head = _Head( rule )
 		s = self.lrStack
 		while s is not None  and  s.head is not lr.head:
 			s.head = lr.head
@@ -131,19 +132,23 @@ class ParserState (object):
 			s = s.next
 
 
-	def __LRAnswer(self, expression, input, start, stop, memoEntry):
+	def __LRAnswer(self, rule, expression, input, start, stop, memoEntry):
 		h = memoEntry.answer.head
-		if h.rule is not expression:
+		if h.rule is not rule:
+			print 'LRanswer for %s @ %d; h.rule is %s; exiting'  %  ( rule.debugName, start, h.rule.debugName )
 			return memoEntry.answer.seed
 		else:
 			memoEntry.answer = memoEntry.answer.seed
 			if memoEntry.answer is None:
+				print 'LRanswer for %s @ %d; memoEntry.answer is None'  %  ( rule.debugName, start )
 				return None
 			else:
-				return self.__growLR( expression, input, start, stop, memoEntry, h )
+				print 'LRanswer for %s @ %d; growing parse...'  %  ( rule.debugName, start )
+				return self.__growLR( rule, expression, input, start, stop, memoEntry, h )
 
 			
-	def __growLR(self, expression, input, start, stop, memoEntry, h):
+	def __growLR(self, rule, expression, input, start, stop, memoEntry, h):
+		print 'growLR for %s @ %d'  %  ( rule.debugName, start )
 		self.heads[start] = h
 		while True:
 			self.pos = start
