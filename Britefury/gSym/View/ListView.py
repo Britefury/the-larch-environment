@@ -97,7 +97,7 @@ class FlowListViewLayout (ListViewLayout):
 		contentsContainer = DTFlow( self._spacing )
 		
 		# Wrap in delimeter container if necessary
-		if beginDelim is not None  or  endDelimFactory is not None:
+		if beginDelim is not None  or  endDelim is not None:
 			box = DTBox( alignment=DTBox.ALIGN_BASELINES )
 			if beginDelim is not None:
 				beginDelim = _listViewCoerce( beginDelim )
@@ -108,7 +108,7 @@ class FlowListViewLayout (ListViewLayout):
 				box.append( endDelim )
 			return box, refreshCell
 		else:
-			return contentsContainer, ref
+			return contentsContainer, refreshCell
 
 
 		

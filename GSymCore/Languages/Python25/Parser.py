@@ -58,62 +58,64 @@ oldTupleOrExpression = Forward()
 
 
 # Target (assignment, for-loop, ...)
-_target = Forward()
+targetItem = Forward()
 
-singleTarget = Production( pythonIdentifier ).action( lambda input, pos, xs: [ 'singleTarget', xs ] )
-tupleTarget = Production( separatedList( _target, bNeedAtLeastOne=True, bAllowTrailingSeparator=True, bRequireTrailingSeparatorForLengthOne=True ) ).action( lambda input, pos, xs: [ 'tupleTarget' ] + xs )
-targetList = ( tupleTarget  |  _target ).debug( 'targetList' )
+singleTarget = Production( pythonIdentifier ).action( lambda input, pos, xs: [ 'singleTarget', xs ] ).debug( 'singleTarget' )
+tupleTarget = Production( separatedList( targetItem, bNeedAtLeastOne=True, bAllowTrailingSeparator=True, bRequireTrailingSeparatorForLengthOne=True ) ).action( lambda input, pos, xs: [ 'tupleTarget' ] + xs ).debug( 'tupleTarget' )
+targetList = ( tupleTarget  |  targetItem ).debug( 'targetList' )
 
-parenTarget = Production( Literal( '(' )  +  targetList  +  Literal( ')' ) ).action( lambda input, pos, xs: xs[1] )
-listTarget = Production( delimitedSeparatedList( _target, '[', ']', bAllowTrailingSeparator=True ) ).action( lambda input, pos, xs: [ 'listTarget' ]  +  xs )
-_target  <<  ( subscript  |  attributeRef  |  parenTarget  |  listTarget  |  singleTarget )
+parenTarget = Production( Literal( '(' )  +  targetList  +  Literal( ')' ) ).action( lambda input, pos, xs: xs[1] ).debug( 'parenTarget' )
+listTarget = Production( delimitedSeparatedList( targetItem, '[', ']', bAllowTrailingSeparator=True ) ).action( lambda input, pos, xs: [ 'listTarget' ]  +  xs ).debug( 'listTarget' )
+targetItem  <<  ( subscript  |  attributeRef  |  parenTarget  |  listTarget  |  singleTarget )
 
 
 
 # Load local variable
-loadLocal = Production( pythonIdentifier ).action( lambda input, pos, xs: [ 'var', xs ] )
+loadLocal = Production( pythonIdentifier ).action( lambda input, pos, xs: [ 'var', xs ] ).debug( 'loadLocal' )
 
 
 # Tuples
-tupleLiteral = Production( separatedList( expression, bNeedAtLeastOne=True, bAllowTrailingSeparator=True, bRequireTrailingSeparatorForLengthOne=True ) ).action( lambda input, pos, xs: [ 'tupleLiteral' ]  +  xs )
-oldTupleLiteral = Production( separatedList( expression, bNeedAtLeastOne=True, bAllowTrailingSeparator=True, bRequireTrailingSeparatorForLengthOne=True ) ).action( lambda input, pos, xs: [ 'tupleLiteral' ]  +  xs )
+tupleLiteral = Production( separatedList( expression, bNeedAtLeastOne=True, bAllowTrailingSeparator=True, bRequireTrailingSeparatorForLengthOne=True ) ).action( lambda input, pos, xs: [ 'tupleLiteral' ]  +  xs ).debug( 'tupleLiteral' )
+oldTupleLiteral = Production( separatedList( expression, bNeedAtLeastOne=True, bAllowTrailingSeparator=True, bRequireTrailingSeparatorForLengthOne=True ) ).action( lambda input, pos, xs: [ 'tupleLiteral' ]  +  xs ).debug( 'oldTupleLiteral' )
 
 
 # Parentheses
-parenForm = Production( Literal( '(' ) + tupleOrExpression + ')' ).action( lambda input, pos, xs: xs[1] )
+parenForm = Production( Literal( '(' ) + tupleOrExpression + ')' ).action( lambda input, pos, xs: xs[1] ).debug( 'parenForm' )
 
 
 # List literal
-listLiteral = Production( delimitedSeparatedList( expression, '[', ']', bAllowTrailingSeparator=True ) ).action( lambda input, pos, xs: [ 'listLiteral' ] + xs )
+listLiteral = Production( delimitedSeparatedList( expression, '[', ']', bAllowTrailingSeparator=True ) ).action( lambda input, pos, xs: [ 'listLiteral' ] + xs ).debug( 'listLiteral' )
 
 
 # List comprehension
-listFor = Production( Keyword( forKeyword )  +  targetList  +  Keyword( inKeyword )  +  oldTupleOrExpression ).action( lambda input, pos, xs: [ 'listFor', xs[1], xs[3] ] )
-listIf = Production( Keyword( ifKeyword )  +  oldExpression ).action( lambda input, pos, xs: [ 'listIf', xs[1] ] )
-listComprehension = Production( Literal( '[' )  +  expression  +  listFor  +  ZeroOrMore( listFor | listIf )  +  Literal( ']' ) ).action( lambda input, pos, xs: [ 'listComprehension', xs[1], xs[2] ]  +  xs[3] )
+listFor = Production( Keyword( forKeyword )  +  targetList  +  Keyword( inKeyword )  +  oldTupleOrExpression ).action( lambda input, pos, xs: [ 'listFor', xs[1], xs[3] ] ).debug( 'listFor' )
+listIf = Production( Keyword( ifKeyword )  +  oldExpression ).action( lambda input, pos, xs: [ 'listIf', xs[1] ] ).debug( 'listIf' )
+listComprehensionItem = listFor | listIf
+listComprehension = Production( Literal( '[' )  +  expression  +  listFor  +  ZeroOrMore( listComprehensionItem )  +  Literal( ']' ) ).action( lambda input, pos, xs: [ 'listComprehension', xs[1], xs[2] ]  +  xs[3] ).debug( 'listComprehension' )
 
 
 # Generator expression
-genFor = Production( Keyword( forKeyword )  +  targetList  +  Keyword( inKeyword )  +  orTest ).action( lambda input, pos, xs: [ 'genFor', xs[1], xs[3] ] )
-genIf = Production( Keyword( ifKeyword )  +  oldExpression ).action( lambda input, pos, xs: [ 'genIf', xs[1] ] )
-generatorExpression = Production( Literal( '(' )  +  expression  +  genFor  +  ZeroOrMore( genFor | genIf )  +  Literal( ')' ) ).action( lambda input, pos, xs: [ 'generatorExpression', xs[1], xs[2] ]  +  xs[3] )
+genFor = Production( Keyword( forKeyword )  +  targetList  +  Keyword( inKeyword )  +  orTest ).action( lambda input, pos, xs: [ 'genFor', xs[1], xs[3] ] ).debug( 'genFor' )
+genIf = Production( Keyword( ifKeyword )  +  oldExpression ).action( lambda input, pos, xs: [ 'genIf', xs[1] ] ).debug( 'genIf' )
+generatorExpressionItem = genFor | genIf
+generatorExpression = Production( Literal( '(' )  +  expression  +  genFor  +  ZeroOrMore( generatorExpressionItem )  +  Literal( ')' ) ).action( lambda input, pos, xs: [ 'generatorExpression', xs[1], xs[2] ]  +  xs[3] ).debug( 'generatorExpression' )
 
 
 # Dictionary literal
-keyValuePair = Production( expression  +  Literal( ':' )  +  expression ).action( lambda input, pos, xs: [ 'keyValuePair', xs[0], xs[2] ] )
-dictLiteral = Production( delimitedSeparatedList( keyValuePair, '{', '}', bAllowTrailingSeparator=True ) ).action( lambda input, pos, xs: [ 'dictLiteral' ] + xs )
+keyValuePair = Production( expression  +  Literal( ':' )  +  expression ).action( lambda input, pos, xs: [ 'keyValuePair', xs[0], xs[2] ] ).debug( 'keyValuePair' )
+dictLiteral = Production( delimitedSeparatedList( keyValuePair, '{', '}', bAllowTrailingSeparator=True ) ).action( lambda input, pos, xs: [ 'dictLiteral' ] + xs ).debug( 'dictLiteral' )
 
 
 # Yield expression
-yieldExpression = Production( Literal( '(' )  +  Keyword( yieldKeyword )  +  expression  +  Literal( ')' ) ).action( lambda input, pos, xs: [ 'yieldExpr', xs[2] ] )
+yieldExpression = Production( Literal( '(' )  +  Keyword( yieldKeyword )  +  expression  +  Literal( ')' ) ).action( lambda input, pos, xs: [ 'yieldExpr', xs[2] ] ).debug( 'yieldExpression' )
 
 
 # Enclosure
-enclosure = Production( parenForm | listLiteral | listComprehension | generatorExpression | dictLiteral | yieldExpression )
+enclosure = Production( parenForm | listLiteral | listComprehension | generatorExpression | dictLiteral | yieldExpression ).debug( 'enclosure' )
 
 
 # Atom
-atom = Production( enclosure | literal | loadLocal )
+atom = Production( enclosure | literal | loadLocal ).debug( 'atom' )
 
 
 # forward def - primary
@@ -121,31 +123,61 @@ primary = Forward()
 
 
 # Attribute ref
-attributeRef  <<  Production( primary + '.' + attrName ).action( lambda input, pos, xs: [ 'attributeRef', xs[0], xs[2] ] )
+attributeRef  <<  Production( primary + '.' + attrName ).action( lambda input, pos, xs: [ 'attributeRef', xs[0], xs[2] ] ).debug( 'attributeRef' )
 
 
 # Subscript and slice
-subscriptSlice = Production( ( expression + ':' + expression ).action( lambda input, pos, xs: [ 'subscriptSlice', xs[0], xs[2] ] ) )
-subscriptLongSlice = Production( ( expression + ':' + expression + ':' + expression ).action( lambda input, pos, xs: [ 'subscriptLongSlice', xs[0], xs[2], xs[4] ] ) )
-subscriptEllipsis = Production( '...' ).action( lambda input, pos, xs: [ 'ellipsis' ] )
+subscriptSlice = Production( ( expression + ':' + expression ).action( lambda input, pos, xs: [ 'subscriptSlice', xs[0], xs[2] ] ) ).debug( 'subscriptSlice' )
+subscriptLongSlice = Production( ( expression + ':' + expression + ':' + expression ).action( lambda input, pos, xs: [ 'subscriptLongSlice', xs[0], xs[2], xs[4] ] ) ).debug( 'subscriptLongSlice' )
+subscriptEllipsis = Production( '...' ).action( lambda input, pos, xs: [ 'ellipsis' ] ).debug( 'subscriptEllipsis' )
 subscriptItem = subscriptLongSlice | subscriptSlice | subscriptEllipsis | expression
-subscriptTuple = Production( separatedList( subscriptItem, bNeedAtLeastOne=True, bAllowTrailingSeparator=True, bRequireTrailingSeparatorForLengthOne=True ) ).action( lambda input, pos, xs: [ 'subscriptTuple' ]  +  xs )
+subscriptTuple = Production( separatedList( subscriptItem, bNeedAtLeastOne=True, bAllowTrailingSeparator=True, bRequireTrailingSeparatorForLengthOne=True ) ).action( lambda input, pos, xs: [ 'subscriptTuple' ]  +  xs ).debug( 'subscriptTuple' )
 subscriptIndex = subscriptTuple  |  subscriptItem
-subscript  <<  Production( ( primary + '[' + subscriptIndex + ']' ).action( lambda input, pos, xs: [ 'subscript', xs[0], xs[2] ] ) )
+subscript  <<  Production( ( primary + '[' + subscriptIndex + ']' ).action( lambda input, pos, xs: [ 'subscript', xs[0], xs[2] ] ) ).debug( 'subscript' )
 
 
 # Call
+def _checkCallArgs(input, pos, xs):
+	bKW = False
+	bArgList = False
+	bKWArgList = False
+	for x in xs:
+		if isinstance( x, list )  and  len( x ) >= 2:
+			if x[0] == 'kwArgList':
+				if bKWArgList:
+					# Not after KW arg list (only 1 allowed)
+					return False
+				bKWArgList = True
+				continue
+			elif x[0] == 'argList':
+				if bKWArgList | bArgList:
+					# Not after KW arg list
+					# Not after arg list (only 1 allowed)
+					return False
+				bArgList = True
+				continue
+			elif x[0] == 'kwArg':
+				if bKWArgList | bArgList:
+					# Not after arg list or KW arg list
+					return False
+				bKW = True
+				continue
+		if bKWArgList | bArgList | bKW:
+			# Not after KW arg list, or arg list, or KW arg
+			return False
+	return True
+				
 argName = Production( pythonIdentifier )
-kwArg = Production( argName + '=' + expression ).action( lambda input, pos, xs: [ 'kwArg', xs[0], xs[2] ] )
-argList = Production( Literal( '*' )  +  expression ).action( lambda input, pos, xs: [ 'argList', xs[1] ] )
-kwArgList = Production( Literal( '**' )  +  expression ).action( lambda input, pos, xs: [ 'kwArgList', xs[1] ] )
-arg = Production( kwArgList | argList | kwArg | expression )
-listOfArgs = Production( separatedList( arg ) )
-call = Production( ( primary + Literal( '(' ) + listOfArgs + Literal( ')' ) ).action( lambda input, pos, xs: [ 'call', xs[0] ] + xs[2] ) )
+kwArg = Production( argName + '=' + expression ).action( lambda input, pos, xs: [ 'kwArg', xs[0], xs[2] ] ).debug( 'kwArg' )
+argList = Production( Literal( '*' )  +  expression ).action( lambda input, pos, xs: [ 'argList', xs[1] ] ).debug( 'argList' )
+kwArgList = Production( Literal( '**' )  +  expression ).action( lambda input, pos, xs: [ 'kwArgList', xs[1] ] ).debug( 'kwArgList' )
+callArg = Production( kwArgList | argList | kwArg | expression ).debug( 'callArg' )
+callArgs = Production( separatedList( callArg, bAllowTrailingSeparator=True ).condition( _checkCallArgs ) )
+call = Production( ( primary + Literal( '(' ) + callArgs + Literal( ')' ) ).action( lambda input, pos, xs: [ 'call', xs[0] ] + xs[2] ) ).debug( 'call' )
 
 
 # Primary
-primary  <<  Production( call | subscript | attributeRef | atom )
+primary  <<  Production( call | subscript | attributeRef | atom ).debug( 'primary' )
 
 
 
@@ -175,29 +207,63 @@ orTest  <<  buildOperatorParser( \
 	],  primary )
 
 
+# Parameters
+def _checkParams(input, pos, xs):
+	bDefaultValParam = False
+	bParamList = False
+	bKWParamList = False
+	for x in xs:
+		if isinstance( x, list )  and  len( x ) >= 2:
+			if x[0] == 'kwParamList':
+				if bKWParamList:
+					# Not after KW param list (only 1 allowed)
+					return False
+				bKWParamList = True
+				continue
+			elif x[0] == 'paramList':
+				if bKWParamList | bParamList:
+					# Not after KW param list
+					# Not after param list (only 1 allowed)
+					return False
+				bParamList = True
+				continue
+			elif x[0] == 'defaultValueParam':
+				if bKWParamList | bParamList:
+					# Not after param list or KW param list
+					return False
+				bDefaultValParam = True
+				continue
+		if bKWParamList | bParamList | bDefaultValParam:
+			# Not after KW param list, or param list, or default value param
+			return False
+	return True
 paramName = pythonIdentifier
-simpleParam = Production( pythonIdentifier.action( lambda input, pos, xs: [ 'simpleParam', xs[0] ] ) )
-defaultValueParam = Production( paramName + '=' + expression ).action( lambda input, pos, xs: [ 'defaultValueParam', xs[0], xs[2] ] )
-paramList = Production( Literal( '*' )  +  paramName ).action( lambda input, pos, xs: [ 'paramList', xs[1] ] )
-kwParamList = Production( Literal( '**' )  +  paramName ).action( lambda input, pos, xs: [ 'kwParamList', xs[1] ] )
-param = Production( kwParamList | paramList | defaultValueParam | simpleParam )
-listOfParams = Production( separatedList( param ) )
-lambdaExpr = Production( ( Keyword( lambdaKeyword )  +  listOfParams  +  Literal( ':' )  +  expression ).action( lambda input, pos, xs: [ 'lambdaExpr', xs[1], xs[3] ] ) )
+simpleParam = Production( pythonIdentifier.action( lambda input, pos, xs: [ 'simpleParam', xs[0] ] ) ).debug( 'simpleParam' )
+defaultValueParam = Production( paramName + '=' + expression ).action( lambda input, pos, xs: [ 'defaultValueParam', xs[0], xs[2] ] ).debug( 'defaultValueParam' )
+paramList = Production( Literal( '*' )  +  paramName ).action( lambda input, pos, xs: [ 'paramList', xs[1] ] ).debug( 'paramList' )
+kwParamList = Production( Literal( '**' )  +  paramName ).action( lambda input, pos, xs: [ 'kwParamList', xs[1] ] ).debug( 'kwParamList' )
+param = Production( kwParamList | paramList | defaultValueParam | simpleParam ).debug( 'param' )
+params = Production( separatedList( param, bAllowTrailingSeparator=True ).condition( _checkParams ) ).debug( 'params' )
+
+
+# Lambda expression_checkParams
+lambdaExpr = Production( ( Keyword( lambdaKeyword )  +  params  +  Literal( ':' )  +  expression ).action( lambda input, pos, xs: [ 'lambdaExpr', xs[1], xs[3] ] ) ).debug( 'lambdaExpr' )
+oldLambdaExpr = Production( ( Keyword( lambdaKeyword )  +  params  +  Literal( ':' )  +  oldExpression ).action( lambda input, pos, xs: [ 'lambdaExpr', xs[1], xs[3] ] ) ).debug( 'oldLambdaExpr' )
 
 			 
-oldExpression  <<  Production( lambdaExpr  |  orTest )
-expression  <<  Production( lambdaExpr  |  orTest )
+oldExpression  <<  Production( lambdaExpr  |  orTest ).debug( 'oldExpression' )
+expression  <<  Production( lambdaExpr  |  orTest ).debug( 'expression' )
 
-tupleOrExpression  <<  ( tupleLiteral | expression )
-oldTupleOrExpression  <<  ( oldTupleLiteral | oldExpression )
-
-
-assignmentStatement = Production( pythonIdentifier  +  '='  +  tupleOrExpression ).action( lambda input, pos, xs: [ 'assignmentStmt', xs[0], xs[2] ] )
-returnStatement = Production( Keyword( 'return' )  +  tupleOrExpression ).action( lambda input, pos, xs: [ 'returnStmt', xs[1] ] )
-ifStatement = Production( Keyword( 'if' )  +  expression  +  ':' ).action( lambda input, pos, xs: [ 'ifStmt', xs[1], [] ] )
+tupleOrExpression  <<  ( tupleLiteral | expression ).debug( 'tupleOrExpression' )
+oldTupleOrExpression  <<  ( oldTupleLiteral | oldExpression ).debug( 'oldTupleOrExpression' )
 
 
-statement = Production( assignmentStatement  |  returnStatement  |  ifStatement  |  expression )
+assignmentStatement = Production( OneOrMore( ( targetList  +  '=' ).action( lambda input, pos, xs: xs[0] ) )  +  tupleOrExpression ).action( lambda input, pos, xs: [ 'assignmentStmt', xs[0], xs[1] ] ).debug( 'assignmentStatement' )
+returnStatement = Production( Keyword( 'return' )  +  tupleOrExpression ).action( lambda input, pos, xs: [ 'returnStmt', xs[1] ] ).debug( 'returnStatement' )
+ifStatement = Production( Keyword( 'if' )  +  expression  +  ':' ).action( lambda input, pos, xs: [ 'ifStmt', xs[1], [] ] ).debug( 'ifStatement' )
+
+
+statement = Production( assignmentStatement  |  returnStatement  |  ifStatement  |  expression ).debug( 'statement' )
 
 
 
@@ -250,7 +316,10 @@ class TestCase_Python25Parser (ParserTestCase):
 		self._matchTest( targetList, '[a,b,]', [ 'listTarget', [ 'singleTarget', 'a' ],  [ 'singleTarget', 'b' ] ] )
 		self._matchTest( targetList, '[a],[b,]', [ 'tupleTarget', [ 'listTarget', [ 'singleTarget', 'a' ] ], [ 'listTarget', [ 'singleTarget', 'b' ] ] ] )
 		self._matchTest( targetList, '[(a,)],[(b,)]', [ 'tupleTarget', [ 'listTarget', [ 'tupleTarget', [ 'singleTarget', 'a' ] ] ], [ 'listTarget', [ 'tupleTarget', [ 'singleTarget', 'b' ] ] ] ] )
-		
+
+		self._matchTest( targetList, 'a[x]', [ 'subscript', [ 'var', 'a' ], [ 'var', 'x' ] ] )
+		self._matchTest( targetList, 'a.b', [ 'attributeRef', [ 'var', 'a' ], 'b' ] )
+
 		
 	def testListLiteral(self):
 		self._matchTest( expression, '[a,b]', [ 'listLiteral', [ 'var', 'a' ], [ 'var', 'b' ] ] )
@@ -336,14 +405,75 @@ class TestCase_Python25Parser (ParserTestCase):
 		
 		
 
+	def testCall(self):
+		self._matchTest( expression, 'a()', [ 'call', [ 'var', 'a' ] ] )
+		self._matchTest( expression, 'a(f)', [ 'call', [ 'var', 'a' ], [ 'var', 'f' ] ] )
+		self._matchTest( expression, 'a(f,)', [ 'call', [ 'var', 'a' ], [ 'var', 'f' ] ] )
+		self._matchTest( expression, 'a(f,g)', [ 'call', [ 'var', 'a' ], [ 'var', 'f' ], [ 'var', 'g' ] ] )
+		self._matchTest( expression, 'a(f,g,m=a)', [ 'call', [ 'var', 'a' ], [ 'var', 'f' ], [ 'var', 'g' ], [ 'kwArg', 'm', [ 'var', 'a' ] ] ] )
+		self._matchTest( expression, 'a(f,g,m=a,n=b)', [ 'call', [ 'var', 'a' ], [ 'var', 'f' ], [ 'var', 'g' ], [ 'kwArg', 'm', [ 'var', 'a' ] ], [ 'kwArg', 'n', [ 'var', 'b' ] ] ] )
+		self._matchTest( expression, 'a(f,g,m=a,n=b,*p)', [ 'call', [ 'var', 'a' ], [ 'var', 'f' ], [ 'var', 'g' ], [ 'kwArg', 'm', [ 'var', 'a' ] ], [ 'kwArg', 'n', [ 'var', 'b' ] ], [ 'argList', [ 'var', 'p' ] ] ] )
+		self._matchTest( expression, 'a(f,m=a,*p,**w)', [ 'call', [ 'var', 'a' ], [ 'var', 'f' ], [ 'kwArg', 'm', [ 'var', 'a' ] ], [ 'argList', [ 'var', 'p' ] ], [ 'kwArgList', [ 'var', 'w' ] ] ] )
+		self._matchTest( expression, 'a(f,m=a,*p)', [ 'call', [ 'var', 'a' ], [ 'var', 'f' ], [ 'kwArg', 'm', [ 'var', 'a' ] ], [ 'argList', [ 'var', 'p' ] ] ] )
+		self._matchTest( expression, 'a(f,m=a,**w)', [ 'call', [ 'var', 'a' ], [ 'var', 'f' ], [ 'kwArg', 'm', [ 'var', 'a' ] ], [ 'kwArgList', [ 'var', 'w' ] ] ] )
+		self._matchTest( expression, 'a(f,*p,**w)', [ 'call', [ 'var', 'a' ], [ 'var', 'f' ], [ 'argList', [ 'var', 'p' ] ], [ 'kwArgList', [ 'var', 'w' ] ] ] )
+		self._matchTest( expression, 'a(m=a,*p,**w)', [ 'call', [ 'var', 'a' ], [ 'kwArg', 'm', [ 'var', 'a' ] ], [ 'argList', [ 'var', 'p' ] ], [ 'kwArgList', [ 'var', 'w' ] ] ] )
+		self._matchTest( expression, 'a(*p,**w)', [ 'call', [ 'var', 'a' ], [ 'argList', [ 'var', 'p' ] ], [ 'kwArgList', [ 'var', 'w' ] ] ] )
+		self._matchTest( expression, 'a(**w)', [ 'call', [ 'var', 'a' ], [ 'kwArgList', [ 'var', 'w' ] ] ] )
+		self._matchFailTest( expression, 'a(m=a,f)' )
+		self._matchFailTest( expression, 'a(*p,f)' )
+		self._matchFailTest( expression, 'a(**w,f)' )
+		self._matchFailTest( expression, 'a(*p,m=a)' )
+		self._matchFailTest( expression, 'a(**w,m=a)' )
+		self._matchFailTest( expression, 'a(**w,*p)' )
+
+
+		
+	def testParams(self):
+		self._matchTest( params, '', [] )
+		self._matchTest( params, 'f', [ [ 'simpleParam', 'f' ] ] )
+		self._matchTest( params, 'f,', [ [ 'simpleParam', 'f' ] ] )
+		self._matchTest( params, 'f,g', [ [ 'simpleParam', 'f' ], [ 'simpleParam', 'g' ] ] )
+		self._matchTest( params, 'f,g,m=a', [ [ 'simpleParam', 'f' ], [ 'simpleParam', 'g' ], [ 'defaultValueParam', 'm', [ 'var', 'a' ] ] ] )
+		self._matchTest( params, 'f,g,m=a,n=b', [ [ 'simpleParam', 'f' ], [ 'simpleParam', 'g' ], [ 'defaultValueParam', 'm', [ 'var', 'a' ] ], [ 'defaultValueParam', 'n', [ 'var', 'b' ] ] ] )
+		self._matchTest( params, 'f,g,m=a,n=b,*p', [ [ 'simpleParam', 'f' ], [ 'simpleParam', 'g' ], [ 'defaultValueParam', 'm', [ 'var', 'a' ] ], [ 'defaultValueParam', 'n', [ 'var', 'b' ] ], [ 'paramList', 'p' ] ] )
+		self._matchTest( params, 'f,m=a,*p,**w', [ [ 'simpleParam', 'f' ], [ 'defaultValueParam', 'm', [ 'var', 'a' ] ], [ 'paramList', 'p' ], [ 'kwParamList', 'w' ] ] )
+		self._matchTest( params, 'f,m=a,*p', [ [ 'simpleParam', 'f' ], [ 'defaultValueParam', 'm', [ 'var', 'a' ] ], [ 'paramList', 'p' ] ] )
+		self._matchTest( params, 'f,m=a,**w', [ [ 'simpleParam', 'f' ], [ 'defaultValueParam', 'm', [ 'var', 'a' ] ], [ 'kwParamList', 'w' ] ] )
+		self._matchTest( params, 'f,*p,**w', [ [ 'simpleParam', 'f' ], [ 'paramList', 'p' ], [ 'kwParamList', 'w' ] ] )
+		self._matchTest( params, 'm=a,*p,**w', [ [ 'defaultValueParam', 'm', [ 'var', 'a' ] ], [ 'paramList', 'p' ], [ 'kwParamList', 'w' ] ] )
+		self._matchTest( params, '*p,**w', [ [ 'paramList', 'p' ], [ 'kwParamList', 'w' ] ] )
+		self._matchTest( params, '**w', [ [ 'kwParamList', 'w' ] ] )
+		self._matchFailTest( params, 'm=a,f' )
+		self._matchFailTest( params, '*p,f' )
+		self._matchFailTest( params, '**w,f' )
+		self._matchFailTest( params, '*p,m=a' )
+		self._matchFailTest( params, '**w,m=a' )
+		self._matchFailTest( params, '**w,*p' )
+
+
+		
+	def testLambda(self):
+		self._matchTest( expression, 'lambda f,m=a,*p,**w: f+m+p+w', [ 'lambdaExpr', [ [ 'simpleParam', 'f' ], [ 'defaultValueParam', 'm', [ 'var', 'a' ] ], [ 'paramList', 'p' ], [ 'kwParamList', 'w' ] ],
+									   [ 'add', [ 'add', [ 'add', [ 'var', 'f' ], [ 'var', 'm' ] ], [ 'var', 'p' ] ], [ 'var', 'w' ] ] ] )
+
+		
+		
 	def testTupleOrExpression(self):
 		self._matchTest( tupleOrExpression, 'a', [ 'var', 'a' ] )
 		self._matchTest( tupleOrExpression, 'a,b', [ 'tupleLiteral', [ 'var', 'a' ], [ 'var', 'b' ] ] )
 		self._matchTest( tupleOrExpression, 'a,2', [ 'tupleLiteral', [ 'var', 'a' ], [ 'intLiteral', 'decimal', 'int', '2' ] ] )
 		self._matchTest( tupleOrExpression, 'lambda x, y: x+y,2', [ 'tupleLiteral', [ 'lambdaExpr', [ [ 'simpleParam', 'x' ], [ 'simpleParam', 'y' ] ], [ 'add', [ 'var', 'x' ], [ 'var', 'y' ] ] ], [ 'intLiteral', 'decimal', 'int', '2' ] ] )
+		
+		
+		
+	def testAssignmentStatement(self):
+		self._matchTest( assignmentStatement, 'a=x', [ 'assignmentStmt', [ [ 'singleTarget', 'a' ] ], [ 'var', 'x' ] ] )
+		self._matchTest( assignmentStatement, 'a,b=c,d=x', [ 'assignmentStmt', [ [ 'tupleTarget', [ 'singleTarget', 'a' ],  [ 'singleTarget', 'b' ] ],  [ 'tupleTarget', [ 'singleTarget', 'c' ],  [ 'singleTarget', 'd' ] ] ], [ 'var', 'x' ] ] )
+		self._matchFailTest( assignmentStatement, '=x' )
 
 		
 
 if __name__ == '__main__':
-	result, pos, dot = listComprehension.debugParseString( '[i  for i in a  if x]' )
+	result, pos, dot = targetList.debugParseString( 'a.b' )
 	print dot
