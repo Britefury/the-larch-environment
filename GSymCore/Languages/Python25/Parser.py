@@ -50,8 +50,7 @@ attrName = Production( pythonIdentifier )
 
 expression = Forward()
 oldExpression = Forward()
-subscript = Forward()
-attributeRef = Forward()
+assignablePrimary = Forward()
 orTest = Forward()
 tupleOrExpression = Forward()
 oldTupleOrExpression = Forward()
@@ -66,7 +65,7 @@ targetList = ( tupleTarget  |  targetItem ).debug( 'targetList' )
 
 parenTarget = Production( Literal( '(' )  +  targetList  +  Literal( ')' ) ).action( lambda input, pos, xs: xs[1] ).debug( 'parenTarget' )
 listTarget = Production( delimitedSeparatedList( targetItem, '[', ']', bAllowTrailingSeparator=True ) ).action( lambda input, pos, xs: [ 'listTarget' ]  +  xs ).debug( 'listTarget' )
-targetItem  <<  ( subscript  |  attributeRef  |  parenTarget  |  listTarget  |  singleTarget )
+targetItem  <<  ( assignablePrimary  |  parenTarget  |  listTarget  |  singleTarget )
 
 
 
@@ -123,7 +122,7 @@ primary = Forward()
 
 
 # Attribute ref
-attributeRef  <<  Production( primary + '.' + attrName ).action( lambda input, pos, xs: [ 'attributeRef', xs[0], xs[2] ] ).debug( 'attributeRef' )
+attributeRef = Production( primary + '.' + attrName ).action( lambda input, pos, xs: [ 'attributeRef', xs[0], xs[2] ] ).debug( 'attributeRef' )
 
 
 # Subscript and slice
@@ -133,7 +132,7 @@ subscriptEllipsis = Production( '...' ).action( lambda input, pos, xs: [ 'ellips
 subscriptItem = subscriptLongSlice | subscriptSlice | subscriptEllipsis | expression
 subscriptTuple = Production( separatedList( subscriptItem, bNeedAtLeastOne=True, bAllowTrailingSeparator=True, bRequireTrailingSeparatorForLengthOne=True ) ).action( lambda input, pos, xs: [ 'subscriptTuple' ]  +  xs ).debug( 'subscriptTuple' )
 subscriptIndex = subscriptTuple  |  subscriptItem
-subscript  <<  Production( ( primary + '[' + subscriptIndex + ']' ).action( lambda input, pos, xs: [ 'subscript', xs[0], xs[2] ] ) ).debug( 'subscript' )
+subscript = Production( ( primary + '[' + subscriptIndex + ']' ).action( lambda input, pos, xs: [ 'subscript', xs[0], xs[2] ] ) ).debug( 'subscript' )
 
 
 # Call
@@ -177,7 +176,8 @@ call = Production( ( primary + Literal( '(' ) + callArgs + Literal( ')' ) ).acti
 
 
 # Primary
-primary  <<  Production( call | subscript | attributeRef | atom ).debug( 'primary' )
+assignablePrimary  <<  Production( subscript | attributeRef ).debug( 'assignablePrimary' )
+primary  <<  Production( call | assignablePrimary | atom ).debug( 'primary' )
 
 
 
@@ -475,5 +475,6 @@ class TestCase_Python25Parser (ParserTestCase):
 		
 
 if __name__ == '__main__':
-	result, pos, dot = targetList.debugParseString( 'a.b' )
+	#result, pos, dot = targetList.debugParseString( 'a.b' )
+	result, pos, dot = subscript.debugParseString( 'a.b' )
 	print dot

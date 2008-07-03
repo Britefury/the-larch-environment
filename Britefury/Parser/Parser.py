@@ -526,6 +526,11 @@ class Production (Group):
 		# Wrap the inner sub-expression in the Condition expression
 		return Production( Condition( self._subexp, conditionFn ) )
 	
+	def debug(self, debugName):
+		super( Production, self ).debug( '**' + debugName )
+		self._subexp.debug( debugName )
+		return self
+	
 
 	def __repr__(self):
 		return 'Production( %s )'  %  self._subexp
@@ -1551,36 +1556,46 @@ class TestCase_Parser (ParserTestCase):
 		primary = Forward()
 		
 		
-		expression = Production( Literal( 'i' )  |  Literal( 'j' ) )
-		methodName = Production( Literal( 'm' )  |  Literal( 'n' ) )
-		interfaceTypeName = Production( Literal( 'I' )  |  Literal( 'J' ) )
-		className = Production( Literal( 'C' )  |  Literal( 'D' ) )
+		expression = Production( Literal( 'i' )  |  Literal( 'j' ) ).debug( 'expression' )
+		methodName = Production( Literal( 'm' )  |  Literal( 'n' ) ).debug( 'methodName' )
+		interfaceTypeName = Production( Literal( 'I' )  |  Literal( 'J' ) ).debug( 'interfaceTypeName' )
+		className = Production( Literal( 'C' )  |  Literal( 'D' ) ).debug( 'className' )
 
-		classOrInterfaceType = Production( className | interfaceTypeName )
+		classOrInterfaceType = Production( className | interfaceTypeName ).debug( 'classOrInterfaceType' )
 		
-		identifier = Production( Literal( 'x' )  |  Literal( 'y' )  |  classOrInterfaceType )
-		expressionName = Production( identifier )
+		identifier = Production( Literal( 'x' )  |  Literal( 'y' )  |  classOrInterfaceType ).debug( 'identifier' )
+		expressionName = Production( identifier ).debug( 'expressionName' )
 		
-		arrayAccess = Production( ( primary + '[' + expression + ']' )   |   ( expressionName + '[' + expression + ']' ) )
-		fieldAccess = Production( ( primary + '.' + identifier )   |   ( Literal( 'super' ) + '.' + identifier ) )
-		methodInvocation = Production( ( primary + '.' + methodName + '()' )   |   ( methodName + '()' ) )
+		arrayAccess = Production( ( primary + '[' + expression + ']' )   |   ( expressionName + '[' + expression + ']' ) ).debug( 'arrayAccess' )
+		fieldAccess = Production( ( primary + '.' + identifier )   |   ( Literal( 'super' ) + '.' + identifier ) ).debug( 'fieldAccess' )
+		methodInvocation = Production( ( primary + '.' + methodName + '()' )   |   ( methodName + '()' ) ).debug( 'methodInvocation' )
 		
-		classInstanceCreationExpression = Production( ( Literal( 'new' )  +  classOrInterfaceType  +  '()' )  |  ( primary + '.' + 'new' + identifier + '()' ) )
+		classInstanceCreationExpression = Production( ( Literal( 'new' )  +  classOrInterfaceType  +  '()' )  |  ( primary + '.' + 'new' + identifier + '()' ) ).debug( 'classInstanceCreationExpression' )
 		
-		primaryNoNewArray = Production( classInstanceCreationExpression | methodInvocation | fieldAccess | arrayAccess | 'this' )
+		primaryNoNewArray = Production( classInstanceCreationExpression | methodInvocation | fieldAccess | arrayAccess | 'this' ).debug( 'primaryNoNewArray' )
 		
 		primary  <<  primaryNoNewArray
 		
 				
-		parser = primary
+		self._matchTest( primary, 'this', 'this' )
+		self._matchTest( primary, 'this.x', [ 'this', '.', 'x' ] )
+		self._matchTest( primary, 'this.x[i]', [ [ 'this', '.', 'x' ], '[', 'i', ']' ] )
+		self._matchTest( primary, 'this.x.y', [ [ 'this', '.', 'x' ], '.', 'y' ] )
+		self._matchTest( primary, 'this.x.m()', [ [ 'this', '.', 'x' ], '.', 'm', '()' ] )
+		self._matchTest( primary, 'x[i][j].y', [ [ [ 'x', '[', 'i', ']' ], '[', 'j', ']' ], '.', 'y' ] )
 		
-		self._matchTest( parser, 'this', 'this' )
-		self._matchTest( parser, 'this.x', [ 'this', '.', 'x' ] )
-		self._matchTest( parser, 'this.x.y', [ [ 'this', '.', 'x' ], '.', 'y' ] )
-		self._matchTest( parser, 'this.x.m()', [ [ 'this', '.', 'x' ], '.', 'm', '()' ] )
-		self._matchTest( parser, 'x[i][j].y', [ [ [ 'x', '[', 'i', ']' ], '[', 'j', ']' ], '.', 'y' ] )
 		
-		
+		self._matchTest( primary, 'this', 'this' )
+		self._matchTest( methodInvocation, 'this.m()', [ 'this', '.', 'm', '()' ] )
+		self._matchTest( methodInvocation, 'this.m().n()', [ [ 'this', '.', 'm', '()' ], '.', 'n', '()' ] )
+		self._matchTest( arrayAccess, 'this[i]', [ 'this', '[', 'i', ']' ] )
+		self._matchTest( arrayAccess, 'this[i][j]', [ [ 'this', '[', 'i', ']' ], '[', 'j', ']' ] )
+		self._matchTest( fieldAccess, 'this.x', [ 'this', '.', 'x' ] )
+		self._matchTest( fieldAccess, 'this.x.y', [ [ 'this', '.', 'x' ], '.', 'y' ] )
+		self._matchTest( methodInvocation, 'this.x.m()', [ [ 'this', '.', 'x' ], '.', 'm', '()' ] )
+		self._matchTest( arrayAccess, 'this.x[i]', [ [ 'this', '.', 'x' ], '[', 'i', ']' ] )
+		self._matchTest( fieldAccess, 'x[j].y', [ [ [ 'x', '[', 'i', ']' ], '[', 'j', ']' ], '.', 'y' ] )
+
 		
 		
 	def testSimpleMessagePassingGrammar(self):
@@ -1639,3 +1654,32 @@ class TestCase_Parser (ParserTestCase):
 		
 
 
+if __name__ == '__main__':
+	# Outputs generated graphviz format data for visualisation of parse of java primary that should be fixed some time....
+	primary = Forward()
+	
+	
+	expression = Production( Literal( 'i' )  |  Literal( 'j' ) ).debug( 'expression' )
+	methodName = Production( Literal( 'm' )  |  Literal( 'n' ) ).debug( 'methodName' )
+	interfaceTypeName = Production( Literal( 'I' )  |  Literal( 'J' ) ).debug( 'interfaceTypeName' )
+	className = Production( Literal( 'C' )  |  Literal( 'D' ) ).debug( 'className' )
+
+	classOrInterfaceType = Production( className | interfaceTypeName ).debug( 'classOrInterfaceType' )
+	
+	identifier = Production( Literal( 'x' )  |  Literal( 'y' )  |  classOrInterfaceType ).debug( 'identifier' )
+	expressionName = Production( identifier ).debug( 'expressionName' )
+	
+	arrayAccess = Production( ( primary + '[' + expression + ']' )   |   ( expressionName + '[' + expression + ']' ) ).debug( 'arrayAccess' )
+	fieldAccess = Production( ( primary + '.' + identifier )   |   ( Literal( 'super' ) + '.' + identifier ) ).debug( 'fieldAccess' )
+	methodInvocation = Production( ( primary + '.' + methodName + '()' )   |   ( methodName + '()' ) ).debug( 'methodInvocation' )
+	
+	classInstanceCreationExpression = Production( ( Literal( 'new' )  +  classOrInterfaceType  +  '()' )  |  ( primary + '.' + 'new' + identifier + '()' ) ).debug( 'classInstanceCreationExpression' )
+	
+	primaryNoNewArray = Production( classInstanceCreationExpression | methodInvocation | fieldAccess | arrayAccess | 'this' ).debug( 'primaryNoNewArray' )
+	
+	primary  <<  primaryNoNewArray
+	
+	
+	res, pos, dot = methodInvocation.debugParseString( 'this.x.m()' )
+	print dot
+	
