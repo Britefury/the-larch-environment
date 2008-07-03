@@ -123,6 +123,7 @@ primary = Forward()
 
 # Attribute ref
 attributeRef = Production( primary + '.' + attrName ).action( lambda input, pos, xs: [ 'attributeRef', xs[0], xs[2] ] ).debug( 'attributeRef' )
+assignAttr = Production( primary + '.' + attrName ).action( lambda input, pos, xs: [ 'assignAttr', xs[0], xs[2] ] ).debug( 'assignAttr' )
 
 
 # Subscript and slice
@@ -133,6 +134,7 @@ subscriptItem = subscriptLongSlice | subscriptSlice | subscriptEllipsis | expres
 subscriptTuple = Production( separatedList( subscriptItem, bNeedAtLeastOne=True, bAllowTrailingSeparator=True, bRequireTrailingSeparatorForLengthOne=True ) ).action( lambda input, pos, xs: [ 'subscriptTuple' ]  +  xs ).debug( 'subscriptTuple' )
 subscriptIndex = subscriptTuple  |  subscriptItem
 subscript = Production( ( primary + '[' + subscriptIndex + ']' ).action( lambda input, pos, xs: [ 'subscript', xs[0], xs[2] ] ) ).debug( 'subscript' )
+assignSubscript = Production( ( primary + '[' + subscriptIndex + ']' ).action( lambda input, pos, xs: [ 'assignSubscript', xs[0], xs[2] ] ) ).debug( 'assignSubscript' )
 
 
 # Call
@@ -318,7 +320,12 @@ class TestCase_Python25Parser (ParserTestCase):
 		self._matchTest( targetList, '[(a,)],[(b,)]', [ 'tupleTarget', [ 'listTarget', [ 'tupleTarget', [ 'singleTarget', 'a' ] ] ], [ 'listTarget', [ 'tupleTarget', [ 'singleTarget', 'b' ] ] ] ] )
 
 		self._matchTest( targetList, 'a[x]', [ 'subscript', [ 'var', 'a' ], [ 'var', 'x' ] ] )
+		self._matchTest( targetList, 'a[x][y]', [ 'subscript', [ 'subscript', [ 'var', 'a' ], [ 'var', 'x' ] ], [ 'var', 'y' ] ] )
 		self._matchTest( targetList, 'a.b', [ 'attributeRef', [ 'var', 'a' ], 'b' ] )
+		self._matchTest( targetList, 'a.b.c', [ 'attributeRef', [ 'attributeRef', [ 'var', 'a' ], 'b' ], 'c' ] )
+
+		self._matchTest( targetList, 'a.b[x]', [ 'subscript', [ 'attributeRef', [ 'var', 'a' ], 'b' ], [ 'var', 'x' ] ] )
+		self._matchTest( targetList, 'a[x].b', [ 'attributeRef', [ 'subscript', [ 'var', 'a' ], [ 'var', 'x' ] ], 'b' ] )
 
 		
 	def testListLiteral(self):

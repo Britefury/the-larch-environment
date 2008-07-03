@@ -42,10 +42,6 @@ class _Head (object):
 		self.evalSet = set()
 		
 		
-	def __eq__(self, x):
-		return self.rule  is  x.rule   and  self.involvedSet  ==  x.involvedSet   and   self.evalSet  ==  x.evalSet
-		
-		
 	
 	
 	
@@ -129,7 +125,7 @@ class ParserState (object):
 		if lr.head is None:
 			lr.head = _Head( expression )
 		s = self.lrStack
-		while s is not None  and  s.head != lr.head:
+		while s is not None  and  s.head is not lr.head:
 			s.head = lr.head
 			lr.head.involvedSet.add( s.rule )
 			s = s.next
