@@ -515,7 +515,7 @@ class Production (Group):
 	"""
 	def evaluate(self, state, input, start, stop):
 		# Invoke the memoisation and left-recursion handling system
-		return state.memoisedMatch( self._subexp, input, start, stop )
+		return state.memoisedMatch( self, self._subexp, input, start, stop )
 
 	
 	def action(self, actionFn):
@@ -1682,5 +1682,5 @@ if __name__ == '__main__':
 	
 	
 	res, pos, dot = methodInvocation.debugParseString( 'this.x.m()' )
-	print dot
+	#print dot
 	
