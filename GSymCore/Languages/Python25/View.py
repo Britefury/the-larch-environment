@@ -137,6 +137,7 @@ PRECEDENCE_LOADLOCAL = 0
 PRECEDENCE_LISTLITERAL = 0
 PRECEDENCE_LISTCOMPREHENSION = 0
 PRECEDENCE_GENERATOREXPRESSION = 0
+PRECEDENCE_CONDITIONALEXPRESSION = 0
 PRECEDENCE_DICTLITERAL = 0
 
 PRECEDENCE_SUBSCRIPTSLICE = 0
@@ -733,6 +734,12 @@ class Python25View (GSymView):
 
 	
 	
+	# Conditional expression
+	def conditionalExpr(self, node, condition, expr, elseExpr):
+		return self( expr )  +  '   '  +  'if '  +  self( condition )  +  ' else '  +  self( elseExpr )
+
+	
+	
 	# Lambda expression
 	def lambdaExpr(self, state, node, params, expr):
 		exprView = viewEval( expr )
@@ -750,6 +757,19 @@ class Python25View (GSymView):
 
 	
 	
+	# Conditional expression
+	def conditionalExpr(self, state, node, condition, expr, elseExpr):
+		conditionView = viewEval( condition, None, python25ViewState( orTestParser ) )
+		exprView = viewEval( expr, None, python25ViewState( orTestParser ) )
+		elseExprView = viewEval( elseExpr, None, python25ViewState( expressionParser ) )
+		return nodeEditor( node,
+				   ahbox( [ exprView,   ahbox( [ markupLabel( _mixedCaps( ifKeyword ) ), conditionView, markupLabel( _mixedCaps( elseKeyword ) ) ] ),   elseExprView ], spacing=15.0 ),
+				   UnparsedText( exprView.text  +  '   '  +  ifKeyword  +  ' '  +  conditionView.text  +  ' '  +  elseKeyword  +  '   '   +  elseExprView.text, PRECEDENCE_CONDITIONALEXPRESSION ),
+				   state )
+	
+	
+	
+	# Assignment statement
 	def assignmentStmt(self, state, node, targets, value):
 		targetViews = mapViewEval( targets, None, python25ViewState( targetListParser ) )
 		valueView = viewEval( value, None, python25ViewState( tupleOrExpressionParser ) )

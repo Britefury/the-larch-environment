@@ -273,6 +273,12 @@ class Python25CodeGenerator (GSymCodeGenerator):
 	
 	
 	
+	# Conditional expression
+	def conditionalExpr(self, node, condition, expr, elseExpr):
+		return self( expr )  +  '   '  +  'if '  +  self( condition )  +  ' else '  +  self( elseExpr )
+
+	
+	
 	# Assignment statement
 	def assignmentStmt(self, node, targets, value):
 		return ''.join( [ self( t ) + ' = '   for t in targets ] )  +  self( value )
