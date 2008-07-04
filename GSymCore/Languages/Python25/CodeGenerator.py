@@ -115,8 +115,11 @@ class Python25CodeGenerator (GSymCodeGenerator):
 	
 	
 	
-	# Yield expression
+	# Yield expression and yield atom
 	def yieldExpression(self, node, expr):
+		return 'yield ' + self( expr )
+		
+	def yieldAtom(self, node, expr):
 		return '(yield ' + self( expr ) + ')'
 		
 	
@@ -279,9 +282,29 @@ class Python25CodeGenerator (GSymCodeGenerator):
 
 	
 	
+	# Assert statement
+	def assertStmt(self, node, condition, *xs):
+		return 'assert '  +  self( condition )  +  ( ', ' + self( xs[0] )   if len( xs ) > 0   else  '' )
+	
+	
 	# Assignment statement
 	def assignmentStmt(self, node, targets, value):
 		return ''.join( [ self( t ) + ' = '   for t in targets ] )  +  self( value )
+	
+	
+	# Augmented assignment statement
+	def augAssignStmt(self, node, op, target, value):
+		return self( target )  +  ' '  +  op  +  ' '  +  self( value )
+	
+	
+	# Pass statement
+	def passStmt(self, node):
+		return 'pass'
+	
+	
+	# Del statement
+	def delStmt(self, node, target):
+		return 'del '  +  self( target )
 	
 	
 	

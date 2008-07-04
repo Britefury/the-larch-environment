@@ -107,7 +107,7 @@ dictLiteral = Production( delimitedSeparatedList( keyValuePair, '{', '}', bAllow
 
 # Yield expression
 yieldExpression = Production( Keyword( yieldKeyword )  +  expression ).action( lambda input, pos, xs: [ 'yieldExpr', xs[1] ] ).debug( 'yieldExpression' )
-yieldAtom = Production( Literal( '(' )  +  Keyword( yieldKeyword )  +  expression  +  Literal( ')' ) ).action( lambda input, pos, xs: [ 'yieldExpr', xs[2] ] ).debug( 'yieldAtom' )
+yieldAtom = Production( Literal( '(' )  +  Keyword( yieldKeyword )  +  expression  +  Literal( ')' ) ).action( lambda input, pos, xs: [ 'yieldAtom', xs[2] ] ).debug( 'yieldAtom' )
 
 
 # Enclosure
@@ -267,7 +267,8 @@ tupleOrExpression  <<  ( tupleLiteral | expression ).debug( 'tupleOrExpression' 
 oldTupleOrExpression  <<  ( oldTupleLiteral | oldExpression ).debug( 'oldTupleOrExpression' )
 
 
-
+# Tuple or expression or yield expression
+tupleOrExpressionOrYieldExpression = tupleOrExpression | yieldExpression
 
 
 
@@ -275,24 +276,26 @@ oldTupleOrExpression  <<  ( oldTupleLiteral | oldExpression ).debug( 'oldTupleOr
 assertStmt = Production( Keyword( assertKeyword ) + expression  +  Optional( Literal( ',' ) + expression ) ).action( lambda input, pos, xs: [ 'assertStmt', xs[1] ]  +  ( [ xs[2][1] ]   if xs[2] is not None  else  [] ) ).debug( 'assertStmt' )
 
 # Assignment statement
-assignmentStmt = Production( OneOrMore( ( targetList  +  '=' ).action( lambda input, pos, xs: xs[0] ) )  +  ( tupleOrExpression | yieldExpression ) ).action( lambda input, pos, xs: [ 'assignmentStmt', xs[0], xs[1] ] ).debug( 'assignmentStmt' )
+assignmentStmt = Production( OneOrMore( ( targetList  +  '=' ).action( lambda input, pos, xs: xs[0] ) )  +  tupleOrExpressionOrYieldExpression ).action( lambda input, pos, xs: [ 'assignmentStmt', xs[0], xs[1] ] ).debug( 'assignmentStmt' )
 
 # Augmented assignment statement
-augOp = Literal( '+=' )  |  '-='  |  '*='  |  '/='  |  '%='  |  '**='  |  '>>='  |  '<<='  |  '&='  |  '^='  |  '|='
-augOpToTag = { '+=' : 'iadd',   '-=' : 'isub',   '*=' : 'imul',   '/=' : 'idiv',   '%=' : 'imod',   '**=' : 'ipow',   '>>=' : 'irshift',   '<<=' : 'ilshift',   '&=' : 'iand',   '^=' : 'ixor',   '|=' : 'ior' }
-augAssignStmt = Production( targetItem  +  augOp  +  ( tupleOrExpression | yieldExpression ) ).action( lambda input, pos, xs: [ 'augAssignStmt', augOpToTag[xs[1]], xs[0], xs[2] ] ).debug( 'augAssignStmt' )
+augOp = Choice( [ Literal( op )   for op in augAssignOps ] )
+augAssignStmt = Production( targetItem  +  augOp  +  tupleOrExpressionOrYieldExpression ).action( lambda input, pos, xs: [ 'augAssignStmt', xs[1], xs[0], xs[2] ] ).debug( 'augAssignStmt' )
 
 # Pass statement
-passStmt = Production( passKeyword ).action( lambda input, pos, xs: [ 'passStmt' ] )
+passStmt = Production( Keyword( passKeyword ) ).action( lambda input, pos, xs: [ 'passStmt' ] )
+
+# Del statement
+delStmt = Production( Keyword( delKeyword )  +  targetList ).action( lambda input, pos, xs: [ 'delStmt', xs[1] ] )
+
+# Return statement
+returnStmt = Production( Keyword( 'return' )  +  tupleOrExpression ).action( lambda input, pos, xs: [ 'returnStmt', xs[1] ] ).debug( 'returnStmt' )
+
+# If statement
+ifStmt = Production( Keyword( 'if' )  +  expression  +  ':' ).action( lambda input, pos, xs: [ 'ifStmt', xs[1], [] ] ).debug( 'ifStmt' )
 
 
-
-
-returnStatement = Production( Keyword( 'return' )  +  tupleOrExpression ).action( lambda input, pos, xs: [ 'returnStmt', xs[1] ] ).debug( 'returnStatement' )
-ifStatement = Production( Keyword( 'if' )  +  expression  +  ':' ).action( lambda input, pos, xs: [ 'ifStmt', xs[1], [] ] ).debug( 'ifStatement' )
-
-
-statement = Production( assertStmt | assignmentStmt | augAssignStmt | passStmt | returnStatement | ifStatement | expression ).debug( 'statement' )
+statement = Production( assertStmt | assignmentStmt | augAssignStmt | passStmt | delStmt | returnStmt | ifStmt | expression ).debug( 'statement' )
 
 
 
@@ -523,21 +526,29 @@ class TestCase_Python25Parser (ParserTestCase):
 		
 		
 	def testAugAssignStmt(self):
-		self._matchTest( statement, 'a += b', [ 'augAssignStmt', 'iadd', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
-		self._matchTest( statement, 'a -= b', [ 'augAssignStmt', 'isub', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
-		self._matchTest( statement, 'a *= b', [ 'augAssignStmt', 'imul', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
-		self._matchTest( statement, 'a /= b', [ 'augAssignStmt', 'idiv', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
-		self._matchTest( statement, 'a %= b', [ 'augAssignStmt', 'imod', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
-		self._matchTest( statement, 'a **= b', [ 'augAssignStmt', 'ipow', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
-		self._matchTest( statement, 'a >>= b', [ 'augAssignStmt', 'irshift', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
-		self._matchTest( statement, 'a <<= b', [ 'augAssignStmt', 'ilshift', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
-		self._matchTest( statement, 'a &= b', [ 'augAssignStmt', 'iand', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
-		self._matchTest( statement, 'a ^= b', [ 'augAssignStmt', 'ixor', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
-		self._matchTest( statement, 'a |= b', [ 'augAssignStmt', 'ior', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
+		self._matchTest( statement, 'a += b', [ 'augAssignStmt', '+=', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
+		self._matchTest( statement, 'a -= b', [ 'augAssignStmt', '-=', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
+		self._matchTest( statement, 'a *= b', [ 'augAssignStmt', '*=', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
+		self._matchTest( statement, 'a /= b', [ 'augAssignStmt', '/=', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
+		self._matchTest( statement, 'a %= b', [ 'augAssignStmt', '%=', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
+		self._matchTest( statement, 'a **= b', [ 'augAssignStmt', '**=', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
+		self._matchTest( statement, 'a >>= b', [ 'augAssignStmt', '>>=', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
+		self._matchTest( statement, 'a <<= b', [ 'augAssignStmt', '<<=', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
+		self._matchTest( statement, 'a &= b', [ 'augAssignStmt', '&=', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
+		self._matchTest( statement, 'a ^= b', [ 'augAssignStmt', '^=', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
+		self._matchTest( statement, 'a |= b', [ 'augAssignStmt', '|=', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
 
 		
 	def testPassStmt(self):
 		self._matchTest( statement, 'pass', [ 'passStmt' ] )
+		
+		
+	def testDelStmt(self):
+		self._matchTest( statement, 'del x', [ 'delStmt', [ 'singleTarget', 'x' ] ] )
+		
+		
+	def testReturnStmt(self):
+		self._matchTest( statement, 'return x', [ 'returnStmt', [ 'var', 'x' ] ] )
 		
 		
 		
