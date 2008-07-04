@@ -122,7 +122,7 @@ class ParserState (object):
 
 	
 	def __setupLR(self, rule, expression, lr):
-		print 'setupLR for %s'  %  rule.debugName
+		#print 'setupLR for %s'  %  rule.debugName
 		if lr.head is None:
 			lr.head = _Head( rule )
 		s = self.lrStack
@@ -135,20 +135,20 @@ class ParserState (object):
 	def __LRAnswer(self, rule, expression, input, start, stop, memoEntry):
 		h = memoEntry.answer.head
 		if h.rule is not rule:
-			print 'LRanswer for %s @ %d; h.rule is %s; exiting'  %  ( rule.debugName, start, h.rule.debugName )
+			#print 'LRanswer for %s @ %d; h.rule is %s; exiting'  %  ( rule.debugName, start, h.rule.debugName )
 			return memoEntry.answer.seed
 		else:
 			memoEntry.answer = memoEntry.answer.seed
 			if memoEntry.answer is None:
-				print 'LRanswer for %s @ %d; memoEntry.answer is None'  %  ( rule.debugName, start )
+				#print 'LRanswer for %s @ %d; memoEntry.answer is None'  %  ( rule.debugName, start )
 				return None
 			else:
-				print 'LRanswer for %s @ %d; growing parse...'  %  ( rule.debugName, start )
+				#print 'LRanswer for %s @ %d; growing parse...'  %  ( rule.debugName, start )
 				return self.__growLR( rule, expression, input, start, stop, memoEntry, h )
 
 			
 	def __growLR(self, rule, expression, input, start, stop, memoEntry, h):
-		print 'growLR for %s @ %d'  %  ( rule.debugName, start )
+		#print 'growLR for %s @ %d'  %  ( rule.debugName, start )
 		self.heads[start] = h
 		while True:
 			self.pos = start

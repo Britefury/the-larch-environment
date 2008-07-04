@@ -1682,5 +1682,5 @@ if __name__ == '__main__':
 	
 	
 	res, pos, dot = methodInvocation.debugParseString( 'this.x.m()' )
-	#print dot
+	print dot
 	
