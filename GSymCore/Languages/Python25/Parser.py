@@ -106,7 +106,8 @@ dictLiteral = Production( delimitedSeparatedList( keyValuePair, '{', '}', bAllow
 
 
 # Yield expression
-yieldExpression = Production( Literal( '(' )  +  Keyword( yieldKeyword )  +  expression  +  Literal( ')' ) ).action( lambda input, pos, xs: [ 'yieldExpr', xs[2] ] ).debug( 'yieldExpression' )
+yieldExpression = Production( Keyword( yieldKeyword )  +  expression ).action( lambda input, pos, xs: [ 'yieldExpr', xs[1] ] ).debug( 'yieldExpression' )
+yieldAtom = Production( Literal( '(' )  +  Keyword( yieldKeyword )  +  expression  +  Literal( ')' ) ).action( lambda input, pos, xs: [ 'yieldExpr', xs[2] ] ).debug( 'yieldAtom' )
 
 
 # Enclosure
@@ -252,20 +253,46 @@ params = Production( separatedList( param, bAllowTrailingSeparator=True ).condit
 lambdaExpr = Production( ( Keyword( lambdaKeyword )  +  params  +  Literal( ':' )  +  expression ).action( lambda input, pos, xs: [ 'lambdaExpr', xs[1], xs[3] ] ) ).debug( 'lambdaExpr' )
 oldLambdaExpr = Production( ( Keyword( lambdaKeyword )  +  params  +  Literal( ':' )  +  oldExpression ).action( lambda input, pos, xs: [ 'lambdaExpr', xs[1], xs[3] ] ) ).debug( 'oldLambdaExpr' )
 
-			 
-oldExpression  <<  Production( lambdaExpr  |  orTest ).debug( 'oldExpression' )
-expression  <<  Production( lambdaExpr  |  orTest ).debug( 'expression' )
 
+# Conditional expression
+conditionalExpression = Production( orTest  +  Keyword( ifKeyword )  +  orTest  +  Keyword( elseKeyword )  +  expression ).action( lambda input, pos, xs: [ 'conditionalExpr', xs[2], xs[0], xs[4] ] )
+
+
+# Expression and old expression (old expression is expression without conditional expression)
+oldExpression  <<  Production( lambdaExpr  |  orTest ).debug( 'oldExpression' )
+expression  <<  Production( lambdaExpr  |  conditionalExpression  |  orTest ).debug( 'expression' )
+
+# Tuple or (old) expression
 tupleOrExpression  <<  ( tupleLiteral | expression ).debug( 'tupleOrExpression' )
 oldTupleOrExpression  <<  ( oldTupleLiteral | oldExpression ).debug( 'oldTupleOrExpression' )
 
 
-assignmentStatement = Production( OneOrMore( ( targetList  +  '=' ).action( lambda input, pos, xs: xs[0] ) )  +  tupleOrExpression ).action( lambda input, pos, xs: [ 'assignmentStmt', xs[0], xs[1] ] ).debug( 'assignmentStatement' )
+
+
+
+
+# Assert statement
+assertStmt = Production( Keyword( assertKeyword ) + expression  +  Optional( Literal( ',' ) + expression ) ).action( lambda input, pos, xs: [ 'assertStmt', xs[1] ]  +  ( [ xs[2][1] ]   if xs[2] is not None  else  [] ) ).debug( 'assertStmt' )
+
+# Assignment statement
+assignmentStmt = Production( OneOrMore( ( targetList  +  '=' ).action( lambda input, pos, xs: xs[0] ) )  +  ( tupleOrExpression | yieldExpression ) ).action( lambda input, pos, xs: [ 'assignmentStmt', xs[0], xs[1] ] ).debug( 'assignmentStmt' )
+
+# Augmented assignment statement
+augOp = Literal( '+=' )  |  '-='  |  '*='  |  '/='  |  '%='  |  '**='  |  '>>='  |  '<<='  |  '&='  |  '^='  |  '|='
+augOpToTag = { '+=' : 'iadd',   '-=' : 'isub',   '*=' : 'imul',   '/=' : 'idiv',   '%=' : 'imod',   '**=' : 'ipow',   '>>=' : 'irshift',   '<<=' : 'ilshift',   '&=' : 'iand',   '^=' : 'ixor',   '|=' : 'ior' }
+augAssignStmt = Production( targetItem  +  augOp  +  ( tupleOrExpression | yieldExpression ) ).action( lambda input, pos, xs: [ 'augAssignStmt', augOpToTag[xs[1]], xs[0], xs[2] ] ).debug( 'augAssignStmt' )
+
+# Pass statement
+passStmt = Production( passKeyword ).action( lambda input, pos, xs: [ 'passStmt' ] )
+
+
+
+
 returnStatement = Production( Keyword( 'return' )  +  tupleOrExpression ).action( lambda input, pos, xs: [ 'returnStmt', xs[1] ] ).debug( 'returnStatement' )
 ifStatement = Production( Keyword( 'if' )  +  expression  +  ':' ).action( lambda input, pos, xs: [ 'ifStmt', xs[1], [] ] ).debug( 'ifStatement' )
 
 
-statement = Production( assignmentStatement  |  returnStatement  |  ifStatement  |  expression ).debug( 'statement' )
+statement = Production( assertStmt | assignmentStmt | augAssignStmt | passStmt | returnStatement | ifStatement | expression ).debug( 'statement' )
 
 
 
@@ -466,6 +493,15 @@ class TestCase_Python25Parser (ParserTestCase):
 
 		
 		
+	def testConditionalExpr(self):
+		self._matchTest( expression, 'x   if y else   z', [ 'conditionalExpr', [ 'var', 'y' ], [ 'var', 'x' ], [ 'var', 'z' ] ] )
+		self._matchTest( expression, '(x   if y else   z)   if w else   q', [ 'conditionalExpr', [ 'var', 'w' ], [ 'conditionalExpr', [ 'var', 'y' ], [ 'var', 'x' ], [ 'var', 'z' ] ], [ 'var', 'q' ] ] )
+		self._matchTest( expression, 'w   if (x   if y else   z) else   q', [ 'conditionalExpr', [ 'conditionalExpr', [ 'var', 'y' ], [ 'var', 'x' ], [ 'var', 'z' ] ], [ 'var', 'w' ], [ 'var', 'q' ] ] )
+		self._matchTest( expression, 'w   if q else   x   if y else   z', [ 'conditionalExpr', [ 'var', 'q' ], [ 'var', 'w' ], [ 'conditionalExpr', [ 'var', 'y' ], [ 'var', 'x' ], [ 'var', 'z' ] ] ] )
+		self._matchFailTest( expression, 'w   if x   if y else   z else   q' )
+		
+		
+	
 	def testTupleOrExpression(self):
 		self._matchTest( tupleOrExpression, 'a', [ 'var', 'a' ] )
 		self._matchTest( tupleOrExpression, 'a,b', [ 'tupleLiteral', [ 'var', 'a' ], [ 'var', 'b' ] ] )
@@ -474,11 +510,39 @@ class TestCase_Python25Parser (ParserTestCase):
 		
 		
 		
-	def testAssignmentStatement(self):
-		self._matchTest( assignmentStatement, 'a=x', [ 'assignmentStmt', [ [ 'singleTarget', 'a' ] ], [ 'var', 'x' ] ] )
-		self._matchTest( assignmentStatement, 'a,b=c,d=x', [ 'assignmentStmt', [ [ 'tupleTarget', [ 'singleTarget', 'a' ],  [ 'singleTarget', 'b' ] ],  [ 'tupleTarget', [ 'singleTarget', 'c' ],  [ 'singleTarget', 'd' ] ] ], [ 'var', 'x' ] ] )
-		self._matchFailTest( assignmentStatement, '=x' )
+	def testAssertStmt(self):
+		self._matchTest( statement, 'assert x', [ 'assertStmt', [ 'var', 'x' ] ] )
+		self._matchTest( statement, 'assert x,y', [ 'assertStmt', [ 'var', 'x' ], [ 'var', 'y' ] ] )
+	
+	
+	def testAssignmentStmt(self):
+		self._matchTest( statement, 'a=x', [ 'assignmentStmt', [ [ 'singleTarget', 'a' ] ], [ 'var', 'x' ] ] )
+		self._matchTest( statement, 'a,b=c,d=x', [ 'assignmentStmt', [ [ 'tupleTarget', [ 'singleTarget', 'a' ],  [ 'singleTarget', 'b' ] ],  [ 'tupleTarget', [ 'singleTarget', 'c' ],  [ 'singleTarget', 'd' ] ] ], [ 'var', 'x' ] ] )
+		self._matchTest( statement, 'a=yield x', [ 'assignmentStmt', [ [ 'singleTarget', 'a' ] ], [ 'yieldExpr', [ 'var', 'x' ] ] ] )
+		self._matchFailTest( statement, '=x' )
+		
+		
+	def testAugAssignStmt(self):
+		self._matchTest( statement, 'a += b', [ 'augAssignStmt', 'iadd', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
+		self._matchTest( statement, 'a -= b', [ 'augAssignStmt', 'isub', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
+		self._matchTest( statement, 'a *= b', [ 'augAssignStmt', 'imul', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
+		self._matchTest( statement, 'a /= b', [ 'augAssignStmt', 'idiv', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
+		self._matchTest( statement, 'a %= b', [ 'augAssignStmt', 'imod', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
+		self._matchTest( statement, 'a **= b', [ 'augAssignStmt', 'ipow', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
+		self._matchTest( statement, 'a >>= b', [ 'augAssignStmt', 'irshift', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
+		self._matchTest( statement, 'a <<= b', [ 'augAssignStmt', 'ilshift', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
+		self._matchTest( statement, 'a &= b', [ 'augAssignStmt', 'iand', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
+		self._matchTest( statement, 'a ^= b', [ 'augAssignStmt', 'ixor', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
+		self._matchTest( statement, 'a |= b', [ 'augAssignStmt', 'ior', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
 
+		
+	def testPassStmt(self):
+		self._matchTest( statement, 'pass', [ 'passStmt' ] )
+		
+		
+		
+		
+		
 		
 
 if __name__ == '__main__':
