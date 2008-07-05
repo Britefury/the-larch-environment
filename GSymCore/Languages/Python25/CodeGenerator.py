@@ -358,6 +358,22 @@ class Python25CodeGenerator (GSymCodeGenerator):
 		return 'from ' + moduleName + ' import *'
 	
 	
+	# Global statement
+	def globalVar(self, node, name):
+		return name
+	
+	def globalStmt(self, node, *xs):
+		return 'global '  +  ', '.join( xs )
+	
+	
+	# Exec statement
+	def execStmt(self, node, codeX, *xs):
+		xt = ''   if len( xs ) == 0   else   ' in ' + self( xs[0] )
+		if len( xs ) > 0:
+			xt = xt  +  ( ''   if len( xs ) == 1   else   ', ' + self( xs[1] ) )
+		return 'exec '  +  self( codeX )  +  xt
+	
+	
 	# If statement
 	def ifStmt(self, node, value, suite):
 		suiteText = '\n'.join( [ self( line )   for line in suite ] )

@@ -954,6 +954,48 @@ class Python25View (GSymView):
 	
 
 	
+	# Global statement
+	def globalVar(self, state, node, name):
+		return nodeEditor( node,
+				   label( name ),
+				   UnparsedText( name, PRECEDENCE_IMPORTCONTENT ),
+				   state )
+	
+	def globalStmt(self, state, node, *xs):
+		xViews = mapViewEval( xs, None, python25ViewState( Parser.globalVar ) )
+		xWidgets = []
+		if len( xs ) > 0:
+			for xv in xViews[:-1]:
+				xWidgets.append( ahbox( [ xv, label( ',', punctuationStyle ) ] ) )
+			xWidgets.append( xViews[-1] )
+		return nodeEditor( node,
+				   ahbox( [ keywordLabel( globalKeyword ) ]  +  xWidgets, spacing=10.0 ),
+				   UnparsedText( globalKeyword  +  ' '  +  UnparsedText( ', ' ).join( [ xv.text   for xv in xViews ] ), PRECEDENCE_STMT ),
+				   state )
+	
+
+	
+	# Exec statement
+	def execStmt(self, state, node, codeX, *xs):
+		widgets = [ viewEval( codeX, None, python25ViewState( Parser.orOp ) ) ]
+		xViews = mapViewEval( xs )
+		if len( xs ) > 0:
+			widgets.append( keywordLabel( inKeyword ) )
+			if len( xs ) == 1:
+				widgets.append( xViews[0] )
+			else:
+				widgets.append( ahbox( [ xViews[0], label( ',', punctuationStyle ) ] ) )
+				widgets.append( xViews[1] )
+		xt = ''   if len( xs ) == 0   else   ' '  +  inKeyword  +  ' ' + xViews[0].text
+		if len( xs ) > 0:
+			xt = xt  +  ( ''   if len( xs ) == 1   else   ', ' + xViews[1].text )
+		return nodeEditor( node,
+				   ahbox( [ keywordLabel( execKeyword ) ]  +  widgets, spacing=10.0 ),
+				   UnparsedText( execKeyword  +  xt, PRECEDENCE_STMT ),
+				   state )
+	
+	
+	
 	# If statement
 	def ifStmt(self, state, node, value, suite):
 		lineViews = mapViewEval( suite, None, python25ViewState( statementParser, MODE_LINE ) )
