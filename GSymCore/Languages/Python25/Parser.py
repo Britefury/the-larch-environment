@@ -9,13 +9,19 @@
 from Britefury.Parser.Parser import getErrorLine, parserCoerce, Bind, Action, Condition, Forward, Group, Production, Suppress, Literal, Keyword, RegEx, Word, Sequence, Combine, Choice, Optional, Repetition, ZeroOrMore, OneOrMore, Peek, PeekNot, ParserTestCase
 from Britefury.Parser.GrammarUtils.Tokens import identifier, decimalInteger, hexInteger, integer, singleQuotedString, doubleQuotedString, quotedString, floatingPoint
 from Britefury.Parser.GrammarUtils.SeparatedList import separatedList, delimitedSeparatedList
-from Britefury.Parser.GrammarUtils.Operators import Prefix, Suffix, InfixLeft, InfixRight, buildOperatorParser
+from Britefury.Parser.GrammarUtils.Operators import Prefix, Suffix, InfixLeft, InfixRight, buildOperatorParserWithAllLevels
 
 from GSymCore.Languages.Python25.Keywords import *
 
 
+
+
+# Python identifier
 pythonIdentifier = identifier  &  ( lambda input, pos, result: result not in keywordsSet )
 	
+
+
+# String literal
 asciiStringSLiteral = Production( singleQuotedString ).action( lambda input, pos, xs: [ 'stringLiteral', 'ascii', 'single', xs[1:-1] ] )
 asciiStringDLiteral = Production( doubleQuotedString ).action( lambda input, pos, xs: [ 'stringLiteral', 'ascii', 'double', xs[1:-1] ] )
 unicodeStringSLiteral = Production( Suppress( Literal( 'u' )  |  Literal( 'U' ) ) + singleQuotedString ).action( lambda input, pos, xs: [ 'stringLiteral', 'unicode', 'single', xs[0][1:-1] ] )
@@ -29,25 +35,36 @@ shortStringLiteral = asciiStringSLiteral | asciiStringDLiteral | unicodeStringSL
 
 
 
+# Integer literal
 decimalIntLiteral = Production( decimalInteger ).action( lambda input, pos, xs: [ 'intLiteral', 'decimal', 'int', xs ] )
 decimalLongLiteral = Production( decimalInteger + Suppress( Literal( 'l' )  |  Literal( 'L' ) ) ).action( lambda input, pos, xs: [ 'intLiteral', 'decimal', 'long', xs[0] ] )
 hexIntLiteral = Production( hexInteger ).action( lambda input, pos, xs: [ 'intLiteral', 'hex', 'int', xs ] )
 hexLongLiteral = Production( hexInteger + Suppress( Literal( 'l' )  |  Literal( 'L' ) ) ).action( lambda input, pos, xs: [ 'intLiteral', 'hex', 'long', xs[0] ] )
-
 integerLiteral = hexLongLiteral | hexIntLiteral | decimalLongLiteral | decimalIntLiteral
 
+
+
+# Float literal
 floatLiteral = Production( floatingPoint ).action( lambda input, pos, xs: [ 'floatLiteral', xs ] )
 
+
+
+# Imaginary literal
 imaginaryLiteral = Production( Combine( [ ( floatingPoint | decimalInteger ), Literal( 'j' ) ] ) ).action( lambda input, pos, xs: [ 'imaginaryLiteral', xs ] )
 
 
+
+# Literal
 literal = shortStringLiteral | imaginaryLiteral | floatLiteral | integerLiteral
 
 
+
+# Attribute name
 attrName = Production( pythonIdentifier )
 
 
 
+# Forward definitions for various components
 expression = Forward()
 oldExpression = Forward()
 attributeRef = Forward()
@@ -76,17 +93,21 @@ targetItem  <<  ( attributeRef  |  subscript  |  parenTarget  |  listTarget  |  
 loadLocal = Production( pythonIdentifier ).action( lambda input, pos, xs: [ 'var', xs ] ).debug( 'loadLocal' )
 
 
+
 # Tuples
 tupleLiteral = Production( separatedList( expression, bNeedAtLeastOne=True, bAllowTrailingSeparator=True, bRequireTrailingSeparatorForLengthOne=True ) ).action( lambda input, pos, xs: [ 'tupleLiteral' ]  +  xs ).debug( 'tupleLiteral' )
 oldTupleLiteral = Production( separatedList( expression, bNeedAtLeastOne=True, bAllowTrailingSeparator=True, bRequireTrailingSeparatorForLengthOne=True ) ).action( lambda input, pos, xs: [ 'tupleLiteral' ]  +  xs ).debug( 'oldTupleLiteral' )
+
 
 
 # Parentheses
 parenForm = Production( Literal( '(' ) + tupleOrExpression + ')' ).action( lambda input, pos, xs: xs[1] ).debug( 'parenForm' )
 
 
+
 # List literal
 listLiteral = Production( delimitedSeparatedList( expression, '[', ']', bAllowTrailingSeparator=True ) ).action( lambda input, pos, xs: [ 'listLiteral' ] + xs ).debug( 'listLiteral' )
+
 
 
 # List comprehension
@@ -96,6 +117,7 @@ listComprehensionItem = listFor | listIf
 listComprehension = Production( Literal( '[' )  +  expression  +  listFor  +  ZeroOrMore( listComprehensionItem )  +  Literal( ']' ) ).action( lambda input, pos, xs: [ 'listComprehension', xs[1], xs[2] ]  +  xs[3] ).debug( 'listComprehension' )
 
 
+
 # Generator expression
 genFor = Production( Keyword( forKeyword )  +  targetList  +  Keyword( inKeyword )  +  orTest ).action( lambda input, pos, xs: [ 'genFor', xs[1], xs[3] ] ).debug( 'genFor' )
 genIf = Production( Keyword( ifKeyword )  +  oldExpression ).action( lambda input, pos, xs: [ 'genIf', xs[1] ] ).debug( 'genIf' )
@@ -103,9 +125,11 @@ generatorExpressionItem = genFor | genIf
 generatorExpression = Production( Literal( '(' )  +  expression  +  genFor  +  ZeroOrMore( generatorExpressionItem )  +  Literal( ')' ) ).action( lambda input, pos, xs: [ 'generatorExpression', xs[1], xs[2] ]  +  xs[3] ).debug( 'generatorExpression' )
 
 
+
 # Dictionary literal
 keyValuePair = Production( expression  +  Literal( ':' )  +  expression ).action( lambda input, pos, xs: [ 'keyValuePair', xs[0], xs[2] ] ).debug( 'keyValuePair' )
 dictLiteral = Production( delimitedSeparatedList( keyValuePair, '{', '}', bAllowTrailingSeparator=True ) ).action( lambda input, pos, xs: [ 'dictLiteral' ] + xs ).debug( 'dictLiteral' )
+
 
 
 # Yield expression
@@ -113,21 +137,26 @@ yieldExpression = Production( Keyword( yieldKeyword )  +  expression ).action( l
 yieldAtom = Production( Literal( '(' )  +  Keyword( yieldKeyword )  +  expression  +  Literal( ')' ) ).action( lambda input, pos, xs: [ 'yieldAtom', xs[2] ] ).debug( 'yieldAtom' )
 
 
+
 # Enclosure
 enclosure = Production( parenForm | listLiteral | listComprehension | generatorExpression | dictLiteral | yieldExpression ).debug( 'enclosure' )
+
 
 
 # Atom
 atom = Production( enclosure | literal | loadLocal ).debug( 'atom' )
 
 
+
 # forward def - primary
 primary = Forward()
+
 
 
 # Attribute ref
 attributeRef  <<  Production( primary + '.' + attrName ).action( lambda input, pos, xs: [ 'attributeRef', xs[0], xs[2] ] ).debug( 'attributeRef' )
 #assignAttr = Production( primary + '.' + attrName ).action( lambda input, pos, xs: [ 'assignAttr', xs[0], xs[2] ] ).debug( 'assignAttr' )
+
 
 
 # Subscript and slice
@@ -139,6 +168,7 @@ subscriptTuple = Production( separatedList( subscriptItem, bNeedAtLeastOne=True,
 subscriptIndex = subscriptTuple  |  subscriptItem
 subscript  <<  Production( ( primary + '[' + subscriptIndex + ']' ).action( lambda input, pos, xs: [ 'subscript', xs[0], xs[2] ] ) ).debug( 'subscript' )
 #assignSubscript = Production( ( primary + '[' + subscriptIndex + ']' ).action( lambda input, pos, xs: [ 'assignSubscript', xs[0], xs[2] ] ) ).debug( 'assignSubscript' )
+
 
 
 # Call
@@ -181,13 +211,16 @@ callArgs = Production( separatedList( callArg, bAllowTrailingSeparator=True ).co
 call = Production( ( primary + Literal( '(' ) + callArgs + Literal( ')' ) ).action( lambda input, pos, xs: [ 'call', xs[0] ] + xs[2] ) ).debug( 'call' )
 
 
+
 # Primary
 #assignablePrimary  <<  Production( subscript | attributeRef ).debug( 'assignablePrimary' )
 #primary  <<  Production( call | assignablePrimary | atom ).debug( 'primary' )
 primary  <<  Production( call | attributeRef | subscript | atom ).debug( 'primary' )
 
 
-orTest  <<  buildOperatorParser( \
+
+# Python operators
+ops, ( powOp, invNegPosOp, mulDivModOp, addSubOp, lrShiftOp, andOP, xorOp, orOp, cmpOp, isOp, inOp, notTestOp, andTestOp, orTestOp ) =  buildOperatorParserWithAllLevels( \
 	[
 		[ InfixRight( Literal( '**' ),  lambda op, x, y: [ 'pow', x, y ] ) ],
 		[ Prefix( Literal( '~' ),  lambda op, x: [ 'invert', x ] ),   Prefix( Literal( '-' ),  lambda op, x: [ 'negate', x ] ),   Prefix( Literal( '+' ),  lambda op, x: [ 'pos', x ] ) ],
@@ -212,8 +245,11 @@ orTest  <<  buildOperatorParser( \
 		[ InfixLeft( Keyword( orKeyword ),  lambda op, x, y: [ 'boolOr', x, y ] ) ],
 	],  primary )
 
+orTest  <<  orTestOp
 
-# Parameters
+
+
+# Parameters (lambda, def statement, etc)
 def _checkParams(input, pos, xs):
 	bDefaultValParam = False
 	bParamList = False
@@ -252,22 +288,28 @@ param = Production( kwParamList | paramList | defaultValueParam | simpleParam ).
 params = Production( separatedList( param, bAllowTrailingSeparator=True ).condition( _checkParams ) ).debug( 'params' )
 
 
+
 # Lambda expression_checkParams
 lambdaExpr = Production( ( Keyword( lambdaKeyword )  +  params  +  Literal( ':' )  +  expression ).action( lambda input, pos, xs: [ 'lambdaExpr', xs[1], xs[3] ] ) ).debug( 'lambdaExpr' )
 oldLambdaExpr = Production( ( Keyword( lambdaKeyword )  +  params  +  Literal( ':' )  +  oldExpression ).action( lambda input, pos, xs: [ 'lambdaExpr', xs[1], xs[3] ] ) ).debug( 'oldLambdaExpr' )
+
 
 
 # Conditional expression
 conditionalExpression = Production( orTest  +  Keyword( ifKeyword )  +  orTest  +  Keyword( elseKeyword )  +  expression ).action( lambda input, pos, xs: [ 'conditionalExpr', xs[2], xs[0], xs[4] ] )
 
 
+
 # Expression and old expression (old expression is expression without conditional expression)
 oldExpression  <<  Production( lambdaExpr  |  orTest ).debug( 'oldExpression' )
 expression  <<  Production( lambdaExpr  |  conditionalExpression  |  orTest ).debug( 'expression' )
 
+
+
 # Tuple or (old) expression
 tupleOrExpression  <<  ( tupleLiteral | expression ).debug( 'tupleOrExpression' )
 oldTupleOrExpression  <<  ( oldTupleLiteral | oldExpression ).debug( 'oldTupleOrExpression' )
+
 
 
 # Tuple or expression or yield expression
@@ -278,24 +320,38 @@ tupleOrExpressionOrYieldExpression = tupleOrExpression | yieldExpression
 # Assert statement
 assertStmt = Production( Keyword( assertKeyword ) + expression  +  Optional( Literal( ',' ) + expression ) ).action( lambda input, pos, xs: [ 'assertStmt', xs[1] ]  +  ( [ xs[2][1] ]   if xs[2] is not None  else  [] ) ).debug( 'assertStmt' )
 
+
+
 # Assignment statement
 assignmentStmt = Production( OneOrMore( ( targetList  +  '=' ).action( lambda input, pos, xs: xs[0] ) )  +  tupleOrExpressionOrYieldExpression ).action( lambda input, pos, xs: [ 'assignmentStmt', xs[0], xs[1] ] ).debug( 'assignmentStmt' )
+
+
 
 # Augmented assignment statement
 augOp = Choice( [ Literal( op )   for op in augAssignOps ] )
 augAssignStmt = Production( targetItem  +  augOp  +  tupleOrExpressionOrYieldExpression ).action( lambda input, pos, xs: [ 'augAssignStmt', xs[1], xs[0], xs[2] ] ).debug( 'augAssignStmt' )
 
+
+
 # Pass statement
 passStmt = Production( Keyword( passKeyword ) ).action( lambda input, pos, xs: [ 'passStmt' ] )
+
+
 
 # Del statement
 delStmt = Production( Keyword( delKeyword )  +  targetList ).action( lambda input, pos, xs: [ 'delStmt', xs[1] ] )
 
+
+
 # Return statement
 returnStmt = Production( Keyword( 'return' )  +  tupleOrExpression ).action( lambda input, pos, xs: [ 'returnStmt', xs[1] ] ).debug( 'returnStmt' )
 
+
+
 # Yield statement
 yieldStmt = Production( Keyword( yieldKeyword )  +  expression ).action( lambda input, pos, xs: [ 'yieldStmt', xs[1] ] ).debug( 'yieldStmt' )
+
+
 
 # Raise statement
 def _raiseFlatten(xs):
@@ -311,14 +367,17 @@ def _raiseFlatten(xs):
 raiseStmt = Production( Keyword( raiseKeyword ) + Optional( expression + Optional( Literal( ',' ) + expression + Optional( Literal( ',' ) + expression ) ) ) ).action( \
 	lambda input, pos, xs: [ 'raiseStmt', ]  +  _raiseFlatten( xs[1] ) ).debug( 'assertStmt' )
 
+
+
 # Break statement
 breakStmt = Production( Keyword( breakKeyword ) ).action( lambda input, pos, xs: [ 'breakStmt' ] )
+
+
 
 # Continue statement
 continueStmt = Production( Keyword( continueKeyword ) ).action( lambda input, pos, xs: [ 'continueStmt' ] )
 
-# If statement
-ifStmt = Production( Keyword( 'if' )  +  expression  +  ':' ).action( lambda input, pos, xs: [ 'ifStmt', xs[1], [] ] ).debug( 'ifStmt' )
+
 
 # Import statement
 _moduleIdentifier = Production( identifier )
@@ -350,8 +409,37 @@ importStmt = Production( simpleImport | fromImport | fromImportAll )
 
 
 
+# Global statement
+globalVar = Production( identifier ).action( lambda input, pos, xs: [ 'globalVar', xs ] )
+globalStmt = Production( Keyword( globalKeyword )  +  separatedList( globalVar, bNeedAtLeastOne=True ) ).action( lambda input, pos, xs: [ 'globalStmt' ]  +  xs[1] )
 
-statement = Production( assertStmt | assignmentStmt | augAssignStmt | passStmt | delStmt | returnStmt | yieldStmt | raiseStmt | breakStmt | continueStmt | importStmt | ifStmt | expression ).debug( 'statement' )
+
+
+# Exec statement
+def _execAction(input, pos, xs):
+	xs = [ 'execStmt' ]  +  xs[1:]
+	if xs[2] is not None:
+		xs = xs[:2] + xs[2][1:]
+		if xs[3] is not None:
+			xs[3] = xs[3][1]
+		else:
+			xs = xs[:3]
+	else:
+		xs = xs[:2]
+	return xs
+execStmt = Production( Keyword( execKeyword )  +  orOp  +  Optional( Keyword( inKeyword ) + expression  +  Optional( Literal( ',' ) + expression )  ) ).action( _execAction )
+
+
+
+# If statement
+ifStmt = Production( Keyword( 'if' )  +  expression  +  ':' ).action( lambda input, pos, xs: [ 'ifStmt', xs[1], [] ] ).debug( 'ifStmt' )
+
+
+
+
+# Statements
+simpleStmt = assertStmt | assignmentStmt | augAssignStmt | passStmt | delStmt | returnStmt | yieldStmt | raiseStmt | breakStmt | continueStmt | importStmt | globalStmt | execStmt
+statement = Production( simpleStmt | ifStmt | expression ).debug( 'statement' )
 
 
 
@@ -672,6 +760,16 @@ class TestCase_Python25Parser (ParserTestCase):
 		self._matchTest( importStmt, 'from x import ( a as p, b as q, )', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImportAs', 'a', 'p' ], [ 'moduleContentImportAs', 'b', 'q' ] ] )
 		self._matchTest( importStmt, 'from x import *', [ 'fromImportAllStmt', [ 'relativeModule', 'x' ] ] )
 		
+		
+	def testGlobalStmt(self):
+		self._matchTest( globalStmt, 'global x', [ 'globalStmt', [ 'globalVar', 'x' ] ] )
+		self._matchTest( globalStmt, 'global x, y', [ 'globalStmt', [ 'globalVar', 'x' ], [ 'globalVar', 'y' ] ] )
+	
+		
+	def testExecStmt(self):
+		self._matchTest( execStmt, 'exec a', [ 'execStmt', [ 'var', 'a' ] ] )
+		self._matchTest( execStmt, 'exec a in b', [ 'execStmt', [ 'var', 'a' ], [ 'var', 'b' ] ] )
+		self._matchTest( execStmt, 'exec a in b,c', [ 'execStmt', [ 'var', 'a' ], [ 'var', 'b' ], [ 'var', 'c' ] ] )
 		
 		
 		

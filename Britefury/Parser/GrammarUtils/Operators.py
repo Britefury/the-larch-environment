@@ -219,17 +219,21 @@ class OperatorTable (object):
 			level._buildParser( self, levelParserForwardDeclarations, forward, prevLevel, parser )
 			parser = forward
 			prevLevel = level
-		return parser
+		return parser, levelParserForwardDeclarations
 
 
 
 
 
 
-def buildOperatorParser(operatorTable, rootParser):
+def buildOperatorParserWithAllLevels(operatorTable, rootParser):
 	if isinstance( operatorTable, list )  or  isinstance( operatorTable, tuple ):
 		operatorTable = OperatorTable( operatorTable, rootParser )
 	return operatorTable.buildParser()
+
+def buildOperatorParser(operatorTable, rootParser):
+	return buildOperatorParserWithAllLevels( operatorTable, rootParser )[0]
+
 
 
 
