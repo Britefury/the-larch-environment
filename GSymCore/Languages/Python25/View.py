@@ -65,9 +65,11 @@ class ParsedNodeInteractor (Interactor):
 	eventMethods = [ tokData ]
 
 
+_compoundStmtNames = set( [ 'ifStmt', 'elifStmt', 'elseStmt', 'whileStmt', 'forStmt', 'tryStmt', 'exceptStmt', 'finallyStmt' ] )	
+	
 
-def _isSuiteStmt(node):
-	return node[0] == 'ifStmt'
+def _isCompoundStmt(node):
+	return node[0] in _compoundStmtNames
 	
 
 class ParsedLineInteractor (Interactor):
@@ -79,9 +81,9 @@ class ParsedLineInteractor (Interactor):
 			else:
 				parsed = _parseText( parser, value )
 				if parsed is not None:
-					if _isSuiteStmt( parsed ):
-						print 'Parsed is a suite statement'
-						if _isSuiteStmt( node ):
+					if _isCompoundStmt( parsed ):
+						print 'Parsed is a compound statement'
+						if _isCompoundStmt( node ):
 							print 'Original is a suite statement'
 							parsed[-1] = node[-1]
 						node = replace( node, parsed )
@@ -264,6 +266,11 @@ def tupleView(state, node, xs, parser=None):
 			   listView( FlowListViewLayout( 5.0, 0.0 ), None, None, ',', xWidgets ),
 			   UnparsedText( UnparsedText( ', ' ).join( [ x   for x in xTexts ] ), PRECEDENCE_TUPLE ),
 			   state )
+
+def suiteView(suite):
+	lineViews = mapViewEval( suite, None, python25ViewState( statementParser, MODE_LINE ) )
+	return listView( VerticalListViewLayout( 0.0, 0.0, 30.0 ), '{', '}', None, lineViews )
+
 
 
 class Python25View (GSymView):
@@ -556,9 +563,12 @@ class Python25View (GSymView):
 				state )
 	
 	def ellipsis(self, state, node):
+		ellipsisLabel = label( '...', punctuationStyle )
+		ellipsisUnparsed = UnparsedText( '...' )
+		ellipsisUnparsed.associateWith( ellipsisLabel )
 		return nodeEditor( node,
 				label( '...', punctuationStyle ),
-				UnparsedText( '...',  PRECEDENCE_SUBSCRIPTSLICE ),
+				UnparsedText( ellipsisUnparsed,  PRECEDENCE_SUBSCRIPTSLICE ),
 				state )
 	
 	def subscriptTuple(self, state, node, *xs):
@@ -584,10 +594,13 @@ class Python25View (GSymView):
 	
 	# Call
 	def kwArg(self, state, node, name, value):
+		nameLabel = label( name )
+		nameUnparsed = UnparsedText( name )
+		nameUnparsed.associateWith( nameLabel )
 		valueView = viewEval( value )
 		return nodeEditor( node,
-				ahbox( [ label( name ), label( '=', punctuationStyle ), valueView ] ),
-				UnparsedText( name  +  '='  +  valueView.text,  PRECEDENCE_ARG ),
+				ahbox( [ nameLabel, label( '=', punctuationStyle ), valueView ] ),
+				UnparsedText( nameUnparsed  +  '='  +  valueView.text,  PRECEDENCE_ARG ),
 				state )
 
 	def argList(self, state, node, value):
@@ -722,28 +735,40 @@ class Python25View (GSymView):
 	
 	# Parameters
 	def simpleParam(self, state, node, name):
+		nameLabel = label( name )
+		nameUnparsed = UnparsedText( name )
+		nameUnparsed.associateWith( nameLabel )
 		return nodeEditor( node,
-				label( name ),
-				UnparsedText( name,  PRECEDENCE_PARAM ),
+				nameLabel,
+				UnparsedText( nameUnparsed,  PRECEDENCE_PARAM ),
 				state )
 
 	def defaultValueParam(self, state, node, name, value):
+		nameLabel = label( name )
+		nameUnparsed = UnparsedText( name )
+		nameUnparsed.associateWith( nameLabel )
 		valueView = viewEval( value )
 		return nodeEditor( node,
-				ahbox( [ label( name ), label( '=', punctuationStyle ), valueView ] ),
-				UnparsedText( name  +  '='  +  valueView.text,  PRECEDENCE_PARAM ),
+				ahbox( [ nameLabel, label( '=', punctuationStyle ), valueView ] ),
+				UnparsedText( nameUnparsed  +  '='  +  valueView.text,  PRECEDENCE_PARAM ),
 				state )
 
 	def paramList(self, state, node, name):
+		nameLabel = label( name )
+		nameUnparsed = UnparsedText( name )
+		nameUnparsed.associateWith( nameLabel )
 		return nodeEditor( node,
-				ahbox( [ label( '*', punctuationStyle ), label( name ) ] ),
-				UnparsedText( '*'  +  name,  PRECEDENCE_PARAM ),
+				ahbox( [ label( '*', punctuationStyle ), nameLabel ] ),
+				UnparsedText( '*'  +  nameUnparsed,  PRECEDENCE_PARAM ),
 				state )
 
 	def kwParamList(self, state, node, name):
+		nameLabel = label( name )
+		nameUnparsed = UnparsedText( name )
+		nameUnparsed.associateWith( nameLabel )
 		return nodeEditor( node,
-				ahbox( [ label( '**', punctuationStyle ), label( name ) ] ),
-				UnparsedText( '**'  +  name,  PRECEDENCE_PARAM ),
+				ahbox( [ label( '**', punctuationStyle ), nameLabel ] ),
+				UnparsedText( '**'  +  nameUnparsed,  PRECEDENCE_PARAM ),
 				state )
 
 	
@@ -891,33 +916,54 @@ class Python25View (GSymView):
 	
 	# Import statement
 	def relativeModule(self, state, node, name):
+		nameLabel = label( name )
+		nameUnparsed = UnparsedText( name )
+		nameUnparsed.associateWith( nameLabel )
 		return nodeEditor( node,
-				   label( name ),
-				   UnparsedText( name, PRECEDENCE_IMPORTCONTENT ),
+				   nameLabel,
+				   UnparsedText( nameUnparsed, PRECEDENCE_IMPORTCONTENT ),
 				   state )
 	
 	def moduleImport(self, state, node, name):
+		nameLabel = label( name )
+		nameUnparsed = UnparsedText( name )
+		nameUnparsed.associateWith( nameLabel )
 		return nodeEditor( node,
-				   label( name ),
-				   UnparsedText( name, PRECEDENCE_IMPORTCONTENT ),
+				   nameLabel,
+				   UnparsedText( nameUnparsed, PRECEDENCE_IMPORTCONTENT ),
 				   state )
 	
 	def moduleImportAs(self, state, node, name, asName):
+		nameLabel = label( name )
+		nameUnparsed = UnparsedText( name )
+		nameUnparsed.associateWith( nameLabel )
+		asNameLabel = label( asName )
+		asNameUnparsed = UnparsedText( asName )
+		asNameUnparsed.associateWith( asNameLabel )
 		return nodeEditor( node,
-				   ahbox( [ label( name ), keywordLabel( asKeyword ), label( asName ) ] ),
-				   UnparsedText( name + ' ' + asKeyword + ' ' + asName, PRECEDENCE_IMPORTCONTENT ),
+				   ahbox( [ nameLabel, keywordLabel( asKeyword ), asNameLabel ] ),
+				   UnparsedText( nameUnparsed + ' ' + asKeyword + ' ' + asNameUnparsed, PRECEDENCE_IMPORTCONTENT ),
 				   state )
 	
 	def moduleContentImport(self, state, node, name):
+		nameLabel = label( name )
+		nameUnparsed = UnparsedText( name )
+		nameUnparsed.associateWith( nameLabel )
 		return nodeEditor( node,
-				   label( name ),
-				   UnparsedText( name, PRECEDENCE_IMPORTCONTENT ),
+				   nameLabel,
+				   UnparsedText( nameUnparsed, PRECEDENCE_IMPORTCONTENT ),
 				   state )
 	
 	def moduleContentImportAs(self, state, node, name, asName):
+		nameLabel = label( name )
+		nameUnparsed = UnparsedText( name )
+		nameUnparsed.associateWith( nameLabel )
+		asNameLabel = label( asName )
+		asNameUnparsed = UnparsedText( asName )
+		asNameUnparsed.associateWith( asNameLabel )
 		return nodeEditor( node,
-				   ahbox( [ label( name ), keywordLabel( asKeyword ), label( asName ) ] ),
-				   UnparsedText( name + ' ' + asKeyword + ' ' + asName, PRECEDENCE_IMPORTCONTENT ),
+				   ahbox( [ nameLabel, keywordLabel( asKeyword ), asNameLabel ] ),
+				   UnparsedText( nameUnparsed + ' ' + asKeyword + ' ' + asNameUnparsed, PRECEDENCE_IMPORTCONTENT ),
 				   state )
 	
 	def importStmt(self, state, node, *xs):
@@ -956,12 +1002,18 @@ class Python25View (GSymView):
 	
 	# Global statement
 	def globalVar(self, state, node, name):
+		nameLabel = label( name )
+		nameUnparsed = UnparsedText( name )
+		nameUnparsed.associateWith( nameLabel )
 		return nodeEditor( node,
-				   label( name ),
-				   UnparsedText( name, PRECEDENCE_IMPORTCONTENT ),
+				   nameLabel,
+				   UnparsedText( nameUnparsed, PRECEDENCE_IMPORTCONTENT ),
 				   state )
 	
 	def globalStmt(self, state, node, *xs):
+		globalLabel = keywordLabel( globalKeyword )
+		globalUnparsed = UnparsedText( globalKeyword )
+		globalUnparsed.associateWith( globalLabel )
 		xViews = mapViewEval( xs, None, python25ViewState( Parser.globalVar ) )
 		xWidgets = []
 		if len( xs ) > 0:
@@ -969,47 +1021,152 @@ class Python25View (GSymView):
 				xWidgets.append( ahbox( [ xv, label( ',', punctuationStyle ) ] ) )
 			xWidgets.append( xViews[-1] )
 		return nodeEditor( node,
-				   ahbox( [ keywordLabel( globalKeyword ) ]  +  xWidgets, spacing=10.0 ),
-				   UnparsedText( globalKeyword  +  ' '  +  UnparsedText( ', ' ).join( [ xv.text   for xv in xViews ] ), PRECEDENCE_STMT ),
+				   ahbox( [ globalLabel ]  +  xWidgets, spacing=10.0 ),
+				   UnparsedText( globalUnparsed  +  ' '  +  UnparsedText( ', ' ).join( [ xv.text   for xv in xViews ] ), PRECEDENCE_STMT ),
 				   state )
 	
 
 	
 	# Exec statement
-	def execStmt(self, state, node, codeX, *xs):
-		widgets = [ viewEval( codeX, None, python25ViewState( Parser.orOp ) ) ]
-		xViews = mapViewEval( xs )
-		if len( xs ) > 0:
+	def execStmt(self, state, node, src, loc, glob):
+		execLabel = keywordLabel( execKeyword )
+		execUnparsed = UnparsedText( execKeyword )
+		execUnparsed.associateWith( execLabel )
+		srcView = viewEval( src, None, python25ViewState( Parser.orOp ) )
+		widgets = [ srcView ]
+		txt = execUnparsed  +  ' '  +  srcView.text
+		if loc != '<nil>':
+			locView = viewEval( loc )
 			widgets.append( keywordLabel( inKeyword ) )
-			if len( xs ) == 1:
-				widgets.append( xViews[0] )
+			if glob != '<nil>':
+				widgets.append( ahbox( [ locView, label( ',', punctuationStyle ) ] ) )
 			else:
-				widgets.append( ahbox( [ xViews[0], label( ',', punctuationStyle ) ] ) )
-				widgets.append( xViews[1] )
-		xt = ''   if len( xs ) == 0   else   ' '  +  inKeyword  +  ' ' + xViews[0].text
-		if len( xs ) > 0:
-			xt = xt  +  ( ''   if len( xs ) == 1   else   ', ' + xViews[1].text )
+				widgets.append( locView )
+			txt += ' '  +  inKeyword  +  ' '  +  locView.text
+		if glob != '<nil>':
+			globView = viewEval( glob )
+			widgets.append( globView )
+			txt += ', '  +  globView.text
 		return nodeEditor( node,
-				   ahbox( [ keywordLabel( execKeyword ) ]  +  widgets, spacing=10.0 ),
-				   UnparsedText( execKeyword  +  xt, PRECEDENCE_STMT ),
+				   ahbox( [ execLabel ]  +  widgets, spacing=10.0 ),
+				   UnparsedText( txt , PRECEDENCE_STMT ),
 				   state )
 	
 	
 	
 	# If statement
-	def ifStmt(self, state, node, value, suite):
-		lineViews = mapViewEval( suite, None, python25ViewState( statementParser, MODE_LINE ) )
-		suiteView = listView( VerticalListViewLayout( 0.0, 0.0, 30.0 ), '{', '}', None, lineViews )
-		
-		valueView = viewEval( value )
+	def ifStmt(self, state, node, condition, suite):
+		ifLabel = keywordLabel( ifKeyword )
+		ifUnparsed = UnparsedText( ifKeyword )
+		ifUnparsed.associateWith( ifLabel )
+		conditionView = viewEval( condition )
 		return nodeEditor( node,
-				vbox( [ ahbox( [ keywordLabel( ifKeyword ),  valueView,  label( ':', punctuationStyle ) ] ),  suiteView ] ),
-				UnparsedText( ifKeyword  +  ' '  +  valueView.text  +  ':',  PRECEDENCE_STMT ),
+				vbox( [ ahbox( [ ifLabel,  conditionView,  label( ':', punctuationStyle ) ] ),  suiteView( suite ) ] ),
+				UnparsedText( ifUnparsed  +  ' '  +  conditionView.text  +  ':',  PRECEDENCE_STMT ),
+				state )
+	
+	
+	
+	# Elif statement
+	def elifStmt(self, state, node, condition, suite):
+		elifLabel = keywordLabel( elifKeyword )
+		elifUnparsed = UnparsedText( elifKeyword )
+		elifUnparsed.associateWith( elifLabel )
+		conditionView = viewEval( condition )
+		return nodeEditor( node,
+				vbox( [ ahbox( [ elifLabel,  conditionView,  label( ':', punctuationStyle ) ] ),  suiteView( suite ) ] ),
+				UnparsedText( elifUnparsed  +  ' '  +  conditionView.text  +  ':',  PRECEDENCE_STMT ),
+				state )
+	
+	
+	
+	# Else statement
+	def elseStmt(self, state, node, suite):
+		elseLabel = keywordLabel( elseKeyword )
+		elseUnparsed = UnparsedText( elseKeyword )
+		elseUnparsed.associateWith( elseLabel )
+		return nodeEditor( node,
+				vbox( [ ahbox( [ elseLabel,  label( ':', punctuationStyle ) ] ),  suiteView( suite ) ] ),
+				UnparsedText( elseUnparsed  +  ':',  PRECEDENCE_STMT ),
+				state )
+	
+	
+	
+	# While statement
+	def whileStmt(self, state, node, condition, suite):
+		whileLabel = keywordLabel( whileKeyword )
+		whileUnparsed = UnparsedText( whileKeyword )
+		whileUnparsed.associateWith( whileLabel )
+		conditionView = viewEval( condition )
+		return nodeEditor( node,
+				vbox( [ ahbox( [ whileLabel,  conditionView,  label( ':', punctuationStyle ) ] ),  suiteView( suite ) ] ),
+				UnparsedText( whileUnparsed  +  ' '  +  conditionView.text  +  ':',  PRECEDENCE_STMT ),
+				state )
+	
+	
+	
+	# For statement
+	def forStmt(self, state, node, target, source, suite):
+		forLabel = keywordLabel( forKeyword )
+		forUnparsed = UnparsedText( forKeyword )
+		forUnparsed.associateWith( forLabel )
+		targetView = viewEval( target, None, python25ViewState( Parser.targetList ) )
+		sourceView = viewEval( source, None, python25ViewState( Parser.tupleOrExpression ) )
+		return nodeEditor( node,
+				   vbox( [ ahbox( [ forLabel, targetView, keywordLabel( inKeyword ), sourceView, label( ':', punctuationStyle ) ] ),  suiteView( suite ) ] ),
+				   UnparsedText( forUnparsed  +  ' '  +  targetView.text  +  ' '  +  inKeyword  +  sourceView.text  +  ':', PRECEDENCE_LISTCOMPREHENSION ),
+				   state )
+	
+	
+
+	# Try statement
+	def tryStmt(self, state, node, suite):
+		tryLabel = keywordLabel( tryKeyword )
+		tryUnparsed = UnparsedText( tryKeyword )
+		tryUnparsed.associateWith( tryLabel )
+		return nodeEditor( node,
+				vbox( [ ahbox( [ tryLabel,  label( ':', punctuationStyle ) ] ),  suiteView( suite ) ] ),
+				UnparsedText( tryUnparsed  +  ':',  PRECEDENCE_STMT ),
+				state )
+	
+	
+	
+	# Except statement
+	def exceptStmt(self, state, node, exc, target, suite):
+		exceptLabel = keywordLabel( exceptKeyword )
+		exceptUnparsed = UnparsedText( exceptKeyword )
+		exceptUnparsed.associateWith( exceptLabel )
+		widgets = []
+		txt = exceptUnparsed
+		if exc != '<nil>':
+			excView = viewEval( exc )
+			if target != '<nil>':
+				widgets.append( ahbox( [ excView, label( ',', punctuationStyle ) ] ) )
+			else:
+				widgets.append( excView )
+			txt += ' '  +  excView.text
+		if target != '<nil>':
+			targetView = viewEval( target )
+			widgets.append( targetView )
+			txt += ', '  +  targetView.text
+		widgets.append( label( ':', punctuationStyle ) )
+		return nodeEditor( node,
+				   vbox( [ ahbox( [ exceptLabel ]  +  widgets, spacing=10.0 ),  suiteView( suite ) ] ),
+				   UnparsedText( txt + ':', PRECEDENCE_STMT ),
+				   state )
+
+	
+	
+	# Finally statement
+	def finallyStmt(self, state, node, suite):
+		finallyLabel = keywordLabel( finallyKeyword )
+		finallyUnparsed = UnparsedText( finallyKeyword )
+		finallyUnparsed.associateWith( finallyLabel )
+		return nodeEditor( node,
+				vbox( [ ahbox( [ finallyLabel,  label( ':', punctuationStyle ) ] ),  suiteView( suite ) ] ),
+				UnparsedText( finallyUnparsed  +  ':',  PRECEDENCE_STMT ),
 				state )
 	
 	
 	
 	
-	
-	
-

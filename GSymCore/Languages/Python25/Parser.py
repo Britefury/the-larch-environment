@@ -85,7 +85,8 @@ targetList = ( tupleTarget  |  targetItem ).debug( 'targetList' )
 parenTarget = Production( Literal( '(' )  +  targetList  +  Literal( ')' ) ).action( lambda input, pos, xs: xs[1] ).debug( 'parenTarget' )
 listTarget = Production( delimitedSeparatedList( targetItem, '[', ']', bAllowTrailingSeparator=True ) ).action( lambda input, pos, xs: [ 'listTarget' ]  +  xs ).debug( 'listTarget' )
 #targetItem  <<  ( assignablePrimary  |  parenTarget  |  listTarget  |  singleTarget )
-targetItem  <<  ( attributeRef  |  subscript  |  parenTarget  |  listTarget  |  singleTarget )
+#targetItem  <<  ( attributeRef  |  subscript  |  parenTarget  |  listTarget  |  singleTarget )
+targetItem  <<  ( parenTarget  |  listTarget  |  singleTarget )
 
 
 
@@ -416,30 +417,61 @@ globalStmt = Production( Keyword( globalKeyword )  +  separatedList( globalVar, 
 
 
 # Exec statement
-def _execAction(input, pos, xs):
-	xs = [ 'execStmt' ]  +  xs[1:]
-	if xs[2] is not None:
-		xs = xs[:2] + xs[2][1:]
-		if xs[3] is not None:
-			xs[3] = xs[3][1]
-		else:
-			xs = xs[:3]
-	else:
-		xs = xs[:2]
-	return xs
-execStmt = Production( Keyword( execKeyword )  +  orOp  +  Optional( Keyword( inKeyword ) + expression  +  Optional( Literal( ',' ) + expression )  ) ).action( _execAction )
+execCodeStmt = Production( Keyword( execKeyword )  +  orOp ).action( lambda input, pos, xs: [ 'execStmt', xs[1], '<nil>', '<nil>' ] )
+execCodeInLocalsStmt = Production( Keyword( execKeyword )  +  orOp  +  Keyword( inKeyword )  +  expression ).action( lambda input, pos, xs: [ 'execStmt', xs[1], xs[3], '<nil>' ] )
+execCodeInLocalsAndGlobalsStmt = Production( Keyword( execKeyword )  +  orOp  +  Keyword( inKeyword )  +  expression  +  ','  +  expression ).action( lambda input, pos, xs: [ 'execStmt', xs[1], xs[3], xs[5] ] )
+execStmt = Production( execCodeInLocalsAndGlobalsStmt | execCodeInLocalsStmt | execCodeStmt )
 
 
 
 # If statement
-ifStmt = Production( Keyword( 'if' )  +  expression  +  ':' ).action( lambda input, pos, xs: [ 'ifStmt', xs[1], [] ] ).debug( 'ifStmt' )
+ifStmt = Production( Keyword( ifKeyword )  +  expression  +  ':' ).action( lambda input, pos, xs: [ 'ifStmt', xs[1], [] ] ).debug( 'ifStmt' )
+
+
+
+# Elif statement
+elifStmt = Production( Keyword( elifKeyword )  +  expression  +  ':' ).action( lambda input, pos, xs: [ 'elifStmt', xs[1], [] ] ).debug( 'elifStmt' )
+
+
+
+# Else statement
+elseStmt = Production( Keyword( elseKeyword )  +  ':' ).action( lambda input, pos, xs: [ 'elseStmt', [] ] ).debug( 'elseStmt' )
+
+
+
+# While statement
+whileStmt = Production( Keyword( whileKeyword )  +  expression  +  ':' ).action( lambda input, pos, xs: [ 'whileStmt', xs[1], [] ] ).debug( 'whileStmt' )
+
+
+
+# For statement
+forStmt = Production( Keyword( forKeyword )  +  targetList  +  Keyword( inKeyword )  +  tupleOrExpression  +  ':' ).action( lambda input, pos, xs: [ 'forStmt', xs[1], xs[3], [] ] ).debug( 'forStmt' )
+
+
+
+# Try statement
+tryStmt = Production( Keyword( tryKeyword )  +  ':' ).action( lambda input, pos, xs: [ 'tryStmt', [] ] ).debug( 'tryStmt' )
+
+
+
+# Except statement
+exceptAllStmt = Production( Keyword( exceptKeyword ) + ':' ).action( lambda input, pos, xs: [ 'exceptStmt', '<nil>', '<nil>', [] ] )
+exceptExcStmt = Production( Keyword( exceptKeyword )  +  expression + ':' ).action( lambda input, pos, xs: [ 'exceptStmt', xs[1], '<nil>', [] ] )
+exceptExcIntoTargetStmt = Production( Keyword( exceptKeyword )  +  expression  +  ','  +  targetItem + ':' ).action( lambda input, pos, xs: [ 'exceptStmt', xs[1], xs[3], [] ] )
+exceptStmt = Production( exceptExcIntoTargetStmt | exceptExcStmt | exceptAllStmt )
+
+
+
+# Finally statement
+finallyStmt = Production( Keyword( finallyKeyword )  +  ':' ).action( lambda input, pos, xs: [ 'finallyStmt', [] ] ).debug( 'finallyStmt' )
 
 
 
 
 # Statements
 simpleStmt = assertStmt | assignmentStmt | augAssignStmt | passStmt | delStmt | returnStmt | yieldStmt | raiseStmt | breakStmt | continueStmt | importStmt | globalStmt | execStmt
-statement = Production( simpleStmt | ifStmt | expression ).debug( 'statement' )
+compoundStmtHeader = ifStmt | elifStmt | elseStmt | whileStmt | forStmt | tryStmt | exceptStmt | finallyStmt
+statement = Production( simpleStmt | compoundStmtHeader | expression ).debug( 'statement' )
 
 
 
@@ -767,9 +799,51 @@ class TestCase_Python25Parser (ParserTestCase):
 	
 		
 	def testExecStmt(self):
-		self._matchTest( execStmt, 'exec a', [ 'execStmt', [ 'var', 'a' ] ] )
-		self._matchTest( execStmt, 'exec a in b', [ 'execStmt', [ 'var', 'a' ], [ 'var', 'b' ] ] )
+		self._matchTest( execStmt, 'exec a', [ 'execStmt', [ 'var', 'a' ], '<nil>', '<nil>' ] )
+		self._matchTest( execStmt, 'exec a in b', [ 'execStmt', [ 'var', 'a' ], [ 'var', 'b' ], '<nil>' ] )
 		self._matchTest( execStmt, 'exec a in b,c', [ 'execStmt', [ 'var', 'a' ], [ 'var', 'b' ], [ 'var', 'c' ] ] )
+		
+		
+	def testIfStmt(self):
+		self._matchTest( ifStmt, 'if a:', [ 'ifStmt', [ 'var', 'a' ], [] ] )
+		
+		
+	def testElIfStmt(self):
+		self._matchTest( elifStmt, 'elif a:', [ 'elifStmt', [ 'var', 'a' ], [] ] )
+		
+		
+	def testElseStmt(self):
+		self._matchTest( elseStmt, 'else:', [ 'elseStmt', [] ] )
+		
+		
+	def testWhileStmt(self):
+		self._matchTest( whileStmt, 'while a:', [ 'whileStmt', [ 'var', 'a' ], [] ] )
+		
+		
+	def testForStmt(self):
+		self._matchTest( forStmt, 'for x in y:', [ 'forStmt', [ 'singleTarget', 'x' ], [ 'var', 'y' ], [] ] )
+		
+		
+	def testTryStmt(self):
+		self._matchTest( tryStmt, 'try:', [ 'tryStmt', [] ] )
+		
+		
+	def testExceptStmt(self):
+		self._matchTest( exceptStmt, 'except:', [ 'exceptStmt', '<nil>', '<nil>', [] ] )
+		self._matchTest( exceptStmt, 'except x:', [ 'exceptStmt', [ 'var', 'x' ], '<nil>', [] ] )
+		self._matchTest( exceptStmt, 'except x, y:', [ 'exceptStmt', [ 'var', 'x' ], [ 'singleTarget', 'y' ], [] ] )
+		
+		
+	def testFinallyStmt(self):
+		self._matchTest( finallyStmt, 'finally:', [ 'finallyStmt', [] ] )
+		
+		
+
+		
+		
+	def testFnCallStStmt(self):
+		self._matchTest( expression, 'x.y()', [ 'call', [ 'attributeRef', [ 'var', 'x' ], 'y' ] ] )
+		self._matchTest( statement, 'x.y()', [ 'call', [ 'attributeRef', [ 'var', 'x' ], 'y' ] ] )
 		
 		
 		
