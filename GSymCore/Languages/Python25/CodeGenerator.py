@@ -307,11 +307,55 @@ class Python25CodeGenerator (GSymCodeGenerator):
 		return 'del '  +  self( target )
 	
 	
-	
 	# Return statement
 	def returnStmt(self, node, value):
 		return 'return '  +  self( value )
 	
+	
+	# Yield statement
+	def yieldStmt(self, node, value):
+		return 'yield '  +  self( value )
+	
+	
+	# Raise statement
+	def raiseStmt(self, node, *xs):
+		return 'raise '  +  ', '.join( [ self( x )   for x in xs ] )
+	
+	
+	# Break statement
+	def breakStmt(self, node):
+		return 'break'
+	
+	
+	# Continue statement
+	def continueStmt(self, node):
+		return 'continue'
+	
+	
+	# Import statement
+	def relativeModule(self, node, name):
+		return name
+	
+	def moduleImport(self, node, name):
+		return name
+	
+	def moduleImportAs(self, node, name, asName):
+		return name + ' as ' + asName
+	
+	def moduleContentImport(self, node, name):
+		return name
+	
+	def moduleContentImportAs(self, node, name, asName):
+		return name + ' as ' + asName
+	
+	def importStmt(self, node, *xs):
+		return 'import '  +  ', '.join( [ self( x )   for x in xs ] )
+	
+	def fromImportStmt(self, node, moduleName, *xs):
+		return 'from ' + moduleName + ' import ' + ', '.join( [ self( x )   for x in xs ] )
+	
+	def fromImportAllStmt(self, node, moduleName):
+		return 'from ' + moduleName + ' import *'
 	
 	
 	# If statement

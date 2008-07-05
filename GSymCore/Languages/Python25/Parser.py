@@ -50,7 +50,9 @@ attrName = Production( pythonIdentifier )
 
 expression = Forward()
 oldExpression = Forward()
-assignablePrimary = Forward()
+attributeRef = Forward()
+subscript = Forward()
+#assignablePrimary = Forward()
 orTest = Forward()
 tupleOrExpression = Forward()
 oldTupleOrExpression = Forward()
@@ -65,7 +67,8 @@ targetList = ( tupleTarget  |  targetItem ).debug( 'targetList' )
 
 parenTarget = Production( Literal( '(' )  +  targetList  +  Literal( ')' ) ).action( lambda input, pos, xs: xs[1] ).debug( 'parenTarget' )
 listTarget = Production( delimitedSeparatedList( targetItem, '[', ']', bAllowTrailingSeparator=True ) ).action( lambda input, pos, xs: [ 'listTarget' ]  +  xs ).debug( 'listTarget' )
-targetItem  <<  ( assignablePrimary  |  parenTarget  |  listTarget  |  singleTarget )
+#targetItem  <<  ( assignablePrimary  |  parenTarget  |  listTarget  |  singleTarget )
+targetItem  <<  ( attributeRef  |  subscript  |  parenTarget  |  listTarget  |  singleTarget )
 
 
 
@@ -123,8 +126,8 @@ primary = Forward()
 
 
 # Attribute ref
-attributeRef = Production( primary + '.' + attrName ).action( lambda input, pos, xs: [ 'attributeRef', xs[0], xs[2] ] ).debug( 'attributeRef' )
-assignAttr = Production( primary + '.' + attrName ).action( lambda input, pos, xs: [ 'assignAttr', xs[0], xs[2] ] ).debug( 'assignAttr' )
+attributeRef  <<  Production( primary + '.' + attrName ).action( lambda input, pos, xs: [ 'attributeRef', xs[0], xs[2] ] ).debug( 'attributeRef' )
+#assignAttr = Production( primary + '.' + attrName ).action( lambda input, pos, xs: [ 'assignAttr', xs[0], xs[2] ] ).debug( 'assignAttr' )
 
 
 # Subscript and slice
@@ -134,8 +137,8 @@ subscriptEllipsis = Production( '...' ).action( lambda input, pos, xs: [ 'ellips
 subscriptItem = subscriptLongSlice | subscriptSlice | subscriptEllipsis | expression
 subscriptTuple = Production( separatedList( subscriptItem, bNeedAtLeastOne=True, bAllowTrailingSeparator=True, bRequireTrailingSeparatorForLengthOne=True ) ).action( lambda input, pos, xs: [ 'subscriptTuple' ]  +  xs ).debug( 'subscriptTuple' )
 subscriptIndex = subscriptTuple  |  subscriptItem
-subscript = Production( ( primary + '[' + subscriptIndex + ']' ).action( lambda input, pos, xs: [ 'subscript', xs[0], xs[2] ] ) ).debug( 'subscript' )
-assignSubscript = Production( ( primary + '[' + subscriptIndex + ']' ).action( lambda input, pos, xs: [ 'assignSubscript', xs[0], xs[2] ] ) ).debug( 'assignSubscript' )
+subscript  <<  Production( ( primary + '[' + subscriptIndex + ']' ).action( lambda input, pos, xs: [ 'subscript', xs[0], xs[2] ] ) ).debug( 'subscript' )
+#assignSubscript = Production( ( primary + '[' + subscriptIndex + ']' ).action( lambda input, pos, xs: [ 'assignSubscript', xs[0], xs[2] ] ) ).debug( 'assignSubscript' )
 
 
 # Call
@@ -179,9 +182,9 @@ call = Production( ( primary + Literal( '(' ) + callArgs + Literal( ')' ) ).acti
 
 
 # Primary
-assignablePrimary  <<  Production( subscript | attributeRef ).debug( 'assignablePrimary' )
-primary  <<  Production( call | assignablePrimary | atom ).debug( 'primary' )
-
+#assignablePrimary  <<  Production( subscript | attributeRef ).debug( 'assignablePrimary' )
+#primary  <<  Production( call | assignablePrimary | atom ).debug( 'primary' )
+primary  <<  Production( call | attributeRef | subscript | atom ).debug( 'primary' )
 
 
 orTest  <<  buildOperatorParser( \
@@ -291,11 +294,64 @@ delStmt = Production( Keyword( delKeyword )  +  targetList ).action( lambda inpu
 # Return statement
 returnStmt = Production( Keyword( 'return' )  +  tupleOrExpression ).action( lambda input, pos, xs: [ 'returnStmt', xs[1] ] ).debug( 'returnStmt' )
 
+# Yield statement
+yieldStmt = Production( Keyword( yieldKeyword )  +  expression ).action( lambda input, pos, xs: [ 'yieldStmt', xs[1] ] ).debug( 'yieldStmt' )
+
+# Raise statement
+def _raiseFlatten(xs):
+	if xs is None:
+		return []
+	else:
+		if xs[0] == ',':
+			xs = xs[1:]
+		if len( xs ) == 2:
+			return [ xs[0] ]  +  _raiseFlatten( xs[1] )
+		else:
+			return [ xs[0] ]
+raiseStmt = Production( Keyword( raiseKeyword ) + Optional( expression + Optional( Literal( ',' ) + expression + Optional( Literal( ',' ) + expression ) ) ) ).action( \
+	lambda input, pos, xs: [ 'raiseStmt', ]  +  _raiseFlatten( xs[1] ) ).debug( 'assertStmt' )
+
+# Break statement
+breakStmt = Production( Keyword( breakKeyword ) ).action( lambda input, pos, xs: [ 'breakStmt' ] )
+
+# Continue statement
+continueStmt = Production( Keyword( continueKeyword ) ).action( lambda input, pos, xs: [ 'continueStmt' ] )
+
 # If statement
 ifStmt = Production( Keyword( 'if' )  +  expression  +  ':' ).action( lambda input, pos, xs: [ 'ifStmt', xs[1], [] ] ).debug( 'ifStmt' )
 
+# Import statement
+_moduleIdentifier = Production( identifier )
+# dotted name
+moduleName = Production( separatedList( _moduleIdentifier, '.', bNeedAtLeastOne=True ) ).action( lambda input, pos, xs: '.'.join( xs ) )
+# relative module name
+_relModDotsModule = ( ZeroOrMore( '.' ) + moduleName ).action( lambda input, pos, xs: ''.join( xs[0] )  +  xs[1] )
+_relModDots = OneOrMore( '.' ).action( lambda input, pos, xs: ''.join( xs ) )
+relativeModule = Production( _relModDotsModule | _relModDots ).action( lambda input, pos, xs: [ 'relativeModule', xs ] )
+# ( <moduleName> 'as' <identifier> )  |  <moduleName>
+moduleImport = Production( ( moduleName + Keyword( asKeyword ) + identifier ).action( lambda input, pos, xs: [ 'moduleImportAs', xs[0], xs[2] ] )   |
+			    			moduleName.action( lambda input, pos, xs: [ 'moduleImport', xs ] ) )
+# 'import' <separatedList( moduleImport )>
+simpleImport = Production( Keyword( importKeyword )  +  separatedList( moduleImport, bNeedAtLeastOne=True ) ).action( lambda input, pos, xs: [ 'importStmt' ] + xs[1] )
+# ( <identifier> 'as' <identifier> )  |  <identifier>
+moduleContentImport = Production( ( identifier + Keyword( asKeyword ) + identifier ).action( lambda input, pos, xs: [ 'moduleContentImportAs', xs[0], xs[2] ] )   |
+			    			identifier.action( lambda input, pos, xs: [ 'moduleContentImport', xs ] ) )
+# 'from' <relativeModule> 'import' ( <separatedList( moduleContentImport )>  |  ( '(' <separatedList( moduleContentImport )> ',' ')' )
+fromImport = Production( Keyword( fromKeyword ) + relativeModule + Keyword( importKeyword ) + \
+				(  \
+					separatedList( moduleContentImport, bNeedAtLeastOne=True )  |  \
+					( Literal( '(' )  +  separatedList( moduleContentImport, bNeedAtLeastOne=True, bAllowTrailingSeparator=True )  +  Literal( ')' ) ).action( lambda input, pos, xs: xs[1] )  \
+				)  \
+			).action( lambda input, pos, xs: [ 'fromImportStmt', xs[1] ] + xs[3] )
+# 'from' <relativeModule> 'import' '*'
+fromImportAll = Production( Keyword( fromKeyword ) + relativeModule + Keyword( importKeyword ) + '*' ).action( lambda input, pos, xs: [ 'fromImportAllStmt', xs[1] ] )
+# Final :::
+importStmt = Production( simpleImport | fromImport | fromImportAll )
 
-statement = Production( assertStmt | assignmentStmt | augAssignStmt | passStmt | delStmt | returnStmt | ifStmt | expression ).debug( 'statement' )
+
+
+
+statement = Production( assertStmt | assignmentStmt | augAssignStmt | passStmt | delStmt | returnStmt | yieldStmt | raiseStmt | breakStmt | continueStmt | importStmt | ifStmt | expression ).debug( 'statement' )
 
 
 
@@ -349,6 +405,9 @@ class TestCase_Python25Parser (ParserTestCase):
 		self._matchTest( targetList, '[a],[b,]', [ 'tupleTarget', [ 'listTarget', [ 'singleTarget', 'a' ] ], [ 'listTarget', [ 'singleTarget', 'b' ] ] ] )
 		self._matchTest( targetList, '[(a,)],[(b,)]', [ 'tupleTarget', [ 'listTarget', [ 'tupleTarget', [ 'singleTarget', 'a' ] ] ], [ 'listTarget', [ 'tupleTarget', [ 'singleTarget', 'b' ] ] ] ] )
 
+		#self._matchTest( subscript, 'a[x]', [ 'subscript', [ 'var', 'a' ], [ 'var', 'x' ] ] )
+		#self._matchTest( attributeRef | subscript, 'a[x]', [ 'subscript', [ 'var', 'a' ], [ 'var', 'x' ] ] )
+		#self._matchTest( targetItem, 'a[x]', [ 'subscript', [ 'var', 'a' ], [ 'var', 'x' ] ] )
 		self._matchTest( targetList, 'a[x]', [ 'subscript', [ 'var', 'a' ], [ 'var', 'x' ] ] )
 		self._matchTest( targetList, 'a[x][y]', [ 'subscript', [ 'subscript', [ 'var', 'a' ], [ 'var', 'x' ] ], [ 'var', 'y' ] ] )
 		self._matchTest( targetList, 'a.b', [ 'attributeRef', [ 'var', 'a' ], 'b' ] )
@@ -550,6 +609,68 @@ class TestCase_Python25Parser (ParserTestCase):
 	def testReturnStmt(self):
 		self._matchTest( statement, 'return x', [ 'returnStmt', [ 'var', 'x' ] ] )
 		
+	
+	def testYieldStmt(self):
+		self._matchTest( statement, 'yield x', [ 'yieldStmt', [ 'var', 'x' ] ] )
+		
+		
+	def testRaiseStmt(self):
+		self._matchTest( statement, 'raise', [ 'raiseStmt' ] )
+		self._matchTest( statement, 'raise x', [ 'raiseStmt', [ 'var', 'x' ] ] )
+		self._matchTest( statement, 'raise x,y', [ 'raiseStmt', [ 'var', 'x' ], [ 'var', 'y' ] ] )
+		self._matchTest( statement, 'raise x,y,z', [ 'raiseStmt', [ 'var', 'x' ], [ 'var', 'y' ], [ 'var', 'z' ] ] )
+		
+		
+	def testBreakStmt(self):
+		self._matchTest( statement, 'break', [ 'breakStmt' ] )
+		
+		
+	def testContinueStmt(self):
+		self._matchTest( statement, 'continue', [ 'continueStmt' ] )
+		
+		
+	def testImportStmt(self):
+		self._matchTest( _moduleIdentifier, 'abc', 'abc' )
+		self._matchTest( moduleName, 'abc', 'abc' )
+		self._matchTest( moduleName, 'abc.xyz', 'abc.xyz' )
+		self._matchTest( _relModDotsModule, 'abc.xyz', 'abc.xyz' )
+		self._matchTest( _relModDotsModule, '...abc.xyz', '...abc.xyz' )
+		self._matchTest( _relModDots, '...', '...' )
+		self._matchTest( relativeModule, 'abc.xyz', [ 'relativeModule', 'abc.xyz' ] )
+		self._matchTest( relativeModule, '...abc.xyz', [ 'relativeModule', '...abc.xyz' ] )
+		self._matchTest( relativeModule, '...', [ 'relativeModule', '...' ] )
+		self._matchTest( moduleImport, 'abc.xyz', [ 'moduleImport', 'abc.xyz' ] )
+		self._matchTest( moduleImport, 'abc.xyz as q', [ 'moduleImportAs', 'abc.xyz', 'q' ] )
+		self._matchTest( simpleImport, 'import a', [ 'importStmt', [ 'moduleImport', 'a' ] ] )
+		self._matchTest( simpleImport, 'import a.b', [ 'importStmt', [ 'moduleImport', 'a.b' ] ] )
+		self._matchTest( simpleImport, 'import a.b as x', [ 'importStmt', [ 'moduleImportAs', 'a.b', 'x' ] ] )
+		self._matchTest( simpleImport, 'import a.b as x, c.d as y', [ 'importStmt', [ 'moduleImportAs', 'a.b', 'x' ], [ 'moduleImportAs', 'c.d', 'y' ] ] )
+		self._matchTest( moduleContentImport, 'xyz', [ 'moduleContentImport', 'xyz' ] )
+		self._matchTest( moduleContentImport, 'xyz as q', [ 'moduleContentImportAs', 'xyz', 'q' ] )
+		self._matchTest( fromImport, 'from x import a', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImport', 'a' ] ] )
+		self._matchTest( fromImport, 'from x import a as p', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImportAs', 'a', 'p' ] ] )
+		self._matchTest( fromImport, 'from x import a as p, b as q', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImportAs', 'a', 'p' ], [ 'moduleContentImportAs', 'b', 'q' ] ] )
+		self._matchTest( fromImport, 'from x import (a)', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImport', 'a' ] ] )
+		self._matchTest( fromImport, 'from x import (a,)', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImport', 'a' ] ] )
+		self._matchTest( fromImport, 'from x import (a as p)', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImportAs', 'a', 'p' ] ] )
+		self._matchTest( fromImport, 'from x import (a as p,)', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImportAs', 'a', 'p' ] ] )
+		self._matchTest( fromImport, 'from x import ( a as p, b as q )', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImportAs', 'a', 'p' ], [ 'moduleContentImportAs', 'b', 'q' ] ] )
+		self._matchTest( fromImport, 'from x import ( a as p, b as q, )', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImportAs', 'a', 'p' ], [ 'moduleContentImportAs', 'b', 'q' ] ] )
+		self._matchTest( fromImportAll, 'from x import *', [ 'fromImportAllStmt', [ 'relativeModule', 'x' ] ] )
+		self._matchTest( importStmt, 'import a', [ 'importStmt', [ 'moduleImport', 'a' ] ] )
+		self._matchTest( importStmt, 'import a.b', [ 'importStmt', [ 'moduleImport', 'a.b' ] ] )
+		self._matchTest( importStmt, 'import a.b as x', [ 'importStmt', [ 'moduleImportAs', 'a.b', 'x' ] ] )
+		self._matchTest( importStmt, 'import a.b as x, c.d as y', [ 'importStmt', [ 'moduleImportAs', 'a.b', 'x' ], [ 'moduleImportAs', 'c.d', 'y' ] ] )
+		self._matchTest( importStmt, 'from x import a', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImport', 'a' ] ] )
+		self._matchTest( importStmt, 'from x import a as p', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImportAs', 'a', 'p' ] ] )
+		self._matchTest( importStmt, 'from x import a as p, b as q', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImportAs', 'a', 'p' ], [ 'moduleContentImportAs', 'b', 'q' ] ] )
+		self._matchTest( importStmt, 'from x import (a)', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImport', 'a' ] ] )
+		self._matchTest( importStmt, 'from x import (a,)', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImport', 'a' ] ] )
+		self._matchTest( importStmt, 'from x import (a as p)', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImportAs', 'a', 'p' ] ] )
+		self._matchTest( importStmt, 'from x import (a as p,)', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImportAs', 'a', 'p' ] ] )
+		self._matchTest( importStmt, 'from x import ( a as p, b as q )', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImportAs', 'a', 'p' ], [ 'moduleContentImportAs', 'b', 'q' ] ] )
+		self._matchTest( importStmt, 'from x import ( a as p, b as q, )', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImportAs', 'a', 'p' ], [ 'moduleContentImportAs', 'b', 'q' ] ] )
+		self._matchTest( importStmt, 'from x import *', [ 'fromImportAllStmt', [ 'relativeModule', 'x' ] ] )
 		
 		
 		

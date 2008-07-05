@@ -19,6 +19,8 @@ from copy import copy
 import re
 
 from Britefury.Parser.ParserState import ParserState
+#from Britefury.Parser.ParserState2 import ParserState2 as ParserState
+#from Britefury.Parser.ParserState3 import ParserState2 as ParserState
 
 
 def parserCoerce(x):
@@ -261,11 +263,11 @@ edge [
 					edgeIndex = len( state.edges )
 					if isinstance( prev.expression, Production ):
 						colour = 'magenta'
-						style = 'dotted'
+						state.edges.append( '"%s" -> "%s" [\nid = %d\ncolor="%s"\n];\n'  %  ( prevName, nodeName, edgeIndex, colour ) )
 					else:
 						colour = 'black'
 						style = 'bold'
-					state.edges.append( '"%s" -> "%s" [\nid = %d\ncolor="%s"\nstyle="%s"];\n'  %  ( prevName, nodeName, edgeIndex, colour, style ) )
+						state.edges.append( '"%s" -> "%s" [\nid = %d\ncolor="%s"\nstyle="%s"];\n'  %  ( prevName, nodeName, edgeIndex, colour, style ) )
 					state.callEdges.add(  ( prev, node )  )
 				state.debugStack.pop()
 				
@@ -279,11 +281,11 @@ edge [
 						edgeIndex = len( state.edges )
 						if isinstance( fromNode.expression, Production ):
 							colour = 'darkgreen'
-							style = 'dotted'
+							state.edges.append( '"%s" -> "%s" [\nid = %d\ncolor="%s"\nconstraint="false"];\n'  %  ( fromName, toName, edgeIndex, colour ) )
 						else:
 							colour = 'red'
 							style = 'bold'
-						state.edges.append( '"%s" -> "%s" [\nid = %d\ncolor="%s"\nstyle="%s"\nconstraint="false"];\n'  %  ( fromName, toName, edgeIndex, colour, style ) )
+							state.edges.append( '"%s" -> "%s" [\nid = %d\ncolor="%s"\nstyle="%s"\nconstraint="false"];\n'  %  ( fromName, toName, edgeIndex, colour, style ) )
 				
 				if result is not None:
 					outDebugResult = DebugParseResult( result, node )
@@ -515,7 +517,7 @@ class Production (Group):
 	"""
 	def evaluate(self, state, input, start, stop):
 		# Invoke the memoisation and left-recursion handling system
-		return state.memoisedMatch( self, self._subexp, input, start, stop )
+		return state.memoisedMatch( self._subexp, input, start, stop )
 
 	
 	def action(self, actionFn):
@@ -1595,7 +1597,8 @@ class TestCase_Parser (ParserTestCase):
 		self._matchTest( fieldAccess, 'this.x.y', [ [ 'this', '.', 'x' ], '.', 'y' ] )
 		self._matchTest( methodInvocation, 'this.x.m()', [ [ 'this', '.', 'x' ], '.', 'm', '()' ] )
 		self._matchTest( arrayAccess, 'this.x[i]', [ [ 'this', '.', 'x' ], '[', 'i', ']' ] )
-		self._matchTest( fieldAccess, 'x[j].y', [ [ [ 'x', '[', 'i', ']' ], '[', 'j', ']' ], '.', 'y' ] )
+		self._matchTest( fieldAccess, 'x[i].y', [ [ 'x', '[', 'i', ']' ], '.', 'y' ] )
+		self._matchTest( fieldAccess, 'x[i][j].y', [ [ [ 'x', '[', 'i', ']' ], '[', 'j', ']' ], '.', 'y' ] )
 
 		
 		

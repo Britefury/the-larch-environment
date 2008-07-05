@@ -19,6 +19,7 @@ import traceback
 
 
 from GSymCore.Languages.Python25.Parser import targetItem as targetItemParser, targetList as targetListParser, listComprehensionItem as listComprehensionItemParser, generatorExpressionItem as generatorExpressionItemParser, keyValuePair as keyValuePairParser, subscriptItem as subscriptItemParser, subscriptIndex as subscriptIndexParser, callArg as callArgParser, param as paramParser, expression as expressionParser, oldExpression as oldExpressionParser, oldTupleOrExpression as oldTupleOrExpressionParser, orTest as orTestParser, tupleOrExpression as tupleOrExpressionParser, tupleOrExpressionOrYieldExpression as tupleOrExpressionOrYieldExpressionParser, statement as statementParser
+from GSymCore.Languages.Python25 import Parser
 from GSymCore.Languages.Python25.Styles import *
 from GSymCore.Languages.Python25.Keywords import *
 
@@ -144,6 +145,7 @@ PRECEDENCE_GENERATOREXPRESSION = 0
 PRECEDENCE_CONDITIONALEXPRESSION = 0
 PRECEDENCE_DICTLITERAL = 0
 PRECEDENCE_YIELDEXPR = 0
+PRECEDENCE_IMPORTCONTENT=0
 
 PRECEDENCE_SUBSCRIPTSLICE = 0
 PRECEDENCE_ARG = 0
@@ -837,12 +839,121 @@ class Python25View (GSymView):
 
 	# Return statement
 	def returnStmt(self, state, node, value):
-		valueView = viewEval( value )
+		valueView = viewEval( value, None, python25ViewState( tupleOrExpressionParser ) )
 		return nodeEditor( node,
 				ahbox( [ keywordLabel( returnKeyword ),  valueView ] ),
 				UnparsedText( returnKeyword  +  ' '  +  valueView.text,  PRECEDENCE_STMT ),
 				state )
 
+	
+	# Yield statement
+	def yieldStmt(self, state, node, value):
+		valueView = viewEval( value )
+		return nodeEditor( node,
+				ahbox( [ keywordLabel( yieldKeyword ),  valueView ] ),
+				UnparsedText( yieldKeyword  +  ' '  +  valueView.text,  PRECEDENCE_STMT ),
+				state )
+
+	
+	# Raise statement
+	def raiseStmt(self, state, node, *xs):
+		xViews = mapViewEval( xs )
+		xWidgets = []
+		if len( xs ) > 0:
+			xWidgets.append( xViews[0] )
+			for x in xViews[1:]:
+				xWidgets.append( label( ',', punctuationStyle ) )
+				xWidgets.append( x )
+		xText = UnparsedText( ', ' ).join( [ x.text   for x in xViews ] )
+		if len( xs ) > 0:
+			xText = ' ' + xText
+		return nodeEditor( node,
+				   ahbox( [ keywordLabel( raiseKeyword ) ] + xWidgets ),
+				   UnparsedText( UnparsedText( raiseKeyword )  +  xText,  PRECEDENCE_STMT ),
+				   state )
+	
+	
+	# Break statement
+	def breakStmt(self, state, node):
+		return nodeEditor( node,
+				   keywordLabel( breakKeyword ),
+				   UnparsedText( breakKeyword, PRECEDENCE_STMT ),
+				   state )
+	
+	
+	# Continue statement
+	def continueStmt(self, state, node):
+		return nodeEditor( node,
+				   keywordLabel( continueKeyword ),
+				   UnparsedText( continueKeyword, PRECEDENCE_STMT ),
+				   state )
+	
+	
+	# Import statement
+	def relativeModule(self, state, node, name):
+		return nodeEditor( node,
+				   label( name ),
+				   UnparsedText( name, PRECEDENCE_IMPORTCONTENT ),
+				   state )
+	
+	def moduleImport(self, state, node, name):
+		return nodeEditor( node,
+				   label( name ),
+				   UnparsedText( name, PRECEDENCE_IMPORTCONTENT ),
+				   state )
+	
+	def moduleImportAs(self, state, node, name, asName):
+		return nodeEditor( node,
+				   ahbox( [ label( name ), keywordLabel( asKeyword ), label( asName ) ] ),
+				   UnparsedText( name + ' ' + asKeyword + ' ' + asName, PRECEDENCE_IMPORTCONTENT ),
+				   state )
+	
+	def moduleContentImport(self, state, node, name):
+		return nodeEditor( node,
+				   label( name ),
+				   UnparsedText( name, PRECEDENCE_IMPORTCONTENT ),
+				   state )
+	
+	def moduleContentImportAs(self, state, node, name, asName):
+		return nodeEditor( node,
+				   ahbox( [ label( name ), keywordLabel( asKeyword ), label( asName ) ] ),
+				   UnparsedText( name + ' ' + asKeyword + ' ' + asName, PRECEDENCE_IMPORTCONTENT ),
+				   state )
+	
+	def importStmt(self, state, node, *xs):
+		xViews = mapViewEval( xs, None, python25ViewState( Parser.moduleImport ) )
+		xWidgets = []
+		if len( xs ) > 0:
+			for xv in xViews[:-1]:
+				xWidgets.append( ahbox( [ xv, label( ',', punctuationStyle ) ] ) )
+			xWidgets.append( xViews[-1] )
+		return nodeEditor( node,
+				   ahbox( [ keywordLabel( importKeyword ) ]  +  xWidgets, spacing=10.0 ),
+				   UnparsedText( importKeyword  +  ' '  +  UnparsedText( ', ' ).join( [ xv.text   for xv in xViews ] ), PRECEDENCE_STMT ),
+				   state )
+	
+	def fromImportStmt(self, state, node, moduleName, *xs):
+		moduleNameView = viewEval( moduleName, None, python25ViewState( Parser.moduleContentImport ) )
+		xViews = mapViewEval( xs, None, python25ViewState( Parser.moduleImport ) )
+		xWidgets = []
+		if len( xs ) > 0:
+			for xv in xViews[:-1]:
+				xWidgets.append( ahbox( [ xv, label( ',', punctuationStyle ) ] ) )
+			xWidgets.append( xViews[-1] )
+		return nodeEditor( node,
+				   ahbox( [ keywordLabel( fromKeyword ), moduleNameView, keywordLabel( importKeyword ) ]  +  xWidgets, spacing=10.0 ),
+				   UnparsedText( fromKeyword  +  ' '  +  moduleNameView.text  +  ' '  +  importKeyword  +  ' '  +  UnparsedText( ', ' ).join( [ xv.text   for xv in xViews ] ), PRECEDENCE_STMT ),
+				   state )
+	
+	def fromImportAllStmt(self, state, node, moduleName):
+		moduleNameView = mapViewEval( moduleName, None, python25ViewState( Parser.moduleContentImport ) )
+		return nodeEditor( node,
+				   ahbox( [ keywordLabel( fromKeyword ), moduleNameView, keywordLabel( importKeyword ), label( '*', punctuationStyle ) ], spacing=10.0 ),
+				   UnparsedText( fromKeyword  +  ' '  +  moduleNameView.text  +  ' '  +  importKeyword  +  ' *', PRECEDENCE_STMT ),
+				   state )
+	
+
+	
 	# If statement
 	def ifStmt(self, state, node, value, suite):
 		lineViews = mapViewEval( suite, None, python25ViewState( statementParser, MODE_LINE ) )
