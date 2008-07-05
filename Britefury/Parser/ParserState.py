@@ -69,18 +69,18 @@ class ParserState (object):
 	# "Packrat Parsers Can Support Left Recursion" by Allesandro Warth, James R. Douglass, Todd Millstein; Viewpoints Research Institute.
 	# To be honest, I don't really understand how they work. I transcribed their pseudo-code into Python, and it just worked.
 	# Test grammars in the unit tests seem to work okay, so its fine by me! :D
-	def memoisedMatch(self, rule, expression, input, start, stop):
-		memoEntry = self.__recall( rule, expression, input, start, stop )
+	def memoisedMatch(self, rule, input, start, stop):
+		memoEntry = self.__recall( rule, input, start, stop )
 		if memoEntry is None:
 			# Create a new _LR, and push it onto the rule invocation stack (implemented as a singly-linked-list of _LR objects)
 			lr = _LR( rule, self.lrStack )
 			self.lrStack = lr
 			
-			# Memoise @lr, then evaluate @expression
+			# Memoise @lr, then evaluate @rule
 			memoEntry = _MemoEntry( lr, start )
 			self.memo[ ( start, rule ) ] = memoEntry
 			
-			answer, self.pos = expression.evaluate( self, input, start, stop )
+			answer, self.pos = rule.evaluate( self, input, start, stop )
 			
 			# Pop @lr off the rule invocation stack
 			self.lrStack = self.lrStack.next
@@ -90,38 +90,38 @@ class ParserState (object):
 			#if lr.head is not None  and  isinstance( memoEntry.answer, _LR ):
 			if lr.head is not None:
 				lr.seed = answer
-				return self.__LRAnswer( rule, expression, input, start, stop, memoEntry ),  self.pos
+				return self.__LRAnswer( rule, input, start, stop, memoEntry ),  self.pos
 			else:
 				memoEntry.answer = answer
 				return answer,  self.pos
 		else:
 			self.pos = memoEntry.pos
 			if isinstance( memoEntry.answer, _LR ):
-				self.__setupLR( rule, expression, memoEntry.answer )
+				self.__setupLR( rule, memoEntry.answer )
 				return memoEntry.answer.seed,  self.pos
 			else:
 				return memoEntry.answer,  self.pos
 
 		
-	def __recall(self, rule, expression, input, start, stop):
+	def __recall(self, rule, input, start, stop):
 		memoEntry = self.memo.get(  ( start, rule )  )
 		h = self.heads.get( start )
 		# If not growing a seed-parse, just return what is in the memo-table
 		if h is None:
 			return memoEntry
 		
-		# Do not evaluate any rule that is not evolved in this left-recursion
+		# Do not evaluate any rule that is not involved in this left-recursion
 		if memoEntry is None  and  rule  is not h.rule  and  rule not in h.involvedSet:
 			return _MemoEntry( None, start )
 		if rule in h.evalSet:
 			h.evalSet.remove( rule )
-			answer, self.pos = expression.evaluate( self, input, start, stop )
+			answer, self.pos = rule.evaluate( self, input, start, stop )
 			memoEntry.answer = answer
 			memoEntry.pos = self.pos
 		return memoEntry
 
 	
-	def __setupLR(self, rule, expression, lr):
+	def __setupLR(self, rule, lr):
 		#print 'setupLR for %s'  %  rule.debugName
 		if lr.head is None:
 			lr.head = _Head( rule )
@@ -132,7 +132,7 @@ class ParserState (object):
 			s = s.next
 
 
-	def __LRAnswer(self, rule, expression, input, start, stop, memoEntry):
+	def __LRAnswer(self, rule, input, start, stop, memoEntry):
 		h = memoEntry.answer.head
 		if h.rule is not rule:
 			#print 'LRanswer for %s @ %d; h.rule is %s; exiting'  %  ( rule.debugName, start, h.rule.debugName )
@@ -144,16 +144,16 @@ class ParserState (object):
 				return None
 			else:
 				#print 'LRanswer for %s @ %d; growing parse...'  %  ( rule.debugName, start )
-				return self.__growLR( rule, expression, input, start, stop, memoEntry, h )
+				return self.__growLR( rule, input, start, stop, memoEntry, h )
 
 			
-	def __growLR(self, rule, expression, input, start, stop, memoEntry, h):
+	def __growLR(self, rule, input, start, stop, memoEntry, h):
 		#print 'growLR for %s @ %d'  %  ( rule.debugName, start )
 		self.heads[start] = h
 		while True:
 			self.pos = start
 			h.evalSet = copy( h.involvedSet )
-			answer, self.pos = expression.evaluate( self, input, start, stop )
+			answer, self.pos = rule.evaluate( self, input, start, stop )
 			if answer is None  or  self.pos <= memoEntry.pos:
 				break
 			memoEntry.answer = answer
