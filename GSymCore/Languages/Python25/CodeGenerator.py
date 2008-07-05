@@ -367,17 +367,66 @@ class Python25CodeGenerator (GSymCodeGenerator):
 	
 	
 	# Exec statement
-	def execStmt(self, node, codeX, *xs):
-		xt = ''   if len( xs ) == 0   else   ' in ' + self( xs[0] )
-		if len( xs ) > 0:
-			xt = xt  +  ( ''   if len( xs ) == 1   else   ', ' + self( xs[1] ) )
-		return 'exec '  +  self( codeX )  +  xt
+	def execStmt(self, node, src, loc, glob):
+		txt = 'exec '  +  self( src )
+		if loc != '<nil>':
+			txt += ' in '  +  self( loc )
+		if glob != '<nil>':
+			txt += ', '  +  self( glob )
+		return txt
 	
 	
 	# If statement
-	def ifStmt(self, node, value, suite):
-		suiteText = '\n'.join( [ self( line )   for line in suite ] )
-		return 'if '  +  self( value ) + ':\n'  +  _indent( suiteText )
+	def ifStmt(self, node, condition, suite):
+		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
+		return 'if '  +  self( condition ) + ':\n'  +  _indent( suiteText )
+	
+
+	# Elif statement
+	def elifStmt(self, node, condition, suite):
+		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
+		return 'elif '  +  self( condition ) + ':\n'  +  _indent( suiteText )
+	
+
+	# Else statement
+	def elseStmt(self, node, suite):
+		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
+		return 'else:\n'  +  _indent( suiteText )
+	
+
+	# While statement
+	def whileStmt(self, node, condition, suite):
+		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
+		return 'while '  +  self( condition ) + ':\n'  +  _indent( suiteText )
+	
+
+	# For statement
+	def forStmt(self, node, target, source, suite):
+		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
+		return 'for '  +  self( target )  +  ' in '  +  self( source )  +  ':\n'  +  _indent( suiteText )
+	
+
+	# Try statement
+	def tryStmt(self, node, suite):
+		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
+		return 'try:\n'  +  _indent( suiteText )
+	
+
+	# Except statement
+	def exceptStmt(self, node, exc, target, suite):
+		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
+		txt = 'except'
+		if exc != '<nil>':
+			txt += ' ' + self( exc )
+		if target != '<nil>':
+			txt += ', ' + self( target )
+		return txt + ':\n'  +  _indent( suiteText )
+	
+
+	# Finally statement
+	def finallyStmt(self, node, suite):
+		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
+		return 'finally:\n'  +  _indent( suiteText )
 	
 
 	
