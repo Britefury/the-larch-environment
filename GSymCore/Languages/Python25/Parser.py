@@ -25,7 +25,7 @@ from GSymCore.Languages.Python25.Keywords import *
 # 'a < b < c' is valid in Python, but is not handled here.
 # The parser needs to be changed, in addition to changing the python document structure to reflect this.
 #
-# Both lambdaExpr and oldLambdaExpr generate identical nodes. This may cause the view to generate inparseable code on some occasions.
+# yieldExpr and yieldAtom are basically the same thing; find a way of unifying this.
 #
 #
 #
@@ -339,7 +339,7 @@ tupleOrExpressionOrYieldExpression = tupleOrExpression | yieldExpression
 
 
 # Assert statement
-assertStmt = Production( Keyword( assertKeyword ) + expression  +  Optional( Literal( ',' ) + expression ) ).action( lambda input, pos, xs: [ 'assertStmt', xs[1] ]  +  ( [ xs[2][1] ]   if xs[2] is not None  else  [] ) ).debug( 'assertStmt' )
+assertStmt = Production( Keyword( assertKeyword ) + expression  +  Optional( Literal( ',' ) + expression ) ).action( lambda input, pos, xs: [ 'assertStmt', xs[1], xs[2][1]   if xs[2] is not None  else  '<nil>' ] ).debug( 'assertStmt' )
 
 
 
@@ -375,18 +375,18 @@ yieldStmt = Production( Keyword( yieldKeyword )  +  expression ).action( lambda 
 
 
 # Raise statement
-def _raiseFlatten(xs):
+def _raiseFlatten(xs, level):
 	if xs is None:
-		return []
+		return [ '<nil>' ] * level
 	else:
 		if xs[0] == ',':
 			xs = xs[1:]
 		if len( xs ) == 2:
-			return [ xs[0] ]  +  _raiseFlatten( xs[1] )
+			return [ xs[0] ]  +  _raiseFlatten( xs[1], level - 1 )
 		else:
 			return [ xs[0] ]
 raiseStmt = Production( Keyword( raiseKeyword ) + Optional( expression + Optional( Literal( ',' ) + expression + Optional( Literal( ',' ) + expression ) ) ) ).action( \
-	lambda input, pos, xs: [ 'raiseStmt', ]  +  _raiseFlatten( xs[1] ) ).debug( 'assertStmt' )
+	lambda input, pos, xs: [ 'raiseStmt', ]  +  _raiseFlatten( xs[1], 3 ) ).debug( 'assertStmt' )
 
 
 
@@ -749,7 +749,7 @@ class TestCase_Python25Parser (ParserTestCase):
 		
 		
 	def testAssertStmt(self):
-		self._matchTest( statement, 'assert x', [ 'assertStmt', [ 'var', 'x' ] ] )
+		self._matchTest( statement, 'assert x', [ 'assertStmt', [ 'var', 'x' ], '<nil>' ] )
 		self._matchTest( statement, 'assert x,y', [ 'assertStmt', [ 'var', 'x' ], [ 'var', 'y' ] ] )
 	
 	
@@ -791,9 +791,9 @@ class TestCase_Python25Parser (ParserTestCase):
 		
 		
 	def testRaiseStmt(self):
-		self._matchTest( statement, 'raise', [ 'raiseStmt' ] )
-		self._matchTest( statement, 'raise x', [ 'raiseStmt', [ 'var', 'x' ] ] )
-		self._matchTest( statement, 'raise x,y', [ 'raiseStmt', [ 'var', 'x' ], [ 'var', 'y' ] ] )
+		self._matchTest( statement, 'raise', [ 'raiseStmt', '<nil>', '<nil>', '<nil>' ] )
+		self._matchTest( statement, 'raise x', [ 'raiseStmt', [ 'var', 'x' ], '<nil>', '<nil>' ] )
+		self._matchTest( statement, 'raise x,y', [ 'raiseStmt', [ 'var', 'x' ], [ 'var', 'y' ], '<nil>' ] )
 		self._matchTest( statement, 'raise x,y,z', [ 'raiseStmt', [ 'var', 'x' ], [ 'var', 'y' ], [ 'var', 'z' ] ] )
 		
 		
@@ -850,14 +850,14 @@ class TestCase_Python25Parser (ParserTestCase):
 		
 		
 	def testGlobalStmt(self):
-		self._matchTest( globalStmt, 'global x', [ 'globalStmt', [ 'globalVar', 'x' ] ] )
-		self._matchTest( globalStmt, 'global x, y', [ 'globalStmt', [ 'globalVar', 'x' ], [ 'globalVar', 'y' ] ] )
+		self._matchTest( statement, 'global x', [ 'globalStmt', [ 'globalVar', 'x' ] ] )
+		self._matchTest( statement, 'global x, y', [ 'globalStmt', [ 'globalVar', 'x' ], [ 'globalVar', 'y' ] ] )
 	
 		
 	def testExecStmt(self):
-		self._matchTest( execStmt, 'exec a', [ 'execStmt', [ 'var', 'a' ], '<nil>', '<nil>' ] )
-		self._matchTest( execStmt, 'exec a in b', [ 'execStmt', [ 'var', 'a' ], [ 'var', 'b' ], '<nil>' ] )
-		self._matchTest( execStmt, 'exec a in b,c', [ 'execStmt', [ 'var', 'a' ], [ 'var', 'b' ], [ 'var', 'c' ] ] )
+		self._matchTest( statement, 'exec a', [ 'execStmt', [ 'var', 'a' ], '<nil>', '<nil>' ] )
+		self._matchTest( statement, 'exec a in b', [ 'execStmt', [ 'var', 'a' ], [ 'var', 'b' ], '<nil>' ] )
+		self._matchTest( statement, 'exec a in b,c', [ 'execStmt', [ 'var', 'a' ], [ 'var', 'b' ], [ 'var', 'c' ] ] )
 		
 		
 	def testIfStmt(self):

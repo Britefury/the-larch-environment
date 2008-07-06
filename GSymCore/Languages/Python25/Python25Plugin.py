@@ -12,7 +12,8 @@ def py25New():
 	return [ '$withLanguageModule', 'GSymCore.Languages.Python25.Python25', [ 'python25Module', [ 'commentStmt', 'New Python 2.5 document' ] ] ]
 
 def py25ImportFile(filename):
-	return importPy25File( filename )
+	content = importPy25File( filename )
+	return [ '$withLanguageModule', 'GSymCore.Languages.Python25.Python25', content ]
 
 
 def initPlugin(pluginInterface):

@@ -849,13 +849,22 @@ class Python25View (GSymView):
 	
 	
 	# Assert statement
-	def assertStmt(self, state, node, condition, *xs):
+	def assertStmt(self, state, node, condition, fail):
+		assertLabel = keywordLabel( assertKeyword )
+		assertUnparsed = UnparsedText( assertKeyword )
+		assertUnparsed.associateWith( assertLabel )
 		conditionView = viewEval( condition )
-		xView = viewEval( xs[0] )   if len( xs ) > 0   else   None
-		xViewWidgets = [ label( ',', punctuationStyle ), xView ]   if xView is not None   else   []
+		widgets = [ assertLabel ]
+		if fail != '<nil>':
+			failView = viewEval( fail )
+			widgets.append( ahbox( [ conditionView, label( ',', punctuationStyle ) ] ) )
+			widgets.append( viewEval( fail ) )
+		else:
+			failView = None
+			widgets.append( conditionView )
 		return nodeEditor( node,
-				   ahbox( [ keywordLabel( assertKeyword ), conditionView ] + xViewWidgets ),
-				   UnparsedText( UnparsedText( assertKeyword )  +  ' '  +  conditionView.text  +  ( ', ' + xView.text ) if xView is not None  else '',  PRECEDENCE_STMT ),
+				   ahbox( widgets, spacing=10.0 ),
+				   UnparsedText( assertUnparsed  +  ' '  +  conditionView.text  +  ( ', ' + failView.text ) if failView is not None  else '',  PRECEDENCE_STMT ),
 				   state )
 	
 	
@@ -920,18 +929,18 @@ class Python25View (GSymView):
 	
 	# Raise statement
 	def raiseStmt(self, state, node, *xs):
+		xs = [ x   for x in xs   if x != '<nil>' ]
 		xViews = mapViewEval( xs )
 		xWidgets = []
 		if len( xs ) > 0:
-			xWidgets.append( xViews[0] )
-			for x in xViews[1:]:
-				xWidgets.append( label( ',', punctuationStyle ) )
-				xWidgets.append( x )
+			for x in xViews[:-1]:
+				xWidgets.append( ahbox( [ x, label( ',', punctuationStyle ) ] ) )
+			xWidgets.append( xViews[-1] )
 		xText = UnparsedText( ', ' ).join( [ x.text   for x in xViews ] )
 		if len( xs ) > 0:
 			xText = ' ' + xText
 		return nodeEditor( node,
-				   ahbox( [ keywordLabel( raiseKeyword ) ] + xWidgets ),
+				   ahbox( [ keywordLabel( raiseKeyword ) ] + xWidgets, spacing=10.0 ),
 				   UnparsedText( UnparsedText( raiseKeyword )  +  xText,  PRECEDENCE_STMT ),
 				   state )
 	

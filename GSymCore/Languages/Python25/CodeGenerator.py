@@ -285,8 +285,8 @@ class Python25CodeGenerator (GSymCodeGenerator):
 	
 	
 	# Assert statement
-	def assertStmt(self, node, condition, *xs):
-		return 'assert '  +  self( condition )  +  ( ', ' + self( xs[0] )   if len( xs ) > 0   else  '' )
+	def assertStmt(self, node, condition, fail):
+		return 'assert '  +  self( condition )  +  ( ', ' + self( fail )   if fail != '<nil>'   else  '' )
 	
 	
 	# Assignment statement
@@ -321,7 +321,7 @@ class Python25CodeGenerator (GSymCodeGenerator):
 	
 	# Raise statement
 	def raiseStmt(self, node, *xs):
-		return 'raise '  +  ', '.join( [ self( x )   for x in xs ] )
+		return 'raise '  +  ', '.join( [ self( x )   for x in xs   if x != '<nil>' ] )
 	
 	
 	# Break statement

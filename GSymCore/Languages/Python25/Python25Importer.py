@@ -40,15 +40,72 @@ def _extractParameters(node):
 	numDefaultParams = len( node.defaults )
 	numSimpleParams = len( node.argnames )  -  ( numDefaultParams + numListParams )
 	params = [ [ 'simpleParam', name ]   for name in node.argnames[:numSimpleParams] ]
-	params.extend( [ [ 'kwParam', name, self( value ) ]   for name, value in zip( node.argnames[numSimpleParams:-numListParams], node.defaults ) ] )
+	params.extend( [ [ 'defaultValueParam', name, _expr( value ) ]   for name, value in zip( node.argnames[numSimpleParams:numSimpleParams+numDefaultParams], node.defaults ) ] )
 	if bParamList:
-		params.append( [ 'paramList', node.argnames[-(numListParams-1)] ] )
+		params.append( [ 'paramList', node.argnames[-2 if bKWParamList  else  -1] ] )
 	if bKWParamList:
 		params.append( [ 'kwParamList', node.argnames[-1] ] )
 	return params
 
+
+
+
+
+class _TargetImporter (_Importer):
+	def __call__(self, node, method=None):
+		if method is None:
+			name = node.__class__.__name__
+			try:
+				method = getattr( self, name )
+			except AttributeError:
+				return _expr( node )
+		return method( node )
+
+	
+	# Targets
+	def AssName(self, node):
+		return [ 'singleTarget', node.name ]
+	
+	def AssAttr(self, node):
+		return [ 'attributeRef', _expr( node.expr ), node.attrname ]
+	
+	def AssTuple(self, node):
+		return [ 'tupleTarget' ]  +  [ _expr( x )   for x in node.nodes ]
+	
+	def AssList(self, node):
+		return [ 'listTarget' ]  +  [ _expr( x )   for x in node.nodes ]
+
+	
+	def Name(self, node):
+		return [ 'singleTarget', node.name ]
+	
+	def Getattr(self, node):
+		return [ 'attributeRef', _expr( node.expr ), node.attrname ]
+	
+	def Tuple(self, node):
+		return [ 'tupleTarget' ]  +  [ _expr( x )   for x in node.nodes ]
+	
+	def List(self, node):
+		return [ 'listTarget' ]  +  [ _expr( x )   for x in node.nodes ]
+
+
+
+
 	
 class _ExprImporter (_Importer):
+	def __call__(self, node, method=None):
+		if node is None:
+			return '<nil>'
+		else:
+			if method is None:
+				name = node.__class__.__name__
+				try:
+					method = getattr( self, name )
+				except AttributeError:
+					return [ 'UNPARSED', name ]
+			return method( node )
+
+	
 	# Constant / literal
 	def Const(self, node):
 		if isinstance( node.value, str ):
@@ -83,98 +140,94 @@ class _ExprImporter (_Importer):
 		return [ 'singleTarget', node.name ]
 	
 	def AssAttr(self, node):
-		return [ 'attributeRef', self( node.expr ), node.attrname ]
+		return [ 'attributeRef', _expr( node.expr ), node.attrname ]
 	
 	def AssTuple(self, node):
-		return [ 'tupleTarget' ]  +  [ self( x )   for x in node.nodes ]
+		return [ 'tupleTarget' ]  +  [ _expr( x )   for x in node.nodes ]
 	
 	def AssList(self, node):
-		return [ 'listTarget' ]  +  [ self( x )   for x in node.nodes ]
-	
+		return [ 'listTarget' ]  +  [ _expr( x )   for x in node.nodes ]
+
 	
 	
 	# Tuple literal
 	def Tuple(self, node):
-		return [ 'tupleLiteral' ]  +  [ self( x )   for x in node.nodes ]
+		return [ 'tupleLiteral' ]  +  [ _expr( x )   for x in node.nodes ]
 	
 	
 	
 	# List literal
 	def List(self, node):
-		return [ 'listLiteral' ]  +  [ self( x )   for x in node.nodes ]
+		return [ 'listLiteral' ]  +  [ _expr( x )   for x in node.nodes ]
 	
 	
 	
 	# List comprehension
 	def ListCompIf(self, node):
-		return [ 'listIf', self( node.test ) ]
+		return [ 'listIf', _expr( node.test ) ]
 	
 	def ListCompFor(self, node):
-		return [ [ 'listFor', self( node.assign ), self( node.list ) ] ]  +  [ self( x )   for x in node.ifs ]
+		return [ [ 'listFor', _expr( node.assign ), _expr( node.list ) ] ]  +  [ _expr( x )   for x in node.ifs ]
 	
 	def ListComp(self, node):
 		quals = []
 		for x in node.quals:
-			quals.extend( self( x ) )
-		return [ 'listComprehension', self( node.expr ) ]   +   quals
+			quals.extend( _expr( x ) )
+		return [ 'listComprehension', _expr( node.expr ) ]   +   quals
 	
 	
 	
 	# Generator expression
 	def GenExprIf(self, node):
-		return [ 'genIf', self( node.test ) ]
+		return [ 'genIf', _expr( node.test ) ]
 	
 	def GenExprFor(self, node):
-		return [ [ 'genFor', self( node.assign ), self( node.iter ) ] ]  +  [ self( x )   for x in node.ifs ]
+		return [ [ 'genFor', _expr( node.assign ), _expr( node.iter ) ] ]  +  [ _expr( x )   for x in node.ifs ]
 	
 	def GenExprInner(self, node):
 		quals = []
 		for x in node.quals:
-			quals.extend( self( x ) )
-		return [ 'generatorExpression', self( node.expr ) ]   +   quals
+			quals.extend( _expr( x ) )
+		return [ 'generatorExpression', _expr( node.expr ) ]   +   quals
 	
 	def GenExpr(self, node):
-		return self( node.code )
+		return _expr( node.code )
 	
 	
 	
 	# Dictionary literal
 	def Dict(self, node):
-		return [ 'dictLiteral' ]  +  [ [ 'keyValuePair', self( x[0] ), self( x[1] ) ]   for x in node.items ]
+		return [ 'dictLiteral' ]  +  [ [ 'keyValuePair', _expr( x[0] ), _expr( x[1] ) ]   for x in node.items ]
 	
 	
 	
 	# Yield expresion
 	def Yield(self, node):
-		return [ 'yieldAtom', self( node.value ) ]
+		return [ 'yieldAtom', _expr( node.value ) ]
 	
 	
 	
 	# Attribute ref
 	def Getattr(self, node):
-		return [ 'attributeRef', self( node.expr ), node.attrname ]
+		return [ 'attributeRef', _expr( node.expr ), node.attrname ]
 		
 	
 	
 	# Subscript	
 	def Subscript(self, node):
 		if len( node.subs ) == 1:
-			s = self( node.subs[0] )
+			s = _expr( node.subs[0] )
 		else:
-			s = [ 'tupleLiteral' ]  +  [ self( x )   for x in node.subs ]
-		return [ 'subscript', self( node.expr ), s ]
+			s = [ 'tupleLiteral' ]  +  [ _expr( x )   for x in node.subs ]
+		return [ 'subscript', _expr( node.expr ), s ]
 	
 	def Slice(self, node):
-		_s = lambda x: self( x )   if x  is not None   else   '<nil>'
-		return [ 'subscript', self( node.expr ), [ 'subscriptSlice', _s( node.lower ), _s( node.upper ) ] ]
+		return [ 'subscript', _expr( node.expr ), [ 'subscriptSlice', _expr( node.lower ), _expr( node.upper ) ] ]
 	
 	def Sliceobj(self, node):
 		def _s(x):
-			if x is not None:
-				s = self( x )
-				return s   if s is not None   else   '<nil>'
-			else:
-				return '<nil>'
+			s = _expr( x )
+			return s   if s is not None   else   '<nil>'
 		def _slice(xs):
 			if len( xs ) == 3:
 				return [ 'subscriptLongSlice', _s( xs[0] ), _s( xs[1] ), _s( xs[2] ) ]
@@ -191,114 +244,279 @@ class _ExprImporter (_Importer):
 	
 	# CallFunc
 	def CallFunc(self, node):
-		_starArg = lambda name, x:   [ [ name, self( x ) ] ]   if x is not None   else   []
-		return [ 'call', self( node.node ) ]  +  [ self( x )   for x in node.args ]  +   _starArg( 'argList', node.star_args )  +  _starArg( 'kwArgList', node.dstar_args )
+		_starArg = lambda name, x:   [ [ name, _expr( x ) ] ]   if x is not None   else   []
+		return [ 'call', _expr( node.node ) ]  +  [ _expr( x )   for x in node.args ]  +   _starArg( 'argList', node.star_args )  +  _starArg( 'kwArgList', node.dstar_args )
 
 	def Keyword(self, node):
-		return [ 'kwArg', node.name, self( node.expr ) ]
+		return [ 'kwArg', node.name, _expr( node.expr ) ]
 			
 				
 	
 	
 	# Operators
 	def Power(self, node):
-		return [ 'pow', self( node.left ), self( node.right ) ]
+		return [ 'pow', _expr( node.left ), _expr( node.right ) ]
 	
 	def Invert(self, node):
-		return [ 'invert', self( node.expr ) ]
+		return [ 'invert', _expr( node.expr ) ]
 	
 	def UnaryAdd(self, node):
-		return [ 'pos', self( node.expr ) ]
+		return [ 'pos', _expr( node.expr ) ]
 	
 	def UnarySub(self, node):
-		return [ 'negate', self( node.expr ) ]
+		return [ 'negate', _expr( node.expr ) ]
 	
 	def Mul(self, node):
-		return [ 'mul', self( node.left ), self( node.right ) ]
+		return [ 'mul', _expr( node.left ), _expr( node.right ) ]
 
 	def Div(self, node):
-		return [ 'div', self( node.left ), self( node.right ) ]
+		return [ 'div', _expr( node.left ), _expr( node.right ) ]
 
 	def Mod(self, node):
-		return [ 'mod', self( node.left ), self( node.right ) ]
+		return [ 'mod', _expr( node.left ), _expr( node.right ) ]
 	
 	def Add(self, node):
-		return [ 'add', self( node.left ), self( node.right ) ]
+		return [ 'add', _expr( node.left ), _expr( node.right ) ]
 	
 	def Sub(self, node):
-		return [ 'sub', self( node.left ), self( node.right ) ]
+		return [ 'sub', _expr( node.left ), _expr( node.right ) ]
 	
 	def LeftShift(self, node):
-		return [ 'lshift', self( node.left ), self( node.right ) ]
+		return [ 'lshift', _expr( node.left ), _expr( node.right ) ]
 	
 	def RightShift(self, node):
-		return [ 'rshift', self( node.left ), self( node.right ) ]
+		return [ 'rshift', _expr( node.left ), _expr( node.right ) ]
 	
 	def Bitand(self, node):
-		return reduce( lambda left, right: [ 'bitAnd', left, self( right ) ],   node.nodes[1:],  self( node.nodes[0] ) )
+		return reduce( lambda left, right: [ 'bitAnd', left, _expr( right ) ],   node.nodes[1:],  _expr( node.nodes[0] ) )
 	
 	def Bitxor(self, node):
-		return reduce( lambda left, right: [ 'bitXor', left, self( right ) ],   node.nodes[1:],  self( node.nodes[0] ) )
+		return reduce( lambda left, right: [ 'bitXor', left, _expr( right ) ],   node.nodes[1:],  _expr( node.nodes[0] ) )
 	
 	def Bitor(self, node):
-		return reduce( lambda left, right: [ 'bitOr', left, self( right ) ],   node.nodes[1:],  self( node.nodes[0] ) )
+		return reduce( lambda left, right: [ 'bitOr', left, _expr( right ) ],   node.nodes[1:],  _expr( node.nodes[0] ) )
 	
 	def Compare(self, node):
-		result = [ _cmpOps[node.ops[0][0]], self( node.expr ), self( node.ops[0][1] ) ]
+		result = [ _cmpOps[node.ops[0][0]], _expr( node.expr ), _expr( node.ops[0][1] ) ]
 		prev = node.ops[0][1]
 		if len( node.ops ) > 1:
 			for op in node.ops[1:]:
-				result = [ 'andTest', result, [ _cmpOps[op[0]], self( prev ), self( op[1] ) ] ]
+				result = [ 'andTest', result, [ _cmpOps[op[0]], _expr( prev ), _expr( op[1] ) ] ]
 				prev = op
 		return result
 	
 	def Not(self, node):
-		return [ 'notTest', self( node.expr ) ]
+		return [ 'notTest', _expr( node.expr ) ]
 	
 	def And(self, node):
-		return reduce( lambda left, right: [ 'andTest', left, self( right ) ],   node.nodes[1:],  self( node.nodes[0] ) )
+		return reduce( lambda left, right: [ 'andTest', left, _expr( right ) ],   node.nodes[1:],  _expr( node.nodes[0] ) )
 	
 	def Or(self, node):
-		return reduce( lambda left, right: [ 'orTest', left, self( right ) ],   node.nodes[1:],  self( node.nodes[0] ) )
+		return reduce( lambda left, right: [ 'orTest', left, _expr( right ) ],   node.nodes[1:],  _expr( node.nodes[0] ) )
 	
 
 	
 	# Lambda expression
 	def Lambda(self, node):
 		params = _extractParameters( node )
-		return [ 'lambdaExpr', params, self( node.code ) ]
+		return [ 'lambdaExpr', params, _expr( node.code ) ]
+	
+	
+	
+	# Conditional expression
+	def IfExp(self, node):
+		return [ 'conditionalExpr', _expr( node.test ), _expr( node.then ), _expr( node.else_ ) ]
 	
 	
 	
 	
 class _StmtImporter (_Importer):
-	def __init__(self):
-		self._exprImporter = _ExprImporter()
-	
-		
 	# Discard (expression statement)
 	def Discard(self, node):
-		return self._exprImporter( node.expr )
+		return _expr( node.expr )
 	
 	
+	# Assert statement
+	def Assert(self, node):
+		return [ 'assertStmt', _expr( node.test ),  _expr( node.fail )   if node.fail is not None   else   '<nil>' ]
+	
+	
+	# Assignment statement
+	def Assign(self, node):
+		return [ 'assignmentStmt', [ _expr( x )   for x in node.nodes ],  _expr( node.expr ) ]
+	
+	
+	# Augmented assignment statement
+	def AugAssign(self, node):
+		return [ 'augAssignStmt', node.op, _target( node.node ), _expr( node.expr ) ]
+	
+	
+	# Pass
+	def Pass(self, node):
+		return [ 'passStmt' ]
+	
+	
+	# Del
+	def AssName(self, node):
+		xs = [ 'singleTarget', node.name ]
+		if node.flags == 'OP_DELETE':
+			xs = [ 'delStmt', xs ]
+		return xs
+	
+	def AssAttr(self, node):
+		xs = [ 'attributeRef', _expr( node.expr ), node.attrname ]
+		if node.flags == 'OP_DELETE':
+			xs = [ 'delStmt', xs ]
+		return xs
+	
+	def AssTuple(self, node):
+		xs = [ 'tupleTarget' ]  +  [ _expr( x )   for x in node.nodes ]
+		if node.flags == 'OP_DELETE':
+			xs = [ 'delStmt', xs ]
+		return xs
+	
+	def AssList(self, node):
+		xs = [ 'listTarget' ]  +  [ _expr( x )   for x in node.nodes ]
+		if node.flags == 'OP_DELETE':
+			xs = [ 'delStmt', xs ]
+		return xs
+	
+	
+	
+	# Return
+	def Return(self, node):
+		return [ 'returnStmt', _expr( node.value ) ]
+
+	
+	# Yield
+	def Yield(self, node):
+		return [ 'yieldStmt', _expr( node.value ) ]
+
+	
+	# Raise
+	def Raise(self, node):
+		return [ 'raiseStmt', _expr( node.expr1 ), _expr( node.expr2 ), _expr( node.expr3 ) ]
+	
+
+	# Break
+	def Break(self, node):
+		return [ 'breakStmt' ]
+	
+	
+	# Continue
+	def Continue(self, node):
+		return [ 'continueStmt' ]
+	
+	
+	# Import
+	def Import(self, node):
+		def nameImport(x):
+			if x[1] is None:
+				return [ 'moduleImport', x[0] ]
+			else:
+				return [ 'moduleImportAs', x[0], x[1] ]
+		return [ 'importStmt' ]  +  [ nameImport( x )   for x in node.names ]
+	
+	def From(self, node):
+		def nameImport(x):
+			if x[1] is None:
+				return [ 'moduleContentImport', x[0] ]
+			else:
+				return [ 'moduleContentImportAs', x[0], x[1] ]
+		if node.names == [ ('*',None) ]:
+			return [ 'fromImportAllStmt', [ 'relativeModule', node.modname ] ]
+		else:
+			return [ 'fromImportStmt', [ 'relativeModule', node.modname ] ]  +  [ nameImport( x )   for x in node.names ]
+		
+		
+	# Global
+	def Global(self, node):
+		return [ 'globalStmt' ]  +  [ [ 'globalVar', name ]   for name in node.names ]
+	
+	
+	# Exec
+	def Exec(self, node):
+		return [ 'execStmt', _expr( node.expr ), _expr( node.locals ), _expr( node.globals ) ]
+	
+	
+	# Printnl
+	def Printnl(self, node):
+		return [ 'call', [ 'var', 'print' ] ]  +  [ _expr( x )   for x in node.nodes ]
+	
+	
+
+	
+	
+class _CompoundStmtImporter (_Importer):
+	def __call__(self, node, method=None):
+		if method is None:
+			name = node.__class__.__name__
+			try:
+				method = getattr( self, name )
+			except AttributeError:
+				return [ _stmt( node ) ]
+		return method( node )
+
+	
+	# Statement list
+	def Stmt(self, node):
+		suite = []
+		for x in node.nodes:
+			suite.extend( _compound( x ) )
+		return suite
+
+	
+	# If
+	def If(self, node):
+		def _test(x, bIf):
+			if bIf:
+				return [ 'ifStmt', _expr( x[0] ), _compound( x[1] ) ]
+			else:
+				return [ 'elifStmt', _expr( x[0] ), _compound( x[1] ) ]
+		result = [ _test( node.tests[0], True ) ]
+		for t in node.tests[1:]:
+			result.append( _test( t, False ) )
+		if node.else_ is not None:
+			result.append( [ 'elseStmt', _compound( node.else_ ) ] )
+		return result
+
+	
+	# While
+	def While(self, node):
+		result = [ [ 'whileStmt', _expr( node.test ), _compound( node.body ) ] ]
+		if node.else_ is not None:
+			result.append( [ 'elseStmt', _compound( node.else_ ) ] )
+		return result
+	
+	
+	
+	
+	
+
 
 
 class _ModuleImporter (_Importer):
-	def __init__(self):
-		self._stmtImporter = _StmtImporter()
-
-	
 	# Module
 	def Module(self, node):
-		return [ 'python25Module' ]  +  self( node.node )
+		return [ 'python25Module' ]  +  _module( node.node )
 	
 	
 	# Statement list
 	def Stmt(self, node):
-		return [ self._stmtImporter( x )   for x in node.nodes ]
+		suite = []
+		for x in node.nodes:
+			suite.extend( _compound( x ) )
+		return suite
 
 	
 	
+	
+_target = _TargetImporter()
+_expr = _ExprImporter()
+_stmt = _StmtImporter()
+_compound = _CompoundStmtImporter()
+_module = _ModuleImporter()
+
 	
 	
 def importPy25Source(source):
@@ -328,16 +546,6 @@ class ImporterTestCase (unittest.TestCase):
 		self.assert_( result == expectedResult )
 		
 		
-	def _stmtTest(self, source, expectedResult):
-		result = importPy25Source( source + '\n' )
-		result = result[1]
-		if result != expectedResult:
-			print 'EXPECTED:'
-			print expectedResult
-			print 'RESULT:'
-			print result
-		self.assert_( result == expectedResult )
-		
 	def _exprTest(self, source, expectedResult):
 		result = importPy25Source( 'a+(' + source + ')\n' )
 		result = result[1][2]
@@ -348,6 +556,27 @@ class ImporterTestCase (unittest.TestCase):
 			print result
 		self.assert_( result == expectedResult )
 		
+	def _stmtTest(self, source, expectedResult):
+		result = importPy25Source( source + '\n' )
+		result = result[1]
+		if result != expectedResult:
+			print 'EXPECTED:'
+			print expectedResult
+			print 'RESULT:'
+			print result
+		self.assert_( result == expectedResult )
+		
+	def _compStmtTest(self, source, expectedResult):
+		result = importPy25Source( source + '\n' )
+		result = result[1:]
+		if result != expectedResult:
+			print 'EXPECTED:'
+			print expectedResult
+			print 'RESULT:'
+			print result
+		self.assert_( result == expectedResult )
+		
+
 		
 		
 	def testModule(self):
@@ -481,6 +710,164 @@ class ImporterTestCase (unittest.TestCase):
 		
 	def testLambda(self):
 		self._exprTest( 'lambda: x', [ 'lambdaExpr', [], [ 'var', 'x' ] ] )
-		self._exprTest( 'lambda a: x', [ 'lambdaExpr', [ [ 'simpleParam', 'a' ] ], [ 'var', 'x' ] ] )
+		self._exprTest( 'lambda f: x', [ 'lambdaExpr', [ [ 'simpleParam', 'f' ] ], [ 'var', 'x' ] ] )
+		self._exprTest( 'lambda f,: x', [ 'lambdaExpr', [ [ 'simpleParam', 'f' ] ], [ 'var', 'x' ] ] )
+		self._exprTest( 'lambda f,g: x', [ 'lambdaExpr', [ [ 'simpleParam', 'f' ], [ 'simpleParam', 'g' ] ], [ 'var', 'x' ] ] )
+		self._exprTest( 'lambda f,g,m=a: x', [ 'lambdaExpr', [ [ 'simpleParam', 'f' ], [ 'simpleParam', 'g' ], [ 'defaultValueParam', 'm', [ 'var', 'a' ] ] ], [ 'var', 'x' ] ] )
+		self._exprTest( 'lambda f,g,m=a,n=b: x', [ 'lambdaExpr', [ [ 'simpleParam', 'f' ], [ 'simpleParam', 'g' ], [ 'defaultValueParam', 'm', [ 'var', 'a' ] ], [ 'defaultValueParam', 'n', [ 'var', 'b' ] ] ], [ 'var', 'x' ] ] )
+		self._exprTest( 'lambda f,g,m=a,n=b,*p: x', [ 'lambdaExpr', [ [ 'simpleParam', 'f' ], [ 'simpleParam', 'g' ], [ 'defaultValueParam', 'm', [ 'var', 'a' ] ], [ 'defaultValueParam', 'n', [ 'var', 'b' ] ], [ 'paramList', 'p' ] ], [ 'var', 'x' ] ] )
+		self._exprTest( 'lambda f,m=a,*p,**w: x', [ 'lambdaExpr', [ [ 'simpleParam', 'f' ], [ 'defaultValueParam', 'm', [ 'var', 'a' ] ], [ 'paramList', 'p' ], [ 'kwParamList', 'w' ] ], [ 'var', 'x' ] ] )
+		self._exprTest( 'lambda f,m=a,*p: x', [ 'lambdaExpr', [ [ 'simpleParam', 'f' ], [ 'defaultValueParam', 'm', [ 'var', 'a' ] ], [ 'paramList', 'p' ] ], [ 'var', 'x' ] ] )
+		self._exprTest( 'lambda f,m=a,**w: x', [ 'lambdaExpr', [ [ 'simpleParam', 'f' ], [ 'defaultValueParam', 'm', [ 'var', 'a' ] ], [ 'kwParamList', 'w' ] ], [ 'var', 'x' ] ] )
+		self._exprTest( 'lambda f,*p,**w: x', [ 'lambdaExpr', [ [ 'simpleParam', 'f' ], [ 'paramList', 'p' ], [ 'kwParamList', 'w' ] ], [ 'var', 'x' ] ] )
+		self._exprTest( 'lambda m=a,*p,**w: x', [ 'lambdaExpr', [ [ 'defaultValueParam', 'm', [ 'var', 'a' ] ], [ 'paramList', 'p' ], [ 'kwParamList', 'w' ] ], [ 'var', 'x' ] ] )
+		self._exprTest( 'lambda *p,**w: x', [ 'lambdaExpr', [ [ 'paramList', 'p' ], [ 'kwParamList', 'w' ] ], [ 'var', 'x' ] ] )
+		self._exprTest( 'lambda **w: x', [ 'lambdaExpr', [ [ 'kwParamList', 'w' ] ], [ 'var', 'x' ] ] )
+		
+		
+	def testConditionalExpr(self):
+		self._exprTest( 'a   if b   else   c', [ 'conditionalExpr', [ 'var', 'b' ], [ 'var', 'a' ], [ 'var', 'c' ] ] )
+		
+		
+
+	
+	def testAssert(self):
+		self._stmtTest( 'assert a', [ 'assertStmt', [ 'var', 'a' ], '<nil>' ] )
+		self._stmtTest( 'assert a,b', [ 'assertStmt', [ 'var', 'a' ], [ 'var', 'b' ] ] )
+		
+
+	def testAssign(self):
+		self._stmtTest( 'a=x', [ 'assignmentStmt', [ [ 'singleTarget', 'a' ] ], [ 'var', 'x' ] ] )
+		self._stmtTest( 'a,b=c,d=x', [ 'assignmentStmt', [ [ 'tupleTarget', [ 'singleTarget', 'a' ],  [ 'singleTarget', 'b' ] ],  [ 'tupleTarget', [ 'singleTarget', 'c' ],  [ 'singleTarget', 'd' ] ] ], [ 'var', 'x' ] ] )
+		self._stmtTest( 'a=yield x', [ 'assignmentStmt', [ [ 'singleTarget', 'a' ] ], [ 'yieldAtom', [ 'var', 'x' ] ] ] )
+	
+		
+	def testAugAssignStmt(self):
+		self._stmtTest( 'a += b', [ 'augAssignStmt', '+=', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
+		self._stmtTest( 'a -= b', [ 'augAssignStmt', '-=', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
+		self._stmtTest( 'a *= b', [ 'augAssignStmt', '*=', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
+		self._stmtTest( 'a /= b', [ 'augAssignStmt', '/=', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
+		self._stmtTest( 'a %= b', [ 'augAssignStmt', '%=', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
+		self._stmtTest( 'a **= b', [ 'augAssignStmt', '**=', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
+		self._stmtTest( 'a >>= b', [ 'augAssignStmt', '>>=', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
+		self._stmtTest( 'a <<= b', [ 'augAssignStmt', '<<=', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
+		self._stmtTest( 'a &= b', [ 'augAssignStmt', '&=', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
+		self._stmtTest( 'a ^= b', [ 'augAssignStmt', '^=', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
+		self._stmtTest( 'a |= b', [ 'augAssignStmt', '|=', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
+		self._stmtTest( 'a.b += b', [ 'augAssignStmt', '+=', [ 'attributeRef', [ 'var', 'a' ], 'b' ], [ 'var', 'b' ] ] )
+		self._stmtTest( 'a[x] += b', [ 'augAssignStmt', '+=', [ 'subscript', [ 'var', 'a' ], [ 'var', 'x' ] ], [ 'var', 'b' ] ] )
+
+	def testPassStmt(self):
+		self._stmtTest( 'pass', [ 'passStmt' ] )
+		
+		
+	def testDelStmt(self):
+		self._stmtTest( 'del x', [ 'delStmt', [ 'singleTarget', 'x' ] ] )
+		
+		
+	def testReturnStmt(self):
+		self._stmtTest( 'return x', [ 'returnStmt', [ 'var', 'x' ] ] )
 		
 	
+	def testYieldStmt(self):
+		self._stmtTest( 'yield x', [ 'yieldAtom', [ 'var', 'x' ] ] )
+		
+		
+	def testRaiseStmt(self):
+		self._stmtTest( 'raise', [ 'raiseStmt', '<nil>', '<nil>', '<nil>' ] )
+		self._stmtTest( 'raise x', [ 'raiseStmt', [ 'var', 'x' ], '<nil>', '<nil>' ] )
+		self._stmtTest( 'raise x,y', [ 'raiseStmt', [ 'var', 'x' ], [ 'var', 'y' ], '<nil>' ] )
+		self._stmtTest( 'raise x,y,z', [ 'raiseStmt', [ 'var', 'x' ], [ 'var', 'y' ], [ 'var', 'z' ] ] )
+		
+		
+	def testBreakStmt(self):
+		self._stmtTest( 'break', [ 'breakStmt' ] )
+		
+		
+	def testContinueStmt(self):
+		self._stmtTest( 'continue', [ 'continueStmt' ] )
+		
+		
+	def testImportStmt(self):
+		self._stmtTest( 'import a', [ 'importStmt', [ 'moduleImport', 'a' ] ] )
+		self._stmtTest( 'import a.b', [ 'importStmt', [ 'moduleImport', 'a.b' ] ] )
+		self._stmtTest( 'import a.b as x', [ 'importStmt', [ 'moduleImportAs', 'a.b', 'x' ] ] )
+		self._stmtTest( 'import a.b as x, c.d as y', [ 'importStmt', [ 'moduleImportAs', 'a.b', 'x' ], [ 'moduleImportAs', 'c.d', 'y' ] ] )
+		self._stmtTest( 'from x import a', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImport', 'a' ] ] )
+		self._stmtTest( 'from x import a as p', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImportAs', 'a', 'p' ] ] )
+		self._stmtTest( 'from x import a as p, b as q', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImportAs', 'a', 'p' ], [ 'moduleContentImportAs', 'b', 'q' ] ] )
+		self._stmtTest( 'from x import (a)', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImport', 'a' ] ] )
+		self._stmtTest( 'from x import (a,)', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImport', 'a' ] ] )
+		self._stmtTest( 'from x import (a as p)', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImportAs', 'a', 'p' ] ] )
+		self._stmtTest( 'from x import (a as p,)', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImportAs', 'a', 'p' ] ] )
+		self._stmtTest( 'from x import ( a as p, b as q )', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImportAs', 'a', 'p' ], [ 'moduleContentImportAs', 'b', 'q' ] ] )
+		self._stmtTest( 'from x import ( a as p, b as q, )', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImportAs', 'a', 'p' ], [ 'moduleContentImportAs', 'b', 'q' ] ] )
+		self._stmtTest( 'from x import *', [ 'fromImportAllStmt', [ 'relativeModule', 'x' ] ] )
+		
+		
+	def testGlobalStmt(self):
+		self._stmtTest( 'global x', [ 'globalStmt', [ 'globalVar', 'x' ] ] )
+		self._stmtTest( 'global x, y', [ 'globalStmt', [ 'globalVar', 'x' ], [ 'globalVar', 'y' ] ] )
+	
+		
+	def testExecStmt(self):
+		self._stmtTest( 'exec a', [ 'execStmt', [ 'var', 'a' ], '<nil>', '<nil>' ] )
+		self._stmtTest( 'exec a in b', [ 'execStmt', [ 'var', 'a' ], [ 'var', 'b' ], '<nil>' ] )
+		self._stmtTest( 'exec a in b,c', [ 'execStmt', [ 'var', 'a' ], [ 'var', 'b' ], [ 'var', 'c' ] ] )
+		
+		
+	def testPrintnl(self):
+		self._stmtTest( 'print x', [ 'call', [ 'var', 'print' ], [ 'var', 'x' ] ] )
+		self._stmtTest( 'print x,y', [ 'call', [ 'var', 'print' ], [ 'var', 'x' ], [ 'var', 'y' ] ] )
+		
+		
+	def testIf(self):
+		src1 = \
+"""
+if a:
+	x
+"""
+		src2 = \
+"""
+if a:
+	x
+elif b:
+	y
+"""
+		src3 = \
+"""
+if a:
+	x
+else:
+	z
+"""
+		src4 = \
+"""
+if a:
+	x
+elif b:
+	y
+else:
+	z
+"""
+		self._compStmtTest( src1, [ [ 'ifStmt', [ 'var', 'a' ], [ [ 'var', 'x' ] ] ] ] )
+		self._compStmtTest( src2, [ [ 'ifStmt', [ 'var', 'a' ], [ [ 'var', 'x' ] ] ], [ 'elifStmt', [ 'var', 'b' ], [ [ 'var', 'y' ] ] ] ] )
+		self._compStmtTest( src3, [ [ 'ifStmt', [ 'var', 'a' ], [ [ 'var', 'x' ] ] ], [ 'elseStmt', [ [ 'var', 'z' ] ] ] ] )
+		self._compStmtTest( src4, [ [ 'ifStmt', [ 'var', 'a' ], [ [ 'var', 'x' ] ] ], [ 'elifStmt', [ 'var', 'b' ], [ [ 'var', 'y' ] ] ], [ 'elseStmt', [ [ 'var', 'z' ] ] ] ] )
+
+		
+	def testWhile(self):
+		src1 = \
+"""
+while a:
+	x
+"""
+		src2 = \
+"""
+while a:
+	x
+else:
+	z
+"""
+		self._compStmtTest( src1, [ [ 'whileStmt', [ 'var', 'a' ], [ [ 'var', 'x' ] ] ] ] )
+		self._compStmtTest( src2, [ [ 'whileStmt', [ 'var', 'a' ], [ [ 'var', 'x' ] ] ], [ 'elseStmt', [ [ 'var', 'z' ] ] ] ] )
