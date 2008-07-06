@@ -458,6 +458,10 @@ class _StmtImporter (_Importer):
 	def Printnl(self, node):
 		return [ 'call', [ 'var', 'print' ] ]  +  [ _expr( x )   for x in node.nodes ]
 	
+
+	# Print
+	def Print(self, node):
+		return [ 'call', [ 'var', 'print' ] ]  +  [ _expr( x )   for x in node.nodes ]
 	
 
 	
@@ -548,7 +552,13 @@ class _CompoundStmtImporter (_Importer):
 
 	# Class
 	def Class(self, node):
-		return [ [ 'classStmt', node.name, [ _expr( b )   for b in node.bases ], _compound( node.code ) ] ]
+		if len( node.bases ) == 0:
+			bases = '<nil>'
+		elif len( node.bases ) == 1:
+			bases = _expr( node.bases[0] )
+		else:
+			bases = [ 'tupleLiteral' ]  +  [ _expr( b )   for b in node.bases ]
+		return [ [ 'classStmt', node.name, bases, _compound( node.code ) ] ]
 	
 
 
@@ -1050,8 +1060,14 @@ class Q:
 class Q (object):
 	x
 """
-		self._compStmtTest( src1, [ [ 'classStmt', 'Q', [], [ [ 'var', 'x' ] ] ] ] )
-		self._compStmtTest( src2, [ [ 'classStmt', 'Q', [ [ 'var', 'object' ] ], [ [ 'var', 'x' ] ] ] ] )
+		src3 = \
+"""
+class Q (a,b):
+	x
+"""
+		self._compStmtTest( src1, [ [ 'classStmt', 'Q', '<nil>', [ [ 'var', 'x' ] ] ] ] )
+		self._compStmtTest( src2, [ [ 'classStmt', 'Q', [ 'var', 'object' ], [ [ 'var', 'x' ] ] ] ] )
+		self._compStmtTest( src3, [ [ 'classStmt', 'Q', [ 'tupleLiteral', [ 'var', 'a' ], [ 'var', 'b' ] ], [ [ 'var', 'x' ] ] ] ] )
 
 		
 		

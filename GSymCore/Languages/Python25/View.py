@@ -1039,7 +1039,7 @@ class Python25View (GSymView):
 				   state )
 	
 	def fromImportAllStmt(self, state, node, moduleName):
-		moduleNameView = mapViewEval( moduleName, None, python25ViewState( Parser.moduleContentImport ) )
+		moduleNameView = viewEval( moduleName, None, python25ViewState( Parser.moduleContentImport ) )
 		return nodeEditor( node,
 				   ahbox( [ keywordLabel( fromKeyword ), moduleNameView, keywordLabel( importKeyword ), label( '*', punctuationStyle ) ], spacing=10.0 ),
 				   UnparsedText( fromKeyword  +  ' '  +  moduleNameView.text  +  ' '  +  importKeyword  +  ' *', PRECEDENCE_STMT ),

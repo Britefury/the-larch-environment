@@ -5,7 +5,7 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from Britefury.GLisp.GLispUtil import isGLispList
+from Britefury.GLisp.GLispUtil import isGLispList, gLispSrcToString
 
 
 
@@ -30,7 +30,7 @@ def dispatch(target, xs, *args):
 			raise DispatchNameError, 'GLisp dispatch: could not find method named %s in class %s'  %  ( name, type( target ).__name__ )
 		return method( *( args + ( xs, ) + tuple( xs[1:] ) ) )
 	else:
-		raise DispatchTypeError, 'GLisp dispatch: can only dispatch on lists'
+		raise DispatchTypeError, 'GLisp dispatch: can only dispatch on lists; not on %s'  %  ( gLispSrcToString( xs ) )
 
 
 		
