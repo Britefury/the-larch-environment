@@ -158,8 +158,8 @@ class Python25CodeGenerator (GSymCodeGenerator):
 	def kwArgList(self, node, value):
 		return '*' + self( value )
 	
-	def call(self, node, target, *params):
-		return self( target ) + '( ' + ', '.join( [ self( p )   for p in params ] ) + ' )'
+	def call(self, node, target, *args):
+		return self( target ) + '( ' + ', '.join( [ self( a )   for a in args ] ) + ' )'
 	
 	
 	
@@ -429,4 +429,32 @@ class Python25CodeGenerator (GSymCodeGenerator):
 		return 'finally:\n'  +  _indent( suiteText )
 	
 
+	# With statement
+	def withStmt(self, node, expr, target, suite):
+		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
+		return 'with '  +  self( expr )  +  ( ' as ' + self( target )   if target != '<nil>'   else   '' )  +  ':\n'  +  _indent( suiteText )
 	
+	
+	# Def statement
+	def defStmt(self, node, name, params, suite):
+		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
+		return 'def '  +  name  +  '('  +  ', '.join( [ self( p )   for p in params ] )  +  '):\n'  +    +  _indent( suiteText )
+	
+
+	# Deco statement
+	def decoStmt(self, node, name, args):
+		text = '@' + name
+		if args != '<nil>':
+			text += '( ' + ', '.join( [ self( a )   for a in args ] ) + ' )'
+		return text
+	
+
+	# Class statement
+	def classStmt(self, node, name, inheritance, suite):
+		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
+		text = 'class '  +  name
+		if inheritance != '<nil>':
+			text += '('  +  self( inheritance )  +  ')'
+		return text  +  '):\n'  +    +  _indent( suiteText )
+	
+
