@@ -18,6 +18,7 @@ from GSymCore.Languages.Python25.Keywords import *
 
 # Python identifier
 pythonIdentifier = identifier  &  ( lambda input, pos, result: result not in keywordsSet )
+dottedPythonIdentifer = Production( separatedList( pythonIdentifier, '.', bNeedAtLeastOne=True ) ).action( lambda input, pos, xs: '.'.join( xs ) )
 	
 
 
@@ -381,21 +382,21 @@ continueStmt = Production( Keyword( continueKeyword ) ).action( lambda input, po
 
 
 # Import statement
-_moduleIdentifier = Production( identifier )
+_moduleIdentifier = Production( pythonIdentifier )
 # dotted name
 moduleName = Production( separatedList( _moduleIdentifier, '.', bNeedAtLeastOne=True ) ).action( lambda input, pos, xs: '.'.join( xs ) )
 # relative module name
 _relModDotsModule = ( ZeroOrMore( '.' ) + moduleName ).action( lambda input, pos, xs: ''.join( xs[0] )  +  xs[1] )
 _relModDots = OneOrMore( '.' ).action( lambda input, pos, xs: ''.join( xs ) )
 relativeModule = Production( _relModDotsModule | _relModDots ).action( lambda input, pos, xs: [ 'relativeModule', xs ] )
-# ( <moduleName> 'as' <identifier> )  |  <moduleName>
-moduleImport = Production( ( moduleName + Keyword( asKeyword ) + identifier ).action( lambda input, pos, xs: [ 'moduleImportAs', xs[0], xs[2] ] )   |
+# ( <moduleName> 'as' <pythonIdentifier> )  |  <moduleName>
+moduleImport = Production( ( moduleName + Keyword( asKeyword ) + pythonIdentifier ).action( lambda input, pos, xs: [ 'moduleImportAs', xs[0], xs[2] ] )   |
 			    			moduleName.action( lambda input, pos, xs: [ 'moduleImport', xs ] ) )
 # 'import' <separatedList( moduleImport )>
 simpleImport = Production( Keyword( importKeyword )  +  separatedList( moduleImport, bNeedAtLeastOne=True ) ).action( lambda input, pos, xs: [ 'importStmt' ] + xs[1] )
-# ( <identifier> 'as' <identifier> )  |  <identifier>
-moduleContentImport = Production( ( identifier + Keyword( asKeyword ) + identifier ).action( lambda input, pos, xs: [ 'moduleContentImportAs', xs[0], xs[2] ] )   |
-			    			identifier.action( lambda input, pos, xs: [ 'moduleContentImport', xs ] ) )
+# ( <pythonIdentifier> 'as' <pythonIdentifier> )  |  <pythonIdentifier>
+moduleContentImport = Production( ( pythonIdentifier + Keyword( asKeyword ) + pythonIdentifier ).action( lambda input, pos, xs: [ 'moduleContentImportAs', xs[0], xs[2] ] )   |
+			    			pythonIdentifier.action( lambda input, pos, xs: [ 'moduleContentImport', xs ] ) )
 # 'from' <relativeModule> 'import' ( <separatedList( moduleContentImport )>  |  ( '(' <separatedList( moduleContentImport )> ',' ')' )
 fromImport = Production( Keyword( fromKeyword ) + relativeModule + Keyword( importKeyword ) + \
 				(  \
@@ -411,7 +412,7 @@ importStmt = Production( simpleImport | fromImport | fromImportAll )
 
 
 # Global statement
-globalVar = Production( identifier ).action( lambda input, pos, xs: [ 'globalVar', xs ] )
+globalVar = Production( pythonIdentifier ).action( lambda input, pos, xs: [ 'globalVar', xs ] )
 globalStmt = Production( Keyword( globalKeyword )  +  separatedList( globalVar, bNeedAtLeastOne=True ) ).action( lambda input, pos, xs: [ 'globalStmt' ]  +  xs[1] )
 
 
@@ -467,10 +468,31 @@ finallyStmt = Production( Keyword( finallyKeyword )  +  ':' ).action( lambda inp
 
 
 
+# With statement
+withStmt = Production( Keyword( withKeyword )  +  expression  +  Optional( Keyword( asKeyword )  +  targetItem )  +  ':' ).action( lambda input, pos, xs: [ 'withStmt', xs[1], xs[2][1]   if xs[2] is not None   else   '<nil>', [] ] )
+
+
+
+# Def statement
+defStmt = Production( Keyword( defKeyword )  +  pythonIdentifier  +  '('  +  params  +  ')'  +  ':' ).action( lambda input, pos, xs: [ 'defStmt', xs[1], xs[3], [] ] )
+
+
+
+# Decorator statement
+decoStmt = Production( Literal( '@' )  +  dottedPythonIdentifer  +  Optional( Literal( '(' )  +  callArgs  +  ')' ) ).action( lambda input, pos, xs: [ 'decoStmt', xs[1], xs[2][1]   if xs[2] is not None   else   '<nil>' ] )
+
+
+
+# Class statement
+classStmt = Production( Keyword( classKeyword )  +  pythonIdentifier  +  Optional( Literal( '(' )  +  tupleOrExpression  +  ')' )  +  ':' ).action( lambda input, pos, xs: [ 'classStmt', xs[1], xs[2][1]   if xs[2] is not None   else   '<nil>', [] ] )
+
+
+
+
 
 # Statements
 simpleStmt = assertStmt | assignmentStmt | augAssignStmt | passStmt | delStmt | returnStmt | yieldStmt | raiseStmt | breakStmt | continueStmt | importStmt | globalStmt | execStmt
-compoundStmtHeader = ifStmt | elifStmt | elseStmt | whileStmt | forStmt | tryStmt | exceptStmt | finallyStmt
+compoundStmtHeader = ifStmt | elifStmt | elseStmt | whileStmt | forStmt | tryStmt | exceptStmt | finallyStmt | withStmt | defStmt | decoStmt | classStmt
 statement = Production( simpleStmt | compoundStmtHeader | expression ).debug( 'statement' )
 
 
@@ -836,6 +858,26 @@ class TestCase_Python25Parser (ParserTestCase):
 		
 	def testFinallyStmt(self):
 		self._matchTest( finallyStmt, 'finally:', [ 'finallyStmt', [] ] )
+		
+		
+	def testWithStmt(self):
+		self._matchTest( withStmt, 'with a:', [ 'withStmt', [ 'var', 'a' ], '<nil>', [] ] )
+		self._matchTest( withStmt, 'with a as b:', [ 'withStmt', [ 'var', 'a' ], [ 'singleTarget', 'b' ], [] ] )
+		
+		
+	def testDefStmt(self):
+		self._matchTest( defStmt, 'def f():', [ 'defStmt', 'f', [], [] ] )
+		self._matchTest( defStmt, 'def f(x):', [ 'defStmt', 'f', [ [ 'simpleParam', 'x' ] ], [] ] )
+		
+		
+	def testDecoStmt(self):
+		self._matchTest( decoStmt, '@f', [ 'decoStmt', 'f', '<nil>' ] )
+		self._matchTest( decoStmt, '@f(x)', [ 'decoStmt', 'f', [ [ 'var', 'x' ] ] ] )
+		
+		
+	def testClassStmt(self):
+		self._matchTest( classStmt, 'class Q:', [ 'classStmt', 'Q', '<nil>', [] ] )
+		self._matchTest( classStmt, 'class Q (x):', [ 'classStmt', 'Q', [ 'var', 'x' ], [] ] )
 		
 		
 

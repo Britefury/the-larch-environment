@@ -65,7 +65,7 @@ class ParsedNodeInteractor (Interactor):
 	eventMethods = [ tokData ]
 
 
-_compoundStmtNames = set( [ 'ifStmt', 'elifStmt', 'elseStmt', 'whileStmt', 'forStmt', 'tryStmt', 'exceptStmt', 'finallyStmt' ] )	
+_compoundStmtNames = set( [ 'ifStmt', 'elifStmt', 'elseStmt', 'whileStmt', 'forStmt', 'tryStmt', 'exceptStmt', 'finallyStmt', 'withStmt', 'defStmt', 'classStmt' ] )	
 	
 
 def _isCompoundStmt(node):
@@ -269,7 +269,7 @@ def tupleView(state, node, xs, parser=None):
 
 def suiteView(suite):
 	lineViews = mapViewEval( suite, None, python25ViewState( statementParser, MODE_LINE ) )
-	return listView( VerticalListViewLayout( 0.0, 0.0, 30.0 ), '{', '}', None, lineViews )
+	return listView( VerticalListViewLayout( 0.0, 0.0, 30.0 ), None, None, None, lineViews )
 
 
 
@@ -623,8 +623,7 @@ class Python25View (GSymView):
 		argWidgets = []
 		if len( args ) > 0:
 			for a in argViews[:-1]:
-				argWidgets.append( a )
-				argWidgets.append( label( ',', punctuationStyle ) )
+				argWidgets.append( ahbox( [ a, label( ',', punctuationStyle ) ] ) )
 			argWidgets.append( argViews[-1] )
 		return nodeEditor( node,
 				ahbox( [ viewEval( target ), label( '(', punctuationStyle ) ]  +  argWidgets  +  [ label( ')', punctuationStyle ) ] ),
@@ -786,11 +785,10 @@ class Python25View (GSymView):
 		paramWidgets = []
 		if len( params ) > 0:
 			for p in paramViews[:-1]:
-				paramWidgets.append( p )
-				paramWidgets.append( label( ',', punctuationStyle ) )
+				paramWidgets.append( ahbox( [ p, label( ',', punctuationStyle ) ] ) )
 			paramWidgets.append( paramViews[-1] )
 		return nodeEditor( node,
-				ahbox( [ keywordLabel( lambdaKeyword ) ]  +  paramWidgets  +  [ label( ':', punctuationStyle ), exprView ] ),
+				ahbox( [ keywordLabel( lambdaKeyword ) ]  +  paramWidgets  +  [ label( ':', punctuationStyle ), exprView ], spacing=5.0 ),
 				UnparsedText( lambdaKeyword  +  ' ' + UnparsedText( ', ' ).join( [ p.text   for p in paramViews ] ) + ': '  +  exprView.text,  PRECEDENCE_LAMBDAEXPR ),
 				state )
 
@@ -1169,4 +1167,103 @@ class Python25View (GSymView):
 	
 	
 	
+	# With statement
+	def withStmt(self, state, node, expr, target, suite):
+		withLabel = keywordLabel( withKeyword )
+		withUnparsed = UnparsedText( withKeyword )
+		withUnparsed.associateWith( withLabel )
+		exprView = viewEval( expr )
+		widgets = [ exprView ]
+		txt = withUnparsed  +  ' '  +  exprView.text
+		if target != '<nil>':
+			targetView = viewEval( target )
+			widgets.append( keywordLabel( asKeyword ) )
+			widgets.append( targetView )
+			txt += ' as ' +  targetView.text
+		widgets.append( label( ':', punctuationStyle ) )
+		return nodeEditor( node,
+				   vbox( [ ahbox( [ withLabel ]  +  widgets, spacing=10.0 ),  suiteView( suite ) ] ),
+				   UnparsedText( txt + ':', PRECEDENCE_STMT ),
+				   state )
+
+	
+	
+	# Def statement
+	def defStmt(self, state, node, name, params, suite):
+		defLabel = keywordLabel( defKeyword )
+		defUnparsed = UnparsedText( defKeyword )
+		defUnparsed.associateWith( defLabel )
+		
+		nameLabel = label( name )
+		nameUnparsed = UnparsedText( name )
+		nameUnparsed.associateWith( nameLabel )
+		
+		paramViews = mapViewEval( params, None, python25ViewState( paramParser ) )
+		paramWidgets = [ label( '(', punctuationStyle ) ]
+		if len( params ) > 0:
+			for p in paramViews[:-1]:
+				paramWidgets.append( ahbox( [ p, label( ',', punctuationStyle ) ] ) )
+			paramWidgets.append( paramViews[-1] )
+		paramWidgets.append( label( ')', punctuationStyle ) )
+		return nodeEditor( node,
+				vbox( [ ahbox( [ defLabel, nameLabel ]  +  paramWidgets  +  [ label( ':', punctuationStyle ) ], spacing=10.0 ),  suiteView( suite ) ] ),
+				UnparsedText( defUnparsed  +  ' ' + nameUnparsed + '(' + UnparsedText( ', ' ).join( [ p.text   for p in paramViews ] ) + '):',  PRECEDENCE_STMT ),
+				state )
+
+	
+	# Decorator statement
+	def decoStmt(self, state, node, name, args):
+		atLabel = label( '@' )
+		atUnparsed = UnparsedText( '@' )
+		atUnparsed.associateWith( atLabel )
+		
+		nameLabel = label( name )
+		nameUnparsed = UnparsedText( name )
+		nameUnparsed.associateWith( nameLabel )
+		
+		if args != '<nil>':
+			argViews = mapViewEval( args, None, python25ViewState( callArgParser ) )
+			argWidgets = [ label( '(', punctuationStyle ) ]
+			if len( args ) > 0:
+				for a in argViews[:-1]:
+					argWidgets.append( ahbox( [ a, label( ',', punctuationStyle ) ] ) )
+				argWidgets.append( argViews[-1] )
+			argWidgets.append( label( ')', punctuationStyle ) )
+			argsUnparsed = '( ' + UnparsedText( ', ' ).join( [ a.text   for a in argViews ] ) + ' )'
+		else:
+			argWidgets = []
+			argsUnparsed = ''
+		return nodeEditor( node,
+				   ahbox( [ atLabel, nameLabel ]  +  argWidgets ),
+				   UnparsedText( atUnparsed  +  nameUnparsed  +  argsUnparsed, PRECEDENCE_STMT ),
+				   state )
+	
+	
+	
+	# Def statement
+	def classStmt(self, state, node, name, inheritance, suite):
+		classLabel = keywordLabel( classKeyword )
+		classUnparsed = UnparsedText( classKeyword )
+		classUnparsed.associateWith( classLabel )
+		
+		nameLabel = label( name )
+		nameUnparsed = UnparsedText( name )
+		nameUnparsed.associateWith( nameLabel )
+		
+		if inheritance != '<nil>':
+			inheritanceView = viewEval( inheritance, None, python25ViewState( Parser.tupleOrExpression ) )
+			inhWidget = ahbox( [ label( '(', punctuationStyle ),  inheritanceView,  label( ')', punctuationStyle ) ] )
+			inhUnparsed = UnparsedText( '(' )  +  inheritanceView.text  +  ')'
+			classLine = ahbox( [ classLabel, nameLabel, inhWidget, label( ':', punctuationStyle ) ], spacing=10.0 )
+			classLineUnparsed = classUnparsed  +  ' '  +  nameUnparsed  +  inhUnparsed  +  ':'
+		else:
+			inhWidgets = []
+			classLine = ahbox( [ classLabel, nameLabel, label( ':', punctuationStyle ) ], spacing=10.0 )
+			classLineUnparsed = classUnparsed  +  ' '  +  nameUnparsed  +  ':'
+			
+		return nodeEditor( node,
+				vbox( [ classLine,  suiteView( suite ) ] ),
+				UnparsedText( classLineUnparsed,  PRECEDENCE_STMT ),
+				state )
+
 	
