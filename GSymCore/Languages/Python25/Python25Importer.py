@@ -330,6 +330,21 @@ class _ExprImporter (_Importer):
 	
 	
 	
+	
+class _DecoratorImporter (_Importer):
+	def Name(self, node):
+		return [ 'decoStmt', node.name, '<nil>' ]
+
+	def Name(self, node):
+		return [ 'decoStmt', node.name, '<nil>' ]
+
+	def CallFunc(self, node):
+		_starArg = lambda name, x:   [ [ name, _expr( x ) ] ]   if x is not None   else   []
+		return [ 'decoStmt', node.node.name, [ _expr( x )   for x in node.args ]  +   _starArg( 'argList', node.star_args )  +  _starArg( 'kwArgList', node.dstar_args ) ]
+
+	
+	
+	
 class _StmtImporter (_Importer):
 	# Discard (expression statement)
 	def Discard(self, node):
@@ -487,10 +502,53 @@ class _CompoundStmtImporter (_Importer):
 		if node.else_ is not None:
 			result.append( [ 'elseStmt', _compound( node.else_ ) ] )
 		return result
+
+	
+	# For
+	def For(self, node):
+		result = [ [ 'forStmt', _expr( node.assign ), _expr( node.list ), _compound( node.body ) ] ]
+		if node.else_ is not None:
+			result.append( [ 'elseStmt', _compound( node.else_ ) ] )
+		return result
 	
 	
+	# Try
+	def TryExcept(self, node):
+		result = [ [ 'tryStmt', _compound( node.body ) ] ]
+		for h in node.handlers:
+			result.append( [ 'exceptStmt',  _expr( h[0] )   if h[0] is not None   else   '<nil>',  _expr( h[1] )   if h[1] is not None   else   '<nil>',   _compound( h[2] ) ] )
+		if node.else_ is not None:
+			result.append( [ 'elseStmt', _compound( node.else_ ) ] )
+		return result
+	
+	def TryFinally(self, node):
+		body = _compound( node.body )
+		body.append( [ 'finallyStmt', _compound( node.final ) ] )
+		return body
 	
 	
+	# With
+	def With(self, node):
+		return [ [ 'withStmt',    _expr( node.expr ),   _target( node.vars )   if node.vars is not None   else   '<nil>',   _compound( node.body ) ] ]
+	
+	
+	# Function
+	def Decorators(self, node):
+		return [ _decorator( x )   for x in node.nodes ]
+		
+		
+	def Function(self, node):
+		params = _extractParameters( node )
+		result = [ [ 'defStmt', node.name, params, _compound( node.code ) ] ]
+		if node.decorators is not None:
+			result = _compound( node.decorators )  +  result
+		return result
+		
+	
+
+	# Class
+	def Class(self, node):
+		return [ [ 'classStmt', node.name, [ _expr( b )   for b in node.bases ], _compound( node.code ) ] ]
 	
 
 
@@ -513,6 +571,7 @@ class _ModuleImporter (_Importer):
 	
 _target = _TargetImporter()
 _expr = _ExprImporter()
+_decorator = _DecoratorImporter()
 _stmt = _StmtImporter()
 _compound = _CompoundStmtImporter()
 _module = _ModuleImporter()
@@ -871,3 +930,129 @@ else:
 """
 		self._compStmtTest( src1, [ [ 'whileStmt', [ 'var', 'a' ], [ [ 'var', 'x' ] ] ] ] )
 		self._compStmtTest( src2, [ [ 'whileStmt', [ 'var', 'a' ], [ [ 'var', 'x' ] ] ], [ 'elseStmt', [ [ 'var', 'z' ] ] ] ] )
+
+		
+		
+	def testFor(self):
+		src1 = \
+"""
+for a in q:
+	x
+"""
+		src2 = \
+"""
+for a in q:
+	x
+else:
+	z
+"""
+		self._compStmtTest( src1, [ [ 'forStmt', [ 'singleTarget', 'a' ], [ 'var', 'q' ], [ [ 'var', 'x' ] ] ] ] )
+		self._compStmtTest( src2, [ [ 'forStmt', [ 'singleTarget', 'a' ], [ 'var', 'q' ], [ [ 'var', 'x' ] ] ], [ 'elseStmt', [ [ 'var', 'z' ] ] ] ] )
+
+		
+		
+	def testTry(self):
+		src1 = \
+"""
+try:
+	x
+except:
+	p
+except a:
+	q
+except a,b:
+	r
+"""
+		src2 = \
+"""
+try:
+	x
+except:
+	p
+else:
+	z
+"""
+		src3 = \
+"""
+try:
+	x
+except:
+	p
+finally:
+	z
+"""
+		self._compStmtTest( src1, [ [ 'tryStmt', [ [ 'var', 'x' ] ] ],  [ 'exceptStmt', '<nil>', '<nil>', [ [ 'var', 'p' ] ] ],   [ 'exceptStmt', [ 'var', 'a' ], '<nil>', [ [ 'var', 'q' ] ] ],    [ 'exceptStmt', [ 'var', 'a' ], [ 'singleTarget', 'b' ], [ [ 'var', 'r' ] ] ] ] )
+		self._compStmtTest( src2, [ [ 'tryStmt', [ [ 'var', 'x' ] ] ],  [ 'exceptStmt', '<nil>', '<nil>', [ [ 'var', 'p' ] ] ],   [ 'elseStmt', [ [ 'var', 'z' ] ] ] ] )
+		self._compStmtTest( src3, [ [ 'tryStmt', [ [ 'var', 'x' ] ] ],  [ 'exceptStmt', '<nil>', '<nil>', [ [ 'var', 'p' ] ] ],   [ 'finallyStmt', [ [ 'var', 'z' ] ] ] ] )
+
+		
+		
+	#def testWith(self):
+		#src1 = \
+#"""
+#with a:
+	#x
+#"""
+		#src2 = \
+#"""
+#with a as b:
+	#x
+#"""
+		#self._compStmtTest( src1, [ [ 'withStmt', [ 'var', 'a' ], '<nil>', [ [ 'var', 'x' ] ] ] ] )
+		#self._compStmtTest( src2, [ [ 'withStmt', [ 'var', 'a' ], [ 'singleTarget', 'b' ], [ [ 'var', 'x' ] ] ] ] )
+
+	
+	def testFunction(self):
+		src1 = \
+"""
+def f():
+	x
+"""
+		src2 = \
+"""
+def f(a,b=q,*c,**d):
+	x
+"""
+		src3 = \
+"""
+@p
+def f():
+	x
+"""
+		src4 = \
+"""
+@p(h)
+def f():
+	x
+"""
+		src5 = \
+"""
+@p(h)
+@q(j)
+def f():
+	x
+"""
+		self._compStmtTest( src1, [ [ 'defStmt', 'f', [], [ [ 'var', 'x' ] ] ] ] )
+		self._compStmtTest( src2, [ [ 'defStmt', 'f', [ [ 'simpleParam', 'a' ], [ 'defaultValueParam', 'b', [ 'var', 'q' ] ], [ 'paramList', 'c' ], [ 'kwParamList', 'd' ] ], [ [ 'var', 'x' ] ] ] ] )
+		self._compStmtTest( src3, [ [ 'decoStmt', 'p', '<nil>' ], [ 'defStmt', 'f', [], [ [ 'var', 'x' ] ] ] ] )
+		self._compStmtTest( src4, [ [ 'decoStmt', 'p', [ [ 'var', 'h' ] ] ], [ 'defStmt', 'f', [], [ [ 'var', 'x' ] ] ] ] )
+		self._compStmtTest( src5, [ [ 'decoStmt', 'p', [ [ 'var', 'h' ] ] ], [ 'decoStmt', 'q', [ [ 'var', 'j' ] ] ], [ 'defStmt', 'f', [], [ [ 'var', 'x' ] ] ] ] )
+
+		
+	def testClass(self):
+		src1 = \
+"""
+class Q:
+	x
+"""
+		src2 = \
+"""
+class Q (object):
+	x
+"""
+		self._compStmtTest( src1, [ [ 'classStmt', 'Q', [], [ [ 'var', 'x' ] ] ] ] )
+		self._compStmtTest( src2, [ [ 'classStmt', 'Q', [ [ 'var', 'object' ] ], [ [ 'var', 'x' ] ] ] ] )
+
+		
+		
+		
