@@ -7,6 +7,8 @@
 ##-*************************
 from Britefury.Kernel.Abstract import abstractmethod
 
+from Britefury.DocModel.DMList import DMList
+
 from Britefury.GLisp.GLispUtil import isGLispList
 from Britefury.gSymConfig.gSymVersion import compareVersions, gSymVersion
 
@@ -137,3 +139,7 @@ def loadDocument(world, xs, contentHandler):
 		raise GSymDocumentContentInvalidType
 
 
+	
+def newDocument(content):
+	doc = [ '$gSymDocument', '0.1-alpha', [ '$unit', content ] ]
+	return DMList( doc )

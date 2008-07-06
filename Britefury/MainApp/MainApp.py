@@ -33,9 +33,11 @@ from Britefury.DocModel.DMIO import readSX, writeSX
 
 from Britefury.gSym.gSymWorld import GSymWorld
 from Britefury.gSym.gSymEnvironment import GSymEnvironment
-from Britefury.gSym.gSymDocument import loadDocument, GSymDocumentViewContentHandler
+from Britefury.gSym.gSymDocument import loadDocument, newDocument, GSymDocumentViewContentHandler
 
 from Britefury.DocView.DocView import DocView
+
+from Britefury.Plugin import InitPlugins
 
 #from Britefury.PyImport import PythonImporter
 
@@ -56,8 +58,22 @@ class GSymScriptEnvironment (object):
 	GSymScriptEnvironment(app) -> scripting environment with @app as the app""" )
 
 
+	
+	
+	
+class MainAppPluginInterface (object):
+	def __init__(self, app):
+		self._app = app
+		
+		
+	def registerNewDocumentFactory(self, menuLabel, newDocFn):
+		self._app.registerNewDocumentFactory( menuLabel, newDocFn )
+		
+	def registerImporter(self, menuLabel, fileType, filePattern, importFn):
+		self._app.registerImporter( menuLabel, fileType, filePattern, importFn )
 
 
+		
 
 class MainApp (object):
 	class _Output (object):
@@ -98,13 +114,32 @@ class MainApp (object):
 		buttonBox.pack_end( oneToOneButton, False, False, 0 )
 		buttonBox.pack_end( resetButton, False, False, 0 )
 		buttonBox.show()
+		
+		
+		
+		
+		# FILE -> NEW MENU
+		
+		newEmptyItem = gtk.MenuItem( 'Empty' )
+		newEmptyItem.connect( 'activate', self._p_onNewEmpty )
+
+		self._newMenu = gtk.Menu()
+		self._newMenu.append( newEmptyItem )
+		
+		
+		
+		
+		# FILE -> IMPORT MENU
+		
+		self._importMenu = gtk.Menu()
 
 
+		
 		
 		# FILE MENU
 		
 		newItem = gtk.MenuItem( 'New' )
-		newItem.connect( 'activate', self._p_onNew )
+		newItem.set_submenu( self._newMenu )
 
 		openItem = gtk.MenuItem( 'Open' )
 		openItem.connect( 'activate', self._p_onOpen )
@@ -112,9 +147,8 @@ class MainApp (object):
 		saveItem = gtk.MenuItem( 'Save' )
 		saveItem.connect( 'activate', self._p_onSave )
 
-		importPyItem = gtk.MenuItem( 'Import Python source' )
-		importPyItem.connect( 'activate', self._p_onImportPy )
-		importPyItem.set_sensitive( False )
+		importItem = gtk.MenuItem( 'Import' )
+		importItem.set_submenu( self._importMenu )
 
 		exportTeXItem = gtk.MenuItem( 'Export TeX document' )
 		exportTeXItem.connect( 'activate', self._p_onExportTeX )
@@ -125,10 +159,11 @@ class MainApp (object):
 		fileMenu.append( newItem )
 		fileMenu.append( openItem )
 		fileMenu.append( saveItem )
-		fileMenu.append( importPyItem )
+		fileMenu.append( importItem )
 		fileMenu.append( exportTeXItem )
 
 
+		
 
 		# EDIT MENU
 		
@@ -143,6 +178,7 @@ class MainApp (object):
 		editMenu.append( redoItem )
 
 
+		
 		
 		# EXECUTE MENU
 		
@@ -160,12 +196,14 @@ class MainApp (object):
 
 
 
+		
 		# ACTIONS MENU
 		
 		self._actionsMenu = gtk.Menu()
 
 
 
+		
 		# SCRIPT MENU
 		
 		scriptWindowItem = gtk.MenuItem( _( 'Script window' ) )
@@ -225,7 +263,7 @@ class MainApp (object):
 
 
 
-		self.setDocument( '', documentRoot, bEvaluate )
+		self.setDocument( documentRoot, bEvaluate )
 
 
 		scriptBanner = _( "gSym scripting console (uses pyconsole by Yevgen Muntyan)\nPython %s\nType help(object) for help on an object\nThe gSym scripting environment is available via the local variable 'gsym'\n" ) % ( sys.version, )
@@ -247,6 +285,10 @@ class MainApp (object):
 		self._scriptWindow.connect( 'delete-event', self._p_onScriptWindowDelete )
 		self._scriptWindow.set_title( _( 'gSym Script Window' ) )
 		self._bScriptWindowVisible = False
+		
+		
+		self._pluginInterface = MainAppPluginInterface( self )
+		InitPlugins.initPlugins( self._pluginInterface )
 
 
 
@@ -259,7 +301,7 @@ class MainApp (object):
 		
 
 
-	def setDocument(self, moduleName, documentRoot, bEvaluate):
+	def setDocument(self, documentRoot, bEvaluate):
 		self._documentRoot = documentRoot
 
 		self._commandHistory = CommandHistory()
@@ -370,14 +412,30 @@ class MainApp (object):
 
 
 
-	def _p_onNew(self, widget):
+	def _p_onNewEmpty(self, widget):
 		bProceed = True
 		if self._bUnsavedData:
 			bProceed = confirmDialog( _( 'New project' ), _( 'You have not saved your work. Proceed?' ), gtk.STOCK_NEW, gtk.STOCK_CANCEL, 'y', 'n', True, self._window )
 		if bProceed:
 			documentRoot = self.makeEmptyDocument()
-			self.setDocument( '', documentRoot, False )
+			self.setDocument( documentRoot, False )
 
+
+	def registerNewDocumentFactory(self, menuLabel, newDocFn):
+		def _onNew(widget):
+			bProceed = True
+			if self._bUnsavedData:
+				bProceed = confirmDialog( _( 'New' ), _( 'You have not saved your work. Proceed?' ), gtk.STOCK_NEW, gtk.STOCK_CANCEL, 'y', 'n', True, self._window )
+			if bProceed:
+				content = newDocFn()
+				if content is not None:
+					documentRoot = newDocument( content )
+					self.setDocument( documentRoot, True )
+		menuItem = gtk.MenuItem( menuLabel )
+		menuItem.connect( 'activate', _onNew )
+		menuItem.show()
+		self._newMenu.append( menuItem )
+		
 
 	def _p_onOpen(self, widget):
 		bProceed = True
@@ -400,8 +458,8 @@ class MainApp (object):
 					f = open( filename, 'r' )
 					if f is not None:
 						try:
-							documentRoot = readSX( file( filename, 'r' ) )
-							self.setDocument( self._world.filenameToModuleName( filename ), documentRoot, True )
+							documentRoot = readSX( f )
+							self.setDocument( documentRoot, True )
 						except IOError:
 							pass
 
@@ -444,6 +502,34 @@ class MainApp (object):
 			return False
 
 
+	def registerImporter(self, menuLabel, fileType, filePattern, importFn):
+		def _onImport(widget):
+			bProceed = True
+			if self._bUnsavedData:
+				bProceed = confirmDialog( _( 'Import' ), _( 'You have not saved your work. Proceed?' ), gtk.STOCK_NEW, gtk.STOCK_CANCEL, 'y', 'n', True, self._window )
+			if bProceed:
+				filter = gtk.FileFilter()
+				filter.set_name( fileType )
+				filter.add_pattern( filePattern )
+	
+				openDialog = gtk.FileChooserDialog( _( 'Import' ), self._window, gtk.FILE_CHOOSER_ACTION_OPEN,
+												( gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_OK, gtk.RESPONSE_OK ) )
+				openDialog.add_filter( filter )
+				openDialog.show()
+				response = openDialog.run()
+				filename = openDialog.get_filename()
+				openDialog.destroy()
+				if response == gtk.RESPONSE_OK:
+					if filename is not None:
+						content = importFn( filename )
+						if content is not None:
+							documentRoot = newDocument( content )
+							self.setDocument( documentRoot, True )
+		menuItem = gtk.MenuItem( menuLabel )
+		menuItem.connect( 'activate', _onImport )
+		menuItem.show()
+		self._importMenu.append( menuItem )
+		
 
 	def _p_onImportPy(self, widget):
 		pass
@@ -580,9 +666,7 @@ class MainApp (object):
 
 	@staticmethod
 	def makeEmptyDocument():
-		xs = DMList()
-		xs.extend( [ 'a', 'b', 'c' ] )
-		return xs
+		return DMList()
 
 
 	@staticmethod
