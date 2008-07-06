@@ -558,20 +558,39 @@ class Python25View (GSymView):
 	
 	# Subscript
 	def subscriptSlice(self, state, node, x, y):
-		xView = viewEval( x )
-		yView = viewEval( y )
+		widgets = []
+		def _v(n):
+			if n != '<nil>':
+				nView = viewEval( n )
+				widgets.append( nView )
+				return nView, nView.text
+			else:
+				return None, ''
+		xView, xText = _v( x )
+		widgets.append( label( ':', punctuationStyle ) )
+		yView, yText = _v( y )
 		return nodeEditor( node,
-				ahbox( [ xView, label( ':', punctuationStyle ), yView  ] ),
-				UnparsedText( xView.text  +  ':'  +  yView.text,  PRECEDENCE_SUBSCRIPTSLICE ),
+				ahbox( widgets ),
+				UnparsedText( xText  +  ':'  +  yText,  PRECEDENCE_SUBSCRIPTSLICE ),
 				state )
 
 	def subscriptLongSlice(self, state, node, x, y, z):
-		xView = viewEval( x )
-		yView = viewEval( y )
-		zView = viewEval( z )
+		widgets = []
+		def _v(n):
+			if n != '<nil>':
+				nView = viewEval( n )
+				widgets.append( nView )
+				return nView, nView.text
+			else:
+				return None, ''
+		xView, xText = _v( x )
+		widgets.append( label( ':', punctuationStyle ) )
+		yView, yText = _v( y )
+		widgets.append( label( ':', punctuationStyle ) )
+		zView, zText = _v( z )
 		return nodeEditor( node,
-				ahbox( [ xView, label( ':', punctuationStyle ), yView, label( ':', punctuationStyle ), zView  ] ),
-				UnparsedText( xView.text  +  ':'  +  yView.text  +  ':'  +  zView.text,  PRECEDENCE_SUBSCRIPTSLICE ),
+				ahbox( widgets ),
+				UnparsedText( xText  +  ':'  +  yText  +  ':'  +  zText,  PRECEDENCE_SUBSCRIPTSLICE ),
 				state )
 	
 	def ellipsis(self, state, node):
@@ -720,26 +739,26 @@ class Python25View (GSymView):
 		return horizontalBinOpView( state, node, x, y, '!=', PRECEDENCE_CMP )
 
 
-	def cmpIsNot(self, state, node, x, y):
+	def isNotTest(self, state, node, x, y):
 		return horizontalBinOpView( state, node, x, y, 'is not', PRECEDENCE_IS )
 
-	def cmpIs(self, state, node, x, y):
+	def isTest(self, state, node, x, y):
 		return horizontalBinOpView( state, node, x, y, 'is', PRECEDENCE_IS )
 
-	def cmpNotIn(self, state, node, x, y):
+	def notInTest(self, state, node, x, y):
 		return horizontalBinOpView( state, node, x, y, 'not in', PRECEDENCE_IN )
 
-	def cmpIn(self, state, node, x, y):
+	def inTest(self, state, node, x, y):
 		return horizontalBinOpView( state, node, x, y, 'in', PRECEDENCE_IN )
 
 
-	def boolNot(self, state, node, x):
+	def notTest(self, state, node, x):
 		return horizontalPrefixOpView( state, node, x, 'not', PRECEDENCE_NOT )
 	
-	def boolAnd(self, state, node, x, y):
+	def andTest(self, state, node, x, y):
 		return horizontalBinOpView( state, node, x, y, 'and', PRECEDENCE_AND )
 
-	def boolOr(self, state, node, x, y):
+	def orTest(self, state, node, x, y):
 		return horizontalBinOpView( state, node, x, y, 'or', PRECEDENCE_OR )
 
 
@@ -792,7 +811,16 @@ class Python25View (GSymView):
 	
 	# Lambda expression
 	def lambdaExpr(self, state, node, params, expr):
-		exprView = viewEval( expr )
+		# The Python 2.5 grammar has two versions of the lambda expression grammar; one what reckognises the full lambda expression, and one that
+		# reckognises a lambda expression that cannot wrap conditional expression.
+		# Ensure that we use the correct parser for @expr
+		exprParser = Parser.expression
+		if state is not None:
+			parser, mode = state
+			if parser is Parser.oldExpression   or  parser is Parser.oldLambdaExpr  or  parser is Parser.oldTupleOrExpression:
+				exprParser = Parser.oldExpression
+			
+		exprView = viewEval( expr, None, python25ViewState( exprParser ) )
 		paramViews = mapViewEval( params, None, python25ViewState( Parser.param ) )
 		paramWidgets = []
 		if len( params ) > 0:

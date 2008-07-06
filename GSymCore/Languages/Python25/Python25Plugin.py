@@ -5,13 +5,14 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
+from GSymCore.Languages.Python25.Python25Importer import importPy25File
 
 
 def py25New():
 	return [ '$withLanguageModule', 'GSymCore.Languages.Python25.Python25', [ 'python25Module', [ 'commentStmt', 'New Python 2.5 document' ] ] ]
 
 def py25ImportFile(filename):
-	return None
+	return importPy25File( filename )
 
 
 def initPlugin(pluginInterface):

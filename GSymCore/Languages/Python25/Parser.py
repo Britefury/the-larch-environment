@@ -17,6 +17,22 @@ from GSymCore.Languages.Python25.Keywords import *
 
 
 
+#
+#
+#
+# !!!!!! NOTES !!!!!!
+# Comparison operators are NOT parsed correctly;
+# 'a < b < c' is valid in Python, but is not handled here.
+# The parser needs to be changed, in addition to changing the python document structure to reflect this.
+#
+# Both lambdaExpr and oldLambdaExpr generate identical nodes. This may cause the view to generate inparseable code on some occasions.
+#
+#
+#
+
+
+
+
 
 # Python identifier
 pythonIdentifier = identifier  &  ( lambda input, pos, result: result not in keywordsSet )
@@ -164,8 +180,9 @@ attributeRef  <<  Production( primary + '.' + attrName ).action( lambda input, p
 
 
 # Subscript and slice
-subscriptSlice = Production( ( expression + ':' + expression ).action( lambda input, pos, xs: [ 'subscriptSlice', xs[0], xs[2] ] ) ).debug( 'subscriptSlice' )
-subscriptLongSlice = Production( ( expression + ':' + expression + ':' + expression ).action( lambda input, pos, xs: [ 'subscriptLongSlice', xs[0], xs[2], xs[4] ] ) ).debug( 'subscriptLongSlice' )
+_sliceItem = lambda x: x   if x is not None   else   '<nil>'
+subscriptSlice = Production( ( Optional( expression ) + ':' + Optional( expression )  ).action( lambda input, pos, xs: [ 'subscriptSlice', _sliceItem( xs[0] ), _sliceItem( xs[2] ) ] ) ).debug( 'subscriptSlice' )
+subscriptLongSlice = Production( ( Optional( expression )  + ':' + Optional( expression )  + ':' + Optional( expression )  ).action( lambda input, pos, xs: [ 'subscriptLongSlice', _sliceItem( xs[0] ), _sliceItem( xs[2] ), _sliceItem( xs[4] ) ] ) ).debug( 'subscriptLongSlice' )
 subscriptEllipsis = Production( '...' ).action( lambda input, pos, xs: [ 'ellipsis' ] ).debug( 'subscriptEllipsis' )
 subscriptItem = subscriptLongSlice | subscriptSlice | subscriptEllipsis | expression
 subscriptTuple = Production( separatedList( subscriptItem, bNeedAtLeastOne=True, bAllowTrailingSeparator=True, bRequireTrailingSeparatorForLengthOne=True ) ).action( lambda input, pos, xs: [ 'subscriptTuple' ]  +  xs ).debug( 'subscriptTuple' )
@@ -242,11 +259,11 @@ ops, ( powOp, invNegPosOp, mulDivModOp, addSubOp, lrShiftOp, andOP, xorOp, orOp,
 			InfixLeft( Literal( '==' ),  lambda op, x, y: [ 'eq', x, y ] ),
 			InfixLeft( Literal( '!=' ),  lambda op, x, y: [ 'neq', x, y ] ),
 		],
-		[ InfixLeft( Keyword( isKeyword ) + Keyword( notKeyword ),  lambda op, x, y: [ 'cmpIsNot', x, y ] ),   InfixLeft( Keyword( isKeyword ),  lambda op, x, y: [ 'cmpIs', x, y ] ) ],
-		[ InfixLeft( Keyword( notKeyword ) + Keyword( inKeyword ),  lambda op, x, y: [ 'cmpNotIn', x, y ] ),   InfixLeft( Keyword( inKeyword ),  lambda op, x, y: [ 'cmpIn', x, y ] ) ],
-		[ Prefix( Keyword( notKeyword ),  lambda op, x: [ 'boolNot', x ] ) ],
-		[ InfixLeft( Keyword( andKeyword ),  lambda op, x, y: [ 'boolAnd', x, y ] ) ],
-		[ InfixLeft( Keyword( orKeyword ),  lambda op, x, y: [ 'boolOr', x, y ] ) ],
+		[ InfixLeft( Keyword( isKeyword ) + Keyword( notKeyword ),  lambda op, x, y: [ 'isNotTest', x, y ] ),   InfixLeft( Keyword( isKeyword ),  lambda op, x, y: [ 'isTest', x, y ] ) ],
+		[ InfixLeft( Keyword( notKeyword ) + Keyword( inKeyword ),  lambda op, x, y: [ 'notInTest', x, y ] ),   InfixLeft( Keyword( inKeyword ),  lambda op, x, y: [ 'inTest', x, y ] ) ],
+		[ Prefix( Keyword( notKeyword ),  lambda op, x: [ 'notTest', x ] ) ],
+		[ InfixLeft( Keyword( andKeyword ),  lambda op, x, y: [ 'andTest', x, y ] ) ],
+		[ InfixLeft( Keyword( orKeyword ),  lambda op, x, y: [ 'orTest', x, y ] ) ],
 	],  primary )
 
 orTest  <<  orTestOp
@@ -641,7 +658,17 @@ class TestCase_Python25Parser (ParserTestCase):
 	def testSubscript(self):
 		self._matchTest( expression, 'a[x]', [ 'subscript', [ 'var', 'a' ], [ 'var', 'x' ] ] )
 		self._matchTest( expression, 'a[x:p]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptSlice', [ 'var', 'x' ], [ 'var', 'p' ] ] ] )
+		self._matchTest( expression, 'a[x:]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptSlice', [ 'var', 'x' ], '<nil>' ] ] )
+		self._matchTest( expression, 'a[:p]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptSlice', '<nil>', [ 'var', 'p' ] ] ] )
+		self._matchTest( expression, 'a[:]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptSlice', '<nil>', '<nil>' ] ] )
 		self._matchTest( expression, 'a[x:p:f]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptLongSlice', [ 'var', 'x' ], [ 'var', 'p' ], [ 'var', 'f' ] ] ] )
+		self._matchTest( expression, 'a[x:p:]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptLongSlice', [ 'var', 'x' ], [ 'var', 'p' ], '<nil>' ] ] )
+		self._matchTest( expression, 'a[x::f]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptLongSlice', [ 'var', 'x' ], '<nil>', [ 'var', 'f' ] ] ] )
+		self._matchTest( expression, 'a[:p:f]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptLongSlice', '<nil>', [ 'var', 'p' ], [ 'var', 'f' ] ] ] )
+		self._matchTest( expression, 'a[::]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptLongSlice', '<nil>', '<nil>', '<nil>' ] ] )
+		self._matchTest( expression, 'a[::f]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptLongSlice', '<nil>', '<nil>', [ 'var', 'f' ] ] ] )
+		self._matchTest( expression, 'a[x::]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptLongSlice', [ 'var', 'x' ], '<nil>', '<nil>' ] ] )
+		self._matchTest( expression, 'a[:p:]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptLongSlice', '<nil>', [ 'var', 'p' ], '<nil>' ] ] )
 		self._matchTest( expression, 'a[x,y]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptTuple', [ 'var', 'x' ], [ 'var', 'y' ] ] ] )
 		self._matchTest( expression, 'a[x:p,y:q]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptTuple', [ 'subscriptSlice', [ 'var', 'x' ], [ 'var', 'p' ] ], [ 'subscriptSlice', [ 'var', 'y' ], [ 'var', 'q' ] ] ] ] )
 		self._matchTest( expression, 'a[x:p:f,y:q:g]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptTuple', [ 'subscriptLongSlice', [ 'var', 'x' ], [ 'var', 'p' ], [ 'var', 'f' ] ], [ 'subscriptLongSlice', [ 'var', 'y' ], [ 'var', 'q' ], [ 'var', 'g' ] ] ] ] )
