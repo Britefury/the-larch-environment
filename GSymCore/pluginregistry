@@ -1,0 +1,3 @@
+($gSymPluginRegistry
+	GSymCore.Languages.Python25.Python25Plugin
+ )

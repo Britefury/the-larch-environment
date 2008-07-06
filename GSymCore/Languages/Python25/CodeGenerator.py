@@ -457,4 +457,10 @@ class Python25CodeGenerator (GSymCodeGenerator):
 			text += '('  +  self( inheritance )  +  ')'
 		return text  +  '):\n'  +    +  _indent( suiteText )
 	
+	
+	
+	# Comment statement
+	def commentStmt(self, node, comment):
+		return '#' + comment
+	
 

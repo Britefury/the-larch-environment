@@ -18,7 +18,6 @@ from Britefury.gSym.View.UnparsedText import UnparsedText
 import traceback
 
 
-from GSymCore.Languages.Python25.Parser import targetItem as targetItemParser, targetList as targetListParser, listComprehensionItem as listComprehensionItemParser, generatorExpressionItem as generatorExpressionItemParser, keyValuePair as keyValuePairParser, subscriptItem as subscriptItemParser, subscriptIndex as subscriptIndexParser, callArg as callArgParser, param as paramParser, expression as expressionParser, oldExpression as oldExpressionParser, oldTupleOrExpression as oldTupleOrExpressionParser, orTest as orTestParser, tupleOrExpression as tupleOrExpressionParser, tupleOrExpressionOrYieldExpression as tupleOrExpressionOrYieldExpressionParser, statement as statementParser
 from GSymCore.Languages.Python25 import Parser
 from GSymCore.Languages.Python25.Styles import *
 from GSymCore.Languages.Python25.Keywords import *
@@ -193,7 +192,7 @@ def _unparsedListViewNeedsDelims(x, outerPrecedence):
 
 
 MODE_EXPRESSION = 0
-MODE_LINE = 1
+MODE_STATEMENT = 1
 
 
 
@@ -202,19 +201,38 @@ def python25ViewState(parser, mode=MODE_EXPRESSION):
 
 
 
+def suiteView(suite):
+	lineViews = mapViewEval( suite, None, python25ViewState( Parser.statement, MODE_STATEMENT ) )
+	return listView( VerticalListViewLayout( 0.0, 0.0, 0.0 ), None, None, None, lineViews )
+
+
+
 def nodeEditor(node, contents, text, state):
 	if state is None:
-		parser = expressionParser
+		parser = Parser.expression
 		mode = MODE_EXPRESSION
 	else:
 		parser, mode = state
 
 	if mode == MODE_EXPRESSION:
 		return interact( focus( customEntry( highlight( contents, 'ctrl', 'ctrl' ), text.getText(), 'ctrl', 'ctrl' ) ),  ParsedNodeInteractor( node, parser ) ),   text
-	elif mode == MODE_LINE:
+	elif mode == MODE_STATEMENT:
 		return interact( focus( customEntry( highlight( contents, style=lineEditorStyle ), text.getText() ) ),  ParsedLineInteractor( node, parser ) ),   text
 	else:
 		raise ValueError
+		
+
+
+def compoundStatementEditor(node, headerContents, headerText, suite, state):
+	if state is None:
+		parser = Parser.statement
+		mode = MODE_STATEMENT
+	else:
+		parser, mode = state
+
+	headerWidget = interact( focus( customEntry( highlight( headerContents, style=lineEditorStyle ), headerText.getText() ) ),  ParsedLineInteractor( node, parser ) )
+	statementWidget = vbox( [ headerWidget, indent( suiteView( suite ), 30.0 ) ] )
+	return statementWidget, headerText
 		
 
 
@@ -267,16 +285,10 @@ def tupleView(state, node, xs, parser=None):
 			   UnparsedText( UnparsedText( ', ' ).join( [ x   for x in xTexts ] ), PRECEDENCE_TUPLE ),
 			   state )
 
-def suiteView(suite):
-	lineViews = mapViewEval( suite, None, python25ViewState( statementParser, MODE_LINE ) )
-	return listView( VerticalListViewLayout( 0.0, 0.0, 30.0 ), None, None, None, lineViews )
-
-
-
 class Python25View (GSymView):
 	# MISC
 	def python25Module(self, state, node, *content):
-		lineViews = mapViewEval( content, None, python25ViewState( statementParser, MODE_LINE ) )
+		lineViews = mapViewEval( content, None, python25ViewState( Parser.statement, MODE_STATEMENT ) )
 		return listView( VerticalListViewLayout( 0.0, 0.0, 0.0 ), None, None, None, lineViews ), ''
 	
 
@@ -405,10 +417,10 @@ class Python25View (GSymView):
 				state )
 	
 	def tupleTarget(self, state, node, *xs):
-		return tupleView( state, node, xs, targetItemParser )
+		return tupleView( state, node, xs, Parser.targetItem )
 	
 	def listTarget(self, state, node, *xs):
-		xViews = mapViewEval( xs, None, python25ViewState( targetItemParser ) )
+		xViews = mapViewEval( xs, None, python25ViewState( Parser.targetItem ) )
 		return nodeEditor( node,
 				   listView( FlowListViewLayout( 5.0, 0.0 ), '[', ']', ',', xViews ),
 				   UnparsedText( '[ '  +  UnparsedText( ', ' ).join( [ x.text   for x in xViews ] )  +  ' ]', PRECEDENCE_LISTLITERAL ),
@@ -446,15 +458,15 @@ class Python25View (GSymView):
 	
 	# List comprehension
 	def listFor(self, state, node, target, source):
-		targetView = viewEval( target, None, python25ViewState( targetListParser ) )
-		sourceView = viewEval( source, None, python25ViewState( oldTupleOrExpressionParser ) )
+		targetView = viewEval( target, None, python25ViewState( Parser.targetList ) )
+		sourceView = viewEval( source, None, python25ViewState( Parser.oldTupleOrExpression ) )
 		return nodeEditor( node,
 				   ahbox( [ keywordLabel( forKeyword ), targetView, keywordLabel( inKeyword ), sourceView ] ),
 				   UnparsedText( forKeyword  +  ' '  +  targetView.text  +  ' '  +  inKeyword  +  sourceView.text, PRECEDENCE_LISTCOMPREHENSION ),
 				   state )
 	
 	def listIf(self, state, node, condition):
-		conditionView = viewEval( condition, None, python25ViewState( oldExpressionParser ) )
+		conditionView = viewEval( condition, None, python25ViewState( Parser.oldExpression ) )
 		return nodeEditor( node,
 				   ahbox( [ keywordLabel( ifKeyword ), conditionView ] ),
 				   UnparsedText( ifKeyword  +  ' '  +  conditionView.text, PRECEDENCE_LISTCOMPREHENSION ),
@@ -462,7 +474,7 @@ class Python25View (GSymView):
 	
 	def listComprehension(self, state, node, expr, *xs):
 		exprView = viewEval( expr )
-		xViews = mapViewEval( xs, None, python25ViewState( listComprehensionItemParser ) )
+		xViews = mapViewEval( xs, None, python25ViewState( Parser.listComprehensionItem ) )
 		return nodeEditor( node,
 				   ahbox( [ label( '[', punctuationStyle ),  ahbox( [ exprView ]  +  xViews, spacing=15.0 ), label( ']', punctuationStyle ) ] ),
 				   UnparsedText( '[ '  +  exprView.text  +  '   '  +  UnparsedText( '   ' ).join( [ x.text   for x in xViews ] )  +  ' ]', PRECEDENCE_LISTCOMPREHENSION ),
@@ -472,15 +484,15 @@ class Python25View (GSymView):
 	
 	# List comprehension
 	def genFor(self, state, node, target, source):
-		targetView = viewEval( target, None, python25ViewState( targetListParser ) )
-		sourceView = viewEval( source, None, python25ViewState( orTestParser ) )
+		targetView = viewEval( target, None, python25ViewState( Parser.targetList ) )
+		sourceView = viewEval( source, None, python25ViewState( Parser.orTest ) )
 		return nodeEditor( node,
 				   ahbox( [ keywordLabel( forKeyword ), targetView, keywordLabel( inKeyword ), sourceView ] ),
 				   UnparsedText( forKeyword  +  ' '  +  targetView.text  +  ' '  +  inKeyword  +  sourceView.text, PRECEDENCE_GENERATOREXPRESSION ),
 				   state )
 	
 	def genIf(self, state, node, condition):
-		conditionView = viewEval( condition, None, python25ViewState( oldExpressionParser ) )
+		conditionView = viewEval( condition, None, python25ViewState( Parser.oldExpression ) )
 		return nodeEditor( node,
 				   ahbox( [ keywordLabel( ifKeyword ), conditionView ] ),
 				   UnparsedText( ifKeyword  +  ' '  +  conditionView.text, PRECEDENCE_GENERATOREXPRESSION ),
@@ -488,7 +500,7 @@ class Python25View (GSymView):
 	
 	def generatorExpression(self, state, node, expr, *xs):
 		exprView = viewEval( expr )
-		xViews = mapViewEval( xs, None, python25ViewState( generatorExpressionItemParser ) )
+		xViews = mapViewEval( xs, None, python25ViewState( Parser.generatorExpressionItem ) )
 		return nodeEditor( node,
 				   ahbox( [ label( '(', punctuationStyle ),  exprView ]  +  xViews  +  [ label( ')', punctuationStyle ) ], spacing=15.0 ),
 				   UnparsedText( '( '  +  exprView.text  +  '   '  +  UnparsedText( '   ' ).join( [ x.text   for x in xViews ] )  +  ' ]', PRECEDENCE_GENERATOREXPRESSION ),
@@ -506,7 +518,7 @@ class Python25View (GSymView):
 				state )
 
 	def dictLiteral(self, state, node, *xs):
-		xViews = mapViewEval( xs, None, keyValuePairParser )
+		xViews = mapViewEval( xs, None, Parser.keyValuePair )
 		return nodeEditor( node,
 				   listView( FlowListViewLayout( 10.0, 5.0 ), '{', '}', ',', xViews ),
 				   UnparsedText( '{ '  +  UnparsedText( ', ' ).join( [ x.text   for x in xViews ] )  +  ' }', PRECEDENCE_DICTLITERAL ),
@@ -572,7 +584,7 @@ class Python25View (GSymView):
 				state )
 	
 	def subscriptTuple(self, state, node, *xs):
-		xViews = mapViewEval( xs, None, python25ViewState( subscriptItemParser ) )
+		xViews = mapViewEval( xs, None, python25ViewState( Parser.subscriptItem ) )
 		return nodeEditor( node,
 				   listView( FlowListViewLayout( 5.0, 0.0 ), None, None, ',', xViews ),
 				   UnparsedText( '( '  +  UnparsedText( ', ' ).join( [ x.text   for x in xViews ] )  +  ' )', PRECEDENCE_TUPLE ),
@@ -580,7 +592,7 @@ class Python25View (GSymView):
 
 	def subscript(self, state, node, target, index):
 		targetView = viewEval( target )
-		indexView = viewEval( index, None, python25ViewState( subscriptIndexParser ) )
+		indexView = viewEval( index, None, python25ViewState( Parser.subscriptIndex ) )
 		#return nodeEditor( node,
 				#scriptRSub( targetView,  ahbox( [ label( '[', punctuationStyle ),  indexView,  label( ']', punctuationStyle ) ] ) ),
 				#UnparsedText( _unparsePrecedenceGT( targetView.text, PRECEDENCE_SUBSCRIPT ) + '[' + indexView.text + ']',  PRECEDENCE_SUBSCRIPT ),
@@ -619,7 +631,7 @@ class Python25View (GSymView):
 
 	def call(self, state, node, target, *args):
 		targetView = viewEval( target )
-		argViews = mapViewEval( args, None, python25ViewState( callArgParser ) )
+		argViews = mapViewEval( args, None, python25ViewState( Parser.callArg ) )
 		argWidgets = []
 		if len( args ) > 0:
 			for a in argViews[:-1]:
@@ -781,7 +793,7 @@ class Python25View (GSymView):
 	# Lambda expression
 	def lambdaExpr(self, state, node, params, expr):
 		exprView = viewEval( expr )
-		paramViews = mapViewEval( params, None, python25ViewState( paramParser ) )
+		paramViews = mapViewEval( params, None, python25ViewState( Parser.param ) )
 		paramWidgets = []
 		if len( params ) > 0:
 			for p in paramViews[:-1]:
@@ -796,9 +808,9 @@ class Python25View (GSymView):
 	
 	# Conditional expression
 	def conditionalExpr(self, state, node, condition, expr, elseExpr):
-		conditionView = viewEval( condition, None, python25ViewState( orTestParser ) )
-		exprView = viewEval( expr, None, python25ViewState( orTestParser ) )
-		elseExprView = viewEval( elseExpr, None, python25ViewState( expressionParser ) )
+		conditionView = viewEval( condition, None, python25ViewState( Parser.orTest ) )
+		exprView = viewEval( expr, None, python25ViewState( Parser.orTest ) )
+		elseExprView = viewEval( elseExpr, None, python25ViewState( Parser.expression ) )
 		return nodeEditor( node,
 				   ahbox( [ exprView,   ahbox( [ keywordLabel( ifKeyword ), conditionView ] ), ahbox( [ keywordLabel( elseKeyword ), elseExprView ] )   ], spacing=15.0 ),
 				   UnparsedText( exprView.text  +  '   '  +  ifKeyword  +  ' '  +  conditionView.text  +  ' '  +  elseKeyword  +  '   '   +  elseExprView.text, PRECEDENCE_CONDITIONALEXPRESSION ),
@@ -821,8 +833,8 @@ class Python25View (GSymView):
 	
 	# Assignment statement
 	def assignmentStmt(self, state, node, targets, value):
-		targetViews = mapViewEval( targets, None, python25ViewState( targetListParser ) )
-		valueView = viewEval( value, None, python25ViewState( tupleOrExpressionOrYieldExpressionParser ) )
+		targetViews = mapViewEval( targets, None, python25ViewState( Parser.targetList ) )
+		valueView = viewEval( value, None, python25ViewState( Parser.tupleOrExpressionOrYieldExpression ) )
 		targetWidgets = []
 		for t in targetViews:
 			targetWidgets.append( t )
@@ -835,8 +847,8 @@ class Python25View (GSymView):
 
 	# Augmented assignment statement
 	def augAssignStmt(self, state, node, op, target, value):
-		targetView = viewEval( target, None, python25ViewState( targetItemParser ) )
-		valueView = viewEval( value, None, python25ViewState( tupleOrExpressionOrYieldExpressionParser ) )
+		targetView = viewEval( target, None, python25ViewState( Parser.targetItem ) )
+		valueView = viewEval( value, None, python25ViewState( Parser.tupleOrExpressionOrYieldExpression ) )
 		return nodeEditor( node,
 				ahbox( [ targetView,  label( op, punctuationStyle ),  valueView ] ),
 				UnparsedText( targetView.text  +  op  +  valueView.text, PRECEDENCE_STMT ),
@@ -853,7 +865,7 @@ class Python25View (GSymView):
 	
 	# Del statement
 	def delStmt(self, state, node, target):
-		targetView = viewEval( target, None, python25ViewState( targetListParser ) )
+		targetView = viewEval( target, None, python25ViewState( Parser.targetList ) )
 		return nodeEditor( node,
 				ahbox( [ keywordLabel( delKeyword ),  targetView ] ),
 				UnparsedText( delKeyword  +  ' '  +  targetView.text,  PRECEDENCE_STMT ),
@@ -862,7 +874,7 @@ class Python25View (GSymView):
 
 	# Return statement
 	def returnStmt(self, state, node, value):
-		valueView = viewEval( value, None, python25ViewState( tupleOrExpressionParser ) )
+		valueView = viewEval( value, None, python25ViewState( Parser.tupleOrExpression ) )
 		return nodeEditor( node,
 				ahbox( [ keywordLabel( returnKeyword ),  valueView ] ),
 				UnparsedText( returnKeyword  +  ' '  +  valueView.text,  PRECEDENCE_STMT ),
@@ -1058,9 +1070,10 @@ class Python25View (GSymView):
 		ifUnparsed = UnparsedText( ifKeyword )
 		ifUnparsed.associateWith( ifLabel )
 		conditionView = viewEval( condition )
-		return nodeEditor( node,
-				vbox( [ ahbox( [ ifLabel,  conditionView,  label( ':', punctuationStyle ) ] ),  suiteView( suite ) ] ),
+		return compoundStatementEditor( node,
+				ahbox( [ ifLabel,  conditionView,  label( ':', punctuationStyle ) ] ),
 				UnparsedText( ifUnparsed  +  ' '  +  conditionView.text  +  ':',  PRECEDENCE_STMT ),
+				suite,
 				state )
 	
 	
@@ -1071,9 +1084,10 @@ class Python25View (GSymView):
 		elifUnparsed = UnparsedText( elifKeyword )
 		elifUnparsed.associateWith( elifLabel )
 		conditionView = viewEval( condition )
-		return nodeEditor( node,
-				vbox( [ ahbox( [ elifLabel,  conditionView,  label( ':', punctuationStyle ) ] ),  suiteView( suite ) ] ),
+		return compoundStatementEditor( node,
+				ahbox( [ elifLabel,  conditionView,  label( ':', punctuationStyle ) ] ),
 				UnparsedText( elifUnparsed  +  ' '  +  conditionView.text  +  ':',  PRECEDENCE_STMT ),
+				suite,
 				state )
 	
 	
@@ -1083,9 +1097,10 @@ class Python25View (GSymView):
 		elseLabel = keywordLabel( elseKeyword )
 		elseUnparsed = UnparsedText( elseKeyword )
 		elseUnparsed.associateWith( elseLabel )
-		return nodeEditor( node,
-				vbox( [ ahbox( [ elseLabel,  label( ':', punctuationStyle ) ] ),  suiteView( suite ) ] ),
+		return compoundStatementEditor( node,
+				ahbox( [ elseLabel,  label( ':', punctuationStyle ) ] ),
 				UnparsedText( elseUnparsed  +  ':',  PRECEDENCE_STMT ),
+				suite,
 				state )
 	
 	
@@ -1096,10 +1111,11 @@ class Python25View (GSymView):
 		whileUnparsed = UnparsedText( whileKeyword )
 		whileUnparsed.associateWith( whileLabel )
 		conditionView = viewEval( condition )
-		return nodeEditor( node,
-				vbox( [ ahbox( [ whileLabel,  conditionView,  label( ':', punctuationStyle ) ] ),  suiteView( suite ) ] ),
+		return compoundStatementEditor( node,
+				ahbox( [ whileLabel,  conditionView,  label( ':', punctuationStyle ) ] ),
 				UnparsedText( whileUnparsed  +  ' '  +  conditionView.text  +  ':',  PRECEDENCE_STMT ),
-				state )
+				suite,
+				state  )
 	
 	
 	
@@ -1110,9 +1126,10 @@ class Python25View (GSymView):
 		forUnparsed.associateWith( forLabel )
 		targetView = viewEval( target, None, python25ViewState( Parser.targetList ) )
 		sourceView = viewEval( source, None, python25ViewState( Parser.tupleOrExpression ) )
-		return nodeEditor( node,
-				   vbox( [ ahbox( [ forLabel, targetView, keywordLabel( inKeyword ), sourceView, label( ':', punctuationStyle ) ] ),  suiteView( suite ) ] ),
+		return compoundStatementEditor( node,
+				   ahbox( [ forLabel, targetView, keywordLabel( inKeyword ), sourceView, label( ':', punctuationStyle ) ] ),
 				   UnparsedText( forUnparsed  +  ' '  +  targetView.text  +  ' '  +  inKeyword  +  sourceView.text  +  ':', PRECEDENCE_LISTCOMPREHENSION ),
+				   suite,
 				   state )
 	
 	
@@ -1122,9 +1139,10 @@ class Python25View (GSymView):
 		tryLabel = keywordLabel( tryKeyword )
 		tryUnparsed = UnparsedText( tryKeyword )
 		tryUnparsed.associateWith( tryLabel )
-		return nodeEditor( node,
-				vbox( [ ahbox( [ tryLabel,  label( ':', punctuationStyle ) ] ),  suiteView( suite ) ] ),
+		return compoundStatementEditor( node,
+				ahbox( [ tryLabel,  label( ':', punctuationStyle ) ] ),
 				UnparsedText( tryUnparsed  +  ':',  PRECEDENCE_STMT ),
+				suite,
 				state )
 	
 	
@@ -1148,9 +1166,10 @@ class Python25View (GSymView):
 			widgets.append( targetView )
 			txt += ', '  +  targetView.text
 		widgets.append( label( ':', punctuationStyle ) )
-		return nodeEditor( node,
-				   vbox( [ ahbox( [ exceptLabel ]  +  widgets, spacing=10.0 ),  suiteView( suite ) ] ),
+		return compoundStatementEditor( node,
+				   ahbox( [ exceptLabel ]  +  widgets, spacing=10.0 ),
 				   UnparsedText( txt + ':', PRECEDENCE_STMT ),
+				   suite,
 				   state )
 
 	
@@ -1160,9 +1179,10 @@ class Python25View (GSymView):
 		finallyLabel = keywordLabel( finallyKeyword )
 		finallyUnparsed = UnparsedText( finallyKeyword )
 		finallyUnparsed.associateWith( finallyLabel )
-		return nodeEditor( node,
-				vbox( [ ahbox( [ finallyLabel,  label( ':', punctuationStyle ) ] ),  suiteView( suite ) ] ),
+		return compoundStatementEditor( node,
+				ahbox( [ finallyLabel,  label( ':', punctuationStyle ) ] ),
 				UnparsedText( finallyUnparsed  +  ':',  PRECEDENCE_STMT ),
+				suite,
 				state )
 	
 	
@@ -1181,9 +1201,10 @@ class Python25View (GSymView):
 			widgets.append( targetView )
 			txt += ' as ' +  targetView.text
 		widgets.append( label( ':', punctuationStyle ) )
-		return nodeEditor( node,
-				   vbox( [ ahbox( [ withLabel ]  +  widgets, spacing=10.0 ),  suiteView( suite ) ] ),
+		return compoundStatementEditor( node,
+				   ahbox( [ withLabel ]  +  widgets, spacing=10.0 ),
 				   UnparsedText( txt + ':', PRECEDENCE_STMT ),
+				   suite,
 				   state )
 
 	
@@ -1198,16 +1219,17 @@ class Python25View (GSymView):
 		nameUnparsed = UnparsedText( name )
 		nameUnparsed.associateWith( nameLabel )
 		
-		paramViews = mapViewEval( params, None, python25ViewState( paramParser ) )
+		paramViews = mapViewEval( params, None, python25ViewState( Parser.param ) )
 		paramWidgets = [ label( '(', punctuationStyle ) ]
 		if len( params ) > 0:
 			for p in paramViews[:-1]:
 				paramWidgets.append( ahbox( [ p, label( ',', punctuationStyle ) ] ) )
 			paramWidgets.append( paramViews[-1] )
 		paramWidgets.append( label( ')', punctuationStyle ) )
-		return nodeEditor( node,
-				vbox( [ ahbox( [ defLabel, nameLabel ]  +  paramWidgets  +  [ label( ':', punctuationStyle ) ], spacing=10.0 ),  suiteView( suite ) ] ),
+		return compoundStatementEditor( node,
+				ahbox( [ defLabel, nameLabel ]  +  paramWidgets  +  [ label( ':', punctuationStyle ) ], spacing=10.0 ),
 				UnparsedText( defUnparsed  +  ' ' + nameUnparsed + '(' + UnparsedText( ', ' ).join( [ p.text   for p in paramViews ] ) + '):',  PRECEDENCE_STMT ),
+				suite,
 				state )
 
 	
@@ -1222,7 +1244,7 @@ class Python25View (GSymView):
 		nameUnparsed.associateWith( nameLabel )
 		
 		if args != '<nil>':
-			argViews = mapViewEval( args, None, python25ViewState( callArgParser ) )
+			argViews = mapViewEval( args, None, python25ViewState( Parser.callArg ) )
 			argWidgets = [ label( '(', punctuationStyle ) ]
 			if len( args ) > 0:
 				for a in argViews[:-1]:
@@ -1261,9 +1283,22 @@ class Python25View (GSymView):
 			classLine = ahbox( [ classLabel, nameLabel, label( ':', punctuationStyle ) ], spacing=10.0 )
 			classLineUnparsed = classUnparsed  +  ' '  +  nameUnparsed  +  ':'
 			
-		return nodeEditor( node,
-				vbox( [ classLine,  suiteView( suite ) ] ),
+		return compoundStatementEditor( node,
+				classLine,
 				UnparsedText( classLineUnparsed,  PRECEDENCE_STMT ),
+				suite,
 				state )
+
+	
+	# Comment statement
+	def commentStmt(self, state, node, comment):
+		commentLabel = label( comment, commentStyle )
+		commentUnparsed = UnparsedText( comment )
+		commentUnparsed.associateWith( commentLabel )
+	
+		return nodeEditor( node,
+				   commentLabel,
+				   UnparsedText( '#' + commentUnparsed, PRECEDENCE_STMT ),
+				   state )
 
 	

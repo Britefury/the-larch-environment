@@ -6,6 +6,8 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
 
+import string
+
 from Britefury.Parser.Parser import getErrorLine, parserCoerce, Bind, Action, Condition, Forward, Group, Production, Suppress, Literal, Keyword, RegEx, Word, Sequence, Combine, Choice, Optional, Repetition, ZeroOrMore, OneOrMore, Peek, PeekNot, ParserTestCase
 from Britefury.Parser.GrammarUtils.Tokens import identifier, decimalInteger, hexInteger, integer, singleQuotedString, doubleQuotedString, quotedString, floatingPoint
 from Britefury.Parser.GrammarUtils.SeparatedList import separatedList, delimitedSeparatedList
@@ -488,12 +490,17 @@ classStmt = Production( Keyword( classKeyword )  +  pythonIdentifier  +  Optiona
 
 
 
+# Comment statement
+commentStmt = Production( Literal( '#' )  +  Word( string.printable ) ).action( lambda input, pos, xs: [ 'commentStmt', xs[1] ] )
+
+
+
 
 
 # Statements
 simpleStmt = assertStmt | assignmentStmt | augAssignStmt | passStmt | delStmt | returnStmt | yieldStmt | raiseStmt | breakStmt | continueStmt | importStmt | globalStmt | execStmt
 compoundStmtHeader = ifStmt | elifStmt | elseStmt | whileStmt | forStmt | tryStmt | exceptStmt | finallyStmt | withStmt | defStmt | decoStmt | classStmt
-statement = Production( simpleStmt | compoundStmtHeader | expression ).debug( 'statement' )
+statement = Production( simpleStmt | compoundStmtHeader | commentStmt | expression ).debug( 'statement' )
 
 
 
@@ -878,6 +885,11 @@ class TestCase_Python25Parser (ParserTestCase):
 	def testClassStmt(self):
 		self._matchTest( classStmt, 'class Q:', [ 'classStmt', 'Q', '<nil>', [] ] )
 		self._matchTest( classStmt, 'class Q (x):', [ 'classStmt', 'Q', [ 'var', 'x' ], [] ] )
+		
+		
+	def testCommentStmt(self):
+		self._matchTest( commentStmt, '#x', [ 'commentStmt', 'x' ] )
+		self._matchTest( commentStmt, '#' + string.printable, [ 'commentStmt', string.printable ] )
 		
 		
 
