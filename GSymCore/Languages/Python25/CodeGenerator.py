@@ -132,10 +132,12 @@ class Python25CodeGenerator (GSymCodeGenerator):
 
 	# Subscript
 	def subscriptSlice(self, node, lower, upper):
-		return self( lower ) + ':' + self( upper )
+		txt = lambda x:  self( x )   if x != '<nil>'   else ''
+		return txt( lower ) + ':' + txt( upper )
 
 	def subscriptLongSlice(self, node, lower, upper, stride):
-		return self( lower ) + ':' + self( upper ) + ':' + self( stride )
+		txt = lambda x:  self( x )   if x != '<nil>'   else ''
+		return txt( lower ) + ':' + txt( upper ) + ':' + txt( stride )
 	
 	def ellipsis(self, node):
 		return '...'
@@ -230,26 +232,26 @@ class Python25CodeGenerator (GSymCodeGenerator):
 		return '( '  +  self( x )  +  ' != '  +  self( y )  +  ' )'
 	
 
-	def cmpIsNot(self, node, x, y):
+	def isNotTest(self, node, x, y):
 		return '( '  +  self( x )  +  ' is not '  +  self( y )  +  ' )'
 	
-	def cmpIs(self, node, x, y):
+	def isTest(self, node, x, y):
 		return '( '  +  self( x )  +  ' is '  +  self( y )  +  ' )'
 	
-	def cmpNotIn(self, node, x, y):
+	def notInTest(self, node, x, y):
 		return '( '  +  self( x )  +  ' not in '  +  self( y )  +  ' )'
 	
-	def cmpIn(self, node, x, y):
+	def inTest(self, node, x, y):
 		return '( '  +  self( x )  +  ' in '  +  self( y )  +  ' )'
 
 	
-	def boolNot(self, node, x):
+	def notTest(self, node, x):
 		return '(not '  +  self( x )  +  ')'
 	
-	def boolAnd(self, node, x, y):
+	def andTest(self, node, x, y):
 		return '( '  +  self( x )  +  ' and '  +  self( y )  +  ' )'
 	
-	def boolOr(self, node, x, y):
+	def orTest(self, node, x, y):
 		return '( '  +  self( x )  +  ' or '  +  self( y )  +  ' )'
 	
 	
