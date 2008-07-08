@@ -365,7 +365,7 @@ class MainApp (object):
 			
 			lispContentHandler = GSymDocumentLISPViewContentHandler( self._commandHistory )
 			self._lispView = loadDocument( self._world, documentRoot, lispContentHandler )
-			self._lispView.refreshCell.changedSignal.connect( self._p_queueRefresh )
+			self._lispView.refreshCell.changedSignal.connect( self._p_queueLispRefresh )
 			self._lispView.refresh()
 			self._lispDoc.child = self._lispView.rootView.widget
 			self._lispView.setDocument( self._lispDoc )
@@ -383,9 +383,16 @@ class MainApp (object):
 		if self._view is not None:
 			self._view.refresh()
 
+	def _p_refreshLispView(self):
+		if self._view is not None:
+			self._lispView.refresh()
+
 
 	def _p_queueRefresh(self):
 		queueEvent( self._p_refreshView )
+
+	def _p_queueLispRefresh(self):
+		queueEvent( self._p_refreshLispView )
 
 
 

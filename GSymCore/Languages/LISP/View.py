@@ -115,6 +115,17 @@ def viewLispNode(node, state):
 		else:
 			raise ValueError
 		v = listView( layout, label( '(', punctuationStyle ), label( ')', punctuationStyle ), None, xViews )
+		
+		#beginDelim = label( '(', punctuationStyle )
+		#endDelim = label( ')', punctuationStyle )
+		#if mode == MODE_HORIZONTAL:
+			#v = ahbox( [ beginDelim,  ahbox( xViews, spacing=10.0 ),  endDelim ] )
+		#elif mode == MODE_VERTICALINLINE:
+			#v = vbox( [ beginDelim,  indent( vbox( xViews, spacing=10.0 ), 20.0 ),  endDelim ] )
+		#elif mode == MODE_VERTICAL:
+			#v = vbox( [ beginDelim,  indent( vbox( xViews, spacing=10.0 ), 20.0 ),  endDelim ] )
+		#else:
+			#raise ValueError
 
 		def _text(x, n):
 			if isGLispList( n ):
