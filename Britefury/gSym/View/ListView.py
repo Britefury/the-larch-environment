@@ -185,8 +185,10 @@ class VerticalInlineListViewLayout (ListViewLayout):
 			elif len( contents ) > 0:
 				contentWidgets = self._p_getContentWidgets( contents, xs )
 				first = self._p_itemsInHBox( self._delimSpacing, beginDelim, contentWidgets[0] )   if beginDelim is not None   else contentWidgets[0]
-				last = self._p_indent( self._p_itemsInHBox( self._delimSpacing, contentWidgets[-1], endDelim )   if endDelim is not None   else contentWidgets[-1] )
-				middle = [ self._p_indent( c )   for c in contentWidgets[1:-1] ]
+				#last = self._p_indent( self._p_itemsInHBox( self._delimSpacing, contentWidgets[-1], endDelim )   if endDelim is not None   else contentWidgets[-1] )
+				last = endDelim
+				#middle = [ self._p_indent( c )   for c in contentWidgets[1:-1] ]
+				middle = [ self._p_indent( c )   for c in contentWidgets[1:] ]
 				
 				contentsContainer = DTBox( direction=DTBox.TOP_TO_BOTTOM, alignment=DTBox.ALIGN_LEFT, spacing=self._spacing )
 				contentsContainer[:] = [ first ]  +  middle  +  [ last ]

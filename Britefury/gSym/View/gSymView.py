@@ -499,6 +499,12 @@ def listView(layout, beginDelim, endDelim, separatorFactory, children, style=Non
 	viewNodeInstance.refreshCells.append( refreshCell )
 	_applyStyleSheetStack( viewNodeInstance, widget )
 	_applyStyle( style, widget )
+	viewNodeInstance = _globalNodeViewInstanceStack[-1]
+	def _registerRelationships():
+		for ch in children:
+			if isinstance( ch, DVNode ):
+				_registerViewNodeRelationship( viewNodeInstance, ch )
+	_buildRefreshCellAndRegister( viewNodeInstance, _registerRelationships )
 	return widget
 
 
