@@ -304,7 +304,7 @@ class DTBox (DTContainerSequence):
 			if len( self._childEntries ) > 0:
 				requisition += self._spacing  *  ( len( self._childEntries ) - 1 )
 		self._childrenRequisition.y = requisition
-		if self._direction == DTBox.LEFT_TO_RIGHT  or  self._direction == DTBox.RIGHT_TO_LEFT  and  baseline is not None:
+		if ( self._direction == DTBox.LEFT_TO_RIGHT  or  self._direction == DTBox.RIGHT_TO_LEFT )  and  aboveBaseline is not None  and  baseline is not None:
 			alignedHeight = aboveBaseline + baseline
 			baselinePadding = ( requisition - alignedHeight )  *  0.5
 			self._childrenAboveBaseline = aboveBaseline - baselinePadding
