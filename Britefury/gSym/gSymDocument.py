@@ -14,6 +14,7 @@ from Britefury.gSymConfig.gSymVersion import compareVersions, gSymVersion
 
 from Britefury.gSym.View.gSymView import GSymViewFactory
 from Britefury.gSym.gSymEnvironment import GSymEnvironment
+from GSymCore.Languages.LISP import LISP
 
 
 
@@ -40,6 +41,19 @@ class GSymDocumentViewContentHandler (GSymDocumentContentHandler):
 	def withLanguageModule(self, world, importLanguage, xs):
 		language = world.getModuleLanguage( importLanguage )
 		languageViewFactory = GSymViewFactory( world, importLanguage, language.getViewFactory() )
+		return languageViewFactory.createDocumentView( xs, self._commandHistory )
+		
+		
+
+
+class GSymDocumentLISPViewContentHandler (GSymDocumentContentHandler):
+	def __init__(self, commandHistory):
+		super( GSymDocumentLISPViewContentHandler, self ).__init__()
+		self._commandHistory = commandHistory 
+	
+	def withLanguageModule(self, world, importLanguage, xs):
+		language = LISP.language
+		languageViewFactory = GSymViewFactory( world, 'LISP', language.getViewFactory() )
 		return languageViewFactory.createDocumentView( xs, self._commandHistory )
 		
 		

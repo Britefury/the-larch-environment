@@ -23,7 +23,6 @@ import traceback
 
 from GSymCore.Languages.LISP import Parser
 from GSymCore.Languages.LISP.Styles import *
-from GSymCore.Languages.LISP.Keywords import *
 
 
 
@@ -48,7 +47,7 @@ class ParsedNodeInteractor (Interactor):
 	@textEventMethod()
 	def tokData(self, bUserEvent, bChanged, value, node):
 		if bChanged:
-			parsed = _parseText( parser, value )
+			parsed = _parseText( value )
 			if parsed is not None:
 				replace( node, parsed )
 			else:
@@ -60,7 +59,7 @@ class ParsedNodeInteractor (Interactor):
 	
 	
 def nodeEditor(node, contents, text, state):
-	return interact( focus( customEntry( highlight( contents, style=lineEditorStyle ), text.getText() ) ),  ParsedNodeInteractor( node ) ),   text
+	return interact( focus( customEntry( highlight( contents ), text.getText() ) ),  ParsedNodeInteractor( node ) ),   text
 
 
 
@@ -69,7 +68,7 @@ MODE_VERTICALINLINE = 1
 MODE_VERTICAL = 2
 
 
-def LISPView(node, state):
+def viewLispNode(node, state):
 	if isGLispList( node ):
 		# List
 		xViews = mapViewEval( node )
@@ -83,7 +82,7 @@ def LISPView(node, state):
 				for x in node[1:]:
 					if isGLispList( x ):
 						mode = MODE_VERTICALINLINE
-						break`
+						break
 		
 			
 		if mode == MODE_HORIZONTAL:
@@ -105,3 +104,8 @@ def LISPView(node, state):
 			unparsed = UnparsedText( repr( node ) )
 		# String
 		return nodeEditor( node, label( node ), unparsed, state )
+	
+	
+	
+def LISPView():
+	return viewLispNode

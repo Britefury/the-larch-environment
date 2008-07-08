@@ -33,7 +33,7 @@ from Britefury.DocModel.DMIO import readSX, writeSX
 
 from Britefury.gSym.gSymWorld import GSymWorld
 from Britefury.gSym.gSymEnvironment import GSymEnvironment
-from Britefury.gSym.gSymDocument import loadDocument, newDocument, GSymDocumentViewContentHandler
+from Britefury.gSym.gSymDocument import loadDocument, newDocument, GSymDocumentViewContentHandler, GSymDocumentLISPViewContentHandler
 
 from Britefury.DocView.DocView import DocView
 
@@ -204,6 +204,17 @@ class MainApp (object):
 
 
 		
+		# VIEW MENU
+		
+		viewLispItem = gtk.MenuItem( 'Show LISP window' )
+		viewLispItem.connect( 'activate', self._onShowLisp )
+		
+		viewMenu = gtk.Menu()
+		viewMenu.append( viewLispItem )
+		
+		
+		
+		
 		# SCRIPT MENU
 		
 		scriptWindowItem = gtk.MenuItem( _( 'Script window' ) )
@@ -226,6 +237,9 @@ class MainApp (object):
 		
 		self._actionsMenuItem = gtk.MenuItem( 'Actions' )
 		self._actionsMenuItem.set_submenu( self._actionsMenu )
+		
+		viewMenuItem = gtk.MenuItem( 'View' )
+		viewMenuItem.set_submenu( viewMenu )
 
 		scriptMenuItem = gtk.MenuItem( _( 'Script' ) )
 		scriptMenuItem.set_submenu( scriptMenu )
@@ -236,6 +250,7 @@ class MainApp (object):
 		menuBar.append( editMenuItem )
 		menuBar.append( runMenuItem )
 		menuBar.append( self._actionsMenuItem )
+		menuBar.append( viewMenuItem )
 		menuBar.append( scriptMenuItem )
 		menuBar.show_all()
 
@@ -263,9 +278,37 @@ class MainApp (object):
 
 
 
+		#
+		# LISP window
+		#
+		self._lispWindow = gtk.Window( gtk.WINDOW_TOPLEVEL )
+		self._lispDoc =DTDocument()
+		self._lispDoc.undoSignal.connect( self._p_onUndo )
+		self._lispDoc.redoSignal.connect( self._p_onRedo )
+		self._lispDoc.getGtkWidget().show()
+		self._lispWindow.set_transient_for( self._window )
+		self._lispWindow.connect( 'delete-event', self._p_onLispWindowDelete )
+		self._lispWindow.set_title( _( 'LISP View Window' ) )
+		self._lispWindow.set_size_request( 640, 480 )
+		self._lispWindow.add( self._lispDoc.getGtkWidget() )
+		self._bLispWindowVisible = False
+		self._lispView = None
+
+		
+		# Set the document
 		self.setDocument( documentRoot, bEvaluate )
 
 
+		#
+		# Plugins
+		#
+		self._pluginInterface = MainAppPluginInterface( self )
+		InitPlugins.initPlugins( self._pluginInterface )
+
+
+		#
+		# Script window
+		#
 		scriptBanner = _( "gSym scripting console (uses pyconsole by Yevgen Muntyan)\nPython %s\nType help(object) for help on an object\nThe gSym scripting environment is available via the local variable 'gsym'\n" ) % ( sys.version, )
 		self._scriptEnv = GSymScriptEnvironment( self )
 		self._scriptConsole = Console( locals = { 'gsym' : self._scriptEnv }, banner=scriptBanner, use_rlcompleter=False )
@@ -287,10 +330,9 @@ class MainApp (object):
 		self._bScriptWindowVisible = False
 		
 		
-		self._pluginInterface = MainAppPluginInterface( self )
-		InitPlugins.initPlugins( self._pluginInterface )
-
-
+		
+		
+		
 
 
 
@@ -320,9 +362,17 @@ class MainApp (object):
 			self._view.refresh()
 			self._doc.child = self._view.rootView.widget
 			self._view.setDocument( self._doc )
+			
+			lispContentHandler = GSymDocumentLISPViewContentHandler( self._commandHistory )
+			self._lispView = loadDocument( self._world, documentRoot, lispContentHandler )
+			self._lispView.refreshCell.changedSignal.connect( self._p_queueRefresh )
+			self._lispView.refresh()
+			self._lispDoc.child = self._lispView.rootView.widget
+			self._lispView.setDocument( self._lispDoc )
 		else:
 			self._view = None
 			self._doc.child = DTLabel( '<empty>', font='Sans 11 bold', colour=Colour3f( 0.0, 0.0, 0.5 ) )
+			self._lispDoc.child = DTLabel( '<empty>', font='Sans 11 bold', colour=Colour3f( 0.0, 0.0, 0.5 ) )
 	
 
 
@@ -639,9 +689,25 @@ class MainApp (object):
 	def _p_onDestroy(self, widget, data=None):
 		gtk.main_quit()
 
+		
+		
+		
+	def _onShowLisp(self, widget):
+		self._bLispWindowVisible = not self._bLispWindowVisible
+		if self._bLispWindowVisible:
+			self._lispWindow.show()
+		else:
+			self._lispWindow.hide()
 
 
 
+	def _p_onLispWindowDelete(self, window, event):
+		window.hide()
+		self._bLispWindowVisible = False
+		return True
+
+
+	
 	def _p_onScriptWindowDelete(self, window, event):
 		window.hide()
 		self._bScriptWindowVisible = False
@@ -664,6 +730,8 @@ class MainApp (object):
 
 
 
+	
+	
 	@staticmethod
 	def makeEmptyDocument():
 		return DMList()

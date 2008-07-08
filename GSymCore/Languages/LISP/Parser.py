@@ -33,7 +33,7 @@ unicodeStringS = Production( ( Literal( 'u' )  |  Literal( 'U' ) ) + singleQuote
 unicodeStringD = Production( ( Literal( 'u' )  |  Literal( 'U' ) ) + doubleQuotedString ).action( lambda input, pos, xs: 'u' + xs[1] )
 
 
-unquotedStringChars = ( string.digits + string.letters + string.punctuation ).replace( '(', '' ).replace( ')', '' ).replace( '\'', '' ).replace( '`', '' ).replace( '{', '' ).replace( '}', '' )
+_unquotedStringChars = ( string.digits + string.letters + string.punctuation ).replace( '(', '' ).replace( ')', '' ).replace( '\'', '' ).replace( '`', '' ).replace( '{', '' ).replace( '}', '' )
 
 
 unquotedString = Production( Word( _unquotedStringChars ) ).action( lambda input, pos, xs: xs )
@@ -41,7 +41,7 @@ _quotedString = Production( unicodeStringS  |  unicodeStringD  |  singleQuotedSt
 
 parser = Forward()
 _list = Production( Literal( '(' )  +  ZeroOrMore( parser )  +  Literal( ')' ) ).action( lambda input, pos, xs: xs[1] )
-parser  <<  Production( _quotedString | _unquotedString | _list )
+parser  <<  Production( _quotedString | unquotedString | _list )
 
 
 
