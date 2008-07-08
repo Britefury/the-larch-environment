@@ -62,16 +62,37 @@ def nodeEditor(node, contents, text, state):
 	return interact( focus( customEntry( highlight( contents ), text.getText() ) ),  ParsedNodeInteractor( node ) ),   text
 
 
+def stringNodeEditor(node, text, state):
+	return interact( focus( customEntry( highlight( label( text.getText() ) ), text.getText() ) ),  ParsedNodeInteractor( node ) )
+
+
 
 MODE_HORIZONTAL = 0
 MODE_VERTICALINLINE = 1
 MODE_VERTICAL = 2
 
 
+def viewStringNode(node, state):
+	res, pos = Parser.unquotedString.parseString( node )
+	if res is not None:
+		unparsed = UnparsedText( node )
+	else:
+		unparsed = UnparsedText( repr( node ) )
+	# String
+	return stringNodeEditor( node, unparsed, state )
+
+
+def lispViewEval(node, state):
+	if isGLispList( node ):
+		return viewEval( node )
+	else:
+		return viewStringNode( node, state )
+
+
 def viewLispNode(node, state):
 	if isGLispList( node ):
 		# List
-		xViews = mapViewEval( node )
+		xViews = [ lispViewEval( x, state )   for x in node ]
 		
 		# Check the contents:
 		mode = MODE_HORIZONTAL
@@ -88,22 +109,22 @@ def viewLispNode(node, state):
 		if mode == MODE_HORIZONTAL:
 			layout = HorizontalListViewLayout( 10.0, 0.0 )
 		elif mode == MODE_VERTICALINLINE:
-			layout = VerticalInlineListViewLayout( 10.0, 0.0, 10.0 )
+			layout = VerticalInlineListViewLayout( 0.0, 0.0, 10.0 )
 		elif mode == MODE_VERTICAL:
-			layout = VerticalListViewLayout( 10.0, 0.0, 10.0 )
+			layout = VerticalListViewLayout( 0.0, 0.0, 10.0 )
 		else:
 			raise ValueError
 		v = listView( layout, label( '(', punctuationStyle ), label( ')', punctuationStyle ), None, xViews )
-		unparsed = UnparsedText( '(' + UnparsedText( ' ' ).join( [ xv.text   for xv in xViews ] )  +  ')' )
+
+		def _text(x, n):
+			if isGLispList( n ):
+				return x.text
+			else:
+				return n
+		unparsed = UnparsedText( '(' + UnparsedText( ' ' ).join( [ _text( xv, n )   for xv, n in zip( xViews, node ) ] )  +  ')' )
 		return nodeEditor( node, v, unparsed, state )
 	else:
-		res, pos = Parser.unquotedString.parseString( node )
-		if res is not None:
-			unparsed = UnparsedText( node )
-		else:
-			unparsed = UnparsedText( repr( node ) )
-		# String
-		return nodeEditor( node, label( node ), unparsed, state )
+		raise TypeError
 	
 	
 	
