@@ -15,8 +15,6 @@ from Britefury.gSym.View.EditOperations import replace, append, prepend, insertB
 
 from Britefury.gSym.View.UnparsedText import UnparsedText
 
-import traceback
-
 
 from GSymCore.Languages.Python25 import Parser
 from GSymCore.Languages.Python25.Styles import *

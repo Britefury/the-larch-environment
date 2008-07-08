@@ -746,6 +746,8 @@ class Word (ParserExpression):
 		
 		
 	def evaluate(self, state, input, start, stop):
+		start = state.chomp( input, start, stop )
+
 		m = self._re.match( input, start, stop )
 		
 		if m is not None:		
@@ -1155,7 +1157,7 @@ class ParserTestCase (unittest.TestCase):
 	def _matchTest(self, parser, input, expected, ignoreChars=string.whitespace):
 		result, pos = parser.parseString( input, ignoreChars=ignoreChars )
 		if result is None:
-			print 'PARSE FAILURE while parsing', input
+			print 'PARSE FAILURE while parsing %s, stopped at %d: %s'  %  ( input, pos, input[:pos] )
 			print 'EXPECTED:'
 			print expected
 		self.assert_( result is not None )
