@@ -74,6 +74,41 @@ class MainAppPluginInterface (object):
 
 
 		
+class MainAppDocView (object):		
+	def __init__(self, app):
+		self._app = app
+		self._doc = DTDocument()
+		self._doc.undoSignal.connect( app._p_onUndo )
+		self._doc.redoSignal.connect( app._p_onRedo )
+		self._doc.getGtkWidget().show()
+		self._view = None
+		
+		
+	def getGtkWidget(self):
+		return self._doc.getGtkWidget()
+	
+		
+	def setDocumentContent(self, documentRoot, contentHandler):
+		if documentRoot is not None:
+			self._view = loadDocument( self._app._world, documentRoot, contentHandler )
+			self._view.refreshCell.changedSignal.connect( self.__queueRefresh )
+			self._view.refresh()
+			self._doc.child = self._view.rootView.widget
+			self._view.setDocument( self._doc )
+		else:
+			self._view = None
+			self._doc.child = DTLabel( '<empty>', font='Sans 11 bold', colour=Colour3f( 0.0, 0.0, 0.5 ) )
+		
+			
+	def __refreshView(self):
+		if self._view is not None:
+			self._view.refresh()
+
+	def __queueRefresh(self):
+		queueEvent( self.__refreshView )
+			
+	
+		
 
 class MainApp (object):
 	class _Output (object):
@@ -87,18 +122,14 @@ class MainApp (object):
 			self._textBuffer.insert_with_tags_by_name( pos, text, self._tagName )
 
 
-	def __init__(self, documentRoot, bEvaluate):
+	def __init__(self, documentRoot):
 		self._documentRoot = None
-		self._view = None
 		self._commandHistory = None
 		self._bUnsavedData = False
 		
 		self._world = GSymWorld()
-
-		self._doc = DTDocument()
-		self._doc.undoSignal.connect( self._p_onUndo )
-		self._doc.redoSignal.connect( self._p_onRedo )
-		self._doc.getGtkWidget().show()
+		
+		self._docView = MainAppDocView( self )
 
 
 		resetButton = gtk.Button( 'Reset' )
@@ -259,7 +290,7 @@ class MainApp (object):
 
 		box = gtk.VBox()
 		box.pack_start( menuBar, False, False )
-		box.pack_start( self._doc.getGtkWidget() )
+		box.pack_start( self._docView.getGtkWidget() )
 		box.pack_start( gtk.HSeparator(), False, False, 10 )
 		box.pack_start( buttonBox, False, False, 10 )
 		box.show_all()
@@ -281,22 +312,19 @@ class MainApp (object):
 		#
 		# LISP window
 		#
+		self._lispDocView = MainAppDocView( self )
 		self._lispWindow = gtk.Window( gtk.WINDOW_TOPLEVEL )
-		self._lispDoc =DTDocument()
-		self._lispDoc.undoSignal.connect( self._p_onUndo )
-		self._lispDoc.redoSignal.connect( self._p_onRedo )
-		self._lispDoc.getGtkWidget().show()
 		self._lispWindow.set_transient_for( self._window )
 		self._lispWindow.connect( 'delete-event', self._p_onLispWindowDelete )
 		self._lispWindow.set_title( _( 'LISP View Window' ) )
 		self._lispWindow.set_size_request( 640, 480 )
-		self._lispWindow.add( self._lispDoc.getGtkWidget() )
+		self._lispWindow.add( self._lispDocView.getGtkWidget() )
 		self._bLispWindowVisible = False
 		self._lispView = None
 
 		
 		# Set the document
-		self.setDocument( documentRoot, bEvaluate )
+		self.setDocument( documentRoot )
 
 
 		#
@@ -343,11 +371,12 @@ class MainApp (object):
 		
 
 
-	def setDocument(self, documentRoot, bEvaluate):
+	def setDocument(self, documentRoot):
 		self._documentRoot = documentRoot
 
 		self._commandHistory = CommandHistory()
-		self._commandHistory.track( self._documentRoot )
+		if self._documentRoot is not None:
+			self._commandHistory.track( self._documentRoot )
 		self._commandHistory.changedSignal.connect( self._p_onCommandHistoryChanged )
 		self._bUnsavedData = False
 		
@@ -355,44 +384,18 @@ class MainApp (object):
 		self._actionsMenu = gtk.Menu()
 		self._actionsMenuItem.set_submenu( self._actionsMenu )
 		
-		if bEvaluate:
-			contentHandler = GSymDocumentViewContentHandler( self._commandHistory )
-			self._view = loadDocument( self._world, documentRoot, contentHandler )
-			self._view.refreshCell.changedSignal.connect( self._p_queueRefresh )
-			self._view.refresh()
-			self._doc.child = self._view.rootView.widget
-			self._view.setDocument( self._doc )
+		contentHandler = GSymDocumentViewContentHandler( self._commandHistory )
+		self._docView.setDocumentContent( documentRoot, contentHandler )
+		
+		self._setLispDocument()
 			
+			
+	def _setLispDocument(self):
+		if self._lispDocView is not None:		
 			lispContentHandler = GSymDocumentLISPViewContentHandler( self._commandHistory )
-			self._lispView = loadDocument( self._world, documentRoot, lispContentHandler )
-			self._lispView.refreshCell.changedSignal.connect( self._p_queueLispRefresh )
-			self._lispView.refresh()
-			self._lispDoc.child = self._lispView.rootView.widget
-			self._lispView.setDocument( self._lispDoc )
-		else:
-			self._view = None
-			self._doc.child = DTLabel( '<empty>', font='Sans 11 bold', colour=Colour3f( 0.0, 0.0, 0.5 ) )
-			self._lispDoc.child = DTLabel( '<empty>', font='Sans 11 bold', colour=Colour3f( 0.0, 0.0, 0.5 ) )
+			self._lispDocView.setDocumentContent( self._documentRoot, lispContentHandler )
+		
 	
-
-
-
-
-
-	def _p_refreshView(self):
-		if self._view is not None:
-			self._view.refresh()
-
-	def _p_refreshLispView(self):
-		if self._view is not None:
-			self._lispView.refresh()
-
-
-	def _p_queueRefresh(self):
-		queueEvent( self._p_refreshView )
-
-	def _p_queueLispRefresh(self):
-		queueEvent( self._p_refreshLispView )
 
 
 
@@ -474,8 +477,8 @@ class MainApp (object):
 		if self._bUnsavedData:
 			bProceed = confirmDialog( _( 'New project' ), _( 'You have not saved your work. Proceed?' ), gtk.STOCK_NEW, gtk.STOCK_CANCEL, 'y', 'n', True, self._window )
 		if bProceed:
-			documentRoot = self.makeEmptyDocument()
-			self.setDocument( documentRoot, False )
+			documentRoot = None
+			self.setDocument( documentRoot )
 
 
 	def registerNewDocumentFactory(self, menuLabel, newDocFn):
@@ -487,7 +490,7 @@ class MainApp (object):
 				content = newDocFn()
 				if content is not None:
 					documentRoot = newDocument( content )
-					self.setDocument( documentRoot, True )
+					self.setDocument( documentRoot )
 		menuItem = gtk.MenuItem( menuLabel )
 		menuItem.connect( 'activate', _onNew )
 		menuItem.show()
@@ -516,7 +519,7 @@ class MainApp (object):
 					if f is not None:
 						try:
 							documentRoot = readSX( f )
-							self.setDocument( documentRoot, True )
+							self.setDocument( documentRoot )
 						except IOError:
 							pass
 
@@ -581,7 +584,7 @@ class MainApp (object):
 						content = importFn( filename )
 						if content is not None:
 							documentRoot = newDocument( content )
-							self.setDocument( documentRoot, True )
+							self.setDocument( documentRoot )
 		menuItem = gtk.MenuItem( menuLabel )
 		menuItem.connect( 'activate', _onImport )
 		menuItem.show()
@@ -702,16 +705,29 @@ class MainApp (object):
 	def _onShowLisp(self, widget):
 		self._bLispWindowVisible = not self._bLispWindowVisible
 		if self._bLispWindowVisible:
+			self._lispDocView = MainAppDocView( self )
+			self._lispWindow = gtk.Window( gtk.WINDOW_TOPLEVEL )
+			self._lispWindow.set_transient_for( self._window )
+			self._lispWindow.connect( 'delete-event', self._p_onLispWindowDelete )
+			self._lispWindow.set_title( _( 'LISP View Window' ) )
+			self._lispWindow.set_size_request( 640, 480 )
+			self._lispWindow.add( self._lispDocView.getGtkWidget() )
+			self._bLispWindowVisible = False
+			self._lispView = None
 			self._lispWindow.show()
+			self._setLispDocument()
 		else:
-			self._lispWindow.hide()
+			self._lispDocView = None
+			self._lispWindow.destroy()
+			self._lispWindow = None
 
 
 
 	def _p_onLispWindowDelete(self, window, event):
-		window.hide()
+		self._lispDocView = None
+		self._lispWindow = None
 		self._bLispWindowVisible = False
-		return True
+		return False
 
 
 	

@@ -104,17 +104,13 @@ class DTCustomEntry (DTBin):
 
 		self._stateMask = DTDocument.stateValueCoerce( stateMask )
 		self._stateTest = DTDocument.stateValueCoerce( stateTest )
+		
+		self._entryText = entryText
+		self._font = font
 
 		self._custom = self._CustomContainer( self )
-		self._entry = self._Entry( self, entryText, font )
-		self._entry.textInsertedSignal.connect( self._p_onEntryTextInserted )
-		self._entry.textDeletedSignal.connect( self._p_onEntryTextDeleted )
-		self._entry.textModifiedSignal.connect( self._p_onEntryTextModified )
-		self._entry.commitSignal.connect( self._p_onEntryCommit )
-		self._entry.finishSignal.connect( self._p_onEntryFinish )
-		self._entry.backspaceStartSignal.connect( self._p_onEntryBackspaceStart )
-		self._entry.deleteEndSignal.connect( self._p_onEntryDeleteEnd )
-
+		self._entry = None
+		
 		self.setChild( self._custom )
 		
 		self._textAtStart = None
@@ -132,18 +128,25 @@ class DTCustomEntry (DTBin):
 
 
 	def getEntryText(self):
-		return self._entry.text
+		if self._entry is not None:
+			return self._entry.text
+		else:
+			return self._entryText
 
 	def setEntryText(self, text):
-		self._entry.text = text
+		if self._entry is not None:
+			self._entry.text = text
+		else:
+			self._entryText = text
 		
 		
 	def setFont(self, font):
-		self._label.setFont( font )
-		self._entry.setFont( font )
+		self._font = font
+		if self._entry is not None:
+			self._entry.setFont( font )
 
 	def getFont(self):
-		return self._label.getFont()
+		return self._font
 
 
 	def setStateMask(self, stateMask):
@@ -162,6 +165,7 @@ class DTCustomEntry (DTBin):
 	
 	def startEditing(self):
 		if self.getChild() is not self._entry:
+			self._makeEntry()
 			self.setChild( self._entry )
 			self._entry.startEditing()
 			self._textAtStart = self._entry.text
@@ -179,7 +183,7 @@ class DTCustomEntry (DTBin):
 		if self.getChild()  is  self._entry:
 			index = self._entry.getCursorIndexAt( pos )
 		else:
-			index = len( self._entry.text )
+			index = len( self._entryText )
 		self.startEditing()
 		self._entry.setCursorIndex( index )
 
@@ -194,6 +198,7 @@ class DTCustomEntry (DTBin):
 			self._bIgnoreEntryLoseFocus = False
 			self.setChild( self._custom )
 			self._o_emitFinishEditing( self._entry.text, self._entry.text != self._textAtStart, bUserEvent )
+			self._destroyEntry()
 
 	def _o_emitFinishEditing(self, text, bChanged, bUserEvent):
 		self.finishEditingSignal.emit( self, text, bChanged, bUserEvent )
@@ -248,6 +253,7 @@ class DTCustomEntry (DTBin):
 		self._o_emitTextDeleted( start, end, textDeleted )
 
 	def _p_onEntryTextModified(self, entry, text):
+		self._entryText = text
 		self._o_emitTextModified( text )
 
 	def _o_emitTextInserted(self, position, bAppended, textInserted):
@@ -287,28 +293,48 @@ class DTCustomEntry (DTBin):
 
 		
 
+	def _makeEntry(self):
+		self._entry = self._Entry( self, self._entryText, self._font )
+		self._entry.textInsertedSignal.connect( self._p_onEntryTextInserted )
+		self._entry.textDeletedSignal.connect( self._p_onEntryTextDeleted )
+		self._entry.textModifiedSignal.connect( self._p_onEntryTextModified )
+		self._entry.commitSignal.connect( self._p_onEntryCommit )
+		self._entry.finishSignal.connect( self._p_onEntryFinish )
+		self._entry.backspaceStartSignal.connect( self._p_onEntryBackspaceStart )
+		self._entry.deleteEndSignal.connect( self._p_onEntryDeleteEnd )
 
+	def _destroyEntry(self):
+		self._entry.textInsertedSignal.disconnect( self._p_onEntryTextInserted )
+		self._entry.textDeletedSignal.disconnect( self._p_onEntryTextDeleted )
+		self._entry.textModifiedSignal.disconnect( self._p_onEntryTextModified )
+		self._entry.commitSignal.disconnect( self._p_onEntryCommit )
+		self._entry.finishSignal.disconnect( self._p_onEntryFinish )
+		self._entry.backspaceStartSignal.disconnect( self._p_onEntryBackspaceStart )
+		self._entry.deleteEndSignal.disconnect( self._p_onEntryDeleteEnd )
+		self._entry = None
+
+		
 	#
 	# CURSOR ENTITY METHODS
 	#
 
-	def _o_getFirstCursorEntity(self):
-		return self._entry.getFirstCursorEntity()
+#	def _o_getFirstCursorEntity(self):
+#		return self._custom.getFirstCursorEntity()
 	
-	def _o_getLastCursorEntity(self):
-		return self._entry.getLastCursorEntity()
+#	def _o_getLastCursorEntity(self):
+#		return self._custom.getLastCursorEntity()
 
 	
-	def _o_linkChildEntryCursorEntity(self, childEntry):
+#	def _o_linkChildEntryCursorEntity(self, childEntry):
 		# Prevent the DTBin superclass from linking in anything other than the entry
-		pass
+#		pass
 		#prevCursorEntity = self._f_getPrevCursorEntityBeforeChild( childEntry.child )
 		#nextCursorEntity = self._f_getNextCursorEntityAfterChild( childEntry.child )
 		#DTCursorEntity.splice( prevCursorEntity, nextCursorEntity, childEntry.child.getFirstCursorEntity(), childEntry.child.getLastCursorEntity() )
 
-	def _o_unlinkChildEntryCursorEntity(self, childEntry):
+#	def _o_unlinkChildEntryCursorEntity(self, childEntry):
 		# Prevent the DTBin superclass from unlinking in anything other than the entry
-		pass
+#		pass
 		#DTCursorEntity.remove( childEntry.child.getFirstCursorEntity(), childEntry.child.getLastCursorEntity() )
 		
 		

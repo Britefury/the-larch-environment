@@ -31,9 +31,6 @@ if __name__ == '__main__':
 	initGSymEnvironment()
 	
 
-	documentRoot = readSX( '(a b c)' )
-	bEvaluate = False
-	
 	if len( sys.argv ) == 2:
 		filename = sys.argv[1]
 		try:
@@ -42,7 +39,7 @@ if __name__ == '__main__':
 		except IOError:
 			pass
 
-	app = MainApp( documentRoot, bEvaluate )
+	app = MainApp( None )
 
 	gtk.main()
 	
