@@ -312,15 +312,9 @@ class MainApp (object):
 		#
 		# LISP window
 		#
-		self._lispDocView = MainAppDocView( self )
-		self._lispWindow = gtk.Window( gtk.WINDOW_TOPLEVEL )
-		self._lispWindow.set_transient_for( self._window )
-		self._lispWindow.connect( 'delete-event', self._p_onLispWindowDelete )
-		self._lispWindow.set_title( _( 'LISP View Window' ) )
-		self._lispWindow.set_size_request( 640, 480 )
-		self._lispWindow.add( self._lispDocView.getGtkWidget() )
+		self._lispDocView = None
+		self._lispWindow = None
 		self._bLispWindowVisible = False
-		self._lispView = None
 
 		
 		# Set the document
@@ -713,7 +707,6 @@ class MainApp (object):
 			self._lispWindow.set_size_request( 640, 480 )
 			self._lispWindow.add( self._lispDocView.getGtkWidget() )
 			self._bLispWindowVisible = False
-			self._lispView = None
 			self._lispWindow.show()
 			self._setLispDocument()
 		else:
