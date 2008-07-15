@@ -17,5 +17,5 @@ literalFormatStyle = GSymStyleSheet( colour=Colour3f( 0.0, 0.0, 0.5 ), font='San
 punctuationStyle = GSymStyleSheet( colour=Colour3f( 0.0, 0.0, 1.0 ), font='Sans 11' )
 operatorStyle = GSymStyleSheet( colour=Colour3f( 0.0, 0.5, 0.0 ), font='Sans 11' )
 keywordStyle = GSymStyleSheet( colour=Colour3f( 0.25, 0.0, 0.5 ), font='Sans 11' )
-lineEditorStyle = GSymStyleSheet( highlightBackgroundColour=Colour3f( 0.95, 0.95, 1.0 ) )
+lineEditorStyle = GSymStyleSheet( highlightBackgroundColour=Colour3f( 0.85, 0.85, 1.0 ) )
 commentStyle = GSymStyleSheet( colour=Colour3f( 0.4, 0.4, 0.4 ), font='Sans 11' )

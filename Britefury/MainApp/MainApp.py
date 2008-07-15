@@ -106,7 +106,13 @@ class MainAppDocView (object):
 
 	def __queueRefresh(self):
 		queueEvent( self.__refreshView )
+		
+		
+	def reset(self):
+		self._doc.reset()
 			
+	def oneToOne(self):
+		self._doc.oneToOne()
 	
 		
 
@@ -451,10 +457,14 @@ class MainApp (object):
 
 
 	def _p_onReset(self, widget):
-		self._doc.reset()
+		self._docView.reset()
+		if self._lispDocView is not None:
+			self._lispDocView.reset()
 
 	def _p_onOneToOne(self, widget):
-		self._doc.oneToOne()
+		self._docView.oneToOne()
+		if self._lispDocView is not None:
+			self._lispDocView.oneToOne()
 
 
 

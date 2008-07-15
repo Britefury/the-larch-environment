@@ -354,11 +354,13 @@ class DTBox (DTContainerSequence):
 		else:
 			for entry in self._childEntries:
 				if entry.alignment == self._ALIGN_TOPLEFT:
-					self._o_allocateChildX( entry.child, 0.0, entry._reqWidth )
+					self._o_allocateChildX( entry.child, 0.0, min( entry._reqWidth, allocation ) )
 				elif entry.alignment == self.ALIGN_CENTRE:
-					self._o_allocateChildX( entry.child, ( allocation - entry._reqWidth )  *  0.5, entry._reqWidth )
+					childAlloc = min( entry._reqWidth, allocation )
+					self._o_allocateChildX( entry.child, ( allocation - childAlloc )  *  0.5, childAlloc )
 				elif entry.alignment == self._ALIGN_BOTTOMRIGHT:
-					self._o_allocateChildX( entry.child, allocation - entry._reqWidth, entry._reqWidth )
+					childAlloc = min( entry._reqWidth, allocation )
+					self._o_allocateChildX( entry.child, allocation - childAlloc, childAlloc )
 				elif entry.alignment == self.ALIGN_EXPAND:
 					self._o_allocateChildX( entry.child, 0.0, allocation )
 
