@@ -102,12 +102,12 @@ class DTFlow (DTContainerSequence):
 		if len( self._childEntries ) > 0:
 			spacing = self._spacing  *  ( len( self._childEntries ) - 1 )
 		return requisition + spacing
-
-	def _o_getRequiredHeightAndBaseline(self):
+	
+	def __getLineRequiredHeightAndBaselines(self, line):
 		aboveBaseline = 0.0
 		baseline = None
 		height = 0.0
-		for entry in self._childEntries:
+		for entry in line:
 			req, bas = entry.child._f_getRequisitionHeightAndBaseline()
 			entry._baseline = bas
 			height = max( height, req )
@@ -122,6 +122,15 @@ class DTFlow (DTContainerSequence):
 			requisition = height
 		return requisition, baseline
 
+	def _o_getRequiredHeightAndBaseline(self):
+		requisition, baseline = self.__getLineRequiredHeightAndBaselines( self._lines[0] )
+		for line in self._lines[1:]:
+			lineReq, lineBas = self.__getLineRequiredHeightAndBaselines( line )
+			requisition += lineReq
+			if baseline is not None:
+				baseline += lineReq
+		return requisition, baseline
+
 
 	def _o_onAllocateX(self, allocation):
 		x = 0.0
@@ -129,10 +138,11 @@ class DTFlow (DTContainerSequence):
 		currentLine = []
 		bFirstChildInLine = True
 		bFirstLine = True
+		indentation = 0.0
 		for entry in self._childEntries:
-			childWidth = entry._reqWidth
+			childWidth = min( entry._reqWidth, allocation )
 
-			childRight = x + childWidth
+			childRight = x + childWidth + entry.padding * 2.0
 			if childRight > allocation:
 				if bFirstChildInLine:
 					# First child in this line takes up whole line
@@ -145,7 +155,8 @@ class DTFlow (DTContainerSequence):
 					else:
 						x = self._indentation
 					# Allocate
-					self._o_allocateChildX( entry.child, x + entry.padding, childWidth )
+					childAlloc = min( childWidth, allocation - ( x + entry.padding*2.0 ) )
+					self._o_allocateChildX( entry.child, x + entry.padding, childAlloc )
 					
 					# Start a new line
 					# Nothing in the current line
@@ -173,20 +184,25 @@ class DTFlow (DTContainerSequence):
 					bFirstChildInLine = False
 					
 					# Allocate
-					self._o_allocateChildX( entry.child, x, childWidth )
+					childAlloc = min( childWidth, allocation - ( x + entry.padding*2.0 ) )
+					self._o_allocateChildX( entry.child, x + entry.padding, childAlloc )
 					
 					# Move @x on
 					x += childWidth + self._spacing
+
+				# Get the indentation
+				indentation = self._indentation
 			else:
 				# Continue existing line
 				
 				# Allocate
-				self._o_allocateChildX( entry.child, x, childWidth )
+				childAlloc = min( childWidth, allocation - ( x + entry.padding*2.0 ) )
+				self._o_allocateChildX( entry.child, x + entry.padding, childWidth )
 
 				# Add @entry to the current line
 				currentLine.append( entry )
 				# Move @x on
-				x += childWidth + self._spacing
+				x += childWidth + self._spacing + entry.padding * 2.0
 				# Next child will not be the first child in this line
 				bFirstChildInLine = False
 				
@@ -245,6 +261,7 @@ if __name__ == '__main__':
 
 
 	from Britefury.DocPresent.Toolkit.DTLabel import DTLabel
+	from Britefury.DocPresent.Toolkit.DTBox import DTBox
 	from Britefury.DocPresent.Toolkit.DTDocument import DTDocument
 	import cairo
 	from Britefury.Math.Math import Colour3f
@@ -298,12 +315,37 @@ if __name__ == '__main__':
 
 	labels = [ MyLabel( text )   for text in labelTexts ]
 
-	line = DTFlow( indentation=30.0 )
+	flowLine = DTFlow( indentation=30.0 )
 	for label in labels:
-		line.append( label )
-	line.spacing = 5.0
+		flowLine.append( label )
+	flowLine.spacing = 5.0
+	
+	
 
-	doc.child = line
+	def makeRecursiveFlow(level):
+		f = DTFlow( indentation=30.0 )
+		if level == 0:
+			for i in xrange( 0, 10 ):
+				f.append( DTLabel( '%d' % i ) )
+		else:
+			for i in [ 'a', 'b', 'c' ]:
+				f.append( DTLabel( '%s%d' % ( i*10, level ) ) )
+			f.append( DTLabel( '(' ) )
+			f.append( makeRecursiveFlow( level - 1 ) )
+			f.append( DTLabel( ')' ) )
+		return f
+	
+	
+	rflow = makeRecursiveFlow( 4 )
+
+	contentsBox = DTBox( direction=DTBox.TOP_TO_BOTTOM, alignment=DTBox.ALIGN_LEFT )
+	contentsBox[:] = [ flowLine, rflow ]
+	#contentsBox[:] = [ flowLine ]
+	#contentsBox[:] = [ rflow ]
+	
+	
+
+	doc.child = contentsBox
 
 
 	textButton = makeButton( 'Change text', onChangeText )
