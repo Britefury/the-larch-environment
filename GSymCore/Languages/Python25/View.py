@@ -516,7 +516,7 @@ class Python25View (GSymView):
 				state )
 
 	def dictLiteral(self, state, node, *xs):
-		xViews = mapViewEval( xs, None, Parser.keyValuePair )
+		xViews = mapViewEval( xs, None, python25ViewState( Parser.keyValuePair ) )
 		return nodeEditor( node,
 				   listView( FlowListViewLayout( 10.0, 5.0 ), '{', '}', ',', xViews ),
 				   UnparsedText( '{ '  +  UnparsedText( ', ' ).join( [ x.text   for x in xViews ] )  +  ' }', PRECEDENCE_DICTLITERAL ),

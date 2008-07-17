@@ -13,63 +13,9 @@ from copy import copy
 
 
 
-_blockedSlots = set()
-_slotsToIncomingSignals = {}
-_signalToData = {}
-_signalToConnectionListener = {}
-
-
-
-
-def blockSlot(func):
-	"Block the slot function @func"
-	global _blockedSlots
-	if func not in _blockedSlots:
-		_blockedSlots.add( func )
-		try:
-			incomingSignals = _slotsToIncomingSignals[func]
-		except KeyError:
-			pass
-		else:
-			for x in incomingSignals:
-				x._p_slotBlocked( func )
-
-def unblockSlot(func):
-	"Unblock the slot function @func"
-	global _blockedSlots
-	if func in _blockedSlots:
-		_blockedSlots.remove( func )
-		try:
-			incomingSignals = _slotsToIncomingSignals[func]
-		except KeyError:
-			pass
-		else:
-			for x in incomingSignals:
-				x._p_slotUnblocked( func )
-
-
-def getSignalsConnectedToSlot(func):
-	"Get all signals that are connected to @func"
-	try:
-		return _slotsToIncomingSignals[func]
-	except KeyError:
-		return set()
-
-
-def disconnectAllIncomingSignals(func):
-	"Disconnect all signals that are connected to @func"
-	try:
-		incomingSignals = _slotsToIncomingSignals[func]
-	except KeyError:
-		pass
-	else:
-		for x in copy( incomingSignals ):
-			x.disconnect( func )
-
-
-
-
 class _ConnectionListNode (object):
+	__slots__ = [ 'func', 'active', 'prev', 'next' ]
+
 	def __init__(self, func):
 		super( _ConnectionListNode, self ).__init__()
 		self.func = func
@@ -81,6 +27,8 @@ class _ConnectionListNode (object):
 
 
 class _ConnectionList (object):
+	__slots__ = [ 'head', 'tail' ]
+
 	def __init__(self):
 		super( _ConnectionList, self ).__init__()
 		self.head = None
@@ -122,12 +70,14 @@ class _ConnectionList (object):
 
 class Signal (object):
 	"Signal class"
+	
+	__slots__ = [ '__weakref__', '_connectionListener', '__doc__', '_connections', '_funcToConnection', '_unblockedConnections', '_numSlots' ]
 
 	def __init__(self, doc=''):
 		"Constructor"
 		super( Signal, self ).__init__()
 		self._connectionListener = None
-		self.__doc__ = doc
+		#self.__doc__ = doc
 
 
 
@@ -137,14 +87,12 @@ class Signal (object):
 			self._funcToConnection = {}
 			self._unblockedConnections = _ConnectionList()
 			self._numSlots = 0
-			self._numBlockedSlots = 0
 
 	def _p_deinit(self):
 		del self._connections
 		del self._funcToConnection
 		del self._unblockedConnections
 		del self._numSlots
-		del self._numBlockedSlots
 
 
 
@@ -152,7 +100,7 @@ class Signal (object):
 		"Connect the signal to the function @func"
 		self._p_init()
 
-		if self._p_getConnection( func ) is None:
+		if self._funcToConnection.get( func ) is None:
 			# Create the connection object
 			connection = _ConnectionListNode( func )
 
@@ -161,28 +109,8 @@ class Signal (object):
 			self._funcToConnection[func] = connection
 
 
-			# Add @self to the list of incoming signals associated with @func
-			try:
-				incomingSignals = _slotsToIncomingSignals[func]
-			except KeyError:
-				incomingSignals = set()
-				_slotsToIncomingSignals[func] = incomingSignals
-			incomingSignals.add( self )
-
-			# Handle slot blocking
-			bSignalBlocked = self._numBlockedSlots == self._numSlots
-			bSlotBlocked = func in _blockedSlots
-
-
 			self._numSlots += 1
-
-			if bSlotBlocked:
-				self._numBlockedSlots += 1
-			else:
-				self._unblockedConnections.append( connection )
-
-			if bSignalBlocked and not bSlotBlocked:
-				self._p_unblockEmit()
+			self._unblockedConnections.append( connection )
 
 
 			if len( self._connections ) == 1:
@@ -197,7 +125,7 @@ class Signal (object):
 		"Disconnect the signal from the function @func"
 		if hasattr( self, '_connections' ):
 			# Get the connection
-			connection = self._p_getConnection( func )
+			connection = self._funcToConnection.get( func )
 
 			if connection is not None:
 				# Deactivate the connection, so it will be skipped by any emissions currently taking place
@@ -208,27 +136,8 @@ class Signal (object):
 				del self._funcToConnection[func]
 
 
-				# Remove @self from the list of incoming signals associated with @func
-				try:
-					incomingSignals = _slotsToIncomingSignals[func]
-					incomingSignals.remove( self )
-				except KeyError:
-					pass
-
-				# Handle slot blocking
-				bSlotBlocked = func in _blockedSlots
-
-
 				self._numSlots -= 1
-
-				if bSlotBlocked:
-					self._numBlockedSlots -= 1
-				else:
-					self._unblockedConnections.remove( connection )
-
-				bSignalBlocked = self._numBlockedSlots == self._numSlots
-				if bSignalBlocked and not bSlotBlocked:
-					self._p_blockEmit()
+				self._unblockedConnections.remove( connection )
 
 				if len( self._connections ) == 0:
 					if self._connectionListener is not None:
@@ -247,20 +156,10 @@ class Signal (object):
 					# Deactivate the connection
 					connection.active = False
 
-					# Remove @self from incoming signals
-					try:
-						incomingSignals = _slotsToIncomingSignals[connection.func]
-						incomingSignals.remove( self )
-					except KeyError:
-						pass
-
 				self._connections = []
 				self._funcToConnection = {}
 
-				# Unblock emit
-				self._p_unblockEmit()
-
-				self._numSlots = self._numBlockedSlots = 0
+				self._numSlots = 0
 
 
 				if self._connectionListener is not None:
@@ -291,64 +190,15 @@ class Signal (object):
 
 
 
-	def _p_getConnection(self, func):
-		"Private - get the connection object from @self that corresponds to @func"
-		try:
-			return self._funcToConnection[func]
-		except KeyError:
-			return None
-
-
-
-
-	def _p_slotBlocked(self, func):
-		"Private - notify a signal that one of its connected slots has been blocked"
-		connection = self._p_getConnection( func )
-		assert connection is not None, 'could not get connection for @func'
-		self._unblockedConnections.remove( connection )
-
-		self._numBlockedSlots = self._numBlockedSlots + 1
-		if self._numBlockedSlots == self._numSlots:
-			self._p_blockEmit()
-
-
-
-	def _p_slotUnblocked(self, func):
-		"Private - notify a signal that one of its connected slots has been unblocked"
-		connection = self._p_getConnection( func )
-		assert connection is not None, 'could not get connection for @func'
-		self._unblockedConnections.append( connection )
-
-		if self._numBlockedSlots == self._numSlots:
-			self._p_unblockEmit()
-		self._numBlockedSlots = self._numBlockedSlots - 1
-
-
-
-
-	def _p_blockEmit(self):
-		"Private - block the emission method"
-		blockSlot( self.emit )
-
-
-
-	def _p_unblockEmit(self):
-		"Private - unblock the emission method"
-		unblockSlot( self.emit )
-
-
-
-
 	def emit(self, *args, **kwargs):
 		"Emit"
 		if hasattr( self, '_connections' ):
-			if self._numBlockedSlots < self._numSlots:
-				connection = self._unblockedConnections.head
-				while connection is not None:
-					if connection.active:
-						connection.func( *args, **kwargs )
+			connection = self._unblockedConnections.head
+			while connection is not None:
+				if connection.active:
+					connection.func( *args, **kwargs )
 
-					connection = connection.next
+				connection = connection.next
 
 
 
@@ -374,6 +224,8 @@ class Signal (object):
 
 
 class _InstanceSignal (Signal):
+	__slots__ = [ '_refCount', '_classSignal', '_instance' ]
+	
 	def __init__(self, classSignal, instance, doc=''):
 		super( _InstanceSignal, self ).__init__( doc )
 		self._refCount = 0
@@ -396,6 +248,7 @@ class _InstanceSignal (Signal):
 
 
 class ClassSignal (object):
+	__slots__ = [ '_instanceSignals', '_instanceSignalSet', '__doc__' ]
 	def __init__(self, doc=''):
 		super( ClassSignal, self ).__init__()
 		self._instanceSignals = weakref.WeakValueDictionary()
@@ -407,11 +260,12 @@ class ClassSignal (object):
 		if instance is None:
 			return self
 		else:
+			key = id( instance )
 			try:
-				instanceSignal = self._instanceSignals[instance]
+				instanceSignal = self._instanceSignals[key]
 			except KeyError:
 				instanceSignal = _InstanceSignal( self, instance, self.__doc__ )
-				self._instanceSignals[instance] = instanceSignal
+				self._instanceSignals[key] = instanceSignal
 			return instanceSignal
 
 	def __set__(self, instance, value):

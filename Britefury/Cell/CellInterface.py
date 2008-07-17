@@ -12,7 +12,7 @@ Define CellInterface and CellOwner
 
 import weakref
 
-from Britefury.Util.SignalSlot import ClassSignal
+from Britefury.Util.SignalSlot import ClassSignal, Signal
 
 from Britefury.Kernel.Mutability import *
 
@@ -81,14 +81,14 @@ class CellInterface (object):
 	REFRESHSTATE_REFRESH_NOT_REQUIRED = 2
 	
 	
-	__slots__ = [ '__weakref__', '_refreshState', '_dependents' ]
+	__slots__ = [ '__weakref__', '_refreshState', '_dependents', 'changedSignal', 'evaluatorSignal', 'validitySignal' ]
 
 	_cellDependencies = None
 
 
-	changedSignal = ClassSignal()
-	evaluatorSignal = ClassSignal()
-	validitySignal = ClassSignal()
+	#changedSignal = ClassSignal()
+	#evaluatorSignal = ClassSignal()
+	#validitySignal = ClassSignal()
 
 
 	def __init__(self):
@@ -96,6 +96,9 @@ class CellInterface (object):
 
 		self._refreshState = self.REFRESHSTATE_UNINITIALISED
 		self._dependents = weakref.WeakKeyDictionary()
+		self.changedSignal = Signal()
+		self.evaluatorSignal = Signal()
+		self.validitySignal = Signal()
 
 
 
