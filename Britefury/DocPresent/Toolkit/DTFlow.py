@@ -123,13 +123,16 @@ class DTFlow (DTContainerSequence):
 		return requisition, baseline
 
 	def _o_getRequiredHeightAndBaseline(self):
-		requisition, baseline = self.__getLineRequiredHeightAndBaselines( self._lines[0] )
-		for line in self._lines[1:]:
-			lineReq, lineBas = self.__getLineRequiredHeightAndBaselines( line )
-			requisition += lineReq
-			if baseline is not None:
-				baseline += lineReq
-		return requisition, baseline
+		if len( self._lines ) > 0:
+			requisition, baseline = self.__getLineRequiredHeightAndBaselines( self._lines[0] )
+			for line in self._lines[1:]:
+				lineReq, lineBas = self.__getLineRequiredHeightAndBaselines( line )
+				requisition += lineReq
+				if baseline is not None:
+					baseline += lineReq
+			return requisition, baseline
+		else:
+			return 0.0, None
 
 
 	def _o_onAllocateX(self, allocation):

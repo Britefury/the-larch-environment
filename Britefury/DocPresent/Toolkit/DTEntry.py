@@ -87,19 +87,35 @@ class _EntryTextSizeAllocator (object):
 		
 			
 
+				
+				
+class DTEntryListener (object):
+	def onEntryCommit(self, entry):
+		pass
+	
+	def onEntryFinish(self, entry):
+		pass
+		  
+	def onBackstaceStart(self, entry):
+		pass
+	
+	def onDeleteEnd(self, entry):
+		pass
+	
+	def onTextInserted(self, entry, position, bAppended, textInserted):
+		pass
+	
+	def onTextDelete(self, entry, startIndex, endIndex, textDeleted):
+		pass
+	
+	def onTextModified(self, entry, text):
+		pass
+	
+				
 			
 			
 
 class DTEntry (DTWidget):
-	commitSignal = ClassSignal()       				# ( entry )		- Enter pressed; contents committed
-	finishSignal = ClassSignal()					# ( entry )		- finishEditing() called
-	backspaceStartSignal = ClassSignal()				# ( entry )		- backspace pressed when cursor at start
-	deleteEndSignal = ClassSignal()					# ( entry )		- delete pressed when cursor at end
-	textInsertedSignal = ClassSignal()				# ( entry, position, bAppended, textInserted )
-	textDeletedSignal = ClassSignal()				# ( entry, startIndex, endIndex, textDeleted )
-	textModifiedSignal = ClassSignal()				# ( entry, text )
-
-
 	def __init__(self, text='', font=None, borderWidth=1.0, backgroundColour=Colour3f( 1.0, 1.0, 1.0 ), highlightedBackgroundColour=Colour3f( 0.0, 0.0, 0.5 ), textColour=Colour3f( 0.0, 0.0, 0.0 ), highlightedTextColour=Colour3f( 1.0, 1.0, 1.0 ), borderColour=Colour3f( 0.7, 0.85, 0.7 ), autoCompleteList=None):
 		super( DTEntry, self ).__init__()
 
@@ -110,6 +126,9 @@ class DTEntry (DTWidget):
 		self.bEditable = True
 		
 		
+		self.listener = None
+		
+
 		self._text = text
 		
 		self._borderWidth = borderWidth
@@ -353,7 +372,8 @@ class DTEntry (DTWidget):
 			# remove from list
 			del self._cursorEntities[start:end]
 			self._cursorIndex = start
-			self.textDeletedSignal.emit( self, start, end, textDeleted )
+			if self.listener is not None:
+				self.listener.onEntryTextDeleted( self, start, end, textDeleted )
 		self._p_setSelectionBounds( None )
 
 
@@ -396,10 +416,12 @@ class DTEntry (DTWidget):
 		self._p_setText( text )
 		self._p_setSelectionBounds( None )
 		self._p_rebuildCursorEntityList()
-		self.textDeletedSignal.emit( self, 0, len( deletedText ), deletedText )
+		if self.listener is not None:
+			self.listener.onEntryTextDeleted( self, 0, len( deletedText ), deletedText )
 		self._cursorIndex = len( self._text )
-		self.textInsertedSignal.emit( self, 0, True, text )
-		self.textModifiedSignal.emit( self, self.getText() )
+		if self.listener is not None:
+			self.listener.onEntryTextInserted( self, 0, True, text )
+			self.listener.onEntryTextModified( self, self.getText() )
 		self._p_onTextModified()
 
 
@@ -445,7 +467,8 @@ class DTEntry (DTWidget):
 
 		modKeys = event.state & _modKeysMask
 		if event.keyVal == gtk.keysyms.Return:
-			self.commitSignal.emit( self )
+			if self.listener is not None:
+				self.listener.onEntryCommit( self )
 			self.ungrabFocus()
 			bHandled = True
 		elif event.keyVal == gtk.keysyms.BackSpace  and  self.bEditable:
@@ -458,12 +481,14 @@ class DTEntry (DTWidget):
 				textDeleted = self._text[self._cursorIndex-1:self._cursorIndex]
 				self._p_setText( self._text[:self._cursorIndex-1] + self._text[self._cursorIndex:] )
 				self._cursorIndex -= 1
-				self.textDeletedSignal.emit( self, self._cursorIndex, self._cursorIndex+1, textDeleted )
-				self.textModifiedSignal.emit( self, self.getText() )
+				if self.listener is not None:
+					self.listener.onEntryTextDeleted( self, self._cursorIndex, self._cursorIndex+1, textDeleted )
+					self.listener.onEntryTextModified( self, self.getText() )
 				self._p_onTextModified()
 			else:
 				# Send backspace start signal
-				self.backspaceStartSignal.emit( self )
+				if self.listener is not None:
+					self.listener.onEntryBackspaceStart( self )
 			bHandled = True
 		elif event.keyVal == gtk.keysyms.Delete  and  self.bEditable:
 			text = self._text
@@ -475,12 +500,14 @@ class DTEntry (DTWidget):
 				del self._cursorEntities[self._cursorIndex]
 				textDeleted = self._text[self._cursorIndex:self._cursorIndex+1]
 				self._p_setText( self._text[:self._cursorIndex] + self._text[self._cursorIndex+1:] )
-				self.textDeletedSignal.emit( self, self._cursorIndex, self._cursorIndex+1, textDeleted )
-				self.textModifiedSignal.emit( self, self.getText() )
+				if self.listener is not None:
+					self.listener.onEntryTextDeleted( self, self._cursorIndex, self._cursorIndex+1, textDeleted )
+					self.listener.onEntryTextModified( self, self.getText() )
 				self._p_onTextModified()
 			else:
 				# Send delete end signal
-				self.deleteEndSignal.emit( self )
+				if self.listener is not None:
+					self.listener.onEntryDeleteEnd( self )
 			bHandled = True
 		elif event.keyString != ''  and  ( modKeys == 0  or  modKeys == gtk.gdk.SHIFT_MASK )  and  self.bEditable:
 			if self._selectionBounds is not None:
@@ -511,8 +538,9 @@ class DTEntry (DTWidget):
 			self._p_setText( self._text[:self._cursorIndex] + event.keyString + self._text[self._cursorIndex:] )
 			self._cursorIndex += len( event.keyString )
 
-			self.textInsertedSignal.emit( self, position, bAppended, event.keyString )
-			self.textModifiedSignal.emit( self, self.getText() )
+			if self.listener is not None:
+				self.listener.onEntryTextInserted( self, position, bAppended, event.keyString )
+				self.listener.onEntryTextModified( self, self.getText() )
 			self._p_onTextModified()
 			bHandled = True
 
@@ -755,7 +783,8 @@ class DTEntry (DTWidget):
 		self.setCursorIndex( index )
 		
 	def finishEditing(self):
-		self.finishSignal.emit( self )
+		if self.listener is not None:
+			self.listener.onEntryFinish( self )
 		self.ungrabFocus()
 
 	

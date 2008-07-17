@@ -17,5 +17,7 @@ def isValueImmutable(value):
 
 registerImmutableValueType( bool )
 registerImmutableValueType( int )
+registerImmutableValueType( long )
 registerImmutableValueType( float )
 registerImmutableValueType( str )
+registerImmutableValueType( unicode )

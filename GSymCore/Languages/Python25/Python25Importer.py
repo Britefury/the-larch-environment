@@ -124,7 +124,7 @@ class _ExprImporter (_Importer):
 			else:
 				return [ 'add', [ 'floatLiteral', repr( node.value.real ) ], [ 'imaginaryLiteral', repr( node.value.imag ) + 'j' ] ]
 		elif node.value is None:
-			return None
+			return [ 'var', 'None' ]
 		else:
 			print 'Const: could not handle value', node.value
 			raise ValueError

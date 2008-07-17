@@ -12,14 +12,14 @@ import traceback
 from Britefury.Math.Math import Colour3f
 
 from Britefury.DocPresent.Toolkit.DTBin import DTBin
-from Britefury.DocPresent.Toolkit.DTEntry import DTEntry
+from Britefury.DocPresent.Toolkit.DTEntry import DTEntry, DTEntryListener
 from Britefury.DocPresent.Toolkit.DTDocument import DTDocument
 from Britefury.DocPresent.Toolkit.DTWidget import DTWidget
 
 
 
 
-class DTCustomEntry (DTBin):
+class DTCustomEntry (DTBin, DTEntryListener):
 	textInsertedSignal = ClassSignal()				# ( entry, position, bAppended, textInserted )
 	textDeletedSignal = ClassSignal()				# ( entry, startIndex, endIndex, textDeleted )
 	textModifiedSignal = ClassSignal()				# ( entry, text )
@@ -246,13 +246,13 @@ class DTCustomEntry (DTBin):
 		self._entry.moveCursorToEnd()
 
 
-	def _p_onEntryTextInserted(self, entry, position, bAppended, textInserted):
+	def onEntryTextInserted(self, entry, position, bAppended, textInserted):
 		self._o_emitTextInserted( position, bAppended, textInserted )
 
-	def _p_onEntryTextDeleted(self, entry, start, end, textDeleted):
+	def onEntryTextDeleted(self, entry, start, end, textDeleted):
 		self._o_emitTextDeleted( start, end, textDeleted )
 
-	def _p_onEntryTextModified(self, entry, text):
+	def onEntryTextModified(self, entry, text):
 		self._entryText = text
 		self._o_emitTextModified( text )
 
@@ -265,16 +265,16 @@ class DTCustomEntry (DTBin):
 	def _o_emitTextModified(self, text):
 		self.textModifiedSignal.emit( self, text )
 
-	def _p_onEntryCommit(self, entry):
+	def onEntryCommit(self, entry):
 		self._p_finishEditing( True )
 
-	def _p_onEntryFinish(self, entry):
+	def onEntryFinish(self, entry):
 		self._p_finishEditing( False )
 
-	def _p_onEntryBackspaceStart(self, entry):
+	def onEntryBackspaceStart(self, entry):
 		self.backspaceStartSignal.emit( self )
 
-	def _p_onEntryDeleteEnd(self, entry):
+	def onEntryDeleteEnd(self, entry):
 		self.deleteEndSignal.emit( self )
 
 	def _p_onEntryLoseFocus(self):
@@ -295,22 +295,10 @@ class DTCustomEntry (DTBin):
 
 	def _makeEntry(self):
 		self._entry = self._Entry( self, self._entryText, self._font )
-		self._entry.textInsertedSignal.connect( self._p_onEntryTextInserted )
-		self._entry.textDeletedSignal.connect( self._p_onEntryTextDeleted )
-		self._entry.textModifiedSignal.connect( self._p_onEntryTextModified )
-		self._entry.commitSignal.connect( self._p_onEntryCommit )
-		self._entry.finishSignal.connect( self._p_onEntryFinish )
-		self._entry.backspaceStartSignal.connect( self._p_onEntryBackspaceStart )
-		self._entry.deleteEndSignal.connect( self._p_onEntryDeleteEnd )
+		self._entry.listener = self
 
 	def _destroyEntry(self):
-		self._entry.textInsertedSignal.disconnect( self._p_onEntryTextInserted )
-		self._entry.textDeletedSignal.disconnect( self._p_onEntryTextDeleted )
-		self._entry.textModifiedSignal.disconnect( self._p_onEntryTextModified )
-		self._entry.commitSignal.disconnect( self._p_onEntryCommit )
-		self._entry.finishSignal.disconnect( self._p_onEntryFinish )
-		self._entry.backspaceStartSignal.disconnect( self._p_onEntryBackspaceStart )
-		self._entry.deleteEndSignal.disconnect( self._p_onEntryDeleteEnd )
+		self._entry.listener = None
 		self._entry = None
 
 		
