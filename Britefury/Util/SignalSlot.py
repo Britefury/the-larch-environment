@@ -37,10 +37,10 @@ class _ConnectionList (object):
 
 	def append(self, node):
 		"Append connection node to the list"
-		if self.head == None:
+		if self.head is None:
 			self.head = node
 
-		if self.tail != None:
+		if self.tail is not None:
 			self.tail.next = node
 
 		node.prev = self.tail
@@ -49,10 +49,10 @@ class _ConnectionList (object):
 
 	def remove(self, node):
 		"Remove connection node from the list"
-		if node.prev != None:
+		if node.prev is not None:
 			node.prev.next = node.next
 
-		if node.next != None:
+		if node.next is not None:
 			node.next.prev = node.prev
 
 		if self.head == node:
@@ -63,6 +63,20 @@ class _ConnectionList (object):
 
 	def clear(self):
 		self.head = self.tail = None
+		
+		
+	def isEmpty(self):
+		return self.head is None
+	
+	def hasOneElement(self):
+		return self.head is not None   and   self.tail is self.head
+	
+	
+	def __iter__(self):
+		x = self.head
+		while x is not None:
+			yield x
+			x = x.next
 
 
 
@@ -71,53 +85,44 @@ class _ConnectionList (object):
 class Signal (object):
 	"Signal class"
 	
-	__slots__ = [ '__weakref__', '_connectionListener', '__doc__', '_connections', '_funcToConnection', '_unblockedConnections', '_numSlots' ]
+	__slots__ = [ '__weakref__', '_connectionListener', '_funcToConnection', '_connections' ]
 
-	def __init__(self, doc=''):
+	def __init__(self):
 		"Constructor"
 		super( Signal, self ).__init__()
 		self._connectionListener = None
-		#self.__doc__ = doc
 
 
 
-	def _p_init(self):
+	def __init(self):
 		if not hasattr( self, '_connections' ):
-			self._connections = []
 			self._funcToConnection = {}
-			self._unblockedConnections = _ConnectionList()
-			self._numSlots = 0
+			self._connections = _ConnectionList()
 
-	def _p_deinit(self):
-		del self._connections
+	def __deinit(self):
 		del self._funcToConnection
-		del self._unblockedConnections
-		del self._numSlots
+		del self._connections
 
 
 
 	def connect(self, func):
 		"Connect the signal to the function @func"
-		self._p_init()
+		self.__init()
 
-		if self._funcToConnection.get( func ) is None:
+		if func not in self._funcToConnection:
 			# Create the connection object
 			connection = _ConnectionListNode( func )
 
 			# Add to the connection list
-			self._connections.append( connection )
 			self._funcToConnection[func] = connection
+			self._connections.append( connection )
 
 
-			self._numSlots += 1
-			self._unblockedConnections.append( connection )
-
-
-			if len( self._connections ) == 1:
+			if self._connections.hasOneElement():
 				# Had 0 connections before adding this one
 				if self._connectionListener is not None:
 					self._connectionListener( self )
-				self._o_ref()
+				self._ref()
 
 
 
@@ -129,43 +134,36 @@ class Signal (object):
 
 			if connection is not None:
 				# Deactivate the connection, so it will be skipped by any emissions currently taking place
-				connection.active = False;
+				connection.active = False
 
 				# Remove from the connection list
-				self._connections.remove( connection )
 				del self._funcToConnection[func]
+				self._connections.remove( connection )
 
-
-				self._numSlots -= 1
-				self._unblockedConnections.remove( connection )
-
-				if len( self._connections ) == 0:
+				if self._connections.isEmpty():
 					if self._connectionListener is not None:
 						self._connectionListener( self )
-					self._p_deinit()
-					self._o_unref()
+					self.__deinit()
+					self._unref()
 
 
 	def disconnectAll(self):
 		"Disconnect the signal from all slots"
 		if hasattr( self, '_connections' ):
-			bHadConnections = len( self._connections ) > 0
+			bHadConnections = not self._connections.isEmpty()
 
 			if bHadConnections:
+				# Deactivate all connections
 				for connection in self._connections:
-					# Deactivate the connection
 					connection.active = False
 
-				self._connections = []
 				self._funcToConnection = {}
-
-				self._numSlots = 0
 
 
 				if self._connectionListener is not None:
 					self._connectionListener( self )
-				self._o_unref()
-				self._p_deinit()
+				self.__deinit()
+				self._unref()
 
 
 
@@ -173,7 +171,7 @@ class Signal (object):
 	def hasConnections(self):
 		"Determine if the signal has any outgoing connections"
 		if hasattr( self, '_connections' ):
-			return len( self._connections ) > 0
+			return not self._connections.isEmpty()
 		else:
 			return 0
 
@@ -182,9 +180,9 @@ class Signal (object):
 	def setConnectionListener(self, listener):
 		"Add a connection listener"
 		if listener is not None  and  self._connectionListener is None:
-			self._o_ref()
+			self._ref()
 		elif listener is None  and  self._connectionListener is not None:
-			self._o_unref()
+			self._unref()
 		self._connectionListener = listener
 
 
@@ -193,7 +191,7 @@ class Signal (object):
 	def emit(self, *args, **kwargs):
 		"Emit"
 		if hasattr( self, '_connections' ):
-			connection = self._unblockedConnections.head
+			connection = self._connections.head
 			while connection is not None:
 				if connection.active:
 					connection.func( *args, **kwargs )
@@ -214,10 +212,10 @@ class Signal (object):
 
 
 
-	def _o_ref(self):
+	def _ref(self):
 		pass
 
-	def _o_unref(self):
+	def _unref(self):
 		pass
 
 
@@ -232,12 +230,12 @@ class _InstanceSignal (Signal):
 		self._classSignal = classSignal
 		self._instance = instance
 
-	def _o_ref(self):
+	def _ref(self):
 		if self._refCount == 0:
 			self._classSignal._instanceSignalSet.add( self )
 		self._refCount += 1
 
-	def _o_unref(self):
+	def _unref(self):
 		self._refCount -= 1
 		if self._refCount == 0:
 			self._classSignal._instanceSignalSet.remove( self )
@@ -305,16 +303,6 @@ class DummySignal (object):
 
 
 
-	def _p_slotBlocked(self, func):
-		"Private - notify a signal that one of its connected slots has been blocked"
-		pass
-
-
-	def _p_slotUnblocked(self, func):
-		"Private - notify a signal that one of its connected slots has been unblocked"
-		pass
-
-
 	def chainConnect(self, sig):
 		"Chain connect to signal @sig"
 		pass
@@ -327,180 +315,105 @@ class DummySignal (object):
 
 
 
+import unittest
 
-if __name__ == '__main__':
-	s0 = Signal()
+class TestCase_Signal (unittest.TestCase):
+	def testConnectDisconnect(self):
+		s0 = Signal()
+		
+		log = []
+	
+	
+		def f0(x):
+			log.append( '>f0%d' % x )
+			s0.disconnect( f1 )
+			log.append( '<f0%d' % x )
+	
+		def f1(x):
+			log.append( '>f1%d' % x )
+			log.append( '<f1%d' % x )
+	
+		def f2(x):
+			log.append( '>f2%d' % x )
+			s0.disconnect( f2 )
+			s0.emit(x+1)
+			log.append( '<f2%d' % x )
+	
+		def f3(x):
+			log.append( '>f3%d' % x )
+			s0.connect( f4 )
+			log.append( '<f3%d' % x )
+	
+		def f4(x):
+			log.append( '>f4%d' % x )
+			log.append( '<f4%d' % x )
+	
+	
+		s0.connect( f0 )
+		s0.connect( f1 )
+		s0.connect( f2 )
+		s0.connect( f3 )
+	
+		s0.emit(0)
+		
+		self.assert_( log == [ '>f00', '<f00', '>f20', '>f01', '<f01', '>f31', '<f31', '>f41', '<f41', '<f20', '>f30', '<f30', '>f40', '<f40' ] )
+		
+		
+	def testChainConnect(self):
+		s0 = Signal()
+		s1 = Signal()
+		
+		log = []
+		def f(x):
+			log.append( 'f%d' % x )
+			
+		s1.connect( f )
 
+		s0.emit()
+		self.assert_( log == [] )
 
-	def f0(x):
-		print '>f0', x
+		s0.chainConnect( s1 )
+		s0.emit( 0 )
+		self.assert_( log == [ 'f0' ] )
+		
+		s0.emit( 1 )
+		self.assert_( log == [ 'f0', 'f1' ] )
+
+		s0.chainDisconnect( s1 )
+		s0.emit( 2 )
+		self.assert_( log == [ 'f0', 'f1' ] )
+		
+		
+	def testConnectionListner(self):
+		log = []
+		
+		def cl(sig):
+			log.append( sig.hasConnections() )
+		
+		s0 = Signal()
+		s0.setConnectionListener( cl )
+		
+		def f0():
+			pass
+		
+		def f1():
+			pass
+		
+		self.assert_( log == [] )
+		s0.connect( f0 )
+		self.assert_( log == [ True ] )
+		s0.connect( f1 )
+		self.assert_( log == [ True ] )
 		s0.disconnect( f1 )
-		print '<f0', x
-
-	def f1(x):
-		print '>f1', x
-		print '<f1', x
-
-	def f2(x):
-		print '>f2', x
-		s0.disconnect( f2 )
-		s0.emit(x+1)
-		print '<f2', x
-
-	def f3(x):
-		print '>f3', x
-		s0.connect( f4 )
-		print '<f3', x
-
-	def f4(x):
-		print '>f4', x
-		print '<f4', x
+		self.assert_( log == [ True ] )
+		s0.disconnect( f0 )
+		self.assert_( log == [ True, False ] )
+		
 
 
-	s0.connect( f0 )
-	s0.connect( f1 )
-	s0.connect( f2 )
-	s0.connect( f3 )
-
-	s0.emit(0)
-
-
-	print '=================='
-
-
-
-	names = {}
-
-	def makeFun(name):
-		def f():
-			print '> %s' % ( name, )
-		names[f] = name
-		print 'FUNCTION %s' % ( name, )
-		return f
-
-	def makeSignal(name):
-		s = Signal()
-		names[s] = name
-		print 'SIGNAL %s' % ( name, )
-		return s
-
-	def emit(s):
-		print '%s.emit' % ( names[s], )
-		s.emit()
-
-	def connect(s, f):
-		print '%s -> %s' % ( names[s], names[f] )
-		s.connect( f )
-
-	def disconnect(s, f):
-		print '%s <- %s' % ( names[s], names[f] )
-		s.disconnect( f )
-
-	def chainConnect(s, d):
-		print '%s :=> %s' % ( names[s], names[d] )
-		s.chainConnect( d )
-
-	def chainDisconnect(s, d):
-		print '%s <=: %s' % ( names[s], names[d] )
-		s.chainDisconnect( d )
-
-	def block(f):
-		print '|| %s' % ( names[f], )
-		blockSlot( f )
-
-	def unblock(f):
-		print '-- %s' % ( names[f], )
-		unblockSlot( f )
-
-	p = makeSignal( 'p' )
-	q = makeSignal( 'q' )
-	r = makeSignal( 'r' )
-
-	f0 = makeFun( 'f0' )
-	f1 = makeFun( 'f1' )
-	f2 = makeFun( 'f2' )
-	f3 = makeFun( 'f3' )
-	f4 = makeFun( 'f4' )
-
-	emit( p )
-	connect( p, f0 )
-	emit( p )
-	connect( p, f1 )
-	emit( p )
-	connect( q, f2 )
-	emit( q )
-	connect( q, f3 )
-	emit( q )
-	chainConnect( p, q )
-	chainConnect( q, r )
-	connect( r, f4 )
-	emit( p )
-	disconnect( p, f0 )
-	emit( p )
-	disconnect( p, f1 )
-	emit( p )
-	connect( p, f0 )
-	connect( p, f1 )
-	emit( p )
-	block( f0 )
-	emit( p )
-	block( f1 )
-	emit( p )
-	unblock( f0 )
-	unblock( f1 )
-	emit( p )
-	block( f2 )
-	emit( p )
-	block( f3 )
-	emit( p )
-	unblock( f3 )
-	emit( p )
-
-
-	print '=================='
-
-
-	class C (object):
-		sig = Signal()
-
-
-	def f0():
-		print 'f0'
-
-	def f1():
-		print 'f1'
-
-	def f2():
-		print 'f2'
-
-	def f3():
-		print 'f3'
-
-
-	a = C()
-	b = C()
-	c = C()
-	d = C()
-
-	a.sig.connect( f0 )
-	b.sig.connect( f1 )
-	c.sig.connect( f2 )
-	d.sig.connect( f3 )
-
-
-	print 'a.sig.emit()'
-	a.sig.emit()
-	print 'b.sig.emit()'
-	b.sig.emit()
-	print 'c.sig.emit()'
-	c.sig.emit()
-	print 'd.sig.emit()'
-	d.sig.emit()
-
-
-	print '=================='
-
-
+		
+		
+if __name__ == '__main__':
 	import datetime
 
 	class A (object):
@@ -530,6 +443,3 @@ if __name__ == '__main__':
 	elapsed = endTime - startTime
 	seconds = elapsed.days * 86400.0  +  elapsed.seconds  +  elapsed.microseconds / 1000000.0
 	print '%d emissions took %f seconds; %f emissions per second' % ( numEmissions, seconds, numEmissions / seconds )
-
-
-	# Performance: 224k emissions per second, 215k with psyco
