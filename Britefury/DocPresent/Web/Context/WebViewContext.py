@@ -22,8 +22,15 @@ class WebViewContext (object):
 		return prefix + str( x )
 	
 	
-	def onReadyScript(self, script):
+	def runScriptOnReady(self, script):
 		self._onReadyScriptQueue.append( script )
+		
+	def runScript(self, script):
+		self._scriptQueue.append( script )
+		
+		
+	def getOnReadyScript(self):
+		return '\n'.join( self._onReadyScriptQueue )
 		
 		
 
@@ -38,6 +45,13 @@ class TestCase_WebViewContext (unittest.TestCase):
 		self.assert_( vctx.allocID( 'b' )  ==  'b0' )
 		self.assert_( vctx.allocID( 'b' )  ==  'b1' )
 		self.assert_( vctx.allocID( 'a' )  ==  'a2' )
+		
+		
+	def test_onReadyScript(self):
+		vctx = WebViewContext()
+		vctx.runScriptOnReady( 'test()\n' )
+		vctx.runScriptOnReady( 'test()\na()\nb()\n' )
+		self.assert_( vctx.getOnReadyScript()  ==  'test()\n\ntest()\na()\nb()\n' )
 		
 		
 		
