@@ -64,9 +64,9 @@ class CellInterface (object):
 
 
 	Signals:
-	changedSignal - emitted when the value becomes out of date
-	evaluatorSignal - emitted when the evaluator is changed
-	valididySignal - emitted when the cell becomes valid or invalid
+	changedSignal() - emitted when the value becomes out of date
+	evaluatorSignal( oldEval, newEval ) - emitted when the evaluator is changed
+	validitySignal() - emitted when the cell becomes valid or invalid
 	"""
 	
 	"""

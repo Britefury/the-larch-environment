@@ -8,8 +8,6 @@
 from Britefury.Math.Math import Point2, Vector2
 from Britefury.DocPresent.Toolkit.DTContainer import DTContainer
 
-from Britefury.DocPresent.Toolkit.DTCursorEntity import DTCursorEntity
-
 
 
 class DTBin (DTContainer):
@@ -32,7 +30,6 @@ class DTBin (DTContainer):
 				child._f_unparent()
 			if self._child is not None:
 				entry = self._childToEntry[self._child]
-				self._o_unlinkChildEntryCursorEntity( entry )
 				self._childEntries.remove( entry )
 				self._o_unregisterChildEntry( entry )
 			self._child = child
@@ -40,7 +37,6 @@ class DTBin (DTContainer):
 				entry = self.ChildEntry( self._child )
 				self._childEntries.append( entry )
 				self._o_registerChildEntry( entry )
-				self._o_linkChildEntryCursorEntity( entry )
 
 			self._o_queueResize()
 
@@ -95,55 +91,6 @@ class DTBin (DTContainer):
 
 
 
-	#
-	# CURSOR ENTITY METHODS
-	#
-
-	def _o_getFirstCursorEntity(self):
-		if self._child is not None:
-			return self._child.getFirstCursorEntity()
-		else:
-			return None
-
-
-	def _o_getLastCursorEntity(self):
-		if self._child is not None:
-			return self._child.getLastCursorEntity()
-		else:
-			return None
-
-	
-	def _o_getPrevCursorEntityBeforeChild(self, child):
-		return None
-		
-	def _o_getNextCursorEntityAfterChild(self, child):
-		return None
-
-
-	def _o_linkChildEntryCursorEntity(self, childEntry):
-		prevCursorEntity = self._f_getPrevCursorEntityBeforeChild( childEntry.child )
-		nextCursorEntity = self._f_getNextCursorEntityAfterChild( childEntry.child )
-		DTCursorEntity.splice( prevCursorEntity, nextCursorEntity, childEntry.child.getFirstCursorEntity(), childEntry.child.getLastCursorEntity() )
-
-	def _o_unlinkChildEntryCursorEntity(self, childEntry):
-		DTCursorEntity.remove( childEntry.child.getFirstCursorEntity(), childEntry.child.getLastCursorEntity() )
-
-
-		
-		
-	#
-	# CURSOR POSITIONING METHODS
-	#
-	
-	def _o_getCursorLocationAtPosition(self, localPosition):
-		if self._child is not None:
-			entry = self._childToEntry[self._child]
-			return self._child.getCursorLocationAtPosition( entry.containerToChildSpace( localPosition ) )
-		else:
-			return None
-	
-
-		
 	#
 	# FOCUS NAVIGATION METHODS
 	#

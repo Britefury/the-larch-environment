@@ -7,7 +7,6 @@
 ##-*************************
 from Britefury.Math.Math import Point2, Vector2
 
-from Britefury.DocPresent.Toolkit.DTCursorEntity import DTCursorEntity
 from Britefury.DocPresent.Toolkit.DTContainer import DTContainer
 
 
@@ -67,7 +66,6 @@ class DTScript (DTContainer):
 				entry = self._childToEntry[existingChild]
 				self._childEntries.remove( entry )
 				self._o_unregisterChildEntry( entry )
-				DTCursorEntity.remove( existingChild.getFirstCursorEntity(), existingChild.getLastCursorEntity() )
 			self._children[slot] = child
 			if child is not None:
 				entry = self.ChildEntry( child)
@@ -75,7 +73,6 @@ class DTScript (DTContainer):
 				self._o_registerChildEntry( entry )
 				if slot != self.MAIN:
 					child._f_setScale( self._childScale, self._rootScale * self._childScale )
-				DTCursorEntity.splice( self._f_getPrevCursorEntityBeforeChild( child ), self._f_getNextCursorEntityAfterChild( child ), child.getFirstCursorEntity(), child.getLastCursorEntity() )
 
 			self._o_queueResize()
 	
@@ -382,43 +379,6 @@ class DTScript (DTContainer):
 
 
 
-	#
-	# CURSOR ENTITY METHODS
-	#
-
-	def _o_getFirstCursorEntity(self):
-		for slot in self.childSlots:
-			if self._children[slot] is not None:
-				return self._children[slot].getFirstCursorEntity()
-		return None
-
-
-	def _o_getLastCursorEntity(self):
-		for slot in reversed( self.childSlots ):
-			if self._children[slot] is not None:
-				return self._children[slot].getFirstCursorEntity()
-		return None
-		
-		
-	
-	def _o_getPrevCursorEntityBeforeChild(self, child):
-		index = self._children.index( child )
-		if index != self.RIGHTSUB:
-			for slot in reversed( self.childSlots[:index] ):
-				if self._children[slot] is not None:
-					return self._children[slot].getLastCursorEntity()
-		return None
-	
-		
-	def _o_getNextCursorEntityAfterChild(self, child):
-		index = self._children.index( child )
-		if index != self.RIGHTSUB:
-			for slot in self.childSlots[index+1:]:
-				if self._children[slot] is not None:
-					return self._children[slot].getFirstCursorEntity()
-		return None
-	
-	
 	#
 	# FOCUS NAVIGATION METHODS
 	#
