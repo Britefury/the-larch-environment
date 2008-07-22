@@ -7,6 +7,34 @@
 ##-*************************
 from Britefury.DocPresent.Web.HtmlTag import HtmlTag
 from Britefury.DocPresent.Web.ModifierKeys import testEventModifierKeys_js
+from Britefury.DocPresent.Web.Element import Element
+
+
+class EditAsText (Element):
+	modifierKeysValue = ''
+	modifierKeysMask = ''
+	
+	@classmethod
+	def js_initFunction(cls):
+		template = \
+"""
+function (element, text)
+{
+	element.click(
+		function (event)
+		{
+			if ( %s )
+			{
+				element.html( "<input text=\"" + text + "\">" );
+			}
+		}
+	);
+}
+"""
+	jsModTest = testEventModifierKeys_js( 'event', cls.modifierKeysValue, cls.modifierKeysMask )
+	return template % jsModTest
+	
+
 
 
 
@@ -25,7 +53,7 @@ $("#%s").click(
 	}
 );
 """  %  ( tagID, jsModTest, tagID, text )
-	ctx.viewContext.onReadyScript( script )
+	ctx.viewContext.runScript( script )
 	return HtmlTag( html, className='editastext', tagID=tagID )
 	
 	
@@ -37,8 +65,8 @@ import unittest
 
 class TestCase_EditAsText (unittest.TestCase):
 	def test_editAsText(self):
-		from Britefury.gSym.View.Web.WebViewContext import WebViewContext
-		from Britefury.gSym.View.Web.WebViewNodeContext import WebViewNodeContext
+		from Britefury.DocPresent.Web.Context.WebViewContext import WebViewContext
+		from Britefury.DocPresent.Web.Context.WebViewNodeContext import WebViewNodeContext
 		vctx = WebViewContext()
 		nctx = WebViewNodeContext( vctx )
 
