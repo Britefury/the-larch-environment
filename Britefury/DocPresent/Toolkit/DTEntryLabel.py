@@ -307,32 +307,6 @@ class DTEntryLabel (DTBin):
 		
 
 
-	#
-	# CURSOR ENTITY METHODS
-	#
-
-	def _o_getFirstCursorEntity(self):
-		return self._entry.getFirstCursorEntity()
-	
-	def _o_getLastCursorEntity(self):
-		return self._entry.getLastCursorEntity()
-
-	
-	def _o_linkChildEntryCursorEntity(self, childEntry):
-		# Prevent the DTBin superclass from linking in anything other than the entry
-		pass
-		#prevCursorEntity = self._f_getPrevCursorEntityBeforeChild( childEntry.child )
-		#nextCursorEntity = self._f_getNextCursorEntityAfterChild( childEntry.child )
-		#DTCursorEntity.splice( prevCursorEntity, nextCursorEntity, childEntry.child.getFirstCursorEntity(), childEntry.child.getLastCursorEntity() )
-
-	def _o_unlinkChildEntryCursorEntity(self, childEntry):
-		# Prevent the DTBin superclass from unlinking in anything other than the entry
-		pass
-		#DTCursorEntity.remove( childEntry.child.getFirstCursorEntity(), childEntry.child.getLastCursorEntity() )
-		
-		
-		
-
 	labelText = property( getLabelText, setLabelText )
 	entryText = property( getEntryText, setEntryText )
 	text = property( getText )

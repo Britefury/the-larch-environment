@@ -6,26 +6,9 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
 
-from Britefury.DocPresent.Toolkit.DTCursorEntity import DTCursorEntity
 from Britefury.DocPresent.Toolkit.DTWidget import DTWidget
 
 
 class DTSimpleStaticWidget (DTWidget):
-	def __init__(self):
-		super( DTSimpleStaticWidget, self ).__init__()
-
-		self._cursorEntity = DTCursorEntity( self )
-
-
-
-	#
-	# CURSOR ENTITY METHODS
-	#
-	
-	def _o_getFirstCursorEntity(self):
-		return self._cursorEntity
-	
-	def _o_getLastCursorEntity(self):
-		return self._cursorEntity
-
+	pass
 

@@ -6,27 +6,26 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
 from Britefury.DocPresent.Web.HtmlTag import HtmlTag
-from Britefury.DocPresent.Web.ModifierKeys import modifierKeyStringToFlags
+from Britefury.DocPresent.Web.ModifierKeys import testEventModifierKeys_js
 
 
 
 def editAsText(ctx, html, text, modifierKeysValue, modifierKeysMask):
-	modifierKeysValue = modifierKeyStringToFlags( modifierKeysValue )
-	modifierKeysMask = modifierKeyStringToFlags( modifierKeysMask )
+	jsModTest = testEventModifierKeys_js( 'event', modifierKeysValue, modifierKeysMask )
 	tagID = ctx.allocIDForNodeContent( 'editastext' )
 	script = \
 """
 $("#%s").click(
 	function (event)
 	{
-		if ( ( gsym_global_modifierKeysState & %d )  ==  %d )
+		if ( %s )
 		{
 			$("#%s").html( "<input text="%s">" )
 		}
 	}
 );
-"""  %  ( tagID, modifierKeysMask, modifierKeysValue, tagID, text )
-	ctx.viewContext.runScript( script )
+"""  %  ( tagID, jsModTest, tagID, text )
+	ctx.viewContext.onReadyScript( script )
 	return HtmlTag( html, className='editastext', tagID=tagID )
 	
 	
@@ -49,7 +48,7 @@ class TestCase_EditAsText (unittest.TestCase):
 $("#editastext0").click(
 	function (event)
 	{
-		if ( ( gsym_global_modifierKeysState & 2 )  ==  2 )
+		if ( event.shiftKey == true )
 		{
 			$("#editastext0").html( "<input text="abc">" )
 		}

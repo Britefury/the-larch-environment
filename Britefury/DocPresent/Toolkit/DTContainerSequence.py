@@ -7,8 +7,6 @@
 ##-*************************
 from Britefury.Kernel.Abstract import abstractmethod
 
-from Britefury.DocPresent.Toolkit.DTCursorEntity import DTCursorEntity
-
 from Britefury.DocPresent.Toolkit.DTContainer import DTContainer
 from Britefury.DocPresent.Toolkit.DTBin import DTBin
 
@@ -45,9 +43,6 @@ class DTContainerSequence (DTContainer):
 
 			self._p_childListModified()
 			
-			for entry in self._childEntries:
-				self._p_linkChildEntryCursorEntity( entry )
-			
 			self._o_queueResize()
 		else:
 			newEntry = self._p_itemToChildEntry( item )
@@ -56,7 +51,6 @@ class DTContainerSequence (DTContainer):
 			self._childEntries[index] = newEntry
 			self._o_registerChildEntry( newEntry )
 			self._p_childListModified()
-			self._p_linkChildEntryCursorEntity( newEntry )
 			self._o_queueResize()
 
 
@@ -68,10 +62,8 @@ class DTContainerSequence (DTContainer):
 		if isinstance( entry, list ):
 			for e in entry:
 				self._o_unregisterChildEntry( e )
-				DTCursorEntity.remove( e.child.getFirstCursorEntity(), e.child.getLastCursorEntity() )
 		else:
 			self._o_unregisterChildEntry( entry )
-			DTCursorEntity.remove( entry.child.getFirstCursorEntity(), entry.child.getLastCursorEntity() )
 		self._p_childListModified()
 		self._o_queueResize()
 
@@ -83,7 +75,6 @@ class DTContainerSequence (DTContainer):
 		self._childEntries.append( entry )
 		self._o_registerChildEntry( entry )
 		self._p_childListModified()
-		self._p_linkChildEntryCursorEntity( entry )
 		self._o_queueResize()
 		
 
@@ -95,9 +86,6 @@ class DTContainerSequence (DTContainer):
 			self._o_registerChildEntry( entry )
 		self._p_childListModified()
 		
-		for entry in entries:
-			self._p_linkChildEntryCursorEntity( entry )
-			
 		self._o_queueResize()
 
 
@@ -106,7 +94,6 @@ class DTContainerSequence (DTContainer):
 		self._childEntries.insert( index, entry )
 		self._o_registerChildEntry( entry )
 		self._p_childListModified()
-		self._p_linkChildEntryCursorEntity( entry )
 		self._o_queueResize()
 
 
@@ -118,8 +105,6 @@ class DTContainerSequence (DTContainer):
 		self._o_unregisterChildEntry( entry )
 		self._p_childListModified()
 		
-		DTCursorEntity.remove( entry.child.getFirstCursorEntity(), entry.child.getLastCursorEntity() )
-		
 		self._o_queueResize()
 
 
@@ -129,12 +114,6 @@ class DTContainerSequence (DTContainer):
 		index = self._childEntries.index( entry )
 		self[index] = DTBin()
 
-
-
-	def _p_linkChildEntryCursorEntity(self, childEntry):
-		prevCursorEntity = self._f_getPrevCursorEntityBeforeChild( childEntry.child )
-		nextCursorEntity = self._f_getNextCursorEntityAfterChild( childEntry.child )
-		DTCursorEntity.splice( prevCursorEntity, nextCursorEntity, childEntry.child.getFirstCursorEntity(), childEntry.child.getLastCursorEntity() )
 
 
 
@@ -151,79 +130,8 @@ class DTContainerSequence (DTContainer):
 	
 	
 	
-	
-	
-	
-	
-	#
-	# CURSOR ENTITY METHODS
-	#
-
 	def isOrderReversed(self):
 		return False
 	
 	
-	def _o_getFirstCursorEntity(self):
-		entries = self._childEntries
-		if self.isOrderReversed():
-			entries = reversed( entries )
-
-		for entry in entries:
-			first = entry.child.getFirstCursorEntity()
-			if first is not None:
-				return first
-		return None
-
-
-	def _o_getLastCursorEntity(self):
-		entries = self._childEntries
-		if not self.isOrderReversed():
-			entries = reversed( entries )
-
-		for entry in entries:
-			last = entry.child.getLastCursorEntity()
-			if last is not None:
-				return last
-		return None
-
-
-
-	def _o_getPrevCursorEntityBeforeChild(self, child):
-		entry = self._childToEntry[child]
-		index = self._childEntries.index( entry )
-		
-		if self.isOrderReversed():
-			try:
-				entries = self._childEntries[index+1:]
-			except IndexError:
-				return None
-		else:
-			entries = reversed( self._childEntries[:index] )
-		
-		for entry in entries:
-			last = entry.child.getLastCursorEntity()
-			if last is not None:
-				return last
-		return None
-
-		
-	def _o_getNextCursorEntityAfterChild(self, child):
-		entry = self._childToEntry[child]
-		index = self._childEntries.index( entry )
-		
-		if self.isOrderReversed():
-			entries = reversed( self._childEntries[:index] )
-		else:
-			try:
-				entries = self._childEntries[index+1:]
-			except IndexError:
-				return None
-		
-		for entry in entries:
-			first = entry.child.getFirstCursorEntity()
-			if first is not None:
-				return first
-		return None
-
-
 

@@ -122,7 +122,6 @@ class DTWidget (object):
 
 		self._waitingImmediateEvents = []
 		
-		self._bCursorBlocked = False
 		self._cursors = weakref.WeakKeyDictionary()
 		
 		self._pointerPosition = None
@@ -357,15 +356,6 @@ class DTWidget (object):
 	def _o_onLoseFocus(self):
 		self._bHasFocus = False
 
-	def _o_onCursorEnter(self, cursor):
-		self._cursor = cursor
-
-	def _o_onCursorLeave(self):
-		self._cursor = None
-
-	def _o_onCursorMotion(self, cursor, mode):
-		pass
-
 	def _o_onRealise(self, context, pangoContext):
 		pass
 
@@ -483,15 +473,6 @@ class DTWidget (object):
 	def _f_evScroll(self, scroll):
 		self._o_onScroll( scroll )
 
-	def _f_evCursorEnter(self, cursor):
-		self._o_onCursorEnter( cursor )
-
-	def _f_evCursorLeave(self):
-		self._o_onCursorLeave()
-
-	def _f_evCursorMotion(self, cursor, mode):
-		self._o_onCursorMotion( cursor, mode )
-
 	def _f_evRealise(self, context, pangoContext):
 		self._realiseContext = context
 		self._pangoContext = pangoContext
@@ -555,98 +536,6 @@ class DTWidget (object):
 
 
 
-	#
-	# CURSOR ENTITY METHODS
-	#
-	
-	def setCursorBlocked(self, bBlocked):
-		if bBlocked != self._bCursorBlocked:
-			self._bCursorBlocked = bBlocked
-			if self._parent is not None:
-				self._parent._f_childCursorBlocked( self )
-			else:
-				self._parent._f_childCursorUnblocked( self )
-			
-	def isCursorBlocked(self):
-		return self._bCursorBlocked
-
-	
-	def getFirstCursorEntity(self):
-		if self._bCursorBlocked:
-			return None
-		else:
-			return self._o_getFirstCursorEntity()
-	
-	def getLastCursorEntity(self):
-		if self._bCursorBlocked:
-			return None
-		else:
-			return self._o_getLastCursorEntity()
-
-
-	@abstractmethod
-	def _o_getFirstCursorEntity(self):
-		pass
-	
-	@abstractmethod
-	def _o_getLastCursorEntity(self):
-		pass
-
-
-	def getPrevCursorEntity(self):
-		first = self.getFirstCursorEntity()
-		if first is not None:
-			return first.prev
-		else:
-			if self._parent is not None:
-				return self._parent._f_getPrevCursorEntityBeforeChild( self )
-			else:
-				return None
-
-	def getNextCursorEntity(self):
-		last = self.getLastCursorEntity()
-		if last is not None:
-			return last.next
-		else:
-			if self._parent is not None:
-				return self._parent._f_getNextCursorEntityAfterChild( self )
-			else:
-				return None
-			
-			
-			
-			
-	
-	#
-	# CURSOR POSITIONING METHODS
-	#
-	
-	def getCursorSegment(self, cursorLocation):
-		raise TypeError, 'Widets of type \'%s\' have no cursor entities'  %  ( type( self ).__name__, )
-	
-	
-	def getCursorLocationAtPosition(self, localPosition):
-		return self._o_getCursorLocationAtPosition( localPosition )
-
-	def _o_getCursorLocationAtPosition(self, localPosition):
-		return None
-
-
-
-
-	#
-	# CURSOR MANAGEMENT METHODS
-	#
-	
-	def _f_registerCursor(self, cursor):
-		self._cursors[cursor] = 0
-	
-	def _f_unregisterCursor(self, cursor):
-		del self._cursors[cursor]
-		
-		
-		
-		
 	#
 	# FOCUS NAVIGATION METHODS
 	#

@@ -13,7 +13,7 @@ class WebViewContext (object):
 	def __init__(self):
 		self._bInitialised = False
 		self._idTable = defaultdict( int )
-		self._scriptQueue = []
+		self._onReadyScriptQueue = []
 	
 	
 	def allocID(self, prefix):
@@ -22,8 +22,8 @@ class WebViewContext (object):
 		return prefix + str( x )
 	
 	
-	def runScript(self, script):
-		self._scriptQueue.append( script )
+	def onReadyScript(self, script):
+		self._onReadyScriptQueue.append( script )
 		
 		
 

@@ -14,7 +14,6 @@ import pangocairo
 
 from Britefury.Math.Math import Colour3f, Vector2
 
-from Britefury.DocPresent.Toolkit.DTCursorEntity import DTCursorEntity
 from Britefury.DocPresent.Toolkit.DTWidget import DTSimpleStaticWidget
 
 
@@ -143,29 +142,6 @@ class DTCustomSymbol (DTSimpleStaticWidget):
 
 
 
-	#
-	# CURSOR POSITIONING METHODS
-	#
-	
-	def getCursorSegment(self, cursorLocation):
-		assert cursorLocation.cursorEntity is self._cursorEntity
-		if cursorLocation.edge == DTCursorLocation.EDGE_LEADING:
-			x = self._symbolPosition.x
-		elif cursorLocation.edge == DTCursorLocation.EDGE_TRAILING:
-			x = self._symbolPosition.x + self._symbolSize.x
-		
-		pos = Point2( x, self._symbolPosition.y )
-		return Segment2( pos, pos + Vector2( 0.0, self._symbolSize.y ) )
-	
-	
-	def _o_getCursorLocationAtPosition(self, localPosition):
-		if localPosition.x  <  ( self._symbolPosition.x  +  self._symbolSize.x * 0.5 ):
-			return DTCursorLocation( self._cursorEntity, DTCursorLocation.EDGE_LEADING )
-		else:
-			return DTCursorLocation( self._cursorEntity, DTCursorLocation.EDGE_TRAILING )
-
-		
-		
 		
 	size = property( getSize, setSize )
 	colour = property( getColour, setColour )

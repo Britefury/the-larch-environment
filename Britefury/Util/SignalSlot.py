@@ -89,7 +89,6 @@ class Signal (object):
 
 	def __init__(self):
 		"Constructor"
-		super( Signal, self ).__init__()
 		self._connectionListener = None
 
 
@@ -224,8 +223,8 @@ class Signal (object):
 class _InstanceSignal (Signal):
 	__slots__ = [ '_refCount', '_classSignal', '_instance' ]
 	
-	def __init__(self, classSignal, instance, doc=''):
-		super( _InstanceSignal, self ).__init__( doc )
+	def __init__(self, classSignal, instance):
+		super( _InstanceSignal, self ).__init__()
 		self._refCount = 0
 		self._classSignal = classSignal
 		self._instance = instance
@@ -246,12 +245,12 @@ class _InstanceSignal (Signal):
 
 
 class ClassSignal (object):
-	__slots__ = [ '_instanceSignals', '_instanceSignalSet', '__doc__' ]
-	def __init__(self, doc=''):
+	__slots__ = [ '_instanceSignals', '_instanceSignalSet' ]
+	
+	def __init__(self):
 		super( ClassSignal, self ).__init__()
 		self._instanceSignals = weakref.WeakValueDictionary()
 		self._instanceSignalSet = set()
-		self.__doc__ = doc
 
 
 	def __get__(self, instance, owner):
@@ -262,7 +261,7 @@ class ClassSignal (object):
 			try:
 				instanceSignal = self._instanceSignals[key]
 			except KeyError:
-				instanceSignal = _InstanceSignal( self, instance, self.__doc__ )
+				instanceSignal = _InstanceSignal( self, instance )
 				self._instanceSignals[key] = instanceSignal
 			return instanceSignal
 

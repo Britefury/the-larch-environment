@@ -302,30 +302,6 @@ class DTCustomEntry (DTBin, DTEntryListener):
 		self._entry = None
 
 		
-	#
-	# CURSOR ENTITY METHODS
-	#
-
-#	def _o_getFirstCursorEntity(self):
-#		return self._custom.getFirstCursorEntity()
-	
-#	def _o_getLastCursorEntity(self):
-#		return self._custom.getLastCursorEntity()
-
-	
-#	def _o_linkChildEntryCursorEntity(self, childEntry):
-		# Prevent the DTBin superclass from linking in anything other than the entry
-#		pass
-		#prevCursorEntity = self._f_getPrevCursorEntityBeforeChild( childEntry.child )
-		#nextCursorEntity = self._f_getNextCursorEntityAfterChild( childEntry.child )
-		#DTCursorEntity.splice( prevCursorEntity, nextCursorEntity, childEntry.child.getFirstCursorEntity(), childEntry.child.getLastCursorEntity() )
-
-#	def _o_unlinkChildEntryCursorEntity(self, childEntry):
-		# Prevent the DTBin superclass from unlinking in anything other than the entry
-#		pass
-		#DTCursorEntity.remove( childEntry.child.getFirstCursorEntity(), childEntry.child.getLastCursorEntity() )
-		
-		
 		
 
 	customChild = property( getCustomChild, setCustomChild )

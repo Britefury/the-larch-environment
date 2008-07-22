@@ -18,7 +18,6 @@ from Britefury.Math.Math import Colour3f, Vector2, Point2, Segment2
 
 from Britefury.DocPresent.Text.DocText import DocTextActiveRange
 
-from Britefury.DocPresent.Toolkit.DTCursor import DTCursorLocation
 from Britefury.DocPresent.Toolkit.DTSimpleStaticWidget import DTSimpleStaticWidget
 
 
@@ -254,29 +253,6 @@ class DTText (DTSimpleStaticWidget):
 
 		
 		
-	#
-	# CURSOR POSITIONING METHODS
-	#
-	
-	def getCursorSegment(self, cursorLocation):
-		assert cursorLocation.cursorEntity is self._cursorEntity
-		if cursorLocation.edge == DTCursorLocation.EDGE_LEADING:
-			x = self._textPosition.x
-		elif cursorLocation.edge == DTCursorLocation.EDGE_TRAILING:
-			x = self._textPosition.x + self._textSize.x
-		
-		pos = Point2( x, self._textPosition.y )
-		return Segment2( pos, pos + Vector2( 0.0, self._textSize.y ) )
-	
-	
-	def _o_getCursorLocationAtPosition(self, localPosition):
-		if localPosition.x  <  ( self._textPosition.x  +  self._textSize.x * 0.5 ):
-			return DTCursorLocation( self._cursorEntity, DTCursorLocation.EDGE_LEADING )
-		else:
-			return DTCursorLocation( self._cursorEntity, DTCursorLocation.EDGE_TRAILING )
-		
-		
-	
 	#
 	# TEXT RANGE RESPONSE METHODS
 	#
