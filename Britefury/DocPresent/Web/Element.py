@@ -19,8 +19,21 @@ class ElementClass (type):
 
 class Element (object):
 	@classmethod
-	def js_initFunctionBody(cls):
+	def js_classInit(cls):
 		return None
+	
+
+	def js_instanceInitFunction(self):
+		return None
+	
+	def js_callInstanceInit(self, js_functionExpression):
+		pass
+	
+	
+	
+	@classmethod
+	def js_classInit(
+	
 	
 	
 	
