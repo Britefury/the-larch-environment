@@ -7,11 +7,24 @@
 ##-*************************
 import cherrypy
 
+
+
+
 class ServerApp (object):
+	def __init__(self, contentSource):
+		self._contentSource = contentSource
+
+		
 	def index(self):
 		return 'Hello world'
+	
+	def event(self):
+		return 'Event'
+	
+	
 	index.exposed = True
+	event.exposed = True
 	
 
 def startServer():
-	cherrypy.quickstart( ServerApp() )
+	cherrypy.quickstart( ServerApp(), '/', 'serverconfig.cfg' )
