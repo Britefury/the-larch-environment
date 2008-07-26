@@ -7,7 +7,7 @@
 ##-*************************
 from collections import defaultdict
 
-from Britefury.Web.WDDomEdit import WDDomEdit
+from Britefury.DocPresent.Web.WDDomEdit import WDDomEdit
 
 
 
@@ -67,7 +67,7 @@ class WebViewContext (object):
 			node = self._nodesToRefresh.pop()
 			domEdit = WDDomEdit()
 			self.pushOperation( domEdit )
-			domEdit.html = node.html( self )
+			domEdit.html = node.html()
 			domEdit.nodeID = node.getID()
 			self.popOperation()
 			self.page.queueObject( domEdit )
