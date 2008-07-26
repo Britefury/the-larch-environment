@@ -42,4 +42,8 @@ Revision 308:
 	GLisp compiler removed.
 	GMeta compiler removed.
 	
+Revision 385 - PROTOTYPE 3
+	A web-based version of gSym has been started here.
+	Running python gsym.py runs prototype 3, using the Cairo based document presentation system.
+	
 	
