@@ -1,4 +1,3 @@
-<<<<<<< .mine
 ##-*************************
 ##-* This program is free software; you can use it, redistribute it and/or modify it
 ##-* under the terms of the GNU General Public License version 2 as published by the
@@ -13,53 +12,21 @@ import cherrypy
 from Britefury.extlibs.json import json
 
 
-from Britefury.DocPresent.Web.DPView import DPView
+from Britefury.Web.Page import Page
 
 
-pageTemplate = """
-<html>
-<head>
-<script type="text/javascript" src="resources/json2.js"></script>
-<script type="text/javascript" src="resources/jquery_1.2.6.js"></script>
-%s
-<title>%s</title>
-</head>
-
-<body>
-%s
-</body>
-
-</html>
-
-"""
 
 class ServerApp (object):
-	def __init__(self):
-		self._view = DPView( 'gSym test' )
+	def __init__(self, pageFactory):
+		self._page = pageFactory()
 	
 	@cherrypy.expose
 	def index(self):
-		scripts = self._view.scripts()
-		title = self._view.title()
-		body = self._view.htmlBody()
-		
-		html = pageTemplate  %  ( scripts,   title,   body )
-		
-		return html
+		return self._page.html()
 	
 	@cherrypy.expose
-	def eventexchange(self):
-		params = cherrypy.request.params
-		try:
-			events = params['events']
-		except KeyError:
-			return ''
-		else:
-			jsData = json.read( events )
-			self._view.receiveEventsAsJSon()
-
-		jsData = self._view.sendEventsAsJSon()
-		return json.write( jsData )
+	def objectexchange(self, objs):
+		return self._page.doServerObjectExchange( objs )
 
 
 
@@ -78,9 +45,10 @@ class Resources (object):
 	
 	
 
-app = ServerApp()
-app.resources = Resources()
+def startServer(app=None):
+	if app is None:
+		app = ServerApp()
 
+	app.resources = Resources()
 
-def startServer():    
 	cherrypy.quickstart( app, '/', 'serverconfig.cfg' )
