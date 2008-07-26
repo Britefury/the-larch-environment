@@ -12,7 +12,7 @@ import cherrypy
 from Britefury.extlibs.json import json
 
 
-from Britefury.Web.Page import Page
+from Britefury.DocPresent.Web.Page import Page
 
 
 

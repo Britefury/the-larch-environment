@@ -11,23 +11,24 @@ from Britefury.DocPresent.Web.Context.WebViewNodeContext import WebViewNodeConte
 from Britefury.DocPresent.Web.WDDomEdit import WDDomEdit
 
 
-class WDNode (object):
+class WDNode (WebViewNodeContext):
 	def __init__(self, viewContext, htmlFn):
-		self._viewContext = viewContext
+		super( WDNode, self ).__init__( viewContext )
+
 		self._htmlFn = htmlFn
 		self._id = viewContext.allocID( 'WDNode' )
 		self._bRefreshRequired = True
 		viewContext._queueNodeRefresh( self )
 		
 		
-	def html(self, viewContext):
+	def html(self):
 		if self._bRefreshRequired:
-			html = '<span class="WDNode" id="%s">'  %  self._id    +    self._htmlFn( viewContext )    +    '</span>'
+			html = '<span class="WDNode" id="%s">'  %  self._id    +    self._htmlFn( self )    +    '</span>'
 			self._bRefreshRequired = False
-			viewContext._dequeueNodeRefresh( self )
+			self.viewContext._dequeueNodeRefresh( self )
 			return html
 		else:
-			top = viewContext.topOperation()
+			top = self.viewContext.topOperation()
 			if not isinstance( top, WDDomEdit ):
 				raise TypeError, 'top operation must be a WDDomEdit'
 			top.placeHolderIDs.append( self._id )
@@ -37,7 +38,7 @@ class WDNode (object):
 	def setHtmlFn(self, htmlFn):
 		self._htmlFn = htmlFn
 		self._bRefreshRequired = True
-		self._viewContext._queueNodeRefresh( self )
+		self.viewContext._queueNodeRefresh( self )
 		
 	def getID(self):
 		return self._id

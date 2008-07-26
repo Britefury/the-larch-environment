@@ -6,9 +6,9 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
 from Britefury.MainApp import ServerApp
-from Britefury.Web.Page import Page
-from Britefury.Web.SharedObject import SharedObject, JSClassNamedMethod, JSMethod
-from Britefury.Web.WDNode import WDNode
+from Britefury.DocPresent.Web.Page import Page
+from Britefury.DocPresent.Web.SharedObject import SharedObject, JSClassNamedMethod, JSMethod
+from Britefury.DocPresent.Web.WDNode import WDNode
 from Britefury.DocPresent.Web.Context.WebViewContext import WebViewContext
 from Britefury.DocPresent.Web.Context.WebViewNodeContext import WebViewNodeContext
 
@@ -56,23 +56,22 @@ _bRootFn1 = True
 def _dom(page):
 	global _rootFn1, _rootFn2
 	viewContext = WebViewContext( page )
-	nodeContext = WebViewNodeContext( viewContext )
 	
-	_rootFn1 = lambda ctx: '<span class="power">' + a.html( ctx ) + ' <span class="operator">*</span> ' + b.html( ctx ) + '</span>'
-	_rootFn2 = lambda ctx: '<span class="power">' + a.html( ctx ) + '<sup>' + b.html( ctx ) + '</sup>' + '</span>'
+	_rootFn1 = lambda ctx: '<span class="power">' + a.html() + ' <span class="operator">*</span> ' + b.html() + '</span>'
+	_rootFn2 = lambda ctx: '<span class="power">' + a.html() + '<sup>' + b.html() + '</sup>' + '</span>'
 
 	root = WDNode( viewContext, _rootFn1 )
 	a = WDNode( viewContext, lambda ctx: 'a <span class="operator">+</span> b' )
 	b = WDNode( viewContext, lambda ctx: 'c <span class="operator">*</span> d' )
 	
-	return root, viewContext, nodeContext
+	return root, viewContext
 
 	
 
 class TestPage (Page):
 	def __init__(self, title):
 		super( TestPage, self ).__init__( title )
-		self._root, self._viewContext, self._nodeContext = _dom( self )
+		self._root, self._viewContext = _dom( self )
 		
 		
 	def _styles(self):
@@ -95,7 +94,7 @@ $(".clickme").click(
 		body = \
 """
 <h1>gSym DOM Edit test</h1>
-""" + self._root.html( self._viewContext ) + \
+""" + self._root.html() + \
 """
 <br>
 <br>

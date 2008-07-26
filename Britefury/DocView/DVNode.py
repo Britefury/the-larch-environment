@@ -121,6 +121,12 @@ class DVNode (object):
 			return None
 	
 
+	def _f_setContentsFactory(self, contentsFactory):
+		if contentsFactory is not self._contentsFactory:
+			self._contentsFactory = contentsFactory
+			self._contentsCell.function = self._p_computeContents
+			
+			
 	def _f_setRefreshCells(self, cells):
 		self._cellsToRefresh = cells
 		self._o_resetRefreshCell()
@@ -129,12 +135,6 @@ class DVNode (object):
 		self._children.add( child )
 		
 		
-	def _f_setContentsFactory(self, contentsFactory):
-		if contentsFactory is not self._contentsFactory:
-			self._contentsFactory = contentsFactory
-			self._contentsCell.function = self._p_computeContents
-			
-			
 			
 	#
 	# CONTENT ACQUISITION METHODS
