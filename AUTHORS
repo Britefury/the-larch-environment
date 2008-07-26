@@ -5,12 +5,13 @@ AUTHORS
 The gCell distribution includes the following libraries:
 
 greenlet		Found in cpp/extlibs/greenlet			By Armin Rigo, Christian Tismer, et al				http://codespeak.net/py/current/doc/home.html
-piemenu		Foudn in Britefury/extlibs/piemenu		By Don Hopkins								http://www.donhopkins.com/
+piemenu		Found in Britefury/extlibs/piemenu		By Don Hopkins								http://www.donhopkins.com/
+json			Found in Britefury/extlibs/json			By Patrick D. Logan							http://www.json.org
 
 
 
-The gCell application was written by Geoffrey French (MrMeanie / Britefury).
-gCell is (C)copyright Geoffrey French 2006-2007.
+The gSym application was written by Geoffrey French (MrMeanie / Britefury).
+gSym is (C)copyright Geoffrey French 2006-2008.
 
 
 

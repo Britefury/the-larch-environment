@@ -29,6 +29,8 @@ class DPView (object):
 	def receiveEventsAsJSon(self, eventsJSon):
 		if isinstance( eventsJSon, list ):
 			events = [ DPEvent.fromJSon( j )   for j in eventsJSon ]
+			for event in events:
+				self.dispatchIncomingEvent( event )
 			return
 		raise InvalidDPEventList
 		
@@ -38,8 +40,16 @@ class DPView (object):
 		self._eventQueue.append( event )
 		
 	
+	def dispatchIncomingEvent(self, event):
+		pass
+		
+		
 		
 	def scripts(self):
+		return ''
+	
+	
+	def readyScripts(self):
 		return ''
 	
 	

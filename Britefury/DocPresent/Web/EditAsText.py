@@ -67,7 +67,7 @@ class TestCase_EditAsText (unittest.TestCase):
 	def test_editAsText(self):
 		from Britefury.DocPresent.Web.Context.WebViewContext import WebViewContext
 		from Britefury.DocPresent.Web.Context.WebViewNodeContext import WebViewNodeContext
-		vctx = WebViewContext()
+		vctx = WebViewContext( None )
 		nctx = WebViewNodeContext( vctx )
 
 		expectedHtml = '<span class="editastext" id="editastext0">test</span>'

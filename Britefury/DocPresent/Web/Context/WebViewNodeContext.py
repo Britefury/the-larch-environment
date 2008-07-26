@@ -27,7 +27,7 @@ import unittest
 
 class TestCase_WebViewNodeContext (unittest.TestCase):
 	def test_allocID(self):
-		nctx = WebViewNodeContext( WebViewContext() )
+		nctx = WebViewNodeContext( WebViewContext( None ) )
 		self.assert_( nctx.allocIDForNodeContent( 'a' )  ==  'a0' )
 		self.assert_( nctx.allocIDForNodeContent( 'a' )  ==  'a1' )
 		self.assert_( nctx.allocIDForNodeContent( 'b' )  ==  'b0' )
