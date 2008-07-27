@@ -12,6 +12,9 @@ from Britefury.DocTree.DocTreeNode import DocTreeNode
 
 from Britefury.DocView.DocViewNodeTable import DocViewNodeTable
 
+from Britefury.DocPresent.Web.Context.WebViewContext import WebViewContext
+from Britefury.DocPresent.Web.Page import Page
+
 
 
 
@@ -21,23 +24,37 @@ class DocView (object):
 		
 		assert isinstance( root, DocTreeNode )
 
+		# Tree and tree root node
 		self._tree = tree
 		self._root = root
 
-		self._document = None
+		# Command history
 		self._commandHistory = commandHistory
 
-		self._nodeFactory = nodeFactory
+		# Factory to make nodes
+		self._defaultNodeFactory = nodeFactory
 
+		# Refresh cell
 		self.refreshCell = Cell()
-		self.refreshCell.function = self._p_refresh
+		self.refreshCell.function = self._refresh
 
+		# Node to DocViewNode table
 		self._nodeTable = DocViewNodeTable()
 		
+		# View of root node
 		self._rootView = None
+		
+		# Create the page, and the view context
+		self.page = Page( 'gSym test' )
+		self.viewContext = WebViewContext( self.page )
 
 		
-	def _p_getRootView(self):
+	
+	def _getRootView(self):
+		"""
+		Get the view of the root node
+		(creates it if it does not exist yet)
+		"""
 		if self._rootView is None:
 			self._rootView = self.buildNodeView( self._root )
 		return self._rootView
@@ -45,47 +62,55 @@ class DocView (object):
 
 
 
-	def getDocument(self):
-		return self._document
-	
-	def setDocument(self, document):
-		self._document = document
-
-
-	def documentUngrab(self):
-		self._document.removeFocusGrab()
-
-
-
 	def buildNodeView(self, treeNode, nodeFactory=None):
+		"""
+		Build a view node for a document node (obtained through a tree node)
+		"""
 		assert isinstance( treeNode, DocTreeNode )
 		
 		if treeNode is None:
+			# No document node; no view node
 			return None
 		else:
+			# If no node factory has been specified, use the default one
 			if nodeFactory is None:
-				nodeFactory = self._nodeFactory
+				nodeFactory = self._defaultNodeFactory
 			
+			# See if we already have a view node for @treeNode
 			try:
 				viewNode = self._nodeTable[treeNode]
 			except KeyError:
+				# We don't have a view node
 				try:
+					# Try to re-use a now unused view node
 					viewNode = self._nodeTable.takeUnusedViewNodeFor( treeNode )
 				except KeyError:
+					# Could not find anything.....
+					# Create one
 					viewNode = nodeFactory( self, treeNode )
+					# Add to the node table
 					self._nodeTable[treeNode] = viewNode
 
+			# Refresh the node
 			viewNode.refresh()
 
 			return viewNode
 
+		
+		
 
 	def getViewNodeForDocTreeNode(self, treeNode):
+		"""
+		Get the view node for a document/tree node (if there is one)
+		"""
 		return self._nodeTable[treeNode]
 
 
 
 	def refreshAndGetViewNodeForDocTreeNode(self, treeNode):
+		"""
+		Refresh the whole documentm then get the view node for a document/tree node (if there is one)
+		"""
 		self.refresh()
 		return self._nodeTable[treeNode]
 
@@ -93,27 +118,44 @@ class DocView (object):
 
 
 
-	def _p_refresh(self):
+	def _refresh(self):
+		"""
+		Refresh the whole document
+		"""
+		# Refresh the root view
 		self.rootView.refresh()
 
 
 	def refresh(self):
+		"""
+		Refresh the whole document
+		"""
+		# Go through the refresh cell
 		self.refreshCell.immutableValue
-		#self.rootView.refresh()
 
 
 
 
-	def _f_commandHistoryFreeze(self):
+	def _commandHistoryFreeze(self):
+		"""
+		Freeze the command history
+		"""
 		if self._commandHistory is not None:
 			self._commandHistory.freeze()
 
 
-	def _f_commandHistoryThaw(self):
+	def _commandHistoryThaw(self):
+		"""
+		Thaw the command history
+		"""
 		if self._commandHistory is not None:
 			self._commandHistory.thaw()
 			
 			
-	rootView = property( _p_getRootView )
-	document = property( getDocument, setDocument )
+			
+	def _queueNodeRefresh(self, viewNode):
+		assert False, 'not implemented'
+			
+			
+	rootView = property( _getRootView )
 

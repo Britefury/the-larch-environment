@@ -573,7 +573,7 @@ def viewEval(content, nodeViewFunction=None, state=None):
 	viewInstance = viewNodeInstance.viewInstance
 	nodeFactory = viewInstance._f_makeNodeFactory( nodeViewFunction, state )
 	viewNode = viewNodeInstance.view.buildNodeView( content, nodeFactory )
-	viewNode._f_setContentsFactory( viewNodeInstance.viewInstance._f_makeNodeContentsFactory( nodeViewFunction, state ) )
+	viewNode.setContentsFactory( viewNodeInstance.viewInstance._f_makeNodeContentsFactory( nodeViewFunction, state ) )
 	viewNode.refresh()
 	
 	return viewNode
@@ -632,7 +632,7 @@ class _GSymViewInstance (object):
 			# Build a DVNode for the document subtree at @docNode
 			# self._p_buildNodeContents is a factory that builds the contents withing the DVNode
 			node = DVNode( view, treeNode )
-			node._f_setContentsFactory( self._f_makeNodeContentsFactory( nodeViewFunction, state ) )
+			node.setContentsFactory( self._f_makeNodeContentsFactory( nodeViewFunction, state ) )
 			return node
 		return _nodeFactory
 	
@@ -641,7 +641,7 @@ class _GSymViewInstance (object):
 		# Build a DVNode for the document subtree at @docNode
 		# self._p_buildNodeContents is a factory that builds the contents withing the DVNode
 		node = DVNode( view, treeNode )
-		node._f_setContentsFactory( self._f_makeNodeContentsFactory( None, None ) )
+		node.setContentsFactory( self._f_makeNodeContentsFactory( None, None ) )
 		return node
 	
 

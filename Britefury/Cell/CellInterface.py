@@ -83,12 +83,65 @@ class CellInterface (object):
 	
 	__slots__ = [ '__weakref__', '_refreshState', '_dependents', 'changedSignal', 'evaluatorSignal', 'validitySignal' ]
 
-	_cellDependencies = None
+	
+	
+	
+	_cellAccessList = None
+	
+	@staticmethod
+	def pushNewAccessList():
+		"""
+		Starts tracking cell accesses;
+		Creates a new global cell access list that records all cells that are accessed through getValue() / getImmutableValue()
+		Returns the current access list
+		Call popAccessList() with the value returned here, to finish tracking cell accesses
+		"""
+		# Save the existing/old global access list
+		oldAccesses = CellInterface._cellAccessList
+		# Create a new access list
+		CellInterface._cellAccessList = weakref.WeakKeyDictionary()
+		# Return the existing list
+		return oldAccesses
+	
+	@staticmethod
+	def popAccessList(oldAccesses):
+		"""
+		Stops tracking cell accesses;
+		Restores the old cell access list (which was returned by pushNewAccessList())
+		Returns a WeakKeyDictionary where the keys are the cells that were access between pushNewAccessList() and popAccessList()
+		"""
+		# Get the current access list
+		accesses = CellInterface._cellAccessList
+		# Restore the existing/old global access list
+		CellInterface._cellAccessList = oldAccesses
+		# Return the current list
+		return accesses
+		
 
 
-	#changedSignal = ClassSignal()
-	#evaluatorSignal = ClassSignal()
-	#validitySignal = ClassSignal()
+	@staticmethod
+	def blockAccessTracking():
+		"""
+		Blocks tracking of cell accesses
+		Returns the current access list; this MUST be passed to unblockAccessTracking()
+		"""
+		# Save the existing/old global access list
+		oldAccesses = CellInterface._cellAccessList
+		# Clear access list
+		CellInterface._cellAccessList = None
+		# Return the existing list
+		return oldAccesses
+	
+	@staticmethod
+	def unblockAccessTracking(oldAccesses):
+		"""
+		Unblocks cell access tracking
+		Pass the object returned by blockAccessTracking()
+		"""
+		# Restore the existing/old global access list
+		CellInterface._cellAccessList = oldAccesses
+		
+
 
 
 	def __init__(self):
@@ -124,29 +177,13 @@ class CellInterface (object):
 
 
 
-	def getValue(self):
+	def getValue(self, bBlockDependencies=False):
 		"""Get the value of the cell"""
 		assert False, 'abstract'
 
-	def getValueAsClass(self, asClass):
-		"""Get the value of the cell as class @asClass. If the value is an instance of @asClass, it is returned, else None"""
-		value = self.getImmutableValue()
-		if isinstance( value, asClass ):
-			return self.getValue()
-		else:
-			return None
-
-	def getImmutableValue(self):
+	def getImmutableValue(self, bBlockDependencies=False):
 		"""Get the immutable value of the cell. This value is only used where you DO NOT intend to modify it. This will not return a copy of the value"""
 		assert False, 'abstract'
-
-	def getImmutableValueAsClass(self, asClass):
-		"""See getValueAsClass(), same thing but for immutable value"""
-		value = self.getImmutableValue()
-		if isinstance( value, asClass ):
-			return value
-		else:
-			return None
 
 
 	def isValid(self):
