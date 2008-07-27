@@ -47,10 +47,10 @@ class DVNode (object):
 		self._contentsCell = RefCell()
 		self._contentsCell.function = self._computeContents
 		self._contentsCell.changedSignal.connect( self._onContentsChanged )
-		self._contents = None
 		
 		# HTML node
-		self._htmlNode = WDNode( self._view.viewContext, self._generateHtml )
+		self._htmlNode = WDNode( self, self._view.viewContext, self._generateHtml )
+		self._htmlNode.disable()
 		
 		# Unparsed text
 		self._text = None
@@ -60,6 +60,9 @@ class DVNode (object):
 		
 		# Child DVNodes
 		self._children = set()
+		
+		# Reference count; determine if @self is in use
+		self._refCount = 0
 		
 
 		
@@ -111,22 +114,24 @@ class DVNode (object):
 		# The list of children may change:
 		# Unregister all the existing parent->child relationships
 		for child in self._children:
+			child.__unref()
 			self._view._nodeTable.unrefViewNode( child )
 		# And clear the list
 		self._children = set()
 		
 		if self._contentsFactory is not None:
 			# Compute the contents
-			self._contents = self._contentsFactory( self, self.treeNode )
+			contents = self._contentsFactory( self, self.treeNode, self._htmlNode )
 			
 			# The children list will have been re-populated; register the new relationships
 			for child in self._children:
+				child.__ref()
 				self._view._nodeTable.refViewNode( child )
+				
+			return contents
 		else:
 			# No contents factory
-			self._contents = None
-		
-		return None
+			return None
 		
 		
 	def _onContentsChanged(self):
@@ -140,87 +145,57 @@ class DVNode (object):
 	#
 		
 	def _generateHtml(self, nodeContext):
-		accesses = CellInterface.blockAccessTracking()
-		self._contentsCell.getImmutableValue()
-		CellInterface.unblockAccessTracking( accesses )
-		contents = self._contents
-		self._contents = None
-		html, self._text = contents
-		return html
-	
-	
-	def getHtmlNode(self):
-		return self._htmlNode
-			
-			
-			
-			
-			
-	#
-	# REFRESH METHODS
-	#
-	
-	def _refreshNode(self):
-		"""
-		Refresh the node
-		"""
-		
-		# Invoke getImmutableValue() on each of the refresh cells; this will ensure that the dependency relationships on child nodes are
-		# discovered by the Cell system
-		for cell in self._cellsToRefresh:
-			cell.getImmutableValue()
-			
-		# Get the contents
 		contents = self._contentsCell.getImmutableValue()
 		
 		if isinstance( contents, tuple ):
 			html, text = contents
+			
 			assert isinstance( html, str )  or  isinstance( html, unicode )  or  isinstance( widget, DVNode )
 			assert isinstance( text, UnparsedText )  or  isinstance( text, str )  or  isinstance( text, unicode )
 			
-			# If the contents is a DVNode, get its widget
-			if isinstance( html, DVNode ):
-				html = html.getHtml()
-			
-			self._widget.child = widget
-			self._text = contents[1]
+			self._text = text
+			return html
 		else:
-			# Contents is just a widget
-			if isinstance( contents, DTWidget ):
-				self._widget.child = contents
-			elif isinstance( contents, DVNode ):
-				self._widget.child = contents.widget
-			else:
-				raise TypeError, 'contents should be a DTWidget or a DVNode'
+			html = contents
+			assert isinstance( html, str )  or  isinstance( html, unicode )  or  isinstance( widget, DVNode )
+			
 			self._text = None
-
-
-	def _resetRefreshCell(self):
-		"""
-		Reset the refresh cell; causes a refresh to be queued
-		"""
-		self.refreshCell.function = self._refreshNode
-
-
+	
+			return html
+	
+	def getHtmlNode(self):
+		return self._htmlNode
+	
+	
+	
+	
+	#
+	# REFRESH METHODS
+	#
+	
 	def refresh(self):
-		"""
-		Refresh this node
-		"""
-		self.refreshCell.immutableValue
-
-
-		
-
+		self._generateHtml( self._htmlNode )
+			
+			
+			
+			
+			
 	#
 	# CHILD RELATIONSHIP METHODS
 	#
 	
-	def _f_setRefreshCells(self, cells):
-		self._cellsToRefresh = cells
-		self._resetRefreshCell()
-		
 	def _registerChild(self, child):
 		self._children.add( child )
+		
+	def __ref(self):
+		if self._refCount == 0:
+			self._htmlNode.enable()
+		self._refCount += 1
+		
+	def __unref(self):
+		self._refCount -= 1
+		if self._refCount == 0:
+			self._htmlNode.disable()
 		
 		
 			
@@ -228,9 +203,8 @@ class DVNode (object):
 	# CONTENT ACQUISITION METHODS
 	#
 	
-	def getWidget(self):
-		self.refresh()
-		return self._widget
+	def reference(self):
+		return self._htmlNode.reference()
 	
 	def getText(self):
 		self.refresh()

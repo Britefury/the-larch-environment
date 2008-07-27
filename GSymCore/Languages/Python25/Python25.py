@@ -9,7 +9,8 @@ from Britefury.gSym.gSymLanguage import GSymLanguage
 
 
 from GSymCore.Languages.Python25.CodeGenerator import Python25CodeGenerator
-from GSymCore.Languages.Python25.View import Python25View
+#from GSymCore.Languages.Python25.View import Python25View
+from GSymCore.Languages.Python25.ViewWeb import Python25View
 
 
 language = GSymLanguage()

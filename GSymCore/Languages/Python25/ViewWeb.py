@@ -216,7 +216,8 @@ def python25ViewState(parser, mode=MODE_EXPRESSION):
 
 def suiteView(suite):
 	lineViews = mapViewEval( suite, None, python25ViewState( Parser.statement, MODE_STATEMENT ) )
-	return listView( VerticalListViewLayout( 0.0, 0.0, 0.0 ), None, None, None, lineViews )
+	#return listView( VerticalListViewLayout( 0.0, 0.0, 0.0 ), None, None, None, lineViews )
+	return '<br>\n'.join( [ lineView.reference()   for lineView in lineViews ] )
 
 
 
@@ -227,34 +228,38 @@ exprHighlightClass = HighlightHtmlClass( 'expr', 'ctrl', 'ctrl' )
 
 
 
-def nodeEditor(ctx, node, htmlWithUnparsed, state):
+def nodeEditor(ctx, node, html, text, state):
 	if state is None:
 		parser = Parser.expression
 		mode = MODE_EXPRESSION
 	else:
 		parser, mode = state
 
-	assert False
+	#assert False
 	if mode == MODE_EXPRESSION:
-		return interact( focus( editAsText( ctx, highlight( ctx, contents, exprHighlightClass ), text.getText(), 'ctrl', 'ctrl' ) ),  ParsedNodeInteractor( node, parser ) ),   text
+		#return interact( focus( editAsText( ctx, highlight( ctx, contents, exprHighlightClass ), text.getText(), 'ctrl', 'ctrl' ) ),  ParsedNodeInteractor( node, parser ) ),   text
+		return html, text
 	elif mode == MODE_STATEMENT:
-		return interact( focus( editAsText( ctx, highlight( ctx, contents, stmtHighlightClass ), text.getText() ) ),  ParsedLineInteractor( node, parser ) ),   text
+		#return interact( focus( editAsText( ctx, highlight( ctx, contents, stmtHighlightClass ), text.getText() ) ),  ParsedLineInteractor( node, parser ) ),   text
+		return html, text
 	else:
 		raise ValueError
 		
 
 
-def compoundStatementEditor(ctx, node, headerContents, headerText, suite, state):
+def compoundStatementEditor(ctx, node, headerHtml, headerText, suite, state):
 	if state is None:
 		parser = Parser.statement
 		mode = MODE_STATEMENT
 	else:
 		parser, mode = state
 
-	assert False
-	headerWidget = interact( focus( customEntry( highlight( headerContents, style=lineEditorStyle ), headerText.getText() ) ),  ParsedLineInteractor( node, parser ) )
-	statementWidget = vbox( [ headerWidget, indent( suiteView( suite ), 30.0 ) ] )
-	return statementWidget, headerText
+	#assert False
+	#headerWidget = interact( focus( customEntry( highlight( headerContents, style=lineEditorStyle ), headerText.getText() ) ),  ParsedLineInteractor( node, parser ) )
+	#statementWidget = vbox( [ headerWidget, indent( suiteView( suite ), 30.0 ) ] )
+	#return statementWidget, headerText
+	statementHtml = headerHtml + suiteView( suite )
+	return headerHtml, headerText
 
 
 
@@ -263,27 +268,33 @@ class Python25View (GSymView):
 	# MISC
 	def python25Module(self, ctx, state, node, *content):
 		lineViews = mapViewEval( ctx, content, None, python25ViewState( Parser.statement, MODE_STATEMENT ) )
-		return listView( ctx, VerticalListViewLayout( 0.0, 0.0, 0.0 ), None, None, None, lineViews ), ''
+		#return listView( ctx, VerticalListViewLayout( 0.0, 0.0, 0.0 ), None, None, None, lineViews ), ''
+		return '<br>\n'.join( [ lineView.reference()   for lineView in lineViews ] ), ''
 	
 
 	
 	def blankLine(self, ctx, state, node):
 		return nodeEditor( ctx, node,
-				unparseAs( ctx, '<br>', '' ),
+				'',
+				UnparsedText( '' ),
 				state )
 	
 	
 	def UNPARSED(self, ctx, state, node, value):
 		html = _htmlSytle( '&lt;' + value + '&gt;', 'unparsed' )
 		return nodeEditor( ctx, node,
-				unparseAs( ctx, html, value ),
+				html,
+				UnparsedText( value ),
+				#unparseAs( ctx, html, value ),
 				state )
 	
 	
 	# Variable reference
 	def var(self, ctx, state, node, name):
 		return nodeEditor( ctx, node,
-				unparseAs( ctx, name, name, PRECEDENCE_VAR ),
+				name,
+				UnparsedText( name, PRECEDENCE_VAR ),
+				#unparseAs( ctx, name, name, PRECEDENCE_VAR ),
 				state )
 	
 
@@ -293,7 +304,9 @@ class Python25View (GSymView):
 		targetView = viewEval( ctx, target )
 		html = targetView.html + _punctuation( '.' ) + name
 		return nodeEditor( ctx, node,
-				unparseAs( ctx, html, targetView.text + '.' + unparseAs( name, name ), PRECEDENCE_ATTR ),
+				html,
+				UnparsedText( targetView.text + '.' + name, PRECEDENCE_ATTR ),
+				#unparseAs( ctx, html, targetView.text + '.' + unparseAs( name, name ), PRECEDENCE_ATTR ),
 				state )
 
 
@@ -303,7 +316,9 @@ class Python25View (GSymView):
 		valueView = viewEval( ctx, value, None, python25ViewState( Parser.tupleOrExpression ) )
 		html = _keyword( returnKeyword ) + ' ' + valueView.html
 		return nodeEditor( ctx, node,
-				unparseAs( ctx, html, returnKeyword + ' ' + valueView.text, PRECEDENCE_STMT ),
+				html,
+				UnparsedText( returnKeyword  +  ' '  +  valueView.text, PRECEDENCE_STMT ),
+				#unparseAs( ctx, html, returnKeyword + ' ' + valueView.text, PRECEDENCE_STMT ),
 				state )
 
 	
@@ -313,6 +328,8 @@ class Python25View (GSymView):
 		conditionView = viewEval( ctx, condition )
 		headerHtml = _keyword( whileKeyword ) + ' ' + conditionView.html + _punctuation( ':' )
 		return compoundStatementEditor( ctx, node,
-				unparseAs( headerHtml, unparseAs( whileKeyword + ' ' + conditionView.text + ':' ) ),
+				headerHtml,
+				UnparsedText( whileKeyword + ' ' + conditionView.text + ':' ),
+				#unparseAs( headerHtml, unparseAs( whileKeyword + ' ' + conditionView.text + ':' ) ),
 				suite,
 				state  )

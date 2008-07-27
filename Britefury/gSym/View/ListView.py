@@ -7,14 +7,6 @@
 ##-*************************
 from Britefury.Cell.Cell import Cell
 
-from Britefury.DocPresent.Toolkit.DTWidget import DTWidget
-from Britefury.DocPresent.Toolkit.DTLabel import DTLabel
-from Britefury.DocPresent.Toolkit.DTBorder import DTBorder
-from Britefury.DocPresent.Toolkit.DTBox import DTBox
-from Britefury.DocPresent.Toolkit.DTBin import DTBin
-from Britefury.DocPresent.Toolkit.DTFlow import DTFlow
-from Britefury.DocPresent.Toolkit.DTFlowWithSeparators import DTFlowWithSeparators
-
 from Britefury.DocView.DVNode import DVNode
 
 
