@@ -8,10 +8,7 @@
 import weakref
 
 
-from Britefury.DocPresent.Web.Context.WebViewContext import WebViewContext
 from Britefury.DocPresent.Web.Context.WebViewNodeContext import WebViewNodeContext
-
-from Britefury.DocPresent.Web.WDDomEdit import WDDomEdit
 
 
 _refStartTag = u'\ue000'
@@ -23,15 +20,24 @@ class WDNode (WebViewNodeContext):
 	_nodeTable = weakref.WeakValueDictionary()
 	
 	
-	def __init__(self, viewContext, htmlFn):
-		super( WDNode, self ).__init__( viewContext )
+	def __init__(self, owner, viewContext, htmlFn):
+		super( WDNode, self ).__init__( owner, viewContext )
 
 		self._htmlFn = htmlFn
 		self._id = viewContext.allocID( 'WDNode' )
 		self._bRefreshRequired = True
+		self.bEnabled = True
 		viewContext._queueNodeRefresh( self )
 		
 		WDNode._nodeTable[self._id] = self
+		
+		
+		
+	def enable(self):
+		self.bEnabled = True
+		
+	def disable(self):
+		self.bEnabled = False
 		
 		
 		
@@ -191,37 +197,37 @@ class TestCase_WDNode (unittest.TestCase):
 
 	def test_getID(self):
 		ctx = self._makeContext()
-		n = WDNode( ctx, lambda nodeContext: '' )
+		n = WDNode( None, ctx, lambda nodeContext: '' )
 		self.assert_( n.getID() == 'WDNode0' )
 	
 		
 	def test_reference(self):
 		ctx = self._makeContext()
-		n = WDNode( ctx, lambda nodeContext: '' )
+		n = WDNode( None, ctx, lambda nodeContext: '' )
 		self.assert_( n.reference() == u'\ue000WDNode0\ue001' )
 		
 		
 	def test_contentSpan(self):
 		ctx = self._makeContext()
-		n = WDNode( ctx, lambda nodeContext: 'hi' )
+		n = WDNode( None, ctx, lambda nodeContext: 'hi' )
 		self.assert_( n._contentSpan( 'hi' ) == u'<span class="WDNode" id="WDNode0">hi</span>' )
 		
 		
 	def test_placeholder(self):
 		ctx = self._makeContext()
-		n = WDNode( ctx, lambda nodeContext: 'hi' )
+		n = WDNode( None, ctx, lambda nodeContext: 'hi' )
 		self.assert_( n._placeholder() == u'<span class="__gsym__placeholder" id="WDNode0"></span>' )
 		
 		
 	def test_htmlForClient(self):
 		ctx = self._makeContext()
-		n = WDNode( ctx, lambda nodeContext: 'hi' )
+		n = WDNode( None, ctx, lambda nodeContext: 'hi' )
 		self.assert_( n.htmlForClient() == ( n._contentSpan( 'hi' ),   None ) )
 
 		
 	def test_htmlForClient_alreadyOnClient(self):
 		ctx = self._makeContext()
-		n = WDNode( ctx, lambda nodeContext: 'hi' )
+		n = WDNode( None, ctx, lambda nodeContext: 'hi' )
 		n.onClient()
 		self.assert_( n.htmlForClient() == ( n._placeholder(),   n.getID() ) )
 
@@ -231,8 +237,8 @@ class TestCase_WDNode (unittest.TestCase):
 		
 	def test_htmlWithReference(self):
 		ctx = self._makeContext()
-		n1 = WDNode( ctx, lambda nodeContext: 'hi' )
-		n2 = WDNode( ctx, lambda nodeContext: 'a' + n1.reference() + 'b' )
+		n1 = WDNode( None, ctx, lambda nodeContext: 'hi' )
+		n2 = WDNode( None, ctx, lambda nodeContext: 'a' + n1.reference() + 'b' )
 		self.assert_( n2.htmlForClient() == ( n2._contentSpan( u'a\ue000WDNode0\ue001b' ),   None ) )
 
 		
@@ -246,10 +252,10 @@ class TestCase_WDNode (unittest.TestCase):
 		
 	def test_resolvedSubtreeHtmlForClient(self):
 		ctx = self._makeContext()
-		n1 = WDNode( ctx, lambda nodeContext: 'hi' )
-		n2 = WDNode( ctx, lambda nodeContext: 'a' + n1.reference() + 'b' )
-		n3 = WDNode( ctx, lambda nodeContext: 'there' )
-		n4 = WDNode( ctx, lambda nodeContext: 'c' + n2.reference() + 'd' + n3.reference() + 'e' )
+		n1 = WDNode( None, ctx, lambda nodeContext: 'hi' )
+		n2 = WDNode( None, ctx, lambda nodeContext: 'a' + n1.reference() + 'b' )
+		n3 = WDNode( None, ctx, lambda nodeContext: 'there' )
+		n4 = WDNode( None, ctx, lambda nodeContext: 'c' + n2.reference() + 'd' + n3.reference() + 'e' )
 		
 		self.assert_( n4.resolvedSubtreeHtmlForClient()  ==  ( n4._contentSpan( u'c' + n2._contentSpan( 'a' + n1._contentSpan( 'hi' ) + 'b' ) + 'd' + n3._contentSpan( 'there' ) + 'e' ),    set( [ n1, n2, n3 ] ),   set( [] ) ) )
 		

@@ -19,10 +19,12 @@ from Britefury.DocPresent.Web.Page import Page
 
 
 class DocView (object):
-	def __init__(self, tree, root, commandHistory, nodeFactory):
+	def __init__(self, owner, tree, root, commandHistory, nodeFactory):
 		super( DocView, self ).__init__()
 		
 		assert isinstance( root, DocTreeNode )
+		
+		self.owner = owner
 
 		# Tree and tree root node
 		self._tree = tree
@@ -46,7 +48,7 @@ class DocView (object):
 		
 		# Create the page, and the view context
 		self.page = Page( 'gSym test' )
-		self.viewContext = WebViewContext( self.page )
+		self.viewContext = WebViewContext( owner, self.page )
 
 		
 	
