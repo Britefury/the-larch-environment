@@ -49,18 +49,18 @@ class ClickedMessage (SharedObject):
 """ )
 
 
-_rootFn1 = None
-_rootFn2 = None
-_bRootFn1 = True
+_aFn1 = None
+_aFn2 = None
+_aFnIndex = 0
 	
 def _dom(page):
-	global _rootFn1, _rootFn2
+	global _aFn1, _aFn2
 	viewContext = WebViewContext( page )
 	
-	_rootFn1 = lambda ctx: '<span class="power">' + a.html() + ' <span class="operator">*</span> ' + b.html() + '</span>'
-	_rootFn2 = lambda ctx: '<span class="power">' + a.html() + '<sup>' + b.html() + '</sup>' + '</span>'
+	_aFn1 = lambda ctx: '<span class="power">' + a.reference() + ' <span class="operator">*</span> ' + b.reference() + '</span>'
+	_aFn2 = lambda ctx: '<span class="power">' + a.reference() + '<sup>' + b.reference() + '</sup>' + '</span>'
 
-	root = WDNode( viewContext, _rootFn1 )
+	root = WDNode( viewContext, _aFn1 )
 	a = WDNode( viewContext, lambda ctx: 'a <span class="operator">+</span> b' )
 	b = WDNode( viewContext, lambda ctx: 'c <span class="operator">*</span> d' )
 	
@@ -91,10 +91,11 @@ $(".clickme").click(
 
 	
 	def _htmlBody(self):
+		html, resolvedRefNodes, placeHolderIDs = self._root.resolvedSubtreeHtmlForClient()
 		body = \
 """
 <h1>gSym DOM Edit test</h1>
-""" + self._root.html() + \
+""" + html + \
 """
 <br>
 <br>
@@ -106,14 +107,14 @@ $(".clickme").click(
 	
 	
 	def handleIncomingObject(self, obj):
-		global _bRootFn1
+		global _aFnIndex
 		if isinstance( obj, ClickedMessage ):
-			if _bRootFn1:
-				self._root.setHtmlFn( _rootFn2 )
-				_bRootFn1 = False
+			if _aFnIndex == 0:
+				self._root.setHtmlFn( _aFn2 )
+				_aFnIndex = 1
 			else:
-				self._root.setHtmlFn( _rootFn1 )
-				_bRootFn1 = True
+				self._root.setHtmlFn( _aFn1 )
+				_aFnIndex = 0
 			self._viewContext.refreshNodes()
 
 

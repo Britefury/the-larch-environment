@@ -15,13 +15,12 @@ from Britefury.Util.SignalSlot import ClassSignal
 
 from Britefury.Kernel import KMeta
 
+from Britefury.Cell.CellInterface import CellInterface
 from Britefury.Cell.Cell import RefCell
 
 from Britefury.DocView.DocView import DocView
 
-from Britefury.DocPresent.Toolkit.DTWidget import *
-from Britefury.DocPresent.Toolkit.DTBorder import *
-from Britefury.DocPresent.Toolkit.DTLabel import *
+from Britefury.DocPresent.Web.WDNode import WDNode
 
 from Britefury.gSym.View.UnparsedText import UnparsedText
 
@@ -34,27 +33,41 @@ class DVNode (object):
 
 	def __init__(self, view, treeNode):
 		super( DVNode, self ).__init__()
+		
+		# Tree node and document node
 		self.treeNode = treeNode
 		self.docNode = treeNode.node
+		
+		# View and parent DVNOde
 		self._view = view
 		self._parent = None
-		self.refreshCell = RefCell()
-		self.refreshCell.function = self._o_refreshNode
 		
-		self._widget = DTBin()
-		self._text = None
+		# Contents factory and contents cell
 		self._contentsFactory = None
 		self._contentsCell = RefCell()
-		self._contentsCell.function = self._p_computeContents
-		self._cellsToRefresh = []
+		self._contentsCell.function = self._computeContents
+		self._contentsCell.changedSignal.connect( self._onContentsChanged )
+		self._contents = None
+		
+		# HTML node
+		self._htmlNode = WDNode( self._view.viewContext, self._generateHtml )
+		
+		# Unparsed text
+		self._text = None
+		
+		# Focus
 		self.focus = None
 		
+		# Child DVNodes
 		self._children = set()
 		
 
 		
 		
 	def _changeTreeNode(self, treeNode):
+		"""
+		Change the tree node used by this DVNode
+		"""
 		assert treeNode.node is self.docNode, 'DVNode._changeTreeNode(): doc-node must remain the same'
 		self.treeNode = treeNode
 		
@@ -64,6 +77,9 @@ class DVNode (object):
 	# DOCUMENT VIEW METHODS
 	#
 	def getDocView(self):
+		"""
+		Get the document view
+		"""
 		return self._view
 
 
@@ -71,21 +87,100 @@ class DVNode (object):
 	
 	
 	#
+	# CONTENTS METHODS
+	#
+	
+	def setContentsFactory(self, contentsFactory):
+		"""
+		Set the contents factory
+		"""
+		if contentsFactory is not self._contentsFactory:
+			# Change @self._contentsFactory, and reset @self._contentsCell
+			self._contentsFactory = contentsFactory
+			self._contentsCell.function = self._computeContents
+			
+			
+			
+	def _computeContents(self):
+		"""
+		Compute the contents of this node
+		"""
+		# Note that the contents are stored in the @_contents attribute. This is to avoid the contents
+		# being cached by the contents cell and therefore taking up memory.
+		
+		# The list of children may change:
+		# Unregister all the existing parent->child relationships
+		for child in self._children:
+			self._view._nodeTable.unrefViewNode( child )
+		# And clear the list
+		self._children = set()
+		
+		if self._contentsFactory is not None:
+			# Compute the contents
+			self._contents = self._contentsFactory( self, self.treeNode )
+			
+			# The children list will have been re-populated; register the new relationships
+			for child in self._children:
+				self._view._nodeTable.refViewNode( child )
+		else:
+			# No contents factory
+			self._contents = None
+		
+		return None
+		
+		
+	def _onContentsChanged(self):
+		self._htmlNode.contentsChanged()
+	
+
+		
+		
+	#
+	# HTML GENERATION
+	#
+		
+	def _generateHtml(self, nodeContext):
+		accesses = CellInterface.blockAccessTracking()
+		self._contentsCell.getImmutableValue()
+		CellInterface.unblockAccessTracking( accesses )
+		contents = self._contents
+		self._contents = None
+		html, self._text = contents
+		return html
+	
+	
+	def getHtmlNode(self):
+		return self._htmlNode
+			
+			
+			
+			
+			
+	#
 	# REFRESH METHODS
 	#
 	
-	def _o_refreshNode(self):
+	def _refreshNode(self):
+		"""
+		Refresh the node
+		"""
+		
+		# Invoke getImmutableValue() on each of the refresh cells; this will ensure that the dependency relationships on child nodes are
+		# discovered by the Cell system
 		for cell in self._cellsToRefresh:
 			cell.getImmutableValue()
+			
+		# Get the contents
 		contents = self._contentsCell.getImmutableValue()
+		
 		if isinstance( contents, tuple ):
-			widget, text = contents
-			assert isinstance( widget, DTWidget )  or  isinstance( widget, DVNode )
+			html, text = contents
+			assert isinstance( html, str )  or  isinstance( html, unicode )  or  isinstance( widget, DVNode )
 			assert isinstance( text, UnparsedText )  or  isinstance( text, str )  or  isinstance( text, unicode )
 			
 			# If the contents is a DVNode, get its widget
-			if isinstance( widget, DVNode ):
-				widget = widget.widget
+			if isinstance( html, DVNode ):
+				html = html.getHtml()
 			
 			self._widget.child = widget
 			self._text = contents[1]
@@ -100,36 +195,29 @@ class DVNode (object):
 			self._text = None
 
 
-	def _o_resetRefreshCell(self):
-		self.refreshCell.function = self._o_refreshNode
+	def _resetRefreshCell(self):
+		"""
+		Reset the refresh cell; causes a refresh to be queued
+		"""
+		self.refreshCell.function = self._refreshNode
 
 
 	def refresh(self):
+		"""
+		Refresh this node
+		"""
 		self.refreshCell.immutableValue
 
 
-	def _p_computeContents(self):
-		for child in self._children:
-			self._view._nodeTable.unrefViewNode( child )
-		self._children = set()
-		if self._contentsFactory is not None:
-			contents = self._contentsFactory( self, self.treeNode )
-			for child in self._children:
-				self._view._nodeTable.refViewNode( child )
-			return contents
-		else:
-			return None
-	
+		
 
-	def _f_setContentsFactory(self, contentsFactory):
-		if contentsFactory is not self._contentsFactory:
-			self._contentsFactory = contentsFactory
-			self._contentsCell.function = self._p_computeContents
-			
-			
+	#
+	# CHILD RELATIONSHIP METHODS
+	#
+	
 	def _f_setRefreshCells(self, cells):
 		self._cellsToRefresh = cells
-		self._o_resetRefreshCell()
+		self._resetRefreshCell()
 		
 	def _registerChild(self, child):
 		self._children.add( child )
@@ -177,12 +265,18 @@ class DVNode (object):
 			return None
 
 
-	def _f_commandHistoryFreeze(self):
-		self._view._f_commandHistoryFreeze()
+	def _commandHistoryFreeze(self):
+		"""
+		Freeze the command history
+		"""
+		self._view._commandHistoryFreeze()
 
 
-	def _f_commandHistoryThaw(self):
-		self._view._f_commandHistoryThaw()
+	def _commandHistoryThaw(self):
+		"""
+		Thaw the command history
+		"""
+		self._view._commandHistoryThaw()
 
 
 

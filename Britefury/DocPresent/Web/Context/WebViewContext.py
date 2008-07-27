@@ -19,6 +19,7 @@ class WebViewContext (object):
 		self._operationStack = []
 		self.page = page
 		self._nodesToRefresh = set()
+		self._bIgnoreDequeueRequests = False
 	
 	
 	def allocID(self, prefix):
@@ -56,23 +57,46 @@ class WebViewContext (object):
 		self._nodesToRefresh.add( node )
 		
 	def _dequeueNodeRefresh(self, node):
-		try:
-			self._nodesToRefresh.remove( node )
-		except KeyError:
-			pass
+		if not self._bIgnoreDequeueRequests:
+			try:
+				self._nodesToRefresh.remove( node )
+			except KeyError:
+				pass
 		
 		
 	def refreshNodes(self):
+		self._bIgnoreDequeueRequests = True
+		
+		nodeIDToResolvedData = {}
+		
+		# Take a copy of the list of nodes to refresh
+		refreshedNodes = list( self._nodesToRefresh )
+		
 		while len( self._nodesToRefresh ) > 0:
+			# Get a node from the set of nodes to refresh
 			node = self._nodesToRefresh.pop()
-			domEdit = WDDomEdit()
-			self.pushOperation( domEdit )
-			domEdit.html = node.html()
-			domEdit.nodeID = node.getID()
-			self.popOperation()
+			
+			# Generate the resolved HTML, reference nodes, and place holder IDs for the DOM subtree rooted at @node
+			resolvedHtml, resolvedRefNodes, resolvedPlaceHolderIDs = node.resolvedSubtreeHtmlForClient( nodeIDToResolvedData )
+			
+			# Remove the nodes from @self._nodesToRefresh which are in @resolvedRefNodes, as their content is included in the resolved content
+			self._nodesToRefresh.difference_update( resolvedRefNodes )
+			
+			
+		# The table @nodeIDToResolvedData will map node ID to resolved data
+		# Each entry will map the node ID to the data for the subtree rooted at that node.
+		# This will result in the minimum number of DOM modifications to bring the client DOM up to date.
+		for nodeID, ( resolvedHtml, resolvedRefNodes, resolvedPlaceHolderIDs )  in  nodeIDToResolvedData.items():
+			# Create the DOM edit operation
+			domEdit = WDDomEdit( nodeID, resolvedHtml, list( resolvedPlaceHolderIDs ) )
+			# Queue it to be sent to the client
 			self.page.queueObject( domEdit )
 			
+		# Inform all nodes that they are now up to date on the client
+		for node in refreshedNodes:
+			node.onClient()
 			
+		self._bIgnoreDequeueRequests = False
 	
 
 		
