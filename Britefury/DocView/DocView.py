@@ -17,6 +17,17 @@ from Britefury.DocPresent.Web.Page import Page
 
 
 
+class DocViewPage (Page):
+	def __init__(self, title, docView):
+		super( DocViewPage, self ).__init__( title )
+		self._docView = docView
+		
+	
+	def _htmlBody(self):
+		html, resolvedRefNodes, placeHolderIDs = self._docView.rootView.getHtmlNode().resolvedSubtreeHtmlForClient()
+		return html
+
+
 
 class DocView (object):
 	def __init__(self, owner, tree, root, commandHistory, nodeFactory):
@@ -47,7 +58,7 @@ class DocView (object):
 		self._rootView = None
 		
 		# Create the page, and the view context
-		self.page = Page( 'gSym test' )
+		self.page = DocViewPage( 'gSym test', self )
 		self.viewContext = WebViewContext( owner, self.page )
 
 		

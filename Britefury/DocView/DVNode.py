@@ -259,7 +259,6 @@ class DVNode (object):
 
 	parentNodeView = property( getParentNodeView )
 	docView = property( getDocView )
-	widget = property( getWidget )
 	text = property( getText )
 
 

@@ -11,7 +11,7 @@ from copy import copy
 
 from Britefury.DocPresent.Web.WDNode import WDNode
 from Britefury.DocPresent.Web.Context.WebViewContext import WebViewContext
-from Britefury.DocPresent.Web.Context.WebViewNode import WebViewNode
+from Britefury.DocPresent.Web.Context.WebViewNodeContext import WebViewNodeContext
 
 from Britefury.DocView.DVNode import DVNode
 from Britefury.DocView.DocView import DocView
@@ -174,8 +174,8 @@ def viewEval(nodeContext, content, nodeViewFunction=None, state=None):
 	# Get a node factory
 	nodeFactory = viewInstance._makeNodeFactory( nodeViewFunction, state )
 	# A call to DocNode.buildNodeView builds the view, and puts it in the DocView's table
-	viewNode = viewNodeInstance.view.buildNodeView( content, nodeFactory )
-	viewNode.setContentsFactory( viewNodeInstance.viewInstance._makeNodeContentsFactory( nodeViewFunction, state ) )
+	viewNode = viewInstance.view.buildNodeView( content, nodeFactory )
+	viewNode.setContentsFactory( viewInstance._makeNodeContentsFactory( nodeViewFunction, state ) )
 	viewNode.refresh()
 	
 	_registerViewNodeRelationship( nodeContext.owner, viewNode )
@@ -257,7 +257,7 @@ class _GSymViewInstance (object):
 			# Build the contents
 			viewContents = self._buildNodeViewContents( nodeContext, nodeViewInstance, treeNode, nodeViewFunction, state )
 			# Get the refresh cells that need to be monitored, and hand them to the DVNode
-			viewNode._f_setRefreshCells( nodeViewInstance.refreshCells )
+			# HACK viewNode._f_setRefreshCells( nodeViewInstance.refreshCells )
 			# Return the contents
 			return viewContents
 		
@@ -362,8 +362,8 @@ class _GSymViewInstance (object):
 
 			
 class GSymView (object):
-	def __call__(self, xs, state):
-		return dispatch( self, xs, state )
+	def __call__(self, xs, nodeContext, state):
+		return dispatch( self, xs, nodeContext, state )
 	
 		
 		
