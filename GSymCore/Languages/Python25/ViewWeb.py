@@ -5,8 +5,7 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
-from Britefury.gSym.View.gSymView import activeBorder, border, indent, highlight, hline, label, markupLabel, entry, markupEntry, customEntry, hbox, ahbox, vbox, flow, flowSep, \
-     script, scriptLSuper, scriptLSub, scriptRSuper, scriptRSub, listView, interact, focus, viewEval, mapViewEval, GSymView
+from Britefury.gSym.View.gSymView import listView, viewEval, mapViewEval, GSymView
 from Britefury.gSym.View.ListView import FlowListViewLayout, HorizontalListViewLayout, VerticalInlineListViewLayout, VerticalListViewLayout
 
 from Britefury.gSym.View.Interactor import keyEventMethod, accelEventMethod, textEventMethod, backspaceStartMethod, deleteEndMethod, Interactor
@@ -214,16 +213,16 @@ def python25ViewState(parser, mode=MODE_EXPRESSION):
 
 
 
-def suiteView(suite):
-	lineViews = mapViewEval( suite, None, python25ViewState( Parser.statement, MODE_STATEMENT ) )
+def suiteView(ctx, suite):
+	lineViews = mapViewEval( ctx, suite, None, python25ViewState( Parser.statement, MODE_STATEMENT ) )
 	#return listView( VerticalListViewLayout( 0.0, 0.0, 0.0 ), None, None, None, lineViews )
 	return '<br>\n'.join( [ lineView.reference()   for lineView in lineViews ] )
 
 
 
 
-stmtHighlightClass = HighlightHtmlClass( 'stmt' )
-exprHighlightClass = HighlightHtmlClass( 'expr', 'ctrl', 'ctrl' )
+#stmtHighlightClass = HighlightHtmlClass( 'stmt' )
+#exprHighlightClass = HighlightHtmlClass( 'expr', 'ctrl', 'ctrl' )
 
 
 
@@ -253,13 +252,15 @@ def compoundStatementEditor(ctx, node, headerHtml, headerText, suite, state):
 		mode = MODE_STATEMENT
 	else:
 		parser, mode = state
+		
+	print suite
 
 	#assert False
 	#headerWidget = interact( focus( customEntry( highlight( headerContents, style=lineEditorStyle ), headerText.getText() ) ),  ParsedLineInteractor( node, parser ) )
 	#statementWidget = vbox( [ headerWidget, indent( suiteView( suite ), 30.0 ) ] )
 	#return statementWidget, headerText
-	statementHtml = headerHtml + suiteView( suite )
-	return headerHtml, headerText
+	statementHtml = headerHtml + '<br>\n' + suiteView( ctx, suite )
+	return statementHtml, headerText
 
 
 
@@ -302,7 +303,7 @@ class Python25View (GSymView):
 	# Attribute ref
 	def attributeRef(self, ctx, state, node, target, name):
 		targetView = viewEval( ctx, target )
-		html = targetView.html + _punctuation( '.' ) + name
+		html = targetView.reference() + _punctuation( '.' ) + name
 		return nodeEditor( ctx, node,
 				html,
 				UnparsedText( targetView.text + '.' + name, PRECEDENCE_ATTR ),
@@ -314,7 +315,7 @@ class Python25View (GSymView):
 	# Return statement
 	def returnStmt(self, ctx, state, node, value):
 		valueView = viewEval( ctx, value, None, python25ViewState( Parser.tupleOrExpression ) )
-		html = _keyword( returnKeyword ) + ' ' + valueView.html
+		html = _keyword( returnKeyword ) + ' ' + valueView.reference()
 		return nodeEditor( ctx, node,
 				html,
 				UnparsedText( returnKeyword  +  ' '  +  valueView.text, PRECEDENCE_STMT ),
@@ -326,7 +327,7 @@ class Python25View (GSymView):
 	# While statement
 	def whileStmt(self, ctx, state, node, condition, suite):
 		conditionView = viewEval( ctx, condition )
-		headerHtml = _keyword( whileKeyword ) + ' ' + conditionView.html + _punctuation( ':' )
+		headerHtml = _keyword( whileKeyword ) + ' ' + conditionView.reference() + _punctuation( ':' )
 		return compoundStatementEditor( ctx, node,
 				headerHtml,
 				UnparsedText( whileKeyword + ' ' + conditionView.text + ':' ),
