@@ -6,6 +6,7 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
 from Britefury.extlibs.json import json
+from Britefury.DocPresent.Web.JSScript import jsScriptClasses
 from Britefury.DocPresent.Web.SharedObject import SharedObject, sharedObjectClasses, generateJSImplementation
 
 
@@ -64,31 +65,7 @@ $(document).ready( function()
 
 _js_pageScripts = \
 """
-Function.prototype.method = function(name, func)
-{
-	this.prototype[name] = func;
-	return this;
-}
-
-
-_classNameToClass = {};
 _outgoingObjectQueue = [];
-
-function _json_to_shared_object(json)
-{
-	var className = json[0];
-	var content = json[1];
-	
-	cls = _classNameToClass[className];
-	return cls.fromJSonContent( content );
-};
-
-function _shared_object_to_json(obj)
-{
-	var className = obj.className();
-	var content = obj.jsonContent();
-	return [ className, content ];
-};
 
 
 
@@ -161,8 +138,9 @@ class Page (object):
 	def _scripts(self):
 		pageHeaderScript = _js_pageScripts
 		
-		sharedObjectClassScripts = '\n\n'.join( [ self._class_js( c )   for c in sharedObjectClasses ] )
-		return pageHeaderScript  +  '\n\n\n'  +  sharedObjectClassScripts  +  '\n\n\n'  +  self._initScripts()
+		jsScripts = '\n\n'.join( [ c.__class_js__()   for c in jsScriptClasses ] )
+		
+		return pageHeaderScript  +  '\n\n\n'  +  jsScripts  +  '\n\n\n'  +  self._initScripts()
 	
 	
 	def _initScripts(self):
@@ -170,7 +148,7 @@ class Page (object):
 	
 	
 	def _readyScripts(self):
-		return ''
+		return '\n\n'.join( [ c.__class_onReady_js__()   for c in jsScriptClasses ] )
 	
 	
 	def _styles(self):

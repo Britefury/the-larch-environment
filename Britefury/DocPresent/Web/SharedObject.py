@@ -8,6 +8,34 @@
 import types
 
 
+from Britefury.DocPresent.Web.JSScript import JSScriptClass, JSScript
+
+
+
+
+
+_classRegsitryJS = \
+"""
+_classNameToClass = {};
+
+function _json_to_shared_object(json)
+{
+	var className = json[0];
+	var content = json[1];
+	
+	cls = _classNameToClass[className];
+	return cls.fromJSonContent( content );
+};
+
+function _shared_object_to_json(obj)
+{
+	var className = obj.className();
+	var content = obj.jsonContent();
+	return [ className, content ];
+};
+"""
+
+
 class InvalidSharedObjectJSon (Exception):
 	pass
 
@@ -44,7 +72,7 @@ class JSClassNamedMethod (JSClassMethod):
 
 
 
-class SharedObjectClass (type):
+class SharedObjectClass (JSScriptClass):
 	def __init__(cls, clsName, clsBases, clsDict):
 		super( SharedObjectClass, cls ).__init__( clsName, clsBases, clsDict )
 		_sharedObjectClassNameToClass[clsName] = cls
@@ -59,7 +87,7 @@ class SharedObjectClass (type):
 		
 		
 
-class SharedObject (object):
+class SharedObject (JSScript):
 	__metaclass__ = SharedObjectClass
 	
 	
@@ -97,6 +125,16 @@ class SharedObject (object):
 		else:
 			print j
 			raise InvalidSharedObjectJSon
+		
+		
+		
+	@classmethod
+	def __class_js__(cls):
+		initialJS = ''
+		if cls is SharedObject:
+			initialJS = _classRegsitryJS + '\n\n\n'
+		clsName = cls.__name__
+		return initialJS  +  generateJSImplementation( cls )  +  '_classNameToClass.%s = %s\n'  %  ( clsName, clsName )  +  '%s.className = "%s"\n'  %  ( clsName, clsName )  +  '\n\n'
 
 	
 	

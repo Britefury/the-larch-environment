@@ -5,8 +5,123 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
+from Britefury.DocPresent.Web.JSScript import JSScript
 
-from Britefury.DocPresent.Web.ModifierKeys import modifierKeyStringToFlags
+from Britefury.DocPresent.Web.ModifierKeys import testEventModifierKeys_js
+
+
+
+highlight_js = \
+"""
+function HighlightClass(normalStyle, highlightedStyle, ctrlKey, shiftKey, altKey, ctrlMask, shiftMask, altMask)
+{
+	this.normalStyle = normalStyle;
+	this.highlightedStyle = highlightedStyle;
+	this.ctrlKey = ctrlKey;
+	this.shiftKey = shiftKey;
+	this.altKey = altKey;
+	this.ctrlMask = ctrlMask;
+	this.shiftMask = shiftMask;
+	this.altMask = altMask;
+	this.bOn = false;
+	this.stack = new Array();
+}
+
+
+HighlightClass.prototype.getHighlightedElement = function()
+{
+	if ( this.bOn )
+	{
+		if ( this.stack.length > 0 )
+		{
+			return this.stack[ this.stack.length-1 ];
+		}
+	}
+	
+	return undefined
+}
+
+HighlightClass.prototype.handleKeyState = function(event)
+{
+	if ( ( event.ctrlKey == this.ctrlKey  ||  !this.ctrlMask )   &&   ( event.shiftKey == this.shiftKey  ||  !this.shiftMask )   &&   ( event.altKey == this.altKey  ||  !this.altMask ) )
+	{
+		this.bOn = true;
+	}
+	else
+	{
+		this.bOn = false;
+	}
+}
+
+HighlightClass.prototype.handleHighlightChange = function(prev, cur)
+{
+	if ( prev != cur )
+	{
+		if ( prev != undefined )
+		{
+			if ( this.highlightedStyle != "" )
+			{
+				prev.removeClass( this.highlightedStyle );
+			}
+			if ( this.normalStyle != "" )
+			{
+				prev.addClass( this.normalStyle );
+			}
+		}
+
+		if ( cur != undefined )
+		{
+			if ( this.normalStyle != "" )
+			{
+				cur.removeClass( this.normalStyle );
+			}
+			if ( this.highlightedStyle != "" )
+			{
+				cur.addClass( this.highlightedStyle );
+			}
+		}
+	}
+}
+
+HighlightClass.prototype.onEnter = function(element, event)
+{
+	prev = this.getHighlightedElement();
+	this.stack.push( element );
+	this.handleKeyState( event );
+	cur = this.getHighlightedElement();
+	this.handleHighlightChange( prev, cur );
+}
+
+
+
+
+
+"""
+
+
+applyHighlightFnJS = \
+"""
+function applyHighlight_%(className)s(element)
+{
+	// Get the stack for the relevant highlight class name
+	var stack = _highlightTable[%(className)s];
+	if ( stack == undefined )
+	{
+		stack = new Array();
+		_highlightTable[%(className)s] = stack;
+	}
+	
+	
+	element.hover(
+		function (event)
+		{
+		},
+		function (event)
+		{
+		}
+	);
+}
+"""
 
 
 
