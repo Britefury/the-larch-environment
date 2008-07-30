@@ -216,7 +216,8 @@ def python25ViewState(parser, mode=MODE_EXPRESSION):
 def suiteView(ctx, suite):
 	lineViews = mapViewEval( ctx, suite, None, python25ViewState( Parser.statement, MODE_STATEMENT ) )
 	#return listView( VerticalListViewLayout( 0.0, 0.0, 0.0 ), None, None, None, lineViews )
-	return '<br>\n'.join( [ lineView.reference()   for lineView in lineViews ] )
+	
+	return '<span style="margin-left: 2em">' + '<br>\n'.join( [ lineView.reference()   for lineView in lineViews ] ) + '</span>'
 
 
 
