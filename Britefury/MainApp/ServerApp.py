@@ -40,6 +40,10 @@ class Resources (object):
 	def jquery_1_2_6_js(self):
 		return open( os.path.join( 'resources', 'jquery-1.2.6.js' ), 'r' ).read()
 
+	@cherrypy.expose
+	def highlight_js(self):
+		return open( os.path.join( 'resources', 'highlight.js' ), 'r' ).read()
+
 	
 	
 	

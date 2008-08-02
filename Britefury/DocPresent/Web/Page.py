@@ -24,6 +24,8 @@ _pageTemplate = """
 </style>
 <script type="text/javascript" src="resources/json2.js"></script>
 <script type="text/javascript" src="resources/jquery_1.2.6.js"></script>
+<script type="text/javascript" src="resources/highlight.js"></script>
+%s
 <script type="text/javascript">
 function log(message) {
     if (!log.window_ || log.window_.closed) {
@@ -114,6 +116,10 @@ class Page (object):
 	def __init__(self, title):
 		self._objectQueue = []
 		self._pageTitle = title
+		self._cssStyles = ''
+		self._jsIncludes = []
+		self._jsOnLoad = ''
+		self._jsOnReady  = ''
 		
 		
 	def _sendObjectsAsJSon(self):
@@ -134,13 +140,19 @@ class Page (object):
 	
 	def _class_js(self, c):
 		return generateJSImplementation( c )  +  '_classNameToClass.%s = %s\n'  %  ( c.__name__, c.__name__ )  +  '%s.className = "%s"\n'  %  ( c.__name__, c.__name__ )  +  '\n\n'
+		
+	
+	
+	def _scriptIncludes(self):
+		return ''.join( [ '<script type="text/javascript" src="%s"></script>\n'  %  include   for include in self._jsIncludes ] )
+
 	
 	def _scripts(self):
 		pageHeaderScript = _js_pageScripts
 		
 		jsScripts = '\n\n'.join( [ c.__class_js__()   for c in jsScriptClasses ] )
 		
-		return pageHeaderScript  +  '\n\n\n'  +  jsScripts  +  '\n\n\n'  +  self._initScripts()
+		return pageHeaderScript  +  '\n\n\n'  +  jsScripts  +  '\n\n\n'  +  self._initScripts()   +  '\n\n\n'  +  self._jsOnLoad
 	
 	
 	def _initScripts(self):
@@ -148,11 +160,11 @@ class Page (object):
 	
 	
 	def _readyScripts(self):
-		return '\n\n'.join( [ c.__class_onReady_js__()   for c in jsScriptClasses ] )
+		return '\n\n'.join( [ c.__class_onReady_js__()   for c in jsScriptClasses ] )   +   '\n\n\n'  +  self._jsOnReady
 	
 	
 	def _styles(self):
-		return ''
+		return self._cssStyles
 	
 	def _title(self):
 		return self._pageTitle
@@ -164,7 +176,7 @@ class Page (object):
 	
 	
 	def html(self):
-		return _pageTemplate  %  ( self._styles(),		self._scripts(),   self._readyScripts(),   self._title(),   self._htmlBody() )
+		return _pageTemplate  %  ( self._styles(),   self._scriptIncludes(),   self._scripts(),   self._readyScripts(),   self._title(),   self._htmlBody() )
 	
 	def doServerObjectExchange(self, objs):
 		# Read and process incoming objects that came with the request
@@ -185,5 +197,19 @@ class Page (object):
 	def handleIncomingObject(self, obj):
 		pass
 		
+	
+	
+	
+	def addCSSStyles(self, cssStyles):
+		self._cssStyles += cssStyles
+	
+	def extendJSIncludes(self, jsIncludes):
+		self._jsIncludes.extend( jsIncludes )
+		
+	def addJSOnLoad(self, js):
+		self._jsOnLoad += js
+		
+	def addJSOnReady(self, js):
+		self._jsOnReady += js
 		
 		
