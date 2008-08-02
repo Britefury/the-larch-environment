@@ -420,10 +420,6 @@ class DTWidget (object):
 	def _f_evDndMotion(self, localPos, dndButton, state, dndSource, dndBeginData, dndCache):
 		return self._o_onDndMotion( localPos, dndButton, state, dndSource, dndBeginData, dndCache )
 
-	def _f_evDndLeave(self):
-		return self._o_onDndLeave()
-
-
 
 	def _f_evDndBegin(self):
 		return self._o_onDndBegin( self._dndLocalPos, self._dndButton, self._dndState )

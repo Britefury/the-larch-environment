@@ -218,7 +218,7 @@ class _GSymViewInstance (object):
 	"""
 	Manages state concerning a view of a specific document
 	"""
-	def __init__(self, tree, xs, viewFactory, commandHistory):
+	def __init__(self, tree, xs, viewFactory, commandHistory, viewClass):
 		self.tree = tree
 		self.xs = xs
 		self.generalNodeViewFunction = viewFactory._createViewFunction()
@@ -226,6 +226,14 @@ class _GSymViewInstance (object):
 		self.view = DocView( self, self.tree, self.xs, commandHistory, self._rootNodeFactory )
 		self.focusWidget = None
 		self._queue = _ViewQueue( self.view )
+		if viewClass.__css_styles__ != []:
+			self.view.page.addCSSStyles( viewClass.__css_styles__ )
+		if viewClass.__js_includes__ != []:
+			self.view.page.extendJSIncludes( viewClass.__js_includes__ )
+		if viewClass.__js_onLoad__ != '':
+			self.view.page.addJSOnLoad( viewClass.__js_onLoad__ )
+		if viewClass.__js_onReady__ != '':
+			self.view.page.addJSOnReady( viewClass.__js_onReady__ )
 		
 		self._nodeContentsFactories = {}
 		
@@ -362,6 +370,11 @@ class _GSymViewInstance (object):
 
 			
 class GSymView (object):
+	__css_styles__ = ''
+	__js_includes__ = []
+	__js_onLoad__ = ''
+	__js_onReady__ = ''
+	
 	def __call__(self, xs, nodeContext, state):
 		return dispatch( self, xs, nodeContext, state )
 	
@@ -387,7 +400,7 @@ class GSymViewFactory (object):
 	def createDocumentView(self, xs, commandHistory):
 		tree = DocTree()
 		txs = tree.treeNode( xs )
-		viewInstance = _GSymViewInstance( tree, txs, self, commandHistory )
+		viewInstance = _GSymViewInstance( tree, txs, self, commandHistory, self.viewClass )
 		return viewInstance.view
 
 

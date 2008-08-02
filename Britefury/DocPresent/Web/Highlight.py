@@ -5,150 +5,44 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from Britefury.DocPresent.Web.JSScript import JSScript
+from Britefury.DocPresent.Web.ModifierKeys import modifierKeyStringToFlags, MOD_ALT, MOD_CTRL, MOD_SHIFT
 
-from Britefury.DocPresent.Web.ModifierKeys import testEventModifierKeys_js
-
-
-
-highlight_js = \
-"""
-function HighlightClass(normalStyle, highlightedStyle, ctrlKey, shiftKey, altKey, ctrlMask, shiftMask, altMask)
-{
-	this.normalStyle = normalStyle;
-	this.highlightedStyle = highlightedStyle;
-	this.ctrlKey = ctrlKey;
-	this.shiftKey = shiftKey;
-	this.altKey = altKey;
-	this.ctrlMask = ctrlMask;
-	this.shiftMask = shiftMask;
-	this.altMask = altMask;
-	this.bOn = false;
-	this.stack = new Array();
-}
-
-
-HighlightClass.prototype.getHighlightedElement = function()
-{
-	if ( this.bOn )
-	{
-		if ( this.stack.length > 0 )
-		{
-			return this.stack[ this.stack.length-1 ];
-		}
-	}
-	
-	return undefined
-}
-
-HighlightClass.prototype.handleKeyState = function(event)
-{
-	if ( ( event.ctrlKey == this.ctrlKey  ||  !this.ctrlMask )   &&   ( event.shiftKey == this.shiftKey  ||  !this.shiftMask )   &&   ( event.altKey == this.altKey  ||  !this.altMask ) )
-	{
-		this.bOn = true;
-	}
-	else
-	{
-		this.bOn = false;
-	}
-}
-
-HighlightClass.prototype.handleHighlightChange = function(prev, cur)
-{
-	if ( prev != cur )
-	{
-		if ( prev != undefined )
-		{
-			if ( this.highlightedStyle != "" )
-			{
-				prev.removeClass( this.highlightedStyle );
-			}
-			if ( this.normalStyle != "" )
-			{
-				prev.addClass( this.normalStyle );
-			}
-		}
-
-		if ( cur != undefined )
-		{
-			if ( this.normalStyle != "" )
-			{
-				cur.removeClass( this.normalStyle );
-			}
-			if ( this.highlightedStyle != "" )
-			{
-				cur.addClass( this.highlightedStyle );
-			}
-		}
-	}
-}
-
-HighlightClass.prototype.onEnter = function(element, event)
-{
-	prev = this.getHighlightedElement();
-	this.stack.push( element );
-	this.handleKeyState( event );
-	cur = this.getHighlightedElement();
-	this.handleHighlightChange( prev, cur );
-}
-
-
-
-
-
-"""
-
-
-applyHighlightFnJS = \
-"""
-function applyHighlight_%(className)s(element)
-{
-	// Get the stack for the relevant highlight class name
-	var stack = _highlightTable[%(className)s];
-	if ( stack == undefined )
-	{
-		stack = new Array();
-		_highlightTable[%(className)s] = stack;
-	}
-	
-	
-	element.hover(
-		function (event)
-		{
-		},
-		function (event)
-		{
-		}
-	);
-}
-"""
 
 
 
 class HighlightHtmlClass (object):
-	def __init__(self, className, modifierKeysValue, modifierKeysMask):
-		self._className = className + '_hl'
-		self._activeClassName = className + '_ahl'
+	def __init__(self, className, normalStyle, highlightedStyle, modifierKeysValue, modifierKeysMask):
+		self._className = className
+		self._normalStyle = normalStyle
+		self._highlightedStyle = highlightedStyle
 		self._modifierKeysValue = modifierKeyStringToFlags( modifierKeysValue )
 		self._modifierKeysMask = modifierKeyStringToFlags( modifierKeysMask )
 		
-	def headerScript(self):
-		assert False
 		
-	def apply(self, ctx, html):
-		return '<span class="%s">%s</span>'  %  ( self._className, html )
+	def onLoadJS(self):
+		def jsBool(b):
+			if b:
+				return 'true'
+			else:
+				return 'false'
+		return '%s = new HighlightClass( "%s", "%s", %s, %s, %s, %s, %s, %s );\n'  %  ( self._className, self._normalStyle, self._highlightedStyle,
+											    jsBool( self._modifierKeysValue & MOD_CTRL != 0 ),
+											    jsBool( self._modifierKeysValue & MOD_SHIFT != 0 ),
+											    jsBool( self._modifierKeysValue & MOD_ALT != 0 ),
+											    jsBool( self._modifierKeysMask & MOD_CTRL != 0 ),
+											    jsBool( self._modifierKeysMask & MOD_SHIFT != 0 ),
+											    jsBool( self._modifierKeysMask & MOD_ALT != 0 ) )
+		
+	def apply(self, nodeContext, html):
+		nodeID = nodeContext.viewContext.allocID( 'highlight' )
+		classStr = 'class="%s" ' % self._normalStyle   if self._normalStyle != ''   else   ''
+		return '<span %s id="%s">%s</span><script type="text/javascript">%s.applyTo( $("#%s") );</script>'  %  ( classStr, nodeID, html, self._className, nodeID )
 	
 	
 	
-def highlight(ctx, html, highlightClass):
-	return highlightClass.apply( ctx, html )
+def highlight(nodeContext, html, highlightClass):
+	return highlightClass.apply( nodeContext, html )
 	
 	
 	
-import unittest
-
-
-class TestCase_Highlight (unittest.TestCase):
-	def testHighlight(self):
-		self.assert_( False )
 	

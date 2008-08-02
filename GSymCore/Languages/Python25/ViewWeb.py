@@ -15,7 +15,7 @@ from Britefury.gSym.View.EditOperations import replace, append, prepend, insertB
 from Britefury.gSym.View.UnparsedText import UnparsedText
 
 from Britefury.DocPresent.Web.UnparseAs import unparseAs
-from Britefury.DocPresent.Web.Highlight import highlight
+from Britefury.DocPresent.Web.Highlight import HighlightHtmlClass, highlight
 
 
 from GSymCore.Languages.Python25 import Parser
@@ -228,6 +228,10 @@ def suiteView(ctx, suite):
 
 
 
+exprHighlightClass = HighlightHtmlClass( 'exprHighlight', '', 'expr_highlight', 'ctrl', 'ctrl, shift, alt' )
+stmtHighlightClass = HighlightHtmlClass( 'stmtHighlight', '', 'stmt_highlight', '', 'ctrl, shift, alt' )
+
+
 def nodeEditor(ctx, node, html, text, state):
 	if state is None:
 		parser = Parser.expression
@@ -238,10 +242,10 @@ def nodeEditor(ctx, node, html, text, state):
 	#assert False
 	if mode == MODE_EXPRESSION:
 		#return interact( focus( editAsText( ctx, highlight( ctx, contents, exprHighlightClass ), text.getText(), 'ctrl', 'ctrl' ) ),  ParsedNodeInteractor( node, parser ) ),   text
-		return html, text
+		return highlight( ctx, html, exprHighlightClass ), text
 	elif mode == MODE_STATEMENT:
 		#return interact( focus( editAsText( ctx, highlight( ctx, contents, stmtHighlightClass ), text.getText() ) ),  ParsedLineInteractor( node, parser ) ),   text
-		return html, text
+		return highlight( ctx, html, stmtHighlightClass ), text
 	else:
 		raise ValueError
 		
@@ -254,7 +258,7 @@ def compoundStatementEditor(ctx, node, headerHtml, headerText, suite, state):
 	else:
 		parser, mode = state
 		
-	print suite
+	headerHtml = highlight( ctx, headerHtml, stmtHighlightClass )
 
 	#assert False
 	#headerWidget = interact( focus( customEntry( highlight( headerContents, style=lineEditorStyle ), headerText.getText() ) ),  ParsedLineInteractor( node, parser ) )
@@ -267,6 +271,15 @@ def compoundStatementEditor(ctx, node, headerHtml, headerText, suite, state):
 
 
 class Python25View (GSymView):
+	__css_styles__ = \
+		"""
+		.expr_highlight { background-color:#e0ffe0; }
+		.stmt_highlight { background-color:#e0e0ff; }
+		"""
+	
+	__js_onLoad__ = exprHighlightClass.onLoadJS() + stmtHighlightClass.onLoadJS()
+	
+	
 	# MISC
 	def python25Module(self, ctx, state, node, *content):
 		lineViews = mapViewEval( ctx, content, None, python25ViewState( Parser.statement, MODE_STATEMENT ) )
