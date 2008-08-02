@@ -5,86 +5,96 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from Britefury.DocPresent.Web.HtmlTag import HtmlTag
-from Britefury.DocPresent.Web.ModifierKeys import testEventModifierKeys_js
-from Britefury.DocPresent.Web.Element import Element
+from Britefury.DocPresent.Web.ModifierKeys import modifierKeyStringToFlags, MOD_ALT, MOD_CTRL, MOD_SHIFT
+from Britefury.DocPresent.Web.SharedObject import SharedObject, JSMethod, JSClassMethod, JSClassNamedMethod
 
 
-class EditAsText (Element):
-	modifierKeysValue = ''
-	modifierKeysMask = ''
-	
-	@classmethod
-	def js_initFunction(cls):
-		template = \
+class TextEditCommit (SharedObject):
+	def __init__(self, editorID, text):
+		super( TextEditCommit, self ).__init__()
+		
+		self.editorID = editorID
+		self.text = text
+	__init__.jsFunction = \
 """
-function (element, text)
+function (editorID, text)
 {
-	element.click(
-		function (event)
-		{
-			if ( %s )
-			{
-				element.html( "<input text=\"" + text + "\">" );
-			}
-		}
-	);
+	this.editorID = editorID;
+	this.text = text;
 }
 """
-	jsModTest = testEventModifierKeys_js( 'event', cls.modifierKeysValue, cls.modifierKeysMask )
-	return template % jsModTest
 	
-
-
-
-
-def editAsText(ctx, html, text, modifierKeysValue, modifierKeysMask):
-	jsModTest = testEventModifierKeys_js( 'event', modifierKeysValue, modifierKeysMask )
-	tagID = ctx.allocIDForNodeContent( 'editastext' )
-	script = \
+	
+	
+	def jsonContent(self):
+		return [ self.editorID, self.text ]
+	jsonContent.jsFunction =\
+"""function ()
+{
+	return [ this.editorID, this.text ];
+}
 """
-$("#%s").click(
-	function (event)
-	{
-		if ( %s )
-		{
-			$("#%s").html( "<input text="%s">" )
-		}
-	}
-);
-"""  %  ( tagID, jsModTest, tagID, text )
-	ctx.viewContext.runScript( script )
-	return HtmlTag( html, className='editastext', tagID=tagID )
+	
+	@classmethod
+	def fromJSonContent(cls, content):
+		return TextEditCommit( content[0], content[1] )
 	
 	
-	
-	
-	
-import unittest
+	fromJSonContent_js = JSClassNamedMethod( 'fromJSonContent', \
+"""function (content)
+{
+	return new TextEditCommit( content[0], content[1] );
+}
+""" )
 
 
-class TestCase_EditAsText (unittest.TestCase):
-	def test_editAsText(self):
-		from Britefury.DocPresent.Web.Context.WebViewContext import WebViewContext
-		from Britefury.DocPresent.Web.Context.WebViewNodeContext import WebViewNodeContext
-		vctx = WebViewContext( None )
-		nctx = WebViewNodeContext( vctx )
+	__js__handle = JSMethod( 'handle', \
+"""function ()
+{
+	log( "Cannot handle TextEditCommit on the client side" );
+}
+""" )
 
-		expectedHtml = '<span class="editastext" id="editastext0">test</span>'
-		expectedScript = \
-"""
-$("#editastext0").click(
-	function (event)
-	{
-		if ( event.shiftKey == true )
-		{
-			$("#editastext0").html( "<input text="abc">" )
-		}
-	}
-);
-"""
-		self.assert_( editAsText( nctx, 'test', 'abc', 'shift', 'shift' )  ==  expectedHtml )
-		self.assert_( vctx._scriptQueue  ==  [ expectedScript ] )
+	
+	
+	
 		
+	
+class EditAsTextHtmlClass (object):
+	def __init__(self, className, modifierKeysValue, modifierKeysMask):
+		self._className = className
+		self._modifierKeysValue = modifierKeyStringToFlags( modifierKeysValue )
+		self._modifierKeysMask = modifierKeyStringToFlags( modifierKeysMask )
+		
+		
+	def onLoadJS(self):
+		def jsBool(b):
+			if b:
+				return 'true'
+			else:
+				return 'false'
+		return '%s = new EditAsTextClass( %s, %s, %s, %s, %s, %s );\n'  %  ( self._className,
+											    jsBool( self._modifierKeysValue & MOD_CTRL != 0 ),
+											    jsBool( self._modifierKeysValue & MOD_SHIFT != 0 ),
+											    jsBool( self._modifierKeysValue & MOD_ALT != 0 ),
+											    jsBool( self._modifierKeysMask & MOD_CTRL != 0 ),
+											    jsBool( self._modifierKeysMask & MOD_SHIFT != 0 ),
+											    jsBool( self._modifierKeysMask & MOD_ALT != 0 ) )
+		
+	def apply(self, nodeContext, html):
+		nodeID = nodeContext.viewContext.allocID( 'editastext' )
+		return '<span id="%s">%s</span><script type="text/javascript">%s.applyTo( $("#%s") );</script>'  %  ( nodeID, html, self._className, nodeID )
+	
+	
+	
+def editAsText(nodeContext, html, editAsTextClass):
+	return editAsTextClass.apply( nodeContext, html )
 
+
+
+
+
+
+	
+	
 	
