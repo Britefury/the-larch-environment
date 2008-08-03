@@ -8,6 +8,7 @@
 from Britefury.extlibs.json import json
 from Britefury.DocPresent.Web.JSScript import jsScriptClasses
 from Britefury.DocPresent.Web.SharedObject import SharedObject, sharedObjectClasses, generateJSImplementation
+from Britefury.DocPresent.Web.EventFromClient import EventFromClient
 
 
 
@@ -25,6 +26,7 @@ _pageTemplate = """
 <script type="text/javascript" src="resources/json2.js"></script>
 <script type="text/javascript" src="resources/jquery_1.2.6.js"></script>
 <script type="text/javascript" src="resources/highlight.js"></script>
+<script type="text/javascript" src="resources/editastext.js"></script>
 %s
 <script type="text/javascript">
 function log(message) {
@@ -120,6 +122,7 @@ class Page (object):
 		self._jsIncludes = []
 		self._jsOnLoad = ''
 		self._jsOnReady  = ''
+		self._eventHandlers = {}
 		
 		
 	def _sendObjectsAsJSon(self):
@@ -133,6 +136,7 @@ class Page (object):
 			objs = [ SharedObject.fromJSon( j )   for j in objectsJSON ]
 			for obj in objs:
 				self.handleIncomingObject( obj )
+			self.objectsHandled()
 		else:
 			raise InvalidSharedObjectList
 		
@@ -195,6 +199,16 @@ class Page (object):
 	
 
 	def handleIncomingObject(self, obj):
+		if isinstance( obj, EventFromClient ):
+			try:
+				handler = self._eventHandlers[obj.sourceID]
+			except KeyError:
+				pass
+			else:
+				handler( obj )
+				
+				
+	def objectsHandled(self):
 		pass
 		
 	
@@ -211,5 +225,13 @@ class Page (object):
 		
 	def addJSOnReady(self, js):
 		self._jsOnReady += js
+		
+		
+		
+	def registerEventHandler(self, sourceID, handler):
+		self._eventHandlers[sourceID] = handler
+		
+	def unregisterEventHandler(self, sourceID):
+		del self._eventHandlers[sourceID]
 		
 		

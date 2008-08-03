@@ -7,58 +7,53 @@
 ##-*************************
 from Britefury.DocPresent.Web.ModifierKeys import modifierKeyStringToFlags, MOD_ALT, MOD_CTRL, MOD_SHIFT
 from Britefury.DocPresent.Web.SharedObject import SharedObject, JSMethod, JSClassMethod, JSClassNamedMethod
+from Britefury.DocPresent.Web.EventFromClient import EventFromClient
 
 
-class TextEditCommit (SharedObject):
-	def __init__(self, editorID, text):
-		super( TextEditCommit, self ).__init__()
+
+
+class EditAsTextCommit (EventFromClient):
+	def __init__(self, sourceID, text, bUserEvent):
+		super( EditAsTextCommit, self ).__init__( sourceID )
 		
-		self.editorID = editorID
 		self.text = text
+		self.bUserEvent = bUserEvent
 	__init__.jsFunction = \
 """
-function (editorID, text)
+function (sourceID, text, bUserEvent)
 {
-	this.editorID = editorID;
+	this.sourceID = sourceID;
 	this.text = text;
+	this.bUserEvent = bUserEvent;
 }
 """
 	
 	
 	
 	def jsonContent(self):
-		return [ self.editorID, self.text ]
+		return [ self.sourceID, self.text, self.bUserEvent ]
 	jsonContent.jsFunction =\
 """function ()
 {
-	return [ this.editorID, this.text ];
+	return [ this.sourceID, this.text, this.bUserEvent ];
 }
 """
 	
 	@classmethod
 	def fromJSonContent(cls, content):
-		return TextEditCommit( content[0], content[1] )
+		return EditAsTextCommit( content[0], content[1], content[2] )
 	
 	
 	fromJSonContent_js = JSClassNamedMethod( 'fromJSonContent', \
 """function (content)
 {
-	return new TextEditCommit( content[0], content[1] );
-}
-""" )
-
-
-	__js__handle = JSMethod( 'handle', \
-"""function ()
-{
-	log( "Cannot handle TextEditCommit on the client side" );
+	return new EditAsTextCommit( content[0], content[1], content[2] );
 }
 """ )
 
 	
 	
 	
-		
 	
 class EditAsTextHtmlClass (object):
 	def __init__(self, className, modifierKeysValue, modifierKeysMask):
@@ -69,10 +64,7 @@ class EditAsTextHtmlClass (object):
 		
 	def onLoadJS(self):
 		def jsBool(b):
-			if b:
-				return 'true'
-			else:
-				return 'false'
+			return 'true'   if b   else   'false'
 		return '%s = new EditAsTextClass( %s, %s, %s, %s, %s, %s );\n'  %  ( self._className,
 											    jsBool( self._modifierKeysValue & MOD_CTRL != 0 ),
 											    jsBool( self._modifierKeysValue & MOD_SHIFT != 0 ),
@@ -81,14 +73,19 @@ class EditAsTextHtmlClass (object):
 											    jsBool( self._modifierKeysMask & MOD_SHIFT != 0 ),
 											    jsBool( self._modifierKeysMask & MOD_ALT != 0 ) )
 		
-	def apply(self, nodeContext, html):
+	def apply(self, nodeContext, html, text, handler):
+		def _handler(event):
+			handler( event.text, event.bUserEvent )
+		
 		nodeID = nodeContext.viewContext.allocID( 'editastext' )
-		return '<span id="%s">%s</span><script type="text/javascript">%s.applyTo( $("#%s") );</script>'  %  ( nodeID, html, self._className, nodeID )
+		editAsTextHtml = '<span id="%s">%s</span><script type="text/javascript">%s.applyTo( $("#%s"), "%s" );</script>'  %  ( nodeID, html, self._className, nodeID, text.replace( '"', '\\"' ) )
+		nodeContext.viewContext.registerEventHandler( nodeID, _handler )
+		return editAsTextHtml
 	
 	
 	
-def editAsText(nodeContext, html, editAsTextClass):
-	return editAsTextClass.apply( nodeContext, html )
+def editAsText(nodeContext, editAsTextClass, html, text, handler):
+	return editAsTextClass.apply( nodeContext, html, text, handler )
 
 
 

@@ -16,6 +16,7 @@ from Britefury.gSym.View.UnparsedText import UnparsedText
 
 from Britefury.DocPresent.Web.UnparseAs import unparseAs
 from Britefury.DocPresent.Web.Highlight import HighlightHtmlClass, highlight
+from Britefury.DocPresent.Web.EditAsText import EditAsTextHtmlClass, editAsText
 
 
 from GSymCore.Languages.Python25 import Parser
@@ -51,30 +52,30 @@ def _parseText(parser, text):
 		return None
 
 
-class ParsedNodeInteractor (Interactor):
-	@textEventMethod()
-	def tokData(self, bUserEvent, bChanged, value, node, parser):
-		if bChanged:
+
+_compoundStmtNames = set( [ 'ifStmt', 'elifStmt', 'elseStmt', 'whileStmt', 'forStmt', 'tryStmt', 'exceptStmt', 'finallyStmt', 'withStmt', 'defStmt', 'classStmt' ] )	
+	
+
+def parsedNodeTextHandler(nodeToEdit, parser, startText):
+	def handler(value, bUserEvent):
+		node = nodeToEdit
+		if value != startText:
 			parsed = _parseText( parser, value )
 			if parsed is not None:
 				replace( node, parsed )
 			else:
 				replace( node, [ 'UNPARSED', value ] )
-	
-	eventMethods = [ tokData ]
-
-
-_compoundStmtNames = set( [ 'ifStmt', 'elifStmt', 'elseStmt', 'whileStmt', 'forStmt', 'tryStmt', 'exceptStmt', 'finallyStmt', 'withStmt', 'defStmt', 'classStmt' ] )	
-	
+	return handler
 
 def _isCompoundStmt(node):
 	return node[0] in _compoundStmtNames
 	
 
-class ParsedLineInteractor (Interactor):
-	@textEventMethod()
-	def tokData(self, bUserEvent, bChanged, value, node, parser):
-		if bChanged:
+	
+def parsedLineTextHandler(nodeToEdit, parser, startText):
+	def handler(value, bUserEvent):
+		node = nodeToEdit
+		if value != startText:
 			if value.strip() == '':
 				node = replace( node, [ 'blankLine' ] )
 			else:
@@ -98,19 +99,8 @@ class ParsedLineInteractor (Interactor):
 		if bUserEvent:
 			print 'Inserting...'
 			return insertAfter( node, [ 'blankLine' ] )
-		
-		
-		
-	@backspaceStartMethod()
-	def backspaceStart(self, node, parser):
-		print 'Backspace start'
-	
 
-	@deleteEndMethod()
-	def deleteEnd(self, node, parser):
-		print 'Delete end'
-
-	eventMethods = [ tokData, backspaceStart, deleteEnd ]
+	return handler
 
 
 	
@@ -231,6 +221,9 @@ def suiteView(ctx, suite):
 exprHighlightClass = HighlightHtmlClass( 'exprHighlight', '', 'expr_highlight', 'ctrl', 'ctrl, shift, alt' )
 stmtHighlightClass = HighlightHtmlClass( 'stmtHighlight', '', 'stmt_highlight', '', 'ctrl, shift, alt' )
 
+exprEditorClass = EditAsTextHtmlClass( 'exprEditor', 'ctrl', 'ctrl, shift, alt' )
+stmtEditorClass = EditAsTextHtmlClass( 'stmtEditor', '', 'ctrl, shift, alt' )
+
 
 def nodeEditor(ctx, node, html, text, state):
 	if state is None:
@@ -242,10 +235,14 @@ def nodeEditor(ctx, node, html, text, state):
 	#assert False
 	if mode == MODE_EXPRESSION:
 		#return interact( focus( editAsText( ctx, highlight( ctx, contents, exprHighlightClass ), text.getText(), 'ctrl', 'ctrl' ) ),  ParsedNodeInteractor( node, parser ) ),   text
-		return highlight( ctx, html, exprHighlightClass ), text
+		highlightHtml = highlight( ctx, exprHighlightClass, html )
+		editorHtml = editAsText( ctx, exprEditorClass, highlightHtml, text.getText(), parsedNodeTextHandler( node, parser, text.getText() ) )
+		return editorHtml, text
 	elif mode == MODE_STATEMENT:
 		#return interact( focus( editAsText( ctx, highlight( ctx, contents, stmtHighlightClass ), text.getText() ) ),  ParsedLineInteractor( node, parser ) ),   text
-		return highlight( ctx, html, stmtHighlightClass ), text
+		highlightHtml = highlight( ctx, stmtHighlightClass, html )
+		editorHtml = editAsText( ctx, stmtEditorClass, highlightHtml, text.getText(), parsedLineTextHandler( node, parser, text.getText() ) )
+		return editorHtml, text
 	else:
 		raise ValueError
 		
@@ -258,13 +255,14 @@ def compoundStatementEditor(ctx, node, headerHtml, headerText, suite, state):
 	else:
 		parser, mode = state
 		
-	headerHtml = highlight( ctx, headerHtml, stmtHighlightClass )
+	highlightHtml = highlight( ctx, stmtHighlightClass, headerHtml )
+	editorHtml = editAsText( ctx, stmtEditorClass, highlightHtml, headerText.getText(), parsedLineTextHandler( node, parser, headerText.getText() ) )
 
 	#assert False
 	#headerWidget = interact( focus( customEntry( highlight( headerContents, style=lineEditorStyle ), headerText.getText() ) ),  ParsedLineInteractor( node, parser ) )
 	#statementWidget = vbox( [ headerWidget, indent( suiteView( suite ), 30.0 ) ] )
 	#return statementWidget, headerText
-	statementHtml = headerHtml + '<br>\n' + suiteView( ctx, suite )
+	statementHtml = editorHtml + '<br>\n' + suiteView( ctx, suite )
 	return statementHtml, headerText
 
 
@@ -277,7 +275,7 @@ class Python25View (GSymView):
 		.stmt_highlight { background-color:#e0e0ff; }
 		"""
 	
-	__js_onLoad__ = exprHighlightClass.onLoadJS() + stmtHighlightClass.onLoadJS()
+	__js_onLoad__ = exprHighlightClass.onLoadJS() + stmtHighlightClass.onLoadJS() + exprEditorClass.onLoadJS() + stmtEditorClass.onLoadJS()
 	
 	
 	# MISC

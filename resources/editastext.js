@@ -9,64 +9,62 @@ function EditAsTextClass(ctrlKey, shiftKey, altKey, ctrlMask, shiftMask, altMask
 }
 
 
-EditAsTextClass.prototype.startEditing = function(element, event)
+EditAsTextClass.prototype.startEditing = function(element, event, text)
 {
     var editor = this;
     
-    var editorID = element.id;
+    var editorID = element.attr( "id" );
+    var inputID = editorID + "_input";
 
-    function inputBlur = function(event)
+    function inputBlur (event)
     {
-        editor.commit( element, editorID, this.value );
+        editor.commit( inputElement, editorID, this.value, false );
     }
     
-    function inputKeyDown = function(event)
+    function inputKeyDown (event)
     {
         switch ( event.keyCode )
         {
         case 13:
-            editor.commit( element, editorID, this.value );
+            editor.commit( inputElement, editorID, this.value, true );
         default:
             break;
         }
     }
     
-    //var inputID = editorID + "_input";
-    
-    //element.html( "<input type=\"text\" id=\"" + inputID + "\">" );
-    element.html( "<input type=\"text\" id=\">" );
-    //var inputElement = $( "#" + inputID );
-    var inputElement = element.children();
+    element.replaceWith( "<input type=\"text\" id=\"" + inputID + "\" value=\"" + text + "\"></input>" );
+    var inputElement = $( "#" + inputID );
     inputElement.blur( inputBlur );
     inputElement.keydown( inputKeyDown );
+    inputElement.focus();
 }
 
-EditAsTextClass.prototype.commit = function(element, editorID, text)
+EditAsTextClass.prototype.commit = function(inputElement, editorID, text, bUserEvent)
 {
-    element.html( "..." );
-	sendObject( new TextEditCommit( editorID, text ) );
+    inputElement.replaceWith( "..." );
+	sendObject( new EditAsTextCommit( editorID, text, bUserEvent ) );
 }
 
-EditAsTextClass.prototype.onClick = function(element, event)
+EditAsTextClass.prototype.onClick = function(element, event, text)
 {
     var ctrlKey = event.ctrlKey == true;
     var shiftKey = event.shiftKey == true;
     var altKey = event.altKey == true;
 	if ( ( ctrlKey == this.ctrlKey  ||  !this.ctrlMask )   &&   ( shiftKey == this.shiftKey  ||  !this.shiftMask )   &&   ( altKey == this.altKey  ||  !this.altMask ) )
 	{
-        this.startEditing( element, event );
+        this.startEditing( element, event, text );
 	}
 }
 
 
 
-EditAsTextClass.prototype.applyTo = function(element)
+EditAsTextClass.prototype.applyTo = function(element, text)
 {
     var editor = this;
 	element.click(
 		function (event)
 		{
-			editor.onClick( element, event );
+			editor.onClick( element, event, text );
 		}
 	);
 }

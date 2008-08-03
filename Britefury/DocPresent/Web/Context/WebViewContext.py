@@ -51,6 +51,14 @@ class WebViewContext (object):
 				pass
 		
 		
+	def registerEventHandler(self, sourceID, handler):
+		self.page.registerEventHandler( sourceID, handler )
+		
+	def unregisterEventHandler(self, sourceID):
+		self.page.unregisterEventHandler( sourceID )
+
+		
+	
 	def refreshNodes(self):
 		self._bIgnoreDequeueRequests = True
 		
