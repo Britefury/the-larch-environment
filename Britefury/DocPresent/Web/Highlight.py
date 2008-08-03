@@ -40,7 +40,7 @@ class HighlightHtmlClass (object):
 	
 	
 	
-def highlight(nodeContext, html, highlightClass):
+def highlight(nodeContext, highlightClass, html):
 	return highlightClass.apply( nodeContext, html )
 	
 	

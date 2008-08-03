@@ -44,6 +44,10 @@ class Resources (object):
 	def highlight_js(self):
 		return open( os.path.join( 'resources', 'highlight.js' ), 'r' ).read()
 
+	@cherrypy.expose
+	def editastext_js(self):
+		return open( os.path.join( 'resources', 'editastext.js' ), 'r' ).read()
+
 	
 	
 	

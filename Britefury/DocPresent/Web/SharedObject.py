@@ -152,6 +152,11 @@ def _generateJSForClassMethod(cls, method):
 	
 
 def _generateJSForConstructor(cls):
+	bases = [ base   for base in cls.__bases__   if issubclass( base, SharedObject ) ]
+	
+	inheritanceJS = '%s.prototype = new %s;\n'  %  ( cls.__name__, bases[0].__name__ )      if len( bases ) > 0   else   ''
+	
+	
 	try:
 		method = cls.__init__
 	except AttributeError:
@@ -162,13 +167,13 @@ def _generateJSForConstructor(cls):
 		except AttributeError:
 			pass
 		else:
-			return '%s = %s'  %  ( cls.__name__, jsFunction )
+			return '%s = %s'  %  ( cls.__name__, jsFunction )  +  inheritanceJS
 
 	return \
 """function %s()
 {
 }
-"""  %  cls.__name__
+"""  %  cls.__name__  +  inheritanceJS
 
 
 def _generateClassNameMethod(cls):

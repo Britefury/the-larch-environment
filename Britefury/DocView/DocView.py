@@ -27,6 +27,10 @@ class DocViewPage (Page):
 		html, resolvedRefNodes, placeHolderIDs = self._docView.rootView.getHtmlNode().resolvedSubtreeHtmlForClient()
 		return html
 
+	
+	def objectsHandled(self):
+		self._docView.viewContext.refreshNodes()
+
 
 
 class DocView (object):
