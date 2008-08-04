@@ -69,11 +69,11 @@ class ProxyCell (CellInterface):
 
 
 	def getValue(self):
-		if CellInterface._cellDependencies is not None:
-			CellInterface._cellDependencies[self] = 0
+		if CellInterface._cellAccessList is not None:
+			CellInterface._cellAccessList[self] = 0
 
-		oldCellDeps = CellInterface._cellDependencies
-		CellInterface._cellDependencies = None
+		oldCellDeps = CellInterface._cellAccessList
+		CellInterface._cellAccessList = None
 
 		self._p_refreshTargetCell()
 
@@ -83,16 +83,16 @@ class ProxyCell (CellInterface):
 		if self._targetCell is not None:
 			result = self._targetCell.getValue()
 
-		CellInterface._cellDependencies = oldCellDeps
+		CellInterface._cellAccessList = oldCellDeps
 
 		return result
 
 	def getImmutableValue(self):
-		if CellInterface._cellDependencies is not None:
-			CellInterface._cellDependencies[self] = 0
+		if CellInterface._cellAccessList is not None:
+			CellInterface._cellAccessList[self] = 0
 
-		oldCellDeps = CellInterface._cellDependencies
-		CellInterface._cellDependencies = None
+		oldCellDeps = CellInterface._cellAccessList
+		CellInterface._cellAccessList = None
 
 		self._p_refreshTargetCell()
 
@@ -102,7 +102,7 @@ class ProxyCell (CellInterface):
 		if self._targetCell is not None:
 			result = self._targetCell.getImmutableValue()
 
-		CellInterface._cellDependencies = oldCellDeps
+		CellInterface._cellAccessList = oldCellDeps
 
 		return result
 
