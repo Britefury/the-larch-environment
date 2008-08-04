@@ -15,12 +15,13 @@ from Britefury.Util.SignalSlot import ClassSignal
 
 from Britefury.Kernel import KMeta
 
-from Britefury.Cell.CellInterface import CellInterface
 from Britefury.Cell.Cell import RefCell
 
 from Britefury.DocView.DocView import DocView
 
-from Britefury.DocPresent.Web.WDNode import WDNode
+from Britefury.DocPresent.Toolkit.DTWidget import *
+from Britefury.DocPresent.Toolkit.DTBorder import *
+from Britefury.DocPresent.Toolkit.DTLabel import *
 
 from Britefury.gSym.View.UnparsedText import UnparsedText
 
@@ -33,44 +34,27 @@ class DVNode (object):
 
 	def __init__(self, view, treeNode):
 		super( DVNode, self ).__init__()
-		
-		# Tree node and document node
 		self.treeNode = treeNode
 		self.docNode = treeNode.node
-		
-		# View and parent DVNOde
 		self._view = view
 		self._parent = None
+		self.refreshCell = RefCell()
+		self.refreshCell.function = self._o_refreshNode
 		
-		# Contents factory and contents cell
+		self._widget = DTBin()
+		self._text = None
 		self._contentsFactory = None
 		self._contentsCell = RefCell()
-		self._contentsCell.function = self._computeContents
-		self._contentsCell.changedSignal.connect( self._onContentsChanged )
-		
-		# HTML node
-		self._htmlNode = WDNode( self, self._view.viewContext, self._generateHtml )
-		self._htmlNode.disable()
-		
-		# Unparsed text
-		self._text = None
-		
-		# Focus
+		self._contentsCell.function = self._p_computeContents
+		self._cellsToRefresh = []
 		self.focus = None
 		
-		# Child DVNodes
 		self._children = set()
-		
-		# Reference count; determine if @self is in use
-		self._refCount = 0
 		
 
 		
 		
 	def _changeTreeNode(self, treeNode):
-		"""
-		Change the tree node used by this DVNode
-		"""
 		assert treeNode.node is self.docNode, 'DVNode._changeTreeNode(): doc-node must remain the same'
 		self.treeNode = treeNode
 		
@@ -80,9 +64,6 @@ class DVNode (object):
 	# DOCUMENT VIEW METHODS
 	#
 	def getDocView(self):
-		"""
-		Get the document view
-		"""
 		return self._view
 
 
@@ -90,121 +71,78 @@ class DVNode (object):
 	
 	
 	#
-	# CONTENTS METHODS
-	#
-	
-	def setContentsFactory(self, contentsFactory):
-		"""
-		Set the contents factory
-		"""
-		if contentsFactory is not self._contentsFactory:
-			# Change @self._contentsFactory, and reset @self._contentsCell
-			self._contentsFactory = contentsFactory
-			self._contentsCell.function = self._computeContents
-			
-			
-			
-	def _computeContents(self):
-		"""
-		Compute the contents of this node
-		"""
-		# Note that the contents are stored in the @_contents attribute. This is to avoid the contents
-		# being cached by the contents cell and therefore taking up memory.
-		
-		# The list of children may change:
-		# Unregister all the existing parent->child relationships
-		for child in self._children:
-			child.__unref()
-			self._view._nodeTable.unrefViewNode( child )
-		# And clear the list
-		self._children = set()
-		
-		if self._contentsFactory is not None:
-			# Compute the contents
-			contents = self._contentsFactory( self, self.treeNode, self._htmlNode )
-			
-			# The children list will have been re-populated; register the new relationships
-			for child in self._children:
-				child.__ref()
-				self._view._nodeTable.refViewNode( child )
-				
-			return contents
-		else:
-			# No contents factory
-			return None
-		
-		
-	def _onContentsChanged(self):
-		self._htmlNode.contentsChanged()
-	
-
-		
-		
-	#
-	# HTML GENERATION
-	#
-		
-	def _generateHtml(self, nodeContext):
-		contents = self._contentsCell.getImmutableValue()
-		
-		if isinstance( contents, tuple ):
-			html, text = contents
-			
-			assert isinstance( html, str )  or  isinstance( html, unicode )  or  isinstance( widget, DVNode )
-			assert isinstance( text, UnparsedText )  or  isinstance( text, str )  or  isinstance( text, unicode )
-			
-			self._text = text
-			return html
-		else:
-			html = contents
-			assert isinstance( html, str )  or  isinstance( html, unicode )  or  isinstance( widget, DVNode )
-			
-			self._text = None
-	
-			return html
-	
-	def getHtmlNode(self):
-		return self._htmlNode
-	
-	
-	
-	
-	#
 	# REFRESH METHODS
 	#
 	
+	def _o_refreshNode(self):
+		for cell in self._cellsToRefresh:
+			cell.getImmutableValue()
+		contents = self._contentsCell.getImmutableValue()
+		if isinstance( contents, tuple ):
+			widget, text = contents
+			assert isinstance( widget, DTWidget )  or  isinstance( widget, DVNode )
+			assert isinstance( text, UnparsedText )  or  isinstance( text, str )  or  isinstance( text, unicode )
+			
+			# If the contents is a DVNode, get its widget
+			if isinstance( widget, DVNode ):
+				widget = widget.widget
+			
+			self._widget.child = widget
+			self._text = contents[1]
+		else:
+			# Contents is just a widget
+			if isinstance( contents, DTWidget ):
+				self._widget.child = contents
+			elif isinstance( contents, DVNode ):
+				self._widget.child = contents.widget
+			else:
+				raise TypeError, 'contents should be a DTWidget or a DVNode'
+			self._text = None
+
+
+	def _o_resetRefreshCell(self):
+		self.refreshCell.function = self._o_refreshNode
+
+
 	def refresh(self):
-		self._generateHtml( self._htmlNode )
-			
-			
-			
-			
-			
-	#
-	# CHILD RELATIONSHIP METHODS
-	#
+		self.refreshCell.immutableValue
+
+
+	def _p_computeContents(self):
+		for child in self._children:
+			self._view._nodeTable.unrefViewNode( child )
+		self._children = set()
+		if self._contentsFactory is not None:
+			contents = self._contentsFactory( self, self.treeNode )
+			for child in self._children:
+				self._view._nodeTable.refViewNode( child )
+			return contents
+		else:
+			return None
 	
+
+	def _f_setRefreshCells(self, cells):
+		self._cellsToRefresh = cells
+		self._o_resetRefreshCell()
+		
 	def _registerChild(self, child):
 		self._children.add( child )
 		
-	def __ref(self):
-		if self._refCount == 0:
-			self._htmlNode.enable()
-		self._refCount += 1
 		
-	def __unref(self):
-		self._refCount -= 1
-		if self._refCount == 0:
-			self._htmlNode.disable()
-		
-		
+	def _f_setContentsFactory(self, contentsFactory):
+		if contentsFactory is not self._contentsFactory:
+			self._contentsFactory = contentsFactory
+			self._contentsCell.function = self._p_computeContents
+			
+			
 			
 	#
 	# CONTENT ACQUISITION METHODS
 	#
 	
-	def reference(self):
-		return self._htmlNode.reference()
+	def getWidget(self):
+		self.refresh()
+		return self._widget
 	
 	def getText(self):
 		self.refresh()
@@ -239,18 +177,12 @@ class DVNode (object):
 			return None
 
 
-	def _commandHistoryFreeze(self):
-		"""
-		Freeze the command history
-		"""
-		self._view._commandHistoryFreeze()
+	def _f_commandHistoryFreeze(self):
+		self._view._f_commandHistoryFreeze()
 
 
-	def _commandHistoryThaw(self):
-		"""
-		Thaw the command history
-		"""
-		self._view._commandHistoryThaw()
+	def _f_commandHistoryThaw(self):
+		self._view._f_commandHistoryThaw()
 
 
 
@@ -259,6 +191,7 @@ class DVNode (object):
 
 	parentNodeView = property( getParentNodeView )
 	docView = property( getDocView )
+	widget = property( getWidget )
 	text = property( getText )
 
 

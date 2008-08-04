@@ -9,42 +9,50 @@ from Britefury.DocPresent.Web.SharedObject import SharedObject, JSMethod, JSClas
 
 
 class WDDomEdit (SharedObject):
-	def __init__(self, nodeID, html, placeHolderIDs):
+	def __init__(self):
 		super( WDDomEdit, self ).__init__()
 		
-		self.nodeID = nodeID
-		self.html = html
-		self.placeHolderIDs = placeHolderIDs
+		self.placeHolderIDs = []
+		self.html = ''
+		self.nodeID = ''
 	__init__.jsFunction = \
 """
-function (nodeID, html, placeHolderIDs)
+function ()
 {
-	this.nodeID = nodeID;
-	this.html = html;
-	this.placeHolderIDs = placeHolderIDs;
+	this.placeHolderIDs = [];
+	this.html = "";
+	this.nodeID = "";
 }
 """
 	
 	
 	
 	def jsonContent(self):
-		return [ self.nodeID, self.html, self.placeHolderIDs ]
+		return [ self.placeHolderIDs, self.html, self.nodeID ]
 	jsonContent.jsFunction =\
 """function ()
 {
-	return [ this.nodeID, this.html, this.placeHolderIDs ];
+	return [ this.placeHolderIDs, this.html, this.nodeID ];
 }
 """
 	
 	@classmethod
 	def fromJSonContent(cls, content):
-		return WDDomEdit( content[0], content[1], content[2] )
+		o = WDDomEdit()
+		o.placeHolderIDs = content[0]
+		o.html = content[1]
+		o.nodeID = content[2]
+		return o
 	
 	
 	fromJSonContent_js = JSClassNamedMethod( 'fromJSonContent', \
 """function (content)
 {
-	return new WDDomEdit( content[0], content[1], content[2] );
+	var o = new WDDomEdit();
+	o.placeHolderIDs = content[0];
+	o.html = content[1];
+	o.nodeID = content[2];
+	return o;
 }
 """ )
 

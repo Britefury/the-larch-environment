@@ -12,66 +12,32 @@ from Britefury.DocTree.DocTreeNode import DocTreeNode
 
 from Britefury.DocView.DocViewNodeTable import DocViewNodeTable
 
-from Britefury.DocPresent.Web.Context.WebViewContext import WebViewContext
-from Britefury.DocPresent.Web.Page import Page
-
-
-
-class DocViewPage (Page):
-	def __init__(self, title, docView):
-		super( DocViewPage, self ).__init__( title )
-		self._docView = docView
-		
-	
-	def _htmlBody(self):
-		html, resolvedRefNodes, placeHolderIDs = self._docView.rootView.getHtmlNode().resolvedSubtreeHtmlForClient()
-		return html
-
-	
-	def objectsHandled(self):
-		self._docView.viewContext.refreshNodes()
 
 
 
 class DocView (object):
-	def __init__(self, owner, tree, root, commandHistory, nodeFactory):
+	def __init__(self, tree, root, commandHistory, nodeFactory):
 		super( DocView, self ).__init__()
 		
 		assert isinstance( root, DocTreeNode )
-		
-		self.owner = owner
 
-		# Tree and tree root node
 		self._tree = tree
 		self._root = root
 
-		# Command history
+		self._document = None
 		self._commandHistory = commandHistory
 
-		# Factory to make nodes
-		self._defaultNodeFactory = nodeFactory
+		self._nodeFactory = nodeFactory
 
-		# Refresh cell
 		self.refreshCell = Cell()
-		self.refreshCell.function = self._refresh
+		self.refreshCell.function = self._p_refresh
 
-		# Node to DocViewNode table
 		self._nodeTable = DocViewNodeTable()
 		
-		# View of root node
 		self._rootView = None
-		
-		# Create the page, and the view context
-		self.page = DocViewPage( 'gSym test', self )
-		self.viewContext = WebViewContext( owner, self.page )
 
 		
-	
-	def _getRootView(self):
-		"""
-		Get the view of the root node
-		(creates it if it does not exist yet)
-		"""
+	def _p_getRootView(self):
 		if self._rootView is None:
 			self._rootView = self.buildNodeView( self._root )
 		return self._rootView
@@ -79,55 +45,47 @@ class DocView (object):
 
 
 
+	def getDocument(self):
+		return self._document
+	
+	def setDocument(self, document):
+		self._document = document
+
+
+	def documentUngrab(self):
+		self._document.removeFocusGrab()
+
+
+
 	def buildNodeView(self, treeNode, nodeFactory=None):
-		"""
-		Build a view node for a document node (obtained through a tree node)
-		"""
 		assert isinstance( treeNode, DocTreeNode )
 		
 		if treeNode is None:
-			# No document node; no view node
 			return None
 		else:
-			# If no node factory has been specified, use the default one
 			if nodeFactory is None:
-				nodeFactory = self._defaultNodeFactory
+				nodeFactory = self._nodeFactory
 			
-			# See if we already have a view node for @treeNode
 			try:
 				viewNode = self._nodeTable[treeNode]
 			except KeyError:
-				# We don't have a view node
 				try:
-					# Try to re-use a now unused view node
 					viewNode = self._nodeTable.takeUnusedViewNodeFor( treeNode )
 				except KeyError:
-					# Could not find anything.....
-					# Create one
 					viewNode = nodeFactory( self, treeNode )
-					# Add to the node table
 					self._nodeTable[treeNode] = viewNode
 
-			# Refresh the node
 			viewNode.refresh()
 
 			return viewNode
 
-		
-		
 
 	def getViewNodeForDocTreeNode(self, treeNode):
-		"""
-		Get the view node for a document/tree node (if there is one)
-		"""
 		return self._nodeTable[treeNode]
 
 
 
 	def refreshAndGetViewNodeForDocTreeNode(self, treeNode):
-		"""
-		Refresh the whole documentm then get the view node for a document/tree node (if there is one)
-		"""
 		self.refresh()
 		return self._nodeTable[treeNode]
 
@@ -135,44 +93,27 @@ class DocView (object):
 
 
 
-	def _refresh(self):
-		"""
-		Refresh the whole document
-		"""
-		# Refresh the root view
+	def _p_refresh(self):
 		self.rootView.refresh()
 
 
 	def refresh(self):
-		"""
-		Refresh the whole document
-		"""
-		# Go through the refresh cell
 		self.refreshCell.immutableValue
+		#self.rootView.refresh()
 
 
 
 
-	def _commandHistoryFreeze(self):
-		"""
-		Freeze the command history
-		"""
+	def _f_commandHistoryFreeze(self):
 		if self._commandHistory is not None:
 			self._commandHistory.freeze()
 
 
-	def _commandHistoryThaw(self):
-		"""
-		Thaw the command history
-		"""
+	def _f_commandHistoryThaw(self):
 		if self._commandHistory is not None:
 			self._commandHistory.thaw()
 			
 			
-			
-	def _queueNodeRefresh(self, viewNode):
-		assert False, 'not implemented'
-			
-			
-	rootView = property( _getRootView )
+	rootView = property( _p_getRootView )
+	document = property( getDocument, setDocument )
 

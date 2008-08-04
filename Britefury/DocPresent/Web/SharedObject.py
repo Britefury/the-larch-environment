@@ -8,34 +8,6 @@
 import types
 
 
-from Britefury.DocPresent.Web.JSScript import JSScriptClass, JSScript
-
-
-
-
-
-_classRegsitryJS = \
-"""
-_classNameToClass = {};
-
-function _json_to_shared_object(json)
-{
-	var className = json[0];
-	var content = json[1];
-	
-	cls = _classNameToClass[className];
-	return cls.fromJSonContent( content );
-};
-
-function _shared_object_to_json(obj)
-{
-	var className = obj.className();
-	var content = obj.jsonContent();
-	return [ className, content ];
-};
-"""
-
-
 class InvalidSharedObjectJSon (Exception):
 	pass
 
@@ -72,7 +44,7 @@ class JSClassNamedMethod (JSClassMethod):
 
 
 
-class SharedObjectClass (JSScriptClass):
+class SharedObjectClass (type):
 	def __init__(cls, clsName, clsBases, clsDict):
 		super( SharedObjectClass, cls ).__init__( clsName, clsBases, clsDict )
 		_sharedObjectClassNameToClass[clsName] = cls
@@ -87,7 +59,7 @@ class SharedObjectClass (JSScriptClass):
 		
 		
 
-class SharedObject (JSScript):
+class SharedObject (object):
 	__metaclass__ = SharedObjectClass
 	
 	
@@ -125,16 +97,6 @@ class SharedObject (JSScript):
 		else:
 			print j
 			raise InvalidSharedObjectJSon
-		
-		
-		
-	@classmethod
-	def __class_js__(cls):
-		initialJS = ''
-		if cls is SharedObject:
-			initialJS = _classRegsitryJS + '\n\n\n'
-		clsName = cls.__name__
-		return initialJS  +  generateJSImplementation( cls )  +  '_classNameToClass.%s = %s\n'  %  ( clsName, clsName )  +  '%s.className = "%s"\n'  %  ( clsName, clsName )  +  '\n\n'
 
 	
 	
@@ -152,11 +114,6 @@ def _generateJSForClassMethod(cls, method):
 	
 
 def _generateJSForConstructor(cls):
-	bases = [ base   for base in cls.__bases__   if issubclass( base, SharedObject ) ]
-	
-	inheritanceJS = '%s.prototype = new %s;\n'  %  ( cls.__name__, bases[0].__name__ )      if len( bases ) > 0   else   ''
-	
-	
 	try:
 		method = cls.__init__
 	except AttributeError:
@@ -167,13 +124,13 @@ def _generateJSForConstructor(cls):
 		except AttributeError:
 			pass
 		else:
-			return '%s = %s'  %  ( cls.__name__, jsFunction )  +  inheritanceJS
+			return '%s = %s'  %  ( cls.__name__, jsFunction )
 
 	return \
 """function %s()
 {
 }
-"""  %  cls.__name__  +  inheritanceJS
+"""  %  cls.__name__
 
 
 def _generateClassNameMethod(cls):
