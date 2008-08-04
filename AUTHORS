@@ -4,11 +4,9 @@ AUTHORS
 
 The gCell distribution includes the following libraries:
 
-greenlet		Found in cpp/extlibs/greenlet			By Armin Rigo, Christian Tismer, et al			http://codespeak.net/py/current/doc/home.html
+greenlet		Found in cpp/extlibs/greenlet			By Armin Rigo, Christian Tismer, et al				http://codespeak.net/py/current/doc/home.html
 piemenu		Found in Britefury/extlibs/piemenu		By Don Hopkins								http://www.donhopkins.com/
 json			Found in Britefury/extlibs/json			By Patrick D. Logan							http://www.json.org
-json-js		Found in resources/json2.js			By json.org								http://www.json.org
-jquery		Found in resources/jquery-1.2.6.js		By John Resig (jquery.com)					http://www.jquery.com
 
 
 

@@ -5,7 +5,8 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
-from Britefury.gSym.View.gSymView import listView, viewEval, mapViewEval, GSymView
+from Britefury.gSym.View.gSymView import activeBorder, border, indent, highlight, hline, label, markupLabel, entry, markupEntry, customEntry, hbox, ahbox, vbox, flow, flowSep, \
+     script, scriptLSuper, scriptLSub, scriptRSuper, scriptRSub, listView, interact, focus, viewEval, mapViewEval, GSymView
 from Britefury.gSym.View.ListView import FlowListViewLayout, HorizontalListViewLayout, VerticalInlineListViewLayout, VerticalListViewLayout
 
 from Britefury.gSym.View.Interactor import keyEventMethod, accelEventMethod, textEventMethod, backspaceStartMethod, deleteEndMethod, Interactor
@@ -15,8 +16,7 @@ from Britefury.gSym.View.EditOperations import replace, append, prepend, insertB
 from Britefury.gSym.View.UnparsedText import UnparsedText
 
 from Britefury.DocPresent.Web.UnparseAs import unparseAs
-from Britefury.DocPresent.Web.Highlight import HighlightHtmlClass, highlight
-from Britefury.DocPresent.Web.EditAsText import EditAsTextHtmlClass, editAsText
+from Britefury.DocPresent.Web.Highlight import highlight
 
 
 from GSymCore.Languages.Python25 import Parser
@@ -52,30 +52,30 @@ def _parseText(parser, text):
 		return None
 
 
-
-_compoundStmtNames = set( [ 'ifStmt', 'elifStmt', 'elseStmt', 'whileStmt', 'forStmt', 'tryStmt', 'exceptStmt', 'finallyStmt', 'withStmt', 'defStmt', 'classStmt' ] )	
-	
-
-def parsedNodeTextHandler(nodeToEdit, parser, startText):
-	def handler(value, bUserEvent):
-		node = nodeToEdit
-		if value != startText:
+class ParsedNodeInteractor (Interactor):
+	@textEventMethod()
+	def tokData(self, bUserEvent, bChanged, value, node, parser):
+		if bChanged:
 			parsed = _parseText( parser, value )
 			if parsed is not None:
 				replace( node, parsed )
 			else:
 				replace( node, [ 'UNPARSED', value ] )
-	return handler
+	
+	eventMethods = [ tokData ]
+
+
+_compoundStmtNames = set( [ 'ifStmt', 'elifStmt', 'elseStmt', 'whileStmt', 'forStmt', 'tryStmt', 'exceptStmt', 'finallyStmt', 'withStmt', 'defStmt', 'classStmt' ] )	
+	
 
 def _isCompoundStmt(node):
 	return node[0] in _compoundStmtNames
 	
 
-	
-def parsedLineTextHandler(nodeToEdit, parser, startText):
-	def handler(value, bUserEvent):
-		node = nodeToEdit
-		if value != startText:
+class ParsedLineInteractor (Interactor):
+	@textEventMethod()
+	def tokData(self, bUserEvent, bChanged, value, node, parser):
+		if bChanged:
 			if value.strip() == '':
 				node = replace( node, [ 'blankLine' ] )
 			else:
@@ -99,8 +99,19 @@ def parsedLineTextHandler(nodeToEdit, parser, startText):
 		if bUserEvent:
 			print 'Inserting...'
 			return insertAfter( node, [ 'blankLine' ] )
+		
+		
+		
+	@backspaceStartMethod()
+	def backspaceStart(self, node, parser):
+		print 'Backspace start'
+	
 
-	return handler
+	@deleteEndMethod()
+	def deleteEnd(self, node, parser):
+		print 'Delete end'
+
+	eventMethods = [ tokData, backspaceStart, deleteEnd ]
 
 
 	
@@ -203,111 +214,76 @@ def python25ViewState(parser, mode=MODE_EXPRESSION):
 
 
 
-def suiteView(ctx, suite):
-	lineViews = mapViewEval( ctx, suite, None, python25ViewState( Parser.statement, MODE_STATEMENT ) )
-	#return listView( VerticalListViewLayout( 0.0, 0.0, 0.0 ), None, None, None, lineViews )
-	
-	return '<span style="margin-left: 2em">' + '<br>\n'.join( [ lineView.reference()   for lineView in lineViews ] ) + '</span>'
+def suiteView(suite):
+	lineViews = mapViewEval( suite, None, python25ViewState( Parser.statement, MODE_STATEMENT ) )
+	return listView( VerticalListViewLayout( 0.0, 0.0, 0.0 ), None, None, None, lineViews )
 
 
 
 
-#stmtHighlightClass = HighlightHtmlClass( 'stmt' )
-#exprHighlightClass = HighlightHtmlClass( 'expr', 'ctrl', 'ctrl' )
+stmtHighlightClass = HighlightHtmlClass( 'stmt' )
+exprHighlightClass = HighlightHtmlClass( 'expr', 'ctrl', 'ctrl' )
 
 
 
 
-exprHighlightClass = HighlightHtmlClass( 'exprHighlight', '', 'expr_highlight', 'ctrl', 'ctrl, shift, alt' )
-stmtHighlightClass = HighlightHtmlClass( 'stmtHighlight', '', 'stmt_highlight', '', 'ctrl, shift, alt' )
-
-exprEditorClass = EditAsTextHtmlClass( 'exprEditor', 'ctrl', 'ctrl, shift, alt' )
-stmtEditorClass = EditAsTextHtmlClass( 'stmtEditor', '', 'ctrl, shift, alt' )
-
-
-def nodeEditor(ctx, node, html, text, state):
+def nodeEditor(ctx, node, htmlWithUnparsed, state):
 	if state is None:
 		parser = Parser.expression
 		mode = MODE_EXPRESSION
 	else:
 		parser, mode = state
 
-	#assert False
+	assert False
 	if mode == MODE_EXPRESSION:
-		#return interact( focus( editAsText( ctx, highlight( ctx, contents, exprHighlightClass ), text.getText(), 'ctrl', 'ctrl' ) ),  ParsedNodeInteractor( node, parser ) ),   text
-		highlightHtml = highlight( ctx, exprHighlightClass, html )
-		editorHtml = editAsText( ctx, exprEditorClass, highlightHtml, text.getText(), parsedNodeTextHandler( node, parser, text.getText() ) )
-		return editorHtml, text
+		return interact( focus( editAsText( ctx, highlight( ctx, contents, exprHighlightClass ), text.getText(), 'ctrl', 'ctrl' ) ),  ParsedNodeInteractor( node, parser ) ),   text
 	elif mode == MODE_STATEMENT:
-		#return interact( focus( editAsText( ctx, highlight( ctx, contents, stmtHighlightClass ), text.getText() ) ),  ParsedLineInteractor( node, parser ) ),   text
-		highlightHtml = highlight( ctx, stmtHighlightClass, html )
-		editorHtml = editAsText( ctx, stmtEditorClass, highlightHtml, text.getText(), parsedLineTextHandler( node, parser, text.getText() ) )
-		return editorHtml, text
+		return interact( focus( editAsText( ctx, highlight( ctx, contents, stmtHighlightClass ), text.getText() ) ),  ParsedLineInteractor( node, parser ) ),   text
 	else:
 		raise ValueError
 		
 
 
-def compoundStatementEditor(ctx, node, headerHtml, headerText, suite, state):
+def compoundStatementEditor(ctx, node, headerContents, headerText, suite, state):
 	if state is None:
 		parser = Parser.statement
 		mode = MODE_STATEMENT
 	else:
 		parser, mode = state
-		
-	highlightHtml = highlight( ctx, stmtHighlightClass, headerHtml )
-	editorHtml = editAsText( ctx, stmtEditorClass, highlightHtml, headerText.getText(), parsedLineTextHandler( node, parser, headerText.getText() ) )
 
-	#assert False
-	#headerWidget = interact( focus( customEntry( highlight( headerContents, style=lineEditorStyle ), headerText.getText() ) ),  ParsedLineInteractor( node, parser ) )
-	#statementWidget = vbox( [ headerWidget, indent( suiteView( suite ), 30.0 ) ] )
-	#return statementWidget, headerText
-	statementHtml = editorHtml + '<br>\n' + suiteView( ctx, suite )
-	return statementHtml, headerText
+	assert False
+	headerWidget = interact( focus( customEntry( highlight( headerContents, style=lineEditorStyle ), headerText.getText() ) ),  ParsedLineInteractor( node, parser ) )
+	statementWidget = vbox( [ headerWidget, indent( suiteView( suite ), 30.0 ) ] )
+	return statementWidget, headerText
 
 
 
 
 class Python25View (GSymView):
-	__css_styles__ = \
-		"""
-		.expr_highlight { background-color:#e0ffe0; }
-		.stmt_highlight { background-color:#e0e0ff; }
-		"""
-	
-	__js_onLoad__ = exprHighlightClass.onLoadJS() + stmtHighlightClass.onLoadJS() + exprEditorClass.onLoadJS() + stmtEditorClass.onLoadJS()
-	
-	
 	# MISC
 	def python25Module(self, ctx, state, node, *content):
 		lineViews = mapViewEval( ctx, content, None, python25ViewState( Parser.statement, MODE_STATEMENT ) )
-		#return listView( ctx, VerticalListViewLayout( 0.0, 0.0, 0.0 ), None, None, None, lineViews ), ''
-		return '<br>\n'.join( [ lineView.reference()   for lineView in lineViews ] ), ''
+		return listView( ctx, VerticalListViewLayout( 0.0, 0.0, 0.0 ), None, None, None, lineViews ), ''
 	
 
 	
 	def blankLine(self, ctx, state, node):
 		return nodeEditor( ctx, node,
-				'',
-				UnparsedText( '' ),
+				unparseAs( ctx, '<br>', '' ),
 				state )
 	
 	
 	def UNPARSED(self, ctx, state, node, value):
 		html = _htmlSytle( '&lt;' + value + '&gt;', 'unparsed' )
 		return nodeEditor( ctx, node,
-				html,
-				UnparsedText( value ),
-				#unparseAs( ctx, html, value ),
+				unparseAs( ctx, html, value ),
 				state )
 	
 	
 	# Variable reference
 	def var(self, ctx, state, node, name):
 		return nodeEditor( ctx, node,
-				name,
-				UnparsedText( name, PRECEDENCE_VAR ),
-				#unparseAs( ctx, name, name, PRECEDENCE_VAR ),
+				unparseAs( ctx, name, name, PRECEDENCE_VAR ),
 				state )
 	
 
@@ -315,11 +291,9 @@ class Python25View (GSymView):
 	# Attribute ref
 	def attributeRef(self, ctx, state, node, target, name):
 		targetView = viewEval( ctx, target )
-		html = targetView.reference() + _punctuation( '.' ) + name
+		html = targetView.html + _punctuation( '.' ) + name
 		return nodeEditor( ctx, node,
-				html,
-				UnparsedText( targetView.text + '.' + name, PRECEDENCE_ATTR ),
-				#unparseAs( ctx, html, targetView.text + '.' + unparseAs( name, name ), PRECEDENCE_ATTR ),
+				unparseAs( ctx, html, targetView.text + '.' + unparseAs( name, name ), PRECEDENCE_ATTR ),
 				state )
 
 
@@ -327,11 +301,9 @@ class Python25View (GSymView):
 	# Return statement
 	def returnStmt(self, ctx, state, node, value):
 		valueView = viewEval( ctx, value, None, python25ViewState( Parser.tupleOrExpression ) )
-		html = _keyword( returnKeyword ) + ' ' + valueView.reference()
+		html = _keyword( returnKeyword ) + ' ' + valueView.html
 		return nodeEditor( ctx, node,
-				html,
-				UnparsedText( returnKeyword  +  ' '  +  valueView.text, PRECEDENCE_STMT ),
-				#unparseAs( ctx, html, returnKeyword + ' ' + valueView.text, PRECEDENCE_STMT ),
+				unparseAs( ctx, html, returnKeyword + ' ' + valueView.text, PRECEDENCE_STMT ),
 				state )
 
 	
@@ -339,10 +311,8 @@ class Python25View (GSymView):
 	# While statement
 	def whileStmt(self, ctx, state, node, condition, suite):
 		conditionView = viewEval( ctx, condition )
-		headerHtml = _keyword( whileKeyword ) + ' ' + conditionView.reference() + _punctuation( ':' )
+		headerHtml = _keyword( whileKeyword ) + ' ' + conditionView.html + _punctuation( ':' )
 		return compoundStatementEditor( ctx, node,
-				headerHtml,
-				UnparsedText( whileKeyword + ' ' + conditionView.text + ':' ),
-				#unparseAs( headerHtml, unparseAs( whileKeyword + ' ' + conditionView.text + ':' ) ),
+				unparseAs( headerHtml, unparseAs( whileKeyword + ' ' + conditionView.text + ':' ) ),
 				suite,
 				state  )
