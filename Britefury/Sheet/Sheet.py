@@ -1299,8 +1299,8 @@ class CompositeCell (CellInterface):
 
 		# Add @self to the global dependency list if it exists; this ensures that any cell that
 		# is recomputing its value will know that the @value of self is required
-		if CellInterface._cellDependencies is not None:
-			CellInterface._cellDependencies[self] = 0
+		if CellInterface._cellAccessList is not None:
+			CellInterface._cellAccessList[self] = 0
 
 		return self._value
 
@@ -1309,8 +1309,8 @@ class CompositeCell (CellInterface):
 
 		# Add @self to the global dependency list if it exists; this ensures that any cell that
 		# is recomputing its value will know that the @value of self is required
-		if CellInterface._cellDependencies is not None:
-			CellInterface._cellDependencies[self] = 0
+		if CellInterface._cellAccessList is not None:
+			CellInterface._cellAccessList[self] = 0
 
 		return self._value
 
