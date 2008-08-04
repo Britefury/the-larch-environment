@@ -116,8 +116,8 @@ class LiteralCell (CellInterface):
 
 		# Add @self to the global dependency list if it exists; this ensures that any cell that
 		# is recomputing its value will know that the @value of self is required
-		if CellInterface._cellAccessList is not None:
-			CellInterface._cellAccessList[self] = None
+		if CellInterface._cellDependencies is not None:
+			CellInterface._cellDependencies[self] = None
 
 		if isValueImmutable( self._value ):
 			return self._value
@@ -129,8 +129,8 @@ class LiteralCell (CellInterface):
 
 		# Add @self to the global dependency list if it exists; this ensures that any cell that
 		# is recomputing its value will know that the @value of self is required
-		if CellInterface._cellAccessList is not None:
-			CellInterface._cellAccessList[self] = None
+		if CellInterface._cellDependencies is not None:
+			CellInterface._cellDependencies[self] = None
 
 		return self._value
 
@@ -222,8 +222,8 @@ class LiteralRefCell (LiteralCell):
 
 		# Add @self to the global dependency list if it exists; this ensures that any cell that
 		# is recomputing its value will know that the @value of self is required
-		if CellInterface._cellAccessList is not None:
-			CellInterface._cellAccessList[self] = None
+		if CellInterface._cellDependencies is not None:
+			CellInterface._cellDependencies[self] = None
 
 		return self._value
 

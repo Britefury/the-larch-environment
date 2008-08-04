@@ -6,9 +6,7 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
 from Britefury.extlibs.json import json
-from Britefury.DocPresent.Web.JSScript import jsScriptClasses
 from Britefury.DocPresent.Web.SharedObject import SharedObject, sharedObjectClasses, generateJSImplementation
-from Britefury.DocPresent.Web.EventFromClient import EventFromClient
 
 
 
@@ -25,9 +23,6 @@ _pageTemplate = """
 </style>
 <script type="text/javascript" src="resources/json2.js"></script>
 <script type="text/javascript" src="resources/jquery_1.2.6.js"></script>
-<script type="text/javascript" src="resources/highlight.js"></script>
-<script type="text/javascript" src="resources/editastext.js"></script>
-%s
 <script type="text/javascript">
 function log(message) {
     if (!log.window_ || log.window_.closed) {
@@ -69,7 +64,31 @@ $(document).ready( function()
 
 _js_pageScripts = \
 """
+Function.prototype.method = function(name, func)
+{
+	this.prototype[name] = func;
+	return this;
+}
+
+
+_classNameToClass = {};
 _outgoingObjectQueue = [];
+
+function _json_to_shared_object(json)
+{
+	var className = json[0];
+	var content = json[1];
+	
+	cls = _classNameToClass[className];
+	return cls.fromJSonContent( content );
+};
+
+function _shared_object_to_json(obj)
+{
+	var className = obj.className();
+	var content = obj.jsonContent();
+	return [ className, content ];
+};
 
 
 
@@ -118,11 +137,6 @@ class Page (object):
 	def __init__(self, title):
 		self._objectQueue = []
 		self._pageTitle = title
-		self._cssStyles = ''
-		self._jsIncludes = []
-		self._jsOnLoad = ''
-		self._jsOnReady  = ''
-		self._eventHandlers = {}
 		
 		
 	def _sendObjectsAsJSon(self):
@@ -136,7 +150,6 @@ class Page (object):
 			objs = [ SharedObject.fromJSon( j )   for j in objectsJSON ]
 			for obj in objs:
 				self.handleIncomingObject( obj )
-			self.objectsHandled()
 		else:
 			raise InvalidSharedObjectList
 		
@@ -144,19 +157,12 @@ class Page (object):
 	
 	def _class_js(self, c):
 		return generateJSImplementation( c )  +  '_classNameToClass.%s = %s\n'  %  ( c.__name__, c.__name__ )  +  '%s.className = "%s"\n'  %  ( c.__name__, c.__name__ )  +  '\n\n'
-		
-	
-	
-	def _scriptIncludes(self):
-		return ''.join( [ '<script type="text/javascript" src="%s"></script>\n'  %  include   for include in self._jsIncludes ] )
-
 	
 	def _scripts(self):
 		pageHeaderScript = _js_pageScripts
 		
-		jsScripts = '\n\n'.join( [ c.__class_js__()   for c in jsScriptClasses ] )
-		
-		return pageHeaderScript  +  '\n\n\n'  +  jsScripts  +  '\n\n\n'  +  self._initScripts()   +  '\n\n\n'  +  self._jsOnLoad
+		sharedObjectClassScripts = '\n\n'.join( [ self._class_js( c )   for c in sharedObjectClasses ] )
+		return pageHeaderScript  +  '\n\n\n'  +  sharedObjectClassScripts  +  '\n\n\n'  +  self._initScripts()
 	
 	
 	def _initScripts(self):
@@ -164,11 +170,11 @@ class Page (object):
 	
 	
 	def _readyScripts(self):
-		return '\n\n'.join( [ c.__class_onReady_js__()   for c in jsScriptClasses ] )   +   '\n\n\n'  +  self._jsOnReady
+		return ''
 	
 	
 	def _styles(self):
-		return self._cssStyles
+		return ''
 	
 	def _title(self):
 		return self._pageTitle
@@ -180,7 +186,7 @@ class Page (object):
 	
 	
 	def html(self):
-		return _pageTemplate  %  ( self._styles(),   self._scriptIncludes(),   self._scripts(),   self._readyScripts(),   self._title(),   self._htmlBody() )
+		return _pageTemplate  %  ( self._styles(),		self._scripts(),   self._readyScripts(),   self._title(),   self._htmlBody() )
 	
 	def doServerObjectExchange(self, objs):
 		# Read and process incoming objects that came with the request
@@ -199,39 +205,7 @@ class Page (object):
 	
 
 	def handleIncomingObject(self, obj):
-		if isinstance( obj, EventFromClient ):
-			try:
-				handler = self._eventHandlers[obj.sourceID]
-			except KeyError:
-				pass
-			else:
-				handler( obj )
-				
-				
-	def objectsHandled(self):
 		pass
 		
-	
-	
-	
-	def addCSSStyles(self, cssStyles):
-		self._cssStyles += cssStyles
-	
-	def extendJSIncludes(self, jsIncludes):
-		self._jsIncludes.extend( jsIncludes )
-		
-	def addJSOnLoad(self, js):
-		self._jsOnLoad += js
-		
-	def addJSOnReady(self, js):
-		self._jsOnReady += js
-		
-		
-		
-	def registerEventHandler(self, sourceID, handler):
-		self._eventHandlers[sourceID] = handler
-		
-	def unregisterEventHandler(self, sourceID):
-		del self._eventHandlers[sourceID]
 		
 		

@@ -5,11 +5,11 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
+from Britefury.DocPresent.Web.Context.WebViewContext import WebViewContext
 
 
 class WebViewNodeContext (object):
-	def __init__(self, owner, viewContext):
-		self.owner = owner
+	def __init__(self, viewContext):
 		self.viewContext = viewContext
 		self.idsInNode = set()
 		
@@ -27,7 +27,6 @@ import unittest
 
 class TestCase_WebViewNodeContext (unittest.TestCase):
 	def test_allocID(self):
-		from Britefury.DocPresent.Web.Context.WebViewContext import WebViewContext
 		nctx = WebViewNodeContext( WebViewContext( None ) )
 		self.assert_( nctx.allocIDForNodeContent( 'a' )  ==  'a0' )
 		self.assert_( nctx.allocIDForNodeContent( 'a' )  ==  'a1' )

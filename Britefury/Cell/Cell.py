@@ -140,21 +140,24 @@ class Cell (CellInterface):
 		try:
 			# Add @self to the global dependency list if it exists; this ensures that any cell that
 			# is recomputing its value will know that the @value of self is required
-			if CellInterface._cellAccessList is not None:
-				CellInterface._cellAccessList[self] = None
+			if CellInterface._cellDependencies is not None:
+				CellInterface._cellDependencies[self] = None
 
 			if self._refreshState  !=  self.REFRESHSTATE_REFRESH_NOT_REQUIRED:
 				# IS THIS CORRECT
 				self._refreshState = self.REFRESHSTATE_REFRESH_NOT_REQUIRED
 				if isinstance( self._evaluator, CellEvaluator ):
-					# Push a new cell access list
-					oldCellAccesses = CellInterface.pushNewAccessList()
+					# Save the existing global dependency list
+					oldCellDeps = CellInterface._cellDependencies
+					# Create a new dependency list for @self
+					deps = weakref.WeakKeyDictionary()
+					CellInterface._cellDependencies = deps
 					try:
 						self._valueCache = self._evaluator.evaluate( self )
 					except CellEvaluationError:
 						self._valueCache = self._p_getDefaultValueForUse()
-					# Restore the existing cell access list
-					deps = CellInterface.popAccessList( oldCellAccesses )
+					# Restore the existing global dependency list
+					CellInterface._cellDependencies = oldCellDeps
 
 					if not self._p_checkValueType( self._valueCache ):
 						self._valueCache = self._p_getDefaultValueForUse()

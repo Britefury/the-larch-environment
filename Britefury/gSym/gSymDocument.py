@@ -14,7 +14,7 @@ from Britefury.gSymConfig.gSymVersion import compareVersions, gSymVersion
 
 from Britefury.gSym.View.gSymView import GSymViewFactory
 from Britefury.gSym.gSymEnvironment import GSymEnvironment
-#from GSymCore.Languages.LISP import LISP
+from GSymCore.Languages.LISP import LISP
 
 
 

@@ -12,7 +12,7 @@ import cherrypy
 from Britefury.extlibs.json import json
 
 
-from Britefury.DocPresent.Web.Page import Page
+from Britefury.Web.Page import Page
 
 
 
@@ -39,14 +39,6 @@ class Resources (object):
 	@cherrypy.expose
 	def jquery_1_2_6_js(self):
 		return open( os.path.join( 'resources', 'jquery-1.2.6.js' ), 'r' ).read()
-
-	@cherrypy.expose
-	def highlight_js(self):
-		return open( os.path.join( 'resources', 'highlight.js' ), 'r' ).read()
-
-	@cherrypy.expose
-	def editastext_js(self):
-		return open( os.path.join( 'resources', 'editastext.js' ), 'r' ).read()
 
 	
 	
