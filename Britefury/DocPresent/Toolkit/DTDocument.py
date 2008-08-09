@@ -79,11 +79,6 @@ _undoAccel = gtk.accelerator_parse( '<control>z' )
 _redoAccel = gtk.accelerator_parse( '<control><shift>Z' )
 
 
-_CURSOR_HEIGHT = 22.0
-
-
-
-
 class _GtkPresentationArea (gtk.DrawingArea):
 	"""This helper class is declared, since the do_key_press_event() method of a gtk.DrawingArea must be overridden in order to receive keyboard events.
 	We cannot derive our main class from gtk.DrawingArea, otherwise the DTWidget and gtk.DrawingArea 'parent' attributed will collide, resulting in problems.
