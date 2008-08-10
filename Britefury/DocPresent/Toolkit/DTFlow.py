@@ -325,21 +325,37 @@ if __name__ == '__main__':
 	
 	
 
-	def makeRecursiveFlow(level):
-		f = DTFlow( indentation=30.0 )
+	def makeRecursiveAttrFlow(level, inner):
 		if level == 0:
+			return inner
+		else:
+			b = DTBox()
+			b.append( DTLabel( 'foo%d'  %  level ) )
+			b.append( DTLabel( '.' ) )
+			f = DTFlow( indentation=30.0 )
+			f.append( b )
+			f.append( makeRecursiveAttrFlow( level - 1, inner ) )
+		return f
+
+	def makeRecursiveCallFlow(level):
+		if level == 0:
+			f = DTFlow( indentation=30.0 )
 			for i in xrange( 0, 10 ):
 				f.append( DTLabel( '%d' % i ) )
+			return f
 		else:
-			for i in [ 'a', 'b', 'c' ]:
-				f.append( DTLabel( '%s%d' % ( i*10, level ) ) )
-			f.append( DTLabel( '(' ) )
-			f.append( makeRecursiveFlow( level - 1 ) )
-			f.append( DTLabel( ')' ) )
-		return f
+			call = DTFlow( indentation=30.0 )
+			call.append( DTLabel( 'bar' ) )
+			call.append( DTLabel( '(' ) )
+			call.append( makeRecursiveCallFlow( level - 1 ) )
+			call.append( DTLabel( ')' ) )
+			a = makeRecursiveAttrFlow( 4, call )
+			return a
 	
 	
-	rflow = makeRecursiveFlow( 4 )
+	
+	
+	rflow = makeRecursiveCallFlow( 4 )
 
 	contentsBox = DTBox( direction=DTBox.TOP_TO_BOTTOM, alignment=DTBox.ALIGN_LEFT )
 	contentsBox[:] = [ flowLine, rflow ]

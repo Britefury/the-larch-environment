@@ -20,7 +20,12 @@ import Britefury.Math.Xform2;
 
 
 
-abstract public class DPWidget {
+abstract public class DPWidget
+{
+	protected static double NON_TYPESET_CHILD_BASELINE_OFFSET = -5.0;
+	
+	
+	
 	//
 	//
 	// EXCEPTIONS
@@ -755,12 +760,14 @@ abstract public class DPWidget {
 	abstract protected VMetrics computeRequiredVMetrics();
 
 	
-	protected void onAllocateX(double allocation)
+	protected HMetrics onAllocateX(double allocation)
 	{
+		return hmetrics;
 	}
 	
-	protected void onAllocateY(double allocation)
+	protected VMetrics onAllocateY(double allocation)
 	{
+		return vmetrics;
 	}
 	
 	
@@ -916,16 +923,16 @@ abstract public class DPWidget {
 	}
 	
 	
-	protected void allocateX(double allocation)
+	protected HMetrics allocateX(double allocation)
 	{
 		this.allocation.x = allocation;
-		onAllocateX( allocation );
+		return onAllocateX( allocation );
 	}
 	
-	protected void allocateY(double allocation)
+	protected VMetrics allocateY(double allocation)
 	{
 		this.allocation.y = allocation;
-		onAllocateY( allocation );
+		return onAllocateY( allocation );
 	}
 	
 	

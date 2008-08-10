@@ -196,28 +196,32 @@ public abstract class DPContainer extends DPWidget {
 	
 	
 	
-	protected void allocateChildX(DPWidget child, double localPosX, double localWidth)
+	protected HMetrics allocateChildX(DPWidget child, double localPosX, double localWidth)
 	{
 		double childWidth = localWidth / child.scale;
-		child.allocateX( childWidth );
+		HMetrics hm = child.allocateX( childWidth );
 		ChildEntry entry = childToEntry.get( child );
 		
 		entry.pos.x = localPosX;
-		entry.size.x = localWidth;
+		entry.size.x = hm.width;
+		
+		return hm;
 	}
 	
-	protected void allocateChildY(DPWidget child, double localPosY, double localHeight)
+	protected VMetrics allocateChildY(DPWidget child, double localPosY, double localHeight)
 	{
 		double childHeight = localHeight / child.scale;
-		child.allocateY( childHeight );
+		VMetrics vm = child.allocateY( childHeight );
 		ChildEntry entry = childToEntry.get( child );
 		
 		entry.pos.y = localPosY;
-		entry.size.y = localHeight;
+		entry.size.y = vm.height;
 		
 		entry.childToContainerXform = new Xform2( child.scale, entry.pos.toVector2() );
 		entry.containerToChildXform = entry.childToContainerXform.inverse();
 		entry.box = new AABox2( entry.pos, entry.pos.add( entry.size ) );
+		
+		return vm;
 	}
 	
 	

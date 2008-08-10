@@ -113,19 +113,27 @@ public class DPBin extends DPContainer
 	
 	
 	
-	protected void onAllocateX(double width)
+	protected HMetrics onAllocateX(double width)
 	{
 		if ( child != null )
 		{
-			allocateChildX( child, 0.0, width );
+			return allocateChildX( child, 0.0, width );
+		}
+		else
+		{
+			return new HMetrics();
 		}
 	}
 
-	protected void onAllocateY(double height)
+	protected VMetrics onAllocateY(double height)
 	{
 		if ( child != null )
 		{
-			allocateChildY( child, 0.0, height );
+			return allocateChildY( child, 0.0, height );
+		}
+		else
+		{
+			return new VMetrics();
 		}
 	}
 	

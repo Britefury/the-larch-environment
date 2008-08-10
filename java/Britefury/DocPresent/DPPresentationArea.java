@@ -99,19 +99,21 @@ public class DPPresentationArea extends DPBin {
 		
 		public void paint(Graphics g)
 		{
+			Graphics2D g2;
 			try
 			{
-				Graphics2D g2 = (Graphics2D)g;
-				RenderingHints aa = new RenderingHints( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-				RenderingHints taa = new RenderingHints( RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-				g2.addRenderingHints( aa );
-				g2.addRenderingHints( taa );
-				area.exposeEvent( g2, new Rectangle2D.Double( 0.0, 0.0, (double)getWidth(), (double)getHeight()) );
+				g2 = (Graphics2D)g;
 			}
 			catch (ClassCastException e)
 			{
 				throw new CannotGetGraphics2DException();
 			}
+
+			RenderingHints aa = new RenderingHints( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			RenderingHints taa = new RenderingHints( RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+			g2.addRenderingHints( aa );
+			g2.addRenderingHints( taa );
+			area.exposeEvent( g2, new Rectangle2D.Double( 0.0, 0.0, (double)getWidth(), (double)getHeight()) );
 		}
 	
 		
@@ -596,21 +598,29 @@ public class DPPresentationArea extends DPBin {
 	}
 	
 	
-	protected void onAllocateX(double allocation)
+	protected HMetrics onAllocateX(double allocation)
 	{
 		if ( child != null )
 		{
-			allocateChildX( child, 0.0, allocation );
+			return allocateChildX( child, 0.0, allocation );
+		}
+		else
+		{
+			return new HMetrics();
 		}
 	}
 	
 	
-	protected void onAllocateY(double allocation)
+	protected VMetrics onAllocateY(double allocation)
 	{
 		if ( child != null )
 		{
 			double height = allocation  <  childVMetrics.height  ?  allocation : childVMetrics.height;
-			allocateChildY( child, 0.0, height );
+			return allocateChildY( child, 0.0, height );
+		}
+		else
+		{
+			return new VMetrics();
 		}
 	}
 	
