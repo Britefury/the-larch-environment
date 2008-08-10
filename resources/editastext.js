@@ -65,6 +65,7 @@ EditAsTextClass.prototype.applyTo = function(element, text)
 		function (event)
 		{
 			editor.onClick( element, event, text );
+            return false;
 		}
 	);
 }
