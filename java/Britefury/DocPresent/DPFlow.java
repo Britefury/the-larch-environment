@@ -38,8 +38,7 @@ public class DPFlow extends DPContainerSequence
 	
 	public DPFlow()
 	{
-		super();
-		lines = new Vector< Vector<FlowChildEntry> >();
+		this( 0.0, 0.0, 0.0 );
 	}
 
 	public DPFlow(double spacing, double padding, double indentation)
@@ -54,6 +53,8 @@ public class DPFlow extends DPContainerSequence
 		this.spacing = spacing;
 		this.padding = padding;
 		this.indentation = indentation;
+
+		lines = new Vector< Vector<FlowChildEntry> >();
 	}
 
 
@@ -211,7 +212,7 @@ public class DPFlow extends DPContainerSequence
 				// Compute the spacing inherent in the advance field of the child h-metrics
 				double advanceSpacing = chm.advance - chm.width;
 				// Compute the spacing for this child; the greater of the advance spacing and the box spacing
-				double childSpacing = advanceSpacing > boxSpacing  ?  advanceSpacing : boxSpacing;
+				double childSpacing = Math.max( advanceSpacing, boxSpacing );
 				
 				width = advance + chm.width + entry.padding * 2.0;
 				advance = width + childSpacing;
@@ -225,7 +226,6 @@ public class DPFlow extends DPContainerSequence
 	
 	protected HMetrics onAllocateX(double allocation)
 	{
-		double x = 0.0, width = 0.0;
 		lines.clear();
 		Vector<FlowChildEntry> currentLine = new Vector<FlowChildEntry>();
 		boolean bFirstChildInLine = true;
@@ -233,14 +233,14 @@ public class DPFlow extends DPContainerSequence
 		
 		double boxWidth = 0.0, boxAdvance = 0.0;
 		
+		double x = 0.0, width = 0.0;
+
 		for (ChildEntry baseEntry: childEntries)
 		{
 			FlowChildEntry entry = (FlowChildEntry)baseEntry;
 			
-			double childWidth = entry.child.hmetrics.width;
-			childWidth = childWidth < allocation  ?  childWidth : allocation;
-			
-			double childRight = x + entry.child.hmetrics.width + entry.padding * 2.0;
+			double childWidth = Math.min( entry.child.hmetrics.width, allocation );
+			double childRight = x + childWidth + entry.padding * 2.0;
 			
 			if ( childRight > allocation )
 			{
@@ -265,8 +265,7 @@ public class DPFlow extends DPContainerSequence
 					}
 					
 					// Allocate
-					double spaceForChild = allocation - ( x + entry.padding * 2.0 );
-					double childAlloc = childWidth < spaceForChild  ?  childWidth : spaceForChild;
+					double childAlloc = Math.min( childWidth, allocation - ( x + entry.padding * 2.0 ) );
 					HMetrics childAllocatedMetrics = allocateChildX( entry.child, x + entry.padding, childAlloc );
 					
 					boxWidth = Math.max( boxWidth, childAllocatedMetrics.width );
@@ -276,8 +275,8 @@ public class DPFlow extends DPContainerSequence
 					// Nothing in the current line
 					currentLine = new Vector<FlowChildEntry>();
 					// Start @x at indentation
-					x = indentation;
 					width = 0.0; 
+					x = indentation;
 					// Not the first line
 					bFirstLine = false;
 					// Next child will be first in line
@@ -302,8 +301,7 @@ public class DPFlow extends DPContainerSequence
 					bFirstChildInLine = false;
 
 					// Allocate
-					double spaceForChild = allocation - ( x + entry.padding * 2.0 );
-					double childAlloc = childWidth < spaceForChild  ?  childWidth : spaceForChild;
+					double childAlloc = Math.min( childWidth, allocation - ( x + entry.padding * 2.0 ) );
 					HMetrics childAllocatedMetrics = allocateChildX( entry.child, x + entry.padding, childAlloc );
 					
 					// Move @x on
@@ -311,10 +309,11 @@ public class DPFlow extends DPContainerSequence
 					double advanceSpacing = childAllocatedMetrics.advance - childAllocatedMetrics.width;
 					double childSpacing = Math.max( advanceSpacing, spacing );
 					width = x + childAllocatedMetrics.width + entry.padding * 2.0;
-					x += width + childSpacing;
+					double advance = x + childAllocatedMetrics.advance + entry.padding * 2.0;
+					x = width + childSpacing;
 
 					boxWidth = Math.max( boxWidth, width );
-					boxAdvance = Math.max( boxAdvance, x );
+					boxAdvance = Math.max( boxAdvance, advance );
 				}
 			}
 			else
@@ -322,8 +321,7 @@ public class DPFlow extends DPContainerSequence
 				// Continue existing line
 				
 				// Allocate
-				double spaceForChild = allocation - ( x + entry.padding * 2.0 );
-				double childAlloc = childWidth < spaceForChild  ?  childWidth : spaceForChild;
+				double childAlloc = Math.min( childWidth, allocation - ( x + entry.padding * 2.0 ) );
 				HMetrics childAllocatedMetrics = allocateChildX( entry.child, x + entry.padding, childAlloc );
 
 				// Add @entry to the new line
@@ -333,12 +331,14 @@ public class DPFlow extends DPContainerSequence
 				double advanceSpacing = childAllocatedMetrics.advance - childAllocatedMetrics.width;
 				double childSpacing = Math.max( advanceSpacing, spacing );
 				width = x + childAllocatedMetrics.width + entry.padding * 2.0;
-				x += width + childSpacing;
+				double advance = x + childAllocatedMetrics.advance + entry.padding * 2.0;
+				x = width + childSpacing;
+
 				// Next child will not be the first in line
 				bFirstChildInLine = false;
 
 				boxWidth = Math.max( boxWidth, width );
-				boxAdvance = Math.max( boxAdvance, x );
+				boxAdvance = Math.max( boxAdvance, advance );
 			}
 		}
 		
