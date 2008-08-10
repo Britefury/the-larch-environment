@@ -13,11 +13,13 @@ public class DPEmpty extends DPWidget
 	}
 
 	
-	protected void onAllocateX(double allocation)
+	protected HMetrics onAllocateX(double allocation)
 	{
+		return new HMetrics();
 	}
 
-	protected void onAllocateY(double allocation)
+	protected VMetrics onAllocateY(double allocation)
 	{
+		return new VMetrics();
 	}
 }

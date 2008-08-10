@@ -9,10 +9,11 @@ import java.awt.font.TextLayout;
 
 import Britefury.DocPresent.DPPresentationArea;
 import Britefury.DocPresent.HMetrics;
-import Britefury.DocPresent.HMetricsTypeset;
 import Britefury.DocPresent.VMetrics;
 import Britefury.DocPresent.VMetricsTypeset;
 import Britefury.Math.Point2;
+
+
 
 public class TextVisual
 {
@@ -114,7 +115,7 @@ public class TextVisual
 	public HMetrics computeHMetrics()
 	{
 		refreshLayout();
-		return new HMetricsTypeset( layout.getBounds().getWidth(), layout.getAdvance() );
+		return new HMetrics( layout.getBounds().getWidth(), layout.getAdvance() );
 	}
 	
 	public VMetrics computeVMetrics()

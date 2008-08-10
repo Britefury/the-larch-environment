@@ -13,6 +13,12 @@ public class DPVBox extends DPAbstractBox
 	public enum Typesetting { NONE, ALIGN_WITH_TOP, ALIGN_WITH_BOTTOM, IN_TO_TOP_OUT_FROM_BOTTOM };
 	
 	
+	public static class InvalidTypesettingException extends RuntimeException
+	{
+		private static final long serialVersionUID = 1L;
+	}
+	
+	
 	protected static class VBoxChildEntry extends DPAbstractBox.BoxChildEntry
 	{
 		public Alignment alignment;
@@ -143,7 +149,87 @@ public class DPVBox extends DPAbstractBox
 		}
 	}
 	
+
 	
+	private VMetrics childrenVMetricsToBoxVMetrics(VMetrics[] childVMetrics, double height)
+	{
+		VMetrics topMetrics = childVMetrics[0], bottomMetrics = childVMetrics[childVMetrics.length-1];
+
+		// The vertical spacing to go below @this is the vspacing of the bottom child
+		double vspacing = bottomMetrics.vspacing;
+		
+		if ( typesetting == Typesetting.NONE )
+		{
+			return new VMetrics( height, vspacing );
+		}
+		else
+		{
+			// Need the metrics for the top and bottom entries
+			VMetricsTypeset topTSMetrics = null, bottomTSMetrics = null;
+			
+			if ( topMetrics  instanceof VMetricsTypeset )
+			{
+				topTSMetrics = (VMetricsTypeset)topMetrics;
+			}
+
+			if ( bottomMetrics  instanceof VMetricsTypeset )
+			{
+				bottomTSMetrics = (VMetricsTypeset)bottomMetrics;
+			}
+
+			if ( typesetting == Typesetting.ALIGN_WITH_TOP )
+			{
+				if ( topTSMetrics != null )
+				{
+					return new VMetricsTypeset( topTSMetrics.ascent, height - topTSMetrics.ascent, vspacing );
+				}
+				else
+				{
+					return new VMetricsTypeset( topMetrics.height, height - topMetrics.height, vspacing );
+				}
+			}
+			else if ( typesetting == Typesetting.ALIGN_WITH_BOTTOM )
+			{
+				if ( topTSMetrics != null )
+				{
+					return new VMetricsTypeset( height - bottomTSMetrics.descent, bottomTSMetrics.descent, vspacing );
+				}
+				else
+				{
+					return new VMetricsTypeset( height, 0.0, vspacing );
+				}
+			}
+			else if ( typesetting == Typesetting.IN_TO_TOP_OUT_FROM_BOTTOM )
+			{
+				double topAscent, bottomDescent;
+
+				if ( topTSMetrics != null )
+				{
+					topAscent = topTSMetrics.ascent;
+				}
+				else
+				{
+					topAscent = topMetrics.height;
+				}
+
+				if ( bottomTSMetrics != null )
+				{
+					bottomDescent = bottomTSMetrics.descent;
+				}
+				else
+				{
+					bottomDescent = 0.0;
+				}
+				
+				return new VMetricsTypesetWithBaselineOffset( topAscent, height - topAscent, height - topAscent - bottomDescent, vspacing );
+			}
+		}
+		
+		throw new InvalidTypesettingException();
+	}
+
+	
+
 	
 	
 	protected HMetrics computeRequiredHMetrics()
@@ -160,30 +246,15 @@ public class DPVBox extends DPAbstractBox
 				childHMetrics[i] = childEntries.get( i ).child.getRequiredHMetrics();
 			}
 			
-			HMetricsTypeset typesetHMetrics = new HMetricsTypeset();
-			boolean bTypeset = false;
+			HMetrics hm = new HMetrics();
 			for (int i = 0; i < childHMetrics.length; i++)
 			{
 				HMetrics chm = childHMetrics[i];
-				typesetHMetrics.width = typesetHMetrics.width > chm.width  ?  typesetHMetrics.width : chm.width;
-				if ( chm instanceof HMetricsTypeset)
-				{
-					HMetricsTypeset chmt = (HMetricsTypeset)chm;
-					typesetHMetrics.advance = typesetHMetrics.advance > chmt.advance  ?  typesetHMetrics.advance : chmt.advance;
-					bTypeset = true;
-				}
+				hm.width = hm.width > chm.width  ?  hm.width : chm.width;
+				hm.advance = hm.advance > chm.advance  ?  hm.advance : chm.advance;
 			}
 			
-			if ( bTypeset )
-			{
-				typesetHMetrics.advance = typesetHMetrics.advance > typesetHMetrics.width  ?  typesetHMetrics.advance : typesetHMetrics.width;
-				childrenHMetrics = typesetHMetrics;
-			}
-			else
-			{
-				HMetrics hm = new HMetrics( typesetHMetrics.width );
-				childrenHMetrics = hm;
-			}
+			childrenHMetrics = hm;
 		}
 		
 		return childrenHMetrics;
@@ -208,6 +279,7 @@ public class DPVBox extends DPAbstractBox
 			
 			// Accumulate the height required for all the children
 			double height = 0.0;
+			double y = 0.0;
 			for (int i = 0; i < childVMetrics.length; i++)
 			{
 				VMetrics chm = childVMetrics[i];
@@ -218,89 +290,18 @@ public class DPVBox extends DPAbstractBox
 				// The spacing to be used is either the box spacing, or the child's v-spacing, whichever is greater
 				double childSpacing = boxSpacing  >  chm.vspacing  ?  boxSpacing  :  chm.vspacing;
 				
-				double chHeight = chm.height;
-				height += ( chHeight + childSpacing + entry.padding * 2.0 );
+				height = y + chm.height + entry.padding * 2.0;
+				y = height + childSpacing;
 			}
 			
-			VMetrics topMetrics = childVMetrics[0], bottomMetrics = childVMetrics[childVMetrics.length-1];
-
-			// The vertical spacing to go below @this is the vspacing of the bottom child
-			double vspacing = bottomMetrics.vspacing;
-			
-			if ( typesetting == Typesetting.NONE )
-			{
-				childrenVMetrics = new VMetrics( height, vspacing );
-			}
-			else
-			{
-				// Need the metrics for the top and bottom entries
-				VMetricsTypeset topTSMetrics = null, bottomTSMetrics = null;
-				
-				if ( topMetrics  instanceof VMetricsTypeset )
-				{
-					topTSMetrics = (VMetricsTypeset)topMetrics;
-				}
-
-				if ( bottomMetrics  instanceof VMetricsTypeset )
-				{
-					bottomTSMetrics = (VMetricsTypeset)bottomMetrics;
-				}
-
-				if ( typesetting == Typesetting.ALIGN_WITH_TOP )
-				{
-					if ( topTSMetrics != null )
-					{
-						childrenVMetrics = new VMetricsTypeset( topTSMetrics.ascent, height - topTSMetrics.ascent, vspacing );
-					}
-					else
-					{
-						childrenVMetrics = new VMetricsTypeset( topMetrics.height, height - topMetrics.height, vspacing );
-					}
-				}
-				else if ( typesetting == Typesetting.ALIGN_WITH_BOTTOM )
-				{
-					if ( topTSMetrics != null )
-					{
-						childrenVMetrics = new VMetricsTypeset( height - bottomTSMetrics.descent, bottomTSMetrics.descent, vspacing );
-					}
-					else
-					{
-						childrenVMetrics = new VMetricsTypeset( height, 0.0, vspacing );
-					}
-				}
-				else if ( typesetting == Typesetting.IN_TO_TOP_OUT_FROM_BOTTOM )
-				{
-					double topAscent, bottomDescent;
-
-					if ( topTSMetrics != null )
-					{
-						topAscent = topTSMetrics.ascent;
-					}
-					else
-					{
-						topAscent = topMetrics.height;
-					}
-
-					if ( bottomTSMetrics != null )
-					{
-						bottomDescent = bottomTSMetrics.descent;
-					}
-					else
-					{
-						bottomDescent = 0.0;
-					}
-					
-					childrenVMetrics = new VMetricsTypeset( topAscent, height - topAscent, height - topAscent - bottomDescent, vspacing );
-				}
-			}
+			childrenVMetrics = childrenVMetricsToBoxVMetrics( childVMetrics, height );
 		}
 		
 		return childrenVMetrics;
 	}
 
-	
 
-	protected void onAllocateX(double allocation)
+	protected HMetrics onAllocateX(double allocation)
 	{
 		for (ChildEntry baseEntry: childEntries)
 		{
@@ -323,9 +324,11 @@ public class DPVBox extends DPAbstractBox
 				allocateChildX( entry.child, 0.0, allocation );
 			}
 		}
+		
+		return childrenHMetrics;
 	}
 
-	protected void onAllocateY(double allocation)
+	protected VMetrics onAllocateY(double allocation)
 	{
 		double expandPerChild = 0.0, shrinkPerChild = 0.0;
 		if ( allocation > childrenVMetrics.height )
@@ -348,21 +351,24 @@ public class DPVBox extends DPAbstractBox
 		}
 		
 		
+		double height = 0.0;
 		double y = 0.0;
-		for (ChildEntry baseEntry: childEntries)
+		VMetrics[] childVMetrics = new VMetrics[childEntries.size()];
+		for (int i = 0; i < childEntries.size(); i++)
 		{
-			VBoxChildEntry entry = (VBoxChildEntry)baseEntry;
+			VBoxChildEntry entry = (VBoxChildEntry)childEntries.get( i );
 			
-			double childAlloc = entry.child.vmetrics.height;
-			double childHeight = childAlloc;
+			
+			double childBox = entry.child.vmetrics.height;
+			double childAlloc = childBox;
 			double childY = y + entry.padding;
 			
 			if ( entry.bExpand )
 			{
-				childAlloc += expandPerChild;
+				childBox += expandPerChild;
 				if ( entry.bFill )
 				{
-					childHeight += expandPerChild;
+					childAlloc += expandPerChild;
 				}
 				else
 				{
@@ -371,16 +377,22 @@ public class DPVBox extends DPAbstractBox
 			}
 			if ( entry.bShrink )
 			{
+				childBox -= shrinkPerChild;
 				childAlloc -= shrinkPerChild;
-				childHeight -= shrinkPerChild;
 			}
 			
 
-			// The spacing to be used is either the box spacing, or the child's v-spacing, whichever is greater
-			double childSpacing = spacing  >  entry.child.vmetrics.vspacing  ?  spacing  :  entry.child.vmetrics.vspacing;
+			VMetrics childAllocatedMetrics = allocateChildY( entry.child, childY, childAlloc );
 
-			allocateChildY( entry.child, childY, childHeight );
-			y += childAlloc + childSpacing;
+			// The spacing to be used is either the box spacing, or the child's v-spacing, whichever is greater
+			double childSpacing = spacing  >  childAllocatedMetrics.vspacing  ?  spacing  :  childAllocatedMetrics.vspacing;
+
+			height = y + childAllocatedMetrics.height + entry.padding * 2.0;
+			y = height + childSpacing;
+			
+			childVMetrics[i] = childAllocatedMetrics;
 		}
+		
+		return childrenVMetricsToBoxVMetrics( childVMetrics, height );
 	}
 }
