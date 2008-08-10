@@ -231,7 +231,7 @@ public class DPFlow extends DPContainerSequence
 		boolean bFirstChildInLine = true;
 		boolean bFirstLine = true;
 		
-		double lineWidth = 0.0, lineAdvance = 0.0;
+		double boxWidth = 0.0, boxAdvance = 0.0;
 		
 		for (ChildEntry baseEntry: childEntries)
 		{
@@ -269,6 +269,9 @@ public class DPFlow extends DPContainerSequence
 					double childAlloc = childWidth < spaceForChild  ?  childWidth : spaceForChild;
 					HMetrics childAllocatedMetrics = allocateChildX( entry.child, x + entry.padding, childAlloc );
 					
+					boxWidth = Math.max( boxWidth, childAllocatedMetrics.width );
+					boxAdvance = Math.max( boxAdvance, childAllocatedMetrics.advance );
+
 					// Start a new line
 					// Nothing in the current line
 					currentLine = new Vector<FlowChildEntry>();
@@ -279,10 +282,6 @@ public class DPFlow extends DPContainerSequence
 					bFirstLine = false;
 					// Next child will be first in line
 					bFirstChildInLine = true;
-					
-					
-					lineWidth = Math.max( lineWidth, childAllocatedMetrics.width );
-					lineAdvance = Math.max( lineAdvance, childAllocatedMetrics.advance );
 				}
 				else
 				{
@@ -310,12 +309,12 @@ public class DPFlow extends DPContainerSequence
 					// Move @x on
 					// Compute child spacing
 					double advanceSpacing = childAllocatedMetrics.advance - childAllocatedMetrics.width;
-					double childSpacing = advanceSpacing > spacing  ?  advanceSpacing : spacing;
-					width = x + child
-					x += childWidth + childSpacing + entry.padding * 2.0;
+					double childSpacing = Math.max( advanceSpacing, spacing );
+					width = x + childAllocatedMetrics.width + entry.padding * 2.0;
+					x += width + childSpacing;
 
-					lineWidth = lineWidth > childAllocatedMetrics.width  ?  lineWidth : childAllocatedMetrics.width;
-					lineAdvance = lineAdvance > childAllocatedMetrics.advance  ?  lineAdvance : childAllocatedMetrics.advance;
+					boxWidth = Math.max( boxWidth, width );
+					boxAdvance = Math.max( boxAdvance, x );
 				}
 			}
 			else
@@ -325,17 +324,21 @@ public class DPFlow extends DPContainerSequence
 				// Allocate
 				double spaceForChild = allocation - ( x + entry.padding * 2.0 );
 				double childAlloc = childWidth < spaceForChild  ?  childWidth : spaceForChild;
-				allocateChildX( entry.child, x + entry.padding, childAlloc );
+				HMetrics childAllocatedMetrics = allocateChildX( entry.child, x + entry.padding, childAlloc );
 
 				// Add @entry to the new line
 				currentLine.add( entry );
 				// Move @x on
 				// Compute child spacing
-				double advanceSpacing = entry.child.hmetrics.advance - entry.child.hmetrics.width;
-				double childSpacing = advanceSpacing > spacing  ?  advanceSpacing : spacing;
-				x += childWidth + childSpacing + entry.padding * 2.0;
+				double advanceSpacing = childAllocatedMetrics.advance - childAllocatedMetrics.width;
+				double childSpacing = Math.max( advanceSpacing, spacing );
+				width = x + childAllocatedMetrics.width + entry.padding * 2.0;
+				x += width + childSpacing;
 				// Next child will not be the first in line
 				bFirstChildInLine = false;
+
+				boxWidth = Math.max( boxWidth, width );
+				boxAdvance = Math.max( boxAdvance, x );
 			}
 		}
 		
@@ -344,6 +347,8 @@ public class DPFlow extends DPContainerSequence
 		{
 			lines.add( currentLine );
 		}
+		
+		return new HMetrics( boxWidth, boxAdvance );
 	}
 	
 	
@@ -426,6 +431,50 @@ public class DPFlow extends DPContainerSequence
 	}
 	
 	
+	private VMetrics lineMetricsToFlowVMetrics(double height, VMetrics[] lineMetrics)
+	{
+		VMetrics topMetrics = lineMetrics[0], bottomMetrics = lineMetrics[lineMetrics.length-1];
+
+		// The vertical spacing to go below @this is the vspacing of the bottom child
+		double vspacing = bottomMetrics.vspacing;
+		
+		// Need the metrics for the top and bottom entries
+		VMetricsTypeset topTSMetrics = null, bottomTSMetrics = null;
+		
+		if ( topMetrics  instanceof VMetricsTypeset )
+		{
+			topTSMetrics = (VMetricsTypeset)topMetrics;
+		}
+
+		if ( bottomMetrics  instanceof VMetricsTypeset )
+		{
+			bottomTSMetrics = (VMetricsTypeset)bottomMetrics;
+		}
+
+		double topAscent, bottomDescent;
+
+		if ( topTSMetrics != null )
+		{
+			topAscent = topTSMetrics.ascent;
+		}
+		else
+		{
+			topAscent = topMetrics.height;
+		}
+
+		if ( bottomTSMetrics != null )
+		{
+			bottomDescent = bottomTSMetrics.descent;
+		}
+		else
+		{
+			bottomDescent = 0.0;
+		}
+		
+		return new VMetricsTypesetWithBaselineOffset( topAscent, height - topAscent, height - topAscent - bottomDescent, vspacing );
+	}
+
+
 	protected VMetrics computeRequiredVMetrics()
 	{
 		if ( lines.isEmpty() )
@@ -451,51 +500,11 @@ public class DPFlow extends DPContainerSequence
 				y = height + chm.vspacing;
 			}
 			
-			VMetrics topMetrics = lineVMetrics[0], bottomMetrics = lineVMetrics[lineVMetrics.length-1];
-
-			// The vertical spacing to go below @this is the vspacing of the bottom child
-			double vspacing = bottomMetrics.vspacing;
-			
-			// Need the metrics for the top and bottom entries
-			VMetricsTypeset topTSMetrics = null, bottomTSMetrics = null;
-			
-			if ( topMetrics  instanceof VMetricsTypeset )
-			{
-				topTSMetrics = (VMetricsTypeset)topMetrics;
-			}
-
-			if ( bottomMetrics  instanceof VMetricsTypeset )
-			{
-				bottomTSMetrics = (VMetricsTypeset)bottomMetrics;
-			}
-
-			double topAscent, bottomDescent;
-
-			if ( topTSMetrics != null )
-			{
-				topAscent = topTSMetrics.ascent;
-			}
-			else
-			{
-				topAscent = topMetrics.height;
-			}
-
-			if ( bottomTSMetrics != null )
-			{
-				bottomDescent = bottomTSMetrics.descent;
-			}
-			else
-			{
-				bottomDescent = 0.0;
-			}
-			
-			return new VMetricsTypesetWithBaselineOffset( topAscent, height - topAscent, height - topAscent - bottomDescent, vspacing );
+			return lineMetricsToFlowVMetrics( height, lineVMetrics );
 		}
 	}
 
-
-	
-	private void allocateLineY(Vector<FlowChildEntry> line, VMetrics vm, double localPosY, double localHeight)
+	private VMetrics allocateLineY(Vector<FlowChildEntry> line, VMetrics vm, double localPosY, double localHeight)
 	{
 		if ( !line.isEmpty() )
 		{
@@ -535,19 +544,35 @@ public class DPFlow extends DPContainerSequence
 				}
 			}
 		}
+		
+		return vm;
 	}
 	
 	
 	protected VMetrics onAllocateY(double allocation)
 	{
-		double y = 0.0;
-		for (int i = 0; i < lines.size(); i++)
+		if ( lines.size() == 0 )
 		{
-			Vector<FlowChildEntry> line = lines.get( i );
-			VMetrics vm = lineVMetrics[i];
+			return new VMetrics();
+		}
+		else
+		{
+			double y = 0.0, height = 0.0;
+			VMetrics[] lineMetrics = new VMetrics[lines.size()];
 			
-			allocateLineY( line, vm, y, vm.height  );
-			y += vm.height + vm.vspacing;
+			for (int i = 0; i < lines.size(); i++)
+			{
+				Vector<FlowChildEntry> line = lines.get( i );
+				VMetrics vm = lineVMetrics[i];
+				
+				VMetrics childAllocatedMetrics = allocateLineY( line, vm, y, vm.height  );
+				height = y + childAllocatedMetrics.height;
+				y = height + childAllocatedMetrics.vspacing;
+				
+				lineMetrics[i] = childAllocatedMetrics;
+			}
+
+			return lineMetricsToFlowVMetrics( height, lineMetrics );
 		}
 	}
 }
