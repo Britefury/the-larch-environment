@@ -64,6 +64,7 @@ function (nodeID, html, placeHolderIDs)
 		}
 		
 		var nodeToReplace = $("#"+this.nodeID);
+		nodeToReplace.html( "" );
 		nodeToReplace.replaceWith( this.html );
 		
 		for (i in this.placeHolderIDs)
