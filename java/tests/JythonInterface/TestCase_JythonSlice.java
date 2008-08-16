@@ -1,6 +1,6 @@
 package tests.JythonInterface;
 
-import Britefury.JythonInterface.JythonSlice;
+import BritefuryJ.JythonInterface.JythonSlice;
 import junit.framework.TestCase;
 
 public class TestCase_JythonSlice extends TestCase

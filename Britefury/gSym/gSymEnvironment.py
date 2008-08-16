@@ -8,10 +8,6 @@
 import os.path
 import sys
 
-from Britefury.FileIO.IOXml import ioReadIntoObjectFromFile, ioWriteObjectToFile
-
-from Britefury.DocModel.DMIO import readSX
-
 from Britefury.GLisp.GLispUtil import gLispSrcToString
 
 
