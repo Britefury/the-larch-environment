@@ -20,8 +20,8 @@ def initPlugins(pluginInterface):
 		return
 
 	content = readSX( f )
-	
-	
+
+
 	if isinstance( content, DMListInterface ):
 		if content[0] == '$gSymPluginRegistry':
 			for moduleName in content[1:]:
@@ -31,4 +31,3 @@ def initPlugins(pluginInterface):
 					mod = getattr( mod, comp )
 				initPlugin = getattr( mod, 'initPlugin' )
 				initPlugin( pluginInterface )
-	

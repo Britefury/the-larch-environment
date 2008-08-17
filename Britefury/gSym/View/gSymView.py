@@ -9,23 +9,21 @@ import sys
 
 from copy import copy
 
-from Britefury.Math.Math import Colour3f
-
 from Britefury.Cell.Cell import Cell
 
-from Britefury.DocPresent.Toolkit.DTWidget import DTWidget
-from Britefury.DocPresent.Toolkit.DTActiveBorder import DTActiveBorder
-from Britefury.DocPresent.Toolkit.DTBin import DTBin 
-from Britefury.DocPresent.Toolkit.DTBorder import DTBorder
-from Britefury.DocPresent.Toolkit.DTBox import DTBox
-from Britefury.DocPresent.Toolkit.DTHighlight import DTHighlight
-from Britefury.DocPresent.Toolkit.DTHLine import DTHLine
-from Britefury.DocPresent.Toolkit.DTLabel import DTLabel
-from Britefury.DocPresent.Toolkit.DTScript import DTScript
-from Britefury.DocPresent.Toolkit.DTEntryLabel import DTEntryLabel
-from Britefury.DocPresent.Toolkit.DTCustomEntry import DTCustomEntry
-from Britefury.DocPresent.Toolkit.DTFlow import DTFlow
-from Britefury.DocPresent.Toolkit.DTFlowWithSeparators import DTFlowWithSeparators
+#from Britefury.DocPresent.Toolkit.DTWidget import DTWidget
+#from Britefury.DocPresent.Toolkit.DTActiveBorder import DTActiveBorder
+#from Britefury.DocPresent.Toolkit.DTBin import DTBin 
+#from Britefury.DocPresent.Toolkit.DTBorder import DTBorder
+#from Britefury.DocPresent.Toolkit.DTBox import DTBox
+#from Britefury.DocPresent.Toolkit.DTHighlight import DTHighlight
+#from Britefury.DocPresent.Toolkit.DTHLine import DTHLine
+#from Britefury.DocPresent.Toolkit.DTLabel import DTLabel
+#from Britefury.DocPresent.Toolkit.DTScript import DTScript
+#from Britefury.DocPresent.Toolkit.DTEntryLabel import DTEntryLabel
+#from Britefury.DocPresent.Toolkit.DTCustomEntry import DTCustomEntry
+#from Britefury.DocPresent.Toolkit.DTFlow import DTFlow
+#from Britefury.DocPresent.Toolkit.DTFlowWithSeparators import DTFlowWithSeparators
 
 
 from Britefury.DocView.DVNode import DVNode
@@ -392,7 +390,8 @@ def customEntry(customChild, entryText, stateMask=0, stateTest=0, style=None):
 
 
 
-def hbox(children, style=None, alignment=DTBox.ALIGN_CENTRE, spacing=0.0):
+#def hbox(children, style=None, alignment=DTBox.ALIGN_CENTRE, spacing=0.0):
+def hbox(children, style=None, alignment=None, spacing=0.0):
 	"""
 	Runtime - called by compiled code at run-time
 	Builds a horizontal DTBox widget, with child, builds and registers a refresh cell
@@ -416,7 +415,8 @@ def ahbox(children, style=None, spacing=0.0):
 	_applyStyle( style, widget )
 	return widget
 
-def vbox(children, style=None, alignment=DTBox.ALIGN_LEFT, spacing=0.0):
+#def vbox(children, style=None, alignment=DTBox.ALIGN_LEFT, spacing=0.0):
+def vbox(children, style=None, alignment=None, spacing=0.0):
 	"""
 	Runtime - called by compiled code at run-time
 	Builds a vertical DTBox widget, with child, builds and registers a refresh cell

@@ -22,7 +22,7 @@ from Britefury.Util.SignalSlot import ClassSignal
 
 from Britefury.Kernel.Mutability import *
 
-from Britefury.FileIO.IOXml import *
+#from Britefury.FileIO.IOXml import *
 
 from Britefury.Cell.CellEvaluator import CellEvaluator
 from Britefury.Cell.CellInterface import CellInterface
@@ -52,7 +52,7 @@ class LiteralCellClass (type):
 		if not clsDict.has_key( 'bAllowNone' ):
 			raise AttributeError, 'bAllowNone not specified'
 
-		ioObjectFactoryRegister( clsName, cls )
+		#ioObjectFactoryRegister( clsName, cls )
 
 
 
@@ -60,9 +60,9 @@ class LiteralCellClass (type):
 class LiteralCell (CellInterface):
 	__slots__ = [ '_defaultValue', '_value', 'owner' ]
 
-	__metaclass__ = LiteralCellClass
+	#__metaclass__ = LiteralCellClass
 
-	__ioxml_can_delegate__ = True
+	#__ioxml_can_delegate__ = True
 
 
 	valueClass = None

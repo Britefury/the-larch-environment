@@ -5,10 +5,6 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
-import pygtk
-pygtk.require( '2.0' )
-import gtk
-
 import traceback
 
 from Britefury.Util.SignalSlot import ClassSignal
@@ -19,9 +15,9 @@ from Britefury.Cell.Cell import RefCell
 
 from Britefury.DocView.DocView import DocView
 
-from Britefury.DocPresent.Toolkit.DTWidget import *
-from Britefury.DocPresent.Toolkit.DTBorder import *
-from Britefury.DocPresent.Toolkit.DTLabel import *
+#from Britefury.DocPresent.Toolkit.DTWidget import *
+#from Britefury.DocPresent.Toolkit.DTBorder import *
+#from Britefury.DocPresent.Toolkit.DTLabel import *
 
 from Britefury.gSym.View.UnparsedText import UnparsedText
 

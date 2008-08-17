@@ -17,6 +17,7 @@ identifier = RegEx( "[A-Za-z_][A-Za-z0-9_]*" )
 singleQuotedString = RegEx( r"'(?:[^'\n\r\\]|(?:'')|(?:\\x[0-9a-fA-F]+)|(?:\\.))*'" )
 doubleQuotedString = RegEx( r'"(?:[^"\n\r\\]|(?:"")|(?:\\x[0-9a-fA-F]+)|(?:\\.))*"' )
 quotedString = RegEx( r'''(?:"(?:[^"\n\r\\]|(?:"")|(?:\\x[0-9a-fA-F]+)|(?:\\.))*")|(?:'(?:[^'\n\r\\]|(?:'')|(?:\\x[0-9a-fA-F]+)|(?:\\.))*')''' )
+unicodeString = ( ( Literal( 'u' )  |  Literal( 'U' ) )  +  quotedString ).action( lambda input, begin, xs: xs[0] + xs[1] )
 decimalInteger = RegEx( r"[\-]?[0-9]+" )
 hexInteger = RegEx( r"0x[0-9A-Fa-f]+" )
 integer = decimalInteger  |  hexInteger
@@ -33,22 +34,22 @@ class TestCase_Tokens (ParserTestCase):
 		self._matchTest( parser, 'ab12', 'ab12' )
 		self._matchFailTest( parser, '12ab' )
 		self._matchTest( parser, '_ab', '_ab' )
-		
-		
+
+
 	def testSingleQuotedString(self):
 		parser = singleQuotedString
 		self._matchTest( parser, "'abc'", "'abc'" )
 		self._matchTest( parser, r"'ab\'c'", r"'ab\'c'" )
 		self._matchTest( parser, "'abc'113", "'abc'" )
-	
-		
+
+
 	def testDoubleQuotedString(self):
 		parser = doubleQuotedString
 		self._matchTest( parser, '"abc"', '"abc"' )
 		self._matchTest( parser, r'"ab\"c"', r'"ab\"c"' )
 		self._matchTest( parser, '"abc"113', '"abc"' )
-	
-		
+
+
 	def testQuotedString(self):
 		parser = quotedString
 		self._matchTest( parser, "'abc'", "'abc'" )
@@ -57,8 +58,8 @@ class TestCase_Tokens (ParserTestCase):
 		self._matchTest( parser, '"abc"', '"abc"' )
 		self._matchTest( parser, r'"ab\"c"', r'"ab\"c"' )
 		self._matchTest( parser, '"abc"113', '"abc"' )
-	
-		
+
+
 	def testUnicodeString(self):
 		parser = unicodeString
 		self._matchTest( parser, "u'abc'", "u'abc'" )
@@ -67,21 +68,21 @@ class TestCase_Tokens (ParserTestCase):
 		self._matchTest( parser, 'u"abc"', 'u"abc"' )
 		self._matchTest( parser, r'u"ab\"c"', r'u"ab\"c"' )
 		self._matchTest( parser, 'u"abc"113', 'u"abc"' )
-		
-		
+
+
 	def testDecimalInteger(self):
 		parser = decimalInteger
 		self._matchTest( parser, "123", "123" )
 		self._matchTest( parser, "-123", "-123" )
-		
-		
+
+
 	def testHexadecimalInteger(self):
 		parser = hexInteger
 		self._matchTest( parser, "0x123", "0x123" )
 		self._matchTest( parser, "0x0123456789abcdef", "0x0123456789abcdef" )
 		self._matchTest( parser, "0x0123456789ABCDEF", "0x0123456789ABCDEF" )
-		
-		
+
+
 
 	def testFloatingPoint(self):
 		parser = floatingPoint
@@ -105,5 +106,4 @@ class TestCase_Tokens (ParserTestCase):
 		self._matchTest( parser, "-.14e5", "-.14e5" )
 		self._matchTest( parser, "-.14e-5", "-.14e-5" )
 
-		
-		
+

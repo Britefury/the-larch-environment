@@ -14,7 +14,7 @@ from Britefury.Util.SignalSlot import ClassSignal
 
 from Britefury.Kernel.Mutability import *
 
-from Britefury.FileIO.IOXml import *
+#from Britefury.FileIO.IOXml import *
 
 from Britefury.Cell.CellEvaluator import CellEvaluator, CellEvaluationError
 from Britefury.Cell.CellEvaluatorFunction import CellEvaluatorFunction
@@ -41,15 +41,15 @@ class CellClass (type):
 		if not clsDict.has_key( 'bAllowNone' ):
 			raise AttributeError, 'bAllowNone not specified'
 
-		ioObjectFactoryRegister( clsName, cls )
+		#ioObjectFactoryRegister( clsName, cls )
 
 
 class Cell (CellInterface):
 	__slots__ = [ '_defaultValue', '_evaluator', '_valueCache', '_dependencies', '_cycleLock', 'owner' ]
 
-	__metaclass__ = CellClass
+	#__metaclass__ = CellClass
 
-	__ioxml_can_delegate__ = True
+	#__ioxml_can_delegate__ = True
 
 
 	valueClass = None
@@ -220,38 +220,38 @@ class Cell (CellInterface):
 
 
 
-	def __readxml__(self, xmlNode):
-		if xmlNode.isValid():
-			evalNode = xmlNode
+	#def __readxml__(self, xmlNode):
+		#if xmlNode.isValid():
+			#evalNode = xmlNode
 
-			if xmlNode.getTypeProperty() == 'Cell':
-				evalNode = xmlNode.getChild( 'evaluator' )
+			#if xmlNode.getTypeProperty() == 'Cell':
+				#evalNode = xmlNode.getChild( 'evaluator' )
 
-			if evalNode.isValid():
-				bCellEvaluatorNotSerialisable = ioXmlReadBoolProp( evalNode.property( 'b_cell_evaluator_not_serialisable' ) )
+			#if evalNode.isValid():
+				#bCellEvaluatorNotSerialisable = ioXmlReadBoolProp( evalNode.property( 'b_cell_evaluator_not_serialisable' ) )
 
-				if not bCellEvaluatorNotSerialisable:
-					bCellEvaluatorProcedural = ioXmlReadBoolProp( evalNode.property( 'b_cell_evaluator_procedural' ) )
+				#if not bCellEvaluatorNotSerialisable:
+					#bCellEvaluatorProcedural = ioXmlReadBoolProp( evalNode.property( 'b_cell_evaluator_procedural' ) )
 
-					evaluator = evalNode.readObject()
-					if not bCellEvaluatorProcedural:
-						# Literal; check type
-						if not self._p_checkValueType( evaluator ):
-							evaluator = self._p_getDefaultValueForUse()
-					self._p_setEvaluator( evaluator )
+					#evaluator = evalNode.readObject()
+					#if not bCellEvaluatorProcedural:
+						## Literal; check type
+						#if not self._p_checkValueType( evaluator ):
+							#evaluator = self._p_getDefaultValueForUse()
+					#self._p_setEvaluator( evaluator )
 
 
 
-	def __writexml__(self, xmlNode):
-		if xmlNode.isValid():
-			# Record if the cell value is procedural (not literal), and not serialisable
-			if isinstance( self._evaluator, CellEvaluator ):
-				ioXmlWriteBoolProp( xmlNode.property( 'b_cell_evaluator_procedural' ), True )
+	#def __writexml__(self, xmlNode):
+		#if xmlNode.isValid():
+			## Record if the cell value is procedural (not literal), and not serialisable
+			#if isinstance( self._evaluator, CellEvaluator ):
+				#ioXmlWriteBoolProp( xmlNode.property( 'b_cell_evaluator_procedural' ), True )
 
-				if not self._evaluator.bSerialisable:
-					ioXmlWriteBoolProp( xmlNode.property( 'b_cell_evaluator_not_serialisable' ), True )
+				#if not self._evaluator.bSerialisable:
+					#ioXmlWriteBoolProp( xmlNode.property( 'b_cell_evaluator_not_serialisable' ), True )
 
-			xmlNode  <<  self._evaluator
+			#xmlNode  <<  self._evaluator
 
 
 
