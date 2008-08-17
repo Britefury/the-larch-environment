@@ -13,8 +13,8 @@ class DocTreeString (str, DocTreeNode):
 	def __init__(self, node):
 		str.__init__( node )
 		DocTreeNode.__init__( self, None, node, None, -1 )
-		
-		
+
+
 	@staticmethod
 	def _build(tree, value, parent, indexInParent):
 		x = DocTreeString( value )
@@ -24,30 +24,29 @@ class DocTreeString (str, DocTreeNode):
 		return x
 
 
-	
-	
+
+
 import unittest
-	
+
 class TestCase_DocTreeString(unittest.TestCase):
 	def testId(self):
 		x = 'x'
 		x2 = 'x'
 		dx = DocTreeString( 'x' )
 		dx2 = DocTreeString( 'x' )
-		
+
 		self.assert_( x is x )
 		self.assert_( x is x2 )
 		self.assert_( x is not dx )
 		self.assert_( x is not dx2 )
-		
+
 		self.assert_( dx is dx )
 		self.assert_( dx is not dx2 )
 
-		
+
 	def testCmp(self):
 		x = 'x'
 		dx = DocTreeString( 'x' )
-		
+
 		self.assert_( x == dx )
 		self.assert_( dx == x )
-		

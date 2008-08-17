@@ -5,10 +5,10 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
-from Britefury.Math.Math import Colour3f
+from java.awt import Color
 
 from Britefury.gSym.View.gSymStyleSheet import GSymStyleSheet
 
 
-stringStyle = GSymStyleSheet( colour=Colour3f( 0.0, 0.5, 0.5 ), font='Sans 11' )
-punctuationStyle = GSymStyleSheet( colour=Colour3f( 0.0, 0.0, 1.0 ), font='Sans 11' )
+stringStyle = GSymStyleSheet( colour=Color( 0.0, 0.5, 0.5 ), font='Sans 11' )
+punctuationStyle = GSymStyleSheet( colour=Color( 0.0, 0.0, 1.0 ), font='Sans 11' )

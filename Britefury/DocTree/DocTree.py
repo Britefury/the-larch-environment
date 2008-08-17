@@ -23,16 +23,16 @@ from Britefury.DocTree.DocTreeUnicode import DocTreeUnicode
 
 
 
-	
-	
+
+
 class _DocTreeKeyError (Exception):
 	pass
 
 
 class _Key (object):
 	__slots__ = [ '_docNode', '_parent', '_index', '_table', '_hash' ]
-	
-	
+
+
 	def __init__(self, docNode, parentTreeNode, index, table):
 		super( _Key, self ).__init__()
 		if isinstance( docNode, DMNode ):
@@ -106,7 +106,7 @@ class _Key (object):
 
 class _DocTreeKey (object):
 	__slots__ = [ '_docNode', '_parent', '_index' ]
-	
+
 	def __init__(self, docNode, parentTreeNode, index):
 		super( _DocTreeKey, self ).__init__()
 		if isinstance( docNode, DMNode ):
@@ -168,8 +168,8 @@ class _DocTreeKey (object):
 			parent = self._parent
 
 		return docNode, parent, self._index
-	
-	
+
+
 	def __cmp__(self, x):
 		return cmp( self._asTuple(), x._asTuple() )
 
@@ -251,14 +251,14 @@ class _DocTreeNodeTable (object):
 class DocTree (object):
 	def __init__(self):
 		super( DocTree, self ).__init__()
-		
+
 		self._table = _DocTreeNodeTable()
-		
-		
-		
+
+
+
 	def treeNode(self, x, parentTreeNode=None, indexInParent=-1):
 		key = _DocTreeKey( x, parentTreeNode, indexInParent )
-		
+
 		try:
 			docTreeNode = self._table[key]
 		except KeyError:		
@@ -270,12 +270,12 @@ class DocTree (object):
 				docTreeNode = DocTreeUnicode._build( self, x, parentTreeNode, indexInParent )
 			else:
 				docTreeNode = DocTreeNode( self, x, parentTreeNode, indexInParent )
-			
+
 			self._table[key] = docTreeNode
-		
+
 		return docTreeNode
-	
-	
+
+
 
 
 
@@ -299,7 +299,7 @@ class TestCase_DocTreeNodeTable (unittest.TestCase):
 
 	def testTable(self):
 		import gc
-		
+
 		class Value (object):
 			pass
 
@@ -383,73 +383,73 @@ class TestCase_DocTree (unittest.TestCase):
 		self.assert_( w_5.indexInParent == 5 )
 		self.assert_( u','.join( w_a )  ==  u'0,1,2,3,4,5,6,7,8,9' )
 
-		
-		
-		
+
+
+
 	def _buildDiamondDoc(self):
 		dd = DMList( [ 'd' ] )
 		dc = DMList( [ dd ] )
 		db = DMList( [ dd ] )
 		da = DMList( [ db, dc ] )
 		return da, db, dc, dd
-	
-	
+
+
 	def _buildDiamondTree(self):
 		da, db, dc, dd = self._buildDiamondDoc()
 		tree = DocTree()
 		ta = tree.treeNode( da )
 		return da, db, dc, dd, tree, ta
-		
-	
-	
+
+
+
 	def testListToTree(self):
 		data = [ 'a', 'b' ]
 		tree = DocTree()
 		self.assertRaises( TypeError, lambda: tree.treeNode( data ) )
 
-		
+
 	def testDiamond(self):
 		da, db, dc, dd = self._buildDiamondDoc()
-		
+
 		self.assert_( da[0][0][0] == 'd' )
 		self.assert_( da[0][0] is da[1][0] )
-		
-		
+
+
 	def testDiamondTree(self):
 		da, db, dc, dd, tree, ta = self._buildDiamondTree()
-		
+
 		tb = ta[0]
 		tc = ta[1]
 		tbd = tb[0]
 		tcd = tc[0]
-		
+
 		self.assert_( tbd is not tcd )
 		self.assert_( tbd.node is tcd.node )
-		
+
 		# modify
 		de = DMList( [ dd ] )
 		dc[0] = de
-		
+
 		self.assert_( dc[0][0]  is dd )
 		self.assert_( dc[0][0]  is db[0] )
-		
-		
+
+
 		tc2 = ta[1]
 		te = tc2[0]
 		ted = te[0]
-		
-		
+
+
 		self.assert_( tbd is not ted )
 		self.assert_( tc2 is tc )
 		self.assert_( ted.node is tbd.node )
-		
-		
+
+
 	def testModifyTree(self):
 		module = DMList( [ 'module', [ 'expr', [ 'add', [ 'ref', 'a' ], [ 'ref', 'b' ] ] ] ] )
 		tree = DocTree()
-		
+
 		tModule = tree.treeNode( module )
-		
+
 		tExpr = tModule[1]
 		tAdd = tExpr[1]
 		tRefA = tAdd[1]
@@ -458,14 +458,13 @@ class TestCase_DocTree (unittest.TestCase):
 		tIf = tParent[1]
 		tIf[-1].insert( 0, [ 'unbound' ] )
 		tUnbound = tIf[1][0]
-		
+
 		self.assert_( module[1][1][1][1][0] == [ 'unbound' ] )
 		self.assert_( module == [ 'module', [ 'expr', [ 'add', [ 'if', [ [ 'unbound' ] ] ], [ 'ref', 'b' ] ] ] ] )
 		self.assert_( tUnbound.node  is  module[1][1][1][1][0] )
 		self.assert_( tModule[1][1][1][1][0] is tUnbound )
 		self.assert_( tUnbound.parentTreeNode.parentTreeNode.parentTreeNode.parentTreeNode.parentTreeNode is tModule )
 		self.assert_( tUnbound.indexInParent == 0 )
-		
 
-		
-	
+
+

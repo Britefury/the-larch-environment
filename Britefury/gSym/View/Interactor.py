@@ -6,7 +6,7 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
 
-import gtk
+#import gtk
 
 from Britefury.gSym.View.InteractorEvent import InteractorEvent, InteractorEventKey, InteractorEventText, InteractorEventBackspaceStart, InteractorEventDeleteEnd
 
@@ -37,6 +37,7 @@ def keyEventMethod(keyString):
 
 
 def accelEventMethod(accelString):
+	## TODO
 	keyValue, mods = gtk.accelerator_parse( accelString )
 	return eventMethodDecorator( InteractorEventKey, lambda method, target, event, args, kwargs: method( target, event.keyValue, event.mods, *args, **kwargs ), lambda event: event.keyValue == keyValue  and  event.mods == mods )
 	

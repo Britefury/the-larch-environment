@@ -55,7 +55,7 @@ class TestCase_LISPParser (ParserTestCase):
 		self._matchTest( parser, '"abc"', 'abc' )
 		self._matchTest( parser, "u'abc'", u'abc' )
 		self._matchTest( parser, 'u"abc"', u'abc' )
-		
+
 	def testList(self):
 		self._matchTest( parser, '()', [] )
 		self._matchTest( parser, '(x)', [ 'x' ] )
@@ -63,11 +63,10 @@ class TestCase_LISPParser (ParserTestCase):
 		self._matchTest( parser, '(x y z)', [ 'x', 'y', 'z' ] )
 		self._matchTest( parser, '(x (y (z())))', [ 'x', [ 'y', [ 'z', []]]] )
 
-		
+
 if __name__ == '__main__':
 	res, pos, dot = parser.debugParseString( '(x y z)' )
 	print dot
-		
-		
-		
-		
+
+
+

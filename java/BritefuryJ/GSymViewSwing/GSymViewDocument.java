@@ -6,13 +6,12 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Element;
 import javax.swing.text.GapContent;
 
+import BritefuryJ.GSymViewSwing.DocLayout.DocLayout;
+import BritefuryJ.GSymViewSwing.DocLayout.DocLayoutNode;
 import BritefuryJ.GSymViewSwing.ElementViewFactories.DocStructureDocRootViewFactory;
 import BritefuryJ.GSymViewSwing.ElementViewFactories.DocStructureParagraphViewFactory;
 import BritefuryJ.GSymViewSwing.ElementViewFactories.DocStructureTextViewFactory;
 import BritefuryJ.GSymViewSwing.ElementViewFactories.ElementViewFactory;
-import BritefuryJ.GSymViewSwing.ElementViewFactories.GlyphViewFactory;
-import BritefuryJ.GSymViewSwing.ElementViewFactories.ParagraphViewFactory;
-import BritefuryJ.GSymViewSwing.ElementViewFactories.VBoxViewFactory;
 
 
 public class GSymViewDocument extends AbstractDocument
@@ -114,10 +113,11 @@ public class GSymViewDocument extends AbstractDocument
 	
 	
 	private BranchElement defaultRoot;
-	private DocElementSpec elementReplaceOperationSpec;
+	private DocLayoutNode elementReplaceOperationSpec;
 	private AbstractElement elementReplaceOperationElementToReplace;
 	private BranchElement elementReplaceOperationParent;
 	private int elementReplaceOperationIndexInParent;
+	private DocLayout documentLayout;
 	
 	
 	
@@ -131,6 +131,8 @@ public class GSymViewDocument extends AbstractDocument
 	{
 		super( c );
 		
+		documentLayout = new DocLayout( this );
+
 		defaultRoot = createDefaultRoot();
 		elementReplaceOperationSpec = null;
 		elementReplaceOperationElementToReplace = null;
@@ -150,7 +152,7 @@ public class GSymViewDocument extends AbstractDocument
 	
 	
 	
-	public void elementReplace(Element elementToReplace, DocElementSpec replacementElementSpec)
+	public void elementReplace(Element elementToReplace, DocLayoutNode replacementElementSpec)
 	{
 		try
 		{
@@ -195,7 +197,8 @@ public class GSymViewDocument extends AbstractDocument
 		}
 		else
 		{
-			Element replacementElementSubtree = elementReplaceOperationSpec.createElementSubtree( this, elementReplaceOperationParent, elementReplaceOperationElementToReplace.getStartOffset() );
+			Element replacementElementSubtree = elementReplaceOperationSpec.createElementSubtree( elementReplaceOperationParent, elementReplaceOperationElementToReplace.getStartOffset() );
+			elementReplaceOperationSpec.setElement( replacementElementSubtree );
 			Element[] oldElements = {};
 			Element[] newElements = { replacementElementSubtree };
 
@@ -246,99 +249,14 @@ public class GSymViewDocument extends AbstractDocument
 	{
 		DocRootElement root = new DocRootElement( null, null );
 		ParagraphElement para = new ParagraphElement( root, null );
-		TextElement leaf = new TextElement( para, null, 0, 1 );
-		Element[] leaves = { leaf };
+		Element content = documentLayout.getRoot().createElementSubtree( para, 0 );
+		documentLayout.getRoot().setElement( content );
+		Element[] leaves = { content };
 		para.replace( 0, 0, leaves );
 		Element[] paras = { para };
 		root.replace( 0, 0, paras );
 		return root;
 	}
-	
-	private DocElementSpec paramSpec()
-	{
-		DocElementSpecLeaf leaf0 = new DocElementSpecLeaf( "aaaaaaa,", null, GlyphViewFactory.viewFactory );
-		DocElementSpecLeaf leaf1 = new DocElementSpecLeaf( "bbbbbbb,", null, GlyphViewFactory.viewFactory );
-		DocElementSpecLeaf leaf2 = new DocElementSpecLeaf( "ccccccc,", null, GlyphViewFactory.viewFactory );
-		DocElementSpecLeaf leaf3 = new DocElementSpecLeaf( "ddddddd,", null, GlyphViewFactory.viewFactory );
-		DocElementSpecLeaf leaf4 = new DocElementSpecLeaf( "eeeeeee,", null, GlyphViewFactory.viewFactory );
-		DocElementSpecLeaf leaf5 = new DocElementSpecLeaf( "fffffff,", null, GlyphViewFactory.viewFactory );
-		DocElementSpecLeaf leaf6 = new DocElementSpecLeaf( "ggggggg,", null, GlyphViewFactory.viewFactory );
-		DocElementSpecLeaf[] leaves = { leaf0, leaf1, leaf2, leaf3, leaf4, leaf5, leaf6 };
-		DocElementSpecBranch branch = new DocElementSpecBranch( leaves, null, ParagraphViewFactory.viewFactory );
-		return branch;
-	}
-	
-	private DocElementSpec callSpec(DocElementSpec inner)
-	{
-		DocElementSpecLeaf openParen = new DocElementSpecLeaf( "(", null, GlyphViewFactory.viewFactory );
-		DocElementSpecLeaf closeParen = new DocElementSpecLeaf( ")", null, GlyphViewFactory.viewFactory );
-		DocElementSpec[] innerOpen = { inner, openParen };
-		DocElementSpec innerOpenBranch = new DocElementSpecBranch( innerOpen, null, VBoxViewFactory.viewFactory );
-		DocElementSpec params = paramSpec();
-		DocElementSpec[] call = { innerOpenBranch, params, closeParen };
-		DocElementSpecBranch callBranch = new DocElementSpecBranch( call, null, ParagraphViewFactory.viewFactory );
-		return callBranch;
-	}
-	
-	
-
-	private DocElementSpec getAttrSpec(DocElementSpec inner, String attrName)
-	{
-		DocElementSpecLeaf dot = new DocElementSpecLeaf( ".", null, GlyphViewFactory.viewFactory );
-		DocElementSpecLeaf attr = new DocElementSpecLeaf( attrName, null, GlyphViewFactory.viewFactory );
-		DocElementSpec[] innerDot = { inner, dot };
-		DocElementSpecBranch innerDotBranch = new DocElementSpecBranch( innerDot, null, VBoxViewFactory.viewFactory );
-		DocElementSpec[] getattr = { innerDotBranch, attr };
-		DocElementSpecBranch getattrBranch = new DocElementSpecBranch( getattr, null, ParagraphViewFactory.viewFactory );
-		return getattrBranch;
-	}
-	
-	
-	
-	DocElementSpec getattrSpecRecursive(DocElementSpec inner, int level)
-	{
-		if ( level == 0 )
-		{
-			return inner;
-		}
-		else
-		{
-			return getattrSpecRecursive( getAttrSpec( inner, "attr" + String.valueOf( level ) ), level - 1 );
-		}
-	}
-	
-
-
-	public void testFill()
-	{
-		DocElementSpecLeaf leaf0 = new DocElementSpecLeaf( "a,", null, GlyphViewFactory.viewFactory );
-		DocElementSpecLeaf leaf1 = new DocElementSpecLeaf( "b,", null, GlyphViewFactory.viewFactory );
-		DocElementSpecLeaf leaf2 = new DocElementSpecLeaf( "c,", null, GlyphViewFactory.viewFactory );
-		DocElementSpecLeaf leaf3 = new DocElementSpecLeaf( "d,", null, GlyphViewFactory.viewFactory );
-		DocElementSpecLeaf leaf4 = new DocElementSpecLeaf( "e,", null, GlyphViewFactory.viewFactory );
-		DocElementSpecLeaf leaf5 = new DocElementSpecLeaf( "f,", null, GlyphViewFactory.viewFactory );
-		DocElementSpecLeaf leaf6 = new DocElementSpecLeaf( "g,", null, GlyphViewFactory.viewFactory );
-		DocElementSpecLeaf[] leaves = { leaf0, leaf1, leaf2, leaf3, leaf4, leaf5, leaf6 };
-		DocElementSpecBranch branch = new DocElementSpecBranch( leaves, null, ParagraphViewFactory.viewFactory );
-		
-		elementReplace( defaultRoot.getElement( 0 ).getElement( 0 ), branch );
-	}
-	
-	
-	
-	public void testFill2()
-	{
-		DocElementSpec inner = new DocElementSpecLeaf( "this", null, GlyphViewFactory.viewFactory );
-		inner = getattrSpecRecursive( inner, 4 );
-		inner = callSpec( inner );
-		inner = getattrSpecRecursive( inner, 4 );
-		inner = callSpec( inner );
-		inner = getattrSpecRecursive( inner, 4 );
-		inner = callSpec( inner );
-		
-		elementReplace( defaultRoot.getElement( 0 ).getElement( 0 ), inner );
-	}
-	
 	
 	
 	public CustomLeafElement createGSymLeafElement(Element parent, AttributeSet attribs, int start, int end, ElementViewFactory viewFactory)
@@ -349,5 +267,12 @@ public class GSymViewDocument extends AbstractDocument
 	public CustomBranchElement createGSymBranchElement(Element parent, AttributeSet attribs, ElementViewFactory viewFactory)
 	{
 		return new CustomBranchElement( parent, attribs, viewFactory );
+	}
+	
+	
+	
+	public DocLayout getDocumentLayout()
+	{
+		return documentLayout;
 	}
 }

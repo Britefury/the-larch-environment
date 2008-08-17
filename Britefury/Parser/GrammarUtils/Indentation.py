@@ -40,9 +40,9 @@ def _processIndentation(indentationStack, indentation, indentToken, dedentToken,
 def indentedBlocksPrePass(text, indentToken='$<indent>$', dedentToken='$<dedent>$'):
 	"""
 	Processe text whose blocks are determined by indentation, by inserting indent and dedent tokens
-	
+
 	indentedBlocksPrePass(text, indentToken='$<indent>$', dedentToken='$<dedent>$')  ->  text with indent and detent tokens
-	
+
 	For example
 	a
 	b
@@ -50,9 +50,9 @@ def indentedBlocksPrePass(text, indentToken='$<indent>$', dedentToken='$<dedent>
 	  d
 	e
 	f
-	
+
 	==>>
-	
+
 	a
 	b
 	  $<indent>$c
@@ -61,30 +61,30 @@ def indentedBlocksPrePass(text, indentToken='$<indent>$', dedentToken='$<dedent>
 	f	
 	"""
 	lines = text.split( '\n' )
-	
+
 	if len( lines ) > 0:
 		indentationStack = []
 		indentationStack.append( _getLineIndentation( lines[0] ) )
-		
+
 		indentationLevel = 0
-		
+
 		for i, line in enumerate( lines ):
 			if line.strip() != '':
 				indentation = _getLineIndentation( line )
 				content = _getLineWithoutIndentation( line )
-				
+
 				processedIndentation, indentationLevel = _processIndentation( indentationStack, indentation, indentToken, dedentToken, indentationLevel )
 				lines[i] = processedIndentation +  content
 				currentIndentation = indentation
-				
+
 		bAppendBlankLine = indentationLevel > 0
-				
+
 		for i in xrange( 0, indentationLevel ):
 			lines.append( dedentToken )
-			
+
 		if bAppendBlankLine:
 			lines.append( '' )
-	
+
 	return '\n'.join( lines )
 
 
@@ -100,7 +100,7 @@ class TestCase_Indentation (ParserTestCase):
 			"  d",
 			"e",
 			"f", ] )  +  '\n'
-		
+
 		expected1 = '\n'.join( [
 			"a",
 			"b",
@@ -108,8 +108,8 @@ class TestCase_Indentation (ParserTestCase):
 			"  d",
 			"$<dedent>$e",
 			"f", ] )  +  '\n'
-		
-		
+
+
 		src2 = '\n'.join( [
 			"  a",
 			"  b",
@@ -117,7 +117,7 @@ class TestCase_Indentation (ParserTestCase):
 			"    d",
 			"  e",
 			"  f", ] )  +  '\n'
-		
+
 		expected2 = '\n'.join( [
 			"  a",
 			"  b",
@@ -125,7 +125,7 @@ class TestCase_Indentation (ParserTestCase):
 			"    d",
 			"  $<dedent>$e",
 			"  f", ] )  +  '\n'
-		
+
 
 		src3 = '\n'.join( [
 			"  a",
@@ -134,7 +134,7 @@ class TestCase_Indentation (ParserTestCase):
 			"    d",
 			"      e",
 			"      f", ] )  +  '\n'
-		
+
 		expected3 = '\n'.join( [
 			"  a",
 			"  b",
@@ -145,7 +145,7 @@ class TestCase_Indentation (ParserTestCase):
 			"",
 			"$<dedent>$",
 			"$<dedent>$", ] )  +  '\n'
-		
+
 
 		src4 = '\n'.join( [
 			"  a",
@@ -156,7 +156,7 @@ class TestCase_Indentation (ParserTestCase):
 			"      f",
 			"  g",
 			"  h", ] )  +  '\n'
-		
+
 		expected4 = '\n'.join( [
 			"  a",
 			"  b",
@@ -166,17 +166,17 @@ class TestCase_Indentation (ParserTestCase):
 			"      f",
 			"  $<dedent>$$<dedent>$g",
 			"  h" ] )  +  '\n'
-		
+
 		self.assert_( indentedBlocksPrePass( src1 )  ==  expected1 )
 		self.assert_( indentedBlocksPrePass( src2 )  ==  expected2 )
 		self.assert_( indentedBlocksPrePass( src3 )  ==  expected3 )
 		self.assert_( indentedBlocksPrePass( src4 )  ==  expected4 )
-		
-	
-		
-		
-		
-				
+
+
+
+
+
+
 
 	def testIndentedGrammar(self):
 		loadlLocal = Production( identifier )
@@ -185,10 +185,10 @@ class TestCase_Indentation (ParserTestCase):
 		minus = Literal( '-' )
 		star = Literal( '*' )
 		slash = Literal( '/' )
-		
+
 		addop = plus | minus
 		mulop = star | slash
-				
+
 		expression = Forward()
 		parenExpression = Production( Literal( '(' )  +  expression  +  ')' )
 		atom = Production( loadlLocal  |  parenExpression )
@@ -202,29 +202,29 @@ class TestCase_Indentation (ParserTestCase):
 		add = Forward()
 		add  <<  Production( ( add  + addop + mul )  |  mul )
 		expression  <<  Production( add )
-		
-		
+
+
 		singleStatement = Production( ( expression + Suppress( ';' ) )  >>  ( lambda input, pos, xs: xs[0] ) )
 
 		statement = Forward()
 		block = Production( ZeroOrMore( statement ) )
 		compoundStatement = Production( ( Literal( '$<indent>$' )  +  block  +  Literal( '$<dedent>$' ) )  >>  ( lambda input, pos, xs: xs[1] ) )
 		statement  <<  Production( compoundStatement  |  singleStatement )
-		
-		
+
+
 		parser = block
-		
-		
+
+
 		src1 = """
 self.x();
-		"""
-		
+		     """
+
 		src2 = """
 self.y();
-   a.b();
-   c.d();
-		"""
+		     a.b();
+		     c.d();
+		     """
 		self._matchTest( parser, indentedBlocksPrePass( src1 ), [ [ 'self', '.', 'x', '(', [], ')' ] ] )
 		self._matchTest( parser, indentedBlocksPrePass( src2 ), [ [ 'self', '.', 'y', '(', [], ')' ], [ [ 'a', '.', 'b', '(', [], ')' ], [ 'c', '.', 'd', '(', [], ')' ] ] ] )
-		
+
 

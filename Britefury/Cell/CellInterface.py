@@ -16,7 +16,7 @@ from Britefury.Util.SignalSlot import ClassSignal, Signal
 
 from Britefury.Kernel.Mutability import *
 
-from Britefury.FileIO.IOXml import *
+#from Britefury.FileIO.IOXml import *
 
 
 

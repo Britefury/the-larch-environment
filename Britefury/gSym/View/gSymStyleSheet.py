@@ -5,13 +5,6 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
-from Britefury.DocPresent.Toolkit.DTContainer import DTContainer
-from Britefury.DocPresent.Toolkit.DTBorder import DTBorder
-from Britefury.DocPresent.Toolkit.DTActiveBorder import DTActiveBorder
-from Britefury.DocPresent.Toolkit.DTLabel import DTLabel
-from Britefury.DocPresent.Toolkit.DTBox import DTBox
-
-
 
 
 class GSymStyleSheet (object):

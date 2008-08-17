@@ -10,7 +10,7 @@
 Defines the CellEvaluator interface, and metaclass
 """
 
-from Britefury.FileIO.IOXml import *
+#from Britefury.FileIO.IOXml import *
 
 
 
@@ -24,7 +24,7 @@ class CellEvaluatorClass (type):
 	def __init__(cls, clsName, clsBases, clsDict):
 		super( CellEvaluatorClass, cls ).__init__( clsName, clsBases, clsDict )
 
-		ioObjectFactoryRegister( clsName, cls )
+		#ioObjectFactoryRegister( clsName, cls )
 
 
 
@@ -36,7 +36,7 @@ class CellEvaluator (object):
 
 	bSerialisable - Determines if instances of this class can be serialised
 	"""
-	__metaclass__ = CellEvaluatorClass
+	#__metaclass__ = CellEvaluatorClass
 
 
 	bSerialisable = False
@@ -47,11 +47,11 @@ class CellEvaluator (object):
 		assert False, 'abstract'
 
 
-	def __readxml__(self, xmlNode):
-		pass
+	#def __readxml__(self, xmlNode):
+	#	pass
 
-	def __writexml__(self, xmlNode):
-		pass
+	#def __writexml__(self, xmlNode):
+	#	pass
 
 
 
