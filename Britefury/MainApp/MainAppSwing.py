@@ -19,7 +19,12 @@ from BritefuryJ.GSymViewSwing.DocLayout import *
 from BritefuryJ.GSymViewSwing.ElementViewFactories import *
 
 
+from Britefury.Event.QueuedEvent import queueEvent
+
 from Britefury.CommandHistory.CommandHistory import CommandHistory
+
+from Britefury.DocModel.DMList import DMList
+from Britefury.DocModel.DMIO import readSX, writeSX
 
 from Britefury.gSym.gSymWorld import GSymWorld
 from Britefury.gSym.gSymEnvironment import GSymEnvironment
