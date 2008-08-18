@@ -1,22 +1,32 @@
 package BritefuryJ.GSymViewSwing;
 
+import java.awt.Color;
+import java.awt.Font;
+
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Element;
 import javax.swing.text.GapContent;
+import javax.swing.text.Style;
+import javax.swing.text.StyleContext;
+import javax.swing.text.StyledDocument;
 
 import BritefuryJ.GSymViewSwing.DocLayout.DocLayout;
 import BritefuryJ.GSymViewSwing.DocLayout.DocLayoutNode;
 import BritefuryJ.GSymViewSwing.ElementViewFactories.DocStructureDocRootViewFactory;
 import BritefuryJ.GSymViewSwing.ElementViewFactories.DocStructureParagraphViewFactory;
-import BritefuryJ.GSymViewSwing.ElementViewFactories.DocStructureTextViewFactory;
 import BritefuryJ.GSymViewSwing.ElementViewFactories.ElementViewFactory;
 
 
-public class GSymViewDocument extends AbstractDocument
+public class GSymViewDocument extends AbstractDocument implements StyledDocument
 {
 	public static class InvalidElementTypeException extends RuntimeException
+	{
+		private static final long serialVersionUID = 1L;
+	}
+	
+	public static class OperationNotSupportedException extends RuntimeException
 	{
 		private static final long serialVersionUID = 1L;
 	}
@@ -57,22 +67,7 @@ public class GSymViewDocument extends AbstractDocument
 	}
 
 	
-	public class TextElement extends LeafElement implements DocumentElement
-	{
-		private static final long serialVersionUID = 1L;
-
-		public TextElement(Element parent, AttributeSet attribs, int off0, int off1)
-		{
-			super( parent, attribs, off0, off1 );
-		}
-
-		public ElementViewFactory getViewFactory()
-		{
-			return DocStructureTextViewFactory.viewFactory;
-		}
-	}
 	
-
 	public class CustomBranchElement extends BranchElement implements DocumentElement
 	{
 		private static final long serialVersionUID = 1L;
@@ -149,6 +144,7 @@ public class GSymViewDocument extends AbstractDocument
 	{
 		return defaultRoot.positionToElement( pos );
 	}
+	
 	
 	
 	
@@ -247,14 +243,21 @@ public class GSymViewDocument extends AbstractDocument
 
 	private BranchElement createDefaultRoot()
 	{
+//		DocRootElement root = new DocRootElement( null, null );
+//		ParagraphElement para = new ParagraphElement( root, null );
+//		Element content = documentLayout.getRoot().createElementSubtree( para, 0 );
+//		documentLayout.getRoot().setElement( content );
+//		Element[] leaves = { content };
+//		para.replace( 0, 0, leaves );
+//		Element[] paras = { para };
+//		root.replace( 0, 0, paras );
+//		return root;
+
 		DocRootElement root = new DocRootElement( null, null );
-		ParagraphElement para = new ParagraphElement( root, null );
-		Element content = documentLayout.getRoot().createElementSubtree( para, 0 );
+		Element content = documentLayout.getRoot().createElementSubtree( root, 0 );
 		documentLayout.getRoot().setElement( content );
 		Element[] leaves = { content };
-		para.replace( 0, 0, leaves );
-		Element[] paras = { para };
-		root.replace( 0, 0, paras );
+		root.replace( 0, 0, leaves );
 		return root;
 	}
 	
@@ -274,5 +277,90 @@ public class GSymViewDocument extends AbstractDocument
 	public DocLayout getDocumentLayout()
 	{
 		return documentLayout;
+	}
+
+	
+	
+	public Style addStyle(String name, Style parent)
+	{
+		StyleContext context = (StyleContext)getAttributeContext();
+		return context.addStyle( name, parent );
+	}
+	
+	public Color getBackground(AttributeSet attribs)
+	{
+		StyleContext context = (StyleContext)getAttributeContext();
+		return context.getBackground( attribs );
+	}
+
+	public Element getCharacterElement(int pos)
+	{
+		Element e = getDefaultRootElement();
+		
+		while ( !e.isLeaf() )
+		{
+			int index = e.getElementIndex( pos );
+			e = e.getElement( index );
+		}
+		return e;
+	}
+
+	public Font getFont(AttributeSet attribs)
+	{
+		StyleContext context = (StyleContext)getAttributeContext();
+		Font f = context.getFont( attribs );
+		System.out.println( "GSymViewDocument.getFont(): font=" + f.toString() );
+		return f;
+	}
+
+	public Color getForeground(AttributeSet attribs)
+	{
+		StyleContext context = (StyleContext)getAttributeContext();
+		return context.getForeground( attribs );
+	}
+
+	public Style getLogicalStyle(int pos)
+	{
+		Style s = null;
+		Element paragraph = getParagraphElement( pos );
+
+		if ( paragraph != null )
+		{
+			AttributeSet attribs = paragraph.getAttributes();
+			AttributeSet parent = attribs.getResolveParent();
+			if ( parent instanceof Style )
+			{
+				s = (Style)parent;
+			}
+		}
+
+		return s;
+	}
+
+	public Style getStyle(String name)
+	{
+		StyleContext context = (StyleContext)getAttributeContext();
+		return context.getStyle( name );
+	}
+
+	public void removeStyle(String name)
+	{
+		StyleContext context = (StyleContext)getAttributeContext();
+		context.removeStyle( name );
+	}
+
+	public void setCharacterAttributes(int offset, int length, AttributeSet attribs, boolean replace)
+	{
+		throw new OperationNotSupportedException();
+	}
+
+	public void setLogicalStyle(int pos, Style s)
+	{
+		throw new OperationNotSupportedException();
+	}
+
+	public void setParagraphAttributes(int offset, int length, AttributeSet attribs, boolean replace)
+	{
+		throw new OperationNotSupportedException();
 	}
 }

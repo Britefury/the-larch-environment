@@ -11,7 +11,9 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.text.AbstractDocument;
-import javax.swing.text.Document;
+import javax.swing.text.Style;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyleContext;
 
 import BritefuryJ.GSymViewSwing.GSymViewDocument;
 import BritefuryJ.GSymViewSwing.GSymViewEditorKit;
@@ -19,7 +21,7 @@ import BritefuryJ.GSymViewSwing.DocLayout.DocLayout;
 import BritefuryJ.GSymViewSwing.DocLayout.DocLayoutNode;
 import BritefuryJ.GSymViewSwing.DocLayout.DocLayoutNodeBranch;
 import BritefuryJ.GSymViewSwing.DocLayout.DocLayoutNodeLeaf;
-import BritefuryJ.GSymViewSwing.ElementViewFactories.GlyphViewFactory;
+import BritefuryJ.GSymViewSwing.ElementViewFactories.LabelViewFactory;
 import BritefuryJ.GSymViewSwing.ElementViewFactories.ParagraphViewFactory;
 import BritefuryJ.GSymViewSwing.ElementViewFactories.VBoxViewFactory;
 
@@ -28,6 +30,7 @@ public class Test_GSymViewSwing
 	private JFrame frame;
 	private GSymViewDocument document;
 	private DocLayout docLayout;
+	private Style regular, bold, italic;
 	
 	
 	public static void main(String[] args)
@@ -49,13 +52,12 @@ public class Test_GSymViewSwing
 		textPane.setPreferredSize( new Dimension( 640, 480 ) );
 		
 		GSymViewEditorKit editorKit = new GSymViewEditorKit();
-		Document doc = editorKit.createDefaultDocument();
+		document = (GSymViewDocument)editorKit.createDefaultDocument();
 		
-		document = (GSymViewDocument)doc;
 		docLayout = document.getDocumentLayout();
 		
 		textPane.setEditorKit( editorKit );
-		textPane.setDocument( doc );
+		textPane.setDocument( document );
 		
 		JMenuBar menuBar = createMenus();
 		
@@ -64,7 +66,23 @@ public class Test_GSymViewSwing
 		frame.add( textPane );
 		
 		frame.pack();
+
+	
+	
+		Style def = StyleContext.getDefaultStyleContext().getStyle( StyleContext.DEFAULT_STYLE );
+		StyleConstants.setFontFamily( def, "SansSerif" );
+		//StyleConstants.setFontSize( def, 24 );
+		
+		regular = document.addStyle( "regular", def );
+
+		bold = document.addStyle( "bold", regular );
+		StyleConstants.setBold( bold, true );
+
+		italic = document.addStyle( "italic", regular );
+		StyleConstants.setItalic( italic, true );
 	}
+	
+	
 	
 	
 	private JMenuBar createMenus()
@@ -120,13 +138,13 @@ public class Test_GSymViewSwing
 	
 	private DocLayoutNode paramSpec()
 	{
-		DocLayoutNodeLeaf leaf0 = new DocLayoutNodeLeaf( "aaaaaaa,", null, GlyphViewFactory.viewFactory );
-		DocLayoutNodeLeaf leaf1 = new DocLayoutNodeLeaf( "bbbbbbb,", null, GlyphViewFactory.viewFactory );
-		DocLayoutNodeLeaf leaf2 = new DocLayoutNodeLeaf( "ccccccc,", null, GlyphViewFactory.viewFactory );
-		DocLayoutNodeLeaf leaf3 = new DocLayoutNodeLeaf( "ddddddd,", null, GlyphViewFactory.viewFactory );
-		DocLayoutNodeLeaf leaf4 = new DocLayoutNodeLeaf( "eeeeeee,", null, GlyphViewFactory.viewFactory );
-		DocLayoutNodeLeaf leaf5 = new DocLayoutNodeLeaf( "fffffff,", null, GlyphViewFactory.viewFactory );
-		DocLayoutNodeLeaf leaf6 = new DocLayoutNodeLeaf( "ggggggg,", null, GlyphViewFactory.viewFactory );
+		DocLayoutNodeLeaf leaf0 = new DocLayoutNodeLeaf( "aaaaaaa,", italic, LabelViewFactory.viewFactory );
+		DocLayoutNodeLeaf leaf1 = new DocLayoutNodeLeaf( "bbbbbbb,", italic, LabelViewFactory.viewFactory );
+		DocLayoutNodeLeaf leaf2 = new DocLayoutNodeLeaf( "ccccccc,", italic, LabelViewFactory.viewFactory );
+		DocLayoutNodeLeaf leaf3 = new DocLayoutNodeLeaf( "ddddddd,", italic, LabelViewFactory.viewFactory );
+		DocLayoutNodeLeaf leaf4 = new DocLayoutNodeLeaf( "eeeeeee,", italic, LabelViewFactory.viewFactory );
+		DocLayoutNodeLeaf leaf5 = new DocLayoutNodeLeaf( "fffffff,", italic, LabelViewFactory.viewFactory );
+		DocLayoutNodeLeaf leaf6 = new DocLayoutNodeLeaf( "ggggggg", italic, LabelViewFactory.viewFactory );
 		DocLayoutNodeLeaf[] leaves = { leaf0, leaf1, leaf2, leaf3, leaf4, leaf5, leaf6 };
 		DocLayoutNodeBranch branch = new DocLayoutNodeBranch( null, ParagraphViewFactory.viewFactory );
 		branch.setChildren( leaves );
@@ -135,8 +153,8 @@ public class Test_GSymViewSwing
 	
 	private DocLayoutNode callSpec(DocLayoutNode inner)
 	{
-		DocLayoutNodeLeaf openParen = new DocLayoutNodeLeaf( "(", null, GlyphViewFactory.viewFactory );
-		DocLayoutNodeLeaf closeParen = new DocLayoutNodeLeaf( ")", null, GlyphViewFactory.viewFactory );
+		DocLayoutNodeLeaf openParen = new DocLayoutNodeLeaf( "(", bold, LabelViewFactory.viewFactory );
+		DocLayoutNodeLeaf closeParen = new DocLayoutNodeLeaf( ")", bold, LabelViewFactory.viewFactory );
 		DocLayoutNode[] innerOpen = { inner, openParen };
 		DocLayoutNodeBranch innerOpenBranch = new DocLayoutNodeBranch( null, VBoxViewFactory.viewFactory );
 		innerOpenBranch.setChildren( innerOpen );
@@ -151,8 +169,8 @@ public class Test_GSymViewSwing
 
 	private DocLayoutNode getAttrSpec(DocLayoutNode inner, String attrName)
 	{
-		DocLayoutNodeLeaf dot = new DocLayoutNodeLeaf( ".", null, GlyphViewFactory.viewFactory );
-		DocLayoutNodeLeaf attr = new DocLayoutNodeLeaf( attrName, null, GlyphViewFactory.viewFactory );
+		DocLayoutNodeLeaf dot = new DocLayoutNodeLeaf( ".", bold, LabelViewFactory.viewFactory );
+		DocLayoutNodeLeaf attr = new DocLayoutNodeLeaf( attrName, italic, LabelViewFactory.viewFactory );
 		DocLayoutNode[] innerDot = { inner, dot };
 		DocLayoutNodeBranch innerDotBranch = new DocLayoutNodeBranch( null, VBoxViewFactory.viewFactory );
 		innerDotBranch.setChildren( innerDot );
@@ -180,13 +198,13 @@ public class Test_GSymViewSwing
 
 	public void testFill()
 	{
-		DocLayoutNodeLeaf leaf0 = new DocLayoutNodeLeaf( "a,", null, GlyphViewFactory.viewFactory );
-		DocLayoutNodeLeaf leaf1 = new DocLayoutNodeLeaf( "b,", null, GlyphViewFactory.viewFactory );
-		DocLayoutNodeLeaf leaf2 = new DocLayoutNodeLeaf( "c,", null, GlyphViewFactory.viewFactory );
-		DocLayoutNodeLeaf leaf3 = new DocLayoutNodeLeaf( "d,", null, GlyphViewFactory.viewFactory );
-		DocLayoutNodeLeaf leaf4 = new DocLayoutNodeLeaf( "e,", null, GlyphViewFactory.viewFactory );
-		DocLayoutNodeLeaf leaf5 = new DocLayoutNodeLeaf( "f,", null, GlyphViewFactory.viewFactory );
-		DocLayoutNodeLeaf leaf6 = new DocLayoutNodeLeaf( "g,", null, GlyphViewFactory.viewFactory );
+		DocLayoutNodeLeaf leaf0 = new DocLayoutNodeLeaf( "a,", italic, LabelViewFactory.viewFactory );
+		DocLayoutNodeLeaf leaf1 = new DocLayoutNodeLeaf( "b,", italic, LabelViewFactory.viewFactory );
+		DocLayoutNodeLeaf leaf2 = new DocLayoutNodeLeaf( "c,", italic, LabelViewFactory.viewFactory );
+		DocLayoutNodeLeaf leaf3 = new DocLayoutNodeLeaf( "d,", italic, LabelViewFactory.viewFactory );
+		DocLayoutNodeLeaf leaf4 = new DocLayoutNodeLeaf( "e,", italic, LabelViewFactory.viewFactory );
+		DocLayoutNodeLeaf leaf5 = new DocLayoutNodeLeaf( "f,", italic, LabelViewFactory.viewFactory );
+		DocLayoutNodeLeaf leaf6 = new DocLayoutNodeLeaf( "g,", italic, LabelViewFactory.viewFactory );
 		DocLayoutNodeLeaf[] leaves = { leaf0, leaf1, leaf2, leaf3, leaf4, leaf5, leaf6 };
 		DocLayoutNodeBranch branch = new DocLayoutNodeBranch( null, ParagraphViewFactory.viewFactory );
 		branch.setChildren( leaves );
@@ -201,7 +219,7 @@ public class Test_GSymViewSwing
 	
 	public void testFill2()
 	{
-		DocLayoutNode inner = new DocLayoutNodeLeaf( "this", null, GlyphViewFactory.viewFactory );
+		DocLayoutNode inner = new DocLayoutNodeLeaf( "this", bold, LabelViewFactory.viewFactory );
 		inner = getattrSpecRecursive( inner, 4 );
 		inner = callSpec( inner );
 		inner = getattrSpecRecursive( inner, 4 );

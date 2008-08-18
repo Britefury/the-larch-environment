@@ -1,6 +1,6 @@
 package BritefuryJ.GSymViewSwing;
 
-import javax.swing.text.DefaultEditorKit;
+import javax.swing.text.StyledEditorKit;
 import javax.swing.text.Document;
 import javax.swing.text.Element;
 import javax.swing.text.View;
@@ -8,7 +8,7 @@ import javax.swing.text.ViewFactory;
 
 import BritefuryJ.GSymViewSwing.ElementViewFactories.ElementViewFactory;
 
-public class GSymViewEditorKit extends DefaultEditorKit
+public class GSymViewEditorKit extends StyledEditorKit
 {
 	private static class ViewFac implements ViewFactory 
 	{

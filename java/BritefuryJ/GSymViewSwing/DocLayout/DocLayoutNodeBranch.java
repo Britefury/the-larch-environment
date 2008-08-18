@@ -5,7 +5,7 @@ import javax.swing.text.AttributeSet;
 import javax.swing.text.Element;
 
 import BritefuryJ.GSymViewSwing.ElementViewFactories.ElementViewFactory;
-import BritefuryJ.GSymViewSwing.ElementViewFactories.GlyphViewFactory;
+import BritefuryJ.GSymViewSwing.ElementViewFactories.LabelViewFactory;
 
 public class DocLayoutNodeBranch extends DocLayoutNode
 {
@@ -73,7 +73,7 @@ public class DocLayoutNodeBranch extends DocLayoutNode
 		if ( children.length == 0 )
 		{
 			AbstractDocument.BranchElement branch = docLayout.document.createGSymBranchElement( parent, attribs, viewFactory );
-			Element[] childElements = { docLayout.document.createGSymLeafElement( branch, attribs, offset, offset + 1, GlyphViewFactory.viewFactory ) };
+			Element[] childElements = { docLayout.document.createGSymLeafElement( branch, attribs, offset, offset + 1, LabelViewFactory.viewFactory ) };
 			branch.replace( 0, 0, childElements );
 			return branch;
 		}
