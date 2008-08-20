@@ -5,8 +5,8 @@ import java.awt.Dimension;
 import java.awt.Font;
 import javax.swing.JFrame;
 
-import Britefury.DocPresent.DPText;
-import Britefury.DocPresent.DPPresentationArea;
+import BritefuryJ.DocPresent.DPText;
+import BritefuryJ.DocPresent.DPPresentationArea;
 
 public class DPTextTest {
 	public static void main(final String[] args) {

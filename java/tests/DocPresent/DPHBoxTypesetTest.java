@@ -6,10 +6,10 @@ import java.awt.Font;
 
 import javax.swing.JFrame;
 
-import Britefury.DocPresent.DPVBox;
-import Britefury.DocPresent.DPHBoxTypeset;
-import Britefury.DocPresent.DPPresentationArea;
-import Britefury.DocPresent.DPText;
+import BritefuryJ.DocPresent.DPVBox;
+import BritefuryJ.DocPresent.DPHBoxTypeset;
+import BritefuryJ.DocPresent.DPPresentationArea;
+import BritefuryJ.DocPresent.DPText;
 
 public class DPHBoxTypesetTest
 {

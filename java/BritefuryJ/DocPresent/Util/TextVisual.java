@@ -1,4 +1,4 @@
-package Britefury.DocPresent.Util;
+package BritefuryJ.DocPresent.Util;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -7,11 +7,13 @@ import java.awt.font.FontRenderContext;
 import java.awt.font.TextHitInfo;
 import java.awt.font.TextLayout;
 
-import Britefury.DocPresent.DPPresentationArea;
-import Britefury.DocPresent.HMetrics;
-import Britefury.DocPresent.VMetrics;
-import Britefury.DocPresent.VMetricsTypeset;
-import Britefury.Math.Point2;
+import javax.swing.JComponent;
+
+import BritefuryJ.DocPresent.DPPresentationArea;
+import BritefuryJ.DocPresent.HMetrics;
+import BritefuryJ.DocPresent.VMetrics;
+import BritefuryJ.DocPresent.VMetricsTypeset;
+import BritefuryJ.Math.Point2;
 
 
 
@@ -29,7 +31,7 @@ public class TextVisual
 	private Font font;
 	private Color colour;
 	private TextVisualListener listener;
-	private DPPresentationArea area;
+	private JComponent component;
 	
 	
 	public TextVisual(String text, Font font, Color colour, TextVisualListener listener)
@@ -94,18 +96,18 @@ public class TextVisual
 	
 	public void realise(DPPresentationArea a)
 	{
-		area = a;
-		
-		if ( area == null )
-		{
-			System.out.println( "realise: Area is null" );
-		}
+		component = a.getComponent();
+	}
+	
+	public void realise(JComponent component)
+	{
+		this.component = component;
 	}
 	
 	
 	public void unrealise()
 	{
-		area = null;
+		component = null;
 		layout = null;
 	}
 	
@@ -170,10 +172,10 @@ public class TextVisual
 	
 	private void refreshLayout()
 	{
-		assert area != null;
+		assert component != null;
 		if ( layout == null )
 		{
-			Graphics2D graphics = area.getGraphics();
+			Graphics2D graphics = (Graphics2D)component.getGraphics();
 			FontRenderContext frc = graphics.getFontRenderContext();
 			layout = new TextLayout( text, font, frc );
 		}

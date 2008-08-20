@@ -1,6 +1,7 @@
-package Britefury.DocPresent;
+package BritefuryJ.DocPresent;
 
 import java.awt.Color;
+import java.lang.Math;
 
 
 
@@ -99,8 +100,8 @@ public class DPHBox extends DPAbstractHBox
 			for (int i = 0; i < childVMetrics.length; i++)
 			{
 				VMetrics chm = childVMetrics[i];
-				vm.height = vm.height > chm.height  ?  vm.height : chm.height;
-				vm.vspacing = vm.vspacing > chm.vspacing  ?  vm.vspacing : chm.vspacing;
+				vm.height = Math.max( vm.height, chm.height );
+				vm.vspacing = Math.max( vm.vspacing, chm.vspacing );
 			}
 			
 			childrenVMetrics = vm;
@@ -116,7 +117,7 @@ public class DPHBox extends DPAbstractHBox
 		for (ChildEntry baseEntry: childEntries)
 		{
 			VBoxChildEntry entry = (VBoxChildEntry)baseEntry;
-			double childAlloc = entry.child.vmetrics.height < allocation  ?  entry.child.vmetrics.height : allocation;
+			double childAlloc = Math.min( entry.child.vmetrics.height, allocation );
 			if ( entry.alignment == Alignment.TOP )
 			{
 				allocateChildY( entry.child, 0.0, childAlloc );

@@ -1,7 +1,7 @@
-package Britefury.DocPresent.Event;
+package BritefuryJ.DocPresent.Event;
 
-import Britefury.DocPresent.Input.PointerInterface;
-import Britefury.Math.Xform2;
+import BritefuryJ.DocPresent.Input.PointerInterface;
+import BritefuryJ.Math.Xform2;
 
 
 

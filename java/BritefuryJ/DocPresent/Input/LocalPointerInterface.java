@@ -1,7 +1,7 @@
-package Britefury.DocPresent.Input;
+package BritefuryJ.DocPresent.Input;
 
-import Britefury.Math.Point2;
-import Britefury.Math.Xform2;
+import BritefuryJ.Math.Point2;
+import BritefuryJ.Math.Xform2;
 
 public class LocalPointerInterface extends PointerInterface {
 	protected PointerInterface pointer;

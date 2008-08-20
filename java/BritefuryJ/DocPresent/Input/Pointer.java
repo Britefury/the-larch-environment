@@ -1,6 +1,6 @@
-package Britefury.DocPresent.Input;
+package BritefuryJ.DocPresent.Input;
 
-import Britefury.Math.Point2;
+import BritefuryJ.Math.Point2;
 
 
 

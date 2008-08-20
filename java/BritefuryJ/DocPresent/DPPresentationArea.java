@@ -1,4 +1,4 @@
-package Britefury.DocPresent;
+package BritefuryJ.DocPresent;
 
 import java.lang.Math;
 
@@ -30,18 +30,18 @@ import java.awt.geom.Rectangle2D;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 
-import Britefury.Math.AABox2;
-import Britefury.Math.Vector2;
-import Britefury.Math.Point2;
+import BritefuryJ.Math.AABox2;
+import BritefuryJ.Math.Vector2;
+import BritefuryJ.Math.Point2;
 
-import Britefury.DocPresent.Event.PointerButtonEvent;
-import Britefury.DocPresent.Event.PointerMotionEvent;
-import Britefury.DocPresent.Event.PointerScrollEvent;
+import BritefuryJ.DocPresent.Event.PointerButtonEvent;
+import BritefuryJ.DocPresent.Event.PointerMotionEvent;
+import BritefuryJ.DocPresent.Event.PointerScrollEvent;
 
-import Britefury.DocPresent.Input.Modifier;
-import Britefury.DocPresent.Input.PointerInterface;
-import Britefury.DocPresent.Input.Pointer;
-import Britefury.DocPresent.Input.InputTable;
+import BritefuryJ.DocPresent.Input.Modifier;
+import BritefuryJ.DocPresent.Input.PointerInterface;
+import BritefuryJ.DocPresent.Input.Pointer;
+import BritefuryJ.DocPresent.Input.InputTable;
 
 
 

@@ -6,13 +6,13 @@ import java.awt.Font;
 
 import javax.swing.JFrame;
 
-import Britefury.DocPresent.DPFlow;
-import Britefury.DocPresent.DPPresentationArea;
-import Britefury.DocPresent.DPText;
-import Britefury.DocPresent.DPHBoxTypeset;
-import Britefury.DocPresent.DPVBox;
-import Britefury.DocPresent.DPVBox.Alignment;
-import Britefury.DocPresent.DPVBox.Typesetting;
+import BritefuryJ.DocPresent.DPFlow;
+import BritefuryJ.DocPresent.DPPresentationArea;
+import BritefuryJ.DocPresent.DPText;
+import BritefuryJ.DocPresent.DPHBoxTypeset;
+import BritefuryJ.DocPresent.DPVBox;
+import BritefuryJ.DocPresent.DPVBox.Alignment;
+import BritefuryJ.DocPresent.DPVBox.Typesetting;
 
 public class DPFlowTest_2deepwithhboxes
 {

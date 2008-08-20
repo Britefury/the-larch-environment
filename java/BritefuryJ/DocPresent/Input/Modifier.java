@@ -1,4 +1,4 @@
-package Britefury.DocPresent.Input;
+package BritefuryJ.DocPresent.Input;
 
 public class Modifier {
 	public static int CTRL = 0x1;

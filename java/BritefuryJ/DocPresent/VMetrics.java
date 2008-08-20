@@ -1,4 +1,4 @@
-package Britefury.DocPresent;
+package BritefuryJ.DocPresent;
 
 public class VMetrics
 {

@@ -1,9 +1,9 @@
-package Britefury.DocPresent;
+package BritefuryJ.DocPresent;
 
-import Britefury.DocPresent.DPWidget;
-import Britefury.DocPresent.Event.PointerButtonEvent;
-import Britefury.DocPresent.Input.PointerInterface;
-import Britefury.Math.Point2;
+import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.Event.PointerButtonEvent;
+import BritefuryJ.DocPresent.Input.PointerInterface;
+import BritefuryJ.Math.Point2;
 
 
 

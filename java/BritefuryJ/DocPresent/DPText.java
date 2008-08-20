@@ -1,12 +1,12 @@
-package Britefury.DocPresent;
+package BritefuryJ.DocPresent;
 
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.font.TextHitInfo;
 
-import Britefury.DocPresent.Util.TextVisual;
-import Britefury.Math.Point2;
+import BritefuryJ.DocPresent.Util.TextVisual;
+import BritefuryJ.Math.Point2;
 
 public class DPText extends DPWidget implements TextVisual.TextVisualListener
 {

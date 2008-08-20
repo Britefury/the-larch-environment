@@ -1,6 +1,7 @@
-package Britefury.DocPresent;
+package BritefuryJ.DocPresent;
 
 import java.awt.Color;
+import java.lang.Math;
 
 
 public class DPHBoxTypeset extends DPAbstractHBox
@@ -89,8 +90,8 @@ public class DPHBoxTypeset extends DPAbstractHBox
 				}
 				
 				// Accumulate the ascent and descent
-				ascent = ascent > childAscent  ?  ascent : childAscent;
-				descent = descent > childDescent  ?  descent : childDescent;
+				ascent = Math.max( ascent, childAscent );
+				descent = Math.max( descent, childDescent );
 				
 				// Accumulate the baseline offset of the child, if it has one
 				if ( chm instanceof VMetricsTypesetWithBaselineOffset )
@@ -102,7 +103,7 @@ public class DPHBoxTypeset extends DPAbstractHBox
 
 				// Handle the v-spacing
 				double childDescentAndVSpacing = childDescent + chm.vspacing;
-				descentAndVSpacing = descentAndVSpacing > childDescentAndVSpacing  ?  descentAndVSpacing : childDescentAndVSpacing;
+				descentAndVSpacing = Math.max( descentAndVSpacing, childDescentAndVSpacing );
 			}
 			
 			if ( bBaselineIsOffset )

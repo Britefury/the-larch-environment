@@ -1,11 +1,11 @@
-package Britefury.DocPresent;
+package BritefuryJ.DocPresent;
 
 import java.awt.Color;
 import java.util.HashSet;
 
 import org.python.core.PySlice;
 
-import Britefury.JythonInterface.JythonSlice;
+import BritefuryJ.JythonInterface.JythonSlice;
 
 
 

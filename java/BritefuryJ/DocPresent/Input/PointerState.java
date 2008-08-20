@@ -1,8 +1,8 @@
-package Britefury.DocPresent.Input;
+package BritefuryJ.DocPresent.Input;
 
 
-import Britefury.DocPresent.Input.Modifier;
-import Britefury.Math.Point2;
+import BritefuryJ.DocPresent.Input.Modifier;
+import BritefuryJ.Math.Point2;
 
 
 

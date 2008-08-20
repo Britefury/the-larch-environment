@@ -1,4 +1,4 @@
-package Britefury.DocPresent.Input;
+package BritefuryJ.DocPresent.Input;
 
 public class InputState {
 	public class InvalidPointerException extends RuntimeException
