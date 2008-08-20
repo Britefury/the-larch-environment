@@ -1,7 +1,7 @@
-package Britefury.DocPresent.Input;
+package BritefuryJ.DocPresent.Input;
 
 
-import Britefury.DocPresent.Input.Pointer;
+import BritefuryJ.DocPresent.Input.Pointer;
 
 
 public class InputTable {

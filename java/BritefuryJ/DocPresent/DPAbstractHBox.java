@@ -1,8 +1,8 @@
-package Britefury.DocPresent;
+package BritefuryJ.DocPresent;
 
 import java.awt.Color;
 
-import Britefury.Math.Point2;
+import BritefuryJ.Math.Point2;
 
 
 

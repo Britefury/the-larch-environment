@@ -9,10 +9,10 @@ import java.awt.Graphics2D;
 
 import javax.swing.JFrame;
 
-import Britefury.DocPresent.DPCustomSymbol;
-import Britefury.DocPresent.HMetrics;
-import Britefury.DocPresent.DPPresentationArea;
-import Britefury.DocPresent.VMetrics;
+import BritefuryJ.DocPresent.DPCustomSymbol;
+import BritefuryJ.DocPresent.HMetrics;
+import BritefuryJ.DocPresent.DPPresentationArea;
+import BritefuryJ.DocPresent.VMetrics;
 
 
 

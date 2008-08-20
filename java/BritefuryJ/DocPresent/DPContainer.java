@@ -1,4 +1,4 @@
-package Britefury.DocPresent;
+package BritefuryJ.DocPresent;
 
 import java.util.Vector;
 import java.util.HashMap;
@@ -8,14 +8,14 @@ import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.AffineTransform;
 
-import Britefury.DocPresent.Event.PointerButtonEvent;
-import Britefury.DocPresent.Event.PointerMotionEvent;
-import Britefury.DocPresent.Event.PointerScrollEvent;
-import Britefury.DocPresent.Input.PointerInterface;
-import Britefury.Math.AABox2;
-import Britefury.Math.Point2;
-import Britefury.Math.Vector2;
-import Britefury.Math.Xform2;
+import BritefuryJ.DocPresent.Event.PointerButtonEvent;
+import BritefuryJ.DocPresent.Event.PointerMotionEvent;
+import BritefuryJ.DocPresent.Event.PointerScrollEvent;
+import BritefuryJ.DocPresent.Input.PointerInterface;
+import BritefuryJ.Math.AABox2;
+import BritefuryJ.Math.Point2;
+import BritefuryJ.Math.Vector2;
+import BritefuryJ.Math.Xform2;
 
 
 

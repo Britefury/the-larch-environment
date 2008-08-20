@@ -6,10 +6,10 @@ import java.awt.Font;
 
 import javax.swing.JFrame;
 
-import Britefury.DocPresent.DPFlow;
-import Britefury.DocPresent.DPPresentationArea;
-import Britefury.DocPresent.DPText;
-import Britefury.DocPresent.DPVBox;
+import BritefuryJ.DocPresent.DPFlow;
+import BritefuryJ.DocPresent.DPPresentationArea;
+import BritefuryJ.DocPresent.DPText;
+import BritefuryJ.DocPresent.DPVBox;
 
 public class DPFlowTest_simple
 {

@@ -1,4 +1,4 @@
-package Britefury.DocPresent;
+package BritefuryJ.DocPresent;
 
 import java.awt.Color;
 import java.awt.Graphics2D;

@@ -6,11 +6,11 @@ import java.awt.Font;
 
 import javax.swing.JFrame;
 
-import Britefury.DocPresent.DPPresentationArea;
-import Britefury.DocPresent.DPText;
-import Britefury.DocPresent.DPHBoxTypeset;
-import Britefury.DocPresent.DPFlow;
-import Britefury.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.DPPresentationArea;
+import BritefuryJ.DocPresent.DPText;
+import BritefuryJ.DocPresent.DPHBoxTypeset;
+import BritefuryJ.DocPresent.DPFlow;
+import BritefuryJ.DocPresent.DPWidget;
 
 public class DPFlowTest_call_getattr
 {

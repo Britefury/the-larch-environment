@@ -1,4 +1,4 @@
-package Britefury.DocPresent.Event;
+package BritefuryJ.DocPresent.Event;
 
 public class Event {
 

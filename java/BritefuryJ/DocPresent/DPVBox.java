@@ -1,8 +1,9 @@
-package Britefury.DocPresent;
+package BritefuryJ.DocPresent;
 
 import java.awt.Color;
+import java.lang.Math;
 
-import Britefury.Math.Point2;
+import BritefuryJ.Math.Point2;
 
 
 
@@ -250,8 +251,8 @@ public class DPVBox extends DPAbstractBox
 			for (int i = 0; i < childHMetrics.length; i++)
 			{
 				HMetrics chm = childHMetrics[i];
-				hm.width = hm.width > chm.width  ?  hm.width : chm.width;
-				hm.advance = hm.advance > chm.advance  ?  hm.advance : chm.advance;
+				hm.width = Math.max( hm.width, chm.width );
+				hm.advance = Math.max( hm.advance, chm.advance );
 			}
 			
 			childrenHMetrics = hm;
@@ -288,7 +289,7 @@ public class DPVBox extends DPAbstractBox
 				// The spacing for the box is @spacing if this is NOT the last child; else 0.0
 				double boxSpacing = ( i == childVMetrics.length - 1 )  ?  0.0  :  spacing;
 				// The spacing to be used is either the box spacing, or the child's v-spacing, whichever is greater
-				double childSpacing = boxSpacing  >  chm.vspacing  ?  boxSpacing  :  chm.vspacing;
+				double childSpacing = Math.max( boxSpacing, chm.vspacing );
 				
 				height = y + chm.height + entry.padding * 2.0;
 				y = height + childSpacing;
@@ -306,7 +307,7 @@ public class DPVBox extends DPAbstractBox
 		for (ChildEntry baseEntry: childEntries)
 		{
 			VBoxChildEntry entry = (VBoxChildEntry)baseEntry;
-			double childAlloc = entry.child.hmetrics.width < allocation  ?  entry.child.hmetrics.width : allocation;
+			double childAlloc = Math.min( entry.child.hmetrics.width, allocation );
 			if ( entry.alignment == Alignment.LEFT )
 			{
 				allocateChildX( entry.child, 0.0, childAlloc );
@@ -385,7 +386,7 @@ public class DPVBox extends DPAbstractBox
 			VMetrics childAllocatedMetrics = allocateChildY( entry.child, childY, childAlloc );
 
 			// The spacing to be used is either the box spacing, or the child's v-spacing, whichever is greater
-			double childSpacing = spacing  >  childAllocatedMetrics.vspacing  ?  spacing  :  childAllocatedMetrics.vspacing;
+			double childSpacing = Math.max( spacing, childAllocatedMetrics.vspacing );
 
 			height = y + childAllocatedMetrics.height + entry.padding * 2.0;
 			y = height + childSpacing;

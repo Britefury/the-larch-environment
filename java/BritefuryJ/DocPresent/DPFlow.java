@@ -1,10 +1,10 @@
-package Britefury.DocPresent;
+package BritefuryJ.DocPresent;
 
 import java.lang.Math;
 import java.awt.Color;
 import java.util.Vector;
 
-import Britefury.Math.Point2;
+import BritefuryJ.Math.Point2;
 
 
 
@@ -403,8 +403,8 @@ public class DPFlow extends DPContainerSequence
 				}
 				
 				// Accumulate the ascent and descent
-				ascent = ascent > childAscent  ?  ascent : childAscent;
-				descent = descent > childDescent  ?  descent : childDescent;
+				ascent = Math.max( ascent, childAscent );
+				descent = Math.max( descent, childDescent );
 				
 				// Accumulate the baseline offset of the child, if it has one
 				if ( chm instanceof VMetricsTypesetWithBaselineOffset )
@@ -416,7 +416,7 @@ public class DPFlow extends DPContainerSequence
 
 				// Handle the v-spacing
 				double childDescentAndVSpacing = childDescent + chm.vspacing;
-				descentAndVSpacing = descentAndVSpacing > childDescentAndVSpacing  ?  descentAndVSpacing : childDescentAndVSpacing;
+				descentAndVSpacing = Math.max( descentAndVSpacing, childDescentAndVSpacing );
 			}
 			
 			if ( bBaselineIsOffset )

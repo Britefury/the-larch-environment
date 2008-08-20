@@ -1,6 +1,6 @@
-package Britefury.DocPresent;
+package BritefuryJ.DocPresent;
 
-import Britefury.Math.Point2;
+import BritefuryJ.Math.Point2;
 
 public interface DndListener {
 	public Object onDndBegin(DndDrag drag);
