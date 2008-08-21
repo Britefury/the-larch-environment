@@ -139,8 +139,8 @@ abstract public class DPWidget
 	protected DPPresentationArea presentationArea;
 	protected boolean bHasFocus, bFocusGrabbed, bRealised, bResizeQueued;
 	protected double scale, rootScale;
-	protected HMetrics hmetrics;
-	protected VMetrics vmetrics;
+	protected HMetrics minH, prefH;
+	protected VMetrics minV, prefV;
 	protected Vector2 allocation;
 	
 	protected LinkedList<IImmediateEvent> waitingImmediateEvents;
@@ -169,8 +169,10 @@ abstract public class DPWidget
 	public DPWidget()
 	{
 		scale = rootScale = 1.0;
-		hmetrics = new HMetrics();
-		vmetrics = new VMetrics();
+		minH = new HMetrics();
+		prefH = new HMetrics();
+		minV = new VMetrics();
+		prefV = new VMetrics();
 		allocation = new Vector2();
 		waitingImmediateEvents = new LinkedList<IImmediateEvent>();
 		pointersWithinBounds = new LinkedList<PointerInterface>();
@@ -755,23 +757,6 @@ abstract public class DPWidget
 	}
 	
 	
-	abstract protected HMetrics computeRequiredHMetrics();
-	
-	abstract protected VMetrics computeRequiredVMetrics();
-
-	
-	protected HMetrics onAllocateX(double allocation)
-	{
-		return hmetrics;
-	}
-	
-	protected VMetrics onAllocateY(double allocation)
-	{
-		return vmetrics;
-	}
-	
-	
-	
 	protected void clip(Graphics2D graphics)
 	{
 		graphics.clip( new Rectangle2D.Double( 0.0, 0.0, allocation.x, allocation.y ) );
@@ -779,7 +764,7 @@ abstract public class DPWidget
 
 	protected void clipIfAllocationInsufficient(Graphics2D graphics)
 	{
-		if ( allocation.x < hmetrics.width  ||  allocation.y < vmetrics.height )
+		if ( allocation.x < minH.width  ||  allocation.y < minV.height )
 		{
 			clip( graphics );
 		}
@@ -910,29 +895,67 @@ abstract public class DPWidget
 	}
 	
 	
-	protected HMetrics getRequiredHMetrics()
+	
+	
+	//
+	//
+	// LAYOUT METHODS
+	//
+	//
+	
+	
+	abstract protected HMetrics computeMinimumHMetrics();
+	abstract protected HMetrics computePreferredHMetrics();
+	
+	abstract protected VMetrics computeMinimumVMetrics();
+	abstract protected VMetrics computePreferredVMetrics();
+
+	
+	protected void allocateContentsX(double allocation)
 	{
-		hmetrics = computeRequiredHMetrics().scaled( scale );
-		return hmetrics;
 	}
 	
-	protected VMetrics getRequiredVMetrics()
+	protected void allocateContentsY(double allocation)
 	{
-		vmetrics = computeRequiredVMetrics().scaled( scale );
-		return vmetrics;
 	}
 	
 	
-	protected HMetrics allocateX(double allocation)
+	
+	protected HMetrics refreshMinimumHMetrics()
 	{
-		this.allocation.x = allocation;
-		return onAllocateX( allocation );
+		minH = computeMinimumHMetrics().scaled( scale );
+		return minH;
 	}
 	
-	protected VMetrics allocateY(double allocation)
+	protected HMetrics refreshPreferredHMetrics()
 	{
-		this.allocation.y = allocation;
-		return onAllocateY( allocation );
+		prefH = computePreferredHMetrics().scaled( scale );
+		return prefH;
+	}
+	
+	protected VMetrics refreshMinimumVMetrics()
+	{
+		minV = computeMinimumVMetrics().scaled( scale );
+		return minV;
+	}
+	
+	protected VMetrics refreshPreferredVMetrics()
+	{
+		prefV = computePreferredVMetrics().scaled( scale );
+		return prefV;
+	}
+	
+	
+	protected void allocateX(double width)
+	{
+		allocation.x = width;
+		allocateContentsX( width );
+	}
+	
+	protected void allocateY(double height)
+	{
+		allocation.y = height;
+		allocateContentsY( height );
 	}
 	
 	
@@ -1432,5 +1455,21 @@ abstract public class DPWidget
 	}
 		
 	
-
+	
+	
+	//
+	//
+	// PARAGRAPH METHODS
+	//
+	//
+	
+	public int getLineBreakPriority()
+	{
+		return -1;
+	}
+	
+	public boolean isLineBreak()
+	{
+		return getLineBreakPriority() >= 0;
+	}
 }

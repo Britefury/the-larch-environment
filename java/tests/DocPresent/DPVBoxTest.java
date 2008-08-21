@@ -36,19 +36,19 @@ public class DPVBoxTest {
 		DPText[] c2 = makeTexts( "RIGHT" );
 		DPText[] c3 = makeTexts( "EXPAND" );
 		
-		DPVBox b0 = new DPVBox( DPVBox.Typesetting.NONE, DPVBox.Alignment.LEFT, 0.0, false, false, false, 0.0 );
+		DPVBox b0 = new DPVBox( DPVBox.Typesetting.NONE, DPVBox.Alignment.LEFT, 0.0, false, 0.0 );
 		b0.extend( c0 );
 		
-		DPVBox b1 = new DPVBox( DPVBox.Typesetting.NONE, DPVBox.Alignment.CENTRE, 0.0, false, false, false, 0.0 );
+		DPVBox b1 = new DPVBox( DPVBox.Typesetting.NONE, DPVBox.Alignment.CENTRE, 0.0, false, 0.0 );
 		b1.extend( c1 );
 		
-		DPVBox b2 = new DPVBox( DPVBox.Typesetting.NONE, DPVBox.Alignment.RIGHT, 0.0, false, false, false, 0.0 );
+		DPVBox b2 = new DPVBox( DPVBox.Typesetting.NONE, DPVBox.Alignment.RIGHT, 0.0, false, 0.0 );
 		b2.extend( c2 );
 		
-		DPVBox b3 = new DPVBox( DPVBox.Typesetting.NONE, DPVBox.Alignment.EXPAND, 0.0, true, false, false, 0.0 );
+		DPVBox b3 = new DPVBox( DPVBox.Typesetting.NONE, DPVBox.Alignment.EXPAND, 0.0, true, 0.0 );
 		b3.extend( c3 );
 		
-		DPVBox box = new DPVBox( DPVBox.Typesetting.NONE, DPVBox.Alignment.EXPAND, 20.0, false, false, false, 0.0 );
+		DPVBox box = new DPVBox( DPVBox.Typesetting.NONE, DPVBox.Alignment.EXPAND, 20.0, false, 0.0 );
 		box.append( b0 );
 		box.append( b1 );
 		box.append( b2 );

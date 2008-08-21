@@ -62,12 +62,23 @@ public class DPCustomSymbol extends DPWidget
 	
 	
 	
-	protected HMetrics computeRequiredHMetrics()
+	protected HMetrics computeMinimumHMetrics()
 	{
 		return symbol.computeHMetrics();
 	}
 	
-	protected VMetrics computeRequiredVMetrics()
+	protected HMetrics computePreferredHMetrics()
+	{
+		return symbol.computeHMetrics();
+	}
+
+
+	protected VMetrics computeMinimumVMetrics()
+	{
+		return symbol.computeVMetrics();
+	}
+
+	protected VMetrics computePreferredVMetrics()
 	{
 		return symbol.computeVMetrics();
 	}

@@ -6,8 +6,8 @@ import java.awt.Font;
 
 import javax.swing.JFrame;
 
+import BritefuryJ.DocPresent.DPHBox;
 import BritefuryJ.DocPresent.DPVBox;
-import BritefuryJ.DocPresent.DPHBoxTypeset;
 import BritefuryJ.DocPresent.DPPresentationArea;
 import BritefuryJ.DocPresent.DPText;
 
@@ -25,14 +25,14 @@ public class DPHBoxTypesetTest
 	}
 	
 	
-	protected static DPHBoxTypeset makeTypesetHBox(DPVBox.Typesetting typesetting, String header)
+	protected static DPHBox makeTypesetHBox(DPVBox.Typesetting typesetting, String header)
 	{
 		DPText[] txt = makeTexts( header );
-		DPVBox v = new DPVBox( typesetting, DPVBox.Alignment.LEFT, 0.0, false, false, false, 0.0 );
+		DPVBox v = new DPVBox( typesetting, DPVBox.Alignment.LEFT, 0.0, false, 0.0 );
 		v.extend( txt );
 		DPText before = new DPText( header, new Font( "Sans serif", Font.BOLD, 18 ), Color.BLACK );
 		DPText after = new DPText( " After", new Font( "Sans serif", Font.BOLD, 18 ), Color.BLACK );
-		DPHBoxTypeset t = new DPHBoxTypeset( 0.0, false, false, false, 0.0 );
+		DPHBox t = new DPHBox( DPHBox.Alignment.BASELINES, 0.0, false, 0.0 );
 		t.append( before );
 		t.append( v );
 		t.append( after );
@@ -48,16 +48,14 @@ public class DPHBoxTypesetTest
 
 		DPPresentationArea area = new DPPresentationArea();
 		
-		DPHBoxTypeset t0 = makeTypesetHBox( DPVBox.Typesetting.NONE, "NONE" );
-		DPHBoxTypeset t1 = makeTypesetHBox( DPVBox.Typesetting.ALIGN_WITH_TOP, "ALIGN_WITH_TOP" );
-		DPHBoxTypeset t2 = makeTypesetHBox( DPVBox.Typesetting.ALIGN_WITH_BOTTOM, "ALIGN_WITH_BOTTOM" );
-		DPHBoxTypeset t3 = makeTypesetHBox( DPVBox.Typesetting.IN_TO_TOP_OUT_FROM_BOTTOM, "IN_TO_TOP_OUT_FROM_BOTTOM" );
+		DPHBox t0 = makeTypesetHBox( DPVBox.Typesetting.NONE, "NONE" );
+		DPHBox t1 = makeTypesetHBox( DPVBox.Typesetting.ALIGN_WITH_TOP, "ALIGN_WITH_TOP" );
+		DPHBox t2 = makeTypesetHBox( DPVBox.Typesetting.ALIGN_WITH_BOTTOM, "ALIGN_WITH_BOTTOM" );
 		
-		DPVBox box = new DPVBox( DPVBox.Typesetting.NONE, DPVBox.Alignment.EXPAND, 20.0, false, false, false, 0.0 );
+		DPVBox box = new DPVBox( DPVBox.Typesetting.NONE, DPVBox.Alignment.EXPAND, 20.0, false, 0.0 );
 		box.append( t0 );
 		box.append( t1 );
 		box.append( t2 );
-		box.append( t3 );
 	     
 	     
 		area.setChild( box );

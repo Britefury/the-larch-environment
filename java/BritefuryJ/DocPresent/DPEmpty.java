@@ -2,23 +2,23 @@ package BritefuryJ.DocPresent;
 
 public class DPEmpty extends DPWidget
 {
-	protected HMetrics computeRequiredHMetrics()
+	protected HMetrics computeMinimumHMetrics()
 	{
 		return new HMetrics();
 	}
 
-	protected VMetrics computeRequiredVMetrics()
+	protected HMetrics computePreferredHMetrics()
+	{
+		return new HMetrics();
+	}
+
+
+	protected VMetrics computeMinimumVMetrics()
 	{
 		return new VMetrics();
 	}
-
 	
-	protected HMetrics onAllocateX(double allocation)
-	{
-		return new HMetrics();
-	}
-
-	protected VMetrics onAllocateY(double allocation)
+	protected VMetrics computePreferredVMetrics()
 	{
 		return new VMetrics();
 	}

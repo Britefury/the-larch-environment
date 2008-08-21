@@ -117,7 +117,8 @@ public class TextVisual
 	public HMetrics computeHMetrics()
 	{
 		refreshLayout();
-		return new HMetrics( layout.getBounds().getWidth(), layout.getAdvance() );
+		double width = layout.getBounds().getWidth();
+		return new HMetrics( width, layout.getAdvance() - width );
 	}
 	
 	public VMetrics computeVMetrics()

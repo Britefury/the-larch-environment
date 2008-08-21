@@ -88,18 +88,28 @@ public class DPText extends DPWidget implements TextVisual.TextVisualListener
 	
 	
 	
-	protected HMetrics computeRequiredHMetrics()
+	protected HMetrics computeMinimumHMetrics()
 	{
 		return visual.computeHMetrics();
 	}
 	
-	protected VMetrics computeRequiredVMetrics()
+	protected HMetrics computePreferredHMetrics()
+	{
+		return visual.computeHMetrics();
+	}
+
+	
+	protected VMetrics computeMinimumVMetrics()
 	{
 		return visual.computeVMetrics();
 	}
+
+	protected VMetrics computePreferredVMetrics()
+	{
+		return visual.computeVMetrics();
+	}
+
 	
-
-
 	public void textVisualRequestRedraw(TextVisual t)
 	{
 		queueFullRedraw();
