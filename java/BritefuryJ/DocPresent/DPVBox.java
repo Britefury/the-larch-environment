@@ -191,31 +191,6 @@ public class DPVBox extends DPAbstractBox
 
 
 	
-	private HMetrics combineHMetrics(HMetrics[] childHMetrics)
-	{
-		if ( childHMetrics.length == 0 )
-		{
-			return new HMetrics();
-		}
-		else
-		{
-			HMetrics hm = new HMetrics();
-			double advance = 0.0;
-			for (int i = 0; i < childHMetrics.length; i++)
-			{
-				HMetrics chm = childHMetrics[i];
-				double chAdvance = chm.width + chm.hspacing;
-				hm.width = Math.max( hm.width, chm.width );
-				advance = Math.max( advance, chAdvance );
-			}
-			
-			hm.hspacing = advance - hm.width;
-			
-			return hm;
-		}
-	}
-	
-	
 	private VMetrics combineVMetrics(VMetrics[] childVMetrics)
 	{
 		if ( childVMetrics.length == 0 )
@@ -252,12 +227,12 @@ public class DPVBox extends DPAbstractBox
 	
 	protected HMetrics computeMinimumHMetrics()
 	{
-		return combineHMetrics( getChildrenRefreshedMinimumHMetrics() );
+		return HMetrics.max( getChildrenRefreshedMinimumHMetrics() );
 	}
 
 	protected HMetrics computePreferredHMetrics()
 	{
-		return combineHMetrics( getChildrenRefreshedPreferredHMetrics() );
+		return HMetrics.max( getChildrenRefreshedPreferredHMetrics() );
 	}
 
 	

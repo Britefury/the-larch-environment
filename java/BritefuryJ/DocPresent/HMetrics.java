@@ -65,6 +65,42 @@ public class HMetrics extends Metrics
 	
 	
 	
+	public HMetrics add(HMetrics x)
+	{
+		return new HMetrics( width + hspacing + x.width, x.hspacing );
+	}
+	
+	public static HMetrics max(HMetrics x, HMetrics y)
+	{
+		double width = Math.max( x.width, y.width );
+		double advance = Math.max( x.width + x.hspacing, y.width + y.hspacing );
+		return new HMetrics( width, advance - width );
+	}
+	
+	
+	public static HMetrics max(HMetrics[] xs)
+	{
+		double width = 0.0, advance = 0.0;
+		for (int i = 0; i < xs.length; i++)
+		{
+			HMetrics x = xs[i];
+			double xAdvance = x.width + x.hspacing;
+			width = Math.max( width, x.width );
+			advance = Math.max( advance, xAdvance );
+		}
+		
+		return new HMetrics( width, advance - width );
+	}
+	
+	
+	public static HMetrics lerp(HMetrics a, HMetrics b, double t)
+	{
+		double width = a.width  +  ( b.width - a.width ) * t;
+		double advance = a.width + a.hspacing  +  ( b.width + b.hspacing - ( a.width + a.hspacing ) ) * t;
+		return new HMetrics( width, advance - width );
+	}
+	
+	
 	
 	
 	

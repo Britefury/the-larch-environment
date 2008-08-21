@@ -105,7 +105,7 @@ public class DPParagraphTest
 
 	public DPParagraphTest()
 	{
-		JFrame frame = new JFrame( "HBox test" );
+		JFrame frame = new JFrame( "Paragraph test" );
 
 		//This stops the app on window close.
 		frame.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
