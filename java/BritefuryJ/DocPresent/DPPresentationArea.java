@@ -583,9 +583,11 @@ public class DPPresentationArea extends DPBin {
 	{
 		if ( bAllocationRequired )
 		{
-			getRequiredHMetrics();
+			refreshMinimumHMetrics();
+			refreshPreferredHMetrics();
 			allocateX( areaSize.x / rootScaleInWindowSpace );
-			VMetrics v = getRequiredVMetrics();
+			refreshMinimumVMetrics();
+			VMetrics v = refreshPreferredVMetrics();
 			allocateY( v.height );
 			bAllocationRequired = false;
 			
@@ -598,29 +600,21 @@ public class DPPresentationArea extends DPBin {
 	}
 	
 	
-	protected HMetrics onAllocateX(double allocation)
+	protected void allocateContentsX(double allocation)
 	{
 		if ( child != null )
 		{
-			return allocateChildX( child, 0.0, allocation );
-		}
-		else
-		{
-			return new HMetrics();
+			allocateChildX( child, 0.0, allocation );
 		}
 	}
 	
 	
-	protected VMetrics onAllocateY(double allocation)
+	protected void allocateContentsY(double allocation)
 	{
 		if ( child != null )
 		{
-			double height = allocation  <  childVMetrics.height  ?  allocation : childVMetrics.height;
-			return allocateChildY( child, 0.0, height );
-		}
-		else
-		{
-			return new VMetrics();
+			double height = Math.min( allocation, prefV.height );
+			allocateChildY( child, 0.0, height );
 		}
 	}
 	

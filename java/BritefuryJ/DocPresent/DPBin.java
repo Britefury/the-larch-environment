@@ -2,11 +2,10 @@ package BritefuryJ.DocPresent;
 
 import java.awt.Color;
 
+
 public class DPBin extends DPContainer
 {
 	protected DPWidget child;
-	protected HMetrics childHMetrics;
-	protected VMetrics childVMetrics;
 	protected double childScale;
 	
 	
@@ -20,8 +19,6 @@ public class DPBin extends DPContainer
 	{
 		super( backgroundColour );
 		
-		childHMetrics = new HMetrics();
-		childVMetrics = new VMetrics();
 		childScale = 1.0;
 	}
 	
@@ -83,57 +80,70 @@ public class DPBin extends DPContainer
 	
 	
 
-	protected HMetrics computeRequiredHMetrics()
+	protected HMetrics computeMinimumHMetrics()
 	{
 		if ( child != null )
 		{
-			childHMetrics = child.computeRequiredHMetrics();
-		}
-		else
-		{
-			childHMetrics = new HMetrics();
-		}
-		
-		return childHMetrics;
-	}
-
-	protected VMetrics computeRequiredVMetrics()
-	{
-		if ( child != null )
-		{
-			childVMetrics = child.computeRequiredVMetrics();
-		}
-		else
-		{
-			childVMetrics = new VMetrics();
-		}
-		
-		return childVMetrics;
-	}
-	
-	
-	
-	protected HMetrics onAllocateX(double width)
-	{
-		if ( child != null )
-		{
-			return allocateChildX( child, 0.0, width );
+			return child.refreshMinimumHMetrics();
 		}
 		else
 		{
 			return new HMetrics();
 		}
 	}
-
-	protected VMetrics onAllocateY(double height)
+	
+	protected HMetrics computePreferredHMetrics()
 	{
 		if ( child != null )
 		{
-			return allocateChildY( child, 0.0, height );
+			return child.refreshPreferredHMetrics();
+		}
+		else
+		{
+			return new HMetrics();
+		}
+	}
+	
+	protected VMetrics computeMinimumVMetrics()
+	{
+		if ( child != null )
+		{
+			return child.refreshMinimumVMetrics();
 		}
 		else
 		{
 			return new VMetrics();
+		}
+	}
+
+	protected VMetrics computePreferredVMetrics()
+	{
+		if ( child != null )
+		{
+			return child.refreshPreferredVMetrics();
+		}
+		else
+		{
+			return new VMetrics();
+		}
+	}
+	
+	
+	
+	
+	protected void allocateContentsX(double width)
+	{
+		if ( child != null )
+		{
+			allocateChildX( child, 0.0, width );
+		}
+	}
+
+	protected void allocateContentsY(double height)
+	{
+		if ( child != null )
+		{
+			allocateChildY( child, 0.0, height );
 		}
 	}
 	

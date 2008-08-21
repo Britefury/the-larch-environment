@@ -6,12 +6,12 @@ import java.awt.Font;
 
 import javax.swing.JFrame;
 
+import BritefuryJ.DocPresent.DPParagraph;
 import BritefuryJ.DocPresent.DPPresentationArea;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
-import BritefuryJ.DocPresent.DPFlow;
 
-public class DPFlowTest_2deep
+public class DPParagraphTest_simple
 {
 	protected static DPText[] makeTexts(String header)
 	{
@@ -19,18 +19,19 @@ public class DPFlowTest_2deep
 		DPText t0 = new DPText( "Hello", new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );
 		DPText t1 = new DPText( "World", new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );
 		DPText t2 = new DPText( "Foo", new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );
-		DPText t3 = new DPText( "Bar", new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );
-		DPText t4 = new DPText( "Moo", new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );
-		DPText t5 = new DPText( "Test", new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );
-		DPText t6 = new DPText( "This", new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );
+		DPText t3 = new DPText( "j", new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );
+		DPText t4 = new DPText( "q", new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );
+		DPText t5 = new DPText( "'", new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );
+		DPText t6 = new DPText( ".", new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );
+		DPText t7 = new DPText( "Bar", new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );
 		
-		DPText[] texts = { h, t0, t1, t2, t3, t4, t5, t6 };
+		DPText[] texts = { h, t0, t1, t2, t3, t4, t5, t6, t7 };
 		return texts;
 	}
 	
 	
 	public static void main(final String[] args) {
-		JFrame frame = new JFrame( "Flow; 2-deep test" );
+		JFrame frame = new JFrame( "Flow; simple test" );
 
 		//This stops the app on window close.
 		frame.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
@@ -38,31 +39,18 @@ public class DPFlowTest_2deep
 		DPPresentationArea area = new DPPresentationArea();
 	     
 	     
-		DPText[] c0 = makeTexts( "FLOW1" );
-		DPText[] c1 = makeTexts( "FLOW2" );
-		DPText[] c2 = makeTexts( "FLOW3" );
-		DPText[] c3 = makeTexts( "FLOW4" );
+		DPText[] c0 = makeTexts( "UNINDENTED" );
+		DPText[] c1 = makeTexts( "INDENTED" );
 		
-		DPFlow b0 = new DPFlow( 5.0, 0.0, 30.0 );
+		DPParagraph b0 = new DPParagraph( DPParagraph.Alignment.BASELINES, 10.0, 0.0, 0.0 );
 		b0.extend( c0 );
 		
-		DPFlow b1 = new DPFlow( 5.0, 0.0, 30.0 );
+		DPParagraph b1 = new DPParagraph( DPParagraph.Alignment.BASELINES, 10.0, 0.0, 30.0 );
 		b1.extend( c1 );
 		
-		DPFlow b2 = new DPFlow( 5.0, 0.0, 30.0 );
-		b2.extend( c2 );
-		
-		DPFlow b3 = new DPFlow( 5.0, 0.0, 30.0 );
-		b3.extend( c3 );
-		
-		DPFlow f = new DPFlow( 15.0, 0.0, 30.0 );
-		f.append( b0 );
-		f.append( b1 );
-		f.append( b2 );
-		f.append( b3 );
-		
-		DPVBox box = new DPVBox();
-		box.append( f );
+		DPVBox box = new DPVBox( DPVBox.Typesetting.NONE, DPVBox.Alignment.LEFT, 20.0, false, 0.0 );
+		box.append( b0 );
+		box.append( b1 );
 	     
 	     
 		area.setChild( box );

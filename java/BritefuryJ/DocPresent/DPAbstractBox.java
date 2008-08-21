@@ -1,6 +1,7 @@
 package BritefuryJ.DocPresent;
 
 import java.awt.Color;
+import java.util.List;
 
 
 
@@ -14,16 +15,14 @@ abstract public class DPAbstractBox extends DPContainerSequence
 
 	protected static class BoxChildEntry extends DPContainer.ChildEntry
 	{
-		public boolean bExpand, bFill, bShrink;
+		public int packFlags;
 		public double padding;
 		
-		public BoxChildEntry(DPWidget child, boolean bExpand, boolean bFill, boolean bShrink, double padding)
+		public BoxChildEntry(DPWidget child, boolean bExpand, double padding)
 		{
 			super( child );
 			
-			this.bExpand = bExpand;
-			this.bFill = bFill;
-			this.bShrink = bShrink;
+			this.packFlags = Metrics.packFlags( bExpand );
 			this.padding = padding;
 		}
 	}
@@ -32,11 +31,7 @@ abstract public class DPAbstractBox extends DPContainerSequence
 	
 	protected double spacing;
 	protected boolean bExpand;
-	protected boolean bFill;
-	protected boolean bShrink;
 	protected double padding;
-	int numExpand;
-	int numShrink;
 	HMetrics childrenHMetrics;
 	VMetrics childrenVMetrics;
 
@@ -47,19 +42,17 @@ abstract public class DPAbstractBox extends DPContainerSequence
 		super();
 	}
 
-	public DPAbstractBox(double spacing, boolean bExpand, boolean bFill, boolean bShrink, double padding)
+	public DPAbstractBox(double spacing, boolean bExpand, double padding)
 	{
-		this( spacing, bExpand, bFill, bShrink, padding, null );
+		this( spacing, bExpand, padding, null );
 	}
 	
-	public DPAbstractBox(double spacing, boolean bExpand, boolean bFill, boolean bShrink, double padding, Color backgroundColour)
+	public DPAbstractBox(double spacing, boolean bExpand, double padding, Color backgroundColour)
 	{
 		super( backgroundColour );
 		
 		this.spacing = spacing;
 		this.bExpand = bExpand;
-		this.bFill = bFill;
-		this.bShrink = bShrink;
 		this.padding = padding;
 	}
 
@@ -85,30 +78,6 @@ abstract public class DPAbstractBox extends DPContainerSequence
 	public void setExpand(boolean bExpand)
 	{
 		this.bExpand = bExpand;
-		queueResize();
-	}
-
-	
-	public boolean getFill()
-	{
-		return bFill;
-	}
-
-	public void setFill(boolean bFill)
-	{
-		this.bFill = bFill;
-		queueResize();
-	}
-
-	
-	public boolean getShrink()
-	{
-		return bShrink;
-	}
-
-	public void setShrink(boolean bShrink)
-	{
-		this.bShrink = bShrink;
 		queueResize();
 	}
 
@@ -144,6 +113,18 @@ abstract public class DPAbstractBox extends DPContainerSequence
 		extendChildEntries( entries );
 	}
 
+	public void extend(List<DPWidget> children)
+	{
+		ChildEntry[] entries = new ChildEntry[children.size()];
+		
+		for (int i = 0; i < children.size(); i++)
+		{
+			entries[i] = createChildEntryForChild( children.get( i ) );
+		}
+		
+		extendChildEntries( entries );
+	}
+
 	
 	public void insert(int index, DPWidget child)
 	{
@@ -158,19 +139,32 @@ abstract public class DPAbstractBox extends DPContainerSequence
 	
 	protected void childListModified()
 	{
-		numExpand = numShrink = 0;
-		
-		for (ChildEntry entry: childEntries)
+	}
+
+
+
+
+
+
+	protected int[] getChildrenPackFlags(List<ChildEntry> nodes)
+	{
+		int[] chm = new int[nodes.size()];
+		for (int i = 0; i < nodes.size(); i++)
 		{
-			BoxChildEntry vboxEntry = (BoxChildEntry)entry;
-			if ( vboxEntry.bExpand )
-			{
-				numExpand++;
-			}
-			if ( vboxEntry.bShrink )
-			{
-				numShrink++;
-			}
+			chm[i] = ((BoxChildEntry)nodes.get( i )).packFlags;
 		}
+		return chm;
+	}
+
+	protected int[] getChildrenPackFlags()
+	{
+		return getChildrenPackFlags( childEntries );
+	}
+
+
+
+	protected double getChildPadding(int index)
+	{
+		return ((BoxChildEntry)childEntries.get( index )).padding;
 	}
 }

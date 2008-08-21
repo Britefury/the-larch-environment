@@ -2,6 +2,7 @@ package BritefuryJ.DocPresent;
 
 import java.awt.Color;
 import java.util.HashSet;
+import java.util.List;
 
 import org.python.core.PySlice;
 
@@ -209,4 +210,144 @@ abstract public class DPContainerSequence extends DPContainer
 		
 	
 	abstract protected void childListModified();
+
+
+
+
+
+
+
+
+
+	HMetrics[] getChildrenRefreshedMinimumHMetrics(List<ChildEntry> nodes)
+	{
+		HMetrics[] chm = new HMetrics[nodes.size()];
+		for (int i = 0; i < nodes.size(); i++)
+		{
+			chm[i] = nodes.get( i ).child.refreshMinimumHMetrics();
+		}
+		return chm;
+	}
+
+	HMetrics[] getChildrenRefreshedMinimumHMetrics()
+	{
+		return getChildrenRefreshedMinimumHMetrics( childEntries );
+	}
+
+	
+	HMetrics[] getChildrenRefreshedPreferredHMetrics(List<ChildEntry> nodes)
+	{
+		HMetrics[] chm = new HMetrics[nodes.size()];
+		for (int i = 0; i < nodes.size(); i++)
+		{
+			chm[i] = nodes.get( i ).child.refreshPreferredHMetrics();
+		}
+		return chm;
+	}
+	
+	HMetrics[] getChildrenRefreshedPreferredHMetrics()
+	{
+		return getChildrenRefreshedPreferredHMetrics( childEntries );
+	}
+	
+	
+	
+	VMetrics[] getChildrenRefreshedMinimumVMetrics(List<ChildEntry> nodes)
+	{
+		VMetrics[] chm = new VMetrics[nodes.size()];
+		for (int i = 0; i < nodes.size(); i++)
+		{
+			chm[i] = nodes.get( i ).child.refreshMinimumVMetrics();
+		}
+		return chm;
+	}
+
+	VMetrics[] getChildrenRefreshedMinimumVMetrics()
+	{
+		return getChildrenRefreshedMinimumVMetrics( childEntries );
+	}
+
+	
+	VMetrics[] getChildrenRefreshedPreferredVMetrics(List<ChildEntry> nodes)
+	{
+		VMetrics[] chm = new VMetrics[nodes.size()];
+		for (int i = 0; i < nodes.size(); i++)
+		{
+			chm[i] = nodes.get( i ).child.refreshPreferredVMetrics();
+		}
+		return chm;
+	}
+
+	VMetrics[] getChildrenRefreshedPreferredVMetrics()
+	{
+		return getChildrenRefreshedPreferredVMetrics( childEntries );
+	}
+
+
+	
+	
+	
+	HMetrics[] getChildrenMinimumHMetrics(List<ChildEntry> nodes)
+	{
+		HMetrics[] chm = new HMetrics[nodes.size()];
+		for (int i = 0; i < nodes.size(); i++)
+		{
+			chm[i] = nodes.get( i ).child.minH;
+		}
+		return chm;
+	}
+
+	HMetrics[] getChildrenMinimumHMetrics()
+	{
+		return getChildrenMinimumHMetrics( childEntries );
+	}
+
+	
+	HMetrics[] getChildrenPreferredHMetrics(List<ChildEntry> nodes)
+	{
+		HMetrics[] chm = new HMetrics[nodes.size()];
+		for (int i = 0; i < nodes.size(); i++)
+		{
+			chm[i] = nodes.get( i ).child.prefH;
+		}
+		return chm;
+	}
+	
+	HMetrics[] getChildrenPreferredHMetrics()
+	{
+		return getChildrenPreferredHMetrics( childEntries );
+	}
+	
+	
+	
+	VMetrics[] getChildrenMinimumVMetrics(List<ChildEntry> nodes)
+	{
+		VMetrics[] chm = new VMetrics[nodes.size()];
+		for (int i = 0; i < nodes.size(); i++)
+		{
+			chm[i] = nodes.get( i ).child.minV;
+		}
+		return chm;
+	}
+
+	VMetrics[] getChildrenMinimumVMetrics()
+	{
+		return getChildrenMinimumVMetrics( childEntries );
+	}
+
+	
+	VMetrics[] getChildrenPreferredVMetrics(List<ChildEntry> nodes)
+	{
+		VMetrics[] chm = new VMetrics[nodes.size()];
+		for (int i = 0; i < nodes.size(); i++)
+		{
+			chm[i] = nodes.get( i ).child.prefV;
+		}
+		return chm;
+	}
+
+	VMetrics[] getChildrenPreferredVMetrics()
+	{
+		return getChildrenPreferredVMetrics( childEntries );
+	}
 }

@@ -20,12 +20,41 @@ public class VMetricsTypeset extends VMetrics
 	}
 
 
-	public VMetrics scaled(double scale)
+	public VMetricsTypeset scaled(double scale)
 	{
 		return new VMetricsTypeset( ascent * scale, descent * scale, vspacing * scale );
 	}
 	
+	public VMetricsTypeset minSpacing(double spacing)
+	{
+		if ( spacing > vspacing )
+		{
+			return new VMetricsTypeset( ascent, descent, spacing );
+		}
+		else
+		{
+			return this;
+		}
+	}
 	
+	public VMetrics offsetLength(double deltaLength)
+	{
+		return new VMetricsTypeset( ascent + deltaLength *0.5, descent + deltaLength * 0.5, vspacing );
+	}
+	
+	public VMetricsTypeset withHeight(double height)
+	{
+		double deltaHeight = height - this.height;
+		return new VMetricsTypeset( ascent + deltaHeight * 0.5, descent + deltaHeight * 0.5, vspacing );
+	}
+
+	
+	public boolean isTypeset()
+	{
+		return true;
+	}
+	
+
 	public String toString()
 	{
 		return "VMetricsTypeset( ascent=" + String.valueOf( ascent ) + ", descent=" + String.valueOf( descent ) + ", height=" + String.valueOf( height ) + ", vspacing=" + String.valueOf( vspacing ) + " )";

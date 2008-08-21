@@ -11,25 +11,12 @@ import BritefuryJ.Math.Point2;
 public class DPVBox extends DPAbstractBox
 {
 	public enum Alignment { LEFT, CENTRE, RIGHT, EXPAND };
-	public enum Typesetting { NONE, ALIGN_WITH_TOP, ALIGN_WITH_BOTTOM, IN_TO_TOP_OUT_FROM_BOTTOM };
+	public enum Typesetting { NONE, ALIGN_WITH_TOP, ALIGN_WITH_BOTTOM };
 	
 	
 	public static class InvalidTypesettingException extends RuntimeException
 	{
 		private static final long serialVersionUID = 1L;
-	}
-	
-	
-	protected static class VBoxChildEntry extends DPAbstractBox.BoxChildEntry
-	{
-		public Alignment alignment;
-		
-		public VBoxChildEntry(DPWidget child, Alignment alignment, boolean bExpand, boolean bFill, boolean bShrink, double padding)
-		{
-			super( child, bExpand, bFill, bShrink, padding );
-			
-			this.alignment = alignment;
-		}
 	}
 	
 	
@@ -42,17 +29,17 @@ public class DPVBox extends DPAbstractBox
 	
 	public DPVBox()
 	{
-		this( Typesetting.NONE, Alignment.CENTRE, 0.0, false, false, false, 0.0, null );
+		this( Typesetting.NONE, Alignment.CENTRE, 0.0, false, 0.0, null );
 	}
 	
-	public DPVBox(Typesetting typesetting, Alignment alignment, double spacing, boolean bExpand, boolean bFill, boolean bShrink, double padding)
+	public DPVBox(Typesetting typesetting, Alignment alignment, double spacing, boolean bExpand, double padding)
 	{
-		this( typesetting, alignment, spacing, bExpand, bFill, bShrink, padding, null );
+		this( typesetting, alignment, spacing, bExpand, padding, null );
 	}
 	
-	public DPVBox(Typesetting typesetting, Alignment alignment, double spacing, boolean bExpand, boolean bFill, boolean bShrink, double padding, Color backgroundColour)
+	public DPVBox(Typesetting typesetting, Alignment alignment, double spacing, boolean bExpand, double padding, Color backgroundColour)
 	{
-		super( spacing, bExpand, bFill, bShrink, padding, backgroundColour );
+		super( spacing, bExpand, padding, backgroundColour );
 		
 		this.typesetting = typesetting;
 		this.alignment = alignment;
@@ -86,22 +73,22 @@ public class DPVBox extends DPAbstractBox
 
 	
 
-	public void append(DPWidget child, Alignment alignment, boolean bExpand, boolean bFill, boolean bShrink, double padding)
+	public void append(DPWidget child, boolean bExpand, double padding)
 	{
-		appendChildEntry( new VBoxChildEntry( child, alignment, bExpand, bFill, bShrink, padding ) );
+		appendChildEntry( new BoxChildEntry( child, bExpand, padding ) );
 	}
 
 	
-	public void insert(int index, DPWidget child, Alignment alignment, boolean bExpand, boolean bFill, boolean bShrink, double padding)
+	public void insert(int index, DPWidget child, boolean bExpand, double padding)
 	{
-		insertChildEntry( index, new VBoxChildEntry( child, alignment, bExpand, bFill, bShrink, padding ) );
+		insertChildEntry( index, new BoxChildEntry( child, bExpand, padding ) );
 	}
 	
 	
 	
-	protected VBoxChildEntry createChildEntryForChild(DPWidget child)
+	protected BoxChildEntry createChildEntryForChild(DPWidget child)
 	{
-		return new VBoxChildEntry( child, alignment, bExpand, bFill, bShrink, padding );
+		return new BoxChildEntry( child, bExpand, padding );
 	}
 	
 	
@@ -152,13 +139,10 @@ public class DPVBox extends DPAbstractBox
 	
 
 	
-	private VMetrics childrenVMetricsToBoxVMetrics(VMetrics[] childVMetrics, double height)
+	private VMetrics computeVMetricsTypesetting(VMetrics[] childVMetrics, double height, double vspacing)
 	{
 		VMetrics topMetrics = childVMetrics[0], bottomMetrics = childVMetrics[childVMetrics.length-1];
 
-		// The vertical spacing to go below @this is the vspacing of the bottom child
-		double vspacing = bottomMetrics.vspacing;
-		
 		if ( typesetting == Typesetting.NONE )
 		{
 			return new VMetrics( height, vspacing );
@@ -168,12 +152,12 @@ public class DPVBox extends DPAbstractBox
 			// Need the metrics for the top and bottom entries
 			VMetricsTypeset topTSMetrics = null, bottomTSMetrics = null;
 			
-			if ( topMetrics  instanceof VMetricsTypeset )
+			if ( topMetrics.isTypeset() )
 			{
 				topTSMetrics = (VMetricsTypeset)topMetrics;
 			}
 
-			if ( bottomMetrics  instanceof VMetricsTypeset )
+			if ( bottomMetrics.isTypeset() )
 			{
 				bottomTSMetrics = (VMetricsTypeset)bottomMetrics;
 			}
@@ -200,200 +184,149 @@ public class DPVBox extends DPAbstractBox
 					return new VMetricsTypeset( height, 0.0, vspacing );
 				}
 			}
-			else if ( typesetting == Typesetting.IN_TO_TOP_OUT_FROM_BOTTOM )
-			{
-				double topAscent, bottomDescent;
-
-				if ( topTSMetrics != null )
-				{
-					topAscent = topTSMetrics.ascent;
-				}
-				else
-				{
-					topAscent = topMetrics.height;
-				}
-
-				if ( bottomTSMetrics != null )
-				{
-					bottomDescent = bottomTSMetrics.descent;
-				}
-				else
-				{
-					bottomDescent = 0.0;
-				}
-				
-				return new VMetricsTypesetWithBaselineOffset( topAscent, height - topAscent, height - topAscent - bottomDescent, vspacing );
-			}
 		}
 		
 		throw new InvalidTypesettingException();
 	}
 
-	
 
 	
-	
-	protected HMetrics computeRequiredHMetrics()
+	private HMetrics combineHMetrics(HMetrics[] childHMetrics)
 	{
-		if ( childEntries.size() == 0 )
+		if ( childHMetrics.length == 0 )
 		{
-			childrenHMetrics = new HMetrics();
+			return new HMetrics();
 		}
 		else
 		{
-			HMetrics[] childHMetrics = new HMetrics[childEntries.size()];
-			for (int i = 0; i < childHMetrics.length; i++)
-			{
-				childHMetrics[i] = childEntries.get( i ).child.getRequiredHMetrics();
-			}
-			
 			HMetrics hm = new HMetrics();
+			double advance = 0.0;
 			for (int i = 0; i < childHMetrics.length; i++)
 			{
 				HMetrics chm = childHMetrics[i];
+				double chAdvance = chm.width + chm.hspacing;
 				hm.width = Math.max( hm.width, chm.width );
-				hm.advance = Math.max( hm.advance, chm.advance );
+				advance = Math.max( advance, chAdvance );
 			}
 			
-			childrenHMetrics = hm;
+			hm.hspacing = advance - hm.width;
+			
+			return hm;
 		}
-		
-		return childrenHMetrics;
 	}
-
-
-
-	protected VMetrics computeRequiredVMetrics()
+	
+	
+	private VMetrics combineVMetrics(VMetrics[] childVMetrics)
 	{
-		if ( childEntries.isEmpty() )
+		if ( childVMetrics.length == 0 )
 		{
-			childrenVMetrics = new VMetrics();
+			return new VMetrics();
 		}
 		else
 		{
-			// Get the vmetrics for the children
-			VMetrics[] childVMetrics = new VMetrics[childEntries.size()];
-			for (int i = 0; i < childVMetrics.length; i++)
-			{
-				childVMetrics[i] = childEntries.get( i ).child.getRequiredVMetrics();
-			}
-			
 			// Accumulate the height required for all the children
 			double height = 0.0;
 			double y = 0.0;
 			for (int i = 0; i < childVMetrics.length; i++)
 			{
 				VMetrics chm = childVMetrics[i];
-				VBoxChildEntry entry = (VBoxChildEntry)childEntries.get( i );
 				
-				// The spacing for the box is @spacing if this is NOT the last child; else 0.0
-				double boxSpacing = ( i == childVMetrics.length - 1 )  ?  0.0  :  spacing;
-				// The spacing to be used is either the box spacing, or the child's v-spacing, whichever is greater
-				double childSpacing = Math.max( boxSpacing, chm.vspacing );
+				if ( i != childVMetrics.length - 1)
+				{
+					chm = chm.minSpacing( spacing );
+				}
 				
-				height = y + chm.height + entry.padding * 2.0;
-				y = height + childSpacing;
+				height = y + chm.height  +  getChildPadding( i ) * 2.0;
+				y = height + chm.vspacing;
 			}
 			
-			childrenVMetrics = childrenVMetricsToBoxVMetrics( childVMetrics, height );
+			//return computeVMetricsTypesetting( childVMetrics, height, y - height );
+			VMetrics vm = computeVMetricsTypesetting( childVMetrics, height, y - height );
+			return vm;
 		}
-		
-		return childrenVMetrics;
+	}
+
+	
+
+	
+	
+	protected HMetrics computeMinimumHMetrics()
+	{
+		return combineHMetrics( getChildrenRefreshedMinimumHMetrics() );
+	}
+
+	protected HMetrics computePreferredHMetrics()
+	{
+		return combineHMetrics( getChildrenRefreshedPreferredHMetrics() );
+	}
+
+	
+	protected VMetrics computeMinimumVMetrics()
+	{
+		return combineVMetrics( getChildrenRefreshedMinimumVMetrics() );
+	}
+
+	protected VMetrics computePreferredVMetrics()
+	{
+		return combineVMetrics( getChildrenRefreshedPreferredVMetrics() );
 	}
 
 
-	protected HMetrics onAllocateX(double allocation)
+	
+
+	
+	
+	protected void allocateContentsX(double allocation)
 	{
+		super.allocateContentsX( allocation );
+
 		for (ChildEntry baseEntry: childEntries)
 		{
-			VBoxChildEntry entry = (VBoxChildEntry)baseEntry;
-			double childAlloc = Math.min( entry.child.hmetrics.width, allocation );
-			if ( entry.alignment == Alignment.LEFT )
+			BoxChildEntry entry = (BoxChildEntry)baseEntry;
+			double childWidth = Math.min( entry.child.prefH.width, allocation );
+			if ( alignment == Alignment.LEFT )
 			{
-				allocateChildX( entry.child, 0.0, childAlloc );
+				allocateChildX( entry.child, 0.0, childWidth );
 			}
-			else if ( entry.alignment == Alignment.CENTRE )
+			else if ( alignment == Alignment.CENTRE )
 			{
-				allocateChildX( entry.child, ( allocation - childAlloc )  *  0.5, childAlloc );
+				allocateChildX( entry.child, ( allocation - childWidth )  *  0.5, childWidth );
 			}
-			else if ( entry.alignment == Alignment.RIGHT )
+			else if ( alignment == Alignment.RIGHT )
 			{
-				allocateChildX( entry.child, allocation - childAlloc, childAlloc );
+				allocateChildX( entry.child, allocation - childWidth, childWidth );
 			}
-			else if ( entry.alignment == Alignment.EXPAND )
+			else if ( alignment == Alignment.EXPAND )
 			{
 				allocateChildX( entry.child, 0.0, allocation );
 			}
 		}
-		
-		return childrenHMetrics;
 	}
 
-	protected VMetrics onAllocateY(double allocation)
+	protected void allocateContentsY(double allocation)
 	{
-		double expandPerChild = 0.0, shrinkPerChild = 0.0;
-		if ( allocation > childrenVMetrics.height )
-		{
-			// More space than is required
-			if ( numExpand > 0 )
-			{
-				double totalExpand = allocation - childrenVMetrics.height;
-				expandPerChild = totalExpand / (double)numExpand;
-			}
-		}
-		else if ( allocation < childrenVMetrics.height )
-		{
-			// Insufficient space; shrink
-			if ( numShrink > 0 )
-			{
-				double totalShrink = childrenVMetrics.height - allocation;
-				shrinkPerChild = totalShrink / (double)numShrink;
-			}
-		}
+		super.allocateContentsY( allocation );
 		
+		Metrics[] allocated = VMetrics.allocateSpacePacked( getChildrenMinimumVMetrics(), getChildrenPreferredVMetrics(), getChildrenPackFlags(), allocation );
 		
 		double height = 0.0;
 		double y = 0.0;
-		VMetrics[] childVMetrics = new VMetrics[childEntries.size()];
-		for (int i = 0; i < childEntries.size(); i++)
+		for (int i = 0; i < allocated.length; i++)
 		{
-			VBoxChildEntry entry = (VBoxChildEntry)childEntries.get( i );
+			VMetrics chm = (VMetrics)allocated[i];
 			
-			
-			double childBox = entry.child.vmetrics.height;
-			double childAlloc = childBox;
-			double childY = y + entry.padding;
-			
-			if ( entry.bExpand )
+			if ( i != allocated.length - 1)
 			{
-				childBox += expandPerChild;
-				if ( entry.bFill )
-				{
-					childAlloc += expandPerChild;
-				}
-				else
-				{
-					childY += expandPerChild * 0.5;
-				}
-			}
-			if ( entry.bShrink )
-			{
-				childBox -= shrinkPerChild;
-				childAlloc -= shrinkPerChild;
+				chm = chm.minSpacing( spacing );
 			}
 			
-
-			VMetrics childAllocatedMetrics = allocateChildY( entry.child, childY, childAlloc );
-
-			// The spacing to be used is either the box spacing, or the child's v-spacing, whichever is greater
-			double childSpacing = Math.max( spacing, childAllocatedMetrics.vspacing );
-
-			height = y + childAllocatedMetrics.height + entry.padding * 2.0;
-			y = height + childSpacing;
+			double childPadding = getChildPadding( i );
+			double childY = y + childPadding;
 			
-			childVMetrics[i] = childAllocatedMetrics;
+			allocateChildY( childEntries.get( i ).child, childY, chm.height );
+			
+			height = y + chm.height + childPadding * 2.0;
+			y = height + chm.vspacing;
 		}
-		
-		return childrenVMetricsToBoxVMetrics( childVMetrics, height );
 	}
 }

@@ -43,24 +43,29 @@ public class DPHBoxTest
 		DPText[] c1 = makeTexts( "CENTRE" );
 		DPText[] c2 = makeTexts( "BOTTOM" );
 		DPText[] c3 = makeTexts( "EXPAND" );
+		DPText[] c4 = makeTexts( "BASELINES" );
 		
-		DPHBox b0 = new DPHBox( DPHBox.Alignment.TOP, 0.0, false, false, false, 0.0 );
+		DPHBox b0 = new DPHBox( DPHBox.Alignment.TOP, 0.0, false, 0.0 );
 		b0.extend( c0 );
 		
-		DPHBox b1 = new DPHBox( DPHBox.Alignment.CENTRE, 0.0, false, false, false, 0.0 );
+		DPHBox b1 = new DPHBox( DPHBox.Alignment.CENTRE, 0.0, false, 0.0 );
 		b1.extend( c1 );
 		
-		DPHBox b2 = new DPHBox( DPHBox.Alignment.BOTTOM, 0.0, false, false, false, 0.0 );
+		DPHBox b2 = new DPHBox( DPHBox.Alignment.BOTTOM, 0.0, false, 0.0 );
 		b2.extend( c2 );
 		
-		DPHBox b3 = new DPHBox( DPHBox.Alignment.EXPAND, 0.0, true, false, false, 0.0 );
+		DPHBox b3 = new DPHBox( DPHBox.Alignment.EXPAND, 0.0, false, 0.0 );
 		b3.extend( c3 );
 		
-		DPVBox box = new DPVBox( DPVBox.Typesetting.NONE, DPVBox.Alignment.EXPAND, 20.0, false, false, false, 0.0 );
+		DPHBox b4 = new DPHBox( DPHBox.Alignment.BASELINES, 0.0, false, 0.0 );
+		b4.extend( c4 );
+		
+		DPVBox box = new DPVBox( DPVBox.Typesetting.NONE, DPVBox.Alignment.EXPAND, 20.0, false, 0.0 );
 		box.append( b0 );
 		box.append( b1 );
 		box.append( b2 );
 		box.append( b3 );
+		box.append( b4 );
 	     
 	     
 		area.setChild( box );
