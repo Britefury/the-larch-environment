@@ -3,6 +3,7 @@ package BritefuryJ.DocPresent.Util;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.Shape;
 import java.awt.font.FontRenderContext;
 import java.awt.font.TextHitInfo;
 import java.awt.font.TextLayout;
@@ -135,6 +136,19 @@ public class TextVisual
 		graphics.setColor( colour );
 		layout.draw( graphics, 0.0f, layout.getAscent() );
 	}
+	
+	public void drawCaret(Graphics2D graphics, int offset)
+	{
+		refreshLayout();
+		Shape[] carets = layout.getCaretShapes( offset );
+		graphics.translate( 0.0, layout.getAscent() );
+		graphics.draw( carets[0] );
+		if ( carets[1] != null )
+		{
+			graphics.draw( carets[1] );
+		}
+	}
+	
 	
 	
 	

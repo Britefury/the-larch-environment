@@ -1,5 +1,6 @@
 package BritefuryJ.DocPresent.Caret;
 
+import BritefuryJ.DocPresent.DPContentLeaf;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Marker.MarkerListener;
 
@@ -36,6 +37,37 @@ public class Caret implements MarkerListener
 		}
 	}
 	
+	public Marker getMarker()
+	{
+		return marker;
+	}
+	
+	
+	public DPContentLeaf getWidget()
+	{
+		if ( marker != null )
+		{
+			return marker.getWidget();
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	
+	
+	public boolean isValid()
+	{
+		if ( marker != null )
+		{
+			return marker.isValid();
+		}
+		else
+		{
+			return false;
+		}
+	}
 	
 	
 	

@@ -1,12 +1,14 @@
 package BritefuryJ.DocPresent;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Vector;
 
 import java.awt.event.KeyEvent;
 import java.awt.Graphics2D;
 import java.awt.geom.*;
 
+import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Event.PointerScrollEvent;
@@ -113,37 +115,13 @@ abstract public class DPWidget
 
 	//
 	//
-	// ENUMERATIONS
-	//
-	//
-
-	
-	// Cursor movement
-	public enum CursorMovement {
-		MOVE,
-		DRAG
-	};
-	
-	
-	// Focus policy
-	public enum FocusPolicy {
-		IGNORE,
-		CHILDRENFIRST,
-		TAKE
-	};
-	
-	
-	
-	
-	//
-	//
 	// FIELDS
 	//
 	//
 	
 	protected DPContainer parent;
 	protected DPPresentationArea presentationArea;
-	protected boolean bHasFocus, bFocusGrabbed, bRealised, bResizeQueued;
+	protected boolean bRealised, bResizeQueued;
 	protected double scale, rootScale;
 	protected HMetrics minH, prefH;
 	protected VMetrics minV, prefV;
@@ -347,37 +325,6 @@ abstract public class DPWidget
 	
 	
 
-	
-	//
-	// Focus methods
-	//
-
-	public void grabFocus()
-	{
-		if ( !bFocusGrabbed )
-		{
-			bFocusGrabbed = true;
-			if ( presentationArea != null )
-			{
-				presentationArea.takeFocusGrab( this );
-			}
-		}
-	}
-
-	public void ungrabFocus()
-	{
-		if ( bFocusGrabbed )
-		{
-			bFocusGrabbed = false;
-			if ( presentationArea != null )
-			{
-				presentationArea.relinquishFocusGrab( this );
-			}
-		}
-	}
-	
-	
-	
 	
 	//
 	// Drag and drop methods
@@ -722,25 +669,14 @@ abstract public class DPWidget
 	}
 	
 	
-	protected boolean onKeyPress(KeyEvent event)
+	protected boolean onKeyPress(Caret caret, KeyEvent event)
 	{
 		return false;
 	}
 	
-	protected boolean onKeyRelease(KeyEvent event)
+	protected boolean onKeyRelease(Caret caret, KeyEvent event)
 	{
 		return false;
-	}
-	
-	
-	protected void onGainFocus()
-	{
-		bHasFocus = true;
-	}
-	
-	protected void onLoseFocus()
-	{
-		bHasFocus = false;
 	}
 	
 	
@@ -870,10 +806,6 @@ abstract public class DPWidget
 		{
 			handleLeave( new PointerMotionEvent( pointer, PointerMotionEvent.Action.LEAVE ) );
 		}
-		if ( bFocusGrabbed )
-		{
-			ungrabFocus();
-		}
 		onUnrealise();
 		bRealised = false;		
 	}
@@ -962,6 +894,7 @@ abstract public class DPWidget
 	{
 		allocation.y = height;
 		allocateContentsY( height );
+		bResizeQueued = false;
 	}
 	
 	
@@ -970,38 +903,19 @@ abstract public class DPWidget
 	// Focus navigation methods
 	//
 	
-	protected FocusPolicy focusPolicy()
-	{
-		return FocusPolicy.IGNORE;
-	}
-	
-	
 	protected boolean handleMotionKeyPress(KeyEvent keyEvent, int modifiers)
 	{
 		return false;
 	}
 	
-	protected DPWidget[] horizontalNavigationList()
+	protected List<DPWidget> horizontalNavigationList()
 	{
 		return null;
 	}
 	
-	protected DPWidget[] verticalNavigationList()
+	protected List<DPWidget> verticalNavigationList()
 	{
 		return null;
-	}
-	
-	protected static int navListIndexOf(DPWidget[] navList, DPWidget child)
-	{
-		for (int i = 0; i < navList.length; i++)
-		{
-			if ( child == navList[i] )
-			{
-				return i;
-			}
-		}
-		
-		return -1;
 	}
 	
 	protected Point2 getCursorPosition()
@@ -1009,457 +923,6 @@ abstract public class DPWidget
 		return new Point2( allocation.mul( 0.5 ) );
 	}
 	
-	
-	
-	public void startEditing()
-	{
-		makeCurrent();
-	}
-	
-	public void startEditingAtStart()
-	{
-		makeCurrent();
-	}
-	
-	public void startEditingAtEnd()
-	{
-		makeCurrent();
-	}
-	
-	public void startEditingAtPosition(Point2 pos)
-	{
-		makeCurrent();
-	}
-	
-	public void finishEditing()
-	{	
-	}
-	
-	
-	public void makeCurrent()
-	{
-		grabFocus();
-	}
-	
-	
-	
-	protected void caretLeft(boolean bItemStep)
-	{
-		DPWidget left = getFocusLeafToLeft();
-		if ( left != null )
-		{
-			finishEditing();
-			if ( bItemStep )
-			{
-				left.makeCurrent();
-			}
-			else
-			{
-				left.startEditingAtEnd();
-			}
-		}
-	}
-	
-	protected void caretRight(boolean bItemStep)
-	{
-		DPWidget right = getFocusLeafToRight();
-		if ( right != null )
-		{
-			finishEditing();
-			if ( bItemStep )
-			{
-				right.makeCurrent();
-			}
-			else
-			{
-				right.startEditingAtStart();
-			}
-		}
-	}
-	
-	
-	protected void caretToLeftChild()
-	{
-		DPWidget[] navList = horizontalNavigationList();
-		if ( navList != null )
-		{
-			finishEditing();
-			navList[0].makeCurrent();
-		}
-	}
-	
-	protected void caretToRightChild()
-	{
-		DPWidget[] navList = horizontalNavigationList();
-		if ( navList != null )
-		{
-			finishEditing();
-			navList[navList.length-1].makeCurrent();
-		}
-	}
-	
-	
-	protected void caretToParent()
-	{
-		if ( parent != null )
-		{
-			finishEditing();
-			parent.makeCurrent();
-		}
-	}
-	
-	
-	
-	protected void caretUp()
-	{
-		DPWidget above = getFocusLeafAbove();
-		if ( above != null )
-		{
-			Point2 cursorPosInAbove = getLocalPointRelativeTo( above, getCursorPosition() );
-			finishEditing();
-			above.startEditingAtPosition( cursorPosInAbove );
-		}
-	}
-	
-	protected void caretDown()
-	{
-		DPWidget below = getFocusLeafBelow();
-		if ( below != null )
-		{
-			Point2 cursorPosInAbove = getLocalPointRelativeTo( below, getCursorPosition() );
-			finishEditing();
-			below.startEditingAtPosition( cursorPosInAbove );
-		}
-	}
-	
-	
-	
-	protected DPWidget getLeftFocusLeaf()
-	{
-		if ( focusPolicy() == FocusPolicy.TAKE )
-		{
-			// Take the focus
-			return this;
-		}
-		else
-		{
-			// Check the child nodes
-			DPWidget[] navList = horizontalNavigationList();
-			if ( navList != null )
-			{
-				for (int i = 0; i < navList.length; i++)
-				{
-					DPWidget l = navList[i].getLeftFocusLeaf();
-					if ( l != null )
-					{
-						return l;
-					}
-				}
-			}
-			
-			if ( focusPolicy() == FocusPolicy.CHILDRENFIRST )
-			{
-				return this;
-			}
-			else
-			{
-				return null;
-			}
-		}
-	}
-	
-	protected DPWidget getRightFocusLeaf()
-	{
-		if ( focusPolicy() == FocusPolicy.TAKE )
-		{
-			// Take the focus
-			return this;
-		}
-		else
-		{
-			// Check the child nodes
-			DPWidget[] navList = horizontalNavigationList();
-			if ( navList != null )
-			{
-				for (int i = navList.length - 1; i >= 0; i--)
-				{
-					DPWidget l = navList[i].getRightFocusLeaf();
-					if ( l != null )
-					{
-						return l;
-					}
-				}
-			}
-			
-			if ( focusPolicy() == FocusPolicy.CHILDRENFIRST )
-			{
-				return this;
-			}
-			else
-			{
-				return null;
-			}
-		}
-	}
-	
-	
-	protected DPWidget getFocusLeafToLeft()
-	{
-		if ( parent != null )
-		{
-			return parent.getFocusLeafToLeftFromChild( this );
-		}
-		else
-		{
-			return null;
-		}
-	}
-	
-	protected DPWidget getFocusLeafToRight()
-	{
-		if ( parent != null )
-		{
-			return parent.getFocusLeafToRightFromChild( this );
-		}
-		else
-		{
-			return null;
-		}
-	}
-	
-	
-	protected DPWidget getFocusLeafToLeftFromChild(DPWidget child)
-	{
-		DPWidget[] navList = horizontalNavigationList();
-		if ( navList != null )
-		{
-			int index = navListIndexOf( navList, child );
-			if ( index != -1 )
-			{
-				for (int i = index - 1; i >= 0; i--)
-				{
-					DPWidget l = navList[i].getRightFocusLeaf();
-					if ( l != null )
-					{
-						return l;
-					}
-				}
-			}
-		}
-		
-		if ( parent != null )
-		{
-			return parent.getFocusLeafToLeftFromChild( this );
-		}
-		else
-		{
-			return null;
-		}
-	}
-	
-	protected DPWidget getFocusLeafToRightFromChild(DPWidget child)
-	{
-		DPWidget[] navList = horizontalNavigationList();
-		if ( navList != null )
-		{
-			int index = navListIndexOf( navList, child );
-			if ( index != -1 )
-			{
-				for (int i = index + 1; i < navList.length; i++)
-				{
-					DPWidget l = navList[i].getLeftFocusLeaf();
-					if ( l != null )
-					{
-						return l;
-					}
-				}
-			}
-		}
-		
-		if ( parent != null )
-		{
-			return parent.getFocusLeafToRightFromChild( this );
-		}
-		else
-		{
-			return null;
-		}
-	}
-	
-	
-	
-	protected DPWidget getFocusLeafAbove()
-	{
-		return getFocusLeafAboveOrBelow( false );
-	}
-	
-	protected DPWidget getFocusLeafBelow()
-	{
-		return getFocusLeafAboveOrBelow( true );
-	}
-	
-	protected DPWidget getFocusLeafAboveOrBelow(boolean bBelow)
-	{
-		if ( parent != null )
-		{
-			Point2 localCursorPos = getCursorPosition();
-			return parent.getFocusLeafAboveOrBelowFromChild( this, bBelow, getLocalPointRelativeToAncestor( parent, localCursorPos ) );
-		}
-		else
-		{
-			return null;
-		}
-	}
-	
-	protected DPWidget getFocusLeafAboveOrBelowFromChild(DPWidget child, boolean bBelow, Point2 localCursorPos)
-	{
-		DPWidget[] navList = verticalNavigationList();
-		if ( navList != null )
-		{
-			int index = navListIndexOf( navList, child );
-			if ( index != -1 )
-			{
-				Point2 cursorPosInRootSpace = getLocalPointRelativeToRoot( localCursorPos );
-				if ( bBelow )
-				{
-					for (int i = index + 1; i < navList.length; i++)
-					{
-						DPWidget l = navList[i].getTopOrBottomFocusLeaf( false, cursorPosInRootSpace );
-						if ( l != null )
-						{
-							return l;
-						}
-					}
-				}
-				else
-				{
-					for (int i = index - 1; i >= 0; i--)
-					{
-						DPWidget l = navList[i].getTopOrBottomFocusLeaf( true, cursorPosInRootSpace );
-						if ( l != null )
-						{
-							return l;
-						}
-					}
-				}
-			}
-		}
-		
-		if ( parent != null )
-		{
-			return parent.getFocusLeafAboveOrBelowFromChild( this, bBelow, getLocalPointRelativeToAncestor( parent, localCursorPos ) );
-		}
-		else
-		{
-			return null;
-		}
-	}
-	
-	protected DPWidget getTopOrBottomFocusLeaf(boolean bBottom, Point2 cursorPosInRootSpace)
-	{
-		if ( focusPolicy() == FocusPolicy.TAKE )
-		{
-			return this;
-		}
-		else
-		{
-			DPWidget[] navList = verticalNavigationList();
-			if ( navList != null )
-			{
-				if ( bBottom )
-				{
-					for (int i = navList.length - 1; i >= 0; i--)
-					{
-						DPWidget l = navList[i].getTopOrBottomFocusLeaf( bBottom, cursorPosInRootSpace );
-						if ( l != null )
-						{
-							return l;
-						}
-					}
-				}
-				else
-				{
-					for (int i = 0; i < navList.length; i++)
-					{
-						DPWidget l = navList[i].getTopOrBottomFocusLeaf( bBottom, cursorPosInRootSpace );
-						if ( l != null )
-						{
-							return l;
-						}
-					}
-				}
-				
-				if ( focusPolicy() == FocusPolicy.CHILDRENFIRST )
-				{
-					return this;
-				}
-				else
-				{
-					return null;
-				}
-			}
-			else
-			{
-				navList = horizontalNavigationList();
-				if ( navList != null )
-				{
-					double closestDistance = 0.0;
-					DPWidget closestNode = null;
-					for (DPWidget item: navList)
-					{
-						AABox2 bounds = getLocalAABox();
-						double lower = item.getLocalPointRelativeToRoot( bounds.getLower() ).x;
-						double upper = item.getLocalPointRelativeToRoot( bounds.getUpper() ).x;
-						if ( cursorPosInRootSpace.x >=  lower  &&  cursorPosInRootSpace.x <= upper )
-						{
-							DPWidget l = item.getTopOrBottomFocusLeaf( bBottom, cursorPosInRootSpace );
-							if ( l != null )
-							{
-								return l;
-							}
-						}
-						else
-						{
-							double distance;
-							if ( cursorPosInRootSpace.x < lower )
-							{
-								distance = lower - cursorPosInRootSpace.x;
-							}
-							else // cursorPosInRootSpace.x > upper
-							{
-								distance = cursorPosInRootSpace.x - upper;
-							}
-							
-							if ( closestNode == null  ||  distance < closestDistance )
-							{
-								closestDistance = distance;
-								closestNode = item;
-							}
-						}
-					}
-					
-					if ( closestNode != null )
-					{
-						DPWidget l = closestNode.getTopOrBottomFocusLeaf( bBottom, cursorPosInRootSpace );
-						if ( l != null )
-						{
-							return l;
-						}
-					}
-				}
-				
-				if ( focusPolicy() == FocusPolicy.CHILDRENFIRST )
-				{
-					return this;
-				}
-				else
-				{
-					return null;
-				}
-			}
-		}
-	}
-		
 	
 	
 	
@@ -1490,5 +953,35 @@ abstract public class DPWidget
 	public int getContentLength()
 	{
 		return 0;
+	}
+	
+	
+	
+	//
+	//
+	// CONTENT LEAF METHODS
+	//
+	//
+	
+	public boolean isContentLeaf()
+	{
+		return false;
+	}
+
+
+	
+	protected DPContentLeaf getLeftContentLeaf()
+	{
+		return null;
+	}
+	
+	protected DPContentLeaf getRightContentLeaf()
+	{
+		return null;
+	}
+	
+	protected DPContentLeaf getTopOrBottomFocusLeaf(boolean bBottom, Point2 cursorPosInRootSpace)
+	{
+		return null;
 	}
 }

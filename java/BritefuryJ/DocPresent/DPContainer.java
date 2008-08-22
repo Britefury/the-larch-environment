@@ -2,6 +2,7 @@ package BritefuryJ.DocPresent;
 
 import java.util.Vector;
 import java.util.HashMap;
+import java.util.List;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -135,6 +136,8 @@ public abstract class DPContainer extends DPWidget {
 			child.handleRealise();
 		}
 		
+		structureChanged();
+		
 		return childEntry;
 	}
 	
@@ -150,6 +153,17 @@ public abstract class DPContainer extends DPWidget {
 		child.setParent( null, null );
 		
 		childToEntry.remove( child );
+
+		structureChanged();
+	}
+	
+	
+	protected void structureChanged()
+	{
+		if ( parent != null )
+		{
+			parent.structureChanged();
+		}
 	}
 	
 	
@@ -186,6 +200,7 @@ public abstract class DPContainer extends DPWidget {
 	
 	protected void onChildResizeRequest(DPWidget child)
 	{
+		queueResize();
 	}
 	
 	protected void childResizeRequest(DPWidget child)
@@ -565,10 +580,7 @@ public abstract class DPContainer extends DPWidget {
 		{
 			if ( entry.box.intersects( areaBox ) )
 			{
-				Vector2 translation = entry.childToContainerXform.translation;
-				double scale = entry.childToContainerXform.scale;
-				graphics.translate( translation.x, translation.y );
-				graphics.scale( scale, scale );
+				entry.childToContainerXform.apply( graphics );
 				entry.child.handleDraw( graphics, entry.containerToChildXform.transform( areaBox ) );
 				graphics.setTransform( currentTransform );
 			}
@@ -592,6 +604,240 @@ public abstract class DPContainer extends DPWidget {
 		for (ChildEntry entry: childEntries)
 		{
 			entry.child.setPresentationArea( area );
+		}
+	}
+
+
+	
+	
+	//
+	//
+	// CONTENT LEAF METHODS
+	//
+	//
+
+	protected DPContentLeaf getLeftContentLeaf()
+	{
+		// Check the child nodes
+		List<DPWidget> navList = horizontalNavigationList();
+		if ( navList != null )
+		{
+			for (DPWidget w: navList)
+			{
+				DPContentLeaf l = w.getLeftContentLeaf();
+				if ( l != null )
+				{
+					return l;
+				}
+			}
+		}
+		
+		return null;
+	}
+	
+	protected DPContentLeaf getRightContentLeaf()
+	{
+		// Check the child nodes
+		List<DPWidget> navList = horizontalNavigationList();
+		if ( navList != null )
+		{
+			for (int i = navList.size() - 1; i >= 0; i--)
+			{
+				DPContentLeaf l = navList.get( i ).getRightContentLeaf();
+				if ( l != null )
+				{
+					return l;
+				}
+			}
+		}
+		
+		return null;
+	}
+
+	protected DPContentLeaf getTopOrBottomFocusLeaf(boolean bBottom, Point2 cursorPosInRootSpace)
+	{
+		List<DPWidget> navList = verticalNavigationList();
+		if ( navList != null )
+		{
+			if ( bBottom )
+			{
+				for (int i = navList.size() - 1; i >= 0; i--)
+				{
+					DPContentLeaf l = navList.get( i ).getTopOrBottomFocusLeaf( bBottom, cursorPosInRootSpace );
+					if ( l != null )
+					{
+						return l;
+					}
+				}
+			}
+			else
+			{
+				for (DPWidget w: navList)
+				{
+					DPContentLeaf l = w.getTopOrBottomFocusLeaf( bBottom, cursorPosInRootSpace );
+					if ( l != null )
+					{
+						return l;
+					}
+				}
+			}
+			
+			return null;
+		}
+		else
+		{
+			navList = horizontalNavigationList();
+			if ( navList != null )
+			{
+				double closestDistance = 0.0;
+				DPWidget closestNode = null;
+				for (DPWidget item: navList)
+				{
+					AABox2 bounds = getLocalAABox();
+					double lower = item.getLocalPointRelativeToRoot( bounds.getLower() ).x;
+					double upper = item.getLocalPointRelativeToRoot( bounds.getUpper() ).x;
+					if ( cursorPosInRootSpace.x >=  lower  &&  cursorPosInRootSpace.x <= upper )
+					{
+						DPContentLeaf l = item.getTopOrBottomFocusLeaf( bBottom, cursorPosInRootSpace );
+						if ( l != null )
+						{
+							return l;
+						}
+					}
+					else
+					{
+						double distance;
+						if ( cursorPosInRootSpace.x < lower )
+						{
+							distance = lower - cursorPosInRootSpace.x;
+						}
+						else // cursorPosInRootSpace.x > upper
+						{
+							distance = cursorPosInRootSpace.x - upper;
+						}
+						
+						if ( closestNode == null  ||  distance < closestDistance )
+						{
+							closestDistance = distance;
+							closestNode = item;
+						}
+					}
+				}
+				
+				if ( closestNode != null )
+				{
+					DPContentLeaf l = closestNode.getTopOrBottomFocusLeaf( bBottom, cursorPosInRootSpace );
+					if ( l != null )
+					{
+						return l;
+					}
+				}
+			}
+			
+			return null;
+		}
+	}
+	
+	
+	protected DPContentLeaf getContentLeafToLeftFromChild(DPWidget child)
+	{
+		List<DPWidget> navList = horizontalNavigationList();
+		if ( navList != null )
+		{
+			int index = navList.indexOf( child );
+			if ( index != -1 )
+			{
+				for (int i = index - 1; i >= 0; i--)
+				{
+					DPContentLeaf l = navList.get( i ).getRightContentLeaf();
+					if ( l != null )
+					{
+						return l;
+					}
+				}
+			}
+		}
+		
+		if ( parent != null )
+		{
+			return parent.getContentLeafToLeftFromChild( this );
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	protected DPContentLeaf getContentLeafToRightFromChild(DPWidget child)
+	{
+		List<DPWidget> navList = horizontalNavigationList();
+		if ( navList != null )
+		{
+			int index = navList.indexOf( child );
+			if ( index != -1 )
+			{
+				for (int i = index + 1; i < navList.size(); i++)
+				{
+					DPContentLeaf l = navList.get( i ).getLeftContentLeaf();
+					if ( l != null )
+					{
+						return l;
+					}
+				}
+			}
+		}
+		
+		if ( parent != null )
+		{
+			return parent.getContentLeafToRightFromChild( this );
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	protected DPContentLeaf getFocusLeafAboveOrBelowFromChild(DPWidget child, boolean bBelow, Point2 localCursorPos)
+	{
+		List<DPWidget> navList = verticalNavigationList();
+		if ( navList != null )
+		{
+			int index = navList.indexOf( child );
+			if ( index != -1 )
+			{
+				Point2 cursorPosInRootSpace = getLocalPointRelativeToRoot( localCursorPos );
+				if ( bBelow )
+				{
+					for (int i = index + 1; i < navList.size(); i++)
+					{
+						DPContentLeaf l = navList.get( i ).getTopOrBottomFocusLeaf( false, cursorPosInRootSpace );
+						if ( l != null )
+						{
+							return l;
+						}
+					}
+				}
+				else
+				{
+					for (int i = index - 1; i >= 0; i--)
+					{
+						DPContentLeaf l = navList.get( i ).getTopOrBottomFocusLeaf( true, cursorPosInRootSpace );
+						if ( l != null )
+						{
+							return l;
+						}
+					}
+				}
+			}
+		}
+		
+		if ( parent != null )
+		{
+			return parent.getFocusLeafAboveOrBelowFromChild( this, bBelow, getLocalPointRelativeToAncestor( parent, localCursorPos ) );
+		}
+		else
+		{
+			return null;
 		}
 	}
 }

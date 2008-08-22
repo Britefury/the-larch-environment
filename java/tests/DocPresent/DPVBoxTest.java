@@ -62,6 +62,7 @@ public class DPVBoxTest {
 		area.getComponent().setPreferredSize( new Dimension( 640, 480 ) );
 		frame.add( area.getComponent() );
 		frame.pack();
+		area.getComponent().requestFocusInWindow();
 		frame.setVisible(true);
 	}
 }

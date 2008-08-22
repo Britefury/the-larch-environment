@@ -1,5 +1,7 @@
 package BritefuryJ.Math;
 
+import java.awt.Graphics2D;
+
 public class Xform2 {
 	public double scale;
 	public Vector2 translation;
@@ -57,5 +59,19 @@ public class Xform2 {
 	public AABox2 transform(AABox2 b)
 	{
 		return new AABox2( transform( b.getLower() ), transform( b.getUpper() ) );
+	}
+	
+	
+	
+	public void apply(Graphics2D graphics)
+	{
+		graphics.translate( translation.x, translation.y );
+		graphics.scale( scale, scale );
+	}
+	
+	
+	public String toString()
+	{
+		return "Xform2( translation=" + translation.toString() + ", scale=" + String.valueOf( scale ) + " )";
 	}
 }

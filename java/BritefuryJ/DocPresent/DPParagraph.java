@@ -640,4 +640,15 @@ public class DPParagraph extends DPContainerSequence
 			y = height + chm.vspacing;
 		}
 	}
+	
+	
+	
+	//
+	// Focus navigation methods
+	//
+	
+	protected List<DPWidget> horizontalNavigationList()
+	{
+		return getChildren();
+	}
 }

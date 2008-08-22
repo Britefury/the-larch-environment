@@ -2,6 +2,7 @@ package BritefuryJ.DocPresent;
 
 import java.awt.Color;
 import java.lang.Math;
+import java.util.List;
 
 import BritefuryJ.DocPresent.Metrics.HMetrics;
 import BritefuryJ.DocPresent.Metrics.Metrics;
@@ -307,5 +308,21 @@ public class DPVBox extends DPAbstractBox
 			height = y + chm.height + childPadding * 2.0;
 			y = height + chm.vspacing;
 		}
+	}
+	
+	
+	
+	//
+	// Focus navigation methods
+	//
+	
+	protected List<DPWidget> horizontalNavigationList()
+	{
+		return getChildren();
+	}
+	
+	protected List<DPWidget> verticalNavigationList()
+	{
+		return getChildren();
 	}
 }
