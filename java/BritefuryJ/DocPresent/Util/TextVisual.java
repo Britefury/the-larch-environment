@@ -10,9 +10,9 @@ import java.awt.font.TextLayout;
 import javax.swing.JComponent;
 
 import BritefuryJ.DocPresent.DPPresentationArea;
-import BritefuryJ.DocPresent.HMetrics;
-import BritefuryJ.DocPresent.VMetrics;
-import BritefuryJ.DocPresent.VMetricsTypeset;
+import BritefuryJ.DocPresent.Metrics.HMetrics;
+import BritefuryJ.DocPresent.Metrics.VMetrics;
+import BritefuryJ.DocPresent.Metrics.VMetricsTypeset;
 import BritefuryJ.Math.Point2;
 
 

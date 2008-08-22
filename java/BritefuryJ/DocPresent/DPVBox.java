@@ -3,6 +3,10 @@ package BritefuryJ.DocPresent;
 import java.awt.Color;
 import java.lang.Math;
 
+import BritefuryJ.DocPresent.Metrics.HMetrics;
+import BritefuryJ.DocPresent.Metrics.Metrics;
+import BritefuryJ.DocPresent.Metrics.VMetrics;
+import BritefuryJ.DocPresent.Metrics.VMetricsTypeset;
 import BritefuryJ.Math.Point2;
 
 

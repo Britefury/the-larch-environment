@@ -1,4 +1,4 @@
-package BritefuryJ.DocPresent;
+package BritefuryJ.DocPresent.Metrics;
 
 public class HMetrics extends Metrics
 {

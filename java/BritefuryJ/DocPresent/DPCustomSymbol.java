@@ -3,6 +3,9 @@ package BritefuryJ.DocPresent;
 import java.awt.Color;
 import java.awt.Graphics2D;
 
+import BritefuryJ.DocPresent.Metrics.HMetrics;
+import BritefuryJ.DocPresent.Metrics.VMetrics;
+
 
 public class DPCustomSymbol extends DPWidget
 {

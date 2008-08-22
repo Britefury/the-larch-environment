@@ -6,6 +6,8 @@ import java.util.List;
 
 import org.python.core.PySlice;
 
+import BritefuryJ.DocPresent.Metrics.HMetrics;
+import BritefuryJ.DocPresent.Metrics.VMetrics;
 import BritefuryJ.JythonInterface.JythonSlice;
 
 
@@ -78,12 +80,6 @@ abstract public class DPContainerSequence extends DPContainer
 		ChildEntry[] oldChildEntriesArray = (ChildEntry[])childEntries.toArray();
 		ChildEntry[] newChildEntriesArray = (ChildEntry[])JythonSlice.arraySetSlice( oldChildEntriesArray, slice, itemEntriesArray );
 		
-		childEntries.setSize( newChildEntriesArray.length );
-		for (int i = 0; i < newChildEntriesArray.length; i++)
-		{
-			childEntries.set( i, newChildEntriesArray[i] );
-		}
-		
 		HashSet<ChildEntry> newEntrySet = new HashSet<ChildEntry>( childEntries );
 		
 		
@@ -98,6 +94,12 @@ abstract public class DPContainerSequence extends DPContainer
 			unregisterChildEntry( entry );
 		}
 
+		childEntries.setSize( newChildEntriesArray.length );
+		for (int i = 0; i < newChildEntriesArray.length; i++)
+		{
+			childEntries.set( i, newChildEntriesArray[i] );
+		}
+		
 		for (ChildEntry entry: added)
 		{
 			registerChildEntry( entry );
@@ -112,8 +114,8 @@ abstract public class DPContainerSequence extends DPContainer
 	public void __delitem__(int index)
 	{
 		ChildEntry entry = childEntries.get( index );
-		childEntries.remove( index );
 		unregisterChildEntry( entry );
+		childEntries.remove( index );
 		
 		childListModified();
 		queueResize();
@@ -127,17 +129,17 @@ abstract public class DPContainerSequence extends DPContainer
 		
 		ChildEntry[] newChildEntriesArray = (ChildEntry[])JythonSlice.arrayDelSlice( in, slice );
 		
+		for (ChildEntry entry: removedArray)
+		{
+			unregisterChildEntry( entry );
+		}
+
 		childEntries.setSize( newChildEntriesArray.length );
 		for (int i = 0; i < newChildEntriesArray.length; i++)
 		{
 			childEntries.set( i, newChildEntriesArray[i] );
 		}
 		
-		for (ChildEntry entry: removedArray)
-		{
-			unregisterChildEntry( entry );
-		}
-
 		childListModified();
 		queueResize();
 	}
@@ -192,8 +194,8 @@ abstract public class DPContainerSequence extends DPContainer
 	{
 		assert hasChild( entry.child );
 		
-		childEntries.remove( entry );
 		unregisterChildEntry( entry );
+		childEntries.remove( entry );
 		
 		childListModified();
 		queueResize();

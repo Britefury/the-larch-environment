@@ -42,6 +42,7 @@ import BritefuryJ.DocPresent.Input.Modifier;
 import BritefuryJ.DocPresent.Input.PointerInterface;
 import BritefuryJ.DocPresent.Input.Pointer;
 import BritefuryJ.DocPresent.Input.InputTable;
+import BritefuryJ.DocPresent.Metrics.VMetrics;
 
 
 
@@ -1020,19 +1021,19 @@ public class DPPresentationArea extends DPBin {
 				{
 					if ( keyCode == KeyEvent.VK_LEFT )
 					{
-						keyboardFocusTarget.cursorLeft( false );
+						keyboardFocusTarget.caretLeft( false );
 					}
 					else if ( keyCode == KeyEvent.VK_RIGHT )
 					{
-						keyboardFocusTarget.cursorRight( false );
+						keyboardFocusTarget.caretRight( false );
 					}
 					else if ( keyCode == KeyEvent.VK_UP )
 					{
-						keyboardFocusTarget.cursorUp();
+						keyboardFocusTarget.caretUp();
 					}
 					else if ( keyCode == KeyEvent.VK_DOWN )
 					{
-						keyboardFocusTarget.cursorDown();
+						keyboardFocusTarget.caretDown();
 					}
 					return true;
 				}
