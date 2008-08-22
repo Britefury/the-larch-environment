@@ -2,6 +2,8 @@ package BritefuryJ.DocPresent;
 
 import java.awt.Color;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Vector;
 
 import BritefuryJ.DocPresent.Metrics.HMetrics;
 import BritefuryJ.DocPresent.Metrics.VMetrics;
@@ -726,5 +728,25 @@ public class DPScript extends DPContainer
 			VMetricsTypeset childV = childrenV[RIGHTSUB];
 			allocateChildY( children[RIGHTSUB], y - childV.ascent, childV.height );
 		}
+	}
+	
+	
+	//
+	// Focus navigation methods
+	//
+	
+	protected List<DPWidget> horizontalNavigationList()
+	{
+		Vector<DPWidget> xs = new Vector<DPWidget>();
+		
+		for (DPWidget x: children)
+		{
+			if ( x != null )
+			{
+				xs.add( x );
+			}
+		}
+		
+		return xs;
 	}
 }

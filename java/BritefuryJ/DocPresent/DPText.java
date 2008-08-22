@@ -3,14 +3,16 @@ package BritefuryJ.DocPresent;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.event.KeyEvent;
 import java.awt.font.TextHitInfo;
 
+import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Metrics.HMetrics;
 import BritefuryJ.DocPresent.Metrics.VMetrics;
 import BritefuryJ.DocPresent.Util.TextVisual;
 import BritefuryJ.Math.Point2;
 
-public class DPText extends DPWidget implements TextVisual.TextVisualListener
+public class DPText extends DPContentLeaf implements TextVisual.TextVisualListener
 {
 	protected TextVisual visual;
 	protected Point2 textPos;
@@ -18,6 +20,7 @@ public class DPText extends DPWidget implements TextVisual.TextVisualListener
 	
 	public DPText(String text, Font font, Color colour)
 	{
+		super( text );
 		assert font != null;
 		
 		visual = new TextVisual( text, font, colour, this );
@@ -29,14 +32,20 @@ public class DPText extends DPWidget implements TextVisual.TextVisualListener
 	
 	public String getText()
 	{
-		return visual.getText();
+		return getContent();
 	}
 	
 	public void setText(String text)
 	{
-		visual.setText( text );
+		setContent( text );
 	}
 	
+	
+	public void contentChanged()
+	{
+		visual.setText( getContent() );
+	}
+
 	
 	public Font getFont()
 	{
@@ -89,6 +98,13 @@ public class DPText extends DPWidget implements TextVisual.TextVisualListener
 	}
 	
 	
+	public void drawCaret(Graphics2D graphics, Caret c)
+	{
+		visual.drawCaret( graphics, c.getMarker().getIndex() );
+	}
+
+
+
 	
 	protected HMetrics computeMinimumHMetrics()
 	{
@@ -121,5 +137,20 @@ public class DPText extends DPWidget implements TextVisual.TextVisualListener
 	public void textVisualRequestResize(TextVisual t)
 	{
 		queueResize();
+	}
+
+
+
+	public int getContentPositonForPoint(Point2 localPos)
+	{
+		TextHitInfo info = hitTest( localPos );
+		return info.getInsertionIndex();
+	}
+	
+	
+	protected boolean onKeyPress(Caret caret, KeyEvent event)
+	{
+		insertContent( caret.getMarker().getIndex(), String.valueOf( event.getKeyChar() ) );
+		return true;
 	}
 }

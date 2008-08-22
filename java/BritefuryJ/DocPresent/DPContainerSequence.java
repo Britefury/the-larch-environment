@@ -3,6 +3,7 @@ package BritefuryJ.DocPresent;
 import java.awt.Color;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Vector;
 
 import org.python.core.PySlice;
 
@@ -213,6 +214,18 @@ abstract public class DPContainerSequence extends DPContainer
 	
 	abstract protected void childListModified();
 
+	
+	
+	
+	Vector<DPWidget> getChildren()
+	{
+		Vector<DPWidget> xs = new Vector<DPWidget>();
+		for (ChildEntry entry: childEntries)
+		{
+			xs.add( entry.child );
+		}
+		return xs;
+	}
 
 
 

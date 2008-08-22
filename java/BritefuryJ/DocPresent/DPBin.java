@@ -1,6 +1,8 @@
 package BritefuryJ.DocPresent;
 
 import java.awt.Color;
+import java.util.Arrays;
+import java.util.List;
 
 import BritefuryJ.DocPresent.Metrics.HMetrics;
 import BritefuryJ.DocPresent.Metrics.VMetrics;
@@ -152,23 +154,17 @@ public class DPBin extends DPContainer
 	
 	
 	
-	protected void onChildResizeRequest(DPWidget child)
-	{
-		queueResize();
-	}
-	
-	
 	
 	//
 	// Focus navigation methods
 	//
 	
-	protected DPWidget[] horizontalNavigationList()
+	protected List<DPWidget> horizontalNavigationList()
 	{
 		if ( child != null )
 		{
 			DPWidget[] navList = { child };
-			return navList;
+			return Arrays.asList( navList );
 		}
 		else
 		{

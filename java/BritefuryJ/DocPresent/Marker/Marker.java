@@ -1,13 +1,13 @@
 package BritefuryJ.DocPresent.Marker;
 
-import BritefuryJ.DocPresent.DPLeaf;
+import BritefuryJ.DocPresent.DPContentLeaf;
 
 public class Marker
 {
 	public enum Bias { START, END };
 	
 	
-	protected DPLeaf widget;
+	protected DPContentLeaf widget;
 	protected int position;
 	protected Bias bias;
 	protected MarkerListener listener;
@@ -21,7 +21,7 @@ public class Marker
 		this.bias = Bias.START;
 	}
 	
-	public Marker(DPLeaf widget, int position, Bias bias)
+	public Marker(DPContentLeaf widget, int position, Bias bias)
 	{
 		this.widget = widget;
 		this.position = position;
@@ -36,7 +36,7 @@ public class Marker
 	
 	
 	
-	public DPLeaf getWidget()
+	public DPContentLeaf getWidget()
 	{
 		return widget;
 	}
@@ -65,7 +65,7 @@ public class Marker
 		changed();
 	}
 	
-	public void set(DPLeaf widget, int position, Bias bias)
+	public void set(DPContentLeaf widget, int position, Bias bias)
 	{
 		this.widget = widget;
 		this.position = position;
@@ -82,6 +82,13 @@ public class Marker
 	public static int getIndex(int position, Bias bias)
 	{
 		return bias == Bias.END  ?  position + 1  :  position;
+	}
+	
+	
+	
+	public boolean isValid()
+	{
+		return widget != null;
 	}
 	
 	

@@ -33,7 +33,10 @@ import javax.swing.SwingUtilities;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Vector2;
 import BritefuryJ.Math.Point2;
+import BritefuryJ.Math.Xform2;
 
+import BritefuryJ.DocPresent.Caret.Caret;
+import BritefuryJ.DocPresent.Caret.CaretListener;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Event.PointerScrollEvent;
@@ -48,7 +51,8 @@ import BritefuryJ.DocPresent.Metrics.VMetrics;
 
 
 
-public class DPPresentationArea extends DPBin {
+public class DPPresentationArea extends DPBin implements CaretListener
+{
 	public static class CannotGetGraphics2DException extends RuntimeException
 	{
 		private static final long serialVersionUID = 1L;
@@ -94,7 +98,12 @@ public class DPPresentationArea extends DPBin {
 			addMouseListener( this );
 			addMouseMotionListener( this );
 			addMouseWheelListener( this );
+			addKeyListener( this );
 			addHierarchyListener( this );
+			
+			
+			setFocusable( true );
+			setRequestFocusEnabled( true );
 		}
 		
 		
@@ -333,8 +342,6 @@ public class DPPresentationArea extends DPBin {
 	
 	private WeakHashMap<StateKeyListener, Object> stateKeyListeners;
 	
-	private DPWidget keyboardFocusTarget;
-	
 	private PresentationAreaComponent component;
 	
 	private Runnable immediateEventDispatcher;
@@ -342,6 +349,9 @@ public class DPPresentationArea extends DPBin {
 	private UndoListener undoListener;
 	
 	private boolean bAllocationRequired;
+	
+	private Caret caret;
+	private DPContentLeaf currentCaretLeaf;
 	
 	
 		
@@ -366,7 +376,13 @@ public class DPPresentationArea extends DPBin {
 		rootSpaceMouse = new Pointer();
 		inputTable = new InputTable( rootSpaceMouse );
 		
+		stateKeyListeners = new WeakHashMap<StateKeyListener, Object>();
+		
 		bAllocationRequired = true;	
+		
+		caret = new Caret();
+		caret.setCaretListener( this );
+		currentCaretLeaf = null;
 	}
 	
 	
@@ -624,41 +640,6 @@ public class DPPresentationArea extends DPBin {
 	
 	
 	//
-	// Focus methods
-	//
-	
-	protected void takeFocusGrab(DPWidget child)
-	{
-		if ( child != keyboardFocusTarget )
-		{
-			if ( keyboardFocusTarget != null )
-			{
-				DPWidget focusTarget = keyboardFocusTarget;
-				keyboardFocusTarget = null;
-				focusTarget.onLoseFocus();
-			}
-			
-			keyboardFocusTarget = child;
-			
-			keyboardFocusTarget.onGainFocus();
-		}
-	}
-	
-	
-	protected void relinquishFocusGrab(DPWidget child)
-	{
-		if ( child == keyboardFocusTarget )
-		{
-			DPWidget focusTarget = keyboardFocusTarget;
-			keyboardFocusTarget = null;
-			focusTarget.onLoseFocus();
-		}
-	}
-	
-	
-	
-	
-	//
 	// Hierarchy methods
 	//
 	
@@ -670,6 +651,24 @@ public class DPPresentationArea extends DPBin {
 	{
 	}
 	
+	
+	protected void structureChanged()
+	{
+		if ( !caret.isValid() )
+		{
+			Runnable putCaretAtStart = new Runnable()
+			{
+				public void run()
+				{
+					DPContentLeaf leaf = getLeftContentLeaf();
+					caret.setMarker( leaf.markerAtStart() );
+				}
+			};
+		
+			SwingUtilities.invokeLater( putCaretAtStart );
+		}
+	}
+
 	
 	
 	
@@ -713,12 +712,32 @@ public class DPPresentationArea extends DPBin {
 		
 		// Draw
 		handleDraw( graphics, new AABox2( topLeftRootSpace, bottomRightRootSpace) );
+		//graphics.setTransform( transform );
+		drawCaret( graphics );
 		
 		// Restore transform
 		graphics.setTransform( transform );
 		
 		// Emit any immediate events
 		emitImmediateEvents();
+	}
+	
+	
+	private void drawCaret(Graphics2D graphics)
+	{
+		if ( caret.isValid() )
+		{
+			DPContentLeaf widget = caret.getWidget();
+			
+			if ( widget != null )
+			{
+				Xform2 x = widget.getTransformRelativeToRoot();
+				AffineTransform current = graphics.getTransform();
+				x.apply( graphics );
+				widget.drawCaret( graphics, caret );
+				graphics.setTransform( current );
+			}
+		}
 	}
 	
 	
@@ -937,9 +956,9 @@ public class DPPresentationArea extends DPBin {
 			}
 			else
 			{
-				if ( keyboardFocusTarget != null )
+				if ( caret.isValid() )
 				{
-					keyboardFocusTarget.onKeyPress( event );
+					caret.getMarker().getWidget().onKeyPress( caret, event );
 					emitImmediateEvents();
 					return true;
 				}
@@ -988,9 +1007,9 @@ public class DPPresentationArea extends DPBin {
 			}
 			else
 			{
-				if ( keyboardFocusTarget != null )
+				if ( caret.isValid() )
 				{
-					keyboardFocusTarget.onKeyRelease( event );
+					caret.getMarker().getWidget().onKeyRelease( caret, event );
 					emitImmediateEvents();
 					return true;
 				}
@@ -1011,31 +1030,24 @@ public class DPPresentationArea extends DPBin {
 		int keyCode = event.getKeyCode();
 		if ( keyCode == KeyEvent.VK_LEFT  ||  keyCode == KeyEvent.VK_RIGHT  ||  keyCode == KeyEvent.VK_UP  ||  keyCode == KeyEvent.VK_DOWN  ||  keyCode == KeyEvent.VK_HOME  ||  keyCode == KeyEvent.VK_END )
 		{
-			if ( keyboardFocusTarget != null )
+			if ( caret.isValid() )
 			{
-				if ( keyboardFocusTarget.handleMotionKeyPress( event, modifiers ) )
+				DPContentLeaf leaf = caret.getMarker().getWidget();
+				if ( keyCode == KeyEvent.VK_LEFT )
 				{
-					return true;
+					leaf.moveMarkerLeft( caret.getMarker(), false );
 				}
-				else
+				else if ( keyCode == KeyEvent.VK_RIGHT )
 				{
-					if ( keyCode == KeyEvent.VK_LEFT )
-					{
-						keyboardFocusTarget.caretLeft( false );
-					}
-					else if ( keyCode == KeyEvent.VK_RIGHT )
-					{
-						keyboardFocusTarget.caretRight( false );
-					}
-					else if ( keyCode == KeyEvent.VK_UP )
-					{
-						keyboardFocusTarget.caretUp();
-					}
-					else if ( keyCode == KeyEvent.VK_DOWN )
-					{
-						keyboardFocusTarget.caretDown();
-					}
-					return true;
+					leaf.moveMarkerRight( caret.getMarker(), false );
+				}
+				else if ( keyCode == KeyEvent.VK_UP )
+				{
+					leaf.moveMarkerUp( caret.getMarker() );
+				}
+				else if ( keyCode == KeyEvent.VK_DOWN )
+				{
+					leaf.moveMarkerDown( caret.getMarker() );
 				}
 			}
 			return true;
@@ -1166,4 +1178,36 @@ public class DPPresentationArea extends DPBin {
 		return g2;
 	}
 	
+	
+	
+	
+	//
+	//
+	// CARET METHODS
+	//
+	//
+	
+	public void caretChanged(Caret c)
+	{
+		assert c == caret;
+		
+		DPContentLeaf caretLeaf = c.getWidget();
+		
+		if ( caretLeaf != currentCaretLeaf )
+		{
+			if ( currentCaretLeaf != null )
+			{
+				currentCaretLeaf.handleCaretLeave( caret );
+			}
+			
+			currentCaretLeaf = caretLeaf;
+			
+			if ( currentCaretLeaf != null )
+			{
+				currentCaretLeaf.handleCaretEnter( caret );
+			}
+		}
+		
+		queueFullRedraw();
+	}
 }

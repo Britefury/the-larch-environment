@@ -2,6 +2,7 @@ package BritefuryJ.DocPresent;
 
 import java.awt.Color;
 import java.lang.Math;
+import java.util.List;
 
 import BritefuryJ.DocPresent.Metrics.HMetrics;
 import BritefuryJ.DocPresent.Metrics.Metrics;
@@ -313,5 +314,16 @@ public class DPHBox extends DPAbstractBox
 				}
 			}
 		}
+	}
+	
+	
+	
+	//
+	// Focus navigation methods
+	//
+	
+	protected List<DPWidget> horizontalNavigationList()
+	{
+		return getChildren();
 	}
 }
