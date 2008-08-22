@@ -2,6 +2,9 @@ package BritefuryJ.DocPresent;
 
 import java.awt.Color;
 
+import BritefuryJ.DocPresent.Metrics.HMetrics;
+import BritefuryJ.DocPresent.Metrics.VMetrics;
+
 
 public class DPBin extends DPContainer
 {
@@ -41,8 +44,8 @@ public class DPBin extends DPContainer
 			if ( this.child != null )
 			{
 				ChildEntry entry = childToEntry.get( this.child );
-				childEntries.remove( entry );
 				unregisterChildEntry( entry );
+				childEntries.remove( entry );
 			}
 			
 			this.child = child;

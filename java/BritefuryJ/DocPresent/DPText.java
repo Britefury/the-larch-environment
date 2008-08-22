@@ -5,6 +5,8 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.font.TextHitInfo;
 
+import BritefuryJ.DocPresent.Metrics.HMetrics;
+import BritefuryJ.DocPresent.Metrics.VMetrics;
 import BritefuryJ.DocPresent.Util.TextVisual;
 import BritefuryJ.Math.Point2;
 

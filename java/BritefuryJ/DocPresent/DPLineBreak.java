@@ -1,6 +1,6 @@
 package BritefuryJ.DocPresent;
 
-public class DPLineBreak extends DPBin
+public class DPLineBreak extends DPBin implements LineBreakInterface
 {
 	private int lineBreakPriority;
 	
@@ -27,5 +27,12 @@ public class DPLineBreak extends DPBin
 	public int getLineBreakPriority()
 	{
 		return lineBreakPriority;
+	}
+	
+	
+	
+	public LineBreakInterface getLineBreakInterface()
+	{
+		return this;
 	}
 }

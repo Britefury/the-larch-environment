@@ -1,5 +1,8 @@
 package BritefuryJ.DocPresent;
 
+import BritefuryJ.DocPresent.Metrics.HMetrics;
+import BritefuryJ.DocPresent.Metrics.VMetrics;
+
 public class DPEmpty extends DPWidget
 {
 	protected HMetrics computeMinimumHMetrics()

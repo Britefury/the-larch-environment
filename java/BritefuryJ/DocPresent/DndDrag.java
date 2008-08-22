@@ -9,7 +9,8 @@ import BritefuryJ.Math.Point2;
 
 
 
-public class DndDrag {
+public class DndDrag
+{
 	protected PointerInterface pointer;
 	
 	protected int button;

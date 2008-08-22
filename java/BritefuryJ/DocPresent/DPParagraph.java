@@ -5,6 +5,10 @@ import java.awt.Color;
 import java.util.List;
 import java.util.Vector;
 
+import BritefuryJ.DocPresent.Metrics.HMetrics;
+import BritefuryJ.DocPresent.Metrics.Metrics;
+import BritefuryJ.DocPresent.Metrics.VMetrics;
+import BritefuryJ.DocPresent.Metrics.VMetricsTypeset;
 import BritefuryJ.Math.Point2;
 
 
@@ -357,7 +361,7 @@ public class DPParagraph extends DPContainerSequence
 			{
 				ParagraphChildEntry childEntry = (ParagraphChildEntry)childEntries.get( i );
 				DPWidget child = childEntry.child;
-				if ( child.isLineBreak() )
+				if ( child.getLineBreakInterface() != null )
 				{
 					width = Math.max( width, lineWidth );
 					advance = Math.max( advance, lineX );
@@ -375,7 +379,7 @@ public class DPParagraph extends DPContainerSequence
 					{
 						// Spacing not appended to last child
 						
-						if ( !childEntries.get( i+1 ).child.isLineBreak() )
+						if ( childEntries.get( i+1 ).child.getLineBreakInterface() != null )
 						{
 							// Spacing not applied before a line break
 							chm = chm.minSpacing( spacing );
@@ -431,21 +435,24 @@ public class DPParagraph extends DPContainerSequence
 		int lineStartIndex = 0;
 		double lineWidth = 0.0;
 		double lineX = 0.0;
-		DPWidget lineBestBreak = null;
-		int lineBestBreakIndex = -1;
+		DPWidget bestLineBreakWidget = null;
+		LineBreakInterface bestLineBreakInterface = null;
+		int bestLineBreakIndex = -1;
 		
 		for (int i = 0; i < childEntries.size(); i++)
 		{
 			// Get the child
 			ParagraphChildEntry childEntry = (ParagraphChildEntry)childEntries.get( i );
 			DPWidget child = childEntry.child;
-			if ( child.isLineBreak() )
+			LineBreakInterface lineBreak = child.getLineBreakInterface();
+			if ( lineBreak != null )
 			{
-				// Note the line break down
-				if ( lineBestBreak == null  ||  lineBestBreak.getLineBreakPriority()  <=  child.getLineBreakPriority() )
+				// Keep track of the best line break candidate
+				if ( bestLineBreakWidget == null  ||  bestLineBreakInterface.getLineBreakPriority()  <=  lineBreak.getLineBreakPriority() )
 				{
-					lineBestBreak = child;
-					lineBestBreakIndex = i;
+					bestLineBreakWidget = child;
+					bestLineBreakInterface = lineBreak;
+					bestLineBreakIndex = i;
 				}
 			}
 			
@@ -465,23 +472,23 @@ public class DPParagraph extends DPContainerSequence
 			
 			
 			// A line break is required if the @lineWidth has gone over @allocation
-			if ( lineWidth > allocation  &&  lineBestBreak != null )
+			if ( lineWidth > allocation  &&  bestLineBreakWidget != null )
 			{
-				if ( lineBestBreakIndex > lineStartIndex )
+				if ( bestLineBreakIndex > lineStartIndex )
 				{
 					// Build a new line
-					lines.add( new Line( childEntries.subList( lineStartIndex, lineBestBreakIndex ) ) );
+					lines.add( new Line( childEntries.subList( lineStartIndex, bestLineBreakIndex ) ) );
 				}
 				
 				// We want the for-loop to return to the break position
-				i = lineBestBreakIndex;		// @i will be @lineBestBreakIndex at the beginning of the next loop
+				i = bestLineBreakIndex;		// @i will be @lineBestBreakIndex at the beginning of the next loop
 
 				// Start the next line
-				lineStartIndex = lineBestBreakIndex + 1;
+				lineStartIndex = bestLineBreakIndex + 1;
 				lineWidth = 0.0;
 				lineX = indentation;
-				lineBestBreak = null;
-				lineBestBreakIndex = -1;
+				bestLineBreakWidget = null;
+				bestLineBreakIndex = -1;
 			}
 		}
 	

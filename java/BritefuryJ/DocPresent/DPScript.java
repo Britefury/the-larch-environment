@@ -3,6 +3,10 @@ package BritefuryJ.DocPresent;
 import java.awt.Color;
 import java.util.Arrays;
 
+import BritefuryJ.DocPresent.Metrics.HMetrics;
+import BritefuryJ.DocPresent.Metrics.VMetrics;
+import BritefuryJ.DocPresent.Metrics.VMetricsTypeset;
+
 
 public class DPScript extends DPContainer
 {
@@ -81,8 +85,8 @@ public class DPScript extends DPContainer
 			if ( existingChild != null )
 			{
 				ChildEntry entry = childToEntry.get( existingChild );
-				childEntries.remove( entry );
 				unregisterChildEntry( entry );
+				childEntries.remove( entry );
 			}
 			
 			children[slot] = child;

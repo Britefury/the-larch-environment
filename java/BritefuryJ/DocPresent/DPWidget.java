@@ -11,6 +11,8 @@ import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Event.PointerScrollEvent;
 import BritefuryJ.DocPresent.Input.PointerInterface;
+import BritefuryJ.DocPresent.Metrics.HMetrics;
+import BritefuryJ.DocPresent.Metrics.VMetrics;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
@@ -32,7 +34,8 @@ abstract public class DPWidget
 	//
 	//
 	
-	public static class CouldNotFindWidgetAncestorException extends RuntimeException {
+	public static class CouldNotFindWidgetAncestorException extends RuntimeException
+	{
 		static final long serialVersionUID = 0L;
 		
 		public CouldNotFindWidgetAncestorException()
@@ -41,7 +44,8 @@ abstract public class DPWidget
 	}
 	
 	
-	public static class DndDisabledException extends RuntimeException {
+	public static class DndDisabledException extends RuntimeException
+	{
 		static final long serialVersionUID = 0L;
 		
 		public DndDisabledException()
@@ -50,7 +54,8 @@ abstract public class DPWidget
 	}
 
 	
-	public static class DndOperationAlreadyInList extends RuntimeException {
+	public static class DndOperationAlreadyInList extends RuntimeException
+	{
 		static final long serialVersionUID = 0L;
 		
 		public DndOperationAlreadyInList()
@@ -59,7 +64,8 @@ abstract public class DPWidget
 	}
 
 	
-	public static class DndOperationNotInList extends RuntimeException {
+	public static class DndOperationNotInList extends RuntimeException
+	{
 		static final long serialVersionUID = 0L;
 		
 		public DndOperationNotInList()
@@ -1037,7 +1043,7 @@ abstract public class DPWidget
 	
 	
 	
-	protected void cursorLeft(boolean bItemStep)
+	protected void caretLeft(boolean bItemStep)
 	{
 		DPWidget left = getFocusLeafToLeft();
 		if ( left != null )
@@ -1054,7 +1060,7 @@ abstract public class DPWidget
 		}
 	}
 	
-	protected void cursorRight(boolean bItemStep)
+	protected void caretRight(boolean bItemStep)
 	{
 		DPWidget right = getFocusLeafToRight();
 		if ( right != null )
@@ -1072,7 +1078,7 @@ abstract public class DPWidget
 	}
 	
 	
-	protected void cursorToLeftChild()
+	protected void caretToLeftChild()
 	{
 		DPWidget[] navList = horizontalNavigationList();
 		if ( navList != null )
@@ -1082,7 +1088,7 @@ abstract public class DPWidget
 		}
 	}
 	
-	protected void cursorToRightChild()
+	protected void caretToRightChild()
 	{
 		DPWidget[] navList = horizontalNavigationList();
 		if ( navList != null )
@@ -1093,7 +1099,7 @@ abstract public class DPWidget
 	}
 	
 	
-	protected void cursorToParent()
+	protected void caretToParent()
 	{
 		if ( parent != null )
 		{
@@ -1104,7 +1110,7 @@ abstract public class DPWidget
 	
 	
 	
-	protected void cursorUp()
+	protected void caretUp()
 	{
 		DPWidget above = getFocusLeafAbove();
 		if ( above != null )
@@ -1115,7 +1121,7 @@ abstract public class DPWidget
 		}
 	}
 	
-	protected void cursorDown()
+	protected void caretDown()
 	{
 		DPWidget below = getFocusLeafBelow();
 		if ( below != null )
@@ -1177,7 +1183,7 @@ abstract public class DPWidget
 			{
 				for (int i = navList.length - 1; i >= 0; i--)
 				{
-					DPWidget l = navList[i].getLeftFocusLeaf();
+					DPWidget l = navList[i].getRightFocusLeaf();
 					if ( l != null )
 					{
 						return l;
@@ -1463,13 +1469,26 @@ abstract public class DPWidget
 	//
 	//
 	
-	public int getLineBreakPriority()
+	public LineBreakInterface getLineBreakInterface()
 	{
-		return -1;
+		return null;
 	}
 	
-	public boolean isLineBreak()
+	
+	
+	//
+	//
+	// CONTENT METHODS
+	//
+	//
+	
+	public String getContent()
 	{
-		return getLineBreakPriority() >= 0;
+		return "";
+	}
+	
+	public int getContentLength()
+	{
+		return 0;
 	}
 }

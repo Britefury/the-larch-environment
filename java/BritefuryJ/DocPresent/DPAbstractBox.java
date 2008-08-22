@@ -3,6 +3,10 @@ package BritefuryJ.DocPresent;
 import java.awt.Color;
 import java.util.List;
 
+import BritefuryJ.DocPresent.Metrics.HMetrics;
+import BritefuryJ.DocPresent.Metrics.Metrics;
+import BritefuryJ.DocPresent.Metrics.VMetrics;
+
 
 
 abstract public class DPAbstractBox extends DPContainerSequence
