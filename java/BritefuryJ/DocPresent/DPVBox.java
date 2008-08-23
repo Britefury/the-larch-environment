@@ -1,6 +1,5 @@
 package BritefuryJ.DocPresent;
 
-import java.awt.Color;
 import java.lang.Math;
 import java.util.List;
 
@@ -8,6 +7,7 @@ import BritefuryJ.DocPresent.Metrics.HMetrics;
 import BritefuryJ.DocPresent.Metrics.Metrics;
 import BritefuryJ.DocPresent.Metrics.VMetrics;
 import BritefuryJ.DocPresent.Metrics.VMetricsTypeset;
+import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 import BritefuryJ.Math.Point2;
 
 
@@ -25,59 +25,21 @@ public class DPVBox extends DPAbstractBox
 	}
 	
 	
-	Typesetting typesetting;
-	Alignment alignment;
-	
-	
-	
-	
+
 	
 	public DPVBox()
 	{
-		this( Typesetting.NONE, Alignment.CENTRE, 0.0, false, 0.0, null );
+		this( VBoxStyleSheet.defaultStyleSheet );
 	}
 	
-	public DPVBox(Typesetting typesetting, Alignment alignment, double spacing, boolean bExpand, double padding)
+	public DPVBox(VBoxStyleSheet syleSheet)
 	{
-		this( typesetting, alignment, spacing, bExpand, padding, null );
-	}
-	
-	public DPVBox(Typesetting typesetting, Alignment alignment, double spacing, boolean bExpand, double padding, Color backgroundColour)
-	{
-		super( spacing, bExpand, padding, backgroundColour );
-		
-		this.typesetting = typesetting;
-		this.alignment = alignment;
+		super( syleSheet );
 	}
 	
 	
 	
 	
-	public Typesetting getTypesetting()
-	{
-		return typesetting;
-	}
-
-	public void setAlignment(Typesetting typesetting)
-	{
-		this.typesetting = typesetting;
-		queueResize();
-	}
-
-	
-	public Alignment getAlignment()
-	{
-		return alignment;
-	}
-
-	public void setAlignment(Alignment alignment)
-	{
-		this.alignment = alignment;
-		queueResize();
-	}
-
-	
-
 	public void append(DPWidget child, boolean bExpand, double padding)
 	{
 		appendChildEntry( new BoxChildEntry( child, bExpand, padding ) );
@@ -93,7 +55,7 @@ public class DPVBox extends DPAbstractBox
 	
 	protected BoxChildEntry createChildEntryForChild(DPWidget child)
 	{
-		return new BoxChildEntry( child, bExpand, padding );
+		return new BoxChildEntry( child, getExpand(), getPadding() );
 	}
 	
 	
@@ -148,6 +110,7 @@ public class DPVBox extends DPAbstractBox
 	{
 		VMetrics topMetrics = childVMetrics[0], bottomMetrics = childVMetrics[childVMetrics.length-1];
 
+		Typesetting typesetting = getTypesetting();
 		if ( typesetting == Typesetting.NONE )
 		{
 			return new VMetrics( height, vspacing );
@@ -204,6 +167,8 @@ public class DPVBox extends DPAbstractBox
 		}
 		else
 		{
+			double spacing = getSpacing();
+			
 			// Accumulate the height required for all the children
 			double height = 0.0;
 			double y = 0.0;
@@ -259,6 +224,8 @@ public class DPVBox extends DPAbstractBox
 	protected void allocateContentsX(double allocation)
 	{
 		super.allocateContentsX( allocation );
+		
+		Alignment alignment = getAlignment();
 
 		for (ChildEntry baseEntry: childEntries)
 		{
@@ -286,6 +253,8 @@ public class DPVBox extends DPAbstractBox
 	protected void allocateContentsY(double allocation)
 	{
 		super.allocateContentsY( allocation );
+		
+		double spacing = getSpacing();
 		
 		Metrics[] allocated = VMetrics.allocateSpacePacked( getChildrenMinimumVMetrics(), getChildrenPreferredVMetrics(), getChildrenPackFlags(), allocation );
 		
@@ -324,5 +293,21 @@ public class DPVBox extends DPAbstractBox
 	protected List<DPWidget> verticalNavigationList()
 	{
 		return getChildren();
+	}
+
+
+
+	
+	
+	
+	
+	protected Typesetting getTypesetting()
+	{
+		return ((VBoxStyleSheet)styleSheet).getTypesetting();
+	}
+
+	protected Alignment getAlignment()
+	{
+		return ((VBoxStyleSheet)styleSheet).getAlignment();
 	}
 }

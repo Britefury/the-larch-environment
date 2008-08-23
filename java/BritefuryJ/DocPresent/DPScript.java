@@ -1,6 +1,5 @@
 package BritefuryJ.DocPresent;
 
-import java.awt.Color;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
@@ -8,6 +7,7 @@ import java.util.Vector;
 import BritefuryJ.DocPresent.Metrics.HMetrics;
 import BritefuryJ.DocPresent.Metrics.VMetrics;
 import BritefuryJ.DocPresent.Metrics.VMetricsTypeset;
+import BritefuryJ.DocPresent.StyleSheets.ScriptStyleSheet;
 
 
 public class DPScript extends DPContainer
@@ -36,23 +36,17 @@ public class DPScript extends DPContainer
 	protected HMetrics mainMinH, mainPrefH;
 	protected HMetrics rightMinH, rightPrefH;
 	protected double superscriptAscent, mainAscent, subscriptAscent;
-	protected double spacing, scriptSpacing;
 	
 	
 	
 	public DPScript()
 	{
-		this( 1.0, 1.0, null );
+		this( ScriptStyleSheet.defaultStyleSheet );
 	}
 	
-	public DPScript(double spacing, double scriptSpacing)
+	public DPScript(ScriptStyleSheet styleSheet)
 	{
-		this( spacing, scriptSpacing, null );
-	}
-	
-	public DPScript(double spacing, double scriptSpacing, Color backgroundColour)
-	{
-		super( backgroundColour );
+		super( styleSheet );
 		
 		children = new DPWidget[NUMCHILDREN];
 		leftMinH = new HMetrics();
@@ -62,9 +56,6 @@ public class DPScript extends DPContainer
 		superscriptAscent = 0.0;
 		mainAscent = 0.0;
 		subscriptAscent = 0.0;
-		
-		this.spacing = spacing;
-		this.scriptSpacing = scriptSpacing;
 	}
 
 	
@@ -406,12 +397,12 @@ public class DPScript extends DPContainer
 
 		if ( hasLeftChild()   &&   ( hasMainChild()  ||  hasRightChild() ) )
 		{
-			left = left.minSpacing( spacing );
+			left = left.minSpacing( getSpacing() );
 		}
 		
 		if ( hasMainChild()  &&  hasRightChild() )
 		{
-			main = main.minSpacing( spacing );
+			main = main.minSpacing( getSpacing() );
 		}
 		
 		
@@ -456,7 +447,7 @@ public class DPScript extends DPContainer
 		
 		if ( hasSuperscriptChild()  &&  hasSubscriptChild() )
 		{
-			q = scriptSpacing;
+			q = getScriptSpacing();
 			
 			// Start with f = 0
 			f = 0.0;
@@ -645,7 +636,7 @@ public class DPScript extends DPContainer
 		
 		if ( hasLeftChild() )
 		{
-			leftH = leftH.minSpacing( spacing );
+			leftH = leftH.minSpacing( getSpacing() );
 		}
 		
 		x += leftH.width + leftH.hspacing;
@@ -655,7 +646,7 @@ public class DPScript extends DPContainer
 		if ( children[MAIN] != null )
 		{
 			allocateChildX( children[MAIN], x, mainH.width );
-			mainH = mainH.minSpacing( spacing );
+			mainH = mainH.minSpacing( getSpacing() );
 		}
 		
 		x += mainH.width + mainH.hspacing;
@@ -748,5 +739,22 @@ public class DPScript extends DPContainer
 		}
 		
 		return xs;
+	}
+	
+	
+	
+	
+	//
+	// STYLESHEET METHODS
+	//
+	
+	protected double getSpacing()
+	{
+		return ((ScriptStyleSheet)styleSheet).getSpacing();
+	}
+
+	protected double getScriptSpacing()
+	{
+		return ((ScriptStyleSheet)styleSheet).getScriptSpacing();
 	}
 }

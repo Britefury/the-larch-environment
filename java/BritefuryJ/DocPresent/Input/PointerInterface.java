@@ -7,7 +7,8 @@ import BritefuryJ.Math.Xform2;
 
 
 
-public abstract class PointerInterface {
+public abstract class PointerInterface
+{
 	abstract public Point2 getLocalPos();
 	abstract public int getModifiers();
 	
@@ -29,9 +30,9 @@ public abstract class PointerInterface {
 	}
 	
 	
-	public LocalPointerInterface transformed(Xform2 xToLocal)
+	public LocalPointerInterface transformed(Xform2 parentToX)
 	{
-		return new LocalPointerInterface( this, xToLocal );
+		return new LocalPointerInterface( this, parentToX );
 	}
 	
 	

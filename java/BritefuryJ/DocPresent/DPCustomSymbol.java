@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 
 import BritefuryJ.DocPresent.Metrics.HMetrics;
 import BritefuryJ.DocPresent.Metrics.VMetrics;
+import BritefuryJ.DocPresent.StyleSheets.CustomSymbolStyleSheet;
 
 
 public class DPCustomSymbol extends DPWidget
@@ -18,14 +19,19 @@ public class DPCustomSymbol extends DPWidget
 	
 	
 	protected SymbolInterface symbol;
-	protected Color colour;
 	
 	
 	
-	public DPCustomSymbol(SymbolInterface symbol, Color colour)
+	public DPCustomSymbol(SymbolInterface symbol)
 	{
+		this( CustomSymbolStyleSheet.defaultStyleSheet, symbol );
+	}
+	
+	public DPCustomSymbol(CustomSymbolStyleSheet styleSheet, SymbolInterface symbol)
+	{
+		super( styleSheet );
+		
 		this.symbol = symbol;
-		this.colour = colour;
 		
 		queueResize();
 	}
@@ -43,23 +49,11 @@ public class DPCustomSymbol extends DPWidget
 	}
 	
 	
-	public Color getColour()
-	{
-		return colour;
-	}
-	
-	public void setColour(Color colour)
-	{
-		this.colour = colour;
-		queueFullRedraw();
-	}
-	
-	
 	protected void draw(Graphics2D graphics)
 	{
 		super.draw( graphics );
 		
-		graphics.setColor( colour );
+		graphics.setColor( getColour() );
 		symbol.draw( graphics );
 	}
 	
@@ -84,6 +78,12 @@ public class DPCustomSymbol extends DPWidget
 	protected VMetrics computePreferredVMetrics()
 	{
 		return symbol.computeVMetrics();
+	}
+	
+	
+	protected Color getColour()
+	{
+		return ((CustomSymbolStyleSheet)styleSheet).getColour();
 	}
 }
 

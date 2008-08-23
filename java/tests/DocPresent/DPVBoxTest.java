@@ -8,14 +8,18 @@ import javax.swing.JFrame;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPPresentationArea;
 import BritefuryJ.DocPresent.DPVBox;
+import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
 public class DPVBoxTest {
 	protected static DPText[] makeTexts(String header)
 	{
-		DPText h = new DPText( header, new Font( "Sans serif", Font.BOLD, 18 ), Color.BLACK );
-		DPText t0 = new DPText( "Hello", new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );
-		DPText t1 = new DPText( "World", new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );
-		DPText t2 = new DPText( "Foo", new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );
+		TextStyleSheet t12 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );
+		TextStyleSheet t18 = new TextStyleSheet( new Font( "Sans serif", Font.BOLD, 18 ), Color.BLACK );
+		DPText h = new DPText( t18, header );
+		DPText t0 = new DPText( t12, "Hello" );
+		DPText t1 = new DPText( t12, "World" );
+		DPText t2 = new DPText( t12, "Foo" );
 		
 		DPText[] texts = { h, t0, t1, t2 };
 		return texts;
@@ -36,19 +40,24 @@ public class DPVBoxTest {
 		DPText[] c2 = makeTexts( "RIGHT" );
 		DPText[] c3 = makeTexts( "EXPAND" );
 		
-		DPVBox b0 = new DPVBox( DPVBox.Typesetting.NONE, DPVBox.Alignment.LEFT, 0.0, false, 0.0 );
+		VBoxStyleSheet b0s = new VBoxStyleSheet( DPVBox.Typesetting.NONE, DPVBox.Alignment.LEFT, 0.0, false, 0.0 );
+		DPVBox b0 = new DPVBox( b0s );
 		b0.extend( c0 );
 		
-		DPVBox b1 = new DPVBox( DPVBox.Typesetting.NONE, DPVBox.Alignment.CENTRE, 0.0, false, 0.0 );
+		VBoxStyleSheet b1s = new VBoxStyleSheet( DPVBox.Typesetting.NONE, DPVBox.Alignment.CENTRE, 0.0, false, 0.0 );
+		DPVBox b1 = new DPVBox( b1s );
 		b1.extend( c1 );
 		
-		DPVBox b2 = new DPVBox( DPVBox.Typesetting.NONE, DPVBox.Alignment.RIGHT, 0.0, false, 0.0 );
+		VBoxStyleSheet b2s = new VBoxStyleSheet( DPVBox.Typesetting.NONE, DPVBox.Alignment.RIGHT, 0.0, false, 0.0 );
+		DPVBox b2 = new DPVBox( b2s );
 		b2.extend( c2 );
 		
-		DPVBox b3 = new DPVBox( DPVBox.Typesetting.NONE, DPVBox.Alignment.EXPAND, 0.0, true, 0.0 );
+		VBoxStyleSheet b3s = new VBoxStyleSheet( DPVBox.Typesetting.NONE, DPVBox.Alignment.EXPAND, 0.0, true, 0.0 );
+		DPVBox b3 = new DPVBox( b3s );
 		b3.extend( c3 );
 		
-		DPVBox box = new DPVBox( DPVBox.Typesetting.NONE, DPVBox.Alignment.EXPAND, 20.0, false, 0.0 );
+		VBoxStyleSheet boxS = new VBoxStyleSheet( DPVBox.Typesetting.NONE, DPVBox.Alignment.EXPAND, 20.0, false, 0.0 );
+		DPVBox box = new DPVBox( boxS );
 		box.append( b0 );
 		box.append( b1 );
 		box.append( b2 );

@@ -1,11 +1,11 @@
 package BritefuryJ.DocPresent;
 
-import java.awt.Color;
 import java.util.Arrays;
 import java.util.List;
 
 import BritefuryJ.DocPresent.Metrics.HMetrics;
 import BritefuryJ.DocPresent.Metrics.VMetrics;
+import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 
 
 public class DPBin extends DPContainer
@@ -17,12 +17,12 @@ public class DPBin extends DPContainer
 	
 	public DPBin()
 	{
-		this( null );
+		this( ContainerStyleSheet.defaultStyleSheet );
 	}
-	
-	public DPBin(Color backgroundColour)
+
+	public DPBin(ContainerStyleSheet styleSheet)
 	{
-		super( backgroundColour );
+		super( styleSheet );
 		
 		childScale = 1.0;
 	}

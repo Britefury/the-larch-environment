@@ -4,7 +4,8 @@ import BritefuryJ.Math.Point2;
 
 
 
-public class Pointer extends PointerInterface {
+public class Pointer extends PointerInterface
+{
 	protected Point2 localPos;
 	protected int modifiers;
 	

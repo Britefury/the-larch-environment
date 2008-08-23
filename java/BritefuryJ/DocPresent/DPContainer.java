@@ -13,6 +13,7 @@ import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Event.PointerScrollEvent;
 import BritefuryJ.DocPresent.Input.PointerInterface;
+import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
@@ -56,39 +57,25 @@ public abstract class DPContainer extends DPWidget {
 	protected ChildEntry pressGrabChildEntry;
 	protected int pressGrabButton;
 	protected HashMap<PointerInterface, ChildEntry> pointerChildEntryTable, pointerDndChildEntryTable;
-	protected Color backgroundColour;
 	
 	
 	
 	public DPContainer()
 	{
-		this( null );
+		this( ContainerStyleSheet.defaultStyleSheet );
 	}
-	
-	public DPContainer(Color backgroundColour)
+
+	public DPContainer(ContainerStyleSheet styleSheet)
 	{
+		super( styleSheet );
+		
 		childEntries = new Vector<ChildEntry>();
 		childToEntry = new HashMap<DPWidget, ChildEntry>();
 		
 		pointerChildEntryTable = new HashMap<PointerInterface, ChildEntry>();
 		pointerDndChildEntryTable = new HashMap<PointerInterface, ChildEntry>();
-		
-		this.backgroundColour = backgroundColour;
 	}
 	
-	
-	
-	public Color getBackgroundColour()
-	{
-		return backgroundColour;
-	}
-	
-	public void setBackgroundColour(Color colour)
-	{
-		backgroundColour = colour;
-		queueFullRedraw();
-	}
-
 	
 	
 	public boolean hasChild(DPWidget child)
@@ -105,14 +92,14 @@ public abstract class DPContainer extends DPWidget {
 	}
 	
 	
-	public Xform2 getChildTransformRelativeToAncestor(DPWidget child, DPWidget ancestor, Xform2 x)
+	protected Xform2 getChildTransformRelativeToAncestor(DPWidget child, DPWidget ancestor, Xform2 x)
 	{
 		ChildEntry entry = childToEntry.get( child );
 		Xform2 localX = x.concat( entry.childToContainerXform );
 		return getTransformRelativeToAncestor( ancestor, localX );
 	}
 
-	public Point2 getChildLocalPointRelativeToAncestor(DPWidget child, DPWidget ancestor, Point2 p)
+	protected Point2 getChildLocalPointRelativeToAncestor(DPWidget child, DPWidget ancestor, Point2 p)
 	{
 		ChildEntry entry = childToEntry.get( child );
 		Point2 localP = entry.childToContainerXform.transform( p );
@@ -341,7 +328,7 @@ public abstract class DPContainer extends DPWidget {
 			ChildEntry entry = getChildEntryAtLocalPoint( event.pointer.getLocalPos() );
 			if ( entry != null )
 			{
-				boolean bHandled = entry.child.handleButtonDown( event.transformed( entry.containerToChildXform) );
+				boolean bHandled = entry.child.handleButtonDown( event.transformed( entry.containerToChildXform ) );
 				if ( bHandled )
 				{
 					pressGrabChildEntry = entry;
@@ -563,6 +550,7 @@ public abstract class DPContainer extends DPWidget {
 	
 	protected void drawBackground(Graphics2D graphics)
 	{
+		Color backgroundColour = getBackgroundColour();
 		if ( backgroundColour != null )
 		{
 			graphics.setColor( backgroundColour );
@@ -654,7 +642,7 @@ public abstract class DPContainer extends DPWidget {
 		return null;
 	}
 
-	protected DPContentLeaf getTopOrBottomFocusLeaf(boolean bBottom, Point2 cursorPosInRootSpace)
+	protected DPContentLeaf getTopOrBottomContentLeaf(boolean bBottom, Point2 cursorPosInRootSpace)
 	{
 		List<DPWidget> navList = verticalNavigationList();
 		if ( navList != null )
@@ -663,7 +651,7 @@ public abstract class DPContainer extends DPWidget {
 			{
 				for (int i = navList.size() - 1; i >= 0; i--)
 				{
-					DPContentLeaf l = navList.get( i ).getTopOrBottomFocusLeaf( bBottom, cursorPosInRootSpace );
+					DPContentLeaf l = navList.get( i ).getTopOrBottomContentLeaf( bBottom, cursorPosInRootSpace );
 					if ( l != null )
 					{
 						return l;
@@ -674,7 +662,7 @@ public abstract class DPContainer extends DPWidget {
 			{
 				for (DPWidget w: navList)
 				{
-					DPContentLeaf l = w.getTopOrBottomFocusLeaf( bBottom, cursorPosInRootSpace );
+					DPContentLeaf l = w.getTopOrBottomContentLeaf( bBottom, cursorPosInRootSpace );
 					if ( l != null )
 					{
 						return l;
@@ -698,7 +686,7 @@ public abstract class DPContainer extends DPWidget {
 					double upper = item.getLocalPointRelativeToRoot( bounds.getUpper() ).x;
 					if ( cursorPosInRootSpace.x >=  lower  &&  cursorPosInRootSpace.x <= upper )
 					{
-						DPContentLeaf l = item.getTopOrBottomFocusLeaf( bBottom, cursorPosInRootSpace );
+						DPContentLeaf l = item.getTopOrBottomContentLeaf( bBottom, cursorPosInRootSpace );
 						if ( l != null )
 						{
 							return l;
@@ -709,10 +697,12 @@ public abstract class DPContainer extends DPWidget {
 						double distance;
 						if ( cursorPosInRootSpace.x < lower )
 						{
+							// Cursor to the left of the box
 							distance = lower - cursorPosInRootSpace.x;
 						}
 						else // cursorPosInRootSpace.x > upper
 						{
+							// Cursor to the right of the box
 							distance = cursorPosInRootSpace.x - upper;
 						}
 						
@@ -726,7 +716,7 @@ public abstract class DPContainer extends DPWidget {
 				
 				if ( closestNode != null )
 				{
-					DPContentLeaf l = closestNode.getTopOrBottomFocusLeaf( bBottom, cursorPosInRootSpace );
+					DPContentLeaf l = closestNode.getTopOrBottomContentLeaf( bBottom, cursorPosInRootSpace );
 					if ( l != null )
 					{
 						return l;
@@ -797,7 +787,7 @@ public abstract class DPContainer extends DPWidget {
 		}
 	}
 	
-	protected DPContentLeaf getFocusLeafAboveOrBelowFromChild(DPWidget child, boolean bBelow, Point2 localCursorPos)
+	protected DPContentLeaf getContentLeafAboveOrBelowFromChild(DPWidget child, boolean bBelow, Point2 localCursorPos)
 	{
 		List<DPWidget> navList = verticalNavigationList();
 		if ( navList != null )
@@ -810,7 +800,7 @@ public abstract class DPContainer extends DPWidget {
 				{
 					for (int i = index + 1; i < navList.size(); i++)
 					{
-						DPContentLeaf l = navList.get( i ).getTopOrBottomFocusLeaf( false, cursorPosInRootSpace );
+						DPContentLeaf l = navList.get( i ).getTopOrBottomContentLeaf( false, cursorPosInRootSpace );
 						if ( l != null )
 						{
 							return l;
@@ -821,7 +811,7 @@ public abstract class DPContainer extends DPWidget {
 				{
 					for (int i = index - 1; i >= 0; i--)
 					{
-						DPContentLeaf l = navList.get( i ).getTopOrBottomFocusLeaf( true, cursorPosInRootSpace );
+						DPContentLeaf l = navList.get( i ).getTopOrBottomContentLeaf( true, cursorPosInRootSpace );
 						if ( l != null )
 						{
 							return l;
@@ -833,11 +823,25 @@ public abstract class DPContainer extends DPWidget {
 		
 		if ( parent != null )
 		{
-			return parent.getFocusLeafAboveOrBelowFromChild( this, bBelow, getLocalPointRelativeToAncestor( parent, localCursorPos ) );
+			return parent.getContentLeafAboveOrBelowFromChild( this, bBelow, getLocalPointRelativeToAncestor( parent, localCursorPos ) );
 		}
 		else
 		{
 			return null;
 		}
+	}
+	
+	
+	
+	
+	//
+	//
+	// STYLESHEET METHODS
+	//
+	//
+	
+	protected Color getBackgroundColour()
+	{
+		return ((ContainerStyleSheet)styleSheet).getBackgroundColour();
 	}
 }

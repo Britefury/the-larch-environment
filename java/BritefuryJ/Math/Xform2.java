@@ -2,7 +2,8 @@ package BritefuryJ.Math;
 
 import java.awt.Graphics2D;
 
-public class Xform2 {
+public class Xform2 implements Cloneable
+{
 	public double scale;
 	public Vector2 translation;
 	
@@ -31,6 +32,25 @@ public class Xform2 {
 		this.translation = translation.clone();
 	}
 	
+	
+	
+	public Xform2 clone()
+	{
+		try {
+			return (Xform2)super.clone();
+		}
+		catch (CloneNotSupportedException e)
+		{
+			return null;
+		}
+	}
+	
+	
+	public boolean equals(Xform2 b)
+	{
+		return scale == b.scale  &&  translation.equals( b.translation );
+	}
+
 	
 	
 	public Xform2 inverse()

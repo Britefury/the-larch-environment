@@ -1,12 +1,13 @@
 package BritefuryJ.DocPresent.Util;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.awt.font.FontRenderContext;
+import java.awt.font.LineMetrics;
 import java.awt.font.TextHitInfo;
 import java.awt.font.TextLayout;
+import java.awt.geom.Line2D;
 
 import javax.swing.JComponent;
 
@@ -14,6 +15,7 @@ import BritefuryJ.DocPresent.DPPresentationArea;
 import BritefuryJ.DocPresent.Metrics.HMetrics;
 import BritefuryJ.DocPresent.Metrics.VMetrics;
 import BritefuryJ.DocPresent.Metrics.VMetricsTypeset;
+import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.Math.Point2;
 
 
@@ -29,19 +31,15 @@ public class TextVisual
 	
 	private TextLayout layout;
 	private String text;
-	private Font font;
-	private Color colour;
+	private TextStyleSheet styleSheet;
 	private TextVisualListener listener;
 	private JComponent component;
 	
 	
-	public TextVisual(String text, Font font, Color colour, TextVisualListener listener)
+	public TextVisual(String text, TextStyleSheet styleSheet, TextVisualListener listener)
 	{
-		assert font != null;
-		
 		this.text = text;
-		this.font = font;
-		this.colour = colour;
+		this.styleSheet = styleSheet;
 		this.listener = listener;
 	}
 	
@@ -58,38 +56,6 @@ public class TextVisual
 		{
 			this.text = text;
 			layoutChanged();
-		}
-	}
-	
-	
-	
-	public Font getFont()
-	{
-		return font;
-	}
-	
-	public void setFont(Font font)
-	{
-		if ( font != this.font )
-		{
-			this.font = font;
-			layoutChanged();
-		}
-	}
-	
-	
-	
-	public Color getColour()
-	{
-		return colour;
-	}
-	
-	public void setColour(Color colour)
-	{
-		if ( !colour.equals( this.colour ) )
-		{
-			this.colour = colour;
-			requestRedraw();
 		}
 	}
 	
@@ -118,14 +84,38 @@ public class TextVisual
 	public HMetrics computeHMetrics()
 	{
 		refreshLayout();
-		double width = layout.getBounds().getWidth();
-		return new HMetrics( width, layout.getAdvance() - width );
+		if ( layout != null )
+		{
+			double width = layout.getBounds().getWidth();
+			return new HMetrics( width, layout.getAdvance() - width );
+		}
+		else
+		{
+			return new HMetrics();
+		}
 	}
 	
 	public VMetrics computeVMetrics()
 	{
 		refreshLayout();
-		return new VMetricsTypeset( layout.getAscent(), layout.getDescent(), layout.getLeading() );
+		if ( layout != null )
+		{
+			return new VMetricsTypeset( layout.getAscent(), layout.getDescent(), layout.getLeading() );
+		}
+		else
+		{
+			if ( component != null )
+			{
+				Graphics2D graphics = (Graphics2D)component.getGraphics();
+				if ( graphics != null )
+				{
+					FontRenderContext frc = graphics.getFontRenderContext();
+					LineMetrics lineMetrics = styleSheet.getFont().getLineMetrics( "", frc );
+					return new VMetricsTypeset( lineMetrics.getAscent(), lineMetrics.getDescent(), lineMetrics.getLeading() );
+				}
+			}
+			return new VMetrics();
+		}
 	}
 	
 	
@@ -133,19 +123,34 @@ public class TextVisual
 	public void draw(Graphics2D graphics)
 	{
 		refreshLayout();
-		graphics.setColor( colour );
-		layout.draw( graphics, 0.0f, layout.getAscent() );
+		if ( layout != null )
+		{
+			Color prevColour = graphics.getColor();
+			graphics.setColor( styleSheet.getColour() );
+			layout.draw( graphics, 0.0f, layout.getAscent() );
+			graphics.setColor( prevColour );
+		}
 	}
 	
 	public void drawCaret(Graphics2D graphics, int offset)
 	{
 		refreshLayout();
-		Shape[] carets = layout.getCaretShapes( offset );
-		graphics.translate( 0.0, layout.getAscent() );
-		graphics.draw( carets[0] );
-		if ( carets[1] != null )
+		if ( layout != null )
 		{
-			graphics.draw( carets[1] );
+			Shape[] carets = layout.getCaretShapes( offset );
+			graphics.translate( 0.0, layout.getAscent() );
+			graphics.draw( carets[0] );
+			if ( carets[1] != null )
+			{
+				graphics.draw( carets[1] );
+			}
+		}
+		else
+		{
+			FontRenderContext frc = graphics.getFontRenderContext();
+			LineMetrics lineMetrics = styleSheet.getFont().getLineMetrics( "", frc );
+			Line2D.Double line = new Line2D.Double( 0.0, 0.0, 0.0, lineMetrics.getAscent() + lineMetrics.getDescent() );
+			graphics.draw( line );
 		}
 	}
 	
@@ -155,7 +160,14 @@ public class TextVisual
 	public TextHitInfo hitTest(Point2 pos)
 	{
 		refreshLayout();
-		return layout.hitTestChar( (float)pos.x, (float)pos.y );
+		if ( layout != null )
+		{
+			return layout.hitTestChar( (float)pos.x, (float)pos.y );
+		}
+		else
+		{
+			return null;
+		}
 	}
 	
 	
@@ -177,22 +189,14 @@ public class TextVisual
 		}
 	}
 	
-	private void requestRedraw()
-	{
-		if ( listener != null )
-		{
-			listener.textVisualRequestRedraw( this );
-		}
-	}
-	
 	private void refreshLayout()
 	{
 		assert component != null;
-		if ( layout == null )
+		if ( layout == null  &&  text.length() > 0 )
 		{
 			Graphics2D graphics = (Graphics2D)component.getGraphics();
 			FontRenderContext frc = graphics.getFontRenderContext();
-			layout = new TextLayout( text, font, frc );
+			layout = new TextLayout( text, styleSheet.getFont(), frc );
 		}
 	}
 }

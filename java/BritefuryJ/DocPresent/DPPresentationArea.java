@@ -201,6 +201,7 @@ public class DPPresentationArea extends DPBin implements CaretListener
 
 		public void keyTyped(KeyEvent e)
 		{
+			area.keyTypedEvent( e, getModifiers( e ) );
 		}
 		
 		
@@ -400,6 +401,15 @@ public class DPPresentationArea extends DPBin implements CaretListener
 	}
 
 	
+	public Caret getCaret()
+	{
+		return caret;
+	}
+
+
+
+
+	
 	//
 	// Space conversion and navigation methods
 	//
@@ -476,9 +486,9 @@ public class DPPresentationArea extends DPBin implements CaretListener
 	{
 		panRootSpace( windowSpaceToRootSpace( pan ) );
 	}
-
-
-
+	
+	
+	
 	
 	//
 	// Immediate event queue methods
@@ -734,7 +744,10 @@ public class DPPresentationArea extends DPBin implements CaretListener
 				Xform2 x = widget.getTransformRelativeToRoot();
 				AffineTransform current = graphics.getTransform();
 				x.apply( graphics );
+				Color prevColour = graphics.getColor();
+				graphics.setColor( Color.blue );
 				widget.drawCaret( graphics, caret );
+				graphics.setColor( prevColour );
 				graphics.setTransform( current );
 			}
 		}
@@ -922,19 +935,11 @@ public class DPPresentationArea extends DPBin implements CaretListener
 		
 		if ( bCtrl  &&  keyChar == 'z' )
 		{
-			if ( undoListener != null )
-			{
-				undoListener.onUndo( this );
-			}
 			emitImmediateEvents();
 			return true;
 		}
 		else if ( bCtrlShift  &&  keyChar == 'z' )
 		{
-			if ( undoListener != null )
-			{
-				undoListener.onRedo( this );
-			}
 			emitImmediateEvents();
 			return true;
 		}
@@ -945,8 +950,7 @@ public class DPPresentationArea extends DPBin implements CaretListener
 		}
 		else
 		{
-			int keyCode = event.getKeyCode();
-			if ( keyCode == KeyEvent.VK_CONTROL  ||  keyCode == KeyEvent.VK_SHIFT  ||  keyCode == KeyEvent.VK_ALT  ||  keyCode == KeyEvent.VK_ALT_GRAPH )
+			if ( isModifierKey( event ) )
 			{
 				for (StateKeyListener listener: stateKeyListeners.keySet())
 				{
@@ -989,15 +993,14 @@ public class DPPresentationArea extends DPBin implements CaretListener
 			emitImmediateEvents();
 			return true;
 		}
-		else if ( handleNavigationKeyRelease( event, modifiers ) )
+		else if ( isNavigationKey( event ) )
 		{
 			emitImmediateEvents();
 			return true;
 		}
 		else
 		{
-			int keyCode = event.getKeyCode();
-			if ( keyCode == KeyEvent.VK_CONTROL  ||  keyCode == KeyEvent.VK_SHIFT  ||  keyCode == KeyEvent.VK_ALT  ||  keyCode == KeyEvent.VK_ALT_GRAPH )
+			if ( isModifierKey( event ) )
 			{
 				for (StateKeyListener listener: stateKeyListeners.keySet())
 				{
@@ -1024,28 +1027,99 @@ public class DPPresentationArea extends DPBin implements CaretListener
 	
 	
 	
+	protected boolean keyTypedEvent(KeyEvent event, int modifiers)
+	{
+		rootSpaceMouse.setModifiers( modifiers );
+		
+		boolean bCtrl = ( modifiers & Modifier._KEYS_MASK )  ==  Modifier.CTRL;
+		boolean bCtrlShift = ( modifiers & Modifier._KEYS_MASK )  ==  ( Modifier.CTRL | Modifier.SHIFT );
+		char keyChar = event.getKeyChar();
+		
+		if ( bCtrl  &&  keyChar == 'z' )
+		{
+			if ( undoListener != null )
+			{
+				undoListener.onUndo( this );
+			}
+			emitImmediateEvents();
+			return true;
+		}
+		else if ( bCtrlShift  &&  keyChar == 'z' )
+		{
+			if ( undoListener != null )
+			{
+				undoListener.onRedo( this );
+			}
+			emitImmediateEvents();
+			return true;
+		}
+		else if ( isNavigationKey( event ) )
+		{
+			emitImmediateEvents();
+			return true;
+		}
+		else
+		{
+			if ( isModifierKey( event ) )
+			{
+				for (StateKeyListener listener: stateKeyListeners.keySet())
+				{
+					listener.onStateKeyTyped( event );
+				}
+				return false;
+			}
+			else
+			{
+				if ( caret.isValid() )
+				{
+					caret.getMarker().getWidget().onKeyTyped( caret, event );
+					emitImmediateEvents();
+					return true;
+				}
+				else
+				{
+					emitImmediateEvents();
+					return false;
+				}
+			}
+		}
+	}
+	
+	
+	
+	
+	protected boolean isNavigationKey(KeyEvent event)
+	{
+		int keyCode = event.getKeyCode();
+		return keyCode == KeyEvent.VK_LEFT  ||  keyCode == KeyEvent.VK_RIGHT  ||  keyCode == KeyEvent.VK_UP  ||  keyCode == KeyEvent.VK_DOWN  ||  keyCode == KeyEvent.VK_HOME  ||  keyCode == KeyEvent.VK_END;
+	}
+	
+	protected boolean isModifierKey(KeyEvent event)
+	{
+		int keyCode = event.getKeyCode();
+		return keyCode == KeyEvent.VK_CONTROL  ||  keyCode == KeyEvent.VK_SHIFT  ||  keyCode == KeyEvent.VK_ALT  ||  keyCode == KeyEvent.VK_ALT_GRAPH;
+	}
 	
 	protected boolean handleNavigationKeyPress(KeyEvent event, int modifiers)
 	{
-		int keyCode = event.getKeyCode();
-		if ( keyCode == KeyEvent.VK_LEFT  ||  keyCode == KeyEvent.VK_RIGHT  ||  keyCode == KeyEvent.VK_UP  ||  keyCode == KeyEvent.VK_DOWN  ||  keyCode == KeyEvent.VK_HOME  ||  keyCode == KeyEvent.VK_END )
+		if ( isNavigationKey( event ) )
 		{
 			if ( caret.isValid() )
 			{
 				DPContentLeaf leaf = caret.getMarker().getWidget();
-				if ( keyCode == KeyEvent.VK_LEFT )
+				if ( event.getKeyCode() == KeyEvent.VK_LEFT )
 				{
 					leaf.moveMarkerLeft( caret.getMarker(), false );
 				}
-				else if ( keyCode == KeyEvent.VK_RIGHT )
+				else if ( event.getKeyCode() == KeyEvent.VK_RIGHT )
 				{
 					leaf.moveMarkerRight( caret.getMarker(), false );
 				}
-				else if ( keyCode == KeyEvent.VK_UP )
+				else if ( event.getKeyCode() == KeyEvent.VK_UP )
 				{
 					leaf.moveMarkerUp( caret.getMarker() );
 				}
-				else if ( keyCode == KeyEvent.VK_DOWN )
+				else if ( event.getKeyCode() == KeyEvent.VK_DOWN )
 				{
 					leaf.moveMarkerDown( caret.getMarker() );
 				}
@@ -1058,20 +1132,6 @@ public class DPPresentationArea extends DPBin implements CaretListener
 		}
 	}
 	
-	protected boolean handleNavigationKeyRelease(KeyEvent event, int modifiers)
-	{
-		int keyCode = event.getKeyCode();
-		if ( keyCode == KeyEvent.VK_LEFT  ||  keyCode == KeyEvent.VK_RIGHT  ||  keyCode == KeyEvent.VK_UP  ||  keyCode == KeyEvent.VK_DOWN  ||  keyCode == KeyEvent.VK_HOME  ||  keyCode == KeyEvent.VK_END )
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
-
-
 
 	protected void realiseEvent()
 	{

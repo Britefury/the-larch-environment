@@ -8,13 +8,13 @@ import java.awt.event.KeyEvent;
 import java.awt.Graphics2D;
 import java.awt.geom.*;
 
-import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Event.PointerScrollEvent;
 import BritefuryJ.DocPresent.Input.PointerInterface;
 import BritefuryJ.DocPresent.Metrics.HMetrics;
 import BritefuryJ.DocPresent.Metrics.VMetrics;
+import BritefuryJ.DocPresent.StyleSheets.WidgetStyleSheet;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
@@ -119,6 +119,7 @@ abstract public class DPWidget
 	//
 	//
 	
+	protected WidgetStyleSheet styleSheet;
 	protected DPContainer parent;
 	protected DPPresentationArea presentationArea;
 	protected boolean bRealised, bResizeQueued;
@@ -152,6 +153,12 @@ abstract public class DPWidget
 	
 	public DPWidget()
 	{
+		this( WidgetStyleSheet.defaultStyleSheet );
+	}
+	
+	public DPWidget(WidgetStyleSheet styleSheet)
+	{
+		this.styleSheet = styleSheet;
 		scale = rootScale = 1.0;
 		minH = new HMetrics();
 		prefH = new HMetrics();
@@ -296,6 +303,40 @@ abstract public class DPWidget
 			parent.removeChild( this );
 		}
 		presentationArea = null;
+	}
+	
+	
+	public void getAncestry(List<DPWidget> ancestry)
+	{
+		if ( parent != null )
+		{
+			parent.getAncestry( ancestry );
+		}
+		
+		ancestry.add( this );
+	}
+	
+	
+	public static void getAncestryToCommonAncestor(DPWidget w0, List<DPWidget> ancestry0, DPWidget w1, List<DPWidget> ancestry1)
+	{
+		w0.getAncestry( ancestry0 );
+		w1.getAncestry( ancestry1 );
+		
+		int minLength = Math.min( ancestry0.size(), ancestry1.size() );
+		
+		for (int i = 0; i < minLength; i++)
+		{
+			DPWidget p0 = ancestry0.get( ancestry0.size() - 1 - i );
+			DPWidget p1 = ancestry1.get( ancestry1.size() - 1 - i );
+			
+			if ( p0 == p1 )
+			{
+				break;
+			}
+			
+			ancestry0.remove( ancestry0.size() - 1 );
+			ancestry1.remove( ancestry1.size() - 1 );
+		}
 	}
 	
 	
@@ -669,17 +710,6 @@ abstract public class DPWidget
 	}
 	
 	
-	protected boolean onKeyPress(Caret caret, KeyEvent event)
-	{
-		return false;
-	}
-	
-	protected boolean onKeyRelease(Caret caret, KeyEvent event)
-	{
-		return false;
-	}
-	
-	
 	protected void onRealise()
 	{
 	}
@@ -980,7 +1010,7 @@ abstract public class DPWidget
 		return null;
 	}
 	
-	protected DPContentLeaf getTopOrBottomFocusLeaf(boolean bBottom, Point2 cursorPosInRootSpace)
+	protected DPContentLeaf getTopOrBottomContentLeaf(boolean bBottom, Point2 cursorPosInRootSpace)
 	{
 		return null;
 	}

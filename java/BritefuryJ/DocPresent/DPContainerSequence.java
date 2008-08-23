@@ -1,6 +1,5 @@
 package BritefuryJ.DocPresent;
 
-import java.awt.Color;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Vector;
@@ -9,6 +8,7 @@ import org.python.core.PySlice;
 
 import BritefuryJ.DocPresent.Metrics.HMetrics;
 import BritefuryJ.DocPresent.Metrics.VMetrics;
+import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 import BritefuryJ.JythonInterface.JythonSlice;
 
 
@@ -17,12 +17,12 @@ abstract public class DPContainerSequence extends DPContainer
 {
 	public DPContainerSequence()
 	{
-		super( null );
+		this( ContainerStyleSheet.defaultStyleSheet );
 	}
-	
-	public DPContainerSequence(Color backgroundColour)
+
+	public DPContainerSequence(ContainerStyleSheet styleSheet)
 	{
-		super( backgroundColour );
+		super( styleSheet );
 	}
 
 	

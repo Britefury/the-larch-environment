@@ -1,14 +1,12 @@
 package BritefuryJ.DocPresent;
 
-import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.event.KeyEvent;
 import java.awt.font.TextHitInfo;
 
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Metrics.HMetrics;
 import BritefuryJ.DocPresent.Metrics.VMetrics;
+import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.Util.TextVisual;
 import BritefuryJ.Math.Point2;
 
@@ -18,12 +16,16 @@ public class DPText extends DPContentLeaf implements TextVisual.TextVisualListen
 	protected Point2 textPos;
 	
 	
-	public DPText(String text, Font font, Color colour)
+	public DPText(String text)
 	{
-		super( text );
-		assert font != null;
+		this( TextStyleSheet.defaultStyleSheet, text );
+	}
+	
+	public DPText(TextStyleSheet styleSheet, String text)
+	{
+		super( styleSheet, text );
 		
-		visual = new TextVisual( text, font, colour, this );
+		visual = new TextVisual( text, styleSheet, this );
 		
 		textPos = new Point2();
 	}
@@ -46,30 +48,6 @@ public class DPText extends DPContentLeaf implements TextVisual.TextVisualListen
 		visual.setText( getContent() );
 	}
 
-	
-	public Font getFont()
-	{
-		return visual.getFont();
-	}
-	
-	public void setFont(Font font)
-	{
-		assert font != null;
-
-		visual.setFont( font );
-	}
-	
-	
-	public Color getColour()
-	{
-		return visual.getColour();
-	}
-	
-	public void setColour(Color colour)
-	{
-		visual.setColour( colour );
-	}
-	
 	
 	public TextHitInfo hitTest(Point2 pos)
 	{
@@ -144,13 +122,13 @@ public class DPText extends DPContentLeaf implements TextVisual.TextVisualListen
 	public int getContentPositonForPoint(Point2 localPos)
 	{
 		TextHitInfo info = hitTest( localPos );
-		return info.getInsertionIndex();
-	}
-	
-	
-	protected boolean onKeyPress(Caret caret, KeyEvent event)
-	{
-		insertContent( caret.getMarker().getIndex(), String.valueOf( event.getKeyChar() ) );
-		return true;
+		if ( info != null )
+		{
+			return info.getInsertionIndex();
+		}
+		else
+		{
+			return 0;
+		}
 	}
 }
