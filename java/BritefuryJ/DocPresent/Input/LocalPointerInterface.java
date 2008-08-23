@@ -3,16 +3,17 @@ package BritefuryJ.DocPresent.Input;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Xform2;
 
-public class LocalPointerInterface extends PointerInterface {
+public class LocalPointerInterface extends PointerInterface
+{
 	protected PointerInterface pointer;
 	protected Xform2 globalToLocal, localToGlobal;
 	
 
-	public LocalPointerInterface(PointerInterface pointer, Xform2 localToGlobal)
+	public LocalPointerInterface(PointerInterface pointer, Xform2 globalToLocal)
 	{
 		this.pointer = pointer;
-		this.localToGlobal = localToGlobal;
-		this.globalToLocal = localToGlobal.inverse();
+		this.globalToLocal = globalToLocal;
+		this.localToGlobal = globalToLocal.inverse();
 	}
 	
 	
@@ -39,9 +40,9 @@ public class LocalPointerInterface extends PointerInterface {
 
 
 
-	public LocalPointerInterface transformed(Xform2 xToLocal)
+	public LocalPointerInterface transformed(Xform2 parentToX)
 	{
-		return new LocalPointerInterface( pointer, xToLocal.concat( localToGlobal ) );
+		return new LocalPointerInterface( pointer, globalToLocal.concat( parentToX ) );
 	}
 
 

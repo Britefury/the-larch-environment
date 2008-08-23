@@ -10,15 +10,19 @@ import BritefuryJ.DocPresent.DPHBox;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPPresentationArea;
 import BritefuryJ.DocPresent.DPText;
+import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
 public class DPHBoxTypesetTest
 {
 	protected static DPText[] makeTexts(String header)
 	{
-		DPText t0 = new DPText( "Hello", new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );
-		DPText t1 = new DPText( "World", new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );
-		DPText t2 = new DPText( "Foo", new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );
-		DPText t3 = new DPText( "Bar", new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );
+		TextStyleSheet t12 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );
+		DPText t0 = new DPText( t12, "Hello" );
+		DPText t1 = new DPText( t12, "World" );
+		DPText t2 = new DPText( t12, "Foo" );
+		DPText t3 = new DPText( t12, "Bar" );
 		
 		DPText[] texts = { t0, t1, t2, t3 };
 		return texts;
@@ -28,11 +32,14 @@ public class DPHBoxTypesetTest
 	protected static DPHBox makeTypesetHBox(DPVBox.Typesetting typesetting, String header)
 	{
 		DPText[] txt = makeTexts( header );
-		DPVBox v = new DPVBox( typesetting, DPVBox.Alignment.LEFT, 0.0, false, 0.0 );
+		VBoxStyleSheet vs = new VBoxStyleSheet( typesetting, DPVBox.Alignment.LEFT, 0.0, false, 0.0 );
+		DPVBox v = new DPVBox( vs );
 		v.extend( txt );
-		DPText before = new DPText( header, new Font( "Sans serif", Font.BOLD, 18 ), Color.BLACK );
-		DPText after = new DPText( " After", new Font( "Sans serif", Font.BOLD, 18 ), Color.BLACK );
-		DPHBox t = new DPHBox( DPHBox.Alignment.BASELINES, 0.0, false, 0.0 );
+		TextStyleSheet t18 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );
+		DPText before = new DPText( t18, header );
+		DPText after = new DPText( t18, " After" );
+		HBoxStyleSheet ts = new HBoxStyleSheet( DPHBox.Alignment.BASELINES, 0.0, false, 0.0 );
+		DPHBox t = new DPHBox( ts );
 		t.append( before );
 		t.append( v );
 		t.append( after );
@@ -52,7 +59,8 @@ public class DPHBoxTypesetTest
 		DPHBox t1 = makeTypesetHBox( DPVBox.Typesetting.ALIGN_WITH_TOP, "ALIGN_WITH_TOP" );
 		DPHBox t2 = makeTypesetHBox( DPVBox.Typesetting.ALIGN_WITH_BOTTOM, "ALIGN_WITH_BOTTOM" );
 		
-		DPVBox box = new DPVBox( DPVBox.Typesetting.NONE, DPVBox.Alignment.EXPAND, 20.0, false, 0.0 );
+		VBoxStyleSheet boxs = new VBoxStyleSheet( DPVBox.Typesetting.NONE, DPVBox.Alignment.EXPAND, 20.0, false, 0.0 );
+		DPVBox box = new DPVBox( boxs );
 		box.append( t0 );
 		box.append( t1 );
 		box.append( t2 );

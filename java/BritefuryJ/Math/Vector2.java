@@ -1,6 +1,7 @@
 package BritefuryJ.Math;
 
-public class Vector2 implements Cloneable {
+public class Vector2 implements Cloneable
+{
 	public double x, y;
 	
 	

@@ -1,6 +1,5 @@
 package BritefuryJ.DocPresent;
 
-import java.awt.Color;
 import java.lang.Math;
 import java.util.List;
 
@@ -8,6 +7,7 @@ import BritefuryJ.DocPresent.Metrics.HMetrics;
 import BritefuryJ.DocPresent.Metrics.Metrics;
 import BritefuryJ.DocPresent.Metrics.VMetrics;
 import BritefuryJ.DocPresent.Metrics.VMetricsTypeset;
+import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
 import BritefuryJ.Math.Point2;
 
 
@@ -17,45 +17,20 @@ public class DPHBox extends DPAbstractBox
 	public enum Alignment { TOP, CENTRE, BOTTOM, EXPAND, BASELINES };
 	
 	
-	Alignment alignment;
-	
-	
-	
-	
 	
 	public DPHBox()
 	{
-		this( Alignment.CENTRE, 0.0, false, 0.0, null );
+		this( HBoxStyleSheet.defaultStyleSheet );
 	}
 	
-	public DPHBox(Alignment alignment, double spacing, boolean bExpand, double padding)
+	public DPHBox(HBoxStyleSheet syleSheet)
 	{
-		this( alignment, spacing, bExpand, padding, null );
-	}
-	
-	public DPHBox(Alignment alignment, double spacing, boolean bExpand, double padding, Color backgroundColour)
-	{
-		super( spacing, bExpand, padding, backgroundColour );
-		
-		this.alignment = alignment;
+		super( syleSheet );
 	}
 	
 	
 	
 	
-	public Alignment getAlignment()
-	{
-		return alignment;
-	}
-
-	public void setAlignment(Alignment alignment)
-	{
-		this.alignment = alignment;
-		queueResize();
-	}
-
-	
-
 	public void append(DPWidget child,  boolean bExpand, double padding)
 	{
 		appendChildEntry( new BoxChildEntry( child, bExpand, padding ) );
@@ -71,7 +46,7 @@ public class DPHBox extends DPAbstractBox
 	
 	protected BoxChildEntry createChildEntryForChild(DPWidget child)
 	{
-		return new BoxChildEntry( child, bExpand, padding );
+		return new BoxChildEntry( child, getExpand(), getPadding() );
 	}
 	
 	
@@ -129,6 +104,7 @@ public class DPHBox extends DPAbstractBox
 		}
 		else
 		{
+			double spacing = getSpacing();
 			// Accumulate the width required for all the children
 			double width = 0.0;
 			double x = 0.0;
@@ -158,6 +134,7 @@ public class DPHBox extends DPAbstractBox
 		}
 		else
 		{
+			Alignment alignment = getAlignment();
 			if ( alignment == Alignment.BASELINES )
 			{
 				double ascent = 0.0, descent = 0.0;
@@ -235,6 +212,7 @@ public class DPHBox extends DPAbstractBox
 		
 		Metrics[] allocated = VMetrics.allocateSpacePacked( getChildrenMinimumHMetrics(), getChildrenPreferredHMetrics(), getChildrenPackFlags(), allocation );
 		
+		double spacing = getSpacing();
 		double width = 0.0;
 		double x = 0.0;
 		for (int i = 0; i < allocated.length; i++)
@@ -262,6 +240,7 @@ public class DPHBox extends DPAbstractBox
 	{
 		super.allocateContentsY( allocation );
 		
+		Alignment alignment = getAlignment();
 		if ( alignment == Alignment.BASELINES )
 		{
 			VMetricsTypeset vmt = (VMetricsTypeset)prefV;
@@ -325,5 +304,11 @@ public class DPHBox extends DPAbstractBox
 	protected List<DPWidget> horizontalNavigationList()
 	{
 		return getChildren();
+	}
+	
+	
+	protected Alignment getAlignment()
+	{
+		return ((HBoxStyleSheet)styleSheet).getAlignment();
 	}
 }

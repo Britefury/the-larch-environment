@@ -27,6 +27,17 @@ public class PointerButtonEvent extends PointerEvent {
 	}
 	
 	
+	public int getButton()
+	{
+		return button;
+	}
+	
+	public Action getAction()
+	{
+		return action;
+	}
+	
+	
 	
 	public PointerButtonEvent transformed(Xform2 xToLocal)
 	{

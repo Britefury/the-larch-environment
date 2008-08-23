@@ -12,14 +12,17 @@ import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPHBox;
 import BritefuryJ.DocPresent.DPScript;
+import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
 public class DPScriptTest
 {
-	protected DPWidget makeText(String text, Font f, Color c)
+	protected DPWidget makeText(String text, TextStyleSheet styleSheet)
 	{
 		if ( text != null )
 		{
-			return new DPText( text, f, c );
+			return new DPText( styleSheet, text );
 		}
 		else
 		{
@@ -31,20 +34,24 @@ public class DPScriptTest
 	protected DPWidget makeScriptWidget(String mainText, String leftSuperText, String leftSubText, String rightSuperText, String rightSubText)
 	{
 		Font f0 = new Font( "Sans serif", Font.PLAIN, 16 );
-		DPText main = new DPText( mainText, f0, Color.black );
+		TextStyleSheet s0 = new TextStyleSheet( f0, Color.black );
+		TextStyleSheet s1 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 10 ), Color.blue );
+		TextStyleSheet s2 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 24 ), Color.red );
+		DPText main = new DPText( s0, mainText);
 		
 		DPScript script = new DPScript();
 		
 		script.setMainChild( main );
-		script.setLeftSuperscriptChild( makeText( leftSuperText, f0, Color.black ) );
-		script.setLeftSubscriptChild( makeText( leftSubText, f0, Color.black ) );
-		script.setRightSuperscriptChild( makeText( rightSuperText, f0, Color.black ) );
-		script.setRightSubscriptChild( makeText( rightSubText, f0, Color.black ) );
+		script.setLeftSuperscriptChild( makeText( leftSuperText, s0 ) );
+		script.setLeftSubscriptChild( makeText( leftSubText, s0 ) );
+		script.setRightSuperscriptChild( makeText( rightSuperText, s0 ) );
+		script.setRightSubscriptChild( makeText( rightSubText, s0 ) );
 
-		DPText labelA = new DPText( "Label A yYgGjJpPqQ", new Font( "Sans serif", Font.PLAIN, 10 ), Color.blue );
-		DPText labelB = new DPText( "Label B yYgGjJpPqQ", new Font( "Sans serif", Font.PLAIN, 24 ), Color.red );
+		DPText labelA = new DPText( s1, "Label A yYgGjJpPqQ" );
+		DPText labelB = new DPText( s2, "Label B yYgGjJpPqQ" );
 		
-		DPHBox box = new DPHBox( DPHBox.Alignment.BASELINES, 0.0, false, 0.0 );
+		HBoxStyleSheet boxs = new HBoxStyleSheet( DPHBox.Alignment.BASELINES, 0.0, false, 0.0 );
+		DPHBox box = new DPHBox( boxs );
 		box.append( labelA );
 		box.append( script );
 		box.append( labelB );
@@ -56,7 +63,8 @@ public class DPScriptTest
 	
 	protected DPWidget createContentNode()
 	{
-		DPVBox box = new DPVBox( DPVBox.Typesetting.NONE, DPVBox.Alignment.LEFT, 0.0, false, 0.0 );
+		VBoxStyleSheet boxs = new VBoxStyleSheet( DPVBox.Typesetting.NONE, DPVBox.Alignment.LEFT, 0.0, false, 0.0 );
+		DPVBox box = new DPVBox( boxs );
 		
 		for (int i = 0; i < 16; i++)
 		{

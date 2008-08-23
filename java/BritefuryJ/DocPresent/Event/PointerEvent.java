@@ -15,6 +15,12 @@ public class PointerEvent extends Event {
 	}
 	
 	
+	public PointerInterface getPointer()
+	{
+		return pointer;
+	}
+	
+	
 	public PointerEvent transformed(Xform2 xToLocal)
 	{
 		return new PointerEvent( pointer.transformed( xToLocal ) );

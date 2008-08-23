@@ -13,6 +13,7 @@ import BritefuryJ.DocPresent.DPCustomSymbol;
 import BritefuryJ.DocPresent.DPPresentationArea;
 import BritefuryJ.DocPresent.Metrics.HMetrics;
 import BritefuryJ.DocPresent.Metrics.VMetrics;
+import BritefuryJ.DocPresent.StyleSheets.CustomSymbolStyleSheet;
 
 
 
@@ -48,8 +49,8 @@ public class DPCustomSymbolTest
 			}
 		};
      
-		
-		DPCustomSymbol customSym = new DPCustomSymbol( symbol, Color.blue );
+		CustomSymbolStyleSheet styleSheet = new CustomSymbolStyleSheet( Color.blue );
+		DPCustomSymbol customSym = new DPCustomSymbol( styleSheet, symbol );
 		     
 		area.setChild( customSym );
 		     

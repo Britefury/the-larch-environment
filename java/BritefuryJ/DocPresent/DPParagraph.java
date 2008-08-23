@@ -1,7 +1,6 @@
 package BritefuryJ.DocPresent;
 
 import java.lang.Math;
-import java.awt.Color;
 import java.util.List;
 import java.util.Vector;
 
@@ -9,6 +8,7 @@ import BritefuryJ.DocPresent.Metrics.HMetrics;
 import BritefuryJ.DocPresent.Metrics.Metrics;
 import BritefuryJ.DocPresent.Metrics.VMetrics;
 import BritefuryJ.DocPresent.Metrics.VMetricsTypeset;
+import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
 import BritefuryJ.Math.Point2;
 
 
@@ -51,84 +51,23 @@ public class DPParagraph extends DPContainerSequence
 
 	
 	
-	protected double spacing, padding, indentation;
-	private Alignment alignment;
 	private Vector<Line> lines;
 
 	
 	
 	public DPParagraph()
 	{
-		this( Alignment.BASELINES, 0.0, 0.0, 0.0 );
+		this( ParagraphStyleSheet.defaultStyleSheet );
 	}
 
-	public DPParagraph(Alignment alignment, double spacing, double padding, double indentation)
+	public DPParagraph(ParagraphStyleSheet styleSheet)
 	{
-		this( alignment, spacing, padding, indentation, null );
-	}
-	
-	public DPParagraph(Alignment alignment, double spacing, double padding, double indentation, Color backgroundColour)
-	{
-		super( backgroundColour );
+		super( styleSheet );
 		
-		this.alignment = alignment;
-		this.spacing = spacing;
-		this.padding = padding;
-		this.indentation = indentation;
-
 		lines = new Vector<Line>();
 	}
 
 
-	
-	public Alignment getAlignment()
-	{
-		return alignment;
-	}
-
-	public void setAlignment(Alignment alignment)
-	{
-		this.alignment = alignment;
-		queueResize();
-	}
-
-
-	public double getSpacing()
-	{
-		return spacing;
-	}
-
-	public void setSpacing(double spacing)
-	{
-		this.spacing = spacing;
-		queueResize();
-	}
-
-	
-	public double getPadding()
-	{
-		return padding;
-	}
-
-	public void setPadding(double padding)
-	{
-		this.padding = padding;
-		queueResize();
-	}
-
-	
-	public double getIndentation()
-	{
-		return indentation;
-	}
-
-	public void setIndentation(double indentation)
-	{
-		this.indentation = indentation;
-		queueResize();
-	}
-
-	
 	
 	public void append(DPWidget child)
 	{
@@ -219,7 +158,7 @@ public class DPParagraph extends DPContainerSequence
 	
 	protected ParagraphChildEntry createChildEntryForChild(DPWidget child)
 	{
-		return new ParagraphChildEntry( child, padding );
+		return new ParagraphChildEntry( child, getPadding() );
 	}
 
 	
@@ -239,6 +178,7 @@ public class DPParagraph extends DPContainerSequence
 		}
 		else
 		{
+			double spacing = getSpacing();
 			// Accumulate the width required for all the children
 			double width = 0.0;
 			double x = initialX;
@@ -269,6 +209,7 @@ public class DPParagraph extends DPContainerSequence
 		}
 		else
 		{
+			Alignment alignment = getAlignment();
 			if ( alignment == Alignment.BASELINES )
 			{
 				double ascent = 0.0, descent = 0.0;
@@ -347,6 +288,9 @@ public class DPParagraph extends DPContainerSequence
 		}
 		else
 		{
+			double spacing = getSpacing();
+			double indentation = getIndentation();
+
 			// To compute the minimum required h-metrics, assume all line breaks are used.
 			
 			// Overall width and advance
@@ -431,6 +375,9 @@ public class DPParagraph extends DPContainerSequence
 	
 	private void splitIntoLines(double allocation)
 	{
+		double spacing = getSpacing();
+		double indentation = getIndentation();
+
 		// Width and advance for a line
 		int lineStartIndex = 0;
 		double lineWidth = 0.0;
@@ -504,6 +451,8 @@ public class DPParagraph extends DPContainerSequence
 	
 	private void allocateLineX(Line line, double lineX, double allocation)
 	{
+		double spacing = getSpacing();
+
 		Metrics[] allocated = HMetrics.allocateSpacePacked( getChildrenMinimumHMetrics( line.children ), getChildrenPreferredHMetrics( line.children ), null, allocation );
 		
 		double width = 0.0;
@@ -533,6 +482,8 @@ public class DPParagraph extends DPContainerSequence
 	protected void allocateContentsX(double allocation)
 	{
 		super.allocateContentsX( allocation );
+
+		double indentation = getIndentation();
 		
 		
 		// Stage 1:
@@ -556,6 +507,7 @@ public class DPParagraph extends DPContainerSequence
 
 	private void allocateLineY(Line line, double lineY, double lineAllocation)
 	{
+		Alignment alignment = getAlignment();
 		if ( alignment == Alignment.BASELINES )
 		{
 			VMetricsTypeset vmt = (VMetricsTypeset)line.prefV;
@@ -650,5 +602,34 @@ public class DPParagraph extends DPContainerSequence
 	protected List<DPWidget> horizontalNavigationList()
 	{
 		return getChildren();
+	}
+	
+	
+	
+	
+	//
+	//
+	// STYLESHEET METHODS
+	//
+	//
+
+	public Alignment getAlignment()
+	{
+		return ((ParagraphStyleSheet)styleSheet).getAlignment();
+	}
+
+	public double getSpacing()
+	{
+		return ((ParagraphStyleSheet)styleSheet).getSpacing();
+	}
+
+	public double getPadding()
+	{
+		return ((ParagraphStyleSheet)styleSheet).getPadding();
+	}
+
+	public double getIndentation()
+	{
+		return ((ParagraphStyleSheet)styleSheet).getIndentation();
 	}
 }

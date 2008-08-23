@@ -1,11 +1,11 @@
 package BritefuryJ.DocPresent;
 
-import java.awt.Color;
 import java.util.List;
 
 import BritefuryJ.DocPresent.Metrics.HMetrics;
 import BritefuryJ.DocPresent.Metrics.Metrics;
 import BritefuryJ.DocPresent.Metrics.VMetrics;
+import BritefuryJ.DocPresent.StyleSheets.AbstractBoxStyleSheet;
 
 
 
@@ -33,9 +33,6 @@ abstract public class DPAbstractBox extends DPContainerSequence
 
 	
 	
-	protected double spacing;
-	protected boolean bExpand;
-	protected double padding;
 	HMetrics childrenHMetrics;
 	VMetrics childrenVMetrics;
 
@@ -43,62 +40,15 @@ abstract public class DPAbstractBox extends DPContainerSequence
 	
 	public DPAbstractBox()
 	{
-		super();
+		this( AbstractBoxStyleSheet.defaultStyleSheet );
 	}
 
-	public DPAbstractBox(double spacing, boolean bExpand, double padding)
+	public DPAbstractBox(AbstractBoxStyleSheet styleSheet)
 	{
-		this( spacing, bExpand, padding, null );
-	}
-	
-	public DPAbstractBox(double spacing, boolean bExpand, double padding, Color backgroundColour)
-	{
-		super( backgroundColour );
-		
-		this.spacing = spacing;
-		this.bExpand = bExpand;
-		this.padding = padding;
+		super( styleSheet );
 	}
 
 
-	
-	public double getSpacing()
-	{
-		return spacing;
-	}
-
-	public void setSpacing(double spacing)
-	{
-		this.spacing = spacing;
-		queueResize();
-	}
-
-	
-	public boolean getExpand()
-	{
-		return bExpand;
-	}
-
-	public void setExpand(boolean bExpand)
-	{
-		this.bExpand = bExpand;
-		queueResize();
-	}
-
-	
-	public double getPadding()
-	{
-		return padding;
-	}
-
-	public void setPadding(double padding)
-	{
-		this.padding = padding;
-		queueResize();
-	}
-
-	
-	
 	
 	public void append(DPWidget child)
 	{
@@ -170,5 +120,23 @@ abstract public class DPAbstractBox extends DPContainerSequence
 	protected double getChildPadding(int index)
 	{
 		return ((BoxChildEntry)childEntries.get( index )).padding;
+	}
+
+
+
+
+	public double getSpacing()
+	{
+		return ((AbstractBoxStyleSheet)styleSheet).getSpacing();
+	}
+
+	public boolean getExpand()
+	{
+		return ((AbstractBoxStyleSheet)styleSheet).getExpand();
+	}
+
+	public double getPadding()
+	{
+		return ((AbstractBoxStyleSheet)styleSheet).getPadding();
 	}
 }
