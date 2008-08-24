@@ -8,15 +8,15 @@
 import sys
 
 
-from javax.swing import JFrame, JEditorPane, AbstractAction, JMenuItem, JMenu, JMenuBar, KeyStroke, JOptionPane
+from javax.swing import JFrame, AbstractAction, JMenuItem, JMenu, JMenuBar, KeyStroke, JOptionPane
 from javax.swing.filechooser import FileNameExtensionFilter
-from java.awt import Dimension
+from java.awt import Dimension, Font, Color
 from java.awt.event import WindowListener
 
 
-from BritefuryJ.GSymViewSwing import *
-from BritefuryJ.GSymViewSwing.DocLayout import *
-from BritefuryJ.GSymViewSwing.ElementViewFactories import *
+from BritefuryJ.DocPresent import *
+from BritefuryJ.DocPresent.ElementTree import *
+from BritefuryJ.DocPresent.StyleSheets import *
 
 
 from Britefury.Event.QueuedEvent import queueEvent
@@ -70,21 +70,15 @@ class MainAppDocView (object):
 	def __init__(self, app):
 		self._app = app
 		
-		self._editorPane = JEditorPane()
-		self._editorPane.setPreferredSize( Dimension( 640, 480 ) )
+		self._elementTree = ElementTree()
+		self._area = self._elementTree.getPresentationArea()
+		self._area.getComponent().setPreferredSize( Dimension( 640, 480 ) )
 		
-		editorKit = GSymViewEditorKit()
-		self._document = editorKit.createDefaultDocument()
-		self._docLayout = self._document.getDocumentLayout();
-		
-		self._editorPane.setEditorKit( editorKit )
-		self._editorPane.setDocument( self._document )
-
 		self._view = None
 		
 		
 	def getComponent(self):
-		return self._editorPane
+		return self._area.getComponent()
 	
 		
 	def setDocumentContent(self, documentRoot, contentHandler):
@@ -92,14 +86,14 @@ class MainAppDocView (object):
 			self._view = loadDocument( self._app._world, documentRoot, contentHandler )
 			self._view.refreshCell.changedSignal.connect( self.__queueRefresh )
 			self._view.refresh()
-			self._doc.child = self._view.rootView.widget
-			self._view.setDocumentLayout( self._docLayout )
+			self._elementTree.getRoot().setChild( self._view.rootView.element )
 		else:
 			self._view = None
 			
-			subtree = [ DocLayoutNodeLeaf( "<empty>", None, GlyphViewFactory.viewFactory ) ]
-			self._docLayout.getRoot().setChildren( subtree )
-			self._docLayout.refresh()
+			textStyle = TextStyleSheet( Font( 'SansSerif', Font.BOLD, 12 ), Color( 0.0, 0.0, 0.5 ) )
+			textElem = TextElement( textStyle, '<empty>' )
+			rootElem = self._elementTree.getRoot()
+			self._elementTree.getRoot().setChild( textElem )
 		
 			
 	def __refreshView(self):
