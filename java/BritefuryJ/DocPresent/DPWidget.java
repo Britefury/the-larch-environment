@@ -971,24 +971,6 @@ abstract public class DPWidget
 	
 	//
 	//
-	// CONTENT METHODS
-	//
-	//
-	
-	public String getContent()
-	{
-		return "";
-	}
-	
-	public int getContentLength()
-	{
-		return 0;
-	}
-	
-	
-	
-	//
-	//
 	// CONTENT LEAF METHODS
 	//
 	//
@@ -1014,4 +996,8 @@ abstract public class DPWidget
 	{
 		return null;
 	}
+	
+	
+	
+	public abstract ContentInterface getContentInterface();
 }

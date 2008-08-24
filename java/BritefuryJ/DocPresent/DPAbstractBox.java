@@ -1,6 +1,7 @@
 package BritefuryJ.DocPresent;
 
 import java.util.List;
+import java.util.Arrays;
 
 import BritefuryJ.DocPresent.Metrics.HMetrics;
 import BritefuryJ.DocPresent.Metrics.Metrics;
@@ -57,14 +58,7 @@ abstract public class DPAbstractBox extends DPContainerSequence
 
 	public void extend(DPWidget[] children)
 	{
-		ChildEntry[] entries = new ChildEntry[children.length];
-		
-		for (int i = 0; i < children.length; i++)
-		{
-			entries[i] = createChildEntryForChild( children[i] );
-		}
-		
-		extendChildEntries( entries );
+		extend( Arrays.asList( children ) );
 	}
 
 	public void extend(List<DPWidget> children)

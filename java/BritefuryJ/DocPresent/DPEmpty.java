@@ -38,4 +38,17 @@ public class DPEmpty extends DPWidget
 	{
 		return new VMetrics();
 	}
+
+
+	
+	//
+	//
+	// CONTENT METHODS
+	//
+	//
+	
+	public ContentInterface getContentInterface()
+	{
+		return null;
+	}
 }

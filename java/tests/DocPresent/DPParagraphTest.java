@@ -29,10 +29,6 @@ public class DPParagraphTest
 		for (int i = 0; i < words.length; i++)
 		{
 			String word = words[i];
-			if ( i != words.length-1 )
-			{
-				word = word + " ";
-			}
 			nodes.add( new DPText( style, word ) );
 		}
 		return nodes;
@@ -46,7 +42,10 @@ public class DPParagraphTest
 			nodesOut.add( nodesIn.get( i ) );
 			if ( step <= 1  ||  i % step == (step-1) )
 			{
-				nodesOut.add( new DPLineBreak() );
+				DPText space = new DPText( " " );
+				DPLineBreak b = new DPLineBreak();
+				b.setChild( space );
+				nodesOut.add( b );
 			}
 		}
 		return nodesOut;
