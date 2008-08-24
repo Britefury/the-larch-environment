@@ -5,7 +5,7 @@ import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
 
 public class HBoxElement extends SequenceBranchElement
 {
-	protected HBoxElement(HBoxStyleSheet styleSheet)
+	public HBoxElement(HBoxStyleSheet styleSheet)
 	{
 		super( new DPHBox( styleSheet ) );
 	}
