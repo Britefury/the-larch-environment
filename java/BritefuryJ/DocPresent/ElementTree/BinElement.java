@@ -24,7 +24,10 @@ public class BinElement extends BranchElement
 	{
 		if ( child != this.child )
 		{
-			this.child.setParent( null );
+			if ( this.child != null )
+			{
+				this.child.setParent( null );
+			}
 			this.child = child;
 			this.child.setParent( this );
 			

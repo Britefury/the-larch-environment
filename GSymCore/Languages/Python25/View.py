@@ -7,7 +7,7 @@
 ##-*************************
 from Britefury.gSym.View.gSymView import activeBorder, border, indent, highlight, hline, label, markupLabel, entry, markupEntry, customEntry, hbox, ahbox, vbox, flow, flowSep, \
      script, scriptLSuper, scriptLSub, scriptRSuper, scriptRSub, listView, interact, focus, viewEval, mapViewEval, GSymView
-from Britefury.gSym.View.ListView import FlowListViewLayout, HorizontalListViewLayout, VerticalInlineListViewLayout, VerticalListViewLayout
+from Britefury.gSym.View.ListView import ParagraphListViewLayout, HorizontalListViewLayout, VerticalInlineListViewLayout, VerticalListViewLayout
 
 from Britefury.gSym.View.Interactor import keyEventMethod, accelEventMethod, textEventMethod, backspaceStartMethod, deleteEndMethod, Interactor
 
@@ -279,7 +279,7 @@ def tupleView(state, node, xs, parser=None):
 	xWidgets = [ tupleWidget( x )   for x in xViews ]
 	xTexts = [ tupleText( x.text )   for x in xViews ]
 	return nodeEditor( node,
-			   listView( FlowListViewLayout( 5.0, 0.0 ), None, None, ',', xWidgets ),
+			   listView( ParagraphListViewLayout( 5.0, 0.0 ), None, None, ',', xWidgets ),
 			   UnparsedText( UnparsedText( ', ' ).join( [ x   for x in xTexts ] ), PRECEDENCE_TUPLE ),
 			   state )
 
@@ -420,7 +420,7 @@ class Python25View (GSymView):
 	def listTarget(self, state, node, *xs):
 		xViews = mapViewEval( xs, None, python25ViewState( Parser.targetItem ) )
 		return nodeEditor( node,
-				   listView( FlowListViewLayout( 5.0, 0.0 ), '[', ']', ',', xViews ),
+				   listView( ParagraphListViewLayout( 5.0, 0.0 ), '[', ']', ',', xViews ),
 				   UnparsedText( '[ '  +  UnparsedText( ', ' ).join( [ x.text   for x in xViews ] )  +  ' ]', PRECEDENCE_LISTLITERAL ),
 				   state )
 
@@ -448,7 +448,7 @@ class Python25View (GSymView):
 	def listLiteral(self, state, node, *xs):
 		xViews = mapViewEval( xs )
 		return nodeEditor( node,
-				   listView( FlowListViewLayout( 5.0, 0.0 ), '[', ']', ',', xViews ),
+				   listView( ParagraphListViewLayout( 5.0, 0.0 ), '[', ']', ',', xViews ),
 				   UnparsedText( '[ '  +  UnparsedText( ', ' ).join( [ x.text   for x in xViews ] )  +  ' ]', PRECEDENCE_LISTLITERAL ),
 				   state )
 
@@ -518,7 +518,7 @@ class Python25View (GSymView):
 	def dictLiteral(self, state, node, *xs):
 		xViews = mapViewEval( xs, None, python25ViewState( Parser.keyValuePair ) )
 		return nodeEditor( node,
-				   listView( FlowListViewLayout( 10.0, 5.0 ), '{', '}', ',', xViews ),
+				   listView( ParagraphListViewLayout( 10.0, 5.0 ), '{', '}', ',', xViews ),
 				   UnparsedText( '{ '  +  UnparsedText( ', ' ).join( [ x.text   for x in xViews ] )  +  ' }', PRECEDENCE_DICTLITERAL ),
 				   state )
 
@@ -603,7 +603,7 @@ class Python25View (GSymView):
 	def subscriptTuple(self, state, node, *xs):
 		xViews = mapViewEval( xs, None, python25ViewState( Parser.subscriptItem ) )
 		return nodeEditor( node,
-				   listView( FlowListViewLayout( 5.0, 0.0 ), None, None, ',', xViews ),
+				   listView( ParagraphListViewLayout( 5.0, 0.0 ), None, None, ',', xViews ),
 				   UnparsedText( '( '  +  UnparsedText( ', ' ).join( [ x.text   for x in xViews ] )  +  ' )', PRECEDENCE_TUPLE ),
 				   state )
 

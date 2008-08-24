@@ -5,7 +5,8 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
-import traceback
+from BritefuryJ.DocPresent.ElementTree import *
+
 
 from Britefury.Util.SignalSlot import ClassSignal
 
@@ -14,10 +15,6 @@ from Britefury.Kernel import KMeta
 from Britefury.Cell.Cell import RefCell
 
 from Britefury.DocView.DocView import DocView
-
-#from Britefury.DocPresent.Toolkit.DTWidget import *
-#from Britefury.DocPresent.Toolkit.DTBorder import *
-#from Britefury.DocPresent.Toolkit.DTLabel import *
 
 from Britefury.gSym.View.UnparsedText import UnparsedText
 
@@ -37,8 +34,8 @@ class DVNode (object):
 		self.refreshCell = RefCell()
 		self.refreshCell.function = self._o_refreshNode
 		
-		self._widget = DTBin()
-		self._text = None
+		self._element = BinElement()
+		self._metadata = None
 		self._contentsFactory = None
 		self._contentsCell = RefCell()
 		self._contentsCell.function = self._p_computeContents
@@ -75,25 +72,24 @@ class DVNode (object):
 			cell.getImmutableValue()
 		contents = self._contentsCell.getImmutableValue()
 		if isinstance( contents, tuple ):
-			widget, text = contents
-			assert isinstance( widget, DTWidget )  or  isinstance( widget, DVNode )
-			assert isinstance( text, UnparsedText )  or  isinstance( text, str )  or  isinstance( text, unicode )
+			element, metadata = contents
+			assert isinstance( widget, Element )  or  isinstance( widget, DVNode )
 			
 			# If the contents is a DVNode, get its widget
 			if isinstance( widget, DVNode ):
-				widget = widget.widget
+				element = element.element
 			
-			self._widget.child = widget
-			self._text = contents[1]
+			self._element.setChild( element )
+			self._metadata = metadata
 		else:
 			# Contents is just a widget
-			if isinstance( contents, DTWidget ):
-				self._widget.child = contents
+			if isinstance( contents, Element ):
+				self._element.setChild( contents )
 			elif isinstance( contents, DVNode ):
-				self._widget.child = contents.widget
+				self._element.setChild( contents.element )
 			else:
-				raise TypeError, 'contents should be a DTWidget or a DVNode'
-			self._text = None
+				raise TypeError, 'contents should be an Element or a DVNode'
+			self._metadata = None
 
 
 	def _o_resetRefreshCell(self):
@@ -136,14 +132,13 @@ class DVNode (object):
 	# CONTENT ACQUISITION METHODS
 	#
 	
-	def getWidget(self):
+	def getElement(self):
 		self.refresh()
-		return self._widget
+		return self._element
 	
-	def getText(self):
+	def getMetadata(self):
 		self.refresh()
-		return self._text
-	
+		return self._metadata	
 			
 			
 			
@@ -187,8 +182,8 @@ class DVNode (object):
 
 	parentNodeView = property( getParentNodeView )
 	docView = property( getDocView )
-	widget = property( getWidget )
-	text = property( getText )
+	element = property( getElement )
+	metadata = property( getMetadata )
 
 
 

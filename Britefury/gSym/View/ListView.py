@@ -20,16 +20,16 @@ from Britefury.DocView.DVNode import DVNode
 
 
 
-def _listViewCoerce(x):
+def _listViewCoerce(styleSheet, x):
 	if isinstance( x, str )  or  isinstance( x, unicode ):
-		return DTLabel( x )
+		return TextElement( styleSheet, x )
 	else:
 		return x
 
 
-def _listViewFactoryCoerce(x):
+def _listViewFactoryCoerce(styleSheet, x):
 	if isinstance( x, str )  or  isinstance( x, unicode ):
-		return lambda: DTLabel( x )
+		return lambda: TextElement( styleSheet, x )
 	else:
 		return x
 
@@ -54,21 +54,21 @@ class ListViewLayout (object):
 		b[:] = items
 		return b
 	
-	def _p_getContentWidgets(self, contents, xs):
-		widgets = []
+	def _getContentElements(self, contents, xs):
+		elements = []
 		for c in contents:
 			if isinstance( c, DVNode ):
 				c.refresh()
-				widgets.append( c.widget )
-			elif isinstance( c, DTWidget ):
-				widgets.append( c )
+				elements.append( c.getElement() )
+			elif isinstance( c, Element ):
+				elements.append( c )
 			else:
-				raiseRuntimeError( TypeError, xs, 'ListViewLayout._p_getContentWidgets: could not process child of type %s'  %  ( type( c ).__name__, ) )
-		return widgets
+				raiseRuntimeError( TypeError, xs, 'ListViewLayout._getContentElements: could not process child of type %s'  %  ( type( c ).__name__, ) )
+		return elements
 		
 	
 	
-	def _p_buildRefreshCell(self, refreshFunction):
+	def _buildRefreshCell(self, refreshFunction):
 		cell = Cell()
 		cell.function = refreshFunction
 		return cell
@@ -76,11 +76,14 @@ class ListViewLayout (object):
 	
 	
 	
-class FlowListViewLayout (ListViewLayout):
-	def __init__(self, spacing, delimSpacing):
-		super( FlowListViewLayout, self ).__init__()
+class ParagraphListViewLayout (ListViewLayout):
+	def __init__(self, spacing, delimSpacing, delimStyleSheet, paragraphStyleSheet, lineBreakPriority):
+		super( ParagraphListViewLayout, self ).__init__()
 		self._spacing = spacing
 		self._contentsPadding = delimSpacing * 2.0
+		self._delimStyleSheet = delimStyleSheet
+		self._paragraphStyleSheet = paragraphStyleSheet
+		self._lineBreakPriority = lineBreakPriority
 		
 		
 	
@@ -89,26 +92,24 @@ class FlowListViewLayout (ListViewLayout):
 
 		def _refresh():
 			if len( contents ) > 0:
-				contentWidgets = self._p_getContentWidgets( contents, xs )
-				contentsContainer[:] = [ self._p_itemWithSeparator( c, separatorFactory )   for c in contentWidgets[:-1] ]  +  [ contentWidgets[-1] ]
-		refreshCell = self._p_buildRefreshCell( _refresh )
+				contentElements = self._getContentElements( contents, xs )
+				contents = []
+				if beginDelim is not None:
+					contents.append( _listViewCoerce( self._delimStyleSheet, beginDelim ) )
+				for c in contentElements[:-1]:
+					contents.append( c )
+					contents.append( separatorFactory() )
+					contents.append( LineBreakElement( self._lineBreakPriority ) )
+				contents.append( contentElements[-1] )
+				if endDelim is not None:
+					contents.append( _listViewCoerce( self._delimStyleSheet, endDelim ) )
+				paragraph.setChildren( contents )
+		refreshCell = self._buildRefreshCell( _refresh )
 			
 		# Produce contents container
-		contentsContainer = DTFlow( self._spacing )
+		paragraph = ParagraphElement( self._paragraphStyleSheet, self._spacing )
 		
-		# Wrap in delimeter container if necessary
-		if beginDelim is not None  or  endDelim is not None:
-			box = DTBox( alignment=DTBox.ALIGN_BASELINES )
-			if beginDelim is not None:
-				beginDelim = _listViewCoerce( beginDelim )
-				box.append( beginDelim )
-			box.append( contentsContainer, padding=self._contentsPadding )
-			if endDelim is not None:
-				endDelim = _listViewCoerce( endDelim )
-				box.append( endDelim )
-			return box, refreshCell
-		else:
-			return contentsContainer, refreshCell
+		return paragraph, refreshCell
 
 
 		
@@ -126,9 +127,9 @@ class HorizontalListViewLayout (ListViewLayout):
 		
 		def _refresh():
 			if len( contents ) > 0:
-				contentWidgets = self._p_getContentWidgets( contents, xs )
+				contentWidgets = self._getContentElements( contents, xs )
 				contentsContainer[:] = [ self._p_itemWithSeparator( c, separatorFactory )   for c in contentWidgets[:-1] ]  +  [ contentWidgets[-1] ]
-		refreshCell = self._p_buildRefreshCell( _refresh )
+		refreshCell = self._buildRefreshCell( _refresh )
 
 		# Produce contents container
 		contentsContainer = DTBox( alignment=DTBox.ALIGN_BASELINES, spacing=self._spacing )
@@ -178,12 +179,12 @@ class VerticalInlineListViewLayout (ListViewLayout):
 			
 		def _refresh():
 			if len( contents ) <= 1:
-				contentWidgets = self._p_getContentWidgets( contents, xs )
+				contentWidgets = self._getContentElements( contents, xs )
 				contentWidgets = [ beginDelim ] + contentWidgets   if beginDelim is not None   else contentWidgets
 				contentWidgets = contentWidgets + [ endDelim ]   if endDelim is not None   else contentWidgets
 				bin.child = self._p_itemsInHBox( self._delimSpacing, *contentWidgets )
 			elif len( contents ) > 0:
-				contentWidgets = self._p_getContentWidgets( contents, xs )
+				contentWidgets = self._getContentElements( contents, xs )
 				first = self._p_itemsInHBox( self._delimSpacing, beginDelim, contentWidgets[0] )   if beginDelim is not None   else contentWidgets[0]
 				#last = self._p_indent( self._p_itemsInHBox( self._delimSpacing, contentWidgets[-1], endDelim )   if endDelim is not None   else contentWidgets[-1] )
 				last = endDelim
@@ -194,7 +195,7 @@ class VerticalInlineListViewLayout (ListViewLayout):
 				contentsContainer[:] = [ first ]  +  middle  +  [ last ]
 			
 				bin.child = contentsContainer
-		refreshCell = self._p_buildRefreshCell( _refresh )
+		refreshCell = self._buildRefreshCell( _refresh )
 
 		
 		return bin, refreshCell
@@ -215,9 +216,9 @@ class VerticalListViewLayout (ListViewLayout):
 		
 		def _refresh():
 			if len( contents ) > 0:
-				contentWidgets = self._p_getContentWidgets( contents, xs )
+				contentWidgets = self._getContentElements( contents, xs )
 				contentsContainer[:] = [ self._p_itemWithSeparator( c, separatorFactory )   for c in contentWidgets[:-1] ]  +  [ contentWidgets[-1] ]
-		refreshCell = self._p_buildRefreshCell( _refresh )
+		refreshCell = self._buildRefreshCell( _refresh )
 
 		
 		# Produce contents container
