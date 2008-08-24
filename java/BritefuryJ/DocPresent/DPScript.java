@@ -10,7 +10,7 @@ import BritefuryJ.DocPresent.Metrics.VMetricsTypeset;
 import BritefuryJ.DocPresent.StyleSheets.ScriptStyleSheet;
 
 
-public class DPScript extends DPContainer
+public class DPScript extends DPContainer implements ContentInterface
 {
 	public static int LEFTSUPER = 0;
 	public static int LEFTSUB = 1;
@@ -18,7 +18,7 @@ public class DPScript extends DPContainer
 	public static int RIGHTSUPER = 3;
 	public static int RIGHTSUB = 4;
 	
-	private static int NUMCHILDREN = 5;
+	public static int NUMCHILDREN = 5;
 	
 	private static double childScale = 0.7;
 	
@@ -756,5 +756,54 @@ public class DPScript extends DPContainer
 	protected double getScriptSpacing()
 	{
 		return ((ScriptStyleSheet)styleSheet).getScriptSpacing();
+	}
+
+
+
+
+	//
+	//
+	// CONTENT METHODS
+	//
+	//
+
+	public String getContent()
+	{
+		String xs = "";
+		for (DPWidget child: children)
+		{
+			if ( child != null )
+			{
+				ContentInterface childContent = child.getContentInterface();
+				if ( childContent != null )
+				{
+					xs += childContent.getContent();
+				}
+			}
+		}
+		return xs;
+	}
+
+	public int getContentLength()
+	{
+		int length = 0;
+		for (DPWidget child: children)
+		{
+			if ( child != null )
+			{
+				ContentInterface childContent = child.getContentInterface();
+				if ( childContent != null )
+				{
+					length += childContent.getContentLength();
+				}
+			}
+		}
+		return length;
+	}
+	
+	
+	public ContentInterface getContentInterface()
+	{
+		return this;
 	}
 }

@@ -11,7 +11,7 @@ import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleSheets.ContentLeafStyleSheet;
 import BritefuryJ.Math.Point2;
 
-public abstract class DPContentLeaf extends DPWidget
+public abstract class DPContentLeaf extends DPWidget implements ContentInterface
 {
 	public static class InvalidMarkerPosition extends RuntimeException
 	{
@@ -37,7 +37,7 @@ public abstract class DPContentLeaf extends DPWidget
 	
 	private WeakHashMap<Marker,Object> markers;
 	protected String content;
-	protected ContentListener listener;
+	protected WidgetContentListener listener;
 	
 	
 	
@@ -67,6 +67,11 @@ public abstract class DPContentLeaf extends DPWidget
 	//
 	//
 	
+	public ContentInterface getContentInterface()
+	{
+		return this;
+	}
+
 	public String getContent()
 	{
 		return content;
@@ -139,6 +144,12 @@ public abstract class DPContentLeaf extends DPWidget
 		{
 			listener.contentReplaced( m, length, x );
 		}
+	}
+	
+	
+	public void setContentListener(WidgetContentListener listener)
+	{
+		this.listener = listener;
 	}
 	
 	

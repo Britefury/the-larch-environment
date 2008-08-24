@@ -8,7 +8,7 @@ import BritefuryJ.DocPresent.Metrics.VMetrics;
 import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 
 
-public class DPBin extends DPContainer
+public class DPBin extends DPContainer implements ContentInterface
 {
 	protected DPWidget child;
 	protected double childScale;
@@ -173,4 +173,42 @@ public class DPBin extends DPContainer
 	}
 	
 	
+	
+	//
+	//
+	// CONTENT METHODS
+	//
+	//
+
+	public String getContent()
+	{
+		if ( child != null )
+		{
+			ContentInterface childContent = child.getContentInterface();
+			if ( childContent != null )
+			{
+				return childContent.getContent();
+			}
+		}
+		return "";
+	}
+
+	public int getContentLength()
+	{
+		if ( child != null )
+		{
+			ContentInterface childContent = child.getContentInterface();
+			if ( childContent != null )
+			{
+				return childContent.getContentLength();
+			}
+		}
+		return 0;
+	}
+	
+	
+	public ContentInterface getContentInterface()
+	{
+		return this;
+	}
 }

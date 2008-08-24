@@ -2,7 +2,7 @@ package BritefuryJ.DocPresent.StyleSheets;
 
 import java.awt.Color;
 
-public class CustomSymbolStyleSheet extends WidgetStyleSheet
+public class CustomSymbolStyleSheet extends ContentLeafStyleSheet
 {
 	public static CustomSymbolStyleSheet defaultStyleSheet = new CustomSymbolStyleSheet();
 	

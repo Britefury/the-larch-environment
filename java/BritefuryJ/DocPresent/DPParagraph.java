@@ -1,6 +1,7 @@
 package BritefuryJ.DocPresent;
 
 import java.lang.Math;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 
@@ -76,14 +77,7 @@ public class DPParagraph extends DPContainerSequence
 
 	public void extend(DPWidget[] children)
 	{
-		ChildEntry[] entries = new ChildEntry[children.length];
-		
-		for (int i = 0; i < children.length; i++)
-		{
-			entries[i] = createChildEntryForChild( children[i] );
-		}
-		
-		extendChildEntries( entries );
+		extend( Arrays.asList( children ) );
 	}
 
 	public void extend(List<DPWidget> children)
@@ -424,7 +418,7 @@ public class DPParagraph extends DPContainerSequence
 				if ( bestLineBreakIndex > lineStartIndex )
 				{
 					// Build a new line
-					lines.add( new Line( childEntries.subList( lineStartIndex, bestLineBreakIndex ) ) );
+					lines.add( new Line( childEntries.subList( lineStartIndex, bestLineBreakIndex +1 ) ) );
 				}
 				
 				// We want the for-loop to return to the break position

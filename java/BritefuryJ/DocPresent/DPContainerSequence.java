@@ -1,5 +1,6 @@
 package BritefuryJ.DocPresent;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Vector;
@@ -13,7 +14,7 @@ import BritefuryJ.JythonInterface.JythonSlice;
 
 
 
-abstract public class DPContainerSequence extends DPContainer
+abstract public class DPContainerSequence extends DPContainer implements ContentInterface
 {
 	public DPContainerSequence()
 	{
@@ -24,6 +25,48 @@ abstract public class DPContainerSequence extends DPContainer
 	{
 		super( styleSheet );
 	}
+
+	
+	
+	@SuppressWarnings("unchecked")
+	public void setChildren(List<DPWidget> items)
+	{
+		HashSet<ChildEntry> oldEntrySet = new HashSet<ChildEntry>( childEntries );
+		
+		ChildEntry[] itemEntriesArray = new ChildEntry[items.size()];
+		for (int i = 0; i < items.size(); i++)
+		{
+			itemEntriesArray[i] = createChildEntryForChild( items.get( i ) );
+		}
+		
+		HashSet<ChildEntry> newEntrySet = new HashSet<ChildEntry>( Arrays.asList( itemEntriesArray ) );
+		
+		
+		HashSet<ChildEntry> removed = (HashSet<ChildEntry>)oldEntrySet.clone();
+		removed.removeAll( newEntrySet );
+		HashSet<ChildEntry> added = (HashSet<ChildEntry>)newEntrySet.clone();
+		added.removeAll( oldEntrySet );
+		
+		
+		for (ChildEntry entry: removed)
+		{
+			unregisterChildEntry( entry );
+		}
+		
+		childEntries.clear();
+		childEntries.addAll( Arrays.asList( itemEntriesArray ) );
+
+		for (ChildEntry entry: added)
+		{
+			registerChildEntry( entry );
+		}
+		
+		
+		childListModified();
+		queueResize();
+	}
+	
+	
 
 	
 	
@@ -95,11 +138,8 @@ abstract public class DPContainerSequence extends DPContainer
 			unregisterChildEntry( entry );
 		}
 
-		childEntries.setSize( newChildEntriesArray.length );
-		for (int i = 0; i < newChildEntriesArray.length; i++)
-		{
-			childEntries.set( i, newChildEntriesArray[i] );
-		}
+		childEntries.clear();
+		childEntries.addAll( Arrays.asList( newChildEntriesArray ) );
 		
 		for (ChildEntry entry: added)
 		{
@@ -364,5 +404,48 @@ abstract public class DPContainerSequence extends DPContainer
 	VMetrics[] getChildrenPreferredVMetrics()
 	{
 		return getChildrenPreferredVMetrics( childEntries );
+	}
+
+
+
+
+	//
+	//
+	// CONTENT METHODS
+	//
+	//
+
+	public String getContent()
+	{
+		String xs = "";
+		for (DPWidget child: getChildren())
+		{
+			ContentInterface childContent = child.getContentInterface();
+			if ( childContent != null )
+			{
+				xs += childContent.getContent();
+			}
+		}
+		return xs;
+	}
+
+	public int getContentLength()
+	{
+		int length = 0;
+		for (DPWidget child: getChildren())
+		{
+			ContentInterface childContent = child.getContentInterface();
+			if ( childContent != null )
+			{
+				length += childContent.getContentLength();
+			}
+		}
+		return length;
+	}
+	
+	
+	public ContentInterface getContentInterface()
+	{
+		return this;
 	}
 }
