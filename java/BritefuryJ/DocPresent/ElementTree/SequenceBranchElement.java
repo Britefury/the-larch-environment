@@ -17,6 +17,8 @@ public class SequenceBranchElement extends BranchElement
 	protected SequenceBranchElement(DPContainerSequence widget)
 	{
 		super( widget );
+		
+		children = new Vector<Element>();
 	}
 
 
@@ -58,6 +60,6 @@ public class SequenceBranchElement extends BranchElement
 	
 	public DPContainerSequence getWidget()
 	{
-		return (DPContainerSequence)super.getWidget();
+		return (DPContainerSequence)widget;
 	}
 }

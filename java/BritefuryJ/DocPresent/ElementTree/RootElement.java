@@ -12,6 +12,6 @@ public class RootElement extends BinElement
 	
 	public DPPresentationArea getWidget()
 	{
-		return (DPPresentationArea)super.getWidget();
+		return (DPPresentationArea)widget;
 	}
 }

@@ -13,6 +13,6 @@ public class VBoxElement extends SequenceBranchElement
 
 	public DPVBox getWidget()
 	{
-		return (DPVBox)super.getWidget();
+		return (DPVBox)widget;
 	}
 }

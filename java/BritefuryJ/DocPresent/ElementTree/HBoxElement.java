@@ -13,6 +13,6 @@ public class HBoxElement extends SequenceBranchElement
 
 	public DPHBox getWidget()
 	{
-		return (DPHBox)super.getWidget();
+		return (DPHBox)widget;
 	}
 }

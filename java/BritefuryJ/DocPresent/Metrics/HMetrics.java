@@ -64,6 +64,12 @@ public class HMetrics extends Metrics
 	}
 	
 	
+	public HMetrics border(double leftMargin, double rightMargin)
+	{
+		return new HMetrics( width + leftMargin + rightMargin, Math.max( hspacing - rightMargin, 0.0 ) );
+	}
+	
+	
 	
 	public HMetrics add(HMetrics x)
 	{

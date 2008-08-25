@@ -9,22 +9,10 @@ import sys
 
 from copy import copy
 
+from BritefuryJ.DocPresent.ElementTree import *
+from BritefuryJ.DocPresent.StyleSheets import *
+
 from Britefury.Cell.Cell import Cell
-
-#from Britefury.DocPresent.Toolkit.DTWidget import DTWidget
-#from Britefury.DocPresent.Toolkit.DTActiveBorder import DTActiveBorder
-#from Britefury.DocPresent.Toolkit.DTBin import DTBin 
-#from Britefury.DocPresent.Toolkit.DTBorder import DTBorder
-#from Britefury.DocPresent.Toolkit.DTBox import DTBox
-#from Britefury.DocPresent.Toolkit.DTHighlight import DTHighlight
-#from Britefury.DocPresent.Toolkit.DTHLine import DTHLine
-#from Britefury.DocPresent.Toolkit.DTLabel import DTLabel
-#from Britefury.DocPresent.Toolkit.DTScript import DTScript
-#from Britefury.DocPresent.Toolkit.DTEntryLabel import DTEntryLabel
-#from Britefury.DocPresent.Toolkit.DTCustomEntry import DTCustomEntry
-#from Britefury.DocPresent.Toolkit.DTFlow import DTFlow
-#from Britefury.DocPresent.Toolkit.DTFlowWithSeparators import DTFlowWithSeparators
-
 
 from Britefury.DocView.DVNode import DVNode
 from Britefury.DocView.DocView import DocView
@@ -149,51 +137,34 @@ def _binRefreshCell(viewNodeInstance, bin, child):
 		chNode = child
 		def _binRefresh():
 			chNode.refresh()
-			bin.child = chNode.widget
+			bin.setChild( chNode.element )
 			_registerViewNodeRelationship( viewNodeInstance, chNode )
 		_buildRefreshCellAndRegister( viewNodeInstance, _binRefresh )
-	elif isinstance( child, DTWidget ):
-		bin.child = child
+	elif isinstance( child, Element ):
+		bin.setChild( child )
 	else:
 		raiseRuntimeError( TypeError, viewNodeInstance.xs, '_GSymNodeViewInstance._binRefreshCell: could not process child of type %s'  %  ( type( child ).__name__, ) )
 
-def _customEntryRefreshCell(viewNodeInstance, customEntry, child):
-	"""
-	Runtime - called by compiled code at run-time
-	Builds and registers a refresh cell (if necessary) for a widget that is an instance of DTCusomEntry
-	"""
-	if isinstance( child, DVNode ):
-		chNode = child
-		def _customEntryRefresh():
-			chNode.refresh()
-			customEntry.customChild = chNode.widget
-			_registerViewNodeRelationship( viewNodeInstance, chNode )
-		_buildRefreshCellAndRegister( viewNodeInstance, _customEntryRefresh )
-	elif isinstance( child, DTWidget ):
-		customEntry.customChild = child
-	else:
-		raiseRuntimeError( TypeError, viewNodeInstance.xs, '_GSymNodeViewInstance._customEntryRefreshCell: could not process child of type %s'  %  ( type( child ).__name__, ) )
-
-def _containerSeqRefreshCell(viewNodeInstance, widget, children):
+def _containerSeqRefreshCell(viewNodeInstance, container, children):
 	"""
 	Runtime - called by compiled code at run-time
 	Builds and registers a refresh cell (if necessary) for a widget that is an instance of DTBox
 	"""
 	def _containerSeqRefresh():
-		widgets = []
+		elements = []
 		for child in children:
 			if isinstance( child, DVNode ):
 				child.refresh()
-				widgets.append( child.widget )
+				elements.append( child.element )
 				_registerViewNodeRelationship( viewNodeInstance, child )
-			elif isinstance( child, DTWidget ):
-				widgets.append( child )
+			elif isinstance( child, Element ):
+				elements.append( child )
 			else:
 				raiseRuntimeError( TypeError, viewNodeInstance.xs, 'defineView: _containerSeqRefreshCell: could not process child of type %s'  %  ( type( child ).__name__, ) )
-		widget[:] = widgets
+		container.setChildren( elements )
 	_buildRefreshCellAndRegister( viewNodeInstance, _containerSeqRefresh )
 
-def _scriptRefreshCell(viewNodeInstance, script, child, childSlotAttrName):
+def _scriptRefreshCell(viewNodeInstance, script, child, slotIndex):
 	"""
 	Runtime - called by compiled code at run-time
 	Builds and registers a refresh cell (if necessary) for a widget that is an instance of DTBin
@@ -202,29 +173,17 @@ def _scriptRefreshCell(viewNodeInstance, script, child, childSlotAttrName):
 		chNode = child
 		def _scriptRefresh():
 			chNode.refresh()
-			#script.mainChild = chNode.widget
-			setattr( script, childSlotAttrName, chNode.widget )
+			script.setChild( slotIndex, chNode.element )
 			_registerViewNodeRelationship( viewNodeInstance, chNode )
 		_buildRefreshCellAndRegister( viewNodeInstance, _scriptRefresh )
-	elif isinstance( child, DTWidget ):
-		#script.mainChild = child
-		setattr( script, childSlotAttrName, child)
+	elif isinstance( child, Element ):
+		script.setChild( slotIndex, child )
 	else:
 		raiseRuntimeError( TypeError, viewNodeInstance.xs, '_GSymNodeViewInstance._scriptRefreshCell: could not process child of type %s'  %  ( type( child ).__name__, ) )
 
 
 	
 	
-def _applyStyleSheetStack(viewNodeInstance, widget):
-	for styleSheet in viewNodeInstance.styleSheetStack:
-		styleSheet.applyToWidget( widget )
-
-
-
-
-	
-
-
 			
 	
 
@@ -232,258 +191,117 @@ def _setKeyHandler(viewNodeInstance, widget):
 	widget.keyHandler = viewNodeInstance.viewInstance._p_handleKeyPress
 
 
-	
-	
-	
-	
-	
-def _applyStyle(style, widget):
-	if style is not None:
-		if isinstance( style, GSymStyleSheet ):
-			style.applyToWidget( widget )
-		else:
-			for s in style:
-				s.applyToWidget( widget )
-				
-				
 
-def activeBorder(child, style=None):
+
+#
+#
+# 'ctx' parameters are _GSymNodeViewInstance instances
+#
+#
+
+
+
+def border(ctx, styleSheet, child):
 	"""
 	Runtime - called by compiled code at run-time
-	Builds a DTActiveBorder widget, with child, builds and registers a refresh cell
+	Builds a DPBorder widget, with child, builds and registers a refresh cell
 	"""
-	viewNodeInstance = _globalNodeViewInstanceStack[-1]
-	widget = DTActiveBorder()
-	_setKeyHandler( viewNodeInstance, widget )
-	_binRefreshCell( viewNodeInstance, widget, child )
-	_applyStyleSheetStack( viewNodeInstance, widget )
-	_applyStyle( style, widget )
-	return widget
+	viewNodeInstance = ctx
+	element = BorderElement( styleSheet )
+	_binRefreshCell( viewNodeInstance, element, child )
+	return element
 
-def border(child, style=None):
+def indent(ctx, indentation, child):
 	"""
 	Runtime - called by compiled code at run-time
-	Builds a DTBorder widget, with child, builds and registers a refresh cell
+	Builds a DPBorder widget, with child, builds and registers a refresh cell
 	"""
-	viewNodeInstance = _globalNodeViewInstanceStack[-1]
-	widget = DTBorder()
-	_binRefreshCell( viewNodeInstance, widget, child )
-	_applyStyleSheetStack( viewNodeInstance, widget )
-	_applyStyle( style, widget )
-	return widget
+	viewNodeInstance = ctx
+	styleSheet = viewNodeInstance.viewInstance._indentationStyleSheet( indentation )
+	element = BorderElement( styleSheet )
+	_binRefreshCell( viewNodeInstance, element, child )
+	return element
 
-def indent(child, indentation, style=None):
-	"""
-	Runtime - called by compiled code at run-time
-	Builds a DTBorder widget, with child, builds and registers a refresh cell
-	"""
-	viewNodeInstance = _globalNodeViewInstanceStack[-1]
-	widget = DTBorder()
-	widget.allMargins = 0.0
-	widget.leftMargin = indentation
-	_binRefreshCell( viewNodeInstance, widget, child )
-	_applyStyleSheetStack( viewNodeInstance, widget )
-	_applyStyle( style, widget )
-	return widget
-
-def highlight(child, stateMask=0, stateTest=0, style=None):
+def text(ctx, styleSheet, txt):
 	"""
 	Runtime - called by compiled code at run-time
-	Builds a DTHighlight widget, with child, builds and registers a refresh cell
+	Builds a DPText widget
 	"""
-	viewNodeInstance = _globalNodeViewInstanceStack[-1]
-	widget = DTHighlight( stateMask, stateTest )
-	_binRefreshCell( viewNodeInstance, widget, child )
-	_applyStyleSheetStack( viewNodeInstance, widget )
-	_applyStyle( style, widget )
-	return widget
+	viewNodeInstance = ctx
+	element = TextElement( styleSheet, txt )
+	return element
 
-def hline(style=None):
-	"""
-	Runtime - called by compiled code at run-time
-	Builds a DTLabel widget
-	"""
-	viewNodeInstance = _globalNodeViewInstanceStack[-1]
-	widget = DTHLine()
-	_applyStyleSheetStack( viewNodeInstance, widget )
-	_applyStyle( style, widget )
-	return widget
 
-def label(text, style=None):
+
+def hbox(ctx, styleSheet, children):
 	"""
 	Runtime - called by compiled code at run-time
-	Builds a DTLabel widget
+	Builds a DPHBox widget, with child, builds and registers a refresh cell
 	"""
-	viewNodeInstance = _globalNodeViewInstanceStack[-1]
-	if isinstance( text, DocTreeNode ):
-		text = text.node
-	widget = DTLabel( text )
-	_applyStyleSheetStack( viewNodeInstance, widget )
-	_applyStyle( style, widget )
-	return widget
+	viewNodeInstance = ctx
+	element = HBoxElement( styleSheet )
+	_containerSeqRefreshCell( viewNodeInstance, element, children )
+	return element
 
-def markupLabel(text, style=None):
+_ahboxStyleSheet = HBoxStyleSheet( DPHBox.Alignment.BASELINES, 0.0, False, 0.0 )
+def ahbox(ctx, children):
 	"""
 	Runtime - called by compiled code at run-time
-	Builds a markup DTLabel widget
+	Builds a DPHBox widget, with child, builds and registers a refresh cell
 	"""
-	viewNodeInstance = _globalNodeViewInstanceStack[-1]
-	if isinstance( text, DocTreeNode ):
-		text = text.node
-	widget = DTLabel( text )
-	widget.bUseMarkup = True
-	_applyStyleSheetStack( viewNodeInstance, widget )
-	_applyStyle( style, widget )
-	return widget
+	return hbox( ctx, _ahboxStyleSheet, children )
 
-
-
-def entry(labelText, entryText, style=None):
-	"""Builds a DTEntryLabel widget"""
-	viewNodeInstance = _globalNodeViewInstanceStack[-1]
-	if isinstance( labelText, DocTreeNode ):
-		labelText = labelText.node
-	if isinstance( entryText, DocTreeNode ):
-		entryText = entryText.node
-	widget = DTEntryLabel( labelText, entryText )
-	widget.textModifiedSignal.connect( viewNodeInstance.viewInstance._p_onEntryModifed )
-	widget.finishEditingSignal.connect( viewNodeInstance.viewInstance._p_onEntryFinished )
-	widget.backspaceStartSignal.connect( viewNodeInstance.viewInstance._p_onEntryBackspaceStart )
-	widget.deleteEndSignal.connect( viewNodeInstance.viewInstance._p_onEntryDeleteEnd )
-	_applyStyleSheetStack( viewNodeInstance, widget )
-	_applyStyle( style, widget )
-	return widget
-
-def markupEntry(labelText, entryText, style=None):
-	"""Builds a DTEntryLabel widget"""
-	viewNodeInstance = _globalNodeViewInstanceStack[-1]
-	if isinstance( labelText, DocTreeNode ):
-		labelText = labelText.node
-	if isinstance( entryText, DocTreeNode ):
-		entryText = entryText.node
-	widget = DTEntryLabel( labelText, entryText )
-	widget.textModifiedSignal.connect( viewNodeInstance.viewInstance._p_onEntryModifed )
-	widget.finishEditingSignal.connect( viewNodeInstance.viewInstance._p_onEntryFinished )
-	widget.backspaceStartSignal.connect( viewNodeInstance.viewInstance._p_onEntryBackspaceStart )
-	widget.deleteEndSignal.connect( viewNodeInstance.viewInstance._p_onEntryDeleteEnd )
-	widget.bLabelUseMarkup = True
-	_applyStyleSheetStack( viewNodeInstance, widget )
-	_applyStyle( style, widget )
-	return widget
-
-def customEntry(customChild, entryText, stateMask=0, stateTest=0, style=None):
-	"""Builds a DTEntryLabel widget"""
-	viewNodeInstance = _globalNodeViewInstanceStack[-1]
-	if isinstance( entryText, DocTreeNode ):
-		entryText = entryText.node
-	elif isinstance( entryText, UnparsedText ):
-		entryText = entryText.getText()
-	widget = DTCustomEntry( entryText, stateMask=stateMask, stateTest=stateTest )
-	widget.textModifiedSignal.connect( viewNodeInstance.viewInstance._p_onEntryModifed )
-	widget.finishEditingSignal.connect( viewNodeInstance.viewInstance._p_onEntryFinished )
-	widget.backspaceStartSignal.connect( viewNodeInstance.viewInstance._p_onEntryBackspaceStart )
-	widget.deleteEndSignal.connect( viewNodeInstance.viewInstance._p_onEntryDeleteEnd )
-	_customEntryRefreshCell( viewNodeInstance, widget, customChild )
-	_applyStyleSheetStack( viewNodeInstance, widget )
-	_applyStyle( style, widget )
-	return widget
-
-
-
-#def hbox(children, style=None, alignment=DTBox.ALIGN_CENTRE, spacing=0.0):
-def hbox(children, style=None, alignment=None, spacing=0.0):
-	"""
-	Runtime - called by compiled code at run-time
-	Builds a horizontal DTBox widget, with child, builds and registers a refresh cell
-	"""
-	viewNodeInstance = _globalNodeViewInstanceStack[-1]
-	widget = DTBox( spacing=spacing, alignment=alignment )
-	_containerSeqRefreshCell( viewNodeInstance, widget, children )
-	_applyStyleSheetStack( viewNodeInstance, widget )
-	_applyStyle( style, widget )
-	return widget
-
-def ahbox(children, style=None, spacing=0.0):
-	"""
-	Runtime - called by compiled code at run-time
-	Builds a horizontal DTBox widget, with child, builds and registers a refresh cell
-	"""
-	viewNodeInstance = _globalNodeViewInstanceStack[-1]
-	widget = DTBox( spacing=spacing, alignment=DTBox.ALIGN_BASELINES )
-	_containerSeqRefreshCell( viewNodeInstance, widget, children )
-	_applyStyleSheetStack( viewNodeInstance, widget )
-	_applyStyle( style, widget )
-	return widget
-
-#def vbox(children, style=None, alignment=DTBox.ALIGN_LEFT, spacing=0.0):
-def vbox(children, style=None, alignment=None, spacing=0.0):
+def vbox(ctx, styleSheet, children):
 	"""
 	Runtime - called by compiled code at run-time
 	Builds a vertical DTBox widget, with child, builds and registers a refresh cell
 	"""
-	viewNodeInstance = _globalNodeViewInstanceStack[-1]
-	widget = DTBox( direction=DTBox.TOP_TO_BOTTOM, spacing=spacing, alignment=alignment )
-	_containerSeqRefreshCell( viewNodeInstance, widget, children )
-	_applyStyleSheetStack( viewNodeInstance, widget )
-	_applyStyle( style, widget )
-	return widget
+	viewNodeInstance = ctx
+	element = VBoxElement( styleSheet )
+	_containerSeqRefreshCell( viewNodeInstance, element, children )
+	return element
 
-def flow(children, style=None, spacing=0.0, indentation=40.0):
+def paragraph(ctx, styleSheet, children):
 	"""
 	Runtime - called by compiled code at run-time
 	Builds a DTFlow widget, with child, builds and registers a refresh cell
 	"""
-	viewNodeInstance = _globalNodeViewInstanceStack[-1]
-	widget = DTFlow( spacing=spacing, indentation=indentation )
-	_containerSeqRefreshCell( viewNodeInstance, widget, children )
-	_applyStyleSheetStack( viewNodeInstance, widget )
-	_applyStyle( style, widget )
-	return widget
+	viewNodeInstance = ctx
+	element = ParagraphElement( styleSheet )
+	_containerSeqRefreshCell( viewNodeInstance, element, children )
+	return element
 
-def flowSep(children, separatorFactory=',', style=None, spacing=0.0, indentation=0.0):
-	"""
-	Runtime - called by compiled code at run-time
-	Builds a DTFlowWithSeparators widget, with child, builds and registers a refresh cell
-	"""
-	viewNodeInstance = _globalNodeViewInstanceStack[-1]
-	widget = DTFlowWithSeparators( separatorFactory, spacing=spacing, indentation=indentation )
-	_containerSeqRefreshCell( viewNodeInstance, widget, children )
-	_applyStyleSheetStack( viewNodeInstance, widget )
-	_applyStyle( style, widget )
-	return widget
 
-def script(mainChild, leftSuperChild, leftSubChild, rightSuperChild, rightSubChild, style=None):
+def script(ctx, styleSheet, mainChild, leftSuperChild, leftSubChild, rightSuperChild, rightSubChild):
 	"""
 	Runtime - called by compiled code at run-time
 	Builds a DTActiveBorder widget, with child, builds and registers a refresh cell
 	"""
-	viewNodeInstance = _globalNodeViewInstanceStack[-1]
-	widget = DTScript()
+	viewNodeInstance = ctx
+	element = ScriptElement( styleSheet )
 	
-	_scriptRefreshCell( viewNodeInstance, widget, mainChild, 'mainChild' )
+	_scriptRefreshCell( viewNodeInstance, widget, mainChild, DPScript.MAIN )
 	if leftSuperChild is not None:
-		_scriptRefreshCell( viewNodeInstance, widget, leftSuperChild, 'leftSuperscriptChild' )
+		_scriptRefreshCell( viewNodeInstance, widget, leftSuperChild, DPScript.LEFTSUPER )
 	if leftSubChild is not None:
-		_scriptRefreshCell( viewNodeInstance, widget, leftSubChild, 'leftSubscriptChild' )
+		_scriptRefreshCell( viewNodeInstance, widget, leftSubChild, DPScript.LEFTSUB )
 	if rightSuperChild is not None:
-		_scriptRefreshCell( viewNodeInstance, widget, rightSuperChild, 'rightSuperscriptChild' )
+		_scriptRefreshCell( viewNodeInstance, widget, rightSuperChild, DPScript.RIGHTSUPER )
 	if rightSubChild is not None:
-		_scriptRefreshCell( viewNodeInstance, widget, rightSubChild, 'rightSubscriptChild' )
-	_applyStyleSheetStack( viewNodeInstance, widget )
-	_applyStyle( style, widget )
-	return widget
+		_scriptRefreshCell( viewNodeInstance, widget, rightSubChild, DPScript.RIGHTSUB )
+	return element
 
-def scriptLSuper(mainChild, scriptChild, style=None):
-	return script( mainChild, scriptChild, None, None, None, style )
+def scriptLSuper(ctx, styleSheet, mainChild, scriptChild):
+	return script( ctx, styleSheet, mainChild, scriptChild, None, None, None )
 
-def scriptLSub(mainChild, scriptChild, style=None):
-	return script( mainChild, None, scriptChild, None, None, style )
+def scriptLSub(ctx, styleSheet, mainChild, scriptChild):
+	return script( ctx, styleSheet, mainChild, None, scriptChild, None, None )
 
-def scriptRSuper(mainChild, scriptChild, style=None):
-	return script( mainChild, None, None, scriptChild, None, style )
+def scriptRSuper(ctx, styleSheet, mainChild, scriptChild):
+	return script( ctx, styleSheet, mainChild, None, None, scriptChild, None )
 
-def scriptRSub(mainChild, scriptChild, style=None):
-	return script( mainChild, None, None, None, scriptChild, style )
+def scriptRSub(ctx, styleSheet, mainChild, scriptChild):
+	return script( ctx, styleSheet, mainChild, None, None, None, scriptChild )
 
 
 
@@ -555,11 +373,6 @@ def interact(child, *interactors):
 		return _processChild( child )
 		
 
-def focus(child):
-	viewNodeInstance = _globalNodeViewInstanceStack[-1]
-	viewNodeInstance.viewNode.focus = child
-	return child
-
 
 
 def viewEval(content, nodeViewFunction=None, state=None):
@@ -581,6 +394,8 @@ def viewEval(content, nodeViewFunction=None, state=None):
 
 def mapViewEval(content, nodeViewFunction=None, state=None):
 	return [ viewEval( x, nodeViewFunction, state )   for x in content ]
+
+
 
 
 
@@ -624,9 +439,22 @@ class _GSymViewInstance (object):
 		self.focusWidget = None
 		self._queue = _ViewQueue( self.view )
 		
+		self._indentationStyleSheets = {}
+		
 		self._nodeContentsFactories = {}
 		
+		
+		
+	def _indentationStyleSheet(self, indentation):
+		try:
+			return self._indentationStyleSheets[indentation]
+		except KeyError:
+			styleSheet = BorderStyleSheet( indentation, 0.0, 0.0, 0.0 )
+			self._indentationStyleSheets[indentation] = styleSheet
+			return styleSheet
 	
+	
+		
 	def _f_makeNodeFactory(self, nodeViewFunction, state):
 		def _nodeFactory(view, treeNode):
 			# Build a DVNode for the document subtree at @docNode

@@ -44,6 +44,6 @@ public class BinElement extends BranchElement
 	
 	public DPBin getWidget()
 	{
-		return (DPBin)super.getWidget();
+		return (DPBin)widget;
 	}
 }

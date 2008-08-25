@@ -11,7 +11,8 @@ import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
-public class DPVBoxTest {
+public class DPVBoxTest
+{
 	protected static DPText[] makeTexts(String header)
 	{
 		TextStyleSheet t12 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );

@@ -123,6 +123,6 @@ public class ScriptElement extends BranchElement
 
 	public DPScript getWidget()
 	{
-		return (DPScript)super.getWidget();
+		return (DPScript)widget;
 	}
 }
