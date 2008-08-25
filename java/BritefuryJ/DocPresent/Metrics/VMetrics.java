@@ -55,6 +55,11 @@ public class VMetrics extends Metrics
 		return new VMetrics( height, vspacing );
 	}
 	
+	public VMetrics border(double topMargin, double bottomMargin)
+	{
+		return new VMetrics( height + topMargin + bottomMargin, Math.max( vspacing - bottomMargin, 0.0 ) );
+	}
+	
 	
 	
 	public boolean isTypeset()

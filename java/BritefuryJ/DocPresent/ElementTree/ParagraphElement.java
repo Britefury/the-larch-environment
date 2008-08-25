@@ -13,6 +13,6 @@ public class ParagraphElement extends SequenceBranchElement
 
 	public DPParagraph getWidget()
 	{
-		return (DPParagraph)super.getWidget();
+		return (DPParagraph)widget;
 	}
 }

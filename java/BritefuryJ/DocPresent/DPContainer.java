@@ -550,7 +550,7 @@ public abstract class DPContainer extends DPWidget {
 	
 	protected void drawBackground(Graphics2D graphics)
 	{
-		Color backgroundColour = getBackgroundColour();
+		Color backgroundColour = getStyleSheet().getBackgroundColour();
 		if ( backgroundColour != null )
 		{
 			graphics.setColor( backgroundColour );
@@ -840,8 +840,8 @@ public abstract class DPContainer extends DPWidget {
 	//
 	//
 	
-	protected Color getBackgroundColour()
+	protected ContainerStyleSheet getStyleSheet()
 	{
-		return ((ContainerStyleSheet)styleSheet).getBackgroundColour();
+		return (ContainerStyleSheet)styleSheet;
 	}
 }

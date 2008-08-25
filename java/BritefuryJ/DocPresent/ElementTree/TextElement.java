@@ -14,6 +14,6 @@ public class TextElement extends LeafElement
 
 	public DPText getWidget()
 	{
-		return (DPText)super.getWidget();
+		return (DPText)widget;
 	}
 }

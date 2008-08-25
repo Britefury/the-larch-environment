@@ -7,32 +7,23 @@
 ##-*************************
 from Britefury.Cell.Cell import Cell
 
-#from Britefury.DocPresent.Toolkit.DTWidget import DTWidget
-#from Britefury.DocPresent.Toolkit.DTLabel import DTLabel
-#from Britefury.DocPresent.Toolkit.DTBorder import DTBorder
-#from Britefury.DocPresent.Toolkit.DTBox import DTBox
-#from Britefury.DocPresent.Toolkit.DTBin import DTBin
-#from Britefury.DocPresent.Toolkit.DTFlow import DTFlow
-#from Britefury.DocPresent.Toolkit.DTFlowWithSeparators import DTFlowWithSeparators
-
 from Britefury.DocView.DVNode import DVNode
 
+from BritefuryJ.DocPresent.ElementTree import *
+from BritefuryJ.DocPresent.StyleSheets import *
 
 
 
-def _listViewCoerce(styleSheet, x):
-	if isinstance( x, str )  or  isinstance( x, unicode ):
-		return TextElement( styleSheet, x )
-	else:
+
+def _listViewCoerce(x):
+	if isinstance( x, Element ):
 		return x
-
-
-def _listViewFactoryCoerce(styleSheet, x):
-	if isinstance( x, str )  or  isinstance( x, unicode ):
-		return lambda: TextElement( styleSheet, x )
 	else:
-		return x
+		return x()
 
+
+def listViewStrToElementFactory(styleSheet, x):
+	return TextElement( styleSheet, x )
 	
 	
 
@@ -40,19 +31,6 @@ def _listViewFactoryCoerce(styleSheet, x):
 class ListViewLayout (object):
 	def layoutContents(self, xs, contents, beginDelim, endDelim, separatorFactory):
 		pass
-	
-	def _p_itemWithSeparator(self, item, separatorFactory):
-		if separatorFactory is not None:
-			b = DTBox( alignment=DTBox.ALIGN_BASELINES )
-			b[:] = [ item, separatorFactory() ]
-			return b
-		else:
-			return item
-	
-	def _p_itemsInHBox(self, spacing, *items):
-		b = DTBox( alignment=DTBox.ALIGN_BASELINES, spacing=spacing )
-		b[:] = items
-		return b
 	
 	def _getContentElements(self, contents, xs):
 		elements = []
@@ -77,96 +55,89 @@ class ListViewLayout (object):
 	
 	
 class ParagraphListViewLayout (ListViewLayout):
-	def __init__(self, spacing, delimSpacing, delimStyleSheet, paragraphStyleSheet, lineBreakPriority):
+	def __init__(self, paragraphStyleSheet, spacingFactory, lineBreakPriority):
 		super( ParagraphListViewLayout, self ).__init__()
-		self._spacing = spacing
-		self._contentsPadding = delimSpacing * 2.0
-		self._delimStyleSheet = delimStyleSheet
 		self._paragraphStyleSheet = paragraphStyleSheet
+		self._spacingFactory = spacingFactory
 		self._lineBreakPriority = lineBreakPriority
-		
 		
 	
 	def layoutContents(self, xs, contents, beginDelim, endDelim, separatorFactory):
-		separatorFactory = _listViewFactoryCoerce( separatorFactory )
-
 		def _refresh():
 			if len( contents ) > 0:
 				contentElements = self._getContentElements( contents, xs )
-				contents = []
+				childElements = []
 				if beginDelim is not None:
-					contents.append( _listViewCoerce( self._delimStyleSheet, beginDelim ) )
+					childElements.append( _listViewCoerce( beginDelim ) )
 				for c in contentElements[:-1]:
-					contents.append( c )
-					contents.append( separatorFactory() )
-					contents.append( LineBreakElement( self._lineBreakPriority ) )
-				contents.append( contentElements[-1] )
+					childElements.append( c )
+					childElements.append( separatorFactory() )
+					lineBreak = LineBreakElement( self._lineBreakPriority )
+					if self._spacingFactory is not None:
+						lineBreak.setChild( self._spacingFactory() )
+					childElements.append( lineBreak )
+				childElements.append( contentElements[-1] )
 				if endDelim is not None:
-					contents.append( _listViewCoerce( self._delimStyleSheet, endDelim ) )
-				paragraph.setChildren( contents )
+					childElements.append( _listViewCoerce( endDelim ) )
+				paragraphElem.setChildren( childElements )
 		refreshCell = self._buildRefreshCell( _refresh )
 			
 		# Produce contents container
-		paragraph = ParagraphElement( self._paragraphStyleSheet, self._spacing )
+		paragraphElem = ParagraphElement( self._paragraphStyleSheet )
 		
-		return paragraph, refreshCell
+		return paragraphElem, refreshCell
 
 
 		
 		
 		
 class HorizontalListViewLayout (ListViewLayout):
-	def __init__(self, spacing, delimSpacing):
+	def __init__(self, hboxStyleSheet, spacingFactory):
 		super( HorizontalListViewLayout, self ).__init__()
-		self._spacing = spacing
-		self._contentsPadding = delimSpacing * 2.0
+		self._hboxStyleSheet = hboxStyleSheet
+		self._spacingFactory = spacingFactory
 
 
 	def layoutContents(self, xs, contents, beginDelim, endDelim, separatorFactory):
-		separatorFactory = _listViewFactoryCoerce( separatorFactory )
-		
 		def _refresh():
 			if len( contents ) > 0:
-				contentWidgets = self._getContentElements( contents, xs )
-				contentsContainer[:] = [ self._p_itemWithSeparator( c, separatorFactory )   for c in contentWidgets[:-1] ]  +  [ contentWidgets[-1] ]
+				contentElements = self._getContentElements( contents, xs )
+				childElements = []
+				if beginDelim is not None:
+					childElements.append( _listViewCoerce( beginDelim ) )
+				for c in contentElements[:-1]:
+					childElements.append( c )
+					childElements.append( separatorFactory() )
+					if self._spacingFactory is not None:
+						childElements.append( self._spacingFactory() )
+				childElements.append( contentElements[-1] )
+				if endDelim is not None:
+					childElements.append( _listViewCoerce( endDelim ) )
+				hboxElem.setChildren( childElements )
 		refreshCell = self._buildRefreshCell( _refresh )
-
+			
 		# Produce contents container
-		contentsContainer = DTBox( alignment=DTBox.ALIGN_BASELINES, spacing=self._spacing )
+		hboxElem = HBoxElement( self._hboxStyleSheet )
 		
-		# Wrap in delimeter container if necessary
-		if beginDelim is not None  or  endDelimFactory is not None:
-			box = DTBox( alignment=DTBox.ALIGN_BASELINES )
-			if beginDelim is not None:
-				beginDelim = _listViewCoerce( beginDelim )
-				box.append( beginDelim )
-			box.append( contentsContainer, padding=self._contentsPadding )
-			if endDelim is not None:
-				endDelim = _listViewCoerce( endDelim )
-				box.append( endDelim )
-			return box, refreshCell
-		else:
-			return contentsContainer, refreshCell
+		return hboxElem, refreshCell
 
 
 	
 class VerticalInlineListViewLayout (ListViewLayout):
-	def __init__(self, spacing, delimSpacing, indentation=0.0):
+	def __init__(self, vboxStyleSheet, hboxStyleSheet, indentation=0.0):
 		super( VerticalInlineListViewLayout, self ).__init__()
-		self._spacing = spacing
-		self._delimSpacing = delimSpacing
-		self._indentation = indentation
+		self._vboxStyleSheet = vboxStyleSheet
+		self._hboxStyleSheet = hboxStyleSheet
+		self._borderStyleSheet = BorderStyleSheet( indentation, 0.0, 0.0, 0.0 )
 		
 		
-	def _p_indent(self, x):
-		b = DTBorder( leftMargin=self._indentation )
-		b.child = x
+	def _indent(self, x):
+		b = BorderElement( self._borderStyleSheet )
+		b.setChild( x )
 		return b
 
 
 	def layoutContents(self, xs, contents, beginDelim, endDelim, separatorFactory):
-		separatorFactory = _listViewFactoryCoerce( separatorFactory )
-		
 		if beginDelim is not None:
 			beginDelim = _listViewCoerce( beginDelim )
 		
@@ -174,29 +145,40 @@ class VerticalInlineListViewLayout (ListViewLayout):
 			endDelim = _listViewCoerce( endDelim )
 			
 			
-		bin = DTBin()
+		bin = BinElement( ContainerStyleSheet() )
 			
 			
 		def _refresh():
 			if len( contents ) <= 1:
-				contentWidgets = self._getContentElements( contents, xs )
-				contentWidgets = [ beginDelim ] + contentWidgets   if beginDelim is not None   else contentWidgets
-				contentWidgets = contentWidgets + [ endDelim ]   if endDelim is not None   else contentWidgets
-				bin.child = self._p_itemsInHBox( self._delimSpacing, *contentWidgets )
-			elif len( contents ) > 0:
-				contentWidgets = self._getContentElements( contents, xs )
-				first = self._p_itemsInHBox( self._delimSpacing, beginDelim, contentWidgets[0] )   if beginDelim is not None   else contentWidgets[0]
-				#last = self._p_indent( self._p_itemsInHBox( self._delimSpacing, contentWidgets[-1], endDelim )   if endDelim is not None   else contentWidgets[-1] )
-				last = endDelim
-				#middle = [ self._p_indent( c )   for c in contentWidgets[1:-1] ]
-				middle = [ self._p_indent( c )   for c in contentWidgets[1:] ]
+				contentElements = self._getContentElements( contents, xs )
+				contentElements = [ beginDelim ] + contentWidgets   if beginDelim is not None   else contentWidgets
+				contentElements = contentWidgets + [ endDelim ]   if endDelim is not None   else contentWidgets
+				singleLine = HBoxElement( self._hboxStyleSheet )
+				singleLine.setChildren( contentElements )
+				bin.setChild( singleLine )
+			elif len( contents ) >= 2:
+				contentElements = self._getContentElements( contents, xs )
 				
-				contentsContainer = DTBox( direction=DTBox.TOP_TO_BOTTOM, alignment=DTBox.ALIGN_LEFT, spacing=self._spacing )
-				contentsContainer[:] = [ first ]  +  middle  +  [ last ]
-			
-				bin.child = contentsContainer
-		refreshCell = self._buildRefreshCell( _refresh )
+				if beginDelim is not None:
+					first = HBoxElement( self._hboxStyleSheet )
+					first.setChildren( [ beginDelim, contentElements[0] ] )
+				else:
+					first = contentElements[0]
+					
+				if endDelim is not None:
+					last = HBoxElement( self._hboxStyleSheet )
+					last.setChildren( [ contentElements[-1], endDelim ] )
+					last = self._indent( last )
+				else:
+					last = self._indent( contentElements[-1] )
 
+				middle = [ self._indent( c )   for c in contentElements[1:-1] ]
+				
+				vbox = VBoxElement( self._vboxStyleSheet )
+				vbox.setChildren( [ first ]  +  middle  +  [ last ] )
+				
+				bin.setChild( vbox )
+		refreshCell = self._buildRefreshCell( _refresh )
 		
 		return bin, refreshCell
 
@@ -204,43 +186,39 @@ class VerticalInlineListViewLayout (ListViewLayout):
 	
 	
 class VerticalListViewLayout (ListViewLayout):
-	def __init__(self, spacing, delimSpacing, indentation):
+	def __init__(self, vboxStyleSheet, hboxStyleSheet):
 		super( VerticalListViewLayout, self ).__init__()
-		self._spacing = spacing
-		self._contentsPadding = delimSpacing * 2.0
-		self._indentation = 30.0
+		self._vboxStyleSheet = vboxStyleSheet
+		self._hboxStyleSheet = hboxStyleSheet
 		
 
 	def layoutContents(self, xs, contents, beginDelim, endDelim, separatorFactory):
-		separatorFactory = _listViewFactoryCoerce( separatorFactory )
-		
 		def _refresh():
 			if len( contents ) > 0:
-				contentWidgets = self._getContentElements( contents, xs )
-				contentsContainer[:] = [ self._p_itemWithSeparator( c, separatorFactory )   for c in contentWidgets[:-1] ]  +  [ contentWidgets[-1] ]
+				contentElements = self._getContentElements( contents, xs )
+				childElements = []
+				if beginDelim is not None:
+					childElements.append( _listViewCoerce( beginDelim ) )
+				for c in contentElements[:-1]:
+					if separatorFactory is not None:
+						x = HBoxElement( self._hboxStyleSheet )
+						x.setChildren( [ c, separatorFactory() ] )
+					else:
+						x = c
+					childElements.append( x )
+				childElements.append( contentElements[-1] )
+				if endDelim is not None:
+					childElements.append( _listViewCoerce( endDelim ) )
+				vboxElem.setChildren( childElements )
 		refreshCell = self._buildRefreshCell( _refresh )
-
-		
-		# Produce contents container
-		contentsContainer = DTBox( direction=DTBox.TOP_TO_BOTTOM, alignment=DTBox.ALIGN_LEFT, spacing=self._spacing )
 			
-		indent = DTBorder( leftMargin=self._indentation )
-		indent.child = contentsContainer
+		# Produce contents container
+		vboxElem = VBoxElement( self._vboxStyleSheet )
 		
-		# Wrap in delimeter container if necessary
-		if beginDelim is not None  or  endDelim is not None:
-			box = DTBox( direction=DTBox.TOP_TO_BOTTOM, alignment=DTBox.ALIGN_LEFT )
-			if beginDelim is not None:
-				beginDelim = _listViewCoerce( beginDelim )
-				box.append( beginDelim )
-			box.append( indent, padding=self._contentsPadding )
-			if endDelim is not None:
-				endDelim = _listViewCoerce( endDelim )
-				box.append( endDelim )
-			return box, refreshCell
-		else:
-			return indent, refreshCell
+		return vboxElem, refreshCell
 
+	
+	
 
 	
 
@@ -248,6 +226,8 @@ class VerticalListViewLayout (ListViewLayout):
 
 def listView(xs, layout, beginDelim, endDelim, separatorFactory, contents):
 	return layout.layoutContents( xs, contents, beginDelim, endDelim, separatorFactory )
+
+
 
 
 

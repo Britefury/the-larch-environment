@@ -5,7 +5,7 @@ import BritefuryJ.DocPresent.DPWidget;
 
 public abstract class Element
 {
-	private DPWidget widget;
+	protected DPWidget widget;
 	protected BranchElement parent;
 	
 	

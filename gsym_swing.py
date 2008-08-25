@@ -8,7 +8,8 @@
 import sys
 import os
 
-sys.path.append( os.path.join( os.getcwd(), 'bin' ) )
+from Britefury.InitBritefuryJ import initBritefuryJ
+initBritefuryJ()
 
 from Britefury.I18n import i18n
 i18n.initialise()

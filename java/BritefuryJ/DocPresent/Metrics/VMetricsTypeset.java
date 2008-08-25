@@ -48,6 +48,12 @@ public class VMetricsTypeset extends VMetrics
 		return new VMetricsTypeset( ascent + deltaHeight * 0.5, descent + deltaHeight * 0.5, vspacing );
 	}
 
+	public VMetrics border(double topMargin, double bottomMargin)
+	{
+		return new VMetricsTypeset( ascent + topMargin, descent + bottomMargin, Math.max( vspacing - bottomMargin, 0.0 ) );
+	}
+	
+
 	
 	public boolean isTypeset()
 	{

@@ -28,6 +28,6 @@ public class LineBreakElement extends BinElement
 	
 	public DPLineBreak getWidget()
 	{
-		return (DPLineBreak)super.getWidget();
+		return (DPLineBreak)widget;
 	}
 }

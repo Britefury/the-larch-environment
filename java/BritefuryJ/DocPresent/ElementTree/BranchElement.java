@@ -12,6 +12,6 @@ public abstract class BranchElement extends Element
 
 	public DPContainer getWidget()
 	{
-		return (DPContainer)super.getWidget();
+		return (DPContainer)widget;
 	}
 }

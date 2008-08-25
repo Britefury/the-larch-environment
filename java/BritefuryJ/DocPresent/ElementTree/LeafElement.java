@@ -16,7 +16,7 @@ public class LeafElement extends Element implements WidgetContentListener
 	
 	public DPContentLeaf getWidget()
 	{
-		return (DPContentLeaf)super.getWidget();
+		return (DPContentLeaf)widget;
 	}
 
 	
