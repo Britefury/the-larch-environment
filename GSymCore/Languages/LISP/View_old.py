@@ -8,7 +8,8 @@
 from Britefury.GLisp.GLispUtil import isGLispList
 
 
-from Britefury.gSym.View.gSymView import border, indent, text, hbox, ahbox, vbox, paragraph, script, scriptLSuper, scriptLSub, scriptRSuper, scriptRSub, listView, interact, viewEval, mapViewEval, GSymView
+from Britefury.gSym.View.gSymView import activeBorder, border, indent, highlight, hline, label, markupLabel, entry, markupEntry, customEntry, hbox, ahbox, vbox, flow, flowSep, \
+     script, scriptLSuper, scriptLSub, scriptRSuper, scriptRSub, listView, interact, focus, viewEval, mapViewEval, GSymView
 from Britefury.gSym.View.ListView import ParagraphListViewLayout, HorizontalListViewLayout, VerticalInlineListViewLayout, VerticalListViewLayout
 
 from Britefury.gSym.View.Interactor import keyEventMethod, accelEventMethod, textEventMethod, backspaceStartMethod, deleteEndMethod, Interactor
@@ -17,9 +18,7 @@ from Britefury.gSym.View.EditOperations import replace, append, prepend, insertB
 
 from Britefury.gSym.View.UnparsedText import UnparsedText
 
-
-from BritefuryJ.DocPresent.StyleSheets import *
-from BritefuryJ.DocPresent import *
+import traceback
 
 
 from GSymCore.Languages.LISP import Parser
@@ -59,14 +58,12 @@ class ParsedNodeInteractor (Interactor):
 	
 	
 	
-def nodeEditor(ctx, node, contents, metadata, state):
-	#return interact( focus( customEntry( highlight( contents ), text.getText() ) ),  ParsedNodeInteractor( node ) ),   text
-	return contents, metadata
+def nodeEditor(node, contents, text, state):
+	return interact( focus( customEntry( highlight( contents ), text.getText() ) ),  ParsedNodeInteractor( node ) ),   text
 
 
-def stringNodeEditor(ctx, node, metadata, state):
-	#return interact( focus( customEntry( highlight( label( text.getText() ) ), text.getText() ) ),  ParsedNodeInteractor( node ) )
-	return text( ctx, string_textStyle, node ), metadata
+def stringNodeEditor(node, text, state):
+	return interact( focus( customEntry( highlight( label( text.getText() ) ), text.getText() ) ),  ParsedNodeInteractor( node ) )
 
 
 
@@ -75,24 +72,27 @@ MODE_VERTICALINLINE = 1
 MODE_VERTICAL = 2
 
 
-def viewStringNode(ctx, node, state):
+def viewStringNode(node, state):
 	res, pos = Parser.unquotedString.parseString( node )
-	node = repr( node )
-	# String
-	return stringNodeEditor( ctx, node, None, state )
-
-
-def lispViewEval(ctx, node, state):
-	if isGLispList( node ):
-		return viewEval( ctx, node )
+	if res is not None:
+		unparsed = UnparsedText( node )
 	else:
-		return viewStringNode( ctx, node, state )
+		unparsed = UnparsedText( repr( node ) )
+	# String
+	return stringNodeEditor( node, unparsed, state )
 
 
-def viewLispNode(ctx, node, state):
+def lispViewEval(node, state):
+	if isGLispList( node ):
+		return viewEval( node )
+	else:
+		return viewStringNode( node, state )
+
+
+def viewLispNode(node, state):
 	if isGLispList( node ):
 		# List
-		xViews = [ lispViewEval( ctx, x, state )   for x in node ]
+		xViews = [ lispViewEval( x, state )   for x in node ]
 		
 		# Check the contents:
 		mode = MODE_HORIZONTAL
@@ -107,16 +107,22 @@ def viewLispNode(ctx, node, state):
 		
 			
 		if mode == MODE_HORIZONTAL:
-			layout = horizontal_listViewLayout
+			layout = HorizontalListViewLayout( 10.0, 0.0 )
 		elif mode == MODE_VERTICALINLINE:
-			layout = verticalInline_listViewLayout
+			layout = VerticalInlineListViewLayout( 0.0, 0.0, 10.0 )
 		elif mode == MODE_VERTICAL:
-			layout = vertical_listViewLayout
+			layout = VerticalListViewLayout( 0.0, 0.0, 10.0 )
 		else:
 			raise ValueError
-		v = listView( ctx, layout, lambda: text( ctx, punctuation_textStyle, '(' ), lambda: text( ctx, punctuation_textStyle, ')' ), None, xViews )
+		v = listView( layout, label( '(', punctuationStyle ), label( ')', punctuationStyle ), None, xViews )
 		
-		return nodeEditor( ctx, node, v, None, state )
+		def _text(x, n):
+			if isGLispList( n ):
+				return x.text
+			else:
+				return n
+		unparsed = UnparsedText( '(' + UnparsedText( ' ' ).join( [ _text( xv, n )   for xv, n in zip( xViews, node ) ] )  +  ')' )
+		return nodeEditor( node, v, unparsed, state )
 	else:
 		raise TypeError
 	

@@ -8,7 +8,7 @@
 import sys
 
 
-from javax.swing import JFrame, AbstractAction, JMenuItem, JMenu, JMenuBar, KeyStroke, JOptionPane
+from javax.swing import JFrame, AbstractAction, JMenuItem, JMenu, JMenuBar, KeyStroke, JOptionPane, JFileChooser, JOptionPane
 from javax.swing.filechooser import FileNameExtensionFilter
 from java.awt import Dimension, Font, Color
 from java.awt.event import WindowListener
@@ -86,7 +86,7 @@ class MainAppDocView (object):
 			self._view = loadDocument( self._app._world, documentRoot, contentHandler )
 			self._view.refreshCell.changedSignal.connect( self.__queueRefresh )
 			self._view.refresh()
-			self._elementTree.getRoot().setChild( self._view.rootView.element )
+			self._elementTree.getRoot().setChild( self._view.getRootView().element )
 		else:
 			self._view = None
 			
@@ -343,7 +343,7 @@ class MainApp (object):
 			bProceed = response == JOptionPane.YES_OPTION
 		if bProceed:
 			openDialog = JFileChooser()
-			openDialog.setFileFilter( FileNameExtensionFilter( 'gSym project (*.gsym)', 'gsym' ) )
+			openDialog.setFileFilter( FileNameExtensionFilter( 'gSym project (*.gsym)', [ 'gsym' ] ) )
 			response = openDialog.showOpenDialog( self._frame )
 			if response == JFileChooser.APPROVE_OPTION:
 				sf = openDialog.getSelectedFile()
@@ -364,7 +364,7 @@ class MainApp (object):
 		bFinished = False
 		while not bFinished:
 			openDialog = JFileChooser()
-			openDialog.setFileFilter( FileNameExtensionFilter( 'gSym project (*.gsym)', 'gsym' ) )
+			openDialog.setFileFilter( FileNameExtensionFilter( 'gSym project (*.gsym)', [ 'gsym' ] ) )
 			response = openDialog.showSaveDialog( self._frame )
 			if response == JFileChooser.APPROVE_OPTION:
 				sf = openDialog.getSelectedFile()
@@ -403,7 +403,7 @@ class MainApp (object):
 				bProceed = response == JOptionPane.YES_OPTION
 			if bProceed:
 				openDialog = JFileChooser()
-				openDialog.setFileFilter( FileNameExtensionFilter( 'gSym project (*.gsym)', 'gsym' ) )
+				openDialog.setFileFilter( FileNameExtensionFilter( fileType, [ filePattern ] ) )
 				response = openDialog.showDialog( self._frame, 'Import' )
 				if response == JFileChooser.APPROVE_OPTION:
 					sf = openDialog.getSelectedFile()

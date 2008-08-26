@@ -186,10 +186,10 @@ class VerticalInlineListViewLayout (ListViewLayout):
 	
 	
 class VerticalListViewLayout (ListViewLayout):
-	def __init__(self, vboxStyleSheet, hboxStyleSheet):
+	def __init__(self, vboxStyleSheet, separatorHboxStyleSheet):
 		super( VerticalListViewLayout, self ).__init__()
 		self._vboxStyleSheet = vboxStyleSheet
-		self._hboxStyleSheet = hboxStyleSheet
+		self._separatorHboxStyleSheet = separatorHboxStyleSheet
 		
 
 	def layoutContents(self, xs, contents, beginDelim, endDelim, separatorFactory):
@@ -201,7 +201,7 @@ class VerticalListViewLayout (ListViewLayout):
 					childElements.append( _listViewCoerce( beginDelim ) )
 				for c in contentElements[:-1]:
 					if separatorFactory is not None:
-						x = HBoxElement( self._hboxStyleSheet )
+						x = HBoxElement( self._separatorHboxStyleSheet )
 						x.setChildren( [ c, separatorFactory() ] )
 					else:
 						x = c

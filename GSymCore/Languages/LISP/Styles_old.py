@@ -5,19 +5,10 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
+from java.awt import Color
+
+from Britefury.gSym.View.gSymStyleSheet import GSymStyleSheet
 
 
-class GSymStyleSheet (object):
-	def __init__(self, **settings):
-		self._settings = settings
-		
-		
-	def applyToWidget(self, widget):
-		for key, value in self._settings.items():
-			try:
-				a = getattr( widget.__class__, key )
-			except AttributeError:
-				pass
-			else:
-				setattr( widget, key, value )
-				
+stringStyle = GSymStyleSheet( colour=Color( 0.0, 0.5, 0.5 ), font='Sans 11' )
+punctuationStyle = GSymStyleSheet( colour=Color( 0.0, 0.0, 1.0 ), font='Sans 11' )

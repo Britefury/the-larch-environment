@@ -18,4 +18,4 @@ def py25ImportFile(filename):
 
 def initPlugin(pluginInterface):
 	pluginInterface.registerNewDocumentFactory( 'Python 2.5', py25New )
-	pluginInterface.registerImporter( 'Python 2.5', 'Python 2.5 source (*.py)', '*.py', py25ImportFile )
+	pluginInterface.registerImporter( 'Python 2.5', 'Python 2.5 source (*.py)', 'py', py25ImportFile )
