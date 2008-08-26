@@ -5,17 +5,37 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
-from Britefury.Math.Math import Colour3f
+from java.awt import Font, Color
 
-from Britefury.gSym.View.gSymStyleSheet import GSymStyleSheet
+from Britefury.gSym.View.ListView import ParagraphListViewLayout, HorizontalListViewLayout, VerticalInlineListViewLayout, VerticalListViewLayout
+
+from BritefuryJ.DocPresent import *
+from BritefuryJ.DocPresent.StyleSheets import *
+from BritefuryJ.DocPresent.ElementTree import *
 
 
-nilStyle = GSymStyleSheet( colour=Colour3f( 0.75, 0.0, 0.0 ), font='Sans 11 italic' )
-unparsedStyle = GSymStyleSheet( colour=Colour3f( 0.75, 0.0, 0.0 ), font='Sans 11 italic' )
-numericLiteralStyle = GSymStyleSheet( colour=Colour3f( 0.0, 0.5, 0.5 ), font='Sans 11' )
-literalFormatStyle = GSymStyleSheet( colour=Colour3f( 0.0, 0.0, 0.5 ), font='Sans 11' )
-punctuationStyle = GSymStyleSheet( colour=Colour3f( 0.0, 0.0, 1.0 ), font='Sans 11' )
-operatorStyle = GSymStyleSheet( colour=Colour3f( 0.0, 0.5, 0.0 ), font='Sans 11' )
-keywordStyle = GSymStyleSheet( colour=Colour3f( 0.25, 0.0, 0.5 ), font='Sans 11' )
-lineEditorStyle = GSymStyleSheet( highlightBackgroundColour=Colour3f( 0.85, 0.85, 1.0 ) )
-commentStyle = GSymStyleSheet( colour=Colour3f( 0.4, 0.4, 0.4 ), font='Sans 11' )
+default_textStyle = TextStyleSheet()
+
+nil_textStyle = TextStyleSheet( Font( 'SansSerif', Font.ITALIC, 12 ),  Color( 0.75, 0.0, 0.0 ) )
+unparsed_textStyle = TextStyleSheet( Font( 'SansSerif', Font.ITALIC, 12 ),  Color( 0.75, 0.0, 0.0 ) )
+keyword_textStyle = TextStyleSheet( Font( 'SansSerif', Font.BOLD, 12 ),  Color( 0.25, 0.0, 0.5 ) )
+numericLiteral_textStyle = TextStyleSheet( Font( 'SansSerif', Font.PLAIN, 12 ),  Color( 0.0, 0.5, 0.5 ) )
+literalFormat_textStyle = TextStyleSheet( Font( 'SansSerif', Font.PLAIN, 12 ),  Color( 0.0, 0.0, 0.5 ) )
+punctuation_textStyle = TextStyleSheet( Font( 'SansSerif', Font.PLAIN, 12 ),  Color( 0.0, 0.0, 1.0 ) )
+operator_textStyle = TextStyleSheet( Font( 'SansSerif', Font.PLAIN, 12 ),  Color( 0.0, 0.5, 0.0 ) )
+comment_textStyle = TextStyleSheet( Font( 'SansSerif', Font.PLAIN, 12 ),  Color( 0.4, 0.4, 0.4 ) )
+
+python_paragraphStyle = ParagraphStyleSheet( DPParagraph.Alignment.BASELINES, 0.0, 0.0, 30.0 )
+
+compoundStmt_vboxStyle = VBoxStyleSheet( DPVBox.Typesetting.ALIGN_WITH_TOP, DPVBox.Alignment.LEFT, 0.0, False, 0.0 )
+
+tuple_listViewLayout = ParagraphListViewLayout( python_paragraphStyle, lambda: TextElement( default_textStyle, ' ' ), 0 )
+
+module_listViewLayout = VerticalListViewLayout( VBoxStyleSheet( DPVBox.Typesetting.ALIGN_WITH_TOP, DPVBox.Alignment.LEFT, 0.0, False, 0.0 ), \
+						HBoxStyleSheet( DPHBox.Alignment.BASELINES, 0.0, False, 0.0 ) )
+
+suite_listViewLayout = VerticalListViewLayout( VBoxStyleSheet( DPVBox.Typesetting.ALIGN_WITH_TOP, DPVBox.Alignment.LEFT, 0.0, False, 0.0 ), \
+						HBoxStyleSheet( DPHBox.Alignment.BASELINES, 0.0, False, 0.0 ) )
+
+#lineEditorStyle = GSymStyleSheet( highlightBackgroundColour=Colour3f( 0.85, 0.85, 1.0 ) )
+

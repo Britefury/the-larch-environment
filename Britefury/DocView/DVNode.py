@@ -6,6 +6,7 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
 from BritefuryJ.DocPresent.ElementTree import *
+from BritefuryJ.DocPresent.StyleSheets import *
 
 
 from Britefury.Util.SignalSlot import ClassSignal
@@ -18,6 +19,9 @@ from Britefury.DocView.DocView import DocView
 
 from Britefury.gSym.View.UnparsedText import UnparsedText
 
+
+
+_defaultBinStyleSheet = ContainerStyleSheet()
 
 
 class DVNode (object):
@@ -34,7 +38,7 @@ class DVNode (object):
 		self.refreshCell = RefCell()
 		self.refreshCell.function = self._o_refreshNode
 		
-		self._element = BinElement()
+		self._element = BinElement( _defaultBinStyleSheet )
 		self._metadata = None
 		self._contentsFactory = None
 		self._contentsCell = RefCell()
@@ -73,10 +77,10 @@ class DVNode (object):
 		contents = self._contentsCell.getImmutableValue()
 		if isinstance( contents, tuple ):
 			element, metadata = contents
-			assert isinstance( widget, Element )  or  isinstance( widget, DVNode )
+			assert isinstance( element, Element )  or  isinstance( element, DVNode )
 			
 			# If the contents is a DVNode, get its widget
-			if isinstance( widget, DVNode ):
+			if isinstance( element, DVNode ):
 				element = element.element
 			
 			self._element.setChild( element )
@@ -97,7 +101,7 @@ class DVNode (object):
 
 
 	def refresh(self):
-		self.refreshCell.immutableValue
+		self.refreshCell.getImmutableValue()
 
 
 	def _p_computeContents(self):

@@ -9,9 +9,6 @@ import sys
 
 from copy import copy
 
-from BritefuryJ.DocPresent.ElementTree import *
-from BritefuryJ.DocPresent.StyleSheets import *
-
 from Britefury.Cell.Cell import Cell
 
 from Britefury.DocView.DVNode import DVNode
@@ -22,7 +19,6 @@ from Britefury.GLisp.GLispUtil import isGLispList, gLispSrcToString
 
 from Britefury.GLisp.GLispDispatch import dispatch
 
-from Britefury.gSym.View.gSymStyleSheet import GSymStyleSheet
 from Britefury.gSym.View.Interactor import Interactor, NoEventMatch
 from Britefury.gSym.View.InteractorEvent import InteractorEventKey, InteractorEventText, InteractorEventBackspaceStart, InteractorEventDeleteEnd
 from Britefury.gSym.View import ListView
@@ -30,6 +26,12 @@ from Britefury.gSym.View.UnparsedText import UnparsedText
 
 from Britefury.DocTree.DocTree import DocTree
 from Britefury.DocTree.DocTreeNode import DocTreeNode
+
+
+from BritefuryJ.DocPresent import *
+from BritefuryJ.DocPresent.ElementTree import *
+from BritefuryJ.DocPresent.StyleSheets import *
+
 
 
 """
@@ -75,10 +77,6 @@ def raiseRuntimeError(exceptionClass, src, reason):
 	raise exceptionClass, reason  +  '   ::   '  +  gLispSrcToString( src, 3 )
 
 
-
-
-
-_globalNodeViewInstanceStack = []
 
 
 
@@ -306,24 +304,25 @@ def scriptRSub(ctx, styleSheet, mainChild, scriptChild):
 
 
 
-def listView(layout, beginDelim, endDelim, separatorFactory, children, style=None):
+def listView(ctx, layout, beginDelim, endDelim, separatorFactory, children):
 	"""
 	Runtime - called by compiled code at run-time
 	Builds a list view.
 	@layout controls the layout
 	"""
-	viewNodeInstance = _globalNodeViewInstanceStack[-1]
-	widget, refreshCell = ListView.listView( viewNodeInstance.xs, layout, beginDelim, endDelim, separatorFactory, children )
+	viewNodeInstance = ctx
+	element, refreshCell = ListView.listView( viewNodeInstance.xs, layout, beginDelim, endDelim, separatorFactory, children )
 	viewNodeInstance.refreshCells.append( refreshCell )
-	_applyStyleSheetStack( viewNodeInstance, widget )
-	_applyStyle( style, widget )
-	viewNodeInstance = _globalNodeViewInstanceStack[-1]
 	def _registerRelationships():
 		for ch in children:
 			if isinstance( ch, DVNode ):
 				_registerViewNodeRelationship( viewNodeInstance, ch )
 	_buildRefreshCellAndRegister( viewNodeInstance, _registerRelationships )
-	return widget
+	return element
+
+
+listViewStrToElementFactory = ListView.listViewStrToElementFactory
+
 
 
 
@@ -347,21 +346,21 @@ class _DocEventHandler (object):
 		return event
 		
 
-def interact(child, *interactors):
+def interact(ctx, child, *interactors):
 	"""
 	Runtime - called by compiled code at run-time
 	Connects interactors
 	"""
 	
-	viewNodeInstance = _globalNodeViewInstanceStack[-1]
+	viewNodeInstance = ctx
 
 	def _processChild(c):
 		if isinstance( c, DVNode ):
-			widget = DTBin()
-			widget.addDocEventHandler( _DocEventHandler( viewNodeInstance.viewInstance, interactors ) )
-			_binRefreshCell( viewNodeInstance, widget, c )
+			element = BinElement()
+			element.addDocEventHandler( _DocEventHandler( viewNodeInstance.viewInstance, interactors ) )
+			_binRefreshCell( viewNodeInstance, element, c )
 			return widget
-		elif isinstance( c, DTWidget ):
+		elif isinstance( c, Element ):
 			c.addDocEventHandler( _DocEventHandler( viewNodeInstance.viewInstance, interactors ) )
 			return c
 		else:
@@ -375,9 +374,9 @@ def interact(child, *interactors):
 
 
 
-def viewEval(content, nodeViewFunction=None, state=None):
+def viewEval(ctx, content, nodeViewFunction=None, state=None):
 	"""Build a view for a document subtree (@content)"""
-	viewNodeInstance = _globalNodeViewInstanceStack[-1]
+	viewNodeInstance = ctx
 
 	if not isinstance( content, DocTreeNode ):
 		raise TypeError, 'buildView: content is not a DocTreeNode'
@@ -392,8 +391,8 @@ def viewEval(content, nodeViewFunction=None, state=None):
 	return viewNode
 
 
-def mapViewEval(content, nodeViewFunction=None, state=None):
-	return [ viewEval( x, nodeViewFunction, state )   for x in content ]
+def mapViewEval(ctx, content, nodeViewFunction=None, state=None):
+	return [ viewEval( ctx, x, nodeViewFunction, state )   for x in content ]
 
 
 
@@ -433,7 +432,7 @@ class _GSymViewInstance (object):
 		self.tree = tree
 		self.xs = xs
 		self.viewNodeInstanceStack = []
-		self.generalNodeViewFunction = viewFactory._f_createViewFunction( self.viewNodeInstanceStack )
+		self.generalNodeViewFunction = viewFactory.createViewFunction( self.viewNodeInstanceStack )
 		# self._p_buildDVNode is a factory that builds DVNode instances for document subtrees
 		self.view = DocView( self.tree, self.xs, commandHistory, self._p_rootNodeFactory )
 		self.focusWidget = None
@@ -504,13 +503,11 @@ class _GSymViewInstance (object):
 		#1. Push @nodeViewInstance onto the view instance's view node instance stack
 		# This is done so that the functions that have been compiled can get a reference to @this
 		self.viewNodeInstanceStack.append( nodeViewInstance )
-		_globalNodeViewInstanceStack.append( nodeViewInstance )
 		
 		#2. Create the view contents
-		viewContents = nodeViewFunction( content, state )
+		viewContents = nodeViewFunction( content, nodeViewInstance, state )
 		
 		#3. Pop @self from the view instance's view node instance stack
-		_globalNodeViewInstanceStack.pop()
 		self.viewNodeInstanceStack.pop()
 		
 		#4. Return the view contents
@@ -523,39 +520,6 @@ class _GSymViewInstance (object):
 		def _refresh():
 			self.view.refresh()
 		self._queue.queue( _refresh )
-		
-		
-	def _p_queueSelect(self, node):
-		def _focus():
-			assert isinstance( node, DocTreeNode ), 'Could not select a node of type %s'  %  ( type( node ), )
-			try:
-				viewNode = self.view.getViewNodeForDocTreeNode( node )
-			except KeyError:
-				print 'gSymView:_GSymViewInstance._p_queueSelect(): Could not get widget to focus on', node.node
-				self.focusWidget = None
-			else:
-				self.focusWidget = viewNode.focus
-		self._queue.queue( _focus )
-		
-		
-		def _select():
-			if self.focusWidget is not None:
-				#self.focusWidget.makeCurrent()
-				self.focusWidget.startEditing()
-		self._queue.final = _select
-		
-		
-			
-	def _p_queueRefreshAndSelect(self, node):
-		self._p_queueRefresh()
-		self._p_queueSelect( node )
-		
-	
-	def _p_queueSendEventToFocus(self, event):
-		def _send():
-			if self.focusWidget is not None:
-				self._p_sendDocEventToWidget( self.focusWidget, event )
-		self._queue.queue( _send )
 		
 		
 	def _p_sendDocEventToWidget(self, widget, event):
@@ -582,24 +546,12 @@ class _GSymViewInstance (object):
 			print 'gSymView._sendDocEvent: ***unhandled event*** %s'  %  ( event, )
 		return bHandled
 	
-	def _p_onEntryModifed(self, widget, text):
-		pass
-	
-	def _p_onEntryFinished(self, widget, text, bChanged, bUserEvent):
-		self._sendDocEvent( widget, InteractorEventText( bUserEvent, bChanged, text ) )
-
-	def _p_onEntryBackspaceStart(self, widget):
-		self._sendDocEvent( widget, InteractorEventBackspaceStart() )
-	
-	def _p_onEntryDeleteEnd(self, widget):
-		self._sendDocEvent( widget, InteractorEventDeleteEnd() )
-	
 
 
 			
 class GSymView (object):
-	def __call__(self, xs, state):
-		return dispatch( self, xs, state )
+	def __call__(self, xs, ctx, state):
+		return dispatch( self, xs, ctx, state )
 	
 		
 		
@@ -616,7 +568,7 @@ class GSymViewFactory (object):
 		self.viewClass = viewClass
 		
 		
-	def _f_createViewFunction(self, viewNodeInstanceStack):
+	def createViewFunction(self, viewNodeInstanceStack):
 		return self.viewClass()
 		
 		

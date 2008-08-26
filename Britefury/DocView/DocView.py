@@ -37,7 +37,7 @@ class DocView (object):
 		self._rootView = None
 
 		
-	def _p_getRootView(self):
+	def getRootView(self):
 		if self._rootView is None:
 			self._rootView = self.buildNodeView( self._root )
 		return self._rootView
@@ -94,11 +94,12 @@ class DocView (object):
 
 
 	def _p_refresh(self):
-		self.rootView.refresh()
+		self.getRootView().refresh()
 
 
 	def refresh(self):
-		self.refreshCell.immutableValue
+		#self.refreshCell.immutableValue
+		self.refreshCell.getImmutableValue()
 		#self.rootView.refresh()
 
 
@@ -114,6 +115,5 @@ class DocView (object):
 			self._commandHistory.thaw()
 			
 			
-	rootView = property( _p_getRootView )
 	document = property( getDocument, setDocument )
 
