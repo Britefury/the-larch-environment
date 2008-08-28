@@ -66,7 +66,7 @@ def nodeEditor(ctx, node, contents, metadata, state):
 
 def stringNodeEditor(ctx, node, metadata, state):
 	#return interact( focus( customEntry( highlight( label( text.getText() ) ), text.getText() ) ),  ParsedNodeInteractor( node ) )
-	return text( ctx, string_textStyle, node ), metadata
+	return text( ctx, string_textStyle, node )
 
 
 
@@ -75,24 +75,25 @@ MODE_VERTICALINLINE = 1
 MODE_VERTICAL = 2
 
 
-def viewStringNode(ctx, node, state):
+def viewStringNode(node, ctx, state):
 	res, pos = Parser.unquotedString.parseString( node )
-	node = repr( node )
+	if res is None:
+		node = repr( node )
 	# String
 	return stringNodeEditor( ctx, node, None, state )
 
 
-def lispViewEval(ctx, node, state):
+def lispViewEval(node, ctx, state):
 	if isGLispList( node ):
 		return viewEval( ctx, node )
 	else:
-		return viewStringNode( ctx, node, state )
+		return viewStringNode( node, ctx, state )
 
 
-def viewLispNode(ctx, node, state):
+def viewLispNode(node, ctx, state):
 	if isGLispList( node ):
 		# List
-		xViews = [ lispViewEval( ctx, x, state )   for x in node ]
+		xViews = [ lispViewEval( x, ctx, state )   for x in node ]
 		
 		# Check the contents:
 		mode = MODE_HORIZONTAL
@@ -118,7 +119,7 @@ def viewLispNode(ctx, node, state):
 		
 		return nodeEditor( ctx, node, v, None, state )
 	else:
-		raise TypeError
+		raise TypeError, 'node is %s'  %  node
 	
 	
 	
