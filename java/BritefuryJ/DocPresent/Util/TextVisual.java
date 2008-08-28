@@ -22,6 +22,12 @@ import BritefuryJ.Math.Point2;
 
 public class TextVisual
 {
+	public static class UnrealisedException extends RuntimeException
+	{
+		private static final long serialVersionUID = 1L;
+	}
+	
+	
 	public static interface TextVisualListener
 	{
 		public void textVisualRequestResize(TextVisual t);
@@ -191,8 +197,7 @@ public class TextVisual
 	
 	private void refreshLayout()
 	{
-		assert component != null;
-		if ( layout == null  &&  text.length() > 0 )
+		if ( layout == null  &&  text.length() > 0  &&  component != null )
 		{
 			Graphics2D graphics = (Graphics2D)component.getGraphics();
 			FontRenderContext frc = graphics.getFontRenderContext();

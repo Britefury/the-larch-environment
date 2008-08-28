@@ -15,7 +15,7 @@ def queueEvent(func):
 	class Run (Runnable):
 		def run(self):
 			func()
-	SwingUtilities.invokeLater( func )
+	SwingUtilities.invokeLater( Run() )
 
 
 
