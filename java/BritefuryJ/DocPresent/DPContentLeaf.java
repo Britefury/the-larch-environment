@@ -572,6 +572,11 @@ public abstract class DPContentLeaf extends DPWidget implements ContentInterface
 		
 		DPContentLeaf left = getContentLeafToLeft();
 		
+		while ( left != null  &&  !left.isRealised() )
+		{
+			left = left.getContentLeafToLeft();
+		}
+		
 		if ( left != null )
 		{
 			for (Marker x: xs)
@@ -582,6 +587,11 @@ public abstract class DPContentLeaf extends DPWidget implements ContentInterface
 		else
 		{
 			DPContentLeaf right = getContentLeafToRight();
+			
+			while ( right != null  &&  !right.isRealised() )
+			{
+				right = right.getContentLeafToRight();
+			}
 			
 			if ( right != null )
 			{
