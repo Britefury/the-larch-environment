@@ -7,7 +7,6 @@ import java.util.Vector;
 
 import javax.swing.JFrame;
 
-import tests.DocPresent.DPScriptTest;
 import BritefuryJ.DocPresent.DPHBox;
 import BritefuryJ.DocPresent.DPPresentationArea;
 import BritefuryJ.DocPresent.DPVBox;
@@ -21,7 +20,7 @@ import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
-public class ScriptElemenTest
+public class ScriptElementTest
 {
 	protected Element makeText(String text, TextStyleSheet styleSheet)
 	{
@@ -95,7 +94,7 @@ public class ScriptElemenTest
 
 
 
-	public ScriptElemenTest()
+	public ScriptElementTest()
 	{
 		JFrame frame = new JFrame( "Script test" );
 
@@ -117,6 +116,6 @@ public class ScriptElemenTest
 	
 	public static void main(String[] args)
 	{
-		new DPScriptTest();
+		new ScriptElementTest();
 	}
 }

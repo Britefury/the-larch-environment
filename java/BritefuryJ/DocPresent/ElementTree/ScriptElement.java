@@ -65,7 +65,7 @@ public class ScriptElement extends BranchElement
 			if ( child != null )
 			{
 				child.setParent( this );
-				existingChild.setElementTree( tree );
+				child.setElementTree( tree );
 			}
 		}
 	}

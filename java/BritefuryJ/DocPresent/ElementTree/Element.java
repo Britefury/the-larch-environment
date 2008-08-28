@@ -68,4 +68,11 @@ public abstract class Element
 	{
 		return tree;
 	}
+	
+	
+	
+	protected boolean isParagraph()
+	{
+		return false;
+	}
 }
