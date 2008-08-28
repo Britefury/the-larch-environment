@@ -10,6 +10,7 @@ public class ElementTree
 	public ElementTree()
 	{
 		root = new RootElement();
+		root.setElementTree( this );
 	}
 	
 	
@@ -21,5 +22,16 @@ public class ElementTree
 	public DPPresentationArea getPresentationArea()
 	{
 		return root.getWidget();
+	}
+	
+	
+	protected void registerElement(Element elem)
+	{
+		
+	}
+	
+	protected void unregisterElement(Element elem)
+	{
+		
 	}
 }

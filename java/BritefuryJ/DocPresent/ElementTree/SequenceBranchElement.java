@@ -43,6 +43,7 @@ public class SequenceBranchElement extends BranchElement
 		for (Element x: removed)
 		{
 			x.setParent( null );
+			x.setElementTree( null );
 		}
 		
 		children.clear();
@@ -53,6 +54,7 @@ public class SequenceBranchElement extends BranchElement
 		for (Element x: added)
 		{
 			x.setParent( this );
+			x.setElementTree( tree );
 		}
 	}
 	
@@ -61,5 +63,12 @@ public class SequenceBranchElement extends BranchElement
 	public DPContainerSequence getWidget()
 	{
 		return (DPContainerSequence)widget;
+	}
+
+
+
+	protected List<Element> getChildren()
+	{
+		return children;
 	}
 }

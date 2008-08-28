@@ -1,5 +1,8 @@
 package BritefuryJ.DocPresent.ElementTree;
 
+import java.util.List;
+import java.util.Vector;
+
 import BritefuryJ.DocPresent.DPScript;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.StyleSheets.ScriptStyleSheet;
@@ -47,6 +50,7 @@ public class ScriptElement extends BranchElement
 			if ( existingChild != null )
 			{
 				existingChild.setParent( null );
+				existingChild.setElementTree( null );
 			}
 			
 			children[slot] = child;
@@ -61,6 +65,7 @@ public class ScriptElement extends BranchElement
 			if ( child != null )
 			{
 				child.setParent( this );
+				existingChild.setElementTree( tree );
 			}
 		}
 	}
@@ -124,5 +129,21 @@ public class ScriptElement extends BranchElement
 	public DPScript getWidget()
 	{
 		return (DPScript)widget;
+	}
+
+
+	protected List<Element> getChildren()
+	{
+		Vector<Element> xs = new Vector<Element>();
+		
+		for (int slot = 0; slot < NUMCHILDREN; slot++)
+		{
+			if ( children[slot] != null )
+			{
+				xs.add( children[slot] );
+			}
+		}
+		
+		return xs;
 	}
 }
