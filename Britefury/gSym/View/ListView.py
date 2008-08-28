@@ -126,17 +126,20 @@ class HorizontalListViewLayout (ListViewLayout):
 
 	
 class VerticalInlineListViewLayout (ListViewLayout):
-	def __init__(self, vboxStyleSheet, hboxStyleSheet, indentation=0.0):
+	def __init__(self, vboxStyleSheet, lineParagraphStyleSheet, indentation=0.0):
 		super( VerticalInlineListViewLayout, self ).__init__()
 		self._vboxStyleSheet = vboxStyleSheet
-		self._hboxStyleSheet = hboxStyleSheet
-		self._borderStyleSheet = BorderStyleSheet( indentation, 0.0, 0.0, 0.0 )
+		self._lineParagraphStyleSheet = lineParagraphStyleSheet
+		self._borderStyleSheet = BorderStyleSheet( indentation, 0.0, 0.0, 0.0 )   if  indentation != 0.0   else   None
 		
 		
 	def _indent(self, x):
-		b = BorderElement( self._borderStyleSheet )
-		b.setChild( x )
-		return b
+		if self._borderStyleSheet is not None:
+			b = BorderElement( self._borderStyleSheet )
+			b.setChild( x )
+			return b
+		else:
+			return x
 
 
 	def layoutContents(self, xs, contents, beginDelim, endDelim, separatorFactory):
@@ -155,14 +158,14 @@ class VerticalInlineListViewLayout (ListViewLayout):
 				contentElements = self._getContentElements( contents, xs )
 				contentElements = [ beginDelim ] + contentWidgets   if beginDelim is not None   else contentWidgets
 				contentElements = contentWidgets + [ endDelim ]   if endDelim is not None   else contentWidgets
-				singleLine = HBoxElement( self._hboxStyleSheet )
+				singleLine = ParagraphElement( self._lineParagraphStyleSheet )
 				singleLine.setChildren( contentElements )
 				bin.setChild( singleLine )
 			elif len( contents ) >= 2:
 				contentElements = self._getContentElements( contents, xs )
 				
 				if beginDelim is not None  or  separatorFactory is not None:
-					first = HBoxElement( self._hboxStyleSheet )
+					first = ParagraphElement( self._lineParagraphStyleSheet )
 					firstChildren = []
 					if beginDelim is not None:
 						firstChildren.append( beginDelim )
@@ -173,16 +176,17 @@ class VerticalInlineListViewLayout (ListViewLayout):
 				else:
 					first = contentElements[0]
 					
+				last = self._indent( contentElements[-1] )
+				
 				if endDelim is not None:
-					last = HBoxElement( self._hboxStyleSheet )
-					last.setChildren( [ contentElements[-1], endDelim ] )
-					last = self._indent( last )
+					end = [ endDelim ]
 				else:
-					last = self._indent( contentElements[-1] )
+					end = []
+				
 					
 				def _middleChild(c):
 					if separatorFactory is not None:
-						elem = HBoxElement( self._hboxStyleSheet )
+						elem = ParagraphElement( self._lineParagraphStyleSheet )
 						elem.setChildren( [ c, separatorFactory() ] )
 						return elem
 					else:
@@ -191,7 +195,7 @@ class VerticalInlineListViewLayout (ListViewLayout):
 				middle = [ self._indent( _middleChild( c ) )   for c in contentElements[1:-1] ]
 				
 				vbox = VBoxElement( self._vboxStyleSheet )
-				vbox.setChildren( [ first ]  +  middle  +  [ last ] )
+				vbox.setChildren( [ first ]  +  middle  +  [ last ]  +  end )
 				
 				bin.setChild( vbox )
 		refreshCell = self._buildRefreshCell( _refresh )
@@ -202,10 +206,20 @@ class VerticalInlineListViewLayout (ListViewLayout):
 	
 	
 class VerticalListViewLayout (ListViewLayout):
-	def __init__(self, vboxStyleSheet, separatorHboxStyleSheet):
+	def __init__(self, vboxStyleSheet, lineParagraphStyleSheet, indentation=0.0):
 		super( VerticalListViewLayout, self ).__init__()
 		self._vboxStyleSheet = vboxStyleSheet
-		self._separatorHboxStyleSheet = separatorHboxStyleSheet
+		self._lineParagraphStyleSheet = lineParagraphStyleSheet
+		self._borderStyleSheet = BorderStyleSheet( indentation, 0.0, 0.0, 0.0 )   if  indentation != 0.0   else   None
+		
+		
+	def _indent(self, x):
+		if self._borderStyleSheet is not None:
+			b = BorderElement( self._borderStyleSheet )
+			b.setChild( x )
+			return b
+		else:
+			return x
 		
 
 	def layoutContents(self, xs, contents, beginDelim, endDelim, separatorFactory):
@@ -217,12 +231,13 @@ class VerticalListViewLayout (ListViewLayout):
 					childElements.append( _listViewCoerce( beginDelim ) )
 				for c in contentElements[:-1]:
 					if separatorFactory is not None:
-						x = HBoxElement( self._separatorHboxStyleSheet )
+						x = ParagraphElement( self._lineParagraphStyleSheet )
 						x.setChildren( [ c, separatorFactory() ] )
 					else:
 						x = c
+					x = self._indent( x )
 					childElements.append( x )
-				childElements.append( contentElements[-1] )
+				childElements.append( self._indent( contentElements[-1] ) )
 				if endDelim is not None:
 					childElements.append( _listViewCoerce( endDelim ) )
 				vboxElem.setChildren( childElements )

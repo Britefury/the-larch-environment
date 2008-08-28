@@ -35,20 +35,20 @@ paragraphStyle = ParagraphStyleSheet()
 paragraph, paragraphCell = listView( [], ParagraphListViewLayout( paragraphStyle, spacingFactory, 0 ), beginDelimFactory, endDelimFactory, separatorFactory, listContents )
 paragraphCell.getValue()
 
-listContents = [ TextElement( textStyle, x )   for x in [ 'abc', '123', 'xyz', 'paragraph', 'list', 'test' ] ]
+listContents = [ TextElement( textStyle, x )   for x in [ 'abc', '123', 'xyz', 'horizontal', 'list', 'test' ] ]
 hboxStyle = HBoxStyleSheet()
 hbox, hboxCell = listView( [], HorizontalListViewLayout( hboxStyle, spacingFactory ), beginDelimFactory, endDelimFactory, separatorFactory, listContents )
 hboxCell.getValue()
 
-listContents = [ TextElement( textStyle, x )   for x in [ 'abc', '123', 'xyz', 'paragraph', 'list', 'test' ] ]
+listContents = [ TextElement( textStyle, x )   for x in [ 'abc', '123', 'xyz', 'vertical-inline', 'list', 'test' ] ]
 vInlineVBoxStyle = VBoxStyleSheet( DPVBox.Typesetting.NONE, DPVBox.Alignment.LEFT, 0.0, False, 0.0 )
-vInlineHBoxStyle = HBoxStyleSheet( DPHBox.Alignment.BASELINES, 0.0, False, 0.0 )
-vboxInline, vboxInlineCell = listView( [], VerticalInlineListViewLayout( vInlineVBoxStyle, vInlineHBoxStyle, 20.0 ), beginDelimFactory, endDelimFactory, separatorFactory, listContents )
+vInlineParaStyle = ParagraphStyleSheet()
+vboxInline, vboxInlineCell = listView( [], VerticalInlineListViewLayout( vInlineVBoxStyle, vInlineParaStyle, 20.0 ), beginDelimFactory, endDelimFactory, separatorFactory, listContents )
 vboxInlineCell.getValue()
 
-listContents = [ TextElement( textStyle, x )   for x in [ 'abc', '123', 'xyz', 'paragraph', 'list', 'test' ] ]
+listContents = [ TextElement( textStyle, x )   for x in [ 'abc', '123', 'xyz', 'vertical', 'list', 'test' ] ]
 vboxStyle = VBoxStyleSheet( DPVBox.Typesetting.NONE, DPVBox.Alignment.LEFT, 0.0, False, 0.0 )
-vhboxStyle = HBoxStyleSheet( DPHBox.Alignment.BASELINES, 0.0, False, 0.0 )
+vhboxStyle = ParagraphStyleSheet()
 vbox, vboxCell = listView( [], VerticalListViewLayout( vboxStyle, vhboxStyle ), beginDelimFactory, endDelimFactory, separatorFactory, listContents )
 vboxCell.getValue()
 

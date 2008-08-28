@@ -32,10 +32,10 @@ compoundStmt_vboxStyle = VBoxStyleSheet( DPVBox.Typesetting.ALIGN_WITH_TOP, DPVB
 tuple_listViewLayout = ParagraphListViewLayout( python_paragraphStyle, lambda: TextElement( default_textStyle, ' ' ), 0 )
 
 module_listViewLayout = VerticalListViewLayout( VBoxStyleSheet( DPVBox.Typesetting.ALIGN_WITH_TOP, DPVBox.Alignment.LEFT, 0.0, False, 0.0 ), \
-						HBoxStyleSheet( DPHBox.Alignment.BASELINES, 0.0, False, 0.0 ) )
+						ParagraphStyleSheet() )
 
 suite_listViewLayout = VerticalListViewLayout( VBoxStyleSheet( DPVBox.Typesetting.ALIGN_WITH_TOP, DPVBox.Alignment.LEFT, 0.0, False, 0.0 ), \
-						HBoxStyleSheet( DPHBox.Alignment.BASELINES, 0.0, False, 0.0 ) )
+						ParagraphStyleSheet() )
 
 #lineEditorStyle = GSymStyleSheet( highlightBackgroundColour=Colour3f( 0.85, 0.85, 1.0 ) )
 
