@@ -8,6 +8,7 @@ public abstract class Element
 	protected DPWidget widget;
 	protected BranchElement parent;
 	protected ElementTree tree;
+	protected ElementContentListener contentListener;
 	
 	
 	protected Element(DPWidget widget)
@@ -15,12 +16,20 @@ public abstract class Element
 		this.widget = widget;
 		parent = null;
 		tree = null;
+		contentListener = null;
 	}
 	
 	
 	public DPWidget getWidget()
 	{
 		return widget;
+	}
+	
+	
+	
+	public void setContentListener(ElementContentListener listener)
+	{
+		contentListener = listener;
 	}
 	
 	
@@ -74,5 +83,39 @@ public abstract class Element
 	protected boolean isParagraph()
 	{
 		return false;
+	}
+	
+	
+	
+	
+	
+	protected boolean onContentModified()
+	{
+		if ( contentListener != null )
+		{
+			if ( contentListener.contentModified( this ) )
+			{
+				return true;
+			}
+		}
+		
+		if ( parent != null )
+		{
+			return parent.onChildContentModified( this );
+		}
+		
+		return false;
+	}
+	
+	
+	
+	public String getContent()
+	{
+		return "";
+	}
+	
+	public int getContentLength()
+	{
+		return 0;
 	}
 }

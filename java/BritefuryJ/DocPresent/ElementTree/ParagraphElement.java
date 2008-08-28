@@ -207,4 +207,30 @@ public class ParagraphElement extends SequenceBranchElement
 	{
 		return true;
 	}
+
+
+
+	public String getContent()
+	{
+		String result = "";
+		
+		for (Element child: children)
+		{
+			result += child.getContent();
+		}
+		
+		return result;
+	}
+	
+	public int getContentLength()
+	{
+		int result = 0;
+		
+		for (Element child: children)
+		{
+			result += child.getContentLength();
+		}
+		
+		return result;
+	}
 }

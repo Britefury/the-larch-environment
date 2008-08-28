@@ -25,6 +25,8 @@ def _sanitiseInputData(data):
 def replace(data, replacement):
 	if isinstance( data, DocTreeNode ):
 		parent = data.parentTreeNode
+		if parent is None:
+			print 'NONE: ', data
 		parent[data.indexInParent] = _sanitiseInputData( replacement )
 		return parent[data.indexInParent]
 	else:

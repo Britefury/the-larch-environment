@@ -326,30 +326,9 @@ listViewStrToElementFactory = ListView.listViewStrToElementFactory
 
 
 
-class _DocEventHandler (object):
-	def __init__(self, viewInstance, interactors):
-		super( _DocEventHandler, self ).__init__()
-		self.viewInstance = viewInstance
-		self.interactors = interactors
-		
-	def __call__(self, event):
-		for interactor in self.interactors:
-			try:
-				nodeToSelect, ev = interactor.handleEvent( event )
-			except NoEventMatch:
-				pass
-			else:
-				if nodeToSelect is not None:
-					self.viewInstance._p_queueRefreshAndSelect( nodeToSelect )
-				if ev is not event:
-					return ev
-		return event
-		
-
-def interact(ctx, child, *interactors):
+def contentListener(ctx, child, listener):
 	"""
-	Runtime - called by compiled code at run-time
-	Connects interactors
+	Sets a content listener
 	"""
 	
 	viewNodeInstance = ctx
@@ -357,14 +336,14 @@ def interact(ctx, child, *interactors):
 	def _processChild(c):
 		if isinstance( c, DVNode ):
 			element = BinElement()
-			element.addDocEventHandler( _DocEventHandler( viewNodeInstance.viewInstance, interactors ) )
+			bin.setContentListener( listener )
 			_binRefreshCell( viewNodeInstance, element, c )
 			return widget
 		elif isinstance( c, Element ):
-			c.addDocEventHandler( _DocEventHandler( viewNodeInstance.viewInstance, interactors ) )
+			c.setContentListener( listener )
 			return c
 		else:
-			raiseRuntimeError( TypeError, viewNodeInstance.xs, 'interact: could not process child of type %s'  %  ( type( c ).__name__, ) )
+			raiseRuntimeError( TypeError, viewNodeInstance.xs, 'contentListener: could not process child of type %s'  %  ( type( c ).__name__, ) )
 			
 	if isinstance( child, list )  or  isinstance( child, tuple ):
 		return [ _processChild( c )   for c in child ]

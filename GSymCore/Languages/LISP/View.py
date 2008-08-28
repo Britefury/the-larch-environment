@@ -8,7 +8,7 @@
 from Britefury.GLisp.GLispUtil import isGLispList
 
 
-from Britefury.gSym.View.gSymView import border, indent, text, hbox, ahbox, vbox, paragraph, script, scriptLSuper, scriptLSub, scriptRSuper, scriptRSub, listView, interact, viewEval, mapViewEval, GSymView
+from Britefury.gSym.View.gSymView import border, indent, text, hbox, ahbox, vbox, paragraph, script, scriptLSuper, scriptLSub, scriptRSuper, scriptRSub, listView, contentListener, viewEval, mapViewEval, GSymView
 from Britefury.gSym.View.ListView import ParagraphListViewLayout, HorizontalListViewLayout, VerticalInlineListViewLayout, VerticalListViewLayout
 
 from Britefury.gSym.View.Interactor import keyEventMethod, accelEventMethod, textEventMethod, backspaceStartMethod, deleteEndMethod, Interactor
@@ -18,8 +18,9 @@ from Britefury.gSym.View.EditOperations import replace, append, prepend, insertB
 from Britefury.gSym.View.UnparsedText import UnparsedText
 
 
-from BritefuryJ.DocPresent.StyleSheets import *
 from BritefuryJ.DocPresent import *
+from BritefuryJ.DocPresent.StyleSheets import *
+from BritefuryJ.DocPresent.ElementTree import *
 
 
 from GSymCore.Languages.LISP import Parser
@@ -44,29 +45,28 @@ def _parseText(text):
 		return None
 
 
-class ParsedNodeInteractor (Interactor):
-	@textEventMethod()
-	def tokData(self, bUserEvent, bChanged, value, node):
-		if bChanged:
-			parsed = _parseText( value )
-			if parsed is not None:
-				replace( node, parsed )
-			else:
-				replace( node, value )
-	
-	eventMethods = [ tokData ]
+class ParsedNodeContentListener (ElementContentListener):
+	def __init__(self, node):
+		#super( ParsedNodeContentListener, self ).__init__()
+		self._node = node
 
-	
+	def contentModified(self, element):
+		value = element.getContent()
+		parsed = _parseText( value )
+		if parsed is not None:
+			replace( self._node, parsed )
+		else:
+			replace( self._node, value )
+		
+		
 	
 	
 def nodeEditor(ctx, node, contents, metadata, state):
-	#return interact( focus( customEntry( highlight( contents ), text.getText() ) ),  ParsedNodeInteractor( node ) ),   text
-	return contents, metadata
+	return contentListener( ctx, contents, ParsedNodeContentListener( node ) ), metadata
 
 
 def stringNodeEditor(ctx, node, metadata, state):
-	#return interact( focus( customEntry( highlight( label( text.getText() ) ), text.getText() ) ),  ParsedNodeInteractor( node ) )
-	return text( ctx, string_textStyle, node )
+	return contentListener( ctx, text( ctx, string_textStyle, node ), ParsedNodeContentListener( node ) )
 
 
 

@@ -34,4 +34,11 @@ public abstract class BranchElement extends Element
 			}
 		}
 	}
+	
+	
+	
+	protected boolean onChildContentModified(Element child)
+	{
+		return onContentModified();
+	}
 }

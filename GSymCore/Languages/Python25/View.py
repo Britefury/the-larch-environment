@@ -5,7 +5,7 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
-from Britefury.gSym.View.gSymView import border, indent, text, hbox, ahbox, vbox, paragraph, script, scriptLSuper, scriptLSub, scriptRSuper, scriptRSub, listView, interact, viewEval, mapViewEval, GSymView
+from Britefury.gSym.View.gSymView import border, indent, text, hbox, ahbox, vbox, paragraph, script, scriptLSuper, scriptLSub, scriptRSuper, scriptRSub, listView, contentListener, viewEval, mapViewEval, GSymView
 from Britefury.gSym.View.ListView import ParagraphListViewLayout, HorizontalListViewLayout, VerticalInlineListViewLayout, VerticalListViewLayout
 
 from Britefury.gSym.View.Interactor import keyEventMethod, accelEventMethod, textEventMethod, backspaceStartMethod, deleteEndMethod, Interactor
@@ -45,6 +45,21 @@ def _parseText(parser, text):
 		print 'FULL TEXT:', text
 		print '<FAIL>'
 		return None
+
+
+class ParsedNodeContentListener (ElementContentListener):
+	def __init__(self, node, parser):
+		#super( ParsedNodeContentListener, self ).__init__()
+		self._node = node
+		self._parser = parser
+
+	def contentModified(self, element):
+		value = element.getContent()
+		parsed = _parseText( self._parser, value )
+		if parsed is not None:
+			replace( self._node, parsed )
+		else:
+			replace( self._node, [ 'UNPARSED', value ] )
 
 
 #class ParsedNodeInteractor (Interactor):
@@ -212,7 +227,8 @@ def nodeEditor(ctx, node, contents, metadata, state):
 
 	if mode == MODE_EXPRESSION:
 		#return interact( focus( customEntry( highlight( contents, 'ctrl', 'ctrl' ), text.getText(), 'ctrl', 'ctrl' ) ),  ParsedNodeInteractor( node, parser ) ),   text
-		return contents, metadata
+		#return contents, metadata
+		return contentListener( ctx, contents, ParsedNodeContentListener( node, parser ) ),  metadata
 	elif mode == MODE_STATEMENT:
 		#return interact( focus( customEntry( highlight( contents, style=lineEditorStyle ), text.getText() ) ),  ParsedLineInteractor( node, parser ) ),   text
 		return contents, metadata
@@ -278,7 +294,7 @@ class Python25View (GSymView):
 	
 	def UNPARSED(self, ctx, state, node, value):
 		return nodeEditor( ctx, node,
-				text( ctx, unparsed_textStyle, '<' + value + '>', unparsedStyle ),
+				text( ctx, unparsed_textStyle, '<' + value + '>' ),
 				None,
 				state )
 	

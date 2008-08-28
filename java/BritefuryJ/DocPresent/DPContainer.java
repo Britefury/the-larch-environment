@@ -22,7 +22,8 @@ import BritefuryJ.Math.Xform2;
 
 
 
-public abstract class DPContainer extends DPWidget {
+public abstract class DPContainer extends DPWidget
+{
 	protected static class ChildEntry
 	{
 		public DPWidget child;
@@ -631,7 +632,8 @@ public abstract class DPContainer extends DPWidget {
 		{
 			for (int i = navList.size() - 1; i >= 0; i--)
 			{
-				DPContentLeaf l = navList.get( i ).getRightContentLeaf();
+				DPWidget w = navList.get( i );
+				DPContentLeaf l = w.getRightContentLeaf();
 				if ( l != null )
 				{
 					return l;
@@ -651,7 +653,8 @@ public abstract class DPContainer extends DPWidget {
 			{
 				for (int i = navList.size() - 1; i >= 0; i--)
 				{
-					DPContentLeaf l = navList.get( i ).getTopOrBottomContentLeaf( bBottom, cursorPosInRootSpace );
+					DPWidget w = navList.get( i );
+					DPContentLeaf l = w.getTopOrBottomContentLeaf( bBottom, cursorPosInRootSpace );
 					if ( l != null )
 					{
 						return l;
@@ -739,7 +742,8 @@ public abstract class DPContainer extends DPWidget {
 			{
 				for (int i = index - 1; i >= 0; i--)
 				{
-					DPContentLeaf l = navList.get( i ).getRightContentLeaf();
+					DPWidget w = navList.get( i );
+					DPContentLeaf l = w.getRightContentLeaf();
 					if ( l != null )
 					{
 						return l;
@@ -768,7 +772,8 @@ public abstract class DPContainer extends DPWidget {
 			{
 				for (int i = index + 1; i < navList.size(); i++)
 				{
-					DPContentLeaf l = navList.get( i ).getLeftContentLeaf();
+					DPWidget w = navList.get( i );
+					DPContentLeaf l = w.getLeftContentLeaf();
 					if ( l != null )
 					{
 						return l;
@@ -800,7 +805,8 @@ public abstract class DPContainer extends DPWidget {
 				{
 					for (int i = index + 1; i < navList.size(); i++)
 					{
-						DPContentLeaf l = navList.get( i ).getTopOrBottomContentLeaf( false, cursorPosInRootSpace );
+						DPWidget w = navList.get( i );
+						DPContentLeaf l = w.getTopOrBottomContentLeaf( false, cursorPosInRootSpace );
 						if ( l != null )
 						{
 							return l;
@@ -811,7 +817,8 @@ public abstract class DPContainer extends DPWidget {
 				{
 					for (int i = index - 1; i >= 0; i--)
 					{
-						DPContentLeaf l = navList.get( i ).getTopOrBottomContentLeaf( true, cursorPosInRootSpace );
+						DPWidget w = navList.get( i );
+						DPContentLeaf l = w.getTopOrBottomContentLeaf( true, cursorPosInRootSpace );
 						if ( l != null )
 						{
 							return l;

@@ -43,9 +43,11 @@ public class DPBin extends DPContainer implements ContentInterface
 				child.unparent();
 			}
 			
-			if ( this.child != null )
+			DPWidget prevChild = this.child;
+			
+			if ( prevChild != null )
 			{
-				ChildEntry entry = childToEntry.get( this.child );
+				ChildEntry entry = childToEntry.get( prevChild );
 				unregisterChildEntry( entry );
 				childEntries.remove( entry );
 			}
