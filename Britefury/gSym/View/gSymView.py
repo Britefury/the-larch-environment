@@ -134,8 +134,7 @@ def _binRefreshCell(viewNodeInstance, bin, child):
 	if isinstance( child, DVNode ):
 		chNode = child
 		def _binRefresh():
-			#chNode.refresh()
-			bin.setChild( chNode.element )
+			bin.setChild( chNode.getElement() )
 			_registerViewNodeRelationship( viewNodeInstance, chNode )
 		_buildRefreshCellAndRegister( viewNodeInstance, _binRefresh )
 	elif isinstance( child, Element ):
@@ -152,8 +151,7 @@ def _containerSeqRefreshCell(viewNodeInstance, container, children):
 		elements = []
 		for child in children:
 			if isinstance( child, DVNode ):
-				#child.refresh()
-				elements.append( child.element )
+				elements.append( child.getElement() )
 				_registerViewNodeRelationship( viewNodeInstance, child )
 			elif isinstance( child, Element ):
 				elements.append( child )
@@ -170,8 +168,7 @@ def _scriptRefreshCell(viewNodeInstance, script, child, slotIndex):
 	if isinstance( child, DVNode ):
 		chNode = child
 		def _scriptRefresh():
-			#chNode.refresh()
-			script.setChild( slotIndex, chNode.element )
+			script.setChild( slotIndex, chNode.getElement() )
 			_registerViewNodeRelationship( viewNodeInstance, chNode )
 		_buildRefreshCellAndRegister( viewNodeInstance, _scriptRefresh )
 	elif isinstance( child, Element ):
@@ -338,7 +335,7 @@ def contentListener(ctx, child, listener):
 		if isinstance( c, DVNode ):
 			element = ParagraphElemtent( _contentListenerParaStyle )
 			bin.setContentListener( listener )
-			_containerSeqRefreshCell( viewNodeInstance, element, [ c.element ] )
+			_containerSeqRefreshCell( viewNodeInstance, element, [ c.getElement() ] )
 			return element
 		elif isinstance( c, Element ):
 			c.setContentListener( listener )
@@ -357,7 +354,7 @@ def contentListener(ctx, child, listener):
 def viewEval(ctx, content, nodeViewFunction=None, state=None):
 	"""Build a view for a document subtree (@content)"""
 	viewNodeInstance = ctx
-
+	
 	if not isinstance( content, DocTreeNode ):
 		raise TypeError, 'buildView: content is not a DocTreeNode'
 		

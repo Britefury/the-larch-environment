@@ -86,7 +86,7 @@ class MainAppDocView (object):
 			self._view = loadDocument( self._app._world, documentRoot, contentHandler )
 			self._view.refreshCell.changedSignal.connect( self.__queueRefresh )
 			self._view.refresh()
-			self._elementTree.getRoot().setChild( self._view.getRootView().element )
+			self._elementTree.getRoot().setChild( self._view.getRootView().getElement() )
 		else:
 			self._view = None
 			
@@ -190,6 +190,10 @@ class MainApp (object):
 		scriptMenu = JMenu( 'Script' )
 		scriptMenu.add( _action( _( 'Script window' ), self._onScriptWindowMenuItem ) )
 		
+		def _testAction():
+			self._documentRoot[2][1][2][1][1][1][1] = 'this'
+		
+		scriptMenu.add( _action( _( 'test' ), _testAction ) )
 		
 		menuBar = JMenuBar();
 		menuBar.add( fileMenu )
