@@ -325,6 +325,7 @@ listViewStrToElementFactory = ListView.listViewStrToElementFactory
 
 
 
+_contentListenerParaStyle = ParagraphStyleSheet()
 
 def contentListener(ctx, child, listener):
 	"""
@@ -335,10 +336,10 @@ def contentListener(ctx, child, listener):
 
 	def _processChild(c):
 		if isinstance( c, DVNode ):
-			element = BinElement()
+			element = ParagraphElemtent( _contentListenerParaStyle )
 			bin.setContentListener( listener )
-			_binRefreshCell( viewNodeInstance, element, c )
-			return widget
+			_containerSeqRefreshCell( viewNodeInstance, element, [ c.element ] )
+			return element
 		elif isinstance( c, Element ):
 			c.setContentListener( listener )
 			return c
@@ -365,7 +366,6 @@ def viewEval(ctx, content, nodeViewFunction=None, state=None):
 	nodeFactory = viewInstance._f_makeNodeFactory( nodeViewFunction, state )
 	viewNode = viewNodeInstance.view.buildNodeView( content, nodeFactory )
 	viewNode._f_setContentsFactory( viewNodeInstance.viewInstance._f_makeNodeContentsFactory( nodeViewFunction, state ) )
-	viewNode.refresh()
 	
 	return viewNode
 
@@ -410,8 +410,7 @@ class _GSymViewInstance (object):
 	def __init__(self, tree, xs, viewFactory, commandHistory):
 		self.tree = tree
 		self.xs = xs
-		self.viewNodeInstanceStack = []
-		self.generalNodeViewFunction = viewFactory.createViewFunction( self.viewNodeInstanceStack )
+		self.generalNodeViewFunction = viewFactory.createViewFunction()
 		# self._p_buildDVNode is a factory that builds DVNode instances for document subtrees
 		self.view = DocView( self.tree, self.xs, commandHistory, self._p_rootNodeFactory )
 		self.focusWidget = None
@@ -479,18 +478,7 @@ class _GSymViewInstance (object):
 		if nodeViewFunction is None:
 			nodeViewFunction = self.generalNodeViewFunction
 
-		#1. Push @nodeViewInstance onto the view instance's view node instance stack
-		# This is done so that the functions that have been compiled can get a reference to @this
-		self.viewNodeInstanceStack.append( nodeViewInstance )
-		
-		#2. Create the view contents
-		viewContents = nodeViewFunction( content, nodeViewInstance, state )
-		
-		#3. Pop @self from the view instance's view node instance stack
-		self.viewNodeInstanceStack.pop()
-		
-		#4. Return the view contents
-		return viewContents
+		return nodeViewFunction( content, nodeViewInstance, state )
 	
 	
 	
@@ -547,7 +535,7 @@ class GSymViewFactory (object):
 		self.viewClass = viewClass
 		
 		
-	def createViewFunction(self, viewNodeInstanceStack):
+	def createViewFunction(self):
 		return self.viewClass()
 		
 		

@@ -21,7 +21,8 @@ from Britefury.gSym.View.UnparsedText import UnparsedText
 
 
 
-_defaultBinStyleSheet = ContainerStyleSheet()
+#_defaultBinStyleSheet = ContainerStyleSheet()
+_defaultParagraphStyleSheet = ParagraphStyleSheet()
 
 
 class DVNode (object):
@@ -38,7 +39,8 @@ class DVNode (object):
 		self.refreshCell = RefCell()
 		self.refreshCell.function = self._o_refreshNode
 		
-		self._element = BinElement( _defaultBinStyleSheet )
+		#self._element = BinElement( _defaultBinStyleSheet )
+		self._element = ParagraphElement( _defaultParagraphStyleSheet )
 		self._metadata = None
 		self._contentsFactory = None
 		self._contentsCell = RefCell()
@@ -83,14 +85,17 @@ class DVNode (object):
 			if isinstance( element, DVNode ):
 				element = element.element
 			
-			self._element.setChild( element )
+			#self._element.setChild( element )
+			self._element.setChildren( [ element ] )
 			self._metadata = metadata
 		else:
 			# Contents is just a widget
 			if isinstance( contents, Element ):
-				self._element.setChild( contents )
+				#self._element.setChild( contents )
+				self._element.setChildren( [ contents ] )
 			elif isinstance( contents, DVNode ):
-				self._element.setChild( contents.element )
+				#self._element.setChild( contents.element )
+				self._element.setChildren( [ contents.element ] )
 			else:
 				raise TypeError, 'contents should be an Element or a DVNode'
 			self._metadata = None

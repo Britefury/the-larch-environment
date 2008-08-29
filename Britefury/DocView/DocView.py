@@ -98,9 +98,7 @@ class DocView (object):
 
 
 	def refresh(self):
-		#self.refreshCell.immutableValue
 		self.refreshCell.getImmutableValue()
-		#self.rootView.refresh()
 
 
 
