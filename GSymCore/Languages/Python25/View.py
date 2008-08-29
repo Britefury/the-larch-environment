@@ -280,12 +280,14 @@ def tupleView(ctx, state, node, xs, parser=None):
 class Python25View (GSymView):
 	# MISC
 	def python25Module(self, ctx, state, node, *content):
+		print '>> python25Module'
 		lineViews = mapViewEval( ctx, content, None, python25ViewState( Parser.statement, MODE_STATEMENT ) )
 		return listView( ctx, module_listViewLayout, None, None, None, lineViews ), ''
 	
 
 	
 	def blankLine(self, ctx, state, node):
+		print '>> blankLine'
 		return nodeEditor( ctx, node,
 				text( ctx, default_textStyle, ' ' ),
 				None,
@@ -293,6 +295,7 @@ class Python25View (GSymView):
 	
 	
 	def UNPARSED(self, ctx, state, node, value):
+		print '>> UNPARSED'
 		return nodeEditor( ctx, node,
 				text( ctx, unparsed_textStyle, value ),
 				None,
@@ -301,6 +304,7 @@ class Python25View (GSymView):
 	
 	# Variable reference
 	def var(self, ctx, state, node, name):
+		print '>> var ' + name
 		return nodeEditor( ctx, node,
 				text( ctx, default_textStyle, name ),
 				None,
@@ -310,6 +314,7 @@ class Python25View (GSymView):
 	
 	# Attribute ref
 	def attributeRef(self, ctx, state, node, target, name):
+		print '>> attributeRef ' + name
 		return nodeEditor( ctx, node,
 				paragraph( ctx, python_paragraphStyle, [ viewEval( ctx, target ),  text( ctx, punctuation_textStyle, '.' ),  text( ctx, default_textStyle, name ) ] ),
 				PRECEDENCE_ATTR,
@@ -319,6 +324,7 @@ class Python25View (GSymView):
 	
 	# Return statement
 	def returnStmt(self, ctx, state, node, value):
+		print '>> returnStmt'
 		valueView = viewEval( ctx, value, None, python25ViewState( Parser.tupleOrExpression ) )
 		return nodeEditor( ctx, node,
 				paragraph( ctx, python_paragraphStyle, [ keywordText( ctx, returnKeyword ),  valueView ] ),
@@ -328,6 +334,7 @@ class Python25View (GSymView):
 	
 	# While statement
 	def whileStmt(self, ctx, state, node, condition, suite):
+		print '>> whileStmt'
 		whileLabel = keywordText( ctx, whileKeyword )
 		conditionView = viewEval( ctx, condition )
 		return compoundStatementEditor( ctx, node,
