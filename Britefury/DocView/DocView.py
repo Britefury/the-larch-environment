@@ -75,8 +75,6 @@ class DocView (object):
 					viewNode = nodeFactory( self, treeNode )
 					self._nodeTable[treeNode] = viewNode
 
-			viewNode.refresh()
-
 			return viewNode
 
 

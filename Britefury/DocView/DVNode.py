@@ -5,6 +5,8 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
+import traceback
+
 from BritefuryJ.DocPresent.ElementTree import *
 from BritefuryJ.DocPresent.StyleSheets import *
 
@@ -23,6 +25,9 @@ from Britefury.gSym.View.UnparsedText import UnparsedText
 
 #_defaultBinStyleSheet = ContainerStyleSheet()
 _defaultParagraphStyleSheet = ParagraphStyleSheet()
+
+
+_dbg_computeContentsStack = []
 
 
 class DVNode (object):
@@ -50,6 +55,7 @@ class DVNode (object):
 		
 		self._children = set()
 		
+		
 
 		
 		
@@ -74,33 +80,42 @@ class DVNode (object):
 	#
 	
 	def _o_refreshNode(self):
+		if len( _dbg_computeContentsStack ) == 1:
+			print '###'
+			print '###'
+			print '###'
+			print '###'
+			print 'FOUND'
+			traceback.print_stack()
+			print '...'
+			print '...'
+			print '...'
+			print '...'
+		contents = self._contentsCell.getImmutableValue()
 		for cell in self._cellsToRefresh:
 			cell.getImmutableValue()
-		contents = self._contentsCell.getImmutableValue()
 		if isinstance( contents, tuple ):
 			element, metadata = contents
-			assert isinstance( element, Element )  or  isinstance( element, DVNode )
-			
-			# If the contents is a DVNode, get its widget
-			if isinstance( element, DVNode ):
-				element = element.element
-			
-			#self._element.setChild( element )
-			self._element.setChildren( [ element ] )
-			self._metadata = metadata
 		else:
-			# Contents is just a widget
-			if isinstance( contents, Element ):
-				#self._element.setChild( contents )
-				self._element.setChildren( [ contents ] )
-			elif isinstance( contents, DVNode ):
-				#self._element.setChild( contents.element )
-				self._element.setChildren( [ contents.element ] )
-			else:
-				raise TypeError, 'contents should be an Element or a DVNode'
-			self._metadata = None
+			element = contents
+			metadata = None
+			
+		assert isinstance( element, Element )  or  isinstance( element, DVNode )
+		
+		# If the contents is a DVNode, get its widget
+		if isinstance( element, DVNode ):
+			element = element.getElement()
+		elif isinstance( element, Element ):
+			pass
+		else:
+			raise TypeError, 'contents should be an Element or a DVNode'
+		
+		#self._element.setChild( element )
+		self._element.setChildren( [ element ] )
+		self._metadata = metadata
 
 
+		
 	def _o_resetRefreshCell(self):
 		self.refreshCell.function = self._o_refreshNode
 
@@ -110,6 +125,7 @@ class DVNode (object):
 
 
 	def _p_computeContents(self):
+		_dbg_computeContentsStack.append( self )
 		for child in self._children:
 			self._view._nodeTable.unrefViewNode( child )
 		self._children = set()
@@ -117,14 +133,15 @@ class DVNode (object):
 			contents = self._contentsFactory( self, self.treeNode )
 			for child in self._children:
 				self._view._nodeTable.refViewNode( child )
+			_dbg_computeContentsStack.pop()
 			return contents
 		else:
+			_dbg_computeContentsStack.pop()
 			return None
 	
 
 	def _f_setRefreshCells(self, cells):
 		self._cellsToRefresh = cells
-		self._o_resetRefreshCell()
 		
 	def _registerChild(self, child):
 		self._children.add( child )
@@ -140,6 +157,9 @@ class DVNode (object):
 	#
 	# CONTENT ACQUISITION METHODS
 	#
+	
+	def getElementNoRefresh(self):
+		return self._element
 	
 	def getElement(self):
 		self.refresh()
@@ -191,7 +211,6 @@ class DVNode (object):
 
 	parentNodeView = property( getParentNodeView )
 	docView = property( getDocView )
-	element = property( getElement )
 	metadata = property( getMetadata )
 
 

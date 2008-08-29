@@ -36,7 +36,6 @@ class ListViewLayout (object):
 		elements = []
 		for c in contents:
 			if isinstance( c, DVNode ):
-				#c.refresh()
 				elements.append( c.getElement() )
 			elif isinstance( c, Element ):
 				elements.append( c )
