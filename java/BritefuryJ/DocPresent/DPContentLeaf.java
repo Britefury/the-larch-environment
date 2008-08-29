@@ -67,11 +67,6 @@ public abstract class DPContentLeaf extends DPWidget implements ContentInterface
 	//
 	//
 	
-	public ContentInterface getContentInterface()
-	{
-		return this;
-	}
-
 	public String getContent()
 	{
 		return content;
@@ -241,7 +236,11 @@ public abstract class DPContentLeaf extends DPWidget implements ContentInterface
 			throw new InvalidMarkerPosition();
 		}
 		
-		m.getWidget().unregisterMarker( m );
+		DPContentLeaf oldWidget = m.getWidget();
+		if ( oldWidget != null )
+		{
+			oldWidget.unregisterMarker( m );
+		}
 		m.set( this, position, bias );
 		registerMarker( m );
 	}

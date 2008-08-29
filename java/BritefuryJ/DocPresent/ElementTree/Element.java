@@ -1,9 +1,12 @@
 package BritefuryJ.DocPresent.ElementTree;
 
+import java.util.List;
+
 import BritefuryJ.DocPresent.ContentInterface;
 import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.DPWidget.CouldNotFindAncestorException;
 
-public abstract class Element
+public abstract class Element implements ContentInterface
 {
 	protected DPWidget widget;
 	protected BranchElement parent;
@@ -32,16 +35,6 @@ public abstract class Element
 		contentListener = listener;
 	}
 	
-	
-	
-	public ContentInterface getContentInterface()
-	{
-		if ( widget != null )
-		{
-			return widget.getContentInterface();
-		}
-		return null;
-	}
 	
 	
 	protected void setParent(BranchElement parent)
@@ -80,6 +73,51 @@ public abstract class Element
 	
 	
 	
+
+	public boolean isInSubtreeRootedAt(BranchElement r)
+	{
+		Element e = this;
+		
+		while ( e != null  &&  e != r )
+		{
+			e = e.getParent();
+		}
+		
+		return e == r;
+	}
+	
+	
+	public void getAncestry(List<Element> ancestry)
+	{
+		// Root to top
+		if ( parent != null )
+		{
+			parent.getAncestry( ancestry );
+		}
+		
+		ancestry.add( this );
+	}
+	
+	public void getAncestryTo(BranchElement r, List<Element> ancestry)
+	{
+		// Root to top
+		if ( r != this )
+		{
+			if ( parent != null )
+			{
+				parent.getAncestryTo( r, ancestry );
+			}
+			else
+			{
+				throw new CouldNotFindAncestorException();
+			}
+		}
+		
+		ancestry.add( this );
+	}
+
+	
+	
 	protected boolean isParagraph()
 	{
 		return false;
@@ -109,13 +147,18 @@ public abstract class Element
 	
 	
 	
+	public DPWidget getWidgetAtContentStart()
+	{
+		return getWidget();
+	}
+	
 	public String getContent()
 	{
-		return "";
+		return getWidget().getContent();
 	}
 	
 	public int getContentLength()
 	{
-		return 0;
+		return getWidget().getContentLength();
 	}
 }

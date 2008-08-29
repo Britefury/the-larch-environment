@@ -294,7 +294,7 @@ class Python25View (GSymView):
 	
 	def UNPARSED(self, ctx, state, node, value):
 		return nodeEditor( ctx, node,
-				text( ctx, unparsed_textStyle, '<' + value + '>' ),
+				text( ctx, unparsed_textStyle, value ),
 				None,
 				state )
 	

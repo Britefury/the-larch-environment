@@ -71,17 +71,4 @@ public class SequenceBranchElement extends BranchElement
 	{
 		return children;
 	}
-
-
-
-
-	public String getContent()
-	{
-		return getWidget().getContent();
-	}
-	
-	public int getContentLength()
-	{
-		return getWidget().getContentLength();
-	}
 }

@@ -47,8 +47,13 @@ public class DPEmpty extends DPWidget
 	//
 	//
 	
-	public ContentInterface getContentInterface()
+	public String getContent()
 	{
-		return null;
+		return "";
+	}
+	
+	public int getContentLength()
+	{
+		return 0;
 	}
 }

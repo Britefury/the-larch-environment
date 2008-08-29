@@ -673,7 +673,7 @@ public class DPPresentationArea extends DPBin implements CaretListener
 					DPContentLeaf leaf = getLeftContentLeaf();
 					if ( leaf != null )
 					{
-						caret.setMarker( leaf.markerAtStart() );
+						leaf.moveMarkerToStart( caret.getMarker() );
 					}
 				}
 			};

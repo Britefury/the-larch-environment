@@ -57,9 +57,17 @@ public class ParagraphElement extends SequenceBranchElement
 			widget = paragraph;
 			paragraphParent = null;
 			paraChildParagraphs = new Vector<ParagraphElement>();
+			if ( tree != null )
+			{
+				tree.registerElement( this );
+			}
 		}
 		else if ( mode == Mode.INPARENT )
 		{
+			if ( tree != null )
+			{
+				tree.unregisterElement( this );
+			}
 			paragraph = null;
 			widget = null;
 			paragraphParent = null;
@@ -67,6 +75,10 @@ public class ParagraphElement extends SequenceBranchElement
 		}
 		else
 		{
+			if ( tree != null )
+			{
+				tree.unregisterElement( this );
+			}
 			paragraph = null;
 			widget = null;
 			paragraphParent = null;
@@ -210,6 +222,33 @@ public class ParagraphElement extends SequenceBranchElement
 
 
 
+	public DPWidget getWidgetAtContentStart()
+	{
+		if ( children.size() > 0 )
+		{
+			return children.get( 0 ).getWidgetAtContentStart();
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	public int getContentOffsetOfChild(Element elem)
+	{
+		int offset = 0;
+		for (Element c: children)
+		{
+			if ( c == elem )
+			{
+				return offset;
+			}
+		}
+		
+		return -1;
+	}
+
+	
 	public String getContent()
 	{
 		String result = "";

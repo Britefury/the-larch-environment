@@ -24,7 +24,7 @@ import BritefuryJ.Math.Xform2;
 
 
 
-abstract public class DPWidget
+abstract public class DPWidget implements ContentInterface
 {
 	protected static double NON_TYPESET_CHILD_BASELINE_OFFSET = -5.0;
 	
@@ -36,43 +36,27 @@ abstract public class DPWidget
 	//
 	//
 	
-	public static class CouldNotFindWidgetAncestorException extends RuntimeException
+	public static class CouldNotFindAncestorException extends RuntimeException
 	{
 		static final long serialVersionUID = 0L;
-		
-		public CouldNotFindWidgetAncestorException()
-		{
-		}
 	}
 	
 	
 	public static class DndDisabledException extends RuntimeException
 	{
 		static final long serialVersionUID = 0L;
-		
-		public DndDisabledException()
-		{
-		}
 	}
 
 	
 	public static class DndOperationAlreadyInList extends RuntimeException
 	{
 		static final long serialVersionUID = 0L;
-		
-		public DndOperationAlreadyInList()
-		{
-		}
 	}
 
 	
 	public static class DndOperationNotInList extends RuntimeException
 	{
 		static final long serialVersionUID = 0L;
-		
-		public DndOperationNotInList()
-		{
-		}
 	}
 	
 	
@@ -213,7 +197,7 @@ abstract public class DPWidget
 		{
 			if ( ancestor != null )
 			{
-				throw new CouldNotFindWidgetAncestorException();
+				throw new CouldNotFindAncestorException();
 			}
 			return x;
 		}
@@ -253,7 +237,7 @@ abstract public class DPWidget
 		{
 			if ( ancestor != null )
 			{
-				throw new CouldNotFindWidgetAncestorException();
+				throw new CouldNotFindAncestorException();
 			}
 			return p;
 		}
@@ -306,11 +290,44 @@ abstract public class DPWidget
 	}
 	
 	
+	
+	public boolean isInSubtreeRootedAt(DPContainer r)
+	{
+		DPWidget w = this;
+		
+		while ( w != null  &&  w != r )
+		{
+			w = w.getParent();
+		}
+		
+		return w == r;
+	}
+	
+	
 	public void getAncestry(List<DPWidget> ancestry)
 	{
+		// Root to top
 		if ( parent != null )
 		{
 			parent.getAncestry( ancestry );
+		}
+		
+		ancestry.add( this );
+	}
+	
+	public void getAncestryTo(DPContainer r, List<DPWidget> ancestry)
+	{
+		// Root to top
+		if ( r != this )
+		{
+			if ( parent != null )
+			{
+				parent.getAncestryTo( r, ancestry );
+			}
+			else
+			{
+				throw new CouldNotFindAncestorException();
+			}
 		}
 		
 		ancestry.add( this );
@@ -996,8 +1013,4 @@ abstract public class DPWidget
 	{
 		return null;
 	}
-	
-	
-	
-	public abstract ContentInterface getContentInterface();
 }
