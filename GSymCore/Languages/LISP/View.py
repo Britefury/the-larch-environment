@@ -57,6 +57,7 @@ class ParsedNodeContentListener (ElementContentListener):
 			replace( self._node, parsed )
 		else:
 			replace( self._node, value )
+		return True
 		
 		
 	

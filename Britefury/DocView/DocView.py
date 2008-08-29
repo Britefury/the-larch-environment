@@ -74,7 +74,7 @@ class DocView (object):
 				except KeyError:
 					viewNode = nodeFactory( self, treeNode )
 					self._nodeTable[treeNode] = viewNode
-
+					
 			return viewNode
 
 
