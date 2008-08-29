@@ -13,6 +13,7 @@ public class Caret implements MarkerListener
 	
 	public Caret()
 	{
+		marker = new Marker();
 	}
 	
 	
@@ -21,21 +22,6 @@ public class Caret implements MarkerListener
 		this.listener = listener;
 	}
 	
-	
-	public void setMarker(Marker m)
-	{
-		if ( marker != null )
-		{
-			marker.setMarkerListener( null );
-		}
-		
-		marker = m;
-
-		if ( marker != null )
-		{
-			marker.setMarkerListener( this );
-		}
-	}
 	
 	public Marker getMarker()
 	{

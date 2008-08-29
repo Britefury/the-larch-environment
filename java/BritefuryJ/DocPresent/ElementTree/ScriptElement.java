@@ -146,16 +146,4 @@ public class ScriptElement extends BranchElement
 		
 		return xs;
 	}
-
-
-
-	public String getContent()
-	{
-		return getWidget().getContent();
-	}
-	
-	public int getContentLength()
-	{
-		return getWidget().getContentLength();
-	}
 }

@@ -14,7 +14,7 @@ import BritefuryJ.JythonInterface.JythonSlice;
 
 
 
-abstract public class DPContainerSequence extends DPContainer implements ContentInterface
+abstract public class DPContainerSequence extends DPContainer
 {
 	public DPContainerSequence()
 	{
@@ -257,7 +257,7 @@ abstract public class DPContainerSequence extends DPContainer implements Content
 	
 	
 	
-	Vector<DPWidget> getChildren()
+	protected List<DPWidget> getChildren()
 	{
 		Vector<DPWidget> xs = new Vector<DPWidget>();
 		for (ChildEntry entry: childEntries)
@@ -420,11 +420,7 @@ abstract public class DPContainerSequence extends DPContainer implements Content
 		String xs = "";
 		for (DPWidget child: getChildren())
 		{
-			ContentInterface childContent = child.getContentInterface();
-			if ( childContent != null )
-			{
-				xs += childContent.getContent();
-			}
+			xs += child.getContent();
 		}
 		return xs;
 	}
@@ -434,18 +430,8 @@ abstract public class DPContainerSequence extends DPContainer implements Content
 		int length = 0;
 		for (DPWidget child: getChildren())
 		{
-			ContentInterface childContent = child.getContentInterface();
-			if ( childContent != null )
-			{
-				length += childContent.getContentLength();
-			}
+			length += child.getContentLength();
 		}
 		return length;
-	}
-	
-	
-	public ContentInterface getContentInterface()
-	{
-		return this;
 	}
 }

@@ -22,7 +22,7 @@ import BritefuryJ.Math.Xform2;
 
 
 
-public abstract class DPContainer extends DPWidget
+public abstract class DPContainer extends DPWidget implements ContentInterface
 {
 	protected static class ChildEntry
 	{
@@ -157,6 +157,8 @@ public abstract class DPContainer extends DPWidget
 	
 	protected abstract void removeChild(DPWidget child);
 	
+	
+	protected abstract List<DPWidget> getChildren();
 	
 	
 	
@@ -850,5 +852,43 @@ public abstract class DPContainer extends DPWidget
 	protected ContainerStyleSheet getStyleSheet()
 	{
 		return (ContainerStyleSheet)styleSheet;
+	}
+	
+	
+	
+	
+	
+	//
+	//
+	// CONTENT METHODS
+	//
+	//
+	
+	public int getContentOffsetOfChild(DPWidget child)
+	{
+		int offset = 0;
+		for (DPWidget c: getChildren())
+		{
+			if ( c == child )
+			{
+				return offset;
+			}
+		}
+		
+		return -1;
+	}
+
+	public int getContentOffsetOfDescendent(DPWidget descendent)
+	{
+		Vector<DPWidget> path = new Vector<DPWidget>();
+		descendent.getAncestryTo( this, path );
+		int offset = 0;
+		for (int i = 0; i < path.size() - 1; i++)
+		{
+			DPContainer parent = (DPContainer)path.get( i );
+			DPWidget child = path.get( i + 1 );
+			offset += parent.getContentOffsetOfChild( child );
+		}
+		return offset;
 	}
 }

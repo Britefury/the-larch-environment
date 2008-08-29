@@ -134,7 +134,7 @@ def _binRefreshCell(viewNodeInstance, bin, child):
 	if isinstance( child, DVNode ):
 		chNode = child
 		def _binRefresh():
-			chNode.refresh()
+			#chNode.refresh()
 			bin.setChild( chNode.element )
 			_registerViewNodeRelationship( viewNodeInstance, chNode )
 		_buildRefreshCellAndRegister( viewNodeInstance, _binRefresh )
@@ -152,7 +152,7 @@ def _containerSeqRefreshCell(viewNodeInstance, container, children):
 		elements = []
 		for child in children:
 			if isinstance( child, DVNode ):
-				child.refresh()
+				#child.refresh()
 				elements.append( child.element )
 				_registerViewNodeRelationship( viewNodeInstance, child )
 			elif isinstance( child, Element ):
@@ -170,7 +170,7 @@ def _scriptRefreshCell(viewNodeInstance, script, child, slotIndex):
 	if isinstance( child, DVNode ):
 		chNode = child
 		def _scriptRefresh():
-			chNode.refresh()
+			#chNode.refresh()
 			script.setChild( slotIndex, chNode.element )
 			_registerViewNodeRelationship( viewNodeInstance, chNode )
 		_buildRefreshCellAndRegister( viewNodeInstance, _scriptRefresh )

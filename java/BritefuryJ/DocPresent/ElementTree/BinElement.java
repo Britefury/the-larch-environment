@@ -67,16 +67,4 @@ public class BinElement extends BranchElement
 			return Arrays.asList( ch );
 		}
 	}
-	
-
-
-	public String getContent()
-	{
-		return getWidget().getContent();
-	}
-	
-	public int getContentLength()
-	{
-		return getWidget().getContentLength();
-	}
 }

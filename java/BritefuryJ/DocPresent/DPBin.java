@@ -8,7 +8,7 @@ import BritefuryJ.DocPresent.Metrics.VMetrics;
 import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 
 
-public class DPBin extends DPContainer implements ContentInterface
+public class DPBin extends DPContainer
 {
 	protected DPWidget child;
 	protected double childScale;
@@ -66,6 +66,29 @@ public class DPBin extends DPContainer implements ContentInterface
 	}
 	
 	
+	protected void removeChild(DPWidget child)
+	{
+		assert child == this.child;
+		setChild( null );
+	}
+	
+	
+
+	protected List<DPWidget> getChildren()
+	{
+		if ( child != null )
+		{
+			DPWidget[] children = { child };
+			return Arrays.asList( children );
+		}
+		else
+		{
+			DPWidget[] children = {};
+			return Arrays.asList( children );
+		}
+	}
+
+	
 	public double getChildScale()
 	{
 		return childScale;
@@ -75,13 +98,6 @@ public class DPBin extends DPContainer implements ContentInterface
 	{
 		childScale = scale;
 		queueResize();
-	}
-	
-	
-	protected void removeChild(DPWidget child)
-	{
-		assert child == this.child;
-		setChild( null );
 	}
 	
 	
@@ -186,11 +202,7 @@ public class DPBin extends DPContainer implements ContentInterface
 	{
 		if ( child != null )
 		{
-			ContentInterface childContent = child.getContentInterface();
-			if ( childContent != null )
-			{
-				return childContent.getContent();
-			}
+			return child.getContent();
 		}
 		return "";
 	}
@@ -199,18 +211,8 @@ public class DPBin extends DPContainer implements ContentInterface
 	{
 		if ( child != null )
 		{
-			ContentInterface childContent = child.getContentInterface();
-			if ( childContent != null )
-			{
-				return childContent.getContentLength();
-			}
+			return child.getContentLength();
 		}
 		return 0;
-	}
-	
-	
-	public ContentInterface getContentInterface()
-	{
-		return this;
 	}
 }
