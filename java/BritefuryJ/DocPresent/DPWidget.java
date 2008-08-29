@@ -36,7 +36,7 @@ abstract public class DPWidget implements ContentInterface
 	//
 	//
 	
-	public static class CouldNotFindAncestorException extends RuntimeException
+	public static class IsNotInSubtreeException extends RuntimeException
 	{
 		static final long serialVersionUID = 0L;
 	}
@@ -197,7 +197,7 @@ abstract public class DPWidget implements ContentInterface
 		{
 			if ( ancestor != null )
 			{
-				throw new CouldNotFindAncestorException();
+				throw new IsNotInSubtreeException();
 			}
 			return x;
 		}
@@ -237,7 +237,7 @@ abstract public class DPWidget implements ContentInterface
 		{
 			if ( ancestor != null )
 			{
-				throw new CouldNotFindAncestorException();
+				throw new IsNotInSubtreeException();
 			}
 			return p;
 		}
@@ -304,55 +304,55 @@ abstract public class DPWidget implements ContentInterface
 	}
 	
 	
-	public void getAncestry(List<DPWidget> ancestry)
+	public void getWidgetPathToRoot(List<DPWidget> path)
 	{
 		// Root to top
 		if ( parent != null )
 		{
-			parent.getAncestry( ancestry );
+			parent.getWidgetPathToRoot( path );
 		}
 		
-		ancestry.add( this );
+		path.add( this );
 	}
 	
-	public void getAncestryTo(DPContainer r, List<DPWidget> ancestry)
+	public void getWidgetPathToSubtreeRoot(DPContainer subtreeRoot, List<DPWidget> path)
 	{
 		// Root to top
-		if ( r != this )
+		if ( subtreeRoot != this )
 		{
 			if ( parent != null )
 			{
-				parent.getAncestryTo( r, ancestry );
+				parent.getWidgetPathToSubtreeRoot( subtreeRoot, path );
 			}
 			else
 			{
-				throw new CouldNotFindAncestorException();
+				throw new IsNotInSubtreeException();
 			}
 		}
 		
-		ancestry.add( this );
+		path.add( this );
 	}
 	
 	
-	public static void getAncestryToCommonAncestor(DPWidget w0, List<DPWidget> ancestry0, DPWidget w1, List<DPWidget> ancestry1)
+	public static void getPathsToCommonSubtreeRoot(DPWidget w0, List<DPWidget> path0, DPWidget w1, List<DPWidget> path1)
 	{
-		w0.getAncestry( ancestry0 );
-		w1.getAncestry( ancestry1 );
+		w0.getWidgetPathToRoot( path0 );
+		w1.getWidgetPathToRoot( path1 );
 		
-		int minLength = Math.min( ancestry0.size(), ancestry1.size() );
+		int minLength = Math.min( path0.size(), path1.size() );
 		
 		for (int i = 0; i < minLength; i++)
 		{
-			DPWidget p0 = ancestry0.get( ancestry0.size() - 1 - i );
-			DPWidget p1 = ancestry1.get( ancestry1.size() - 1 - i );
+			DPWidget p0 = path0.get( path0.size() - 1 - i );
+			DPWidget p1 = path1.get( path1.size() - 1 - i );
 			
 			if ( p0 == p1 )
 			{
 				break;
 			}
 			
-			ancestry0.remove( ancestry0.size() - 1 );
-			ancestry1.remove( ancestry1.size() - 1 );
+			path0.remove( path0.size() - 1 );
+			path1.remove( path1.size() - 1 );
 		}
 	}
 	

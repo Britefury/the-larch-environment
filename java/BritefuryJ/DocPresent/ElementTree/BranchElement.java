@@ -46,7 +46,7 @@ public abstract class BranchElement extends Element
 	public int getContentOffsetOfDescendent(Element descendent)
 	{
 		Vector<Element> path = new Vector<Element>();
-		descendent.getAncestryTo( this, path );
+		descendent.getElementPathToSubtreeRoot( this, path );
 		int offset = 0;
 		for (int i = 0; i < path.size() - 1; i++)
 		{

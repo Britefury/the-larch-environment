@@ -881,7 +881,7 @@ public abstract class DPContainer extends DPWidget implements ContentInterface
 	public int getContentOffsetOfDescendent(DPWidget descendent)
 	{
 		Vector<DPWidget> path = new Vector<DPWidget>();
-		descendent.getAncestryTo( this, path );
+		descendent.getWidgetPathToSubtreeRoot( this, path );
 		int offset = 0;
 		for (int i = 0; i < path.size() - 1; i++)
 		{

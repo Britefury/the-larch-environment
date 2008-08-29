@@ -666,7 +666,7 @@ public class DPPresentationArea extends DPBin implements CaretListener
 	{
 		if ( !caret.isValid() )
 		{
-			Runnable putCaretAtStart = new Runnable()
+			final Runnable putCaretAtStart = new Runnable()
 			{
 				public void run()
 				{
