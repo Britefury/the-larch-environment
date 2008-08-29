@@ -5,8 +5,6 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
-import traceback
-
 from BritefuryJ.DocPresent.ElementTree import *
 from BritefuryJ.DocPresent.StyleSheets import *
 
@@ -27,7 +25,6 @@ from Britefury.gSym.View.UnparsedText import UnparsedText
 _defaultParagraphStyleSheet = ParagraphStyleSheet()
 
 
-_dbg_computeContentsStack = []
 
 
 class DVNode (object):
@@ -54,7 +51,7 @@ class DVNode (object):
 		self.focus = None
 		
 		self._children = set()
-		
+			
 		
 
 		
@@ -80,17 +77,6 @@ class DVNode (object):
 	#
 	
 	def _o_refreshNode(self):
-		if len( _dbg_computeContentsStack ) == 1:
-			print '###'
-			print '###'
-			print '###'
-			print '###'
-			print 'FOUND'
-			traceback.print_stack()
-			print '...'
-			print '...'
-			print '...'
-			print '...'
 		contents = self._contentsCell.getImmutableValue()
 		for cell in self._cellsToRefresh:
 			cell.getImmutableValue()
@@ -125,7 +111,6 @@ class DVNode (object):
 
 
 	def _p_computeContents(self):
-		_dbg_computeContentsStack.append( self )
 		for child in self._children:
 			self._view._nodeTable.unrefViewNode( child )
 		self._children = set()
@@ -133,10 +118,8 @@ class DVNode (object):
 			contents = self._contentsFactory( self, self.treeNode )
 			for child in self._children:
 				self._view._nodeTable.refViewNode( child )
-			_dbg_computeContentsStack.pop()
 			return contents
 		else:
-			_dbg_computeContentsStack.pop()
 			return None
 	
 
