@@ -1,6 +1,9 @@
 package BritefuryJ.DocPresent.ElementTree.Marker;
 
 import BritefuryJ.DocPresent.DPContentLeaf;
+import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.ElementTree.BranchElement;
+import BritefuryJ.DocPresent.ElementTree.Element;
 import BritefuryJ.DocPresent.ElementTree.ElementTree;
 import BritefuryJ.DocPresent.ElementTree.LeafElement;
 import BritefuryJ.DocPresent.Marker.Marker;
@@ -20,7 +23,7 @@ public class ElementMarker
 
 
 
-	public LeafElement getElement()
+	public Element getElement()
 	{
 		return (LeafElement)tree.getElementForWidget( widgetMarker.getWidget() );
 	}
@@ -30,12 +33,45 @@ public class ElementMarker
 		return widgetMarker.getPosition();
 	}
 	
+	public int getPositionInSubtree(Element subtreeRoot)
+	{
+		Element element = getElement();
+		if ( subtreeRoot == element )
+		{
+			return getPosition();
+		}
+		else
+		{
+			BranchElement b = (BranchElement)subtreeRoot;
+			if ( element.isInSubtreeRootedAt( b ) )
+			{
+				return getPosition() + b.getContentOffsetOfDescendent( element );
+			}
+			else
+			{
+				throw new DPWidget.IsNotInSubtreeException();
+			}
+		}
+	}
+	
 	public Bias getBias()
 	{
 		return widgetMarker.getBias();
 	}
 	
 	
+	public int getIndex()
+	{
+		return widgetMarker.getIndex();
+	}
+	
+	public int getIndexInSubtree(Element subtreeRoot)
+	{
+		int p = getPositionInSubtree( subtreeRoot );
+		return getBias() == Bias.END  ?  p + 1  :  p;
+	}
+	
+
 	public void setPosition(int position)
 	{
 		widgetMarker.setPosition( position );
@@ -51,11 +87,6 @@ public class ElementMarker
 		widgetMarker.set( (DPContentLeaf)element.getWidgetAtContentStart(), position, bias );
 	}
 	
-	
-	public int getIndex()
-	{
-		return widgetMarker.getIndex();
-	}
 	
 	public static int getIndex(int position, Bias bias)
 	{
@@ -73,7 +104,8 @@ public class ElementMarker
 	
 	public ElementMarker clone()
 	{
-		try {
+		try
+		{
 			return (ElementMarker)super.clone();
 		}
 		catch (CloneNotSupportedException e)

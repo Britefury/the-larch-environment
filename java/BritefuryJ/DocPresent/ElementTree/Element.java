@@ -4,7 +4,7 @@ import java.util.List;
 
 import BritefuryJ.DocPresent.ContentInterface;
 import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.DPWidget.CouldNotFindAncestorException;
+import BritefuryJ.DocPresent.DPWidget.IsNotInSubtreeException;
 
 public abstract class Element implements ContentInterface
 {
@@ -87,33 +87,33 @@ public abstract class Element implements ContentInterface
 	}
 	
 	
-	public void getAncestry(List<Element> ancestry)
+	public void getElementPathToRoot(List<Element> path)
 	{
 		// Root to top
 		if ( parent != null )
 		{
-			parent.getAncestry( ancestry );
+			parent.getElementPathToRoot( path );
 		}
 		
-		ancestry.add( this );
+		path.add( this );
 	}
 	
-	public void getAncestryTo(BranchElement r, List<Element> ancestry)
+	public void getElementPathToSubtreeRoot(BranchElement subtreeRoot, List<Element> path)
 	{
 		// Root to top
-		if ( r != this )
+		if ( subtreeRoot != this )
 		{
 			if ( parent != null )
 			{
-				parent.getAncestryTo( r, ancestry );
+				parent.getElementPathToSubtreeRoot( subtreeRoot, path );
 			}
 			else
 			{
-				throw new CouldNotFindAncestorException();
+				throw new IsNotInSubtreeException();
 			}
 		}
 		
-		ancestry.add( this );
+		path.add( this );
 	}
 
 	
