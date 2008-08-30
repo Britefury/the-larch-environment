@@ -5,6 +5,11 @@ import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 
 public class TextElement extends LeafElement
 {
+	public TextElement(String text)
+	{
+		this( TextStyleSheet.defaultStyleSheet, text );
+	}
+
 	public TextElement(TextStyleSheet styleSheet, String text)
 	{
 		super( new DPText( styleSheet, text ) );

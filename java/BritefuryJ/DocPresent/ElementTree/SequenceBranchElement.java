@@ -8,7 +8,7 @@ import BritefuryJ.DocPresent.DPContainerSequence;
 import BritefuryJ.DocPresent.DPWidget;
 
 
-public class SequenceBranchElement extends BranchElement
+public abstract class SequenceBranchElement extends BranchElement
 {
 	protected Vector<Element> children;
 	

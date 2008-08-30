@@ -5,6 +5,11 @@ import BritefuryJ.DocPresent.StyleSheets.BorderStyleSheet;
 
 public class BorderElement extends BinElement
 {
+	public BorderElement()
+	{
+		this( BorderStyleSheet.defaultStyleSheet );
+	}
+	
 	public BorderElement(BorderStyleSheet styleSheet)
 	{
 		super( new DPBorder( styleSheet ) );

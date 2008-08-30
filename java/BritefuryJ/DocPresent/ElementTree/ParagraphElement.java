@@ -6,6 +6,8 @@ import java.util.Vector;
 
 import BritefuryJ.DocPresent.DPParagraph;
 import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.ElementTree.Marker.ElementMarker;
+import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
 
 public class ParagraphElement extends SequenceBranchElement
@@ -19,6 +21,11 @@ public class ParagraphElement extends SequenceBranchElement
 	private Vector<ParagraphElement> paraChildParagraphs;
 	
 	
+	public ParagraphElement()
+	{
+		this( ParagraphStyleSheet.defaultStyleSheet );
+	}
+
 	public ParagraphElement(ParagraphStyleSheet styleSheet)
 	{
 		super( null );
@@ -243,6 +250,7 @@ public class ParagraphElement extends SequenceBranchElement
 			{
 				return offset;
 			}
+			offset += c.getContentLength();
 		}
 		
 		return -1;
@@ -271,5 +279,57 @@ public class ParagraphElement extends SequenceBranchElement
 		}
 		
 		return result;
+	}
+	
+	
+	
+	
+	//
+	//
+	// MARKER METHODS
+	//
+	//
+	
+	public ElementMarker marker(int position, Marker.Bias bias)
+	{
+		return new ElementMarker( tree, getWidget().marker( position, bias ) );
+	}
+	
+	public ElementMarker markerAtStart()
+	{
+		return new ElementMarker( tree, getWidget().markerAtStart() );
+	}
+	
+	public ElementMarker markerAtEnd()
+	{
+		return new ElementMarker( tree, getWidget().markerAtEnd() );
+	}
+	
+	
+	public void moveMarker(ElementMarker m, int position, Marker.Bias bias)
+	{
+		getWidget().moveMarker( m.getWidgetMarker(), position, bias );
+	}
+	
+	public void moveMarkerToStart(ElementMarker m)
+	{
+		getWidget().moveMarkerToStart( m.getWidgetMarker() );
+	}
+	
+	public void moveMarkerToEnd(ElementMarker m)
+	{
+		getWidget().moveMarkerToEnd( m.getWidgetMarker() );
+	}
+	
+	
+	
+	public boolean isMarkerAtStart(ElementMarker m)
+	{
+		return getWidget().isMarkerAtStart( m.getWidgetMarker() );
+	}
+	
+	public boolean isMarkerAtEnd(ElementMarker m)
+	{
+		return getWidget().isMarkerAtEnd( m.getWidgetMarker() );
 	}
 }

@@ -4,7 +4,7 @@ import BritefuryJ.DocPresent.DPContentLeaf;
 import BritefuryJ.DocPresent.WidgetContentListener;
 import BritefuryJ.DocPresent.Marker.Marker;
 
-public class LeafElement extends Element implements WidgetContentListener
+public abstract class LeafElement extends Element implements WidgetContentListener
 {
 	protected LeafElement(DPContentLeaf widget)
 	{
@@ -19,6 +19,14 @@ public class LeafElement extends Element implements WidgetContentListener
 		return (DPContentLeaf)widget;
 	}
 
+	
+	public LeafElement getLeafAtContentPosition(int position)
+	{
+		return this;
+	}
+
+
+	
 	
 	public void contentInserted(Marker m, String x)
 	{

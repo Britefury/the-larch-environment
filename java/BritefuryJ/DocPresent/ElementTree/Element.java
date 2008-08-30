@@ -5,6 +5,8 @@ import java.util.List;
 import BritefuryJ.DocPresent.ContentInterface;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.DPWidget.IsNotInSubtreeException;
+import BritefuryJ.DocPresent.ElementTree.Marker.ElementMarker;
+import BritefuryJ.DocPresent.Marker.Marker;
 
 public abstract class Element implements ContentInterface
 {
@@ -160,5 +162,74 @@ public abstract class Element implements ContentInterface
 	public int getContentLength()
 	{
 		return getWidget().getContentLength();
+	}
+
+
+	public int getContentOffsetInSubtree(BranchElement subtreeRoot)
+	{
+		if ( this == subtreeRoot )
+		{
+			return 0;
+		}
+		else
+		{
+			return parent.getChildContentOffsetInSubtree( this, subtreeRoot );
+		}
+	}
+
+	public LeafElement getLeafAtContentPosition(int position)
+	{
+		return null;
+	}
+
+
+
+	//
+	//
+	// MARKER METHODS
+	//
+	//
+	
+	public ElementMarker marker(int position, Marker.Bias bias)
+	{
+		return new ElementMarker( tree, getWidget().marker( position, bias ) );
+	}
+	
+	public ElementMarker markerAtStart()
+	{
+		return new ElementMarker( tree, getWidget().markerAtStart() );
+	}
+	
+	public ElementMarker markerAtEnd()
+	{
+		return new ElementMarker( tree, getWidget().markerAtEnd() );
+	}
+	
+	
+	public void moveMarker(ElementMarker m, int position, Marker.Bias bias)
+	{
+		getWidget().moveMarker( m.getWidgetMarker(), position, bias );
+	}
+	
+	public void moveMarkerToStart(ElementMarker m)
+	{
+		getWidget().moveMarkerToStart( m.getWidgetMarker() );
+	}
+	
+	public void moveMarkerToEnd(ElementMarker m)
+	{
+		getWidget().moveMarkerToEnd( m.getWidgetMarker() );
+	}
+	
+	
+	
+	public boolean isMarkerAtStart(ElementMarker m)
+	{
+		return getWidget().isMarkerAtStart( m.getWidgetMarker() );
+	}
+	
+	public boolean isMarkerAtEnd(ElementMarker m)
+	{
+		return getWidget().isMarkerAtEnd( m.getWidgetMarker() );
 	}
 }

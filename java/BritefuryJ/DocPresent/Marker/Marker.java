@@ -6,6 +6,16 @@ import BritefuryJ.DocPresent.DPWidget;
 
 public class Marker
 {
+	public static class InvalidMarkerPosition extends RuntimeException
+	{
+		static final long serialVersionUID = 0L;
+		
+		public InvalidMarkerPosition()
+		{
+		}
+	}
+
+	
 	public enum Bias { START, END };
 	
 	
@@ -59,7 +69,7 @@ public class Marker
 			DPContainer c = (DPContainer)subtreeRoot;
 			if ( widget.isInSubtreeRootedAt( c ) )
 			{
-				return position + c.getContentOffsetOfDescendent( widget );
+				return position + widget.getContentOffsetInSubtree( c );
 			}
 			else
 			{

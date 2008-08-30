@@ -13,16 +13,6 @@ import BritefuryJ.Math.Point2;
 
 public abstract class DPContentLeaf extends DPWidget implements ContentInterface
 {
-	public static class InvalidMarkerPosition extends RuntimeException
-	{
-		static final long serialVersionUID = 0L;
-		
-		public InvalidMarkerPosition()
-		{
-		}
-	}
-	
-	
 	public static class CannotCreateMarkerWithEmptyContent extends RuntimeException
 	{
 		static final long serialVersionUID = 0L;
@@ -204,7 +194,7 @@ public abstract class DPContentLeaf extends DPWidget implements ContentInterface
 		
 		if ( position >= getContentLength() )
 		{
-			throw new InvalidMarkerPosition();
+			throw new Marker.InvalidMarkerPosition();
 		}
 
 		Marker m = new Marker( this, position, bias );
@@ -228,12 +218,12 @@ public abstract class DPContentLeaf extends DPWidget implements ContentInterface
 	{
 		if ( position > getContentLength() )
 		{
-			throw new InvalidMarkerPosition();
+			throw new Marker.InvalidMarkerPosition();
 		}
 		
 		if ( position == getContentLength()  &&  bias == Marker.Bias.END )
 		{
-			throw new InvalidMarkerPosition();
+			throw new Marker.InvalidMarkerPosition();
 		}
 		
 		DPContentLeaf oldWidget = m.getWidget();
@@ -549,6 +539,12 @@ public abstract class DPContentLeaf extends DPWidget implements ContentInterface
 		return this;
 	}
 	
+	
+	public DPContentLeaf getLeafAtContentPosition(int position)
+	{
+		return this;
+	}
+
 	
 	
 	

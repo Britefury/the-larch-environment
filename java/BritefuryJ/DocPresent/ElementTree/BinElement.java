@@ -12,6 +12,11 @@ public class BinElement extends BranchElement
 	protected Element child;
 	
 	
+	public BinElement()
+	{
+		this( ContainerStyleSheet.defaultStyleSheet );
+	}
+
 	public BinElement(ContainerStyleSheet styleSheet)
 	{
 		this( new DPBin( styleSheet ) );

@@ -12,6 +12,7 @@ import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Event.PointerScrollEvent;
 import BritefuryJ.DocPresent.Input.PointerInterface;
+import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Metrics.HMetrics;
 import BritefuryJ.DocPresent.Metrics.VMetrics;
 import BritefuryJ.DocPresent.StyleSheets.WidgetStyleSheet;
@@ -1012,5 +1013,128 @@ abstract public class DPWidget implements ContentInterface
 	protected DPContentLeaf getTopOrBottomContentLeaf(boolean bBottom, Point2 cursorPosInRootSpace)
 	{
 		return null;
+	}
+
+
+
+	public DPContentLeaf getLeafAtContentPosition(int position)
+	{
+		return null;
+	}
+	
+	
+	
+	
+	//
+	//
+	// CONTENT METHODS
+	//
+	//
+	
+	public int getContentOffsetInSubtree(DPContainer subtreeRoot)
+	{
+		if ( this == subtreeRoot )
+		{
+			return 0;
+		}
+		else
+		{
+			return parent.getChildContentOffsetInSubtree( this, subtreeRoot );
+		}
+	}
+	
+	
+	
+	//
+	//
+	// MARKER METHODS
+	//
+	//
+	
+	public Marker marker(int position, Marker.Bias bias)
+	{
+		return markerAtStart();
+	}
+	
+	public Marker markerAtStart()
+	{
+		DPContentLeaf leaf = null;
+		
+		if ( parent != null )
+		{
+			leaf = parent.getContentLeafToRightFromChild( this );
+		}
+		
+		if ( leaf != null )
+		{
+			return leaf.markerAtStart();
+		}
+		else
+		{
+			leaf = parent.getContentLeafToLeftFromChild( this );
+			if ( leaf != null )
+			{
+				return leaf.markerAtEnd();
+			}
+			else
+			{
+				throw new Marker.InvalidMarkerPosition();
+			}
+		}
+	}
+	
+	public Marker markerAtEnd()
+	{
+		return markerAtStart();
+	}
+	
+	
+	public void moveMarker(Marker m, int position, Marker.Bias bias)
+	{
+		moveMarkerToStart( m );
+	}
+	
+	public void moveMarkerToStart(Marker m)
+	{
+		DPContentLeaf leaf = null;
+		
+		if ( parent != null )
+		{
+			leaf = parent.getContentLeafToRightFromChild( this );
+		}
+		
+		if ( leaf != null )
+		{
+			leaf.moveMarkerToStart( m );
+		}
+		else
+		{
+			leaf = parent.getContentLeafToLeftFromChild( this );
+			if ( leaf != null )
+			{
+				leaf.moveMarkerToEnd( m );
+			}
+			else
+			{
+				throw new Marker.InvalidMarkerPosition();
+			}
+		}
+	}
+	
+	public void moveMarkerToEnd(Marker m)
+	{
+		moveMarkerToStart( m );
+	}
+	
+	
+	
+	public boolean isMarkerAtStart(Marker m)
+	{
+		return false;
+	}
+	
+	public boolean isMarkerAtEnd(Marker m)
+	{
+		return false;
 	}
 }

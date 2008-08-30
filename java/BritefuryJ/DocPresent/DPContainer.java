@@ -13,6 +13,7 @@ import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Event.PointerScrollEvent;
 import BritefuryJ.DocPresent.Input.PointerInterface;
+import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
@@ -873,22 +874,171 @@ public abstract class DPContainer extends DPWidget implements ContentInterface
 			{
 				return offset;
 			}
+			offset += c.getContentLength();
 		}
 		
 		return -1;
 	}
 
-	public int getContentOffsetOfDescendent(DPWidget descendent)
+	public DPWidget getChildAtContentPosition(int position)
 	{
-		Vector<DPWidget> path = new Vector<DPWidget>();
-		descendent.getWidgetPathToSubtreeRoot( this, path );
 		int offset = 0;
-		for (int i = 0; i < path.size() - 1; i++)
+		for (DPWidget c: getChildren())
 		{
-			DPContainer parent = (DPContainer)path.get( i );
-			DPWidget child = path.get( i + 1 );
-			offset += parent.getContentOffsetOfChild( child );
+			int end = offset + c.getContentLength();
+			if ( position >= offset  &&  position < end )
+			{
+				return c;
+			}
+			offset = end;
 		}
-		return offset;
+		
+		return null;
+	}
+
+	public DPContentLeaf getLeafAtContentPosition(int position)
+	{
+		DPWidget c = getChildAtContentPosition( position );
+		
+		if ( c != null )
+		{
+			return c.getLeafAtContentPosition( position - getContentOffsetOfChild( c ) );
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	
+	
+	protected int getChildContentOffsetInSubtree(DPWidget child, DPContainer subtreeRoot)
+	{
+		return getContentOffsetOfChild( child )  +  getContentOffsetInSubtree( subtreeRoot );
+	}
+
+
+
+
+
+	//
+	//
+	// MARKER METHODS
+	//
+	//
+
+	public Marker marker(int position, Marker.Bias bias)
+	{
+		DPContentLeaf leaf = getLeafAtContentPosition( position );
+		
+		if ( leaf != null )
+		{
+			return leaf.marker( position - leaf.getContentOffsetInSubtree( this ), bias );
+		}
+		else
+		{
+			throw new Marker.InvalidMarkerPosition();
+		}
+	}
+	
+	public Marker markerAtStart()
+	{
+		DPContentLeaf leaf = getLeftContentLeaf();
+		
+		if ( leaf != null )
+		{
+			return leaf.markerAtStart();
+		}
+		else
+		{
+			throw new Marker.InvalidMarkerPosition();
+		}
+	}
+	
+	public Marker markerAtEnd()
+	{
+		DPContentLeaf leaf = getRightContentLeaf();
+		
+		if ( leaf != null )
+		{
+			return leaf.markerAtEnd();
+		}
+		else
+		{
+			throw new Marker.InvalidMarkerPosition();
+		}
+	}
+	
+	
+	public void moveMarker(Marker m, int position, Marker.Bias bias)
+	{
+		DPContentLeaf leaf = getLeafAtContentPosition( position );
+		
+		if ( leaf != null )
+		{
+			leaf.moveMarker( m, position - leaf.getContentOffsetInSubtree( this ), bias );
+		}
+		else
+		{
+			throw new Marker.InvalidMarkerPosition();
+		}
+	}
+	
+	public void moveMarkerToStart(Marker m)
+	{
+		DPContentLeaf leaf = getLeftContentLeaf();
+		
+		if ( leaf != null )
+		{
+			leaf.moveMarkerToStart( m );
+		}
+		else
+		{
+			throw new Marker.InvalidMarkerPosition();
+		}
+	}
+	
+	public void moveMarkerToEnd(Marker m)
+	{
+		DPContentLeaf leaf = getRightContentLeaf();
+		
+		if ( leaf != null )
+		{
+			leaf.moveMarkerToEnd( m );
+		}
+		else
+		{
+			throw new Marker.InvalidMarkerPosition();
+		}
+	}
+	
+	
+	
+	public boolean isMarkerAtStart(Marker m)
+	{
+		DPContentLeaf leaf = getLeftContentLeaf();
+		
+		if ( leaf != null )
+		{
+			return leaf.isMarkerAtStart( m );
+		}
+		else
+		{
+			throw new Marker.InvalidMarkerPosition();
+		}
+	}
+	
+	public boolean isMarkerAtEnd(Marker m)
+	{
+		DPContentLeaf leaf = getRightContentLeaf();
+		
+		if ( leaf != null )
+		{
+			return leaf.isMarkerAtEnd( m );
+		}
+		else
+		{
+			throw new Marker.InvalidMarkerPosition();
+		}
 	}
 }

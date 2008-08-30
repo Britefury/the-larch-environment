@@ -5,6 +5,11 @@ import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
 public class VBoxElement extends SequenceBranchElement
 {
+	public VBoxElement()
+	{
+		this( VBoxStyleSheet.defaultStyleSheet );
+	}
+
 	public VBoxElement(VBoxStyleSheet styleSheet)
 	{
 		super( new DPVBox( styleSheet ) );
