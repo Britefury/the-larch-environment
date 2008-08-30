@@ -45,7 +45,7 @@ public class ElementMarker
 			BranchElement b = (BranchElement)subtreeRoot;
 			if ( element.isInSubtreeRootedAt( b ) )
 			{
-				return getPosition() + b.getContentOffsetOfDescendent( element );
+				return getPosition() + element.getContentOffsetInSubtree( b );
 			}
 			else
 			{
@@ -112,5 +112,12 @@ public class ElementMarker
 		{
 			return null;
 		}
+	}
+	
+	
+	
+	public Marker getWidgetMarker()
+	{
+		return widgetMarker;
 	}
 }

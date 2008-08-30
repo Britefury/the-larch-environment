@@ -1,7 +1,6 @@
 package BritefuryJ.DocPresent.ElementTree;
 
 import java.util.List;
-import java.util.Vector;
 
 import BritefuryJ.DocPresent.DPContainer;
 
@@ -40,23 +39,45 @@ public abstract class BranchElement extends Element
 	
 	public int getContentOffsetOfChild(Element elem)
 	{
-		return getWidget().getContentOffsetOfChild( getWidgetAtContentStart() );
+		return getWidget().getContentOffsetOfChild( elem.getWidgetAtContentStart() );
 	}
 	
-	public int getContentOffsetOfDescendent(Element descendent)
+	public Element getChildAtContentPosition(int position)
 	{
-		Vector<Element> path = new Vector<Element>();
-		descendent.getElementPathToSubtreeRoot( this, path );
 		int offset = 0;
-		for (int i = 0; i < path.size() - 1; i++)
+		for (Element c: getChildren())
 		{
-			BranchElement parent = (BranchElement)path.get( i );
-			Element child = path.get( i + 1 );
-			offset += parent.getContentOffsetOfChild( child );
+			int end = offset + c.getContentLength();
+			if ( position >= offset  &&  position < end )
+			{
+				return c;
+			}
+			offset = end;
 		}
-		return offset;
+		
+		return null;
 	}
 
+	public LeafElement getLeafAtContentPosition(int position)
+	{
+		Element c = getChildAtContentPosition( position );
+		
+		if ( c != null )
+		{
+			return c.getLeafAtContentPosition( position - getContentOffsetOfChild( c ) );
+		}
+		else
+		{
+			return null;
+		}
+	}
+
+	protected int getChildContentOffsetInSubtree(Element child, BranchElement subtreeRoot)
+	{
+		return getContentOffsetOfChild( child )  +  getContentOffsetInSubtree( subtreeRoot );
+	}
+
+	
 	
 	protected boolean onChildContentModified(Element child)
 	{
