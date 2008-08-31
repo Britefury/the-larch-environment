@@ -5,8 +5,12 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
+import difflib
+
+from BritefuryJ.DocPresent import *
 from BritefuryJ.DocPresent.ElementTree import *
 from BritefuryJ.DocPresent.StyleSheets import *
+from BritefuryJ.DocPresent.Marker import *
 
 
 from Britefury.Util.SignalSlot import ClassSignal
@@ -43,6 +47,7 @@ class DVNode (object):
 		
 		#self._element = BinElement( _defaultBinStyleSheet )
 		self._element = ParagraphElement( _defaultParagraphStyleSheet )
+		self._elementContent = None
 		self._metadata = None
 		self._contentsFactory = None
 		self._contentsCell = RefCell()
@@ -77,30 +82,45 @@ class DVNode (object):
 	#
 	
 	def _o_refreshNode(self):
+		position, bias, contentString = self._getCursorPositionBiasAndContentString( self._elementContent )
+
 		contents = self._contentsCell.getImmutableValue()
 		for cell in self._cellsToRefresh:
 			cell.getImmutableValue()
-		if isinstance( contents, tuple ):
-			element, metadata = contents
-		else:
-			element = contents
-			metadata = None
-			
-		assert isinstance( element, Element )  or  isinstance( element, DVNode )
-		
-		# If the contents is a DVNode, get its widget
-		if isinstance( element, DVNode ):
-			element = element.getElement()
-		elif isinstance( element, Element ):
-			pass
-		else:
-			raise TypeError, 'contents should be an Element or a DVNode'
-		
-		#self._element.setChild( element )
-		self._element.setChildren( [ element ] )
-		self._metadata = metadata
 
+		self._updateElementAndMetadata( contents )
 
+		if position is not None  and  bias is not None  and  self._elementContent is not None:
+			print 'POSITION', position
+			index = position + 1   if bias == Marker.Bias.END   else   position
+
+			newContentString = self._elementContent.getContent()
+
+			# Compute the difference
+			matcher = difflib.SequenceMatcher( lambda x: x in ' \t', contentString, newContentString )
+			for tag, i1, i2, j1, j2 in matcher.get_opcodes():
+				if tag == 'replace':
+					if position >= i2:
+						position += ( j2 - j1 ) - ( i2 - i1 )
+				elif tag == 'delete':
+					if position >= i1:
+						position = max( position - ( i2 - i1 ), i1 )
+				elif tag == 'insert':
+					if position >= i1:
+						position += ( j2 - j1 )
+				elif tag == 'equal':
+					pass
+				else:
+					raise ValueError, 'unreckognised tag'
+			elementTree = self._elementContent.getElementTree()
+			caret = elementTree.getCaret()
+			leaf = self._elementContent.getLeafAtContentPosition( position )
+			if leaf is not None:
+				position -= leaf.getContentOffsetInSubtree( self._elementContent )
+				leaf.moveMarker( caret.getMarker(), position, bias )
+
+				
+				
 		
 	def _o_resetRefreshCell(self):
 		self.refreshCell.function = self._o_refreshNode
@@ -118,9 +138,55 @@ class DVNode (object):
 			contents = self._contentsFactory( self, self.treeNode )
 			for child in self._children:
 				self._view._nodeTable.refViewNode( child )
+			
 			return contents
 		else:
 			return None
+		
+		
+	def _getCursorPositionBiasAndContentString(self, element):
+		if element is not None:
+			contentString = element.getContent()
+			elementTree = element.getElementTree()
+			caret = elementTree.getCaret()
+			try:
+				position = caret.getMarker().getPositionInSubtree( self._elementContent )
+			except DPWidget.IsNotInSubtreeException:
+				return None, None, contentString
+			return position, caret.getMarker().getBias(), contentString
+		else:
+			return None, None, ''
+		
+	
+		
+					
+
+	def _updateElementAndMetadata(self, contents):
+		if contents is not None:
+			if isinstance( contents, tuple ):
+				element, metadata = contents
+			else:
+				element = contents
+				metadata = None
+				
+			assert isinstance( element, Element )  or  isinstance( element, DVNode )
+			
+			# If the contents is a DVNode, get its widget
+			if isinstance( element, DVNode ):
+				element = element.getElement()
+			elif isinstance( element, Element ):
+				pass
+			else:
+				raise TypeError, 'contents should be an Element or a DVNode'
+			
+			#self._element.setChild( element )
+			self._elementContent = element
+			self._element.setChildren( [ element ] )
+			self._metadata = metadata
+		else:
+			self._elementContent = None
+			self._element.setChildren( [] )
+			self._metadata = None
 	
 
 	def _f_setRefreshCells(self, cells):

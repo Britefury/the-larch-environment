@@ -22,52 +22,91 @@ def _sanitiseInputData(data):
 		return data
 
 
-def replace(data, replacement):
+def replace(ctx, data, replacement):
 	if isinstance( data, DocTreeNode ):
 		parent = data.parentTreeNode
 		if parent is None:
-			print 'NONE: ', data
+			print 'EditOperations:replace(): no parent ', data
 		parent[data.indexInParent] = _sanitiseInputData( replacement )
 		return parent[data.indexInParent]
 	else:
-		raise TypeError, '$replace: @data must be a DocTreeNode'
+		raise TypeError, 'EditOperations:replace(): @data must be a DocTreeNode'
 	
 	
-	
-
-def append(x, data):
-	if isinstance( x, DocTreeNode ):
-		x.append( data )
-		return x[-1]
+def replaceWithRange(ctx, data, replacement):
+	if isinstance( data, DocTreeNode ):
+		parent = data.parentTreeNode
+		if parent is None:
+			print 'EditOperations:replaceWithRange(): no parent ', data
+		parent[data.indexInParent:data.indexInParent+1] = _sanitiseInputData( replacement )
+		return parent[data.indexInParent]
 	else:
-		raise TypeError, '$append: @x must be a DocTreeNode'
+		raise TypeError, 'EditOperations:replaceWithRange(): @data must be a DocTreeNode'
+	
+	
+	
 
-def prepend(x, data):
+def append(ctx, xs, data):
 	if isinstance( x, DocTreeNode ):
-		x.insert( 0, data )
-		return x[0]
+		xs.append( data )
+		return xs[-1]
 	else:
-		raise TypeError, '$prepend: @x must be a DocTreeNode'
+		raise TypeError, 'EditOperations:append(): @x must be a DocTreeNode'
 
-def insertBefore(x, data):
+def prepend(ctx, xs, data):
+	if isinstance( xs, DocTreeNode ):
+		xs.insert( 0, data )
+		return xs[0]
+	else:
+		raise TypeError, 'EditOperations:prepend(): @x must be a DocTreeNode'
+
+def insertBefore(ctx, x, data):
 	if isinstance( x, DocTreeNode ):
 		parent = x.parentTreeNode
 		index = parent.index( x.node )
 		parent.insert( index, _sanitiseInputData( data ) )
 		return parent[index]
 	else:
-		raise TypeError, '$insertBefore: @x must be a DocTreeNode'
+		raise TypeError, 'EditOperations:insertBefore(): @x must be a DocTreeNode'
 
 
-def insertAfter(x, data):
+def insertRangeBefore(ctx, x, data):
+	if isinstance( x, DocTreeNode ):
+		parent = x.parentTreeNode
+		index = parent.index( x.node )
+		parent[index:index] = _sanitiseInputData( data )
+		return parent[index]
+	else:
+		raise TypeError, 'EditOperations:insertRangeBefore(): @x must be a DocTreeNode'
+
+
+def insertAfter(ctx, x, data):
 	if isinstance( x, DocTreeNode ):
 		parent = x.parentTreeNode
 		index = parent.node.index( x.node ) + 1
 		parent.insert( index, _sanitiseInputData( data ) )
 		return parent[index]
 	else:
-		raise TypeError, '$insertAfter: @x must be a DocTreeNode'
+		raise TypeError, 'EditOperations:insertAfter(): @x must be a DocTreeNode'
 
+	
+def insertRangeAfter(ctx, x, data):
+	if isinstance( x, DocTreeNode ):
+		parent = x.parentTreeNode
+		index = parent.node.index( x.node ) + 1
+		parent[index:index] = _sanitiseInputData( data )
+		return parent[index]
+	else:
+		raise TypeError, 'EditOperations:insertRangeAfter(): @x must be a DocTreeNode'
+
+
+def remove(ctx, x):
+	if isinstance( x, DocTreeNode ):
+		parent = x.parentTreeNode
+		parent.remove( x.node )
+		return None
+	else:
+		raise TypeError, 'EditOperations:remove(): @x must be a DocTreeNode'
 
 	
 	

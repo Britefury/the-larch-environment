@@ -10,7 +10,7 @@ from Britefury.gSym.View.ListView import ParagraphListViewLayout, HorizontalList
 
 from Britefury.gSym.View.Interactor import keyEventMethod, accelEventMethod, textEventMethod, backspaceStartMethod, deleteEndMethod, Interactor
 
-from Britefury.gSym.View.EditOperations import replace, append, prepend, insertBefore, insertAfter
+from Britefury.gSym.View.EditOperations import replace, replaceWithRange, append, prepend, insertBefore, insertRangeBefore, insertAfter, insertRangeAfter
 
 from Britefury.gSym.View.UnparsedText import UnparsedText
 
@@ -48,8 +48,9 @@ def _parseText(parser, text):
 
 
 class ParsedNodeContentListener (ElementContentListener):
-	def __init__(self, node, parser):
+	def __init__(self, ctx, node, parser):
 		#super( ParsedNodeContentListener, self ).__init__()
+		self._ctx = ctx
 		self._node = node
 		self._parser = parser
 
@@ -57,23 +58,10 @@ class ParsedNodeContentListener (ElementContentListener):
 		value = element.getContent()
 		parsed = _parseText( self._parser, value )
 		if parsed is not None:
-			replace( self._node, parsed )
+			replace( self._ctx, self._node, parsed )
 		else:
-			replace( self._node, [ 'UNPARSED', value ] )
+			replace( self._ctx, self._node, [ 'UNPARSED', value ] )
 		return True
-
-
-#class ParsedNodeInteractor (Interactor):
-	#@textEventMethod()
-	#def tokData(self, bUserEvent, bChanged, value, node, parser):
-		#if bChanged:
-			#parsed = _parseText( parser, value )
-			#if parsed is not None:
-				#replace( node, parsed )
-			#else:
-				#replace( node, [ 'UNPARSED', value ] )
-	
-	#eventMethods = [ tokData ]
 
 
 _compoundStmtNames = set( [ 'ifStmt', 'elifStmt', 'elseStmt', 'whileStmt', 'forStmt', 'tryStmt', 'exceptStmt', 'finallyStmt', 'withStmt', 'defStmt', 'classStmt' ] )	
@@ -82,49 +70,69 @@ _compoundStmtNames = set( [ 'ifStmt', 'elifStmt', 'elseStmt', 'whileStmt', 'forS
 def _isCompoundStmt(node):
 	return node[0] in _compoundStmtNames
 	
-
-#class ParsedLineInteractor (Interactor):
-	#@textEventMethod()
-	#def tokData(self, bUserEvent, bChanged, value, node, parser):
-		#if bChanged:
-			#if value.strip() == '':
-				#node = replace( node, [ 'blankLine' ] )
-			#else:
-				#parsed = _parseText( parser, value )
-				#if parsed is not None:
-					#if _isCompoundStmt( parsed ):
-						#print 'Parsed is a compound statement'
-						#if _isCompoundStmt( node ):
-							#print 'Original is a suite statement'
-							#parsed[-1] = node[-1]
-						#node = replace( node, parsed )
-						#if bUserEvent:
-							#print 'Inserting blankline into suite'
-							#return prepend( node[-1], [ 'blankLine' ] )
-						#else:
-							#return node
-					#else:
-						#node = replace( node, parsed )
-				#else:
-					#node = replace( node, [ 'UNPARSED', value ] )
-		#if bUserEvent:
-			#print 'Inserting...'
-			#return insertAfter( node, [ 'blankLine' ] )
+	
+	
+	
+	
+class ParsedLineContentListener (ElementContentListener):
+	def __init__(self, ctx, node, parser):
+		self._ctx = ctx
+		self._node = node
+		self._parser = parser
 		
-		
-		
-	#@backspaceStartMethod()
-	#def backspaceStart(self, node, parser):
-		#print 'Backspace start'
 	
 
-	#@deleteEndMethod()
-	#def deleteEnd(self, node, parser):
-		#print 'Delete end'
+	def parseLines(self, lineStrings):
+		result = []
+		# For each line
+		for i, line in enumerate( lineStrings ):
+			if line.strip() == '':
+				# Blank line
+				result.append( [ 'blankLine' ] )
+			else:
+				# Parse
+				parsed = _parseText( self._parser, line )
+				if parsed is None:
+					# Parse failure; unparsed text
+					result.append( [ 'UNPARSED', line ] )
+				else:
+					# Parsed
+					if not _isCompoundStmt( parsed ):
+						# Normal statement (non-compount)
+						result.append( parsed )
+					else:
+						lineParsed = parsed
+						lineParsed[-1] = self.parseLines( lineStrings[i+1:] )
+						result.append( lineParsed )
+						break
+		return result
+						
+						
+	
+	
+	def contentModified(self, element):
+		# Get the content
+		value = element.getContent()
+		# Split into lines
+		lineStrings = value.split( '\n' )
+		# Parse
+		parsedLines = self.parseLines( lineStrings )
+		
+		if _isCompoundStmt( self._node ):
+			originalContents = self._node[-1]
+			if _isCompoundStmt( parsedLines[-1] ):
+				parsedLines[-1][-1].extend( originalContents )
+			else:
+				parsedLines.extend( originalContents )
 
-	#eventMethods = [ tokData, backspaceStart, deleteEnd ]
+		replaceWithRange( self._ctx, self._node, parsedLines )
+			
+			
+			
 
-
+	
+	
+	
 	
 
 PRECEDENCE_TUPLE = 200
@@ -227,12 +235,9 @@ def nodeEditor(ctx, node, contents, metadata, state):
 		parser, mode = state
 
 	if mode == MODE_EXPRESSION:
-		#return interact( focus( customEntry( highlight( contents, 'ctrl', 'ctrl' ), text.getText(), 'ctrl', 'ctrl' ) ),  ParsedNodeInteractor( node, parser ) ),   text
-		#return contents, metadata
-		return contentListener( ctx, contents, ParsedNodeContentListener( node, parser ) ),  metadata
-	elif mode == MODE_STATEMENT:
-		#return interact( focus( customEntry( highlight( contents, style=lineEditorStyle ), text.getText() ) ),  ParsedLineInteractor( node, parser ) ),   text
 		return contents, metadata
+	elif mode == MODE_STATEMENT:
+		return contentListener( ctx, contents, ParsedLineContentListener( ctx, node, parser ) ),  metadata
 	else:
 		raise ValueError
 		
@@ -244,9 +249,7 @@ def compoundStatementEditor(ctx, node, headerContents, metadata, suite, state):
 	else:
 		parser, mode = state
 
-	#headerWidget = interact( focus( customEntry( highlight( headerContents, style=lineEditorStyle ), headerText.getText() ) ),  ParsedLineInteractor( node, parser ) )
-	headerElement = headerContents
-	#statementWidget = vbox( [ headerWidget, indent( suiteView( suite ), 30.0 ) ] )
+	headerElement = contentListener( ctx, headerContents, ParsedLineContentListener( ctx, node, parser ) )
 	statementElement = vbox( ctx, compoundStmt_vboxStyle, [ headerElement, indent( ctx, 30.0, suiteView( ctx, suite ) ) ] )
 	return statementElement, metadata
 		
@@ -322,7 +325,7 @@ class Python25View (GSymView):
 	def returnStmt(self, ctx, state, node, value):
 		valueView = viewEval( ctx, value, None, python25ViewState( Parser.tupleOrExpression ) )
 		return nodeEditor( ctx, node,
-				paragraph( ctx, python_paragraphStyle, [ keywordText( ctx, returnKeyword ),  valueView ] ),
+				paragraph( ctx, python_paragraphStyle, [ keywordText( ctx, returnKeyword ),  text( ctx, default_textStyle, ' ' ),  valueView ] ),
 				PRECEDENCE_STMT,
 				state )
 
@@ -332,7 +335,7 @@ class Python25View (GSymView):
 		whileLabel = keywordText( ctx, whileKeyword )
 		conditionView = viewEval( ctx, condition )
 		return compoundStatementEditor( ctx, node,
-				paragraph( ctx, python_paragraphStyle, [ whileLabel,  conditionView,  text( ctx, punctuation_textStyle, ':' ) ] ),
+				paragraph( ctx, python_paragraphStyle, [ whileLabel,  text( ctx, default_textStyle, ' ' ),  conditionView,  text( ctx, punctuation_textStyle, ':' ) ] ),
 				PRECEDENCE_STMT,
 				suite,
 				state  )
