@@ -3,7 +3,7 @@ package BritefuryJ.DocPresent;
 import java.lang.Math;
 
 import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.List;
 import java.util.WeakHashMap;
 
 import java.awt.Color;
@@ -494,13 +494,14 @@ public class DPPresentationArea extends DPBin implements CaretListener
 	// Immediate event queue methods
 	//
 	
-	public void queueImmediateEvent(IImmediateEvent event)
+	public void queueImmediateEvent(Runnable event)
 	{
 		if ( waitingImmediateEvents.isEmpty()  &&  immediateEventDispatcher == null )
 		{
 			final DPPresentationArea presArea = this;
 			// We will be adding the first event; create the dispatcher and queue it
-			immediateEventDispatcher = new Runnable() {
+			immediateEventDispatcher = new Runnable()
+			{
 				public void run()
 				{
 					presArea.dispatchQueuedImmediateEvents();
@@ -516,7 +517,7 @@ public class DPPresentationArea extends DPBin implements CaretListener
 		}
 	}
 
-	public void dequeueImmediateEvent(IImmediateEvent event)
+	public void dequeueImmediateEvent(Runnable event)
 	{
 		if ( waitingImmediateEvents.contains( event ) )
 		{
@@ -533,11 +534,11 @@ public class DPPresentationArea extends DPBin implements CaretListener
 	@SuppressWarnings("unchecked")
 	private void emitImmediateEvents()
 	{
-		LinkedList<IImmediateEvent> events = (LinkedList<IImmediateEvent>)waitingImmediateEvents.clone();
+		List<Runnable> events = (List<Runnable>)waitingImmediateEvents.clone();
 		
-		for (IImmediateEvent event: events)
+		for (Runnable event: events)
 		{
-			event.onEvent();
+			event.run();
 		}
 		
 		waitingImmediateEvents.clear();

@@ -25,7 +25,7 @@ public class ElementMarker
 
 	public Element getElement()
 	{
-		return (LeafElement)tree.getElementForWidget( widgetMarker.getWidget() );
+		return tree.getElementForWidget( widgetMarker.getWidget() );
 	}
 	
 	public int getPosition()
@@ -43,7 +43,7 @@ public class ElementMarker
 		else
 		{
 			BranchElement b = (BranchElement)subtreeRoot;
-			if ( element.isInSubtreeRootedAt( b ) )
+			if ( element != null  &&  element.isInSubtreeRootedAt( b ) )
 			{
 				return getPosition() + element.getContentOffsetInSubtree( b );
 			}

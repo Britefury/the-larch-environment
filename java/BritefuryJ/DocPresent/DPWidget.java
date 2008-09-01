@@ -64,25 +64,13 @@ abstract public class DPWidget implements ContentInterface
 	
 	//
 	//
-	// Immediate Event interface
-	//
-	//
-	
-	public static interface IImmediateEvent {
-		abstract void onEvent();
-	}
-	
-
-	
-	
-	//
-	//
 	// Drag and drop classes
 	//
 	//
 	
 	// Drag and drop state
-	protected static class DndState {
+	protected static class DndState
+	{
 		protected Vector<DndOperation> sourceOps, destOps;
 
 
@@ -113,7 +101,7 @@ abstract public class DPWidget implements ContentInterface
 	protected VMetrics minV, prefV;
 	protected Vector2 allocation;
 	
-	protected LinkedList<IImmediateEvent> waitingImmediateEvents;
+	protected LinkedList<Runnable> waitingImmediateEvents;
 	
 	protected LinkedList<PointerInterface> pointersWithinBounds;
 	
@@ -150,7 +138,7 @@ abstract public class DPWidget implements ContentInterface
 		minV = new VMetrics();
 		prefV = new VMetrics();
 		allocation = new Vector2();
-		waitingImmediateEvents = new LinkedList<IImmediateEvent>();
+		waitingImmediateEvents = new LinkedList<Runnable>();
 		pointersWithinBounds = new LinkedList<PointerInterface>();
 	}
 	
@@ -365,7 +353,7 @@ abstract public class DPWidget implements ContentInterface
 			presentationArea = area;
 			if ( presentationArea != null )
 			{
-				for (IImmediateEvent event: waitingImmediateEvents)
+				for (Runnable event: waitingImmediateEvents)
 				{
 					presentationArea.queueImmediateEvent( event );
 				}
@@ -655,7 +643,7 @@ abstract public class DPWidget implements ContentInterface
 	// Immediate event queue methods
 	//
 	
-	public void queueImmediateEvent(IImmediateEvent event)
+	public void queueImmediateEvent(Runnable event)
 	{
 		if ( presentationArea != null )
 		{
@@ -668,7 +656,7 @@ abstract public class DPWidget implements ContentInterface
 			
 	}
 
-	public void dequeueImmediateEvent(IImmediateEvent event)
+	public void dequeueImmediateEvent(Runnable event)
 	{
 		if ( presentationArea != null )
 		{
