@@ -7,7 +7,7 @@
 ##-*************************
 import sys
 
-
+from java.lang import Runnable
 from javax.swing import JFrame, AbstractAction, JMenuItem, JMenu, JMenuBar, KeyStroke, JOptionPane, JFileChooser, JOptionPane
 from javax.swing.filechooser import FileNameExtensionFilter
 from java.awt import Dimension, Font, Color
@@ -84,7 +84,7 @@ class MainAppDocView (object):
 	def setDocumentContent(self, documentRoot, contentHandler):
 		if documentRoot is not None:
 			self._view = loadDocument( self._app._world, documentRoot, contentHandler )
-			self._view.refreshCell.changedSignal.connect( self.__queueRefresh )
+			self._view.refreshCell.changedSignal.connect( self._queueRefresh )
 			self._view.refresh()
 			self._elementTree.getRoot().setChild( self._view.getRootView().getElement() )
 		else:
@@ -96,12 +96,15 @@ class MainAppDocView (object):
 			self._elementTree.getRoot().setChild( textElem )
 		
 			
-	def __refreshView(self):
+	def _refreshView(self):
 		if self._view is not None:
 			self._view.refresh()
 
-	def __queueRefresh(self):
-		queueEvent( self.__refreshView )
+	def _queueRefresh(self):
+		class Run (Runnable):
+			def run(r):
+				self._refreshView()
+		self._area.queueImmediateEvent( Run() )
 		
 		
 	def reset(self):
