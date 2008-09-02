@@ -161,6 +161,7 @@ PRECEDENCE_ATTR = 0
 
 PRECEDENCE_LOADLOCAL = 0
 PRECEDENCE_LISTLITERAL = 0
+PRECEDENCE_LITERALVALUE = 0
 PRECEDENCE_LISTCOMPREHENSION = 0
 PRECEDENCE_GENERATOREXPRESSION = 0
 PRECEDENCE_CONDITIONALEXPRESSION = 0
@@ -275,8 +276,8 @@ def tupleView(ctx, state, node, xs, parser=None):
 	else:
 		xViews = mapViewEval( ctx, xs )
 	xElements = [ tupleElement( x )   for x in xViews ]
-	return nodeEditor( node,
-			   listView( ctx, tuple_listViewLayout, None, None, ',', xElements ),
+	return nodeEditor( ctx, node,
+			   listView( ctx, tuple_listViewLayout, None, None, lambda: text( ctx, punctuation_textStyle, ',' ), xElements ),
 			   PRECEDENCE_TUPLE,
 			   state )
 
@@ -303,6 +304,102 @@ class Python25View (GSymView):
 				state )
 	
 	
+	# String literal
+	def stringLiteral(self, ctx, state, node, format, quotation, value):
+		boxContents = []
+		
+		if format == 'ascii':
+			pass
+		elif format == 'unicode':
+			boxContents.append( text( ctx, literalFormat_textStyle, 'u' ) )
+		elif format == 'ascii-regex':
+			boxContents.append( text( ctx, literalFormat_textStyle, 'r' ) )
+		elif format == 'unicode-regex':
+			boxContents.append( text( ctx, literalFormat_textStyle, 'ur' ) )
+		else:
+			raise ValueError, 'invalid string literal format'
+		
+		if quotation == 'single':
+			boxContents.append( text( ctx, punctuation_textStyle, "'" ) )
+			boxContents.append( None )
+			boxContents.append( text( ctx, punctuation_textStyle, "'" ) )
+		else:
+			boxContents.append( text( ctx, punctuation_textStyle, '"' ) )
+			boxContents.append( None )
+			boxContents.append( text( ctx, punctuation_textStyle, '"' ) )
+			
+		boxContents[-2] = text( ctx, default_textStyle, value )
+		
+		return nodeEditor( ctx, node,
+				paragraph( ctx, python_paragraphStyle, boxContents ),
+				PRECEDENCE_LITERALVALUE,
+				state )
+	
+	
+	# Integer literal
+	def intLiteral(self, ctx, state, node, format, numType, value):
+		boxContents = []
+		
+		if numType == 'int':
+			if format == 'decimal':
+				valueString = '%d'  %  int( value )
+			elif format == 'hex':
+				valueString = '%x'  %  int( value, 16 )
+			boxContents.append( text( ctx, numericLiteral_textStyle, valueString ) )
+		elif numType == 'long':
+			if format == 'decimal':
+				valueString = '%d'  %  long( value )
+			elif format == 'hex':
+				valueString = '%x'  %  long( value, 16 )
+			boxContents.append( text( ctx, numericLiteral_textStyle, valueString ) )
+			boxContents.append( text( ctx, literalFormat_textStyle, 'L' ) )
+			
+		return nodeEditor( ctx, node,
+				paragraph( ctx, python_paragraphStyle, boxContents ),
+				PRECEDENCE_LITERALVALUE,
+				state )
+	
+
+	
+	# Float literal
+	def floatLiteral(self, ctx, state, node, value):
+		return nodeEditor( ctx, node,
+				text( ctx, numericLiteral_textStyle, value ),
+				PRECEDENCE_LITERALVALUE,
+				state )
+	
+
+	
+	# Imaginary literal
+	def imaginaryLiteral(self, sctx, tate, node, value):
+		return nodeEditor( ctx, node,
+				text( ctx, numericLiteral_textStyle, value ),
+				PRECEDENCE_LITERALVALUE,
+				state )
+	
+
+	
+	# Targets
+	def singleTarget(self, ctx, state, node, name):
+		return nodeEditor( ctx, node,
+				text( ctx, default_textStyle, name ),
+				nameUnparsed,
+				state )
+
+	
+	def tupleTarget(self, ctx, state, node, *xs):
+		return tupleView( ctx, state, node, xs, Parser.targetItem )
+	
+	def listTarget(self, ctx, state, node, *xs):
+		xViews = mapViewEval( ctx, xs, None, python25ViewState( Parser.targetItem ) )
+		return nodeEditor( ctx, node,
+				listView( ctx, list_listViewLayout, lambda: text( ctx, punctuation_textStyle, '[' ), lambda: text( ctx, punctuation_textStyle, ']' ), lambda: text( ctx, punctuation_textStyle, ',' ), xViews ),
+				None,
+				state )
+
+	
+	
+	
 	# Variable reference
 	def var(self, ctx, state, node, name):
 		return nodeEditor( ctx, node,
@@ -311,6 +408,76 @@ class Python25View (GSymView):
 				state )
 	
 
+	
+	# Tuple literal
+	def tupleLiteral(self, ctx, state, node, *xs):
+		return tupleView( ctx, state, node, xs )
+
+	
+	
+	# List literal
+	def listLiteral(self, ctx, state, node, *xs):
+		xViews = mapViewEval( ctx, xs )
+		return nodeEditor( ctx, node,
+				listView( ctx, list_listViewLayout, lambda: text( ctx, punctuation_textStyle, '[' ), lambda: text( ctx, punctuation_textStyle, ']' ), lambda: text( ctx, punctuation_textStyle, ',' ), xViews ),
+				PRECEDENCE_LISTLITERAL,
+				state )
+
+	
+	
+	# List comprehension
+	def listFor(self, ctx, state, node, target, source):
+		targetView = viewEval( ctx, target, None, python25ViewState( Parser.targetList ) )
+		sourceView = viewEval( ctx, source, None, python25ViewState( Parser.oldTupleOrExpression ) )
+		return nodeEditor( ctx, node,
+				paragraph( ctx, listComp_paragraphStyle, [ keywordText( ctx, forKeyword ), text( ctx, default_textStyle, ' ' ), targetView, text( ctx, default_textStyle, ' ' ), keywordText( ctx, inKeyword ), text( ctx, default_textStyle, ' ' ), sourceView ] ),
+				PRECEDENCE_LISTCOMPREHENSION,
+				state )
+	
+	def listIf(self, ctx, state, node, condition):
+		conditionView = viewEval( ctx, condition, None, python25ViewState( Parser.oldExpression ) )
+		return nodeEditor( ctx, node,
+				paragraph( ctx, listComp_paragraphStyle, [ keywordText( ctx, ifKeyword ), text( ctx, default_textStyle, ' ' ), conditionView ] ),
+				PRECEDENCE_LISTCOMPREHENSION,
+				state )
+	
+	def listComprehension(self, ctx, state, node, expr, *xs):
+		exprView = viewEval( ctx, expr )
+		xViews = mapViewEval( ctx, xs, None, python25ViewState( Parser.listComprehensionItem ) )
+		return nodeEditor( ctx, node,
+				paragraph( ctx, listComp_paragraphStyle, [ text( ctx, punctuation_textStyle, '[' ),  exprView ] + xViews + [ text( ctx, punctuation_textStyle, ']' ) ] ),
+				PRECEDENCE_LISTCOMPREHENSION,
+				state )
+	
+	
+	
+
+	# Generator expression
+	def genFor(self, ctx, state, node, target, source):
+		targetView = viewEval( ctx, target, None, python25ViewState( Parser.targetList ) )
+		sourceView = viewEval( ctx, source, None, python25ViewState( Parser.orTest ) )
+		return nodeEditor( ctx, node,
+				paragraph( ctx, listComp_paragraphStyle, [ keywordText( ctx, forKeyword ), text( ctx, default_textStyle, ' ' ), targetView, text( ctx, default_textStyle, ' ' ), keywordText( ctx, inKeyword ), text( ctx, default_textStyle, ' ' ), sourceView ] ),
+				PRECEDENCE_GENERATOREXPRESSION,
+				state )
+	
+	def genIf(self, ctx, state, node, condition):
+		conditionView = viewEval( ctx, condition, None, python25ViewState( Parser.oldExpression ) )
+		return nodeEditor( ctx, node,
+				paragraph( ctx, listComp_paragraphStyle, [ keywordText( ctx, ifKeyword ), text( ctx, default_textStyle, ' ' ), conditionView ] ),
+				PRECEDENCE_GENERATOREXPRESSION,
+				state )
+	
+	def generatorExpression(self, ctx, state, node, expr, *xs):
+		exprView = viewEval( ctx, expr )
+		xViews = mapViewEval( ctx, xs, None, python25ViewState( Parser.generatorExpressionItem ) )
+		return nodeEditor( ctx, node,
+				paragraph( ctx, listComp_paragraphStyle, [ text( ctx, punctuation_textStyle, '(' ),  exprView ] + xViews + [ text( ctx, punctuation_textStyle, ')' ) ] ),
+				PRECEDENCE_GENERATOREXPRESSION,
+				 state )
+
+	
+	
 	
 	# Attribute ref
 	def attributeRef(self, ctx, state, node, target, name):
@@ -341,4 +508,10 @@ class Python25View (GSymView):
 				state  )
 	
 	
+	# Comment statement
+	def commentStmt(self, ctx, state, node, comment):
+		return nodeEditor( ctx, node,
+				text( ctx, comment_textStyle, '#' + comment ),
+				PRECEDENCE_STMT,
+				state )
 	
