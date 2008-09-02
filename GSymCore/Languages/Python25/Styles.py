@@ -30,6 +30,9 @@ python_paragraphStyle = ParagraphStyleSheet( DPParagraph.Alignment.BASELINES, 0.
 compoundStmt_vboxStyle = VBoxStyleSheet( DPVBox.Typesetting.ALIGN_WITH_TOP, DPVBox.Alignment.LEFT, 0.0, False, 0.0 )
 
 tuple_listViewLayout = ParagraphListViewLayout( python_paragraphStyle, lambda: TextElement( default_textStyle, ' ' ), 0 )
+list_listViewLayout = ParagraphListViewLayout( python_paragraphStyle, lambda: TextElement( default_textStyle, ' ' ), 0 )
+
+listComp_paragraphStyle = ParagraphStyleSheet( DPParagraph.Alignment.BASELINES, 15.0, 0.0, 30.0 )
 
 module_listViewLayout = VerticalListViewLayout( VBoxStyleSheet( DPVBox.Typesetting.ALIGN_WITH_TOP, DPVBox.Alignment.LEFT, 0.0, False, 0.0 ), \
 						ParagraphStyleSheet() )
