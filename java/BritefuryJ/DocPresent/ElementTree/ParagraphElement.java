@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Vector;
 
+import BritefuryJ.DocPresent.DPContainer;
 import BritefuryJ.DocPresent.DPParagraph;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.ElementTree.Marker.ElementMarker;
@@ -231,13 +232,20 @@ public class ParagraphElement extends SequenceBranchElement
 
 	public DPWidget getWidgetAtContentStart()
 	{
-		if ( children.size() > 0 )
+		if ( mode ==  Mode.INDEPENDENT )
 		{
-			return children.get( 0 ).getWidgetAtContentStart();
+			return getWidget();
 		}
 		else
 		{
-			return null;
+			if ( children.size() > 0 )
+			{
+				return children.get( 0 ).getWidgetAtContentStart();
+			}
+			else
+			{
+				return null;
+			}
 		}
 	}
 	
@@ -253,7 +261,7 @@ public class ParagraphElement extends SequenceBranchElement
 			offset += c.getContentLength();
 		}
 		
-		return -1;
+		throw new DPContainer.CouldNotFindChildException();
 	}
 
 	

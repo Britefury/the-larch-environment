@@ -181,6 +181,11 @@ public class ElementContentTest extends TestCase
 		assertEquals( root.getLeafAtContentPosition( 20 ), ty );
 		assertEquals( root.getLeafAtContentPosition( 21 ), null );
 		
+		assertEquals( b.getLeafAtContentPosition( 0 ), tb0 );
+		assertEquals( b.getLeafAtContentPosition( 1 ), tb0 );
+		assertEquals( b.getLeafAtContentPosition( 2 ), tb1 );
+		assertEquals( b.getLeafAtContentPosition( 3 ), tb1 );
+		assertEquals( b.getLeafAtContentPosition( 4 ), tb2 );
 		
 		
 		// Test getContentOffsetInSubtree() for widgets

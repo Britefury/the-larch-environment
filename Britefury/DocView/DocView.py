@@ -35,6 +35,8 @@ class DocView (object):
 		self._nodeTable = DocViewNodeTable()
 		
 		self._rootView = None
+		
+		self._caretNode = None
 
 		
 	def getRootView(self):
