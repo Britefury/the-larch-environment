@@ -114,67 +114,39 @@ class _ViewQueue (object):
 
 
 
-def _buildRefreshCellAndRegister(viewNodeInstance, refreshFunction):
-	"""
-	Builds a refresh cell, and registers it by appending it to @refreshCells
-	"""
-	cell = Cell()
-	cell.function = refreshFunction
-	viewNodeInstance.refreshCells.append( cell )
-
 def _registerViewNodeRelationship(viewNodeInstance, childNode):
 	viewNodeInstance.viewNode._registerChild( childNode )
 
 
-def _binRefreshCell(viewNodeInstance, bin, child):
-	"""
-	Runtime - called by compiled code at run-time
-	Builds and registers a refresh cell (if necessary) for a widget that is an instance of DTBin
-	"""
+def _populateBin(viewNodeInstance, bin, child):
 	if isinstance( child, DVNode ):
-		chNode = child
-		def _binRefresh():
-			bin.setChild( chNode.getElement() )
-			_registerViewNodeRelationship( viewNodeInstance, chNode )
-		_buildRefreshCellAndRegister( viewNodeInstance, _binRefresh )
+		bin.setChild( child.getElementNoRefresh() )
+		_registerViewNodeRelationship( viewNodeInstance, child )
 	elif isinstance( child, Element ):
 		bin.setChild( child )
 	else:
-		raiseRuntimeError( TypeError, viewNodeInstance.xs, '_GSymNodeViewInstance._binRefreshCell: could not process child of type %s'  %  ( type( child ).__name__, ) )
+		raiseRuntimeError( TypeError, viewNodeInstance.xs, '_populateBin: could not process child of type %s'  %  ( type( child ).__name__, ) )
 
-def _containerSeqRefreshCell(viewNodeInstance, container, children):
-	"""
-	Runtime - called by compiled code at run-time
-	Builds and registers a refresh cell (if necessary) for a widget that is an instance of DTBox
-	"""
-	def _containerSeqRefresh():
-		elements = []
-		for child in children:
-			if isinstance( child, DVNode ):
-				elements.append( child.getElement() )
-				_registerViewNodeRelationship( viewNodeInstance, child )
-			elif isinstance( child, Element ):
-				elements.append( child )
-			else:
-				raiseRuntimeError( TypeError, viewNodeInstance.xs, 'defineView: _containerSeqRefreshCell: could not process child of type %s'  %  ( type( child ).__name__, ) )
-		container.setChildren( elements )
-	_buildRefreshCellAndRegister( viewNodeInstance, _containerSeqRefresh )
+def _populateContainerSeq(viewNodeInstance, container, children):
+	elements = []
+	for child in children:
+		if isinstance( child, DVNode ):
+			elements.append( child.getElementNoRefresh() )
+			_registerViewNodeRelationship( viewNodeInstance, child )
+		elif isinstance( child, Element ):
+			elements.append( child )
+		else:
+			raiseRuntimeError( TypeError, viewNodeInstance.xs, ' _populateContainerSeq: could not process child of type %s'  %  ( type( child ).__name__, ) )
+	container.setChildren( elements )
 
-def _scriptRefreshCell(viewNodeInstance, script, child, slotIndex):
-	"""
-	Runtime - called by compiled code at run-time
-	Builds and registers a refresh cell (if necessary) for a widget that is an instance of DTBin
-	"""
+def _populateScript(viewNodeInstance, script, child, slotIndex):
 	if isinstance( child, DVNode ):
-		chNode = child
-		def _scriptRefresh():
-			script.setChild( slotIndex, chNode.getElement() )
-			_registerViewNodeRelationship( viewNodeInstance, chNode )
-		_buildRefreshCellAndRegister( viewNodeInstance, _scriptRefresh )
+		script.setChild( slotIndex, child.getElementNoRefresh() )
+		_registerViewNodeRelationship( viewNodeInstance, chNode )
 	elif isinstance( child, Element ):
 		script.setChild( slotIndex, child )
 	else:
-		raiseRuntimeError( TypeError, viewNodeInstance.xs, '_GSymNodeViewInstance._scriptRefreshCell: could not process child of type %s'  %  ( type( child ).__name__, ) )
+		raiseRuntimeError( TypeError, viewNodeInstance.xs, '_populateScript: could not process child of type %s'  %  ( type( child ).__name__, ) )
 
 
 	
@@ -203,7 +175,7 @@ def border(ctx, styleSheet, child):
 	"""
 	viewNodeInstance = ctx
 	element = BorderElement( styleSheet )
-	_binRefreshCell( viewNodeInstance, element, child )
+	_populateBin( viewNodeInstance, element, child )
 	return element
 
 def indent(ctx, indentation, child):
@@ -214,7 +186,7 @@ def indent(ctx, indentation, child):
 	viewNodeInstance = ctx
 	styleSheet = viewNodeInstance.viewInstance._indentationStyleSheet( indentation )
 	element = BorderElement( styleSheet )
-	_binRefreshCell( viewNodeInstance, element, child )
+	_populateBin( viewNodeInstance, element, child )
 	return element
 
 def text(ctx, styleSheet, txt):
@@ -235,7 +207,7 @@ def hbox(ctx, styleSheet, children):
 	"""
 	viewNodeInstance = ctx
 	element = HBoxElement( styleSheet )
-	_containerSeqRefreshCell( viewNodeInstance, element, children )
+	_populateContainerSeq( viewNodeInstance, element, children )
 	return element
 
 _ahboxStyleSheet = HBoxStyleSheet( DPHBox.Alignment.BASELINES, 0.0, False, 0.0 )
@@ -253,7 +225,7 @@ def vbox(ctx, styleSheet, children):
 	"""
 	viewNodeInstance = ctx
 	element = VBoxElement( styleSheet )
-	_containerSeqRefreshCell( viewNodeInstance, element, children )
+	_populateContainerSeq( viewNodeInstance, element, children )
 	return element
 
 def paragraph(ctx, styleSheet, children):
@@ -263,7 +235,7 @@ def paragraph(ctx, styleSheet, children):
 	"""
 	viewNodeInstance = ctx
 	element = ParagraphElement( styleSheet )
-	_containerSeqRefreshCell( viewNodeInstance, element, children )
+	_populateContainerSeq( viewNodeInstance, element, children )
 	return element
 
 
@@ -275,15 +247,15 @@ def script(ctx, styleSheet, mainChild, leftSuperChild, leftSubChild, rightSuperC
 	viewNodeInstance = ctx
 	element = ScriptElement( styleSheet )
 	
-	_scriptRefreshCell( viewNodeInstance, widget, mainChild, DPScript.MAIN )
+	_populateScript( viewNodeInstance, widget, mainChild, DPScript.MAIN )
 	if leftSuperChild is not None:
-		_scriptRefreshCell( viewNodeInstance, widget, leftSuperChild, DPScript.LEFTSUPER )
+		_populateScript( viewNodeInstance, widget, leftSuperChild, DPScript.LEFTSUPER )
 	if leftSubChild is not None:
-		_scriptRefreshCell( viewNodeInstance, widget, leftSubChild, DPScript.LEFTSUB )
+		_populateScript( viewNodeInstance, widget, leftSubChild, DPScript.LEFTSUB )
 	if rightSuperChild is not None:
-		_scriptRefreshCell( viewNodeInstance, widget, rightSuperChild, DPScript.RIGHTSUPER )
+		_populateScript( viewNodeInstance, widget, rightSuperChild, DPScript.RIGHTSUPER )
 	if rightSubChild is not None:
-		_scriptRefreshCell( viewNodeInstance, widget, rightSubChild, DPScript.RIGHTSUB )
+		_populateScript( viewNodeInstance, widget, rightSubChild, DPScript.RIGHTSUB )
 	return element
 
 def scriptLSuper(ctx, styleSheet, mainChild, scriptChild):
@@ -308,13 +280,10 @@ def listView(ctx, layout, beginDelim, endDelim, separatorFactory, children):
 	@layout controls the layout
 	"""
 	viewNodeInstance = ctx
-	element, refreshCell = ListView.listView( viewNodeInstance.xs, layout, beginDelim, endDelim, separatorFactory, children )
-	viewNodeInstance.refreshCells.append( refreshCell )
-	def _registerRelationships():
-		for ch in children:
-			if isinstance( ch, DVNode ):
-				_registerViewNodeRelationship( viewNodeInstance, ch )
-	_buildRefreshCellAndRegister( viewNodeInstance, _registerRelationships )
+	element = ListView.listView( viewNodeInstance.xs, layout, beginDelim, endDelim, separatorFactory, children )
+	for child in children:
+		if isinstance( child, DVNode ):
+			_registerViewNodeRelationship( viewNodeInstance, child )
 	return element
 
 
@@ -381,14 +350,13 @@ class _GSymNodeViewInstance (object):
 	Manages state that concerns a view of a specific sub-tree of a document
 	"""
 	
-	__slots__ = [ 'xs', 'view', 'viewInstance', 'viewNode', 'refreshCells', 'styleSheetStack' ]
+	__slots__ = [ 'xs', 'view', 'viewInstance', 'viewNode', 'styleSheetStack' ]
 
 	def __init__(self, xs, view, viewInstance, viewNode):
 		self.xs = xs
 		self.view = view
 		self.viewInstance = viewInstance
 		self.viewNode = viewNode
-		self.refreshCells = []
 		self.styleSheetStack = []
 
 		
@@ -455,8 +423,6 @@ class _GSymViewInstance (object):
 			## HACK ##
 			# Build the contents
 			viewContents = self._p_buildNodeViewContents( nodeViewInstance, treeNode, nodeViewFunction, state )
-			# Get the refresh cells that need to be monitored, and hand them to the DVNode
-			viewNode._f_setRefreshCells( nodeViewInstance.refreshCells )
 			# Return the contents
 			return viewContents
 		

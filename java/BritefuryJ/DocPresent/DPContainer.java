@@ -25,6 +25,13 @@ import BritefuryJ.Math.Xform2;
 
 public abstract class DPContainer extends DPWidget implements ContentInterface
 {
+	public static class CouldNotFindChildException extends RuntimeException
+	{
+		private static final long serialVersionUID = 1L;
+	}
+	
+	
+	
 	protected static class ChildEntry
 	{
 		public DPWidget child;
@@ -877,7 +884,7 @@ public abstract class DPContainer extends DPWidget implements ContentInterface
 			offset += c.getContentLength();
 		}
 		
-		return -1;
+		throw new CouldNotFindChildException();
 	}
 
 	public DPWidget getChildAtContentPosition(int position)
