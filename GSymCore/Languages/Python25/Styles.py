@@ -34,10 +34,10 @@ list_listViewLayout = ParagraphListViewLayout( python_paragraphStyle, lambda: Te
 
 listComp_paragraphStyle = ParagraphStyleSheet( DPParagraph.Alignment.BASELINES, 15.0, 0.0, 30.0 )
 
-module_listViewLayout = VerticalListViewLayout( VBoxStyleSheet( DPVBox.Typesetting.ALIGN_WITH_TOP, DPVBox.Alignment.LEFT, 0.0, False, 0.0 ), \
+module_listViewLayout = VerticalListViewLayout( VBoxStyleSheet( DPVBox.Typesetting.ALIGN_WITH_TOP, DPVBox.Alignment.EXPAND, 0.0, False, 0.0 ), \
 						ParagraphStyleSheet() )
 
-suite_listViewLayout = VerticalListViewLayout( VBoxStyleSheet( DPVBox.Typesetting.ALIGN_WITH_TOP, DPVBox.Alignment.LEFT, 0.0, False, 0.0 ), \
+suite_listViewLayout = VerticalListViewLayout( VBoxStyleSheet( DPVBox.Typesetting.ALIGN_WITH_TOP, DPVBox.Alignment.EXPAND, 0.0, False, 0.0 ), \
 						ParagraphStyleSheet() )
 
 #lineEditorStyle = GSymStyleSheet( highlightBackgroundColour=Colour3f( 0.85, 0.85, 1.0 ) )
