@@ -156,35 +156,40 @@ class VerticalInlineListViewLayout (ListViewLayout):
 		elif len( contents ) >= 2:
 			contentElements = self._getContentElements( contents, xs )
 			
+			first = ParagraphElement( self._lineParagraphStyleSheet )
 			if beginDelim is not None  or  separatorFactory is not None:
-				first = ParagraphElement( self._lineParagraphStyleSheet )
 				firstChildren = []
 				if beginDelim is not None:
 					firstChildren.append( beginDelim )
 				firstChildren.append( contentElements[0] )
 				if separatorFactory is not None:
 					firstChildren.append( separatorFactory() )
+				newLine = TextElement( '\n' )
+				firstChildren.append( newLine )
 				first.setChildren( firstChildren )
 			else:
-				first = contentElements[0]
+				firstChildren.append( contentElements[0] )
+				firstChildren.append( newLine )
+			first.setChildren( firstChildren )
 				
-			last = self._indent( contentElements[-1] )
+				
+			def _restChild(c, bLast):
+				elem = ParagraphElement( self._lineParagraphStyleSheet )
+				newLine = TextElement( '\n' )
+				if separatorFactory is not None  and  not bLast:
+					elem.setChildren( [ c, separatorFactory(), newLine ] )
+				else:
+					elem.setChildren( [ c, newLine ] )
+				return elem
+
+			middle = [ self._indent( _restChild( c, False ) )   for c in contentElements[1:-1] ]
+			
+			last = _restChild( contentElements[-1], True )
 			
 			if endDelim is not None:
 				end = [ endDelim ]
 			else:
 				end = []
-			
-				
-			def _middleChild(c):
-				if separatorFactory is not None:
-					elem = ParagraphElement( self._lineParagraphStyleSheet )
-					elem.setChildren( [ c, separatorFactory() ] )
-					return elem
-				else:
-					return c
-
-			middle = [ self._indent( _middleChild( c ) )   for c in contentElements[1:-1] ]
 			
 			vbox = VBoxElement( self._vboxStyleSheet )
 			vbox.setChildren( [ first ]  +  middle  +  [ last ]  +  end )
@@ -224,11 +229,12 @@ class VerticalListViewLayout (ListViewLayout):
 		if len( contents ) > 0:
 			contentElements = self._getContentElements( contents, xs )
 			for c in contentElements[:-1]:
+				x = ParagraphElement( self._lineParagraphStyleSheet )
+				newLine = TextElement( '\n' )
 				if separatorFactory is not None:
-					x = ParagraphElement( self._lineParagraphStyleSheet )
-					x.setChildren( [ c, separatorFactory() ] )
+					x.setChildren( [ c, separatorFactory(), newLine ] )
 				else:
-					x = c
+					x.setChildren( [ c, newLine ] )
 				x = self._indent( x )
 				childElements.append( x )
 			childElements.append( self._indent( contentElements[-1] ) )
