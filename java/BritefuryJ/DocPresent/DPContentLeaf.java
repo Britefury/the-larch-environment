@@ -208,9 +208,19 @@ public abstract class DPContentLeaf extends DPWidget implements ContentInterface
 		return marker( 0, Marker.Bias.START );
 	}
 	
+	public Marker markerAtStartPlusOne()
+	{
+		return marker( Math.min( 1, content.length() ), Marker.Bias.START );
+	}
+	
 	public Marker markerAtEnd()
 	{
-		return marker( content.length() - 1, Marker.Bias.END );
+		return marker( Math.max( content.length() - 1, 0 ), Marker.Bias.END );
+	}
+	
+	public Marker markerAtEndMinusOne()
+	{
+		return marker( Math.max( content.length() - 1, 0 ), Marker.Bias.START );
 	}
 	
 	
@@ -240,16 +250,19 @@ public abstract class DPContentLeaf extends DPWidget implements ContentInterface
 		moveMarker( m, 0, Marker.Bias.START );
 	}
 	
+	public void moveMarkerToStartPlusOne(Marker m)
+	{
+		moveMarker( m, Math.min( 1, content.length() ), Marker.Bias.START );
+	}
+	
 	public void moveMarkerToEnd(Marker m)
 	{
-		if ( content.length() == 0 )
-		{
-			moveMarker( m, 0, Marker.Bias.START );
-		}
-		else
-		{
-			moveMarker( m, content.length() - 1, Marker.Bias.END );
-		}
+		moveMarker( m, Math.max( content.length() - 1, 0 ), Marker.Bias.END );
+	}
+	
+	public void moveMarkerToEndMinusOne(Marker m)
+	{
+		moveMarker( m, Math.max( content.length() - 1, 0 ), Marker.Bias.START );
 	}
 	
 	
@@ -344,7 +357,7 @@ public abstract class DPContentLeaf extends DPWidget implements ContentInterface
 				}
 				else
 				{
-					return left.markerAtEnd();
+					return left.markerAtEndMinusOne();
 				}
 			}
 			else
@@ -371,7 +384,7 @@ public abstract class DPContentLeaf extends DPWidget implements ContentInterface
 				}
 				else
 				{
-					left.moveMarkerToEnd( marker );
+					left.moveMarkerToEndMinusOne( marker );
 				}
 			}
 		}
@@ -396,7 +409,7 @@ public abstract class DPContentLeaf extends DPWidget implements ContentInterface
 				}
 				else
 				{
-					return right.markerAtStart();
+					return right.markerAtStartPlusOne();
 				}
 			}
 			else
@@ -423,7 +436,7 @@ public abstract class DPContentLeaf extends DPWidget implements ContentInterface
 				}
 				else
 				{
-					right.moveMarkerToStart( marker );
+					right.moveMarkerToStartPlusOne( marker );
 				}
 			}
 		}
