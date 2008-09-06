@@ -1079,6 +1079,113 @@ class Python25View (GSymView):
 	
 	
 
+	# Try statement
+	def tryStmt(self, ctx, state, node, suite):
+		return compoundStatementEditor( ctx, node,
+						paragraph( ctx, python_paragraphStyle, [ keywordText( ctx, tryKeyword ),  text( ctx, punctuation_textStyle, ':' ) ] ),
+						PRECEDENCE_STMT,
+						suite,
+						state )
+	
+	
+	
+	# Except statement
+	def exceptStmt(self, ctx, state, node, exc, target, suite):
+		elements = []
+		if exc != '<nil>':
+			excView = viewEval( ctx, exc )
+			elements.extend( [ text( ctx, default_textStyle, ' ' ),  excView ] )
+		if target != '<nil>':
+			targetView = viewEval( ctx, target )
+			elements.extend( [ text( ctx, default_textStyle, ', ' ),  targetView ] )
+		elements.append( text( ctx, punctuation_textStyle, ':' ) )
+		return compoundStatementEditor( ctx, node,
+						paragraph( ctx, python_paragraphStyle, [ keywordText( ctx, exceptKeyword ) ]  +  elements ),
+						PRECEDENCE_STMT,
+						suite,
+						state )
+
+	
+	
+	# Finally statement
+	def finallyStmt(self, ctx, state, node, suite):
+		return compoundStatementEditor( ctx, node,
+						paragraph( ctx, python_paragraphStyle, [ keywordText( ctx, finallyKeyword ),  text( ctx, punctuation_textStyle, ':' ) ] ),
+						PRECEDENCE_STMT,
+						suite,
+						state )
+	
+	
+	
+	# With statement
+	def withStmt(self, ctx, state, node, expr, target, suite):
+		exprView = viewEval( ctx, expr )
+		elements = [ exprView ]
+		if target != '<nil>':
+			targetView = viewEval( ctx, target )
+			elements.extend( [ text( ctx, default_textStyle, ' ' ),  keywordText( ctx, asKeyword ),  text( ctx, default_textStyle, ' ' ),  targetView ] )
+		elements.append( text( ctx, punctuation_textStyle, ':' ) )
+		return compoundStatementEditor( ctx, node,
+						paragraph( ctx, python_paragraphStyle, [ keywordText( ctx, withKeyword ),  text( ctx, default_textStyle, ' ' ) ]  +  elements ),
+						PRECEDENCE_STMT,
+						suite,
+						state )
+
+	
+	
+	# Def statement
+	def defStmt(self, ctx, state, node, name, params, suite):
+		paramViews = mapViewEval( ctx, params, None, python25ViewState( Parser.param ) )
+		paramElements = [ text( ctx, punctuation_textStyle, '(' ) ]
+		if len( params ) > 0:
+			for p in paramViews[:-1]:
+				paramElements.extend( [ p,  text( ctx, punctuation_textStyle, ', ' ) ] )
+			paramElements.append( paramViews[-1] )
+		paramElements.append( text( ctx, punctuation_textStyle, ')' ) )
+		return compoundStatementEditor( ctx, node,
+						paragraph( ctx, python_paragraphStyle, [ keywordText( ctx, defKeyword ),  text( ctx, default_textStyle, ' ' ),  text( ctx, default_textStyle, name ) ]  +  \
+							   paramElements  +  [ text( ctx, punctuation_textStyle, ':' ) ] ),
+						PRECEDENCE_STMT,
+						suite,
+						state )
+
+	
+	# Decorator statement
+	def decoStmt(self, ctx, state, node, name, args):
+		if args != '<nil>':
+			argViews = mapViewEval( ctx, args, None, python25ViewState( Parser.callArg ) )
+			argElements = [ text( ctx, punctuation_textStyle, '(' ) ]
+			if len( args ) > 0:
+				for a in argViews[:-1]:
+					argElements.extend( [ a, text( ctx, punctuation_textStyle, ', ' ) ] )
+				argElements.append( argViews[-1] )
+			argElements.append( text( ctx, punctuation_textStyle, ')' ) )
+		else:
+			argElements = []
+		return nodeEditor( ctx, node,
+				   paragraph( ctx, python_paragraphStyle, [ text( ctx, punctuation_textStyle, '@' ),  text( ctx, default_textStyle, name ) ]  +  argElements ),
+				   PRECEDENCE_STMT,
+				   state )
+	
+	
+	
+	# Def statement
+	def classStmt(self, ctx, state, node, name, inheritance, suite):
+		if inheritance != '<nil>':
+			inheritanceView = viewEval( ctx, inheritance, None, python25ViewState( Parser.tupleOrExpression ) )
+			inhElements = [ text( ctx, punctuation_textStyle, '(' ),  inheritanceView,  text( ctx, punctuation_textStyle, ')' ) ]
+		else:
+			inhElements = []
+			
+		return compoundStatementEditor( ctx, node,
+						paragraph( ctx, python_paragraphStyle, [ keywordText( ctx, classKeyword ),  text( ctx, default_textStyle, ' ' ),  text( ctx, default_textStyle, name ) ]  +  \
+							   inhElements  +  [ text( ctx, punctuation_textStyle, ':' ) ] ),
+						PRECEDENCE_STMT,
+						suite,
+						state )
+	
+	
+	
 	# Comment statement
 	def commentStmt(self, ctx, state, node, comment):
 		return nodeEditor( ctx, node,
