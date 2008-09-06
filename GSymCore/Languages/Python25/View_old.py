@@ -801,12 +801,6 @@ class Python25View (GSymView):
 
 	
 	
-	# Conditional expression
-	def conditionalExpr(self, node, condition, expr, elseExpr):
-		return self( expr )  +  '   '  +  'if '  +  self( condition )  +  ' else '  +  self( elseExpr )
-
-	
-	
 	# Lambda expression
 	def lambdaExpr(self, state, node, params, expr):
 		# The Python 2.5 grammar has two versions of the lambda expression grammar; one what reckognises the full lambda expression, and one that

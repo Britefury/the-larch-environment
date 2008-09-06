@@ -236,7 +236,7 @@ public class DPScript extends DPContainer
 				}
 				else
 				{
-					metrics[i] = new VMetricsTypeset( metrics[i].height, 0.0, v.vspacing );
+					metrics[i] = new VMetricsTypeset( v.height, 0.0, v.vspacing );
 				}
 			}
 			else
@@ -263,7 +263,7 @@ public class DPScript extends DPContainer
 				}
 				else
 				{
-					metrics[i] = new VMetricsTypeset( metrics[i].height, 0.0, v.vspacing );
+					metrics[i] = new VMetricsTypeset( v.height, 0.0, v.vspacing );
 				}
 			}
 			else
@@ -335,7 +335,7 @@ public class DPScript extends DPContainer
 				}
 				else
 				{
-					metrics[i] = new VMetricsTypeset( metrics[i].height, 0.0, v.vspacing );
+					metrics[i] = new VMetricsTypeset( v.height, 0.0, v.vspacing );
 				}
 			}
 			else
@@ -362,7 +362,7 @@ public class DPScript extends DPContainer
 				}
 				else
 				{
-					metrics[i] = new VMetricsTypeset( metrics[i].height, 0.0, v.vspacing );
+					metrics[i] = new VMetricsTypeset( v.height, 0.0, v.vspacing );
 				}
 			}
 			else
