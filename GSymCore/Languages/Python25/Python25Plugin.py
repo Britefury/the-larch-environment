@@ -13,7 +13,6 @@ def py25New():
 
 def py25ImportFile(filename):
 	content = importPy25File( filename )
-	print content
 	return [ '$withLanguageModule', 'GSymCore.Languages.Python25.Python25', content ]
 
 

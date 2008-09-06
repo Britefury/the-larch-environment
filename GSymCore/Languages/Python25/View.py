@@ -181,7 +181,7 @@ PRECEDENCE_PARAM = 0
 
 
 def _paren(ctx, x):
-	return paragraph( ctx, python_paragraphStyle, [ text( ctx, punctuation_textStyle, '(' ), c, text( ctx, punctuation_textStyle, ')' ) ] )
+	return paragraph( ctx, python_paragraphStyle, [ text( ctx, punctuation_textStyle, '(' ), x, text( ctx, punctuation_textStyle, ')' ) ] )
 
 def _precedenceGT(ctx, x, outerPrecedence):
 	if outerPrecedence is not None  and  x.metadata is not None  and  x.metadata > outerPrecedence:
