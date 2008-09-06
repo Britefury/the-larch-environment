@@ -561,19 +561,29 @@ class Python25View (GSymView):
 
 	# Subscript
 	def subscriptSlice(self, ctx, state, node, x, y):
-		xView = viewEval( ctx, x )
-		yView = viewEval( ctx, y )
+		def _sliceIndex(i):
+			if i == '<nil>':
+				return []
+			else:
+				return [ viewEval( ctx, i ) ]
+		xView = _sliceIndex( x )
+		yView = _sliceIndex( y )
 		return nodeEditor( ctx, node,
-				   paragraph( ctx, python_paragraphStyle, [ xView, text( ctx, punctuation_textStyle, ':' ), yView ] ),
+				   paragraph( ctx, python_paragraphStyle, xView + [ text( ctx, punctuation_textStyle, ':' ) ] + yView ),
 				   PRECEDENCE_SUBSCRIPTSLICE,
 				   state )
 
 	def subscriptLongSlice(self, ctx, state, node, x, y, z):
-		xView = viewEval( ctx, x )
-		yView = viewEval( ctx, y )
-		zView = viewEval( ctx, z )
+		def _sliceIndex(i):
+			if i == '<nil>':
+				return []
+			else:
+				return [ viewEval( ctx, i ) ]
+		xView = _sliceIndex( x )
+		yView = _sliceIndex( y )
+		zView = _sliceIndex( z )
 		return nodeEditor( ctx, node,
-				   paragraph( ctx, python_paragraphStyle, [ xView, text( ctx, punctuation_textStyle, ':' ), yView, text( ctx, punctuation_textStyle, ':' ), zView ] ),
+				   paragraph( ctx, python_paragraphStyle, xView + [ text( ctx, punctuation_textStyle, ':' ) ] +  yView + [ text( ctx, punctuation_textStyle, ':' ) ] + zView ),
 				   PRECEDENCE_SUBSCRIPTSLICE,
 				   state )
 
