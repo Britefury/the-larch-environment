@@ -5,18 +5,25 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
-import compiler
-from compiler import ast
+import _ast
 
 
 # Would need to generate an 'oldLambdaExpr' node when necessary
 
 
 
+def _getNodeTypeName(node):
+	name = node.__class__.__name__
+	if '.' in name:
+		return name[name.rfind( '.' )+1:]
+	else:
+		return name
+
+
 class _Importer (object):
 	def __call__(self, node, method=None):
 		if method is None:
-			name = node.__class__.__name__
+			name = _getNodeTypeName( node )
 			try:
 				method = getattr( self, name )
 			except AttributeError:
@@ -25,26 +32,18 @@ class _Importer (object):
 
 
 	
-_cmpOps = { '<' : 'lt',  '<=' : 'lte',  '==' : 'eq',  '!=' : 'neq',  '>' : 'gt',  '>=' : 'gte',  'is' : 'isTest',  'is not' : 'isNotTest',  'in' : 'inTest',  'not in' : 'notInTest' }
-	
-	
-
 def _extractParameters(node):
-	bParamList = ( node.flags & 4 )  !=  0
-	bKWParamList = ( node.flags & 8 )  !=  0
-	numListParams = 0
-	if bParamList:
-		numListParams += 1
-	if bKWParamList:
-		numListParams += 1
 	numDefaultParams = len( node.defaults )
-	numSimpleParams = len( node.argnames )  -  ( numDefaultParams + numListParams )
-	params = [ [ 'simpleParam', name ]   for name in node.argnames[:numSimpleParams] ]
-	params.extend( [ [ 'defaultValueParam', name, _expr( value ) ]   for name, value in zip( node.argnames[numSimpleParams:numSimpleParams+numDefaultParams], node.defaults ) ] )
-	if bParamList:
-		params.append( [ 'paramList', node.argnames[-2 if bKWParamList  else  -1] ] )
-	if bKWParamList:
-		params.append( [ 'kwParamList', node.argnames[-1] ] )
+	numSimpleParams = len( node.args )  -  ( numDefaultParams )
+	
+	params = [ [ 'simpleParam', name.id ]   for name in node.args[:numSimpleParams] ]
+	params.extend( [ [ 'defaultValueParam', name.id, _expr( value ) ]   for name, value in zip( node.args[numSimpleParams:], node.defaults ) ] )
+	
+	if node.vararg is not None:
+		params.append( [ 'paramList', node.vararg ] )
+	if node.kwarg is not None:
+		params.append( [ 'kwParamList', node.kwarg ] )
+	
 	return params
 
 
@@ -54,7 +53,7 @@ def _extractParameters(node):
 class _TargetImporter (_Importer):
 	def __call__(self, node, method=None):
 		if method is None:
-			name = node.__class__.__name__
+			name = _getNodeTypeName( node )
 			try:
 				method = getattr( self, name )
 			except AttributeError:
@@ -63,33 +62,111 @@ class _TargetImporter (_Importer):
 
 	
 	# Targets
-	def AssName(self, node):
-		return [ 'singleTarget', node.name ]
+	#def AssName(self, node):
+		#return [ 'singleTarget', node.id ]
 	
-	def AssAttr(self, node):
-		return [ 'attributeRef', _expr( node.expr ), node.attrname ]
+	#def AssAttr(self, node):
+		#return [ 'attributeRef', _target( node.expr ), node.attr ]
 	
-	def AssTuple(self, node):
-		return [ 'tupleTarget' ]  +  [ _expr( x )   for x in node.nodes ]
+	#def AssTuple(self, node):
+		#return [ 'tupleTarget' ]  +  [ _target( x )   for x in node.elts ]
 	
-	def AssList(self, node):
-		return [ 'listTarget' ]  +  [ _expr( x )   for x in node.nodes ]
+	#def AssList(self, node):
+		#return [ 'listTarget' ]  +  [ _target( x )   for x in node.elts ]
 
 	
 	def Name(self, node):
-		return [ 'singleTarget', node.name ]
+		return [ 'singleTarget', node.id ]
 	
-	def Getattr(self, node):
-		return [ 'attributeRef', _expr( node.expr ), node.attrname ]
+	def Attribute(self, node):
+		return [ 'attributeRef', _expr( node.value ), node.attr ]
 	
 	def Tuple(self, node):
-		return [ 'tupleTarget' ]  +  [ _expr( x )   for x in node.nodes ]
+		return [ 'tupleTarget' ]  +  [ _target( x )   for x in node.elts ]
 	
 	def List(self, node):
-		return [ 'listTarget' ]  +  [ _expr( x )   for x in node.nodes ]
+		return [ 'listTarget' ]  +  [ _target( x )   for x in node.elts ]
 
 
 
+
+	
+class _ListCompImporter (_Importer):
+	# List comprehension
+	def comprehension(self, node):
+		return [ [ 'listFor', _target( node.target ), _expr( node.iter ) ] ]  +  [ [ 'listIf', _expr( x ) ]   for x in node.ifs ]
+	
+	def comprehensionType(self, node):
+		return self.comprehension( node )
+
+
+class _GenExprImporter (_Importer):
+	# Generator expression comprehension
+	def comprehension(self, node):
+		return [ [ 'genFor', _target( node.target ), _expr( node.iter ) ] ]  +  [ [ 'genIf', _expr( x ) ]   for x in node.ifs ]
+
+	def comprehensionType(self, node):
+		return self.comprehension( node )
+
+
+class _LambdaArgsImporter (_Importer):
+	# Lambda arguments
+	def arguments(self, node):
+		return _extractParameters( node )
+	
+	def argumentsType(self, node):
+		return self.arguments( node )
+
+	
+class _ImportImporter (_Importer):
+	# Import statement
+	def alias(self, node):
+		if node.asname is None:
+			return [ 'moduleImport', node.name ]
+		else:
+			return [ 'moduleImportAs', node.name, node.asname ]
+		
+
+class _ImportFromImporter (_Importer):
+	# Import statement
+	def alias(self, node):
+		if node.asname is None:
+			return [ 'moduleContentImport', node.name ]
+		else:
+			return [ 'moduleContentImportAs', node.name, node.asname ]
+		
+	
+class _ExceptHandlerImporter (_Importer):
+	# Import statement
+	def excepthandler(self, node):
+		return [ 'exceptStmt',     _expr( node.type )   if node.type is not None   else '<nil>',     _target( node.name )   if node.name is not None   else '<nil>',    _flattenedCompound( node.body ) ]
+		
+	
+class _DecoratorImporter (_Importer):
+	def Name(self, node):
+		return [ 'decoStmt', node.id, '<nil>' ]
+
+	def Call(self, node):
+		_starArg = lambda name, x:   [ [ name, _expr( x ) ] ]   if x is not None   else   []
+		return [ 'decoStmt', node.func.id, [ _expr( x )   for x in node.args ]  +  [ _expr( x )   for x in node.keywords ]  +  _starArg( 'argList', node.starargs )  +  _starArg( 'kwArgList', node.kwargs ) ]
+
+	def keyword(self, node):
+		return [ 'kwArg', node.arg, _expr( node.value ) ]
+
+
+	
+	
+_binOpNameTable = { 'Pow' : 'pow',  'Add' : 'add',  'Mult' : 'mul',  'Div' : 'div',  'Mod' : 'mod',  'Add' : 'add',  'Sub' : 'sub',  'LShift' : 'lshift',  'RShift' : 'rshift',  'BitAnd' : 'bitAnd',  'BitXor' : 'bitXor',  'BitOr' : 'bitOr' }	
+_unaryOpNameTable = { 'Invert' : 'invert',  'USub' : 'negate',  'UAdd' : 'pos',  'Not' : 'notTest' }	
+_boolOpNameTable = { 'And' : 'andTest',  'Or' : 'orTest' }	
+_cmpOpTable = { 'Lt' : 'lt',  'LtE' : 'lte',  'Eq' : 'eq',  'NotEq' : 'neq',  'Gt' : 'gt',  'GtE' : 'gte',  'Is' : 'isTest',  'IsNot' : 'isNotTest',  'In' : 'inTest',  'NotIn' : 'notInTest' }
+	
+	
+def _getOpNodeName(op):
+	if hasattr( op, 'name' ):
+		return op.name()
+	else:
+		return _getNodeTypeName( op )
 
 	
 class _ExprImporter (_Importer):
@@ -98,7 +175,7 @@ class _ExprImporter (_Importer):
 			return '<nil>'
 		else:
 			if method is None:
-				name = node.__class__.__name__
+				name = _getNodeTypeName( node )
 				try:
 					method = getattr( self, name )
 				except AttributeError:
@@ -106,98 +183,97 @@ class _ExprImporter (_Importer):
 			return method( node )
 
 	
-	# Constant / literal
-	def Const(self, node):
-		if isinstance( node.value, str ):
-			return [ 'stringLiteral', 'ascii', 'single', repr( node.value )[1:-1] ]
-		elif isinstance( node.value, unicode ):
-			return [ 'stringLiteral', 'unicode', 'single', repr( node.value )[2:-1] ]
-		elif isinstance( node.value, int ):
-			return [ 'intLiteral', 'decimal', 'int', repr( node.value ) ]
-		elif isinstance( node.value, long ):
-			return [ 'intLiteral', 'decimal', 'long', repr( node.value )[:-1] ]
-		elif isinstance( node.value, float ):
-			return [ 'floatLiteral', repr( node.value ) ]
-		elif isinstance( node.value, complex ):
-			if node.value.real == 0.0:
-				return [ 'imaginaryLiteral', repr( node.value.imag ) + 'j' ]
+	# Expression
+	def Expression(self, node):
+		return _expr( node.body )
+		
+		
+		
+	# Number literal
+	def Num(self, node):
+		value = node.n
+		if isinstance( value, int ):
+			return [ 'intLiteral', 'decimal', 'int', repr( value ) ]
+		elif isinstance( value, long ):
+			return [ 'intLiteral', 'decimal', 'long', repr( value )[:-1] ]
+		elif isinstance( value, float ):
+			return [ 'floatLiteral', repr( value ) ]
+		elif isinstance( value, complex ):
+			if value.real == 0.0:
+				return [ 'imaginaryLiteral', repr( value.imag ) + 'j' ]
 			else:
-				return [ 'add', [ 'floatLiteral', repr( node.value.real ) ], [ 'imaginaryLiteral', repr( node.value.imag ) + 'j' ] ]
-		elif node.value is None:
-			return [ 'var', 'None' ]
+				return [ 'add', [ 'floatLiteral', repr( value.real ) ], [ 'imaginaryLiteral', repr( value.imag ) + 'j' ] ]
 		else:
-			print 'Const: could not handle value', node.value
+			print 'Const: could not handle value', value
 			raise ValueError
+		
+	
+	# String literal
+	def Str(self, node):
+		value = node.s
+		if isinstance( value, str ):
+			return [ 'stringLiteral', 'ascii', 'single', repr( value )[1:-1] ]
+		elif isinstance( value, unicode ):
+			return [ 'stringLiteral', 'unicode', 'single', repr( value )[2:-1] ]
+		else:
+			print 'Const: could not handle value', value
+			raise ValueError
+
 		
 		
 	# Variable ref
 	def Name(self, node):
-		return [ 'var', node.name ]
+		return [ 'var', node.id ]
 
 
 	# Targets
-	def AssName(self, node):
-		return [ 'singleTarget', node.name ]
+	#def AssName(self, node):
+		#return [ 'singleTarget', node.name ]
 	
-	def AssAttr(self, node):
-		return [ 'attributeRef', _expr( node.expr ), node.attrname ]
+	#def AssAttr(self, node):
+		#return [ 'attributeRef', _expr( node.expr ), node.attrname ]
 	
-	def AssTuple(self, node):
-		return [ 'tupleTarget' ]  +  [ _expr( x )   for x in node.nodes ]
+	#def AssTuple(self, node):
+		#return [ 'tupleTarget' ]  +  [ _expr( x )   for x in node.nodes ]
 	
-	def AssList(self, node):
-		return [ 'listTarget' ]  +  [ _expr( x )   for x in node.nodes ]
+	#def AssList(self, node):
+		#return [ 'listTarget' ]  +  [ _expr( x )   for x in node.nodes ]
 
 	
 	
 	# Tuple literal
 	def Tuple(self, node):
-		return [ 'tupleLiteral' ]  +  [ _expr( x )   for x in node.nodes ]
+		return [ 'tupleLiteral' ]  +  [ _expr( x )   for x in node.elts ]
 	
 	
 	
 	# List literal
 	def List(self, node):
-		return [ 'listLiteral' ]  +  [ _expr( x )   for x in node.nodes ]
+		return [ 'listLiteral' ]  +  [ _expr( x )   for x in node.elts ]
 	
 	
 	
 	# List comprehension
-	def ListCompIf(self, node):
-		return [ 'listIf', _expr( node.test ) ]
-	
-	def ListCompFor(self, node):
-		return [ [ 'listFor', _expr( node.assign ), _expr( node.list ) ] ]  +  [ _expr( x )   for x in node.ifs ]
-	
 	def ListComp(self, node):
-		quals = []
-		for x in node.quals:
-			quals.extend( _expr( x ) )
-		return [ 'listComprehension', _expr( node.expr ) ]   +   quals
+		gens = []
+		for x in node.generators:
+			gens.extend( _listComp( x ) )
+		return [ 'listComprehension', _expr( node.elt ) ]   +   gens
 	
 	
 	
 	# Generator expression
-	def GenExprIf(self, node):
-		return [ 'genIf', _expr( node.test ) ]
-	
-	def GenExprFor(self, node):
-		return [ [ 'genFor', _expr( node.assign ), _expr( node.iter ) ] ]  +  [ _expr( x )   for x in node.ifs ]
-	
-	def GenExprInner(self, node):
-		quals = []
-		for x in node.quals:
-			quals.extend( _expr( x ) )
-		return [ 'generatorExpression', _expr( node.expr ) ]   +   quals
-	
-	def GenExpr(self, node):
-		return _expr( node.code )
+	def GeneratorExp(self, node):
+		gens = []
+		for x in node.generators:
+			gens.extend( _genExp( x ) )
+		return [ 'generatorExpression', _expr( node.elt ) ]   +   gens
 	
 	
 	
 	# Dictionary literal
 	def Dict(self, node):
-		return [ 'dictLiteral' ]  +  [ [ 'keyValuePair', _expr( x[0] ), _expr( x[1] ) ]   for x in node.items ]
+		return [ 'dictLiteral' ]  +  [ [ 'keyValuePair', _expr( k ), _expr( v ) ]   for k, v in zip( node.keys, node.values ) ]
 	
 	
 	
@@ -208,162 +284,113 @@ class _ExprImporter (_Importer):
 	
 	
 	# Attribute ref
-	def Getattr(self, node):
-		return [ 'attributeRef', _expr( node.expr ), node.attrname ]
+	def Attribute(self, node):
+		return [ 'attributeRef', _expr( node.value ), node.attr ]
 		
 	
 	
 	# Subscript	
 	def Subscript(self, node):
-		if len( node.subs ) == 1:
-			s = _expr( node.subs[0] )
-		else:
-			s = [ 'tupleLiteral' ]  +  [ _expr( x )   for x in node.subs ]
-		return [ 'subscript', _expr( node.expr ), s ]
+		return [ 'subscript', _expr( node.value ), _expr( node.slice ) ]
+	
+	def Index(self, node):
+		return _expr( node.value )
 	
 	def Slice(self, node):
-		return [ 'subscript', _expr( node.expr ), [ 'subscriptSlice', _expr( node.lower ), _expr( node.upper ) ] ]
-	
-	def Sliceobj(self, node):
 		def _s(x):
 			s = _expr( x )
 			return s   if s is not None   else   '<nil>'
-		def _slice(xs):
-			if len( xs ) == 3:
-				return [ 'subscriptLongSlice', _s( xs[0] ), _s( xs[1] ), _s( xs[2] ) ]
-			elif len( xs ) == 2:
-				return [ 'subscriptSlice', _s( xs[0] ), _s( xs[1] ) ]
-			else:
-				raise ValueError
-		return _slice( node.nodes )
+		if node.step is None:
+			return [ 'subscriptSlice', _s( node.lower ), _s( node.upper ) ]
+		else:
+			return [ 'subscriptLongSlice', _s( node.lower ), _s( node.upper ), _s( node.step ) ]
+	
+	def ExtSlice(self, node):
+		return [ 'tupleLiteral' ]  +  [ _expr( x )   for x in node.dims ]
 	
 	def Ellipsis(self, node):
 		return [ 'ellipsis' ]
 	
 	
 	
-	# CallFunc
-	def CallFunc(self, node):
+	# Call
+	def Call(self, node):
 		_starArg = lambda name, x:   [ [ name, _expr( x ) ] ]   if x is not None   else   []
-		return [ 'call', _expr( node.node ) ]  +  [ _expr( x )   for x in node.args ]  +   _starArg( 'argList', node.star_args )  +  _starArg( 'kwArgList', node.dstar_args )
+		return [ 'call', _expr( node.func ) ]  +  [ _expr( x )   for x in node.args ]  +  [ _expr( x )   for x in node.keywords ]  +  _starArg( 'argList', node.starargs )  +  _starArg( 'kwArgList', node.kwargs )
 
-	def Keyword(self, node):
-		return [ 'kwArg', node.name, _expr( node.expr ) ]
+	def keyword(self, node):
+		return [ 'kwArg', node.arg, _expr( node.value ) ]
 			
 				
 	
 	
-	# Operators
-	def Power(self, node):
-		return [ 'pow', _expr( node.left ), _expr( node.right ) ]
+	# Binary operator
+	def BinOp(self, node):
+		opName = _getOpNodeName( node.op )
+		opNodeHdr = _binOpNameTable[opName]
+		return [ opNodeHdr, _expr( node.left ), _expr( node.right ) ]
+		
 	
-	def Invert(self, node):
-		return [ 'invert', _expr( node.expr ) ]
 	
-	def UnaryAdd(self, node):
-		return [ 'pos', _expr( node.expr ) ]
-	
-	def UnarySub(self, node):
-		return [ 'negate', _expr( node.expr ) ]
-	
-	def Mul(self, node):
-		return [ 'mul', _expr( node.left ), _expr( node.right ) ]
+	# Unary operator
+	def UnaryOp(self, node):
+		opName = _getOpNodeName( node.op )
+		opNodeHdr = _unaryOpNameTable[opName]
+		return [ opNodeHdr, _expr( node.operand ) ]
+		
 
-	def Div(self, node):
-		return [ 'div', _expr( node.left ), _expr( node.right ) ]
-
-	def Mod(self, node):
-		return [ 'mod', _expr( node.left ), _expr( node.right ) ]
 	
-	def Add(self, node):
-		return [ 'add', _expr( node.left ), _expr( node.right ) ]
-	
-	def Sub(self, node):
-		return [ 'sub', _expr( node.left ), _expr( node.right ) ]
-	
-	def LeftShift(self, node):
-		return [ 'lshift', _expr( node.left ), _expr( node.right ) ]
-	
-	def RightShift(self, node):
-		return [ 'rshift', _expr( node.left ), _expr( node.right ) ]
-	
-	def Bitand(self, node):
-		return reduce( lambda left, right: [ 'bitAnd', left, _expr( right ) ],   node.nodes[1:],  _expr( node.nodes[0] ) )
-	
-	def Bitxor(self, node):
-		return reduce( lambda left, right: [ 'bitXor', left, _expr( right ) ],   node.nodes[1:],  _expr( node.nodes[0] ) )
-	
-	def Bitor(self, node):
-		return reduce( lambda left, right: [ 'bitOr', left, _expr( right ) ],   node.nodes[1:],  _expr( node.nodes[0] ) )
-	
+	# Compare
 	def Compare(self, node):
-		result = [ _cmpOps[node.ops[0][0]], _expr( node.expr ), _expr( node.ops[0][1] ) ]
-		prev = node.ops[0][1]
+		def _cmpName(x):
+			return _cmpOpTable[ _getOpNodeName( x ) ]
+		result = [ _cmpName( node.ops[0] ), _expr( node.left ), _expr( node.comparators[0] ) ]
+		prev = node.comparators[0]
 		if len( node.ops ) > 1:
-			for op in node.ops[1:]:
-				result = [ 'andTest', result, [ _cmpOps[op[0]], _expr( prev ), _expr( op[1] ) ] ]
-				prev = op
+			for op, comparator in zip( node.ops[1:], node.comparators[1:] ):
+				result = [ 'andTest', result, [ _cmpName( op ), _expr( prev ), _expr( comparator ) ] ]
+				prev = comparator
 		return result
 	
-	def Not(self, node):
-		return [ 'notTest', _expr( node.expr ) ]
 	
-	def And(self, node):
-		return reduce( lambda left, right: [ 'andTest', left, _expr( right ) ],   node.nodes[1:],  _expr( node.nodes[0] ) )
 	
-	def Or(self, node):
-		return reduce( lambda left, right: [ 'orTest', left, _expr( right ) ],   node.nodes[1:],  _expr( node.nodes[0] ) )
-	
-
+	# Boolean operations
+	def BoolOp(self, node):
+		opName = _getOpNodeName( node.op )
+		opNodeHdr = _boolOpNameTable[opName]
+		return reduce( lambda left, right: [ opNodeHdr, left, _expr( right ) ],   node.values[1:],  _expr( node.values[0] ) )
+		
 	
 	# Lambda expression
 	def Lambda(self, node):
-		params = _extractParameters( node )
-		return [ 'lambdaExpr', params, _expr( node.code ) ]
+		return [ 'lambdaExpr', _lambdaArgs( node.args ), _expr( node.body ) ]
 	
 	
 	
 	# Conditional expression
 	def IfExp(self, node):
-		return [ 'conditionalExpr', _expr( node.test ), _expr( node.then ), _expr( node.else_ ) ]
+		return [ 'conditionalExpr', _expr( node.test ), _expr( node.body ), _expr( node.orelse ) ]
 	
 	
 	
 	
 	
-class _DecoratorImporter (_Importer):
-	def Name(self, node):
-		return [ 'decoStmt', node.name, '<nil>' ]
-
-	def Name(self, node):
-		return [ 'decoStmt', node.name, '<nil>' ]
-
-	def CallFunc(self, node):
-		_starArg = lambda name, x:   [ [ name, _expr( x ) ] ]   if x is not None   else   []
-		return [ 'decoStmt', node.node.name, [ _expr( x )   for x in node.args ]  +   _starArg( 'argList', node.star_args )  +  _starArg( 'kwArgList', node.dstar_args ) ]
-
-	
-	
+_augAssignOpTable = { 'Add' : '+=',  'Sub' : '-=',  'Mult' : '*=',  'Div' : '/=',  'Mod' : '%=',  'Pow' : '**=',  'LShift' : '<<=',  'RShift' : '>>=',  'BitAnd' : '&=',  'BitOr' : '|=', 'BitXor' : '^=' }
 	
 class _StmtImporter (_Importer):
-	# Discard (expression statement)
-	def Discard(self, node):
-		return _expr( node.expr )
-	
-	
 	# Assert statement
 	def Assert(self, node):
-		return [ 'assertStmt', _expr( node.test ),  _expr( node.fail )   if node.fail is not None   else   '<nil>' ]
+		return [ 'assertStmt', _expr( node.test ),  _expr( node.msg )   if node.msg is not None   else   '<nil>' ]
 	
 	
 	# Assignment statement
 	def Assign(self, node):
-		return [ 'assignmentStmt', [ _expr( x )   for x in node.nodes ],  _expr( node.expr ) ]
+		return [ 'assignmentStmt', [ _target( x )   for x in node.targets ],  _expr( node.value ) ]
 	
 	
 	# Augmented assignment statement
 	def AugAssign(self, node):
-		return [ 'augAssignStmt', node.op, _target( node.node ), _expr( node.expr ) ]
+		return [ 'augAssignStmt', _augAssignOpTable[ _getNodeTypeName( node.op ) ], _target( node.target ), _expr( node.value ) ]
 	
 	
 	# Pass
@@ -372,31 +399,9 @@ class _StmtImporter (_Importer):
 	
 	
 	# Del
-	def AssName(self, node):
-		xs = [ 'singleTarget', node.name ]
-		if node.flags == 'OP_DELETE':
-			xs = [ 'delStmt', xs ]
-		return xs
-	
-	def AssAttr(self, node):
-		xs = [ 'attributeRef', _expr( node.expr ), node.attrname ]
-		if node.flags == 'OP_DELETE':
-			xs = [ 'delStmt', xs ]
-		return xs
-	
-	def AssTuple(self, node):
-		xs = [ 'tupleTarget' ]  +  [ _expr( x )   for x in node.nodes ]
-		if node.flags == 'OP_DELETE':
-			xs = [ 'delStmt', xs ]
-		return xs
-	
-	def AssList(self, node):
-		xs = [ 'listTarget' ]  +  [ _expr( x )   for x in node.nodes ]
-		if node.flags == 'OP_DELETE':
-			xs = [ 'delStmt', xs ]
-		return xs
-	
-	
+	def Delete(self, node):
+		return [ 'delStmt' ]  +  [ _target( x )   for x in node.targets ]
+		
 	
 	# Return
 	def Return(self, node):
@@ -410,7 +415,7 @@ class _StmtImporter (_Importer):
 	
 	# Raise
 	def Raise(self, node):
-		return [ 'raiseStmt', _expr( node.expr1 ), _expr( node.expr2 ), _expr( node.expr3 ) ]
+		return [ 'raiseStmt', _expr( node.type ), _expr( node.inst ), _expr( node.tback ) ]
 	
 
 	# Break
@@ -425,23 +430,13 @@ class _StmtImporter (_Importer):
 	
 	# Import
 	def Import(self, node):
-		def nameImport(x):
-			if x[1] is None:
-				return [ 'moduleImport', x[0] ]
-			else:
-				return [ 'moduleImportAs', x[0], x[1] ]
-		return [ 'importStmt' ]  +  [ nameImport( x )   for x in node.names ]
+		return [ 'importStmt' ]  +  [ _import( x )   for x in node.names ]
 	
-	def From(self, node):
-		def nameImport(x):
-			if x[1] is None:
-				return [ 'moduleContentImport', x[0] ]
-			else:
-				return [ 'moduleContentImportAs', x[0], x[1] ]
-		if node.names == [ ('*',None) ]:
-			return [ 'fromImportAllStmt', [ 'relativeModule', node.modname ] ]
+	def ImportFrom(self, node):
+		if len( node.names ) == 1   and   node.names[0].name == '*':
+			return [ 'fromImportAllStmt', [ 'relativeModule', node.module ] ]
 		else:
-			return [ 'fromImportStmt', [ 'relativeModule', node.modname ] ]  +  [ nameImport( x )   for x in node.names ]
+			return [ 'fromImportStmt', [ 'relativeModule', node.module ] ]  +  [ _importFrom( x )   for x in node.names ]
 		
 		
 	# Global
@@ -451,17 +446,19 @@ class _StmtImporter (_Importer):
 	
 	# Exec
 	def Exec(self, node):
-		return [ 'execStmt', _expr( node.expr ), _expr( node.locals ), _expr( node.globals ) ]
+		return [ 'execStmt', _expr( node.body ), _expr( node.locals ), _expr( node.globals ) ]
 	
 	
-	# Printnl
-	def Printnl(self, node):
-		return [ 'call', [ 'var', 'print' ] ]  +  [ _expr( x )   for x in node.nodes ]
-	
-
 	# Print
 	def Print(self, node):
-		return [ 'call', [ 'var', 'print' ] ]  +  [ _expr( x )   for x in node.nodes ]
+		return [ 'call', [ 'var', 'print' ] ]  +  [ _expr( x )   for x in node.values ]
+	
+	
+	
+	
+	# Expression
+	def Expr(self, node):
+		return _expr( node.value )
 	
 
 	
@@ -469,7 +466,7 @@ class _StmtImporter (_Importer):
 class _CompoundStmtImporter (_Importer):
 	def __call__(self, node, method=None):
 		if method is None:
-			name = node.__class__.__name__
+			name = _getNodeTypeName( node )
 			try:
 				method = getattr( self, name )
 			except AttributeError:
@@ -477,88 +474,76 @@ class _CompoundStmtImporter (_Importer):
 		return method( node )
 
 	
-	# Statement list
-	def Stmt(self, node):
-		suite = []
-		for x in node.nodes:
-			suite.extend( _compound( x ) )
-		return suite
-
-	
 	# If
 	def If(self, node):
-		def _test(x, bIf):
-			if bIf:
-				return [ 'ifStmt', _expr( x[0] ), _compound( x[1] ) ]
+		def _handleNode(n, bFirst):
+			name = 'ifStmt'   if bFirst   else 'elifStmt'
+			result = [ [ name, _expr( n.test ), _flattenedCompound( n.body ) ] ]
+			if len( n.orelse ) == 1   and   isinstance( n.orelse[0], _ast.If ):
+				result.extend( _handleNode( n.orelse[0], False ) )
+			elif len( n.orelse ) == 0:
+				pass
 			else:
-				return [ 'elifStmt', _expr( x[0] ), _compound( x[1] ) ]
-		result = [ _test( node.tests[0], True ) ]
-		for t in node.tests[1:]:
-			result.append( _test( t, False ) )
-		if node.else_ is not None:
-			result.append( [ 'elseStmt', _compound( node.else_ ) ] )
-		return result
+				result.extend( [ [ 'elseStmt', _flattenedCompound( n.orelse) ] ] )
+			return result;
+			
+		return _handleNode( node, True )
 
 	
 	# While
 	def While(self, node):
-		result = [ [ 'whileStmt', _expr( node.test ), _compound( node.body ) ] ]
-		if node.else_ is not None:
-			result.append( [ 'elseStmt', _compound( node.else_ ) ] )
+		result = [ [ 'whileStmt', _expr( node.test ), _flattenedCompound( node.body ) ] ]
+		if len( node.orelse ) > 0:
+			result.append( [ 'elseStmt', _flattenedCompound( node.orelse ) ] )
 		return result
 
 	
 	# For
 	def For(self, node):
-		result = [ [ 'forStmt', _expr( node.assign ), _expr( node.list ), _compound( node.body ) ] ]
-		if node.else_ is not None:
-			result.append( [ 'elseStmt', _compound( node.else_ ) ] )
+		result = [ [ 'forStmt', _target( node.target ), _expr( node.iter ), _flattenedCompound( node.body ) ] ]
+		if len( node.orelse ) > 0:
+			result.append( [ 'elseStmt', _flattenedCompound( node.orelse ) ] )
 		return result
 	
 	
 	# Try
 	def TryExcept(self, node):
-		result = [ [ 'tryStmt', _compound( node.body ) ] ]
+		result = [ [ 'tryStmt', _flattenedCompound( node.body ) ] ]
 		for h in node.handlers:
-			result.append( [ 'exceptStmt',  _expr( h[0] )   if h[0] is not None   else   '<nil>',  _expr( h[1] )   if h[1] is not None   else   '<nil>',   _compound( h[2] ) ] )
-		if node.else_ is not None:
-			result.append( [ 'elseStmt', _compound( node.else_ ) ] )
+			result.append( _except( h ) )
+		if len( node.orelse ) > 0:
+			result.append( [ 'elseStmt', _flattenedCompound( node.orelse ) ] )
 		return result
 	
 	def TryFinally(self, node):
-		body = _compound( node.body )
-		body.append( [ 'finallyStmt', _compound( node.final ) ] )
+		body = _flattenedCompound( node.body )
+		body.append( [ 'finallyStmt', _flattenedCompound( node.finalbody ) ] )
 		return body
 	
 	
 	# With
 	def With(self, node):
-		return [ [ 'withStmt',    _expr( node.expr ),   _target( node.vars )   if node.vars is not None   else   '<nil>',   _compound( node.body ) ] ]
+		return [ [ 'withStmt',    _expr( node.expr ),   _target( node.vars )   if node.vars is not None   else   '<nil>',   _flattenedCompound( node.body ) ] ]
 	
 	
 	# Function
-	def Decorators(self, node):
-		return [ _decorator( x )   for x in node.nodes ]
-		
-		
-	def Function(self, node):
-		params = _extractParameters( node )
-		result = [ [ 'defStmt', node.name, params, _compound( node.code ) ] ]
-		if node.decorators is not None:
-			result = _compound( node.decorators )  +  result
+	def FunctionDef(self, node):
+		result = [ _decorator( dec )   for dec in node.decorators ]
+		params = _extractParameters( node.args )
+		result.append( [ 'defStmt', node.name, params, _flattenedCompound( node.body ) ] )
 		return result
 		
 	
 
 	# Class
-	def Class(self, node):
+	def ClassDef(self, node):
 		if len( node.bases ) == 0:
 			bases = '<nil>'
 		elif len( node.bases ) == 1:
 			bases = _expr( node.bases[0] )
 		else:
 			bases = [ 'tupleLiteral' ]  +  [ _expr( b )   for b in node.bases ]
-		return [ [ 'classStmt', node.name, bases, _compound( node.code ) ] ]
+		return [ [ 'classStmt', node.name, bases, _flattenedCompound( node.body ) ] ]
 	
 
 
@@ -566,38 +551,44 @@ class _CompoundStmtImporter (_Importer):
 class _ModuleImporter (_Importer):
 	# Module
 	def Module(self, node):
-		return [ 'python25Module' ]  +  _module( node.node )
+		return [ 'python25Module' ]  +  _flattenedCompound( node.body )
 	
 	
-	# Statement list
-	def Stmt(self, node):
-		suite = []
-		for x in node.nodes:
-			suite.extend( _compound( x ) )
-		return suite
-
 	
 	
 	
 _target = _TargetImporter()
+_listComp = _ListCompImporter()
+_genExp = _GenExprImporter()
+_lambdaArgs = _LambdaArgsImporter()
+_import = _ImportImporter()
+_importFrom = _ImportFromImporter()
+_except = _ExceptHandlerImporter()
 _expr = _ExprImporter()
 _decorator = _DecoratorImporter()
 _stmt = _StmtImporter()
 _compound = _CompoundStmtImporter()
 _module = _ModuleImporter()
 
+
+def _flattenedCompound(nodeList):
+	xs = []
+	for node in nodeList:
+		xs.extend( _compound( node ) )
+	return xs
+	
+
 	
 	
-def importPy25Source(source):
-	importer = _ModuleImporter()
-	tree = compiler.parse( source )
-	return importer( tree )
+def importPy25Source(source, moduleName, mode):
+	tree = compile( source, moduleName, mode, _ast.PyCF_ONLY_AST )
+	return _module( tree )
 
 
 def importPy25File(filename):
-	importer = _ModuleImporter()
-	tree = compiler.parseFile( filename )
-	return importer( tree )
+	source = open( filename, 'r' ).read()
+	tree = compile( source, filename, 'exec', _ast.PyCF_ONLY_AST )
+	return _module( tree )
 
 
 
@@ -606,7 +597,7 @@ import unittest
 
 class ImporterTestCase (unittest.TestCase):
 	def _moduleTest(self, source, expectedResult):
-		result = importPy25Source( source )
+		result = importPy25Source( source, '<test_module>', 'exec' )
 		if result != expectedResult:
 			print 'EXPECTED:'
 			print expectedResult
@@ -616,8 +607,8 @@ class ImporterTestCase (unittest.TestCase):
 		
 		
 	def _exprTest(self, source, expectedResult):
-		result = importPy25Source( 'a+(' + source + ')\n' )
-		result = result[1][2]
+		result = importPy25Source( source, '<text_expr>', 'exec' )
+		result = result[1]
 		if result != expectedResult:
 			print 'EXPECTED:'
 			print expectedResult
@@ -626,7 +617,7 @@ class ImporterTestCase (unittest.TestCase):
 		self.assert_( result == expectedResult )
 		
 	def _stmtTest(self, source, expectedResult):
-		result = importPy25Source( source + '\n' )
+		result = importPy25Source( source, '<test_stmt>', 'exec' )
 		result = result[1]
 		if result != expectedResult:
 			print 'EXPECTED:'
@@ -636,7 +627,7 @@ class ImporterTestCase (unittest.TestCase):
 		self.assert_( result == expectedResult )
 		
 	def _compStmtTest(self, source, expectedResult):
-		result = importPy25Source( source + '\n' )
+		result = importPy25Source( source, '<test_stmt>', 'exec' )
 		result = result[1:]
 		if result != expectedResult:
 			print 'EXPECTED:'
@@ -662,9 +653,12 @@ class ImporterTestCase (unittest.TestCase):
 	def testName(self):
 		self._exprTest( 'a', [ 'var', 'a' ] )
 	
-	def testConst(self):
+	def testStr(self):
 		self._exprTest( "'a'", [ 'stringLiteral', 'ascii', 'single', 'a' ] )
 		self._exprTest( "u'a'", [ 'stringLiteral', 'unicode', 'single', u'a' ] )
+		
+		
+	def testNum(self):
 		self._exprTest( '1', [ 'intLiteral', 'decimal', 'int', '1' ] )
 		self._exprTest( '1L', [ 'intLiteral', 'decimal', 'long', '1' ] )
 		self._exprTest( '1.0', [ 'floatLiteral', '1.0' ] )
@@ -693,7 +687,7 @@ class ImporterTestCase (unittest.TestCase):
 		
 		
 		
-	def testGenExpr(self):
+	def testGeneratorExp(self):
 		self._exprTest( '(a   for a in x)',   [ 'generatorExpression', [ 'var', 'a' ],  [ 'genFor', [ 'singleTarget', 'a', ], [ 'var', 'x' ] ] ] )
 		self._exprTest( '(a   for a,b in x)',   [ 'generatorExpression', [ 'var', 'a' ],  [ 'genFor', [ 'tupleTarget', [ 'singleTarget', 'a', ], [ 'singleTarget', 'b' ] ], [ 'var', 'x' ] ] ] )
 		self._exprTest( '(a   for [a,b] in x)',   [ 'generatorExpression', [ 'var', 'a' ],  [ 'genFor', [ 'listTarget', [ 'singleTarget', 'a', ], [ 'singleTarget', 'b' ] ], [ 'var', 'x' ] ] ] )
@@ -713,7 +707,7 @@ class ImporterTestCase (unittest.TestCase):
 		self._exprTest( '(yield a)', [ 'yieldAtom', [ 'var', 'a' ] ] )
 		
 		
-	def testGetAttr(self):
+	def testAttribute(self):
 		self._exprTest( 'a.b', [ 'attributeRef', [ 'var', 'a' ], 'b' ] )
 		
 		
@@ -727,7 +721,7 @@ class ImporterTestCase (unittest.TestCase):
 		self._exprTest( 'a[b:]',  [ 'subscript', [ 'var', 'a' ], [ 'subscriptSlice', [ 'var', 'b' ], '<nil>' ] ] )
 		self._exprTest( 'a[:c]',  [ 'subscript', [ 'var', 'a' ], [ 'subscriptSlice', '<nil>', [ 'var', 'c' ] ] ] )
 		self._exprTest( 'a[b:c:d]',  [ 'subscript', [ 'var', 'a' ], [ 'subscriptLongSlice', [ 'var', 'b' ], [ 'var', 'c' ], [ 'var', 'd' ] ] ] )
-		self._exprTest( 'a[b:c:]',  [ 'subscript', [ 'var', 'a' ], [ 'subscriptLongSlice', [ 'var', 'b' ], [ 'var', 'c' ], '<nil>' ] ] )
+		self._exprTest( 'a[b:c:]',  [ 'subscript', [ 'var', 'a' ], [ 'subscriptLongSlice', [ 'var', 'b' ], [ 'var', 'c' ], [ 'var', 'None' ] ] ] )
 		self._exprTest( 'a[b::d]',  [ 'subscript', [ 'var', 'a' ], [ 'subscriptLongSlice', [ 'var', 'b' ], '<nil>', [ 'var', 'd' ] ] ] )
 		self._exprTest( 'a[:c:d]',  [ 'subscript', [ 'var', 'a' ], [ 'subscriptLongSlice', '<nil>', [ 'var', 'c' ], [ 'var', 'd' ] ] ] )
 		self._exprTest( 'a[b:c,d:e]',  [ 'subscript', [ 'var', 'a' ], [ 'tupleLiteral', [ 'subscriptSlice', [ 'var', 'b' ], [ 'var', 'c' ] ], [ 'subscriptSlice', [ 'var', 'd' ], [ 'var', 'e' ] ] ] ] )
@@ -738,7 +732,7 @@ class ImporterTestCase (unittest.TestCase):
 		
 	
 
-	def testCallFunc(self):
+	def testCall(self):
 		self._exprTest( 'a()',   [ 'call', [ 'var', 'a' ] ] )
 		self._exprTest( 'a(f)',   [ 'call', [ 'var', 'a' ], [ 'var', 'f' ] ] )
 		self._exprTest( 'a(f,g=x)',   [ 'call', [ 'var', 'a' ], [ 'var', 'f' ], [ 'kwArg', 'g', [ 'var', 'x' ] ] ] )
@@ -746,11 +740,8 @@ class ImporterTestCase (unittest.TestCase):
 		self._exprTest( 'a(f,g=x,*h,**i)',   [ 'call', [ 'var', 'a' ], [ 'var', 'f' ], [ 'kwArg', 'g', [ 'var', 'x' ] ], [ 'argList', [ 'var', 'h' ] ], [ 'kwArgList', [ 'var', 'i' ] ] ] )
 	
 	
-	def testOperators(self):
+	def testBinOp(self):
 		self._exprTest( 'a ** b', [ 'pow', [ 'var', 'a' ], [ 'var', 'b' ] ] )
-		self._exprTest( '~a', [ 'invert', [ 'var', 'a' ], ] )
-		self._exprTest( '+a', [ 'pos', [ 'var', 'a' ], ] )
-		self._exprTest( '-a', [ 'negate', [ 'var', 'a' ], ] )
 		self._exprTest( 'a * b', [ 'mul', [ 'var', 'a' ], [ 'var', 'b' ] ] )
 		self._exprTest( 'a / b', [ 'div', [ 'var', 'a' ], [ 'var', 'b' ] ] )
 		self._exprTest( 'a % b', [ 'mod', [ 'var', 'a' ], [ 'var', 'b' ] ] )
@@ -764,6 +755,16 @@ class ImporterTestCase (unittest.TestCase):
 		self._exprTest( 'a ^ b ^ c', [ 'bitXor', [ 'bitXor', [ 'var', 'a' ], [ 'var', 'b' ] ], [ 'var', 'c' ] ] )
 		self._exprTest( 'a | b', [ 'bitOr', [ 'var', 'a' ], [ 'var', 'b' ] ] )
 		self._exprTest( 'a | b | c', [ 'bitOr', [ 'bitOr', [ 'var', 'a' ], [ 'var', 'b' ] ], [ 'var', 'c' ] ] )
+		
+		
+	def testUnaryOp(self):
+		self._exprTest( '~a', [ 'invert', [ 'var', 'a' ], ] )
+		self._exprTest( '+a', [ 'pos', [ 'var', 'a' ], ] )
+		self._exprTest( '-a', [ 'negate', [ 'var', 'a' ], ] )
+		self._exprTest( 'not a', [ 'notTest', [ 'var', 'a' ] ] )
+		
+		
+	def testCompare(self):
 		self._exprTest( 'a < b', [ 'lt', [ 'var', 'a' ], [ 'var', 'b' ] ] )
 		self._exprTest( 'a < b < c', [ 'andTest', [ 'lt', [ 'var', 'a' ], [ 'var', 'b' ] ], [ 'lt', [ 'var', 'b' ], [ 'var', 'c' ] ] ] )
 		self._exprTest( 'a <= b', [ 'lte', [ 'var', 'a' ], [ 'var', 'b' ] ] )
@@ -775,6 +776,11 @@ class ImporterTestCase (unittest.TestCase):
 		self._exprTest( 'a is not b', [ 'isNotTest', [ 'var', 'a' ], [ 'var', 'b' ] ] )
 		self._exprTest( 'a in b', [ 'inTest', [ 'var', 'a' ], [ 'var', 'b' ] ] )
 		self._exprTest( 'a not in b', [ 'notInTest', [ 'var', 'a' ], [ 'var', 'b' ] ] )
+		
+		
+	def testBoolOp(self):
+		self._exprTest( 'a and b', [ 'andTest', [ 'var', 'a' ], [ 'var', 'b' ] ] )
+		self._exprTest( 'a or b', [ 'orTest', [ 'var', 'a' ], [ 'var', 'b' ] ] )
 		
 		
 	def testLambda(self):
@@ -881,8 +887,8 @@ class ImporterTestCase (unittest.TestCase):
 		
 	def testExecStmt(self):
 		self._stmtTest( 'exec a', [ 'execStmt', [ 'var', 'a' ], '<nil>', '<nil>' ] )
-		self._stmtTest( 'exec a in b', [ 'execStmt', [ 'var', 'a' ], [ 'var', 'b' ], '<nil>' ] )
-		self._stmtTest( 'exec a in b,c', [ 'execStmt', [ 'var', 'a' ], [ 'var', 'b' ], [ 'var', 'c' ] ] )
+		self._stmtTest( 'exec a in b', [ 'execStmt', [ 'var', 'a' ], '<nil>', [ 'var', 'b' ] ] )
+		self._stmtTest( 'exec a in b,c', [ 'execStmt', [ 'var', 'a' ], [ 'var', 'c' ], [ 'var', 'b' ] ] )
 		
 		
 	def testPrintnl(self):
@@ -1070,5 +1076,6 @@ class Q (a,b):
 		self._compStmtTest( src3, [ [ 'classStmt', 'Q', [ 'tupleLiteral', [ 'var', 'a' ], [ 'var', 'b' ] ], [ [ 'var', 'x' ] ] ] ] )
 
 		
-		
+if __name__ == '__main__':
+	unittest.main()
 		

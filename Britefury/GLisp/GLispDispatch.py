@@ -6,6 +6,7 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
 from Britefury.GLisp.GLispUtil import isGLispList, gLispSrcToString
+from Britefury.DocTree.DocTreeNode import DocTreeNode
 
 
 
@@ -30,7 +31,10 @@ def dispatch(target, xs, *args):
 			raise DispatchNameError, 'GLisp dispatch: could not find method named %s in class %s'  %  ( name, type( target ).__name__ )
 		return method( *( args + ( xs, ) + tuple( xs[1:] ) ) )
 	else:
-		raise DispatchTypeError, 'GLisp dispatch: can only dispatch on lists; not on %s'  %  ( gLispSrcToString( xs ) )
+		if isinstance( xs, DocTreeNode ):
+			raise DispatchTypeError, 'GLisp dispatch: can only dispatch on lists; not on %s  (from %s)'  %  ( gLispSrcToString( xs ), gLispSrcToString( xs.getParentTreeNode().getParentTreeNode() ) )
+		else:
+			raise DispatchTypeError, 'GLisp dispatch: can only dispatch on lists; not on %s'  %  ( gLispSrcToString( xs ) )
 
 
 		
