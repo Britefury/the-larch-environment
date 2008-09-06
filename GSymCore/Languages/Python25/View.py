@@ -5,7 +5,7 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
-from Britefury.gSym.View.gSymView import border, indent, text, hbox, ahbox, vbox, paragraph, script, scriptLSuper, scriptLSub, scriptRSuper, scriptRSub, listView, contentListener, viewEval, mapViewEval, GSymView
+from Britefury.gSym.View.gSymView import border, indent, text, hiddenText, whitespace, hbox, ahbox, vbox, paragraph, script, scriptLSuper, scriptLSub, scriptRSuper, scriptRSub, listView, contentListener, viewEval, mapViewEval, GSymView
 from Britefury.gSym.View.ListView import ParagraphListViewLayout, HorizontalListViewLayout, VerticalInlineListViewLayout, VerticalListViewLayout
 
 from Britefury.gSym.View.Interactor import keyEventMethod, accelEventMethod, textEventMethod, backspaceStartMethod, deleteEndMethod, Interactor
@@ -250,7 +250,7 @@ def compoundStatementEditor(ctx, node, headerContents, metadata, suite, state):
 	else:
 		parser, mode = state
 		
-	headerParagraph = paragraph( ctx, python_paragraphStyle, [ headerContents, text( ctx, default_textStyle, '\n' ) ] )
+	headerParagraph = paragraph( ctx, python_paragraphStyle, [ headerContents, whitespace( ctx, '\n' ) ] )
 
 	headerElement = contentListener( ctx, headerParagraph, ParsedLineContentListener( ctx, node, parser ) )
 	statementElement = vbox( ctx, compoundStmt_vboxStyle, [ headerElement, indent( ctx, 30.0, suiteView( ctx, suite ) ) ] )

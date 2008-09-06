@@ -969,7 +969,12 @@ public class DPPresentationArea extends DPBin implements CaretListener
 			{
 				if ( caret.isValid() )
 				{
-					caret.getMarker().getWidget().onKeyPress( caret, event );
+					DPContentLeaf leaf = caret.getMarker().getWidget();
+					if ( leaf.isEditable() )
+					{
+						DPContentLeafEditable editable = (DPContentLeafEditable)leaf;
+						editable.onKeyPress( caret, event );
+					}
 					emitImmediateEvents();
 					return true;
 				}
@@ -1019,7 +1024,12 @@ public class DPPresentationArea extends DPBin implements CaretListener
 			{
 				if ( caret.isValid() )
 				{
-					caret.getMarker().getWidget().onKeyRelease( caret, event );
+					DPContentLeaf leaf = caret.getMarker().getWidget();
+					if ( leaf.isEditable() )
+					{
+						DPContentLeafEditable editable = (DPContentLeafEditable)leaf;
+						editable.onKeyRelease( caret, event );
+					}
 					emitImmediateEvents();
 					return true;
 				}
@@ -1079,7 +1089,12 @@ public class DPPresentationArea extends DPBin implements CaretListener
 			{
 				if ( caret.isValid() )
 				{
-					caret.getMarker().getWidget().onKeyTyped( caret, event );
+					DPContentLeaf leaf = caret.getMarker().getWidget();
+					if ( leaf.isEditable() )
+					{
+						DPContentLeafEditable editable = (DPContentLeafEditable)leaf;
+						editable.onKeyTyped( caret, event );
+					}
 					emitImmediateEvents();
 					return true;
 				}
@@ -1116,19 +1131,19 @@ public class DPPresentationArea extends DPBin implements CaretListener
 				DPContentLeaf leaf = caret.getMarker().getWidget();
 				if ( event.getKeyCode() == KeyEvent.VK_LEFT )
 				{
-					leaf.moveMarkerLeft( caret.getMarker(), false );
+					leaf.moveMarkerLeft( caret.getMarker(), false, true );
 				}
 				else if ( event.getKeyCode() == KeyEvent.VK_RIGHT )
 				{
-					leaf.moveMarkerRight( caret.getMarker(), false );
+					leaf.moveMarkerRight( caret.getMarker(), false, true );
 				}
 				else if ( event.getKeyCode() == KeyEvent.VK_UP )
 				{
-					leaf.moveMarkerUp( caret.getMarker() );
+					leaf.moveMarkerUp( caret.getMarker(), true );
 				}
 				else if ( event.getKeyCode() == KeyEvent.VK_DOWN )
 				{
-					leaf.moveMarkerDown( caret.getMarker() );
+					leaf.moveMarkerDown( caret.getMarker(), true );
 				}
 			}
 			return true;

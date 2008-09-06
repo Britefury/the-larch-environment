@@ -164,7 +164,7 @@ class VerticalInlineListViewLayout (ListViewLayout):
 				firstChildren.append( contentElements[0] )
 				if separatorFactory is not None:
 					firstChildren.append( separatorFactory() )
-				newLine = TextElement( '\n' )
+				newLine = WhitespaceElement( '\n' )
 				firstChildren.append( newLine )
 				first.setChildren( firstChildren )
 			else:
@@ -175,7 +175,7 @@ class VerticalInlineListViewLayout (ListViewLayout):
 				
 			def _restChild(c, bLast):
 				elem = ParagraphElement( self._lineParagraphStyleSheet )
-				newLine = TextElement( '\n' )
+				newLine = WhitespaceElement( '\n' )
 				if separatorFactory is not None  and  not bLast:
 					elem.setChildren( [ c, separatorFactory(), newLine ] )
 				else:
@@ -230,7 +230,7 @@ class VerticalListViewLayout (ListViewLayout):
 			contentElements = self._getContentElements( contents, xs )
 			for c in contentElements[:-1]:
 				x = ParagraphElement( self._lineParagraphStyleSheet )
-				newLine = TextElement( '\n' )
+				newLine = WhitespaceElement( '\n' )
 				if separatorFactory is not None:
 					x.setChildren( [ c, separatorFactory(), newLine ] )
 				else:

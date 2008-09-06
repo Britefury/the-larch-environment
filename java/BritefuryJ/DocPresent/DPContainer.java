@@ -654,7 +654,7 @@ public abstract class DPContainer extends DPWidget implements ContentInterface
 		return null;
 	}
 
-	protected DPContentLeaf getTopOrBottomContentLeaf(boolean bBottom, Point2 cursorPosInRootSpace)
+	protected DPContentLeaf getTopOrBottomContentLeaf(boolean bBottom, Point2 cursorPosInRootSpace, boolean bSkipWhitespace)
 	{
 		List<DPWidget> navList = verticalNavigationList();
 		if ( navList != null )
@@ -664,7 +664,7 @@ public abstract class DPContainer extends DPWidget implements ContentInterface
 				for (int i = navList.size() - 1; i >= 0; i--)
 				{
 					DPWidget w = navList.get( i );
-					DPContentLeaf l = w.getTopOrBottomContentLeaf( bBottom, cursorPosInRootSpace );
+					DPContentLeaf l = w.getTopOrBottomContentLeaf( bBottom, cursorPosInRootSpace, bSkipWhitespace );
 					if ( l != null )
 					{
 						return l;
@@ -675,7 +675,7 @@ public abstract class DPContainer extends DPWidget implements ContentInterface
 			{
 				for (DPWidget w: navList)
 				{
-					DPContentLeaf l = w.getTopOrBottomContentLeaf( bBottom, cursorPosInRootSpace );
+					DPContentLeaf l = w.getTopOrBottomContentLeaf( bBottom, cursorPosInRootSpace, bSkipWhitespace );
 					if ( l != null )
 					{
 						return l;
@@ -691,7 +691,7 @@ public abstract class DPContainer extends DPWidget implements ContentInterface
 			if ( navList != null )
 			{
 				double closestDistance = 0.0;
-				DPWidget closestNode = null;
+				DPContentLeaf closestNode = null;
 				for (DPWidget item: navList)
 				{
 					AABox2 bounds = getLocalAABox();
@@ -699,7 +699,7 @@ public abstract class DPContainer extends DPWidget implements ContentInterface
 					double upper = item.getLocalPointRelativeToRoot( bounds.getUpper() ).x;
 					if ( cursorPosInRootSpace.x >=  lower  &&  cursorPosInRootSpace.x <= upper )
 					{
-						DPContentLeaf l = item.getTopOrBottomContentLeaf( bBottom, cursorPosInRootSpace );
+						DPContentLeaf l = item.getTopOrBottomContentLeaf( bBottom, cursorPosInRootSpace, bSkipWhitespace );
 						if ( l != null )
 						{
 							return l;
@@ -721,19 +721,19 @@ public abstract class DPContainer extends DPWidget implements ContentInterface
 						
 						if ( closestNode == null  ||  distance < closestDistance )
 						{
-							closestDistance = distance;
-							closestNode = item;
+							DPContentLeaf l = item.getTopOrBottomContentLeaf( bBottom, cursorPosInRootSpace, bSkipWhitespace );
+							if ( l != null )
+							{
+								closestDistance = distance;
+								closestNode = l;
+							}
 						}
 					}
 				}
 				
 				if ( closestNode != null )
 				{
-					DPContentLeaf l = closestNode.getTopOrBottomContentLeaf( bBottom, cursorPosInRootSpace );
-					if ( l != null )
-					{
-						return l;
-					}
+					return closestNode;
 				}
 			}
 			
@@ -802,7 +802,7 @@ public abstract class DPContainer extends DPWidget implements ContentInterface
 		}
 	}
 	
-	protected DPContentLeaf getContentLeafAboveOrBelowFromChild(DPWidget child, boolean bBelow, Point2 localCursorPos)
+	protected DPContentLeaf getContentLeafAboveOrBelowFromChild(DPWidget child, boolean bBelow, Point2 localCursorPos, boolean bSkipWhitespace)
 	{
 		List<DPWidget> navList = verticalNavigationList();
 		if ( navList != null )
@@ -816,7 +816,7 @@ public abstract class DPContainer extends DPWidget implements ContentInterface
 					for (int i = index + 1; i < navList.size(); i++)
 					{
 						DPWidget w = navList.get( i );
-						DPContentLeaf l = w.getTopOrBottomContentLeaf( false, cursorPosInRootSpace );
+						DPContentLeaf l = w.getTopOrBottomContentLeaf( false, cursorPosInRootSpace, bSkipWhitespace );
 						if ( l != null )
 						{
 							return l;
@@ -828,7 +828,7 @@ public abstract class DPContainer extends DPWidget implements ContentInterface
 					for (int i = index - 1; i >= 0; i--)
 					{
 						DPWidget w = navList.get( i );
-						DPContentLeaf l = w.getTopOrBottomContentLeaf( true, cursorPosInRootSpace );
+						DPContentLeaf l = w.getTopOrBottomContentLeaf( true, cursorPosInRootSpace, bSkipWhitespace );
 						if ( l != null )
 						{
 							return l;
@@ -840,7 +840,7 @@ public abstract class DPContainer extends DPWidget implements ContentInterface
 		
 		if ( parent != null )
 		{
-			return parent.getContentLeafAboveOrBelowFromChild( this, bBelow, getLocalPointRelativeToAncestor( parent, localCursorPos ) );
+			return parent.getContentLeafAboveOrBelowFromChild( this, bBelow, getLocalPointRelativeToAncestor( parent, localCursorPos ), bSkipWhitespace );
 		}
 		else
 		{

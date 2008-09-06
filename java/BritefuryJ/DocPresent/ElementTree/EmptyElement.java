@@ -10,9 +10,14 @@ public class EmptyElement extends Element
 		this( WidgetStyleSheet.defaultStyleSheet );
 	}
 	
-	protected EmptyElement(WidgetStyleSheet styleSheet)
+	public EmptyElement(WidgetStyleSheet styleSheet)
 	{
-		super( new DPEmpty( styleSheet ) );
+		this( new DPEmpty( styleSheet ) );
+	}
+	
+	protected EmptyElement(DPEmpty widget)
+	{
+		super( widget );
 	}
 	
 	

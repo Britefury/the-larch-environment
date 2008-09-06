@@ -169,20 +169,12 @@ def _setKeyHandler(viewNodeInstance, widget):
 
 
 def border(ctx, styleSheet, child):
-	"""
-	Runtime - called by compiled code at run-time
-	Builds a DPBorder widget, with child, builds and registers a refresh cell
-	"""
 	viewNodeInstance = ctx
 	element = BorderElement( styleSheet )
 	_populateBin( viewNodeInstance, element, child )
 	return element
 
 def indent(ctx, indentation, child):
-	"""
-	Runtime - called by compiled code at run-time
-	Builds a DPBorder widget, with child, builds and registers a refresh cell
-	"""
 	viewNodeInstance = ctx
 	styleSheet = viewNodeInstance.viewInstance._indentationStyleSheet( indentation )
 	element = BorderElement( styleSheet )
@@ -190,13 +182,13 @@ def indent(ctx, indentation, child):
 	return element
 
 def text(ctx, styleSheet, txt):
-	"""
-	Runtime - called by compiled code at run-time
-	Builds a DPText widget
-	"""
-	viewNodeInstance = ctx
-	element = TextElement( styleSheet, txt )
-	return element
+	return TextElement( styleSheet, txt )
+
+def hiddenText(ctx, txt):
+	return HiddenContentElement( txt )
+
+def whitespace(ctx, txt, width=0.0):
+	return WhitespaceElement( txt, width )
 
 
 

@@ -3,10 +3,8 @@ package BritefuryJ.DocPresent;
 import java.util.Vector;
 import java.util.WeakHashMap;
 import java.awt.Graphics2D;
-import java.awt.event.KeyEvent;
 
 import BritefuryJ.DocPresent.Caret.Caret;
-import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleSheets.ContentLeafStyleSheet;
 import BritefuryJ.Math.Point2;
@@ -87,51 +85,6 @@ public abstract class DPContentLeaf extends DPWidget implements ContentInterface
 	
 	
 	
-	public void insertContent(Marker marker, String x)
-	{
-		int index = marker.getIndex();
-		content = content.substring( 0, index ) + x + content.substring( index );
-		markerInsert( index, x.length() );
-		contentChanged();
-		if ( listener != null )
-		{
-			listener.contentInserted( marker, x );
-		}
-	}
-
-	public void removeContent(Marker m, int length)
-	{
-		int index = m.getIndex();
-		content = content.substring( 0, index ) + content.substring( index + length );
-		markerRemove( index, length );
-		contentChanged();
-		if ( listener != null )
-		{
-			listener.contentRemoved( m, length );
-		}
-	}
-	
-	public void replaceContent(Marker m, int length, String x)
-	{
-		int index = m.getIndex();
-		content = content.substring( 0, index )  +  x  +  content.substring( index + length );
-		
-		if ( x.length() > length )
-		{
-			markerInsert( index + length, x.length() - length );
-		}
-		else if ( x.length() < length )
-		{
-			markerRemove( index + x.length(), length - x.length() );
-		}
-		contentChanged();
-		if ( listener != null )
-		{
-			listener.contentReplaced( m, length, x );
-		}
-	}
-	
-	
 	public void setContentListener(WidgetContentListener listener)
 	{
 		this.listener = listener;
@@ -142,7 +95,7 @@ public abstract class DPContentLeaf extends DPWidget implements ContentInterface
 	{
 	}
 	
-	
+
 	
 	
 	
@@ -308,7 +261,7 @@ public abstract class DPContentLeaf extends DPWidget implements ContentInterface
 	
 	
 	
-	private void markerInsert(int position, int length)
+	protected void markerInsert(int position, int length)
 	{
 		for (Marker m: markers.keySet())
 		{
@@ -319,7 +272,7 @@ public abstract class DPContentLeaf extends DPWidget implements ContentInterface
 		}
 	}
 	
-	private void markerRemove(int position, int length)
+	protected void markerRemove(int position, int length)
 	{
 		int end = position + length;
 
@@ -344,11 +297,22 @@ public abstract class DPContentLeaf extends DPWidget implements ContentInterface
 
 	// MARKER MOVEMENT METHODS
 	
-	protected Marker markerToLeft(Marker m, boolean bItemStep)
+	protected Marker markerToLeft(Marker m, boolean bItemStep, boolean bSkipWhitespace)
 	{
 		if ( isMarkerAtStart( m ) )
 		{
 			DPContentLeaf left = getContentLeafToLeft();
+			boolean bSkippedWhitespace = false;
+			
+			if ( bSkipWhitespace )
+			{
+				while ( left != null  &&  left.isWhitespace() )
+				{
+					left = left.getContentLeafToLeft();
+					bSkippedWhitespace = true;
+				}
+			}
+			
 			if ( left != null )
 			{
 				if ( bItemStep )
@@ -357,7 +321,14 @@ public abstract class DPContentLeaf extends DPWidget implements ContentInterface
 				}
 				else
 				{
-					return left.markerAtEndMinusOne();
+					if ( bSkippedWhitespace )
+					{
+						return left.markerAtEnd();
+					}
+					else
+					{
+						return left.markerAtEndMinusOne();
+					}
 				}
 			}
 			else
@@ -371,11 +342,23 @@ public abstract class DPContentLeaf extends DPWidget implements ContentInterface
 		}
 	}
 
-	protected void moveMarkerLeft(Marker marker, boolean bItemStep)
+	protected void moveMarkerLeft(Marker marker, boolean bItemStep, boolean bSkipWhitespace)
 	{
 		if ( isMarkerAtStart( marker ) )
 		{
 			DPContentLeaf left = getContentLeafToLeft();
+			boolean bSkippedWhitespace = false;
+			
+
+			if ( bSkipWhitespace )
+			{
+				while ( left != null  &&  left.isWhitespace() )
+				{
+					left = left.getContentLeafToLeft();
+					bSkippedWhitespace = true;
+				}
+			}
+
 			if ( left != null )
 			{
 				if ( bItemStep )
@@ -384,7 +367,14 @@ public abstract class DPContentLeaf extends DPWidget implements ContentInterface
 				}
 				else
 				{
-					left.moveMarkerToEndMinusOne( marker );
+					if ( bSkippedWhitespace )
+					{
+						left.moveMarkerToEnd( marker );
+					}
+					else
+					{
+						left.moveMarkerToEndMinusOne( marker );
+					}
 				}
 			}
 		}
@@ -396,11 +386,23 @@ public abstract class DPContentLeaf extends DPWidget implements ContentInterface
 
 
 
-	protected Marker markerToRight(Marker m, boolean bItemStep)
+	protected Marker markerToRight(Marker m, boolean bItemStep, boolean bSkipWhitespace)
 	{
 		if ( isMarkerAtEnd( m ) )
 		{
 			DPContentLeaf right = getContentLeafToRight();
+			boolean bSkippedWhitespace = false;
+			
+
+			if ( bSkipWhitespace )
+			{
+				while ( right != null  &&  right.isWhitespace() )
+				{
+					right = right.getContentLeafToRight();
+					bSkippedWhitespace = true;
+				}
+			}
+
 			if ( right != null )
 			{
 				if ( bItemStep )
@@ -409,7 +411,14 @@ public abstract class DPContentLeaf extends DPWidget implements ContentInterface
 				}
 				else
 				{
-					return right.markerAtStartPlusOne();
+					if ( bSkippedWhitespace )
+					{
+						return right.markerAtStart();
+					}
+					else
+					{
+						return right.markerAtStartPlusOne();
+					}
 				}
 			}
 			else
@@ -423,11 +432,23 @@ public abstract class DPContentLeaf extends DPWidget implements ContentInterface
 		}
 	}
 	
-	protected void moveMarkerRight(Marker marker, boolean bItemStep)
+	protected void moveMarkerRight(Marker marker, boolean bItemStep, boolean bSkipWhitespace)
 	{
 		if ( isMarkerAtEnd( marker ) )
 		{
 			DPContentLeaf right = getContentLeafToRight();
+			boolean bSkippedWhitespace = false;
+			
+
+			if ( bSkipWhitespace )
+			{
+				while ( right != null  &&  right.isWhitespace() )
+				{
+					right = right.getContentLeafToRight();
+					bSkippedWhitespace = true;
+				}
+			}
+
 			if ( right != null )
 			{
 				if ( bItemStep )
@@ -436,7 +457,14 @@ public abstract class DPContentLeaf extends DPWidget implements ContentInterface
 				}
 				else
 				{
-					right.moveMarkerToStartPlusOne( marker );
+					if ( bSkippedWhitespace )
+					{
+						right.moveMarkerToStart( marker );
+					}
+					else
+					{
+						right.moveMarkerToStartPlusOne( marker );
+					}
 				}
 			}
 		}
@@ -446,10 +474,10 @@ public abstract class DPContentLeaf extends DPWidget implements ContentInterface
 		}
 	}
 	
-	protected void moveMarkerUp(Marker marker)
+	protected void moveMarkerUp(Marker marker, boolean bSkipWhitespace)
 	{
 		Point2 cursorPos = getCursorPosition();
-		DPContentLeaf above = getContentLeafAbove( cursorPos );
+		DPContentLeaf above = getContentLeafAbove( cursorPos, bSkipWhitespace );
 		if ( above != null )
 		{
 			Point2 cursorPosInAbove = getLocalPointRelativeTo( above, cursorPos );
@@ -458,10 +486,10 @@ public abstract class DPContentLeaf extends DPWidget implements ContentInterface
 		}
 	}
 	
-	protected void moveMarkerDown(Marker marker)
+	protected void moveMarkerDown(Marker marker, boolean bSkipWhitespace)
 	{
 		Point2 cursorPos = getCursorPosition();
-		DPContentLeaf below = getContentLeafBelow( cursorPos );
+		DPContentLeaf below = getContentLeafBelow( cursorPos, bSkipWhitespace );
 		if ( below != null )
 		{
 			Point2 cursorPosInBelow = getLocalPointRelativeTo( below, cursorPos );
@@ -484,6 +512,16 @@ public abstract class DPContentLeaf extends DPWidget implements ContentInterface
 	public boolean isContentLeaf()
 	{
 		return true;
+	}
+	
+	public boolean isWhitespace()
+	{
+		return false;
+	}
+	
+	public boolean isEditable()
+	{
+		return false;
 	}
 
 	
@@ -514,21 +552,21 @@ public abstract class DPContentLeaf extends DPWidget implements ContentInterface
 	
 	
 	
-	protected DPContentLeaf getContentLeafAbove(Point2 localPos)
+	protected DPContentLeaf getContentLeafAbove(Point2 localPos, boolean bSkipWhitespace)
 	{
-		return getContentLeafAboveOrBelow( localPos, false );
+		return getContentLeafAboveOrBelow( localPos, false, bSkipWhitespace );
 	}
 	
-	protected DPContentLeaf getContentLeafBelow(Point2 localPos)
+	protected DPContentLeaf getContentLeafBelow(Point2 localPos, boolean bSkipWhitespace)
 	{
-		return getContentLeafAboveOrBelow( localPos, true );
+		return getContentLeafAboveOrBelow( localPos, true, bSkipWhitespace );
 	}
 	
-	protected DPContentLeaf getContentLeafAboveOrBelow(Point2 localPos, boolean bBelow)
+	protected DPContentLeaf getContentLeafAboveOrBelow(Point2 localPos, boolean bBelow, boolean bSkipWhitespace)
 	{
 		if ( parent != null )
 		{
-			return parent.getContentLeafAboveOrBelowFromChild( this, bBelow, getLocalPointRelativeToAncestor( parent, localPos ) );
+			return parent.getContentLeafAboveOrBelowFromChild( this, bBelow, getLocalPointRelativeToAncestor( parent, localPos ), bSkipWhitespace );
 		}
 		else
 		{
@@ -547,9 +585,16 @@ public abstract class DPContentLeaf extends DPWidget implements ContentInterface
 		return this;
 	}
 
-	protected DPContentLeaf getTopOrBottomContentLeaf(boolean bBottom, Point2 cursorPosInRootSpace)
+	protected DPContentLeaf getTopOrBottomContentLeaf(boolean bBottom, Point2 cursorPosInRootSpace, boolean bSkipWhitespace)
 	{
-		return this;
+		if ( bSkipWhitespace && isWhitespace() )
+		{
+			return null;
+		}
+		else
+		{
+			return this;
+		}
 	}
 	
 	
@@ -616,107 +661,6 @@ public abstract class DPContentLeaf extends DPWidget implements ContentInterface
 					x.set( null, 0, Marker.Bias.START );
 				}
 			}
-		}
-	}
-	
-	
-	
-
-	//
-	//
-	// INPUT EVENT HANDLING
-	//
-	//
-	
-	protected boolean handleBackspace(Caret caret)
-	{
-		if ( isMarkerAtStart( caret.getMarker() ) )
-		{
-			DPContentLeaf left = getContentLeafToLeft();
-			if ( left == null )
-			{
-				return false;
-			}
-			else
-			{
-				left.moveMarkerToEnd( caret.getMarker() );
-				return true;
-			}
-		}
-		else
-		{
-			removeContent( markerToLeft( caret.getMarker(), false ), 1 );
-			return true;
-		}
-	}
-	
-	protected boolean handleDelete(Caret caret)
-	{
-		if ( isMarkerAtEnd( caret.getMarker() ) )
-		{
-			DPContentLeaf right = getContentLeafToRight();
-			if ( right == null )
-			{
-				return false;
-			}
-			else
-			{
-				right.moveMarkerToStart( caret.getMarker() );
-				return true;
-			}
-		}
-		else
-		{
-			removeContent( caret.getMarker(), 1 );
-			return true;
-		}
-	}
-	
-	protected boolean onKeyPress(Caret caret, KeyEvent event)
-	{
-		if ( event.getKeyCode() == KeyEvent.VK_BACK_SPACE )
-		{
-			return handleBackspace( caret );
-		}
-		else if ( event.getKeyCode() == KeyEvent.VK_DELETE )
-		{
-			return handleDelete( caret );
-		}
-		return false;
-	}
-
-	protected boolean onKeyRelease(Caret caret, KeyEvent event)
-	{
-		return false;
-	}
-
-	protected boolean onKeyTyped(Caret caret, KeyEvent event)
-	{
-		if ( event.getKeyChar() != KeyEvent.VK_BACK_SPACE  &&  event.getKeyChar() != KeyEvent.VK_DELETE )
-		{
-			insertContent( caret.getMarker(), String.valueOf( event.getKeyChar() ) );
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
-	
-	
-	
-	protected boolean onButtonDown(PointerButtonEvent event)
-	{
-		if ( event.getButton() == 1 )
-		{
-			Caret caret = presentationArea.getCaret();
-			int contentPos = getContentPositonForPoint( event.getPointer().getLocalPos() );
-			moveMarker( caret.getMarker(), contentPos, Marker.Bias.START );
-			return true;
-		}
-		else
-		{
-			return false;
 		}
 	}
 }
