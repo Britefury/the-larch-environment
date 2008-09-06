@@ -24,10 +24,7 @@ from Britefury.gSym.gSymEnvironment import initGSymEnvironment, shutdownGSymEnvi
 from Britefury.MainApp.MainAppSwing import MainApp
 
 
-
-
-
-if __name__ == '__main__':
+def main():
 	initGSymEnvironment()
 	
 
@@ -44,3 +41,7 @@ if __name__ == '__main__':
 	app.run()
 	
 	shutdownGSymEnvironment()
+
+
+if __name__ == '__main__':
+	main()

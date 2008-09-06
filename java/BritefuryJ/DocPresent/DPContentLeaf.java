@@ -634,7 +634,13 @@ public abstract class DPContentLeaf extends DPWidget implements ContentInterface
 		{
 			for (Marker x: xs)
 			{
-				left.moveMarkerToEnd( x );
+				try
+				{
+					left.moveMarkerToEnd( x );
+				}
+				catch (Marker.InvalidMarkerPosition e)
+				{
+				}
 			}
 		}
 		else
@@ -650,7 +656,13 @@ public abstract class DPContentLeaf extends DPWidget implements ContentInterface
 			{
 				for (Marker x: xs)
 				{
-					right.moveMarkerToEnd( x );
+					try
+					{
+						right.moveMarkerToEnd( x );
+					}
+					catch (Marker.InvalidMarkerPosition e)
+					{
+					}
 				}
 			}
 			else
