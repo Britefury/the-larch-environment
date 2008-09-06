@@ -89,7 +89,8 @@ class DVNode (object):
 		print 'Node: ', self.docNode[0], position, self._elementContent
 
 		# Set the caret node to self
-		self._view._caretNode = self
+		if position is not None  and  bias is not None  and  self._elementContent is not None:
+			self._view._caretNode = self
 
 		contents = self._contentsCell.getImmutableValue()
 		for child in self._children:
