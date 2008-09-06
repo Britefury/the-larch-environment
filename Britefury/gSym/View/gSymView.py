@@ -142,7 +142,7 @@ def _populateContainerSeq(viewNodeInstance, container, children):
 def _populateScript(viewNodeInstance, script, child, slotIndex):
 	if isinstance( child, DVNode ):
 		script.setChild( slotIndex, child.getElementNoRefresh() )
-		_registerViewNodeRelationship( viewNodeInstance, chNode )
+		_registerViewNodeRelationship( viewNodeInstance, child )
 	elif isinstance( child, Element ):
 		script.setChild( slotIndex, child )
 	else:
@@ -239,15 +239,15 @@ def script(ctx, styleSheet, mainChild, leftSuperChild, leftSubChild, rightSuperC
 	viewNodeInstance = ctx
 	element = ScriptElement( styleSheet )
 	
-	_populateScript( viewNodeInstance, widget, mainChild, DPScript.MAIN )
+	_populateScript( viewNodeInstance, element, mainChild, DPScript.MAIN )
 	if leftSuperChild is not None:
-		_populateScript( viewNodeInstance, widget, leftSuperChild, DPScript.LEFTSUPER )
+		_populateScript( viewNodeInstance, element, leftSuperChild, DPScript.LEFTSUPER )
 	if leftSubChild is not None:
-		_populateScript( viewNodeInstance, widget, leftSubChild, DPScript.LEFTSUB )
+		_populateScript( viewNodeInstance, element, leftSubChild, DPScript.LEFTSUB )
 	if rightSuperChild is not None:
-		_populateScript( viewNodeInstance, widget, rightSuperChild, DPScript.RIGHTSUPER )
+		_populateScript( viewNodeInstance, element, rightSuperChild, DPScript.RIGHTSUPER )
 	if rightSubChild is not None:
-		_populateScript( viewNodeInstance, widget, rightSubChild, DPScript.RIGHTSUB )
+		_populateScript( viewNodeInstance, element, rightSubChild, DPScript.RIGHTSUB )
 	return element
 
 def scriptLSuper(ctx, styleSheet, mainChild, scriptChild):

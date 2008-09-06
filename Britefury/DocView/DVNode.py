@@ -132,6 +132,10 @@ class DVNode (object):
 					leafPosition = newPosition - leafOffset
 					print 'Node "%s"; content was "%s" now "%s"'  %  ( self.docNode[0], startContent, self._elementContent.getContent() )
 					print 'Position was %d, now is %d; leaf (%s) offset is %d, moving to %d in leaf'  %  ( position, newPosition, leaf.getContent(), leafOffset, leafPosition )
+					leafPosition = max( 0, leafPosition )
+					if leafPosition >= leaf.getContentLength():
+						leafPosition = leaf.getContentLength() - 1
+						bias = Marker.Bias.END
 					leaf.moveMarker( caret.getMarker(), leafPosition, bias )
 
 				
