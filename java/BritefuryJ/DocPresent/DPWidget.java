@@ -998,7 +998,7 @@ abstract public class DPWidget implements ContentInterface
 		return null;
 	}
 	
-	protected DPContentLeaf getTopOrBottomContentLeaf(boolean bBottom, Point2 cursorPosInRootSpace)
+	protected DPContentLeaf getTopOrBottomContentLeaf(boolean bBottom, Point2 cursorPosInRootSpace, boolean bSkipWhitespace)
 	{
 		return null;
 	}
