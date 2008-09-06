@@ -86,7 +86,7 @@ class DVNode (object):
 		else:
 			startContent = ''
 		position, bias, contentString = self._getCursorPositionBiasAndContentString( self._elementContent )
-		print 'Node: ', self.docNode[0], position, self._elementContent
+		#print 'Node: ', self.docNode[0], position, self._elementContent
 
 		# Set the caret node to self
 		if position is not None  and  bias is not None  and  self._elementContent is not None:

@@ -126,6 +126,9 @@ class _ImportImporter (_Importer):
 		else:
 			return [ 'moduleImportAs', node.name, node.asname ]
 		
+	def aliasType(self, node):
+		return self.alias( node )
+
 
 class _ImportFromImporter (_Importer):
 	# Import statement
@@ -135,12 +138,18 @@ class _ImportFromImporter (_Importer):
 		else:
 			return [ 'moduleContentImportAs', node.name, node.asname ]
 		
+	def aliasType(self, node):
+		return self.alias( node )
+
 	
 class _ExceptHandlerImporter (_Importer):
 	# Import statement
 	def excepthandler(self, node):
 		return [ 'exceptStmt',     _expr( node.type )   if node.type is not None   else '<nil>',     _target( node.name )   if node.name is not None   else '<nil>',    _flattenedCompound( node.body ) ]
 		
+	def excepthandlerType(self, node):
+		return self.excepthandler( node )
+
 	
 class _DecoratorImporter (_Importer):
 	def Name(self, node):
@@ -152,6 +161,9 @@ class _DecoratorImporter (_Importer):
 
 	def keyword(self, node):
 		return [ 'kwArg', node.arg, _expr( node.value ) ]
+
+	def keywordType(self, node):
+		return self.keyword( node )
 
 
 	
@@ -226,21 +238,6 @@ class _ExprImporter (_Importer):
 		return [ 'var', node.id ]
 
 
-	# Targets
-	#def AssName(self, node):
-		#return [ 'singleTarget', node.name ]
-	
-	#def AssAttr(self, node):
-		#return [ 'attributeRef', _expr( node.expr ), node.attrname ]
-	
-	#def AssTuple(self, node):
-		#return [ 'tupleTarget' ]  +  [ _expr( x )   for x in node.nodes ]
-	
-	#def AssList(self, node):
-		#return [ 'listTarget' ]  +  [ _expr( x )   for x in node.nodes ]
-
-	
-	
 	# Tuple literal
 	def Tuple(self, node):
 		return [ 'tupleLiteral' ]  +  [ _expr( x )   for x in node.elts ]
@@ -321,6 +318,8 @@ class _ExprImporter (_Importer):
 	def keyword(self, node):
 		return [ 'kwArg', node.arg, _expr( node.value ) ]
 			
+	def keywordType(self, node):
+		return self.keyword( node )
 				
 	
 	
@@ -390,7 +389,7 @@ class _StmtImporter (_Importer):
 	
 	# Augmented assignment statement
 	def AugAssign(self, node):
-		return [ 'augAssignStmt', _augAssignOpTable[ _getNodeTypeName( node.op ) ], _target( node.target ), _expr( node.value ) ]
+		return [ 'augAssignStmt', _augAssignOpTable[ _getOpNodeName( node.op ) ], _target( node.target ), _expr( node.value ) ]
 	
 	
 	# Pass
