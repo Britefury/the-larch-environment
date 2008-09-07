@@ -154,12 +154,6 @@ def _populateScript(viewNodeInstance, script, child, slotIndex):
 			
 	
 
-def _setKeyHandler(viewNodeInstance, widget):
-	widget.keyHandler = viewNodeInstance.viewInstance._p_handleKeyPress
-
-
-
-
 #
 #
 # 'ctx' parameters are _GSymNodeViewInstance instances
@@ -285,29 +279,32 @@ listViewStrToElementFactory = ListView.listViewStrToElementFactory
 
 _contentListenerParaStyle = ParagraphStyleSheet()
 
+
+
+
+def _applyContentListener(ctx, child, listener):
+	viewNodeInstance = ctx
+
+	if isinstance( child, DVNode ):
+		element = ParagraphElemtent( _contentListenerParaStyle )
+		element.setContentListener( listener )
+		return element
+	elif isinstance( child, Element ):
+		child.setContentListener( listener )
+		return child
+	else:
+		raiseRuntimeError( TypeError, viewNodeInstance.xs, '_applyContentListener: could not process child of type %s'  %  ( type( child ).__name__, ) )
+
+		
 def contentListener(ctx, child, listener):
 	"""
 	Sets a content listener
 	"""
 	
-	viewNodeInstance = ctx
-
-	def _processChild(c):
-		if isinstance( c, DVNode ):
-			element = ParagraphElemtent( _contentListenerParaStyle )
-			bin.setContentListener( listener )
-			_containerSeqRefreshCell( viewNodeInstance, element, [ c.getElement() ] )
-			return element
-		elif isinstance( c, Element ):
-			c.setContentListener( listener )
-			return c
-		else:
-			raiseRuntimeError( TypeError, viewNodeInstance.xs, 'contentListener: could not process child of type %s'  %  ( type( c ).__name__, ) )
-			
 	if isinstance( child, list )  or  isinstance( child, tuple ):
-		return [ _processChild( c )   for c in child ]
+		return [ _applyContentListener( ctx, c, listener )   for c in child ]
 	else:
-		return _processChild( child )
+		return _applyContentListener( ctx, child, listener )
 		
 
 
@@ -321,8 +318,7 @@ def viewEval(ctx, content, nodeViewFunction=None, state=None):
 		
 	# A call to DocNode.buildNodeView builds the view, and puts it in the DocView's table
 	viewInstance = viewNodeInstance.viewInstance
-	nodeFactory = viewInstance._f_makeNodeFactory( nodeViewFunction, state )
-	viewNode = viewNodeInstance.view.buildNodeView( content, nodeFactory )
+	viewNode = viewNodeInstance.view.buildNodeView( content )
 	viewNode._f_setContentsFactory( viewNodeInstance.viewInstance._f_makeNodeContentsFactory( nodeViewFunction, state ) )
 	
 	return viewNode
@@ -342,14 +338,13 @@ class _GSymNodeViewInstance (object):
 	Manages state that concerns a view of a specific sub-tree of a document
 	"""
 	
-	__slots__ = [ 'xs', 'view', 'viewInstance', 'viewNode', 'styleSheetStack' ]
+	__slots__ = [ 'xs', 'view', 'viewInstance', 'viewNode' ]
 
 	def __init__(self, xs, view, viewInstance, viewNode):
 		self.xs = xs
 		self.view = view
 		self.viewInstance = viewInstance
 		self.viewNode = viewNode
-		self.styleSheetStack = []
 
 		
 
@@ -357,6 +352,22 @@ class _GSymNodeViewInstance (object):
 	
 	
 	
+	
+class _GSymViewInstanceNodeContentsFactory (object):
+	__slots__ = [ '_nodeViewFunction', '_state', '_viewInstance' ]
+	
+	def __init__(self, viewInstance, nodeViewFunction, state):
+		self._viewInstance = viewInstance
+		self._nodeViewFunction = nodeViewFunction
+		self._state = state
+		
+	
+	def __call__(self, viewNode, treeNode):
+		# Create the node view instance
+		nodeViewInstance = _GSymNodeViewInstance( treeNode.node, self._viewInstance.view, self._viewInstance, viewNode )
+		## HACK ##
+		# Build the contents
+		return self._viewInstance._p_buildNodeViewContents( nodeViewInstance, treeNode, self._nodeViewFunction, self._state )
 	
 	
 	
@@ -369,7 +380,7 @@ class _GSymViewInstance (object):
 		self.xs = xs
 		self.generalNodeViewFunction = viewFactory.createViewFunction()
 		# self._p_buildDVNode is a factory that builds DVNode instances for document subtrees
-		self.view = DocView( self.tree, self.xs, commandHistory, self._p_rootNodeFactory )
+		self.view = DocView( self.tree, self.xs, commandHistory, self._rootNodeViewInitialiser )
 		self.focusWidget = None
 		self._queue = _ViewQueue( self.view )
 		
@@ -389,41 +400,18 @@ class _GSymViewInstance (object):
 	
 	
 		
-	def _f_makeNodeFactory(self, nodeViewFunction, state):
-		def _nodeFactory(view, treeNode):
-			# Build a DVNode for the document subtree at @docNode
-			# self._p_buildNodeContents is a factory that builds the contents withing the DVNode
-			node = DVNode( view, treeNode )
-			node._f_setContentsFactory( self._f_makeNodeContentsFactory( nodeViewFunction, state ) )
-			return node
-		return _nodeFactory
-	
+	def _rootNodeViewInitialiser(self, viewNode, treeNode):
+		viewNode._f_setContentsFactory( self._f_makeNodeContentsFactory( None, None ) )
 
-	def _p_rootNodeFactory(self, view, treeNode):
-		# Build a DVNode for the document subtree at @docNode
-		# self._p_buildNodeContents is a factory that builds the contents withing the DVNode
-		node = DVNode( view, treeNode )
-		node._f_setContentsFactory( self._f_makeNodeContentsFactory( None, None ) )
-		return node
-	
 
 
 	def _f_makeNodeContentsFactory(self, nodeViewFunction, state):
-		def _buildNodeContents(viewNode, treeNode):
-			# Create the node view instance
-			nodeViewInstance = _GSymNodeViewInstance( treeNode.node, self.view, self, viewNode )
-			## HACK ##
-			# Build the contents
-			viewContents = self._p_buildNodeViewContents( nodeViewInstance, treeNode, nodeViewFunction, state )
-			# Return the contents
-			return viewContents
-		
 		#Memoise the contents factory; keyed by @nodeViewFunction and @state
 		key = nodeViewFunction, state
 		try:
 			return self._nodeContentsFactories[key]
 		except KeyError:
-			factory = _buildNodeContents
+			factory = _GSymViewInstanceNodeContentsFactory( self, nodeViewFunction, state )
 			self._nodeContentsFactories[key] = factory
 			return factory
 		
@@ -438,38 +426,9 @@ class _GSymViewInstance (object):
 	
 	
 	
-	def _p_queueRefresh(self):
-		def _refresh():
-			self.view.refresh()
-		self._queue.queue( _refresh )
 		
+
 		
-	def _p_sendDocEventToWidget(self, widget, event):
-		self.focusWidget = widget
-		processedEvent = widget.sendDocEvent( event )
-		if processedEvent is None:
-			return True
-		elif processedEvent is event:
-			return False
-		else:
-			self._p_queueSendEventToFocus( processedEvent )
-			return True
-	
-	
-	def _p_handleKeyPress(self, widget, keyPressEvent):
-		event = InteractorEventKey.fromDTKeyEvent( widget, True, keyPressEvent )
-		return self._p_sendDocEventToWidget( widget, event )
-
-	
-
-	def _sendDocEvent(self, widget, event):
-		bHandled = self._p_sendDocEventToWidget( widget, event )
-		if not bHandled:
-			print 'gSymView._sendDocEvent: ***unhandled event*** %s'  %  ( event, )
-		return bHandled
-	
-
-
 			
 class GSymView (object):
 	def __call__(self, xs, ctx, state):

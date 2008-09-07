@@ -19,8 +19,6 @@ from Britefury.Kernel import KMeta
 
 from Britefury.Cell.Cell import RefCell
 
-from Britefury.DocView.DocView import DocView
-
 from Britefury.gSym.View.UnparsedText import UnparsedText
 
 

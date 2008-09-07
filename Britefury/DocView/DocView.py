@@ -11,12 +11,13 @@ from Britefury.DocModel.DMListInterface import DMListInterface
 from Britefury.DocTree.DocTreeNode import DocTreeNode
 
 from Britefury.DocView.DocViewNodeTable import DocViewNodeTable
+from Britefury.DocView.DVNode import DVNode
 
 
 
 
 class DocView (object):
-	def __init__(self, tree, root, commandHistory, nodeFactory):
+	def __init__(self, tree, root, commandHistory, rootNodeInitialiser):
 		super( DocView, self ).__init__()
 		
 		assert isinstance( root, DocTreeNode )
@@ -27,7 +28,7 @@ class DocView (object):
 		self._document = None
 		self._commandHistory = commandHistory
 
-		self._nodeFactory = nodeFactory
+		self._rootNodeInitialiser = rootNodeInitialiser
 
 		self.refreshCell = Cell()
 		self.refreshCell.function = self._p_refresh
@@ -42,6 +43,7 @@ class DocView (object):
 	def getRootView(self):
 		if self._rootView is None:
 			self._rootView = self.buildNodeView( self._root )
+			self._rootNodeInitialiser( self._rootView, self._root )
 		return self._rootView
 
 
@@ -59,22 +61,19 @@ class DocView (object):
 
 
 
-	def buildNodeView(self, treeNode, nodeFactory=None):
+	def buildNodeView(self, treeNode):
 		assert isinstance( treeNode, DocTreeNode )
 		
 		if treeNode is None:
 			return None
 		else:
-			if nodeFactory is None:
-				nodeFactory = self._nodeFactory
-			
 			try:
 				viewNode = self._nodeTable[treeNode]
 			except KeyError:
 				try:
 					viewNode = self._nodeTable.takeUnusedViewNodeFor( treeNode )
 				except KeyError:
-					viewNode = nodeFactory( self, treeNode )
+					viewNode = DVNode( self, treeNode )
 					self._nodeTable[treeNode] = viewNode
 					
 			return viewNode
