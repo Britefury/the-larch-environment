@@ -1,6 +1,11 @@
 package BritefuryJ.Cell;
 
-public interface CellEvaluator
+public abstract class CellEvaluator
 {
-	public Object evaluate();
+	public abstract Object evaluate();
+	
+	public boolean isLiteral()
+	{
+		return false;
+	}
 }

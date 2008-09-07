@@ -1,15 +1,22 @@
 package BritefuryJ.Cell;
 
 
-public class LiteralCell extends CellBase
+public class LiteralCell extends CellInterface
 {
 	private CellEvaluatorLiteral evaluator;
 	private CellOwner owner;
 	
+	
+	
 	public LiteralCell()
 	{
+		this( null );
+	}
+	
+	public LiteralCell(Object value)
+	{
 		super();
-		evaluator = new CellEvaluatorLiteral( null );
+		evaluator = new CellEvaluatorLiteral( value );
 		owner = null;
 	}
 	
@@ -28,25 +35,7 @@ public class LiteralCell extends CellBase
 		{
 			owner.onCellEvaluator( this, oldEval, evaluator );
 		}
-		changed();
-	}
-
-
-	public Object getValue()
-	{
-		refreshState = RefreshState.REFRESH_NOT_REQUIRED;
-		
-		if ( cellAccessList != null )
-		{
-			cellAccessList.put( this, null );
-		}
-		
-		return evaluator.evaluate();
-	}
-
-	public boolean isValid()
-	{
-		return true;
+		onChanged();
 	}
 
 
@@ -61,6 +50,21 @@ public class LiteralCell extends CellBase
 	}
 
 	public boolean isLiteral()
+	{
+		return true;
+	}
+
+	
+	public Object getValue()
+	{
+		refreshState = RefreshState.REFRESH_NOT_REQUIRED;
+		
+		onAccess();
+		
+		return evaluator.evaluate();
+	}
+
+	public boolean isValid()
 	{
 		return true;
 	}
