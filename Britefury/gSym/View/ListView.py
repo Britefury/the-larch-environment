@@ -5,8 +5,6 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from Britefury.Cell.Cell import Cell
-
 from Britefury.DocView.DVNode import DVNode
 
 from BritefuryJ.DocPresent.ElementTree import *

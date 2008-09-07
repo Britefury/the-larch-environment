@@ -7,7 +7,7 @@
 ##-*************************
 from copy import copy
 
-from Britefury.Cell.Cell import RefCell
+from BritefuryJ.Cell import Cell
 
 from Britefury.DocModel.DMListInterface import DMListInterface
 
@@ -22,7 +22,7 @@ class DMVirtualList (DMListInterface):
 
 	def __init__(self, op):
 		self._op = op
-		self._cell = RefCell()
+		self._cell = Cell()
 
 		self._cell.setFunction( self._op.evaluate )
 

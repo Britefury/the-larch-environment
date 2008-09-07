@@ -12,12 +12,12 @@ from BritefuryJ.DocPresent.ElementTree import *
 from BritefuryJ.DocPresent.StyleSheets import *
 from BritefuryJ.DocPresent.Marker import *
 
+from BritefuryJ.Cell import Cell
+
 
 from Britefury.Util.SignalSlot import ClassSignal
 
 from Britefury.Kernel import KMeta
-
-from Britefury.Cell.Cell import RefCell
 
 from Britefury.gSym.View.UnparsedText import UnparsedText
 
@@ -40,7 +40,7 @@ class DVNode (object):
 		self.docNode = treeNode.node
 		self._view = view
 		self._parent = None
-		self.refreshCell = RefCell()
+		self.refreshCell = Cell()
 		self.refreshCell.setFunction( self._o_refreshNode )
 		
 		#self._element = BinElement( _defaultBinStyleSheet )
@@ -48,7 +48,7 @@ class DVNode (object):
 		self._elementContent = None
 		self._metadata = None
 		self._contentsFactory = None
-		self._contentsCell = RefCell()
+		self._contentsCell = Cell()
 		self._contentsCell.setFunction( self._p_computeContents )
 		self.focus = None
 		
@@ -90,7 +90,7 @@ class DVNode (object):
 		if position is not None  and  bias is not None  and  self._elementContent is not None:
 			self._view._caretNode = self
 
-		contents = self._contentsCell.getImmutableValue()
+		contents = self._contentsCell.getValue()
 		for child in self._children:
 			child.refresh()
 
@@ -145,7 +145,7 @@ class DVNode (object):
 
 
 	def refresh(self):
-		self.refreshCell.getImmutableValue()
+		self.refreshCell.getValue()
 
 
 	def _getCursorPositionBiasAndContentString(self, element):

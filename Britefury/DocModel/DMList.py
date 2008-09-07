@@ -8,7 +8,7 @@
 from weakref import WeakKeyDictionary
 from copy import copy, deepcopy
 
-from Britefury.Cell.LiteralCell import LiteralRefCell
+from BritefuryJ.Cell import LiteralCell
 
 from Britefury.DocModel.DocModelLayer import DocModelLayer
 from Britefury.DocModel.DMNode import DMNode
@@ -30,7 +30,7 @@ class DMList (DMListInterface):
 		super( DMList, self ).__init__()
 
 
-		self._cell = LiteralRefCell()
+		self._cell = LiteralCell()
 		if value is None:
 			value = []
 		else:

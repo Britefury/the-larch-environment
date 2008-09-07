@@ -7,7 +7,7 @@
 ##-*************************
 from weakref import WeakKeyDictionary
 
-from Britefury.Cell.Cell import RefCell
+from BritefuryJ.Cell import Cell
 
 import Britefury.DocModel.DMVirtualList
 
@@ -51,7 +51,7 @@ class DocModelLayer (object):
 				return destList
 
 
-			destCell = RefCell()
+			destCell = Cell()
 			destCell.setFunction( _cellFunc )
 
 			self._srcListToDestCell[srcList] = destCell
