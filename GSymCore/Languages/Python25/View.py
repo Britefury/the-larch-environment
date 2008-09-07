@@ -27,6 +27,55 @@ from GSymCore.Languages.Python25.Keywords import *
 
 
 
+
+class _TextFactory (object):
+	__slots__ = [ 'ctx' ]
+	
+	style = default_textStyle
+	text = ''
+	
+	def __init__(self, ctx):
+		self.ctx = ctx
+
+	def __call__(self):
+		return text( self.ctx, self.style, self.text )
+
+
+class _CommaFactory (_TextFactory):
+	style = punctuation_textStyle
+	text = ','
+	
+	
+
+class _OpenBracketFactory (_TextFactory):
+	style = punctuation_textStyle
+	text = '['
+	
+class _CloseBracketFactory (_TextFactory):
+	style = punctuation_textStyle
+	text = ']'
+
+	
+class _OpenBraceFactory (_TextFactory):
+	style = punctuation_textStyle
+	text = '{'
+	
+class _CloseBraceFactory (_TextFactory):
+	style = punctuation_textStyle
+	text = '}'
+	
+
+class _OpenParenFactory (_TextFactory):
+	style = punctuation_textStyle
+	text = '('
+	
+class _CloseParenFactory (_TextFactory):
+	style = punctuation_textStyle
+	text = ')'
+	
+
+
+
 def keywordText(ctx, keyword):
 	return text( ctx, keyword_textStyle, keyword )
 
@@ -290,19 +339,21 @@ def paragraphPrefixOpView(ctx, state, node, x, op, precedence):
 			   state )
 
 
+
+def _tupleElement(ctx, x):
+	if x.metadata == PRECEDENCE_TUPLE:
+		return paragraph( ctx, python_paragraphStyle, [ text( ctx, punctuation_textStyle, '(' ), x, text( ctx, punctuation_textStyle, ')' ) ] )
+	else:
+		return x
+
 def tupleView(ctx, state, node, xs, parser=None):
-	def tupleElement(x):
-		if x.metadata == PRECEDENCE_TUPLE:
-			return paragraph( ctx, python_paragraphStyle, [ text( ctx, punctuation_textStyle, '(' ), x, text( ctx, punctuation_textStyle, ')' ) ] )
-		else:
-			return x
 	if parser is not None:
 		xViews = mapViewEval( ctx, xs, None, python25ViewState( parser ) )
 	else:
 		xViews = mapViewEval( ctx, xs )
-	xElements = [ tupleElement( x )   for x in xViews ]
+	xElements = [ _tupleElement( ctx, x )   for x in xViews ]
 	return nodeEditor( ctx, node,
-			   listView( ctx, tuple_listViewLayout, None, None, lambda: text( ctx, punctuation_textStyle, ',' ), xElements ),
+			   listView( ctx, tuple_listViewLayout, None, None, _CommaFactory( ctx ), xElements ),
 			   PRECEDENCE_TUPLE,
 			   state )
 
@@ -418,7 +469,7 @@ class Python25View (GSymView):
 	def listTarget(self, ctx, state, node, *xs):
 		xViews = mapViewEval( ctx, xs, None, python25ViewState( Parser.targetItem ) )
 		return nodeEditor( ctx, node,
-				   listView( ctx, list_listViewLayout, lambda: text( ctx, punctuation_textStyle, '[' ), lambda: text( ctx, punctuation_textStyle, ']' ), lambda: text( ctx, punctuation_textStyle, ',' ), xViews ),
+				   listView( ctx, list_listViewLayout, _OpenBracketFactory( ctx ), _CloseBracketFactory( ctx ), _CommaFactory( ctx ), xViews ),
 				   None,
 				   state )
 
@@ -444,7 +495,7 @@ class Python25View (GSymView):
 	def listLiteral(self, ctx, state, node, *xs):
 		xViews = mapViewEval( ctx, xs )
 		return nodeEditor( ctx, node,
-				   listView( ctx, list_listViewLayout, lambda: text( ctx, punctuation_textStyle, '[' ), lambda: text( ctx, punctuation_textStyle, ']' ), lambda: text( ctx, punctuation_textStyle, ',' ), xViews ),
+				   listView( ctx, list_listViewLayout, _OpenBracketFactory( ctx ), _CloseBracketFactory( ctx ), _CommaFactory( ctx ), xViews ),
 				   PRECEDENCE_LISTLITERAL,
 				   state )
 
@@ -528,7 +579,7 @@ class Python25View (GSymView):
 	def dictLiteral(self, ctx, state, node, *xs):
 		xViews = mapViewEval( ctx, xs, None, python25ViewState( Parser.keyValuePair ) )
 		return nodeEditor( ctx, node,
-				   listView( ctx, dict_listViewLayout, lambda: text( ctx, punctuation_textStyle, '{' ), lambda: text( ctx, punctuation_textStyle, '}' ), lambda: text( ctx, punctuation_textStyle, ',' ), xViews ),
+				   listView( ctx, dict_listViewLayout, _OpenBraceFactory( ctx ), _CloseBraceFactory( ctx ), _CommaFactory( ctx ), xViews ),
 				   PRECEDENCE_DICTLITERAL,
 				   state )
 
@@ -596,7 +647,7 @@ class Python25View (GSymView):
 	def subscriptTuple(self, ctx, state, node, *xs):
 		xViews = mapViewEval( ctx, xs, None, python25ViewState( Parser.subscriptItem ) )
 		return nodeEditor( ctx, node,
-				   listView( ctx, tuple_listViewLayout, None, None, lambda: text( ctx, punctuation_textStyle, ',' ), xViews ),
+				   listView( ctx, tuple_listViewLayout, None, None, _CommaFactory( ctx ), xViews ),
 				   PRECEDENCE_TUPLE,
 				   state )
 

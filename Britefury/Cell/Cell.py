@@ -277,19 +277,6 @@ class Cell (CellInterface):
 
 
 
-	bValid = property( isValid, None )
-
-	evaluator = property( getEvaluator, setEvaluator )
-	literalValue = property( getLiteralValue, setLiteralValue )
-	bLiteral = property( isLiteral )
-	function = property( None, setFunction )
-
-	value = property( getValue )
-	immutableValue = property( getImmutableValue )
-
-	dependencies = property( getDependencies )
-
-
 
 
 
@@ -310,7 +297,7 @@ class RefCell (Cell):
 
 	def __copy__(self):
 		cell = self.__class__( self._defaultValue )
-		if self.bLiteral:
+		if self.isLiteral():
 			cell._p_setEvaluator( self._evaluator )
 		else:
 			cell._p_setEvaluator( copy( self._evaluator ) )
@@ -318,7 +305,7 @@ class RefCell (Cell):
 
 
 	def copyFrom(self, cell):
-		if cell.bLiteral:
+		if cell.isLiteral():
 			self._p_setEvaluator( cell._evaluator )
 		else:
 			self._p_setEvaluator( copy( cell._evaluator ) )
@@ -329,7 +316,6 @@ class RefCell (Cell):
 
 
 
-	value = property( getValue )
 
 
 
@@ -412,39 +398,39 @@ class TestCase_Cell (unittest.TestCase):
 	def testSimpleValue(self):
 		cell = IntCell( 1 )
 
-		self.assert_( cell.value == 1 )
-		self.assert_( cell.immutableValue == 1 )
+		self.assert_( cell.getValue() == 1 )
+		self.assert_( cell.getImmutableValue() == 1 )
 		self.assert_( cell._evaluator == 1 )
 
-		cell.literalValue = 20
+		cell.setLiteralValue( 20 )
 
-		self.assert_( cell.value == 20 )
-		self.assert_( cell.immutableValue == 20 )
+		self.assert_( cell.getValue() == 20 )
+		self.assert_( cell.getImmutableValue() == 20 )
 		self.assert_( cell._evaluator == 20 )
 
 
 	def testMutable(self):
 		cell = _TestCell( _TestCellValue( 1 ) )
 
-		self.assert_( cell.value.x == 1 )
-		self.assert_( cell.immutableValue.x == 1 )
-		self.assert_( cell.value is not cell.immutableValue )
+		self.assert_( cell.getValue().x == 1 )
+		self.assert_( cell.getImmutableValue().x == 1 )
+		self.assert_( cell.getValue() is not cell.getImmutableValue() )
 
-		cell.literalValue = _TestCellValue( 20 )
+		cell.setLiteralValue( _TestCellValue( 20 ) )
 
-		self.assert_( cell.value.x == 20 )
-		self.assert_( cell.immutableValue.x == 20 )
-		self.assert_( cell.value is not cell.immutableValue )
+		self.assert_( cell.getValue().x == 20 )
+		self.assert_( cell.getImmutableValue().x == 20 )
+		self.assert_( cell.getValue() is not cell.getImmutableValue() )
 
-		cell.value.x = 50
+		cell.getValue().x = 50
 
-		self.assert_( cell.value.x == 20 )
-		self.assert_( cell.immutableValue.x == 20 )
+		self.assert_( cell.getValue().x == 20 )
+		self.assert_( cell.getImmutableValue().x == 20 )
 
-		cell.value.x = 50
+		cell.getValue().x = 50
 
-		self.assert_( cell.value.x == 20 )
-		self.assert_( cell.immutableValue.x == 20 )
+		self.assert_( cell.getValue().x == 20 )
+		self.assert_( cell.getImmutableValue().x == 20 )
 
 
 	def testLiteral(self):
@@ -452,7 +438,7 @@ class TestCase_Cell (unittest.TestCase):
 
 		self.assert_( cell._evaluator == 1 )
 
-		cell.literalValue = 20
+		cell.setLiteralValue( 20 )
 
 		self.assert_( cell._evaluator == 20 )
 
@@ -462,7 +448,7 @@ class TestCase_Cell (unittest.TestCase):
 
 		cell = IntCell( 1 )
 		cell.evaluatorSignal.connect( self.makeListener( 'evaluator' ) )
-		cell.literalValue = 20
+		cell.setLiteralValue( 20 )
 		self.assert_( self.received( 'evaluator' ) == 1 )
 
 
@@ -471,8 +457,8 @@ class TestCase_Cell (unittest.TestCase):
 
 		cell = IntCell( 1 )
 		cell.changedSignal.connect( self.makeListener( 'changed' ) )
-		self.assert_( cell.value == 1 )
-		cell.literalValue = 20
+		self.assert_( cell.getValue() == 1 )
+		cell.setLiteralValue( 20 )
 		self.assert_( self.received( 'changed' ) == 1 )
 
 
@@ -480,9 +466,9 @@ class TestCase_Cell (unittest.TestCase):
 		def f():
 			return 20
 		cell = IntCell( 1 )
-		cell.function = f
+		cell.setFunction( f )
 
-		self.assert_( cell.value == 20 )
+		self.assert_( cell.getValue() == 20 )
 		self.assert_( cell._evaluator._function is f )
 
 
@@ -491,22 +477,22 @@ class TestCase_Cell (unittest.TestCase):
 
 		def f():
 			callCount[0] += 1
-			return cell1.value * 3
+			return cell1.getValue() * 3
 
 		cell1 = IntCell( 1 )
 		cell2 = IntCell( 0 )
-		cell2.function = f
+		cell2.setFunction( f )
 
 		self.assert_( callCount[0] == 0 )
-		self.assert_( cell1.value == 1 )
-		self.assert_( cell2.value == 3 )
+		self.assert_( cell1.getValue() == 1 )
+		self.assert_( cell2.getValue() == 3 )
 		self.assert_( callCount[0] == 1 )
-		self.assert_( cell2.value == 3 )
+		self.assert_( cell2.getValue() == 3 )
 		self.assert_( callCount[0] == 1 )
-		cell1.literalValue = 12
-		self.assert_( cell2.value == 36 )
+		cell1.setLiteralValue( 12 )
+		self.assert_( cell2.getValue() == 36 )
 		self.assert_( callCount[0] == 2 )
-		self.assert_( cell2.value == 36 )
+		self.assert_( cell2.getValue() == 36 )
 		self.assert_( callCount[0] == 2 )
 
 
@@ -515,31 +501,31 @@ class TestCase_Cell (unittest.TestCase):
 		self.assert_( self.received( 'changed' ) == 0 )
 
 		def f():
-			return cell1.value * 3
+			return cell1.getValue() * 3
 
 		def g():
-			return cell2.value * 2
+			return cell2.getValue() * 2
 
 		cell1 = IntCell( 1 )
 		cell2 = IntCell( 0 )
 		cell3 = IntCell( 0 )
-		cell2.function = f
-		cell3.function = g
+		cell2.setFunction( f )
+		cell3.setFunction( g )
 		cell3.changedSignal.connect( self.makeListener( 'changed' ) )
 
-		self.assert_( cell1.value == 1 )
-		self.assert_( cell2.value == 3 )
-		self.assert_( cell3.value == 6 )
+		self.assert_( cell1.getValue() == 1 )
+		self.assert_( cell2.getValue() == 3 )
+		self.assert_( cell3.getValue() == 6 )
 		self.assert_( self.received( 'changed' ) == 0 )
-		cell1.literalValue = 12
-		self.assert_( cell1.value == 12 )
-		self.assert_( cell2.value == 36 )
-		self.assert_( cell3.value == 72 )
+		cell1.setLiteralValue( 12 )
+		self.assert_( cell1.getValue() == 12 )
+		self.assert_( cell2.getValue() == 36 )
+		self.assert_( cell3.getValue() == 72 )
 		self.assert_( self.received( 'changed' ) == 1 )
-		cell3.function = f
-		self.assert_( cell1.value == 12 )
-		self.assert_( cell2.value == 36 )
-		self.assert_( cell3.value == 36 )
+		cell3.setFunction( f )
+		self.assert_( cell1.getValue() == 12 )
+		self.assert_( cell2.getValue() == 36 )
+		self.assert_( cell3.getValue() == 36 )
 		self.assert_( self.received( 'changed' ) == 2 )
 
 
@@ -552,92 +538,92 @@ class TestCase_Cell (unittest.TestCase):
 
 
 		def f():
-			return cell1.value * 3
+			return cell1.getValue() * 3
 
 		def g():
-			return cell2.value * 4
+			return cell2.getValue() * 4
 
-		cellB.function = f
+		cellB.setFunction( f )
 		self.assert_( cellB._evaluator._function is f )
 
-		self.assert_( cell1.value == 1 )
-		self.assert_( cellB.value == 3 )
-		self.assert_( cellB.dependencies ==  [ cell1 ] )
-		self.assert_( cell1.dependents == [ cellB ] )
-		self.assert_( cell2.dependents == [] )
+		self.assert_( cell1.getValue() == 1 )
+		self.assert_( cellB.getValue() == 3 )
+		self.assert_( cellB.getDependencies() ==  [ cell1 ] )
+		self.assert_( cell1.getDependents() == [ cellB ] )
+		self.assert_( cell2.getDependents() == [] )
 
-		cell1.literalValue = 7
+		cell1.setLiteralValue( 7 )
 
-		self.assert_( cell1.value == 7 )
-		self.assert_( cellB.value == 21 )
-		self.assert_( cellB.value == 21 )
-		self.assert_( cellB.dependencies == [ cell1 ] )
-		self.assert_( cell1.dependents == [ cellB ] )
-		self.assert_( cell2.dependents == [] )
+		self.assert_( cell1.getValue() == 7 )
+		self.assert_( cellB.getValue() == 21 )
+		self.assert_( cellB.getValue() == 21 )
+		self.assert_( cellB.getDependencies() == [ cell1 ] )
+		self.assert_( cell1.getDependents() == [ cellB ] )
+		self.assert_( cell2.getDependents() == [] )
 
-		cellB.function = g
+		cellB.setFunction( g )
 
-		self.assert_( cellB.value == 8 )
-		cell2.literalValue = 12
-		self.assert_( cellB.value == 48 )
-		cell1.literalValue = 5
-		self.assert_( cellB.value == 48 )
-		self.assert_( cellB.dependencies == [ cell2 ] )
-		self.assert_( cell1.dependents == [] )
-		self.assert_( cell2.dependents == [ cellB ] )
-
-
-
-		cell2.function = f
-
-		self.assert_( cell1.value == 5 )
-		self.assert_( cell2.value == 15 )
-		self.assert_( cellB.value == 60 )
-		self.assert_( cellB.dependencies == [ cell2 ] )
-		self.assert_( cell2.dependencies == [ cell1 ] )
-		self.assert_( cell1.dependents == [ cell2 ] )
-		self.assert_( cell2.dependents == [ cellB ] )
-		cell1.literalValue = 3
-		self.assert_( cell1.value == 3 )
-		self.assert_( cell2.value == 9 )
-		self.assert_( cellB.value == 36 )
-		self.assert_( cellB.dependencies == [ cell2 ] )
-		self.assert_( cell2.dependencies == [ cell1 ] )
-		self.assert_( cell1.dependents == [ cell2 ] )
-		self.assert_( cell2.dependents == [ cellB ] )
+		self.assert_( cellB.getValue() == 8 )
+		cell2.setLiteralValue( 12 )
+		self.assert_( cellB.getValue() == 48 )
+		cell1.setLiteralValue( 5 )
+		self.assert_( cellB.getValue() == 48 )
+		self.assert_( cellB.getDependencies() == [ cell2 ] )
+		self.assert_( cell1.getDependents() == [] )
+		self.assert_( cell2.getDependents() == [ cellB ] )
 
 
-	def testXml(self):
-		cell1 = IntCell( 20 )
 
-		cell2 = IntCell( 1 )
+		cell2.setFunction( f )
 
-		docOut = OutputXmlDocument()
-		docOut.getContentNode()  <<  cell1
-		xml = docOut.writeString()
+		self.assert_( cell1.getValue() == 5 )
+		self.assert_( cell2.getValue() == 15 )
+		self.assert_( cellB.getValue() == 60 )
+		self.assert_( cellB.getDependencies() == [ cell2 ] )
+		self.assert_( cell2.getDependencies() == [ cell1 ] )
+		self.assert_( cell1.getDependents() == [ cell2 ] )
+		self.assert_( cell2.getDependents() == [ cellB ] )
+		cell1.setLiteralValue( 3 )
+		self.assert_( cell1.getValue() == 3 )
+		self.assert_( cell2.getValue() == 9 )
+		self.assert_( cellB.getValue() == 36 )
+		self.assert_( cellB.getDependencies() == [ cell2 ] )
+		self.assert_( cell2.getDependencies() == [ cell1 ] )
+		self.assert_( cell1.getDependents() == [ cell2 ] )
+		self.assert_( cell2.getDependents() == [ cellB ] )
 
-		docIn = InputXmlDocument()
-		docIn.parse( xml )
 
-		docIn.getContentNode()  >>  cell2
+	#def testXml(self):
+		#cell1 = IntCell( 20 )
 
-		self.assert_( cell2.value == 20 )
+		#cell2 = IntCell( 1 )
 
-		docOut2 = OutputXmlDocument()
-		docOut2.getContentNode()  <<  cell2
-		xml2 = docOut2.writeString()
+		#docOut = OutputXmlDocument()
+		#docOut.getContentNode()  <<  cell1
+		#xml = docOut.writeString()
 
-		self.assert_( xml == xml2 )
+		#docIn = InputXmlDocument()
+		#docIn.parse( xml )
+
+		#docIn.getContentNode()  >>  cell2
+
+		#self.assert_( cell2.getValue() == 20 )
+
+		#docOut2 = OutputXmlDocument()
+		#docOut2.getContentNode()  <<  cell2
+		#xml2 = docOut2.writeString()
+
+		#self.assert_( xml == xml2 )
 
 
 	def testCopy(self):
 		cell1 = IntCell( 20 )
 
-		self.assert_( cell1.value == 20 )
+		self.assert_( cell1.getValue() == 20 )
 
 		cell2 = copy( cell1 )
 
-		self.assert_( cell2.value == 20 )
+		self.assert_( cell2.getValue() == 20 )
 
 
 
@@ -645,12 +631,12 @@ class TestCase_Cell (unittest.TestCase):
 		cell1 = IntCell( 20 )
 		cell2 = IntCell( 30 )
 
-		self.assert_( cell1.value == 20 )
-		self.assert_( cell2.value == 30 )
+		self.assert_( cell1.getValue() == 20 )
+		self.assert_( cell2.getValue() == 30 )
 
 		cell2.copyFrom( cell1 )
 
-		self.assert_( cell2.value == 20 )
+		self.assert_( cell2.getValue() == 20 )
 
 
 
@@ -660,21 +646,21 @@ class TestCase_Cell (unittest.TestCase):
 
 
 		def c2f():
-			return cell1.value * 20
+			return cell1.getValue() * 20
 
-		cell2.function = c2f
+		cell2.setFunction( c2f )
 
 
-		self.assert_( cell1.value == 13 )
-		self.assert_( cell2.value == 260 )
-		self.assert_( cell2.dependencies == [ cell1 ] )
-		self.assert_( cell1.dependents == [ cell2 ] )
+		self.assert_( cell1.getValue() == 13 )
+		self.assert_( cell2.getValue() == 260 )
+		self.assert_( cell2.getDependencies() == [ cell1 ] )
+		self.assert_( cell1.getDependents() == [ cell2 ] )
 
 		del cell2
 
 		gc.collect()
 
-		self.assert_( cell1.dependents == [] )
+		self.assert_( cell1.getDependents() == [] )
 
 
 

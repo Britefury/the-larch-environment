@@ -31,7 +31,7 @@ class DocView (object):
 		self._rootNodeInitialiser = rootNodeInitialiser
 
 		self.refreshCell = Cell()
-		self.refreshCell.function = self._p_refresh
+		self.refreshCell.setFunction( self._p_refresh )
 
 		self._nodeTable = DocViewNodeTable()
 		

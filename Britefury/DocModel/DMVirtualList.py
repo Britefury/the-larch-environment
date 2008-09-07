@@ -24,7 +24,7 @@ class DMVirtualList (DMListInterface):
 		self._op = op
 		self._cell = RefCell()
 
-		self._cell.function = self._op.evaluate
+		self._cell.setFunction( self._op.evaluate )
 
 
 	def append(self, x):
@@ -47,22 +47,22 @@ class DMVirtualList (DMListInterface):
 
 
 	def __getitem__(self, i):
-		return self._cell.value[i]
+		return self._cell.getValue()[i]
 
 	def __contains__(self, x):
-		return x in self._cell.value
+		return x in self._cell.getValue()
 
 	def __iter__(self):
-		return iter( self._cell.value )
+		return iter( self._cell.getValue() )
 
 	def __add__(self, xs):
-		return self._cell.value + xs
+		return self._cell.getValue() + xs
 
 	def __len__(self):
-		return len( self._cell.value )
+		return len( self._cell.getValue() )
 
 	def index(self, x):
-		return self._cell.value.index( x )
+		return self._cell.getValue().index( x )
 
 
 	def getDestList(self, layer):
@@ -83,7 +83,7 @@ class DMVirtualList (DMListInterface):
 
 	def setOp(self, op):
 		self._op = op
-		self._cell.function = self._op.evaluate
+		self._cell.setFunction( self._op.evaluate )
 
 
 	op = property( None, setOp )
