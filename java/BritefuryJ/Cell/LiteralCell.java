@@ -1,7 +1,8 @@
 package BritefuryJ.Cell;
 
 
-public class LiteralCell extends CellBase {
+public class LiteralCell extends CellBase
+{
 	private CellEvaluatorLiteral evaluator;
 	private CellOwner owner;
 	
@@ -13,11 +14,13 @@ public class LiteralCell extends CellBase {
 	}
 	
 	
-	public CellEvaluator getEvaluator() {
+	public CellEvaluator getEvaluator()
+	{
 		return evaluator;
 	}
 
-	public void setEvaluator(CellEvaluator eval) {
+	public void setEvaluator(CellEvaluator eval)
+	{
 		CellEvaluatorLiteral oldEval = evaluator;
 		evaluator = (CellEvaluatorLiteral)eval;
 		emitEvaluator( oldEval, evaluator );
@@ -29,32 +32,36 @@ public class LiteralCell extends CellBase {
 	}
 
 
-	public Object getValue() {
+	public Object getValue()
+	{
 		refreshState = RefreshState.REFRESH_NOT_REQUIRED;
 		
-		if ( cellDependencies != null )
+		if ( cellAccessList != null )
 		{
-			cellDependencies.put( this, null );
+			cellAccessList.put( this, null );
 		}
 		
 		return evaluator.evaluate();
 	}
 
-	public boolean isValid() {
+	public boolean isValid()
+	{
 		return true;
 	}
 
 
-	public Object getLiteralValue() {
+	public Object getLiteralValue()
+	{
 		return evaluator.evaluate();
 	}
 
-	public void setLiteralValue(Object value) {
+	public void setLiteralValue(Object value)
+	{
 		setEvaluator( new CellEvaluatorLiteral( value ) );
 	}
 
-	public boolean isLiteral() {
+	public boolean isLiteral()
+	{
 		return true;
 	}
-
 }
