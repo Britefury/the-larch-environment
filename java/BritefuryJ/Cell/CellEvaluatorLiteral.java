@@ -1,7 +1,7 @@
 package BritefuryJ.Cell;
 
 
-public class CellEvaluatorLiteral implements CellEvaluator
+public class CellEvaluatorLiteral extends CellEvaluator
 {
 	private Object value;
 	
@@ -17,5 +17,12 @@ public class CellEvaluatorLiteral implements CellEvaluator
 	public Object evaluate()
 	{
 		return value;
+	}
+
+
+
+	public boolean isLiteral()
+	{
+		return true;
 	}
 }
