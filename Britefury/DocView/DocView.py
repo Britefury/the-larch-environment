@@ -5,7 +5,7 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
-from Britefury.Cell.Cell import Cell
+from BritefuryJ.Cell import Cell
 
 from Britefury.DocModel.DMListInterface import DMListInterface
 from Britefury.DocTree.DocTreeNode import DocTreeNode
@@ -97,7 +97,7 @@ class DocView (object):
 
 
 	def refresh(self):
-		self.refreshCell.getImmutableValue()
+		self.refreshCell.getValue()
 
 
 

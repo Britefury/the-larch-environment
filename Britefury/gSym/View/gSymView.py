@@ -9,8 +9,6 @@ import sys
 
 from copy import copy
 
-from Britefury.Cell.Cell import Cell
-
 from Britefury.DocView.DVNode import DVNode
 from Britefury.DocView.DocView import DocView
 

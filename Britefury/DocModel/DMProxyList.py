@@ -8,7 +8,7 @@
 from weakref import WeakKeyDictionary
 from copy import copy
 
-from Britefury.Cell.Cell import RefCell
+from BritefuryJ.Cell import Cell
 
 from Britefury.DocModel.DocModelLayer import DocModelLayer
 from Britefury.DocModel.DMListInterface import DMListInterface

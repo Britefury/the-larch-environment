@@ -18,6 +18,8 @@ from BritefuryJ.DocPresent import *
 from BritefuryJ.DocPresent.ElementTree import *
 from BritefuryJ.DocPresent.StyleSheets import *
 
+from BritefuryJ.Cell import CellListener
+
 
 from Britefury.Event.QueuedEvent import queueEvent
 
@@ -66,7 +68,7 @@ class MainAppPluginInterface (object):
 
 
 		
-class MainAppDocView (object):	
+class MainAppDocView (CellListener):	
 	def __init__(self, app):
 		self._app = app
 		
@@ -84,7 +86,7 @@ class MainAppDocView (object):
 	def setDocumentContent(self, documentRoot, contentHandler):
 		if documentRoot is not None:
 			self._view = loadDocument( self._app._world, documentRoot, contentHandler )
-			self._view.refreshCell.changedSignal.connect( self._queueRefresh )
+			self._view.refreshCell.addListener( self )
 			self._view.refresh()
 			self._elementTree.getRoot().setChild( self._view.getRootView().getElement() )
 		else:
@@ -112,7 +114,18 @@ class MainAppDocView (object):
 			
 	def oneToOne(self):
 		self._doc.oneToOne()
-	
+
+		
+		
+	def onCellChanged(self, cell):
+		self._queueRefresh()
+
+	def onCellEvaluator(self, cell, oldEval, newEval):
+		pass
+
+	def onCellValidity(self, cell):
+		pass
+		
 		
 
 		
