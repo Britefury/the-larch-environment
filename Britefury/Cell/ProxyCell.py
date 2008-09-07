@@ -138,7 +138,7 @@ class ProxyCell (CellInterface):
 		target = None
 
 		if self._targetSourceCell is not None:
-			target = self._targetSourceCell.immutableValue
+			target = self._targetSourceCell.getImmutableValue()
 
 		if not isinstance( target, CellInterface ):
 			target = None
@@ -204,15 +204,6 @@ class ProxyCell (CellInterface):
 
 
 
-	bValid = property( isValid, None )
-
-	evaluator = property( getEvaluator, setEvaluator )
-	literalValue = property( getLiteralValue, setLiteralValue )
-	bLiteral = property( isLiteral )
-
-	value = property( getValue )
-	immutableValue = property( getImmutableValue )
-
 	targetSourceCell = property( getTargetSourceCell, setTargetSourceCell )
 
 
@@ -272,27 +263,27 @@ class TestCase_ProxyCell (unittest.TestCase):
 		self.assert_( pCell.isValid() )
 		self.assert_( qCell.isValid() )
 
-		pCellTarget.literalValue = None
+		pCellTarget.setLiteralValue( None )
 
 		self.assert_( not pCell.isValid() )
 		self.assert_( not qCell.isValid() )
 
-		pCellTarget.literalValue = cell
+		pCellTarget.setLiteralValue( cell )
 
 		self.assert_( pCell.isValid() )
 		self.assert_( qCell.isValid() )
 
-		qCellTarget.literalValue = None
+		qCellTarget.setLiteralValue( None )
 
 		self.assert_( pCell.isValid() )
 		self.assert_( not qCell.isValid() )
 
-		qCellTarget.literalValue = cell
+		qCellTarget.setLiteralValue( cell )
 
 		self.assert_( pCell.isValid() )
 		self.assert_( qCell.isValid() )
 
-		qCellTarget.literalValue = pCell
+		qCellTarget.setLiteralValue( pCell )
 
 		self.assert_( pCell.isValid() )
 		self.assert_( qCell.isValid() )
@@ -343,17 +334,17 @@ class TestCase_ProxyCell (unittest.TestCase):
 		self.assert_( pCell.isValid() )
 		self.assert_( qCell.isValid() )
 
-		qCellTarget.literalValue = None
+		qCellTarget.setLiteralValue( None )
 
 		self.assert_( pCell.isValid() )
 		self.assert_( not qCell.isValid() )
 
-		qCellTarget.literalValue = cell
+		qCellTarget.setLiteralValue( cell )
 
 		self.assert_( pCell.isValid() )
 		self.assert_( qCell.isValid() )
 
-		qCellTarget.literalValue = pCell
+		qCellTarget.setLiteralValue( pCell )
 
 		self.assert_( pCell.isValid() )
 		self.assert_( qCell.isValid() )
@@ -374,31 +365,31 @@ class TestCase_ProxyCell (unittest.TestCase):
 		self.assert_( qCell.isValid() )
 		self.assert_( self.wasReceivedAndReset( 'validity' ) == False )
 
-		pCellTarget.literalValue = None
+		pCellTarget.setLiteralValue( None )
 
 		self.assert_( not pCell.isValid() )
 		self.assert_( not qCell.isValid() )
 		self.assert_( self.wasReceivedAndReset( 'validity' ) == True )
 
-		pCellTarget.literalValue = cell
+		pCellTarget.setLiteralValue( cell )
 
 		self.assert_( pCell.isValid() )
 		self.assert_( qCell.isValid() )
 		self.assert_( self.wasReceivedAndReset( 'validity' ) == True )
 
-		qCellTarget.literalValue = None
+		qCellTarget.setLiteralValue( None )
 
 		self.assert_( pCell.isValid() )
 		self.assert_( not qCell.isValid() )
 		self.assert_( self.wasReceivedAndReset( 'validity' ) == True )
 
-		qCellTarget.literalValue = cell
+		qCellTarget.setLiteralValue( cell )
 
 		self.assert_( pCell.isValid() )
 		self.assert_( qCell.isValid() )
 		self.assert_( self.wasReceivedAndReset( 'validity' ) == True )
 
-		qCellTarget.literalValue = pCell
+		qCellTarget.setLiteralValue( pCell )
 
 		self.assert_( pCell.isValid() )
 		self.assert_( qCell.isValid() )
@@ -457,19 +448,19 @@ class TestCase_ProxyCell (unittest.TestCase):
 		self.assert_( qCell.isValid() )
 		self.reset( 'validity' )
 
-		qCellTarget.literalValue = None
+		qCellTarget.setLiteralValue( None )
 
 		self.assert_( pCell.isValid() )
 		self.assert_( not qCell.isValid() )
 		self.assert_( self.wasReceivedAndReset( 'validity' ) == True )
 
-		qCellTarget.literalValue = cell
+		qCellTarget.setLiteralValue( cell )
 
 		self.assert_( pCell.isValid() )
 		self.assert_( qCell.isValid() )
 		self.assert_( self.wasReceivedAndReset( 'validity' ) == True )
 
-		qCellTarget.literalValue = pCell
+		qCellTarget.setLiteralValue( pCell )
 
 		self.assert_( pCell.isValid() )
 		self.assert_( qCell.isValid() )
@@ -483,23 +474,23 @@ class TestCase_ProxyCell (unittest.TestCase):
 		pCellTarget = CellRefCell( None, cell1 )
 		pCell = ProxyCell( pCellTarget )
 
-		self.assert_( cell1.value == 1 )
-		self.assert_( cell2.value == 2 )
-		self.assert_( pCell.value == 1 )
+		self.assert_( cell1.getValue() == 1 )
+		self.assert_( cell2.getValue() == 2 )
+		self.assert_( pCell.getValue() == 1 )
 
-		pCellTarget.literalValue = cell2
+		pCellTarget.setLiteralValue( cell2 )
 
-		self.assert_( pCell.value == 2 )
+		self.assert_( pCell.getValue() == 2 )
 
-		pCell.literalValue = 20
+		pCell.setLiteralValue( 20 )
 
-		self.assert_( pCell.value == 20 )
-		self.assert_( cell2.value == 20 )
+		self.assert_( pCell.getValue() == 20 )
+		self.assert_( cell2.getValue() == 20 )
 
-		pCellTarget.literalValue = cell1
+		pCellTarget.setLiteralValue( cell1 )
 
-		self.assert_( pCell.value == 1 )
-		self.assert_( cell2.value == 20 )
+		self.assert_( pCell.getValue() == 1 )
+		self.assert_( cell2.getValue() == 20 )
 
 
 	def testProxyCellLiteralValue2nd(self):
@@ -510,43 +501,43 @@ class TestCase_ProxyCell (unittest.TestCase):
 		pCellTarget = CellRefCell( None, cell2 )
 		pCell = ProxyCell( atCell1 )
 
-		self.assert_( cell1.value == 1 )
-		self.assert_( cell2.value == 2 )
-		self.assert_( pCell.value == 1 )
+		self.assert_( cell1.getValue() == 1 )
+		self.assert_( cell2.getValue() == 2 )
+		self.assert_( pCell.getValue() == 1 )
 
 		pCell.targetSourceCell = atCell2
 
-		self.assert_( pCell.value == 2 )
+		self.assert_( pCell.getValue() == 2 )
 
-		pCell.literalValue = 20
+		pCell.setLiteralValue( 20 )
 
-		self.assert_( cell1.value == 1 )
-		self.assert_( cell2.value == 20 )
-		self.assert_( pCell.value == 20 )
+		self.assert_( cell1.getValue() == 1 )
+		self.assert_( cell2.getValue() == 20 )
+		self.assert_( pCell.getValue() == 20 )
 
 		pCell.targetSourceCell = atCell1
 
-		self.assert_( cell1.value == 1 )
-		self.assert_( cell2.value == 20 )
-		self.assert_( pCell.value == 1 )
+		self.assert_( cell1.getValue() == 1 )
+		self.assert_( cell2.getValue() == 20 )
+		self.assert_( pCell.getValue() == 1 )
 
 		pCell.targetSourceCell = pCellTarget
 
-		self.assert_( cell1.value == 1 )
-		self.assert_( cell2.value == 20 )
-		self.assert_( pCell.value == 20 )
+		self.assert_( cell1.getValue() == 1 )
+		self.assert_( cell2.getValue() == 20 )
+		self.assert_( pCell.getValue() == 20 )
 
-		pCellTarget.literalValue = cell1
+		pCellTarget.setLiteralValue( cell1 )
 
-		self.assert_( cell1.value == 1 )
-		self.assert_( cell2.value == 20 )
-		self.assert_( pCell.value == 1 )
+		self.assert_( cell1.getValue() == 1 )
+		self.assert_( cell2.getValue() == 20 )
+		self.assert_( pCell.getValue() == 1 )
 
-		pCell.literalValue = 30
+		pCell.setLiteralValue( 30 )
 
-		self.assert_( cell1.value == 30 )
-		self.assert_( cell2.value == 20 )
-		self.assert_( pCell.value == 30 )
+		self.assert_( cell1.getValue() == 30 )
+		self.assert_( cell2.getValue() == 20 )
+		self.assert_( pCell.getValue() == 30 )
 
 
 
@@ -558,30 +549,30 @@ class TestCase_ProxyCell (unittest.TestCase):
 
 		pCell.changedSignal.connect( self.makeListener( 'changed' ) )
 
-		self.assert_( cell1.value == 1 )
-		self.assert_( cell2.value == 2 )
-		self.assert_( pCell.value == 1 )
+		self.assert_( cell1.getValue() == 1 )
+		self.assert_( cell2.getValue() == 2 )
+		self.assert_( pCell.getValue() == 1 )
 		self.assert_( self.received( 'changed' ) == 0 )
 
-		pCellTarget.literalValue = cell2
+		pCellTarget.setLiteralValue( cell2 )
 
-		self.assert_( cell1.value == 1 )
-		self.assert_( cell2.value == 2 )
-		self.assert_( pCell.value == 2 )
+		self.assert_( cell1.getValue() == 1 )
+		self.assert_( cell2.getValue() == 2 )
+		self.assert_( pCell.getValue() == 2 )
 		self.assert_( self.received( 'changed' ) == 1 )
 
-		cell2.literalValue = 20
+		cell2.setLiteralValue( 20 )
 
-		self.assert_( cell1.value == 1 )
-		self.assert_( cell2.value == 20 )
-		self.assert_( pCell.value == 20 )
+		self.assert_( cell1.getValue() == 1 )
+		self.assert_( cell2.getValue() == 20 )
+		self.assert_( pCell.getValue() == 20 )
 		self.assert_( self.received( 'changed' ) == 2 )
 
-		pCellTarget.literalValue = cell1
+		pCellTarget.setLiteralValue( cell1 )
 
-		self.assert_( cell1.value == 1 )
-		self.assert_( cell2.value == 20 )
-		self.assert_( pCell.value == 1 )
+		self.assert_( cell1.getValue() == 1 )
+		self.assert_( cell2.getValue() == 20 )
+		self.assert_( pCell.getValue() == 1 )
 		self.assert_( self.received( 'changed' ) == 3 )
 
 
@@ -598,51 +589,51 @@ class TestCase_ProxyCell (unittest.TestCase):
 
 		pCell.changedSignal.connect( self.makeListener( 'changed' ) )
 
-		self.assert_( cell1.value == 1 )
-		self.assert_( cell2.value == 2 )
-		self.assert_( pCell.value == 1 )
+		self.assert_( cell1.getValue() == 1 )
+		self.assert_( cell2.getValue() == 2 )
+		self.assert_( pCell.getValue() == 1 )
 		self.assert_( self.received( 'changed' ) == 0 )
 
 		pCell.targetSourceCell = atCell2
 
-		self.assert_( cell1.value == 1 )
-		self.assert_( cell2.value == 2 )
-		self.assert_( pCell.value == 2 )
+		self.assert_( cell1.getValue() == 1 )
+		self.assert_( cell2.getValue() == 2 )
+		self.assert_( pCell.getValue() == 2 )
 		self.assert_( self.received( 'changed' ) == 1 )
 
-		cell2.literalValue = 20
+		cell2.setLiteralValue( 20 )
 
-		self.assert_( cell1.value == 1 )
-		self.assert_( cell2.value == 20 )
-		self.assert_( pCell.value == 20 )
+		self.assert_( cell1.getValue() == 1 )
+		self.assert_( cell2.getValue() == 20 )
+		self.assert_( pCell.getValue() == 20 )
 		self.assert_( self.received( 'changed' ) == 2 )
 
 		pCell.targetSourceCell = atCell1
 
-		self.assert_( cell1.value == 1 )
-		self.assert_( cell2.value == 20 )
-		self.assert_( pCell.value == 1 )
+		self.assert_( cell1.getValue() == 1 )
+		self.assert_( cell2.getValue() == 20 )
+		self.assert_( pCell.getValue() == 1 )
 		self.assert_( self.received( 'changed' ) == 3 )
 
 		pCell.targetSourceCell = pCellTarget
 
-		self.assert_( cell1.value == 1 )
-		self.assert_( cell2.value == 20 )
-		self.assert_( pCell.value == 20 )
+		self.assert_( cell1.getValue() == 1 )
+		self.assert_( cell2.getValue() == 20 )
+		self.assert_( pCell.getValue() == 20 )
 		self.assert_( self.received( 'changed' ) == 4 )
 
-		pCellTarget.literalValue = cell1
+		pCellTarget.setLiteralValue( cell1 )
 
-		self.assert_( cell1.value == 1 )
-		self.assert_( cell2.value == 20 )
-		self.assert_( pCell.value == 1 )
+		self.assert_( cell1.getValue() == 1 )
+		self.assert_( cell2.getValue() == 20 )
+		self.assert_( pCell.getValue() == 1 )
 		self.assert_( self.received( 'changed' ) == 5 )
 
-		pCell.literalValue = 30
+		pCell.setLiteralValue( 30 )
 
-		self.assert_( cell1.value == 30 )
-		self.assert_( cell2.value == 20 )
-		self.assert_( pCell.value == 30 )
+		self.assert_( cell1.getValue() == 30 )
+		self.assert_( cell2.getValue() == 20 )
+		self.assert_( pCell.getValue() == 30 )
 		self.assert_( self.received( 'changed' ) == 6 )
 
 
@@ -656,36 +647,36 @@ class TestCase_ProxyCell (unittest.TestCase):
 
 
 		def f():
-			return pCell.value * 5
+			return pCell.getValue() * 5
 
-		fCell.function = f
+		fCell.setFunction( f )
 
 		fCell.changedSignal.connect( self.makeListener( 'changed' ) )
 
 		self.assert_( self.received( 'changed' ) == 0 )
-		self.assert_( cell1.value == 1 )
-		self.assert_( cell2.value == 3 )
-		self.assert_( pCell.value == 1 )
-		self.assert_( fCell.value == 5 )
+		self.assert_( cell1.getValue() == 1 )
+		self.assert_( cell2.getValue() == 3 )
+		self.assert_( pCell.getValue() == 1 )
+		self.assert_( fCell.getValue() == 5 )
 
-		self.assert_( fCell.dependencies == [ pCell ] )
+		self.assert_( fCell.getDependencies() == [ pCell ] )
 
-		pCellTarget.literalValue = cell2
+		pCellTarget.setLiteralValue( cell2 )
 
 		self.assert_( self.received( 'changed' ) == 1 )
-		self.assert_( cell1.value == 1 )
-		self.assert_( cell2.value == 3 )
-		self.assert_( pCell.value == 3 )
-		self.assert_( fCell.value == 15 )
+		self.assert_( cell1.getValue() == 1 )
+		self.assert_( cell2.getValue() == 3 )
+		self.assert_( pCell.getValue() == 3 )
+		self.assert_( fCell.getValue() == 15 )
 
 
-		pCell.literalValue = 4
+		pCell.setLiteralValue( 4 )
 
 		self.assert_( self.received( 'changed' ) == 2 )
-		self.assert_( cell1.value == 1 )
-		self.assert_( cell2.value == 4 )
-		self.assert_( pCell.value == 4 )
-		self.assert_( fCell.value == 20 )
+		self.assert_( cell1.getValue() == 1 )
+		self.assert_( cell2.getValue() == 4 )
+		self.assert_( pCell.getValue() == 4 )
+		self.assert_( fCell.getValue() == 20 )
 
 
 

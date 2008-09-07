@@ -80,40 +80,6 @@ def raiseRuntimeError(exceptionClass, src, reason):
 
 
 
-class _ViewQueue (object):
-	def __init__(self, view):
-		super( _ViewQueue, self ).__init__()
-		self._events = []
-		self._view = view
-		self.final = None
-		
-		
-	def queue(self, f):
-		if f not in self._events:
-			if len( self._events ) == 0:
-				self._view.document.queueImmediateEvent( self._p_fire )
-			self._events.append( f )
-		
-	def dequeue(self, f):
-		if f in self._events:
-			self._events.remove( f )
-			if len( self._events ) == 0:
-				self._view.document.dequeueImmediateEvent( self._p_fire )
-		
-		
-	def _p_fire(self):
-		while len( self._events ) > 0:
-			events = copy( self._events )
-			self._events = []
-			for event in events:
-				event()
-		if self.final is not None:
-			self.final()
-			self.final = None
-				
-
-
-
 def _registerViewNodeRelationship(viewNodeInstance, childNode):
 	viewNodeInstance.viewNode._registerChild( childNode )
 
@@ -382,7 +348,6 @@ class _GSymViewInstance (object):
 		# self._p_buildDVNode is a factory that builds DVNode instances for document subtrees
 		self.view = DocView( self.tree, self.xs, commandHistory, self._rootNodeViewInitialiser )
 		self.focusWidget = None
-		self._queue = _ViewQueue( self.view )
 		
 		self._indentationStyleSheets = {}
 		

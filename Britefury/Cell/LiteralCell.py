@@ -195,15 +195,6 @@ class LiteralCell (CellInterface):
 
 
 
-	bValid = property( isValid, None )
-
-	evaluator = property( getEvaluator, setEvaluator )
-	literalValue = property( getLiteralValue, setLiteralValue )
-	bLiteral = property( isLiteral )
-
-	value = property( getValue )
-	immutableValue = property( getImmutableValue )
-
 
 
 
@@ -240,7 +231,6 @@ class LiteralRefCell (LiteralCell):
 		return self._defaultValue
 
 
-	value = property( getValue )
 
 
 
@@ -307,39 +297,39 @@ class TestCase_LiteralCell (unittest.TestCase):
 	def testSimpleValue(self):
 		cell = LiteralIntCell( 1 )
 
-		self.assert_( cell.value == 1 )
-		self.assert_( cell.immutableValue == 1 )
+		self.assert_( cell.getValue() == 1 )
+		self.assert_( cell.getImmutableValue() == 1 )
 		self.assert_( cell._value == 1 )
 
-		cell.literalValue = 20
+		cell.setLiteralValue( 20 )
 
-		self.assert_( cell.value == 20 )
-		self.assert_( cell.immutableValue == 20 )
+		self.assert_( cell.getValue() == 20 )
+		self.assert_( cell.getImmutableValue() == 20 )
 		self.assert_( cell._value == 20 )
 
 
 	def testMutable(self):
 		cell = _TestLiteralCell( _CellValue( 1 ) )
 
-		self.assert_( cell.value.x == 1 )
-		self.assert_( cell.immutableValue.x == 1 )
-		self.assert_( cell.value is not cell.immutableValue )
+		self.assert_( cell.getValue().x == 1 )
+		self.assert_( cell.getImmutableValue().x == 1 )
+		self.assert_( cell.getValue() is not cell.getImmutableValue() )
 
-		cell.literalValue = _CellValue( 20 )
+		cell.setLiteralValue( _CellValue( 20 ) )
 
-		self.assert_( cell.value.x == 20 )
-		self.assert_( cell.immutableValue.x == 20 )
-		self.assert_( cell.value is not cell.immutableValue )
+		self.assert_( cell.getValue().x == 20 )
+		self.assert_( cell.getImmutableValue().x == 20 )
+		self.assert_( cell.getValue() is not cell.getImmutableValue() )
 
-		cell.value.x = 50
+		cell.getValue().x = 50
 
-		self.assert_( cell.value.x == 20 )
-		self.assert_( cell.immutableValue.x == 20 )
+		self.assert_( cell.getValue().x == 20 )
+		self.assert_( cell.getImmutableValue().x == 20 )
 
-		cell.value.x = 50
+		cell.getValue().x = 50
 
-		self.assert_( cell.value.x == 20 )
-		self.assert_( cell.immutableValue.x == 20 )
+		self.assert_( cell.getValue().x == 20 )
+		self.assert_( cell.getImmutableValue().x == 20 )
 
 
 	def testLiteral(self):
@@ -347,7 +337,7 @@ class TestCase_LiteralCell (unittest.TestCase):
 
 		self.assert_( cell._value == 1 )
 
-		cell.literalValue = 20
+		cell.setLiteralValue( 20 )
 
 		self.assert_( cell._value == 20 )
 
@@ -357,7 +347,7 @@ class TestCase_LiteralCell (unittest.TestCase):
 
 		cell = LiteralIntCell( 1 )
 		cell.evaluatorSignal.connect( self.makeListener( 'evaluator' ) )
-		cell.literalValue = 20
+		cell.setLiteralValue( 20 )
 		self.assert_( self.received( 'evaluator' ) == 1 )
 
 
@@ -366,42 +356,42 @@ class TestCase_LiteralCell (unittest.TestCase):
 
 		cell = LiteralIntCell( 1 )
 		cell.changedSignal.connect( self.makeListener( 'changed' ) )
-		self.assert_( cell.value == 1 )
-		cell.literalValue = 20
+		self.assert_( cell.getValue() == 1 )
+		cell.setLiteralValue( 20 )
 		self.assert_( self.received( 'changed' ) == 1 )
 
 
-	def testXml(self):
-		cell1 = LiteralIntCell( 20 )
+	#def testXml(self):
+		#cell1 = LiteralIntCell( 20 )
 
-		cell2 = LiteralIntCell( 1 )
+		#cell2 = LiteralIntCell( 1 )
 
-		docOut = OutputXmlDocument()
-		docOut.getContentNode()  <<  cell1
-		xml = docOut.writeString()
+		#docOut = OutputXmlDocument()
+		#docOut.getContentNode()  <<  cell1
+		#xml = docOut.writeString()
 
-		docIn = InputXmlDocument()
-		docIn.parse( xml )
+		#docIn = InputXmlDocument()
+		#docIn.parse( xml )
 
-		docIn.getContentNode()  >>  cell2
+		#docIn.getContentNode()  >>  cell2
 
-		self.assert_( cell2.value == 20 )
+		#self.assert_( cell2.getValue() == 20 )
 
-		docOut2 = OutputXmlDocument()
-		docOut2.getContentNode()  <<  cell2
-		xml2 = docOut2.writeString()
+		#docOut2 = OutputXmlDocument()
+		#docOut2.getContentNode()  <<  cell2
+		#xml2 = docOut2.writeString()
 
-		self.assert_( xml == xml2 )
+		#self.assert_( xml == xml2 )
 
 
 	def testCopy(self):
 		cell1 = LiteralIntCell( 20 )
 
-		self.assert_( cell1.value == 20 )
+		self.assert_( cell1.getValue() == 20 )
 
 		cell2 = copy( cell1 )
 
-		self.assert_( cell2.value == 20 )
+		self.assert_( cell2.getValue() == 20 )
 
 
 
@@ -409,12 +399,12 @@ class TestCase_LiteralCell (unittest.TestCase):
 		cell1 = LiteralIntCell( 20 )
 		cell2 = LiteralIntCell( 30 )
 
-		self.assert_( cell1.value == 20 )
-		self.assert_( cell2.value == 30 )
+		self.assert_( cell1.getValue() == 20 )
+		self.assert_( cell2.getValue() == 30 )
 
 		cell2.copyFrom( cell1 )
 
-		self.assert_( cell2.value == 20 )
+		self.assert_( cell2.getValue() == 20 )
 
 
 

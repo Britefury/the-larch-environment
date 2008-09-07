@@ -35,13 +35,13 @@ class DMList (DMListInterface):
 			value = []
 		else:
 			value = [ self._p_coerce( x )   for x in value ]
-		self._cell.literalValue = value
+		self._cell.setLiteralValue( value )
 
 		self._commandTracker_ = None
 
 
 	def __str__(self):
-		return '(' + ' '.join( [ str( v )  for v in self._cell.literalValue ] ) + ')'
+		return '(' + ' '.join( [ str( v )  for v in self._cell.getLiteralValue() ] ) + ')'
 
 
 	def _p_coerce(self, x):
@@ -56,27 +56,27 @@ class DMList (DMListInterface):
 
 
 	def append(self, x):
-		v = self._cell.literalValue
+		v = self._cell.getLiteralValue()
 		x = self._p_coerce( x )
 		v.append( x )
-		self._cell.literalValue = v
+		self._cell.setLiteralValue( v )
 		if self._commandTracker_ is not None:
 			self._commandTracker_._f_onAppended( self, x )
 
 
 	def extend(self, xs):
-		v = self._cell.literalValue
+		v = self._cell.getLiteralValue()
 		xs = [ self._p_coerce( x )   for x in xs ]
 		v.extend( xs )
-		self._cell.literalValue = v
+		self._cell.setLiteralValue( v )
 		if self._commandTracker_ is not None:
 			self._commandTracker_._f_onExtended( self, xs )
 
 	def insert(self, i, x):
-		v = self._cell.literalValue
+		v = self._cell.getLiteralValue()
 		x = self._p_coerce( x )
 		v.insert( i, x )
-		self._cell.literalValue = v
+		self._cell.setLiteralValue( v )
 		if self._commandTracker_ is not None:
 			self._commandTracker_._f_onInserted( self, i, x )
 
@@ -85,7 +85,7 @@ class DMList (DMListInterface):
 			raise ValueError
 		if self._commandTracker_ is not None:
 			self._commandTracker_._f_onRemove( self, x )
-		v = self._cell.literalValue
+		v = self._cell.getLiteralValue()
 		bRemoved = False
 		if isinstance( x, DMNode ):
 			for i, a in enumerate( v ):
@@ -94,50 +94,50 @@ class DMList (DMListInterface):
 					bRemoved = True
 		if not bRemoved:
 			v.remove( x )
-		self._cell.literalValue = v
+		self._cell.setLiteralValue( v )
 
 	def __setitem__(self, i, x):
-		v = self._cell.literalValue
+		v = self._cell.getLiteralValue()
 		oldV = copy( v )
 		if isinstance( i, slice ):
 			x = [ self._p_coerce( p )   for p in x ]
 		else:
 			x = self._p_coerce( x )
 		v[i] = x
-		self._cell.literalValue = v
+		self._cell.setLiteralValue( v )
 		if self._commandTracker_ is not None:
 			self._commandTracker_._f_onSet( self, oldV, v )
 
 	def __delitem__(self, i):
-		v = self._cell.literalValue
+		v = self._cell.getLiteralValue()
 		oldV = copy( v )
 		del v[i]
-		self._cell.literalValue = v
+		self._cell.setLiteralValue( v )
 		if self._commandTracker_ is not None:
 			self._commandTracker_._f_onSet( self, oldV, v )
 
 
 	def __getitem__(self, i):
-		return self._cell.value[i]
+		return self._cell.getValue()[i]
 
 	def __contains__(self, x):
-		return x in self._cell.value
+		return x in self._cell.getValue()
 
 	def __iter__(self):
-		return iter( self._cell.value )
+		return iter( self._cell.getValue() )
 
 	def __add__(self, xs):
-		return self._cell.value + xs
+		return self._cell.getValue() + xs
 
 	def __len__(self):
-		return len( self._cell.value )
+		return len( self._cell.getValue() )
 
 	def index(self, x):
 		if isinstance( x, DMNode ):
-			for i, a in enumerate( self._cell.value ):
+			for i, a in enumerate( self._cell.getValue() ):
 				if a is x:
 					return i
-		return self._cell.value.index( x )
+		return self._cell.getValue().index( x )
 
 
 	def getDestList(self, layer):
@@ -150,12 +150,12 @@ class DMList (DMListInterface):
 
 	def __copy__(self):
 		c = DMList()
-		c._cell.literalValue = self._cell.literalValue
+		c._cell.setLiteralValue( self._cell.getLiteralValue() )
 		return c
 
 	def __deepcopy__(self, memo):
 		c = DMList()
-		c._cell.literalValue = deepcopy( self._cell.literalValue, memo )
+		c._cell.setLiteralValue( deepcopy( self._cell.getLiteralValue(), memo ) )
 		return c
 	
 	

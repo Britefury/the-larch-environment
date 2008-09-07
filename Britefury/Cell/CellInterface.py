@@ -207,13 +207,3 @@ class CellInterface (object):
 
 
 
-	bValid = property( isValid, None )
-
-	evaluator = property( getEvaluator, setEvaluator )
-	literalValue = property( getLiteralValue, setLiteralValue )
-	bLiteral = property( isLiteral )
-
-	value = property( getValue )
-	immutableValue = property( getImmutableValue )
-
-	dependents = property( getDependents )

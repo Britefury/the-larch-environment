@@ -41,7 +41,7 @@ class DVNode (object):
 		self._view = view
 		self._parent = None
 		self.refreshCell = RefCell()
-		self.refreshCell.function = self._o_refreshNode
+		self.refreshCell.setFunction( self._o_refreshNode )
 		
 		#self._element = BinElement( _defaultBinStyleSheet )
 		self._element = ParagraphElement( _defaultParagraphStyleSheet )
@@ -49,7 +49,7 @@ class DVNode (object):
 		self._metadata = None
 		self._contentsFactory = None
 		self._contentsCell = RefCell()
-		self._contentsCell.function = self._p_computeContents
+		self._contentsCell.setFunction( self._p_computeContents )
 		self.focus = None
 		
 		self._children = set()
@@ -141,7 +141,7 @@ class DVNode (object):
 				
 		
 	def _o_resetRefreshCell(self):
-		self.refreshCell.function = self._o_refreshNode
+		self.refreshCell.setFunction( self._o_refreshNode )
 
 
 	def refresh(self):
@@ -218,7 +218,7 @@ class DVNode (object):
 	def _f_setContentsFactory(self, contentsFactory):
 		if contentsFactory is not self._contentsFactory:
 			self._contentsFactory = contentsFactory
-			self._contentsCell.function = self._p_computeContents
+			self._contentsCell.setFunction( self._p_computeContents )
 			
 			
 			

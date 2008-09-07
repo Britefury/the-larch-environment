@@ -52,7 +52,7 @@ class DocModelLayer (object):
 
 
 			destCell = RefCell()
-			destCell.function = _cellFunc
+			destCell.setFunction( _cellFunc )
 
 			self._srcListToDestCell[srcList] = destCell
 

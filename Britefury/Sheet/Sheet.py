@@ -391,7 +391,7 @@ class SheetRefField (FieldBaseWithXml):
 					return getattr( sheet.cells, self._targetField._name )
 
 			targetCellRefCell = CellRefCell()
-			targetCellRefCell.function = refCellFunction
+			targetCellRefCell.setFunction( refCellFunction )
 			targetCellRefCell.owner = instance
 			setattr( instance, self._targetCellRefCellAttrName, targetCellRefCell )
 
@@ -761,7 +761,7 @@ class FunctionField (FieldBase):
 		cell = Cell()
 		def _f():
 			return self._function( instance )
-		cell.function = _f
+		cell.setFunction( _f )
 		setattr( instance, self._cellAttrName, cell )
 		instance._f_attachCellToScope( self._name, cell )
 		cell.owner = instance
@@ -833,7 +833,7 @@ class FunctionRefField (FieldBase):
 		cell = RefCell()
 		def _f():
 			return self._function( instance )
-		cell.function = _f
+		cell.setFunction( _f )
 		setattr( instance, self._cellAttrName, cell )
 		instance._f_attachCellToScope( self._name, cell )
 		cell.owner = instance
@@ -1225,7 +1225,6 @@ class SheetRefCell (RefCell):
 			return False
 
 
-	value = property( getValue )
 
 
 
@@ -1364,15 +1363,6 @@ class CompositeCell (CellInterface):
 
 
 
-	bValid = property( isValid, None )
-
-	evaluator = property( getEvaluator, setEvaluator )
-	literalValue = property( getLiteralValue, setLiteralValue )
-	bLiteral = property( isLiteral )
-
-	value = property( getValue )
-	immutableValue = property( getImmutableValue )
-
 
 
 
@@ -1427,9 +1417,9 @@ if __name__ == '__main__':
 
 		def testCells(self):
 			s = SheetA()
-			self.assert_( s.cells.a.value == 0 )
-			self.assert_( s.cells.b.value == 3.14 )
-			self.assert_( s.cells.c.value == False )
+			self.assert_( s.cells.a.getValue() == 0 )
+			self.assert_( s.cells.b.getValue() == 3.14 )
+			self.assert_( s.cells.c.getValue() == False )
 
 
 		def testSet(self):
@@ -1450,7 +1440,7 @@ if __name__ == '__main__':
 				return b.sa * 4
 
 			cellX = Cell()
-			cellX.function = f
+			cellX.setFunction( f )
 
 			a2.a = 3
 
@@ -1458,12 +1448,12 @@ if __name__ == '__main__':
 			b.s = a1
 
 			self.assert_( b.sa == 0 )
-			self.assert_( cellX.value == 0 )
+			self.assert_( cellX.getValue() == 0 )
 
 			b.s = a2
 
 			self.assert_( b.sa == 3 )
-			self.assert_( cellX.value == 12 )
+			self.assert_( cellX.getValue() == 12 )
 
 
 		def testInheritedRef(self):
@@ -1474,7 +1464,7 @@ if __name__ == '__main__':
 				return b.sa * 4
 
 			cellX = Cell()
-			cellX.function = f
+			cellX.setFunction( f )
 
 			a2.a = 3
 			a2.d = 23
@@ -1484,13 +1474,13 @@ if __name__ == '__main__':
 
 			self.assert_( b.sd == 10 )
 			self.assert_( b.sa == 0 )
-			self.assert_( cellX.value == 0 )
+			self.assert_( cellX.getValue() == 0 )
 
 			b.s = a2
 
 			self.assert_( b.sd == 23 )
 			self.assert_( b.sa == 3 )
-			self.assert_( cellX.value == 12 )
+			self.assert_( cellX.getValue() == 12 )
 
 
 		def testXml(self):
