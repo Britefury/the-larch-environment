@@ -174,8 +174,12 @@ class ParsedLineContentListener (ElementContentListener):
 				parsedLines[-1][-1].extend( originalContents )
 			else:
 				parsedLines.extend( originalContents )
-
-		replaceWithRange( self._ctx, self._node, parsedLines )
+				
+		if len( parsedLines ) == 1  and  parsedLines[0] == self._node:
+			# Same data; ignore
+			pass
+		else:
+			replaceWithRange( self._ctx, self._node, parsedLines )
 
 
 

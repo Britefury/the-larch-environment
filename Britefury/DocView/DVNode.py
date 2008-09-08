@@ -17,6 +17,8 @@ from BritefuryJ.Cell import Cell
 
 from Britefury.Util.SignalSlot import ClassSignal
 
+from Britefury.GLisp.GLispUtil import isGLispList
+
 from Britefury.Kernel import KMeta
 
 from Britefury.gSym.View.UnparsedText import UnparsedText
@@ -56,8 +58,6 @@ class DVNode (object):
 			
 		
 
-		
-		
 	def _changeTreeNode(self, treeNode):
 		assert treeNode.node is self.docNode, 'DVNode._changeTreeNode(): doc-node must remain the same'
 		self.treeNode = treeNode
@@ -88,6 +88,8 @@ class DVNode (object):
 
 		# Set the caret node to self
 		if position is not None  and  bias is not None  and  self._elementContent is not None:
+			if isGLispList( self.docNode ):
+				print 'Node: %s, position=%d'  %  ( self.docNode[0], position )
 			self._view._caretNode = self
 
 		contents = self._contentsCell.getValue()
@@ -125,16 +127,18 @@ class DVNode (object):
 						raise ValueError, 'unreckognised tag'
 				elementTree = self._elementContent.getElementTree()
 				caret = elementTree.getCaret()
+				
+				newPosition = max( 0, newPosition )
+				if newPosition >= self._elementContent.getContentLength():
+					newPosition = self._elementContent.getContentLength() - 1
+					bias = Marker.Bias.END
+				
 				leaf = self._elementContent.getLeafAtContentPosition( newPosition )
 				if leaf is not None:
 					leafOffset = leaf.getContentOffsetInSubtree( self._elementContent )
 					leafPosition = newPosition - leafOffset
 					print 'Node "%s"; content was "%s" now "%s"'  %  ( self.docNode[0], startContent, self._elementContent.getContent() )
 					print 'Position was %d, now is %d; leaf (%s) offset is %d, moving to %d in leaf'  %  ( position, newPosition, leaf.getContent(), leafOffset, leafPosition )
-					leafPosition = max( 0, leafPosition )
-					if leafPosition >= leaf.getContentLength():
-						leafPosition = leaf.getContentLength() - 1
-						bias = Marker.Bias.END
 					leaf.moveMarker( caret.getMarker(), leafPosition, bias )
 
 				
