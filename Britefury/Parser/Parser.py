@@ -21,6 +21,7 @@ import re
 from Britefury.Parser.ParserState import ParserState
 #from Britefury.Parser.ParserState2 import ParserState2 as ParserState
 #from Britefury.Parser.ParserState3 import ParserState2 as ParserState
+#from Britefury.Parser.ParserState4 import ParserState2 as ParserState
 
 
 def parserCoerce(x):
@@ -204,6 +205,9 @@ edge [
 
 	def __or__(self, x):
 		return Choice( [ self, x ] )
+
+	def __xor__(self, x):
+		return BestChoice( [ self, x ] )
 
 	def __pow__(self, name):
 		return Bind( name, self )
@@ -911,13 +915,66 @@ class Choice (ParserExpression):
 
 		return None, maxErrorPos
 
-
 	def getChildren(self):
 		return self._subexps
 
 
 	def __or__(self, x):
 		f = Choice( self._subexps  +  [ x ] )
+		f._o_copySettingsFrom( self )
+		return f
+
+
+	def _o_compare(self, x):
+		return self._subexps  ==  x._subexps
+
+	def __repr__(self):
+		return '( ' + ' | '.join( [ str( s )  for s in self._subexps ] ) + ' )'
+
+
+
+
+class BestChoice (ParserExpression):
+	"""
+	BestChoice
+
+	Matches the best of a list of sub-expressions
+	
+	The sub-expression that consumes the most characters is the one that is used.
+
+	The parse result is the parse result of the successfully match sub-expression.
+	"""
+	def __init__(self, subexps):
+		"""
+		subexps - the sub expressions, one of which is to be matched
+		"""
+		super( BestChoice, self ).__init__()
+		self._subexps = [ parserCoerce( x )   for x in subexps ]
+
+
+	def evaluate(self, state, input, start, stop):
+		bestResult = None
+		bestPos = -1
+		maxErrorPos = start
+		for i, subexp in enumerate( self._subexps ):
+			res, pos = subexp.evaluate( state, input, start, stop )
+			if res is not None  and  pos > bestPos:
+				bestResult = res
+				bestPos = pos
+			else:
+				maxErrorPos = max( maxErrorPos, pos )
+
+		if bestResult is not None:
+			return bestResult, bestPos
+		else:
+			return None, maxErrorPos
+
+	def getChildren(self):
+		return self._subexps
+
+
+	def __xor__(self, x):
+		f = BestChoice( self._subexps  +  [ x ] )
 		f._o_copySettingsFrom( self )
 		return f
 
@@ -1406,6 +1463,25 @@ class TestCase_Parser (ParserTestCase):
 		self._matchFailTest( parser, 'xy' )
 		self._matchSubTest( Literal( 'ab' )  |  Literal( 'abcd' ),   'ab', 'ab', 0, 2 )
 		self._matchSubTest( Literal( 'ab' )  |  Literal( 'abcd' ),   'abcd', 'ab', 0, 2 )
+		self._bindingsTest( parser, 'ab', { 'x':'ab' } )
+		self._bindingsTest( parser, 'qw', { 'x':'qw' } )
+		self._bindingsTest( parser, 'fh', { 'x':'fh' } )
+
+
+	def testBestChoice(self):
+		self.assert_( BestChoice( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )   ==   BestChoice( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] ) )
+		self.assert_( BestChoice( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )   !=   BestChoice( [ Literal( 'ab' ), Literal( 'qw' ) ] ) )
+		self.assert_( BestChoice( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )   !=   BestChoice( [ Literal( 'qb' ), Literal( 'qw' ), Literal( 'fh' ) ] ) )
+		self.assert_( BestChoice( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )   ==   Literal( 'ab' )  ^  Literal( 'qw' )  ^  Literal( 'fh' ) )
+		self.assert_( BestChoice( [ Literal( 'ab' ), Literal( 'qw' ), Literal( 'fh' ) ] )   ==   Literal( 'ab' )  ^  'qw'  ^  'fh' )
+
+		parser = BestChoice( [ Literal( 'ab' ) ** 'x', Literal( 'qw' ) ** 'x', Literal( 'fh' ) ** 'x' ] )
+		self._matchSubTest( parser, 'ab', 'ab', 0, 2 )
+		self._matchSubTest( parser, 'qw', 'qw', 0, 2 )
+		self._matchSubTest( parser, 'fh', 'fh', 0, 2 )
+		self._matchFailTest( parser, 'xy' )
+		self._matchSubTest( Literal( 'ab' )  ^  Literal( 'abcd' ),   'ab', 'ab', 0, 2 )
+		self._matchSubTest( Literal( 'ab' )  ^  Literal( 'abcd' ),   'abcd', 'abcd', 0, 4 )
 		self._bindingsTest( parser, 'ab', { 'x':'ab' } )
 		self._bindingsTest( parser, 'qw', { 'x':'qw' } )
 		self._bindingsTest( parser, 'fh', { 'x':'fh' } )

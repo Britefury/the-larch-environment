@@ -80,6 +80,13 @@ class _LeftRecursiveApplication (object):
 	
 	
 	
+		
+		
+		
+		
+		
+	
+	
 class ParserState2 (object):
 	def __init__(self, ignoreChars=string.whitespace):
 		super( ParserState2, self ).__init__()
@@ -111,6 +118,9 @@ class ParserState2 (object):
 			memoEntry = _MemoEntry( rule, None, start )
 			self.memo[(rule,start)] = memoEntry
 			
+			
+			memos = self.memo.copy()
+			
 			# Create a rule invocation record, and push onto the rule invocation stack
 			self.ruleInvocationStack = _RuleInvocation( rule, memoEntry, self.ruleInvocationStack )
 			memoEntry.bEvaluating = True
@@ -118,12 +128,14 @@ class ParserState2 (object):
 			
 			if memoEntry.bLeftRecursionDetected:
 				answer, pos = self.__growLeftRecursiveParse( rule, input, start, stop, memoEntry, answer, pos )
+				self.memo.clear()
+				self.memo.update( memos )
 
 			# Pop the rule invocation off the rule invocation stack
 			self.ruleInvocationStack = self.ruleInvocationStack.outerInvocation
 			memoEntry.bEvaluating = False
 			memoEntry.answer, memoEntry.pos = answer, pos
-
+			
 			log  <<   'match %s @ %d  ->  %s : %d'  %  ( rule.debugName, start, ansstr( answer ), pos )
 			return answer, pos
 		else:
@@ -259,7 +271,7 @@ class ParserState2 (object):
 		return answer, pos
 		
 		
-if True:
+if False:
 	from Britefury.Parser.Parser import *
 	from Britefury.Parser import Parser
 	Parser.ParserState = ParserState2
@@ -339,7 +351,6 @@ if True:
 			self._matchTest( methodInvocation, 'this.x.y.m()', [ [ [ 'this', '.', 'x' ], '.', 'y' ], '.', 'm', '()' ] )
 			self._matchTest( methodInvocation, 'this[i].m()', [ [ 'this', '[', 'i', ']' ], '.', 'm', '()' ] )
 			self._matchTest( methodInvocation, 'this[i][j].m()', [ [ [ 'this', '[', 'i', ']' ], '[', 'j', ']' ], '.', 'm', '()' ] )
-			self._matchTest( fieldAccessOrArrayAccess, 'this[i]', [ 'this', '[', 'i', ']' ] )
 			self._matchTest( arrayAccess, 'this[i]', [ 'this', '[', 'i', ']' ] )
 			self._matchTest( arrayAccess, 'this[i][j]', [ [ 'this', '[', 'i', ']' ], '[', 'j', ']' ] )
 			self._matchTest( arrayAccess, 'this.x[i]', [ [ 'this', '.', 'x' ], '[', 'i', ']' ] )
@@ -348,8 +359,11 @@ if True:
 			self._matchTest( arrayAccess, 'this.m().n()[i]', [ [ [ 'this', '.', 'm', '()' ], '.', 'n', '()' ], '[', 'i', ']' ] )
 			self._matchTest( fieldAccess, 'this.x', [ 'this', '.', 'x' ] )
 			self._matchTest( fieldAccess, 'this.x.y', [ [ 'this', '.', 'x' ], '.', 'y' ] )
-			self._matchTest( fieldAccess, 'this[i].y', [ [ 'x', '[', 'i', ']' ], '.', 'y' ] )
-			self._matchTest( fieldAccess, 'this[i][j].y', [ [ [ 'x', '[', 'i', ']' ], '[', 'j', ']' ], '.', 'y' ] )
+			self._matchTest( fieldAccess, 'this[i].y', [ [ 'this', '[', 'i', ']' ], '.', 'y' ] )
+			self._matchTest( fieldAccess, 'this[i][j].y', [ [ [ 'this', '[', 'i', ']' ], '[', 'j', ']' ], '.', 'y' ] )
+			self._matchTest( fieldAccessOrArrayAccess, 'this[i]', [ 'this', '[', 'i', ']' ] )
+			self._matchTest( fieldAccessOrArrayAccess, 'this[i].x', [ [ 'this', '[', 'i', ']' ], '.', 'x' ] )
+			self._matchTest( fieldAccessOrArrayAccess, 'this.x[i]', [ [ 'this', '.', 'x' ], '[', 'i', ']' ] )
 
 		
 	if __name__ == '__main__':
@@ -414,7 +428,7 @@ if True:
 			fieldAccessOrArrayAccess = Production( fieldAccess | arrayAccess )
 			
 			parser = fieldAccessOrArrayAccess
-			testString = 'this[i]'
+			testString = 'this.x[i]'
 			
 		if bDot:
 			ans, pos, dot =  parser.debugParseString( testString )
