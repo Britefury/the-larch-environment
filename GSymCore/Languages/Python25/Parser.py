@@ -88,7 +88,6 @@ expression = Forward()
 oldExpression = Forward()
 attributeRef = Forward()
 subscript = Forward()
-#assignablePrimary = Forward()
 orTest = Forward()
 tupleOrExpression = Forward()
 oldTupleOrExpression = Forward()
@@ -103,8 +102,7 @@ targetList = ( tupleTarget  |  targetItem ).debug( 'targetList' )
 
 parenTarget = Production( Literal( '(' )  +  targetList  +  Literal( ')' ) ).action( lambda input, pos, xs: xs[1] ).debug( 'parenTarget' )
 listTarget = Production( delimitedSeparatedList( targetItem, '[', ']', bAllowTrailingSeparator=True ) ).action( lambda input, pos, xs: [ 'listTarget' ]  +  xs ).debug( 'listTarget' )
-#targetItem  <<  ( assignablePrimary  |  parenTarget  |  listTarget  |  singleTarget )
-#targetItem  <<  ( attributeRef  |  subscript  |  parenTarget  |  listTarget  |  singleTarget )
+#targetItem  <<  ( ( attributeRef  ^  subscript )  |  parenTarget  |  listTarget  |  singleTarget )
 targetItem  <<  ( parenTarget  |  listTarget  |  singleTarget )
 
 
@@ -175,7 +173,6 @@ primary = Forward()
 
 # Attribute ref
 attributeRef  <<  Production( primary + '.' + attrName ).action( lambda input, pos, xs: [ 'attributeRef', xs[0], xs[2] ] ).debug( 'attributeRef' )
-#assignAttr = Production( primary + '.' + attrName ).action( lambda input, pos, xs: [ 'assignAttr', xs[0], xs[2] ] ).debug( 'assignAttr' )
 
 
 
@@ -188,7 +185,6 @@ subscriptItem = subscriptLongSlice | subscriptSlice | subscriptEllipsis | expres
 subscriptTuple = Production( separatedList( subscriptItem, bNeedAtLeastOne=True, bAllowTrailingSeparator=True, bRequireTrailingSeparatorForLengthOne=True ) ).action( lambda input, pos, xs: [ 'subscriptTuple' ]  +  xs ).debug( 'subscriptTuple' )
 subscriptIndex = subscriptTuple  |  subscriptItem
 subscript  <<  Production( ( primary + '[' + subscriptIndex + ']' ).action( lambda input, pos, xs: [ 'subscript', xs[0], xs[2] ] ) ).debug( 'subscript' )
-#assignSubscript = Production( ( primary + '[' + subscriptIndex + ']' ).action( lambda input, pos, xs: [ 'assignSubscript', xs[0], xs[2] ] ) ).debug( 'assignSubscript' )
 
 
 
@@ -234,8 +230,6 @@ call = Production( ( primary + Literal( '(' ) + callArgs + Literal( ')' ) ).acti
 
 
 # Primary
-#assignablePrimary  <<  Production( subscript | attributeRef ).debug( 'assignablePrimary' )
-#primary  <<  Production( call | assignablePrimary | atom ).debug( 'primary' )
 primary  <<  Production( call | attributeRef | subscript | atom ).debug( 'primary' )
 
 
@@ -571,9 +565,9 @@ class TestCase_Python25Parser (ParserTestCase):
 		self._matchTest( targetList, '[a],[b,]', [ 'tupleTarget', [ 'listTarget', [ 'singleTarget', 'a' ] ], [ 'listTarget', [ 'singleTarget', 'b' ] ] ] )
 		self._matchTest( targetList, '[(a,)],[(b,)]', [ 'tupleTarget', [ 'listTarget', [ 'tupleTarget', [ 'singleTarget', 'a' ] ] ], [ 'listTarget', [ 'tupleTarget', [ 'singleTarget', 'b' ] ] ] ] )
 
-		#self._matchTest( subscript, 'a[x]', [ 'subscript', [ 'var', 'a' ], [ 'var', 'x' ] ] )
-		#self._matchTest( attributeRef | subscript, 'a[x]', [ 'subscript', [ 'var', 'a' ], [ 'var', 'x' ] ] )
-		#self._matchTest( targetItem, 'a[x]', [ 'subscript', [ 'var', 'a' ], [ 'var', 'x' ] ] )
+		self._matchTest( subscript, 'a[x]', [ 'subscript', [ 'var', 'a' ], [ 'var', 'x' ] ] )
+		self._matchTest( attributeRef | subscript, 'a[x]', [ 'subscript', [ 'var', 'a' ], [ 'var', 'x' ] ] )
+		self._matchTest( targetItem, 'a[x]', [ 'subscript', [ 'var', 'a' ], [ 'var', 'x' ] ] )
 		self._matchTest( targetList, 'a[x]', [ 'subscript', [ 'var', 'a' ], [ 'var', 'x' ] ] )
 		self._matchTest( targetList, 'a[x][y]', [ 'subscript', [ 'subscript', [ 'var', 'a' ], [ 'var', 'x' ] ], [ 'var', 'y' ] ] )
 		self._matchTest( targetList, 'a.b', [ 'attributeRef', [ 'var', 'a' ], 'b' ] )
