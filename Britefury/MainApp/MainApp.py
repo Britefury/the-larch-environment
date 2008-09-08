@@ -523,6 +523,7 @@ class MainApp (object):
 					if f is not None:
 						try:
 							documentRoot = readSX( f )
+							documentRoot = DMList( documentRoot )
 							self.setDocument( documentRoot )
 						except IOError:
 							pass

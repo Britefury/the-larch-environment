@@ -22,7 +22,7 @@ def initPlugins(pluginInterface):
 	content = readSX( f )
 
 
-	if isinstance( content, DMListInterface ):
+	if isinstance( content, list ):
 		if content[0] == '$gSymPluginRegistry':
 			for moduleName in content[1:]:
 				mod = __import__( moduleName )
