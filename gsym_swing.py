@@ -17,6 +17,7 @@ i18n.initialise()
 
 
 from Britefury.DocModel.DMIO import readSX
+from Britefury.DocModel.DMList import DMList
 
 from Britefury.gSym.gSymEnvironment import initGSymEnvironment, shutdownGSymEnvironment
 
@@ -32,6 +33,7 @@ def main():
 		filename = sys.argv[1]
 		try:
 			documentRoot = readSX( file( filename, 'r' ) )
+			documentRoot = DMList( documentRoot )
 			bEvaluate = True
 		except IOError:
 			pass

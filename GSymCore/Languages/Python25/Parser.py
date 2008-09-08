@@ -929,6 +929,12 @@ class TestCase_Python25Parser (ParserTestCase):
 		
 		
 		
+	def testDictInList(self):
+		self._matchTest( statement, 'y = [ x, { a : b } ]', [ 'assignmentStmt', [ [ 'singleTarget', 'y' ] ], [ 'listLiteral', [ 'var', 'x' ], [ 'dictLiteral', [ 'keyValuePair', [ 'var', 'a' ], [ 'var', 'b' ] ] ] ] ] )
+		
+		
+		
+		
 
 if __name__ == '__main__':
 	#result, pos, dot = targetList.debugParseString( 'a.b' )

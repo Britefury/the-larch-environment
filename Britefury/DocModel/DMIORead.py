@@ -8,8 +8,6 @@
 import string
 import re
 
-from Britefury.DocModel import DMList
-
 
 """
 gSym document model IO
@@ -49,7 +47,7 @@ def readSX(source):
 	while pos < len( source ):
 		if source[pos] == '(':
 			# Open paren; start new list
-			xs = DMList.DMList()
+			xs = []
 			# Append the new list to the list that is on the top of the stack; this builds the structure
 			if len( stack ) > 0:
 				stack[-1].append( xs )
