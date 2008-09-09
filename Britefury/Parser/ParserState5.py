@@ -116,7 +116,11 @@ class ParserState2 (object):
 		if memoEntry is None:
 			# Create the memo-entry, and memoise
 			memoEntry = _MemoEntry( rule, None, start )
-			self.memo[(rule,start)] = memoEntry
+			posMemo = self.memo.setdefault( start, {} )
+			posMemo[rule] = memoEntry
+			
+			
+			posMemoCopy = posMemo.copy()
 			
 			# Create a rule invocation record, and push onto the rule invocation stack
 			self.ruleInvocationStack = _RuleInvocation( rule, memoEntry, self.ruleInvocationStack )
@@ -125,6 +129,8 @@ class ParserState2 (object):
 			
 			if memoEntry.bLeftRecursionDetected:
 				answer, pos = self.__growLeftRecursiveParse( rule, input, start, stop, memoEntry, answer, pos )
+				posMemo.clear()
+				posMemo.update( posMemoCopy )
 
 			# Pop the rule invocation off the rule invocation stack
 			self.ruleInvocationStack = self.ruleInvocationStack.outerInvocation
@@ -146,7 +152,11 @@ class ParserState2 (object):
 
 		
 	def __recall(self, rule, input, start, stop):
-		memoEntry = self.memo.get( (rule,start) )
+		posMemo = self.memo.get( start )
+		if posMemo is not None:
+			memoEntry = posMemo.get( rule )
+		else:
+			memoEntry = None
 		log >>  '__recall %s @ %d'  %  ( rule.debugName, start )
 		
 #		if memoEntry is not None  and  memoEntry.lrApplication is not None  and  memoEntry is not memoEntry.lrApplication.memoEntry:
@@ -327,7 +337,7 @@ if False:
 			
 			primary  <<  Production( primaryNoNewArray ).debug( 'primary' )
 			
-			fieldAccessOrArrayAccess = Production( fieldAccess | arrayAccess )
+			fieldAccessOrArrayAccess = Production( fieldAccess ^ arrayAccess )
 			
 					
 			self._matchTest( primary, 'this', 'this' )

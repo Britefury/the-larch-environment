@@ -18,10 +18,11 @@ import operator
 from copy import copy
 import re
 
-from Britefury.Parser.ParserState import ParserState
+#from Britefury.Parser.ParserState import ParserState
 #from Britefury.Parser.ParserState2 import ParserState2 as ParserState
 #from Britefury.Parser.ParserState3 import ParserState2 as ParserState
 #from Britefury.Parser.ParserState4 import ParserState2 as ParserState
+from Britefury.Parser.ParserState5 import ParserState2 as ParserState
 
 
 def parserCoerce(x):
