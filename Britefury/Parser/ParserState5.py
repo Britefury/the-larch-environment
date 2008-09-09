@@ -9,46 +9,6 @@ import string
 from copy import copy
 
 
-def ansstr(x):
-	if x is None:
-		return '<FAIL>'
-	else:
-		return x.result
-	
-	
-bDebugStmts = False
-bDot = True
-
-
-class Logger (object):
-	def __init__(self):
-		self.level = 0
-		
-		
-	def _ind(self):
-		return '\t' * self.level
-		
-	
-		
-	def __rshift__(self, message):
-		if bDebugStmts:
-			print self._ind() + '>' + message
-		self.level += 1
-
-	def __lshift__(self, message):
-		self.level -= 1
-		if bDebugStmts:
-			print self._ind() + '<' + message
-		
-	def __le__(self, message):
-		if bDebugStmts:
-			print self._ind() + '' + message
-		
-log = Logger()
-
-
-		
-		
 class _MemoEntry (object):
 	__slots__ = [ 'rule', 'answer', 'pos', 'bEvaluating', 'bLeftRecursionDetected', 'lrApplications', 'growingLRParseCount' ]
 	
@@ -64,6 +24,8 @@ class _MemoEntry (object):
 		
 		
 class _RuleInvocation (object):
+	__slots__ = [ 'rule', 'memoEntry', 'outerInvocation' ]
+	
 	def __init__(self, rule, memoEntry, outerInvocation):
 		self.rule = rule
 		self.memoEntry = memoEntry
@@ -71,6 +33,8 @@ class _RuleInvocation (object):
 		
 		
 class _LeftRecursiveApplication (object):
+	__slots__ = [ 'memoEntry', 'rule', 'involvedSet', 'evalSet' ]
+	
 	def __init__(self, memoEntry, rule):
 		self.memoEntry = memoEntry
 		self.rule = rule
@@ -110,7 +74,6 @@ class ParserState2 (object):
 	# To be honest, I don't really understand how they work. I transcribed their pseudo-code into Python, and it just worked.
 	# Test grammars in the unit tests seem to work okay, so its fine by me! :D
 	def memoisedMatch(self, rule, input, start, stop):
-		log >>  'match %s @ %d'  %  ( rule.debugName, start )
 		memoEntry = self.__recall( rule, input, start, stop )
 		
 		if memoEntry is None:
@@ -137,7 +100,6 @@ class ParserState2 (object):
 			memoEntry.bEvaluating = False
 			memoEntry.answer, memoEntry.pos = answer, pos
 			
-			log  <<   'match %s @ %d  ->  %s : %d'  %  ( rule.debugName, start, ansstr( answer ), pos )
 			return answer, pos
 		else:
 			if memoEntry.bEvaluating:
@@ -147,7 +109,6 @@ class ParserState2 (object):
 					self.__onLeftRecursionInnerReapplication( rule, input, start, stop, memoEntry )
 				else:
 					self.__onLeftRecursionDetected( rule, input, start, stop, memoEntry )
-			log  <<  'match %s @ %d  (memo)  ->  %s : %d'  %  ( rule.debugName, start, ansstr( memoEntry.answer ), memoEntry.pos )
 			return memoEntry.answer, memoEntry.pos
 
 		
@@ -157,11 +118,8 @@ class ParserState2 (object):
 			memoEntry = posMemo.get( rule )
 		else:
 			memoEntry = None
-		log >>  '__recall %s @ %d'  %  ( rule.debugName, start )
 		
-#		if memoEntry is not None  and  memoEntry.lrApplication is not None  and  memoEntry is not memoEntry.lrApplication.memoEntry:
 		if memoEntry is not None  and  len( memoEntry.lrApplications ) > 0:
-			log <=  '__recall %s @ %d; innerLR, lr-application for %s'  %  ( rule.debugName, start, [ app.rule.debugName   for app in memoEntry.lrApplications.values() ] )
 			# This rule application is involved in a left-recursive application of a rule
 			bInEvalSet = False
 			for lrApplication in memoEntry.lrApplications.values():
@@ -179,21 +137,12 @@ class ParserState2 (object):
 				# Pop the rule invocation off the rule invocation stack
 				self.ruleInvocationStack = self.ruleInvocationStack.outerInvocation
 				memoEntry.bEvaluating = False
-			else:
-				log <=  ( '__recall %s @ %d; rule; not in eval set'  %  ( rule.debugName, start ) )
-		else:
-			if memoEntry is None:
-				log <=  ( '__recall %s @ %d; rule; no entry'  %  ( rule.debugName, start ) )
-			elif len( memoEntry.lrApplications ) == 0:
-				log <=  ( '__recall %s @ %d; rule; no lr-application'  %  ( rule.debugName, start ) )
 			
 
-		log <<  '__recall %s @ %d'  %  ( rule.debugName, start )
 		return memoEntry
 	
 	
 	def __onLeftRecursionDetected(self, rule, input, start, stop, memoEntry):
-		log >>  '__onLeftRecursionDetected %s @ %d'  %  ( rule.debugName, start )
 		# Left recursion has been detected
 		memoEntry.bLeftRecursionDetected = True
 		
@@ -215,14 +164,11 @@ class ParserState2 (object):
 			invocation = invocation.outerInvocation
 			
 		involved = [ m.rule.debugName   for m in lrApplication.involvedSet ]
-		log <<  '__onLeftRecursionDetected %s @ %d  ::  involved=%s'  %  ( rule.debugName, start, involved )
 			
 		
 	
 	def __onLeftRecursionInnerReapplication(self, rule, input, start, stop, memoEntry):
-		log >>  '__onLeftRecursionInnerReapplication %s @ %d'  %  ( rule.debugName, start )
 		lrApplication = memoEntry.lrApplications[rule]
-		#lrApplication.involvedSet = set()
 
 		# No rule invocation record has been created for this invocation yet, so the current top of
 		# the stack points to the outer invocation
@@ -234,19 +180,16 @@ class ParserState2 (object):
 			invocation = invocation.outerInvocation
 			
 		involved = [ m.rule.debugName   for m in lrApplication.involvedSet ]
-		log <<  '__onLeftRecursionInnerReapplication %s @ %d  ::  involved=%s'  %  ( rule.debugName, start, involved )
 			
 		
 	
 		
 	def __growLeftRecursiveParse(self, rule, input, start, stop, memoEntry, answer, pos):
-		log <= '__growLeftRecursiveParse begin %s @ %d' % ( rule.debugName, start )
 		memoEntry.growingLRParseCount += 1
 		lrApplication = memoEntry.lrApplications[rule]
 		
 		while True:
 			involved = [ m.rule.debugName   for m in lrApplication.involvedSet ]
-			log <= '__growLeftRecursiveParse %s @ %d iter: involved= %s'  %  ( rule.debugName, start, involved )
 			# Put the answer and position into the memo entry for the next attempt
 			memoEntry.answer, memoEntry.pos = answer, pos
 			# Prepare the evaluation set
@@ -255,10 +198,6 @@ class ParserState2 (object):
 			newAnswer, newPos = rule.evaluate( self, input, start, stop )
 			# Fail or no additional characters consumed?
 			if newAnswer is None   or   newPos <= pos:
-				if newAnswer is None:
-					log <= '__growLeftRecursiveParse terminating due to fail %s @ %d' % ( rule.debugName, start )
-				if newPos <= pos:
-					log <= '__growLeftRecursiveParse terminating due to no additional consumption %s @ %d' % ( rule.debugName, start )
 				# Further applications will not improve matters
 				break
 			# This application of @rule improved matters; take the answer and position to use for the next iteration
@@ -268,11 +207,7 @@ class ParserState2 (object):
 		# Clear any fields associated with LR
 		memoEntry.growingLRParseCount -= 1
 		memoEntry.bLeftRecursionDetected = False
-		#for m in lrApplication.involvedSet:
-		#	del m.lrApplications[rule]
 		
-		log <= '__growLeftRecursiveParse end %s @ %d' % ( rule.debugName, start )
-
 		return answer, pos
 		
 		
