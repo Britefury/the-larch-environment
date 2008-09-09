@@ -23,7 +23,7 @@ def isLicenseLine(line):
 	return line.startswith( '//##*' )  or  line.startswith( '##-*' )
 
 
-cppLicense = open( 'cpplicenseheader' ).readlines()
+javaLicense = open( 'javalicenseheader' ).readlines()
 pyLicense = open( 'pylicenseheader' ).readlines()
 
 
@@ -32,17 +32,17 @@ pyLicense = open( 'pylicenseheader' ).readlines()
 
 
 for filename in sys.argv[1:]:
-	bIsCpp = cmpExt( filename, '.cpp' )  or  cmpExt( filename, '.h' )
+	bIsJava = cmpExt( filename, '.java' )
 	bIsPy = cmpExt( filename, '.py' )
 
-	if bIsCpp  or  bIsPy:
+	if bIsJava  or  bIsPy:
 		if not isExtLib( filename ):
 			print 'Updating %s...' % filename
 			f = open( filename, 'r' )
 
 			strippedLines = [ line   for line in f   if not isLicenseLine( line ) ]
-			if bIsCpp:
-				newLines = cppLicense + strippedLines
+			if bIsJava:
+				newLines = javaLicense + strippedLines
 			elif bIsPy:
 				newLines = pyLicense + strippedLines
 			else:

@@ -47,4 +47,6 @@ Revision 388 - PROTOTYPE 3
 	Running python gsym.py runs prototype 3, using the Cairo based document presentation system.
 	A web-based version of gSym has been started here.
 	
+Revision 480 - PROTOTYPE 5 - last revision with original LR-packrat-parser implementation; all subsequent versions use reformulated algorithm.
+	
 	
