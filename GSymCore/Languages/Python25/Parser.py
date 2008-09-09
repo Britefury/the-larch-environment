@@ -102,8 +102,8 @@ targetList = ( tupleTarget  |  targetItem ).debug( 'targetList' )
 
 parenTarget = Production( Literal( '(' )  +  targetList  +  Literal( ')' ) ).action( lambda input, pos, xs: xs[1] ).debug( 'parenTarget' )
 listTarget = Production( delimitedSeparatedList( targetItem, '[', ']', bAllowTrailingSeparator=True ) ).action( lambda input, pos, xs: [ 'listTarget' ]  +  xs ).debug( 'listTarget' )
-#targetItem  <<  ( ( attributeRef  ^  subscript )  |  parenTarget  |  listTarget  |  singleTarget )
-targetItem  <<  ( parenTarget  |  listTarget  |  singleTarget )
+targetItem  <<  ( ( attributeRef  ^  subscript )  |  parenTarget  |  listTarget  |  singleTarget )
+#targetItem  <<  ( parenTarget  |  listTarget  |  singleTarget )
 
 
 
