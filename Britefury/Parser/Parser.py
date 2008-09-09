@@ -1634,7 +1634,7 @@ class TestCase_Parser (ParserTestCase):
 
 
 
-	def testLeftRecursionJavaPrimary(self):
+	def testLeftRecursionSimplifiedJavaPrimary(self):
 		primary = Forward()
 
 
@@ -1657,30 +1657,43 @@ class TestCase_Parser (ParserTestCase):
 		primaryNoNewArray = Production( classInstanceCreationExpression | methodInvocation | fieldAccess | arrayAccess | 'this' ).debug( 'primaryNoNewArray' )
 
 		primary  <<  Production( primaryNoNewArray ).debug( 'primary' )
-
+		
+		fieldAccessOrArrayAccess = Production( fieldAccess ^ arrayAccess )
+			
 
 		self._matchTest( primary, 'this', 'this' )
 		self._matchTest( primary, 'this.x', [ 'this', '.', 'x' ] )
 		self._matchTest( primary, 'this.x[i]', [ [ 'this', '.', 'x' ], '[', 'i', ']' ] )
 		self._matchTest( primary, 'this.x.y', [ [ 'this', '.', 'x' ], '.', 'y' ] )
 		self._matchTest( primary, 'this.x.m()', [ [ 'this', '.', 'x' ], '.', 'm', '()' ] )
+		self._matchTest( primary, 'this.x.m().n()', [ [ [ 'this', '.', 'x' ], '.', 'm', '()' ], '.', 'n', '()' ] )
 		self._matchTest( primary, 'x[i][j].y', [ [ [ 'x', '[', 'i', ']' ], '[', 'j', ']' ], '.', 'y' ] )
-
 
 		self._matchTest( primary, 'this', 'this' )
 		self._matchTest( methodInvocation, 'this.m()', [ 'this', '.', 'm', '()' ] )
 		self._matchTest( methodInvocation, 'this.m().n()', [ [ 'this', '.', 'm', '()' ], '.', 'n', '()' ] )
+		self._matchTest( methodInvocation, 'this.x.m()', [ [ 'this', '.', 'x' ], '.', 'm', '()' ] )
+		self._matchTest( methodInvocation, 'this.x.y.m()', [ [ [ 'this', '.', 'x' ], '.', 'y' ], '.', 'm', '()' ] )
+		self._matchTest( methodInvocation, 'this[i].m()', [ [ 'this', '[', 'i', ']' ], '.', 'm', '()' ] )
+		self._matchTest( methodInvocation, 'this[i][j].m()', [ [ [ 'this', '[', 'i', ']' ], '[', 'j', ']' ], '.', 'm', '()' ] )
 		self._matchTest( arrayAccess, 'this[i]', [ 'this', '[', 'i', ']' ] )
 		self._matchTest( arrayAccess, 'this[i][j]', [ [ 'this', '[', 'i', ']' ], '[', 'j', ']' ] )
+		self._matchTest( arrayAccess, 'this.x[i]', [ [ 'this', '.', 'x' ], '[', 'i', ']' ] )
+		self._matchTest( arrayAccess, 'this.x.y[i]', [ [ [ 'this', '.', 'x' ], '.', 'y' ], '[', 'i', ']' ] )
+		self._matchTest( arrayAccess, 'this.m()[i]', [ [ 'this', '.', 'm', '()' ], '[', 'i', ']' ] )
+		self._matchTest( arrayAccess, 'this.m().n()[i]', [ [ [ 'this', '.', 'm', '()' ], '.', 'n', '()' ], '[', 'i', ']' ] )
 		self._matchTest( fieldAccess, 'this.x', [ 'this', '.', 'x' ] )
 		self._matchTest( fieldAccess, 'this.x.y', [ [ 'this', '.', 'x' ], '.', 'y' ] )
-		self._matchTest( methodInvocation, 'this.x.m()', [ [ 'this', '.', 'x' ], '.', 'm', '()' ] )
-		self._matchTest( arrayAccess, 'this.x[i]', [ [ 'this', '.', 'x' ], '[', 'i', ']' ] )
-		self._matchTest( fieldAccess, 'x[i].y', [ [ 'x', '[', 'i', ']' ], '.', 'y' ] )
-		self._matchTest( fieldAccess, 'x[i][j].y', [ [ [ 'x', '[', 'i', ']' ], '[', 'j', ']' ], '.', 'y' ] )
+		self._matchTest( fieldAccess, 'this[i].y', [ [ 'this', '[', 'i', ']' ], '.', 'y' ] )
+		self._matchTest( fieldAccess, 'this[i][j].y', [ [ [ 'this', '[', 'i', ']' ], '[', 'j', ']' ], '.', 'y' ] )
+		self._matchTest( fieldAccessOrArrayAccess, 'this[i]', [ 'this', '[', 'i', ']' ] )
+		self._matchTest( fieldAccessOrArrayAccess, 'this[i].x', [ [ 'this', '[', 'i', ']' ], '.', 'x' ] )
+		self._matchTest( fieldAccessOrArrayAccess, 'this.x[i]', [ [ 'this', '.', 'x' ], '[', 'i', ']' ] )
 
-
-
+		
+		
+		
+		
 	def testSimpleMessagePassingGrammar(self):
 		identifier = RegEx( "[A-Za-z_][A-Za-z0-9_]*" )
 
@@ -1762,6 +1775,8 @@ if __name__ == '__main__':
 
 	primary  <<  Production( primaryNoNewArray ).debug( 'primary' )
 
+	fieldAccessOrArrayAccess = Production( fieldAccess ^ arrayAccess )
 
-	res, pos, dot = methodInvocation.debugParseString( 'this.x.m()' )
+	
+	res, pos, dot = fieldAccessOrArrayAccess.debugParseString( 'this.x[i]' )
 	print dot
