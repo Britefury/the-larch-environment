@@ -18,11 +18,7 @@ import operator
 from copy import copy
 import re
 
-#from Britefury.Parser.ParserState import ParserState
-#from Britefury.Parser.ParserState2 import ParserState2 as ParserState
-#from Britefury.Parser.ParserState3 import ParserState2 as ParserState
-#from Britefury.Parser.ParserState4 import ParserState2 as ParserState
-from Britefury.Parser.ParserState5 import ParserState2 as ParserState
+from Britefury.Parser.ParserState import ParserState
 
 
 def parserCoerce(x):
@@ -1604,6 +1600,30 @@ class TestCase_Parser (ParserTestCase):
 
 
 
+	def testRightRecursion(self):
+		x = Production( 'x' )
+		y = Forward()
+		y << Production( ( x + y )  |  'y' )
+		
+		self._matchTest( y, 'xxxy', [ 'x', [ 'x', [ 'x', 'y' ] ] ] )
+	
+	def testDirectLeftRecursion(self):
+		x = Production( 'x' ).debug( 'x' )
+		y = Forward()
+		y << Production( ( y + x )  |  'y' ).debug( 'y' )
+		
+		self._matchTest( y, 'yxxx', [[[ 'y', 'x' ], 'x' ], 'x' ] )
+	
+	
+	def testIndirectLeftRecursion(self):
+		x = Production( 'x' ).debug( 'x' )
+		z = Forward()
+		y = Production( ( z + x )  |  'z' ).debug( 'y' )
+		z << Production( y  |  'y' ).debug( 'z' )
+		
+		self._matchTest( z, 'zxxx', [[[ 'z', 'x' ], 'x' ], 'x' ] )
+
+			
 	def testLeftRecursion(self):
 		integer = Word( string.digits )
 		plus = Literal( '+' )

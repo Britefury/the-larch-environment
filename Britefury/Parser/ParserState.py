@@ -9,49 +9,76 @@ import string
 from copy import copy
 
 
+"""
+This module provides a left-recursive packrat parser state.
+
+The algorithm used here is based on the algorithm that is presented in the paper
+	"Packrat Parsers Can Support Left Recursion"
+		by
+		Allesandro Warth, James R. Douglass, and Todd Millstein
+		
+While their algorithm handles most indirect left recursion cases, it does not handle
+overlapping left recursion, in which left-recursion must be handled for several
+rules, at the same position in the stream.
+
+The 'heads' table described in their paper is a mapping from position to 'Head' structure.
+This means that in the case where a rule A is found to be left-recursive, should a rule B
+also be discovered to be left-recursive, which is invoked by A, then their algorithm will
+not behave as expected.
+
+The algorithm here is a reformulated version of the one presented by Warth et al.
+"""
+
+
+
 
 class _MemoEntry (object):
-	__slots__ = [ 'answer', 'pos' ]
+	__slots__ = [ 'rule', 'answer', 'pos', 'bEvaluating', 'bLeftRecursionDetected', 'lrApplications', 'growingLRParseCount' ]
 	
-	def __init__(self, answer, pos):
+	def __init__(self, rule, answer, pos):
 		super( _MemoEntry, self ).__init__()
+		self.rule = rule
 		self.answer = answer
 		self.pos = pos
+		self.bEvaluating = False
+		self.bLeftRecursionDetected = False
+		self.lrApplications = {}
+		self.growingLRParseCount = 0
 		
 		
-
+class _RuleInvocation (object):
+	__slots__ = [ 'rule', 'memoEntry', 'outerInvocation' ]
 	
-class _LR (object):
-	__slots__ = [ 'seed', 'rule', 'head', 'next' ]
-	
-	def __init__(self, rule, next):
-		super( _LR, self ).__init__()
-		self.seed = None
+	def __init__(self, rule, memoEntry, outerInvocation):
 		self.rule = rule
-		self.head = None
-		self.next = next
+		self.memoEntry = memoEntry
+		self.outerInvocation = outerInvocation
 		
 		
-class _Head (object):
-	__slots__ = [ 'rule', 'involvedSet', 'evalSet' ]
+class _LeftRecursiveApplication (object):
+	__slots__ = [ 'memoEntry', 'rule', 'involvedSet', 'evalSet' ]
 	
-	def __init__(self, rule):
-		super( _Head, self ).__init__()
+	def __init__(self, memoEntry, rule):
+		self.memoEntry = memoEntry
 		self.rule = rule
 		self.involvedSet = set()
 		self.evalSet = set()
 		
-		
 	
+	
+	
+		
+		
+		
+		
+		
 	
 	
 class ParserState (object):
 	def __init__(self, ignoreChars=string.whitespace):
 		super( ParserState, self ).__init__()
 		self.memo = {}
-		self.lrStack = None
-		self.pos = 0
-		self.heads = {}
+		self.ruleInvocationStack = None
 		self.ignoreChars = ignoreChars
 		self.debugStack = []
 		self.nodes = []
@@ -65,101 +92,144 @@ class ParserState (object):
 		return stop
 					
 				
-	# The next five methods; memoisedMatch(), __recall(), __setupLR(), __LRAnswer(), __growLR() are taken from the paper
-	# "Packrat Parsers Can Support Left Recursion" by Allesandro Warth, James R. Douglass, Todd Millstein; Viewpoints Research Institute.
-	# To be honest, I don't really understand how they work. I transcribed their pseudo-code into Python, and it just worked.
-	# Test grammars in the unit tests seem to work okay, so its fine by me! :D
 	def memoisedMatch(self, rule, input, start, stop):
 		memoEntry = self.__recall( rule, input, start, stop )
+		
 		if memoEntry is None:
-			# Create a new _LR, and push it onto the rule invocation stack (implemented as a singly-linked-list of _LR objects)
-			lr = _LR( rule, self.lrStack )
-			self.lrStack = lr
+			# Create the memo-entry, and memoise
+			memoEntry = _MemoEntry( rule, None, start )
+			posMemo = self.memo.setdefault( start, {} )
+			posMemo[rule] = memoEntry
 			
-			# Memoise @lr, then evaluate @rule
-			memoEntry = _MemoEntry( lr, start )
-			self.memo[ ( start, rule ) ] = memoEntry
 			
-			answer, self.pos = rule.evaluate( self, input, start, stop )
+			posMemoCopy = posMemo.copy()
 			
-			# Pop @lr off the rule invocation stack
-			self.lrStack = self.lrStack.next
+			# Create a rule invocation record, and push onto the rule invocation stack
+			self.ruleInvocationStack = _RuleInvocation( rule, memoEntry, self.ruleInvocationStack )
+			memoEntry.bEvaluating = True
+			answer, pos = rule.evaluate( self, input, start, stop )
 			
-			memoEntry.pos = self.pos
+			if memoEntry.bLeftRecursionDetected:
+				answer, pos = self.__growLeftRecursiveParse( rule, input, start, stop, memoEntry, answer, pos )
+				posMemo.clear()
+				posMemo.update( posMemoCopy )
+
+			# Pop the rule invocation off the rule invocation stack
+			self.ruleInvocationStack = self.ruleInvocationStack.outerInvocation
+			memoEntry.bEvaluating = False
+			memoEntry.answer, memoEntry.pos = answer, pos
 			
-			#if lr.head is not None  and  isinstance( memoEntry.answer, _LR ):
-			if lr.head is not None:
-				lr.seed = answer
-				return self.__LRAnswer( rule, input, start, stop, memoEntry ),  self.pos
-			else:
-				memoEntry.answer = answer
-				return answer,  self.pos
+			return answer, pos
 		else:
-			self.pos = memoEntry.pos
-			if isinstance( memoEntry.answer, _LR ):
-				self.__setupLR( rule, memoEntry.answer )
-				return memoEntry.answer.seed,  self.pos
-			else:
-				return memoEntry.answer,  self.pos
+			if memoEntry.bEvaluating:
+				# Somewhere up in the call stack is the outer application of @rule; this application
+				# recursive; specifically left-recursive since we are at the same position in the stream
+				if memoEntry.growingLRParseCount > 0:
+					# The left-recursive parse is being grown right now
+					self.__onLeftRecursionInnerReapplication( rule, input, start, stop, memoEntry )
+				else:
+					# Left recursion has been detected
+					self.__onLeftRecursionDetected( rule, input, start, stop, memoEntry )
+			return memoEntry.answer, memoEntry.pos
 
 		
 	def __recall(self, rule, input, start, stop):
-		memoEntry = self.memo.get(  ( start, rule )  )
-		h = self.heads.get( start )
-		# If not growing a seed-parse, just return what is in the memo-table
-		if h is None:
-			return memoEntry
-		
-		# Do not evaluate any rule that is not involved in this left-recursion
-		if memoEntry is None  and  rule  is not h.rule  and  rule not in h.involvedSet:
-			return _MemoEntry( None, start )
-		if rule in h.evalSet:
-			h.evalSet.remove( rule )
-			answer, self.pos = rule.evaluate( self, input, start, stop )
-			memoEntry.answer = answer
-			memoEntry.pos = self.pos
-		return memoEntry
-
-	
-	def __setupLR(self, rule, lr):
-		#print 'setupLR for %s'  %  rule.debugName
-		if lr.head is None:
-			lr.head = _Head( rule )
-		s = self.lrStack
-		while s is not None  and  s.head is not lr.head:
-			s.head = lr.head
-			lr.head.involvedSet.add( s.rule )
-			s = s.next
-
-
-	def __LRAnswer(self, rule, input, start, stop, memoEntry):
-		h = memoEntry.answer.head
-		if h.rule is not rule:
-			#print 'LRanswer for %s @ %d; h.rule is %s; exiting'  %  ( rule.debugName, start, h.rule.debugName )
-			return memoEntry.answer.seed
+		posMemo = self.memo.get( start )
+		if posMemo is not None:
+			memoEntry = posMemo.get( rule )
 		else:
-			memoEntry.answer = memoEntry.answer.seed
-			if memoEntry.answer is None:
-				#print 'LRanswer for %s @ %d; memoEntry.answer is None'  %  ( rule.debugName, start )
-				return None
-			else:
-				#print 'LRanswer for %s @ %d; growing parse...'  %  ( rule.debugName, start )
-				return self.__growLR( rule, input, start, stop, memoEntry, h )
+			memoEntry = None
+		
+		if memoEntry is not None  and  len( memoEntry.lrApplications ) > 0:
+			# This rule application is involved in a left-recursive application of a rule
+			bInEvalSet = False
+			for lrApplication in memoEntry.lrApplications.values():
+				# Remove from the evaluation set
+				if memoEntry in lrApplication.evalSet:
+					lrApplication.evalSet.remove( memoEntry )
+					bInEvalSet = True
 
+			if bInEvalSet:
+				# Create a rule invocation record, and push onto the rule invocation stack
+				self.ruleInvocationStack = _RuleInvocation( rule, memoEntry, self.ruleInvocationStack )
+				memoEntry.bEvaluating = True
+				# Just evaluate it, and fill in the memo entry with the new values
+				memoEntry.answer, memoEntry.pos = rule.evaluate( self, input, start, stop )
+				# Pop the rule invocation off the rule invocation stack
+				self.ruleInvocationStack = self.ruleInvocationStack.outerInvocation
+				memoEntry.bEvaluating = False
 			
-	def __growLR(self, rule, input, start, stop, memoEntry, h):
-		#print 'growLR for %s @ %d'  %  ( rule.debugName, start )
-		self.heads[start] = h
-		while True:
-			self.pos = start
-			h.evalSet = copy( h.involvedSet )
-			answer, self.pos = rule.evaluate( self, input, start, stop )
-			if answer is None  or  self.pos <= memoEntry.pos:
-				break
-			memoEntry.answer = answer
-			memoEntry.pos = self.pos
-		del self.heads[start]
-		self.pos = memoEntry.pos
-		return memoEntry.answer
 
+		return memoEntry
+	
+	
+	def __onLeftRecursionDetected(self, rule, input, start, stop, memoEntry):
+		# Left recursion has been detected
+		memoEntry.bLeftRecursionDetected = True
+		
+		# Create a left-recursive application record, if one does not already exist
+		try:
+			lrApplication = memoEntry.lrApplications[rule]
+		except KeyError:
+			lrApplication = _LeftRecursiveApplication( memoEntry, rule )
+			memoEntry.lrApplications[rule] = lrApplication
+
+		# No rule invocation record has been created for this invocation yet, so the current top of
+		# the stack points to the outer invocation
+		invocation = self.ruleInvocationStack
+
+		# Walk up the stack until @memoEntry is encountered again, adding each entry to the involvedSet set
+		# Simply walking until we reach the bottom of the stack is not sufficient; in the case where the outer
+		# invocation of @rule is invoked inside another left-recursive rule, B, we will reach the outer invocation of B,
+		# not the outer invocation of @rule. Stopping when we reach the same memo-entry will ensure that we
+		# stop at the outer invocation of @rule.
+		while invocation is not None   and   invocation.memoEntry is not memoEntry:
+			lrApplication.involvedSet.add( invocation.memoEntry )
+			invocation.memoEntry.lrApplications[rule] = lrApplication
+			invocation = invocation.outerInvocation
+			
+		
+	
+	def __onLeftRecursionInnerReapplication(self, rule, input, start, stop, memoEntry):
+		lrApplication = memoEntry.lrApplications[rule]
+
+		# No rule invocation record has been created for this invocation yet, so the current top of
+		# the stack points to the outer invocation
+		invocation = self.ruleInvocationStack
+
+		# Walk up the stack until @memoEntry is encountered again, adding each entry to the involvedSet set
+		while invocation is not None   and   invocation.memoEntry is not memoEntry:
+			lrApplication.involvedSet.add( invocation.memoEntry )
+			invocation = invocation.outerInvocation
+			
+		
+	
+		
+	def __growLeftRecursiveParse(self, rule, input, start, stop, memoEntry, answer, pos):
+		memoEntry.growingLRParseCount += 1
+		lrApplication = memoEntry.lrApplications[rule]
+		
+		while True:
+			# Put the answer and position into the memo entry for the next attempt
+			memoEntry.answer, memoEntry.pos = answer, pos
+			# Prepare the evaluation set
+			lrApplication.evalSet = copy( lrApplication.involvedSet )
+			# Try re-evaluation
+			newAnswer, newPos = rule.evaluate( self, input, start, stop )
+			# Fail or no additional characters consumed?
+			if newAnswer is None   or   newPos <= pos:
+				# Further applications will not improve matters
+				break
+			# This application of @rule improved matters; take the answer and position to use for the next iteration
+			answer, pos = newAnswer, newPos
+			
+			
+		# Left recursive application is finished
+		memoEntry.growingLRParseCount -= 1
+		memoEntry.bLeftRecursionDetected = False
+		
+		return answer, pos
+		
+		
+			
 	
