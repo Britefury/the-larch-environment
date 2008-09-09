@@ -29,9 +29,7 @@ pyLicense = open( 'pylicenseheader' ).readlines()
 
 
 
-
-
-for filename in sys.argv[1:]:
+def processFile(filename):
 	bIsJava = cmpExt( filename, '.java' )
 	bIsPy = cmpExt( filename, '.py' )
 
@@ -54,4 +52,17 @@ for filename in sys.argv[1:]:
 				f = open( filename, 'w' )
 				f.writelines( newLines )
 
+
+def visit(arg, dirname, names):
+	for filename in names:
+		processFile( os.path.join( dirname, filename ) )
+		
+
+				
+for filename in sys.argv[1:]:
+	if os.path.isdir( filename ):
+		print 'Processing directory %s.....'  %  filename
+		os.path.walk( filename, visit, None )
+	else:
+		processFile( filename )
 
