@@ -9,6 +9,29 @@ import string
 from copy import copy
 
 
+"""
+This module provides a left-recursive packrat parser state.
+
+The algorithm used here is based on the algorithm that is presented in the paper
+	"Packrat Parsers Can Support Left Recursion"
+		by
+		Allesandro Warth, James R. Douglass, and Todd Millstein
+		
+While their algorithm handles most indirect left recursion cases, it does not handle
+overlapping left recursion, in which left-recursion must be handled for several
+rules, at the same position in the stream.
+
+The 'heads' table described in their paper is a mapping from position to 'Head' structure.
+This means that in the case where a rule A is found to be left-recursive, should a rule B
+also be discovered to be left-recursive, which is invoked by A, then their algorithm will
+not behave as expected.
+
+The algorithm here is a reformulated version of the one presented by Warth et al.
+"""
+
+
+
+
 class _MemoEntry (object):
 	__slots__ = [ 'rule', 'answer', 'pos', 'bEvaluating', 'bLeftRecursionDetected', 'lrApplications', 'growingLRParseCount' ]
 	
@@ -69,10 +92,6 @@ class ParserState2 (object):
 		return stop
 					
 				
-	# The next five methods; memoisedMatch(), __recall(), __setupLR(), __LRAnswer(), __growLR() are taken from the paper
-	# "Packrat Parsers Can Support Left Recursion" by Allesandro Warth, James R. Douglass, Todd Millstein; Viewpoints Research Institute.
-	# To be honest, I don't really understand how they work. I transcribed their pseudo-code into Python, and it just worked.
-	# Test grammars in the unit tests seem to work okay, so its fine by me! :D
 	def memoisedMatch(self, rule, input, start, stop):
 		memoEntry = self.__recall( rule, input, start, stop )
 		
@@ -106,8 +125,10 @@ class ParserState2 (object):
 				# Somewhere up in the call stack is the outer application of @rule; this application
 				# recursive; specifically left-recursive since we are at the same position in the stream
 				if memoEntry.growingLRParseCount > 0:
+					# The left-recursive parse is being grown right now
 					self.__onLeftRecursionInnerReapplication( rule, input, start, stop, memoEntry )
 				else:
+					# Left recursion has been detected
 					self.__onLeftRecursionDetected( rule, input, start, stop, memoEntry )
 			return memoEntry.answer, memoEntry.pos
 
@@ -146,7 +167,7 @@ class ParserState2 (object):
 		# Left recursion has been detected
 		memoEntry.bLeftRecursionDetected = True
 		
-		# Create a left-recursive application record
+		# Create a left-recursive application record, if one does not already exist
 		try:
 			lrApplication = memoEntry.lrApplications[rule]
 		except KeyError:
@@ -158,12 +179,14 @@ class ParserState2 (object):
 		invocation = self.ruleInvocationStack
 
 		# Walk up the stack until @memoEntry is encountered again, adding each entry to the involvedSet set
+		# Simply walking until we reach the bottom of the stack is not sufficient; in the case where the outer
+		# invocation of @rule is invoked inside another left-recursive rule, B, we will reach the outer invocation of B,
+		# not the outer invocation of @rule. Stopping when we reach the same memo-entry will ensure that we
+		# stop at the outer invocation of @rule.
 		while invocation is not None   and   invocation.memoEntry is not memoEntry:
 			lrApplication.involvedSet.add( invocation.memoEntry )
 			invocation.memoEntry.lrApplications[rule] = lrApplication
 			invocation = invocation.outerInvocation
-			
-		involved = [ m.rule.debugName   for m in lrApplication.involvedSet ]
 			
 		
 	
@@ -179,8 +202,6 @@ class ParserState2 (object):
 			lrApplication.involvedSet.add( invocation.memoEntry )
 			invocation = invocation.outerInvocation
 			
-		involved = [ m.rule.debugName   for m in lrApplication.involvedSet ]
-			
 		
 	
 		
@@ -189,7 +210,6 @@ class ParserState2 (object):
 		lrApplication = memoEntry.lrApplications[rule]
 		
 		while True:
-			involved = [ m.rule.debugName   for m in lrApplication.involvedSet ]
 			# Put the answer and position into the memo entry for the next attempt
 			memoEntry.answer, memoEntry.pos = answer, pos
 			# Prepare the evaluation set
@@ -204,7 +224,7 @@ class ParserState2 (object):
 			answer, pos = newAnswer, newPos
 			
 			
-		# Clear any fields associated with LR
+		# Left recursive application is finished
 		memoEntry.growingLRParseCount -= 1
 		memoEntry.bLeftRecursionDetected = False
 		
@@ -248,7 +268,7 @@ if False:
 		
 				
 		
-		def testLeftRecursionJavaPrimary(self):
+		def testLeftRecursionSimplifiedJavaPrimary(self):
 			primary = Forward()
 			
 			
