@@ -18,11 +18,7 @@ from copy import *
 
 import weakref
 
-from Britefury.Util.SignalSlot import ClassSignal
-
 from Britefury.Kernel.Mutability import *
-
-#from Britefury.FileIO.IOXml import *
 
 from Britefury.Cell.CellEvaluator import CellEvaluator
 from Britefury.Cell.CellInterface import CellInterface

@@ -10,8 +10,6 @@
 Defines the CellEvaluator interface, and metaclass
 """
 
-#from Britefury.FileIO.IOXml import *
-
 
 
 

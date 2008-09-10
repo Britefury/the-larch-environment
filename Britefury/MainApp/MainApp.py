@@ -21,8 +21,6 @@ from Britefury.Event.QueuedEvent import queueEvent
 from Britefury.UI.ConfirmDialog import *
 from Britefury.UI.ConfirmOverwriteFileDialog import confirmOverwriteFileDialog
 
-from Britefury.FileIO.IOXml import *
-
 from Britefury.CommandHistory.CommandHistory import CommandHistory
 
 from Britefury.DocPresent.Toolkit.DTDocument import DTDocument
