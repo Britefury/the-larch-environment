@@ -26,7 +26,7 @@ public class JythonSlice
 	public static Object[] arrayGetSlice(Object[] in, PySlice slice)
 	{
 		// Based on Jython PyList source code
-		int indices[] = slice.indices( in.length );
+		int indices[] = slice.indicesEx( in.length );
 		
 		int start = indices[0];
 		int stop = indices[1];
@@ -77,7 +77,7 @@ public class JythonSlice
 	public static Object[] arraySetSlice(Object[] dest, PySlice slice, Object[] src)
 	{
 		// Based on Jython PyList source code
-		int indices[] = slice.indices( dest.length );
+		int indices[] = slice.indicesEx( dest.length );
 		
 		int start = indices[0];
 		int stop = indices[1];
@@ -133,7 +133,7 @@ public class JythonSlice
 	public static Object[] arrayDelSlice(Object[] dest, PySlice slice)
 	{
 		// Based on Jython PyList source code
-		int indices[] = slice.indices( dest.length );
+		int indices[] = slice.indicesEx( dest.length );
 		
 		int start = indices[0];
 		int stop = indices[1];

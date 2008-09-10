@@ -14,8 +14,6 @@ from Britefury.Util.SignalSlot import ClassSignal
 
 from Britefury.Kernel.Mutability import *
 
-#from Britefury.FileIO.IOXml import *
-
 from Britefury.Cell.CellEvaluator import CellEvaluator, CellEvaluationError
 from Britefury.Cell.CellEvaluatorFunction import CellEvaluatorFunction
 from Britefury.Cell.CellInterface import CellInterface, CellOwner

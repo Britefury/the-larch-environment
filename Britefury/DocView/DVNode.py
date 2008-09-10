@@ -15,11 +15,7 @@ from BritefuryJ.DocPresent.Marker import *
 from BritefuryJ.Cell import Cell
 
 
-from Britefury.Util.SignalSlot import ClassSignal
-
 from Britefury.GLisp.GLispUtil import isGLispList
-
-from Britefury.Kernel import KMeta
 
 from Britefury.gSym.View.UnparsedText import UnparsedText
 
