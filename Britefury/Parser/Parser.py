@@ -1798,5 +1798,8 @@ if __name__ == '__main__':
 	fieldAccessOrArrayAccess = Production( fieldAccess ^ arrayAccess )
 
 	
-	res, pos, dot = fieldAccessOrArrayAccess.debugParseString( 'this.x[i]' )
+	#testString = 'this[i]'
+	testString = 'this.x[i]'
+	
+	res, pos, dot = fieldAccessOrArrayAccess.debugParseString( testString )
 	print dot
