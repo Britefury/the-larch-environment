@@ -97,9 +97,9 @@ def _parseText(parser, text):
 		return None
 
 
-class ParsedNodeContentListener (ElementContentListener):
+class ParsedExpressionContentListener (ElementContentListener):
 	def __init__(self, ctx, node, parser):
-		#super( ParsedNodeContentListener, self ).__init__()
+		#super( ParsedExpressionContentListener, self ).__init__()
 		self._ctx = ctx
 		self._node = node
 		self._parser = parser
@@ -266,18 +266,19 @@ def _listViewNeedsDelims(x, outerPrecedence):
 
 
 
-MODE_EXPRESSION = 0
-MODE_STATEMENT = 1
+MODE_DISPLAYCONTENTS = 0
+MODE_EDITEXPRESSION = 1
+MODE_EDITSTATEMENT = 2
 
 
 
-def python25ViewState(parser, mode=MODE_EXPRESSION):
+def python25ViewState(parser, mode=MODE_DISPLAYCONTENTS):
 	return parser, mode
 
 
 
 def suiteView(ctx, suite):
-	lineViews = mapViewEval( ctx, suite, None, python25ViewState( Parser.statement, MODE_STATEMENT ) )
+	lineViews = mapViewEval( ctx, suite, None, python25ViewState( Parser.statement, MODE_EDITSTATEMENT ) )
 	return listView( ctx, suite_listViewLayout, None, None, None, lineViews )
 
 
@@ -285,13 +286,15 @@ def suiteView(ctx, suite):
 def nodeEditor(ctx, node, contents, metadata, state):
 	if state is None:
 		parser = Parser.expression
-		mode = MODE_EXPRESSION
+		mode = MODE_DISPLAYCONTENTS
 	else:
 		parser, mode = state
 
-	if mode == MODE_EXPRESSION:
+	if mode == MODE_DISPLAYCONTENTS:
 		return contents, metadata
-	elif mode == MODE_STATEMENT:
+	elif mode == MODE_EDITEXPRESSION:
+		return contentListener( ctx, contents, ParsedExpressionContentListener( ctx, node, parser ) ),  metadata
+	elif mode == MODE_EDITSTATEMENT:
 		return contentListener( ctx, contents, ParsedLineContentListener( ctx, node, parser ) ),  metadata
 	else:
 		raise ValueError
@@ -300,7 +303,7 @@ def nodeEditor(ctx, node, contents, metadata, state):
 def compoundStatementEditor(ctx, node, headerContents, metadata, suite, state):
 	if state is None:
 		parser = Parser.statement
-		mode = MODE_STATEMENT
+		mode = MODE_EDITSTATEMENT
 	else:
 		parser, mode = state
 
@@ -312,9 +315,7 @@ def compoundStatementEditor(ctx, node, headerContents, metadata, suite, state):
 
 
 
-def binOpView(ctx, state, node, x, y, precedence, bRightAssociative, elementFactory):
-	xView = viewEval( ctx, x )
-	yView = viewEval( ctx, y )
+def binOpView(ctx, state, node, x, y, xView, yView, precedence, bRightAssociative, elementFactory):
 	if bRightAssociative:
 		xView = _precedenceGTE( ctx, xView, precedence )
 		yView = _precedenceGT( ctx, yView, precedence )
@@ -365,7 +366,7 @@ def tupleView(ctx, state, node, xs, parser=None):
 class Python25View (GSymView):
 	# MISC
 	def python25Module(self, ctx, state, node, *content):
-		lineViews = mapViewEval( ctx, content, None, python25ViewState( Parser.statement, MODE_STATEMENT ) )
+		lineViews = mapViewEval( ctx, content, None, python25ViewState( Parser.statement, MODE_EDITSTATEMENT ) )
 		return listView( ctx, module_listViewLayout, None, None, None, lineViews ), ''
 
 
@@ -708,9 +709,11 @@ class Python25View (GSymView):
 
 	# Operators
 	def pow(self, ctx, state, node, x, y):
+		xView = viewEval( ctx, x )
+		yView = viewEval( ctx, y, None, python25ViewState( Parser.expression, MODE_EDITEXPRESSION ) )
 		def _elementFactory(ctx, state, node, x, y, xView, yView):
 			return scriptRSuper( ctx, pow_scriptStyle, xView, paragraph( ctx, python_paragraphStyle, [ text( ctx, punctuation_textStyle, '**' ), text( ctx, default_textStyle, ' ' ), yView ] ) )
-		return binOpView( ctx, state, node, x, y, PRECEDENCE_POW, True, _elementFactory )
+		return binOpView( ctx, state, node, x, y, xView, yView, PRECEDENCE_POW, True, _elementFactory )
 
 
 	def invert(self, ctx, state, node, x):
@@ -726,27 +729,19 @@ class Python25View (GSymView):
 	def mul(self, ctx, state, node, x, y):
 		return paragraphBinOpView( ctx, state, node, x, y, '*', PRECEDENCE_MULDIVMOD, False )
 
-
 	def div(self, ctx, state, node, x, y):
+		xView = viewEval( ctx, x, None, python25ViewState( Parser.expression, MODE_EDITEXPRESSION ) )
+		yView = viewEval( ctx, y, None, python25ViewState( Parser.expression, MODE_EDITEXPRESSION ) )
 		def _elementFactory(ctx, state, node, x, y, xView, yView):
 			xx = paragraph( ctx, python_paragraphStyle, [ xView, whitespace( ctx, '' ) ] )
 			yy = paragraph( ctx, python_paragraphStyle, [ yView, whitespace( ctx, '' ) ] )
 			return fraction( ctx, div_fractionStyle, xx, yy )
-		return binOpView( ctx, state, node, x, y, PRECEDENCE_POW, True, _elementFactory )
-
-	#return paragraphBinOpView( ctx, state, node, x, y, '/', PRECEDENCE_MULDIVMOD, False )
-		#return binOpView( ctx, state, node, x, y, '/',
-					#lambda state, node, x, y, xView, yView: \
-					#vbox( [
-							#vbox( [ xView ], alignment='centre' ),
-							#hline( operatorStyle ),
-							#vbox( [ yView ], alignment='centre' ) ],
-						#alignment='expand' ),
-					#PRECEDENCE_MULDIVMOD )
+		return binOpView( ctx, state, node, x, y, xView, yView, PRECEDENCE_POW, True, _elementFactory )
 
 	def mod(self, ctx, state, node, x, y):
 		return paragraphBinOpView( ctx, state, node, x, y, '%', PRECEDENCE_MULDIVMOD, False )
 
+	
 	def add(self, ctx, state, node, x, y):
 		return paragraphBinOpView( ctx, state, node, x, y, '+', PRECEDENCE_ADDSUB, False )
 
