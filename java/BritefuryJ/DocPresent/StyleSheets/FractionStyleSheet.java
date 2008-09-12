@@ -47,6 +47,11 @@ public class FractionStyleSheet extends ContainerStyleSheet
 		this( 2.0, 3.0, 5.0, Color.black );
 	}
 	
+	public FractionStyleSheet(Color colour)
+	{
+		this( 2.0, 3.0, 5.0, colour );
+	}
+	
 	public FractionStyleSheet(double vspacing, double hpadding, double yOffset, Color colour)
 	{
 		super();

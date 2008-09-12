@@ -456,6 +456,11 @@ public class DPFraction extends DPContainer
 	// Focus navigation methods
 	//
 	
+	protected List<DPWidget> horizontalNavigationList()
+	{
+		return verticalNavigationList();
+	}
+
 	protected List<DPWidget> verticalNavigationList()
 	{
 		Vector<DPWidget> xs = new Vector<DPWidget>();

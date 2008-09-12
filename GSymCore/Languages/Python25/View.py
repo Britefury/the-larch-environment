@@ -5,7 +5,7 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from Britefury.gSym.View.gSymView import border, indent, text, hiddenText, whitespace, hbox, ahbox, vbox, paragraph, script, scriptLSuper, scriptLSub, scriptRSuper, scriptRSub, listView, contentListener, \
+from Britefury.gSym.View.gSymView import border, indent, text, hiddenText, whitespace, hbox, ahbox, vbox, paragraph, script, scriptLSuper, scriptLSub, scriptRSuper, scriptRSub, fraction, listView, contentListener, \
      viewEval, mapViewEval, GSymView
 from Britefury.gSym.View.ListView import ParagraphListViewLayout, HorizontalListViewLayout, VerticalInlineListViewLayout, VerticalListViewLayout
 
@@ -451,7 +451,7 @@ class Python25View (GSymView):
 
 
 	# Imaginary literal
-	def imaginaryLiteral(self, sctx, tate, node, value):
+	def imaginaryLiteral(self, ctx, state, node, value):
 		return nodeEditor( ctx, node,
 				   text( ctx, numericLiteral_textStyle, value ),
 				   PRECEDENCE_LITERALVALUE,
@@ -728,7 +728,13 @@ class Python25View (GSymView):
 
 
 	def div(self, ctx, state, node, x, y):
-		return paragraphBinOpView( ctx, state, node, x, y, '/', PRECEDENCE_MULDIVMOD, False )
+		def _elementFactory(ctx, state, node, x, y, xView, yView):
+			xx = paragraph( ctx, python_paragraphStyle, [ xView, whitespace( ctx, '' ) ] )
+			yy = paragraph( ctx, python_paragraphStyle, [ yView, whitespace( ctx, '' ) ] )
+			return fraction( ctx, div_fractionStyle, xx, yy )
+		return binOpView( ctx, state, node, x, y, PRECEDENCE_POW, True, _elementFactory )
+
+	#return paragraphBinOpView( ctx, state, node, x, y, '/', PRECEDENCE_MULDIVMOD, False )
 		#return binOpView( ctx, state, node, x, y, '/',
 					#lambda state, node, x, y, xView, yView: \
 					#vbox( [
