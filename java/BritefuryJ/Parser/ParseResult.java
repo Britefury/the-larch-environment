@@ -7,13 +7,14 @@
 package BritefuryJ.Parser;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class ParseResult
 {
 	public Object value;
 	public int begin, end;
-	public HashMap<String, Object> bindings;
-	public boolean bSuppressed, bValid;
+	public Map<String, Object> bindings;
+	private boolean bSuppressed, bValid;
 	
 	
 	public ParseResult()
@@ -57,7 +58,29 @@ public class ParseResult
 		bValid = true;
 	}
 	
+	private ParseResult(Object value, int begin, int end, Map<String, Object> bindings, boolean bSuppressed, boolean bValid)
+	{
+		this.value = value;
+		this.begin = begin;
+		this.end = end;
+		this.bindings = bindings;
+		this.bSuppressed = bSuppressed;
+		this.bValid = bValid;
+	}
 	
+	
+	
+	public ParseResult suppressed()
+	{
+		return new ParseResult( value, begin, end, bindings, true, bValid );
+	}
+	
+	
+	public boolean isSuppressed()
+	{
+		return bSuppressed;
+	}
+
 	public boolean isValid()
 	{
 		return bValid;

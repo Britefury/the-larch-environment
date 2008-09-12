@@ -46,28 +46,29 @@ def _parseText(text):
 
 
 class ParsedNodeContentListener (ElementContentListener):
-	def __init__(self, node):
+	def __init__(self, ctx, node):
 		#super( ParsedNodeContentListener, self ).__init__()
+		self._ctx = ctx
 		self._node = node
 
 	def contentModified(self, element):
 		value = element.getContent()
 		parsed = _parseText( value )
 		if parsed is not None:
-			replace( self._node, parsed )
+			replace( self._ctx, self._node, parsed )
 		else:
-			replace( self._node, value )
+			replace( self._ctx, self._node, value )
 		return True
 		
 		
 	
 	
 def nodeEditor(ctx, node, contents, metadata, state):
-	return contentListener( ctx, contents, ParsedNodeContentListener( node ) ), metadata
+	return contentListener( ctx, contents, ParsedNodeContentListener( ctx, node ) ), metadata
 
 
 def stringNodeEditor(ctx, node, metadata, state):
-	return contentListener( ctx, text( ctx, string_textStyle, node ), ParsedNodeContentListener( node ) )
+	return contentListener( ctx, text( ctx, string_textStyle, node ), ParsedNodeContentListener( ctx, node ) )
 
 
 

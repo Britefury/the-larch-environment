@@ -7,53 +7,63 @@
 package BritefuryJ.Parser;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
-public class Bind extends ParserExpression
+public class Forward extends ParserExpression
 {
 	protected ParserExpression subexp;
-	protected String name;
 	
 	
-	public Bind(String subexp, String name)
+	public Forward()
 	{
-		this( coerce( subexp ), name );
-	}
-	
-	public Bind(List<Object> subexp, String name) throws ParserCoerceException
-	{
-		this( coerce( subexp ), name );
-	}
-		
-	public Bind(ParserExpression subexp, String name)
-	{
-		this.subexp = subexp;
-		this.name = name;
+		this.subexp = null;
 	}
 	
 	
-	public String getName()
+	
+	public ParserExpression setExpression(String exp)
 	{
-		return name;
+		subexp = coerce( exp );
+		return this;
+	}
+	
+	public ParserExpression setExpression(List<Object> exp) throws ParserCoerceException
+	{
+		subexp = coerce( exp );
+		return this;
+	}
+	
+	public ParserExpression setExpression(ParserExpression exp)
+	{
+		subexp = exp;
+		return this;
 	}
 	
 
+	
+	public ParserExpression __lshift__(String exp)
+	{
+		subexp = coerce( exp );
+		return this;
+	}
+	
+	public ParserExpression __lshift__(List<Object> exp) throws ParserCoerceException
+	{
+		subexp = coerce( exp );
+		return this;
+	}
+	
+	public ParserExpression __lshift__(ParserExpression exp)
+	{
+		subexp = exp;
+		return this;
+	}
+	
+
+	
 	protected ParseResult evaluate(ParserState state, String input, int start, int stop)
 	{
-		ParseResult res = subexp.evaluate( state, input, start, stop );
-		
-		if ( res.isValid() )
-		{
-			HashMap<String, Object> b = new HashMap<String, Object>();
-			b.putAll( res.bindings );
-			b.put( name, res.value );
-			return new ParseResult( res.value, res.begin, res.end, b );
-		}
-		else
-		{
-			return res;
-		}
+		return subexp.evaluate( state, input, start, stop );
 	}
 
 
@@ -66,10 +76,10 @@ public class Bind extends ParserExpression
 	
 	public boolean compareTo(ParserExpression x)
 	{
-		if ( x instanceof Bind )
+		if ( x instanceof Forward )
 		{
-			Bind xb = (Bind)x;
-			return subexp.compareTo( xb.subexp )  &&  name.equals( xb.name );
+			Forward xf = (Forward)x;
+			return subexp.compareTo( xf.subexp );
 		}
 		else
 		{
@@ -79,6 +89,6 @@ public class Bind extends ParserExpression
 	
 	public String toString()
 	{
-		return "Bind( '" + name + "' = " + subexp.toString() + " )";
+		return "Forward( <" + subexp.getDebugName() + "> )";
 	}
 }

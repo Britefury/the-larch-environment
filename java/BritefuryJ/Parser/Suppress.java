@@ -9,41 +9,30 @@ package BritefuryJ.Parser;
 import java.util.Arrays;
 import java.util.List;
 
-public class Action extends ParserExpression
+public class Suppress extends ParserExpression
 {
 	protected ParserExpression subexp;
-	protected ParseAction a;
 	
 	
-	public Action(String subexp, ParseAction a)
+	public Suppress(String subexp)
 	{
-		this( coerce( subexp ), a );
+		this( coerce( subexp ) );
 	}
 	
-	public Action(List<Object> subexp, ParseAction a) throws ParserCoerceException
+	public Suppress(List<Object> subexp) throws ParserCoerceException
 	{
-		this( coerce( subexp ), a );
+		this( coerce( subexp ) );
 	}
 		
-	public Action(ParserExpression subexp, ParseAction a)
+	public Suppress(ParserExpression subexp)
 	{
 		this.subexp = subexp;
-		this.a = a;
 	}
 	
-
+	
 	protected ParseResult evaluate(ParserState state, String input, int start, int stop)
 	{
-		ParseResult res = subexp.evaluate( state, input, start, stop );
-		
-		if ( res.isValid() )
-		{
-			return new ParseResult( this.a.invoke( input, res.begin, res.value, res.bindings ), res.begin, res.end );
-		}
-		else
-		{
-			return res;
-		}
+		return subexp.evaluate( state, input, start, stop ).suppressed();
 	}
 
 
@@ -56,10 +45,10 @@ public class Action extends ParserExpression
 	
 	public boolean compareTo(ParserExpression x)
 	{
-		if ( x instanceof Action )
+		if ( x instanceof Suppress )
 		{
-			Action xa = (Action)x;
-			return subexp.compareTo( xa.subexp )  &&  a == xa.a;
+			Suppress xs = (Suppress)x;
+			return subexp.compareTo( xs.subexp );
 		}
 		else
 		{
@@ -69,6 +58,6 @@ public class Action extends ParserExpression
 	
 	public String toString()
 	{
-		return "Action( " + subexp.toString() + " -> " + a.toString() + " )";
+		return "Suppress( " + subexp.toString() + " )";
 	}
 }

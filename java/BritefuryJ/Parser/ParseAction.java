@@ -6,9 +6,9 @@
 //##************************
 package BritefuryJ.Parser;
 
-import java.util.HashMap;
+import java.util.Map;
 
 public interface ParseAction
 {
-	public Object invoke(String input, int begin, Object x, HashMap<String, Object> bindings);
+	public Object invoke(String input, int begin, Object x, Map<String, Object> bindings);
 }

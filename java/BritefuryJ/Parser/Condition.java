@@ -15,6 +15,16 @@ public class Condition extends ParserExpression
 	protected ParseCondition cond;
 	
 	
+	public Condition(String subexp, ParseCondition cond)
+	{
+		this( coerce( subexp ), cond );
+	}
+	
+	public Condition(List<Object> subexp, ParseCondition cond) throws ParserCoerceException
+	{
+		this( coerce( subexp ), cond );
+	}
+		
 	public Condition(ParserExpression subexp, ParseCondition cond)
 	{
 		this.subexp = subexp;
@@ -51,9 +61,17 @@ public class Condition extends ParserExpression
 		return Arrays.asList( children );
 	}
 	
-	public boolean compareTo(Condition x)
+	public boolean compareTo(ParserExpression x)
 	{
-		return subexp.compareTo( x.subexp )  &&  cond == x.cond;
+		if ( x instanceof Condition )
+		{
+			Condition xc = (Condition)x;
+			return subexp.compareTo( xc.subexp )  &&  cond == xc.cond;
+		}
+		else
+		{
+			return false;
+		}
 	}
 	
 	public String toString()

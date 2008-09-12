@@ -44,20 +44,34 @@ public class ParserState
 	
 	private HashMap<Integer, HashMap<ParserExpression, MemoEntry> > memo;
 	private RuleInvocation ruleInvocationStack;
-	private Pattern ignoreChars;
+	private Pattern junkPattern;
 	
 	
-	public ParserState(String ignoreCharsRegex)
+	public ParserState(String junkRegex)
 	{
 		this.memo = new HashMap<Integer, HashMap<ParserExpression, MemoEntry> >();
-		ignoreChars = Pattern.compile( ignoreCharsRegex );
+		junkPattern = Pattern.compile( junkRegex );
 	}
 	
 	
-	public int skipIgnoredChars(String input, int start, int stop)
+	public int skipJunkChars(String input, int start, int stop)
 	{
-		Matcher m = ignoreChars.matcher( input.subSequence( start, stop ) );
-		m.find();
-		return m.end();
+		Matcher m = junkPattern.matcher( input.subSequence( start, stop ) );
+		if ( m.find() )
+		{
+			return start + m.end();
+		}
+		else
+		{
+			return start;
+		}
+	}
+	
+	
+	
+	ParseResult memoisedMatch(ParserExpression rule, String input, int start, int stop)
+	{
+		// TODO: implement
+		return null;
 	}
 }
