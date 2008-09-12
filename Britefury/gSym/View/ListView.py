@@ -182,7 +182,7 @@ class VerticalInlineListViewLayout (ListViewLayout):
 
 			middle = [ self._indent( _restChild( c, False ) )   for c in contentElements[1:-1] ]
 			
-			last = _restChild( contentElements[-1], True )
+			last = self._indent( _restChild( contentElements[-1], True ) )
 			
 			if endDelim is not None:
 				end = [ endDelim ]
@@ -222,7 +222,9 @@ class VerticalListViewLayout (ListViewLayout):
 		childElements = []
 
 		if beginDelim is not None:
-			childElements.append( _listViewCoerce( beginDelim ) )
+			x = ParagraphElement( self._lineParagraphStyleSheet )
+			x.setChildren( [ _listViewCoerce( beginDelim ), WhitespaceElement( '\n' ) ] )
+			childElements.append( x )
 
 		if len( contents ) > 0:
 			contentElements = self._getContentElements( contents, xs )
@@ -235,7 +237,11 @@ class VerticalListViewLayout (ListViewLayout):
 					x.setChildren( [ c, newLine ] )
 				x = self._indent( x )
 				childElements.append( x )
-			childElements.append( self._indent( contentElements[-1] ) )
+
+			x = ParagraphElement( self._lineParagraphStyleSheet )
+			x.setChildren( [ contentElements[-1], WhitespaceElement( '\n' ) ] )
+			x = self._indent( x )
+			childElements.append( x )
 
 		if endDelim is not None:
 			childElements.append( _listViewCoerce( endDelim ) )

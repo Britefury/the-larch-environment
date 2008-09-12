@@ -6,21 +6,134 @@
 //##************************
 package BritefuryJ.Parser;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Vector;
 
-public class Combine extends ParserExpression
+public class Combine extends BranchExpression
 {
-	ParserExpression[] children;
-	
-	public Combine(List<ParserExpression> children)
+	public Combine(Object[] subexps) throws ParserCoerceException
 	{
-		this.children = (ParserExpression[])children.toArray();
+		super( subexps );
+	}
+	
+	public Combine(List<Object> subexps) throws ParserCoerceException
+	{
+		super( subexps );
 	}
 	
 	
+	@SuppressWarnings("unchecked")
 	protected ParseResult evaluate(ParserState state, String input, int start, int stop)
 	{
-		// TODO Auto-generated method stub
-		return null;
+		Vector<Object> values = new Vector<Object>();
+		boolean bFinalValueIsString = true;
+		HashMap<String, Object> bindings = new HashMap<String, Object>();
+		
+		int pos = start;
+		for (int i = 0; i < subexps.length; i++)
+		{
+			if ( pos >= stop )
+			{
+				return new ParseResult( pos );
+			}
+			
+			ParseResult result = subexps[i].evaluate(  state, input, pos, stop );
+			pos = result.end;
+			
+			if ( !result.isValid() )
+			{
+				return new ParseResult( pos );
+			}
+			else
+			{
+				if ( !result.isSuppressed() )
+				{
+					bindings.putAll( result.bindings );
+					values.add( result.value );
+					
+					if ( !(result.value instanceof String) )
+					{
+						bFinalValueIsString = false;
+					}
+				}
+			}
+		}
+		
+		
+		if ( bFinalValueIsString )
+		{
+			String value = "";
+			for (Object v: values)
+			{
+				String s = (String)v;
+				value += s;
+			}
+			
+			return new ParseResult( value, start, pos, bindings );
+		}
+		else
+		{
+			Vector<Object> value = new Vector<Object>();
+			
+			for (Object v: values)
+			{
+				if ( v instanceof List )
+				{
+					List<Object> l = (List<Object>)v;
+					value.addAll( l );
+				}
+				else
+				{
+					value.add( v );
+				}
+			}
+
+			return new ParseResult( value, start, pos, bindings );
+		}
+	}
+	
+	
+
+	public ParserExpression __sub__(ParserExpression x)
+	{
+		try
+		{
+			return new Combine( joinSubexp( x ) );
+		}
+		catch (ParserCoerceException e)
+		{
+			throw new RuntimeException();
+		}
+	}
+
+	public ParserExpression __sub__(String x)
+	{
+		try
+		{
+			return new Combine( joinSubexp( coerce( x ) ) );
+		}
+		catch (ParserCoerceException e)
+		{
+			throw new RuntimeException();
+		}
+	}
+
+	public ParserExpression __sub__(List<Object> x)
+	{
+		try
+		{
+			return new Combine( joinSubexp( coerce( x ) ) );
+		}
+		catch (ParserCoerceException e)
+		{
+			throw new RuntimeException();
+		}
+	}
+
+
+	public String toString()
+	{
+		return "Combine( " + subexpsToString() + " )";
 	}
 }

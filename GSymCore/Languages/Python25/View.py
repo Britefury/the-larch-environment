@@ -728,7 +728,7 @@ class Python25View (GSymView):
 
 
 	def div(self, ctx, state, node, x, y):
-		return paragraphBinOpView( ctx, state, node, x, y, '%', PRECEDENCE_MULDIVMOD, False )
+		return paragraphBinOpView( ctx, state, node, x, y, '/', PRECEDENCE_MULDIVMOD, False )
 		#return binOpView( ctx, state, node, x, y, '/',
 					#lambda state, node, x, y, xView, yView: \
 					#vbox( [

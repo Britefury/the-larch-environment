@@ -8,19 +8,80 @@ package BritefuryJ.Parser;
 
 import java.util.List;
 
-public class Choice extends ParserExpression
+public class Choice extends BranchExpression
 {
-	ParserExpression[] children;
-	
-	public Choice(List<ParserExpression> children)
+	public Choice(Object[] subexps) throws ParserCoerceException
 	{
-		this.children = (ParserExpression[])children.toArray();
+		super( subexps );
+	}
+	
+	public Choice(List<Object> subexps) throws ParserCoerceException
+	{
+		super( subexps );
 	}
 	
 	
 	protected ParseResult evaluate(ParserState state, String input, int start, int stop)
 	{
-		// TODO Auto-generated method stub
-		return null;
+		int maxErrorPos = start;
+		
+		for (ParserExpression subexp: subexps)
+		{
+			ParseResult result = subexp.evaluate(  state, input, start, stop );
+			if ( result.isValid() )
+			{
+				return result;
+			}
+			else
+			{
+				maxErrorPos = Math.max( maxErrorPos, result.end );
+			}
+		}
+		
+		return new ParseResult( maxErrorPos );
+	}
+	
+	
+
+	public ParserExpression __or__(ParserExpression x)
+	{
+		try
+		{
+			return new Choice( joinSubexp( x ) );
+		}
+		catch (ParserCoerceException e)
+		{
+			throw new RuntimeException();
+		}
+	}
+
+	public ParserExpression __or__(String x)
+	{
+		try
+		{
+			return new Choice( joinSubexp( coerce( x ) ) );
+		}
+		catch (ParserCoerceException e)
+		{
+			throw new RuntimeException();
+		}
+	}
+
+	public ParserExpression __or__(List<Object> x)
+	{
+		try
+		{
+			return new Choice( joinSubexp( coerce( x ) ) );
+		}
+		catch (ParserCoerceException e)
+		{
+			throw new RuntimeException();
+		}
+	}
+
+
+	public String toString()
+	{
+		return "Choice( " + subexpsToString() + " )";
 	}
 }

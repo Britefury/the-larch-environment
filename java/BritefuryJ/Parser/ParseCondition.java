@@ -6,9 +6,9 @@
 //##************************
 package BritefuryJ.Parser;
 
-import java.util.HashMap;
+import java.util.Map;
 
 public interface ParseCondition
 {
-	public boolean test(String input, int begin, Object x, HashMap<String, Object> bindings);
+	public boolean test(String input, int begin, Object x, Map<String, Object> bindings);
 }
