@@ -112,6 +112,14 @@ def _populateScript(viewNodeInstance, script, child, slotIndex):
 	else:
 		raiseRuntimeError( TypeError, viewNodeInstance.xs, '_populateScript: could not process child of type %s'  %  ( type( child ).__name__, ) )
 
+def _populateFraction(viewNodeInstance, fraction, child, slotIndex):
+	if isinstance( child, DVNode ):
+		fraction.setChild( slotIndex, child.getElementNoRefresh() )
+		_registerViewNodeRelationship( viewNodeInstance, child )
+	elif isinstance( child, Element ):
+		fraction.setChild( slotIndex, child )
+	else:
+		raiseRuntimeError( TypeError, viewNodeInstance.xs, '_populateFraction: could not process child of type %s'  %  ( type( child ).__name__, ) )
 
 	
 	
@@ -219,6 +227,20 @@ def scriptRSuper(ctx, styleSheet, mainChild, scriptChild):
 
 def scriptRSub(ctx, styleSheet, mainChild, scriptChild):
 	return script( ctx, styleSheet, mainChild, None, None, None, scriptChild )
+
+
+def fraction(ctx, styleSheet, numerator, denominator):
+	"""
+	Runtime - called by compiled code at run-time
+	Builds a DTActiveBorder widget, with child, builds and registers a refresh cell
+	"""
+	viewNodeInstance = ctx
+	element = FractionElement( styleSheet )
+	
+	_populateFraction( viewNodeInstance, element, numerator, DPFraction.NUMERATOR )
+	_populateFraction( viewNodeInstance, element, denominator, DPFraction.DENOMINATOR )
+	return element
+
 
 
 

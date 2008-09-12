@@ -26,6 +26,7 @@ operator_textStyle = TextStyleSheet( Font( 'SansSerif', Font.PLAIN, 12 ),  Color
 comment_textStyle = TextStyleSheet( Font( 'SansSerif', Font.PLAIN, 12 ),  Color( 0.4, 0.4, 0.4 ) )
 
 pow_scriptStyle = ScriptStyleSheet( 0.0, 0.0 )
+div_fractionStyle = FractionStyleSheet( Color( 0.0, 0.5, 0.0 ) )
 
 python_paragraphStyle = ParagraphStyleSheet( DPParagraph.Alignment.BASELINES, 0.0, 0.0, 30.0 )
 
