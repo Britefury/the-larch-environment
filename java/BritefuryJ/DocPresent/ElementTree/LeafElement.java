@@ -49,4 +49,72 @@ public abstract class LeafElement extends Element implements WidgetContentListen
 	{
 		onContentModified();
 	}
+	
+	
+	
+	public LeafElement getContentLeafToLeft()
+	{
+		DPContentLeaf w = getWidget().getContentLeafToLeft();
+		if ( w != null )
+		{
+			return (LeafElement)tree.getElementForWidget( w );
+		}
+		else
+		{
+			return null;
+		}
+	}
+
+	public LeafElement getContentLeafToRight()
+	{
+		DPContentLeaf w = getWidget().getContentLeafToRight();
+		if ( w != null )
+		{
+			return (LeafElement)tree.getElementForWidget( w );
+		}
+		else
+		{
+			return null;
+		}
+	}
+
+
+	public LeafElement getEditableContentLeafToLeft()
+	{
+		DPContentLeaf w = getWidget().getEditableContentLeafToLeft();
+		if ( w != null )
+		{
+			return (LeafElement)tree.getElementForWidget( w );
+		}
+		else
+		{
+			return null;
+		}
+	}
+
+	public LeafElement getEditableContentLeafToRight()
+	{
+		DPContentLeaf w = getWidget().getEditableContentLeafToRight();
+		if ( w != null )
+		{
+			return (LeafElement)tree.getElementForWidget( w );
+		}
+		else
+		{
+			return null;
+		}
+	}
+
+
+
+
+	public boolean isWhitespace()
+	{
+		return getWidget().isWhitespace();
+	}
+	
+	public boolean isEditable()
+	{
+		return getWidget().isEditable();
+	}
 }

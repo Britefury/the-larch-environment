@@ -106,12 +106,15 @@ class ParsedExpressionContentListener (ElementContentListener):
 
 	def contentModified(self, element):
 		value = element.getContent()
-		parsed = _parseText( self._parser, value )
-		if parsed is not None:
-			replace( self._ctx, self._node, parsed )
+		if '\n' not in value:
+			parsed = _parseText( self._parser, value )
+			if parsed is not None:
+				replace( self._ctx, self._node, parsed )
+			else:
+				replace( self._ctx, self._node, [ 'UNPARSED', value ] )
+			return True
 		else:
-			replace( self._ctx, self._node, [ 'UNPARSED', value ] )
-		return True
+			return False
 
 
 _compoundStmtNames = set( [ 'ifStmt', 'elifStmt', 'elseStmt', 'whileStmt', 'forStmt', 'tryStmt', 'exceptStmt', 'finallyStmt', 'withStmt', 'defStmt', 'classStmt' ] )	
@@ -712,7 +715,7 @@ class Python25View (GSymView):
 		xView = viewEval( ctx, x )
 		yView = viewEval( ctx, y, None, python25ViewState( Parser.expression, MODE_EDITEXPRESSION ) )
 		def _elementFactory(ctx, state, node, x, y, xView, yView):
-			return scriptRSuper( ctx, pow_scriptStyle, xView, paragraph( ctx, python_paragraphStyle, [ text( ctx, punctuation_textStyle, '**' ), text( ctx, default_textStyle, ' ' ), yView ] ) )
+			return scriptRSuper( ctx, pow_scriptStyle, xView, paragraph( ctx, python_paragraphStyle, [ text( ctx, punctuation_textStyle, '**' ), text( ctx, default_textStyle, ' ' ), yView, whitespace( ctx, '' ) ] ) )
 		return binOpView( ctx, state, node, x, y, xView, yView, PRECEDENCE_POW, True, _elementFactory )
 
 

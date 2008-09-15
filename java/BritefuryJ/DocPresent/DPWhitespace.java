@@ -45,8 +45,47 @@ public class DPWhitespace extends DPContentLeaf
 	
 	public void drawCaret(Graphics2D graphics, Caret c)
 	{
+		if ( c.getMarker().getIndex() <= getContentLength() / 2 )
+		{
+			drawCaretAtStart( graphics );
+		}
+		else
+		{
+			drawCaretAtEnd( graphics );
+		}
 	}
 
+	public void drawCaretAtStart(Graphics2D graphics)
+	{
+		DPContentLeaf leaf = this;
+		while ( leaf != null  &&  leaf.isWhitespace() )
+		{
+			leaf = leaf.getContentLeafToLeft();
+		}
+		
+		if ( leaf != null )
+		{
+			leaf.drawCaretAtEnd( graphics );
+		}
+	}
+	
+	public void drawCaretAtEnd(Graphics2D graphics)
+	{
+		DPContentLeaf leaf = this;
+		while ( leaf != null  &&  leaf.isWhitespace() )
+		{
+			leaf = leaf.getContentLeafToRight();
+		}
+		
+		if ( leaf != null )
+		{
+			leaf.drawCaretAtStart( graphics );
+		}
+	}
+
+	
+	
+	
 	public int getContentPositonForPoint(Point2 localPos)
 	{
 		if ( localPos.x >= width * 0.5 )

@@ -20,7 +20,6 @@ import BritefuryJ.Math.Point2;
 public class DPText extends DPContentLeafEditable implements TextVisual.TextVisualListener
 {
 	protected TextVisual visual;
-	protected Point2 textPos;
 	
 	
 	public DPText(String text)
@@ -33,8 +32,6 @@ public class DPText extends DPContentLeafEditable implements TextVisual.TextVisu
 		super( styleSheet, text );
 		
 		visual = new TextVisual( text, styleSheet, this );
-		
-		textPos = new Point2();
 	}
 	
 	
@@ -86,6 +83,16 @@ public class DPText extends DPContentLeafEditable implements TextVisual.TextVisu
 	public void drawCaret(Graphics2D graphics, Caret c)
 	{
 		visual.drawCaret( graphics, c.getMarker().getIndex() );
+	}
+
+	public void drawCaretAtStart(Graphics2D graphics)
+	{
+		visual.drawCaretAtStart( graphics );
+	}
+
+	public void drawCaretAtEnd(Graphics2D graphics)
+	{
+		visual.drawCaretAtEnd( graphics );
 	}
 
 

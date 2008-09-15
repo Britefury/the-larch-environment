@@ -6,12 +6,34 @@
 //##************************
 package tests.Parser;
 
+import BritefuryJ.DocModel.DMIORead;
+import BritefuryJ.DocModel.DMIORead.ParseSXErrorException;
 import BritefuryJ.Parser.ParseResult;
 import BritefuryJ.Parser.ParserExpression;
 import junit.framework.TestCase;
 
 public class ParserTestCase extends TestCase
 {
+	public void matchTestSX(ParserExpression parser, String input, String expectedSX)
+	{
+		matchTestSX( parser, input, expectedSX, "[ \t\n]*" );
+	}
+
+	public void matchTestSX(ParserExpression parser, String input, String expectedSX, String ignoreCharsRegex)
+	{
+		try
+		{
+			Object expected = DMIORead.readSX( expectedSX );
+			matchTest( parser, input, expected, ignoreCharsRegex );
+		}
+		catch (ParseSXErrorException e)
+		{
+			System.out.println( "Could not parse expected SX" );
+			fail();
+		}
+	}
+	
+	
 	public void matchTest(ParserExpression parser, String input, Object expected)
 	{
 		matchTest( parser, input, expected, "[ \t\n]*" );
@@ -29,33 +51,70 @@ public class ParserTestCase extends TestCase
 		assertTrue( result.isValid() );
 		
 		Object value = result.value;
+		String valueStr = value != null  ?  value.toString()  :  "<null>";
+		String valueClassName = value != null  ?  value.getClass().getName()  :  "<null>";
+		String expectedStr = expected != null  ?  expected.toString()  :  "<null>";
+		String expectedClassName = expected != null  ?  expected.getClass().getName()  :  "<null>";
 		
 		if ( result.end != input.length() )
 		{
 			System.out.println( "INCOMPLETE PARSE while parsing " + input );
 			System.out.println( "Parsed " + String.valueOf( result.end ) + "/" + String.valueOf( input.length() ) + " characters" );
 			System.out.println( "Parsed text " + input.substring( 0, result.end ) );
-			System.out.println( "EXPECTED:" );
-			System.out.println( expected.toString() );
-			System.out.println( "RESULT:" );
-			System.out.println( value.toString() );
+			System.out.println( "EXPECTED: (a " + expectedClassName + ")" );
+			System.out.println( expectedStr );
+			System.out.println( "RESULT: (a " + valueClassName + ")" );
+			System.out.println( valueStr );
 		}
 		assertEquals( result.end, input.length() );
 		
 		
-		if ( !value.equals( expected ) )
+		boolean bValuesMatch = true;
+		if ( value == null )
+		{
+			bValuesMatch = expected == null;
+		}
+		else
+		{
+			bValuesMatch = value.equals( expected );
+		}
+		if ( !bValuesMatch )
 		{
 			System.out.println( "VALUE DIFFERS FROM EXPECTED" );
-			System.out.println( "EXPECTED: (a " + expected.getClass().getName() + ")" );
-			System.out.println( expected.toString() );
-			System.out.println( "RESULT: (a " + value.getClass().getName() + ")" );
-			System.out.println( value.toString() );
+			System.out.println( "EXPECTED: (a " + expectedClassName + ")" );
+			System.out.println( expectedStr );
+			System.out.println( "RESULT: (a " + valueClassName + ")" );
+			System.out.println( valueStr );
 		}
-		assertTrue( value.equals( expected ) );
+		assertTrue( bValuesMatch );
 	}
 
 
 
+	
+	
+	
+	
+	
+	
+	public void matchSubTestSX(ParserExpression parser, String input, String expectedSX, int end)
+	{
+		matchSubTestSX( parser, input, expectedSX, end, "[ \t\n]*" );
+	}
+
+	public void matchSubTestSX(ParserExpression parser, String input, String expectedSX, int end, String ignoreCharsRegex)
+	{
+		try
+		{
+			Object expected = DMIORead.readSX( expectedSX );
+			matchSubTest( parser, input, expected, end, ignoreCharsRegex );
+		}
+		catch (ParseSXErrorException e)
+		{
+			System.out.println( "Could not parse expected SX" );
+			fail();
+		}
+	}
 	
 	
 	public void matchSubTest(ParserExpression parser, String input, Object expected, int end)
@@ -75,29 +134,42 @@ public class ParserTestCase extends TestCase
 		assertTrue( result.isValid() );
 		
 		Object value = result.value;
+		String valueStr = value != null  ?  value.toString()  :  "<null>";
+		String valueClassName = value != null  ?  value.getClass().getName()  :  "<null>";
+		String expectedStr = expected != null  ?  expected.toString()  :  "<null>";
+		String expectedClassName = expected != null  ?  expected.getClass().getName()  :  "<null>";
 		
 		if ( result.end != end )
 		{
 			System.out.println( "DID NOT PARSE CORRECT AMOUNT while parsing " + input.substring( 0, end ) );
 			System.out.println( "Parsed " + String.valueOf( result.end ) + "/" + String.valueOf( end ) + " characters" );
 			System.out.println( input.substring( 0, result.end ) );
-			System.out.println( "EXPECTED:" );
-			System.out.println( expected.toString() );
-			System.out.println( "RESULT:" );
-			System.out.println( value.toString() );
+			System.out.println( "EXPECTED: (a " + expectedClassName + ")" );
+			System.out.println( expectedStr );
+			System.out.println( "RESULT: (a " + valueClassName + ")" );
+			System.out.println( valueStr );
 		}
 		assertEquals( result.end, end );
 		
 		
-		if ( !value.equals( expected ) )
+		boolean bValuesMatch = true;
+		if ( value == null )
+		{
+			bValuesMatch = expected == null;
+		}
+		else
+		{
+			bValuesMatch = value.equals( expected );
+		}
+		if ( !bValuesMatch )
 		{
 			System.out.println( "VALUE DIFFERS FROM EXPECTED" );
-			System.out.println( "EXPECTED:" );
-			System.out.println( expected.toString() );
-			System.out.println( "RESULT:" );
-			System.out.println( value.toString() );
+			System.out.println( "EXPECTED: (a " + expectedClassName + ")" );
+			System.out.println( expectedStr );
+			System.out.println( "RESULT: (a " + valueClassName + ")" );
+			System.out.println( valueStr );
 		}
-		assertTrue( value.equals( expected ) );
+		assertTrue( bValuesMatch );
 	}
 
 
@@ -110,65 +182,21 @@ public class ParserTestCase extends TestCase
 	public void matchFailTest(ParserExpression parser, String input, String ignoreCharsRegex)
 	{
 		ParseResult result = parser.parseString( input );
+
 		if ( result.isValid() )
 		{
+			Object value = result.value;
+			String valueStr = value != null  ?  value.toString()  :  "<null>";
+			String valueClassName = value != null  ?  value.getClass().getName()  :  "<null>";
+
 			System.out.println( "FAILURE EXPECTED; GOT SUCCESS" );
 			System.out.println( "EXPECTED:" );
 			System.out.println( "<fail>" );
-			System.out.println( "RESULT:" );
-			System.out.println( result.value.toString() );
+			System.out.println( "RESULT: (a " + valueClassName + ")" );
+			System.out.println( valueStr );
 			System.out.println( "Consumed " + String.valueOf( result.end ) + "/" + String.valueOf( input.length() ) + " characters" );
 		}
 		assertFalse( result.isValid() );
 	}
 
 }
-
-
-/*
-	def _matchTestSX(self, parser, input, expectedSX, ignoreChars=string.whitespace):
-		result, pos = parser.parseString( input, ignoreChars=ignoreChars )
-
-		expected = readSX( expectedSX )
-
-		if result is None:
-			print 'PARSE FAILURE while parsing', input
-			print 'EXPECTED:'
-			print expectedSX
-		self.assert_( result is not None )
-
-		res = result.result
-
-		if result.end != len( input ):
-			print 'INCOMPLETE PARSE while parsing', input
-			print 'Parsed %d/%d characters'  %  ( result.end, len( input ) )
-			print input[:result.end]
-			print 'EXPECTED:'
-			print expectedSX
-			print 'RESULT:'
-			stream = cStringIO.StringIO()
-			writeSX( stream, res )
-			print stream.getvalue()
-
-		if res != expected:
-			print 'EXPECTED:'
-			print expectedSX
-			print ''
-			print 'RESULT:'
-			stream = cStringIO.StringIO()
-			writeSX( stream, res )
-			print stream.getvalue()
-		self.assert_( res == expected )
-
-
-	def _matchFailTest(self, parser, input, ignoreChars=string.whitespace):
-		result, pos = parser.parseString( input, ignoreChars=ignoreChars )
-		if result is not None   and   result.end == len( input ):
-			print 'EXPECTED:'
-			print '<fail>'
-			print ''
-			print 'RESULT:'
-			print result.result
-			print 'consumed %d/%d chars'  %  ( result.end, len( input ) )
-		self.assert_( result is None  or  result.end != len( input ) )
-*/

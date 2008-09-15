@@ -31,7 +31,7 @@ public class Sequence extends BranchExpression
 		int pos = start;
 		for (int i = 0; i < subexps.length; i++)
 		{
-			if ( pos >= stop )
+			if ( pos > stop )
 			{
 				return new ParseResult( pos );
 			}

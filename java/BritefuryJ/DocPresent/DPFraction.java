@@ -61,14 +61,23 @@ public class DPFraction extends DPContainer
 			
 			if ( index == 0 )
 			{
-				graphics.draw( new Line2D.Double( 0.0, -2.0, 0.0, allocation.y + 2.0 ) );
+				drawCaretAtStart( graphics );
 			}
 			else
 			{
-				graphics.draw( new Line2D.Double( allocation.x, -2.0, allocation.x, allocation.y + 2.0 ) );
+				drawCaretAtEnd( graphics );
 			}
 		}
 
+		public void drawCaretAtStart(Graphics2D graphics)
+		{
+			graphics.draw( new Line2D.Double( 0.0, -2.0, 0.0, allocation.y + 2.0 ) );
+		}
+
+		public void drawCaretAtEnd(Graphics2D graphics)
+		{
+			graphics.draw( new Line2D.Double( 0.0, -2.0, 0.0, allocation.y + 2.0 ) );
+		}
 
 
 		
