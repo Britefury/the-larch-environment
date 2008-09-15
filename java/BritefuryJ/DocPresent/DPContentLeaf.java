@@ -113,6 +113,8 @@ public abstract class DPContentLeaf extends DPWidget implements ContentInterface
 	//
 	
 	public abstract void drawCaret(Graphics2D graphics, Caret c);
+	public abstract void drawCaretAtStart(Graphics2D graphics);
+	public abstract void drawCaretAtEnd(Graphics2D graphics);
 	
 	
 	protected void onCaretEnter(Caret c)
@@ -147,12 +149,17 @@ public abstract class DPContentLeaf extends DPWidget implements ContentInterface
 	
 	public Marker marker(int position, Marker.Bias bias)
 	{
-		if ( getContentLength() == 0 )
+		if ( position > getContentLength() )
 		{
-			throw new CannotCreateMarkerWithEmptyContent();
+			throw new Marker.InvalidMarkerPosition();
 		}
 		
-		if ( position >= getContentLength() )
+		if ( getContentLength() == 0 && position == 0 )
+		{
+			bias = Marker.Bias.END;
+		}
+		
+		if ( position == getContentLength()  &&  bias == Marker.Bias.END )
 		{
 			throw new Marker.InvalidMarkerPosition();
 		}
@@ -189,6 +196,11 @@ public abstract class DPContentLeaf extends DPWidget implements ContentInterface
 		if ( position > getContentLength() )
 		{
 			throw new Marker.InvalidMarkerPosition();
+		}
+		
+		if ( getContentLength() == 0 && position == 0 )
+		{
+			bias = Marker.Bias.START;
 		}
 		
 		if ( position == getContentLength()  &&  bias == Marker.Bias.END )
@@ -533,7 +545,7 @@ public abstract class DPContentLeaf extends DPWidget implements ContentInterface
 
 	
 	
-	protected DPContentLeaf getContentLeafToLeft()
+	public DPContentLeaf getContentLeafToLeft()
 	{
 		if ( parent != null )
 		{
@@ -545,7 +557,7 @@ public abstract class DPContentLeaf extends DPWidget implements ContentInterface
 		}
 	}
 	
-	protected DPContentLeaf getContentLeafToRight()
+	public DPContentLeaf getContentLeafToRight()
 	{
 		if ( parent != null )
 		{
@@ -555,6 +567,30 @@ public abstract class DPContentLeaf extends DPWidget implements ContentInterface
 		{
 			return null;
 		}
+	}
+	
+	public DPContentLeaf getEditableContentLeafToLeft()
+	{
+		DPContentLeaf leaf = this;
+		
+		while ( leaf != null  &&  !leaf.isEditable() )
+		{
+			leaf = leaf.getContentLeafToLeft();
+		}
+		
+		return leaf;
+	}
+	
+	public DPContentLeaf getEditableContentLeafToRight()
+	{
+		DPContentLeaf leaf = this;
+		
+		while ( leaf != null  &&  !leaf.isEditable() )
+		{
+			leaf = leaf.getContentLeafToRight();
+		}
+		
+		return leaf;
 	}
 	
 	

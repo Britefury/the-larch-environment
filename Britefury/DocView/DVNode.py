@@ -85,7 +85,8 @@ class DVNode (object):
 		# Set the caret node to self
 		if position is not None  and  bias is not None  and  self._elementContent is not None:
 			if isGLispList( self.docNode ):
-				print 'Node: %s, position=%d'  %  ( self.docNode[0], position )
+				#print 'Node: %s, position=%d'  %  ( self.docNode[0], position )
+				pass
 			self._view._caretNode = self
 
 		contents = self._contentsCell.getValue()
@@ -133,9 +134,32 @@ class DVNode (object):
 				if leaf is not None:
 					leafOffset = leaf.getContentOffsetInSubtree( self._elementContent )
 					leafPosition = newPosition - leafOffset
-					print 'Node "%s"; content was "%s" now "%s"'  %  ( self.docNode[0], startContent, self._elementContent.getContent() )
-					print 'Position was %d, now is %d; leaf (%s) offset is %d, moving to %d in leaf'  %  ( position, newPosition, leaf.getContent(), leafOffset, leafPosition )
-					leaf.moveMarker( caret.getMarker(), leafPosition, bias )
+					
+					if leaf.isEditable():
+						#print 'Node "%s"; content was "%s" now "%s"'  %  ( self.docNode[0], startContent, self._elementContent.getContent() )
+						#print 'Position was %d, now is %d; leaf (%s) offset is %d, moving to %d in leaf'  %  ( position, newPosition, leaf.getContent(), leafOffset, leafPosition )
+						leaf.moveMarker( caret.getMarker(), leafPosition, bias )
+					else:
+						if leafPosition < leaf.getContentLength()/2:
+							left = leaf.getEditableContentLeafToLeft()
+							if left is not None:
+								left.moveMarkerToEnd( caret.getMarker() )
+							else:
+								right = leaf.getEditableContentLeafToRight()
+								if right is not None:
+									right.moveMarkerToStart( caret.getMarker() )
+								else:
+									leaf.moveMarker( caret.getMarker(), leafPosition, bias )
+						else:
+							right = leaf.getEditableContentLeafToRight()
+							if right is not None:
+								right.moveMarkerToStart( caret.getMarker() )
+							else:
+								left = leaf.getEditableContentLeafToLeft()
+								if left is not None:
+									left.moveMarkerToEnd( caret.getMarker() )
+								else:
+									leaf.moveMarker( caret.getMarker(), leafPosition, bias )
 
 				
 				

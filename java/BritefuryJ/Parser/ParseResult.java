@@ -58,6 +58,16 @@ public class ParseResult
 		bValid = true;
 	}
 	
+	public ParseResult(Object value, int begin, int end, boolean bSuppressed)
+	{
+		this.value = value;
+		this.begin = begin;
+		this.end = end;
+		this.bindings = new HashMap<String, Object>();
+		this.bSuppressed = bSuppressed;
+		this.bValid = true;
+	}
+	
 	private ParseResult(Object value, int begin, int end, Map<String, Object> bindings, boolean bSuppressed, boolean bValid)
 	{
 		this.value = value;

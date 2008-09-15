@@ -106,6 +106,19 @@ public class DPCustomSymbol extends DPContentLeafEditable
 		graphics.draw( line );
 	}
 
+	public void drawCaretAtStart(Graphics2D graphics)
+	{
+		double h = symbol.computeVMetrics().height;
+		graphics.draw( new Line2D.Double( 0.0, 0.0, 0.0, h) );
+	}
+
+	public void drawCaretAtEnd(Graphics2D graphics)
+	{
+		double x = symbol.computeHMetrics().width;
+		double h = symbol.computeVMetrics().height;
+		graphics.draw( new Line2D.Double( x, 0.0, x, h) );
+	}
+
 	public int getContentPositonForPoint(Point2 localPos)
 	{
 		if ( localPos.x  >=  symbol.computeHMetrics().width * 0.5 )

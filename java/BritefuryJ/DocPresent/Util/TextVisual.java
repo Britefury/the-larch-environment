@@ -167,6 +167,18 @@ public class TextVisual
 		}
 	}
 	
+	public void drawCaretAtStart(Graphics2D graphics)
+	{
+		double h = layout.getBounds().getHeight();
+		graphics.draw( new Line2D.Double( 0.0, 0.0, 0.0, h ) );
+	}
+
+	public void drawCaretAtEnd(Graphics2D graphics)
+	{
+		double x = layout.getBounds().getWidth();
+		double h = layout.getBounds().getHeight();
+		graphics.draw( new Line2D.Double( x, 0.0, x, h ) );
+	}
 	
 	
 	
