@@ -798,10 +798,180 @@ public class Test_Parser extends ParserTestCase
 			throw new RuntimeException();
 		}
 	}
+
+	public void testLeftRecursion()
+	{
+		try
+		{
+			ParserExpression integer = new Word( "0123456789" );
+			ParserExpression plus = new Literal( "+" );
+			ParserExpression minus = new Literal( "-" );
+			ParserExpression star = new Literal( "*" );
+			ParserExpression slash = new Literal( "/" );
+		
+			ParserExpression addop = plus.__or__(  minus );
+			ParserExpression mulop = star.__or__(  slash );
+
+			Forward mul = new Forward();
+			mul.setExpression( new Production( ( mul.__add__( mulop ).__add__( integer ) ).__or__( integer ) ) );
+			Forward add = new Forward();
+			add.setExpression( new Production( ( add.__add__( addop ).__add__( mul ) ).__or__( mul ) ) );
+			ParserExpression parser = add;
+			
+			matchTest( parser, "123", "123" );
+			
+			matchTestSX( parser, "1*2", "(1 * 2)" );
+			matchTestSX( parser, "1*2*3", "((1 * 2) * 3)" );
+
+			matchTestSX( parser, "1+2", "(1 + 2)" );
+			matchTestSX( parser, "1+2+3", "((1 + 2) + 3)" );
+
+			matchTestSX( parser, "1+2*3", "(1 + (2 * 3))" );
+			matchTestSX( parser, "1*2+3", "((1 * 2) + 3)" );
+
+			matchTestSX( parser, "1*2+3+4", "(((1 * 2) + 3) + 4)" );
+			matchTestSX( parser, "1+2*3+4", "((1 + (2 * 3)) + 4)" );
+			matchTestSX( parser, "1+2+3*4", "((1 + 2) + (3 * 4))" );
+
+			matchTestSX( parser, "1+2*3*4", "(1 + ((2 * 3) * 4))" );
+			matchTestSX( parser, "1*2+3*4", "((1 * 2) + (3 * 4))" );
+			matchTestSX( parser, "1*2*3+4", "(((1 * 2) * 3) + 4)" );
+		}
+		catch (ParserCoerceException e)
+		{
+			throw new RuntimeException();
+		}
+	}
+
+
+
+	public void testLeftRecursionSimplifiedJavaPrimary()
+	{
+		try
+		{
+			Forward primary = new Forward();
+			
+			
+			ParserExpression expression = new Production( new Literal( "i" ).__or__( new Literal( "j" ) ) ).debug( "expression" );
+			ParserExpression methodName = new Production( new Literal( "m" ).__or__( new Literal( "n" ) ) ).debug( "methodName" );
+			ParserExpression interfaceTypeName = new Production( new Literal( "I" ).__or__( new Literal( "J" ) ) ).debug( "interfaceTypeName" );
+			ParserExpression className = new Production( new Literal( "C" ).__or__( new Literal( "D" ) ) ).debug( "className" );
+
+			ParserExpression classOrInterfaceType = new Production( className.__or__( interfaceTypeName ) ).debug( "classOrInterfaceType" );
+
+			ParserExpression identifier = new Production( new Literal( "x" ).__or__( new Literal( "y" ).__or__( classOrInterfaceType ) ) ).debug( "identifier" );
+			ParserExpression expressionName = new Production( identifier ).debug( "expressionName" );
+
+			ParserExpression arrayAccess = new Production( ( primary.__add__( "[" ).__add__( expression ).__add__( "]" ) ).__or__(
+												expressionName.__add__( "[" ).__add__( expression ).__add__( "]" ) ) ).debug( "expressionName" );
+			ParserExpression fieldAccess = new Production( ( primary.__add__( "." ).__add__( identifier ) ).__or__(
+					new Literal( "super" ).__add__( "." ).__add__( identifier ) ) ).debug( "expressionName" );
+			ParserExpression methodInvocation = new Production( ( primary.__add__( "." ).__add__( methodName ).__add__( "()" ) ).__or__(
+					methodName.__add__( "()" ) ) ).debug( "methodInvocation" );
+			
+			ParserExpression classInstanceCreationExpression = new Production( ( new Literal( "new" ).__add__( classOrInterfaceType ).__add__( "()" ) ).__or__(
+					primary.__add__( "." ).__add__( "new" ).__add__( identifier ).__add__( "()" ) ) ).debug( "classInstanceCreationExpression" );
+			
+			ParserExpression primaryNoNewArray = new Production( classInstanceCreationExpression.__or__( methodInvocation ).__or__( fieldAccess ).__or__( arrayAccess ).__or__( "this" ) ).debug( "primaryNoNewArray" );
+
+			primary.setExpression( new Production( primaryNoNewArray ).debug( "primary" ) );
+			
+			ParserExpression fieldAccessOrArrayAccess = new Production( fieldAccess.__xor__( arrayAccess ) );
+		
+			
+		
+			matchTestSX( primary, "this", "this" );
+			matchTestSX( primary, "this.x", "(this . x)" );
+			matchTestSX( primary, "this.x[i]", "((this . x) [ i ])" );
+			matchTestSX( primary, "this.x.y", "((this . x) . y)" );
+			matchTestSX( primary, "this.x.m()", "((this . x) . m \"()\")" );
+			matchTestSX( primary, "this.x.m().n()", "(((this . x) . m \"()\") . n \"()\")" );
+			matchTestSX( primary, "x[i][j].y", "(((x [ i ]) [ j ]) . y)" );
+
+			matchTestSX( methodInvocation, "this.m()", "(this . m \"()\")" );
+			matchTestSX( methodInvocation, "this.m().n()", "((this . m \"()\") . n \"()\")" );
+			matchTestSX( methodInvocation, "this.x.m()", "((this . x) . m \"()\")" );
+			matchTestSX( methodInvocation, "this.x.y.m()", "(((this . x) . y) . m \"()\")" );
+			matchTestSX( methodInvocation, "this[i].m()", "((this [ i ]) . m \"()\")" );
+			matchTestSX( methodInvocation, "this[i][j].m()", "(((this [ i ]) [ j ]) . m \"()\")" );
+			matchTestSX( arrayAccess, "this[i]", "(this [ i ])" );
+			matchTestSX( arrayAccess, "this[i][j]", "((this [ i ]) [ j ])" );
+			matchTestSX( arrayAccess, "this.x[i]", "((this . x) [ i ])" );
+			matchTestSX( arrayAccess, "this.x.y[i]", "(((this . x) . y) [ i ])" );
+			matchTestSX( arrayAccess, "this.m()[i]", "((this . m \"()\") [ i ])" );
+			matchTestSX( arrayAccess, "this.m().n()[i]", "(((this . m \"()\") . n \"()\") [ i ])" );
+			matchTestSX( fieldAccess, "this.x", "(this . x)" );
+			matchTestSX( fieldAccess, "this.x.y", "((this . x) . y)" );
+			matchTestSX( fieldAccess, "this[i].x", "((this [ i ]) . x)" );
+			matchTestSX( fieldAccess, "this[i][j].x", "(((this [ i ]) [ j ]) . x)" );
+			matchTestSX( fieldAccessOrArrayAccess, "this[i]", "(this [ i ])" );
+			matchTestSX( fieldAccessOrArrayAccess, "this[i].x", "((this [ i ]) . x)" );
+			matchTestSX( fieldAccessOrArrayAccess, "this.x[i]", "((this . x) [ i ])" );
+		}
+		catch (ParserCoerceException e)
+		{
+			throw new RuntimeException();
+		}
+	}
 }
 
 
 /*
 
+	def testLeftRecursionSimplifiedJavaPrimary(self):
+		primary = Forward()
+
+
+		expression = Production( Literal( 'i' )  |  Literal( 'j' ) ).debug( 'expression' )
+		methodName = Production( Literal( 'm' )  |  Literal( 'n' ) ).debug( 'methodName' )
+		interfaceTypeName = Production( Literal( 'I' )  |  Literal( 'J' ) ).debug( 'interfaceTypeName' )
+		className = Production( Literal( 'C' )  |  Literal( 'D' ) ).debug( 'className' )
+
+		classOrInterfaceType = Production( className | interfaceTypeName ).debug( 'classOrInterfaceType' )
+
+		identifier = Production( Literal( 'x' )  |  Literal( 'y' )  |  classOrInterfaceType ).debug( 'identifier' )
+		expressionName = Production( identifier ).debug( 'expressionName' )
+
+		arrayAccess = Production( ( primary + '[' + expression + ']' )   |   ( expressionName + '[' + expression + ']' ) ).debug( 'arrayAccess' )
+		fieldAccess = Production( ( primary + '.' + identifier )   |   ( Literal( 'super' ) + '.' + identifier ) ).debug( 'fieldAccess' )
+		methodInvocation = Production( ( primary + '.' + methodName + '()' )   |   ( methodName + '()' ) ).debug( 'methodInvocation' )
+
+		classInstanceCreationExpression = Production( ( Literal( 'new' )  +  classOrInterfaceType  +  '()' )  |  ( primary + '.' + 'new' + identifier + '()' ) ).debug( 'classInstanceCreationExpression' )
+
+		primaryNoNewArray = Production( classInstanceCreationExpression | methodInvocation | fieldAccess | arrayAccess | 'this' ).debug( 'primaryNoNewArray' )
+
+		primary  <<  Production( primaryNoNewArray ).debug( 'primary' )
+		
+		fieldAccessOrArrayAccess = Production( fieldAccess ^ arrayAccess )
+			
+
+		self._matchTest( primary, 'this', 'this' )
+		self._matchTest( primary, 'this.x', [ 'this', '.', 'x' ] )
+		self._matchTest( primary, 'this.x[i]', [ [ 'this', '.', 'x' ], '[', 'i', ']' ] )
+		self._matchTest( primary, 'this.x.y', [ [ 'this', '.', 'x' ], '.', 'y' ] )
+		self._matchTest( primary, 'this.x.m()', [ [ 'this', '.', 'x' ], '.', 'm', '()' ] )
+		self._matchTest( primary, 'this.x.m().n()', [ [ [ 'this', '.', 'x' ], '.', 'm', '()' ], '.', 'n', '()' ] )
+		self._matchTest( primary, 'x[i][j].y', [ [ [ 'x', '[', 'i', ']' ], '[', 'j', ']' ], '.', 'y' ] )
+
+		self._matchTest( primary, 'this', 'this' )
+		self._matchTest( methodInvocation, 'this.m()', [ 'this', '.', 'm', '()' ] )
+		self._matchTest( methodInvocation, 'this.m().n()', [ [ 'this', '.', 'm', '()' ], '.', 'n', '()' ] )
+		self._matchTest( methodInvocation, 'this.x.m()', [ [ 'this', '.', 'x' ], '.', 'm', '()' ] )
+		self._matchTest( methodInvocation, 'this.x.y.m()', [ [ [ 'this', '.', 'x' ], '.', 'y' ], '.', 'm', '()' ] )
+		self._matchTest( methodInvocation, 'this[i].m()', [ [ 'this', '[', 'i', ']' ], '.', 'm', '()' ] )
+		self._matchTest( methodInvocation, 'this[i][j].m()', [ [ [ 'this', '[', 'i', ']' ], '[', 'j', ']' ], '.', 'm', '()' ] )
+		self._matchTest( arrayAccess, 'this[i]', [ 'this', '[', 'i', ']' ] )
+		self._matchTest( arrayAccess, 'this[i][j]', [ [ 'this', '[', 'i', ']' ], '[', 'j', ']' ] )
+		self._matchTest( arrayAccess, 'this.x[i]', [ [ 'this', '.', 'x' ], '[', 'i', ']' ] )
+		self._matchTest( arrayAccess, 'this.x.y[i]', [ [ [ 'this', '.', 'x' ], '.', 'y' ], '[', 'i', ']' ] )
+		self._matchTest( arrayAccess, 'this.m()[i]', [ [ 'this', '.', 'm', '()' ], '[', 'i', ']' ] )
+		self._matchTest( arrayAccess, 'this.m().n()[i]', [ [ [ 'this', '.', 'm', '()' ], '.', 'n', '()' ], '[', 'i', ']' ] )
+		self._matchTest( fieldAccess, 'this.x', [ 'this', '.', 'x' ] )
+		self._matchTest( fieldAccess, 'this.x.y', [ [ 'this', '.', 'x' ], '.', 'y' ] )
+		self._matchTest( fieldAccess, 'this[i].y', [ [ 'this', '[', 'i', ']' ], '.', 'y' ] )
+		self._matchTest( fieldAccess, 'this[i][j].y', [ [ [ 'this', '[', 'i', ']' ], '[', 'j', ']' ], '.', 'y' ] )
+		self._matchTest( fieldAccessOrArrayAccess, 'this[i]', [ 'this', '[', 'i', ']' ] )
+		self._matchTest( fieldAccessOrArrayAccess, 'this[i].x', [ [ 'this', '[', 'i', ']' ], '.', 'x' ] )
+		self._matchTest( fieldAccessOrArrayAccess, 'this.x[i]', [ [ 'this', '.', 'x' ], '[', 'i', ']' ] )
 
 */
