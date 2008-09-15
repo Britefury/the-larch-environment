@@ -60,9 +60,10 @@ public abstract class ParserExpression
 	
 	
 	
-	public void debug(String debugName)
+	public ParserExpression debug(String debugName)
 	{
 		this.debugName = debugName;
+		return this;
 	}
 	
 	public String getDebugName()
