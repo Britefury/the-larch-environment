@@ -26,7 +26,7 @@ public abstract class BranchElement extends Element
 	
 	
 	
-	protected abstract List<Element> getChildren();
+	public abstract List<Element> getChildren();
 	
 	
 	protected void setElementTree(ElementTree tree)

@@ -74,7 +74,7 @@ public abstract class SequenceBranchElement extends BranchElement
 
 
 
-	protected List<Element> getChildren()
+	public List<Element> getChildren()
 	{
 		return children;
 	}

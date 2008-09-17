@@ -107,9 +107,6 @@ class DVNode (object):
 	
 				oldIndex = position  +  ( 1  if bias == Marker.Bias.END  else  0 )
 
-				print 'CONTENT CHANGED:'
-				print contentString[:oldIndex] + '>|<' + contentString[oldIndex:]
-				ns = contentString
 				# Compute the difference
 				matcher = difflib.SequenceMatcher( lambda x: x in ' \t', contentString, newContentString )
 				for tag, i1, i2, j1, j2 in matcher.get_opcodes():
@@ -129,8 +126,6 @@ class DVNode (object):
 				
 				
 				newIndex = newPosition  +  ( 1  if newBias == Marker.Bias.END  else  0 )
-				
-				print newContentString[:newIndex] + '>|<' + newContentString[newIndex:]
 				
 				newPosition = max( 0, newPosition )
 				if newPosition >= self._elementContent.getContentLength():

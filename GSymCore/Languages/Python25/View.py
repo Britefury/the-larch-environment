@@ -19,6 +19,7 @@ from Britefury.gSym.View.UnparsedText import UnparsedText
 
 
 from BritefuryJ.DocPresent.StyleSheets import *
+from BritefuryJ.DocPresent.ElementTree import *
 from BritefuryJ.DocPresent import *
 
 
@@ -301,6 +302,8 @@ def nodeEditor(ctx, node, contents, metadata, state):
 		contents = addContentLineStops( ctx, contents )
 		return contentListener( ctx, contents, ParsedExpressionContentListener( ctx, node, parser ) ),  metadata
 	elif mode == MODE_EDITSTATEMENT:
+		#contents = addContentLineStops( ctx, contents, True )
+		contents = addContentLineStops( ctx, contents )
 		return contentListener( ctx, contents, ParsedLineContentListener( ctx, node, parser ) ),  metadata
 	else:
 		raise ValueError
@@ -369,20 +372,36 @@ def tupleView(ctx, state, node, xs, parser=None):
 			   state )
 
 
+def printElem(elem, level):
+	print '  ' * level, elem, elem.getContent()
+	if isinstance( elem, BranchElement ):
+		for x in elem.getChildren():
+			printElem( x, level + 1 )
+	
 
-def addContentLineStops(ctx, content):
+def addContentLineStops(ctx, content, bDebug=False):
+	if bDebug:
+		print 'addContentLineStops()'
 	children = []
 	
 	if isinstance( content, DVNode ):
 		contentElement = content.getElement()
 	else:
 		contentElement = content
+		
+	if bDebug:
+		print 'Content is:'
+		printElem( contentElement, 0 )
 	
 	# Left
 	leftLeaf = contentElement.getLeftContentLeaf()
 	if leftLeaf is not None:
-		if leftLeaf.getContentLine() is not None:
+		if bDebug:
+			print 'Checking left: ', leftLeaf, leftLeaf.getContent()
+		if leftLeaf.getContentLine() is not contentElement.getContentLine():
 			# Need an extra element
+			if bDebug:
+				print 'Adding left stop'
 			children.append( text( ctx, default_textStyle, '' ) )
 			
 	children.append( content )
@@ -391,7 +410,11 @@ def addContentLineStops(ctx, content):
 	rightStop = None
 	rightLeaf = contentElement.getRightContentLeaf()
 	if rightLeaf is not None:
-		if rightLeaf.getContentLine() is not None:
+		if bDebug:
+			print 'Checking right: ', rightLeaf, rightLeaf.getContent(), rightLeaf.getContentLine(), contentElement.getContentLine()
+		if rightLeaf.getContentLine() is not contentElement.getContentLine():
+			if bDebug:
+				print 'Adding right stop'
 			# Need an extra element
 			rightStop = text( ctx, default_textStyle, '' )
 	if rightStop is None:
