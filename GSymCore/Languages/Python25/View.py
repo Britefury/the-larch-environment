@@ -298,6 +298,7 @@ def nodeEditor(ctx, node, contents, metadata, state):
 	if mode == MODE_DISPLAYCONTENTS:
 		return contents, metadata
 	elif mode == MODE_EDITEXPRESSION:
+		contents = addContentLineStops( ctx, contents )
 		return contentListener( ctx, contents, ParsedExpressionContentListener( ctx, node, parser ) ),  metadata
 	elif mode == MODE_EDITSTATEMENT:
 		return contentListener( ctx, contents, ParsedLineContentListener( ctx, node, parser ) ),  metadata
@@ -752,7 +753,6 @@ class Python25View (GSymView):
 		yView = viewEval( ctx, y, None, python25ViewState( Parser.expression, MODE_EDITEXPRESSION ) )
 		def _elementFactory(ctx, state, node, x, y, xView, yView):
 			yContent = paragraph( ctx, python_paragraphStyle, [ text( ctx, punctuation_textStyle, '**' ), text( ctx, default_textStyle, ' ' ), yView ] )
-			yContent = addContentLineStops( ctx, yContent )
 			return scriptRSuper( ctx, pow_scriptStyle, xView, yContent )
 		return binOpView( ctx, state, node, x, y, xView, yView, PRECEDENCE_POW, True, _elementFactory )
 
@@ -774,9 +774,7 @@ class Python25View (GSymView):
 		xView = viewEval( ctx, x, None, python25ViewState( Parser.expression, MODE_EDITEXPRESSION ) )
 		yView = viewEval( ctx, y, None, python25ViewState( Parser.expression, MODE_EDITEXPRESSION ) )
 		def _elementFactory(ctx, state, node, x, y, xView, yView):
-			xContent = addContentLineStops( ctx, xView )
-			yContent = addContentLineStops( ctx, yView )
-			return fraction( ctx, div_fractionStyle, xContent, yContent )
+			return fraction( ctx, div_fractionStyle, xView, yView )
 		return binOpView( ctx, state, node, x, y, xView, yView, PRECEDENCE_POW, True, _elementFactory )
 
 	def mod(self, ctx, state, node, x, y):
