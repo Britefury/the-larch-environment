@@ -10,6 +10,7 @@ package BritefuryJ.DocPresent.ElementTree;
 import java.util.List;
 
 import BritefuryJ.DocPresent.ContentInterface;
+import BritefuryJ.DocPresent.DPContentLeaf;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.DPWidget.IsNotInSubtreeException;
 import BritefuryJ.DocPresent.ElementTree.Marker.ElementMarker;
@@ -184,9 +185,35 @@ public abstract class Element implements ContentInterface
 		}
 	}
 
+	public LeafElement getLeftContentLeaf()
+	{
+		DPContentLeaf leaf = getWidget().getLeftContentLeaf();
+		
+		return (LeafElement)tree.getElementForWidget( leaf );
+	}
+	
+	public LeafElement getRightContentLeaf()
+	{
+		DPContentLeaf leaf = getWidget().getRightContentLeaf();
+		
+		return (LeafElement)tree.getElementForWidget( leaf );
+	}
+	
 	public LeafElement getLeafAtContentPosition(int position)
 	{
 		return null;
+	}
+	
+	public Element getContentLine()
+	{
+		if ( parent != null )
+		{
+			return parent.getContentLineFromChild( this );
+		}
+		else
+		{
+			return null;
+		}
 	}
 
 

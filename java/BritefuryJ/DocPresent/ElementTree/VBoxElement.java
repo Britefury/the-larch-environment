@@ -27,4 +27,12 @@ public class VBoxElement extends SequenceBranchElement
 	{
 		return (DPVBox)widget;
 	}
+
+
+
+
+	public Element getContentLineFromChild(Element element)
+	{
+		return this;
+	}
 }
