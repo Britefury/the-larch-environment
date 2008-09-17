@@ -38,6 +38,8 @@ class DocView (object):
 		self._rootView = None
 		
 		self._caretNode = None
+		
+		self._refreshQueue = []
 
 		
 	def getRootView(self):
@@ -94,6 +96,13 @@ class DocView (object):
 
 	def _p_refresh(self):
 		self.getRootView().refresh()
+		for f in self._refreshQueue:
+			f()
+		self._refreshQueue = []
+		
+		
+	def _queueAfterRefresh(self, f):
+		self._refreshQueue.append( f )
 
 
 	def refresh(self):

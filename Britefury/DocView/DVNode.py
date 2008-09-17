@@ -95,71 +95,81 @@ class DVNode (object):
 
 		self._updateElementAndMetadata( contents )
 		
-		#if self._view._caretNode is self:
-		if True:
+		if self._view._caretNode is self:
+		#if True:
 			# Invoking child.refresh() above can cause this method to be invoked on another node; recursively;
 			# Ensure that only the inner-most recursion level handles the caret
 			if position is not None  and  bias is not None  and  self._elementContent is not None:
-				index = position + 1   if bias == Marker.Bias.END   else   position
-	
 				newContentString = self._elementContent.getContent()
 				
 				newPosition = position
+				newBias = bias
 	
+				oldIndex = position  +  ( 1  if bias == Marker.Bias.END  else  0 )
+
+				print 'CONTENT CHANGED:'
+				print contentString[:oldIndex] + '>|<' + contentString[oldIndex:]
+				ns = contentString
 				# Compute the difference
 				matcher = difflib.SequenceMatcher( lambda x: x in ' \t', contentString, newContentString )
 				for tag, i1, i2, j1, j2 in matcher.get_opcodes():
-					if tag == 'replace':
-						if newPosition >= i2:
-							newPosition += ( j2 - j1 ) - ( i2 - i1 )
-					elif tag == 'delete':
-						if newPosition >= i1:
-							newPosition = max( newPosition - ( i2 - i1 ), i1 )
-					elif tag == 'insert':
-						if newPosition >= i1:
-							newPosition += ( j2 - j1 )
-					elif tag == 'equal':
-						pass
-					else:
-						raise ValueError, 'unreckognised tag'
+					if ( position > i1  or  ( position == i1  and  bias == Marker.Bias.END ) )   and   position < i2:
+						# Caret is in the range of this opcode
+						if tag == 'delete':
+							# Range deleted; move to position in destination; bias:START
+							newPosition = j1
+							newBias = Marker.Bias.START
+						elif tag == 'replace'  or  tag == 'equal'  or  tag == 'insert':
+							# Range replaced or equal; move position by delta
+							newPosition += j1 - i1
+						else:
+							raise ValueError, 'unreckognised tag'
 				elementTree = self._elementContent.getElementTree()
 				caret = elementTree.getCaret()
+				
+				
+				newIndex = newPosition  +  ( 1  if newBias == Marker.Bias.END  else  0 )
+				
+				print newContentString[:newIndex] + '>|<' + newContentString[newIndex:]
 				
 				newPosition = max( 0, newPosition )
 				if newPosition >= self._elementContent.getContentLength():
 					newPosition = self._elementContent.getContentLength() - 1
-					bias = Marker.Bias.END
+					newBias = Marker.Bias.END
 				
-				leaf = self._elementContent.getLeafAtContentPosition( newPosition )
-				if leaf is not None:
-					leafOffset = leaf.getContentOffsetInSubtree( self._elementContent )
-					leafPosition = newPosition - leafOffset
-					
-					if leaf.isEditable():
-						#print 'Node "%s"; content was "%s" now "%s"'  %  ( self.docNode[0], startContent, self._elementContent.getContent() )
-						#print 'Position was %d, now is %d; leaf (%s) offset is %d, moving to %d in leaf'  %  ( position, newPosition, leaf.getContent(), leafOffset, leafPosition )
-						leaf.moveMarker( caret.getMarker(), leafPosition, bias )
-					else:
-						if leafPosition < leaf.getContentLength()/2:
-							left = leaf.getEditableContentLeafToLeft()
-							if left is not None:
-								left.moveMarkerToEnd( caret.getMarker() )
+				def _afterRefresh():
+					leaf = self._elementContent.getLeafAtContentPosition( newPosition )
+					if leaf is not None:
+						leafOffset = leaf.getContentOffsetInSubtree( self._elementContent )
+						leafPosition = newPosition - leafOffset
+						
+						if leaf.isEditable():
+							#print 'Node "%s"; content was "%s" now "%s"'  %  ( self.docNode[0], startContent, self._elementContent.getContent() )
+							#print 'Position was %d, now is %d; leaf (%s) offset is %d, moving to %d in leaf'  %  ( position, newPosition, leaf.getContent(), leafOffset, leafPosition )
+							leaf.moveMarker( caret.getMarker(), leafPosition, newBias )
+						else:
+							if leafPosition < leaf.getContentLength()/2:
+								left = leaf.getEditableContentLeafToLeft()
+								if left is not None:
+									left.moveMarkerToEnd( caret.getMarker() )
+								else:
+									right = leaf.getEditableContentLeafToRight()
+									if right is not None:
+										right.moveMarkerToStart( caret.getMarker() )
+									else:
+										leaf.moveMarker( caret.getMarker(), leafPosition, newBias )
 							else:
 								right = leaf.getEditableContentLeafToRight()
 								if right is not None:
 									right.moveMarkerToStart( caret.getMarker() )
 								else:
-									leaf.moveMarker( caret.getMarker(), leafPosition, bias )
-						else:
-							right = leaf.getEditableContentLeafToRight()
-							if right is not None:
-								right.moveMarkerToStart( caret.getMarker() )
-							else:
-								left = leaf.getEditableContentLeafToLeft()
-								if left is not None:
-									left.moveMarkerToEnd( caret.getMarker() )
-								else:
-									leaf.moveMarker( caret.getMarker(), leafPosition, bias )
+									left = leaf.getEditableContentLeafToLeft()
+									if left is not None:
+										left.moveMarkerToEnd( caret.getMarker() )
+									else:
+										leaf.moveMarker( caret.getMarker(), leafPosition, newBias )
+				
+				self._view._queueAfterRefresh( _afterRefresh )
 
 				
 				
