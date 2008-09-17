@@ -16,6 +16,12 @@ import BritefuryJ.DocPresent.StyleSheets.ScriptStyleSheet;
 
 public class ScriptElement extends BranchElement
 {
+	public static class CouldNotFindChildException extends RuntimeException
+	{
+		private static final long serialVersionUID = 1L;
+	};
+	
+	
 	public static int LEFTSUPER = DPScript.LEFTSUPER;
 	public static int LEFTSUB = DPScript.LEFTSUB;
 	public static int MAIN = DPScript.MAIN;
@@ -152,5 +158,30 @@ public class ScriptElement extends BranchElement
 		}
 		
 		return xs;
+	}
+
+
+
+
+
+
+	public Element getContentLineFromChild(Element element)
+	{
+		for (int slot = 0; slot < NUMCHILDREN; slot++)
+		{
+			if ( element == children[slot] )
+			{
+				if ( slot == MAIN )
+				{
+					return getContentLine();
+				}
+				else
+				{
+					return this;
+				}
+			}
+		}
+		
+		throw new CouldNotFindChildException();
 	}
 }

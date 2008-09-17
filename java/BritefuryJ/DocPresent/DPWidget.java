@@ -995,12 +995,12 @@ abstract public class DPWidget implements ContentInterface
 
 
 	
-	protected DPContentLeaf getLeftContentLeaf()
+	public DPContentLeaf getLeftContentLeaf()
 	{
 		return null;
 	}
 	
-	protected DPContentLeaf getRightContentLeaf()
+	public DPContentLeaf getRightContentLeaf()
 	{
 		return null;
 	}

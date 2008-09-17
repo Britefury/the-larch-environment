@@ -618,12 +618,12 @@ public abstract class DPContentLeaf extends DPWidget implements ContentInterface
 	}
 	
 	
-	protected DPContentLeaf getLeftContentLeaf()
+	public DPContentLeaf getLeftContentLeaf()
 	{
 		return this;
 	}
 
-	protected DPContentLeaf getRightContentLeaf()
+	public DPContentLeaf getRightContentLeaf()
 	{
 		return this;
 	}

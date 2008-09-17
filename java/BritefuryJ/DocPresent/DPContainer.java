@@ -622,7 +622,7 @@ public abstract class DPContainer extends DPWidget implements ContentInterface
 	//
 	//
 
-	protected DPContentLeaf getLeftContentLeaf()
+	public DPContentLeaf getLeftContentLeaf()
 	{
 		// Check the child nodes
 		List<DPWidget> navList = horizontalNavigationList();
@@ -641,7 +641,7 @@ public abstract class DPContainer extends DPWidget implements ContentInterface
 		return null;
 	}
 	
-	protected DPContentLeaf getRightContentLeaf()
+	public DPContentLeaf getRightContentLeaf()
 	{
 		// Check the child nodes
 		List<DPWidget> navList = horizontalNavigationList();

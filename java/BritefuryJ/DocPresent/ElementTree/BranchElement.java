@@ -84,6 +84,12 @@ public abstract class BranchElement extends Element
 		return getContentOffsetOfChild( child )  +  getContentOffsetInSubtree( subtreeRoot );
 	}
 
+
+
+	public Element getContentLineFromChild(Element element)
+	{
+		return getContentLine();
+	}
 	
 	
 	protected boolean onChildContentModified(Element child)

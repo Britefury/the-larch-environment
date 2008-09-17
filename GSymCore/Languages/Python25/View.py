@@ -5,6 +5,8 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
+from Britefury.DocView.DVNode import DVNode
+
 from Britefury.gSym.View.gSymView import border, indent, text, hiddenText, whitespace, hbox, ahbox, vbox, paragraph, script, scriptLSuper, scriptLSub, scriptRSuper, scriptRSub, fraction, listView, contentListener, \
      viewEval, mapViewEval, GSymView
 from Britefury.gSym.View.ListView import ParagraphListViewLayout, HorizontalListViewLayout, VerticalInlineListViewLayout, VerticalListViewLayout
@@ -366,6 +368,38 @@ def tupleView(ctx, state, node, xs, parser=None):
 			   state )
 
 
+
+def addContentLineStops(ctx, content):
+	leftStop = None
+	rightStop = None
+	
+	if isinstance( content, DVNode ):
+		contentElement = content.getElement()
+	else:
+		contentElement = content
+	
+	# Left
+	leftLeaf = contentElement.getLeftContentLeaf()
+	if leftLeaf is not None:
+		if leftLeaf.getContentLine() is not None:
+			# Need an extra element
+			leftStop = text( ctx, default_textStyle, '' )
+	
+	# Right
+	rightLeaf = contentElement.getRightContentLeaf()
+	if rightLeaf is not None:
+		if rightLeaf.getContentLine() is not None:
+			# Need an extra element
+			rightStop = text( ctx, default_textStyle, '' )
+	if rightStop is None:
+		rightStop = whitespace( ctx, '' )
+			
+	
+	children = [ leftStop ]   if leftStop is not None   else []    +    [ content, rightStop ]
+	return paragraph( ctx, python_paragraphStyle, children )
+
+	
+
 class Python25View (GSymView):
 	# MISC
 	def python25Module(self, ctx, state, node, *content):
@@ -715,7 +749,9 @@ class Python25View (GSymView):
 		xView = viewEval( ctx, x )
 		yView = viewEval( ctx, y, None, python25ViewState( Parser.expression, MODE_EDITEXPRESSION ) )
 		def _elementFactory(ctx, state, node, x, y, xView, yView):
-			return scriptRSuper( ctx, pow_scriptStyle, xView, paragraph( ctx, python_paragraphStyle, [ text( ctx, punctuation_textStyle, '**' ), text( ctx, default_textStyle, ' ' ), yView, whitespace( ctx, '' ) ] ) )
+			yContent = paragraph( ctx, python_paragraphStyle, [ text( ctx, punctuation_textStyle, '**' ), text( ctx, default_textStyle, ' ' ), yView ] )
+			yContent = addContentLineStops( ctx, yContent )
+			return scriptRSuper( ctx, pow_scriptStyle, xView, yContent )
 		return binOpView( ctx, state, node, x, y, xView, yView, PRECEDENCE_POW, True, _elementFactory )
 
 
@@ -736,9 +772,9 @@ class Python25View (GSymView):
 		xView = viewEval( ctx, x, None, python25ViewState( Parser.expression, MODE_EDITEXPRESSION ) )
 		yView = viewEval( ctx, y, None, python25ViewState( Parser.expression, MODE_EDITEXPRESSION ) )
 		def _elementFactory(ctx, state, node, x, y, xView, yView):
-			xx = paragraph( ctx, python_paragraphStyle, [ xView, whitespace( ctx, '' ) ] )
-			yy = paragraph( ctx, python_paragraphStyle, [ yView, whitespace( ctx, '' ) ] )
-			return fraction( ctx, div_fractionStyle, xx, yy )
+			xContent = addContentLineStops( ctx, xView )
+			yContent = addContentLineStops( ctx, yView )
+			return fraction( ctx, div_fractionStyle, xContent, yContent )
 		return binOpView( ctx, state, node, x, y, xView, yView, PRECEDENCE_POW, True, _elementFactory )
 
 	def mod(self, ctx, state, node, x, y):
