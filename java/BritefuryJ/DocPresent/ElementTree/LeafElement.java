@@ -27,6 +27,16 @@ public abstract class LeafElement extends Element implements WidgetContentListen
 	}
 
 	
+	public LeafElement getLeftContentLeaf()
+	{
+		return this;
+	}
+	
+	public LeafElement getRightContentLeaf()
+	{
+		return this;
+	}
+	
 	public LeafElement getLeafAtContentPosition(int position)
 	{
 		return this;

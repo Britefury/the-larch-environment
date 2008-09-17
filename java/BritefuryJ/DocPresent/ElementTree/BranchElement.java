@@ -65,6 +65,35 @@ public abstract class BranchElement extends Element
 		return null;
 	}
 
+	public LeafElement getLeftContentLeaf()
+	{
+		for (Element c: getChildren())
+		{
+			LeafElement leaf = c.getLeftContentLeaf();
+			if ( leaf != null )
+			{
+				return leaf;
+			}
+		}
+		
+		return null;
+	}
+	
+	public LeafElement getRightContentLeaf()
+	{
+		List<Element> ch = getChildren();
+		for (int i = ch.size() - 1; i >= 0; i--)
+		{
+			LeafElement leaf = ch.get( i ).getRightContentLeaf();
+			if ( leaf != null )
+			{
+				return leaf;
+			}
+		}
+		
+		return null;
+	}
+	
 	public LeafElement getLeafAtContentPosition(int position)
 	{
 		Element c = getChildAtContentPosition( position );

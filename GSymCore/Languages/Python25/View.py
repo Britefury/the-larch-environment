@@ -370,8 +370,7 @@ def tupleView(ctx, state, node, xs, parser=None):
 
 
 def addContentLineStops(ctx, content):
-	leftStop = None
-	rightStop = None
+	children = []
 	
 	if isinstance( content, DVNode ):
 		contentElement = content.getElement()
@@ -383,9 +382,12 @@ def addContentLineStops(ctx, content):
 	if leftLeaf is not None:
 		if leftLeaf.getContentLine() is not None:
 			# Need an extra element
-			leftStop = text( ctx, default_textStyle, '' )
+			children.append( text( ctx, default_textStyle, '' ) )
+			
+	children.append( content )
 	
 	# Right
+	rightStop = None
 	rightLeaf = contentElement.getRightContentLeaf()
 	if rightLeaf is not None:
 		if rightLeaf.getContentLine() is not None:
@@ -393,9 +395,9 @@ def addContentLineStops(ctx, content):
 			rightStop = text( ctx, default_textStyle, '' )
 	if rightStop is None:
 		rightStop = whitespace( ctx, '' )
+
+	children.append( rightStop )
 			
-	
-	children = [ leftStop ]   if leftStop is not None   else []    +    [ content, rightStop ]
 	return paragraph( ctx, python_paragraphStyle, children )
 
 	
