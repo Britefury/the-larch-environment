@@ -145,7 +145,7 @@ public class ScriptElement extends BranchElement
 	}
 
 
-	protected List<Element> getChildren()
+	public List<Element> getChildren()
 	{
 		Vector<Element> xs = new Vector<Element>();
 		

@@ -66,7 +66,7 @@ public class BinElement extends BranchElement
 
 
 
-	protected List<Element> getChildren()
+	public List<Element> getChildren()
 	{
 		if ( child == null )
 		{
