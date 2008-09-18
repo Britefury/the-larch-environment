@@ -135,7 +135,7 @@ public abstract class CellInterface
 	}
 
 
-	protected static WeakHashMap<CellInterface, Object> blockAccessTracking()
+	public static WeakHashMap<CellInterface, Object> blockAccessTracking()
 	{
 		// Blocks tracking of cell accesses
 		// Returns the current access list; this MUST be passed to unblockAccessTracking()
@@ -148,7 +148,7 @@ public abstract class CellInterface
 		return oldAccesses;
 	}
 
-	protected static void unblockAccessTracking(WeakHashMap<CellInterface, Object> oldAccesses)
+	public static void unblockAccessTracking(WeakHashMap<CellInterface, Object> oldAccesses)
 	{
 		// Unblocks cell access tracking
 		// Pass the object returned by blockAccessTracking()

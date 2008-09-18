@@ -29,6 +29,7 @@ from Britefury.DocTree.DocTreeNode import DocTreeNode
 from BritefuryJ.DocPresent import *
 from BritefuryJ.DocPresent.ElementTree import *
 from BritefuryJ.DocPresent.StyleSheets import *
+from BritefuryJ.Cell import *
 
 
 
@@ -306,6 +307,17 @@ def viewEval(ctx, content, nodeViewFunction=None, state=None):
 	viewInstance = viewNodeInstance.viewInstance
 	viewNode = viewNodeInstance.view.buildNodeView( content )
 	viewNode._f_setContentsFactory( viewNodeInstance.viewInstance._f_makeNodeContentsFactory( nodeViewFunction, state ) )
+	
+	
+	# Block access tracking to prevent the contents of this node being dependent upon the child node being refreshed,
+	# and refresh the view node
+	# Refreshing the child node will ensure that when its contents are inserted into outer elements, its full element tree
+	# is up to date and available.
+	# Blocking the access tracking prevents an inner node from causing all parent/grandparent/etc nodes from requiring a
+	# refresh.
+	accessList = CellInterface.blockAccessTracking()
+	viewNode.refresh()
+	CellInterface.unblockAccessTracking( accessList )
 	
 	return viewNode
 
