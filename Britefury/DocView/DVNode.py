@@ -44,7 +44,6 @@ class DVNode (object):
 		#self._element = BinElement( _defaultBinStyleSheet )
 		self._element = ParagraphElement( _defaultParagraphStyleSheet )
 		self._elementContent = None
-		self._metadata = None
 		self._contentsFactory = None
 		self._contentsCell = Cell()
 		self._contentsCell.setFunction( self._p_computeContents )
@@ -93,7 +92,7 @@ class DVNode (object):
 		for child in self._children:
 			child.refresh()
 
-		self._updateElementAndMetadata( contents )
+		self._updateElement( contents )
 		
 		if self._view._caretNode is self:
 		#if True:
@@ -212,32 +211,19 @@ class DVNode (object):
 			return None
 		
 		
-	def _updateElementAndMetadata(self, contents):
-		if contents is not None:
-			if isinstance( contents, tuple ):
-				element, metadata = contents
-			else:
-				element = contents
-				metadata = None
-				
-			assert isinstance( element, Element )  or  isinstance( element, DVNode )
-			
-			# If the contents is a DVNode, get its widget
-			if isinstance( element, DVNode ):
-				element = element.getElementNoRefresh()
-			elif isinstance( element, Element ):
+	def _updateElement(self, element):
+		if element is not None:
+			if isinstance( element, Element ):
 				pass
 			else:
-				raise TypeError, 'contents should be an Element or a DVNode'
+				raise TypeError, 'contents should be an Element, not a \'%s\''  %  type( element ) 
 			
 			#self._element.setChild( element )
 			self._elementContent = element
 			self._element.setChildren( [ element ] )
-			self._metadata = metadata
 		else:
 			self._elementContent = None
 			self._element.setChildren( [] )
-			self._metadata = None
 	
 
 	def _registerChild(self, child):
@@ -262,10 +248,6 @@ class DVNode (object):
 		self.refresh()
 		return self._element
 	
-	def getMetadata(self):
-		self.refresh()
-		return self._metadata	
-			
 			
 			
 			
@@ -308,7 +290,6 @@ class DVNode (object):
 
 	parentNodeView = property( getParentNodeView )
 	docView = property( getDocView )
-	metadata = property( getMetadata )
 
 
 
