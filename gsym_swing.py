@@ -8,6 +8,8 @@
 import sys
 import os
 
+from javax.swing import UIManager
+
 from Britefury.InitBritefuryJ import initBritefuryJ
 initBritefuryJ()
 
@@ -37,6 +39,8 @@ def main():
 			bEvaluate = True
 		except IOError:
 			pass
+		
+	UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
 
 	app = MainApp( None )
 

@@ -84,10 +84,7 @@ def _registerViewNodeRelationship(viewNodeInstance, childNode):
 
 
 def _populateBin(viewNodeInstance, bin, child):
-	if isinstance( child, DVNode ):
-		bin.setChild( child.getElementNoRefresh() )
-		_registerViewNodeRelationship( viewNodeInstance, child )
-	elif isinstance( child, Element ):
+	if isinstance( child, Element ):
 		bin.setChild( child )
 	else:
 		raiseRuntimeError( TypeError, viewNodeInstance.xs, '_populateBin: could not process child of type %s'  %  ( type( child ).__name__, ) )
@@ -95,29 +92,20 @@ def _populateBin(viewNodeInstance, bin, child):
 def _populateContainerSeq(viewNodeInstance, container, children):
 	elements = []
 	for child in children:
-		if isinstance( child, DVNode ):
-			elements.append( child.getElementNoRefresh() )
-			_registerViewNodeRelationship( viewNodeInstance, child )
-		elif isinstance( child, Element ):
+		if isinstance( child, Element ):
 			elements.append( child )
 		else:
 			raiseRuntimeError( TypeError, viewNodeInstance.xs, ' _populateContainerSeq: could not process child of type %s'  %  ( type( child ).__name__, ) )
 	container.setChildren( elements )
 
 def _populateScript(viewNodeInstance, script, child, slotIndex):
-	if isinstance( child, DVNode ):
-		script.setChild( slotIndex, child.getElementNoRefresh() )
-		_registerViewNodeRelationship( viewNodeInstance, child )
-	elif isinstance( child, Element ):
+	if isinstance( child, Element ):
 		script.setChild( slotIndex, child )
 	else:
 		raiseRuntimeError( TypeError, viewNodeInstance.xs, '_populateScript: could not process child of type %s'  %  ( type( child ).__name__, ) )
 
 def _populateFraction(viewNodeInstance, fraction, child, slotIndex):
-	if isinstance( child, DVNode ):
-		fraction.setChild( slotIndex, child.getElementNoRefresh() )
-		_registerViewNodeRelationship( viewNodeInstance, child )
-	elif isinstance( child, Element ):
+	if isinstance( child, Element ):
 		fraction.setChild( slotIndex, child )
 	else:
 		raiseRuntimeError( TypeError, viewNodeInstance.xs, '_populateFraction: could not process child of type %s'  %  ( type( child ).__name__, ) )
@@ -254,9 +242,6 @@ def listView(ctx, layout, beginDelim, endDelim, separatorFactory, children):
 	"""
 	viewNodeInstance = ctx
 	element = ListView.listView( viewNodeInstance.xs, layout, beginDelim, endDelim, separatorFactory, children )
-	for child in children:
-		if isinstance( child, DVNode ):
-			_registerViewNodeRelationship( viewNodeInstance, child )
 	return element
 
 
@@ -272,11 +257,7 @@ _contentListenerParaStyle = ParagraphStyleSheet()
 def _applyContentListener(ctx, child, listener):
 	viewNodeInstance = ctx
 
-	if isinstance( child, DVNode ):
-		element = ParagraphElemtent( _contentListenerParaStyle )
-		element.setContentListener( listener )
-		return element
-	elif isinstance( child, Element ):
+	if isinstance( child, Element ):
 		child.setContentListener( listener )
 		return child
 	else:
@@ -319,7 +300,9 @@ def viewEval(ctx, content, nodeViewFunction=None, state=None):
 	viewNode.refresh()
 	CellInterface.unblockAccessTracking( accessList )
 	
-	return viewNode
+	_registerViewNodeRelationship( viewNodeInstance, viewNode )
+
+	return viewNode.getElementNoRefresh()
 
 
 def mapViewEval(ctx, content, nodeViewFunction=None, state=None):
