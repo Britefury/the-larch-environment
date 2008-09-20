@@ -49,11 +49,138 @@ public class DPParagraph extends DPContainerSequence
 	{
 		public List<ChildEntry> children;
 		public VMetrics minV, prefV;
+		public double posY, sizeY;
 		
 		
 		public Line(List<ChildEntry> children)
 		{
 			this.children = children;
+		}
+
+	
+		
+		private void allocateX(DPParagraph paragraph, double lineX, double allocation)
+		{
+			double spacing = paragraph.getSpacing();
+
+			Metrics[] allocated = HMetrics.allocateSpacePacked( getChildrenMinimumHMetrics( children ), getChildrenPreferredHMetrics( children ), null, allocation );
+			
+			double width = 0.0;
+			double x = lineX;
+			for (int i = 0; i < allocated.length; i++)
+			{
+				HMetrics chm = (HMetrics)allocated[i];
+				
+				if ( i != allocated.length - 1)
+				{
+					chm = chm.minSpacing( spacing );
+				}
+				
+				ParagraphChildEntry entry = (ParagraphChildEntry)children.get( i ); 
+
+				double childX = x + entry.padding;
+				
+				paragraph.allocateChildX( entry.child, childX, chm.width );
+
+				width = x + chm.width + entry.padding * 2.0;
+				x = width + chm.hspacing;
+			}
+		}
+
+		private void allocateY(DPParagraph paragraph, double lineY, double lineAllocation)
+		{
+			Alignment alignment = paragraph.getAlignment();
+			
+			posY = lineY;
+			sizeY = lineAllocation;
+			
+			if ( alignment == Alignment.BASELINES )
+			{
+				VMetricsTypeset vmt = (VMetricsTypeset)prefV;
+				
+				double delta = lineAllocation - vmt.height;
+				double y = lineY + vmt.ascent + delta * 0.5;
+				
+				for (ChildEntry entry: children)
+				{
+					ParagraphChildEntry paraEntry = (ParagraphChildEntry)entry;
+					DPWidget child = paraEntry.child;
+					double chAscent;
+					VMetrics chm = child.prefV;
+					if ( chm.isTypeset() )
+					{
+						VMetricsTypeset tchm = (VMetricsTypeset)chm;
+						chAscent = tchm.ascent;
+					}
+					else
+					{
+						chAscent = chm.height * 0.5  -  NON_TYPESET_CHILD_BASELINE_OFFSET;
+					}
+
+					double childY = Math.max( y - chAscent, 0.0 );
+					double childHeight = Math.min( chm.height, lineAllocation );
+					paragraph.allocateChildY( child, childY, childHeight );
+				}
+			}
+			else
+			{
+				for (ChildEntry entry: children)
+				{
+					DPWidget child = entry.child;
+					double childHeight = Math.min( child.prefV.height, lineAllocation );
+					if ( alignment == Alignment.TOP )
+					{
+						paragraph.allocateChildY( child, 0.0, childHeight );
+					}
+					else if ( alignment == Alignment.CENTRE )
+					{
+						paragraph.allocateChildY( child, ( lineAllocation - childHeight ) * 0.5, childHeight );
+					}
+					else if ( alignment == Alignment.BOTTOM )
+					{
+						paragraph.allocateChildY( child, lineAllocation - childHeight, childHeight );
+					}
+					else if ( alignment == Alignment.EXPAND )
+					{
+						paragraph.allocateChildY( child, 0.0, lineAllocation );
+					}
+				}
+			}
+		}
+		
+		
+
+		private ChildEntry getChildEntryClosestToLocalPoint(Point2 localPos)
+		{
+			if ( children.size() == 0 )
+			{
+				return null;
+			}
+			else if ( children.size() == 1 )
+			{
+				return children.get( 0 );
+			}
+			else
+			{
+				ChildEntry entryI = children.get( 0 );
+				for (int i = 0; i < children.size() - 1; i++)
+				{
+					ChildEntry entryJ = children.get( i + 1 );
+					double iUpperX = entryI.pos.x + entryI.size.x;
+					double jLowerX = entryJ.pos.x;
+					
+					double midX = ( iUpperX + jLowerX ) * 0.5;
+					
+					if ( localPos.x < midX )
+					{
+						return entryI;
+					}
+					
+					entryI = entryJ;
+				}
+				
+				return children.get( children.size() - 1 );
+			}
 		}
 	}
 
@@ -450,36 +577,6 @@ public class DPParagraph extends DPContainerSequence
 	
 	
 	
-	private void allocateLineX(Line line, double lineX, double allocation)
-	{
-		double spacing = getSpacing();
-
-		Metrics[] allocated = HMetrics.allocateSpacePacked( getChildrenMinimumHMetrics( line.children ), getChildrenPreferredHMetrics( line.children ), null, allocation );
-		
-		double width = 0.0;
-		double x = lineX;
-		for (int i = 0; i < allocated.length; i++)
-		{
-			HMetrics chm = (HMetrics)allocated[i];
-			
-			if ( i != allocated.length - 1)
-			{
-				chm = chm.minSpacing( spacing );
-			}
-			
-			ParagraphChildEntry entry = (ParagraphChildEntry)line.children.get( i ); 
-
-			double childX = x + entry.padding;
-			
-			allocateChildX( entry.child, childX, chm.width );
-
-			width = x + chm.width + entry.padding * 2.0;
-			x = width + chm.hspacing;
-		}
-	}
-
-
-	
 	protected void allocateContentsX(double allocation)
 	{
 		super.allocateContentsX( allocation );
@@ -498,7 +595,7 @@ public class DPParagraph extends DPContainerSequence
 		boolean bFirst = true;
 		for (Line line: lines)
 		{
-			allocateLineX( line, bFirst ? 0.0 : indentation, allocation );
+			line.allocateX( this, bFirst ? 0.0 : indentation, allocation );
 			bFirst = false;
 		}
 	}
@@ -506,64 +603,6 @@ public class DPParagraph extends DPContainerSequence
 	
 	
 
-	private void allocateLineY(Line line, double lineY, double lineAllocation)
-	{
-		Alignment alignment = getAlignment();
-		if ( alignment == Alignment.BASELINES )
-		{
-			VMetricsTypeset vmt = (VMetricsTypeset)line.prefV;
-			
-			double delta = lineAllocation - vmt.height;
-			double y = lineY + vmt.ascent + delta * 0.5;
-			
-			for (ChildEntry entry: line.children)
-			{
-				ParagraphChildEntry paraEntry = (ParagraphChildEntry)entry;
-				DPWidget child = paraEntry.child;
-				double chAscent;
-				VMetrics chm = child.prefV;
-				if ( chm.isTypeset() )
-				{
-					VMetricsTypeset tchm = (VMetricsTypeset)chm;
-					chAscent = tchm.ascent;
-				}
-				else
-				{
-					chAscent = chm.height * 0.5  -  NON_TYPESET_CHILD_BASELINE_OFFSET;
-				}
-
-				double childY = Math.max( y - chAscent, 0.0 );
-				double childHeight = Math.min( chm.height, lineAllocation );
-				allocateChildY( child, childY, childHeight );
-			}
-		}
-		else
-		{
-			for (ChildEntry entry: line.children)
-			{
-				DPWidget child = entry.child;
-				double childHeight = Math.min( child.prefV.height, lineAllocation );
-				if ( alignment == Alignment.TOP )
-				{
-					allocateChildY( child, 0.0, childHeight );
-				}
-				else if ( alignment == Alignment.CENTRE )
-				{
-					allocateChildY( child, ( lineAllocation - childHeight ) * 0.5, childHeight );
-				}
-				else if ( alignment == Alignment.BOTTOM )
-				{
-					allocateChildY( child, lineAllocation - childHeight, childHeight );
-				}
-				else if ( alignment == Alignment.EXPAND )
-				{
-					allocateChildY( child, 0.0, lineAllocation );
-				}
-			}
-		}
-	}
-	
-	
 	protected void allocateContentsY(double allocation)
 	{
 		super.allocateContentsY( allocation );
@@ -587,13 +626,61 @@ public class DPParagraph extends DPContainerSequence
 		{
 			VMetrics chm = (VMetrics)allocated[i];
 			
-			allocateLineY( lines.get( i ), y, chm.height );
+			lines.get( i ).allocateY( this, y, chm.height );
 
 			height = y + chm.height;
 			y = height + chm.vspacing;
 		}
 	}
 	
+	
+	
+	private Line getLineClosestToLocalPoint(Point2 localPos)
+	{
+		if ( lines.size() == 0 )
+		{
+			return null;
+		}
+		else if ( lines.size() == 1 )
+		{
+			return lines.firstElement();
+		}
+		else
+		{
+			Line lineI = lines.firstElement();
+			for (int i = 0; i < lines.size() - 1; i++)
+			{
+				Line lineJ = lines.get( i + 1 );
+				double iUpperY = lineI.posY + lineI.sizeY;
+				double jLowerY = lineJ.posY;
+				
+				double midY = ( iUpperY + jLowerY ) * 0.5;
+				
+				if ( localPos.y < midY )
+				{
+					return lineI;
+				}
+				
+				lineI = lineJ;
+			}
+			
+			return lines.lastElement();
+		}
+	}
+
+	protected ChildEntry getChildEntryClosestToLocalPoint(Point2 localPos)
+	{
+		Line line = getLineClosestToLocalPoint( localPos );
+		
+		if ( line != null )
+		{
+			return line.getChildEntryClosestToLocalPoint( localPos );
+		}
+		else
+		{
+			return null;
+		}
+	}
 	
 	
 	//
