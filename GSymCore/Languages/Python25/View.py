@@ -432,7 +432,7 @@ class Python25View (GSymView):
 
 
 	def UNPARSED(self, ctx, state, node, value):
-		return statementNodeEditor( ctx, node,
+		return expressionNodeEditor( ctx, node,
 				   text( ctx, unparsed_textStyle, value ),
 				   PRECEDENCE_STMT,
 				   state )

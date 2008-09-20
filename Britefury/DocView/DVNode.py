@@ -95,7 +95,6 @@ class DVNode (object):
 		self._updateElement( contents )
 		
 		if self._view._caretNode is self:
-		#if True:
 			# Invoking child.refresh() above can cause this method to be invoked on another node; recursively;
 			# Ensure that only the inner-most recursion level handles the caret
 			if position is not None  and  bias is not None  and  self._elementContent is not None:
@@ -126,44 +125,46 @@ class DVNode (object):
 				
 				newIndex = newPosition  +  ( 1  if newBias == Marker.Bias.END  else  0 )
 				
+				print 'CURSOR POSITION CHANGE'
+				print contentString[:oldIndex].replace( '\n', '\\n' ) + '>|<' + contentString[oldIndex:].replace( '\n', '\\n' )
+				print newContentString[:newIndex].replace( '\n', '\\n' ) + '>|<' + newContentString[newIndex:].replace( '\n', '\\n' )
+				
 				newPosition = max( 0, newPosition )
 				if newPosition >= self._elementContent.getContentLength():
 					newPosition = self._elementContent.getContentLength() - 1
 					newBias = Marker.Bias.END
 				
-				def _afterRefresh():
-					leaf = self._elementContent.getLeafAtContentPosition( newPosition )
-					if leaf is not None:
-						leafOffset = leaf.getContentOffsetInSubtree( self._elementContent )
-						leafPosition = newPosition - leafOffset
-						
-						if leaf.isEditable():
-							#print 'Node "%s"; content was "%s" now "%s"'  %  ( self.docNode[0], startContent, self._elementContent.getContent() )
-							#print 'Position was %d, now is %d; leaf (%s) offset is %d, moving to %d in leaf'  %  ( position, newPosition, leaf.getContent(), leafOffset, leafPosition )
-							leaf.moveMarker( caret.getMarker(), leafPosition, newBias )
-						else:
-							if leafPosition < leaf.getContentLength()/2:
-								left = leaf.getEditableContentLeafToLeft()
-								if left is not None:
-									left.moveMarkerToEnd( caret.getMarker() )
-								else:
-									right = leaf.getEditableContentLeafToRight()
-									if right is not None:
-										right.moveMarkerToStart( caret.getMarker() )
-									else:
-										leaf.moveMarker( caret.getMarker(), leafPosition, newBias )
+				leaf = self._elementContent.getLeafAtContentPosition( newPosition )
+				if leaf is not None:
+					print leaf, leaf.getContent().replace( '\n', '\\n' )
+					leafOffset = leaf.getContentOffsetInSubtree( self._elementContent )
+					leafPosition = newPosition - leafOffset
+					
+					if leaf.isEditable():
+						#print 'Node "%s"; content was "%s" now "%s"'  %  ( self.docNode[0], startContent, self._elementContent.getContent() )
+						#print 'Position was %d, now is %d; leaf (%s) offset is %d, moving to %d in leaf'  %  ( position, newPosition, leaf.getContent(), leafOffset, leafPosition )
+						leaf.moveMarker( caret.getMarker(), leafPosition, newBias )
+					else:
+						if leafPosition < leaf.getContentLength()/2:
+							left = leaf.getEditableContentLeafToLeft()
+							if left is not None:
+								left.moveMarkerToEnd( caret.getMarker() )
 							else:
 								right = leaf.getEditableContentLeafToRight()
 								if right is not None:
 									right.moveMarkerToStart( caret.getMarker() )
 								else:
-									left = leaf.getEditableContentLeafToLeft()
-									if left is not None:
-										left.moveMarkerToEnd( caret.getMarker() )
-									else:
-										leaf.moveMarker( caret.getMarker(), leafPosition, newBias )
-				
-				self._view._queueAfterRefresh( _afterRefresh )
+									leaf.moveMarker( caret.getMarker(), leafPosition, newBias )
+						else:
+							right = leaf.getEditableContentLeafToRight()
+							if right is not None:
+								right.moveMarkerToStart( caret.getMarker() )
+							else:
+								left = leaf.getEditableContentLeafToLeft()
+								if left is not None:
+									left.moveMarkerToEnd( caret.getMarker() )
+								else:
+									leaf.moveMarker( caret.getMarker(), leafPosition, newBias )
 
 				
 				
