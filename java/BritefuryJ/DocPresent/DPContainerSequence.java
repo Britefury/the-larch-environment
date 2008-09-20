@@ -39,30 +39,52 @@ abstract public class DPContainerSequence extends DPContainer
 	public void setChildren(List<DPWidget> items)
 	{
 		HashSet<ChildEntry> oldEntrySet = new HashSet<ChildEntry>( childEntries );
+
+		// Set of added entries
+		HashSet<ChildEntry> added = new HashSet<ChildEntry>();
 		
+		// Build an array containing the child entry list, *after* modification
 		ChildEntry[] itemEntriesArray = new ChildEntry[items.size()];
 		for (int i = 0; i < items.size(); i++)
 		{
-			itemEntriesArray[i] = createChildEntryForChild( items.get( i ) );
+			// Reuse existing child entries if possible
+			ChildEntry entry = childToEntry.get( items.get( i ) );
+			if ( entry != null )
+			{
+				itemEntriesArray[i] = entry;
+			}
+			else
+			{
+				// Create a new entry for the child/item
+				entry = createChildEntryForChild( items.get( i ) );
+				itemEntriesArray[i] = entry;
+
+				// @item is not already present in the list of children; it is new, so @entry will be added to the list
+				added.add( entry );
+				
+				// We cannot simply assume that the entry at position @i is removed, since this entry may have been moved to a different
+				// position in the sequence, and another entry/child removed. We have to determine what is removed later on
+			}
 		}
 		
 		HashSet<ChildEntry> newEntrySet = new HashSet<ChildEntry>( Arrays.asList( itemEntriesArray ) );
 		
 		
+		// Compute set of removed entries
 		HashSet<ChildEntry> removed = (HashSet<ChildEntry>)oldEntrySet.clone();
 		removed.removeAll( newEntrySet );
-		HashSet<ChildEntry> added = (HashSet<ChildEntry>)newEntrySet.clone();
-		added.removeAll( oldEntrySet );
 		
-		
+		// Unregister removed entries
 		for (ChildEntry entry: removed)
 		{
 			unregisterChildEntry( entry );
 		}
 		
+		// Set contents of @childEntries list
 		childEntries.clear();
 		childEntries.addAll( Arrays.asList( itemEntriesArray ) );
 
+		// Register added entries
 		for (ChildEntry entry: added)
 		{
 			registerChildEntry( entry );
@@ -349,7 +371,7 @@ abstract public class DPContainerSequence extends DPContainer
 	
 	
 	
-	HMetrics[] getChildrenMinimumHMetrics(List<ChildEntry> nodes)
+	static HMetrics[] getChildrenMinimumHMetrics(List<ChildEntry> nodes)
 	{
 		HMetrics[] chm = new HMetrics[nodes.size()];
 		for (int i = 0; i < nodes.size(); i++)
@@ -365,7 +387,7 @@ abstract public class DPContainerSequence extends DPContainer
 	}
 
 	
-	HMetrics[] getChildrenPreferredHMetrics(List<ChildEntry> nodes)
+	static HMetrics[] getChildrenPreferredHMetrics(List<ChildEntry> nodes)
 	{
 		HMetrics[] chm = new HMetrics[nodes.size()];
 		for (int i = 0; i < nodes.size(); i++)
@@ -382,7 +404,7 @@ abstract public class DPContainerSequence extends DPContainer
 	
 	
 	
-	VMetrics[] getChildrenMinimumVMetrics(List<ChildEntry> nodes)
+	static VMetrics[] getChildrenMinimumVMetrics(List<ChildEntry> nodes)
 	{
 		VMetrics[] chm = new VMetrics[nodes.size()];
 		for (int i = 0; i < nodes.size(); i++)
@@ -398,7 +420,7 @@ abstract public class DPContainerSequence extends DPContainer
 	}
 
 	
-	VMetrics[] getChildrenPreferredVMetrics(List<ChildEntry> nodes)
+	static VMetrics[] getChildrenPreferredVMetrics(List<ChildEntry> nodes)
 	{
 		VMetrics[] chm = new VMetrics[nodes.size()];
 		for (int i = 0; i < nodes.size(); i++)

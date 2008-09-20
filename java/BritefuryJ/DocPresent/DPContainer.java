@@ -268,6 +268,8 @@ public abstract class DPContainer extends DPWidget implements ContentInterface
 		return null;
 	}
 	
+	protected abstract ChildEntry getChildEntryClosestToLocalPoint(Point2 localPos);
+	
 	
 	
 	//

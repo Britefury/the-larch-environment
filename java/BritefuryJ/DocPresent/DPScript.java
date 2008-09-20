@@ -15,6 +15,7 @@ import BritefuryJ.DocPresent.Metrics.HMetrics;
 import BritefuryJ.DocPresent.Metrics.VMetrics;
 import BritefuryJ.DocPresent.Metrics.VMetricsTypeset;
 import BritefuryJ.DocPresent.StyleSheets.ScriptStyleSheet;
+import BritefuryJ.Math.Point2;
 
 
 public class DPScript extends DPContainer
@@ -26,6 +27,10 @@ public class DPScript extends DPContainer
 	public static int RIGHTSUB = 4;
 	
 	public static int NUMCHILDREN = 5;
+	
+	private static int LEFTCOLUMN = 0;
+	private static int MAINCOLUMN = 1;
+	private static int RIGHTCOLUMN = 2;
 	
 	private static double childScale = 0.7;
 	
@@ -745,6 +750,172 @@ public class DPScript extends DPContainer
 		}
 	}
 	
+
+	
+	
+	private Vector<ChildEntry> getChildEntries(int[] slots)
+	{
+		Vector<ChildEntry> entries = new Vector<ChildEntry>();
+		for (int slot: slots)
+		{
+			if ( children[slot] != null )
+			{
+				entries.add( childToEntry.get( children[slot] ) );
+			}
+		}
+		
+		return entries;
+	}
+	
+	private Vector<ChildEntry> getChildEntriesInColumn(int column)
+	{
+		if ( column == LEFTCOLUMN )
+		{
+			int slots[] = { LEFTSUPER, LEFTSUB };
+			return getChildEntries( slots );
+		}
+		else if ( column == MAINCOLUMN )
+		{
+			int slots[] = { MAIN };
+			return getChildEntries( slots );
+		}
+		else if ( column == RIGHTCOLUMN )
+		{
+			int slots[] = { RIGHTSUPER, RIGHTSUB };
+			return getChildEntries( slots );
+		}
+		else
+		{
+			throw new RuntimeException();
+		}
+	}
+	
+	
+	private double getColumnXEdge(Vector<ChildEntry> column, boolean bRightEdge)
+	{
+		double columnEdgeX = 0.0;
+		for (int i = 0; i < column.size(); i++)
+		{
+			ChildEntry entry = column.get( i );
+			
+			double edgeX = 0.0;
+			if ( bRightEdge )
+			{
+				edgeX = entry.pos.x + entry.size.x;
+			}
+			else
+			{
+				edgeX = entry.pos.x;
+			}
+			
+			if ( i > 0 )
+			{
+				if ( bRightEdge )
+				{
+					columnEdgeX = Math.max( columnEdgeX, edgeX );
+				}
+				else
+				{
+					columnEdgeX = Math.min( columnEdgeX, edgeX );
+				}
+			}
+			else
+			{
+				columnEdgeX= edgeX;
+			}
+		}
+		
+		return columnEdgeX;
+	}
+	
+	
+	protected ChildEntry getChildEntryClosestToLocalPoint(Point2 localPos)
+	{
+		if ( childEntries.size() == 0 )
+		{
+			// No children
+			return null;
+		}
+		else if ( childEntries.size() == 1 )
+		{
+			// Only 1 child
+			return childEntries.firstElement();
+		}
+		else
+		{
+			// Group children by column
+			Vector< Vector<ChildEntry> > childEntriesByColumn = new Vector< Vector<ChildEntry> >();
+			
+			int[] columns = { LEFTCOLUMN, MAINCOLUMN, RIGHTCOLUMN };
+			
+			for (int col: columns)
+			{
+				Vector<ChildEntry> childEntries = getChildEntriesInColumn( col );
+				
+				if ( childEntries.size() > 0 )
+				{
+					childEntriesByColumn.add( childEntries );
+				}
+			}
+			
+			
+			// Determine which column is closest
+			Vector<ChildEntry> closestColumn = null;
+			
+			if ( childEntriesByColumn.size() == 1 )
+			{
+				closestColumn = childEntriesByColumn.firstElement();
+			}
+			else
+			{
+				Vector<ChildEntry> colI = childEntriesByColumn.firstElement();
+				for (int i = 0; i < childEntriesByColumn.size() - 1; i++)
+				{
+					Vector<ChildEntry> colJ = childEntriesByColumn.get( i + 1 );
+					double rightEdgeI = getColumnXEdge( colI, true );
+					double leftEdgeJ = getColumnXEdge( colJ, false );
+					
+					double midPoint = ( rightEdgeI + leftEdgeJ ) * 0.5;
+					
+					if ( localPos.x < midPoint )
+					{
+						closestColumn = colI;
+						break;
+					}
+				}
+				
+				if ( closestColumn == null )
+				{
+					closestColumn = childEntriesByColumn.lastElement();
+				}
+			}
+			
+			
+			
+			// Now determine which child entry is the closest
+			if ( closestColumn.size() == 1 )
+			{
+				// One entry; only 1 choice
+				return closestColumn.firstElement();
+			}
+			else if ( closestColumn.size() == 2 )
+			{
+				ChildEntry entryI = closestColumn.firstElement();
+				ChildEntry entryJ = closestColumn.lastElement();
+				double iUpperY = entryI.pos.y + entryI.size.y;
+				double jLowerY = entryJ.pos.y;
+					
+				double midY = ( iUpperY + jLowerY ) * 0.5;
+				
+				return localPos.y < midY  ?  entryI  :  entryJ;
+			}
+			else
+			{
+				throw new RuntimeException();
+			}
+		}
+	}
+
 	
 	//
 	// Focus navigation methods

@@ -304,6 +304,41 @@ public class DPHBox extends DPAbstractBox
 	
 	
 	
+	protected ChildEntry getChildEntryClosestToLocalPoint(Point2 localPos)
+	{
+		if ( childEntries.size() == 0 )
+		{
+			return null;
+		}
+		else if ( childEntries.size() == 1 )
+		{
+			return childEntries.firstElement();
+		}
+		else
+		{
+			ChildEntry entryI = childEntries.firstElement();
+			for (int i = 0; i < childEntries.size() - 1; i++)
+			{
+				ChildEntry entryJ = childEntries.get( i + 1 );
+				double iUpperX = entryI.pos.x + entryI.size.x;
+				double jLowerX = entryJ.pos.x;
+				
+				double midX = ( iUpperX + jLowerX ) * 0.5;
+				
+				if ( localPos.x < midX )
+				{
+					return entryI;
+				}
+				
+				entryI = entryJ;
+			}
+			
+			return childEntries.lastElement();
+		}
+	}
+
+
+	
 	//
 	// Focus navigation methods
 	//

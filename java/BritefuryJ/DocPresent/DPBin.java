@@ -13,6 +13,7 @@ import java.util.List;
 import BritefuryJ.DocPresent.Metrics.HMetrics;
 import BritefuryJ.DocPresent.Metrics.VMetrics;
 import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
+import BritefuryJ.Math.Point2;
 
 
 public class DPBin extends DPContainer
@@ -179,6 +180,18 @@ public class DPBin extends DPContainer
 	
 	
 	
+	protected ChildEntry getChildEntryClosestToLocalPoint(Point2 localPos)
+	{
+		if ( childEntries.size() == 0 )
+		{
+			return null;
+		}
+		else
+		{
+			return childEntries.firstElement();
+		}
+	}
+
 	
 	//
 	// Focus navigation methods

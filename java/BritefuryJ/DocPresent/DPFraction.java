@@ -183,8 +183,18 @@ public class DPFraction extends DPContainer
 			if ( child != null )
 			{
 				ChildEntry entry = new ChildEntry( child );
-				childEntries.add( entry );
 				registerChildEntry( entry );
+				
+				int insertIndex = 0;
+				for (int i = 0; i < slot; i++)
+				{
+					if ( children[i] != null )
+					{
+						insertIndex++;
+					}
+				}
+				
+				childEntries.insertElementAt( entry, insertIndex );
 			}
 			
 			queueResize();
@@ -460,6 +470,42 @@ public class DPFraction extends DPContainer
 		}
 	}
 	
+	
+
+	protected ChildEntry getChildEntryClosestToLocalPoint(Point2 localPos)
+	{
+		if ( childEntries.size() == 0 )
+		{
+			return null;
+		}
+		else if ( childEntries.size() == 1 )
+		{
+			return childEntries.firstElement();
+		}
+		else
+		{
+			ChildEntry entryI = childToEntry.get( children[0] );
+			for (int i = 0; i < childEntries.size() - 1; i++)
+			{
+				ChildEntry entryJ = childEntries.get( i + 1 );
+				double iUpperY = entryI.pos.y + entryI.size.y;
+				double jLowerY = entryJ.pos.y;
+				
+				double midY = ( iUpperY + jLowerY ) * 0.5;
+				
+				if ( localPos.y < midY )
+				{
+					return entryI;
+				}
+				
+				entryI = entryJ;
+			}
+			
+			return childEntries.lastElement();
+		}
+	}
+
+
 	
 	//
 	// Focus navigation methods
