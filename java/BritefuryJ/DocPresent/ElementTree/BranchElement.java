@@ -8,17 +8,27 @@
 package BritefuryJ.DocPresent.ElementTree;
 
 import java.util.List;
+import java.util.Vector;
 
 import BritefuryJ.DocPresent.DPContainer;
 
 public abstract class BranchElement extends Element
 {
+	//
+	// Constructor
+	//
+	
 	protected BranchElement(DPContainer widget)
 	{
 		super( widget );
 	}
 
 
+	
+	//
+	// Widget
+	//
+	
 	public DPContainer getWidget()
 	{
 		return (DPContainer)widget;
@@ -26,8 +36,9 @@ public abstract class BranchElement extends Element
 	
 	
 	
-	public abstract List<Element> getChildren();
-	
+	//
+	// Element tree and parent methods
+	//
 	
 	protected void setElementTree(ElementTree tree)
 	{
@@ -42,13 +53,87 @@ public abstract class BranchElement extends Element
 		}
 	}
 	
+
 	
+	//
+	// Element tree structure methods
+	//
+
+	public abstract List<Element> getChildren();
 	
-	public int getContentOffsetOfChild(Element elem)
+
+	
+	public List<LeafElement> getLeavesInSubtree(BranchFilter branchFilter, LeafFilter leafFilter)
 	{
-		return getWidget().getContentOffsetOfChild( elem.getWidgetAtContentStart() );
+		Vector<LeafElement> leaves = new Vector<LeafElement>();
+
+		if ( branchFilter == null  ||  branchFilter.test( this ) )
+		{
+			for (Element ch: getChildren())
+			{
+				leaves.addAll( ch.getLeavesInSubtree( branchFilter, leafFilter ) );
+			}
+		}
+
+		return leaves;
 	}
 	
+	public LeafElement getFirstLeafInSubtree(BranchFilter branchFilter, LeafFilter leafFilter)
+	{
+		if ( branchFilter == null  ||  branchFilter.test( this ) )
+		{
+			for (Element child: getChildren())
+			{
+				LeafElement leaf = child.getFirstLeafInSubtree( branchFilter, leafFilter );
+				if ( leaf != null )
+				{
+					return leaf;
+				}
+			}
+			return null;
+		}
+		else
+		{
+			return null;
+		}
+	}
+
+	public LeafElement getLastLeafInSubtree(BranchFilter branchFilter, LeafFilter leafFilter)
+	{
+		if ( branchFilter == null  ||  branchFilter.test( this ) )
+		{
+			List<Element> children = getChildren();
+			for (int i = children.size() - 1; i >= 0; i--)
+			{
+				LeafElement leaf = children.get( i ).getLastLeafInSubtree( branchFilter, leafFilter );
+				if ( leaf != null )
+				{
+					return leaf;
+				}
+			}
+			return null;
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	
+	public LeafElement getLeafAtContentPosition(int position)
+	{
+		Element c = getChildAtContentPosition( position );
+		
+		if ( c != null )
+		{
+			return c.getLeafAtContentPosition( position - getContentOffsetOfChild( c ) );
+		}
+		else
+		{
+			return null;
+		}
+	}
+
 	public Element getChildAtContentPosition(int position)
 	{
 		int offset = 0;
@@ -65,49 +150,70 @@ public abstract class BranchElement extends Element
 		return null;
 	}
 
-	public LeafElement getLeftContentLeaf()
+	
+	protected LeafElement getPreviousLeafFromChild(Element child, BranchFilter subtreeRootFilter, BranchFilter branchFilter, LeafFilter leafFilter)
 	{
-		for (Element c: getChildren())
+		if ( subtreeRootFilter == null  ||  subtreeRootFilter.test( this ) )
 		{
-			LeafElement leaf = c.getLeftContentLeaf();
-			if ( leaf != null )
+			List<Element> children = getChildren();
+			int index = children.indexOf( child );
+			if ( index != -1 )
 			{
-				return leaf;
+				for (int i = index - 1; i >= 0; i--)
+				{
+					Element e = children.get( i );
+					LeafElement l = e.getLastLeafInSubtree( branchFilter, leafFilter );
+					if ( l != null )
+					{
+						return l;
+					}
+				}
+			}
+			
+			if ( parent != null )
+			{
+				return parent.getPreviousLeafFromChild( this, subtreeRootFilter, branchFilter, leafFilter );
 			}
 		}
 		
 		return null;
 	}
 	
-	public LeafElement getRightContentLeaf()
+	protected LeafElement getNextLeafFromChild(Element child, BranchFilter subtreeRootFilter, BranchFilter branchFilter, LeafFilter leafFilter)
 	{
-		List<Element> ch = getChildren();
-		for (int i = ch.size() - 1; i >= 0; i--)
+		if ( subtreeRootFilter == null  ||  subtreeRootFilter.test( this ) )
 		{
-			LeafElement leaf = ch.get( i ).getRightContentLeaf();
-			if ( leaf != null )
+			List<Element> children = getChildren();
+			int index = children.indexOf( child );
+			if ( index != -1 )
 			{
-				return leaf;
+				for (int i = index + 1; i < children.size(); i++)
+				{
+					Element e = children.get( i );
+					LeafElement l = e.getFirstLeafInSubtree( branchFilter, leafFilter );
+					if ( l != null )
+					{
+						return l;
+					}
+				}
+			}
+		
+			if ( parent != null )
+			{
+				return parent.getNextLeafFromChild( this, subtreeRootFilter, branchFilter, leafFilter );
 			}
 		}
-		
-		return null;
-	}
-	
-	public LeafElement getLeafAtContentPosition(int position)
-	{
-		Element c = getChildAtContentPosition( position );
-		
-		if ( c != null )
-		{
-			return c.getLeafAtContentPosition( position - getContentOffsetOfChild( c ) );
-		}
-		else
-		{
-			return null;
-		}
-	}
 
+		return null;
+	}
+	
+
+	
+	public int getContentOffsetOfChild(Element elem)
+	{
+		return getWidget().getContentOffsetOfChild( elem.getWidgetAtContentStart() );
+	}
+	
 	protected int getChildContentOffsetInSubtree(Element child, BranchElement subtreeRoot)
 	{
 		return getContentOffsetOfChild( child )  +  getContentOffsetInSubtree( subtreeRoot );

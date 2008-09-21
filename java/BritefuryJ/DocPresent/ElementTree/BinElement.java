@@ -57,6 +57,11 @@ public class BinElement extends BranchElement
 		}
 	}
 	
+	public Element getChild()
+	{
+		return child;
+	}
+	
 
 	
 	public DPBin getWidget()

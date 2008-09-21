@@ -230,13 +230,6 @@ public class ParagraphElement extends SequenceBranchElement
 
 
 
-	protected boolean isParagraph()
-	{
-		return true;
-	}
-
-
-
 	public DPWidget getWidgetAtContentStart()
 	{
 		if ( mode ==  Mode.INDEPENDENT )
@@ -346,5 +339,16 @@ public class ParagraphElement extends SequenceBranchElement
 	public boolean isMarkerAtEnd(ElementMarker m)
 	{
 		return getWidget().isMarkerAtEnd( m.getWidgetMarker() );
+	}
+
+
+
+	//
+	// Element type methods
+	//
+	
+	protected boolean isParagraph()
+	{
+		return true;
 	}
 }

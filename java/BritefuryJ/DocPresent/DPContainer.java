@@ -76,6 +76,11 @@ public abstract class DPContainer extends DPWidget implements ContentInterface
 	
 	
 	
+	
+	//
+	// Constructors
+	//
+	
 	public DPContainer()
 	{
 		this( ContainerStyleSheet.defaultStyleSheet );
@@ -94,19 +99,9 @@ public abstract class DPContainer extends DPWidget implements ContentInterface
 	
 	
 	
-	public boolean hasChild(DPWidget child)
-	{
-		for (ChildEntry entry: childEntries)
-		{
-			if ( child == entry.child )
-			{
-				return true;
-			}
-		}
-		
-		return false;
-	}
-	
+	//
+	// Geometry methods
+	//
 	
 	protected Xform2 getChildTransformRelativeToAncestor(DPWidget child, DPWidget ancestor, Xform2 x)
 	{
@@ -122,7 +117,23 @@ public abstract class DPContainer extends DPWidget implements ContentInterface
 		return getLocalPointRelativeToAncestor( ancestor, localP );
 	}
 	
+
+	protected void refreshScale(double scale, double rootScale)
+	{
+		super.refreshScale( scale, rootScale );
+		
+		for (ChildEntry childEntry: childEntries)
+		{
+			childEntry.child.setScale( 1.0, rootScale );
+		}
+	}
 	
+	
+	
+	
+	//
+	// Child registration methods
+	//
 	
 	protected ChildEntry registerChildEntry(ChildEntry childEntry)
 	{
@@ -161,6 +172,37 @@ public abstract class DPContainer extends DPWidget implements ContentInterface
 	}
 	
 	
+	
+	
+	
+	
+	//
+	// Tree structure methods
+	//
+	
+	
+	protected abstract void removeChild(DPWidget child);
+	
+	public boolean hasChild(DPWidget child)
+	{
+		for (ChildEntry entry: childEntries)
+		{
+			if ( child == entry.child )
+			{
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	
+	protected abstract List<DPWidget> getChildren();
+	
+	
+	
+	
+	
 	protected void structureChanged()
 	{
 		if ( parent != null )
@@ -169,28 +211,13 @@ public abstract class DPContainer extends DPWidget implements ContentInterface
 		}
 	}
 	
-	
-	protected abstract void removeChild(DPWidget child);
-	
-	
-	protected abstract List<DPWidget> getChildren();
-	
-	
-	
-	
-	protected void refreshScale(double scale, double rootScale)
-	{
-		super.refreshScale( scale, rootScale );
-		
-		for (ChildEntry childEntry: childEntries)
-		{
-			childEntry.child.setScale( 1.0, rootScale );
-		}
-	}
-	
-	
-	
 
+	
+	
+	//
+	// Event handling methods
+	//
+	
 	protected void onLeaveIntoChild(PointerMotionEvent event, DPWidget child)
 	{
 	}

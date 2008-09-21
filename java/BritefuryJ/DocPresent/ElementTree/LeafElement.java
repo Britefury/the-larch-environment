@@ -7,12 +7,35 @@
 //##************************
 package BritefuryJ.DocPresent.ElementTree;
 
+import java.util.List;
+import java.util.Vector;
+
 import BritefuryJ.DocPresent.DPContentLeaf;
 import BritefuryJ.DocPresent.WidgetContentListener;
 import BritefuryJ.DocPresent.Marker.Marker;
 
 public abstract class LeafElement extends Element implements WidgetContentListener
 {
+	//
+	// Utility classes
+	//
+	
+	public static class LeafFilterEditable implements LeafFilter
+	{
+		public boolean test(LeafElement element)
+		{
+			return element.isEditable();
+		}
+	}
+	
+	
+	
+	
+	
+	//
+	// Constructor
+	//
+	
 	protected LeafElement(DPContentLeaf widget)
 	{
 		super( widget );
@@ -21,21 +44,57 @@ public abstract class LeafElement extends Element implements WidgetContentListen
 	
 	
 	
+	//
+	// Widget
+	//
+	
 	public DPContentLeaf getWidget()
 	{
 		return (DPContentLeaf)widget;
 	}
 
 	
-	public LeafElement getLeftContentLeaf()
+
+
+
+	//
+	// Element tree structure methods
+	//
+	
+	public List<LeafElement> getLeavesInSubtree(BranchFilter branchFilter, LeafFilter leafFilter)
 	{
-		return this;
+		Vector<LeafElement> leaves = new Vector<LeafElement>();
+		if ( leafFilter == null  ||  leafFilter.test( this ) )
+		{
+			leaves.add( this );
+		}
+		return leaves;
 	}
 	
-	public LeafElement getRightContentLeaf()
+	public LeafElement getFirstLeafInSubtree(BranchFilter branchFilter, LeafFilter leafFilter)
 	{
-		return this;
+		if ( leafFilter == null  ||  leafFilter.test( this ) )
+		{
+			return this;
+		}
+		else
+		{
+			return null;
+		}
 	}
+
+	public LeafElement getLastLeafInSubtree(BranchFilter branchFilter, LeafFilter leafFilter)
+	{
+		if ( leafFilter == null  ||  leafFilter.test( this ) )
+		{
+			return this;
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
 	
 	public LeafElement getLeafAtContentPosition(int position)
 	{
@@ -43,7 +102,36 @@ public abstract class LeafElement extends Element implements WidgetContentListen
 	}
 
 
+	public LeafElement getPreviousLeaf(BranchFilter subtreeRootFilter, BranchFilter branchFilter, LeafFilter leafFilter)
+	{
+		if ( parent != null )
+		{
+			return parent.getPreviousLeafFromChild( this, subtreeRootFilter, branchFilter, leafFilter );
+		}
+		else
+		{
+			return null;
+		}
+	}
 	
+	public LeafElement getNextLeaf(BranchFilter subtreeRootFilter, BranchFilter branchFilter, LeafFilter leafFilter)
+	{
+		if ( parent != null )
+		{
+			return parent.getNextLeafFromChild( this, subtreeRootFilter, branchFilter, leafFilter );
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	
+	
+	
+	//
+	// Content methods
+	//
 	
 	public void contentInserted(Marker m, String x)
 	{
@@ -62,33 +150,6 @@ public abstract class LeafElement extends Element implements WidgetContentListen
 	
 	
 	
-	public LeafElement getContentLeafToLeft()
-	{
-		DPContentLeaf w = getWidget().getContentLeafToLeft();
-		if ( w != null )
-		{
-			return (LeafElement)tree.getElementForWidget( w );
-		}
-		else
-		{
-			return null;
-		}
-	}
-
-	public LeafElement getContentLeafToRight()
-	{
-		DPContentLeaf w = getWidget().getContentLeafToRight();
-		if ( w != null )
-		{
-			return (LeafElement)tree.getElementForWidget( w );
-		}
-		else
-		{
-			return null;
-		}
-	}
-
-
 	public LeafElement getEditableContentLeafToLeft()
 	{
 		DPContentLeaf w = getWidget().getEditableContentLeafToLeft();

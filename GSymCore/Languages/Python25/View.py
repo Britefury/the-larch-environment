@@ -384,7 +384,7 @@ def addContentLineStops(ctx, content, bDebug=False):
 		printElem( contentElement, 0 )
 	
 	# Left
-	leftLeaf = contentElement.getLeftContentLeaf()
+	leftLeaf = contentElement.getFirstLeafInSubtree()
 	if leftLeaf is not None:
 		if bDebug:
 			print 'Checking left: ', leftLeaf, leftLeaf.getContent()
@@ -398,7 +398,7 @@ def addContentLineStops(ctx, content, bDebug=False):
 	
 	# Right
 	rightStop = None
-	rightLeaf = contentElement.getRightContentLeaf()
+	rightLeaf = contentElement.getLastLeafInSubtree()
 	if rightLeaf is not None:
 		if bDebug:
 			print 'Checking right: ', rightLeaf, rightLeaf.getContent(), rightLeaf.getContentLine(), contentElement.getContentLine()
