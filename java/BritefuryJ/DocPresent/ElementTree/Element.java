@@ -8,6 +8,7 @@
 package BritefuryJ.DocPresent.ElementTree;
 
 import java.util.List;
+import java.util.Vector;
 
 import BritefuryJ.DocPresent.ContentInterface;
 import BritefuryJ.DocPresent.DPWidget;
@@ -23,6 +24,11 @@ public abstract class Element implements ContentInterface
 	protected ElementContentListener contentListener;
 	
 	
+	
+	//
+	// Constructor
+	//
+	
 	protected Element(DPWidget widget)
 	{
 		this.widget = widget;
@@ -32,6 +38,11 @@ public abstract class Element implements ContentInterface
 	}
 	
 	
+	
+	//
+	// Widget
+	//
+	
 	public DPWidget getWidget()
 	{
 		return widget;
@@ -39,12 +50,20 @@ public abstract class Element implements ContentInterface
 	
 	
 	
+	//
+	// Listeners
+	//
+	
 	public void setContentListener(ElementContentListener listener)
 	{
 		contentListener = listener;
 	}
 	
 	
+	
+	//
+	// Element tree and parent methods
+	//
 	
 	protected void setParent(BranchElement parent)
 	{
@@ -83,6 +102,10 @@ public abstract class Element implements ContentInterface
 	
 	
 
+	//
+	// Element tree structure methods
+	//
+	
 	public boolean isInSubtreeRootedAt(BranchElement r)
 	{
 		Element e = this;
@@ -94,7 +117,6 @@ public abstract class Element implements ContentInterface
 		
 		return e == r;
 	}
-	
 	
 	public void getElementPathToRoot(List<Element> path)
 	{
@@ -125,16 +147,63 @@ public abstract class Element implements ContentInterface
 		path.add( this );
 	}
 
+
 	
-	
-	protected boolean isParagraph()
+	public List<LeafElement> getLeavesInSubtree(BranchFilter branchFilter, LeafFilter leafFilter)
 	{
-		return false;
+		return new Vector<LeafElement>();
+	}
+	
+	public List<LeafElement> getLeavesInSubtree()
+	{
+		return getLeavesInSubtree( null, null );
+	}
+	
+	public LeafElement getFirstLeafInSubtree(BranchFilter branchFilter, LeafFilter leafFilter)
+	{
+		return null;
+	}
+
+	public LeafElement getFirstLeafInSubtree()
+	{
+		return getFirstLeafInSubtree( null, null );
+	}
+
+	public LeafElement getLastLeafInSubtree(BranchFilter branchFilter, LeafFilter leafFilter)
+	{
+		return null;
+	}
+
+	public LeafElement getLastLeafInSubtree()
+	{
+		return getLastLeafInSubtree( null, null );
+	}
+
+	
+	public LeafElement getLeafAtContentPosition(int position)
+	{
+		return null;
 	}
 	
 	
+	public int getContentOffsetInSubtree(BranchElement subtreeRoot)
+	{
+		if ( this == subtreeRoot )
+		{
+			return 0;
+		}
+		else
+		{
+			return parent.getChildContentOffsetInSubtree( this, subtreeRoot );
+		}
+	}
+
+
+
 	
-	
+	//
+	// Content methods
+	//
 	
 	protected boolean onContentModified()
 	{
@@ -172,33 +241,6 @@ public abstract class Element implements ContentInterface
 	}
 
 
-	public int getContentOffsetInSubtree(BranchElement subtreeRoot)
-	{
-		if ( this == subtreeRoot )
-		{
-			return 0;
-		}
-		else
-		{
-			return parent.getChildContentOffsetInSubtree( this, subtreeRoot );
-		}
-	}
-
-	public LeafElement getLeftContentLeaf()
-	{
-		return null;
-	}
-	
-	public LeafElement getRightContentLeaf()
-	{
-		return null;
-	}
-	
-	public LeafElement getLeafAtContentPosition(int position)
-	{
-		return null;
-	}
-	
 	public Element getContentLine()
 	{
 		if ( parent != null )
@@ -215,7 +257,7 @@ public abstract class Element implements ContentInterface
 
 	//
 	//
-	// MARKER METHODS
+	// Marker methods
 	//
 	//
 	
@@ -260,5 +302,16 @@ public abstract class Element implements ContentInterface
 	public boolean isMarkerAtEnd(ElementMarker m)
 	{
 		return getWidget().isMarkerAtEnd( m.getWidgetMarker() );
+	}
+	
+	
+	
+	//
+	// Element type methods
+	//
+	
+	protected boolean isParagraph()
+	{
+		return false;
 	}
 }

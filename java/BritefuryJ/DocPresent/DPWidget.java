@@ -127,7 +127,7 @@ abstract public class DPWidget implements ContentInterface
 	
 	//
 	//
-	// Constructor
+	// Constructors
 	//
 	//
 	
@@ -250,7 +250,7 @@ abstract public class DPWidget implements ContentInterface
 	
 	
 	//
-	// Widget tree methods
+	// Tree structure methods
 	//
 	
 	public boolean isRealised()
