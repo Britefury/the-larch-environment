@@ -80,6 +80,8 @@ public class ScriptElement extends BranchElement
 				child.setParent( this );
 				child.setElementTree( tree );
 			}
+			
+			onChildListChanged();
 		}
 	}
 	

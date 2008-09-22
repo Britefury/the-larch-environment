@@ -58,6 +58,18 @@ public abstract class BranchElement extends Element
 	//
 	// Element tree structure methods
 	//
+	
+	protected void onChildListChanged()
+	{
+		if ( parent != null )
+		{
+			parent.onSubtreeStructureChanged();
+		}
+	}
+	
+	protected void onSubtreeStructureChanged()
+	{
+	}
 
 	public abstract List<Element> getChildren();
 	

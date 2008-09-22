@@ -63,6 +63,8 @@ public abstract class SequenceBranchElement extends BranchElement
 			x.setParent( this );
 			x.setElementTree( tree );
 		}
+		
+		onChildListChanged();
 	}
 	
 

@@ -106,6 +106,8 @@ public class FractionElement extends BranchElement
 				child.setParent( this );
 				child.setElementTree( tree );
 			}
+
+			onChildListChanged();
 		}
 	}
 	

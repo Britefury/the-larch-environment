@@ -102,6 +102,11 @@ public abstract class LeafElement extends Element implements WidgetContentListen
 	}
 
 
+	public LeafElement getPreviousLeaf()
+	{
+		return getPreviousLeaf( null, null, null );
+	}
+
 	public LeafElement getPreviousLeaf(BranchFilter subtreeRootFilter, BranchFilter branchFilter, LeafFilter leafFilter)
 	{
 		if ( parent != null )
@@ -114,6 +119,11 @@ public abstract class LeafElement extends Element implements WidgetContentListen
 		}
 	}
 	
+	public LeafElement getNextLeaf()
+	{
+		return getNextLeaf( null, null, null );
+	}
+
 	public LeafElement getNextLeaf(BranchFilter subtreeRootFilter, BranchFilter branchFilter, LeafFilter leafFilter)
 	{
 		if ( parent != null )
@@ -126,6 +136,26 @@ public abstract class LeafElement extends Element implements WidgetContentListen
 		}
 	}
 	
+	public LeafElement getPreviousEditableLeaf(BranchFilter subtreeRootFilter, BranchFilter branchFilter)
+	{
+		return getPreviousLeaf( subtreeRootFilter, branchFilter, new LeafFilterEditable() );
+	}
+
+	public LeafElement getPreviousEditableLeaf()
+	{
+		return getPreviousEditableLeaf( null, null );
+	}
+
+	public LeafElement getNextEditableLeaf(BranchFilter subtreeRootFilter, BranchFilter branchFilter)
+	{
+		return getNextLeaf( subtreeRootFilter, branchFilter, new LeafFilterEditable() );
+	}
+
+	public LeafElement getNextEditableLeaf()
+	{
+		return getNextEditableLeaf( null, null );
+	}
+
 	
 	
 	

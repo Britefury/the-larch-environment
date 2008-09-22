@@ -146,21 +146,21 @@ class DVNode (object):
 						leaf.moveMarker( caret.getMarker(), leafPosition, newBias )
 					else:
 						if leafPosition < leaf.getContentLength()/2:
-							left = leaf.getEditableContentLeafToLeft()
+							left = leaf.getPreviousEditableLeaf()
 							if left is not None:
 								left.moveMarkerToEnd( caret.getMarker() )
 							else:
-								right = leaf.getEditableContentLeafToRight()
+								right = leaf.getNextEditableLeaf()
 								if right is not None:
 									right.moveMarkerToStart( caret.getMarker() )
 								else:
 									leaf.moveMarker( caret.getMarker(), leafPosition, newBias )
 						else:
-							right = leaf.getEditableContentLeafToRight()
+							right = leaf.getNextEditableLeaf()
 							if right is not None:
 								right.moveMarkerToStart( caret.getMarker() )
 							else:
-								left = leaf.getEditableContentLeafToLeft()
+								left = leaf.getPreviousEditableLeaf()
 								if left is not None:
 									left.moveMarkerToEnd( caret.getMarker() )
 								else:

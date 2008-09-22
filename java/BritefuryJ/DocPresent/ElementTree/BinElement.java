@@ -54,6 +54,8 @@ public class BinElement extends BranchElement
 				childWidget = child.getWidget();
 			}
 			getWidget().setChild( childWidget );
+			
+			onChildListChanged();
 		}
 	}
 	
