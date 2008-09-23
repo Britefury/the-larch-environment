@@ -131,7 +131,7 @@ public abstract class CollatableBranchElement extends BranchElement
 		collationRoot = b;
 	}
 	
-	protected void refreshCollatedContents()
+	protected void refreshContainerWidgetContents()
 	{
 	}
 
@@ -175,7 +175,7 @@ public abstract class CollatableBranchElement extends BranchElement
 		if ( collationMode == CollationMode.ROOT )
 		{
 			// Refresh the widget contents
-			refreshCollatedContents();
+			refreshContainerWidgetContents();
 		}
 		else if ( collationMode == CollationMode.CONTENTSCOLLATED )
 		{

@@ -68,7 +68,7 @@ public abstract class CollatedBranchElement extends CollatableSequenceBranchElem
 
 	protected abstract CollatableBranchFilter createCollationFilter();
 
-	protected void refreshCollatedContents()
+	protected void refreshContainerWidgetContents()
 	{
 		if ( collationMode == CollationMode.ROOT )
 		{
@@ -107,7 +107,7 @@ public abstract class CollatedBranchElement extends CollatableSequenceBranchElem
 			
 			collatedChildBranches = newCollatedChildBranches;
 			
-			setContainerChildWidgets( childWidgets );
+			setCollatedContainerChildWidgets( childWidgets );
 	
 			for (CollatableBranchElement x: addedCollatedChildBranches)
 			{
@@ -117,11 +117,11 @@ public abstract class CollatedBranchElement extends CollatableSequenceBranchElem
 		}
 	}
 	
-	protected abstract void setContainerChildWidgets(List<DPWidget> childWidgets);
+	protected abstract void setCollatedContainerChildWidgets(List<DPWidget> childWidgets);
 	
 	protected void onCollatedSubtreeStructureChanged(BranchElement child)
 	{
-		refreshCollatedContents();
+		refreshContainerWidgetContents();
 	}
 
 	

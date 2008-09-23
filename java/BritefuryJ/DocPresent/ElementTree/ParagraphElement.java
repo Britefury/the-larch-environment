@@ -56,7 +56,7 @@ public class ParagraphElement extends CollatedBranchElement
 	}
 	
 
-	protected void setContainerChildWidgets(List<DPWidget> childWidgets)
+	protected void setCollatedContainerChildWidgets(List<DPWidget> childWidgets)
 	{
 		getWidget().setChildren( childWidgets );
 	}
