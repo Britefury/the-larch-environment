@@ -310,6 +310,21 @@ public abstract class Element implements ContentInterface
 	// Element type methods
 	//
 	
+	protected boolean isBranch()
+	{
+		return false;
+	}
+	
+	protected boolean isCollatableBranch()
+	{
+		return false;
+	}
+	
+	protected boolean isCollatedBranch()
+	{
+		return false;
+	}
+	
 	protected boolean isParagraph()
 	{
 		return false;

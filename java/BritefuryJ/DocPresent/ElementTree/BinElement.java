@@ -26,15 +26,21 @@ public class BinElement extends BranchElement
 
 	public BinElement(ContainerStyleSheet styleSheet)
 	{
-		this( new DPBin( styleSheet ) );
+		super( new DPBin( styleSheet ) );
+	}
+	
+	protected BinElement(DPBin bin)
+	{
+		super( bin );
 	}
 
-	protected BinElement(DPBin widget)
+	
+	public DPBin getWidget()
 	{
-		super( widget );
+		return (DPBin)widget;
 	}
-	
-	
+
+
 	public void setChild(Element child)
 	{
 		if ( child != this.child )
@@ -66,13 +72,6 @@ public class BinElement extends BranchElement
 	
 
 	
-	public DPBin getWidget()
-	{
-		return (DPBin)widget;
-	}
-
-
-
 	public List<Element> getChildren()
 	{
 		if ( child == null )

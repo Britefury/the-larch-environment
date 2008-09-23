@@ -64,15 +64,21 @@ public class FractionElement extends BranchElement
 		this( styleSheet, "/" );
 	}
 	
-	public FractionElement(FractionStyleSheet styleSheet, String content)
+	public FractionElement(FractionStyleSheet styleSheet, String barContent)
 	{
 		super( new DPFraction( styleSheet ) );
 		
 		children = new Element[NUMCHILDREN];
 		
-		setChild( BAR, new BarElement( styleSheet.getBarStyleSheet(), content ) );
+		setChild( BAR, new BarElement( styleSheet.getBarStyleSheet(), barContent ) );
 	}
 
+
+
+	public DPFraction getWidget()
+	{
+		return (DPFraction)widget;
+	}
 
 
 
@@ -145,12 +151,6 @@ public class FractionElement extends BranchElement
 		setChild( DENOMINATOR, child );
 	}
 	
-
-
-	public DPFraction getWidget()
-	{
-		return (DPFraction)widget;
-	}
 
 
 	public List<Element> getChildren()
