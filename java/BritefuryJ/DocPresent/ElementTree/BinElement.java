@@ -26,7 +26,7 @@ public class BinElement extends BranchElement
 
 	public BinElement(ContainerStyleSheet styleSheet)
 	{
-		super( new DPBin( styleSheet ) );
+		this( new DPBin( styleSheet ) );
 	}
 	
 	protected BinElement(DPBin bin)
