@@ -53,13 +53,6 @@ public class ProxyElement extends CollatableBranchElement
 			this.child.setParent( this );
 			this.child.setElementTree( tree );
 			
-			DPWidget childWidget = null;
-			if ( child != null )
-			{
-				childWidget = child.getWidget();
-			}
-			getWidget().setChild( childWidget );
-			
 			onChildListChanged();
 		}
 	}
@@ -70,6 +63,18 @@ public class ProxyElement extends CollatableBranchElement
 	}
 	
 
+	
+	protected void refreshContainerWidgetContents()
+	{
+		DPWidget childWidget = null;
+		if ( child != null )
+		{
+			childWidget = child.getWidget();
+		}
+		getWidget().setChild( childWidget );
+	}
+
+	
 	
 	public List<Element> getChildren()
 	{

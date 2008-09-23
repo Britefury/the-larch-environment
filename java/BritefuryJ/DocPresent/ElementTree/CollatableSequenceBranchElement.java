@@ -37,14 +37,6 @@ public abstract class CollatableSequenceBranchElement extends CollatableBranchEl
 
 	public void setChildren(List<Element> xs)
 	{
-		Vector<DPWidget> childWidgets = new Vector<DPWidget>();
-
-		childWidgets.setSize( xs.size() );
-		for (int i = 0; i < xs.size(); i++)
-		{
-			childWidgets.set( i, xs.get( i ).getWidget() );
-		}
-		
 		HashSet<Element> added, removed;
 		
 		added = new HashSet<Element>( xs );
@@ -62,8 +54,6 @@ public abstract class CollatableSequenceBranchElement extends CollatableBranchEl
 		children.clear();
 		children.addAll( xs );
 		
-		getWidget().setChildren( childWidgets );
-
 		for (Element x: added)
 		{
 			x.setParent( this );
@@ -73,6 +63,19 @@ public abstract class CollatableSequenceBranchElement extends CollatableBranchEl
 		onChildListChanged();
 	}
 	
+
+	
+	protected void refreshContainerWidgetContents()
+	{
+		Vector<DPWidget> childWidgets = new Vector<DPWidget>();
+		childWidgets.setSize( children.size() );
+		for (int i = 0; i < children.size(); i++)
+		{
+			childWidgets.set( i, children.get( i ).getWidget() );
+		}
+		
+		getWidget().setChildren( childWidgets );
+	}
 
 	
 	public List<Element> getChildren()

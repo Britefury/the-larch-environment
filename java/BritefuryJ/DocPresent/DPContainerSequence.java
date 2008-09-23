@@ -49,15 +49,11 @@ abstract public class DPContainerSequence extends DPContainer
 		{
 			// Reuse existing child entries if possible
 			ChildEntry entry = childToEntry.get( items.get( i ) );
-			if ( entry != null )
-			{
-				itemEntriesArray[i] = entry;
-			}
-			else
+			
+			if ( entry == null )
 			{
 				// Create a new entry for the child/item
 				entry = createChildEntryForChild( items.get( i ) );
-				itemEntriesArray[i] = entry;
 
 				// @item is not already present in the list of children; it is new, so @entry will be added to the list
 				added.add( entry );
@@ -65,6 +61,8 @@ abstract public class DPContainerSequence extends DPContainer
 				// We cannot simply assume that the entry at position @i is removed, since this entry may have been moved to a different
 				// position in the sequence, and another entry/child removed. We have to determine what is removed later on
 			}
+
+			itemEntriesArray[i] = entry;
 		}
 		
 		HashSet<ChildEntry> newEntrySet = new HashSet<ChildEntry>( Arrays.asList( itemEntriesArray ) );
