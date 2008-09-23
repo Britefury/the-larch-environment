@@ -7,6 +7,7 @@
 package BritefuryJ.DocPresent.ElementTree;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Vector;
 
 import BritefuryJ.DocPresent.DPContainerSequence;
@@ -49,11 +50,11 @@ public abstract class CollatedBranchElement extends CollatableSequenceBranchElem
 	{
 		super.setCollationMode( m );
 		
-		if ( collationMode == CollationMode.INDEPENDENT )
+		if ( collationMode == CollationMode.ROOT )
 		{
 			collatedChildBranches = new Vector<CollatableBranchElement>();
 		}
-		else if ( collationMode == CollationMode.INPARENT )
+		else if ( collationMode == CollationMode.CONTENTSCOLLATED )
 		{
 			collatedChildBranches = null;
 		}
@@ -65,11 +66,11 @@ public abstract class CollatedBranchElement extends CollatableSequenceBranchElem
 	
 	
 
-	protected abstract BranchFilter createCollationFilter();
+	protected abstract CollatableBranchFilter createCollationFilter();
 
 	protected void refreshCollatedContents()
 	{
-		if ( collationMode == CollationMode.INDEPENDENT )
+		if ( collationMode == CollationMode.ROOT )
 		{
 			// Gather the collated contents that are current, and the state that they will be in after completion
 			Vector<Element> newChildren = new Vector<Element>();
@@ -101,21 +102,22 @@ public abstract class CollatedBranchElement extends CollatableSequenceBranchElem
 			for (CollatableBranchElement x: removedCollatedChildBranches)
 			{
 				x.setCollationRoot( null );
-				x.setCollationMode( CollationMode.NONE );
+				x.setCollationMode( CollationMode.UNINITIALISED );
 			}
 			
 			collatedChildBranches = newCollatedChildBranches;
 			
-			getWidget().setChildren( childWidgets );
+			setContainerChildWidgets( childWidgets );
 	
 			for (CollatableBranchElement x: addedCollatedChildBranches)
 			{
-				x.setCollationMode( CollationMode.INPARENT );
+				x.setCollationMode( CollationMode.CONTENTSCOLLATED );
 				x.setCollationRoot( this );
 			}
 		}
 	}
 	
+	protected abstract void setContainerChildWidgets(List<DPWidget> childWidgets);
 	
 	protected void onCollatedSubtreeStructureChanged(BranchElement child)
 	{
