@@ -223,7 +223,17 @@ public abstract class BranchElement extends Element
 	
 	public int getContentOffsetOfChild(Element elem)
 	{
-		return getWidget().getContentOffsetOfChild( elem.getWidgetAtContentStart() );
+		int offset = 0;
+		for (Element c: getChildren())
+		{
+			if ( c == elem )
+			{
+				return offset;
+			}
+			offset += c.getContentLength();
+		}
+		
+		throw new DPContainer.CouldNotFindChildException();
 	}
 	
 	protected int getChildContentOffsetInSubtree(Element child, BranchElement subtreeRoot)

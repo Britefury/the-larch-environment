@@ -21,8 +21,7 @@ from Britefury.gSym.View.UnparsedText import UnparsedText
 
 
 
-#_defaultBinStyleSheet = ContainerStyleSheet()
-_defaultParagraphStyleSheet = ParagraphStyleSheet()
+_defaultProxyStyleSheet = ContainerStyleSheet()
 
 
 
@@ -41,8 +40,7 @@ class DVNode (object):
 		self.refreshCell = Cell()
 		self.refreshCell.setFunction( self._o_refreshNode )
 		
-		#self._element = BinElement( _defaultBinStyleSheet )
-		self._element = ParagraphElement( _defaultParagraphStyleSheet )
+		self._element = ProxyElement( _defaultProxyStyleSheet )
 		self._elementContent = None
 		self._contentsFactory = None
 		self._contentsCell = Cell()
@@ -219,12 +217,11 @@ class DVNode (object):
 			else:
 				raise TypeError, 'contents should be an Element, not a \'%s\''  %  type( element ) 
 			
-			#self._element.setChild( element )
 			self._elementContent = element
-			self._element.setChildren( [ element ] )
+			self._element.setChild( element )
 		else:
 			self._elementContent = None
-			self._element.setChildren( [] )
+			self._element.setChild( None )
 	
 
 	def _registerChild(self, child):

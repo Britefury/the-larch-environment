@@ -325,6 +325,11 @@ public abstract class Element implements ContentInterface
 		return false;
 	}
 	
+	protected boolean isProxy()
+	{
+		return false;
+	}
+	
 	protected boolean isParagraph()
 	{
 		return false;
