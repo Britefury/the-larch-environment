@@ -1,9 +1,8 @@
-//##************************
 //##* This program is free software; you can use it, redistribute it and/or modify it
 //##* under the terms of the GNU General Public License version 2 as published by the
 //##* Free Software Foundation. The full text of the GNU General Public License
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
-//##* program. This source code is (C)copyright Geoffrey French 1999-2008.
+//##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
 package BritefuryJ.DocPresent.ElementTree;
 
@@ -13,17 +12,17 @@ import java.util.Vector;
 
 import BritefuryJ.DocPresent.DPContainerSequence;
 import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 
-
-public abstract class SequenceBranchElement extends BranchElement
+public abstract class CollatableSequenceBranchElement extends CollatableBranchElement
 {
 	protected Vector<Element> children;
 	
 	
 	
-	protected SequenceBranchElement(DPContainerSequence container)
+	protected CollatableSequenceBranchElement(ContainerStyleSheet styleSheet)
 	{
-		super( container );
+		super( styleSheet );
 		
 		children = new Vector<Element>();
 	}
