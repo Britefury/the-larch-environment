@@ -643,7 +643,7 @@ class Python25View (GSymView):
 		yView = _sliceIndex( y )
 		return expressionNodeEditor( ctx, node,
 				   paragraph( ctx, python_paragraphStyle, xView + [ text( ctx, punctuation_textStyle, ':' ) ] + yView ),
-				   PRECEDENCE_SUBSCRIPTSLICE,
+				   PRECEDENCE_SUBSCRIPTINDEX,
 				   state )
 
 	def subscriptLongSlice(self, ctx, state, node, x, y, z):
@@ -657,7 +657,7 @@ class Python25View (GSymView):
 		zView = _sliceIndex( z )
 		return expressionNodeEditor( ctx, node,
 				   paragraph( ctx, python_paragraphStyle, xView + [ text( ctx, punctuation_textStyle, ':' ) ] +  yView + [ text( ctx, punctuation_textStyle, ':' ) ] + zView ),
-				   PRECEDENCE_SUBSCRIPTSLICE,
+				   PRECEDENCE_SUBSCRIPTINDEX,
 				   state )
 
 	def ellipsis(self, ctx, state, node):
