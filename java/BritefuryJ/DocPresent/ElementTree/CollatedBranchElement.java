@@ -6,17 +6,12 @@
 //##************************
 package BritefuryJ.DocPresent.ElementTree;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Vector;
-
 import BritefuryJ.DocPresent.DPContainerSequence;
-import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 
-public abstract class CollatedBranchElement extends CollatableSequenceBranchElement
+public abstract class CollatedBranchElement extends CollatableSequenceBranchElement implements CollatedElementInterface
 {
-	private Vector<CollatableBranchElement> collatedChildBranches;
+	private ElementCollator collator;
 	
 	
 	//
@@ -27,7 +22,7 @@ public abstract class CollatedBranchElement extends CollatableSequenceBranchElem
 	{
 		super( styleSheet );
 		
-		this.collatedChildBranches = null;
+		this.collator = null;
 	}
 
 	
@@ -52,87 +47,21 @@ public abstract class CollatedBranchElement extends CollatableSequenceBranchElem
 		
 		if ( collationMode == CollationMode.ROOT )
 		{
-			collatedChildBranches = new Vector<CollatableBranchElement>();
+			collator = new ElementCollator( this );
 		}
 		else if ( collationMode == CollationMode.CONTENTSCOLLATED )
 		{
-			collatedChildBranches = null;
+			collator = null;
 		}
 		else
 		{
-			collatedChildBranches = null;
+			collator = null;
 		}
 	}
 	
 	
-
-	protected abstract CollatableBranchFilter createCollationFilter();
-
 	protected void refreshContainerWidgetContents()
 	{
-		if ( collationMode == CollationMode.ROOT )
-		{
-			// Gather the collated contents that are current, and the state that they will be in after completion
-			Vector<Element> newChildren = new Vector<Element>();
-			Vector<CollatableBranchElement> newCollatedChildBranches = new Vector<CollatableBranchElement>();
-			
-			collateSubtree( newChildren, newCollatedChildBranches, createCollationFilter() );
-			
-			
-			// Generate the list of child widgets
-			Vector<DPWidget> childWidgets = new Vector<DPWidget>();
-			
-			childWidgets.setSize( newChildren.size() );
-			for (int i = 0; i < newChildren.size(); i++)
-			{
-				childWidgets.set( i, newChildren.get( i ).getWidget() );
-			}
-			
-
-			
-			// Work out what has been added, and what has been removed
-			HashSet<CollatableBranchElement> addedCollatedChildBranches, removedCollatedChildBranches;
-			
-			addedCollatedChildBranches = new HashSet<CollatableBranchElement>( newCollatedChildBranches );
-			removedCollatedChildBranches = new HashSet<CollatableBranchElement>( collatedChildBranches );
-			addedCollatedChildBranches.removeAll( collatedChildBranches );
-			removedCollatedChildBranches.removeAll( newCollatedChildBranches );
-			
-			
-			for (CollatableBranchElement x: removedCollatedChildBranches)
-			{
-				x.setCollationRoot( null );
-				x.setCollationMode( CollationMode.UNINITIALISED );
-			}
-			
-			collatedChildBranches = newCollatedChildBranches;
-			
-			setCollatedContainerChildWidgets( childWidgets );
-	
-			for (CollatableBranchElement x: addedCollatedChildBranches)
-			{
-				x.setCollationMode( CollationMode.CONTENTSCOLLATED );
-				x.setCollationRoot( this );
-			}
-		}
-	}
-	
-	protected abstract void setCollatedContainerChildWidgets(List<DPWidget> childWidgets);
-	
-	protected void onCollatedSubtreeStructureChanged(BranchElement child)
-	{
-		refreshContainerWidgetContents();
-	}
-
-	
-	
-	
-	//
-	// Element type methods
-	//
-	
-	protected boolean isCollatedBranch()
-	{
-		return true;
+		collator.refreshContainerWidgetContents();
 	}
 }

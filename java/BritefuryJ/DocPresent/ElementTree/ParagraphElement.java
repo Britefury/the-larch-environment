@@ -50,13 +50,13 @@ public class ParagraphElement extends CollatedBranchElement
 
 	
 	
-	protected CollatableBranchFilter createCollationFilter()
+	public void collateSubtree(List<Element> childElementsOut, List<CollatableBranchElement> collatedBranchesOut)
 	{
-		return new ParagraphCollationFilter();
+		collateSubtree( childElementsOut, collatedBranchesOut, new ParagraphCollationFilter() );
 	}
-	
 
-	protected void setCollatedContainerChildWidgets(List<DPWidget> childWidgets)
+
+	public void setCollatedContainerChildWidgets(List<DPWidget> childWidgets)
 	{
 		getWidget().setChildren( childWidgets );
 	}

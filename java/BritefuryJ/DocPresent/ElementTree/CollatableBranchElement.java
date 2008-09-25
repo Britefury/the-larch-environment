@@ -21,7 +21,7 @@ public abstract class CollatableBranchElement extends BranchElement
 	private ContainerStyleSheet styleSheet;
 	private DPContainer container;
 	protected CollationMode collationMode;
-	private CollatedBranchElement collationRoot;
+	private ElementCollator collationRootCollator;
 
 	
 	//
@@ -35,7 +35,7 @@ public abstract class CollatableBranchElement extends BranchElement
 		this.styleSheet = styleSheet;
 		this.container = null;
 		this.collationMode = CollationMode.UNINITIALISED;
-		this.collationRoot = null;
+		this.collationRootCollator = null;
 	}
 
 
@@ -79,7 +79,7 @@ public abstract class CollatableBranchElement extends BranchElement
 		{
 			container = createContainerWidget( styleSheet );
 			widget = container;
-			collationRoot = null;
+			collationRootCollator = null;
 			if ( tree != null )
 			{
 				tree.registerElement( this );
@@ -93,7 +93,7 @@ public abstract class CollatableBranchElement extends BranchElement
 			}
 			container = null;
 			widget = null;
-			collationRoot = null;
+			collationRootCollator = null;
 		}
 		else
 		{
@@ -103,7 +103,7 @@ public abstract class CollatableBranchElement extends BranchElement
 			}
 			container = null;
 			widget = null;
-			collationRoot = null;
+			collationRootCollator = null;
 		}
 	}
 	
@@ -126,9 +126,9 @@ public abstract class CollatableBranchElement extends BranchElement
 		}
 	}
 	
-	protected void setCollationRoot(CollatedBranchElement b)
+	protected void setCollator(ElementCollator c)
 	{
-		collationRoot = b;
+		collationRootCollator = c;
 	}
 	
 	protected void refreshContainerWidgetContents()
@@ -165,8 +165,6 @@ public abstract class CollatableBranchElement extends BranchElement
 	
 	protected void onChildListChanged()
 	{
-		super.onChildListChanged();
-		
 		if ( collationMode == CollationMode.UNINITIALISED )
 		{
 			setCollationMode( CollationMode.ROOT );
@@ -174,13 +172,14 @@ public abstract class CollatableBranchElement extends BranchElement
 		
 		if ( collationMode == CollationMode.ROOT )
 		{
-			// Refresh the widget contents
 			refreshContainerWidgetContents();
 		}
 		else if ( collationMode == CollationMode.CONTENTSCOLLATED )
 		{
-			collationRoot.onCollatedSubtreeStructureChanged( this );
+			collationRootCollator.onCollatedSubtreeStructureChanged( this );
 		}
+
+		super.onChildListChanged();
 	}
 	
 

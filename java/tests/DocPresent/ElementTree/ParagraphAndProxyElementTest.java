@@ -101,6 +101,21 @@ public class ParagraphAndProxyElementTest
 
 	
 	
+	protected Element makeProxy(String text)
+	{
+		Font f0 = new Font( "Sans serif", Font.PLAIN, 12 );
+		TextStyleSheet s0 = new TextStyleSheet( f0, Color.black );
+		TextElement t0 = new TextElement( s0, text );
+		
+		ContainerStyleSheet s2 = new ContainerStyleSheet();
+		ProxyElement proxy = new ProxyElement( s2 );
+		proxy.setChild( t0 );
+
+		
+		return proxy;
+	}
+
+	
 	protected Element createContentNode()
 	{
 		VBoxStyleSheet boxs = new VBoxStyleSheet( DPVBox.Typesetting.NONE, DPVBox.Alignment.LEFT, 50.0, false, 0.0 );
@@ -108,6 +123,7 @@ public class ParagraphAndProxyElementTest
 		Vector<Element> children = new Vector<Element>();
 		
 		children.add( makeParagraphElement( "word_", 15 ) );
+		children.add( makeProxy( "In a proxy" ) );
 		children.add( makeNestedParagraphElement( "word_", 0.0, 3, 4 ) );
 		
 		box.setChildren( children );
@@ -119,7 +135,7 @@ public class ParagraphAndProxyElementTest
 
 	public ParagraphAndProxyElementTest()
 	{
-		JFrame frame = new JFrame( "Paragraph element test" );
+		JFrame frame = new JFrame( "Paragraph and proxy element test" );
 
 		//This stops the app on window close.
 		frame.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );

@@ -42,5 +42,7 @@ module_listViewLayout = VerticalListViewLayout( VBoxStyleSheet( DPVBox.Typesetti
 suite_listViewLayout = VerticalListViewLayout( VBoxStyleSheet( DPVBox.Typesetting.ALIGN_WITH_TOP, DPVBox.Alignment.EXPAND, 0.0, False, 0.0 ), \
 						ParagraphStyleSheet() )
 
+python_segmentCaretStopFactory = SegmentElement.EmptyTextElementStopFactory( default_textStyle )
+
 #lineEditorStyle = GSymStyleSheet( highlightBackgroundColour=Colour3f( 0.85, 0.85, 1.0 ) )
 

@@ -167,11 +167,4 @@ public class FractionElement extends BranchElement
 		
 		return xs;
 	}
-
-
-
-	public Element getContentLineFromChild(Element element)
-	{
-		return this;
-	}
 }
