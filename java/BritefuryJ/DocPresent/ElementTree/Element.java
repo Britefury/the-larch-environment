@@ -241,11 +241,11 @@ public abstract class Element implements ContentInterface
 	}
 
 
-	public Element getContentLine()
+	public SegmentElement getSegment()
 	{
 		if ( parent != null )
 		{
-			return parent.getContentLineFromChild( this );
+			return parent.getLinearTextSectionFromChild( this );
 		}
 		else
 		{
@@ -320,17 +320,17 @@ public abstract class Element implements ContentInterface
 		return false;
 	}
 	
-	protected boolean isCollatedBranch()
-	{
-		return false;
-	}
-	
 	protected boolean isProxy()
 	{
 		return false;
 	}
 	
 	protected boolean isParagraph()
+	{
+		return false;
+	}
+	
+	protected boolean isSegment()
 	{
 		return false;
 	}

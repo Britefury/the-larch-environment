@@ -149,8 +149,7 @@ def whitespace(ctx, txt, width=0.0):
 
 def hbox(ctx, styleSheet, children):
 	"""
-	Runtime - called by compiled code at run-time
-	Builds a DPHBox widget, with child, builds and registers a refresh cell
+	Horizontal box container
 	"""
 	viewNodeInstance = ctx
 	element = HBoxElement( styleSheet )
@@ -160,15 +159,13 @@ def hbox(ctx, styleSheet, children):
 _ahboxStyleSheet = HBoxStyleSheet( DPHBox.Alignment.BASELINES, 0.0, False, 0.0 )
 def ahbox(ctx, children):
 	"""
-	Runtime - called by compiled code at run-time
-	Builds a DPHBox widget, with child, builds and registers a refresh cell
+	Baseline-aligned horizontal box container
 	"""
 	return hbox( ctx, _ahboxStyleSheet, children )
 
 def vbox(ctx, styleSheet, children):
 	"""
-	Runtime - called by compiled code at run-time
-	Builds a vertical DTBox widget, with child, builds and registers a refresh cell
+	Vertical box container
 	"""
 	viewNodeInstance = ctx
 	element = VBoxElement( styleSheet )
@@ -177,12 +174,29 @@ def vbox(ctx, styleSheet, children):
 
 def paragraph(ctx, styleSheet, children):
 	"""
-	Runtime - called by compiled code at run-time
-	Builds a DTFlow widget, with child, builds and registers a refresh cell
+	Paragraph container
 	"""
 	viewNodeInstance = ctx
 	element = ParagraphElement( styleSheet )
 	_populateContainerSeq( viewNodeInstance, element, children )
+	return element
+
+def lineBreak(ctx, styleSheet, child):
+	"""
+	Line break container
+	"""
+	viewNodeInstance = ctx
+	element = LineBreakElement( styleSheet )
+	_populateBin( viewNodeInstance, element, child )
+	return element
+
+def segment(ctx, styleSheet, caretStopFactory, child):
+	"""
+	Segment container
+	"""
+	viewNodeInstance = ctx
+	element = SegmentElement( styleSheet, caretStopFactory )
+	_populateBin( viewNodeInstance, element, child )
 	return element
 
 
@@ -236,7 +250,6 @@ def fraction(ctx, styleSheet, numerator, denominator):
 
 def listView(ctx, layout, beginDelim, endDelim, separatorFactory, children):
 	"""
-	Runtime - called by compiled code at run-time
 	Builds a list view.
 	@layout controls the layout
 	"""

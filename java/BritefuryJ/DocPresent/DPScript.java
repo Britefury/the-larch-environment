@@ -457,135 +457,127 @@ public class DPScript extends DPContainer
 		
 		
 		// top: TOP
-		// a: super top
-		// b: main top
-		// c: super descent
-		// d: super bottom
-		// e: sub top
-		// f: main descent
-		// g: main bottom
-		// h: sub descent
-		// i: sub bottom
 		// bottom: BOTTOM
+		// All y-co-ordinates are relative to an arbitrary co-ordinate system until the end of the calculation
 		//
 		// q: spacing between super bottom and sub top
 		// r: min distance between super baseline and main baseline (1/3 of Mh)
 		// s: min distance between main baseline and sub baseline (1/3 of Mh)
 		// r and s can be thought of as springs
-		double a, b, c, d, e, f, g, h, i, bottom, top, q, r, s;
+		double superTop, mainTop, superBaseline, superBottom, subTop, mainBaseline, mainBottom, subBaseline, subBottom, bottom, top, q, r, s;
 		
 		if ( hasSuperscriptChild()  &&  hasSubscriptChild() )
 		{
 			q = getScriptSpacing();
 			
-			// Start with f = 0
-			f = 0.0;
+			// Start with main-baseline = 0
+			mainBaseline = 0.0;
 			
-			// We can compute b and g immediately
-			b = f - Ma;
-			g = f + Md;
+			// We can compute main-top and main-bottom immediately
+			mainTop = mainBaseline - Ma;
+			mainBottom = mainBaseline + Md;
 			
-			// Next compute c and h
+			// Next compute super-baseline and sub-baseline
 			// The distance between c and h is max( Pd + Ba + q, r + s )
 			r = Mh * superOffset;
 			s = Mh * subOffset;
-			double cToH = Math.max( Pd + Ba + q,   r + s );
+			double deltaBaseline = Math.max( Pd + Ba + q,   r + s );
 		
 			// Divide cToH between r and s according to their proportion
-			r = cToH  *  superOffsetFraction;
-			s = cToH  *  subOffsetFraction;
+			r = deltaBaseline  *  superOffsetFraction;
+			s = deltaBaseline  *  subOffsetFraction;
 			
-			// We can now compute c and h
-			c = f - r;
-			h = f + s;
+			// We can now compute superscript-baseline and subscript-baseline
+			superBaseline = mainBaseline - r;
+			subBaseline = mainBaseline + s;
 			
-			// We can compute a and d
-			a = c - Pa;
-			d = c + Pd;
+			// We can compute super-top and super-bottom
+			superTop = superBaseline - Pa;
+			superBottom = superBaseline + Pd;
 			
-			// We can compute i and e
-			e = h - Ba;
-			i = h + Bd;
+			// We can compute subscript-top and subscript-bottom
+			subTop = subBaseline - Ba;
+			subBottom = subBaseline + Bd;
 			
 			// We can now compute the top and the bottom
-			top = Math.min( b, a );
-			bottom = Math.max( g, i );
+			top = Math.min( mainTop, superTop );
+			bottom = Math.max( mainBottom, subBottom );
 			
-			superscriptAscent = c - top;
-			mainAscent = f - top;
-			subscriptAscent = h - top;
+			superscriptAscent = superBaseline - top;
+			mainAscent = mainBaseline - top;
+			subscriptAscent = subBaseline - top;
 		}
 		else if ( hasSuperscriptChild() )
 		{
-			// Start with f = 0
-			f = 0.0;
+			// Start with main-baseline = 0
+			mainBaseline = 0.0;
 			
-			// We can compute b and g immediately
-			b = f - Ma;
-			g = f + Md;
+			// We can compute main-top and main-bottom immediately
+			mainTop = mainBaseline - Ma;
+			mainBottom = mainBaseline + Md;
 			
 			// R
 			r = Mh * superOffset;
 			
-			// C
-			c = f - r;
+			// Superscript-baseline
+			superBaseline = mainBaseline - r;
 
-			// We can compute a and d
-			a = c - Pa;
-			d = c + Pd;
+			// We can compute super-top and super-bottom
+			superTop = superBaseline - Pa;
+			superBottom = superBaseline + Pd;
 			
 			// We can now compute the top and the bottom
-			top = Math.min( b, a );
-			bottom = Math.max( g, d );
+			top = Math.min( mainTop, superTop );
+			bottom = Math.max( mainBottom, superBottom );
 			
-			superscriptAscent = c - top;
-			mainAscent = f - top;
-			subscriptAscent = f - top;
+			superscriptAscent = superBaseline - top;
+			mainAscent = mainBaseline - top;
+			subscriptAscent = mainBaseline - top;
 		}
 		else if ( hasSubscriptChild() )
 		{
-			// Start with f = 0
-			f = 0.0;
+			// Start with main-baseline = 0
+			mainBaseline = 0.0;
 			
-			// We can compute b and g immediately
-			b = f - Ma;
-			g = f + Md;
+			// We can compute main-top and main-bottom immediately
+			mainTop = mainBaseline - Ma;
+			mainBottom = mainBaseline + Md;
 			
-			// Next compute h
+			// S
 			s = Mh * subOffset;
 			
-			// We can now compute h
-			h = f + s;
+			// We can now compute subscript-baseline
+			subBaseline = mainBaseline + s;
 			
-			// We can compute i and e
-			e = h - Ba;
-			i = h + Bd;
+			// We can compute sub-top and sub-bottom 
+			subTop = subBaseline - Ba;
+			subBottom = subBaseline + Bd;
 			
 			// We can now compute the top and the bottom
-			top = Math.min( b, e );
-			bottom = Math.max( g, i );
+			top = Math.min( mainTop, subTop );
+			bottom = Math.max( mainBottom, subBottom );
 			
-			superscriptAscent = f - top;
-			mainAscent = f - top;
-			subscriptAscent = h - top;
+			superscriptAscent = mainBaseline - top;
+			mainAscent = mainBaseline - top;
+			subscriptAscent = subBaseline - top;
 		}
 		else
 		{
-			f = 0.0;
+			mainBaseline = 0.0;
 			
 			top = -Ma;
 			bottom = Md;
 			
-			superscriptAscent = f - top;
-			mainAscent = f - top;
-			subscriptAscent = f - top;
+			superscriptAscent = mainBaseline - top;
+			mainAscent = mainBaseline - top;
+			subscriptAscent = mainBaseline - top;
 		}
 		
 		
 		double height = bottom - top;
 		
 		double descent = height - mainAscent;
-		return new VMetricsTypeset( mainAscent, descent, height );
+		return new VMetricsTypeset( mainAscent, descent, getSpacing() );
 	}
 	
 

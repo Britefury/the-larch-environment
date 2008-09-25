@@ -51,8 +51,11 @@ public class BinElement extends BranchElement
 				this.child.setElementTree( null );
 			}
 			this.child = child;
-			this.child.setParent( this );
-			this.child.setElementTree( tree );
+			if ( this.child != null )
+			{
+				this.child.setParent( this );
+				this.child.setElementTree( tree );
+			}
 			
 			DPWidget childWidget = null;
 			if ( child != null )

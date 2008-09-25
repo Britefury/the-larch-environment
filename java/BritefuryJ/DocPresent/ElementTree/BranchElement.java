@@ -61,14 +61,15 @@ public abstract class BranchElement extends Element
 	
 	protected void onChildListChanged()
 	{
-		if ( parent != null )
-		{
-			parent.onSubtreeStructureChanged();
-		}
+		onSubtreeStructureChanged();
 	}
 	
 	protected void onSubtreeStructureChanged()
 	{
+		if ( parent != null )
+		{
+			parent.onSubtreeStructureChanged();
+		}
 	}
 
 	public abstract List<Element> getChildren();
@@ -243,9 +244,9 @@ public abstract class BranchElement extends Element
 
 
 
-	public Element getContentLineFromChild(Element element)
+	public SegmentElement getLinearTextSectionFromChild(Element element)
 	{
-		return getContentLine();
+		return getSegment();
 	}
 	
 	

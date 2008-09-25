@@ -50,8 +50,11 @@ public class ProxyElement extends CollatableBranchElement
 				this.child.setElementTree( null );
 			}
 			this.child = child;
-			this.child.setParent( this );
-			this.child.setElementTree( tree );
+			if ( this.child != null )
+			{
+				this.child.setParent( this );
+				this.child.setElementTree( tree );
+			}
 			
 			onChildListChanged();
 		}

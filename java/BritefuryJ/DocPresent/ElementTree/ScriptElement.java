@@ -161,29 +161,4 @@ public class ScriptElement extends BranchElement
 		
 		return xs;
 	}
-
-
-
-
-
-
-	public Element getContentLineFromChild(Element element)
-	{
-		for (int slot = 0; slot < NUMCHILDREN; slot++)
-		{
-			if ( element == children[slot] )
-			{
-				if ( slot == MAIN )
-				{
-					return getContentLine();
-				}
-				else
-				{
-					return this;
-				}
-			}
-		}
-		
-		throw new CouldNotFindChildException();
-	}
 }
