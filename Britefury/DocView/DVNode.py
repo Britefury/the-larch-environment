@@ -124,8 +124,15 @@ class DVNode (object):
 				newIndex = newPosition  +  ( 1  if newBias == Marker.Bias.END  else  0 )
 				
 				print 'CURSOR POSITION CHANGE'
-				print contentString[:oldIndex].replace( '\n', '\\n' ) + '>|<' + contentString[oldIndex:].replace( '\n', '\\n' )
-				print newContentString[:newIndex].replace( '\n', '\\n' ) + '>|<' + newContentString[newIndex:].replace( '\n', '\\n' )
+				if bias == Marker.Bias.START:
+					print contentString[:oldIndex].replace( '\n', '\\n' ) + '>|.' + contentString[oldIndex:].replace( '\n', '\\n' )
+				else:
+					print contentString[:oldIndex].replace( '\n', '\\n' ) + '.|<' + contentString[oldIndex:].replace( '\n', '\\n' )
+
+				if bias == Marker.Bias.START:
+					print newContentString[:newIndex].replace( '\n', '\\n' ) + '>|.' + newContentString[newIndex:].replace( '\n', '\\n' )
+				else:
+					print newContentString[:newIndex].replace( '\n', '\\n' ) + '.|<' + newContentString[newIndex:].replace( '\n', '\\n' )
 				
 				newPosition = max( 0, newPosition )
 				if newPosition >= self._elementContent.getContentLength():
@@ -134,7 +141,7 @@ class DVNode (object):
 				
 				leaf = self._elementContent.getLeafAtContentPosition( newPosition )
 				if leaf is not None:
-					print leaf, leaf.getContent().replace( '\n', '\\n' )
+					print leaf, "'" + leaf.getContent().replace( '\n', '\\n' ) + "'"
 					leafOffset = leaf.getContentOffsetInSubtree( self._elementContent )
 					leafPosition = newPosition - leafOffset
 					
@@ -143,23 +150,30 @@ class DVNode (object):
 						#print 'Position was %d, now is %d; leaf (%s) offset is %d, moving to %d in leaf'  %  ( position, newPosition, leaf.getContent(), leafOffset, leafPosition )
 						leaf.moveMarker( caret.getMarker(), leafPosition, newBias )
 					else:
+						segFilter = SegmentElement.SegmentFilter( leaf.getSegment() )
+						elemFilter = LeafElement.LeafFilterEditable()
+						
 						if leafPosition < leaf.getContentLength()/2:
-							left = leaf.getPreviousEditableLeaf()
+							left = leaf.getPreviousLeaf( segFilter, None, elemFilter )
 							if left is not None:
+								print left, "'" + left.getContent().replace( '\n', '\\n' ) + "'", left.getSegment() is leaf.getSegment()
 								left.moveMarkerToEnd( caret.getMarker() )
 							else:
-								right = leaf.getNextEditableLeaf()
+								right = leaf.getNextLeaf( segFilter, None, elemFilter )
 								if right is not None:
+									print right, "'" + right.getContent().replace( '\n', '\\n' ) + "'"
 									right.moveMarkerToStart( caret.getMarker() )
 								else:
 									leaf.moveMarker( caret.getMarker(), leafPosition, newBias )
 						else:
-							right = leaf.getNextEditableLeaf()
+							right = leaf.getNextLeaf( segFilter, None, elemFilter )
 							if right is not None:
+								print right, "'" + right.getContent().replace( '\n', '\\n' ) + "'"
 								right.moveMarkerToStart( caret.getMarker() )
 							else:
-								left = leaf.getPreviousEditableLeaf()
+								left = leaf.getPreviousLeaf( segFilter, None, elemFilter )
 								if left is not None:
+									print left, "'" + left.getContent().replace( '\n', '\\n' ) + "'"
 									left.moveMarkerToEnd( caret.getMarker() )
 								else:
 									leaf.moveMarker( caret.getMarker(), leafPosition, newBias )

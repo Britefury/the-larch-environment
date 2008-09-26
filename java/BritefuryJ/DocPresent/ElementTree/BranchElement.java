@@ -76,7 +76,7 @@ public abstract class BranchElement extends Element
 	
 
 	
-	public List<LeafElement> getLeavesInSubtree(BranchFilter branchFilter, LeafFilter leafFilter)
+	public List<LeafElement> getLeavesInSubtree(ElementFilter branchFilter, ElementFilter leafFilter)
 	{
 		Vector<LeafElement> leaves = new Vector<LeafElement>();
 
@@ -91,7 +91,7 @@ public abstract class BranchElement extends Element
 		return leaves;
 	}
 	
-	public LeafElement getFirstLeafInSubtree(BranchFilter branchFilter, LeafFilter leafFilter)
+	public LeafElement getFirstLeafInSubtree(ElementFilter branchFilter, ElementFilter leafFilter)
 	{
 		if ( branchFilter == null  ||  branchFilter.test( this ) )
 		{
@@ -111,7 +111,7 @@ public abstract class BranchElement extends Element
 		}
 	}
 
-	public LeafElement getLastLeafInSubtree(BranchFilter branchFilter, LeafFilter leafFilter)
+	public LeafElement getLastLeafInSubtree(ElementFilter branchFilter, ElementFilter leafFilter)
 	{
 		if ( branchFilter == null  ||  branchFilter.test( this ) )
 		{
@@ -164,7 +164,7 @@ public abstract class BranchElement extends Element
 	}
 
 	
-	protected LeafElement getPreviousLeafFromChild(Element child, BranchFilter subtreeRootFilter, BranchFilter branchFilter, LeafFilter leafFilter)
+	protected LeafElement getPreviousLeafFromChild(Element child, ElementFilter subtreeRootFilter, ElementFilter branchFilter, ElementFilter leafFilter)
 	{
 		if ( subtreeRootFilter == null  ||  subtreeRootFilter.test( this ) )
 		{
@@ -192,7 +192,7 @@ public abstract class BranchElement extends Element
 		return null;
 	}
 	
-	protected LeafElement getNextLeafFromChild(Element child, BranchFilter subtreeRootFilter, BranchFilter branchFilter, LeafFilter leafFilter)
+	protected LeafElement getNextLeafFromChild(Element child, ElementFilter subtreeRootFilter, ElementFilter branchFilter, ElementFilter leafFilter)
 	{
 		if ( subtreeRootFilter == null  ||  subtreeRootFilter.test( this ) )
 		{
