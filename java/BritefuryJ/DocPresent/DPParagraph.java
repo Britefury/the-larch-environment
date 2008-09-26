@@ -389,6 +389,10 @@ public class DPParagraph extends DPContainerSequence
 		{
 			return new VMetrics();
 		}
+		else if ( childVMetrics.length == 1 )
+		{
+			return childVMetrics[0];
+		}
 		else
 		{
 			// Accumulate the height required for all the children
