@@ -332,8 +332,8 @@ def compoundStatementEditor(ctx, node, headerContents, precedence, suite, state)
 	else:
 		outerPrecedence, parser, mode = state
 
-	headerParagraph = paragraph( ctx, python_paragraphStyle, [ headerContents, whitespace( ctx, '\n' ) ] )
-
+	headerSegment = segment( ctx, python_paragraphStyle, python_segmentCaretStopFactory, headerContents )
+	headerParagraph = paragraph( ctx, python_paragraphStyle, [ headerSegment, whitespace( ctx, '\n' ) ] )
 	headerElement = contentListener( ctx, headerParagraph, ParsedLineContentListener( ctx, node, parser ) )
 	statementElement = vbox( ctx, compoundStmt_vboxStyle, [ headerElement, indent( ctx, 30.0, suiteView( ctx, suite ) ) ] )
 	return statementElement

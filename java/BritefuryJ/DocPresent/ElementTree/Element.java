@@ -149,7 +149,7 @@ public abstract class Element implements ContentInterface
 
 
 	
-	public List<LeafElement> getLeavesInSubtree(BranchFilter branchFilter, LeafFilter leafFilter)
+	public List<LeafElement> getLeavesInSubtree(ElementFilter branchFilter, ElementFilter leafFilter)
 	{
 		return new Vector<LeafElement>();
 	}
@@ -159,7 +159,7 @@ public abstract class Element implements ContentInterface
 		return getLeavesInSubtree( null, null );
 	}
 	
-	public LeafElement getFirstLeafInSubtree(BranchFilter branchFilter, LeafFilter leafFilter)
+	public LeafElement getFirstLeafInSubtree(ElementFilter branchFilter, ElementFilter leafFilter)
 	{
 		return null;
 	}
@@ -169,7 +169,7 @@ public abstract class Element implements ContentInterface
 		return getFirstLeafInSubtree( null, null );
 	}
 
-	public LeafElement getLastLeafInSubtree(BranchFilter branchFilter, LeafFilter leafFilter)
+	public LeafElement getLastLeafInSubtree(ElementFilter branchFilter, ElementFilter leafFilter)
 	{
 		return null;
 	}
@@ -241,6 +241,13 @@ public abstract class Element implements ContentInterface
 	}
 
 
+	
+	//
+	//
+	// Segment methods
+	//
+	//
+	
 	public SegmentElement getSegment()
 	{
 		if ( parent != null )

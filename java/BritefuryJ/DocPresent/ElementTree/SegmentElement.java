@@ -16,6 +16,28 @@ import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 
 public class SegmentElement extends BranchElement implements CollatedElementInterface
 {
+	//
+	// Utility classes
+	//
+	
+	public static class SegmentFilter implements ElementFilter
+	{
+		private SegmentElement segment;
+		
+		
+		public SegmentFilter(SegmentElement seg)
+		{
+			segment = seg;
+		}
+		
+		public boolean test(Element element)
+		{
+			return element.getSegment() == segment;
+		}
+	}
+
+	
+	
 	private static class ParagraphCollationFilter implements CollatableBranchFilter
 	{
 		public boolean test(CollatableBranchElement branch)

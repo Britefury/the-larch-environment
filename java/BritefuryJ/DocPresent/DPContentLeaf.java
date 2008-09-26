@@ -284,9 +284,13 @@ public abstract class DPContentLeaf extends DPWidget implements ContentInterface
 	{
 		for (Marker m: markers.keySet())
 		{
-			if ( m.getIndex() >= position )
+			if ( m.getIndex() > position )
 			{
 				m.setPosition( m.getPosition() + length );
+			}
+			else if ( m.getIndex() == position )
+			{
+				m.setPositionAndBias( position + length - 1, Marker.Bias.END );
 			}
 		}
 	}

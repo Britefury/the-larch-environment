@@ -6,7 +6,21 @@
 //##************************
 package BritefuryJ.DocPresent.ElementTree;
 
-public interface BranchFilter
+public class ElementFilterAnd implements ElementFilter
 {
-	public boolean test(BranchElement branch);
+	private ElementFilter x, y;
+	
+	
+	
+	public ElementFilterAnd(ElementFilter x, ElementFilter y)
+	{
+		this.x = x;
+		this.y = y;
+	}
+
+	
+	public boolean test(Element elem)
+	{
+		return x.test( elem )  &&  y.test( elem );
+	}
 }

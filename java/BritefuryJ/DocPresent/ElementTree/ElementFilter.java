@@ -6,7 +6,7 @@
 //##************************
 package BritefuryJ.DocPresent.ElementTree;
 
-public interface LeafFilter
+public interface ElementFilter
 {
-	public boolean test(LeafElement leaf);
+	public boolean test(Element elem);
 }

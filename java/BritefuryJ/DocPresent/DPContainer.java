@@ -929,10 +929,12 @@ public abstract class DPContainer extends DPWidget implements ContentInterface
 		for (DPWidget c: getChildren())
 		{
 			int end = offset + c.getContentLength();
+			
 			if ( position >= offset  &&  position < end )
 			{
 				return c;
 			}
+
 			offset = end;
 		}
 		
