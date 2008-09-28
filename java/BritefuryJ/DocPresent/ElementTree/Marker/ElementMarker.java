@@ -32,7 +32,15 @@ public class ElementMarker
 
 	public Element getElement()
 	{
-		return tree.getElementForWidget( widgetMarker.getWidget() );
+		DPContentLeaf widget = widgetMarker.getWidget();
+		if ( widget != null )
+		{
+			return widget.getElement();
+		}
+		else
+		{
+			return null;
+		}
 	}
 	
 	public int getPosition()

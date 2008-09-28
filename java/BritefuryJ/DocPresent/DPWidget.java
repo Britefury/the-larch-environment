@@ -15,6 +15,7 @@ import java.awt.event.KeyEvent;
 import java.awt.Graphics2D;
 import java.awt.geom.*;
 
+import BritefuryJ.DocPresent.ElementTree.Element;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Event.PointerScrollEvent;
@@ -114,6 +115,8 @@ abstract public class DPWidget implements ContentInterface
 	
 	protected DndState dndState;
 	
+	protected Element element;
+	
 	
 	
 	
@@ -147,6 +150,23 @@ abstract public class DPWidget implements ContentInterface
 		allocation = new Vector2();
 		waitingImmediateEvents = new LinkedList<Runnable>();
 		pointersWithinBounds = new LinkedList<PointerInterface>();
+	}
+	
+	
+	
+	
+	//
+	// Element methods
+	//
+	
+	public Element getElement()
+	{
+		return element;
+	}
+	
+	public void setElement(Element element)
+	{
+		this.element = element;
 	}
 	
 	

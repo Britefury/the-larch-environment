@@ -78,31 +78,19 @@ public abstract class CollatableBranchElement extends BranchElement
 		if ( collationMode == CollationMode.ROOT )
 		{
 			container = createContainerWidget( styleSheet );
-			widget = container;
+			setWidget( container );
 			collationRootCollator = null;
-			if ( tree != null )
-			{
-				tree.registerElement( this );
-			}
 		}
 		else if ( collationMode == CollationMode.CONTENTSCOLLATED )
 		{
-			if ( tree != null )
-			{
-				tree.unregisterElement( this );
-			}
 			container = null;
-			widget = null;
+			setWidget( null );
 			collationRootCollator = null;
 		}
 		else
 		{
-			if ( tree != null )
-			{
-				tree.unregisterElement( this );
-			}
 			container = null;
-			widget = null;
+			setWidget( null );
 			collationRootCollator = null;
 		}
 	}
