@@ -172,27 +172,11 @@ public abstract class CollatableBranchElement extends BranchElement
 	
 
 	
-	public DPWidget getWidgetAtContentStart()
-	{
-		if ( collationMode ==  CollationMode.ROOT )
-		{
-			return getWidget();
-		}
-		else
-		{
-			List<Element> ch = getChildren();
-			if ( ch.size() > 0 )
-			{
-				return ch.get( 0 ).getWidgetAtContentStart();
-			}
-			else
-			{
-				return null;
-			}
-		}
-	}
-
-
+	
+	
+	//
+	// Content methods
+	//
 
 	public String getContent()
 	{
@@ -218,6 +202,27 @@ public abstract class CollatableBranchElement extends BranchElement
 		return result;
 	}
 	
+	public DPWidget getWidgetAtContentStart()
+	{
+		if ( collationMode ==  CollationMode.ROOT )
+		{
+			return getWidget();
+		}
+		else
+		{
+			List<Element> ch = getChildren();
+			if ( ch.size() > 0 )
+			{
+				return ch.get( 0 ).getWidgetAtContentStart();
+			}
+			else
+			{
+				return null;
+			}
+		}
+	}
+
+
 
 	
 	//

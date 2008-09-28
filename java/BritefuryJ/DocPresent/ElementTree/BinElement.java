@@ -88,4 +88,35 @@ public class BinElement extends BranchElement
 			return Arrays.asList( ch );
 		}
 	}
+	
+	
+	
+	
+	//
+	// Content methods
+	//
+	
+	public String getContent()
+	{
+		if ( child != null )
+		{
+			return child.getContent();
+		}
+		else
+		{
+			return null;
+		}
+	}
+
+	public int getContentLength()
+	{
+		if ( child != null )
+		{
+			return child.getContentLength();
+		}
+		else
+		{
+			return 0;
+		}
+	}
 }

@@ -80,4 +80,29 @@ public abstract class SequenceBranchElement extends BranchElement
 	{
 		return children;
 	}
+	
+	
+	public String getContent()
+	{
+		StringBuilder builder = new StringBuilder();
+		
+		for (Element child: children)
+		{
+			builder.append( child.getContent() );
+		}
+		
+		return builder.toString();
+	}
+	
+	public int getContentLength()
+	{
+		int length = 0;
+		
+		for (Element child: children)
+		{
+			length += child.getContentLength();
+		}
+		
+		return length;
+	}
 }

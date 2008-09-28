@@ -163,6 +163,17 @@ public abstract class LeafElement extends Element implements WidgetContentListen
 	// Content methods
 	//
 	
+	public String getContent()
+	{
+		return getWidget().getContent();
+	}
+	
+	public int getContentLength()
+	{
+		return getWidget().getContentLength();
+	}
+	
+	
 	public void contentInserted(Marker m, String x)
 	{
 		onContentModified();

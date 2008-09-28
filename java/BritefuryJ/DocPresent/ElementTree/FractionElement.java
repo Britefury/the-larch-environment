@@ -167,4 +167,40 @@ public class FractionElement extends BranchElement
 		
 		return xs;
 	}
+
+
+
+	//
+	// Content methods
+	//
+	
+	public String getContent()
+	{
+		StringBuilder builder = new StringBuilder();
+		
+		for (int slot = 0; slot < NUMCHILDREN; slot++)
+		{
+			if ( children[slot] != null )
+			{
+				builder.append( children[slot].getContent() );
+			}
+		}
+		
+		return builder.toString();
+	}
+	
+	public int getContentLength()
+	{
+		int length = 0;
+		
+		for (int slot = 0; slot < NUMCHILDREN; slot++)
+		{
+			if ( children[slot] != null )
+			{
+				length += children[slot].getContentLength();
+			}
+		}
+		
+		return length;
+	}
 }
