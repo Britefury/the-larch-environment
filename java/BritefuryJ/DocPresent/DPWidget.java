@@ -33,7 +33,7 @@ import BritefuryJ.Math.Xform2;
 
 
 
-abstract public class DPWidget implements ContentInterface
+abstract public class DPWidget
 {
 	protected static double NON_TYPESET_CHILD_BASELINE_OFFSET = -5.0;
 	
@@ -1037,26 +1037,6 @@ abstract public class DPWidget implements ContentInterface
 		return null;
 	}
 	
-	
-	
-	
-	//
-	//
-	// CONTENT METHODS
-	//
-	//
-	
-	public int getContentOffsetInSubtree(DPContainer subtreeRoot)
-	{
-		if ( this == subtreeRoot )
-		{
-			return 0;
-		}
-		else
-		{
-			return parent.getChildContentOffsetInSubtree( this, subtreeRoot );
-		}
-	}
 	
 	
 	

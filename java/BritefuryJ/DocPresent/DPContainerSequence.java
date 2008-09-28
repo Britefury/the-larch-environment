@@ -432,33 +432,4 @@ abstract public class DPContainerSequence extends DPContainer
 	{
 		return getChildrenPreferredVMetrics( childEntries );
 	}
-
-
-
-
-	//
-	//
-	// CONTENT METHODS
-	//
-	//
-
-	public String getContent()
-	{
-		String xs = "";
-		for (DPWidget child: getChildren())
-		{
-			xs += child.getContent();
-		}
-		return xs;
-	}
-
-	public int getContentLength()
-	{
-		int length = 0;
-		for (DPWidget child: getChildren())
-		{
-			length += child.getContentLength();
-		}
-		return length;
-	}
 }
