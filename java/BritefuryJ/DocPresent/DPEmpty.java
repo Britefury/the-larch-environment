@@ -45,22 +45,4 @@ public class DPEmpty extends DPWidget
 	{
 		return new VMetrics();
 	}
-
-
-	
-	//
-	//
-	// CONTENT METHODS
-	//
-	//
-	
-	public String getContent()
-	{
-		return "";
-	}
-	
-	public int getContentLength()
-	{
-		return 0;
-	}
 }

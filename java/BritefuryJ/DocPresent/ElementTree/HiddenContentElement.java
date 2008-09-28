@@ -7,11 +7,14 @@
 //##************************
 package BritefuryJ.DocPresent.ElementTree;
 
-import BritefuryJ.DocPresent.DPHiddenContent;
+import BritefuryJ.DocPresent.DPEmpty;
 import BritefuryJ.DocPresent.StyleSheets.WidgetStyleSheet;
 
 public class HiddenContentElement extends EmptyElement
 {
+	private String content;
+	
+	
 	public HiddenContentElement()
 	{
 		this( WidgetStyleSheet.defaultStyleSheet, "" );
@@ -29,13 +32,40 @@ public class HiddenContentElement extends EmptyElement
 	
 	public HiddenContentElement(WidgetStyleSheet styleSheet, String content)
 	{
-		super( new DPHiddenContent( styleSheet, content ) );
+		super( new DPEmpty( styleSheet ) );
+		
+		this.content = content;
 	}
 	
 	
 	
-	public DPHiddenContent getWidget()
+	public DPEmpty getWidget()
 	{
-		return (DPHiddenContent)widget;
+		return (DPEmpty)widget;
+	}
+
+
+
+
+
+	//
+	//
+	// CONTENT METHODS
+	//
+	//
+	
+	public String getContent()
+	{
+		return content;
+	}
+	
+	public int getContentLength()
+	{
+		return content.length();
+	}
+	
+	public void setContent(String x)
+	{
+		content = x;
 	}
 }
