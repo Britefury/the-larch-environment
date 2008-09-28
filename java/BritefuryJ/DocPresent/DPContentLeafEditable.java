@@ -17,6 +17,11 @@ import BritefuryJ.DocPresent.StyleSheets.ContentLeafStyleSheet;
 
 public abstract class DPContentLeafEditable extends DPContentLeaf
 {
+	//
+	// Constructors
+	//
+	
+	
 	protected DPContentLeafEditable()
 	{
 		super();
@@ -29,11 +34,22 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	
 
 	
+	
+	
+	//
+	// Specialised getElement()
+	//
+	
 	public EditableLeafElement getElement()
 	{
 		return (EditableLeafElement)element;
 	}
 	
+	
+	
+	//
+	// Content modification
+	//
 	
 	public void insertContent(Marker marker, String x)
 	{
@@ -65,14 +81,6 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	
 	
 
-	public boolean isEditable()
-	{
-		return true;
-	}
-
-
-	
-	
 	//
 	//
 	// INPUT EVENT HANDLING
@@ -169,5 +177,17 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 		{
 			return false;
 		}
+	}
+
+
+
+
+	//
+	// Type methods
+	//
+	
+	public boolean isEditable()
+	{
+		return true;
 	}
 }

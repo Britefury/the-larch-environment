@@ -33,6 +33,12 @@ public class EditableLeafElement extends LeafElement
 	
 	
 	
+	
+	
+	//
+	// Content modification methods
+	//
+	
 	public void setContent(String newContent)
 	{
 		int oldLength = content.length();
