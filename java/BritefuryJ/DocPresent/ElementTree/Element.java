@@ -241,15 +241,18 @@ public abstract class Element implements ContentInterface
 		return getWidget();
 	}
 	
-	public String getContent()
-	{
-		return getWidget().getContent();
-	}
+//	public String getContent()
+//	{
+//		return getWidget().getContent();
+//	}
+//	
+//	public int getContentLength()
+//	{
+//		return getWidget().getContentLength();
+//	}
 	
-	public int getContentLength()
-	{
-		return getWidget().getContentLength();
-	}
+	public abstract String getContent();
+	public abstract int getContentLength();
 
 
 	

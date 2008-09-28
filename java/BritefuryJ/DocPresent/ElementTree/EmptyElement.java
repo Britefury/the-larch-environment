@@ -33,4 +33,16 @@ public class EmptyElement extends Element
 	{
 		return (DPEmpty)widget;
 	}
+	
+	
+	
+	public String getContent()
+	{
+		return "";
+	}
+	
+	public int getContentLength()
+	{
+		return 0;
+	}
 }
