@@ -32,6 +32,12 @@ public abstract class Element implements ContentInterface
 	protected Element(DPWidget widget)
 	{
 		this.widget = widget;
+		
+		if ( widget != null )
+		{
+			widget.setElement( this );
+		}
+		
 		parent = null;
 		tree = null;
 		contentListener = null;
@@ -46,6 +52,24 @@ public abstract class Element implements ContentInterface
 	public DPWidget getWidget()
 	{
 		return widget;
+	}
+	
+	protected void setWidget(DPWidget w)
+	{
+		if ( w != widget )
+		{
+			if ( widget != null )
+			{
+				widget.setElement( null );
+			}
+			
+			widget = w;
+	
+			if ( widget != null )
+			{
+				widget.setElement( this );
+			}
+		}
 	}
 	
 	
@@ -72,20 +96,7 @@ public abstract class Element implements ContentInterface
 	
 	protected void setElementTree(ElementTree tree)
 	{
-		if ( tree != this.tree )
-		{
-			if ( this.tree != null )
-			{
-				this.tree.unregisterElement( this );
-			}
-			
-			this.tree = tree;
-
-			if ( this.tree != null )
-			{
-				this.tree.registerElement( this );
-			}
-		}
+		this.tree = tree;
 	}
 	
 	
