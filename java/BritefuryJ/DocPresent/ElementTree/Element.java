@@ -10,13 +10,12 @@ package BritefuryJ.DocPresent.ElementTree;
 import java.util.List;
 import java.util.Vector;
 
-import BritefuryJ.DocPresent.ContentInterface;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.DPWidget.IsNotInSubtreeException;
 import BritefuryJ.DocPresent.ElementTree.Marker.ElementMarker;
 import BritefuryJ.DocPresent.Marker.Marker;
 
-public abstract class Element implements ContentInterface
+public abstract class Element
 {
 	protected DPWidget widget;
 	protected BranchElement parent;
