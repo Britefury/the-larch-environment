@@ -215,6 +215,11 @@ public abstract class Element
 	// Content methods
 	//
 	
+	protected void contentChanged()
+	{
+		onContentModified();
+	}
+	
 	protected boolean onContentModified()
 	{
 		if ( contentListener != null )
@@ -239,16 +244,6 @@ public abstract class Element
 	{
 		return getWidget();
 	}
-	
-//	public String getContent()
-//	{
-//		return getWidget().getContent();
-//	}
-//	
-//	public int getContentLength()
-//	{
-//		return getWidget().getContentLength();
-//	}
 	
 	public abstract String getContent();
 	public abstract int getContentLength();

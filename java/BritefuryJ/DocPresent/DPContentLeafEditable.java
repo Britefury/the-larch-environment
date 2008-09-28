@@ -10,70 +10,55 @@ package BritefuryJ.DocPresent;
 import java.awt.event.KeyEvent;
 
 import BritefuryJ.DocPresent.Caret.Caret;
+import BritefuryJ.DocPresent.ElementTree.EditableLeafElement;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleSheets.ContentLeafStyleSheet;
 
 public abstract class DPContentLeafEditable extends DPContentLeaf
 {
-	DPContentLeafEditable()
+	protected DPContentLeafEditable()
 	{
 		super();
 	}
 	
-	DPContentLeafEditable(ContentLeafStyleSheet styleSheet)
+	protected DPContentLeafEditable(ContentLeafStyleSheet styleSheet)
 	{
 		super( styleSheet );
 	}
 	
-	DPContentLeafEditable(ContentLeafStyleSheet styleSheet, String content)
-	{
-		super( styleSheet, content );
-	}
+
 	
+	public EditableLeafElement getElement()
+	{
+		return (EditableLeafElement)element;
+	}
 	
 	
 	public void insertContent(Marker marker, String x)
 	{
-		int index = marker.getIndex();
-		content = content.substring( 0, index ) + x + content.substring( index );
-		markerInsert( index, x.length() );
-		contentChanged();
-		if ( listener != null )
+		EditableLeafElement e = getElement();
+		if ( e != null )
 		{
-			listener.contentInserted( marker, x );
+			e.insertContent( marker, x );
 		}
 	}
 
-	public void removeContent(Marker m, int length)
+	public void removeContent(Marker marker, int length)
 	{
-		int index = m.getIndex();
-		content = content.substring( 0, index ) + content.substring( index + length );
-		markerRemove( index, length );
-		contentChanged();
-		if ( listener != null )
+		EditableLeafElement e = getElement();
+		if ( e != null )
 		{
-			listener.contentRemoved( m, length );
+			e.removeContent( marker, length );
 		}
 	}
 	
-	public void replaceContent(Marker m, int length, String x)
+	public void replaceContent(Marker marker, int length, String x)
 	{
-		int index = m.getIndex();
-		content = content.substring( 0, index )  +  x  +  content.substring( index + length );
-		
-		if ( x.length() > length )
+		EditableLeafElement e = getElement();
+		if ( e != null )
 		{
-			markerInsert( index + length, x.length() - length );
-		}
-		else if ( x.length() < length )
-		{
-			markerRemove( index + x.length(), length - x.length() );
-		}
-		contentChanged();
-		if ( listener != null )
-		{
-			listener.contentReplaced( m, length, x );
+			e.replaceContent( marker, length, x );
 		}
 	}
 	
@@ -176,8 +161,8 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 		if ( event.getButton() == 1 )
 		{
 			Caret caret = presentationArea.getCaret();
-			int contentPos = getContentPositonForPoint( event.getPointer().getLocalPos() );
-			moveMarker( caret.getMarker(), contentPos, Marker.Bias.START );
+			int markerPos = getMarkerPositonForPoint( event.getPointer().getLocalPos() );
+			moveMarker( caret.getMarker(), markerPos, Marker.Bias.START );
 			return true;
 		}
 		else

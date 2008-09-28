@@ -10,7 +10,7 @@ package BritefuryJ.DocPresent.ElementTree;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 
-public class TextElement extends LeafElement
+public class TextElement extends EditableLeafElement
 {
 	public TextElement(String text)
 	{
@@ -19,7 +19,7 @@ public class TextElement extends LeafElement
 
 	public TextElement(TextStyleSheet styleSheet, String text)
 	{
-		super( new DPText( styleSheet, text ) );
+		super( new DPText( styleSheet, text ), text );
 	}
 
 
@@ -27,5 +27,14 @@ public class TextElement extends LeafElement
 	public DPText getWidget()
 	{
 		return (DPText)widget;
+	}
+	
+	
+	
+	protected void contentChanged()
+	{
+		getWidget().setText( getContent() );
+		
+		super.contentChanged();
 	}
 }

@@ -31,78 +31,45 @@ public abstract class DPContentLeaf extends DPWidget
 
 	
 	private WeakHashMap<Marker,Object> markers;
-	protected String content;
-	protected WidgetContentListener listener;
 	
 	
 	
 	DPContentLeaf()
 	{
-		this( ContentLeafStyleSheet.defaultStyleSheet, "" );
+		this( ContentLeafStyleSheet.defaultStyleSheet );
 	}
 	
 	DPContentLeaf(ContentLeafStyleSheet styleSheet)
 	{
-		this( styleSheet, "" );
-	}
-	
-	DPContentLeaf(ContentLeafStyleSheet styleSheet, String content)
-	{
 		super( styleSheet );
 		
 		markers = new WeakHashMap<Marker,Object>();
-		this.content = content;
 	}
 	
 	
 	
+	
 	//
-	//
-	// CONTENT METHODS
-	//
+	// Marker range methods
 	//
 	
-	public String getContent()
-	{
-		return content;
-	}
+	protected abstract int getMarkerRange();
 	
-	public int getContentLength()
+	protected void markerRangeChanged(int oldLength, int newLength)
 	{
-		return content.length();
-	}
-	
-	public void setContent(String x)
-	{
-		int oldLength = content.length();
-		content = x;
-		
-		if ( x.length() > oldLength )
+		if ( newLength > oldLength )
 		{
-			markerInsert( oldLength, x.length() - oldLength );
+			markerInsert( oldLength, newLength - oldLength );
 		}
-		else if ( x.length() < oldLength )
+		else if ( newLength < oldLength )
 		{
-			markerRemove( x.length(), oldLength - x.length() );
+			markerRemove( newLength, oldLength - newLength );
 		}
-		contentChanged();
 	}
 	
-	public abstract int getContentPositonForPoint(Point2 localPos);
+	public abstract int getMarkerPositonForPoint(Point2 localPos);
 	
 	
-	
-	public void setContentListener(WidgetContentListener listener)
-	{
-		this.listener = listener;
-	}
-	
-	
-	public void contentChanged()
-	{
-	}
-	
-
 	
 	
 	
@@ -149,17 +116,17 @@ public abstract class DPContentLeaf extends DPWidget
 	
 	public Marker marker(int position, Marker.Bias bias)
 	{
-		if ( position > getContentLength() )
+		if ( position > getMarkerRange() )
 		{
 			throw new Marker.InvalidMarkerPosition();
 		}
 		
-		if ( getContentLength() == 0 && position == 0 )
+		if ( getMarkerRange() == 0 && position == 0 )
 		{
 			bias = Marker.Bias.END;
 		}
 		
-		if ( position == getContentLength()  &&  bias == Marker.Bias.END )
+		if ( position == getMarkerRange()  &&  bias == Marker.Bias.END )
 		{
 			throw new Marker.InvalidMarkerPosition();
 		}
@@ -177,33 +144,33 @@ public abstract class DPContentLeaf extends DPWidget
 	
 	public Marker markerAtStartPlusOne()
 	{
-		return marker( Math.min( 1, content.length() ), Marker.Bias.START );
+		return marker( Math.min( 1, getMarkerRange() ), Marker.Bias.START );
 	}
 	
 	public Marker markerAtEnd()
 	{
-		return marker( Math.max( content.length() - 1, 0 ), Marker.Bias.END );
+		return marker( Math.max( getMarkerRange() - 1, 0 ), Marker.Bias.END );
 	}
 	
 	public Marker markerAtEndMinusOne()
 	{
-		return marker( Math.max( content.length() - 1, 0 ), Marker.Bias.START );
+		return marker( Math.max( getMarkerRange() - 1, 0 ), Marker.Bias.START );
 	}
 	
 	
 	public void moveMarker(Marker m, int position, Marker.Bias bias)
 	{
-		if ( position > getContentLength() )
+		if ( position > getMarkerRange() )
 		{
 			throw new Marker.InvalidMarkerPosition();
 		}
 		
-		if ( getContentLength() == 0 && position == 0 )
+		if ( getMarkerRange() == 0 && position == 0 )
 		{
 			bias = Marker.Bias.START;
 		}
 		
-		if ( position == getContentLength()  &&  bias == Marker.Bias.END )
+		if ( position == getMarkerRange()  &&  bias == Marker.Bias.END )
 		{
 			throw new Marker.InvalidMarkerPosition();
 		}
@@ -224,17 +191,17 @@ public abstract class DPContentLeaf extends DPWidget
 	
 	public void moveMarkerToStartPlusOne(Marker m)
 	{
-		moveMarker( m, Math.min( 1, content.length() ), Marker.Bias.START );
+		moveMarker( m, Math.min( 1, getMarkerRange() ), Marker.Bias.START );
 	}
 	
 	public void moveMarkerToEnd(Marker m)
 	{
-		moveMarker( m, Math.max( content.length() - 1, 0 ), Marker.Bias.END );
+		moveMarker( m, Math.max( getMarkerRange() - 1, 0 ), Marker.Bias.END );
 	}
 	
 	public void moveMarkerToEndMinusOne(Marker m)
 	{
-		moveMarker( m, Math.max( content.length() - 1, 0 ), Marker.Bias.START );
+		moveMarker( m, Math.max( getMarkerRange() - 1, 0 ), Marker.Bias.START );
 	}
 	
 	
@@ -255,7 +222,7 @@ public abstract class DPContentLeaf extends DPWidget
 	{
 		if ( m.getWidget() == this )
 		{
-			return m.getIndex() == getContentLength();
+			return m.getIndex() == getMarkerRange();
 		}
 		else
 		{
@@ -280,7 +247,7 @@ public abstract class DPContentLeaf extends DPWidget
 	
 	
 	
-	protected void markerInsert(int position, int length)
+	public void markerInsert(int position, int length)
 	{
 		for (Marker m: markers.keySet())
 		{
@@ -295,7 +262,7 @@ public abstract class DPContentLeaf extends DPWidget
 		}
 	}
 	
-	protected void markerRemove(int position, int length)
+	public void markerRemove(int position, int length)
 	{
 		int end = position + length;
 
@@ -504,7 +471,7 @@ public abstract class DPContentLeaf extends DPWidget
 		if ( above != null )
 		{
 			Point2 cursorPosInAbove = getLocalPointRelativeTo( above, cursorPos );
-			int contentPos = above.getContentPositonForPoint( cursorPosInAbove );
+			int contentPos = above.getMarkerPositonForPoint( cursorPosInAbove );
 			above.moveMarker( marker, contentPos, Marker.Bias.START );
 		}
 	}
@@ -516,7 +483,7 @@ public abstract class DPContentLeaf extends DPWidget
 		if ( below != null )
 		{
 			Point2 cursorPosInBelow = getLocalPointRelativeTo( below, cursorPos );
-			int contentPos = below.getContentPositonForPoint( cursorPosInBelow );
+			int contentPos = below.getMarkerPositonForPoint( cursorPosInBelow );
 			below.moveMarker( marker, contentPos, Marker.Bias.START );
 		}
 	}

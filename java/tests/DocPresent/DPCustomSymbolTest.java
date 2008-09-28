@@ -57,7 +57,7 @@ public class DPCustomSymbolTest
 		};
      
 		CustomSymbolStyleSheet styleSheet = new CustomSymbolStyleSheet( Color.blue );
-		DPCustomSymbol customSym = new DPCustomSymbol( styleSheet, symbol," " );
+		DPCustomSymbol customSym = new DPCustomSymbol( styleSheet, symbol );
 		     
 		area.setChild( customSym );
 		     

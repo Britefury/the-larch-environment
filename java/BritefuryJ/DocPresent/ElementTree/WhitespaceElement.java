@@ -18,7 +18,7 @@ public class WhitespaceElement extends LeafElement
 
 	public WhitespaceElement(String whitespace, double width)
 	{
-		super( new DPWhitespace( whitespace, width ) );
+		super( new DPWhitespace(  width ), whitespace );
 	}
 
 

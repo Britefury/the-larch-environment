@@ -32,14 +32,14 @@ public class DPCustomSymbol extends DPContentLeafEditable
 	
 	
 	
-	public DPCustomSymbol(SymbolInterface symbol, String content)
+	public DPCustomSymbol(SymbolInterface symbol)
 	{
-		this( CustomSymbolStyleSheet.defaultStyleSheet, symbol, content );
+		this( CustomSymbolStyleSheet.defaultStyleSheet, symbol );
 	}
 	
-	public DPCustomSymbol(CustomSymbolStyleSheet styleSheet, SymbolInterface symbol, String content)
+	public DPCustomSymbol(CustomSymbolStyleSheet styleSheet, SymbolInterface symbol)
 	{
-		super( styleSheet, content );
+		super( styleSheet );
 		
 		this.symbol = symbol;
 		
@@ -119,7 +119,18 @@ public class DPCustomSymbol extends DPContentLeafEditable
 		graphics.draw( new Line2D.Double( x, 0.0, x, h) );
 	}
 
-	public int getContentPositonForPoint(Point2 localPos)
+	
+	
+	//
+	// Marker methods
+	//
+	
+	protected int getMarkerRange()
+	{
+		return 1;
+	}
+	
+	public int getMarkerPositonForPoint(Point2 localPos)
 	{
 		if ( localPos.x  >=  symbol.computeHMetrics().width * 0.5 )
 		{

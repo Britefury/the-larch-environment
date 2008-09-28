@@ -22,22 +22,22 @@ public class DPWhitespace extends DPContentLeaf
 	
 	public DPWhitespace()
 	{
-		this( ContentLeafStyleSheet.defaultStyleSheet, "", 0.0 );
+		this( ContentLeafStyleSheet.defaultStyleSheet, 0.0 );
 	}
 	
 	public DPWhitespace(ContentLeafStyleSheet styleSheet)
 	{
-		this( styleSheet, "", 0.0 );
+		this( styleSheet, 0.0 );
 	}
 	
-	public DPWhitespace(String content, double width)
+	public DPWhitespace(double width)
 	{
-		this( ContentLeafStyleSheet.defaultStyleSheet, content, width );
+		this( ContentLeafStyleSheet.defaultStyleSheet, width );
 	}
 
-	public DPWhitespace(ContentLeafStyleSheet styleSheet, String content, double width)
+	public DPWhitespace(ContentLeafStyleSheet styleSheet, double width)
 	{
-		super( styleSheet, content );
+		super( styleSheet );
 		this.width = width;
 	}
 
@@ -45,7 +45,7 @@ public class DPWhitespace extends DPContentLeaf
 	
 	public void drawCaret(Graphics2D graphics, Caret c)
 	{
-		if ( c.getMarker().getIndex() <= getContentLength() / 2 )
+		if ( c.getMarker().getIndex() == 0 )
 		{
 			drawCaretAtStart( graphics );
 		}
@@ -86,18 +86,6 @@ public class DPWhitespace extends DPContentLeaf
 	
 	
 	
-	public int getContentPositonForPoint(Point2 localPos)
-	{
-		if ( localPos.x >= width * 0.5 )
-		{
-			return 1;
-		}
-		else
-		{
-			return 0;
-		}
-	}
-
 	protected HMetrics computeMinimumHMetrics()
 	{
 		return new HMetrics( width );
@@ -121,6 +109,28 @@ public class DPWhitespace extends DPContentLeaf
 
 
 
+	//
+	// Marker methods
+	//
+	
+	public int getMarkerPositonForPoint(Point2 localPos)
+	{
+		if ( localPos.x >= width * 0.5 )
+		{
+			return 1;
+		}
+		else
+		{
+			return 0;
+		}
+	}
+
+	protected int getMarkerRange()
+	{
+		return 1;
+	}
+
+	
 	public boolean isWhitespace()
 	{
 		return true;
