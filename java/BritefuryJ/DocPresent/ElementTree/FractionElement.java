@@ -15,7 +15,7 @@ import BritefuryJ.DocPresent.StyleSheets.FractionStyleSheet;
 
 public class FractionElement extends BranchElement
 {
-	public static class BarElement extends LeafElement
+	public static class BarElement extends EditableLeafElement
 	{
 		public BarElement(String content)
 		{
@@ -24,7 +24,7 @@ public class FractionElement extends BranchElement
 
 		public BarElement(FractionStyleSheet.BarStyleSheet styleSheet, String content)
 		{
-			super( new DPFraction.DPFractionBar( styleSheet, content ) );
+			super( new DPFraction.DPFractionBar( styleSheet ), content );
 		}
 
 

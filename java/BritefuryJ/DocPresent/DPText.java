@@ -20,6 +20,7 @@ import BritefuryJ.Math.Point2;
 public class DPText extends DPContentLeafEditable implements TextVisual.TextVisualListener
 {
 	protected TextVisual visual;
+	protected String text;
 	
 	
 	public DPText(String text)
@@ -29,29 +30,21 @@ public class DPText extends DPContentLeafEditable implements TextVisual.TextVisu
 	
 	public DPText(TextStyleSheet styleSheet, String text)
 	{
-		super( styleSheet, text );
+		super( styleSheet );
+		
+		this.text = text;
 		
 		visual = new TextVisual( text, styleSheet, this );
 	}
 	
 	
 	
-	public String getText()
-	{
-		return getContent();
-	}
-	
 	public void setText(String text)
 	{
-		setContent( text );
+		this.text = text;
+		visual.setText( text );
 	}
 	
-	
-	public void contentChanged()
-	{
-		visual.setText( getContent() );
-	}
-
 	
 	public TextHitInfo hitTest(Point2 pos)
 	{
@@ -133,7 +126,13 @@ public class DPText extends DPContentLeafEditable implements TextVisual.TextVisu
 
 
 
-	public int getContentPositonForPoint(Point2 localPos)
+
+	protected int getMarkerRange()
+	{
+		return text.length();
+	}
+
+	public int getMarkerPositonForPoint(Point2 localPos)
 	{
 		TextHitInfo info = hitTest( localPos );
 		if ( info != null )

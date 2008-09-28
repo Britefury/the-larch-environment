@@ -11,10 +11,8 @@ import java.util.List;
 import java.util.Vector;
 
 import BritefuryJ.DocPresent.DPContentLeaf;
-import BritefuryJ.DocPresent.WidgetContentListener;
-import BritefuryJ.DocPresent.Marker.Marker;
 
-public abstract class LeafElement extends Element implements WidgetContentListener
+public abstract class LeafElement extends Element
 {
 	//
 	// Utility classes
@@ -35,7 +33,7 @@ public abstract class LeafElement extends Element implements WidgetContentListen
 	// Fields
 	//
 	
-	String content;
+	protected String content;
 	
 	
 	
@@ -45,10 +43,11 @@ public abstract class LeafElement extends Element implements WidgetContentListen
 	// Constructor
 	//
 	
-	protected LeafElement(DPContentLeaf widget)
+	protected LeafElement(DPContentLeaf widget, String content)
 	{
 		super( widget );
-		widget.setContentListener( this );
+		
+		this.content = content;
 	}
 	
 	
@@ -174,30 +173,15 @@ public abstract class LeafElement extends Element implements WidgetContentListen
 	
 	public String getContent()
 	{
-		return getWidget().getContent();
+		return content;
 	}
 	
 	public int getContentLength()
 	{
-		return getWidget().getContentLength();
+		return content.length();
 	}
 	
 	
-	public void contentInserted(Marker m, String x)
-	{
-		onContentModified();
-	}
-
-	public void contentRemoved(Marker m, int length)
-	{
-		onContentModified();
-	}
-
-	public void contentReplaced(Marker m, int length, String x)
-	{
-		onContentModified();
-	}
-
 
 	
 	

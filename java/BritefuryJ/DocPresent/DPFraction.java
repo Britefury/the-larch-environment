@@ -28,22 +28,12 @@ public class DPFraction extends DPContainer
 	{
 		public DPFractionBar()
 		{
-			this( FractionStyleSheet.BarStyleSheet.defaultStyleSheet, "/" );
-		}
-
-		public DPFractionBar(String content)
-		{
-			this( FractionStyleSheet.BarStyleSheet.defaultStyleSheet, content );
+			this( FractionStyleSheet.BarStyleSheet.defaultStyleSheet );
 		}
 
 		public DPFractionBar(FractionStyleSheet.BarStyleSheet styleSheet)
 		{
-			super( styleSheet, "/" );
-		}
-
-		public DPFractionBar(FractionStyleSheet.BarStyleSheet styleSheet, String content)
-		{
-			super( styleSheet, content );
+			super( styleSheet );
 		}
 
 	
@@ -101,13 +91,23 @@ public class DPFraction extends DPContainer
 		{
 			return new VMetrics();
 		}
-
 		
-		public int getContentPositonForPoint(Point2 localPos)
+		
+		
+		//
+		// Marker methods
+		//
+
+		protected int getMarkerRange()
+		{
+			return 1;
+		}
+
+		public int getMarkerPositonForPoint(Point2 localPos)
 		{
 			if ( localPos.x >= allocation.x * 0.5 )
 			{
-				return getContentLength();
+				return 1;
 			}
 			else
 			{
