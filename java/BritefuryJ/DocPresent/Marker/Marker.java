@@ -7,9 +7,7 @@
 //##************************
 package BritefuryJ.DocPresent.Marker;
 
-import BritefuryJ.DocPresent.DPContainer;
 import BritefuryJ.DocPresent.DPContentLeaf;
-import BritefuryJ.DocPresent.DPWidget;
 
 public class Marker
 {
@@ -65,26 +63,6 @@ public class Marker
 		return position;
 	}
 	
-	public int getPositionInSubtree(DPWidget subtreeRoot)
-	{
-		if ( subtreeRoot == widget )
-		{
-			return position;
-		}
-		else
-		{
-			DPContainer c = (DPContainer)subtreeRoot;
-			if ( widget.isInSubtreeRootedAt( c ) )
-			{
-				return position + widget.getContentOffsetInSubtree( c );
-			}
-			else
-			{
-				throw new DPWidget.IsNotInSubtreeException();
-			}
-		}
-	}
-	
 	public Bias getBias()
 	{
 		return bias;
@@ -94,12 +72,6 @@ public class Marker
 	public int getIndex()
 	{
 		return bias == Bias.END  ?  position + 1  :  position;
-	}
-	
-	public int getIndexInSubtree(DPWidget subtreeRoot)
-	{
-		int p = getPositionInSubtree( subtreeRoot );
-		return bias == Bias.END  ?  p + 1  :  p;
 	}
 	
 

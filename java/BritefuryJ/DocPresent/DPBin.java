@@ -209,30 +209,4 @@ public class DPBin extends DPContainer
 			return null;
 		}
 	}
-	
-	
-	
-	//
-	//
-	// CONTENT METHODS
-	//
-	//
-
-	public String getContent()
-	{
-		if ( child != null )
-		{
-			return child.getContent();
-		}
-		return "";
-	}
-
-	public int getContentLength()
-	{
-		if ( child != null )
-		{
-			return child.getContentLength();
-		}
-		return 0;
-	}
 }

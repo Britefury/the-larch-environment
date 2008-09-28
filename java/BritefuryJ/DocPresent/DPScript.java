@@ -944,39 +944,4 @@ public class DPScript extends DPContainer
 	{
 		return ((ScriptStyleSheet)styleSheet).getScriptSpacing();
 	}
-
-
-
-
-	//
-	//
-	// CONTENT METHODS
-	//
-	//
-
-	public String getContent()
-	{
-		String xs = "";
-		for (DPWidget child: children)
-		{
-			if ( child != null )
-			{
-				xs += child.getContent();
-			}
-		}
-		return xs;
-	}
-
-	public int getContentLength()
-	{
-		int length = 0;
-		for (DPWidget child: children)
-		{
-			if ( child != null )
-			{
-				length += child.getContentLength();
-			}
-		}
-		return length;
-	}
 }

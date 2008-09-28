@@ -31,6 +31,15 @@ public abstract class LeafElement extends Element implements WidgetContentListen
 	
 	
 	
+	//
+	// Fields
+	//
+	
+	String content;
+	
+	
+	
+	
 	
 	//
 	// Constructor
@@ -190,6 +199,12 @@ public abstract class LeafElement extends Element implements WidgetContentListen
 	}
 
 
+	
+	
+	
+	//
+	// Type methods
+	//
 
 
 	public boolean isWhitespace()

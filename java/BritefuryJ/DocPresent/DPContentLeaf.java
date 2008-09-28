@@ -16,7 +16,7 @@ import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleSheets.ContentLeafStyleSheet;
 import BritefuryJ.Math.Point2;
 
-public abstract class DPContentLeaf extends DPWidget implements ContentInterface
+public abstract class DPContentLeaf extends DPWidget
 {
 	public static class CannotCreateMarkerWithEmptyContent extends RuntimeException
 	{
