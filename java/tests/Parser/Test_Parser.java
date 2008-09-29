@@ -437,18 +437,11 @@ public class Test_Parser extends ParserTestCase
 		assertTrue( new Repetition( new Literal( "ab" ), 0, 1, false ).compareTo( new Repetition( "ab", 0, 1 ) ) );
 
 		ParserExpression parser_2, parser02, parser02N, parser24, parser2_;
-		try
-		{
-			parser_2 = new Repetition( new Word( "a", "b" ).bindTo( "x" ).__add__( new Word( "c", "d" ).bindTo( "y" ) ),  -1, 2 );
-			parser02 = new Repetition( new Word( "a", "b" ).bindTo( "x" ).__add__( new Word( "c", "d" ).bindTo( "y" ) ),  0, 2 );
-			parser02N = new Repetition( new Word( "a", "b" ).bindTo( "x" ).__add__( new Word( "c", "d" ).bindTo( "y" ) ),  0, 2, true );
-			parser24 = new Repetition( new Word( "a", "b" ).bindTo( "x" ).__add__( new Word( "c", "d" ).bindTo( "y" ) ),  2, 4 );
-			parser2_ = new Repetition( new Word( "a", "b" ).bindTo( "x" ).__add__( new Word( "c", "d" ).bindTo( "y" ) ),  2, -1 );
-		}
-		catch (ParserCoerceException e)
-		{
-			throw new RuntimeException();
-		}
+		parser_2 = new Repetition( new Word( "a", "b" ).bindTo( "x" ).__add__( new Word( "c", "d" ).bindTo( "y" ) ),  -1, 2 );
+		parser02 = new Repetition( new Word( "a", "b" ).bindTo( "x" ).__add__( new Word( "c", "d" ).bindTo( "y" ) ),  0, 2 );
+		parser02N = new Repetition( new Word( "a", "b" ).bindTo( "x" ).__add__( new Word( "c", "d" ).bindTo( "y" ) ),  0, 2, true );
+		parser24 = new Repetition( new Word( "a", "b" ).bindTo( "x" ).__add__( new Word( "c", "d" ).bindTo( "y" ) ),  2, 4 );
+		parser2_ = new Repetition( new Word( "a", "b" ).bindTo( "x" ).__add__( new Word( "c", "d" ).bindTo( "y" ) ),  2, -1 );
 		
 		String[][] result0 = {};
 		String[][] result1 = { { "ab", "cd", } };
@@ -537,15 +530,8 @@ public class Test_Parser extends ParserTestCase
 		assertTrue( new ZeroOrMore( new Literal( "ab" ), false ).compareTo( new ZeroOrMore( "ab" ) ) );
 
 		ParserExpression parserO, parserN;
-		try
-		{
-			parserO = new ZeroOrMore( new Word( "a", "b" ).bindTo( "x" ).__add__( new Word( "c", "d" ).bindTo( "y" ) ) );
-			parserN = new ZeroOrMore( new Word( "a", "b" ).bindTo( "x" ).__add__( new Word( "c", "d" ).bindTo( "y" ) ), true );
-		}
-		catch (ParserCoerceException e)
-		{
-			throw new RuntimeException();
-		}
+		parserO = new ZeroOrMore( new Word( "a", "b" ).bindTo( "x" ).__add__( new Word( "c", "d" ).bindTo( "y" ) ) );
+		parserN = new ZeroOrMore( new Word( "a", "b" ).bindTo( "x" ).__add__( new Word( "c", "d" ).bindTo( "y" ) ), true );
 		
 		String[][] result0 = {};
 		String[][] result1 = { { "ab", "cd", } };
@@ -579,15 +565,7 @@ public class Test_Parser extends ParserTestCase
 		assertFalse( new OneOrMore( new Literal( "ab" ) ).compareTo( new OneOrMore( new Literal( "cd" ) ) ) );
 		assertTrue( new OneOrMore( new Literal( "ab" ) ).compareTo( new OneOrMore( "ab" ) ) );
 
-		ParserExpression parser;
-		try
-		{
-			parser = new OneOrMore( new Word( "a", "b" ).bindTo( "x" ).__add__( new Word( "c", "d" ).bindTo( "y" ) ) );
-		}
-		catch (ParserCoerceException e)
-		{
-			throw new RuntimeException();
-		}
+		ParserExpression parser = new OneOrMore( new Word( "a", "b" ).bindTo( "x" ).__add__( new Word( "c", "d" ).bindTo( "y" ) ) );
 		
 		String[][] result1 = { { "ab", "cd", } };
 		String[][] result2 = { { "ab", "cd", },   { "abb", "cdd" } };
@@ -617,15 +595,7 @@ public class Test_Parser extends ParserTestCase
 		assertFalse( new Peek( new Literal( "ab" ) ).compareTo( new Peek( new Literal( "cd" ) ) ) );
 		assertTrue( new Peek( new Literal( "ab" ) ).compareTo( new Peek( "ab" ) ) );
 
-		ParserExpression parser;
-		try
-		{
-			parser = new OneOrMore( new Word( "a", "b" ).bindTo( "x" ) ).__add__( new Peek( new Word( "c", "d" ).bindTo( "y" ) ) );
-		}
-		catch (ParserCoerceException e)
-		{
-			throw new RuntimeException();
-		}
+		ParserExpression parser = new OneOrMore( new Word( "a", "b" ).bindTo( "x" ) ).__add__( new Peek( new Word( "c", "d" ).bindTo( "y" ) ) );
 		
 		String[][] result1 = { { "ab" } };
 		String[][] result2 = { { "ab", "ab" } };
@@ -647,15 +617,7 @@ public class Test_Parser extends ParserTestCase
 		assertFalse( new PeekNot( new Literal( "ab" ) ).compareTo( new PeekNot( new Literal( "cd" ) ) ) );
 		assertTrue( new PeekNot( new Literal( "ab" ) ).compareTo( new PeekNot( "ab" ) ) );
 
-		ParserExpression parser;
-		try
-		{
-			parser = new OneOrMore( new Word( "a", "b" ).bindTo( "x" ) ).__add__( new PeekNot( new Word( "c", "d" ).bindTo( "y" ) ) );
-		}
-		catch (ParserCoerceException e)
-		{
-			throw new RuntimeException();
-		}
+		ParserExpression parser = new OneOrMore( new Word( "a", "b" ).bindTo( "x" ) ).__add__( new PeekNot( new Word( "c", "d" ).bindTo( "y" ) ) );
 		
 		String[][] result1 = { { "ab" } };
 		String[][] result2 = { { "ab", "ab" } };
@@ -672,246 +634,204 @@ public class Test_Parser extends ParserTestCase
 	
 	public void testNonRecursiveCalculator()
 	{
-		try
-		{
-			ParserExpression integer = new Word( "0123456789" );
-			ParserExpression plus = new Literal( "+" );
-			ParserExpression minus = new Literal( "-" );
-			ParserExpression star = new Literal( "*" );
-			ParserExpression slash = new Literal( "/" );
+		ParserExpression integer = new Word( "0123456789" );
+		ParserExpression plus = new Literal( "+" );
+		ParserExpression minus = new Literal( "-" );
+		ParserExpression star = new Literal( "*" );
+		ParserExpression slash = new Literal( "/" );
+	
+		ParserExpression addop = plus.__or__(  minus );
+		ParserExpression mulop = star.__or__(  slash );
 		
-			ParserExpression addop = plus.__or__(  minus );
-			ParserExpression mulop = star.__or__(  slash );
-			
-			ParseAction flattenAction = new ParseAction()
-			{
-				@SuppressWarnings("unchecked")
-				public Object invoke(String input, int begin, Object x, Map<String, Object> bindings)
-				{
-					Vector<Object> y = new Vector<Object>();
-					List<Object> xx = (List<Object>)x;
-					for (Object a: xx)
-					{
-						y.addAll( (List<Object>)a );
-					}
-					return y;
-				}
-			};
-
-			ParseAction action = new ParseAction()
-			{
-				@SuppressWarnings("unchecked")
-				public Object invoke(String input, int begin, Object x, Map<String, Object> bindings)
-				{
-					List<Object> xx = (List<Object>)x;
-					if ( xx.get( 1 ).equals( new Vector<Object>() ) )
-					{
-						return xx.get( 0 );
-					}
-					else
-					{
-						Vector<Object> res = new Vector<Object>();
-						res.add( xx.get( 0 ) );
-						res.addAll( (List<Object>)xx.get( 1 ) );
-						return res;
-					}
-				}
-			};
-			
-			ParserExpression mul = new Production( ( integer.__add__( new ZeroOrMore( mulop.__add__( integer ) ).action( flattenAction ) ) ) ).action( action );
-			ParserExpression add = new Production( ( mul.__add__( new ZeroOrMore( addop.__add__( mul ) ).action( flattenAction ) ) ) ).action( action );
-			ParserExpression parser = add;
-			
-			matchTest( parser, "123", "123" );
-			
-			matchTestSX( parser, "1*2", "(1 * 2)" );
-			matchTestSX( parser, "1*2*3", "(1 * 2 * 3)" );
-
-			matchTestSX( parser, "1+2", "(1 + 2)" );
-			matchTestSX( parser, "1+2+3", "(1 + 2 + 3)" );
-
-			matchTestSX( parser, "1+2*3", "(1 + (2 * 3))" );
-			matchTestSX( parser, "1*2+3", "((1 * 2) + 3)" );
-
-			matchTestSX( parser, "1*2+3+4", "((1 * 2) + 3 + 4)" );
-			matchTestSX( parser, "1+2*3+4", "(1 + (2 * 3) + 4)" );
-			matchTestSX( parser, "1+2+3*4", "(1 + 2 + (3 * 4))" );
-
-			matchTestSX( parser, "1+2*3*4", "(1 + (2 * 3 * 4))" );
-			matchTestSX( parser, "1*2+3*4", "((1 * 2) + (3 * 4))" );
-			matchTestSX( parser, "1*2*3+4", "((1 * 2 * 3) + 4)" );
-		}
-		catch (ParserCoerceException e)
+		ParseAction flattenAction = new ParseAction()
 		{
-			throw new RuntimeException();
-		}
+			@SuppressWarnings("unchecked")
+			public Object invoke(String input, int begin, Object x, Map<String, Object> bindings)
+			{
+				Vector<Object> y = new Vector<Object>();
+				List<Object> xx = (List<Object>)x;
+				for (Object a: xx)
+				{
+					y.addAll( (List<Object>)a );
+				}
+				return y;
+			}
+		};
+
+		ParseAction action = new ParseAction()
+		{
+			@SuppressWarnings("unchecked")
+			public Object invoke(String input, int begin, Object x, Map<String, Object> bindings)
+			{
+				List<Object> xx = (List<Object>)x;
+				if ( xx.get( 1 ).equals( new Vector<Object>() ) )
+				{
+					return xx.get( 0 );
+				}
+				else
+				{
+					Vector<Object> res = new Vector<Object>();
+					res.add( xx.get( 0 ) );
+					res.addAll( (List<Object>)xx.get( 1 ) );
+					return res;
+				}
+			}
+		};
+		
+		ParserExpression mul = new Production( ( integer.__add__( new ZeroOrMore( mulop.__add__( integer ) ).action( flattenAction ) ) ) ).action( action );
+		ParserExpression add = new Production( ( mul.__add__( new ZeroOrMore( addop.__add__( mul ) ).action( flattenAction ) ) ) ).action( action );
+		ParserExpression parser = add;
+		
+		matchTest( parser, "123", "123" );
+		
+		matchTestSX( parser, "1*2", "(1 * 2)" );
+		matchTestSX( parser, "1*2*3", "(1 * 2 * 3)" );
+
+		matchTestSX( parser, "1+2", "(1 + 2)" );
+		matchTestSX( parser, "1+2+3", "(1 + 2 + 3)" );
+
+		matchTestSX( parser, "1+2*3", "(1 + (2 * 3))" );
+		matchTestSX( parser, "1*2+3", "((1 * 2) + 3)" );
+
+		matchTestSX( parser, "1*2+3+4", "((1 * 2) + 3 + 4)" );
+		matchTestSX( parser, "1+2*3+4", "(1 + (2 * 3) + 4)" );
+		matchTestSX( parser, "1+2+3*4", "(1 + 2 + (3 * 4))" );
+
+		matchTestSX( parser, "1+2*3*4", "(1 + (2 * 3 * 4))" );
+		matchTestSX( parser, "1*2+3*4", "((1 * 2) + (3 * 4))" );
+		matchTestSX( parser, "1*2*3+4", "((1 * 2 * 3) + 4)" );
 	}
 
 
 	public void testRightRecursion()
 	{
-		try
-		{
-			ParserExpression x = new Production( "x" );
-			Forward y = new Forward();
-			y.setExpression( new Production( x.__add__( y ).__or__( "y" ) ) );
-			
-			matchTestSX( y, "xxxy", "(x (x (x y)))" );
-		}
-		catch (ParserCoerceException e)
-		{
-			throw new RuntimeException();
-		}
+		ParserExpression x = new Production( "x" );
+		Forward y = new Forward();
+		y.setExpression( new Production( x.__add__( y ).__or__( "y" ) ) );
+		
+		matchTestSX( y, "xxxy", "(x (x (x y)))" );
 	}
 
 
 	public void testDirectLeftRecursion()
 	{
-		try
-		{
-			ParserExpression x = new Production( "x" );
-			Forward y = new Forward();
-			y.setExpression( new Production( y.__add__( x ).__or__( "y" ) ) );
-			
-			matchTestSX( y, "yxxx", "(((y x) x) x)" );
-		}
-		catch (ParserCoerceException e)
-		{
-			throw new RuntimeException();
-		}
+		ParserExpression x = new Production( "x" );
+		Forward y = new Forward();
+		y.setExpression( new Production( y.__add__( x ).__or__( "y" ) ) );
+		
+		matchTestSX( y, "yxxx", "(((y x) x) x)" );
 	}
 
 	public void testIndirectLeftRecursion()
 	{
-		try
-		{
-			Production x = new Production( "x" );
-			Forward z = new Forward();
-			Production y = new Production( z.__add__( x ).__or__( "z" ) );
-			z.setExpression( new Production( y.__or__( "y" ) ) );
-			
-			matchTestSX( z, "zxxx", "(((z x) x) x)" );
-			matchTestSX( z, "yxxx", "(((y x) x) x)" );
-		}
-		catch (ParserCoerceException e)
-		{
-			throw new RuntimeException();
-		}
+		Production x = new Production( "x" );
+		Forward z = new Forward();
+		Production y = new Production( z.__add__( x ).__or__( "z" ) );
+		z.setExpression( new Production( y.__or__( "y" ) ) );
+		
+		matchTestSX( z, "zxxx", "(((z x) x) x)" );
+		matchTestSX( z, "yxxx", "(((y x) x) x)" );
 	}
 
 	public void testLeftRecursion()
 	{
-		try
-		{
-			ParserExpression integer = new Word( "0123456789" );
-			ParserExpression plus = new Literal( "+" );
-			ParserExpression minus = new Literal( "-" );
-			ParserExpression star = new Literal( "*" );
-			ParserExpression slash = new Literal( "/" );
+		ParserExpression integer = new Word( "0123456789" );
+		ParserExpression plus = new Literal( "+" );
+		ParserExpression minus = new Literal( "-" );
+		ParserExpression star = new Literal( "*" );
+		ParserExpression slash = new Literal( "/" );
+	
+		ParserExpression addop = plus.__or__(  minus );
+		ParserExpression mulop = star.__or__(  slash );
+
+		Forward mul = new Forward();
+		mul.setExpression( new Production( ( mul.__add__( mulop ).__add__( integer ) ).__or__( integer ) ) );
+		Forward add = new Forward();
+		add.setExpression( new Production( ( add.__add__( addop ).__add__( mul ) ).__or__( mul ) ) );
+		ParserExpression parser = add;
 		
-			ParserExpression addop = plus.__or__(  minus );
-			ParserExpression mulop = star.__or__(  slash );
+		matchTest( parser, "123", "123" );
+		
+		matchTestSX( parser, "1*2", "(1 * 2)" );
+		matchTestSX( parser, "1*2*3", "((1 * 2) * 3)" );
 
-			Forward mul = new Forward();
-			mul.setExpression( new Production( ( mul.__add__( mulop ).__add__( integer ) ).__or__( integer ) ) );
-			Forward add = new Forward();
-			add.setExpression( new Production( ( add.__add__( addop ).__add__( mul ) ).__or__( mul ) ) );
-			ParserExpression parser = add;
-			
-			matchTest( parser, "123", "123" );
-			
-			matchTestSX( parser, "1*2", "(1 * 2)" );
-			matchTestSX( parser, "1*2*3", "((1 * 2) * 3)" );
+		matchTestSX( parser, "1+2", "(1 + 2)" );
+		matchTestSX( parser, "1+2+3", "((1 + 2) + 3)" );
 
-			matchTestSX( parser, "1+2", "(1 + 2)" );
-			matchTestSX( parser, "1+2+3", "((1 + 2) + 3)" );
+		matchTestSX( parser, "1+2*3", "(1 + (2 * 3))" );
+		matchTestSX( parser, "1*2+3", "((1 * 2) + 3)" );
 
-			matchTestSX( parser, "1+2*3", "(1 + (2 * 3))" );
-			matchTestSX( parser, "1*2+3", "((1 * 2) + 3)" );
+		matchTestSX( parser, "1*2+3+4", "(((1 * 2) + 3) + 4)" );
+		matchTestSX( parser, "1+2*3+4", "((1 + (2 * 3)) + 4)" );
+		matchTestSX( parser, "1+2+3*4", "((1 + 2) + (3 * 4))" );
 
-			matchTestSX( parser, "1*2+3+4", "(((1 * 2) + 3) + 4)" );
-			matchTestSX( parser, "1+2*3+4", "((1 + (2 * 3)) + 4)" );
-			matchTestSX( parser, "1+2+3*4", "((1 + 2) + (3 * 4))" );
-
-			matchTestSX( parser, "1+2*3*4", "(1 + ((2 * 3) * 4))" );
-			matchTestSX( parser, "1*2+3*4", "((1 * 2) + (3 * 4))" );
-			matchTestSX( parser, "1*2*3+4", "(((1 * 2) * 3) + 4)" );
-		}
-		catch (ParserCoerceException e)
-		{
-			throw new RuntimeException();
-		}
+		matchTestSX( parser, "1+2*3*4", "(1 + ((2 * 3) * 4))" );
+		matchTestSX( parser, "1*2+3*4", "((1 * 2) + (3 * 4))" );
+		matchTestSX( parser, "1*2*3+4", "(((1 * 2) * 3) + 4)" );
 	}
 
 
 
 	public void testLeftRecursionSimplifiedJavaPrimary()
 	{
-		try
-		{
-			Forward primary = new Forward();
-			
-			
-			ParserExpression expression = new Production( new Literal( "i" ).__or__( new Literal( "j" ) ) ).debug( "expression" );
-			ParserExpression methodName = new Production( new Literal( "m" ).__or__( new Literal( "n" ) ) ).debug( "methodName" );
-			ParserExpression interfaceTypeName = new Production( new Literal( "I" ).__or__( new Literal( "J" ) ) ).debug( "interfaceTypeName" );
-			ParserExpression className = new Production( new Literal( "C" ).__or__( new Literal( "D" ) ) ).debug( "className" );
-
-			ParserExpression classOrInterfaceType = new Production( className.__or__( interfaceTypeName ) ).debug( "classOrInterfaceType" );
-
-			ParserExpression identifier = new Production( new Literal( "x" ).__or__( new Literal( "y" ).__or__( classOrInterfaceType ) ) ).debug( "identifier" );
-			ParserExpression expressionName = new Production( identifier ).debug( "expressionName" );
-
-			ParserExpression arrayAccess = new Production( ( primary.__add__( "[" ).__add__( expression ).__add__( "]" ) ).__or__(
-												expressionName.__add__( "[" ).__add__( expression ).__add__( "]" ) ) ).debug( "expressionName" );
-			ParserExpression fieldAccess = new Production( ( primary.__add__( "." ).__add__( identifier ) ).__or__(
-					new Literal( "super" ).__add__( "." ).__add__( identifier ) ) ).debug( "expressionName" );
-			ParserExpression methodInvocation = new Production( ( primary.__add__( "." ).__add__( methodName ).__add__( "()" ) ).__or__(
-					methodName.__add__( "()" ) ) ).debug( "methodInvocation" );
-			
-			ParserExpression classInstanceCreationExpression = new Production( ( new Literal( "new" ).__add__( classOrInterfaceType ).__add__( "()" ) ).__or__(
-					primary.__add__( "." ).__add__( "new" ).__add__( identifier ).__add__( "()" ) ) ).debug( "classInstanceCreationExpression" );
-			
-			ParserExpression primaryNoNewArray = new Production( classInstanceCreationExpression.__or__( methodInvocation ).__or__( fieldAccess ).__or__( arrayAccess ).__or__( "this" ) ).debug( "primaryNoNewArray" );
-
-			primary.setExpression( new Production( primaryNoNewArray ).debug( "primary" ) );
-			
-			ParserExpression fieldAccessOrArrayAccess = new Production( fieldAccess.__xor__( arrayAccess ) );
+		Forward primary = new Forward();
 		
-			
 		
-			matchTestSX( primary, "this", "this" );
-			matchTestSX( primary, "this.x", "(this . x)" );
-			matchTestSX( primary, "this.x[i]", "((this . x) [ i ])" );
-			matchTestSX( primary, "this.x.y", "((this . x) . y)" );
-			matchTestSX( primary, "this.x.m()", "((this . x) . m \"()\")" );
-			matchTestSX( primary, "this.x.m().n()", "(((this . x) . m \"()\") . n \"()\")" );
-			matchTestSX( primary, "x[i][j].y", "(((x [ i ]) [ j ]) . y)" );
+		ParserExpression expression = new Production( new Literal( "i" ).__or__( new Literal( "j" ) ) ).debug( "expression" );
+		ParserExpression methodName = new Production( new Literal( "m" ).__or__( new Literal( "n" ) ) ).debug( "methodName" );
+		ParserExpression interfaceTypeName = new Production( new Literal( "I" ).__or__( new Literal( "J" ) ) ).debug( "interfaceTypeName" );
+		ParserExpression className = new Production( new Literal( "C" ).__or__( new Literal( "D" ) ) ).debug( "className" );
 
-			matchTestSX( methodInvocation, "this.m()", "(this . m \"()\")" );
-			matchTestSX( methodInvocation, "this.m().n()", "((this . m \"()\") . n \"()\")" );
-			matchTestSX( methodInvocation, "this.x.m()", "((this . x) . m \"()\")" );
-			matchTestSX( methodInvocation, "this.x.y.m()", "(((this . x) . y) . m \"()\")" );
-			matchTestSX( methodInvocation, "this[i].m()", "((this [ i ]) . m \"()\")" );
-			matchTestSX( methodInvocation, "this[i][j].m()", "(((this [ i ]) [ j ]) . m \"()\")" );
-			matchTestSX( arrayAccess, "this[i]", "(this [ i ])" );
-			matchTestSX( arrayAccess, "this[i][j]", "((this [ i ]) [ j ])" );
-			matchTestSX( arrayAccess, "this.x[i]", "((this . x) [ i ])" );
-			matchTestSX( arrayAccess, "this.x.y[i]", "(((this . x) . y) [ i ])" );
-			matchTestSX( arrayAccess, "this.m()[i]", "((this . m \"()\") [ i ])" );
-			matchTestSX( arrayAccess, "this.m().n()[i]", "(((this . m \"()\") . n \"()\") [ i ])" );
-			matchTestSX( fieldAccess, "this.x", "(this . x)" );
-			matchTestSX( fieldAccess, "this.x.y", "((this . x) . y)" );
-			matchTestSX( fieldAccess, "this[i].x", "((this [ i ]) . x)" );
-			matchTestSX( fieldAccess, "this[i][j].x", "(((this [ i ]) [ j ]) . x)" );
-			matchTestSX( fieldAccessOrArrayAccess, "this[i]", "(this [ i ])" );
-			matchTestSX( fieldAccessOrArrayAccess, "this[i].x", "((this [ i ]) . x)" );
-			matchTestSX( fieldAccessOrArrayAccess, "this.x[i]", "((this . x) [ i ])" );
-		}
-		catch (ParserCoerceException e)
-		{
-			throw new RuntimeException();
-		}
+		ParserExpression classOrInterfaceType = new Production( className.__or__( interfaceTypeName ) ).debug( "classOrInterfaceType" );
+
+		ParserExpression identifier = new Production( new Literal( "x" ).__or__( new Literal( "y" ).__or__( classOrInterfaceType ) ) ).debug( "identifier" );
+		ParserExpression expressionName = new Production( identifier ).debug( "expressionName" );
+
+		ParserExpression arrayAccess = new Production( ( primary.__add__( "[" ).__add__( expression ).__add__( "]" ) ).__or__(
+											expressionName.__add__( "[" ).__add__( expression ).__add__( "]" ) ) ).debug( "expressionName" );
+		ParserExpression fieldAccess = new Production( ( primary.__add__( "." ).__add__( identifier ) ).__or__(
+				new Literal( "super" ).__add__( "." ).__add__( identifier ) ) ).debug( "expressionName" );
+		ParserExpression methodInvocation = new Production( ( primary.__add__( "." ).__add__( methodName ).__add__( "()" ) ).__or__(
+				methodName.__add__( "()" ) ) ).debug( "methodInvocation" );
+		
+		ParserExpression classInstanceCreationExpression = new Production( ( new Literal( "new" ).__add__( classOrInterfaceType ).__add__( "()" ) ).__or__(
+				primary.__add__( "." ).__add__( "new" ).__add__( identifier ).__add__( "()" ) ) ).debug( "classInstanceCreationExpression" );
+		
+		ParserExpression primaryNoNewArray = new Production( classInstanceCreationExpression.__or__( methodInvocation ).__or__( fieldAccess ).__or__( arrayAccess ).__or__( "this" ) ).debug( "primaryNoNewArray" );
+
+		primary.setExpression( new Production( primaryNoNewArray ).debug( "primary" ) );
+		
+		ParserExpression fieldAccessOrArrayAccess = new Production( fieldAccess.__xor__( arrayAccess ) );
+	
+		
+	
+		matchTestSX( primary, "this", "this" );
+		matchTestSX( primary, "this.x", "(this . x)" );
+		matchTestSX( primary, "this.x[i]", "((this . x) [ i ])" );
+		matchTestSX( primary, "this.x.y", "((this . x) . y)" );
+		matchTestSX( primary, "this.x.m()", "((this . x) . m \"()\")" );
+		matchTestSX( primary, "this.x.m().n()", "(((this . x) . m \"()\") . n \"()\")" );
+		matchTestSX( primary, "x[i][j].y", "(((x [ i ]) [ j ]) . y)" );
+
+		matchTestSX( methodInvocation, "this.m()", "(this . m \"()\")" );
+		matchTestSX( methodInvocation, "this.m().n()", "((this . m \"()\") . n \"()\")" );
+		matchTestSX( methodInvocation, "this.x.m()", "((this . x) . m \"()\")" );
+		matchTestSX( methodInvocation, "this.x.y.m()", "(((this . x) . y) . m \"()\")" );
+		matchTestSX( methodInvocation, "this[i].m()", "((this [ i ]) . m \"()\")" );
+		matchTestSX( methodInvocation, "this[i][j].m()", "(((this [ i ]) [ j ]) . m \"()\")" );
+		matchTestSX( arrayAccess, "this[i]", "(this [ i ])" );
+		matchTestSX( arrayAccess, "this[i][j]", "((this [ i ]) [ j ])" );
+		matchTestSX( arrayAccess, "this.x[i]", "((this . x) [ i ])" );
+		matchTestSX( arrayAccess, "this.x.y[i]", "(((this . x) . y) [ i ])" );
+		matchTestSX( arrayAccess, "this.m()[i]", "((this . m \"()\") [ i ])" );
+		matchTestSX( arrayAccess, "this.m().n()[i]", "(((this . m \"()\") . n \"()\") [ i ])" );
+		matchTestSX( fieldAccess, "this.x", "(this . x)" );
+		matchTestSX( fieldAccess, "this.x.y", "((this . x) . y)" );
+		matchTestSX( fieldAccess, "this[i].x", "((this [ i ]) . x)" );
+		matchTestSX( fieldAccess, "this[i][j].x", "(((this [ i ]) [ j ]) . x)" );
+		matchTestSX( fieldAccessOrArrayAccess, "this[i]", "(this [ i ])" );
+		matchTestSX( fieldAccessOrArrayAccess, "this[i].x", "((this [ i ]) . x)" );
+		matchTestSX( fieldAccessOrArrayAccess, "this.x[i]", "((this . x) [ i ])" );
 	}
 }
 

@@ -58,16 +58,9 @@ public class Choice extends BranchExpression
 		return new Choice( joinSubexp( coerce( x ) ) );
 	}
 
-	public ParserExpression __or__(List<Object> x)
+	public ParserExpression __or__(List<Object> x) throws ParserCoerceException
 	{
-		try
-		{
-			return new Choice( joinSubexp( coerce( x ) ) );
-		}
-		catch (ParserCoerceException e)
-		{
-			throw new RuntimeException();
-		}
+		return new Choice( joinSubexp( coerce( x ) ) );
 	}
 
 

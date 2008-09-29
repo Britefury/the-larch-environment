@@ -73,16 +73,9 @@ public class Sequence extends BranchExpression
 		return new Sequence( joinSubexp( coerce( x ) ) );
 	}
 
-	public ParserExpression __add__(List<Object> x)
+	public ParserExpression __add__(List<Object> x) throws ParserCoerceException
 	{
-		try
-		{
-			return new Sequence( joinSubexp( coerce( x ) ) );
-		}
-		catch (ParserCoerceException e)
-		{
-			throw new RuntimeException();
-		}
+		return new Sequence( joinSubexp( coerce( x ) ) );
 	}
 
 
