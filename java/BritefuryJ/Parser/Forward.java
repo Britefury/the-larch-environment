@@ -39,6 +39,11 @@ public class Forward extends ParserExpression
 		return this;
 	}
 	
+	public ParserExpression getExpression()
+	{
+		return subexp;
+	}
+	
 
 	
 	public ParserExpression __lshift__(String exp)

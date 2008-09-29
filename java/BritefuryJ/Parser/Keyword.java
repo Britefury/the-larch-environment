@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 public class Keyword extends ParserExpression
 {
 	protected String keywordString, disallowedSubsequentChars;
-	Pattern postPattern;
+	private Pattern postPattern;
 	
 	
 	public Keyword(String keywordString)

@@ -12,9 +12,14 @@ import java.util.Vector;
 
 public abstract class BranchExpression extends ParserExpression
 {
-	ParserExpression[] subexps;
+	protected ParserExpression[] subexps;
 	
 
+	public BranchExpression(ParserExpression[] subexps)
+	{
+		this.subexps = subexps;
+	}
+	
 	public BranchExpression(Object[] subexps) throws ParserCoerceException
 	{
 		this( Arrays.asList( subexps ) );
@@ -108,11 +113,11 @@ public abstract class BranchExpression extends ParserExpression
 		return result;
 	}
 	
-	protected List<Object> joinSubexp(ParserExpression x)
+	protected ParserExpression[] joinSubexp(ParserExpression x)
 	{
-		Vector<Object> xs = new Vector<Object>();
-		xs.addAll( Arrays.asList( subexps) );
-		xs.add( x );
+		ParserExpression[] xs = new ParserExpression[subexps.length + 1];
+		System.arraycopy( subexps, 0, xs, 0, subexps.length );
+		xs[subexps.length] = x;
 		return xs;
 	}
 }

@@ -57,6 +57,22 @@ public class Repetition extends UnaryBranchExpression
 		this.bNullIfZero = bNullIfZero;
 	}
 	
+	
+	public int getMinRepetitions()
+	{
+		return minRepetitions;
+	}
+	
+	public int getMaxRepetitions()
+	{
+		return maxRepetitions;
+	}
+	
+	public boolean getNullIfZero()
+	{
+		return bNullIfZero;
+	}
+	
 
 	protected ParseResult evaluate(ParserState state, String input, int start, int stop)
 	{
