@@ -6,29 +6,35 @@
 //##************************
 package BritefuryJ.Parser;
 
-import java.util.Arrays;
 import java.util.List;
 
-public class Action extends ParserExpression
+public class Action extends UnaryBranchExpression
 {
-	protected ParserExpression subexp;
 	protected ParseAction a;
 	
 	
 	public Action(String subexp, ParseAction a)
 	{
-		this( coerce( subexp ), a );
+		super( subexp );
+		this.a = a;
 	}
 	
 	public Action(List<Object> subexp, ParseAction a) throws ParserCoerceException
 	{
-		this( coerce( subexp ), a );
+		super( subexp );
+		this.a = a;
 	}
 		
 	public Action(ParserExpression subexp, ParseAction a)
 	{
-		this.subexp = subexp;
+		super( subexp );
 		this.a = a;
+	}
+	
+	
+	public ParseAction getAction()
+	{
+		return a;
 	}
 	
 
@@ -48,18 +54,12 @@ public class Action extends ParserExpression
 
 
 
-	public List<ParserExpression> getChildren()
-	{
-		ParserExpression[] children = { subexp };
-		return Arrays.asList( children );
-	}
-	
 	public boolean compareTo(ParserExpression x)
 	{
 		if ( x instanceof Action )
 		{
-			Action xa = (Action)x;
-			return subexp.compareTo( xa.subexp )  &&  a == xa.a;
+			Action ax = (Action)x;
+			return super.compareTo( x )  &&  a == ax.a;
 		}
 		else
 		{

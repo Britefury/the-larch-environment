@@ -42,6 +42,19 @@ public class Optional extends UnaryBranchExpression
 	}
 
 
+	public boolean compareTo(ParserExpression x)
+	{
+		if ( x instanceof Optional )
+		{
+			return super.compareTo( x );
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+
 	public String toString()
 	{
 		return "Optional( " + subexp.toString() + " )";

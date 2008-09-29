@@ -73,10 +73,10 @@ public abstract class ParserExpression
 	
 	
 	
-	protected List<Object> withSibling(ParserExpression sibling)
+	protected ParserExpression[] withSibling(ParserExpression sibling)
 	{
-		Object[] exprs = { this, sibling };
-		return Arrays.asList( exprs );
+		ParserExpression[] exprs = { this, sibling };
+		return exprs;
 	}
 
 

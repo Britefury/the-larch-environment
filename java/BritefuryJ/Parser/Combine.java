@@ -12,6 +12,11 @@ import java.util.Vector;
 
 public class Combine extends BranchExpression
 {
+	public Combine(ParserExpression[] subexps)
+	{
+		super( subexps );
+	}
+	
 	public Combine(Object[] subexps) throws ParserCoerceException
 	{
 		super( subexps );
@@ -97,26 +102,12 @@ public class Combine extends BranchExpression
 
 	public ParserExpression __sub__(ParserExpression x)
 	{
-		try
-		{
-			return new Combine( joinSubexp( x ) );
-		}
-		catch (ParserCoerceException e)
-		{
-			throw new RuntimeException();
-		}
+		return new Combine( joinSubexp( x ) );
 	}
 
 	public ParserExpression __sub__(String x)
 	{
-		try
-		{
-			return new Combine( joinSubexp( coerce( x ) ) );
-		}
-		catch (ParserCoerceException e)
-		{
-			throw new RuntimeException();
-		}
+		return new Combine( joinSubexp( coerce( x ) ) );
 	}
 
 	public ParserExpression __sub__(List<Object> x)

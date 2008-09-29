@@ -41,6 +41,19 @@ public class PeekNot extends UnaryBranchExpression
 	}
 
 
+	public boolean compareTo(ParserExpression x)
+	{
+		if ( x instanceof PeekNot )
+		{
+			return super.compareTo( x );
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+
 	public String toString()
 	{
 		return "PeekNot( " + subexp.toString() + " )";

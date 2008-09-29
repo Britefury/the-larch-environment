@@ -41,6 +41,19 @@ public class Peek extends UnaryBranchExpression
 	}
 
 
+	public boolean compareTo(ParserExpression x)
+	{
+		if ( x instanceof Peek )
+		{
+			return super.compareTo( x );
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+
 	public String toString()
 	{
 		return "Peek( " + subexp.toString() + " )";

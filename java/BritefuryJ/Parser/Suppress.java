@@ -6,27 +6,23 @@
 //##************************
 package BritefuryJ.Parser;
 
-import java.util.Arrays;
 import java.util.List;
 
-public class Suppress extends ParserExpression
+public class Suppress extends UnaryBranchExpression
 {
-	protected ParserExpression subexp;
-	
-	
 	public Suppress(String subexp)
 	{
-		this( coerce( subexp ) );
+		super( subexp );
 	}
 	
 	public Suppress(List<Object> subexp) throws ParserCoerceException
 	{
-		this( coerce( subexp ) );
+		super( subexp );
 	}
 		
 	public Suppress(ParserExpression subexp)
 	{
-		this.subexp = subexp;
+		super( subexp );
 	}
 	
 	
@@ -37,18 +33,11 @@ public class Suppress extends ParserExpression
 
 
 
-	public List<ParserExpression> getChildren()
-	{
-		ParserExpression[] children = { subexp };
-		return Arrays.asList( children );
-	}
-	
 	public boolean compareTo(ParserExpression x)
 	{
 		if ( x instanceof Suppress )
 		{
-			Suppress xs = (Suppress)x;
-			return subexp.compareTo( xs.subexp );
+			return super.compareTo( x );
 		}
 		else
 		{

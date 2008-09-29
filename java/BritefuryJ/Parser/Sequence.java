@@ -12,6 +12,11 @@ import java.util.Vector;
 
 public class Sequence extends BranchExpression
 {
+	public Sequence(ParserExpression[] subexps)
+	{
+		super( subexps );
+	}
+	
 	public Sequence(Object[] subexps) throws ParserCoerceException
 	{
 		super( subexps );
@@ -60,26 +65,12 @@ public class Sequence extends BranchExpression
 
 	public ParserExpression __add__(ParserExpression x)
 	{
-		try
-		{
-			return new Sequence( joinSubexp( x ) );
-		}
-		catch (ParserCoerceException e)
-		{
-			throw new RuntimeException();
-		}
+		return new Sequence( joinSubexp( x ) );
 	}
 
 	public ParserExpression __add__(String x)
 	{
-		try
-		{
-			return new Sequence( joinSubexp( coerce( x ) ) );
-		}
-		catch (ParserCoerceException e)
-		{
-			throw new RuntimeException();
-		}
+		return new Sequence( joinSubexp( coerce( x ) ) );
 	}
 
 	public ParserExpression __add__(List<Object> x)

@@ -6,32 +6,28 @@
 //##************************
 package BritefuryJ.Parser;
 
-import java.util.Arrays;
 import java.util.List;
 
-public class Production extends ParserExpression
+public class Production extends UnaryBranchExpression
 {
-	protected ParserExpression subexp;
-	
-	
 	public Production(String subexp)
 	{
-		this( coerce( subexp ) );
+		super( subexp );
 	}
 	
 	public Production(List<Object> subexp) throws ParserCoerceException
 	{
-		this( coerce( subexp ) );
+		super( subexp );
 	}
 		
 	public Production(ParserExpression subexp)
 	{
-		this.subexp = subexp;
+		super( subexp );
 	}
 	
 	public Production(ParserExpression subexp, String debugName)
 	{
-		this.subexp = subexp;
+		super( subexp );
 		debug( debugName );
 	}
 	
@@ -66,18 +62,11 @@ public class Production extends ParserExpression
 
 	
 	
-	public List<ParserExpression> getChildren()
-	{
-		ParserExpression[] children = { subexp };
-		return Arrays.asList( children );
-	}
-	
 	public boolean compareTo(ParserExpression x)
 	{
 		if ( x instanceof Production )
 		{
-			Production xp = (Production)x;
-			return subexp.compareTo( xp.subexp );
+			return super.compareTo( x );
 		}
 		else
 		{
@@ -85,6 +74,8 @@ public class Production extends ParserExpression
 		}
 	}
 	
+
+
 	public String toString()
 	{
 		return "Production( " + subexp.toString() + " )";

@@ -6,29 +6,29 @@
 //##************************
 package BritefuryJ.Parser;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-public class Bind extends ParserExpression
+public class Bind extends UnaryBranchExpression
 {
-	protected ParserExpression subexp;
 	protected String name;
 	
 	
 	public Bind(String subexp, String name)
 	{
-		this( coerce( subexp ), name );
+		super( subexp );
+		this.name = name;
 	}
 	
 	public Bind(List<Object> subexp, String name) throws ParserCoerceException
 	{
-		this( coerce( subexp ), name );
+		super( subexp );
+		this.name = name;
 	}
 		
 	public Bind(ParserExpression subexp, String name)
 	{
-		this.subexp = subexp;
+		super( subexp );
 		this.name = name;
 	}
 	
@@ -58,18 +58,12 @@ public class Bind extends ParserExpression
 
 
 
-	public List<ParserExpression> getChildren()
-	{
-		ParserExpression[] children = { subexp };
-		return Arrays.asList( children );
-	}
-	
 	public boolean compareTo(ParserExpression x)
 	{
 		if ( x instanceof Bind )
 		{
-			Bind xb = (Bind)x;
-			return subexp.compareTo( xb.subexp )  &&  name.equals( xb.name );
+			Bind xx = (Bind)x;
+			return super.compareTo( x )  &&  name.equals( xx.name );
 		}
 		else
 		{

@@ -10,6 +10,11 @@ import java.util.List;
 
 public class Choice extends BranchExpression
 {
+	public Choice(ParserExpression[] subexps)
+	{
+		super( subexps );
+	}
+	
 	public Choice(Object[] subexps) throws ParserCoerceException
 	{
 		super( subexps );
@@ -45,26 +50,12 @@ public class Choice extends BranchExpression
 
 	public ParserExpression __or__(ParserExpression x)
 	{
-		try
-		{
-			return new Choice( joinSubexp( x ) );
-		}
-		catch (ParserCoerceException e)
-		{
-			throw new RuntimeException();
-		}
+		return new Choice( joinSubexp( x ) );
 	}
 
 	public ParserExpression __or__(String x)
 	{
-		try
-		{
-			return new Choice( joinSubexp( coerce( x ) ) );
-		}
-		catch (ParserCoerceException e)
-		{
-			throw new RuntimeException();
-		}
+		return new Choice( joinSubexp( coerce( x ) ) );
 	}
 
 	public ParserExpression __or__(List<Object> x)
