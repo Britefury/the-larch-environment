@@ -38,7 +38,7 @@ public class Sequence extends BranchExpression
 		{
 			if ( pos > stop )
 			{
-				return new ParseResult( pos );
+				return ParseResult.failure( pos );
 			}
 			
 			ParseResult result = subexps[i].evaluate(  state, input, pos, stop );
@@ -46,7 +46,7 @@ public class Sequence extends BranchExpression
 			
 			if ( !result.isValid() )
 			{
-				return new ParseResult( pos );
+				return ParseResult.failure( pos );
 			}
 			else
 			{

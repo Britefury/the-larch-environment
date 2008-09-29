@@ -50,7 +50,7 @@ public class Condition extends UnaryBranchExpression
 			}
 			else
 			{
-				return new ParseResult( res.end );
+				return ParseResult.failure( res.end );
 			}
 		}
 		else

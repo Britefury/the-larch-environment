@@ -57,7 +57,7 @@ public class Keyword extends ParserExpression
 			}
 		}
 		
-		return new ParseResult( start );
+		return ParseResult.failure( start );
 	}
 
 

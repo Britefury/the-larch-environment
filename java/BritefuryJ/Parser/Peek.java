@@ -32,11 +32,11 @@ public class Peek extends UnaryBranchExpression
 		
 		if ( res.isValid() )
 		{
-			return new ParseResult( null, start, start, true );
+			return ParseResult.suppressedNoValue( start, start );
 		}
 		else
 		{
-			return new ParseResult( start );
+			return ParseResult.failure( start );
 		}
 	}
 

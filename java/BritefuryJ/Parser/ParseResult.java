@@ -27,16 +27,6 @@ public class ParseResult
 	}
 	
 	
-	public ParseResult(int end)
-	{
-		this.value = null;
-		this.begin = 0;
-		this.end = end;
-		bindings = new HashMap<String, Object>();
-		bSuppressed = false;
-		bValid = false;
-	}
-
 	
 	public ParseResult(Object value, int begin, int end)
 	{
@@ -58,7 +48,18 @@ public class ParseResult
 		bValid = true;
 	}
 	
-	public ParseResult(Object value, int begin, int end, boolean bSuppressed)
+	
+	private ParseResult(int end)
+	{
+		this.value = null;
+		this.begin = 0;
+		this.end = end;
+		bindings = new HashMap<String, Object>();
+		bSuppressed = false;
+		bValid = false;
+	}
+
+	private ParseResult(Object value, int begin, int end, boolean bSuppressed)
 	{
 		this.value = value;
 		this.begin = begin;
@@ -94,5 +95,17 @@ public class ParseResult
 	public boolean isValid()
 	{
 		return bValid;
+	}
+	
+	
+	
+	public static ParseResult failure(int end)
+	{
+		return new ParseResult( end );
+	}
+	
+	public static ParseResult suppressedNoValue(int begin, int end)
+	{
+		return new ParseResult( null, begin, end, true );
 	}
 }

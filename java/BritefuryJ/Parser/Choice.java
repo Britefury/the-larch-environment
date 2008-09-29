@@ -43,7 +43,7 @@ public class Choice extends BranchExpression
 			}
 		}
 		
-		return new ParseResult( maxErrorPos );
+		return ParseResult.failure( maxErrorPos );
 	}
 	
 	

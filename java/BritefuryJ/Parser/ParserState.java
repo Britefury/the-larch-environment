@@ -26,7 +26,7 @@ public class ParserState
 		public MemoEntry(ParserExpression rule, int start)
 		{
 			this.rule = rule;
-			answer = new ParseResult( start );
+			answer = ParseResult.failure( start );
 			bEvaluating = bLeftRecursionDetected = false;
 			lrApplications = new HashMap<ParserExpression, LeftRecursiveApplication>();
 			growingLRParseCount = 0;
