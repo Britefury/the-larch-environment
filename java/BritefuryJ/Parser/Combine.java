@@ -110,16 +110,9 @@ public class Combine extends BranchExpression
 		return new Combine( joinSubexp( coerce( x ) ) );
 	}
 
-	public ParserExpression __sub__(List<Object> x)
+	public ParserExpression __sub__(List<Object> x) throws ParserCoerceException
 	{
-		try
-		{
-			return new Combine( joinSubexp( coerce( x ) ) );
-		}
-		catch (ParserCoerceException e)
-		{
-			throw new RuntimeException();
-		}
+		return new Combine( joinSubexp( coerce( x ) ) );
 	}
 
 

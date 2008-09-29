@@ -83,12 +83,12 @@ public abstract class ParserExpression
 	
 	
 
-	public ParserExpression __add__(ParserExpression x) throws ParserCoerceException
+	public ParserExpression __add__(ParserExpression x)
 	{
 		return new Sequence( withSibling( x ) );
 	}
 
-	public ParserExpression __add__(String x) throws ParserCoerceException
+	public ParserExpression __add__(String x)
 	{
 		return new Sequence( withSibling( coerce( x ) ) );
 	}
@@ -99,12 +99,12 @@ public abstract class ParserExpression
 	}
 
 	
-	public ParserExpression __sub__(ParserExpression x) throws ParserCoerceException
+	public ParserExpression __sub__(ParserExpression x)
 	{
 		return new Combine( withSibling( x ) );
 	}
 
-	public ParserExpression __sub__(String x) throws ParserCoerceException
+	public ParserExpression __sub__(String x)
 	{
 		return new Combine( withSibling( coerce( x ) ) );
 	}
@@ -115,12 +115,12 @@ public abstract class ParserExpression
 	}
 
 	
-	public ParserExpression __or__(ParserExpression x) throws ParserCoerceException
+	public ParserExpression __or__(ParserExpression x)
 	{
 		return new Choice( withSibling( x ) );
 	}
 
-	public ParserExpression __or__(String x) throws ParserCoerceException
+	public ParserExpression __or__(String x)
 	{
 		return new Choice( withSibling( coerce( x ) ) );
 	}
@@ -131,12 +131,12 @@ public abstract class ParserExpression
 	}
 
 	
-	public ParserExpression __xor__(ParserExpression x) throws ParserCoerceException
+	public ParserExpression __xor__(ParserExpression x)
 	{
 		return new BestChoice( withSibling( x ) );
 	}
 
-	public ParserExpression __xor__(String x) throws ParserCoerceException
+	public ParserExpression __xor__(String x)
 	{
 		return new BestChoice( withSibling( coerce( x ) ) );
 	}

@@ -68,16 +68,9 @@ public class BestChoice extends BranchExpression
 		return new BestChoice( joinSubexp( coerce( x ) ) );
 	}
 
-	public ParserExpression __xor__(List<Object> x)
+	public ParserExpression __xor__(List<Object> x) throws ParserCoerceException
 	{
-		try
-		{
-			return new BestChoice( joinSubexp( coerce( x ) ) );
-		}
-		catch (ParserCoerceException e)
-		{
-			throw new RuntimeException();
-		}
+		return new BestChoice( joinSubexp( coerce( x ) ) );
 	}
 
 

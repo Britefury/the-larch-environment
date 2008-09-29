@@ -18,6 +18,6 @@ public class Tokens
 	public static ParserExpression unicodeString = new RegEx( "(u|U)((?:\"(?:[^\"\\n\\r\\\\]|(?:\"\")|(?:\\\\x[0-9a-fA-F]+)|(?:\\\\.))*\")|(?:\'(?:[^\'\\n\\r\\\\]|(?:\'\')|(?:\\\\x[0-9a-fA-F]+)|(?:\\\\.))*\'))" );
 	public static ParserExpression decimalInteger = new RegEx( "[\\-]?[0-9]+" );
 	public static ParserExpression hexInteger = new RegEx( "0x[0-9A-Fa-f]+" );
-	//public static ParserExpression integer = decimalInteger.__or__( hexInteger );
+	public static ParserExpression integer = decimalInteger.__or__( hexInteger );
 	public static ParserExpression floatingPoint = new RegEx( "[\\-]?(([0-9]+\\.[0-9]*)|(\\.[0-9]+))(e[\\-]?[0-9]+)?" );
 }
