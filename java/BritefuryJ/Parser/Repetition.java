@@ -107,7 +107,7 @@ public class Repetition extends UnaryBranchExpression
 		
 		if ( ( i < minRepetitions)  ||  ( maxRepetitions != -1  &&  i > maxRepetitions ) )
 		{
-			return new ParseResult( errorPos );
+			return ParseResult.failure( errorPos );
 		}
 		else
 		{

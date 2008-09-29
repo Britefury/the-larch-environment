@@ -76,7 +76,7 @@ public class RegEx extends ParserExpression
 		}
 		else
 		{
-			return new ParseResult( start );
+			return ParseResult.failure( start );
 		}
 	}
 

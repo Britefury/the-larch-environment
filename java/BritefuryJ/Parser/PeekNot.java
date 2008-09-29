@@ -32,11 +32,11 @@ public class PeekNot extends UnaryBranchExpression
 		
 		if ( res.isValid() )
 		{
-			return new ParseResult( start );
+			return ParseResult.failure( start );
 		}
 		else
 		{
-			return new ParseResult( null, start, start, true );
+			return ParseResult.suppressedNoValue( start, start );
 		}
 	}
 

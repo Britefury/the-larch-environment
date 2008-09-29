@@ -199,4 +199,34 @@ public class ParserTestCase extends TestCase
 		assertFalse( result.isValid() );
 	}
 
+
+
+	public void matchIncompleteTest(ParserExpression parser, String input)
+	{
+		matchIncompleteTest( parser, input, "[ \t\n]*" );
+	}
+	
+	public void matchIncompleteTest(ParserExpression parser, String input, String ignoreCharsRegex)
+	{
+		ParseResult result = parser.parseString( input );
+
+		if ( !result.isValid() )
+		{
+			System.out.println( "PARSE FAILURE while parsing " + input + ", stopped at " + String.valueOf( result.end ) + ": " + input.substring(  0, result.end ) );
+			System.out.println( "EXPECTED INCOMPLETE PARSE:" );
+		}
+		assertTrue( result.isValid() );
+		
+		Object value = result.value;
+		String valueStr = value != null  ?  value.toString()  :  "<null>";
+		String valueClassName = value != null  ?  value.getClass().getName()  :  "<null>";
+		
+		if ( result.end == input.length() )
+		{
+			System.out.println( "EXPECTED INCOMPLETE PARSE while parsing " + input );
+			System.out.println( "RESULT: (a " + valueClassName + ")" );
+			System.out.println( valueStr );
+		}
+		assertTrue( result.end != input.length() );
+	}
 }

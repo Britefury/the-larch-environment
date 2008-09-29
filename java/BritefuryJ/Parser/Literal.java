@@ -38,7 +38,7 @@ public class Literal extends ParserExpression
 			}
 		}
 		
-		return new ParseResult( start );
+		return ParseResult.failure( start );
 	}
 
 

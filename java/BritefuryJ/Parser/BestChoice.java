@@ -52,7 +52,7 @@ public class BestChoice extends BranchExpression
 		}
 		else
 		{
-			return new ParseResult( maxErrorPos );
+			return ParseResult.failure( maxErrorPos );
 		}
 	}
 	

@@ -37,7 +37,7 @@ public class Optional extends UnaryBranchExpression
 		}
 		else
 		{
-			return new ParseResult( null, res.begin, res.end );
+			return new ParseResult( null, start, start );
 		}
 	}
 
