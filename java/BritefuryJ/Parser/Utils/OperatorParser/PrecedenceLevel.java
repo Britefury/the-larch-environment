@@ -62,7 +62,7 @@ public class PrecedenceLevel
 	}
 	
 	
-	protected void buildParser(OperatorTable operatorTable, List<Forward> levelParserForwardDeclarations, Forward forwardDeclaration,
+	protected void buildParser(OperatorTable operatorTable, Vector<Forward> levelParserForwardDeclarations, Forward forwardDeclaration,
 			PrecedenceLevel previousLevel, ParserExpression previousLevelParser)
 	{
 		ParserExpression[] choices = new ParserExpression[operators.size() + 1];

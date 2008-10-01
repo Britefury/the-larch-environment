@@ -8,6 +8,7 @@ package BritefuryJ.Parser.Utils.OperatorParser;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 import BritefuryJ.Parser.Forward;
 import BritefuryJ.Parser.ParseAction;
@@ -55,7 +56,7 @@ public class Suffix extends Operator
 	
 	
 	protected ParserExpression buildParser(OperatorTable operatorTable,
-			List<Forward> levelParserForwardDeclarations, PrecedenceLevel thisLevel,
+			Vector<Forward> levelParserForwardDeclarations, PrecedenceLevel thisLevel,
 			ParserExpression thisLevelParser, PrecedenceLevel previousLevel,
 			ParserExpression previousLevelParser)
 	{

@@ -8,6 +8,7 @@ package BritefuryJ.Parser.Utils.OperatorParser;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 import BritefuryJ.Parser.Forward;
 import BritefuryJ.Parser.ParseAction;
@@ -55,12 +56,12 @@ public abstract class BinaryOperator extends Operator
 	
 	
 	
-	protected abstract ParserExpression buildOperatorParser(OperatorTable operatorTable, List<Forward> levelParserForwardDeclarations, PrecedenceLevel thisLevel,
+	protected abstract ParserExpression buildOperatorParser(OperatorTable operatorTable, Vector<Forward> levelParserForwardDeclarations, PrecedenceLevel thisLevel,
 			ParserExpression thisLevelParser, PrecedenceLevel previousLevel, ParserExpression previousLevelParser);
 
 
 	protected ParserExpression buildParser(OperatorTable operatorTable,
-			List<Forward> levelParserForwardDeclarations, PrecedenceLevel thisLevel,
+			Vector<Forward> levelParserForwardDeclarations, PrecedenceLevel thisLevel,
 			ParserExpression thisLevelParser, PrecedenceLevel previousLevel,
 			ParserExpression previousLevelParser)
 	{
