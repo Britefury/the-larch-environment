@@ -36,6 +36,16 @@ public class OperatorTable
 	
 	
 	
+	private ParserExpression rootParser;
+	private List<PrecedenceLevel> levels;
+	
+	
+	//
+	// Constructor
+	//
+	
+	
+	
 	protected ParserExpression getLowestPrecedenceUnaryOperatorLevelParserAbove(List<Forward> levelParserForwardDeclarations, PrecedenceLevel thisLevel, OperatorFilter opFilter)
 	{
 		return null;

@@ -167,13 +167,6 @@ class PrecedenceLevel (object):
 		self._operators = operators
 
 
-	def _buildLevelChoice(self, operators, rootParser):
-		opParsers = []
-		prevLevelParser = rootParser
-		for forward, op in zip( forwardDefs, operators ):
-			opParsers.append( operators.parser( forward, prevLevelParser, prefixOnly ) )
-
-
 	def _areOperatorsOfClass(self, unaryOperatorClass):
 		if len( self._operators ) > 0:
 			return isinstance( self._operators[0], unaryOperatorClass )
