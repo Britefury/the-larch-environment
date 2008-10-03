@@ -6,14 +6,10 @@
 //##************************
 package BritefuryJ.Parser;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class ParseResult
 {
 	public Object value;
 	public int begin, end;
-	public Map<String, Object> bindings;
 	private boolean bSuppressed, bValid;
 	
 	
@@ -21,7 +17,6 @@ public class ParseResult
 	{
 		value = null;
 		begin = end = 0;
-		bindings = new HashMap<String, Object>();
 		bSuppressed = false;
 		bValid = false;
 	}
@@ -33,17 +28,6 @@ public class ParseResult
 		this.value = value;
 		this.begin = begin;
 		this.end = end;
-		bindings = new HashMap<String, Object>();
-		bSuppressed = false;
-		bValid = true;
-	}
-	
-	public ParseResult(Object value, int begin, int end, HashMap<String, Object> bindings)
-	{
-		this.value = value;
-		this.begin = begin;
-		this.end = end;
-		this.bindings = bindings;
 		bSuppressed = false;
 		bValid = true;
 	}
@@ -54,7 +38,6 @@ public class ParseResult
 		this.value = null;
 		this.begin = 0;
 		this.end = end;
-		bindings = new HashMap<String, Object>();
 		bSuppressed = false;
 		bValid = false;
 	}
@@ -64,17 +47,15 @@ public class ParseResult
 		this.value = value;
 		this.begin = begin;
 		this.end = end;
-		this.bindings = new HashMap<String, Object>();
 		this.bSuppressed = bSuppressed;
 		this.bValid = true;
 	}
 	
-	private ParseResult(Object value, int begin, int end, Map<String, Object> bindings, boolean bSuppressed, boolean bValid)
+	private ParseResult(Object value, int begin, int end, boolean bSuppressed, boolean bValid)
 	{
 		this.value = value;
 		this.begin = begin;
 		this.end = end;
-		this.bindings = bindings;
 		this.bSuppressed = bSuppressed;
 		this.bValid = bValid;
 	}
@@ -83,7 +64,7 @@ public class ParseResult
 	
 	public ParseResult suppressed()
 	{
-		return new ParseResult( value, begin, end, bindings, true, bValid );
+		return new ParseResult( value, begin, end, true, bValid );
 	}
 	
 	

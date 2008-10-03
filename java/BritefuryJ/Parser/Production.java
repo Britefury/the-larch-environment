@@ -50,11 +50,6 @@ public class Production extends UnaryBranchExpression
 		return new Production( new Action( subexp, a ), debugName );
 	}
 
-	public ParserExpression bindTo(String name)
-	{
-		return new Production( new Bind( subexp, name ), debugName );
-	}
-
 	public ParserExpression condition(ParseCondition cond)
 	{
 		return new Production( new Condition( subexp, cond ), debugName );

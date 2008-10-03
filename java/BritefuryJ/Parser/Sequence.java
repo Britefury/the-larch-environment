@@ -6,7 +6,6 @@
 //##************************
 package BritefuryJ.Parser;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
 
@@ -31,7 +30,6 @@ public class Sequence extends BranchExpression
 	protected ParseResult evaluate(ParserState state, String input, int start, int stop)
 	{
 		Vector<Object> value = new Vector<Object>();
-		HashMap<String, Object> bindings = new HashMap<String, Object>();
 		
 		int pos = start;
 		for (int i = 0; i < subexps.length; i++)
@@ -52,13 +50,12 @@ public class Sequence extends BranchExpression
 			{
 				if ( !result.isSuppressed() )
 				{
-					bindings.putAll( result.bindings );
 					value.add( result.value );
 				}
 			}
 		}
 		
-		return new ParseResult( value, start, pos, bindings );
+		return new ParseResult( value, start, pos );
 	}
 	
 	

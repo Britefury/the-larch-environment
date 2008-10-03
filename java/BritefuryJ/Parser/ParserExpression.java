@@ -148,15 +148,14 @@ public abstract class ParserExpression
 	}
 
 	
-	public ParserExpression __pow__(String name)
-	{
-		return new Bind( this, name );
-	}
-
-	
 	public ParserExpression __and__(ParseCondition cond)
 	{
-		return new Condition( this, cond );
+		return condition( cond );
+	}
+
+	public ParserExpression __and__(PyObject cond)
+	{
+		return condition( cond );
 	}
 
 
@@ -171,12 +170,12 @@ public abstract class ParserExpression
 		return new Action( this, a );
 	}
 
-	public ParserExpression bindTo(String name)
-	{
-		return new Bind( this, name );
-	}
-
 	public ParserExpression condition(ParseCondition cond)
+	{
+		return new Condition( this, cond );
+	}
+	
+	public ParserExpression condition(PyObject cond)
 	{
 		return new Condition( this, cond );
 	}
