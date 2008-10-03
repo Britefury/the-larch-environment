@@ -6,7 +6,6 @@
 //##************************
 package BritefuryJ.Parser;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
 
@@ -33,7 +32,6 @@ public class Combine extends BranchExpression
 	{
 		Vector<Object> values = new Vector<Object>();
 		boolean bFinalValueIsString = true;
-		HashMap<String, Object> bindings = new HashMap<String, Object>();
 		
 		int pos = start;
 		for (int i = 0; i < subexps.length; i++)
@@ -54,7 +52,6 @@ public class Combine extends BranchExpression
 			{
 				if ( !result.isSuppressed() )
 				{
-					bindings.putAll( result.bindings );
 					values.add( result.value );
 					
 					if ( !(result.value instanceof String) )
@@ -75,7 +72,7 @@ public class Combine extends BranchExpression
 				value += s;
 			}
 			
-			return new ParseResult( value, start, pos, bindings );
+			return new ParseResult( value, start, pos );
 		}
 		else
 		{
@@ -94,7 +91,7 @@ public class Combine extends BranchExpression
 				}
 			}
 
-			return new ParseResult( value, start, pos, bindings );
+			return new ParseResult( value, start, pos );
 		}
 	}
 	

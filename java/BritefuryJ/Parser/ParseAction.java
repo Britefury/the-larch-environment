@@ -6,9 +6,7 @@
 //##************************
 package BritefuryJ.Parser;
 
-import java.util.Map;
-
 public interface ParseAction
 {
-	public Object invoke(String input, int begin, Object x, Map<String, Object> bindings);
+	public Object invoke(String input, int begin, Object x);
 }

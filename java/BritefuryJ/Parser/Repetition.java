@@ -6,7 +6,6 @@
 //##************************
 package BritefuryJ.Parser;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
 
@@ -77,7 +76,6 @@ public class Repetition extends UnaryBranchExpression
 	protected ParseResult evaluate(ParserState state, String input, int start, int stop)
 	{
 		Vector<Object> values = new Vector<Object>();
-		HashMap<String, Object> bindings = new HashMap<String, Object>();
 		
 		int pos = start;
 		int errorPos = start;
@@ -96,7 +94,6 @@ public class Repetition extends UnaryBranchExpression
 			{
 				if ( !res.isSuppressed() )
 				{
-					bindings.putAll( res.bindings );
 					values.add( res.value );
 				}
 				pos = res.end;
@@ -113,11 +110,11 @@ public class Repetition extends UnaryBranchExpression
 		{
 			if ( bNullIfZero  &&  i == 0 )
 			{
-				return new ParseResult( null, start, pos, bindings );
+				return new ParseResult( null, start, pos );
 			}
 			else
 			{
-				return new ParseResult( values, start, pos, bindings );
+				return new ParseResult( values, start, pos );
 			}
 		}
 

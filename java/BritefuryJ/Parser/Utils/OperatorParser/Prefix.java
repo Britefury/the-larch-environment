@@ -7,7 +7,6 @@
 package BritefuryJ.Parser.Utils.OperatorParser;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Vector;
 
 import BritefuryJ.Parser.Forward;
@@ -28,11 +27,11 @@ public class Prefix extends UnaryOperator
 		
 		
 		@SuppressWarnings("unchecked")
-		public Object invoke(String input, int begin, Object x, Map<String, Object> bindings)
+		public Object invoke(String input, int begin, Object x)
 		{
 			List<Object> xs = (List<Object>)x;
 
-			return action.invoke( input, begin, xs.get( 1 ), bindings );
+			return action.invoke( input, begin, xs.get( 1 ) );
 		}
 	}
 	

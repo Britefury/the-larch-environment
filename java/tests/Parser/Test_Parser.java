@@ -7,14 +7,11 @@
 package tests.Parser;
 
 import java.util.Arrays;
-import java.util.Map;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
 
 import BritefuryJ.Parser.Action;
 import BritefuryJ.Parser.BestChoice;
-import BritefuryJ.Parser.Bind;
 import BritefuryJ.Parser.Choice;
 import BritefuryJ.Parser.Combine;
 import BritefuryJ.Parser.Condition;
@@ -25,7 +22,6 @@ import BritefuryJ.Parser.OneOrMore;
 import BritefuryJ.Parser.Optional;
 import BritefuryJ.Parser.ParseAction;
 import BritefuryJ.Parser.ParseCondition;
-import BritefuryJ.Parser.ParseResult;
 import BritefuryJ.Parser.ParserExpression;
 import BritefuryJ.Parser.Peek;
 import BritefuryJ.Parser.PeekNot;
@@ -54,33 +50,6 @@ public class Test_Parser extends ParserTestCase
 		}
 		
 		return v;
-	}
-
-	public void bindingsTest(ParserExpression parser, String input, String[][] expectedBindings)
-	{
-		bindingsTest( parser, input, expectedBindings, "[ \t\n]*" );
-	}
-
-	public void bindingsTest(ParserExpression parser, String input, String[][] expectedBindings, String ignoreCharsRegex)
-	{
-		ParseResult result = parser.parseString( input );
-		assertTrue( result.isValid() );
-		
-		HashMap<String, String> expected = new HashMap<String, String>();
-		for (int i = 0; i < expectedBindings.length; i++)
-		{
-			expected.put( expectedBindings[i][0], expectedBindings[i][1] );
-		}
-		
-		if ( !expected.equals( result.bindings ) )
-		{
-			System.out.println( "EXPECTED BINDINGS:" );
-			System.out.println( expected.toString() );
-			System.out.println( "RESULT BINDINGS:" );
-			System.out.println( result.bindings.toString() );
-		}
-		
-		assertTrue( expected.equals( result.bindings ) );
 	}
 
 	
@@ -147,27 +116,11 @@ public class Test_Parser extends ParserTestCase
 	}
 	
 	
-	public void testBind()
-	{
-		assertTrue( new Bind( "abc", "x" ).compareTo( new Bind( "abc", "x" ) ) );
-		assertFalse( new Bind( "abc", "x" ).compareTo( new Bind( "def", "x" ) ) );
-		assertFalse( new Bind( "abc", "x" ).compareTo( new Bind( "abc", "y" ) ) );
-		assertTrue( new Bind( "abc", "x" ).compareTo( new Literal( "abc" ).bindTo( "x" ) ) );
-		
-		ParserExpression parser = new Literal( "abc" ).bindTo( "x" );
-		
-		matchTest( parser, "abc", "abc" );
-		
-		String[][] bindings = { { "x", "abc" } };
-		bindingsTest( parser, "abc", bindings );
-	}
-
-
 	public void testAction()
 	{
 		ParseAction f = new ParseAction()
 		{
-			public Object invoke(String input, int begin, Object value, Map<String, Object> bindings)
+			public Object invoke(String input, int begin, Object value)
 			{
 				String v = (String)value;
 				return v + v;
@@ -176,7 +129,7 @@ public class Test_Parser extends ParserTestCase
 
 		ParseAction g = new ParseAction()
 		{
-			public Object invoke(String input, int begin, Object value, Map<String, Object> bindings)
+			public Object invoke(String input, int begin, Object value)
 			{
 				String v = (String)value;
 				return v + v + v;
@@ -191,9 +144,6 @@ public class Test_Parser extends ParserTestCase
 		ParserExpression parser = new Literal( "abc" ).action( f );
 		
 		matchTest( parser, "abc", "abcabc" );
-		
-		String[][] bindings = {};
-		bindingsTest( parser, "abc", bindings );
 	}
 
 
@@ -201,7 +151,7 @@ public class Test_Parser extends ParserTestCase
 	{
 		ParseCondition f = new ParseCondition()
 		{
-			public boolean test(String input, int begin, Object value, Map<String, Object> bindings)
+			public boolean test(String input, int begin, Object value)
 			{
 				String v = (String)value;
 				return v.startsWith( "hello" );
@@ -210,7 +160,7 @@ public class Test_Parser extends ParserTestCase
 
 		ParseCondition g = new ParseCondition()
 		{
-			public boolean test(String input, int begin, Object value, Map<String, Object> bindings)
+			public boolean test(String input, int begin, Object value)
 			{
 				String v = (String)value;
 				return v.startsWith( "there" );
@@ -243,15 +193,13 @@ public class Test_Parser extends ParserTestCase
 			assertTrue( new Sequence( abqwfh ).compareTo( new Literal( "ab" ).__add__( new Literal( "qw" ) ).__add__( new Literal( "fh" ) ) ) );
 			assertTrue( new Sequence( abqwfh ).compareTo( new Literal( "ab" ).__add__( "qw" ).__add__( "fh" ) ) );
 
-			Object[] subs = { new Literal( "ab" ).bindTo(  "x" ), new Literal( "qw" ).bindTo(  "y" ), new Literal( "fh" ).bindTo(  "z" ) };
+			Object[] subs = { new Literal( "ab" ), new Literal( "qw" ), new Literal( "fh" ) };
 			ParserExpression parser = new Sequence( subs );
 			
 			String[] result = { "ab", "qw", "fh" };
 			
 			matchTest( parser, "abqwfh", Arrays.asList( result ) );
 			matchFailTest( parser, "abfh" );
-			String[][] bindings = { { "x", "ab"},  { "y", "qw" },  { "z", "fh" } };
-			bindingsTest( parser, "abqwfh", bindings );
 		}
 		catch (ParserCoerceException e)
 		{
@@ -274,13 +222,11 @@ public class Test_Parser extends ParserTestCase
 			assertTrue( new Combine( abqwfh ).compareTo( new Literal( "ab" ).__sub__( new Literal( "qw" ) ).__sub__( new Literal( "fh" ) ) ) );
 			assertTrue( new Combine( abqwfh ).compareTo( new Literal( "ab" ).__sub__( "qw" ).__sub__( "fh" ) ) );
 
-			Object[] subs = { new Literal( "ab" ).bindTo(  "x" ), new Literal( "qw" ).bindTo(  "y" ), new Literal( "fh" ).bindTo(  "z" ) };
+			Object[] subs = { new Literal( "ab" ), new Literal( "qw" ), new Literal( "fh" ) };
 			ParserExpression parser = new Combine( subs );
 			
 			matchTest( parser, "abqwfh", "abqwfh" );
 			matchFailTest( parser, "abfh" );
-			String[][] bindings = { { "x", "ab"},  { "y", "qw" },  { "z", "fh" } };
-			bindingsTest( parser, "abqwfh", bindings );
 
 		
 		
@@ -312,15 +258,13 @@ public class Test_Parser extends ParserTestCase
 			assertFalse( new Suppress( new Literal( "ab" ) ).compareTo( new Suppress( new Literal( "cd" ) ) ) );
 			assertTrue( new Suppress( new Literal( "ab" ) ).compareTo( new Literal( "ab" ).suppress() ) );
 
-			Object[] subs = { new Literal( "ab" ).bindTo(  "x" ), new Literal( "qw" ).bindTo(  "y" ).suppress(), new Literal( "fh" ).bindTo(  "z" ) };
+			Object[] subs = { new Literal( "ab" ), new Literal( "qw" ).suppress(), new Literal( "fh" ) };
 			ParserExpression parser = new Sequence( subs );
 			
 			String[] result = { "ab", "fh" };
 			
 			matchTest( parser, "abqwfh", Arrays.asList( result ) );
 			matchFailTest( parser, "abfh" );
-			String[][] bindings = { { "x", "ab"},  { "z", "fh" } };
-			bindingsTest( parser, "abqwfh", bindings );
 		}
 		catch (ParserCoerceException e)
 		{
@@ -343,7 +287,7 @@ public class Test_Parser extends ParserTestCase
 			assertTrue( new Choice( abqwfh ).compareTo( new Literal( "ab" ).__or__( new Literal( "qw" ) ).__or__( new Literal( "fh" ) ) ) );
 			assertTrue( new Choice( abqwfh ).compareTo( new Literal( "ab" ).__or__( "qw" ).__or__( "fh" ) ) );
 
-			Object[] subs = { new Literal( "ab" ).bindTo(  "x" ), new Literal( "qw" ).bindTo(  "y" ), new Literal( "fh" ).bindTo(  "z" ) };
+			Object[] subs = { new Literal( "ab" ), new Literal( "qw" ), new Literal( "fh" ) };
 			ParserExpression parser = new Choice( subs );
 			
 			matchTest( parser, "ab", "ab" );
@@ -352,15 +296,6 @@ public class Test_Parser extends ParserTestCase
 			matchFailTest( parser, "xy" );
 			matchSubTest( new Literal( "ab" ).__or__( "abcd" ), "ab", "ab", 2 );
 			matchSubTest( new Literal( "ab" ).__or__( "abcd" ), "abcd", "ab", 2 );
-
-			String[][] bindings1 = { { "x", "ab"} };
-			bindingsTest( parser, "ab", bindings1 );
-
-			String[][] bindings2 = { { "y", "qw"} };
-			bindingsTest( parser, "qw", bindings2 );
-
-			String[][] bindings3 = { { "z", "fh"} };
-			bindingsTest( parser, "fh", bindings3 );
 		}
 		catch (ParserCoerceException e)
 		{
@@ -382,7 +317,7 @@ public class Test_Parser extends ParserTestCase
 			assertTrue( new BestChoice( abqwfh ).compareTo( new Literal( "ab" ).__xor__( new Literal( "qw" ) ).__xor__( new Literal( "fh" ) ) ) );
 			assertTrue( new BestChoice( abqwfh ).compareTo( new Literal( "ab" ).__xor__( "qw" ).__xor__( "fh" ) ) );
 
-			Object[] subs = { new Literal( "ab" ).bindTo(  "x" ), new Literal( "qw" ).bindTo(  "y" ), new Literal( "fh" ).bindTo(  "z" ) };
+			Object[] subs = { new Literal( "ab" ), new Literal( "qw" ), new Literal( "fh" ) };
 			ParserExpression parser = new BestChoice( subs );
 			
 			matchTest( parser, "ab", "ab" );
@@ -391,15 +326,6 @@ public class Test_Parser extends ParserTestCase
 			matchFailTest( parser, "xy" );
 			matchSubTest( new Literal( "ab" ).__xor__( "abcd" ), "ab", "ab", 2 );
 			matchSubTest( new Literal( "ab" ).__xor__( "abcd" ), "abcd", "abcd", 4 );
-
-			String[][] bindings1 = { { "x", "ab"} };
-			bindingsTest( parser, "ab", bindings1 );
-
-			String[][] bindings2 = { { "y", "qw"} };
-			bindingsTest( parser, "qw", bindings2 );
-
-			String[][] bindings3 = { { "z", "fh"} };
-			bindingsTest( parser, "fh", bindings3 );
 		}
 		catch (ParserCoerceException e)
 		{
@@ -414,15 +340,11 @@ public class Test_Parser extends ParserTestCase
 		assertFalse( new Optional( new Literal( "ab" ) ).compareTo( new Optional( new Literal( "cd" ) ) ) );
 		assertTrue( new Optional( new Literal( "ab" ) ).compareTo( new Optional( "ab" ) ) );
 
-		ParserExpression parser = new Optional( new Word( "a", "b" ).bindTo( "x" ) );
+		ParserExpression parser = new Optional( new Word( "a", "b" ) );
 		
 		matchTest( parser, "", null );
 		matchTest( parser, "abb", "abb" );
 		matchSubTest( parser, "abbabb", "abb", 3 );
-		String[][] bindings1 = {};
-		bindingsTest( parser, "", bindings1 );
-		String[][] bindings2 = { { "x", "abb"} };
-		bindingsTest( parser, "abb", bindings2 );
 	}
 
 
@@ -437,11 +359,11 @@ public class Test_Parser extends ParserTestCase
 		assertTrue( new Repetition( new Literal( "ab" ), 0, 1, false ).compareTo( new Repetition( "ab", 0, 1 ) ) );
 
 		ParserExpression parser_2, parser02, parser02N, parser24, parser2_;
-		parser_2 = new Repetition( new Word( "a", "b" ).bindTo( "x" ).__add__( new Word( "c", "d" ).bindTo( "y" ) ),  -1, 2 );
-		parser02 = new Repetition( new Word( "a", "b" ).bindTo( "x" ).__add__( new Word( "c", "d" ).bindTo( "y" ) ),  0, 2 );
-		parser02N = new Repetition( new Word( "a", "b" ).bindTo( "x" ).__add__( new Word( "c", "d" ).bindTo( "y" ) ),  0, 2, true );
-		parser24 = new Repetition( new Word( "a", "b" ).bindTo( "x" ).__add__( new Word( "c", "d" ).bindTo( "y" ) ),  2, 4 );
-		parser2_ = new Repetition( new Word( "a", "b" ).bindTo( "x" ).__add__( new Word( "c", "d" ).bindTo( "y" ) ),  2, -1 );
+		parser_2 = new Repetition( new Word( "a", "b" ).__add__( new Word( "c", "d" ) ),  -1, 2 );
+		parser02 = new Repetition( new Word( "a", "b" ).__add__( new Word( "c", "d" ) ),  0, 2 );
+		parser02N = new Repetition( new Word( "a", "b" ).__add__( new Word( "c", "d" ) ),  0, 2, true );
+		parser24 = new Repetition( new Word( "a", "b" ).__add__( new Word( "c", "d" ) ),  2, 4 );
+		parser2_ = new Repetition( new Word( "a", "b" ).__add__( new Word( "c", "d" ) ),  2, -1 );
 		
 		String[][] result0 = {};
 		String[][] result1 = { { "ab", "cd", } };
@@ -450,74 +372,41 @@ public class Test_Parser extends ParserTestCase
 		String[][] result4 = { { "ab", "cd", },   { "abb", "cdd" },   { "abbb", "cddd" },   { "abbbb", "cdddd" } };
 		String[][] result5 = { { "ab", "cd", },   { "abb", "cdd" },   { "abbb", "cddd" },   { "abbbb", "cdddd" },   { "abbbbb", "cddddd" } };
 		
-		String[][] bindings0 = {};
-		String[][] bindings1 = { { "x", "ab" },   { "y", "cd" } };
-		String[][] bindings2 = { { "x", "abb" },   { "y", "cdd" } };
-		String[][] bindings3 = { { "x", "abbb" },   { "y", "cddd" } };
-		String[][] bindings4 = { { "x", "abbbb" },   { "y", "cdddd" } };
-		String[][] bindings5 = { { "x", "abbbbb" },   { "y", "cddddd" } };
-		
 		matchTest( parser_2, "", arrayToList2D( result0 ) );
 		matchTest( parser02, "", arrayToList2D( result0 ) );
 		matchTest( parser02N, "", null );
 		matchFailTest( parser24, "" );
 		matchFailTest( parser2_, "" );
-		bindingsTest( parser_2, "", bindings0 );
-		bindingsTest( parser02, "", bindings0 );
-		bindingsTest( parser02N, "", bindings0 );
 		
 		matchTest( parser_2, "abcd", arrayToList2D( result1 ) );
 		matchTest( parser02, "abcd", arrayToList2D( result1 ) );
 		matchTest( parser02N, "abcd", arrayToList2D( result1 ) );
 		matchFailTest( parser24, "abcd" );
 		matchFailTest( parser2_, "abcd" );
-		bindingsTest( parser_2, "abcd", bindings1 );
-		bindingsTest( parser02, "abcd", bindings1 );
-		bindingsTest( parser02N, "abcd", bindings1 );
 		
 		matchTest( parser_2, "abcdabbcdd", arrayToList2D( result2 ) );
 		matchTest( parser02, "abcdabbcdd", arrayToList2D( result2  ) );
 		matchTest( parser02N, "abcdabbcdd", arrayToList2D( result2  ) );
 		matchTest( parser24, "abcdabbcdd", arrayToList2D( result2  ) );
 		matchTest( parser2_, "abcdabbcdd", arrayToList2D( result2  ) );
-		bindingsTest( parser_2, "abcdabbcdd", bindings2 );
-		bindingsTest( parser02, "abcdabbcdd", bindings2 );
-		bindingsTest( parser02N, "abcdabbcdd", bindings2 );
-		bindingsTest( parser24, "abcdabbcdd", bindings2 );
-		bindingsTest( parser2_, "abcdabbcdd", bindings2 );
 		
 		matchSubTest( parser_2, "abcdabbcddabbbcddd", arrayToList2D( result2 ), 10 );
 		matchSubTest( parser02, "abcdabbcddabbbcddd", arrayToList2D( result2 ), 10 );
 		matchSubTest( parser02N, "abcdabbcddabbbcddd", arrayToList2D( result2 ), 10 );
 		matchTest( parser24, "abcdabbcddabbbcddd", arrayToList2D( result3 ) );
 		matchTest( parser2_, "abcdabbcddabbbcddd", arrayToList2D( result3 ) );
-		bindingsTest( parser_2, "abcdabbcddabbbcddd", bindings2 );
-		bindingsTest( parser02, "abcdabbcddabbbcddd", bindings2 );
-		bindingsTest( parser02N, "abcdabbcddabbbcddd", bindings2 );
-		bindingsTest( parser24, "abcdabbcddabbbcddd", bindings3 );
-		bindingsTest( parser2_, "abcdabbcddabbbcddd", bindings3 );
 		
 		matchSubTest( parser_2, "abcdabbcddabbbcdddabbbbcdddd", arrayToList2D( result2 ), 10 );
 		matchSubTest( parser02, "abcdabbcddabbbcdddabbbbcdddd", arrayToList2D( result2 ), 10 );
 		matchSubTest( parser02N, "abcdabbcddabbbcdddabbbbcdddd", arrayToList2D( result2 ), 10 );
 		matchTest( parser24, "abcdabbcddabbbcdddabbbbcdddd", arrayToList2D( result4 ) );
 		matchTest( parser2_, "abcdabbcddabbbcdddabbbbcdddd", arrayToList2D( result4 ) );
-		bindingsTest( parser_2, "abcdabbcddabbbcdddabbbbcdddd", bindings2 );
-		bindingsTest( parser02, "abcdabbcddabbbcdddabbbbcdddd", bindings2 );
-		bindingsTest( parser02N, "abcdabbcddabbbcdddabbbbcdddd", bindings2 );
-		bindingsTest( parser24, "abcdabbcddabbbcdddabbbbcdddd", bindings4 );
-		bindingsTest( parser2_, "abcdabbcddabbbcdddabbbbcdddd", bindings4 );
 		
 		matchSubTest( parser_2, "abcdabbcddabbbcdddabbbbcddddabbbbbcddddd", arrayToList2D( result2 ), 10 );
 		matchSubTest( parser02, "abcdabbcddabbbcdddabbbbcddddabbbbbcddddd", arrayToList2D( result2 ), 10 );
 		matchSubTest( parser02N, "abcdabbcddabbbcdddabbbbcddddabbbbbcddddd", arrayToList2D( result2 ), 10 );
 		matchSubTest( parser24, "abcdabbcddabbbcdddabbbbcddddabbbbbcddddd", arrayToList2D( result4 ), 28 );
 		matchTest( parser2_, "abcdabbcddabbbcdddabbbbcddddabbbbbcddddd", arrayToList2D( result5 ) );
-		bindingsTest( parser_2, "abcdabbcddabbbcdddabbbbcddddabbbbbcddddd", bindings2 );
-		bindingsTest( parser02, "abcdabbcddabbbcdddabbbbcddddabbbbbcddddd", bindings2 );
-		bindingsTest( parser02N, "abcdabbcddabbbcdddabbbbcddddabbbbbcddddd", bindings2 );
-		bindingsTest( parser24, "abcdabbcddabbbcdddabbbbcddddabbbbbcddddd", bindings4 );
-		bindingsTest( parser2_, "abcdabbcddabbbcdddabbbbcddddabbbbbcddddd", bindings5 );
 	}
 
 
@@ -530,31 +419,21 @@ public class Test_Parser extends ParserTestCase
 		assertTrue( new ZeroOrMore( new Literal( "ab" ), false ).compareTo( new ZeroOrMore( "ab" ) ) );
 
 		ParserExpression parserO, parserN;
-		parserO = new ZeroOrMore( new Word( "a", "b" ).bindTo( "x" ).__add__( new Word( "c", "d" ).bindTo( "y" ) ) );
-		parserN = new ZeroOrMore( new Word( "a", "b" ).bindTo( "x" ).__add__( new Word( "c", "d" ).bindTo( "y" ) ), true );
+		parserO = new ZeroOrMore( new Word( "a", "b" ).__add__( new Word( "c", "d" ) ) );
+		parserN = new ZeroOrMore( new Word( "a", "b" ).__add__( new Word( "c", "d" ) ), true );
 		
 		String[][] result0 = {};
 		String[][] result1 = { { "ab", "cd", } };
 		String[][] result2 = { { "ab", "cd", },   { "abb", "cdd" } };
 		
-		String[][] bindings0 = {};
-		String[][] bindings1 = { { "x", "ab" },   { "y", "cd" } };
-		String[][] bindings2 = { { "x", "abb" },   { "y", "cdd" } };
-		
 		matchTest( parserO, "", arrayToList2D( result0 ) );
 		matchTest( parserN, "", null );
-		bindingsTest( parserO, "", bindings0 );
-		bindingsTest( parserN, "", bindings0 );
 		
 		matchTest( parserO, "abcd", arrayToList2D( result1 ) );
 		matchTest( parserN, "abcd", arrayToList2D( result1 ) );
-		bindingsTest( parserO, "abcd", bindings1 );
-		bindingsTest( parserN, "abcd", bindings1 );
 		
 		matchTest( parserO, "abcdabbcdd", arrayToList2D( result2 ) );
 		matchTest( parserN, "abcdabbcdd", arrayToList2D( result2 ) );
-		bindingsTest( parserO, "abcdabbcdd", bindings2 );
-		bindingsTest( parserN, "abcdabbcdd", bindings2 );
 	}
 
 
@@ -565,26 +444,19 @@ public class Test_Parser extends ParserTestCase
 		assertFalse( new OneOrMore( new Literal( "ab" ) ).compareTo( new OneOrMore( new Literal( "cd" ) ) ) );
 		assertTrue( new OneOrMore( new Literal( "ab" ) ).compareTo( new OneOrMore( "ab" ) ) );
 
-		ParserExpression parser = new OneOrMore( new Word( "a", "b" ).bindTo( "x" ).__add__( new Word( "c", "d" ).bindTo( "y" ) ) );
+		ParserExpression parser = new OneOrMore( new Word( "a", "b" ).__add__( new Word( "c", "d" ) ) );
 		
 		String[][] result1 = { { "ab", "cd", } };
 		String[][] result2 = { { "ab", "cd", },   { "abb", "cdd" } };
 		String[][] result3 = { { "ab", "cd", },   { "abb", "cdd" },   { "abbb", "cddd" } };
 		
-		String[][] bindings1 = { { "x", "ab" },   { "y", "cd" } };
-		String[][] bindings2 = { { "x", "abb" },   { "y", "cdd" } };
-		String[][] bindings3 = { { "x", "abbb" },   { "y", "cddd" } };
-		
 		matchFailTest( parser, "" );
 		
 		matchTest( parser, "abcd", arrayToList2D( result1 ) );
-		bindingsTest( parser, "abcd", bindings1 );
 		
 		matchTest( parser, "abcdabbcdd", arrayToList2D( result2 ) );
-		bindingsTest( parser, "abcdabbcdd", bindings2 );
 		
 		matchTest( parser, "abcdabbcddabbbcddd", arrayToList2D( result3 ) );
-		bindingsTest( parser, "abcdabbcddabbbcddd", bindings3 );
 	}
 
 
@@ -595,7 +467,7 @@ public class Test_Parser extends ParserTestCase
 		assertFalse( new Peek( new Literal( "ab" ) ).compareTo( new Peek( new Literal( "cd" ) ) ) );
 		assertTrue( new Peek( new Literal( "ab" ) ).compareTo( new Peek( "ab" ) ) );
 
-		ParserExpression parser = new OneOrMore( new Word( "a", "b" ).bindTo( "x" ) ).__add__( new Peek( new Word( "c", "d" ).bindTo( "y" ) ) );
+		ParserExpression parser = new OneOrMore( new Word( "a", "b" ) ).__add__( new Peek( new Word( "c", "d" ) ) );
 		
 		String[][] result1 = { { "ab" } };
 		String[][] result2 = { { "ab", "ab" } };
@@ -605,8 +477,6 @@ public class Test_Parser extends ParserTestCase
 		matchFailTest( parser, "abab" );
 		matchSubTest( parser, "abcd", arrayToList2D( result1 ), 2 );
 		matchSubTest( parser, "ababcd", arrayToList2D( result2 ), 4 );
-		String[][] bindings1 = { { "x", "ab" } };
-		bindingsTest( parser, "abcd", bindings1 );
 	}
 
 
@@ -617,7 +487,7 @@ public class Test_Parser extends ParserTestCase
 		assertFalse( new PeekNot( new Literal( "ab" ) ).compareTo( new PeekNot( new Literal( "cd" ) ) ) );
 		assertTrue( new PeekNot( new Literal( "ab" ) ).compareTo( new PeekNot( "ab" ) ) );
 
-		ParserExpression parser = new OneOrMore( new Word( "a", "b" ).bindTo( "x" ) ).__add__( new PeekNot( new Word( "c", "d" ).bindTo( "y" ) ) );
+		ParserExpression parser = new OneOrMore( new Word( "a", "b" ) ).__add__( new PeekNot( new Word( "c", "d" ) ) );
 		
 		String[][] result1 = { { "ab" } };
 		String[][] result2 = { { "ab", "ab" } };
@@ -627,8 +497,6 @@ public class Test_Parser extends ParserTestCase
 		matchFailTest( parser, "ababcd" );
 		matchTest( parser, "ab", arrayToList2D( result1 ) );
 		matchTest( parser, "abab", arrayToList2D( result2 ) );
-		String[][] bindings1 = { { "x", "ab" } };
-		bindingsTest( parser, "ab", bindings1 );
 	}
 	
 	
@@ -646,7 +514,7 @@ public class Test_Parser extends ParserTestCase
 		ParseAction flattenAction = new ParseAction()
 		{
 			@SuppressWarnings("unchecked")
-			public Object invoke(String input, int begin, Object x, Map<String, Object> bindings)
+			public Object invoke(String input, int begin, Object x)
 			{
 				Vector<Object> y = new Vector<Object>();
 				List<Object> xx = (List<Object>)x;
@@ -661,7 +529,7 @@ public class Test_Parser extends ParserTestCase
 		ParseAction action = new ParseAction()
 		{
 			@SuppressWarnings("unchecked")
-			public Object invoke(String input, int begin, Object x, Map<String, Object> bindings)
+			public Object invoke(String input, int begin, Object x)
 			{
 				List<Object> xx = (List<Object>)x;
 				if ( xx.get( 1 ).equals( new Vector<Object>() ) )

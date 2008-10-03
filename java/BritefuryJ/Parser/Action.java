@@ -12,22 +12,21 @@ import org.python.core.PyInteger;
 import org.python.core.Py;
 
 import java.util.List;
-import java.util.Map;
 
 public class Action extends UnaryBranchExpression
 {
-	private static class PyCallAction implements ParseAction
+	private static class PyAction implements ParseAction
 	{
 		private PyObject callable;
 		
 		
-		public PyCallAction(PyObject callable)
+		public PyAction(PyObject callable)
 		{
 			this.callable = callable;
 		}
 
 
-		public Object invoke(String input, int begin, Object x, Map<String, Object> bindings)
+		public Object invoke(String input, int begin, Object x)
 		{
 			return callable.__call__( new PyString( input ), new PyInteger( begin ), Py.java2py( x ) );
 		}
@@ -58,17 +57,17 @@ public class Action extends UnaryBranchExpression
 	
 	public Action(String subexp, PyObject a)
 	{
-		this( subexp, new PyCallAction( a ) );
+		this( subexp, new PyAction( a ) );
 	}
 	
 	public Action(List<Object> subexp, PyObject a) throws ParserCoerceException
 	{
-		this( subexp, new PyCallAction( a ) );
+		this( subexp, new PyAction( a ) );
 	}
 		
 	public Action(ParserExpression subexp, PyObject a)
 	{
-		this( subexp, new PyCallAction( a ) );
+		this( subexp, new PyAction( a ) );
 	}
 	
 	
@@ -84,7 +83,7 @@ public class Action extends UnaryBranchExpression
 		
 		if ( res.isValid() )
 		{
-			return new ParseResult( this.a.invoke( input, res.begin, res.value, res.bindings ), res.begin, res.end );
+			return new ParseResult( this.a.invoke( input, res.begin, res.value ), res.begin, res.end );
 		}
 		else
 		{

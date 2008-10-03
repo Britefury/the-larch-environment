@@ -8,8 +8,32 @@ package BritefuryJ.Parser;
 
 import java.util.List;
 
+import org.python.core.Py;
+import org.python.core.PyInteger;
+import org.python.core.PyObject;
+import org.python.core.PyString;
+
 public class Condition extends UnaryBranchExpression
 {
+	private static class PyCondition implements ParseCondition
+	{
+		private PyObject callable;
+		
+		
+		public PyCondition(PyObject callable)
+		{
+			this.callable = callable;
+		}
+
+
+		public boolean test(String input, int begin, Object x)
+		{
+			return Py.py2boolean( callable.__call__( new PyString( input ), new PyInteger( begin ), Py.java2py( x ) ) );
+		}
+	}
+
+	
+	
 	protected ParseCondition cond;
 	
 	
@@ -31,6 +55,23 @@ public class Condition extends UnaryBranchExpression
 		this.cond = cond;
 	}
 	
+
+	public Condition(String subexp, PyObject cond)
+	{
+		this( subexp, new PyCondition( cond ) );
+	}
+	
+	public Condition(List<Object> subexp, PyObject cond) throws ParserCoerceException
+	{
+		this( subexp, new PyCondition( cond ) );
+	}
+		
+	public Condition(ParserExpression subexp, PyObject cond)
+	{
+		this( subexp, new PyCondition( cond ) );
+	}
+	
+
 	
 	public ParseCondition getCondition()
 	{
@@ -44,7 +85,7 @@ public class Condition extends UnaryBranchExpression
 		
 		if ( res.isValid() )
 		{
-			if ( cond.test( input, res.begin, res.value, res.bindings ) )
+			if ( cond.test( input, res.begin, res.value ) )
 			{
 				return res;
 			}
