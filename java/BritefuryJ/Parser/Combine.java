@@ -28,7 +28,7 @@ public class Combine extends BranchExpression
 	
 	
 	@SuppressWarnings("unchecked")
-	protected ParseResult evaluate(ParserState state, String input, int start, int stop)
+	protected ParseResult parse(ParserState state, String input, int start, int stop)
 	{
 		Vector<Object> values = new Vector<Object>();
 		boolean bFinalValueIsString = true;

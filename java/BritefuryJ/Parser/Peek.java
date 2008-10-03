@@ -26,7 +26,7 @@ public class Peek extends UnaryBranchExpression
 	}
 	
 
-	protected ParseResult evaluate(ParserState state, String input, int start, int stop)
+	protected ParseResult parse(ParserState state, String input, int start, int stop)
 	{
 		ParseResult res = subexp.evaluate( state, input, start, stop );
 		

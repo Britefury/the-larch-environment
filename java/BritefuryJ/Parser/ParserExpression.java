@@ -57,7 +57,91 @@ public abstract class ParserExpression
 	}
 	
 	
-	protected abstract ParseResult evaluate(ParserState state, String input, int start, int stop);
+	public DebugParseResult debugParseString(String input)
+	{
+		return debugParseString( input, 0, input.length() );
+	}
+
+	public DebugParseResult debugParseString(String input, String junkRegex)
+	{
+		return debugParseString( input, 0, input.length(), junkRegex );
+	}
+
+	public DebugParseResult debugParseString(String input, int start, int stop)
+	{
+		return debugParseString( input, start, stop, "[ \t\n]*" );
+	}
+	
+	public DebugParseResult debugParseString(String input, int start, int stop, String junkRegex)
+	{
+		if ( stop == -1 )
+		{
+			stop = input.length();
+		}
+		
+		ParserState state = new ParserState( junkRegex );
+		state.enableDebuggin();
+		DebugParseResult result = (DebugParseResult)evaluate( state, input, start, stop );
+		if ( result.isValid() )
+		{
+			result.end = state.skipJunkChars( input, result.end, stop );
+		}
+		
+		return result;
+	}
+	
+	
+
+	protected ParseResult evaluate(ParserState state, String input, int start, int stop)
+	{
+		if ( state.bDebuggingEnabled )
+		{
+			// Get the current top of the debug stack (outer call)
+			DebugNode prev = state.debugStack;
+			// Create the debug info node
+			DebugNode node = new DebugNode( prev, this );
+
+			// Push @node onto the debug stack
+			state.debugStack = node;
+			
+			// Get the parse result
+			ParseResult result = parse( state, input, start, stop );
+			node.setResult( result );
+			
+			// If @prev is valid, add @node as a call-child of @prev
+			if ( prev != null )
+			{
+				prev.addCallChild( node );
+			}
+			
+			// Pop @node off the debug stack
+			state.debugStack = prev;
+			
+			
+			if ( result instanceof DebugParseResult )
+			{
+				DebugParseResult debugResult = (DebugParseResult)result;
+				
+				DebugNode fromNode = node;
+				DebugNode toNode = debugResult.debugNode;
+				
+				if ( !fromNode.getCallChildren().contains( toNode ) )
+				{
+					fromNode.addMemoChild( toNode );
+				}
+			}
+			
+			
+			return result.debug( node );
+		}
+		else
+		{
+			return parse( state, input, start, stop );
+		}
+	}
+	
+	
+	protected abstract ParseResult parse(ParserState state, String input, int start, int stop);
 	
 	
 	

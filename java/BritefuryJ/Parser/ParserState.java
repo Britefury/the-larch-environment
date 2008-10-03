@@ -12,7 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-public class ParserState
+class ParserState
 {
 	private static class MemoEntry
 	{
@@ -65,9 +65,13 @@ public class ParserState
 	}
 	
 	
+	
 	private HashMap<Integer, HashMap<ParserExpression, MemoEntry> > memo;
 	private RuleInvocation ruleInvocationStack;
 	private Pattern junkPattern;
+	protected DebugNode debugStack;
+	protected boolean bDebuggingEnabled;
+	
 	
 	
 	public ParserState(String junkRegex)
@@ -88,6 +92,13 @@ public class ParserState
 		{
 			return start;
 		}
+	}
+	
+	
+	protected void enableDebuggin()
+	{
+		bDebuggingEnabled = true;
+		debugStack = null;
 	}
 	
 	

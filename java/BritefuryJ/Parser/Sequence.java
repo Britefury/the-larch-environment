@@ -27,7 +27,7 @@ public class Sequence extends BranchExpression
 	}
 	
 	
-	protected ParseResult evaluate(ParserState state, String input, int start, int stop)
+	protected ParseResult parse(ParserState state, String input, int start, int stop)
 	{
 		Vector<Object> value = new Vector<Object>();
 		

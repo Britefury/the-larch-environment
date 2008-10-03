@@ -26,7 +26,7 @@ public class Choice extends BranchExpression
 	}
 	
 	
-	protected ParseResult evaluate(ParserState state, String input, int start, int stop)
+	protected ParseResult parse(ParserState state, String input, int start, int stop)
 	{
 		int maxErrorPos = start;
 		

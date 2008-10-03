@@ -33,7 +33,7 @@ public class Production extends UnaryBranchExpression
 	}
 	
 	
-	protected ParseResult evaluate(ParserState state, String input, int start, int stop)
+	protected ParseResult parse(ParserState state, String input, int start, int stop)
 	{
 		return state.memoisedMatch( subexp, input, start, stop );
 	}
