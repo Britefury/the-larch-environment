@@ -8,37 +8,14 @@
 import unittest
 import sys
 
-from Britefury.Cell import CellEvaluatorFunction
-from Britefury.Cell import CellEvaluator
-from Britefury.Cell import CellEvaluatorPythonExpression
-from Britefury.Cell import CellInterface
-from Britefury.Cell import Cell
-from Britefury.Cell import LiteralCell
-from Britefury.Cell import ProxyCell
+from Britefury.InitBritefuryJ import initBritefuryJ
+initBritefuryJ()
+
+from Britefury.Tests.BritefuryJ.Parser.Utils import Operators
 
 
-from Britefury.DocModel import DMNode
-from Britefury.DocModel import DMNull
-from Britefury.DocModel import DMNode
-from Britefury.DocModel import DMSymbol
-from Britefury.DocModel import DMListOperator
-from Britefury.DocModel import DMListOpNop
-from Britefury.DocModel import DMListOpMap
-from Britefury.DocModel import DMListOpSlice
-from Britefury.DocModel import DMListOpJoin
-from Britefury.DocModel import DMListInterface
-from Britefury.DocModel import DMVirtualList
-from Britefury.DocModel import DMList
-from Britefury.DocModel import DMProxyList
-from Britefury.DocModel import DocModelLayer
-from Britefury.DocModel import DMInterpreter
-from Britefury.DocModel import DMIORead
-from Britefury.DocModel import DMIOWrite
 
-
-testModules = [ CellEvaluatorFunction, CellEvaluator, CellEvaluatorPythonExpression, CellInterface, Cell, LiteralCell, ProxyCell,
-				DMNode, DMNull, DMSymbol, DMListOperator, DMListInterface, DMVirtualList, DMList, DMProxyList, DocModelLayer, DMListOpNop, DMListOpMap, DMListOpSlice, DMListOpJoin,
-				DMInterpreter, DMIORead, DMIOWrite ]
+testModules = [ Operators ]
 
 
 if __name__ == '__main__':

@@ -6,6 +6,7 @@
 //##************************
 package BritefuryJ.Parser.Utils.OperatorParser;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -35,6 +36,26 @@ public abstract class BinaryOperator extends Operator
 			return action.invoke( input, begin, xs.get( 0 ), xs.get( 2 ), bindings );
 		}
 	}
+	
+	
+	protected static class DefaultBinaryOperatorParseAction implements BinaryOperatorParseAction
+	{
+		private String operator;
+		
+		
+		public DefaultBinaryOperatorParseAction(String operator)
+		{
+			this.operator = operator;
+		}
+		
+		
+		public Object invoke(String input, int begin, Object x, Object y, Map<String, Object> bindings)
+		{
+			Object[] xs = { operator, x, y };
+			return Arrays.asList( xs );
+		}
+	}
+
 	
 	
 	protected BinaryOperatorParseAction action;

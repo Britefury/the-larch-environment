@@ -17,9 +17,14 @@ public class InfixLeft extends BinaryOperator
 	// Constructors
 	//
 	
-	protected InfixLeft(ParserExpression opExpression, BinaryOperatorParseAction action)
+	public InfixLeft(ParserExpression opExpression, BinaryOperatorParseAction action)
 	{
 		super( opExpression, action );
+	}
+
+	public InfixLeft(String operator)
+	{
+		this( ParserExpression.coerce( operator ), new DefaultBinaryOperatorParseAction( operator ) );
 	}
 
 	

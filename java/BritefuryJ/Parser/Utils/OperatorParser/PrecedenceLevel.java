@@ -25,6 +25,13 @@ public class PrecedenceLevel
 	private Vector<Operator> operators;
 	
 	
+	
+	//
+	//
+	// Constructor
+	//
+	//
+	
 	public PrecedenceLevel(List<Operator> ops) throws OperatorParserPrecedenceLevelCannotMixOperatorTypesError
 	{
 		Object operatorClass = null;

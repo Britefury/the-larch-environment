@@ -14,9 +14,9 @@ import BritefuryJ.Parser.Forward;
 import BritefuryJ.Parser.ParseAction;
 import BritefuryJ.Parser.ParserExpression;
 
-class Prefix extends Operator
+public class Prefix extends UnaryOperator
 {
-	private class PrefixOpAction implements ParseAction
+	private static class PrefixOpAction implements ParseAction
 	{
 		private UnaryOperatorParseAction action;
 		
@@ -45,11 +45,16 @@ class Prefix extends Operator
 	// Constructors
 	//
 	
-	protected Prefix(ParserExpression opExpression, UnaryOperatorParseAction action)
+	public Prefix(ParserExpression opExpression, UnaryOperatorParseAction action)
 	{
 		super( opExpression );
 		
 		this.action = new PrefixOpAction( action );
+	}
+
+	public Prefix(String operator)
+	{
+		this( ParserExpression.coerce( operator ), new DefaultUnaryOperatorParseAction( operator ) );
 	}
 
 	
