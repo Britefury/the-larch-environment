@@ -8,6 +8,7 @@ package BritefuryJ.Parser;
 
 import java.util.Arrays;
 import java.util.List;
+import org.python.core.PyObject;
 
 public abstract class ParserExpression
 {
@@ -161,6 +162,11 @@ public abstract class ParserExpression
 
 
 	public ParserExpression action(ParseAction a)
+	{
+		return new Action( this, a );
+	}
+
+	public ParserExpression action(PyObject a)
 	{
 		return new Action( this, a );
 	}

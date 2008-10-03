@@ -7,6 +7,7 @@
 package BritefuryJ.Parser;
 
 import java.util.List;
+import org.python.core.PyObject;
 
 public class Production extends UnaryBranchExpression
 {
@@ -40,6 +41,11 @@ public class Production extends UnaryBranchExpression
 
 
 	public ParserExpression action(ParseAction a)
+	{
+		return new Production( new Action( subexp, a ), debugName );
+	}
+
+	public ParserExpression action(PyObject a)
 	{
 		return new Production( new Action( subexp, a ), debugName );
 	}

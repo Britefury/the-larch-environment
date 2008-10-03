@@ -6,10 +6,34 @@
 //##************************
 package BritefuryJ.Parser;
 
+import org.python.core.PyObject;
+import org.python.core.PyString;
+import org.python.core.PyInteger;
+import org.python.core.Py;
+
 import java.util.List;
+import java.util.Map;
 
 public class Action extends UnaryBranchExpression
 {
+	private static class PyCallAction implements ParseAction
+	{
+		private PyObject callable;
+		
+		
+		public PyCallAction(PyObject callable)
+		{
+			this.callable = callable;
+		}
+
+
+		public Object invoke(String input, int begin, Object x, Map<String, Object> bindings)
+		{
+			return callable.__call__( new PyString( input ), new PyInteger( begin ), Py.java2py( x ) );
+		}
+	}
+	
+	
 	protected ParseAction a;
 	
 	
@@ -29,6 +53,22 @@ public class Action extends UnaryBranchExpression
 	{
 		super( subexp );
 		this.a = a;
+	}
+	
+	
+	public Action(String subexp, PyObject a)
+	{
+		this( subexp, new PyCallAction( a ) );
+	}
+	
+	public Action(List<Object> subexp, PyObject a) throws ParserCoerceException
+	{
+		this( subexp, new PyCallAction( a ) );
+	}
+		
+	public Action(ParserExpression subexp, PyObject a)
+	{
+		this( subexp, new PyCallAction( a ) );
 	}
 	
 	

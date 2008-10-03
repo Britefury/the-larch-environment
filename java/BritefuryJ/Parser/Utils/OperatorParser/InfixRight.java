@@ -17,11 +17,15 @@ public class InfixRight extends BinaryOperator
 	// Constructors
 	//
 	
-	protected InfixRight(ParserExpression opExpression, BinaryOperatorParseAction action)
+	public InfixRight(ParserExpression opExpression, BinaryOperatorParseAction action)
 	{
 		super( opExpression, action );
 	}
 
+	public InfixRight(String operator)
+	{
+		this( ParserExpression.coerce( operator ), new DefaultBinaryOperatorParseAction( operator ) );
+	}
 	
 	
 	protected ParserExpression buildOperatorParser(OperatorTable operatorTable,

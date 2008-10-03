@@ -13,6 +13,7 @@ import java.util.Vector;
 import BritefuryJ.Parser.Forward;
 import BritefuryJ.Parser.ParseAction;
 import BritefuryJ.Parser.ParserExpression;
+import BritefuryJ.Parser.Utils.OperatorParser.UnaryOperator.DefaultUnaryOperatorParseAction;
 
 public class Suffix extends Operator
 {
@@ -46,11 +47,16 @@ public class Suffix extends Operator
 	// Constructors
 	//
 	
-	protected Suffix(ParserExpression opExpression, UnaryOperatorParseAction action)
+	public Suffix(ParserExpression opExpression, UnaryOperatorParseAction action)
 	{
 		super( opExpression );
 		
 		this.action = new SuffixOpAction( action );
+	}
+
+	public Suffix(String operator)
+	{
+		this( ParserExpression.coerce( operator ), new DefaultUnaryOperatorParseAction( operator ) );
 	}
 
 	
