@@ -41,7 +41,7 @@ public class NodeView
 	static BorderStyleSheet nodeBorderStyle = new BorderStyleSheet( 1.0, 1.0, 1.0, 1.0, Color.black );
 	
 	static VBoxStyleSheet childrenVBoxStyle = new VBoxStyleSheet( DPVBox.Typesetting.NONE, DPVBox.Alignment.LEFT, 3.0, false, 5.0 );
-	static HBoxStyleSheet mainHBoxStyle = new HBoxStyleSheet( DPHBox.Alignment.CENTRE, 40.0, false, 0.0 );
+	static HBoxStyleSheet mainHBoxStyle = new HBoxStyleSheet( DPHBox.Alignment.CENTRE, 80.0, false, 0.0 );
 	
 	
 	
@@ -86,6 +86,11 @@ public class NodeView
 		return mainWidget;
 	}
 	
+	protected DPWidget getNodeWidget()
+	{
+		return nodeWidget;
+	}
+	
 	
 	void registerEdges()
 	{
@@ -97,6 +102,11 @@ public class NodeView
 		for (DebugNode child: data.getMemoChildren())
 		{
 			parseView.addMemoEdge( this, parseView.getNodeView( child, input ) );
+		}
+
+		for (NodeView child: children)
+		{
+			child.registerEdges();
 		}
 	}
 	

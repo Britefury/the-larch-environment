@@ -483,6 +483,19 @@ public class DPPresentationArea extends DPBin implements CaretListener
 		queueFullRedraw();
 	}
 	
+	public void zoomToFit()
+	{
+		performAllocation();
+		
+		double ax = allocation.x == 0.0  ?  1.0  :  allocation.x;
+		double ay = allocation.y == 0.0  ?  1.0  :  allocation.y;
+		
+		windowTopLeftCornerInRootSpace = new Point2();
+		rootScaleInWindowSpace = Math.min( areaSize.x / ax, areaSize.y / ay );
+		rootScaleInWindowSpace = rootScaleInWindowSpace == 0.0  ?  1.0  :  rootScaleInWindowSpace;
+		queueFullRedraw();
+	}
+	
 	public void zoom(double zoomFactor, Point2 centreInWindowSpace)
 	{
 		Point2 centreInRootSpace = windowSpaceToRootSpace( centreInWindowSpace );
