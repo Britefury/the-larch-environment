@@ -7,6 +7,9 @@
 ##-*************************
 import string
 
+import java.util.List
+import java.lang.String
+
 from Britefury.DocModel.DMListInterface import DMListInterface
 
 
@@ -49,6 +52,16 @@ def _writeList(stream, content):
 	stream.write( ')' )
 
 
+def _writeJList(stream, content):
+	stream.write( '(' )
+	if content.size() > 0:
+		for v in content.subList( 0, content.size() - 1 ):
+			__writesx__( stream, v )
+			stream.write( ' ' )
+		__writesx__( stream, content[content.size()-1] )
+	stream.write( ')' )
+
+
 def __writesx__(stream, content):
 	if isinstance( content, str )  or  isinstance( content, unicode ):
 		if needsQuotes( content ):
@@ -59,6 +72,8 @@ def __writesx__(stream, content):
 		stream.write( repr( content ) )
 	elif isinstance( content, list ):
 		_writeList( stream, content )
+	elif isinstance( content, java.util.List ):
+		_writeJList( stream, content )
 	elif isinstance( content, DMListInterface ):
 		_writeList( stream, content )
 
