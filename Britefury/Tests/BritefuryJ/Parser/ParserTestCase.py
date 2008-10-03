@@ -6,22 +6,40 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
 
+import java.util.List
+
 import string
 import unittest
 from Britefury.DocModel.DMIO import readSX, writeSX
 import cStringIO
 
+import re
+
+_whitespaceRegex = '[' + re.escape( string.whitespace ) + ']*'
+
 
 class ParserTestCase (unittest.TestCase):
-	def _matchTest(self, parser, input, expected, ignoreChars=string.whitespace):
+	def _cmpValue(self, x, y):
+		xStream = cStringIO.StringIO()
+		writeSX( xStream, x )
+
+		yStream = cStringIO.StringIO()
+		writeSX( yStream, y )
+		
+		return xStream.getvalue() == yStream.getvalue()
+			
+	
+	
+	def _matchTest(self, parser, input, expected, ignoreChars=_whitespaceRegex):
 		result = parser.parseString( input, ignoreChars )
-		if result is None:
-			print 'PARSE FAILURE while parsing %s, stopped at %d: %s'  %  ( input, pos, input[:pos] )
+		
+		if not result.isValid():
+			print 'PARSE FAILURE while parsing %s, stopped at %d: %s'  %  ( input, result.end, input[:result.end] )
 			print 'EXPECTED:'
 			print expected
-		self.assert_( result is not None )
-
-		res = result.result
+		self.assert_( result.isValid() )
+		
+		value = result.value;
 
 		if result.end != len( input ):
 			print 'INCOMPLETE PARSE while parsing', input
@@ -32,28 +50,29 @@ class ParserTestCase (unittest.TestCase):
 			print 'RESULT:'
 			print res
 
-		if res != expected:
+		bSame = self._cmpValue( value, expected )
+		if not bSame:
 			print 'EXPECTED:'
 			print expected
 			print ''
 			print 'RESULT:'
-			print res
-		self.assert_( res == expected )
+			print value.toString()
+		self.assert_( bSame )
 
 
 
-	def _matchTestSX(self, parser, input, expectedSX, ignoreChars=string.whitespace):
+	def _matchTestSX(self, parser, input, expectedSX, ignoreChars=_whitespaceRegex):
 		result = parser.parseString( input, ignoreChars )
 
 		expected = readSX( expectedSX )
-
-		if result is None:
+		
+		if not result.isValid():
 			print 'PARSE FAILURE while parsing', input
 			print 'EXPECTED:'
 			print expectedSX
-		self.assert_( result is not None )
+		self.assert_( result.isValid() )
 
-		res = result.result
+		value = result.value
 
 		if result.end != len( input ):
 			print 'INCOMPLETE PARSE while parsing', input
@@ -63,50 +82,29 @@ class ParserTestCase (unittest.TestCase):
 			print expectedSX
 			print 'RESULT:'
 			stream = cStringIO.StringIO()
-			writeSX( stream, res )
+			writeSX( stream, value )
 			print stream.getvalue()
 
-		if res != expected:
+		bSame = self._cmpValue( value, expected )
+		if not bSame:
 			print 'EXPECTED:'
 			print expectedSX
 			print ''
 			print 'RESULT:'
 			stream = cStringIO.StringIO()
-			writeSX( stream, res )
+			writeSX( stream, value )
 			print stream.getvalue()
-		self.assert_( res == expected )
+		self.assert_( bSame )
 
-
-	def _matchSubTest(self, parser, input, expected, begin=None, end=None, ignoreChars=string.whitespace):
+		
+	def _matchFailTest(self, parser, input, ignoreChars=_whitespaceRegex):
 		result = parser.parseString( input, ignoreChars )
-		if result is None:
-			print 'PARSE FAILURE while parsing', input
-			print 'EXPECTED:'
-			print expected
-		self.assert_( result is not None )
-		res = result.result
-		if res != expected:
-			print 'EXPECTED:'
-			print expected
-			print ''
-			print 'RESULT:'
-			print res
-		self.assert_( res == expected )
-
-		if result is not None:
-			if begin is not None:
-				self.assert_( begin == result.begin )
-			if end is not None:
-				self.assert_( end == result.end )
-
-
-	def _matchFailTest(self, parser, input, ignoreChars=string.whitespace):
-		result = parser.parseString( input, ignoreChars )
-		if result is not None   and   result.end == len( input ):
+		
+		if result.isValid()   and   result.end == len( input ):
 			print 'EXPECTED:'
 			print '<fail>'
 			print ''
 			print 'RESULT:'
-			print result.result
+			print result.value
 			print 'consumed %d/%d chars'  %  ( result.end, len( input ) )
-		self.assert_( result is None  or  result.end != len( input ) )
+		self.assert_( not result.isValid()  or  result.end != len( input ) )

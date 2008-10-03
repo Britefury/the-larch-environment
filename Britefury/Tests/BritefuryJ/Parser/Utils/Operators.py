@@ -498,8 +498,7 @@ def _makeTestCaseClassImplFromText(text):
 TestCase_Impl = _makeTestCaseClassImplFromText( _unitTestSpecification )
 
 
-#class TestCase_Operators (ParserTestCase, TestCase_Impl):
-class TestCase_Operators (ParserTestCase):
+class TestCase_Operators (ParserTestCase, TestCase_Impl):
 	def testLeft_Prefix_Manual(self):
 		atom = identifier
 
@@ -520,7 +519,7 @@ class TestCase_Operators (ParserTestCase):
 		self._matchTestSX( parser, 'x * ~y * z',    '(* x (~ (* y z)))' )
 		self._matchTestSX( parser, 'x * y * ~z',     '(* (* x y) (~ z))' )
 
-
+		
 	def testLeft_Prefix_Auto(self):
 		atom = identifier
 
