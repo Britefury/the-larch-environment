@@ -52,6 +52,7 @@ import BritefuryJ.DocPresent.Input.Modifier;
 import BritefuryJ.DocPresent.Input.PointerInterface;
 import BritefuryJ.DocPresent.Input.Pointer;
 import BritefuryJ.DocPresent.Input.InputTable;
+import BritefuryJ.DocPresent.Metrics.HMetrics;
 import BritefuryJ.DocPresent.Metrics.VMetrics;
 
 
@@ -361,6 +362,8 @@ public class DPPresentationArea extends DPBin implements CaretListener
 	private Caret caret;
 	private DPContentLeaf currentCaretLeaf;
 	
+	private boolean bHorizontalClamp;
+	
 	
 		
 	
@@ -386,7 +389,9 @@ public class DPPresentationArea extends DPBin implements CaretListener
 		
 		stateKeyListeners = new WeakHashMap<StateKeyListener, Object>();
 		
-		bAllocationRequired = true;	
+		bAllocationRequired = true;
+		
+		bHorizontalClamp = true;
 		
 		caret = new Caret();
 		caret.setCaretListener( this );
@@ -396,7 +401,18 @@ public class DPPresentationArea extends DPBin implements CaretListener
 	
 	
 	
-	void setUndoListener(UndoListener l)
+	public void disableHorizontalClamping()
+	{
+		bHorizontalClamp = false;
+	}
+	
+	public void enableHorizontalClamping()
+	{
+		bHorizontalClamp = true;
+	}
+	
+	
+	public void setUndoListener(UndoListener l)
 	{
 		undoListener = l;
 	}
@@ -619,8 +635,15 @@ public class DPPresentationArea extends DPBin implements CaretListener
 		if ( bAllocationRequired )
 		{
 			refreshMinimumHMetrics();
-			refreshPreferredHMetrics();
-			allocateX( areaSize.x / rootScaleInWindowSpace );
+			HMetrics h = refreshPreferredHMetrics();
+			if ( bHorizontalClamp )
+			{
+				allocateX( areaSize.x / rootScaleInWindowSpace );
+			}
+			else
+			{
+				allocateX( h.width );
+			}
 			refreshMinimumVMetrics();
 			VMetrics v = refreshPreferredVMetrics();
 			allocateY( v.height );

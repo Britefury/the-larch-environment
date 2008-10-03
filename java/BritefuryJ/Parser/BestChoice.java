@@ -26,7 +26,7 @@ public class BestChoice extends BranchExpression
 	}
 	
 	
-	protected ParseResult evaluate(ParserState state, String input, int start, int stop)
+	protected ParseResult parse(ParserState state, String input, int start, int stop)
 	{
 		ParseResult bestResult = null;
 		int bestPos = -1;

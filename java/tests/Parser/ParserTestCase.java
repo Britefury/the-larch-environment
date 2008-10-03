@@ -44,29 +44,29 @@ public class ParserTestCase extends TestCase
 		ParseResult result = parser.parseString( input );
 		if ( !result.isValid() )
 		{
-			System.out.println( "PARSE FAILURE while parsing " + input + ", stopped at " + String.valueOf( result.end ) + ": " + input.substring(  0, result.end ) );
+			System.out.println( "PARSE FAILURE while parsing " + input + ", stopped at " + String.valueOf( result.getEnd() ) + ": " + input.substring(  0, result.getEnd() ) );
 			System.out.println( "EXPECTED:" );
 			System.out.println( expected.toString() );
 		}
 		assertTrue( result.isValid() );
 		
-		Object value = result.value;
+		Object value = result.getValue();
 		String valueStr = value != null  ?  value.toString()  :  "<null>";
 		String valueClassName = value != null  ?  value.getClass().getName()  :  "<null>";
 		String expectedStr = expected != null  ?  expected.toString()  :  "<null>";
 		String expectedClassName = expected != null  ?  expected.getClass().getName()  :  "<null>";
 		
-		if ( result.end != input.length() )
+		if ( result.getEnd() != input.length() )
 		{
 			System.out.println( "INCOMPLETE PARSE while parsing " + input );
-			System.out.println( "Parsed " + String.valueOf( result.end ) + "/" + String.valueOf( input.length() ) + " characters" );
-			System.out.println( "Parsed text " + input.substring( 0, result.end ) );
+			System.out.println( "Parsed " + String.valueOf( result.getEnd() ) + "/" + String.valueOf( input.length() ) + " characters" );
+			System.out.println( "Parsed text " + input.substring( 0, result.getEnd() ) );
 			System.out.println( "EXPECTED: (a " + expectedClassName + ")" );
 			System.out.println( expectedStr );
 			System.out.println( "RESULT: (a " + valueClassName + ")" );
 			System.out.println( valueStr );
 		}
-		assertEquals( result.end, input.length() );
+		assertEquals( result.getEnd(), input.length() );
 		
 		
 		boolean bValuesMatch = true;
@@ -127,29 +127,29 @@ public class ParserTestCase extends TestCase
 		ParseResult result = parser.parseString( input );
 		if ( !result.isValid() )
 		{
-			System.out.println( "PARSE FAILURE while parsing " + input.substring(  0, end ) + ", stopped at " + String.valueOf( result.end ) + ": " + input.substring(  0, result.end ) );
+			System.out.println( "PARSE FAILURE while parsing " + input.substring(  0, end ) + ", stopped at " + String.valueOf( result.getEnd() ) + ": " + input.substring(  0, result.getEnd() ) );
 			System.out.println( "EXPECTED:" );
 			System.out.println( expected.toString() );
 		}
 		assertTrue( result.isValid() );
 		
-		Object value = result.value;
+		Object value = result.getValue();
 		String valueStr = value != null  ?  value.toString()  :  "<null>";
 		String valueClassName = value != null  ?  value.getClass().getName()  :  "<null>";
 		String expectedStr = expected != null  ?  expected.toString()  :  "<null>";
 		String expectedClassName = expected != null  ?  expected.getClass().getName()  :  "<null>";
 		
-		if ( result.end != end )
+		if ( result.getEnd() != end )
 		{
 			System.out.println( "DID NOT PARSE CORRECT AMOUNT while parsing " + input.substring( 0, end ) );
-			System.out.println( "Parsed " + String.valueOf( result.end ) + "/" + String.valueOf( end ) + " characters" );
-			System.out.println( input.substring( 0, result.end ) );
+			System.out.println( "Parsed " + String.valueOf( result.getEnd() ) + "/" + String.valueOf( end ) + " characters" );
+			System.out.println( input.substring( 0, result.getEnd() ) );
 			System.out.println( "EXPECTED: (a " + expectedClassName + ")" );
 			System.out.println( expectedStr );
 			System.out.println( "RESULT: (a " + valueClassName + ")" );
 			System.out.println( valueStr );
 		}
-		assertEquals( result.end, end );
+		assertEquals( result.getEnd(), end );
 		
 		
 		boolean bValuesMatch = true;
@@ -185,7 +185,7 @@ public class ParserTestCase extends TestCase
 
 		if ( result.isValid() )
 		{
-			Object value = result.value;
+			Object value = result.getValue();
 			String valueStr = value != null  ?  value.toString()  :  "<null>";
 			String valueClassName = value != null  ?  value.getClass().getName()  :  "<null>";
 
@@ -194,7 +194,7 @@ public class ParserTestCase extends TestCase
 			System.out.println( "<fail>" );
 			System.out.println( "RESULT: (a " + valueClassName + ")" );
 			System.out.println( valueStr );
-			System.out.println( "Consumed " + String.valueOf( result.end ) + "/" + String.valueOf( input.length() ) + " characters" );
+			System.out.println( "Consumed " + String.valueOf( result.getEnd() ) + "/" + String.valueOf( input.length() ) + " characters" );
 		}
 		assertFalse( result.isValid() );
 	}
@@ -212,21 +212,21 @@ public class ParserTestCase extends TestCase
 
 		if ( !result.isValid() )
 		{
-			System.out.println( "PARSE FAILURE while parsing " + input + ", stopped at " + String.valueOf( result.end ) + ": " + input.substring(  0, result.end ) );
+			System.out.println( "PARSE FAILURE while parsing " + input + ", stopped at " + String.valueOf( result.getEnd() ) + ": " + input.substring(  0, result.getEnd() ) );
 			System.out.println( "EXPECTED INCOMPLETE PARSE:" );
 		}
 		assertTrue( result.isValid() );
 		
-		Object value = result.value;
+		Object value = result.getValue();
 		String valueStr = value != null  ?  value.toString()  :  "<null>";
 		String valueClassName = value != null  ?  value.getClass().getName()  :  "<null>";
 		
-		if ( result.end == input.length() )
+		if ( result.getEnd() == input.length() )
 		{
 			System.out.println( "EXPECTED INCOMPLETE PARSE while parsing " + input );
 			System.out.println( "RESULT: (a " + valueClassName + ")" );
 			System.out.println( valueStr );
 		}
-		assertTrue( result.end != input.length() );
+		assertTrue( result.getEnd() != input.length() );
 	}
 }

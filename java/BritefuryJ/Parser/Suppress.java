@@ -26,7 +26,7 @@ public class Suppress extends UnaryBranchExpression
 	}
 	
 	
-	protected ParseResult evaluate(ParserState state, String input, int start, int stop)
+	protected ParseResult parse(ParserState state, String input, int start, int stop)
 	{
 		return subexp.evaluate( state, input, start, stop ).suppressed();
 	}

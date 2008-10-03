@@ -24,7 +24,7 @@ public class Literal extends ParserExpression
 	
 	
 	
-	protected ParseResult evaluate(ParserState state, String input, int start, int stop)
+	protected ParseResult parse(ParserState state, String input, int start, int stop)
 	{
 		start = state.skipJunkChars( input, start, stop );
 		

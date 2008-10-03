@@ -8,9 +8,9 @@ package BritefuryJ.Parser;
 
 public class ParseResult
 {
-	public Object value;
-	public int begin, end;
-	private boolean bSuppressed, bValid;
+	protected Object value;
+	protected int begin, end;
+	protected boolean bSuppressed, bValid;
 	
 	
 	public ParseResult()
@@ -67,6 +67,28 @@ public class ParseResult
 		return new ParseResult( value, begin, end, true, bValid );
 	}
 	
+	
+	public DebugParseResult debug(DebugNode debugNode)
+	{
+		return new DebugParseResult( value, begin, end, bSuppressed, bValid, debugNode );
+	}
+	
+	
+	
+	public Object getValue()
+	{
+		return value;
+	}
+	
+	public int getBegin()
+	{
+		return begin;
+	}
+	
+	public int getEnd()
+	{
+		return end;
+	}
 	
 	public boolean isSuppressed()
 	{

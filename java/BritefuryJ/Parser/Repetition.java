@@ -73,7 +73,7 @@ public class Repetition extends UnaryBranchExpression
 	}
 	
 
-	protected ParseResult evaluate(ParserState state, String input, int start, int stop)
+	protected ParseResult parse(ParserState state, String input, int start, int stop)
 	{
 		Vector<Object> values = new Vector<Object>();
 		

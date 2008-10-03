@@ -89,7 +89,8 @@ public class DPBorder extends DPBin
 	{
 		if ( child != null )
 		{
-			allocateChildX( child, getStyleSheet().getLeftMargin(), width );
+			double hborder = getStyleSheet().getLeftMargin() + getStyleSheet().getRightMargin();
+			allocateChildX( child, getStyleSheet().getLeftMargin(), width - hborder );
 		}
 	}
 
@@ -97,7 +98,8 @@ public class DPBorder extends DPBin
 	{
 		if ( child != null )
 		{
-			allocateChildY( child, getStyleSheet().getTopMargin(), height );
+			double vborder = getStyleSheet().getTopMargin() + getStyleSheet().getBottomMargin();
+			allocateChildY( child, getStyleSheet().getTopMargin(), height - vborder );
 		}
 	}
 	
