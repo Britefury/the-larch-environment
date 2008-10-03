@@ -5,26 +5,25 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-import os
 import sys
 
-import pygtk
-pygtk.require( '2.0' )
-import gtk
+from java.lang import Runnable
+from javax.swing import JFrame, AbstractAction, JMenuItem, JMenu, JMenuBar, KeyStroke, JOptionPane, JFileChooser, JOptionPane
+from javax.swing.filechooser import FileNameExtensionFilter
+from java.awt import Dimension, Font, Color
+from java.awt.event import WindowListener
 
-from Britefury.extlibs.pyconsole.pyconsole import Console
 
-from Britefury.Math.Math import Colour3f
+from BritefuryJ.DocPresent import *
+from BritefuryJ.DocPresent.ElementTree import *
+from BritefuryJ.DocPresent.StyleSheets import *
+
+from BritefuryJ.Cell import CellListener
+
 
 from Britefury.Event.QueuedEvent import queueEvent
 
-from Britefury.UI.ConfirmDialog import *
-from Britefury.UI.ConfirmOverwriteFileDialog import confirmOverwriteFileDialog
-
 from Britefury.CommandHistory.CommandHistory import CommandHistory
-
-from Britefury.DocPresent.Toolkit.DTDocument import DTDocument
-from Britefury.DocPresent.Toolkit.DTLabel import DTLabel
 
 from Britefury.DocModel.DMList import DMList
 from Britefury.DocModel.DMIO import readSX, writeSX
@@ -33,11 +32,8 @@ from Britefury.gSym.gSymWorld import GSymWorld
 from Britefury.gSym.gSymEnvironment import GSymEnvironment
 from Britefury.gSym.gSymDocument import loadDocument, newDocument, GSymDocumentViewContentHandler, GSymDocumentLISPViewContentHandler
 
-from Britefury.DocView.DocView import DocView
-
 from Britefury.Plugin import InitPlugins
 
-#from Britefury.PyImport import PythonImporter
 
 
 
@@ -72,60 +68,80 @@ class MainAppPluginInterface (object):
 
 
 		
-class MainAppDocView (object):		
+class MainAppDocView (CellListener):	
 	def __init__(self, app):
 		self._app = app
-		self._doc = DTDocument()
-		self._doc.undoSignal.connect( app._p_onUndo )
-		self._doc.redoSignal.connect( app._p_onRedo )
-		self._doc.getGtkWidget().show()
+		
+		self._elementTree = ElementTree()
+		self._area = self._elementTree.getPresentationArea()
+		self._area.getComponent().setPreferredSize( Dimension( 640, 480 ) )
+		
 		self._view = None
 		
 		
-	def getGtkWidget(self):
-		return self._doc.getGtkWidget()
+	def getComponent(self):
+		return self._area.getComponent()
 	
 		
 	def setDocumentContent(self, documentRoot, contentHandler):
 		if documentRoot is not None:
 			self._view = loadDocument( self._app._world, documentRoot, contentHandler )
-			self._view.refreshCell.changedSignal.connect( self.__queueRefresh )
+			self._view.refreshCell.addListener( self )
 			self._view.refresh()
-			self._doc.child = self._view.rootView.widget
-			self._view.setDocument( self._doc )
+			self._elementTree.getRoot().setChild( self._view.getRootView().getElement() )
 		else:
 			self._view = None
-			self._doc.child = DTLabel( '<empty>', font='Sans 11 bold', colour=Colour3f( 0.0, 0.0, 0.5 ) )
+			
+			textStyle = TextStyleSheet( Font( 'SansSerif', Font.BOLD, 12 ), Color( 0.0, 0.0, 0.5 ) )
+			textElem = TextElement( textStyle, '<empty>' )
+			rootElem = self._elementTree.getRoot()
+			self._elementTree.getRoot().setChild( textElem )
 		
 			
-	def __refreshView(self):
+	def _refreshView(self):
 		if self._view is not None:
 			self._view.refresh()
 
-	def __queueRefresh(self):
-		queueEvent( self.__refreshView )
+	def _queueRefresh(self):
+		class Run (Runnable):
+			def run(r):
+				self._refreshView()
+		self._area.queueImmediateEvent( Run() )
 		
 		
 	def reset(self):
-		self._doc.reset()
+		self._area.reset()
 			
 	def oneToOne(self):
-		self._doc.oneToOne()
-	
+		self._area.oneToOne()
+
+		
+		
+	def onCellChanged(self, cell):
+		self._queueRefresh()
+
+	def onCellEvaluator(self, cell, oldEval, newEval):
+		pass
+
+	def onCellValidity(self, cell):
+		pass
+		
 		
 
+		
+def _action(name, f):
+	class Act (AbstractAction):
+		def actionPerformed(action, event):
+			f()
+	return Act( name )
+	
+		
+		
+		
+
+
+
 class MainApp (object):
-	class _Output (object):
-		def __init__(self, textBuffer, tagName, backupOut):
-			self._textBuffer = textBuffer
-			self._tagName = tagName
-			self._backupOut = backupOut
-
-		def write(self, text):
-			pos = self._textBuffer.get_iter_at_mark( self._textBuffer.get_insert() )
-			self._textBuffer.insert_with_tags_by_name( pos, text, self._tagName )
-
-
 	def __init__(self, documentRoot):
 		self._documentRoot = None
 		self._commandHistory = None
@@ -135,195 +151,106 @@ class MainApp (object):
 		
 		self._docView = MainAppDocView( self )
 
-
-		resetButton = gtk.Button( 'Reset' )
-		resetButton.show()
-		resetButton.connect( 'clicked', self._p_onReset )
-
-		oneToOneButton = gtk.Button( '1:1' )
-		oneToOneButton.show()
-		oneToOneButton.connect( 'clicked', self._p_onOneToOne )
-
-
-		buttonBox = gtk.HBox( spacing=20 )
-		buttonBox.pack_end( oneToOneButton, False, False, 0 )
-		buttonBox.pack_end( resetButton, False, False, 0 )
-		buttonBox.show()
-		
 		
 		
 		
 		# FILE -> NEW MENU
 		
-		newEmptyItem = gtk.MenuItem( 'Empty' )
-		newEmptyItem.connect( 'activate', self._p_onNewEmpty )
-
-		self._newMenu = gtk.Menu()
-		self._newMenu.append( newEmptyItem )
-		
+		self._newMenu = JMenu( 'New' )
+		self._newMenu.add( _action( 'Empty', self._onNewEmpty ) )
 		
 		
 		
 		# FILE -> IMPORT MENU
 		
-		self._importMenu = gtk.Menu()
+		self._importMenu = JMenu( 'Import' )
 
 
-		
 		
 		# FILE MENU
 		
-		newItem = gtk.MenuItem( 'New' )
-		newItem.set_submenu( self._newMenu )
-
-		openItem = gtk.MenuItem( 'Open' )
-		openItem.connect( 'activate', self._p_onOpen )
-
-		saveItem = gtk.MenuItem( 'Save' )
-		saveItem.connect( 'activate', self._p_onSave )
-
-		importItem = gtk.MenuItem( 'Import' )
-		importItem.set_submenu( self._importMenu )
-
-		exportTeXItem = gtk.MenuItem( 'Export TeX document' )
-		exportTeXItem.connect( 'activate', self._p_onExportTeX )
-		exportTeXItem.set_sensitive( False )
-
-
-		fileMenu = gtk.Menu()
-		fileMenu.append( newItem )
-		fileMenu.append( openItem )
-		fileMenu.append( saveItem )
-		fileMenu.append( importItem )
-		fileMenu.append( exportTeXItem )
+		fileMenu = JMenu( 'File' )
+		fileMenu.add( self._newMenu )
+		fileMenu.add( _action( 'Open', self._onOpen ) )
+		fileMenu.add( _action( 'Save', self._onSave ) )
+		fileMenu.add( self._importMenu )
 
 
 		
-
 		# EDIT MENU
 		
-		undoItem = gtk.MenuItem( 'Undo' )
-		undoItem.connect( 'activate', self._p_onUndo )
-
-		redoItem = gtk.MenuItem( 'Redo' )
-		redoItem.connect( 'activate', self._p_onRedo )
-
-		editMenu = gtk.Menu()
-		editMenu.append( undoItem )
-		editMenu.append( redoItem )
-
+		editMenu = JMenu( 'Edit' )
+		editMenu.add( _action( 'Undo', self._onUndo ) )
+		editMenu.getItem( 0 ).setAccelerator( KeyStroke.getKeyStroke( 'ctrl z' ) )
+		editMenu.add( _action( 'Redo', self._onRedo ) )
+		editMenu.getItem( 1 ).setAccelerator( KeyStroke.getKeyStroke( 'ctrl shift z' ) )
 
 		
-		
-		# EXECUTE MENU
-		
-		executeItem = gtk.MenuItem( 'Execute' )
-		executeItem.connect( 'activate', self._p_onExecute )
-		executeItem.set_sensitive( False )
-
-		showCodeItem = gtk.MenuItem( 'Show code' )
-		showCodeItem.connect( 'activate', self._p_onShowCode )
-		showCodeItem.set_sensitive( False )
-
-		runMenu = gtk.Menu()
-		runMenu.append( executeItem )
-		runMenu.append( showCodeItem )
-
-
-
 		
 		# ACTIONS MENU
 		
-		self._actionsMenu = gtk.Menu()
+		self._actionsMenu = JMenu( 'Actions' )
 
 
 
 		
 		# VIEW MENU
 		
-		viewLispItem = gtk.MenuItem( 'Show LISP window' )
-		viewLispItem.connect( 'activate', self._onShowLisp )
-		
-		viewMenu = gtk.Menu()
-		viewMenu.append( viewLispItem )
-		
+		viewMenu = JMenu( 'View' )
+		viewMenu.add( _action( 'Show LISP window', self._onShowLisp ) )
+		viewMenu.add( _action( 'Reset', self._onReset ) )
+		viewMenu.add( _action( '1:1', self._onOneToOne ) )
 		
 		
 		
 		# SCRIPT MENU
 		
-		scriptWindowItem = gtk.MenuItem( _( 'Script window' ) )
-		scriptWindowItem.connect( 'activate', self._p_onScriptWindowMenuItem )
-
-
-		scriptMenu = gtk.Menu()
-		scriptMenu.append( scriptWindowItem )
-
-
-
-		fileMenuItem = gtk.MenuItem( 'File' )
-		fileMenuItem.set_submenu( fileMenu )
-
-		editMenuItem = gtk.MenuItem( 'Edit' )
-		editMenuItem.set_submenu( editMenu )
-
-		runMenuItem = gtk.MenuItem( 'Run' )
-		runMenuItem.set_submenu( runMenu )
+		scriptMenu = JMenu( 'Script' )
+		scriptMenu.add( _action( _( 'Script window' ), self._onScriptWindowMenuItem ) )
 		
-		self._actionsMenuItem = gtk.MenuItem( 'Actions' )
-		self._actionsMenuItem.set_submenu( self._actionsMenu )
+		def _testAction():
+			self._documentRoot[2][1][2][1][1][1][1] = 'this'
 		
-		viewMenuItem = gtk.MenuItem( 'View' )
-		viewMenuItem.set_submenu( viewMenu )
+		scriptMenu.add( _action( _( 'test' ), _testAction ) )
+		
+		menuBar = JMenuBar();
+		menuBar.add( fileMenu )
+		menuBar.add( editMenu )
+		menuBar.add( self._actionsMenu )
+		menuBar.add( viewMenu )
+		menuBar.add( scriptMenu )
 
-		scriptMenuItem = gtk.MenuItem( _( 'Script' ) )
-		scriptMenuItem.set_submenu( scriptMenu )
-
-
-		menuBar = gtk.MenuBar()
-		menuBar.append( fileMenuItem )
-		menuBar.append( editMenuItem )
-		menuBar.append( runMenuItem )
-		menuBar.append( self._actionsMenuItem )
-		menuBar.append( viewMenuItem )
-		menuBar.append( scriptMenuItem )
-		menuBar.show_all()
-
-
-
-
-		box = gtk.VBox()
-		box.pack_start( menuBar, False, False )
-		box.pack_start( self._docView.getGtkWidget() )
-		box.pack_start( gtk.HSeparator(), False, False, 10 )
-		box.pack_start( buttonBox, False, False, 10 )
-		box.show_all()
 		
 		
-		self._p_initialise()
+		self._initialise()
+		
+		
 
-
-		self._window = gtk.Window( gtk.WINDOW_TOPLEVEL );
-		self._window.connect( 'delete-event', self._p_onDeleteEvent )
-		self._window.connect( 'destroy', self._p_onDestroy )
-		self._window.set_border_width( 10 )
-		self._window.set_size_request( 640, 480 )
-		self._window.add( box )
-		self._window.show()
-
-
-
+		self._frame = JFrame( 'gSym' )
+		self._frame.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
+		
+		self._frame.setJMenuBar( menuBar )
+		
+		self._frame.add( self._docView.getComponent() )
+		
+		self._frame.pack()
+		
+		
+		
+		
+		
 		#
 		# LISP window
 		#
 		self._lispDocView = None
-		self._lispWindow = None
+		self._lispFrame = None
 		self._bLispWindowVisible = False
 
 		
 		# Set the document
 		self.setDocument( documentRoot )
-
+		
+		
 
 		#
 		# Plugins
@@ -331,40 +258,42 @@ class MainApp (object):
 		self._pluginInterface = MainAppPluginInterface( self )
 		InitPlugins.initPlugins( self._pluginInterface )
 
-
+		
+		
 		#
 		# Script window
 		#
 		scriptBanner = _( "gSym scripting console (uses pyconsole by Yevgen Muntyan)\nPython %s\nType help(object) for help on an object\nThe gSym scripting environment is available via the local variable 'gsym'\n" ) % ( sys.version, )
 		self._scriptEnv = GSymScriptEnvironment( self )
-		self._scriptConsole = Console( locals = { 'gsym' : self._scriptEnv }, banner=scriptBanner, use_rlcompleter=False )
-		self._scriptConsole.connect( 'command', self._p_onScriptPreCommand )
-		self._scriptConsole.connect_after( 'command', self._p_onScriptPostCommand )
-		self._scriptConsole.show()
+		#self._scriptConsole = Console( locals = { 'gsym' : self._scriptEnv }, banner=scriptBanner, use_rlcompleter=False )
+		#self._scriptConsole.connect( 'command', self._p_onScriptPreCommand )
+		#self._scriptConsole.connect_after( 'command', self._p_onScriptPostCommand )
+		#self._scriptConsole.show()
 
-		self._scriptScrolledWindow = gtk.ScrolledWindow()
-		self._scriptScrolledWindow.set_policy( gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC )
-		self._scriptScrolledWindow.add( self._scriptConsole )
-		self._scriptScrolledWindow.set_size_request( 640, 480 )
-		self._scriptScrolledWindow.show()
+		#self._scriptScrolledWindow = gtk.ScrolledWindow()
+		#self._scriptScrolledWindow.set_policy( gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC )
+		#self._scriptScrolledWindow.add( self._scriptConsole )
+		#self._scriptScrolledWindow.set_size_request( 640, 480 )
+		#self._scriptScrolledWindow.show()
 
-		self._scriptWindow = gtk.Window( gtk.WINDOW_TOPLEVEL )
-		self._scriptWindow.set_transient_for( self._window )
-		self._scriptWindow.add( self._scriptScrolledWindow )
-		self._scriptWindow.connect( 'delete-event', self._p_onScriptWindowDelete )
-		self._scriptWindow.set_title( _( 'gSym Script Window' ) )
+		#self._scriptWindow = gtk.Window( gtk.WINDOW_TOPLEVEL )
+		#self._scriptWindow.set_transient_for( self._window )
+		#self._scriptWindow.add( self._scriptScrolledWindow )
+		#self._scriptWindow.connect( 'delete-event', self._p_onScriptWindowDelete )
+		#self._scriptWindow.set_title( _( 'gSym Script Window' ) )
 		self._bScriptWindowVisible = False
+
+		
+
+	
+	def run(self):
+		self._frame.setVisible( True )
+
 		
 		
 		
 		
-		
-
-
-
-
-
-	def _p_initialise(self):
+	def _initialise(self):
 		pass
 		
 
@@ -375,12 +304,11 @@ class MainApp (object):
 		self._commandHistory = CommandHistory()
 		if self._documentRoot is not None:
 			self._commandHistory.track( self._documentRoot )
-		self._commandHistory.changedSignal.connect( self._p_onCommandHistoryChanged )
+		self._commandHistory.changedSignal.connect( self._onCommandHistoryChanged )
 		self._bUnsavedData = False
 		
 	
-		self._actionsMenu = gtk.Menu()
-		self._actionsMenuItem.set_submenu( self._actionsMenu )
+		self._actionsMenu.removeAll()
 		
 		contentHandler = GSymDocumentViewContentHandler( self._commandHistory )
 		self._docView.setDocumentContent( documentRoot, contentHandler )
@@ -392,166 +320,91 @@ class MainApp (object):
 		if self._lispDocView is not None:		
 			lispContentHandler = GSymDocumentLISPViewContentHandler( self._commandHistory )
 			self._lispDocView.setDocumentContent( self._documentRoot, lispContentHandler )
-		
-	
 
-
-
-	def _p_executeCode(self, source):
-		textView = gtk.TextView()
-		textBuffer = textView.get_buffer()
-		textView.set_wrap_mode( gtk.WRAP_WORD )
-		textView.set_editable( False )
-		textView.set_cursor_visible( True )
-		textView.show()
-
-		stdoutTag = textBuffer.create_tag( 'stdout', foreground="#006000")
-		stderrTag = textBuffer.create_tag( 'stderr', foreground="#006000")
-
-		scrolledWindow = gtk.ScrolledWindow()
-		scrolledWindow.set_policy( gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC )
-		scrolledWindow.add( textView )
-		scrolledWindow.set_size_request( 640, 480 )
-		scrolledWindow.show()
-
-		textViewWindow = gtk.Window( gtk.WINDOW_TOPLEVEL )
-		textViewWindow.set_transient_for( self._window )
-		textViewWindow.add( scrolledWindow )
-		textViewWindow.set_title( 'Output' )
-
-		textViewWindow.show()
-
-		savedStdout, savedStderr = sys.stdout, sys.stderr
-		sys.stdout = self._Output( textBuffer, 'stdout', savedStdout )
-		sys.stderr = self._Output( textBuffer, 'stderr', savedStderr )
-		exec source in {}
-		sys.stdout, sys.stderr = savedStdout, savedStderr
-
-
-
-
-	def _p_makeSourceWindow(self, text):
-		textView = gtk.TextView()
-		textView.get_buffer().set_text( text )
-		textView.set_wrap_mode( gtk.WRAP_WORD )
-		textView.set_editable( False )
-		textView.set_cursor_visible( False )
-		textView.show()
-
-		scrolledWindow = gtk.ScrolledWindow()
-		scrolledWindow.set_policy( gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC )
-		scrolledWindow.add( textView )
-		scrolledWindow.set_size_request( 640, 480 )
-		scrolledWindow.show()
-
-		textViewWindow = gtk.Window( gtk.WINDOW_TOPLEVEL )
-		textViewWindow.set_transient_for( self._window )
-		textViewWindow.add( scrolledWindow )
-		textViewWindow.set_title( 'Python source' )
-
-		textViewWindow.show()
-
-
-
-
-	def _p_onReset(self, widget):
-		self._docView.reset()
-		if self._lispDocView is not None:
-			self._lispDocView.reset()
-
-	def _p_onOneToOne(self, widget):
-		self._docView.oneToOne()
-		if self._lispDocView is not None:
-			self._lispDocView.oneToOne()
-
-
-
-
-
-	def _p_onCommandHistoryChanged(self, commandHistory):
+			
+			
+			
+			
+	def _onCommandHistoryChanged(self, commandHistory):
 		self._bUnsavedData = True
 
-
-
-
-	def _p_onNewEmpty(self, widget):
+		
+		
+	def _onNewEmpty(self):
 		bProceed = True
 		if self._bUnsavedData:
-			bProceed = confirmDialog( _( 'New project' ), _( 'You have not saved your work. Proceed?' ), gtk.STOCK_NEW, gtk.STOCK_CANCEL, 'y', 'n', True, self._window )
+			response = JOptionPane.showOptionDialog( self._frame, 'You have not saved your work. Proceed?', 'New Project', JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, None, [ 'New', 'Cancel' ], 'Cancel' )
+			bProceed = response == JOptionPane.YES_OPTION
 		if bProceed:
 			documentRoot = None
 			self.setDocument( documentRoot )
 
 
 	def registerNewDocumentFactory(self, menuLabel, newDocFn):
-		def _onNew(widget):
+		def _onNew():
 			bProceed = True
 			if self._bUnsavedData:
-				bProceed = confirmDialog( _( 'New' ), _( 'You have not saved your work. Proceed?' ), gtk.STOCK_NEW, gtk.STOCK_CANCEL, 'y', 'n', True, self._window )
+				response = JOptionPane.showOptionDialog( self._frame, 'You have not saved your work. Proceed?', 'New Project', JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, None, [ 'New', 'Cancel' ], 'Cancel' )
+				bProceed = response == JOptionPane.YES_OPTION
 			if bProceed:
 				content = newDocFn()
 				if content is not None:
 					documentRoot = newDocument( content )
 					self.setDocument( documentRoot )
-		menuItem = gtk.MenuItem( menuLabel )
-		menuItem.connect( 'activate', _onNew )
-		menuItem.show()
-		self._newMenu.append( menuItem )
-		
 
-	def _p_onOpen(self, widget):
+		self._newMenu.add( _action( menuLabel, _onNew ) )
+
+		
+		
+		
+		
+	def _onOpen(self):
 		bProceed = True
 		if self._bUnsavedData:
-			bProceed = confirmDialog( _( 'New project' ), _( 'You have not saved your work. Proceed?' ), gtk.STOCK_NEW, gtk.STOCK_CANCEL, 'y', 'n', True, self._window )
+			response = JOptionPane.showOptionDialog( self._frame, 'You have not saved your work. Proceed?', 'Open Project', JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, None, [ 'Open', 'Cancel' ], 'Cancel' )
+			bProceed = response == JOptionPane.YES_OPTION
 		if bProceed:
-			gsymFilter = gtk.FileFilter()
-			gsymFilter.set_name( _( 'gSym project (*.gsym)' ) )
-			gsymFilter.add_pattern( '*.gsym' )
-
-			openDialog = gtk.FileChooserDialog( _( 'Open' ), self._window, gtk.FILE_CHOOSER_ACTION_OPEN,
-											( gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_OK, gtk.RESPONSE_OK ) )
-			openDialog.add_filter( gsymFilter )
-			openDialog.show()
-			response = openDialog.run()
-			filename = openDialog.get_filename()
-			openDialog.destroy()
-			if response == gtk.RESPONSE_OK:
-				if filename is not None:
-					f = open( filename, 'r' )
-					if f is not None:
-						try:
-							documentRoot = readSX( f )
-							documentRoot = DMList( documentRoot )
-							self.setDocument( documentRoot )
-						except IOError:
-							pass
+			openDialog = JFileChooser()
+			openDialog.setFileFilter( FileNameExtensionFilter( 'gSym project (*.gsym)', [ 'gsym' ] ) )
+			response = openDialog.showOpenDialog( self._frame )
+			if response == JFileChooser.APPROVE_OPTION:
+				sf = openDialog.getSelectedFile()
+				if sf is not None:
+					filename = sf.getPath()
+					if filename is not None:
+						f = open( filename, 'r' )
+						if f is not None:
+							try:
+								documentRoot = readSX( f )
+								documentRoot = DMList( documentRoot )
+								self.setDocument( documentRoot )
+							except IOError:
+								pass
 
 
-	def _p_onSave(self, widget):
+	def _onSave(self):
 		filename = None
 		bFinished = False
 		while not bFinished:
-			gsymFilter = gtk.FileFilter()
-			gsymFilter.set_name( _( 'gSym project (*.gsym)' ) )
-			gsymFilter.add_pattern( '*.gsym' )
-
-			saveAsDialog = gtk.FileChooserDialog( _( 'Save As' ), self._window, gtk.FILE_CHOOSER_ACTION_SAVE,
-										( gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_OK, gtk.RESPONSE_OK ) )
-			saveAsDialog.add_filter( gsymFilter )
-			saveAsDialog.show()
-			response = saveAsDialog.run()
-			filenameFromDialog = saveAsDialog.get_filename()
-			saveAsDialog.destroy()
-			if response == gtk.RESPONSE_OK:
-				if filenameFromDialog is not None:
-					if os.path.exists( filenameFromDialog ):
-						if confirmOverwriteFileDialog( filenameFromDialog, self._window ):
+			openDialog = JFileChooser()
+			openDialog.setFileFilter( FileNameExtensionFilter( 'gSym project (*.gsym)', [ 'gsym' ] ) )
+			response = openDialog.showSaveDialog( self._frame )
+			if response == JFileChooser.APPROVE_OPTION:
+				sf = openDialog.getSelectedFile()
+				if sf is not None:
+					filenameFromDialog = sf.getPath()
+					if filenameFromDialog is not None:
+						if os.path.exists( filenameFromDialog ):
+							response = JOptionPane.showOptionDialog( self._frame, 'File already exists. Overwrite?', 'File already exists', JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, None, [ 'Overwrite', 'Cancel' ], 'Cancel' )
+							if response == JFileChooser.APPROVE_OPTION:
+								filename = filenameFromDialog
+								bFinished = True
+							else:
+								bFinished = False
+						else:
 							filename = filenameFromDialog
 							bFinished = True
-						else:
-							bFinished = False
 					else:
-						filename = filenameFromDialog
 						bFinished = True
 				else:
 					bFinished = True
@@ -559,108 +412,39 @@ class MainApp (object):
 				bFinished = True
 
 		if filename is not None:
-			self._p_writeFile( filename )
+			self._writeFile( filename )
 			return True
 		else:
 			return False
 
 
 	def registerImporter(self, menuLabel, fileType, filePattern, importFn):
-		def _onImport(widget):
+		def _onImport():
 			bProceed = True
 			if self._bUnsavedData:
-				bProceed = confirmDialog( _( 'Import' ), _( 'You have not saved your work. Proceed?' ), gtk.STOCK_NEW, gtk.STOCK_CANCEL, 'y', 'n', True, self._window )
+				response = JOptionPane.showOptionDialog( self._frame, 'You have not saved your work. Proceed?', 'Import', JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, None, [ 'Open', 'Cancel' ], 'Cancel' )
+				bProceed = response == JOptionPane.YES_OPTION
 			if bProceed:
-				filter = gtk.FileFilter()
-				filter.set_name( fileType )
-				filter.add_pattern( filePattern )
-	
-				openDialog = gtk.FileChooserDialog( _( 'Import' ), self._window, gtk.FILE_CHOOSER_ACTION_OPEN,
-												( gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_OK, gtk.RESPONSE_OK ) )
-				openDialog.add_filter( filter )
-				openDialog.show()
-				response = openDialog.run()
-				filename = openDialog.get_filename()
-				openDialog.destroy()
-				if response == gtk.RESPONSE_OK:
-					if filename is not None:
-						content = importFn( filename )
-						if content is not None:
-							documentRoot = newDocument( content )
-							self.setDocument( documentRoot )
-		menuItem = gtk.MenuItem( menuLabel )
-		menuItem.connect( 'activate', _onImport )
-		menuItem.show()
-		self._importMenu.append( menuItem )
+				openDialog = JFileChooser()
+				openDialog.setFileFilter( FileNameExtensionFilter( fileType, [ filePattern ] ) )
+				response = openDialog.showDialog( self._frame, 'Import' )
+				if response == JFileChooser.APPROVE_OPTION:
+					sf = openDialog.getSelectedFile()
+					if sf is not None:
+						filename = sf.getPath()
+						if filename is not None:
+							content = importFn( filename )
+							if content is not None:
+								documentRoot = newDocument( content )
+								self.setDocument( documentRoot )
 		
+		self._importMenu.add( _action( menuLabel, _onImport ) )
 
-	def _p_onImportPy(self, widget):
-		pass
-		#bProceed = True
-		#if self._bUnsavedData:
-			#bProceed = confirmDialog( _( 'New project' ), _( 'You have not saved your work. Proceed?' ), gtk.STOCK_NEW, gtk.STOCK_CANCEL, 'y', 'n', True, self._window )
-		#if bProceed:
-			#pyFilter = gtk.FileFilter()
-			#pyFilter.set_name( _( 'Python source (*.py)' ) )
-			#pyFilter.add_pattern( '*.py' )
-
-			#openDialog = gtk.FileChooserDialog( _( 'Import' ), self._window, gtk.FILE_CHOOSER_ACTION_OPEN,
-											#( gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_OK, gtk.RESPONSE_OK ) )
-			#openDialog.add_filter( pyFilter )
-			#openDialog.show()
-			#response = openDialog.run()
-			#filename = openDialog.get_filename()
-			#openDialog.destroy()
-			#if response == gtk.RESPONSE_OK:
-				#if filename is not None:
-					#f = open( filename, 'r' )
-					#if f is not None:
-						#graph, root = self.importPythonSource( f.read() )
-						#if graph is not None  and  root is not None:
-							#self.setGraph( graph, root )
-
-
-
-	def _p_onExportTeX(self, widget):
-		pass
-		#filename = None
-		#bFinished = False
-		#while not bFinished:
-			#texFilter = gtk.FileFilter()
-			#texFilter.set_name( _( 'TeX document (*.tex)' ) )
-			#texFilter.add_pattern( '*.tex' )
-
-			#saveAsDialog = gtk.FileChooserDialog( _( 'Export TeX' ), self._window, gtk.FILE_CHOOSER_ACTION_SAVE,
-										#( gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_OK, gtk.RESPONSE_OK ) )
-			#saveAsDialog.add_filter( texFilter )
-			#saveAsDialog.show()
-			#response = saveAsDialog.run()
-			#filenameFromDialog = saveAsDialog.get_filename()
-			#saveAsDialog.destroy()
-			#if response == gtk.RESPONSE_OK:
-				#if filenameFromDialog is not None:
-					#if os.path.exists( filenameFromDialog ):
-						#if confirmOverwriteFileDialog( filenameFromDialog, self._window ):
-							#filename = filenameFromDialog
-							#bFinished = True
-						#else:
-							#bFinished = False
-					#else:
-						#filename = filenameFromDialog
-						#bFinished = True
-				#else:
-					#bFinished = True
-			#else:
-				#bFinished = True
-
-		#if filename is not None:
-			#self._p_exportTeX( filename )
-			#return True
-		#else:
-			#return False
-
-
-	def _p_writeFile(self, filename):
+		
+		
+		
+		
+	def _writeFile(self, filename):
 		f = open( filename, 'w' )
 		if f is not None:
 			writeSX( f, self._documentRoot )
@@ -668,77 +452,59 @@ class MainApp (object):
 			self._bUnsavedData = False
 
 
-	#def _p_exportTeX(self, filename):
-		#open( filename, 'w' ).write( self._graphRoot.generateTex().asText() )
-
-
-	def _p_onUndo(self, sender):
+	def _onUndo(self):
 		if self._commandHistory.canUndo():
 			self._commandHistory.undo()
 
-	def _p_onRedo(self, sender):
+	def _onRedo(self):
 		if self._commandHistory.canRedo():
 			self._commandHistory.redo()
 
 
-
-	def _p_onExecute(self, widget):
-		pyCodeBlock = self._graphRoot.generatePyCodeBlock()
-		text = pyCodeBlock.asText()
-		self._p_executeCode( text )
-
-
-	def _p_onShowCode(self, widget):
-		pyCodeBlock = self._graphRoot.generatePyCodeBlock()
-		text = pyCodeBlock.asText()
-		self._p_makeSourceWindow( text )
-
-
-
-
-	def _p_onDeleteEvent(self, widget, event, data=None):
-		return False
-
-	def _p_onDestroy(self, widget, data=None):
-		gtk.main_quit()
-
 		
-		
-		
-	def _onShowLisp(self, widget):
+
+	def _onShowLisp(self):
 		self._bLispWindowVisible = not self._bLispWindowVisible
 		if self._bLispWindowVisible:
+			class _Listener (WindowListener):
+				def windowActivated(listener, event):
+					pass
+				
+				def windowClosed(listener, event):
+					self._lispDocView = None
+					self._lispFrame = None
+					self._bLispWindowVisible = False
+				
+				def windowClosing(listener, event):
+					pass
+				
+				def windowDeactivated(listener, event):
+					pass
+				
+				def windowDeiconified(listener, event):
+					pass
+				
+				def windowIconified(listener, event):
+					pass
+				
+				def windowOpened(listener, event):
+					pass
+			
+			
 			self._lispDocView = MainAppDocView( self )
-			self._lispWindow = gtk.Window( gtk.WINDOW_TOPLEVEL )
-			self._lispWindow.set_transient_for( self._window )
-			self._lispWindow.connect( 'delete-event', self._p_onLispWindowDelete )
-			self._lispWindow.set_title( _( 'LISP View Window' ) )
-			self._lispWindow.set_size_request( 640, 480 )
-			self._lispWindow.add( self._lispDocView.getGtkWidget() )
-			self._bLispWindowVisible = False
-			self._lispWindow.show()
+			self._lispFrame = JFrame( 'LISP View Window' )
+			self._lispFrame.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
+			self._lispFrame.add( self._lispDocView.getComponent() )
+			self._lispFrame.pack()
+			self._lispFrame.setVisible( True )
 			self._setLispDocument()
 		else:
 			self._lispDocView = None
-			self._lispWindow.destroy()
-			self._lispWindow = None
+			self._lispFrame.dispose()
+			self._lispFrame = None
 
 
-
-	def _p_onLispWindowDelete(self, window, event):
-		self._lispDocView = None
-		self._lispWindow = None
-		self._bLispWindowVisible = False
-		return False
-
-
-	
-	def _p_onScriptWindowDelete(self, window, event):
-		window.hide()
-		self._bScriptWindowVisible = False
-		return True
-
-	def _p_onScriptWindowMenuItem(self, widget):
+	def _onScriptWindowMenuItem(self):
 		self._bScriptWindowVisible = not self._bScriptWindowVisible
 		if self._bScriptWindowVisible:
 			self._scriptWindow.show()
@@ -746,23 +512,26 @@ class MainApp (object):
 			self._scriptWindow.hide()
 
 
-	def _p_onScriptPreCommand(self, console, code):
-		self._commandHistory.freeze()
+	def _onReset(self):
+		self._docView.reset()
+		if self._lispDocView is not None:
+			self._lispDocView.reset()
 
-	def _p_onScriptPostCommand(self, console, code):
-		self._commandHistory.thaw()
+	def _onOneToOne(self):
+		self._docView.oneToOne()
+		if self._lispDocView is not None:
+			self._lispDocView.oneToOne()
+
+			
+	#def _p_onScriptPreCommand(self, console, code):
+		#self._commandHistory.freeze()
+
+	#def _p_onScriptPostCommand(self, console, code):
+		#self._commandHistory.thaw()
 
 
 
 
 	
-	
-	@staticmethod
-	def makeEmptyDocument():
-		return DMList()
 
-
-	@staticmethod
-	def importPythonSource(source):
-		return PythonImporter.importPythonSource( source )
 
