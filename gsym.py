@@ -6,6 +6,12 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
 import sys
+import os
+
+from javax.swing import UIManager
+
+from Britefury.InitBritefuryJ import initBritefuryJ
+initBritefuryJ()
 
 from Britefury.I18n import i18n
 i18n.initialise()
@@ -20,15 +26,7 @@ from Britefury.gSym.gSymEnvironment import initGSymEnvironment, shutdownGSymEnvi
 from Britefury.MainApp.MainApp import MainApp
 
 
-
-
-
-if __name__ == '__main__':
-	import pygtk
-	pygtk.require( '2.0' )
-	import gtk
-
-	
+def main():
 	initGSymEnvironment()
 	
 
@@ -40,9 +38,15 @@ if __name__ == '__main__':
 			bEvaluate = True
 		except IOError:
 			pass
+		
+	UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
 
 	app = MainApp( None )
 
-	gtk.main()
+	app.run()
 	
 	shutdownGSymEnvironment()
+
+
+if __name__ == '__main__':
+	main()

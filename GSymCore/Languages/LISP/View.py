@@ -63,8 +63,8 @@ class ParsedNodeContentListener (ElementContentListener):
 		
 	
 	
-def nodeEditor(ctx, node, contents, metadata, state):
-	return contentListener( ctx, contents, ParsedNodeContentListener( ctx, node ) ), metadata
+def nodeEditor(ctx, node, contents, state):
+	return contentListener( ctx, contents, ParsedNodeContentListener( ctx, node ) )
 
 
 def stringNodeEditor(ctx, node, metadata, state):
@@ -119,7 +119,7 @@ def viewLispNode(node, ctx, state):
 			raise ValueError
 		v = listView( ctx, layout, lambda: text( ctx, punctuation_textStyle, '(' ), lambda: text( ctx, punctuation_textStyle, ')' ), None, xViews )
 		
-		return nodeEditor( ctx, node, v, None, state )
+		return nodeEditor( ctx, node, v, state )
 	else:
 		raise TypeError, 'node is %s'  %  node
 	
