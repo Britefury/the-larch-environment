@@ -11,7 +11,7 @@ import BritefuryJ.Parser.Forward;
 import BritefuryJ.Parser.Literal;
 import BritefuryJ.Parser.Production;
 import BritefuryJ.Parser.ParserExpression;
-import BritefuryJ.Parser.DebugViewer.ParseView;
+import BritefuryJ.Parser.DebugViewer.ParseViewFrame;
 
 public class DebugViewerTest
 {
@@ -20,8 +20,7 @@ public class DebugViewerTest
 		String input = "this[i][j].x.m()";
 		ParserExpression parser = buildParser();
 		DebugParseResult result = parser.debugParseString( input );
-		ParseView view = new ParseView( result, input );
-		view.showInFrame();
+		new ParseViewFrame( result, input );
 	}
 	
 	
