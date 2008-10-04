@@ -8,16 +8,21 @@ package BritefuryJ.Parser.DebugViewer;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.geom.Rectangle2D;
 import java.util.Arrays;
 import java.util.Vector;
 import java.util.regex.Pattern;
 
+import BritefuryJ.DocPresent.DPBin;
 import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPHBox;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.StyleSheets.BorderStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
@@ -26,6 +31,68 @@ import BritefuryJ.Parser.ParseResult;
 
 public class NodeView
 {
+	private static class DPNodeBin extends DPBin
+	{
+		private NodeView nodeView;
+		private boolean bHighlight;
+		
+		public DPNodeBin(NodeView nodeView)
+		{
+			super( ContainerStyleSheet.defaultStyleSheet );
+			
+			this.nodeView = nodeView;
+			this.bHighlight = false;
+		}
+		
+		
+		
+		void highlight()
+		{
+			if ( !bHighlight )
+			{
+				bHighlight = true;
+				queueFullRedraw();
+			}
+		}
+		
+		void unhighlight()
+		{
+			if ( bHighlight )
+			{
+				bHighlight = false;
+				queueFullRedraw();
+			}
+		}
+		
+		
+		
+		protected boolean handleButtonDown(PointerButtonEvent event)
+		{
+			boolean bResult = super.handleButtonDown( event );
+			
+			if ( event.getButton() == 1 )
+			{
+				nodeView.onClicked();
+				return true;
+			}
+			else
+			{
+				return bResult;
+			}
+		}
+
+
+		
+		protected void drawBackground(Graphics2D graphics)
+		{
+			Color backgroundColour = bHighlight  ?  new Color( 1.0f, 1.0f, 0.5f )  :  Color.white;
+			graphics.setColor( backgroundColour );
+			graphics.fill( new Rectangle2D.Double( 0.0, 0.0, allocation.x, allocation.y ) );
+		}
+	}
+
+	
+	
 	static int MAX_STRING_LENGTH = 64;
 	
 	static TextStyleSheet debugNameStyle = new TextStyleSheet( new Font( "Sans serif", Font.BOLD, 24 ), Color.blue );
@@ -38,7 +105,7 @@ public class NodeView
 	static VBoxStyleSheet titleSuccessVBoxStyle = new VBoxStyleSheet( DPVBox.Typesetting.NONE, DPVBox.Alignment.CENTRE, 0.0, false, 0.0, new Color( 0.85f, 0.95f, 0.85f ) );
 	static VBoxStyleSheet titleFailVBoxStyle = new VBoxStyleSheet( DPVBox.Typesetting.NONE, DPVBox.Alignment.CENTRE, 0.0, false, 0.0, new Color( 1.0f, 0.85f, 0.85f ) );
 	static VBoxStyleSheet contentVBoxStyle = new VBoxStyleSheet( DPVBox.Typesetting.NONE, DPVBox.Alignment.LEFT, 0.0, false, 0.0 );
-	static VBoxStyleSheet nodeVBoxStyle = new VBoxStyleSheet( DPVBox.Typesetting.NONE, DPVBox.Alignment.EXPAND, 0.0, false, 0.0, Color.white );
+	static VBoxStyleSheet nodeVBoxStyle = new VBoxStyleSheet( DPVBox.Typesetting.NONE, DPVBox.Alignment.EXPAND, 0.0, false, 0.0 );
 	static BorderStyleSheet nodeBorderStyle = new BorderStyleSheet( 1.0, 1.0, 1.0, 1.0, Color.black );
 	
 	static VBoxStyleSheet childrenVBoxStyle = new VBoxStyleSheet( DPVBox.Typesetting.NONE, DPVBox.Alignment.LEFT, 3.0, false, 3.0 );
@@ -47,6 +114,7 @@ public class NodeView
 	
 	
 	private DPWidget nodeWidget, mainWidget;
+	private DPNodeBin nodeBinWidget;
 	private ParseView parseView;
 	private Vector<NodeView> children;
 	private DebugNode data;
@@ -93,7 +161,13 @@ public class NodeView
 	}
 	
 	
-	void registerEdges()
+	protected DebugNode getDebugNode()
+	{
+		return data;
+	}
+	
+	
+	protected void registerEdges()
 	{
 		for (NodeView child: children)
 		{
@@ -110,6 +184,27 @@ public class NodeView
 			child.registerEdges();
 		}
 	}
+	
+	
+	
+	private void onClicked()
+	{
+		parseView.onNodeSelected( this );
+	}
+	
+	
+	protected void highlight()
+	{
+		nodeBinWidget.highlight();
+	}
+	
+	protected void unhighlight()
+	{
+		nodeBinWidget.unhighlight();
+	}
+	
+	
+	
 	
 	
 	
@@ -221,8 +316,11 @@ public class NodeView
 		DPWidget[] children = { titleBoxWidget, contentBoxWidget };
 		nodeBoxWidget.setChildren( Arrays.asList( children ) );
 		
+		nodeBinWidget = new DPNodeBin( this );
+		nodeBinWidget.setChild( nodeBoxWidget );
+		
 		DPBorder nodeBorderWidget = new DPBorder( nodeBorderStyle );
-		nodeBorderWidget.setChild( nodeBoxWidget );
+		nodeBorderWidget.setChild( nodeBinWidget );
 		
 		return nodeBorderWidget;
 	}
