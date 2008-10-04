@@ -12,10 +12,11 @@ from Britefury.InitBritefuryJ import initBritefuryJ
 initBritefuryJ()
 
 from Britefury.Tests.BritefuryJ.Parser.Utils import Operators
+from Britefury.Tests.Britefury.Grammar import Grammar
 
 
 
-testModules = [ Operators ]
+testModules = [ Operators, Grammar ]
 
 
 if __name__ == '__main__':

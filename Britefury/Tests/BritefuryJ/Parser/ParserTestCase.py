@@ -48,7 +48,7 @@ class ParserTestCase (unittest.TestCase):
 			print 'EXPECTED:'
 			print expected
 			print 'RESULT:'
-			print res
+			print value
 
 		bSame = self._cmpValue( value, expected )
 		if not bSame:
