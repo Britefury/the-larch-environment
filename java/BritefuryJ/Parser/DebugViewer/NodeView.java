@@ -21,6 +21,7 @@ import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
+import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.StyleSheets.BorderStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
@@ -34,32 +35,33 @@ public class NodeView
 	private static class DPNodeBin extends DPBin
 	{
 		private NodeView nodeView;
-		private boolean bHighlight;
+		private boolean bSelected, bHighlight;
 		
 		public DPNodeBin(NodeView nodeView)
 		{
 			super( ContainerStyleSheet.defaultStyleSheet );
 			
 			this.nodeView = nodeView;
-			this.bHighlight = false;
+			bSelected = false;
+			bHighlight = false;
 		}
 		
 		
 		
-		void highlight()
+		void select()
 		{
-			if ( !bHighlight )
+			if ( !bSelected )
 			{
-				bHighlight = true;
+				bSelected = true;
 				queueFullRedraw();
 			}
 		}
 		
-		void unhighlight()
+		void unselect()
 		{
-			if ( bHighlight )
+			if ( bSelected )
 			{
-				bHighlight = false;
+				bSelected = false;
 				queueFullRedraw();
 			}
 		}
@@ -80,12 +82,29 @@ public class NodeView
 				return bResult;
 			}
 		}
+		
+		protected void onEnter(PointerMotionEvent event)
+		{
+			super.onEnter( event );
+			
+			bHighlight = true;
+			queueFullRedraw();
+		}
+
+		protected void onLeave(PointerMotionEvent event)
+		{
+			super.onLeave( event );
+
+			bHighlight = false;
+			queueFullRedraw();
+		}
 
 
 		
 		protected void drawBackground(Graphics2D graphics)
 		{
-			Color backgroundColour = bHighlight  ?  new Color( 1.0f, 1.0f, 0.5f )  :  Color.white;
+			Color backgroundColour = bHighlight  ?  new Color( 0.7f, 0.85f, 1.0f )  :  Color.white;
+			backgroundColour = bSelected  ?  new Color( 1.0f, 1.0f, 0.6f )  :  backgroundColour;
 			graphics.setColor( backgroundColour );
 			graphics.fill( new Rectangle2D.Double( 0.0, 0.0, allocation.x, allocation.y ) );
 		}
@@ -193,14 +212,14 @@ public class NodeView
 	}
 	
 	
-	protected void highlight()
+	protected void select()
 	{
-		nodeBinWidget.highlight();
+		nodeBinWidget.select();
 	}
 	
-	protected void unhighlight()
+	protected void unselect()
 	{
-		nodeBinWidget.unhighlight();
+		nodeBinWidget.unselect();
 	}
 	
 	

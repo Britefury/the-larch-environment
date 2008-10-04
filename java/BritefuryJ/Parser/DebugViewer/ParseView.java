@@ -199,7 +199,7 @@ public class ParseView
 		{
 			if ( selection != null )
 			{
-				selection.unhighlight();
+				selection.unselect();
 			}
 			
 			selection = node;
@@ -207,7 +207,7 @@ public class ParseView
 
 			if ( selection != null )
 			{
-				selection.highlight();
+				selection.select();
 				d = selection.getDebugNode();
 			}
 			

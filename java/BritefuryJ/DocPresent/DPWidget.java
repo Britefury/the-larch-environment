@@ -728,7 +728,7 @@ abstract public class DPWidget
 	{
 	}
 
-	protected void onEnter(PointerMotionEvent events)
+	protected void onEnter(PointerMotionEvent event)
 	{
 	}
 
