@@ -114,17 +114,28 @@ public class ParseView
 		}
 	}
 	
+	
+	
+	public static interface ParseViewListener
+	{
+		public void onSelectionChanged(DebugNode selection);
+	}
+	
 	private DPPresentationArea area;
 	private DPViewBin bin;
 	private HashMap<DebugNode, NodeView> nodeTable;
 	private Vector<Edge> callEdges, memoEdges;
 	private NodeView root;
+	private NodeView selection;
+	private ParseViewListener listener;
 	
 	
 	
 	
 	public ParseView(DebugParseResult result, String input)
 	{
+		selection = null;
+		
 		area = new DPPresentationArea();
 		
 		bin = new DPViewBin( ContainerStyleSheet.defaultStyleSheet, this );
@@ -140,6 +151,13 @@ public class ParseView
 		bin.setChild( root.getWidget() );
 		area.setChild( bin );
 		area.disableHorizontalClamping();
+	}
+	
+	
+	
+	public void setListener(ParseViewListener listener)
+	{
+		this.listener = listener;
 	}
 	
 	
@@ -171,5 +189,33 @@ public class ParseView
 	protected void addMemoEdge(NodeView a, NodeView b)
 	{
 		memoEdges.add( new Edge( this, a, b ) );
+	}
+	
+	
+	
+	protected void onNodeSelected(NodeView node)
+	{
+		if ( node != selection )
+		{
+			if ( selection != null )
+			{
+				selection.unhighlight();
+			}
+			
+			selection = node;
+			DebugNode d = null;
+
+			if ( selection != null )
+			{
+				selection.highlight();
+				d = selection.getDebugNode();
+			}
+			
+			
+			if ( listener != null )
+			{
+				listener.onSelectionChanged( d );
+			}
+		}
 	}
 }
