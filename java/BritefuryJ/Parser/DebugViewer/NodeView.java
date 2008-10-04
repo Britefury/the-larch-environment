@@ -26,21 +26,22 @@ import BritefuryJ.Parser.ParseResult;
 
 public class NodeView
 {
-	static int MAX_STRING_LENGTH = 16;
+	static int MAX_STRING_LENGTH = 64;
 	
 	static TextStyleSheet debugNameStyle = new TextStyleSheet( new Font( "Sans serif", Font.BOLD, 24 ), Color.blue );
-	static TextStyleSheet classNameStyle = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 14 ), new Color( 0.0f, 0.0f, 0.5f ) );
+	static TextStyleSheet classNameStyle = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 18 ), new Color( 0.0f, 0.0f, 0.5f ) );
 	static TextStyleSheet rangeStyle = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.black );
 	static TextStyleSheet inputStyle = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.black );
-	static TextStyleSheet valueStyle = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.black );
-	static TextStyleSheet failStyle = new TextStyleSheet( new Font( "Sans serif", Font.ITALIC, 12 ), new Color( 0.5f, 0.0f, 0.0f ) );
+	static TextStyleSheet valueStyle = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 16 ), Color.black );
+	static TextStyleSheet failStyle = new TextStyleSheet( new Font( "Sans serif", Font.ITALIC, 16 ), new Color( 0.5f, 0.0f, 0.0f ) );
 	static HBoxStyleSheet titleTextHBoxStyle = new HBoxStyleSheet( DPHBox.Alignment.BASELINES, 10.0, false, 0.0 );
-	static VBoxStyleSheet titleVBoxStyle = new VBoxStyleSheet( DPVBox.Typesetting.NONE, DPVBox.Alignment.CENTRE, 0.0, false, 0.0, new Color( 0.8f, 0.8f, 0.8f ) );
+	static VBoxStyleSheet titleSuccessVBoxStyle = new VBoxStyleSheet( DPVBox.Typesetting.NONE, DPVBox.Alignment.CENTRE, 0.0, false, 0.0, new Color( 0.85f, 0.95f, 0.85f ) );
+	static VBoxStyleSheet titleFailVBoxStyle = new VBoxStyleSheet( DPVBox.Typesetting.NONE, DPVBox.Alignment.CENTRE, 0.0, false, 0.0, new Color( 1.0f, 0.85f, 0.85f ) );
 	static VBoxStyleSheet contentVBoxStyle = new VBoxStyleSheet( DPVBox.Typesetting.NONE, DPVBox.Alignment.LEFT, 0.0, false, 0.0 );
 	static VBoxStyleSheet nodeVBoxStyle = new VBoxStyleSheet( DPVBox.Typesetting.NONE, DPVBox.Alignment.EXPAND, 0.0, false, 0.0, Color.white );
 	static BorderStyleSheet nodeBorderStyle = new BorderStyleSheet( 1.0, 1.0, 1.0, 1.0, Color.black );
 	
-	static VBoxStyleSheet childrenVBoxStyle = new VBoxStyleSheet( DPVBox.Typesetting.NONE, DPVBox.Alignment.LEFT, 3.0, false, 5.0 );
+	static VBoxStyleSheet childrenVBoxStyle = new VBoxStyleSheet( DPVBox.Typesetting.NONE, DPVBox.Alignment.LEFT, 3.0, false, 3.0 );
 	static HBoxStyleSheet mainHBoxStyle = new HBoxStyleSheet( DPHBox.Alignment.CENTRE, 80.0, false, 0.0 );
 	
 	
@@ -142,7 +143,9 @@ public class NodeView
 	{
 		DPWidget titleWidget = makeTitleWidget( data );
 		
-		DPVBox titleBoxWidget = new DPVBox( titleVBoxStyle );
+		VBoxStyleSheet style = data.getResult().isValid()  ?  titleSuccessVBoxStyle  :  titleFailVBoxStyle;
+		
+		DPVBox titleBoxWidget = new DPVBox( style );
 		
 		DPWidget[] children = { titleWidget };
 		titleBoxWidget.setChildren( Arrays.asList( children ) );
@@ -156,11 +159,11 @@ public class NodeView
 		
 		if ( result.isValid() )
 		{
-			rangeText = ":" + String.valueOf( result.getEnd() );
+			rangeText = String.valueOf( result.getBegin() ) + "   :   " + String.valueOf( result.getEnd() );
 		}
 		else
 		{
-			rangeText = String.valueOf( result.getBegin() ) + "   :   " + String.valueOf( result.getEnd() );
+			rangeText = ":" + String.valueOf( result.getEnd() );
 		}
 
 		return new DPText( rangeStyle, rangeText );
@@ -213,7 +216,7 @@ public class NodeView
 	{
 		DPWidget titleBoxWidget = makeTitleBoxWidget( data );
 		DPWidget contentBoxWidget = makeContentBoxWidget( data, input );
-
+		
 		DPVBox nodeBoxWidget = new DPVBox( nodeVBoxStyle );
 		DPWidget[] children = { titleBoxWidget, contentBoxWidget };
 		nodeBoxWidget.setChildren( Arrays.asList( children ) );

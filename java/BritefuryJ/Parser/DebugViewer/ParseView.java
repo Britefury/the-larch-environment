@@ -7,14 +7,10 @@
 package BritefuryJ.Parser.DebugViewer;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.geom.CubicCurve2D;
 import java.util.HashMap;
 import java.util.Vector;
-
-import javax.swing.JFrame;
-import javax.swing.WindowConstants;
 
 import BritefuryJ.DocPresent.DPBin;
 import BritefuryJ.DocPresent.DPPresentationArea;
@@ -175,19 +171,5 @@ public class ParseView
 	protected void addMemoEdge(NodeView a, NodeView b)
 	{
 		memoEdges.add( new Edge( this, a, b ) );
-	}
-	
-	
-	
-	public void showInFrame()
-	{
-		JFrame frame = new JFrame( "Parse tree" );
-		frame.setDefaultCloseOperation( WindowConstants.DISPOSE_ON_CLOSE );
-
-		area.getComponent().setPreferredSize( new Dimension( 640, 480 ) );
-		frame.add( area.getComponent() );
-		frame.pack();
-		frame.setVisible(true);
-		area.zoomToFit();
 	}
 }
