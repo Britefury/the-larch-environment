@@ -8,7 +8,7 @@ package BritefuryJ.CommandHistory;
 
 public class CommandTracker
 {
-	private CommandHistory commandHistory;
+	protected CommandHistory commandHistory;
 	
 	
 	public CommandTracker(CommandHistory commandHistory)
