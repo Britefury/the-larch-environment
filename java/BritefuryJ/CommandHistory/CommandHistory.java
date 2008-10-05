@@ -119,10 +119,17 @@ public class CommandHistory
 	
 	
 	
+	
+	//
+	//
+	// Constructor
+	//
+	//
 	public CommandHistory()
 	{
 		past = new Vector<Entry>();
 		future = new Vector<Entry>();
+		trackers = new HashMap<CommandTrackerFactory, CommandTracker>();
 		bCommandsBlocked = false;
 		bFrozen = false;
 		freezeCount = 0;
