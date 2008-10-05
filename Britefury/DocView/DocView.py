@@ -30,8 +30,8 @@ class DocView (object):
 
 		self._rootNodeInitialiser = rootNodeInitialiser
 
-		self.refreshCell = Cell()
-		self.refreshCell.setFunction( self._p_refresh )
+		self._refreshCell = Cell()
+		self._refreshCell.setFunction( self._p_refresh )
 
 		self._nodeTable = DocViewNodeTable()
 		
@@ -106,7 +106,10 @@ class DocView (object):
 
 
 	def refresh(self):
-		self.refreshCell.getValue()
+		self._refreshCell.getValue()
+		
+	def getRefreshCell(self):
+		return self._refreshCell
 
 
 

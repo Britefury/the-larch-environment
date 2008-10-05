@@ -86,7 +86,7 @@ class MainAppDocView (CellListener):
 	def setDocumentContent(self, documentRoot, contentHandler):
 		if documentRoot is not None:
 			self._view = loadDocument( self._app._world, documentRoot, contentHandler )
-			self._view.refreshCell.addListener( self )
+			self._view.getRefreshCell().addListener( self )
 			self._view.refresh()
 			self._elementTree.getRoot().setChild( self._view.getRootView().getElement() )
 		else:

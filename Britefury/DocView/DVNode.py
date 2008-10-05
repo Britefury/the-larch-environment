@@ -37,15 +37,14 @@ class DVNode (object):
 		self.docNode = treeNode.node
 		self._view = view
 		self._parent = None
-		self.refreshCell = Cell()
-		self.refreshCell.setFunction( self._o_refreshNode )
+		self._refreshCell = Cell()
+		self._refreshCell.setFunction( self._o_refreshNode )
 		
 		self._element = ProxyElement( _defaultProxyStyleSheet )
 		self._elementContent = None
 		self._contentsFactory = None
 		self._contentsCell = Cell()
 		self._contentsCell.setFunction( self._p_computeContents )
-		self.focus = None
 		
 		self._children = set()
 			
@@ -182,11 +181,11 @@ class DVNode (object):
 				
 		
 	def _o_resetRefreshCell(self):
-		self.refreshCell.setFunction( self._o_refreshNode )
+		self._refreshCell.setFunction( self._o_refreshNode )
 
 
 	def refresh(self):
-		self.refreshCell.getValue()
+		self._refreshCell.getValue()
 
 
 	def _getCursorPositionBiasAndContentString(self, element):

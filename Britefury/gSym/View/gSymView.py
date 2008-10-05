@@ -375,7 +375,6 @@ class _GSymViewInstance (object):
 		self.generalNodeViewFunction = viewFactory.createViewFunction()
 		# self._p_buildDVNode is a factory that builds DVNode instances for document subtrees
 		self.view = DocView( self.tree, self.xs, commandHistory, self._rootNodeViewInitialiser )
-		self.focusWidget = None
 		
 		self._indentationStyleSheets = {}
 		
