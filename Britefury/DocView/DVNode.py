@@ -27,10 +27,6 @@ _defaultProxyStyleSheet = ContainerStyleSheet()
 
 
 class DVNode (object):
-	class _CouldNotFindNextChildError (Exception):
-		pass
-
-
 	def __init__(self, view, treeNode):
 		super( DVNode, self ).__init__()
 		self.treeNode = treeNode

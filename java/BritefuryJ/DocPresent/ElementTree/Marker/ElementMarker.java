@@ -9,6 +9,7 @@ package BritefuryJ.DocPresent.ElementTree.Marker;
 
 import BritefuryJ.DocPresent.DPContentLeaf;
 import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.DPWidget.IsNotInSubtreeException;
 import BritefuryJ.DocPresent.ElementTree.BranchElement;
 import BritefuryJ.DocPresent.ElementTree.Element;
 import BritefuryJ.DocPresent.ElementTree.ElementTree;
@@ -48,7 +49,7 @@ public class ElementMarker
 		return widgetMarker.getPosition();
 	}
 	
-	public int getPositionInSubtree(Element subtreeRoot)
+	public int getPositionInSubtree(Element subtreeRoot) throws IsNotInSubtreeException
 	{
 		Element element = getElement();
 		if ( subtreeRoot == element )
@@ -80,7 +81,7 @@ public class ElementMarker
 		return widgetMarker.getIndex();
 	}
 	
-	public int getIndexInSubtree(Element subtreeRoot)
+	public int getIndexInSubtree(Element subtreeRoot) throws IsNotInSubtreeException
 	{
 		int p = getPositionInSubtree( subtreeRoot );
 		return getBias() == Bias.END  ?  p + 1  :  p;

@@ -139,7 +139,7 @@ public abstract class Element
 		path.add( this );
 	}
 	
-	public void getElementPathToSubtreeRoot(BranchElement subtreeRoot, List<Element> path)
+	public void getElementPathToSubtreeRoot(BranchElement subtreeRoot, List<Element> path) throws IsNotInSubtreeException
 	{
 		// Root to top
 		if ( subtreeRoot != this )

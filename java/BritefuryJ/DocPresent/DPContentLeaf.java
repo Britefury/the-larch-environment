@@ -580,7 +580,14 @@ public abstract class DPContentLeaf extends DPWidget
 	{
 		if ( parent != null )
 		{
-			return parent.getContentLeafAboveOrBelowFromChild( this, bBelow, getLocalPointRelativeToAncestor( parent, localPos ), bSkipWhitespace );
+			try
+			{
+				return parent.getContentLeafAboveOrBelowFromChild( this, bBelow, getLocalPointRelativeToAncestor( parent, localPos ), bSkipWhitespace );
+			}
+			catch (IsNotInSubtreeException e)
+			{
+				throw new RuntimeException();
+			}
 		}
 		else
 		{

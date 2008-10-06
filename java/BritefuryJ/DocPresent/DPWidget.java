@@ -45,7 +45,7 @@ abstract public class DPWidget
 	//
 	//
 	
-	public static class IsNotInSubtreeException extends RuntimeException
+	public static class IsNotInSubtreeException extends Exception
 	{
 		static final long serialVersionUID = 0L;
 	}
@@ -189,7 +189,14 @@ abstract public class DPWidget
 	
 	public Xform2 getTransformRelativeToRoot(Xform2 x)
 	{
-		return getTransformRelativeToAncestor( null, x );
+		try
+		{
+			return getTransformRelativeToAncestor( null, x );
+		}
+		catch (IsNotInSubtreeException e)
+		{
+			throw new RuntimeException();
+		}
 	}
 	
 	public Xform2 getTransformRelativeToRoot()
@@ -199,7 +206,7 @@ abstract public class DPWidget
 	
 	
 	
-	public Xform2 getTransformRelativeToAncestor(DPWidget ancestor, Xform2 x)
+	public Xform2 getTransformRelativeToAncestor(DPWidget ancestor, Xform2 x) throws IsNotInSubtreeException
 	{
 		if ( ancestor == this )
 		{
@@ -219,7 +226,7 @@ abstract public class DPWidget
 		}
 	}
 	
-	public Xform2 getTransformRelativeToAncestor(DPWidget ancestor)
+	public Xform2 getTransformRelativeToAncestor(DPWidget ancestor) throws IsNotInSubtreeException
 	{
 		return getTransformRelativeToAncestor( ancestor, new Xform2() );
 	}
@@ -236,10 +243,17 @@ abstract public class DPWidget
 	
 	public Point2 getLocalPointRelativeToRoot(Point2 p)
 	{
-		return getLocalPointRelativeToAncestor( null, p );
+		try
+		{
+			return getLocalPointRelativeToAncestor( null, p );
+		}
+		catch (IsNotInSubtreeException e)
+		{
+			throw new RuntimeException();
+		}
 	}
 	
-	public Point2 getLocalPointRelativeToAncestor(DPWidget ancestor, Point2 p)
+	public Point2 getLocalPointRelativeToAncestor(DPWidget ancestor, Point2 p) throws IsNotInSubtreeException
 	{
 		if ( ancestor == this )
 		{
@@ -331,7 +345,7 @@ abstract public class DPWidget
 		path.add( this );
 	}
 	
-	public void getWidgetPathToSubtreeRoot(DPContainer subtreeRoot, List<DPWidget> path)
+	public void getWidgetPathToSubtreeRoot(DPContainer subtreeRoot, List<DPWidget> path) throws IsNotInSubtreeException
 	{
 		// Root to top
 		if ( subtreeRoot != this )
