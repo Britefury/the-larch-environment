@@ -102,14 +102,14 @@ public abstract class DPContainer extends DPWidget
 	// Geometry methods
 	//
 	
-	protected Xform2 getChildTransformRelativeToAncestor(DPWidget child, DPWidget ancestor, Xform2 x)
+	protected Xform2 getChildTransformRelativeToAncestor(DPWidget child, DPWidget ancestor, Xform2 x) throws IsNotInSubtreeException
 	{
 		ChildEntry entry = childToEntry.get( child );
 		Xform2 localX = x.concat( entry.childToContainerXform );
 		return getTransformRelativeToAncestor( ancestor, localX );
 	}
 
-	protected Point2 getChildLocalPointRelativeToAncestor(DPWidget child, DPWidget ancestor, Point2 p)
+	protected Point2 getChildLocalPointRelativeToAncestor(DPWidget child, DPWidget ancestor, Point2 p) throws IsNotInSubtreeException
 	{
 		ChildEntry entry = childToEntry.get( child );
 		Point2 localP = entry.childToContainerXform.transform( p );
@@ -875,7 +875,14 @@ public abstract class DPContainer extends DPWidget
 		
 		if ( parent != null )
 		{
-			return parent.getContentLeafAboveOrBelowFromChild( this, bBelow, getLocalPointRelativeToAncestor( parent, localCursorPos ), bSkipWhitespace );
+			try
+			{
+				return parent.getContentLeafAboveOrBelowFromChild( this, bBelow, getLocalPointRelativeToAncestor( parent, localCursorPos ), bSkipWhitespace );
+			}
+			catch (IsNotInSubtreeException e)
+			{
+				throw new RuntimeException();
+			}
 		}
 		else
 		{
