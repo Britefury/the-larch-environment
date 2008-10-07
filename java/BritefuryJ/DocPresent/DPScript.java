@@ -7,9 +7,9 @@
 //##************************
 package BritefuryJ.DocPresent;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Vector;
 
 import BritefuryJ.DocPresent.Metrics.HMetrics;
 import BritefuryJ.DocPresent.Metrics.VMetrics;
@@ -178,7 +178,7 @@ public class DPScript extends DPContainer
 	
 	protected List<DPWidget> getChildren()
 	{
-		Vector<DPWidget> ch = new Vector<DPWidget>();
+		ArrayList<DPWidget> ch = new ArrayList<DPWidget>();
 		
 		for (int slot = 0; slot < NUMCHILDREN; slot++)
 		{
@@ -745,9 +745,9 @@ public class DPScript extends DPContainer
 
 	
 	
-	private Vector<ChildEntry> getChildEntries(int[] slots)
+	private ArrayList<ChildEntry> getChildEntries(int[] slots)
 	{
-		Vector<ChildEntry> entries = new Vector<ChildEntry>();
+		ArrayList<ChildEntry> entries = new ArrayList<ChildEntry>();
 		for (int slot: slots)
 		{
 			if ( children[slot] != null )
@@ -759,7 +759,7 @@ public class DPScript extends DPContainer
 		return entries;
 	}
 	
-	private Vector<ChildEntry> getChildEntriesInColumn(int column)
+	private ArrayList<ChildEntry> getChildEntriesInColumn(int column)
 	{
 		if ( column == LEFTCOLUMN )
 		{
@@ -783,7 +783,7 @@ public class DPScript extends DPContainer
 	}
 	
 	
-	private double getColumnXEdge(Vector<ChildEntry> column, boolean bRightEdge)
+	private double getColumnXEdge(ArrayList<ChildEntry> column, boolean bRightEdge)
 	{
 		double columnEdgeX = 0.0;
 		for (int i = 0; i < column.size(); i++)
@@ -831,18 +831,18 @@ public class DPScript extends DPContainer
 		else if ( childEntries.size() == 1 )
 		{
 			// Only 1 child
-			return childEntries.firstElement();
+			return childEntries.get( 0 );
 		}
 		else
 		{
 			// Group children by column
-			Vector< Vector<ChildEntry> > childEntriesByColumn = new Vector< Vector<ChildEntry> >();
+			ArrayList< ArrayList<ChildEntry> > childEntriesByColumn = new ArrayList< ArrayList<ChildEntry> >();
 			
 			int[] columns = { LEFTCOLUMN, MAINCOLUMN, RIGHTCOLUMN };
 			
 			for (int col: columns)
 			{
-				Vector<ChildEntry> childEntries = getChildEntriesInColumn( col );
+				ArrayList<ChildEntry> childEntries = getChildEntriesInColumn( col );
 				
 				if ( childEntries.size() > 0 )
 				{
@@ -852,18 +852,18 @@ public class DPScript extends DPContainer
 			
 			
 			// Determine which column is closest
-			Vector<ChildEntry> closestColumn = null;
+			ArrayList<ChildEntry> closestColumn = null;
 			
 			if ( childEntriesByColumn.size() == 1 )
 			{
-				closestColumn = childEntriesByColumn.firstElement();
+				closestColumn = childEntriesByColumn.get( 0 );
 			}
 			else
 			{
-				Vector<ChildEntry> colI = childEntriesByColumn.firstElement();
+				ArrayList<ChildEntry> colI = childEntriesByColumn.get( 0 );
 				for (int i = 0; i < childEntriesByColumn.size() - 1; i++)
 				{
-					Vector<ChildEntry> colJ = childEntriesByColumn.get( i + 1 );
+					ArrayList<ChildEntry> colJ = childEntriesByColumn.get( i + 1 );
 					double rightEdgeI = getColumnXEdge( colI, true );
 					double leftEdgeJ = getColumnXEdge( colJ, false );
 					
@@ -878,7 +878,7 @@ public class DPScript extends DPContainer
 				
 				if ( closestColumn == null )
 				{
-					closestColumn = childEntriesByColumn.lastElement();
+					closestColumn = childEntriesByColumn.get( childEntriesByColumn.size() - 1 );
 				}
 			}
 			
@@ -888,12 +888,12 @@ public class DPScript extends DPContainer
 			if ( closestColumn.size() == 1 )
 			{
 				// One entry; only 1 choice
-				return closestColumn.firstElement();
+				return closestColumn.get( 0 );
 			}
 			else if ( closestColumn.size() == 2 )
 			{
-				ChildEntry entryI = closestColumn.firstElement();
-				ChildEntry entryJ = closestColumn.lastElement();
+				ChildEntry entryI = closestColumn.get( 0 );
+				ChildEntry entryJ = closestColumn.get( closestColumn.size() - 1 );
 				double iUpperY = entryI.pos.y + entryI.size.y;
 				double jLowerY = entryJ.pos.y;
 					
@@ -915,7 +915,7 @@ public class DPScript extends DPContainer
 	
 	protected List<DPWidget> horizontalNavigationList()
 	{
-		Vector<DPWidget> xs = new Vector<DPWidget>();
+		ArrayList<DPWidget> xs = new ArrayList<DPWidget>();
 		
 		for (DPWidget x: children)
 		{

@@ -6,8 +6,8 @@
 //##************************
 package BritefuryJ.DocPresent.ElementTree;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import BritefuryJ.DocPresent.DPParagraph;
 import BritefuryJ.DocPresent.DPWidget;
@@ -145,7 +145,7 @@ public class SegmentElement extends BranchElement implements CollatedElementInte
 	
 	public List<Element> getChildren()
 	{
-		Vector<Element> ch = new Vector<Element>();
+		ArrayList<Element> ch = new ArrayList<Element>();
 		
 		if ( beginStop != null )
 		{

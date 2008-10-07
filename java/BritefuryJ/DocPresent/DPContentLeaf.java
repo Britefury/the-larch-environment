@@ -7,7 +7,7 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-import java.util.Vector;
+import java.util.ArrayList;
 import java.util.WeakHashMap;
 import java.awt.Graphics2D;
 
@@ -642,7 +642,7 @@ public abstract class DPContentLeaf extends DPWidget
 	{
 		super.onUnrealise();
 
-		Vector<Marker> xs = new Vector<Marker>( markers.keySet() );
+		ArrayList<Marker> xs = new ArrayList<Marker>( markers.keySet() );
 		
 		DPContentLeaf left = getContentLeafToLeft();
 		

@@ -7,7 +7,7 @@
 package BritefuryJ.Parser.Utils.OperatorParser;
 
 import java.util.List;
-import java.util.Vector;
+import java.util.ArrayList;
 
 import BritefuryJ.Parser.Forward;
 import BritefuryJ.Parser.ParserExpression;
@@ -54,7 +54,7 @@ public class OperatorTable
 	
 	
 	
-	protected ParserExpression getLowestPrecedenceUnaryOperatorLevelParserAbove(Vector<Forward> levelParserForwardDeclarations, PrecedenceLevel aboveLevel, OperatorFilter opFilter)
+	protected ParserExpression getLowestPrecedenceUnaryOperatorLevelParserAbove(ArrayList<Forward> levelParserForwardDeclarations, PrecedenceLevel aboveLevel, OperatorFilter opFilter)
 	{
 		int index = levels.indexOf( aboveLevel );
 		for (int i = levels.size() - 1; i >= index; i--)
@@ -71,7 +71,7 @@ public class OperatorTable
 	public ParserExpression buildParser()
 	{
 		ParserExpression parser = rootParser;
-		Vector<Forward> levelParserForwardDeclarations = new Vector<Forward>();
+		ArrayList<Forward> levelParserForwardDeclarations = new ArrayList<Forward>();
 		for (int i = 0; i < levels.size(); i++)
 		{
 			levelParserForwardDeclarations.add( new Forward() );

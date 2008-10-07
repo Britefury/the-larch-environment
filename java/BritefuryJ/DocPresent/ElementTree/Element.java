@@ -7,8 +7,8 @@
 //##************************
 package BritefuryJ.DocPresent.ElementTree;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.DPWidget.IsNotInSubtreeException;
@@ -161,7 +161,7 @@ public abstract class Element
 	
 	public List<LeafElement> getLeavesInSubtree(ElementFilter branchFilter, ElementFilter leafFilter)
 	{
-		return new Vector<LeafElement>();
+		return new ArrayList<LeafElement>();
 	}
 	
 	public List<LeafElement> getLeavesInSubtree()

@@ -6,15 +6,15 @@
 //##************************
 package BritefuryJ.DocPresent.ElementTree;
 
+import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Vector;
 
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.ElementTree.CollatableBranchElement.CollationMode;
 
 public class ElementCollator
 {
-	private Vector<CollatableBranchElement> collatedChildBranches;
+	private ArrayList<CollatableBranchElement> collatedChildBranches;
 	private CollatedElementInterface element;
 	
 	
@@ -24,7 +24,7 @@ public class ElementCollator
 	
 	public ElementCollator(CollatedElementInterface element)
 	{
-		collatedChildBranches = new Vector<CollatableBranchElement>();
+		collatedChildBranches = new ArrayList<CollatableBranchElement>();
 		this.element = element;
 	}
 
@@ -36,19 +36,19 @@ public class ElementCollator
 	protected void refreshContainerWidgetContents()
 	{
 		// Gather the collated contents that are current, and the state that they will be in after completion
-		Vector<Element> newChildren = new Vector<Element>();
-		Vector<CollatableBranchElement> newCollatedChildBranches = new Vector<CollatableBranchElement>();
+		ArrayList<Element> newChildren = new ArrayList<Element>();
+		ArrayList<CollatableBranchElement> newCollatedChildBranches = new ArrayList<CollatableBranchElement>();
 		
 		element.collateSubtree( newChildren, newCollatedChildBranches );
 		
 		
 		// Generate the list of child widgets
-		Vector<DPWidget> childWidgets = new Vector<DPWidget>();
+		ArrayList<DPWidget> childWidgets = new ArrayList<DPWidget>();
 		
-		childWidgets.setSize( newChildren.size() );
-		for (int i = 0; i < newChildren.size(); i++)
+		childWidgets.ensureCapacity( newChildren.size() );
+		for (Element newChild: newChildren)
 		{
-			childWidgets.set( i, newChildren.get( i ).getWidget() );
+			childWidgets.add( newChild.getWidget() );
 		}
 		
 

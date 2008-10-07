@@ -6,9 +6,9 @@
 //##************************
 package tests.Parser;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Vector;
 
 import BritefuryJ.Parser.Action;
 import BritefuryJ.Parser.BestChoice;
@@ -38,10 +38,10 @@ public class Test_Parser extends ParserTestCase
 {
 	private List<Object> arrayToList2D(Object[][] a)
 	{
-		Vector<Object> v = new Vector<Object>();
+		ArrayList<Object> v = new ArrayList<Object>();
 		for (int i = 0; i < a.length; i++)
 		{
-			Vector<Object> v2 = new Vector<Object>();
+			ArrayList<Object> v2 = new ArrayList<Object>();
 			for (int j = 0; j < a[i].length; j++)
 			{
 				v2.add( a[i][j] );
@@ -516,7 +516,7 @@ public class Test_Parser extends ParserTestCase
 			@SuppressWarnings("unchecked")
 			public Object invoke(String input, int begin, Object x)
 			{
-				Vector<Object> y = new Vector<Object>();
+				ArrayList<Object> y = new ArrayList<Object>();
 				List<Object> xx = (List<Object>)x;
 				for (Object a: xx)
 				{
@@ -532,13 +532,13 @@ public class Test_Parser extends ParserTestCase
 			public Object invoke(String input, int begin, Object x)
 			{
 				List<Object> xx = (List<Object>)x;
-				if ( xx.get( 1 ).equals( new Vector<Object>() ) )
+				if ( xx.get( 1 ).equals( new ArrayList<Object>() ) )
 				{
 					return xx.get( 0 );
 				}
 				else
 				{
-					Vector<Object> res = new Vector<Object>();
+					ArrayList<Object> res = new ArrayList<Object>();
 					res.add( xx.get( 0 ) );
 					res.addAll( (List<Object>)xx.get( 1 ) );
 					return res;

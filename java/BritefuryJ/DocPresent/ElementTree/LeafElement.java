@@ -7,8 +7,8 @@
 //##************************
 package BritefuryJ.DocPresent.ElementTree;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import BritefuryJ.DocPresent.DPContentLeaf;
 
@@ -71,7 +71,7 @@ public abstract class LeafElement extends Element
 	
 	public List<LeafElement> getLeavesInSubtree(ElementFilter branchFilter, ElementFilter leafFilter)
 	{
-		Vector<LeafElement> leaves = new Vector<LeafElement>();
+		ArrayList<LeafElement> leaves = new ArrayList<LeafElement>();
 		if ( leafFilter == null  ||  leafFilter.test( this ) )
 		{
 			leaves.add( this );

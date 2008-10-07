@@ -188,7 +188,7 @@ public class DPBin extends DPContainer
 		}
 		else
 		{
-			return childEntries.firstElement();
+			return childEntries.get( 0 );
 		}
 	}
 

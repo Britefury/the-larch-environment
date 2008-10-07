@@ -8,9 +8,9 @@
 package BritefuryJ.DocPresent;
 
 import java.lang.Math;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Vector;
 
 import BritefuryJ.DocPresent.Metrics.HMetrics;
 import BritefuryJ.DocPresent.Metrics.Metrics;
@@ -186,7 +186,7 @@ public class DPParagraph extends DPContainerSequence
 
 	
 	
-	private Vector<Line> lines;
+	private ArrayList<Line> lines;
 
 	
 	
@@ -199,7 +199,7 @@ public class DPParagraph extends DPContainerSequence
 	{
 		super( styleSheet );
 		
-		lines = new Vector<Line>();
+		lines = new ArrayList<Line>();
 	}
 
 
@@ -647,11 +647,11 @@ public class DPParagraph extends DPContainerSequence
 		}
 		else if ( lines.size() == 1 )
 		{
-			return lines.firstElement();
+			return lines.get( 0 );
 		}
 		else
 		{
-			Line lineI = lines.firstElement();
+			Line lineI = lines.get( 0 );
 			for (int i = 0; i < lines.size() - 1; i++)
 			{
 				Line lineJ = lines.get( i + 1 );
@@ -668,7 +668,7 @@ public class DPParagraph extends DPContainerSequence
 				lineI = lineJ;
 			}
 			
-			return lines.lastElement();
+			return lines.get( lines.size() - 1 );
 		}
 	}
 

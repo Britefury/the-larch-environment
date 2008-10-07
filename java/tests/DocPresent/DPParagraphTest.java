@@ -10,7 +10,7 @@ package tests.DocPresent;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.util.Vector;
+import java.util.ArrayList;
 
 import javax.swing.JFrame;
 
@@ -29,10 +29,10 @@ public class DPParagraphTest
 {
 	static String textBlock = "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
 	
-	protected Vector<DPWidget> makeTextNodes(String text, TextStyleSheet style)
+	protected ArrayList<DPWidget> makeTextNodes(String text, TextStyleSheet style)
 	{
 		String[] words = text.split( " " );
-		Vector<DPWidget> nodes = new Vector<DPWidget>();
+		ArrayList<DPWidget> nodes = new ArrayList<DPWidget>();
 		for (int i = 0; i < words.length; i++)
 		{
 			String word = words[i];
@@ -41,9 +41,9 @@ public class DPParagraphTest
 		return nodes;
 	}
 	
-	protected Vector<DPWidget> addLineBreaks(Vector<DPWidget> nodesIn, int step)
+	protected ArrayList<DPWidget> addLineBreaks(ArrayList<DPWidget> nodesIn, int step)
 	{
-		Vector<DPWidget> nodesOut = new Vector<DPWidget>();
+		ArrayList<DPWidget> nodesOut = new ArrayList<DPWidget>();
 		for (int i = 0; i < nodesIn.size(); i++)
 		{
 			nodesOut.add( nodesIn.get( i ) );
@@ -74,7 +74,7 @@ public class DPParagraphTest
 	
 	protected DPParagraph makeParagraph(String title, DPParagraph.Alignment alignment, double spacing, double padding, double indentation, int lineBreakStep, TextStyleSheet textStyle)
 	{
-		Vector<DPWidget> children = makeTextNodes( title + ": " + textBlock, textStyle );
+		ArrayList<DPWidget> children = makeTextNodes( title + ": " + textBlock, textStyle );
 		if ( lineBreakStep > 0 )
 		{
 			children = addLineBreaks( children, lineBreakStep );
@@ -87,9 +87,9 @@ public class DPParagraphTest
 	
 	protected DPParagraph makeParagraphWithNestedPara(String title, DPParagraph.Alignment alignment, double spacing, double padding, double indentation, int lineBreakStep, TextStyleSheet textStyle, TextStyleSheet nestedTextStyle)
 	{
-		Vector<DPWidget> children = makeTextNodes( title + ": " + textBlock, textStyle );
+		ArrayList<DPWidget> children = makeTextNodes( title + ": " + textBlock, textStyle );
 		children = addLineBreaks( children, lineBreakStep );
-		children.insertElementAt( makeParagraph( title + " (inner)", alignment, spacing, padding, indentation, lineBreakStep, nestedTextStyle ), children.size()/2 );
+		children.add( children.size()/2, makeParagraph( title + " (inner)", alignment, spacing, padding, indentation, lineBreakStep, nestedTextStyle ) );
 		ParagraphStyleSheet boxs = new ParagraphStyleSheet( alignment, spacing, padding, indentation );
 		DPParagraph box = new DPParagraph( boxs );
 		box.extend( children );

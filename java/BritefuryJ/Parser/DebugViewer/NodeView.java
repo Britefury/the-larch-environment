@@ -10,8 +10,8 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Vector;
 import java.util.regex.Pattern;
 
 import BritefuryJ.DocPresent.DPBin;
@@ -135,7 +135,7 @@ public class NodeView
 	private DPWidget nodeWidget, mainWidget;
 	private DPNodeBin nodeBinWidget;
 	private ParseView parseView;
-	private Vector<NodeView> children;
+	private ArrayList<NodeView> children;
 	private DebugNode data;
 	private String input;
 
@@ -149,8 +149,8 @@ public class NodeView
 		
 		nodeWidget = makeNodeWidget( data, input );
 		
-		Vector<DPWidget> childWidgets = new Vector<DPWidget>();
-		children = new Vector<NodeView>();
+		ArrayList<DPWidget> childWidgets = new ArrayList<DPWidget>();
+		children = new ArrayList<NodeView>();
 		for (DebugNode child: data.getCallChildren())
 		{
 			NodeView childView = parseView.getNodeView( child, input );

@@ -7,7 +7,7 @@
 package BritefuryJ.Parser.Utils.OperatorParser;
 
 import java.util.List;
-import java.util.Vector;
+import java.util.ArrayList;
 
 import BritefuryJ.Parser.Choice;
 import BritefuryJ.Parser.Forward;
@@ -22,7 +22,7 @@ public class PrecedenceLevel
 	}
 	
 	
-	private Vector<Operator> operators;
+	private ArrayList<Operator> operators;
 	
 	
 	
@@ -51,7 +51,7 @@ public class PrecedenceLevel
 			}
 		}
 		
-		operators = new Vector<Operator>();
+		operators = new ArrayList<Operator>();
 		operators.addAll( ops );
 	}
 	
@@ -69,7 +69,7 @@ public class PrecedenceLevel
 	}
 	
 	
-	protected void buildParser(OperatorTable operatorTable, Vector<Forward> levelParserForwardDeclarations, Forward forwardDeclaration,
+	protected void buildParser(OperatorTable operatorTable, ArrayList<Forward> levelParserForwardDeclarations, Forward forwardDeclaration,
 			PrecedenceLevel previousLevel, ParserExpression previousLevelParser)
 	{
 		ParserExpression[] choices = new ParserExpression[operators.size() + 1];

@@ -6,8 +6,8 @@
 //##************************
 package BritefuryJ.Parser;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 public class Combine extends BranchExpression
 {
@@ -30,7 +30,7 @@ public class Combine extends BranchExpression
 	@SuppressWarnings("unchecked")
 	protected ParseResult parse(ParserState state, String input, int start, int stop)
 	{
-		Vector<Object> values = new Vector<Object>();
+		ArrayList<Object> values = new ArrayList<Object>();
 		boolean bFinalValueIsString = true;
 		
 		int pos = start;
@@ -76,7 +76,7 @@ public class Combine extends BranchExpression
 		}
 		else
 		{
-			Vector<Object> value = new Vector<Object>();
+			ArrayList<Object> value = new ArrayList<Object>();
 			
 			for (Object v: values)
 			{

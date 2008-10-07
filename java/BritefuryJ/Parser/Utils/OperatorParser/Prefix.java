@@ -7,7 +7,7 @@
 package BritefuryJ.Parser.Utils.OperatorParser;
 
 import java.util.List;
-import java.util.Vector;
+import java.util.ArrayList;
 
 import BritefuryJ.Parser.Forward;
 import BritefuryJ.Parser.ParseAction;
@@ -59,7 +59,7 @@ public class Prefix extends UnaryOperator
 	
 	
 	protected ParserExpression buildParser(OperatorTable operatorTable,
-			Vector<Forward> levelParserForwardDeclarations, PrecedenceLevel thisLevel,
+			ArrayList<Forward> levelParserForwardDeclarations, PrecedenceLevel thisLevel,
 			ParserExpression thisLevelParser, PrecedenceLevel previousLevel,
 			ParserExpression previousLevelParser)
 	{

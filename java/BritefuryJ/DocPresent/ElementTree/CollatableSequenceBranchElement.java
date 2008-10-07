@@ -6,9 +6,9 @@
 //##************************
 package BritefuryJ.DocPresent.ElementTree;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Vector;
 
 import BritefuryJ.DocPresent.DPContainerSequence;
 import BritefuryJ.DocPresent.DPWidget;
@@ -16,7 +16,7 @@ import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 
 public abstract class CollatableSequenceBranchElement extends CollatableBranchElement
 {
-	protected Vector<Element> children;
+	protected ArrayList<Element> children;
 	
 	
 	
@@ -24,7 +24,7 @@ public abstract class CollatableSequenceBranchElement extends CollatableBranchEl
 	{
 		super( styleSheet );
 		
-		children = new Vector<Element>();
+		children = new ArrayList<Element>();
 	}
 
 
@@ -67,11 +67,11 @@ public abstract class CollatableSequenceBranchElement extends CollatableBranchEl
 	
 	protected void refreshContainerWidgetContents()
 	{
-		Vector<DPWidget> childWidgets = new Vector<DPWidget>();
-		childWidgets.setSize( children.size() );
-		for (int i = 0; i < children.size(); i++)
+		ArrayList<DPWidget> childWidgets = new ArrayList<DPWidget>();
+		childWidgets.ensureCapacity( children.size() );
+		for (Element child: children)
 		{
-			childWidgets.set( i, children.get( i ).getWidget() );
+			childWidgets.add( child.getWidget() );
 		}
 		
 		getWidget().setChildren( childWidgets );

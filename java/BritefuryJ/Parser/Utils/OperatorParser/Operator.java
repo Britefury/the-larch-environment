@@ -6,7 +6,7 @@
 //##************************
 package BritefuryJ.Parser.Utils.OperatorParser;
 
-import java.util.Vector;
+import java.util.ArrayList;
 
 import BritefuryJ.Parser.Forward;
 import BritefuryJ.Parser.ParserExpression;
@@ -23,6 +23,6 @@ public abstract class Operator
 	
 	
 	
-	protected abstract ParserExpression buildParser(OperatorTable operatorTable, Vector<Forward> levelParserForwardDeclarations, PrecedenceLevel thisLevel,
+	protected abstract ParserExpression buildParser(OperatorTable operatorTable, ArrayList<Forward> levelParserForwardDeclarations, PrecedenceLevel thisLevel,
 			ParserExpression thisLevelParser, PrecedenceLevel previousLevel, ParserExpression previousLevelParser);
 }

@@ -10,7 +10,7 @@ package tests.DocPresent;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.util.Vector;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import javax.swing.JFrame;
@@ -27,7 +27,7 @@ import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
 public class DPParagraphTest_simple
 {
-	protected static Vector<DPWidget> makeTexts(String header)
+	protected static ArrayList<DPWidget> makeTexts(String header)
 	{
 		TextStyleSheet t12 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );
 		TextStyleSheet t18 = new TextStyleSheet( new Font( "Sans serif", Font.BOLD, 18 ), Color.BLACK );
@@ -42,12 +42,12 @@ public class DPParagraphTest_simple
 		DPText t7 = new DPText( t12, "Bar" );
 		
 		DPText[] texts = { h, t0, t1, t2, t3, t4, t5, t6, t7 };
-		return new Vector<DPWidget>( Arrays.asList( texts ) );
+		return new ArrayList<DPWidget>( Arrays.asList( texts ) );
 	}
 	
-	protected static Vector<DPWidget> addLineBreaks(Vector<DPWidget> nodesIn, int step)
+	protected static ArrayList<DPWidget> addLineBreaks(ArrayList<DPWidget> nodesIn, int step)
 	{
-		Vector<DPWidget> nodesOut = new Vector<DPWidget>();
+		ArrayList<DPWidget> nodesOut = new ArrayList<DPWidget>();
 		for (int i = 0; i < nodesIn.size(); i++)
 		{
 			nodesOut.add( nodesIn.get( i ) );
@@ -68,9 +68,9 @@ public class DPParagraphTest_simple
 		DPPresentationArea area = new DPPresentationArea();
 	     
 	     
-		Vector<DPWidget> c0 = makeTexts( "UNINDENTED" );
+		ArrayList<DPWidget> c0 = makeTexts( "UNINDENTED" );
 		c0 = addLineBreaks( c0, 1 );
-		Vector<DPWidget> c1 = makeTexts( "INDENTED" );
+		ArrayList<DPWidget> c1 = makeTexts( "INDENTED" );
 		c1 = addLineBreaks( c1, 1 );
 		
 		ParagraphStyleSheet b0s = new ParagraphStyleSheet( DPParagraph.Alignment.BASELINES, 10.0, 0.0, 0.0 );
