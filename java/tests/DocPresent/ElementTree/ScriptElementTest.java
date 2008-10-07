@@ -10,7 +10,7 @@ package tests.DocPresent.ElementTree;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.util.Vector;
+import java.util.ArrayList;
 
 import javax.swing.JFrame;
 
@@ -63,7 +63,7 @@ public class ScriptElementTest
 		
 		HBoxStyleSheet boxs = new HBoxStyleSheet( DPHBox.Alignment.BASELINES, 0.0, false, 0.0 );
 		HBoxElement box = new HBoxElement( boxs );
-		Vector<Element> boxChildren = new Vector<Element>();
+		ArrayList<Element> boxChildren = new ArrayList<Element>();
 		boxChildren.add( labelA );
 		boxChildren.add( script );
 		boxChildren.add( labelB );
@@ -78,7 +78,7 @@ public class ScriptElementTest
 	{
 		VBoxStyleSheet boxs = new VBoxStyleSheet( DPVBox.Typesetting.NONE, DPVBox.Alignment.LEFT, 0.0, false, 0.0 );
 		VBoxElement box = new VBoxElement( boxs );
-		Vector<Element> children = new Vector<Element>();
+		ArrayList<Element> children = new ArrayList<Element>();
 		
 		for (int i = 0; i < 16; i++)
 		{

@@ -7,9 +7,9 @@
 //##************************
 package BritefuryJ.DocPresent.ElementTree;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Vector;
 
 import BritefuryJ.DocPresent.DPContainerSequence;
 import BritefuryJ.DocPresent.DPWidget;
@@ -17,7 +17,7 @@ import BritefuryJ.DocPresent.DPWidget;
 
 public abstract class SequenceBranchElement extends BranchElement
 {
-	protected Vector<Element> children;
+	protected ArrayList<Element> children;
 	
 	
 	
@@ -25,7 +25,7 @@ public abstract class SequenceBranchElement extends BranchElement
 	{
 		super( container );
 		
-		children = new Vector<Element>();
+		children = new ArrayList<Element>();
 	}
 
 
@@ -38,12 +38,12 @@ public abstract class SequenceBranchElement extends BranchElement
 
 	public void setChildren(List<Element> xs)
 	{
-		Vector<DPWidget> childWidgets = new Vector<DPWidget>();
+		ArrayList<DPWidget> childWidgets = new ArrayList<DPWidget>();
 
-		childWidgets.setSize( xs.size() );
-		for (int i = 0; i < xs.size(); i++)
+		childWidgets.ensureCapacity( xs.size() );
+		for (Element x: xs)
 		{
-			childWidgets.set( i, xs.get( i ).getWidget() );
+			childWidgets.add( x.getWidget() );
 		}
 		
 		HashSet<Element> added, removed;

@@ -6,7 +6,7 @@
 //##************************
 package BritefuryJ.Parser.Utils.OperatorParser;
 
-import java.util.Vector;
+import java.util.ArrayList;
 
 import BritefuryJ.Parser.Forward;
 import BritefuryJ.Parser.ParserExpression;
@@ -30,7 +30,7 @@ public class InfixLeft extends BinaryOperator
 	
 	
 	protected ParserExpression buildOperatorParser(OperatorTable operatorTable,
-			Vector<Forward> levelParserForwardDeclarations, PrecedenceLevel thisLevel,
+			ArrayList<Forward> levelParserForwardDeclarations, PrecedenceLevel thisLevel,
 			ParserExpression thisLevelParser, PrecedenceLevel previousLevel,
 			ParserExpression previousLevelParser)
 	{

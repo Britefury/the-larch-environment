@@ -6,7 +6,7 @@
 //##************************
 package tests.DMIO;
 
-import java.util.Vector;
+import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 import junit.framework.TestCase;
@@ -172,18 +172,18 @@ public class Test_DMIORead extends TestCase
 	
 	public void testReadList()
 	{
-		Vector<Object> h = new Vector<Object>();
+		ArrayList<Object> h = new ArrayList<Object>();
 		h.add( "h" );
 		h.add( "1" );
 		h.add( "2L" );
 		h.add( "3.0" );
 		
-		Vector<Object> g = new Vector<Object>();
+		ArrayList<Object> g = new ArrayList<Object>();
 		g.add( "g" );
 		g.add( h );
 		g.add( "Hi" );
 
-		Vector<Object> f = new Vector<Object>();
+		ArrayList<Object> f = new ArrayList<Object>();
 		f.add( "f" );
 		f.add( g );
 		f.add( "There" );

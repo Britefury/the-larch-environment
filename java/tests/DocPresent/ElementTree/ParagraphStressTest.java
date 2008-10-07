@@ -10,7 +10,7 @@ package tests.DocPresent.ElementTree;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.util.Vector;
+import java.util.ArrayList;
 
 import javax.swing.JFrame;
 
@@ -35,7 +35,7 @@ public class ParagraphStressTest
 		Font f0 = new Font( "Sans serif", Font.PLAIN, 12 );
 		TextStyleSheet s0 = new TextStyleSheet( f0, Color.black );
 		
-		Vector<Element> ch = new Vector<Element>();
+		ArrayList<Element> ch = new ArrayList<Element>();
 		
 		for (int i = 0; i < numChildren; i++)
 		{
@@ -71,7 +71,7 @@ public class ParagraphStressTest
 	{
 		VBoxStyleSheet boxs = new VBoxStyleSheet( DPVBox.Typesetting.NONE, DPVBox.Alignment.LEFT, 0.0, false, 0.0 );
 		VBoxElement box = new VBoxElement( boxs );
-		Vector<Element> children = new Vector<Element>();
+		ArrayList<Element> children = new ArrayList<Element>();
 		
 		for (int i = 0; i < 256; i++)
 		{

@@ -6,6 +6,7 @@
 //##************************
 package BritefuryJ.DocModel;
 
+import java.util.ArrayList;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -114,7 +115,7 @@ public class DMIORead
 	public static Object readSX(String source) throws ParseSXErrorException
 	{
 		int pos = 0;
-		Vector<Object> stack = new Vector<Object>();
+		ArrayList<Object> stack = new ArrayList<Object>();
 		Object last = null;
 		while ( pos < source.length() )
 		{
@@ -125,7 +126,7 @@ public class DMIORead
 				// Append the new list to the list that is on the top of the stach; this builds the structure
 				if ( stack.size() > 0 )
 				{
-					Vector<Object> top = (Vector<Object>)stack.lastElement();
+					Vector<Object> top = (Vector<Object>)stack.get( stack.size() - 1 );
 					top.add( xs );
 				}
 				// Make the top of the stack the new list
@@ -139,8 +140,8 @@ public class DMIORead
 				{
 					throw new ParseSXErrorException();
 				}
-				last = stack.lastElement();
-				stack.removeElementAt( stack.size() - 1 );
+				last = stack.get( stack.size() - 1 );
+				stack.remove( stack.size() - 1 );
 				pos++;
 			}
 			else
@@ -163,7 +164,7 @@ public class DMIORead
 					String s = evalString( res.value );
 					if ( stack.size() > 0 )
 					{
-						Vector<Object> top = (Vector<Object>)stack.lastElement();
+						Vector<Object> top = (Vector<Object>)stack.get( stack.size() - 1 );
 						top.add( s );
 					}
 					else
@@ -181,7 +182,7 @@ public class DMIORead
 					String s = res.value;
 					if ( stack.size() > 0 )
 					{
-						Vector<Object> top = (Vector<Object>)stack.lastElement();
+						Vector<Object> top = (Vector<Object>)stack.get( stack.size() - 1 );
 						top.add( s );
 					}
 					else

@@ -7,7 +7,7 @@
 package BritefuryJ.CommandHistory;
 
 import java.util.HashMap;
-import java.util.Vector;
+import java.util.ArrayList;
 
 public class CommandHistory
 {
@@ -56,16 +56,16 @@ public class CommandHistory
 
 	private static class MultiEntry extends Entry
 	{
-		private Vector<Command> commands;
+		private ArrayList<Command> commands;
 		
 		public MultiEntry()
 		{
-			commands = new Vector<Command>();
+			commands = new ArrayList<Command>();
 		}
 		
 		public MultiEntry(SingleEntry entry)
 		{
-			commands = new Vector<Command>();
+			commands = new ArrayList<Command>();
 			commands.add( entry.getCommand() );
 		}
 		
@@ -94,7 +94,7 @@ public class CommandHistory
 		{
 			if ( commands.size() > 0 )
 			{
-				return commands.lastElement();
+				return commands.get( commands.size() - 1 );
 			}
 			else
 			{
@@ -111,7 +111,7 @@ public class CommandHistory
 	
 	
 	
-	private Vector<Entry> past, future;
+	private ArrayList<Entry> past, future;
 	private HashMap<CommandTrackerFactory, CommandTracker> trackers;
 	private boolean bCommandsBlocked, bFrozen;
 	private int freezeCount;
@@ -127,8 +127,8 @@ public class CommandHistory
 	//
 	public CommandHistory()
 	{
-		past = new Vector<Entry>();
-		future = new Vector<Entry>();
+		past = new ArrayList<Entry>();
+		future = new ArrayList<Entry>();
 		trackers = new HashMap<CommandTrackerFactory, CommandTracker>();
 		bCommandsBlocked = false;
 		bFrozen = false;
@@ -159,7 +159,7 @@ public class CommandHistory
 			{
 				if ( bFrozen )
 				{
-					((MultiEntry)past.lastElement()).add( command );
+					((MultiEntry)past.get( past.size() - 1 )).add( command );
 				}
 				else
 				{
@@ -183,8 +183,8 @@ public class CommandHistory
 			thaw();
 		}
 		
-		Entry entry = past.lastElement();
-		past.setSize( past.size() - 1 );
+		Entry entry = past.get( past.size() - 1 );
+		past.remove( past.size() - 1 );
 		unexecuteEntry( entry );
 		future.add( entry );
 		
@@ -202,8 +202,8 @@ public class CommandHistory
 			thaw();
 		}
 		
-		Entry entry = future.lastElement();
-		future.setSize( future.size() - 1 );
+		Entry entry = future.get( future.size() - 1 );
+		future.remove( future.size() - 1 );
 		executeEntry( entry );
 		past.add( entry );
 		
@@ -248,7 +248,7 @@ public class CommandHistory
 			Entry top = topEntry();
 			if ( top != null  &&  top.isEmpty() )
 			{
-				past.setSize( past.size() - 1 );
+				past.remove( past.size() - 1 );
 			}
 			bFrozen = false;
 		}
@@ -310,7 +310,7 @@ public class CommandHistory
 	{
 		if ( past.size() > 0 )
 		{
-			return past.lastElement().top();
+			return past.get( past.size() - 1 ).top();
 		}
 		else
 		{
@@ -322,7 +322,7 @@ public class CommandHistory
 	{
 		if ( past.size() > 0 )
 		{
-			return past.lastElement();
+			return past.get( past.size() - 1 );
 		}
 		else
 		{

@@ -7,9 +7,9 @@
 //##************************
 package BritefuryJ.DocPresent;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Vector;
 
 import java.awt.event.KeyEvent;
 import java.awt.Graphics2D;
@@ -79,7 +79,7 @@ abstract public class DPWidget
 	// Drag and drop state
 	protected static class DndState
 	{
-		protected Vector<DndOperation> sourceOps, destOps;
+		protected ArrayList<DndOperation> sourceOps, destOps;
 
 
 		protected DndListener dndListener;
@@ -87,8 +87,8 @@ abstract public class DPWidget
 		
 		protected DndState()
 		{
-			sourceOps = new Vector<DndOperation>();
-			destOps = new Vector<DndOperation>();
+			sourceOps = new ArrayList<DndOperation>();
+			destOps = new ArrayList<DndOperation>();
 		}
 	}
 

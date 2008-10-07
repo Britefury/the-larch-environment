@@ -6,8 +6,8 @@
 //##************************
 package BritefuryJ.Parser.Utils;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import BritefuryJ.Parser.OneOrMore;
 import BritefuryJ.Parser.Optional;
@@ -22,7 +22,7 @@ public class SeparatedList
 	{
 		public Object invoke(String input, int begin, Object x)
 		{
-			return new Vector<Object>();
+			return new ArrayList<Object>();
 		}
 	}
 
@@ -33,11 +33,11 @@ public class SeparatedList
 		{
 			if ( x == null )
 			{
-				return new Vector<Object>();
+				return new ArrayList<Object>();
 			}
 			else
 			{
-				Vector<Object> result = new Vector<Object>();
+				ArrayList<Object> result = new ArrayList<Object>();
 				List<Object> xs = (List<Object>)x;
 				result.add( xs.get( 0 ) );
 				
@@ -56,7 +56,7 @@ public class SeparatedList
 		@SuppressWarnings("unchecked")
 		public Object invoke(String input, int begin, Object x)
 		{
-			Vector<Object> result = new Vector<Object>();
+			ArrayList<Object> result = new ArrayList<Object>();
 			List<Object> xs = (List<Object>)x;
 			result.add( xs.get( 0 ) );
 			

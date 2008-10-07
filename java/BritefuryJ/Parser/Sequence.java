@@ -6,8 +6,8 @@
 //##************************
 package BritefuryJ.Parser;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 public class Sequence extends BranchExpression
 {
@@ -29,7 +29,7 @@ public class Sequence extends BranchExpression
 	
 	protected ParseResult parse(ParserState state, String input, int start, int stop)
 	{
-		Vector<Object> value = new Vector<Object>();
+		ArrayList<Object> value = new ArrayList<Object>();
 		
 		int pos = start;
 		for (int i = 0; i < subexps.length; i++)

@@ -7,10 +7,10 @@
 //##************************
 package BritefuryJ.DocPresent;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Vector;
 
 import org.python.core.PySlice;
 
@@ -202,11 +202,8 @@ abstract public class DPContainerSequence extends DPContainer
 			unregisterChildEntry( entry );
 		}
 
-		childEntries.setSize( newChildEntriesArray.length );
-		for (int i = 0; i < newChildEntriesArray.length; i++)
-		{
-			childEntries.set( i, newChildEntriesArray[i] );
-		}
+		childEntries.clear();
+		childEntries.addAll( Arrays.asList( newChildEntriesArray ) );
 		
 		childListModified();
 		queueResize();
@@ -234,11 +231,11 @@ abstract public class DPContainerSequence extends DPContainer
 		}
 		
 		int start = childEntries.size();
-		childEntries.setSize( start + entries.length );
+		childEntries.ensureCapacity( start + entries.length );
 		for (int i = 0; i < entries.length; i++)
 		{
 			ChildEntry entry = entries[i];
-			childEntries.set( start + i, entry );
+			childEntries.add( entry );
 			registerChildEntry( entry );
 		}
 
@@ -251,7 +248,7 @@ abstract public class DPContainerSequence extends DPContainer
 	{
 		assert !hasChild( entry.child );
 		
-		childEntries.insertElementAt( entry, index );
+		childEntries.add( index, entry );
 		registerChildEntry( entry );
 		childListModified();
 		queueResize();
@@ -286,7 +283,7 @@ abstract public class DPContainerSequence extends DPContainer
 	
 	protected List<DPWidget> getChildren()
 	{
-		Vector<DPWidget> xs = new Vector<DPWidget>();
+		ArrayList<DPWidget> xs = new ArrayList<DPWidget>();
 		for (ChildEntry entry: childEntries)
 		{
 			xs.add( entry.child );

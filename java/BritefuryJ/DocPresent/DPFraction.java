@@ -11,9 +11,9 @@ import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Vector;
 
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Metrics.HMetrics;
@@ -194,7 +194,7 @@ public class DPFraction extends DPContainer
 					}
 				}
 				
-				childEntries.insertElementAt( entry, insertIndex );
+				childEntries.add( insertIndex, entry );
 			}
 			
 			queueResize();
@@ -244,7 +244,7 @@ public class DPFraction extends DPContainer
 	
 	protected List<DPWidget> getChildren()
 	{
-		Vector<DPWidget> ch = new Vector<DPWidget>();
+		ArrayList<DPWidget> ch = new ArrayList<DPWidget>();
 		
 		for (int slot = 0; slot < NUMCHILDREN; slot++)
 		{
@@ -480,7 +480,7 @@ public class DPFraction extends DPContainer
 		}
 		else if ( childEntries.size() == 1 )
 		{
-			return childEntries.firstElement();
+			return childEntries.get( 0 );
 		}
 		else
 		{
@@ -501,7 +501,7 @@ public class DPFraction extends DPContainer
 				entryI = entryJ;
 			}
 			
-			return childEntries.lastElement();
+			return childEntries.get( childEntries.size() - 1 );
 		}
 	}
 
@@ -518,7 +518,7 @@ public class DPFraction extends DPContainer
 
 	protected List<DPWidget> verticalNavigationList()
 	{
-		Vector<DPWidget> xs = new Vector<DPWidget>();
+		ArrayList<DPWidget> xs = new ArrayList<DPWidget>();
 		
 		for (DPWidget x: children)
 		{

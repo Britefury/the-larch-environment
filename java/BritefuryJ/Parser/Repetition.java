@@ -6,8 +6,8 @@
 //##************************
 package BritefuryJ.Parser;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 public class Repetition extends UnaryBranchExpression
 {
@@ -75,7 +75,7 @@ public class Repetition extends UnaryBranchExpression
 
 	protected ParseResult parse(ParserState state, String input, int start, int stop)
 	{
-		Vector<Object> values = new Vector<Object>();
+		ArrayList<Object> values = new ArrayList<Object>();
 		
 		int pos = start;
 		int errorPos = start;

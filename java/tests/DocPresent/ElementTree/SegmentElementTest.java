@@ -9,8 +9,8 @@ package tests.DocPresent.ElementTree;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Vector;
 
 import javax.swing.JFrame;
 
@@ -90,7 +90,7 @@ public class SegmentElementTest
 	{
 		VBoxStyleSheet boxs = new VBoxStyleSheet( DPVBox.Typesetting.NONE, DPVBox.Alignment.LEFT, 0.0, false, 0.0 );
 		VBoxElement box = new VBoxElement( boxs );
-		Vector<Element> children = new Vector<Element>();
+		ArrayList<Element> children = new ArrayList<Element>();
 		
 		children.add( line( text( "seg" ) ) );
 		children.add( line( bin( text( "a" ), "+", text( "b" ) ) ) );

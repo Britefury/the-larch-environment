@@ -7,7 +7,7 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-import java.util.Vector;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -67,7 +67,7 @@ public abstract class DPContainer extends DPWidget
 	
 	
 	
-	protected Vector<ChildEntry> childEntries;
+	protected ArrayList<ChildEntry> childEntries;
 	protected HashMap<DPWidget, ChildEntry> childToEntry;
 	protected ChildEntry pressGrabChildEntry;
 	protected int pressGrabButton;
@@ -89,7 +89,7 @@ public abstract class DPContainer extends DPWidget
 	{
 		super( styleSheet );
 		
-		childEntries = new Vector<ChildEntry>();
+		childEntries = new ArrayList<ChildEntry>();
 		childToEntry = new HashMap<DPWidget, ChildEntry>();
 		
 		pointerChildEntryTable = new HashMap<PointerInterface, ChildEntry>();

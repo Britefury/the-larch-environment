@@ -6,9 +6,9 @@
 //##************************
 package BritefuryJ.Parser;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Vector;
 
 public abstract class BranchExpression extends ParserExpression
 {
@@ -28,7 +28,7 @@ public abstract class BranchExpression extends ParserExpression
 	@SuppressWarnings("unchecked")
 	public BranchExpression(List<Object> subexps) throws ParserCoerceException
 	{
-		Vector<ParserExpression> xs = new Vector<ParserExpression>();
+		ArrayList<ParserExpression> xs = new ArrayList<ParserExpression>();
 		
 		for (Object x: subexps)
 		{

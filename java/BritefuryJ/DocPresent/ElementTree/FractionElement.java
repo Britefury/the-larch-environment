@@ -6,8 +6,8 @@
 //##************************
 package BritefuryJ.DocPresent.ElementTree;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import BritefuryJ.DocPresent.DPFraction;
 import BritefuryJ.DocPresent.DPWidget;
@@ -155,7 +155,7 @@ public class FractionElement extends BranchElement
 
 	public List<Element> getChildren()
 	{
-		Vector<Element> xs = new Vector<Element>();
+		ArrayList<Element> xs = new ArrayList<Element>();
 		
 		for (int slot = 0; slot < NUMCHILDREN; slot++)
 		{

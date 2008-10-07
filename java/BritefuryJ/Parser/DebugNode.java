@@ -6,12 +6,12 @@
 //##************************
 package BritefuryJ.Parser;
 
-import java.util.Vector;
+import java.util.ArrayList;
 
 public class DebugNode
 {
 	private DebugNode prev;
-	private Vector<DebugNode> callChildren, memoChildren;
+	private ArrayList<DebugNode> callChildren, memoChildren;
 
 	private ParserExpression expression;
 	private ParseResult result;
@@ -19,8 +19,8 @@ public class DebugNode
 	
 	public DebugNode(DebugNode prev, ParserExpression expression)
 	{
-		callChildren = new Vector<DebugNode>();
-		memoChildren = new Vector<DebugNode>();
+		callChildren = new ArrayList<DebugNode>();
+		memoChildren = new ArrayList<DebugNode>();
 		this.prev = prev;
 		this.expression = expression;
 		this.result = null;
@@ -49,12 +49,12 @@ public class DebugNode
 	}
 
 
-	public Vector<DebugNode> getCallChildren()
+	public ArrayList<DebugNode> getCallChildren()
 	{
 		return callChildren;
 	}
 
-	public Vector<DebugNode> getMemoChildren()
+	public ArrayList<DebugNode> getMemoChildren()
 	{
 		return memoChildren;
 	}

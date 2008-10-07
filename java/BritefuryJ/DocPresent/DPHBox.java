@@ -312,11 +312,11 @@ public class DPHBox extends DPAbstractBox
 		}
 		else if ( childEntries.size() == 1 )
 		{
-			return childEntries.firstElement();
+			return childEntries.get( 0 );
 		}
 		else
 		{
-			ChildEntry entryI = childEntries.firstElement();
+			ChildEntry entryI = childEntries.get( 0 );
 			for (int i = 0; i < childEntries.size() - 1; i++)
 			{
 				ChildEntry entryJ = childEntries.get( i + 1 );
@@ -333,7 +333,7 @@ public class DPHBox extends DPAbstractBox
 				entryI = entryJ;
 			}
 			
-			return childEntries.lastElement();
+			return childEntries.get( childEntries.size() - 1 );
 		}
 	}
 

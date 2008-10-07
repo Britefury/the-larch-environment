@@ -9,8 +9,8 @@ package BritefuryJ.Parser.DebugViewer;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.CubicCurve2D;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Vector;
 
 import BritefuryJ.DocPresent.DPBin;
 import BritefuryJ.DocPresent.DPPresentationArea;
@@ -124,7 +124,7 @@ public class ParseView
 	private DPPresentationArea area;
 	private DPViewBin bin;
 	private HashMap<DebugNode, NodeView> nodeTable;
-	private Vector<Edge> callEdges, memoEdges;
+	private ArrayList<Edge> callEdges, memoEdges;
 	private NodeView root;
 	private NodeView selection;
 	private ParseViewListener listener;
@@ -141,8 +141,8 @@ public class ParseView
 		bin = new DPViewBin( ContainerStyleSheet.defaultStyleSheet, this );
 		
 		nodeTable = new HashMap<DebugNode, NodeView>();
-		callEdges = new Vector<Edge>();
-		memoEdges = new Vector<Edge>();
+		callEdges = new ArrayList<Edge>();
+		memoEdges = new ArrayList<Edge>();
 		
 		root = getNodeView( result.debugNode, input );
 		
