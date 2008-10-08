@@ -306,7 +306,10 @@ abstract public class DPWidget
 	protected void setParent(DPContainer parent, DPPresentationArea area)
 	{
 		this.parent = parent;
-		setPresentationArea( area );
+		if ( area != presentationArea )
+		{
+			setPresentationArea( area );
+		}
 	}
 	
 	
@@ -400,13 +403,7 @@ abstract public class DPWidget
 				}
 				waitingImmediateEvents.clear();
 			}
-			onSetPresentationArea( area );
 		}
-	}
-	
-	
-	protected void onSetPresentationArea(DPPresentationArea area)
-	{
 	}
 
 	
@@ -761,7 +758,7 @@ abstract public class DPWidget
 	{
 	}
 	
-	protected void onUnrealise()
+	protected void onUnrealise(DPWidget unrealiseRoot)
 	{
 	}
 	
@@ -876,14 +873,14 @@ abstract public class DPWidget
 	}
 	
 	@SuppressWarnings("unchecked")
-	protected void handleUnrealise()
+	protected void handleUnrealise(DPWidget unrealiseRoot)
 	{
 		LinkedList<PointerInterface> pointers = (LinkedList<PointerInterface>)pointersWithinBounds.clone();
 		for (PointerInterface pointer: pointers)
 		{
 			handleLeave( new PointerMotionEvent( pointer, PointerMotionEvent.Action.LEAVE ) );
 		}
-		onUnrealise();
+		onUnrealise( unrealiseRoot );
 		bRealised = false;		
 	}
 	
@@ -1037,6 +1034,30 @@ abstract public class DPWidget
 	public DPContentLeaf getRightContentLeaf()
 	{
 		return null;
+	}
+	
+	public DPContentLeaf getContentLeafToLeft()
+	{
+		if ( parent != null )
+		{
+			return parent.getContentLeafToLeftFromChild( this );
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	public DPContentLeaf getContentLeafToRight()
+	{
+		if ( parent != null )
+		{
+			return parent.getContentLeafToRightFromChild( this );
+		}
+		else
+		{
+			return null;
+		}
 	}
 	
 	protected DPContentLeaf getTopOrBottomContentLeaf(boolean bBottom, Point2 cursorPosInRootSpace, boolean bSkipWhitespace)

@@ -59,9 +59,9 @@ public class DPText extends DPContentLeafEditable implements TextVisual.TextVisu
 		visual.realise( presentationArea );
 	}
 	
-	protected void onUnrealise()
+	protected void onUnrealise(DPWidget unrealiseRoot)
 	{
-		super.onUnrealise();
+		super.onUnrealise( unrealiseRoot );
 		visual.unrealise();
 	}
 	
