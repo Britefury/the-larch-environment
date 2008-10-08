@@ -516,30 +516,6 @@ public abstract class DPContentLeaf extends DPWidget
 
 	
 	
-	public DPContentLeaf getContentLeafToLeft()
-	{
-		if ( parent != null )
-		{
-			return parent.getContentLeafToLeftFromChild( this );
-		}
-		else
-		{
-			return null;
-		}
-	}
-	
-	public DPContentLeaf getContentLeafToRight()
-	{
-		if ( parent != null )
-		{
-			return parent.getContentLeafToRightFromChild( this );
-		}
-		else
-		{
-			return null;
-		}
-	}
-	
 	public DPContentLeaf getEditableContentLeafToLeft()
 	{
 		DPContentLeaf leaf = this;
@@ -638,48 +614,28 @@ public abstract class DPContentLeaf extends DPWidget
 		super.onRealise();
 	}
 	
-	protected void onUnrealise()
+	protected void onUnrealise(DPWidget unrealiseRoot)
 	{
-		super.onUnrealise();
+		super.onUnrealise( unrealiseRoot );
 
 		ArrayList<Marker> xs = new ArrayList<Marker>( markers.keySet() );
 		
-		DPContentLeaf left = getContentLeafToLeft();
-		
-		while ( left != null  &&  !left.isRealised() )
+		if ( xs.size() > 0 )
 		{
-			left = left.getContentLeafToLeft();
-		}
-		
-		if ( left != null )
-		{
-			for (Marker x: xs)
-			{
-				try
-				{
-					left.moveMarkerToEnd( x );
-				}
-				catch (Marker.InvalidMarkerPosition e)
-				{
-				}
-			}
-		}
-		else
-		{
-			DPContentLeaf right = getContentLeafToRight();
+			DPContentLeaf left = unrealiseRoot.getContentLeafToLeft();
 			
-			while ( right != null  &&  !right.isRealised() )
+			while ( left != null  &&  !left.isRealised() )
 			{
-				right = right.getContentLeafToRight();
+				left = left.getContentLeafToLeft();
 			}
 			
-			if ( right != null )
+			if ( left != null )
 			{
 				for (Marker x: xs)
 				{
 					try
 					{
-						right.moveMarkerToEnd( x );
+						left.moveMarkerToEnd( x );
 					}
 					catch (Marker.InvalidMarkerPosition e)
 					{
@@ -688,10 +644,33 @@ public abstract class DPContentLeaf extends DPWidget
 			}
 			else
 			{
-				for (Marker x: xs)
+				DPContentLeaf right = unrealiseRoot.getContentLeafToRight();
+				
+				while ( right != null  &&  !right.isRealised() )
 				{
-					unregisterMarker( x );
-					x.set( null, 0, Marker.Bias.START );
+					right = right.getContentLeafToRight();
+				}
+				
+				if ( right != null )
+				{
+					for (Marker x: xs)
+					{
+						try
+						{
+							right.moveMarkerToStart( x );
+						}
+						catch (Marker.InvalidMarkerPosition e)
+						{
+						}
+					}
+				}
+				else
+				{
+					for (Marker x: xs)
+					{
+						unregisterMarker( x );
+						x.set( null, 0, Marker.Bias.START );
+					}
 				}
 			}
 		}

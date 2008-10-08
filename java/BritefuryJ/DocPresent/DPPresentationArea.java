@@ -364,6 +364,8 @@ public class DPPresentationArea extends DPBin implements CaretListener
 	
 	private boolean bHorizontalClamp;
 	
+	private boolean bStructureRefreshQueued;
+	
 	
 		
 	
@@ -396,6 +398,8 @@ public class DPPresentationArea extends DPBin implements CaretListener
 		caret = new Caret();
 		caret.setCaretListener( this );
 		currentCaretLeaf = null;
+		
+		bStructureRefreshQueued = false;
 	}
 	
 	
@@ -710,22 +714,28 @@ public class DPPresentationArea extends DPBin implements CaretListener
 	{
 		if ( !caret.isValid() )
 		{
-			final Runnable putCaretAtStart = new Runnable()
+			if ( !bStructureRefreshQueued )
 			{
-				public void run()
+				final Runnable putCaretAtStart = new Runnable()
 				{
-					if ( !caret.isValid() )
+					public void run()
 					{
-						DPContentLeaf leaf = getLeftContentLeaf();
-						if ( leaf != null )
+						if ( !caret.isValid() )
 						{
-							leaf.moveMarkerToStart( caret.getMarker() );
+							DPContentLeaf leaf = getLeftContentLeaf();
+							if ( leaf != null )
+							{
+								leaf.moveMarkerToStart( caret.getMarker() );
+							}
 						}
+						
+						bStructureRefreshQueued = false;
 					}
-				}
-			};
-		
-			SwingUtilities.invokeLater( putCaretAtStart );
+				};
+			
+				bStructureRefreshQueued = true;
+				SwingUtilities.invokeLater( putCaretAtStart );
+			}
 		}
 	}
 
@@ -1207,7 +1217,7 @@ public class DPPresentationArea extends DPBin implements CaretListener
 	
 	protected void unrealiseEvent()
 	{
-		handleUnrealise();
+		handleUnrealise( this );
 		emitImmediateEvents();
 	}
 	

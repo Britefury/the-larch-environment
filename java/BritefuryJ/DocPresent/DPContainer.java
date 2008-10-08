@@ -160,7 +160,7 @@ public abstract class DPContainer extends DPWidget
 		
 		if ( isRealised() )
 		{
-			child.handleUnrealise();
+			child.handleUnrealise( child );
 		}
 		
 		child.setParent( null, null );
@@ -583,13 +583,13 @@ public abstract class DPContainer extends DPWidget
 		}
 	}
 	
-	protected void handleUnrealise()
+	protected void handleUnrealise(DPWidget unrealiseRoot)
 	{
 		for (ChildEntry entry: childEntries)
 		{
-			entry.child.handleUnrealise();
+			entry.child.handleUnrealise( unrealiseRoot );
 		}
-		super.handleUnrealise();
+		super.handleUnrealise( unrealiseRoot );
 	}
 	
 	
