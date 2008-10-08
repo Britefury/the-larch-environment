@@ -93,6 +93,33 @@ class DMListCommandTracker extends CommandTracker
 
 	
 	
+	private static class InsertAllCommand extends Command
+	{
+		private DMList xs;
+		private int i;
+		private List<Object> x;
+		
+		public InsertAllCommand(DMList xs, int i, List<Object> x)
+		{
+			this.xs = xs;
+			this.i = i;
+			this.x = x;
+		}
+
+		
+		protected void execute()
+		{
+			xs.addAll( i, x );
+		}
+
+		protected void unexecute()
+		{
+			xs.removeRange( i, x.size() );
+		}
+	}
+
+	
+	
 	private static class ClearCommand extends Command
 	{
 		private DMList xs;
@@ -221,6 +248,11 @@ class DMListCommandTracker extends CommandTracker
 	protected void onAddAll(DMList xs, List<Object> x)
 	{
 		commandHistory.addCommand( new AddAllCommand( xs, x ) );
+	}
+
+	protected void onInsertAll(DMList xs, int i, List<Object> x)
+	{
+		commandHistory.addCommand( new InsertAllCommand( xs, i, x ) );
 	}
 
 	protected void onClear(DMList xs, Vector<Object> contents)
