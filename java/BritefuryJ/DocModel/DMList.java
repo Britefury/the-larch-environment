@@ -23,6 +23,185 @@ import BritefuryJ.JythonInterface.JythonSlice;
 
 public class DMList implements DMListInterface, Trackable
 {
+	public static class ListView implements List<Object>
+	{
+		private DMList src;
+		private int start, stop;
+		
+		
+		private ListView(DMList src, int start, int stop)
+		{
+			this.src = src;
+			this.start = start;
+			this.stop = stop;
+		}
+
+	
+	
+	
+		public boolean add(Object x)
+		{
+			src.add( stop, x );
+			return true;
+		}
+		
+		public void add(int index, Object x)
+		{
+			src.add( start + index, x );
+		}
+		
+		public boolean addAll(Collection<? extends Object> xs)
+		{
+			return src.addAll( stop, xs );
+		}
+		
+		public boolean addAll(int index, Collection<? extends Object> xs)
+		{
+			return src.addAll( start + index, xs );
+		}
+		
+
+		
+		public void clear()
+		{
+			src.removeRange( start, stop - start );
+		}
+		
+		
+		public boolean contains(Object x)
+		{
+			return src.getInternalContainer().subList( start, stop ).contains( x );
+		}
+		
+
+		public boolean containsAll(Collection<?> x)
+		{
+			return src.getInternalContainer().subList( start, stop ).containsAll( x );
+		}
+		
+		
+		public boolean equals(Object xs)
+		{
+			return src.getInternalContainer().subList( start, stop ).equals( xs );
+		}
+		
+		
+		public Object get(int index)
+		{
+			return src.get( start + index );
+		}
+		
+		
+		public int indexOf(Object x)
+		{
+			int index = src.indexOf( x );
+			if ( index < start  ||  index >= stop  ||  index == -1 )
+			{
+				return -1;
+			}
+			else
+			{
+				return index - start;
+			}
+		}
+
+		
+		public boolean isEmpty()
+		{
+			return src.isEmpty()  ||  start >= stop;
+		}
+		
+		
+		public Iterator<Object> iterator()
+		{
+			return src.getInternalContainer().subList( start, stop ).iterator();
+		}
+		
+		
+		public int lastIndexOf(Object x)
+		{
+			int index = src.lastIndexOf( x );
+			if ( index < start  ||  index >= stop  ||  index == -1 )
+			{
+				return -1;
+			}
+			else
+			{
+				return index - start;
+			}
+		}
+
+		
+		public ListIterator<Object> listIterator()
+		{
+			return src.getInternalContainer().subList( start, stop ).listIterator();
+		}
+		
+		public ListIterator<Object> listIterator(int i)
+		{
+			return src.getInternalContainer().subList( start, stop ).listIterator( i );
+		}
+		
+		public Object remove(int i)
+		{
+			return src.remove( i - start );
+		}
+		
+		public boolean remove(Object x)
+		{
+			int index = indexOf( x );
+			if ( index == -1 )
+			{
+				return false;
+			}
+			else
+			{
+				src.remove( start + index );
+				return true;
+			}
+		}
+		
+		public boolean removeAll(Collection<?> x)
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		public boolean retainAll(Collection<?> x)
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		public Object set(int index, Object x)
+		{
+			return src.set( start + index, x );
+		}
+		
+		public int size()
+		{
+			return stop - start;
+		}
+		
+		
+		
+		public List<Object> subList(int fromIndex, int toIndex)
+		{
+			return new ListView( src, start + fromIndex, start + toIndex );
+		}
+
+		public Object[] toArray()
+		{
+			return src.getInternalContainer().subList( start, stop ).toArray();
+		}
+
+		public <T> T[] toArray(T[] a)
+		{
+			return src.getInternalContainer().subList( start, stop ).toArray( a );
+		}
+	}
+	
+	
+	
+	
 	private LiteralCell cell;
 	private DMListCommandTracker commandTracker;
 	
@@ -135,9 +314,25 @@ public class DMList implements DMListInterface, Trackable
 		return true;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public boolean addAll(int index, Collection<? extends Object> xs)
 	{
-		throw new UnsupportedOperationException();
+		Vector<Object> v = (Vector<Object>)cell.getLiteralValue();
+		
+		Vector<Object> cxs = new Vector<Object>();
+		cxs.ensureCapacity( xs.size() );
+		for (Object x: xs)
+		{
+			cxs.add( coerce( x ) );
+		}
+		
+		v.addAll( index, cxs );
+		cell.setLiteralValue( v );
+		if ( commandTracker != null )
+		{
+			commandTracker.onInsertAll( this, index, cxs );
+		}
+		return true;
 	}
 	
 
@@ -180,11 +375,10 @@ public class DMList implements DMListInterface, Trackable
 	
 	
 	@SuppressWarnings("unchecked")
-	public boolean equals(DMList xs)
+	public boolean equals(Object xs)
 	{
 		Vector<Object> v = (Vector<Object>)cell.getValue();
-		Vector<Object> v2 = (Vector<Object>)xs.cell.getValue();
-		return v.equals( v2 );
+		return v.equals( xs );
 	}
 	
 	
@@ -307,8 +501,7 @@ public class DMList implements DMListInterface, Trackable
 	
 	public List<Object> subList(int fromIndex, int toIndex)
 	{
-		// TODO Auto-generated method stub
-		return null;
+		return new ListView( this, fromIndex, toIndex );
 	}
 
 	@SuppressWarnings("unchecked")
@@ -482,6 +675,21 @@ public class DMList implements DMListInterface, Trackable
 	 * Only call from DMListCommandTracker
 	 */
 	@SuppressWarnings("unchecked")
+	protected void removeRange(int start, int num)
+	{
+		Vector<Object> v = (Vector<Object>)cell.getLiteralValue();
+		for (int i = 0; i < num; i++)
+		{
+			v.remove( start );
+		}
+		cell.setLiteralValue( v );
+	}
+
+
+	/*
+	 * Only call from DMListCommandTracker
+	 */
+	@SuppressWarnings("unchecked")
 	protected void setContents(List<Object> xs)
 	{
 		Vector<Object> v = (Vector<Object>)cell.getLiteralValue();
@@ -491,6 +699,11 @@ public class DMList implements DMListInterface, Trackable
 	}
 
 
+	@SuppressWarnings("unchecked")
+	protected Vector<Object> getInternalContainer()
+	{
+		return (Vector<Object>)cell.getLiteralValue();
+	}
 
 
 
