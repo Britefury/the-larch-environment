@@ -31,7 +31,7 @@ public interface DMListInterface extends List<Object>
 	public int index(Object x, int j, int k);
 	public int count(Object x);
 	
-	DMListInterface __add__(List<Object> xs);
-	DMListInterface __mul__(int n);
-	DMListInterface __rmul__(int n);
+	public DMListInterface __add__(List<Object> xs);
+	public DMListInterface __mul__(int n);
+	public DMListInterface __rmul__(int n);
 }

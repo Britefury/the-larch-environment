@@ -44,7 +44,7 @@ public class DVNode
 	}
 	
 	
-	private PyObject view;
+	private DocView view;
 	private PyObject treeNode, docNode;
 	
 	private DVNode parent;
@@ -57,7 +57,7 @@ public class DVNode
 	private HashSet<DVNode> children;
 	
 	
-	public DVNode(PyObject view, PyObject treeNode, PyObject docNode)
+	public DVNode(DocView view, PyObject treeNode, PyObject docNode)
 	{
 		this.view = view;
 		this.treeNode = treeNode;
@@ -116,7 +116,7 @@ public class DVNode
 	//
 	//
 	
-	public PyObject getDocView()
+	public DocView getDocView()
 	{
 		return view;
 	}
@@ -131,19 +131,42 @@ public class DVNode
 	
 	private void refreshNode()
 	{
-		String startContent;
+		String startContent = element != null  ?  element.getContent()  :  "";
 		
-		if ( element != null )
-		{
-			startContent = element.getContent();
-		}
-		else
-		{
-			startContent = "";
-		}
-		
+		// If the caret is within the bounds of @element; set the view's caret node to @this
 		PositionBiasContent startState = getCaretPositionBiasAndContentString( element );
+		if ( startState != null )
+		{
+			view.setCaretNode( this );
+		}
 		
+		// Compute the element for this node, and refresh all children
+		Element e = (Element)elementCell.getValue();
+		for (DVNode child: children)
+		{
+			child.refresh();
+		}
+		
+		// Set the node element
+		updateNodeElement( e );
+		
+		// If the caret node is still @this (has not been grabbed by an inner node)
+		if ( view.getCaretNode() == this )
+		{
+			if ( startState != null  &&  element != null )
+			{
+				String newContent = element.getContent();
+				
+				int newPosition = startState.position;
+				Marker.Bias newBias = startState.bias;
+				
+				int oldIndex = startState.position  +  ( startState.bias == Marker.Bias.END  ?  1  :  0 );
+				
+				// Compute the difference
+				
+				
+			}
+		}
 	}
 	
 	
@@ -187,7 +210,22 @@ public class DVNode
 	private Element computeNodeElement()
 	{
 		return null;
-	}*/
+	}
 	
 	
+	private void updateNodeElement(Element e)
+	{
+		if ( e != null )
+		{
+			element = e;
+			proxyElement.setChild( element );
+		}
+		else
+		{
+			element = null;
+			proxyElement.setChild( null );
+		}
+	}
+	
+	*/
 }
