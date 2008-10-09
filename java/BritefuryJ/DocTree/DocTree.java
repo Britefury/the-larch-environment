@@ -254,43 +254,43 @@ public class DocTree
 	}
 	
 	
-	public DocTreeNode treeNode(DMListInterface x, DocTreeNode parentNode, int indexInParent)
+	public DocTreeNode treeNode(DMListInterface x, DocTreeNode parentTreeNode, int indexInParent)
 	{
-		DocTreeKey key = new DocTreeKey( x, parentNode, indexInParent );
+		DocTreeKey key = new DocTreeKey( x, parentTreeNode, indexInParent );
 		
-		DocTreeNode node = new DocTreeList( this, x, parentNode, indexInParent );
+		DocTreeNode node = new DocTreeList( this, x, parentTreeNode, indexInParent );
 		
 		table.put( key, node );
 		
 		return node;
 	}
 	
-	public DocTreeNode treeNode(String x, DocTreeNode parentNode, int indexInParent)
+	public DocTreeNode treeNode(String x, DocTreeNode parentTreeNode, int indexInParent)
 	{
-		DocTreeKey key = new DocTreeKey( x, parentNode, indexInParent );
+		DocTreeKey key = new DocTreeKey( x, parentTreeNode, indexInParent );
 		
-		DocTreeNode node = new DocTreeString( x, parentNode, indexInParent );
+		DocTreeNode node = new DocTreeString( x, parentTreeNode, indexInParent );
 		
 		table.put( key, node );
 		
 		return node;
 	}
 
-	public DocTreeNode treeNode(Object x, DocTreeNode parentNode, int indexInParent)
+	public DocTreeNode treeNode(Object x, DocTreeNode parentTreeNode, int indexInParent)
 	{
 		if ( x instanceof String )
 		{
-			return treeNode( (String)x, parentNode, indexInParent );
+			return treeNode( (String)x, parentTreeNode, indexInParent );
 		}
 		else if ( x instanceof DMListInterface )
 		{
-			return treeNode( (DMListInterface)x, parentNode, indexInParent );
+			return treeNode( (DMListInterface)x, parentTreeNode, indexInParent );
 		}
 		else
 		{
-			DocTreeKey key = new DocTreeKey( x, parentNode, indexInParent );
+			DocTreeKey key = new DocTreeKey( x, parentTreeNode, indexInParent );
 			
-			DocTreeNodeObject node = new DocTreeNodeObject( x, parentNode, indexInParent );
+			DocTreeNodeObject node = new DocTreeNodeObject( x, parentTreeNode, indexInParent );
 			
 			table.put( key, node );
 			
