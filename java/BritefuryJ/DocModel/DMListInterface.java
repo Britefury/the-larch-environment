@@ -22,7 +22,16 @@ public interface DMListInterface extends List<Object>
 	public void __setitem__(PySlice i, List<Object> xs);
 	public void __delitem__(int i);
 	public void __delitem__(PySlice i);
+	public Object pop();
+	public Object pop(int i);
+
+	public int __len__();
 	public int index(Object x);
+	public int index(Object x, int j);
+	public int index(Object x, int j, int k);
+	public int count(Object x);
 	
 	DMListInterface __add__(List<Object> xs);
+	DMListInterface __mul__(int n);
+	DMListInterface __rmul__(int n);
 }

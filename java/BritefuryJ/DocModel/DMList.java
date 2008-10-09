@@ -13,12 +13,14 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Vector;
 
+import org.python.core.Py;
 import org.python.core.PySlice;
 
 import BritefuryJ.Cell.LiteralCell;
 import BritefuryJ.CommandHistory.CommandTracker;
 import BritefuryJ.CommandHistory.CommandTrackerFactory;
 import BritefuryJ.CommandHistory.Trackable;
+import BritefuryJ.JythonInterface.JythonIndex;
 import BritefuryJ.JythonInterface.JythonSlice;
 
 public class DMList implements DMListInterface, Trackable
@@ -541,11 +543,17 @@ public class DMList implements DMListInterface, Trackable
 	
 	public void insert(int i, Object x)
 	{
+		int s = size();
+		// Clamp to -s:s
+		i = Math.min( Math.max( i, -s ), s );
+		// Handle negative indexing
+		i = i < 0  ?  s + i  :  i;
 		add( i, x );
 	}
 	
 	public Object __getitem__(int i)
 	{
+		i = JythonIndex.pyIndexToJava( i, size(), "DMList index out of range" );
 		return get( i );
 	}
 	
@@ -558,6 +566,7 @@ public class DMList implements DMListInterface, Trackable
 	
 	public void __setitem__(int i, Object x)
 	{
+		i = JythonIndex.pyIndexToJava( i, size(), "DMList assignment index out of range" );
 		set( i, x );
 	}
 	
@@ -591,6 +600,7 @@ public class DMList implements DMListInterface, Trackable
 	
 	public void __delitem__(int i)
 	{
+		i = JythonIndex.pyIndexToJava( i, size(), "DMList assignment index out of range" );
 		remove( i );
 	}
 	
@@ -613,6 +623,17 @@ public class DMList implements DMListInterface, Trackable
 		}
 	}
 	
+	public Object pop()
+	{
+		return remove( size() - 1 );
+	}
+	
+	public Object pop(int i)
+	{
+		i = JythonIndex.pyIndexToJava( i, size(), "pop index out of range" );
+		return remove( i );
+	}
+	
 	public int __len__()
 	{
 		return size();
@@ -620,7 +641,69 @@ public class DMList implements DMListInterface, Trackable
 
 	public int index(Object x)
 	{
-		return indexOf( x );
+		int i = indexOf( x );
+		if ( i == -1 )
+		{
+			throw Py.ValueError( "DMList.index(x): x not in list" );
+		}
+		return i;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public int index(Object x, int j)
+	{
+		Vector<Object> v = (Vector<Object>)cell.getValue();
+	
+		int s = v.size();
+		// Clamp to -s:s
+		j = Math.min( Math.max( j, -s ), s );
+		// Handle negative indexing
+		j = j < 0  ?  s + j  :  j;
+
+		int i = v.subList( j, v.size() ).indexOf( x );
+		if ( i == -1 )
+		{
+			throw Py.ValueError( "DMList.index(x,j): x not in list[j:]" );
+		}
+		return i + j;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public int index(Object x, int j, int k)
+	{
+		Vector<Object> v = (Vector<Object>)cell.getValue();
+		
+		int s = v.size();
+		// Clamp to -s:s
+		j = Math.min( Math.max( j, -s ), s );
+		k = Math.min( Math.max( k, -s ), s );
+		// Handle negative indexing
+		j = j < 0  ?  s + j  :  j;
+		k = k < 0  ?  s + k  :  k;
+
+		int i = v.subList( j, k ).indexOf( x );
+		if ( i == -1 )
+		{
+			throw Py.ValueError( "DMList.index(x,j,k): x not in list[j:k]" );
+		}
+		return i + j;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public int count(Object x)
+	{
+		int n = 0;
+		
+		Vector<Object> v = (Vector<Object>)cell.getValue();
+		for (Object a: v)
+		{
+			if ( a.equals( x ) )
+			{
+				n++;
+			}
+		}
+		
+		return n;
 	}
 	
 	
@@ -629,6 +712,24 @@ public class DMList implements DMListInterface, Trackable
 		DMList result = (DMList)clone();
 		result.addAll( xs );
 		return result;
+	}
+
+	
+	
+	public DMListInterface __mul__(int n)
+	{
+		DMList result = new DMList();
+		for (int i = 0; i < n; i++)
+		{
+			result.addAll( this );
+		}
+		return result;
+	}
+
+	
+	public DMListInterface __rmul__(int n)
+	{
+		return __mul__( n );
 	}
 
 	
