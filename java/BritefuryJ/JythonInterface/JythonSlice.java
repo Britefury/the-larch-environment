@@ -23,6 +23,7 @@ public class JythonSlice
 	}
 	
 	
+	
 	public static Object[] arrayGetSlice(Object[] in, PySlice slice)
 	{
 		// Based on Jython PyList source code
