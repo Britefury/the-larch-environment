@@ -297,5 +297,11 @@ public class DocTree
 			return node;
 		}
 	}
+	
+	
+	public Object py_treeNode(DocTreeNode node)
+	{
+		return node;
+	}
 }
 

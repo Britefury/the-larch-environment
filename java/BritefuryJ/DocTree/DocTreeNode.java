@@ -8,7 +8,7 @@ package BritefuryJ.DocTree;
 
 public interface DocTreeNode
 {
-	Object getNode();
-	DocTreeNode getParentTreeNode();
-	int getIndexInParent();
+	public Object getNode();
+	public DocTreeNode getParentTreeNode();
+	public int getIndexInParent();
 }

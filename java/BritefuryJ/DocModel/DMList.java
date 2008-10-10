@@ -15,6 +15,7 @@ import java.util.Vector;
 
 import org.python.core.Py;
 import org.python.core.PySlice;
+import org.python.core.PyString;
 
 import BritefuryJ.Cell.LiteralCell;
 import BritefuryJ.CommandHistory.CommandTracker;
@@ -237,6 +238,11 @@ public class DMList implements DMListInterface, Trackable
 		return x;
 	}
 	
+	public Object coerce(PyString x)
+	{
+		return x.toString();
+	}
+	
 	public Object coerce(List<Object> x)
 	{
 		return new DMList( x );
@@ -245,7 +251,11 @@ public class DMList implements DMListInterface, Trackable
 	@SuppressWarnings("unchecked")
 	public Object coerce(Object x)
 	{
-		if ( x instanceof String )
+		if ( x instanceof PyString )
+		{
+			return coerce( (PyString)x );
+		}
+		else if ( x instanceof String )
 		{
 			return coerce( (String)x );
 		}
