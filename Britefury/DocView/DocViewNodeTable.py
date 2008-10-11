@@ -195,7 +195,7 @@ class DocViewNodeTable (object):
 
 import unittest
 from BritefuryJ.DocModel import DMListInterface, DMList
-from Britefury.DocTree.DocTree import DocTree
+from BritefuryJ.DocTree import DocTree
 
 class TestCase_DocViewNodeTable (unittest.TestCase):
 	class _Value (object):

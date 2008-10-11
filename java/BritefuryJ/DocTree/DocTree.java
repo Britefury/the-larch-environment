@@ -34,19 +34,25 @@ public class DocTree
 		public Key(Object docNode, DocTreeNode parentTreeNode, int index)
 		{
 			this.docNode = new WeakReference<Object>( docNode );
-			this.parentTreeNode = new WeakReference<DocTreeNode>( parentTreeNode );
+			if ( parentTreeNode != null )
+			{
+				this.parentTreeNode = new WeakReference<DocTreeNode>( parentTreeNode );
+			}
 			this.index = index;
 			
-			this.hash = tripleHash( docNode.hashCode(), parentTreeNode.hashCode(), index );
+			this.hash = tripleHash( docNode.hashCode(), parentTreeNode != null  ?  parentTreeNode.hashCode()  :  0, index );
 		}
 		
 		public Key(Object docNode, DocTreeNode parentTreeNode, int index, DocTreeNodeTable table)
 		{
 			this.docNode = new WeakReference<Object>( docNode, table.refQueue );
-			this.parentTreeNode = new WeakReference<DocTreeNode>( parentTreeNode, table.refQueue );
+			if ( parentTreeNode != null )
+			{
+				this.parentTreeNode = new WeakReference<DocTreeNode>( parentTreeNode, table.refQueue );
+			}
 			this.index = index;
 			
-			this.hash = tripleHash( docNode.hashCode(), parentTreeNode.hashCode(), index );
+			this.hash = tripleHash( docNode.hashCode(), parentTreeNode != null  ?  parentTreeNode.hashCode()  :  0, index );
 		}
 		
 		
@@ -61,7 +67,14 @@ public class DocTree
 			if ( x instanceof Key )
 			{
 				Key kx = (Key)x;
-				return docNode.equals( kx.docNode )  &&  parentTreeNode.equals( kx.parentTreeNode )  &&  index == kx.index;  
+				if ( parentTreeNode == null )
+				{
+					return docNode.equals( kx.docNode )  &&  kx.parentTreeNode == null  &&  index == kx.index;
+				}
+				else
+				{
+					return docNode.equals( kx.docNode )  &&  parentTreeNode.equals( kx.parentTreeNode )  &&  index == kx.index;
+				}
 			}
 			else
 			{
@@ -72,7 +85,14 @@ public class DocTree
 		
 		public DocTreeKey docTreeKey()
 		{
-			return new DocTreeKey( docNode.get(), parentTreeNode.get(), index );
+			if ( parentTreeNode != null )
+			{
+				return new DocTreeKey( docNode.get(), parentTreeNode.get(), index );
+			}
+			else
+			{
+				return new DocTreeKey( docNode.get(), null, index );
+			}
 		}
 		
 		
@@ -109,7 +129,10 @@ public class DocTree
 		public DocTreeKey(Object docNode, DocTreeNode parentTreeNode, int index)
 		{
 			this.docNode = new WeakReference<Object>( docNode );
-			this.parentTreeNode = new WeakReference<DocTreeNode>( parentTreeNode );
+			if ( parentTreeNode != null )
+			{
+				this.parentTreeNode = new WeakReference<DocTreeNode>( parentTreeNode );
+			}
 			this.index = index;
 		}
 		
@@ -121,7 +144,14 @@ public class DocTree
 		
 		public DocTreeNode getParentTreeNode()
 		{
-			return parentTreeNode.get();
+			if ( parentTreeNode != null )
+			{
+				return parentTreeNode.get();
+			}
+			else
+			{
+				return null;
+			}
 		}
 		
 		public int getIndex()
@@ -134,22 +164,22 @@ public class DocTree
 		{
 			Object docNode = getDocNode();
 			DocTreeNode parent = getParentTreeNode();
-			if ( docNode == null  ||  parent == null )
+			if ( docNode == null  ||  ( parentTreeNode != null  &&  parent == null ) )
 			{
 				throw new DocTreeKeyError();
 			}
-			return new Key( getDocNode(), getParentTreeNode(), index, null );
+			return new Key( docNode, parent, index );
 		}
 
 		public Key key(DocTreeNodeTable table) throws DocTreeKeyError
 		{
 			Object docNode = getDocNode();
 			DocTreeNode parent = getParentTreeNode();
-			if ( docNode == null  ||  parent == null )
+			if ( docNode == null  ||  ( parentTreeNode != null  &&  parent == null ) )
 			{
 				throw new DocTreeKeyError();
 			}
-			return new Key( getDocNode(), getParentTreeNode(), index, table );
+			return new Key( docNode, parent, index, table );
 		}
 	}
 
@@ -251,6 +281,12 @@ public class DocTree
 	public DocTree()
 	{
 		table = new DocTreeNodeTable();
+	}
+	
+	
+	public DocTreeNode treeNode(Object x)
+	{
+		return treeNode( x, null, -1 );
 	}
 	
 	
