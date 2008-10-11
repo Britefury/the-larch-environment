@@ -164,6 +164,13 @@ public class Test_DMIOWrite extends TestCase
 	}
 	
 	
+	public void testWriteEmptyString()
+	{
+		Object[] xs = { "" };
+		writeTest( Arrays.asList( xs ), "(\"\")" );
+	}
+
+	
 	public void testWriteEmptyList()
 	{
 		Object[] xs = { };

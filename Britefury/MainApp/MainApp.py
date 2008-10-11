@@ -14,6 +14,8 @@ from java.awt import Dimension, Font, Color
 from java.awt.event import WindowListener
 
 
+from Britefury.DocModel import DMIORead, DMIOWrite
+
 from BritefuryJ.DocPresent import *
 from BritefuryJ.DocPresent.ElementTree import *
 from BritefuryJ.DocPresent.StyleSheets import *
@@ -26,7 +28,6 @@ from Britefury.Event.QueuedEvent import queueEvent
 from Britefury.CommandHistory.CommandHistory import CommandHistory
 
 from Britefury.DocModel.DMList import DMList
-from Britefury.DocModel.DMIO import readSX, writeSX
 
 from Britefury.gSym.gSymWorld import GSymWorld
 from Britefury.gSym.gSymEnvironment import GSymEnvironment
@@ -375,7 +376,7 @@ class MainApp (object):
 						f = open( filename, 'r' )
 						if f is not None:
 							try:
-								documentRoot = readSX( f )
+								documentRoot = DMIORead.readSX( f )
 								documentRoot = DMList( documentRoot )
 								self.setDocument( documentRoot )
 							except IOError:
@@ -447,7 +448,7 @@ class MainApp (object):
 	def _writeFile(self, filename):
 		f = open( filename, 'w' )
 		if f is not None:
-			writeSX( f, self._documentRoot )
+			f.write( DMIOWrite.writeSX( self._documentRoot ) )
 			f.close()
 			self._bUnsavedData = False
 

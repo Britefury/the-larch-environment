@@ -7,7 +7,9 @@
 ##-*************************
 import os
 
-from Britefury.DocModel.DMIO import readSX
+from java.util import List
+from BritefuryJ.DocModel import DMIORead
+
 from Britefury.DocModel.DMListInterface import DMListInterface
 
 
@@ -19,12 +21,12 @@ def initPlugins(pluginInterface):
 		print 'Could not open plugin registry'
 		return
 
-	content = readSX( f )
+	content = DMIORead.readSX( f.read() )
 
 
-	if isinstance( content, list ):
+	if isinstance( content, List ):
 		if content[0] == '$gSymPluginRegistry':
-			for moduleName in content[1:]:
+			for moduleName in content.subList( 1, content.size() ):
 				mod = __import__( moduleName )
 				components = moduleName.split( '.' )
 				for comp in components[1:]:
