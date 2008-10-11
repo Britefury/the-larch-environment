@@ -5,6 +5,10 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
+from java.lang import String
+
+from BritefuryJ.DocModel import DMListInterface as JDMListInterface
+
 from Britefury.DocModel.DMListInterface import DMListInterface
 
 from Britefury.DocTree.DocTreeNode import DocTreeNode
@@ -13,10 +17,10 @@ from Britefury.DocTree.DocTreeList import DocTreeList
 
 
 def isGLispString(xs):
-	return isinstance( xs, str )  or  isinstance( xs, unicode )
+	return isinstance( xs, str )  or  isinstance( xs, unicode )  or  isinstance( xs, String )
 
 def isGLispList(xs):
-	return isinstance( xs, tuple )  or  isinstance( xs, list )  or  isinstance( xs, DMListInterface )  or  isinstance( xs, DocTreeList )
+	return isinstance( xs, tuple )  or  isinstance( xs, list )  or  isinstance( xs, DMListInterface )  or  isinstance( xs, DocTreeList )  or isinstance( xs, JDMListInterface )
 
 
 def isGLispComment(xs):

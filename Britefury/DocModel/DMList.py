@@ -8,6 +8,8 @@
 from weakref import WeakKeyDictionary
 from copy import copy, deepcopy
 
+from java.util import List
+
 from BritefuryJ.Cell import LiteralCell
 
 from Britefury.DocModel.DocModelLayer import DocModelLayer
@@ -45,7 +47,7 @@ class DMList (DMListInterface):
 
 
 	def _p_coerce(self, x):
-		if isinstance( x, list )  or  isinstance( x, tuple ):
+		if isinstance( x, list )  or  isinstance( x, tuple )  or  isinstance( x, List ):
 			return DMList( x )
 		elif isinstance( x, str ):
 			return intern( x )

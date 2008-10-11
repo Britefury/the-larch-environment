@@ -8,9 +8,10 @@
 
 import java.util.List
 
+from BritefuryJ.DocModel import DMIORead, DMIOWrite
+
 import string
 import unittest
-from Britefury.DocModel.DMIO import readSX, writeSX
 import cStringIO
 
 import re
@@ -20,13 +21,9 @@ _whitespaceRegex = '[' + re.escape( string.whitespace ) + ']*'
 
 class ParserTestCase (unittest.TestCase):
 	def _cmpValue(self, x, y):
-		xStream = cStringIO.StringIO()
-		writeSX( xStream, x )
-
-		yStream = cStringIO.StringIO()
-		writeSX( yStream, y )
-		
-		return xStream.getvalue() == yStream.getvalue()
+		xstr = DMIOWrite.writeSX( x )
+		ystr = DMIOWrite.writeSX( y )
+		return xstr == ystr
 			
 	
 	
@@ -64,7 +61,7 @@ class ParserTestCase (unittest.TestCase):
 	def _matchTestSX(self, parser, input, expectedSX, ignoreChars=_whitespaceRegex):
 		result = parser.parseString( input, ignoreChars )
 
-		expected = readSX( expectedSX )
+		expected = DMIORead.readSX( expectedSX )
 		
 		if not result.isValid():
 			print 'PARSE FAILURE while parsing', input
@@ -81,9 +78,7 @@ class ParserTestCase (unittest.TestCase):
 			print 'EXPECTED:'
 			print expectedSX
 			print 'RESULT:'
-			stream = cStringIO.StringIO()
-			writeSX( stream, value )
-			print stream.getvalue()
+			print DMIOWrite.writeSX( value )
 
 		bSame = self._cmpValue( value, expected )
 		if not bSame:
@@ -91,9 +86,7 @@ class ParserTestCase (unittest.TestCase):
 			print expectedSX
 			print ''
 			print 'RESULT:'
-			stream = cStringIO.StringIO()
-			writeSX( stream, value )
-			print stream.getvalue()
+			print DMIOWrite.writeSX( value )
 		self.assert_( bSame )
 
 		

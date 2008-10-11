@@ -261,7 +261,7 @@ class DocTree (object):
 
 		try:
 			docTreeNode = self._table[key]
-		except KeyError:		
+		except KeyError:
 			if isDMListCompatible( x ):
 				docTreeNode = DocTreeList( self, x, parentTreeNode, indexInParent )
 			elif isinstance( x, str ):

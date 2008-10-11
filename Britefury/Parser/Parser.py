@@ -1203,7 +1203,7 @@ class PeekNot (ParserExpression):
 
 
 import unittest
-from Britefury.DocModel.DMIO import readSX, writeSX
+from BritefuryJ.DocModel import DMIORead, DMIOWrite
 import cStringIO
 
 
@@ -1240,7 +1240,7 @@ class ParserTestCase (unittest.TestCase):
 	def _matchTestSX(self, parser, input, expectedSX, ignoreChars=string.whitespace):
 		result, pos = parser.parseString( input, ignoreChars=ignoreChars )
 
-		expected = readSX( expectedSX )
+		expected = DMIORead.readSX( expectedSX )
 
 		if result is None:
 			print 'PARSE FAILURE while parsing', input
@@ -1257,18 +1257,14 @@ class ParserTestCase (unittest.TestCase):
 			print 'EXPECTED:'
 			print expectedSX
 			print 'RESULT:'
-			stream = cStringIO.StringIO()
-			writeSX( stream, res )
-			print stream.getvalue()
+			print DMIOWrite.writeSX( res )
 
 		if res != expected:
 			print 'EXPECTED:'
 			print expectedSX
 			print ''
 			print 'RESULT:'
-			stream = cStringIO.StringIO()
-			writeSX( stream, res )
-			print stream.getvalue()
+			print DMIOWrite.writeSX( res )
 		self.assert_( res == expected )
 
 
