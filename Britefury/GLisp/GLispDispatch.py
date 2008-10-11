@@ -6,7 +6,9 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
 from Britefury.GLisp.GLispUtil import isGLispList, gLispSrcToString
-from Britefury.DocTree.DocTreeNode import DocTreeNode
+#from Britefury.DocTree.DocTreeNode import DocTreeNode
+from BritefuryJ.DocTree import DocTreeNode
+from BritefuryJ.DocTree import DocTreeString
 
 
 
@@ -25,6 +27,8 @@ def dispatch(target, xs, *args):
 		if len( xs ) < 1:
 			raise DispatchSizeError, 'GLisp dispatch: require at least 1 element for dispatch'
 		name = xs[0]
+		if isinstance( name, DocTreeString ):
+			name = name.getString()
 		try:
 			method = getattr( target, name )
 		except AttributeError:

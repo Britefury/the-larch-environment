@@ -9,6 +9,9 @@ import sys
 
 from copy import copy
 
+from BritefuryJ.DocTree import DocTree
+from BritefuryJ.DocTree import DocTreeNode
+
 from Britefury.DocView.DVNode import DVNode
 from Britefury.DocView.DocView import DocView
 
@@ -22,8 +25,8 @@ from Britefury.gSym.View.InteractorEvent import InteractorEventKey, InteractorEv
 from Britefury.gSym.View import ListView
 from Britefury.gSym.View.UnparsedText import UnparsedText
 
-from Britefury.DocTree.DocTree import DocTree
-from Britefury.DocTree.DocTreeNode import DocTreeNode
+#from Britefury.DocTree.DocTree import DocTree
+#from Britefury.DocTree.DocTreeNode import DocTreeNode
 
 
 from BritefuryJ.DocPresent import *

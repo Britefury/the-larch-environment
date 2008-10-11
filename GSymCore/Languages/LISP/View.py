@@ -68,7 +68,12 @@ def nodeEditor(ctx, node, contents, state):
 
 
 def stringNodeEditor(ctx, node, metadata, state):
-	return contentListener( ctx, text( ctx, string_textStyle, node ), ParsedNodeContentListener( ctx, node ) )
+	res, pos = Parser.unquotedString.parseString( node.getString() )
+	if res is None:
+		nodeText = repr( node.getString() )
+	else:
+		nodeText = node.getString()
+	return contentListener( ctx, text( ctx, string_textStyle, nodeText ), ParsedNodeContentListener( ctx, node ) )
 
 
 
@@ -78,9 +83,6 @@ MODE_VERTICAL = 2
 
 
 def viewStringNode(node, ctx, state):
-	res, pos = Parser.unquotedString.parseString( node )
-	if res is None:
-		node = repr( node )
 	# String
 	return stringNodeEditor( ctx, node, None, state )
 

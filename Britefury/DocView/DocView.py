@@ -7,8 +7,7 @@
 ##-*************************
 from BritefuryJ.Cell import Cell
 
-from Britefury.DocModel.DMListInterface import DMListInterface
-from Britefury.DocTree.DocTreeNode import DocTreeNode
+from BritefuryJ.DocTree import DocTreeNode
 
 from Britefury.DocView.DocViewNodeTable import DocViewNodeTable
 from Britefury.DocView.DVNode import DVNode

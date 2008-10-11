@@ -7,20 +7,20 @@
 ##-*************************
 from java.lang import String
 
-from BritefuryJ.DocModel import DMListInterface as JDMListInterface
+from BritefuryJ.DocModel import DMListInterface
 
-from Britefury.DocModel.DMListInterface import DMListInterface
+#from Britefury.DocTree.DocTreeNode import DocTreeNode
+#from Britefury.DocTree.DocTreeList import DocTreeList
 
-from Britefury.DocTree.DocTreeNode import DocTreeNode
-from Britefury.DocTree.DocTreeList import DocTreeList
-
+from BritefuryJ.DocTree import DocTreeNode
+from BritefuryJ.DocTree import DocTreeList
 
 
 def isGLispString(xs):
 	return isinstance( xs, str )  or  isinstance( xs, unicode )  or  isinstance( xs, String )
 
 def isGLispList(xs):
-	return isinstance( xs, tuple )  or  isinstance( xs, list )  or  isinstance( xs, DMListInterface )  or  isinstance( xs, DocTreeList )  or isinstance( xs, JDMListInterface )
+	return isinstance( xs, tuple )  or  isinstance( xs, list )  or  isinstance( xs, DocTreeList )  or isinstance( xs, DMListInterface )
 
 
 def isGLispComment(xs):
@@ -34,7 +34,7 @@ def stripGLispComments(xs):
 
 def gLispSrcToString(x, level=3):
 	if isinstance( x, DocTreeNode ):
-		x = x.node
+		x = x.getNode()
 
 	if x is None:
 		return 'None'
@@ -56,7 +56,7 @@ def _indent(s):
 
 def _gLispSrcToStringPretty(x):
 	if isinstance( x, DocTreeNode ):
-		x = x.node
+		x = x.getNode()
 
 	if x is None:
 		return [ 'None' ]
