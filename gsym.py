@@ -18,8 +18,7 @@ i18n.initialise()
 
 
 from BritefuryJ.DocModel import DMIORead
-
-from Britefury.DocModel.DMList import DMList
+from BritefuryJ.DocModel import DMList
 
 from Britefury.gSym.gSymEnvironment import initGSymEnvironment, shutdownGSymEnvironment
 

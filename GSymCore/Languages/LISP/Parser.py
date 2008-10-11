@@ -8,6 +8,8 @@
 
 import string
 
+from BritefuryJ.DocModel import DMList
+
 from Britefury.Parser.Parser import getErrorLine, parserCoerce, Bind, Action, Condition, Forward, Group, Production, Suppress, Literal, Keyword, RegEx, Word, Sequence, Combine, Choice, Optional, Repetition, ZeroOrMore, OneOrMore, Peek, PeekNot, ParserTestCase
 from Britefury.Parser.GrammarUtils.Tokens import identifier, decimalInteger, hexInteger, integer, singleQuotedString, doubleQuotedString, quotedString, floatingPoint
 
@@ -23,7 +25,7 @@ def _quotedStringParseAction(tokens):
 
 
 def _listParseAction(tokens):
-	return DMList.DMList( tokens[0] )
+	return DMList( tokens[0] )
 
 
 def _p(xs):
