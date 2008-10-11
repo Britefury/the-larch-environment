@@ -14,7 +14,9 @@ from java.awt import Dimension, Font, Color
 from java.awt.event import WindowListener
 
 
-from Britefury.DocModel import DMIORead, DMIOWrite
+from BritefuryJ.CommandHistory import CommandHistory, CommandHistoryListener
+
+from Britefury.DocModel import DMIORead, DMIOWrite, DMList
 
 from BritefuryJ.DocPresent import *
 from BritefuryJ.DocPresent.ElementTree import *
@@ -25,9 +27,6 @@ from BritefuryJ.Cell import CellListener
 
 from Britefury.Event.QueuedEvent import queueEvent
 
-from Britefury.CommandHistory.CommandHistory import CommandHistory
-
-from Britefury.DocModel.DMList import DMList
 
 from Britefury.gSym.gSymWorld import GSymWorld
 from Britefury.gSym.gSymEnvironment import GSymEnvironment
@@ -301,11 +300,18 @@ class MainApp (object):
 
 	def setDocument(self, documentRoot):
 		self._documentRoot = documentRoot
+		
+		
 
 		self._commandHistory = CommandHistory()
+		
+		class Listener (CommandHistoryListener):
+			def onCommandHistoryChanged(_self, history):
+				self._onCommandHistoryChanged( history )
+		
 		if self._documentRoot is not None:
 			self._commandHistory.track( self._documentRoot )
-		self._commandHistory.changedSignal.connect( self._onCommandHistoryChanged )
+		self._commandHistory.setListener( Listener() )
 		self._bUnsavedData = False
 		
 	

@@ -16,6 +16,7 @@ import java.util.Vector;
 import org.python.core.Py;
 import org.python.core.PySlice;
 import org.python.core.PyString;
+import org.python.core.PyUnicode;
 
 import BritefuryJ.Cell.LiteralCell;
 import BritefuryJ.CommandHistory.CommandTracker;
@@ -45,22 +46,28 @@ public class DMList implements DMListInterface, Trackable
 		public boolean add(Object x)
 		{
 			src.add( stop, x );
+			stop++;
 			return true;
 		}
 		
 		public void add(int index, Object x)
 		{
 			src.add( start + index, x );
+			stop++;
 		}
 		
 		public boolean addAll(Collection<? extends Object> xs)
 		{
-			return src.addAll( stop, xs );
+			boolean bResult = src.addAll( stop, xs );
+			stop += xs.size();
+			return bResult;
 		}
 		
 		public boolean addAll(int index, Collection<? extends Object> xs)
 		{
-			return src.addAll( start + index, xs );
+			boolean bResult = src.addAll( start + index, xs );
+			stop += xs.size();
+			return bResult;
 		}
 		
 
@@ -68,6 +75,7 @@ public class DMList implements DMListInterface, Trackable
 		public void clear()
 		{
 			src.removeRange( start, stop - start );
+			stop = start;
 		}
 		
 		
@@ -147,7 +155,9 @@ public class DMList implements DMListInterface, Trackable
 		
 		public Object remove(int i)
 		{
-			return src.remove( i - start );
+			Object x = src.remove( i - start );
+			stop--;
+			return x;
 		}
 		
 		public boolean remove(Object x)
@@ -160,6 +170,7 @@ public class DMList implements DMListInterface, Trackable
 			else
 			{
 				src.remove( start + index );
+				stop--;
 				return true;
 			}
 		}
@@ -188,6 +199,10 @@ public class DMList implements DMListInterface, Trackable
 		
 		public List<Object> subList(int fromIndex, int toIndex)
 		{
+			if ( fromIndex < 0  ||  toIndex > size()  ||  fromIndex > toIndex )
+			{
+				throw new IndexOutOfBoundsException();
+			}
 			return new ListView( src, start + fromIndex, start + toIndex );
 		}
 
@@ -243,6 +258,11 @@ public class DMList implements DMListInterface, Trackable
 		return x.toString();
 	}
 	
+	public Object coerce(PyUnicode x)
+	{
+		return x.toString();
+	}
+	
 	public Object coerce(List<Object> x)
 	{
 		return new DMList( x );
@@ -254,6 +274,10 @@ public class DMList implements DMListInterface, Trackable
 		if ( x instanceof PyString )
 		{
 			return coerce( (PyString)x );
+		}
+		else if ( x instanceof PyUnicode )
+		{
+			return coerce( (PyUnicode)x );
 		}
 		else if ( x instanceof String )
 		{
@@ -513,6 +537,10 @@ public class DMList implements DMListInterface, Trackable
 	
 	public List<Object> subList(int fromIndex, int toIndex)
 	{
+		if ( fromIndex < 0  ||  toIndex > size()  ||  fromIndex > toIndex )
+		{
+			throw new IndexOutOfBoundsException();
+		}
 		return new ListView( this, fromIndex, toIndex );
 	}
 
@@ -753,11 +781,27 @@ public class DMList implements DMListInterface, Trackable
 			
 			for (int i = 0; i < size() - 1; i++)
 			{
-				builder.append( get( i ).toString() );
+				Object x = get( i );
+				if ( x == null )
+				{
+					builder.append( "<null>" );
+				}
+				else
+				{
+					builder.append( x.toString() );
+				}
 				builder.append( ", " );
 			}
 			
-			builder.append( get( size() - 1 ).toString() );
+			Object x = get( size() - 1 );
+			if ( x == null )
+			{
+				builder.append( "<null>" );
+			}
+			else
+			{
+				builder.append( x.toString() );
+			}
 			builder.append( " ]" );
 			
 			return builder.toString();

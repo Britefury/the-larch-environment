@@ -5,7 +5,7 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from Britefury.DocModel.DMListInterface import DMListInterface
+from BritefuryJ.DocModel import DMList
 
 from Britefury.DocTree.DocTreeNode import DocTreeNode
 
@@ -15,9 +15,9 @@ def _sanitiseInputData(data):
 	if isinstance( data, DocTreeNode ):
 		return _sanitiseInputData( data.node )
 	elif isinstance( data, list ):
-		return [ _sanitiseInputData( x )   for x in data ]
+		return DMList( [ _sanitiseInputData( x )   for x in data ] )
 	elif isinstance( data, tuple ):
-		return tuple( [ _sanitiseInputData( x )   for x in data ] )
+		return DMList( [ _sanitiseInputData( x )   for x in data ] )
 	else:
 		return data
 
@@ -27,7 +27,7 @@ def replace(ctx, data, replacement):
 		parent = data.parentTreeNode
 		if parent is None:
 			print 'EditOperations:replace(): no parent ', data
-		parent[data.indexInParent] = _sanitiseInputData( replacement )
+		parent.getNode()[data.indexInParent] = _sanitiseInputData( replacement )
 		return parent[data.indexInParent]
 	else:
 		raise TypeError, 'EditOperations:replace(): @data must be a DocTreeNode'
@@ -38,7 +38,7 @@ def replaceWithRange(ctx, data, replacement):
 		parent = data.parentTreeNode
 		if parent is None:
 			print 'EditOperations:replaceWithRange(): no parent ', data
-		parent[data.indexInParent:data.indexInParent+1] = _sanitiseInputData( replacement )
+		parent.getNode()[data.indexInParent:data.indexInParent+1] = _sanitiseInputData( replacement )
 		return parent[data.indexInParent]
 	else:
 		raise TypeError, 'EditOperations:replaceWithRange(): @data must be a DocTreeNode'
@@ -48,14 +48,16 @@ def replaceWithRange(ctx, data, replacement):
 
 def append(ctx, xs, data):
 	if isinstance( x, DocTreeNode ):
-		xs.append( data )
+		#xs.append( data )
+		xs.add( data )
 		return xs[-1]
 	else:
 		raise TypeError, 'EditOperations:append(): @x must be a DocTreeNode'
 
 def prepend(ctx, xs, data):
 	if isinstance( xs, DocTreeNode ):
-		xs.insert( 0, data )
+		#xs.insert( 0, data )
+		xs.add( 0, data )
 		return xs[0]
 	else:
 		raise TypeError, 'EditOperations:prepend(): @x must be a DocTreeNode'
@@ -64,7 +66,8 @@ def insertBefore(ctx, x, data):
 	if isinstance( x, DocTreeNode ):
 		parent = x.parentTreeNode
 		index = parent.index( x.node )
-		parent.insert( index, _sanitiseInputData( data ) )
+		#parent.insert( index, _sanitiseInputData( data ) )
+		parent.add( index, _sanitiseInputData( data ) )
 		return parent[index]
 	else:
 		raise TypeError, 'EditOperations:insertBefore(): @x must be a DocTreeNode'
@@ -84,7 +87,8 @@ def insertAfter(ctx, x, data):
 	if isinstance( x, DocTreeNode ):
 		parent = x.parentTreeNode
 		index = parent.node.index( x.node ) + 1
-		parent.insert( index, _sanitiseInputData( data ) )
+		#parent.insert( index, _sanitiseInputData( data ) )
+		parent.add( index, _sanitiseInputData( data ) )
 		return parent[index]
 	else:
 		raise TypeError, 'EditOperations:insertAfter(): @x must be a DocTreeNode'

@@ -9,9 +9,13 @@ from copy import copy, deepcopy
 import sys
 import weakref
 
+
+from BritefuryJ.DocModel import DMList, DMListInterface
+
+
 from Britefury.Kernel.Abstract import abstractmethod
-from Britefury.DocModel.DMNode import DMNode
-from Britefury.DocModel.DMListInterface import DMListInterface, isDMListCompatible
+#from Britefury.DocModel.DMNode import DMNode
+#from Britefury.DocModel.DMListInterface import DMListInterface, isDMListCompatible
 
 
 from Britefury.DocTree.DocTreeNode import DocTreeNode
@@ -35,7 +39,7 @@ class _Key (object):
 
 	def __init__(self, docNode, parentTreeNode, index, table):
 		super( _Key, self ).__init__()
-		if isinstance( docNode, DMNode ):
+		if isinstance( docNode, DMListInterface ):
 			self._docNode = weakref.ref( docNode, self.__remove )
 		else:
 			self._docNode = docNode
@@ -109,12 +113,12 @@ class _DocTreeKey (object):
 
 	def __init__(self, docNode, parentTreeNode, index):
 		super( _DocTreeKey, self ).__init__()
-		if isinstance( docNode, DMNode ):
+		if isinstance( docNode, DMListInterface ):
 			self._docNode = weakref.ref( docNode )
 		else:
 			self._docNode = docNode
 
-		if isinstance( parentTreeNode, DMNode ):
+		if isinstance( parentTreeNode, DocTreeNode ):
 			self._parent = weakref.ref( parentTreeNode )
 		else:
 			self._parent = parentTreeNode
@@ -262,7 +266,7 @@ class DocTree (object):
 		try:
 			docTreeNode = self._table[key]
 		except KeyError:
-			if isDMListCompatible( x ):
+			if isinstance( x, DMListInterface ):
 				docTreeNode = DocTreeList( self, x, parentTreeNode, indexInParent )
 			elif isinstance( x, str ):
 				docTreeNode = DocTreeString._build( self, x, parentTreeNode, indexInParent )
@@ -282,13 +286,12 @@ class DocTree (object):
 
 
 import unittest
-from Britefury.DocModel.DMList import DMList
 
 
 class TestCase_DocTreeNodeTable (unittest.TestCase):
 	def testDocNodeKey(self):
-		x = DMNode()
-		y = DMNode()
+		x = DMList()
+		y = DMList()
 
 		kx = _DocTreeKey( x, None, -1 )
 		ky = _DocTreeKey( y, kx, 1 )
@@ -304,8 +307,8 @@ class TestCase_DocTreeNodeTable (unittest.TestCase):
 			pass
 
 
-		x = DMNode()
-		y = DMNode()
+		x = DMList()
+		y = DMList()
 		a = Value()
 
 		kx = _DocTreeKey( x, None, -1 )
@@ -344,7 +347,7 @@ class TestCase_DocTreeNodeTable (unittest.TestCase):
 
 		self.assert_( len( t ) == 0 )
 
-		y = DMNode()
+		y = DMList()
 		ky = _DocTreeKey( y, kx, 1 )
 		t[ky] = a
 

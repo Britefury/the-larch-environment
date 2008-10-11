@@ -5,9 +5,9 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from Britefury.Kernel.Abstract import abstractmethod
+from BritefuryJ.DocModel import DMList
 
-from Britefury.DocModel.DMList import DMList
+from Britefury.Kernel.Abstract import abstractmethod
 
 from Britefury.GLisp.GLispUtil import isGLispList
 from Britefury.gSymConfig.gSymVersion import compareVersions, gSymVersion
