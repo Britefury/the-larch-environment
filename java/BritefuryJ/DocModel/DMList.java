@@ -283,6 +283,10 @@ public class DMList implements DMListInterface, Trackable
 		{
 			return coerce( (String)x );
 		}
+		else if ( x instanceof DMList )
+		{
+			return x;
+		}
 		else if ( x instanceof List )
 		{
 			return coerce( (List<Object>)x );

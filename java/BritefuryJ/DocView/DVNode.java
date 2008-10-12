@@ -6,46 +6,38 @@
 //##************************
 package BritefuryJ.DocView;
 
-/*import java.util.HashSet;
-
-import org.python.core.PyObject;
+import java.util.HashSet;
 
 import BritefuryJ.Cell.Cell;
 import BritefuryJ.Cell.CellEvaluator;
-import BritefuryJ.DocPresent.DPWidget.IsNotInSubtreeException;
 import BritefuryJ.DocPresent.ElementTree.Element;
-import BritefuryJ.DocPresent.ElementTree.ElementTree;
 import BritefuryJ.DocPresent.ElementTree.ProxyElement;
-import BritefuryJ.DocPresent.ElementTree.Caret.ElementCaret;
-import BritefuryJ.DocPresent.Marker.Marker;*/
+import BritefuryJ.DocTree.DocTreeNode;
 
 public class DVNode
 {
-/*	public static interface NodeElementFactory
+	public static class CannotChangeDocNodeException extends Exception
 	{
-		public Element createNodeElement();
+		private static final long serialVersionUID = 1L;
+		
+	}
+
+	public static interface NodeElementFactory
+	{
+		public Element createNodeElement(DVNode viewNode, DocTreeNode treeNode);
 	}
 	
-	
-	
-	private static class PositionBiasContent
+	public static interface NodeElementChangeListener
 	{
-		public int position;
-		public Marker.Bias bias;
-		public String content;
-		
-		
-		public PositionBiasContent(int position, Marker.Bias bias, String content)
-		{
-			this.position = position;
-			this.bias = bias;
-			this.content = content;
-		}
+		public void elementChangeFrom(DVNode node, Element e);
+		public void elementChangeTo(DVNode node, Element e);
 	}
+	
 	
 	
 	private DocView view;
-	private PyObject treeNode, docNode;
+	private Object docNode;
+	private DocTreeNode treeNode;
 	
 	private DVNode parent;
 	
@@ -56,12 +48,15 @@ public class DVNode
 	
 	private HashSet<DVNode> children;
 	
+	private NodeElementChangeListener elementChangeListener;
 	
-	public DVNode(DocView view, PyObject treeNode, PyObject docNode)
+	
+	
+	public DVNode(DocView view, DocTreeNode treeNode)
 	{
 		this.view = view;
 		this.treeNode = treeNode;
-		this.docNode = docNode;
+		this.docNode = treeNode.getNode();
 		
 		parent = null;
 		
@@ -100,19 +95,69 @@ public class DVNode
 	
 	
 	
-	public void changeTreeNode(PyObject treeNode)
+	/*
+	 * Change the doc tree node that is views by this
+	 * 
+	 * The underlying document node MUST BE THE SAME NODE, or this function will fail
+	 */
+	protected void changeTreeNode(DocTreeNode treeNode) throws CannotChangeDocNodeException
 	{
 		// Ensure that the doc node is the same
-		PyObject d = treeNode.__getattr__( "docNode" );
-		assert d == docNode;
+		if ( treeNode.getNode()  !=  docNode )
+		{
+			throw new CannotChangeDocNodeException();
+		}
+		
 		this.treeNode = treeNode;
+	}
+	
+	
+	/*
+	 * Set the element change listener
+	 */
+	public void setElementChangeListener(NodeElementChangeListener listener)
+	{
+		elementChangeListener = listener;
+	}
+	
+	
+	
+	/*
+	 * Set the node element factory
+	 */
+	public void setNodeElementFactory(NodeElementFactory factory)
+	{
+		if ( factory != elementFactory )
+		{
+			elementFactory = factory;
+			elementCell.setEvaluator( elementCell.getEvaluator() );
+		}
 	}
 	
 	
 	
 	//
 	//
-	// Document view methods
+	// Content acquisition methods
+	//
+	//
+	
+	public Element getElementNoRefresh()
+	{
+		return element;
+	}
+	
+	public Element getElement()
+	{
+		refresh();
+		return element;
+	}
+	
+	
+	
+	//
+	//
+	// Document view and node treemethods
 	//
 	//
 	
@@ -120,6 +165,40 @@ public class DVNode
 	{
 		return view;
 	}
+	
+	public DVNode getParentNodeView()
+	{
+		return parent;
+	}
+	
+	public boolean isDescendantOf(DVNode node)
+	{
+		DVNode n = this;
+		
+		while ( n != null )
+		{
+			if ( n == node )
+			{
+				return true;
+			}
+			
+			n = n.parent;
+		}
+		
+		return false;
+	}
+	
+	
+	public DocTreeNode getTreeNode()
+	{
+		return treeNode;
+	}
+	
+	public Object getDocNode()
+	{
+		return docNode;
+	}
+	
 	
 	
 	
@@ -131,15 +210,11 @@ public class DVNode
 	
 	private void refreshNode()
 	{
-		String startContent = element != null  ?  element.getContent()  :  "";
-		
-		// If the caret is within the bounds of @element; set the view's caret node to @this
-		PositionBiasContent startState = getCaretPositionBiasAndContentString( element );
-		if ( startState != null )
+		if ( elementChangeListener != null )
 		{
-			view.setCaretNode( this );
+			elementChangeListener.elementChangeFrom( this, element );
 		}
-		
+
 		// Compute the element for this node, and refresh all children
 		Element e = (Element)elementCell.getValue();
 		for (DVNode child: children)
@@ -150,29 +225,11 @@ public class DVNode
 		// Set the node element
 		updateNodeElement( e );
 		
-		// If the caret node is still @this (has not been grabbed by an inner node)
-		if ( view.getCaretNode() == this )
+		
+		if ( elementChangeListener != null )
 		{
-			if ( startState != null  &&  element != null )
-			{
-				String newContent = element.getContent();
-				
-				int newPosition = startState.position;
-				Marker.Bias newBias = startState.bias;
-				
-				int oldIndex = startState.position  +  ( startState.bias == Marker.Bias.END  ?  1  :  0 );
-				
-				// Compute the difference
-				
-				
-			}
+			elementChangeListener.elementChangeTo( this, element );
 		}
-	}
-	
-	
-	private void resetRefreshCell()
-	{
-		refreshCell.setEvaluator( refreshCell.getEvaluator() );
 	}
 	
 	
@@ -182,36 +239,33 @@ public class DVNode
 	}
 	
 	
-	private PositionBiasContent getCaretPositionBiasAndContentString(Element e)
+	private Element computeNodeElement()
 	{
-		if ( e != null )
+		// Unregister existing child relationships
+		for (DVNode child: children)
 		{
-			ElementTree tree = e.getElementTree();
-			ElementCaret caret = tree.getCaret();
-			int position;
-			try
+			view.nodeTable.unrefViewNode( child );
+		}
+		children.clear();
+		
+		if ( elementFactory != null )
+		{
+			Element e = elementFactory.createNodeElement( this, treeNode );
+			
+			// Register new child relationships
+			for (DVNode child: children)
 			{
-				position = caret.getMarker().getPositionInSubtree( element );
+				view.nodeTable.refViewNode( child );
 			}
-			catch (IsNotInSubtreeException e1)
-			{
-				return null;
-			}
-			return new PositionBiasContent( position, caret.getMarker().getBias(), e.getContent() );
+			
+			return e;
 		}
 		else
 		{
 			return null;
 		}
 	}
-	
-	
-	
-	private Element computeNodeElement()
-	{
-		return null;
-	}
-	
+
 	
 	private void updateNodeElement(Element e)
 	{
@@ -227,5 +281,9 @@ public class DVNode
 		}
 	}
 	
-	*/
+	
+	public void registerChild(DVNode child)
+	{
+		children.add( child );
+	}
 }
