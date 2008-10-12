@@ -294,9 +294,3 @@ class DVNode (object):
 
 
 
-
-	parentNodeView = property( getParentNodeView )
-	docView = property( getDocView )
-
-
-
