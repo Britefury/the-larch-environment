@@ -8,16 +8,20 @@ package BritefuryJ.DocView;
 
 public class DocView
 {
-	private DVNode caretNode;
+	protected DocViewNodeTable nodeTable;
 	
 	
-	public void setCaretNode(DVNode caretNode)
+	public DocView()
 	{
-		this.caretNode = caretNode;
+		nodeTable = new DocViewNodeTable();
 	}
 	
-	public DVNode getCaretNode()
+	
+	public void refresh()
 	{
-		return caretNode;
+		// TODO
+		
+		// Clear unused entries from the node table
+		nodeTable.clearUnused();
 	}
 }

@@ -69,11 +69,11 @@ public class DocTree
 				Key kx = (Key)x;
 				if ( parentTreeNode == null )
 				{
-					return docNode.equals( kx.docNode )  &&  kx.parentTreeNode == null  &&  index == kx.index;
+					return docNode.get() == kx.docNode.get()  &&  kx.parentTreeNode == null  &&  index == kx.index;
 				}
 				else
 				{
-					return docNode.equals( kx.docNode )  &&  parentTreeNode.equals( kx.parentTreeNode )  &&  index == kx.index;
+					return docNode.get() == kx.docNode.get()  &&  parentTreeNode.get() == kx.parentTreeNode.get()  &&  index == kx.index;
 				}
 			}
 			else
@@ -111,6 +111,24 @@ public class DocTree
 			mult += 82520 + 2;
 			x = ( x ^ a ) * mult;
 			return x + 97351;
+		}
+		
+		
+		public String toString()
+		{
+			String d = "<null>", p = "<null>";
+			if ( docNode.get() != null )
+			{
+				d = docNode.get().toString();
+			}
+			if ( parentTreeNode != null )
+			{
+				if ( parentTreeNode.get() != null )
+				{
+					p = parentTreeNode.get().toString();
+				}
+			}
+			return "Key( docNode=" + d + ", parentTreeNode=" + p + ", index=" + index + ", hash=" + hash + ")";
 		}
 	}
 	
@@ -180,6 +198,24 @@ public class DocTree
 				throw new DocTreeKeyError();
 			}
 			return new Key( docNode, parent, index, table );
+		}
+
+	
+		public String toString()
+		{
+			String d = "<null>", p = "<null>";
+			if ( docNode.get() != null )
+			{
+				d = docNode.get().toString();
+			}
+			if ( parentTreeNode != null )
+			{
+				if ( parentTreeNode.get() != null )
+				{
+					p = parentTreeNode.get().toString();
+				}
+			}
+			return "DocTreeKey( docNode=" + d + ", parentTreeNode=" + p + ", index=" + index + ")";
 		}
 	}
 
@@ -290,54 +326,75 @@ public class DocTree
 	}
 	
 	
-	public DocTreeNode treeNode(DMListInterface x, DocTreeNode parentTreeNode, int indexInParent)
+/*	public DocTreeNode treeNode(DMListInterface x, DocTreeNode parentTreeNode, int indexInParent)
 	{
 		DocTreeKey key = new DocTreeKey( x, parentTreeNode, indexInParent );
 		
-		DocTreeNode node = new DocTreeList( this, x, parentTreeNode, indexInParent );
+		DocTreeNode node = table.get( key );
 		
-		table.put( key, node );
-		
-		return node;
+		if ( node != null )
+		{
+			return node;
+		}
+		else
+		{
+			node = new DocTreeList( this, (DMListInterface)x, parentTreeNode, indexInParent );
+
+			table.put( key, node );
+				
+			return node;
+		}
 	}
 	
 	public DocTreeNode treeNode(String x, DocTreeNode parentTreeNode, int indexInParent)
 	{
 		DocTreeKey key = new DocTreeKey( x, parentTreeNode, indexInParent );
 		
-		DocTreeNode node = new DocTreeString( x, parentTreeNode, indexInParent );
+		DocTreeNode node = table.get( key );
 		
-		table.put( key, node );
-		
-		return node;
-	}
-
-	public DocTreeNode treeNode(Object x, DocTreeNode parentTreeNode, int indexInParent)
-	{
-		if ( x instanceof String )
+		if ( node != null )
 		{
-			return treeNode( (String)x, parentTreeNode, indexInParent );
-		}
-		else if ( x instanceof DMListInterface )
-		{
-			return treeNode( (DMListInterface)x, parentTreeNode, indexInParent );
+			return node;
 		}
 		else
 		{
-			DocTreeKey key = new DocTreeKey( x, parentTreeNode, indexInParent );
-			
-			DocTreeNodeObject node = new DocTreeNodeObject( x, parentTreeNode, indexInParent );
-			
+			node = new DocTreeString( (String)x, parentTreeNode, indexInParent );
+
 			table.put( key, node );
-			
+				
 			return node;
 		}
-	}
-	
-	
-	public Object py_treeNode(DocTreeNode node)
+	}*/
+
+	public DocTreeNode treeNode(Object x, DocTreeNode parentTreeNode, int indexInParent)
 	{
-		return node;
+		DocTreeKey key = new DocTreeKey( x, parentTreeNode, indexInParent );
+		
+		DocTreeNode node = table.get( key );
+		
+		if ( node != null )
+		{
+			return node;
+		}
+		else
+		{
+			if ( x instanceof String )
+			{
+				node = new DocTreeString( (String)x, parentTreeNode, indexInParent );
+			}
+			else if ( x instanceof DMListInterface )
+			{
+				node = new DocTreeList( this, (DMListInterface)x, parentTreeNode, indexInParent );
+			}
+			else
+			{
+				node = new DocTreeNodeObject( x, parentTreeNode, indexInParent );
+			}
+
+			table.put( key, node );
+				
+			return node;
+		}
 	}
 }
 
