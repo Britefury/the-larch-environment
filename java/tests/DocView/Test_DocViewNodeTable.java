@@ -44,7 +44,7 @@ public class Test_DocViewNodeTable extends TestCase
 		tcd = (DocTreeList)tc.get( 0 );
 		
 		
-		view = new DocView();
+		view = new DocView( tree, ta, null );
 		
 		va = new DVNode( view, ta );
 		vb = new DVNode( view, tb );

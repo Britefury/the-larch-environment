@@ -24,7 +24,6 @@ class DocView (object):
 		self._tree = tree
 		self._root = root
 
-		self._document = None
 		self._commandHistory = commandHistory
 
 		self._rootNodeInitialiser = rootNodeInitialiser
@@ -47,18 +46,6 @@ class DocView (object):
 			self._rootNodeInitialiser( self._rootView, self._root )
 		return self._rootView
 
-
-
-
-	def getDocument(self):
-		return self._document
-	
-	def setDocument(self, document):
-		self._document = document
-
-
-	def documentUngrab(self):
-		self._document.removeFocusGrab()
 
 
 
@@ -122,6 +109,4 @@ class DocView (object):
 		if self._commandHistory is not None:
 			self._commandHistory.thaw()
 			
-			
-	document = property( getDocument, setDocument )
 

@@ -6,22 +6,120 @@
 //##************************
 package BritefuryJ.DocView;
 
+import BritefuryJ.Cell.Cell;
+import BritefuryJ.Cell.CellEvaluator;
+import BritefuryJ.DocTree.DocTree;
+import BritefuryJ.DocTree.DocTreeNode;
+
 public class DocView
 {
-	protected DocViewNodeTable nodeTable;
-	
-	
-	public DocView()
+	public interface RootNodeInitialiser
 	{
+		public void initRootNode(DVNode rootView, Object rootDocNode);
+	}
+	
+	
+	private DocTreeNode root;
+	private RootNodeInitialiser rootNodeInitialiser;
+	private Cell refreshCell;
+	protected DocViewNodeTable nodeTable;
+	private DVNode rootView;
+	
+	
+	public DocView(DocTree tree, DocTreeNode root, RootNodeInitialiser rootNodeInitialiser)
+	{
+		this.root = root;
+		this.rootNodeInitialiser = rootNodeInitialiser;
+		
+		final DocView view = this;
+		CellEvaluator refreshEval = new CellEvaluator()
+		{
+			public Object evaluate()
+			{
+				view.performRefresh();
+				return null;
+			}
+		};
+		refreshCell = new Cell();
+		refreshCell.setEvaluator( refreshEval );
+		
 		nodeTable = new DocViewNodeTable();
+	}
+	
+	
+	public DVNode getRootNode()
+	{
+		if ( rootView == null )
+		{
+			rootView = buildNodeView( root );
+			rootNodeInitialiser.initRootNode( rootView, root );
+		}
+		return rootView;
+	}
+	
+	
+	
+	public DVNode buildNodeView(DocTreeNode treeNode)
+	{
+		if ( treeNode == null )
+		{
+			return null;
+		}
+		else
+		{
+			// Try to get a view node for @treeNode from the node table; one will be returned if a view node exists, else null.
+			DVNode viewNode = nodeTable.get( treeNode );
+			
+			if ( viewNode == null )
+			{
+				// No view node in the table.
+				// Try asking the table for an unused one
+				viewNode = nodeTable.takeUnusedViewNodeFor( treeNode );
+				
+				if ( viewNode == null )
+				{
+					// No existing view node could be acquired.
+					// Create a new one
+					viewNode = new DVNode( this, treeNode );
+					nodeTable.put( treeNode, viewNode );
+				}
+			}
+			
+			return viewNode;
+		}
+	}
+	
+	
+	public DVNode getViewNodeForDocTreeNode(DocTreeNode treeNode)
+	{
+		return nodeTable.get( treeNode );
+	}
+	
+	
+	public DVNode refreshAndGetViewNodeForDocTreeNode(DocTreeNode treeNode)
+	{
+		refresh();
+		return nodeTable.get( treeNode );
+	}
+	
+	
+	
+	private void performRefresh()
+	{
+		getRootNode().refresh();
+		
+		// Clear unused entries from the node table
+		nodeTable.clearUnused();
 	}
 	
 	
 	public void refresh()
 	{
-		// TODO
-		
-		// Clear unused entries from the node table
-		nodeTable.clearUnused();
+		refreshCell.getValue();
+	}
+	
+	public Cell getRefreshCell()
+	{
+		return refreshCell;
 	}
 }
