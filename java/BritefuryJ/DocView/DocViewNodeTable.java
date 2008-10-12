@@ -7,6 +7,7 @@
 package BritefuryJ.DocView;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.WeakHashMap;
@@ -107,6 +108,22 @@ public class DocViewNodeTable
 		{
 			refedNodes.remove( treeNode );
 			destroyIfEmpty();
+		}
+		
+		public boolean containsKey(DocTreeNode treeNode)
+		{
+			return refedNodes.containsKey( treeNode );
+		}
+		
+		
+		public int size()
+		{
+			return refedNodes.size();
+		}
+		
+		public int getNumUnrefedNodes()
+		{
+			return unrefedNodes.size();
 		}
 		
 		
@@ -244,6 +261,61 @@ public class DocViewNodeTable
 	}
 	
 	
+	public boolean containsKey(DocTreeNode treeNode)
+	{
+		ViewTableForDocNode subTable = table.get( treeNode.getNode() );
+		if ( subTable != null )
+		{
+			return subTable.containsKey( treeNode );
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+	
+	public int size()
+	{
+		int s = 0;
+		for (ViewTableForDocNode subTable: table.values())
+		{
+			s += subTable.size();
+		}
+		return s;
+	}
+	
+	public int getNumDocNodes()
+	{
+		return table.size();
+	}
+	
+	public int getNumViewNodesForDocNode(Object docNode)
+	{
+		ViewTableForDocNode subTable = table.get( docNode );
+		if ( subTable != null )
+		{
+			return subTable.size();
+		}
+		else
+		{
+			return 0;
+		}
+	}
+	
+	public int getNumUnrefedViewNodesForDocNode(Object docNode)
+	{
+		ViewTableForDocNode subTable = table.get( docNode );
+		if ( subTable != null )
+		{
+			return subTable.getNumUnrefedNodes();
+		}
+		else
+		{
+			return 0;
+		}
+	}
+	
 	
 	public void clearUnused()
 	{
@@ -252,6 +324,17 @@ public class DocViewNodeTable
 			subTable.clearUnrefedViewNodes();
 		}
 		unrefedTables.clear();
+	}
+	
+	
+	public void clean()
+	{
+		ArrayList<ViewTableForDocNode> subTables = new ArrayList<ViewTableForDocNode>();
+		subTables.addAll( table.values() );
+		for (ViewTableForDocNode subTable: subTables)
+		{
+			subTable.destroyIfEmpty();
+		}
 	}
 
 	
