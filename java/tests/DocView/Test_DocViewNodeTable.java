@@ -7,323 +7,291 @@
 package tests.DocView;
 
 import java.util.Arrays;
-import java.util.List;
 
 import BritefuryJ.DocModel.DMList;
+import BritefuryJ.DocTree.DocTree;
+import BritefuryJ.DocTree.DocTreeList;
+import BritefuryJ.DocView.DVNode;
+import BritefuryJ.DocView.DocView;
+import BritefuryJ.DocView.DocViewNodeTable;
 
 import junit.framework.TestCase;
 
 public class Test_DocViewNodeTable extends TestCase
 {
-	@SuppressWarnings("unchecked")
-	private static Object listRGet(List<Object> xs, int[] is)
-	{
-		Object x = xs;
-		for (int i: is)
-		{
-			List<Object> xx = (List<Object>)x;
-			x = xx.get( i );
-		}
-		return x;
-	}
+	private DMList da, db, dc, dd;
+	private DocTreeList ta, tb, tc, tbd, tcd;
+	private DocTree tree;
+	private DocViewNodeTable table;
+	private DVNode va, vb, vc, vbd, vcd;
+	private DocView view;
 	
 
-
-	private static DMList[] buildDiamondDoc()
+	
+	public void setUp()
 	{
-		DMList dd = new DMList( Arrays.asList( new Object[] { "d" } ) );
-		DMList dc = new DMList( Arrays.asList( new Object[] { dd } ) );
-		DMList db = new DMList( Arrays.asList( new Object[] { dd } ) );
-		DMList da = new DMList( Arrays.asList( new Object[] { db, dc } ) );
-		return new DMList[]{ da, db, dc, dd };
+		dd = new DMList( Arrays.asList( new Object[] { "d" } ) );
+		dc = new DMList( Arrays.asList( new Object[] { dd } ) );
+		db = new DMList( Arrays.asList( new Object[] { dd } ) );
+		da = new DMList( Arrays.asList( new Object[] { db, dc } ) );
+		
+		
+		tree = new DocTree();
+		ta = (DocTreeList)tree.treeNode( da );
+		tb = (DocTreeList)ta.get( 0 );
+		tc = (DocTreeList)ta.get( 1 );
+		tbd = (DocTreeList)tb.get( 0 );
+		tcd = (DocTreeList)tc.get( 0 );
+		
+		
+		view = new DocView();
+		
+		va = new DVNode( view, ta );
+		vb = new DVNode( view, tb );
+		vc = new DVNode( view, tc );
+		vbd = new DVNode( view, tbd );
+		vcd = new DVNode( view, tcd );
+		
+		
+		table = new DocViewNodeTable();
+
+		table.put( ta, va );
+		table.put( tb, vb );
+		table.put( tc, vc );
+		table.put( tbd, vbd );
+		table.put( tcd, vcd );
 	}
 	
+	public void tearDown()
+	{
+		da = db = dc = dd = null;
+		
+		tree = null;
+		ta = tb = tc = tbd = tcd = null;
+		
+		table = null;
+
+		view = null;
+		va = vb = vc = vbd = vcd = null;
+	}
+	
+	
+	
+	public void testAccessors()
+	{
+		assertEquals( table.size(), 5 );
+		assertEquals( table.getNumDocNodes(), 4 );
+		assertEquals( table.getNumViewNodesForDocNode( dd ), 2 );
+		
+		assertTrue( table.containsKey( ta ) );
+		assertTrue( table.containsKey( tb ) );
+		assertTrue( table.containsKey( tc ) );
+		assertTrue( table.containsKey( tbd ) );
+		assertTrue( table.containsKey( tcd ) );
+
+		assertSame( table.get( ta ), va );
+		assertSame( table.get( tb ), vb );
+		assertSame( table.get( tc ), vc );
+		assertSame( table.get( tbd ), vbd );
+		assertSame( table.get( tcd ), vcd );
+	}
+	
+	public void testRemove()
+	{
+		table.remove( ta );
+		table.remove( tbd );
+
+		assertEquals( table.size(), 3 );
+		assertEquals( table.getNumDocNodes(), 3 );
+		assertEquals( table.getNumViewNodesForDocNode( dd ), 1 );
+		
+		assertFalse( table.containsKey( ta ) );
+		assertTrue( table.containsKey( tb ) );
+		assertTrue( table.containsKey( tc ) );
+		assertFalse( table.containsKey( tbd ) );
+		assertTrue( table.containsKey( tcd ) );
+
+		assertSame( table.get( ta ), null );
+		assertSame( table.get( tb ), vb );
+		assertSame( table.get( tc ), vc );
+		assertSame( table.get( tbd ), null );
+		assertSame( table.get( tcd ), vcd );
+	}
+
+	public void testPut()
+	{
+		DVNode vx = new DVNode( view, ta  );
+		DVNode vy = new DVNode( view, tbd );
+		
+		table.put( ta, vx );
+		table.put( tbd, vy );
+
+		assertEquals( table.size(), 5 );
+		assertEquals( table.getNumDocNodes(), 4 );
+		assertEquals( table.getNumViewNodesForDocNode( dd ), 2 );
+		
+		assertTrue( table.containsKey( ta ) );
+		assertTrue( table.containsKey( tb ) );
+		assertTrue( table.containsKey( tc ) );
+		assertTrue( table.containsKey( tbd ) );
+		assertTrue( table.containsKey( tcd ) );
+
+		assertSame( table.get( ta ), vx );
+		assertSame( table.get( tb ), vb );
+		assertSame( table.get( tc ), vc );
+		assertSame( table.get( tbd ), vy );
+		assertSame( table.get( tcd ), vcd );
+	}
+
+	public void testGC()
+	{
+		va = null;
+		vbd = null;
+		System.gc();
+		
+		// Need to call DocViewNodeTable.clean() in order to clean away all weak-refs, etc
+		table.clean();
+
+		assertEquals( table.size(), 3 );
+		assertEquals( table.getNumDocNodes(), 3 );
+		assertEquals( table.getNumViewNodesForDocNode( dd ), 1 );
+		
+		assertFalse( table.containsKey( ta ) );
+		assertTrue( table.containsKey( tb ) );
+		assertTrue( table.containsKey( tc ) );
+		assertFalse( table.containsKey( tbd ) );
+		assertTrue( table.containsKey( tcd ) );
+
+		assertSame( table.get( ta ), null );
+		assertSame( table.get( tb ), vb );
+		assertSame( table.get( tc ), vc );
+		assertSame( table.get( tbd ), null );
+		assertSame( table.get( tcd ), vcd );
+	}
+	
+	
+	public void testUnref()
+	{
+		table.unrefViewNode( va );
+		table.unrefViewNode( vbd );
+
+		assertEquals( table.size(), 3 );
+		assertEquals( table.getNumDocNodes(), 4 );
+		assertEquals( table.getNumViewNodesForDocNode( da ), 0 );
+		assertEquals( table.getNumViewNodesForDocNode( dd ), 1 );
+		assertEquals( table.getNumUnrefedViewNodesForDocNode( da ), 1 );
+		assertEquals( table.getNumUnrefedViewNodesForDocNode( dd ), 1 );
+		
+		assertFalse( table.containsKey( ta ) );
+		assertTrue( table.containsKey( tb ) );
+		assertTrue( table.containsKey( tc ) );
+		assertFalse( table.containsKey( tbd ) );
+		assertTrue( table.containsKey( tcd ) );
+
+		assertSame( table.get( ta ), null );
+		assertSame( table.get( tb ), vb );
+		assertSame( table.get( tc ), vc );
+		assertSame( table.get( tbd ), null );
+		assertSame( table.get( tcd ), vcd );
+		
+		table.clearUnused();
+
+		assertEquals( table.size(), 3 );
+		assertEquals( table.getNumDocNodes(), 3 );
+	}
+
+	
+	
+	public void testUnrefReref()
+	{
+		table.unrefViewNode( va );
+		table.unrefViewNode( vbd );
+		table.refViewNode( va );
+		table.refViewNode( vbd );
+
+		assertEquals( table.size(), 5 );
+		assertEquals( table.getNumDocNodes(), 4 );
+		assertEquals( table.getNumViewNodesForDocNode( da ), 1 );
+		assertEquals( table.getNumViewNodesForDocNode( dd ), 2 );
+		assertEquals( table.getNumUnrefedViewNodesForDocNode( da ), 0 );
+		assertEquals( table.getNumUnrefedViewNodesForDocNode( dd ), 0 );
+		
+		assertTrue( table.containsKey( ta ) );
+		assertTrue( table.containsKey( tb ) );
+		assertTrue( table.containsKey( tc ) );
+		assertTrue( table.containsKey( tbd ) );
+		assertTrue( table.containsKey( tcd ) );
+
+		assertSame( table.get( ta ), va );
+		assertSame( table.get( tb ), vb );
+		assertSame( table.get( tc ), vc );
+		assertSame( table.get( tbd ), vbd );
+		assertSame( table.get( tcd ), vcd );
+		
+		table.clearUnused();
+
+		assertEquals( table.size(), 5 );
+		assertEquals( table.getNumDocNodes(), 4 );
+	}
 
 
+
+
+
+	public void testReuseUnrefed()
+	{
+		table.remove( tbd );
+		table.unrefViewNode( vcd );
+
+		assertEquals( table.size(), 3 );
+		assertEquals( table.getNumDocNodes(), 4 );
+		assertEquals( table.getNumViewNodesForDocNode( dd ), 0 );
+		assertEquals( table.getNumUnrefedViewNodesForDocNode( dd ), 1 );
+		
+		assertTrue( table.containsKey( ta ) );
+		assertTrue( table.containsKey( tb ) );
+		assertTrue( table.containsKey( tc ) );
+		assertFalse( table.containsKey( tbd ) );
+		assertFalse( table.containsKey( tcd ) );
+
+		assertSame( table.get( ta ), va );
+		assertSame( table.get( tb ), vb );
+		assertSame( table.get( tc ), vc );
+		assertSame( table.get( tbd ), null );
+		assertSame( table.get( tcd ), null );
+		
+		
+		// Reuse
+		DVNode val = table.takeUnusedViewNodeFor( tcd );
+		assertSame( val, vcd );
+		assertSame( val.getDocNode(), dd );
+		assertSame( val.getTreeNode(), tcd );
+		
+		assertSame( table.get( tcd ), vcd );
+		assertFalse( table.containsKey( tbd ) );
+		assertTrue( table.containsKey( tcd ) );
+		assertEquals( table.size(), 4 );
+		
+		
+		
+		// Unref again
+		table.unrefViewNode( vcd );
+		assertEquals( table.size(), 3 );
+		
+		
+		// Reuse for a different key this time
+		val = table.takeUnusedViewNodeFor( tbd );
+		assertSame( val, vcd );					// This is the DVNode vcd
+		assertSame( val.getDocNode(), dd );			// dd is the doc-node, (as previously)
+		assertSame( val.getTreeNode(), tbd );		// the tree-node is now tbd  (changed)
+		
+		assertSame( table.get( tbd ), vcd );
+		assertTrue( table.containsKey( tbd ) );		// contains tbd
+		assertFalse( table.containsKey( tcd ) );		// but not tcd
+		assertEquals( table.size(), 4 );
+		
+		
+		// Ensure that there is no unused node
+		assertSame( table.takeUnusedViewNodeFor( tbd ), null );
+	}
 }
-
-
-/*
-	class _Value (object):
-		def __init__(self, docNode, treeNode, x):
-			self.docNode = docNode
-			self.treeNode = treeNode
-			self.x = x
-
-
-		def _changeTreeNode(self, treeNode):
-			assert treeNode.node is self.docNode
-			self.treeNode = treeNode
-
-
-
-	def _buildDiamondDoc(self):
-		dd = DMList( [ 'd' ] )
-		dc = DMList( [ dd ] )
-		db = DMList( [ dd ] )
-		da = DMList( [ db, dc ] )
-		return da, db, dc, dd
-
-
-	def _buildDiamondTree(self):
-		da, db, dc, dd = self._buildDiamondDoc()
-		tree = DocTree()
-		ta = tree.treeNode( da )
-		return da, db, dc, dd, tree, ta
-
-
-	def _buildDiamondTable(self):
-		da, db, dc, dd, tree, ta = self._buildDiamondTree()
-		table = DocViewNodeTable()
-
-		tb = ta[0]
-		tc = ta[1]
-		tbd = tb[0]
-		tcd = tc[0]
-
-		va = self._Value( da, ta, 'a' )
-		vb = self._Value( db, tb, 'b' )
-		vc = self._Value( dc, tc, 'c' )
-		vbd = self._Value( dd, tbd, 'bd' )
-		vcd = self._Value( dd, tcd, 'cd' )
-
-		table[ta] = va
-		table[tb] = vb
-		table[tc] = vc
-		table[tbd] = vbd
-		table[tcd] = vcd
-
-		return da, db, dc, dd, tree, ta, tb, tc, tbd, tcd, va, vb, vc, vbd, vcd, table
-
-
-
-	def testAccessors(self):
-		da, db, dc, dd, tree, ta, tb, tc, tbd, tcd, va, vb, vc, vbd, vcd, table = self._buildDiamondTable()
-
-		self.assert_( len( table._table ) == 4 )
-		self.assert_( len( table._table[tbd.node] ) == 2 )
-
-		self.assert_( table[ta].x  ==  'a' )
-		self.assert_( table[tb].x  ==  'b' )
-		self.assert_( table[tc].x  ==  'c' )
-		self.assert_( table[tbd].x  ==  'bd' )
-		self.assert_( table[tcd].x  ==  'cd' )
-
-		self.assert_( ta in table )
-		self.assert_( tb in table )
-		self.assert_( tc in table )
-		self.assert_( tbd in table )
-		self.assert_( tcd in table )
-
-		self.assert_( len( table ) == 5 )
-		self.assert_( set( iter( table ) )  ==  set( [ ta, tb, tc, tbd, tcd ] ) )
-		self.assert_( set( table.keys() )  ==  set( [ ta, tb, tc, tbd, tcd ] ) )
-		self.assert_( set( table.values() )  ==  set( [ va, vb, vc, vbd, vcd ] ) )
-		self.assert_( set( table.items() )  ==  set( [ (ta,va), (tb,vb), (tc,vc), (tbd,vbd), (tcd,vcd) ] ) )
-
-
-
-	def testDel(self):
-		da, db, dc, dd, tree, ta, tb, tc, tbd, tcd, va, vb, vc, vbd, vcd, table = self._buildDiamondTable()
-
-		del table[ta]
-		del table[tbd]
-
-		self.assert_( len( table._table ) == 3 )
-		self.assert_( len( table._table[tbd.node] ) == 1 )
-
-		self.assert_( table[tb].x  ==  'b' )
-		self.assert_( table[tc].x  ==  'c' )
-		self.assert_( table[tcd].x  ==  'cd' )
-
-		self.assert_( ta not in table )
-		self.assert_( tb in table )
-		self.assert_( tc in table )
-		self.assert_( tbd not in table )
-		self.assert_( tcd in table )
-
-		self.assert_( len( table ) == 3 )
-		self.assert_( set( iter( table ) )  ==  set( [ tb, tc, tcd ] ) )
-		self.assert_( set( table.keys() )  ==  set( [ tb, tc, tcd ] ) )
-		self.assert_( set( table.values() )  ==  set( [ vb, vc, vcd ] ) )
-		self.assert_( set( table.items() )  ==  set( [ (tb,vb), (tc,vc), (tcd,vcd) ] ) )
-
-
-	def testSet(self):
-		da, db, dc, dd, tree, ta, tb, tc, tbd, tcd, va, vb, vc, vbd, vcd, table = self._buildDiamondTable()
-
-		vx = self._Value( da, ta, 'x' )
-		vy = self._Value( dd, tbd, 'y' )
-
-		table[ta] = vx
-		table[tbd] = vy
-
-		self.assert_( table[ta].x  ==  'x' )
-		self.assert_( table[tb].x  ==  'b' )
-		self.assert_( table[tc].x  ==  'c' )
-		self.assert_( table[tbd].x  ==  'y' )
-		self.assert_( table[tcd].x  ==  'cd' )
-
-		self.assert_( ta in table )
-		self.assert_( tb in table )
-		self.assert_( tc in table )
-		self.assert_( tbd in table )
-		self.assert_( tcd in table )
-
-		self.assert_( len( table ) == 5 )
-		self.assert_( set( iter( table ) )  ==  set( [ ta, tb, tc, tbd, tcd ] ) )
-		self.assert_( set( table.keys() )  ==  set( [ ta, tb, tc, tbd, tcd ] ) )
-		self.assert_( set( table.values() )  ==  set( [ vx, vb, vc, vy, vcd ] ) )
-		self.assert_( set( table.items() )  ==  set( [ (ta,vx), (tb,vb), (tc,vc), (tbd,vy), (tcd,vcd) ] ) )
-
-
-
-	def testGC(self):
-		import gc
-		da, db, dc, dd, tree, ta, tb, tc, tbd, tcd, va, vb, vc, vbd, vcd, table = self._buildDiamondTable()
-
-		del va
-		del vbd
-		gc.collect()
-
-		self.assert_( len( table._table ) == 4 )
-		self.assert_( len( table._table[tbd.node] ) == 1 )
-
-		self.assert_( table[tb].x  ==  'b' )
-		self.assert_( table[tc].x  ==  'c' )
-		self.assert_( table[tcd].x  ==  'cd' )
-
-		self.assert_( ta not in table )
-		self.assert_( tb in table )
-		self.assert_( tc in table )
-		self.assert_( tbd not in table )
-		self.assert_( tcd in table )
-
-		self.assert_( len( table ) == 3 )
-		self.assert_( set( iter( table ) )  ==  set( [ tb, tc, tcd ] ) )
-		self.assert_( set( table.keys() )  ==  set( [ tb, tc, tcd ] ) )
-		self.assert_( set( table.values() )  ==  set( [ vb, vc, vcd ] ) )
-		self.assert_( set( table.items() )  ==  set( [ (tb,vb), (tc,vc), (tcd,vcd) ] ) )
-
-
-	def testUnref(self):
-		da, db, dc, dd, tree, ta, tb, tc, tbd, tcd, va, vb, vc, vbd, vcd, table = self._buildDiamondTable()
-
-		table.unrefViewNode( va )
-		table.unrefViewNode( vbd )
-
-		self.assert_( len( table._table ) == 4 )
-		self.assert_( len( table._table[tbd.node] ) == 1 )
-		self.assert_( len( table._table[ta.node]._unrefedNodes ) == 1 )
-		self.assert_( len( table._table[tbd.node]._unrefedNodes ) == 1 )
-
-		self.assert_( table[tb].x  ==  'b' )
-		self.assert_( table[tc].x  ==  'c' )
-		self.assert_( table[tcd].x  ==  'cd' )
-
-		self.assert_( ta not in table )
-		self.assert_( tb in table )
-		self.assert_( tc in table )
-		self.assert_( tbd not in table )
-		self.assert_( tcd in table )
-
-		self.assert_( len( table ) == 3 )
-		self.assert_( set( iter( table ) )  ==  set( [ tb, tc, tcd ] ) )
-		self.assert_( set( table.keys() )  ==  set( [ tb, tc, tcd ] ) )
-		self.assert_( set( table.values() )  ==  set( [ vb, vc, vcd ] ) )
-		self.assert_( set( table.items() )  ==  set( [ (tb,vb), (tc,vc), (tcd,vcd) ] ) )
-
-		table.clearUnused()
-
-		self.assert_( len( table._table ) == 3 )
-
-
-
-	def testUnrefReref(self):
-		da, db, dc, dd, tree, ta, tb, tc, tbd, tcd, va, vb, vc, vbd, vcd, table = self._buildDiamondTable()
-
-		table.unrefViewNode( va )
-		table.unrefViewNode( vbd )
-		table.refViewNode( va )
-		table.refViewNode( vbd )
-
-		self.assert_( len( table._table ) == 4 )
-		self.assert_( len( table._table[tbd.node] ) == 2 )
-
-		self.assert_( table[ta].x  ==  'a' )
-		self.assert_( table[tb].x  ==  'b' )
-		self.assert_( table[tc].x  ==  'c' )
-		self.assert_( table[tbd].x  ==  'bd' )
-		self.assert_( table[tcd].x  ==  'cd' )
-
-		self.assert_( ta in table )
-		self.assert_( tb in table )
-		self.assert_( tc in table )
-		self.assert_( tbd in table )
-		self.assert_( tcd in table )
-
-		self.assert_( len( table ) == 5 )
-		self.assert_( set( iter( table ) )  ==  set( [ ta, tb, tc, tbd, tcd ] ) )
-		self.assert_( set( table.keys() )  ==  set( [ ta, tb, tc, tbd, tcd ] ) )
-		self.assert_( set( table.values() )  ==  set( [ va, vb, vc, vbd, vcd ] ) )
-		self.assert_( set( table.items() )  ==  set( [ (ta,va), (tb,vb), (tc,vc), (tbd,vbd), (tcd,vcd) ] ) )
-
-
-	def testReuseUnrefed(self):
-		da, db, dc, dd, tree, ta, tb, tc, tbd, tcd, va, vb, vc, vbd, vcd, table = self._buildDiamondTable()
-
-		del table[tbd]
-		table.unrefViewNode( vcd )
-
-		self.assert_( len( table._table ) == 4 )
-		self.assert_( len( table._table[tcd.node] ) == 0 )
-		self.assert_( len( table._table[tcd.node]._refedNodes ) == 0 )
-		self.assert_( len( table._table[tcd.node]._unrefedNodes ) == 1 )
-
-		self.assert_( table[ta].x  ==  'a' )
-		self.assert_( table[tb].x  ==  'b' )
-		self.assert_( table[tc].x  ==  'c' )
-
-		self.assert_( ta in table )
-		self.assert_( tb in table )
-		self.assert_( tc in table )
-		self.assert_( tbd not in table )
-		self.assert_( tcd not in table )
-
-		self.assert_( len( table ) == 3 )
-		self.assert_( set( iter( table ) )  ==  set( [ ta, tb, tc ] ) )
-		self.assert_( set( table.keys() )  ==  set( [ ta, tb, tc] ) )
-		self.assert_( set( table.values() )  ==  set( [ va, vb, vc ] ) )
-		self.assert_( set( table.items() )  ==  set( [ (ta,va), (tb,vb), (tc,vc) ] ) )
-
-
-		# Reuse
-		val = table.takeUnusedViewNodeFor( tcd )
-		self.assert_( val is vcd )
-		self.assert_( val.docNode is dd )
-		self.assert_( val.treeNode is tcd )
-
-		self.assert_( table[tcd].x  ==  'cd' )
-		self.assert_( tbd not in table )
-		self.assert_( tcd in table )
-		self.assert_( len( table ) == 4 )
-
-
-		# Unref again
-		table.unrefViewNode( vcd )
-		self.assert_( len( table ) == 3 )
-
-		# Reuse for a different key this time
-		val = table.takeUnusedViewNodeFor( tbd )
-		self.assert_( val is vcd )
-		self.assert_( val.docNode is dd )
-		self.assert_( val.treeNode is tbd )
-
-		self.assert_( table[tbd].x  ==  'cd' )
-		self.assert_( tbd in table )
-		self.assert_( tcd not in table )
-		self.assert_( len( table ) == 4 )
-
-
-		self.assertRaises( KeyError, lambda: table.takeUnusedViewNodeFor( tbd ) )
-*/
