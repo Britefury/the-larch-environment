@@ -12,8 +12,10 @@ from copy import copy
 from BritefuryJ.DocTree import DocTree
 from BritefuryJ.DocTree import DocTreeNode
 
-from Britefury.DocView.DVNode import DVNode
-from Britefury.DocView.DocView import DocView
+from BritefuryJ.DocView import DVNode
+from BritefuryJ.DocView import DocView
+
+#from Britefury.DocView.DocView import DocView
 
 
 from Britefury.GLisp.GLispUtil import isGLispList, gLispSrcToString
@@ -83,7 +85,7 @@ def raiseRuntimeError(exceptionClass, src, reason):
 
 
 def _registerViewNodeRelationship(viewNodeInstance, childNode):
-	viewNodeInstance.viewNode._registerChild( childNode )
+	viewNodeInstance.viewNode.registerChild( childNode )
 
 
 def _populateBin(viewNodeInstance, bin, child):
@@ -303,7 +305,8 @@ def viewEval(ctx, content, nodeViewFunction=None, state=None):
 	# A call to DocNode.buildNodeView builds the view, and puts it in the DocView's table
 	viewInstance = viewNodeInstance.viewInstance
 	viewNode = viewNodeInstance.view.buildNodeView( content )
-	viewNode._f_setContentsFactory( viewNodeInstance.viewInstance._f_makeNodeContentsFactory( nodeViewFunction, state ) )
+	#viewNode._f_setContentsFactory( viewNodeInstance.viewInstance._f_makeNodeContentsFactory( nodeViewFunction, state ) )
+	viewNode.setNodeElementFactory( viewNodeInstance.viewInstance._f_makeNodeElementFactory( nodeViewFunction, state ) )
 	
 	
 	# Block access tracking to prevent the contents of this node being dependent upon the child node being refreshed,
@@ -350,7 +353,7 @@ class _GSymNodeViewInstance (object):
 	
 	
 	
-class _GSymViewInstanceNodeContentsFactory (object):
+class _GSymViewInstanceNodeContentsFactory (DVNode.NodeElementFactory):
 	__slots__ = [ '_nodeViewFunction', '_state', '_viewInstance' ]
 	
 	def __init__(self, viewInstance, nodeViewFunction, state):
@@ -359,7 +362,7 @@ class _GSymViewInstanceNodeContentsFactory (object):
 		self._state = state
 		
 	
-	def __call__(self, viewNode, treeNode):
+	def createNodeElement(self, viewNode, treeNode):
 		# Create the node view instance
 		nodeViewInstance = _GSymNodeViewInstance( treeNode.node, self._viewInstance.view, self._viewInstance, viewNode )
 		## HACK ##
@@ -373,11 +376,17 @@ class _GSymViewInstance (object):
 	Manages state concerning a view of a specific document
 	"""
 	def __init__(self, tree, xs, viewFactory, commandHistory):
+		class RootInitialiser (DocView.RootNodeInitialiser):
+			def initRootNode(initialiserSelf, viewNode, treeNode):
+				viewNode.setNodeElementFactory( self._f_makeNodeElementFactory( None, None ) )
+			
+		
+		
 		self.tree = tree
 		self.xs = xs
 		self.generalNodeViewFunction = viewFactory.createViewFunction()
 		# self._p_buildDVNode is a factory that builds DVNode instances for document subtrees
-		self.view = DocView( self.tree, self.xs, commandHistory, self._rootNodeViewInitialiser )
+		self.view = DocView( self.tree, self.xs, RootInitialiser(), _NodeElementChangeListener() )
 		
 		self._indentationStyleSheets = {}
 		
@@ -395,12 +404,7 @@ class _GSymViewInstance (object):
 	
 	
 		
-	def _rootNodeViewInitialiser(self, viewNode, treeNode):
-		viewNode._f_setContentsFactory( self._f_makeNodeContentsFactory( None, None ) )
-
-
-
-	def _f_makeNodeContentsFactory(self, nodeViewFunction, state):
+	def _f_makeNodeElementFactory(self, nodeViewFunction, state):
 		#Memoise the contents factory; keyed by @nodeViewFunction and @state
 		key = nodeViewFunction, state
 		try:
@@ -421,10 +425,136 @@ class _GSymViewInstance (object):
 	
 	
 	
+class _NodeElementChangeListener (DVNode.NodeElementChangeListener):
+	def __init__(self):
+		self._caretNode = None
+		self._posBiasContent = None
+	
 		
+	def elementChangeFrom(self, node, element):
+		elementContent = node.getInnerElementNoRefresh()
+		if elementContent is not None:
+			startContent = elementContent.getContent()
+		else:
+			startContent = ''
+		self._posBiasContent = self._getCursorPositionBiasAndContentString( node, elementContent )
+		position, bias, contentString = self._posBiasContent
+		#print 'Node: ', node.getDocNode()[0], position, elementContent
+
+		# Set the caret node to node
+		if position is not None  and  bias is not None  and  elementContent is not None:
+			if isGLispList( node.getDocNode() ):
+				#print 'Node: %s, position=%d'  %  ( node.getDocNode()[0], position )
+				pass
+			self._caretNode = node
+		
+		
+	def elementChangeTo(self, node, element):
+		if self._caretNode is node:
+			elementContent = node.getInnerElementNoRefresh()
+			position, bias, contentString = self._posBiasContent
+			# Invoking child.refresh() above can cause this method to be invoked on another node; recursively;
+			# Ensure that only the inner-most recursion level handles the caret
+			if position is not None  and  bias is not None  and  elementContent is not None:
+				newContentString = elementContent.getContent()
+				
+				newPosition = position
+				newBias = bias
+	
+				oldIndex = position  +  ( 1  if bias == Marker.Bias.END  else  0 )
+
+				# Compute the difference
+				matcher = difflib.SequenceMatcher( lambda x: x in ' \t', contentString, newContentString )
+				for tag, i1, i2, j1, j2 in matcher.get_opcodes():
+					if ( position > i1  or  ( position == i1  and  bias == Marker.Bias.END ) )   and   position < i2:
+						# Caret is in the range of this opcode
+						if tag == 'delete':
+							# Range deleted; move to position in destination; bias:START
+							newPosition = j1
+							newBias = Marker.Bias.START
+						elif tag == 'replace'  or  tag == 'equal'  or  tag == 'insert':
+							# Range replaced or equal; move position by delta
+							newPosition += j1 - i1
+						else:
+							raise ValueError, 'unreckognised tag'
+				elementTree = elementContent.getElementTree()
+				caret = elementTree.getCaret()
+				
+				
+				newIndex = newPosition  +  ( 1  if newBias == Marker.Bias.END  else  0 )
+				
+				print 'CURSOR POSITION CHANGE'
+				if bias == Marker.Bias.START:
+					print contentString[:oldIndex].replace( '\n', '\\n' ) + '>|.' + contentString[oldIndex:].replace( '\n', '\\n' )
+				else:
+					print contentString[:oldIndex].replace( '\n', '\\n' ) + '.|<' + contentString[oldIndex:].replace( '\n', '\\n' )
+
+				if bias == Marker.Bias.START:
+					print newContentString[:newIndex].replace( '\n', '\\n' ) + '>|.' + newContentString[newIndex:].replace( '\n', '\\n' )
+				else:
+					print newContentString[:newIndex].replace( '\n', '\\n' ) + '.|<' + newContentString[newIndex:].replace( '\n', '\\n' )
+				
+				newPosition = max( 0, newPosition )
+				if newPosition >= elementContent.getContentLength():
+					newPosition = elementContent.getContentLength() - 1
+					newBias = Marker.Bias.END
+				
+				leaf = elementContent.getLeafAtContentPosition( newPosition )
+				if leaf is not None:
+					print leaf, "'" + leaf.getContent().replace( '\n', '\\n' ) + "'"
+					leafOffset = leaf.getContentOffsetInSubtree( elementContent )
+					leafPosition = newPosition - leafOffset
+					
+					if leaf.isEditable():
+						#print 'Node "%s"; content was "%s" now "%s"'  %  ( node.getDocNode()[0], startContent, elementContent.getContent() )
+						#print 'Position was %d, now is %d; leaf (%s) offset is %d, moving to %d in leaf'  %  ( position, newPosition, leaf.getContent(), leafOffset, leafPosition )
+						leaf.moveMarker( caret.getMarker(), leafPosition, newBias )
+					else:
+						segFilter = SegmentElement.SegmentFilter( leaf.getSegment() )
+						elemFilter = LeafElement.LeafFilterEditable()
+						
+						if leafPosition < leaf.getContentLength()/2:
+							left = leaf.getPreviousLeaf( segFilter, None, elemFilter )
+							if left is not None:
+								print left, "'" + left.getContent().replace( '\n', '\\n' ) + "'", left.getSegment() is leaf.getSegment()
+								left.moveMarkerToEnd( caret.getMarker() )
+							else:
+								right = leaf.getNextLeaf( segFilter, None, elemFilter )
+								if right is not None:
+									print right, "'" + right.getContent().replace( '\n', '\\n' ) + "'"
+									right.moveMarkerToStart( caret.getMarker() )
+								else:
+									leaf.moveMarker( caret.getMarker(), leafPosition, newBias )
+						else:
+							right = leaf.getNextLeaf( segFilter, None, elemFilter )
+							if right is not None:
+								print right, "'" + right.getContent().replace( '\n', '\\n' ) + "'"
+								right.moveMarkerToStart( caret.getMarker() )
+							else:
+								left = leaf.getPreviousLeaf( segFilter, None, elemFilter )
+								if left is not None:
+									print left, "'" + left.getContent().replace( '\n', '\\n' ) + "'"
+									left.moveMarkerToEnd( caret.getMarker() )
+								else:
+									leaf.moveMarker( caret.getMarker(), leafPosition, newBias )
 
 		
-			
+	def _getCursorPositionBiasAndContentString(self, node, element):
+		if element is not None:
+			contentString = element.getContent()
+			elementTree = element.getElementTree()
+			caret = elementTree.getCaret()
+			try:
+				position = caret.getMarker().getPositionInSubtree( node.getInnerElementNoRefresh() )
+			except DPWidget.IsNotInSubtreeException:
+				return None, None, contentString
+			return position, caret.getMarker().getBias(), contentString
+		else:
+			return None, None, ''
+
+		
+		
+		
 class GSymView (object):
 	def __call__(self, xs, ctx, state):
 		return dispatch( self, xs, ctx, state )
