@@ -17,44 +17,6 @@ import BritefuryJ.DocModel.DMListInterface;
 
 public class DocTreeList implements DocTreeNode, DMListInterface
 {
-	public class DocTreeListIterator implements Iterator<Object>
-	{
-		private DocTreeList xs;
-		private Iterator<Object> iter;
-		
-		private DocTreeListIterator(DocTreeList xs, Iterator<Object> iter)
-		{
-			this.xs = xs;
-			this.iter = iter;
-		}
-		
-		
-		public boolean hasNext()
-		{
-			return iter.hasNext();
-		}
-
-		public Object next()
-		{
-			Object next = iter.next();
-			int index = -1;
-			for (int i = 0; i < xs.node.size(); i++)
-			{
-				if ( next == xs.get( i ) )
-				{
-					index = i;
-				}
-			}
-			return xs.tree.treeNode( next, xs, index );
-		}
-
-		public void remove()
-		{
-			iter.remove();
-		}
-	}
-	
-	
 	public class DocTreeListListIterator implements ListIterator<Object>
 	{
 		private DocTreeList xs;
@@ -217,7 +179,7 @@ public class DocTreeList implements DocTreeNode, DMListInterface
 	
 	public Iterator<Object> iterator()
 	{
-		return new DocTreeListIterator( this, node.iterator() );
+		return listIterator();
 	}
 	
 	

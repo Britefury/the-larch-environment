@@ -7,7 +7,16 @@
 ##-*************************
 import sys
 
+import difflib
+
 from copy import copy
+
+from BritefuryJ.Cell import *
+
+from BritefuryJ.DocPresent import *
+from BritefuryJ.DocPresent.ElementTree import *
+from BritefuryJ.DocPresent.StyleSheets import *
+from BritefuryJ.DocPresent.Marker import *
 
 from BritefuryJ.DocTree import DocTree
 from BritefuryJ.DocTree import DocTreeNode
@@ -30,11 +39,6 @@ from Britefury.gSym.View.UnparsedText import UnparsedText
 #from Britefury.DocTree.DocTree import DocTree
 #from Britefury.DocTree.DocTreeNode import DocTreeNode
 
-
-from BritefuryJ.DocPresent import *
-from BritefuryJ.DocPresent.ElementTree import *
-from BritefuryJ.DocPresent.StyleSheets import *
-from BritefuryJ.Cell import *
 
 
 
@@ -437,8 +441,7 @@ class _NodeElementChangeListener (DVNode.NodeElementChangeListener):
 			startContent = elementContent.getContent()
 		else:
 			startContent = ''
-		self._posBiasContent = self._getCursorPositionBiasAndContentString( node, elementContent )
-		position, bias, contentString = self._posBiasContent
+		position, bias, contentString = self._getCursorPositionBiasAndContentString( node, elementContent )
 		#print 'Node: ', node.getDocNode()[0], position, elementContent
 
 		# Set the caret node to node
@@ -447,6 +450,7 @@ class _NodeElementChangeListener (DVNode.NodeElementChangeListener):
 				#print 'Node: %s, position=%d'  %  ( node.getDocNode()[0], position )
 				pass
 			self._caretNode = node
+			self._posBiasContent = position, bias, contentString
 		
 		
 	def elementChangeTo(self, node, element):
@@ -485,14 +489,14 @@ class _NodeElementChangeListener (DVNode.NodeElementChangeListener):
 				
 				print 'CURSOR POSITION CHANGE'
 				if bias == Marker.Bias.START:
-					print contentString[:oldIndex].replace( '\n', '\\n' ) + '>|.' + contentString[oldIndex:].replace( '\n', '\\n' )
+					print contentString[:oldIndex].replace( '\n', '\\n' ) + '>|' + contentString[oldIndex:].replace( '\n', '\\n' )
 				else:
-					print contentString[:oldIndex].replace( '\n', '\\n' ) + '.|<' + contentString[oldIndex:].replace( '\n', '\\n' )
+					print contentString[:oldIndex].replace( '\n', '\\n' ) + '|<' + contentString[oldIndex:].replace( '\n', '\\n' )
 
 				if bias == Marker.Bias.START:
-					print newContentString[:newIndex].replace( '\n', '\\n' ) + '>|.' + newContentString[newIndex:].replace( '\n', '\\n' )
+					print newContentString[:newIndex].replace( '\n', '\\n' ) + '>|' + newContentString[newIndex:].replace( '\n', '\\n' )
 				else:
-					print newContentString[:newIndex].replace( '\n', '\\n' ) + '.|<' + newContentString[newIndex:].replace( '\n', '\\n' )
+					print newContentString[:newIndex].replace( '\n', '\\n' ) + '|<' + newContentString[newIndex:].replace( '\n', '\\n' )
 				
 				newPosition = max( 0, newPosition )
 				if newPosition >= elementContent.getContentLength():
