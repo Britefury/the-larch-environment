@@ -397,7 +397,7 @@ class Python25View (GSymView):
 	def UNPARSED(self, ctx, state, node, value):
 		value = value.getString()
 		return expressionNodeEditor( ctx, node,
-				   text( ctx, unparsed_textStyle, value.getString() ),
+				   text( ctx, unparsed_textStyle, value ),
 				   None,
 				   state )
 

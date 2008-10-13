@@ -115,15 +115,6 @@ public class DVNode
 	}
 	
 	
-	/*
-	 * Set the element change listener
-	 */
-	public void setElementChangeListener(NodeElementChangeListener listener)
-	{
-		elementChangeListener = listener;
-	}
-	
-	
 	
 	/*
 	 * Set the node element factory
