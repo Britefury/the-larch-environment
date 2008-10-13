@@ -24,9 +24,10 @@ public class DocView
 	private Cell refreshCell;
 	protected DocViewNodeTable nodeTable;
 	private DVNode rootView;
+	private DVNode.NodeElementChangeListener elementChangeListener;
 	
 	
-	public DocView(DocTree tree, DocTreeNode root, RootNodeInitialiser rootNodeInitialiser)
+	public DocView(DocTree tree, DocTreeNode root, RootNodeInitialiser rootNodeInitialiser, DVNode.NodeElementChangeListener elementChangeListener)
 	{
 		this.root = root;
 		this.rootNodeInitialiser = rootNodeInitialiser;
@@ -44,10 +45,12 @@ public class DocView
 		refreshCell.setEvaluator( refreshEval );
 		
 		nodeTable = new DocViewNodeTable();
+		
+		this.elementChangeListener = elementChangeListener;
 	}
 	
 	
-	public DVNode getRootNode()
+	public DVNode getRootView()
 	{
 		if ( rootView == null )
 		{
@@ -80,7 +83,7 @@ public class DocView
 				{
 					// No existing view node could be acquired.
 					// Create a new one
-					viewNode = new DVNode( this, treeNode );
+					viewNode = new DVNode( this, treeNode, elementChangeListener );
 					nodeTable.put( treeNode, viewNode );
 				}
 			}
@@ -106,7 +109,7 @@ public class DocView
 	
 	private void performRefresh()
 	{
-		getRootNode().refresh();
+		getRootView().refresh();
 		
 		// Clear unused entries from the node table
 		nodeTable.clearUnused();

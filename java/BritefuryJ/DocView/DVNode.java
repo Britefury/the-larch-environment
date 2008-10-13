@@ -52,7 +52,7 @@ public class DVNode
 	
 	
 	
-	public DVNode(DocView view, DocTreeNode treeNode)
+	public DVNode(DocView view, DocTreeNode treeNode, NodeElementChangeListener elementChangeListener)
 	{
 		this.view = view;
 		this.treeNode = treeNode;
@@ -91,6 +91,9 @@ public class DVNode
 		
 		
 		children = new HashSet<DVNode>();
+		
+		
+		this.elementChangeListener = elementChangeListener;
 	}
 	
 	
@@ -144,14 +147,21 @@ public class DVNode
 	
 	public Element getElementNoRefresh()
 	{
-		return element;
+		return proxyElement;
 	}
 	
 	public Element getElement()
 	{
 		refresh();
+		return proxyElement;
+	}
+	
+	
+	public Element getInnerElementNoRefresh()
+	{
 		return element;
 	}
+	
 	
 	
 	

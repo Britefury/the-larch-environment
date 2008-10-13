@@ -44,13 +44,13 @@ public class Test_DocViewNodeTable extends TestCase
 		tcd = (DocTreeList)tc.get( 0 );
 		
 		
-		view = new DocView( tree, ta, null );
+		view = new DocView( tree, ta, null, null );
 		
-		va = new DVNode( view, ta );
-		vb = new DVNode( view, tb );
-		vc = new DVNode( view, tc );
-		vbd = new DVNode( view, tbd );
-		vcd = new DVNode( view, tcd );
+		va = new DVNode( view, ta, null );
+		vb = new DVNode( view, tb, null );
+		vc = new DVNode( view, tc, null );
+		vbd = new DVNode( view, tbd, null );
+		vcd = new DVNode( view, tcd, null );
 		
 		
 		table = new DocViewNodeTable();
@@ -120,8 +120,8 @@ public class Test_DocViewNodeTable extends TestCase
 
 	public void testPut()
 	{
-		DVNode vx = new DVNode( view, ta  );
-		DVNode vy = new DVNode( view, tbd );
+		DVNode vx = new DVNode( view, ta, null  );
+		DVNode vy = new DVNode( view, tbd, null );
 		
 		table.put( ta, vx );
 		table.put( tbd, vy );

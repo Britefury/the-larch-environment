@@ -6,6 +6,7 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
 import sys
+import os
 
 from java.lang import Runnable
 from javax.swing import JFrame, AbstractAction, JMenuItem, JMenu, JMenuBar, KeyStroke, JOptionPane, JFileChooser, JOptionPane
@@ -16,7 +17,7 @@ from java.awt.event import WindowListener
 
 from BritefuryJ.CommandHistory import CommandHistory, CommandHistoryListener
 
-from Britefury.DocModel import DMIORead, DMIOWrite, DMList
+from BritefuryJ.DocModel import DMIORead, DMIOWrite, DMList
 
 from BritefuryJ.DocPresent import *
 from BritefuryJ.DocPresent.ElementTree import *
@@ -382,7 +383,7 @@ class MainApp (object):
 						f = open( filename, 'r' )
 						if f is not None:
 							try:
-								documentRoot = DMIORead.readSX( f )
+								documentRoot = DMIORead.readSX( f.read() )
 								documentRoot = DMList( documentRoot )
 								self.setDocument( documentRoot )
 							except IOError:
