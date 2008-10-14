@@ -18,7 +18,6 @@ import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
-import BritefuryJ.Parser.DebugNode;
 import BritefuryJ.Parser.DebugParseResult;
 
 public class ParseView
@@ -118,12 +117,12 @@ public class ParseView
 	
 	public static interface ParseViewListener
 	{
-		public void onSelectionChanged(DebugNode selection);
+		public void onSelectionChanged(DebugParseResult.DebugNode selection);
 	}
 	
 	private DPPresentationArea area;
 	private DPViewBin bin;
-	private HashMap<DebugNode, NodeView> nodeTable;
+	private HashMap<DebugParseResult.DebugNode, NodeView> nodeTable;
 	private ArrayList<Edge> callEdges, memoEdges;
 	private NodeView root;
 	private NodeView selection;
@@ -140,7 +139,7 @@ public class ParseView
 		
 		bin = new DPViewBin( ContainerStyleSheet.defaultStyleSheet, this );
 		
-		nodeTable = new HashMap<DebugNode, NodeView>();
+		nodeTable = new HashMap<DebugParseResult.DebugNode, NodeView>();
 		callEdges = new ArrayList<Edge>();
 		memoEdges = new ArrayList<Edge>();
 		
@@ -167,7 +166,7 @@ public class ParseView
 	}
 	
 	
-	protected NodeView getNodeView(DebugNode node, String input)
+	protected NodeView getNodeView(DebugParseResult.DebugNode node, String input)
 	{
 		NodeView view = nodeTable.get( node );
 		
@@ -203,7 +202,7 @@ public class ParseView
 			}
 			
 			selection = node;
-			DebugNode d = null;
+			DebugParseResult.DebugNode d = null;
 
 			if ( selection != null )
 			{

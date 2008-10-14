@@ -25,7 +25,6 @@ import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
 
 import BritefuryJ.DocPresent.DPPresentationArea;
-import BritefuryJ.Parser.DebugNode;
 import BritefuryJ.Parser.DebugParseResult;
 import BritefuryJ.Parser.ParseResult;
 
@@ -142,7 +141,7 @@ public class ParseViewFrame implements ParseView.ParseViewListener
 
 
 	
-	public void onSelectionChanged(DebugNode selection)
+	public void onSelectionChanged(DebugParseResult.DebugNode selection)
 	{
 		try
 		{

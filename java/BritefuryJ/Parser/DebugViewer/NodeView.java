@@ -27,7 +27,7 @@ import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
-import BritefuryJ.Parser.DebugNode;
+import BritefuryJ.Parser.DebugParseResult;
 import BritefuryJ.Parser.ParseResult;
 
 public class NodeView
@@ -136,12 +136,12 @@ public class NodeView
 	private DPNodeBin nodeBinWidget;
 	private ParseView parseView;
 	private ArrayList<NodeView> children;
-	private DebugNode data;
+	private DebugParseResult.DebugNode data;
 	private String input;
 
 	
 	
-	public NodeView(ParseView parseView, DebugNode data, String input)
+	public NodeView(ParseView parseView, DebugParseResult.DebugNode data, String input)
 	{
 		this.parseView = parseView;
 		this.data = data;
@@ -151,7 +151,7 @@ public class NodeView
 		
 		ArrayList<DPWidget> childWidgets = new ArrayList<DPWidget>();
 		children = new ArrayList<NodeView>();
-		for (DebugNode child: data.getCallChildren())
+		for (DebugParseResult.DebugNode child: data.getCallChildren())
 		{
 			NodeView childView = parseView.getNodeView( child, input );
 			children.add( childView );
@@ -180,7 +180,7 @@ public class NodeView
 	}
 	
 	
-	protected DebugNode getDebugNode()
+	protected DebugParseResult.DebugNode getDebugNode()
 	{
 		return data;
 	}
@@ -193,7 +193,7 @@ public class NodeView
 			parseView.addCallEdge( this, child );
 		}
 		
-		for (DebugNode child: data.getMemoChildren())
+		for (DebugParseResult.DebugNode child: data.getMemoChildren())
 		{
 			parseView.addMemoEdge( this, parseView.getNodeView( child, input ) );
 		}
@@ -227,7 +227,7 @@ public class NodeView
 	
 	
 	
-	private DPWidget makeTitleWidget(DebugNode data)
+	private DPWidget makeTitleWidget(DebugParseResult.DebugNode data)
 	{
 		String debugName = data.getExpression().getDebugName();
 		
@@ -253,7 +253,7 @@ public class NodeView
 		}
 	}
 	
-	private DPWidget makeTitleBoxWidget(DebugNode data)
+	private DPWidget makeTitleBoxWidget(DebugParseResult.DebugNode data)
 	{
 		DPWidget titleWidget = makeTitleWidget( data );
 		
@@ -266,7 +266,7 @@ public class NodeView
 		return titleBoxWidget;
 	}
 	
-	private DPWidget makeRangeWidget(DebugNode data)
+	private DPWidget makeRangeWidget(DebugParseResult.DebugNode data)
 	{
 		ParseResult result = data.getResult();
 		String rangeText = "";
@@ -283,7 +283,7 @@ public class NodeView
 		return new DPText( rangeStyle, rangeText );
 	}
 	
-	private DPWidget makeInputWidget(DebugNode data, String input)
+	private DPWidget makeInputWidget(DebugParseResult.DebugNode data, String input)
 	{
 		input = input.substring( data.getResult().getBegin(), data.getResult().getEnd() );
 		
@@ -295,7 +295,7 @@ public class NodeView
 		return new DPText( inputStyle, input );
 	}
 
-	private DPWidget makeValueWidget(DebugNode data)
+	private DPWidget makeValueWidget(DebugParseResult.DebugNode data)
 	{
 		ParseResult result = data.getResult();
 		
@@ -314,7 +314,7 @@ public class NodeView
 		}
 	}
 	
-	private DPWidget makeContentBoxWidget(DebugNode data, String input)
+	private DPWidget makeContentBoxWidget(DebugParseResult.DebugNode data, String input)
 	{
 		DPWidget rangeWidget = makeRangeWidget( data );
 		DPWidget inputWidget = makeInputWidget( data, input );
@@ -326,7 +326,7 @@ public class NodeView
 		return contentBoxWidget;
 	}
 	
-	private DPWidget makeNodeWidget(DebugNode data, String input)
+	private DPWidget makeNodeWidget(DebugParseResult.DebugNode data, String input)
 	{
 		DPWidget titleBoxWidget = makeTitleBoxWidget( data );
 		DPWidget contentBoxWidget = makeContentBoxWidget( data, input );
