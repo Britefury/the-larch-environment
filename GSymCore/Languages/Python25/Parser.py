@@ -27,6 +27,8 @@ from GSymCore.Languages.Python25.Keywords import *
 #
 # yieldExpr and yieldAtom are basically the same thing; find a way of unifying this.
 #
+# Print statements are not handled correctly
+#
 #
 #
 

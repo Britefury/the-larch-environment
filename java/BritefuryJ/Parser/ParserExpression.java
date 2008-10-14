@@ -97,9 +97,9 @@ public abstract class ParserExpression
 		if ( state.bDebuggingEnabled )
 		{
 			// Get the current top of the debug stack (outer call)
-			DebugNode prev = state.debugStack;
+			DebugParseResult.DebugNode prev = state.debugStack;
 			// Create the debug info node
-			DebugNode node = new DebugNode( prev, this );
+			DebugParseResult.DebugNode node = new DebugParseResult.DebugNode( prev, this );
 
 			// Push @node onto the debug stack
 			state.debugStack = node;
@@ -122,8 +122,8 @@ public abstract class ParserExpression
 			{
 				DebugParseResult debugResult = (DebugParseResult)result;
 				
-				DebugNode fromNode = node;
-				DebugNode toNode = debugResult.debugNode;
+				DebugParseResult.DebugNode fromNode = node;
+				DebugParseResult.DebugNode toNode = debugResult.debugNode;
 				
 				if ( !fromNode.getCallChildren().contains( toNode ) )
 				{

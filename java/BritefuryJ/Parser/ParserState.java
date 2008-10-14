@@ -69,7 +69,7 @@ class ParserState
 	private HashMap<Integer, HashMap<ParserExpression, MemoEntry> > memo;
 	private RuleInvocation ruleInvocationStack;
 	private Pattern junkPattern;
-	protected DebugNode debugStack;
+	protected DebugParseResult.DebugNode debugStack;
 	protected boolean bDebuggingEnabled;
 	
 	

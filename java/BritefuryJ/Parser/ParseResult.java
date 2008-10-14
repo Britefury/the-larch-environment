@@ -68,7 +68,7 @@ public class ParseResult
 	}
 	
 	
-	public DebugParseResult debug(DebugNode debugNode)
+	public DebugParseResult debug(DebugParseResult.DebugNode debugNode)
 	{
 		return new DebugParseResult( value, begin, end, bSuppressed, bValid, debugNode );
 	}
