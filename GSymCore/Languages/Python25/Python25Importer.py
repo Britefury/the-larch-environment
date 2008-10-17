@@ -577,6 +577,39 @@ def _flattenedCompound(nodeList):
 	return xs
 	
 
+
+class MisMatchedMultilineQuoteError (Exception):
+	pass
+
+
+def _buildMultiLineQuoteTable(source):
+	quoteTable = []
+	pos = 0
+	while True:
+		try:
+			start = source[pos:].index( '"""' ) + pos
+		except ValueError:
+			try:
+				start = source[pos:].index( "'''" ) + pos
+			except ValueError:
+				return quoteTable
+			else:
+				try:
+					stop = source[start+3:].index( "'''" ) + start + 3
+				except ValueError:
+					raise MisMatchedMultilineQuoteError
+				quoteTable.append( ( start, stop + 3 ) )
+				pos = stop + 3
+		else:
+			try:
+				stop = source[start+3:].index( '"""' ) + start + 3
+			except ValueError:
+				raise MisMatchedMultilineQuoteError
+			quoteTable.append( ( start, stop + 3 ) )
+			pos = stop + 3
+		
+
+
 	
 	
 def importPy25Source(source, moduleName, mode):
@@ -634,6 +667,15 @@ class ImporterTestCase (unittest.TestCase):
 			print 'RESULT:'
 			print result
 		self.assert_( result == expectedResult )
+		
+		
+	def test_buildMultiLineQuoteTable(self):
+		self.assert_( _buildMultiLineQuoteTable( 'abc' ) == [] )
+		self.assertRaises( MisMatchedMultilineQuoteError, lambda: _buildMultiLineQuoteTable( 'abc"""' ) )
+		self.assertRaises( MisMatchedMultilineQuoteError, lambda: _buildMultiLineQuoteTable( "abc'''" ) )
+		self.assert_( _buildMultiLineQuoteTable( 'abc"""q"""' ) == [ ( 3, 10 ) ] )
+		self.assert_( _buildMultiLineQuoteTable( 'abc"""q"""xxy' + "'''q'''" ) == [ ( 3, 10 ), ( 13, 20 ) ] )
+		self.assertRaises( MisMatchedMultilineQuoteError, lambda: _buildMultiLineQuoteTable( 'abc"""q"""xxy' + "'''q''" ) )
 		
 
 		
