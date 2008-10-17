@@ -10,7 +10,7 @@ import java.util.Arrays;
 
 import BritefuryJ.Parser.ParserExpression;
 
-public abstract class UnaryOperator extends Operator
+abstract class UnaryOperator extends Operator
 {
 	protected static class DefaultUnaryOperatorParseAction implements UnaryOperatorParseAction
 	{

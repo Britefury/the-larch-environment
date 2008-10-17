@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import BritefuryJ.Parser.Forward;
 import BritefuryJ.Parser.ParserExpression;
 
-public abstract class Operator
+abstract class Operator
 {
 	protected ParserExpression opExpression;
 	

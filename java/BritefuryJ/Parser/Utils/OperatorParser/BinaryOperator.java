@@ -14,7 +14,7 @@ import BritefuryJ.Parser.Forward;
 import BritefuryJ.Parser.ParseAction;
 import BritefuryJ.Parser.ParserExpression;
 
-public abstract class BinaryOperator extends Operator
+abstract class BinaryOperator extends Operator
 {
 	private class BinaryOpAction implements ParseAction
 	{
