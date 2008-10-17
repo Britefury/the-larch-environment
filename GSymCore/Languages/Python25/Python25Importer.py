@@ -142,15 +142,6 @@ class _ImportFromImporter (_Importer):
 		return self.alias( node )
 
 	
-class _ExceptHandlerImporter (_Importer):
-	# Import statement
-	def excepthandler(self, node):
-		return [ 'exceptStmt',     _expr( node.type )   if node.type is not None   else '<nil>',     _target( node.name )   if node.name is not None   else '<nil>',    _flattenedCompound( node.body ) ]
-		
-	def excepthandlerType(self, node):
-		return self.excepthandler( node )
-
-	
 class _DecoratorImporter (_Importer):
 	def Name(self, node):
 		return [ 'decoStmt', node.id, '<nil>' ]
@@ -462,31 +453,52 @@ class _StmtImporter (_Importer):
 
 	
 	
-class _CompoundStmtImporter (_Importer):
+class _ExceptHandlerImporter (_Importer):
 	def __call__(self, structTab, node, method=None):
 		if method is None:
 			name = _getNodeTypeName( node )
 			try:
 				method = getattr( self, name )
 			except AttributeError:
-				structTab.pos = node.lineno
-				return [ _stmt( node ) ]
+				return [ 'UNPARSED', name ]
 		return method( structTab, node )
+	# Import statement
+	def excepthandler(self, structTab, node):
+		return [ 'exceptStmt',     _expr( node.type )   if node.type is not None   else '<nil>',     _target( node.name )   if node.name is not None   else '<nil>',    _flattenedCompound( structTab, node.body ) ]
+		
+	def excepthandlerType(self, structTab, node):
+		return self.excepthandler( structTab, node )
+
+	
+
+
+class _CompoundStmtImporter (_Importer):
+	def __call__(self, structTab, node, method=None):
+		xs = structTab.nodesTo( node.lineno - 1 )
+		if method is None:
+			name = _getNodeTypeName( node )
+			try:
+				method = getattr( self, name )
+			except AttributeError:
+				return xs + [ _stmt( node ) ]
+		return xs + method( structTab, node )
 
 	
 	# If
 	def If(self, structTab, node):
 		def _handleNode(n, bFirst):
 			name = 'ifStmt'   if bFirst   else 'elifStmt'
-			result = structTab.nodesTo( n.lineno - 1 )
-			result += [ [ name, _expr( n.test ), _flattenedCompound( structTab, n.body ) ] ]
+			result = [ [ name, _expr( n.test ), _flattenedCompound( structTab, n.body ) ] ]
 			if len( n.orelse ) == 1   and   isinstance( n.orelse[0], _ast.If ):
+				xs = structTab.nodesTo( n.orelse[0].lineno - 1 )
+				result.extend( xs )
 				result.extend( _handleNode( n.orelse[0], False ) )
 			elif len( n.orelse ) == 0:
 				pass
 			else:
-				result.extend( structTab.nodesTo( n.lineno - 1 ) )
-				result.extend( [ [ 'elseStmt', _flattenedCompound( structTab, n.orelse) ] ] )
+				xs = structTab.nodesTo( n.orelse[0].lineno - 1 )
+				result.extend( xs )
+				result.extend( [ [ 'elseStmt', _flattenedCompound( structTab, n.orelse ) ] ] )
 			return result;
 			
 		return _handleNode( node, True )
@@ -494,47 +506,53 @@ class _CompoundStmtImporter (_Importer):
 	
 	# While
 	def While(self, structTab, node):
-		result = structTab.nodesTo( node.lineno - 1 )
-		result += [ [ 'whileStmt', _expr( node.test ), _flattenedCompound( structTab, node.body ) ] ]
+		result = [ [ 'whileStmt', _expr( node.test ), _flattenedCompound( structTab, node.body ) ] ]
 		if len( node.orelse ) > 0:
-			xs = structTab.nodesTo( node.lineno - 1 )
+			xs = structTab.nodesTo( node.orelse[0].lineno - 1 )
+			result.extend( xs )
 			result.append( [ 'elseStmt', _flattenedCompound( structTab, node.orelse ) + xs ] )
 		return result
 
 	
 	# For
 	def For(self, structTab, node):
-		result = [ [ 'forStmt', _target( node.target ), _expr( node.iter ), _flattenedCompound( node.body ) ] ]
+		result = [ [ 'forStmt', _target( node.target ), _expr( node.iter ), _flattenedCompound( structTab, node.body ) ] ]
 		if len( node.orelse ) > 0:
-			result.append( [ 'elseStmt', _flattenedCompound( node.orelse ) ] )
+			xs = structTab.nodesTo( node.orelse[0].lineno - 1 )
+			result.extend( xs )
+			result.append( [ 'elseStmt', _flattenedCompound( structTab, node.orelse ) ] )
 		return result
 	
 	
 	# Try
 	def TryExcept(self, structTab, node):
-		result = [ [ 'tryStmt', _flattenedCompound( node.body ) ] ]
+		result = [ [ 'tryStmt', _flattenedCompound( structTab, node.body ) ] ]
 		for h in node.handlers:
-			result.append( _except( h ) )
+			xs = structTab.nodesTo( h.lineno - 1 )
+			result.extend( xs )
+			result.append( _except( structTab, h ) )
 		if len( node.orelse ) > 0:
-			result.append( [ 'elseStmt', _flattenedCompound( node.orelse ) ] )
+			xs = structTab.nodesTo( node.orelse[0].lineno - 1 )
+			result.extend( xs )
+			result.append( [ 'elseStmt', _flattenedCompound( structTab, node.orelse ) ] )
 		return result
 	
 	def TryFinally(self, structTab, node):
-		body = _flattenedCompound( node.body )
-		body.append( [ 'finallyStmt', _flattenedCompound( node.finalbody ) ] )
+		body = _flattenedCompound( structTab, node.body )
+		body.append( [ 'finallyStmt', _flattenedCompound( structTab, node.finalbody ) ] )
 		return body
 	
 	
 	# With
 	def With(self, structTab, node):
-		return [ [ 'withStmt',    _expr( node.expr ),   _target( node.vars )   if node.vars is not None   else   '<nil>',   _flattenedCompound( node.body ) ] ]
+		return [ [ 'withStmt',    _expr( node.expr ),   _target( node.vars )   if node.vars is not None   else   '<nil>',   _flattenedCompound( structTab, node.body ) ] ]
 	
 	
 	# Function
 	def FunctionDef(self, structTab, node):
 		result = [ _decorator( dec )   for dec in node.decorators ]
 		params = _extractParameters( node.args )
-		result.append( [ 'defStmt', node.name, params, _flattenedCompound( node.body ) ] )
+		result.append( [ 'defStmt', node.name, params, _flattenedCompound( structTab, node.body ) ] )
 		return result
 		
 	
@@ -547,7 +565,7 @@ class _CompoundStmtImporter (_Importer):
 			bases = _expr( node.bases[0] )
 		else:
 			bases = [ 'tupleLiteral' ]  +  [ _expr( b )   for b in node.bases ]
-		return [ [ 'classStmt', node.name, bases, _flattenedCompound( node.body ) ] ]
+		return [ [ 'classStmt', node.name, bases, _flattenedCompound( structTab, node.body ) ] ]
 	
 
 
@@ -564,7 +582,7 @@ class _ModuleImporter (_Importer):
 
 	
 	# Module
-	def Module(self, structTab node):
+	def Module(self, structTab, node):
 		return [ 'python25Module' ]  +  _flattenedCompound( structTab, node.body )
 	
 	
@@ -589,6 +607,7 @@ def _flattenedCompound(structTab, nodeList):
 	xs = []
 	for node in nodeList:
 		xs.extend( _compound( structTab, node ) )
+	xs.extend( structTab.nodesToIndentationChange() )
 	return xs
 	
 
@@ -700,7 +719,10 @@ class _StructureTable (object):
 		lines = source.split( '\n' )
 		pos = 0
 		self.table = [ None ] * len( lines )
+		self.indentationChange = [ False ] * len( lines )
 		tableIndex = 0
+		
+		prevIndentation = None
 	
 		for i, line in enumerate( lines ):
 			lineEndPos = pos + len( line )
@@ -712,25 +734,51 @@ class _StructureTable (object):
 					break
 				tableIndex += 1
 			
-			x = lines.strip()
+			x = line.strip()
 			if x == '':
 				if start is None  or  lineEndPos < start:
 					self.table[i] = [ 'blankLine' ]
 			elif x.startswith( '#' ):
 				commentPos = pos + line.index( '#' )
 				if not _isQuoted( commentPos, quoteTable, tableIndex ):
-					self.table[i] = [ 'commentStmt', x[x.index( '#' ):] ]
+					self.table[i] = [ 'commentStmt', x[x.index( '#' )+1:] ]
 			
 			pos += lineEndPos + 1
-		
+			
+			
+			if x != '':
+				indentation = line[:line.index( x )]
+				if prevIndentation is not None  and  indentation != prevIndentation:
+					self.indentationChange[i] = True
+					
+				prevIndentation = indentation
+					
 		self.pos = 0
+		
+		
+		
 		
 	
 	def nodesTo(self, pos):
-		xs = self.table[self.pos:pos]
-		xs = [ x   for x in xs   if x is not None ]
-		self.pos = pos + 1
-		return xs
+		if pos > self.pos:
+			xs = self.table[self.pos:pos]
+			xs = [ x   for x in xs   if x is not None ]
+			self.pos = pos + 1
+			return xs
+		else:
+			return []
+	
+	
+	def nodesToIndentationChange(self):
+		pos = len( self.indentationChange )
+		for i in xrange( self.pos, len( self.indentationChange ) ):
+			if self.indentationChange[i]:
+				pos = i
+				break
+			
+		return self.nodesTo( pos )
+		
+				
 		
 		
 		
@@ -740,13 +788,15 @@ class _StructureTable (object):
 	
 def importPy25Source(source, moduleName, mode):
 	tree = compile( source, moduleName, mode, _ast.PyCF_ONLY_AST )
-	return _module( tree )
+	structTab = _StructureTable( source )
+	return _module( structTab, tree )
 
 
 def importPy25File(filename):
 	source = open( filename, 'r' ).read()
 	tree = compile( source, filename, 'exec', _ast.PyCF_ONLY_AST )
-	return _module( tree )
+	structTab = _StructureTable( source )
+	return _module( structTab, tree )
 
 
 
@@ -1076,22 +1126,19 @@ class ImporterTestCase (unittest.TestCase):
 		src1 = \
 """
 if a:
-	x
-"""
+	x"""
 		src2 = \
 """
 if a:
 	x
 elif b:
-	y
-"""
+	y"""
 		src3 = \
 """
 if a:
 	x
 else:
-	z
-"""
+	z"""
 		src4 = \
 """
 if a:
@@ -1099,12 +1146,11 @@ if a:
 elif b:
 	y
 else:
-	z
-"""
-		self._compStmtTest( src1, [ [ 'ifStmt', [ 'var', 'a' ], [ [ 'var', 'x' ] ] ] ] )
-		self._compStmtTest( src2, [ [ 'ifStmt', [ 'var', 'a' ], [ [ 'var', 'x' ] ] ], [ 'elifStmt', [ 'var', 'b' ], [ [ 'var', 'y' ] ] ] ] )
-		self._compStmtTest( src3, [ [ 'ifStmt', [ 'var', 'a' ], [ [ 'var', 'x' ] ] ], [ 'elseStmt', [ [ 'var', 'z' ] ] ] ] )
-		self._compStmtTest( src4, [ [ 'ifStmt', [ 'var', 'a' ], [ [ 'var', 'x' ] ] ], [ 'elifStmt', [ 'var', 'b' ], [ [ 'var', 'y' ] ] ], [ 'elseStmt', [ [ 'var', 'z' ] ] ] ] )
+	z"""
+		self._compStmtTest( src1, [ [ 'blankLine' ], [ 'ifStmt', [ 'var', 'a' ], [ [ 'var', 'x' ] ] ] ] )
+		self._compStmtTest( src2, [ [ 'blankLine' ], [ 'ifStmt', [ 'var', 'a' ], [ [ 'var', 'x' ] ] ], [ 'elifStmt', [ 'var', 'b' ], [ [ 'var', 'y' ] ] ] ] )
+		self._compStmtTest( src3, [ [ 'blankLine' ], [ 'ifStmt', [ 'var', 'a' ], [ [ 'var', 'x' ] ] ], [ 'elseStmt', [ [ 'var', 'z' ] ] ] ] )
+		self._compStmtTest( src4, [ [ 'blankLine' ], [ 'ifStmt', [ 'var', 'a' ], [ [ 'var', 'x' ] ] ], [ 'elifStmt', [ 'var', 'b' ], [ [ 'var', 'y' ] ] ], [ 'elseStmt', [ [ 'var', 'z' ] ] ] ] )
 
 		
 	def testWhile(self):
@@ -1118,10 +1164,9 @@ while a:
 while a:
 	x
 else:
-	z
-"""
-		self._compStmtTest( src1, [ [ 'whileStmt', [ 'var', 'a' ], [ [ 'var', 'x' ] ] ] ] )
-		self._compStmtTest( src2, [ [ 'whileStmt', [ 'var', 'a' ], [ [ 'var', 'x' ] ] ], [ 'elseStmt', [ [ 'var', 'z' ] ] ] ] )
+	z"""
+		self._compStmtTest( src1, [ [ 'blankLine' ], [ 'whileStmt', [ 'var', 'a' ], [ [ 'var', 'x' ] ] ] ] )
+		self._compStmtTest( src2, [ [ 'blankLine' ], [ 'whileStmt', [ 'var', 'a' ], [ [ 'var', 'x' ] ] ], [ 'elseStmt', [ [ 'var', 'z' ] ] ] ] )
 
 		
 		
@@ -1129,17 +1174,15 @@ else:
 		src1 = \
 """
 for a in q:
-	x
-"""
+	x"""
 		src2 = \
 """
 for a in q:
 	x
 else:
-	z
-"""
-		self._compStmtTest( src1, [ [ 'forStmt', [ 'singleTarget', 'a' ], [ 'var', 'q' ], [ [ 'var', 'x' ] ] ] ] )
-		self._compStmtTest( src2, [ [ 'forStmt', [ 'singleTarget', 'a' ], [ 'var', 'q' ], [ [ 'var', 'x' ] ] ], [ 'elseStmt', [ [ 'var', 'z' ] ] ] ] )
+	z"""
+		self._compStmtTest( src1, [ [ 'blankLine' ], [ 'forStmt', [ 'singleTarget', 'a' ], [ 'var', 'q' ], [ [ 'var', 'x' ] ] ] ] )
+		self._compStmtTest( src2, [ [ 'blankLine' ], [ 'forStmt', [ 'singleTarget', 'a' ], [ 'var', 'q' ], [ [ 'var', 'x' ] ] ], [ 'elseStmt', [ [ 'var', 'z' ] ] ] ] )
 
 		
 		
@@ -1162,8 +1205,7 @@ try:
 except:
 	p
 else:
-	z
-"""
+	z"""
 		src3 = \
 """
 try:
@@ -1171,11 +1213,10 @@ try:
 except:
 	p
 finally:
-	z
-"""
-		self._compStmtTest( src1, [ [ 'tryStmt', [ [ 'var', 'x' ] ] ],  [ 'exceptStmt', '<nil>', '<nil>', [ [ 'var', 'p' ] ] ],   [ 'exceptStmt', [ 'var', 'a' ], '<nil>', [ [ 'var', 'q' ] ] ],    [ 'exceptStmt', [ 'var', 'a' ], [ 'singleTarget', 'b' ], [ [ 'var', 'r' ] ] ] ] )
-		self._compStmtTest( src2, [ [ 'tryStmt', [ [ 'var', 'x' ] ] ],  [ 'exceptStmt', '<nil>', '<nil>', [ [ 'var', 'p' ] ] ],   [ 'elseStmt', [ [ 'var', 'z' ] ] ] ] )
-		self._compStmtTest( src3, [ [ 'tryStmt', [ [ 'var', 'x' ] ] ],  [ 'exceptStmt', '<nil>', '<nil>', [ [ 'var', 'p' ] ] ],   [ 'finallyStmt', [ [ 'var', 'z' ] ] ] ] )
+	z"""
+		self._compStmtTest( src1, [ [ 'blankLine' ], [ 'tryStmt', [ [ 'var', 'x' ] ] ],  [ 'exceptStmt', '<nil>', '<nil>', [ [ 'var', 'p' ] ] ],   [ 'exceptStmt', [ 'var', 'a' ], '<nil>', [ [ 'var', 'q' ] ] ],    [ 'exceptStmt', [ 'var', 'a' ], [ 'singleTarget', 'b' ], [ [ 'var', 'r' ] ] ] ] )
+		self._compStmtTest( src2, [ [ 'blankLine' ], [ 'tryStmt', [ [ 'var', 'x' ] ] ],  [ 'exceptStmt', '<nil>', '<nil>', [ [ 'var', 'p' ] ] ],   [ 'elseStmt', [ [ 'var', 'z' ] ] ] ] )
+		self._compStmtTest( src3, [ [ 'blankLine' ], [ 'tryStmt', [ [ 'var', 'x' ] ] ],  [ 'exceptStmt', '<nil>', '<nil>', [ [ 'var', 'p' ] ] ],   [ 'finallyStmt', [ [ 'var', 'z' ] ] ] ] )
 
 		
 		
@@ -1209,26 +1250,23 @@ def f(a,b=q,*c,**d):
 """
 @p
 def f():
-	x
-"""
+	x"""
 		src4 = \
 """
 @p(h)
 def f():
-	x
-"""
+	x"""
 		src5 = \
 """
 @p(h)
 @q(j)
 def f():
-	x
-"""
-		self._compStmtTest( src1, [ [ 'defStmt', 'f', [], [ [ 'var', 'x' ] ] ] ] )
-		self._compStmtTest( src2, [ [ 'defStmt', 'f', [ [ 'simpleParam', 'a' ], [ 'defaultValueParam', 'b', [ 'var', 'q' ] ], [ 'paramList', 'c' ], [ 'kwParamList', 'd' ] ], [ [ 'var', 'x' ] ] ] ] )
-		self._compStmtTest( src3, [ [ 'decoStmt', 'p', '<nil>' ], [ 'defStmt', 'f', [], [ [ 'var', 'x' ] ] ] ] )
-		self._compStmtTest( src4, [ [ 'decoStmt', 'p', [ [ 'var', 'h' ] ] ], [ 'defStmt', 'f', [], [ [ 'var', 'x' ] ] ] ] )
-		self._compStmtTest( src5, [ [ 'decoStmt', 'p', [ [ 'var', 'h' ] ] ], [ 'decoStmt', 'q', [ [ 'var', 'j' ] ] ], [ 'defStmt', 'f', [], [ [ 'var', 'x' ] ] ] ] )
+	x"""
+		self._compStmtTest( src1, [ [ 'blankLine' ], [ 'defStmt', 'f', [], [ [ 'var', 'x' ] ] ] ] )
+		self._compStmtTest( src2, [ [ 'blankLine' ], [ 'defStmt', 'f', [ [ 'simpleParam', 'a' ], [ 'defaultValueParam', 'b', [ 'var', 'q' ] ], [ 'paramList', 'c' ], [ 'kwParamList', 'd' ] ], [ [ 'var', 'x' ] ] ] ] )
+		self._compStmtTest( src3, [ [ 'blankLine' ], [ 'decoStmt', 'p', '<nil>' ], [ 'defStmt', 'f', [], [ [ 'var', 'x' ] ] ] ] )
+		self._compStmtTest( src4, [ [ 'blankLine' ], [ 'decoStmt', 'p', [ [ 'var', 'h' ] ] ], [ 'defStmt', 'f', [], [ [ 'var', 'x' ] ] ] ] )
+		self._compStmtTest( src5, [ [ 'blankLine' ], [ 'decoStmt', 'p', [ [ 'var', 'h' ] ] ], [ 'decoStmt', 'q', [ [ 'var', 'j' ] ] ], [ 'defStmt', 'f', [], [ [ 'var', 'x' ] ] ] ] )
 
 		
 	def testClass(self):
@@ -1247,9 +1285,9 @@ class Q (object):
 class Q (a,b):
 	x
 """
-		self._compStmtTest( src1, [ [ 'classStmt', 'Q', '<nil>', [ [ 'var', 'x' ] ] ] ] )
-		self._compStmtTest( src2, [ [ 'classStmt', 'Q', [ 'var', 'object' ], [ [ 'var', 'x' ] ] ] ] )
-		self._compStmtTest( src3, [ [ 'classStmt', 'Q', [ 'tupleLiteral', [ 'var', 'a' ], [ 'var', 'b' ] ], [ [ 'var', 'x' ] ] ] ] )
+		self._compStmtTest( src1, [ [ 'blankLine' ], [ 'classStmt', 'Q', '<nil>', [ [ 'var', 'x' ] ] ] ] )
+		self._compStmtTest( src2, [ [ 'blankLine' ], [ 'classStmt', 'Q', [ 'var', 'object' ], [ [ 'var', 'x' ] ] ] ] )
+		self._compStmtTest( src3, [ [ 'blankLine' ], [ 'classStmt', 'Q', [ 'tupleLiteral', [ 'var', 'a' ], [ 'var', 'b' ] ], [ [ 'var', 'x' ] ] ] ] )
 
 		
 if __name__ == '__main__':
