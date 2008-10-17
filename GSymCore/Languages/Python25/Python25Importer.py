@@ -463,42 +463,47 @@ class _StmtImporter (_Importer):
 	
 	
 class _CompoundStmtImporter (_Importer):
-	def __call__(self, node, method=None):
+	def __call__(self, structTab, node, method=None):
 		if method is None:
 			name = _getNodeTypeName( node )
 			try:
 				method = getattr( self, name )
 			except AttributeError:
+				structTab.pos = node.lineno
 				return [ _stmt( node ) ]
-		return method( node )
+		return method( structTab, node )
 
 	
 	# If
-	def If(self, node):
+	def If(self, structTab, node):
 		def _handleNode(n, bFirst):
 			name = 'ifStmt'   if bFirst   else 'elifStmt'
-			result = [ [ name, _expr( n.test ), _flattenedCompound( n.body ) ] ]
+			result = structTab.nodesTo( n.lineno - 1 )
+			result += [ [ name, _expr( n.test ), _flattenedCompound( structTab, n.body ) ] ]
 			if len( n.orelse ) == 1   and   isinstance( n.orelse[0], _ast.If ):
 				result.extend( _handleNode( n.orelse[0], False ) )
 			elif len( n.orelse ) == 0:
 				pass
 			else:
-				result.extend( [ [ 'elseStmt', _flattenedCompound( n.orelse) ] ] )
+				result.extend( structTab.nodesTo( n.lineno - 1 ) )
+				result.extend( [ [ 'elseStmt', _flattenedCompound( structTab, n.orelse) ] ] )
 			return result;
 			
 		return _handleNode( node, True )
 
 	
 	# While
-	def While(self, node):
-		result = [ [ 'whileStmt', _expr( node.test ), _flattenedCompound( node.body ) ] ]
+	def While(self, structTab, node):
+		result = structTab.nodesTo( node.lineno - 1 )
+		result += [ [ 'whileStmt', _expr( node.test ), _flattenedCompound( structTab, node.body ) ] ]
 		if len( node.orelse ) > 0:
-			result.append( [ 'elseStmt', _flattenedCompound( node.orelse ) ] )
+			xs = structTab.nodesTo( node.lineno - 1 )
+			result.append( [ 'elseStmt', _flattenedCompound( structTab, node.orelse ) + xs ] )
 		return result
 
 	
 	# For
-	def For(self, node):
+	def For(self, structTab, node):
 		result = [ [ 'forStmt', _target( node.target ), _expr( node.iter ), _flattenedCompound( node.body ) ] ]
 		if len( node.orelse ) > 0:
 			result.append( [ 'elseStmt', _flattenedCompound( node.orelse ) ] )
@@ -506,7 +511,7 @@ class _CompoundStmtImporter (_Importer):
 	
 	
 	# Try
-	def TryExcept(self, node):
+	def TryExcept(self, structTab, node):
 		result = [ [ 'tryStmt', _flattenedCompound( node.body ) ] ]
 		for h in node.handlers:
 			result.append( _except( h ) )
@@ -514,19 +519,19 @@ class _CompoundStmtImporter (_Importer):
 			result.append( [ 'elseStmt', _flattenedCompound( node.orelse ) ] )
 		return result
 	
-	def TryFinally(self, node):
+	def TryFinally(self, structTab, node):
 		body = _flattenedCompound( node.body )
 		body.append( [ 'finallyStmt', _flattenedCompound( node.finalbody ) ] )
 		return body
 	
 	
 	# With
-	def With(self, node):
+	def With(self, structTab, node):
 		return [ [ 'withStmt',    _expr( node.expr ),   _target( node.vars )   if node.vars is not None   else   '<nil>',   _flattenedCompound( node.body ) ] ]
 	
 	
 	# Function
-	def FunctionDef(self, node):
+	def FunctionDef(self, structTab, node):
 		result = [ _decorator( dec )   for dec in node.decorators ]
 		params = _extractParameters( node.args )
 		result.append( [ 'defStmt', node.name, params, _flattenedCompound( node.body ) ] )
@@ -535,7 +540,7 @@ class _CompoundStmtImporter (_Importer):
 	
 
 	# Class
-	def ClassDef(self, node):
+	def ClassDef(self, structTab, node):
 		if len( node.bases ) == 0:
 			bases = '<nil>'
 		elif len( node.bases ) == 1:
@@ -548,9 +553,19 @@ class _CompoundStmtImporter (_Importer):
 
 
 class _ModuleImporter (_Importer):
+	def __call__(self, structTab, node, method=None):
+		if method is None:
+			name = _getNodeTypeName( node )
+			try:
+				method = getattr( self, name )
+			except AttributeError:
+				return [ 'UNPARSED', name ]
+		return method( structTab, node )
+
+	
 	# Module
-	def Module(self, node):
-		return [ 'python25Module' ]  +  _flattenedCompound( node.body )
+	def Module(self, structTab node):
+		return [ 'python25Module' ]  +  _flattenedCompound( structTab, node.body )
 	
 	
 	
@@ -570,10 +585,10 @@ _compound = _CompoundStmtImporter()
 _module = _ModuleImporter()
 
 
-def _flattenedCompound(nodeList):
+def _flattenedCompound(structTab, nodeList):
 	xs = []
 	for node in nodeList:
-		xs.extend( _compound( node ) )
+		xs.extend( _compound( structTab, node ) )
 	return xs
 	
 
@@ -582,31 +597,142 @@ class MisMatchedMultilineQuoteError (Exception):
 	pass
 
 
+
+def _findTripleQuote(source, pos):
+	try:
+		s = source.index( "'''", pos )
+	except ValueError:
+		s = None
+	
+	try:
+		d = source.index( '"""', pos )
+	except ValueError:
+		d = None
+		
+	if s is None  and  d is None:
+		return None, None
+	elif s is not None  and  d is None:
+		return s, "'''"
+	elif s is None  and  d is not None:
+		return d, '"""'
+	else:
+		if s < d:
+			return s, "'''"
+		else:
+			return d, '"""'
+		
+		
+def _findComment(source, pos):
+	try:
+		return source.index( '#', pos )
+	except ValueError:
+		return None
+	
+			
+			
 def _buildMultiLineQuoteTable(source):
 	quoteTable = []
 	pos = 0
-	while True:
-		try:
-			start = source[pos:].index( '"""' ) + pos
-		except ValueError:
+	start = None
+	quote = None
+	while pos < len( source ):
+		# Look for the next comment, and the next triple quote
+		commentPos = _findComment( source, pos )
+		if start is None:
+			start, quote = _findTripleQuote( source, pos )
+			
+		if commentPos is None  and  start is None:
+			break
+		
+		if commentPos is not None  and  ( start is None  or  commentPos < start ):
+			# Got a comment; find the newline that ends it
 			try:
-				start = source[pos:].index( "'''" ) + pos
+				newLinePos = source.index( '\n', commentPos )
 			except ValueError:
-				return quoteTable
+				pos = len( source )
+				break
 			else:
+				# Move on to this position; next loop iteration
+				pos = newLinePos + 1
+				if start is not None  and  start < pos:
+					# The start of the triple quoted string lies within this comment; ignore the quotes
+					start = None
+					quote = None
+				else:
+					continue
+		
+		if start is not None:
+			if start < pos:
+				# The start of the triple quoted string lies within this comment; ignore the quotes
+				pass
+			else:
+				# We have a quote, look for the end quote
 				try:
-					stop = source[start+3:].index( "'''" ) + start + 3
+					stop = source.index( quote, start + 3 )
 				except ValueError:
 					raise MisMatchedMultilineQuoteError
 				quoteTable.append( ( start, stop + 3 ) )
 				pos = stop + 3
-		else:
-			try:
-				stop = source[start+3:].index( '"""' ) + start + 3
-			except ValueError:
-				raise MisMatchedMultilineQuoteError
-			quoteTable.append( ( start, stop + 3 ) )
-			pos = stop + 3
+				
+			start = None
+			quote = None
+			
+				
+	return quoteTable
+			
+
+def _isQuoted(charPos, quoteTable, tableIndex):
+	for i in xrange( tableIndex, len( quoteTable ) ):
+		start, stop = quoteTable[i]
+		if charPos >= start  and  charPos < stop:
+			return True
+		elif charPos < start:
+			return False
+	return False
+
+
+
+
+class _StructureTable (object):
+	def __init__(self, source):
+		quoteTable = _buildMultiLineQuoteTable( source )
+		
+		lines = source.split( '\n' )
+		pos = 0
+		self.table = [ None ] * len( lines )
+		tableIndex = 0
+	
+		for i, line in enumerate( lines ):
+			lineEndPos = pos + len( line )
+			
+			start, stop = None, None
+			while tableIndex < len( quoteTable ):
+				start, stop = quoteTable[tableIndex]
+				if stop > pos:
+					break
+				tableIndex += 1
+			
+			x = lines.strip()
+			if x == '':
+				if start is None  or  lineEndPos < start:
+					self.table[i] = [ 'blankLine' ]
+			elif x.startswith( '#' ):
+				commentPos = pos + line.index( '#' )
+				if not _isQuoted( commentPos, quoteTable, tableIndex ):
+					self.table[i] = [ 'commentStmt', x[x.index( '#' ):] ]
+			
+			pos += lineEndPos + 1
+		
+		self.pos = 0
+		
+	
+	def nodesTo(self, pos):
+		xs = self.table[self.pos:pos]
+		xs = [ x   for x in xs   if x is not None ]
+		self.pos = pos + 1
+		return xs
+		
+		
 		
 
 
@@ -675,7 +801,16 @@ class ImporterTestCase (unittest.TestCase):
 		self.assertRaises( MisMatchedMultilineQuoteError, lambda: _buildMultiLineQuoteTable( "abc'''" ) )
 		self.assert_( _buildMultiLineQuoteTable( 'abc"""q"""' ) == [ ( 3, 10 ) ] )
 		self.assert_( _buildMultiLineQuoteTable( 'abc"""q"""xxy' + "'''q'''" ) == [ ( 3, 10 ), ( 13, 20 ) ] )
+		self.assert_( _buildMultiLineQuoteTable( "abc'''q'''xxy" + '"""q"""' ) == [ ( 3, 10 ), ( 13, 20 ) ] )
 		self.assertRaises( MisMatchedMultilineQuoteError, lambda: _buildMultiLineQuoteTable( 'abc"""q"""xxy' + "'''q''" ) )
+
+		self.assert_( _buildMultiLineQuoteTable( 'abc"""q"""xxy#' + "'''q'''" ) == [ ( 3, 10 ) ] )
+		self.assert_( _buildMultiLineQuoteTable( '#abc"""q"""xxy' + "'''q'''" ) == [] )
+		self.assert_( _buildMultiLineQuoteTable( '#abc"""q"""\nxxy' + "'''q'''" ) == [ ( 15, 22 ) ] )
+		self.assert_( _buildMultiLineQuoteTable( 'abc"""q#"""xxy' + "'''q'''" ) == [ ( 3, 11 ),  ( 14, 21 ) ] )
+		self.assert_( _buildMultiLineQuoteTable( 'abc"""q"""#xxy\n' + "'''q'''" ) == [ ( 3, 10 ), ( 15, 22 ) ] )
+		self.assert_( _buildMultiLineQuoteTable( 'abc"""q"""#xxy\n' + "'''q\n'''" ) == [ ( 3, 10 ), ( 15, 23 ) ] )
+		self.assert_( _buildMultiLineQuoteTable( 'abc"""q"""#xxy\n' + "'''q#'''" ) == [ ( 3, 10 ), ( 15, 23 ) ] )
 		
 
 		
