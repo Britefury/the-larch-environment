@@ -337,25 +337,25 @@ abstract public class DPWidget
 	}
 	
 	
-	public void getWidgetPathToRoot(List<DPWidget> path)
+	public void getWidgetPathFromRoot(List<DPWidget> path)
 	{
 		// Root to top
 		if ( parent != null )
 		{
-			parent.getWidgetPathToRoot( path );
+			parent.getWidgetPathFromRoot( path );
 		}
 		
 		path.add( this );
 	}
 	
-	public void getWidgetPathToSubtreeRoot(DPContainer subtreeRoot, List<DPWidget> path) throws IsNotInSubtreeException
+	public void getWidgetPathFromSubtreeRoot(DPContainer subtreeRoot, List<DPWidget> path) throws IsNotInSubtreeException
 	{
 		// Root to top
 		if ( subtreeRoot != this )
 		{
 			if ( parent != null )
 			{
-				parent.getWidgetPathToSubtreeRoot( subtreeRoot, path );
+				parent.getWidgetPathFromSubtreeRoot( subtreeRoot, path );
 			}
 			else
 			{
@@ -367,25 +367,37 @@ abstract public class DPWidget
 	}
 	
 	
-	public static void getPathsToCommonSubtreeRoot(DPWidget w0, List<DPWidget> path0, DPWidget w1, List<DPWidget> path1)
+	public static void getPathsFromCommonSubtreeRoot(DPWidget w0, List<DPWidget> path0, DPWidget w1, List<DPWidget> path1)
 	{
-		w0.getWidgetPathToRoot( path0 );
-		w1.getWidgetPathToRoot( path1 );
-		
-		int minLength = Math.min( path0.size(), path1.size() );
-		
-		for (int i = 0; i < minLength; i++)
+		if ( w0 == w1 )
 		{
-			DPWidget p0 = path0.get( path0.size() - 1 - i );
-			DPWidget p1 = path1.get( path1.size() - 1 - i );
+			path0.add( w0 );
+			path1.add( w1 );
+		}
+		else
+		{
+			w0.getWidgetPathFromRoot( path0 );
+			w1.getWidgetPathFromRoot( path1 );
 			
-			if ( p0 == p1 )
+			int minLength = Math.min( path0.size(), path1.size() );
+			
+			int common = 0;
+			
+			for (int i = 0; i < minLength; i++)
 			{
-				break;
+				DPWidget p0 = path0.get( i );
+				DPWidget p1 = path1.get( i );
+				
+				common = i;
+				
+				if ( p0 != p1 )
+				{
+					break;
+				}
 			}
 			
-			path0.remove( path0.size() - 1 );
-			path1.remove( path1.size() - 1 );
+			path0.subList( 0, common ).clear();
+			path1.subList( 0, common ).clear();
 		}
 	}
 	
