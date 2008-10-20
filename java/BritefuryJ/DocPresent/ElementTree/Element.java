@@ -128,25 +128,25 @@ public abstract class Element
 		return e == r;
 	}
 	
-	public void getElementPathToRoot(List<Element> path)
+	public void getElementPathFromRoot(List<Element> path)
 	{
 		// Root to top
 		if ( parent != null )
 		{
-			parent.getElementPathToRoot( path );
+			parent.getElementPathFromRoot( path );
 		}
 		
 		path.add( this );
 	}
 	
-	public void getElementPathToSubtreeRoot(BranchElement subtreeRoot, List<Element> path) throws IsNotInSubtreeException
+	public void getElementPathFromSubtreeRoot(BranchElement subtreeRoot, List<Element> path) throws IsNotInSubtreeException
 	{
 		// Root to top
 		if ( subtreeRoot != this )
 		{
 			if ( parent != null )
 			{
-				parent.getElementPathToSubtreeRoot( subtreeRoot, path );
+				parent.getElementPathFromSubtreeRoot( subtreeRoot, path );
 			}
 			else
 			{

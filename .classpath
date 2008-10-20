@@ -3,6 +3,6 @@
 	<classpathentry kind="src" path="java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="C:/jython2.5a3/jython-complete.jar"/>
+	<classpathentry kind="lib" path="C:/code/jython/dist/jython.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
