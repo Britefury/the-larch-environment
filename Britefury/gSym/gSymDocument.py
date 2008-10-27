@@ -9,7 +9,7 @@ from BritefuryJ.DocModel import DMList
 
 from Britefury.Kernel.Abstract import abstractmethod
 
-from Britefury.GLisp.GLispUtil import isGLispList
+from Britefury.Util.NodeUtil import isListNode
 from Britefury.gSymConfig.gSymVersion import compareVersions, gSymVersion
 
 from Britefury.gSym.View.gSymView import GSymViewFactory
@@ -88,7 +88,7 @@ def loadDocument(world, xs, contentHandler):
 	"""
 	($gSymDocument <gsym_version> <module>)
 	"""
-	if not isGLispList( xs ):
+	if not isListNode( xs ):
 		raise GSymDocumentInvalidStructure
 	
 	if len( xs ) < 3:
@@ -113,7 +113,7 @@ def loadDocument(world, xs, contentHandler):
 	
 	
 	
-	if not isGLispList( unitXs ):
+	if not isListNode( unitXs ):
 		raise GSymDocumentInvalidStructure
 	
 	if len( unitXs ) < 1:
@@ -131,7 +131,7 @@ def loadDocument(world, xs, contentHandler):
 	
 	
 	
-	if not isGLispList( docXs ):
+	if not isListNode( docXs ):
 		raise GSymDocumentInvalidStructure
 	
 	if len( docXs ) < 1:

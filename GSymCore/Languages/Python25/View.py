@@ -18,9 +18,13 @@ from Britefury.gSym.View.EditOperations import replace, replaceWithRange, append
 from Britefury.gSym.View.UnparsedText import UnparsedText
 
 
+from Britefury.Util.NodeUtil import *
+
+
 from BritefuryJ.DocPresent.StyleSheets import *
 from BritefuryJ.DocPresent.ElementTree import *
 from BritefuryJ.DocPresent import *
+
 
 
 from GSymCore.Languages.Python25 import Parser
@@ -395,7 +399,7 @@ class Python25View (GSymView):
 
 
 	def UNPARSED(self, ctx, state, node, value):
-		value = value.getString()
+		value = value.toString()
 		return expressionNodeEditor( ctx, node,
 				   text( ctx, unparsed_textStyle, value ),
 				   None,
@@ -406,9 +410,9 @@ class Python25View (GSymView):
 	def stringLiteral(self, ctx, state, node, format, quotation, value):
 		boxContents = []
 		
-		format = format.getString()
-		quotation = quotation.getString()
-		value = value.getString()
+		format = format.toString()
+		quotation = quotation.toString()
+		value = value.toString()
 
 		if format == 'ascii':
 			pass
@@ -442,9 +446,9 @@ class Python25View (GSymView):
 	def intLiteral(self, ctx, state, node, format, numType, value):
 		boxContents = []
 
-		format = format.getString()
-		numType = numType.getString()
-		value = value.getString()
+		format = format.toString()
+		numType = numType.toString()
+		value = value.toString()
 
 		if numType == 'int':
 			if format == 'decimal':
@@ -469,7 +473,7 @@ class Python25View (GSymView):
 
 	# Float literal
 	def floatLiteral(self, ctx, state, node, value):
-		value = value.getString()
+		value = value.toString()
 		return expressionNodeEditor( ctx, node,
 				   text( ctx, numericLiteral_textStyle, value ),
 				   PRECEDENCE_LITERALVALUE,
@@ -479,7 +483,7 @@ class Python25View (GSymView):
 
 	# Imaginary literal
 	def imaginaryLiteral(self, ctx, state, node, value):
-		value = value.getString()
+		value = value.toString()
 		return expressionNodeEditor( ctx, node,
 				   text( ctx, numericLiteral_textStyle, value ),
 				   PRECEDENCE_LITERALVALUE,
@@ -489,7 +493,7 @@ class Python25View (GSymView):
 
 	# Targets
 	def singleTarget(self, ctx, state, node, name):
-		name = name.getString()
+		name = name.toString()
 		return expressionNodeEditor( ctx, node,
 				   text( ctx, default_textStyle, name ),
 				   PRECEDENCE_TARGET,
@@ -511,7 +515,7 @@ class Python25View (GSymView):
 
 	# Variable reference
 	def var(self, ctx, state, node, name):
-		name = name.getString()
+		name = name.toString()
 		return expressionNodeEditor( ctx, node,
 				   text( ctx, default_textStyle, name ),
 				   PRECEDENCE_LOADLOCAL,
@@ -637,7 +641,7 @@ class Python25View (GSymView):
 
 	# Attribute ref
 	def attributeRef(self, ctx, state, node, target, name):
-		name = name.getString()
+		name = name.toString()
 		targetView = viewEval( ctx, target, None, python25ViewState( PRECEDENCE_ATTR ) )
 		return expressionNodeEditor( ctx, node,
 				   paragraph( ctx, python_paragraphStyle, [ targetView,  text( ctx, punctuation_textStyle, '.' ),  text( ctx, default_textStyle, name ) ] ),
@@ -649,7 +653,7 @@ class Python25View (GSymView):
 	# Subscript
 	def subscriptSlice(self, ctx, state, node, x, y):
 		def _sliceIndex(i):
-			if i.getNode() == '<nil>':
+			if isNullNode( i ):
 				return []
 			else:
 				return [ viewEval( ctx, i, None, python25ViewState( PRECEDENCE_SUBSCRIPTINDEX ) ) ]
@@ -662,7 +666,7 @@ class Python25View (GSymView):
 
 	def subscriptLongSlice(self, ctx, state, node, x, y, z):
 		def _sliceIndex(i):
-			if i.getNode() == '<nil>':
+			if isNullNode( i ):
 				return []
 			else:
 				return [ viewEval( ctx, i, None, python25ViewState( PRECEDENCE_SUBSCRIPTINDEX ) ) ]
@@ -700,7 +704,7 @@ class Python25View (GSymView):
 
 	# Call
 	def kwArg(self, ctx, state, node, name, value):
-		name = name.getString()
+		name = name.toString()
 		valueView = viewEval( ctx, value, None, python25ViewState( PRECEDENCE_ARG ) )
 		return expressionNodeEditor( ctx, node,
 				   paragraph( ctx, python_paragraphStyle, [ text( ctx, default_textStyle, name ), text( ctx, punctuation_textStyle, '=' ), valueView ] ),
@@ -848,14 +852,14 @@ class Python25View (GSymView):
 
 	# Parameters
 	def simpleParam(self, ctx, state, node, name):
-		name = name.getString()
+		name = name.toString()
 		return expressionNodeEditor( ctx, node,
 				   text( ctx, default_textStyle, name ),
 				   PRECEDENCE_PARAM,
 				   state )
 
 	def defaultValueParam(self, ctx, state, node, name, value):
-		name = name.getString()
+		name = name.toString()
 		valueView = viewEval( ctx, value, None, python25ViewState( PRECEDENCE_PARAM ) )
 		return expressionNodeEditor( ctx, node,
 				   paragraph( ctx, python_paragraphStyle, [ text( ctx, default_textStyle, name ), text( ctx, punctuation_textStyle, '=' ), valueView ] ),
@@ -863,14 +867,14 @@ class Python25View (GSymView):
 				   state )
 
 	def paramList(self, ctx, state, node, name):
-		name = name.getString()
+		name = name.toString()
 		return expressionNodeEditor( ctx, node,
 				   paragraph( ctx, python_paragraphStyle, [ text( ctx, punctuation_textStyle, '*' ),  text( ctx, default_textStyle, name ) ] ),
 				   PRECEDENCE_PARAM,
 				   state )
 
 	def kwParamList(self, ctx, state, node, name):
-		name = name.getString()
+		name = name.toString()
 		return expressionNodeEditor( ctx, node,
 				   paragraph( ctx, python_paragraphStyle, [ text( ctx, punctuation_textStyle, '**' ),  text( ctx, default_textStyle, name ) ] ),
 				   PRECEDENCE_PARAM,
@@ -924,7 +928,7 @@ class Python25View (GSymView):
 	def assertStmt(self, ctx, state, node, condition, fail):
 		conditionView = viewEval( ctx, condition, None, python25ViewState( PRECEDENCE_STMT ) )
 		elements = [ keywordText( ctx, assertKeyword ), text( ctx, default_textStyle, ' ' ), conditionView ]
-		if fail.getNode() != '<nil>':
+		if not isNullNode( fail ):
 			failView = viewEval( ctx, fail, None, python25ViewState( PRECEDENCE_STMT ) )
 			elements.extend( [ text( ctx, punctuation_textStyle, ', ' ),  failView ] )
 		return statementNodeEditor( ctx, node,
@@ -948,7 +952,7 @@ class Python25View (GSymView):
 
 	# Augmented assignment statement
 	def augAssignStmt(self, ctx, state, node, op, target, value):
-		op = op.getString()
+		op = op.toString()
 		targetView = viewEval( ctx, target, None, python25ViewState( PRECEDENCE_STMT, Parser.targetItem ) )
 		valueView = viewEval( ctx, value, None, python25ViewState( PRECEDENCE_STMT, Parser.tupleOrExpressionOrYieldExpression ) )
 		return statementNodeEditor( ctx, node,
@@ -994,7 +998,7 @@ class Python25View (GSymView):
 
 	# Raise statement
 	def raiseStmt(self, ctx, state, node, *xs):
-		xs = [ x   for x in xs   if x.getNode() != '<nil>' ]
+		xs = [ x   for x in xs   if not isNullNode( x ) ]
 		xViews = mapViewEval( ctx, xs, None, python25ViewState( PRECEDENCE_STMT ) )
 		xElements = []
 		if len( xs ) > 0:
@@ -1025,22 +1029,22 @@ class Python25View (GSymView):
 
 	# Import statement
 	def relativeModule(self, ctx, state, node, name):
-		name = name.getString()
+		name = name.toString()
 		return expressionNodeEditor( ctx, node,
 				   text( ctx, default_textStyle, name ),
 				   PRECEDENCE_IMPORTCONTENT,
 				   state )
 	
 	def moduleImport(self, ctx, state, node, name):
-		name = name.getString()
+		name = name.toString()
 		return expressionNodeEditor( ctx, node,
 				   text( ctx, default_textStyle, name ),
 				   PRECEDENCE_IMPORTCONTENT,
 				   state )
 	
 	def moduleImportAs(self, ctx, state, node, name, asName):
-		name = name.getString()
-		asName = asName.getString()
+		name = name.toString()
+		asName = asName.toString()
 		return expressionNodeEditor( ctx, node,
 				   paragraph( ctx, python_paragraphStyle, [ text( ctx, default_textStyle, name ),  text( ctx, default_textStyle, ' ' ),  keywordText( ctx, asKeyword ),
 									    text( ctx, default_textStyle, ' ' ),  text( ctx, default_textStyle, asName ) ] ),
@@ -1048,15 +1052,15 @@ class Python25View (GSymView):
 				   state )
 	
 	def moduleContentImport(self, ctx, state, node, name):
-		name = name.getString()
+		name = name.toString()
 		return expressionNodeEditor( ctx, node,
 				   text( ctx, default_textStyle, name ),
 				   PRECEDENCE_IMPORTCONTENT,
 				   state )
 	
 	def moduleContentImportAs(self, ctx, state, node, name, asName):
-		name = name.getString()
-		asName = asName.getString()
+		name = name.toString()
+		asName = asName.toString()
 		return expressionNodeEditor( ctx, node,
 				   paragraph( ctx, python_paragraphStyle, [ text( ctx, default_textStyle, name ),  text( ctx, default_textStyle, ' ' ),  keywordText( ctx, asKeyword ),
 									    text( ctx, default_textStyle, ' ' ),  text( ctx, default_textStyle, asName ) ] ),
@@ -1075,8 +1079,8 @@ class Python25View (GSymView):
 				   PRECEDENCE_STMT,
 				   state )
 	
-	def fromImportStmt(self, ctx, state, node, moduleName, *xs):
-		moduleNameView = viewEval( ctx, moduleName, None, python25ViewState( PRECEDENCE_STMT, Parser.moduleContentImport ) )
+	def fromImportStmt(self, ctx, state, node, mod, *xs):
+		modView = viewEval( ctx, mod, None, python25ViewState( PRECEDENCE_STMT, Parser.moduleContentImport ) )
 		xViews = mapViewEval( ctx, xs, None, python25ViewState( PRECEDENCE_STMT, Parser.moduleImport ) )
 		xElements = []
 		if len( xs ) > 0:
@@ -1084,15 +1088,15 @@ class Python25View (GSymView):
 				xElements.extend( [ xv,  text( ctx, punctuation_textStyle, ', ' ) ] )
 			xElements.append( xViews[-1] )
 		return statementNodeEditor( ctx, node,
-				   paragraph( ctx, python_paragraphStyle, [ keywordText( ctx, fromKeyword ), text( ctx, default_textStyle, ' ' ), moduleNameView, text( ctx, default_textStyle, ' ' ),
+				   paragraph( ctx, python_paragraphStyle, [ keywordText( ctx, fromKeyword ), text( ctx, default_textStyle, ' ' ), modView, text( ctx, default_textStyle, ' ' ),
 									    keywordText( ctx, importKeyword ), text( ctx, default_textStyle, ' ' ) ]  +  xElements ),
 				   PRECEDENCE_STMT,
 				   state )
 	
-	def fromImportAllStmt(self, ctx, state, node, moduleName):
-		moduleNameView = viewEval( ctx, moduleName, None, python25ViewState( PRECEDENCE_STMT, Parser.moduleContentImport ) )
+	def fromImportAllStmt(self, ctx, state, node, mod):
+		modView = viewEval( ctx, mod, None, python25ViewState( PRECEDENCE_STMT, Parser.moduleContentImport ) )
 		return statementNodeEditor( ctx, node,
-				   paragraph( ctx, python_paragraphStyle, [ keywordText( ctx, fromKeyword ), text( ctx, default_textStyle, ' ' ), moduleNameView, text( ctx, default_textStyle, ' ' ),
+				   paragraph( ctx, python_paragraphStyle, [ keywordText( ctx, fromKeyword ), text( ctx, default_textStyle, ' ' ), modView, text( ctx, default_textStyle, ' ' ),
 									     keywordText( ctx, importKeyword ), text( ctx, default_textStyle, ' ' ),  text( ctx, punctuation_textStyle, '*' ) ] ),
 				   PRECEDENCE_STMT,
 				   state )
@@ -1100,7 +1104,7 @@ class Python25View (GSymView):
 
 	# Global statement
 	def globalVar(self, ctx, state, node, name):
-		name = name.getString()
+		name = name.toString()
 		return statementNodeEditor( ctx, node,
 				   text( ctx, default_textStyle, name ),
 				   PRECEDENCE_STMT,
@@ -1124,10 +1128,10 @@ class Python25View (GSymView):
 	def execStmt(self, ctx, state, node, src, loc, glob):
 		srcView = viewEval( ctx, src, None, python25ViewState( PRECEDENCE_STMT, Parser.orOp ) )
 		elements = [ srcView ]
-		if loc.getNode() != '<nil>':
+		if not isNullNode( loc ):
 			locView = viewEval( ctx, loc, None, python25ViewState( PRECEDENCE_STMT ) )
 			elements.extend( [ text( ctx, default_textStyle, ' ' ),  keywordText( ctx, inKeyword ),  text( ctx, default_textStyle, ' ' ),  locView ] )
-		if glob.getNode() != '<nil>':
+		if not isNullNode( glob ):
 			globView = viewEval( ctx, glob, None, python25ViewState( PRECEDENCE_STMT ) )
 			elements.extend( [ text( ctx, default_textStyle, ', ' ),  globView ] )
 		return statementNodeEditor( ctx, node,
@@ -1206,10 +1210,10 @@ class Python25View (GSymView):
 	# Except statement
 	def exceptStmt(self, ctx, state, node, exc, target, suite):
 		elements = []
-		if exc.getNode() != '<nil>':
+		if not isNullNode( exc ):
 			excView = viewEval( ctx, exc, None, python25ViewState( PRECEDENCE_STMT ) )
 			elements.extend( [ text( ctx, default_textStyle, ' ' ),  excView ] )
-		if target.getNode() != '<nil>':
+		if not isNullNode( target ):
 			targetView = viewEval( ctx, target, None, python25ViewState( PRECEDENCE_STMT ) )
 			elements.extend( [ text( ctx, default_textStyle, ', ' ),  targetView ] )
 		elements.append( text( ctx, punctuation_textStyle, ':' ) )
@@ -1235,7 +1239,7 @@ class Python25View (GSymView):
 	def withStmt(self, ctx, state, node, expr, target, suite):
 		exprView = viewEval( ctx, expr, None, python25ViewState( PRECEDENCE_STMT ) )
 		elements = [ exprView ]
-		if target.getNode() != '<nil>':
+		if not isNullNode( target ):
 			targetView = viewEval( ctx, target, None, python25ViewState( PRECEDENCE_STMT ) )
 			elements.extend( [ text( ctx, default_textStyle, ' ' ),  keywordText( ctx, asKeyword ),  text( ctx, default_textStyle, ' ' ),  targetView ] )
 		elements.append( text( ctx, punctuation_textStyle, ':' ) )
@@ -1249,7 +1253,7 @@ class Python25View (GSymView):
 	
 	# Def statement
 	def defStmt(self, ctx, state, node, name, params, suite):
-		name = name.getString()
+		name = name.toString()
 		paramViews = mapViewEval( ctx, params, None, python25ViewState( PRECEDENCE_STMT, Parser.param ) )
 		paramElements = [ text( ctx, punctuation_textStyle, '(' ) ]
 		if len( params ) > 0:
@@ -1267,8 +1271,8 @@ class Python25View (GSymView):
 	
 	# Decorator statement
 	def decoStmt(self, ctx, state, node, name, args):
-		name = name.getString()
-		if args.getNode() != '<nil>':
+		name = name.toString()
+		if not isNullNode( args ):
 			argViews = mapViewEval( ctx, args, None, python25ViewState( PRECEDENCE_STMT, Parser.callArg ) )
 			argElements = [ text( ctx, punctuation_textStyle, '(' ) ]
 			if len( args ) > 0:
@@ -1287,10 +1291,10 @@ class Python25View (GSymView):
 	
 	# Def statement
 	def classStmt(self, ctx, state, node, name, inheritance, suite):
-		name = name.getString()
-		if inheritance.getNode() != '<nil>':
-			inheritanceView = viewEval( ctx, inheritance, None, python25ViewState( PRECEDENCE_STMT, Parser.tupleOrExpression ) )
-			inhElements = [ text( ctx, punctuation_textStyle, '(' ),  inheritanceView,  text( ctx, punctuation_textStyle, ')' ) ]
+		name = name.toString()
+		if not isNullNode( inheritance ):
+			inhViews = mapViewEval( ctx, inheritance, None, python25ViewState( PRECEDENCE_TUPLEELEMENT, Parser.expression ) )
+			inhElements = [ text( ctx, punctuation_textStyle, '(' ),  listView( ctx, tuple_listViewLayout, None, None, _CommaFactory( ctx ), inhViews ),  text( ctx, punctuation_textStyle, ')' ) ]
 		else:
 			inhElements = []
 			
@@ -1301,11 +1305,11 @@ class Python25View (GSymView):
 						suite,
 						state )
 	
-	
+
 	
 	# Comment statement
 	def commentStmt(self, ctx, state, node, comment):
-		comment = comment.getString()
+		comment = comment.toString()
 		return statementNodeEditor( ctx, node,
 				   text( ctx, comment_textStyle, '#' + comment ),
 				   PRECEDENCE_STMT,

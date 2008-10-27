@@ -14,8 +14,7 @@ from BritefuryJ.DocPresent.Marker import *
 
 from BritefuryJ.Cell import Cell
 
-
-from Britefury.GLisp.GLispUtil import isGLispList
+from Britefury.Util.NodeUtil import isListNode
 
 from Britefury.gSym.View.UnparsedText import UnparsedText
 
@@ -76,7 +75,7 @@ class DVNode (object):
 
 		# Set the caret node to self
 		if position is not None  and  bias is not None  and  self._elementContent is not None:
-			if isGLispList( self.docNode ):
+			if isListNode( self.docNode ):
 				#print 'Node: %s, position=%d'  %  ( self.docNode[0], position )
 				pass
 			self._view._caretNode = self

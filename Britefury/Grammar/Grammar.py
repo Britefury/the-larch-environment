@@ -51,7 +51,8 @@ class _RuleHelper (object):
 class Rule (object):
 	def __init__(self, f):
 		self._f = f
-		self._name = f.__name__
+		# TODO: The call to str() is to prevent Jython 2.5a3 from complaining about 'intern'ing a unicode, lower down
+		self._name = str( f.__name__ )
 		self._attrName = intern( '_rule_' + self._name )
 		self._bEvaluatingAttrName = intern( '_forward_' + self._name )
 		

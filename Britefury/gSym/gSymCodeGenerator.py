@@ -5,20 +5,15 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from Britefury.GLisp.GLispDispatch import dispatch
+from Britefury.Dispatch.MethodDispatch import methodDispatch
 
 
 
 
 
 class GSymCodeGenerator (object):
-	def __init__(self, targetFormat):
-		super( GSymCodeGenerator, self ).__init__()
-		self._targetFormat = targetFormat
-		
-		
 	def __call__(self, xs):
-		return dispatch( self, xs )
+		return methodDispatch( self, xs )
 
 
 

@@ -11,7 +11,7 @@ import java.util.List;
 
 public class PatternMatcher
 {
-	public class MatchFailureException extends Exception
+	public static class MatchFailureException extends Exception
 	{
 		private static final long serialVersionUID = 1L;
 	}
@@ -35,13 +35,18 @@ public class PatternMatcher
 	
 	public Object match(Object x) throws MatchFailureException
 	{
+		return match( x, null );
+	}
+
+	public Object match(Object x, Object arg) throws MatchFailureException
+	{
 		HashMap<String, Object> bindings = new HashMap<String, Object>();
 		
 		for (Guard g: guards)
 		{
 			if ( g.testPattern( x, bindings ) )
 			{
-				return g.invokeAction( x, bindings );
+				return g.invokeAction( x, bindings, arg );
 			}
 			bindings.clear();
 		}

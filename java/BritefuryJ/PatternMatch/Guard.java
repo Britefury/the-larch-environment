@@ -10,6 +10,7 @@ import java.util.Map;
 
 import org.python.core.Py;
 import org.python.core.PyObject;
+import org.python.core.PySequenceList;
 
 import BritefuryJ.PatternMatch.Pattern.Pattern;
 import BritefuryJ.PatternMatch.Pattern.ListPattern.OnlyOneRepeatAllowedException;
@@ -26,7 +27,7 @@ public class Guard
 			this.callable = callable;
 		}
 
-
+		
 		public Object invoke(Object x, Map<String, Object> bindings)
 		{
 			String[] keywords = new String[bindings.size()];
@@ -41,6 +42,47 @@ public class Guard
 				i++;
 			}
 			return callable.__call__( values, keywords );
+		}
+
+	
+		public Object invoke(Object x, Map<String, Object> bindings, Object arg)
+		{
+			if ( arg != null  &&  arg instanceof PySequenceList )
+			{
+				PySequenceList args = (PySequenceList)arg;
+				int numArgs = args.size();
+				String[] keywords = new String[bindings.size()];
+				PyObject[] values = new PyObject[bindings.size() + 1 + numArgs];
+				
+				keywords = bindings.keySet().toArray( keywords );
+				for (int i = 0; i < numArgs; i++)
+				{
+					values[i] = Py.java2py( args.get( i ) );
+				}
+				values[numArgs] = Py.java2py( x );
+				int i = numArgs + 1;
+				for (Object v: bindings.values())
+				{
+					values[i] = Py.java2py( v );
+					i++;
+				}
+				return callable.__call__( values, keywords );
+			}
+			else
+			{
+				String[] keywords = new String[bindings.size()];
+				PyObject[] values = new PyObject[bindings.size() + 1];
+				
+				keywords = bindings.keySet().toArray( keywords );
+				values[0] = Py.java2py( x );
+				int i = 1;
+				for (Object v: bindings.values())
+				{
+					values[i] = Py.java2py( v );
+					i++;
+				}
+				return callable.__call__( values, keywords );
+			}
 		}
 	}
 
@@ -76,8 +118,8 @@ public class Guard
 		return pattern.test( x, bindings );
 	}
 	
-	protected Object invokeAction(Object x, Map<String, Object> bindings)
+	protected Object invokeAction(Object x, Map<String, Object> bindings, Object arg)
 	{
-		return action.invoke( x, bindings );
+		return action.invoke( x, bindings, arg );
 	}
 }

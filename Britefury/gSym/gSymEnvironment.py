@@ -8,7 +8,7 @@
 import os.path
 import sys
 
-from Britefury.GLisp.GLispUtil import gLispSrcToString
+from Britefury.Util.NodeUtil import nodeToSXString
 
 
 
@@ -77,7 +77,7 @@ class GSymEnvironment (object):
 
 
 	def raiseError(self, exceptionClass, src, reason):
-		raise exceptionClass, reason  +  '   ::   '  +  gLispSrcToString( src, 3 )
+		raise exceptionClass, reason  +  '   ::   '  +  nodeToSXString( src, 3 )
 	
 	
 	def _f_instantiateImportedModule(self, path, moduleGlobals):

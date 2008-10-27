@@ -107,6 +107,7 @@ public class Test_DMIOWrite extends TestCase
 	public void testQuotedStringContents()
 	{
 		matchTest( DMIOWrite.quotedStringContents, "abc123ABC_", "abc123ABC_" );
+		matchTest( DMIOWrite.quotedStringContents, "abc123ABC_`", "abc123ABC_`" );
 		matchTest( DMIOWrite.quotedStringContents, "abc123()ABC_", "abc123()ABC_" );
 		matchTest( DMIOWrite.quotedStringContents, "abc123( )ABC_", "abc123( )ABC_" );
 		matchFailTest( DMIOWrite.quotedStringContents, "abc123(\\)ABC_" );
@@ -130,6 +131,7 @@ public class Test_DMIOWrite extends TestCase
 		assertEquals( DMIOWrite.quoteString( "a" ), "\"a\"" );
 		assertEquals( DMIOWrite.quoteString( "a b" ), "\"a b\"" );
 		assertEquals( DMIOWrite.quoteString( "abcdefgh" ), "\"abcdefgh\"" );
+		assertEquals( DMIOWrite.quoteString( "abcdefgh`" ), "\"abcdefgh`\"" );
 		assertEquals( DMIOWrite.quoteString( "\nabcdefgh" ), "\"\\nabcdefgh\"" );
 		assertEquals( DMIOWrite.quoteString( "abcd\nefgh" ), "\"abcd\\nefgh\"" );
 		assertEquals( DMIOWrite.quoteString( "abcdefgh\n" ), "\"abcdefgh\\n\"" );

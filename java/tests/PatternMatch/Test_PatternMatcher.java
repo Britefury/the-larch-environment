@@ -24,7 +24,7 @@ public class Test_PatternMatcher extends PatternMatchTestCase
 	{
 		return new MatchAction()
 		{
-			public Object invoke(Object x, Map<String, Object> bindings)
+			public Object invoke(Object x, Map<String, Object> bindings, Object arg)
 			{
 				return s;
 			}
@@ -35,7 +35,7 @@ public class Test_PatternMatcher extends PatternMatchTestCase
 	{
 		return new MatchAction()
 		{
-			public Object invoke(Object x, Map<String, Object> bindings)
+			public Object invoke(Object x, Map<String, Object> bindings, Object arg)
 			{
 				return bindings.get( "x" );
 			}

@@ -326,46 +326,6 @@ public class DocTree
 	}
 	
 	
-/*	public DocTreeNode treeNode(DMListInterface x, DocTreeNode parentTreeNode, int indexInParent)
-	{
-		DocTreeKey key = new DocTreeKey( x, parentTreeNode, indexInParent );
-		
-		DocTreeNode node = table.get( key );
-		
-		if ( node != null )
-		{
-			return node;
-		}
-		else
-		{
-			node = new DocTreeList( this, (DMListInterface)x, parentTreeNode, indexInParent );
-
-			table.put( key, node );
-				
-			return node;
-		}
-	}
-	
-	public DocTreeNode treeNode(String x, DocTreeNode parentTreeNode, int indexInParent)
-	{
-		DocTreeKey key = new DocTreeKey( x, parentTreeNode, indexInParent );
-		
-		DocTreeNode node = table.get( key );
-		
-		if ( node != null )
-		{
-			return node;
-		}
-		else
-		{
-			node = new DocTreeString( (String)x, parentTreeNode, indexInParent );
-
-			table.put( key, node );
-				
-			return node;
-		}
-	}*/
-
 	public DocTreeNode treeNode(Object x, DocTreeNode parentTreeNode, int indexInParent)
 	{
 		DocTreeKey key = new DocTreeKey( x, parentTreeNode, indexInParent );

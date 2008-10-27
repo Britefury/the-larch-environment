@@ -5,7 +5,7 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from Britefury.GLisp.GLispUtil import isGLispList
+from Britefury.Util.NodeUtil import isListNode
 
 
 from Britefury.gSym.View.gSymView import border, indent, text, hbox, ahbox, vbox, paragraph, script, scriptLSuper, scriptLSub, scriptRSuper, scriptRSub, listView, contentListener, viewEval, mapViewEval, GSymView
@@ -68,11 +68,11 @@ def nodeEditor(ctx, node, contents, state):
 
 
 def stringNodeEditor(ctx, node, metadata, state):
-	res, pos = Parser.unquotedString.parseString( node.getString() )
+	res, pos = Parser.unquotedString.parseString( node.toString() )
 	if res is None:
-		nodeText = repr( node.getString() )
+		nodeText = repr( node.toString() )
 	else:
-		nodeText = node.getString()
+		nodeText = node.toString()
 	return contentListener( ctx, text( ctx, string_textStyle, nodeText ), ParsedNodeContentListener( ctx, node ) )
 
 
@@ -88,25 +88,25 @@ def viewStringNode(node, ctx, state):
 
 
 def lispViewEval(node, ctx, state):
-	if isGLispList( node ):
+	if isListNode( node ):
 		return viewEval( ctx, node )
 	else:
 		return viewStringNode( node, ctx, state )
 
 
 def viewLispNode(node, ctx, state):
-	if isGLispList( node ):
+	if isListNode( node ):
 		# List
 		xViews = [ lispViewEval( x, ctx, state )   for x in node ]
 		
 		# Check the contents:
 		mode = MODE_HORIZONTAL
 		if len( node ) > 0:
-			if isGLispList( node[0] ):
+			if isListNode( node[0] ):
 				mode = MODE_VERTICAL
 			else:
 				for x in node[1:]:
-					if isGLispList( x ):
+					if isListNode( x ):
 						mode = MODE_VERTICALINLINE
 						break
 		
