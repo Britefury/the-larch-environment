@@ -39,12 +39,6 @@ public class DocTreeString implements DocTreeNode
 	
 	
 	
-	public String getString()
-	{
-		return node;
-	}
-
-	
 	public String toString()
 	{
 		return node;

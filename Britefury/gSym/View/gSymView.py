@@ -27,9 +27,9 @@ from BritefuryJ.DocView import DocView
 #from Britefury.DocView.DocView import DocView
 
 
-from Britefury.GLisp.GLispUtil import isGLispList, gLispSrcToString
+from Britefury.Util.NodeUtil import isListNode, nodeToSXString
 
-from Britefury.GLisp.GLispDispatch import dispatch
+from Britefury.Dispatch.MethodDispatch import methodDispatch
 
 from Britefury.gSym.View.Interactor import Interactor, NoEventMatch
 from Britefury.gSym.View.InteractorEvent import InteractorEventKey, InteractorEventText, InteractorEventBackspaceStart, InteractorEventDeleteEnd
@@ -82,7 +82,7 @@ The hierarchy of document view nodes is respected however.
 
 
 def raiseRuntimeError(exceptionClass, src, reason):
-	raise exceptionClass, reason  +  '   ::   '  +  gLispSrcToString( src, 3 )
+	raise exceptionClass, reason  +  '   ::   '  +  nodeToSXString( src )
 
 
 
@@ -446,7 +446,7 @@ class _NodeElementChangeListener (DVNode.NodeElementChangeListener):
 
 		# Set the caret node to node
 		if position is not None  and  bias is not None  and  elementContent is not None:
-			if isGLispList( node.getDocNode() ):
+			if isListNode( node.getDocNode() ):
 				#print 'Node: %s, position=%d'  %  ( node.getDocNode()[0], position )
 				pass
 			self._caretNode = node
@@ -561,7 +561,7 @@ class _NodeElementChangeListener (DVNode.NodeElementChangeListener):
 		
 class GSymView (object):
 	def __call__(self, xs, ctx, state):
-		return dispatch( self, xs, ctx, state )
+		return methodDispatch( self, xs, ctx, state )
 	
 		
 		

@@ -11,6 +11,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
+
 /*
  * gSym document model IO
  *
@@ -35,7 +36,7 @@ public class DMIOWrite
 	
 	
 	public static String unquotedStringPunctuationChars = "+-*/%^&|!$@.,<>=[]~";
-	public static String quotedStringPunctuationChars = "+-*/%^&|!$@.,<>=[]~'() ";
+	public static String quotedStringPunctuationChars = "+-*/%^&|!$@.,<>=[]~'()` ";
 	public static Pattern unquotedString = Pattern.compile( "[0-9A-Za-z_" + Pattern.quote( unquotedStringPunctuationChars ) + "]+" );
 	public static Pattern quotedStringContents = Pattern.compile( "[0-9A-Za-z_" + Pattern.quote( quotedStringPunctuationChars ) + "]+" );
 
@@ -147,6 +148,7 @@ public class DMIOWrite
 		}
 		else
 		{
+			System.out.println( "Data type: " + content.getClass().getName() );
 			throw new InvalidDataTypeException();
 		}
 	}

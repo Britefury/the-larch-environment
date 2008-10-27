@@ -69,7 +69,9 @@ public class Test_DMIORead extends TestCase
 			fail();
 		}
 		
-		if ( !res.equals( expected ) )
+		boolean bEqual = res.equals( expected );
+
+		if ( !bEqual )
 		{
 			System.out.println( "VALUES ARE NOT THE SAME" );
 			System.out.println( "EXPECTED:" );
@@ -78,7 +80,7 @@ public class Test_DMIORead extends TestCase
 			System.out.println( res.toString() );
 		}
 		
-		assertTrue( res.equals( expected ) );
+		assertTrue( bEqual );
 	}
 
 
@@ -100,11 +102,13 @@ public class Test_DMIORead extends TestCase
 		matchFailTest( DMIORead.unquotedString, "abc123ABC_+-*/%^&|!$@.,<>=[]~\t" );
 		matchFailTest( DMIORead.unquotedString, "abc123ABC_+-*/%^&|!$@.,<>=[]~\n" );
 		matchFailTest( DMIORead.unquotedString, "abc123ABC_+-*/%^&|!$@.,<>=[]~\\" );
+		matchFailTest( DMIORead.unquotedString, "abc123ABC_`" );
 	}
 
 	public void testQuotedString()
 	{
 		matchTest( DMIORead.quotedString, "\"abc123ABC_\"", "\"abc123ABC_\"" );
+		matchTest( DMIORead.quotedString, "\"abc123ABC_`\"", "\"abc123ABC_`\"" );
 		matchTest( DMIORead.quotedString, "\"abc123()ABC_\"", "\"abc123()ABC_\"" );
 		matchTest( DMIORead.quotedString, "\"abc123( )ABC_\"", "\"abc123( )ABC_\"" );
 		matchTest( DMIORead.quotedString, "\"abc123(\\\\)ABC_\"", "\"abc123(\\\\)ABC_\"" );

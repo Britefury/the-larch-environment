@@ -44,7 +44,7 @@ public class DMIORead
 	
 
 	public static String unquotedStringPunctuationChars = "+-*/%^&|!$@.,<>=[]~";
-	public static String quotedStringPunctuationChars = "+-*/%^&|!$@.,<>=[]~'() ";
+	public static String quotedStringPunctuationChars = "+-*/%^&|!$@.,<>=[]~'()` ";
 	public static String inStringUnescapedChars = "[0-9A-Za-z_" + Pattern.quote( quotedStringPunctuationChars ) + "]";
 	
 	public static String hexCharEscape = Pattern.quote( "\\x" ) + "[0-9A-Fa-f]+" + Pattern.quote( "x" );

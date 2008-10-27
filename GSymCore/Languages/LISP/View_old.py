@@ -5,7 +5,7 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from Britefury.GLisp.GLispUtil import isGLispList
+from Britefury.Uitl.NodeUtil import isListNode
 
 
 from Britefury.gSym.View.gSymView import activeBorder, border, indent, highlight, hline, label, markupLabel, entry, markupEntry, customEntry, hbox, ahbox, vbox, flow, flowSep, \
@@ -83,25 +83,25 @@ def viewStringNode(node, state):
 
 
 def lispViewEval(node, state):
-	if isGLispList( node ):
+	if isListNode( node ):
 		return viewEval( node )
 	else:
 		return viewStringNode( node, state )
 
 
 def viewLispNode(node, state):
-	if isGLispList( node ):
+	if isListNode( node ):
 		# List
 		xViews = [ lispViewEval( x, state )   for x in node ]
 		
 		# Check the contents:
 		mode = MODE_HORIZONTAL
 		if len( node ) > 0:
-			if isGLispList( node[0] ):
+			if isListNode( node[0] ):
 				mode = MODE_VERTICAL
 			else:
 				for x in node[1:]:
-					if isGLispList( x ):
+					if isListNode( x ):
 						mode = MODE_VERTICALINLINE
 						break
 		
@@ -117,7 +117,7 @@ def viewLispNode(node, state):
 		v = listView( layout, label( '(', punctuationStyle ), label( ')', punctuationStyle ), None, xViews )
 		
 		def _text(x, n):
-			if isGLispList( n ):
+			if isListNode( n ):
 				return x.text
 			else:
 				return n

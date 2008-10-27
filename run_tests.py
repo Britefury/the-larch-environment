@@ -11,21 +11,40 @@ import sys
 from Britefury.InitBritefuryJ import initBritefuryJ
 initBritefuryJ()
 
-from Britefury.Tests.BritefuryJ.Parser.Utils import Operators
-from Britefury.Tests.Britefury.Grammar import Grammar
+import Britefury.Dispatch.MethodDispatch
+import Britefury.Dispatch.PatternDispatch
+import Britefury.Dispatch.Dispatch
+import Britefury.Transformation.Transformation
+import Britefury.Tests.BritefuryJ.Parser.Utils.Operators
+import Britefury.Tests.BritefuryJ.PatternMatch.Test_PatternMatcher
+import Britefury.Tests.Britefury.Grammar.Grammar
+import GSymCore.Languages.Python25.CodeGenerator
+import GSymCore.Languages.Python25.Parser
+import GSymCore.Languages.Python25.IdentityTransformation
 
 
-
-testModules = [ Operators, Grammar ]
+testModules = [ Britefury.Dispatch.MethodDispatch, Britefury.Dispatch.PatternDispatch, Britefury.Dispatch.Dispatch,
+		Britefury.Transformation.Transformation,
+		Britefury.Tests.BritefuryJ.Parser.Utils.Operators, Britefury.Tests.BritefuryJ.PatternMatch.Test_PatternMatcher,
+		Britefury.Tests.Britefury.Grammar.Grammar,
+		GSymCore.Languages.Python25.CodeGenerator, GSymCore.Languages.Python25.Parser, GSymCore.Languages.Python25.IdentityTransformation ]
 
 
 if __name__ == '__main__':
 	if len( sys.argv ) > 1:
-		testModules = [ module   for module in testModules   if module.__name__.split('.')[-1] in sys.argv[1:] ]
+		moduleNames = [ m.__name__   for m in testModules ]
+		
+		for a in sys.argv[1:]:
+			if a not in moduleNames:
+				print 'No test module %s'  %  a
+		testModules = [ module   for module in testModules   if module.__name__ in sys.argv[1:] ]
 
 
 	loader = unittest.TestLoader()
 
+	#print 'Testing the following modules:'
+	#for m in testModules:
+		#print m.__name__
 	suites = [ loader.loadTestsFromModule( module )   for module in testModules ]
 
 	runner = unittest.TextTestRunner()
