@@ -28,7 +28,7 @@ public abstract class Pattern
 	
 	
 	@SuppressWarnings("unchecked")
-	public static Pattern asPattern(Object x) throws OnlyOneRepeatAllowedException
+	public static Pattern toPattern(Object x) throws OnlyOneRepeatAllowedException
 	{
 		if ( x instanceof Pattern )
 		{
@@ -40,7 +40,7 @@ public abstract class Pattern
 			Pattern[] ps = new Pattern[xs.size()];
 			for (int i = 0; i < xs.size(); i++)
 			{
-				ps[i] = asPattern( xs.get( i ) );
+				ps[i] = toPattern( xs.get( i ) );
 			}
 			return new ListPattern( ps );
 		}

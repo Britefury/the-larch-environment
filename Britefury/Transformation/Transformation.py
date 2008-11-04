@@ -6,18 +6,61 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
 
+from Britefury.Dispatch.Dispatch import DispatchError
+
 
 class Transformation (object):
-	def __init__(self, identity, xform):
+	def __init__(self, identity, xforms):
 		self._identity = identity
+		self._xforms =  xforms
 		
 		
-	def __call__(self, node, xform):
-		return self._identity( xform, node )
+	def __call__(self, node, *args):
+		a = _TransformApplication( self._identity, self._xforms )
+		return a( node )
 	
-	def __apply__(self, node):
-		return self._identity.__apply__( node )
+	
+	
+	
+class _TransformApplication (object):
+	def __init__(self, identity, xforms):
+		self._identity = identity
+		self._xforms = xforms
+		self._stack = [ False ]
+		
+		
+	def __call__(self, node, *args):
+		self._stack.append( False )
+		
+		bTransformed = False
+		for x in self._xforms:
+			try:
+				node = x( node, self )
+				bTransformed = True
+			except DispatchError:
+				pass
+				
+		
+		if bTransformed:
+			# Content modified, set the outer stack entry to True
+			self._stack[-2] = True
+			self._stack.pop()
+			return node
+		else:
+			transformedNode = self._identity( node, self )
+			if self._stack[-1]:
+				# Inner application transformed the content
+				self._stack.pop()
+				return transformedNode
+			else:
+				# Unmodified tree
+				self._stack.pop()
+				return node
+			
+		
 
+		
+	
 
 
 import unittest
@@ -39,43 +82,78 @@ class TestCase_Transformation (unittest.TestCase):
 		
 		
 		
-	class TestTransformation (TransformationInterface):
+	class TestTransformation1 (TransformationInterface):
 		def stringNode(self, xform, node, x, y):
 			return [ 'stringNode', x + 'jk', xform( y ) ]
+
+	class TestTransformation2 (TransformationInterface):
+		def stringNode(self, xform, node, x, y):
+			return [ 'stringNode', x + 'pq', xform( y ) ]
 
 		
 		
 	def setUp(self):
-		self.data_ss = [ 'twoStrings', 'a', 'b' ]
-		self.data_nn = [ 'twoNodes', [ 'twoStrings', 'a', 'b' ], [ 'twoStrings', 'c', 'd' ] ]
-		self.data_sn = [ 'stringNode', 'a', [ 'twoStrings', 'b', 'c' ] ]
-
-		self.data_sn_x = [ 'stringNode', 'ajk', [ 'twoStrings', 'b', 'c' ] ]
-
+		self.data_s = [ 'twoStrings', 'a', 'b' ]
 		
+		self.data_nss = [ 'twoNodes', [ 'twoStrings', 'a', 'b' ], [ 'twoStrings', 'c', 'd' ] ]
+
+		self.data_bs = [ 'stringNode', 'a', [ 'twoStrings', 'b', 'c' ] ]
+		self.data_bs_x1 = [ 'stringNode', 'ajk', [ 'twoStrings', 'b', 'c' ] ]
+		self.data_bs_x2 = [ 'stringNode', 'apq', [ 'twoStrings', 'b', 'c' ] ]
+		self.data_bs_x12 = [ 'stringNode', 'ajkpq', [ 'twoStrings', 'b', 'c' ] ]
+		
+		self.data_nbss = [ 'twoNodes', [ 'stringNode', 'a', [ 'twoStrings', 'b', 'c' ] ], [ 'twoStrings', 'd', 'e' ] ]
+		self.data_nbss_x1 = [ 'twoNodes', [ 'stringNode', 'ajk', [ 'twoStrings', 'b', 'c' ] ], [ 'twoStrings', 'd', 'e' ] ]
+		self.data_nbss_x2 = [ 'twoNodes', [ 'stringNode', 'apq', [ 'twoStrings', 'b', 'c' ] ], [ 'twoStrings', 'd', 'e' ] ]
+		self.data_nbss_x12 = [ 'twoNodes', [ 'stringNode', 'ajkpq', [ 'twoStrings', 'b', 'c' ] ], [ 'twoStrings', 'd', 'e' ] ]
 		
 		
 	def test_test_identity(self):
 		ix = self.IdentityTransformation()
 		x = ix.__apply__
 		
-		self.assert_( x( self.data_ss )  is  self.data_ss )
-		self.assert_( x( self.data_nn )  is not  self.data_nn )
-		self.assert_( x( self.data_nn )  ==  self.data_nn )
-		self.assert_( x( self.data_sn )  is not  self.data_sn )
-		self.assert_( x( self.data_sn )  ==  self.data_sn )
+		self.assert_( x( self.data_s )  is  self.data_s )
+		self.assert_( x( self.data_nss )  is not  self.data_nss )
+		self.assert_( x( self.data_nss )  ==  self.data_nss )
+		self.assert_( x( self.data_bs )  is not  self.data_bs )
+		self.assert_( x( self.data_bs )  ==  self.data_bs )
 
 		
-	def test_test_xform(self):
+	def test_test_xform1(self):
 		ix = self.IdentityTransformation()
-		xx = self.TestTransformation()
-		d = Dispatcher( [ xx, ix ] )
+		xx1 = self.TestTransformation1()
+		xf = Transformation( ix, [ xx1 ] )
 		
-		def transform(node):
-			return d( node, transform )
+		self.assert_( xf( self.data_s )  is  self.data_s )
+		self.assert_( xf( self.data_nss )  is  self.data_nss )
+		self.assert_( xf( self.data_bs )  is not  self.data_bs )
+		self.assert_( xf( self.data_bs )  ==  self.data_bs_x1 )
+		self.assert_( xf( self.data_nbss )  is not  self.data_nbss )
+		self.assert_( xf( self.data_nbss )  ==  self.data_nbss_x1 )
+
 		
-		self.assert_( transform( self.data_ss )  is  self.data_ss )
-		self.assert_( transform( self.data_nn )  is not  self.data_nn )
-		self.assert_( transform( self.data_nn )  ==  self.data_nn )
-		self.assert_( transform( self.data_sn )  is not  self.data_sn )
-		self.assert_( transform( self.data_sn )  ==  self.data_sn_x )
+	def test_test_xform2(self):
+		ix = self.IdentityTransformation()
+		xx2 = self.TestTransformation2()
+		xf = Transformation( ix, [ xx2 ] )
+		
+		self.assert_( xf( self.data_s )  is  self.data_s )
+		self.assert_( xf( self.data_nss )  is  self.data_nss )
+		self.assert_( xf( self.data_bs )  is not  self.data_bs )
+		self.assert_( xf( self.data_bs )  ==  self.data_bs_x2 )
+		self.assert_( xf( self.data_nbss )  is not  self.data_nbss )
+		self.assert_( xf( self.data_nbss )  ==  self.data_nbss_x2 )
+
+		
+	def test_test_xform12(self):
+		ix = self.IdentityTransformation()
+		xx1 = self.TestTransformation1()
+		xx2 = self.TestTransformation2()
+		xf = Transformation( ix, [ xx1, xx2 ] )
+		
+		self.assert_( xf( self.data_s )  is  self.data_s )
+		self.assert_( xf( self.data_nss )  is  self.data_nss )
+		self.assert_( xf( self.data_bs )  is not  self.data_bs )
+		self.assert_( xf( self.data_bs )  ==  self.data_bs_x12 )
+		self.assert_( xf( self.data_nbss )  is not  self.data_nbss )
+		self.assert_( xf( self.data_nbss )  ==  self.data_nbss_x12 )
