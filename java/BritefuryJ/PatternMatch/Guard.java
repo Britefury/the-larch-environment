@@ -104,12 +104,12 @@ public class Guard
 	
 	public Guard(Object pattern, MatchAction action) throws OnlyOneRepeatAllowedException
 	{
-		this( Pattern.asPattern( pattern ), action );
+		this( Pattern.toPattern( pattern ), action );
 	}
 	
 	public Guard(Object pattern, PyObject action) throws OnlyOneRepeatAllowedException
 	{
-		this( Pattern.asPattern( pattern ), action );
+		this( Pattern.toPattern( pattern ), action );
 	}
 	
 	

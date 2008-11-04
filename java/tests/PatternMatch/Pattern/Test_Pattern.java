@@ -232,10 +232,10 @@ public class Test_Pattern extends PatternTestCase
 	public void testCoerce() throws OnlyOneRepeatAllowedException
 	{
 		Pattern a = new Anything();
-		assertSame( a, Pattern.asPattern( a ) );
+		assertSame( a, Pattern.toPattern( a ) );
 
-		assertEquals( new Literal( "x" ), Pattern.asPattern( "x" ) );
+		assertEquals( new Literal( "x" ), Pattern.toPattern( "x" ) );
 		
-		assertEquals( new ListPattern( new Pattern[] { new Literal( "x" ), new Literal( "y" ) } ),   Pattern.asPattern( Arrays.asList( new String[] { "x", "y" } ) ) );
+		assertEquals( new ListPattern( new Pattern[] { new Literal( "x" ), new Literal( "y" ) } ),   Pattern.toPattern( Arrays.asList( new String[] { "x", "y" } ) ) );
 	}
 }
