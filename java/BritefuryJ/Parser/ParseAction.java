@@ -8,5 +8,5 @@ package BritefuryJ.Parser;
 
 public interface ParseAction
 {
-	public Object invoke(String input, int begin, Object x);
+	public Object invoke(Object input, int begin, Object x);
 }

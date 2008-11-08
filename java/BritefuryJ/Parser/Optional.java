@@ -27,7 +27,7 @@ public class Optional extends UnaryBranchExpression
 	}
 	
 
-	protected ParseResult parse(ParserState state, String input, int start, int stop)
+	protected ParseResult parse(ParserState state, Object input, int start, int stop) throws ParserIncompatibleDataTypeException
 	{
 		ParseResult res = subexp.evaluate( state, input, start, stop );
 		

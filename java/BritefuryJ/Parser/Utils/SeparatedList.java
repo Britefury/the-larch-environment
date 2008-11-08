@@ -20,7 +20,7 @@ public class SeparatedList
 {
 	public static class EmptyListAction implements ParseAction
 	{
-		public Object invoke(String input, int begin, Object x)
+		public Object invoke(Object input, int begin, Object x)
 		{
 			return new ArrayList<Object>();
 		}
@@ -29,7 +29,7 @@ public class SeparatedList
 	public static class SeparatedListAction implements ParseAction
 	{
 		@SuppressWarnings("unchecked")
-		public Object invoke(String input, int begin, Object x)
+		public Object invoke(Object input, int begin, Object x)
 		{
 			if ( x == null )
 			{
@@ -54,7 +54,7 @@ public class SeparatedList
 	private static class SeparatedListActionOneOrMore implements ParseAction
 	{
 		@SuppressWarnings("unchecked")
-		public Object invoke(String input, int begin, Object x)
+		public Object invoke(Object input, int begin, Object x)
 		{
 			ArrayList<Object> result = new ArrayList<Object>();
 			List<Object> xs = (List<Object>)x;
@@ -72,7 +72,7 @@ public class SeparatedList
 	private static class DelimitedListAction implements ParseAction
 	{
 		@SuppressWarnings("unchecked")
-		public Object invoke(String input, int begin, Object x)
+		public Object invoke(Object input, int begin, Object x)
 		{
 			List<Object> xs = (List<Object>)x;
 			return xs.get( 1 );

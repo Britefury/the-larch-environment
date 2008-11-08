@@ -24,22 +24,22 @@ public abstract class ParserExpression
 	
 	
 	
-	public ParseResult parseString(String input)
+	public ParseResult parseString(String input) throws ParserIncompatibleDataTypeException
 	{
 		return parseString( input, 0, input.length() );
 	}
 
-	public ParseResult parseString(String input, String junkRegex)
+	public ParseResult parseString(String input, String junkRegex) throws ParserIncompatibleDataTypeException
 	{
 		return parseString( input, 0, input.length(), junkRegex );
 	}
 
-	public ParseResult parseString(String input, int start, int stop)
+	public ParseResult parseString(String input, int start, int stop) throws ParserIncompatibleDataTypeException
 	{
 		return parseString( input, start, stop, "[ \t\n]*" );
 	}
 	
-	public ParseResult parseString(String input, int start, int stop, String junkRegex)
+	public ParseResult parseString(String input, int start, int stop, String junkRegex) throws ParserIncompatibleDataTypeException
 	{
 		if ( stop == -1 )
 		{
@@ -57,22 +57,22 @@ public abstract class ParserExpression
 	}
 	
 	
-	public DebugParseResult debugParseString(String input)
+	public DebugParseResult debugParseString(String input) throws ParserIncompatibleDataTypeException
 	{
 		return debugParseString( input, 0, input.length() );
 	}
 
-	public DebugParseResult debugParseString(String input, String junkRegex)
+	public DebugParseResult debugParseString(String input, String junkRegex) throws ParserIncompatibleDataTypeException
 	{
 		return debugParseString( input, 0, input.length(), junkRegex );
 	}
 
-	public DebugParseResult debugParseString(String input, int start, int stop)
+	public DebugParseResult debugParseString(String input, int start, int stop) throws ParserIncompatibleDataTypeException
 	{
 		return debugParseString( input, start, stop, "[ \t\n]*" );
 	}
 	
-	public DebugParseResult debugParseString(String input, int start, int stop, String junkRegex)
+	public DebugParseResult debugParseString(String input, int start, int stop, String junkRegex) throws ParserIncompatibleDataTypeException
 	{
 		if ( stop == -1 )
 		{
@@ -92,7 +92,7 @@ public abstract class ParserExpression
 	
 	
 
-	protected ParseResult evaluate(ParserState state, String input, int start, int stop)
+	protected ParseResult evaluate(ParserState state, Object input, int start, int stop) throws ParserIncompatibleDataTypeException
 	{
 		if ( state.bDebuggingEnabled )
 		{
@@ -141,7 +141,7 @@ public abstract class ParserExpression
 	}
 	
 	
-	protected abstract ParseResult parse(ParserState state, String input, int start, int stop);
+	protected abstract ParseResult parse(ParserState state, Object input, int start, int stop) throws ParserIncompatibleDataTypeException;
 	
 	
 	

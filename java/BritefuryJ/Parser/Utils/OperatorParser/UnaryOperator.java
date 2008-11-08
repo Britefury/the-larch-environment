@@ -23,7 +23,7 @@ abstract class UnaryOperator extends Operator
 		}
 		
 		
-		public Object invoke(String input, int begin, Object x)
+		public Object invoke(Object input, int begin, Object x)
 		{
 			Object[] xs = { operator, x };
 			return Arrays.asList( xs );

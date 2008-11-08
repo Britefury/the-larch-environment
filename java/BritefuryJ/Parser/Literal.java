@@ -24,7 +24,7 @@ public class Literal extends ParserExpression
 	
 	
 	
-	protected ParseResult parse(ParserState state, String input, int start, int stop)
+	protected ParseResult parse(ParserState state, String input, int start, int stop) throws ParserIncompatibleDataTypeException
 	{
 		start = state.skipJunkChars( input, start, stop );
 		
@@ -39,6 +39,19 @@ public class Literal extends ParserExpression
 		}
 		
 		return ParseResult.failure( start );
+	}
+	
+	
+	protected ParseResult parse(ParserState state, Object input, int start, int stop) throws ParserIncompatibleDataTypeException
+	{
+		if ( input instanceof String )
+		{
+			return parse( state, (String)input, start, stop );
+		}
+		else
+		{
+			throw new ParserIncompatibleDataTypeException();
+		}
 	}
 
 

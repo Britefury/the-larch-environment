@@ -28,7 +28,7 @@ public class Suffix extends Operator
 		
 		
 		@SuppressWarnings("unchecked")
-		public Object invoke(String input, int begin, Object x)
+		public Object invoke(Object input, int begin, Object x)
 		{
 			List<Object> xs = (List<Object>)x;
 
