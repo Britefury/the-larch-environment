@@ -26,13 +26,34 @@ public class Choice extends BranchExpression
 	}
 	
 	
-	protected ParseResult parse(ParserState state, Object input, int start, int stop) throws ParserIncompatibleDataTypeException
+	protected ParseResult parseString(ParserState state, String input, int start, int stop)
 	{
 		int maxErrorPos = start;
 		
 		for (ParserExpression subexp: subexps)
 		{
-			ParseResult result = subexp.evaluate(  state, input, start, stop );
+			ParseResult result = subexp.evaluateString(  state, input, start, stop );
+			if ( result.isValid() )
+			{
+				return result;
+			}
+			else
+			{
+				maxErrorPos = Math.max( maxErrorPos, result.end );
+			}
+		}
+		
+		return ParseResult.failure( maxErrorPos );
+	}
+	
+	
+	protected ParseResult parseNode(ParserState state, Object input, int start, int stop)
+	{
+		int maxErrorPos = start;
+		
+		for (ParserExpression subexp: subexps)
+		{
+			ParseResult result = subexp.evaluateNode(  state, input, start, stop );
 			if ( result.isValid() )
 			{
 				return result;

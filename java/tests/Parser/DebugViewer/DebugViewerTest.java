@@ -9,14 +9,13 @@ package tests.Parser.DebugViewer;
 import BritefuryJ.Parser.DebugParseResult;
 import BritefuryJ.Parser.Forward;
 import BritefuryJ.Parser.Literal;
-import BritefuryJ.Parser.ParserIncompatibleDataTypeException;
 import BritefuryJ.Parser.Production;
 import BritefuryJ.Parser.ParserExpression;
 import BritefuryJ.Parser.DebugViewer.ParseViewFrame;
 
 public class DebugViewerTest
 {
-	public static void main(final String[] args) throws ParserIncompatibleDataTypeException
+	public static void main(final String[] args)
 	{
 		String input = "this[i][j].x.m()";
 		ParserExpression parser = buildParser();

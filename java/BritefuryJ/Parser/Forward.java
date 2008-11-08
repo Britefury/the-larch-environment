@@ -54,9 +54,15 @@ public class Forward extends ParserExpression
 	
 
 	
-	protected ParseResult parse(ParserState state, Object input, int start, int stop) throws ParserIncompatibleDataTypeException
+	protected ParseResult parseString(ParserState state, String input, int start, int stop)
 	{
-		return subexp.evaluate( state, input, start, stop );
+		return subexp.evaluateString( state, input, start, stop );
+	}
+
+
+	protected ParseResult parseNode(ParserState state, Object input, int start, int stop)
+	{
+		return subexp.evaluateNode( state, input, start, stop );
 	}
 
 

@@ -17,22 +17,22 @@ public abstract class ParserExpression
 	
 	
 	
-	public ParseResult parseString(String input) throws ParserIncompatibleDataTypeException
+	public ParseResult parseString(String input)
 	{
 		return parseString( input, 0, input.length() );
 	}
 
-	public ParseResult parseString(String input, String junkRegex) throws ParserIncompatibleDataTypeException
+	public ParseResult parseString(String input, String junkRegex)
 	{
 		return parseString( input, 0, input.length(), junkRegex );
 	}
 
-	public ParseResult parseString(String input, int start, int stop) throws ParserIncompatibleDataTypeException
+	public ParseResult parseString(String input, int start, int stop)
 	{
 		return parseString( input, start, stop, "[ \t\n]*" );
 	}
 	
-	public ParseResult parseString(String input, int start, int stop, String junkRegex) throws ParserIncompatibleDataTypeException
+	public ParseResult parseString(String input, int start, int stop, String junkRegex)
 	{
 		if ( stop == -1 )
 		{
@@ -40,7 +40,7 @@ public abstract class ParserExpression
 		}
 		
 		ParserState state = new ParserState( junkRegex );
-		ParseResult result = evaluate( state, input, start, stop );
+		ParseResult result = evaluateString( state, input, start, stop );
 		if ( result.isValid() )
 		{
 			result.end = state.skipJunkChars( input, result.end, stop );
@@ -50,22 +50,22 @@ public abstract class ParserExpression
 	}
 	
 	
-	public DebugParseResult debugParseString(String input) throws ParserIncompatibleDataTypeException
+	public DebugParseResult debugParseString(String input)
 	{
 		return debugParseString( input, 0, input.length() );
 	}
 
-	public DebugParseResult debugParseString(String input, String junkRegex) throws ParserIncompatibleDataTypeException
+	public DebugParseResult debugParseString(String input, String junkRegex)
 	{
 		return debugParseString( input, 0, input.length(), junkRegex );
 	}
 
-	public DebugParseResult debugParseString(String input, int start, int stop) throws ParserIncompatibleDataTypeException
+	public DebugParseResult debugParseString(String input, int start, int stop)
 	{
 		return debugParseString( input, start, stop, "[ \t\n]*" );
 	}
 	
-	public DebugParseResult debugParseString(String input, int start, int stop, String junkRegex) throws ParserIncompatibleDataTypeException
+	public DebugParseResult debugParseString(String input, int start, int stop, String junkRegex)
 	{
 		if ( stop == -1 )
 		{
@@ -73,8 +73,8 @@ public abstract class ParserExpression
 		}
 		
 		ParserState state = new ParserState( junkRegex );
-		state.enableDebuggin();
-		DebugParseResult result = (DebugParseResult)evaluate( state, input, start, stop );
+		state.enableDebugging();
+		DebugParseResult result = (DebugParseResult)evaluateString( state, input, start, stop );
 		if ( result.isValid() )
 		{
 			result.end = state.skipJunkChars( input, result.end, stop );
@@ -84,8 +84,24 @@ public abstract class ParserExpression
 	}
 	
 	
+	
+	
+	public ParseResult parseList(List<Object> input)
+	{
+		ParserState state = new ParserState( "" );
+		return evaluateNode( state, input, 0, input.size() );
+	}
+	
+	public DebugParseResult debugParseList(List<Object> input)
+	{
+		ParserState state = new ParserState( "" );
+		state.enableDebugging();
+		return (DebugParseResult)evaluateRootNode( state, input, 0, input.size() );
+	}
+	
+	
 
-	protected ParseResult evaluate(ParserState state, Object input, int start, int stop) throws ParserIncompatibleDataTypeException
+	protected ParseResult evaluateString(ParserState state, String input, int start, int stop)
 	{
 		if ( state.bDebuggingEnabled )
 		{
@@ -98,7 +114,7 @@ public abstract class ParserExpression
 			state.debugStack = node;
 			
 			// Get the parse result
-			ParseResult result = parse( state, input, start, stop );
+			ParseResult result = parseString( state, input, start, stop );
 			node.setResult( result );
 			
 			// If @prev is valid, add @node as a call-child of @prev
@@ -129,12 +145,116 @@ public abstract class ParserExpression
 		}
 		else
 		{
-			return parse( state, input, start, stop );
+			return parseString( state, input, start, stop );
+		}
+	}
+	
+	protected ParseResult evaluateNode(ParserState state, Object input, int start, int stop)
+	{
+		if ( state.bDebuggingEnabled )
+		{
+			// Get the current top of the debug stack (outer call)
+			DebugParseResult.DebugNode prev = state.debugStack;
+			// Create the debug info node
+			DebugParseResult.DebugNode node = new DebugParseResult.DebugNode( prev, this );
+
+			// Push @node onto the debug stack
+			state.debugStack = node;
+			
+			// Get the parse result
+			ParseResult result = parseNode( state, input, start, stop );
+			node.setResult( result );
+			
+			// If @prev is valid, add @node as a call-child of @prev
+			if ( prev != null )
+			{
+				prev.addCallChild( node );
+			}
+			
+			// Pop @node off the debug stack
+			state.debugStack = prev;
+			
+			
+			if ( result instanceof DebugParseResult )
+			{
+				DebugParseResult debugResult = (DebugParseResult)result;
+				
+				DebugParseResult.DebugNode fromNode = node;
+				DebugParseResult.DebugNode toNode = debugResult.debugNode;
+				
+				if ( !fromNode.getCallChildren().contains( toNode ) )
+				{
+					fromNode.addMemoChild( toNode );
+				}
+			}
+			
+			
+			return result.debug( node );
+		}
+		else
+		{
+			return parseNode( state, input, start, stop );
 		}
 	}
 	
 	
-	protected abstract ParseResult parse(ParserState state, Object input, int start, int stop) throws ParserIncompatibleDataTypeException;
+	private ParseResult evaluateRootNode(ParserState state, Object input, int start, int stop)
+	{
+		if ( state.bDebuggingEnabled )
+		{
+			// Get the current top of the debug stack (outer call)
+			DebugParseResult.DebugNode prev = state.debugStack;
+			// Create the debug info node
+			DebugParseResult.DebugNode node = new DebugParseResult.DebugNode( prev, this );
+
+			// Push @node onto the debug stack
+			state.debugStack = node;
+			
+			// Get the parse result
+			ParseResult result = parseRootNode( state, input, start, stop );
+			node.setResult( result );
+			
+			// If @prev is valid, add @node as a call-child of @prev
+			if ( prev != null )
+			{
+				prev.addCallChild( node );
+			}
+			
+			// Pop @node off the debug stack
+			state.debugStack = prev;
+			
+			
+			if ( result instanceof DebugParseResult )
+			{
+				DebugParseResult debugResult = (DebugParseResult)result;
+				
+				DebugParseResult.DebugNode fromNode = node;
+				DebugParseResult.DebugNode toNode = debugResult.debugNode;
+				
+				if ( !fromNode.getCallChildren().contains( toNode ) )
+				{
+					fromNode.addMemoChild( toNode );
+				}
+			}
+			
+			
+			return result.debug( node );
+		}
+		else
+		{
+			return parseRootNode( state, input, start, stop );
+		}
+	}
+	
+	
+	
+	protected abstract ParseResult parseString(ParserState state, String input, int start, int stop);
+	protected abstract ParseResult parseNode(ParserState state, Object input, int start, int stop);
+	
+	protected ParseResult parseRootNode(ParserState state, Object input, int start, int stop)
+	{
+		return parseNode( state, input, start, stop );
+	}
 	
 	
 	
@@ -280,5 +400,16 @@ public abstract class ParserExpression
 	public String toString()
 	{
 		return "ParserExpression()";
+	}
+	
+	
+	protected boolean isTerminal()
+	{
+		return false;
+	}
+	
+	protected boolean isSequence()
+	{
+		return false;
 	}
 }

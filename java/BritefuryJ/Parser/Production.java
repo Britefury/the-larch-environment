@@ -27,9 +27,15 @@ public class Production extends UnaryBranchExpression
 	}
 	
 	
-	protected ParseResult parse(ParserState state, Object input, int start, int stop) throws ParserIncompatibleDataTypeException
+	protected ParseResult parseString(ParserState state, String input, int start, int stop)
 	{
-		return state.memoisedMatch( subexp, input, start, stop );
+		return state.memoisedMatchString( subexp, input, start, stop );
+	}
+
+
+	protected ParseResult parseNode(ParserState state, Object input, int start, int stop)
+	{
+		return state.memoisedMatchNode( subexp, input, start, stop );
 	}
 
 

@@ -6,53 +6,62 @@
 //##************************
 package BritefuryJ.Parser;
 
+import java.util.List;
 
-public class Peek extends UnaryBranchExpression
+public class ItemAsString extends UnaryBranchExpression
 {
-	public Peek(String subexp)
+	public ItemAsString(String subexp)
 	{
 		super( subexp );
 	}
 	
-	public Peek(ParserExpression subexp)
+	public ItemAsString(ParserExpression subexp)
 	{
 		super( subexp );
 	}
 	
-
+	
 	protected ParseResult parseString(ParserState state, String input, int start, int stop)
 	{
-		ParseResult res = subexp.evaluateString( state, input, start, stop );
-		
-		if ( res.isValid() )
-		{
-			return ParseResult.suppressedNoValue( start, start );
-		}
-		else
-		{
-			return ParseResult.failure( start );
-		}
+		return subexp.evaluateString( state, input, start, stop );
 	}
 
 
+	@SuppressWarnings("unchecked")
 	protected ParseResult parseNode(ParserState state, Object input, int start, int stop)
 	{
-		ParseResult res = subexp.evaluateNode( state, input, start, stop );
-		
-		if ( res.isValid() )
+		if ( input instanceof String )
 		{
-			return ParseResult.suppressedNoValue( start, start );
+			return subexp.evaluateString( state, (String)input, start, stop );
 		}
-		else
+		else if ( input instanceof List )
 		{
-			return ParseResult.failure( start );
+			try
+			{
+				List<Object> xs = (List<Object>)input;
+				if ( stop > start )
+				{
+					String s = (String)xs.get( start );
+					ParseResult res = subexp.evaluateString( state, s, 0, s.length() );
+					if ( res.isValid() )
+					{
+						return new ParseResult( res.getValue(), start, start + 1 );
+					}
+				}
+			}
+			catch (ClassCastException e)
+			{
+			}
 		}
+
+		return ParseResult.failure( start );
 	}
+
 
 
 	public boolean compareTo(ParserExpression x)
 	{
-		if ( x instanceof Peek )
+		if ( x instanceof ItemAsString )
 		{
 			return super.compareTo( x );
 		}
@@ -62,9 +71,8 @@ public class Peek extends UnaryBranchExpression
 		}
 	}
 	
-
 	public String toString()
 	{
-		return "Peek( " + subexp.toString() + " )";
+		return "ItemAsString( " + subexp.toString() + " )";
 	}
 }

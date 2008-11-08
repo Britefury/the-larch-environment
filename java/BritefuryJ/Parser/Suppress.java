@@ -20,9 +20,15 @@ public class Suppress extends UnaryBranchExpression
 	}
 	
 	
-	protected ParseResult parse(ParserState state, Object input, int start, int stop) throws ParserIncompatibleDataTypeException
+	protected ParseResult parseString(ParserState state, String input, int start, int stop)
 	{
-		return subexp.evaluate( state, input, start, stop ).suppressed();
+		return subexp.evaluateString( state, input, start, stop ).suppressed();
+	}
+
+
+	protected ParseResult parseNode(ParserState state, Object input, int start, int stop)
+	{
+		return subexp.evaluateNode( state, input, start, stop ).suppressed();
 	}
 
 

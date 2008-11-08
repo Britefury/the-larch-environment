@@ -14,6 +14,13 @@ import java.util.regex.Pattern;
 
 class ParserState
 {
+	protected enum Mode { STRING, NODE };
+	
+	protected class InvalidModeException extends RuntimeException
+	{
+		private static final long serialVersionUID = 1L;
+	}
+	
 	private static class MemoEntry
 	{
 		public ParserExpression rule;
@@ -95,7 +102,7 @@ class ParserState
 	}
 	
 	
-	protected void enableDebuggin()
+	protected void enableDebugging()
 	{
 		bDebuggingEnabled = true;
 		debugStack = null;
@@ -103,10 +110,20 @@ class ParserState
 	
 	
 	
-	@SuppressWarnings("unchecked")
-	ParseResult memoisedMatch(ParserExpression rule, Object input, int start, int stop) throws ParserIncompatibleDataTypeException
+	ParseResult memoisedMatchString(ParserExpression rule, String input, int start, int stop)
 	{
-		MemoEntry memoEntry = recall( rule, input, start, stop );
+		return memoisedMatch( rule, input, start, stop, Mode.STRING );
+	}
+	
+	ParseResult memoisedMatchNode(ParserExpression rule, Object input, int start, int stop)
+	{
+		return memoisedMatch( rule, input, start, stop, Mode.NODE );
+	}
+	
+	@SuppressWarnings("unchecked")
+	ParseResult memoisedMatch(ParserExpression rule, Object input, int start, int stop, Mode mode)
+	{
+		MemoEntry memoEntry = recall( rule, input, start, stop, mode );
 		
 		if ( memoEntry == null )
 		{
@@ -129,12 +146,25 @@ class ParserState
 			// Create a rule invocation record, and push onto the rule invocation stack
 			ruleInvocationStack = new RuleInvocation( rule, memoEntry, ruleInvocationStack );
 			memoEntry.bEvaluating = true;
-			ParseResult answer = rule.evaluate( this, input, start, stop );
+			
+			ParseResult answer;
+			if ( mode == Mode.STRING )
+			{
+				answer = rule.evaluateString( this, (String)input, start, stop );
+			}
+			else if ( mode == Mode.NODE )
+			{
+				answer = rule.evaluateNode( this, input, start, stop );
+			}
+			else
+			{
+				throw new InvalidModeException();
+			}
 			
 			if ( memoEntry.bLeftRecursionDetected )
 			{
 				// Grow the left recursive parse
-				answer = growLeftRecursiveParse( rule, input, start, stop, memoEntry, answer );
+				answer = growLeftRecursiveParse( rule, input, start, stop, memoEntry, answer, mode );
 				// Restore the memo
 				memo.put( iStart, posMemoCopy );
 			}
@@ -168,7 +198,7 @@ class ParserState
 	}
 	
 	
-	private MemoEntry recall(ParserExpression rule, Object input, int start, int stop) throws ParserIncompatibleDataTypeException
+	private MemoEntry recall(ParserExpression rule, Object input, int start, int stop, Mode mode)
 	{
 		// Get the memo-entry from the memo table
 		HashMap<ParserExpression, MemoEntry> posMemo = memo.get( new Integer( start ) );
@@ -201,7 +231,19 @@ class ParserState
 				ruleInvocationStack = new RuleInvocation( rule, memoEntry, ruleInvocationStack );
 				memoEntry.bEvaluating = true;
 				// Just evaluate it, and fill in the memo entry with the new values
-				ParseResult res = rule.evaluate( this, input, start, stop );
+				ParseResult res;
+				if ( mode == Mode.STRING )
+				{
+					res = rule.evaluateString( this, (String)input, start, stop );
+				}
+				else if ( mode == Mode.NODE )
+				{
+					res = rule.evaluateNode( this, input, start, stop );
+				}
+				else
+				{
+					throw new InvalidModeException();
+				}
 				memoEntry.answer = res;
 				// Pop the rule invocation off the rule invocation stack
 				ruleInvocationStack = ruleInvocationStack.outerInvocation;
@@ -271,7 +313,7 @@ class ParserState
 
 
 	@SuppressWarnings("unchecked")
-	private ParseResult growLeftRecursiveParse(ParserExpression rule, Object input, int start, int stop, MemoEntry memoEntry, ParseResult answer) throws ParserIncompatibleDataTypeException
+	private ParseResult growLeftRecursiveParse(ParserExpression rule, Object input, int start, int stop, MemoEntry memoEntry, ParseResult answer, Mode mode)
 	{
 		memoEntry.growingLRParseCount++;
 		LeftRecursiveApplication lrApplication = memoEntry.lrApplications.get( rule );
@@ -285,7 +327,19 @@ class ParserState
 			// Prepare the evaluation set
 			lrApplication.evalSet = (HashSet<MemoEntry>)lrApplication.involvedSet.clone();
 			// Try re-evaluation
-			ParseResult res = rule.evaluate( this, input, start, stop );
+			ParseResult res;
+			if ( mode == Mode.STRING )
+			{
+				res = rule.evaluateString( this, (String)input, start, stop );
+			}
+			else if ( mode == Mode.NODE )
+			{
+				res = rule.evaluateNode( this, input, start, stop );
+			}
+			else
+			{
+				throw new InvalidModeException();
+			}
 			// Fail or no additional characters consumed?
 			if ( !res.isValid()  ||  res.end <= answer.end )
 			{
