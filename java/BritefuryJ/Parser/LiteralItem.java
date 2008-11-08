@@ -6,47 +6,43 @@
 //##************************
 package BritefuryJ.Parser;
 
-public class Literal extends ParserExpression
+import java.util.List;
+
+public class LiteralItem extends ParserExpression
 {
-	protected String matchString;
+	protected Object matchValue;
 	
 	
-	public Literal(String matchString)
+	public LiteralItem(Object matchValue)
 	{
-		this.matchString = matchString;
+		this.matchValue = matchValue;
 	}
 	
 	
-	public String getMatchString()
+	public Object getMatchValue()
 	{
-		return matchString;
+		return matchValue;
 	}
 	
 	
 	
-	protected ParseResult parse(ParserState state, String input, int start, int stop) throws ParserIncompatibleDataTypeException
+	private ParseResult parse(ParserState state, List<Object> input, int start, int stop) throws ParserIncompatibleDataTypeException
 	{
-		start = state.skipJunkChars( input, start, stop );
-		
-		int end = start + matchString.length();
-		
-		if ( end <= stop )
+		if ( matchValue.equals( input.get( start ) ) )
 		{
-			if ( matchString.equals( input.substring( start, end ) ) )
-			{
-				return new ParseResult( matchString, start, end );
-			}
+			return new ParseResult( input.get( start ), start, start + 1 );
 		}
 		
 		return ParseResult.failure( start );
 	}
 	
 	
+	@SuppressWarnings("unchecked")
 	protected ParseResult parse(ParserState state, Object input, int start, int stop) throws ParserIncompatibleDataTypeException
 	{
 		try
 		{
-			return parse( state, (String)input, start, stop );
+			return parse( state, (List<Object>)input, start, stop );
 		}
 		catch (ClassCastException e)
 		{
@@ -57,10 +53,10 @@ public class Literal extends ParserExpression
 
 	public boolean compareTo(ParserExpression x)
 	{
-		if ( x instanceof Literal )
+		if ( x instanceof LiteralItem )
 		{
-			Literal xl = (Literal)x;
-			return matchString.equals( xl.matchString );
+			LiteralItem xl = (LiteralItem)x;
+			return matchValue.equals( xl.matchValue );
 		}
 		else
 		{
@@ -70,6 +66,6 @@ public class Literal extends ParserExpression
 	
 	public String toString()
 	{
-		return "Literal( \"" + matchString + "\" )";
+		return "LiteralItem( \"" + matchValue.toString() + "\" )";
 	}
 }
