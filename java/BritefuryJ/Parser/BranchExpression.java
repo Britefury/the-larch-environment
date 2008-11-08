@@ -20,34 +20,18 @@ public abstract class BranchExpression extends ParserExpression
 		this.subexps = subexps;
 	}
 	
-	public BranchExpression(Object[] subexps) throws ParserCoerceException
+	public BranchExpression(Object[] subexps)
 	{
 		this( Arrays.asList( subexps ) );
 	}
 	
-	@SuppressWarnings("unchecked")
-	public BranchExpression(List<Object> subexps) throws ParserCoerceException
+	public BranchExpression(List<Object> subexps)
 	{
 		ArrayList<ParserExpression> xs = new ArrayList<ParserExpression>();
 		
 		for (Object x: subexps)
 		{
-			if ( x instanceof ParserExpression )
-			{
-				xs.add( (ParserExpression)x );
-			}
-			else if ( x instanceof String )
-			{
-				xs.add( coerce( (String)x ) );
-			}
-			else if ( x instanceof List )
-			{
-				xs.add( coerce( (List<Object>)x ) );
-			}
-			else
-			{
-				throw new ParserCoerceException();
-			}
+			xs.add( coerce( x ) );
 		}
 		
 		this.subexps = new ParserExpression[xs.size()];
@@ -113,7 +97,7 @@ public abstract class BranchExpression extends ParserExpression
 		return result;
 	}
 	
-	protected ParserExpression[] joinSubexp(ParserExpression x)
+	protected ParserExpression[] appendToSubexps(ParserExpression x)
 	{
 		ParserExpression[] xs = new ParserExpression[subexps.length + 1];
 		System.arraycopy( subexps, 0, xs, 0, subexps.length );

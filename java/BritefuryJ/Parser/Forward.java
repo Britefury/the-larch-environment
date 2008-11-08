@@ -21,13 +21,7 @@ public class Forward extends ParserExpression
 	
 	
 	
-	public ParserExpression setExpression(String exp)
-	{
-		subexp = coerce( exp );
-		return this;
-	}
-	
-	public ParserExpression setExpression(List<Object> exp) throws ParserCoerceException
+	public ParserExpression setExpression(Object exp)
 	{
 		subexp = coerce( exp );
 		return this;
@@ -46,13 +40,7 @@ public class Forward extends ParserExpression
 	
 
 	
-	public ParserExpression __lshift__(String exp)
-	{
-		subexp = coerce( exp );
-		return this;
-	}
-	
-	public ParserExpression __lshift__(List<Object> exp) throws ParserCoerceException
+	public ParserExpression __lshift__(Object exp)
 	{
 		subexp = coerce( exp );
 		return this;

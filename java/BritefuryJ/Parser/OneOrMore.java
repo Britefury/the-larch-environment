@@ -6,16 +6,10 @@
 //##************************
 package BritefuryJ.Parser;
 
-import java.util.List;
 
 public class OneOrMore extends Repetition
 {
 	public OneOrMore(String subexp)
-	{
-		super( subexp, 1, -1 );
-	}
-
-	public OneOrMore(List<Object> subexp) throws ParserCoerceException
 	{
 		super( subexp, 1, -1 );
 	}

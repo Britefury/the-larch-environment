@@ -6,7 +6,6 @@
 //##************************
 package BritefuryJ.Parser;
 
-import java.util.List;
 import org.python.core.PyObject;
 
 public class Production extends UnaryBranchExpression
@@ -16,11 +15,6 @@ public class Production extends UnaryBranchExpression
 		super( subexp );
 	}
 	
-	public Production(List<Object> subexp) throws ParserCoerceException
-	{
-		super( subexp );
-	}
-		
 	public Production(ParserExpression subexp)
 	{
 		super( subexp );

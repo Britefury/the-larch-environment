@@ -16,12 +16,12 @@ public class Sequence extends BranchExpression
 		super( subexps );
 	}
 	
-	public Sequence(Object[] subexps) throws ParserCoerceException
+	public Sequence(Object[] subexps)
 	{
 		super( subexps );
 	}
 	
-	public Sequence(List<Object> subexps) throws ParserCoerceException
+	public Sequence(List<Object> subexps)
 	{
 		super( subexps );
 	}
@@ -62,17 +62,12 @@ public class Sequence extends BranchExpression
 
 	public ParserExpression __add__(ParserExpression x)
 	{
-		return new Sequence( joinSubexp( x ) );
+		return new Sequence( appendToSubexps( x ) );
 	}
 
-	public ParserExpression __add__(String x)
+	public ParserExpression __add__(Object x)
 	{
-		return new Sequence( joinSubexp( coerce( x ) ) );
-	}
-
-	public ParserExpression __add__(List<Object> x) throws ParserCoerceException
-	{
-		return new Sequence( joinSubexp( coerce( x ) ) );
+		return new Sequence( appendToSubexps( coerce( x ) ) );
 	}
 
 

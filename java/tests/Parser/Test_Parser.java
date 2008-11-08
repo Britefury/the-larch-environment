@@ -32,7 +32,6 @@ import BritefuryJ.Parser.Sequence;
 import BritefuryJ.Parser.Suppress;
 import BritefuryJ.Parser.Word;
 import BritefuryJ.Parser.ZeroOrMore;
-import BritefuryJ.Parser.ParserExpression.ParserCoerceException;
 
 public class Test_Parser extends ParserTestCase
 {
@@ -185,26 +184,19 @@ public class Test_Parser extends ParserTestCase
 		Object[] abqw = { new Literal( "ab" ), new Literal( "qw" ) };
 		Object[] qbqwfh = { new Literal( "qb" ), new Literal( "qw" ), new Literal( "fh" ) };
 		
-		try
-		{
-			assertTrue( new Sequence( abqwfh ).compareTo( new Sequence( abqwfh ) ) );
-			assertFalse( new Sequence( abqwfh ).compareTo( new Sequence( abqw ) ) );
-			assertFalse( new Sequence( abqwfh ).compareTo( new Sequence( qbqwfh ) ) );
-			assertTrue( new Sequence( abqwfh ).compareTo( new Literal( "ab" ).__add__( new Literal( "qw" ) ).__add__( new Literal( "fh" ) ) ) );
-			assertTrue( new Sequence( abqwfh ).compareTo( new Literal( "ab" ).__add__( "qw" ).__add__( "fh" ) ) );
+		assertTrue( new Sequence( abqwfh ).compareTo( new Sequence( abqwfh ) ) );
+		assertFalse( new Sequence( abqwfh ).compareTo( new Sequence( abqw ) ) );
+		assertFalse( new Sequence( abqwfh ).compareTo( new Sequence( qbqwfh ) ) );
+		assertTrue( new Sequence( abqwfh ).compareTo( new Literal( "ab" ).__add__( new Literal( "qw" ) ).__add__( new Literal( "fh" ) ) ) );
+		assertTrue( new Sequence( abqwfh ).compareTo( new Literal( "ab" ).__add__( "qw" ).__add__( "fh" ) ) );
 
-			Object[] subs = { new Literal( "ab" ), new Literal( "qw" ), new Literal( "fh" ) };
-			ParserExpression parser = new Sequence( subs );
-			
-			String[] result = { "ab", "qw", "fh" };
-			
-			matchTest( parser, "abqwfh", Arrays.asList( result ) );
-			matchFailTest( parser, "abfh" );
-		}
-		catch (ParserCoerceException e)
-		{
-			throw new RuntimeException();
-		}
+		Object[] subs = { new Literal( "ab" ), new Literal( "qw" ), new Literal( "fh" ) };
+		ParserExpression parser = new Sequence( subs );
+		
+		String[] result = { "ab", "qw", "fh" };
+		
+		matchTest( parser, "abqwfh", Arrays.asList( result ) );
+		matchFailTest( parser, "abfh" );
 	}
 
 
@@ -214,62 +206,48 @@ public class Test_Parser extends ParserTestCase
 		Object[] abqw = { new Literal( "ab" ), new Literal( "qw" ) };
 		Object[] qbqwfh = { new Literal( "qb" ), new Literal( "qw" ), new Literal( "fh" ) };
 		
-		try
-		{
-			assertTrue( new Combine( abqwfh ).compareTo( new Combine( abqwfh ) ) );
-			assertFalse( new Combine( abqwfh ).compareTo( new Combine( abqw ) ) );
-			assertFalse( new Combine( abqwfh ).compareTo( new Combine( qbqwfh ) ) );
-			assertTrue( new Combine( abqwfh ).compareTo( new Literal( "ab" ).__sub__( new Literal( "qw" ) ).__sub__( new Literal( "fh" ) ) ) );
-			assertTrue( new Combine( abqwfh ).compareTo( new Literal( "ab" ).__sub__( "qw" ).__sub__( "fh" ) ) );
+		assertTrue( new Combine( abqwfh ).compareTo( new Combine( abqwfh ) ) );
+		assertFalse( new Combine( abqwfh ).compareTo( new Combine( abqw ) ) );
+		assertFalse( new Combine( abqwfh ).compareTo( new Combine( qbqwfh ) ) );
+		assertTrue( new Combine( abqwfh ).compareTo( new Literal( "ab" ).__sub__( new Literal( "qw" ) ).__sub__( new Literal( "fh" ) ) ) );
+		assertTrue( new Combine( abqwfh ).compareTo( new Literal( "ab" ).__sub__( "qw" ).__sub__( "fh" ) ) );
 
-			Object[] subs = { new Literal( "ab" ), new Literal( "qw" ), new Literal( "fh" ) };
-			ParserExpression parser = new Combine( subs );
-			
-			matchTest( parser, "abqwfh", "abqwfh" );
-			matchFailTest( parser, "abfh" );
-
+		Object[] subs = { new Literal( "ab" ), new Literal( "qw" ), new Literal( "fh" ) };
+		ParserExpression parser = new Combine( subs );
 		
-		
-			Object[] subsB1 = { new Literal( "ab" ), new Literal( "cd" ) };
-			Object[] subsB2 = { new Literal( "ef" ), new Literal( "gh" ) };
-			Object[] subsB3 = { new Literal( "ij" ), new Literal( "kl" ) };
-			Object[] subsB = { new Sequence( subsB1 ), new Sequence( subsB2 ), new Sequence( subsB3 ) };
-			ParserExpression parser2 = new Combine( subsB );
-			String[] result2 = { "ab", "cd", "ef", "gh", "ij", "kl" };
-			matchTest( parser2, "abcdefghijkl", Arrays.asList( result2 ) );
+		matchTest( parser, "abqwfh", "abqwfh" );
+		matchFailTest( parser, "abfh" );
 
-			Object[] subsC = { new Sequence( subsB1 ), new Sequence( subsB2 ), new Sequence( subsB3 ), new Literal( "xyz" ) };
-			ParserExpression parser3 = new Combine( subsC );
-			String[] result3 = { "ab", "cd", "ef", "gh", "ij", "kl", "xyz" };
-			matchTest( parser3, "abcdefghijklxyz", Arrays.asList( result3 ) );
-		}
-		catch (ParserCoerceException e)
-		{
-			throw new RuntimeException();
-		}
+	
+	
+		Object[] subsB1 = { new Literal( "ab" ), new Literal( "cd" ) };
+		Object[] subsB2 = { new Literal( "ef" ), new Literal( "gh" ) };
+		Object[] subsB3 = { new Literal( "ij" ), new Literal( "kl" ) };
+		Object[] subsB = { new Sequence( subsB1 ), new Sequence( subsB2 ), new Sequence( subsB3 ) };
+		ParserExpression parser2 = new Combine( subsB );
+		String[] result2 = { "ab", "cd", "ef", "gh", "ij", "kl" };
+		matchTest( parser2, "abcdefghijkl", Arrays.asList( result2 ) );
+
+		Object[] subsC = { new Sequence( subsB1 ), new Sequence( subsB2 ), new Sequence( subsB3 ), new Literal( "xyz" ) };
+		ParserExpression parser3 = new Combine( subsC );
+		String[] result3 = { "ab", "cd", "ef", "gh", "ij", "kl", "xyz" };
+		matchTest( parser3, "abcdefghijklxyz", Arrays.asList( result3 ) );
 	}
 
 
 	public void testSuppress()
 	{
-		try
-		{
-			assertTrue( new Suppress( new Literal( "ab" ) ).compareTo( new Suppress( new Literal( "ab" ) ) ) );
-			assertFalse( new Suppress( new Literal( "ab" ) ).compareTo( new Suppress( new Literal( "cd" ) ) ) );
-			assertTrue( new Suppress( new Literal( "ab" ) ).compareTo( new Literal( "ab" ).suppress() ) );
+		assertTrue( new Suppress( new Literal( "ab" ) ).compareTo( new Suppress( new Literal( "ab" ) ) ) );
+		assertFalse( new Suppress( new Literal( "ab" ) ).compareTo( new Suppress( new Literal( "cd" ) ) ) );
+		assertTrue( new Suppress( new Literal( "ab" ) ).compareTo( new Literal( "ab" ).suppress() ) );
 
-			Object[] subs = { new Literal( "ab" ), new Literal( "qw" ).suppress(), new Literal( "fh" ) };
-			ParserExpression parser = new Sequence( subs );
-			
-			String[] result = { "ab", "fh" };
-			
-			matchTest( parser, "abqwfh", Arrays.asList( result ) );
-			matchFailTest( parser, "abfh" );
-		}
-		catch (ParserCoerceException e)
-		{
-			throw new RuntimeException();
-		}
+		Object[] subs = { new Literal( "ab" ), new Literal( "qw" ).suppress(), new Literal( "fh" ) };
+		ParserExpression parser = new Sequence( subs );
+		
+		String[] result = { "ab", "fh" };
+		
+		matchTest( parser, "abqwfh", Arrays.asList( result ) );
+		matchFailTest( parser, "abfh" );
 	}
 
 
@@ -279,28 +257,21 @@ public class Test_Parser extends ParserTestCase
 		Object[] abqw = { new Literal( "ab" ), new Literal( "qw" ) };
 		Object[] qbqwfh = { new Literal( "qb" ), new Literal( "qw" ), new Literal( "fh" ) };
 		
-		try
-		{
-			assertTrue( new Choice( abqwfh ).compareTo( new Choice( abqwfh ) ) );
-			assertFalse( new Choice( abqwfh ).compareTo( new Choice( abqw ) ) );
-			assertFalse( new Choice( abqwfh ).compareTo( new Choice( qbqwfh ) ) );
-			assertTrue( new Choice( abqwfh ).compareTo( new Literal( "ab" ).__or__( new Literal( "qw" ) ).__or__( new Literal( "fh" ) ) ) );
-			assertTrue( new Choice( abqwfh ).compareTo( new Literal( "ab" ).__or__( "qw" ).__or__( "fh" ) ) );
+		assertTrue( new Choice( abqwfh ).compareTo( new Choice( abqwfh ) ) );
+		assertFalse( new Choice( abqwfh ).compareTo( new Choice( abqw ) ) );
+		assertFalse( new Choice( abqwfh ).compareTo( new Choice( qbqwfh ) ) );
+		assertTrue( new Choice( abqwfh ).compareTo( new Literal( "ab" ).__or__( new Literal( "qw" ) ).__or__( new Literal( "fh" ) ) ) );
+		assertTrue( new Choice( abqwfh ).compareTo( new Literal( "ab" ).__or__( "qw" ).__or__( "fh" ) ) );
 
-			Object[] subs = { new Literal( "ab" ), new Literal( "qw" ), new Literal( "fh" ) };
-			ParserExpression parser = new Choice( subs );
-			
-			matchTest( parser, "ab", "ab" );
-			matchTest( parser, "qw", "qw" );
-			matchTest( parser, "fh", "fh" );
-			matchFailTest( parser, "xy" );
-			matchSubTest( new Literal( "ab" ).__or__( "abcd" ), "ab", "ab", 2 );
-			matchSubTest( new Literal( "ab" ).__or__( "abcd" ), "abcd", "ab", 2 );
-		}
-		catch (ParserCoerceException e)
-		{
-			throw new RuntimeException();
-		}
+		Object[] subs = { new Literal( "ab" ), new Literal( "qw" ), new Literal( "fh" ) };
+		ParserExpression parser = new Choice( subs );
+		
+		matchTest( parser, "ab", "ab" );
+		matchTest( parser, "qw", "qw" );
+		matchTest( parser, "fh", "fh" );
+		matchFailTest( parser, "xy" );
+		matchSubTest( new Literal( "ab" ).__or__( "abcd" ), "ab", "ab", 2 );
+		matchSubTest( new Literal( "ab" ).__or__( "abcd" ), "abcd", "ab", 2 );
 	}
 
 	public void testBestChoice()
@@ -309,28 +280,21 @@ public class Test_Parser extends ParserTestCase
 		Object[] abqw = { new Literal( "ab" ), new Literal( "qw" ) };
 		Object[] qbqwfh = { new Literal( "qb" ), new Literal( "qw" ), new Literal( "fh" ) };
 		
-		try
-		{
-			assertTrue( new BestChoice( abqwfh ).compareTo( new BestChoice( abqwfh ) ) );
-			assertFalse( new BestChoice( abqwfh ).compareTo( new BestChoice( abqw ) ) );
-			assertFalse( new BestChoice( abqwfh ).compareTo( new BestChoice( qbqwfh ) ) );
-			assertTrue( new BestChoice( abqwfh ).compareTo( new Literal( "ab" ).__xor__( new Literal( "qw" ) ).__xor__( new Literal( "fh" ) ) ) );
-			assertTrue( new BestChoice( abqwfh ).compareTo( new Literal( "ab" ).__xor__( "qw" ).__xor__( "fh" ) ) );
+		assertTrue( new BestChoice( abqwfh ).compareTo( new BestChoice( abqwfh ) ) );
+		assertFalse( new BestChoice( abqwfh ).compareTo( new BestChoice( abqw ) ) );
+		assertFalse( new BestChoice( abqwfh ).compareTo( new BestChoice( qbqwfh ) ) );
+		assertTrue( new BestChoice( abqwfh ).compareTo( new Literal( "ab" ).__xor__( new Literal( "qw" ) ).__xor__( new Literal( "fh" ) ) ) );
+		assertTrue( new BestChoice( abqwfh ).compareTo( new Literal( "ab" ).__xor__( "qw" ).__xor__( "fh" ) ) );
 
-			Object[] subs = { new Literal( "ab" ), new Literal( "qw" ), new Literal( "fh" ) };
-			ParserExpression parser = new BestChoice( subs );
-			
-			matchTest( parser, "ab", "ab" );
-			matchTest( parser, "qw", "qw" );
-			matchTest( parser, "fh", "fh" );
-			matchFailTest( parser, "xy" );
-			matchSubTest( new Literal( "ab" ).__xor__( "abcd" ), "ab", "ab", 2 );
-			matchSubTest( new Literal( "ab" ).__xor__( "abcd" ), "abcd", "abcd", 4 );
-		}
-		catch (ParserCoerceException e)
-		{
-			throw new RuntimeException();
-		}
+		Object[] subs = { new Literal( "ab" ), new Literal( "qw" ), new Literal( "fh" ) };
+		ParserExpression parser = new BestChoice( subs );
+		
+		matchTest( parser, "ab", "ab" );
+		matchTest( parser, "qw", "qw" );
+		matchTest( parser, "fh", "fh" );
+		matchFailTest( parser, "xy" );
+		matchSubTest( new Literal( "ab" ).__xor__( "abcd" ), "ab", "ab", 2 );
+		matchSubTest( new Literal( "ab" ).__xor__( "abcd" ), "abcd", "abcd", 4 );
 	}
 
 

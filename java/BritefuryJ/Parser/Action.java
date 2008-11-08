@@ -6,11 +6,9 @@
 //##************************
 package BritefuryJ.Parser;
 
-import org.python.core.PyObject;
-import org.python.core.PyInteger;
 import org.python.core.Py;
-
-import java.util.List;
+import org.python.core.PyInteger;
+import org.python.core.PyObject;
 
 public class Action extends UnaryBranchExpression
 {
@@ -41,12 +39,6 @@ public class Action extends UnaryBranchExpression
 		this.a = a;
 	}
 	
-	public Action(List<Object> subexp, ParseAction a) throws ParserCoerceException
-	{
-		super( subexp );
-		this.a = a;
-	}
-		
 	public Action(ParserExpression subexp, ParseAction a)
 	{
 		super( subexp );
@@ -59,11 +51,6 @@ public class Action extends UnaryBranchExpression
 		this( subexp, new PyAction( a ) );
 	}
 	
-	public Action(List<Object> subexp, PyObject a) throws ParserCoerceException
-	{
-		this( subexp, new PyAction( a ) );
-	}
-		
 	public Action(ParserExpression subexp, PyObject a)
 	{
 		this( subexp, new PyAction( a ) );

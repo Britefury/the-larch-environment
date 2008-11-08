@@ -15,12 +15,12 @@ public class BestChoice extends BranchExpression
 		super( subexps );
 	}
 	
-	public BestChoice(Object[] subexps) throws ParserCoerceException
+	public BestChoice(Object[] subexps)
 	{
 		super( subexps );
 	}
 	
-	public BestChoice(List<Object> subexps) throws ParserCoerceException
+	public BestChoice(List<Object> subexps)
 	{
 		super( subexps );
 	}
@@ -60,17 +60,12 @@ public class BestChoice extends BranchExpression
 
 	public ParserExpression __xor__(ParserExpression x)
 	{
-		return new BestChoice( joinSubexp( x ) );
+		return new BestChoice( appendToSubexps( x ) );
 	}
 
-	public ParserExpression __xor__(String x)
+	public ParserExpression __xor__(Object x)
 	{
-		return new BestChoice( joinSubexp( coerce( x ) ) );
-	}
-
-	public ParserExpression __xor__(List<Object> x) throws ParserCoerceException
-	{
-		return new BestChoice( joinSubexp( coerce( x ) ) );
+		return new BestChoice( appendToSubexps( coerce( x ) ) );
 	}
 
 

@@ -6,7 +6,6 @@
 //##************************
 package BritefuryJ.Parser;
 
-import java.util.List;
 
 public class ZeroOrMore extends Repetition
 {
@@ -20,16 +19,6 @@ public class ZeroOrMore extends Repetition
 		super( subexp, 0, -1, bNullIfZero );
 	}
 	
-	public ZeroOrMore(List<Object> subexp) throws ParserCoerceException
-	{
-		this( subexp, false );
-	}
-
-	public ZeroOrMore(List<Object> subexp, boolean bNullIfZero) throws ParserCoerceException
-	{
-		super( subexp, 0, -1, bNullIfZero );
-	}
-		
 	public ZeroOrMore(ParserExpression subexp)
 	{
 		this( subexp, false );

@@ -6,7 +6,6 @@
 //##************************
 package BritefuryJ.Parser;
 
-import java.util.List;
 
 public class Suppress extends UnaryBranchExpression
 {
@@ -15,11 +14,6 @@ public class Suppress extends UnaryBranchExpression
 		super( subexp );
 	}
 	
-	public Suppress(List<Object> subexp) throws ParserCoerceException
-	{
-		super( subexp );
-	}
-		
 	public Suppress(ParserExpression subexp)
 	{
 		super( subexp );
