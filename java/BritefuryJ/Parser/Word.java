@@ -64,11 +64,11 @@ public class Word extends ParserExpression
 	
 	protected ParseResult parse(ParserState state, Object input, int start, int stop) throws ParserIncompatibleDataTypeException
 	{
-		if ( input instanceof String )
+		try
 		{
 			return parse( state, (String)input, start, stop );
 		}
-		else
+		catch (ClassCastException e)
 		{
 			throw new ParserIncompatibleDataTypeException();
 		}
