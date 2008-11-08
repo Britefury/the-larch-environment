@@ -6,8 +6,6 @@
 //##************************
 package BritefuryJ.Parser;
 
-import java.util.List;
-
 import org.python.core.Py;
 import org.python.core.PyInteger;
 import org.python.core.PyObject;
@@ -42,12 +40,6 @@ public class Condition extends UnaryBranchExpression
 		this.cond = cond;
 	}
 	
-	public Condition(List<Object> subexp, ParseCondition cond) throws ParserCoerceException
-	{
-		super( subexp );
-		this.cond = cond;
-	}
-		
 	public Condition(ParserExpression subexp, ParseCondition cond)
 	{
 		super( subexp );
@@ -60,11 +52,6 @@ public class Condition extends UnaryBranchExpression
 		this( subexp, new PyCondition( cond ) );
 	}
 	
-	public Condition(List<Object> subexp, PyObject cond) throws ParserCoerceException
-	{
-		this( subexp, new PyCondition( cond ) );
-	}
-		
 	public Condition(ParserExpression subexp, PyObject cond)
 	{
 		this( subexp, new PyCondition( cond ) );

@@ -14,19 +14,14 @@ public abstract class UnaryBranchExpression extends ParserExpression
 	protected ParserExpression subexp;
 	
 	
-	public UnaryBranchExpression(String subexp)
-	{
-		this( coerce( subexp ) );
-	}
-	
-	public UnaryBranchExpression(List<Object> subexp) throws ParserCoerceException
-	{
-		this( coerce( subexp ) );
-	}
-		
 	public UnaryBranchExpression(ParserExpression subexp)
 	{
 		this.subexp = subexp;
+	}
+	
+	public UnaryBranchExpression(Object subexp)
+	{
+		this( coerce( subexp ) );
 	}
 	
 	

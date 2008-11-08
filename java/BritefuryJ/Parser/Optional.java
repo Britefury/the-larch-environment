@@ -6,7 +6,6 @@
 //##************************
 package BritefuryJ.Parser;
 
-import java.util.List;
 
 
 public class Optional extends UnaryBranchExpression
@@ -16,11 +15,6 @@ public class Optional extends UnaryBranchExpression
 		super( subexp );
 	}
 	
-	public Optional(List<Object> subexp) throws ParserCoerceException
-	{
-		super( subexp );
-	}
-		
 	public Optional(ParserExpression subexp)
 	{
 		super( subexp );

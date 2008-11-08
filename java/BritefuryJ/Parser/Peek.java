@@ -6,7 +6,6 @@
 //##************************
 package BritefuryJ.Parser;
 
-import java.util.List;
 
 public class Peek extends UnaryBranchExpression
 {
@@ -15,11 +14,6 @@ public class Peek extends UnaryBranchExpression
 		super( subexp );
 	}
 	
-	public Peek(List<Object> subexp) throws ParserCoerceException
-	{
-		super( subexp );
-	}
-		
 	public Peek(ParserExpression subexp)
 	{
 		super( subexp );

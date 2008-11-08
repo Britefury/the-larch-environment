@@ -7,7 +7,6 @@
 package BritefuryJ.Parser;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class Repetition extends UnaryBranchExpression
 {
@@ -28,20 +27,6 @@ public class Repetition extends UnaryBranchExpression
 		this.bNullIfZero = bNullIfZero;
 	}
 	
-	public Repetition(List<Object> subexp, int minRepetitions, int maxRepetitions) throws ParserCoerceException
-	{
-		this( subexp, minRepetitions, maxRepetitions, false );
-	}
-
-	public Repetition(List<Object> subexp, int minRepetitions, int maxRepetitions, boolean bNullIfZero) throws ParserCoerceException
-	{
-		super( subexp );
-		
-		this.minRepetitions = minRepetitions;
-		this.maxRepetitions = maxRepetitions;
-		this.bNullIfZero = bNullIfZero;
-	}
-		
 	public Repetition(ParserExpression subexp, int minRepetitions, int maxRepetitions)
 	{
 		this( subexp, minRepetitions, maxRepetitions, false );

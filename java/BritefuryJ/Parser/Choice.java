@@ -15,12 +15,12 @@ public class Choice extends BranchExpression
 		super( subexps );
 	}
 	
-	public Choice(Object[] subexps) throws ParserCoerceException
+	public Choice(Object[] subexps)
 	{
 		super( subexps );
 	}
 	
-	public Choice(List<Object> subexps) throws ParserCoerceException
+	public Choice(List<Object> subexps)
 	{
 		super( subexps );
 	}
@@ -50,17 +50,12 @@ public class Choice extends BranchExpression
 
 	public ParserExpression __or__(ParserExpression x)
 	{
-		return new Choice( joinSubexp( x ) );
+		return new Choice( appendToSubexps( x ) );
 	}
 
-	public ParserExpression __or__(String x)
+	public ParserExpression __or__(Object x)
 	{
-		return new Choice( joinSubexp( coerce( x ) ) );
-	}
-
-	public ParserExpression __or__(List<Object> x) throws ParserCoerceException
-	{
-		return new Choice( joinSubexp( coerce( x ) ) );
+		return new Choice( appendToSubexps( coerce( x ) ) );
 	}
 
 

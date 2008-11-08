@@ -12,13 +12,6 @@ import org.python.core.PyObject;
 
 public abstract class ParserExpression
 {
-	public static class ParserCoerceException extends Exception
-	{
-		private static final long serialVersionUID = 1L;
-	};
-	
-	
-	
 	protected String debugName = "";
 	
 	
@@ -173,12 +166,7 @@ public abstract class ParserExpression
 		return new Sequence( withSibling( x ) );
 	}
 
-	public ParserExpression __add__(String x)
-	{
-		return new Sequence( withSibling( coerce( x ) ) );
-	}
-
-	public ParserExpression __add__(List<Object> x) throws ParserCoerceException
+	public ParserExpression __add__(Object x)
 	{
 		return new Sequence( withSibling( coerce( x ) ) );
 	}
@@ -189,12 +177,7 @@ public abstract class ParserExpression
 		return new Combine( withSibling( x ) );
 	}
 
-	public ParserExpression __sub__(String x)
-	{
-		return new Combine( withSibling( coerce( x ) ) );
-	}
-
-	public ParserExpression __sub__(List<Object> x) throws ParserCoerceException
+	public ParserExpression __sub__(Object x)
 	{
 		return new Combine( withSibling( coerce( x ) ) );
 	}
@@ -205,12 +188,7 @@ public abstract class ParserExpression
 		return new Choice( withSibling( x ) );
 	}
 
-	public ParserExpression __or__(String x)
-	{
-		return new Choice( withSibling( coerce( x ) ) );
-	}
-
-	public ParserExpression __or__(List<Object> x) throws ParserCoerceException
+	public ParserExpression __or__(Object x)
 	{
 		return new Choice( withSibling( coerce( x ) ) );
 	}
@@ -221,12 +199,7 @@ public abstract class ParserExpression
 		return new BestChoice( withSibling( x ) );
 	}
 
-	public ParserExpression __xor__(String x)
-	{
-		return new BestChoice( withSibling( coerce( x ) ) );
-	}
-
-	public ParserExpression __xor__(List<Object> x) throws ParserCoerceException
+	public ParserExpression __xor__(Object x)
 	{
 		return new BestChoice( withSibling( coerce( x ) ) );
 	}
@@ -271,19 +244,20 @@ public abstract class ParserExpression
 	
 	
 	
-	public static ParserExpression coerce(ParserExpression x)
+	public static ParserExpression coerce(Object x)
 	{
-		return x;
-	}
-
-	public static ParserExpression coerce(String x)
-	{
-		return new Literal( x );
-	}
-
-	public static ParserExpression coerce(List<Object> xs) throws ParserCoerceException
-	{
-		return new Sequence( xs );
+		if ( x instanceof ParserExpression )
+		{
+			return (ParserExpression)x;
+		}
+		else if ( x instanceof String )
+		{
+			return new Literal( (String)x );
+		}
+		else
+		{
+			return new LiteralItem( x );
+		}
 	}
 
 

@@ -16,12 +16,12 @@ public class Combine extends BranchExpression
 		super( subexps );
 	}
 	
-	public Combine(Object[] subexps) throws ParserCoerceException
+	public Combine(Object[] subexps)
 	{
 		super( subexps );
 	}
 	
-	public Combine(List<Object> subexps) throws ParserCoerceException
+	public Combine(List<Object> subexps)
 	{
 		super( subexps );
 	}
@@ -99,17 +99,12 @@ public class Combine extends BranchExpression
 
 	public ParserExpression __sub__(ParserExpression x)
 	{
-		return new Combine( joinSubexp( x ) );
+		return new Combine( appendToSubexps( x ) );
 	}
 
-	public ParserExpression __sub__(String x)
+	public ParserExpression __sub__(Object x)
 	{
-		return new Combine( joinSubexp( coerce( x ) ) );
-	}
-
-	public ParserExpression __sub__(List<Object> x) throws ParserCoerceException
-	{
-		return new Combine( joinSubexp( coerce( x ) ) );
+		return new Combine( appendToSubexps( coerce( x ) ) );
 	}
 
 
