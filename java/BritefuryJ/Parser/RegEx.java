@@ -58,7 +58,7 @@ public class RegEx extends ParserExpression
 	
 	
 	
-	protected ParseResult parse(ParserState state, String input, int start, int stop)
+	protected ParseResult parse(ParserState state, String input, int start, int stop) throws ParserIncompatibleDataTypeException
 	{
 		if ( bSkipJunkChars )
 		{
@@ -77,6 +77,19 @@ public class RegEx extends ParserExpression
 		else
 		{
 			return ParseResult.failure( start );
+		}
+	}
+	
+	
+	protected ParseResult parse(ParserState state, Object input, int start, int stop) throws ParserIncompatibleDataTypeException
+	{
+		if ( input instanceof String )
+		{
+			return parse( state, (String)input, start, stop );
+		}
+		else
+		{
+			throw new ParserIncompatibleDataTypeException();
 		}
 	}
 

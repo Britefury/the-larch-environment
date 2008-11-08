@@ -27,7 +27,7 @@ public class Prefix extends UnaryOperator
 		
 		
 		@SuppressWarnings("unchecked")
-		public Object invoke(String input, int begin, Object x)
+		public Object invoke(Object input, int begin, Object x)
 		{
 			List<Object> xs = (List<Object>)x;
 

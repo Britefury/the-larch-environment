@@ -11,7 +11,6 @@ import java.util.List;
 import org.python.core.Py;
 import org.python.core.PyInteger;
 import org.python.core.PyObject;
-import org.python.core.PyString;
 
 public class Condition extends UnaryBranchExpression
 {
@@ -26,9 +25,9 @@ public class Condition extends UnaryBranchExpression
 		}
 
 
-		public boolean test(String input, int begin, Object x)
+		public boolean test(Object input, int begin, Object x)
 		{
-			return Py.py2boolean( callable.__call__( new PyString( input ), new PyInteger( begin ), Py.java2py( x ) ) );
+			return Py.py2boolean( callable.__call__( Py.java2py( input ), new PyInteger( begin ), Py.java2py( x ) ) );
 		}
 	}
 
@@ -79,7 +78,7 @@ public class Condition extends UnaryBranchExpression
 	}
 	
 
-	protected ParseResult parse(ParserState state, String input, int start, int stop)
+	protected ParseResult parse(ParserState state, Object input, int start, int stop) throws ParserIncompatibleDataTypeException
 	{
 		ParseResult res = subexp.evaluate( state, input, start, stop );
 		

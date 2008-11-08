@@ -26,7 +26,7 @@ public class Choice extends BranchExpression
 	}
 	
 	
-	protected ParseResult parse(ParserState state, String input, int start, int stop)
+	protected ParseResult parse(ParserState state, Object input, int start, int stop) throws ParserIncompatibleDataTypeException
 	{
 		int maxErrorPos = start;
 		

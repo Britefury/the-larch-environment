@@ -28,7 +28,7 @@ public class Combine extends BranchExpression
 	
 	
 	@SuppressWarnings("unchecked")
-	protected ParseResult parse(ParserState state, String input, int start, int stop)
+	protected ParseResult parse(ParserState state, Object input, int start, int stop) throws ParserIncompatibleDataTypeException
 	{
 		ArrayList<Object> values = new ArrayList<Object>();
 		boolean bFinalValueIsString = true;

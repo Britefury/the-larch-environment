@@ -8,5 +8,5 @@ package BritefuryJ.Parser;
 
 public interface ParseCondition
 {
-	public boolean test(String input, int begin, Object x);
+	public boolean test(Object input, int begin, Object x);
 }

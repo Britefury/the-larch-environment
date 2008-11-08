@@ -120,7 +120,7 @@ public class Test_Parser extends ParserTestCase
 	{
 		ParseAction f = new ParseAction()
 		{
-			public Object invoke(String input, int begin, Object value)
+			public Object invoke(Object input, int begin, Object value)
 			{
 				String v = (String)value;
 				return v + v;
@@ -129,7 +129,7 @@ public class Test_Parser extends ParserTestCase
 
 		ParseAction g = new ParseAction()
 		{
-			public Object invoke(String input, int begin, Object value)
+			public Object invoke(Object input, int begin, Object value)
 			{
 				String v = (String)value;
 				return v + v + v;
@@ -151,7 +151,7 @@ public class Test_Parser extends ParserTestCase
 	{
 		ParseCondition f = new ParseCondition()
 		{
-			public boolean test(String input, int begin, Object value)
+			public boolean test(Object input, int begin, Object value)
 			{
 				String v = (String)value;
 				return v.startsWith( "hello" );
@@ -160,7 +160,7 @@ public class Test_Parser extends ParserTestCase
 
 		ParseCondition g = new ParseCondition()
 		{
-			public boolean test(String input, int begin, Object value)
+			public boolean test(Object input, int begin, Object value)
 			{
 				String v = (String)value;
 				return v.startsWith( "there" );
@@ -514,7 +514,7 @@ public class Test_Parser extends ParserTestCase
 		ParseAction flattenAction = new ParseAction()
 		{
 			@SuppressWarnings("unchecked")
-			public Object invoke(String input, int begin, Object x)
+			public Object invoke(Object input, int begin, Object x)
 			{
 				ArrayList<Object> y = new ArrayList<Object>();
 				List<Object> xx = (List<Object>)x;
@@ -529,7 +529,7 @@ public class Test_Parser extends ParserTestCase
 		ParseAction action = new ParseAction()
 		{
 			@SuppressWarnings("unchecked")
-			public Object invoke(String input, int begin, Object x)
+			public Object invoke(Object input, int begin, Object x)
 			{
 				List<Object> xx = (List<Object>)x;
 				if ( xx.get( 1 ).equals( new ArrayList<Object>() ) )

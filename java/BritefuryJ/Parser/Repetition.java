@@ -73,7 +73,7 @@ public class Repetition extends UnaryBranchExpression
 	}
 	
 
-	protected ParseResult parse(ParserState state, String input, int start, int stop)
+	protected ParseResult parse(ParserState state, Object input, int start, int stop) throws ParserIncompatibleDataTypeException
 	{
 		ArrayList<Object> values = new ArrayList<Object>();
 		

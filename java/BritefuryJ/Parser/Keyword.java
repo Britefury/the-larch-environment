@@ -39,7 +39,7 @@ public class Keyword extends ParserExpression
 	
 	
 	
-	protected ParseResult parse(ParserState state, String input, int start, int stop)
+	private ParseResult parse(ParserState state, String input, int start, int stop)
 	{
 		start = state.skipJunkChars( input, start, stop );
 		
@@ -58,6 +58,19 @@ public class Keyword extends ParserExpression
 		}
 		
 		return ParseResult.failure( start );
+	}
+	
+	
+	protected ParseResult parse(ParserState state, Object input, int start, int stop) throws ParserIncompatibleDataTypeException
+	{
+		if ( input instanceof String )
+		{
+			return parse( state, (String)input, start, stop );
+		}
+		else
+		{
+			throw new ParserIncompatibleDataTypeException();
+		}
 	}
 
 

@@ -104,7 +104,7 @@ class ParserState
 	
 	
 	@SuppressWarnings("unchecked")
-	ParseResult memoisedMatch(ParserExpression rule, String input, int start, int stop)
+	ParseResult memoisedMatch(ParserExpression rule, Object input, int start, int stop) throws ParserIncompatibleDataTypeException
 	{
 		MemoEntry memoEntry = recall( rule, input, start, stop );
 		
@@ -168,7 +168,7 @@ class ParserState
 	}
 	
 	
-	private MemoEntry recall(ParserExpression rule, String input, int start, int stop)
+	private MemoEntry recall(ParserExpression rule, Object input, int start, int stop) throws ParserIncompatibleDataTypeException
 	{
 		// Get the memo-entry from the memo table
 		HashMap<ParserExpression, MemoEntry> posMemo = memo.get( new Integer( start ) );
@@ -213,7 +213,7 @@ class ParserState
 	}
 	
 	
-	private void onLeftRecursionDetected(ParserExpression rule, String input, int start, int stop, MemoEntry memoEntry)
+	private void onLeftRecursionDetected(ParserExpression rule, Object input, int start, int stop, MemoEntry memoEntry)
 	{
 		// Left recursion has been detected
 		memoEntry.bLeftRecursionDetected = true;
@@ -246,7 +246,7 @@ class ParserState
 
 
 
-	private void onLeftRecursionInnerReapplication(ParserExpression rule, String input, int start, int stop, MemoEntry memoEntry)
+	private void onLeftRecursionInnerReapplication(ParserExpression rule, Object input, int start, int stop, MemoEntry memoEntry)
 	{
 		// Create a left-recursive application record, if one does not already exist
 		LeftRecursiveApplication lrApplication = memoEntry.lrApplications.get( rule );
@@ -271,7 +271,7 @@ class ParserState
 
 
 	@SuppressWarnings("unchecked")
-	private ParseResult growLeftRecursiveParse(ParserExpression rule, String input, int start, int stop, MemoEntry memoEntry, ParseResult answer)
+	private ParseResult growLeftRecursiveParse(ParserExpression rule, Object input, int start, int stop, MemoEntry memoEntry, ParseResult answer) throws ParserIncompatibleDataTypeException
 	{
 		memoEntry.growingLRParseCount++;
 		LeftRecursiveApplication lrApplication = memoEntry.lrApplications.get( rule );
