@@ -9,7 +9,7 @@ package BritefuryJ.Parser;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Word extends ParserExpression
+public class Word extends Terminal
 {
 	protected String initChars, bodyChars;
 	protected Pattern pattern;
@@ -42,7 +42,7 @@ public class Word extends ParserExpression
 	
 	
 	
-	protected ParseResult parse(ParserState state, String input, int start, int stop) throws ParserIncompatibleDataTypeException
+	protected ParseResult parseString(ParserState state, String input, int start, int stop)
 	{
 		start = state.skipJunkChars( input, start, stop );
 		
@@ -58,19 +58,6 @@ public class Word extends ParserExpression
 		else
 		{
 			return ParseResult.failure( start );
-		}
-	}
-	
-	
-	protected ParseResult parse(ParserState state, Object input, int start, int stop) throws ParserIncompatibleDataTypeException
-	{
-		try
-		{
-			return parse( state, (String)input, start, stop );
-		}
-		catch (ClassCastException e)
-		{
-			throw new ParserIncompatibleDataTypeException();
 		}
 	}
 
@@ -91,5 +78,11 @@ public class Word extends ParserExpression
 	public String toString()
 	{
 		return "Word( \"" + initChars + "\", \"" + bodyChars + "\" )";
+	}
+
+
+	protected boolean isTerminal()
+	{
+		return true;
 	}
 }

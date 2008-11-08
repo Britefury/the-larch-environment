@@ -8,7 +8,7 @@ package BritefuryJ.Parser;
 
 import java.util.regex.Pattern;
 
-public class Keyword extends ParserExpression
+public class Keyword extends Terminal
 {
 	protected String keywordString, disallowedSubsequentChars;
 	private Pattern postPattern;
@@ -39,7 +39,7 @@ public class Keyword extends ParserExpression
 	
 	
 	
-	private ParseResult parse(ParserState state, String input, int start, int stop)
+	protected ParseResult parseString(ParserState state, String input, int start, int stop)
 	{
 		start = state.skipJunkChars( input, start, stop );
 		
@@ -61,19 +61,6 @@ public class Keyword extends ParserExpression
 	}
 	
 	
-	protected ParseResult parse(ParserState state, Object input, int start, int stop) throws ParserIncompatibleDataTypeException
-	{
-		try
-		{
-			return parse( state, (String)input, start, stop );
-		}
-		catch (ClassCastException e)
-		{
-			throw new ParserIncompatibleDataTypeException();
-		}
-	}
-
-
 	public boolean compareTo(ParserExpression x)
 	{
 		if ( x instanceof Keyword )
@@ -90,5 +77,11 @@ public class Keyword extends ParserExpression
 	public String toString()
 	{
 		return "Keyword( \"" + keywordString + "\", \"" + disallowedSubsequentChars + "\" )";
+	}
+
+
+	protected boolean isTerminal()
+	{
+		return true;
 	}
 }

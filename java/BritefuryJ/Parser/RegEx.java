@@ -9,7 +9,7 @@ package BritefuryJ.Parser;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class RegEx extends ParserExpression
+public class RegEx extends Terminal
 {
 	protected String re;
 	protected int flags;
@@ -58,7 +58,7 @@ public class RegEx extends ParserExpression
 	
 	
 	
-	protected ParseResult parse(ParserState state, String input, int start, int stop) throws ParserIncompatibleDataTypeException
+	protected ParseResult parseString(ParserState state, String input, int start, int stop)
 	{
 		if ( bSkipJunkChars )
 		{
@@ -79,19 +79,6 @@ public class RegEx extends ParserExpression
 			return ParseResult.failure( start );
 		}
 	}
-	
-	
-	protected ParseResult parse(ParserState state, Object input, int start, int stop) throws ParserIncompatibleDataTypeException
-	{
-		try
-		{
-			return parse( state, (String)input, start, stop );
-		}
-		catch (ClassCastException e)
-		{
-			throw new ParserIncompatibleDataTypeException();
-		}
-	}
 
 
 	public boolean compareTo(ParserExpression x)
@@ -110,5 +97,11 @@ public class RegEx extends ParserExpression
 	public String toString()
 	{
 		return "RegEx( \"" + re + "\", " + String.valueOf( flags ) + ", " + String.valueOf( bSkipJunkChars ) + "  )";
+	}
+
+
+	protected boolean isTerminal()
+	{
+		return true;
 	}
 }

@@ -6,8 +6,6 @@
 //##************************
 package BritefuryJ.Parser;
 
-import java.util.List;
-
 public class LiteralItem extends ParserExpression
 {
 	protected Object matchValue;
@@ -26,28 +24,19 @@ public class LiteralItem extends ParserExpression
 	
 	
 	
-	private ParseResult parse(ParserState state, List<Object> input, int start, int stop) throws ParserIncompatibleDataTypeException
+	protected ParseResult parseString(ParserState state, String input, int start, int stop)
 	{
-		if ( matchValue.equals( input.get( start ) ) )
+		return ParseResult.failure( start );
+	}
+
+	protected ParseResult parseNode(ParserState state, Object input, int start, int stop)
+	{
+		if ( matchValue.equals( input ) )
 		{
-			return new ParseResult( input.get( start ), start, start + 1 );
+			return new ParseResult( input, start, stop );
 		}
 		
 		return ParseResult.failure( start );
-	}
-	
-	
-	@SuppressWarnings("unchecked")
-	protected ParseResult parse(ParserState state, Object input, int start, int stop) throws ParserIncompatibleDataTypeException
-	{
-		try
-		{
-			return parse( state, (List<Object>)input, start, stop );
-		}
-		catch (ClassCastException e)
-		{
-			throw new ParserIncompatibleDataTypeException();
-		}
 	}
 
 
@@ -67,5 +56,11 @@ public class LiteralItem extends ParserExpression
 	public String toString()
 	{
 		return "LiteralItem( \"" + matchValue.toString() + "\" )";
+	}
+
+
+	protected boolean isTerminal()
+	{
+		return true;
 	}
 }

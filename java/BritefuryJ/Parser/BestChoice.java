@@ -26,7 +26,7 @@ public class BestChoice extends BranchExpression
 	}
 	
 	
-	protected ParseResult parse(ParserState state, Object input, int start, int stop) throws ParserIncompatibleDataTypeException
+	protected ParseResult parseString(ParserState state, String input, int start, int stop)
 	{
 		ParseResult bestResult = null;
 		int bestPos = -1;
@@ -34,7 +34,7 @@ public class BestChoice extends BranchExpression
 		
 		for (ParserExpression subexp: subexps)
 		{
-			ParseResult result = subexp.evaluate(  state, input, start, stop );
+			ParseResult result = subexp.evaluateString(  state, input, start, stop );
 			if ( result.isValid()  &&  result.end > bestPos )
 			{
 				bestResult = result;
@@ -56,6 +56,36 @@ public class BestChoice extends BranchExpression
 		}
 	}
 	
+
+	protected ParseResult parseNode(ParserState state, Object input, int start, int stop)
+	{
+		ParseResult bestResult = null;
+		int bestPos = -1;
+		int maxErrorPos = start;
+		
+		for (ParserExpression subexp: subexps)
+		{
+			ParseResult result = subexp.evaluateNode(  state, input, start, stop );
+			if ( result.isValid()  &&  result.end > bestPos )
+			{
+				bestResult = result;
+				bestPos = result.end;
+			}
+			else
+			{
+				maxErrorPos = Math.max( maxErrorPos, result.end );
+			}
+		}
+		
+		if ( bestResult != null )
+		{
+			return bestResult;
+		}
+		else
+		{
+			return ParseResult.failure( maxErrorPos );
+		}
+	}
 	
 
 	public ParserExpression __xor__(ParserExpression x)

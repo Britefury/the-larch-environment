@@ -28,7 +28,7 @@ public class Combine extends BranchExpression
 	
 	
 	@SuppressWarnings("unchecked")
-	protected ParseResult parse(ParserState state, Object input, int start, int stop) throws ParserIncompatibleDataTypeException
+	protected ParseResult parseString(ParserState state, String input, int start, int stop)
 	{
 		ArrayList<Object> values = new ArrayList<Object>();
 		boolean bFinalValueIsString = true;
@@ -41,7 +41,7 @@ public class Combine extends BranchExpression
 				return ParseResult.failure( pos );
 			}
 			
-			ParseResult result = subexps[i].evaluate(  state, input, pos, stop );
+			ParseResult result = subexps[i].evaluateString(  state, input, pos, stop );
 			pos = result.end;
 			
 			if ( !result.isValid() )
@@ -96,6 +96,55 @@ public class Combine extends BranchExpression
 	}
 	
 	
+	@SuppressWarnings("unchecked")
+	protected ParseResult parseNode(ParserState state, Object input, int start, int stop)
+	{
+		ArrayList<Object> values = new ArrayList<Object>();
+		
+		int pos = start;
+		for (int i = 0; i < subexps.length; i++)
+		{
+			if ( pos > stop )
+			{
+				return ParseResult.failure( pos );
+			}
+			
+			ParseResult result = subexps[i].evaluateNode(  state, input, pos, stop );
+			pos = result.end;
+			
+			if ( !result.isValid() )
+			{
+				return ParseResult.failure( pos );
+			}
+			else
+			{
+				if ( !result.isSuppressed() )
+				{
+					values.add( result.value );
+				}
+			}
+		}
+		
+		
+		ArrayList<Object> value = new ArrayList<Object>();
+		
+		for (Object v: values)
+		{
+			if ( v instanceof List )
+			{
+				List<Object> l = (List<Object>)v;
+				value.addAll( l );
+			}
+			else
+			{
+				value.add( v );
+			}
+		}
+
+		return new ParseResult( value, start, pos );
+	}
+	
+	
 
 	public ParserExpression __sub__(ParserExpression x)
 	{
@@ -111,5 +160,11 @@ public class Combine extends BranchExpression
 	public String toString()
 	{
 		return "Combine( " + subexpsToString() + " )";
+	}
+
+	
+	protected boolean isSequence()
+	{
+		return true;
 	}
 }

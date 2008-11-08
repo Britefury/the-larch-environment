@@ -10,7 +10,6 @@ import BritefuryJ.DocModel.DMIORead;
 import BritefuryJ.DocModel.DMIORead.ParseSXErrorException;
 import BritefuryJ.Parser.ParseResult;
 import BritefuryJ.Parser.ParserExpression;
-import BritefuryJ.Parser.ParserIncompatibleDataTypeException;
 import junit.framework.TestCase;
 
 public class ParserTestCase extends TestCase
@@ -42,17 +41,7 @@ public class ParserTestCase extends TestCase
 
 	public void matchTest(ParserExpression parser, String input, Object expected, String ignoreCharsRegex)
 	{
-		ParseResult result = null;
-		try
-		{
-			result = parser.parseString( input );
-		}
-		catch (ParserIncompatibleDataTypeException e)
-		{
-			System.out.println( "INCOMPATIBLE DATA TYPE" );
-			fail();
-			return;
-		}
+		ParseResult result = parser.parseString( input );
 		
 		if ( !result.isValid() )
 		{
@@ -136,17 +125,8 @@ public class ParserTestCase extends TestCase
 	
 	public void matchSubTest(ParserExpression parser, String input, Object expected, int end, String ignoreCharsRegex)
 	{
-		ParseResult result = null;
-		try
-		{
-			result = parser.parseString( input );
-		}
-		catch (ParserIncompatibleDataTypeException e)
-		{
-			System.out.println( "INCOMPATIBLE DATA TYPE" );
-			fail();
-			return;
-		}
+		ParseResult result = parser.parseString( input );
+
 		if ( !result.isValid() )
 		{
 			System.out.println( "PARSE FAILURE while parsing " + input.substring(  0, end ) + ", stopped at " + String.valueOf( result.getEnd() ) + ": " + input.substring(  0, result.getEnd() ) );
@@ -203,17 +183,7 @@ public class ParserTestCase extends TestCase
 	
 	public void matchFailTest(ParserExpression parser, String input, String ignoreCharsRegex)
 	{
-		ParseResult result;
-		try
-		{
-			result = parser.parseString( input );
-		}
-		catch (ParserIncompatibleDataTypeException e)
-		{
-			System.out.println( "INCOMPATIBLE DATA TYPE" );
-			fail();
-			return;
-		}
+		ParseResult result = parser.parseString( input );
 
 		if ( result.isValid() )
 		{
@@ -240,17 +210,7 @@ public class ParserTestCase extends TestCase
 	
 	public void matchIncompleteTest(ParserExpression parser, String input, String ignoreCharsRegex)
 	{
-		ParseResult result;
-		try
-		{
-			result = parser.parseString( input );
-		}
-		catch (ParserIncompatibleDataTypeException e)
-		{
-			System.out.println( "INCOMPATIBLE DATA TYPE" );
-			fail();
-			return;
-		}
+		ParseResult result = parser.parseString( input );
 
 		if ( !result.isValid() )
 		{

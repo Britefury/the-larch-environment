@@ -6,7 +6,7 @@
 //##************************
 package BritefuryJ.Parser;
 
-public class Literal extends ParserExpression
+public class Literal extends Terminal
 {
 	protected String matchString;
 	
@@ -24,7 +24,7 @@ public class Literal extends ParserExpression
 	
 	
 	
-	protected ParseResult parse(ParserState state, String input, int start, int stop) throws ParserIncompatibleDataTypeException
+	protected ParseResult parseString(ParserState state, String input, int start, int stop)
 	{
 		start = state.skipJunkChars( input, start, stop );
 		
@@ -42,19 +42,6 @@ public class Literal extends ParserExpression
 	}
 	
 	
-	protected ParseResult parse(ParserState state, Object input, int start, int stop) throws ParserIncompatibleDataTypeException
-	{
-		try
-		{
-			return parse( state, (String)input, start, stop );
-		}
-		catch (ClassCastException e)
-		{
-			throw new ParserIncompatibleDataTypeException();
-		}
-	}
-
-
 	public boolean compareTo(ParserExpression x)
 	{
 		if ( x instanceof Literal )
@@ -71,5 +58,11 @@ public class Literal extends ParserExpression
 	public String toString()
 	{
 		return "Literal( \"" + matchString + "\" )";
+	}
+
+
+	protected boolean isTerminal()
+	{
+		return true;
 	}
 }

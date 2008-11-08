@@ -58,7 +58,7 @@ public class Repetition extends UnaryBranchExpression
 	}
 	
 
-	protected ParseResult parse(ParserState state, Object input, int start, int stop) throws ParserIncompatibleDataTypeException
+	protected ParseResult parseString(ParserState state, String input, int start, int stop)
 	{
 		ArrayList<Object> values = new ArrayList<Object>();
 		
@@ -68,7 +68,55 @@ public class Repetition extends UnaryBranchExpression
 		
 		while ( pos <= stop  &&  ( maxRepetitions == -1  ||  i < maxRepetitions ) )
 		{
-			ParseResult res = subexp.evaluate( state, input, pos, stop );
+			ParseResult res = subexp.evaluateString( state, input, pos, stop );
+			errorPos = res.end;
+			
+			if ( !res.isValid() )
+			{
+				break;
+			}
+			else
+			{
+				if ( !res.isSuppressed() )
+				{
+					values.add( res.value );
+				}
+				pos = res.end;
+				i++;
+			}
+		}
+		
+		
+		if ( ( i < minRepetitions)  ||  ( maxRepetitions != -1  &&  i > maxRepetitions ) )
+		{
+			return ParseResult.failure( errorPos );
+		}
+		else
+		{
+			if ( bNullIfZero  &&  i == 0 )
+			{
+				return new ParseResult( null, start, pos );
+			}
+			else
+			{
+				return new ParseResult( values, start, pos );
+			}
+		}
+
+	}
+	
+
+	protected ParseResult parseNode(ParserState state, Object input, int start, int stop)
+	{
+		ArrayList<Object> values = new ArrayList<Object>();
+		
+		int pos = start;
+		int errorPos = start;
+		int i = 0;
+		
+		while ( pos <= stop  &&  ( maxRepetitions == -1  ||  i < maxRepetitions ) )
+		{
+			ParseResult res = subexp.evaluateNode( state, input, pos, stop );
 			errorPos = res.end;
 			
 			if ( !res.isValid() )
