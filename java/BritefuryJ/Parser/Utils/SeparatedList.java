@@ -8,6 +8,7 @@ package BritefuryJ.Parser.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import BritefuryJ.Parser.OneOrMore;
 import BritefuryJ.Parser.Optional;
@@ -20,7 +21,7 @@ public class SeparatedList
 {
 	public static class EmptyListAction implements ParseAction
 	{
-		public Object invoke(Object input, int begin, Object x)
+		public Object invoke(Object input, int begin, Object x, Map<String, Object> bindings)
 		{
 			return new ArrayList<Object>();
 		}
@@ -29,7 +30,7 @@ public class SeparatedList
 	public static class SeparatedListAction implements ParseAction
 	{
 		@SuppressWarnings("unchecked")
-		public Object invoke(Object input, int begin, Object x)
+		public Object invoke(Object input, int begin, Object x, Map<String, Object> bindings)
 		{
 			if ( x == null )
 			{
@@ -54,7 +55,7 @@ public class SeparatedList
 	private static class SeparatedListActionOneOrMore implements ParseAction
 	{
 		@SuppressWarnings("unchecked")
-		public Object invoke(Object input, int begin, Object x)
+		public Object invoke(Object input, int begin, Object x, Map<String, Object> bindings)
 		{
 			ArrayList<Object> result = new ArrayList<Object>();
 			List<Object> xs = (List<Object>)x;
@@ -72,7 +73,7 @@ public class SeparatedList
 	private static class DelimitedListAction implements ParseAction
 	{
 		@SuppressWarnings("unchecked")
-		public Object invoke(Object input, int begin, Object x)
+		public Object invoke(Object input, int begin, Object x, Map<String, Object> bindings)
 		{
 			List<Object> xs = (List<Object>)x;
 			return xs.get( 1 );

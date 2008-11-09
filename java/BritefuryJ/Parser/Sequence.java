@@ -7,7 +7,10 @@
 package BritefuryJ.Parser;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+
+import BritefuryJ.Parser.ParseResult.NameAlreadyBoundException;
 
 public class Sequence extends BranchExpression
 {
@@ -30,6 +33,7 @@ public class Sequence extends BranchExpression
 	protected ParseResult parseString(ParserState state, String input, int start, int stop)
 	{
 		ArrayList<Object> value = new ArrayList<Object>();
+		HashMap<String, Object> bindings = null;
 		
 		int pos = start;
 		for (int i = 0; i < subexps.length; i++)
@@ -48,6 +52,15 @@ public class Sequence extends BranchExpression
 			}
 			else
 			{
+				try
+				{
+					bindings = result.addBindingsTo( bindings );
+				}
+				catch (NameAlreadyBoundException e)
+				{
+					return ParseResult.failure( pos );
+				}
+
 				if ( !result.isSuppressed() )
 				{
 					value.add( result.value );
@@ -55,7 +68,7 @@ public class Sequence extends BranchExpression
 			}
 		}
 		
-		return new ParseResult( value, start, pos );
+		return new ParseResult( value, start, pos, bindings );
 	}
 	
 	

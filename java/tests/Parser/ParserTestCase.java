@@ -6,6 +6,9 @@
 //##************************
 package tests.Parser;
 
+import java.util.HashMap;
+import java.util.List;
+
 import BritefuryJ.DocModel.DMIORead;
 import BritefuryJ.DocModel.DMIORead.ParseSXErrorException;
 import BritefuryJ.Parser.ParseResult;
@@ -41,7 +44,7 @@ public class ParserTestCase extends TestCase
 
 	public void matchTest(ParserExpression parser, String input, Object expected, String ignoreCharsRegex)
 	{
-		ParseResult result = parser.parseString( input );
+		ParseResult result = parser.parseString( input, ignoreCharsRegex );
 		
 		if ( !result.isValid() )
 		{
@@ -125,7 +128,7 @@ public class ParserTestCase extends TestCase
 	
 	public void matchSubTest(ParserExpression parser, String input, Object expected, int end, String ignoreCharsRegex)
 	{
-		ParseResult result = parser.parseString( input );
+		ParseResult result = parser.parseString( input, ignoreCharsRegex );
 
 		if ( !result.isValid() )
 		{
@@ -183,7 +186,7 @@ public class ParserTestCase extends TestCase
 	
 	public void matchFailTest(ParserExpression parser, String input, String ignoreCharsRegex)
 	{
-		ParseResult result = parser.parseString( input );
+		ParseResult result = parser.parseString( input, ignoreCharsRegex );
 
 		if ( result.isValid() )
 		{
@@ -210,7 +213,7 @@ public class ParserTestCase extends TestCase
 	
 	public void matchIncompleteTest(ParserExpression parser, String input, String ignoreCharsRegex)
 	{
-		ParseResult result = parser.parseString( input );
+		ParseResult result = parser.parseString( input, ignoreCharsRegex );
 
 		if ( !result.isValid() )
 		{
@@ -234,7 +237,92 @@ public class ParserTestCase extends TestCase
 
 
 
+	public void bindingsTestSX(ParserExpression parser, String input, String bindingsSX)
+	{
+		try
+		{
+			Object bindings = DMIORead.readSX( bindingsSX );
+			bindingsTest( parser, input, bindings );
+		}
+		catch (ParseSXErrorException e)
+		{
+			System.out.println( "Could not parse bindings SX" );
+			fail();
+		}
+	}
 
+
+	public void bindingsTest(ParserExpression parser, String input, Object bindingsObject)
+	{
+		bindingsTest( parser, input, bindingsObject, "[ \t\n]*" );
+	}
+
+	@SuppressWarnings("unchecked")
+	public void bindingsTest(ParserExpression parser, String input, Object bindingsObject, String ignoreCharsRegex)
+	{
+		ParseResult result = parser.parseString( input, ignoreCharsRegex );
+
+		if ( !result.isValid() )
+		{
+			System.out.println( "PARSE FAILURE while parsing " + input + ", stopped at " + String.valueOf( result.getEnd() ) + ": " + input.substring(  0, result.getEnd() ) );
+		}
+		assertTrue( result.isValid() );
+		
+		if ( result.getEnd() != input.length() )
+		{
+			System.out.println( "INCOMPLETE PARSE while parsing " + input );
+			System.out.println( "Parsed " + String.valueOf( result.getEnd() ) + "/" + String.valueOf( input.length() ) + " characters" );
+			System.out.println( "Parsed text " + input.substring( 0, result.getEnd() ) );
+		}
+		assertEquals( result.getEnd(), input.length() );
+		
+		
+		boolean bBindingsMatch = true;
+		
+		HashMap<String, Object> resBindings = result.getBindings();
+		List<List<Object>> bindings = (List<List<Object>>)bindingsObject;
+		int resBindingsSize = resBindings != null  ?  resBindings.size()  :  0;   
+		assertEquals( bindings.size(), resBindingsSize );
+		
+		if ( bindings.size() > 0 )
+		{
+			for (List<Object> binding: bindings)
+			{
+				String name = (String)binding.get( 0 );
+				Object value = binding.get( 1 );
+				if ( resBindings.containsKey( name ) )
+				{
+					Object resValue = resBindings.get( name );
+					if ( !resValue.equals( value ) )
+					{
+						System.out.println( "BINDING VALUES DO NOT MATCH FOR NAME " + name );
+						System.out.println( "EXPECTED:" );
+						System.out.println( value.toString() );
+						System.out.println( "RESULT:" );
+						System.out.println( resValue.toString() );
+						bBindingsMatch = false;
+					}
+				}
+				else
+				{
+					System.out.println( "EXPECTED BINDING FOR NAME " + name );
+					bBindingsMatch = false;
+				}
+			}
+		}
+		assertTrue( bBindingsMatch );
+	}
+
+	
+	
+	
+	//
+	//
+	//
+	// NODE PARSING TESTS
+	//
+	//
+	//
 
 
 	public void matchNodeTestSX(ParserExpression parser, String inputSX, String expectedSX)
@@ -329,4 +417,70 @@ public class ParserTestCase extends TestCase
 	}
 
 
+	
+	
+	public void bindingsNodeTestSX(ParserExpression parser, String inputSX, String bindingsSX)
+	{
+		try
+		{
+			Object input = DMIORead.readSX( inputSX );
+			Object bindings = DMIORead.readSX( bindingsSX );
+			bindingsNodeTest( parser, input, bindings );
+		}
+		catch (ParseSXErrorException e)
+		{
+			System.out.println( "Could not parse bindings SX" );
+			fail();
+		}
+	}
+
+
+	@SuppressWarnings("unchecked")
+	public void bindingsNodeTest(ParserExpression parser, Object input, Object bindingsObject)
+	{
+		ParseResult result = parser.parseNode( input );
+
+		if ( !result.isValid() )
+		{
+			System.out.println( "PARSE FAILURE" );
+		}
+		assertTrue( result.isValid() );
+		
+	
+		
+		boolean bBindingsMatch = true;
+		
+		HashMap<String, Object> resBindings = result.getBindings();
+		List<List<Object>> bindings = (List<List<Object>>)bindingsObject;
+		int resBindingsSize = resBindings != null  ?  resBindings.size()  :  0;   
+		assertEquals( bindings.size(), resBindingsSize );
+		
+		if ( bindings.size() > 0 )
+		{
+			for (List<Object> binding: bindings)
+			{
+				String name = (String)binding.get( 0 );
+				Object value = binding.get( 1 );
+				if ( resBindings.containsKey( name ) )
+				{
+					Object resValue = resBindings.get( name );
+					if ( !resValue.equals( value ) )
+					{
+						System.out.println( "BINDING VALUES DO NOT MATCH FOR NAME " + name );
+						System.out.println( "EXPECTED:" );
+						System.out.println( value.toString() );
+						System.out.println( "RESULT:" );
+						System.out.println( resValue.toString() );
+						bBindingsMatch = false;
+					}
+				}
+				else
+				{
+					System.out.println( "EXPECTED BINDING FOR NAME " + name );
+					bBindingsMatch = false;
+				}
+			}
+		}
+		assertTrue( bBindingsMatch );
+	}
 }

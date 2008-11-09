@@ -55,6 +55,11 @@ public class Production extends UnaryBranchExpression
 		return new Production( new Condition( subexp, cond ), debugName );
 	}
 	
+	public ParserExpression bindTo(String name)
+	{
+		return new Production( new Bind( name, subexp ), debugName );
+	}
+
 	public ParserExpression suppress()
 	{
 		return new Production( new Suppress( subexp ), debugName );
