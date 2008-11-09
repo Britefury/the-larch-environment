@@ -86,17 +86,45 @@ public abstract class ParserExpression
 	
 	
 	
-	public ParseResult parseList(List<Object> input)
+	@SuppressWarnings("unchecked")
+	public ParseResult parseNode(Object input)
 	{
+		int stop;
+		if ( input instanceof String )
+		{
+			stop = ((String)input).length();
+		}
+		else if ( input instanceof List )
+		{
+			stop = ((List<Object>)input).size();
+		}
+		else
+		{
+			stop = 1;
+		}
 		ParserState state = new ParserState( "" );
-		return evaluateNode( state, input, 0, input.size() );
+		return evaluateRootNode( state, input, 0, stop );
 	}
 	
-	public DebugParseResult debugParseList(List<Object> input)
+	@SuppressWarnings("unchecked")
+	public DebugParseResult debugParseNode(Object input)
 	{
+		int stop;
+		if ( input instanceof String )
+		{
+			stop = ((String)input).length();
+		}
+		else if ( input instanceof List )
+		{
+			stop = ((List<Object>)input).size();
+		}
+		else
+		{
+			stop = 1;
+		}
 		ParserState state = new ParserState( "" );
 		state.enableDebugging();
-		return (DebugParseResult)evaluateRootNode( state, input, 0, input.size() );
+		return (DebugParseResult)evaluateRootNode( state, input, 0, stop );
 	}
 	
 	
