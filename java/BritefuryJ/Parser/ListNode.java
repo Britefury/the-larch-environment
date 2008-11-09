@@ -9,19 +9,19 @@ package BritefuryJ.Parser;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Node extends BranchExpression
+public class ListNode extends BranchExpression
 {
-	public Node(ParserExpression[] subexps)
+	public ListNode(ParserExpression[] subexps)
 	{
 		super( subexps );
 	}
 	
-	public Node(Object[] subexps)
+	public ListNode(Object[] subexps)
 	{
 		super( subexps );
 	}
 	
-	public Node(List<Object> subexps)
+	public ListNode(List<Object> subexps)
 	{
 		super( subexps );
 	}

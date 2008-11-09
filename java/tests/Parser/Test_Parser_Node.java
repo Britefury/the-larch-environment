@@ -11,7 +11,7 @@ import BritefuryJ.Parser.BestChoice;
 import BritefuryJ.Parser.Choice;
 import BritefuryJ.Parser.Combine;
 import BritefuryJ.Parser.Literal;
-import BritefuryJ.Parser.Node;
+import BritefuryJ.Parser.ListNode;
 import BritefuryJ.Parser.ParserExpression;
 import BritefuryJ.Parser.Peek;
 import BritefuryJ.Parser.PeekNot;
@@ -36,20 +36,20 @@ public class Test_Parser_Node extends ParserTestCase
 		matchNodeTestSX( new Anything(), "abcxyz", "abcxyz" );
 	}
 	
-	public void testNode()
+	public void testListNode()
 	{
-		ParserExpression parser1 = new Node( new Object[] { new Literal( "abc" ) } );
+		ParserExpression parser1 = new ListNode( new Object[] { new Literal( "abc" ) } );
 		matchNodeTestSX( parser1, "(abc)", "(abc)" );
 		matchNodeFailTestSX( parser1, "(abcde)" );
 		matchNodeFailTestSX( parser1, "(abc de)" );
 
-		ParserExpression parser2 = new Node( new Object[] { new Literal( "abc" ), new Literal( "def" ) } );
+		ParserExpression parser2 = new ListNode( new Object[] { new Literal( "abc" ), new Literal( "def" ) } );
 		matchNodeTestSX( parser2, "(abc def)", "(abc def)" );
 		matchNodeFailTestSX( parser2, "(abcx def)" );
 		matchNodeFailTestSX( parser2, "(abc defx)" );
 		matchNodeFailTestSX( parser2, "(abcx defx)" );
 
-		ParserExpression parser3 = new Node( new Object[] { new Literal( "abc" ), new Node( new Object[] { new Literal( "d" ), new Literal( "e" ) } ) } );
+		ParserExpression parser3 = new ListNode( new Object[] { new Literal( "abc" ), new ListNode( new Object[] { new Literal( "d" ), new Literal( "e" ) } ) } );
 		matchNodeTestSX( parser3, "(abc (d e))", "(abc (d e))" );
 		matchNodeFailTestSX( parser3, "(abc (de))" );
 		matchNodeFailTestSX( parser3, "(abc de)" );
@@ -57,14 +57,14 @@ public class Test_Parser_Node extends ParserTestCase
 		matchNodeFailTestSX( parser3, "(abc (d ex))" );
 		matchNodeFailTestSX( parser3, "(abc (dx ex))" );
 
-		ParserExpression parser4 = new Node( new Object[] { new Literal( "abc" ), new Node( new Object[] { new Literal( "d" ) } ) } );
+		ParserExpression parser4 = new ListNode( new Object[] { new Literal( "abc" ), new ListNode( new Object[] { new Literal( "d" ) } ) } );
 		matchNodeTestSX( parser4, "(abc (d))", "(abc (d))" );
 		matchNodeFailTestSX( parser4, "(abc d)" );
 	}
 
 	public void testChoice()
 	{
-		ParserExpression parser1 = new Node( new Object[] { new Literal( "a" ), new Choice( new Object[] { new Literal( "b" ), new Literal( "c" ) } ) } );
+		ParserExpression parser1 = new ListNode( new Object[] { new Literal( "a" ), new Choice( new Object[] { new Literal( "b" ), new Literal( "c" ) } ) } );
 		matchNodeTestSX( parser1, "(a b)", "(a b)" );
 		matchNodeTestSX( parser1, "(a c)", "(a c)" );
 		matchNodeFailTestSX( parser1, "(a b c)" );
@@ -72,7 +72,7 @@ public class Test_Parser_Node extends ParserTestCase
 		matchNodeFailTestSX( parser1, "(a (c))" );
 		matchNodeFailTestSX( parser1, "(a (b c))" );
 
-		ParserExpression parser2 = new Node( new Object[] { new Literal( "a" ), new Choice( new Object[] { new Literal( "b" ), new Sequence( new Object[] { new Literal( "b" ), new Literal( "c" ) } ) } ) } );
+		ParserExpression parser2 = new ListNode( new Object[] { new Literal( "a" ), new Choice( new Object[] { new Literal( "b" ), new Sequence( new Object[] { new Literal( "b" ), new Literal( "c" ) } ) } ) } );
 		matchNodeTestSX( parser2, "(a b)", "(a b)" );
 		matchNodeFailTestSX( parser2, "(a b c)" );
 		matchNodeFailTestSX( parser2, "(a (b))" );
@@ -82,7 +82,7 @@ public class Test_Parser_Node extends ParserTestCase
 
 	public void testBestChoice()
 	{
-		ParserExpression parser1 = new Node( new Object[] { new Literal( "a" ), new BestChoice( new Object[] { new Literal( "b" ), new Sequence( new Object[] { new Literal( "b" ), new Literal( "c" ) } ) } ) } );
+		ParserExpression parser1 = new ListNode( new Object[] { new Literal( "a" ), new BestChoice( new Object[] { new Literal( "b" ), new Sequence( new Object[] { new Literal( "b" ), new Literal( "c" ) } ) } ) } );
 		matchNodeTestSX( parser1, "(a b)", "(a b)" );
 		matchNodeTestSX( parser1, "(a b c)", "(a (b c))" );
 		matchNodeFailTestSX( parser1, "(a (b))" );
@@ -92,35 +92,35 @@ public class Test_Parser_Node extends ParserTestCase
 
 	public void testSequence()
 	{
-		ParserExpression parser1 = new Node( new Object[] { new Literal( "a" ), new Sequence( new Object[] { new Literal( "b" ), new Literal( "c" ) } ) } );
+		ParserExpression parser1 = new ListNode( new Object[] { new Literal( "a" ), new Sequence( new Object[] { new Literal( "b" ), new Literal( "c" ) } ) } );
 		matchNodeTestSX( parser1, "(a b c)", "(a (b c))" );
 		matchNodeFailTestSX( parser1, "(a (b c))" );
 	}
 
 	public void testCombine()
 	{
-		ParserExpression parser1 = new Node( new Object[] { new Literal( "a" ), new Combine( new Object[] { new Literal( "b" ), new Literal( "c" ) } ) } );
+		ParserExpression parser1 = new ListNode( new Object[] { new Literal( "a" ), new Combine( new Object[] { new Literal( "b" ), new Literal( "c" ) } ) } );
 		matchNodeTestSX( parser1, "(a b c)", "(a (b c))" );
 		matchNodeFailTestSX( parser1, "(a (b c))" );
 
-		ParserExpression parser2 = new Node( new Object[] { new Literal( "a" ), new Combine( new Object[] { new Sequence( new Object[] { new Literal( "b" ), new Literal( "c" ) } ), new Sequence( new Object[] { new Literal( "d" ), new Literal( "e" ) } ) } ) } );
+		ParserExpression parser2 = new ListNode( new Object[] { new Literal( "a" ), new Combine( new Object[] { new Sequence( new Object[] { new Literal( "b" ), new Literal( "c" ) } ), new Sequence( new Object[] { new Literal( "d" ), new Literal( "e" ) } ) } ) } );
 		matchNodeTestSX( parser2, "(a b c d e)", "(a (b c d e))" );
 	}
 
 	public void testZeroOrMore()
 	{
-		ParserExpression parser1 = new Node( new Object[] { new Literal( "a" ), new ZeroOrMore( new Literal( "b" ) ) } );
+		ParserExpression parser1 = new ListNode( new Object[] { new Literal( "a" ), new ZeroOrMore( new Literal( "b" ) ) } );
 		matchNodeTestSX( parser1, "(a)", "(a ())" );
 		matchNodeTestSX( parser1, "(a b)", "(a (b))" );
 		matchNodeTestSX( parser1, "(a b b)", "(a (b b))" );
 		matchNodeTestSX( parser1, "(a b b b)", "(a (b b b))" );
 
-		ParserExpression parser2 = new Node( new Object[] { new Literal( "a" ), new ZeroOrMore( new Node( new Object[] { new Literal( "d" ), new Literal( "e" ) } ) ) } );
+		ParserExpression parser2 = new ListNode( new Object[] { new Literal( "a" ), new ZeroOrMore( new ListNode( new Object[] { new Literal( "d" ), new Literal( "e" ) } ) ) } );
 		matchNodeTestSX( parser2, "(a)", "(a ())" );
 		matchNodeTestSX( parser2, "(a (d e))", "(a ((d e)))" );
 		matchNodeTestSX( parser2, "(a (d e) (d e))", "(a ((d e) (d e)))" );
 
-		ParserExpression parser3 = new Node( new Object[] { new Literal( "a" ), new ZeroOrMore( new Sequence( new Object[] { new Literal( "d" ), new Literal( "e" ) } ) ) } );
+		ParserExpression parser3 = new ListNode( new Object[] { new Literal( "a" ), new ZeroOrMore( new Sequence( new Object[] { new Literal( "d" ), new Literal( "e" ) } ) ) } );
 		matchNodeTestSX( parser3, "(a)", "(a ())" );
 		matchNodeTestSX( parser3, "(a d e)", "(a ((d e)))" );
 		matchNodeTestSX( parser3, "(a d e d e)", "(a ((d e) (d e)))" );
@@ -128,7 +128,7 @@ public class Test_Parser_Node extends ParserTestCase
 
 	public void testPeek()
 	{
-		ParserExpression parser1 = new Node( new Object[] { new Literal( "a" ), new Peek( new Literal( "b" ) ), new Anything() } );
+		ParserExpression parser1 = new ListNode( new Object[] { new Literal( "a" ), new Peek( new Literal( "b" ) ), new Anything() } );
 		matchNodeFailTestSX( parser1, "(a)" );
 		matchNodeTestSX( parser1, "(a b)", "(a b)" );
 		matchNodeFailTestSX( parser1, "(a b b)" );
@@ -136,7 +136,7 @@ public class Test_Parser_Node extends ParserTestCase
 
 	public void testPeekNot()
 	{
-		ParserExpression parser1 = new Node( new Object[] { new Literal( "a" ), new PeekNot( new Literal( "b" ) ), new Anything() } );
+		ParserExpression parser1 = new ListNode( new Object[] { new Literal( "a" ), new PeekNot( new Literal( "b" ) ), new Anything() } );
 		matchNodeFailTestSX( parser1, "(a)" );
 		matchNodeFailTestSX( parser1, "(a b)" );
 		matchNodeFailTestSX( parser1, "(a b b)" );

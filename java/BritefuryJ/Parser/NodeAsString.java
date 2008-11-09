@@ -8,14 +8,14 @@ package BritefuryJ.Parser;
 
 import java.util.List;
 
-public class ItemAsString extends UnaryBranchExpression
+public class NodeAsString extends UnaryBranchExpression
 {
-	public ItemAsString(String subexp)
+	public NodeAsString(String subexp)
 	{
 		super( subexp );
 	}
 	
-	public ItemAsString(ParserExpression subexp)
+	public NodeAsString(ParserExpression subexp)
 	{
 		super( subexp );
 	}
@@ -61,7 +61,7 @@ public class ItemAsString extends UnaryBranchExpression
 
 	public boolean compareTo(ParserExpression x)
 	{
-		if ( x instanceof ItemAsString )
+		if ( x instanceof NodeAsString )
 		{
 			return super.compareTo( x );
 		}
