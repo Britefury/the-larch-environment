@@ -8,8 +8,26 @@ package BritefuryJ.Parser;
 
 import java.util.List;
 
-public abstract class Terminal extends ParserExpression
+public class Anything extends Terminal
 {
+	public Anything()
+	{
+		super();
+	}
+	
+	
+
+	protected ParseResult parseString(ParserState state, String input, int start, int stop)
+	{
+		if ( stop > start )
+		{
+			return new ParseResult( input.substring( start, start + 1 ), start, start + 1 );
+		}
+		
+		return ParseResult.failure( start );
+	}
+
+	
 	@SuppressWarnings("unchecked")
 	protected ParseResult parseNode(ParserState state, Object input, int start, int stop)
 	{
@@ -19,45 +37,21 @@ public abstract class Terminal extends ParserExpression
 			if ( stop > start )
 			{
 				Object x = xs.get( start );
-				if ( x instanceof String )
-				{
-					String s = (String)x;
-					ParseResult res = parseString( state, s, 0, s.length() );
-					if ( res.isValid()  &&  res.end == s.length() )
-					{
-						return new ParseResult( res.getValue(), start, start + 1 );
-					}
-				}
+				return new ParseResult( x, start, start + 1 );
 			}
-		}
-		else if ( input instanceof String )
-		{
-			String s = (String)input;
-			ParseResult res = parseString( state, s, 0, s.length() );
-			if ( res.isValid()  &&  res.end == s.length() )
+			else
 			{
-				return new ParseResult( res.getValue(), start, start + 1 );
+				return ParseResult.failure( start );
 			}
 		}
 		
 
-		return ParseResult.failure( start );
+		return new ParseResult( input, start, stop );
 	}
 
 
 	protected ParseResult parseRootNode(ParserState state, Object input, int start, int stop)
 	{
-		if ( input instanceof String )
-		{
-			String s = (String)input;
-			ParseResult res = parseString( state, s, 0, s.length() );
-			if ( res.isValid()  &&  res.end == s.length() )
-			{
-				return res;
-			}
-		}
-
-	
-		return ParseResult.failure( start );
+		return new ParseResult( input, start, stop );
 	}
 }

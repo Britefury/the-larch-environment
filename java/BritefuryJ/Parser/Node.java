@@ -61,7 +61,14 @@ public class Node extends BranchExpression
 			}
 		}
 		
-		return new ParseResult( value, start, pos );
+		if ( pos == stop )
+		{
+			return new ParseResult( value, start, pos );
+		}
+		else
+		{
+			return ParseResult.failure( pos );
+		}
 	}
 	
 	
