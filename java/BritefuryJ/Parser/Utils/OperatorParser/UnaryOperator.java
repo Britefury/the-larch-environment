@@ -7,6 +7,7 @@
 package BritefuryJ.Parser.Utils.OperatorParser;
 
 import java.util.Arrays;
+import java.util.Map;
 
 import BritefuryJ.Parser.ParserExpression;
 
@@ -23,7 +24,7 @@ abstract class UnaryOperator extends Operator
 		}
 		
 		
-		public Object invoke(Object input, int begin, Object x)
+		public Object invoke(Object input, int begin, Object x, Map<String, Object> bindings)
 		{
 			Object[] xs = { operator, x };
 			return Arrays.asList( xs );

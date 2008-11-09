@@ -8,6 +8,7 @@ package BritefuryJ.Parser.Utils.OperatorParser;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
 
 import BritefuryJ.Parser.Forward;
 import BritefuryJ.Parser.ParseAction;
@@ -28,11 +29,11 @@ public class Suffix extends Operator
 		
 		
 		@SuppressWarnings("unchecked")
-		public Object invoke(Object input, int begin, Object x)
+		public Object invoke(Object input, int begin, Object x, Map<String, Object> bindings)
 		{
 			List<Object> xs = (List<Object>)x;
 
-			return action.invoke( input, begin, xs.get( 0 ) );
+			return action.invoke( input, begin, xs.get( 0 ), bindings );
 		}
 	}
 	

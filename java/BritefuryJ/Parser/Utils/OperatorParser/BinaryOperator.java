@@ -9,6 +9,7 @@ package BritefuryJ.Parser.Utils.OperatorParser;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import BritefuryJ.Parser.Forward;
 import BritefuryJ.Parser.ParseAction;
@@ -28,11 +29,11 @@ abstract class BinaryOperator extends Operator
 		
 		
 		@SuppressWarnings("unchecked")
-		public Object invoke(Object input, int begin, Object x)
+		public Object invoke(Object input, int begin, Object x, Map<String, Object> bindings)
 		{
 			List<Object> xs = (List<Object>)x;
 			
-			return action.invoke( input, begin, xs.get( 0 ), xs.get( 2 ) );
+			return action.invoke( input, begin, xs.get( 0 ), xs.get( 2 ), bindings );
 		}
 	}
 	
@@ -48,7 +49,7 @@ abstract class BinaryOperator extends Operator
 		}
 		
 		
-		public Object invoke(Object input, int begin, Object x, Object y)
+		public Object invoke(Object input, int begin, Object x, Object y, Map<String, Object> bindings)
 		{
 			Object[] xs = { operator, x, y };
 			return Arrays.asList( xs );

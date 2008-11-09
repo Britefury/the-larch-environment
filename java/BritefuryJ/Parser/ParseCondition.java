@@ -6,7 +6,9 @@
 //##************************
 package BritefuryJ.Parser;
 
+import java.util.Map;
+
 public interface ParseCondition
 {
-	public boolean test(Object input, int begin, Object x);
+	public boolean test(Object input, int begin, Object x, Map<String, Object> bindings);
 }

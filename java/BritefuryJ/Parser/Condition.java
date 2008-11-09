@@ -6,6 +6,8 @@
 //##************************
 package BritefuryJ.Parser;
 
+import java.util.Map;
+
 import org.python.core.Py;
 import org.python.core.PyInteger;
 import org.python.core.PyObject;
@@ -23,7 +25,7 @@ public class Condition extends UnaryBranchExpression
 		}
 
 
-		public boolean test(Object input, int begin, Object x)
+		public boolean test(Object input, int begin, Object x, Map<String, Object> bindings)
 		{
 			return Py.py2boolean( callable.__call__( Py.java2py( input ), new PyInteger( begin ), Py.java2py( x ) ) );
 		}
@@ -71,7 +73,7 @@ public class Condition extends UnaryBranchExpression
 		
 		if ( res.isValid() )
 		{
-			if ( cond.test( input, res.begin, res.value ) )
+			if ( cond.test( input, res.begin, res.value, res.bindings ) )
 			{
 				return res;
 			}
@@ -93,7 +95,7 @@ public class Condition extends UnaryBranchExpression
 		
 		if ( res.isValid() )
 		{
-			if ( cond.test( input, res.begin, res.value ) )
+			if ( cond.test( input, res.begin, res.value, res.bindings ) )
 			{
 				return res;
 			}

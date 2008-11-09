@@ -6,6 +6,8 @@
 //##************************
 package BritefuryJ.Parser;
 
+import java.util.Map;
+
 import org.python.core.Py;
 import org.python.core.PyInteger;
 import org.python.core.PyObject;
@@ -23,7 +25,7 @@ public class Action extends UnaryBranchExpression
 		}
 
 
-		public Object invoke(Object input, int begin, Object x)
+		public Object invoke(Object input, int begin, Object x, Map<String, Object> bindings)
 		{
 			return callable.__call__( Py.java2py( input ), new PyInteger( begin ), Py.java2py( x ) );
 		}
@@ -69,7 +71,7 @@ public class Action extends UnaryBranchExpression
 		
 		if ( res.isValid() )
 		{
-			return new ParseResult( this.a.invoke( input, res.begin, res.value ), res.begin, res.end );
+			return res.withValidUnsuppressedValue( a.invoke(  input, res.begin, res.value, res.bindings ) );
 		}
 		else
 		{
@@ -83,7 +85,7 @@ public class Action extends UnaryBranchExpression
 		
 		if ( res.isValid() )
 		{
-			return new ParseResult( this.a.invoke( input, res.begin, res.value ), res.begin, res.end );
+			return new ParseResult( this.a.invoke( input, res.begin, res.value, res.bindings ), res.begin, res.end );
 		}
 		else
 		{

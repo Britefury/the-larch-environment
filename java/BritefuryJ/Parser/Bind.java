@@ -8,16 +8,10 @@ package BritefuryJ.Parser;
 
 public class Bind extends UnaryBranchExpression
 {
-	private String name;
+	protected String name;
 	
 	
-	public Bind(String name, String subexp)
-	{
-		super( subexp );
-		this.name = name;
-	}
-	
-	public Bind(String name, ParserExpression subexp)
+	public Bind(String name, Object subexp)
 	{
 		super( subexp );
 		this.name = name;
@@ -58,9 +52,8 @@ public class Bind extends UnaryBranchExpression
 			return res;
 		}
 	}
-
-
-
+	
+	
 	public boolean compareTo(ParserExpression x)
 	{
 		if ( x instanceof Bind )

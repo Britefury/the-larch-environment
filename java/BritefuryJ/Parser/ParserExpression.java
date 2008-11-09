@@ -374,7 +374,7 @@ public abstract class ParserExpression
 	{
 		return new Action( this, a );
 	}
-
+	
 	public ParserExpression condition(ParseCondition cond)
 	{
 		return new Condition( this, cond );
@@ -385,6 +385,11 @@ public abstract class ParserExpression
 		return new Condition( this, cond );
 	}
 	
+	public ParserExpression bindTo(String name)
+	{
+		return new Bind( name, this );
+	}
+
 	public ParserExpression suppress()
 	{
 		return new Suppress( this );

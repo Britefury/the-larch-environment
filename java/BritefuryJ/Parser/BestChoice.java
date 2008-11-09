@@ -34,7 +34,7 @@ public class BestChoice extends BranchExpression
 		
 		for (ParserExpression subexp: subexps)
 		{
-			ParseResult result = subexp.evaluateString(  state, input, start, stop );
+			ParseResult result = subexp.evaluateString( state, input, start, stop );
 			if ( result.isValid()  &&  result.end > bestPos )
 			{
 				bestResult = result;
