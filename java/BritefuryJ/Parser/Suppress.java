@@ -9,7 +9,7 @@ package BritefuryJ.Parser;
 
 public class Suppress extends UnaryBranchExpression
 {
-	public Suppress(String subexp)
+	public Suppress(String subexp) throws ParserCoerceException
 	{
 		super( subexp );
 	}
@@ -23,12 +23,6 @@ public class Suppress extends UnaryBranchExpression
 	protected ParseResult parseString(ParserState state, String input, int start, int stop)
 	{
 		return subexp.evaluateString( state, input, start, stop ).suppressed();
-	}
-
-
-	protected ParseResult parseNode(ParserState state, Object input, int start, int stop)
-	{
-		return subexp.evaluateNode( state, input, start, stop ).suppressed();
 	}
 
 

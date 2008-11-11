@@ -15,12 +15,12 @@ public class Choice extends BranchExpression
 		super( subexps );
 	}
 	
-	public Choice(Object[] subexps)
+	public Choice(Object[] subexps) throws ParserCoerceException
 	{
 		super( subexps );
 	}
 	
-	public Choice(List<Object> subexps)
+	public Choice(List<Object> subexps) throws ParserCoerceException
 	{
 		super( subexps );
 	}
@@ -47,34 +47,13 @@ public class Choice extends BranchExpression
 	}
 	
 	
-	protected ParseResult parseNode(ParserState state, Object input, int start, int stop)
-	{
-		int maxErrorPos = start;
-		
-		for (ParserExpression subexp: subexps)
-		{
-			ParseResult result = subexp.evaluateNode(  state, input, start, stop );
-			if ( result.isValid() )
-			{
-				return result;
-			}
-			else
-			{
-				maxErrorPos = Math.max( maxErrorPos, result.end );
-			}
-		}
-		
-		return ParseResult.failure( maxErrorPos );
-	}
-	
-	
 
 	public ParserExpression __or__(ParserExpression x)
 	{
 		return new Choice( appendToSubexps( x ) );
 	}
 
-	public ParserExpression __or__(Object x)
+	public ParserExpression __or__(Object x) throws ParserCoerceException
 	{
 		return new Choice( appendToSubexps( coerce( x ) ) );
 	}

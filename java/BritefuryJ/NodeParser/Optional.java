@@ -4,40 +4,22 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.Parser;
+package BritefuryJ.NodeParser;
 
-public class Bind extends UnaryBranchExpression
+
+
+public class Optional extends UnaryBranchExpression
 {
-	protected String name;
-	
-	
-	public Bind(String name, Object subexp)
+	public Optional(String subexp)
 	{
 		super( subexp );
-		this.name = name;
 	}
 	
-	
-	
-	public String getName()
+	public Optional(ParserExpression subexp)
 	{
-		return name;
+		super( subexp );
 	}
 	
-
-	protected ParseResult parseString(ParserState state, String input, int start, int stop)
-	{
-		ParseResult res = subexp.evaluateString( state, input, start, stop );
-		
-		if ( res.isValid() )
-		{
-			return res.bind( name, res.getValue(), start );
-		}
-		else
-		{
-			return res;
-		}
-	}
 
 	protected ParseResult parseNode(ParserState state, Object input, int start, int stop)
 	{
@@ -45,21 +27,20 @@ public class Bind extends UnaryBranchExpression
 		
 		if ( res.isValid() )
 		{
-			return res.bind( name, res.getValue(), start );
+			return res;
 		}
 		else
 		{
-			return res;
+			return new ParseResult( null, start, start );
 		}
 	}
-	
-	
+
+
 	public boolean compareTo(ParserExpression x)
 	{
-		if ( x instanceof Bind )
+		if ( x instanceof Optional )
 		{
-			Bind bx = (Bind)x;
-			return super.compareTo( x )  &&  name.equals( bx.name );
+			return super.compareTo( x );
 		}
 		else
 		{
@@ -67,8 +48,9 @@ public class Bind extends UnaryBranchExpression
 		}
 	}
 	
+
 	public String toString()
 	{
-		return "Bind( " + name + ": " + subexp.toString() + " )";
+		return "Optional( " + subexp.toString() + " )";
 	}
 }

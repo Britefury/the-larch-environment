@@ -4,12 +4,14 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.Parser;
+package BritefuryJ.NodeParser;
 
 import java.util.List;
 
-public abstract class Terminal extends ParserExpression
+public abstract class StringTerminal extends ParserExpression
 {
+	protected abstract ParseResult parseString(ParserState state, String input);
+	
 	@SuppressWarnings("unchecked")
 	protected ParseResult parseNode(ParserState state, Object input, int start, int stop)
 	{
@@ -22,7 +24,7 @@ public abstract class Terminal extends ParserExpression
 				if ( x instanceof String )
 				{
 					String s = (String)x;
-					ParseResult res = parseString( state, s, 0, s.length() );
+					ParseResult res = parseString( state, s );
 					if ( res.isValid()  &&  res.end == s.length() )
 					{
 						return new ParseResult( res.getValue(), start, start + 1 );
@@ -33,7 +35,7 @@ public abstract class Terminal extends ParserExpression
 		else if ( input instanceof String )
 		{
 			String s = (String)input;
-			ParseResult res = parseString( state, s, 0, s.length() );
+			ParseResult res = parseString( state, s );
 			if ( res.isValid()  &&  res.end == s.length() )
 			{
 				return new ParseResult( res.getValue(), start, start + 1 );
@@ -50,7 +52,7 @@ public abstract class Terminal extends ParserExpression
 		if ( input instanceof String )
 		{
 			String s = (String)input;
-			ParseResult res = parseString( state, s, 0, s.length() );
+			ParseResult res = parseString( state, s );
 			if ( res.isValid()  &&  res.end == s.length() )
 			{
 				return res;

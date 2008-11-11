@@ -9,7 +9,7 @@ package BritefuryJ.Parser;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class RegEx extends Terminal
+public class RegEx extends ParserExpression
 {
 	protected String re;
 	protected int flags;
@@ -97,11 +97,5 @@ public class RegEx extends Terminal
 	public String toString()
 	{
 		return "RegEx( \"" + re + "\", " + String.valueOf( flags ) + ", " + String.valueOf( bSkipJunkChars ) + "  )";
-	}
-
-
-	protected boolean isTerminal()
-	{
-		return true;
 	}
 }

@@ -9,12 +9,12 @@ package BritefuryJ.Parser;
 
 public class OneOrMore extends Repetition
 {
-	public OneOrMore(String subexp)
+	public OneOrMore(ParserExpression subexp)
 	{
 		super( subexp, 1, -1 );
 	}
 
-	public OneOrMore(ParserExpression subexp)
+	public OneOrMore(Object subexp) throws ParserCoerceException
 	{
 		super( subexp, 1, -1 );
 	}

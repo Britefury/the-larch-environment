@@ -7,7 +7,6 @@
 package BritefuryJ.Parser;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class DebugParseResult extends ParseResult
 {
@@ -80,9 +79,9 @@ public class DebugParseResult extends ParseResult
 	public DebugNode debugNode;
 	
 	
-	protected DebugParseResult(Object value, int begin, int end, boolean bSuppressed, boolean bValid, HashMap<String, Object> bindings, DebugNode debugNode)
+	protected DebugParseResult(Object value, int begin, int end, boolean bSuppressed, boolean bValid, DebugNode debugNode)
 	{
-		super( value, begin, end, bSuppressed, bValid, bindings );
+		super( value, begin, end, bSuppressed, bValid );
 		this.debugNode = debugNode;
 	}
 	

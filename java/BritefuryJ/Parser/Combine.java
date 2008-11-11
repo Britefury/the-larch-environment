@@ -7,10 +7,7 @@
 package BritefuryJ.Parser;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-
-import BritefuryJ.Parser.ParseResult.NameAlreadyBoundException;
 
 public class Combine extends BranchExpression
 {
@@ -19,12 +16,12 @@ public class Combine extends BranchExpression
 		super( subexps );
 	}
 	
-	public Combine(Object[] subexps)
+	public Combine(Object[] subexps) throws ParserCoerceException
 	{
 		super( subexps );
 	}
 	
-	public Combine(List<Object> subexps)
+	public Combine(List<Object> subexps) throws ParserCoerceException
 	{
 		super( subexps );
 	}
@@ -34,7 +31,6 @@ public class Combine extends BranchExpression
 	protected ParseResult parseString(ParserState state, String input, int start, int stop)
 	{
 		ArrayList<Object> values = new ArrayList<Object>();
-		HashMap<String, Object> bindings = null;
 		boolean bFinalValueIsString = true;
 		
 		int pos = start;
@@ -54,15 +50,6 @@ public class Combine extends BranchExpression
 			}
 			else
 			{
-				try
-				{
-					bindings = result.addBindingsTo( bindings );
-				}
-				catch (NameAlreadyBoundException e)
-				{
-					return ParseResult.failure( pos );
-				}
-
 				if ( !result.isSuppressed() )
 				{
 					values.add( result.value );
@@ -85,7 +72,7 @@ public class Combine extends BranchExpression
 				value += s;
 			}
 			
-			return new ParseResult( value, start, pos, bindings );
+			return new ParseResult( value, start, pos );
 		}
 		else
 		{
@@ -104,57 +91,8 @@ public class Combine extends BranchExpression
 				}
 			}
 
-			return new ParseResult( value, start, pos, bindings );
+			return new ParseResult( value, start, pos );
 		}
-	}
-	
-	
-	@SuppressWarnings("unchecked")
-	protected ParseResult parseNode(ParserState state, Object input, int start, int stop)
-	{
-		ArrayList<Object> values = new ArrayList<Object>();
-		
-		int pos = start;
-		for (int i = 0; i < subexps.length; i++)
-		{
-			if ( pos > stop )
-			{
-				return ParseResult.failure( pos );
-			}
-			
-			ParseResult result = subexps[i].evaluateNode(  state, input, pos, stop );
-			pos = result.end;
-			
-			if ( !result.isValid() )
-			{
-				return ParseResult.failure( pos );
-			}
-			else
-			{
-				if ( !result.isSuppressed() )
-				{
-					values.add( result.value );
-				}
-			}
-		}
-		
-		
-		ArrayList<Object> value = new ArrayList<Object>();
-		
-		for (Object v: values)
-		{
-			if ( v instanceof List )
-			{
-				List<Object> l = (List<Object>)v;
-				value.addAll( l );
-			}
-			else
-			{
-				value.add( v );
-			}
-		}
-
-		return new ParseResult( value, start, pos );
 	}
 	
 	
@@ -164,7 +102,7 @@ public class Combine extends BranchExpression
 		return new Combine( appendToSubexps( x ) );
 	}
 
-	public ParserExpression __sub__(Object x)
+	public ParserExpression __sub__(Object x) throws ParserCoerceException
 	{
 		return new Combine( appendToSubexps( coerce( x ) ) );
 	}
@@ -173,11 +111,5 @@ public class Combine extends BranchExpression
 	public String toString()
 	{
 		return "Combine( " + subexpsToString() + " )";
-	}
-
-	
-	protected boolean isSequence()
-	{
-		return true;
 	}
 }

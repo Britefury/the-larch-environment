@@ -13,12 +13,12 @@ public class Repetition extends UnaryBranchExpression
 	protected int minRepetitions, maxRepetitions;
 	protected boolean bNullIfZero;
 	
-	public Repetition(String subexp, int minRepetitions, int maxRepetitions)
+	public Repetition(ParserExpression subexp, int minRepetitions, int maxRepetitions)
 	{
 		this( subexp, minRepetitions, maxRepetitions, false );
 	}
 
-	public Repetition(String subexp, int minRepetitions, int maxRepetitions, boolean bNullIfZero)
+	public Repetition(ParserExpression subexp, int minRepetitions, int maxRepetitions, boolean bNullIfZero)
 	{
 		super( subexp );
 		
@@ -27,12 +27,12 @@ public class Repetition extends UnaryBranchExpression
 		this.bNullIfZero = bNullIfZero;
 	}
 	
-	public Repetition(ParserExpression subexp, int minRepetitions, int maxRepetitions)
+	public Repetition(Object subexp, int minRepetitions, int maxRepetitions) throws ParserCoerceException
 	{
 		this( subexp, minRepetitions, maxRepetitions, false );
 	}
 
-	public Repetition(ParserExpression subexp, int minRepetitions, int maxRepetitions, boolean bNullIfZero)
+	public Repetition(Object subexp, int minRepetitions, int maxRepetitions, boolean bNullIfZero) throws ParserCoerceException
 	{
 		super( subexp );
 		
@@ -69,54 +69,6 @@ public class Repetition extends UnaryBranchExpression
 		while ( pos <= stop  &&  ( maxRepetitions == -1  ||  i < maxRepetitions ) )
 		{
 			ParseResult res = subexp.evaluateString( state, input, pos, stop );
-			errorPos = res.end;
-			
-			if ( !res.isValid() )
-			{
-				break;
-			}
-			else
-			{
-				if ( !res.isSuppressed() )
-				{
-					values.add( res.value );
-				}
-				pos = res.end;
-				i++;
-			}
-		}
-		
-		
-		if ( ( i < minRepetitions)  ||  ( maxRepetitions != -1  &&  i > maxRepetitions ) )
-		{
-			return ParseResult.failure( errorPos );
-		}
-		else
-		{
-			if ( bNullIfZero  &&  i == 0 )
-			{
-				return new ParseResult( null, start, pos );
-			}
-			else
-			{
-				return new ParseResult( values, start, pos );
-			}
-		}
-
-	}
-	
-
-	protected ParseResult parseNode(ParserState state, Object input, int start, int stop)
-	{
-		ArrayList<Object> values = new ArrayList<Object>();
-		
-		int pos = start;
-		int errorPos = start;
-		int i = 0;
-		
-		while ( pos <= stop  &&  ( maxRepetitions == -1  ||  i < maxRepetitions ) )
-		{
-			ParseResult res = subexp.evaluateNode( state, input, pos, stop );
 			errorPos = res.end;
 			
 			if ( !res.isValid() )

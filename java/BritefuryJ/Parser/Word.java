@@ -9,7 +9,7 @@ package BritefuryJ.Parser;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Word extends Terminal
+public class Word extends ParserExpression
 {
 	protected String initChars, bodyChars;
 	protected Pattern pattern;
@@ -78,11 +78,5 @@ public class Word extends Terminal
 	public String toString()
 	{
 		return "Word( \"" + initChars + "\", \"" + bodyChars + "\" )";
-	}
-
-
-	protected boolean isTerminal()
-	{
-		return true;
 	}
 }

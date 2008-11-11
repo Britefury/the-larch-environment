@@ -20,12 +20,12 @@ public abstract class BranchExpression extends ParserExpression
 		this.subexps = subexps;
 	}
 	
-	public BranchExpression(Object[] subexps)
+	public BranchExpression(Object[] subexps) throws ParserCoerceException
 	{
 		this( Arrays.asList( subexps ) );
 	}
 	
-	public BranchExpression(List<Object> subexps)
+	public BranchExpression(List<Object> subexps) throws ParserCoerceException
 	{
 		ArrayList<ParserExpression> xs = new ArrayList<ParserExpression>();
 		
