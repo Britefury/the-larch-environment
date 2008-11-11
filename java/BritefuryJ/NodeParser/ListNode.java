@@ -4,10 +4,13 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.Parser;
+package BritefuryJ.NodeParser;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+
+import BritefuryJ.NodeParser.ParseResult.NameAlreadyBoundException;
 
 public class ListNode extends BranchExpression
 {
@@ -36,6 +39,7 @@ public class ListNode extends BranchExpression
 	private ParseResult parseNodeContents(ParserState state, List<Object> input, int start, int stop)
 	{
 		ArrayList<Object> value = new ArrayList<Object>();
+		HashMap<String, Object> bindings = null;
 		
 		int pos = start;
 		for (int i = 0; i < subexps.length; i++)
@@ -54,6 +58,15 @@ public class ListNode extends BranchExpression
 			}
 			else
 			{
+				try
+				{
+					bindings = result.addBindingsTo( bindings );
+				}
+				catch (NameAlreadyBoundException e)
+				{
+					return ParseResult.failure( pos );
+				}
+				
 				if ( !result.isSuppressed() )
 				{
 					value.add( result.value );
@@ -63,7 +76,7 @@ public class ListNode extends BranchExpression
 		
 		if ( pos == stop )
 		{
-			return new ParseResult( value, start, pos );
+			return new ParseResult( value, start, pos, bindings );
 		}
 		else
 		{

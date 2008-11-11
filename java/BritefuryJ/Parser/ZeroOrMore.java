@@ -9,16 +9,6 @@ package BritefuryJ.Parser;
 
 public class ZeroOrMore extends Repetition
 {
-	public ZeroOrMore(String subexp)
-	{
-		this( subexp, false );
-	}
-
-	public ZeroOrMore(String subexp, boolean bNullIfZero)
-	{
-		super( subexp, 0, -1, bNullIfZero );
-	}
-	
 	public ZeroOrMore(ParserExpression subexp)
 	{
 		this( subexp, false );
@@ -29,6 +19,16 @@ public class ZeroOrMore extends Repetition
 		super( subexp, 0, -1, bNullIfZero );
 	}
 
+	public ZeroOrMore(Object subexp) throws ParserCoerceException
+	{
+		this( subexp, false );
+	}
+
+	public ZeroOrMore(Object subexp, boolean bNullIfZero) throws ParserCoerceException
+	{
+		super( subexp, 0, -1, bNullIfZero );
+	}
+	
 
 
 	public String toString()

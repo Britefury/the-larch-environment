@@ -6,7 +6,7 @@
 //##************************
 package BritefuryJ.Parser;
 
-public class Literal extends Terminal
+public class Literal extends ParserExpression
 {
 	protected String matchString;
 	
@@ -58,11 +58,5 @@ public class Literal extends Terminal
 	public String toString()
 	{
 		return "Literal( \"" + matchString + "\" )";
-	}
-
-
-	protected boolean isTerminal()
-	{
-		return true;
 	}
 }

@@ -9,7 +9,6 @@ package tests.Parser;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import BritefuryJ.Parser.Action;
 import BritefuryJ.Parser.BestChoice;
@@ -118,11 +117,11 @@ public class Test_Parser extends ParserTestCase
 	}
 	
 	
-	public void testAction()
+	public void testAction() throws ParserExpression.ParserCoerceException
 	{
 		ParseAction f = new ParseAction()
 		{
-			public Object invoke(Object input, int begin, Object value, Map<String, Object> bindings)
+			public Object invoke(String input, int begin, Object value)
 			{
 				String v = (String)value;
 				return v + v;
@@ -131,7 +130,7 @@ public class Test_Parser extends ParserTestCase
 
 		ParseAction g = new ParseAction()
 		{
-			public Object invoke(Object input, int begin, Object value, Map<String, Object> bindings)
+			public Object invoke(String input, int begin, Object value)
 			{
 				String v = (String)value;
 				return v + v + v;
@@ -143,18 +142,17 @@ public class Test_Parser extends ParserTestCase
 		assertFalse( new Action( "abc", f ).compareTo( new Action( "abc", g ) ) );
 		assertTrue( new Action( "abc", f ).compareTo( new Literal( "abc" ).action( f ) ) );
 		
-		ParserExpression parser = new Literal( "abc" ).bindTo( "x" ).action( f );
+		ParserExpression parser = new Literal( "abc" ).action( f );
 		
 		matchTest( parser, "abc", "abcabc" );
-		bindingsTestSX( parser, "abc", "((x abc))" );
 	}
 
 
-	public void testCondition()
+	public void testCondition() throws ParserExpression.ParserCoerceException
 	{
 		ParseCondition f = new ParseCondition()
 		{
-			public boolean test(Object input, int begin, Object value, Map<String, Object> bindings)
+			public boolean test(String input, int begin, Object value)
 			{
 				String v = (String)value;
 				return v.startsWith( "hello" );
@@ -163,7 +161,7 @@ public class Test_Parser extends ParserTestCase
 
 		ParseCondition g = new ParseCondition()
 		{
-			public boolean test(Object input, int begin, Object value, Map<String, Object> bindings)
+			public boolean test(String input, int begin, Object value)
 			{
 				String v = (String)value;
 				return v.startsWith( "there" );
@@ -175,46 +173,14 @@ public class Test_Parser extends ParserTestCase
 		assertFalse( new Condition( "abc", f ).compareTo( new Condition( "abc", g ) ) );
 		assertTrue( new Condition( "abc", f ).compareTo( new Literal( "abc" ).condition( f ) ) );
 		
-		ParserExpression parser = new Word( "abcdefghijklmnopqrstuvwxyz" ).bindTo( "x" ).condition( f );
+		ParserExpression parser = new Word( "abcdefghijklmnopqrstuvwxyz" ).condition( f );
 		
 		matchTest( parser, "helloworld", "helloworld" );
 		matchFailTest( parser, "xabcdef" );
-		bindingsTestSX( parser, "hellothere", "((x hellothere))" );
 	}
 	
 	
-	public void testBind()
-	{
-		ParserExpression parser1 = identifier.bindTo( "x" );
-		
-		matchTestSX( parser1, "abc", "abc" );
-		bindingsTestSX( parser1, "abc", "((x abc))" );
-
-	
-		ParserExpression parser2 = identifier.bindTo( "x" ).bindTo( "y" );
-		
-		matchTestSX( parser2, "abc", "abc" );
-		bindingsTestSX( parser2, "abc", "((x abc) (y abc))" );
-
-	
-		//ParserExpression parser3 = new OneOrMore( identifier.bindTo( "x" ) );
-		
-		//matchTestSX( parser3, "abc", "(abc)" );
-		//bindingsTestSX( parser3, "abc", "((x abc))" );
-		//matchFailTest( parser3, "abc abc" );
-	}
-	
-	
-	public void testRebind()
-	{
-		//ParserExpression parser1 = new ZeroOrMore( identifier.bindTo( "x" ) );
-		
-		//matchTest( parser1, "abc", "abc" );
-		//bindingsTestSX( parser1, "abc", "((x abc))" );
-	}
-	
-	
-	public void testSequence()
+	public void testSequence() throws ParserExpression.ParserCoerceException
 	{
 		Object[] abqwfh = { new Literal( "ab" ), new Literal( "qw" ), new Literal( "fh" ) };
 		Object[] abqw = { new Literal( "ab" ), new Literal( "qw" ) };
@@ -226,18 +192,17 @@ public class Test_Parser extends ParserTestCase
 		assertTrue( new Sequence( abqwfh ).compareTo( new Literal( "ab" ).__add__( new Literal( "qw" ) ).__add__( new Literal( "fh" ) ) ) );
 		assertTrue( new Sequence( abqwfh ).compareTo( new Literal( "ab" ).__add__( "qw" ).__add__( "fh" ) ) );
 
-		Object[] subs = { new Literal( "ab" ).bindTo( "x" ), new Literal( "qw" ).bindTo( "y" ), new Literal( "fh" ) };
+		Object[] subs = { new Literal( "ab" ), new Literal( "qw" ), new Literal( "fh" ) };
 		ParserExpression parser = new Sequence( subs );
 		
 		String[] result = { "ab", "qw", "fh" };
 		
 		matchTest( parser, "abqwfh", Arrays.asList( result ) );
 		matchFailTest( parser, "abfh" );
-		bindingsTestSX( parser, "abqwfh", "((x ab) (y qw))" );
 	}
 
 
-	public void testCombine()
+	public void testCombine() throws ParserExpression.ParserCoerceException
 	{
 		Object[] abqwfh = { new Literal( "ab" ), new Literal( "qw" ), new Literal( "fh" ) };
 		Object[] abqw = { new Literal( "ab" ), new Literal( "qw" ) };
@@ -249,12 +214,11 @@ public class Test_Parser extends ParserTestCase
 		assertTrue( new Combine( abqwfh ).compareTo( new Literal( "ab" ).__sub__( new Literal( "qw" ) ).__sub__( new Literal( "fh" ) ) ) );
 		assertTrue( new Combine( abqwfh ).compareTo( new Literal( "ab" ).__sub__( "qw" ).__sub__( "fh" ) ) );
 
-		Object[] subs = { new Literal( "ab" ).bindTo( "x" ), new Literal( "qw" ).bindTo( "y" ), new Literal( "fh" ) };
-		ParserExpression parser = new Combine( subs ).bindTo( "p" );
+		Object[] subs = { new Literal( "ab" ), new Literal( "qw" ), new Literal( "fh" ) };
+		ParserExpression parser = new Combine( subs );
 		
 		matchTest( parser, "abqwfh", "abqwfh" );
 		matchFailTest( parser, "abfh" );
-		bindingsTestSX( parser, "abqwfh", "((x ab) (y qw) (p abqwfh))" );
 
 	
 	
@@ -273,24 +237,23 @@ public class Test_Parser extends ParserTestCase
 	}
 
 
-	public void testSuppress()
+	public void testSuppress() throws ParserExpression.ParserCoerceException
 	{
 		assertTrue( new Suppress( new Literal( "ab" ) ).compareTo( new Suppress( new Literal( "ab" ) ) ) );
 		assertFalse( new Suppress( new Literal( "ab" ) ).compareTo( new Suppress( new Literal( "cd" ) ) ) );
 		assertTrue( new Suppress( new Literal( "ab" ) ).compareTo( new Literal( "ab" ).suppress() ) );
 
-		Object[] subs = { new Literal( "ab" ).bindTo( "x" ), new Literal( "qw" ).bindTo( "y" ).suppress(), new Literal( "fh" ) };
+		Object[] subs = { new Literal( "ab" ), new Literal( "qw" ).suppress(), new Literal( "fh" ) };
 		ParserExpression parser = new Sequence( subs );
 		
 		String[] result = { "ab", "fh" };
 		
 		matchTest( parser, "abqwfh", Arrays.asList( result ) );
 		matchFailTest( parser, "abfh" );
-		bindingsTestSX( parser, "abqwfh", "((x ab) (y qw))" );
 	}
 
 
-	public void testChoice()
+	public void testChoice() throws ParserExpression.ParserCoerceException
 	{
 		Object[] abqwfh = { new Literal( "ab" ), new Literal( "qw" ), new Literal( "fh" ) };
 		Object[] abqw = { new Literal( "ab" ), new Literal( "qw" ) };
@@ -302,7 +265,7 @@ public class Test_Parser extends ParserTestCase
 		assertTrue( new Choice( abqwfh ).compareTo( new Literal( "ab" ).__or__( new Literal( "qw" ) ).__or__( new Literal( "fh" ) ) ) );
 		assertTrue( new Choice( abqwfh ).compareTo( new Literal( "ab" ).__or__( "qw" ).__or__( "fh" ) ) );
 
-		Object[] subs = { new Literal( "ab" ).bindTo( "x" ), new Literal( "qw" ).bindTo( "x" ), new Literal( "fh" ) };
+		Object[] subs = { new Literal( "ab" ), new Literal( "qw" ), new Literal( "fh" ) };
 		ParserExpression parser = new Choice( subs );
 		
 		matchTest( parser, "ab", "ab" );
@@ -311,12 +274,9 @@ public class Test_Parser extends ParserTestCase
 		matchFailTest( parser, "xy" );
 		matchSubTest( new Literal( "ab" ).__or__( "abcd" ), "ab", "ab", 2 );
 		matchSubTest( new Literal( "ab" ).__or__( "abcd" ), "abcd", "ab", 2 );
-		bindingsTestSX( parser, "ab", "((x ab))" );
-		bindingsTestSX( parser, "qw", "((x qw))" );
-		bindingsTestSX( parser, "fh", "()" );
 	}
 
-	public void testBestChoice()
+	public void testBestChoice() throws ParserExpression.ParserCoerceException
 	{
 		Object[] abqwfh = { new Literal( "ab" ), new Literal( "qw" ), new Literal( "fh" ) };
 		Object[] abqw = { new Literal( "ab" ), new Literal( "qw" ) };
@@ -328,7 +288,7 @@ public class Test_Parser extends ParserTestCase
 		assertTrue( new BestChoice( abqwfh ).compareTo( new Literal( "ab" ).__xor__( new Literal( "qw" ) ).__xor__( new Literal( "fh" ) ) ) );
 		assertTrue( new BestChoice( abqwfh ).compareTo( new Literal( "ab" ).__xor__( "qw" ).__xor__( "fh" ) ) );
 
-		Object[] subs = { new Literal( "ab" ).bindTo( "x" ), new Literal( "qw" ).bindTo( "x" ), new Literal( "fh" ) };
+		Object[] subs = { new Literal( "ab" ), new Literal( "qw" ), new Literal( "fh" ) };
 		ParserExpression parser = new BestChoice( subs );
 		
 		matchTest( parser, "ab", "ab" );
@@ -337,29 +297,24 @@ public class Test_Parser extends ParserTestCase
 		matchFailTest( parser, "xy" );
 		matchSubTest( new Literal( "ab" ).__xor__( "abcd" ), "ab", "ab", 2 );
 		matchSubTest( new Literal( "ab" ).__xor__( "abcd" ), "abcd", "abcd", 4 );
-		bindingsTestSX( parser, "ab", "((x ab))" );
-		bindingsTestSX( parser, "qw", "((x qw))" );
-		bindingsTestSX( parser, "fh", "()" );
 	}
 
 
-	public void testOptional()
+	public void testOptional() throws ParserExpression.ParserCoerceException
 	{
 		assertTrue( new Optional( new Literal( "ab" ) ).compareTo( new Optional( new Literal( "ab" ) ) ) );
 		assertFalse( new Optional( new Literal( "ab" ) ).compareTo( new Optional( new Literal( "cd" ) ) ) );
 		assertTrue( new Optional( new Literal( "ab" ) ).compareTo( new Optional( "ab" ) ) );
 
-		ParserExpression parser = new Optional( new Word( "a", "b" ).bindTo( "x" ) );
+		ParserExpression parser = new Word( "a", "b" ).optional();
 		
 		matchTest( parser, "", null );
 		matchTest( parser, "abb", "abb" );
 		matchSubTest( parser, "abbabb", "abb", 3 );
-		bindingsTestSX( parser, "", "()" );
-		bindingsTestSX( parser, "abb", "((x abb))" );
 	}
 
 
-	public void testRepetition()
+	public void testRepetition() throws ParserExpression.ParserCoerceException
 	{
 		assertTrue( new Repetition( new Literal( "ab" ), 0, 1, false ).compareTo( new Repetition( new Literal( "ab" ), 0, 1, false ) ) );
 		assertFalse( new Repetition( new Literal( "ab" ), 0, 1, false ).compareTo( new Repetition( new Literal( "cd" ), 0, 1, false ) ) );
@@ -421,7 +376,7 @@ public class Test_Parser extends ParserTestCase
 	}
 
 
-	public void testZeroOrMore()
+	public void testZeroOrMore() throws ParserExpression.ParserCoerceException
 	{
 		assertTrue( new ZeroOrMore( new Literal( "ab" ), false ).compareTo( new ZeroOrMore( new Literal( "ab" ), false ) ) );
 		assertFalse( new ZeroOrMore( new Literal( "ab" ), false ).compareTo( new ZeroOrMore( new Literal( "cd" ), false ) ) );
@@ -449,7 +404,7 @@ public class Test_Parser extends ParserTestCase
 
 
 
-	public void testOneOrMore()
+	public void testOneOrMore() throws ParserExpression.ParserCoerceException
 	{
 		assertTrue( new OneOrMore( new Literal( "ab" ) ).compareTo( new OneOrMore( new Literal( "ab" ) ) ) );
 		assertFalse( new OneOrMore( new Literal( "ab" ) ).compareTo( new OneOrMore( new Literal( "cd" ) ) ) );
@@ -472,7 +427,7 @@ public class Test_Parser extends ParserTestCase
 
 
 
-	public void testPeek()
+	public void testPeek() throws ParserExpression.ParserCoerceException
 	{
 		assertTrue( new Peek( new Literal( "ab" ) ).compareTo( new Peek( new Literal( "ab" ) ) ) );
 		assertFalse( new Peek( new Literal( "ab" ) ).compareTo( new Peek( new Literal( "cd" ) ) ) );
@@ -492,7 +447,7 @@ public class Test_Parser extends ParserTestCase
 
 
 
-	public void testPeekNot()
+	public void testPeekNot() throws ParserExpression.ParserCoerceException
 	{
 		assertTrue( new PeekNot( new Literal( "ab" ) ).compareTo( new PeekNot( new Literal( "ab" ) ) ) );
 		assertFalse( new PeekNot( new Literal( "ab" ) ).compareTo( new PeekNot( new Literal( "cd" ) ) ) );
@@ -525,7 +480,7 @@ public class Test_Parser extends ParserTestCase
 		ParseAction flattenAction = new ParseAction()
 		{
 			@SuppressWarnings("unchecked")
-			public Object invoke(Object input, int begin, Object x, Map<String, Object> bindings)
+			public Object invoke(String input, int begin, Object x)
 			{
 				ArrayList<Object> y = new ArrayList<Object>();
 				List<Object> xx = (List<Object>)x;
@@ -540,7 +495,7 @@ public class Test_Parser extends ParserTestCase
 		ParseAction action = new ParseAction()
 		{
 			@SuppressWarnings("unchecked")
-			public Object invoke(Object input, int begin, Object x, Map<String, Object> bindings)
+			public Object invoke(String input, int begin, Object x)
 			{
 				List<Object> xx = (List<Object>)x;
 				if ( xx.get( 1 ).equals( new ArrayList<Object>() ) )
@@ -582,7 +537,7 @@ public class Test_Parser extends ParserTestCase
 	}
 
 
-	public void testRightRecursion()
+	public void testRightRecursion() throws ParserExpression.ParserCoerceException
 	{
 		ParserExpression x = new Production( "x" );
 		Forward y = new Forward();
@@ -592,7 +547,7 @@ public class Test_Parser extends ParserTestCase
 	}
 
 
-	public void testDirectLeftRecursion()
+	public void testDirectLeftRecursion() throws ParserExpression.ParserCoerceException
 	{
 		ParserExpression x = new Production( "x" );
 		Forward y = new Forward();
@@ -601,7 +556,7 @@ public class Test_Parser extends ParserTestCase
 		matchTestSX( y, "yxxx", "(((y x) x) x)" );
 	}
 
-	public void testIndirectLeftRecursion()
+	public void testIndirectLeftRecursion() throws ParserExpression.ParserCoerceException
 	{
 		Production x = new Production( "x" );
 		Forward z = new Forward();
@@ -651,7 +606,7 @@ public class Test_Parser extends ParserTestCase
 
 
 
-	public void testLeftRecursionSimplifiedJavaPrimary()
+	public void testLeftRecursionSimplifiedJavaPrimary() throws ParserExpression.ParserCoerceException
 	{
 		Forward primary = new Forward();
 		

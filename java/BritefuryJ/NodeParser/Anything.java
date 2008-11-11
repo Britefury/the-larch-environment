@@ -4,11 +4,11 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.Parser;
+package BritefuryJ.NodeParser;
 
 import java.util.List;
 
-public class Anything extends Terminal
+public class Anything extends ParserExpression
 {
 	public Anything()
 	{
@@ -17,17 +17,6 @@ public class Anything extends Terminal
 	
 	
 
-	protected ParseResult parseString(ParserState state, String input, int start, int stop)
-	{
-		if ( stop > start )
-		{
-			return new ParseResult( input.substring( start, start + 1 ), start, start + 1 );
-		}
-		
-		return ParseResult.failure( start );
-	}
-
-	
 	@SuppressWarnings("unchecked")
 	protected ParseResult parseNode(ParserState state, Object input, int start, int stop)
 	{

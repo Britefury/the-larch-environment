@@ -6,8 +6,6 @@
 //##************************
 package BritefuryJ.Parser;
 
-import java.util.Map;
-
 import org.python.core.Py;
 import org.python.core.PyInteger;
 import org.python.core.PyObject;
@@ -25,7 +23,7 @@ public class Condition extends UnaryBranchExpression
 		}
 
 
-		public boolean test(Object input, int begin, Object x, Map<String, Object> bindings)
+		public boolean test(String input, int begin, Object x)
 		{
 			return Py.py2boolean( callable.__call__( Py.java2py( input ), new PyInteger( begin ), Py.java2py( x ) ) );
 		}
@@ -36,7 +34,7 @@ public class Condition extends UnaryBranchExpression
 	protected ParseCondition cond;
 	
 	
-	public Condition(String subexp, ParseCondition cond)
+	public Condition(String subexp, ParseCondition cond) throws ParserCoerceException
 	{
 		super( subexp );
 		this.cond = cond;
@@ -49,7 +47,7 @@ public class Condition extends UnaryBranchExpression
 	}
 	
 
-	public Condition(String subexp, PyObject cond)
+	public Condition(String subexp, PyObject cond) throws ParserCoerceException
 	{
 		this( subexp, new PyCondition( cond ) );
 	}
@@ -73,29 +71,7 @@ public class Condition extends UnaryBranchExpression
 		
 		if ( res.isValid() )
 		{
-			if ( cond.test( input, res.begin, res.value, res.bindings ) )
-			{
-				return res;
-			}
-			else
-			{
-				return ParseResult.failure( res.end );
-			}
-		}
-		else
-		{
-			return res;
-		}
-	}
-
-
-	protected ParseResult parseNode(ParserState state, Object input, int start, int stop)
-	{
-		ParseResult res = subexp.evaluateNode( state, input, start, stop );
-		
-		if ( res.isValid() )
-		{
-			if ( cond.test( input, res.begin, res.value, res.bindings ) )
+			if ( cond.test( input, res.begin, res.value ) )
 			{
 				return res;
 			}

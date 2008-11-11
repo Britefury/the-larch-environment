@@ -6,8 +6,6 @@
 //##************************
 package BritefuryJ.Parser;
 
-import java.util.Map;
-
 import org.python.core.Py;
 import org.python.core.PyInteger;
 import org.python.core.PyObject;
@@ -25,7 +23,7 @@ public class Action extends UnaryBranchExpression
 		}
 
 
-		public Object invoke(Object input, int begin, Object x, Map<String, Object> bindings)
+		public Object invoke(String input, int begin, Object x)
 		{
 			return callable.__call__( Py.java2py( input ), new PyInteger( begin ), Py.java2py( x ) );
 		}
@@ -35,7 +33,7 @@ public class Action extends UnaryBranchExpression
 	protected ParseAction a;
 	
 	
-	public Action(String subexp, ParseAction a)
+	public Action(String subexp, ParseAction a) throws ParserCoerceException
 	{
 		super( subexp );
 		this.a = a;
@@ -48,7 +46,7 @@ public class Action extends UnaryBranchExpression
 	}
 	
 	
-	public Action(String subexp, PyObject a)
+	public Action(String subexp, PyObject a) throws ParserCoerceException
 	{
 		this( subexp, new PyAction( a ) );
 	}
@@ -71,28 +69,13 @@ public class Action extends UnaryBranchExpression
 		
 		if ( res.isValid() )
 		{
-			return res.withValidUnsuppressedValue( a.invoke(  input, res.begin, res.value, res.bindings ) );
+			return res.withValidUnsuppressedValue( a.invoke(  input, res.begin, res.value ) );
 		}
 		else
 		{
 			return res;
 		}
 	}
-
-	protected ParseResult parseNode(ParserState state, Object input, int start, int stop)
-	{
-		ParseResult res = subexp.evaluateNode( state, input, start, stop );
-		
-		if ( res.isValid() )
-		{
-			return new ParseResult( this.a.invoke( input, res.begin, res.value, res.bindings ), res.begin, res.end );
-		}
-		else
-		{
-			return res;
-		}
-	}
-
 
 
 	public boolean compareTo(ParserExpression x)

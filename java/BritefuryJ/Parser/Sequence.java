@@ -7,10 +7,7 @@
 package BritefuryJ.Parser;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-
-import BritefuryJ.Parser.ParseResult.NameAlreadyBoundException;
 
 public class Sequence extends BranchExpression
 {
@@ -19,12 +16,12 @@ public class Sequence extends BranchExpression
 		super( subexps );
 	}
 	
-	public Sequence(Object[] subexps)
+	public Sequence(Object[] subexps) throws ParserCoerceException
 	{
 		super( subexps );
 	}
 	
-	public Sequence(List<Object> subexps)
+	public Sequence(List<Object> subexps) throws ParserCoerceException
 	{
 		super( subexps );
 	}
@@ -33,7 +30,6 @@ public class Sequence extends BranchExpression
 	protected ParseResult parseString(ParserState state, String input, int start, int stop)
 	{
 		ArrayList<Object> value = new ArrayList<Object>();
-		HashMap<String, Object> bindings = null;
 		
 		int pos = start;
 		for (int i = 0; i < subexps.length; i++)
@@ -52,47 +48,6 @@ public class Sequence extends BranchExpression
 			}
 			else
 			{
-				try
-				{
-					bindings = result.addBindingsTo( bindings );
-				}
-				catch (NameAlreadyBoundException e)
-				{
-					return ParseResult.failure( pos );
-				}
-
-				if ( !result.isSuppressed() )
-				{
-					value.add( result.value );
-				}
-			}
-		}
-		
-		return new ParseResult( value, start, pos, bindings );
-	}
-	
-	
-	protected ParseResult parseNode(ParserState state, Object input, int start, int stop)
-	{
-		ArrayList<Object> value = new ArrayList<Object>();
-		
-		int pos = start;
-		for (int i = 0; i < subexps.length; i++)
-		{
-			if ( pos > stop )
-			{
-				return ParseResult.failure( pos );
-			}
-			
-			ParseResult result = subexps[i].evaluateNode(  state, input, pos, stop );
-			pos = result.end;
-			
-			if ( !result.isValid() )
-			{
-				return ParseResult.failure( pos );
-			}
-			else
-			{
 				if ( !result.isSuppressed() )
 				{
 					value.add( result.value );
@@ -102,15 +57,15 @@ public class Sequence extends BranchExpression
 		
 		return new ParseResult( value, start, pos );
 	}
-	
-	
 
+	
+	
 	public ParserExpression __add__(ParserExpression x)
 	{
 		return new Sequence( appendToSubexps( x ) );
 	}
 
-	public ParserExpression __add__(Object x)
+	public ParserExpression __add__(Object x) throws ParserCoerceException
 	{
 		return new Sequence( appendToSubexps( coerce( x ) ) );
 	}
@@ -119,11 +74,5 @@ public class Sequence extends BranchExpression
 	public String toString()
 	{
 		return "Sequence( " + subexpsToString() + " )";
-	}
-
-	
-	protected boolean isSequence()
-	{
-		return true;
 	}
 }

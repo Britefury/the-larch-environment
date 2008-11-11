@@ -10,7 +10,7 @@ import org.python.core.PyObject;
 
 public class Production extends UnaryBranchExpression
 {
-	public Production(String subexp)
+	public Production(String subexp) throws ParserCoerceException
 	{
 		super( subexp );
 	}
@@ -33,12 +33,6 @@ public class Production extends UnaryBranchExpression
 	}
 
 
-	protected ParseResult parseNode(ParserState state, Object input, int start, int stop)
-	{
-		return state.memoisedMatchNode( subexp, input, start, stop );
-	}
-
-
 
 	public ParserExpression action(ParseAction a)
 	{
@@ -55,14 +49,14 @@ public class Production extends UnaryBranchExpression
 		return new Production( new Condition( subexp, cond ), debugName );
 	}
 	
-	public ParserExpression bindTo(String name)
-	{
-		return new Production( new Bind( name, subexp ), debugName );
-	}
-
 	public ParserExpression suppress()
 	{
 		return new Production( new Suppress( subexp ), debugName );
+	}
+
+	public ParserExpression optional()
+	{
+		return new Production( new Optional( subexp ), debugName );
 	}
 
 

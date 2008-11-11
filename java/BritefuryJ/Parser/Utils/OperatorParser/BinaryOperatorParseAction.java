@@ -6,9 +6,7 @@
 //##************************
 package BritefuryJ.Parser.Utils.OperatorParser;
 
-import java.util.Map;
-
 public interface BinaryOperatorParseAction
 {
-	public Object invoke(Object input, int begin, Object left, Object right, Map<String, Object> bindings);
+	public Object invoke(String input, int begin, Object left, Object right);
 }

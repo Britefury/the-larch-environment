@@ -15,12 +15,12 @@ public class BestChoice extends BranchExpression
 		super( subexps );
 	}
 	
-	public BestChoice(Object[] subexps)
+	public BestChoice(Object[] subexps) throws ParserCoerceException
 	{
 		super( subexps );
 	}
 	
-	public BestChoice(List<Object> subexps)
+	public BestChoice(List<Object> subexps) throws ParserCoerceException
 	{
 		super( subexps );
 	}
@@ -57,43 +57,12 @@ public class BestChoice extends BranchExpression
 	}
 	
 
-	protected ParseResult parseNode(ParserState state, Object input, int start, int stop)
-	{
-		ParseResult bestResult = null;
-		int bestPos = -1;
-		int maxErrorPos = start;
-		
-		for (ParserExpression subexp: subexps)
-		{
-			ParseResult result = subexp.evaluateNode(  state, input, start, stop );
-			if ( result.isValid()  &&  result.end > bestPos )
-			{
-				bestResult = result;
-				bestPos = result.end;
-			}
-			else
-			{
-				maxErrorPos = Math.max( maxErrorPos, result.end );
-			}
-		}
-		
-		if ( bestResult != null )
-		{
-			return bestResult;
-		}
-		else
-		{
-			return ParseResult.failure( maxErrorPos );
-		}
-	}
-	
-
 	public ParserExpression __xor__(ParserExpression x)
 	{
 		return new BestChoice( appendToSubexps( x ) );
 	}
 
-	public ParserExpression __xor__(Object x)
+	public ParserExpression __xor__(Object x) throws ParserCoerceException
 	{
 		return new BestChoice( appendToSubexps( coerce( x ) ) );
 	}

@@ -15,7 +15,7 @@ import BritefuryJ.Parser.DebugViewer.ParseViewFrame;
 
 public class DebugViewerTest
 {
-	public static void main(final String[] args)
+	public static void main(final String[] args) throws ParserExpression.ParserCoerceException
 	{
 		String input = "this[i][j].x.m()";
 		ParserExpression parser = buildParser();
@@ -25,7 +25,7 @@ public class DebugViewerTest
 	
 	
 	
-	private static ParserExpression buildParser()
+	private static ParserExpression buildParser() throws ParserExpression.ParserCoerceException
 	{
 		Forward primary = new Forward();
 		

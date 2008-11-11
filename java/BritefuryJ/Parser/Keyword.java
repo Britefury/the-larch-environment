@@ -8,7 +8,7 @@ package BritefuryJ.Parser;
 
 import java.util.regex.Pattern;
 
-public class Keyword extends Terminal
+public class Keyword extends ParserExpression
 {
 	protected String keywordString, disallowedSubsequentChars;
 	private Pattern postPattern;
@@ -77,11 +77,5 @@ public class Keyword extends Terminal
 	public String toString()
 	{
 		return "Keyword( \"" + keywordString + "\", \"" + disallowedSubsequentChars + "\" )";
-	}
-
-
-	protected boolean isTerminal()
-	{
-		return true;
 	}
 }

@@ -7,9 +7,10 @@
 package BritefuryJ.Parser;
 
 
+
 public class PeekNot extends UnaryBranchExpression
 {
-	public PeekNot(String subexp)
+	public PeekNot(String subexp) throws ParserCoerceException
 	{
 		super( subexp );
 	}
@@ -23,21 +24,6 @@ public class PeekNot extends UnaryBranchExpression
 	protected ParseResult parseString(ParserState state, String input, int start, int stop)
 	{
 		ParseResult res = subexp.evaluateString( state, input, start, stop );
-		
-		if ( res.isValid() )
-		{
-			return ParseResult.failure( start );
-		}
-		else
-		{
-			return ParseResult.suppressedNoValue( start, start );
-		}
-	}
-
-
-	protected ParseResult parseNode(ParserState state, Object input, int start, int stop)
-	{
-		ParseResult res = subexp.evaluateNode( state, input, start, stop );
 		
 		if ( res.isValid() )
 		{

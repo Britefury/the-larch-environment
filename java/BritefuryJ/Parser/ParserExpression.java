@@ -12,6 +12,13 @@ import org.python.core.PyObject;
 
 public abstract class ParserExpression
 {
+	public static class ParserCoerceException extends Exception
+	{
+		private static final long serialVersionUID = 1L;
+	};
+	
+	
+	
 	protected String debugName = "";
 	
 	
@@ -86,49 +93,6 @@ public abstract class ParserExpression
 	
 	
 	
-	@SuppressWarnings("unchecked")
-	public ParseResult parseNode(Object input)
-	{
-		int stop;
-		if ( input instanceof String )
-		{
-			stop = ((String)input).length();
-		}
-		else if ( input instanceof List )
-		{
-			stop = ((List<Object>)input).size();
-		}
-		else
-		{
-			stop = 1;
-		}
-		ParserState state = new ParserState( "" );
-		return evaluateRootNode( state, input, 0, stop );
-	}
-	
-	@SuppressWarnings("unchecked")
-	public DebugParseResult debugParseNode(Object input)
-	{
-		int stop;
-		if ( input instanceof String )
-		{
-			stop = ((String)input).length();
-		}
-		else if ( input instanceof List )
-		{
-			stop = ((List<Object>)input).size();
-		}
-		else
-		{
-			stop = 1;
-		}
-		ParserState state = new ParserState( "" );
-		state.enableDebugging();
-		return (DebugParseResult)evaluateRootNode( state, input, 0, stop );
-	}
-	
-	
-
 	protected ParseResult evaluateString(ParserState state, String input, int start, int stop)
 	{
 		if ( state.bDebuggingEnabled )
@@ -177,112 +141,7 @@ public abstract class ParserExpression
 		}
 	}
 	
-	protected ParseResult evaluateNode(ParserState state, Object input, int start, int stop)
-	{
-		if ( state.bDebuggingEnabled )
-		{
-			// Get the current top of the debug stack (outer call)
-			DebugParseResult.DebugNode prev = state.debugStack;
-			// Create the debug info node
-			DebugParseResult.DebugNode node = new DebugParseResult.DebugNode( prev, this );
-
-			// Push @node onto the debug stack
-			state.debugStack = node;
-			
-			// Get the parse result
-			ParseResult result = parseNode( state, input, start, stop );
-			node.setResult( result );
-			
-			// If @prev is valid, add @node as a call-child of @prev
-			if ( prev != null )
-			{
-				prev.addCallChild( node );
-			}
-			
-			// Pop @node off the debug stack
-			state.debugStack = prev;
-			
-			
-			if ( result instanceof DebugParseResult )
-			{
-				DebugParseResult debugResult = (DebugParseResult)result;
-				
-				DebugParseResult.DebugNode fromNode = node;
-				DebugParseResult.DebugNode toNode = debugResult.debugNode;
-				
-				if ( !fromNode.getCallChildren().contains( toNode ) )
-				{
-					fromNode.addMemoChild( toNode );
-				}
-			}
-			
-			
-			return result.debug( node );
-		}
-		else
-		{
-			return parseNode( state, input, start, stop );
-		}
-	}
-	
-	
-	private ParseResult evaluateRootNode(ParserState state, Object input, int start, int stop)
-	{
-		if ( state.bDebuggingEnabled )
-		{
-			// Get the current top of the debug stack (outer call)
-			DebugParseResult.DebugNode prev = state.debugStack;
-			// Create the debug info node
-			DebugParseResult.DebugNode node = new DebugParseResult.DebugNode( prev, this );
-
-			// Push @node onto the debug stack
-			state.debugStack = node;
-			
-			// Get the parse result
-			ParseResult result = parseRootNode( state, input, start, stop );
-			node.setResult( result );
-			
-			// If @prev is valid, add @node as a call-child of @prev
-			if ( prev != null )
-			{
-				prev.addCallChild( node );
-			}
-			
-			// Pop @node off the debug stack
-			state.debugStack = prev;
-			
-			
-			if ( result instanceof DebugParseResult )
-			{
-				DebugParseResult debugResult = (DebugParseResult)result;
-				
-				DebugParseResult.DebugNode fromNode = node;
-				DebugParseResult.DebugNode toNode = debugResult.debugNode;
-				
-				if ( !fromNode.getCallChildren().contains( toNode ) )
-				{
-					fromNode.addMemoChild( toNode );
-				}
-			}
-			
-			
-			return result.debug( node );
-		}
-		else
-		{
-			return parseRootNode( state, input, start, stop );
-		}
-	}
-	
-	
-	
 	protected abstract ParseResult parseString(ParserState state, String input, int start, int stop);
-	protected abstract ParseResult parseNode(ParserState state, Object input, int start, int stop);
-	
-	protected ParseResult parseRootNode(ParserState state, Object input, int start, int stop)
-	{
-		return parseNode( state, input, start, stop );
-	}
 	
 	
 	
@@ -314,7 +173,7 @@ public abstract class ParserExpression
 		return new Sequence( withSibling( x ) );
 	}
 
-	public ParserExpression __add__(Object x)
+	public ParserExpression __add__(Object x) throws ParserCoerceException
 	{
 		return new Sequence( withSibling( coerce( x ) ) );
 	}
@@ -325,7 +184,7 @@ public abstract class ParserExpression
 		return new Combine( withSibling( x ) );
 	}
 
-	public ParserExpression __sub__(Object x)
+	public ParserExpression __sub__(Object x) throws ParserCoerceException
 	{
 		return new Combine( withSibling( coerce( x ) ) );
 	}
@@ -336,7 +195,7 @@ public abstract class ParserExpression
 		return new Choice( withSibling( x ) );
 	}
 
-	public ParserExpression __or__(Object x)
+	public ParserExpression __or__(Object x) throws ParserCoerceException
 	{
 		return new Choice( withSibling( coerce( x ) ) );
 	}
@@ -347,7 +206,7 @@ public abstract class ParserExpression
 		return new BestChoice( withSibling( x ) );
 	}
 
-	public ParserExpression __xor__(Object x)
+	public ParserExpression __xor__(Object x) throws ParserCoerceException
 	{
 		return new BestChoice( withSibling( coerce( x ) ) );
 	}
@@ -385,19 +244,19 @@ public abstract class ParserExpression
 		return new Condition( this, cond );
 	}
 	
-	public ParserExpression bindTo(String name)
-	{
-		return new Bind( name, this );
-	}
-
 	public ParserExpression suppress()
 	{
 		return new Suppress( this );
 	}
 	
+	public ParserExpression optional()
+	{
+		return new Optional( this );
+	}
 	
 	
-	public static ParserExpression coerce(Object x)
+	
+	public static ParserExpression coerce(Object x) throws ParserCoerceException
 	{
 		if ( x instanceof ParserExpression )
 		{
@@ -409,8 +268,13 @@ public abstract class ParserExpression
 		}
 		else
 		{
-			return new LiteralItem( x );
+			throw new ParserCoerceException();
 		}
+	}
+
+	public static ParserExpression coerce(String x)
+	{
+		return new Literal( x );
 	}
 
 
@@ -433,16 +297,5 @@ public abstract class ParserExpression
 	public String toString()
 	{
 		return "ParserExpression()";
-	}
-	
-	
-	protected boolean isTerminal()
-	{
-		return false;
-	}
-	
-	protected boolean isSequence()
-	{
-		return false;
 	}
 }

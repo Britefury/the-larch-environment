@@ -6,9 +6,6 @@
 //##************************
 package BritefuryJ.Parser;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class ParseResult
 {
 	protected static class NameAlreadyBoundException extends Exception
@@ -20,7 +17,6 @@ public class ParseResult
 	protected Object value;
 	protected int begin, end;
 	protected boolean bSuppressed, bValid;
-	protected HashMap<String, Object> bindings;
 	
 	
 	public ParseResult()
@@ -38,16 +34,6 @@ public class ParseResult
 		this.end = end;
 		bSuppressed = false;
 		bValid = true;
-	}
-	
-	public ParseResult(Object value, int begin, int end, HashMap<String, Object> bindings)
-	{
-		this.value = value;
-		this.begin = begin;
-		this.end = end;
-		bSuppressed = false;
-		bValid = true;
-		this.bindings = bindings;
 	}
 	
 	
@@ -69,117 +55,32 @@ public class ParseResult
 		this.bValid = true;
 	}
 	
-	private ParseResult(Object value, int begin, int end, boolean bSuppressed, boolean bValid)
+	protected ParseResult(Object value, int begin, int end, boolean bSuppressed, boolean bValid)
 	{
 		this.value = value;
 		this.begin = begin;
 		this.end = end;
 		this.bSuppressed = bSuppressed;
 		this.bValid = bValid;
-	}
-	
-	protected ParseResult(Object value, int begin, int end, boolean bSuppressed, boolean bValid, HashMap<String, Object> bindings)
-	{
-		this.value = value;
-		this.begin = begin;
-		this.end = end;
-		this.bSuppressed = bSuppressed;
-		this.bValid = bValid;
-		this.bindings = bindings;
 	}
 	
 	
 	
 	protected ParseResult withValidUnsuppressedValue(Object v)
 	{
-		return new ParseResult( v, begin, end, false, true, bindings );
+		return new ParseResult( v, begin, end, false, true );
 	}
 	
 	
 	protected ParseResult suppressed()
 	{
-		return new ParseResult( value, begin, end, true, bValid, bindings );
-	}
-	
-	
-	protected ParseResult bind(String name, Object bindingValue, int start)
-	{
-		HashMap<String, Object> b = new HashMap<String, Object>();
-		
-		if ( bindings != null )
-		{
-			if ( bindings.containsKey( name ) )
-			{
-				if ( !bindingValue.equals( bindings.get( name ) ) )
-				{
-					return failure( start );
-				}
-				else
-				{
-					return this;
-				}
-			}
-			else
-			{
-				b.putAll( bindings );
-			}
-		}
-		
-		b.put( name, bindingValue );
-		
-		return new ParseResult( value, begin, end, bSuppressed, bValid, b );
-	}
-	
-	
-	protected ParseResult clearBindings()
-	{
-		return new ParseResult( value, begin, end, bSuppressed, bValid );
-	}
-	
-	
-	
-	protected HashMap<String, Object> addBindingsTo(HashMap<String, Object> joinedBindings) throws NameAlreadyBoundException
-	{
-		if ( bindings == null )
-		{
-			return joinedBindings;
-		}
-		else
-		{
-			if ( joinedBindings == null )
-			{
-				joinedBindings = new HashMap<String, Object>();
-				joinedBindings.putAll( bindings );
-			}
-			else
-			{
-				for (Map.Entry<String, Object> entry: bindings.entrySet())
-				{
-					String name = entry.getKey();
-					Object value = entry.getValue();
-					if ( joinedBindings.containsKey( name ) )
-					{
-						Object existingValue = joinedBindings.get( name );
-						if ( !value.equals( existingValue ) )
-						{
-							throw new NameAlreadyBoundException();
-						}
-					}
-					else
-					{
-						joinedBindings.put( name, value );
-					}
-				}
-			}
-
-			return joinedBindings;
-		}
+		return new ParseResult( value, begin, end, true, bValid );
 	}
 	
 	
 	protected DebugParseResult debug(DebugParseResult.DebugNode debugNode)
 	{
-		return new DebugParseResult( value, begin, end, bSuppressed, bValid, bindings, debugNode );
+		return new DebugParseResult( value, begin, end, bSuppressed, bValid, debugNode );
 	}
 	
 	
@@ -207,11 +108,6 @@ public class ParseResult
 	public boolean isValid()
 	{
 		return bValid;
-	}
-	
-	public HashMap<String, Object> getBindings()
-	{
-		return bindings;
 	}
 	
 	

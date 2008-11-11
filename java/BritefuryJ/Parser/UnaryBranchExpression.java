@@ -19,7 +19,7 @@ public abstract class UnaryBranchExpression extends ParserExpression
 		this.subexp = subexp;
 	}
 	
-	public UnaryBranchExpression(Object subexp)
+	public UnaryBranchExpression(Object subexp) throws ParserCoerceException
 	{
 		this( coerce( subexp ) );
 	}
