@@ -8,7 +8,7 @@ package BritefuryJ.NodeParser;
 
 import java.util.List;
 
-public abstract class StringTerminal extends ParserExpression
+abstract class StringTerminal extends ParserExpression
 {
 	protected abstract ParseResult parseString(ParserState state, String input);
 	
@@ -43,23 +43,6 @@ public abstract class StringTerminal extends ParserExpression
 		}
 		
 
-		return ParseResult.failure( start );
-	}
-
-
-	protected ParseResult parseRootNode(ParserState state, Object input, int start, int stop)
-	{
-		if ( input instanceof String )
-		{
-			String s = (String)input;
-			ParseResult res = parseString( state, s );
-			if ( res.isValid()  &&  res.end == s.length() )
-			{
-				return res;
-			}
-		}
-
-	
 		return ParseResult.failure( start );
 	}
 }

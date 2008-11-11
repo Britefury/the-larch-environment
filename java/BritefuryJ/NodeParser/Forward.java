@@ -23,7 +23,7 @@ public class Forward extends ParserExpression
 	
 	public ParserExpression setExpression(Object exp)
 	{
-		subexp = coerce( exp );
+		subexp = toParserExpression( exp );
 		return this;
 	}
 	
@@ -42,7 +42,7 @@ public class Forward extends ParserExpression
 	
 	public ParserExpression __lshift__(Object exp)
 	{
-		subexp = coerce( exp );
+		subexp = toParserExpression( exp );
 		return this;
 	}
 	

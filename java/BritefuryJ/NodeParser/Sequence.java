@@ -80,7 +80,7 @@ public class Sequence extends BranchExpression
 
 	public ParserExpression __add__(Object x)
 	{
-		return new Sequence( appendToSubexps( coerce( x ) ) );
+		return new Sequence( appendToSubexps( toParserExpression( x ) ) );
 	}
 
 

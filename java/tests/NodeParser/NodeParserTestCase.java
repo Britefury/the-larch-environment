@@ -19,17 +19,29 @@ public class NodeParserTestCase extends TestCase
 {
 	public void matchNodeTestSX(ParserExpression parser, String inputSX, String expectedSX)
 	{
+		Object input = null;
 		try
 		{
-			Object input = DMIORead.readSX( inputSX );
-			Object expected = DMIORead.readSX( expectedSX );
-			matchNodeTest( parser, input, expected );
+			input = DMIORead.readSX( inputSX );
+		}
+		catch (ParseSXErrorException e)
+		{
+			System.out.println( "Could not parse input SX" );
+			fail();
+		}
+
+		Object expected = null;
+		try
+		{
+			expected = DMIORead.readSX( expectedSX );
 		}
 		catch (ParseSXErrorException e)
 		{
 			System.out.println( "Could not parse expected SX" );
 			fail();
 		}
+
+		matchNodeTest( parser, input, expected );
 	}
 	
 	
@@ -83,7 +95,7 @@ public class NodeParserTestCase extends TestCase
 		}
 		catch (ParseSXErrorException e)
 		{
-			System.out.println( "Could not parse expected SX" );
+			System.out.println( "Could not parse input SX" );
 			fail();
 		}
 	}
@@ -113,17 +125,29 @@ public class NodeParserTestCase extends TestCase
 	
 	public void bindingsNodeTestSX(ParserExpression parser, String inputSX, String bindingsSX)
 	{
+		Object input = null;
 		try
 		{
-			Object input = DMIORead.readSX( inputSX );
-			Object bindings = DMIORead.readSX( bindingsSX );
-			bindingsNodeTest( parser, input, bindings );
+			input = DMIORead.readSX( inputSX );
+		}
+		catch (ParseSXErrorException e)
+		{
+			System.out.println( "Could not parse input SX" );
+			fail();
+		}
+
+		Object bindings = null;
+		try
+		{
+			bindings = DMIORead.readSX( bindingsSX );
 		}
 		catch (ParseSXErrorException e)
 		{
 			System.out.println( "Could not parse bindings SX" );
 			fail();
 		}
+
+		bindingsNodeTest( parser, input, bindings );
 	}
 
 

@@ -100,7 +100,7 @@ public class ListNode extends BranchExpression
 					ParseResult res = parseNodeContents( state, node, 0, node.size() );
 					if ( res.isValid() )
 					{
-						return new ParseResult( res.getValue(), start, start + 1 );
+						return res.withRange( start, start + 1 );
 					}
 				}
 			}
@@ -110,18 +110,6 @@ public class ListNode extends BranchExpression
 		return ParseResult.failure( start );
 	}
 
-	@SuppressWarnings("unchecked")
-	protected ParseResult parseRootNode(ParserState state, Object input, int start, int stop)
-	{
-		if ( input instanceof List )
-		{
-			List<Object> node = (List<Object>)input;
-			return parseNodeContents( state, node, start, stop );
-		}
-
-	
-		return ParseResult.failure( start );
-	}
 
 	
 	public ParserExpression __add__(ParserExpression x)
@@ -131,7 +119,7 @@ public class ListNode extends BranchExpression
 
 	public ParserExpression __add__(Object x)
 	{
-		return new Sequence( appendToSubexps( coerce( x ) ) );
+		return new Sequence( appendToSubexps( toParserExpression( x ) ) );
 	}
 
 

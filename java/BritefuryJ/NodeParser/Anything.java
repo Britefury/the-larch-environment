@@ -37,10 +37,4 @@ public class Anything extends ParserExpression
 
 		return new ParseResult( input, start, stop );
 	}
-
-
-	protected ParseResult parseRootNode(ParserState state, Object input, int start, int stop)
-	{
-		return new ParseResult( input, start, stop );
-	}
 }

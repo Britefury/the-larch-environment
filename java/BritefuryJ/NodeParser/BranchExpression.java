@@ -31,7 +31,7 @@ public abstract class BranchExpression extends ParserExpression
 		
 		for (Object x: subexps)
 		{
-			xs.add( coerce( x ) );
+			xs.add( toParserExpression( x ) );
 		}
 		
 		this.subexps = new ParserExpression[xs.size()];

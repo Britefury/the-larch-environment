@@ -26,7 +26,7 @@ public class Peek extends UnaryBranchExpression
 		
 		if ( res.isValid() )
 		{
-			return ParseResult.suppressedNoValue( start, start );
+			return res.peek();
 		}
 		else
 		{

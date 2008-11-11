@@ -59,6 +59,16 @@ public class Production extends UnaryBranchExpression
 		return new Production( new Optional( subexp ), debugName );
 	}
 
+	public ParserExpression zeroOrMore()
+	{
+		return new Production( new ZeroOrMore( subexp ), debugName );
+	}
+
+	public ParserExpression oneOrMore()
+	{
+		return new Production( new OneOrMore( subexp ), debugName );
+	}
+
 
 	
 	

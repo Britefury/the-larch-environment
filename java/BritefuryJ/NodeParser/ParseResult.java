@@ -95,10 +95,21 @@ public class ParseResult
 		return new ParseResult( v, begin, end, false, true, bindings );
 	}
 	
+	protected ParseResult withRange(int begin, int end)
+	{
+		return new ParseResult( value, begin, end, false, true, bindings );
+	}
+	
+	
 	
 	protected ParseResult suppressed()
 	{
 		return new ParseResult( value, begin, end, true, bValid, bindings );
+	}
+	
+	protected ParseResult peek()
+	{
+		return new ParseResult( null, begin, begin, true, true, bindings );
 	}
 	
 	
@@ -133,7 +144,14 @@ public class ParseResult
 	
 	protected ParseResult clearBindings()
 	{
-		return new ParseResult( value, begin, end, bSuppressed, bValid );
+		if ( bindings == null )
+		{
+			return this;
+		}
+		else
+		{
+			return new ParseResult( value, begin, end, bSuppressed, bValid );
+		}
 	}
 	
 	
