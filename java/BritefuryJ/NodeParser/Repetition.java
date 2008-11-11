@@ -7,6 +7,9 @@
 package BritefuryJ.NodeParser;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+
+import BritefuryJ.NodeParser.ParseResult.NameAlreadyBoundException;
 
 public class Repetition extends UnaryBranchExpression
 {
@@ -61,6 +64,7 @@ public class Repetition extends UnaryBranchExpression
 	protected ParseResult parseNode(ParserState state, Object input, int start, int stop)
 	{
 		ArrayList<Object> values = new ArrayList<Object>();
+		HashMap<String, Object> bindings = null;
 		
 		int pos = start;
 		int errorPos = start;
@@ -68,20 +72,29 @@ public class Repetition extends UnaryBranchExpression
 		
 		while ( pos <= stop  &&  ( maxRepetitions == -1  ||  i < maxRepetitions ) )
 		{
-			ParseResult res = subexp.evaluateNode( state, input, pos, stop );
-			errorPos = res.end;
+			ParseResult result = subexp.evaluateNode( state, input, pos, stop );
+			errorPos = result.end;
 			
-			if ( !res.isValid() )
+			if ( !result.isValid() )
 			{
 				break;
 			}
 			else
 			{
-				if ( !res.isSuppressed() )
+				try
 				{
-					values.add( res.value );
+					bindings = result.addBindingsTo( bindings );
 				}
-				pos = res.end;
+				catch (NameAlreadyBoundException e)
+				{
+					break;
+				}
+
+				if ( !result.isSuppressed() )
+				{
+					values.add( result.value );
+				}
+				pos = result.end;
 				i++;
 			}
 		}
@@ -95,11 +108,11 @@ public class Repetition extends UnaryBranchExpression
 		{
 			if ( bNullIfZero  &&  i == 0 )
 			{
-				return new ParseResult( null, start, pos );
+				return new ParseResult( null, start, pos, bindings );
 			}
 			else
 			{
-				return new ParseResult( values, start, pos );
+				return new ParseResult( values, start, pos, bindings );
 			}
 		}
 

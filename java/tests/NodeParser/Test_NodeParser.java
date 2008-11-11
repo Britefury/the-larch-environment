@@ -6,6 +6,7 @@
 //##************************
 package tests.NodeParser;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -29,6 +30,26 @@ import BritefuryJ.NodeParser.ParseCondition;
 public class Test_NodeParser extends NodeParserTestCase
 {
 	static ParserExpression identifier = new RegEx( "[A-Za-z_][A-Za-z0-9_]*" );
+	
+	
+	static Object deepArrayToList(Object[] xs)
+	{
+		ArrayList<Object> l = new ArrayList<Object>();
+		
+		for (Object x: xs)
+		{
+			if ( x.getClass().isArray() )
+			{
+				l.add( deepArrayToList( (Object[])x ) );
+			}
+			else
+			{
+				l.add( x );
+			}
+		}
+		
+		return l;
+	}
 	
 	
 	public void testAnything()
@@ -227,6 +248,15 @@ public class Test_NodeParser extends NodeParserTestCase
 		bindingsNodeTestSX( parser1, "(a b c)", "((x c))" );
 	}
 
+	public void testOptional()
+	{
+		ParserExpression parser1 = new ListNode( new Object[] { new Literal( "a" ), new Sequence( new Object[] { new Literal( "b" ).bindTo( "x" ).optional(), new Literal( "c" ) } ) } );
+		matchNodeTestSX( parser1, "(a b c)", "(a (b c))" );
+		matchNodeTest( parser1, Arrays.asList( new Object[] { "a", "c" } ), Arrays.asList( new Object[] { "a", Arrays.asList( new Object[] { null, "c" } ) } ) );
+		matchNodeFailTestSX( parser1, "(a (b c))" );
+		bindingsNodeTestSX( parser1, "(a b c)", "((x b))" );
+	}
+
 	public void testZeroOrMore()
 	{
 		ParserExpression parser1 = new ListNode( new Object[] { new Literal( "a" ), new ZeroOrMore( new Literal( "b" ) ) } );
@@ -244,6 +274,15 @@ public class Test_NodeParser extends NodeParserTestCase
 		matchNodeTestSX( parser3, "(a)", "(a ())" );
 		matchNodeTestSX( parser3, "(a d e)", "(a ((d e)))" );
 		matchNodeTestSX( parser3, "(a d e d e)", "(a ((d e) (d e)))" );
+
+		ParserExpression parser4 = new ListNode( new Object[] { new Literal( "a" ), new ZeroOrMore( identifier.bindTo( "x" ) ), new Anything().zeroOrMore() } );
+		matchNodeTestSX( parser4, "(a)", "(a () ())" );
+		matchNodeTestSX( parser4, "(a b)", "(a (b) ())" );
+		matchNodeTestSX( parser4, "(a b b)", "(a (b b) ())" );
+		matchNodeTestSX( parser4, "(a b b c)", "(a (b b) (c))" );
+		bindingsNodeTestSX( parser4, "(a b)", "((x b))" );
+		bindingsNodeTestSX( parser4, "(a b b)", "((x b))" );
+		bindingsNodeTestSX( parser4, "(a b b c)", "((x b))" );
 	}
 
 	public void testOneOrMore()
@@ -263,38 +302,70 @@ public class Test_NodeParser extends NodeParserTestCase
 		matchNodeFailTestSX( parser3, "(a)" );
 		matchNodeTestSX( parser3, "(a d e)", "(a ((d e)))" );
 		matchNodeTestSX( parser3, "(a d e d e)", "(a ((d e) (d e)))" );
+
+		ParserExpression parser4 = new ListNode( new Object[] { new Literal( "a" ), new OneOrMore( identifier.bindTo( "x" ) ), new Anything().zeroOrMore() } );
+		matchNodeFailTestSX( parser4, "(a)" );
+		matchNodeTestSX( parser4, "(a b)", "(a (b) ())" );
+		matchNodeTestSX( parser4, "(a b b)", "(a (b b) ())" );
+		matchNodeTestSX( parser4, "(a b b c)", "(a (b b) (c))" );
+		bindingsNodeTestSX( parser4, "(a b)", "((x b))" );
+		bindingsNodeTestSX( parser4, "(a b b)", "((x b))" );
+		bindingsNodeTestSX( parser4, "(a b b c)", "((x b))" );
 	}
 
 	public void testPeek()
 	{
-		ParserExpression parser1 = new ListNode( new Object[] { new Literal( "a" ), new Peek( new Literal( "b" ) ), new Anything() } );
+		ParserExpression parser1 = new ListNode( new Object[] { new Literal( "a" ), new Peek( new Literal( "b" ).bindTo( "x" ) ), new Anything() } );
 		matchNodeFailTestSX( parser1, "(a)" );
 		matchNodeTestSX( parser1, "(a b)", "(a b)" );
 		matchNodeFailTestSX( parser1, "(a b b)" );
+		bindingsNodeTestSX( parser1, "(a b)", "((x b))" );
 	}
 
 	public void testPeekNot()
 	{
-		ParserExpression parser1 = new ListNode( new Object[] { new Literal( "a" ), new PeekNot( new Literal( "b" ) ), new Anything() } );
+		ParserExpression parser1 = new ListNode( new Object[] { new Literal( "a" ), new PeekNot( new Literal( "b" ).bindTo( "x" ) ), new Anything() } );
 		matchNodeFailTestSX( parser1, "(a)" );
 		matchNodeFailTestSX( parser1, "(a b)" );
 		matchNodeFailTestSX( parser1, "(a b b)" );
 		matchNodeTestSX( parser1, "(a c)", "(a c)" );
 		matchNodeTestSX( parser1, "(a (x y z))", "(a (x y z))" );
+		bindingsNodeTestSX( parser1, "(a c)", "()" );
 	}
 
 	public void testSuppress()
 	{
-		ParserExpression parser1 = new ListNode( new Object[] { new Literal( "a" ), new Sequence( new Object[] { new Literal( "b" ).suppress(), new Literal( "c" ) } ) } );
+		ParserExpression parser1 = new ListNode( new Object[] { new Literal( "a" ), new Sequence( new Object[] { new Literal( "b" ).bindTo( "x" ).suppress(), new Literal( "c" ) } ) } );
 		matchNodeTestSX( parser1, "(a b c)", "(a (c))" );
 		matchNodeFailTestSX( parser1, "(a (b c))" );
+		bindingsNodeTestSX( parser1, "(a b c)", "((x b))" );
 	}
-
-	public void testOptional()
+	
+	
+	
+	public void testLerpRefactor()
 	{
-		ParserExpression parser1 = new ListNode( new Object[] { new Literal( "a" ), new Sequence( new Object[] { new Literal( "b" ).optional(), new Literal( "c" ) } ) } );
-		matchNodeTestSX( parser1, "(a b c)", "(a (b c))" );
-		matchNodeTest( parser1, Arrays.asList( new Object[] { "a", "c" } ), Arrays.asList( new Object[] { "a", Arrays.asList( new Object[] { null, "c" } ) } ) );
-		matchNodeFailTestSX( parser1, "(a (b c))" );
+		ParseAction lerpAction = new ParseAction()
+		{
+			public Object invoke(Object input, int begin, Object x, Map<String, Object> bindings)
+			{
+				return deepArrayToList( new Object[] { "+", bindings.get( "a" ), new Object[] { "*", new Object[] { "-", bindings.get( "b" ), bindings.get( "a" ) }, bindings.get( "t" ) } } );
+			}
+		};
+		
+		ParserExpression oneMinusT = ParserExpression.toParserExpression( new Object[] { "-", "1.0", new Anything().bindTo( "t" ) } );
+		bindingsNodeTestSX( oneMinusT, "(- 1.0 x)", "((t x))" );
+
+		ParserExpression bTimesT = ParserExpression.toParserExpression( new Object[] { "*", new Anything().bindTo( "b" ), new Anything().bindTo( "t" ) } );
+		bindingsNodeTestSX( bTimesT, "(* q x)", "((b q) (t x))" );
+
+		ParserExpression aTimesOneMinusT = ParserExpression.toParserExpression( new Object[] { "*", new Anything().bindTo( "a" ), oneMinusT } );
+		bindingsNodeTestSX( aTimesOneMinusT, "(* p (- 1.0 x))", "((a p) (t x))" );
+		
+		ParserExpression lerp = ParserExpression.toParserExpression( new Object[] { "+", aTimesOneMinusT, bTimesT } );
+		bindingsNodeTestSX( lerp, "(+ (* p (- 1.0 x)) (* q x))", "((a p) (b q) (t x))" );
+
+		ParserExpression lerpRefactor = lerp.action( lerpAction );
+		matchNodeTestSX( lerpRefactor, "(+ (* p (- 1.0 x)) (* q x))", "(+ p (* (- q p) x))" );
 	}
 }

@@ -64,7 +64,7 @@ public class BestChoice extends BranchExpression
 
 	public ParserExpression __xor__(Object x)
 	{
-		return new BestChoice( appendToSubexps( coerce( x ) ) );
+		return new BestChoice( appendToSubexps( toParserExpression( x ) ) );
 	}
 
 

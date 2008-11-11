@@ -21,7 +21,7 @@ public abstract class UnaryBranchExpression extends ParserExpression
 	
 	public UnaryBranchExpression(Object subexp)
 	{
-		this( coerce( subexp ) );
+		this( toParserExpression( subexp ) );
 	}
 	
 	

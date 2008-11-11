@@ -29,7 +29,7 @@ public class Production extends UnaryBranchExpression
 	
 	protected ParseResult parseNode(ParserState state, Object input, int start, int stop)
 	{
-		return state.memoisedMatch( subexp, input, start, stop );
+		return state.memoisedMatch( subexp, input, start, stop ).clearBindings();
 	}
 
 
@@ -62,6 +62,16 @@ public class Production extends UnaryBranchExpression
 	public ParserExpression optional()
 	{
 		return new Production( new Optional( subexp ), debugName );
+	}
+
+	public ParserExpression zeroOrMore()
+	{
+		return new Production( new ZeroOrMore( subexp ), debugName );
+	}
+
+	public ParserExpression oneOrMore()
+	{
+		return new Production( new OneOrMore( subexp ), debugName );
 	}
 
 

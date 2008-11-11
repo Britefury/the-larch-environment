@@ -254,6 +254,16 @@ public abstract class ParserExpression
 		return new Optional( this );
 	}
 	
+	public ParserExpression zeroOrMore()
+	{
+		return new ZeroOrMore( this );
+	}
+	
+	public ParserExpression oneOrMore()
+	{
+		return new OneOrMore( this );
+	}
+
 	
 	
 	public static ParserExpression coerce(Object x) throws ParserCoerceException

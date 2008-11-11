@@ -55,7 +55,7 @@ public class Choice extends BranchExpression
 
 	public ParserExpression __or__(Object x)
 	{
-		return new Choice( appendToSubexps( coerce( x ) ) );
+		return new Choice( appendToSubexps( toParserExpression( x ) ) );
 	}
 
 

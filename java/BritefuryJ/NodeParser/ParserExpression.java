@@ -17,45 +17,19 @@ public abstract class ParserExpression
 	
 	
 	
-	@SuppressWarnings("unchecked")
 	public ParseResult parseNode(Object input)
 	{
-		int stop;
-		if ( input instanceof String )
-		{
-			stop = ((String)input).length();
-		}
-		else if ( input instanceof List )
-		{
-			stop = ((List<Object>)input).size();
-		}
-		else
-		{
-			stop = 1;
-		}
 		ParserState state = new ParserState();
-		return evaluateRootNode( state, input, 0, stop );
+		List<Object> inputInList = Arrays.asList( new Object[] { input } );
+		return evaluateNode( state, inputInList, 0, 1 );
 	}
 	
-	@SuppressWarnings("unchecked")
 	public DebugParseResult debugParseNode(Object input)
 	{
-		int stop;
-		if ( input instanceof String )
-		{
-			stop = ((String)input).length();
-		}
-		else if ( input instanceof List )
-		{
-			stop = ((List<Object>)input).size();
-		}
-		else
-		{
-			stop = 1;
-		}
 		ParserState state = new ParserState();
 		state.enableDebugging();
-		return (DebugParseResult)evaluateRootNode( state, input, 0, stop );
+		List<Object> inputInList = Arrays.asList( new Object[] { input } );
+		return (DebugParseResult)evaluateNode( state, inputInList, 0, 1 );
 	}
 	
 	
@@ -106,65 +80,10 @@ public abstract class ParserExpression
 		{
 			return parseNode( state, input, start, stop );
 		}
-	}
-	
-	
-	private ParseResult evaluateRootNode(ParserState state, Object input, int start, int stop)
-	{
-		if ( state.bDebuggingEnabled )
-		{
-			// Get the current top of the debug stack (outer call)
-			DebugParseResult.DebugNode prev = state.debugStack;
-			// Create the debug info node
-			DebugParseResult.DebugNode node = new DebugParseResult.DebugNode( prev, this );
-
-			// Push @node onto the debug stack
-			state.debugStack = node;
-			
-			// Get the parse result
-			ParseResult result = parseRootNode( state, input, start, stop );
-			node.setResult( result );
-			
-			// If @prev is valid, add @node as a call-child of @prev
-			if ( prev != null )
-			{
-				prev.addCallChild( node );
-			}
-			
-			// Pop @node off the debug stack
-			state.debugStack = prev;
-			
-			
-			if ( result instanceof DebugParseResult )
-			{
-				DebugParseResult debugResult = (DebugParseResult)result;
-				
-				DebugParseResult.DebugNode fromNode = node;
-				DebugParseResult.DebugNode toNode = debugResult.debugNode;
-				
-				if ( !fromNode.getCallChildren().contains( toNode ) )
-				{
-					fromNode.addMemoChild( toNode );
-				}
-			}
-			
-			
-			return result.debug( node );
-		}
-		else
-		{
-			return parseRootNode( state, input, start, stop );
-		}
-	}
-	
+	}	
 	
 	
 	protected abstract ParseResult parseNode(ParserState state, Object input, int start, int stop);
-	
-	protected ParseResult parseRootNode(ParserState state, Object input, int start, int stop)
-	{
-		return parseNode( state, input, start, stop );
-	}
 	
 	
 	
@@ -198,7 +117,7 @@ public abstract class ParserExpression
 
 	public ParserExpression __add__(Object x)
 	{
-		return new Sequence( withSibling( coerce( x ) ) );
+		return new Sequence( withSibling( toParserExpression( x ) ) );
 	}
 
 	
@@ -209,7 +128,7 @@ public abstract class ParserExpression
 
 	public ParserExpression __or__(Object x)
 	{
-		return new Choice( withSibling( coerce( x ) ) );
+		return new Choice( withSibling( toParserExpression( x ) ) );
 	}
 
 	
@@ -220,7 +139,7 @@ public abstract class ParserExpression
 
 	public ParserExpression __xor__(Object x)
 	{
-		return new BestChoice( withSibling( coerce( x ) ) );
+		return new BestChoice( withSibling( toParserExpression( x ) ) );
 	}
 
 	
@@ -271,13 +190,36 @@ public abstract class ParserExpression
 		return new Optional( this );
 	}
 	
+	public ParserExpression zeroOrMore()
+	{
+		return new ZeroOrMore( this );
+	}
+	
+	public ParserExpression oneOrMore()
+	{
+		return new OneOrMore( this );
+	}
 	
 	
-	public static ParserExpression coerce(Object x)
+	
+	@SuppressWarnings("unchecked")
+	public static ParserExpression toParserExpression(Object x)
 	{
 		if ( x instanceof ParserExpression )
 		{
 			return (ParserExpression)x;
+		}
+		else if ( x instanceof String )
+		{
+			return new Literal( (String)x );
+		}
+		else if ( x instanceof List )
+		{
+			return new ListNode( (List<Object>)x );
+		}
+		else if ( x.getClass().isArray() )
+		{
+			return new ListNode( Arrays.asList( (Object[])x ) );
 		}
 		else
 		{
@@ -285,7 +227,7 @@ public abstract class ParserExpression
 		}
 	}
 
-	public static ParserExpression coerce(String x)
+	public static ParserExpression toParserExpression(String x)
 	{
 		return new Literal( x );
 	}
