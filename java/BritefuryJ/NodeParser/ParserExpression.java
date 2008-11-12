@@ -180,6 +180,11 @@ public abstract class ParserExpression
 		return new Bind( name, this );
 	}
 
+	public ParserExpression clearBindings()
+	{
+		return new ClearBindings( this );
+	}
+
 	public ParserExpression suppress()
 	{
 		return new Suppress( this );

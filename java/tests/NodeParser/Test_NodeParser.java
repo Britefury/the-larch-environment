@@ -13,12 +13,14 @@ import java.util.Map;
 import BritefuryJ.NodeParser.Anything;
 import BritefuryJ.NodeParser.BestChoice;
 import BritefuryJ.NodeParser.Choice;
+import BritefuryJ.NodeParser.Forward;
 import BritefuryJ.NodeParser.Literal;
 import BritefuryJ.NodeParser.ListNode;
 import BritefuryJ.NodeParser.OneOrMore;
 import BritefuryJ.NodeParser.ParserExpression;
 import BritefuryJ.NodeParser.Peek;
 import BritefuryJ.NodeParser.PeekNot;
+import BritefuryJ.NodeParser.Production;
 import BritefuryJ.NodeParser.Sequence;
 import BritefuryJ.NodeParser.ZeroOrMore;
 import BritefuryJ.NodeParser.RegEx;
@@ -168,6 +170,15 @@ public class Test_NodeParser extends NodeParserTestCase
 //		matchNodeTestSX( parser3, "(abc abc)", "((abc abc))" );
 //		bindingsNodeTestSX( parser3, "(abc abc)", "((x abc))" );
 //		matchNodeFailTestSX( parser3, "(abc def)" );
+	}
+	
+	
+	public void testClearBindings()
+	{
+		ParserExpression parser1 = identifier.bindTo(  "x" ).clearBindings();
+		
+		matchNodeTestSX( parser1, "abc", "abc" );
+		bindingsNodeTestSX( parser1, "abc", "()" );
 	}
 	
 	
@@ -367,5 +378,55 @@ public class Test_NodeParser extends NodeParserTestCase
 
 		ParserExpression lerpRefactor = lerp.action( lerpAction );
 		matchNodeTestSX( lerpRefactor, "(+ (* p (- 1.0 x)) (* q x))", "(+ p (* (- q p) x))" );
+	}
+
+	
+	
+	private static class MethodCallRefactorHelper
+	{
+		static ParserExpression getAttr(ParserExpression target, ParserExpression name)
+		{
+			return ParserExpression.toParserExpression( new Object[] { "getAttr", target, name } );
+		}
+		
+		static ParserExpression call(ParserExpression target, ParserExpression params)
+		{
+			return ParserExpression.toParserExpression( new Object[] { "call", target, params } );
+		}
+
+		static ParserExpression methodCall(ParserExpression target, ParserExpression name, ParserExpression params)
+		{
+			return call( getAttr( target, name ), params );
+		}
+	}
+
+
+	public void testMethodCallRefactor()
+	{
+		ParseAction methodCallRefactorAction = new ParseAction()
+		{
+			public Object invoke(Object input, int begin, Object x, Map<String, Object> bindings)
+			{
+				return deepArrayToList( new Object[] { "invokeMethod", bindings.get( "target" ), bindings.get( "name" ), bindings.get( "params" ) } );
+			}
+		};
+		
+		ParserExpression load = ParserExpression.toParserExpression( new Object[] { "load", new Anything() } );
+		ParserExpression params = ParserExpression.toParserExpression( new Object[] { "params" } );
+		
+		Forward expression = new Forward();
+		ParserExpression methodCall = new Production( MethodCallRefactorHelper.methodCall( expression.bindTo( "target" ), identifier.bindTo( "name" ), params.bindTo( "params" ) ).action( methodCallRefactorAction ) );
+		ParserExpression call = new Production( MethodCallRefactorHelper.call( expression, params ) );
+		ParserExpression getAttr = new Production( MethodCallRefactorHelper.getAttr( expression, identifier ) );
+		expression.setExpression( new Production( new Choice( new Object[] { methodCall, call, getAttr, load } ) ) );
+		
+		matchNodeTestSX( expression, "(load x)", "(load x)" );
+		matchNodeTestSX( expression, "(call (load x) (params))", "(call (load x) (params))" );
+		matchNodeTestSX( expression, "(getAttr (load x) blah)", "(getAttr (load x) blah)" );
+		matchNodeTestSX( expression, "(call (getAttr (load x) blah) (params))", "(invokeMethod (load x) blah (params))" );
+		matchNodeTestSX( expression, "(call (getAttr (getAttr (load y) foo) blah) (params))", "(invokeMethod (getAttr (load y) foo) blah (params))" );
+		matchNodeTestSX( expression, "(call (getAttr (call (load y) (params)) blah) (params))", "(invokeMethod (call (load y) (params)) blah (params))" );
+		matchNodeTestSX( expression, "(call (getAttr (call (getAttr (load x) foo) (params)) blah) (params))", "(invokeMethod (invokeMethod (load x) foo (params)) blah (params))" );
+		matchNodeTestSX( expression, "(call (getAttr (call (call (getAttr (load x) blah) (params)) (params)) blah) (params))", "(invokeMethod (call (invokeMethod (load x) blah (params)) (params)) blah (params))" );
 	}
 }
