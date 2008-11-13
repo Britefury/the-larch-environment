@@ -6,7 +6,10 @@
 //##************************
 package BritefuryJ.Parser;
 
-public class ParseResult
+import BritefuryJ.ParserSupport.DebugNode;
+import BritefuryJ.ParserSupport.ParseResultInterface;
+
+public class ParseResult implements ParseResultInterface
 {
 	protected static class NameAlreadyBoundException extends Exception
 	{
@@ -78,7 +81,7 @@ public class ParseResult
 	}
 	
 	
-	protected DebugParseResult debug(DebugParseResult.DebugNode debugNode)
+	protected DebugParseResult debug(DebugNode debugNode)
 	{
 		return new DebugParseResult( value, begin, end, bSuppressed, bValid, debugNode );
 	}

@@ -11,6 +11,8 @@ import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import BritefuryJ.ParserSupport.DebugNode;
+
 
 class ParserState
 {
@@ -69,7 +71,7 @@ class ParserState
 	private HashMap<Integer, HashMap<ParserExpression, MemoEntry> > memo;
 	private RuleInvocation ruleInvocationStack;
 	private Pattern junkPattern;
-	protected DebugParseResult.DebugNode debugStack;
+	protected DebugNode debugStack;
 	protected boolean bDebuggingEnabled;
 	
 	

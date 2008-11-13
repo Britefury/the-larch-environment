@@ -20,7 +20,7 @@ public class DebugViewerTest
 		String input = "this[i][j].x.m()";
 		ParserExpression parser = buildParser();
 		DebugParseResult result = parser.debugParseString( input );
-		new ParseViewFrame( result, input );
+		new ParseViewFrame( result );
 	}
 	
 	
