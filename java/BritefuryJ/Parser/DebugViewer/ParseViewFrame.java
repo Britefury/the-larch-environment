@@ -9,6 +9,7 @@ package BritefuryJ.Parser.DebugViewer;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.JFrame;
@@ -25,8 +26,9 @@ import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
 
 import BritefuryJ.DocPresent.DPPresentationArea;
-import BritefuryJ.Parser.DebugParseResult;
-import BritefuryJ.Parser.ParseResult;
+import BritefuryJ.ParserSupport.DebugNode;
+import BritefuryJ.ParserSupport.DebugParseResultInterface;
+import BritefuryJ.ParserSupport.ParseResultInterface;
 
 public class ParseViewFrame implements ParseView.ParseViewListener
 {
@@ -41,13 +43,9 @@ public class ParseViewFrame implements ParseView.ParseViewListener
 	private JScrollPane inputScrollPane, resultScrollPane;
 	private JSplitPane textSplitPane, mainSplitPane;
 	
-	private String input;
-	
-	public ParseViewFrame(DebugParseResult result, String input)
+	public ParseViewFrame(DebugParseResultInterface result)
 	{
-		this.input = input;
-		
-		view = new ParseView( result, input );
+		view = new ParseView( result );
 		view.setListener( this );
 		area = view.getPresentationArea();
 		area.getComponent().setPreferredSize( new Dimension( 640, 480 ) );
@@ -141,7 +139,8 @@ public class ParseViewFrame implements ParseView.ParseViewListener
 
 
 	
-	public void onSelectionChanged(DebugParseResult.DebugNode selection)
+	@SuppressWarnings("unchecked")
+	public void onSelectionChanged(DebugNode selection)
 	{
 		try
 		{
@@ -150,13 +149,87 @@ public class ParseViewFrame implements ParseView.ParseViewListener
 
 			if ( selection != null )
 			{
-				ParseResult result = selection.getResult();
+				ParseResultInterface result = selection.getResult();
+				Object inputObject = selection.getInput();
+				if ( inputObject instanceof String )
+				{
+					String input = (String)inputObject;
+					if ( result.isValid() )
+					{
+						inputDoc.insertString( inputDoc.getLength(), input.substring( 0, result.getBegin() ), inputDoc.getStyle( "unused" ) );
+						inputDoc.insertString( inputDoc.getLength(), input.substring( result.getBegin(), result.getEnd() ), inputDoc.getStyle( "parsed" ) );
+						inputDoc.insertString( inputDoc.getLength(), input.substring( result.getEnd(), input.length() ), inputDoc.getStyle( "unused" ) );
+					}
+					else
+					{
+						inputDoc.insertString( inputDoc.getLength(), input.substring( 0, result.getEnd() ), inputDoc.getStyle( "unused" ) );
+						inputDoc.insertString( inputDoc.getLength(), input.substring( result.getEnd(), input.length() ), inputDoc.getStyle( "unconsumed" ) );
+					}
+				}
+				else if ( inputObject instanceof List )
+				{
+					List<Object> input = (List<Object>)inputObject;
+					if ( result.isValid() )
+					{
+						int parsedIndex = 0, postIndex = 0;
+						String content = "[";
+						
+						for (int i = 0; i < input.size(); i++)
+						{
+							if ( i == result.getBegin() )
+							{
+								parsedIndex = content.length();
+							}
+							if ( i == result.getEnd() )
+							{
+								postIndex = content.length();
+							}
+							content += input.get( i ).toString();
+							
+							if ( i != input.size() - 1 )
+							{
+								content += ", ";
+							}
+						}
+						
+						content += "]";
+						
+						inputDoc.insertString( inputDoc.getLength(), content.substring( 0, parsedIndex ), inputDoc.getStyle( "unused" ) );
+						inputDoc.insertString( inputDoc.getLength(), content.substring( parsedIndex, postIndex ), inputDoc.getStyle( "parsed" ) );
+						inputDoc.insertString( inputDoc.getLength(), content.substring( postIndex, content.length() ), inputDoc.getStyle( "unused" ) );
+					}
+					else
+					{
+						int errorIndex = 0;
+						String content = "[";
+						
+						for (int i = 0; i < input.size(); i++)
+						{
+							if ( i == result.getEnd() )
+							{
+								errorIndex = content.length();
+							}
+							content += input.get( i ).toString();
+							
+							if ( i != input.size() - 1 )
+							{
+								content += ", ";
+							}
+						}
+						
+						content += "]";
+						
+						inputDoc.insertString( inputDoc.getLength(), content.substring( 0, errorIndex ), inputDoc.getStyle( "unused" ) );
+						inputDoc.insertString( inputDoc.getLength(), content.substring( errorIndex, content.length() ), inputDoc.getStyle( "unconsumed" ) );
+					}
+				}
+				else
+				{
+					inputDoc.insertString( inputDoc.getLength(), inputObject.toString(), inputDoc.getStyle( "unused" ) );
+				}
+				
 				if ( result.isValid() )
 				{
-					inputDoc.insertString( inputDoc.getLength(), input.substring( 0, result.getBegin() ), inputDoc.getStyle( "unused" ) );
-					inputDoc.insertString( inputDoc.getLength(), input.substring( result.getBegin(), result.getEnd() ), inputDoc.getStyle( "parsed" ) );
-					inputDoc.insertString( inputDoc.getLength(), input.substring( result.getEnd(), input.length() ), inputDoc.getStyle( "unused" ) );
-					
 					String valueString = "";
 					if ( result.getValue() != null )
 					{
@@ -167,9 +240,6 @@ public class ParseViewFrame implements ParseView.ParseViewListener
 				}
 				else
 				{
-					inputDoc.insertString( inputDoc.getLength(), input.substring( 0, result.getEnd() ), inputDoc.getStyle( "unused" ) );
-					inputDoc.insertString( inputDoc.getLength(), input.substring( result.getEnd(), input.length() ), inputDoc.getStyle( "unconsumed" ) );
-
 					resultDoc.insertString( 0, "<fail>", resultDoc.getStyle( "fail" ) );
 				}
 			}

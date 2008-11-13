@@ -18,7 +18,8 @@ import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
-import BritefuryJ.Parser.DebugParseResult;
+import BritefuryJ.ParserSupport.DebugNode;
+import BritefuryJ.ParserSupport.DebugParseResultInterface;
 
 public class ParseView
 {
@@ -117,12 +118,12 @@ public class ParseView
 	
 	public static interface ParseViewListener
 	{
-		public void onSelectionChanged(DebugParseResult.DebugNode selection);
+		public void onSelectionChanged(DebugNode selection);
 	}
 	
 	private DPPresentationArea area;
 	private DPViewBin bin;
-	private HashMap<DebugParseResult.DebugNode, NodeView> nodeTable;
+	private HashMap<DebugNode, NodeView> nodeTable;
 	private ArrayList<Edge> callEdges, memoEdges;
 	private NodeView root;
 	private NodeView selection;
@@ -131,7 +132,7 @@ public class ParseView
 	
 	
 	
-	public ParseView(DebugParseResult result, String input)
+	public ParseView(DebugParseResultInterface result)
 	{
 		selection = null;
 		
@@ -139,11 +140,11 @@ public class ParseView
 		
 		bin = new DPViewBin( ContainerStyleSheet.defaultStyleSheet, this );
 		
-		nodeTable = new HashMap<DebugParseResult.DebugNode, NodeView>();
+		nodeTable = new HashMap<DebugNode, NodeView>();
 		callEdges = new ArrayList<Edge>();
 		memoEdges = new ArrayList<Edge>();
 		
-		root = getNodeView( result.debugNode, input );
+		root = getNodeView( result.getDebugNode() );
 		
 		root.registerEdges();
 		
@@ -166,13 +167,13 @@ public class ParseView
 	}
 	
 	
-	protected NodeView getNodeView(DebugParseResult.DebugNode node, String input)
+	protected NodeView getNodeView(DebugNode node)
 	{
 		NodeView view = nodeTable.get( node );
 		
 		if ( view == null )
 		{
-			view = new NodeView( this, node, input );
+			view = new NodeView( this, node );
 			nodeTable.put( node, view );
 		}
 		
@@ -202,7 +203,7 @@ public class ParseView
 			}
 			
 			selection = node;
-			DebugParseResult.DebugNode d = null;
+			DebugNode d = null;
 
 			if ( selection != null )
 			{

@@ -10,7 +10,10 @@ import java.util.Arrays;
 import java.util.List;
 import org.python.core.PyObject;
 
-public abstract class ParserExpression
+import BritefuryJ.ParserSupport.DebugNode;
+import BritefuryJ.ParserSupport.ParserExpressionInterface;
+
+public abstract class ParserExpression implements ParserExpressionInterface
 {
 	public static class ParserCoerceException extends Exception
 	{
@@ -98,9 +101,9 @@ public abstract class ParserExpression
 		if ( state.bDebuggingEnabled )
 		{
 			// Get the current top of the debug stack (outer call)
-			DebugParseResult.DebugNode prev = state.debugStack;
+			DebugNode prev = state.debugStack;
 			// Create the debug info node
-			DebugParseResult.DebugNode node = new DebugParseResult.DebugNode( prev, this );
+			DebugNode node = new DebugNode( prev, this, input );
 
 			// Push @node onto the debug stack
 			state.debugStack = node;
@@ -123,8 +126,8 @@ public abstract class ParserExpression
 			{
 				DebugParseResult debugResult = (DebugParseResult)result;
 				
-				DebugParseResult.DebugNode fromNode = node;
-				DebugParseResult.DebugNode toNode = debugResult.debugNode;
+				DebugNode fromNode = node;
+				DebugNode toNode = debugResult.debugNode;
 				
 				if ( !fromNode.getCallChildren().contains( toNode ) )
 				{

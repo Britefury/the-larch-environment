@@ -4,23 +4,24 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.Parser;
+package BritefuryJ.PatternMatch;
 
+import java.util.HashMap;
 
 import BritefuryJ.ParserSupport.DebugNode;
 import BritefuryJ.ParserSupport.DebugParseResultInterface;
 
-public class DebugParseResult extends ParseResult implements DebugParseResultInterface
+public class DebugMatchResult extends MatchResult implements DebugParseResultInterface
 {
 	public DebugNode debugNode;
 	
 	
-	protected DebugParseResult(Object value, int begin, int end, boolean bSuppressed, boolean bValid, DebugNode debugNode)
+	protected DebugMatchResult(Object value, int begin, int end, boolean bSuppressed, boolean bValid, HashMap<String, Object> bindings, DebugNode debugNode)
 	{
-		super( value, begin, end, bSuppressed, bValid );
+		super( value, begin, end, bSuppressed, bValid, bindings );
 		this.debugNode = debugNode;
 	}
-
+	
 
 	public DebugNode getDebugNode()
 	{
