@@ -8,8 +8,8 @@ package BritefuryJ.PatternMatch;
 
 import java.util.HashMap;
 
-import BritefuryJ.ParserSupport.DebugNode;
-import BritefuryJ.ParserSupport.DebugParseResultInterface;
+import BritefuryJ.ParserHelpers.DebugNode;
+import BritefuryJ.ParserHelpers.DebugParseResultInterface;
 
 public class DebugMatchResult extends MatchResult implements DebugParseResultInterface
 {

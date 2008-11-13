@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.Parser.DebugViewer;
+package BritefuryJ.ParserDebugViewer;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -28,8 +28,8 @@ import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
-import BritefuryJ.ParserSupport.DebugNode;
-import BritefuryJ.ParserSupport.ParseResultInterface;
+import BritefuryJ.ParserHelpers.DebugNode;
+import BritefuryJ.ParserHelpers.ParseResultInterface;
 
 public class NodeView
 {

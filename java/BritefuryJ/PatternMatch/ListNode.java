@@ -30,13 +30,13 @@ public class ListNode extends BranchExpression
 	}
 	
 	
-	protected MatchResult parseString(MatcherState state, String input, int start, int stop)
+	protected MatchResult parseString(MatchState state, String input, int start, int stop)
 	{
 		return MatchResult.failure( start );
 	}
 	
 	
-	private MatchResult parseNodeContents(MatcherState state, List<Object> input, int start, int stop)
+	private MatchResult parseNodeContents(MatchState state, List<Object> input, int start, int stop)
 	{
 		ArrayList<Object> value = new ArrayList<Object>();
 		HashMap<String, Object> bindings = null;
@@ -86,7 +86,7 @@ public class ListNode extends BranchExpression
 	
 	
 	@SuppressWarnings("unchecked")
-	protected MatchResult parseNode(MatcherState state, Object input, int start, int stop)
+	protected MatchResult parseNode(MatchState state, Object input, int start, int stop)
 	{
 		if ( input instanceof List )
 		{

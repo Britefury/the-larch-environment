@@ -8,7 +8,7 @@ package BritefuryJ.PatternMatch;
 
 public class AnyString extends StringTerminal
 {
-	protected MatchResult parseString(MatcherState state, String input)
+	protected MatchResult parseString(MatchState state, String input)
 	{
 		return new MatchResult( input, 0, input.length() );
 	}

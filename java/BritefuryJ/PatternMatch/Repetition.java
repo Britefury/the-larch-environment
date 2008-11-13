@@ -61,7 +61,7 @@ public class Repetition extends UnaryBranchExpression
 	}
 	
 
-	protected MatchResult parseNode(MatcherState state, Object input, int start, int stop)
+	protected MatchResult parseNode(MatchState state, Object input, int start, int stop)
 	{
 		ArrayList<Object> values = new ArrayList<Object>();
 		HashMap<String, Object> bindings = null;
