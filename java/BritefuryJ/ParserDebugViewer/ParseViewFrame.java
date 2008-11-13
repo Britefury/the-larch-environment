@@ -12,9 +12,12 @@ import java.awt.event.ActionEvent;
 import java.util.List;
 
 import javax.swing.AbstractAction;
+import javax.swing.BoxLayout;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextPane;
@@ -36,8 +39,12 @@ public class ParseViewFrame implements ParseView.ParseViewListener
 	private JFrame frame;
 	private JMenu viewMenu;
 	private JMenuBar menuBar;
-	private DPPresentationArea area;
+	private JPanel graphPanel;
+	private JLabel graphLabel;
+	private DPPresentationArea graph;
 	
+	private JPanel inputPanel, resultPanel;
+	private JLabel inputLabel, resultLabel;
 	private JTextPane inputTextPane, resultTextPane;
 	private StyledDocument inputDoc, resultDoc;
 	private JScrollPane inputScrollPane, resultScrollPane;
@@ -47,15 +54,22 @@ public class ParseViewFrame implements ParseView.ParseViewListener
 	{
 		view = new ParseView( result );
 		view.setListener( this );
-		area = view.getPresentationArea();
-		area.getComponent().setPreferredSize( new Dimension( 640, 480 ) );
+		graph = view.getPresentationArea();
+		graph.getComponent().setPreferredSize( new Dimension( 640, 480 ) );
 		
 		frame = new JFrame( "Parse tree" );
 		frame.setDefaultCloseOperation( WindowConstants.DISPOSE_ON_CLOSE );
 		
+		graphLabel = new JLabel( "Graph" );
+		graphPanel = new JPanel();
+		graphPanel.setLayout( new BoxLayout( graphPanel, BoxLayout.PAGE_AXIS ) );
+		graphPanel.add( graphLabel );
+		graphPanel.add( graph.getComponent() );
+		
 		
 		Style defaultStyle = StyleContext.getDefaultStyleContext().getStyle( StyleContext.DEFAULT_STYLE );
 
+		inputLabel = new JLabel( "Input" );
 		inputTextPane = new JTextPane();
 		inputTextPane.setEditable( false );
 		inputDoc = inputTextPane.getStyledDocument();
@@ -68,7 +82,12 @@ public class ParseViewFrame implements ParseView.ParseViewListener
 		inputScrollPane = new JScrollPane( inputTextPane );
 		inputScrollPane.setVerticalScrollBarPolicy( JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED );
 		inputScrollPane.setPreferredSize( new Dimension( 200, 200 ) );
-		
+		inputPanel = new JPanel();
+		inputPanel.setLayout( new BoxLayout( inputPanel, BoxLayout.PAGE_AXIS ) );
+		inputPanel.add( inputLabel );
+		inputPanel.add( inputScrollPane );
+	
+		resultLabel = new JLabel( "Result" );
 		resultTextPane = new JTextPane();
 		resultTextPane.setEditable( false );
 		resultDoc = resultTextPane.getStyledDocument();
@@ -79,12 +98,16 @@ public class ParseViewFrame implements ParseView.ParseViewListener
 		resultScrollPane = new JScrollPane( resultTextPane );
 		resultScrollPane.setVerticalScrollBarPolicy( JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED );
 		resultScrollPane.setPreferredSize( new Dimension( 200, 200 ) );
+		resultPanel = new JPanel();
+		resultPanel.setLayout( new BoxLayout( resultPanel, BoxLayout.PAGE_AXIS ) );
+		resultPanel.add( resultLabel );
+		resultPanel.add( resultScrollPane );
 		
-		textSplitPane = new JSplitPane( JSplitPane.HORIZONTAL_SPLIT, inputScrollPane, resultScrollPane );
+		textSplitPane = new JSplitPane( JSplitPane.HORIZONTAL_SPLIT, inputPanel, resultPanel );
 		textSplitPane.setOneTouchExpandable( true );
 		textSplitPane.setResizeWeight( 0.5 );
 		
-		mainSplitPane = new JSplitPane( JSplitPane.VERTICAL_SPLIT, area.getComponent(), textSplitPane );
+		mainSplitPane = new JSplitPane( JSplitPane.VERTICAL_SPLIT, graphPanel, textSplitPane );
 		mainSplitPane.setResizeWeight( 0.75 );
 		
 		
@@ -97,7 +120,7 @@ public class ParseViewFrame implements ParseView.ParseViewListener
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				area.reset();
+				graph.reset();
 			}
 
 			private static final long serialVersionUID = 1L;
@@ -107,7 +130,7 @@ public class ParseViewFrame implements ParseView.ParseViewListener
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				area.oneToOne();
+				graph.oneToOne();
 			}
 
 			private static final long serialVersionUID = 1L;
@@ -117,7 +140,7 @@ public class ParseViewFrame implements ParseView.ParseViewListener
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				area.zoomToFit();
+				graph.zoomToFit();
 			}
 
 			private static final long serialVersionUID = 1L;
@@ -134,7 +157,7 @@ public class ParseViewFrame implements ParseView.ParseViewListener
 		frame.add( mainSplitPane );
 		frame.pack();
 		frame.setVisible(true);
-		area.zoomToFit();
+		graph.zoomToFit();
 	}
 
 
@@ -171,7 +194,7 @@ public class ParseViewFrame implements ParseView.ParseViewListener
 					List<Object> input = (List<Object>)inputObject;
 					if ( result.isValid() )
 					{
-						int parsedIndex = 0, postIndex = 0;
+						int parsedIndex = -1, postIndex = -1;
 						String content = "[";
 						
 						for (int i = 0; i < input.size(); i++)
@@ -194,13 +217,16 @@ public class ParseViewFrame implements ParseView.ParseViewListener
 						
 						content += "]";
 						
+						parsedIndex = parsedIndex == -1  ?  content.length() - 1  :  parsedIndex;
+						postIndex = postIndex == -1  ?  content.length() - 1  :  postIndex;
+						
 						inputDoc.insertString( inputDoc.getLength(), content.substring( 0, parsedIndex ), inputDoc.getStyle( "unused" ) );
 						inputDoc.insertString( inputDoc.getLength(), content.substring( parsedIndex, postIndex ), inputDoc.getStyle( "parsed" ) );
 						inputDoc.insertString( inputDoc.getLength(), content.substring( postIndex, content.length() ), inputDoc.getStyle( "unused" ) );
 					}
 					else
 					{
-						int errorIndex = 0;
+						int errorIndex = -1;
 						String content = "[";
 						
 						for (int i = 0; i < input.size(); i++)
@@ -219,6 +245,8 @@ public class ParseViewFrame implements ParseView.ParseViewListener
 						
 						content += "]";
 						
+						errorIndex = errorIndex == -1  ?  content.length() - 1  :  errorIndex;
+
 						inputDoc.insertString( inputDoc.getLength(), content.substring( 0, errorIndex ), inputDoc.getStyle( "unused" ) );
 						inputDoc.insertString( inputDoc.getLength(), content.substring( errorIndex, content.length() ), inputDoc.getStyle( "unconsumed" ) );
 					}
