@@ -18,7 +18,7 @@ public class Anything extends MatchExpression
 	
 
 	@SuppressWarnings("unchecked")
-	protected MatchResult parseNode(MatcherState state, Object input, int start, int stop)
+	protected MatchResult parseNode(MatchState state, Object input, int start, int stop)
 	{
 		if ( input instanceof List )
 		{

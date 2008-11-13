@@ -11,7 +11,7 @@ import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import BritefuryJ.ParserSupport.DebugNode;
+import BritefuryJ.ParserHelpers.DebugNode;
 
 
 class ParserState

@@ -10,8 +10,8 @@ import java.util.Arrays;
 import java.util.List;
 import org.python.core.PyObject;
 
-import BritefuryJ.ParserSupport.DebugNode;
-import BritefuryJ.ParserSupport.ParserExpressionInterface;
+import BritefuryJ.ParserHelpers.DebugNode;
+import BritefuryJ.ParserHelpers.ParserExpressionInterface;
 
 public abstract class MatchExpression implements ParserExpressionInterface
 {
@@ -22,14 +22,14 @@ public abstract class MatchExpression implements ParserExpressionInterface
 	
 	public MatchResult parseNode(Object input)
 	{
-		MatcherState state = new MatcherState();
+		MatchState state = new MatchState();
 		List<Object> inputInList = Arrays.asList( new Object[] { input } );
 		return evaluateNode( state, inputInList, 0, 1 );
 	}
 	
 	public DebugMatchResult debugParseNode(Object input)
 	{
-		MatcherState state = new MatcherState();
+		MatchState state = new MatchState();
 		state.enableDebugging();
 		List<Object> inputInList = Arrays.asList( new Object[] { input } );
 		return (DebugMatchResult)evaluateNode( state, inputInList, 0, 1 );
@@ -37,7 +37,7 @@ public abstract class MatchExpression implements ParserExpressionInterface
 	
 	
 
-	protected MatchResult evaluateNode(MatcherState state, Object input, int start, int stop)
+	protected MatchResult evaluateNode(MatchState state, Object input, int start, int stop)
 	{
 		if ( state.bDebuggingEnabled )
 		{
@@ -86,7 +86,7 @@ public abstract class MatchExpression implements ParserExpressionInterface
 	}	
 	
 	
-	protected abstract MatchResult parseNode(MatcherState state, Object input, int start, int stop);
+	protected abstract MatchResult parseNode(MatchState state, Object input, int start, int stop);
 	
 	
 	

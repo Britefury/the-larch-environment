@@ -27,7 +27,7 @@ public class Production extends UnaryBranchExpression
 	}
 	
 	
-	protected MatchResult parseNode(MatcherState state, Object input, int start, int stop)
+	protected MatchResult parseNode(MatchState state, Object input, int start, int stop)
 	{
 		return state.memoisedMatch( subexp, input, start, stop ).clearBindings();
 	}

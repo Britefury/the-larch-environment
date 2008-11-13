@@ -10,8 +10,8 @@ import java.util.Arrays;
 import java.util.List;
 import org.python.core.PyObject;
 
-import BritefuryJ.ParserSupport.DebugNode;
-import BritefuryJ.ParserSupport.ParserExpressionInterface;
+import BritefuryJ.ParserHelpers.DebugNode;
+import BritefuryJ.ParserHelpers.ParserExpressionInterface;
 
 public abstract class ParserExpression implements ParserExpressionInterface
 {

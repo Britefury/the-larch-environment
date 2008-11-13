@@ -4,14 +4,14 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package tests.Parser.DebugViewer;
+package tests.ParserDebugViewer;
 
 import BritefuryJ.Parser.DebugParseResult;
 import BritefuryJ.Parser.Forward;
 import BritefuryJ.Parser.Literal;
 import BritefuryJ.Parser.Production;
 import BritefuryJ.Parser.ParserExpression;
-import BritefuryJ.Parser.DebugViewer.ParseViewFrame;
+import BritefuryJ.ParserDebugViewer.ParseViewFrame;
 
 public class DebugViewerTest
 {

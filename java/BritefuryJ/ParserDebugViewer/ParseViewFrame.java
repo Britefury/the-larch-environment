@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.Parser.DebugViewer;
+package BritefuryJ.ParserDebugViewer;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -26,9 +26,9 @@ import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
 
 import BritefuryJ.DocPresent.DPPresentationArea;
-import BritefuryJ.ParserSupport.DebugNode;
-import BritefuryJ.ParserSupport.DebugParseResultInterface;
-import BritefuryJ.ParserSupport.ParseResultInterface;
+import BritefuryJ.ParserHelpers.DebugNode;
+import BritefuryJ.ParserHelpers.DebugParseResultInterface;
+import BritefuryJ.ParserHelpers.ParseResultInterface;
 
 public class ParseViewFrame implements ParseView.ParseViewListener
 {

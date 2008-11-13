@@ -9,8 +9,8 @@ package BritefuryJ.PatternMatch;
 import java.util.HashMap;
 import java.util.Map;
 
-import BritefuryJ.ParserSupport.DebugNode;
-import BritefuryJ.ParserSupport.ParseResultInterface;
+import BritefuryJ.ParserHelpers.DebugNode;
+import BritefuryJ.ParserHelpers.ParseResultInterface;
 
 public class MatchResult implements ParseResultInterface
 {

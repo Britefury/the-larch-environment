@@ -26,7 +26,7 @@ public class Choice extends BranchExpression
 	}
 	
 	
-	protected MatchResult parseNode(MatcherState state, Object input, int start, int stop)
+	protected MatchResult parseNode(MatchState state, Object input, int start, int stop)
 	{
 		int maxErrorPos = start;
 		

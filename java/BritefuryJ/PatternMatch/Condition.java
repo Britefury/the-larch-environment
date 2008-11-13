@@ -67,7 +67,7 @@ public class Condition extends UnaryBranchExpression
 	}
 	
 
-	protected MatchResult parseNode(MatcherState state, Object input, int start, int stop)
+	protected MatchResult parseNode(MatchState state, Object input, int start, int stop)
 	{
 		MatchResult res = subexp.evaluateNode( state, input, start, stop );
 		

@@ -20,7 +20,7 @@ public class Suppress extends UnaryBranchExpression
 	}
 	
 	
-	protected MatchResult parseNode(MatcherState state, Object input, int start, int stop)
+	protected MatchResult parseNode(MatchState state, Object input, int start, int stop)
 	{
 		return subexp.evaluateNode( state, input, start, stop ).suppressed();
 	}

@@ -4,9 +4,9 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.ParserSupport;
+package BritefuryJ.ParserHelpers;
 
-public interface ParserExpressionInterface
+public interface DebugParseResultInterface
 {
-	public String getDebugName();
+	public DebugNode getDebugNode();
 }

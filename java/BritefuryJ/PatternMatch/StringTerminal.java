@@ -10,10 +10,10 @@ import java.util.List;
 
 abstract class StringTerminal extends MatchExpression
 {
-	protected abstract MatchResult parseString(MatcherState state, String input);
+	protected abstract MatchResult parseString(MatchState state, String input);
 	
 	@SuppressWarnings("unchecked")
-	protected MatchResult parseNode(MatcherState state, Object input, int start, int stop)
+	protected MatchResult parseNode(MatchState state, Object input, int start, int stop)
 	{
 		if ( input instanceof List )
 		{

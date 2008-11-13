@@ -7,8 +7,8 @@
 package BritefuryJ.Parser;
 
 
-import BritefuryJ.ParserSupport.DebugNode;
-import BritefuryJ.ParserSupport.DebugParseResultInterface;
+import BritefuryJ.ParserHelpers.DebugNode;
+import BritefuryJ.ParserHelpers.DebugParseResultInterface;
 
 public class DebugParseResult extends ParseResult implements DebugParseResultInterface
 {

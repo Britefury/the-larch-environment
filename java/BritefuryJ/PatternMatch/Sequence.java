@@ -30,7 +30,7 @@ public class Sequence extends BranchExpression
 	}
 	
 	
-	protected MatchResult parseNode(MatcherState state, Object input, int start, int stop)
+	protected MatchResult parseNode(MatchState state, Object input, int start, int stop)
 	{
 		ArrayList<Object> value = new ArrayList<Object>();
 		HashMap<String, Object> bindings = null;

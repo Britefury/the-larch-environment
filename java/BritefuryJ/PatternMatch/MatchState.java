@@ -8,10 +8,10 @@ package BritefuryJ.PatternMatch;
 
 import java.util.HashMap;
 
-import BritefuryJ.ParserSupport.DebugNode;
+import BritefuryJ.ParserHelpers.DebugNode;
 
 
-class MatcherState
+class MatchState
 {
 	private static class MemoKey
 	{
@@ -46,7 +46,7 @@ class MatcherState
 	
 	
 	
-	public MatcherState()
+	public MatchState()
 	{
 		this.memos = new HashMap<Object, HashMap<MemoKey, MatchResult> >();
 	}
