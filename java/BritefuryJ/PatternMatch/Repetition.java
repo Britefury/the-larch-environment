@@ -16,12 +16,12 @@ public class Repetition extends UnaryBranchExpression
 	protected int minRepetitions, maxRepetitions;
 	protected boolean bNullIfZero;
 	
-	public Repetition(String subexp, int minRepetitions, int maxRepetitions)
+	public Repetition(Object subexp, int minRepetitions, int maxRepetitions)
 	{
 		this( subexp, minRepetitions, maxRepetitions, false );
 	}
 
-	public Repetition(String subexp, int minRepetitions, int maxRepetitions, boolean bNullIfZero)
+	public Repetition(Object subexp, int minRepetitions, int maxRepetitions, boolean bNullIfZero)
 	{
 		super( subexp );
 		

@@ -301,7 +301,7 @@ class Python25CodeGenerator (GSymCodeGenerator):
 	
 	# Lambda expression
 	def lambdaExpr(self, node, params, expr):
-		return 'lambda '  +  ', '.join( [ self( p )   for p in params ] )  +  ': '  +  self( expr )
+		return '( lambda '  +  ', '.join( [ self( p )   for p in params ] )  +  ': '  +  self( expr ) + ' )'
 	
 	
 	

@@ -17,6 +17,12 @@ public class Bind extends UnaryBranchExpression
 		this.name = name;
 	}
 	
+	public Bind(String name, MatchExpression subexp)
+	{
+		super( subexp );
+		this.name = name;
+	}
+	
 	
 	
 	public String getName()

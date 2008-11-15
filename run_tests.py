@@ -12,7 +12,7 @@ from Britefury.InitBritefuryJ import initBritefuryJ
 initBritefuryJ()
 
 import Britefury.Dispatch.MethodDispatch
-import Britefury.Dispatch.PatternDispatch
+#import Britefury.Dispatch.PatternDispatch
 import Britefury.Dispatch.Dispatch
 import Britefury.Transformation.Transformation
 import Britefury.Tests.BritefuryJ.Parser.Utils.Operators
@@ -23,7 +23,7 @@ import GSymCore.Languages.Python25.Parser
 import GSymCore.Languages.Python25.IdentityTransformation
 
 
-testModules = [ Britefury.Dispatch.MethodDispatch, Britefury.Dispatch.PatternDispatch, Britefury.Dispatch.Dispatch,
+testModules = [ Britefury.Dispatch.MethodDispatch, Britefury.Dispatch.Dispatch,
 		Britefury.Transformation.Transformation,
 		Britefury.Tests.BritefuryJ.Parser.Utils.Operators, Britefury.Tests.BritefuryJ.PatternMatch.Test_PatternMatcher,
 		Britefury.Tests.Britefury.Grammar.Grammar,

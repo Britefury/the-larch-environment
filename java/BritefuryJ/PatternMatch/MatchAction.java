@@ -10,5 +10,5 @@ import java.util.Map;
 
 public interface MatchAction
 {
-	public Object invoke(Object input, int begin, Object x, Map<String, Object> bindings);
+	public Object invoke(Object input, Object x, Map<String, Object> bindings, Object arg);
 }

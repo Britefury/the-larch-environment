@@ -10,5 +10,5 @@ import java.util.Map;
 
 public interface MatchCondition
 {
-	public boolean test(Object input, int begin, Object x, Map<String, Object> bindings);
+	public boolean test(Object input, Object x, Map<String, Object> bindings, Object arg);
 }

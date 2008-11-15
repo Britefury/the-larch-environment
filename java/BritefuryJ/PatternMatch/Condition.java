@@ -9,8 +9,8 @@ package BritefuryJ.PatternMatch;
 import java.util.Map;
 
 import org.python.core.Py;
-import org.python.core.PyInteger;
 import org.python.core.PyObject;
+import org.python.core.PySequenceList;
 
 public class Condition extends UnaryBranchExpression
 {
@@ -25,9 +25,27 @@ public class Condition extends UnaryBranchExpression
 		}
 
 
-		public boolean test(Object input, int begin, Object x, Map<String, Object> bindings)
+		public boolean test(Object input, Object x, Map<String, Object> bindings, Object arg)
 		{
-			return Py.py2boolean( callable.__call__( Py.java2py( input ), new PyInteger( begin ), Py.java2py( x ) ) );
+			if ( arg != null  &&  arg instanceof PySequenceList )
+			{
+				PySequenceList args = (PySequenceList)arg;
+				int numArgs = args.size();
+				PyObject[] values = new PyObject[numArgs + 3];
+				
+				for (int i = 0; i < numArgs; i++)
+				{
+					values[i] = Py.java2py( args.get( i ) );
+				}
+				values[numArgs] = Py.java2py( input );
+				values[numArgs] = Py.java2py( x );
+				values[numArgs] = Py.java2py( bindings );
+				return Py.py2boolean( callable.__call__( values ) );
+			}
+			else
+			{
+				return Py.py2boolean( callable.__call__( Py.java2py( input ), Py.java2py( x ), Py.java2py( bindings ) ) );
+			}
 		}
 	}
 
@@ -36,7 +54,7 @@ public class Condition extends UnaryBranchExpression
 	protected MatchCondition cond;
 	
 	
-	public Condition(String subexp, MatchCondition cond)
+	public Condition(Object subexp, MatchCondition cond)
 	{
 		super( subexp );
 		this.cond = cond;
@@ -73,7 +91,7 @@ public class Condition extends UnaryBranchExpression
 		
 		if ( res.isValid() )
 		{
-			if ( cond.test( input, res.begin, res.value, res.bindings ) )
+			if ( cond.test( input, res.value, res.bindings, state.arg ) )
 			{
 				return res;
 			}

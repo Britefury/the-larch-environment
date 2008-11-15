@@ -562,9 +562,9 @@ class _CompoundStmtImporter (_Importer):
 		if len( node.bases ) == 0:
 			bases = '<nil>'
 		elif len( node.bases ) == 1:
-			bases = _expr( node.bases[0] )
+			bases = [ _expr( node.bases[0] ) ]
 		else:
-			bases = [ 'tupleLiteral' ]  +  [ _expr( b )   for b in node.bases ]
+			bases = [ _expr( b )   for b in node.bases ]
 		return [ [ 'classStmt', node.name, bases, _flattenedCompound( structTab, node.body ) ] ]
 	
 

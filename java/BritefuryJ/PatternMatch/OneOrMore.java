@@ -9,7 +9,7 @@ package BritefuryJ.PatternMatch;
 
 public class OneOrMore extends Repetition
 {
-	public OneOrMore(String subexp)
+	public OneOrMore(Object subexp)
 	{
 		super( subexp, 1, -1 );
 	}

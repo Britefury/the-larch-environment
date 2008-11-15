@@ -41,14 +41,14 @@ public class PatternMatchDebugViewerTest
 	{
 		MatchAction methodCallRefactorAction = new MatchAction()
 		{
-			public Object invoke(Object input, int begin, Object x, Map<String, Object> bindings)
+			public Object invoke(Object input, Object x, Map<String, Object> bindings, Object arg)
 			{
 				return deepArrayToList( new Object[] { "invokeMethod", bindings.get( "target" ), bindings.get( "name" ), bindings.get( "params" ) } );
 			}
 		};
 		
-		MatchExpression load = MatchExpression.toParserExpression( new Object[] { "load", new Anything() } );
-		MatchExpression params = MatchExpression.toParserExpression( new Object[] { "params" } );
+		MatchExpression load = MatchExpression.toMatchExpression( new Object[] { "load", new Anything() } );
+		MatchExpression params = MatchExpression.toMatchExpression( new Object[] { "params" } );
 		
 		Forward expression = new Forward();
 		MatchExpression methodCall = new Production( MethodCallRefactorHelper.methodCall( expression.bindTo( "target" ), identifier.bindTo( "name" ), params.bindTo( "params" ) ).action( methodCallRefactorAction ) );
@@ -64,12 +64,12 @@ public class PatternMatchDebugViewerTest
 	{
 		static MatchExpression getAttr(MatchExpression target, MatchExpression name)
 		{
-			return MatchExpression.toParserExpression( new Object[] { "getAttr", target, name } );
+			return MatchExpression.toMatchExpression( new Object[] { "getAttr", target, name } );
 		}
 		
 		static MatchExpression call(MatchExpression target, MatchExpression params)
 		{
-			return MatchExpression.toParserExpression( new Object[] { "call", target, params } );
+			return MatchExpression.toMatchExpression( new Object[] { "call", target, params } );
 		}
 
 		static MatchExpression methodCall(MatchExpression target, MatchExpression name, MatchExpression params)

@@ -9,7 +9,7 @@ package BritefuryJ.PatternMatch;
 
 public class PeekNot extends UnaryBranchExpression
 {
-	public PeekNot(String subexp)
+	public PeekNot(Object subexp)
 	{
 		super( subexp );
 	}
