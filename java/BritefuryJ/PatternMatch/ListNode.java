@@ -36,6 +36,7 @@ public class ListNode extends BranchExpression
 	}
 	
 	
+	@SuppressWarnings("unchecked")
 	private MatchResult parseNodeContents(MatchState state, List<Object> input, int start, int stop)
 	{
 		ArrayList<Object> value = new ArrayList<Object>();
@@ -69,7 +70,14 @@ public class ListNode extends BranchExpression
 				
 				if ( !result.isSuppressed() )
 				{
-					value.add( result.value );
+					if ( result.isMergeable() )
+					{
+						value.addAll( (List<Object>)result.value );
+					}
+					else
+					{
+						value.add( result.value );
+					}
 				}
 			}
 		}

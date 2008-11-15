@@ -200,11 +200,6 @@ public abstract class MatchExpression implements ParserExpressionInterface
 	}
 
 
-	public MatchExpression __rlshift__(String name)
-	{
-		return bindTo( name );
-	}
-
 
 
 	public MatchExpression action(MatchAction a)
@@ -215,6 +210,16 @@ public abstract class MatchExpression implements ParserExpressionInterface
 	public MatchExpression action(PyObject a)
 	{
 		return new Action( this, a );
+	}
+	
+	public MatchExpression mergeUpAction(MatchAction a)
+	{
+		return Action.mergeUpAction( this, a );
+	}
+
+	public MatchExpression mergeUpAction(PyObject a)
+	{
+		return Action.mergeUpAction( this, a );
 	}
 	
 	public MatchExpression condition(MatchCondition cond)

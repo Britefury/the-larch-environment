@@ -50,6 +50,16 @@ public class Production extends UnaryBranchExpression
 		return new Production( new Action( subexp, a ), debugName );
 	}
 
+	public MatchExpression mergeUpAction(MatchAction a)
+	{
+		return new Production( Action.mergeUpAction( this, a ), debugName );
+	}
+
+	public MatchExpression mergeUpAction(PyObject a)
+	{
+		return new Production( Action.mergeUpAction( this, a ), debugName );
+	}
+	
 	public MatchExpression condition(MatchCondition cond)
 	{
 		return new Production( new Condition( subexp, cond ), debugName );

@@ -31,7 +31,7 @@ public class Optional extends UnaryBranchExpression
 		}
 		else
 		{
-			return new MatchResult( null, start, start );
+			return MatchResult.suppressedNoValue( start, start );
 		}
 	}
 

@@ -11,22 +11,12 @@ public class ZeroOrMore extends Repetition
 {
 	public ZeroOrMore(Object subexp)
 	{
-		this( subexp, false );
-	}
-
-	public ZeroOrMore(Object subexp, boolean bNullIfZero)
-	{
-		super( subexp, 0, -1, bNullIfZero );
+		super( subexp, 0, -1 );
 	}
 	
 	public ZeroOrMore(MatchExpression subexp)
 	{
-		this( subexp, false );
-	}
-
-	public ZeroOrMore(MatchExpression subexp, boolean bNullIfZero)
-	{
-		super( subexp, 0, -1, bNullIfZero );
+		super( subexp, 0, -1 );
 	}
 
 

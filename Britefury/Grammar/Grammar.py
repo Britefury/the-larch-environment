@@ -38,7 +38,7 @@ class _RuleHelper (object):
 				if hasattr( self._grammarInstance, self._desc._attrName ):
 					# The attribute @self._desc._attrName has been set, then this rule is recursive, so a @Forward will already have been created
 					forward = getattr( self._grammarInstance, self._desc._attrName )
-					forward << rule
+					forward.setExpression( rule )
 					rule = forward
 				else:
 					# Set the rule
