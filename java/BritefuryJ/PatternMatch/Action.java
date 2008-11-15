@@ -51,18 +51,31 @@ public class Action extends UnaryBranchExpression
 	
 	
 	protected MatchAction a;
+	protected boolean bMergeUp;
 	
 	
 	public Action(Object subexp, MatchAction a)
 	{
+		this( subexp, a, false );
+	}
+	
+	public Action(Object subexp, MatchAction a, boolean bMergeUp)
+	{
 		super( subexp );
 		this.a = a;
+		this.bMergeUp = bMergeUp;
 	}
 	
 	public Action(MatchExpression subexp, MatchAction a)
 	{
+		this( subexp, a, false );
+	}
+	
+	public Action(MatchExpression subexp, MatchAction a, boolean bMergeUp)
+	{
 		super( subexp );
 		this.a = a;
+		this.bMergeUp = bMergeUp;
 	}
 	
 	
@@ -71,15 +84,30 @@ public class Action extends UnaryBranchExpression
 		this( subexp, new PyAction( a ) );
 	}
 	
+	public Action(Object subexp, PyObject a, boolean bMergeUp)
+	{
+		this( subexp, new PyAction( a ), bMergeUp );
+	}
+	
 	public Action(MatchExpression subexp, PyObject a)
 	{
 		this( subexp, new PyAction( a ) );
+	}
+	
+	public Action(MatchExpression subexp, PyObject a, boolean bMergeUp)
+	{
+		this( subexp, new PyAction( a ), bMergeUp );
 	}
 	
 	
 	public MatchAction getAction()
 	{
 		return a;
+	}
+	
+	public boolean getMergeUp()
+	{
+		return bMergeUp;
 	}
 	
 
@@ -89,7 +117,7 @@ public class Action extends UnaryBranchExpression
 		
 		if ( res.isValid() )
 		{
-			return res.withValidUnsuppressedValue( this.a.invoke( input, res.value, res.bindings, state.arg ) );
+			return res.actionValue( this.a.invoke( input, res.value, res.bindings, state.arg ), bMergeUp );
 		}
 		else
 		{
@@ -104,7 +132,7 @@ public class Action extends UnaryBranchExpression
 		if ( x instanceof Action )
 		{
 			Action ax = (Action)x;
-			return super.compareTo( x )  &&  a == ax.a;
+			return super.compareTo( x )  &&  a == ax.a  &&  bMergeUp == ax.bMergeUp;
 		}
 		else
 		{
@@ -114,6 +142,28 @@ public class Action extends UnaryBranchExpression
 	
 	public String toString()
 	{
-		return "Action( " + subexp.toString() + " -> " + a.toString() + " )";
+		return "Action( " + subexp.toString() + " -> " + a.toString() + ", " + bMergeUp + " )";
+	}
+	
+	
+	
+	static Action mergeUpAction(Object subexp, MatchAction a)
+	{
+		return new Action( subexp, a, true );
+	}
+
+	static Action mergeUpAction(MatchExpression subexp, MatchAction a)
+	{
+		return new Action( subexp, a, true );
+	}
+
+	static Action mergeUpAction(Object subexp, PyObject a)
+	{
+		return new Action( subexp, a, true );
+	}
+
+	static Action mergeUpAction(MatchExpression subexp, PyObject a)
+	{
+		return new Action( subexp, a, true );
 	}
 }

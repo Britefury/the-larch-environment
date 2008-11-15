@@ -8,40 +8,28 @@ package BritefuryJ.PatternMatch;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import BritefuryJ.PatternMatch.MatchResult.NameAlreadyBoundException;
 
 public class Repetition extends UnaryBranchExpression
 {
 	protected int minRepetitions, maxRepetitions;
-	protected boolean bNullIfZero;
 	
 	public Repetition(Object subexp, int minRepetitions, int maxRepetitions)
-	{
-		this( subexp, minRepetitions, maxRepetitions, false );
-	}
-
-	public Repetition(Object subexp, int minRepetitions, int maxRepetitions, boolean bNullIfZero)
 	{
 		super( subexp );
 		
 		this.minRepetitions = minRepetitions;
 		this.maxRepetitions = maxRepetitions;
-		this.bNullIfZero = bNullIfZero;
 	}
 	
 	public Repetition(MatchExpression subexp, int minRepetitions, int maxRepetitions)
 	{
-		this( subexp, minRepetitions, maxRepetitions, false );
-	}
-
-	public Repetition(MatchExpression subexp, int minRepetitions, int maxRepetitions, boolean bNullIfZero)
-	{
 		super( subexp );
 		
 		this.minRepetitions = minRepetitions;
 		this.maxRepetitions = maxRepetitions;
-		this.bNullIfZero = bNullIfZero;
 	}
 	
 	
@@ -55,12 +43,8 @@ public class Repetition extends UnaryBranchExpression
 		return maxRepetitions;
 	}
 	
-	public boolean getNullIfZero()
-	{
-		return bNullIfZero;
-	}
-	
 
+	@SuppressWarnings("unchecked")
 	protected MatchResult parseNode(MatchState state, Object input, int start, int stop)
 	{
 		ArrayList<Object> values = new ArrayList<Object>();
@@ -92,7 +76,14 @@ public class Repetition extends UnaryBranchExpression
 
 				if ( !result.isSuppressed() )
 				{
-					values.add( result.value );
+					if ( result.isMergeable() )
+					{
+						values.addAll( (List<Object>)result.value );
+					}
+					else
+					{
+						values.add( result.value );
+					}
 				}
 				pos = result.end;
 				i++;
@@ -106,14 +97,7 @@ public class Repetition extends UnaryBranchExpression
 		}
 		else
 		{
-			if ( bNullIfZero  &&  i == 0 )
-			{
-				return new MatchResult( null, start, pos, bindings );
-			}
-			else
-			{
-				return new MatchResult( values, start, pos, bindings );
-			}
+			return MatchResult.mergeableValue( values, start, pos, bindings );
 		}
 
 	}
@@ -124,7 +108,7 @@ public class Repetition extends UnaryBranchExpression
 		if ( x instanceof Repetition )
 		{
 			Repetition rx = (Repetition)x;
-			return super.compareTo( x )  &&  minRepetitions == rx.minRepetitions  &&  maxRepetitions == rx.maxRepetitions  &&  bNullIfZero == rx.bNullIfZero;  
+			return super.compareTo( x )  &&  minRepetitions == rx.minRepetitions  &&  maxRepetitions == rx.maxRepetitions;  
 		}
 		else
 		{
@@ -135,7 +119,6 @@ public class Repetition extends UnaryBranchExpression
 	
 	public String toString()
 	{
-		String nullIfZeroStr = bNullIfZero  ?  ", null-if-zero"  :  "";
-		return "Repetition( " + subexp.toString() + ", " + String.valueOf( minRepetitions ) + ":" + String.valueOf( maxRepetitions ) + nullIfZeroStr + " )";
+		return "Repetition( " + subexp.toString() + ", " + String.valueOf( minRepetitions ) + ":" + String.valueOf( maxRepetitions ) + " )";
 	}
 }

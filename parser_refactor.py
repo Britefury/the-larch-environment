@@ -1,3 +1,5 @@
+import java.util.List
+
 from Britefury.InitBritefuryJ import initBritefuryJ
 initBritefuryJ()
 
@@ -11,10 +13,13 @@ from GSymCore.Languages.Python25.IdentityTransformation import Python25IdentityT
 from GSymCore.Languages.Python25.Python25Importer import importPy25File, importPy25Source
 from GSymCore.Languages.Python25.CodeGenerator import Python25CodeGenerator
 
+from datetime import datetime
+
 
 
 
 xs = importPy25File( 'GSymCore/Languages/Python25/Parser.py' )
+xs = DMList( xs )
 
 
 
@@ -75,7 +80,7 @@ def _makeRuleMethod(input, x, bindings):
 	return [ 'defStmt', bindings['ruleName'], [ [ 'simpleParam', 'self' ] ], [ [ 'returnStmt', bindings['ruleExpression'] ] ] ]
 parserRule = Production( [ 'assignmentStmt', [ [ 'singleTarget', AnyString().bindTo( 'ruleName' )] ], production.bindTo( 'ruleExpression' ) ] ).action( _makeRuleMethod )
 statement = parserRule  |  Anything()
-module = Production( [ 'python25Module', ZeroOrMore( statement ) ] ).action( lambda input, x, bindings: [ 'python25Module' ] + x[1] )
+module = Production( [ 'python25Module', ZeroOrMore( statement ) ] )
 
 
 
@@ -92,6 +97,20 @@ xf = Transformation( Python25IdentityTransformation(), [ xform1 ] )
 
 cg = Python25CodeGenerator()
 
-#print xf( xs )
-print cg( xf( xs ) )
+#t1 = datetime.now()
+xs2 = xf( xs )
+#t2 = datetime.now()
+
+print cg( xs2 )
+#def _count(x):
+	#if isinstance( x, java.util.List ):
+		#c = 0
+		#for xx in x:
+			#c += _count( xx )
+		#return c
+	#else:
+		#return 1
+
+#print '%d nodes; transformation time: %s'  %  ( _count( xs ), t2 - t1 )
+#print type( xs ), isinstance( xs, java.util.List )
 

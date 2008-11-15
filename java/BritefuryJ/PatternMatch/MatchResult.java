@@ -22,7 +22,7 @@ public class MatchResult implements ParseResultInterface
 	
 	protected Object value;
 	protected int begin, end;
-	protected boolean bSuppressed, bValid;
+	protected boolean bSuppressed, bValid, bMerge;
 	protected HashMap<String, Object> bindings;
 	
 	
@@ -81,38 +81,39 @@ public class MatchResult implements ParseResultInterface
 		this.bValid = bValid;
 	}
 	
-	protected MatchResult(Object value, int begin, int end, boolean bSuppressed, boolean bValid, HashMap<String, Object> bindings)
+	protected MatchResult(Object value, int begin, int end, boolean bSuppressed, boolean bValid, boolean bMerge, HashMap<String, Object> bindings)
 	{
 		this.value = value;
 		this.begin = begin;
 		this.end = end;
 		this.bSuppressed = bSuppressed;
 		this.bValid = bValid;
+		this.bMerge = bMerge;
 		this.bindings = bindings;
 	}
 	
 	
 	
-	protected MatchResult withValidUnsuppressedValue(Object v)
+	protected MatchResult actionValue(Object v, boolean bMergeUp)
 	{
-		return new MatchResult( v, begin, end, false, true, bindings );
+		return new MatchResult( v, begin, end, false, true, bMergeUp, bindings );
 	}
 	
 	protected MatchResult withRange(int begin, int end)
 	{
-		return new MatchResult( value, begin, end, false, true, bindings );
+		return new MatchResult( value, begin, end, false, true, bMerge, bindings );
 	}
 	
 	
 	
 	protected MatchResult suppressed()
 	{
-		return new MatchResult( value, begin, end, true, bValid, bindings );
+		return new MatchResult( value, begin, end, true, bValid, bMerge, bindings );
 	}
 	
 	protected MatchResult peek()
 	{
-		return new MatchResult( null, begin, begin, true, true, bindings );
+		return new MatchResult( null, begin, begin, true, true, bMerge, bindings );
 	}
 	
 	
@@ -141,7 +142,7 @@ public class MatchResult implements ParseResultInterface
 		
 		b.put( name, bindingValue );
 		
-		return new MatchResult( value, begin, end, bSuppressed, bValid, b );
+		return new MatchResult( value, begin, end, bSuppressed, bValid, bMerge, b );
 	}
 	
 	
@@ -200,7 +201,7 @@ public class MatchResult implements ParseResultInterface
 	
 	protected DebugMatchResult debug(DebugNode debugNode)
 	{
-		return new DebugMatchResult( value, begin, end, bSuppressed, bValid, bindings, debugNode );
+		return new DebugMatchResult( value, begin, end, bSuppressed, bValid, bMerge, bindings, debugNode );
 	}
 	
 	
@@ -230,6 +231,11 @@ public class MatchResult implements ParseResultInterface
 		return bValid;
 	}
 	
+	public boolean isMergeable()
+	{
+		return bMerge;
+	}
+	
 	public HashMap<String, Object> getBindings()
 	{
 		return bindings;
@@ -245,5 +251,10 @@ public class MatchResult implements ParseResultInterface
 	public static MatchResult suppressedNoValue(int begin, int end)
 	{
 		return new MatchResult( null, begin, end, true );
+	}
+	
+	public static MatchResult mergeableValue(Object value, int begin, int end, HashMap<String, Object> bindings)
+	{
+		return new MatchResult( value, begin, end, false, true, true, bindings );
 	}
 }

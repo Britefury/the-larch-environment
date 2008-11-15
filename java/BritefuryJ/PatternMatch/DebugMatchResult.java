@@ -16,9 +16,9 @@ public class DebugMatchResult extends MatchResult implements DebugParseResultInt
 	public DebugNode debugNode;
 	
 	
-	protected DebugMatchResult(Object value, int begin, int end, boolean bSuppressed, boolean bValid, HashMap<String, Object> bindings, DebugNode debugNode)
+	protected DebugMatchResult(Object value, int begin, int end, boolean bSuppressed, boolean bValid, boolean bMerge, HashMap<String, Object> bindings, DebugNode debugNode)
 	{
-		super( value, begin, end, bSuppressed, bValid, bindings );
+		super( value, begin, end, bSuppressed, bValid, bMerge, bindings );
 		this.debugNode = debugNode;
 	}
 	
