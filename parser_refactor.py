@@ -65,10 +65,10 @@ def _productionInstanceExpression(subexp):
 
 
 parserExpression = Forward()
-parserExpression << ( _parserMethodInvoke( parserExpression )  |  _parserBinOp( parserExpression )  |  _branchInstanceExpression( parserExpression )  |  _terminalInstanceExpression() )
+parserExpression.setExpression( ( _parserMethodInvoke( parserExpression )  |  _parserBinOp( parserExpression )  |  _branchInstanceExpression( parserExpression )  |  _terminalInstanceExpression() ) )
 production = Forward()
 prod = _productionInstanceExpression( parserExpression ).action( lambda input, x, bindings: bindings['subexp'] )
-production << ( _parserMethodInvoke( production )  |  prod )
+production.setExpression( ( _parserMethodInvoke( production )  |  prod ) )
 
 
 def _makeRuleMethod(input, x, bindings):

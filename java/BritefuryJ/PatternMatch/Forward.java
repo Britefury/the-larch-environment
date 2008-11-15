@@ -40,20 +40,6 @@ public class Forward extends MatchExpression
 	
 
 	
-	public MatchExpression __lshift__(Object exp)
-	{
-		subexp = toMatchExpression( exp );
-		return this;
-	}
-	
-	public MatchExpression __lshift__(MatchExpression exp)
-	{
-		subexp = exp;
-		return this;
-	}
-	
-
-	
 	protected MatchResult parseNode(MatchState state, Object input, int start, int stop)
 	{
 		return subexp.evaluateNode( state, input, start, stop );
