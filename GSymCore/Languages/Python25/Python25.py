@@ -12,6 +12,13 @@ from GSymCore.Languages.Python25.CodeGenerator import Python25CodeGenerator
 from GSymCore.Languages.Python25.View import Python25View
 
 
+def pyTransformModify(cur, new):
+	cur[1:] = new[1:]
+
+
+
+
 language = GSymLanguage()
 language.registerCodeGeneratorFactory( 'ascii', Python25CodeGenerator )
 language.registerViewFactory( Python25View )
+language.registerTransformModifyFn( pyTransformModify )

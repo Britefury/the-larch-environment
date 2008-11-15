@@ -15,7 +15,6 @@ def py25ImportFile(filename):
 	content = importPy25File( filename )
 	return [ '$withLanguageModule', 'GSymCore.Languages.Python25.Python25', content ]
 
-
 def initPlugin(pluginInterface):
 	pluginInterface.registerNewDocumentFactory( 'Python 2.5', py25New )
 	pluginInterface.registerImporter( 'Python 2.5', 'Python 2.5 source (*.py)', 'py', py25ImportFile )

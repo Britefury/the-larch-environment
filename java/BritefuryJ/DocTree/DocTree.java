@@ -348,6 +348,7 @@ public class DocTree
 			}
 			else
 			{
+				System.out.println( "DocTree.treeNode(): wrapping " + x.getClass().getName() );
 				node = new DocTreeNodeObject( x, parentTreeNode, indexInParent );
 			}
 
