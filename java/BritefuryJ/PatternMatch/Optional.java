@@ -10,7 +10,7 @@ package BritefuryJ.PatternMatch;
 
 public class Optional extends UnaryBranchExpression
 {
-	public Optional(String subexp)
+	public Optional(Object subexp)
 	{
 		super( subexp );
 	}

@@ -31,7 +31,7 @@ public abstract class BranchExpression extends MatchExpression
 		
 		for (Object x: subexps)
 		{
-			xs.add( toParserExpression( x ) );
+			xs.add( toMatchExpression( x ) );
 		}
 		
 		this.subexps = new MatchExpression[xs.size()];

@@ -21,7 +21,7 @@ public abstract class UnaryBranchExpression extends MatchExpression
 	
 	public UnaryBranchExpression(Object subexp)
 	{
-		this( toParserExpression( subexp ) );
+		this( toMatchExpression( subexp ) );
 	}
 	
 	

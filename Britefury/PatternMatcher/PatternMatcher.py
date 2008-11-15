@@ -5,46 +5,46 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from BritefuryJ.Parser import Forward, Production
+from BritefuryJ.Parser import Production, Forward
 
 
 
 class _RuleHelper (object):
-	def __init__(self, grammarInstance, desc):
-		self._grammarInstance = grammarInstance
+	def __init__(self, matcherInstance, desc):
+		self._matcherInstance = matcherInstance
 		self._desc = desc
 		
 		
 	def __call__(self, *args, **kwargs):
 		try:
 			# If the rule has already been produced, then just return it
-			rule = getattr( self._grammarInstance, self._desc._attrName )
+			rule = getattr( self._matcherInstance, self._desc._attrName )
 		except AttributeError:
 			# We need to build the parser expression
-			if hasattr( self._grammarInstance, self._desc._bEvaluatingAttrName ):
+			if hasattr( self._matcherInstance, self._desc._bEvaluatingAttrName ):
 				# Recursive rule detected; create a @Forward parser expression
 				rule = Forward()
-				setattr( self._grammarInstance, self._desc._attrName, rule )
+				setattr( self._matcherInstance, self._desc._attrName, rule )
 			else:
 				# Set the attribute in @self._desc._bEvaluatingAttrName so that recursive rule creation can be detected
-				setattr( self._grammarInstance, self._desc._bEvaluatingAttrName, True )
+				setattr( self._matcherInstance, self._desc._bEvaluatingAttrName, True )
 				
 				# Create the parser expression
-				parser = self._desc._f( self._grammarInstance, *args, **kwargs )
+				parser = self._desc._f( self._matcherInstance, *args, **kwargs )
 				
 				# Create a production and set the debug name
 				rule = Production( parser ).debug( self._desc._name )
 				
-				if hasattr( self._grammarInstance, self._desc._attrName ):
+				if hasattr( self._matcherInstance, self._desc._attrName ):
 					# The attribute @self._desc._attrName has been set, then this rule is recursive, so a @Forward will already have been created
-					forward = getattr( self._grammarInstance, self._desc._attrName )
+					forward = getattr( self._matcherInstance, self._desc._attrName )
 					forward << rule
 					rule = forward
 				else:
 					# Set the rule
-					setattr( self._grammarInstance, self._desc._attrName, rule )
+					setattr( self._matcherInstance, self._desc._attrName, rule )
 				# No longer evaluating
-				delattr( self._grammarInstance, self._desc._bEvaluatingAttrName )
+				delattr( self._matcherInstance, self._desc._bEvaluatingAttrName )
 		return rule
 	
 
@@ -66,6 +66,6 @@ class Rule (object):
 
 	
 
-class Grammar (object):
+class PatternMatcher (object):
 	pass
 	

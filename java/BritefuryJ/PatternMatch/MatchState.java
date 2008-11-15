@@ -7,6 +7,7 @@
 package BritefuryJ.PatternMatch;
 
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 
 import BritefuryJ.ParserHelpers.DebugNode;
 
@@ -37,18 +38,22 @@ class MatchState
 	
 
 	
-	private HashMap<Object, HashMap<MemoKey, MatchResult> > memos;
+	private IdentityHashMap<Object, HashMap<MemoKey, MatchResult> > memos;
 	private Object currentInput;
 	private HashMap<MemoKey, MatchResult> currentMemo;
+	protected Object arg;
+	protected MatchAction delegateAction;
 	
 	protected DebugNode debugStack;
 	protected boolean bDebuggingEnabled;
 	
 	
 	
-	public MatchState()
+	public MatchState(Object arg, MatchAction delegateAction)
 	{
-		this.memos = new HashMap<Object, HashMap<MemoKey, MatchResult> >();
+		this.memos = new IdentityHashMap<Object, HashMap<MemoKey, MatchResult> >();
+		this.arg = arg;
+		this.delegateAction = delegateAction;
 	}
 	
 	

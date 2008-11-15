@@ -9,12 +9,12 @@ package BritefuryJ.PatternMatch;
 import java.util.Map;
 
 import org.python.core.Py;
-import org.python.core.PyInteger;
 import org.python.core.PyObject;
+import org.python.core.PySequenceList;
 
 public class Action extends UnaryBranchExpression
 {
-	private static class PyAction implements MatchAction
+	protected static class PyAction implements MatchAction
 	{
 		private PyObject callable;
 		
@@ -25,9 +25,27 @@ public class Action extends UnaryBranchExpression
 		}
 
 
-		public Object invoke(Object input, int begin, Object x, Map<String, Object> bindings)
+		public Object invoke(Object input, Object x, Map<String, Object> bindings, Object arg)
 		{
-			return callable.__call__( Py.java2py( input ), new PyInteger( begin ), Py.java2py( x ) );
+			if ( arg != null  &&  arg instanceof PySequenceList )
+			{
+				PySequenceList args = (PySequenceList)arg;
+				int numArgs = args.size();
+				PyObject[] values = new PyObject[numArgs + 3];
+				
+				for (int i = 0; i < numArgs; i++)
+				{
+					values[i] = Py.java2py( args.get( i ) );
+				}
+				values[numArgs] = Py.java2py( input );
+				values[numArgs] = Py.java2py( x );
+				values[numArgs] = Py.java2py( bindings );
+				return callable.__call__( values );
+			}
+			else
+			{
+				return callable.__call__( Py.java2py( input ), Py.java2py( x ), Py.java2py( bindings ) );
+			}
 		}
 	}
 	
@@ -35,7 +53,7 @@ public class Action extends UnaryBranchExpression
 	protected MatchAction a;
 	
 	
-	public Action(String subexp, MatchAction a)
+	public Action(Object subexp, MatchAction a)
 	{
 		super( subexp );
 		this.a = a;
@@ -48,7 +66,7 @@ public class Action extends UnaryBranchExpression
 	}
 	
 	
-	public Action(String subexp, PyObject a)
+	public Action(Object subexp, PyObject a)
 	{
 		this( subexp, new PyAction( a ) );
 	}
@@ -71,7 +89,7 @@ public class Action extends UnaryBranchExpression
 		
 		if ( res.isValid() )
 		{
-			return res.withValidUnsuppressedValue( this.a.invoke( input, res.begin, res.value, res.bindings ) );
+			return res.withValidUnsuppressedValue( this.a.invoke( input, res.value, res.bindings, state.arg ) );
 		}
 		else
 		{

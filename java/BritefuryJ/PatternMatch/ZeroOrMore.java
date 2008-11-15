@@ -9,12 +9,12 @@ package BritefuryJ.PatternMatch;
 
 public class ZeroOrMore extends Repetition
 {
-	public ZeroOrMore(String subexp)
+	public ZeroOrMore(Object subexp)
 	{
 		this( subexp, false );
 	}
 
-	public ZeroOrMore(String subexp, boolean bNullIfZero)
+	public ZeroOrMore(Object subexp, boolean bNullIfZero)
 	{
 		super( subexp, 0, -1, bNullIfZero );
 	}

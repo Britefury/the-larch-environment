@@ -13,6 +13,11 @@ public class ClearBindings extends UnaryBranchExpression
 		super( subexp );
 	}
 	
+	public ClearBindings(MatchExpression subexp)
+	{
+		super( subexp );
+	}
+	
 	
 	
 	protected MatchResult parseNode(MatchState state, Object input, int start, int stop)

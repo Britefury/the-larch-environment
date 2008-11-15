@@ -119,7 +119,7 @@ public class ListNode extends BranchExpression
 
 	public MatchExpression __add__(Object x)
 	{
-		return new Sequence( appendToSubexps( toParserExpression( x ) ) );
+		return new Sequence( appendToSubexps( toMatchExpression( x ) ) );
 	}
 
 

@@ -10,7 +10,7 @@ import org.python.core.PyObject;
 
 public class Production extends UnaryBranchExpression
 {
-	public Production(String subexp)
+	public Production(Object subexp)
 	{
 		super( subexp );
 	}
@@ -18,6 +18,12 @@ public class Production extends UnaryBranchExpression
 	public Production(MatchExpression subexp)
 	{
 		super( subexp );
+	}
+	
+	public Production(Object subexp, String debugName)
+	{
+		super( subexp );
+		debug( debugName );
 	}
 	
 	public Production(MatchExpression subexp, String debugName)

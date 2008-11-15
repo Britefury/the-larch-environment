@@ -23,7 +23,7 @@ public class Forward extends MatchExpression
 	
 	public MatchExpression setExpression(Object exp)
 	{
-		subexp = toParserExpression( exp );
+		subexp = toMatchExpression( exp );
 		return this;
 	}
 	
@@ -42,7 +42,7 @@ public class Forward extends MatchExpression
 	
 	public MatchExpression __lshift__(Object exp)
 	{
-		subexp = toParserExpression( exp );
+		subexp = toMatchExpression( exp );
 		return this;
 	}
 	

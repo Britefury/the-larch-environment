@@ -5,8 +5,9 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from BritefuryJ.PatternMatch import PatternMatcher, Guard
-from BritefuryJ.PatternMatch.Pattern import Anything
+from BritefuryJ.PatternMatch import *
+
+from BritefuryJ.DocModel import DMIORead, DMIOWrite
 
 
 import unittest
@@ -14,22 +15,15 @@ import unittest
 
 
 class TestCase_PatternMatcher (unittest.TestCase):
-	m = PatternMatcher( [ Guard( [ 'add', [ 'mul', 'a' << Anything(), [ 'sub', '1.0', 't' << Anything() ] ], [ 'mul', 'b' << Anything(), 't' << Anything() ] ], lambda node, a, b, t: [ 'add', a, [ 'mul', [ 'sub', b, a ], t ] ] ) ] )
-	m2 = PatternMatcher( [ Guard( [ 'add', [ 'mul', 'a' << Anything(), [ 'sub', '1.0', 't' << Anything() ] ], [ 'mul', 'b' << Anything(), 't' << Anything() ] ], lambda p, q, r, node, a, b, t: [ p, q, r, [ 'add', a, [ 'mul', [ 'sub', b, a ], t ] ] ] ) ] )
-
-	
-	def test_NoMatchSimple(self):
-		self.assertRaises( PatternMatcher.MatchFailureException, lambda: self.m.match( [ 'hi', 'there' ] ) )
+	def test_lerpRefactor(self):
+		oneMinusT = MatchExpression.toMatchExpression( [ '-', '1.0', 't' << Anything() ] )
+		bTimesT = MatchExpression.toMatchExpression( [ '*', 'b' << Anything(), 't' << Anything() ] )
+		aTimesOneMinusT = MatchExpression.toMatchExpression( [ '*', 'a' << Anything(), oneMinusT ] )
+		lerp = MatchExpression.toMatchExpression( [ '+', aTimesOneMinusT, bTimesT ] )
+		lerpRefactor = lerp.action( lambda input, begin, x, bindings: [ '+', bindings['a'], [ '*', [ '-', bindings['b'], bindings['a'] ], bindings['t'] ] ] )
 		
+		data = DMIORead.readSX( '(+ (* p (- 1.0 x)) (* q x))' )
+		expected = DMIORead.readSX( '(+ p (* (- q p) x))' )
+		result = lerpRefactor.parseNode( data )
+		self.assert_( DMIOWrite.writeSX( result.getValue() )  ==  DMIOWrite.writeSX( expected ) )
 		
-	def test_NoMatchWrongName(self):
-		self.assertRaises( PatternMatcher.MatchFailureException, lambda: self.m.match( [ 'add', [ 'mul', 'x', [ 'sub', '1.0', 'z' ] ], [ 'mul', 'y', 'w' ] ] ) )
-		
-		
-	def test_PatternMatch(self):
-		self.assert_( self.m.match( [ 'add', [ 'mul', 'x', [ 'sub', '1.0', 'q' ] ], [ 'mul', 'y', 'q' ] ] )  ==  [ 'add', 'x', [ 'mul', [ 'sub', 'y', 'x' ], 'q' ] ] )
-
-		
-	def test_PatternMatchWithArgs(self):
-		self.assert_( self.m2.match( [ 'add', [ 'mul', 'x', [ 'sub', '1.0', 'q' ] ], [ 'mul', 'y', 'q' ] ],  ( 1, 2, 3 ) )  ==  [ 1, 2, 3, [ 'add', 'x', [ 'mul', [ 'sub', 'y', 'x' ], 'q' ] ] ] )
-	

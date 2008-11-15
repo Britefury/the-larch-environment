@@ -9,6 +9,7 @@ package BritefuryJ.PatternMatch;
 import java.util.Arrays;
 import java.util.List;
 import org.python.core.PyObject;
+import org.python.core.PyString;
 
 import BritefuryJ.ParserHelpers.DebugNode;
 import BritefuryJ.ParserHelpers.ParserExpressionInterface;
@@ -22,17 +23,59 @@ public abstract class MatchExpression implements ParserExpressionInterface
 	
 	public MatchResult parseNode(Object input)
 	{
-		MatchState state = new MatchState();
+		return parseNode( input, null, (MatchAction)null );
+	}
+	
+	public MatchResult parseNode(Object input, MatchAction delegateAction)
+	{
+		return parseNode( input, null, delegateAction );
+	}
+	
+	public MatchResult parseNode(Object input, Object arg, MatchAction delegateAction)
+	{
+		MatchState state = new MatchState( arg, delegateAction );
 		List<Object> inputInList = Arrays.asList( new Object[] { input } );
 		return evaluateNode( state, inputInList, 0, 1 );
 	}
 	
+	public MatchResult parseNode(Object input, PyObject delegateAction)
+	{
+		return parseNode( input, null, new Action.PyAction( delegateAction ) );
+	}
+	
+	public MatchResult parseNode(Object input, Object arg, PyObject delegateAction)
+	{
+		return parseNode( input, arg, new Action.PyAction( delegateAction ) );
+	}
+	
+
+	
 	public DebugMatchResult debugParseNode(Object input)
 	{
-		MatchState state = new MatchState();
+		return debugParseNode( input, null, (MatchAction)null );
+	}
+	
+	public DebugMatchResult debugParseNode(Object input, MatchAction delegateAction)
+	{
+		return debugParseNode( input, null, delegateAction );
+	}
+	
+	public DebugMatchResult debugParseNode(Object input, Object arg, MatchAction delegateAction)
+	{
+		MatchState state = new MatchState( arg, delegateAction );
 		state.enableDebugging();
 		List<Object> inputInList = Arrays.asList( new Object[] { input } );
 		return (DebugMatchResult)evaluateNode( state, inputInList, 0, 1 );
+	}
+	
+	public DebugMatchResult debugParseNode(Object input, PyObject delegateAction)
+	{
+		return debugParseNode( input, null, new Action.PyAction( delegateAction ) );
+	}
+
+	public DebugMatchResult debugParseNode(Object input, Object arg, PyObject delegateAction)
+	{
+		return debugParseNode( input, arg, new Action.PyAction( delegateAction ) );
 	}
 	
 	
@@ -120,7 +163,7 @@ public abstract class MatchExpression implements ParserExpressionInterface
 
 	public MatchExpression __add__(Object x)
 	{
-		return new Sequence( withSibling( toParserExpression( x ) ) );
+		return new Sequence( withSibling( toMatchExpression( x ) ) );
 	}
 
 	
@@ -131,7 +174,7 @@ public abstract class MatchExpression implements ParserExpressionInterface
 
 	public MatchExpression __or__(Object x)
 	{
-		return new Choice( withSibling( toParserExpression( x ) ) );
+		return new Choice( withSibling( toMatchExpression( x ) ) );
 	}
 
 	
@@ -142,7 +185,7 @@ public abstract class MatchExpression implements ParserExpressionInterface
 
 	public MatchExpression __xor__(Object x)
 	{
-		return new BestChoice( withSibling( toParserExpression( x ) ) );
+		return new BestChoice( withSibling( toMatchExpression( x ) ) );
 	}
 
 	
@@ -154,6 +197,12 @@ public abstract class MatchExpression implements ParserExpressionInterface
 	public MatchExpression __and__(PyObject cond)
 	{
 		return condition( cond );
+	}
+
+
+	public MatchExpression __rlshift__(String name)
+	{
+		return bindTo( name );
 	}
 
 
@@ -211,7 +260,7 @@ public abstract class MatchExpression implements ParserExpressionInterface
 	
 	
 	@SuppressWarnings("unchecked")
-	public static MatchExpression toParserExpression(Object x)
+	public static MatchExpression toMatchExpression(Object x)
 	{
 		if ( x instanceof MatchExpression )
 		{
@@ -220,6 +269,10 @@ public abstract class MatchExpression implements ParserExpressionInterface
 		else if ( x instanceof String )
 		{
 			return new Literal( (String)x );
+		}
+		else if ( x instanceof PyString )
+		{
+			return new Literal( ((PyString)x).toString() );
 		}
 		else if ( x instanceof List )
 		{
@@ -231,11 +284,11 @@ public abstract class MatchExpression implements ParserExpressionInterface
 		}
 		else
 		{
-			return new Literal( (String)x );
+			return new Literal( x.toString() );
 		}
 	}
 
-	public static MatchExpression toParserExpression(String x)
+	public static MatchExpression toMatchExpression(String x)
 	{
 		return new Literal( x );
 	}

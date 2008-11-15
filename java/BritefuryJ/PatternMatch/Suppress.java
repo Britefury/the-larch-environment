@@ -9,7 +9,7 @@ package BritefuryJ.PatternMatch;
 
 public class Suppress extends UnaryBranchExpression
 {
-	public Suppress(String subexp)
+	public Suppress(Object subexp)
 	{
 		super( subexp );
 	}

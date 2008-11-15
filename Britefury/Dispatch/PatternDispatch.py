@@ -21,9 +21,9 @@ class PatternDispatch (object):
 	def __call__(self, node, *args):
 		try:
 			if len( args ) == 0:
-				return self._matcher.match( node )
+				return self._matcher.parseNode( node, None )
 			else:
-				return self._matcher.match( node, args )
+				return self._matcher.parseNode( node, args )
 		except PatternMatcher.MatchFailureException:
 			raise DispatchError
 
