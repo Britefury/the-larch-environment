@@ -55,6 +55,22 @@ class GSymDocumentLISPViewContentHandler (GSymDocumentContentHandler):
 		language = LISP.language
 		languageViewFactory = GSymViewFactory( world, 'LISP', language.getViewFactory() )
 		return languageViewFactory.createDocumentView( xs, self._commandHistory )
+	
+	
+	
+	
+class GSymDocumentTransformContentHandler (GSymDocumentContentHandler):
+	def __init__(self, xform):
+		super( GSymDocumentTransformContentHandler, self ).__init__()
+		self._xform = xform 
+		
+	def withLanguageModule(self, world, importLanguage, xs):
+		language = world.getModuleLanguage( importLanguage )
+		transformModifyFn = language.getTransformModifyFn()
+		xs2 = self._xform( xs )
+		xs2 = DMList( xs2 )
+		transformModifyFn( xs, xs2 )
+		return xs2
 		
 		
 

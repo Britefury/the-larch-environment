@@ -28,7 +28,7 @@ def methodDispatch(target, node, *args):
 		return method( *( args + ( node, ) + tuple( node[1:] ) ) )
 	else:
 		if isinstance( node, DocTreeNode ):
-			raise DispatchDataError, 'methodDispatch(): can only dispatch on lists; not on %s  (from %s)'  %  ( nodeToSXString( node ), nodeToSXString( node.getParentTreeNode().getParentTreeNode() ) )
+			raise DispatchDataError, 'methodDispatch(): can only dispatch on lists; not on %s:%s  (from %s)'  %  ( node.getClass().getName(), nodeToSXString( node ), nodeToSXString( node.getParentTreeNode().getParentTreeNode() ) )
 		else:
 			raise DispatchDataError, 'methodDispatch(): can only dispatch on lists; not on %s'  %  ( nodeToSXString( node ) )
 

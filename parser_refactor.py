@@ -18,12 +18,6 @@ from datetime import datetime
 
 
 
-xs = importPy25File( 'GSymCore/Languages/Python25/Parser.py' )
-xs = DMList( xs )
-
-
-
-
 def _call(target, params):
 	return MatchExpression.toMatchExpression( [ 'call', target, params ] )
 
@@ -92,25 +86,7 @@ xform1 = PatternMatchTransformation( module )
 
 
 
-xf = Transformation( Python25IdentityTransformation(), [ xform1 ] )
+xform = Transformation( Python25IdentityTransformation(), [ xform1 ] )
 
 
-cg = Python25CodeGenerator()
-
-#t1 = datetime.now()
-xs2 = xf( xs )
-#t2 = datetime.now()
-
-print cg( xs2 )
-#def _count(x):
-	#if isinstance( x, java.util.List ):
-		#c = 0
-		#for xx in x:
-			#c += _count( xx )
-		#return c
-	#else:
-		#return 1
-
-#print '%d nodes; transformation time: %s'  %  ( _count( xs ), t2 - t1 )
-#print type( xs ), isinstance( xs, java.util.List )
 

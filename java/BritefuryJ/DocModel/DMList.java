@@ -14,6 +14,8 @@ import java.util.ListIterator;
 import java.util.Vector;
 
 import org.python.core.Py;
+import org.python.core.PyJavaInstance;
+import org.python.core.PyObject;
 import org.python.core.PySlice;
 import org.python.core.PyString;
 import org.python.core.PyUnicode;
@@ -291,8 +293,13 @@ public class DMList implements DMListInterface, Trackable
 		{
 			return coerce( (List<Object>)x );
 		}
+		else if ( x instanceof PyJavaInstance )
+		{
+			return coerce( Py.tojava( (PyObject)x, Object.class ) );
+		}
 		else
 		{
+			System.out.println( "DMList.coerce(): attempted to coerce " + x.getClass().getName() );
 			return x;
 		}
 	}

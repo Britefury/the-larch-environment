@@ -31,7 +31,7 @@ from Britefury.Event.QueuedEvent import queueEvent
 
 from Britefury.gSym.gSymWorld import GSymWorld
 from Britefury.gSym.gSymEnvironment import GSymEnvironment
-from Britefury.gSym.gSymDocument import loadDocument, newDocument, GSymDocumentViewContentHandler, GSymDocumentLISPViewContentHandler
+from Britefury.gSym.gSymDocument import loadDocument, newDocument, GSymDocumentViewContentHandler, GSymDocumentLISPViewContentHandler, GSymDocumentTransformContentHandler
 
 from Britefury.Plugin import InitPlugins
 
@@ -66,7 +66,7 @@ class MainAppPluginInterface (object):
 		
 	def registerImporter(self, menuLabel, fileType, filePattern, importFn):
 		self._app.registerImporter( menuLabel, fileType, filePattern, importFn )
-
+		
 
 		
 class MainAppDocView (CellListener):	
@@ -191,6 +191,7 @@ class MainApp (object):
 		# ACTIONS MENU
 		
 		self._actionsMenu = JMenu( 'Actions' )
+		self._actionsMenu.add( _action( 'Transform...', self._onTransform ) )
 
 
 
@@ -302,6 +303,8 @@ class MainApp (object):
 	def setDocument(self, documentRoot):
 		self._documentRoot = documentRoot
 		
+		#self._actionsMenu.removeAll()
+		
 		
 
 		self._commandHistory = CommandHistory()
@@ -316,8 +319,6 @@ class MainApp (object):
 		self._bUnsavedData = False
 		
 	
-		self._actionsMenu.removeAll()
-		
 		contentHandler = GSymDocumentViewContentHandler( self._commandHistory )
 		self._docView.setDocumentContent( documentRoot, contentHandler )
 		
@@ -471,6 +472,24 @@ class MainApp (object):
 
 		
 
+	def _onTransform(self):
+		openDialog = JFileChooser()
+		openDialog.setFileFilter( FileNameExtensionFilter( 'Python source (*.py)', [ 'py' ] ) )
+		response = openDialog.showOpenDialog( self._frame )
+		if response == JFileChooser.APPROVE_OPTION:
+			sf = openDialog.getSelectedFile()
+			if sf is not None:
+				filename = sf.getPath()
+				if filename is not None:
+					env = {}
+					execfile( filename, env )
+					xFn = env['xform']
+					
+					contentHandler = GSymDocumentTransformContentHandler( xFn )
+					loadDocument( self._world, self._documentRoot, contentHandler )
+							
+
+					
 	def _onShowLisp(self):
 		self._bLispWindowVisible = not self._bLispWindowVisible
 		if self._bLispWindowVisible:
