@@ -16,8 +16,6 @@ from BritefuryJ.Cell import Cell
 
 from Britefury.Util.NodeUtil import isListNode
 
-from Britefury.gSym.View.UnparsedText import UnparsedText
-
 
 
 _defaultProxyStyleSheet = ContainerStyleSheet()

@@ -15,8 +15,6 @@ from Britefury.gSym.View.Interactor import keyEventMethod, accelEventMethod, tex
 
 from Britefury.gSym.View.EditOperations import replace, replaceWithRange, append, prepend, insertBefore, insertRangeBefore, insertAfter, insertRangeAfter
 
-from Britefury.gSym.View.UnparsedText import UnparsedText
-
 
 from Britefury.Util.NodeUtil import *
 
