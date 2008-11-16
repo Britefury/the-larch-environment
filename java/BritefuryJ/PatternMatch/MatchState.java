@@ -34,6 +34,19 @@ class MatchState
 			x = ( x ^ position ) * mult;
 			return x + 97351;
 		}
+		
+		public boolean equals(Object x)
+		{
+			if ( x instanceof MemoKey )
+			{
+				MemoKey mx = (MemoKey)x;
+				return position == mx.position  &&  rule == mx.rule;
+			}
+			else
+			{
+				return false;
+			}
+		}
 	}
 	
 

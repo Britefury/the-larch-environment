@@ -11,11 +11,7 @@ from Britefury.Util.NodeUtil import isListNode
 from Britefury.gSym.View.gSymView import border, indent, text, hbox, ahbox, vbox, paragraph, script, scriptLSuper, scriptLSub, scriptRSuper, scriptRSub, listView, contentListener, viewEval, mapViewEval, GSymView
 from Britefury.gSym.View.ListView import ParagraphListViewLayout, HorizontalListViewLayout, VerticalInlineListViewLayout, VerticalListViewLayout
 
-from Britefury.gSym.View.Interactor import keyEventMethod, accelEventMethod, textEventMethod, backspaceStartMethod, deleteEndMethod, Interactor
-
 from Britefury.gSym.View.EditOperations import replace, append, prepend, insertBefore, insertAfter
-
-from Britefury.gSym.View.UnparsedText import UnparsedText
 
 
 from BritefuryJ.DocPresent import *

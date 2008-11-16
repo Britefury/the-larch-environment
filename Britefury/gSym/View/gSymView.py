@@ -31,10 +31,7 @@ from Britefury.Util.NodeUtil import isListNode, nodeToSXString
 
 from Britefury.Dispatch.MethodDispatch import methodDispatch
 
-from Britefury.gSym.View.Interactor import Interactor, NoEventMatch
-from Britefury.gSym.View.InteractorEvent import InteractorEventKey, InteractorEventText, InteractorEventBackspaceStart, InteractorEventDeleteEnd
 from Britefury.gSym.View import ListView
-from Britefury.gSym.View.UnparsedText import UnparsedText
 
 #from Britefury.DocTree.DocTree import DocTree
 #from Britefury.DocTree.DocTreeNode import DocTreeNode
