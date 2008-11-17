@@ -11,12 +11,12 @@ import java.util.List;
 import BritefuryJ.DocPresent.ElementTree.Element;
 import BritefuryJ.DocPresent.ElementTree.ElementFactory;
 
-abstract class ListViewLayout
+public abstract class ListViewLayout
 {
 	public enum TrailingSeparator { NEVER, ONE_ELEMENT, ALWAYS };
 	
 
-	abstract Element layoutChildren(List<Element> children, ElementFactory beginDelim, ElementFactory endDelim, ElementFactory separator);
+	public abstract Element createListElement(List<Element> children, ElementFactory beginDelim, ElementFactory endDelim, ElementFactory separator);
 	
 	
 	

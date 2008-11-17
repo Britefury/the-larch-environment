@@ -21,7 +21,7 @@ public class HorizontalListViewLayout extends ListViewLayout
 	private TrailingSeparator trailingSeparator;
 	
 	
-	public HorizontalListViewLayout(HBoxStyleSheet styleSheet, ElementFactory spacingFactory, int lineBreakPriority, TrailingSeparator trailingSeparator)
+	public HorizontalListViewLayout(HBoxStyleSheet styleSheet, ElementFactory spacingFactory, TrailingSeparator trailingSeparator)
 	{
 		this.styleSheet = styleSheet;
 		this.spacingFactory = spacingFactory;
@@ -29,11 +29,12 @@ public class HorizontalListViewLayout extends ListViewLayout
 	}
 	
 	
-	public Element layoutChildren(List<Element> children, ElementFactory beginDelim, ElementFactory endDelim, ElementFactory separator)
+	public Element createListElement(List<Element> children, ElementFactory beginDelim, ElementFactory endDelim, ElementFactory separator)
 	{
 		HBoxElement hbox = new HBoxElement( styleSheet );
 		
 		ArrayList<Element> childElems = new ArrayList<Element>();
+		childElems.ensureCapacity( children.size() + 2 );
 		
 		if ( beginDelim != null )
 		{

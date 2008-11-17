@@ -147,7 +147,7 @@ class VerticalInlineListViewLayout (ListViewLayout):
 		if len( contents ) <= 1:
 			contentElements = self._getContentElements( contents, xs )
 			contentElements = [ beginDelim ] + contentWidgets   if beginDelim is not None   else contentWidgets
-			contentElements = contentWidgets + [ endDelim ]   if endDelim is not None   else contentWidgets
+			contentElements = contentElements + [ endDelim ]   if endDelim is not None   else contentElements
 			singleLine = ParagraphElement( self._lineParagraphStyleSheet )
 			singleLine.setChildren( contentElements )
 			return singleLine
