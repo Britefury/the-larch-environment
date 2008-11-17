@@ -56,11 +56,12 @@ public class VerticalListViewLayout extends IndentedListViewLayout
 	}
 	
 
-	public Element layoutChildren(List<Element> children, ElementFactory beginDelim, ElementFactory endDelim, ElementFactory separator)
+	public Element createListElement(List<Element> children, ElementFactory beginDelim, ElementFactory endDelim, ElementFactory separator)
 	{
 		VBoxElement vbox = new VBoxElement( styleSheet );
 		
 		ArrayList<Element> childElems = new ArrayList<Element>();
+		childElems.ensureCapacity( children.size() );
 		
 		if ( children.size() > 0 )
 		{
@@ -89,6 +90,7 @@ public class VerticalListViewLayout extends IndentedListViewLayout
 			VBoxElement outerVBox = new VBoxElement( styleSheet );
 			
 			ArrayList<Element> outerChildElems = new ArrayList<Element>();
+			outerChildElems.ensureCapacity( 3 );
 			
 			if ( beginDelim != null )
 			{

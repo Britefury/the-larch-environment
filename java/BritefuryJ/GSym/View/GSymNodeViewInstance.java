@@ -8,9 +8,13 @@ package BritefuryJ.GSym.View;
 
 import java.util.List;
 
+import org.python.core.Py;
+import org.python.core.PyObject;
+
 import BritefuryJ.DocPresent.DPHBox;
 import BritefuryJ.DocPresent.ElementTree.BorderElement;
 import BritefuryJ.DocPresent.ElementTree.Element;
+import BritefuryJ.DocPresent.ElementTree.ElementFactory;
 import BritefuryJ.DocPresent.ElementTree.FractionElement;
 import BritefuryJ.DocPresent.ElementTree.HBoxElement;
 import BritefuryJ.DocPresent.ElementTree.HiddenContentElement;
@@ -32,9 +36,27 @@ import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 import BritefuryJ.DocView.DVNode;
 import BritefuryJ.DocView.DocView;
+import BritefuryJ.GSym.View.ListView.ListViewLayout;
 
 public class GSymNodeViewInstance
 {
+	private static class PyElementFactory implements ElementFactory
+	{
+		private PyObject callable;
+		
+		public PyElementFactory(PyObject callable)
+		{
+			this.callable = callable;
+		}
+		
+		
+		public Element createElement()
+		{
+			return Py.tojava( callable.__call__(), Element.class );
+		}
+	}
+	
+	
 	protected Object xs;
 	protected DocView view;
 	protected GSymViewInstance viewInstance;
@@ -192,6 +214,16 @@ public class GSymNodeViewInstance
 	}
 	
 
+	public Element listView(ListViewLayout layout, ElementFactory beginDelim, ElementFactory endDelim, ElementFactory separator, List<Element> children)
+	{
+		return layout.createListElement( children, beginDelim, endDelim, separator );
+	}
+	
+	public Element listView(ListViewLayout layout, PyObject beginDelim, PyObject endDelim, PyObject separator, List<Element> children)
+	{
+		return layout.createListElement( children, new PyElementFactory( beginDelim ), new PyElementFactory( endDelim ), new PyElementFactory( separator ) );
+	}
+	
 	
 	
 	
