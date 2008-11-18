@@ -6,6 +6,7 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
 from Britefury.gSym.gSymLanguage import GSymLanguage
+from Britefury.gSym.View.gSymView import GSymViewFactory
 
 
 from GSymCore.Languages.Python25.CodeGenerator import Python25CodeGenerator
@@ -16,9 +17,11 @@ def pyTransformModify(cur, new):
 	cur[1:] = new[1:]
 
 
+	
+viewFac = GSymViewFactory( Python25View )
 
 
 language = GSymLanguage()
 language.registerCodeGeneratorFactory( 'ascii', Python25CodeGenerator )
-language.registerViewFactory( Python25View )
+language.registerViewFactory( viewFac )
 language.registerTransformModifyFn( pyTransformModify )

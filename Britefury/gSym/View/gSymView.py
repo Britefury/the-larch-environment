@@ -568,10 +568,8 @@ class GSymViewFactory (object):
 	Used to manufacture document views
 	Manages state concerning a view that has been compiled.
 	"""
-	def __init__(self, world, name, viewClass):
+	def __init__(self, viewClass):
 		super( GSymViewFactory, self ).__init__()
-		self.world = world
-		self.name = name
 		self.viewClass = viewClass
 		
 		

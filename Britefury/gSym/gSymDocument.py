@@ -40,7 +40,7 @@ class GSymDocumentViewContentHandler (GSymDocumentContentHandler):
 	
 	def withLanguageModule(self, world, importLanguage, xs):
 		language = world.getModuleLanguage( importLanguage )
-		languageViewFactory = GSymViewFactory( world, importLanguage, language.getViewFactory() )
+		languageViewFactory = language.getViewFactory()
 		return languageViewFactory.createDocumentView( xs, self._commandHistory )
 		
 		
@@ -53,7 +53,7 @@ class GSymDocumentLISPViewContentHandler (GSymDocumentContentHandler):
 	
 	def withLanguageModule(self, world, importLanguage, xs):
 		language = LISP.language
-		languageViewFactory = GSymViewFactory( world, 'LISP', language.getViewFactory() )
+		languageViewFactory = language.getViewFactory()
 		return languageViewFactory.createDocumentView( xs, self._commandHistory )
 	
 	

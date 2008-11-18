@@ -58,7 +58,7 @@ public class GSymNodeViewInstance
 	
 		public Element createElement(DocTreeNode x, GSymNodeViewInstance ctx, Object state)
 		{
-			return Py.tojava( callable.__call__( Py.java2py( x ), Py.java2py( ctx ), Py.java2py( state ) ), Element.class );
+			return (Element)Py.tojava( callable.__call__( Py.java2py( x ), Py.java2py( ctx ), Py.java2py( state ) ), Element.class );
 		}
 	}
 	
@@ -75,7 +75,7 @@ public class GSymNodeViewInstance
 		
 		public Element createElement()
 		{
-			return Py.tojava( callable.__call__(), Element.class );
+			return (Element)Py.tojava( callable.__call__(), Element.class );
 		}
 	}
 	
