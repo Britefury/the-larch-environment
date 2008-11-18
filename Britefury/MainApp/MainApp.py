@@ -8,6 +8,8 @@
 import sys
 import os
 
+from datetime import datetime
+
 from java.lang import Runnable
 from javax.swing import JFrame, AbstractAction, JMenuItem, JMenu, JMenuBar, KeyStroke, JOptionPane, JFileChooser, JOptionPane
 from javax.swing.filechooser import FileNameExtensionFilter
@@ -88,7 +90,7 @@ class MainAppDocView (CellListener):
 		if documentRoot is not None:
 			self._view = loadDocument( self._app._world, documentRoot, contentHandler )
 			self._view.getRefreshCell().addListener( self )
-			self._view.refresh()
+			self._refreshView()
 			self._elementTree.getRoot().setChild( self._view.getRootView().getElement() )
 		else:
 			self._view = None
@@ -101,7 +103,10 @@ class MainAppDocView (CellListener):
 			
 	def _refreshView(self):
 		if self._view is not None:
+			t1 = datetime.now()
 			self._view.refresh()
+			t2 = datetime.now()
+			print 'MainApp: refresh time = ', t2 - t1
 
 	def _queueRefresh(self):
 		class Run (Runnable):

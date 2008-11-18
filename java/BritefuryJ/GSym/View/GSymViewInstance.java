@@ -67,11 +67,12 @@ public class GSymViewInstance
 		
 		public int hashCode()
 		{
+			int stateHash = state != null  ?  state.hashCode()  :  0;
 			int mult = 1000003;
 			int x = 0x345678;
 			x = ( x ^ nodeViewFunction.hashCode() ) * mult;
 			mult += 82520 + 2;
-			x = ( x ^ state.hashCode() ) * mult;
+			x = ( x ^ stateHash ) * mult;
 			return x + 97351;
 		}
 		
@@ -103,7 +104,11 @@ public class GSymViewInstance
 	{
 		this.tree = tree;
 		this.txs = txs;
-		this.generalNodeViewFunction = viewFactory.createViewFunction();
+		generalNodeViewFunction = viewFactory.createViewFunction();
+		if ( generalNodeViewFunction == null )
+		{
+			throw new RuntimeException();
+		}
 		view = new DocView( tree, txs, new RootInitialiser(), changeListener );
 		
 		indentationStyleSheets = new HashMap<Float, BorderStyleSheet>();
@@ -128,6 +133,11 @@ public class GSymViewInstance
 	protected DVNode.NodeElementFactory makeNodeElementFactory(GSymNodeViewFunction nodeViewFunction, Object state)
 	{
 		// Memoise the contents factory, keyed by  @nodeViewFunction and @state
+		if ( nodeViewFunction == null )
+		{
+			nodeViewFunction = generalNodeViewFunction;
+		}
+
 		NodeContentsFactoryKey key = new NodeContentsFactoryKey( nodeViewFunction, state );
 		
 		NodeContentsFactory factory = nodeContentsFactories.get( key );

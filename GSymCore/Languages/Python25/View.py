@@ -7,11 +7,7 @@
 ##-*************************
 from Britefury.Parser.Parser import ParserExpression
 
-from Britefury.gSym.View.gSymView import border, indent, text, hiddenText, whitespace, hbox, ahbox, vbox, paragraph, lineBreak, segment, script, scriptLSuper, scriptLSub, scriptRSuper, scriptRSub, fraction, \
-     listView, contentListener, viewEval, mapViewEval, GSymView
-from Britefury.gSym.View.ListView import ParagraphListViewLayout, HorizontalListViewLayout, VerticalInlineListViewLayout, VerticalListViewLayout
-
-from Britefury.gSym.View.Interactor import keyEventMethod, accelEventMethod, textEventMethod, backspaceStartMethod, deleteEndMethod, Interactor
+from Britefury.gSym.View.gSymView import GSymView
 
 from Britefury.gSym.View.EditOperations import replace, replaceWithRange, append, prepend, insertBefore, insertRangeBefore, insertAfter, insertRangeAfter
 
@@ -22,6 +18,8 @@ from Britefury.Util.NodeUtil import *
 from BritefuryJ.DocPresent.StyleSheets import *
 from BritefuryJ.DocPresent.ElementTree import *
 from BritefuryJ.DocPresent import *
+
+from BritefuryJ.GSym.View.ListView import ParagraphListViewLayout, HorizontalListViewLayout, VerticalInlineListViewLayout, VerticalListViewLayout
 
 
 
@@ -43,7 +41,7 @@ class _TextFactory (object):
 		self.ctx = ctx
 
 	def __call__(self):
-		return text( self.ctx, self.style, self.text )
+		return self.ctx.text( self.style, self.text )
 
 
 class _CommaFactory (_TextFactory):
@@ -82,7 +80,7 @@ class _CloseParenFactory (_TextFactory):
 
 
 def keywordText(ctx, keyword):
-	return text( ctx, keyword_textStyle, keyword )
+	return ctx.text( keyword_textStyle, keyword )
 
 
 
@@ -251,7 +249,7 @@ PRECEDENCE_TARGET = 0
 
 
 def _paren(ctx, x):
-	return paragraph( ctx, python_paragraphStyle, [ text( ctx, punctuation_textStyle, '(' ), x, text( ctx, punctuation_textStyle, ')' ) ] )
+	return ctx.paragraph( python_paragraphStyle, [ ctx.text( punctuation_textStyle, '(' ), x, ctx.text( punctuation_textStyle, ')' ) ] )
 
 def _precedenceParen(ctx, x, xPrecedence, outerPrecedence):
 	if outerPrecedence is not None  and  xPrecedence is not None  and  xPrecedence > outerPrecedence:
@@ -283,8 +281,8 @@ def python25ViewState(outerPrecedence, parser=Parser.expression, mode=MODE_DISPL
 
 
 def suiteView(ctx, suite):
-	lineViews = mapViewEval( ctx, suite, None, python25ViewState( PRECEDENCE_NONE, Parser.statement, MODE_EDITSTATEMENT ) )
-	return listView( ctx, suite_listViewLayout, None, None, None, lineViews )
+	lineViews = ctx.mapViewEvalFn( suite, None, python25ViewState( PRECEDENCE_NONE, Parser.statement, MODE_EDITSTATEMENT ) )
+	return ctx.listView( suite_listViewLayout, None, None, None, lineViews )
 
 
 
@@ -298,8 +296,8 @@ def statementNodeEditor(ctx, node, contents, precedence, state):
 
 	if mode == MODE_EDITSTATEMENT:
 		#contents = addContentLineStops( ctx, contents, True )
-		contents = segment( ctx, python_paragraphStyle, python_segmentCaretStopFactory, contents )
-		return contentListener( ctx, contents, ParsedLineContentListener( ctx, node, parser ) )
+		contents = ctx.segment( python_paragraphStyle, python_segmentCaretStopFactory, contents )
+		return ctx.contentListener( contents, ParsedLineContentListener( ctx, node, parser ) )
 	else:
 		raise ValueError, 'invalid mode %d'  %  mode
 
@@ -317,11 +315,11 @@ def expressionNodeEditor(ctx, node, contents, precedence, state):
 		return contents
 	elif mode == MODE_EDITEXPRESSION:
 		contents = _precedenceParen( ctx, contents, precedence, outerPrecedence )
-		contents = segment( ctx, python_paragraphStyle, python_segmentCaretStopFactory, contents )
-		return contentListener( ctx, contents, ParsedExpressionContentListener( ctx, node, parser ) )
+		contents = ctx.segment( python_paragraphStyle, python_segmentCaretStopFactory, contents )
+		return ctx.contentListener( contents, ParsedExpressionContentListener( ctx, node, parser ) )
 	elif mode == MODE_EDITSTATEMENT:
-		contents = segment( ctx, python_paragraphStyle, python_segmentCaretStopFactory, contents )
-		return contentListener( ctx, contents, ParsedLineContentListener( ctx, node, parser ) )
+		contents = ctx.segment( python_paragraphStyle, python_segmentCaretStopFactory, contents )
+		return ctx.contentListener( contents, ParsedLineContentListener( ctx, node, parser ) )
 	else:
 		raise ValueError, 'invalid mode %d'  %  mode
 
@@ -334,29 +332,29 @@ def compoundStatementEditor(ctx, node, headerContents, precedence, suite, state)
 	else:
 		outerPrecedence, parser, mode = state
 
-	headerSegment = segment( ctx, python_paragraphStyle, python_segmentCaretStopFactory, headerContents )
-	headerParagraph = paragraph( ctx, python_paragraphStyle, [ headerSegment, whitespace( ctx, '\n' ) ] )
-	headerElement = contentListener( ctx, headerParagraph, ParsedLineContentListener( ctx, node, parser ) )
-	statementElement = vbox( ctx, compoundStmt_vboxStyle, [ headerElement, indent( ctx, 30.0, suiteView( ctx, suite ) ) ] )
+	headerSegment = ctx.segment( python_paragraphStyle, python_segmentCaretStopFactory, headerContents )
+	headerParagraph = ctx.paragraph( python_paragraphStyle, [ headerSegment, ctx.whitespace( '\n' ) ] )
+	headerElement = ctx.contentListener( headerParagraph, ParsedLineContentListener( ctx, node, parser ) )
+	statementElement = ctx.vbox( compoundStmt_vboxStyle, [ headerElement, ctx.indent( 30.0, suiteView( ctx, suite ) ) ] )
 	return statementElement
 
 
 
 def paragraphBinOpView(ctx, state, node, x, y, op, precedence, bRightAssociative):
 	xPrec, yPrec = computeBinOpViewPrecedenceValues( precedence, bRightAssociative )
-	xView = viewEval( ctx, x, None, python25ViewState( xPrec ) )
-	yView = viewEval( ctx, y, None, python25ViewState( yPrec ) )
-	opView = text( ctx, operator_textStyle, op )
+	xView = ctx.viewEvalFn( x, None, python25ViewState( xPrec ) )
+	yView = ctx.viewEvalFn( y, None, python25ViewState( yPrec ) )
+	opView = ctx.text( operator_textStyle, op )
 	return expressionNodeEditor( ctx, node,
-			   paragraph( ctx, python_paragraphStyle, [ xView, text( ctx, default_textStyle, ' ' ), opView, text( ctx, default_textStyle, ' ' ), yView ] ),
+			   ctx.paragraph( python_paragraphStyle, [ xView, ctx.text( default_textStyle, ' ' ), opView, ctx.text( default_textStyle, ' ' ), yView ] ),
 			   precedence,
 			   state )
 
 def paragraphPrefixOpView(ctx, state, node, x, op, precedence):
-	xView = viewEval( ctx, x, None, python25ViewState( precedence ) )
-	opView = text( ctx, operator_textStyle, op )
+	xView = ctx.viewEvalFn( x, None, python25ViewState( precedence ) )
+	opView = ctx.text( operator_textStyle, op )
 	return expressionNodeEditor( ctx, node,
-			   paragraph( ctx, python_paragraphStyle, [ opView, xView ] ),
+			   ctx.paragraph( python_paragraphStyle, [ opView, xView ] ),
 			   precedence,
 			   state )
 
@@ -364,11 +362,11 @@ def paragraphPrefixOpView(ctx, state, node, x, op, precedence):
 
 def tupleView(ctx, state, node, xs, parser=None):
 	if parser is not None:
-		xViews = mapViewEval( ctx, xs, None, python25ViewState( PRECEDENCE_TUPLEELEMENT, parser ) )
+		xViews = ctx.mapViewEvalFn( xs, None, python25ViewState( PRECEDENCE_TUPLEELEMENT, parser ) )
 	else:
-		xViews = mapViewEval( ctx, xs, None, python25ViewState( PRECEDENCE_TUPLEELEMENT ) )
+		xViews = ctx.mapViewEvalFn( xs, None, python25ViewState( PRECEDENCE_TUPLEELEMENT ) )
 	return expressionNodeEditor( ctx, node,
-			   listView( ctx, tuple_listViewLayout, None, None, _CommaFactory( ctx ), xViews ),
+			   ctx.listView( tuple_listViewLayout, None, None, _CommaFactory( ctx ), xViews ),
 			   PRECEDENCE_TUPLE,
 			   state )
 
@@ -384,14 +382,14 @@ def printElem(elem, level):
 class Python25View (GSymView):
 	# MISC
 	def python25Module(self, ctx, state, node, *content):
-		lineViews = mapViewEval( ctx, content, None, python25ViewState( PRECEDENCE_NONE, Parser.statement, MODE_EDITSTATEMENT ) )
-		return listView( ctx, module_listViewLayout, None, None, None, lineViews )
+		lineViews = ctx.mapViewEvalFn( content, None, python25ViewState( PRECEDENCE_NONE, Parser.statement, MODE_EDITSTATEMENT ) )
+		return ctx.listView( module_listViewLayout, None, None, None, lineViews )
 
 
 
 	def blankLine(self, ctx, state, node):
 		return statementNodeEditor( ctx, node,
-				   text( ctx, default_textStyle, ' ' ),
+				   ctx.text( default_textStyle, ' ' ),
 				   None,
 				   state )
 
@@ -399,7 +397,7 @@ class Python25View (GSymView):
 	def UNPARSED(self, ctx, state, node, value):
 		value = value.toString()
 		return expressionNodeEditor( ctx, node,
-				   text( ctx, unparsed_textStyle, value ),
+				   ctx.text( unparsed_textStyle, value ),
 				   None,
 				   state )
 
@@ -415,27 +413,27 @@ class Python25View (GSymView):
 		if format == 'ascii':
 			pass
 		elif format == 'unicode':
-			boxContents.append( text( ctx, literalFormat_textStyle, 'u' ) )
+			boxContents.append( ctx.text( literalFormat_textStyle, 'u' ) )
 		elif format == 'ascii-regex':
-			boxContents.append( text( ctx, literalFormat_textStyle, 'r' ) )
+			boxContents.append( ctx.text( literalFormat_textStyle, 'r' ) )
 		elif format == 'unicode-regex':
-			boxContents.append( text( ctx, literalFormat_textStyle, 'ur' ) )
+			boxContents.append( ctx.text( literalFormat_textStyle, 'ur' ) )
 		else:
 			raise ValueError, 'invalid string literal format'
 
 		if quotation == 'single':
-			boxContents.append( text( ctx, punctuation_textStyle, "'" ) )
+			boxContents.append( ctx.text( punctuation_textStyle, "'" ) )
 			boxContents.append( None )
-			boxContents.append( text( ctx, punctuation_textStyle, "'" ) )
+			boxContents.append( ctx.text( punctuation_textStyle, "'" ) )
 		else:
-			boxContents.append( text( ctx, punctuation_textStyle, '"' ) )
+			boxContents.append( ctx.text( punctuation_textStyle, '"' ) )
 			boxContents.append( None )
-			boxContents.append( text( ctx, punctuation_textStyle, '"' ) )
+			boxContents.append( ctx.text( punctuation_textStyle, '"' ) )
 
-		boxContents[-2] = text( ctx, default_textStyle, value )
+		boxContents[-2] = ctx.text( default_textStyle, value )
 
 		return expressionNodeEditor( ctx, node,
-				   paragraph( ctx, python_paragraphStyle, boxContents ),
+				   ctx.paragraph( python_paragraphStyle, boxContents ),
 				   PRECEDENCE_LITERALVALUE,
 				   state )
 
@@ -453,17 +451,17 @@ class Python25View (GSymView):
 				valueString = '%d'  %  int( value )
 			elif format == 'hex':
 				valueString = '%x'  %  int( value, 16 )
-			boxContents.append( text( ctx, numericLiteral_textStyle, valueString ) )
+			boxContents.append( ctx.text( numericLiteral_textStyle, valueString ) )
 		elif numType == 'long':
 			if format == 'decimal':
 				valueString = '%d'  %  long( value )
 			elif format == 'hex':
 				valueString = '%x'  %  long( value, 16 )
-			boxContents.append( text( ctx, numericLiteral_textStyle, valueString ) )
-			boxContents.append( text( ctx, literalFormat_textStyle, 'L' ) )
+			boxContents.append( ctx.text( numericLiteral_textStyle, valueString ) )
+			boxContents.append( ctx.text( literalFormat_textStyle, 'L' ) )
 
 		return expressionNodeEditor( ctx, node,
-				   paragraph( ctx, python_paragraphStyle, boxContents ),
+				   ctx.paragraph( python_paragraphStyle, boxContents ),
 				   PRECEDENCE_LITERALVALUE,
 				   state )
 
@@ -473,7 +471,7 @@ class Python25View (GSymView):
 	def floatLiteral(self, ctx, state, node, value):
 		value = value.toString()
 		return expressionNodeEditor( ctx, node,
-				   text( ctx, numericLiteral_textStyle, value ),
+				   ctx.text( numericLiteral_textStyle, value ),
 				   PRECEDENCE_LITERALVALUE,
 				   state )
 
@@ -483,7 +481,7 @@ class Python25View (GSymView):
 	def imaginaryLiteral(self, ctx, state, node, value):
 		value = value.toString()
 		return expressionNodeEditor( ctx, node,
-				   text( ctx, numericLiteral_textStyle, value ),
+				   ctx.text( numericLiteral_textStyle, value ),
 				   PRECEDENCE_LITERALVALUE,
 				   state )
 
@@ -493,7 +491,7 @@ class Python25View (GSymView):
 	def singleTarget(self, ctx, state, node, name):
 		name = name.toString()
 		return expressionNodeEditor( ctx, node,
-				   text( ctx, default_textStyle, name ),
+				   ctx.text( default_textStyle, name ),
 				   PRECEDENCE_TARGET,
 				   state )
 
@@ -502,9 +500,9 @@ class Python25View (GSymView):
 		return tupleView( ctx, state, node, xs, Parser.targetItem )
 
 	def listTarget(self, ctx, state, node, *xs):
-		xViews = mapViewEval( ctx, xs, None, python25ViewState( PRECEDENCE_SEQUENCEELEMENT, Parser.targetItem ) )
+		xViews = ctx.mapViewEvalFn( xs, None, python25ViewState( PRECEDENCE_SEQUENCEELEMENT, Parser.targetItem ) )
 		return expressionNodeEditor( ctx, node,
-				   listView( ctx, list_listViewLayout, _OpenBracketFactory( ctx ), _CloseBracketFactory( ctx ), _CommaFactory( ctx ), xViews ),
+				   ctx.listView( list_listViewLayout, _OpenBracketFactory( ctx ), _CloseBracketFactory( ctx ), _CommaFactory( ctx ), xViews ),
 				   PRECEDENCE_TARGET,
 				   state )
 
@@ -515,7 +513,7 @@ class Python25View (GSymView):
 	def var(self, ctx, state, node, name):
 		name = name.toString()
 		return expressionNodeEditor( ctx, node,
-				   text( ctx, default_textStyle, name ),
+				   ctx.text( default_textStyle, name ),
 				   PRECEDENCE_LOADLOCAL,
 				   state )
 
@@ -529,9 +527,9 @@ class Python25View (GSymView):
 
 	# List literal
 	def listLiteral(self, ctx, state, node, *xs):
-		xViews = mapViewEval( ctx, xs, None, python25ViewState( PRECEDENCE_SEQUENCEELEMENT ) )
+		xViews = ctx.mapViewEvalFn( xs, None, python25ViewState( PRECEDENCE_SEQUENCEELEMENT ) )
 		return expressionNodeEditor( ctx, node,
-				   listView( ctx, list_listViewLayout, _OpenBracketFactory( ctx ), _CloseBracketFactory( ctx ), _CommaFactory( ctx ), xViews ),
+				   ctx.listView( list_listViewLayout, _OpenBracketFactory( ctx ), _CloseBracketFactory( ctx ), _CommaFactory( ctx ), xViews ),
 				   PRECEDENCE_LISTLITERAL,
 				   state )
 
@@ -539,31 +537,31 @@ class Python25View (GSymView):
 
 	# List comprehension
 	def listFor(self, ctx, state, node, target, source):
-		targetView = viewEval( ctx, target, None, python25ViewState( PRECEDENCE_COMPREHENSIONELEMENT, Parser.targetList ) )
-		sourceView = viewEval( ctx, source, None, python25ViewState( PRECEDENCE_COMPREHENSIONELEMENT, Parser.oldTupleOrExpression ) )
+		targetView = ctx.viewEvalFn( target, None, python25ViewState( PRECEDENCE_COMPREHENSIONELEMENT, Parser.targetList ) )
+		sourceView = ctx.viewEvalFn( source, None, python25ViewState( PRECEDENCE_COMPREHENSIONELEMENT, Parser.oldTupleOrExpression ) )
 		return expressionNodeEditor( ctx, node,
-				   paragraph( ctx, python_paragraphStyle, [ keywordText( ctx, forKeyword ), text( ctx, default_textStyle, ' ' ), targetView, text( ctx, default_textStyle, ' ' ), keywordText( ctx, inKeyword ), text( ctx, default_textStyle, ' ' ), sourceView ] ),
+				   ctx.paragraph( python_paragraphStyle, [ keywordText( ctx, forKeyword ), ctx.text( default_textStyle, ' ' ), targetView, ctx.text( default_textStyle, ' ' ), keywordText( ctx, inKeyword ), ctx.text( default_textStyle, ' ' ), sourceView ] ),
 				   PRECEDENCE_LISTCOMPREHENSION,
 				   state )
 
 	def listIf(self, ctx, state, node, condition):
-		conditionView = viewEval( ctx, condition, None, python25ViewState( PRECEDENCE_COMPREHENSIONELEMENT, Parser.oldExpression ) )
+		conditionView = ctx.viewEvalFn( condition, None, python25ViewState( PRECEDENCE_COMPREHENSIONELEMENT, Parser.oldExpression ) )
 		return expressionNodeEditor( ctx, node,
-				   paragraph( ctx, python_paragraphStyle, [ keywordText( ctx, ifKeyword ), text( ctx, default_textStyle, ' ' ), conditionView ] ),
+				   ctx.paragraph( python_paragraphStyle, [ keywordText( ctx, ifKeyword ), ctx.text( default_textStyle, ' ' ), conditionView ] ),
 				   PRECEDENCE_LISTCOMPREHENSION,
 				   state )
 
 	def listComprehension(self, ctx, state, node, expr, *xs):
-		exprView = viewEval( ctx, expr, None, python25ViewState( PRECEDENCE_COMPREHENSIONELEMENT ) )
-		xViews = mapViewEval( ctx, xs, None, python25ViewState( PRECEDENCE_COMPREHENSIONELEMENT, Parser.listComprehensionItem ) )
+		exprView = ctx.viewEvalFn( expr, None, python25ViewState( PRECEDENCE_COMPREHENSIONELEMENT ) )
+		xViews = ctx.mapViewEvalFn( xs, None, python25ViewState( PRECEDENCE_COMPREHENSIONELEMENT, Parser.listComprehensionItem ) )
 		xViewsSpaced = []
 		if len( xViews ) > 0:
 			for x in xViews[:-1]:
 				xViewsSpaced.append( x )
-				xViewsSpaced.append( whitespace( ctx, ' ', 15.0 ) )
+				xViewsSpaced.append( ctx.whitespace( ' ', 15.0 ) )
 			xViewsSpaced.append( xViews[-1] )
 		return expressionNodeEditor( ctx, node,
-				   paragraph( ctx, python_paragraphStyle, [ text( ctx, punctuation_textStyle, '[' ),  exprView,  whitespace( ctx, ' ', 15.0 ) ] + xViewsSpaced + [ text( ctx, punctuation_textStyle, ']' ) ] ),
+				   ctx.paragraph( python_paragraphStyle, [ ctx.text( punctuation_textStyle, '[' ),  exprView,  ctx.whitespace( ' ', 15.0 ) ] + xViewsSpaced + [ ctx.text( punctuation_textStyle, ']' ) ] ),
 				   PRECEDENCE_LISTCOMPREHENSION,
 				   state )
 
@@ -572,31 +570,31 @@ class Python25View (GSymView):
 
 	# Generator expression
 	def genFor(self, ctx, state, node, target, source):
-		targetView = viewEval( ctx, target, None, python25ViewState( PRECEDENCE_COMPREHENSIONELEMENT, Parser.targetList ) )
-		sourceView = viewEval( ctx, source, None, python25ViewState( PRECEDENCE_COMPREHENSIONELEMENT, Parser.orTest ) )
+		targetView = ctx.viewEvalFn( target, None, python25ViewState( PRECEDENCE_COMPREHENSIONELEMENT, Parser.targetList ) )
+		sourceView = ctx.viewEvalFn( source, None, python25ViewState( PRECEDENCE_COMPREHENSIONELEMENT, Parser.orTest ) )
 		return expressionNodeEditor( ctx, node,
-				   paragraph( ctx, python_paragraphStyle, [ keywordText( ctx, forKeyword ), text( ctx, default_textStyle, ' ' ), targetView, text( ctx, default_textStyle, ' ' ), keywordText( ctx, inKeyword ), text( ctx, default_textStyle, ' ' ), sourceView ] ),
+				   ctx.paragraph( python_paragraphStyle, [ keywordText( ctx, forKeyword ), ctx.text( default_textStyle, ' ' ), targetView, ctx.text( default_textStyle, ' ' ), keywordText( ctx, inKeyword ), ctx.text( default_textStyle, ' ' ), sourceView ] ),
 				   PRECEDENCE_GENERATOREXPRESSION,
 				   state )
 
 	def genIf(self, ctx, state, node, condition):
-		conditionView = viewEval( ctx, condition, None, python25ViewState( PRECEDENCE_COMPREHENSIONELEMENT, Parser.oldExpression ) )
+		conditionView = ctx.viewEvalFn( condition, None, python25ViewState( PRECEDENCE_COMPREHENSIONELEMENT, Parser.oldExpression ) )
 		return expressionNodeEditor( ctx, node,
-				   paragraph( ctx, python_paragraphStyle, [ keywordText( ctx, ifKeyword ), text( ctx, default_textStyle, ' ' ), conditionView ] ),
+				   ctx.paragraph( python_paragraphStyle, [ keywordText( ctx, ifKeyword ), ctx.text( default_textStyle, ' ' ), conditionView ] ),
 				   PRECEDENCE_GENERATOREXPRESSION,
 				   state )
 
 	def generatorExpression(self, ctx, state, node, expr, *xs):
-		exprView = viewEval( ctx, expr, None, python25ViewState( PRECEDENCE_COMPREHENSIONELEMENT ) )
-		xViews = mapViewEval( ctx, xs, None, python25ViewState( PRECEDENCE_COMPREHENSIONELEMENT, Parser.generatorExpressionItem ) )
+		exprView = ctx.viewEvalFn( expr, None, python25ViewState( PRECEDENCE_COMPREHENSIONELEMENT ) )
+		xViews = ctx.mapViewEvalFn( xs, None, python25ViewState( PRECEDENCE_COMPREHENSIONELEMENT, Parser.generatorExpressionItem ) )
 		xViewsSpaced = []
 		if len( xViews ) > 0:
 			for x in xViews[:-1]:
 				xViewsSpaced.append( x )
-				xViewsSpaced.append( whitespace( ctx, ' ', 15.0 ) )
+				xViewsSpaced.append( ctx.whitespace( ' ', 15.0 ) )
 			xViewsSpaced.append( xViews[-1] )
 		return expressionNodeEditor( ctx, node,
-				   paragraph( ctx, python_paragraphStyle, [ text( ctx, punctuation_textStyle, '(' ),  exprView,  whitespace( ctx, ' ', 15.0 ) ] + xViewsSpaced + [ text( ctx, punctuation_textStyle, ')' ) ] ),
+				   ctx.paragraph( python_paragraphStyle, [ ctx.text( punctuation_textStyle, '(' ),  exprView,  ctx.whitespace( ' ', 15.0 ) ] + xViewsSpaced + [ ctx.text( punctuation_textStyle, ')' ) ] ),
 				   PRECEDENCE_GENERATOREXPRESSION,
 				   state )
 
@@ -605,33 +603,33 @@ class Python25View (GSymView):
 
 	# Dictionary literal
 	def keyValuePair(self, ctx, state, node, key, value):
-		keyView = viewEval( ctx, key, None, python25ViewState( PRECEDENCE_SEQUENCEELEMENT ) )
-		valueView = viewEval( ctx, value, None, python25ViewState( PRECEDENCE_SEQUENCEELEMENT ) )
+		keyView = ctx.viewEvalFn( key, None, python25ViewState( PRECEDENCE_SEQUENCEELEMENT ) )
+		valueView = ctx.viewEvalFn( value, None, python25ViewState( PRECEDENCE_SEQUENCEELEMENT ) )
 		return expressionNodeEditor( ctx, node,
-				   paragraph( ctx, python_paragraphStyle, [ keyView, text( ctx, punctuation_textStyle, ' : ' ), valueView ] ),
+				   ctx.paragraph( python_paragraphStyle, [ keyView, ctx.text( punctuation_textStyle, ' : ' ), valueView ] ),
 				   PRECEDENCE_NONE,
 				   state )
 
 	def dictLiteral(self, ctx, state, node, *xs):
-		xViews = mapViewEval( ctx, xs, None, python25ViewState( PRECEDENCE_SEQUENCEELEMENT, Parser.keyValuePair ) )
+		xViews = ctx.mapViewEvalFn( xs, None, python25ViewState( PRECEDENCE_SEQUENCEELEMENT, Parser.keyValuePair ) )
 		return expressionNodeEditor( ctx, node,
-				   listView( ctx, dict_listViewLayout, _OpenBraceFactory( ctx ), _CloseBraceFactory( ctx ), _CommaFactory( ctx ), xViews ),
+				   ctx.listView( dict_listViewLayout, _OpenBraceFactory( ctx ), _CloseBraceFactory( ctx ), _CommaFactory( ctx ), xViews ),
 				   PRECEDENCE_DICTLITERAL,
 				   state )
 
 
 	# Yield expression
 	def yieldExpr(self, ctx, state, node, value):
-		valueView = viewEval( ctx, value, None, python25ViewState( PRECEDENCE_YIELDVALUE ) )
+		valueView = ctx.viewEvalFn( value, None, python25ViewState( PRECEDENCE_YIELDVALUE ) )
 		return expressionNodeEditor( ctx, node,
-				   paragraph( ctx, python_paragraphStyle, [ keywordText( ctx, yieldKeyword ),  text( ctx, punctuation_textStyle, ' ' ),  valueView ] ),
+				   ctx.paragraph( python_paragraphStyle, [ keywordText( ctx, yieldKeyword ),  ctx.text( punctuation_textStyle, ' ' ),  valueView ] ),
 				   PRECEDENCE_YIELDEXPR,
 				   state )
 
 	def yieldAtom(self, ctx, state, node, value):
-		valueView = viewEval( ctx, value, None, python25ViewState( PRECEDENCE_YIELDVALUE ) )
+		valueView = ctx.viewEvalFn( value, None, python25ViewState( PRECEDENCE_YIELDVALUE ) )
 		return expressionNodeEditor( ctx, node,
-				   paragraph( ctx, python_paragraphStyle, [ text( ctx, punctuation_textStyle, '(' ),  keywordText( ctx, yieldKeyword ),  text( ctx, punctuation_textStyle, ' ' ),  valueView,  text( ctx, punctuation_textStyle, ')' ) ] ),
+				   ctx.paragraph( python_paragraphStyle, [ ctx.text( punctuation_textStyle, '(' ),  keywordText( ctx, yieldKeyword ),  ctx.text( punctuation_textStyle, ' ' ),  valueView,  ctx.text( punctuation_textStyle, ')' ) ] ),
 				   PRECEDENCE_YIELDEXPR,
 				   state )
 
@@ -640,9 +638,9 @@ class Python25View (GSymView):
 	# Attribute ref
 	def attributeRef(self, ctx, state, node, target, name):
 		name = name.toString()
-		targetView = viewEval( ctx, target, None, python25ViewState( PRECEDENCE_ATTR ) )
+		targetView = ctx.viewEvalFn( target, None, python25ViewState( PRECEDENCE_ATTR ) )
 		return expressionNodeEditor( ctx, node,
-				   paragraph( ctx, python_paragraphStyle, [ targetView,  text( ctx, punctuation_textStyle, '.' ),  text( ctx, default_textStyle, name ) ] ),
+				   ctx.paragraph( python_paragraphStyle, [ targetView,  ctx.text( punctuation_textStyle, '.' ),  ctx.text( default_textStyle, name ) ] ),
 				   PRECEDENCE_ATTR,
 				   state )
 
@@ -654,11 +652,11 @@ class Python25View (GSymView):
 			if isNullNode( i ):
 				return []
 			else:
-				return [ viewEval( ctx, i, None, python25ViewState( PRECEDENCE_SUBSCRIPTINDEX ) ) ]
+				return [ ctx.viewEvalFn( i, None, python25ViewState( PRECEDENCE_SUBSCRIPTINDEX ) ) ]
 		xView = _sliceIndex( x )
 		yView = _sliceIndex( y )
 		return expressionNodeEditor( ctx, node,
-				   paragraph( ctx, python_paragraphStyle, xView + [ text( ctx, punctuation_textStyle, ':' ) ] + yView ),
+				   ctx.paragraph( python_paragraphStyle, xView + [ ctx.text( punctuation_textStyle, ':' ) ] + yView ),
 				   PRECEDENCE_SUBSCRIPTINDEX,
 				   state )
 
@@ -667,33 +665,33 @@ class Python25View (GSymView):
 			if isNullNode( i ):
 				return []
 			else:
-				return [ viewEval( ctx, i, None, python25ViewState( PRECEDENCE_SUBSCRIPTINDEX ) ) ]
+				return [ ctx.viewEvalFn( i, None, python25ViewState( PRECEDENCE_SUBSCRIPTINDEX ) ) ]
 		xView = _sliceIndex( x )
 		yView = _sliceIndex( y )
 		zView = _sliceIndex( z )
 		return expressionNodeEditor( ctx, node,
-				   paragraph( ctx, python_paragraphStyle, xView + [ text( ctx, punctuation_textStyle, ':' ) ] +  yView + [ text( ctx, punctuation_textStyle, ':' ) ] + zView ),
+				   ctx.paragraph( python_paragraphStyle, xView + [ ctx.text( punctuation_textStyle, ':' ) ] +  yView + [ ctx.text( punctuation_textStyle, ':' ) ] + zView ),
 				   PRECEDENCE_SUBSCRIPTINDEX,
 				   state )
 
 	def ellipsis(self, ctx, state, node):
 		return expressionNodeEditor( ctx, node,
-				   text( ctx, punctuation_textStyle, '...' ),
+				   ctx.text( punctuation_textStyle, '...' ),
 				   PRECEDENCE_ELLIPSIS,
 				   state )
 
 	def subscriptTuple(self, ctx, state, node, *xs):
-		xViews = mapViewEval( ctx, xs, None, python25ViewState( PRECEDENCE_TUPLE, Parser.subscriptItem ) )
+		xViews = ctx.mapViewEvalFn( xs, None, python25ViewState( PRECEDENCE_TUPLE, Parser.subscriptItem ) )
 		return expressionNodeEditor( ctx, node,
-				   listView( ctx, tuple_listViewLayout, None, None, _CommaFactory( ctx ), xViews ),
+				   ctx.listView( tuple_listViewLayout, None, None, _CommaFactory( ctx ), xViews ),
 				   PRECEDENCE_TUPLE,
 				   state )
 
 	def subscript(self, ctx, state, node, target, index):
-		targetView = viewEval( ctx, target, None, python25ViewState( PRECEDENCE_SUBSCRIPT ) )
-		indexView = viewEval( ctx, index, None, python25ViewState( PRECEDENCE_SUBSCRIPTINDEX, Parser.subscriptIndex ) )
+		targetView = ctx.viewEvalFn( target, None, python25ViewState( PRECEDENCE_SUBSCRIPT ) )
+		indexView = ctx.viewEvalFn( index, None, python25ViewState( PRECEDENCE_SUBSCRIPTINDEX, Parser.subscriptIndex ) )
 		return expressionNodeEditor( ctx, node,
-				   paragraph( ctx, python_paragraphStyle, [ targetView,  text( ctx, punctuation_textStyle, '[' ),  indexView,  text( ctx, punctuation_textStyle, ']' ) ] ),
+				   ctx.paragraph( python_paragraphStyle, [ targetView,  ctx.text( punctuation_textStyle, '[' ),  indexView,  ctx.text( punctuation_textStyle, ']' ) ] ),
 				   PRECEDENCE_SUBSCRIPT,
 				   state )
 
@@ -703,37 +701,37 @@ class Python25View (GSymView):
 	# Call
 	def kwArg(self, ctx, state, node, name, value):
 		name = name.toString()
-		valueView = viewEval( ctx, value, None, python25ViewState( PRECEDENCE_ARG ) )
+		valueView = ctx.viewEvalFn( value, None, python25ViewState( PRECEDENCE_ARG ) )
 		return expressionNodeEditor( ctx, node,
-				   paragraph( ctx, python_paragraphStyle, [ text( ctx, default_textStyle, name ), text( ctx, punctuation_textStyle, '=' ), valueView ] ),
+				   ctx.paragraph( python_paragraphStyle, [ ctx.text( default_textStyle, name ), ctx.text( punctuation_textStyle, '=' ), valueView ] ),
 				   PRECEDENCE_ARG,
 				   state )
 
 	def argList(self, ctx, state, node, value):
-		valueView = viewEval( ctx, value, None, python25ViewState( PRECEDENCE_ARG ) )
+		valueView = ctx.viewEvalFn( value, None, python25ViewState( PRECEDENCE_ARG ) )
 		return expressionNodeEditor( ctx, node,
-				   paragraph( ctx, python_paragraphStyle, [ text( ctx, punctuation_textStyle, '*' ),  valueView ] ),
+				   ctx.paragraph( python_paragraphStyle, [ ctx.text( punctuation_textStyle, '*' ),  valueView ] ),
 				   PRECEDENCE_ARG,
 				   state )
 
 	def kwArgList(self, ctx, state, node, value):
-		valueView = viewEval( ctx, value, None, python25ViewState( PRECEDENCE_ARG ) )
+		valueView = ctx.viewEvalFn( value, None, python25ViewState( PRECEDENCE_ARG ) )
 		return expressionNodeEditor( ctx, node,
-				   paragraph( ctx, python_paragraphStyle, [ text( ctx, punctuation_textStyle, '**' ),  valueView ] ),
+				   ctx.paragraph( python_paragraphStyle, [ ctx.text( punctuation_textStyle, '**' ),  valueView ] ),
 				   PRECEDENCE_ARG,
 				   state )
 
 	def call(self, ctx, state, node, target, *args):
-		targetView = viewEval( ctx, target, None, python25ViewState( PRECEDENCE_CALL ) )
-		argViews = mapViewEval( ctx, args, None, python25ViewState( PRECEDENCE_ARG, Parser.callArg ) )
+		targetView = ctx.viewEvalFn( target, None, python25ViewState( PRECEDENCE_CALL ) )
+		argViews = ctx.mapViewEvalFn( args, None, python25ViewState( PRECEDENCE_ARG, Parser.callArg ) )
 		argElements = []
 		if len( args ) > 0:
 			for a in argViews[:-1]:
 				argElements.append( a )
-				argElements.append( text( ctx, punctuation_textStyle, ', ' ) )
+				argElements.append( ctx.text( punctuation_textStyle, ', ' ) )
 			argElements.append( argViews[-1] )
 		return expressionNodeEditor( ctx, node,
-				   paragraph( ctx, python_paragraphStyle, [ targetView, text( ctx, punctuation_textStyle, '(' ) ]  +  argElements  +  [ text( ctx, punctuation_textStyle, ')' ) ] ),
+				   ctx.paragraph( python_paragraphStyle, [ targetView, ctx.text( punctuation_textStyle, '(' ) ]  +  argElements  +  [ ctx.text( punctuation_textStyle, ')' ) ] ),
 				   PRECEDENCE_CALL,
 				   state )
 
@@ -744,11 +742,11 @@ class Python25View (GSymView):
 	# Operators
 	def pow(self, ctx, state, node, x, y):
 		xPrec, yPrec = computeBinOpViewPrecedenceValues( PRECEDENCE_POW, True )
-		xView = viewEval( ctx, x, None, python25ViewState( xPrec ) )
-		yView = viewEval( ctx, y, None, python25ViewState( yPrec, Parser.expression, MODE_EDITEXPRESSION ) )
-		yElement = paragraph( ctx, python_paragraphStyle, [ text( ctx, punctuation_textStyle, '**' ), text( ctx, default_textStyle, ' ' ), yView ] )
+		xView = ctx.viewEvalFn( x, None, python25ViewState( xPrec ) )
+		yView = ctx.viewEvalFn( y, None, python25ViewState( yPrec, Parser.expression, MODE_EDITEXPRESSION ) )
+		yElement = ctx.paragraph( python_paragraphStyle, [ ctx.text( punctuation_textStyle, '**' ), ctx.text( default_textStyle, ' ' ), yView ] )
 		return expressionNodeEditor( ctx, node,
-				   scriptRSuper( ctx, pow_scriptStyle, xView, yElement  ),
+				   ctx.scriptRSuper( pow_scriptStyle, xView, yElement  ),
 				   PRECEDENCE_POW,
 				   state )
 
@@ -768,10 +766,10 @@ class Python25View (GSymView):
 
 	def div(self, ctx, state, node, x, y):
 		xPrec, yPrec = computeBinOpViewPrecedenceValues( PRECEDENCE_MULDIVMOD, False )
-		xView = viewEval( ctx, x, None, python25ViewState( xPrec, Parser.expression, MODE_EDITEXPRESSION ) )
-		yView = viewEval( ctx, y, None, python25ViewState( yPrec, Parser.expression, MODE_EDITEXPRESSION ) )
+		xView = ctx.viewEvalFn( x, None, python25ViewState( xPrec, Parser.expression, MODE_EDITEXPRESSION ) )
+		yView = ctx.viewEvalFn( y, None, python25ViewState( yPrec, Parser.expression, MODE_EDITEXPRESSION ) )
 		return expressionNodeEditor( ctx, node,
-				   fraction( ctx, div_fractionStyle, xView, yView ),
+				   ctx.fraction( div_fractionStyle, xView, yView ),
 				   PRECEDENCE_MULDIVMOD,
 				   state )
 
@@ -852,29 +850,29 @@ class Python25View (GSymView):
 	def simpleParam(self, ctx, state, node, name):
 		name = name.toString()
 		return expressionNodeEditor( ctx, node,
-				   text( ctx, default_textStyle, name ),
+				   ctx.text( default_textStyle, name ),
 				   PRECEDENCE_PARAM,
 				   state )
 
 	def defaultValueParam(self, ctx, state, node, name, value):
 		name = name.toString()
-		valueView = viewEval( ctx, value, None, python25ViewState( PRECEDENCE_PARAM ) )
+		valueView = ctx.viewEvalFn( value, None, python25ViewState( PRECEDENCE_PARAM ) )
 		return expressionNodeEditor( ctx, node,
-				   paragraph( ctx, python_paragraphStyle, [ text( ctx, default_textStyle, name ), text( ctx, punctuation_textStyle, '=' ), valueView ] ),
+				   ctx.paragraph( python_paragraphStyle, [ ctx.text( default_textStyle, name ), ctx.text( punctuation_textStyle, '=' ), valueView ] ),
 				   PRECEDENCE_PARAM,
 				   state )
 
 	def paramList(self, ctx, state, node, name):
 		name = name.toString()
 		return expressionNodeEditor( ctx, node,
-				   paragraph( ctx, python_paragraphStyle, [ text( ctx, punctuation_textStyle, '*' ),  text( ctx, default_textStyle, name ) ] ),
+				   ctx.paragraph( python_paragraphStyle, [ ctx.text( punctuation_textStyle, '*' ),  ctx.text( default_textStyle, name ) ] ),
 				   PRECEDENCE_PARAM,
 				   state )
 
 	def kwParamList(self, ctx, state, node, name):
 		name = name.toString()
 		return expressionNodeEditor( ctx, node,
-				   paragraph( ctx, python_paragraphStyle, [ text( ctx, punctuation_textStyle, '**' ),  text( ctx, default_textStyle, name ) ] ),
+				   ctx.paragraph( python_paragraphStyle, [ ctx.text( punctuation_textStyle, '**' ),  ctx.text( default_textStyle, name ) ] ),
 				   PRECEDENCE_PARAM,
 				   state )
 
@@ -891,16 +889,16 @@ class Python25View (GSymView):
 			if parser is Parser.oldExpression   or  parser is Parser.oldLambdaExpr  or  parser is Parser.oldTupleOrExpression:
 				exprParser = Parser.oldExpression
 
-		exprView = viewEval( ctx, expr, None, python25ViewState( PRECEDENCE_LAMBDAEXPR, exprParser ) )
-		paramViews = mapViewEval( ctx, params, None, python25ViewState( PRECEDENCE_PARAM, Parser.param ) )
+		exprView = ctx.viewEvalFn( expr, None, python25ViewState( PRECEDENCE_LAMBDAEXPR, exprParser ) )
+		paramViews = ctx.mapViewEvalFn( params, None, python25ViewState( PRECEDENCE_PARAM, Parser.param ) )
 		paramElements = []
 		if len( params ) > 0:
 			for p in paramViews[:-1]:
 				paramElements.append( p )
-				paramElements.append( text( ctx, punctuation_textStyle, ', ' ) )
+				paramElements.append( ctx.text( punctuation_textStyle, ', ' ) )
 			paramElements.append( paramViews[-1] )
 		return expressionNodeEditor( ctx, node,
-				   paragraph( ctx, python_paragraphStyle, [ keywordText( ctx, lambdaKeyword ),  text( ctx, default_textStyle, ' ' ) ]  +  paramElements  +  [ text( ctx, punctuation_textStyle, ': ' ), exprView ] ),
+				   ctx.paragraph( python_paragraphStyle, [ keywordText( ctx, lambdaKeyword ),  ctx.text( default_textStyle, ' ' ) ]  +  paramElements  +  [ ctx.text( punctuation_textStyle, ': ' ), exprView ] ),
 				   PRECEDENCE_LAMBDAEXPR,
 				   state )
 
@@ -908,13 +906,13 @@ class Python25View (GSymView):
 
 	# Conditional expression
 	def conditionalExpr(self, ctx, state, node, condition, expr, elseExpr):
-		conditionView = viewEval( ctx, condition, None, python25ViewState( PRECEDENCE_CONDITIONALEXPRESSION, Parser.orTest ) )
-		exprView = viewEval( ctx, expr, None, python25ViewState( PRECEDENCE_CONDITIONALEXPRESSION, Parser.orTest ) )
-		elseExprView = viewEval( ctx, elseExpr, None, python25ViewState( PRECEDENCE_CONDITIONALEXPRESSION, Parser.expression ) )
+		conditionView = ctx.viewEvalFn( condition, None, python25ViewState( PRECEDENCE_CONDITIONALEXPRESSION, Parser.orTest ) )
+		exprView = ctx.viewEvalFn( expr, None, python25ViewState( PRECEDENCE_CONDITIONALEXPRESSION, Parser.orTest ) )
+		elseExprView = ctx.viewEvalFn( elseExpr, None, python25ViewState( PRECEDENCE_CONDITIONALEXPRESSION, Parser.expression ) )
 		return expressionNodeEditor( ctx, node,
-				   paragraph( ctx, python_paragraphStyle, [ exprView,   whitespace( ctx, '  ', 15.0 ),
-									    keywordText( ctx, ifKeyword ), text( ctx, default_textStyle, ' ' ), conditionView,   whitespace( ctx, '  ', 15.0 ),
-									    keywordText( ctx, elseKeyword ), text( ctx, default_textStyle, ' ' ), elseExprView ] ),
+				   ctx.paragraph( python_paragraphStyle, [ exprView,   ctx.whitespace( '  ', 15.0 ),
+									    keywordText( ctx, ifKeyword ), ctx.text( default_textStyle, ' ' ), conditionView,   ctx.whitespace( '  ', 15.0 ),
+									    keywordText( ctx, elseKeyword ), ctx.text( default_textStyle, ' ' ), elseExprView ] ),
 				   PRECEDENCE_CONDITIONALEXPRESSION,
 				   state )
 
@@ -924,26 +922,26 @@ class Python25View (GSymView):
 
 	# Assert statement
 	def assertStmt(self, ctx, state, node, condition, fail):
-		conditionView = viewEval( ctx, condition, None, python25ViewState( PRECEDENCE_STMT ) )
-		elements = [ keywordText( ctx, assertKeyword ), text( ctx, default_textStyle, ' ' ), conditionView ]
+		conditionView = ctx.viewEvalFn( condition, None, python25ViewState( PRECEDENCE_STMT ) )
+		elements = [ keywordText( ctx, assertKeyword ), ctx.text( default_textStyle, ' ' ), conditionView ]
 		if not isNullNode( fail ):
-			failView = viewEval( ctx, fail, None, python25ViewState( PRECEDENCE_STMT ) )
-			elements.extend( [ text( ctx, punctuation_textStyle, ', ' ),  failView ] )
+			failView = ctx.viewEvalFn( fail, None, python25ViewState( PRECEDENCE_STMT ) )
+			elements.extend( [ ctx.text( punctuation_textStyle, ', ' ),  failView ] )
 		return statementNodeEditor( ctx, node,
-				   paragraph( ctx, python_paragraphStyle, elements ),
+				   ctx.paragraph( python_paragraphStyle, elements ),
 				   PRECEDENCE_STMT,
 				   state )
 
 
 	# Assignment statement
 	def assignmentStmt(self, ctx, state, node, targets, value):
-		targetViews = mapViewEval( ctx, targets, None, python25ViewState( PRECEDENCE_STMT, Parser.targetList ) )
-		valueView = viewEval( ctx, value, None, python25ViewState( PRECEDENCE_STMT, Parser.tupleOrExpressionOrYieldExpression ) )
+		targetViews = ctx.mapViewEvalFn( targets, None, python25ViewState( PRECEDENCE_STMT, Parser.targetList ) )
+		valueView = ctx.viewEvalFn( value, None, python25ViewState( PRECEDENCE_STMT, Parser.tupleOrExpressionOrYieldExpression ) )
 		targetElements = []
 		for t in targetViews:
-			targetElements.extend( [ t,  text( ctx, punctuation_textStyle, ' = ' ) ] )
+			targetElements.extend( [ t,  ctx.text( punctuation_textStyle, ' = ' ) ] )
 		return statementNodeEditor( ctx, node,
-				   paragraph( ctx, python_paragraphStyle, targetElements  +  [ valueView ] ),
+				   ctx.paragraph( python_paragraphStyle, targetElements  +  [ valueView ] ),
 				   PRECEDENCE_STMT,
 				   state )
 
@@ -951,10 +949,10 @@ class Python25View (GSymView):
 	# Augmented assignment statement
 	def augAssignStmt(self, ctx, state, node, op, target, value):
 		op = op.toString()
-		targetView = viewEval( ctx, target, None, python25ViewState( PRECEDENCE_STMT, Parser.targetItem ) )
-		valueView = viewEval( ctx, value, None, python25ViewState( PRECEDENCE_STMT, Parser.tupleOrExpressionOrYieldExpression ) )
+		targetView = ctx.viewEvalFn( target, None, python25ViewState( PRECEDENCE_STMT, Parser.targetItem ) )
+		valueView = ctx.viewEvalFn( value, None, python25ViewState( PRECEDENCE_STMT, Parser.tupleOrExpressionOrYieldExpression ) )
 		return statementNodeEditor( ctx, node,
-				   paragraph( ctx, python_paragraphStyle, [ targetView,  text( ctx, punctuation_textStyle, ' ' + op + ' ' ),  valueView ] ),
+				   ctx.paragraph( python_paragraphStyle, [ targetView,  ctx.text( punctuation_textStyle, ' ' + op + ' ' ),  valueView ] ),
 				   PRECEDENCE_STMT,
 				   state )
 
@@ -969,27 +967,27 @@ class Python25View (GSymView):
 
 	# Del statement
 	def delStmt(self, ctx, state, node, target):
-		targetView = viewEval( ctx, target, None, python25ViewState( PRECEDENCE_STMT, Parser.targetList ) )
+		targetView = ctx.viewEvalFn( target, None, python25ViewState( PRECEDENCE_STMT, Parser.targetList ) )
 		return statementNodeEditor( ctx, node,
-				   paragraph( ctx, python_paragraphStyle, [ keywordText( ctx, delKeyword ),  text( ctx, default_textStyle, ' ' ),  targetView ] ),
+				   ctx.paragraph( python_paragraphStyle, [ keywordText( ctx, delKeyword ),  ctx.text( default_textStyle, ' ' ),  targetView ] ),
 				   PRECEDENCE_STMT,
 				   state )
 
 
 	# Return statement
 	def returnStmt(self, ctx, state, node, value):
-		valueView = viewEval( ctx, value, None, python25ViewState( PRECEDENCE_STMT, Parser.tupleOrExpression ) )
+		valueView = ctx.viewEvalFn( value, None, python25ViewState( PRECEDENCE_STMT, Parser.tupleOrExpression ) )
 		return statementNodeEditor( ctx, node,
-				   paragraph( ctx, python_paragraphStyle, [ keywordText( ctx, returnKeyword ),  text( ctx, default_textStyle, ' ' ),  valueView ] ),
+				   ctx.paragraph( python_paragraphStyle, [ keywordText( ctx, returnKeyword ),  ctx.text( default_textStyle, ' ' ),  valueView ] ),
 				   PRECEDENCE_STMT,
 				   state )
 
 
 	# Yield statement
 	def yieldStmt(self, ctx, state, node, value):
-		valueView = viewEval( ctx, value, None, python25ViewState( PRECEDENCE_STMT ) )
+		valueView = ctx.viewEvalFn( value, None, python25ViewState( PRECEDENCE_STMT ) )
 		return statementNodeEditor( ctx, node,
-				   paragraph( ctx, python_paragraphStyle, [ keywordText( ctx, yieldKeyword ),  text( ctx, default_textStyle, ' ' ),  valueView ] ),
+				   ctx.paragraph( python_paragraphStyle, [ keywordText( ctx, yieldKeyword ),  ctx.text( default_textStyle, ' ' ),  valueView ] ),
 				   PRECEDENCE_STMT,
 				   state )
 
@@ -997,14 +995,14 @@ class Python25View (GSymView):
 	# Raise statement
 	def raiseStmt(self, ctx, state, node, *xs):
 		xs = [ x   for x in xs   if not isNullNode( x ) ]
-		xViews = mapViewEval( ctx, xs, None, python25ViewState( PRECEDENCE_STMT ) )
+		xViews = ctx.mapViewEvalFn( xs, None, python25ViewState( PRECEDENCE_STMT ) )
 		xElements = []
 		if len( xs ) > 0:
 			for x in xViews[:-1]:
-				xElements.extend( [ x,  text( ctx, punctuation_textStyle, ', ' ) ] )
+				xElements.extend( [ x,  ctx.text( punctuation_textStyle, ', ' ) ] )
 			xElements.append( xViews[-1] )
 		return statementNodeEditor( ctx, node,
-				   paragraph( ctx, python_paragraphStyle, [ keywordText( ctx, raiseKeyword ),  text( ctx, default_textStyle, ' ' ) ] + xElements ),
+				   ctx.paragraph( python_paragraphStyle, [ keywordText( ctx, raiseKeyword ),  ctx.text( default_textStyle, ' ' ) ] + xElements ),
 				   PRECEDENCE_STMT,
 				   state )
 
@@ -1029,14 +1027,14 @@ class Python25View (GSymView):
 	def relativeModule(self, ctx, state, node, name):
 		name = name.toString()
 		return expressionNodeEditor( ctx, node,
-				   text( ctx, default_textStyle, name ),
+				   ctx.text( default_textStyle, name ),
 				   PRECEDENCE_IMPORTCONTENT,
 				   state )
 	
 	def moduleImport(self, ctx, state, node, name):
 		name = name.toString()
 		return expressionNodeEditor( ctx, node,
-				   text( ctx, default_textStyle, name ),
+				   ctx.text( default_textStyle, name ),
 				   PRECEDENCE_IMPORTCONTENT,
 				   state )
 	
@@ -1044,15 +1042,15 @@ class Python25View (GSymView):
 		name = name.toString()
 		asName = asName.toString()
 		return expressionNodeEditor( ctx, node,
-				   paragraph( ctx, python_paragraphStyle, [ text( ctx, default_textStyle, name ),  text( ctx, default_textStyle, ' ' ),  keywordText( ctx, asKeyword ),
-									    text( ctx, default_textStyle, ' ' ),  text( ctx, default_textStyle, asName ) ] ),
+				   ctx.paragraph( python_paragraphStyle, [ ctx.text( default_textStyle, name ),  ctx.text( default_textStyle, ' ' ),  keywordText( ctx, asKeyword ),
+									    ctx.text( default_textStyle, ' ' ),  ctx.text( default_textStyle, asName ) ] ),
 				   PRECEDENCE_IMPORTCONTENT,
 				   state )
 	
 	def moduleContentImport(self, ctx, state, node, name):
 		name = name.toString()
 		return expressionNodeEditor( ctx, node,
-				   text( ctx, default_textStyle, name ),
+				   ctx.text( default_textStyle, name ),
 				   PRECEDENCE_IMPORTCONTENT,
 				   state )
 	
@@ -1060,42 +1058,42 @@ class Python25View (GSymView):
 		name = name.toString()
 		asName = asName.toString()
 		return expressionNodeEditor( ctx, node,
-				   paragraph( ctx, python_paragraphStyle, [ text( ctx, default_textStyle, name ),  text( ctx, default_textStyle, ' ' ),  keywordText( ctx, asKeyword ),
-									    text( ctx, default_textStyle, ' ' ),  text( ctx, default_textStyle, asName ) ] ),
+				   ctx.paragraph( python_paragraphStyle, [ ctx.text( default_textStyle, name ),  ctx.text( default_textStyle, ' ' ),  keywordText( ctx, asKeyword ),
+									    ctx.text( default_textStyle, ' ' ),  ctx.text( default_textStyle, asName ) ] ),
 				   PRECEDENCE_IMPORTCONTENT,
 				   state )
 	
 	def importStmt(self, ctx, state, node, *xs):
-		xViews = mapViewEval( ctx, xs, None, python25ViewState( PRECEDENCE_STMT, Parser.moduleImport ) )
+		xViews = ctx.mapViewEvalFn( xs, None, python25ViewState( PRECEDENCE_STMT, Parser.moduleImport ) )
 		xElements = []
 		if len( xs ) > 0:
 			for xv in xViews[:-1]:
-				xElements.extend( [ xv,  text( ctx, punctuation_textStyle, ', ' ) ] )
+				xElements.extend( [ xv,  ctx.text( punctuation_textStyle, ', ' ) ] )
 			xElements.append( xViews[-1] )
 		return statementNodeEditor( ctx, node,
-				   paragraph( ctx, python_paragraphStyle, [ keywordText( ctx, importKeyword ), text( ctx, default_textStyle, ' ' ) ]  +  xElements ),
+				   ctx.paragraph( python_paragraphStyle, [ keywordText( ctx, importKeyword ), ctx.text( default_textStyle, ' ' ) ]  +  xElements ),
 				   PRECEDENCE_STMT,
 				   state )
 	
 	def fromImportStmt(self, ctx, state, node, mod, *xs):
-		modView = viewEval( ctx, mod, None, python25ViewState( PRECEDENCE_STMT, Parser.moduleContentImport ) )
-		xViews = mapViewEval( ctx, xs, None, python25ViewState( PRECEDENCE_STMT, Parser.moduleImport ) )
+		modView = ctx.viewEvalFn( mod, None, python25ViewState( PRECEDENCE_STMT, Parser.moduleContentImport ) )
+		xViews = ctx.mapViewEvalFn( xs, None, python25ViewState( PRECEDENCE_STMT, Parser.moduleImport ) )
 		xElements = []
 		if len( xs ) > 0:
 			for xv in xViews[:-1]:
-				xElements.extend( [ xv,  text( ctx, punctuation_textStyle, ', ' ) ] )
+				xElements.extend( [ xv,  ctx.text( punctuation_textStyle, ', ' ) ] )
 			xElements.append( xViews[-1] )
 		return statementNodeEditor( ctx, node,
-				   paragraph( ctx, python_paragraphStyle, [ keywordText( ctx, fromKeyword ), text( ctx, default_textStyle, ' ' ), modView, text( ctx, default_textStyle, ' ' ),
-									    keywordText( ctx, importKeyword ), text( ctx, default_textStyle, ' ' ) ]  +  xElements ),
+				   ctx.paragraph( python_paragraphStyle, [ keywordText( ctx, fromKeyword ), ctx.text( default_textStyle, ' ' ), modView, ctx.text( default_textStyle, ' ' ),
+									    keywordText( ctx, importKeyword ), ctx.text( default_textStyle, ' ' ) ]  +  xElements ),
 				   PRECEDENCE_STMT,
 				   state )
 	
 	def fromImportAllStmt(self, ctx, state, node, mod):
-		modView = viewEval( ctx, mod, None, python25ViewState( PRECEDENCE_STMT, Parser.moduleContentImport ) )
+		modView = ctx.viewEvalFn( mod, None, python25ViewState( PRECEDENCE_STMT, Parser.moduleContentImport ) )
 		return statementNodeEditor( ctx, node,
-				   paragraph( ctx, python_paragraphStyle, [ keywordText( ctx, fromKeyword ), text( ctx, default_textStyle, ' ' ), modView, text( ctx, default_textStyle, ' ' ),
-									     keywordText( ctx, importKeyword ), text( ctx, default_textStyle, ' ' ),  text( ctx, punctuation_textStyle, '*' ) ] ),
+				   ctx.paragraph( python_paragraphStyle, [ keywordText( ctx, fromKeyword ), ctx.text( default_textStyle, ' ' ), modView, ctx.text( default_textStyle, ' ' ),
+									     keywordText( ctx, importKeyword ), ctx.text( default_textStyle, ' ' ),  ctx.text( punctuation_textStyle, '*' ) ] ),
 				   PRECEDENCE_STMT,
 				   state )
 
@@ -1104,19 +1102,19 @@ class Python25View (GSymView):
 	def globalVar(self, ctx, state, node, name):
 		name = name.toString()
 		return statementNodeEditor( ctx, node,
-				   text( ctx, default_textStyle, name ),
+				   ctx.text( default_textStyle, name ),
 				   PRECEDENCE_STMT,
 				   state )
 	
 	def globalStmt(self, ctx, state, node, *xs):
-		xViews = mapViewEval( ctx, xs, None, python25ViewState( PRECEDENCE_STMT, Parser.globalVar ) )
+		xViews = ctx.mapViewEvalFn( xs, None, python25ViewState( PRECEDENCE_STMT, Parser.globalVar ) )
 		xElements = []
 		if len( xs ) > 0:
 			for xv in xViews[:-1]:
-				xElements.extend( [ xv,  text( ctx, punctuation_textStyle, ', ' ) ] )
+				xElements.extend( [ xv,  ctx.text( punctuation_textStyle, ', ' ) ] )
 			xElements.append( xViews[-1] )
 		return statementNodeEditor( ctx, node,
-				   paragraph( ctx, python_paragraphStyle, [ keywordText( ctx, globalKeyword ),  text( ctx, default_textStyle, ' ' ) ]  +  xElements ),
+				   ctx.paragraph( python_paragraphStyle, [ keywordText( ctx, globalKeyword ),  ctx.text( default_textStyle, ' ' ) ]  +  xElements ),
 				   PRECEDENCE_STMT,
 				   state )
 	
@@ -1124,16 +1122,16 @@ class Python25View (GSymView):
 	
 	# Exec statement
 	def execStmt(self, ctx, state, node, src, loc, glob):
-		srcView = viewEval( ctx, src, None, python25ViewState( PRECEDENCE_STMT, Parser.orOp ) )
+		srcView = ctx.viewEvalFn( src, None, python25ViewState( PRECEDENCE_STMT, Parser.orOp ) )
 		elements = [ srcView ]
 		if not isNullNode( loc ):
-			locView = viewEval( ctx, loc, None, python25ViewState( PRECEDENCE_STMT ) )
-			elements.extend( [ text( ctx, default_textStyle, ' ' ),  keywordText( ctx, inKeyword ),  text( ctx, default_textStyle, ' ' ),  locView ] )
+			locView = ctx.viewEvalFn( loc, None, python25ViewState( PRECEDENCE_STMT ) )
+			elements.extend( [ ctx.text( default_textStyle, ' ' ),  keywordText( ctx, inKeyword ),  ctx.text( default_textStyle, ' ' ),  locView ] )
 		if not isNullNode( glob ):
-			globView = viewEval( ctx, glob, None, python25ViewState( PRECEDENCE_STMT ) )
-			elements.extend( [ text( ctx, default_textStyle, ', ' ),  globView ] )
+			globView = ctx.viewEvalFn( glob, None, python25ViewState( PRECEDENCE_STMT ) )
+			elements.extend( [ ctx.text( default_textStyle, ', ' ),  globView ] )
 		return statementNodeEditor( ctx, node,
-				   paragraph( ctx, python_paragraphStyle, [ keywordText( ctx, execKeyword ),  text( ctx, default_textStyle, ' ' ) ]  +  elements ),
+				   ctx.paragraph( python_paragraphStyle, [ keywordText( ctx, execKeyword ),  ctx.text( default_textStyle, ' ' ) ]  +  elements ),
 				   PRECEDENCE_STMT,
 				   state )
 
@@ -1143,9 +1141,9 @@ class Python25View (GSymView):
 	
 	# If statement
 	def ifStmt(self, ctx, state, node, condition, suite):
-		conditionView = viewEval( ctx, condition, None, python25ViewState( PRECEDENCE_STMT ) )
+		conditionView = ctx.viewEvalFn( condition, None, python25ViewState( PRECEDENCE_STMT ) )
 		return compoundStatementEditor( ctx, node,
-						paragraph( ctx, python_paragraphStyle, [ keywordText( ctx, ifKeyword ),  text( ctx, default_textStyle, ' ' ),  conditionView,  text( ctx, punctuation_textStyle, ':' ) ] ),
+						ctx.paragraph( python_paragraphStyle, [ keywordText( ctx, ifKeyword ),  ctx.text( default_textStyle, ' ' ),  conditionView,  ctx.text( punctuation_textStyle, ':' ) ] ),
 						PRECEDENCE_STMT,
 						suite,
 						state )
@@ -1154,9 +1152,9 @@ class Python25View (GSymView):
 	
 	# Elif statement
 	def elifStmt(self, ctx, state, node, condition, suite):
-		conditionView = viewEval( ctx, condition, None, python25ViewState( PRECEDENCE_STMT ) )
+		conditionView = ctx.viewEvalFn( condition, None, python25ViewState( PRECEDENCE_STMT ) )
 		return compoundStatementEditor( ctx, node,
-						paragraph( ctx, python_paragraphStyle, [ keywordText( ctx, elifKeyword ),  text( ctx, default_textStyle, ' ' ),  conditionView,  text( ctx, punctuation_textStyle, ':' ) ] ),
+						ctx.paragraph( python_paragraphStyle, [ keywordText( ctx, elifKeyword ),  ctx.text( default_textStyle, ' ' ),  conditionView,  ctx.text( punctuation_textStyle, ':' ) ] ),
 						PRECEDENCE_STMT,
 						suite,
 						state )
@@ -1166,7 +1164,7 @@ class Python25View (GSymView):
 	# Else statement
 	def elseStmt(self, ctx, state, node, suite):
 		return compoundStatementEditor( ctx, node,
-						paragraph( ctx, python_paragraphStyle, [ keywordText( ctx, elseKeyword ),  text( ctx, punctuation_textStyle, ':' ) ] ),
+						ctx.paragraph( python_paragraphStyle, [ keywordText( ctx, elseKeyword ),  ctx.text( punctuation_textStyle, ':' ) ] ),
 						PRECEDENCE_STMT,
 						suite,
 						state )
@@ -1174,9 +1172,9 @@ class Python25View (GSymView):
 	
 	# While statement
 	def whileStmt(self, ctx, state, node, condition, suite):
-		conditionView = viewEval( ctx, condition, None, python25ViewState( PRECEDENCE_STMT ) )
+		conditionView = ctx.viewEvalFn( condition, None, python25ViewState( PRECEDENCE_STMT ) )
 		return compoundStatementEditor( ctx, node,
-						paragraph( ctx, python_paragraphStyle, [ keywordText( ctx, whileKeyword ),  text( ctx, default_textStyle, ' ' ),  conditionView,  text( ctx, punctuation_textStyle, ':' ) ] ),
+						ctx.paragraph( python_paragraphStyle, [ keywordText( ctx, whileKeyword ),  ctx.text( default_textStyle, ' ' ),  conditionView,  ctx.text( punctuation_textStyle, ':' ) ] ),
 						PRECEDENCE_STMT,
 						suite,
 						state  )
@@ -1184,11 +1182,11 @@ class Python25View (GSymView):
 
 	# For statement
 	def forStmt(self, ctx, state, node, target, source, suite):
-		targetView = viewEval( ctx, target, None, python25ViewState( PRECEDENCE_STMT, Parser.targetList ) )
-		sourceView = viewEval( ctx, source, None, python25ViewState( PRECEDENCE_STMT, Parser.tupleOrExpression ) )
+		targetView = ctx.viewEvalFn( target, None, python25ViewState( PRECEDENCE_STMT, Parser.targetList ) )
+		sourceView = ctx.viewEvalFn( source, None, python25ViewState( PRECEDENCE_STMT, Parser.tupleOrExpression ) )
 		return compoundStatementEditor( ctx, node,
-						paragraph( ctx, python_paragraphStyle, [ keywordText( ctx, forKeyword ),  text( ctx, default_textStyle, ' ' ),  targetView,  text( ctx, default_textStyle, ' ' ),
-											 keywordText( ctx, inKeyword ),  text( ctx, default_textStyle, ' ' ),  sourceView,  text( ctx, punctuation_textStyle, ':' ) ] ),
+						ctx.paragraph( python_paragraphStyle, [ keywordText( ctx, forKeyword ),  ctx.text( default_textStyle, ' ' ),  targetView,  ctx.text( default_textStyle, ' ' ),
+											 keywordText( ctx, inKeyword ),  ctx.text( default_textStyle, ' ' ),  sourceView,  ctx.text( punctuation_textStyle, ':' ) ] ),
 						PRECEDENCE_STMT,
 						suite,
 						state  )
@@ -1198,7 +1196,7 @@ class Python25View (GSymView):
 	# Try statement
 	def tryStmt(self, ctx, state, node, suite):
 		return compoundStatementEditor( ctx, node,
-						paragraph( ctx, python_paragraphStyle, [ keywordText( ctx, tryKeyword ),  text( ctx, punctuation_textStyle, ':' ) ] ),
+						ctx.paragraph( python_paragraphStyle, [ keywordText( ctx, tryKeyword ),  ctx.text( punctuation_textStyle, ':' ) ] ),
 						PRECEDENCE_STMT,
 						suite,
 						state )
@@ -1209,14 +1207,14 @@ class Python25View (GSymView):
 	def exceptStmt(self, ctx, state, node, exc, target, suite):
 		elements = []
 		if not isNullNode( exc ):
-			excView = viewEval( ctx, exc, None, python25ViewState( PRECEDENCE_STMT ) )
-			elements.extend( [ text( ctx, default_textStyle, ' ' ),  excView ] )
+			excView = ctx.viewEvalFn( exc, None, python25ViewState( PRECEDENCE_STMT ) )
+			elements.extend( [ ctx.text( default_textStyle, ' ' ),  excView ] )
 		if not isNullNode( target ):
-			targetView = viewEval( ctx, target, None, python25ViewState( PRECEDENCE_STMT ) )
-			elements.extend( [ text( ctx, default_textStyle, ', ' ),  targetView ] )
-		elements.append( text( ctx, punctuation_textStyle, ':' ) )
+			targetView = ctx.viewEvalFn( target, None, python25ViewState( PRECEDENCE_STMT ) )
+			elements.extend( [ ctx.text( default_textStyle, ', ' ),  targetView ] )
+		elements.append( ctx.text( punctuation_textStyle, ':' ) )
 		return compoundStatementEditor( ctx, node,
-						paragraph( ctx, python_paragraphStyle, [ keywordText( ctx, exceptKeyword ) ]  +  elements ),
+						ctx.paragraph( python_paragraphStyle, [ keywordText( ctx, exceptKeyword ) ]  +  elements ),
 						PRECEDENCE_STMT,
 						suite,
 						state )
@@ -1226,7 +1224,7 @@ class Python25View (GSymView):
 	# Finally statement
 	def finallyStmt(self, ctx, state, node, suite):
 		return compoundStatementEditor( ctx, node,
-						paragraph( ctx, python_paragraphStyle, [ keywordText( ctx, finallyKeyword ),  text( ctx, punctuation_textStyle, ':' ) ] ),
+						ctx.paragraph( python_paragraphStyle, [ keywordText( ctx, finallyKeyword ),  ctx.text( punctuation_textStyle, ':' ) ] ),
 						PRECEDENCE_STMT,
 						suite,
 						state )
@@ -1235,14 +1233,14 @@ class Python25View (GSymView):
 	
 	# With statement
 	def withStmt(self, ctx, state, node, expr, target, suite):
-		exprView = viewEval( ctx, expr, None, python25ViewState( PRECEDENCE_STMT ) )
+		exprView = ctx.viewEvalFn( expr, None, python25ViewState( PRECEDENCE_STMT ) )
 		elements = [ exprView ]
 		if not isNullNode( target ):
-			targetView = viewEval( ctx, target, None, python25ViewState( PRECEDENCE_STMT ) )
-			elements.extend( [ text( ctx, default_textStyle, ' ' ),  keywordText( ctx, asKeyword ),  text( ctx, default_textStyle, ' ' ),  targetView ] )
-		elements.append( text( ctx, punctuation_textStyle, ':' ) )
+			targetView = ctx.viewEvalFn( target, None, python25ViewState( PRECEDENCE_STMT ) )
+			elements.extend( [ ctx.text( default_textStyle, ' ' ),  keywordText( ctx, asKeyword ),  ctx.text( default_textStyle, ' ' ),  targetView ] )
+		elements.append( ctx.text( punctuation_textStyle, ':' ) )
 		return compoundStatementEditor( ctx, node,
-						paragraph( ctx, python_paragraphStyle, [ keywordText( ctx, withKeyword ),  text( ctx, default_textStyle, ' ' ) ]  +  elements ),
+						ctx.paragraph( python_paragraphStyle, [ keywordText( ctx, withKeyword ),  ctx.text( default_textStyle, ' ' ) ]  +  elements ),
 						PRECEDENCE_STMT,
 						suite,
 						state )
@@ -1252,16 +1250,16 @@ class Python25View (GSymView):
 	# Def statement
 	def defStmt(self, ctx, state, node, name, params, suite):
 		name = name.toString()
-		paramViews = mapViewEval( ctx, params, None, python25ViewState( PRECEDENCE_STMT, Parser.param ) )
-		paramElements = [ text( ctx, punctuation_textStyle, '(' ) ]
+		paramViews = ctx.mapViewEvalFn( params, None, python25ViewState( PRECEDENCE_STMT, Parser.param ) )
+		paramElements = [ ctx.text( punctuation_textStyle, '(' ) ]
 		if len( params ) > 0:
 			for p in paramViews[:-1]:
-				paramElements.extend( [ p,  text( ctx, punctuation_textStyle, ', ' ) ] )
+				paramElements.extend( [ p,  ctx.text( punctuation_textStyle, ', ' ) ] )
 			paramElements.append( paramViews[-1] )
-		paramElements.append( text( ctx, punctuation_textStyle, ')' ) )
+		paramElements.append( ctx.text( punctuation_textStyle, ')' ) )
 		return compoundStatementEditor( ctx, node,
-						paragraph( ctx, python_paragraphStyle, [ keywordText( ctx, defKeyword ),  text( ctx, default_textStyle, ' ' ),  text( ctx, default_textStyle, name ) ]  +  \
-							   paramElements  +  [ text( ctx, punctuation_textStyle, ':' ) ] ),
+						ctx.paragraph( python_paragraphStyle, [ keywordText( ctx, defKeyword ),  ctx.text( default_textStyle, ' ' ),  ctx.text( default_textStyle, name ) ]  +  \
+							   paramElements  +  [ ctx.text( punctuation_textStyle, ':' ) ] ),
 						PRECEDENCE_STMT,
 						suite,
 						state )
@@ -1271,17 +1269,17 @@ class Python25View (GSymView):
 	def decoStmt(self, ctx, state, node, name, args):
 		name = name.toString()
 		if not isNullNode( args ):
-			argViews = mapViewEval( ctx, args, None, python25ViewState( PRECEDENCE_STMT, Parser.callArg ) )
-			argElements = [ text( ctx, punctuation_textStyle, '(' ) ]
+			argViews = ctx.mapViewEvalFn( args, None, python25ViewState( PRECEDENCE_STMT, Parser.callArg ) )
+			argElements = [ ctx.text( punctuation_textStyle, '(' ) ]
 			if len( args ) > 0:
 				for a in argViews[:-1]:
-					argElements.extend( [ a, text( ctx, punctuation_textStyle, ', ' ) ] )
+					argElements.extend( [ a, ctx.text( punctuation_textStyle, ', ' ) ] )
 				argElements.append( argViews[-1] )
-			argElements.append( text( ctx, punctuation_textStyle, ')' ) )
+			argElements.append( ctx.text( punctuation_textStyle, ')' ) )
 		else:
 			argElements = []
 		return statementNodeEditor( ctx, node,
-				   paragraph( ctx, python_paragraphStyle, [ text( ctx, punctuation_textStyle, '@' ),  text( ctx, default_textStyle, name ) ]  +  argElements ),
+				   ctx.paragraph( python_paragraphStyle, [ ctx.text( punctuation_textStyle, '@' ),  ctx.text( default_textStyle, name ) ]  +  argElements ),
 				   PRECEDENCE_STMT,
 				   state )
 	
@@ -1291,14 +1289,14 @@ class Python25View (GSymView):
 	def classStmt(self, ctx, state, node, name, inheritance, suite):
 		name = name.toString()
 		if not isNullNode( inheritance ):
-			inhViews = mapViewEval( ctx, inheritance, None, python25ViewState( PRECEDENCE_TUPLEELEMENT, Parser.expression ) )
-			inhElements = [ text( ctx, punctuation_textStyle, '(' ),  listView( ctx, tuple_listViewLayout, None, None, _CommaFactory( ctx ), inhViews ),  text( ctx, punctuation_textStyle, ')' ) ]
+			inhViews = ctx.mapViewEvalFn( inheritance, None, python25ViewState( PRECEDENCE_TUPLEELEMENT, Parser.expression ) )
+			inhElements = [ ctx.text( punctuation_textStyle, '(' ),  ctx.listView( tuple_listViewLayout, None, None, _CommaFactory( ctx ), inhViews ),  ctx.text( punctuation_textStyle, ')' ) ]
 		else:
 			inhElements = []
 			
 		return compoundStatementEditor( ctx, node,
-						paragraph( ctx, python_paragraphStyle, [ keywordText( ctx, classKeyword ),  text( ctx, default_textStyle, ' ' ),  text( ctx, default_textStyle, name ) ]  +  \
-							   inhElements  +  [ text( ctx, punctuation_textStyle, ':' ) ] ),
+						ctx.paragraph( python_paragraphStyle, [ keywordText( ctx, classKeyword ),  ctx.text( default_textStyle, ' ' ),  ctx.text( default_textStyle, name ) ]  +  \
+							   inhElements  +  [ ctx.text( punctuation_textStyle, ':' ) ] ),
 						PRECEDENCE_STMT,
 						suite,
 						state )
@@ -1309,7 +1307,7 @@ class Python25View (GSymView):
 	def commentStmt(self, ctx, state, node, comment):
 		comment = comment.toString()
 		return statementNodeEditor( ctx, node,
-				   text( ctx, comment_textStyle, '#' + comment ),
+				   ctx.text( comment_textStyle, '#' + comment ),
 				   PRECEDENCE_STMT,
 				   state )
 
