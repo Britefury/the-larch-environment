@@ -389,8 +389,12 @@ class MainApp (object):
 						f = open( filename, 'r' )
 						if f is not None:
 							try:
+								t1 = datetime.now()
 								documentRoot = DMIORead.readSX( f.read() )
+								t2 = datetime.now()
 								documentRoot = DMList( documentRoot )
+								t3 = datetime.now()
+								print 'Read SX time=%s, convert to DMLIst time=%s'  %  ( t2 - t1, t3 - t2 )
 								self.setDocument( documentRoot )
 							except IOError:
 								pass
@@ -447,7 +451,10 @@ class MainApp (object):
 					if sf is not None:
 						filename = sf.getPath()
 						if filename is not None:
+							t1 = datetime.now()
 							content = importFn( filename )
+							t2 = datetime.now()
+							print 'Import time ', t2 - t1
 							if content is not None:
 								documentRoot = newDocument( content )
 								self.setDocument( documentRoot )
