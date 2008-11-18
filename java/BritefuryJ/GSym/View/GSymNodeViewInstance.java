@@ -6,14 +6,18 @@
 //##************************
 package BritefuryJ.GSym.View;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.WeakHashMap;
 
 import org.python.core.Py;
 import org.python.core.PyObject;
 
+import BritefuryJ.Cell.CellInterface;
 import BritefuryJ.DocPresent.DPHBox;
 import BritefuryJ.DocPresent.ElementTree.BorderElement;
 import BritefuryJ.DocPresent.ElementTree.Element;
+import BritefuryJ.DocPresent.ElementTree.ElementContentListener;
 import BritefuryJ.DocPresent.ElementTree.ElementFactory;
 import BritefuryJ.DocPresent.ElementTree.FractionElement;
 import BritefuryJ.DocPresent.ElementTree.HBoxElement;
@@ -34,6 +38,7 @@ import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.ScriptStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
+import BritefuryJ.DocTree.DocTreeNode;
 import BritefuryJ.DocView.DVNode;
 import BritefuryJ.DocView.DocView;
 import BritefuryJ.GSym.View.ListView.ListViewLayout;
@@ -224,6 +229,89 @@ public class GSymNodeViewInstance
 		return layout.createListElement( children, new PyElementFactory( beginDelim ), new PyElementFactory( endDelim ), new PyElementFactory( separator ) );
 	}
 	
+	
+	
+	public Element contentListener(Element child, ElementContentListener listener)
+	{
+		child.setContentListener( listener );
+		return child;
+	}
+	
+	public List<Element> contentListener(List<Element> children, ElementContentListener listener)
+	{
+		for (Element child: children)
+		{
+			child.setContentListener( listener );
+		}
+		return children;
+	}
+	
+	
+	public Element viewEval(DocTreeNode x)
+	{
+		return viewEvalFn( x, null, null );
+	}
+
+	public Element viewEval(DocTreeNode x, Object state)
+	{
+		return viewEvalFn( x, null, state );
+	}
+
+	public Element viewEvalFn(DocTreeNode x, GSymNodeViewFunction nodeViewFunction)
+	{
+		return viewEvalFn( x, nodeViewFunction, null );
+	}
+
+	public Element viewEvalFn(DocTreeNode x, GSymNodeViewFunction nodeViewFunction, Object state)
+	{
+		// A call to DocNode.buildNodeView builds the view, and puts it in the DocView's table
+		DVNode viewNode = view.buildNodeView( x );
+		viewNode.setNodeElementFactory( viewInstance.makeNodeElementFactory( nodeViewFunction, state ) );
+		
+		
+		// Block access tracking to prevent the contents of this node being dependent upon the child node being refreshed,
+		// and refresh the view node
+		// Refreshing the child node will ensure that when its contents are inserted into outer elements, its full element tree
+		// is up to date and available.
+		// Blocking the access tracking prevents an inner node from causing all parent/grandparent/etc nodes from requiring a
+		// refresh.
+		WeakHashMap<CellInterface, Object> accessList = CellInterface.blockAccessTracking();
+		viewNode.refresh();
+		CellInterface.unblockAccessTracking( accessList );
+		
+		registerViewNodeRelationship( viewNode );
+		
+		return viewNode.getElementNoRefresh();
+	}
+	
+	
+	
+	
+	public List<Element> mapViewEval(List<DocTreeNode> xs)
+	{
+		return mapViewEvalFn( xs, null, null );
+	}
+
+	public List<Element> mapViewEval(List<DocTreeNode> xs, Object state)
+	{
+		return mapViewEvalFn( xs, null, state );
+	}
+
+	public List<Element> mapViewEvalFn(List<DocTreeNode> xs, GSymNodeViewFunction nodeViewFunction)
+	{
+		return mapViewEvalFn( xs, nodeViewFunction, null );
+	}
+
+	public List<Element> mapViewEvalFn(List<DocTreeNode> xs, GSymNodeViewFunction nodeViewFunction, Object state)
+	{
+		ArrayList<Element> children = new ArrayList<Element>();
+		children.ensureCapacity( xs.size() );
+		for (DocTreeNode x: xs)
+		{
+			children.add( viewEvalFn( x, nodeViewFunction, state ) );
+		}
+		return children;
+	}
 	
 	
 	
