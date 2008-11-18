@@ -45,6 +45,24 @@ import BritefuryJ.GSym.View.ListView.ListViewLayout;
 
 public class GSymNodeViewInstance
 {
+	protected static class PyGSymNodeViewFunction implements GSymNodeViewFunction
+	{
+		private PyObject callable;
+		
+		
+		public PyGSymNodeViewFunction(PyObject callable)
+		{
+			this.callable = callable;
+		}
+
+	
+		public Element createElement(DocTreeNode x, GSymNodeViewInstance ctx, Object state)
+		{
+			return Py.tojava( callable.__call__( Py.java2py( x ), Py.java2py( ctx ), Py.java2py( state ) ), Element.class );
+		}
+	}
+	
+	
 	private static class PyElementFactory implements ElementFactory
 	{
 		private PyObject callable;
@@ -249,12 +267,12 @@ public class GSymNodeViewInstance
 	
 	public Element viewEval(DocTreeNode x)
 	{
-		return viewEvalFn( x, null, null );
+		return viewEvalFn( x, (GSymNodeViewFunction)null, null );
 	}
 
 	public Element viewEval(DocTreeNode x, Object state)
 	{
-		return viewEvalFn( x, null, state );
+		return viewEvalFn( x, (GSymNodeViewFunction)null, state );
 	}
 
 	public Element viewEvalFn(DocTreeNode x, GSymNodeViewFunction nodeViewFunction)
@@ -284,17 +302,27 @@ public class GSymNodeViewInstance
 		return viewNode.getElementNoRefresh();
 	}
 	
+	public Element viewEvalFn(DocTreeNode x, PyObject nodeViewFunction)
+	{
+		return viewEvalFn( x, new PyGSymNodeViewFunction( nodeViewFunction ), null );
+	}
+
+	public Element viewEvalFn(DocTreeNode x, PyObject nodeViewFunction, Object state)
+	{
+		return viewEvalFn( x, new PyGSymNodeViewFunction( nodeViewFunction ), state );
+	}
+	
 	
 	
 	
 	public List<Element> mapViewEval(List<DocTreeNode> xs)
 	{
-		return mapViewEvalFn( xs, null, null );
+		return mapViewEvalFn( xs, (GSymNodeViewFunction)null, null );
 	}
 
 	public List<Element> mapViewEval(List<DocTreeNode> xs, Object state)
 	{
-		return mapViewEvalFn( xs, null, state );
+		return mapViewEvalFn( xs, (GSymNodeViewFunction)null, state );
 	}
 
 	public List<Element> mapViewEvalFn(List<DocTreeNode> xs, GSymNodeViewFunction nodeViewFunction)
@@ -311,6 +339,16 @@ public class GSymNodeViewInstance
 			children.add( viewEvalFn( x, nodeViewFunction, state ) );
 		}
 		return children;
+	}
+	
+	public List<Element> mapViewEvalFn(List<DocTreeNode> xs, PyObject nodeViewFunction)
+	{
+		return mapViewEvalFn( xs, new PyGSymNodeViewFunction( nodeViewFunction ), null );
+	}
+
+	public List<Element> mapViewEvalFn(List<DocTreeNode> xs, PyObject nodeViewFunction, Object state)
+	{
+		return mapViewEvalFn( xs, new PyGSymNodeViewFunction( nodeViewFunction ), state );
 	}
 	
 	

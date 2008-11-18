@@ -11,5 +11,5 @@ import BritefuryJ.DocTree.DocTreeNode;
 
 public interface GSymNodeViewFunction
 {
-	public Element createElement(DocTreeNode content, GSymNodeViewInstance ctx, Object state);
+	public Element createElement(DocTreeNode x, GSymNodeViewInstance ctx, Object state);
 }
