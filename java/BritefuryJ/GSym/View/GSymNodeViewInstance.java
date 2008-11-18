@@ -24,6 +24,7 @@ import BritefuryJ.DocPresent.ElementTree.HBoxElement;
 import BritefuryJ.DocPresent.ElementTree.HiddenContentElement;
 import BritefuryJ.DocPresent.ElementTree.LineBreakElement;
 import BritefuryJ.DocPresent.ElementTree.ParagraphElement;
+import BritefuryJ.DocPresent.ElementTree.PyElementFactory;
 import BritefuryJ.DocPresent.ElementTree.ScriptElement;
 import BritefuryJ.DocPresent.ElementTree.SegmentElement;
 import BritefuryJ.DocPresent.ElementTree.TextElement;
@@ -61,23 +62,7 @@ public class GSymNodeViewInstance
 			return (Element)Py.tojava( callable.__call__( Py.java2py( x ), Py.java2py( ctx ), Py.java2py( state ) ), Element.class );
 		}
 	}
-	
-	
-	private static class PyElementFactory implements ElementFactory
-	{
-		private PyObject callable;
-		
-		public PyElementFactory(PyObject callable)
-		{
-			this.callable = callable;
-		}
-		
-		
-		public Element createElement()
-		{
-			return (Element)Py.tojava( callable.__call__(), Element.class );
-		}
-	}
+
 	
 	
 	protected Object xs;
@@ -244,7 +229,7 @@ public class GSymNodeViewInstance
 	
 	public Element listView(ListViewLayout layout, PyObject beginDelim, PyObject endDelim, PyObject separator, List<Element> children)
 	{
-		return layout.createListElement( children, new PyElementFactory( beginDelim ), new PyElementFactory( endDelim ), new PyElementFactory( separator ) );
+		return layout.createListElement( children, PyElementFactory.pyToElementFactory( beginDelim ), PyElementFactory.pyToElementFactory( endDelim ), PyElementFactory.pyToElementFactory( separator ) );
 	}
 	
 	

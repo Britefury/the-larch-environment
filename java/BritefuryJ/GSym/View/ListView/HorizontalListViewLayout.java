@@ -9,9 +9,12 @@ package BritefuryJ.GSym.View.ListView;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.python.core.PyObject;
+
 import BritefuryJ.DocPresent.ElementTree.Element;
 import BritefuryJ.DocPresent.ElementTree.ElementFactory;
 import BritefuryJ.DocPresent.ElementTree.HBoxElement;
+import BritefuryJ.DocPresent.ElementTree.PyElementFactory;
 import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
 
 public class HorizontalListViewLayout extends ListViewLayout
@@ -28,7 +31,13 @@ public class HorizontalListViewLayout extends ListViewLayout
 		this.trailingSeparator = trailingSeparator;
 	}
 	
-	
+	public HorizontalListViewLayout(HBoxStyleSheet styleSheet, PyObject spacingFactory, TrailingSeparator trailingSeparator)
+	{
+		this( styleSheet, PyElementFactory.pyToElementFactory( spacingFactory ), trailingSeparator );
+	}
+
+		
+		
 	public Element createListElement(List<Element> children, ElementFactory beginDelim, ElementFactory endDelim, ElementFactory separator)
 	{
 		HBoxElement hbox = new HBoxElement( styleSheet );

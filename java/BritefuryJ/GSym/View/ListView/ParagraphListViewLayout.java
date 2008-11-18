@@ -9,10 +9,13 @@ package BritefuryJ.GSym.View.ListView;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.python.core.PyObject;
+
 import BritefuryJ.DocPresent.ElementTree.Element;
 import BritefuryJ.DocPresent.ElementTree.ElementFactory;
 import BritefuryJ.DocPresent.ElementTree.LineBreakElement;
 import BritefuryJ.DocPresent.ElementTree.ParagraphElement;
+import BritefuryJ.DocPresent.ElementTree.PyElementFactory;
 import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
 
 public class ParagraphListViewLayout extends ListViewLayout
@@ -29,6 +32,11 @@ public class ParagraphListViewLayout extends ListViewLayout
 		this.spacingFactory = spacingFactory;
 		this.lineBreakPriority = lineBreakPriority;
 		this.trailingSeparator = trailingSeparator;
+	}
+	
+	public ParagraphListViewLayout(ParagraphStyleSheet styleSheet, PyObject spacingFactory, int lineBreakPriority, TrailingSeparator trailingSeparator)
+	{
+		this( styleSheet, PyElementFactory.pyToElementFactory( spacingFactory ), lineBreakPriority, trailingSeparator );
 	}
 	
 	
