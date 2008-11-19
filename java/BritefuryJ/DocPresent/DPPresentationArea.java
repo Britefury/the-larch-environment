@@ -629,9 +629,9 @@ public class DPPresentationArea extends DPBin implements CaretListener
 	// Queue resize
 	//
 	
-	protected void queueResize()
+	protected void handleQueueResize()
 	{
-		super.queueResize();
+		super.handleQueueResize();
 		bAllocationRequired = true;
 		queueFullRedraw();
 	}
