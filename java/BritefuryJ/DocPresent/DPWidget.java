@@ -103,7 +103,7 @@ abstract public class DPWidget
 	protected WidgetStyleSheet styleSheet;
 	protected DPContainer parent;
 	protected DPPresentationArea presentationArea;
-	protected boolean bRealised, bResizeQueued;
+	protected boolean bRealised, bResizeQueued, bSizingModified;
 	protected double scale, rootScale;
 	protected HMetrics minH, prefH;
 	protected VMetrics minV, prefV;
@@ -947,40 +947,60 @@ abstract public class DPWidget
 	
 	protected HMetrics refreshMinimumHMetrics()
 	{
-		minH = computeMinimumHMetrics().scaled( scale );
+		if ( bResizeQueued  ||  bSizingModified )
+		{
+			minH = computeMinimumHMetrics().scaled( scale );
+		}
 		return minH;
 	}
 	
 	protected HMetrics refreshPreferredHMetrics()
 	{
-		prefH = computePreferredHMetrics().scaled( scale );
+		if ( bResizeQueued  ||  bSizingModified )
+		{
+			prefH = computePreferredHMetrics().scaled( scale );
+		}
 		return prefH;
 	}
 	
 	protected VMetrics refreshMinimumVMetrics()
 	{
-		minV = computeMinimumVMetrics().scaled( scale );
+		if ( bResizeQueued  ||  bSizingModified )
+		{
+			minV = computeMinimumVMetrics().scaled( scale );
+		}
 		return minV;
 	}
 	
 	protected VMetrics refreshPreferredVMetrics()
 	{
-		prefV = computePreferredVMetrics().scaled( scale );
+		if ( bResizeQueued  ||  bSizingModified )
+		{
+			prefV = computePreferredVMetrics().scaled( scale );
+		}
 		return prefV;
 	}
 	
 	
 	protected void allocateX(double width)
 	{
-		allocation.x = width;
-		allocateContentsX( width );
+		if ( bResizeQueued  ||  bSizingModified  ||  width != allocation.x )
+		{
+			allocation.x = width;
+			allocateContentsX( width );
+			bSizingModified = true;
+		}
 	}
 	
 	protected void allocateY(double height)
 	{
-		allocation.y = height;
-		allocateContentsY( height );
+		if ( bResizeQueued  ||  bSizingModified  ||  height != allocation.y )
+		{
+			allocation.y = height;
+			allocateContentsY( height );
+		}
 		bResizeQueued = false;
+		bSizingModified = false;
 	}
 	
 	

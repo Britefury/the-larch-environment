@@ -7,12 +7,6 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-import java.lang.Math;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.WeakHashMap;
-
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics;
@@ -33,27 +27,28 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
+import java.util.HashMap;
+import java.util.List;
+import java.util.WeakHashMap;
 
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
-
-import BritefuryJ.Math.AABox2;
-import BritefuryJ.Math.Vector2;
-import BritefuryJ.Math.Point2;
-import BritefuryJ.Math.Xform2;
 
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Caret.CaretListener;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Event.PointerScrollEvent;
-
-import BritefuryJ.DocPresent.Input.Modifier;
-import BritefuryJ.DocPresent.Input.PointerInterface;
-import BritefuryJ.DocPresent.Input.Pointer;
 import BritefuryJ.DocPresent.Input.InputTable;
+import BritefuryJ.DocPresent.Input.Modifier;
+import BritefuryJ.DocPresent.Input.Pointer;
+import BritefuryJ.DocPresent.Input.PointerInterface;
 import BritefuryJ.DocPresent.Metrics.HMetrics;
 import BritefuryJ.DocPresent.Metrics.VMetrics;
+import BritefuryJ.Math.AABox2;
+import BritefuryJ.Math.Point2;
+import BritefuryJ.Math.Vector2;
+import BritefuryJ.Math.Xform2;
 
 
 
@@ -636,6 +631,7 @@ public class DPPresentationArea extends DPBin implements CaretListener
 	
 	protected void queueResize()
 	{
+		super.queueResize();
 		bAllocationRequired = true;
 		queueFullRedraw();
 	}
@@ -651,6 +647,7 @@ public class DPPresentationArea extends DPBin implements CaretListener
 	{
 		if ( bAllocationRequired )
 		{
+			long t1 = System.currentTimeMillis();
 			refreshMinimumHMetrics();
 			HMetrics h = refreshPreferredHMetrics();
 			if ( bHorizontalClamp )
@@ -671,6 +668,8 @@ public class DPPresentationArea extends DPBin implements CaretListener
 			{
 				rootMotionEvent( new PointerMotionEvent( rootSpaceMouse, PointerMotionEvent.Action.MOTION ) );
 			}			
+			long t2 = System.currentTimeMillis();
+			System.out.println( "DPPresentationArea.performAllocation(): Realloc time = " + (double)(t2-t1) * 0.001 );
 		}
 	}
 	
