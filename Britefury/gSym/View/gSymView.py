@@ -7,6 +7,8 @@
 ##-*************************
 import sys
 
+from datetime import datetime
+
 import difflib
 
 from copy import copy
@@ -24,6 +26,8 @@ from BritefuryJ.DocTree import DocTreeNode
 from BritefuryJ.DocView import DVNode
 from BritefuryJ.DocView import DocView
 
+from BritefuryJ.GSym.View import StringDiff
+
 #from Britefury.DocView.DocView import DocView
 
 
@@ -35,6 +39,10 @@ from Britefury.gSym.View import ListView
 
 #from Britefury.DocTree.DocTree import DocTree
 #from Britefury.DocTree.DocTreeNode import DocTreeNode
+
+
+
+DIFF_THRESHOLD = 65536
 
 
 
@@ -465,19 +473,38 @@ class _NodeElementChangeListener (DVNode.NodeElementChangeListener):
 				oldIndex = position  +  ( 1  if bias == Marker.Bias.END  else  0 )
 
 				# Compute the difference
-				matcher = difflib.SequenceMatcher( lambda x: x in ' \t', contentString, newContentString )
-				for tag, i1, i2, j1, j2 in matcher.get_opcodes():
-					if ( position > i1  or  ( position == i1  and  bias == Marker.Bias.END ) )   and   position < i2:
-						# Caret is in the range of this opcode
-						if tag == 'delete':
-							# Range deleted; move to position in destination; bias:START
-							newPosition = j1
-							newBias = Marker.Bias.START
-						elif tag == 'replace'  or  tag == 'equal'  or  tag == 'insert':
-							# Range replaced or equal; move position by delta
-							newPosition += j1 - i1
+				prefixLen = StringDiff.getCommonPrefixLength( contentString, newContentString )
+				suffixLen = StringDiff.getCommonSuffixLength( contentString, newContentString )
+				contentChanged = contentString[prefixLen:-suffixLen]
+				newContentChanged = newContentString[prefixLen:-suffixLen]
+				
+				if ( len( contentChanged ) * len( newContentChanged ) )  >  DIFF_THRESHOLD:
+					if position > prefixLen:
+						rel = position - prefixLen
+						if rel > len( contentChanged ):
+							rel += len( newContentChanged ) - len( contentChanged )
 						else:
-							raise ValueError, 'unreckognised tag'
+							rel = min( rel, len( newContentChanged ) )
+						position = rel + prefixLen
+				else:
+					matcher = difflib.SequenceMatcher( lambda x: x in ' \t', contentChanged, newContentChanged )
+					opcodes = matcher.get_opcodes()
+					for tag, i1, i2, j1, j2 in matcher.get_opcodes():
+						i1 += prefixLen
+						i2 += prefixLen
+						j1 += prefixLen
+						j2 += prefixLen
+						if ( position > i1  or  ( position == i1  and  bias == Marker.Bias.END ) )   and   position < i2:
+							# Caret is in the range of this opcode
+							if tag == 'delete':
+								# Range deleted; move to position in destination; bias:START
+								newPosition = j1
+								newBias = Marker.Bias.START
+							elif tag == 'replace'  or  tag == 'equal'  or  tag == 'insert':
+								# Range replaced or equal; move position by delta
+								newPosition += j1 - i1
+							else:
+								raise ValueError, 'unreckognised tag'
 				elementTree = elementContent.getElementTree()
 				caret = elementTree.getCaret()
 				
@@ -485,15 +512,15 @@ class _NodeElementChangeListener (DVNode.NodeElementChangeListener):
 				newIndex = newPosition  +  ( 1  if newBias == Marker.Bias.END  else  0 )
 				
 				print 'CURSOR POSITION CHANGE'
-				if bias == Marker.Bias.START:
-					print contentString[:oldIndex].replace( '\n', '\\n' ) + '>|' + contentString[oldIndex:].replace( '\n', '\\n' )
-				else:
-					print contentString[:oldIndex].replace( '\n', '\\n' ) + '|<' + contentString[oldIndex:].replace( '\n', '\\n' )
+				#if bias == Marker.Bias.START:
+					#print contentString[:oldIndex].replace( '\n', '\\n' ) + '>|' + contentString[oldIndex:].replace( '\n', '\\n' )
+				#else:
+					#print contentString[:oldIndex].replace( '\n', '\\n' ) + '|<' + contentString[oldIndex:].replace( '\n', '\\n' )
 
-				if bias == Marker.Bias.START:
-					print newContentString[:newIndex].replace( '\n', '\\n' ) + '>|' + newContentString[newIndex:].replace( '\n', '\\n' )
-				else:
-					print newContentString[:newIndex].replace( '\n', '\\n' ) + '|<' + newContentString[newIndex:].replace( '\n', '\\n' )
+				#if bias == Marker.Bias.START:
+					#print newContentString[:newIndex].replace( '\n', '\\n' ) + '>|' + newContentString[newIndex:].replace( '\n', '\\n' )
+				#else:
+					#print newContentString[:newIndex].replace( '\n', '\\n' ) + '|<' + newContentString[newIndex:].replace( '\n', '\\n' )
 				
 				newPosition = max( 0, newPosition )
 				if newPosition >= elementContent.getContentLength():
@@ -502,7 +529,7 @@ class _NodeElementChangeListener (DVNode.NodeElementChangeListener):
 				
 				leaf = elementContent.getLeafAtContentPosition( newPosition )
 				if leaf is not None:
-					print leaf, "'" + leaf.getContent().replace( '\n', '\\n' ) + "'"
+					#print leaf, "'" + leaf.getContent().replace( '\n', '\\n' ) + "'"
 					leafOffset = leaf.getContentOffsetInSubtree( elementContent )
 					leafPosition = newPosition - leafOffset
 					
@@ -517,24 +544,24 @@ class _NodeElementChangeListener (DVNode.NodeElementChangeListener):
 						if leafPosition < leaf.getContentLength()/2:
 							left = leaf.getPreviousLeaf( segFilter, None, elemFilter )
 							if left is not None:
-								print left, "'" + left.getContent().replace( '\n', '\\n' ) + "'", left.getSegment() is leaf.getSegment()
+								#print left, "'" + left.getContent().replace( '\n', '\\n' ) + "'", left.getSegment() is leaf.getSegment()
 								left.moveMarkerToEnd( caret.getMarker() )
 							else:
 								right = leaf.getNextLeaf( segFilter, None, elemFilter )
 								if right is not None:
-									print right, "'" + right.getContent().replace( '\n', '\\n' ) + "'"
+									#print right, "'" + right.getContent().replace( '\n', '\\n' ) + "'"
 									right.moveMarkerToStart( caret.getMarker() )
 								else:
 									leaf.moveMarker( caret.getMarker(), leafPosition, newBias )
 						else:
 							right = leaf.getNextLeaf( segFilter, None, elemFilter )
 							if right is not None:
-								print right, "'" + right.getContent().replace( '\n', '\\n' ) + "'"
+								#print right, "'" + right.getContent().replace( '\n', '\\n' ) + "'"
 								right.moveMarkerToStart( caret.getMarker() )
 							else:
 								left = leaf.getPreviousLeaf( segFilter, None, elemFilter )
 								if left is not None:
-									print left, "'" + left.getContent().replace( '\n', '\\n' ) + "'"
+									#print left, "'" + left.getContent().replace( '\n', '\\n' ) + "'"
 									left.moveMarkerToEnd( caret.getMarker() )
 								else:
 									leaf.moveMarker( caret.getMarker(), leafPosition, newBias )
