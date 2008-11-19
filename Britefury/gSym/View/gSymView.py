@@ -465,6 +465,7 @@ class _NodeElementChangeListener (DVNode.NodeElementChangeListener):
 			# Invoking child.refresh() above can cause this method to be invoked on another node; recursively;
 			# Ensure that only the inner-most recursion level handles the caret
 			if position is not None  and  bias is not None  and  elementContent is not None:
+				print 'CURSOR POSITION CHANGE'
 				newContentString = elementContent.getContent()
 				
 				newPosition = position
@@ -472,24 +473,46 @@ class _NodeElementChangeListener (DVNode.NodeElementChangeListener):
 	
 				oldIndex = position  +  ( 1  if bias == Marker.Bias.END  else  0 )
 
-				# Compute the difference
+				# Compute the difference between the old content and the new content in order to update the cursor position
+				
+				# String differencing is a O(mn) algorithm, where m and n are the lengths of the source and destination strings respectively
+				# In order to prevent awful performance, string differencing must be applied to as little text as possible.
+				# In most cases, the edit operation affects part of the content in the middle of the string; large parts of the beginning and end
+				# will remain unchanged
+				# By computing the common prefix and common suffix of the two strings, we can narrow down the window to which differencing
+				# is applied.
+				# Limiting the scope can cause the differencing algorithm to produce a different result, than if it was applied to the whole string.
+				# In order to keeps the result consistent with that of a complete string difference, an extra character at the start and end of the
+				# change region is included.
+				
+				# Get the size of the common prefix and suffix
 				prefixLen = StringDiff.getCommonPrefixLength( contentString, newContentString )
 				suffixLen = StringDiff.getCommonSuffixLength( contentString, newContentString )
-				contentChanged = contentString[prefixLen:-suffixLen]
-				newContentChanged = newContentString[prefixLen:-suffixLen]
+				# Include 1 extra character at each end if available
+				prefixLen = max( 0, prefixLen - 1 )
+				suffixLen = max( 0, suffixLen - 1 )
+				# Compute the lengths of the change region in the original content and the new content
+				origChangeRegionLength = len( contentString ) - prefixLen - suffixLen
+				newChangeRegionLength = len( newContentString ) - prefixLen - suffixLen
 				
-				if ( len( contentChanged ) * len( newContentChanged ) )  >  DIFF_THRESHOLD:
+				# If the m*n > DIFF_THRESHOLD, use a simpler method; this prevents slow downs
+				if ( origChangeRegionLength * newChangeRegionLength )  >  DIFF_THRESHOLD:
+					# HACK HACK HACK
 					if position > prefixLen:
 						rel = position - prefixLen
-						if rel > len( contentChanged ):
-							rel += len( newContentChanged ) - len( contentChanged )
+						if rel > origChangeRegionLength:
+							rel += newChangeRegionLength - origChangeRegionLength
 						else:
-							rel = min( rel, len( newContentChanged ) )
+							rel = min( rel, newChangeRegionLength )
 						position = rel + prefixLen
+					# HACK HACK HACK
 				else:
-					matcher = difflib.SequenceMatcher( lambda x: x in ' \t', contentChanged, newContentChanged )
+					origChangeRegion = contentString[prefixLen:-suffixLen]
+					newChangeRegion = newContentString[prefixLen:-suffixLen]
+					matcher = difflib.SequenceMatcher( lambda x: x in ' \t', origChangeRegion, newChangeRegion )
 					opcodes = matcher.get_opcodes()
 					for tag, i1, i2, j1, j2 in matcher.get_opcodes():
+						# Apply the prefix offset
 						i1 += prefixLen
 						i2 += prefixLen
 						j1 += prefixLen
@@ -511,7 +534,6 @@ class _NodeElementChangeListener (DVNode.NodeElementChangeListener):
 				
 				newIndex = newPosition  +  ( 1  if newBias == Marker.Bias.END  else  0 )
 				
-				print 'CURSOR POSITION CHANGE'
 				#if bias == Marker.Bias.START:
 					#print contentString[:oldIndex].replace( '\n', '\\n' ) + '>|' + contentString[oldIndex:].replace( '\n', '\\n' )
 				#else:
