@@ -103,7 +103,7 @@ abstract public class DPWidget
 	protected WidgetStyleSheet styleSheet;
 	protected DPContainer parent;
 	protected DPPresentationArea presentationArea;
-	protected boolean bRealised, bResizeQueued, bSizingModified;
+	protected boolean bRealised, bResizeQueued, bSizeUpToDate;
 	protected double scale, rootScale;
 	protected HMetrics minH, prefH;
 	protected VMetrics minV, prefV;
@@ -799,7 +799,7 @@ abstract public class DPWidget
 	}
 	
 	
-	protected void queueResize()
+	protected void handleQueueResize()
 	{
 		if ( !bResizeQueued  &&  bRealised )
 		{
@@ -809,6 +809,13 @@ abstract public class DPWidget
 			}
 			bResizeQueued = true;
 		}
+	}
+	
+	
+	protected void queueResize()
+	{
+		handleQueueResize();
+		bSizeUpToDate = false;
 	}
 	
 	
@@ -881,7 +888,7 @@ abstract public class DPWidget
 	{
 		bRealised = true;
 		onRealise();
-		queueResize();
+		handleQueueResize();
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -947,7 +954,7 @@ abstract public class DPWidget
 	
 	protected HMetrics refreshMinimumHMetrics()
 	{
-		if ( bResizeQueued  ||  bSizingModified )
+		if ( !bSizeUpToDate )
 		{
 			minH = computeMinimumHMetrics().scaled( scale );
 		}
@@ -956,7 +963,7 @@ abstract public class DPWidget
 	
 	protected HMetrics refreshPreferredHMetrics()
 	{
-		if ( bResizeQueued  ||  bSizingModified )
+		if ( !bSizeUpToDate )
 		{
 			prefH = computePreferredHMetrics().scaled( scale );
 		}
@@ -965,7 +972,7 @@ abstract public class DPWidget
 	
 	protected VMetrics refreshMinimumVMetrics()
 	{
-		if ( bResizeQueued  ||  bSizingModified )
+		if ( !bSizeUpToDate )
 		{
 			minV = computeMinimumVMetrics().scaled( scale );
 		}
@@ -974,7 +981,7 @@ abstract public class DPWidget
 	
 	protected VMetrics refreshPreferredVMetrics()
 	{
-		if ( bResizeQueued  ||  bSizingModified )
+		if ( !bSizeUpToDate )
 		{
 			prefV = computePreferredVMetrics().scaled( scale );
 		}
@@ -984,23 +991,23 @@ abstract public class DPWidget
 	
 	protected void allocateX(double width)
 	{
-		if ( bResizeQueued  ||  bSizingModified  ||  width != allocation.x )
+		if ( !bSizeUpToDate  ||  width != allocation.x )
 		{
 			allocation.x = width;
 			allocateContentsX( width );
-			bSizingModified = true;
+			bSizeUpToDate = false;
 		}
 	}
 	
 	protected void allocateY(double height)
 	{
-		if ( bResizeQueued  ||  bSizingModified  ||  height != allocation.y )
+		if ( !bSizeUpToDate  ||  height != allocation.y )
 		{
 			allocation.y = height;
 			allocateContentsY( height );
 		}
 		bResizeQueued = false;
-		bSizingModified = false;
+		bSizeUpToDate = true;
 	}
 	
 	
