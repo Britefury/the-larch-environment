@@ -34,6 +34,14 @@ def replace(ctx, data, replacement):
 		raise TypeError, 'EditOperations:replace(): @data must be a DocTreeNode'
 	
 	
+def replaceNodeContents(ctx, node, replacement):
+	if isinstance( node, DocTreeNode ):
+		node[:] = _sanitiseInputData( replacement )
+		return node
+	else:
+		raise TypeError, 'EditOperations:replace(): @node must be a DocTreeNode'
+	
+	
 def replaceWithRange(ctx, data, replacement):
 	if isinstance( data, DocTreeNode ):
 		parent = data.getParentTreeNode()

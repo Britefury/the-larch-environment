@@ -9,7 +9,7 @@ from Britefury.Parser.Parser import ParserExpression
 
 from Britefury.gSym.View.gSymView import GSymView
 
-from Britefury.gSym.View.EditOperations import replace, replaceWithRange, append, prepend, insertBefore, insertRangeBefore, insertAfter, insertRangeAfter
+from Britefury.gSym.View.EditOperations import replace, replaceWithRange, replaceNodeContents, append, prepend, insertBefore, insertRangeBefore, insertAfter, insertRangeAfter
 
 
 from Britefury.Util.NodeUtil import *
@@ -112,9 +112,11 @@ class ParsedExpressionContentListener (ElementContentListener):
 		if '\n' not in value:
 			parsed = _parseText( self._parser, value )
 			if parsed is not None:
-				replace( self._ctx, self._node, parsed )
+				#replace( self._ctx, self._node, parsed )
+				replaceNodeContents( self._ctx, self._node, parsed )
 			else:
-				replace( self._ctx, self._node, [ 'UNPARSED', value ] )
+				#replace( self._ctx, self._node, [ 'UNPARSED', value ] )
+				replaceNodeContents( self._ctx, self._node, [ 'UNPARSED', value ] )
 			return True
 		else:
 			return False
