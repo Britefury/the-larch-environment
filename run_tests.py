@@ -21,13 +21,15 @@ import Britefury.Tests.Britefury.Grammar.Grammar
 import GSymCore.Languages.Python25.CodeGenerator
 import GSymCore.Languages.Python25.Parser
 import GSymCore.Languages.Python25.IdentityTransformation
+import GSymCore.Languages.Java.Parser
 
 
 testModules = [ Britefury.Dispatch.MethodDispatch, Britefury.Dispatch.Dispatch,
 		Britefury.Transformation.Transformation,
 		Britefury.Tests.BritefuryJ.Parser.Utils.Operators, Britefury.Tests.BritefuryJ.PatternMatch.Test_PatternMatcher,
 		Britefury.Tests.Britefury.Grammar.Grammar,
-		GSymCore.Languages.Python25.CodeGenerator, GSymCore.Languages.Python25.Parser, GSymCore.Languages.Python25.IdentityTransformation ]
+		GSymCore.Languages.Python25.CodeGenerator, GSymCore.Languages.Python25.Parser, GSymCore.Languages.Python25.IdentityTransformation,
+		GSymCore.Languages.Java.Parser ]
 
 
 if __name__ == '__main__':

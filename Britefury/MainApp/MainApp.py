@@ -454,9 +454,10 @@ class MainApp (object):
 							t1 = datetime.now()
 							content = importFn( filename )
 							t2 = datetime.now()
-							print 'Import time ', t2 - t1
 							if content is not None:
 								documentRoot = newDocument( content )
+								t3 = datetime.now()
+								print 'Import time=%s, convert to DMList time=%s'  %  ( t2 - t1, t3 - t2 )
 								self.setDocument( documentRoot )
 		
 		self._importMenu.add( _action( menuLabel, _onImport ) )
