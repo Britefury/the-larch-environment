@@ -31,6 +31,8 @@ from GSymCore.Languages.Python25.Keywords import *
 #
 # Print statements are not handled correctly
 #
+# Octal integers not handled correctly
+#
 #
 #
 
