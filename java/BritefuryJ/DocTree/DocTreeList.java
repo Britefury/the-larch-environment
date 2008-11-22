@@ -6,6 +6,7 @@
 //##************************
 package BritefuryJ.DocTree;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.ListIterator;
 import org.python.core.PySlice;
 
 import BritefuryJ.DocModel.DMListInterface;
+import BritefuryJ.JythonInterface.JythonSlice;
 
 public class DocTreeList implements DocTreeNode, DMListInterface
 {
@@ -276,7 +278,14 @@ public class DocTreeList implements DocTreeNode, DMListInterface
 	
 	public List<Object> __getitem__(PySlice i)
 	{
-		return node.__getitem__( i );
+		ArrayList<Object> txs = new ArrayList<Object>();
+		int[] indices = JythonSlice.sliceIndices( size(), i );
+		txs.ensureCapacity( indices.length );
+		for (int j: indices)
+		{
+			txs.add( tree.treeNode( node.get( j ), this, j ) );
+		}
+		return txs;
 	}
 	
 	public void __setitem__(int i, Object x)

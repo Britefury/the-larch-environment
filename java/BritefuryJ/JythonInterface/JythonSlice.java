@@ -24,6 +24,58 @@ public class JythonSlice
 	
 	
 	
+	public static int[] sliceIndices(int length, PySlice slice)
+	{
+		// Based on Jython PyList source code
+		int indices[] = slice.indicesEx( length );
+		
+		int start = indices[0];
+		int stop = indices[1];
+		int step = indices[2];
+		
+		return sliceIndices( start, stop, step );
+	}
+	
+	
+	public static int[] sliceIndices(int start, int stop, int step)
+	{
+		if ( step == 0 )
+		{
+			throw new SliceStepCannotBeZero();
+		}
+
+		if ( step > 0  &&  stop < start )
+		{
+			stop = start;
+		}
+		
+		int n = sliceLength( start, stop, step );
+		
+		int[] out = new int[n];
+		if ( step == 1)
+		{
+			for (int i = start, j = 0; i < stop; i++, j++)
+			{
+				out[j] = i;
+			}
+			return out;
+		}
+		else
+		{
+			int j = 0;
+			for (int i = start; j < n; i += step, j++)
+			{
+				out[j] = i;
+			}
+			
+			return out;
+		}
+	}
+	
+
+
+	
+	
 	public static Object[] arrayGetSlice(Object[] in, PySlice slice)
 	{
 		// Based on Jython PyList source code
