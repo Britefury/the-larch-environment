@@ -53,7 +53,17 @@ public class Prefix extends UnaryOperator
 
 	public Prefix(String operator)
 	{
-		this( ParserExpression.coerce( operator ), new DefaultUnaryOperatorParseAction( operator ) );
+		this( ParserExpression.coerce( operator ), new BuildASTNodeAction( operator ) );
+	}
+
+	public Prefix(ParserExpression opExpression, String nodeOperator)
+	{
+		this( opExpression, new BuildASTNodeAction( nodeOperator ) );
+	}
+
+	public Prefix(String operator, String nodeOperator)
+	{
+		this( ParserExpression.coerce( operator ), new BuildASTNodeAction( nodeOperator ) );
 	}
 
 	

@@ -68,10 +68,11 @@ public class OperatorTable
 	}
 	
 	
-	public ParserExpression buildParser()
+	public List<ParserExpression> buildParsers()
 	{
 		ParserExpression parser = rootParser;
 		ArrayList<Forward> levelParserForwardDeclarations = new ArrayList<Forward>();
+		ArrayList<ParserExpression> levelParsers = new ArrayList<ParserExpression>();
 		for (int i = 0; i < levels.size(); i++)
 		{
 			levelParserForwardDeclarations.add( new Forward() );
@@ -84,8 +85,9 @@ public class OperatorTable
 			lvl.buildParser( this, levelParserForwardDeclarations, f, prevLevel, parser );
 			parser = f;
 			prevLevel = lvl;
+			levelParsers.add( f );
 		}
 		
-		return parser;
+		return levelParsers;
 	}
 }

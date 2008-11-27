@@ -24,7 +24,17 @@ public class InfixLeft extends BinaryOperator
 
 	public InfixLeft(String operator)
 	{
-		this( ParserExpression.coerce( operator ), new DefaultBinaryOperatorParseAction( operator ) );
+		this( ParserExpression.coerce( operator ), new BuildASTNodeAction( operator ) );
+	}
+
+	public InfixLeft(ParserExpression opExpression, String nodeOperator)
+	{
+		this( opExpression, new BuildASTNodeAction( nodeOperator ) );
+	}
+
+	public InfixLeft(String operator, String nodeOperator)
+	{
+		this( ParserExpression.coerce( operator ), new BuildASTNodeAction( nodeOperator ) );
 	}
 
 	

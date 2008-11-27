@@ -12,12 +12,12 @@ import BritefuryJ.Parser.ParserExpression;
 
 abstract class UnaryOperator extends Operator
 {
-	protected static class DefaultUnaryOperatorParseAction implements UnaryOperatorParseAction
+	protected static class BuildASTNodeAction implements UnaryOperatorParseAction
 	{
 		private String operator;
 		
 		
-		public DefaultUnaryOperatorParseAction(String operator)
+		public BuildASTNodeAction(String operator)
 		{
 			this.operator = operator;
 		}

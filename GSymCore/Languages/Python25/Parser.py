@@ -8,10 +8,12 @@
 
 import string
 
-from Britefury.Parser.Parser import getErrorLine, parserCoerce, Bind, Action, Condition, Forward, Group, Production, Suppress, Literal, Keyword, RegEx, Word, Sequence, Combine, Choice, Optional, Repetition, ZeroOrMore, OneOrMore, Peek, PeekNot, ParserTestCase
-from Britefury.Parser.GrammarUtils.Tokens import identifier, decimalInteger, hexInteger, integer, singleQuotedString, doubleQuotedString, quotedString, floatingPoint
-from Britefury.Parser.GrammarUtils.SeparatedList import separatedList, delimitedSeparatedList
-from Britefury.Parser.GrammarUtils.Operators import Prefix, Suffix, InfixLeft, InfixRight, buildOperatorParserWithAllLevels
+from BritefuryJ.Parser import Action, Condition, Forward, Production, Suppress, Literal, Keyword, RegEx, Word, Sequence, Combine, Choice, Optional, Repetition, ZeroOrMore, OneOrMore, Peek, PeekNot
+from BritefuryJ.Parser.Utils.Tokens import identifier, decimalInteger, hexInteger, integer, singleQuotedString, doubleQuotedString, quotedString, floatingPoint
+from BritefuryJ.Parser.Utils.SeparatedList import separatedList, delimitedSeparatedList
+from BritefuryJ.Parser.Utils.OperatorParser import Prefix, Suffix, InfixLeft, InfixRight, PrecedenceLevel, OperatorTable
+
+from Britefury.Tests.BritefuryJ.Parser.ParserTestCase import ParserTestCase
 
 from Britefury.Util.NodeUtil import makeNullNode
 
@@ -42,7 +44,7 @@ from GSymCore.Languages.Python25.Keywords import *
 
 # Python identifier
 pythonIdentifier = identifier  &  ( lambda input, pos, result: result not in keywordsSet )
-dottedPythonIdentifer = Production( separatedList( pythonIdentifier, '.', bNeedAtLeastOne=True ) ).action( lambda input, pos, xs: '.'.join( xs ) )
+dottedPythonIdentifer = Production( separatedList( pythonIdentifier, '.', True, False, False ) ).action( lambda input, pos, xs: '.'.join( xs ) )
 	
 
 
@@ -103,11 +105,11 @@ oldTupleOrExpression = Forward()
 targetItem = Forward()
 
 singleTarget = Production( pythonIdentifier ).action( lambda input, pos, xs: [ 'singleTarget', xs ] ).debug( 'singleTarget' )
-tupleTarget = Production( separatedList( targetItem, bNeedAtLeastOne=True, bAllowTrailingSeparator=True, bRequireTrailingSeparatorForLengthOne=True ) ).action( lambda input, pos, xs: [ 'tupleTarget' ] + xs ).debug( 'tupleTarget' )
+tupleTarget = Production( separatedList( targetItem, True, True, True ) ).action( lambda input, pos, xs: [ 'tupleTarget' ] + xs ).debug( 'tupleTarget' )
 targetList = ( tupleTarget  |  targetItem ).debug( 'targetList' )
 
 parenTarget = Production( Literal( '(' )  +  targetList  +  Literal( ')' ) ).action( lambda input, pos, xs: xs[1] ).debug( 'parenTarget' )
-listTarget = Production( delimitedSeparatedList( targetItem, '[', ']', bAllowTrailingSeparator=True ) ).action( lambda input, pos, xs: [ 'listTarget' ]  +  xs ).debug( 'listTarget' )
+listTarget = Production( delimitedSeparatedList( targetItem, '[', ']', False, True, False ) ).action( lambda input, pos, xs: [ 'listTarget' ]  +  xs ).debug( 'listTarget' )
 targetItem  <<  ( ( attributeRef  ^  subscript )  |  parenTarget  |  listTarget  |  singleTarget )
 #targetItem  <<  ( parenTarget  |  listTarget  |  singleTarget )
 
@@ -119,13 +121,13 @@ loadLocal = Production( pythonIdentifier ).action( lambda input, pos, xs: [ 'var
 
 
 # Tuples
-tupleLiteral = Production( separatedList( expression, bNeedAtLeastOne=True, bAllowTrailingSeparator=True, bRequireTrailingSeparatorForLengthOne=True ) ).action( lambda input, pos, xs: [ 'tupleLiteral' ]  +  xs ).debug( 'tupleLiteral' )
-oldTupleLiteral = Production( separatedList( expression, bNeedAtLeastOne=True, bAllowTrailingSeparator=True, bRequireTrailingSeparatorForLengthOne=True ) ).action( lambda input, pos, xs: [ 'tupleLiteral' ]  +  xs ).debug( 'oldTupleLiteral' )
+tupleLiteral = Production( separatedList( expression, True, True, True ) ).action( lambda input, pos, xs: [ 'tupleLiteral' ]  +  xs ).debug( 'tupleLiteral' )
+oldTupleLiteral = Production( separatedList( expression, True, True, True ) ).action( lambda input, pos, xs: [ 'tupleLiteral' ]  +  xs ).debug( 'oldTupleLiteral' )
 
 
 
 # Expression list
-expressionList = separatedList( expression, bNeedAtLeastOne=True, bAllowTrailingSeparator=True, bRequireTrailingSeparatorForLengthOne=False ) 
+expressionList = separatedList( expression, True, True, False ) 
 
 
 
@@ -135,7 +137,7 @@ parenForm = Production( Literal( '(' ) + tupleOrExpression + ')' ).action( lambd
 
 
 # List literal
-listLiteral = Production( delimitedSeparatedList( expression, '[', ']', bAllowTrailingSeparator=True ) ).action( lambda input, pos, xs: [ 'listLiteral' ] + xs ).debug( 'listLiteral' )
+listLiteral = Production( delimitedSeparatedList( expression, '[', ']', False, True, False ) ).action( lambda input, pos, xs: [ 'listLiteral' ] + xs ).debug( 'listLiteral' )
 
 
 
@@ -157,7 +159,7 @@ generatorExpression = Production( Literal( '(' )  +  expression  +  genFor  +  Z
 
 # Dictionary literal
 keyValuePair = Production( expression  +  Literal( ':' )  +  expression ).action( lambda input, pos, xs: [ 'keyValuePair', xs[0], xs[2] ] ).debug( 'keyValuePair' )
-dictLiteral = Production( delimitedSeparatedList( keyValuePair, '{', '}', bAllowTrailingSeparator=True ) ).action( lambda input, pos, xs: [ 'dictLiteral' ] + xs ).debug( 'dictLiteral' )
+dictLiteral = Production( delimitedSeparatedList( keyValuePair, '{', '}', False, True, False ) ).action( lambda input, pos, xs: [ 'dictLiteral' ] + xs ).debug( 'dictLiteral' )
 
 
 
@@ -193,7 +195,7 @@ subscriptSlice = Production( ( Optional( expression ) + ':' + Optional( expressi
 subscriptLongSlice = Production( ( Optional( expression )  + ':' + Optional( expression )  + ':' + Optional( expression )  ).action( lambda input, pos, xs: [ 'subscriptLongSlice', _sliceItem( xs[0] ), _sliceItem( xs[2] ), _sliceItem( xs[4] ) ] ) ).debug( 'subscriptLongSlice' )
 subscriptEllipsis = Production( '...' ).action( lambda input, pos, xs: [ 'ellipsis' ] ).debug( 'subscriptEllipsis' )
 subscriptItem = subscriptLongSlice | subscriptSlice | subscriptEllipsis | expression
-subscriptTuple = Production( separatedList( subscriptItem, bNeedAtLeastOne=True, bAllowTrailingSeparator=True, bRequireTrailingSeparatorForLengthOne=True ) ).action( lambda input, pos, xs: [ 'subscriptTuple' ]  +  xs ).debug( 'subscriptTuple' )
+subscriptTuple = Production( separatedList( subscriptItem, True, True, True ) ).action( lambda input, pos, xs: [ 'subscriptTuple' ]  +  xs ).debug( 'subscriptTuple' )
 subscriptIndex = subscriptTuple  |  subscriptItem
 subscript  <<  Production( ( primary + '[' + subscriptIndex + ']' ).action( lambda input, pos, xs: [ 'subscript', xs[0], xs[2] ] ) ).debug( 'subscript' )
 
@@ -235,7 +237,7 @@ kwArg = Production( argName + '=' + expression ).action( lambda input, pos, xs: 
 argList = Production( Literal( '*' )  +  expression ).action( lambda input, pos, xs: [ 'argList', xs[1] ] ).debug( 'argList' )
 kwArgList = Production( Literal( '**' )  +  expression ).action( lambda input, pos, xs: [ 'kwArgList', xs[1] ] ).debug( 'kwArgList' )
 callArg = Production( kwArgList | argList | kwArg | expression ).debug( 'callArg' )
-callArgs = Production( separatedList( callArg, bAllowTrailingSeparator=True ).condition( _checkCallArgs ) )
+callArgs = Production( separatedList( callArg, False, True, False ).condition( _checkCallArgs ) )
 call = Production( ( primary + Literal( '(' ) + callArgs + Literal( ')' ) ).action( lambda input, pos, xs: [ 'call', xs[0] ] + xs[2] ) ).debug( 'call' )
 
 
@@ -246,31 +248,32 @@ primary  <<  Production( call | attributeRef | subscript | atom ).debug( 'primar
 
 
 # Python operators
-ops, ( powOp, invNegPosOp, mulDivModOp, addSubOp, lrShiftOp, andOP, xorOp, orOp, cmpOp, isOp, inOp, notTestOp, andTestOp, orTestOp ) =  buildOperatorParserWithAllLevels( \
+opTable = OperatorTable( 
 	[
-		[ InfixRight( Literal( '**' ),  lambda op, x, y: [ 'pow', x, y ] ) ],
-		[ Prefix( Literal( '~' ),  lambda op, x: [ 'invert', x ] ),   Prefix( Literal( '-' ),  lambda op, x: [ 'negate', x ] ),   Prefix( Literal( '+' ),  lambda op, x: [ 'pos', x ] ) ],
-		[ InfixLeft( Literal( '*' ),  lambda op, x, y: [ 'mul', x, y ] ),   InfixLeft( Literal( '/' ),  lambda op, x, y: [ 'div', x, y ] ),   InfixLeft( Literal( '%' ),  lambda op, x, y: [ 'mod', x, y ] ) ],
-		[ InfixLeft( Literal( '+' ),  lambda op, x, y: [ 'add', x, y ] ),   InfixLeft( Literal( '-' ),  lambda op, x, y: [ 'sub', x, y ] ) ],
-		[ InfixLeft( Literal( '<<' ),  lambda op, x, y: [ 'lshift', x, y ] ),   InfixLeft( Literal( '>>' ),  lambda op, x, y: [ 'rshift', x, y ] ) ],
-		[ InfixLeft( Literal( '&' ),  lambda op, x, y: [ 'bitAnd', x, y ] ) ],
-		[ InfixLeft( Literal( '^' ),  lambda op, x, y: [ 'bitXor', x, y ] ) ],
-		[ InfixLeft( Literal( '|' ),  lambda op, x, y: [ 'bitOr', x, y ] ) ],
-		[
-			InfixLeft( Literal( '<=' ),  lambda op, x, y: [ 'lte', x, y ] ),
-			InfixLeft( Literal( '<' ),  lambda op, x, y: [ 'lt', x, y ] ),
-			InfixLeft( Literal( '>=' ),  lambda op, x, y: [ 'gte', x, y ] ),
-			InfixLeft( Literal( '>' ),  lambda op, x, y: [ 'gt', x, y ] ),
-			InfixLeft( Literal( '==' ),  lambda op, x, y: [ 'eq', x, y ] ),
-			InfixLeft( Literal( '!=' ),  lambda op, x, y: [ 'neq', x, y ] ),
-		],
-		[ InfixLeft( Keyword( isKeyword ) + Keyword( notKeyword ),  lambda op, x, y: [ 'isNotTest', x, y ] ),   InfixLeft( Keyword( isKeyword ),  lambda op, x, y: [ 'isTest', x, y ] ) ],
-		[ InfixLeft( Keyword( notKeyword ) + Keyword( inKeyword ),  lambda op, x, y: [ 'notInTest', x, y ] ),   InfixLeft( Keyword( inKeyword ),  lambda op, x, y: [ 'inTest', x, y ] ) ],
-		[ Prefix( Keyword( notKeyword ),  lambda op, x: [ 'notTest', x ] ) ],
-		[ InfixLeft( Keyword( andKeyword ),  lambda op, x, y: [ 'andTest', x, y ] ) ],
-		[ InfixLeft( Keyword( orKeyword ),  lambda op, x, y: [ 'orTest', x, y ] ) ],
+		PrecedenceLevel( [ InfixRight( Literal( '**' ),  'pow' ) ] ),
+		PrecedenceLevel( [ Prefix( Literal( '~' ),  'invert' ),   Prefix( Literal( '-' ),  'negate' ), Prefix( Literal( '+' ),  'pos' ) ] ),
+		PrecedenceLevel( [ InfixLeft( Literal( '*' ),  'mul' ),   InfixLeft( Literal( '/' ),  'div' ),   InfixLeft( Literal( '%' ),  'mod' ) ] ),
+		PrecedenceLevel( [ InfixLeft( Literal( '+' ),  'add' ),   InfixLeft( Literal( '-' ),  'sub' ) ] ),
+		PrecedenceLevel( [ InfixLeft( Literal( '<<' ),  'lshift' ),   InfixLeft( Literal( '>>' ),  'rshift' ) ] ),
+		PrecedenceLevel( [ InfixLeft( Literal( '&' ),  'bitAnd' ) ] ),
+		PrecedenceLevel( [ InfixLeft( Literal( '^' ),  'bitXor' ) ] ),
+		PrecedenceLevel( [ InfixLeft( Literal( '|' ),  'bitOr' ) ] ),
+		PrecedenceLevel( [
+			InfixLeft( Literal( '<=' ),  'lte' ),
+			InfixLeft( Literal( '<' ),  'lt' ),
+			InfixLeft( Literal( '>=' ),  'gte' ),
+			InfixLeft( Literal( '>' ),  'gt' ),
+			InfixLeft( Literal( '==' ),  'eq' ),
+			InfixLeft( Literal( '!=' ),  'neq' ),
+		] ),
+		PrecedenceLevel( [ InfixLeft( Keyword( isKeyword ) + Keyword( notKeyword ),  'isNotTest' ),   InfixLeft( Keyword( isKeyword ),  'isTest' ) ] ),
+		PrecedenceLevel( [ InfixLeft( Keyword( notKeyword ) + Keyword( inKeyword ),  'notInTest' ),   InfixLeft( Keyword( inKeyword ),  'inTest' ) ] ),
+		PrecedenceLevel( [ Prefix( Keyword( notKeyword ),  'notTest' ) ] ),
+		PrecedenceLevel( [ InfixLeft( Keyword( andKeyword ),  'andTest' ) ] ),
+		PrecedenceLevel( [ InfixLeft( Keyword( orKeyword ),  'orTest' ) ] ),
 	],  primary )
 
+powOp, invNegPosOp, mulDivModOp, addSubOp, lrShiftOp, andOP, xorOp, orOp, cmpOp, isOp, inOp, notTestOp, andTestOp, orTestOp = opTable.buildParsers()
 orTest  <<  orTestOp
 
 
@@ -311,7 +314,7 @@ defaultValueParam = Production( paramName + '=' + expression ).action( lambda in
 paramList = Production( Literal( '*' )  +  paramName ).action( lambda input, pos, xs: [ 'paramList', xs[1] ] ).debug( 'paramList' )
 kwParamList = Production( Literal( '**' )  +  paramName ).action( lambda input, pos, xs: [ 'kwParamList', xs[1] ] ).debug( 'kwParamList' )
 param = Production( kwParamList | paramList | defaultValueParam | simpleParam ).debug( 'param' )
-params = Production( separatedList( param, bAllowTrailingSeparator=True ).condition( _checkParams ) ).debug( 'params' )
+params = Production( separatedList( param, False, True, False ).condition( _checkParams ) ).debug( 'params' )
 
 
 
@@ -408,7 +411,7 @@ continueStmt = Production( Keyword( continueKeyword ) ).action( lambda input, po
 # Import statement
 _moduleIdentifier = Production( pythonIdentifier )
 # dotted name
-moduleName = Production( separatedList( _moduleIdentifier, '.', bNeedAtLeastOne=True ) ).action( lambda input, pos, xs: '.'.join( xs ) )
+moduleName = Production( separatedList( _moduleIdentifier, '.', True, False, False ) ).action( lambda input, pos, xs: '.'.join( xs ) )
 # relative module name
 _relModDotsModule = ( ZeroOrMore( '.' ) + moduleName ).action( lambda input, pos, xs: ''.join( xs[0] )  +  xs[1] )
 _relModDots = OneOrMore( '.' ).action( lambda input, pos, xs: ''.join( xs ) )
@@ -417,15 +420,15 @@ relativeModule = Production( _relModDotsModule | _relModDots ).action( lambda in
 moduleImport = Production( ( moduleName + Keyword( asKeyword ) + pythonIdentifier ).action( lambda input, pos, xs: [ 'moduleImportAs', xs[0], xs[2] ] )   |
 			    			moduleName.action( lambda input, pos, xs: [ 'moduleImport', xs ] ) )
 # 'import' <separatedList( moduleImport )>
-simpleImport = Production( Keyword( importKeyword )  +  separatedList( moduleImport, bNeedAtLeastOne=True ) ).action( lambda input, pos, xs: [ 'importStmt' ] + xs[1] )
+simpleImport = Production( Keyword( importKeyword )  +  separatedList( moduleImport, True, False, False ) ).action( lambda input, pos, xs: [ 'importStmt' ] + xs[1] )
 # ( <pythonIdentifier> 'as' <pythonIdentifier> )  |  <pythonIdentifier>
 moduleContentImport = Production( ( pythonIdentifier + Keyword( asKeyword ) + pythonIdentifier ).action( lambda input, pos, xs: [ 'moduleContentImportAs', xs[0], xs[2] ] )   |
 			    			pythonIdentifier.action( lambda input, pos, xs: [ 'moduleContentImport', xs ] ) )
 # 'from' <relativeModule> 'import' ( <separatedList( moduleContentImport )>  |  ( '(' <separatedList( moduleContentImport )> ',' ')' )
 fromImport = Production( Keyword( fromKeyword ) + relativeModule + Keyword( importKeyword ) + \
 				(  \
-					separatedList( moduleContentImport, bNeedAtLeastOne=True )  |  \
-					( Literal( '(' )  +  separatedList( moduleContentImport, bNeedAtLeastOne=True, bAllowTrailingSeparator=True )  +  Literal( ')' ) ).action( lambda input, pos, xs: xs[1] )  \
+					separatedList( moduleContentImport, True, False, False )  |  \
+					( Literal( '(' )  +  separatedList( moduleContentImport, True, True, False )  +  Literal( ')' ) ).action( lambda input, pos, xs: xs[1] )  \
 				)  \
 			).action( lambda input, pos, xs: [ 'fromImportStmt', xs[1] ] + xs[3] )
 # 'from' <relativeModule> 'import' '*'
@@ -437,7 +440,7 @@ importStmt = Production( simpleImport | fromImport | fromImportAll )
 
 # Global statement
 globalVar = Production( pythonIdentifier ).action( lambda input, pos, xs: [ 'globalVar', xs ] )
-globalStmt = Production( Keyword( globalKeyword )  +  separatedList( globalVar, bNeedAtLeastOne=True ) ).action( lambda input, pos, xs: [ 'globalStmt' ]  +  xs[1] )
+globalStmt = Production( Keyword( globalKeyword )  +  separatedList( globalVar, True, False, False ) ).action( lambda input, pos, xs: [ 'globalStmt' ]  +  xs[1] )
 
 
 
