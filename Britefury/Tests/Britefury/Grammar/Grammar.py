@@ -6,6 +6,7 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
 from BritefuryJ.Parser import *
+from BritefuryJ.Parser.Utils.OperatorParser import *
 
 
 from Britefury.Grammar.Grammar import Grammar, Rule, RuleList
@@ -105,11 +106,13 @@ class GrammarTestCase (ParserTestCase):
 		
 		@RuleList( [ 'mul', 'add' ] )
 		def ops(self):
-			mul = Forward()
-			mul.setExpression( Production( ( mul + '*' + self.atom() ).action( lambda input, begin, xs: [ 'mul', xs[0], xs[2] ] )  |  self.atom() ) )
+			opTable = OperatorTable( 
+				[
+					PrecedenceLevel( [ InfixLeft( Literal( '*' ),  'mul' ) ] ),
+					PrecedenceLevel( [ InfixLeft( Literal( '+' ),  'add' ) ] ),
+				],  self.atom() )
 			
-			add = Forward()
-			add.setExpression( Production( ( add + '+' + mul ).action( lambda input, begin, xs: [ 'add', xs[0], xs[2] ] )  |  mul ) )
+			mul, add = opTable.buildParsers()
 			
 			return [ mul, add ]
 		

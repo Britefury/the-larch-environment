@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.python.core.PyString;
+import org.python.core.PyUnicode;
+
 
 
 /*
@@ -142,13 +145,21 @@ public class DMIOWrite
 		{
 			writeString( builder, (String)content );
 		}
+		else if ( content instanceof PyString )
+		{
+			writeString( builder, ((PyString)content).toString() );
+		}
+		else if ( content instanceof PyUnicode )
+		{
+			writeString( builder, ((PyUnicode)content).toString() );
+		}
 		else if ( content instanceof List )
 		{
 			writeList( builder, (List<Object>)content );
 		}
 		else
 		{
-			System.out.println( "Data type: " + content.getClass().getName() );
+			System.out.println( "Content data type: " + content.getClass().getName() + ", content data: " + content.toString() );
 			throw new InvalidDataTypeException();
 		}
 	}

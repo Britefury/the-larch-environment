@@ -18,12 +18,20 @@ import re
 
 _whitespaceRegex = '[' + re.escape( string.whitespace ) + ']*'
 
+def _deepList(xs):
+	if isinstance( xs, java.util.List )  or  isinstance( xs, list ):
+		return [ _deepList( x )   for x in xs ]
+	else:
+		return xs
 
 class ParserTestCase (unittest.TestCase):
 	def _cmpValue(self, x, y):
-		xstr = DMIOWrite.writeSX( x )
-		ystr = DMIOWrite.writeSX( y )
-		return xstr == ystr
+		x = _deepList( x )
+		y = _deepList( y )
+		#xstr = DMIOWrite.writeSX( x )
+		#ystr = DMIOWrite.writeSX( y )
+		#return xstr == ystr
+		return x == y
 			
 	
 	
