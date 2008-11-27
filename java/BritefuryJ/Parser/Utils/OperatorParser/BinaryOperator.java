@@ -37,12 +37,12 @@ abstract class BinaryOperator extends Operator
 	}
 	
 	
-	protected static class DefaultBinaryOperatorParseAction implements BinaryOperatorParseAction
+	protected static class BuildASTNodeAction implements BinaryOperatorParseAction
 	{
 		private String operator;
 		
 		
-		public DefaultBinaryOperatorParseAction(String operator)
+		public BuildASTNodeAction(String operator)
 		{
 			this.operator = operator;
 		}

@@ -5,7 +5,7 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from Britefury.Parser.Parser import ParserExpression
+from BritefuryJ.Parser import ParserExpression
 
 from Britefury.gSym.View.gSymView import GSymView
 
@@ -85,10 +85,11 @@ def keywordText(ctx, keyword):
 
 
 def _parseText(parser, text):
-	res, pos = parser.parseString( text )
+	res = parser.parseString( text )
+	pos = res.getEnd()
 	if res is not None:
 		if pos == len( text ):
-			return res.result
+			return res.getValue()
 		else:
 			print '<INCOMPLETE>'
 			print 'FULL TEXT:', text

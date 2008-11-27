@@ -24,7 +24,7 @@ def _coerceLevel(x):
 		return PrecedenceLevel( x )
 
 def buildOperatorParser(operatorTable, rootParser):
-	return OperatorTable( [ _coerceLevel( level )   for level in operatorTable ], rootParser ).buildParser()
+	return OperatorTable( [ _coerceLevel( level )   for level in operatorTable ], rootParser ).buildParsers()[-1]
 
 
 

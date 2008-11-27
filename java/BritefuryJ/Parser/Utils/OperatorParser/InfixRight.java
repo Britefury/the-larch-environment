@@ -24,7 +24,17 @@ public class InfixRight extends BinaryOperator
 
 	public InfixRight(String operator)
 	{
-		this( ParserExpression.coerce( operator ), new DefaultBinaryOperatorParseAction( operator ) );
+		this( ParserExpression.coerce( operator ), new BuildASTNodeAction( operator ) );
+	}
+	
+	public InfixRight(ParserExpression opExpression, String nodeOperator)
+	{
+		this( opExpression, new BuildASTNodeAction( nodeOperator ) );
+	}
+	
+	public InfixRight(String operator, String nodeOperator)
+	{
+		this( ParserExpression.coerce( operator ), new BuildASTNodeAction( nodeOperator ) );
 	}
 	
 	

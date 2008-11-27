@@ -156,7 +156,28 @@ public class SeparatedList
 
 
 
+	/**
+	 * Creates a parser expression that will match a separated list, with Literal( "," ) used as the separator.
+	 * 
+	 * <p>Example:<br>
+	 * SeparatedList.separatedList( Tokens.identifier, ",", false, false, false )<br>
+	 * Will construct a parser that will parse the string "a, b, c, d" to the list [ "a", "b", "c", "d" ]
+	 * 
+	 *  @param	subexp							a parser expression that parses a single element from the list
+	 *  @param	bNeedAtLeastOne					if true, only matches a list with one or more elements
+	 *  @param	bAllowTrailingSeparator				if true, will match a list which contains a trailing separator  (e.g. 1,2,3,)
+	 *  @param	bRequireTrailingSeparatorForLengthOne	if true, will require lists with a single element to contain a trailing separator
+	 *  
+	 *  @return									a parser expression that will match the specified separated list
+	 */
+	public static ParserExpression separatedList(ParserExpression subexp, boolean bNeedAtLeastOne, boolean bAllowTrailingSeparator, boolean bRequireTrailingSeparatorForLengthOne)
+	{
+		return separatedList( subexp, ",", bNeedAtLeastOne, bAllowTrailingSeparator, bRequireTrailingSeparatorForLengthOne ); 
+	}
 
+	
+	
+	
 
 
 	/**
@@ -214,6 +235,33 @@ public class SeparatedList
 
 
 	/**
+	 * Creates a parser expression that will match a delimited separated list, with Literal( "," ) used as the separator
+	 * 
+	 * <p>Example:<br>
+	 * SeparatedList.separatedList( Tokens.identifier, new Literal( "{" ), new Literal( "}" ), new Literal( "," ), false, false, false )<br>
+	 * Will construct a parser that will parse the string "{ a, b, c, d }" to the list [ "a", "b", "c", "d" ]
+	 * 
+	 *  @param	subexp							a parser expression that parses a single element from the list
+	 *  @param	beginDelim						a parser expression that parses the delimiter that marks the beginning of the list
+	 *  @param	endDelim							a parser expression that parses the delimiter that marks the end of the list
+	 *  @param	bNeedAtLeastOne					if true, only matches a list with one or more elements
+	 *  @param	bAllowTrailingSeparator				if true, will match a list which contains a trailing separator  (e.g. 1,2,3,)
+	 *  @param	bRequireTrailingSeparatorForLengthOne	if true, will require lists with a single element to contain a trailing separator
+	 *  
+	 *  @return									a parser expression that will match the specified separated list
+	 * @throws ParserCoerceException 
+	 */
+	public static ParserExpression delimitedSeparatedList(ParserExpression subexp, ParserExpression beginDelim, ParserExpression endDelim,
+			boolean bNeedAtLeastOne, boolean bAllowTrailingSeparator, boolean bRequireTrailingSeparatorForLengthOne)
+	{
+		return beginDelim.__add__( separatedList( subexp, ",", bNeedAtLeastOne, bAllowTrailingSeparator, bRequireTrailingSeparatorForLengthOne ) ).__add__( endDelim ).
+				action( new DelimitedListAction() );
+	}
+
+
+
+
+	/**
 	 * Creates a parser expression that will match a delimited separated list.
 	 * 
 	 * <p>Example:<br>
@@ -261,6 +309,32 @@ public class SeparatedList
 			boolean bNeedAtLeastOne, boolean bAllowTrailingSeparator, boolean bRequireTrailingSeparatorForLengthOne)
 	{
 		return ParserExpression.coerce( beginDelim ).__add__( separatedList( subexp, separator, bNeedAtLeastOne, bAllowTrailingSeparator, bRequireTrailingSeparatorForLengthOne ) ).
+				__add__( ParserExpression.coerce( endDelim ) ).action( new DelimitedListAction() );
+	}
+
+
+
+
+	/**
+	 * Creates a parser expression that will match a delimited separated list, with Literal( "," ) used as the separator.
+	 * 
+	 * <p>Example:<br>
+	 * SeparatedList.separatedList( Tokens.identifier, new Literal( "{" ), new Literal( "}" ), new Literal( "," ), false, false, false )<br>
+	 * Will construct a parser that will parse the string "{ a, b, c, d }" to the list [ "a", "b", "c", "d" ]
+	 * 
+	 *  @param	subexp							a parser expression that parses a single element from the list
+	 *  @param	beginDelim						a string that is the delimiter that marks the beginning of the list
+	 *  @param	endDelim							a string that is the delimiter that marks the end of the list
+	 *  @param	bNeedAtLeastOne					if true, only matches a list with one or more elements
+	 *  @param	bAllowTrailingSeparator				if true, will match a list which contains a trailing separator  (e.g. 1,2,3,)
+	 *  @param	bRequireTrailingSeparatorForLengthOne	if true, will require lists with a single element to contain a trailing separator
+	 *  
+	 *  @return									a parser expression that will match the specified separated list
+	 */
+	public static ParserExpression delimitedSeparatedList(ParserExpression subexp, String beginDelim, String endDelim,
+			boolean bNeedAtLeastOne, boolean bAllowTrailingSeparator, boolean bRequireTrailingSeparatorForLengthOne)
+	{
+		return ParserExpression.coerce( beginDelim ).__add__( separatedList( subexp, ",", bNeedAtLeastOne, bAllowTrailingSeparator, bRequireTrailingSeparatorForLengthOne ) ).
 				__add__( ParserExpression.coerce( endDelim ) ).action( new DelimitedListAction() );
 	}
 }

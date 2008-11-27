@@ -12,7 +12,7 @@ import java.util.List;
 import BritefuryJ.Parser.Forward;
 import BritefuryJ.Parser.ParseAction;
 import BritefuryJ.Parser.ParserExpression;
-import BritefuryJ.Parser.Utils.OperatorParser.UnaryOperator.DefaultUnaryOperatorParseAction;
+import BritefuryJ.Parser.Utils.OperatorParser.UnaryOperator.BuildASTNodeAction;
 
 public class Suffix extends Operator
 {
@@ -55,7 +55,17 @@ public class Suffix extends Operator
 
 	public Suffix(String operator)
 	{
-		this( ParserExpression.coerce( operator ), new DefaultUnaryOperatorParseAction( operator ) );
+		this( ParserExpression.coerce( operator ), new BuildASTNodeAction( operator ) );
+	}
+
+	public Suffix(ParserExpression opExpression, String nodeOperator)
+	{
+		this( opExpression, new BuildASTNodeAction( nodeOperator ) );
+	}
+
+	public Suffix(String operator, String nodeOperator)
+	{
+		this( ParserExpression.coerce( operator ), new BuildASTNodeAction( nodeOperator ) );
 	}
 
 	
