@@ -26,7 +26,7 @@ public abstract class UnaryBranchExpression extends ParserExpression
 	
 	
 	
-	public ParserExpression getSubexpression()
+	public ParserExpression getSubExpression()
 	{
 		return subexp;
 	}
