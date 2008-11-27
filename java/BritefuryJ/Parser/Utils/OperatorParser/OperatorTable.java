@@ -82,7 +82,7 @@ public class OperatorTable
 		{
 			Forward f = levelParserForwardDeclarations.get( i );
 			PrecedenceLevel lvl = levels.get( i );
-			lvl.buildParser( this, levelParserForwardDeclarations, f, prevLevel, parser );
+			lvl.buildParser( this, levelParserForwardDeclarations, f, prevLevel, parser, "oplvl_" + i );
 			parser = f;
 			prevLevel = lvl;
 			levelParsers.add( f );

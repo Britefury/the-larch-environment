@@ -112,9 +112,7 @@ class GrammarTestCase (ParserTestCase):
 					PrecedenceLevel( [ InfixLeft( Literal( '+' ),  'add' ) ] ),
 				],  self.atom() )
 			
-			mul, add = opTable.buildParsers()
-			
-			return [ mul, add ]
+			return opTable.buildParsers()
 		
 		@Rule
 		def mul(self):
