@@ -70,7 +70,7 @@ public class PrecedenceLevel
 	
 	
 	protected void buildParser(OperatorTable operatorTable, ArrayList<Forward> levelParserForwardDeclarations, Forward forwardDeclaration,
-			PrecedenceLevel previousLevel, ParserExpression previousLevelParser)
+			PrecedenceLevel previousLevel, ParserExpression previousLevelParser, String debugName)
 	{
 		ParserExpression[] choices = new ParserExpression[operators.size() + 1];
 		for (int i = 0; i < operators.size(); i++)
@@ -79,6 +79,6 @@ public class PrecedenceLevel
 		}
 		choices[operators.size()] = previousLevelParser;
 		
-		forwardDeclaration.setExpression( new Production( new Choice( choices ) ) );
+		forwardDeclaration.setExpression( new Production( new Choice( choices ) ).debug( debugName ) );
 	}
 }

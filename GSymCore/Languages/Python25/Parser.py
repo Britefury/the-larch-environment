@@ -320,7 +320,6 @@ params = Production( separatedList( param, False, True, False ).condition( _chec
 
 # Lambda expression_checkParams
 lambdaExpr = Production( ( Keyword( lambdaKeyword )  +  params  +  Literal( ':' )  +  expression ).action( lambda input, pos, xs: [ 'lambdaExpr', xs[1], xs[3] ] ) ).debug( 'lambdaExpr' )
-oldLambdaExpr = Production( ( Keyword( lambdaKeyword )  +  params  +  Literal( ':' )  +  oldExpression ).action( lambda input, pos, xs: [ 'lambdaExpr', xs[1], xs[3] ] ) ).debug( 'oldLambdaExpr' )
 
 
 
@@ -373,7 +372,7 @@ delStmt = Production( Keyword( delKeyword )  +  targetList ).action( lambda inpu
 
 
 # Return statement
-returnStmt = Production( Keyword( 'return' )  +  tupleOrExpression ).action( lambda input, pos, xs: [ 'returnStmt', xs[1] ] ).debug( 'returnStmt' )
+returnStmt = Production( Keyword( returnKeyword )  +  tupleOrExpression ).action( lambda input, pos, xs: [ 'returnStmt', xs[1] ] ).debug( 'returnStmt' )
 
 
 
