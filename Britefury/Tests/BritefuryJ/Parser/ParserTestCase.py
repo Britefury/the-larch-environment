@@ -58,7 +58,7 @@ class ParserTestCase (unittest.TestCase):
 			print expected
 			print ''
 			print 'RESULT:'
-			print value.toString()
+			print str( value )
 		self.assert_( bSame )
 
 
