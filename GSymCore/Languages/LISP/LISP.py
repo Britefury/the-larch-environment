@@ -6,10 +6,21 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
 from Britefury.gSym.gSymLanguage import GSymLanguage
+from Britefury.gSym.View.gSymView import _NodeElementChangeListener
 
+from BritefuryJ.GSym.View import PyGSymViewFactory
 
 from GSymCore.Languages.LISP.View import LISPView
 
 
+def pyTransformModify(cur, new):
+	cur[1:] = new[1:]
+
+
+	
+viewFac = PyGSymViewFactory( LISPView, _NodeElementChangeListener )
+
+
 language = GSymLanguage()
-language.registerViewFactory( LISPView )
+language.registerViewFactory( viewFac )
+language.registerTransformModifyFn( pyTransformModify )

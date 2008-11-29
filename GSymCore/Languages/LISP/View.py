@@ -7,16 +7,16 @@
 ##-*************************
 from Britefury.Util.NodeUtil import isListNode
 
+from Britefury.gSym.View.gSymView import GSymView
 
-from Britefury.gSym.View.gSymView import border, indent, text, hbox, ahbox, vbox, paragraph, script, scriptLSuper, scriptLSub, scriptRSuper, scriptRSub, listView, contentListener, viewEval, mapViewEval, GSymView
-from Britefury.gSym.View.ListView import ParagraphListViewLayout, HorizontalListViewLayout, VerticalInlineListViewLayout, VerticalListViewLayout
-
-from Britefury.gSym.View.EditOperations import replace, append, prepend, insertBefore, insertAfter
+from Britefury.gSym.View.EditOperations import replace, replaceWithRange, replaceNodeContents, append, prepend, insertBefore, insertRangeBefore, insertAfter, insertRangeAfter
 
 
 from BritefuryJ.DocPresent import *
 from BritefuryJ.DocPresent.StyleSheets import *
 from BritefuryJ.DocPresent.ElementTree import *
+
+from BritefuryJ.GSym.View.ListView import ParagraphListViewLayout, HorizontalListViewLayout, VerticalInlineListViewLayout, VerticalListViewLayout
 
 
 from GSymCore.Languages.LISP import Parser
@@ -60,7 +60,7 @@ class ParsedNodeContentListener (ElementContentListener):
 	
 	
 def nodeEditor(ctx, node, contents, state):
-	return contentListener( ctx, contents, ParsedNodeContentListener( ctx, node ) )
+	return ctx.contentListener( contents, ParsedNodeContentListener( ctx, node ) )
 
 
 def stringNodeEditor(ctx, node, metadata, state):
@@ -69,7 +69,7 @@ def stringNodeEditor(ctx, node, metadata, state):
 		nodeText = repr( node.toString() )
 	else:
 		nodeText = node.toString()
-	return contentListener( ctx, text( ctx, string_textStyle, nodeText ), ParsedNodeContentListener( ctx, node ) )
+	return ctx.contentListener( ctx.text( string_textStyle, nodeText ), ParsedNodeContentListener( ctx, node ) )
 
 
 
@@ -85,7 +85,7 @@ def viewStringNode(node, ctx, state):
 
 def lispViewEval(node, ctx, state):
 	if isListNode( node ):
-		return viewEval( ctx, node )
+		return ctx.viewEval( node )
 	else:
 		return viewStringNode( node, ctx, state )
 
@@ -115,7 +115,7 @@ def viewLispNode(node, ctx, state):
 			layout = vertical_listViewLayout
 		else:
 			raise ValueError
-		v = listView( ctx, layout, lambda: text( ctx, punctuation_textStyle, '(' ), lambda: text( ctx, punctuation_textStyle, ')' ), None, xViews )
+		v = ctx.listView( layout, lambda: ctx.text( punctuation_textStyle, '(' ), lambda: ctx.text( punctuation_textStyle, ')' ), None, xViews )
 		
 		return nodeEditor( ctx, node, v, state )
 	else:

@@ -392,7 +392,7 @@ class Python25View (GSymView):
 
 	def blankLine(self, ctx, state, node):
 		return statementNodeEditor( ctx, node,
-				   ctx.text( default_textStyle, ' ' ),
+				   ctx.text( default_textStyle, '' ),
 				   None,
 				   state )
 
@@ -889,7 +889,7 @@ class Python25View (GSymView):
 		exprParser = Parser.expression
 		if state is not None:
 			outerPrecedence, parser, mode = state
-			if parser is Parser.oldExpression   or  parser is Parser.oldLambdaExpr  or  parser is Parser.oldTupleOrExpression:
+			if parser is Parser.oldExpression   or  parser is Parser.oldTupleOrExpression:
 				exprParser = Parser.oldExpression
 
 		exprView = ctx.viewEvalFn( expr, None, python25ViewState( PRECEDENCE_LAMBDAEXPR, exprParser ) )
