@@ -7,7 +7,7 @@
 ##-*************************
 from java.awt import Font, Color
 
-from Britefury.gSym.View.ListView import ParagraphListViewLayout, HorizontalListViewLayout, VerticalInlineListViewLayout, VerticalListViewLayout
+from BritefuryJ.GSym.View.ListView import ListViewLayout, ParagraphListViewLayout, HorizontalListViewLayout, VerticalInlineListViewLayout, VerticalListViewLayout
 
 from BritefuryJ.DocPresent import *
 from BritefuryJ.DocPresent.StyleSheets import *
@@ -24,10 +24,10 @@ punctuation_textStyle = TextStyleSheet( Font( 'SansSerif', Font.PLAIN, 12 ),  Co
 lisp_paragraphStyle = ParagraphStyleSheet( DPParagraph.Alignment.BASELINES, 0.0, 0.0, 60.0 )
 
 
-horizontal_listViewLayout = ParagraphListViewLayout( lisp_paragraphStyle, lambda: TextElement( default_textStyle, ' ' ), 0 )
+horizontal_listViewLayout = ParagraphListViewLayout( lisp_paragraphStyle, lambda: TextElement( default_textStyle, ' ' ), 0, ListViewLayout.TrailingSeparator.NEVER )
 
 verticalInline_listViewLayout = VerticalInlineListViewLayout( VBoxStyleSheet( DPVBox.Typesetting.ALIGN_WITH_TOP, DPVBox.Alignment.LEFT, 0.0, False, 0.0 ), \
-						ParagraphStyleSheet(), 30.0 )
+						ParagraphStyleSheet(), 30.0, ListViewLayout.TrailingSeparator.NEVER )
 
 vertical_listViewLayout = VerticalListViewLayout( VBoxStyleSheet( DPVBox.Typesetting.ALIGN_WITH_TOP, DPVBox.Alignment.LEFT, 0.0, False, 0.0 ), \
-						ParagraphStyleSheet(), 30.0 )
+						ParagraphStyleSheet(), 30.0, ListViewLayout.TrailingSeparator.NEVER )

@@ -24,23 +24,6 @@ And the same in SVG:
 http://my.opera.com/MacDev_ed/blog/2008/02/05/how-to-do-photoshop-like-effects-in-svg
 
 
-05/Mar/2008
-Considering how to edit a gSym structured document.
-Realised a possible link with Geoffrey Bantle's Blender Mesh system;
-his system uses primitive/atomic mesh edit operations;
-- make vertex, destroy vertex
-  make edge, destroy edge, split edge create vertex, merge edges destroy vertex
-  make face, destroy face, split face create edge, merge faces destroy edge
-A similar system of atomic edits to lists could help in gSym:
-- add child x
-- remove child x
-- replace child x with y
-- split list
-- merge lists
-- insert range i:j
-- remove range i:j
-
-
 07/Mar/2008
 Unicode supports Greek characters; useful for mathematics.
 GTK/cairo supports unicode characters.
@@ -49,18 +32,6 @@ u"\u03bb"
 To display the lambda character.
 http://www.unicode.org   and   http://www.unicode.org/charts
 contain information on using unicode to get these characters.
-
-
-04/Apr/2008
-Need a way of ensuring the data is maintained in a sane state:
-For example, take a binary operator; addition
-(add (loadLocal x) (loadLocal y))     VALID
-(add (loadLocal x) (nilExpr))     VALID
-(add (loadLocal x))      INVALID
-Other more complicated structures could be for example a Python define statement:
-(def name (params...) (body...))
-We need a way of maintain the structure in a valid state, and correct it should it stray into
-an invalid one.
 
 
 04/Apr/2008
@@ -201,3 +172,9 @@ These bindings would be very helpful for creating compilers.
 - The following talk by Guy Steele gives information on language design that could be very useful
     http://video.google.com/videoplay?docid=-8860158196198824415&q=guy+steele&total=977&start=0&num=10&so=0&type=search&plindex=0
 
+
+
+
+29/Nov/2008
+Gregor Kiczales worked on Intentional Programming. He is at the University of British Columbia.
+http://www.cs.ubc.ca/~gregor/

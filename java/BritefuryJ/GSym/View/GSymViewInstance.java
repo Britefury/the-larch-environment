@@ -81,7 +81,14 @@ public class GSymViewInstance
 			if ( x instanceof NodeContentsFactoryKey )
 			{
 				NodeContentsFactoryKey kx = (NodeContentsFactoryKey)x;
-				return nodeViewFunction == kx.nodeViewFunction  &&  state.equals( kx.state ); 
+				if ( state == null  ||  kx.state == null )
+				{
+					return nodeViewFunction == kx.nodeViewFunction  &&  ( state != null ) == ( kx.state != null );
+				}
+				else
+				{
+					return nodeViewFunction == kx.nodeViewFunction  &&  state.equals( kx.state );
+				}
 			}
 			else
 			{
