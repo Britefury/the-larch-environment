@@ -287,26 +287,33 @@ public class SegmentElement extends BranchElement implements CollatedElementInte
 	
 	public String getContent()
 	{
-		if ( child != null )
+		List<Element> ch = getChildren();
+		
+		if ( ch.size() == 0 )
 		{
-			return child.getContent();
+			return null;
 		}
 		else
 		{
-			return null;
+			String content = "";
+			for (Element c: ch)
+			{
+				content += c.getContent();
+			}
+			return content;
 		}
 	}
 
 	public int getContentLength()
 	{
-		if ( child != null )
+		List<Element> ch = getChildren();
+		int length = 0;
+		
+		for (Element c: ch)
 		{
-			return child.getContentLength();
+			length += c.getContentLength();
 		}
-		else
-		{
-			return 0;
-		}
+		return length;
 	}
 	
 	
