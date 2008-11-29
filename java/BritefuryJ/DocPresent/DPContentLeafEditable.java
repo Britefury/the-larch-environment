@@ -11,12 +11,22 @@ import java.awt.event.KeyEvent;
 
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.ElementTree.EditableLeafElement;
-import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleSheets.ContentLeafStyleSheet;
+import BritefuryJ.Math.Point2;
 
 public abstract class DPContentLeafEditable extends DPContentLeaf
 {
+	public static class EditableLeafWidgetFilter extends WidgetFilter
+	{
+		public boolean testLeaf(DPContentLeaf leaf)
+		{
+			return leaf instanceof DPContentLeafEditable;
+		}
+	}
+	
+	
+	
 	//
 	// Constructors
 	//
@@ -164,19 +174,28 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	
 	
 	
-	protected boolean onButtonDown(PointerButtonEvent event)
+//	protected boolean onButtonDown(PointerButtonEvent event)
+//	{
+//		if ( event.getButton() == 1 )
+//		{
+//			Caret caret = presentationArea.getCaret();
+//			int markerPos = getMarkerPositonForPoint( event.getPointer().getLocalPos() );
+//			moveMarker( caret.getMarker(), markerPos, Marker.Bias.START );
+//			return true;
+//		}
+//		else
+//		{
+//			return false;
+//		}
+//	}
+	
+	
+	
+	protected void placeCursor(Point2 localPos)
 	{
-		if ( event.getButton() == 1 )
-		{
-			Caret caret = presentationArea.getCaret();
-			int markerPos = getMarkerPositonForPoint( event.getPointer().getLocalPos() );
-			moveMarker( caret.getMarker(), markerPos, Marker.Bias.START );
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		Caret caret = presentationArea.getCaret();
+		int markerPos = getMarkerPositonForPoint( localPos );
+		moveMarker( caret.getMarker(), markerPos, Marker.Bias.START );
 	}
 
 

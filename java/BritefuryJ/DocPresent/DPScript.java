@@ -821,7 +821,41 @@ public class DPScript extends DPContainer
 	}
 	
 	
-	protected ChildEntry getChildEntryClosestToLocalPoint(Point2 localPos)
+	
+	private DPWidget getLeafClosestToLocalPointInColumn(ArrayList<ChildEntry> column, Point2 localPos, WidgetFilter filter)
+	{
+		// Now determine which child entry is the closest
+		if ( column.size() == 1 )
+		{
+			// One entry; only 1 choice
+			return getLeafClosestToLocalPointFromChild( column.get( 0 ), localPos, filter );
+		}
+		else if ( column.size() == 2 )
+		{
+			ChildEntry entryI = column.get( 0 );
+			ChildEntry entryJ = column.get( 1 );
+			double iUpperY = entryI.pos.y + entryI.size.y;
+			double jLowerY = entryJ.pos.y;
+				
+			double midY = ( iUpperY + jLowerY ) * 0.5;
+			
+			ChildEntry entryA = localPos.y < midY  ?  entryI  :  entryJ;
+			DPWidget c = getLeafClosestToLocalPointFromChild( entryA, localPos, filter );
+			if ( c != null )
+			{
+				return c;
+			}
+
+			ChildEntry entryB = entryA == entryI  ?  entryJ  :  entryI;
+			return getLeafClosestToLocalPointFromChild( entryB, localPos, filter );
+		}
+		else
+		{
+			throw new RuntimeException();
+		}
+	}
+	
+	protected DPWidget getChildLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter)
 	{
 		if ( childEntries.size() == 0 )
 		{
@@ -831,7 +865,7 @@ public class DPScript extends DPContainer
 		else if ( childEntries.size() == 1 )
 		{
 			// Only 1 child
-			return childEntries.get( 0 );
+			return childEntries.get( 0 ).child;
 		}
 		else
 		{
@@ -853,10 +887,12 @@ public class DPScript extends DPContainer
 			
 			// Determine which column is closest
 			ArrayList<ChildEntry> closestColumn = null;
+			int columnIndex = -1;
 			
 			if ( childEntriesByColumn.size() == 1 )
 			{
 				closestColumn = childEntriesByColumn.get( 0 );
+				columnIndex = 0;
 			}
 			else
 			{
@@ -872,38 +908,72 @@ public class DPScript extends DPContainer
 					if ( localPos.x < midPoint )
 					{
 						closestColumn = colI;
+						columnIndex = i;
 						break;
 					}
 				}
 				
 				if ( closestColumn == null )
 				{
-					closestColumn = childEntriesByColumn.get( childEntriesByColumn.size() - 1 );
+					columnIndex = childEntriesByColumn.size() - 1;
+					closestColumn = childEntriesByColumn.get( columnIndex );
 				}
 			}
 			
 			
 			
-			// Now determine which child entry is the closest
-			if ( closestColumn.size() == 1 )
+			DPWidget c = getLeafClosestToLocalPointInColumn( closestColumn, localPos, filter );
+			
+			if ( c != null )
 			{
-				// One entry; only 1 choice
-				return closestColumn.get( 0 );
-			}
-			else if ( closestColumn.size() == 2 )
-			{
-				ChildEntry entryI = closestColumn.get( 0 );
-				ChildEntry entryJ = closestColumn.get( closestColumn.size() - 1 );
-				double iUpperY = entryI.pos.y + entryI.size.y;
-				double jLowerY = entryJ.pos.y;
-					
-				double midY = ( iUpperY + jLowerY ) * 0.5;
-				
-				return localPos.y < midY  ?  entryI  :  entryJ;
+				return c;
 			}
 			else
 			{
-				throw new RuntimeException();
+				ChildEntry next = null;
+				DPWidget nextC = null;
+				for (int j = columnIndex + 1; j < childEntriesByColumn.size(); j++)
+				{
+					nextC = getLeafClosestToLocalPointInColumn( childEntriesByColumn.get( j ), localPos, filter );
+					if ( nextC != null )
+					{
+						next = childToEntry.get( c );
+						break;
+					}
+				}
+
+				ChildEntry prev = null;
+				DPWidget prevC = null;
+				for (int j = columnIndex - 1; j >= 0; j--)
+				{
+					prevC = getLeafClosestToLocalPointInColumn( childEntriesByColumn.get( j ), localPos, filter );
+					if ( prevC != null )
+					{
+						prev = childToEntry.get( c );
+						break;
+					}
+				}
+				
+				
+				if ( prev == null  &&  next == null )
+				{
+					return null;
+				}
+				else if ( prev == null  &&  next != null )
+				{
+					return nextC;
+				}
+				else if ( prev != null  &&  next == null )
+				{
+					return prevC;
+				}
+				else
+				{
+					double distToPrev = localPos.y - ( prev.pos.y + prev.size.y );
+					double distToNext = next.pos.y - localPos.y;
+					
+					return distToPrev > distToNext  ?  prevC  :  nextC;
+				}
 			}
 		}
 	}

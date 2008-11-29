@@ -150,7 +150,7 @@ public class DPParagraph extends DPContainerSequence
 		
 		
 
-		private ChildEntry getChildEntryClosestToLocalPoint(Point2 localPos)
+		private ChildEntry getChildEntryClosestToLocalPoint(Point2 localPos, WidgetFilter filter)
 		{
 			if ( children.size() == 0 )
 			{
@@ -672,13 +672,67 @@ public class DPParagraph extends DPContainerSequence
 		}
 	}
 
-	protected ChildEntry getChildEntryClosestToLocalPoint(Point2 localPos)
+	protected DPWidget getChildLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter)
 	{
 		Line line = getLineClosestToLocalPoint( localPos );
 		
 		if ( line != null )
 		{
-			return line.getChildEntryClosestToLocalPoint( localPos );
+			ChildEntry entry = line.getChildEntryClosestToLocalPoint( localPos, filter );
+			
+			DPWidget c = getLeafClosestToLocalPointFromChild( entry, localPos, filter );
+			
+			if ( c != null )
+			{
+				return c;
+			}
+			
+			int index = childEntries.indexOf( entry );
+			
+			ChildEntry next = null;
+			DPWidget nextC = null;
+			for (int j = index + 1; j < childEntries.size(); j++)
+			{
+				nextC = getLeafClosestToLocalPointFromChild( childEntries.get( j ), localPos, filter );
+				if ( nextC != null )
+				{
+					next = childEntries.get( j );
+					break;
+				}
+			}
+
+			ChildEntry prev = null;
+			DPWidget prevC = null;
+			for (int j = index - 1; j >= 0; j--)
+			{
+				prevC = getLeafClosestToLocalPointFromChild( childEntries.get( j ), localPos, filter );
+				if ( prevC != null )
+				{
+					prev = childEntries.get( j );
+					break;
+				}
+			}
+	
+			
+			if ( prev == null  &&  next == null )
+			{
+				return null;
+			}
+			else if ( prev == null  &&  next != null )
+			{
+				return nextC;
+			}
+			else if ( prev != null  &&  next == null )
+			{
+				return prevC;
+			}
+			else
+			{
+				double distToPrev = localPos.x - ( prev.pos.x + prev.size.x );
+				double distToNext = next.pos.x - localPos.x;
+				
+				return distToPrev > distToNext  ?  prevC  :  nextC;
+			}
 		}
 		else
 		{
