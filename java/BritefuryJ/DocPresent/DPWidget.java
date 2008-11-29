@@ -1112,6 +1112,10 @@ abstract public class DPWidget
 	}
 	
 	
+	protected abstract DPWidget getLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter);
+	
+	
+	
 	
 	
 	//

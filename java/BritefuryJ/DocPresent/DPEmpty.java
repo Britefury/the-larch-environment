@@ -10,6 +10,7 @@ package BritefuryJ.DocPresent;
 import BritefuryJ.DocPresent.Metrics.HMetrics;
 import BritefuryJ.DocPresent.Metrics.VMetrics;
 import BritefuryJ.DocPresent.StyleSheets.WidgetStyleSheet;
+import BritefuryJ.Math.Point2;
 
 public class DPEmpty extends DPWidget
 {
@@ -44,5 +45,19 @@ public class DPEmpty extends DPWidget
 	protected VMetrics computePreferredVMetrics()
 	{
 		return new VMetrics();
+	}
+
+
+
+	protected DPWidget getLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter)
+	{
+		if ( filter.testEmpty( this ) )
+		{
+			return this;
+		}
+		else
+		{
+			return null;
+		}
 	}
 }

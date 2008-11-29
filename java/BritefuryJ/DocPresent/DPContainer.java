@@ -37,6 +37,29 @@ public abstract class DPContainer extends DPWidget
 	}
 	
 	
+	protected static interface ClosestPointChildSearcher
+	{
+		DPWidget getLeafClosestToLocalPointFromChild(ChildEntry entry, Point2 localPos, WidgetFilter filter);
+	}
+	
+	protected static class ClosestPointChildContainerSearcher implements ClosestPointChildSearcher
+	{
+		private DPContainer container;
+		
+		
+		public ClosestPointChildContainerSearcher(DPContainer container)
+		{
+			this.container = container;
+		}
+
+		public DPWidget getLeafClosestToLocalPointFromChild(ChildEntry entry, Point2 localPos, WidgetFilter filter)
+		{
+			return container.getChildLeafClosestToLocalPoint( localPos, filter );
+		}
+	}
+	
+	
+	
 	
 	protected static class ChildEntry
 	{
@@ -293,10 +316,6 @@ public abstract class DPContainer extends DPWidget
 		
 		return null;
 	}
-	
-	protected abstract ChildEntry getChildEntryClosestToLocalPoint(Point2 localPos);
-	
-	
 	
 	//
 	// Drag and drop methods
@@ -887,6 +906,218 @@ public abstract class DPContainer extends DPWidget
 		else
 		{
 			return null;
+		}
+	}
+	
+	
+	
+	
+	protected DPWidget getLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter)
+	{
+		if ( filter.testContainer( this ) )
+		{
+			return getChildLeafClosestToLocalPoint( localPos, filter );
+		}
+		else
+		{
+			return null;
+		}
+	}
+
+	protected abstract DPWidget getChildLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter);
+	
+	protected DPWidget getLeafClosestToLocalPointFromChild(ChildEntry childEntry, Point2 localPos, WidgetFilter filter)
+	{
+		return childEntry.child.getLeafClosestToLocalPoint( childEntry.containerToChildXform.transform( localPos ), filter );
+	}
+	
+
+	
+	protected DPWidget getChildLeafClosestToLocalPointHorizontal(Point2 localPos, WidgetFilter filter)
+	{
+		if ( childEntries.size() == 0 )
+		{
+			return null;
+		}
+		else if ( childEntries.size() == 1 )
+		{
+			return getLeafClosestToLocalPointFromChild( childEntries.get( 0 ), localPos, filter );
+		}
+		else
+		{
+			ChildEntry start = null;
+			int startIndex = -1;
+			ChildEntry entryI = childEntries.get( 0 );
+			for (int i = 0; i < childEntries.size() - 1; i++)
+			{
+				ChildEntry entryJ = childEntries.get( i + 1 );
+				double iUpperX = entryI.pos.x + entryI.size.x;
+				double jLowerX = entryJ.pos.x;
+				
+				double midx = ( iUpperX + jLowerX ) * 0.5;
+				
+				if ( localPos.x < midx )
+				{
+					startIndex = i;
+					start = entryI;
+					break;
+				}
+				
+				entryI = entryJ;
+			}
+			
+			if ( start == null )
+			{
+				startIndex = childEntries.size() - 1;
+				start = childEntries.get( startIndex );
+			}
+			
+			DPWidget c = getLeafClosestToLocalPointFromChild( start, localPos, filter );
+			if ( c != null )
+			{
+				return c;
+			}
+			else
+			{
+				ChildEntry next = null;
+				DPWidget nextC = null;
+				for (int j = startIndex + 1; j < childEntries.size(); j++)
+				{
+					nextC = getLeafClosestToLocalPointFromChild( childEntries.get( j ), localPos, filter );
+					if ( nextC != null )
+					{
+						next = childEntries.get( j );
+						break;
+					}
+				}
+
+				ChildEntry prev = null;
+				DPWidget prevC = null;
+				for (int j = startIndex - 1; j >= 0; j--)
+				{
+					prevC = getLeafClosestToLocalPointFromChild( childEntries.get( j ), localPos, filter );
+					if ( prevC != null )
+					{
+						prev = childEntries.get( j );
+						break;
+					}
+				}
+				
+
+				if ( prev == null  &&  next == null )
+				{
+					return null;
+				}
+				else if ( prev == null  &&  next != null )
+				{
+					return nextC;
+				}
+				else if ( prev != null  &&  next == null )
+				{
+					return prevC;
+				}
+				else
+				{
+					double distToPrev = localPos.x - ( prev.pos.x + prev.size.x );
+					double distToNext = next.pos.x - localPos.x;
+					
+					return distToPrev > distToNext  ?  prevC  :  nextC;
+				}
+			}
+		}
+	}
+	
+	protected DPWidget getChildLeafClosestToLocalPointVertical(Point2 localPos, WidgetFilter filter)
+	{
+		if ( childEntries.size() == 0 )
+		{
+			return null;
+		}
+		else if ( childEntries.size() == 1 )
+		{
+			return getLeafClosestToLocalPointFromChild( childEntries.get( 0 ), localPos, filter );
+		}
+		else
+		{
+			ChildEntry start = null;
+			int startIndex = -1;
+			ChildEntry entryI = childEntries.get( 0 );
+			for (int i = 0; i < childEntries.size() - 1; i++)
+			{
+				ChildEntry entryJ = childEntries.get( i + 1 );
+				double iUpperY = entryI.pos.y + entryI.size.y;
+				double jLowerY = entryJ.pos.y;
+				
+				double midY = ( iUpperY + jLowerY ) * 0.5;
+				
+				if ( localPos.y < midY )
+				{
+					startIndex = i;
+					start = entryI;
+					break;
+				}
+				
+				entryI = entryJ;
+			}
+			
+			if ( start == null )
+			{
+				startIndex = childEntries.size() - 1;
+				start = childEntries.get( startIndex );
+			}
+			
+			DPWidget c = getLeafClosestToLocalPointFromChild( start, localPos, filter );
+			if ( c != null )
+			{
+				return c;
+			}
+			else
+			{
+				ChildEntry next = null;
+				DPWidget nextC = null;
+				for (int j = startIndex + 1; j < childEntries.size(); j++)
+				{
+					nextC = getLeafClosestToLocalPointFromChild( childEntries.get( j ), localPos, filter );
+					if ( nextC != null )
+					{
+						next = childEntries.get( j );
+						break;
+					}
+				}
+
+				ChildEntry prev = null;
+				DPWidget prevC = null;
+				for (int j = startIndex - 1; j >= 0; j--)
+				{
+					prevC = getLeafClosestToLocalPointFromChild( childEntries.get( j ), localPos, filter );
+					if ( prevC != null )
+					{
+						prev = childEntries.get( j );
+						break;
+					}
+				}
+				
+				
+				if ( prev == null  &&  next == null )
+				{
+					return null;
+				}
+				else if ( prev == null  &&  next != null )
+				{
+					return nextC;
+				}
+				else if ( prev != null  &&  next == null )
+				{
+					return prevC;
+				}
+				else
+				{
+					double distToPrev = localPos.y - ( prev.pos.y + prev.size.y );
+					double distToNext = next.pos.y - localPos.y;
+					
+					return distToPrev > distToNext  ?  prevC  :  nextC;
+				}
+			}
 		}
 	}
 	

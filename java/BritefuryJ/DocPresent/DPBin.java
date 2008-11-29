@@ -180,15 +180,15 @@ public class DPBin extends DPContainer
 	
 	
 	
-	protected ChildEntry getChildEntryClosestToLocalPoint(Point2 localPos)
+	protected DPWidget getChildLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter)
 	{
-		if ( childEntries.size() == 0 )
+		if ( child == null )
 		{
 			return null;
 		}
 		else
 		{
-			return childEntries.get( 0 );
+			return getLeafClosestToLocalPointFromChild( childEntries.get( 0 ), localPos, filter );
 		}
 	}
 

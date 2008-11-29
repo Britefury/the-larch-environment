@@ -472,37 +472,9 @@ public class DPFraction extends DPContainer
 	
 	
 
-	protected ChildEntry getChildEntryClosestToLocalPoint(Point2 localPos)
+	protected DPWidget getChildLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter)
 	{
-		if ( childEntries.size() == 0 )
-		{
-			return null;
-		}
-		else if ( childEntries.size() == 1 )
-		{
-			return childEntries.get( 0 );
-		}
-		else
-		{
-			ChildEntry entryI = childToEntry.get( children[0] );
-			for (int i = 0; i < childEntries.size() - 1; i++)
-			{
-				ChildEntry entryJ = childEntries.get( i + 1 );
-				double iUpperY = entryI.pos.y + entryI.size.y;
-				double jLowerY = entryJ.pos.y;
-				
-				double midY = ( iUpperY + jLowerY ) * 0.5;
-				
-				if ( localPos.y < midY )
-				{
-					return entryI;
-				}
-				
-				entryI = entryJ;
-			}
-			
-			return childEntries.get( childEntries.size() - 1 );
-		}
+		return getChildLeafClosestToLocalPointVertical( localPos, filter );
 	}
 
 

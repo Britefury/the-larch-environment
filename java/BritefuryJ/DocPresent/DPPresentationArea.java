@@ -820,10 +820,17 @@ public class DPPresentationArea extends DPBin implements CaretListener
 		Point2 rootPos = windowSpaceToRootSpace( windowPos );
 		rootSpaceMouse.setLocalPos( rootPos );
 		rootSpaceMouse.setModifiers( modifiers );
+		if ( ( modifiers & ( Modifier.ALT | Modifier.ALT_GRAPH | Modifier.CTRL | Modifier.SHIFT ) )  ==  0 )
+		{
+			DPContentLeafEditable leaf = (DPContentLeafEditable)getLeafClosestToLocalPoint( rootPos, new DPContentLeafEditable.EditableLeafWidgetFilter() );
+			Xform2 x = leaf.getTransformRelativeToRoot();
+			leaf.placeCursor( x.transform( rootPos ) );
+		}
+
 		if ( ( modifiers & Modifier.ALT )  ==  0 )
 		{
 			PointerButtonEvent event = new PointerButtonEvent( rootSpaceMouse, button, PointerButtonEvent.Action.DOWN );
-			
+				
 			dndButtonDownEvent( event );
 			handleButtonDown( event );
 		}
