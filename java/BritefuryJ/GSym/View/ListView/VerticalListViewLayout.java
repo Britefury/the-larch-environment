@@ -14,7 +14,6 @@ import BritefuryJ.DocPresent.ElementTree.Element;
 import BritefuryJ.DocPresent.ElementTree.ElementFactory;
 import BritefuryJ.DocPresent.ElementTree.ParagraphElement;
 import BritefuryJ.DocPresent.ElementTree.VBoxElement;
-import BritefuryJ.DocPresent.ElementTree.WhitespaceElement;
 import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
@@ -34,24 +33,18 @@ public class VerticalListViewLayout extends IndentedListViewLayout
 	}
 	
 	
-	private Element createLineParagraph(Element child)
-	{
-		ParagraphElement paragraph = new ParagraphElement( lineParagraphStyleSheet );
-		paragraph.setChildren( Arrays.asList( new Element[] { child, new WhitespaceElement( "\n" ) } ) );
-		return paragraph;
-	}
-	
 	private Element createLineParagraph(Element child, ElementFactory separator)
 	{
 		if ( separator != null )
 		{
 			ParagraphElement paragraph = new ParagraphElement( lineParagraphStyleSheet );
-			paragraph.setChildren( Arrays.asList( new Element[] { child, separator.createElement(), new WhitespaceElement( "\n" ) } ) );
+			//paragraph.setChildren( Arrays.asList( new Element[] { child, separator.createElement(), new WhitespaceElement( "\n" ) } ) );
+			paragraph.setChildren( Arrays.asList( new Element[] { child, separator.createElement() } ) );
 			return paragraph;
 		}
 		else
 		{
-			return createLineParagraph( child );
+			return child;
 		}
 	}
 	
@@ -76,7 +69,7 @@ public class VerticalListViewLayout extends IndentedListViewLayout
 			}
 			else
 			{
-				childElems.add( createLineParagraph( children.get( children.size() - 1 ) ) );
+				childElems.add( children.get( children.size() - 1 ) );
 			}
 		}
 
@@ -94,14 +87,14 @@ public class VerticalListViewLayout extends IndentedListViewLayout
 			
 			if ( beginDelim != null )
 			{
-				outerChildElems.add( createLineParagraph( beginDelim.createElement() ) );
+				outerChildElems.add( beginDelim.createElement() );
 			}
 			
 			outerChildElems.add( indented );
 			
 			if ( endDelim != null )
 			{
-				outerChildElems.add( createLineParagraph( endDelim.createElement() ) );
+				outerChildElems.add(  endDelim.createElement() );
 			}
 			
 			outerVBox.setChildren( outerChildElems );

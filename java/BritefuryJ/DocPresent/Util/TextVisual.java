@@ -170,7 +170,17 @@ public class TextVisual
 	public void drawCaretAtStart(Graphics2D graphics)
 	{
 		refreshLayout();
-		double h = layout.getBounds().getHeight();
+		double h = 0.0;
+		if ( layout != null )
+		{
+			h = layout.getBounds().getHeight();
+		}
+		else
+		{
+			FontRenderContext frc = graphics.getFontRenderContext();
+			LineMetrics lineMetrics = styleSheet.getFont().getLineMetrics( "", frc );
+			h = lineMetrics.getAscent() + lineMetrics.getDescent();
+		}
 		graphics.draw( new Line2D.Double( 0.0, 0.0, 0.0, h ) );
 	}
 
@@ -178,7 +188,17 @@ public class TextVisual
 	{
 		refreshLayout();
 		double x = layout.getBounds().getWidth();
-		double h = layout.getBounds().getHeight();
+		double h = 0.0;
+		if ( layout != null )
+		{
+			h = layout.getBounds().getHeight();
+		}
+		else
+		{
+			FontRenderContext frc = graphics.getFontRenderContext();
+			LineMetrics lineMetrics = styleSheet.getFont().getLineMetrics( "", frc );
+			h = lineMetrics.getAscent() + lineMetrics.getDescent();
+		}
 		graphics.draw( new Line2D.Double( x, 0.0, x, h ) );
 	}
 	

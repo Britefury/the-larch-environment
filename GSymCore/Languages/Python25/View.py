@@ -285,7 +285,8 @@ def python25ViewState(outerPrecedence, parser=Parser.expression, mode=MODE_DISPL
 
 def suiteView(ctx, suite):
 	lineViews = ctx.mapViewEvalFn( suite, None, python25ViewState( PRECEDENCE_NONE, Parser.statement, MODE_EDITSTATEMENT ) )
-	return ctx.listView( suite_listViewLayout, None, None, None, lineViews )
+	newLineFac = lambda: ctx.whitespace( '\n' )
+	return ctx.listView( suite_listViewLayout, None, None, newLineFac, lineViews )
 
 
 
@@ -386,7 +387,8 @@ class Python25View (GSymView):
 	# MISC
 	def python25Module(self, ctx, state, node, *content):
 		lineViews = ctx.mapViewEvalFn( content, None, python25ViewState( PRECEDENCE_NONE, Parser.statement, MODE_EDITSTATEMENT ) )
-		return ctx.listView( module_listViewLayout, None, None, None, lineViews )
+		newLineFac = lambda: ctx.whitespace( '\n' )
+		return ctx.listView( module_listViewLayout, None, None, newLineFac, lineViews )
 
 
 
