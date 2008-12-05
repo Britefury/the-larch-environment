@@ -14,7 +14,7 @@ import BritefuryJ.DocPresent.ElementTree.Element;
 import BritefuryJ.DocPresent.ElementTree.ElementFactory;
 import BritefuryJ.DocPresent.ElementTree.ParagraphElement;
 import BritefuryJ.DocPresent.ElementTree.VBoxElement;
-import BritefuryJ.DocPresent.ElementTree.WhitespaceElement;
+//import BritefuryJ.DocPresent.ElementTree.WhitespaceElement;
 import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
@@ -36,16 +36,16 @@ public class VerticalInlineListViewLayout extends IndentedListViewLayout
 	
 	private Element createLineParagraph(Element child, ElementFactory separator)
 	{
-		ParagraphElement paragraph = new ParagraphElement( lineParagraphStyleSheet );
 		if ( separator != null )
 		{
-			paragraph.setChildren( Arrays.asList( new Element[] { child, separator.createElement(), new WhitespaceElement( "\n" ) } ) );
+			ParagraphElement paragraph = new ParagraphElement( lineParagraphStyleSheet );
+			paragraph.setChildren( Arrays.asList( new Element[] { child, separator.createElement() } ) );
+			return paragraph;
 		}
 		else
 		{
-			paragraph.setChildren( Arrays.asList( new Element[] { child, new WhitespaceElement( "\n" ) } ) );
+			return child;
 		}
-		return paragraph;
 	}
 	
 
@@ -80,12 +80,12 @@ public class VerticalInlineListViewLayout extends IndentedListViewLayout
 		else
 		{
 			// First line
-			ParagraphElement first = new ParagraphElement( lineParagraphStyleSheet );
-			ArrayList<Element> firstChildElems = new ArrayList<Element>();
-			firstChildElems.ensureCapacity( 4 );
-			
+			Element first = null;
 			if ( beginDelim != null  ||  separator != null )
 			{
+				first = new ParagraphElement( lineParagraphStyleSheet );
+				ArrayList<Element> firstChildElems = new ArrayList<Element>();
+				firstChildElems.ensureCapacity( 3 );
 				if ( beginDelim != null )
 				{
 					firstChildElems.add( beginDelim.createElement() );
@@ -95,14 +95,11 @@ public class VerticalInlineListViewLayout extends IndentedListViewLayout
 				{
 					firstChildElems.add( separator.createElement() );
 				}
-				firstChildElems.add( new WhitespaceElement( "\n" ) );
 			}
 			else
 			{
-				firstChildElems.add( children.get( 0 ) );
-				firstChildElems.add( new WhitespaceElement( "\n" ) );
+				first = children.get( 0 );
 			}
-			first.setChildren( firstChildElems );
 			
 			
 			// Middle lines
