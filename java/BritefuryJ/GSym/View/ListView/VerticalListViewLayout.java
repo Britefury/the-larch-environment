@@ -33,13 +33,13 @@ public class VerticalListViewLayout extends IndentedListViewLayout
 	}
 	
 	
-	private Element createLineParagraph(Element child, ElementFactory separator)
+	private Element createLineParagraph(int index, Element child, SeparatorElementFactory separator)
 	{
 		if ( separator != null )
 		{
 			ParagraphElement paragraph = new ParagraphElement( lineParagraphStyleSheet );
 			//paragraph.setChildren( Arrays.asList( new Element[] { child, separator.createElement(), new WhitespaceElement( "\n" ) } ) );
-			paragraph.setChildren( Arrays.asList( new Element[] { child, separator.createElement() } ) );
+			paragraph.setChildren( Arrays.asList( new Element[] { child, separator.createElement( index, child ) } ) );
 			return paragraph;
 		}
 		else
@@ -49,7 +49,7 @@ public class VerticalListViewLayout extends IndentedListViewLayout
 	}
 	
 
-	public Element createListElement(List<Element> children, ElementFactory beginDelim, ElementFactory endDelim, ElementFactory separator)
+	public Element createListElement(List<Element> children, ElementFactory beginDelim, ElementFactory endDelim, SeparatorElementFactory separator)
 	{
 		VBoxElement vbox = new VBoxElement( styleSheet );
 		
@@ -60,12 +60,12 @@ public class VerticalListViewLayout extends IndentedListViewLayout
 		{
 			for (int i = 0; i < children.size() - 1; i++)
 			{
-				childElems.add( createLineParagraph( children.get( i ), separator ) );
+				childElems.add( createLineParagraph( i, children.get( i ), separator ) );
 			}
 
 			if ( trailingSeparatorRequired( children, trailingSeparator ) )
 			{
-				childElems.add( createLineParagraph( children.get( children.size() - 1 ), separator ) );
+				childElems.add( createLineParagraph( children.size() - 1, children.get( children.size() - 1 ), separator ) );
 			}
 			else
 			{

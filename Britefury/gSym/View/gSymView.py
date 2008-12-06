@@ -507,8 +507,9 @@ class _NodeElementChangeListener (DVNode.NodeElementChangeListener):
 						position = rel + prefixLen
 					# HACK HACK HACK
 				else:
-					origChangeRegion = contentString[prefixLen:-suffixLen]
-					newChangeRegion = newContentString[prefixLen:-suffixLen]
+					# Cannot simply use contentString[prefixLen:-suffixLen], since suffixLen may be 0
+					origChangeRegion = contentString[prefixLen:len(contentString)-suffixLen]
+					newChangeRegion = newContentString[prefixLen:len(newContentString)-suffixLen]
 					matcher = difflib.SequenceMatcher( lambda x: x in ' \t', origChangeRegion, newChangeRegion )
 					opcodes = matcher.get_opcodes()
 					for tag, i1, i2, j1, j2 in matcher.get_opcodes():
@@ -534,15 +535,15 @@ class _NodeElementChangeListener (DVNode.NodeElementChangeListener):
 				
 				newIndex = newPosition  +  ( 1  if newBias == Marker.Bias.END  else  0 )
 				
-				#if bias == Marker.Bias.START:
-					#print contentString[:oldIndex].replace( '\n', '\\n' ) + '>|' + contentString[oldIndex:].replace( '\n', '\\n' )
-				#else:
-					#print contentString[:oldIndex].replace( '\n', '\\n' ) + '|<' + contentString[oldIndex:].replace( '\n', '\\n' )
+				if bias == Marker.Bias.START:
+					print contentString[:oldIndex].replace( '\n', '\\n' ) + '>|' + contentString[oldIndex:].replace( '\n', '\\n' )
+				else:
+					print contentString[:oldIndex].replace( '\n', '\\n' ) + '|<' + contentString[oldIndex:].replace( '\n', '\\n' )
 
-				#if bias == Marker.Bias.START:
-					#print newContentString[:newIndex].replace( '\n', '\\n' ) + '>|' + newContentString[newIndex:].replace( '\n', '\\n' )
-				#else:
-					#print newContentString[:newIndex].replace( '\n', '\\n' ) + '|<' + newContentString[newIndex:].replace( '\n', '\\n' )
+				if bias == Marker.Bias.START:
+					print newContentString[:newIndex].replace( '\n', '\\n' ) + '>|' + newContentString[newIndex:].replace( '\n', '\\n' )
+				else:
+					print newContentString[:newIndex].replace( '\n', '\\n' ) + '|<' + newContentString[newIndex:].replace( '\n', '\\n' )
 				
 				newPosition = max( 0, newPosition )
 				if newPosition >= elementContent.getContentLength():

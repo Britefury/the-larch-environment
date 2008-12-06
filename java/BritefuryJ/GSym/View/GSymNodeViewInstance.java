@@ -43,6 +43,8 @@ import BritefuryJ.DocTree.DocTreeNode;
 import BritefuryJ.DocView.DVNode;
 import BritefuryJ.DocView.DocView;
 import BritefuryJ.GSym.View.ListView.ListViewLayout;
+import BritefuryJ.GSym.View.ListView.PySeparatorElementFactory;
+import BritefuryJ.GSym.View.ListView.SeparatorElementFactory;
 
 public class GSymNodeViewInstance
 {
@@ -222,14 +224,14 @@ public class GSymNodeViewInstance
 	}
 	
 
-	public Element listView(ListViewLayout layout, ElementFactory beginDelim, ElementFactory endDelim, ElementFactory separator, List<Element> children)
+	public Element listView(ListViewLayout layout, ElementFactory beginDelim, ElementFactory endDelim, SeparatorElementFactory separator, List<Element> children)
 	{
 		return layout.createListElement( children, beginDelim, endDelim, separator );
 	}
 	
 	public Element listView(ListViewLayout layout, PyObject beginDelim, PyObject endDelim, PyObject separator, List<Element> children)
 	{
-		return layout.createListElement( children, PyElementFactory.pyToElementFactory( beginDelim ), PyElementFactory.pyToElementFactory( endDelim ), PyElementFactory.pyToElementFactory( separator ) );
+		return layout.createListElement( children, PyElementFactory.pyToElementFactory( beginDelim ), PyElementFactory.pyToElementFactory( endDelim ), PySeparatorElementFactory.pyToSeparatorElementFactory( separator ) );
 	}
 	
 	

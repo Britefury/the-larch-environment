@@ -40,7 +40,7 @@ public class ParagraphListViewLayout extends ListViewLayout
 	}
 	
 	
-	public Element createListElement(List<Element> children, ElementFactory beginDelim, ElementFactory endDelim, ElementFactory separator)
+	public Element createListElement(List<Element> children, ElementFactory beginDelim, ElementFactory endDelim, SeparatorElementFactory separator)
 	{
 		ParagraphElement paragraph = new ParagraphElement( styleSheet );
 		
@@ -56,10 +56,11 @@ public class ParagraphListViewLayout extends ListViewLayout
 		{
 			for (int i = 0; i < children.size() - 1; i++)
 			{
-				childElems.add( children.get( i ) );
+				Element child = children.get( i );
+				childElems.add( child );
 				if ( separator != null )
 				{
-					childElems.add( separator.createElement() );
+					childElems.add( separator.createElement( i, child ) );
 				}
 				LineBreakElement lineBreak = new LineBreakElement( lineBreakPriority );
 				if ( spacingFactory != null )
@@ -69,13 +70,14 @@ public class ParagraphListViewLayout extends ListViewLayout
 				childElems.add( lineBreak );
 			}
 
-			childElems.add( children.get( children.size() - 1 ) );
+			Element lastChild = children.get( children.size() - 1 );
+			childElems.add( lastChild );
 			
 			if ( trailingSeparatorRequired( children, trailingSeparator ) )
 			{
 				if ( separator != null )
 				{
-					childElems.add( separator.createElement() );
+					childElems.add( separator.createElement( children.size() - 1, lastChild ) );
 				}
 			}
 		}
