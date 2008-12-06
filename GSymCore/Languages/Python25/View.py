@@ -44,7 +44,21 @@ class _TextFactory (object):
 		return self.ctx.text( self.style, self.text )
 
 
-class _CommaFactory (_TextFactory):
+
+class _TextSeparatorFactory (object):
+	__slots__ = [ 'ctx' ]
+	
+	style = default_textStyle
+	text = ''
+	
+	def __init__(self, ctx):
+		self.ctx = ctx
+
+	def __call__(self, index, child):
+		return self.ctx.text( self.style, self.text )
+
+
+class _CommaFactory (_TextSeparatorFactory):
 	style = punctuation_textStyle
 	text = ','
 	
@@ -285,7 +299,7 @@ def python25ViewState(outerPrecedence, parser=Parser.expression, mode=MODE_DISPL
 
 def suiteView(ctx, suite):
 	lineViews = ctx.mapViewEvalFn( suite, None, python25ViewState( PRECEDENCE_NONE, Parser.statement, MODE_EDITSTATEMENT ) )
-	newLineFac = lambda: ctx.whitespace( '\n' )
+	newLineFac = lambda index, child: ctx.whitespace( '\n' )
 	return ctx.listView( suite_listViewLayout, None, None, newLineFac, lineViews )
 
 
@@ -387,7 +401,7 @@ class Python25View (GSymView):
 	# MISC
 	def python25Module(self, ctx, state, node, *content):
 		lineViews = ctx.mapViewEvalFn( content, None, python25ViewState( PRECEDENCE_NONE, Parser.statement, MODE_EDITSTATEMENT ) )
-		newLineFac = lambda: ctx.whitespace( '\n' )
+		newLineFac = lambda index, child: ctx.whitespace( '\n' )
 		return ctx.listView( module_listViewLayout, None, None, newLineFac, lineViews )
 
 

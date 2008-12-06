@@ -16,12 +16,12 @@ public abstract class ListViewLayout
 	public enum TrailingSeparator { NEVER, ONE_ELEMENT, ALWAYS };
 	
 
-	public abstract Element createListElement(List<Element> children, ElementFactory beginDelim, ElementFactory endDelim, ElementFactory separator);
+	public abstract Element createListElement(List<Element> children, ElementFactory beginDelim, ElementFactory endDelim, SeparatorElementFactory separator);
 	
 	
 	
 	protected boolean trailingSeparatorRequired(List<Element> children, TrailingSeparator trailingSeparator)
 	{
-		return trailingSeparator == TrailingSeparator.ALWAYS  ||  ( trailingSeparator == TrailingSeparator.ONE_ELEMENT && children.size() == 1 );
+		return children.size() > 0  &&  ( trailingSeparator == TrailingSeparator.ALWAYS  ||  ( trailingSeparator == TrailingSeparator.ONE_ELEMENT && children.size() == 1 ) );
 	}
 }

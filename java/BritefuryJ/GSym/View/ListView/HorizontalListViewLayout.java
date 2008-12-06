@@ -38,7 +38,7 @@ public class HorizontalListViewLayout extends ListViewLayout
 
 		
 		
-	public Element createListElement(List<Element> children, ElementFactory beginDelim, ElementFactory endDelim, ElementFactory separator)
+	public Element createListElement(List<Element> children, ElementFactory beginDelim, ElementFactory endDelim, SeparatorElementFactory separator)
 	{
 		HBoxElement hbox = new HBoxElement( styleSheet );
 		
@@ -54,10 +54,11 @@ public class HorizontalListViewLayout extends ListViewLayout
 		{
 			for (int i = 0; i < children.size() - 1; i++)
 			{
-				childElems.add( children.get( i ) );
+				Element child = children.get( i );
+				childElems.add( child );
 				if ( separator != null )
 				{
-					childElems.add( separator.createElement() );
+					childElems.add( separator.createElement( i, child ) );
 				}
 				if ( spacingFactory != null )
 				{
@@ -65,13 +66,14 @@ public class HorizontalListViewLayout extends ListViewLayout
 				}
 			}
 
-			childElems.add( children.get( children.size() - 1 ) );
+			Element lastChild = children.get( children.size() - 1 );
+			childElems.add( lastChild );
 			
 			if ( trailingSeparatorRequired( children, trailingSeparator ) )
 			{
 				if ( separator != null )
 				{
-					childElems.add( separator.createElement() );
+					childElems.add( separator.createElement( children.size() - 1, lastChild ) );
 				}
 			}
 		}

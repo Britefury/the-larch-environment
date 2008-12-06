@@ -187,16 +187,17 @@ public class TextVisual
 	public void drawCaretAtEnd(Graphics2D graphics)
 	{
 		refreshLayout();
-		double x = layout.getBounds().getWidth();
-		double h = 0.0;
+		double x = 0.0, h = 0.0;
 		if ( layout != null )
 		{
+			x = layout.getBounds().getWidth();
 			h = layout.getBounds().getHeight();
 		}
 		else
 		{
 			FontRenderContext frc = graphics.getFontRenderContext();
 			LineMetrics lineMetrics = styleSheet.getFont().getLineMetrics( "", frc );
+			x = 0.0;
 			h = lineMetrics.getAscent() + lineMetrics.getDescent();
 		}
 		graphics.draw( new Line2D.Double( x, 0.0, x, h ) );

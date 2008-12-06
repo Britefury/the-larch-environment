@@ -29,6 +29,7 @@ import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 import BritefuryJ.GSym.View.ListView.HorizontalListViewLayout;
 import BritefuryJ.GSym.View.ListView.ListViewLayout;
 import BritefuryJ.GSym.View.ListView.ParagraphListViewLayout;
+import BritefuryJ.GSym.View.ListView.SeparatorElementFactory;
 import BritefuryJ.GSym.View.ListView.VerticalInlineListViewLayout;
 import BritefuryJ.GSym.View.ListView.VerticalListViewLayout;
 
@@ -64,6 +65,24 @@ public class ListViewTest
 		}
 	}
 	
+	static class TextSeparatorElementFactory implements SeparatorElementFactory
+	{
+		String text;
+		TextStyleSheet styleSheet;
+		
+		public TextSeparatorElementFactory(String text, TextStyleSheet styleSheet)
+		{
+			this.text = text;
+			this.styleSheet = styleSheet;
+		}
+		
+		
+		public Element createElement(int index, Element child)
+		{
+			return new TextElement( styleSheet, text );
+		}
+	}
+	
 	static class SpacingElementFactory implements ElementFactory
 	{
 		double spacing;
@@ -92,7 +111,7 @@ public class ListViewTest
 		{
 			children[i] = new TextElement( s1, txt[i] );
 		}
-		Element ls = layout.createListElement( Arrays.asList( children ), new TextElementFactory( beginDelim, s2 ), new TextElementFactory( endDelim, s2 ), new TextElementFactory( separator, s2 ) );
+		Element ls = layout.createListElement( Arrays.asList( children ), new TextElementFactory( beginDelim, s2 ), new TextElementFactory( endDelim, s2 ), new TextSeparatorElementFactory( separator, s2 ) );
 		
 		
 		Element titleElem = new TextElement( s0, title );

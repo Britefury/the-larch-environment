@@ -37,10 +37,10 @@ list_listViewLayout = ParagraphListViewLayout( python_paragraphStyle, lambda: Te
 dict_listViewLayout = ParagraphListViewLayout( python_paragraphStyle, lambda: TextElement( default_textStyle, ' ' ), 0, ListViewLayout.TrailingSeparator.NEVER )
 
 module_listViewLayout = VerticalListViewLayout( VBoxStyleSheet( DPVBox.Typesetting.ALIGN_WITH_TOP, DPVBox.Alignment.EXPAND, 0.0, False, 0.0 ), \
-						ParagraphStyleSheet(), 0.0, ListViewLayout.TrailingSeparator.NEVER )
+						ParagraphStyleSheet(), 0.0, ListViewLayout.TrailingSeparator.ALWAYS )
 
 suite_listViewLayout = VerticalListViewLayout( VBoxStyleSheet( DPVBox.Typesetting.ALIGN_WITH_TOP, DPVBox.Alignment.EXPAND, 0.0, False, 0.0 ), \
-						ParagraphStyleSheet(), 0.0, ListViewLayout.TrailingSeparator.NEVER )
+						ParagraphStyleSheet(), 0.0, ListViewLayout.TrailingSeparator.ALWAYS )
 
 python_segmentCaretStopFactory = SegmentElement.EmptyTextElementStopFactory( default_textStyle )
 
