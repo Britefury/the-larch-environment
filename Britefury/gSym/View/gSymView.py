@@ -535,15 +535,15 @@ class _NodeElementChangeListener (DVNode.NodeElementChangeListener):
 				
 				newIndex = newPosition  +  ( 1  if newBias == Marker.Bias.END  else  0 )
 				
-				if bias == Marker.Bias.START:
-					print contentString[:oldIndex].replace( '\n', '\\n' ) + '>|' + contentString[oldIndex:].replace( '\n', '\\n' )
-				else:
-					print contentString[:oldIndex].replace( '\n', '\\n' ) + '|<' + contentString[oldIndex:].replace( '\n', '\\n' )
+				#if bias == Marker.Bias.START:
+					#print contentString[:oldIndex].replace( '\n', '\\n' ) + '>|' + contentString[oldIndex:].replace( '\n', '\\n' )
+				#else:
+					#print contentString[:oldIndex].replace( '\n', '\\n' ) + '|<' + contentString[oldIndex:].replace( '\n', '\\n' )
 
-				if bias == Marker.Bias.START:
-					print newContentString[:newIndex].replace( '\n', '\\n' ) + '>|' + newContentString[newIndex:].replace( '\n', '\\n' )
-				else:
-					print newContentString[:newIndex].replace( '\n', '\\n' ) + '|<' + newContentString[newIndex:].replace( '\n', '\\n' )
+				#if bias == Marker.Bias.START:
+					#print newContentString[:newIndex].replace( '\n', '\\n' ) + '>|' + newContentString[newIndex:].replace( '\n', '\\n' )
+				#else:
+					#print newContentString[:newIndex].replace( '\n', '\\n' ) + '|<' + newContentString[newIndex:].replace( '\n', '\\n' )
 				
 				newPosition = max( 0, newPosition )
 				if newPosition >= elementContent.getContentLength():
