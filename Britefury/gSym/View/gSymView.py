@@ -33,9 +33,11 @@ from BritefuryJ.GSym.View import StringDiff
 
 from Britefury.Util.NodeUtil import isListNode, nodeToSXString
 
+from Britefury.Dispatch.Dispatch import DispatchError
 from Britefury.Dispatch.MethodDispatch import methodDispatch
 
 from Britefury.gSym.View import ListView
+from Britefury.gSym.View.gSymStyles import viewError_textStyle
 
 #from Britefury.DocTree.DocTree import DocTree
 #from Britefury.DocTree.DocTreeNode import DocTreeNode
@@ -608,7 +610,10 @@ class _NodeElementChangeListener (DVNode.NodeElementChangeListener):
 		
 class GSymView (object):
 	def __call__(self, xs, ctx, state):
-		return methodDispatch( self, xs, ctx, state )
+		try:
+			return methodDispatch( self, xs, ctx, state )
+		except DispatchError:
+			return ctx.text( viewError_textStyle, '<<ERROR>>' )
 	
 		
 		

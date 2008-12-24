@@ -30,6 +30,7 @@ _parser = LispGrammar()
 def _parseText(text):
 	res = _parser.expression().parseString( text )
 	if res.isValid():
+		pos = res.getEnd()
 		if pos == len( text ):
 			return res.getValue()
 		else:

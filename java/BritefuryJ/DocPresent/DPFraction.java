@@ -428,7 +428,9 @@ public class DPFraction extends DPContainer
 		
 		if ( children[BAR] != null )
 		{
-			double childWidth = Math.min( Math.max( children[NUMERATOR].prefH.width, children[DENOMINATOR].prefH.width ) + padding * 2.0, allocation );
+			double numeratorWidth = children[NUMERATOR] != null  ?  children[NUMERATOR].prefH.width  :  0.0;
+			double denominatorWidth = children[DENOMINATOR] != null  ?  children[DENOMINATOR].prefH.width  :  0.0;
+			double childWidth = Math.min( Math.max( numeratorWidth, denominatorWidth ) + padding * 2.0, allocation );
 			allocateChildX( children[BAR], 0.0, childWidth );
 		}
 		

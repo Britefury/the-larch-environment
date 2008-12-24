@@ -12,7 +12,7 @@ class DispatchError (Exception):
 	pass
 
 
-class DispatchDataError (Exception):
+class DispatchDataError (DispatchError):
 	pass
 
 
