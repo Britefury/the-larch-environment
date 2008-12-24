@@ -755,6 +755,12 @@ class TestCase_Python25Parser (ParserTestCase):
 		
 		
 		
+	def testCompoundExpr(self):
+		self._matchTest( statement, 'q.f()', [ 'call', [ 'attributeRef', [ 'var', 'q' ], 'f' ] ] )
+		self._matchTest( statement, 'q.f().h()', [ 'call', [ 'attributeRef', [ 'call', [ 'attributeRef', [ 'var', 'q' ], 'f' ] ], 'h' ] ] )
+		
+		
+		
 	def testAssertStmt(self):
 		self._matchTest( statement, 'assert x', [ 'assertStmt', [ 'var', 'x' ], makeNullNode() ] )
 		self._matchTest( statement, 'assert x,y', [ 'assertStmt', [ 'var', 'x' ], [ 'var', 'y' ] ] )

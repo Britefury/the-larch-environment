@@ -103,6 +103,8 @@ class ParserState
 		debugStack = null;
 	}
 	
+
+	
 	
 	
 	@SuppressWarnings("unchecked")
@@ -171,10 +173,12 @@ class ParserState
 	}
 	
 	
+	@SuppressWarnings("unchecked")
 	private MemoEntry recall(ParserExpression rule, Object input, int start, int stop)
 	{
 		// Get the memo-entry from the memo table
-		HashMap<ParserExpression, MemoEntry> posMemo = memo.get( new Integer( start ) );
+		Integer iStart = new Integer( start );
+		HashMap<ParserExpression, MemoEntry> posMemo = memo.get( iStart );
 		MemoEntry memoEntry = null;
 		
 		if ( posMemo != null )
@@ -200,12 +204,37 @@ class ParserState
 			
 			if ( bInEvalSet )
 			{
+				HashMap<ParserExpression, MemoEntry> posMemoCopy = (HashMap<ParserExpression, MemoEntry>)posMemo.clone();
+
+				
 				// Create a rule invocation record, and push onto the rule invocation stack
 				ruleInvocationStack = new RuleInvocation( rule, memoEntry, ruleInvocationStack );
 				memoEntry.bEvaluating = true;
 				// Just evaluate it, and fill in the memo entry with the new values
-				ParseResult res = rule.evaluateString( this, (String)input, start, stop );
-				memoEntry.answer = res;
+				ParseResult answer = rule.evaluateString( this, (String)input, start, stop );
+				
+				
+				// In the case where there is overlapping recursion, where rule A is recursive, and invokes rule B (which invokes A, making A recursive), which is also recursive,
+				// for example, rule A is 'attributeRef', rule B is 'primary':
+				// 	primary -> attributeRef | call | subscript | atom
+				// 	attributeRef -> primary '.' name
+				// 	call -> primary '(' ')'
+				// 	subscript -> primary '[' index ']'
+				// say we are parsing the text: 'a.p().q()
+				// Everything up to the last '()' should be consumed
+				// When the system attempts to 'grow' the parse for rule attributeRef by repeating it, the results of a previous invokation of 'primary' are still in the memo, so
+				// this would prevent it from attempting to grow 'primary' resulting in an incomplete parse. (just 'a.p')
+				// This will ensure that parse growth is attempted in these situations
+				if ( memoEntry.bLeftRecursionDetected )
+				{
+					// Grow the left recursive parse
+					answer = growLeftRecursiveParse( rule, input, start, stop, memoEntry, answer );
+					// Restore the memo
+					memo.put( iStart, posMemoCopy );
+				}
+				
+				
+				memoEntry.answer = answer;
 				// Pop the rule invocation off the rule invocation stack
 				ruleInvocationStack = ruleInvocationStack.outerInvocation;
 				memoEntry.bEvaluating = false;
