@@ -58,10 +58,28 @@ public class ElementMarker
 		}
 		else
 		{
-			BranchElement b = (BranchElement)subtreeRoot;
-			if ( element != null  &&  element.isInSubtreeRootedAt( b ) )
+			if ( subtreeRoot instanceof BranchElement )
 			{
-				return getPosition() + element.getContentOffsetInSubtree( b );
+				BranchElement b = (BranchElement)subtreeRoot;
+				if ( element != null  &&  element.isInSubtreeRootedAt( b ) )
+				{
+					return getPosition() + element.getContentOffsetInSubtree( b );
+				}
+				else
+				{
+					throw new DPWidget.IsNotInSubtreeException();
+				}
+			}
+			else if ( subtreeRoot instanceof LeafElement )
+			{
+				if ( element != null  &&  element == subtreeRoot )
+				{
+					return getPosition();
+				}
+				else
+				{
+					throw new DPWidget.IsNotInSubtreeException();
+				}
 			}
 			else
 			{

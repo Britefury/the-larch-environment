@@ -83,7 +83,7 @@ public class VerticalInlineListViewLayout extends IndentedListViewLayout
 			Element first = null;
 			if ( beginDelim != null  ||  separator != null )
 			{
-				first = new ParagraphElement( lineParagraphStyleSheet );
+				ParagraphElement firstPara = new ParagraphElement( lineParagraphStyleSheet );
 				Element child = children.get( 0 );
 				ArrayList<Element> firstChildElems = new ArrayList<Element>();
 				firstChildElems.ensureCapacity( 3 );
@@ -96,6 +96,8 @@ public class VerticalInlineListViewLayout extends IndentedListViewLayout
 				{
 					firstChildElems.add( separator.createElement( 0, child ) );
 				}
+				firstPara.setChildren( firstChildElems );
+				first = firstPara;
 			}
 			else
 			{

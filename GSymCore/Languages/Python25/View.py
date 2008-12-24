@@ -760,17 +760,17 @@ class Python25View (GSymView):
 
 
 	def invert(self, ctx, state, node, x):
-		return paragraphPrefixOpView( ctx, state, node, x, '~', PRECEDENCE_INVERT_NEGATE_POS, self._parser._expression() )
+		return paragraphPrefixOpView( ctx, state, node, x, '~', PRECEDENCE_INVERT_NEGATE_POS, self._parser.expression() )
 
 	def negate(self, ctx, state, node, x):
-		return paragraphPrefixOpView( ctx, state, node, x, '-', PRECEDENCE_INVERT_NEGATE_POS, self._parser._expression() )
+		return paragraphPrefixOpView( ctx, state, node, x, '-', PRECEDENCE_INVERT_NEGATE_POS, self._parser.expression() )
 
 	def pos(self, ctx, state, node, x):
-		return paragraphPrefixOpView( ctx, state, node, x, '+', PRECEDENCE_INVERT_NEGATE_POS, self._parser._expression() )
+		return paragraphPrefixOpView( ctx, state, node, x, '+', PRECEDENCE_INVERT_NEGATE_POS, self._parser.expression() )
 
 
 	def mul(self, ctx, state, node, x, y):
-		return paragraphBinOpView( ctx, state, node, x, y, '*', PRECEDENCE_MULDIVMOD, False, self._parser._expression() )
+		return paragraphBinOpView( ctx, state, node, x, y, '*', PRECEDENCE_MULDIVMOD, False, self._parser.expression() )
 
 	def div(self, ctx, state, node, x, y):
 		xPrec, yPrec = computeBinOpViewPrecedenceValues( PRECEDENCE_MULDIVMOD, False )
@@ -782,73 +782,73 @@ class Python25View (GSymView):
 				   state )
 
 	def mod(self, ctx, state, node, x, y):
-		return paragraphBinOpView( ctx, state, node, x, y, '%', PRECEDENCE_MULDIVMOD, False, self._parser._expression() )
+		return paragraphBinOpView( ctx, state, node, x, y, '%', PRECEDENCE_MULDIVMOD, False, self._parser.expression() )
 
 	
 	def add(self, ctx, state, node, x, y):
-		return paragraphBinOpView( ctx, state, node, x, y, '+', PRECEDENCE_ADDSUB, False, self._parser._expression() )
+		return paragraphBinOpView( ctx, state, node, x, y, '+', PRECEDENCE_ADDSUB, False, self._parser.expression() )
 
 	def sub(self, ctx, state, node, x, y):
-		return paragraphBinOpView( ctx, state, node, x, y, '-', PRECEDENCE_ADDSUB, False, self._parser._expression() )
+		return paragraphBinOpView( ctx, state, node, x, y, '-', PRECEDENCE_ADDSUB, False, self._parser.expression() )
 
 
 	def lshift(self, ctx, state, node, x, y):
-		return paragraphBinOpView( ctx, state, node, x, y, '<<', PRECEDENCE_SHIFT, False, self._parser._expression() )
+		return paragraphBinOpView( ctx, state, node, x, y, '<<', PRECEDENCE_SHIFT, False, self._parser.expression() )
 
 	def rshift(self, ctx, state, node, x, y):
-		return paragraphBinOpView( ctx, state, node, x, y, '>>', PRECEDENCE_SHIFT, False, self._parser._expression() )
+		return paragraphBinOpView( ctx, state, node, x, y, '>>', PRECEDENCE_SHIFT, False, self._parser.expression() )
 
 
 	def bitAnd(self, ctx, state, node, x, y):
-		return paragraphBinOpView( ctx, state, node, x, y, '&', PRECEDENCE_BITAND, False, self._parser._expression() )
+		return paragraphBinOpView( ctx, state, node, x, y, '&', PRECEDENCE_BITAND, False, self._parser.expression() )
 
 	def bitXor(self, ctx, state, node, x, y):
-		return paragraphBinOpView( ctx, state, node, x, y, '^', PRECEDENCE_BITXOR, False, self._parser._expression() )
+		return paragraphBinOpView( ctx, state, node, x, y, '^', PRECEDENCE_BITXOR, False, self._parser.expression() )
 
 	def bitOr(self, ctx, state, node, x, y):
-		return paragraphBinOpView( ctx, state, node, x, y, '|', PRECEDENCE_BITOR, False, self._parser._expression() )
+		return paragraphBinOpView( ctx, state, node, x, y, '|', PRECEDENCE_BITOR, False, self._parser.expression() )
 
 
 	def lte(self, ctx, state, node, x, y):
-		return paragraphBinOpView( ctx, state, node, x, y, '<=', PRECEDENCE_CMP, False, self._parser._expression() )
+		return paragraphBinOpView( ctx, state, node, x, y, '<=', PRECEDENCE_CMP, False, self._parser.expression() )
 
 	def lt(self, ctx, state, node, x, y):
-		return paragraphBinOpView( ctx, state, node, x, y, '<', PRECEDENCE_CMP, False, self._parser._expression() )
+		return paragraphBinOpView( ctx, state, node, x, y, '<', PRECEDENCE_CMP, False, self._parser.expression() )
 
 	def gte(self, ctx, state, node, x, y):
-		return paragraphBinOpView( ctx, state, node, x, y, '>=', PRECEDENCE_CMP, False, self._parser._expression() )
+		return paragraphBinOpView( ctx, state, node, x, y, '>=', PRECEDENCE_CMP, False, self._parser.expression() )
 
 	def gt(self, ctx, state, node, x, y):
-		return paragraphBinOpView( ctx, state, node, x, y, '>', PRECEDENCE_CMP, False, self._parser._expression() )
+		return paragraphBinOpView( ctx, state, node, x, y, '>', PRECEDENCE_CMP, False, self._parser.expression() )
 
 	def eq(self, ctx, state, node, x, y):
-		return paragraphBinOpView( ctx, state, node, x, y, '==', PRECEDENCE_CMP, False, self._parser._expression() )
+		return paragraphBinOpView( ctx, state, node, x, y, '==', PRECEDENCE_CMP, False, self._parser.expression() )
 
 	def neq(self, ctx, state, node, x, y):
-		return paragraphBinOpView( ctx, state, node, x, y, '!=', PRECEDENCE_CMP, False, self._parser._expression() )
+		return paragraphBinOpView( ctx, state, node, x, y, '!=', PRECEDENCE_CMP, False, self._parser.expression() )
 
 
 	def isNotTest(self, ctx, state, node, x, y):
-		return paragraphBinOpView( ctx, state, node, x, y, 'is not', PRECEDENCE_IS, False, self._parser._expression() )
+		return paragraphBinOpView( ctx, state, node, x, y, 'is not', PRECEDENCE_IS, False, self._parser.expression() )
 
 	def isTest(self, ctx, state, node, x, y):
-		return paragraphBinOpView( ctx, state, node, x, y, 'is', PRECEDENCE_IS, False, self._parser._expression() )
+		return paragraphBinOpView( ctx, state, node, x, y, 'is', PRECEDENCE_IS, False, self._parser.expression() )
 
 	def notInTest(self, ctx, state, node, x, y):
-		return paragraphBinOpView( ctx, state, node, x, y, 'not in', PRECEDENCE_IN, False, self._parser._expression() )
+		return paragraphBinOpView( ctx, state, node, x, y, 'not in', PRECEDENCE_IN, False, self._parser.expression() )
 
 	def inTest(self, ctx, state, node, x, y):
-		return paragraphBinOpView( ctx, state, node, x, y, 'in', PRECEDENCE_IN, False, self._parser._expression() )
+		return paragraphBinOpView( ctx, state, node, x, y, 'in', PRECEDENCE_IN, False, self._parser.expression() )
 
 
 	def notTest(self, ctx, state, node, x):
-		return paragraphPrefixOpView( ctx, state, node, x, 'not ', PRECEDENCE_NOT, self._parser._expression() )
+		return paragraphPrefixOpView( ctx, state, node, x, 'not ', PRECEDENCE_NOT, self._parser.expression() )
 
 	def andTest(self, ctx, state, node, x, y):
-		return paragraphBinOpView( ctx, state, node, x, y, 'and', PRECEDENCE_AND, False, self._parser._expression() )
+		return paragraphBinOpView( ctx, state, node, x, y, 'and', PRECEDENCE_AND, False, self._parser.expression() )
 
 	def orTest(self, ctx, state, node, x, y):
-		return paragraphBinOpView( ctx, state, node, x, y, 'or', PRECEDENCE_OR, False, self._parser._expression() )
+		return paragraphBinOpView( ctx, state, node, x, y, 'or', PRECEDENCE_OR, False, self._parser.expression() )
 
 
 
