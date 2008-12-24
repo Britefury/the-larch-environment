@@ -19,19 +19,17 @@ from BritefuryJ.DocPresent.ElementTree import *
 from BritefuryJ.GSym.View.ListView import ParagraphListViewLayout, HorizontalListViewLayout, VerticalInlineListViewLayout, VerticalListViewLayout
 
 
-from GSymCore.Languages.LISP.Parser2 import LispGrammar
+from GSymCore.Languages.LISP import Parser
 from GSymCore.Languages.LISP.Styles import *
 
 
 
-_parser = LispGrammar()
-
 
 def _parseText(text):
-	res = _parser.expression().parseString( text )
-	if res.isValid():
+	res, pos = Parser.parser.parseString( text )
+	if res is not None:
 		if pos == len( text ):
-			return res.getValue()
+			return res.result
 		else:
 			print '<INCOMPLETE>'
 			print 'FULL TEXT:', text
@@ -66,11 +64,11 @@ def nodeEditor(ctx, node, contents, state):
 
 
 def stringNodeEditor(ctx, node, metadata, state):
-	res = _parser.unquotedString().parseString( node.toString() )
-	if res.isValid():
-		nodeText = node.toString()
-	else:
+	res, pos = Parser.unquotedString.parseString( node.toString() )
+	if res is None:
 		nodeText = repr( node.toString() )
+	else:
+		nodeText = node.toString()
 	return ctx.contentListener( ctx.text( string_textStyle, nodeText ), ParsedNodeContentListener( ctx, node ) )
 
 
