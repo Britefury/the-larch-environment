@@ -23,6 +23,7 @@ import GSymCore.Languages.Python25.Parser
 import GSymCore.Languages.Python25.Parser2
 import GSymCore.Languages.Python25.IdentityTransformation
 import GSymCore.Languages.Java.Parser
+import GSymCore.Languages.LISP.Parser2
 
 
 testModules = [ Britefury.Dispatch.MethodDispatch, Britefury.Dispatch.Dispatch,
@@ -30,7 +31,8 @@ testModules = [ Britefury.Dispatch.MethodDispatch, Britefury.Dispatch.Dispatch,
 		Britefury.Tests.BritefuryJ.Parser.Utils.Operators, Britefury.Tests.BritefuryJ.PatternMatch.Test_PatternMatcher,
 		Britefury.Tests.Britefury.Grammar.Grammar,
 		GSymCore.Languages.Python25.CodeGenerator, GSymCore.Languages.Python25.Parser, GSymCore.Languages.Python25.Parser2, GSymCore.Languages.Python25.IdentityTransformation,
-		GSymCore.Languages.Java.Parser ]
+		GSymCore.Languages.Java.Parser,
+		GSymCore.Languages.LISP.Parser2 ]
 
 
 if __name__ == '__main__':
