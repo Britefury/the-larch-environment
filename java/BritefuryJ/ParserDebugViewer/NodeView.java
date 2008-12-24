@@ -318,12 +318,13 @@ public class NodeView
 		
 		if ( result.isValid() )
 		{
-			String value = result.getValue().toString();
-			if ( value.length() > MAX_STRING_LENGTH )
+			Object value = result.getValue();
+			String valueString = value == null  ?  "<null>"  :  value.toString();
+			if ( valueString.length() > MAX_STRING_LENGTH )
 			{
-				value = value.substring( 0, MAX_STRING_LENGTH )  +  "...";
+				valueString = valueString.substring( 0, MAX_STRING_LENGTH )  +  "...";
 			}
-			return new DPText( valueStyle, value );
+			return new DPText( valueStyle, valueString );
 		}
 		else
 		{
