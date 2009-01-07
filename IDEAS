@@ -178,3 +178,24 @@ These bindings would be very helpful for creating compilers.
 29/Nov/2008
 Gregor Kiczales worked on Intentional Programming. He is at the University of British Columbia.
 http://www.cs.ubc.ca/~gregor/
+
+
+
+
+07/Jav/2009
+Design of Lenses, for projection.
+Due to performance considerations, the a lens will maintain two documents, one which is the source document, the other
+which is the projected document, called S and P.
+Two lens functions are supplied, f, and fInv. They transform a node from a document (Ns is a source document node, Np is a
+projected document node) in one direction. f transforms Ns to Np, and fInv transforms Np to Ns.
+A lens function must:
+    - transform a node or return a copy of the node
+    - a lens function is defined as:
+        function(subtreeFunction, fallbackFunction, node) -> node'
+            subtreeFunction - should be applied to subtree nodes; subtreeFunction()   (subtreeFunction will have values for subtreeFunction and fallbackFunction bound, it will also deal with update stuff)
+            fallbackFunction - when function cannot handle a node, it should be passed to fallbackFunction; fallBackFunction(node)   (fallBackFunction will have values for subtreeFunction and its own
+                    fallback bound)
+            node - the node to transform
+    
+        
+    
