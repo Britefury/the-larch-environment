@@ -182,7 +182,7 @@ http://www.cs.ubc.ca/~gregor/
 
 
 
-07/Jav/2009
+07/Jan/2009
 Design of Lenses, for projection.
 Due to performance considerations, the a lens will maintain two documents, one which is the source document, the other
 which is the projected document, called S and P.
@@ -199,3 +199,30 @@ A lens function must:
     
         
     
+09/Jan/2009
+On presenting code aside its documentation in an easy to read form.
+http://www.toolness.com/wp/?p=441
+
+
+
+12/Jan/2009
+Multi-touch GUIs
+Problem: The Jeff Han photo album demo; how to have one photo held down by a hand, at the same time as the other hand 'drags' the viewport, thereby moving
+the workspace contents independent of the photo.
+Dumb solution: Use some special interaction system to work out how to move the photo across the workspace, as the workspace moves underneath it.
+Better solution: When the user touches a photo, remove the constraints that pin the photo to the workspace, and replace them with constraints pinning it
+to the screen. Allow the user to move the photo. When the user lets go, remove the screen constraints, and replace with workspace constraints; move it
+from one 'space' to another.
+
+
+27/Jan/2009
+Smalltalk-esque system; some kind of live editor
+Perhaps an alternative style of Python editor.
+A gSym language definition editor.
+
+
+31/Jan/2009
+Several upcoming Java technologies worth watching:
+http://www.javaworld.com/javaworld/jw-01-2009/jw-01-client-side-roundtable.html
+- JWebPane: replacement for JEditorPane which uses Webkit to render HTML
+- MigLayout: UI Layout engine based that uses a DSL
