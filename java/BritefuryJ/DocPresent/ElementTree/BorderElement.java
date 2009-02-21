@@ -8,18 +8,29 @@
 package BritefuryJ.DocPresent.ElementTree;
 
 import BritefuryJ.DocPresent.DPBorder;
-import BritefuryJ.DocPresent.StyleSheets.BorderStyleSheet;
+import BritefuryJ.DocPresent.Border.Border;
+import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 
 public class BorderElement extends BinElement
 {
 	public BorderElement()
 	{
-		this( BorderStyleSheet.defaultStyleSheet );
+		super( new DPBorder() );
 	}
 	
-	public BorderElement(BorderStyleSheet styleSheet)
+	public BorderElement(Border border)
+	{
+		super( new DPBorder( border ) );
+	}
+	
+	public BorderElement(ContainerStyleSheet styleSheet)
 	{
 		super( new DPBorder( styleSheet ) );
+	}
+	
+	public BorderElement(Border border, ContainerStyleSheet styleSheet)
+	{
+		super( new DPBorder( border, styleSheet ) );
 	}
 	
 	

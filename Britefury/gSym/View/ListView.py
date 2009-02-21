@@ -9,6 +9,7 @@ from Britefury.DocView.DVNode import DVNode
 
 from BritefuryJ.DocPresent.ElementTree import *
 from BritefuryJ.DocPresent.StyleSheets import *
+from BritefuryJ.DocPresent.Border import *
 
 
 
@@ -124,12 +125,12 @@ class VerticalInlineListViewLayout (ListViewLayout):
 		super( VerticalInlineListViewLayout, self ).__init__()
 		self._vboxStyleSheet = vboxStyleSheet
 		self._lineParagraphStyleSheet = lineParagraphStyleSheet
-		self._borderStyleSheet = BorderStyleSheet( indentation, 0.0, 0.0, 0.0 )   if  indentation != 0.0   else   None
+		self._border = EmptyBorder( indentation, 0.0, 0.0, 0.0 )   if  indentation != 0.0   else   None
 		
 		
 	def _indent(self, x):
-		if self._borderStyleSheet is not None:
-			b = BorderElement( self._borderStyleSheet )
+		if self._border is not None:
+			b = BorderElement( self._border, None )
 			b.setChild( x )
 			return b
 		else:
@@ -203,12 +204,12 @@ class VerticalListViewLayout (ListViewLayout):
 		super( VerticalListViewLayout, self ).__init__()
 		self._vboxStyleSheet = vboxStyleSheet
 		self._lineParagraphStyleSheet = lineParagraphStyleSheet
-		self._borderStyleSheet = BorderStyleSheet( indentation, 0.0, 0.0, 0.0 )   if  indentation != 0.0   else   None
+		self._border = EmptyBorder( indentation, 0.0, 0.0, 0.0 )   if  indentation != 0.0   else   None
 		
 		
 	def _indent(self, x):
 		if self._borderStyleSheet is not None:
-			b = BorderElement( self._borderStyleSheet )
+			b = BorderElement( self._border, None )
 			b.setChild( x )
 			return b
 		else:

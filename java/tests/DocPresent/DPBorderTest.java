@@ -18,7 +18,8 @@ import BritefuryJ.DocPresent.DPHBox;
 import BritefuryJ.DocPresent.DPPresentationArea;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
-import BritefuryJ.DocPresent.StyleSheets.BorderStyleSheet;
+import BritefuryJ.DocPresent.Border.Border;
+import BritefuryJ.DocPresent.Border.EmptyBorder;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
@@ -69,8 +70,8 @@ public class DPBorderTest
 		b3.extend( c3 );
 		
 		
-		BorderStyleSheet borderStyle = new BorderStyleSheet( 20.0, 40.0, 60.0, 80.0, new Color( 0.75f, 0.75f, 1.0f ) );
-		DPBorder border = new DPBorder( borderStyle );
+		Border b = new EmptyBorder( 20.0, 40.0, 60.0, 80.0, new Color( 0.75f, 0.75f, 1.0f ) );
+		DPBorder border = new DPBorder( b );
 		border.setChild( b0 );
 		DPHBox hb = new DPHBox();
 		hb.append( border );

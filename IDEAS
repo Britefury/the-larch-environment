@@ -226,3 +226,12 @@ Several upcoming Java technologies worth watching:
 http://www.javaworld.com/javaworld/jw-01-2009/jw-01-client-side-roundtable.html
 - JWebPane: replacement for JEditorPane which uses Webkit to render HTML
 - MigLayout: UI Layout engine based that uses a DSL
+
+
+31/Jan/2009
+GWT (Google Web Toolkit) allows you to write Java client side code which is translated into Javascript.
+A RPC system allows you to call server methods from the client.
+
+
+31/Jan/2009
+SWT (Eclipse UI) has a Browser widget that embeds Gecko in Java. Javascript and Java can call one another.

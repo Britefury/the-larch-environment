@@ -21,9 +21,11 @@ import BritefuryJ.DocPresent.DPHBox;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.Border.Border;
+import BritefuryJ.DocPresent.Border.EmptyBorder;
+import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
-import BritefuryJ.DocPresent.StyleSheets.BorderStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
@@ -122,11 +124,12 @@ public class NodeView
 	static TextStyleSheet valueStyle = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 16 ), Color.black );
 	static TextStyleSheet failStyle = new TextStyleSheet( new Font( "Sans serif", Font.ITALIC, 16 ), new Color( 0.5f, 0.0f, 0.0f ) );
 	static HBoxStyleSheet titleTextHBoxStyle = new HBoxStyleSheet( DPHBox.Alignment.BASELINES, 10.0, false, 0.0 );
-	static VBoxStyleSheet titleSuccessVBoxStyle = new VBoxStyleSheet( DPVBox.Typesetting.NONE, DPVBox.Alignment.CENTRE, 0.0, false, 0.0, new Color( 0.85f, 0.95f, 0.85f ) );
-	static VBoxStyleSheet titleFailVBoxStyle = new VBoxStyleSheet( DPVBox.Typesetting.NONE, DPVBox.Alignment.CENTRE, 0.0, false, 0.0, new Color( 1.0f, 0.85f, 0.85f ) );
+	static VBoxStyleSheet titleVBoxStyle = new VBoxStyleSheet( DPVBox.Typesetting.NONE, DPVBox.Alignment.CENTRE, 0.0, false, 0.0 );
+	static Border titleSuccessBorder = new EmptyBorder( 0.0, 0.0, 0.0, 0.0, new Color( 0.85f, 0.95f, 0.85f ) );
+	static Border titleFailBorder = new EmptyBorder( 0.0, 0.0, 0.0, 0.0, new Color( 1.0f, 0.85f, 0.85f ) );
 	static VBoxStyleSheet contentVBoxStyle = new VBoxStyleSheet( DPVBox.Typesetting.NONE, DPVBox.Alignment.LEFT, 0.0, false, 0.0 );
 	static VBoxStyleSheet nodeVBoxStyle = new VBoxStyleSheet( DPVBox.Typesetting.NONE, DPVBox.Alignment.EXPAND, 0.0, false, 0.0 );
-	static BorderStyleSheet nodeBorderStyle = new BorderStyleSheet( 1.0, 1.0, 1.0, 1.0, Color.black );
+	static Border nodeBorder = new SolidBorder( 1.0, Color.black );
 	
 	static VBoxStyleSheet childrenVBoxStyle = new VBoxStyleSheet( DPVBox.Typesetting.NONE, DPVBox.Alignment.LEFT, 3.0, false, 3.0 );
 	static HBoxStyleSheet mainHBoxStyle = new HBoxStyleSheet( DPHBox.Alignment.CENTRE, 80.0, false, 0.0 );
@@ -257,13 +260,17 @@ public class NodeView
 	{
 		DPWidget titleWidget = makeTitleWidget( data );
 		
-		VBoxStyleSheet style = data.getResult().isValid()  ?  titleSuccessVBoxStyle  :  titleFailVBoxStyle;
-		
-		DPVBox titleBoxWidget = new DPVBox( style );
+		DPVBox titleBoxWidget = new DPVBox( titleVBoxStyle );
 		
 		DPWidget[] children = { titleWidget };
 		titleBoxWidget.setChildren( Arrays.asList( children ) );
-		return titleBoxWidget;
+		
+		
+		Border b = data.getResult().isValid()  ?  titleSuccessBorder  :  titleFailBorder;
+		DPBorder border = new DPBorder( b );
+		border.setChild( titleBoxWidget );
+		
+		return border;
 	}
 	
 	private DPWidget makeRangeWidget(DebugNode data)
@@ -356,7 +363,7 @@ public class NodeView
 		nodeBinWidget = new DPNodeBin( this );
 		nodeBinWidget.setChild( nodeBoxWidget );
 		
-		DPBorder nodeBorderWidget = new DPBorder( nodeBorderStyle );
+		DPBorder nodeBorderWidget = new DPBorder( nodeBorder );
 		nodeBorderWidget.setChild( nodeBinWidget );
 		
 		return nodeBorderWidget;

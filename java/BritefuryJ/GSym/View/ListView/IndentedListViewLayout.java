@@ -6,13 +6,14 @@
 //##************************
 package BritefuryJ.GSym.View.ListView;
 
+import BritefuryJ.DocPresent.Border.Border;
+import BritefuryJ.DocPresent.Border.EmptyBorder;
 import BritefuryJ.DocPresent.ElementTree.BorderElement;
 import BritefuryJ.DocPresent.ElementTree.Element;
-import BritefuryJ.DocPresent.StyleSheets.BorderStyleSheet;
 
 abstract class IndentedListViewLayout extends ListViewLayout
 {
-	private BorderStyleSheet indentationStyleSheet;
+	private Border indentationBorder;
 
 
 
@@ -20,20 +21,20 @@ abstract class IndentedListViewLayout extends ListViewLayout
 	{
 		if ( indentation == 0.0 )
 		{
-			indentationStyleSheet = null;
+			indentationBorder = null;
 		}
 		else
 		{
-			indentationStyleSheet = new BorderStyleSheet( indentation, 0.0, 0.0, 0.0 );
+			indentationBorder = new EmptyBorder( indentation, 0.0, 0.0, 0.0 );
 		}
 	}
 	
 	
 	protected Element indent(Element child)
 	{
-		if ( indentationStyleSheet != null )
+		if ( indentationBorder != null )
 		{
-			BorderElement indent = new BorderElement( indentationStyleSheet );
+			BorderElement indent = new BorderElement( indentationBorder );
 			indent.setChild( child );
 			return indent;
 		}

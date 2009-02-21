@@ -18,6 +18,7 @@ from BritefuryJ.Cell import *
 from BritefuryJ.DocPresent import *
 from BritefuryJ.DocPresent.ElementTree import *
 from BritefuryJ.DocPresent.StyleSheets import *
+from BritefuryJ.DocPresent.Border import *
 from BritefuryJ.DocPresent.Marker import *
 
 from BritefuryJ.DocTree import DocTree
@@ -147,8 +148,8 @@ def border(ctx, styleSheet, child):
 
 def indent(ctx, indentation, child):
 	viewNodeInstance = ctx
-	styleSheet = viewNodeInstance.viewInstance._indentationStyleSheet( indentation )
-	element = BorderElement( styleSheet )
+	border = viewNodeInstance.viewInstance._indentationBorder( indentation )
+	element = BorderElement( border, None )
 	_populateBin( viewNodeInstance, element, child )
 	return element
 
@@ -399,19 +400,19 @@ class _GSymViewInstance (object):
 		# self._p_buildDVNode is a factory that builds DVNode instances for document subtrees
 		self.view = DocView( self.tree, self.xs, RootInitialiser(), _NodeElementChangeListener() )
 		
-		self._indentationStyleSheets = {}
+		self._indentationBorders = {}
 		
 		self._nodeContentsFactories = {}
 		
 		
 		
-	def _indentationStyleSheet(self, indentation):
+	def _indentationBorder(self, indentation):
 		try:
-			return self._indentationStyleSheets[indentation]
+			return self._indentationBorders[indentation]
 		except KeyError:
-			styleSheet = BorderStyleSheet( indentation, 0.0, 0.0, 0.0 )
-			self._indentationStyleSheets[indentation] = styleSheet
-			return styleSheet
+			border = EmptyBorder( indentation, 0.0, 0.0, 0.0 )
+			self._indentationBorders[indentation] = border
+			return border
 	
 	
 		

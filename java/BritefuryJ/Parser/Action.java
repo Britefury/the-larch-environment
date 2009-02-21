@@ -57,7 +57,7 @@ public class Action extends UnaryBranchExpression
 	}
 	
 	
-	public ParseAction getAction()
+	public ParseAction getParseAction()
 	{
 		return a;
 	}
