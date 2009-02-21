@@ -6,7 +6,7 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
 from Britefury.gSym.gSymLanguage import GSymLanguage
-from Britefury.gSym.View.gSymView import _NodeElementChangeListener
+from Britefury.gSym.View.NodeElementChangeListener import _NodeElementChangeListener
 
 from BritefuryJ.GSym.View import PyGSymViewFactory
 
