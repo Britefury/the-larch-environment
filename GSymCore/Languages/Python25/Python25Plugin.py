@@ -5,15 +5,17 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
+from Britefury.gSym.gSymDocument import GSymUnit
+
 from GSymCore.Languages.Python25.Python25Importer import importPy25File
 
 
 def py25New():
-	return [ '$withLanguageModule', 'GSymCore.Languages.Python25.Python25', [ 'python25Module', [ 'commentStmt', 'New Python 2.5 document' ] ] ]
+	return GSymUnit( 'GSymCore.Languages.Python25.Python25', [ 'python25Module', [ 'commentStmt', 'New Python 2.5 document' ] ] )
 
 def py25ImportFile(filename):
 	content = importPy25File( filename )
-	return [ '$withLanguageModule', 'GSymCore.Languages.Python25.Python25', content ]
+	return GSymUnit( 'GSymCore.Languages.Python25.Python25', content )
 
 def initPlugin(pluginInterface):
 	pluginInterface.registerNewDocumentFactory( 'Python 2.5', py25New )

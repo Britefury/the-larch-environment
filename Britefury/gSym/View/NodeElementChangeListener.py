@@ -36,6 +36,9 @@ from Britefury.Dispatch.MethodDispatch import methodDispatch
 
 
 
+DIFF_THRESHOLD = 65536
+
+
 
 class _NodeElementChangeListener (DVNode.NodeElementChangeListener):
 	def __init__(self):
