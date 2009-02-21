@@ -7,7 +7,7 @@
 ##-*************************
 from Britefury.Util.NodeUtil import isListNode
 
-from Britefury.gSym.View.gSymView import GSymView
+from Britefury.gSym.View.GSymView import GSymView
 
 from Britefury.gSym.View.EditOperations import replace, replaceWithRange, replaceNodeContents, append, prepend, insertBefore, insertRangeBefore, insertAfter, insertRangeAfter
 

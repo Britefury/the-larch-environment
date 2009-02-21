@@ -28,12 +28,15 @@ from BritefuryJ.DocPresent.StyleSheets import *
 from BritefuryJ.Cell import CellListener
 
 
+from Britefury.Kernel.Abstract import abstractmethod
+
+
 from Britefury.Event.QueuedEvent import queueEvent
 
 
 from Britefury.gSym.gSymWorld import GSymWorld
 from Britefury.gSym.gSymEnvironment import GSymEnvironment
-from Britefury.gSym.gSymDocument import loadDocument, newDocument, GSymDocumentViewContentHandler, GSymDocumentLISPViewContentHandler, GSymDocumentTransformContentHandler
+from Britefury.gSym.gSymDocument import GSymDocument, GSymUnit, viewUnit, viewUnitLisp, transformUnit
 
 from Britefury.Plugin import InitPlugins
 
@@ -74,7 +77,7 @@ class MainAppPluginInterface (object):
 		
 
 		
-class MainAppDocView (CellListener):	
+class MainAppDocView (CellListener):
 	def __init__(self, app):
 		self._app = app
 		
@@ -89,9 +92,9 @@ class MainAppDocView (CellListener):
 		return self._area.getComponent()
 	
 		
-	def setDocumentContent(self, documentRoot, contentHandler):
-		if documentRoot is not None:
-			self._view = loadDocument( self._app._world, documentRoot, contentHandler )
+	def setUnit(self, unit):
+		if unit is not None:
+			self._view = self.createView( unit )
 			self._view.getRefreshCell().addListener( self )
 			self._refreshView()
 			self._elementTree.getRoot().setChild( self._view.getRootView().getElement() )
@@ -102,6 +105,11 @@ class MainAppDocView (CellListener):
 			textElem = TextElement( textStyle, '<empty>' )
 			rootElem = self._elementTree.getRoot()
 			self._elementTree.getRoot().setChild( textElem )
+			
+	
+	@abstractmethod
+	def createView(self, unit):
+		pass
 		
 			
 	def _refreshView(self):
@@ -138,6 +146,19 @@ class MainAppDocView (CellListener):
 		
 
 		
+class MainAppDocViewNormal (MainAppDocView):
+	def createView(self, unit):
+		return viewUnit( unit, self._app._world, self._app._commandHistory )
+		
+		
+class MainAppDocViewLisp (MainAppDocView):
+	def createView(self, unit):
+		return viewUnitLisp( unit, self._app._world, self._app._commandHistory )
+		
+		
+		
+
+		
 def _action(name, f):
 	class Act (AbstractAction):
 		def actionPerformed(action, event):
@@ -151,14 +172,15 @@ def _action(name, f):
 
 
 class MainApp (object):
-	def __init__(self, documentRoot):
-		self._documentRoot = None
+	def __init__(self, unit):
+		document = GSymDocument( unit )   if unit is not None   else   None
+		self._document = None
 		self._commandHistory = None
 		self._bUnsavedData = False
 		
 		self._world = GSymWorld()
 		
-		self._docView = MainAppDocView( self )
+		self._docView = MainAppDocViewNormal( self )
 
 		
 		
@@ -311,7 +333,7 @@ class MainApp (object):
 
 		
 		# Set the document
-		self.setDocument( documentRoot )
+		self.setDocument( document )
 		
 		
 
@@ -361,8 +383,8 @@ class MainApp (object):
 		
 
 
-	def setDocument(self, documentRoot):
-		self._documentRoot = documentRoot
+	def setDocument(self, document):
+		self._document = document
 		
 		#self._actionsMenu.removeAll()
 		
@@ -374,22 +396,23 @@ class MainApp (object):
 			def onCommandHistoryChanged(_self, history):
 				self._onCommandHistoryChanged( history )
 		
-		if self._documentRoot is not None:
-			self._commandHistory.track( self._documentRoot )
+		if self._document is not None:
+			print type( self._document.unit.contentSX )
+			self._commandHistory.track( self._document.unit.contentSX )
 		self._commandHistory.setListener( Listener() )
 		self._bUnsavedData = False
 		
-	
-		contentHandler = GSymDocumentViewContentHandler( self._commandHistory )
-		self._docView.setDocumentContent( documentRoot, contentHandler )
+
+		unit = self._document.unit   if self._document is not None   else   None
+		self._docView.setUnit( unit )
 		
 		self._setLispDocument()
 			
 			
 	def _setLispDocument(self):
-		if self._lispDocView is not None:		
-			lispContentHandler = GSymDocumentLISPViewContentHandler( self._commandHistory )
-			self._lispDocView.setDocumentContent( self._documentRoot, lispContentHandler )
+		if self._lispDocView is not None:
+			unit = self._document.unit   if self._document is not None   else   None
+			self._lispDocView.setUnit( unit )
 
 			
 			
@@ -406,21 +429,19 @@ class MainApp (object):
 			response = JOptionPane.showOptionDialog( self._frame, 'You have not saved your work. Proceed?', 'New Project', JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, None, [ 'New', 'Cancel' ], 'Cancel' )
 			bProceed = response == JOptionPane.YES_OPTION
 		if bProceed:
-			documentRoot = None
-			self.setDocument( documentRoot )
+			self.setDocument( None )
 
 
-	def registerNewDocumentFactory(self, menuLabel, newDocFn):
+	def registerNewDocumentFactory(self, menuLabel, newUnitFn):
 		def _onNew():
 			bProceed = True
 			if self._bUnsavedData:
 				response = JOptionPane.showOptionDialog( self._frame, 'You have not saved your work. Proceed?', 'New Project', JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, None, [ 'New', 'Cancel' ], 'Cancel' )
 				bProceed = response == JOptionPane.YES_OPTION
 			if bProceed:
-				content = newDocFn()
-				if content is not None:
-					documentRoot = newDocument( content )
-					self.setDocument( documentRoot )
+				unit = newUnitFn()
+				if unit  is not None:
+					self.setDocument( GSymDocument( unit ) )
 
 		self._newMenu.add( _action( menuLabel, _onNew ) )
 
@@ -451,7 +472,8 @@ class MainApp (object):
 								documentRoot = DMList( documentRoot )
 								t3 = datetime.now()
 								print 'Read SX time=%s, convert to DMLIst time=%s'  %  ( t2 - t1, t3 - t2 )
-								self.setDocument( documentRoot )
+								document = GSymDocument.readSX( documentRoot )
+								self.setDocument( document )
 							except IOError:
 								pass
 
@@ -508,13 +530,13 @@ class MainApp (object):
 						filename = sf.getPath()
 						if filename is not None:
 							t1 = datetime.now()
-							content = importFn( filename )
+							unit = importFn( filename )
 							t2 = datetime.now()
-							if content is not None:
-								documentRoot = newDocument( content )
+							if unit is not None:
+								document = GSymDocument( unit )
 								t3 = datetime.now()
 								print 'Import time=%s, convert to DMList time=%s'  %  ( t2 - t1, t3 - t2 )
-								self.setDocument( documentRoot )
+								self.setDocument( document )
 		
 		self._importMenu.add( _action( menuLabel, _onImport ) )
 
@@ -523,11 +545,12 @@ class MainApp (object):
 		
 		
 	def _writeFile(self, filename):
-		f = open( filename, 'w' )
-		if f is not None:
-			f.write( DMIOWrite.writeSX( self._documentRoot ) )
-			f.close()
-			self._bUnsavedData = False
+		if self._document is not None:
+			f = open( filename, 'w' )
+			if f is not None:
+				f.write( DMIOWrite.writeSX( self._document.writeSX() ) )
+				f.close()
+				self._bUnsavedData = False
 
 
 	def _onUndo(self):
@@ -554,8 +577,8 @@ class MainApp (object):
 					execfile( filename, env )
 					xFn = env['xform']
 					
-					contentHandler = GSymDocumentTransformContentHandler( xFn )
-					loadDocument( self._world, self._documentRoot, contentHandler )
+					if self._document is not None:
+						transformUnit( self._document.unit, self._world, xFn )
 							
 
 					
@@ -587,7 +610,7 @@ class MainApp (object):
 					pass
 			
 			
-			self._lispDocView = MainAppDocView( self )
+			self._lispDocView = MainAppDocViewLisp( self )
 			self._lispFrame = JFrame( 'LISP View Window' )
 			self._lispFrame.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
 			self._lispFrame.add( self._lispDocView.getComponent() )
