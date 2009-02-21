@@ -9,8 +9,9 @@ package BritefuryJ.GSym.View;
 import java.util.HashMap;
 
 import BritefuryJ.CommandHistory.CommandHistory;
+import BritefuryJ.DocPresent.Border.Border;
+import BritefuryJ.DocPresent.Border.EmptyBorder;
 import BritefuryJ.DocPresent.ElementTree.Element;
-import BritefuryJ.DocPresent.StyleSheets.BorderStyleSheet;
 import BritefuryJ.DocTree.DocTree;
 import BritefuryJ.DocTree.DocTreeNode;
 import BritefuryJ.DocView.DVNode;
@@ -103,7 +104,7 @@ public class GSymViewInstance
 	private DocTreeNode txs;
 	private GSymNodeViewFunction generalNodeViewFunction;
 	private DocView view;
-	private HashMap<Float, BorderStyleSheet> indentationStyleSheets;
+	private HashMap<Float, Border> indentationBorders;
 	private HashMap<NodeContentsFactoryKey, NodeContentsFactory> nodeContentsFactories;
 	
 	
@@ -118,22 +119,22 @@ public class GSymViewInstance
 		}
 		view = new DocView( tree, txs, new RootInitialiser(), changeListener );
 		
-		indentationStyleSheets = new HashMap<Float, BorderStyleSheet>();
+		indentationBorders = new HashMap<Float, Border>();
 		nodeContentsFactories = new HashMap<NodeContentsFactoryKey, NodeContentsFactory>();
 	}
 	
 	
-	protected BorderStyleSheet indentationStyleSheet(float indentation)
+	protected Border indentationBorder(float indentation)
 	{
-		BorderStyleSheet styleSheet = indentationStyleSheets.get( indentation );
+		Border border = indentationBorders.get( indentation );
 		
-		if ( styleSheet == null )
+		if ( border == null )
 		{
-			styleSheet = new BorderStyleSheet( indentation, 0.0, 0.0, 0.0 );
-			indentationStyleSheets.put( indentation, styleSheet );
+			border = new EmptyBorder( indentation, 0.0, 0.0, 0.0 );
+			indentationBorders.put( indentation, border );
 		}
 		
-		return styleSheet;
+		return border;
 	}
 	
 	

@@ -82,6 +82,13 @@ public class Forward extends ParserExpression
 	
 	public String toString()
 	{
-		return "Forward( <" + subexp.getDebugName() + "> )";
+		if ( subexp == null )
+		{
+			return "Forward( <null> )";
+		}
+		else
+		{
+			return "Forward( <" + subexp.getDebugName() + "> )";
+		}
 	}
 }

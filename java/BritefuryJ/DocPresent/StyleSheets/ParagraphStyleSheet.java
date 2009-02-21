@@ -7,8 +7,6 @@
 //##************************
 package BritefuryJ.DocPresent.StyleSheets;
 
-import java.awt.Color;
-
 import BritefuryJ.DocPresent.DPParagraph;
 
 public class ParagraphStyleSheet extends ContainerStyleSheet
@@ -22,17 +20,12 @@ public class ParagraphStyleSheet extends ContainerStyleSheet
 	
 	public ParagraphStyleSheet()
 	{
-		this( DPParagraph.Alignment.BASELINES, 0.0, 0.0, 0.0, null );
+		this( DPParagraph.Alignment.BASELINES, 0.0, 0.0, 0.0 );
 	}
 	
 	public ParagraphStyleSheet(DPParagraph.Alignment alignment, double spacing, double padding, double indentation)
 	{
-		this( alignment, spacing, padding, indentation, null );
-	}
-	
-	public ParagraphStyleSheet(DPParagraph.Alignment alignment, double spacing, double padding, double indentation, Color backgroundColour)
-	{
-		super( backgroundColour );
+		super();
 		
 		this.alignment = alignment;
 		this.spacing = spacing;

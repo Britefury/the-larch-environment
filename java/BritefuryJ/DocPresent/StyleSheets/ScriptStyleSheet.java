@@ -7,8 +7,6 @@
 //##************************
 package BritefuryJ.DocPresent.StyleSheets;
 
-import java.awt.Color;
-
 public class ScriptStyleSheet extends ContainerStyleSheet
 {
 	public static ScriptStyleSheet defaultStyleSheet = new ScriptStyleSheet();
@@ -19,17 +17,12 @@ public class ScriptStyleSheet extends ContainerStyleSheet
 	
 	public ScriptStyleSheet()
 	{
-		this( 1.0, 1.0, null );
+		this( 1.0, 1.0 );
 	}
 	
 	public ScriptStyleSheet(double spacing, double scriptSpacing)
 	{
-		this( spacing, scriptSpacing, null );
-	}
-	
-	public ScriptStyleSheet(double spacing, double scriptSpacing, Color backgroundColour)
-	{
-		super( backgroundColour );
+		super();
 		
 		this.spacing = spacing;
 		this.scriptSpacing = scriptSpacing;

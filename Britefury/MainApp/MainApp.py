@@ -11,10 +11,10 @@ import os
 from datetime import datetime
 
 from java.lang import Runnable
-from javax.swing import JFrame, AbstractAction, JMenuItem, JMenu, JMenuBar, KeyStroke, JOptionPane, JFileChooser, JOptionPane
+from javax.swing import JFrame, AbstractAction, JMenuItem, JMenu, JMenuBar, KeyStroke, JOptionPane, JFileChooser, JOptionPane, JTextField, JLabel, BoxLayout, JPanel, BorderFactory
 from javax.swing.filechooser import FileNameExtensionFilter
 from java.awt import Dimension, Font, Color
-from java.awt.event import WindowListener
+from java.awt.event import WindowListener, ActionListener, KeyEvent
 
 
 from BritefuryJ.CommandHistory import CommandHistory, CommandHistoryListener
@@ -36,6 +36,9 @@ from Britefury.gSym.gSymEnvironment import GSymEnvironment
 from Britefury.gSym.gSymDocument import loadDocument, newDocument, GSymDocumentViewContentHandler, GSymDocumentLISPViewContentHandler, GSymDocumentTransformContentHandler
 
 from Britefury.Plugin import InitPlugins
+
+
+from Britefury.MainApp.LocationBar import LocationBar
 
 
 
@@ -232,13 +235,66 @@ class MainApp (object):
 		self._initialise()
 		
 		
+		
+		# LOCATION AND FORMAT
+		
+		locationLabel = JLabel( 'Location:' )
+		locationLabel.setBorder( BorderFactory.createEmptyBorder( 0, 5, 0, 5 ) )
+		self._locationField = JTextField( '' )
+		self._locationField.setMaximumSize( Dimension( self._locationField.getMaximumSize().width, self._locationField.getMinimumSize().height ) )
+		self._locationField.setBorder( BorderFactory.createLineBorder( Color.black, 1 ) )
+		
+		class _LocationActionListener (ActionListener):
+			def actionPerformed(listener_self, event):
+				self._onLocationField( self._locationField.getText() )
+				
+		self._locationField.addActionListener( _LocationActionListener() )
+		
+		
+		
+		formatLabel = JLabel( 'Format:' )
+		formatLabel.setBorder( BorderFactory.createEmptyBorder( 0, 25, 0, 5 ) )
+		
+		self._formatField = JTextField( '' )
+		self._formatField.setPreferredSize( Dimension( 150, self._formatField.getMinimumSize().height ) )
+		self._formatField.setMaximumSize( Dimension( 150, self._formatField.getMinimumSize().height ) )
+		self._formatField.setBorder( BorderFactory.createLineBorder( Color.black, 1 ) )
+		
+		class _FormatActionListener (ActionListener):
+			def actionPerformed(listener_self, event):
+				self._onFormatField( self._formatField.getText() )
+				
+		self._formatField.addActionListener(_FormatActionListener() )
+		
+		
+		locationPanel = JPanel()
+		locationPanel.setLayout( BoxLayout( locationPanel, BoxLayout.X_AXIS ) )
+		locationPanel.add( locationLabel )
+		locationPanel.add( self._locationField )
+		locationPanel.add( formatLabel )
+		locationPanel.add( self._formatField )
+		locationPanel.setBorder( BorderFactory.createEmptyBorder( 5, 0, 5, 5 ) )
+		
+		
+
+		
+		
+		# WINDOW
+		
+		windowPanel = JPanel()
+		windowPanel.setLayout( BoxLayout( windowPanel, BoxLayout.Y_AXIS ) )
+		windowPanel.add( locationPanel )
+		windowPanel.add( self._docView.getComponent() )
+		
+		
+		
 
 		self._frame = JFrame( 'gSym' )
 		self._frame.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
 		
 		self._frame.setJMenuBar( menuBar )
 		
-		self._frame.add( self._docView.getComponent() )
+		self._frame.add( windowPanel )
 		
 		self._frame.pack()
 		
@@ -561,8 +617,53 @@ class MainApp (object):
 		self._docView.oneToOne()
 		if self._lispDocView is not None:
 			self._lispDocView.oneToOne()
+			
+			
+			
+	def _onLocationField(self, location):
+		self._changeLocation( location )
+		
+		
+	def setLocation(self, location):
+		self._locationField.setText( location )
+		self._changeLocation( location )
+		
+		
+		
+	def _changeLocation(self, location):
+		print 'MainApp._changeLocation: ', location
+		
+
+		
+
+	def _onFormatField(self, format):
+		self._changeFormat( format )
+		
+		
+	def setFormat(self, format):
+		self._formatField.setText( format )
+		self._changeFormat( format )
+		
+		
+		
+	def _changeFormat(self, format):
+		print 'MainApp._changeFormat: ', format
+		
+		
+		
+	def setLocationAndFormat(self, location, format):
+		self._locationField.setText( location )
+		self._formatField.setText( format )
+		self._changeLocationAndFormat( location, format )
 
 			
+		
+	def _changeLocationAndFormat(self, location, format):
+		print 'MainApp._changeLocationAndFormat: ', location, format
+		
+
+		
+		
 	#def _p_onScriptPreCommand(self, console, code):
 		#self._commandHistory.freeze()
 

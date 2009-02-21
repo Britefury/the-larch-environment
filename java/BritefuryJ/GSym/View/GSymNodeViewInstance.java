@@ -15,6 +15,7 @@ import org.python.core.PyObject;
 
 import BritefuryJ.Cell.CellInterface;
 import BritefuryJ.DocPresent.DPHBox;
+import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.ElementTree.BorderElement;
 import BritefuryJ.DocPresent.ElementTree.Element;
 import BritefuryJ.DocPresent.ElementTree.ElementContentListener;
@@ -31,7 +32,6 @@ import BritefuryJ.DocPresent.ElementTree.TextElement;
 import BritefuryJ.DocPresent.ElementTree.VBoxElement;
 import BritefuryJ.DocPresent.ElementTree.WhitespaceElement;
 import BritefuryJ.DocPresent.ElementTree.SegmentElement.CaretStopElementFactory;
-import BritefuryJ.DocPresent.StyleSheets.BorderStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.FractionStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
@@ -93,17 +93,17 @@ public class GSymNodeViewInstance
 	
 	
 	
-	public Element border(BorderStyleSheet styleSheet, Element child)
+	public Element border(Border border, ContainerStyleSheet styleSheet, Element child)
 	{
-		BorderElement element = new BorderElement( styleSheet );
+		BorderElement element = new BorderElement( border, styleSheet );
 		element.setChild( child );
 		return element;
 	}
 	
 	public Element indent(float indentation, Element child)
 	{
-		BorderStyleSheet styleSheet = viewInstance.indentationStyleSheet( indentation );
-		BorderElement element = new BorderElement( styleSheet );
+		Border border = viewInstance.indentationBorder( indentation );
+		BorderElement element = new BorderElement( border );
 		element.setChild( child );
 		return element;
 	}

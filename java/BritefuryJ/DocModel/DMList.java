@@ -14,11 +14,11 @@ import java.util.ListIterator;
 import java.util.Vector;
 
 import org.python.core.Py;
-import org.python.core.PyJavaInstance;
 import org.python.core.PyObject;
 import org.python.core.PySlice;
 import org.python.core.PyString;
 import org.python.core.PyUnicode;
+import org.python.core.PyJavaType;
 
 import BritefuryJ.Cell.LiteralCell;
 import BritefuryJ.CommandHistory.CommandTracker;
@@ -293,7 +293,7 @@ public class DMList implements DMListInterface, Trackable
 		{
 			return coerce( (List<Object>)x );
 		}
-		else if ( x instanceof PyJavaInstance )
+		else if ( x instanceof PyJavaType )
 		{
 			return coerce( Py.tojava( (PyObject)x, Object.class ) );
 		}

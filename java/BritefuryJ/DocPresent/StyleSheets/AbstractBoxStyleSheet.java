@@ -7,8 +7,6 @@
 //##************************
 package BritefuryJ.DocPresent.StyleSheets;
 
-import java.awt.Color;
-
 public class AbstractBoxStyleSheet extends ContainerStyleSheet
 {
 	public static AbstractBoxStyleSheet defaultStyleSheet = new AbstractBoxStyleSheet();
@@ -20,22 +18,12 @@ public class AbstractBoxStyleSheet extends ContainerStyleSheet
 
 	public AbstractBoxStyleSheet()
 	{
-		this( 0.0, false, 0.0, null );
-	}
-	
-	public AbstractBoxStyleSheet(Color backgroundColour)
-	{
-		this( 0.0, false, 0.0, backgroundColour );
+		this( 0.0, false, 0.0 );
 	}
 	
 	public AbstractBoxStyleSheet(double spacing, boolean bExpand, double padding)
 	{
-		this( spacing, bExpand, padding, null );
-	}
-	
-	public AbstractBoxStyleSheet(double spacing, boolean bExpand, double padding, Color backgroundColour)
-	{
-		super( backgroundColour );
+		super();
 		
 		this.spacing = spacing;
 		this.bExpand = bExpand;

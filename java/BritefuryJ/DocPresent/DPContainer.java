@@ -11,9 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.geom.Rectangle2D;
 import java.awt.geom.AffineTransform;
 
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
@@ -615,12 +613,6 @@ public abstract class DPContainer extends DPWidget
 	
 	protected void drawBackground(Graphics2D graphics)
 	{
-		Color backgroundColour = getStyleSheet().getBackgroundColour();
-		if ( backgroundColour != null )
-		{
-			graphics.setColor( backgroundColour );
-			graphics.fill( new Rectangle2D.Double( 0.0, 0.0, allocation.x, allocation.y ) );
-		}
 	}
 	
 	protected void handleDraw(Graphics2D graphics, AABox2 areaBox)

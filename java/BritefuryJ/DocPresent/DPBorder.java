@@ -7,78 +7,100 @@
 //##************************
 package BritefuryJ.DocPresent;
 
+import java.awt.Graphics2D;
+
+import BritefuryJ.DocPresent.Border.Border;
+import BritefuryJ.DocPresent.Border.EmptyBorder;
 import BritefuryJ.DocPresent.Metrics.HMetrics;
 import BritefuryJ.DocPresent.Metrics.VMetrics;
-import BritefuryJ.DocPresent.StyleSheets.BorderStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 
 
 public class DPBorder extends DPBin
 {
+	public static EmptyBorder defaultBorder = new EmptyBorder( 0.0, 0.0, 0.0, 0.0 );
+	
+	protected Border border;
+	
+	
+	
 	public DPBorder()
 	{
-		this( BorderStyleSheet.defaultStyleSheet );
+		this( defaultBorder, ContainerStyleSheet.defaultStyleSheet );
 	}
 
-	public DPBorder(BorderStyleSheet styleSheet)
+	public DPBorder(Border border)
+	{
+		this( border, ContainerStyleSheet.defaultStyleSheet );
+	}
+
+	public DPBorder(ContainerStyleSheet styleSheet)
+	{
+		this( defaultBorder, styleSheet );
+	}
+	
+	public DPBorder(Border border, ContainerStyleSheet styleSheet)
 	{
 		super( styleSheet );
+		
+		this.border = border;
 	}
 	
 	
+	
+	
+	protected void drawBackground(Graphics2D graphics)
+	{
+		border.draw( graphics, 0.0, 0.0, allocation.x, allocation.y );
+	}
+	
+
 	
 	protected HMetrics computeMinimumHMetrics()
 	{
-		BorderStyleSheet style = getStyleSheet();
-		
 		if ( child != null )
 		{
-			return child.refreshMinimumHMetrics().border( style.getLeftMargin(), style.getRightMargin() );
+			return child.refreshMinimumHMetrics().border( border.getLeftMargin(), border.getRightMargin() );
 		}
 		else
 		{
-			return new HMetrics().border( style.getLeftMargin(), style.getRightMargin() );
+			return new HMetrics().border( border.getLeftMargin(), border.getRightMargin() );
 		}
 	}
 	
 	protected HMetrics computePreferredHMetrics()
 	{
-		BorderStyleSheet style = getStyleSheet();
-		
 		if ( child != null )
 		{
-			return child.refreshPreferredHMetrics().border( style.getLeftMargin(), style.getRightMargin() );
+			return child.refreshPreferredHMetrics().border( border.getLeftMargin(), border.getRightMargin() );
 		}
 		else
 		{
-			return new HMetrics().border( style.getLeftMargin(), style.getRightMargin() );
+			return new HMetrics().border( border.getLeftMargin(), border.getRightMargin() );
 		}
 	}
 	
 	protected VMetrics computeMinimumVMetrics()
 	{
-		BorderStyleSheet style = getStyleSheet();
-		
 		if ( child != null )
 		{
-			return child.refreshMinimumVMetrics().border( style.getTopMargin(), style.getBottomMargin() );
+			return child.refreshMinimumVMetrics().border( border.getTopMargin(), border.getBottomMargin() );
 		}
 		else
 		{
-			return new VMetrics().border( style.getTopMargin(), style.getBottomMargin() );
+			return new VMetrics().border( border.getTopMargin(), border.getBottomMargin() );
 		}
 	}
 
 	protected VMetrics computePreferredVMetrics()
 	{
-		BorderStyleSheet style = getStyleSheet();
-		
 		if ( child != null )
 		{
-			return child.refreshPreferredVMetrics().border( style.getTopMargin(), style.getBottomMargin() );
+			return child.refreshPreferredVMetrics().border( border.getTopMargin(), border.getBottomMargin() );
 		}
 		else
 		{
-			return new VMetrics().border( style.getTopMargin(), style.getBottomMargin() );
+			return new VMetrics().border( border.getTopMargin(), border.getBottomMargin() );
 		}
 	}
 	
@@ -89,8 +111,8 @@ public class DPBorder extends DPBin
 	{
 		if ( child != null )
 		{
-			double hborder = getStyleSheet().getLeftMargin() + getStyleSheet().getRightMargin();
-			allocateChildX( child, getStyleSheet().getLeftMargin(), width - hborder );
+			double hborder = border.getLeftMargin() + border.getRightMargin();
+			allocateChildX( child, border.getLeftMargin(), width - hborder );
 		}
 	}
 
@@ -98,21 +120,8 @@ public class DPBorder extends DPBin
 	{
 		if ( child != null )
 		{
-			double vborder = getStyleSheet().getTopMargin() + getStyleSheet().getBottomMargin();
-			allocateChildY( child, getStyleSheet().getTopMargin(), height - vborder );
+			double vborder = border.getTopMargin() + border.getBottomMargin();
+			allocateChildY( child, border.getTopMargin(), height - vborder );
 		}
-	}
-	
-	
-	
-	//
-	//
-	// STYLESHEET METHODS
-	//
-	//
-	
-	protected BorderStyleSheet getStyleSheet()
-	{
-		return (BorderStyleSheet)styleSheet;
 	}
 }

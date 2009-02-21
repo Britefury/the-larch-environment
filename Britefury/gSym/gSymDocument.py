@@ -173,3 +173,84 @@ def loadDocument(world, xs, contentHandler):
 def newDocument(content):
 	doc = [ '$gSymDocument', '0.1-alpha', [ '$unit', content ] ]
 	return DMList( doc )
+
+
+
+
+class GSymUnit (object):
+	def __init__(self, languageModuleName, contentSX):
+		self.languageModuleName = languageModuleName
+		self.contentSX = contentSX
+		
+		
+	def writeSX(self):
+		sx = [ '$unit', self.languageModuleName, self.contentSX ]
+		return DMList( sx )
+	
+
+	@staticmethod
+	def readSX(self, unitSX):
+		"""
+		($unit <language_module_to_import> <content>)
+		"""
+		
+		if not isListNode( unitSX ):
+			raise GSymDocumentInvalidStructure
+		
+		if len( unitSX ) != 3:
+			raise GSymDocumentInvalidStructure
+		
+
+		if unitSX[0] != '$unit':
+			raise GSymDocumentInvalidStructure
+		
+		languageModuleName = unitSX[1]
+		
+		return GSymUnit( languageModuleName, unitSX[2] )
+		
+
+		
+		
+class GSymDocument (object):
+	def __init__(self, unit):
+		self.unit = unit
+	
+	
+	def writeSX(self):
+		sx = [ '$gSymDocument', '0.1-alpha', self.unit.writeSX() ]
+		return DMList( sx )
+
+	
+	
+	@staticmethod
+	def readSX(world, docSX):
+		"""
+		($gSymDocument <gsym_version> <document_content>)
+		"""
+		if not isListNode( docSX ):
+			raise GSymDocumentInvalidStructure
+		
+		if len( docSX ) < 3:
+			raise GSymDocumentInvalidStructure
+		
+		header = docSX[0]
+		version = docSX[1]
+		contentSX = docSX[2]
+		
+		if header != "$gSymDocument":
+			raise GSymDocumentInvalidHeader
+		
+		try:
+			versionCmp = compareVersions( version, gSymVersion )
+		except TypeError:
+			raise GSymDocumentInvalidVersion
+		except ValueError:
+			raise GSymDocumentInvalidVersion
+		
+		if versionCmp > 0:
+			raise GSymDocumentUnsupportedVersion
+		
+		
+		
+		return GSymDocument( GSymUnit.readSX( contentSX ) )
+			
