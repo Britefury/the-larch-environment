@@ -18,15 +18,6 @@ from GSymCore.Languages.LISP import LISP
 
 
 
-class GSymRequireMetaLanguageDefinition (Exception):
-	pass
-
-class GSymRequireGMetaModule (Exception):
-	pass
-
-
-
-
 class GSymDocumentContentHandler (object):
 	def withLanguageModule(self, world, importLanguage, xs):
 		pass
