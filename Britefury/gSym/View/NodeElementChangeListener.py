@@ -159,7 +159,11 @@ class _NodeElementChangeListener (DVNode.NodeElementChangeListener):
 				leaf = elementContent.getLeafAtContentPosition( newPosition )
 				if leaf is not None:
 					#print leaf, "'" + leaf.getContent().replace( '\n', '\\n' ) + "'"
-					leafOffset = leaf.getContentOffsetInSubtree( elementContent )
+					#assert ( leaf is elementContent )  !=  ( leaf is not elementContent )
+					if leaf is elementContent:
+						leafOffset = 0
+					else:
+						leafOffset = leaf.getContentOffsetInSubtree( elementContent )
 					leafPosition = newPosition - leafOffset
 					
 					if leaf.isEditable():
