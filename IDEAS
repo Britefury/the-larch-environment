@@ -235,3 +235,12 @@ A RPC system allows you to call server methods from the client.
 
 31/Jan/2009
 SWT (Eclipse UI) has a Browser widget that embeds Gecko in Java. Javascript and Java can call one another.
+
+
+01/Mar/2009
+New interaction system: keep text representation around until editing of the line/section is complete, including whitespace.
+This should help alleviate cursor positioning issues.
+PROBLEM: Parsing text into AST, but keeping track of the range of characters that are covered by an AST node. This would
+involve mapping AST nodes to range, to allow the view system to map view node to text range.
+Cannot use IdentityHashMap since Java Strings are converted to Python str's automatically, resulting in key mismatches.
+Cannot use normal hash map, since Python lists are not hashable.
