@@ -41,7 +41,7 @@ from Britefury.gSym.gSymDocument import GSymDocument, GSymUnit, viewUnit, viewUn
 from Britefury.Plugin import InitPlugins
 
 
-from Britefury.MainApp.LocationBar import LocationBar
+from Britefury.MainApp.LocationBar import LocationBar, LocationBarListener
 
 
 
@@ -260,52 +260,21 @@ class MainApp (object):
 		
 		# LOCATION AND FORMAT
 		
-		locationLabel = JLabel( 'Location:' )
-		locationLabel.setBorder( BorderFactory.createEmptyBorder( 0, 5, 0, 5 ) )
-		self._locationField = JTextField( '' )
-		self._locationField.setMaximumSize( Dimension( self._locationField.getMaximumSize().width, self._locationField.getMinimumSize().height ) )
-		self._locationField.setBorder( BorderFactory.createLineBorder( Color.black, 1 ) )
-		
-		class _LocationActionListener (ActionListener):
-			def actionPerformed(listener_self, event):
-				self._onLocationField( self._locationField.getText() )
-				
-		self._locationField.addActionListener( _LocationActionListener() )
-		
-		
-		
-		formatLabel = JLabel( 'Format:' )
-		formatLabel.setBorder( BorderFactory.createEmptyBorder( 0, 25, 0, 5 ) )
-		
-		self._formatField = JTextField( '' )
-		self._formatField.setPreferredSize( Dimension( 150, self._formatField.getMinimumSize().height ) )
-		self._formatField.setMaximumSize( Dimension( 150, self._formatField.getMinimumSize().height ) )
-		self._formatField.setBorder( BorderFactory.createLineBorder( Color.black, 1 ) )
-		
-		class _FormatActionListener (ActionListener):
-			def actionPerformed(listener_self, event):
-				self._onFormatField( self._formatField.getText() )
-				
-		self._formatField.addActionListener(_FormatActionListener() )
-		
-		
-		locationPanel = JPanel()
-		locationPanel.setLayout( BoxLayout( locationPanel, BoxLayout.X_AXIS ) )
-		locationPanel.add( locationLabel )
-		locationPanel.add( self._locationField )
-		locationPanel.add( formatLabel )
-		locationPanel.add( self._formatField )
-		locationPanel.setBorder( BorderFactory.createEmptyBorder( 5, 0, 5, 5 ) )
-		
-		
+		class _LocationBarListener (LocationBarListener):
+			def _onLocation(listener_self, location, format):
+				self._onLocation( location, format )
 
+		self._locationBar = LocationBar( _LocationBarListener(), '', '' )
+		
+		
+		
 		
 		
 		# WINDOW
 		
 		windowPanel = JPanel()
 		windowPanel.setLayout( BoxLayout( windowPanel, BoxLayout.Y_AXIS ) )
-		windowPanel.add( locationPanel )
+		#windowPanel.add( self._locationBar.getComponent() )
 		windowPanel.add( self._docView.getComponent() )
 		
 		
@@ -643,49 +612,22 @@ class MainApp (object):
 			
 			
 			
-	def _onLocationField(self, location):
+	
+	def _onLocation(self, location, format):
+		self._changeLocation( location, format )
+	
+
+	def setLocation(self, location, format):
+		self._locationBar.setLocationAndFormat( location, format )
 		self._changeLocation( location )
 		
 		
-	def setLocation(self, location):
-		self._locationField.setText( location )
-		self._changeLocation( location )
-		
-		
-		
-	def _changeLocation(self, location):
-		print 'MainApp._changeLocation: ', location
+	def _changeLocation(self, location, format):
+		print 'MainApp._changeLocation: ', location, format
 		
 
 		
 
-	def _onFormatField(self, format):
-		self._changeFormat( format )
-		
-		
-	def setFormat(self, format):
-		self._formatField.setText( format )
-		self._changeFormat( format )
-		
-		
-		
-	def _changeFormat(self, format):
-		print 'MainApp._changeFormat: ', format
-		
-		
-		
-	def setLocationAndFormat(self, location, format):
-		self._locationField.setText( location )
-		self._formatField.setText( format )
-		self._changeLocationAndFormat( location, format )
-
-			
-		
-	def _changeLocationAndFormat(self, location, format):
-		print 'MainApp._changeLocationAndFormat: ', location, format
-		
-
-		
 		
 	#def _p_onScriptPreCommand(self, console, code):
 		#self._commandHistory.freeze()
