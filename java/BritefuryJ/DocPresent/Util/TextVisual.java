@@ -8,6 +8,7 @@
 package BritefuryJ.DocPresent.Util;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.awt.font.FontRenderContext;
@@ -15,6 +16,7 @@ import java.awt.font.LineMetrics;
 import java.awt.font.TextHitInfo;
 import java.awt.font.TextLayout;
 import java.awt.geom.Line2D;
+import java.util.ArrayList;
 
 import javax.swing.JComponent;
 
@@ -29,6 +31,118 @@ import BritefuryJ.Math.Point2;
 
 public class TextVisual
 {
+	private static class SegmentLayout
+	{
+		public TextLayout layout;
+		public int length;
+		
+		
+		
+		public SegmentLayout(String text, Font font, FontRenderContext frc, int length)
+		{
+			layout = new TextLayout( text, font, frc );
+			this.length = length;
+		}
+		
+		
+		
+		public void drawCaret(Graphics2D graphics, int charOffset, double xOffset)
+		{
+			Shape[] carets = layout.getCaretShapes( charOffset );
+			graphics.translate( xOffset, layout.getAscent() );
+			graphics.draw( carets[0] );
+			if ( carets[1] != null )
+			{
+				graphics.draw( carets[1] );
+			}
+		}
+
+		
+		
+		public static HMetrics computeHMetrics(SegmentLayout layouts[])
+		{
+			double x = 0.0, end = 0.0;
+			for (SegmentLayout l: layouts)
+			{
+				end = x + l.layout.getBounds().getWidth();
+				x += l.layout.getAdvance();
+			}
+			
+			return new HMetrics( end, x - end );
+		}
+
+		public static VMetricsTypeset computeVMetrics(SegmentLayout layouts[])
+		{
+			double ascent = 0.0, descent = 0.0, vspacing = 0.0;
+			for (SegmentLayout l: layouts)
+			{
+				ascent = Math.max( ascent, l.layout.getAscent() );
+				descent = Math.max( descent, l.layout.getDescent() );
+				vspacing = Math.max( vspacing, l.layout.getLeading() );
+			}
+			
+			return new VMetricsTypeset( ascent, descent, vspacing );
+		}
+		
+		
+		public static void draw(Graphics2D graphics, SegmentLayout layouts[])
+		{
+			double ascent = 0.0;
+			for (SegmentLayout l: layouts)
+			{
+				ascent = Math.max( ascent, l.layout.getAscent() );
+			}
+
+			double x = 0.0;
+			for (SegmentLayout l: layouts)
+			{
+				l.layout.draw( graphics, (float)x, (float)ascent );
+				x += l.layout.getAdvance();
+			}
+		}
+	
+	
+		public static void drawCaret(Graphics2D graphics, int offset, SegmentLayout layouts[])
+		{
+			double x = 0.0;
+			for (SegmentLayout l: layouts)
+			{
+				if ( offset <= l.length )
+				{
+					l.drawCaret( graphics, offset, x );
+					return;
+				}
+				else
+				{
+					offset -= l.length;
+				}
+			}
+		}
+		
+		
+		public static TextHitInfo hitTest(Point2 pos, SegmentLayout layouts[])
+		{
+			double x = 0.0;
+			for (SegmentLayout l: layouts)
+			{
+				double relX = pos.x - x;
+				double advance = l.layout.getAdvance();
+				if ( relX <= advance )
+				{
+					return l.layout.hitTestChar( (float)relX, (float)pos.y );
+				}
+				else
+				{
+					x += advance;
+				}
+			}
+			
+			return null;
+		}
+	}
+	
+	
+	
 	public static class UnrealisedException extends RuntimeException
 	{
 		private static final long serialVersionUID = 1L;
@@ -42,7 +156,7 @@ public class TextVisual
 	}
 	
 	
-	private TextLayout layout;
+	private SegmentLayout layouts[];
 	private String text;
 	private TextStyleSheet styleSheet;
 	private TextVisualListener listener;
@@ -88,7 +202,7 @@ public class TextVisual
 	public void unrealise()
 	{
 		component = null;
-		layout = null;
+		layouts = null;
 	}
 	
 	
@@ -97,10 +211,9 @@ public class TextVisual
 	public HMetrics computeHMetrics()
 	{
 		refreshLayout();
-		if ( layout != null )
+		if ( layouts != null )
 		{
-			double width = layout.getBounds().getWidth();
-			return new HMetrics( width, layout.getAdvance() - width );
+			return SegmentLayout.computeHMetrics( layouts );
 		}
 		else
 		{
@@ -111,9 +224,9 @@ public class TextVisual
 	public VMetrics computeVMetrics()
 	{
 		refreshLayout();
-		if ( layout != null )
+		if ( layouts != null )
 		{
-			return new VMetricsTypeset( layout.getAscent(), layout.getDescent(), layout.getLeading() );
+			return SegmentLayout.computeVMetrics( layouts );
 		}
 		else
 		{
@@ -136,11 +249,11 @@ public class TextVisual
 	public void draw(Graphics2D graphics)
 	{
 		refreshLayout();
-		if ( layout != null )
+		if ( layouts != null )
 		{
 			Color prevColour = graphics.getColor();
 			graphics.setColor( styleSheet.getColour() );
-			layout.draw( graphics, 0.0f, layout.getAscent() );
+			SegmentLayout.draw( graphics, layouts );
 			graphics.setColor( prevColour );
 		}
 	}
@@ -148,15 +261,9 @@ public class TextVisual
 	public void drawCaret(Graphics2D graphics, int offset)
 	{
 		refreshLayout();
-		if ( layout != null )
+		if ( layouts != null )
 		{
-			Shape[] carets = layout.getCaretShapes( offset );
-			graphics.translate( 0.0, layout.getAscent() );
-			graphics.draw( carets[0] );
-			if ( carets[1] != null )
-			{
-				graphics.draw( carets[1] );
-			}
+			SegmentLayout.drawCaret( graphics, offset, layouts );
 		}
 		else
 		{
@@ -171,9 +278,10 @@ public class TextVisual
 	{
 		refreshLayout();
 		double h = 0.0;
-		if ( layout != null )
+		if ( layouts != null )
 		{
-			h = layout.getBounds().getHeight();
+			VMetrics vm = SegmentLayout.computeVMetrics( layouts );
+			h = vm.getLength();
 		}
 		else
 		{
@@ -188,10 +296,12 @@ public class TextVisual
 	{
 		refreshLayout();
 		double x = 0.0, h = 0.0;
-		if ( layout != null )
+		if ( layouts != null )
 		{
-			x = layout.getBounds().getWidth();
-			h = layout.getBounds().getHeight();
+			HMetrics hm = SegmentLayout.computeHMetrics( layouts );
+			VMetrics vm = SegmentLayout.computeVMetrics( layouts );
+			x = hm.getLength();
+			h = vm.getLength();
 		}
 		else
 		{
@@ -208,9 +318,9 @@ public class TextVisual
 	public TextHitInfo hitTest(Point2 pos)
 	{
 		refreshLayout();
-		if ( layout != null )
+		if ( layouts != null )
 		{
-			return layout.hitTestChar( (float)pos.x, (float)pos.y );
+			return SegmentLayout.hitTest( pos, layouts );
 		}
 		else
 		{
@@ -225,7 +335,7 @@ public class TextVisual
 	
 	private void layoutChanged()
 	{
-		layout = null;
+		layouts = null;
 		requestResize();
 	}
 	
@@ -239,11 +349,45 @@ public class TextVisual
 	
 	private void refreshLayout()
 	{
-		if ( layout == null  &&  text.length() > 0  &&  component != null )
+		if ( layouts == null  &&  text.length() > 0  &&  component != null )
 		{
 			Graphics2D graphics = (Graphics2D)component.getGraphics();
 			FontRenderContext frc = graphics.getFontRenderContext();
-			layout = new TextLayout( text, styleSheet.getFont(), frc );
+			
+			if ( styleSheet.getMixedSizeCaps() )
+			{
+				ArrayList<SegmentLayout> segments = new ArrayList<SegmentLayout>();
+				String upperText = text.toUpperCase();
+				
+				Font upperCaseFont = styleSheet.getFont();
+				Font lowerCaseFont = upperCaseFont.deriveFont( upperCaseFont.getSize2D() * 0.75f );
+				boolean bSegmentLowercase = Character.isLowerCase( text.charAt( 0 ) );
+				int segmentPos = 0;
+				
+				for (int i = 0; i < text.length(); i++)
+				{
+					boolean bCharLowercase = Character.isLowerCase( text.charAt( i ) );
+					if ( bCharLowercase != bSegmentLowercase )
+					{
+						// Encountered end of segment
+						SegmentLayout l = new SegmentLayout( upperText.substring( segmentPos, i ), bSegmentLowercase ? lowerCaseFont : upperCaseFont, frc, i - segmentPos );
+						segments.add( l );
+						bSegmentLowercase = bCharLowercase;
+						segmentPos = i;
+					}
+				}
+
+				SegmentLayout l = new SegmentLayout( upperText.substring( segmentPos, text.length() ), bSegmentLowercase ? lowerCaseFont : upperCaseFont, frc, text.length() - segmentPos );
+				segments.add( l );
+				
+				layouts = new SegmentLayout[segments.size()];
+				layouts = segments.toArray( layouts );
+			}
+			else
+			{
+				layouts = new SegmentLayout[1];
+				layouts[0] = new SegmentLayout( text, styleSheet.getFont(), frc, text.length() );
+			}
 		}
 	}
 }

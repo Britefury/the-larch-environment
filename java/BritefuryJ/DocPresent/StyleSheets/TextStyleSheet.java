@@ -21,19 +21,26 @@ public class TextStyleSheet extends ContentLeafStyleSheet
 	
 	protected Font font;
 	protected Color colour;
+	protected boolean bMixedSizeCaps;
 	
 	
 	public TextStyleSheet()
 	{
-		this( defaultFont, Color.black );
+		this( defaultFont, Color.black, false );
 	}
 	
 	public TextStyleSheet(Font font, Color colour)
+	{
+		this( font, colour, false );
+	}
+	
+	public TextStyleSheet(Font font, Color colour, boolean bMixedSizeCaps)
 	{
 		super();
 		
 		this.font = font;
 		this.colour = colour;
+		this.bMixedSizeCaps = bMixedSizeCaps;
 	}
 	
 	
@@ -47,5 +54,11 @@ public class TextStyleSheet extends ContentLeafStyleSheet
 	public Color getColour()
 	{
 		return colour;
+	}
+	
+	
+	public boolean getMixedSizeCaps()
+	{
+		return bMixedSizeCaps;
 	}
 }
