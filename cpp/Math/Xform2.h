@@ -71,46 +71,46 @@ public:
 };
 
 
-inline Vector2 _DllExport_ operator*(const Vector2 &v, const Xform2 &x)
+_DllExport_ inline Vector2 operator*(const Vector2 &v, const Xform2 &x)
 {
 	return v * x.scale;
 }
 
-inline Vector2 & _DllExport_ operator*=(Vector2 &v, const Xform2 &x)
+_DllExport_ inline Vector2 & operator*=(Vector2 &v, const Xform2 &x)
 {
 	v *= x.scale;
 	return v;
 }
 
-inline Point2 _DllExport_ operator*(const Point2 &v, const Xform2 &x)
+_DllExport_ inline Point2 operator*(const Point2 &v, const Xform2 &x)
 {
 	return Point2::mul( v, x.scale )  +  x.translation;
 }
 
-inline Point2 & _DllExport_ operator*=(Point2 &v, const Xform2 &x)
+_DllExport_ inline Point2 & operator*=(Point2 &v, const Xform2 &x)
 {
 	v = Point2::mul( v, x.scale )  +  x.translation;
 	return v;
 }
 
-inline Segment2 _DllExport_ operator*(const Segment2 &v, const Xform2 &x)
+_DllExport_ inline Segment2 operator*(const Segment2 &v, const Xform2 &x)
 {
 	return Segment2( v.a * x, v.b * x );
 }
 
-inline Segment2 & _DllExport_ operator*=(Segment2 &v, const Xform2 &x)
+_DllExport_ inline Segment2 & operator*=(Segment2 &v, const Xform2 &x)
 {
 	v.a *= x;
 	v.b *= x;
 	return v;
 }
 
-inline Xform2 _DllExport_ operator*(const Xform2 &a, const Xform2 &b)
+_DllExport_ inline Xform2 operator*(const Xform2 &a, const Xform2 &b)
 {
 	return Xform2( a.scale * b.scale, a.translation * b.scale + b.translation );
 }
 
-inline Xform2 & _DllExport_ operator*=(Xform2 &a, const Xform2 &b)
+_DllExport_ inline Xform2 & operator*=(Xform2 &a, const Xform2 &b)
 {
 	a.scale *= b.scale;
 	a.translation *= b.scale;
