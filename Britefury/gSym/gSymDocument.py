@@ -49,7 +49,7 @@ class GSymUnit (object):
 	
 
 	@staticmethod
-	def readSX(self, unitSX):
+	def readSX(unitSX):
 		"""
 		($unit <language_module_to_import> <content>)
 		"""

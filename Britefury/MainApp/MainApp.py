@@ -472,7 +472,7 @@ class MainApp (object):
 								documentRoot = DMList( documentRoot )
 								t3 = datetime.now()
 								print 'Read SX time=%s, convert to DMLIst time=%s'  %  ( t2 - t1, t3 - t2 )
-								document = GSymDocument.readSX( documentRoot )
+								document = GSymDocument.readSX( self._world, documentRoot )
 								self.setDocument( document )
 							except IOError:
 								pass
