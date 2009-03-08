@@ -113,6 +113,11 @@ public class GSymNodeViewInstance
 		return new TextElement( styleSheet, txt );
 	}
 	
+	public Element textWithContent(TextStyleSheet styleSheet, String txt, String content)
+	{
+		return new TextElement( styleSheet, txt, content );
+	}
+	
 	public Element hiddenText(String txt)
 	{
 		return new HiddenContentElement( txt );

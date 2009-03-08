@@ -337,7 +337,12 @@ class _ExprImporter (_Importer):
 		result = [ _cmpName( node.ops[0] ), _expr( node.left ), _expr( node.comparators[0] ) ]
 		prev = node.comparators[0]
 		if len( node.ops ) > 1:
-			for op, comparator in zip( node.ops[1:], node.comparators[1:] ):
+			#for op, comparator in zip( node.ops[1:], node.comparators[1:] ):
+				#result = [ 'andTest', result, [ _cmpName( op ), _expr( prev ), _expr( comparator ) ] ]
+				#prev = comparator
+			for i in xrange( 1, len( node.ops ) ):
+				op = node.ops[i]
+				comparator = node.comparators[i]
 				result = [ 'andTest', result, [ _cmpName( op ), _expr( prev ), _expr( comparator ) ] ]
 				prev = comparator
 		return result
@@ -463,11 +468,11 @@ class _ExceptHandlerImporter (_Importer):
 				return [ 'UNPARSED', name ]
 		return method( structTab, node )
 	# Import statement
-	def excepthandler(self, structTab, node):
+	def ExceptHandler(self, structTab, node):
 		return [ 'exceptStmt',     _expr( node.type )   if node.type is not None   else '<nil>',     _target( node.name )   if node.name is not None   else '<nil>',    _flattenedCompound( structTab, node.body ) ]
 		
-	def excepthandlerType(self, structTab, node):
-		return self.excepthandler( structTab, node )
+	def ExceptHandlerType(self, structTab, node):
+		return self.ExceptHandler( structTab, node )
 
 	
 
@@ -550,7 +555,7 @@ class _CompoundStmtImporter (_Importer):
 	
 	# Function
 	def FunctionDef(self, structTab, node):
-		result = [ _decorator( dec )   for dec in node.decorators ]
+		result = [ _decorator( dec )   for dec in node.decorator_list ]
 		params = _extractParameters( node.args )
 		result.append( [ 'defStmt', node.name, params, _flattenedCompound( structTab, node.body ) ] )
 		return result
@@ -1286,8 +1291,8 @@ class Q (a,b):
 	x
 """
 		self._compStmtTest( src1, [ [ 'blankLine' ], [ 'classStmt', 'Q', '<nil>', [ [ 'var', 'x' ] ] ] ] )
-		self._compStmtTest( src2, [ [ 'blankLine' ], [ 'classStmt', 'Q', [ 'var', 'object' ], [ [ 'var', 'x' ] ] ] ] )
-		self._compStmtTest( src3, [ [ 'blankLine' ], [ 'classStmt', 'Q', [ 'tupleLiteral', [ 'var', 'a' ], [ 'var', 'b' ] ], [ [ 'var', 'x' ] ] ] ] )
+		self._compStmtTest( src2, [ [ 'blankLine' ], [ 'classStmt', 'Q', [ [ 'var', 'object' ] ], [ [ 'var', 'x' ] ] ] ] )
+		self._compStmtTest( src3, [ [ 'blankLine' ], [ 'classStmt', 'Q', [ [ 'var', 'a' ], [ 'var', 'b' ] ], [ [ 'var', 'x' ] ] ] ] )
 
 		
 if __name__ == '__main__':

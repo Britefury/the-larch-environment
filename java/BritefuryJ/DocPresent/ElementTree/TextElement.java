@@ -22,6 +22,11 @@ public class TextElement extends EditableLeafElement
 		super( new DPText( styleSheet, text ), text );
 	}
 
+	public TextElement(TextStyleSheet styleSheet, String text, String content)
+	{
+		super( new DPText( styleSheet, text ), content );
+	}
+
 
 
 	public DPText getWidget()
