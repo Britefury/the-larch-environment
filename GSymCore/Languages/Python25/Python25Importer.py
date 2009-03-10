@@ -337,6 +337,9 @@ class _ExprImporter (_Importer):
 		result = [ _cmpName( node.ops[0] ), _expr( node.left ), _expr( node.comparators[0] ) ]
 		prev = node.comparators[0]
 		if len( node.ops ) > 1:
+			# HACK
+			# Workaround for a bug in Jython; use first code segment when this is fixed
+			# HACK
 			#for op, comparator in zip( node.ops[1:], node.comparators[1:] ):
 				#result = [ 'andTest', result, [ _cmpName( op ), _expr( prev ), _expr( comparator ) ] ]
 				#prev = comparator
