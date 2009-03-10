@@ -129,7 +129,7 @@ public class NodeView
 	static Border titleFailBorder = new EmptyBorder( 0.0, 0.0, 0.0, 0.0, new Color( 1.0f, 0.85f, 0.85f ) );
 	static VBoxStyleSheet contentVBoxStyle = new VBoxStyleSheet( DPVBox.Typesetting.NONE, DPVBox.Alignment.LEFT, 0.0, false, 0.0 );
 	static VBoxStyleSheet nodeVBoxStyle = new VBoxStyleSheet( DPVBox.Typesetting.NONE, DPVBox.Alignment.EXPAND, 0.0, false, 0.0 );
-	static Border nodeBorder = new SolidBorder( 1.0, Color.black );
+	static Border nodeBorder = new SolidBorder( 1.0, Color.black, null );
 	
 	static VBoxStyleSheet childrenVBoxStyle = new VBoxStyleSheet( DPVBox.Typesetting.NONE, DPVBox.Alignment.LEFT, 3.0, false, 3.0 );
 	static HBoxStyleSheet mainHBoxStyle = new HBoxStyleSheet( DPHBox.Alignment.CENTRE, 80.0, false, 0.0 );

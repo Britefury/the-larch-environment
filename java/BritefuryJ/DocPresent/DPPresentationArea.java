@@ -824,6 +824,7 @@ public class DPPresentationArea extends DPBin implements CaretListener
 		{
 			DPContentLeafEditable leaf = (DPContentLeafEditable)getLeafClosestToLocalPoint( rootPos, new DPContentLeafEditable.EditableLeafWidgetFilter() );
 			Xform2 x = leaf.getTransformRelativeToRoot();
+			x = x.inverse();
 			leaf.placeCursor( x.transform( rootPos ) );
 		}
 

@@ -40,7 +40,7 @@ public class TextVisual
 		
 		public SegmentLayout(String text, Font font, FontRenderContext frc, int length)
 		{
-			layout = new TextLayout( text, font, frc );
+			this.layout = new TextLayout( text, font, frc );
 			this.length = length;
 		}
 		
@@ -127,22 +127,32 @@ public class TextVisual
 		
 		public static TextHitInfo hitTest(Point2 pos, SegmentLayout layouts[])
 		{
+			double ascent = 0.0;
+			for (SegmentLayout l: layouts)
+			{
+				ascent = Math.max( ascent, l.layout.getAscent() );
+			}
+			double relY = pos.y - ascent;
+
 			double x = 0.0;
+			int offset = 0;
 			for (SegmentLayout l: layouts)
 			{
 				double relX = pos.x - x;
 				double advance = l.layout.getAdvance();
 				if ( relX <= advance )
 				{
-					return l.layout.hitTestChar( (float)relX, (float)pos.y );
+					return l.layout.hitTestChar( (float)relX, (float)relY ).getOffsetHit( offset );
 				}
-				else
-				{
-					x += advance;
-				}
+				x += advance;
+				offset += l.length;
 			}
 			
-			return null;
+			SegmentLayout l = layouts[layouts.length-1];
+			// @x and @advance represent the values for the end of the layouts list; we need the values for the last entry
+			x -= l.layout.getAdvance();
+			offset -= l.length;
+			return l.layout.hitTestChar( (float)( pos.x - x ), (float)relY ).getOffsetHit( offset );
 		}
 	}
 	
@@ -390,8 +400,8 @@ public class TextVisual
 			}
 			else
 			{
-				layouts = new SegmentLayout[1];
-				layouts[0] = new SegmentLayout( text, styleSheet.getFont(), frc, text.length() );
+				SegmentLayout l = new SegmentLayout( text, styleSheet.getFont(), frc, text.length() );
+				layouts = new SegmentLayout[] { l };
 			}
 		}
 	}
