@@ -16,19 +16,21 @@ import java.awt.geom.Rectangle2D;
 public class SolidBorder extends Border
 {
 	private double thickness;
-	private Color colour;
+	private Color colour, backgroundColour;
 	
 	
 	public SolidBorder()
 	{
 		thickness = 0.0;
 		colour = Color.BLACK;
+		backgroundColour = null;
 	}
 	
-	public SolidBorder(double thickness, Color colour)
+	public SolidBorder(double thickness, Color colour, Color backgroundColour)
 	{
 		this.thickness = thickness;
 		this.colour = colour;
+		this.backgroundColour = backgroundColour;
 	}
 	
 	
@@ -56,6 +58,13 @@ public class SolidBorder extends Border
 
 	public void draw(Graphics2D graphics, double x, double y, double w, double h)
 	{
+		if ( backgroundColour != null )
+		{
+			graphics.setColor( backgroundColour );
+			graphics.fill( new Rectangle2D.Double( x + thickness, y + thickness, w - thickness, h - thickness ) );
+		}
+
+		
 		Stroke curStroke = graphics.getStroke();
 		Paint curPaint = graphics.getPaint();
 		

@@ -11,6 +11,7 @@ from BritefuryJ.GSym.View.ListView import ListViewLayout, ParagraphListViewLayou
 
 from BritefuryJ.DocPresent import *
 from BritefuryJ.DocPresent.StyleSheets import *
+from BritefuryJ.DocPresent.Border import *
 from BritefuryJ.DocPresent.ElementTree import *
 
 
@@ -25,6 +26,12 @@ literalFormat_textStyle = TextStyleSheet( Font( 'SansSerif', Font.PLAIN, 12 ),  
 punctuation_textStyle = TextStyleSheet( Font( 'SansSerif', Font.PLAIN, 12 ),  Color( 0.0, 0.0, 1.0 ) )
 operator_textStyle = TextStyleSheet( Font( 'SansSerif', Font.PLAIN, 12 ),  Color( 0.0, 0.5, 0.0 ) )
 comment_textStyle = TextStyleSheet( Font( 'SansSerif', Font.PLAIN, 12 ),  Color( 0.4, 0.4, 0.4 ) )
+
+#defBackground_border = SolidBorder( 2.0, Color( 0.765, 0.867, 0.816 ), Color( 0.913, 0.953, 0.933 ) )
+#defHeader_border = EmptyBorder( 0.0, 0.0, 0.0, 0.0, Color( 0.945, 0.973, 0.961 ) )
+
+defBackground_border = SolidBorder( 2.0, Color( 0.765, 0.867, 0.816 ), Color( 0.945, 0.973, 0.961 ) )
+defHeader_border = EmptyBorder( 0.0, 0.0, 0.0, 0.0, Color( 0.913, 0.953, 0.933 ) )
 
 pow_scriptStyle = ScriptStyleSheet( 0.0, 0.0 )
 div_fractionStyle = FractionStyleSheet( Color( 0.0, 0.5, 0.0 ) )

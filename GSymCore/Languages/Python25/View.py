@@ -1276,13 +1276,15 @@ class Python25View (GSymView):
 				paramElements.extend( [ p,  ctx.text( punctuation_textStyle, ', ' ) ] )
 			paramElements.append( paramViews[-1] )
 		paramElements.append( ctx.text( punctuation_textStyle, ')' ) )
-		return compoundStatementEditor( ctx, node,
-						ctx.paragraph( python_paragraphStyle, [ capitalisedKeywordText( ctx, defKeyword ),  ctx.text( default_textStyle, ' ' ),  ctx.text( default_textStyle, name ) ]  +  \
-							   paramElements  +  [ ctx.text( punctuation_textStyle, ':' ) ] ),
+		header = ctx.paragraph( python_paragraphStyle, [ capitalisedKeywordText( ctx, defKeyword ),  ctx.text( default_textStyle, ' ' ),  ctx.text( default_textStyle, name ) ]  +  \
+							   paramElements  +  [ ctx.text( punctuation_textStyle, ':' ) ] )
+		editor = compoundStatementEditor( ctx, node,
+						ctx.border( defHeader_border, ContainerStyleSheet.defaultStyleSheet, header ),
 						PRECEDENCE_STMT,
 						suite,
 						state,
 						self._parser.statement() )
+		return ctx.border( defBackground_border, ContainerStyleSheet.defaultStyleSheet, editor )
 
 	
 	# Decorator statement
