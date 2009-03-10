@@ -49,7 +49,7 @@ public class TextVisual
 		public void drawCaret(Graphics2D graphics, int charOffset, double xOffset)
 		{
 			Shape[] carets = layout.getCaretShapes( charOffset );
-			graphics.translate( xOffset, layout.getAscent() );
+			graphics.translate( xOffset, 0.0 );
 			graphics.draw( carets[0] );
 			if ( carets[1] != null )
 			{
@@ -104,18 +104,23 @@ public class TextVisual
 	
 		public static void drawCaret(Graphics2D graphics, int offset, SegmentLayout layouts[])
 		{
+			double ascent = 0.0;
+			for (SegmentLayout l: layouts)
+			{
+				ascent = Math.max( ascent, l.layout.getAscent() );
+			}
+			graphics.translate( 0.0, ascent );
+
 			double x = 0.0;
 			for (SegmentLayout l: layouts)
 			{
 				if ( offset <= l.length )
 				{
 					l.drawCaret( graphics, offset, x );
-					return;
+					break;
 				}
-				else
-				{
-					offset -= l.length;
-				}
+				offset -= l.length;
+				x += l.layout.getAdvance();
 			}
 		}
 		
