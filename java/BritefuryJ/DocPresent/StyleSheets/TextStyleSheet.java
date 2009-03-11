@@ -12,7 +12,7 @@ import java.awt.Font;
 
 public class TextStyleSheet extends ContentLeafStyleSheet
 {
-	private static Font defaultFont = new Font( "Sans serif", Font.PLAIN, 12 );
+	private static Font defaultFont = new Font( "Sans serif", Font.PLAIN, 14 );
 
 	
 	public static TextStyleSheet defaultStyleSheet = new TextStyleSheet();
