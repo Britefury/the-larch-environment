@@ -270,8 +270,6 @@ public abstract class BranchElement extends Element
 	
 	public Element createMetaElement()
 	{
-		Element metaHeader = createMetaHeader();
-		
 		VBoxElement metaChildrenVBox = new VBoxElement( metaVBoxStyle );
 		ArrayList<Element> childMetaElements = new ArrayList<Element>();
 		for (Element child: getChildren())
@@ -286,7 +284,7 @@ public abstract class BranchElement extends Element
 		
 		VBoxElement metaVBox = new VBoxElement( metaVBoxStyle );
 		ArrayList<Element> metaVBoxElements = new ArrayList<Element>();
-		metaVBoxElements.add( metaHeader );
+		metaVBoxElements.add( createMetaHeader() );
 		metaVBoxElements.add( indentMetaChildren );
 		metaVBox.setChildren( metaVBoxElements );
 		
@@ -298,7 +296,13 @@ public abstract class BranchElement extends Element
 		if ( metaElement != null )
 		{
 			VBoxElement metaVBox = (VBoxElement)metaElement;
-			BorderElement indentMetaChildren = (BorderElement)metaVBox.getChildren().get( 1 );
+			List<Element> curMetaVBoxChildren = metaVBox.getChildren();
+			ArrayList<Element> metaVBoxChildren = new ArrayList<Element>();
+			metaVBoxChildren.add( createMetaHeader() );
+			metaVBoxChildren.add( curMetaVBoxChildren.get( 1 ) );
+			metaVBox.setChildren( metaVBoxChildren );
+			
+			BorderElement indentMetaChildren = (BorderElement)metaVBoxChildren.get( 1 );
 			VBoxElement metaChildrenVBox = (VBoxElement)indentMetaChildren.getChild();
 
 			ArrayList<Element> childMetaElements = new ArrayList<Element>();

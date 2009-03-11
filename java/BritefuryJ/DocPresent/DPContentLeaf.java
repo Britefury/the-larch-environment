@@ -12,6 +12,7 @@ import java.util.WeakHashMap;
 import java.awt.Graphics2D;
 
 import BritefuryJ.DocPresent.Caret.Caret;
+import BritefuryJ.DocPresent.ElementTree.LeafElement;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleSheets.ContentLeafStyleSheet;
 import BritefuryJ.Math.Point2;
@@ -94,10 +95,12 @@ public abstract class DPContentLeaf extends DPWidget
 	protected void handleCaretEnter(Caret c)
 	{
 		onCaretEnter( c );
+		((LeafElement)element).onCaretEnter();
 	}
 	
 	protected void handleCaretLeave(Caret c)
 	{
+		((LeafElement)element).onCaretLeave();
 		onCaretLeave( c );
 	}
 	
