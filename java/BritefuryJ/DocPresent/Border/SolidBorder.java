@@ -12,23 +12,29 @@ import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.Stroke;
 import java.awt.geom.Rectangle2D;
+import java.awt.geom.RoundRectangle2D;
 
 public class SolidBorder extends Border
 {
-	private double thickness;
+	private double thickness, roundingX, roundingY;
 	private Color colour, backgroundColour;
 	
 	
 	public SolidBorder()
 	{
-		thickness = 0.0;
-		colour = Color.BLACK;
-		backgroundColour = null;
+		this( 0.0, 0.0, 0.0, Color.black, null );
 	}
 	
 	public SolidBorder(double thickness, Color colour, Color backgroundColour)
 	{
+		this( thickness, 0.0, 0.0, colour, backgroundColour );
+	}
+	
+	public SolidBorder(double thickness, double roundingX, double roundingY, Color colour, Color backgroundColour)
+	{
 		this.thickness = thickness;
+		this.roundingX = roundingX;
+		this.roundingY = roundingY;
 		this.colour = colour;
 		this.backgroundColour = backgroundColour;
 	}
@@ -61,7 +67,14 @@ public class SolidBorder extends Border
 		if ( backgroundColour != null )
 		{
 			graphics.setColor( backgroundColour );
-			graphics.fill( new Rectangle2D.Double( x + thickness, y + thickness, w - thickness, h - thickness ) );
+			if ( roundingX != 0.0  ||  roundingY != 0.0 )
+			{
+				graphics.fill( new RoundRectangle2D.Double( x + thickness, y + thickness, w - thickness, h - thickness, roundingX, roundingY ) );
+			}
+			else
+			{
+				graphics.fill( new Rectangle2D.Double( x + thickness, y + thickness, w - thickness, h - thickness ) );
+			}
 		}
 
 		
@@ -72,7 +85,14 @@ public class SolidBorder extends Border
 		graphics.setStroke( s );
 		graphics.setPaint( colour );
 		
-		graphics.draw( new Rectangle2D.Double( x + thickness*0.5, y + thickness*0.5, w-thickness, h-thickness ) );
+		if ( roundingX != 0.0  ||  roundingY != 0.0 )
+		{
+			graphics.draw( new RoundRectangle2D.Double( x + thickness*0.5, y + thickness*0.5, w-thickness, h-thickness, roundingX, roundingY ) );
+		}
+		else
+		{
+			graphics.draw( new Rectangle2D.Double( x + thickness*0.5, y + thickness*0.5, w-thickness, h-thickness ) );
+		}
 		
 		graphics.setStroke( curStroke );
 		graphics.setPaint( curPaint );

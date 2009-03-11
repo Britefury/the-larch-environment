@@ -9,34 +9,52 @@ package BritefuryJ.DocPresent.Border;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.geom.RoundRectangle2D;
 
 public class EmptyBorder extends Border
 {
-	private double leftMargin, rightMargin, topMargin, bottomMargin;
+	private double leftMargin, rightMargin, topMargin, bottomMargin, roundingX, roundingY;
 	private Color backgroundColour;
 	
 	
 	public EmptyBorder()
 	{
-		this( 0.0, 0.0, 0.0, 0.0, null );
+		this( 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, null );
 	}
 	
 	public EmptyBorder(Color backgroundColour)
 	{
-		this( 0.0, 0.0, 0.0, 0.0, backgroundColour );
+		this( 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, backgroundColour );
+	}
+	
+	public EmptyBorder(double roundingX, double roundingY, Color backgroundColour)
+	{
+		this( 0.0, 0.0, 0.0, 0.0, roundingX, roundingY, backgroundColour );
 	}
 	
 	public EmptyBorder(double leftMargin, double rightMargin, double topMargin, double bottomMargin)
 	{
-		this( leftMargin, rightMargin, topMargin, bottomMargin, null );
+		this( leftMargin, rightMargin, topMargin, bottomMargin, 0.0, 0.0, null );
+	}
+	
+	public EmptyBorder(double leftMargin, double rightMargin, double topMargin, double bottomMargin, double roundingX, double roundingY)
+	{
+		this( leftMargin, rightMargin, topMargin, bottomMargin, roundingX, roundingY, null );
 	}
 	
 	public EmptyBorder(double leftMargin, double rightMargin, double topMargin, double bottomMargin, Color backgroundColour)
+	{
+		this( leftMargin, rightMargin, topMargin, bottomMargin, 0.0, 0.0, backgroundColour );
+	}
+	
+	public EmptyBorder(double leftMargin, double rightMargin, double topMargin, double bottomMargin, double roundingX, double roundingY, Color backgroundColour)
 	{
 		this.leftMargin = leftMargin;
 		this.rightMargin = rightMargin;
 		this.topMargin = topMargin;
 		this.bottomMargin = bottomMargin;
+		this.roundingX = roundingX;
+		this.roundingY = roundingY;
 		this.backgroundColour = backgroundColour;
 	}
 	
@@ -66,8 +84,16 @@ public class EmptyBorder extends Border
 	{
 		if ( backgroundColour != null )
 		{
-			graphics.setColor( backgroundColour );
-			graphics.fill( new Rectangle2D.Double( x, y, w, h ) );
+			if ( roundingX != 0.0  ||  roundingY != 0.0 )
+			{
+				graphics.setColor( backgroundColour );
+				graphics.fill( new RoundRectangle2D.Double( x, y, w, h, roundingX, roundingY ) );
+			}
+			else
+			{
+				graphics.setColor( backgroundColour );
+				graphics.fill( new Rectangle2D.Double( x, y, w, h ) );
+			}
 		}
 	}
 }

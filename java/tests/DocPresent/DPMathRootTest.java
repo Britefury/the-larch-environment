@@ -13,16 +13,15 @@ import java.awt.Font;
 import javax.swing.JFrame;
 
 import BritefuryJ.DocPresent.DPFraction;
-import BritefuryJ.DocPresent.DPHBox;
+import BritefuryJ.DocPresent.DPMathRoot;
 import BritefuryJ.DocPresent.DPPresentationArea;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
-public class DPFractionTest
+public class DPMathRootTest
 {
 	protected DPWidget makeText(String text, TextStyleSheet styleSheet)
 	{
@@ -39,10 +38,8 @@ public class DPFractionTest
 	
 	protected DPWidget makeFraction(String numeratorText, String denominatorText)
 	{
-		Font f0 = new Font( "Sans serif", Font.PLAIN, 16 );
+		Font f0 = new Font( "Sans serif", Font.PLAIN, 14 );
 		TextStyleSheet s0 = new TextStyleSheet( f0, new Color( 0.0f, 0.5f, 0.0f ) );
-		TextStyleSheet s1 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 10 ), Color.blue );
-		TextStyleSheet s2 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 24 ), Color.red );
 		DPText num = new DPText( s0, numeratorText );
 		DPText denom = new DPText( s0, denominatorText );
 		
@@ -51,16 +48,24 @@ public class DPFractionTest
 		frac.setNumeratorChild( num );
 		frac.setDenominatorChild( denom );
 
-		DPText labelA = new DPText( s1, "Label A yYgGjJpPqQ" );
-		DPText labelB = new DPText( s2, "Label B yYgGjJpPqQ" );
-		
-		HBoxStyleSheet boxs = new HBoxStyleSheet( DPHBox.Alignment.BASELINES, 0.0, false, 0.0 );
-		DPHBox box = new DPHBox( boxs );
-		box.append( labelA );
-		box.append( frac );
-		box.append( labelB );
-		
-		return box;
+		return frac;
+	}
+
+	
+	protected DPWidget makeRoot(DPWidget child)
+	{
+		DPMathRoot root = new DPMathRoot();
+		root.setChild( child );
+		return root;
+	}
+
+	
+	protected DPWidget makeRoot(String text)
+	{
+		Font f0 = new Font( "Sans serif", Font.PLAIN, 14 );
+		TextStyleSheet s0 = new TextStyleSheet( f0, new Color( 0.0f, 0.5f, 0.0f ) );
+		DPText t = new DPText( s0, text );
+		return makeRoot( t );
 	}
 
 	
@@ -70,10 +75,9 @@ public class DPFractionTest
 		VBoxStyleSheet boxs = new VBoxStyleSheet( DPVBox.Typesetting.NONE, DPVBox.Alignment.LEFT, 0.0, false, 0.0 );
 		DPVBox box = new DPVBox( boxs );
 		
-		box.append( makeFraction( "a", "p" ) );
-		box.append( makeFraction( "a", "p+q" ) );
-		box.append( makeFraction( "a+b", "p" ) );
-		box.append( makeFraction( "a+b", "p+q" ) );
+		box.append( makeRoot( "a" ) );
+		box.append( makeRoot( "a+p" ) );
+		box.append( makeRoot( makeFraction( "a", "p+q" ) ) );
 		
 		
 		return box;
@@ -81,9 +85,9 @@ public class DPFractionTest
 
 
 
-	public DPFractionTest()
+	public DPMathRootTest()
 	{
-		JFrame frame = new JFrame( "Fraction test" );
+		JFrame frame = new JFrame( "Math root test" );
 
 		//This stops the app on window close.
 		frame.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
@@ -106,6 +110,6 @@ public class DPFractionTest
 	
 	public static void main(String[] args)
 	{
-		new DPFractionTest();
+		new DPMathRootTest();
 	}
 }

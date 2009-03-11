@@ -337,12 +337,14 @@ def statementNodeEditor(ctx, node, contents, precedence, state):
 		raise ValueError, 'invalid mode %d'  %  mode
 
 
-def compoundStatementEditor(ctx, node, headerContents, precedence, suite, state, statementParser):
+def compoundStatementEditor(ctx, node, headerContents, precedence, suite, state, statementParser, headerContainerFn=None):
 	outerPrecedence, parser, mode = state
 
 	headerSegment = ctx.segment( python_paragraphStyle, python_segmentCaretStopFactory, headerContents )
 	headerParagraph = ctx.paragraph( python_paragraphStyle, [ headerSegment, ctx.whitespace( '\n' ) ] )
 	headerElement = ctx.contentListener( headerParagraph, ParsedLineContentListener( ctx, node, parser ) )
+	if headerContainerFn is not None:
+		headerElement = headerContainerFn( headerElement )
 	statementElement = ctx.vbox( compoundStmt_vboxStyle, [ headerElement, ctx.indent( 30.0, suiteView( ctx, suite, statementParser ) ) ] )
 	return statementElement
 
@@ -563,7 +565,7 @@ class Python25View (GSymView):
 
 	def listComprehension(self, ctx, state, node, expr, *xs):
 		exprView = ctx.viewEvalFn( expr, None, python25ViewState( PRECEDENCE_COMPREHENSIONELEMENT, self._parser.expression() ) )
-		xViews = ctx.mapViewEvalFn( xs, None, python25ViewState( PRECEDENCE_COMPREHENSIONELEMENT, self._parser.listComprehensionItem() ) )
+		xViews = ctx.mapViewEvalFn( xs, None, python25ViewState( PRECEDENCE_COMPREHENSIONELEMENT, self._parser.comprehensionItem() ) )
 		xViewsSpaced = []
 		if len( xViews ) > 0:
 			for x in xViews[:-1]:
@@ -596,7 +598,7 @@ class Python25View (GSymView):
 
 	def generatorExpression(self, ctx, state, node, expr, *xs):
 		exprView = ctx.viewEvalFn( expr, None, python25ViewState( PRECEDENCE_COMPREHENSIONELEMENT, self._parser.expression() ) )
-		xViews = ctx.mapViewEvalFn( xs, None, python25ViewState( PRECEDENCE_COMPREHENSIONELEMENT, self._parser.generatorExpressionItem() ) )
+		xViews = ctx.mapViewEvalFn( xs, None, python25ViewState( PRECEDENCE_COMPREHENSIONELEMENT, self._parser.comprehensionItem() ) )
 		xViewsSpaced = []
 		if len( xViews ) > 0:
 			for x in xViews[:-1]:
@@ -1276,14 +1278,14 @@ class Python25View (GSymView):
 				paramElements.extend( [ p,  ctx.text( punctuation_textStyle, ', ' ) ] )
 			paramElements.append( paramViews[-1] )
 		paramElements.append( ctx.text( punctuation_textStyle, ')' ) )
-		header = ctx.paragraph( python_paragraphStyle, [ capitalisedKeywordText( ctx, defKeyword ),  ctx.text( default_textStyle, ' ' ),  ctx.text( default_textStyle, name ) ]  +  \
-							   paramElements  +  [ ctx.text( punctuation_textStyle, ':' ) ] )
 		editor = compoundStatementEditor( ctx, node,
-						ctx.border( defHeader_border, ContainerStyleSheet.defaultStyleSheet, header ),
+						ctx.paragraph( python_paragraphStyle, [ capitalisedKeywordText( ctx, defKeyword ),  ctx.text( default_textStyle, ' ' ),  ctx.text( default_textStyle, name ) ]  +  \
+							   paramElements  +  [ ctx.text( punctuation_textStyle, ':' ) ] ),
 						PRECEDENCE_STMT,
 						suite,
 						state,
-						self._parser.statement() )
+						self._parser.statement(),
+						lambda header: ctx.border( defHeader_border, ContainerStyleSheet.defaultStyleSheet, header ) )
 		return ctx.border( defBackground_border, ContainerStyleSheet.defaultStyleSheet, editor )
 
 	
@@ -1316,13 +1318,16 @@ class Python25View (GSymView):
 		else:
 			inhElements = []
 			
-		return compoundStatementEditor( ctx, node,
+		editor = compoundStatementEditor( ctx, node,
 						ctx.paragraph( python_paragraphStyle, [ capitalisedKeywordText( ctx, classKeyword ),  ctx.text( default_textStyle, ' ' ),  ctx.text( default_textStyle, name ) ]  +  \
 							   inhElements  +  [ ctx.text( punctuation_textStyle, ':' ) ] ),
 						PRECEDENCE_STMT,
 						suite,
 						state,
-						self._parser.statement() )
+						self._parser.statement(),
+						lambda header: ctx.border( classHeader_border, ContainerStyleSheet.defaultStyleSheet, header ) )
+		
+		return ctx.border( classBackground_border, ContainerStyleSheet.defaultStyleSheet, editor )
 	
 
 	
