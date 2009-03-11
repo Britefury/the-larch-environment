@@ -11,6 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import BritefuryJ.DocPresent.DPContainer;
+import BritefuryJ.DocPresent.DPVBox;
+import BritefuryJ.DocPresent.Border.EmptyBorder;
+import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
 public abstract class BranchElement extends Element
 {
@@ -62,6 +65,7 @@ public abstract class BranchElement extends Element
 	protected void onChildListChanged()
 	{
 		onSubtreeStructureChanged();
+		refreshMetaElement();
 	}
 	
 	protected void onSubtreeStructureChanged()
@@ -257,6 +261,71 @@ public abstract class BranchElement extends Element
 
 
 
+	//
+	// Meta-element
+	//
+	
+	static EmptyBorder metaIndentBorder = new EmptyBorder( 25.0, 0.0, 0.0, 0.0 );
+	static VBoxStyleSheet metaVBoxStyle = new VBoxStyleSheet( DPVBox.Typesetting.ALIGN_WITH_BOTTOM, DPVBox.Alignment.LEFT, 0.0, false, 0.0 );
+	
+	public Element createMetaElement()
+	{
+		Element metaHeader = createMetaHeader();
+		
+		VBoxElement metaChildrenVBox = new VBoxElement( metaVBoxStyle );
+		ArrayList<Element> childMetaElements = new ArrayList<Element>();
+		for (Element child: getChildren())
+		{
+			Element metaChild = child.initialiseMetaElement();
+			childMetaElements.add( metaChild );
+		}
+		metaChildrenVBox.setChildren( childMetaElements );
+		
+		BorderElement indentMetaChildren = new BorderElement( metaIndentBorder );
+		indentMetaChildren.setChild( metaChildrenVBox );
+		
+		VBoxElement metaVBox = new VBoxElement( metaVBoxStyle );
+		ArrayList<Element> metaVBoxElements = new ArrayList<Element>();
+		metaVBoxElements.add( metaHeader );
+		metaVBoxElements.add( indentMetaChildren );
+		metaVBox.setChildren( metaVBoxElements );
+		
+		return metaVBox;
+	}
+	
+	public void refreshMetaElement()
+	{
+		if ( metaElement != null )
+		{
+			VBoxElement metaVBox = (VBoxElement)metaElement;
+			BorderElement indentMetaChildren = (BorderElement)metaVBox.getChildren().get( 1 );
+			VBoxElement metaChildrenVBox = (VBoxElement)indentMetaChildren.getChild();
+
+			ArrayList<Element> childMetaElements = new ArrayList<Element>();
+			for (Element child: getChildren())
+			{
+				Element metaChild = child.initialiseMetaElement();
+				childMetaElements.add( metaChild );
+			}
+			metaChildrenVBox.setChildren( childMetaElements );
+		}
+	}
+
+	public void shutdownMetaElement()
+	{
+		if ( metaElement != null )
+		{
+			for (Element child: getChildren())
+			{
+				child.shutdownMetaElement();
+			}
+		}
+		super.shutdownMetaElement();
+	}
+
+	
+	
+	
 	//
 	// Element type methods
 	//

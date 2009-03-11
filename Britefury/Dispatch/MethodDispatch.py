@@ -34,6 +34,26 @@ def methodDispatch(target, node, *args):
 
 
 		
+def methodDispatchAndGetName(target, node, *args):
+	if isListNode( node ):
+		if len( node ) < 1:
+			raise DispatchDataError, 'methodDispatch(): require at least 1 element for dispatch'
+		name = node[0]
+		if isinstance( name, DocTreeString ):
+			name = name.toString()
+		try:
+			method = getattr( target, name )
+		except AttributeError:
+			raise DispatchError, 'methodDispatch(): could not find method named %s in class %s'  %  ( name, type( target ).__name__ )
+		return method( *( args + ( node, ) + tuple( node[1:] ) ) ),   name
+	else:
+		if isinstance( node, DocTreeNode ):
+			raise DispatchDataError, 'methodDispatch(): can only dispatch on lists; not on %s:%s  (from %s)'  %  ( node.getClass().getName(), nodeToSXString( node ), nodeToSXString( node.getParentTreeNode().getParentTreeNode() ) )
+		else:
+			raise DispatchDataError, 'methodDispatch(): can only dispatch on lists; not on %s'  %  ( nodeToSXString( node ) )
+
+
+		
 		
 import unittest
 

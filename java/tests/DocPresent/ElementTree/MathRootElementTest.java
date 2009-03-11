@@ -7,17 +7,14 @@
 package tests.DocPresent.ElementTree;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.util.ArrayList;
 
 import javax.swing.JFrame;
 
 import BritefuryJ.DocPresent.DPHBox;
-import BritefuryJ.DocPresent.DPPresentationArea;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.ElementTree.Element;
-import BritefuryJ.DocPresent.ElementTree.ElementTree;
 import BritefuryJ.DocPresent.ElementTree.FractionElement;
 import BritefuryJ.DocPresent.ElementTree.HBoxElement;
 import BritefuryJ.DocPresent.ElementTree.MathRootElement;
@@ -27,7 +24,7 @@ import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
-public class MathRootElementTest
+public class MathRootElementTest extends ElementTreeTestBase
 {
 	protected Element makeText(String text, TextStyleSheet styleSheet)
 	{
@@ -113,25 +110,12 @@ public class MathRootElementTest
 
 
 
-	public MathRootElementTest()
+	private MathRootElementTest()
 	{
 		JFrame frame = new JFrame( "Math root element test" );
-
-		//This stops the app on window close.
-		frame.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
-		
-		ElementTree tree = new ElementTree();
-
-		tree.getRoot().setChild( createContentNode() );
-	     
-	     
-		DPPresentationArea area = tree.getPresentationArea();
-		area.getComponent().setPreferredSize( new Dimension( 640, 480 ) );
-		frame.add( area.getComponent() );
-		frame.pack();
-		frame.setVisible(true);
+		initFrame( frame );
 	}
-	
+
 	
 	public static void main(String[] args)
 	{

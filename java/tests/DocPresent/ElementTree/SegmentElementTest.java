@@ -7,17 +7,14 @@
 package tests.DocPresent.ElementTree;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import javax.swing.JFrame;
 
-import BritefuryJ.DocPresent.DPPresentationArea;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.ElementTree.Element;
-import BritefuryJ.DocPresent.ElementTree.ElementTree;
 import BritefuryJ.DocPresent.ElementTree.FractionElement;
 import BritefuryJ.DocPresent.ElementTree.ParagraphElement;
 import BritefuryJ.DocPresent.ElementTree.ScriptElement;
@@ -28,7 +25,7 @@ import BritefuryJ.DocPresent.ElementTree.WhitespaceElement;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
-public class SegmentElementTest
+public class SegmentElementTest extends ElementTreeTestBase
 {
 	protected Element text(String text)
 	{
@@ -108,20 +105,7 @@ public class SegmentElementTest
 	public SegmentElementTest()
 	{
 		JFrame frame = new JFrame( "Segment test" );
-
-		//This stops the app on window close.
-		frame.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
-		
-		ElementTree tree = new ElementTree();
-
-		tree.getRoot().setChild( createContentNode() );
-	     
-	     
-		DPPresentationArea area = tree.getPresentationArea();
-		area.getComponent().setPreferredSize( new Dimension( 640, 480 ) );
-		frame.add( area.getComponent() );
-		frame.pack();
-		frame.setVisible(true);
+		initFrame( frame );
 	}
 	
 	

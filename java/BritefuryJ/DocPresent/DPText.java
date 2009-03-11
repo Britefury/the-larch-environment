@@ -45,6 +45,11 @@ public class DPText extends DPContentLeafEditable implements TextVisual.TextVisu
 		visual.setText( text );
 	}
 	
+	public String getText()
+	{
+		return "'" + text + "'";
+	}
+	
 	
 	public TextHitInfo hitTest(Point2 pos)
 	{
