@@ -14,6 +14,7 @@ import java.util.List;
 
 import BritefuryJ.DocPresent.DPHBox;
 import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.DPWidget.IsNotInSubtreeException;
 import BritefuryJ.DocPresent.ElementTree.Marker.ElementMarker;
 import BritefuryJ.DocPresent.Marker.Marker;
@@ -338,6 +339,8 @@ public abstract class Element
 	static TextStyleSheet headerDebugTextStyle = new TextStyleSheet( new Font( "Sans serif", Font.BOLD, 14 ), new Color( 0.0f, 0.5f, 0.5f ) );
 	static TextStyleSheet headerDescriptionTextStyle = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 14 ), new Color( 0.0f, 0.0f, 0.75f ) );
 	static HBoxStyleSheet metaHeaderHBoxStyle = new HBoxStyleSheet( DPHBox.Alignment.BASELINES, 10.0, false, 0.0 );
+	static SolidBorder metaHighlightBorder = new SolidBorder( 1.0, 5.0, 5.0, new Color( 0.75f, 0.0f, 0.0f ), new Color( 1.0f, 0.9f, 0.8f ) );
+
 
 	public Element createMetaHeaderData()
 	{
@@ -380,7 +383,18 @@ public abstract class Element
 		}
 		children.add( descr );
 		hbox.setChildren( children );
-		return hbox;
+		
+
+		if ( tree.getCaret().getMarker().getElement() == this )
+		{
+			BorderElement border = new BorderElement( metaHighlightBorder );
+			border.setChild( hbox );
+			return border;
+		}
+		else
+		{
+			return hbox;
+		}
 	}
 	
 	public Element createMetaElement()
@@ -402,6 +416,11 @@ public abstract class Element
 	public void shutdownMetaElement()
 	{
 		metaElement = null;
+	}
+	
+	public Element getMetaElement()
+	{
+		return metaElement;
 	}
 	
 	

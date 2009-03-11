@@ -127,8 +127,8 @@ class MainAppDocView (CellListener):
 	
 	
 	
-	def showMetaWindow(self):
-		self._elementTree.createMetaTreeWindow()
+	def createTreeExplorer(self):
+		self._elementTree.createTreeExplorer()
 	
 		
 	def reset(self):
@@ -235,7 +235,7 @@ class MainApp (object):
 		
 		viewMenu = JMenu( 'View' )
 		viewMenu.add( _action( 'Show LISP window', self._onShowLisp ) )
-		viewMenu.add( _action( 'Show meta-window', self._onShowMetaWindow ) )
+		viewMenu.add( _action( 'Show element tree explorer', self._onShowElementTreeExplorer ) )
 		viewMenu.add( _action( 'Reset', self._onReset ) )
 		viewMenu.add( _action( '1:1', self._onOneToOne ) )
 		
@@ -598,8 +598,8 @@ class MainApp (object):
 			self._lispFrame = None
 	
 	
-	def _onShowMetaWindow(self):
-		self._docView.showMetaWindow()
+	def _onShowElementTreeExplorer(self):
+		self._docView.createTreeExplorer()
 
 
 	def _onScriptWindowMenuItem(self):

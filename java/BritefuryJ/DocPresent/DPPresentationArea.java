@@ -482,6 +482,16 @@ public class DPPresentationArea extends DPBin implements CaretListener
 		queueFullRedraw();
 	}
 	
+	public void focusOn(DPWidget widget)
+	{
+		rootScaleInWindowSpace = 1.0;
+		Point2 topLeft = widget.getLocalPointRelativeToRoot( new Point2( 0.0, 0.0 ) );
+		Point2 bottomRight = widget.getLocalPointRelativeToRoot( new Point2( widget.getAllocation() ) );
+		Point2 centre = Point2.average( topLeft, bottomRight );
+		windowTopLeftCornerInRootSpace = centre.sub( areaSize.mul( 0.5 ) );
+		queueFullRedraw();
+	}
+	
 	public void zoomToFit()
 	{
 		performAllocation();
