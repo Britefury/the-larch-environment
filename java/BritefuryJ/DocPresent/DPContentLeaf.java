@@ -95,12 +95,18 @@ public abstract class DPContentLeaf extends DPWidget
 	protected void handleCaretEnter(Caret c)
 	{
 		onCaretEnter( c );
-		((LeafElement)element).onCaretEnter();
+		if ( element != null )
+		{
+			((LeafElement)element).onCaretEnter();
+		}
 	}
 	
 	protected void handleCaretLeave(Caret c)
 	{
-		((LeafElement)element).onCaretLeave();
+		if ( element != null )
+		{
+			((LeafElement)element).onCaretLeave();
+		}
 		onCaretLeave( c );
 	}
 	

@@ -77,6 +77,12 @@ public class Point2 {
 	{
 		return new Vector2( x, y );
 	}
+	
+	
+	public static Point2 average(Point2 a, Point2 b)
+	{
+		return new Point2( ( a.x + b.x ) * 0.5,  ( a.y + b.y ) * 0.5 );
+	}
 
 
 

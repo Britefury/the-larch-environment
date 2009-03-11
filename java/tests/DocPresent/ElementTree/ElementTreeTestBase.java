@@ -27,13 +27,13 @@ public abstract class ElementTreeTestBase
 		final ElementTree tree = new ElementTree();
 		
 		
-		AbstractAction showMetaTreeAction = new AbstractAction( "Show meta-tree" )
+		AbstractAction showMetaTreeAction = new AbstractAction( "Show element tree explorer" )
 		{
 			private static final long serialVersionUID = 1L;
 
 			public void actionPerformed(ActionEvent event)
 			{
-				tree.createMetaTreeWindow();
+				tree.createTreeExplorer();
 			}
 		};
 		
