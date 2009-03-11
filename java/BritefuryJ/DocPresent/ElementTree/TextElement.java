@@ -42,4 +42,16 @@ public class TextElement extends EditableLeafElement
 		
 		super.contentChanged();
 	}
+
+
+
+
+	//
+	// Meta-element
+	//
+	
+	public Element createMetaHeaderData()
+	{
+		return new TextElement( getWidget().getText() );
+	}
 }

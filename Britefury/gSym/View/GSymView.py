@@ -6,7 +6,7 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
 from Britefury.Dispatch.Dispatch import DispatchError
-from Britefury.Dispatch.MethodDispatch import methodDispatch
+from Britefury.Dispatch.MethodDispatch import methodDispatch, methodDispatchAndGetName
 
 from Britefury.gSym.View.gSymStyles import viewError_textStyle
 
@@ -16,10 +16,13 @@ from Britefury.gSym.View.gSymStyles import viewError_textStyle
 		
 class GSymView (object):
 	def __call__(self, xs, ctx, state):
+		element = None
 		try:
-			return methodDispatch( self, xs, ctx, state )
+			element, name = methodDispatchAndGetName( self, xs, ctx, state )
+			element.setDebugName( name )
 		except DispatchError:
-			return ctx.text( viewError_textStyle, '<<ERROR>>' )
+			element = ctx.text( viewError_textStyle, '<<ERROR>>' )
+		return element
 	
 		
 
