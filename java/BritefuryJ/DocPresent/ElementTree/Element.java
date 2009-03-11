@@ -385,7 +385,9 @@ public abstract class Element
 	
 	public Element createMetaElement()
 	{
-		return createMetaHeader();
+		BinElement bin = new BinElement();
+		bin.setChild( createMetaHeader() );
+		return bin;
 	}
 	
 	public Element initialiseMetaElement()
@@ -403,6 +405,15 @@ public abstract class Element
 	}
 	
 	
+	public void refreshMetaElement()
+	{
+		if ( metaElement != null )
+		{
+			BinElement bin = (BinElement)metaElement;
+			bin.setChild( createMetaHeader() );
+		}
+	}
+
 	public void setDebugName(String debugName)
 	{
 		this.debugName = debugName;
