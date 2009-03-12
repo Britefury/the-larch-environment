@@ -15,7 +15,7 @@ public class ElementTree
 {
 	protected RootElement root;
 	protected ElementCaret caret;
-	protected ElementTree metaTree;
+	protected DPPresentationArea metaArea;
 	protected ElementTreeExplorer explorer;
 	
 	
@@ -24,7 +24,7 @@ public class ElementTree
 		root = new RootElement();
 		root.setElementTree( this );
 		caret = new ElementCaret( this, getPresentationArea().getCaret() );
-		metaTree = null;
+		metaArea = null;
 		explorer = null;
 	}
 	
@@ -46,23 +46,24 @@ public class ElementTree
 	
 	
 	
-	public ElementTree initialiseMetaTree()
+	public DPPresentationArea initialiseMetaTree()
 	{
-		if ( metaTree == null )
+		if ( metaArea == null )
 		{
-			metaTree = new ElementTree();
-			metaTree.getRoot().setChild( root.initialiseMetaElement() );
+			metaArea = new DPPresentationArea();
+			metaArea.disableHorizontalClamping();
+			metaArea.setChild( root.initialiseMetaElement() );
 		}
 		
-		return metaTree;
+		return metaArea;
 	}
 	
 	public void shutdownMetaTree()
 	{
-		if ( metaTree != null )
+		if ( metaArea != null )
 		{
 			root.shutdownMetaElement();
-			metaTree = null;
+			metaArea = null;
 		}
 	}
 	

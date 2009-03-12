@@ -108,9 +108,14 @@ abstract public class DPContainerSequence extends DPContainer
 	}
 	
 	
-	public DPWidget __getitem__(int index)
+	public DPWidget get(int index)
 	{
 		return childEntries.get( index ).child;
+	}
+	
+	public DPWidget __getitem__(int index)
+	{
+		return get( index );
 	}
 	
 	public DPWidget[] __getitem__(PySlice slice)
@@ -127,7 +132,7 @@ abstract public class DPContainerSequence extends DPContainer
 	
 	
 	
-	public void __setitem__(int index, DPWidget item)
+	public void set(int index, DPWidget item)
 	{
 		ChildEntry newEntry = createChildEntryForChild( item );
 		ChildEntry oldEntry = childEntries.get( index );
@@ -138,6 +143,11 @@ abstract public class DPContainerSequence extends DPContainer
 		queueResize();
 	}
 	
+	public void __setitem__(int index, DPWidget item)
+	{
+		set( index, item );
+	}
+
 	@SuppressWarnings("unchecked")
 	public void __setitem__(PySlice slice, DPWidget[] items)
 	{

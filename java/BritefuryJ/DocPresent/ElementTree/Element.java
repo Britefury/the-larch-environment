@@ -12,9 +12,13 @@ import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
 
+import BritefuryJ.DocPresent.DPBin;
+import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPHBox;
+import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.Border.SolidBorder;
+import BritefuryJ.DocPresent.Border.Border;
+import BritefuryJ.DocPresent.Border.EmptyBorder;
 import BritefuryJ.DocPresent.DPWidget.IsNotInSubtreeException;
 import BritefuryJ.DocPresent.ElementTree.Marker.ElementMarker;
 import BritefuryJ.DocPresent.Marker.Marker;
@@ -27,7 +31,7 @@ public abstract class Element
 	protected BranchElement parent;
 	protected ElementTree tree;
 	protected ElementContentListener contentListener;
-	protected Element metaElement;
+	protected DPWidget metaElement;
 	protected String debugName;
 	
 	
@@ -336,22 +340,22 @@ public abstract class Element
 	// Meta-element
 	//
 	
-	static TextStyleSheet headerDebugTextStyle = new TextStyleSheet( new Font( "Sans serif", Font.BOLD, 14 ), new Color( 0.0f, 0.5f, 0.5f ) );
-	static TextStyleSheet headerDescriptionTextStyle = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 14 ), new Color( 0.0f, 0.0f, 0.75f ) );
-	static HBoxStyleSheet metaHeaderHBoxStyle = new HBoxStyleSheet( DPHBox.Alignment.BASELINES, 10.0, false, 0.0 );
-	static SolidBorder metaHighlightBorder = new SolidBorder( 1.0, 5.0, 5.0, new Color( 0.75f, 0.0f, 0.0f ), new Color( 1.0f, 0.9f, 0.8f ) );
+	protected static TextStyleSheet headerDebugTextStyle = new TextStyleSheet( new Font( "Sans serif", Font.BOLD, 14 ), new Color( 0.0f, 0.5f, 0.5f ) );
+	protected static TextStyleSheet headerDescriptionTextStyle = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 14 ), new Color( 0.0f, 0.0f, 0.75f ) );
+	protected static HBoxStyleSheet metaHeaderHBoxStyle = new HBoxStyleSheet( DPHBox.Alignment.BASELINES, 10.0, false, 0.0 );
+	protected static EmptyBorder metaHeaderEmptyBorder = new EmptyBorder();
 
 
-	public Element createMetaHeaderData()
+	public DPWidget createMetaHeaderData()
 	{
 		return null;
 	}
 	
-	public Element createMetaHeaderDebug()
+	public DPWidget createMetaHeaderDebug()
 	{
 		if ( debugName != null )
 		{
-			return new TextElement( headerDebugTextStyle, "<" + debugName + ">" );
+			return new DPText( headerDebugTextStyle, "<" + debugName + ">" );
 		}
 		else
 		{
@@ -359,52 +363,61 @@ public abstract class Element
 		}
 	}
 	
-	public Element createMetaDescription()
+	public DPWidget createMetaDescription()
 	{
 		String description = toString();
 		int index = description.lastIndexOf( "." );
-		return new TextElement( headerDescriptionTextStyle, description.substring( index + 1 ) );
+		return new DPText( headerDescriptionTextStyle, description.substring( index + 1 ) );
 	}
 	
-	public Element createMetaHeader()
+	protected Border getMetaHeaderBorder()
 	{
-		HBoxElement hbox = new HBoxElement( metaHeaderHBoxStyle );
-		ArrayList<Element> children = new ArrayList<Element>();
-		Element data = createMetaHeaderData();
-		Element debug = createMetaHeaderDebug();
-		Element descr = createMetaDescription();
+		return metaHeaderEmptyBorder;
+	}
+	
+	public DPWidget createMetaHeader()
+	{
+		DPHBox hbox = new DPHBox( metaHeaderHBoxStyle );
+		DPWidget data = createMetaHeaderData();
+		DPWidget debug = createMetaHeaderDebug();
+		DPWidget descr = createMetaDescription();
 		if ( data != null )
 		{
-			children.add( data );
+			hbox.append( data );
 		}
 		if ( debug != null )
 		{
-			children.add( debug );
+			hbox.append( debug );
 		}
-		children.add( descr );
-		hbox.setChildren( children );
+		hbox.append( descr );
 		
 
-		if ( tree.getCaret().getMarker().getElement() == this )
+		DPBorder border = new DPBorder( getMetaHeaderBorder() );
+		border.setChild( hbox );
+		return border;
+	}
+	
+	public DPBorder getMetaHeaderBorderWidget()
+	{
+		if ( metaElement != null )
 		{
-			BorderElement border = new BorderElement( metaHighlightBorder );
-			border.setChild( hbox );
-			return border;
+			DPBin bin = (DPBin)metaElement;
+			return (DPBorder)bin.getChild();
 		}
 		else
 		{
-			return hbox;
+			return null;
 		}
 	}
 	
-	public Element createMetaElement()
+	public DPWidget createMetaElement()
 	{
-		BinElement bin = new BinElement();
+		DPBin bin = new DPBin();
 		bin.setChild( createMetaHeader() );
 		return bin;
 	}
 	
-	public Element initialiseMetaElement()
+	public DPWidget initialiseMetaElement()
 	{
 		if ( metaElement == null )
 		{
@@ -418,21 +431,12 @@ public abstract class Element
 		metaElement = null;
 	}
 	
-	public Element getMetaElement()
+	public DPWidget getMetaElement()
 	{
 		return metaElement;
 	}
 	
 	
-	public void refreshMetaElement()
-	{
-		if ( metaElement != null )
-		{
-			BinElement bin = (BinElement)metaElement;
-			bin.setChild( createMetaHeader() );
-		}
-	}
-
 	public void setDebugName(String debugName)
 	{
 		this.debugName = debugName;

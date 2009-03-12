@@ -7,10 +7,15 @@
 //##************************
 package BritefuryJ.DocPresent.ElementTree;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
+import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPContentLeaf;
+import BritefuryJ.DocPresent.Border.Border;
+import BritefuryJ.DocPresent.Border.SolidBorder;
+import BritefuryJ.DocPresent.ElementTree.Caret.ElementCaret;
 
 public abstract class LeafElement extends Element
 {
@@ -189,14 +194,38 @@ public abstract class LeafElement extends Element
 	// Caret methods
 	//
 	
+	protected static SolidBorder metaHeaderHighlightBorder = new SolidBorder( 1.0, 5.0, 5.0, new Color( 0.75f, 0.0f, 0.0f ), new Color( 1.0f, 0.9f, 0.8f ) );
+
+	protected Border getMetaHeaderBorder()
+	{
+		ElementCaret caret = tree.getCaret();
+		if ( caret != null )
+		{
+			Element e = caret.getMarker().getElement();
+			if ( e == this )
+			{
+				return metaHeaderHighlightBorder;
+			}
+		}
+		return metaHeaderEmptyBorder;
+	}
+	
 	public void onCaretEnter()
 	{
-		refreshMetaElement();
+		DPBorder border = getMetaHeaderBorderWidget(); 
+		if ( border != null )
+		{
+			border.setBorder( metaHeaderHighlightBorder );
+		}
 	}
 	
 	public void onCaretLeave()
 	{
-		refreshMetaElement();
+		DPBorder border = getMetaHeaderBorderWidget(); 
+		if ( border != null )
+		{
+			border.setBorder( metaHeaderEmptyBorder );
+		}
 	}
 
 	

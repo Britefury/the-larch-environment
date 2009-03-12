@@ -10,8 +10,10 @@ package BritefuryJ.DocPresent.ElementTree;
 import java.util.ArrayList;
 import java.util.List;
 
+import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPContainer;
 import BritefuryJ.DocPresent.DPVBox;
+import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Border.EmptyBorder;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
@@ -268,25 +270,34 @@ public abstract class BranchElement extends Element
 	static EmptyBorder metaIndentBorder = new EmptyBorder( 25.0, 0.0, 0.0, 0.0 );
 	static VBoxStyleSheet metaVBoxStyle = new VBoxStyleSheet( DPVBox.Typesetting.ALIGN_WITH_BOTTOM, DPVBox.Alignment.LEFT, 0.0, false, 0.0 );
 	
-	public Element createMetaElement()
+	public DPBorder getMetaHeaderBorderWidget()
 	{
-		VBoxElement metaChildrenVBox = new VBoxElement( metaVBoxStyle );
-		ArrayList<Element> childMetaElements = new ArrayList<Element>();
+		if ( metaElement != null )
+		{
+			DPVBox metaVBox = (DPVBox)metaElement;
+			return (DPBorder)metaVBox.get( 0 );
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	public DPWidget createMetaElement()
+	{
+		DPVBox metaChildrenVBox = new DPVBox( metaVBoxStyle );
 		for (Element child: getChildren())
 		{
-			Element metaChild = child.initialiseMetaElement();
-			childMetaElements.add( metaChild );
+			DPWidget metaChild = child.initialiseMetaElement();
+			metaChildrenVBox.append( metaChild );
 		}
-		metaChildrenVBox.setChildren( childMetaElements );
 		
-		BorderElement indentMetaChildren = new BorderElement( metaIndentBorder );
+		DPBorder indentMetaChildren = new DPBorder( metaIndentBorder );
 		indentMetaChildren.setChild( metaChildrenVBox );
 		
-		VBoxElement metaVBox = new VBoxElement( metaVBoxStyle );
-		ArrayList<Element> metaVBoxElements = new ArrayList<Element>();
-		metaVBoxElements.add( createMetaHeader() );
-		metaVBoxElements.add( indentMetaChildren );
-		metaVBox.setChildren( metaVBoxElements );
+		DPVBox metaVBox = new DPVBox( metaVBoxStyle );
+		metaVBox.append( createMetaHeader() );
+		metaVBox.append( indentMetaChildren );
 		
 		return metaVBox;
 	}
@@ -295,20 +306,15 @@ public abstract class BranchElement extends Element
 	{
 		if ( metaElement != null )
 		{
-			VBoxElement metaVBox = (VBoxElement)metaElement;
-			List<Element> curMetaVBoxChildren = metaVBox.getChildren();
-			ArrayList<Element> metaVBoxChildren = new ArrayList<Element>();
-			metaVBoxChildren.add( createMetaHeader() );
-			metaVBoxChildren.add( curMetaVBoxChildren.get( 1 ) );
-			metaVBox.setChildren( metaVBoxChildren );
+			DPVBox metaVBox = (DPVBox)metaElement;
 			
-			BorderElement indentMetaChildren = (BorderElement)metaVBoxChildren.get( 1 );
-			VBoxElement metaChildrenVBox = (VBoxElement)indentMetaChildren.getChild();
+			DPBorder indentMetaChildren = (DPBorder)metaVBox.get( 1 );
+			DPVBox metaChildrenVBox = (DPVBox)indentMetaChildren.getChild();
 
-			ArrayList<Element> childMetaElements = new ArrayList<Element>();
+			ArrayList<DPWidget> childMetaElements = new ArrayList<DPWidget>();
 			for (Element child: getChildren())
 			{
-				Element metaChild = child.initialiseMetaElement();
+				DPWidget metaChild = child.initialiseMetaElement();
 				childMetaElements.add( metaChild );
 			}
 			metaChildrenVBox.setChildren( childMetaElements );
