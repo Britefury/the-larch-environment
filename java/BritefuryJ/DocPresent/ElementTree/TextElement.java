@@ -8,6 +8,7 @@
 package BritefuryJ.DocPresent.ElementTree;
 
 import BritefuryJ.DocPresent.DPText;
+import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 
 public class TextElement extends EditableLeafElement
@@ -50,8 +51,8 @@ public class TextElement extends EditableLeafElement
 	// Meta-element
 	//
 	
-	public Element createMetaHeaderData()
+	public DPWidget createMetaHeaderData()
 	{
-		return new TextElement( getWidget().getText() );
+		return new DPText( getWidget().getText() );
 	}
 }

@@ -48,6 +48,28 @@ public class DPBorder extends DPBin
 	
 	
 	
+	public Border getBorder()
+	{
+		return border;
+	}
+	
+	public void setBorder(Border b)
+	{
+		if ( b != border )
+		{
+			if ( b.getLeftMargin() != border.getLeftMargin()  ||  b.getRightMargin() != border.getRightMargin()  ||  b.getTopMargin() != border.getTopMargin()  ||  b.getBottomMargin() != border.getBottomMargin() )
+			{
+				queueResize();
+			}
+			else
+			{
+				queueFullRedraw();
+			}
+			border = b;
+		}
+	}
+	
+	
 	
 	protected void drawBackground(Graphics2D graphics)
 	{

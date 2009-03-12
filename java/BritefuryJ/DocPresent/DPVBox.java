@@ -150,7 +150,7 @@ public class DPVBox extends DPAbstractBox
 			}
 			else if ( typesetting == Typesetting.ALIGN_WITH_BOTTOM )
 			{
-				if ( topTSMetrics != null )
+				if ( bottomTSMetrics != null )
 				{
 					return new VMetricsTypeset( height - bottomTSMetrics.descent, bottomTSMetrics.descent, vspacing );
 				}
