@@ -408,7 +408,7 @@ def suiteView(ctx, suite, parser):
 	#newLineFac = lambda index, child: ctx.whitespace( '\n' )
 	def newLineFac(index, child):
 		w = ctx.whitespace( '\n' )
-		listener = NewLineContentListener( ctx, node, self._parser.statement(), index, lineViews[index], lineViews[index+1]   if index+1 < len(node)   else   None )
+		listener = NewLineContentListener( ctx, suite, parser, index, lineViews[index], lineViews[index+1]   if index+1 < len(lineViews)   else   None )
 		return ctx.contentListener( w, listener )
 	return ctx.listView( suite_listViewLayout, None, None, newLineFac, lineViews )
 
