@@ -114,7 +114,6 @@ public abstract class DPContentLeafEditableEntry extends DPContentLeafEditable
 						return false;
 					}
 				}
-				System.out.println( "DPContentLeafEditableEntry.handleDelete(): moving marker to " + right.getElement().toString() );
 				right.moveMarkerToStart( caret.getMarker() );
 				return true;
 			}
