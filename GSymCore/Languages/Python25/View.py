@@ -232,7 +232,6 @@ class NewLineContentListener (LineContentListenerWithParser):
 			endIndex = self._index + 2   if self._after is not None   else   self._index + 1
 			
 			value = beforeContent + afterContent
-			print 'Python25 View: NewContentListener.contentModified(): ', self._before
 			
 
 			# Split into lines
