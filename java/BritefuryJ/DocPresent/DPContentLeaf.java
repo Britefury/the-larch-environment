@@ -12,6 +12,7 @@ import java.util.WeakHashMap;
 import java.awt.Graphics2D;
 
 import BritefuryJ.DocPresent.Caret.Caret;
+import BritefuryJ.DocPresent.ElementTree.Element;
 import BritefuryJ.DocPresent.ElementTree.LeafElement;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleSheets.ContentLeafStyleSheet;
@@ -510,6 +511,40 @@ public abstract class DPContentLeaf extends DPWidget
 			Point2 cursorPosInBelow = getLocalPointRelativeTo( below, cursorPos );
 			int contentPos = below.getMarkerPositonForPoint( cursorPosInBelow );
 			below.moveMarker( marker, contentPos, Marker.Bias.START );
+		}
+	}
+	
+	protected void moveMarkerHome(Marker marker)
+	{
+		Element segment = null, homeElement = null;
+		segment = element.getSegment();
+		homeElement = segment != null  ?  segment.getFirstEditableEntryLeafInSubtree()  :  null;
+		if ( segment != null  &&  element == homeElement  &&  isMarkerAtStart( marker ) )
+		{
+			segment = segment.getParent().getSegment();
+			homeElement = segment != null  ?  segment.getFirstEditableEntryLeafInSubtree()  :  null;
+		}
+		
+		if ( homeElement != null )
+		{
+			homeElement.getWidget().moveMarkerToStart( marker );
+		}
+	}
+	
+	protected void moveMarkerEnd(Marker marker)
+	{
+		Element segment = null, endElement = null;
+		segment = element.getSegment();
+		endElement = segment != null  ?  segment.getLastEditableEntryLeafInSubtree()  :  null;
+		if ( segment != null  &&  element == endElement  &&  isMarkerAtEnd( marker ) )
+		{
+			segment = segment.getParent().getSegment();
+			endElement = segment != null  ?  segment.getLastEditableEntryLeafInSubtree()  :  null;
+		}
+		
+		if ( endElement != null )
+		{
+			endElement.getWidget().moveMarkerToEnd( marker );
 		}
 	}
 	
