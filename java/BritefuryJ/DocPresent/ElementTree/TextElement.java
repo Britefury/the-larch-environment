@@ -11,7 +11,7 @@ import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 
-public class TextElement extends EditableLeafElement
+public class TextElement extends EditableEntryLeafElement
 {
 	public TextElement(String text)
 	{

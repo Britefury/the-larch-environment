@@ -39,11 +39,11 @@ public abstract class ElementTreeTestBase
 		
 		
 		// Menu
-		JMenu viewMenu = new JMenu( "View" );
-		viewMenu.add( showMetaTreeAction );
+		JMenu debugMenu = new JMenu( "Debug" );
+		debugMenu.add( showMetaTreeAction );
 		
 		JMenuBar menuBar = new JMenuBar();
-		menuBar.add( viewMenu );
+		menuBar.add( debugMenu );
 		
 		frame.setJMenuBar( menuBar );
 		

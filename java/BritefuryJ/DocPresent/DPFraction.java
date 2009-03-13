@@ -24,7 +24,7 @@ import BritefuryJ.Math.Point2;
 
 public class DPFraction extends DPContainer
 {
-	public static class DPFractionBar extends DPContentLeafEditable
+	public static class DPFractionBar extends DPContentLeafEditableEntry
 	{
 		public DPFractionBar()
 		{

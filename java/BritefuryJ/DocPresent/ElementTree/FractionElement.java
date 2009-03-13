@@ -15,7 +15,7 @@ import BritefuryJ.DocPresent.StyleSheets.FractionStyleSheet;
 
 public class FractionElement extends BranchElement
 {
-	public static class BarElement extends EditableLeafElement
+	public static class BarElement extends EditableEntryLeafElement
 	{
 		public BarElement(String content)
 		{

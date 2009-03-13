@@ -45,7 +45,14 @@ def methodDispatchAndGetName(target, node, *args):
 			method = getattr( target, name )
 		except AttributeError:
 			raise DispatchError, 'methodDispatch(): could not find method named %s in class %s'  %  ( name, type( target ).__name__ )
-		return method( *( args + ( node, ) + tuple( node[1:] ) ) ),   name
+		#return method( *( args + ( node, ) + tuple( node[1:] ) ) ),   name
+		try:
+			lastArgs = tuple( node[1:] )
+		except TypeError:
+			print node[1:]
+			lastArgs = ()
+		methodArgs = args + ( node, ) + lastArgs
+		return method( *methodArgs ),   name
 	else:
 		if isinstance( node, DocTreeNode ):
 			raise DispatchDataError, 'methodDispatch(): can only dispatch on lists; not on %s:%s  (from %s)'  %  ( node.getClass().getName(), nodeToSXString( node ), nodeToSXString( node.getParentTreeNode().getParentTreeNode() ) )

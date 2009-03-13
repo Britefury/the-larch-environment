@@ -17,7 +17,7 @@ import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.Util.TextVisual;
 import BritefuryJ.Math.Point2;
 
-public class DPText extends DPContentLeafEditable implements TextVisual.TextVisualListener
+public class DPText extends DPContentLeafEditableEntry implements TextVisual.TextVisualListener
 {
 	protected TextVisual visual;
 	protected String text;

@@ -137,7 +137,7 @@ class DVNode (object):
 					leafOffset = leaf.getContentOffsetInSubtree( self._elementContent )
 					leafPosition = newPosition - leafOffset
 					
-					if leaf.isEditable():
+					if leaf.isEditableEntry():
 						#print 'Node "%s"; content was "%s" now "%s"'  %  ( self.docNode[0], startContent, self._elementContent.getContent() )
 						#print 'Position was %d, now is %d; leaf (%s) offset is %d, moving to %d in leaf'  %  ( position, newPosition, leaf.getContent(), leafOffset, leafPosition )
 						leaf.moveMarker( caret.getMarker(), leafPosition, newBias )

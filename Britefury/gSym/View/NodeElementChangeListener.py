@@ -166,7 +166,7 @@ class _NodeElementChangeListener (DVNode.NodeElementChangeListener):
 						leafOffset = leaf.getContentOffsetInSubtree( elementContent )
 					leafPosition = newPosition - leafOffset
 					
-					if leaf.isEditable():
+					if leaf.isEditableEntry():
 						#print 'Node "%s"; content was "%s" now "%s"'  %  ( node.getDocNode()[0], startContent, elementContent.getContent() )
 						#print 'Position was %d, now is %d; leaf (%s) offset is %d, moving to %d in leaf'  %  ( position, newPosition, leaf.getContent(), leafOffset, leafPosition )
 						leaf.moveMarker( caret.getMarker(), leafPosition, newBias )

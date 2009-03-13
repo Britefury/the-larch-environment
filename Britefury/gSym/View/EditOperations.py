@@ -5,6 +5,8 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
+from java.util import List
+
 from BritefuryJ.DocModel import DMList
 
 #from Britefury.DocTree.DocTreeNode import DocTreeNode
@@ -19,8 +21,20 @@ def _sanitiseInputData(data):
 		return DMList( [ _sanitiseInputData( x )   for x in data ] )
 	elif isinstance( data, tuple ):
 		return DMList( [ _sanitiseInputData( x )   for x in data ] )
+	elif isinstance( data, List ):
+		return DMList( [ _sanitiseInputData( x )   for x in data ] )
 	else:
 		return data
+	
+	
+def _dataForStr(data):
+	if isinstance( data, DocTreeNode ):
+		return _dataForStr( data.getNode() )
+	elif isinstance( data, List ):
+		return [ _sanitiseInputData( x )   for x in data ]
+	else:
+		return data
+	
 
 
 def replace(ctx, data, replacement):
@@ -28,8 +42,9 @@ def replace(ctx, data, replacement):
 		parent = data.getParentTreeNode()
 		if parent is None:
 			print 'EditOperations:replace(): no parent ', data
-		parent[data.getIndexInParent()] = _sanitiseInputData( replacement )
-		return parent[data.getIndexInParent()]
+		index = parent.indexOfById( data.getNode() )
+		parent[index] = _sanitiseInputData( replacement )
+		return parent[index]
 	else:
 		raise TypeError, 'EditOperations:replace(): @data must be a DocTreeNode'
 	
@@ -47,8 +62,9 @@ def replaceWithRange(ctx, data, replacement):
 		parent = data.getParentTreeNode()
 		if parent is None:
 			print 'EditOperations:replaceWithRange(): no parent ', data
-		parent[data.getIndexInParent():data.getIndexInParent()+1] = _sanitiseInputData( replacement )
-		return parent[data.getIndexInParent()]
+		index = parent.indexOfById( data.getNode() )
+		parent[index:index+1] = _sanitiseInputData( replacement )
+		return parent[index:index+len(replacement)]
 	else:
 		raise TypeError, 'EditOperations:replaceWithRange(): @data must be a DocTreeNode'
 	
@@ -71,10 +87,26 @@ def prepend(ctx, xs, data):
 	else:
 		raise TypeError, 'EditOperations:prepend(): @x must be a DocTreeNode'
 
+def insertElement(ctx, xs, index, data):
+	if isinstance( xs, DocTreeNode ):
+		#parent.insert( index, _sanitiseInputData( data ) )
+		xs.add( index, _sanitiseInputData( data ) )
+		return xs[index]
+	else:
+		raise TypeError, 'EditOperations:insertElement(): @xs must be a DocTreeNode'
+	
+def insertRange(ctx, xs, index, data):
+	if isinstance( xs, DocTreeNode ):
+		#parent.insert( index, _sanitiseInputData( data ) )
+		xs.addAll( index, _sanitiseInputData( data ) )
+		return xs[index]
+	else:
+		raise TypeError, 'EditOperations:insertRange(): @xs must be a DocTreeNode'
+	
 def insertBefore(ctx, x, data):
 	if isinstance( x, DocTreeNode ):
 		parent = x.getParentTreeNode()
-		index = parent.index( x.getNode() )
+		index = parent.indexOfById( x.getNode() )
 		#parent.insert( index, _sanitiseInputData( data ) )
 		parent.add( index, _sanitiseInputData( data ) )
 		return parent[index]
@@ -85,7 +117,7 @@ def insertBefore(ctx, x, data):
 def insertRangeBefore(ctx, x, data):
 	if isinstance( x, DocTreeNode ):
 		parent = x.getParentTreeNode()
-		index = parent.index( x.getNode() )
+		index = parent.indexOfById( x.getNode() )
 		parent[index:index] = _sanitiseInputData( data )
 		return parent[index]
 	else:
@@ -95,7 +127,7 @@ def insertRangeBefore(ctx, x, data):
 def insertAfter(ctx, x, data):
 	if isinstance( x, DocTreeNode ):
 		parent = x.getParentTreeNode()
-		index = parent.getNode().index( x.getNode() ) + 1
+		index = parent.getNode().indexOfById( x.getNode() ) + 1
 		#parent.insert( index, _sanitiseInputData( data ) )
 		parent.add( index, _sanitiseInputData( data ) )
 		return parent[index]
@@ -106,7 +138,7 @@ def insertAfter(ctx, x, data):
 def insertRangeAfter(ctx, x, data):
 	if isinstance( x, DocTreeNode ):
 		parent = x.getParentTreeNode()
-		index = parent.getNode().index( x.getNode() ) + 1
+		index = parent.getNode().indexOfById( x.getNode() ) + 1
 		parent[index:index] = _sanitiseInputData( data )
 		return parent[index]
 	else:

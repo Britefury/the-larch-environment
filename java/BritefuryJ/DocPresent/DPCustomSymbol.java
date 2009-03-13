@@ -18,7 +18,7 @@ import BritefuryJ.DocPresent.StyleSheets.CustomSymbolStyleSheet;
 import BritefuryJ.Math.Point2;
 
 
-public class DPCustomSymbol extends DPContentLeafEditable
+public class DPCustomSymbol extends DPContentLeafEditableEntry
 {
 	public interface SymbolInterface
 	{
