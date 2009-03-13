@@ -1058,13 +1058,6 @@ abstract public class DPWidget
 	//
 	//
 	
-	public boolean isContentLeaf()
-	{
-		return false;
-	}
-
-
-	
 	public DPContentLeaf getLeftContentLeaf()
 	{
 		return null;
@@ -1207,6 +1200,17 @@ abstract public class DPWidget
 	}
 	
 	public boolean isMarkerAtEnd(Marker m)
+	{
+		return false;
+	}
+	
+	
+	
+	//
+	// TYPE METHODS
+	//
+
+	public boolean isContentLeaf()
 	{
 		return false;
 	}

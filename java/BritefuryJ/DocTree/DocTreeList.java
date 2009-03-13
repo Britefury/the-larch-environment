@@ -172,6 +172,11 @@ public class DocTreeList implements DocTreeNode, DMListInterface
 		return node.indexOf( x );
 	}
 
+	public int indexOfById(Object x)
+	{
+		return node.indexOfById( x );
+	}
+
 	
 	public boolean isEmpty()
 	{

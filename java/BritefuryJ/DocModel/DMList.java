@@ -252,17 +252,19 @@ public class DMList implements DMListInterface, Trackable
 	
 	public Object coerce(String x)
 	{
-		return x;
+		// Create a clone of the string to ensure that all String objects in the document are
+		// distinct, even if their contents are the same
+		return new String( x );
 	}
 	
 	public Object coerce(PyString x)
 	{
-		return x.toString();
+		return coerce( x.toString() );
 	}
 	
 	public Object coerce(PyUnicode x)
 	{
-		return x.toString();
+		return coerce( x.toString() );
 	}
 	
 	public Object coerce(List<Object> x)
@@ -299,7 +301,8 @@ public class DMList implements DMListInterface, Trackable
 		}
 		else
 		{
-			System.out.println( "DMList.coerce(): attempted to coerce " + x.getClass().getName() );
+			System.out.println( "DMList.coerce(): attempted to coerce " + x.getClass().getName() + " (" + x.toString() + ")" );
+			//throw new RuntimeException();
 			return x;
 		}
 	}
@@ -442,6 +445,21 @@ public class DMList implements DMListInterface, Trackable
 	{
 		Vector<Object> v = (Vector<Object>)cell.getValue();
 		return v.indexOf(  x );
+	}
+
+	
+	@SuppressWarnings("unchecked")
+	public int indexOfById(Object x)
+	{
+		Vector<Object> v = (Vector<Object>)cell.getValue();
+		for (int i = 0; i < v.size(); i++)
+		{
+			if ( v.get( i ) == x )
+			{
+				return i;
+			}
+		}
+		return -1;
 	}
 
 	

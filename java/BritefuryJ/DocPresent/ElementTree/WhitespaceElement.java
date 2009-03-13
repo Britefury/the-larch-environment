@@ -7,9 +7,11 @@
 //##************************
 package BritefuryJ.DocPresent.ElementTree;
 
+import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPWhitespace;
+import BritefuryJ.DocPresent.DPWidget;
 
-public class WhitespaceElement extends LeafElement
+public class WhitespaceElement extends EditableLeafElement
 {
 	public WhitespaceElement(String whitespace)
 	{
@@ -26,5 +28,16 @@ public class WhitespaceElement extends LeafElement
 	public DPWhitespace getWidget()
 	{
 		return (DPWhitespace)widget;
+	}
+
+
+
+	//
+	// Meta-element
+	//
+	
+	public DPWidget createMetaHeaderData()
+	{
+		return new DPText( "'" + getContent().replace( "\n", "\\n" ) + "'" );
 	}
 }

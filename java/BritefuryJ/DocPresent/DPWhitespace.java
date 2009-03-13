@@ -15,7 +15,7 @@ import BritefuryJ.DocPresent.Metrics.VMetrics;
 import BritefuryJ.DocPresent.StyleSheets.ContentLeafStyleSheet;
 import BritefuryJ.Math.Point2;
 
-public class DPWhitespace extends DPContentLeaf
+public class DPWhitespace extends DPContentLeafEditable
 {
 	protected double width;
 	

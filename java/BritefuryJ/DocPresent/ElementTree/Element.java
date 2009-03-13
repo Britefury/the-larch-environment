@@ -91,6 +91,11 @@ public abstract class Element
 	// Listeners
 	//
 	
+	public ElementContentListener getContentListener()
+	{
+		return contentListener;
+	}
+	
 	public void setContentListener(ElementContentListener listener)
 	{
 		contentListener = listener;
@@ -366,8 +371,8 @@ public abstract class Element
 	public DPWidget createMetaDescription()
 	{
 		String description = toString();
-		int index = description.lastIndexOf( "." );
-		return new DPText( headerDescriptionTextStyle, description.substring( index + 1 ) );
+		description = description.replace( "BritefuryJ.DocPresent.ElementTree.", "" );
+		return new DPText( headerDescriptionTextStyle, description );
 	}
 	
 	protected Border getMetaHeaderBorder()

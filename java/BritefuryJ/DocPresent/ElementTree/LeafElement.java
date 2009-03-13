@@ -27,7 +27,7 @@ public abstract class LeafElement extends Element
 	{
 		public boolean test(Element element)
 		{
-			return ((LeafElement)element).isEditable();
+			return ((LeafElement)element).isEditableEntry();
 		}
 	}
 	
@@ -194,22 +194,6 @@ public abstract class LeafElement extends Element
 	// Caret methods
 	//
 	
-	protected static SolidBorder metaHeaderHighlightBorder = new SolidBorder( 1.0, 5.0, 5.0, new Color( 0.75f, 0.0f, 0.0f ), new Color( 1.0f, 0.9f, 0.8f ) );
-
-	protected Border getMetaHeaderBorder()
-	{
-		ElementCaret caret = tree.getCaret();
-		if ( caret != null )
-		{
-			Element e = caret.getMarker().getElement();
-			if ( e == this )
-			{
-				return metaHeaderHighlightBorder;
-			}
-		}
-		return metaHeaderEmptyBorder;
-	}
-	
 	public void onCaretEnter()
 	{
 		DPBorder border = getMetaHeaderBorderWidget(); 
@@ -230,6 +214,28 @@ public abstract class LeafElement extends Element
 
 	
 	
+	//
+	// Meta element methods
+	//
+	
+	protected static SolidBorder metaHeaderHighlightBorder = new SolidBorder( 1.0, 5.0, 5.0, new Color( 0.75f, 0.0f, 0.0f ), new Color( 1.0f, 0.9f, 0.8f ) );
+
+	protected Border getMetaHeaderBorder()
+	{
+		ElementCaret caret = tree.getCaret();
+		if ( caret != null )
+		{
+			Element e = caret.getMarker().getElement();
+			if ( e == this )
+			{
+				return metaHeaderHighlightBorder;
+			}
+		}
+		return metaHeaderEmptyBorder;
+	}
+	
+
+	
 	
 	//
 	// Type methods
@@ -241,8 +247,8 @@ public abstract class LeafElement extends Element
 		return getWidget().isWhitespace();
 	}
 	
-	public boolean isEditable()
+	public boolean isEditableEntry()
 	{
-		return getWidget().isEditable();
+		return getWidget().isEditableEntry();
 	}
 }

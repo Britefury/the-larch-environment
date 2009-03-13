@@ -19,9 +19,9 @@ public class EditableLeafElement extends LeafElement
 	{
 		super( widget, content );
 	}
-	
-	
-	
+
+
+
 	//
 	// Widget
 	//
@@ -88,5 +88,16 @@ public class EditableLeafElement extends LeafElement
 			getWidget().markerRemove( index + x.length(), length - x.length() );
 		}
 		contentChanged();
+	}
+	
+	public void clearContent()
+	{
+		int length = content.length();
+		if ( length > 0 )
+		{
+			content = "";
+			getWidget().markerRemove( 0, length );
+			contentChanged();
+		}
 	}
 }

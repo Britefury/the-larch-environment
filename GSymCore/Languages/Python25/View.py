@@ -9,7 +9,7 @@ from BritefuryJ.Parser import ParserExpression
 
 from Britefury.gSym.View.GSymView import GSymView
 
-from Britefury.gSym.View.EditOperations import replace, replaceWithRange, replaceNodeContents, append, prepend, insertBefore, insertRangeBefore, insertAfter, insertRangeAfter
+from Britefury.gSym.View.EditOperations import replace, replaceWithRange, replaceNodeContents, append, prepend, insertElement, insertRange, insertBefore, insertRangeBefore, insertAfter, insertRangeAfter
 
 
 from Britefury.Util.NodeUtil import *
@@ -151,8 +151,7 @@ def _isCompoundStmt(node):
 
 
 
-
-class ParsedLineContentListener (ElementContentListener):
+class LineContentListenerWithParser(ElementContentListener):
 	def __init__(self, ctx, node, parser):
 		self._ctx = ctx
 		self._node = node
@@ -186,11 +185,14 @@ class ParsedLineContentListener (ElementContentListener):
 		return result
 
 
-
-
+class ParsedLineContentListener (LineContentListenerWithParser):
 	def contentModified(self, element):
 		# Get the content
 		value = element.getContent()
+		self.handleContent( value )
+
+
+	def handleContent(self, value):
 		# Split into lines
 		lineStrings = value.split( '\n' )
 		# Parse
@@ -209,9 +211,40 @@ class ParsedLineContentListener (ElementContentListener):
 		else:
 			replaceWithRange( self._ctx, self._node, parsedLines )
 
+			
+			
+class NewLineContentListener (LineContentListenerWithParser):
+	def __init__(self, ctx, node, parser, index, before, after):
+		super( NewLineContentListener, self ).__init__( ctx, node, parser )
+		self._index = index
+		self._before = before
+		self._after = after
 
+		
+	def contentModified(self, element):
+		# Get the content
+		value = element.getContent()
+		if value == '':
+			# Newline has been deleted
+			beforeContent = self._before.getContent()
+			afterContent = self._after.getContent()   if self._after is not None   else   ''
+			
+			endIndex = self._index + 2   if self._after is not None   else   self._index + 1
+			
+			value = beforeContent + afterContent
+			print 'Python25 View: NewContentListener.contentModified(): ', self._before
+			
 
+			# Split into lines
+			lineStrings = value.split( '\n' )
+			# Parse
+			parsedLines = self.parseLines( lineStrings )
+			
+			del self._node[self._index:endIndex]
+			insertRange( self._ctx, self._node, self._index, parsedLines )
 
+			
+			
 			
 PRECEDENCE_NONE = None
 
@@ -302,13 +335,6 @@ def python25ViewState(outerPrecedence, parser, mode=MODE_DISPLAYCONTENTS):
 
 
 
-def suiteView(ctx, suite, parser):
-	lineViews = ctx.mapViewEvalFn( suite, None, python25ViewState( PRECEDENCE_NONE, parser, MODE_EDITSTATEMENT ) )
-	newLineFac = lambda index, child: ctx.whitespace( '\n' )
-	return ctx.listView( suite_listViewLayout, None, None, newLineFac, lineViews )
-
-
-
 def expressionNodeEditor(ctx, node, contents, precedence, state):
 	outerPrecedence, parser, mode = state
 
@@ -378,6 +404,17 @@ def tupleView(ctx, state, node, xs, parser):
 			   state )
 
 
+def suiteView(ctx, suite, parser):
+	lineViews = ctx.mapViewEvalFn( suite, None, python25ViewState( PRECEDENCE_NONE, parser, MODE_EDITSTATEMENT ) )
+	#newLineFac = lambda index, child: ctx.whitespace( '\n' )
+	def newLineFac(index, child):
+		w = ctx.whitespace( '\n' )
+		listener = NewLineContentListener( ctx, node, self._parser.statement(), index, lineViews[index], lineViews[index+1]   if index+1 < len(node)   else   None )
+		return ctx.contentListener( w, listener )
+	return ctx.listView( suite_listViewLayout, None, None, newLineFac, lineViews )
+
+
+
 def printElem(elem, level):
 	print '  ' * level, elem, elem.getContent()
 	if isinstance( elem, BranchElement ):
@@ -394,7 +431,11 @@ class Python25View (GSymView):
 	# MISC
 	def python25Module(self, ctx, state, node, *content):
 		lineViews = ctx.mapViewEvalFn( content, None, python25ViewState( PRECEDENCE_NONE, self._parser.statement(), MODE_EDITSTATEMENT ) )
-		newLineFac = lambda index, child: ctx.whitespace( '\n' )
+		#newLineFac = lambda index, child: ctx.whitespace( '\n' )
+		def newLineFac(index, child):
+			w = ctx.whitespace( '\n' )
+			listener = NewLineContentListener( ctx, node, self._parser.statement(), index+1, lineViews[index], lineViews[index+1]   if index+1 < len(lineViews)   else   None )
+			return ctx.contentListener( w, listener )
 		return ctx.listView( module_listViewLayout, None, None, newLineFac, lineViews )
 
 

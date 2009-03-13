@@ -15,10 +15,10 @@ from BritefuryJ.DocPresent.ElementTree import *
 
 
 
-default_textStyle = TextStyleSheet( Font( 'SansSerif', Font.PLAIN, 12 ),  Color.black )
+default_textStyle = TextStyleSheet( Font( 'SansSerif', Font.PLAIN, 14 ),  Color.black )
 
-string_textStyle = TextStyleSheet( Font( 'SansSerif', Font.PLAIN, 12 ),  Color( 0.0, 0.5, 0.5 ) )
-punctuation_textStyle = TextStyleSheet( Font( 'SansSerif', Font.PLAIN, 12 ),  Color( 0.0, 0.0, 1.0 ) )
+string_textStyle = TextStyleSheet( Font( 'SansSerif', Font.PLAIN, 14 ),  Color( 0.0, 0.5, 0.5 ) )
+punctuation_textStyle = TextStyleSheet( Font( 'SansSerif', Font.PLAIN, 14 ),  Color( 0.0, 0.0, 1.0 ) )
 
 
 lisp_paragraphStyle = ParagraphStyleSheet( DPParagraph.Alignment.BASELINES, 0.0, 0.0, 60.0 )

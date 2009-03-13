@@ -524,45 +524,54 @@ public abstract class DPContentLeaf extends DPWidget
 	//
 	//
 	
-	public boolean isContentLeaf()
+	public DPContentLeafEditable getEditableContentLeafToLeft()
 	{
-		return true;
-	}
-	
-	public boolean isWhitespace()
-	{
-		return false;
-	}
-	
-	public boolean isEditable()
-	{
-		return false;
-	}
-
-	
-	
-	public DPContentLeaf getEditableContentLeafToLeft()
-	{
-		DPContentLeaf leaf = this;
+		DPContentLeaf leaf = getContentLeafToLeft();
 		
 		while ( leaf != null  &&  !leaf.isEditable() )
 		{
 			leaf = leaf.getContentLeafToLeft();
 		}
 		
-		return leaf;
+		return (DPContentLeafEditable)leaf;
 	}
 	
-	public DPContentLeaf getEditableContentLeafToRight()
+	public DPContentLeafEditable getEditableContentLeafToRight()
 	{
-		DPContentLeaf leaf = this;
+		DPContentLeaf leaf = getContentLeafToRight();
 		
 		while ( leaf != null  &&  !leaf.isEditable() )
 		{
 			leaf = leaf.getContentLeafToRight();
 		}
 		
-		return leaf;
+		return (DPContentLeafEditable)leaf;
+	}
+	
+
+	
+	public DPContentLeafEditableEntry getEditableEntryContentLeafToLeft()
+	{
+		DPContentLeaf leaf = getContentLeafToLeft();
+		
+		while ( leaf != null  &&  !leaf.isEditableEntry() )
+		{
+			leaf = leaf.getContentLeafToLeft();
+		}
+		
+		return (DPContentLeafEditableEntry)leaf;
+	}
+	
+	public DPContentLeafEditableEntry getEditableEntryContentLeafToRight()
+	{
+		DPContentLeaf leaf = getContentLeafToRight();
+		
+		while ( leaf != null  &&  !leaf.isEditableEntry() )
+		{
+			leaf = leaf.getContentLeafToRight();
+		}
+		
+		return (DPContentLeafEditableEntry)leaf;
 	}
 	
 	
@@ -716,5 +725,31 @@ public abstract class DPContentLeaf extends DPWidget
 				}
 			}
 		}
+	}
+	
+	
+	
+	//
+	// TYPE METHODS
+	//
+
+	public boolean isContentLeaf()
+	{
+		return true;
+	}
+	
+	public boolean isWhitespace()
+	{
+		return false;
+	}
+	
+	public boolean isEditable()
+	{
+		return false;
+	}
+	
+	public boolean isEditableEntry()
+	{
+		return false;
 	}
 }

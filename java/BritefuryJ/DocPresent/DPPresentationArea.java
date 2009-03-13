@@ -832,7 +832,7 @@ public class DPPresentationArea extends DPBin implements CaretListener
 		rootSpaceMouse.setModifiers( modifiers );
 		if ( ( modifiers & ( Modifier.ALT | Modifier.ALT_GRAPH | Modifier.CTRL | Modifier.SHIFT ) )  ==  0 )
 		{
-			DPContentLeafEditable leaf = (DPContentLeafEditable)getLeafClosestToLocalPoint( rootPos, new DPContentLeafEditable.EditableLeafWidgetFilter() );
+			DPContentLeafEditableEntry leaf = (DPContentLeafEditableEntry)getLeafClosestToLocalPoint( rootPos, new DPContentLeafEditableEntry.EditableEntryLeafWidgetFilter() );
 			Xform2 x = leaf.getTransformRelativeToRoot();
 			x = x.inverse();
 			leaf.placeCursor( x.transform( rootPos ) );
@@ -1040,9 +1040,9 @@ public class DPPresentationArea extends DPBin implements CaretListener
 				if ( caret.isValid() )
 				{
 					DPContentLeaf leaf = caret.getMarker().getWidget();
-					if ( leaf.isEditable() )
+					if ( leaf.isEditableEntry() )
 					{
-						DPContentLeafEditable editable = (DPContentLeafEditable)leaf;
+						DPContentLeafEditableEntry editable = (DPContentLeafEditableEntry)leaf;
 						editable.onKeyPress( caret, event );
 					}
 					emitImmediateEvents();
@@ -1095,9 +1095,9 @@ public class DPPresentationArea extends DPBin implements CaretListener
 				if ( caret.isValid() )
 				{
 					DPContentLeaf leaf = caret.getMarker().getWidget();
-					if ( leaf.isEditable() )
+					if ( leaf.isEditableEntry() )
 					{
-						DPContentLeafEditable editable = (DPContentLeafEditable)leaf;
+						DPContentLeafEditableEntry editable = (DPContentLeafEditableEntry)leaf;
 						editable.onKeyRelease( caret, event );
 					}
 					emitImmediateEvents();
@@ -1160,9 +1160,9 @@ public class DPPresentationArea extends DPBin implements CaretListener
 				if ( caret.isValid() )
 				{
 					DPContentLeaf leaf = caret.getMarker().getWidget();
-					if ( leaf.isEditable() )
+					if ( leaf.isEditableEntry() )
 					{
-						DPContentLeafEditable editable = (DPContentLeafEditable)leaf;
+						DPContentLeafEditableEntry editable = (DPContentLeafEditableEntry)leaf;
 						editable.onKeyTyped( caret, event );
 					}
 					emitImmediateEvents();
