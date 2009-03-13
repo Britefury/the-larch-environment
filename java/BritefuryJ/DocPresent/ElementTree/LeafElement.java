@@ -27,6 +27,14 @@ public abstract class LeafElement extends Element
 	{
 		public boolean test(Element element)
 		{
+			return ((LeafElement)element).isEditable();
+		}
+	}
+	
+	public static class LeafFilterEditableEntry implements ElementFilter
+	{
+		public boolean test(Element element)
+		{
 			return ((LeafElement)element).isEditableEntry();
 		}
 	}
@@ -154,6 +162,11 @@ public abstract class LeafElement extends Element
 		return getPreviousLeaf( subtreeRootFilter, branchFilter, new LeafFilterEditable() );
 	}
 
+	public LeafElement getPreviousEditableEntryLeaf(ElementFilter subtreeRootFilter, ElementFilter branchFilter)
+	{
+		return getPreviousLeaf( subtreeRootFilter, branchFilter, new LeafFilterEditableEntry() );
+	}
+
 	public LeafElement getPreviousEditableLeaf()
 	{
 		return getPreviousEditableLeaf( null, null );
@@ -162,6 +175,11 @@ public abstract class LeafElement extends Element
 	public LeafElement getNextEditableLeaf(ElementFilter subtreeRootFilter, ElementFilter branchFilter)
 	{
 		return getNextLeaf( subtreeRootFilter, branchFilter, new LeafFilterEditable() );
+	}
+
+	public LeafElement getNextEditableEntryLeaf(ElementFilter subtreeRootFilter, ElementFilter branchFilter)
+	{
+		return getNextLeaf( subtreeRootFilter, branchFilter, new LeafFilterEditableEntry() );
 	}
 
 	public LeafElement getNextEditableLeaf()
@@ -245,6 +263,11 @@ public abstract class LeafElement extends Element
 	public boolean isWhitespace()
 	{
 		return getWidget().isWhitespace();
+	}
+	
+	public boolean isEditable()
+	{
+		return getWidget().isEditable();
 	}
 	
 	public boolean isEditableEntry()

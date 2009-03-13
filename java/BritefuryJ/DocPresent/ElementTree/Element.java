@@ -198,6 +198,16 @@ public abstract class Element
 		return getFirstLeafInSubtree( null, null );
 	}
 
+	public LeafElement getFirstEditableLeafInSubtree()
+	{
+		return getFirstLeafInSubtree( null, new LeafElement.LeafFilterEditable() );
+	}
+
+	public LeafElement getFirstEditableEntryLeafInSubtree()
+	{
+		return getFirstLeafInSubtree( null, new LeafElement.LeafFilterEditableEntry() );
+	}
+
 	public LeafElement getLastLeafInSubtree(ElementFilter branchFilter, ElementFilter leafFilter)
 	{
 		return null;
@@ -206,6 +216,16 @@ public abstract class Element
 	public LeafElement getLastLeafInSubtree()
 	{
 		return getLastLeafInSubtree( null, null );
+	}
+
+	public LeafElement getLastEditableLeafInSubtree()
+	{
+		return getLastLeafInSubtree( null, new LeafElement.LeafFilterEditable() );
+	}
+
+	public LeafElement getLastEditableEntryLeafInSubtree()
+	{
+		return getLastLeafInSubtree( null, new LeafElement.LeafFilterEditableEntry() );
 	}
 
 	

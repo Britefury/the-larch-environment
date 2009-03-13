@@ -1183,7 +1183,8 @@ public class DPPresentationArea extends DPBin implements CaretListener
 	protected boolean isNavigationKey(KeyEvent event)
 	{
 		int keyCode = event.getKeyCode();
-		return keyCode == KeyEvent.VK_LEFT  ||  keyCode == KeyEvent.VK_RIGHT  ||  keyCode == KeyEvent.VK_UP  ||  keyCode == KeyEvent.VK_DOWN  ||  keyCode == KeyEvent.VK_HOME  ||  keyCode == KeyEvent.VK_END;
+		return keyCode == KeyEvent.VK_LEFT  ||  keyCode == KeyEvent.VK_RIGHT  ||  keyCode == KeyEvent.VK_UP  ||  keyCode == KeyEvent.VK_DOWN  ||
+					keyCode == KeyEvent.VK_HOME  ||  keyCode == KeyEvent.VK_END;
 	}
 	
 	protected boolean isModifierKey(KeyEvent event)
@@ -1214,6 +1215,14 @@ public class DPPresentationArea extends DPBin implements CaretListener
 				else if ( event.getKeyCode() == KeyEvent.VK_DOWN )
 				{
 					leaf.moveMarkerDown( caret.getMarker(), true );
+				}
+				else if ( event.getKeyCode() == KeyEvent.VK_HOME )
+				{
+					leaf.moveMarkerHome( caret.getMarker() );
+				}
+				else if ( event.getKeyCode() == KeyEvent.VK_END )
+				{
+					leaf.moveMarkerEnd( caret.getMarker() );
 				}
 			}
 			return true;
