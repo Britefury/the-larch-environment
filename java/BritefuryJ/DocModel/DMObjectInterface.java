@@ -6,34 +6,31 @@
 //##************************
 package BritefuryJ.DocModel;
 
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-public interface DMObjectInterface extends Map<String, Object>
+import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
+
+public interface DMObjectInterface
 {
-	public Object copy();
-	public Object get(String key, Object defaultValue);
-	
-	public List<List<Object>> items();
-	public Iterator<List<Object>> iteritems();
-	
-	public Set<String> keys();
-	public Iterator<String> iterkeys();
-
-	public Iterator<Object> itervalues();
-	
-	public Object pop(String key);
-	public Object pop(String key, Object defaultValue);
-	public Object popitem();
-	
-	public Object setdefault(String key);
-	public Object setdefault(String key, Object defaultValue);
-	
-	public void update(Map<String, Object> table);
-	
-	
 	public DMObjectClass getDMClass();
-	public Object getFieldValue(int index);
+	
+	public int getFieldIndex(String key);
+	
+	public Object get(int index);
+	public Object get(String key) throws InvalidFieldNameException;
+	
+	public void set(int index, Object value);
+	public void set(String key, Object value) throws InvalidFieldNameException;
+	
+	
+	public String[] getFieldNames();
+	public Object[] getFieldValuesImmutable();
+	
+	public void update(Map<String, Object> table) throws InvalidFieldNameException;
+	
+	
+	public Object __getitem__(int fieldIndex);
+	public void __setitem__(int fieldIndex, Object value);
+	public Object __getitem__(String key);
+	public void __setitem__(String key, Object value);
 }

@@ -291,6 +291,7 @@ public class CommandHistory
 		}
 		
 		t.setTracker( tracker );
+		tracker.track( t );
 	}
 
 	
@@ -300,6 +301,7 @@ public class CommandHistory
 		CommandTracker tracker = trackers.get( factory );
 		assert tracker != null;
 		
+		tracker.stopTracking( t );
 		t.setTracker( null );
 	}
 	

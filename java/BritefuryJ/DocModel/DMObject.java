@@ -6,169 +6,22 @@
 //##************************
 package BritefuryJ.DocModel;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
+import org.python.core.Py;
+import org.python.core.PyObject;
+
+import BritefuryJ.Cell.LiteralCell;
 import BritefuryJ.CommandHistory.CommandTracker;
 import BritefuryJ.CommandHistory.CommandTrackerFactory;
 import BritefuryJ.CommandHistory.Trackable;
+import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
 
-public class DMObject implements DMObjectInterface, Trackable
+public class DMObject extends DMNode implements DMObjectInterface, Trackable
 {
-	public static class InvalidFieldNameException extends RuntimeException
-	{
-		private static final long serialVersionUID = 1L;
-	}
-	
-	
-	protected static class SetViewEntry implements Entry<String, Object>
-	{
-		private DMObject obj;
-		private int index;
-		
-		
-		public SetViewEntry(DMObject obj, int index)
-		{
-			this.obj = obj;
-			this.index = index;
-		}
-		
-		
-		public String getKey()
-		{
-			return obj.getDMClass().getField( index ).getName();
-		}
-
-		public Object getValue()
-		{
-			return obj.fieldData[index];
-		}
-
-		public Object setValue(Object value)
-		{
-			Object old = obj.fieldData[index];
-			obj.fieldData[index] = value;
-			return old;
-		}
-	}
-	
-	
-	protected static class SetView implements Set<Entry<String, Object>>
-	{
-		private DMObject obj;
-		private Entry<String, Object> entries[];
-		
-		
-		public SetView(DMObject obj)
-		{
-			this.obj = obj;
-		}
-
-
-		
-		public boolean add(Entry<String, Object> arg0)
-		{
-			throw new UnsupportedOperationException();
-		}
-
-		public boolean addAll(Collection<? extends Entry<String, Object>> arg0)
-		{
-			throw new UnsupportedOperationException();
-		}
-
-		public void clear()
-		{
-			obj.clear();
-		}
-
-
-		public boolean contains(Object x)
-		{
-			for (int i = 0; i < entries.length; i++)
-			{
-				if ( x == entries[i] )
-				{
-					return true;
-				}
-			}
-			
-			return false;
-		}
-
-		public boolean containsAll(Collection<?> xs)
-		{
-			for (Object x: xs)
-			{
-				if ( !contains( x ) )
-				{
-					return false;
-				}
-			}
-			return true;
-		}
-
-
-		public boolean isEmpty()
-		{
-			return entries.length == 0;
-		}
-
-
-		public Iterator<Entry<String, Object>> iterator()
-		{
-			return Arrays.asList( entries ).iterator();
-		}
-
-
-		public boolean remove(Object x)
-		{
-			throw new UnsupportedOperationException();
-		}
-
-		public boolean removeAll(Collection<?> arg0)
-		{
-			throw new UnsupportedOperationException();
-		}
-
-		public boolean retainAll(Collection<?> arg0)
-		{
-			throw new UnsupportedOperationException();
-		}
-
-
-		public int size()
-		{
-			return entries.length;
-		}
-
-
-		public Object[] toArray()
-		{
-			SetViewEntry xs[] = new SetViewEntry[entries.length];
-			System.arraycopy( entries, 0, xs, 0, entries.length );
-			return xs;
-		}
-
-		@SuppressWarnings("unchecked")
-		public <T> T[] toArray(T[] arg0)
-		{
-			SetViewEntry xs[] = new SetViewEntry[entries.length];
-			System.arraycopy( entries, 0, xs, 0, entries.length );
-			return (T[])xs;
-		}
-	}
-	
-	
-	
-	
-	
 	private DMObjectClass objClass;
-	private Object fieldData[];
+	private LiteralCell cell;
+	private DMObjectCommandTracker commandTracker;
 	
 	
 	
@@ -176,36 +29,130 @@ public class DMObject implements DMObjectInterface, Trackable
 	public DMObject(DMObjectClass objClass)
 	{
 		this.objClass = objClass;
-		fieldData = new Object[objClass.getNumFields()];
+
+		Object fieldData[] = new Object[objClass.getNumFields()];
+		
+		cell = new LiteralCell();
+		cell.setLiteralValue( fieldData );
+		commandTracker = null;
 	}
 	
-	public DMObject(DMObjectClass objClass, Object data[])
+	public DMObject(DMObjectClass objClass, Object values[])
 	{
 		this.objClass = objClass;
-		fieldData = new Object[objClass.getNumFields()];
+		Object fieldData[] = new Object[objClass.getNumFields()];
 		
-		int numToCopy = Math.min( data.length, fieldData.length );
-		System.arraycopy( data, 0, fieldData, 0, numToCopy );
-		if ( numToCopy < fieldData.length )
+		int numToCopy = Math.min( values.length, fieldData.length );
+		for (int i = 0; i < numToCopy; i++)
 		{
-			for (int i = numToCopy; i < fieldData.length; i++)
+			fieldData[i] = coerce( values[i] );
+		}
+		for (int i = numToCopy; i < fieldData.length; i++)
+		{
+			fieldData[i] = null;
+		}
+
+		cell = new LiteralCell();
+		cell.setLiteralValue( fieldData );
+		commandTracker = null;
+	}
+	
+	public DMObject(DMObjectClass objClass, String[] keys, Object[] values) throws InvalidFieldNameException
+	{
+		assert keys.length == values.length;
+		
+		this.objClass = objClass;
+		Object fieldData[] = new Object[objClass.getNumFields()];
+		
+		for (int i = 0; i < keys.length; i++)
+		{
+			int index = objClass.getFieldIndex( keys[i] );
+			if ( index == -1 )
 			{
-				fieldData[i] = null;
+				throw new InvalidFieldNameException();
+			}
+			else
+			{
+				fieldData[index] = coerce( values[i] );
 			}
 		}
+
+		cell = new LiteralCell();
+		cell.setLiteralValue( fieldData );
+		commandTracker = null;
 	}
-	
-	public DMObject(DMObjectClass objClass, Map<String, Object> data)
+
+	public DMObject(DMObjectClass objClass, String[] names, PyObject[] values)
+	{
+		assert names.length == values.length;
+		
+		this.objClass = objClass;
+		Object fieldData[] = new Object[objClass.getNumFields()];
+		
+		for (int i = 0; i < names.length; i++)
+		{
+			int index = objClass.getFieldIndex( names[i] );
+			if ( index == -1 )
+			{
+				throw Py.KeyError( names[i] );
+			}
+			else
+			{
+				fieldData[index] = coerce( Py.tojava( values[i], Object.class ) );
+			}
+		}
+
+		cell = new LiteralCell();
+		cell.setLiteralValue( fieldData );
+		commandTracker = null;
+	}
+
+	public DMObject(PyObject values[], String names[])
+	{
+		assert values.length == ( names.length + 1 );
+		
+		objClass = Py.tojava( values[0], DMObjectClass.class );
+		Object fieldData[] = new Object[objClass.getNumFields()];
+		
+		for (int i = 0; i < names.length; i++)
+		{
+			int index = objClass.getFieldIndex( names[i] );
+			if ( index == -1 )
+			{
+				throw Py.KeyError( names[i] );
+			}
+			else
+			{
+				fieldData[index] = coerce( Py.tojava( values[i+1], Object.class ) );
+			}
+		}
+
+		cell = new LiteralCell();
+		cell.setLiteralValue( fieldData );
+		commandTracker = null;
+	}
+
+	public DMObject(DMObjectClass objClass, Map<String, Object> data) throws InvalidFieldNameException
 	{
 		this.objClass = objClass;
-		fieldData = new Object[objClass.getNumFields()];
+		Object fieldData[] = new Object[objClass.getNumFields()];
 		
-		for (int i = 0; i < objClass.getNumFields(); i++)
+		for (Map.Entry<String, Object> entry: data.entrySet())
 		{
-			DMObjectField f = objClass.getField( i );
-			String name = f.getName();
-			fieldData[i] = data.get( name );
+			int index = objClass.getFieldIndex( entry.getKey() );
+			if ( index == -1 )
+			{
+				throw new InvalidFieldNameException();
+			}
+			else
+			{
+				fieldData[index] = coerce( entry.getValue() );
+			}
 		}
+
+		cell = new LiteralCell();
+		cell.setLiteralValue( fieldData );
+		commandTracker = null;
 	}
 	
 	
@@ -215,88 +162,49 @@ public class DMObject implements DMObjectInterface, Trackable
 		return objClass;
 	}
 	
-	public Object getFieldValue(int value)
+	public int getFieldIndex(String key)
 	{
+		return objClass.getFieldIndex( key );
+	}
+
+	
+	
+	
+	public Object get(int value)
+	{
+		Object[] fieldData = (Object[])cell.getLiteralValue();
 		return fieldData[value];
 	}
 	
-	
-	
-	public void clear()
+	public Object get(String key) throws InvalidFieldNameException
 	{
-		throw new UnsupportedOperationException();
-	}
-	
-	public boolean containsKey(Object key)
-	{
-		return objClass.hasField( (String)key );
-	}
-
-	public boolean containsValue(Object value)
-	{
-		for (Object v: fieldData)
+		Object[] fieldData = (Object[])cell.getLiteralValue();
+		int index = objClass.getFieldIndex( key );
+		if ( index == -1 )
 		{
-			if ( v == value )
-			{
-				return true;
-			}
-		}
-		
-		return false;
-	}
-
-	public Set<Entry<String, Object>> entrySet()
-	{
-		return new SetView( this );
-	}
-	
-	public boolean equals(Object x)
-	{
-		if ( x instanceof DMObjectInterface )
-		{
-			DMObjectInterface xx = (DMObjectInterface)x;
-			
-			if ( xx.getDMClass()  ==  objClass )
-			{
-				for (int i = 0; i < objClass.getNumFields(); i++)
-				{
-					if ( !fieldData[i].equals( xx.getFieldValue( i ) ) )
-					{
-						return false;
-					}
-				}
-				return true;
-			}
-		}
-		
-		return false;
-	}
-
-	public Object get(Object key)
-	{
-		int index = objClass.getFieldIndex( (String)key );
-		if ( index != -1 )
-		{
-			return fieldData[index];
+			throw new InvalidFieldNameException();
 		}
 		else
 		{
-			return null;
+			return fieldData[index];
 		}
 	}
 	
-	public boolean isEmpty()
+	
+	public void set(int index, Object x)
 	{
-		return objClass.isEmpty();
+		Object[] fieldData = (Object[])cell.getLiteralValue();
+		x = coerce( x );
+		Object oldX = fieldData[index];
+		fieldData[index] = x;
+		cell.setLiteralValue( fieldData );
+		if ( commandTracker != null )
+		{
+			commandTracker.onSet( this, index, oldX, x );
+		}
 	}
 	
-	public Set<String> keySet()
-	{
-		return objClass.fieldNameSet();
-	}
-	
-	
-	public Object put(String key, Object value)
+	public void set(String key, Object x) throws InvalidFieldNameException
 	{
 		int index = objClass.getFieldIndex( key );
 		if ( index == -1 )
@@ -305,147 +213,125 @@ public class DMObject implements DMObjectInterface, Trackable
 		}
 		else
 		{
-			Object old = fieldData[index];
-			fieldData[index] = value;
-			return old;
-		}
-	}
-
-	public void putAll(Map<? extends String, ? extends Object> xs)
-	{
-		for (Entry<? extends String, ? extends Object> e: xs.entrySet())
-		{
-			put( e.getKey(), e.getValue() );
+			set( index, x );
 		}
 	}
 
 	
 	
-	public Object remove(Object key)
+	public String[] getFieldNames()
 	{
-		throw new UnsupportedOperationException();
+		return objClass.getFieldNames();
 	}
-
-	public int size()
+	
+	public Object[] getFieldValuesImmutable()
 	{
-		return objClass.getNumFields();
+		Object[] fieldData = (Object[])cell.getLiteralValue();
+		return fieldData;
 	}
-
-
-	public Collection<Object> values()
-	{
-		return Arrays.asList( fieldData );
-	}
-
 	
 	
 	
-	public Object copy()
+	public void update(Map<String, Object> table) throws InvalidFieldNameException
 	{
-		return new DMObject( objClass, fieldData );
-	}
-
-	public Object get(String key, Object defaultValue)
-	{
-		int index = objClass.getFieldIndex( (String)key );
-		if ( index != -1 )
+		Object[] fieldData = (Object[])cell.getLiteralValue();
+		int indices[] = new int[table.size()];
+		Object oldContents[] = new Object[table.size()];
+		Object newContents[] = new Object[table.size()];
+		int i = 0;
+		for (Map.Entry<String, Object> e: table.entrySet())
 		{
-			return fieldData[index];
+			int index = objClass.getFieldIndex( e.getKey() );
+			if ( index == -1 )
+			{
+				throw new InvalidFieldNameException();
+			}
+			else
+			{
+				Object x = coerce( e.getValue() );
+				indices[i] = index;
+				oldContents[i] = fieldData[index];
+				newContents[i] = x;
+				fieldData[index] = x;
+				i++;
+			}
+		}
+		if ( commandTracker != null )
+		{
+			commandTracker.onUpdate( this, indices, oldContents, newContents );
+		}
+	}
+
+	protected void update(int indices[], Object xs[])
+	{
+		assert indices.length == xs.length;
+		
+		Object[] fieldData = (Object[])cell.getLiteralValue();
+		Object oldContents[] = new Object[indices.length];
+		Object newContents[] = new Object[indices.length];
+		for (int i = 0; i < indices.length; i++)
+		{
+			int index = indices[i];
+			oldContents[i] = fieldData[index];
+			Object x = coerce( xs[i] );
+			newContents[i] = x;
+			fieldData[index] = x;
+		}
+		if ( commandTracker != null )
+		{
+			commandTracker.onUpdate( this, indices, oldContents, newContents );
+		}
+	}
+
+	
+	
+	public Object __getitem__(int fieldIndex)
+	{
+		return get( fieldIndex );
+	}
+	
+	public Object __getitem__(String key)
+	{
+		int index = objClass.getFieldIndex( key );
+		if ( index == -1 )
+		{
+		        throw Py.KeyError( key );
 		}
 		else
 		{
-			return defaultValue;
+			return get( index );
 		}
 	}
+	
 
 	
-	@SuppressWarnings("unchecked")
-	public List<List<Object>> items()
+	public void __setitem__(int fieldIndex, Object x)
 	{
-		ArrayList<List<Object>> xs = new ArrayList();
-		xs.ensureCapacity( objClass.getNumFields() );
-		
-		for (int i = 0; i < objClass.getNumFields(); i++)
+		set( fieldIndex, x );
+	}
+	
+	public void __setitem__(String key, Object x)
+	{
+		int index = objClass.getFieldIndex( key );
+		if ( index == -1 )
 		{
-			ArrayList<Object> pair = new ArrayList();
-			pair.ensureCapacity( 2 );
-			pair.add( objClass.getField( i ).getName() );
-			pair.add( fieldData[i] );
-			xs.add( pair );
+		        throw Py.KeyError( key );
 		}
-		
-		return xs;
-	}
-	
-	public Iterator<List<Object>> iteritems()
-	{
-		return items().iterator();
-	}
-	
-	
-	public Set<String> keys()
-	{
-		return keySet();
-	}
-	
-	public Iterator<String> iterkeys()
-	{
-		return keys().iterator();
-	}
-
-	
-	public Iterator<Object> itervalues()
-	{
-		return values().iterator();
-	}
-
-	
-	public Object pop(String key)
-	{
-		throw new UnsupportedOperationException();
-	}
-
-	public Object pop(String key, Object defaultValue)
-	{
-		throw new UnsupportedOperationException();
-	}
-
-	public Object popitem()
-	{
-		throw new UnsupportedOperationException();
-	}
-
-	
-	public Object setdefault(String key)
-	{
-		return setdefault( key, null );
-	}
-
-	public Object setdefault(String key, Object defaultValue)
-	{
-		return get( key );
-	}
-
-	public void update(Map<String, Object> table)
-	{
-		for (Map.Entry<String, Object> e: table.entrySet())
+		else
 		{
-			put( e.getKey(), e.getValue() );
+			set( index, x );
 		}
 	}
 
-
-	@Override
+	
+	
 	public CommandTrackerFactory getTrackerFactory()
 	{
-		// TODO Auto-generated method stub
-		return null;
+		return DMObjectTrackerFactory.factory;
 	}
 
-	@Override
 	public void setTracker(CommandTracker tracker)
 	{
-		// TODO Auto-generated method stub
-		
+		commandTracker = (DMObjectCommandTracker)tracker;
 	}
 }

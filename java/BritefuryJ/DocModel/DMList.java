@@ -14,11 +14,7 @@ import java.util.ListIterator;
 import java.util.Vector;
 
 import org.python.core.Py;
-import org.python.core.PyObject;
 import org.python.core.PySlice;
-import org.python.core.PyString;
-import org.python.core.PyUnicode;
-import org.python.core.PyJavaType;
 
 import BritefuryJ.Cell.LiteralCell;
 import BritefuryJ.CommandHistory.CommandTracker;
@@ -27,7 +23,7 @@ import BritefuryJ.CommandHistory.Trackable;
 import BritefuryJ.JythonInterface.JythonIndex;
 import BritefuryJ.JythonInterface.JythonSlice;
 
-public class DMList implements DMListInterface, Trackable
+public class DMList extends DMNode implements DMListInterface, Trackable
 {
 	public static class ListView implements List<Object>
 	{
@@ -248,65 +244,6 @@ public class DMList implements DMListInterface, Trackable
 		
 		commandTracker = null;
 	}
-	
-	
-	public Object coerce(String x)
-	{
-		// Create a clone of the string to ensure that all String objects in the document are
-		// distinct, even if their contents are the same
-		return new String( x );
-	}
-	
-	public Object coerce(PyString x)
-	{
-		return coerce( x.toString() );
-	}
-	
-	public Object coerce(PyUnicode x)
-	{
-		return coerce( x.toString() );
-	}
-	
-	public Object coerce(List<Object> x)
-	{
-		return new DMList( x );
-	}
-	
-	@SuppressWarnings("unchecked")
-	public Object coerce(Object x)
-	{
-		if ( x instanceof PyString )
-		{
-			return coerce( (PyString)x );
-		}
-		else if ( x instanceof PyUnicode )
-		{
-			return coerce( (PyUnicode)x );
-		}
-		else if ( x instanceof String )
-		{
-			return coerce( (String)x );
-		}
-		else if ( x instanceof DMList )
-		{
-			return x;
-		}
-		else if ( x instanceof List )
-		{
-			return coerce( (List<Object>)x );
-		}
-		else if ( x instanceof PyJavaType )
-		{
-			return coerce( Py.tojava( (PyObject)x, Object.class ) );
-		}
-		else
-		{
-			System.out.println( "DMList.coerce(): attempted to coerce " + x.getClass().getName() + " (" + x.toString() + ")" );
-			//throw new RuntimeException();
-			return x;
-		}
-	}
-	
 	
 	
 	public Object clone()

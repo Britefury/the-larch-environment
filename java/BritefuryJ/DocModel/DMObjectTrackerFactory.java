@@ -4,30 +4,18 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.CommandHistory;
+package BritefuryJ.DocModel;
 
-public class CommandTracker
+import BritefuryJ.CommandHistory.CommandHistory;
+import BritefuryJ.CommandHistory.CommandTracker;
+import BritefuryJ.CommandHistory.CommandTrackerFactory;
+
+public class DMObjectTrackerFactory implements CommandTrackerFactory
 {
-	protected CommandHistory commandHistory;
+	public static DMObjectTrackerFactory factory = new DMObjectTrackerFactory();
 	
-	
-	public CommandTracker(CommandHistory commandHistory)
+	public CommandTracker createTracker(CommandHistory history)
 	{
-		this.commandHistory = commandHistory;
-	}
-	
-	
-	public CommandHistory getCommandHistory()
-	{
-		return commandHistory;
-	}
-	
-	
-	protected void track(Trackable t)
-	{
-	}
-	
-	protected void stopTracking(Trackable t)
-	{
+		return new DMObjectCommandTracker( history );
 	}
 }
