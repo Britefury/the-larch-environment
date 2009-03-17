@@ -7,154 +7,21 @@
 package BritefuryJ.DocModel;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
+
+import org.python.core.PyObject;
 
 
-public class DMObjectClass implements Iterable<DMObjectField>
+public class DMObjectClass
 {
-	protected static class KeySetView implements Set<String>
+	public static class InvalidFieldNameException extends Exception
 	{
-		protected static class KeySetViewIterator implements Iterator<String>
-		{
-			private DMObjectClass objClass;
-			private int index;
-			
-			
-			public KeySetViewIterator(DMObjectClass objClass)
-			{
-				this.objClass = objClass;
-				index = 0;
-			}
-
-
-			public boolean hasNext()
-			{
-				return index < objClass.getNumFields();
-			}
-
-			public String next()
-			{
-				return objClass.getField( index++ ).getName();
-			}
-
-			public void remove()
-			{
-				throw new UnsupportedOperationException();
-			}
-		}
-		
-		
-		
-		private DMObjectClass objClass;
-		
-		
-		public KeySetView(DMObjectClass objClass)
-		{
-			this.objClass = objClass;
-		}
-
-
-		
-		public boolean add(String arg0)
-		{
-			throw new UnsupportedOperationException();
-		}
-
-		public boolean addAll(Collection<? extends String> arg0)
-		{
-			throw new UnsupportedOperationException();
-		}
-
-		public void clear()
-		{
-			throw new UnsupportedOperationException();
-		}
-
-
-		public boolean contains(Object x)
-		{
-			for (int i = 0; i < objClass.allClassFields.length; i++)
-			{
-				if ( x.equals( objClass.allClassFields[i].getName() ) )
-				{
-					return true;
-				}
-			}
-			
-			return false;
-		}
-
-		public boolean containsAll(Collection<?> xs)
-		{
-			for (Object x: xs)
-			{
-				if ( !contains( x ) )
-				{
-					return false;
-				}
-			}
-			return true;
-		}
-
-
-		public boolean isEmpty()
-		{
-			return objClass.isEmpty();
-		}
-
-
-		public Iterator<String> iterator()
-		{
-			return new KeySetViewIterator( objClass );
-		}
-
-
-		public boolean remove(Object x)
-		{
-			throw new UnsupportedOperationException();
-		}
-
-		public boolean removeAll(Collection<?> arg0)
-		{
-			throw new UnsupportedOperationException();
-		}
-
-		public boolean retainAll(Collection<?> arg0)
-		{
-			throw new UnsupportedOperationException();
-		}
-
-
-		public int size()
-		{
-			return objClass.getNumFields();
-		}
-
-
-		public Object[] toArray()
-		{
-			int len = objClass.getNumFields();
-			String xs[] = new String[len];
-			int index = 0;
-			for (DMObjectField f: objClass)
-			{
-				xs[index++] = f.getName();
-			}
-			return xs;
-		}
-
-		@SuppressWarnings("unchecked")
-		public <T> T[] toArray(T[] arg0)
-		{
-			return (T[])toArray();
-		}
-	}
-
+		private static final long serialVersionUID = 1L;
+	};
 	
+
 	
 	
 	
@@ -224,6 +91,12 @@ public class DMObjectClass implements Iterable<DMObjectField>
 	}
 	
 	
+	
+	public int getNumFields()
+	{
+		return allClassFields.length;
+	}
+	
 	public int getFieldIndex(String name)
 	{
 		Integer index = fieldNameToIndex.get( name );
@@ -247,11 +120,6 @@ public class DMObjectClass implements Iterable<DMObjectField>
 		return allClassFields[index];
 	}
 	
-	public int getNumFields()
-	{
-		return allClassFields.length;
-	}
-	
 	public List<DMObjectField> getFields()
 	{
 		return Arrays.asList( allClassFields );
@@ -264,20 +132,17 @@ public class DMObjectClass implements Iterable<DMObjectField>
 	}
 	
 
-	public Iterator<DMObjectField> iterator()
+	public String[] getFieldNames()
 	{
-		return Arrays.asList( allClassFields ).iterator();
+		String fieldNames[] = new String[allClassFields.length];
+		int i = 0;
+		for (DMObjectField field: allClassFields)
+		{
+			fieldNames[i++] = field.getName();
+		}
+		return fieldNames;
 	}
-	
-	
-	public Set<String> fieldNameSet()
-	{
-		return new KeySetView( this );
-	}
-	
-	
-	
-	
+
 	
 	private void initialise()
 	{
@@ -288,4 +153,31 @@ public class DMObjectClass implements Iterable<DMObjectField>
 		}
 	}
 	
+	
+	
+	public DMObject createInstance(Object values[])
+	{
+		return new DMObject( this, values );
+	}
+
+	public DMObject createInstance(String keys[], Object values[]) throws InvalidFieldNameException
+	{
+		return new DMObject( this, keys, values );
+	}
+
+	public DMObject createInstance(PyObject values[], String names[])
+	{
+		return new DMObject( this, names, values );
+	}
+
+	public DMObject createInstance(Map<String, Object> data) throws InvalidFieldNameException
+	{
+		return new DMObject( this, data );
+	}
+	
+	
+	public DMObject __call__(PyObject values[], String names[])
+	{
+		return createInstance( values, names );
+	}
 }

@@ -7,12 +7,10 @@
 package tests.DocModel;
 
 import java.util.Arrays;
-import java.util.Iterator;
-import java.util.Set;
 
+import junit.framework.TestCase;
 import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMObjectField;
-import junit.framework.TestCase;
 
 public class Test_DMObjectClass extends TestCase
 {
@@ -47,13 +45,6 @@ public class Test_DMObjectClass extends TestCase
 		
 		assertTrue( a0.isEmpty() );
 		assertFalse( a1.isEmpty() );
-		
-		Iterator<DMObjectField> i0 = a0.iterator();
-		assertFalse( i0.hasNext() );
-		Iterator<DMObjectField> i1 = a1.iterator();
-		assertTrue( i1.hasNext() );
-		assertSame( i1.next(), f1[0] );
-		assertFalse( i1.hasNext() );
 	}
 
 
@@ -88,13 +79,6 @@ public class Test_DMObjectClass extends TestCase
 		
 		assertTrue( a0.isEmpty() );
 		assertFalse( a1.isEmpty() );
-		
-		Iterator<DMObjectField> i0 = a0.iterator();
-		assertFalse( i0.hasNext() );
-		Iterator<DMObjectField> i1 = a1.iterator();
-		assertTrue( i1.hasNext() );
-		assertSame( i1.next().getName(), f1[0] );
-		assertFalse( i1.hasNext() );
 	}
 
 
@@ -135,41 +119,5 @@ public class Test_DMObjectClass extends TestCase
 		
 		assertFalse( a.isEmpty() );
 		assertFalse( b.isEmpty() );
-		
-		Iterator<DMObjectField> ia = a.iterator();
-		assertTrue( ia.hasNext() );
-		assertSame( ia.next(), af[0] );
-		assertFalse( ia.hasNext() );
-		Iterator<DMObjectField> ib = b.iterator();
-		assertTrue( ib.hasNext() );
-		assertSame( ib.next(), af[0] );
-		assertTrue( ib.hasNext() );
-		assertSame( ib.next(), bf[0] );
-		assertFalse( ib.hasNext() );
-		
-		
-		Set<String> names = b.fieldNameSet();
-	
-		assertTrue( names.contains( "x" ) );
-		assertTrue( names.contains( "y" ) );
-		assertFalse( names.contains( "z" ) );
-
-		assertTrue( names.containsAll( Arrays.asList( new String[] { "x" } ) ) );
-		assertTrue( names.containsAll( Arrays.asList( new String[] { "y" } ) ) );
-		assertTrue( names.containsAll( Arrays.asList( new String[] { "x", "y" } ) ) );
-		assertFalse( names.containsAll( Arrays.asList( new String[] { "z" } ) ) );
-		
-		assertFalse( names.isEmpty() );
-		
-		Iterator<String> ni = names.iterator();
-		assertTrue( ni.hasNext() );
-		assertEquals( ni.next(), "x"  );
-		assertTrue( ni.hasNext() );
-		assertEquals( ni.next(), "y"  );
-		assertFalse( ni.hasNext() );
-		
-		assertTrue( names.size() == 2 );
-		
-		assertEquals( Arrays.asList( names.toArray() ),  Arrays.asList( new String[] { "x", "y" } ) );
 	}
 }

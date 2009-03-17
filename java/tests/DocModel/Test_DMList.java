@@ -12,13 +12,14 @@ import java.util.Iterator;
 import java.util.List;
 
 import junit.framework.TestCase;
-
 import BritefuryJ.Cell.Cell;
 import BritefuryJ.Cell.CellEvaluator;
 import BritefuryJ.CommandHistory.CommandHistory;
 import BritefuryJ.DocModel.DMIORead;
+import BritefuryJ.DocModel.DMIOWrite;
 import BritefuryJ.DocModel.DMList;
 import BritefuryJ.DocModel.DMIORead.ParseSXErrorException;
+import BritefuryJ.DocModel.DMIOWrite.InvalidDataTypeException;
 
 public class Test_DMList extends TestCase
 {
@@ -348,6 +349,45 @@ public class Test_DMList extends TestCase
 
 		String[] a = { "a", "b", "c" };
 		assertEquals( Arrays.asList( readDMListSX( "(a b c)" ).toArray( a ) ), Arrays.asList( strs ) );
+	}
+	
+	
+	
+	public void test_trackTree() throws InvalidDataTypeException
+	{
+		DMList xs = readTrackedDMListSX( "(a b (c d (e f)))" );
+		cmpListSX( xs, "(a b (c d (e f)))" );
+
+		((DMList)((DMList)xs.get( 2 )).get( 2 )).set( 0, "x" );
+		cmpListSX( xs, "(a b (c d (x f)))" );
+		
+		history.undo();
+		cmpListSX( xs, "(a b (c d (e f)))" );
+
+		history.redo();
+		cmpListSX( xs, "(a b (c d (x f)))" );
+		
+		
+		DMList ys = readDMListSX( "(p q (s t))" );
+
+		((DMList)((DMList)xs.get( 2 )).get( 2 )).set( 0, ys );
+		cmpListSX( xs, "(a b (c d ((p q (s t)) f)))" );
+
+		((DMList)((DMList)((DMList)((DMList)xs.get( 2 )).get( 2 )).get( 0 )).get( 2 )).set( 1, "h" );
+		cmpListSX( xs, "(a b (c d ((p q (s h)) f)))" );
+
+		history.undo();
+		cmpListSX( xs, "(a b (c d ((p q (s t)) f)))" );
+
+		history.undo();
+		cmpListSX( xs, "(a b (c d (x f)))" );
+
+		history.redo();
+		cmpListSX( xs, "(a b (c d ((p q (s t)) f)))" );
+
+		history.redo();
+		System.out.println( DMIOWrite.writeSX( xs ) );
+		cmpListSX( xs, "(a b (c d ((p q (s h)) f)))" );
 	}
 	
 }

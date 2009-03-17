@@ -342,11 +342,11 @@ def expressionNodeEditor(ctx, node, contents, precedence, state):
 		return contents
 	elif mode == MODE_EDITEXPRESSION:
 		contents = _precedenceParen( ctx, contents, precedence, outerPrecedence )
-		contents = ctx.segment( python_paragraphStyle, python_segmentCaretStopFactory, contents )
-		return ctx.contentListener( contents, ParsedExpressionContentListener( ctx, node, parser ) )
+		segment = ctx.segment( python_paragraphStyle, python_segmentCaretStopFactory, contents )
+		return ctx.contentListener( segment, ParsedExpressionContentListener( ctx, node, parser ) )
 	elif mode == MODE_EDITSTATEMENT:
-		contents = ctx.segment( python_paragraphStyle, python_segmentCaretStopFactory, contents )
-		return ctx.contentListener( contents, ParsedLineContentListener( ctx, node, parser ) )
+		segment = ctx.segment( python_paragraphStyle, python_segmentCaretStopFactory, contents )
+		return ctx.contentListener( segment, ParsedLineContentListener( ctx, node, parser ) )
 	else:
 		raise ValueError, 'invalid mode %d'  %  mode
 
@@ -356,8 +356,8 @@ def statementNodeEditor(ctx, node, contents, precedence, state):
 
 	if mode == MODE_EDITSTATEMENT:
 		#contents = addContentLineStops( ctx, contents, True )
-		contents = ctx.segment( python_paragraphStyle, python_segmentCaretStopFactory, contents )
-		return ctx.contentListener( contents, ParsedLineContentListener( ctx, node, parser ) )
+		segment = ctx.segment( python_paragraphStyle, python_segmentCaretStopFactory, contents )
+		return ctx.contentListener( segment, ParsedLineContentListener( ctx, node, parser ) )
 	else:
 		raise ValueError, 'invalid mode %d'  %  mode
 
