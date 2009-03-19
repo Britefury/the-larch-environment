@@ -104,6 +104,7 @@ class _NodeElementChangeListener (DVNode.NodeElementChangeListener):
 				# If the m*n > DIFF_THRESHOLD, use a simpler method; this prevents slow downs
 				if ( origChangeRegionLength * newChangeRegionLength )  >  DIFF_THRESHOLD:
 					# HACK HACK HACK
+					print 'Computing cursor position using non-diff hack'
 					if position > prefixLen:
 						rel = position - prefixLen
 						if rel > origChangeRegionLength:
