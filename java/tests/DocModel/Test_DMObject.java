@@ -10,8 +10,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 import BritefuryJ.CommandHistory.CommandHistory;
+import BritefuryJ.DocModel.DMModule;
 import BritefuryJ.DocModel.DMObject;
 import BritefuryJ.DocModel.DMObjectClass;
+import BritefuryJ.DocModel.DMModule.ClassAlreadyDefinedException;
 import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
 import junit.framework.TestCase;
 
@@ -31,20 +33,22 @@ public class Test_DMObject extends TestCase
 
 	
 	
-	public void test_getDMClass() throws InvalidFieldNameException
+	public void test_getDMClass() throws InvalidFieldNameException, ClassAlreadyDefinedException
 	{
-		DMObjectClass A = new DMObjectClass( "A", new String[] { "x", "y" } );
-		DMObject a = A.createInstance( new Object[] { "a", "p" } );
+		DMModule m = new DMModule( "m" );
+		DMObjectClass A = m.newClass( "A", new String[] { "x", "y" } );
+		DMObject a = A.newInstance( new Object[] { "a", "p" } );
 		history.track( a );
 		
 		assertSame( a.getDMClass(), A );
 	}
 
 		
-	public void test_getFieldIndex() throws InvalidFieldNameException
+	public void test_getFieldIndex() throws InvalidFieldNameException, ClassAlreadyDefinedException
 	{
-		DMObjectClass A = new DMObjectClass( "A", new String[] { "x", "y" } );
-		DMObject a = A.createInstance( new Object[] { "a", "p" } );
+		DMModule m = new DMModule( "m" );
+		DMObjectClass A = m.newClass( "A", new String[] { "x", "y" } );
+		DMObject a = A.newInstance( new Object[] { "a", "p" } );
 		history.track( a );
 		
 		assertEquals( a.getFieldIndex( "x" ), 0 );
@@ -52,30 +56,33 @@ public class Test_DMObject extends TestCase
 	}
 
 
-	public void test_DMObject_getFieldNames() throws InvalidFieldNameException
+	public void test_DMObject_getFieldNames() throws InvalidFieldNameException, ClassAlreadyDefinedException
 	{
-		DMObjectClass A = new DMObjectClass( "A", new String[] { "x", "y" } );
-		DMObject a = A.createInstance( new Object[] { "a", "p" } );
+		DMModule m = new DMModule( "m" );
+		DMObjectClass A = m.newClass( "A", new String[] { "x", "y" } );
+		DMObject a = A.newInstance( new Object[] { "a", "p" } );
 		history.track( a );
 		
 		assertEquals( Arrays.asList( a.getFieldNames() ), Arrays.asList( new String[] { "x", "y" } ) );
 	}
 
 		
-	public void test_DMObject_getFieldValuesImmutable() throws InvalidFieldNameException
+	public void test_DMObject_getFieldValuesImmutable() throws InvalidFieldNameException, ClassAlreadyDefinedException
 	{
-		DMObjectClass A = new DMObjectClass( "A", new String[] { "x", "y" } );
-		DMObject a = A.createInstance( new Object[] { "a", "p" } );
+		DMModule m = new DMModule( "m" );
+		DMObjectClass A = m.newClass( "A", new String[] { "x", "y" } );
+		DMObject a = A.newInstance( new Object[] { "a", "p" } );
 		history.track( a );
 		
 		assertEquals( Arrays.asList( a.getFieldValuesImmutable() ), Arrays.asList( new Object[] { "a", "p" } ) );
 	}
 
 	
-	public void test_get() throws InvalidFieldNameException
+	public void test_get() throws InvalidFieldNameException, ClassAlreadyDefinedException
 	{
-		DMObjectClass A = new DMObjectClass( "A", new String[] { "x", "y" } );
-		DMObject a = A.createInstance( new Object[] { "a", "p" } );
+		DMModule m = new DMModule( "m" );
+		DMObjectClass A = m.newClass( "A", new String[] { "x", "y" } );
+		DMObject a = A.newInstance( new Object[] { "a", "p" } );
 		history.track( a );
 		
 		assertEquals( a.get( 0 ), "a" );
@@ -85,10 +92,11 @@ public class Test_DMObject extends TestCase
 	}
 
 
-	public void test_getitem() throws InvalidFieldNameException
+	public void test_getitem() throws InvalidFieldNameException, ClassAlreadyDefinedException
 	{
-		DMObjectClass A = new DMObjectClass( "A", new String[] { "x", "y" } );
-		DMObject a = A.createInstance( new Object[] { "a", "p" } );
+		DMModule m = new DMModule( "m" );
+		DMObjectClass A = m.newClass( "A", new String[] { "x", "y" } );
+		DMObject a = A.newInstance( new Object[] { "a", "p" } );
 		history.track( a );
 		
 		assertEquals( a.__getitem__( 0 ), "a" );
@@ -98,10 +106,11 @@ public class Test_DMObject extends TestCase
 	}
 
 
-	public void test_set() throws InvalidFieldNameException
+	public void test_set() throws InvalidFieldNameException, ClassAlreadyDefinedException
 	{
-		DMObjectClass A = new DMObjectClass( "A", new String[] { "x", "y" } );
-		DMObject a = A.createInstance( new Object[] { "a", "p" } );
+		DMModule m = new DMModule( "m" );
+		DMObjectClass A = m.newClass( "A", new String[] { "x", "y" } );
+		DMObject a = A.newInstance( new Object[] { "a", "p" } );
 		history.track( a );
 		
 		a.set( 0, "b" );
@@ -138,10 +147,11 @@ public class Test_DMObject extends TestCase
 	}
 
 
-	public void test_update() throws InvalidFieldNameException
+	public void test_update() throws InvalidFieldNameException, ClassAlreadyDefinedException
 	{
-		DMObjectClass A = new DMObjectClass( "A", new String[] { "x", "y" } );
-		DMObject a = A.createInstance( new Object[] { "a", "p" } );
+		DMModule m = new DMModule( "m" );
+		DMObjectClass A = m.newClass( "A", new String[] { "x", "y" } );
+		DMObject a = A.newInstance( new Object[] { "a", "p" } );
 		history.track( a );
 		
 		HashMap<String, Object> data = new HashMap<String, Object>();
@@ -159,10 +169,11 @@ public class Test_DMObject extends TestCase
 	}
 
 
-	public void test_setitem() throws InvalidFieldNameException
+	public void test_setitem() throws InvalidFieldNameException, ClassAlreadyDefinedException
 	{
-		DMObjectClass A = new DMObjectClass( "A", new String[] { "x", "y" } );
-		DMObject a = A.createInstance( new Object[] { "a", "p" } );
+		DMModule m = new DMModule( "m" );
+		DMObjectClass A = m.newClass( "A", new String[] { "x", "y" } );
+		DMObject a = A.newInstance( new Object[] { "a", "p" } );
 		history.track( a );
 		
 		a.__setitem__( 0, "e" );
@@ -173,20 +184,21 @@ public class Test_DMObject extends TestCase
 
 	
 	
-	public void test_DMObject_constructors() throws InvalidFieldNameException
+	public void test_DMObject_constructors() throws InvalidFieldNameException, ClassAlreadyDefinedException
 	{
 		HashMap<String, Object> data = new HashMap<String, Object>();
 		data.put( "x", "d" );
 		data.put( "y", "s" );
 
-		DMObjectClass A = new DMObjectClass( "A", new String[] { "x", "y" } );
+		DMModule m = new DMModule( "m" );
+		DMObjectClass A = m.newClass( "A", new String[] { "x", "y" } );
 		DMObject a0 = new DMObject( A, new Object[] { "a", "b" } );
 		DMObject a1 = new DMObject( A, new String[] { "y", "x" }, new Object[] { "a", "b" } );
 		DMObject a2 = new DMObject( A, data );
 		
-		DMObject a3 = A.createInstance( new Object[] { "a", "b" } );
-		DMObject a4 = A.createInstance( new String[] { "y", "x" }, new Object[] { "a", "b" } );
-		DMObject a5 = A.createInstance( data );
+		DMObject a3 = A.newInstance( new Object[] { "a", "b" } );
+		DMObject a4 = A.newInstance( new String[] { "y", "x" }, new Object[] { "a", "b" } );
+		DMObject a5 = A.newInstance( data );
 
 		assertEquals( Arrays.asList( a0.getFieldValuesImmutable() ), Arrays.asList( new Object[] { "a", "b" } ) );
 		assertEquals( Arrays.asList( a1.getFieldValuesImmutable() ), Arrays.asList( new Object[] { "b", "a" } ) );
@@ -199,12 +211,13 @@ public class Test_DMObject extends TestCase
 	
 	
 	
-	public void test_trackTree() throws InvalidFieldNameException
+	public void test_trackTree() throws InvalidFieldNameException, ClassAlreadyDefinedException
 	{
-		DMObjectClass A = new DMObjectClass( "A", new String[] { "x", "y" } );
-		DMObject c = A.createInstance( new Object[] { "c", "r" } );
-		DMObject b = A.createInstance( new Object[] { "b", "q" } );
-		DMObject a = A.createInstance( new Object[] { "a", b } );
+		DMModule m = new DMModule( "m" );
+		DMObjectClass A = m.newClass( "A", new String[] { "x", "y" } );
+		DMObject c = A.newInstance( new Object[] { "c", "r" } );
+		DMObject b = A.newInstance( new Object[] { "b", "q" } );
+		DMObject a = A.newInstance( new Object[] { "a", b } );
 		history.track( a );
 
 		assertEquals( Arrays.asList( a.getFieldValuesImmutable() ), Arrays.asList( new Object[] { "a", b } ) );

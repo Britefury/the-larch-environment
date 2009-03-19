@@ -9,16 +9,19 @@ package tests.DocModel;
 import java.util.Arrays;
 
 import junit.framework.TestCase;
+import BritefuryJ.DocModel.DMModule;
 import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMObjectField;
+import BritefuryJ.DocModel.DMModule.ClassAlreadyDefinedException;
 
 public class Test_DMObjectClass extends TestCase
 {
-	public void test_Constructor_fields()
+	public void test_Constructor_fields() throws ClassAlreadyDefinedException
 	{
+		DMModule m = new DMModule( "m" );
 		DMObjectField f1[] = { new DMObjectField( "x" ) };
-		DMObjectClass a0 = new DMObjectClass( "A", new DMObjectField[] { } );
-		DMObjectClass a1 = new DMObjectClass( "AA", f1 );
+		DMObjectClass a0 = m.newClass( "A", new DMObjectField[] { } );
+		DMObjectClass a1 = m.newClass( "AA", f1 );
 		
 		assertEquals( a0.getName(), "A" );
 		assertEquals( a1.getName(), "AA" );
@@ -48,11 +51,12 @@ public class Test_DMObjectClass extends TestCase
 	}
 
 
-	public void test_Constructor_names()
+	public void test_Constructor_names() throws ClassAlreadyDefinedException
 	{
+		DMModule m = new DMModule( "m" );
 		String f1[] = { "x" };
-		DMObjectClass a0 = new DMObjectClass( "A", new String[] { } );
-		DMObjectClass a1 = new DMObjectClass( "AA", f1 );
+		DMObjectClass a0 = m.newClass( "A", new String[] { } );
+		DMObjectClass a1 = m.newClass( "AA", f1 );
 		
 		assertEquals( a0.getName(), "A" );
 		assertEquals( a1.getName(), "AA" );
@@ -82,13 +86,14 @@ public class Test_DMObjectClass extends TestCase
 	}
 
 
-	public void test_Constructor_superclass_fields()
+	public void test_Constructor_superclass_fields() throws ClassAlreadyDefinedException
 	{
+		DMModule m = new DMModule( "m" );
 		DMObjectField af[] = { new DMObjectField( "x" ) };
-		DMObjectClass a = new DMObjectClass( "A", af );
+		DMObjectClass a = m.newClass( "A", af );
 
 		DMObjectField bf[] = { new DMObjectField( "y" ) };
-		DMObjectClass b = new DMObjectClass( "B", a, bf );
+		DMObjectClass b = m.newClass( "B", a, bf );
 		
 		assertEquals( b.getName(), "B" );
 

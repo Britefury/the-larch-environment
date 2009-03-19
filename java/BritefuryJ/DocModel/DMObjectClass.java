@@ -24,7 +24,7 @@ public class DMObjectClass
 
 	
 	
-	
+	private DMModule module;
 	private String name;
 	private DMObjectClass superClass, superClasses[];
 	private DMObjectField classFields[], allClassFields[];
@@ -32,8 +32,9 @@ public class DMObjectClass
 	
 	
 	
-	public DMObjectClass(String name, DMObjectField fields[])
+	public DMObjectClass(DMModule module, String name, DMObjectField fields[])
 	{
+		this.module = module;
 		this.name = name;
 		superClass = null;
 		superClasses = new DMObjectClass[0];
@@ -43,15 +44,16 @@ public class DMObjectClass
 		initialise();
 	}
 	
-	public DMObjectClass(String name, String fieldNames[])
+	public DMObjectClass(DMModule module, String name, String fieldNames[])
 	{
-		this( name, DMObjectField.nameArrayToFieldArray( fieldNames ) );
+		this( module, name, DMObjectField.nameArrayToFieldArray( fieldNames ) );
 	}
 	
 	
 	
-	public DMObjectClass(String name, DMObjectClass superClass, DMObjectField fields[])
+	public DMObjectClass(DMModule module, String name, DMObjectClass superClass, DMObjectField fields[])
 	{
+		this.module = module;
 		this.name = name;
 		
 		this.superClass = superClass;
@@ -67,12 +69,17 @@ public class DMObjectClass
 		initialise();
 	}
 
-	public DMObjectClass(String name, DMObjectClass superClass, String fieldNames[])
+	public DMObjectClass(DMModule module, String name, DMObjectClass superClass, String fieldNames[])
 	{
-		this( name, superClass, DMObjectField.nameArrayToFieldArray( fieldNames ) );
+		this( module, name, superClass, DMObjectField.nameArrayToFieldArray( fieldNames ) );
 	}
 	
 	
+	
+	public DMModule getModule()
+	{
+		return module;
+	}
 	
 	public String getName()
 	{
@@ -155,22 +162,22 @@ public class DMObjectClass
 	
 	
 	
-	public DMObject createInstance(Object values[])
+	public DMObject newInstance(Object values[])
 	{
 		return new DMObject( this, values );
 	}
 
-	public DMObject createInstance(String keys[], Object values[]) throws InvalidFieldNameException
+	public DMObject newInstance(String keys[], Object values[]) throws InvalidFieldNameException
 	{
 		return new DMObject( this, keys, values );
 	}
 
-	public DMObject createInstance(PyObject values[], String names[])
+	public DMObject newInstance(PyObject values[], String names[])
 	{
 		return new DMObject( this, names, values );
 	}
 
-	public DMObject createInstance(Map<String, Object> data) throws InvalidFieldNameException
+	public DMObject newInstance(Map<String, Object> data) throws InvalidFieldNameException
 	{
 		return new DMObject( this, data );
 	}
@@ -178,6 +185,6 @@ public class DMObjectClass
 	
 	public DMObject __call__(PyObject values[], String names[])
 	{
-		return createInstance( values, names );
+		return newInstance( values, names );
 	}
 }
