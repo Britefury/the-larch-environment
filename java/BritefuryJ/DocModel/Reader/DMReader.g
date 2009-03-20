@@ -37,7 +37,7 @@ import BritefuryJ.DocModel.DMObjectClass;
 
 	protected String unescape(String s)
 	{
-		s = s.replace( "\\n", "\n" ).replace( "\\r", "\r" ).replace( "\\t", "\t" ).replace( "\\\\", "\\" );
+		s = s.replace( "\\n", "\n" ).replace( "\\r", "\r" ).replace( "\\t", "\t" ).replace( "\\\\", "\\" ).replace( "\\\"", "\"" );
 		
 		boolean bScanAgain = true;
 		while ( bScanAgain )
@@ -136,9 +136,7 @@ object returns [Object value]
 			}		
 			WS?
 			moduleName=IDENTIFIER
-			WS?
-			'.'
-			WS?
+			WS
 			className=IDENTIFIER
 			WS?
 			(
@@ -156,7 +154,7 @@ bindings returns [Object value]
 		'{'
 			WS?
 			(
-				name=IDENTIFIER WS? ':' WS? moduleLocation=atom WS
+				name=IDENTIFIER WS? '=' WS? moduleLocation=atom WS
 				{
 					bind( $name.getText(), $moduleLocation.value );
 				}
@@ -181,15 +179,15 @@ fragment QUOTEDSTRING_PUNC
 
 
 fragment STRING_ESCAPE
-	:	'\\' ( 'n'  |  't'  |  'r'  |  ('x' ( '0'..'9' | 'A'..'F' | 'a'..'f' )+ 'x' ) );
+	:	'\\' ( 'n'  |  't'  |  'r'  |  '"'  |  ('x' ( '0'..'9' | 'A'..'F' | 'a'..'f' )+ 'x' ) );
 	
 UNQUOTEDSTRING
-	:	( 'A'..'Z' | 'a'..'z' | '0'..'9' | UNQUOTEDSTRING_PUNC )+;
+	:	( 'A'..'Z' | 'a'..'z' | '0'..'9' | '_' | UNQUOTEDSTRING_PUNC )+;
 
 QUOTEDSTRING
 	:	(
 			'\"'
-			( 'A'..'Z' | 'a'..'z' | '0'..'9' | QUOTEDSTRING_PUNC | STRING_ESCAPE )*
+			( 'A'..'Z' | 'a'..'z' | '0'..'9' | '_' | QUOTEDSTRING_PUNC | STRING_ESCAPE )*
 			'\"'
 		) { setText( getText().substring( 1, getText().length() - 1 ) ); };
 		
@@ -202,6 +200,3 @@ IDENTIFIER
 	;
 
 
-DOTTED_IDENTIFIER
-	:	IDENTIFIER ( '.' IDENTIFIER )*
-	;

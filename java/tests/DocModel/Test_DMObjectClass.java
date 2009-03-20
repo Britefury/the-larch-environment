@@ -16,9 +16,22 @@ import BritefuryJ.DocModel.DMModule.ClassAlreadyDefinedException;
 
 public class Test_DMObjectClass extends TestCase
 {
+	private DMModule m;
+	
+	
+	public void setUp()
+	{
+		m = new DMModule( "m", "m", "test.m" );
+	}
+	
+	public void tearDown()
+	{
+		m = null;
+	}
+	
+	
 	public void test_Constructor_fields() throws ClassAlreadyDefinedException
 	{
-		DMModule m = new DMModule( "m" );
 		DMObjectField f1[] = { new DMObjectField( "x" ) };
 		DMObjectClass a0 = m.newClass( "A", new DMObjectField[] { } );
 		DMObjectClass a1 = m.newClass( "AA", f1 );
@@ -53,7 +66,6 @@ public class Test_DMObjectClass extends TestCase
 
 	public void test_Constructor_names() throws ClassAlreadyDefinedException
 	{
-		DMModule m = new DMModule( "m" );
 		String f1[] = { "x" };
 		DMObjectClass a0 = m.newClass( "A", new String[] { } );
 		DMObjectClass a1 = m.newClass( "AA", f1 );
@@ -88,7 +100,6 @@ public class Test_DMObjectClass extends TestCase
 
 	public void test_Constructor_superclass_fields() throws ClassAlreadyDefinedException
 	{
-		DMModule m = new DMModule( "m" );
 		DMObjectField af[] = { new DMObjectField( "x" ) };
 		DMObjectClass a = m.newClass( "A", af );
 

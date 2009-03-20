@@ -108,21 +108,6 @@ public class DMIOWrite
 	}
 
 	
-	public static void writeList(StringBuilder builder, List<Object> content) throws InvalidDataTypeException
-	{
-		builder.append( "(" );
-		if ( content.size() > 0 )
-		{
-			for (Object v: content.subList( 0, content.size() - 1 ))
-			{
-				writeSX( builder, v );
-				builder.append( " " );
-			}
-			writeSX( builder, content.get( content.size() - 1 ) );
-		}
-		builder.append( ")" );
-	}
-	
 	public static void writeString(StringBuilder builder, String content)
 	{
 		Matcher m = unquotedString.matcher( content );
@@ -135,6 +120,21 @@ public class DMIOWrite
 		{
 			builder.append( quoteString( content ) );
 		}
+	}
+	
+	public static void writeList(StringBuilder builder, List<Object> content) throws InvalidDataTypeException
+	{
+		builder.append( "[" );
+		if ( content.size() > 0 )
+		{
+			for (Object v: content.subList( 0, content.size() - 1 ))
+			{
+				writeSX( builder, v );
+				builder.append( " " );
+			}
+			writeSX( builder, content.get( content.size() - 1 ) );
+		}
+		builder.append( "]" );
 	}
 	
 	

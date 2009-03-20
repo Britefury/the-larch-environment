@@ -72,4 +72,16 @@ public abstract class DMNode
 			return x;
 		}
 	}
+	
+	
+	
+	public static boolean isNull(Object x)
+	{
+		return "<null>".equals( x );
+	}
+	
+	public static String newNull()
+	{
+		return new String( "<null>" );
+	}
 }

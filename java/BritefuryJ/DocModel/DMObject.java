@@ -31,6 +31,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable
 		this.objClass = objClass;
 
 		Object fieldData[] = new Object[objClass.getNumFields()];
+		fillArrayWithNulls( fieldData );
 		
 		cell = new LiteralCell();
 		cell.setLiteralValue( fieldData );
@@ -41,6 +42,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable
 	{
 		this.objClass = objClass;
 		Object fieldData[] = new Object[objClass.getNumFields()];
+		fillArrayWithNulls( fieldData );
 		
 		int numToCopy = Math.min( values.length, fieldData.length );
 		for (int i = 0; i < numToCopy; i++)
@@ -63,7 +65,8 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable
 		
 		this.objClass = objClass;
 		Object fieldData[] = new Object[objClass.getNumFields()];
-		
+		fillArrayWithNulls( fieldData );
+	
 		for (int i = 0; i < keys.length; i++)
 		{
 			int index = objClass.getFieldIndex( keys[i] );
@@ -88,7 +91,8 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable
 		
 		this.objClass = objClass;
 		Object fieldData[] = new Object[objClass.getNumFields()];
-		
+		fillArrayWithNulls( fieldData );
+	
 		for (int i = 0; i < names.length; i++)
 		{
 			int index = objClass.getFieldIndex( names[i] );
@@ -113,6 +117,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable
 		
 		objClass = Py.tojava( values[0], DMObjectClass.class );
 		Object fieldData[] = new Object[objClass.getNumFields()];
+		fillArrayWithNulls( fieldData );
 		
 		for (int i = 0; i < names.length; i++)
 		{
@@ -136,6 +141,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable
 	{
 		this.objClass = objClass;
 		Object fieldData[] = new Object[objClass.getNumFields()];
+		fillArrayWithNulls( fieldData );
 		
 		for (Map.Entry<String, Object> entry: data.entrySet())
 		{
@@ -320,6 +326,40 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable
 		else
 		{
 			set( index, x );
+		}
+	}
+	
+	
+	
+	public boolean equals(Object x)
+	{
+		if ( x instanceof DMObject )
+		{
+			DMObject dx = (DMObject)x;
+			if ( dx.objClass == objClass )
+			{
+				for (int i = 0; i < objClass.getNumFields(); i++)
+				{
+					if ( !get( i ).equals( dx.get( i ) ) )
+					{
+						return false;
+					}
+				}
+				
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	
+	
+	private void fillArrayWithNulls(Object[] xs)
+	{
+		for (int i = 0; i < xs.length; i++)
+		{
+			xs[i] = newNull();
 		}
 	}
 

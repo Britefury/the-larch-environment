@@ -23,14 +23,16 @@ public class DMModule
 	};
 
 	
-	private String moduleName;
+	private String moduleName, shortName, moduleLocation;
 	private HashMap<String, DMObjectClass> classes;
 	
 	
 	
-	public DMModule(String name)
+	public DMModule(String name, String shortName, String location)
 	{
 		this.moduleName = name;
+		this.shortName = shortName;
+		this.moduleLocation = location;
 		classes = new HashMap<String, DMObjectClass>();
 	}
 	
@@ -39,6 +41,16 @@ public class DMModule
 	public String getName()
 	{
 		return moduleName;
+	}
+	
+	public String getShortName()
+	{
+		return shortName;
+	}
+	
+	public String getLocation()
+	{
+		return moduleLocation;
 	}
 	
 	
