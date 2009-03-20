@@ -1,4 +1,4 @@
-// $ANTLR 3.1.2 C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g 2009-03-18 20:46:45
+// $ANTLR 3.1.2 C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g 2009-03-19 22:59:42
 
 package BritefuryJ.DocModel.Reader;
 
@@ -16,25 +16,23 @@ import java.util.ArrayList;
 
 public class DMReaderParser extends Parser {
     public static final String[] tokenNames = new String[] {
-        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "WS", "IDENTIFIER", "UNQUOTEDSTRING", "QUOTEDSTRING", "UNQUOTEDSTRING_PUNC", "QUOTEDSTRING_PUNC", "STRING_ESCAPE", "DOTTED_IDENTIFIER", "'['", "']'", "'('", "'='", "')'", "'{'", "':'", "'}'"
+        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "WS", "IDENTIFIER", "UNQUOTEDSTRING", "QUOTEDSTRING", "UNQUOTEDSTRING_PUNC", "QUOTEDSTRING_PUNC", "STRING_ESCAPE", "'['", "']'", "'('", "'='", "')'", "'{'", "'}'"
     };
     public static final int QUOTEDSTRING=7;
+    public static final int WS=4;
+    public static final int T__16=16;
     public static final int QUOTEDSTRING_PUNC=9;
+    public static final int T__15=15;
     public static final int STRING_ESCAPE=10;
+    public static final int T__17=17;
+    public static final int UNQUOTEDSTRING=6;
+    public static final int T__12=12;
+    public static final int T__11=11;
+    public static final int T__14=14;
+    public static final int IDENTIFIER=5;
+    public static final int T__13=13;
     public static final int UNQUOTEDSTRING_PUNC=8;
     public static final int EOF=-1;
-    public static final int T__19=19;
-    public static final int T__16=16;
-    public static final int WS=4;
-    public static final int T__15=15;
-    public static final int T__18=18;
-    public static final int T__17=17;
-    public static final int T__12=12;
-    public static final int UNQUOTEDSTRING=6;
-    public static final int DOTTED_IDENTIFIER=11;
-    public static final int T__14=14;
-    public static final int T__13=13;
-    public static final int IDENTIFIER=5;
 
     // delegates
     // delegators
@@ -70,7 +68,7 @@ public class DMReaderParser extends Parser {
 
     	protected String unescape(String s)
     	{
-    		s = s.replace( "\\n", "\n" ).replace( "\\r", "\r" ).replace( "\\t", "\t" ).replace( "\\\\", "\\" );
+    		s = s.replace( "\\n", "\n" ).replace( "\\r", "\r" ).replace( "\\t", "\t" ).replace( "\\\\", "\\" ).replace( "\\\"", "\"" );
     		
     		boolean bScanAgain = true;
     		while ( bScanAgain )
@@ -182,10 +180,10 @@ public class DMReaderParser extends Parser {
             int alt1=2;
             int LA1_0 = input.LA(1);
 
-            if ( ((LA1_0>=UNQUOTEDSTRING && LA1_0<=QUOTEDSTRING)||LA1_0==12||LA1_0==14) ) {
+            if ( ((LA1_0>=UNQUOTEDSTRING && LA1_0<=QUOTEDSTRING)||LA1_0==11||LA1_0==13) ) {
                 alt1=1;
             }
-            else if ( (LA1_0==17) ) {
+            else if ( (LA1_0==16) ) {
                 alt1=2;
             }
             else {
@@ -251,12 +249,12 @@ public class DMReaderParser extends Parser {
                 alt2=1;
                 }
                 break;
-            case 12:
+            case 11:
                 {
                 alt2=2;
                 }
                 break;
-            case 14:
+            case 13:
                 {
                 alt2=3;
                 }
@@ -332,7 +330,7 @@ public class DMReaderParser extends Parser {
             // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:123:4: '[' ( WS )? (i= item ( WS )? )* ']'
             {
              ArrayList<Object> xs = new ArrayList<Object>(); 
-            match(input,12,FOLLOW_12_in_list137); 
+            match(input,11,FOLLOW_11_in_list137); 
             // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:125:4: ( WS )?
             int alt3=2;
             int LA3_0 = input.LA(1);
@@ -357,7 +355,7 @@ public class DMReaderParser extends Parser {
                 int alt5=2;
                 int LA5_0 = input.LA(1);
 
-                if ( ((LA5_0>=UNQUOTEDSTRING && LA5_0<=QUOTEDSTRING)||LA5_0==12||LA5_0==14) ) {
+                if ( ((LA5_0>=UNQUOTEDSTRING && LA5_0<=QUOTEDSTRING)||LA5_0==11||LA5_0==13) ) {
                     alt5=1;
                 }
 
@@ -399,7 +397,7 @@ public class DMReaderParser extends Parser {
                 }
             } while (true);
 
-            match(input,13,FOLLOW_13_in_list164); 
+            match(input,12,FOLLOW_12_in_list164); 
              value = xs; 
 
             }
@@ -431,7 +429,7 @@ public class DMReaderParser extends Parser {
             // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:131:2: ( '(' ( WS )? moduleName= IDENTIFIER WS className= IDENTIFIER ( WS )? (k= IDENTIFIER ( WS )? '=' ( WS )? v= item ( WS )? )* ')' )
             // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:132:3: '(' ( WS )? moduleName= IDENTIFIER WS className= IDENTIFIER ( WS )? (k= IDENTIFIER ( WS )? '=' ( WS )? v= item ( WS )? )* ')'
             {
-            match(input,14,FOLLOW_14_in_object186); 
+            match(input,13,FOLLOW_13_in_object186); 
 
             				ArrayList<String> keys = new ArrayList<String>();
             				ArrayList<Object> values = new ArrayList<Object>();
@@ -509,7 +507,7 @@ public class DMReaderParser extends Parser {
 
             	    }
 
-            	    match(input,15,FOLLOW_15_in_object242); 
+            	    match(input,14,FOLLOW_14_in_object242); 
             	    // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:143:26: ( WS )?
             	    int alt9=2;
             	    int LA9_0 = input.LA(1);
@@ -565,7 +563,7 @@ public class DMReaderParser extends Parser {
             } while (true);
 
              value = createObject( moduleName.getText(), className.getText(), keys, values ); 
-            match(input,16,FOLLOW_16_in_object273); 
+            match(input,15,FOLLOW_15_in_object273); 
 
             }
 
@@ -582,7 +580,7 @@ public class DMReaderParser extends Parser {
 
 
     // $ANTLR start "bindings"
-    // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:152:1: bindings returns [Object value] : '{' ( WS )? (name= IDENTIFIER ( WS )? ':' ( WS )? moduleLocation= atom WS )* x= item ( WS )? '}' ;
+    // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:152:1: bindings returns [Object value] : '{' ( WS )? (name= IDENTIFIER ( WS )? '=' ( WS )? moduleLocation= atom WS )* x= item ( WS )? '}' ;
     public final Object bindings() throws RecognitionException {
         Object value = null;
 
@@ -593,10 +591,10 @@ public class DMReaderParser extends Parser {
 
 
         try {
-            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:153:2: ( '{' ( WS )? (name= IDENTIFIER ( WS )? ':' ( WS )? moduleLocation= atom WS )* x= item ( WS )? '}' )
-            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:154:3: '{' ( WS )? (name= IDENTIFIER ( WS )? ':' ( WS )? moduleLocation= atom WS )* x= item ( WS )? '}'
+            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:153:2: ( '{' ( WS )? (name= IDENTIFIER ( WS )? '=' ( WS )? moduleLocation= atom WS )* x= item ( WS )? '}' )
+            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:154:3: '{' ( WS )? (name= IDENTIFIER ( WS )? '=' ( WS )? moduleLocation= atom WS )* x= item ( WS )? '}'
             {
-            match(input,17,FOLLOW_17_in_bindings291); 
+            match(input,16,FOLLOW_16_in_bindings291); 
             // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:155:4: ( WS )?
             int alt12=2;
             int LA12_0 = input.LA(1);
@@ -615,7 +613,7 @@ public class DMReaderParser extends Parser {
 
             }
 
-            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:156:4: (name= IDENTIFIER ( WS )? ':' ( WS )? moduleLocation= atom WS )*
+            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:156:4: (name= IDENTIFIER ( WS )? '=' ( WS )? moduleLocation= atom WS )*
             loop15:
             do {
                 int alt15=2;
@@ -628,7 +626,7 @@ public class DMReaderParser extends Parser {
 
                 switch (alt15) {
             	case 1 :
-            	    // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:157:5: name= IDENTIFIER ( WS )? ':' ( WS )? moduleLocation= atom WS
+            	    // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:157:5: name= IDENTIFIER ( WS )? '=' ( WS )? moduleLocation= atom WS
             	    {
             	    name=(Token)match(input,IDENTIFIER,FOLLOW_IDENTIFIER_in_bindings310); 
             	    // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:157:21: ( WS )?
@@ -649,7 +647,7 @@ public class DMReaderParser extends Parser {
 
             	    }
 
-            	    match(input,18,FOLLOW_18_in_bindings315); 
+            	    match(input,14,FOLLOW_14_in_bindings315); 
             	    // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:157:29: ( WS )?
             	    int alt14=2;
             	    int LA14_0 = input.LA(1);
@@ -710,7 +708,7 @@ public class DMReaderParser extends Parser {
             }
 
              value = x; 
-            match(input,19,FOLLOW_19_in_bindings358); 
+            match(input,17,FOLLOW_17_in_bindings358); 
 
             }
 
@@ -791,35 +789,35 @@ public class DMReaderParser extends Parser {
     public static final BitSet FOLLOW_atom_in_item92 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_list_in_item105 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_object_in_item118 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_12_in_list137 = new BitSet(new long[]{0x00000000000070D0L});
-    public static final BitSet FOLLOW_WS_in_list142 = new BitSet(new long[]{0x00000000000070C0L});
-    public static final BitSet FOLLOW_item_in_list152 = new BitSet(new long[]{0x00000000000070D0L});
-    public static final BitSet FOLLOW_WS_in_list156 = new BitSet(new long[]{0x00000000000070C0L});
-    public static final BitSet FOLLOW_13_in_list164 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_14_in_object186 = new BitSet(new long[]{0x0000000000000030L});
+    public static final BitSet FOLLOW_11_in_list137 = new BitSet(new long[]{0x00000000000038D0L});
+    public static final BitSet FOLLOW_WS_in_list142 = new BitSet(new long[]{0x00000000000038C0L});
+    public static final BitSet FOLLOW_item_in_list152 = new BitSet(new long[]{0x00000000000038D0L});
+    public static final BitSet FOLLOW_WS_in_list156 = new BitSet(new long[]{0x00000000000038C0L});
+    public static final BitSet FOLLOW_12_in_list164 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_13_in_object186 = new BitSet(new long[]{0x0000000000000030L});
     public static final BitSet FOLLOW_WS_in_object198 = new BitSet(new long[]{0x0000000000000020L});
     public static final BitSet FOLLOW_IDENTIFIER_in_object206 = new BitSet(new long[]{0x0000000000000010L});
     public static final BitSet FOLLOW_WS_in_object211 = new BitSet(new long[]{0x0000000000000020L});
-    public static final BitSet FOLLOW_IDENTIFIER_in_object218 = new BitSet(new long[]{0x0000000000010030L});
-    public static final BitSet FOLLOW_WS_in_object223 = new BitSet(new long[]{0x0000000000010020L});
-    public static final BitSet FOLLOW_IDENTIFIER_in_object237 = new BitSet(new long[]{0x0000000000008010L});
-    public static final BitSet FOLLOW_WS_in_object239 = new BitSet(new long[]{0x0000000000008000L});
-    public static final BitSet FOLLOW_15_in_object242 = new BitSet(new long[]{0x00000000000050D0L});
-    public static final BitSet FOLLOW_WS_in_object244 = new BitSet(new long[]{0x00000000000050C0L});
-    public static final BitSet FOLLOW_item_in_object249 = new BitSet(new long[]{0x0000000000010030L});
-    public static final BitSet FOLLOW_WS_in_object251 = new BitSet(new long[]{0x0000000000010020L});
-    public static final BitSet FOLLOW_16_in_object273 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_17_in_bindings291 = new BitSet(new long[]{0x00000000000050F0L});
-    public static final BitSet FOLLOW_WS_in_bindings296 = new BitSet(new long[]{0x00000000000050E0L});
-    public static final BitSet FOLLOW_IDENTIFIER_in_bindings310 = new BitSet(new long[]{0x0000000000040010L});
-    public static final BitSet FOLLOW_WS_in_bindings312 = new BitSet(new long[]{0x0000000000040000L});
-    public static final BitSet FOLLOW_18_in_bindings315 = new BitSet(new long[]{0x00000000000000D0L});
+    public static final BitSet FOLLOW_IDENTIFIER_in_object218 = new BitSet(new long[]{0x0000000000008030L});
+    public static final BitSet FOLLOW_WS_in_object223 = new BitSet(new long[]{0x0000000000008020L});
+    public static final BitSet FOLLOW_IDENTIFIER_in_object237 = new BitSet(new long[]{0x0000000000004010L});
+    public static final BitSet FOLLOW_WS_in_object239 = new BitSet(new long[]{0x0000000000004000L});
+    public static final BitSet FOLLOW_14_in_object242 = new BitSet(new long[]{0x00000000000028D0L});
+    public static final BitSet FOLLOW_WS_in_object244 = new BitSet(new long[]{0x00000000000028C0L});
+    public static final BitSet FOLLOW_item_in_object249 = new BitSet(new long[]{0x0000000000008030L});
+    public static final BitSet FOLLOW_WS_in_object251 = new BitSet(new long[]{0x0000000000008020L});
+    public static final BitSet FOLLOW_15_in_object273 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_16_in_bindings291 = new BitSet(new long[]{0x00000000000028F0L});
+    public static final BitSet FOLLOW_WS_in_bindings296 = new BitSet(new long[]{0x00000000000028E0L});
+    public static final BitSet FOLLOW_IDENTIFIER_in_bindings310 = new BitSet(new long[]{0x0000000000004010L});
+    public static final BitSet FOLLOW_WS_in_bindings312 = new BitSet(new long[]{0x0000000000004000L});
+    public static final BitSet FOLLOW_14_in_bindings315 = new BitSet(new long[]{0x00000000000000D0L});
     public static final BitSet FOLLOW_WS_in_bindings317 = new BitSet(new long[]{0x00000000000000C0L});
     public static final BitSet FOLLOW_atom_in_bindings322 = new BitSet(new long[]{0x0000000000000010L});
-    public static final BitSet FOLLOW_WS_in_bindings324 = new BitSet(new long[]{0x00000000000050E0L});
-    public static final BitSet FOLLOW_item_in_bindings343 = new BitSet(new long[]{0x0000000000080010L});
-    public static final BitSet FOLLOW_WS_in_bindings348 = new BitSet(new long[]{0x0000000000080000L});
-    public static final BitSet FOLLOW_19_in_bindings358 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_WS_in_bindings324 = new BitSet(new long[]{0x00000000000028E0L});
+    public static final BitSet FOLLOW_item_in_bindings343 = new BitSet(new long[]{0x0000000000020010L});
+    public static final BitSet FOLLOW_WS_in_bindings348 = new BitSet(new long[]{0x0000000000020000L});
+    public static final BitSet FOLLOW_17_in_bindings358 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_UNQUOTEDSTRING_in_atom376 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_QUOTEDSTRING_in_atom387 = new BitSet(new long[]{0x0000000000000002L});
 

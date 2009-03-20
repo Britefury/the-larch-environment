@@ -1,4 +1,4 @@
-// $ANTLR 3.1.2 C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g 2009-03-18 20:46:46
+// $ANTLR 3.1.2 C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g 2009-03-19 22:59:43
 
 package BritefuryJ.DocModel.Reader;
 
@@ -10,22 +10,20 @@ import java.util.ArrayList;
 
 public class DMReaderLexer extends Lexer {
     public static final int QUOTEDSTRING=7;
+    public static final int WS=4;
+    public static final int T__16=16;
+    public static final int T__15=15;
     public static final int QUOTEDSTRING_PUNC=9;
     public static final int STRING_ESCAPE=10;
-    public static final int UNQUOTEDSTRING_PUNC=8;
-    public static final int EOF=-1;
-    public static final int T__19=19;
-    public static final int T__16=16;
-    public static final int WS=4;
-    public static final int T__15=15;
-    public static final int T__18=18;
     public static final int T__17=17;
     public static final int T__12=12;
     public static final int UNQUOTEDSTRING=6;
-    public static final int DOTTED_IDENTIFIER=11;
+    public static final int T__11=11;
     public static final int T__14=14;
     public static final int T__13=13;
     public static final int IDENTIFIER=5;
+    public static final int UNQUOTEDSTRING_PUNC=8;
+    public static final int EOF=-1;
 
     // delegates
     // delegators
@@ -40,15 +38,35 @@ public class DMReaderLexer extends Lexer {
     }
     public String getGrammarFileName() { return "C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g"; }
 
-    // $ANTLR start "T__12"
-    public final void mT__12() throws RecognitionException {
+    // $ANTLR start "T__11"
+    public final void mT__11() throws RecognitionException {
         try {
-            int _type = T__12;
+            int _type = T__11;
             int _channel = DEFAULT_TOKEN_CHANNEL;
             // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:7:7: ( '[' )
             // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:7:9: '['
             {
             match('['); 
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally {
+        }
+    }
+    // $ANTLR end "T__11"
+
+    // $ANTLR start "T__12"
+    public final void mT__12() throws RecognitionException {
+        try {
+            int _type = T__12;
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:8:7: ( ']' )
+            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:8:9: ']'
+            {
+            match(']'); 
 
             }
 
@@ -65,10 +83,10 @@ public class DMReaderLexer extends Lexer {
         try {
             int _type = T__13;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:8:7: ( ']' )
-            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:8:9: ']'
+            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:9:7: ( '(' )
+            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:9:9: '('
             {
-            match(']'); 
+            match('('); 
 
             }
 
@@ -85,10 +103,10 @@ public class DMReaderLexer extends Lexer {
         try {
             int _type = T__14;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:9:7: ( '(' )
-            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:9:9: '('
+            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:10:7: ( '=' )
+            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:10:9: '='
             {
-            match('('); 
+            match('='); 
 
             }
 
@@ -105,10 +123,10 @@ public class DMReaderLexer extends Lexer {
         try {
             int _type = T__15;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:10:7: ( '=' )
-            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:10:9: '='
+            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:11:7: ( ')' )
+            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:11:9: ')'
             {
-            match('='); 
+            match(')'); 
 
             }
 
@@ -125,10 +143,10 @@ public class DMReaderLexer extends Lexer {
         try {
             int _type = T__16;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:11:7: ( ')' )
-            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:11:9: ')'
+            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:12:7: ( '{' )
+            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:12:9: '{'
             {
-            match(')'); 
+            match('{'); 
 
             }
 
@@ -145,48 +163,8 @@ public class DMReaderLexer extends Lexer {
         try {
             int _type = T__17;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:12:7: ( '{' )
-            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:12:9: '{'
-            {
-            match('{'); 
-
-            }
-
-            state.type = _type;
-            state.channel = _channel;
-        }
-        finally {
-        }
-    }
-    // $ANTLR end "T__17"
-
-    // $ANTLR start "T__18"
-    public final void mT__18() throws RecognitionException {
-        try {
-            int _type = T__18;
-            int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:13:7: ( ':' )
-            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:13:9: ':'
-            {
-            match(':'); 
-
-            }
-
-            state.type = _type;
-            state.channel = _channel;
-        }
-        finally {
-        }
-    }
-    // $ANTLR end "T__18"
-
-    // $ANTLR start "T__19"
-    public final void mT__19() throws RecognitionException {
-        try {
-            int _type = T__19;
-            int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:14:7: ( '}' )
-            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:14:9: '}'
+            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:13:7: ( '}' )
+            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:13:9: '}'
             {
             match('}'); 
 
@@ -198,7 +176,7 @@ public class DMReaderLexer extends Lexer {
         finally {
         }
     }
-    // $ANTLR end "T__19"
+    // $ANTLR end "T__17"
 
     // $ANTLR start "UNQUOTEDSTRING_PUNC"
     public final void mUNQUOTEDSTRING_PUNC() throws RecognitionException {
@@ -251,12 +229,12 @@ public class DMReaderLexer extends Lexer {
     // $ANTLR start "STRING_ESCAPE"
     public final void mSTRING_ESCAPE() throws RecognitionException {
         try {
-            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:182:2: ( '\\\\' ( 'n' | 't' | 'r' | ( 'x' ( '0' .. '9' | 'A' .. 'F' | 'a' .. 'f' )+ 'x' ) ) )
-            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:182:4: '\\\\' ( 'n' | 't' | 'r' | ( 'x' ( '0' .. '9' | 'A' .. 'F' | 'a' .. 'f' )+ 'x' ) )
+            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:182:2: ( '\\\\' ( 'n' | 't' | 'r' | '\"' | ( 'x' ( '0' .. '9' | 'A' .. 'F' | 'a' .. 'f' )+ 'x' ) ) )
+            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:182:4: '\\\\' ( 'n' | 't' | 'r' | '\"' | ( 'x' ( '0' .. '9' | 'A' .. 'F' | 'a' .. 'f' )+ 'x' ) )
             {
             match('\\'); 
-            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:182:9: ( 'n' | 't' | 'r' | ( 'x' ( '0' .. '9' | 'A' .. 'F' | 'a' .. 'f' )+ 'x' ) )
-            int alt2=4;
+            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:182:9: ( 'n' | 't' | 'r' | '\"' | ( 'x' ( '0' .. '9' | 'A' .. 'F' | 'a' .. 'f' )+ 'x' ) )
+            int alt2=5;
             switch ( input.LA(1) ) {
             case 'n':
                 {
@@ -273,9 +251,14 @@ public class DMReaderLexer extends Lexer {
                 alt2=3;
                 }
                 break;
-            case 'x':
+            case '\"':
                 {
                 alt2=4;
+                }
+                break;
+            case 'x':
+                {
+                alt2=5;
                 }
                 break;
             default:
@@ -308,13 +291,20 @@ public class DMReaderLexer extends Lexer {
                     }
                     break;
                 case 4 :
-                    // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:182:35: ( 'x' ( '0' .. '9' | 'A' .. 'F' | 'a' .. 'f' )+ 'x' )
+                    // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:182:35: '\"'
                     {
-                    // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:182:35: ( 'x' ( '0' .. '9' | 'A' .. 'F' | 'a' .. 'f' )+ 'x' )
-                    // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:182:36: 'x' ( '0' .. '9' | 'A' .. 'F' | 'a' .. 'f' )+ 'x'
+                    match('\"'); 
+
+                    }
+                    break;
+                case 5 :
+                    // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:182:43: ( 'x' ( '0' .. '9' | 'A' .. 'F' | 'a' .. 'f' )+ 'x' )
+                    {
+                    // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:182:43: ( 'x' ( '0' .. '9' | 'A' .. 'F' | 'a' .. 'f' )+ 'x' )
+                    // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:182:44: 'x' ( '0' .. '9' | 'A' .. 'F' | 'a' .. 'f' )+ 'x'
                     {
                     match('x'); 
-                    // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:182:40: ( '0' .. '9' | 'A' .. 'F' | 'a' .. 'f' )+
+                    // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:182:48: ( '0' .. '9' | 'A' .. 'F' | 'a' .. 'f' )+
                     int cnt1=0;
                     loop1:
                     do {
@@ -371,79 +361,22 @@ public class DMReaderLexer extends Lexer {
     }
     // $ANTLR end "STRING_ESCAPE"
 
-    // $ANTLR start "UNQUOTEDSTRING"
-    public final void mUNQUOTEDSTRING() throws RecognitionException {
-        try {
-            int _type = UNQUOTEDSTRING;
-            int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:185:2: ( ( 'A' .. 'Z' | 'a' .. 'z' | '0' .. '9' | UNQUOTEDSTRING_PUNC )+ )
-            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:185:4: ( 'A' .. 'Z' | 'a' .. 'z' | '0' .. '9' | UNQUOTEDSTRING_PUNC )+
-            {
-            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:185:4: ( 'A' .. 'Z' | 'a' .. 'z' | '0' .. '9' | UNQUOTEDSTRING_PUNC )+
-            int cnt3=0;
-            loop3:
-            do {
-                int alt3=2;
-                int LA3_0 = input.LA(1);
-
-                if ( (LA3_0=='!'||(LA3_0>='$' && LA3_0<='&')||(LA3_0>='*' && LA3_0<='+')||(LA3_0>='-' && LA3_0<='9')||(LA3_0>='@' && LA3_0<='Z')||LA3_0=='^'||(LA3_0>='a' && LA3_0<='z')||LA3_0=='|'||LA3_0=='~') ) {
-                    alt3=1;
-                }
-
-
-                switch (alt3) {
-            	case 1 :
-            	    // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:
-            	    {
-            	    if ( input.LA(1)=='!'||(input.LA(1)>='$' && input.LA(1)<='&')||(input.LA(1)>='*' && input.LA(1)<='+')||(input.LA(1)>='-' && input.LA(1)<='9')||(input.LA(1)>='@' && input.LA(1)<='Z')||input.LA(1)=='^'||(input.LA(1)>='a' && input.LA(1)<='z')||input.LA(1)=='|'||input.LA(1)=='~' ) {
-            	        input.consume();
-
-            	    }
-            	    else {
-            	        MismatchedSetException mse = new MismatchedSetException(null,input);
-            	        recover(mse);
-            	        throw mse;}
-
-
-            	    }
-            	    break;
-
-            	default :
-            	    if ( cnt3 >= 1 ) break loop3;
-                        EarlyExitException eee =
-                            new EarlyExitException(3, input);
-                        throw eee;
-                }
-                cnt3++;
-            } while (true);
-
-
-            }
-
-            state.type = _type;
-            state.channel = _channel;
-        }
-        finally {
-        }
-    }
-    // $ANTLR end "UNQUOTEDSTRING"
-
     // $ANTLR start "QUOTEDSTRING"
     public final void mQUOTEDSTRING() throws RecognitionException {
         try {
             int _type = QUOTEDSTRING;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:188:2: ( ( '\\\"' ( 'A' .. 'Z' | 'a' .. 'z' | '0' .. '9' | QUOTEDSTRING_PUNC | STRING_ESCAPE )* '\\\"' ) )
-            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:188:4: ( '\\\"' ( 'A' .. 'Z' | 'a' .. 'z' | '0' .. '9' | QUOTEDSTRING_PUNC | STRING_ESCAPE )* '\\\"' )
+            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:185:2: ( ( '\\\"' ( 'A' .. 'Z' | 'a' .. 'z' | '0' .. '9' | '_' | QUOTEDSTRING_PUNC | STRING_ESCAPE )* '\\\"' ) )
+            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:185:4: ( '\\\"' ( 'A' .. 'Z' | 'a' .. 'z' | '0' .. '9' | '_' | QUOTEDSTRING_PUNC | STRING_ESCAPE )* '\\\"' )
             {
-            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:188:4: ( '\\\"' ( 'A' .. 'Z' | 'a' .. 'z' | '0' .. '9' | QUOTEDSTRING_PUNC | STRING_ESCAPE )* '\\\"' )
-            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:189:4: '\\\"' ( 'A' .. 'Z' | 'a' .. 'z' | '0' .. '9' | QUOTEDSTRING_PUNC | STRING_ESCAPE )* '\\\"'
+            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:185:4: ( '\\\"' ( 'A' .. 'Z' | 'a' .. 'z' | '0' .. '9' | '_' | QUOTEDSTRING_PUNC | STRING_ESCAPE )* '\\\"' )
+            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:186:4: '\\\"' ( 'A' .. 'Z' | 'a' .. 'z' | '0' .. '9' | '_' | QUOTEDSTRING_PUNC | STRING_ESCAPE )* '\\\"'
             {
             match('\"'); 
-            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:190:4: ( 'A' .. 'Z' | 'a' .. 'z' | '0' .. '9' | QUOTEDSTRING_PUNC | STRING_ESCAPE )*
-            loop4:
+            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:187:4: ( 'A' .. 'Z' | 'a' .. 'z' | '0' .. '9' | '_' | QUOTEDSTRING_PUNC | STRING_ESCAPE )*
+            loop3:
             do {
-                int alt4=6;
+                int alt3=7;
                 switch ( input.LA(1) ) {
                 case 'A':
                 case 'B':
@@ -472,7 +405,7 @@ public class DMReaderLexer extends Lexer {
                 case 'Y':
                 case 'Z':
                     {
-                    alt4=1;
+                    alt3=1;
                     }
                     break;
                 case 'a':
@@ -502,7 +435,7 @@ public class DMReaderLexer extends Lexer {
                 case 'y':
                 case 'z':
                     {
-                    alt4=2;
+                    alt3=2;
                     }
                     break;
                 case '0':
@@ -516,7 +449,12 @@ public class DMReaderLexer extends Lexer {
                 case '8':
                 case '9':
                     {
-                    alt4=3;
+                    alt3=3;
+                    }
+                    break;
+                case '_':
+                    {
+                    alt3=4;
                     }
                     break;
                 case '!':
@@ -540,48 +478,55 @@ public class DMReaderLexer extends Lexer {
                 case '}':
                 case '~':
                     {
-                    alt4=4;
+                    alt3=5;
                     }
                     break;
                 case '\\':
                     {
-                    alt4=5;
+                    alt3=6;
                     }
                     break;
 
                 }
 
-                switch (alt4) {
+                switch (alt3) {
             	case 1 :
-            	    // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:190:6: 'A' .. 'Z'
+            	    // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:187:6: 'A' .. 'Z'
             	    {
             	    matchRange('A','Z'); 
 
             	    }
             	    break;
             	case 2 :
-            	    // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:190:17: 'a' .. 'z'
+            	    // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:187:17: 'a' .. 'z'
             	    {
             	    matchRange('a','z'); 
 
             	    }
             	    break;
             	case 3 :
-            	    // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:190:28: '0' .. '9'
+            	    // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:187:28: '0' .. '9'
             	    {
             	    matchRange('0','9'); 
 
             	    }
             	    break;
             	case 4 :
-            	    // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:190:39: QUOTEDSTRING_PUNC
+            	    // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:187:39: '_'
+            	    {
+            	    match('_'); 
+
+            	    }
+            	    break;
+            	case 5 :
+            	    // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:187:45: QUOTEDSTRING_PUNC
             	    {
             	    mQUOTEDSTRING_PUNC(); 
 
             	    }
             	    break;
-            	case 5 :
-            	    // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:190:59: STRING_ESCAPE
+            	case 6 :
+            	    // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:187:65: STRING_ESCAPE
             	    {
             	    mSTRING_ESCAPE(); 
 
@@ -589,7 +534,7 @@ public class DMReaderLexer extends Lexer {
             	    break;
 
             	default :
-            	    break loop4;
+            	    break loop3;
                 }
             } while (true);
 
@@ -614,22 +559,22 @@ public class DMReaderLexer extends Lexer {
         try {
             int _type = WS;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:195:2: ( ( '\\n' | '\\t' | '\\r' | ' ' )+ )
-            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:195:4: ( '\\n' | '\\t' | '\\r' | ' ' )+
+            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:192:2: ( ( '\\n' | '\\t' | '\\r' | ' ' )+ )
+            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:192:4: ( '\\n' | '\\t' | '\\r' | ' ' )+
             {
-            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:195:4: ( '\\n' | '\\t' | '\\r' | ' ' )+
-            int cnt5=0;
-            loop5:
+            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:192:4: ( '\\n' | '\\t' | '\\r' | ' ' )+
+            int cnt4=0;
+            loop4:
             do {
-                int alt5=2;
-                int LA5_0 = input.LA(1);
+                int alt4=2;
+                int LA4_0 = input.LA(1);
 
-                if ( ((LA5_0>='\t' && LA5_0<='\n')||LA5_0=='\r'||LA5_0==' ') ) {
-                    alt5=1;
+                if ( ((LA4_0>='\t' && LA4_0<='\n')||LA4_0=='\r'||LA4_0==' ') ) {
+                    alt4=1;
                 }
 
 
-                switch (alt5) {
+                switch (alt4) {
             	case 1 :
             	    // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:
             	    {
@@ -647,12 +592,12 @@ public class DMReaderLexer extends Lexer {
             	    break;
 
             	default :
-            	    if ( cnt5 >= 1 ) break loop5;
+            	    if ( cnt4 >= 1 ) break loop4;
                         EarlyExitException eee =
-                            new EarlyExitException(5, input);
+                            new EarlyExitException(4, input);
                         throw eee;
                 }
-                cnt5++;
+                cnt4++;
             } while (true);
 
             skip();
@@ -672,8 +617,8 @@ public class DMReaderLexer extends Lexer {
         try {
             int _type = IDENTIFIER;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:199:2: ( ( 'A' .. 'Z' | 'a' .. 'z' | '_' ) ( 'A' .. 'Z' | 'a' .. 'z' | '0' .. '9' | '_' )* )
-            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:199:4: ( 'A' .. 'Z' | 'a' .. 'z' | '_' ) ( 'A' .. 'Z' | 'a' .. 'z' | '0' .. '9' | '_' )*
+            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:196:2: ( ( 'A' .. 'Z' | 'a' .. 'z' | '_' ) ( 'A' .. 'Z' | 'a' .. 'z' | '0' .. '9' | '_' )* )
+            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:196:4: ( 'A' .. 'Z' | 'a' .. 'z' | '_' ) ( 'A' .. 'Z' | 'a' .. 'z' | '0' .. '9' | '_' )*
             {
             if ( (input.LA(1)>='A' && input.LA(1)<='Z')||input.LA(1)=='_'||(input.LA(1)>='a' && input.LA(1)<='z') ) {
                 input.consume();
@@ -684,18 +629,18 @@ public class DMReaderLexer extends Lexer {
                 recover(mse);
                 throw mse;}
 
-            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:199:34: ( 'A' .. 'Z' | 'a' .. 'z' | '0' .. '9' | '_' )*
-            loop6:
+            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:196:34: ( 'A' .. 'Z' | 'a' .. 'z' | '0' .. '9' | '_' )*
+            loop5:
             do {
-                int alt6=2;
-                int LA6_0 = input.LA(1);
+                int alt5=2;
+                int LA5_0 = input.LA(1);
 
-                if ( ((LA6_0>='0' && LA6_0<='9')||(LA6_0>='A' && LA6_0<='Z')||LA6_0=='_'||(LA6_0>='a' && LA6_0<='z')) ) {
-                    alt6=1;
+                if ( ((LA5_0>='0' && LA5_0<='9')||(LA5_0>='A' && LA5_0<='Z')||LA5_0=='_'||(LA5_0>='a' && LA5_0<='z')) ) {
+                    alt5=1;
                 }
 
 
-                switch (alt6) {
+                switch (alt5) {
             	case 1 :
             	    // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:
             	    {
@@ -713,7 +658,7 @@ public class DMReaderLexer extends Lexer {
             	    break;
 
             	default :
-            	    break loop6;
+            	    break loop5;
                 }
             } while (true);
 
@@ -728,39 +673,50 @@ public class DMReaderLexer extends Lexer {
     }
     // $ANTLR end "IDENTIFIER"
 
-    // $ANTLR start "DOTTED_IDENTIFIER"
-    public final void mDOTTED_IDENTIFIER() throws RecognitionException {
+    // $ANTLR start "UNQUOTEDSTRING"
+    public final void mUNQUOTEDSTRING() throws RecognitionException {
         try {
-            int _type = DOTTED_IDENTIFIER;
+            int _type = UNQUOTEDSTRING;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:204:2: ( IDENTIFIER ( '.' IDENTIFIER )* )
-            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:204:4: IDENTIFIER ( '.' IDENTIFIER )*
+            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:200:2: ( ( 'A' .. 'Z' | 'a' .. 'z' | '0' .. '9' | '_' | UNQUOTEDSTRING_PUNC )+ )
+            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:200:4: ( 'A' .. 'Z' | 'a' .. 'z' | '0' .. '9' | '_' | UNQUOTEDSTRING_PUNC )+
             {
-            mIDENTIFIER(); 
-            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:204:15: ( '.' IDENTIFIER )*
-            loop7:
+            // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:200:4: ( 'A' .. 'Z' | 'a' .. 'z' | '0' .. '9' | '_' | UNQUOTEDSTRING_PUNC )+
+            int cnt6=0;
+            loop6:
             do {
-                int alt7=2;
-                int LA7_0 = input.LA(1);
+                int alt6=2;
+                int LA6_0 = input.LA(1);
 
-                if ( (LA7_0=='.') ) {
-                    alt7=1;
+                if ( (LA6_0=='!'||(LA6_0>='$' && LA6_0<='&')||(LA6_0>='*' && LA6_0<='+')||(LA6_0>='-' && LA6_0<='9')||(LA6_0>='@' && LA6_0<='Z')||(LA6_0>='^' && LA6_0<='_')||(LA6_0>='a' && LA6_0<='z')||LA6_0=='|'||LA6_0=='~') ) {
+                    alt6=1;
                 }
 
 
-                switch (alt7) {
+                switch (alt6) {
             	case 1 :
-            	    // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:204:17: '.' IDENTIFIER
+            	    // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:
             	    {
-            	    match('.'); 
-            	    mIDENTIFIER(); 
+            	    if ( input.LA(1)=='!'||(input.LA(1)>='$' && input.LA(1)<='&')||(input.LA(1)>='*' && input.LA(1)<='+')||(input.LA(1)>='-' && input.LA(1)<='9')||(input.LA(1)>='@' && input.LA(1)<='Z')||(input.LA(1)>='^' && input.LA(1)<='_')||(input.LA(1)>='a' && input.LA(1)<='z')||input.LA(1)=='|'||input.LA(1)=='~' ) {
+            	        input.consume();
+
+            	    }
+            	    else {
+            	        MismatchedSetException mse = new MismatchedSetException(null,input);
+            	        recover(mse);
+            	        throw mse;}
+
 
             	    }
             	    break;
 
             	default :
-            	    break loop7;
+            	    if ( cnt6 >= 1 ) break loop6;
+                        EarlyExitException eee =
+                            new EarlyExitException(6, input);
+                        throw eee;
                 }
+                cnt6++;
             } while (true);
 
 
@@ -772,101 +728,87 @@ public class DMReaderLexer extends Lexer {
         finally {
         }
     }
-    // $ANTLR end "DOTTED_IDENTIFIER"
+    // $ANTLR end "UNQUOTEDSTRING"
 
     public void mTokens() throws RecognitionException {
-        // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:1:8: ( T__12 | T__13 | T__14 | T__15 | T__16 | T__17 | T__18 | T__19 | UNQUOTEDSTRING | QUOTEDSTRING | WS | IDENTIFIER | DOTTED_IDENTIFIER )
-        int alt8=13;
-        alt8 = dfa8.predict(input);
-        switch (alt8) {
+        // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:1:8: ( T__11 | T__12 | T__13 | T__14 | T__15 | T__16 | T__17 | QUOTEDSTRING | WS | IDENTIFIER | UNQUOTEDSTRING )
+        int alt7=11;
+        alt7 = dfa7.predict(input);
+        switch (alt7) {
             case 1 :
-                // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:1:10: T__12
+                // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:1:10: T__11
+                {
+                mT__11(); 
+
+                }
+                break;
+            case 2 :
+                // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:1:16: T__12
                 {
                 mT__12(); 
 
                 }
                 break;
-            case 2 :
-                // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:1:16: T__13
+            case 3 :
+                // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:1:22: T__13
                 {
                 mT__13(); 
 
                 }
                 break;
-            case 3 :
-                // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:1:22: T__14
+            case 4 :
+                // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:1:28: T__14
                 {
                 mT__14(); 
 
                 }
                 break;
-            case 4 :
-                // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:1:28: T__15
+            case 5 :
+                // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:1:34: T__15
                 {
                 mT__15(); 
 
                 }
                 break;
-            case 5 :
-                // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:1:34: T__16
+            case 6 :
+                // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:1:40: T__16
                 {
                 mT__16(); 
 
                 }
                 break;
-            case 6 :
-                // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:1:40: T__17
+            case 7 :
+                // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:1:46: T__17
                 {
                 mT__17(); 
 
                 }
                 break;
-            case 7 :
-                // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:1:46: T__18
-                {
-                mT__18(); 
-
-                }
-                break;
             case 8 :
-                // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:1:52: T__19
-                {
-                mT__19(); 
-
-                }
-                break;
-            case 9 :
-                // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:1:58: UNQUOTEDSTRING
-                {
-                mUNQUOTEDSTRING(); 
-
-                }
-                break;
-            case 10 :
-                // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:1:73: QUOTEDSTRING
+                // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:1:52: QUOTEDSTRING
                 {
                 mQUOTEDSTRING(); 
 
                 }
                 break;
-            case 11 :
-                // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:1:86: WS
+            case 9 :
+                // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:1:65: WS
                 {
                 mWS(); 
 
                 }
                 break;
-            case 12 :
-                // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:1:89: IDENTIFIER
+            case 10 :
+                // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:1:68: IDENTIFIER
                 {
                 mIDENTIFIER(); 
 
                 }
                 break;
-            case 13 :
-                // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:1:100: DOTTED_IDENTIFIER
+            case 11 :
+                // C:\\code\\gsym\\trunk\\java\\BritefuryJ\\DocModel\\Reader\\DMReader.g:1:79: UNQUOTEDSTRING
                 {
-                mDOTTED_IDENTIFIER(); 
+                mUNQUOTEDSTRING(); 
 
                 }
                 break;
@@ -876,25 +818,24 @@ public class DMReaderLexer extends Lexer {
     }
 
 
-    protected DFA8 dfa8 = new DFA8(this);
-    static final String DFA8_eotS =
-        "\11\uffff\1\14\3\uffff\1\21\2\14\1\21\2\uffff\2\14";
-    static final String DFA8_eofS =
-        "\25\uffff";
-    static final String DFA8_minS =
-        "\1\11\10\uffff\1\56\3\uffff\2\56\1\101\1\56\2\uffff\2\56";
-    static final String DFA8_maxS =
-        "\1\176\10\uffff\1\172\3\uffff\4\172\2\uffff\2\172";
-    static final String DFA8_acceptS =
-        "\1\uffff\1\1\1\2\1\3\1\4\1\5\1\6\1\7\1\10\1\uffff\1\12\1\13\1\11"+
-        "\4\uffff\1\14\1\15\2\uffff";
-    static final String DFA8_specialS =
-        "\25\uffff}>";
-    static final String[] DFA8_transitionS = {
-            "\2\13\2\uffff\1\13\22\uffff\1\13\1\14\1\12\1\uffff\3\14\1\uffff"+
-            "\1\3\1\5\2\14\1\uffff\15\14\1\7\2\uffff\1\4\2\uffff\1\14\32"+
-            "\11\1\1\1\uffff\1\2\1\14\1\15\1\uffff\32\11\1\6\1\14\1\10\1"+
-            "\14",
+    protected DFA7 dfa7 = new DFA7(this);
+    static final String DFA7_eotS =
+        "\12\uffff\1\14\2\uffff\1\14";
+    static final String DFA7_eofS =
+        "\16\uffff";
+    static final String DFA7_minS =
+        "\1\11\11\uffff\1\41\2\uffff\1\41";
+    static final String DFA7_maxS =
+        "\1\176\11\uffff\1\176\2\uffff\1\176";
+    static final String DFA7_acceptS =
+        "\1\uffff\1\1\1\2\1\3\1\4\1\5\1\6\1\7\1\10\1\11\1\uffff\1\13\1\12"+
+        "\1\uffff";
+    static final String DFA7_specialS =
+        "\16\uffff}>";
+    static final String[] DFA7_transitionS = {
+            "\2\11\2\uffff\1\11\22\uffff\1\11\1\13\1\10\1\uffff\3\13\1\uffff"+
+            "\1\3\1\5\2\13\1\uffff\15\13\3\uffff\1\4\2\uffff\1\13\32\12\1"+
+            "\1\1\uffff\1\2\1\13\1\12\1\uffff\32\12\1\6\1\13\1\7\1\13",
             "",
             "",
             "",
@@ -903,57 +844,48 @@ public class DMReaderLexer extends Lexer {
             "",
             "",
             "",
-            "\1\17\1\uffff\12\16\7\uffff\32\16\4\uffff\1\20\1\uffff\32"+
-            "\16",
+            "",
+            "\1\13\2\uffff\3\13\3\uffff\2\13\1\uffff\3\13\12\15\6\uffff"+
+            "\1\13\32\15\3\uffff\1\13\1\15\1\uffff\32\15\1\uffff\1\13\1\uffff"+
+            "\1\13",
             "",
             "",
-            "",
-            "\1\22\1\uffff\12\20\7\uffff\32\20\4\uffff\1\20\1\uffff\32"+
-            "\20",
-            "\1\17\1\uffff\12\16\7\uffff\32\16\4\uffff\1\20\1\uffff\32"+
-            "\16",
-            "\32\23\4\uffff\1\22\1\uffff\32\23",
-            "\1\22\1\uffff\12\20\7\uffff\32\20\4\uffff\1\20\1\uffff\32"+
-            "\20",
-            "",
-            "",
-            "\1\17\1\uffff\12\24\7\uffff\32\24\4\uffff\1\22\1\uffff\32"+
-            "\24",
-            "\1\17\1\uffff\12\24\7\uffff\32\24\4\uffff\1\22\1\uffff\32"+
-            "\24"
+            "\1\13\2\uffff\3\13\3\uffff\2\13\1\uffff\3\13\12\15\6\uffff"+
+            "\1\13\32\15\3\uffff\1\13\1\15\1\uffff\32\15\1\uffff\1\13\1\uffff"+
+            "\1\13"
     };
 
-    static final short[] DFA8_eot = DFA.unpackEncodedString(DFA8_eotS);
-    static final short[] DFA8_eof = DFA.unpackEncodedString(DFA8_eofS);
-    static final char[] DFA8_min = DFA.unpackEncodedStringToUnsignedChars(DFA8_minS);
-    static final char[] DFA8_max = DFA.unpackEncodedStringToUnsignedChars(DFA8_maxS);
-    static final short[] DFA8_accept = DFA.unpackEncodedString(DFA8_acceptS);
-    static final short[] DFA8_special = DFA.unpackEncodedString(DFA8_specialS);
-    static final short[][] DFA8_transition;
+    static final short[] DFA7_eot = DFA.unpackEncodedString(DFA7_eotS);
+    static final short[] DFA7_eof = DFA.unpackEncodedString(DFA7_eofS);
+    static final char[] DFA7_min = DFA.unpackEncodedStringToUnsignedChars(DFA7_minS);
+    static final char[] DFA7_max = DFA.unpackEncodedStringToUnsignedChars(DFA7_maxS);
+    static final short[] DFA7_accept = DFA.unpackEncodedString(DFA7_acceptS);
+    static final short[] DFA7_special = DFA.unpackEncodedString(DFA7_specialS);
+    static final short[][] DFA7_transition;
 
     static {
-        int numStates = DFA8_transitionS.length;
-        DFA8_transition = new short[numStates][];
+        int numStates = DFA7_transitionS.length;
+        DFA7_transition = new short[numStates][];
         for (int i=0; i<numStates; i++) {
-            DFA8_transition[i] = DFA.unpackEncodedString(DFA8_transitionS[i]);
+            DFA7_transition[i] = DFA.unpackEncodedString(DFA7_transitionS[i]);
         }
     }
 
-    class DFA8 extends DFA {
+    class DFA7 extends DFA {
 
-        public DFA8(BaseRecognizer recognizer) {
+        public DFA7(BaseRecognizer recognizer) {
             this.recognizer = recognizer;
-            this.decisionNumber = 8;
-            this.eot = DFA8_eot;
-            this.eof = DFA8_eof;
-            this.min = DFA8_min;
-            this.max = DFA8_max;
-            this.accept = DFA8_accept;
-            this.special = DFA8_special;
-            this.transition = DFA8_transition;
+            this.decisionNumber = 7;
+            this.eot = DFA7_eot;
+            this.eof = DFA7_eof;
+            this.min = DFA7_min;
+            this.max = DFA7_max;
+            this.accept = DFA7_accept;
+            this.special = DFA7_special;
+            this.transition = DFA7_transition;
         }
         public String getDescription() {
-            return "1:1: Tokens : ( T__12 | T__13 | T__14 | T__15 | T__16 | T__17 | T__18 | T__19 | UNQUOTEDSTRING | QUOTEDSTRING | WS | IDENTIFIER | DOTTED_IDENTIFIER );";
+            return "1:1: Tokens : ( T__11 | T__12 | T__13 | T__14 | T__15 | T__16 | T__17 | QUOTEDSTRING | WS | IDENTIFIER | UNQUOTEDSTRING );";
         }
     }
  

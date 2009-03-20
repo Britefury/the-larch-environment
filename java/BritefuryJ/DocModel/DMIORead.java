@@ -40,6 +40,18 @@ public class DMIORead
 			this.value = value;
 			this.pos = pos;
 		}
+		
+		
+		public boolean isSuccess()
+		{
+			return value != null;
+		}
+		
+		
+		public static MatchResult failure(int pos)
+		{
+			return new MatchResult( null, pos );			
+		}
 	}
 	
 
@@ -73,7 +85,7 @@ public class DMIORead
 		}
 		else
 		{
-			return new MatchResult( null, pos );
+			return MatchResult.failure( pos );
 		}
 	}
 	
@@ -107,6 +119,29 @@ public class DMIORead
 		}
 		
 		return s;
+	}
+	
+	
+	public static MatchResult matchAtom(String source, int pos)
+	{
+		MatchResult res = null;
+		
+		// Quoted string
+		res = match( quotedString, source, pos );
+		if ( res.value != null )
+		{
+			res.value = evalString( res.value );
+			return res;
+		}
+		
+		// Unquoted string
+		res = match( unquotedString, source, pos );
+		if ( res.value != null )
+		{
+			return res;
+		}
+		
+		return MatchResult.failure( pos );
 	}
 	
 	
@@ -157,26 +192,8 @@ public class DMIORead
 					continue;
 				}
 				
-				// Quoted string
-				res = match( quotedString, source, pos );
-				if ( res.value != null )
-				{
-					String s = evalString( res.value );
-					if ( stack.size() > 0 )
-					{
-						Vector<Object> top = (Vector<Object>)stack.get( stack.size() - 1 );
-						top.add( s );
-					}
-					else
-					{
-						last = s;
-					}
-					pos = res.pos;
-					continue;
-				}
-				
-				// Unquoted string
-				res = match( unquotedString, source, pos );
+				// Atom
+				res = matchAtom( source, pos );
 				if ( res.value != null )
 				{
 					String s = res.value;
