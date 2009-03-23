@@ -40,9 +40,14 @@ public class Forward extends MatchExpression
 	
 
 	
-	protected MatchResult parseNode(MatchState state, Object input, int start, int stop)
+	protected MatchResult evaluateNode(MatchState state, Object input)
 	{
-		return subexp.evaluateNode( state, input, start, stop );
+		return subexp.processNode( state, input );
+	}
+
+	protected MatchResult evaluateList(MatchState state, List<Object> input, int start, int stop)
+	{
+		return subexp.processList( state, input, start, stop );
 	}
 
 

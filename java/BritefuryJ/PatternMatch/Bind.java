@@ -6,6 +6,8 @@
 //##************************
 package BritefuryJ.PatternMatch;
 
+import java.util.List;
+
 public class Bind extends UnaryBranchExpression
 {
 	protected String name;
@@ -31,9 +33,23 @@ public class Bind extends UnaryBranchExpression
 	}
 	
 
-	protected MatchResult parseNode(MatchState state, Object input, int start, int stop)
+	protected MatchResult evaluateNode(MatchState state, Object input)
 	{
-		MatchResult res = subexp.evaluateNode( state, input, start, stop );
+		MatchResult res = subexp.processNode( state, input );
+		
+		if ( res.isValid() )
+		{
+			return res.bind( name, res.getValue(), 0 );
+		}
+		else
+		{
+			return res;
+		}
+	}
+	
+	protected MatchResult evaluateList(MatchState state, List<Object> input, int start, int stop)
+	{
+		MatchResult res = subexp.processList( state, input, start, stop );
 		
 		if ( res.isValid() )
 		{

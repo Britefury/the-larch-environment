@@ -8,6 +8,7 @@ package BritefuryJ.PatternMatch;
 
 import java.util.HashMap;
 import java.util.IdentityHashMap;
+import java.util.List;
 
 import BritefuryJ.ParserHelpers.DebugNode;
 
@@ -78,7 +79,40 @@ class MatchState
 	
 	
 	
-	MatchResult memoisedMatch(MatchExpression rule, Object input, int start, int stop)
+	MatchResult memoisedMatchNode(MatchExpression rule, Object input)
+	{
+		if ( input != currentInput )
+		{
+			currentInput = input;
+			
+			currentMemo = memos.get( currentInput );
+			if ( currentMemo == null )
+			{
+				currentMemo = new HashMap<MemoKey, MatchResult>();
+				memos.put( currentInput, currentMemo );
+			}
+		}
+		
+		MemoKey key = new MemoKey( 0, rule );
+		MatchResult memoEntry = currentMemo.get( key );
+		
+		if ( memoEntry == null )
+		{
+			// Create the memo-entry, and memoise
+			MatchResult answer = rule.processNode( this, input );
+			
+			currentMemo.put( key, answer );
+			
+			return answer;
+		}
+		else
+		{
+			return memoEntry;
+		}
+	}
+
+
+	MatchResult memoisedMatchList(MatchExpression rule, List<Object> input, int start, int stop)
 	{
 		if ( input != currentInput )
 		{
@@ -98,7 +132,7 @@ class MatchState
 		if ( memoEntry == null )
 		{
 			// Create the memo-entry, and memoise
-			MatchResult answer = rule.evaluateNode( this, input, start, stop );
+			MatchResult answer = rule.processList( this, input, start, stop );
 			
 			currentMemo.put( key, answer );
 			

@@ -43,9 +43,15 @@ public class Repetition extends UnaryBranchExpression
 		return maxRepetitions;
 	}
 	
+	
+	
+	protected MatchResult evaluateNode(MatchState state, Object input)
+	{
+		return MatchResult.failure( 0 );
+	}
 
 	@SuppressWarnings("unchecked")
-	protected MatchResult parseNode(MatchState state, Object input, int start, int stop)
+	protected MatchResult evaluateList(MatchState state, List<Object> input, int start, int stop)
 	{
 		ArrayList<Object> values = new ArrayList<Object>();
 		HashMap<String, Object> bindings = null;
@@ -56,7 +62,7 @@ public class Repetition extends UnaryBranchExpression
 		
 		while ( pos <= stop  &&  ( maxRepetitions == -1  ||  i < maxRepetitions ) )
 		{
-			MatchResult result = subexp.evaluateNode( state, input, pos, stop );
+			MatchResult result = subexp.processList( state, input, pos, stop );
 			errorPos = result.end;
 			
 			if ( !result.isValid() )

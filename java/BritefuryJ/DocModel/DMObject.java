@@ -9,7 +9,10 @@ package BritefuryJ.DocModel;
 import java.util.Map;
 
 import org.python.core.Py;
+import org.python.core.PyDictionary;
 import org.python.core.PyObject;
+import org.python.core.PyString;
+import org.python.core.PyUnicode;
 
 import BritefuryJ.Cell.LiteralCell;
 import BritefuryJ.CommandHistory.CommandTracker;
@@ -72,7 +75,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable
 			int index = objClass.getFieldIndex( keys[i] );
 			if ( index == -1 )
 			{
-				throw new InvalidFieldNameException();
+				throw new InvalidFieldNameException( keys[i] );
 			}
 			else
 			{
@@ -148,11 +151,49 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable
 			int index = objClass.getFieldIndex( entry.getKey() );
 			if ( index == -1 )
 			{
-				throw new InvalidFieldNameException();
+				throw new InvalidFieldNameException( entry.getKey() );
 			}
 			else
 			{
 				fieldData[index] = coerce( entry.getValue() );
+			}
+		}
+
+		cell = new LiteralCell();
+		cell.setLiteralValue( fieldData );
+		commandTracker = null;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public DMObject(DMObjectClass objClass, PyDictionary data) throws InvalidFieldNameException
+	{
+		this.objClass = objClass;
+		Object fieldData[] = new Object[objClass.getNumFields()];
+		fillArrayWithNulls( fieldData );
+		
+		for (Object e: data.entrySet())
+		{
+			Map.Entry<Object,Object> entry = (Map.Entry<Object,Object>)e;
+			Object k = entry.getKey();
+			String key;
+		
+			if ( k instanceof PyString  ||  k instanceof PyUnicode )
+			{
+				key = k.toString();
+			}
+			else
+			{
+				throw Py.TypeError( "All keys must be of type string" );
+			}
+		
+			int index = objClass.getFieldIndex( key );
+			if ( index == -1 )
+			{
+				throw new InvalidFieldNameException( key );
+			}
+			else
+			{
+				fieldData[index] = coerce( Py.tojava( (PyObject)entry.getValue(), Object.class ) );
 			}
 		}
 
@@ -168,6 +209,11 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable
 		return objClass;
 	}
 	
+	public boolean isInstanceOf(DMObjectClass cls)
+	{
+		return objClass.isSubclassOf( cls );
+	}
+
 	public int getFieldIndex(String key)
 	{
 		return objClass.getFieldIndex( key );
@@ -188,7 +234,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable
 		int index = objClass.getFieldIndex( key );
 		if ( index == -1 )
 		{
-			throw new InvalidFieldNameException();
+			throw new InvalidFieldNameException( key );
 		}
 		else
 		{
@@ -215,7 +261,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable
 		int index = objClass.getFieldIndex( key );
 		if ( index == -1 )
 		{
-			throw new InvalidFieldNameException();
+			throw new InvalidFieldNameException( key );
 		}
 		else
 		{
@@ -250,7 +296,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable
 			int index = objClass.getFieldIndex( e.getKey() );
 			if ( index == -1 )
 			{
-				throw new InvalidFieldNameException();
+				throw new InvalidFieldNameException( e.getKey() );
 			}
 			else
 			{
@@ -311,9 +357,9 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable
 	
 
 	
-	public void __setitem__(int fieldIndex, Object x)
+	public void __setitem__(int index, Object x)
 	{
-		set( fieldIndex, x );
+		set( index, x );
 	}
 	
 	public void __setitem__(String key, Object x)
@@ -373,5 +419,41 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable
 	public void setTracker(CommandTracker tracker)
 	{
 		commandTracker = (DMObjectCommandTracker)tracker;
+	}
+	
+	
+	
+	public String toString()
+	{
+		if ( objClass.getNumFields() > 0 )
+		{
+			StringBuilder builder = new StringBuilder();
+			builder.append( "(" );
+			builder.append( objClass.getName() );
+			builder.append( " :" );
+			
+			Object[] d = getFieldValuesImmutable();
+			
+			for (int i = 0; i < d.length; i++)
+			{
+				builder.append( " " );
+				Object x = d[i];
+				if ( x == null )
+				{
+					builder.append( "<null>" );
+				}
+				else
+				{
+					builder.append( x.toString() );
+				}
+			}
+			builder.append( " )" );
+			
+			return builder.toString();
+		}
+		else
+		{
+			return "(" + objClass.getName() + " :)";
+		}
 	}
 }

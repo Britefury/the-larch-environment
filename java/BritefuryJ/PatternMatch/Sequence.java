@@ -30,8 +30,13 @@ public class Sequence extends BranchExpression
 	}
 	
 	
+	protected MatchResult evaluateNode(MatchState state, Object input)
+	{
+		return MatchResult.failure( 0 );
+	}
+	
 	@SuppressWarnings("unchecked")
-	protected MatchResult parseNode(MatchState state, Object input, int start, int stop)
+	protected MatchResult evaluateList(MatchState state, List<Object> input, int start, int stop)
 	{
 		ArrayList<Object> value = new ArrayList<Object>();
 		HashMap<String, Object> bindings = null;
@@ -44,7 +49,7 @@ public class Sequence extends BranchExpression
 				return MatchResult.failure( pos );
 			}
 			
-			MatchResult result = subexps[i].evaluateNode(  state, input, pos, stop );
+			MatchResult result = subexps[i].processList( state, input, pos, stop );
 			pos = result.end;
 			
 			if ( !result.isValid() )

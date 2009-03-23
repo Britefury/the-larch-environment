@@ -8,5 +8,10 @@ package BritefuryJ.DocModel;
 
 public interface DMModuleResolver
 {
-	public DMModule getModule(String location);
+	public static class CouldNotResolveModuleException extends Exception
+	{
+		private static final long serialVersionUID = 1L;
+	}
+	
+	public DMModule getModule(String location) throws CouldNotResolveModuleException;
 }

@@ -6,6 +6,7 @@
 //##************************
 package BritefuryJ.PatternMatch;
 
+import java.util.List;
 import java.util.Map;
 
 import org.python.core.Py;
@@ -85,9 +86,30 @@ public class Condition extends UnaryBranchExpression
 	}
 	
 
-	protected MatchResult parseNode(MatchState state, Object input, int start, int stop)
+	protected MatchResult evaluateNode(MatchState state, Object input)
 	{
-		MatchResult res = subexp.evaluateNode( state, input, start, stop );
+		MatchResult res = subexp.processNode( state, input );
+		
+		if ( res.isValid() )
+		{
+			if ( cond.test( input, res.value, res.bindings, state.arg ) )
+			{
+				return res;
+			}
+			else
+			{
+				return MatchResult.failure( res.end );
+			}
+		}
+		else
+		{
+			return res;
+		}
+	}
+
+	protected MatchResult evaluateList(MatchState state, List<Object> input, int start, int stop)
+	{
+		MatchResult res = subexp.processList( state, input, start, stop );
 		
 		if ( res.isValid() )
 		{

@@ -6,6 +6,8 @@
 //##************************
 package BritefuryJ.PatternMatch;
 
+import java.util.List;
+
 public class Delegate extends UnaryBranchExpression
 {
 	public Delegate()
@@ -24,9 +26,23 @@ public class Delegate extends UnaryBranchExpression
 	}
 	
 	
-	protected MatchResult parseNode(MatchState state, Object input, int start, int stop)
+	protected MatchResult evaluateNode(MatchState state, Object input)
 	{
-		MatchResult res = subexp.evaluateNode( state, input, start, stop );
+		MatchResult res = subexp.processNode( state, input );
+		
+		if ( res.isValid() )
+		{
+			return res.actionValue( state.delegateAction.invoke( input, res.value, res.bindings, state.arg ), false );
+		}
+		else
+		{
+			return res;
+		}
+	}
+
+	protected MatchResult evaluateList(MatchState state, List<Object> input, int start, int stop)
+	{
+		MatchResult res = subexp.processList( state, input, start, stop );
 		
 		if ( res.isValid() )
 		{

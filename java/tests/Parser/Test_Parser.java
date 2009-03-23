@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import BritefuryJ.DocModel.DMModule;
+import BritefuryJ.DocModel.DMModuleResolver;
 import BritefuryJ.Parser.Action;
 import BritefuryJ.Parser.BestChoice;
 import BritefuryJ.Parser.Choice;
@@ -37,6 +39,36 @@ public class Test_Parser extends ParserTestCase
 {
 	public static ParserExpression identifier = new RegEx( "[A-Za-z_][A-Za-z0-9_]*" );
 
+	protected DMModule M;
+	protected DMModuleResolver resolver = new DMModuleResolver()
+	{
+		public DMModule getModule(String location) throws CouldNotResolveModuleException
+		{
+			return location.equals( "Tests.PatternMatch" )  ?  M  :  null;
+		}
+	};
+	
+	
+	
+	protected DMModuleResolver getModuleResolver()
+	{
+		return resolver;
+	}
+	
+
+	
+	public void setUp()
+	{
+		M = new DMModule( "PatternMatchTest", "m", "Tests.PatternMatch" );
+	}
+	
+	public void tearDown()
+	{
+		M = null;
+	}
+
+	
+	
 	private List<Object> arrayToList2D(Object[][] a)
 	{
 		ArrayList<Object> v = new ArrayList<Object>();
@@ -518,22 +550,22 @@ public class Test_Parser extends ParserTestCase
 		
 		matchTest( parser, "123", "123" );
 		
-		matchTestSX( parser, "1*2", "(1 * 2)" );
-		matchTestSX( parser, "1*2*3", "(1 * 2 * 3)" );
+		matchTestSX( parser, "1*2", "[1 * 2]" );
+		matchTestSX( parser, "1*2*3", "[1 * 2 * 3]" );
 
-		matchTestSX( parser, "1+2", "(1 + 2)" );
-		matchTestSX( parser, "1+2+3", "(1 + 2 + 3)" );
+		matchTestSX( parser, "1+2", "[1 + 2]" );
+		matchTestSX( parser, "1+2+3", "[1 + 2 + 3]" );
 
-		matchTestSX( parser, "1+2*3", "(1 + (2 * 3))" );
-		matchTestSX( parser, "1*2+3", "((1 * 2) + 3)" );
+		matchTestSX( parser, "1+2*3", "[1 + [2 * 3]]" );
+		matchTestSX( parser, "1*2+3", "[[1 * 2] + 3]" );
 
-		matchTestSX( parser, "1*2+3+4", "((1 * 2) + 3 + 4)" );
-		matchTestSX( parser, "1+2*3+4", "(1 + (2 * 3) + 4)" );
-		matchTestSX( parser, "1+2+3*4", "(1 + 2 + (3 * 4))" );
+		matchTestSX( parser, "1*2+3+4", "[[1 * 2] + 3 + 4]" );
+		matchTestSX( parser, "1+2*3+4", "[1 + [2 * 3] + 4]" );
+		matchTestSX( parser, "1+2+3*4", "[1 + 2 + [3 * 4]]" );
 
-		matchTestSX( parser, "1+2*3*4", "(1 + (2 * 3 * 4))" );
-		matchTestSX( parser, "1*2+3*4", "((1 * 2) + (3 * 4))" );
-		matchTestSX( parser, "1*2*3+4", "((1 * 2 * 3) + 4)" );
+		matchTestSX( parser, "1+2*3*4", "[1 + [2 * 3 * 4]]" );
+		matchTestSX( parser, "1*2+3*4", "[[1 * 2] + [3 * 4]]" );
+		matchTestSX( parser, "1*2*3+4", "[[1 * 2 * 3] + 4]" );
 	}
 
 
@@ -543,7 +575,7 @@ public class Test_Parser extends ParserTestCase
 		Forward y = new Forward();
 		y.setExpression( new Production( x.__add__( y ).__or__( "y" ) ) );
 		
-		matchTestSX( y, "xxxy", "(x (x (x y)))" );
+		matchTestSX( y, "xxxy", "[x [x [x y]]]" );
 	}
 
 
@@ -553,7 +585,7 @@ public class Test_Parser extends ParserTestCase
 		Forward y = new Forward();
 		y.setExpression( new Production( y.__add__( x ).__or__( "y" ) ) );
 		
-		matchTestSX( y, "yxxx", "(((y x) x) x)" );
+		matchTestSX( y, "yxxx", "[[[y x] x] x]" );
 	}
 
 	public void testIndirectLeftRecursion() throws ParserExpression.ParserCoerceException
@@ -563,8 +595,8 @@ public class Test_Parser extends ParserTestCase
 		Production y = new Production( z.__add__( x ).__or__( "z" ) );
 		z.setExpression( new Production( y.__or__( "y" ) ) );
 		
-		matchTestSX( z, "zxxx", "(((z x) x) x)" );
-		matchTestSX( z, "yxxx", "(((y x) x) x)" );
+		matchTestSX( z, "zxxx", "[[[z x] x] x]" );
+		matchTestSX( z, "yxxx", "[[[y x] x] x]" );
 	}
 
 	public void testLeftRecursion()
@@ -586,22 +618,22 @@ public class Test_Parser extends ParserTestCase
 		
 		matchTest( parser, "123", "123" );
 		
-		matchTestSX( parser, "1*2", "(1 * 2)" );
-		matchTestSX( parser, "1*2*3", "((1 * 2) * 3)" );
+		matchTestSX( parser, "1*2", "[1 * 2]" );
+		matchTestSX( parser, "1*2*3", "[[1 * 2] * 3]" );
 
-		matchTestSX( parser, "1+2", "(1 + 2)" );
-		matchTestSX( parser, "1+2+3", "((1 + 2) + 3)" );
+		matchTestSX( parser, "1+2", "[1 + 2]" );
+		matchTestSX( parser, "1+2+3", "[[1 + 2] + 3]" );
 
-		matchTestSX( parser, "1+2*3", "(1 + (2 * 3))" );
-		matchTestSX( parser, "1*2+3", "((1 * 2) + 3)" );
+		matchTestSX( parser, "1+2*3", "[1 + [2 * 3]]" );
+		matchTestSX( parser, "1*2+3", "[[1 * 2] + 3]" );
 
-		matchTestSX( parser, "1*2+3+4", "(((1 * 2) + 3) + 4)" );
-		matchTestSX( parser, "1+2*3+4", "((1 + (2 * 3)) + 4)" );
-		matchTestSX( parser, "1+2+3*4", "((1 + 2) + (3 * 4))" );
+		matchTestSX( parser, "1*2+3+4", "[[[1 * 2] + 3] + 4]" );
+		matchTestSX( parser, "1+2*3+4", "[[1 + [2 * 3]] + 4]" );
+		matchTestSX( parser, "1+2+3*4", "[[1 + 2] + [3 * 4]]" );
 
-		matchTestSX( parser, "1+2*3*4", "(1 + ((2 * 3) * 4))" );
-		matchTestSX( parser, "1*2+3*4", "((1 * 2) + (3 * 4))" );
-		matchTestSX( parser, "1*2*3+4", "(((1 * 2) * 3) + 4)" );
+		matchTestSX( parser, "1+2*3*4", "[1 + [[2 * 3] * 4]]" );
+		matchTestSX( parser, "1*2+3*4", "[[1 * 2] + [3 * 4]]" );
+		matchTestSX( parser, "1*2*3+4", "[[[1 * 2] * 3] + 4]" );
 	}
 
 
@@ -610,6 +642,45 @@ public class Test_Parser extends ParserTestCase
 	{
 		Forward primary = new Forward();
 		
+		ParseAction arrayAccessAction = new ParseAction()
+		{
+			@SuppressWarnings("unchecked")
+			public Object invoke(String input, int begin, Object value)
+			{
+				List<Object> v = (List<Object>)value;
+				return Arrays.asList( new Object[] { "arrayAccess", v.get( 0 ), v.get( 2 ) } );
+			}
+		};
+		
+		ParseAction fieldAccessAction = new ParseAction()
+		{
+			@SuppressWarnings("unchecked")
+			public Object invoke(String input, int begin, Object value)
+			{
+				List<Object> v = (List<Object>)value;
+				return Arrays.asList( new Object[] { "fieldAccess", v.get( 0 ), v.get( 2 ) } );
+			}
+		};
+		
+		ParseAction objectMethodInvocationAction = new ParseAction()
+		{
+			@SuppressWarnings("unchecked")
+			public Object invoke(String input, int begin, Object value)
+			{
+				List<Object> v = (List<Object>)value;
+				return Arrays.asList( new Object[] { "methodInvoke", v.get( 0 ), v.get( 2 ) } );
+			}
+		};
+		
+		ParseAction thisMethodInvocationAction = new ParseAction()
+		{
+			@SuppressWarnings("unchecked")
+			public Object invoke(String input, int begin, Object value)
+			{
+				List<Object> v = (List<Object>)value;
+				return Arrays.asList( new Object[] { "methodInvoke", v.get( 0 ) } );
+			}
+		};
 		
 		ParserExpression expression = new Production( new Literal( "i" ).__or__( new Literal( "j" ) ) ).debug( "expression" );
 		ParserExpression methodName = new Production( new Literal( "m" ).__or__( new Literal( "n" ) ) ).debug( "methodName" );
@@ -621,12 +692,12 @@ public class Test_Parser extends ParserTestCase
 		ParserExpression identifier = new Production( new Literal( "x" ).__or__( new Literal( "y" ).__or__( classOrInterfaceType ) ) ).debug( "identifier" );
 		ParserExpression expressionName = new Production( identifier ).debug( "expressionName" );
 
-		ParserExpression arrayAccess = new Production( ( primary.__add__( "[" ).__add__( expression ).__add__( "]" ) ).__or__(
-											expressionName.__add__( "[" ).__add__( expression ).__add__( "]" ) ) ).debug( "expressionName" );
-		ParserExpression fieldAccess = new Production( ( primary.__add__( "." ).__add__( identifier ) ).__or__(
-				new Literal( "super" ).__add__( "." ).__add__( identifier ) ) ).debug( "expressionName" );
-		ParserExpression methodInvocation = new Production( ( primary.__add__( "." ).__add__( methodName ).__add__( "()" ) ).__or__(
-				methodName.__add__( "()" ) ) ).debug( "methodInvocation" );
+		ParserExpression arrayAccess = new Production( ( primary.__add__( "[" ).__add__( expression ).__add__( "]" ) ).action( arrayAccessAction ).__or__(
+											( expressionName.__add__( "[" ).__add__( expression ).__add__( "]" ) ).action( arrayAccessAction ) ) ).debug( "arrayAccess" );
+		ParserExpression fieldAccess = new Production( ( primary.__add__( "." ).__add__( identifier ) ).action( fieldAccessAction ).__or__(
+				( new Literal( "super" ).__add__( "." ).__add__( identifier ) ).action( fieldAccessAction ) ) ).debug( "fieldAccess" );
+		ParserExpression methodInvocation = new Production( ( primary.__add__( "." ).__add__( methodName ).__add__( "()" ) ).action( objectMethodInvocationAction ).__or__(
+				( methodName.__add__( "()" ) ).action( thisMethodInvocationAction ) ) ).debug( "methodInvocation" );
 		
 		ParserExpression classInstanceCreationExpression = new Production( ( new Literal( "new" ).__add__( classOrInterfaceType ).__add__( "()" ) ).__or__(
 				primary.__add__( "." ).__add__( "new" ).__add__( identifier ).__add__( "()" ) ) ).debug( "classInstanceCreationExpression" );
@@ -640,32 +711,32 @@ public class Test_Parser extends ParserTestCase
 		
 	
 		matchTestSX( primary, "this", "this" );
-		matchTestSX( primary, "this.x", "(this . x)" );
-		matchTestSX( primary, "this.x[i]", "((this . x) [ i ])" );
-		matchTestSX( primary, "this.x.y", "((this . x) . y)" );
-		matchTestSX( primary, "this.x.m()", "((this . x) . m \"()\")" );
-		matchTestSX( primary, "this.x.m().n()", "(((this . x) . m \"()\") . n \"()\")" );
-		matchTestSX( primary, "x[i][j].y", "(((x [ i ]) [ j ]) . y)" );
+		matchTestSX( primary, "this.x", "[fieldAccess this x]" );
+		matchTestSX( primary, "this.x[i]", "[arrayAccess [fieldAccess this x] i]" );
+		matchTestSX( primary, "this.x.y", "[fieldAccess [fieldAccess this x] y]" );
+		matchTestSX( primary, "this.x.m()", "[methodInvoke [fieldAccess this x] m]" );
+		matchTestSX( primary, "this.x.m().n()", "[methodInvoke [methodInvoke [fieldAccess this x] m] n]" );
+		matchTestSX( primary, "x[i][j].y", "[fieldAccess [arrayAccess [arrayAccess x i] j] y]" );
 
-		matchTestSX( methodInvocation, "this.m()", "(this . m \"()\")" );
-		matchTestSX( methodInvocation, "this.m().n()", "((this . m \"()\") . n \"()\")" );
-		matchTestSX( methodInvocation, "this.x.m()", "((this . x) . m \"()\")" );
-		matchTestSX( methodInvocation, "this.x.y.m()", "(((this . x) . y) . m \"()\")" );
-		matchTestSX( methodInvocation, "this[i].m()", "((this [ i ]) . m \"()\")" );
-		matchTestSX( methodInvocation, "this[i][j].m()", "(((this [ i ]) [ j ]) . m \"()\")" );
-		matchTestSX( arrayAccess, "this[i]", "(this [ i ])" );
-		matchTestSX( arrayAccess, "this[i][j]", "((this [ i ]) [ j ])" );
-		matchTestSX( arrayAccess, "this.x[i]", "((this . x) [ i ])" );
-		matchTestSX( arrayAccess, "this.x.y[i]", "(((this . x) . y) [ i ])" );
-		matchTestSX( arrayAccess, "this.m()[i]", "((this . m \"()\") [ i ])" );
-		matchTestSX( arrayAccess, "this.m().n()[i]", "(((this . m \"()\") . n \"()\") [ i ])" );
-		matchTestSX( fieldAccess, "this.x", "(this . x)" );
-		matchTestSX( fieldAccess, "this.x.y", "((this . x) . y)" );
-		matchTestSX( fieldAccess, "this[i].x", "((this [ i ]) . x)" );
-		matchTestSX( fieldAccess, "this[i][j].x", "(((this [ i ]) [ j ]) . x)" );
-		matchTestSX( fieldAccessOrArrayAccess, "this[i]", "(this [ i ])" );
-		matchTestSX( fieldAccessOrArrayAccess, "this[i].x", "((this [ i ]) . x)" );
-		matchTestSX( fieldAccessOrArrayAccess, "this.x[i]", "((this . x) [ i ])" );
+		matchTestSX( methodInvocation, "this.m()", "[methodInvoke this m]" );
+		matchTestSX( methodInvocation, "this.m().n()", "[methodInvoke [methodInvoke this m] n]" );
+		matchTestSX( methodInvocation, "this.x.m()", "[methodInvoke [fieldAccess this x] m]" );
+		matchTestSX( methodInvocation, "this.x.y.m()", "[methodInvoke [fieldAccess [fieldAccess this x] y] m]" );
+		matchTestSX( methodInvocation, "this[i].m()", "[methodInvoke [arrayAccess this i] m]" );
+		matchTestSX( methodInvocation, "this[i][j].m()", "[methodInvoke [arrayAccess [arrayAccess this i] j] m]" );
+		matchTestSX( arrayAccess, "this[i]", "[arrayAccess this i]" );
+		matchTestSX( arrayAccess, "this[i][j]", "[arrayAccess [arrayAccess this i] j]" );
+		matchTestSX( arrayAccess, "this.x[i]", "[arrayAccess [fieldAccess this x] i]" );
+		matchTestSX( arrayAccess, "this.x.y[i]", "[arrayAccess [fieldAccess [fieldAccess this x] y] i]" );
+		matchTestSX( arrayAccess, "this.m()[i]", "[arrayAccess [methodInvoke this m] i]" );
+		matchTestSX( arrayAccess, "this.m().n()[i]", "[arrayAccess [methodInvoke [methodInvoke this m] n] i]" );
+		matchTestSX( fieldAccess, "this.x", "[fieldAccess this x]" );
+		matchTestSX( fieldAccess, "this.x.y", "[fieldAccess [fieldAccess this x] y]" );
+		matchTestSX( fieldAccess, "this[i].x", "[fieldAccess [arrayAccess this i] x]" );
+		matchTestSX( fieldAccess, "this[i][j].x", "[fieldAccess [arrayAccess [arrayAccess this i] j] x]" );
+		matchTestSX( fieldAccessOrArrayAccess, "this[i]", "[arrayAccess this i]" );
+		matchTestSX( fieldAccessOrArrayAccess, "this[i].x", "[fieldAccess [arrayAccess this i] x]" );
+		matchTestSX( fieldAccessOrArrayAccess, "this.x[i]", "[arrayAccess [fieldAccess this x] i]" );
 	}
 }
 

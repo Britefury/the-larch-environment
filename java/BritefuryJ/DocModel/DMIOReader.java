@@ -8,11 +8,11 @@ package BritefuryJ.DocModel;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import BritefuryJ.DocModel.DMModule.UnknownClassException;
+import BritefuryJ.DocModel.DMModuleResolver.CouldNotResolveModuleException;
 import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
 
 
@@ -21,6 +21,11 @@ public class DMIOReader
 	public static class ParseErrorException extends Exception
 	{
 		private static final long serialVersionUID = 1L;
+		
+		public ParseErrorException(int pos, String description)
+		{
+			super( "at " + pos + ": " + description );
+		}
 	}
 
 	public static class ParseStackException extends RuntimeException
@@ -29,7 +34,7 @@ public class DMIOReader
 	}
 
 	
-	public static class UnknownModuleException extends Exception
+	public static class BadModuleNameException extends Exception
 	{
 		private static final long serialVersionUID = 1L;
 	}
@@ -51,18 +56,18 @@ public class DMIOReader
 	public static class MatchResult
 	{
 		public String value;
-		int pos;
+		int position;
 		
-		public MatchResult(String value, int pos)
+		public MatchResult(String value, int position)
 		{
 			this.value = value;
-			this.pos = pos;
+			this.position = position;
 		}
 	}
 	
 
-	public static String unquotedStringPunctuationChars = "+-*/%^&|!$@.,<>=[]~";
-	public static String quotedStringPunctuationChars = "+-*/%^&|!$@.,<>=[]~'()` ";
+	public static String unquotedStringPunctuationChars = "+-*/%^&|!$@.<>~";
+	public static String quotedStringPunctuationChars = "+-*/%^&|!$@.,<>=[]{}~'()` ";
 	public static String inStringUnescapedChars = "[0-9A-Za-z_" + Pattern.quote( quotedStringPunctuationChars ) + "]";
 	
 	public static String hexCharEscape = Pattern.quote( "\\x" ) + "[0-9A-Fa-f]+" + Pattern.quote( "x" );
@@ -79,15 +84,15 @@ public class DMIOReader
 	
 	
 	
-	public static MatchResult match(Pattern pattern, String source, int pos)
+	public static MatchResult match(Pattern pattern, String source, int position)
 	{
-		Matcher m = pattern.matcher( source.substring( pos, source.length() ) );
+		Matcher m = pattern.matcher( source.substring( position, source.length() ) );
 		
 		boolean bFound = m.find();
 		if ( bFound  &&  m.start() == 0  &&  m.end() > 0 )
 		{
 			String matchString = m.group();
-			int end = pos + matchString.length();
+			int end = position + matchString.length();
 			return new MatchResult( matchString, end );
 		}
 		else
@@ -129,10 +134,10 @@ public class DMIOReader
 	}
 	
 	
-	public static MatchResult matchAtom(String source, int pos)
+	public static MatchResult matchAtom(String source, int position)
 	{
 		// Quoted string
-		MatchResult res = match( quotedString, source, pos );
+		MatchResult res = match( quotedString, source, position );
 		if ( res != null )
 		{
 			res.value = evalString( res.value );
@@ -140,7 +145,7 @@ public class DMIOReader
 		}
 		
 		// Unquoted string
-		res = match( unquotedString, source, pos );
+		res = match( unquotedString, source, position );
 		if ( res != null )
 		{
 			return res;
@@ -150,13 +155,13 @@ public class DMIOReader
 	}
 	
 	
-	public void eatWhitespace()
+	private void eatWhitespace()
 	{
 		// Whitespace
 		MatchResult res = match( whitespace, source, pos );
 		if ( res != null )
 		{
-			pos = res.pos;
+			pos = res.position;
 		}
 	}
 	
@@ -170,9 +175,10 @@ public class DMIOReader
 	private HashMap<String, DMModule> moduleTable;
 	private String source;
 	private int pos;
+	DMModuleResolver resolver;
 	
 	
-	private DMIOReader(String source)
+	private DMIOReader(String source, DMModuleResolver resolver)
 	{
 		stack = new ArrayList<Object>();
 		nameStack = new ArrayList<String>();
@@ -180,6 +186,7 @@ public class DMIOReader
 		moduleTable = new HashMap<String, DMModule>();
 		this.source = source;
 		pos = 0;
+		this.resolver = resolver;
 	}
 	
 	
@@ -194,9 +201,49 @@ public class DMIOReader
 	}
 	
 	
+	private void objectAcquireFieldName() throws ParseErrorException
+	{
+		eatWhitespace();
+
+		
+		// If the next character is not a ')', which would close the object
+		if ( source.charAt( pos ) != ')' )
+		{
+			// Get the field name
+			String fieldName;
+			MatchResult res = match( identifier, source, pos );
+			if ( res == null )
+			{
+				throw new ParseErrorException( pos, "Could not get field name in object key-value pair" );
+			}
+			pos = res.position;
+			fieldName = res.value;
+			
+			// Consume whitespace
+			eatWhitespace();
+			
+			// Consume the '=' character
+			if ( source.charAt( pos ) == '=' )
+			{
+				pos++;
+			}
+			else
+			{
+				throw new ParseErrorException( pos, "Expected '=' in object key-value pair" );
+			}
+			
+			// Consume whitespace
+			eatWhitespace();
+			
+			// Put this name into the name stack
+			nameStack.set( nameStack.size() - 1, fieldName );
+		}
+	}
+	
+	
 	
 	@SuppressWarnings("unchecked")
-	private void addItemToItemAtTopOfStack(Object item)
+	private void closeItem(Object item) throws ParseErrorException
 	{
 		if ( stack.size() > 0 )
 		{
@@ -205,6 +252,9 @@ public class DMIOReader
 			if ( top instanceof ArrayList )
 			{
 				((ArrayList<Object>)top).add( item );
+				// Prepare for next element
+				// Just eat whitespace
+				eatWhitespace();
 			}
 			else if ( top instanceof DMObject )
 			{
@@ -216,75 +266,25 @@ public class DMIOReader
 				{
 					System.out.println( "Could not set a field named " + getTopOfNameStack() );
 				}
+
+				objectAcquireFieldName();
 			}
 			else
 			{
 				throw new ParseStackException();
 			}
-		}
-	}
-	
-	
-	private void commitItem(Object item) throws ParseErrorException
-	{
-		if ( stack.size() == 0 )
-		{
-			result = item;
 		}
 		else
 		{
-			Object top = getTopOfStack();
-			
-			if ( top instanceof ArrayList )
-			{
-				// Nothing to do; just eat whitespace
-				eatWhitespace();
-			}
-			else if ( top instanceof DMObject )
-			{
-				// Consume any leading whitespace
-				eatWhitespace();
-				
-				// Get the field name
-				String fieldName;
-				MatchResult res = match( identifier, source, pos );
-				if ( res == null )
-				{
-					throw new ParseErrorException();
-				}
-				fieldName = res.value;
-				
-				// Consume whitespace
-				eatWhitespace();
-				
-				// Consume the '=' character
-				if ( source.charAt( pos ) == '=' )
-				{
-					pos++;
-				}
-				else
-				{
-					throw new ParseErrorException();
-				}
-				
-				// Consume whitespace
-				eatWhitespace();
-				
-				nameStack.set( nameStack.size() - 1, fieldName );
-			}
-			else
-			{
-				throw new ParseStackException();
-			}
+			result = item;
 		}
 	}
+	
 	
 	
 	private void openList()
 	{
 		Object item = new ArrayList<Object>();
-		// Append the new list to the list that is on the top of the stach; this builds the structure
-		addItemToItemAtTopOfStack( item );
 		// Make the top of the stack the new list
 		stack.add( item );
 		nameStack.add( "" );
@@ -295,23 +295,23 @@ public class DMIOReader
 		// Ensure that there is an item to close
 		if ( stack.size() == 0 )
 		{
-			throw new ParseErrorException();
+			throw new ParseErrorException( pos, "'']' with no list to close" );
 		}
 		// Ensure that it is a list
 		Object item = getTopOfStack();
 		if ( !( item instanceof ArrayList ) )
 		{
-			throw new ParseErrorException();
+			throw new ParseErrorException( pos, "']' attempting to close non-list" );
 		}
 		
 		// Pop off stack
 		stack.remove( stack.size() - 1 );
 		nameStack.remove( nameStack.size() - 1 );
 		
-		commitItem( item );
+		closeItem( item );
 	}
 	
-	private void openObject() throws ParseErrorException, UnknownModuleException, UnknownClassException
+	private void openObject() throws ParseErrorException, BadModuleNameException, UnknownClassException
 	{
 		MatchResult res = null;
 		
@@ -320,10 +320,11 @@ public class DMIOReader
 		res = match( identifier, source, pos );
 		if ( res == null )
 		{
-			throw new ParseErrorException();
+			throw new ParseErrorException( pos, "Expected module name for object" );
 		}
 		else
 		{
+			pos = res.position;
 			moduleName = res.value;
 		}
 		
@@ -331,14 +332,18 @@ public class DMIOReader
 		DMModule module = moduleTable.get( moduleName );
 		if ( module == null )
 		{
-			throw new UnknownModuleException();
+			throw new BadModuleNameException();
 		}
 		
 		// Need whitespace
 		res = match( whitespace, source, pos );
 		if ( res == null )
 		{
-			throw new ParseErrorException();
+			throw new ParseErrorException( pos, "Expected whitespace after module name for object" );
+		}
+		else
+		{
+			pos = res.position;
 		}
 		
 		// Get class name
@@ -346,10 +351,11 @@ public class DMIOReader
 		res = match( identifier, source, pos );
 		if ( res == null )
 		{
-			throw new ParseErrorException();
+			throw new ParseErrorException( pos, "Expected class name for object" );
 		}
 		else
 		{
+			pos = res.position;
 			className = res.value;
 		}
 		
@@ -358,12 +364,11 @@ public class DMIOReader
 		
 		DMObject item = cls.newInstance( new Object[] {} );
 		
-		// Append the new list to the list that is on the top of the stach; this builds the structure
-		addItemToItemAtTopOfStack( item );
-
 		// Make the top of the stack the new list
 		stack.add( item );
 		nameStack.add( "" );
+		
+		objectAcquireFieldName();
 	}
 	
 	private void closeObject() throws ParseErrorException
@@ -371,62 +376,63 @@ public class DMIOReader
 		// Ensure that there is an item to close
 		if ( stack.size() == 0 )
 		{
-			throw new ParseErrorException();
+			throw new ParseErrorException( pos, "')' with no object to close" );
 		}
 		// Ensure that it is a list
 		Object item = getTopOfStack();
 		if ( !( item instanceof DMObject ) )
 		{
-			throw new ParseErrorException();
+			throw new ParseErrorException( pos, "')' attempting to close non-object" );
 		}
 		
 		// Pop off stack
 		stack.remove( stack.size() - 1 );
 		nameStack.remove( nameStack.size() - 1 );
 		
-		commitItem( item );
+		closeItem( item );
 	}
 	
 	
-	@SuppressWarnings("unchecked")
-	public Object readFromString(String source) throws ParseErrorException
+	public Object read() throws ParseErrorException, BadModuleNameException, UnknownClassException
 	{
-		int pos = 0;
-		ArrayList<Object> stack = new ArrayList<Object>();
 		while ( pos < source.length() )
 		{
-			if ( source.charAt( pos ) == '[' )
+			if ( source.charAt( pos ) == '}' )
+			{
+				// Close bindings
+				// Don't consume the character
+				break;
+			}
+			else if ( source.charAt( pos ) == '[' )
 			{
 				// Open square-bracket; start new list
+				pos++;
 				openList();
-				pos++;
 			}
-			else if ( source.charAt( pos ) == ')' )
+			else if ( source.charAt( pos ) == ']' )
 			{
-				closeList();
 				pos++;
+				closeList();
 			}
 			else if ( source.charAt( pos ) == '(' )
 			{
-				openObject();
 				pos++;
+				openObject();
 			}
 			else if ( source.charAt( pos ) == ')' )
 			{
-				closeObject();
 				pos++;
+				closeObject();
 			}
 			else
 			{
-				// Try looking for:
 				MatchResult res;
 				
 				// Whitespace
-				eatWhitespace();
 				res = match( whitespace, source, pos );
 				if ( res != null )
 				{
-					pos = res.pos;
+					pos = res.position;
 					continue;
 				}
 				
@@ -434,17 +440,143 @@ public class DMIOReader
 				res = matchAtom( source, pos );
 				if ( res != null )
 				{
+					pos = res.position;
 					String s = res.value;
-					addItemToItemAtTopOfStack( s );
-					pos = res.pos;
+					closeItem( s );
 					continue;
 				}
 				
 				
-				throw new ParseErrorException();
+				// Parse error, get the next token to build an error message
+				String token = source.substring( pos );
+				int space = token.indexOf( ' ' );
+				int tab = token.indexOf( '\t' );
+				int newline = token.indexOf( '\n' );
+				if ( space == -1 )
+				{
+					space = token.length();
+				}
+				if ( tab == -1 )
+				{
+					tab = token.length();
+				}
+				if ( newline == -1 )
+				{
+					newline = token.length();
+				}
+				int end = Math.min( Math.min( space, tab ), newline );
+				token = token.substring( 0, end );
+				throw new ParseErrorException( pos, "Unknown token '" + token + "'" );
 			}
+		}
+		
+		if ( stack.size() != 0 )
+		{
+			throw new ParseErrorException( pos, "List or object remains to be closed" );
 		}
 
 		return result;
+	}
+	
+	
+	public Object readDocument() throws ParseErrorException, BadModuleNameException, UnknownClassException, CouldNotResolveModuleException
+	{
+		eatWhitespace();
+		
+		Object obj = null;
+		
+		// Do we have bindings?
+		if ( source.charAt( pos ) == '{' )
+		{
+			pos++;
+			// Read bindings
+			
+			eatWhitespace();
+			
+			// Read bindings until a ':' is encountered
+			while ( source.charAt( pos ) != ':' )
+			{
+				String key, value;
+				MatchResult res = null;
+				
+				// Get key
+				res = match( identifier, source, pos );
+				if ( res != null )
+				{
+					key = res.value;
+					pos = res.position;
+				}
+				else
+				{
+					throw new ParseErrorException( pos, "Expected name for binding" );
+				}
+				
+				
+				// Consume the '=' character
+				eatWhitespace();
+				if ( source.charAt( pos ) != '=' )
+				{
+					throw new ParseErrorException( pos, "Expected '=' for binding" );
+				}
+				pos++;
+				
+				
+				// Get value
+				res = matchAtom( source, pos );
+				if ( res != null )
+				{
+					value = res.value;
+					pos = res.position;
+				}
+				else
+				{
+					throw new ParseErrorException( pos, "Expected location for binding" );
+				}
+				
+				
+				// Get the module, and add to the module table
+				DMModule module = resolver.getModule( value );
+				moduleTable.put( key, module );
+				
+				
+				eatWhitespace();
+			}
+			
+			// Consume the ':' and any whitespace
+			pos++;
+			eatWhitespace();
+			
+			obj = read();
+			
+			eatWhitespace();
+			
+			if ( source.charAt( pos ) != '}' )
+			{
+				throw new ParseErrorException( pos, "Expected '}'" );
+			}
+			
+			pos++;
+		}
+		else
+		{
+			obj = read();
+		}
+
+		
+		eatWhitespace();
+		
+		if ( pos < source.length() )
+		{
+			throw new ParseErrorException( pos, "Expected end, found " + source.substring( pos ) );
+		}
+		
+		return obj;
+	}
+	
+	
+	public static Object readFromString(String source, DMModuleResolver resolver) throws ParseErrorException, BadModuleNameException, UnknownClassException, CouldNotResolveModuleException
+	{
+		DMIOReader reader = new DMIOReader( source, resolver );
+		return reader.readDocument();
 	}
 }

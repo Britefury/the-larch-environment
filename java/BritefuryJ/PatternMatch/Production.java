@@ -6,6 +6,8 @@
 //##************************
 package BritefuryJ.PatternMatch;
 
+import java.util.List;
+
 import org.python.core.PyObject;
 
 public class Production extends UnaryBranchExpression
@@ -33,9 +35,14 @@ public class Production extends UnaryBranchExpression
 	}
 	
 	
-	protected MatchResult parseNode(MatchState state, Object input, int start, int stop)
+	protected MatchResult evaluateNode(MatchState state, Object input)
 	{
-		return state.memoisedMatch( subexp, input, start, stop ).clearBindings();
+		return state.memoisedMatchNode( subexp, input ).clearBindings();
+	}
+
+	protected MatchResult evaluateList(MatchState state, List<Object> input, int start, int stop)
+	{
+		return state.memoisedMatchList( subexp, input, start, stop ).clearBindings();
 	}
 
 

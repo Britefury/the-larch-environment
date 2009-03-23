@@ -24,7 +24,7 @@ public class Literal extends StringTerminal
 	
 	
 	
-	protected MatchResult parseString(MatchState state, String input)
+	protected MatchResult matchString(MatchState state, String input)
 	{
 		if ( matchString.equals( input ) )
 		{
