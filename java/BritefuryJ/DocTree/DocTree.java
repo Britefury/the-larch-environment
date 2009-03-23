@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import BritefuryJ.DocModel.DMListInterface;
+import BritefuryJ.DocModel.DMObjectInterface;
 
 
 public class DocTree
@@ -346,10 +347,14 @@ public class DocTree
 			{
 				node = new DocTreeList( this, (DMListInterface)x, parentTreeNode, indexInParent );
 			}
+			else if ( x instanceof DMObjectInterface )
+			{
+				node = new DocTreeObject( this, (DMObjectInterface)x, parentTreeNode, indexInParent );
+			}
 			else
 			{
 				System.out.println( "DocTree.treeNode(): wrapping " + x.getClass().getName() );
-				node = new DocTreeNodeObject( x, parentTreeNode, indexInParent );
+				node = new DocTreeNodeGeneric( x, parentTreeNode, indexInParent );
 			}
 
 			table.put( key, node );

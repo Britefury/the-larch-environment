@@ -6,6 +6,8 @@
 //##************************
 package BritefuryJ.PatternMatch;
 
+import java.util.List;
+
 
 public class Suppress extends UnaryBranchExpression
 {
@@ -20,9 +22,14 @@ public class Suppress extends UnaryBranchExpression
 	}
 	
 	
-	protected MatchResult parseNode(MatchState state, Object input, int start, int stop)
+	protected MatchResult evaluateNode(MatchState state, Object input)
 	{
-		return subexp.evaluateNode( state, input, start, stop ).suppressed();
+		return MatchResult.failure( 0 );
+	}
+
+	protected MatchResult evaluateList(MatchState state, List<Object> input, int start, int stop)
+	{
+		return subexp.processList( state, input, start, stop ).suppressed();
 	}
 
 

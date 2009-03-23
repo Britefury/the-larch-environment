@@ -17,24 +17,22 @@ public class Anything extends MatchExpression
 	
 	
 
-	@SuppressWarnings("unchecked")
-	protected MatchResult parseNode(MatchState state, Object input, int start, int stop)
+	protected MatchResult evaluateNode(MatchState state, Object input)
 	{
-		if ( input instanceof List )
-		{
-			List<Object> xs = (List<Object>)input;
-			if ( stop > start )
-			{
-				Object x = xs.get( start );
-				return new MatchResult( x, start, start + 1 );
-			}
-			else
-			{
-				return MatchResult.failure( start );
-			}
-		}
-		
+		return new MatchResult( input, 0, 1 );
+	}
 
-		return new MatchResult( input, start, stop );
+
+	protected MatchResult evaluateList(MatchState state, List<Object> input, int start, int stop)
+	{
+		if ( stop > start )
+		{
+			Object x = input.get( start );
+			return new MatchResult( x, start, start + 1 );
+		}
+		else
+		{
+			return MatchResult.failure( start );
+		}
 	}
 }

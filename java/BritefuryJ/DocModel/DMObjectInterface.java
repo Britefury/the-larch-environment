@@ -13,6 +13,7 @@ import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
 public interface DMObjectInterface
 {
 	public DMObjectClass getDMClass();
+	public boolean isInstanceOf(DMObjectClass cls);
 	
 	public int getFieldIndex(String key);
 	
@@ -24,13 +25,12 @@ public interface DMObjectInterface
 	
 	
 	public String[] getFieldNames();
-	public Object[] getFieldValuesImmutable();
 	
 	public void update(Map<String, Object> table) throws InvalidFieldNameException;
 	
 	
 	public Object __getitem__(int fieldIndex);
-	public void __setitem__(int fieldIndex, Object value);
 	public Object __getitem__(String key);
+	public void __setitem__(int index, Object value);
 	public void __setitem__(String key, Object value);
 }

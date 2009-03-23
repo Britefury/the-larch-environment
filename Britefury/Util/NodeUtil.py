@@ -8,11 +8,9 @@
 from java.lang import String
 from java.util import List
 
-from BritefuryJ.DocModel import DMListInterface
+from BritefuryJ.DocModel import DMListInterface, DMObjectInterface
 
-from BritefuryJ.DocTree import DocTreeNode
-from BritefuryJ.DocTree import DocTreeString
-from BritefuryJ.DocTree import DocTreeList
+from BritefuryJ.DocTree import DocTreeNode, DocTreeString, DocTreeList, DocTreeObject
 
 
 def isStringNode(x):
@@ -20,6 +18,9 @@ def isStringNode(x):
 
 def isListNode(xs):
 	return isinstance( xs, List )  or  isinstance( xs, list )  or isinstance( xs, DMListInterface )  or  isinstance( xs, DocTreeList )
+
+def isObjectNode(xs):
+	return isinstance( xs, DMObjectInterface )  or  isinstance( xs, DocTreeObject )
 
 def isNullNode(x):
 	return isStringNode( x )  and  x.toString() == '<nil>'

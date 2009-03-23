@@ -9,35 +9,74 @@ package tests.PatternMatch;
 import java.util.HashMap;
 import java.util.List;
 
-import BritefuryJ.DocModel.DMIORead;
-import BritefuryJ.DocModel.DMIORead.ParseSXErrorException;
+import BritefuryJ.DocModel.DMIOReader;
+import BritefuryJ.DocModel.DMModuleResolver;
+import BritefuryJ.DocModel.DMIOReader.BadModuleNameException;
+import BritefuryJ.DocModel.DMIOReader.ParseErrorException;
+import BritefuryJ.DocModel.DMModule.UnknownClassException;
+import BritefuryJ.DocModel.DMModuleResolver.CouldNotResolveModuleException;
 import BritefuryJ.PatternMatch.MatchResult;
 import BritefuryJ.PatternMatch.MatchExpression;
 import junit.framework.TestCase;
 
-public class PatternMatchTestCase extends TestCase
+public abstract class PatternMatchTestCase extends TestCase
 {
+	abstract protected DMModuleResolver getModuleResolver();
+	
+	
+	
+	
 	public void matchNodeTestSX(MatchExpression parser, String inputSX, String expectedSX)
 	{
 		Object input = null;
 		try
 		{
-			input = DMIORead.readSX( inputSX );
+			input = DMIOReader.readFromString( inputSX, getModuleResolver() );
 		}
-		catch (ParseSXErrorException e)
+		catch (ParseErrorException e)
 		{
 			System.out.println( "Could not parse input SX" );
+			fail();
+		}
+		catch (BadModuleNameException e)
+		{
+			System.out.println( "Bad module name - input" );
+			fail();
+		}
+		catch (UnknownClassException e)
+		{
+			System.out.println( "Unknown class name - input" );
+			fail();
+		}
+		catch (CouldNotResolveModuleException e)
+		{
+			System.out.println( "Could not resolve module - input" );
 			fail();
 		}
 
 		Object expected = null;
 		try
 		{
-			expected = DMIORead.readSX( expectedSX );
+			expected = DMIOReader.readFromString( expectedSX, getModuleResolver() );
 		}
-		catch (ParseSXErrorException e)
+		catch (ParseErrorException e)
 		{
 			System.out.println( "Could not parse expected SX" );
+			fail();
+		}
+		catch (BadModuleNameException e)
+		{
+			System.out.println( "Bad module name - expected" );
+			fail();
+		}
+		catch (UnknownClassException e)
+		{
+			System.out.println( "Unknown class name - expected" );
+			fail();
+		}
+		catch (CouldNotResolveModuleException e)
+		{
+			System.out.println( "Could not resolve module - expected" );
 			fail();
 		}
 
@@ -51,7 +90,7 @@ public class PatternMatchTestCase extends TestCase
 		
 		if ( !result.isValid() )
 		{
-			System.out.println( "PARSE FAILURE" );
+			System.out.println( "MATCH FAILURE" );
 			System.out.println( "EXPECTED:" );
 			System.out.println( expected.toString() );
 		}
@@ -88,16 +127,32 @@ public class PatternMatchTestCase extends TestCase
 	
 	public void matchNodeFailTestSX(MatchExpression parser, String inputSX)
 	{
+		Object input = null;
 		try
 		{
-			Object input = DMIORead.readSX( inputSX );
-			matchNodeFailTest( parser, input );
+			input = DMIOReader.readFromString( inputSX, getModuleResolver() );
 		}
-		catch (ParseSXErrorException e)
+		catch (ParseErrorException e)
 		{
 			System.out.println( "Could not parse input SX" );
 			fail();
 		}
+		catch (BadModuleNameException e)
+		{
+			System.out.println( "Bad module name - input" );
+			fail();
+		}
+		catch (UnknownClassException e)
+		{
+			System.out.println( "Unknown class name - input" );
+			fail();
+		}
+		catch (CouldNotResolveModuleException e)
+		{
+			System.out.println( "Could not resolve module - input" );
+			fail();
+		}
+		matchNodeFailTest( parser, input );
 	}
 
 	
@@ -128,22 +183,52 @@ public class PatternMatchTestCase extends TestCase
 		Object input = null;
 		try
 		{
-			input = DMIORead.readSX( inputSX );
+			input = DMIOReader.readFromString( inputSX, getModuleResolver() );
 		}
-		catch (ParseSXErrorException e)
+		catch (ParseErrorException e)
 		{
 			System.out.println( "Could not parse input SX" );
+			fail();
+		}
+		catch (BadModuleNameException e)
+		{
+			System.out.println( "Bad module name - input" );
+			fail();
+		}
+		catch (UnknownClassException e)
+		{
+			System.out.println( "Unknown class name - input" );
+			fail();
+		}
+		catch (CouldNotResolveModuleException e)
+		{
+			System.out.println( "Could not resolve module - input" );
 			fail();
 		}
 
 		Object bindings = null;
 		try
 		{
-			bindings = DMIORead.readSX( bindingsSX );
+			bindings = DMIOReader.readFromString( bindingsSX, getModuleResolver() );
 		}
-		catch (ParseSXErrorException e)
+		catch (ParseErrorException e)
 		{
 			System.out.println( "Could not parse bindings SX" );
+			fail();
+		}
+		catch (BadModuleNameException e)
+		{
+			System.out.println( "Bad module name - bindings" );
+			fail();
+		}
+		catch (UnknownClassException e)
+		{
+			System.out.println( "Unknown class name - bindings" );
+			fail();
+		}
+		catch (CouldNotResolveModuleException e)
+		{
+			System.out.println( "Could not resolve module - bindings" );
 			fail();
 		}
 
@@ -158,7 +243,7 @@ public class PatternMatchTestCase extends TestCase
 
 		if ( !result.isValid() )
 		{
-			System.out.println( "PARSE FAILURE" );
+			System.out.println( "MATCH FAILURE" );
 		}
 		assertTrue( result.isValid() );
 		

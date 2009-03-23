@@ -7,6 +7,7 @@
 package tests.DocModel;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import BritefuryJ.DocModel.DMIORead;
@@ -19,16 +20,18 @@ import junit.framework.TestCase;
 
 public class Test_DMIOWriter extends TestCase
 {
-	private DMModule module;
-	private DMObjectClass A;
+	private DMModule module, module2;
+	private DMObjectClass A, A2;
 	
 	
 	public void setUp()
 	{
 		module = new DMModule( "module", "m", "test.module" );
+		module2 = new DMModule( "module2", "m", "test.module2" );
 		try
 		{
 			A = module.newClass( "A", new String[] { "x", "y" } );
+			A2 = module2.newClass( "A2", new String[] { "x", "y" } );
 		}
 		catch (ClassAlreadyDefinedException e)
 		{
@@ -39,7 +42,9 @@ public class Test_DMIOWriter extends TestCase
 	public void tearDown()
 	{
 		module = null;
+		module2 = null;
 		A = null;
+		A2 = null;
 	}
 	
 	
@@ -124,7 +129,7 @@ public class Test_DMIOWriter extends TestCase
 	public void testUnquotedString()
 	{
 		matchTest( DMIOWriter.unquotedString, "abc123ABC_", "abc123ABC_" );
-		matchTest( DMIOWriter.unquotedString, "abc123ABC_+-*/%^&|!$@.,<>=[]~", "abc123ABC_+-*/%^&|!$@.,<>=[]~" );
+		matchTest( DMIOWriter.unquotedString, "abc123ABC_+-*/%^&|!$@.,<>~", "abc123ABC_+-*/%^&|!$@.,<>~" );
 		matchFailTest( DMIOWriter.unquotedString, "abc123ABC_+-*/%^&|!$@.,<>=[]~(" );
 		matchFailTest( DMIOWriter.unquotedString, "abc123ABC_+-*/%^&|!$@.,<>=[]~)" );
 		matchFailTest( DMIOWriter.unquotedString, "abc123ABC_+-*/%^&|!$@.,<>=[]~\"" );
@@ -230,6 +235,31 @@ public class Test_DMIOWriter extends TestCase
 	public void testWriteObject()
 	{
 		DMObject a = A.newInstance( new Object[] { "0", "1" } );
-		writeTest( a, "{m=test.module (m A x=0 y=1)}" );
+		writeTest( a, "{m=test.module : (m A x=0 y=1)}" );
+	}
+
+
+	public void testWriteNestedObject()
+	{
+		DMObject a = A.newInstance( new Object[] { "0", "1" } );
+		DMObject b = A.newInstance( new Object[] { a, "2" } );
+		writeTest( b, "{m=test.module : (m A x=(m A x=0 y=1) y=2)}" );
+	}
+
+	public void testWriteObjectInListInObject()
+	{
+		DMObject a = A.newInstance( new Object[] { "0", "1" } );
+		List<Object> b = Arrays.asList( new Object[] { a, "abc" } );
+		DMObject c = A.newInstance( new Object[] { b, "2" } );
+		writeTest( c, "{m=test.module : (m A x=[(m A x=0 y=1) abc] y=2)}" );
+	}
+
+
+	public void testWriteObject_moduleNameCollision()
+	{
+		DMObject a = A.newInstance( new Object[] { "0", "1" } );
+		DMObject b = A2.newInstance( new Object[] { "0", "1" } );
+		List<Object> l = Arrays.asList( new Object[] { a, b } );
+		writeTest( l, "{m=test.module m2=test.module2 : [(m A x=0 y=1) (m2 A2 x=0 y=1)]}" );
 	}
 }

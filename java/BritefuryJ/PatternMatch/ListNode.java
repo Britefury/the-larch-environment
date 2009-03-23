@@ -30,14 +30,8 @@ public class ListNode extends BranchExpression
 	}
 	
 	
-	protected MatchResult parseString(MatchState state, String input, int start, int stop)
-	{
-		return MatchResult.failure( start );
-	}
-	
-	
 	@SuppressWarnings("unchecked")
-	private MatchResult parseNodeContents(MatchState state, List<Object> input, int start, int stop)
+	private MatchResult matchListContents(MatchState state, List<Object> input, int start, int stop)
 	{
 		ArrayList<Object> value = new ArrayList<Object>();
 		HashMap<String, Object> bindings = null;
@@ -50,7 +44,7 @@ public class ListNode extends BranchExpression
 				return MatchResult.failure( pos );
 			}
 			
-			MatchResult result = subexps[i].evaluateNode(  state, input, pos, stop );
+			MatchResult result = subexps[i].processList( state, input, pos, stop );
 			pos = result.end;
 			
 			if ( !result.isValid() )
@@ -94,22 +88,35 @@ public class ListNode extends BranchExpression
 	
 	
 	@SuppressWarnings("unchecked")
-	protected MatchResult parseNode(MatchState state, Object input, int start, int stop)
+	protected MatchResult evaluateNode(MatchState state, Object input)
 	{
 		if ( input instanceof List )
 		{
-			List<Object> xs = (List<Object>)input;
-			if ( stop > start )
+			List<Object> node = (List<Object>)input;
+			MatchResult res = matchListContents( state, node, 0, node.size() );
+			if ( res.isValid() )
 			{
-				Object x = xs.get( start );
-				if ( x instanceof List )
+				return res.withRange( 0, 1 );
+			}
+		}
+		
+
+		return MatchResult.failure( 0 );
+	}
+
+	@SuppressWarnings("unchecked")
+	protected MatchResult evaluateList(MatchState state, List<Object> input, int start, int stop)
+	{
+		if ( stop > start )
+		{
+			Object x = input.get( start );
+			if ( x instanceof List )
+			{
+				List<Object> node = (List<Object>)x;
+				MatchResult res = matchListContents( state, node, 0, node.size() );
+				if ( res.isValid() )
 				{
-					List<Object> node = (List<Object>)x;
-					MatchResult res = parseNodeContents( state, node, 0, node.size() );
-					if ( res.isValid() )
-					{
-						return res.withRange( start, start + 1 );
-					}
+					return res.withRange( start, start + 1 );
 				}
 			}
 		}
@@ -120,17 +127,6 @@ public class ListNode extends BranchExpression
 
 
 	
-	public MatchExpression __add__(MatchExpression x)
-	{
-		return new Sequence( appendToSubexps( x ) );
-	}
-
-	public MatchExpression __add__(Object x)
-	{
-		return new Sequence( appendToSubexps( toMatchExpression( x ) ) );
-	}
-
-
 	public String toString()
 	{
 		return "Sequence( " + subexpsToString() + " )";

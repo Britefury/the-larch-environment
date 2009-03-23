@@ -41,7 +41,7 @@ public class RegEx extends StringTerminal
 	
 	
 	
-	protected MatchResult parseString(MatchState state, String input)
+	protected MatchResult matchString(MatchState state, String input)
 	{
 		Matcher m = pattern.matcher( input );
 		

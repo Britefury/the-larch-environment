@@ -6,14 +6,52 @@
 //##************************
 package tests.Parser;
 
-import BritefuryJ.DocModel.DMIORead;
-import BritefuryJ.DocModel.DMIORead.ParseSXErrorException;
+import BritefuryJ.DocModel.DMIOReader;
+import BritefuryJ.DocModel.DMModuleResolver;
+import BritefuryJ.DocModel.DMIOReader.BadModuleNameException;
+import BritefuryJ.DocModel.DMIOReader.ParseErrorException;
+import BritefuryJ.DocModel.DMModule.UnknownClassException;
+import BritefuryJ.DocModel.DMModuleResolver.CouldNotResolveModuleException;
 import BritefuryJ.Parser.ParseResult;
 import BritefuryJ.Parser.ParserExpression;
 import junit.framework.TestCase;
 
-public class ParserTestCase extends TestCase
+abstract public class ParserTestCase extends TestCase
 {
+	abstract protected DMModuleResolver getModuleResolver();
+
+	
+	
+	private Object readExpectedSX(String expectedSX)
+	{
+		Object expected = null;
+		try
+		{
+			expected = DMIOReader.readFromString( expectedSX, getModuleResolver() );
+		}
+		catch (ParseErrorException e)
+		{
+			System.out.println( "Could not parse expected SX" );
+			fail();
+		}
+		catch (BadModuleNameException e)
+		{
+			System.out.println( "Bad module name - expected" );
+			fail();
+		}
+		catch (UnknownClassException e)
+		{
+			System.out.println( "Unknown class name - expected" );
+			fail();
+		}
+		catch (CouldNotResolveModuleException e)
+		{
+			System.out.println( "Could not resolve module - expected" );
+			fail();
+		}
+		return expected;
+	}
+	
 	public void matchTestSX(ParserExpression parser, String input, String expectedSX)
 	{
 		matchTestSX( parser, input, expectedSX, "[ \t\n]*" );
@@ -21,16 +59,8 @@ public class ParserTestCase extends TestCase
 
 	public void matchTestSX(ParserExpression parser, String input, String expectedSX, String ignoreCharsRegex)
 	{
-		try
-		{
-			Object expected = DMIORead.readSX( expectedSX );
-			matchTest( parser, input, expected, ignoreCharsRegex );
-		}
-		catch (ParseSXErrorException e)
-		{
-			System.out.println( "Could not parse expected SX" );
-			fail();
-		}
+		Object expected = readExpectedSX( expectedSX );
+		matchTest( parser, input, expected, ignoreCharsRegex );
 	}
 	
 	
@@ -105,16 +135,9 @@ public class ParserTestCase extends TestCase
 
 	public void matchSubTestSX(ParserExpression parser, String input, String expectedSX, int end, String ignoreCharsRegex)
 	{
-		try
-		{
-			Object expected = DMIORead.readSX( expectedSX );
-			matchSubTest( parser, input, expected, end, ignoreCharsRegex );
-		}
-		catch (ParseSXErrorException e)
-		{
-			System.out.println( "Could not parse expected SX" );
-			fail();
-		}
+		Object expected = readExpectedSX( expectedSX );
+		matchSubTest( parser, input, expected, end, ignoreCharsRegex );
+
 	}
 	
 	

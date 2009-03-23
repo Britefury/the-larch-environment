@@ -14,7 +14,7 @@ import org.python.core.PyObject;
 import org.python.core.PyString;
 import org.python.core.PyUnicode;
 
-public abstract class DMNode
+public class DMNode
 {
 	public Object coerce(String x)
 	{

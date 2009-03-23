@@ -6,12 +6,43 @@
 //##************************
 package tests.Parser.Utils;
 
+import BritefuryJ.DocModel.DMModule;
+import BritefuryJ.DocModel.DMModuleResolver;
 import BritefuryJ.Parser.ParserExpression;
 import BritefuryJ.Parser.Utils.Tokens;
 import tests.Parser.ParserTestCase;
 
 public class Test_Tokens extends ParserTestCase
 {
+	protected DMModule M;
+	protected DMModuleResolver resolver = new DMModuleResolver()
+	{
+		public DMModule getModule(String location) throws CouldNotResolveModuleException
+		{
+			return location.equals( "Tests.Parser.Tokens" )  ?  M  :  null;
+		}
+	};
+	
+	
+	
+	protected DMModuleResolver getModuleResolver()
+	{
+		return resolver;
+	}
+	
+
+	
+	public void setUp()
+	{
+		M = new DMModule( "Tokens", "m", "Tests.Parser.Tokens" );
+	}
+	
+	public void tearDown()
+	{
+		M = null;
+	}
+
+	
 	public void testIdentifier()
 	{
 		ParserExpression parser = Tokens.identifier;

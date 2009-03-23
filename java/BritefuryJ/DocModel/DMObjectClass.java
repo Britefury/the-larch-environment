@@ -11,7 +11,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.python.core.PyDictionary;
 import org.python.core.PyObject;
+
+import BritefuryJ.PatternMatch.ObjectMatch;
 
 
 public class DMObjectClass
@@ -19,6 +22,11 @@ public class DMObjectClass
 	public static class InvalidFieldNameException extends Exception
 	{
 		private static final long serialVersionUID = 1L;
+		
+		public InvalidFieldNameException(String fieldName)
+		{
+			super( "Invalid field name: '" + fieldName + "'" );
+		}
 	};
 	
 
@@ -26,7 +34,7 @@ public class DMObjectClass
 	
 	private DMModule module;
 	private String name;
-	private DMObjectClass superClass, superClasses[];
+	private DMObjectClass superclass, superclasses[];
 	private DMObjectField classFields[], allClassFields[];
 	private HashMap<String, Integer> fieldNameToIndex;
 	
@@ -35,9 +43,9 @@ public class DMObjectClass
 	public DMObjectClass(DMModule module, String name, DMObjectField fields[])
 	{
 		this.module = module;
-		this.name = name;
-		superClass = null;
-		superClasses = new DMObjectClass[0];
+		this.name = name.intern();
+		superclass = null;
+		superclasses = new DMObjectClass[0];
 		classFields = fields;
 		allClassFields = fields;
 		
@@ -51,27 +59,27 @@ public class DMObjectClass
 	
 	
 	
-	public DMObjectClass(DMModule module, String name, DMObjectClass superClass, DMObjectField fields[])
+	public DMObjectClass(DMModule module, String name, DMObjectClass superclass, DMObjectField fields[])
 	{
 		this.module = module;
-		this.name = name;
+		this.name = name.intern();
 		
-		this.superClass = superClass;
-		superClasses = new DMObjectClass[superClass.superClasses.length + 1];
-		superClasses[0] = superClass;
-		System.arraycopy( superClass.superClasses, 0, superClasses, 1, superClass.superClasses.length );
+		this.superclass = superclass;
+		superclasses = new DMObjectClass[superclass.superclasses.length + 1];
+		superclasses[0] = superclass;
+		System.arraycopy( superclass.superclasses, 0, superclasses, 1, superclass.superclasses.length );
 		
 		classFields = fields;
-		allClassFields = new DMObjectField[superClass.allClassFields.length + classFields.length];
-		System.arraycopy( superClass.allClassFields, 0, allClassFields, 0, superClass.allClassFields.length );
-		System.arraycopy( classFields, 0, allClassFields, superClass.allClassFields.length, classFields.length );
-
+		allClassFields = new DMObjectField[superclass.allClassFields.length + classFields.length];
+		System.arraycopy( superclass.allClassFields, 0, allClassFields, 0, superclass.allClassFields.length );
+		System.arraycopy( classFields, 0, allClassFields, superclass.allClassFields.length, classFields.length );
+		
 		initialise();
 	}
 
-	public DMObjectClass(DMModule module, String name, DMObjectClass superClass, String fieldNames[])
+	public DMObjectClass(DMModule module, String name, DMObjectClass superclass, String fieldNames[])
 	{
-		this( module, name, superClass, DMObjectField.nameArrayToFieldArray( fieldNames ) );
+		this( module, name, superclass, DMObjectField.nameArrayToFieldArray( fieldNames ) );
 	}
 	
 	
@@ -89,12 +97,12 @@ public class DMObjectClass
 	
 	public DMObjectClass getSuperclass()
 	{
-		return superClass;
+		return superclass;
 	}
 	
 	public boolean isSubclassOf(DMObjectClass c)
 	{
-		return c == this  ||  Arrays.asList( superClasses ).contains( c );
+		return c == this  ||  Arrays.asList( superclasses ).contains( c );
 	}
 	
 	
@@ -162,6 +170,11 @@ public class DMObjectClass
 	
 	
 	
+	public DMObject newInstance()
+	{
+		return new DMObject( this );
+	}
+
 	public DMObject newInstance(Object values[])
 	{
 		return new DMObject( this, values );
@@ -181,6 +194,44 @@ public class DMObjectClass
 	{
 		return new DMObject( this, data );
 	}
+	
+	public DMObject newInstance(PyDictionary data) throws InvalidFieldNameException
+	{
+		return new DMObject( this, data );
+	}
+	
+	
+	
+	public ObjectMatch matchExpression() throws InvalidFieldNameException
+	{
+		return new ObjectMatch( this );
+	}
+	
+	public ObjectMatch matchExpression(Object fieldExps[]) throws InvalidFieldNameException
+	{
+		return new ObjectMatch( this, fieldExps );
+	}
+	
+	public ObjectMatch matchExpression(String fieldNames[], Object fieldExps[]) throws InvalidFieldNameException
+	{
+		return new ObjectMatch( this, fieldNames, fieldExps );
+	}
+	
+	public ObjectMatch matchExpression(PyObject values[], String names[]) throws InvalidFieldNameException
+	{
+		return new ObjectMatch( this, names, values );
+	}
+	
+	public ObjectMatch matchExpression(Map<String, Object> data) throws InvalidFieldNameException
+	{
+		return new ObjectMatch( this, data );
+	}
+	
+	public ObjectMatch matchExpression(PyDictionary data) throws InvalidFieldNameException
+	{
+		return new ObjectMatch( this, data );
+	}
+	
 	
 	
 	public DMObject __call__(PyObject values[], String names[])

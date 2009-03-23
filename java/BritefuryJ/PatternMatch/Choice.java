@@ -26,13 +26,33 @@ public class Choice extends BranchExpression
 	}
 	
 	
-	protected MatchResult parseNode(MatchState state, Object input, int start, int stop)
+	protected MatchResult evaluateNode(MatchState state, Object input)
+	{
+		int maxErrorPos = 0;
+		
+		for (MatchExpression subexp: subexps)
+		{
+			MatchResult result = subexp.processNode( state, input );
+			if ( result.isValid() )
+			{
+				return result;
+			}
+			else
+			{
+				maxErrorPos = Math.max( maxErrorPos, result.end );
+			}
+		}
+		
+		return MatchResult.failure( maxErrorPos );
+	}
+	
+	protected MatchResult evaluateList(MatchState state, List<Object> input, int start, int stop)
 	{
 		int maxErrorPos = start;
 		
 		for (MatchExpression subexp: subexps)
 		{
-			MatchResult result = subexp.evaluateNode(  state, input, start, stop );
+			MatchResult result = subexp.processList( state, input, start, stop );
 			if ( result.isValid() )
 			{
 				return result;

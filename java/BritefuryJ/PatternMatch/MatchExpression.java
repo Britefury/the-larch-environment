@@ -34,8 +34,7 @@ public abstract class MatchExpression implements ParserExpressionInterface
 	public MatchResult parseNode(Object input, Object arg, MatchAction delegateAction)
 	{
 		MatchState state = new MatchState( arg, delegateAction );
-		List<Object> inputInList = Arrays.asList( new Object[] { input } );
-		return evaluateNode( state, inputInList, 0, 1 );
+		return processNode( state, input );
 	}
 	
 	public MatchResult parseNode(Object input, PyObject delegateAction)
@@ -64,8 +63,7 @@ public abstract class MatchExpression implements ParserExpressionInterface
 	{
 		MatchState state = new MatchState( arg, delegateAction );
 		state.enableDebugging();
-		List<Object> inputInList = Arrays.asList( new Object[] { input } );
-		return (DebugMatchResult)evaluateNode( state, inputInList, 0, 1 );
+		return (DebugMatchResult)processNode( state, input );
 	}
 	
 	public DebugMatchResult debugParseNode(Object input, PyObject delegateAction)
@@ -80,7 +78,7 @@ public abstract class MatchExpression implements ParserExpressionInterface
 	
 	
 
-	protected MatchResult evaluateNode(MatchState state, Object input, int start, int stop)
+	protected MatchResult processNode(MatchState state, Object input)
 	{
 		if ( state.bDebuggingEnabled )
 		{
@@ -93,7 +91,7 @@ public abstract class MatchExpression implements ParserExpressionInterface
 			state.debugStack = node;
 			
 			// Get the parse result
-			MatchResult result = parseNode( state, input, start, stop );
+			MatchResult result = evaluateNode( state, input );
 			node.setResult( result );
 			
 			// If @prev is valid, add @node as a call-child of @prev
@@ -124,12 +122,61 @@ public abstract class MatchExpression implements ParserExpressionInterface
 		}
 		else
 		{
-			return parseNode( state, input, start, stop );
+			return evaluateNode( state, input );
+		}
+	}	
+	
+	protected MatchResult processList(MatchState state, List<Object> input, int start, int stop)
+	{
+		if ( state.bDebuggingEnabled )
+		{
+			// Get the current top of the debug stack (outer call)
+			DebugNode prev = state.debugStack;
+			// Create the debug info node
+			DebugNode node = new DebugNode( prev, this, input );
+
+			// Push @node onto the debug stack
+			state.debugStack = node;
+			
+			// Get the parse result
+			MatchResult result = evaluateList( state, input, start, stop );
+			node.setResult( result );
+			
+			// If @prev is valid, add @node as a call-child of @prev
+			if ( prev != null )
+			{
+				prev.addCallChild( node );
+			}
+			
+			// Pop @node off the debug stack
+			state.debugStack = prev;
+			
+			
+			if ( result instanceof DebugMatchResult )
+			{
+				DebugMatchResult debugResult = (DebugMatchResult)result;
+				
+				DebugNode fromNode = node;
+				DebugNode toNode = debugResult.debugNode;
+				
+				if ( !fromNode.getCallChildren().contains( toNode ) )
+				{
+					fromNode.addMemoChild( toNode );
+				}
+			}
+			
+			
+			return result.debug( node );
+		}
+		else
+		{
+			return evaluateList( state, input, start, stop );
 		}
 	}	
 	
 	
-	protected abstract MatchResult parseNode(MatchState state, Object input, int start, int stop);
+	protected abstract MatchResult evaluateNode(MatchState state, Object input);
+	protected abstract MatchResult evaluateList(MatchState state, List<Object> input, int start, int stop);
 	
 	
 	

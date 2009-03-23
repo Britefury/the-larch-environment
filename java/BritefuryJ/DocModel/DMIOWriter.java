@@ -6,10 +6,10 @@
 //##************************
 package BritefuryJ.DocModel;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -24,8 +24,8 @@ public class DMIOWriter
 	}
 	
 	
-	public static String unquotedStringPunctuationChars = "+-*/%^&|!$@.,<>=[]~";
-	public static String quotedStringPunctuationChars = "+-*/%^&|!$@.,<>=[]~'()` ";
+	public static String unquotedStringPunctuationChars = "+-*/%^&|!$@.,<>~";
+	public static String quotedStringPunctuationChars = "+-*/%^&|!$@.,<>=[]{}~'()` ";
 	public static Pattern unquotedString = Pattern.compile( "[0-9A-Za-z_" + Pattern.quote( unquotedStringPunctuationChars ) + "]+" );
 	public static Pattern quotedStringContents = Pattern.compile( "[0-9A-Za-z_" + Pattern.quote( quotedStringPunctuationChars ) + "]+" );
 	
@@ -33,6 +33,7 @@ public class DMIOWriter
 	
 	private HashMap<DMModule, String> moduleToName;
 	private HashSet<String> names;
+	private ArrayList<DMModule> modulesInOrder;
 	
 	
 	
@@ -41,6 +42,7 @@ public class DMIOWriter
 	{
 		moduleToName = new HashMap<DMModule, String>();
 		names = new HashSet<String>();
+		modulesInOrder = new ArrayList<DMModule>();
 	}
 	
 
@@ -97,6 +99,7 @@ public class DMIOWriter
 			
 			moduleToName.put( mod, modName );
 			names.add( modName );
+			modulesInOrder.add( mod );
 		}
 		
 		builder.append( modName );
@@ -159,13 +162,16 @@ public class DMIOWriter
 			StringBuilder docBuilder = new StringBuilder();
 			docBuilder.append( "{" );
 			
-			for (Map.Entry<DMModule, String> e: moduleToName.entrySet())
+			for (DMModule mod: modulesInOrder)
 			{
-				docBuilder.append( e.getValue() );
+				String name = moduleToName.get( mod );
+				docBuilder.append( name );
 				docBuilder.append( "=" );
-				docBuilder.append( e.getKey().getLocation() );
+				docBuilder.append( mod.getLocation() );
 				docBuilder.append( " ");
 			}
+			
+			docBuilder.append( ": " );
 			
 			docBuilder.append( builder );
 			
