@@ -328,11 +328,11 @@ public abstract class MatchExpression implements ParserExpressionInterface
 		}
 		else if ( x instanceof List )
 		{
-			return new ListNode( (List<Object>)x );
+			return new ListMatch( (List<Object>)x );
 		}
 		else if ( x.getClass().isArray() )
 		{
-			return new ListNode( Arrays.asList( (Object[])x ) );
+			return new ListMatch( Arrays.asList( (Object[])x ) );
 		}
 		else
 		{

@@ -12,19 +12,19 @@ import java.util.List;
 
 import BritefuryJ.PatternMatch.MatchResult.NameAlreadyBoundException;
 
-public class ListNode extends BranchExpression
+public class ListMatch extends BranchExpression
 {
-	public ListNode(MatchExpression[] subexps)
+	public ListMatch(MatchExpression[] subexps)
 	{
 		super( subexps );
 	}
 	
-	public ListNode(Object[] subexps)
+	public ListMatch(Object[] subexps)
 	{
 		super( subexps );
 	}
 	
-	public ListNode(List<Object> subexps)
+	public ListMatch(List<Object> subexps)
 	{
 		super( subexps );
 	}
