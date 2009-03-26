@@ -65,7 +65,7 @@ public class DMModule
 		return c;
 	}
 	
-	public void set(String name, DMObjectClass c) throws ClassAlreadyDefinedException
+	public void registerClass(String name, DMObjectClass c) throws ClassAlreadyDefinedException
 	{
 		if ( classes.containsKey( name ) )
 		{
@@ -86,42 +86,25 @@ public class DMModule
 		return c;
 	}
 	
-	public void __setitem__(String name, DMObjectClass c)
-	{
-		if ( classes.containsKey( name ) )
-		{
-			throw Py.KeyError( name );
-		}
-		classes.put( name, c );
-	}
-	
 	
 	
 	public DMObjectClass newClass(String name, DMObjectField fields[]) throws ClassAlreadyDefinedException
 	{
-		DMObjectClass c = new DMObjectClass( this, name, fields );
-		set( name, c );
-		return c;
+		return new DMObjectClass( this, name, fields );
 	}
 
 	public DMObjectClass newClass(String name, String fieldNames[]) throws ClassAlreadyDefinedException
 	{
-		DMObjectClass c = new DMObjectClass( this, name, fieldNames );
-		set( name, c );
-		return c;
+		return new DMObjectClass( this, name, fieldNames );
 	}
 
 	public DMObjectClass newClass(String name, DMObjectClass superClass, DMObjectField fields[]) throws ClassAlreadyDefinedException
 	{
-		DMObjectClass c = new DMObjectClass( this, name, superClass, fields );
-		set( name, c );
-		return c;
+		return new DMObjectClass( this, name, superClass, fields );
 	}
 
 	public DMObjectClass newClass(String name, DMObjectClass superClass, String fieldNames[]) throws ClassAlreadyDefinedException
 	{
-		DMObjectClass c = new DMObjectClass( this, name, superClass, fieldNames );
-		set( name, c );
-		return c;
+		return new DMObjectClass( this, name, superClass, fieldNames );
 	}
 }

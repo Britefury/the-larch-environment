@@ -14,6 +14,7 @@ import java.util.Map;
 import org.python.core.PyDictionary;
 import org.python.core.PyObject;
 
+import BritefuryJ.DocModel.DMModule.ClassAlreadyDefinedException;
 import BritefuryJ.PatternMatch.ObjectMatch;
 
 
@@ -40,7 +41,7 @@ public class DMObjectClass
 	
 	
 	
-	public DMObjectClass(DMModule module, String name, DMObjectField fields[])
+	public DMObjectClass(DMModule module, String name, DMObjectField fields[]) throws ClassAlreadyDefinedException
 	{
 		this.module = module;
 		this.name = name.intern();
@@ -52,14 +53,14 @@ public class DMObjectClass
 		initialise();
 	}
 	
-	public DMObjectClass(DMModule module, String name, String fieldNames[])
+	public DMObjectClass(DMModule module, String name, String fieldNames[]) throws ClassAlreadyDefinedException
 	{
 		this( module, name, DMObjectField.nameArrayToFieldArray( fieldNames ) );
 	}
 	
 	
 	
-	public DMObjectClass(DMModule module, String name, DMObjectClass superclass, DMObjectField fields[])
+	public DMObjectClass(DMModule module, String name, DMObjectClass superclass, DMObjectField fields[]) throws ClassAlreadyDefinedException
 	{
 		this.module = module;
 		this.name = name.intern();
@@ -77,9 +78,22 @@ public class DMObjectClass
 		initialise();
 	}
 
-	public DMObjectClass(DMModule module, String name, DMObjectClass superclass, String fieldNames[])
+	public DMObjectClass(DMModule module, String name, DMObjectClass superclass, String fieldNames[]) throws ClassAlreadyDefinedException
 	{
 		this( module, name, superclass, DMObjectField.nameArrayToFieldArray( fieldNames ) );
+	}
+	
+	
+	
+	private void initialise() throws ClassAlreadyDefinedException
+	{
+		fieldNameToIndex = new HashMap<String, Integer>();
+		for (int i = 0; i < allClassFields.length; i++)
+		{
+			fieldNameToIndex.put( allClassFields[i].getName(), new Integer( i ) );
+		}
+		
+		module.registerClass( name, this );
 	}
 	
 	
@@ -158,17 +172,6 @@ public class DMObjectClass
 		return fieldNames;
 	}
 
-	
-	private void initialise()
-	{
-		fieldNameToIndex = new HashMap<String, Integer>();
-		for (int i = 0; i < allClassFields.length; i++)
-		{
-			fieldNameToIndex.put( allClassFields[i].getName(), new Integer( i ) );
-		}
-	}
-	
-	
 	
 	public DMObject newInstance()
 	{
