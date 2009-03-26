@@ -15,23 +15,21 @@ import junit.framework.TestCase;
 
 public class Test_DMModule extends TestCase
 {
-	public void test_set_get() throws UnknownClassException, ClassAlreadyDefinedException
+	public void test_get() throws UnknownClassException, ClassAlreadyDefinedException
 	{
 		DMModule m = new DMModule( "m", "m", "test.m" );
 		
 		DMObjectClass c = new DMObjectClass( m, "c", new String[] {} );
 		
-		m.set( "c", c );
 		assertSame( m.get( "c" ), c );
 	}
 
-	public void test_setitem_getitem()
+	public void test_getitem() throws ClassAlreadyDefinedException
 	{
 		DMModule m = new DMModule( "m", "m", "test.m" );
 		
 		DMObjectClass c = new DMObjectClass( m, "c", new String[] {} );
 		
-		m.__setitem__( "c", c );
 		assertSame( m.__getitem__( "c" ), c );
 	}
 	
