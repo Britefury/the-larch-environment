@@ -237,6 +237,11 @@ public class DMObjectClass
 	
 	
 	
+	public DMObject __call__(Object values[])
+	{
+		return newInstance( values );
+	}
+
 	public DMObject __call__(PyObject values[], String names[])
 	{
 		return newInstance( values, names );
