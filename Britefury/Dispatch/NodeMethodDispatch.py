@@ -15,6 +15,40 @@ import inspect
 
 
 
+
+"""
+Defines a metaclass for dispatching method calls based on node classes of DMObject instances.
+The name of the class is used to choose the method to call.
+Rules of inheritance apply; names of superclasses will be used if that is all that is available
+
+Methods should have the form:
+
+def NodeClass(self, arg0, arg1, ... argM, node, fieldName0, fieldName1, ... fieldNameN):
+	pass
+	
+arg0 ... argM
+	Additional arguments passed to method calls. They are passed in a tuple to
+	the 'args' parameter of the nodeMethodDispatch() function.
+node
+	A reference to the node
+fieldName0 ... fieldNameN
+	The names of fields in the node class
+	
+	
+A dispatch class is declared like so:
+class MyDispatch (object):
+	__metaclass__ = NodeMethodDispatchMetaClass
+	__module__ = MyModule
+	__num_args__ = M
+	
+MyModule
+	a reference to the DMModule in which all the node classes are defined
+M
+	the number of additional arguments (arg0 ... argM  above)
+"""
+
+
+
 class BadFieldNameException (Exception):
 	pass
 
@@ -25,7 +59,7 @@ class NodeMethodDispatchMetaClass (type):
 			self._function = function
 			args, varargs, varkw, defaults = inspect.getargspec( function )
 			assert varargs is None
-			self._indices = [ self._getFieldIndex( dmClass, name )   for name in args[1+numArgs:] ]
+			self._indices = [ self._getFieldIndex( dmClass, name )   for name in args[2+numArgs:] ]
 			
 			self._varKWTable = None
 			if varkw is not None:
@@ -36,7 +70,7 @@ class NodeMethodDispatchMetaClass (type):
 						
 						
 		def call(self, object, dispatchSelf, args):
-			callArgs = args + tuple( [ object.get( index )   for index in self._indices ] )
+			callArgs = args + tuple( [ object ] + [ object.get( index )   for index in self._indices ] )
 			
 			if self._varKWTable is None:
 				return self._function( dispatchSelf, *callArgs )

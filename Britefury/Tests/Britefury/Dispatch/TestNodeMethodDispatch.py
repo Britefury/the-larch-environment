@@ -28,10 +28,10 @@ class TestCase_nodeMethodDispatch (unittest.TestCase):
 			__num_args__ = 0
 			
 			
-			def A(self, x, y):
+			def A(self, node, x, y):
 				return x + y
 		
-			#def B(self, x, y, p, q):
+			#def B(self, node, x, y, p, q):
 			#	return x + y + p + q
 		
 		self.DispatchTest = DispatchTest
