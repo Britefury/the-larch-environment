@@ -159,7 +159,7 @@ class Python25Grammar (Grammar):
 	# Target (assignment, for-loop, ...)
 	@Rule
 	def singleTarget(self):
-		return self.pythonIdentifier().action( lambda input, pos, xs: [ 'singleTarget', xs ] )
+		return self.pythonIdentifier().action( lambda input, pos, xs: Nodes.SingleTarget( name=xs ) )
 	
 	@Rule
 	def tupleTarget(self):
@@ -908,23 +908,23 @@ class TestCase_Python25Parser (ParserTestCase):
 		
 	def testTargets(self):
 		g = Python25Grammar()
-		self._matchTest( g.targetList(), 'a', [ 'singleTarget', 'a' ] )
-		self._matchTest( g.targetList(), '(a)', [ 'singleTarget', 'a' ] )
+		self._matchTest( g.targetList(), 'a', Nodes.SingleTarget( name='a' ) )
+		self._matchTest( g.targetList(), '(a)', Nodes.SingleTarget( name='a' ) )
 		
-		self._matchTest( g.targetList(), '(a,)', [ 'tupleTarget', [ 'singleTarget', 'a' ] ] )
-		self._matchTest( g.targetList(), 'a,b', [ 'tupleTarget', [ 'singleTarget', 'a' ],  [ 'singleTarget', 'b' ] ] )
-		self._matchTest( g.targetList(), '(a,b)', [ 'tupleTarget', [ 'singleTarget', 'a' ],  [ 'singleTarget', 'b' ] ] )
-		self._matchTest( g.targetList(), '(a,b,)', [ 'tupleTarget', [ 'singleTarget', 'a' ],  [ 'singleTarget', 'b' ] ] )
-		self._matchTest( g.targetList(), '(a,b),(c,d)', [ 'tupleTarget', [ 'tupleTarget', [ 'singleTarget', 'a' ], [ 'singleTarget', 'b' ] ], [ 'tupleTarget', [ 'singleTarget', 'c' ], [ 'singleTarget', 'd' ] ] ] )
+		self._matchTest( g.targetList(), '(a,)', [ 'tupleTarget', Nodes.SingleTarget( name='a' ) ] )
+		self._matchTest( g.targetList(), 'a,b', [ 'tupleTarget', Nodes.SingleTarget( name='a' ),  Nodes.SingleTarget( name='b' ) ] )
+		self._matchTest( g.targetList(), '(a,b)', [ 'tupleTarget', Nodes.SingleTarget( name='a' ),  Nodes.SingleTarget( name='b' ) ] )
+		self._matchTest( g.targetList(), '(a,b,)', [ 'tupleTarget', Nodes.SingleTarget( name='a' ),  Nodes.SingleTarget( name='b' ) ] )
+		self._matchTest( g.targetList(), '(a,b),(c,d)', [ 'tupleTarget', [ 'tupleTarget', Nodes.SingleTarget( name='a' ), Nodes.SingleTarget( name='b' ) ], [ 'tupleTarget', Nodes.SingleTarget( name='c' ), Nodes.SingleTarget( name='d' ) ] ] )
 		
 		self._matchFailTest( g.targetList(), '(a,) (b,)' )
 
-		self._matchTest( g.targetList(), '[a]', [ 'listTarget', [ 'singleTarget', 'a' ] ] )
-		self._matchTest( g.targetList(), '[a,]', [ 'listTarget', [ 'singleTarget', 'a' ] ] )
-		self._matchTest( g.targetList(), '[a,b]', [ 'listTarget', [ 'singleTarget', 'a' ],  [ 'singleTarget', 'b' ] ] )
-		self._matchTest( g.targetList(), '[a,b,]', [ 'listTarget', [ 'singleTarget', 'a' ],  [ 'singleTarget', 'b' ] ] )
-		self._matchTest( g.targetList(), '[a],[b,]', [ 'tupleTarget', [ 'listTarget', [ 'singleTarget', 'a' ] ], [ 'listTarget', [ 'singleTarget', 'b' ] ] ] )
-		self._matchTest( g.targetList(), '[(a,)],[(b,)]', [ 'tupleTarget', [ 'listTarget', [ 'tupleTarget', [ 'singleTarget', 'a' ] ] ], [ 'listTarget', [ 'tupleTarget', [ 'singleTarget', 'b' ] ] ] ] )
+		self._matchTest( g.targetList(), '[a]', [ 'listTarget', Nodes.SingleTarget( name='a' ) ] )
+		self._matchTest( g.targetList(), '[a,]', [ 'listTarget', Nodes.SingleTarget( name='a' ) ] )
+		self._matchTest( g.targetList(), '[a,b]', [ 'listTarget', Nodes.SingleTarget( name='a' ),  Nodes.SingleTarget( name='b' )] )
+		self._matchTest( g.targetList(), '[a,b,]', [ 'listTarget', Nodes.SingleTarget( name='a' ),  Nodes.SingleTarget( name='b' ) ] )
+		self._matchTest( g.targetList(), '[a],[b,]', [ 'tupleTarget', [ 'listTarget', Nodes.SingleTarget( name='a' ) ], [ 'listTarget', Nodes.SingleTarget( name='b' ) ] ] )
+		self._matchTest( g.targetList(), '[(a,)],[(b,)]', [ 'tupleTarget', [ 'listTarget', [ 'tupleTarget', Nodes.SingleTarget( name='a' ) ] ], [ 'listTarget', [ 'tupleTarget', Nodes.SingleTarget( name='b' ) ] ] ] )
 
 		self._matchTest( g.subscript(), 'a[x]', [ 'subscript', [ 'var', 'a' ], [ 'var', 'x' ] ] )
 		self._matchTest( g.attributeRef() | g.subscript(), 'a[x]', [ 'subscript', [ 'var', 'a' ], [ 'var', 'x' ] ] )
@@ -947,26 +947,26 @@ class TestCase_Python25Parser (ParserTestCase):
 	def testListComprehension(self):
 		g = Python25Grammar()
 		self._matchTest( g.expression(), '[i  for i in a]', [ 'listComprehension', [ 'var', 'i' ],
-												[ 'comprehensionFor', [ 'singleTarget', 'i' ], [ 'var', 'a' ] ] 
+												[ 'comprehensionFor', Nodes.SingleTarget( name='i' ), [ 'var', 'a' ] ] 
 												] )
 		self._matchFailTest( g.expression(), '[i  if x]', )
 		self._matchTest( g.expression(), '[i  for i in a  if x]', [ 'listComprehension', [ 'var', 'i' ],
-												[ 'comprehensionFor', [ 'singleTarget', 'i' ], [ 'var', 'a' ] ],
+												[ 'comprehensionFor', Nodes.SingleTarget( name='i' ), [ 'var', 'a' ] ],
 												[ 'comprehensionIf', [ 'var', 'x' ] ]
 												] )
 		self._matchTest( g.expression(), '[i  for i in a  for j in b]', [ 'listComprehension', [ 'var', 'i' ],
-												[ 'comprehensionFor', [ 'singleTarget', 'i' ], [ 'var', 'a' ] ],
-												[ 'comprehensionFor', [ 'singleTarget', 'j' ], [ 'var', 'b' ] ]
+												[ 'comprehensionFor', Nodes.SingleTarget( name='i' ), [ 'var', 'a' ] ],
+												[ 'comprehensionFor', Nodes.SingleTarget( name='j' ), [ 'var', 'b' ] ]
 												] )
 		self._matchTest( g.expression(), '[i  for i in a  if x  for j in b]', [ 'listComprehension', [ 'var', 'i' ],
-												[ 'comprehensionFor', [ 'singleTarget', 'i' ], [ 'var', 'a' ] ],
+												[ 'comprehensionFor', Nodes.SingleTarget( name='i' ), [ 'var', 'a' ] ],
 												[ 'comprehensionIf', [ 'var', 'x' ] ],
-												[ 'comprehensionFor', [ 'singleTarget', 'j' ], [ 'var', 'b' ] ]
+												[ 'comprehensionFor', Nodes.SingleTarget( name='j' ), [ 'var', 'b' ] ]
 												] )
 		self._matchTest( g.expression(), '[i  for i in a  if x  for j in b  if y]', [ 'listComprehension', [ 'var', 'i' ],
-												[ 'comprehensionFor', [ 'singleTarget', 'i' ], [ 'var', 'a' ] ],
+												[ 'comprehensionFor', Nodes.SingleTarget( name='i' ), [ 'var', 'a' ] ],
 												[ 'comprehensionIf', [ 'var', 'x' ] ],
-												[ 'comprehensionFor', [ 'singleTarget', 'j' ], [ 'var', 'b' ] ],
+												[ 'comprehensionFor', Nodes.SingleTarget( name='j' ), [ 'var', 'b' ] ],
 												[ 'comprehensionIf', [ 'var', 'y' ] ]
 												] )
 		
@@ -975,26 +975,26 @@ class TestCase_Python25Parser (ParserTestCase):
 	def testGeneratorExpression(self):
 		g = Python25Grammar()
 		self._matchTest( g.expression(), '(i  for i in a)', [ 'generatorExpression', [ 'var', 'i' ],
-												[ 'comprehensionFor', [ 'singleTarget', 'i' ], [ 'var', 'a' ] ]
+												[ 'comprehensionFor', Nodes.SingleTarget( name='i' ), [ 'var', 'a' ] ]
 												] )
 		self._matchFailTest( g.expression(), '(i  if x)', )
 		self._matchTest( g.expression(), '(i  for i in a  if x)', [ 'generatorExpression', [ 'var', 'i' ],
-												[ 'comprehensionFor', [ 'singleTarget', 'i' ], [ 'var', 'a' ] ],
+												[ 'comprehensionFor', Nodes.SingleTarget( name='i' ), [ 'var', 'a' ] ],
 												[ 'comprehensionIf', [ 'var', 'x' ] ]
 												] )
 		self._matchTest( g.expression(), '(i  for i in a  for j in b)', [ 'generatorExpression', [ 'var', 'i' ],
-												[ 'comprehensionFor', [ 'singleTarget', 'i' ], [ 'var', 'a' ] ],
-												[ 'comprehensionFor', [ 'singleTarget', 'j' ], [ 'var', 'b' ] ]
+												[ 'comprehensionFor', Nodes.SingleTarget( name='i' ), [ 'var', 'a' ] ],
+												[ 'comprehensionFor', Nodes.SingleTarget( name='j' ), [ 'var', 'b' ] ]
 												] )
 		self._matchTest( g.expression(), '(i  for i in a  if x  for j in b)', [ 'generatorExpression', [ 'var', 'i' ],
-												[ 'comprehensionFor', [ 'singleTarget', 'i' ], [ 'var', 'a' ] ],
+												[ 'comprehensionFor', Nodes.SingleTarget( name='i' ), [ 'var', 'a' ] ],
 												[ 'comprehensionIf', [ 'var', 'x' ] ],
-												[ 'comprehensionFor', [ 'singleTarget', 'j' ], [ 'var', 'b' ] ]
+												[ 'comprehensionFor', Nodes.SingleTarget( name='j' ), [ 'var', 'b' ] ]
 												] )
 		self._matchTest( g.expression(), '(i  for i in a  if x  for j in b  if y)', [ 'generatorExpression', [ 'var', 'i' ],
-												[ 'comprehensionFor', [ 'singleTarget', 'i' ], [ 'var', 'a' ] ],
+												[ 'comprehensionFor', Nodes.SingleTarget( name='i' ), [ 'var', 'a' ] ],
 												[ 'comprehensionIf', [ 'var', 'x' ] ],
-												[ 'comprehensionFor', [ 'singleTarget', 'j' ], [ 'var', 'b' ] ],
+												[ 'comprehensionFor', Nodes.SingleTarget( name='j' ), [ 'var', 'b' ] ],
 												[ 'comprehensionIf', [ 'var', 'y' ] ]
 												] )
 
@@ -1007,7 +1007,7 @@ class TestCase_Python25Parser (ParserTestCase):
 		
 	def testYieldExpression(self):
 		g = Python25Grammar()
-		self._matchTest( g.expression(), '(yield 2+3)', [ 'yieldExpr', [ 'add', [ 'intLiteral', 'decimal', 'int', '2' ], [ 'intLiteral', 'decimal', 'int', '3' ] ] ] )
+		self._matchTest( g.expression(), '(yield 2+3)', [ 'yieldExpr', [ 'add', Nodes.IntLiteral( format='decimal', numType='int', value='2' ), Nodes.IntLiteral( format='decimal', numType='int', value='3' ) ] ] )
 		
 		
 
@@ -1110,8 +1110,8 @@ class TestCase_Python25Parser (ParserTestCase):
 		g = Python25Grammar()
 		self._matchTest( g.tupleOrExpression(), 'a', [ 'var', 'a' ] )
 		self._matchTest( g.tupleOrExpression(), 'a,b', [ 'tupleLiteral', [ 'var', 'a' ], [ 'var', 'b' ] ] )
-		self._matchTest( g.tupleOrExpression(), 'a,2', [ 'tupleLiteral', [ 'var', 'a' ], [ 'intLiteral', 'decimal', 'int', '2' ] ] )
-		self._matchTest( g.tupleOrExpression(), 'lambda x, y: x+y,2', [ 'tupleLiteral', [ 'lambdaExpr', [ [ 'simpleParam', 'x' ], [ 'simpleParam', 'y' ] ], [ 'add', [ 'var', 'x' ], [ 'var', 'y' ] ] ], [ 'intLiteral', 'decimal', 'int', '2' ] ] )
+		self._matchTest( g.tupleOrExpression(), 'a,2', [ 'tupleLiteral', [ 'var', 'a' ], Nodes.IntLiteral( format='decimal', numType='int', value='2' ) ] )
+		self._matchTest( g.tupleOrExpression(), 'lambda x, y: x+y,2', [ 'tupleLiteral', [ 'lambdaExpr', [ [ 'simpleParam', 'x' ], [ 'simpleParam', 'y' ] ], [ 'add', [ 'var', 'x' ], [ 'var', 'y' ] ] ], Nodes.IntLiteral( format='decimal', numType='int', value='2' ) ] )
 		
 		
 		
@@ -1123,25 +1123,26 @@ class TestCase_Python25Parser (ParserTestCase):
 	
 	def testAssignmentStmt(self):
 		g = Python25Grammar()
-		self._matchTest( g.statement(), 'a=x', [ 'assignmentStmt', [ [ 'singleTarget', 'a' ] ], [ 'var', 'x' ] ] )
-		self._matchTest( g.statement(), 'a,b=c,d=x', [ 'assignmentStmt', [ [ 'tupleTarget', [ 'singleTarget', 'a' ],  [ 'singleTarget', 'b' ] ],  [ 'tupleTarget', [ 'singleTarget', 'c' ],  [ 'singleTarget', 'd' ] ] ], [ 'var', 'x' ] ] )
-		self._matchTest( g.statement(), 'a=yield x', [ 'assignmentStmt', [ [ 'singleTarget', 'a' ] ], [ 'yieldExpr', [ 'var', 'x' ] ] ] )
+		self._matchTest( g.statement(), 'a=x', [ 'assignmentStmt', [ Nodes.SingleTarget( name='a' ) ], [ 'var', 'x' ] ] )
+		self._matchTest( g.statement(), 'a,b=c,d=x', [ 'assignmentStmt', [ [ 'tupleTarget', Nodes.SingleTarget( name='a' ),  Nodes.SingleTarget( name='b' ) ],
+										   [ 'tupleTarget', Nodes.SingleTarget( name='c' ),  Nodes.SingleTarget( name='d' ) ] ], [ 'var', 'x' ] ] )
+		self._matchTest( g.statement(), 'a=yield x', [ 'assignmentStmt', [ Nodes.SingleTarget( name='a' ) ], [ 'yieldExpr', [ 'var', 'x' ] ] ] )
 		self._matchFailTest( g.statement(), '=x' )
 		
 		
 	def testAugAssignStmt(self):
 		g = Python25Grammar()
-		self._matchTest( g.statement(), 'a += b', [ 'augAssignStmt', '+=', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
-		self._matchTest( g.statement(), 'a -= b', [ 'augAssignStmt', '-=', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
-		self._matchTest( g.statement(), 'a *= b', [ 'augAssignStmt', '*=', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
-		self._matchTest( g.statement(), 'a /= b', [ 'augAssignStmt', '/=', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
-		self._matchTest( g.statement(), 'a %= b', [ 'augAssignStmt', '%=', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
-		self._matchTest( g.statement(), 'a **= b', [ 'augAssignStmt', '**=', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
-		self._matchTest( g.statement(), 'a >>= b', [ 'augAssignStmt', '>>=', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
-		self._matchTest( g.statement(), 'a <<= b', [ 'augAssignStmt', '<<=', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
-		self._matchTest( g.statement(), 'a &= b', [ 'augAssignStmt', '&=', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
-		self._matchTest( g.statement(), 'a ^= b', [ 'augAssignStmt', '^=', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
-		self._matchTest( g.statement(), 'a |= b', [ 'augAssignStmt', '|=', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
+		self._matchTest( g.statement(), 'a += b', [ 'augAssignStmt', '+=', Nodes.SingleTarget( name='a' ), [ 'var', 'b' ] ] )
+		self._matchTest( g.statement(), 'a -= b', [ 'augAssignStmt', '-=', Nodes.SingleTarget( name='a' ), [ 'var', 'b' ] ] )
+		self._matchTest( g.statement(), 'a *= b', [ 'augAssignStmt', '*=', Nodes.SingleTarget( name='a' ), [ 'var', 'b' ] ] )
+		self._matchTest( g.statement(), 'a /= b', [ 'augAssignStmt', '/=', Nodes.SingleTarget( name='a' ), [ 'var', 'b' ] ] )
+		self._matchTest( g.statement(), 'a %= b', [ 'augAssignStmt', '%=', Nodes.SingleTarget( name='a' ), [ 'var', 'b' ] ] )
+		self._matchTest( g.statement(), 'a **= b', [ 'augAssignStmt', '**=', Nodes.SingleTarget( name='a' ), [ 'var', 'b' ] ] )
+		self._matchTest( g.statement(), 'a >>= b', [ 'augAssignStmt', '>>=', Nodes.SingleTarget( name='a' ), [ 'var', 'b' ] ] )
+		self._matchTest( g.statement(), 'a <<= b', [ 'augAssignStmt', '<<=', Nodes.SingleTarget( name='a' ), [ 'var', 'b' ] ] )
+		self._matchTest( g.statement(), 'a &= b', [ 'augAssignStmt', '&=', Nodes.SingleTarget( name='a' ), [ 'var', 'b' ] ] )
+		self._matchTest( g.statement(), 'a ^= b', [ 'augAssignStmt', '^=', Nodes.SingleTarget( name='a' ), [ 'var', 'b' ] ] )
+		self._matchTest( g.statement(), 'a |= b', [ 'augAssignStmt', '|=', Nodes.SingleTarget( name='a' ), [ 'var', 'b' ] ] )
 
 		
 	def testPassStmt(self):
@@ -1151,7 +1152,7 @@ class TestCase_Python25Parser (ParserTestCase):
 		
 	def testDelStmt(self):
 		g = Python25Grammar()
-		self._matchTest( g.statement(), 'del x', [ 'delStmt', [ 'singleTarget', 'x' ] ] )
+		self._matchTest( g.statement(), 'del x', [ 'delStmt', Nodes.SingleTarget( name='x' ) ] )
 		
 		
 	def testReturnStmt(self):
@@ -1262,7 +1263,7 @@ class TestCase_Python25Parser (ParserTestCase):
 		
 	def testForStmt(self):
 		g = Python25Grammar()
-		self._matchTest( g.forStmt(), 'for x in y:', [ 'forStmt', [ 'singleTarget', 'x' ], [ 'var', 'y' ], [] ] )
+		self._matchTest( g.forStmt(), 'for x in y:', [ 'forStmt', Nodes.SingleTarget( name='x' ), [ 'var', 'y' ], [] ] )
 		
 		
 	def testTryStmt(self):
@@ -1274,7 +1275,7 @@ class TestCase_Python25Parser (ParserTestCase):
 		g = Python25Grammar()
 		self._matchTest( g.exceptStmt(), 'except:', [ 'exceptStmt', makeNullNode(), makeNullNode(), [] ] )
 		self._matchTest( g.exceptStmt(), 'except x:', [ 'exceptStmt', [ 'var', 'x' ], makeNullNode(), [] ] )
-		self._matchTest( g.exceptStmt(), 'except x, y:', [ 'exceptStmt', [ 'var', 'x' ], [ 'singleTarget', 'y' ], [] ] )
+		self._matchTest( g.exceptStmt(), 'except x, y:', [ 'exceptStmt', [ 'var', 'x' ], Nodes.SingleTarget( name='y' ), [] ] )
 		
 		
 	def testFinallyStmt(self):
@@ -1285,7 +1286,7 @@ class TestCase_Python25Parser (ParserTestCase):
 	def testWithStmt(self):
 		g = Python25Grammar()
 		self._matchTest( g.withStmt(), 'with a:', [ 'withStmt', [ 'var', 'a' ], makeNullNode(), [] ] )
-		self._matchTest( g.withStmt(), 'with a as b:', [ 'withStmt', [ 'var', 'a' ], [ 'singleTarget', 'b' ], [] ] )
+		self._matchTest( g.withStmt(), 'with a as b:', [ 'withStmt', [ 'var', 'a' ], Nodes.SingleTarget( name='b' ), [] ] )
 		
 		
 	def testDefStmt(self):
@@ -1326,7 +1327,7 @@ class TestCase_Python25Parser (ParserTestCase):
 		
 	def testDictInList(self):
 		g = Python25Grammar()
-		self._matchTest( g.statement(), 'y = [ x, { a : b } ]', [ 'assignmentStmt', [ [ 'singleTarget', 'y' ] ], [ 'listLiteral', [ 'var', 'x' ], [ 'dictLiteral', [ 'keyValuePair', [ 'var', 'a' ], [ 'var', 'b' ] ] ] ] ] )
+		self._matchTest( g.statement(), 'y = [ x, { a : b } ]', [ 'assignmentStmt', [ Nodes.SingleTarget( name='y' ) ], [ 'listLiteral', [ 'var', 'x' ], [ 'dictLiteral', [ 'keyValuePair', [ 'var', 'a' ], [ 'var', 'b' ] ] ] ] ] )
 
 
 

@@ -22,18 +22,6 @@ def _deepList(xs):
 		return xs
 
 class ParserTestCase (unittest.TestCase):
-	def _cmpValue(self, x, y):
-		#x = _deepList( x )
-		#y = _deepList( y )
-		x = DMNode.coerce( x )
-		y = DMNode.coerce( y )
-		#xstr = DMIOWrite.writeSX( x )
-		#ystr = DMIOWrite.writeSX( y )
-		#return xstr == ystr
-		return x == y
-			
-	
-	
 	def _matchTest(self, parser, input, expected, ignoreChars=_whitespaceRegex):
 		result = parser.parseString( input, ignoreChars )
 		
@@ -43,7 +31,8 @@ class ParserTestCase (unittest.TestCase):
 			print expected
 		self.assert_( result.isValid() )
 		
-		value = result.value;
+		value = DMNode.coerce( result.value )
+		expected = DMNode.coerce( expected )
 
 		if result.end != len( input ):
 			print 'INCOMPLETE PARSE while parsing', input
@@ -54,13 +43,13 @@ class ParserTestCase (unittest.TestCase):
 			print 'RESULT:'
 			print value
 
-		bSame = self._cmpValue( value, expected )
+		bSame = value == expected
 		if not bSame:
 			print 'EXPECTED:'
 			print expected
 			print ''
 			print 'RESULT:'
-			print str( value )
+			print value
 		self.assert_( bSame )
 
 
@@ -76,7 +65,8 @@ class ParserTestCase (unittest.TestCase):
 			print expectedSX
 		self.assert_( result.isValid() )
 
-		value = result.value
+		value = DMNode.coerce( result.value )
+		expected = DMNode.coerce( expected )
 
 		if result.end != len( input ):
 			print 'INCOMPLETE PARSE while parsing', input
@@ -87,7 +77,7 @@ class ParserTestCase (unittest.TestCase):
 			print 'RESULT:'
 			print DMIOWrite.writeSX( value )
 
-		bSame = self._cmpValue( value, expected )
+		bSame = value == expected
 		if not bSame:
 			print 'EXPECTED:'
 			print expectedSX
