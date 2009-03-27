@@ -15,14 +15,17 @@ module = DMModule( 'Python25', 'py', 'org.Britefury.gSym.Languages.Python25' )
 # Node base classes
 #
 Node = module.newClass( 'Node', [] )
-Stmt = module.newClass( 'Stmt', Node, [] )
 Expr = module.newClass( 'Expr', Node, [ 'parens' ] )
+Stmt = module.newClass( 'Stmt', Node, [] )
+CompoundStmt = module.newClass( 'CompoundStmt', Stmt, [ 'suite' ] )
+
 
 #
-# Module, blank line, unparsed
+# Module, blank line, comment, unparsed
 #
 PythonModule = module.newClass( 'PythonModule', Node, [ 'contents' ] )
 BlankLine = module.newClass( 'BlankLine', Node, [] )
+CommentStmt = module.newClass( 'CommentStmt', Stmt, [ 'comment' ] )
 UNPARSED = module.newClass( 'UNPARSED', Node, [ 'value' ] )
 
 
@@ -32,8 +35,9 @@ UNPARSED = module.newClass( 'UNPARSED', Node, [ 'value' ] )
 Literal = module.newClass( 'Literal', Expr, [] )
 StringLiteral = module.newClass( 'StringLiteral', Literal, [ 'format', 'quotation', 'value' ] )
 IntLiteral = module.newClass( 'IntLiteral', Literal, [ 'format', 'numType', 'value' ] )
-FloatLIteral = module.newClass( 'FloatLiteral', Literal, [ 'value' ] )
+FloatLiteral = module.newClass( 'FloatLiteral', Literal, [ 'value' ] )
 ImaginaryLiteral = module.newClass( 'ImaginaryLiteral', Literal, [ 'value' ] )
+
 
 #
 # Targets
@@ -42,6 +46,7 @@ Target = module.newClass( 'Target', Node, [] )
 SingleTarget = module.newClass( 'SingleTarget', Target, [ 'name' ] )
 TupleTarget = module.newClass( 'TupleTarget', Target, [ 'targets' ] )
 ListTarget = module.newClass( 'ListTarget', Target, [ 'targets' ] )
+
 
 #
 # Expressions (various)
@@ -65,7 +70,7 @@ YieldAtom = module.newClass( 'YieldAtom', Expr, [ 'value' ] )
 AttributeRef = module.newClass( 'AttributeRef', Expr, [ 'target', 'name' ] )
 # Subscript
 SubscriptSlice = module.newClass( 'SubscriptSlice', Node, [ 'lower', 'upper' ] )
-SubscriptLongSlice = module.newClass( 'SubscriptSlice', Node, [ 'lower', 'upper', 'stride' ] )
+SubscriptLongSlice = module.newClass( 'SubscriptLongSlice', Node, [ 'lower', 'upper', 'stride' ] )
 SubscriptEllipsis = module.newClass( 'SubscriptEllipsis', Node, [] )
 SubscriptTuple = module.newClass( 'SubscriptTuple', Node, [ 'values' ] )
 Subscript = module.newClass( 'Subscript', Expr, [ 'target', 'index' ] )
@@ -104,15 +109,17 @@ OrTest = module.newClass( 'OrTest', Expr, [ 'x', 'y' ] )
 # Parameters for lambda / function definition
 SimpleParam = module.newClass( 'SimpleParam', Node, [ 'name' ] )
 DefaultValueParam = module.newClass( 'DefaultValueParam', Node, [ 'name', 'value' ] )
-ParamList = module.newClass( 'SimpleParam', Node, [ 'name' ] )
-KWParamList = module.newClass( 'SimpleParam', Node, [ 'name' ] )
+ParamList = module.newClass( 'ParamList', Node, [ 'name' ] )
+KWParamList = module.newClass( 'KWParamList', Node, [ 'name' ] )
 # Lambda
 LambdaExpr = module.newClass( 'LambdaExpr', Expr, [ 'params', 'expr' ] )
 # Conditional
 ConditionalExpr = module.newClass( 'ConditionalExpr', Expr, [ 'condition', 'expr', 'elseExpr' ] )
 
 
+#
 # Statements
+#
 AssertStmt = module.newClass( 'AssertStmt', Stmt, [ 'condition', 'fail' ] )
 AssignStmt = module.newClass( 'AssignStmt', Stmt, [ 'targets', 'value' ] )
 AugAssignStmt = module.newClass( 'AugAssignStmt', Stmt, [ 'op', 'target', 'value' ] )
@@ -123,3 +130,37 @@ YieldStmt = module.newClass( 'YieldStmt', Stmt, [ 'value' ] )
 RaiseStmt = module.newClass( 'RaiseStmt', Stmt, [ 'exc' ] )
 BreakStmt = module.newClass( 'BreakStmt', Stmt, [] )
 ContinueStmt = module.newClass( 'ContinueStmt', Stmt, [] )
+ExecStmt = module.newClass( 'ExecStmt', Stmt, [ 'source', 'locals', 'globals' ] )
+# Import
+RelativeModule = module.newClass( 'RelativeModule', Node, [ 'name' ] )
+ModuleImport = module.newClass( 'ModuleImport', Node, [ 'name' ] )
+ModuleImportAs = module.newClass( 'ModuleImportAs', Node, [ 'name', 'asName' ] )
+ModuleContentImport = module.newClass( 'ModuleContentImport', Node, [ 'name' ] )
+ModuleContentImportAs = module.newClass( 'ModuleContentImportAs', Node, [ 'name', 'asName' ] )
+ImportStmt = module.newClass( 'ImportStmt', Stmt, [ 'imports' ] )
+FromImportStmt = module.newClass( 'FromImportStmt', Stmt, [ 'module', 'imports' ] )
+FromImportAllStmt = module.newClass( 'FromImportAllStmt', Stmt, [ 'module' ] )
+# Global
+GlobalVar = module.newClass( 'GlobalVar', Node, [ 'name' ] )
+GlobalStmt = module.newClass( 'GlobalStmt', Stmt, [ 'vars' ] )
+
+
+#
+# Compound statements
+#
+IfStmt = module.newClass( 'IfStmt', CompoundStmt, [ 'condition' ] )
+ElIfStmt = module.newClass( 'ElIfStmt', CompoundStmt, [ 'condition' ] )
+ElseStmt = module.newClass( 'ElseStmt', CompoundStmt, [] )
+WhileStmt = module.newClass( 'WhileStmt', CompoundStmt, [ 'condition' ] )
+ForStmt = module.newClass( 'ForStmt', CompoundStmt, [ 'target', 'source' ] )
+TryStmt = module.newClass( 'TryStmt', CompoundStmt, [] )
+ExceptStmt = module.newClass( 'ExceptStmt', CompoundStmt, [ 'exception', 'target' ] )
+FinallyStmt = module.newClass( 'FinallyStmt', CompoundStmt, [] )
+WithStmt = module.newClass( 'WithStmt', CompoundStmt, [ 'expr', 'target' ] )
+DefStmt = module.newClass( 'DefStmt', CompoundStmt, [ 'name', 'params' ] )
+DecoStmt = module.newClass( 'DecoStmt', CompoundStmt, [ 'name', 'args' ] )
+ClassStmt = module.newClass( 'ClassStmt', CompoundStmt, [ 'name', 'bases' ] )
+
+
+
+

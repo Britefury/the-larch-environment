@@ -5,7 +5,7 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-import java.util.List
+from BritefuryJ.DocModel import DMNode
 
 import string
 import unittest
@@ -23,8 +23,10 @@ def _deepList(xs):
 
 class ParserTestCase (unittest.TestCase):
 	def _cmpValue(self, x, y):
-		x = _deepList( x )
-		y = _deepList( y )
+		#x = _deepList( x )
+		#y = _deepList( y )
+		x = DMNode.coerce( x )
+		y = DMNode.coerce( y )
 		#xstr = DMIOWrite.writeSX( x )
 		#ystr = DMIOWrite.writeSX( y )
 		#return xstr == ystr

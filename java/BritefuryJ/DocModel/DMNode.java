@@ -16,30 +16,30 @@ import org.python.core.PyUnicode;
 
 public class DMNode
 {
-	public Object coerce(String x)
+	public static Object coerce(String x)
 	{
 		// Create a clone of the string to ensure that all String objects in the document are
 		// distinct, even if their contents are the same
 		return new String( x );
 	}
 	
-	public Object coerce(PyString x)
+	public static Object coerce(PyString x)
 	{
 		return coerce( x.toString() );
 	}
 	
-	public Object coerce(PyUnicode x)
+	public static Object coerce(PyUnicode x)
 	{
 		return coerce( x.toString() );
 	}
 	
-	public Object coerce(List<Object> x)
+	public static Object coerce(List<Object> x)
 	{
 		return new DMList( x );
 	}
 	
 	@SuppressWarnings("unchecked")
-	public Object coerce(Object x)
+	public static Object coerce(Object x)
 	{
 		if ( x instanceof DMNode )
 		{
