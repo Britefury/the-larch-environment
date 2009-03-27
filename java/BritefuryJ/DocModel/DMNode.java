@@ -11,6 +11,7 @@ import java.util.List;
 import org.python.core.Py;
 import org.python.core.PyJavaType;
 import org.python.core.PyObject;
+import org.python.core.PyObjectDerived;
 import org.python.core.PyString;
 import org.python.core.PyUnicode;
 
@@ -62,6 +63,10 @@ public class DMNode
 			return coerce( (List<Object>)x );
 		}
 		else if ( x instanceof PyJavaType )
+		{
+			return coerce( Py.tojava( (PyObject)x, Object.class ) );
+		}
+		else if ( x instanceof PyObjectDerived )
 		{
 			return coerce( Py.tojava( (PyObject)x, Object.class ) );
 		}

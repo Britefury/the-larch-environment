@@ -386,7 +386,9 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable
 			{
 				for (int i = 0; i < objClass.getNumFields(); i++)
 				{
-					if ( !get( i ).equals( dx.get( i ) ) )
+					Object v = get( i );
+					Object xv = dx.get( i );
+					if ( !v.equals( xv ) )
 					{
 						return false;
 					}
