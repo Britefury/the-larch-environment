@@ -187,7 +187,7 @@ public class DMIOWriter
 
 
 
-	public static String write(Object content) throws InvalidDataTypeException
+	public static String writeAsString(Object content) throws InvalidDataTypeException
 	{
 		DMIOWriter writer = new DMIOWriter();
 		return writer.writeDocument( content );

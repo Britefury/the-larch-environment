@@ -102,7 +102,7 @@ public class Test_DMIOWriter extends TestCase
 		String res = null;
 		try
 		{
-			res = DMIOWriter.write( input );
+			res = DMIOWriter.writeAsString( input );
 		}
 		catch (DMIOWriter.InvalidDataTypeException e)
 		{

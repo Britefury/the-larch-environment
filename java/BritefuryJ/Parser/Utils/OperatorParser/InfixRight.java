@@ -8,6 +8,10 @@ package BritefuryJ.Parser.Utils.OperatorParser;
 
 import java.util.ArrayList;
 
+import org.python.core.PyObject;
+
+import BritefuryJ.DocModel.DMObjectClass;
+import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
 import BritefuryJ.Parser.Forward;
 import BritefuryJ.Parser.ParserExpression;
 
@@ -21,20 +25,25 @@ public class InfixRight extends BinaryOperator
 	{
 		super( opExpression, action );
 	}
+	
+	public InfixRight(String operator, DMObjectClass nodeClass, String leftFieldName, String rightFieldName) throws InvalidFieldNameException
+	{
+		this( ParserExpression.coerce( operator ), new BuildASTNodeAction( nodeClass, leftFieldName, rightFieldName ) );
+	}
+	
+	public InfixRight(String operator, PyObject callable)
+	{
+		this( ParserExpression.coerce( operator ), new PyBinaryOperatorParseAction( callable ) );
+	}
 
-	public InfixRight(String operator)
+	public InfixRight(ParserExpression opExpression, DMObjectClass nodeClass, String leftFieldName, String rightFieldName) throws InvalidFieldNameException
 	{
-		this( ParserExpression.coerce( operator ), new BuildASTNodeAction( operator ) );
+		this( opExpression, new BuildASTNodeAction( nodeClass, leftFieldName, rightFieldName ) );
 	}
-	
-	public InfixRight(ParserExpression opExpression, String nodeOperator)
+
+	public InfixRight(ParserExpression opExpression, PyObject callable)
 	{
-		this( opExpression, new BuildASTNodeAction( nodeOperator ) );
-	}
-	
-	public InfixRight(String operator, String nodeOperator)
-	{
-		this( ParserExpression.coerce( operator ), new BuildASTNodeAction( nodeOperator ) );
+		this( opExpression, new PyBinaryOperatorParseAction( callable ) );
 	}
 	
 	

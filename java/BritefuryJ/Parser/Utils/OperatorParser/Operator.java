@@ -13,16 +13,6 @@ import BritefuryJ.Parser.ParserExpression;
 
 abstract class Operator
 {
-	protected ParserExpression opExpression;
-	
-	
-	protected Operator(ParserExpression opExpression)
-	{
-		this.opExpression = opExpression;
-	}
-	
-	
-	
 	protected abstract ParserExpression buildParser(OperatorTable operatorTable, ArrayList<Forward> levelParserForwardDeclarations, PrecedenceLevel thisLevel,
 			ParserExpression thisLevelParser, PrecedenceLevel previousLevel, ParserExpression previousLevelParser);
 }

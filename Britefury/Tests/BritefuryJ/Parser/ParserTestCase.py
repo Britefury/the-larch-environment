@@ -6,6 +6,7 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
 from BritefuryJ.DocModel import DMNode
+from BritefuryJ.DocModel import DMIOReader, DMIOWriter, DMModuleResolver
 
 import string
 import unittest
@@ -22,6 +23,16 @@ def _deepList(xs):
 		return xs
 
 class ParserTestCase (unittest.TestCase):
+	class Resolver (DMModuleResolver):
+		def __init__(self):
+			self.modules = {}
+			
+		def getModule(self, location):
+			return self.modules[location]
+		
+	resolver = Resolver()
+	
+	
 	def _matchTest(self, parser, input, expected, ignoreChars=_whitespaceRegex):
 		result = parser.parseString( input, ignoreChars )
 		
@@ -57,7 +68,7 @@ class ParserTestCase (unittest.TestCase):
 	def _matchTestSX(self, parser, input, expectedSX, ignoreChars=_whitespaceRegex):
 		result = parser.parseString( input, ignoreChars )
 
-		expected = DMIORead.readSX( expectedSX )
+		expected = DMIOReader.readFromString( expectedSX, self.resolver )
 		
 		if not result.isValid():
 			print 'PARSE FAILURE while parsing', input
@@ -75,7 +86,7 @@ class ParserTestCase (unittest.TestCase):
 			print 'EXPECTED:'
 			print expectedSX
 			print 'RESULT:'
-			print DMIOWrite.writeSX( value )
+			print DMIOWriter.writeAsString( value )
 
 		bSame = value == expected
 		if not bSame:
@@ -83,7 +94,7 @@ class ParserTestCase (unittest.TestCase):
 			print expectedSX
 			print ''
 			print 'RESULT:'
-			print DMIOWrite.writeSX( value )
+			print DMIOWriter.writeAsString( value )
 		self.assert_( bSame )
 
 		

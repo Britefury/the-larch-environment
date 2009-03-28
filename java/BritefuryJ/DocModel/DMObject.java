@@ -52,9 +52,22 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable
 		{
 			fieldData[i] = coerce( values[i] );
 		}
-		for (int i = numToCopy; i < fieldData.length; i++)
+
+		cell = new LiteralCell();
+		cell.setLiteralValue( fieldData );
+		commandTracker = null;
+	}
+	
+	public DMObject(DMObjectClass objClass, PyObject values[])
+	{
+		this.objClass = objClass;
+		Object fieldData[] = new Object[objClass.getNumFields()];
+		fillArrayWithNulls( fieldData );
+		
+		int numToCopy = Math.min( values.length, fieldData.length );
+		for (int i = 0; i < numToCopy; i++)
 		{
-			fieldData[i] = null;
+			fieldData[i] = coerce( Py.tojava( values[i], Object.class ) );
 		}
 
 		cell = new LiteralCell();
@@ -107,6 +120,23 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable
 			{
 				fieldData[index] = coerce( Py.tojava( values[i], Object.class ) );
 			}
+		}
+
+		cell = new LiteralCell();
+		cell.setLiteralValue( fieldData );
+		commandTracker = null;
+	}
+
+	public DMObject(PyObject values[])
+	{
+		objClass = Py.tojava( values[0], DMObjectClass.class );
+		Object fieldData[] = new Object[objClass.getNumFields()];
+		fillArrayWithNulls( fieldData );
+		
+		int numToCopy = Math.min( values.length - 1, fieldData.length );
+		for (int i = 0; i < numToCopy; i++)
+		{
+			fieldData[i] = coerce( Py.tojava( values[i+1], Object.class ) );
 		}
 
 		cell = new LiteralCell();

@@ -11,28 +11,29 @@ import sys
 from Britefury.InitBritefuryJ import initBritefuryJ
 initBritefuryJ()
 
+import Britefury.Dispatch.Dispatch
 import Britefury.Dispatch.MethodDispatch
 #import Britefury.Dispatch.PatternDispatch
-import Britefury.Dispatch.Dispatch
 import Britefury.Transformation.Transformation
 import Britefury.Tests.BritefuryJ.Parser.Utils.Operators
 import Britefury.Tests.BritefuryJ.PatternMatch.Test_PatternMatcher
 import Britefury.Tests.Britefury.Grammar.Grammar
 import Britefury.Tests.Britefury.Dispatch.TestNodeMethodDispatch
 import GSymCore.Languages.Python25.CodeGenerator
-import GSymCore.Languages.Python25.Parser
-import GSymCore.Languages.Python25.Parser2
 import GSymCore.Languages.Python25.Parser3
 import GSymCore.Languages.Python25.IdentityTransformation
 import GSymCore.Languages.Java.Parser
 import GSymCore.Languages.LISP.Parser2
 
 
-testModules = [ Britefury.Dispatch.MethodDispatch, Britefury.Dispatch.Dispatch,
+testModules = [ Britefury.Dispatch.Dispatch,
+		Britefury.Dispatch.MethodDispatch, 
+		#Britefury.Dispatch.PatternDispatch, 
 		Britefury.Transformation.Transformation,
 		Britefury.Tests.BritefuryJ.Parser.Utils.Operators, Britefury.Tests.BritefuryJ.PatternMatch.Test_PatternMatcher,
 		Britefury.Tests.Britefury.Grammar.Grammar, Britefury.Tests.Britefury.Dispatch.TestNodeMethodDispatch,
-		GSymCore.Languages.Python25.CodeGenerator, GSymCore.Languages.Python25.Parser, GSymCore.Languages.Python25.Parser2, GSymCore.Languages.Python25.Parser3,
+		GSymCore.Languages.Python25.CodeGenerator,
+		GSymCore.Languages.Python25.Parser3,
 		GSymCore.Languages.Python25.IdentityTransformation,
 		GSymCore.Languages.Java.Parser,
 		GSymCore.Languages.LISP.Parser2 ]

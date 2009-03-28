@@ -8,7 +8,7 @@
 
 from BritefuryJ.Parser import *
 from BritefuryJ.Parser.Utils import *
-from BritefuryJ.Parser.Utils.OperatorParser import Prefix, Suffix, InfixLeft, InfixRight, PrecedenceLevel, OperatorTable
+from BritefuryJ.Parser.Utils.OperatorParser import Prefix, Suffix, InfixLeft, InfixRight, InfixChain, PrecedenceLevel, OperatorTable
 from BritefuryJ.Parser.Utils.Tokens import identifier
 
 
@@ -47,326 +47,326 @@ _unitTestSpecification = """
 		       a			->			a
 
 
--- prefix :			[ [ Prefix( '~' ) ] ] 
+-- prefix :			[ [ self._prefix( '~' ) ] ] 
 		       a			->			a
-		       ~a			->			(~ a)
-		       ~~a			->			(~ (~ a))
--- suffix :			[ [ Suffix( '!' ) ] ] 
+		       ~a			->			[~ a]
+		       ~~a			->			[~ [~ a]]
+-- suffix :			[ [ self._suffix( '!' ) ] ] 
 		       a			->			a
-		       a!			->			(! a)
-		       a!!			->			(! (! a))
--- left :			[ [ InfixLeft( '*' ) ] ]
+		       a!			->			[! a]
+		       a!!			->			[! [! a]]
+-- left :			[ [ self._infixLeft( '*' ) ] ]
 		       a			->			a
-		       a * b			->			(* a b)
-		       a * b * c		->			(* (* a b) c)
--- right :			[ [ InfixRight( '$' ) ] ]
+		       a * b			->			[* a b]
+		       a * b * c		->			[* [* a b] c]
+-- right :			[ [ self._infixRight( '$' ) ] ]
 		       a			->			a
-		       a $ b			->			($ a b)
-		       a $ b $ c		->			($ a ($ b c))
+		       a $ b			->			[$ a b]
+		       a $ b $ c		->			[$ a [$ b c]]
 
 
--- prefixprefix :		[ [ Prefix( '~' ), Prefix( '!' ) ] ]
+-- prefixprefix :		[ [ self._prefix( '~' ), self._prefix( '!' ) ] ]
 		       a			->			a
-		       ~a			->			(~ a)
-		       !a			->			(! a)
-		       ~!a			->			(~ (! a))
-		       !~a			->			(! (~ a))
--- suffixsuffix :		[ [ Suffix( '~' ), Suffix( '!' ) ] ]
+		       ~a			->			[~ a]
+		       !a			->			[! a]
+		       ~!a			->			[~ [! a]]
+		       !~a			->			[! [~ a]]
+-- suffixsuffix :		[ [ self._suffix( '~' ), self._suffix( '!' ) ] ]
 		       a			->			a
-		       a~			->			(~ a)
-		       a!			->			(! a)
-		       a!~			->			(~ (! a))
-		       a~!			->			(! (~ a))
--- leftleft :		[ [ InfixLeft( '*' ), InfixLeft( '/' ) ] ]
+		       a~			->			[~ a]
+		       a!			->			[! a]
+		       a!~			->			[~ [! a]]
+		       a~!			->			[! [~ a]]
+-- leftleft :		[ [ self._infixLeft( '*' ), self._infixLeft( '/' ) ] ]
 		       a			->			a
-		       a * b			->			(* a b)
-		       a / b			->			(/ a b)
-		       a * b / c * d	->			(* (/ (* a b) c) d)
-		       a / b * c / d	->			(/ (* (/ a b) c) d)
--- rightright :		[ [ InfixRight( '$' ), InfixRight( '@' ) ] ]
+		       a * b			->			[* a b]
+		       a / b			->			[/ a b]
+		       a * b / c * d	->			[* [/ [* a b] c] d]
+		       a / b * c / d	->			[/ [* [/ a b] c] d]
+-- rightright :		[ [ self._infixRight( '$' ), self._infixRight( '@' ) ] ]
 		       a			->			a
-		       a $ b			->			($ a b)
-		       a @ b		->			(@ a b)
-		       a $ b @ c $ d	->			($ a (@ b ($ c d)))
-		       a @ b $ c @ d	->			(@ a ($ b (@ c d)))
+		       a $ b			->			[$ a b]
+		       a @ b		->			[@ a b]
+		       a $ b @ c $ d	->			[$ a [@ b [$ c d]]]
+		       a @ b $ c @ d	->			[@ a [$ b [@ c d]]]
 
 
--- prefix_prefix :	[ [ Prefix( '~' ) ], [ Prefix( '!' ) ] ]
+-- prefix_prefix :	[ [ self._prefix( '~' ) ], [ self._prefix( '!' ) ] ]
 		       a			->			a
-		       ~a			->			(~ a)
-		       !a			->			(! a)
+		       ~a			->			[~ a]
+		       !a			->			[! a]
 		       ~!a			->			<<ERROR>>
-		       !~a			->			(! (~ a))
-		       !!~~a		->			(! (! (~ (~ a))))
+		       !~a			->			[! [~ a]]
+		       !!~~a		->			[! [! [~ [~ a]]]]
 		       !~!~a		->			<<ERROR>>
--- prefix_sufffix :	[ [ Prefix( '~' ) ], [ Suffix( '!' ) ] ]
+-- prefix_sufffix :	[ [ self._prefix( '~' ) ], [ self._suffix( '!' ) ] ]
 		       a			->			a
-		       ~a			->			(~ a)
-		       a!			->			(! a)
-		       ~a!			->			(! (~ a))
-		       ~~a!!		->			(! (! (~ (~ a))))
--- prefix_left :		[ [ Prefix( '~' ) ], [ InfixLeft( '*' ) ] ]
+		       ~a			->			[~ a]
+		       a!			->			[! a]
+		       ~a!			->			[! [~ a]]
+		       ~~a!!		->			[! [! [~ [~ a]]]]
+-- prefix_left :		[ [ self._prefix( '~' ) ], [ self._infixLeft( '*' ) ] ]
 		       a			->			a
-		       ~a			->			(~ a)
-		       a * b * c		->			(* (* a b) c)
-		       ~a * b * c		->			(* (* (~ a) b) c)
-		       a * ~b * c		->			(* (* a (~ b)) c)
-		       a * b * ~c		->			(* (* a b) (~ c))
--- prefix_right :		[ [ Prefix( '~' ) ], [ InfixRight( '$' ) ] ]
+		       ~a			->			[~ a]
+		       a * b * c		->			[* [* a b] c]
+		       ~a * b * c		->			[* [* [~ a] b] c]
+		       a * ~b * c		->			[* [* a [~ b]] c]
+		       a * b * ~c		->			[* [* a b] [~ c]]
+-- prefix_right :		[ [ self._prefix( '~' ) ], [ self._infixRight( '$' ) ] ]
 		       a			->			a
-		       ~a			->			(~ a)
-		       a $ b $ c		->			($ a ($ b c))
-		       ~a $ b $ c		->			($ (~ a) ($ b c))
-		       a $ ~b $ c		->			($ a ($ (~ b) c))
-		       a $ b $ ~c		->			($ a ($ b (~ c)))
--- suffix_prefix :	[ [ Suffix( '!' ) ], [ Prefix( '~' ) ] ]
+		       ~a			->			[~ a]
+		       a $ b $ c		->			[$ a [$ b c]]
+		       ~a $ b $ c		->			[$ [~ a] [$ b c]]
+		       a $ ~b $ c		->			[$ a [$ [~ b] c]]
+		       a $ b $ ~c		->			[$ a [$ b [~ c]]]
+-- suffix_prefix :	[ [ self._suffix( '!' ) ], [ self._prefix( '~' ) ] ]
 		       a			->			a
-		       ~a			->			(~ a)
-		       a!			->			(! a)
-		       ~a!			->			(~ (! a))
-		       ~~a!!		->			(~ (~ (! (! a))))
--- suffix_suffix :	[ [ Suffix( '~' ) ], [ Suffix( '!' ) ] ]
+		       ~a			->			[~ a]
+		       a!			->			[! a]
+		       ~a!			->			[~ [! a]]
+		       ~~a!!		->			[~ [~ [! [! a]]]]
+-- suffix_suffix :	[ [ self._suffix( '~' ) ], [ self._suffix( '!' ) ] ]
 		       a			->			a
-		       a~			->			(~ a)
-		       a!			->			(! a)
-		       a~!			->			(! (~ a))
+		       a~			->			[~ a]
+		       a!			->			[! a]
+		       a~!			->			[! [~ a]]
 		       a!~			->			<<ERROR>>
-		       a~~!!		->			(! (! (~ (~ a))))
+		       a~~!!		->			[! [! [~ [~ a]]]]
 		       a~!~!		->			<<ERROR>>
--- suffix_left :		[ [ Suffix( '!' ) ], [ InfixLeft( '*' ) ] ]
+-- suffix_left :		[ [ self._suffix( '!' ) ], [ self._infixLeft( '*' ) ] ]
 		       a			->			a
-		       a!			->			(! a)
-		       a * b * c		->			(* (* a b) c)
-		       a! * b * c		->			(* (* (! a) b) c)
-		       a * b! * c		->			(* (* a (! b)) c)
-		       a * b * c!		->			(* (* a b) (! c))
--- suffix_right :		[ [ Suffix( '!' ) ], [ InfixRight( '$' ) ] ]
+		       a!			->			[! a]
+		       a * b * c		->			[* [* a b] c]
+		       a! * b * c		->			[* [* [! a] b] c]
+		       a * b! * c		->			[* [* a [! b]] c]
+		       a * b * c!		->			[* [* a b] [! c]]
+-- suffix_right :		[ [ self._suffix( '!' ) ], [ self._infixRight( '$' ) ] ]
 		       a			->			a
-		       a!			->			(! a)
-		       a $ b $ c		->			($ a ($ b c))
-		       a! $ b $ c		->			($ (! a) ($ b c))
-		       a $ b! $ c		->			($ a ($ (! b) c))
-		       a $ b $ c!		->			($ a ($ b (! c)))
--- left_prefix :		[ [ InfixLeft( '*' ) ], [ Prefix( '~' ) ] ]
+		       a!			->			[! a]
+		       a $ b $ c		->			[$ a [$ b c]]
+		       a! $ b $ c		->			[$ [! a] [$ b c]]
+		       a $ b! $ c		->			[$ a [$ [! b] c]]
+		       a $ b $ c!		->			[$ a [$ b [! c]]]
+-- left_prefix :		[ [ self._infixLeft( '*' ) ], [ self._prefix( '~' ) ] ]
 		       a			->			a
-		       ~a			->			(~ a)
-		       a * b * c		->			(* (* a b) c)
-		       ~a * b * c		->			(~ (* (* a b) c))
-		       a * ~b * c		->			(* a (~ (* b c)))
-		       a * b * ~c		->			(* (* a b) (~ c))
--- left_suffix :		[ [ InfixLeft( '*' ) ], [ Suffix( '!' ) ] ]
+		       ~a			->			[~ a]
+		       a * b * c		->			[* [* a b] c]
+		       ~a * b * c		->			[~ [* [* a b] c]]
+		       a * ~b * c		->			[* a [~ [* b c]]]
+		       a * b * ~c		->			[* [* a b] [~ c]]
+-- left_suffix :		[ [ self._infixLeft( '*' ) ], [ self._suffix( '!' ) ] ]
 		       a			->			a
-		       a!			->			(! a)
-		       a * b * c		->			(* (* a b) c)
+		       a!			->			[! a]
+		       a * b * c		->			[* [* a b] c]
 		       a! * b * c		->			<<ERROR>>
 		       a * b! * c		->			<<ERROR>>
-		       a * b * c!		->			(! (* (* a b) c))
--- left_left :		[ [ InfixLeft( '*' ) ], [ InfixLeft( '+' ) ] ]
+		       a * b * c!		->			[! [* [* a b] c]]
+-- left_left :		[ [ self._infixLeft( '*' ) ], [ self._infixLeft( '+' ) ] ]
 		       a			->			a
-		       a * b			->			(* a b)
-		       a + b			->			(+ a b)
-		       a * b + c		->			(+ (* a b) c)
-		       a + b * c		->			(+ a (* b c))
-		       a * b + c * d	->			(+ (* a b) (* c d))
-		       a + b * c + d	->			(+ (+ a (* b c)) d)
--- left_right :		[ [ InfixLeft( '*' ) ], [ InfixRight( '$' ) ] ]
+		       a * b			->			[* a b]
+		       a + b			->			[+ a b]
+		       a * b + c		->			[+ [* a b] c]
+		       a + b * c		->			[+ a [* b c]]
+		       a * b + c * d	->			[+ [* a b] [* c d]]
+		       a + b * c + d	->			[+ [+ a [* b c]] d]
+-- left_right :		[ [ self._infixLeft( '*' ) ], [ self._infixRight( '$' ) ] ]
 		       a			->			a
-		       a * b			->			(* a b)
-		       a $ b			->			($ a b)
-		       a * b * c * d	->			(* (* (* a b) c) d)
-		       a * b * c $ d	->			($ (* (* a b) c) d)
-		       a * b $ c * d	->			($ (* a b) (* c d))
-		       a $ b * c * d	->			($ a (* (* b c) d))
-		       a $ b $ c $ d	->			($ a ($ b ($ c d)))
-		       a * b $ c $ d	->			($ (* a b) ($ c d))
-		       a $ b * c $ d	->			($ a ($ (* b c) d))
-		       a $ b $ c * d	->			($ a ($ b (* c d)))
--- right_prefix :		[ [ InfixRight( '$' ) ], [ Prefix( '~' ) ] ]
+		       a * b			->			[* a b]
+		       a $ b			->			[$ a b]
+		       a * b * c * d	->			[* [* [* a b] c] d]
+		       a * b * c $ d	->			[$ [* [* a b] c] d]
+		       a * b $ c * d	->			[$ [* a b] [* c d]]
+		       a $ b * c * d	->			[$ a [* [* b c] d]]
+		       a $ b $ c $ d	->			[$ a [$ b [$ c d]]]
+		       a * b $ c $ d	->			[$ [* a b] [$ c d]]
+		       a $ b * c $ d	->			[$ a [$ [* b c] d]]
+		       a $ b $ c * d	->			[$ a [$ b [* c d]]]
+-- right_prefix :		[ [ self._infixRight( '$' ) ], [ self._prefix( '~' ) ] ]
 		       a			->			a
-		       ~a			->			(~ a)
-		       a $ b $ c		->			($ a ($ b c))
-		       ~a $ b $ c		->			(~ ($ a ($ b c)))
-		       a $ ~b $ c		->			($ a (~ ($ b c)))
-		       a $ b $ ~c		->			($ a ($ b (~ c)))
--- right_suffix :		[ [ InfixRight( '$' ) ], [ Suffix( '!' ) ] ]
+		       ~a			->			[~ a]
+		       a $ b $ c		->			[$ a [$ b c]]
+		       ~a $ b $ c		->			[~ [$ a [$ b c]]]
+		       a $ ~b $ c		->			[$ a [~ [$ b c]]]
+		       a $ b $ ~c		->			[$ a [$ b [~ c]]]
+-- right_suffix :		[ [ self._infixRight( '$' ) ], [ self._suffix( '!' ) ] ]
 		       a			->			a
-		       a!			->			(! a)
-		       a $ b $ c		->			($ a ($ b c))
+		       a!			->			[! a]
+		       a $ b $ c		->			[$ a [$ b c]]
 		       a! $ b $ c		->			<<ERROR>>
 		       a $ b! $ c		->			<<ERROR>>
-		       a $ b $ c!		->			(! ($ a ($ b c)))
--- right_left :		[ [ InfixRight( '$' ) ], [ InfixLeft( '*' ) ] ]
+		       a $ b $ c!		->			[! [$ a [$ b c]]]
+-- right_left :		[ [ self._infixRight( '$' ) ], [ self._infixLeft( '*' ) ] ]
 		       a			->			a
-		       a $ b			->			($ a b)
-		       a * b			->			(* a b)
-		       a $ b $ c $ d	->			($ a ($ b ($ c d)))
-		       a * b $ c $ d	->			(* a ($ b ($ c d)))
-		       a $ b * c $ d	->			(* ($ a b) ($ c d))
-		       a $ b $ c * d	->			(* ($ a ($ b c )) d)
-		       a * b * c * d	->			(* (* (* a b) c) d)
-		       a * b * c $ d	->			(* (* a b) ($ c d))
-		       a * b $ c * d	->			(* (* a ($ b c)) d)
-		       a $ b * c * d	->			(* (* ($ a b) c) d)
--- right_right :		[ [ InfixRight( '$' ) ], [ InfixRight( '@' ) ] ]
+		       a $ b			->			[$ a b]
+		       a * b			->			[* a b]
+		       a $ b $ c $ d	->			[$ a [$ b [$ c d]]]
+		       a * b $ c $ d	->			[* a [$ b [$ c d]]]
+		       a $ b * c $ d	->			[* [$ a b] [$ c d]]
+		       a $ b $ c * d	->			[* [$ a [$ b c ]] d]
+		       a * b * c * d	->			[* [* [* a b] c] d]
+		       a * b * c $ d	->			[* [* a b] [$ c d]]
+		       a * b $ c * d	->			[* [* a [$ b c]] d]
+		       a $ b * c * d	->			[* [* [$ a b] c] d]
+-- right_right :		[ [ self._infixRight( '$' ) ], [ self._infixRight( '@' ) ] ]
 		       a			->			a
-		       a $ b			->			($ a b)
-		       a @ b		->			(@ a b)
-		       a $ b @ c		->			(@ ($ a b) c)
-		       a @ b $ c		->			(@ a ($ b c))
-		       a $ b $ c $ d	->			($ a ($ b ($ c d)))
-		       a $ b @ c $ d	->			(@ ($ a b) ($ c d))
+		       a $ b			->			[$ a b]
+		       a @ b		->			[@ a b]
+		       a $ b @ c		->			[@ [$ a b] c]
+		       a @ b $ c		->			[@ a [$ b c]]
+		       a $ b $ c $ d	->			[$ a [$ b [$ c d]]]
+		       a $ b @ c $ d	->			[@ [$ a b] [$ c d]]
 
 
--- prefix_left_left :	[ [ Prefix( '~' ) ],  [ InfixLeft( '*' ) ],  [ InfixLeft( '+' ) ] ]
+-- prefix_left_left :	[ [ self._prefix( '~' ) ],  [ self._infixLeft( '*' ) ],  [ self._infixLeft( '+' ) ] ]
 		       a			->			a
-		       ~a			->			(~ a)
-		       a * b			->			(* a b)
-		       a + b			->			(+ a b)
-		       a * b * c * d	->			(* (* (* a b) c) d)
-		       a * b + c * d	->			(+ (* a b) (* c d))
-		       ~a * ~b * ~c * ~d	->		(* (* (* (~ a) (~ b)) (~ c)) (~ d))
-		       ~a * ~b + ~c * ~d	->		(+ (* (~ a) (~ b)) (* (~ c) (~ d)))
--- left_prefix_left :	[ [ InfixLeft( '*' ) ],  [ Prefix( '~' ) ],  [ InfixLeft( '+' ) ] ]
+		       ~a			->			[~ a]
+		       a * b			->			[* a b]
+		       a + b			->			[+ a b]
+		       a * b * c * d	->			[* [* [* a b] c] d]
+		       a * b + c * d	->			[+ [* a b] [* c d]]
+		       ~a * ~b * ~c * ~d	->		[* [* [* [~ a] [~ b]] [~ c]] [~ d]]
+		       ~a * ~b + ~c * ~d	->		[+ [* [~ a] [~ b]] [* [~ c] [~ d]]]
+-- left_prefix_left :	[ [ self._infixLeft( '*' ) ],  [ self._prefix( '~' ) ],  [ self._infixLeft( '+' ) ] ]
 		       a			->			a
-		       ~a			->			(~ a)
-		       a * b			->			(* a b)
-		       a + b			->			(+ a b)
-		       a * b * c * d	->			(* (* (* a b) c) d)
-		       a * b + c * d	->			(+ (* a b) (* c d))
-		       ~a * b + c * d	->			(+ (~ (* a b)) (* c d))
-		       a * b + ~c * d	->			(+ (* a b) (~ (* c d)))
-		       a * ~b * c * d	->			(* a (~ (* (* b c) d)))
-		       a * ~b * c + d	->			(+ (* a (~ (* b c))) d)
-		       ~a * b * c + d	->			(+ (~ (* (* a b) c)) d)
--- left_left_prefix :	[ [ InfixLeft( '*' ) ],  [ InfixLeft( '+' ) ],  [ Prefix( '~' ) ] ]
+		       ~a			->			[~ a]
+		       a * b			->			[* a b]
+		       a + b			->			[+ a b]
+		       a * b * c * d	->			[* [* [* a b] c] d]
+		       a * b + c * d	->			[+ [* a b] [* c d]]
+		       ~a * b + c * d	->			[+ [~ [* a b]] [* c d]]
+		       a * b + ~c * d	->			[+ [* a b] [~ [* c d]]]
+		       a * ~b * c * d	->			[* a [~ [* [* b c] d]]]
+		       a * ~b * c + d	->			[+ [* a [~ [* b c]]] d]
+		       ~a * b * c + d	->			[+ [~ [* [* a b] c]] d]
+-- left_left_prefix :	[ [ self._infixLeft( '*' ) ],  [ self._infixLeft( '+' ) ],  [ self._prefix( '~' ) ] ]
 		       a			->			a
-		       ~a			->			(~ a)
-		       a * b			->			(* a b)
-		       a + b			->			(+ a b)
-		       a * b * c * d	->			(* (* (* a b) c) d)
-		       a * b + c * d	->			(+ (* a b) (* c d))
-		       ~a * b + c * d	->			(~ (+ (* a b) (* c d)))
-		       a * ~b + c * d	->			(* a (~ (+ b (* c d))))
-		       a * b + ~c * d	->			(+ (* a b) (~ (* c d)))
+		       ~a			->			[~ a]
+		       a * b			->			[* a b]
+		       a + b			->			[+ a b]
+		       a * b * c * d	->			[* [* [* a b] c] d]
+		       a * b + c * d	->			[+ [* a b] [* c d]]
+		       ~a * b + c * d	->			[~ [+ [* a b] [* c d]]]
+		       a * ~b + c * d	->			[* a [~ [+ b [* c d]]]]
+		       a * b + ~c * d	->			[+ [* a b] [~ [* c d]]]
 
--- suffix_left_left :	[ [ Suffix( '!' ) ],  [ InfixLeft( '*' ) ],  [ InfixLeft( '+' ) ] ]
+-- suffix_left_left :	[ [ self._suffix( '!' ) ],  [ self._infixLeft( '*' ) ],  [ self._infixLeft( '+' ) ] ]
 		       a			->			a
-		       a!			->			(! a)
-		       a * b			->			(* a b)
-		       a + b			->			(+ a b)
-		       a * b * c * d	->			(* (* (* a b) c) d)
-		       a! * b! * c! * d!	->			(* (* (* (! a) (! b)) (! c)) (! d))
-		       a! * b! + c! * d!	->			(+ (* (! a) (! b)) (* (! c) (! d)))
--- left_suffix_left :	[ [ InfixLeft( '*' ) ],  [ Suffix( '!' ) ],  [ InfixLeft( '+' ) ] ]
+		       a!			->			[! a]
+		       a * b			->			[* a b]
+		       a + b			->			[+ a b]
+		       a * b * c * d	->			[* [* [* a b] c] d]
+		       a! * b! * c! * d!	->			[* [* [* [! a] [! b]] [! c]] [! d]]
+		       a! * b! + c! * d!	->			[+ [* [! a] [! b]] [* [! c] [! d]]]
+-- left_suffix_left :	[ [ self._infixLeft( '*' ) ],  [ self._suffix( '!' ) ],  [ self._infixLeft( '+' ) ] ]
 		       a			->			a
-		       a!			->			(! a)
-		       a * b			->			(* a b)
-		       a + b			->			(+ a b)
-		       a * b * c * d	->			(* (* (* a b) c) d)
-		       a * b + c * d	->			(+ (* a b) (* c d))
-		       a * b! + c * d	->			(+ (! (* a b)) (* c d))
-		       a * b + c * d!	->			(+ (* a b) (! (* c d)))
+		       a!			->			[! a]
+		       a * b			->			[* a b]
+		       a + b			->			[+ a b]
+		       a * b * c * d	->			[* [* [* a b] c] d]
+		       a * b + c * d	->			[+ [* a b] [* c d]]
+		       a * b! + c * d	->			[+ [! [* a b]] [* c d]]
+		       a * b + c * d!	->			[+ [* a b] [! [* c d]]]
 		       a * b * c! * d	->			<<ERROR>>
 		       a + b * c! * d	->			<<ERROR>>
-		       a + b * c * d!	->			(+ a (! (* (* b c) d)))
--- left_left_suffix :	[ [ InfixLeft( '*' ) ],  [ InfixLeft( '+' ) ],  [ Suffix( '!' ) ] ]
+		       a + b * c * d!	->			[+ a [! [* [* b c] d]]]
+-- left_left_suffix :	[ [ self._infixLeft( '*' ) ],  [ self._infixLeft( '+' ) ],  [ self._suffix( '!' ) ] ]
 		       a			->			a
-		       a!			->			(! a)
-		       a * b			->			(* a b)
-		       a + b			->			(+ a b)
-		       a * b * c * d	->			(* (* (* a b) c) d)
-		       a * b + c * d	->			(+ (* a b) (* c d))
-		       a * b + c * d!	->			(! (+ (* a b) (* c d)))
+		       a!			->			[! a]
+		       a * b			->			[* a b]
+		       a + b			->			[+ a b]
+		       a * b * c * d	->			[* [* [* a b] c] d]
+		       a * b + c * d	->			[+ [* a b] [* c d]]
+		       a * b + c * d!	->			[! [+ [* a b] [* c d]]]
 		       a * b + c! * d	->			<<ERROR>>
 		       a * b! + c * d	->			<<ERROR>>
 
 
--- prefix_right_right :	[ [ Prefix( '~' ) ],  [ InfixRight( '$' ) ],  [ InfixRight( '@' ) ] ]
+-- prefix_right_right :	[ [ self._prefix( '~' ) ],  [ self._infixRight( '$' ) ],  [ self._infixRight( '@' ) ] ]
 		       a			->			a
-		       ~a			->			(~ a)
-		       a $ b			->			($ a b)
-		       a @ b		->			(@ a b)
-		       a $ b $ c $ d	->			($ a ($ b ($ c d)))
-		       ~a $ ~b $ ~c $ ~d	->		($ (~ a) ($ (~ b) ($ (~ c) (~ d))))
-		       ~a $ ~b @ ~c $ ~d	->		(@ ($ (~ a) (~ b)) ($ (~ c) (~ d)))
--- right_prefix_right :	[ [ InfixRight( '$' ) ],  [ Prefix( '~' ) ],  [ InfixRight( '@' ) ] ]
+		       ~a			->			[~ a]
+		       a $ b			->			[$ a b]
+		       a @ b		->			[@ a b]
+		       a $ b $ c $ d	->			[$ a [$ b [$ c d]]]
+		       ~a $ ~b $ ~c $ ~d	->		[$ [~ a] [$ [~ b] [$ [~ c] [~ d]]]]
+		       ~a $ ~b @ ~c $ ~d	->		[@ [$ [~ a] [~ b]] [$ [~ c] [~ d]]]
+-- right_prefix_right :	[ [ self._infixRight( '$' ) ],  [ self._prefix( '~' ) ],  [ self._infixRight( '@' ) ] ]
 		       a			->			a
-		       ~a			->			(~ a)
-		       a $ b			->			($ a b)
-		       a @ b		->			(@ a b)
-		       a $ b $ c $ d	->			($ a ($ b ($ c d)))
-		       a $ b @ c $ d	->			(@ ($ a b) ($ c d))
-		       ~a $ b @ c $ d	->			(@ (~ ($ a b)) ($ c d))
-		       a $ b @ ~c $ d	->			(@ ($ a b) (~ ($ c d)))
-		       a $ ~b $ c $ d	->			($ a (~ ($ b ($ c d))))
-		       a $ ~b $ c @ d	->			(@ ($ a (~ ($ b c))) d)
-		       ~a $ b $ c @ d	->			(@ (~ ($ a ($ b c))) d)
--- right_right_prefix :	[ [ InfixRight( '$' ) ],  [ InfixRight( '@' ) ],  [ Prefix( '~' ) ] ]
+		       ~a			->			[~ a]
+		       a $ b			->			[$ a b]
+		       a @ b		->			[@ a b]
+		       a $ b $ c $ d	->			[$ a [$ b [$ c d]]]
+		       a $ b @ c $ d	->			[@ [$ a b] [$ c d]]
+		       ~a $ b @ c $ d	->			[@ [~ [$ a b]] [$ c d]]
+		       a $ b @ ~c $ d	->			[@ [$ a b] [~ [$ c d]]]
+		       a $ ~b $ c $ d	->			[$ a [~ [$ b [$ c d]]]]
+		       a $ ~b $ c @ d	->			[@ [$ a [~ [$ b c]]] d]
+		       ~a $ b $ c @ d	->			[@ [~ [$ a [$ b c]]] d]
+-- right_right_prefix :	[ [ self._infixRight( '$' ) ],  [ self._infixRight( '@' ) ],  [ self._prefix( '~' ) ] ]
 		       a			->			a
-		       ~a			->			(~ a)
-		       a $ b			->			($ a b)
-		       a @ b		->			(@ a b)
-		       a $ b $ c $ d	->			($ a ($ b ($ c d)))
-		       a $ b @ c $ d	->			(@ ($ a b) ($ c d))
-		       ~a $ b @ c $ d	->			(~ (@ ($ a b) ($ c d)))
-		       a $ ~b @ c $ d	->			($ a (~ (@ b ($ c d))))
-		       a $ b @ ~c $ d	->			(@ ($ a b) (~ ($ c d)))
+		       ~a			->			[~ a]
+		       a $ b			->			[$ a b]
+		       a @ b		->			[@ a b]
+		       a $ b $ c $ d	->			[$ a [$ b [$ c d]]]
+		       a $ b @ c $ d	->			[@ [$ a b] [$ c d]]
+		       ~a $ b @ c $ d	->			[~ [@ [$ a b] [$ c d]]]
+		       a $ ~b @ c $ d	->			[$ a [~ [@ b [$ c d]]]]
+		       a $ b @ ~c $ d	->			[@ [$ a b] [~ [$ c d]]]
 
--- suffix_right_right :	[ [ Suffix( '!' ) ],  [ InfixRight( '$' ) ],  [ InfixRight( '@' ) ] ]
+-- suffix_right_right :	[ [ self._suffix( '!' ) ],  [ self._infixRight( '$' ) ],  [ self._infixRight( '@' ) ] ]
 		       a			->			a
-		       a!			->			(! a)
-		       a $ b			->			($ a b)
-		       a @ b		->			(@ a b)
-		       a $ b $ c $ d	->			($ a ($ b ($ c d)))
-		       a $ b @ c $ d	->			(@ ($ a b) ($ c d))
-		       a! $ b! $ c! $ d!	->			($ (! a) ($ (! b) ($ (! c) (! d))))
-		       a! $ b! @ c! $ d!	->		(@ ($ (! a) (! b)) ($ (! c) (! d)))
--- right_suffix_right :	[ [ InfixRight( '$' ) ],  [ Suffix( '!' ) ],  [ InfixRight( '@' ) ] ]
+		       a!			->			[! a]
+		       a $ b			->			[$ a b]
+		       a @ b		->			[@ a b]
+		       a $ b $ c $ d	->			[$ a [$ b [$ c d]]]
+		       a $ b @ c $ d	->			[@ [$ a b] [$ c d]]
+		       a! $ b! $ c! $ d!	->			[$ [! a] [$ [! b] [$ [! c] [! d]]]]
+		       a! $ b! @ c! $ d!	->		[@ [$ [! a] [! b]] [$ [! c] [! d]]]
+-- right_suffix_right :	[ [ self._infixRight( '$' ) ],  [ self._suffix( '!' ) ],  [ self._infixRight( '@' ) ] ]
 		       a			->			a
-		       a!			->			(! a)
-		       a $ b			->			($ a b)
-		       a @ b		->			(@ a b)
-		       a $ b $ c $ d	->			($ a ($ b ($ c d)))
-		       a $ b @ c $ d	->			(@ ($ a b) ($ c d))
-		       a $ b! @ c $ d	->			(@ (! ($ a b)) ($ c d))
-		       a $ b @ c $ d!	->			(@ ($ a b) (! ($ c d)))
+		       a!			->			[! a]
+		       a $ b			->			[$ a b]
+		       a @ b		->			[@ a b]
+		       a $ b $ c $ d	->			[$ a [$ b [$ c d]]]
+		       a $ b @ c $ d	->			[@ [$ a b] [$ c d]]
+		       a $ b! @ c $ d	->			[@ [! [$ a b]] [$ c d]]
+		       a $ b @ c $ d!	->			[@ [$ a b] [! [$ c d]]]
 		       a $ b $ c! $ d	->			<<ERROR>>
 		       a @ b $ c! $ d	->			<<ERROR>>
-		       a @ b $ c $ d!	->			(@ a (! ($ b ($ c d))))
--- right_right_suffix :	[ [ InfixRight( '$' ) ],  [ InfixRight( '@' ) ],  [ Suffix( '!' ) ] ]
+		       a @ b $ c $ d!	->			[@ a [! [$ b [$ c d]]]]
+-- right_right_suffix :	[ [ self._infixRight( '$' ) ],  [ self._infixRight( '@' ) ],  [ self._suffix( '!' ) ] ]
 		       a			->			a
-		       a!			->			(! a)
-		       a $ b			->			($ a b)
-		       a @ b		->			(@ a b)
-		       a $ b $ c $ d	->			($ a ($ b ($ c d)))
-		       a $ b @ c $ d	->			(@ ($ a b) ($ c d))
-		       a $ b @ c $ d!	->			(! (@ ($ a b) ($ c d)))
+		       a!			->			[! a]
+		       a $ b			->			[$ a b]
+		       a @ b		->			[@ a b]
+		       a $ b $ c $ d	->			[$ a [$ b [$ c d]]]
+		       a $ b @ c $ d	->			[@ [$ a b] [$ c d]]
+		       a $ b @ c $ d!	->			[! [@ [$ a b] [$ c d]]]
 		       a $ b @ c! $ d	->			<<ERROR>>
 		       a $ b! @ c $ d	->			<<ERROR>>
 
 
 
--- left_right_prefix_suffix :	[ [ InfixLeft( '*' ) ],  [ InfixRight( '$' ) ],  [ Prefix( '~' ) ],  [ Suffix( '!' ) ] ]
+-- left_right_prefix_suffix :	[ [ self._infixLeft( '*' ) ],  [ self._infixRight( '$' ) ],  [ self._prefix( '~' ) ],  [ self._suffix( '!' ) ] ]
 		       a					->	a
-		       ~a					->	(~ a)
-		       a!					->	(! a)
-		       a * b					->	(* a b)
-		       a $ b					->	($ a b)
-		       a * b * c * d			->	(* (* (* a b) c) d)
-		       a * b * c $ d			->	($ (* (* a b) c) d)
-		       a * b $ c * d			->	($ (* a b) (* c d))
-		       a $ b * c * d			->	($ a (* (* b c) d))
-		       a $ b $ c $ d			->	($ a ($ b ($ c d)))
-		       a * b $ c $ d			->	($ (* a b) ($ c d))
-		       a $ b * c $ d			->	($ a ($ (* b c) d))
-		       a $ b $ c * d			->	($ a ($ b (* c d)))
+		       ~a					->	[~ a]
+		       a!					->	[! a]
+		       a * b					->	[* a b]
+		       a $ b					->	[$ a b]
+		       a * b * c * d			->	[* [* [* a b] c] d]
+		       a * b * c $ d			->	[$ [* [* a b] c] d]
+		       a * b $ c * d			->	[$ [* a b] [* c d]]
+		       a $ b * c * d			->	[$ a [* [* b c] d]]
+		       a $ b $ c $ d			->	[$ a [$ b [$ c d]]]
+		       a * b $ c $ d			->	[$ [* a b] [$ c d]]
+		       a $ b * c $ d			->	[$ a [$ [* b c] d]]
+		       a $ b $ c * d			->	[$ a [$ b [* c d]]]
 
-		       ~a * b $ c * d			->	(~ ($ (* a b) (* c d)))
-		       a * ~b $ c * d			->	(* a (~ ($ b (* c d))))
-		       a * b $ ~c * d			->	($ (* a b) (~ (* c d)))
-		       a * b $ c * ~d			->	($ (* a b) (* c (~ d)))
+		       ~a * b $ c * d			->	[~ [$ [* a b] [* c d]]]
+		       a * ~b $ c * d			->	[* a [~ [$ b [* c d]]]]
+		       a * b $ ~c * d			->	[$ [* a b] [~ [* c d]]]
+		       a * b $ c * ~d			->	[$ [* a b] [* c [~ d]]]
 
-		       a * b $ c * d!			->	(! ($ (* a b) (* c d)))
+		       a * b $ c * d!			->	[! [$ [* a b] [* c d]]]
 		       a * b $ c! * d			->	<<ERROR>>
 		       a * b! $ c * d			->	<<ERROR>>
 		       a! * b $ c * d			->	<<ERROR>>
@@ -374,12 +374,25 @@ _unitTestSpecification = """
 		       a * b! $ ~c * d			->	<<ERROR>>
 		       a! * b $ c * ~d			->	<<ERROR>>
 		       a * ~b $ c! * d			->	<<ERROR>>
-		       a * ~b $ c * d!			->	(! (* a (~ ($ b (* c d)))))
+		       a * ~b $ c * d!			->	[! [* a [~ [$ b [* c d]]]]]
 		       ~a * b $ c! * d			->	<<ERROR>>
 
 
--- left_right_suffix_prefix :	[ [ InfixLeft( '*' ) ],  [ InfixRight( '$' ) ],  [ Suffix( '!' ) ],  [ Prefix( '~' ) ] ]
-		       a * ~b $ c! * d			->	(* (* a (~ (! ($ b c )))) d)
+-- left_right_suffix_prefix :	[ [ self._infixLeft( '*' ) ],  [ self._infixRight( '$' ) ],  [ self._suffix( '!' ) ],  [ self._prefix( '~' ) ] ]
+		       a * ~b $ c! * d			->	[* [* a [~ [! [$ b c]]]] d]
+		       
+		       
+-- infix_chain :				[ [ self._infixChain( 'ic',    [ self._chainOp( '<' ), self._chainOp( '>' ), self._chainOp( '<>' ) ]    ) ] ]
+			a < b					->	[ic a [< b]]
+			a > b					->	[ic a [> b]]
+			a <> b				->	[ic a [<> b]]
+			a < b < c				->	[ic a [< b] [< c]]
+			a < b > c				->	[ic a [< b] [> c]]
+			a > b < c				->	[ic a [> b] [< c]]
+			a <> b < c				->	[ic a [<> b] [< c]]
+			a < b <> c				->	[ic a [< b] [<> c]]
+			a < b > c <> d			->	[ic a [< b] [> c] [<> d]]
+			a <> b > c < d			->	[ic a [<> b] [> c] [< d]]
 """
 
 
@@ -390,7 +403,7 @@ def _makeTestMethod(parserSpec, name, tests):
 	Make a unit testing test method
 	"""
 	def m(self):
-		parser = buildOperatorParser( parserSpec, identifier )
+		parser = buildOperatorParser( eval( parserSpec ), identifier )
 		for input, result in tests:
 			if result is None:
 				self._matchFailTest( parser, input )
@@ -472,8 +485,7 @@ def _makeTestCaseClassImplFromText(text):
 			nameAndParserDef = line.split( '--' )[1]
 			name, parserDef = nameAndParserDef.split( ':' )
 			name = name.strip()
-			parserDef = parserDef.strip()
-			parserSpec = eval( parserDef )
+			parserSpec = parserDef.strip()
 			currentTests = []
 			currentSpec = name, parserSpec, currentTests
 		elif '->' in line:
@@ -499,6 +511,25 @@ TestCase_Impl = _makeTestCaseClassImplFromText( _unitTestSpecification )
 
 
 class TestCase_Operators (ParserTestCase, TestCase_Impl):
+	def _infixLeft(self, x):
+		return InfixLeft( x, lambda input, begin, left, right: [ x, left, right ] )
+	
+	def _infixRight(self, x):
+		return InfixRight( x, lambda input, begin, left, right: [ x, left, right ] )
+	
+	def _prefix(self, x):
+		return Prefix( x, lambda input, begin, subexp: [ x, subexp ] )
+	
+	def _suffix(self, x):
+		return Suffix( x, lambda input, begin, subexp: [ x, subexp ] )
+	
+	def _infixChain(self, prefix, xs):
+		return InfixChain( xs, lambda input, begin, x, ys: [ prefix, x ] + ys )
+	
+	def _chainOp(self, x):
+		return InfixChain.ChainOperator( x, lambda input, begin, subexp: [ x, subexp ] )
+	
+	
 	def testLeft_Prefix_Manual(self):
 		atom = identifier
 
@@ -514,21 +545,21 @@ class TestCase_Operators (ParserTestCase, TestCase_Impl):
 
 		parser = prefix
 
-		self._matchTestSX( parser, 'x * y * z',		'(* (* x y) z)' )
-		self._matchTestSX( parser, '~x * y * z',    '(~ (* (* x y) z))' )
-		self._matchTestSX( parser, 'x * ~y * z',    '(* x (~ (* y z)))' )
-		self._matchTestSX( parser, 'x * y * ~z',     '(* (* x y) (~ z))' )
+		self._matchTestSX( parser, 'x * y * z',		'[* [* x y] z]' )
+		self._matchTestSX( parser, '~x * y * z',    '[~ [* [* x y] z]]' )
+		self._matchTestSX( parser, 'x * ~y * z',    '[* x [~ [* y z]]]' )
+		self._matchTestSX( parser, 'x * y * ~z',     '[* [* x y] [~ z]]' )
 
 		
 	def testLeft_Prefix_Auto(self):
 		atom = identifier
 
-		parser = buildOperatorParser( [ [ InfixLeft( '*' ) ],  [ Prefix( '~' ) ] ], atom )
+		parser = buildOperatorParser( [ [ self._infixLeft( '*' ) ],  [ self._prefix( '~' ) ] ], atom )
 
-		self._matchTestSX( parser, 'x * y * z',    '(* (* x y) z)' )
-		self._matchTestSX( parser, '~x * y * z',    '(~ (* (* x y) z))' )
-		self._matchTestSX( parser, 'x * ~y * z',    '(* x (~ (* y z)))' )
-		self._matchTestSX( parser, 'x * y * ~z',     '(* (* x y) (~ z))' )
+		self._matchTestSX( parser, 'x * y * z',    '[* [* x y] z]' )
+		self._matchTestSX( parser, '~x * y * z',    '[~ [* [* x y] z]]' )
+		self._matchTestSX( parser, 'x * ~y * z',    '[* x [~ [* y z]]]' )
+		self._matchTestSX( parser, 'x * y * ~z',     '[* [* x y] [~ z]]' )
 
 
 
@@ -546,8 +577,8 @@ class TestCase_Operators (ParserTestCase, TestCase_Impl):
 
 		parser = suffix
 
-		self._matchTestSX( parser, 'x * y * z',    '(* (* x y) z)' )
-		self._matchTestSX( parser, 'x * y * z!',    '(! (* (* x y) z))' )
+		self._matchTestSX( parser, 'x * y * z',    '[* [* x y] z]' )
+		self._matchTestSX( parser, 'x * y * z!',    '[! [* [* x y] z]]' )
 		self._matchFailTest( parser, 'x * y! * z' )
 		self._matchFailTest( parser, 'x! * y * z' )
 
@@ -555,10 +586,10 @@ class TestCase_Operators (ParserTestCase, TestCase_Impl):
 	def testLeft_Suffix_Auto(self):
 		atom = identifier
 
-		parser = buildOperatorParser( [ [ InfixLeft( '*' ) ],  [ Suffix( '!' ) ] ], atom )
+		parser = buildOperatorParser( [ [ self._infixLeft( '*' ) ],  [ self._suffix( '!' ) ] ], atom )
 
-		self._matchTestSX( parser, 'x * y * z',    '(* (* x y) z)' )
-		self._matchTestSX( parser, 'x * y * z!',    '(! (* (* x y) z))' )
+		self._matchTestSX( parser, 'x * y * z',    '[* [* x y] z]' )
+		self._matchTestSX( parser, 'x * y * z!',    '[! [* [* x y] z]]' )
 		self._matchFailTest( parser, 'x * y! * z' )
 		self._matchFailTest( parser, 'x! * y * z' )
 
@@ -578,21 +609,21 @@ class TestCase_Operators (ParserTestCase, TestCase_Impl):
 
 		parser = prefix
 
-		self._matchTestSX( parser, 'x $ y $ z',    '($ x ($ y z))' )
-		self._matchTestSX( parser, 'x $ y $ ~z',    '($ x ($ y (~ z)))' )
-		self._matchTestSX( parser, 'x $ ~y $ z',    '($ x (~ ($ y z)))' )
-		self._matchTestSX( parser, '~x $ y $ z',    '(~ ($ x ($ y z)))' )
+		self._matchTestSX( parser, 'x $ y $ z',    '[$ x [$ y z]]' )
+		self._matchTestSX( parser, 'x $ y $ ~z',    '[$ x [$ y [~ z]]]' )
+		self._matchTestSX( parser, 'x $ ~y $ z',    '[$ x [~ [$ y z]]]' )
+		self._matchTestSX( parser, '~x $ y $ z',    '[~ [$ x [$ y z]]]' )
 
 
 	def testRight_Prefix_Auto(self):
 		atom = identifier
 
-		parser = buildOperatorParser( [ [ InfixRight( '$' ) ],  [ Prefix( '~' ) ] ], atom )
+		parser = buildOperatorParser( [ [ self._infixRight( '$' ) ],  [ self._prefix( '~' ) ] ], atom )
 
-		self._matchTestSX( parser, 'x $ y $ z',    '($ x ($ y z))' )
-		self._matchTestSX( parser, 'x $ y $ ~z',    '($ x ($ y (~ z)))' )
-		self._matchTestSX( parser, 'x $ ~y $ z',    '($ x (~ ($ y z)))' )
-		self._matchTestSX( parser, '~x $ y $ z',    '(~ ($ x ($ y z)))' )
+		self._matchTestSX( parser, 'x $ y $ z',    '[$ x [$ y z]]' )
+		self._matchTestSX( parser, 'x $ y $ ~z',    '[$ x [$ y [~ z]]]' )
+		self._matchTestSX( parser, 'x $ ~y $ z',    '[$ x [~ [$ y z]]]' )
+		self._matchTestSX( parser, '~x $ y $ z',    '[~ [$ x [$ y z]]]' )
 
 
 
@@ -611,8 +642,8 @@ class TestCase_Operators (ParserTestCase, TestCase_Impl):
 
 		parser = suffix
 
-		self._matchTestSX( parser, 'x $ y $ z',    '($ x ($ y z))' )
-		self._matchTestSX( parser, 'x $ y $ z!',    '(! ($ x ($ y z)))' )
+		self._matchTestSX( parser, 'x $ y $ z',    '[$ x [$ y z]]' )
+		self._matchTestSX( parser, 'x $ y $ z!',    '[! [$ x [$ y z]]]' )
 		self._matchFailTest( parser, 'x $ y! $ z' )
 		self._matchFailTest( parser, 'x! $ y $ z' )
 
@@ -620,10 +651,10 @@ class TestCase_Operators (ParserTestCase, TestCase_Impl):
 	def testRight_Suffix_Auto(self):
 		atom = identifier
 
-		parser = buildOperatorParser( [ [ InfixRight( '$' ) ],  [ Suffix( '!' ) ] ], atom )
+		parser = buildOperatorParser( [ [ self._infixRight( '$' ) ],  [ self._suffix( '!' ) ] ], atom )
 
-		self._matchTestSX( parser, 'x $ y $ z',    '($ x ($ y z))' )
-		self._matchTestSX( parser, 'x $ y $ z!',    '(! ($ x ($ y z)))' )
+		self._matchTestSX( parser, 'x $ y $ z',    '[$ x [$ y z]]' )
+		self._matchTestSX( parser, 'x $ y $ z!',    '[! [$ x [$ y z]]]' )
 		self._matchFailTest( parser, 'x $ y! $ z' )
 		self._matchFailTest( parser, 'x! $ y $ z' )
 
@@ -650,23 +681,23 @@ class TestCase_Operators (ParserTestCase, TestCase_Impl):
 
 		parser = prefix
 
-		self._matchTestSX( parser, 'x $ y $ z $ w',    '($ x ($ y ($ z w)))' )
-		self._matchTestSX( parser, 'x $ y @ z $ w',    '(@ ($ x y) ($ z w))' )
-		self._matchTestSX( parser, 'x $ y @ z $ ~w',    '(@ ($ x y) ($ z (~ w)))' )
-		self._matchTestSX( parser, 'x $ y @ ~z $ w',    '(@ ($ x y) (~ ($ z w)))' )
-		self._matchTestSX( parser, 'x $ ~y @ z $ w',    '($ x (~ (@ y ($ z w))))' )
-		self._matchTestSX( parser, '~x $ y @ z $ w',    '(~ (@ ($ x y) ($ z w)))' )
+		self._matchTestSX( parser, 'x $ y $ z $ w',    '[$ x [$ y [$ z w]]]' )
+		self._matchTestSX( parser, 'x $ y @ z $ w',    '[@ [$ x y] [$ z w]]' )
+		self._matchTestSX( parser, 'x $ y @ z $ ~w',    '[@ [$ x y] [$ z [~ w]]]' )
+		self._matchTestSX( parser, 'x $ y @ ~z $ w',    '[@ [$ x y] [~ [$ z w]]]' )
+		self._matchTestSX( parser, 'x $ ~y @ z $ w',    '[$ x [~ [@ y [$ z w]]]]' )
+		self._matchTestSX( parser, '~x $ y @ z $ w',    '[~ [@ [$ x y] [$ z w]]]' )
 
 
 	def testRight_Right_Prefix_Auto(self):
 		atom = identifier
 
-		parser = buildOperatorParser( [ [ InfixRight( '$' ) ],  [ InfixRight( '@' ) ],  [ Prefix( '~' ) ] ], atom )
+		parser = buildOperatorParser( [ [ self._infixRight( '$' ) ],  [ self._infixRight( '@' ) ],  [ self._prefix( '~' ) ] ], atom )
 
-		self._matchTestSX( parser, 'x $ y $ z $ w',    '($ x ($ y ($ z w)))' )
-		self._matchTestSX( parser, 'x $ y @ z $ w',    '(@ ($ x y) ($ z w))' )
-		self._matchTestSX( parser, 'x $ y @ z $ ~w',    '(@ ($ x y) ($ z (~ w)))' )
-		self._matchTestSX( parser, 'x $ y @ ~z $ w',    '(@ ($ x y) (~ ($ z w)))' )
-		self._matchTestSX( parser, 'x $ ~y @ z $ w',    '($ x (~ (@ y ($ z w))))' )
-		self._matchTestSX( parser, '~x $ y @ z $ w',    '(~ (@ ($ x y) ($ z w)))' )
-
+		self._matchTestSX( parser, 'x $ y $ z $ w',    '[$ x [$ y [$ z w]]]' )
+		self._matchTestSX( parser, 'x $ y @ z $ w',    '[@ [$ x y] [$ z w]]' )
+		self._matchTestSX( parser, 'x $ y @ z $ ~w',    '[@ [$ x y] [$ z [~ w]]]' )
+		self._matchTestSX( parser, 'x $ y @ ~z $ w',    '[@ [$ x y] [~ [$ z w]]]' )
+		self._matchTestSX( parser, 'x $ ~y @ z $ w',    '[$ x [~ [@ y [$ z w]]]]' )
+		self._matchTestSX( parser, '~x $ y @ z $ w',    '[~ [@ [$ x y] [$ z w]]]' )
+		
