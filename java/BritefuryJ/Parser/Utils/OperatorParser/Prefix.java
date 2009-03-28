@@ -9,6 +9,10 @@ package BritefuryJ.Parser.Utils.OperatorParser;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.python.core.PyObject;
+
+import BritefuryJ.DocModel.DMObjectClass;
+import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
 import BritefuryJ.Parser.Forward;
 import BritefuryJ.Parser.ParseAction;
 import BritefuryJ.Parser.ParserExpression;
@@ -51,19 +55,24 @@ public class Prefix extends UnaryOperator
 		this.action = new PrefixOpAction( action );
 	}
 
-	public Prefix(String operator)
+	public Prefix(String operator, DMObjectClass nodeClass, String fieldName) throws InvalidFieldNameException
 	{
-		this( ParserExpression.coerce( operator ), new BuildASTNodeAction( operator ) );
+		this( ParserExpression.coerce( operator ), new BuildASTNodeAction( nodeClass, fieldName ) );
 	}
 
-	public Prefix(ParserExpression opExpression, String nodeOperator)
+	public Prefix(String operator, PyObject callable)
 	{
-		this( opExpression, new BuildASTNodeAction( nodeOperator ) );
+		this( ParserExpression.coerce( operator ), new PyUnaryOperatorParseAction( callable ) );
 	}
 
-	public Prefix(String operator, String nodeOperator)
+	public Prefix(ParserExpression opExpression, DMObjectClass nodeClass, String fieldName) throws InvalidFieldNameException
 	{
-		this( ParserExpression.coerce( operator ), new BuildASTNodeAction( nodeOperator ) );
+		this( opExpression, new BuildASTNodeAction( nodeClass, fieldName ) );
+	}
+
+	public Prefix(ParserExpression opExpression, PyObject callable)
+	{
+		this( opExpression, new PyUnaryOperatorParseAction( callable ) );
 	}
 
 	

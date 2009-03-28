@@ -7,9 +7,14 @@
 package BritefuryJ.Parser.Utils.OperatorParser;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
+import org.python.core.Py;
+import org.python.core.PyInteger;
+import org.python.core.PyObject;
+
+import BritefuryJ.DocModel.DMObjectClass;
+import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
 import BritefuryJ.Parser.Forward;
 import BritefuryJ.Parser.ParseAction;
 import BritefuryJ.Parser.ParserExpression;
@@ -39,24 +44,59 @@ abstract class BinaryOperator extends Operator
 	
 	protected static class BuildASTNodeAction implements BinaryOperatorParseAction
 	{
-		private String operator;
+		private DMObjectClass nodeClass;
+		private String fieldNames[];
 		
 		
-		public BuildASTNodeAction(String operator)
+		public BuildASTNodeAction(DMObjectClass nodeClass, String leftFieldName, String rightFieldName) throws InvalidFieldNameException
 		{
-			this.operator = operator;
+			this.nodeClass = nodeClass;
+			this.fieldNames = new String[] { leftFieldName, rightFieldName };
+			
+			if ( nodeClass.getFieldIndex( leftFieldName ) == -1 )
+			{
+				throw new InvalidFieldNameException( leftFieldName );
+			}
+
+			if ( nodeClass.getFieldIndex( rightFieldName ) == -1 )
+			{
+				throw new InvalidFieldNameException( rightFieldName );
+			}
 		}
 		
 		
 		public Object invoke(String input, int begin, Object x, Object y)
 		{
-			Object[] xs = { operator, x, y };
-			return Arrays.asList( xs );
+			try
+			{
+				return nodeClass.newInstance( fieldNames, new Object[] { x, y } );
+			}
+			catch (InvalidFieldNameException e)
+			{
+				throw new RuntimeException( "This should not have happened." );
+			}
+		}
+	}
+	
+	protected static class PyBinaryOperatorParseAction implements BinaryOperatorParseAction
+	{
+		private PyObject callable;
+		
+		
+		public PyBinaryOperatorParseAction(PyObject callable)
+		{
+			this.callable = callable;
+		}
+
+		public Object invoke(String input, int begin, Object x, Object y)
+		{
+			return callable.__call__( Py.java2py( input ), new PyInteger( begin ), Py.java2py( x ), Py.java2py( y ) );
 		}
 	}
 
 	
 	
+	protected ParserExpression opExpression;
 	protected BinaryOperatorParseAction action;
 	
 	
@@ -68,8 +108,7 @@ abstract class BinaryOperator extends Operator
 	
 	protected BinaryOperator(ParserExpression opExpression, BinaryOperatorParseAction action)
 	{
-		super( opExpression );
-		
+		this.opExpression = opExpression;
 		this.action = action;
 	}
 

@@ -188,6 +188,11 @@ public class DMObjectClass
 		return new DMObject( this, keys, values );
 	}
 
+	public DMObject newInstance(PyObject values[])
+	{
+		return new DMObject( this, values );
+	}
+
 	public DMObject newInstance(PyObject values[], String names[])
 	{
 		return new DMObject( this, names, values );
@@ -237,7 +242,7 @@ public class DMObjectClass
 	
 	
 	
-	public DMObject __call__(Object values[])
+	public DMObject __call__(PyObject values[])
 	{
 		return newInstance( values );
 	}

@@ -145,9 +145,9 @@ public class Test_DMIOReader extends TestCase
 			{
 				System.out.println( "VALUES ARE NOT THE SAME" );
 				System.out.println( "EXPECTED:" );
-				System.out.println( DMIOWriter.write( expected ) );
+				System.out.println( DMIOWriter.writeAsString( expected ) );
 				System.out.println( "RESULT:" );
-				System.out.println( DMIOWriter.write( res ) );
+				System.out.println( DMIOWriter.writeAsString( res ) );
 			}
 		}
 		catch (InvalidDataTypeException e)

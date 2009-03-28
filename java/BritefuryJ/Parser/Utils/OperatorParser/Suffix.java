@@ -9,12 +9,15 @@ package BritefuryJ.Parser.Utils.OperatorParser;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.python.core.PyObject;
+
+import BritefuryJ.DocModel.DMObjectClass;
+import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
 import BritefuryJ.Parser.Forward;
 import BritefuryJ.Parser.ParseAction;
 import BritefuryJ.Parser.ParserExpression;
-import BritefuryJ.Parser.Utils.OperatorParser.UnaryOperator.BuildASTNodeAction;
 
-public class Suffix extends Operator
+public class Suffix extends UnaryOperator
 {
 	private class SuffixOpAction implements ParseAction
 	{
@@ -53,19 +56,24 @@ public class Suffix extends Operator
 		this.action = new SuffixOpAction( action );
 	}
 
-	public Suffix(String operator)
+	public Suffix(String operator, DMObjectClass nodeClass, String fieldName) throws InvalidFieldNameException
 	{
-		this( ParserExpression.coerce( operator ), new BuildASTNodeAction( operator ) );
+		this( ParserExpression.coerce( operator ), new BuildASTNodeAction( nodeClass, fieldName ) );
 	}
 
-	public Suffix(ParserExpression opExpression, String nodeOperator)
+	public Suffix(String operator, PyObject callable)
 	{
-		this( opExpression, new BuildASTNodeAction( nodeOperator ) );
+		this( ParserExpression.coerce( operator ), new PyUnaryOperatorParseAction( callable ) );
 	}
 
-	public Suffix(String operator, String nodeOperator)
+	public Suffix(ParserExpression opExpression, DMObjectClass nodeClass, String fieldName) throws InvalidFieldNameException
 	{
-		this( ParserExpression.coerce( operator ), new BuildASTNodeAction( nodeOperator ) );
+		this( opExpression, new BuildASTNodeAction( nodeClass, fieldName ) );
+	}
+
+	public Suffix(ParserExpression opExpression, PyObject callable)
+	{
+		this( opExpression, new PyUnaryOperatorParseAction( callable ) );
 	}
 
 	

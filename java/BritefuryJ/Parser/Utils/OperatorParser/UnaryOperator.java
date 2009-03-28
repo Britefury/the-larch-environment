@@ -6,35 +6,70 @@
 //##************************
 package BritefuryJ.Parser.Utils.OperatorParser;
 
-import java.util.Arrays;
+import org.python.core.Py;
+import org.python.core.PyInteger;
+import org.python.core.PyObject;
 
+import BritefuryJ.DocModel.DMObjectClass;
+import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
 import BritefuryJ.Parser.ParserExpression;
 
 abstract class UnaryOperator extends Operator
 {
 	protected static class BuildASTNodeAction implements UnaryOperatorParseAction
 	{
-		private String operator;
+		private DMObjectClass nodeClass;
+		private String fieldNames[];
 		
 		
-		public BuildASTNodeAction(String operator)
+		public BuildASTNodeAction(DMObjectClass nodeClass, String fieldName) throws InvalidFieldNameException
 		{
-			this.operator = operator;
+			this.nodeClass = nodeClass;
+			this.fieldNames = new String[] { fieldName };
+
+			if ( nodeClass.getFieldIndex( fieldName ) == -1 )
+			{
+				throw new InvalidFieldNameException( fieldName );
+			}
 		}
 		
 		
 		public Object invoke(String input, int begin, Object x)
 		{
-			Object[] xs = { operator, x };
-			return Arrays.asList( xs );
+			try
+			{
+				return nodeClass.newInstance( fieldNames, new Object[] { x } );
+			}
+			catch (InvalidFieldNameException e)
+			{
+				throw new RuntimeException( "This should not have happened." );
+			}
+		}
+	}
+	
+	protected static class PyUnaryOperatorParseAction implements UnaryOperatorParseAction
+	{
+		private PyObject callable;
+		
+		
+		public PyUnaryOperatorParseAction(PyObject callable)
+		{
+			this.callable = callable;
+		}
+
+		public Object invoke(String input, int begin, Object x)
+		{
+			return callable.__call__( Py.java2py( input ), new PyInteger( begin ), Py.java2py( x ) );
 		}
 	}
 
 
 
 
+	protected ParserExpression opExpression;
+
 	protected UnaryOperator(ParserExpression opExpression)
 	{
-		super( opExpression );
+		this.opExpression = opExpression;
 	}
 }
