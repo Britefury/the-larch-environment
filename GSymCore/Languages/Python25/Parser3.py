@@ -453,21 +453,21 @@ class Python25Grammar (Grammar):
 		bParamList = False
 		bKWParamList = False
 		for x in xs:
-			if isinstance( x, list )  and  len( x ) >= 2:
-				if x[0] == 'kwParamList':
+			if isinstance( x, DMObject ):
+				if x.isInstanceOf( Nodes.KWParamList ):
 					if bKWParamList:
 						# Not after KW param list (only 1 allowed)
 						return False
 					bKWParamList = True
 					continue
-				elif x[0] == 'paramList':
+				elif x.isInstanceOf( Nodes.ParamList ):
 					if bKWParamList | bParamList:
 						# Not after KW param list
 						# Not after param list (only 1 allowed)
 						return False
 					bParamList = True
 					continue
-				elif x[0] == 'defaultValueParam':
+				elif x.isInstanceOf( Nodes.DefaultValueParam ):
 					if bKWParamList | bParamList:
 						# Not after param list or KW param list
 						return False
@@ -484,19 +484,19 @@ class Python25Grammar (Grammar):
 
 	@Rule
 	def simpleParam(self):
-		return self.pythonIdentifier().action( lambda input, pos, xs: [ 'simpleParam', xs[0] ] )
+		return self.pythonIdentifier().action( lambda input, pos, xs: Nodes.SimpleParam( name=xs ) )
 
 	@Rule
 	def defaultValueParam(self):
-		return ( self.paramName() + '=' + self.expression() ).action( lambda input, pos, xs: [ 'defaultValueParam', xs[0], xs[2] ] )
+		return ( self.paramName() + '=' + self.expression() ).action( lambda input, pos, xs: Nodes.DefaultValueParam( name=xs[0], defaultValue=xs[2] ) )
 
 	@Rule
 	def paramList(self):
-		return ( Literal( '*' )  +  self.paramName() ).action( lambda input, pos, xs: [ 'paramList', xs[1] ] )
+		return ( Literal( '*' )  +  self.paramName() ).action( lambda input, pos, xs: Nodes.ParamList( name=xs[1] ) )
 
 	@Rule
 	def kwParamList(self):
-		return ( Literal( '**' )  +  self.paramName() ).action( lambda input, pos, xs: [ 'kwParamList', xs[1] ] )
+		return ( Literal( '**' )  +  self.paramName() ).action( lambda input, pos, xs: Nodes.KWParamList( name=xs[1] ) )
 
 	@Rule
 	def param(self):
@@ -512,7 +512,7 @@ class Python25Grammar (Grammar):
 	# Lambda expression_checkParams
 	@Rule
 	def lambdaExpr(self):
-		return ( Keyword( lambdaKeyword )  +  self.params()  +  Literal( ':' )  +  self.expression() ).action( lambda input, pos, xs: [ 'lambdaExpr', xs[1], xs[3] ] )
+		return ( Keyword( lambdaKeyword )  +  self.params()  +  Literal( ':' )  +  self.expression() ).action( lambda input, pos, xs: Nodes.LambdaExpr( params=xs[1], expr=xs[3] ) )
 
 
 
@@ -520,7 +520,7 @@ class Python25Grammar (Grammar):
 	# Conditional expression
 	@Rule
 	def conditionalExpression(self):
-		return ( self.orTest()  +  Keyword( ifKeyword )  +  self.orTest()  +  Keyword( elseKeyword )  +  self.expression() ).action( lambda input, pos, xs: [ 'conditionalExpr', xs[2], xs[0], xs[4] ] )
+		return ( self.orTest()  +  Keyword( ifKeyword )  +  self.orTest()  +  Keyword( elseKeyword )  +  self.expression() ).action( lambda input, pos, xs: Nodes.ConditionalExpr( condition=xs[2], expr=xs[0], elseExpr=xs[4] ) )
 
 
 
@@ -558,7 +558,7 @@ class Python25Grammar (Grammar):
 	# Assert statement
 	@Rule
 	def assertStmt(self):
-		return ( Keyword( assertKeyword ) + self.expression()  +  Optional( Literal( ',' ) + self.expression() ) ).action( lambda input, pos, xs: [ 'assertStmt', xs[1], xs[2][1]   if xs[2] is not None  else  makeNullNode() ] )
+		return ( Keyword( assertKeyword ) + self.expression()  +  Optional( Literal( ',' ) + self.expression() ) ).action( lambda input, pos, xs: Nodes.AssertStmt( condition=xs[1], fail=xs[2][1]   if xs[2] is not None  else  makeNullNode() ) )
 
 
 
@@ -566,7 +566,7 @@ class Python25Grammar (Grammar):
 	# Assignment statement
 	@Rule
 	def assignmentStmt(self):
-		return ( OneOrMore( ( self.targetList()  +  '=' ).action( lambda input, pos, xs: xs[0] ) )  +  self.tupleOrExpressionOrYieldExpression() ).action( lambda input, pos, xs: [ 'assignmentStmt', xs[0], xs[1] ] )
+		return ( OneOrMore( ( self.targetList()  +  '=' ).action( lambda input, pos, xs: xs[0] ) )  +  self.tupleOrExpressionOrYieldExpression() ).action( lambda input, pos, xs: Nodes.AssignStmt( targets=xs[0], value=xs[1] ) )
 
 
 
@@ -578,7 +578,7 @@ class Python25Grammar (Grammar):
 
 	@Rule
 	def augAssignStmt(self):
-		return ( self.targetItem()  +  self.augOp()  +  self.tupleOrExpressionOrYieldExpression() ).action( lambda input, pos, xs: [ 'augAssignStmt', xs[1], xs[0], xs[2] ] )
+		return ( self.targetItem()  +  self.augOp()  +  self.tupleOrExpressionOrYieldExpression() ).action( lambda input, pos, xs: Nodes.AugAssignStmt( op=xs[1], target=xs[0], value=xs[2] ) )
 
 
 
@@ -586,28 +586,28 @@ class Python25Grammar (Grammar):
 	# Pass statement
 	@Rule
 	def passStmt(self):
-		return Keyword( passKeyword ).action( lambda input, pos, xs: [ 'passStmt' ] )
+		return Keyword( passKeyword ).action( lambda input, pos, xs: Nodes.PassStmt() )
 
 
 
 	# Del statement
 	@Rule
 	def delStmt(self):
-		return ( Keyword( delKeyword )  +  self.targetList() ).action( lambda input, pos, xs: [ 'delStmt', xs[1] ] )
+		return ( Keyword( delKeyword )  +  self.targetList() ).action( lambda input, pos, xs: Nodes.DelStmt( target=xs[1] ) )
 
 
 
 	# Return statement
 	@Rule
 	def returnStmt(self):
-		return ( Keyword( returnKeyword )  +  self.tupleOrExpression() ).action( lambda input, pos, xs: [ 'returnStmt', xs[1] ] )
+		return ( Keyword( returnKeyword )  +  self.tupleOrExpression() ).action( lambda input, pos, xs: Nodes.ReturnStmt( value=xs[1] ) )
 
 
 
 	# Yield statement
 	@Rule
 	def yieldStmt(self):
-		return ( Keyword( yieldKeyword )  +  self.expression() ).action( lambda input, pos, xs: [ 'yieldStmt', xs[1] ] )
+		return ( Keyword( yieldKeyword )  +  self.expression() ).action( lambda input, pos, xs: Nodes.YieldStmt( value=xs[1] ) )
 
 
 
@@ -1108,19 +1108,19 @@ class TestCase_Python25Parser (ParserTestCase):
 	def testParams(self):
 		g = Python25Grammar()
 		self._matchTest( g.params(), '', [] )
-		self._matchTest( g.params(), 'f', [ [ 'simpleParam', 'f' ] ] )
-		self._matchTest( g.params(), 'f,', [ [ 'simpleParam', 'f' ] ] )
-		self._matchTest( g.params(), 'f,g', [ [ 'simpleParam', 'f' ], [ 'simpleParam', 'g' ] ] )
-		self._matchTest( g.params(), 'f,g,m=a', [ [ 'simpleParam', 'f' ], [ 'simpleParam', 'g' ], [ 'defaultValueParam', 'm', Nodes.Load( name='a' ) ] ] )
-		self._matchTest( g.params(), 'f,g,m=a,n=b', [ [ 'simpleParam', 'f' ], [ 'simpleParam', 'g' ], [ 'defaultValueParam', 'm', Nodes.Load( name='a' ) ], [ 'defaultValueParam', 'n', Nodes.Load( name='b' ) ] ] )
-		self._matchTest( g.params(), 'f,g,m=a,n=b,*p', [ [ 'simpleParam', 'f' ], [ 'simpleParam', 'g' ], [ 'defaultValueParam', 'm', Nodes.Load( name='a' ) ], [ 'defaultValueParam', 'n', Nodes.Load( name='b' ) ], [ 'paramList', 'p' ] ] )
-		self._matchTest( g.params(), 'f,m=a,*p,**w', [ [ 'simpleParam', 'f' ], [ 'defaultValueParam', 'm', Nodes.Load( name='a' ) ], [ 'paramList', 'p' ], [ 'kwParamList', 'w' ] ] )
-		self._matchTest( g.params(), 'f,m=a,*p', [ [ 'simpleParam', 'f' ], [ 'defaultValueParam', 'm', Nodes.Load( name='a' ) ], [ 'paramList', 'p' ] ] )
-		self._matchTest( g.params(), 'f,m=a,**w', [ [ 'simpleParam', 'f' ], [ 'defaultValueParam', 'm', Nodes.Load( name='a' ) ], [ 'kwParamList', 'w' ] ] )
-		self._matchTest( g.params(), 'f,*p,**w', [ [ 'simpleParam', 'f' ], [ 'paramList', 'p' ], [ 'kwParamList', 'w' ] ] )
-		self._matchTest( g.params(), 'm=a,*p,**w', [ [ 'defaultValueParam', 'm', Nodes.Load( name='a' ) ], [ 'paramList', 'p' ], [ 'kwParamList', 'w' ] ] )
-		self._matchTest( g.params(), '*p,**w', [ [ 'paramList', 'p' ], [ 'kwParamList', 'w' ] ] )
-		self._matchTest( g.params(), '**w', [ [ 'kwParamList', 'w' ] ] )
+		self._matchTest( g.params(), 'f', [ Nodes.SimpleParam( name='f' ) ] )
+		self._matchTest( g.params(), 'f,', [ Nodes.SimpleParam( name='f' ) ] )
+		self._matchTest( g.params(), 'f,g', [ Nodes.SimpleParam( name='f' ), Nodes.SimpleParam( name='g' ) ] )
+		self._matchTest( g.params(), 'f,g,m=a', [ Nodes.SimpleParam( name='f' ), Nodes.SimpleParam( name='g' ), Nodes.DefaultValueParam( name='m', defaultValue=Nodes.Load( name='a' ) ) ] )
+		self._matchTest( g.params(), 'f,g,m=a,n=b', [ Nodes.SimpleParam( name='f' ), Nodes.SimpleParam( name='g' ), Nodes.DefaultValueParam( name='m', defaultValue=Nodes.Load( name='a' ) ), Nodes.DefaultValueParam( name='n', defaultValue=Nodes.Load( name='b' ) ) ] )
+		self._matchTest( g.params(), 'f,g,m=a,n=b,*p', [ Nodes.SimpleParam( name='f' ), Nodes.SimpleParam( name='g' ), Nodes.DefaultValueParam( name='m', defaultValue=Nodes.Load( name='a' ) ), Nodes.DefaultValueParam( name='n', defaultValue=Nodes.Load( name='b' ) ), Nodes.ParamList( name='p' ) ] )
+		self._matchTest( g.params(), 'f,m=a,*p,**w', [ Nodes.SimpleParam( name='f' ), Nodes.DefaultValueParam( name='m', defaultValue=Nodes.Load( name='a' ) ), Nodes.ParamList( name='p' ), Nodes.KWParamList( name='w' ) ] )
+		self._matchTest( g.params(), 'f,m=a,*p', [ Nodes.SimpleParam( name='f' ), Nodes.DefaultValueParam( name='m', defaultValue=Nodes.Load( name='a' ) ), Nodes.ParamList( name='p' ) ] )
+		self._matchTest( g.params(), 'f,m=a,**w', [ Nodes.SimpleParam( name='f' ), Nodes.DefaultValueParam( name='m', defaultValue=Nodes.Load( name='a' ) ), Nodes.KWParamList( name='w' ) ] )
+		self._matchTest( g.params(), 'f,*p,**w', [ Nodes.SimpleParam( name='f' ), Nodes.ParamList( name='p' ), Nodes.KWParamList( name='w' ) ] )
+		self._matchTest( g.params(), 'm=a,*p,**w', [ Nodes.DefaultValueParam( name='m', defaultValue=Nodes.Load( name='a' ) ), Nodes.ParamList( name='p' ), Nodes.KWParamList( name='w' ) ] )
+		self._matchTest( g.params(), '*p,**w', [ Nodes.ParamList( name='p' ), Nodes.KWParamList( name='w' ) ] )
+		self._matchTest( g.params(), '**w', [ Nodes.KWParamList( name='w' ) ] )
 		self._matchFailTest( g.params(), 'm=a,f' )
 		self._matchFailTest( g.params(), '*p,f' )
 		self._matchFailTest( g.params(), '**w,f' )
@@ -1132,17 +1132,18 @@ class TestCase_Python25Parser (ParserTestCase):
 
 	def testLambda(self):
 		g = Python25Grammar()
-		self._matchTest( g.expression(), 'lambda f,m=a,*p,**w: f+m+p+w', [ 'lambdaExpr', [ [ 'simpleParam', 'f' ], [ 'defaultValueParam', 'm', Nodes.Load( name='a' ) ], [ 'paramList', 'p' ], [ 'kwParamList', 'w' ] ],
-										   Nodes.Add( x=Nodes.Add( x=Nodes.Add( x=Nodes.Load( name='f' ), y=Nodes.Load( name='m' ) ), y=Nodes.Load( name='p' ) ), y=Nodes.Load( name='w' ) ) ] )
+		self._matchTest( g.expression(), 'lambda f,m=a,*p,**w: f+m+p+w', Nodes.LambdaExpr( 
+			params=[ Nodes.SimpleParam( name='f' ), Nodes.DefaultValueParam( name='m', defaultValue=Nodes.Load( name='a' ) ), Nodes.ParamList( name='p' ), Nodes.KWParamList( name='w' ) ],
+			expr=Nodes.Add( x=Nodes.Add( x=Nodes.Add( x=Nodes.Load( name='f' ), y=Nodes.Load( name='m' ) ), y=Nodes.Load( name='p' ) ), y=Nodes.Load( name='w' ) ) ) )
 
 
 
 	def testConditionalExpr(self):
 		g = Python25Grammar()
-		self._matchTest( g.expression(), 'x   if y else   z', [ 'conditionalExpr', Nodes.Load( name='y' ), Nodes.Load( name='x' ), Nodes.Load( name='z' ) ] )
-		self._matchTest( g.expression(), '(x   if y else   z)   if w else   q', [ 'conditionalExpr', Nodes.Load( name='w' ), [ 'conditionalExpr', Nodes.Load( name='y' ), Nodes.Load( name='x' ), Nodes.Load( name='z' ) ], Nodes.Load( name='q' ) ] )
-		self._matchTest( g.expression(), 'w   if (x   if y else   z) else   q', [ 'conditionalExpr', [ 'conditionalExpr', Nodes.Load( name='y' ), Nodes.Load( name='x' ), Nodes.Load( name='z' ) ], Nodes.Load( name='w' ), Nodes.Load( name='q' ) ] )
-		self._matchTest( g.expression(), 'w   if q else   x   if y else   z', [ 'conditionalExpr', Nodes.Load( name='q' ), Nodes.Load( name='w' ), [ 'conditionalExpr', Nodes.Load( name='y' ), Nodes.Load( name='x' ), Nodes.Load( name='z' ) ] ] )
+		self._matchTest( g.expression(), 'x   if y else   z', Nodes.ConditionalExpr( condition=Nodes.Load( name='y' ), expr=Nodes.Load( name='x' ), elseExpr=Nodes.Load( name='z' ) ) )
+		self._matchTest( g.expression(), '(x   if y else   z)   if w else   q', Nodes.ConditionalExpr( condition=Nodes.Load( name='w' ), expr=Nodes.ConditionalExpr( condition=Nodes.Load( name='y' ), expr=Nodes.Load( name='x' ), elseExpr=Nodes.Load( name='z' ) ), elseExpr=Nodes.Load( name='q' ) ) )
+		self._matchTest( g.expression(), 'w   if (x   if y else   z) else   q', Nodes.ConditionalExpr( condition=Nodes.ConditionalExpr( condition=Nodes.Load( name='y' ), expr=Nodes.Load( name='x' ), elseExpr=Nodes.Load( name='z' ) ), expr=Nodes.Load( name='w' ), elseExpr=Nodes.Load( name='q' ) ) )
+		self._matchTest( g.expression(), 'w   if q else   x   if y else   z', Nodes.ConditionalExpr( condition=Nodes.Load( name='q' ), expr=Nodes.Load( name='w' ), elseExpr=Nodes.ConditionalExpr( condition=Nodes.Load( name='y' ), expr=Nodes.Load( name='x' ), elseExpr=Nodes.Load( name='z' ) ) ) )
 		self._matchFailTest( g.expression(), 'w   if x   if y else   z else   q' )
 
 
@@ -1152,58 +1153,62 @@ class TestCase_Python25Parser (ParserTestCase):
 		self._matchTest( g.tupleOrExpression(), 'a', Nodes.Load( name='a' ) )
 		self._matchTest( g.tupleOrExpression(), 'a,b', Nodes.TupleLiteral( values=[ Nodes.Load( name='a' ), Nodes.Load( name='b' ) ] ) )
 		self._matchTest( g.tupleOrExpression(), 'a,2', Nodes.TupleLiteral( values=[ Nodes.Load( name='a' ), Nodes.IntLiteral( format='decimal', numType='int', value='2' ) ] ) )
-		self._matchTest( g.tupleOrExpression(), 'lambda x, y: x+y,2', Nodes.TupleLiteral( values=[ [ 'lambdaExpr', [ [ 'simpleParam', 'x' ], [ 'simpleParam', 'y' ] ], Nodes.Add( x=Nodes.Load( name='x' ), y=Nodes.Load( name='y' ) ) ], Nodes.IntLiteral( format='decimal', numType='int', value='2' ) ] ) )
+		self._matchTest( g.tupleOrExpression(), 'lambda x, y: x+y,2', Nodes.TupleLiteral(
+			values=[ Nodes.LambdaExpr( params=[ Nodes.SimpleParam( name='x' ), Nodes.SimpleParam( name='y' ) ],
+						   expr=Nodes.Add( x=Nodes.Load( name='x' ), y=Nodes.Load( name='y' ) ) ),
+				Nodes.IntLiteral( format='decimal', numType='int', value='2' ) ] ) )
 
 
 
 	def testAssertStmt(self):
 		g = Python25Grammar()
-		self._matchTest( g.statement(), 'assert x', [ 'assertStmt', Nodes.Load( name='x' ), makeNullNode() ] )
-		self._matchTest( g.statement(), 'assert x,y', [ 'assertStmt', Nodes.Load( name='x' ), Nodes.Load( name='y' ) ] )
+		self._matchTest( g.statement(), 'assert x', Nodes.AssertStmt( condition=Nodes.Load( name='x' ), fail=makeNullNode() ) )
+		self._matchTest( g.statement(), 'assert x,y', Nodes.AssertStmt( condition=Nodes.Load( name='x' ), fail=Nodes.Load( name='y' ) ) )
 
 
 	def testAssignmentStmt(self):
 		g = Python25Grammar()
-		self._matchTest( g.statement(), 'a=x', [ 'assignmentStmt', [ Nodes.SingleTarget( name='a' ) ], Nodes.Load( name='x' ) ] )
-		self._matchTest( g.statement(), 'a,b=c,d=x', [ 'assignmentStmt', [ Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='a' ),  Nodes.SingleTarget( name='b' ) ] ),
-										   Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='c' ),  Nodes.SingleTarget( name='d' ) ] ) ], Nodes.Load( name='x' ) ] )
-		self._matchTest( g.statement(), 'a=yield x', [ 'assignmentStmt', [ Nodes.SingleTarget( name='a' ) ], Nodes.YieldExpr( value=Nodes.Load( name='x' ) ) ] )
+		self._matchTest( g.statement(), 'a=x', Nodes.AssignStmt( targets=[ Nodes.SingleTarget( name='a' ) ], value=Nodes.Load( name='x' ) ) )
+		self._matchTest( g.statement(), 'a=b=x', Nodes.AssignStmt( targets=[ Nodes.SingleTarget( name='a' ), Nodes.SingleTarget( name='b' ) ], value=Nodes.Load( name='x' ) ) )
+		self._matchTest( g.statement(), 'a,b=c,d=x', Nodes.AssignStmt( targets=[ Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='a' ),  Nodes.SingleTarget( name='b' ) ] ),
+										   Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='c' ),  Nodes.SingleTarget( name='d' ) ] ) ], value=Nodes.Load( name='x' ) ) )
+		self._matchTest( g.statement(), 'a=yield x', Nodes.AssignStmt( targets=[ Nodes.SingleTarget( name='a' ) ], value=Nodes.YieldExpr( value=Nodes.Load( name='x' ) ) ) )
 		self._matchFailTest( g.statement(), '=x' )
 
 
 	def testAugAssignStmt(self):
 		g = Python25Grammar()
-		self._matchTest( g.statement(), 'a += b', [ 'augAssignStmt', '+=', Nodes.SingleTarget( name='a' ), Nodes.Load( name='b' ) ] )
-		self._matchTest( g.statement(), 'a -= b', [ 'augAssignStmt', '-=', Nodes.SingleTarget( name='a' ), Nodes.Load( name='b' ) ] )
-		self._matchTest( g.statement(), 'a *= b', [ 'augAssignStmt', '*=', Nodes.SingleTarget( name='a' ), Nodes.Load( name='b' ) ] )
-		self._matchTest( g.statement(), 'a /= b', [ 'augAssignStmt', '/=', Nodes.SingleTarget( name='a' ), Nodes.Load( name='b' ) ] )
-		self._matchTest( g.statement(), 'a %= b', [ 'augAssignStmt', '%=', Nodes.SingleTarget( name='a' ), Nodes.Load( name='b' ) ] )
-		self._matchTest( g.statement(), 'a **= b', [ 'augAssignStmt', '**=', Nodes.SingleTarget( name='a' ), Nodes.Load( name='b' ) ] )
-		self._matchTest( g.statement(), 'a >>= b', [ 'augAssignStmt', '>>=', Nodes.SingleTarget( name='a' ), Nodes.Load( name='b' ) ] )
-		self._matchTest( g.statement(), 'a <<= b', [ 'augAssignStmt', '<<=', Nodes.SingleTarget( name='a' ), Nodes.Load( name='b' ) ] )
-		self._matchTest( g.statement(), 'a &= b', [ 'augAssignStmt', '&=', Nodes.SingleTarget( name='a' ), Nodes.Load( name='b' ) ] )
-		self._matchTest( g.statement(), 'a ^= b', [ 'augAssignStmt', '^=', Nodes.SingleTarget( name='a' ), Nodes.Load( name='b' ) ] )
-		self._matchTest( g.statement(), 'a |= b', [ 'augAssignStmt', '|=', Nodes.SingleTarget( name='a' ), Nodes.Load( name='b' ) ] )
+		self._matchTest( g.statement(), 'a += b', Nodes.AugAssignStmt( op='+=', target=Nodes.SingleTarget( name='a' ), value=Nodes.Load( name='b' ) ) )
+		self._matchTest( g.statement(), 'a -= b', Nodes.AugAssignStmt( op='-=', target=Nodes.SingleTarget( name='a' ), value=Nodes.Load( name='b' ) ) )
+		self._matchTest( g.statement(), 'a *= b', Nodes.AugAssignStmt( op='*=', target=Nodes.SingleTarget( name='a' ), value=Nodes.Load( name='b' ) ) )
+		self._matchTest( g.statement(), 'a /= b', Nodes.AugAssignStmt( op='/=', target=Nodes.SingleTarget( name='a' ), value=Nodes.Load( name='b' ) ) )
+		self._matchTest( g.statement(), 'a %= b', Nodes.AugAssignStmt( op='%=', target=Nodes.SingleTarget( name='a' ), value=Nodes.Load( name='b' ) ) )
+		self._matchTest( g.statement(), 'a **= b', Nodes.AugAssignStmt( op='**=', target=Nodes.SingleTarget( name='a' ), value=Nodes.Load( name='b' ) ) )
+		self._matchTest( g.statement(), 'a >>= b', Nodes.AugAssignStmt( op='>>=', target=Nodes.SingleTarget( name='a' ), value=Nodes.Load( name='b' ) ) )
+		self._matchTest( g.statement(), 'a <<= b', Nodes.AugAssignStmt( op='<<=', target=Nodes.SingleTarget( name='a' ), value=Nodes.Load( name='b' ) ) )
+		self._matchTest( g.statement(), 'a &= b', Nodes.AugAssignStmt( op='&=', target=Nodes.SingleTarget( name='a' ), value=Nodes.Load( name='b' ) ) )
+		self._matchTest( g.statement(), 'a ^= b', Nodes.AugAssignStmt( op='^=', target=Nodes.SingleTarget( name='a' ), value=Nodes.Load( name='b' ) ) )
+		self._matchTest( g.statement(), 'a |= b', Nodes.AugAssignStmt( op='|=', target=Nodes.SingleTarget( name='a' ), value=Nodes.Load( name='b' ) ) )
 
 
 	def testPassStmt(self):
 		g = Python25Grammar()
-		self._matchTest( g.statement(), 'pass', [ 'passStmt' ] )
+		self._matchTest( g.statement(), 'pass', Nodes.PassStmt() )
 
 
 	def testDelStmt(self):
 		g = Python25Grammar()
-		self._matchTest( g.statement(), 'del x', [ 'delStmt', Nodes.SingleTarget( name='x' ) ] )
+		self._matchTest( g.statement(), 'del x', Nodes.DelStmt( target=Nodes.SingleTarget( name='x' ) ) )
 
 
 	def testReturnStmt(self):
 		g = Python25Grammar()
-		self._matchTest( g.statement(), 'return x', [ 'returnStmt', Nodes.Load( name='x' ) ] )
+		self._matchTest( g.statement(), 'return x', Nodes.ReturnStmt( value=Nodes.Load( name='x' ) ) )
 
 
 	def testYieldStmt(self):
 		g = Python25Grammar()
-		self._matchTest( g.statement(), 'yield x', [ 'yieldStmt', Nodes.Load( name='x' ) ] )
+		self._matchTest( g.statement(), 'yield x', Nodes.YieldStmt( value=Nodes.Load( name='x' ) ) )
 
 
 	def testRaiseStmt(self):
@@ -1333,7 +1338,7 @@ class TestCase_Python25Parser (ParserTestCase):
 	def testDefStmt(self):
 		g = Python25Grammar()
 		self._matchTest( g.defStmt(), 'def f():', [ 'defStmt', 'f', [], [] ] )
-		self._matchTest( g.defStmt(), 'def f(x):', [ 'defStmt', 'f', [ [ 'simpleParam', 'x' ] ], [] ] )
+		self._matchTest( g.defStmt(), 'def f(x):', [ 'defStmt', 'f', [ Nodes.SimpleParam( name='x' ) ], [] ] )
 
 
 	def testDecoStmt(self):
@@ -1368,7 +1373,7 @@ class TestCase_Python25Parser (ParserTestCase):
 
 	def testDictInList(self):
 		g = Python25Grammar()
-		self._matchTest( g.statement(), 'y = [ x, { a : b } ]', [ 'assignmentStmt', [ Nodes.SingleTarget( name='y' ) ], Nodes.ListLiteral( values=[ Nodes.Load( name='x' ), Nodes.DictLiteral( values=[ Nodes.DictKeyValuePair( key=Nodes.Load( name='a' ), value=Nodes.Load( name='b' ) ) ] ) ] ) ] )
+		self._matchTest( g.statement(), 'y = [ x, { a : b } ]', Nodes.AssignStmt( targets=[ Nodes.SingleTarget( name='y' ) ], value=Nodes.ListLiteral( values=[ Nodes.Load( name='x' ), Nodes.DictLiteral( values=[ Nodes.DictKeyValuePair( key=Nodes.Load( name='a' ), value=Nodes.Load( name='b' ) ) ] ) ] ) ) )
 
 
 
