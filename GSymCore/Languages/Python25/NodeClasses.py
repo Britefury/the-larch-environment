@@ -113,7 +113,7 @@ AndTest = module.newClass( 'AndTest', Expr, [ 'x', 'y' ] )
 OrTest = module.newClass( 'OrTest', Expr, [ 'x', 'y' ] )
 # Parameters for lambda / function definition
 SimpleParam = module.newClass( 'SimpleParam', Node, [ 'name' ] )
-DefaultValueParam = module.newClass( 'DefaultValueParam', Node, [ 'name', 'value' ] )
+DefaultValueParam = module.newClass( 'DefaultValueParam', Node, [ 'name', 'defaultValue' ] )
 ParamList = module.newClass( 'ParamList', Node, [ 'name' ] )
 KWParamList = module.newClass( 'KWParamList', Node, [ 'name' ] )
 # Lambda
