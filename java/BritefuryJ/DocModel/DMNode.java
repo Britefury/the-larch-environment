@@ -82,11 +82,11 @@ public class DMNode
 	
 	public static boolean isNull(Object x)
 	{
-		return "<null>".equals( x );
+		return "<nil>".equals( x );
 	}
 	
 	public static String newNull()
 	{
-		return new String( "<null>" );
+		return new String( "<nil>" );
 	}
 }
