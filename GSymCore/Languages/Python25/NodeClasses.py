@@ -142,7 +142,7 @@ ModuleImport = module.newClass( 'ModuleImport', Node, [ 'name' ] )
 ModuleImportAs = module.newClass( 'ModuleImportAs', Node, [ 'name', 'asName' ] )
 ModuleContentImport = module.newClass( 'ModuleContentImport', Node, [ 'name' ] )
 ModuleContentImportAs = module.newClass( 'ModuleContentImportAs', Node, [ 'name', 'asName' ] )
-ImportStmt = module.newClass( 'ImportStmt', Stmt, [ 'imports' ] )
+ImportStmt = module.newClass( 'ImportStmt', Stmt, [ 'modules' ] )
 FromImportStmt = module.newClass( 'FromImportStmt', Stmt, [ 'module', 'imports' ] )
 FromImportAllStmt = module.newClass( 'FromImportAllStmt', Stmt, [ 'module' ] )
 # Global
@@ -154,7 +154,7 @@ GlobalStmt = module.newClass( 'GlobalStmt', Stmt, [ 'vars' ] )
 # Compound statements
 #
 IfStmt = module.newClass( 'IfStmt', CompoundStmt, [ 'condition' ] )
-ElIfStmt = module.newClass( 'ElIfStmt', CompoundStmt, [ 'condition' ] )
+ElifStmt = module.newClass( 'ElifStmt', CompoundStmt, [ 'condition' ] )
 ElseStmt = module.newClass( 'ElseStmt', CompoundStmt, [] )
 WhileStmt = module.newClass( 'WhileStmt', CompoundStmt, [ 'condition' ] )
 ForStmt = module.newClass( 'ForStmt', CompoundStmt, [ 'target', 'source' ] )
