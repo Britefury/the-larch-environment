@@ -682,13 +682,13 @@ class Python25Grammar (Grammar):
 	# 'import' <separatedList( moduleImport )>
 	@Rule
 	def simpleImport(self):
-		return ( Keyword( importKeyword )  +  separatedList( self.moduleImport(), True, False, False ) ).action( lambda input, pos, xs: [ 'importStmt' ] + xs[1] )
+		return ( Keyword( importKeyword )  +  separatedList( self.moduleImport(), True, False, False ) ).action( lambda input, pos, xs: Nodes.ImportStmt( modules=xs[1] ) )
 
 
 	# ( <pythonIdentifier> 'as' <pythonIdentifier> )  |  <pythonIdentifier>
 	@Rule
 	def moduleContentImport(self):
-		return ( self.pythonIdentifier() + Keyword( asKeyword ) + self.pythonIdentifier() ).action( lambda input, pos, xs: [ 'moduleContentImportAs', xs[0], xs[2] ] )   |   \
+		return ( self.pythonIdentifier() + Keyword( asKeyword ) + self.pythonIdentifier() ).action( lambda input, pos, xs: Nodes.ModuleContentImportAs( name=xs[0], asName=xs[2] ) )   |   \
 		       self.pythonIdentifier().action( lambda input, pos, xs: Nodes.ModuleContentImport( name=xs ) )
 
 
@@ -700,13 +700,13 @@ class Python25Grammar (Grammar):
 				 separatedList( self.moduleContentImport(), True, False, False )  |  \
 				 ( Literal( '(' )  +  separatedList( self.moduleContentImport(), True, True, False )  +  Literal( ')' ) ).action( lambda input, pos, xs: xs[1] )  \
 				 )  \
-			 ).action( lambda input, pos, xs: [ 'fromImportStmt', xs[1] ] + xs[3] )
+			 ).action( lambda input, pos, xs: Nodes.FromImportStmt( module=xs[1], imports=xs[3] ) )
 
 
 	# 'from' <relativeModule> 'import' '*'
 	@Rule
 	def fromImportAll(self):
-		return ( Keyword( fromKeyword ) + self.relativeModule() + Keyword( importKeyword ) + '*' ).action( lambda input, pos, xs: [ 'fromImportAllStmt', xs[1] ] )
+		return ( Keyword( fromKeyword ) + self.relativeModule() + Keyword( importKeyword ) + '*' ).action( lambda input, pos, xs: Nodes.FromImportAllStmt( module=xs[1] ) )
 
 
 	# Final :::
@@ -720,11 +720,11 @@ class Python25Grammar (Grammar):
 	# Global statement
 	@Rule
 	def globalVar(self):
-		return self.pythonIdentifier().action( lambda input, pos, xs: [ 'globalVar', xs ] )
+		return self.pythonIdentifier().action( lambda input, pos, xs: Nodes.GlobalVar( name=xs ) )
 
 	@Rule
 	def globalStmt(self):
-		return ( Keyword( globalKeyword )  +  separatedList( self.globalVar(), True, False, False ) ).action( lambda input, pos, xs: [ 'globalStmt' ]  +  xs[1] )
+		return ( Keyword( globalKeyword )  +  separatedList( self.globalVar(), True, False, False ) ).action( lambda input, pos, xs: Nodes.GlobalStmt( vars=xs[1] ) )
 
 
 
@@ -733,15 +733,15 @@ class Python25Grammar (Grammar):
 	# Exec statement
 	@Rule
 	def execCodeStmt(self):
-		return ( Keyword( execKeyword )  +  self.orOp() ).action( lambda input, pos, xs: [ 'execStmt', xs[1], makeNullNode(), makeNullNode() ] )
+		return ( Keyword( execKeyword )  +  self.orOp() ).action( lambda input, pos, xs: Nodes.ExecStmt( source=xs[1], locals=makeNullNode(), globals=makeNullNode() ) )
 
 	@Rule
 	def execCodeInLocalsStmt(self):
-		return ( Keyword( execKeyword )  +  self.orOp()  +  Keyword( inKeyword )  +  self.expression() ).action( lambda input, pos, xs: [ 'execStmt', xs[1], xs[3], makeNullNode() ] )
+		return ( Keyword( execKeyword )  +  self.orOp()  +  Keyword( inKeyword )  +  self.expression() ).action( lambda input, pos, xs: Nodes.ExecStmt( source=xs[1], locals=xs[3], globals=makeNullNode() ) )
 
 	@Rule
 	def execCodeInLocalsAndGlobalsStmt(self):
-		return ( Keyword( execKeyword )  +  self.orOp()  +  Keyword( inKeyword )  +  self.expression()  +  ','  +  self.expression() ).action( lambda input, pos, xs: [ 'execStmt', xs[1], xs[3], xs[5] ] )
+		return ( Keyword( execKeyword )  +  self.orOp()  +  Keyword( inKeyword )  +  self.expression()  +  ','  +  self.expression() ).action( lambda input, pos, xs: Nodes.ExecStmt( source=xs[1], locals=xs[3], globals=xs[5] ) )
 
 	@Rule
 	def execStmt(self):
@@ -753,42 +753,42 @@ class Python25Grammar (Grammar):
 	# If statement
 	@Rule
 	def ifStmt(self):
-		return ( Keyword( ifKeyword )  +  self.expression()  +  ':' ).action( lambda input, pos, xs: [ 'ifStmt', xs[1], [] ] )
+		return ( Keyword( ifKeyword )  +  self.expression()  +  ':' ).action( lambda input, pos, xs: Nodes.IfStmt( condition=xs[1], suite=[] ) )
 
 
 
 	# Elif statement
 	@Rule
 	def elifStmt(self):
-		return ( Keyword( elifKeyword )  +  self.expression()  +  ':' ).action( lambda input, pos, xs: [ 'elifStmt', xs[1], [] ] )
+		return ( Keyword( elifKeyword )  +  self.expression()  +  ':' ).action( lambda input, pos, xs: Nodes.ElifStmt( condition=xs[1], suite=[] ) )
 
 
 
 	# Else statement
 	@Rule
 	def elseStmt(self):
-		return( Keyword( elseKeyword )  +  ':' ).action( lambda input, pos, xs: [ 'elseStmt', [] ] )
+		return( Keyword( elseKeyword )  +  ':' ).action( lambda input, pos, xs: Nodes.ElseStmt( suite=[] ) )
 
 
 
 	# While statement
 	@Rule
 	def whileStmt(self):
-		return ( Keyword( whileKeyword )  +  self.expression()  +  ':' ).action( lambda input, pos, xs: [ 'whileStmt', xs[1], [] ] )
+		return ( Keyword( whileKeyword )  +  self.expression()  +  ':' ).action( lambda input, pos, xs: Nodes.WhileStmt( condition=xs[1], suite=[] ) )
 
 
 
 	# For statement
 	@Rule
 	def forStmt(self):
-		return ( Keyword( forKeyword )  +  self.targetList()  +  Keyword( inKeyword )  +  self.tupleOrExpression()  +  ':' ).action( lambda input, pos, xs: [ 'forStmt', xs[1], xs[3], [] ] )
+		return ( Keyword( forKeyword )  +  self.targetList()  +  Keyword( inKeyword )  +  self.tupleOrExpression()  +  ':' ).action( lambda input, pos, xs: Nodes.ForStmt( target=xs[1], source=xs[3], suite=[] ) )
 
 
 
 	# Try statement
 	@Rule
 	def tryStmt(self):
-		return ( Keyword( tryKeyword )  +  ':' ).action( lambda input, pos, xs: [ 'tryStmt', [] ] )
+		return ( Keyword( tryKeyword )  +  ':' ).action( lambda input, pos, xs: Nodes.TryStmt( suite=[] ) )
 
 
 
@@ -796,15 +796,15 @@ class Python25Grammar (Grammar):
 	# Except statement
 	@Rule
 	def exceptAllStmt(self):
-		return ( Keyword( exceptKeyword ) + ':' ).action( lambda input, pos, xs: [ 'exceptStmt', makeNullNode(), makeNullNode(), [] ] )
+		return ( Keyword( exceptKeyword ) + ':' ).action( lambda input, pos, xs: Nodes.ExceptStmt( exception=makeNullNode(), target=makeNullNode(), suite=[] ) )
 
 	@Rule
 	def exceptExcStmt(self):
-		return ( Keyword( exceptKeyword )  +  self.expression() + ':' ).action( lambda input, pos, xs: [ 'exceptStmt', xs[1], makeNullNode(), [] ] )
+		return ( Keyword( exceptKeyword )  +  self.expression() + ':' ).action( lambda input, pos, xs: Nodes.ExceptStmt( exception=xs[1], target=makeNullNode(), suite=[] ) )
 
 	@Rule
 	def exceptExcIntoTargetStmt(self):
-		return ( Keyword( exceptKeyword )  +  self.expression()  +  ','  +  self.targetItem() + ':' ).action( lambda input, pos, xs: [ 'exceptStmt', xs[1], xs[3], [] ] )
+		return ( Keyword( exceptKeyword )  +  self.expression()  +  ','  +  self.targetItem() + ':' ).action( lambda input, pos, xs: Nodes.ExceptStmt( exception=xs[1], target=xs[3], suite=[] ) )
 
 	@Rule
 	def exceptStmt(self):
@@ -816,42 +816,42 @@ class Python25Grammar (Grammar):
 	# Finally statement
 	@Rule
 	def finallyStmt(self):
-		return ( Keyword( finallyKeyword )  +  ':' ).action( lambda input, pos, xs: [ 'finallyStmt', [] ] )
+		return ( Keyword( finallyKeyword )  +  ':' ).action( lambda input, pos, xs: Nodes.FinallyStmt( suite=[] ) )
 
 
 
 	# With statement
 	@Rule
 	def withStmt(self):
-		return ( Keyword( withKeyword )  +  self.expression()  +  Optional( Keyword( asKeyword )  +  self.targetItem() )  +  ':' ).action( lambda input, pos, xs: [ 'withStmt', xs[1], xs[2][1]   if xs[2] is not None   else   makeNullNode(), [] ] )
+		return ( Keyword( withKeyword )  +  self.expression()  +  Optional( Keyword( asKeyword )  +  self.targetItem() )  +  ':' ).action( lambda input, pos, xs: Nodes.WithStmt( expr=xs[1], target=xs[2][1]   if xs[2] is not None   else   makeNullNode(), suite=[] ) )
 
 
 
 	# Def statement
 	@Rule
 	def defStmt(self):
-		return ( Keyword( defKeyword )  +  self.pythonIdentifier()  +  '('  +  self.params()  +  ')'  +  ':' ).action( lambda input, pos, xs: [ 'defStmt', xs[1], xs[3], [] ] )
+		return ( Keyword( defKeyword )  +  self.pythonIdentifier()  +  '('  +  self.params()  +  ')'  +  ':' ).action( lambda input, pos, xs: Nodes.DefStmt( name=xs[1], params=xs[3], suite=[] ) )
 
 
 
 	# Decorator statement
 	@Rule
 	def decoStmt(self):
-		return ( Literal( '@' )  +  self.dottedPythonIdentifer()  +  Optional( Literal( '(' )  +  self.callArgs()  +  ')' ) ).action( lambda input, pos, xs: [ 'decoStmt', xs[1], xs[2][1]   if xs[2] is not None   else   makeNullNode() ] )
+		return ( Literal( '@' )  +  self.dottedPythonIdentifer()  +  Optional( Literal( '(' )  +  self.callArgs()  +  ')' ) ).action( lambda input, pos, xs: Nodes.DecoStmt( name=xs[1], args=( xs[2][1]   if xs[2] is not None   else   makeNullNode() ) ) )
 
 
 
 	# Class statement
 	@Rule
 	def classStmt(self):
-		return ( Keyword( classKeyword )  +  self.pythonIdentifier()  +  Optional( Literal( '(' )  +  self.expressionList()  +  ')' )  +  ':' ).action( lambda input, pos, xs: [ 'classStmt', xs[1], xs[2][1]   if xs[2] is not None   else   makeNullNode(), [] ] )
+		return ( Keyword( classKeyword )  +  self.pythonIdentifier()  +  Optional( Literal( '(' )  +  self.expressionList()  +  ')' )  +  ':' ).action( lambda input, pos, xs: Nodes.ClassStmt( name=xs[1], bases=( xs[2][1]   if xs[2] is not None   else   makeNullNode() ), suite=[] ) )
 
 
 
 	# Comment statement
 	@Rule
 	def commentStmt(self):
-		return ( Literal( '#' )  +  Word( string.printable ) ).action( lambda input, pos, xs: [ 'commentStmt', xs[1] ] )
+		return ( Literal( '#' )  +  Word( string.printable ) ).action( lambda input, pos, xs: Nodes.CommentStmt( comment=xs[1] ) )
 
 
 
@@ -1243,122 +1243,122 @@ class TestCase_Python25Parser (ParserTestCase):
 		self._matchTest( g.relativeModule(), '...', Nodes.RelativeModule( name='...' ) )
 		self._matchTest( g.moduleImport(), 'abc.xyz', Nodes.ModuleImport( name='abc.xyz' ) )
 		self._matchTest( g.moduleImport(), 'abc.xyz as q', Nodes.ModuleImportAs( name='abc.xyz', asName='q' ) )
-		self._matchTest( g.simpleImport(), 'import a', [ 'importStmt', Nodes.ModuleImport( name='a' ) ] )
-		self._matchTest( g.simpleImport(), 'import a.b', [ 'importStmt', Nodes.ModuleImport( name='a.b' ) ] )
-		self._matchTest( g.simpleImport(), 'import a.b as x', [ 'importStmt', Nodes.ModuleImportAs( name='a.b', asName='x' ) ] )
-		self._matchTest( g.simpleImport(), 'import a.b as x, c.d as y', [ 'importStmt', Nodes.ModuleImportAs( name='a.b', asName='x' ), Nodes.ModuleImportAs( name='c.d', asName='y' ) ] )
+		self._matchTest( g.simpleImport(), 'import a', Nodes.ImportStmt( modules=[ Nodes.ModuleImport( name='a' ) ] ) )
+		self._matchTest( g.simpleImport(), 'import a.b', Nodes.ImportStmt( modules=[ Nodes.ModuleImport( name='a.b' ) ] ) )
+		self._matchTest( g.simpleImport(), 'import a.b as x', Nodes.ImportStmt( modules=[ Nodes.ModuleImportAs( name='a.b', asName='x' ) ] ) )
+		self._matchTest( g.simpleImport(), 'import a.b as x, c.d as y', Nodes.ImportStmt( modules=[ Nodes.ModuleImportAs( name='a.b', asName='x' ), Nodes.ModuleImportAs( name='c.d', asName='y' ) ] ) )
 		self._matchTest( g.moduleContentImport(), 'xyz', Nodes.ModuleContentImport( name='xyz' ) )
-		self._matchTest( g.moduleContentImport(), 'xyz as q', [ 'moduleContentImportAs', 'xyz', 'q' ] )
-		self._matchTest( g.fromImport(), 'from x import a', [ 'fromImportStmt', Nodes.RelativeModule( name='x' ), Nodes.ModuleContentImport( name='a' ) ] )
-		self._matchTest( g.fromImport(), 'from x import a as p', [ 'fromImportStmt', Nodes.RelativeModule( name='x' ), [ 'moduleContentImportAs', 'a', 'p' ] ] )
-		self._matchTest( g.fromImport(), 'from x import a as p, b as q', [ 'fromImportStmt', Nodes.RelativeModule( name='x' ), [ 'moduleContentImportAs', 'a', 'p' ], [ 'moduleContentImportAs', 'b', 'q' ] ] )
-		self._matchTest( g.fromImport(), 'from x import (a)', [ 'fromImportStmt', Nodes.RelativeModule( name='x' ), Nodes.ModuleContentImport( name='a' ) ] )
-		self._matchTest( g.fromImport(), 'from x import (a,)', [ 'fromImportStmt', Nodes.RelativeModule( name='x' ), Nodes.ModuleContentImport( name='a' ) ] )
-		self._matchTest( g.fromImport(), 'from x import (a as p)', [ 'fromImportStmt', Nodes.RelativeModule( name='x' ), [ 'moduleContentImportAs', 'a', 'p' ] ] )
-		self._matchTest( g.fromImport(), 'from x import (a as p,)', [ 'fromImportStmt', Nodes.RelativeModule( name='x' ), [ 'moduleContentImportAs', 'a', 'p' ] ] )
-		self._matchTest( g.fromImport(), 'from x import ( a as p, b as q )', [ 'fromImportStmt', Nodes.RelativeModule( name='x' ), [ 'moduleContentImportAs', 'a', 'p' ], [ 'moduleContentImportAs', 'b', 'q' ] ] )
-		self._matchTest( g.fromImport(), 'from x import ( a as p, b as q, )', [ 'fromImportStmt', Nodes.RelativeModule( name='x' ), [ 'moduleContentImportAs', 'a', 'p' ], [ 'moduleContentImportAs', 'b', 'q' ] ] )
-		self._matchTest( g.fromImportAll(), 'from x import *', [ 'fromImportAllStmt', Nodes.RelativeModule( name='x' ) ] )
-		self._matchTest( g.importStmt(), 'import a', [ 'importStmt', Nodes.ModuleImport( name='a' ) ] )
-		self._matchTest( g.importStmt(), 'import a.b', [ 'importStmt', Nodes.ModuleImport( name='a.b' ) ] )
-		self._matchTest( g.importStmt(), 'import a.b as x', [ 'importStmt', Nodes.ModuleImportAs( name='a.b', asName='x' ) ] )
-		self._matchTest( g.importStmt(), 'import a.b as x, c.d as y', [ 'importStmt', Nodes.ModuleImportAs( name='a.b', asName='x' ), Nodes.ModuleImportAs( name='c.d', asName='y' ) ] )
-		self._matchTest( g.importStmt(), 'from x import a', [ 'fromImportStmt', Nodes.RelativeModule( name='x' ), Nodes.ModuleContentImport( name='a' ) ] )
-		self._matchTest( g.importStmt(), 'from x import a as p', [ 'fromImportStmt', Nodes.RelativeModule( name='x' ), [ 'moduleContentImportAs', 'a', 'p' ] ] )
-		self._matchTest( g.importStmt(), 'from x import a as p, b as q', [ 'fromImportStmt', Nodes.RelativeModule( name='x' ), [ 'moduleContentImportAs', 'a', 'p' ], [ 'moduleContentImportAs', 'b', 'q' ] ] )
-		self._matchTest( g.importStmt(), 'from x import (a)', [ 'fromImportStmt', Nodes.RelativeModule( name='x' ), Nodes.ModuleContentImport( name='a' ) ] )
-		self._matchTest( g.importStmt(), 'from x import (a,)', [ 'fromImportStmt', Nodes.RelativeModule( name='x' ), Nodes.ModuleContentImport( name='a' ) ] )
-		self._matchTest( g.importStmt(), 'from x import (a as p)', [ 'fromImportStmt', Nodes.RelativeModule( name='x' ), [ 'moduleContentImportAs', 'a', 'p' ] ] )
-		self._matchTest( g.importStmt(), 'from x import (a as p,)', [ 'fromImportStmt', Nodes.RelativeModule( name='x' ), [ 'moduleContentImportAs', 'a', 'p' ] ] )
-		self._matchTest( g.importStmt(), 'from x import ( a as p, b as q )', [ 'fromImportStmt', Nodes.RelativeModule( name='x' ), [ 'moduleContentImportAs', 'a', 'p' ], [ 'moduleContentImportAs', 'b', 'q' ] ] )
-		self._matchTest( g.importStmt(), 'from x import ( a as p, b as q, )', [ 'fromImportStmt', Nodes.RelativeModule( name='x' ), [ 'moduleContentImportAs', 'a', 'p' ], [ 'moduleContentImportAs', 'b', 'q' ] ] )
-		self._matchTest( g.importStmt(), 'from x import *', [ 'fromImportAllStmt', Nodes.RelativeModule( name='x' ) ] )
+		self._matchTest( g.moduleContentImport(), 'xyz as q', Nodes.ModuleContentImportAs( name='xyz', asName='q' ) )
+		self._matchTest( g.fromImport(), 'from x import a', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImport( name='a' ) ] ) )
+		self._matchTest( g.fromImport(), 'from x import a as p', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ) ] ) )
+		self._matchTest( g.fromImport(), 'from x import a as p, b as q', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ), Nodes.ModuleContentImportAs( name='b', asName='q' ) ] ) )
+		self._matchTest( g.fromImport(), 'from x import (a)', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImport( name='a' ) ] ) )
+		self._matchTest( g.fromImport(), 'from x import (a,)', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImport( name='a' ) ] ) )
+		self._matchTest( g.fromImport(), 'from x import (a as p)', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ) ] ) )
+		self._matchTest( g.fromImport(), 'from x import (a as p,)', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ) ] ) )
+		self._matchTest( g.fromImport(), 'from x import ( a as p, b as q )', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ), Nodes.ModuleContentImportAs( name='b', asName='q' ) ] ) )
+		self._matchTest( g.fromImport(), 'from x import ( a as p, b as q, )', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ), Nodes.ModuleContentImportAs( name='b', asName='q' ) ] ) )
+		self._matchTest( g.fromImportAll(), 'from x import *', Nodes.FromImportAllStmt( module=Nodes.RelativeModule( name='x' ) ) )
+		self._matchTest( g.importStmt(), 'import a', Nodes.ImportStmt( modules=[ Nodes.ModuleImport( name='a' ) ] ) )
+		self._matchTest( g.importStmt(), 'import a.b', Nodes.ImportStmt( modules=[ Nodes.ModuleImport( name='a.b' ) ] ) )
+		self._matchTest( g.importStmt(), 'import a.b as x', Nodes.ImportStmt( modules=[ Nodes.ModuleImportAs( name='a.b', asName='x' ) ] ) )
+		self._matchTest( g.importStmt(), 'import a.b as x, c.d as y', Nodes.ImportStmt( modules=[ Nodes.ModuleImportAs( name='a.b', asName='x' ), Nodes.ModuleImportAs( name='c.d', asName='y' ) ] ) )
+		self._matchTest( g.importStmt(), 'from x import a', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImport( name='a' ) ] ) )
+		self._matchTest( g.importStmt(), 'from x import a as p', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ) ] ) )
+		self._matchTest( g.importStmt(), 'from x import a as p, b as q', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ), Nodes.ModuleContentImportAs( name='b', asName='q' ) ] ) )
+		self._matchTest( g.importStmt(), 'from x import (a)', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImport( name='a' ) ] ) )
+		self._matchTest( g.importStmt(), 'from x import (a,)', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImport( name='a' ) ] ) )
+		self._matchTest( g.importStmt(), 'from x import (a as p)', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ) ] ) )
+		self._matchTest( g.importStmt(), 'from x import (a as p,)', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ) ] ) )
+		self._matchTest( g.importStmt(), 'from x import ( a as p, b as q )', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ), Nodes.ModuleContentImportAs( name='b', asName='q' ) ] ) )
+		self._matchTest( g.importStmt(), 'from x import ( a as p, b as q, )', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ), Nodes.ModuleContentImportAs( name='b', asName='q' ) ] ) )
+		self._matchTest( g.importStmt(), 'from x import *', Nodes.FromImportAllStmt( module=Nodes.RelativeModule( name='x' ) ) )
 
 
 	def testGlobalStmt(self):
 		g = Python25Grammar()
-		self._matchTest( g.statement(), 'global x', [ 'globalStmt', [ 'globalVar', 'x' ] ] )
-		self._matchTest( g.statement(), 'global x, y', [ 'globalStmt', [ 'globalVar', 'x' ], [ 'globalVar', 'y' ] ] )
+		self._matchTest( g.statement(), 'global x', Nodes.GlobalStmt( vars=[ Nodes.GlobalVar( name='x' ) ] ) )
+		self._matchTest( g.statement(), 'global x, y', Nodes.GlobalStmt( vars=[ Nodes.GlobalVar( name='x' ), Nodes.GlobalVar( name='y' ) ] ) )
 
 
 	def testExecStmt(self):
 		g = Python25Grammar()
-		self._matchTest( g.statement(), 'exec a', [ 'execStmt', Nodes.Load( name='a' ), makeNullNode(), makeNullNode() ] )
-		self._matchTest( g.statement(), 'exec a in b', [ 'execStmt', Nodes.Load( name='a' ), Nodes.Load( name='b' ), makeNullNode() ] )
-		self._matchTest( g.statement(), 'exec a in b,c', [ 'execStmt', Nodes.Load( name='a' ), Nodes.Load( name='b' ), Nodes.Load( name='c' ) ] )
+		self._matchTest( g.statement(), 'exec a', Nodes.ExecStmt( source=Nodes.Load( name='a' ), locals=makeNullNode(), globals=makeNullNode() ) )
+		self._matchTest( g.statement(), 'exec a in b', Nodes.ExecStmt( source=Nodes.Load( name='a' ), locals=Nodes.Load( name='b' ), globals=makeNullNode() ) )
+		self._matchTest( g.statement(), 'exec a in b,c', Nodes.ExecStmt( source=Nodes.Load( name='a' ), locals=Nodes.Load( name='b' ), globals=Nodes.Load( name='c' ) ) )
 
 
 	def testIfStmt(self):
 		g = Python25Grammar()
-		self._matchTest( g.ifStmt(), 'if a:', [ 'ifStmt', Nodes.Load( name='a' ), [] ] )
+		self._matchTest( g.ifStmt(), 'if a:', Nodes.IfStmt( condition=Nodes.Load( name='a' ), suite=[] ) )
 
 
 	def testElIfStmt(self):
 		g = Python25Grammar()
-		self._matchTest( g.elifStmt(), 'elif a:', [ 'elifStmt', Nodes.Load( name='a' ), [] ] )
+		self._matchTest( g.elifStmt(), 'elif a:', Nodes.ElifStmt( condition=Nodes.Load( name='a' ), suite=[] ) )
 
 
 	def testElseStmt(self):
 		g = Python25Grammar()
-		self._matchTest( g.elseStmt(), 'else:', [ 'elseStmt', [] ] )
+		self._matchTest( g.elseStmt(), 'else:', Nodes.ElseStmt( suite=[] ) )
 
 
 	def testWhileStmt(self):
 		g = Python25Grammar()
-		self._matchTest( g.whileStmt(), 'while a:', [ 'whileStmt', Nodes.Load( name='a' ), [] ] )
+		self._matchTest( g.whileStmt(), 'while a:', Nodes.WhileStmt( condition=Nodes.Load( name='a' ), suite=[] ) )
 
 
 	def testForStmt(self):
 		g = Python25Grammar()
-		self._matchTest( g.forStmt(), 'for x in y:', [ 'forStmt', Nodes.SingleTarget( name='x' ), Nodes.Load( name='y' ), [] ] )
+		self._matchTest( g.forStmt(), 'for x in y:', Nodes.ForStmt( target=Nodes.SingleTarget( name='x' ), source=Nodes.Load( name='y' ), suite=[] ) )
 
 
 	def testTryStmt(self):
 		g = Python25Grammar()
-		self._matchTest( g.tryStmt(), 'try:', [ 'tryStmt', [] ] )
+		self._matchTest( g.tryStmt(), 'try:', Nodes.TryStmt( suite=[] ) )
 
 
 	def testExceptStmt(self):
 		g = Python25Grammar()
-		self._matchTest( g.exceptStmt(), 'except:', [ 'exceptStmt', makeNullNode(), makeNullNode(), [] ] )
-		self._matchTest( g.exceptStmt(), 'except x:', [ 'exceptStmt', Nodes.Load( name='x' ), makeNullNode(), [] ] )
-		self._matchTest( g.exceptStmt(), 'except x, y:', [ 'exceptStmt', Nodes.Load( name='x' ), Nodes.SingleTarget( name='y' ), [] ] )
+		self._matchTest( g.exceptStmt(), 'except:', Nodes.ExceptStmt( exception=makeNullNode(), target=makeNullNode(), suite=[] ) )
+		self._matchTest( g.exceptStmt(), 'except x:', Nodes.ExceptStmt( exception=Nodes.Load( name='x' ), target=makeNullNode(), suite=[] ) )
+		self._matchTest( g.exceptStmt(), 'except x, y:', Nodes.ExceptStmt( exception=Nodes.Load( name='x' ), target=Nodes.SingleTarget( name='y' ), suite=[] ) )
 
 
 	def testFinallyStmt(self):
 		g = Python25Grammar()
-		self._matchTest( g.finallyStmt(), 'finally:', [ 'finallyStmt', [] ] )
+		self._matchTest( g.finallyStmt(), 'finally:', Nodes.FinallyStmt( suite=[] ) )
 
 
 	def testWithStmt(self):
 		g = Python25Grammar()
-		self._matchTest( g.withStmt(), 'with a:', [ 'withStmt', Nodes.Load( name='a' ), makeNullNode(), [] ] )
-		self._matchTest( g.withStmt(), 'with a as b:', [ 'withStmt', Nodes.Load( name='a' ), Nodes.SingleTarget( name='b' ), [] ] )
+		self._matchTest( g.withStmt(), 'with a:', Nodes.WithStmt( expr=Nodes.Load( name='a' ), target=makeNullNode(), suite=[] ) )
+		self._matchTest( g.withStmt(), 'with a as b:', Nodes.WithStmt( expr=Nodes.Load( name='a' ), target=Nodes.SingleTarget( name='b' ), suite=[] ) )
 
 
 	def testDefStmt(self):
 		g = Python25Grammar()
-		self._matchTest( g.defStmt(), 'def f():', [ 'defStmt', 'f', [], [] ] )
-		self._matchTest( g.defStmt(), 'def f(x):', [ 'defStmt', 'f', [ Nodes.SimpleParam( name='x' ) ], [] ] )
+		self._matchTest( g.defStmt(), 'def f():', Nodes.DefStmt( name='f', params=[], suite=[] ) )
+		self._matchTest( g.defStmt(), 'def f(x):', Nodes.DefStmt( name='f', params=[ Nodes.SimpleParam( name='x' ) ], suite=[] ) )
 
 
 	def testDecoStmt(self):
 		g = Python25Grammar()
-		self._matchTest( g.decoStmt(), '@f', [ 'decoStmt', 'f', makeNullNode() ] )
-		self._matchTest( g.decoStmt(), '@f(x)', [ 'decoStmt', 'f', [ Nodes.Load( name='x' ) ] ] )
+		self._matchTest( g.decoStmt(), '@f', Nodes.DecoStmt( name='f', args=makeNullNode() ) )
+		self._matchTest( g.decoStmt(), '@f(x)', Nodes.DecoStmt( name='f', args=[ Nodes.Load( name='x' ) ] ) )
 
 
 	def testClassStmt(self):
 		g = Python25Grammar()
-		self._matchTest( g.classStmt(), 'class Q:', [ 'classStmt', 'Q', makeNullNode(), [] ] )
-		self._matchTest( g.classStmt(), 'class Q (x):', [ 'classStmt', 'Q', [ Nodes.Load( name='x' ) ], [] ] )
-		self._matchTest( g.classStmt(), 'class Q (x,y):', [ 'classStmt', 'Q', [ Nodes.Load( name='x' ), Nodes.Load( name='y' ) ], [] ] )
+		self._matchTest( g.classStmt(), 'class Q:', Nodes.ClassStmt( name='Q', bases=makeNullNode(), suite=[] ) )
+		self._matchTest( g.classStmt(), 'class Q (x):', Nodes.ClassStmt( name='Q', bases=[ Nodes.Load( name='x' ) ], suite=[] ) )
+		self._matchTest( g.classStmt(), 'class Q (x,y):', Nodes.ClassStmt( name='Q', bases=[ Nodes.Load( name='x' ), Nodes.Load( name='y' ) ], suite=[] ) )
 
 
 	def testCommentStmt(self):
 		g = Python25Grammar()
-		self._matchTest( g.commentStmt(), '#x', [ 'commentStmt', 'x' ] )
-		self._matchTest( g.commentStmt(), '#' + string.printable, [ 'commentStmt', string.printable ] )
+		self._matchTest( g.commentStmt(), '#x', Nodes.CommentStmt( comment='x' ) )
+		self._matchTest( g.commentStmt(), '#' + string.printable, Nodes.CommentStmt( comment=string.printable ) )
 
 
 
