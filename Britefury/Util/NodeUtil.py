@@ -8,7 +8,7 @@
 from java.lang import String
 from java.util import List
 
-from BritefuryJ.DocModel import DMListInterface, DMObjectInterface
+from BritefuryJ.DocModel import DMListInterface, DMObjectInterface, DMNode
 
 from BritefuryJ.DocTree import DocTreeNode, DocTreeString, DocTreeList, DocTreeObject
 
@@ -23,10 +23,10 @@ def isObjectNode(xs):
 	return isinstance( xs, DMObjectInterface )  or  isinstance( xs, DocTreeObject )
 
 def isNullNode(x):
-	return isStringNode( x )  and  x.toString() == '<nil>'
+	return isStringNode( x )  and  DMNode.isNull( x.toString() )
 
 def makeNullNode():
-	return '<nil>'
+	return DMNode.newNull()
 
 
 
