@@ -11,13 +11,17 @@ from Britefury.Util.NodeUtil import isObjectNode, nodeToSXString
 
 from Britefury.Dispatch.Dispatch import DispatchError, DispatchDataError
 
+from BritefuryJ.DocModel import DMModule
+from BritefuryJ.DocTree import DocTreeNode
+
 import inspect
 
 
 
 
 """
-Defines a metaclass for dispatching method calls based on node classes of DMObject instances.
+Defines a metaclass for dispatching method calls based on node classes of DMObject instances,
+and a dispatch function.
 The name of the class is used to choose the method to call.
 Rules of inheritance apply; names of superclasses will be used if that is all that is available
 
@@ -37,28 +41,50 @@ fieldName0 ... fieldNameN
 	
 A dispatch class is declared like so:
 class MyDispatch (object):
-	__metaclass__ = NodeMethodDispatchMetaClass
-	__module__ = MyModule
-	__num_args__ = M
+	__metaclass__ = ObjectNodeMethodDispatchMetaClass
+	__dispatch_module__ = MyModule
+	__dispatch_num_args__ = M
 	
 MyModule
 	a reference to the DMModule in which all the node classes are defined
 M
 	the number of additional arguments (arg0 ... argM  above)
+	
+	
+To dispatch, call:
+	objectNodeMethodDispatch( target, node, args ) -> result_of_method_invocation
+		target - the object that is an instance of a class which uses ObjectNodeMethodDispatchMetaClass
+		node - the node to use as the dispatch 'key'
+		args - additional arguments to be supplied to the method from @target that is invoked
+
+	objectNodeMethodDispatchAndGetName( target, node, args ) -> (result_of_method_invocation, method_name)
+		target - the object that is an instance of a class which uses ObjectNodeMethodDispatchMetaClass
+		node - the node to use as the dispatch 'key'
+		args - additional arguments to be supplied to the method from @target that is invoked
 """
 
 
 
 class BadFieldNameException (Exception):
-	pass
+	def __init__(self, className, fieldName):
+		super( BadFieldNameException, self ).__init__( 'Could not get field named \'%s\' from class \'%s\''  %  ( fieldName, className ) )
+
+class BadClassNameException (Exception):
+	def __init__(self, className):
+		super( BadClassNameException, self ).__init__( 'Could not get class named \'%s\' from module'  %  className )
+
+class ObjectNodeDispatchMethodCannotHaveVarArgs (Exception):
+	def __init__(self, className):
+		super( ObjectNodeDispatchMethodCannotHaveVarArgs, self ).__init__( 'Object node dispatch method \'%s\' should not have varargs'  %  className )
 
 
-class NodeMethodDispatchMetaClass (type):
+class ObjectNodeMethodDispatchMetaClass (type):
 	class _Method (object):
 		def __init__(self, dmClass, function, numArgs):
 			self._function = function
 			args, varargs, varkw, defaults = inspect.getargspec( function )
-			assert varargs is None
+			if varargs is not None:
+				raise ObjectNodeDispatchMethodCannotHaveVarArgs( dmClass.getName() )
 			self._indices = [ self._getFieldIndex( dmClass, name )   for name in args[2+numArgs:] ]
 			
 			self._varKWTable = None
@@ -89,16 +115,23 @@ class NodeMethodDispatchMetaClass (type):
 		def _getFieldIndex(dmClass, name):
 			index = dmClass.getFieldIndex( name )
 			if index == -1:
-				raise BadFieldNameException
+				raise BadFieldNameException, ( dmClass.getName(), name )
 			return index
 			
 
 			
 	def __init__(cls, name, bases, clsDict):
-		super( NodeMethodDispatchMetaClass, cls ).__init__( name, bases, clsDict )
+		super( ObjectNodeMethodDispatchMetaClass, cls ).__init__( name, bases, clsDict )
 		
-		module = cls.__module__
-		numArgs = clsDict.get( '__num_args__', 0 )
+		try:
+			module = cls.__dispatch_module__
+		except AttributeError:
+			module = None
+			
+		try:
+			numArgs = cls.__dispatch_num_args__
+		except AttributeError:
+			numArgs = 0
 		
 		# Store two tables for mapping class name to method; the method table, and the dispatch table
 		# The method table stores entries only for methods that were declared
@@ -115,11 +148,15 @@ class NodeMethodDispatchMetaClass (type):
 		clsDict['__method_table__'] = cls.__method_table__
 
 		# Add entries to the method table
-		for k, v in clsDict.items():
-			if inspect.isfunction( v ):
-				dmClass = module.get( k )
-				method = cls._Method( dmClass, v, numArgs )
-				cls.__method_table__[dmClass.getName()] = method
+		if module is not None:
+			for k, v in clsDict.items():
+				if inspect.isfunction( v ):
+					try:
+						dmClass = module.get( k )
+					except DMModule.UnknownClassException:
+						raise BadClassNameException, ( k, )
+					method = cls._Method( dmClass, v, numArgs )
+					cls.__method_table__[dmClass.getName()] = method
 
 				
 		# Initialise the dispatch table to a copy of the method table
@@ -155,28 +192,28 @@ class NodeMethodDispatchMetaClass (type):
 
 		
 
-def nodeMethodDispatch(target, node, *args):
+def objectNodeMethodDispatch(target, node, *args):
 	if isObjectNode( node ):
 		method = type( target )._getMethodForNode( node )
 		if method is None:
-			raise DispatchError, 'nodeMethodDispatch(): could not find method for nodes of type %s in class %s'  %  ( node.getDMClass().getName(), type( target ).__name__ )
+			raise DispatchError, 'objectNodeMethodDispatch(): could not find method for nodes of type %s in class %s'  %  ( node.getDMClass().getName(), type( target ).__name__ )
 		return method.call( node, target, args )
 	else:
 		if isinstance( node, DocTreeNode ):
-			raise DispatchDataError, 'nodeMethodDispatch(): can only dispatch on objects; not on %s:%s  (from %s)'  %  ( node.getClass().getName(), nodeToSXString( node ), nodeToSXString( node.getParentTreeNode().getParentTreeNode() ) )
+			raise DispatchDataError, 'objectNodeMethodDispatch(): can only dispatch on objects; not on %s:%s  (from %s)'  %  ( node.getClass().getName(), nodeToSXString( node ), nodeToSXString( node.getParentTreeNode().getParentTreeNode() ) )
 		else:
-			raise DispatchDataError, 'nodeMethodDispatch(): can only dispatch on objects; not on %s'  %  ( nodeToSXString( node ) )
+			raise DispatchDataError, 'objectNodeMethodDispatch(): can only dispatch on objects; not on %s'  %  ( nodeToSXString( node ) )
 
 
 		
-def methodDispatchAndGetName(target, node, *args):
+def objectNodeMethodDispatchAndGetName(target, node, *args):
 	if isListNode( node ):
 		method = type( target )._getMethodForNode( node )
 		if method is None:
-			raise DispatchError, 'methodDispatchAndGetName(): could not find method for nodes of type %s in class %s'  %  ( node.getDMClass().getName(), type( target ).__name__ )
+			raise DispatchError, 'objectNodeMethodDispatchAndGetName(): could not find method for nodes of type %s in class %s'  %  ( node.getDMClass().getName(), type( target ).__name__ )
 		return method.call( node, target, args ), method.getName()
 	else:
 		if isinstance( node, DocTreeNode ):
-			raise DispatchDataError, 'methodDispatchAndGetName(): can only dispatch on objects; not on %s:%s  (from %s)'  %  ( node.getClass().getName(), nodeToSXString( node ), nodeToSXString( node.getParentTreeNode().getParentTreeNode() ) )
+			raise DispatchDataError, 'objectNodeMethodDispatchAndGetName(): can only dispatch on objects; not on %s:%s  (from %s)'  %  ( node.getClass().getName(), nodeToSXString( node ), nodeToSXString( node.getParentTreeNode().getParentTreeNode() ) )
 		else:
-			raise DispatchDataError, 'methodDispatchAndGetName(): can only dispatch on objects; not on %s'  %  ( nodeToSXString( node ) )
+			raise DispatchDataError, 'objectNodeMethodDispatchAndGetName(): can only dispatch on objects; not on %s'  %  ( nodeToSXString( node ) )

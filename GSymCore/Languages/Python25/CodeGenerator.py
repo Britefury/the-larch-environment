@@ -5,7 +5,7 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from Britefury.gSym.gSymCodeGenerator import GSymCodeGenerator
+from Britefury.gSym.gSymCodeGenerator import GSymCodeGeneratorListNodeDispatch
 
 from Britefury.Util.NodeUtil import isNullNode
 
@@ -23,7 +23,7 @@ class CodeGeneratorUnparsedException (Exception):
 
 
 
-class Python25CodeGenerator (GSymCodeGenerator):
+class Python25CodeGenerator (GSymCodeGeneratorListNodeDispatch):
 	# Misc
 	def blankLine(self, node):
 		return ''

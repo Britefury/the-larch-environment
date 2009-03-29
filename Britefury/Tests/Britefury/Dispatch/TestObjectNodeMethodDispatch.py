@@ -8,11 +8,11 @@
 import unittest
 
 from Britefury.Dispatch.Dispatch import DispatchError
-from Britefury.Dispatch.NodeMethodDispatch import NodeMethodDispatchMetaClass, nodeMethodDispatch
+from Britefury.Dispatch.ObjectNodeMethodDispatch import ObjectNodeMethodDispatchMetaClass, objectNodeMethodDispatch
 from BritefuryJ.DocModel import DMModule
 
 
-class TestCase_nodeMethodDispatch (unittest.TestCase):
+class TestCase_obejctNodeMethodDispatch (unittest.TestCase):
 	def setUp(self):
 		self.Module = DMModule( 'NodeMethodDispatch', 'dispatch', 'Tests.NodeMethodDispatch' )
 		self.A = self.Module.newClass( 'A', [ 'x', 'y' ] )
@@ -23,9 +23,9 @@ class TestCase_nodeMethodDispatch (unittest.TestCase):
 		self.c = self.C( s='a', t='b' )
 	
 		class DispatchTest (object):
-			__metaclass__ = NodeMethodDispatchMetaClass
-			__module__ = self.Module
-			__num_args__ = 0
+			__metaclass__ = ObjectNodeMethodDispatchMetaClass
+			__dispatch_module__ = self.Module
+			__dispatch_num_args__ = 0
 			
 			
 			def A(self, node, x, y):
@@ -43,12 +43,12 @@ class TestCase_nodeMethodDispatch (unittest.TestCase):
 		
 	def testDispatch(self):
 		d = self.DispatchTest()
-		self.assert_( nodeMethodDispatch( d, self.a )  ==  'ab' )
+		self.assert_( objectNodeMethodDispatch( d, self.a )  ==  'ab' )
 
 	def testDispatchSubclass(self):
 		d = self.DispatchTest()
-		self.assert_( nodeMethodDispatch( d, self.b )  ==  'ab' )
+		self.assert_( objectNodeMethodDispatch( d, self.b )  ==  'ab' )
 
 	def testDispatchNoClass(self):
 		d = self.DispatchTest()
-		self.assertRaises( DispatchError, lambda: nodeMethodDispatch( d, self.c ) )
+		self.assertRaises( DispatchError, lambda: objectNodeMethodDispatch( d, self.c ) )
