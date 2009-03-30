@@ -7,6 +7,7 @@
 ##-*************************
 from Britefury.Dispatch.Dispatch import DispatchError
 from Britefury.Dispatch.MethodDispatch import methodDispatch, methodDispatchAndGetName
+from Britefury.Dispatch.ObjectNodeMethodDispatch import ObjectNodeMethodDispatchMetaClass, objectNodeMethodDispatch, objectNodeMethodDispatchAndGetName
 
 from Britefury.gSym.View.gSymStyles import viewError_textStyle
 
@@ -14,11 +15,30 @@ from Britefury.gSym.View.gSymStyles import viewError_textStyle
 			
 		
 		
-class GSymView (object):
+class GSymViewListNodeDispatch (object):
 	def __call__(self, xs, ctx, state):
 		element = None
 		try:
 			element, name = methodDispatchAndGetName( self, xs, ctx, state )
+			element.setDebugName( name )
+		except DispatchError:
+			element = ctx.text( viewError_textStyle, '<<ERROR>>' )
+		return element
+	
+		
+
+	
+
+
+		
+class GSymViewObjectNodeDispatch (object):
+	__metaclass__ = ObjectNodeMethodDispatchMetaClass
+	__dispatch_num_args__ = 2
+	
+	def __call__(self, xs, ctx, state):
+		element = None
+		try:
+			element, name = objectNodeMethodDispatchAndGetName( self, xs, ctx, state )
 			element.setDebugName( name )
 		except DispatchError:
 			element = ctx.text( viewError_textStyle, '<<ERROR>>' )
