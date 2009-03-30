@@ -259,19 +259,19 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 	def CmpOpNeq(self, node, y):
 		return ' != ' + self( y )
 	
+	def CmpOpIsNot(self, node, y):
+		return ' is not ' + self( y )
 	
-
-	def IsNotTest(self, node, x, y):
-		return '( '  +  self( x )  +  ' is not '  +  self( y )  +  ' )'
+	def CmpOpIs(self, node, y):
+		return ' is ' + self( y )
 	
-	def IsTest(self, node, x, y):
-		return '( '  +  self( x )  +  ' is '  +  self( y )  +  ' )'
+	def CmpOpNotIn(self, node, y):
+		return ' not in ' + self( y )
 	
-	def NotInTest(self, node, x, y):
-		return '( '  +  self( x )  +  ' not in '  +  self( y )  +  ' )'
+	def CmpOpIn(self, node, y):
+		return ' in ' + self( y )
 	
-	def InTest(self, node, x, y):
-		return '( '  +  self( x )  +  ' in '  +  self( y )  +  ' )'
+	
 
 	
 	def NotTest(self, node, x):
@@ -681,11 +681,11 @@ class TestCase_Python25CodeGenerator (unittest.TestCase):
 		self._testSX( '(py Cmp x=(py Load name=a) ops=[(py CmpOpGt y=(py Load name=b))])',  '( a > b )' )
 		self._testSX( '(py Cmp x=(py Load name=a) ops=[(py CmpOpEq y=(py Load name=b))])',  '( a == b )' )
 		self._testSX( '(py Cmp x=(py Load name=a) ops=[(py CmpOpNeq y=(py Load name=b))])',  '( a != b )' )
+		self._testSX( '(py Cmp x=(py Load name=a) ops=[(py CmpOpIsNot y=(py Load name=b))])',  '( a is not b )' )
+		self._testSX( '(py Cmp x=(py Load name=a) ops=[(py CmpOpIs y=(py Load name=b))])',  '( a is b )' )
+		self._testSX( '(py Cmp x=(py Load name=a) ops=[(py CmpOpNotIn y=(py Load name=b))])',  '( a not in b )' )
+		self._testSX( '(py Cmp x=(py Load name=a) ops=[(py CmpOpIn y=(py Load name=b))])',  '( a in b )' )
 		self._testSX( '(py Cmp x=(py Load name=a) ops=[(py CmpOpLt y=(py Load name=b)) (py CmpOpGt y=(py Load name=c))])',  '( a < b > c )' )
-		self._binOpTest( 'IsTest', 'is' )
-		self._binOpTest( 'IsNotTest', 'is not' )
-		self._binOpTest( 'InTest', 'in' )
-		self._binOpTest( 'NotInTest', 'not in' )
 		self._testSX( '(py NotTest x=(py Load name=a))', '(not a)' )
 		self._binOpTest( 'AndTest', 'and' )
 		self._binOpTest( 'OrTest', 'or' )

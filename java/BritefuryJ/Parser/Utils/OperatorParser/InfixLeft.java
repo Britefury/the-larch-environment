@@ -14,6 +14,7 @@ import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
 import BritefuryJ.Parser.Forward;
 import BritefuryJ.Parser.ParserExpression;
+import BritefuryJ.Parser.Sequence;
 
 public class InfixLeft extends BinaryOperator
 {
@@ -65,6 +66,6 @@ public class InfixLeft extends BinaryOperator
 			right = previousLevelParser;
 		}
 		
-		return thisLevelParser.__add__( opExpression ).__add__( right );
+		return new Sequence( new ParserExpression[] { thisLevelParser, opExpression, right } );
 	}
 }

@@ -403,7 +403,7 @@ class Python25Grammar (Grammar):
 
 
 	# Python operators
-	@RuleList( [ 'powOp', 'invNegPosOp', 'mulDivModOp', 'addSubOp', 'lrShiftOp', 'andOP', 'xorOp', 'orOp', 'cmpOp', 'isOp', 'inOp', 'notTestOp', 'andTestOp', 'orTestOp' ] )
+	@RuleList( [ 'powOp', 'invNegPosOp', 'mulDivModOp', 'addSubOp', 'lrShiftOp', 'andOP', 'xorOp', 'orOp', 'cmpOp', 'notTestOp', 'andTestOp', 'orTestOp' ] )
 	def _operators(self):
 		opTable = OperatorTable( 
 			[
@@ -422,10 +422,12 @@ class Python25Grammar (Grammar):
 						InfixChain.ChainOperator( Literal( '>' ),  Nodes.CmpOpGt, 'y' ),
 						InfixChain.ChainOperator( Literal( '==' ),  Nodes.CmpOpEq, 'y' ),
 						InfixChain.ChainOperator( Literal( '!=' ),  Nodes.CmpOpNeq, 'y' ),
+						InfixChain.ChainOperator( Keyword( isKeyword ) + Keyword( notKeyword ),  Nodes.CmpOpIsNot, 'y' ),
+						InfixChain.ChainOperator( Keyword( isKeyword ),  Nodes.CmpOpIs, 'y' ),
+						InfixChain.ChainOperator( Keyword( notKeyword ) + Keyword( inKeyword ),  Nodes.CmpOpNotIn, 'y' ),
+						InfixChain.ChainOperator( Keyword( inKeyword ),  Nodes.CmpOpIn, 'y' ),
 						],  Nodes.Cmp, 'x', 'ops' ),
 					] ),
-				PrecedenceLevel( [ InfixLeft( Keyword( isKeyword ) + Keyword( notKeyword ),  Nodes.IsNotTest, 'x', 'y' ),   InfixLeft( Keyword( isKeyword ),  Nodes.IsTest, 'x', 'y' ) ] ),
-				PrecedenceLevel( [ InfixLeft( Keyword( notKeyword ) + Keyword( inKeyword ),  Nodes.NotInTest, 'x', 'y' ),   InfixLeft( Keyword( inKeyword ),  Nodes.InTest, 'x', 'y' ) ] ),
 				PrecedenceLevel( [ Prefix( Keyword( notKeyword ),  Nodes.NotTest, 'x' ) ] ),
 				PrecedenceLevel( [ InfixLeft( Keyword( andKeyword ),  Nodes.AndTest, 'x', 'y' ) ] ),
 				PrecedenceLevel( [ InfixLeft( Keyword( orKeyword ),  Nodes.OrTest, 'x', 'y' ) ] ),
@@ -1096,10 +1098,10 @@ class TestCase_Python25Parser (ParserTestCase):
 		self._matchTest( g.expression(), 'a>b', Nodes.Cmp( x=Nodes.Load( name='a' ), ops=[ Nodes.CmpOpGt( y=Nodes.Load( name='b' ) ) ] ) )
 		self._matchTest( g.expression(), 'a==b', Nodes.Cmp( x=Nodes.Load( name='a' ), ops=[ Nodes.CmpOpEq( y=Nodes.Load( name='b' ) ) ] ) )
 		self._matchTest( g.expression(), 'a!=b', Nodes.Cmp( x=Nodes.Load( name='a' ), ops=[ Nodes.CmpOpNeq( y=Nodes.Load( name='b' ) ) ] ) )
-		self._matchTest( g.expression(), 'a is not b', Nodes.IsNotTest( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) )
-		self._matchTest( g.expression(), 'a is b', Nodes.IsTest( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) )
-		self._matchTest( g.expression(), 'a not in b', Nodes.NotInTest( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) )
-		self._matchTest( g.expression(), 'a in b', Nodes.InTest( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) )
+		self._matchTest( g.expression(), 'a is not b', Nodes.Cmp( x=Nodes.Load( name='a' ), ops=[ Nodes.CmpOpIsNot( y=Nodes.Load( name='b' ) ) ] ) )
+		self._matchTest( g.expression(), 'a is b', Nodes.Cmp( x=Nodes.Load( name='a' ), ops=[ Nodes.CmpOpIs( y=Nodes.Load( name='b' ) ) ] ) )
+		self._matchTest( g.expression(), 'a not in b', Nodes.Cmp( x=Nodes.Load( name='a' ), ops=[ Nodes.CmpOpNotIn( y=Nodes.Load( name='b' ) ) ] ) )
+		self._matchTest( g.expression(), 'a in b', Nodes.Cmp( x=Nodes.Load( name='a' ), ops=[ Nodes.CmpOpIn( y=Nodes.Load( name='b' ) ) ] ) )
 		self._matchTest( g.expression(), 'not a', Nodes.NotTest( x=Nodes.Load( name='a' ) ) )
 		self._matchTest( g.expression(), 'a and b', Nodes.AndTest( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) )
 		self._matchTest( g.expression(), 'a or b', Nodes.OrTest( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) )
