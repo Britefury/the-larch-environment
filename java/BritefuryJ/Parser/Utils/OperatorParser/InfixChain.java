@@ -19,6 +19,7 @@ import BritefuryJ.Parser.Choice;
 import BritefuryJ.Parser.Forward;
 import BritefuryJ.Parser.ParseAction;
 import BritefuryJ.Parser.ParserExpression;
+import BritefuryJ.Parser.Sequence;
 
 public class InfixChain extends Operator
 {
@@ -224,7 +225,7 @@ public class InfixChain extends Operator
 		
 		private ParserExpression buildParseExpression(ParserExpression right)
 		{
-			ParserExpression e = opExpression.__add__( right );
+			ParserExpression e = new Sequence( new ParserExpression[] { opExpression, right } );
 			return e.action( new ChainOpAction( action ) );
 		}
 	}
@@ -291,7 +292,7 @@ public class InfixChain extends Operator
 		
 		
 		// <thisLeverParser> <rightChoice>+
-		ParserExpression p = thisLevelParser.__add__( rightChoice.oneOrMore() );
+		ParserExpression p = new Sequence( new ParserExpression[] { thisLevelParser, rightChoice.oneOrMore() } );
 		// => action
 		return p.action( action );
 	}

@@ -16,6 +16,7 @@ import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
 import BritefuryJ.Parser.Forward;
 import BritefuryJ.Parser.ParseAction;
 import BritefuryJ.Parser.ParserExpression;
+import BritefuryJ.Parser.Sequence;
 
 public class Prefix extends UnaryOperator
 {
@@ -82,7 +83,7 @@ public class Prefix extends UnaryOperator
 			ParserExpression thisLevelParser, PrecedenceLevel previousLevel,
 			ParserExpression previousLevelParser)
 	{
-		ParserExpression p = opExpression.__add__( thisLevelParser );
+		ParserExpression p = new Sequence( new ParserExpression[] { opExpression, thisLevelParser } );
 		return p.action( action );
 	}
 }

@@ -16,6 +16,7 @@ import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
 import BritefuryJ.Parser.Forward;
 import BritefuryJ.Parser.ParseAction;
 import BritefuryJ.Parser.ParserExpression;
+import BritefuryJ.Parser.Sequence;
 
 public class Suffix extends UnaryOperator
 {
@@ -83,7 +84,7 @@ public class Suffix extends UnaryOperator
 			ParserExpression thisLevelParser, PrecedenceLevel previousLevel,
 			ParserExpression previousLevelParser)
 	{
-		ParserExpression p = thisLevelParser.__add__( opExpression );
+		ParserExpression p = new Sequence( new ParserExpression[] { thisLevelParser, opExpression } );
 		return p.action( action );
 	}
 }
