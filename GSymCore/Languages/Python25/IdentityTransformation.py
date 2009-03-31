@@ -486,22 +486,20 @@ class Python25IdentityTransformation (TransformationInterface):
 
 	
 import unittest
-from BritefuryJ.DocModel import DMIORead, DMIOWrite
+from BritefuryJ.DocModel import DMIOReader
 
 class TestCase_Python25IdentityTransformation (unittest.TestCase):
 	def _testSX(self, sx):
 		try:
-			data = DMIORead.readSX( sx )
-		except DMIORead.ParseSXErrorException:
+			data = DMIOReader.readFromString( sx )
+		except:
 			print 'SX Parse error'
 			self.fail()
 		
 		xform = Python25IdentityTransformation()
 		result = xform.__apply__( data )
 		
-		resultSX = DMIOWrite.writeSX( result )
-		
-		if resultSX != sx:
+		if DMNode.coerce( result ) != DMNode.coerce( data ):
 			print 'TRANSFORMED DIFFERS FROM ORIGINAL'
 			print 'ORIGINAL:'
 			print sx

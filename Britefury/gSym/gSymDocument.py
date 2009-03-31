@@ -5,12 +5,14 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from BritefuryJ.DocModel import DMNode
+from BritefuryJ.DocModel import DMNode, DMModule
 
 from Britefury.Kernel.Abstract import abstractmethod
 
-from Britefury.Util.NodeUtil import isListNode
+from Britefury.Util.NodeUtil import isObjectNode
 from Britefury.gSymConfig.gSymVersion import compareVersions, gSymVersion
+
+from Britefury.gSym.gSymWorld import GSymWorld
 
 from Britefury.gSym.gSymEnvironment import GSymEnvironment
 from GSymCore.Languages.LISP import LISP
@@ -35,38 +37,38 @@ class GSymDocumentUnknownItemType (Exception):
 
 
 
+module = DMModule( 'GSymDocument', 'gsd', 'org.Britefury.gSym.Internal.GSymDocument' )
+
+nodeClass_GSymUnit = module.newClass( 'GSymUnit', [ 'languageModuleName', 'content' ] )
+nodeClass_GSymDocument = module.newClass( 'GSymDocument', [ 'version', 'content' ] )
+
+
+GSymWorld.registerInternalDMModule( module )
+
+
+
+
 
 class GSymUnit (object):
-	def __init__(self, languageModuleName, contentSX):
+	def __init__(self, languageModuleName, content):
 		self.languageModuleName = languageModuleName
-		self.contentSX = DMNode.coerce( contentSX )
+		self.content = DMNode.coerce( content )
 		
 		
 		
-	def writeSX(self):
-		sx = [ '$unit', self.languageModuleName, self.contentSX ]
-		return DMList( sx )
+	def write(self):
+		return nodeClass_GSymUnit( languageModuleName=self.languageModuleName, content=self.content )
 	
 
 	@staticmethod
-	def readSX(unitSX):
-		"""
-		($unit <language_module_to_import> <content>)
-		"""
-		
-		if not isListNode( unitSX ):
+	def read(unit):
+		if not isObjectNode( unit ):
 			raise GSymDocumentInvalidStructure
 		
-		if len( unitSX ) != 3:
+		if not unit.isInstanceOf( nodeClass_GSymUnit ):
 			raise GSymDocumentInvalidStructure
 		
-
-		if unitSX[0] != '$unit':
-			raise GSymDocumentInvalidStructure
-		
-		languageModuleName = unitSX[1]
-		
-		return GSymUnit( languageModuleName, unitSX[2] )
+		return GSymUnit( unit['languageModuleName'], unit['content'] )
 		
 
 		
@@ -76,29 +78,21 @@ class GSymDocument (object):
 		self.unit = unit
 	
 	
-	def writeSX(self):
-		sx = [ '$gSymDocument', '0.1-alpha', self.unit.writeSX() ]
-		return DMList( sx )
+	def write(self):
+		return nodeClass_GSymDocument( version='0.1-alpha', content=self.unit.write() )
 
 	
 	
 	@staticmethod
-	def readSX(world, docSX):
-		"""
-		($gSymDocument <gsym_version> <document_content>)
-		"""
-		if not isListNode( docSX ):
+	def read(world, doc):
+		if not isObjectNode( doc ):
 			raise GSymDocumentInvalidStructure
 		
-		if len( docSX ) < 3:
+		if not doc.isInstanceOf( nodeClass_GSymDocument ):
 			raise GSymDocumentInvalidStructure
 		
-		header = docSX[0]
-		version = docSX[1]
-		contentSX = docSX[2]
-		
-		if header != "$gSymDocument":
-			raise GSymDocumentInvalidHeader
+		version = doc['version']
+		content = doc['content']
 		
 		try:
 			versionCmp = compareVersions( version, gSymVersion )
@@ -112,7 +106,7 @@ class GSymDocument (object):
 		
 		
 		
-		return GSymDocument( GSymUnit.readSX( contentSX ) )
+		return GSymDocument( GSymUnit.read( content ) )
 	
 	
 	
@@ -121,19 +115,19 @@ class GSymDocument (object):
 def viewUnit(unit, world, commandHistory):
 	language = world.getModuleLanguage( unit.languageModuleName )
 	languageViewFactory = language.getViewFactory()
-	return languageViewFactory.createDocumentView( unit.contentSX, commandHistory )
+	return languageViewFactory.createDocumentView( unit.content, commandHistory )
 
 
 def viewUnitLisp(unit, world, commandHistory):
 	language = LISP.language
 	languageViewFactory = language.getViewFactory()
-	return languageViewFactory.createDocumentView( unit.contentSX, commandHistory )
+	return languageViewFactory.createDocumentView( unit.content, commandHistory )
 
 
 def transformUnit(unit, world, xform):
 	language = world.getModuleLanguage( unit.languageModuleName )
 	transformModifyFn = language.getTransformModifyFn()
-	xs2 = xform( xs )
+	xs2 = xform( unit.contentxs )
 	xs2 = DMList( xs2 )
 	transformModifyFn( xs, xs2 )
 	return xs2

@@ -11,6 +11,11 @@ public interface DMModuleResolver
 	public static class CouldNotResolveModuleException extends Exception
 	{
 		private static final long serialVersionUID = 1L;
+		
+		public CouldNotResolveModuleException(String moduleName)
+		{
+			super( "Could not resolve module: " + moduleName );
+		}
 	}
 	
 	public DMModule getModule(String location) throws CouldNotResolveModuleException;

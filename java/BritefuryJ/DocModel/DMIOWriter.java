@@ -24,7 +24,7 @@ public class DMIOWriter
 	}
 	
 	
-	public static String unquotedStringPunctuationChars = "+-*/%^&|!$@.,<>~";
+	public static String unquotedStringPunctuationChars = "+-*/%^&|!$@.<>~";
 	public static String quotedStringPunctuationChars = "+-*/%^&|!$@.,<>=[]{}~'()` ";
 	public static Pattern unquotedString = Pattern.compile( "[0-9A-Za-z_" + Pattern.quote( unquotedStringPunctuationChars ) + "]+" );
 	public static Pattern quotedStringContents = Pattern.compile( "[0-9A-Za-z_" + Pattern.quote( quotedStringPunctuationChars ) + "]+" );

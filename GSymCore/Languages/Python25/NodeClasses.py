@@ -8,7 +8,7 @@
 from BritefuryJ.DocModel import DMModule, DMObjectClass
 
 
-module = DMModule( 'Python25', 'py', 'org.Britefury.gSym.Languages.Python25' )
+module = DMModule( 'Python25', 'py', 'GSymCore.Languages.Python25.Python25' )
 
 
 #
