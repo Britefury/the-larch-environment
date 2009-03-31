@@ -268,6 +268,8 @@ PRECEDENCE_PARAM = 100
 PRECEDENCE_LAMBDAEXPR = 50
 
 PRECEDENCE_OR = 14
+PRECEDENCE_AND = 13
+PRECEDENCE_NOT = 12
 PRECEDENCE_CMP = 9
 PRECEDENCE_BITOR = 8
 PRECEDENCE_BITXOR = 7
@@ -386,7 +388,7 @@ def paragraphBinOpView(ctx, state, node, x, y, op, precedence, bRightAssociative
 
 def paragraphCmpOpView(ctx, state, node, op, y, precedence, expressionParser):
 	opView = ctx.text( operator_textStyle, op )
-	yView = ctx.viewEvalFn( t, None, python25ViewState( precedence, expressionParser ) )
+	yView = ctx.viewEvalFn( y, None, python25ViewState( precedence, expressionParser ) )
 	return expressionNodeEditor( ctx, node,
 			   ctx.paragraph( python_paragraphStyle, [ ctx.text( default_textStyle, ' ' ), opView, ctx.text( default_textStyle, ' ' ), yView ] ),
 			   precedence,
@@ -637,7 +639,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 			for x in itemViews[:-1]:
 				itemViewsSpaced.append( x )
 				itemViewsSpaced.append( ctx.whitespace( ' ', 15.0 ) )
-			itemViewsSpaced.append( xViews[-1] )
+			itemViewsSpaced.append( itemViews[-1] )
 		return expressionNodeEditor( ctx, node,
 				   ctx.paragraph( python_paragraphStyle, [ ctx.text( punctuation_textStyle, '[' ),  exprView,  ctx.whitespace( ' ', 15.0 ) ] + itemViewsSpaced + [ ctx.text( punctuation_textStyle, ']' ) ] ),
 				   PRECEDENCE_LISTCOMPREHENSION,
@@ -653,7 +655,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 			for x in itemViews[:-1]:
 				itemViewsSpaced.append( x )
 				itemViewsSpaced.append( ctx.whitespace( ' ', 15.0 ) )
-			itemViewsSpaced.append( xViews[-1] )
+			itemViewsSpaced.append( itemViews[-1] )
 		return expressionNodeEditor( ctx, node,
 				   ctx.paragraph( python_paragraphStyle, [ ctx.text( punctuation_textStyle, '(' ),  exprView,  ctx.whitespace( ' ', 15.0 ) ] + itemViewsSpaced + [ ctx.text( punctuation_textStyle, ')' ) ] ),
 				   PRECEDENCE_GENERATOREXPRESSION,
@@ -892,7 +894,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	@ObjectNodeDispatchMethod
 	def Cmp(self, ctx, state, node, x, ops):
-		xView = ctx.viewEvalFn( target, None, python25ViewState( PRECEDENCE_CMP, self._parser.expression() ) )
+		xView = ctx.viewEvalFn( x, None, python25ViewState( PRECEDENCE_CMP, self._parser.expression() ) )
 		opViews = ctx.mapViewEvalFn( ops, None, python25ViewState( PRECEDENCE_CMP, self._parser.expression() ) )
 		return expressionNodeEditor( ctx, node,
 				   ctx.paragraph( python_paragraphStyle, [ xView ] + opViews ),
@@ -901,43 +903,43 @@ class Python25View (GSymViewObjectNodeDispatch):
 	
 	@ObjectNodeDispatchMethod
 	def CmpOpLte(self, ctx, state, node, y):
-		return paragraphCmpOpView( ctx, state, node, y, '<=', PRECEDENCE_CMP, self._parser.expression() )
+		return paragraphCmpOpView( ctx, state, node, '<=', y, PRECEDENCE_CMP, self._parser.expression() )
 		
 	@ObjectNodeDispatchMethod
 	def CmpOpLt(self, ctx, state, node, y):
-		return paragraphCmpOpView( ctx, state, node, y, '<', PRECEDENCE_CMP, self._parser.expression() )
+		return paragraphCmpOpView( ctx, state, node, '<', y, PRECEDENCE_CMP, self._parser.expression() )
 		
 	@ObjectNodeDispatchMethod
 	def CmpOpGte(self, ctx, state, node, y):
-		return paragraphCmpOpView( ctx, state, node, y, '>=', PRECEDENCE_CMP, self._parser.expression() )
+		return paragraphCmpOpView( ctx, state, node, '>=', y, PRECEDENCE_CMP, self._parser.expression() )
 		
 	@ObjectNodeDispatchMethod
 	def CmpOpGt(self, ctx, state, node, y):
-		return paragraphCmpOpView( ctx, state, node, y, '>', PRECEDENCE_CMP, self._parser.expression() )
+		return paragraphCmpOpView( ctx, state, node, '>', y, PRECEDENCE_CMP, self._parser.expression() )
 		
 	@ObjectNodeDispatchMethod
 	def CmpOpEq(self, ctx, state, node, y):
-		return paragraphCmpOpView( ctx, state, node, y, '==', PRECEDENCE_CMP, self._parser.expression() )
+		return paragraphCmpOpView( ctx, state, node, '==', y, PRECEDENCE_CMP, self._parser.expression() )
 		
 	@ObjectNodeDispatchMethod
 	def CmpOpNeq(self, ctx, state, node, y):
-		return paragraphCmpOpView( ctx, state, node, y, '!=', PRECEDENCE_CMP, self._parser.expression() )
+		return paragraphCmpOpView( ctx, state, node, '!=', y, PRECEDENCE_CMP, self._parser.expression() )
 		
 	@ObjectNodeDispatchMethod
 	def CmpOpIsNot(self, ctx, state, node, y):
-		return paragraphCmpOpView( ctx, state, node, y, 'is not', PRECEDENCE_CMP, self._parser.expression() )
+		return paragraphCmpOpView( ctx, state, node, 'is not', y, PRECEDENCE_CMP, self._parser.expression() )
 		
 	@ObjectNodeDispatchMethod
 	def CmpOpIs(self, ctx, state, node, y):
-		return paragraphCmpOpView( ctx, state, node, y, 'is', PRECEDENCE_CMP, self._parser.expression() )
+		return paragraphCmpOpView( ctx, state, node, 'is', y, PRECEDENCE_CMP, self._parser.expression() )
 		
 	@ObjectNodeDispatchMethod
 	def CmpOpNotIn(self, ctx, state, node, y):
-		return paragraphCmpOpView( ctx, state, node, y, 'not in', PRECEDENCE_CMP, self._parser.expression() )
+		return paragraphCmpOpView( ctx, state, node, 'not in', y, PRECEDENCE_CMP, self._parser.expression() )
 		
 	@ObjectNodeDispatchMethod
 	def CmpOpIn(self, ctx, state, node, y):
-		return paragraphCmpOpView( ctx, state, node, y, 'in', PRECEDENCE_CMP, self._parser.expression() )
+		return paragraphCmpOpView( ctx, state, node, 'in', y, PRECEDENCE_CMP, self._parser.expression() )
 		
 		
 
