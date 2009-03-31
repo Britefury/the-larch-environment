@@ -78,48 +78,54 @@ class ObjectNodeDispatchMethodCannotHaveVarArgs (Exception):
 		super( ObjectNodeDispatchMethodCannotHaveVarArgs, self ).__init__( 'Object node dispatch method \'%s\' should not have varargs'  %  className )
 
 
-class ObjectNodeMethodDispatchMetaClass (type):
-	class _Method (object):
-		def __init__(self, dmClass, function, numArgs):
-			self._function = function
-			args, varargs, varkw, defaults = inspect.getargspec( function )
-			if varargs is not None:
-				raise ObjectNodeDispatchMethodCannotHaveVarArgs( dmClass.getName() )
-			self._indices = [ self._getFieldIndex( dmClass, name )   for name in args[2+numArgs:] ]
-			
-			self._varKWTable = None
-			if varkw is not None:
-				self._varKWTable = []
-				for i in xrange( 0, dmClass.getNumFields() ):
-					if i not in self._indices:
-						self._varKWTable.append( ( dmClass.getField( i ).getName(), i ) )
-						
-						
-		def call(self, object, dispatchSelf, args):
-			callArgs = args + tuple( [ object ] + [ object.get( index )   for index in self._indices ] )
-			
-			if self._varKWTable is None:
-				return self._function( dispatchSelf, *callArgs )
-			else:
-				kwargs = {}
-				for name, index in self._varKWTable:
-					kwargs[name] = object.get( index )
-				return self._function( dispatchSelf, *callArgs, **kwargs )
-			
-			
-		def getName(self):
-			return self._function.__name__
-			
-			
-		@staticmethod
-		def _getFieldIndex(dmClass, name):
-			index = dmClass.getFieldIndex( name )
-			if index == -1:
-				raise BadFieldNameException, ( dmClass.getName(), name )
-			return index
-			
+		
+		
+class ObjectNodeDispatchMethod (object):		
+	def __init__(self, function):
+		self._function = function
 
-			
+		
+	def _init(self, dmClass, numArgs):
+		args, varargs, varkw, defaults = inspect.getargspec( self._function )
+		if varargs is not None:
+			raise ObjectNodeDispatchMethodCannotHaveVarArgs( dmClass.getName() )
+		self._indices = [ self._getFieldIndex( dmClass, name )   for name in args[2+numArgs:] ]
+		
+		self._varKWTable = None
+		if varkw is not None:
+			self._varKWTable = []
+			for i in xrange( 0, dmClass.getNumFields() ):
+				if i not in self._indices:
+					self._varKWTable.append( ( dmClass.getField( i ).getName(), i ) )
+					
+					
+	def call(self, object, dispatchSelf, args):
+		callArgs = args + tuple( [ object ] + [ object.get( index )   for index in self._indices ] )
+		
+		if self._varKWTable is None:
+			return self._function( dispatchSelf, *callArgs )
+		else:
+			kwargs = {}
+			for name, index in self._varKWTable:
+				kwargs[name] = object.get( index )
+			return self._function( dispatchSelf, *callArgs, **kwargs )
+		
+		
+	def getName(self):
+		return self._function.__name__
+		
+		
+	@staticmethod
+	def _getFieldIndex(dmClass, name):
+		index = dmClass.getFieldIndex( name )
+		if index == -1:
+			raise BadFieldNameException, ( dmClass.getName(), name )
+		return index
+		
+	
+	
+		
+class ObjectNodeMethodDispatchMetaClass (type):
 	def __init__(cls, name, bases, clsDict):
 		super( ObjectNodeMethodDispatchMetaClass, cls ).__init__( name, bases, clsDict )
 		
@@ -150,12 +156,13 @@ class ObjectNodeMethodDispatchMetaClass (type):
 		# Add entries to the method table
 		if module is not None:
 			for k, v in clsDict.items():
-				if inspect.isfunction( v ):
+				if isinstance( v, ObjectNodeDispatchMethod ):
 					try:
 						dmClass = module.get( k )
 					except DMModule.UnknownClassException:
 						raise BadClassNameException, ( k, )
-					method = cls._Method( dmClass, v, numArgs )
+					method = v
+					method._init( dmClass, numArgs )
 					cls.__method_table__[dmClass.getName()] = method
 
 				
@@ -207,7 +214,7 @@ def objectNodeMethodDispatch(target, node, *args):
 
 		
 def objectNodeMethodDispatchAndGetName(target, node, *args):
-	if isListNode( node ):
+	if isObjectNode( node ):
 		method = type( target )._getMethodForNode( node )
 		if method is None:
 			raise DispatchError, 'objectNodeMethodDispatchAndGetName(): could not find method for nodes of type %s in class %s'  %  ( node.getDMClass().getName(), type( target ).__name__ )

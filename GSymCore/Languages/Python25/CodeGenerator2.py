@@ -6,6 +6,7 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
 from Britefury.gSym.gSymCodeGenerator import GSymCodeGeneratorObjectNodeDispatch
+from Britefury.Dispatch.ObjectNodeMethodDispatch import ObjectNodeDispatchMethod
 
 from Britefury.Util.NodeUtil import isNullNode
 
@@ -32,21 +33,25 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 	
 	
 	# Misc
+	@ObjectNodeDispatchMethod
 	def BlankLine(self, node):
 		return ''
 	
 
+	@ObjectNodeDispatchMethod
 	def UNPARSED(self, node, value):
 		raise CodeGeneratorUnparsedException
 	
 	
 	# String literal
+	@ObjectNodeDispatchMethod
 	def StringLiteral(self, node, format, quotation, value):
 		return repr( value.toString() )
 	
 	
 	
 	# Integer literal
+	@ObjectNodeDispatchMethod
 	def IntLiteral(self, node, format, numType, value):
 		format = format.toString()
 		numType = numType.toString()
@@ -75,211 +80,265 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 	
 
 	# Float literal
+	@ObjectNodeDispatchMethod
 	def FloatLiteral(self, node, value):
 		return value.toString()
 
 	
 	
 	# Imaginary literal
+	@ObjectNodeDispatchMethod
 	def ImaginaryLiteral(self, node, value):
 		return value.toString()
 	
 	
 	
 	# Target
+	@ObjectNodeDispatchMethod
 	def SingleTarget(self, node, name):
 		return name.toString()
 	
+	@ObjectNodeDispatchMethod
 	def TupleTarget(self, node, targets):
 		return '( '  +  ', '.join( [ self( i )   for i in targets ] )  +  ', )'
 	
+	@ObjectNodeDispatchMethod
 	def ListTarget(self, node, targets):
 		return '[ '  +  ', '.join( [ self( i )   for i in targets ] )  +  ' ]'
 	
 	
 
 	# Variable reference
+	@ObjectNodeDispatchMethod
 	def Load(self, node, name):
 		return str( name )
 
 	
 	
 	# Tuple literal	
+	@ObjectNodeDispatchMethod
 	def TupleLiteral(self, node, values):
 		return '( '  +  ', '.join( [ self( i )   for i in values ] )  +  ', )'
 
 	
 	
 	# List literal
+	@ObjectNodeDispatchMethod
 	def ListLiteral(self, node, values):
 		return '[ '  +  ', '.join( [ self( i )   for i in values ] )  +  ' ]'
 	
 	
 	
 	# List comprehension / generator expression
+	@ObjectNodeDispatchMethod
 	def ComprehensionFor(self, node, target, source):
 		return 'for ' + self( target ) + ' in ' + self( source )
 	
+	@ObjectNodeDispatchMethod
 	def ComprehensionIf(self, node, condition):
 		return 'if ' + self( condition )
 	
+	@ObjectNodeDispatchMethod
 	def ListComp(self, node, resultExpr, comprehensionItems):
 		return '[ ' + self( resultExpr ) + '   ' + '   '.join( [ self( x )   for x in comprehensionItems ] )  +  ' ]'
 	
+	@ObjectNodeDispatchMethod
 	def GeneratorExpr(self, node, resultExpr, comprehensionItems):
 		return '( ' + self( resultExpr ) + '   ' + '   '.join( [ self( c )   for c in comprehensionItems ] )  +  ' )'
 	
 	
 	
 	# Dictionary literal
+	@ObjectNodeDispatchMethod
 	def DictKeyValuePair(self, node, key, value):
 		return self( key ) + ':' + self( value )
 	
+	@ObjectNodeDispatchMethod
 	def DictLiteral(self, node, values):
 		return '{ '  +  ', '.join( [ self( i )   for i in values ] )  +  ' }'
 	
 	
 	
 	# Yield expression and yield atom
+	@ObjectNodeDispatchMethod
 	def YieldExpr(self, node, value):
 		return 'yield ' + self( value )
 		
+	@ObjectNodeDispatchMethod
 	def YieldAtom(self, node, value):
 		return '(yield ' + self( value ) + ')'
 		
 	
 	
 	# Attribute ref
+	@ObjectNodeDispatchMethod
 	def AttributeRef(self, node, target, name):
 		return self( target ) + '.' + name
 
 	
 
 	# Subscript
+	@ObjectNodeDispatchMethod
 	def SubscriptSlice(self, node, lower, upper):
 		txt = lambda x:  self( x )   if not isNullNode( x )   else ''
 		return txt( lower ) + ':' + txt( upper )
 
+	@ObjectNodeDispatchMethod
 	def SubscriptLongSlice(self, node, lower, upper, stride):
 		txt = lambda x:  self( x )   if not isNullNode( x )   else ''
 		return txt( lower ) + ':' + txt( upper ) + ':' + txt( stride )
 	
+	@ObjectNodeDispatchMethod
 	def SubscriptEllipsis(self, node):
 		return '...'
 
+	@ObjectNodeDispatchMethod
 	def SubscriptTuple(self, node, values):
 		return '('  +  ','.join( [ self( i )   for i in values ] )  +  ',)'
 
+	@ObjectNodeDispatchMethod
 	def Subscript(self, node, target, index):
 		return self( target ) + '[' + self( index ) + ']'
 	
 
 	
 	# Call	
+	@ObjectNodeDispatchMethod
 	def CallKWArg(self, node, name, value):
 		return name.toString() + '=' + self( value )
 	
+	@ObjectNodeDispatchMethod
 	def CallArgList(self, node, value):
 		return '*' + self( value )
 	
+	@ObjectNodeDispatchMethod
 	def CallKWArgList(self, node, value):
 		return '**' + self( value )
 	
+	@ObjectNodeDispatchMethod
 	def Call(self, node, target, args):
 		return self( target ) + '( ' + ', '.join( [ self( a )   for a in args ] ) + ' )'
 	
 	
 	
 	# Operators
+	@ObjectNodeDispatchMethod
 	def Pow(self, node, x, y):
 		return '( '  +  self( x )  +  ' ** '  +  self( y )  +  ' )'
 	
 	
+	@ObjectNodeDispatchMethod
 	def Invert(self, node, x):
 		return '( ~'  +  self( x )  +  ' )'
 	
+	@ObjectNodeDispatchMethod
 	def Negate(self, node, x):
 		return '( -'  +  self( x )  +  ' )'
 	
+	@ObjectNodeDispatchMethod
 	def Pos(self, node, x):
 		return '( +'  +  self( x )  +  ' )'
 	
 	
+	@ObjectNodeDispatchMethod
 	def Mul(self, node, x, y):
 		return '( '  +  self( x )  +  ' * '  +  self( y )  +  ' )'
 	
+	@ObjectNodeDispatchMethod
 	def Div(self, node, x, y):
 		return '( '  +  self( x )  +  ' / '  +  self( y )  +  ' )'
 	
+	@ObjectNodeDispatchMethod
 	def Mod(self, node, x, y):
 		return '( '  +  self( x )  +  ' % '  +  self( y )  +  ' )'
 	
+	@ObjectNodeDispatchMethod
 	def Add(self, node, x, y):
 		return '( '  +  self( x )  +  ' + '  +  self( y )  +  ' )'
 	
+	@ObjectNodeDispatchMethod
 	def Sub(self, node, x, y):
 		return '( '  +  self( x )  +  ' - '  +  self( y )  +  ' )'
 	
 	
+	@ObjectNodeDispatchMethod
 	def LShift(self, node, x, y):
 		return '( '  +  self( x )  +  ' << '  +  self( y )  +  ' )'
 	
+	@ObjectNodeDispatchMethod
 	def RShift(self, node, x, y):
 		return '( '  +  self( x )  +  ' >> '  +  self( y )  +  ' )'
 	
 	
+	@ObjectNodeDispatchMethod
 	def BitAnd(self, node, x, y):
 		return '( '  +  self( x )  +  ' & '  +  self( y )  +  ' )'
 	
+	@ObjectNodeDispatchMethod
 	def BitXor(self, node, x, y):
 		return '( '  +  self( x )  +  ' ^ '  +  self( y )  +  ' )'
 	
+	@ObjectNodeDispatchMethod
 	def BitOr(self, node, x, y):
 		return '( '  +  self( x )  +  ' | '  +  self( y )  +  ' )'
 	
 
+	@ObjectNodeDispatchMethod
 	def Cmp(self, node, x, ops):
 		return '( ' + self( x )  +  ''.join( [ self( op )   for op in ops ] ) + ' )'
 	
+	@ObjectNodeDispatchMethod
 	def CmpOpLte(self, node, y):
 		return ' <= ' + self( y )
 	
+	@ObjectNodeDispatchMethod
 	def CmpOpLt(self, node, y):
 		return ' < ' + self( y )
 	
+	@ObjectNodeDispatchMethod
 	def CmpOpGte(self, node, y):
 		return ' >= ' + self( y )
 	
+	@ObjectNodeDispatchMethod
 	def CmpOpGt(self, node, y):
 		return ' > ' + self( y )
 	
+	@ObjectNodeDispatchMethod
 	def CmpOpEq(self, node, y):
 		return ' == ' + self( y )
 	
+	@ObjectNodeDispatchMethod
 	def CmpOpNeq(self, node, y):
 		return ' != ' + self( y )
 	
+	@ObjectNodeDispatchMethod
 	def CmpOpIsNot(self, node, y):
 		return ' is not ' + self( y )
 	
+	@ObjectNodeDispatchMethod
 	def CmpOpIs(self, node, y):
 		return ' is ' + self( y )
 	
+	@ObjectNodeDispatchMethod
 	def CmpOpNotIn(self, node, y):
 		return ' not in ' + self( y )
 	
+	@ObjectNodeDispatchMethod
 	def CmpOpIn(self, node, y):
 		return ' in ' + self( y )
 	
 	
 
 	
+	@ObjectNodeDispatchMethod
 	def NotTest(self, node, x):
 		return '(not '  +  self( x )  +  ')'
 	
+	@ObjectNodeDispatchMethod
 	def AndTest(self, node, x, y):
 		return '( '  +  self( x )  +  ' and '  +  self( y )  +  ' )'
 	
+	@ObjectNodeDispatchMethod
 	def OrTest(self, node, x, y):
 		return '( '  +  self( x )  +  ' or '  +  self( y )  +  ' )'
 	
@@ -287,68 +346,82 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 	
 	
 	# Parameters	
+	@ObjectNodeDispatchMethod
 	def SimpleParam(self, node, name):
 		return name.toString()
 	
+	@ObjectNodeDispatchMethod
 	def DefaultValueParam(self, node, name, defaultValue):
 		return name.toString()  +  '='  +  self( defaultValue )
 	
+	@ObjectNodeDispatchMethod
 	def ParamList(self, node, name):
 		return '*'  +  name.toString()
 	
+	@ObjectNodeDispatchMethod
 	def KWParamList(self, node, name):
 		return '**'  +  name.toString()
 	
 	
 	
 	# Lambda expression
+	@ObjectNodeDispatchMethod
 	def LambdaExpr(self, node, params, expr):
 		return '( lambda '  +  ', '.join( [ self( p )   for p in params ] )  +  ': '  +  self( expr ) + ' )'
 	
 	
 	
 	# Conditional expression
+	@ObjectNodeDispatchMethod
 	def ConditionalExpr(self, node, condition, expr, elseExpr):
 		return self( expr )  +  '   if '  +  self( condition )  +  '   else '  +  self( elseExpr )
 
 	
 	
 	# Assert statement
+	@ObjectNodeDispatchMethod
 	def AssertStmt(self, node, condition, fail):
 		return 'assert '  +  self( condition )  +  ( ', ' + self( fail )   if fail != '<nil>'   else  '' )
 	
 	
 	# Assignment statement
+	@ObjectNodeDispatchMethod
 	def AssignStmt(self, node, targets, value):
 		return ''.join( [ self( t ) + ' = '   for t in targets ] )  +  self( value )
 	
 	
 	# Augmented assignment statement
+	@ObjectNodeDispatchMethod
 	def AugAssignStmt(self, node, op, target, value):
 		return self( target )  +  ' '  +  op.toString()  +  ' '  +  self( value )
 	
 	
 	# Pass statement
+	@ObjectNodeDispatchMethod
 	def PassStmt(self, node):
 		return 'pass'
 	
 	
 	# Del statement
+	@ObjectNodeDispatchMethod
 	def DelStmt(self, node, target):
 		return 'del '  +  self( target )
 	
 	
 	# Return statement
+	@ObjectNodeDispatchMethod
 	def ReturnStmt(self, node, value):
 		return 'return '  +  self( value )
 	
 	
 	# Yield statement
+	@ObjectNodeDispatchMethod
 	def YieldStmt(self, node, value):
 		return 'yield '  +  self( value )
 	
 	
 	# Raise statement
+	@ObjectNodeDispatchMethod
 	def RaiseStmt(self, node, excType, excValue, traceback):
 		params = ', '.join( [ self( x )   for x in excType, excValue, traceback   if not isNullNode( x ) ] )
 		if params != '':
@@ -358,50 +431,63 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 	
 	
 	# Break statement
+	@ObjectNodeDispatchMethod
 	def BreakStmt(self, node):
 		return 'break'
 	
 	
 	# Continue statement
+	@ObjectNodeDispatchMethod
 	def ContinueStmt(self, node):
 		return 'continue'
 	
 	
 	# Import statement
+	@ObjectNodeDispatchMethod
 	def RelativeModule(self, node, name):
 		return name.toString()
 	
+	@ObjectNodeDispatchMethod
 	def ModuleImport(self, node, name):
 		return name.toString()
 	
+	@ObjectNodeDispatchMethod
 	def ModuleImportAs(self, node, name, asName):
 		return name.toString() + ' as ' + asName.toString()
 	
+	@ObjectNodeDispatchMethod
 	def ModuleContentImport(self, node, name):
 		return name.toString()
 	
+	@ObjectNodeDispatchMethod
 	def ModuleContentImportAs(self, node, name, asName):
 		return name.toString() + ' as ' + asName.toString()
 	
+	@ObjectNodeDispatchMethod
 	def ImportStmt(self, node, modules):
 		return 'import '  +  ', '.join( [ self( x )   for x in modules ] )
 	
+	@ObjectNodeDispatchMethod
 	def FromImportStmt(self, node, module, imports):
 		return 'from ' + self( module ) + ' import ' + ', '.join( [ self( x )   for x in imports ] )
 	
+	@ObjectNodeDispatchMethod
 	def FromImportAllStmt(self, node, module):
 		return 'from ' + self( module ) + ' import *'
 	
 	
 	# Global statement
+	@ObjectNodeDispatchMethod
 	def GlobalVar(self, node, name):
 		return name
 	
+	@ObjectNodeDispatchMethod
 	def GlobalStmt(self, node, vars):
 		return 'global '  +  ', '.join( [ self( x )   for x in vars ] )
 	
 	
 	# Exec statement
+	@ObjectNodeDispatchMethod
 	def ExecStmt(self, node, source, locals, globals):
 		txt = 'exec '  +  self( source )
 		if locals != '<nil>':
@@ -412,42 +498,49 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 	
 	
 	# If statement
+	@ObjectNodeDispatchMethod
 	def IfStmt(self, node, condition, suite):
 		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
 		return 'if '  +  self( condition ) + ':\n'  +  _indent( suiteText )
 	
 
 	# Elif statement
+	@ObjectNodeDispatchMethod
 	def ElifStmt(self, node, condition, suite):
 		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
 		return 'elif '  +  self( condition ) + ':\n'  +  _indent( suiteText )
 	
 
 	# Else statement
+	@ObjectNodeDispatchMethod
 	def ElseStmt(self, node, suite):
 		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
 		return 'else:\n'  +  _indent( suiteText )
 	
 
 	# While statement
+	@ObjectNodeDispatchMethod
 	def WhileStmt(self, node, condition, suite):
 		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
 		return 'while '  +  self( condition ) + ':\n'  +  _indent( suiteText )
 	
 
 	# For statement
+	@ObjectNodeDispatchMethod
 	def ForStmt(self, node, target, source, suite):
 		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
 		return 'for '  +  self( target )  +  ' in '  +  self( source )  +  ':\n'  +  _indent( suiteText )
 	
 
 	# Try statement
+	@ObjectNodeDispatchMethod
 	def TryStmt(self, node, suite):
 		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
 		return 'try:\n'  +  _indent( suiteText )
 	
 
 	# Except statement
+	@ObjectNodeDispatchMethod
 	def ExceptStmt(self, node, exception, target, suite):
 		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
 		txt = 'except'
@@ -459,24 +552,28 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 	
 
 	# Finally statement
+	@ObjectNodeDispatchMethod
 	def FinallyStmt(self, node, suite):
 		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
 		return 'finally:\n'  +  _indent( suiteText )
 	
 
 	# With statement
+	@ObjectNodeDispatchMethod
 	def WithStmt(self, node, expr, target, suite):
 		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
 		return 'with '  +  self( expr )  +  ( ' as ' + self( target )   if target != '<nil>'   else   '' )  +  ':\n'  +  _indent( suiteText )
 	
 	
 	# Def statement
+	@ObjectNodeDispatchMethod
 	def DefStmt(self, node, name, params, suite):
 		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
 		return 'def '  +  name.toString()  +  '('  +  ', '.join( [ self( p )   for p in params ] )  +  '):\n'  +  _indent( suiteText )
 	
 
 	# Deco statement
+	@ObjectNodeDispatchMethod
 	def DecoStmt(self, node, name, args):
 		text = '@' + name.toString()
 		if not isNullNode( args ):
@@ -485,6 +582,7 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 	
 
 	# Class statement
+	@ObjectNodeDispatchMethod
 	def ClassStmt(self, node, name, bases, suite):
 		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
 		text = 'class '  +  name
@@ -495,11 +593,13 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 	
 	
 	# Comment statement
+	@ObjectNodeDispatchMethod
 	def CommentStmt(self, node, comment):
 		return '#' + comment
 
 	
 	# Module
+	@ObjectNodeDispatchMethod
 	def PythonModule(self, node, contents):
 		return '\n'.join( [ self( line )   for line in content ] )
 

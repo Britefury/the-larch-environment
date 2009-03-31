@@ -7,11 +7,12 @@
 ##-*************************
 from Britefury.gSym.gSymDocument import GSymUnit
 
-from GSymCore.Languages.Python25.Python25Importer import importPy25File
+from GSymCore.Languages.Python25.Python25Importer2 import importPy25File
+from GSymCore.Languages.Python25 import NodeClasses as Nodes
 
 
 def py25New():
-	return GSymUnit( 'GSymCore.Languages.Python25.Python25', [ 'python25Module', [ 'commentStmt', 'New Python 2.5 document' ] ] )
+	return GSymUnit( 'GSymCore.Languages.Python25.Python25', Nodes.PythonModule( contents=[ Nodes.CommentStmt( comment='New Python 2.5 document' ) ] ) )
 
 def py25ImportFile(filename):
 	content = importPy25File( filename )
