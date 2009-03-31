@@ -8,7 +8,7 @@
 import unittest
 
 from Britefury.Dispatch.Dispatch import DispatchError
-from Britefury.Dispatch.ObjectNodeMethodDispatch import ObjectNodeMethodDispatchMetaClass, objectNodeMethodDispatch
+from Britefury.Dispatch.ObjectNodeMethodDispatch import ObjectNodeDispatchMethod, ObjectNodeMethodDispatchMetaClass, objectNodeMethodDispatch
 from BritefuryJ.DocModel import DMModule
 
 
@@ -27,7 +27,7 @@ class TestCase_obejctNodeMethodDispatch (unittest.TestCase):
 			__dispatch_module__ = self.Module
 			__dispatch_num_args__ = 0
 			
-			
+			@ObjectNodeDispatchMethod
 			def A(self, node, x, y):
 				return x + y
 		

@@ -5,7 +5,7 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from BritefuryJ.DocModel import DMList
+from BritefuryJ.DocModel import DMNode
 
 from Britefury.Kernel.Abstract import abstractmethod
 
@@ -39,7 +39,7 @@ class GSymDocumentUnknownItemType (Exception):
 class GSymUnit (object):
 	def __init__(self, languageModuleName, contentSX):
 		self.languageModuleName = languageModuleName
-		self.contentSX = DMList( contentSX )
+		self.contentSX = DMNode.coerce( contentSX )
 		
 		
 		
