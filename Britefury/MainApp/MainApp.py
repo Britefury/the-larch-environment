@@ -19,7 +19,7 @@ from java.awt.event import WindowListener, ActionListener, KeyEvent
 
 from BritefuryJ.CommandHistory import CommandHistory, CommandHistoryListener
 
-from BritefuryJ.DocModel import DMIORead, DMIOWrite, DMList
+from BritefuryJ.DocModel import DMIOReader, DMIOWriter, DMNode
 
 from BritefuryJ.DocPresent import *
 from BritefuryJ.DocPresent.ElementTree import *
@@ -177,13 +177,13 @@ def _action(name, f):
 
 
 class MainApp (object):
-	def __init__(self, unit):
+	def __init__(self, world, unit):
 		document = GSymDocument( unit )   if unit is not None   else   None
 		self._document = None
 		self._commandHistory = None
 		self._bUnsavedData = False
 		
-		self._world = GSymWorld()
+		self._world = world
 		
 		self._docView = MainAppDocViewNormal( self )
 
@@ -359,6 +359,10 @@ class MainApp (object):
 
 
 	def setDocument(self, document):
+		if self._document is not None:
+			print 'command history no longer tracking tracking a ', type( self._document.unit.content )
+			self._commandHistory.stopTracking( self._document.unit.content )
+
 		self._document = document
 		
 		#self._actionsMenu.removeAll()
@@ -372,8 +376,8 @@ class MainApp (object):
 				self._onCommandHistoryChanged( history )
 		
 		if self._document is not None:
-			print type( self._document.unit.contentSX )
-			self._commandHistory.track( self._document.unit.contentSX )
+			print 'command history tracking a ', type( self._document.unit.content )
+			self._commandHistory.track( self._document.unit.content )
 		self._commandHistory.setListener( Listener() )
 		self._bUnsavedData = False
 		
@@ -442,12 +446,12 @@ class MainApp (object):
 						if f is not None:
 							try:
 								t1 = datetime.now()
-								documentRoot = DMIORead.readSX( f.read() )
+								documentRoot = DMIOReader.readFromString( f.read(), self._world.resolver )
 								t2 = datetime.now()
-								documentRoot = DMList( documentRoot )
+								documentRoot = DMNode.coerce( documentRoot )
 								t3 = datetime.now()
-								print 'Read SX time=%s, convert to DMLIst time=%s'  %  ( t2 - t1, t3 - t2 )
-								document = GSymDocument.readSX( self._world, documentRoot )
+								print 'Read SX time=%s, convert to DMNode time=%s'  %  ( t2 - t1, t3 - t2 )
+								document = GSymDocument.read( self._world, documentRoot )
 								self.setDocument( document )
 							except IOError:
 								pass
@@ -510,7 +514,7 @@ class MainApp (object):
 							if unit is not None:
 								document = GSymDocument( unit )
 								t3 = datetime.now()
-								print 'Import time=%s, convert to DMList time=%s'  %  ( t2 - t1, t3 - t2 )
+								print 'Import time=%s, convert to DMNode time=%s'  %  ( t2 - t1, t3 - t2 )
 								self.setDocument( document )
 		
 		self._importMenu.add( _action( menuLabel, _onImport ) )
@@ -523,7 +527,7 @@ class MainApp (object):
 		if self._document is not None:
 			f = open( filename, 'w' )
 			if f is not None:
-				f.write( DMIOWrite.writeSX( self._document.writeSX() ) )
+				f.write( DMIOWriter.writeAsString( self._document.write() ) )
 				f.close()
 				self._bUnsavedData = False
 

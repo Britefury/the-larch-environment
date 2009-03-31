@@ -17,10 +17,10 @@ from Britefury.I18n import i18n
 i18n.initialise()
 
 
-from BritefuryJ.DocModel import DMIORead
-from BritefuryJ.DocModel import DMList
+from BritefuryJ.DocModel import DMIOReader, DMNode
 
 from Britefury.gSym.gSymEnvironment import initGSymEnvironment, shutdownGSymEnvironment
+from Britefury.gSym.gSymWorld import GSymWorld
 
 from Britefury.MainApp.MainApp import MainApp
 
@@ -28,19 +28,21 @@ from Britefury.MainApp.MainApp import MainApp
 def main():
 	initGSymEnvironment()
 	
+	world = GSymWorld()
+	
 
 	if len( sys.argv ) == 2:
 		filename = sys.argv[1]
 		try:
-			documentRoot = DMIORead.readSX( file( filename, 'r' ).read() )
-			documentRoot = DMList( documentRoot )
+			documentRoot = DMIOReader.readFromString( file( filename, 'r' ).read(), world.resolver )
+			documentRoot = DMNode.coerce( documentRoot )
 			bEvaluate = True
 		except IOError:
 			pass
 		
 	UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
 
-	app = MainApp( None )
+	app = MainApp( world, None )
 
 	app.run()
 	

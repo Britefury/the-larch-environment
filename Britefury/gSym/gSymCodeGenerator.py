@@ -35,11 +35,11 @@ class GSymCodeGeneratorCollection (object):
 		
 		
 import unittest
-from BritefuryJ.DocModel import DMIORead
+from BritefuryJ.DocModel import DMIOReader
 
 class TestCase_GSymCodeGenerator (unittest.TestCase):
 	def testGSymCodeGenerator(self):
-		class CodeGenerator (GSymCodeGenerator):
+		class CodeGenerator (GSymCodeGeneratorListNodeDispatch):
 			def add(self, node, x, y):
 				return '( '  +  self( x )  +  ' + '  +  self( y )  +  ' )'
 			
@@ -60,6 +60,6 @@ class TestCase_GSymCodeGenerator (unittest.TestCase):
 
 			
 		c = CodeGenerator( 'ascii' )
-		xs = DMIORead.readSX( '(div (add (loadLocal x) (loadLocal y))  (mul (loadLocal a) (loadLocal b)))' )
+		xs = DMIOReader.readSX( '[div [add [loadLocal x] [loadLocal y]]  [mul [loadLocal a] [loadLocal b]]]' )
 		
 		self.assert_( c( xs )  ==  '( ( x + y ) / ( a * b ) )' )
