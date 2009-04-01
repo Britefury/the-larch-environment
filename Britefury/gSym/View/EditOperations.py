@@ -12,6 +12,7 @@ from BritefuryJ.DocModel import DMList
 #from Britefury.DocTree.DocTreeNode import DocTreeNode
 from BritefuryJ.DocTree import DocTreeNode
 
+from Britefury.Util.NodeUtil import *
 
 
 def _sanitiseInputData(data):
@@ -43,6 +44,8 @@ def replace(ctx, data, replacement):
 		if parent is None:
 			print 'EditOperations:replace(): no parent ', data
 		index = parent.indexOfById( data.getNode() )
+		if index == -1:
+			raise ValueError, 'could not replace'
 		parent[index] = _sanitiseInputData( replacement )
 		return parent[index]
 	else:
@@ -63,6 +66,8 @@ def replaceWithRange(ctx, data, replacement):
 		if parent is None:
 			print 'EditOperations:replaceWithRange(): no parent ', data
 		index = parent.indexOfById( data.getNode() )
+		if index == -1:
+			raise ValueError, 'could not replace with range'
 		parent[index:index+1] = _sanitiseInputData( replacement )
 		return parent[index:index+len(replacement)]
 	else:
@@ -107,6 +112,8 @@ def insertBefore(ctx, x, data):
 	if isinstance( x, DocTreeNode ):
 		parent = x.getParentTreeNode()
 		index = parent.indexOfById( x.getNode() )
+		if index == -1:
+			raise ValueError, 'could not insert before'
 		#parent.insert( index, _sanitiseInputData( data ) )
 		parent.add( index, _sanitiseInputData( data ) )
 		return parent[index]
@@ -118,6 +125,8 @@ def insertRangeBefore(ctx, x, data):
 	if isinstance( x, DocTreeNode ):
 		parent = x.getParentTreeNode()
 		index = parent.indexOfById( x.getNode() )
+		if index == -1:
+			raise ValueError, 'could not insert range before'
 		parent[index:index] = _sanitiseInputData( data )
 		return parent[index]
 	else:
@@ -127,7 +136,10 @@ def insertRangeBefore(ctx, x, data):
 def insertAfter(ctx, x, data):
 	if isinstance( x, DocTreeNode ):
 		parent = x.getParentTreeNode()
-		index = parent.getNode().indexOfById( x.getNode() ) + 1
+		index = parent.getNode().indexOfById( x.getNode() )
+		if index == -1:
+			raise ValueError, 'could not insert after'
+		index += 1
 		#parent.insert( index, _sanitiseInputData( data ) )
 		parent.add( index, _sanitiseInputData( data ) )
 		return parent[index]
@@ -138,7 +150,10 @@ def insertAfter(ctx, x, data):
 def insertRangeAfter(ctx, x, data):
 	if isinstance( x, DocTreeNode ):
 		parent = x.getParentTreeNode()
-		index = parent.getNode().indexOfById( x.getNode() ) + 1
+		index = parent.getNode().indexOfById( x.getNode() )
+		if index == -1:
+			raise ValueError, 'could not insert range after'
+		index += 1
 		parent[index:index] = _sanitiseInputData( data )
 		return parent[index]
 	else:

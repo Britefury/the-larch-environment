@@ -10,7 +10,7 @@ import java.util.Map;
 
 import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
 
-public interface DMObjectInterface
+public interface DMObjectInterface extends DMNodeInterface
 {
 	public DMObjectClass getDMClass();
 	public boolean isInstanceOf(DMObjectClass cls);

@@ -40,9 +40,14 @@ def nodeToSXString(x, level=3):
 		return x
 	elif isListNode( x ):
 		if level == 0:
+			return '[...]'
+		else:
+			return '[' + ' '.join( [ nodeToSXString( v, level - 1 )  for v in x ] ) + ']'
+	elif isObjectNode( x ):
+		if level == 0:
 			return '(...)'
 		else:
-			return '(' + ' '.join( [ nodeToSXString( v, level - 1 )  for v in x ] ) + ')'
+			return '( ' + x.getDMClass().getName() + ' : ' + ' '.join( [ x.getDMClass().getField( i ).getName() + '=' + nodeToSXString( x.get( i ), level - 1 )  for i in xrange( 0, x.getDMClass().getNumFields() ) ] ) + ')'
 	else:
 		raise TypeError, '%s'  %  ( x.__class__, )
 

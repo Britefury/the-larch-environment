@@ -25,7 +25,7 @@ from BritefuryJ.GSym.View.ListView import ParagraphListViewLayout, HorizontalLis
 
 
 
-from GSymCore.Languages.Python25.Parser2 import Python25Grammar
+from GSymCore.Languages.Python25.Parser3 import Python25Grammar
 from GSymCore.Languages.Python25.Styles import *
 from GSymCore.Languages.Python25.Keywords import *
 from GSymCore.Languages.Python25 import NodeClasses as Nodes
@@ -135,11 +135,11 @@ class ParsedExpressionContentListener (ElementContentListener):
 		if '\n' not in value:
 			parsed = _parseText( self._parser, value )
 			if parsed is not None:
-				#replace( self._ctx, self._node, parsed )
-				replaceNodeContents( self._ctx, self._node, parsed )
+				replace( self._ctx, self._node, parsed )
+				#replaceNodeContents( self._ctx, self._node, parsed )
 			else:
-				#replace( self._ctx, self._node, [ 'UNPARSED', value ] )
-				replaceNodeContents( self._ctx, self._node, [ 'UNPARSED', value ] )
+				replace( self._ctx, self._node, Nodes.UNPARSED( value=value ) )
+				#replaceNodeContents( self._ctx, self._node, Nodes.UNPARSED( value=value ) )
 			return True
 		else:
 			return False
@@ -149,7 +149,7 @@ _compoundStmtNames = set( [ 'ifStmt', 'elifStmt', 'elseStmt', 'whileStmt', 'forS
 
 
 def _isCompoundStmt(node):
-	return node[0] in _compoundStmtNames
+	return node.isInstanceOf( Nodes.CompoundStmt )
 
 
 
@@ -168,13 +168,13 @@ class LineContentListenerWithParser(ElementContentListener):
 		for i, line in enumerate( lineStrings ):
 			if line.strip() == '':
 				# Blank line
-				result.append( [ 'blankLine' ] )
+				result.append( Nodes.BlankLine() )
 			else:
 				# Parse
 				parsed = _parseText( self._parser, line )
 				if parsed is None:
 					# Parse failure; unparsed text
-					result.append( [ 'UNPARSED', line ] )
+					result.append( Nodes.UNPARSED( value=line ) )
 				else:
 					# Parsed
 					if not _isCompoundStmt( parsed ):
@@ -182,7 +182,7 @@ class LineContentListenerWithParser(ElementContentListener):
 						result.append( parsed )
 					else:
 						lineParsed = parsed
-						lineParsed[-1] = self.parseLines( lineStrings[i+1:] )
+						lineParsed['suite'] = self.parseLines( lineStrings[i+1:] )
 						result.append( lineParsed )
 						break
 		return result
@@ -202,9 +202,9 @@ class ParsedLineContentListener (LineContentListenerWithParser):
 		parsedLines = self.parseLines( lineStrings )
 
 		if _isCompoundStmt( self._node ):
-			originalContents = self._node[-1]
+			originalContents = self._node['suite']
 			if _isCompoundStmt( parsedLines[-1] ):
-				parsedLines[-1][-1].extend( originalContents )
+				parsedLines[-1]['suite'].extend( originalContents )
 			else:
 				parsedLines.extend( originalContents )
 				
