@@ -251,7 +251,19 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable
 
 	
 	
-	
+	public int indexOfById(Object x)
+	{
+		Object[] fieldData = (Object[])cell.getLiteralValue();
+		for (int i = 0; i < fieldData.length; i++)
+		{
+			if ( fieldData[i] == x )
+			{
+				return i;
+			}
+		}
+		return -1;
+	}
+
 	public Object get(int value)
 	{
 		Object[] fieldData = (Object[])cell.getLiteralValue();

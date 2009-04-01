@@ -10,10 +10,8 @@ import java.util.List;
 
 import org.python.core.PySlice;
 
-public interface DMListInterface extends List<Object>
+public interface DMListInterface extends List<Object>, DMNodeInterface
 {
-	public int indexOfById(Object x);
-
 	public void append(Object x);
 	public void extend(List<Object> xs);
 	public void insert(int i, Object x);

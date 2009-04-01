@@ -65,6 +65,11 @@ public class DocTreeObject implements DocTreeNode, DMObjectInterface
 	}
 	
 	
+	public int indexOfById(Object x)
+	{
+		return node.indexOfById( x );
+	}
+	
 	public Object get(int index)
 	{
 		return tree.treeNode( node.get( index ), this, index );
