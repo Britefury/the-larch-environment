@@ -253,7 +253,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable
 	
 	public int indexOfById(Object x)
 	{
-		Object[] fieldData = (Object[])cell.getLiteralValue();
+		Object[] fieldData = (Object[])cell.getValue();
 		for (int i = 0; i < fieldData.length; i++)
 		{
 			if ( fieldData[i] == x )
@@ -266,13 +266,13 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable
 
 	public Object get(int value)
 	{
-		Object[] fieldData = (Object[])cell.getLiteralValue();
+		Object[] fieldData = (Object[])cell.getValue();
 		return fieldData[value];
 	}
 	
 	public Object get(String key) throws InvalidFieldNameException
 	{
-		Object[] fieldData = (Object[])cell.getLiteralValue();
+		Object[] fieldData = (Object[])cell.getValue();
 		int index = objClass.getFieldIndex( key );
 		if ( index == -1 )
 		{
@@ -320,7 +320,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable
 	
 	public Object[] getFieldValuesImmutable()
 	{
-		Object[] fieldData = (Object[])cell.getLiteralValue();
+		Object[] fieldData = (Object[])cell.getValue();
 		return fieldData;
 	}
 	
