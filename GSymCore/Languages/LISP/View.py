@@ -5,7 +5,7 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from Britefury.Util.NodeUtil import isListNode
+from Britefury.Util.NodeUtil import isListNode, isObjectNode, isStringNode, isNullNode
 
 from Britefury.gSym.View.EditOperations import replace, replaceWithRange, replaceNodeContents, append, prepend, insertBefore, insertRangeBefore, insertAfter, insertRangeAfter
 
@@ -85,10 +85,10 @@ def viewStringNode(node, ctx, state):
 
 
 def lispViewEval(node, ctx, state):
-	if isListNode( node ):
-		return ctx.viewEval( node )
-	else:
+	if isStringNode( node ):
 		return viewStringNode( node, ctx, state )
+	else:
+		return ctx.viewEval( node )
 
 
 def viewLispNode(node, ctx, state):
@@ -96,18 +96,18 @@ def viewLispNode(node, ctx, state):
 		# List
 		xViews = [ lispViewEval( x, ctx, state )   for x in node ]
 		
-		# Check the contents:
+		# Check the contents, to determine the layout
 		mode = MODE_HORIZONTAL
 		if len( node ) > 0:
-			if isListNode( node[0] ):
-				mode = MODE_VERTICAL
-			else:
+			if isStringNode( node[0] ):
 				for x in node[1:]:
-					if isListNode( x ):
+					if not isStringNode( x ):
 						mode = MODE_VERTICALINLINE
 						break
+			else:
+				mode = MODE_VERTICAL
 		
-			
+		# Create the layout
 		if mode == MODE_HORIZONTAL:
 			layout = horizontal_listViewLayout
 		elif mode == MODE_VERTICALINLINE:
@@ -116,8 +116,39 @@ def viewLispNode(node, ctx, state):
 			layout = vertical_listViewLayout
 		else:
 			raise ValueError
-		v = ctx.listView( layout, lambda: ctx.text( punctuation_textStyle, '(' ), lambda: ctx.text( punctuation_textStyle, ')' ), None, xViews )
 		
+		# Create a list view
+		v = ctx.listView( layout, lambda: ctx.text( punctuation_textStyle, '[' ), lambda: ctx.text( punctuation_textStyle, ']' ), None, xViews )
+		
+		return nodeEditor( ctx, node, v, state )
+	elif isObjectNode( node ):
+		cls = node.getDMClass()
+		# Header
+		className = ctx.paragraph( lisp_paragraphStyle, [ ctx.text( className_textStyle, cls.getName() ), ctx.text( string_textStyle, ' ' ), ctx.text( punctuation_textStyle, ':' ) ] )
+		itemViews = [ className ]
+		
+		# Create views of each item
+		mode = MODE_HORIZONTAL
+		for i in xrange( 0, cls.getNumFields() ):
+			value = node.get( i )
+			fieldName = cls.getField( i ).getName()
+			if not isNullNode( value ):
+				# If we encounter a non-string value, then this object cannot be displayed in a single line
+				if not isStringNode( value ):
+					mode = MODE_VERTICALINLINE
+				line = ctx.paragraph( lisp_paragraphStyle, [ ctx.text( fieldName_textStyle, fieldName ), ctx.text( punctuation_textStyle, '=' ), lispViewEval( value, ctx, state ) ] )
+				itemViews.append( line )
+				
+		# Create the layout
+		if mode == MODE_HORIZONTAL:
+			layout = horizontal_listViewLayout
+		elif mode == MODE_VERTICALINLINE:
+			layout = verticalInline_listViewLayout
+		else:
+			raise ValueError
+		
+		# Create a list view
+		v = ctx.listView( layout, lambda: ctx.text( punctuation_textStyle, '(' ), lambda: ctx.text( punctuation_textStyle, ')' ), None, itemViews )
 		return nodeEditor( ctx, node, v, state )
 	else:
 		raise TypeError, 'node is %s'  %  node
