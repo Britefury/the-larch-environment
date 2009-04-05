@@ -6,12 +6,12 @@
 //##************************
 package BritefuryJ.DocModel;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Vector;
 
 import org.python.core.Py;
 import org.python.core.PySlice;
@@ -230,14 +230,14 @@ public class DMList extends DMNode implements DMListInterface, Trackable
 	public DMList(List<Object> xs)
 	{
 		cell = new LiteralCell();
-		Vector<Object> value = new Vector<Object>();
+		ArrayList<Object> value = new ArrayList<Object>();
 
 		if ( xs != null )
 		{
-			value.setSize(  xs.size() );
-			for (int i = 0; i < xs.size(); i++)
+			value.ensureCapacity(  xs.size() );
+			for (Object x: xs)
 			{
-				value.set( i, coerce( xs.get( i ) ) );
+				value.add( coerce( x ) );
 			}
 		}
 		cell.setLiteralValue( value );
@@ -256,7 +256,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable
 	@SuppressWarnings("unchecked")
 	public boolean add(Object x)
 	{
-		Vector<Object> v = (Vector<Object>)cell.getLiteralValue();
+		ArrayList<Object> v = (ArrayList<Object>)cell.getLiteralValue();
 		x = coerce( x );
 		boolean bResult = v.add( x );
 		cell.setLiteralValue( v );
@@ -270,7 +270,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable
 	@SuppressWarnings("unchecked")
 	public void add(int index, Object x)
 	{
-		Vector<Object> v = (Vector<Object>)cell.getLiteralValue();
+		ArrayList<Object> v = (ArrayList<Object>)cell.getLiteralValue();
 		x = coerce( x );
 		v.add( index, x );
 		cell.setLiteralValue( v );
@@ -283,9 +283,9 @@ public class DMList extends DMNode implements DMListInterface, Trackable
 	@SuppressWarnings("unchecked")
 	public boolean addAll(Collection<? extends Object> xs)
 	{
-		Vector<Object> v = (Vector<Object>)cell.getLiteralValue();
+		ArrayList<Object> v = (ArrayList<Object>)cell.getLiteralValue();
 		
-		Vector<Object> cxs = new Vector<Object>();
+		ArrayList<Object> cxs = new ArrayList<Object>();
 		cxs.ensureCapacity( xs.size() );
 		for (Object x: xs)
 		{
@@ -304,9 +304,9 @@ public class DMList extends DMNode implements DMListInterface, Trackable
 	@SuppressWarnings("unchecked")
 	public boolean addAll(int index, Collection<? extends Object> xs)
 	{
-		Vector<Object> v = (Vector<Object>)cell.getLiteralValue();
+		ArrayList<Object> v = (ArrayList<Object>)cell.getLiteralValue();
 		
-		Vector<Object> cxs = new Vector<Object>();
+		ArrayList<Object> cxs = new ArrayList<Object>();
 		cxs.ensureCapacity( xs.size() );
 		for (Object x: xs)
 		{
@@ -327,8 +327,8 @@ public class DMList extends DMNode implements DMListInterface, Trackable
 	@SuppressWarnings("unchecked")
 	public void clear()
 	{
-		Vector<Object> v = (Vector<Object>)cell.getLiteralValue();
-		Vector<Object> copy = (Vector<Object>)v.clone();
+		ArrayList<Object> v = (ArrayList<Object>)cell.getLiteralValue();
+		ArrayList<Object> copy = (ArrayList<Object>)v.clone();
 		v.clear();
 		cell.setLiteralValue( v );
 		if ( commandTracker != null )
@@ -341,14 +341,14 @@ public class DMList extends DMNode implements DMListInterface, Trackable
 	@SuppressWarnings("unchecked")
 	public boolean contains(Object x)
 	{
-		return ((Vector<Object>)cell.getValue()).contains( x );
+		return ((ArrayList<Object>)cell.getValue()).contains( x );
 	}
 	
 
 	@SuppressWarnings("unchecked")
 	public boolean containsAll(Collection<?> x)
 	{
-		Vector<Object> v = (Vector<Object>)cell.getValue();
+		ArrayList<Object> v = (ArrayList<Object>)cell.getValue();
 		for (Object a: x)
 		{
 			if ( !v.contains( a ) )
@@ -364,7 +364,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable
 	@SuppressWarnings("unchecked")
 	public boolean equals(Object xs)
 	{
-		Vector<Object> v = (Vector<Object>)cell.getValue();
+		ArrayList<Object> v = (ArrayList<Object>)cell.getValue();
 		return v.equals( xs );
 	}
 	
@@ -372,7 +372,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable
 	@SuppressWarnings("unchecked")
 	public Object get(int index)
 	{
-		Vector<Object> v = (Vector<Object>)cell.getValue();
+		ArrayList<Object> v = (ArrayList<Object>)cell.getValue();
 		return v.get( index );
 	}
 	
@@ -380,7 +380,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable
 	@SuppressWarnings("unchecked")
 	public int indexOf(Object x)
 	{
-		Vector<Object> v = (Vector<Object>)cell.getValue();
+		ArrayList<Object> v = (ArrayList<Object>)cell.getValue();
 		return v.indexOf(  x );
 	}
 
@@ -388,7 +388,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable
 	@SuppressWarnings("unchecked")
 	public int indexOfById(Object x)
 	{
-		Vector<Object> v = (Vector<Object>)cell.getValue();
+		ArrayList<Object> v = (ArrayList<Object>)cell.getValue();
 		for (int i = 0; i < v.size(); i++)
 		{
 			if ( v.get( i ) == x )
@@ -403,7 +403,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable
 	@SuppressWarnings("unchecked")
 	public boolean isEmpty()
 	{
-		Vector<Object> v = (Vector<Object>)cell.getValue();
+		ArrayList<Object> v = (ArrayList<Object>)cell.getValue();
 		return v.isEmpty();
 	}
 	
@@ -411,7 +411,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable
 	@SuppressWarnings("unchecked")
 	public Iterator<Object> iterator()
 	{
-		Vector<Object> v = (Vector<Object>)cell.getValue();
+		ArrayList<Object> v = (ArrayList<Object>)cell.getValue();
 		return v.iterator();
 	}
 	
@@ -419,7 +419,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable
 	@SuppressWarnings("unchecked")
 	public int lastIndexOf(Object x)
 	{
-		Vector<Object> v = (Vector<Object>)cell.getValue();
+		ArrayList<Object> v = (ArrayList<Object>)cell.getValue();
 		return v.lastIndexOf(  x );
 	}
 
@@ -427,21 +427,21 @@ public class DMList extends DMNode implements DMListInterface, Trackable
 	@SuppressWarnings("unchecked")
 	public ListIterator<Object> listIterator()
 	{
-		Vector<Object> v = (Vector<Object>)cell.getValue();
+		ArrayList<Object> v = (ArrayList<Object>)cell.getValue();
 		return v.listIterator();
 	}
 	
 	@SuppressWarnings("unchecked")
 	public ListIterator<Object> listIterator(int i)
 	{
-		Vector<Object> v = (Vector<Object>)cell.getValue();
+		ArrayList<Object> v = (ArrayList<Object>)cell.getValue();
 		return v.listIterator( i );
 	}
 	
 	@SuppressWarnings("unchecked")
 	public Object remove(int i)
 	{
-		Vector<Object> v = (Vector<Object>)cell.getLiteralValue();
+		ArrayList<Object> v = (ArrayList<Object>)cell.getLiteralValue();
 		Object x = v.remove( i );
 		cell.setLiteralValue( v );
 		if ( commandTracker != null )
@@ -454,7 +454,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable
 	@SuppressWarnings("unchecked")
 	public boolean remove(Object x)
 	{
-		Vector<Object> v = (Vector<Object>)cell.getLiteralValue();
+		ArrayList<Object> v = (ArrayList<Object>)cell.getLiteralValue();
 		int i = v.indexOf( x );
 		if ( i != -1 )
 		{
@@ -481,7 +481,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable
 	@SuppressWarnings("unchecked")
 	public Object set(int index, Object x)
 	{
-		Vector<Object> v = (Vector<Object>)cell.getLiteralValue();
+		ArrayList<Object> v = (ArrayList<Object>)cell.getLiteralValue();
 		x = coerce( x );
 		Object oldX = v.set( index, x );
 		cell.setLiteralValue( v );
@@ -495,7 +495,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable
 	@SuppressWarnings("unchecked")
 	public int size()
 	{
-		Vector<Object> v = (Vector<Object>)cell.getValue();
+		ArrayList<Object> v = (ArrayList<Object>)cell.getValue();
 		return v.size();
 	}
 	
@@ -513,14 +513,14 @@ public class DMList extends DMNode implements DMListInterface, Trackable
 	@SuppressWarnings("unchecked")
 	public Object[] toArray()
 	{
-		Vector<Object> v = (Vector<Object>)cell.getValue();
+		ArrayList<Object> v = (ArrayList<Object>)cell.getValue();
 		return v.toArray();
 	}
 
 	@SuppressWarnings("unchecked")
 	public <T> T[] toArray(T[] a)
 	{
-		Vector<Object> v = (Vector<Object>)cell.getValue();
+		ArrayList<Object> v = (ArrayList<Object>)cell.getValue();
 		return v.toArray( a );
 	}
 
@@ -564,7 +564,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable
 	@SuppressWarnings("unchecked")
 	public List<Object> __getitem__(PySlice i)
 	{
-		Vector<Object> v = (Vector<Object>)cell.getValue();
+		ArrayList<Object> v = (ArrayList<Object>)cell.getValue();
 		return Arrays.asList( JythonSlice.arrayGetSlice( v.toArray(), i ) );
 	}
 	
@@ -577,11 +577,11 @@ public class DMList extends DMNode implements DMListInterface, Trackable
 	@SuppressWarnings("unchecked")
 	public void __setitem__(PySlice i, List<Object> xs)
 	{
-		Vector<Object> v = (Vector<Object>)cell.getLiteralValue();
+		ArrayList<Object> v = (ArrayList<Object>)cell.getLiteralValue();
 		
-		Vector<Object> oldContents = (Vector<Object>)v.clone();
+		ArrayList<Object> oldContents = (ArrayList<Object>)v.clone();
 		
-		Vector<Object> cxs = new Vector<Object>();
+		ArrayList<Object> cxs = new ArrayList<Object>();
 		cxs.ensureCapacity( xs.size() );
 		for (Object x: xs)
 		{
@@ -611,8 +611,8 @@ public class DMList extends DMNode implements DMListInterface, Trackable
 	@SuppressWarnings("unchecked")
 	public void __delitem__(PySlice i)
 	{
-		Vector<Object> v = (Vector<Object>)cell.getLiteralValue();
-		Vector<Object> oldContents = (Vector<Object>)v.clone();
+		ArrayList<Object> v = (ArrayList<Object>)cell.getLiteralValue();
+		ArrayList<Object> oldContents = (ArrayList<Object>)v.clone();
 		
 		Object[] dest = v.toArray();
 		
@@ -656,7 +656,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable
 	@SuppressWarnings("unchecked")
 	public int index(Object x, int j)
 	{
-		Vector<Object> v = (Vector<Object>)cell.getValue();
+		ArrayList<Object> v = (ArrayList<Object>)cell.getValue();
 	
 		int s = v.size();
 		// Clamp to -s:s
@@ -675,7 +675,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable
 	@SuppressWarnings("unchecked")
 	public int index(Object x, int j, int k)
 	{
-		Vector<Object> v = (Vector<Object>)cell.getValue();
+		ArrayList<Object> v = (ArrayList<Object>)cell.getValue();
 		
 		int s = v.size();
 		// Clamp to -s:s
@@ -698,7 +698,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable
 	{
 		int n = 0;
 		
-		Vector<Object> v = (Vector<Object>)cell.getValue();
+		ArrayList<Object> v = (ArrayList<Object>)cell.getValue();
 		for (Object a: v)
 		{
 			if ( a.equals( x ) )
@@ -786,8 +786,11 @@ public class DMList extends DMNode implements DMListInterface, Trackable
 	@SuppressWarnings("unchecked")
 	protected void removeLast(int numElements)
 	{
-		Vector<Object> v = (Vector<Object>)cell.getLiteralValue();
-		v.setSize( v.size() - numElements );
+		ArrayList<Object> v = (ArrayList<Object>)cell.getLiteralValue();
+		for (int i = 0, j = v.size() - 1; i < numElements; i++, j--)
+		{
+			v.remove( j );
+		}
 		cell.setLiteralValue( v );
 	}
 
@@ -798,7 +801,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable
 	@SuppressWarnings("unchecked")
 	protected void removeRange(int start, int num)
 	{
-		Vector<Object> v = (Vector<Object>)cell.getLiteralValue();
+		ArrayList<Object> v = (ArrayList<Object>)cell.getLiteralValue();
 		for (int i = 0; i < num; i++)
 		{
 			v.remove( start );
@@ -813,7 +816,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable
 	@SuppressWarnings("unchecked")
 	protected void setContents(List<Object> xs)
 	{
-		Vector<Object> v = (Vector<Object>)cell.getLiteralValue();
+		ArrayList<Object> v = (ArrayList<Object>)cell.getLiteralValue();
 		v.clear();
 		v.addAll( xs );
 		cell.setLiteralValue( v );
@@ -821,14 +824,18 @@ public class DMList extends DMNode implements DMListInterface, Trackable
 
 
 	@SuppressWarnings("unchecked")
-	protected Vector<Object> getInternalContainer()
+	protected ArrayList<Object> getInternalContainer()
 	{
-		return (Vector<Object>)cell.getLiteralValue();
+		return (ArrayList<Object>)cell.getLiteralValue();
 	}
 
 
 
 
+	
+	//
+	// Trackable interface
+	//
 
 	public CommandTrackerFactory getTrackerFactory()
 	{

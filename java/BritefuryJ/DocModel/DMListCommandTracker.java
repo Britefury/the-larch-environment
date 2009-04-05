@@ -6,9 +6,9 @@
 //##************************
 package BritefuryJ.DocModel;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Vector;
 
 import BritefuryJ.CommandHistory.Command;
 import BritefuryJ.CommandHistory.CommandHistory;
@@ -124,9 +124,9 @@ class DMListCommandTracker extends CommandTracker
 	private static class ClearCommand extends Command
 	{
 		private DMList ls;
-		private Vector<Object> contents;
+		private ArrayList<Object> contents;
 		
-		public ClearCommand(DMList ls, Vector<Object> contents)
+		public ClearCommand(DMList ls, ArrayList<Object> contents)
 		{
 			this.ls = ls;
 			this.contents = contents;
@@ -308,7 +308,7 @@ class DMListCommandTracker extends CommandTracker
 		commandHistory.addCommand( new InsertAllCommand( ls, i, xs ) );
 	}
 
-	protected void onClear(DMList ls, Vector<Object> contents)
+	protected void onClear(DMList ls, ArrayList<Object> contents)
 	{
 		commandHistory.addCommand( new ClearCommand( ls, contents ) );
 		for (Object x: contents)

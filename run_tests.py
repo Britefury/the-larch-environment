@@ -24,6 +24,7 @@ import GSymCore.Languages.Python25.CodeGenerator2
 import GSymCore.Languages.Python25.Parser3
 import GSymCore.Languages.Python25.Python25Importer2
 import GSymCore.Languages.Python25.IdentityTransformation
+import GSymCore.Languages.Python25.Precedence
 import GSymCore.Languages.Java.Parser
 import GSymCore.Languages.LISP.Parser2
 
@@ -39,6 +40,7 @@ testModules = [ Britefury.Dispatch.Dispatch,
 		GSymCore.Languages.Python25.Parser3,
 		GSymCore.Languages.Python25.Python25Importer2,
 		GSymCore.Languages.Python25.IdentityTransformation,
+		GSymCore.Languages.Python25.Precedence,
 		GSymCore.Languages.Java.Parser,
 		GSymCore.Languages.LISP.Parser2 ]
 

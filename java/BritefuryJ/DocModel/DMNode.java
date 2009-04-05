@@ -15,7 +15,7 @@ import org.python.core.PyObjectDerived;
 import org.python.core.PyString;
 import org.python.core.PyUnicode;
 
-public class DMNode
+public abstract class DMNode
 {
 	public static Object coerce(String x)
 	{
@@ -78,6 +78,7 @@ public class DMNode
 		}
 	}
 	
+
 	
 	
 	public static boolean isNull(Object x)

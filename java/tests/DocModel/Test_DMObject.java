@@ -266,7 +266,7 @@ public class Test_DMObject extends TestCase
 	}
 	
 	
-	public void testEquals() throws ClassAlreadyDefinedException
+	public void test_equals() throws ClassAlreadyDefinedException
 	{
 		DMObjectClass A = m.newClass( "A", new String[] { "x", "y" } );
 		DMObject c0 = A.newInstance( new Object[] { "c", "r" } );
