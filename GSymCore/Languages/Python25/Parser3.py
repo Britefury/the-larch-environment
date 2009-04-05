@@ -8,7 +8,7 @@
 
 import string
 
-from BritefuryJ.DocModel import DMObject, DMNode
+from BritefuryJ.DocModel import DMObject, DMNode, DefaultIdentityFunction
 
 from BritefuryJ.Parser import Action, Condition, Forward, Production, Suppress, Literal, Keyword, RegEx, Word, Sequence, Combine, Choice, Optional, Repetition, ZeroOrMore, OneOrMore, Peek, PeekNot
 from BritefuryJ.Parser.Utils.Tokens import identifier, decimalInteger, hexInteger, integer, singleQuotedString, doubleQuotedString, quotedString, floatingPoint
@@ -17,7 +17,7 @@ from BritefuryJ.Parser.Utils.OperatorParser import Prefix, Suffix, InfixLeft, In
 
 from Britefury.Tests.BritefuryJ.Parser.ParserTestCase import ParserTestCase
 
-from Britefury.Util.NodeUtil import makeNullNode
+from Britefury.Util.NodeUtil import makeNullNode, isNullNode
 
 from Britefury.Grammar.Grammar import Grammar, Rule, RuleList
 
@@ -30,18 +30,35 @@ import GSymCore.Languages.Python25.NodeClasses as Nodes
 #
 #
 # !!!!!! NOTES !!!!!!
-# Comparison operators are NOT parsed correctly;
-# 'a < b < c' is valid in Python, but is not handled here.
-# The parser needs to be changed, in addition to changing the python document structure to reflect this.
-#
-# yieldExpr and yieldAtom are basically the same thing; find a way of unifying this.
-#
 # Print statements are not handled correctly
 #
 # Octal integers not handled correctly
 #
 #
 #
+
+
+_identity = DefaultIdentityFunction()
+def _updatedNodeCopy(node, xform, **fieldValues):
+	newNode = _identity( node, xform )
+	newNode.update( fieldValues )
+	return newNode
+
+
+def _incrementParens(node):
+	def _xform(node):
+		return node
+	p = node['parens']
+	numParens = 0
+	if not isNullNode:
+		try:
+			numParens = int( p )
+		except ValueError:
+			pass
+	numParens += 1
+	return _updatedNodeCopy( node, _xform, parens=str( numParens ) )
+
+
 
 
 
@@ -216,7 +233,7 @@ class Python25Grammar (Grammar):
 	# Parentheses
 	@Rule
 	def parenForm(self):
-		return( Literal( '(' ) + self.tupleOrExpression() + ')' ).action( lambda input, pos, xs: xs[1] )
+		return( Literal( '(' ) + self.tupleOrExpression() + ')' ).action( lambda input, pos, xs: _incrementParens( xs[1] ) )
 
 
 
@@ -227,26 +244,42 @@ class Python25Grammar (Grammar):
 
 
 
-	# List comprehension and generator expression
+	# List comprehension
 	@Rule
-	def comprehensionFor(self):
+	def listCompFor(self):
 		return ( Keyword( forKeyword )  +  self.targetList()  +  Keyword( inKeyword )  +  self.oldTupleOrExpression() ).action( lambda input, pos, xs: Nodes.ComprehensionFor( target=xs[1], source=xs[3] ) )
 
 	@Rule
-	def comprehensionIf(self):
+	def listCompIf(self):
 		return ( Keyword( ifKeyword )  +  self.oldExpression() ).action( lambda input, pos, xs: Nodes.ComprehensionIf( condition=xs[1] ) )
 
 	@Rule
-	def comprehensionItem(self):
-		return self.comprehensionFor() | self.comprehensionIf()
+	def listCompItem(self):
+		return self.listCompFor() | self.listCompIf()
 
 	@Rule
 	def listComprehension(self):
-		return ( Literal( '[' )  +  self.expression()  +  self.comprehensionFor()  +  ZeroOrMore( self.comprehensionItem() )  +  Literal( ']' ) ).action( lambda input, pos, xs: Nodes.ListComp( resultExpr=xs[1], comprehensionItems=[ xs[2] ] + xs[3] ) )
+		return ( Literal( '[' )  +  self.expression()  +  self.listCompFor()  +  ZeroOrMore( self.listCompItem() )  +  Literal( ']' ) ).action( lambda input, pos, xs: Nodes.ListComp( resultExpr=xs[1], comprehensionItems=[ xs[2] ] + xs[3] ) )
+
+	
+	
+	
+	# Generator expression
+	@Rule
+	def genExpFor(self):
+		return ( Keyword( forKeyword )  +  self.targetList()  +  Keyword( inKeyword )  +  self.orTest() ).action( lambda input, pos, xs: Nodes.ComprehensionFor( target=xs[1], source=xs[3] ) )
+
+	@Rule
+	def genExpIf(self):
+		return ( Keyword( ifKeyword )  +  self.oldExpression() ).action( lambda input, pos, xs: Nodes.ComprehensionIf( condition=xs[1] ) )
+
+	@Rule
+	def genExpItem(self):
+		return self.genExpFor() | self.genExpIf()
 
 	@Rule
 	def generatorExpression(self):
-		return ( Literal( '(' )  +  self.expression()  +  self.comprehensionFor()  +  ZeroOrMore( self.comprehensionItem() )  +  Literal( ')' ) ).action( lambda input, pos, xs: Nodes.GeneratorExpr( resultExpr=xs[1], comprehensionItems=[ xs[2] ] + xs[3] ) )
+		return ( Literal( '(' )  +  self.expression()  +  self.genExpFor()  +  ZeroOrMore( self.genExpItem() )  +  Literal( ')' ) ).action( lambda input, pos, xs: Nodes.GeneratorExpr( resultExpr=xs[1], comprehensionItems=[ xs[2] ] + xs[3] ) )
 
 
 
@@ -265,10 +298,6 @@ class Python25Grammar (Grammar):
 
 	# Yield expression
 	@Rule
-	def yieldExpression(self):
-		return ( Keyword( yieldKeyword )  +  self.expression() ).action( lambda input, pos, xs: Nodes.YieldExpr( value=xs[1] ) )
-
-	@Rule
 	def yieldAtom(self):
 		return ( Literal( '(' )  +  Keyword( yieldKeyword )  +  self.expression()  +  Literal( ')' ) ).action( lambda input, pos, xs: Nodes.YieldAtom( value=xs[2] ) )
 
@@ -277,7 +306,7 @@ class Python25Grammar (Grammar):
 	# Enclosure
 	@Rule
 	def enclosure(self):
-		return self.parenForm() | self.listLiteral() | self.listComprehension() | self.generatorExpression() | self.dictLiteral() | self.yieldExpression()
+		return self.parenForm() | self.listLiteral() | self.listComprehension() | self.generatorExpression() | self.dictLiteral() | self.yieldAtom()
 
 
 
@@ -513,6 +542,10 @@ class Python25Grammar (Grammar):
 
 	# Lambda expression_checkParams
 	@Rule
+	def oldLambdaExpr(self):
+		return ( Keyword( lambdaKeyword )  +  self.params()  +  Literal( ':' )  +  self.oldExpression() ).action( lambda input, pos, xs: Nodes.LambdaExpr( params=xs[1], expr=xs[3] ) )
+
+	@Rule
 	def lambdaExpr(self):
 		return ( Keyword( lambdaKeyword )  +  self.params()  +  Literal( ':' )  +  self.expression() ).action( lambda input, pos, xs: Nodes.LambdaExpr( params=xs[1], expr=xs[3] ) )
 
@@ -529,7 +562,7 @@ class Python25Grammar (Grammar):
 	# Expression and old expression (old expression is expression without conditional expression)
 	@Rule
 	def oldExpression(self):
-		return self.lambdaExpr()  |  self.orTest()
+		return self.oldLambdaExpr()  |  self.orTest()
 
 	@Rule
 	def expression(self):
@@ -552,7 +585,7 @@ class Python25Grammar (Grammar):
 	# Tuple or expression or yield expression
 	@Rule
 	def tupleOrExpressionOrYieldExpression(self):
-		return self.tupleOrExpression() | self.yieldExpression()
+		return self.tupleOrExpression() | self.yieldAtom()
 
 
 
@@ -1015,9 +1048,9 @@ class TestCase_Python25Parser (ParserTestCase):
 											   Nodes.DictKeyValuePair( key=Nodes.Load( name='b' ), value=Nodes.Load( name='y' ) ) ] ) )
 
 
-	def testYieldExpression(self):
+	def testYieldAtom(self):
 		g = Python25Grammar()
-		self._matchTest( g.expression(), '(yield 2+3)', Nodes.YieldExpr( value=Nodes.Add( x=Nodes.IntLiteral( format='decimal', numType='int', value='2' ), y=Nodes.IntLiteral( format='decimal', numType='int', value='3' ) ) ) )
+		self._matchTest( g.expression(), '(yield 2+3)', Nodes.YieldAtom( value=Nodes.Add( x=Nodes.IntLiteral( format='decimal', numType='int', value='2' ), y=Nodes.IntLiteral( format='decimal', numType='int', value='3' ) ) ) )
 
 
 
@@ -1105,7 +1138,18 @@ class TestCase_Python25Parser (ParserTestCase):
 		self._matchTest( g.expression(), 'not a', Nodes.NotTest( x=Nodes.Load( name='a' ) ) )
 		self._matchTest( g.expression(), 'a and b', Nodes.AndTest( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) )
 		self._matchTest( g.expression(), 'a or b', Nodes.OrTest( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) )
+		
+		
+	def testOperatorPrecedence(self):
+		g = Python25Grammar()
+		self._matchTest( g.expression(), 'a + b < c', Nodes.Cmp( x=Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ), ops=[ Nodes.CmpOpLt( y=Nodes.Load( name='c' ) ) ] ) )
 
+		
+	def testParens(self):
+		g = Python25Grammar()
+		self._matchTest( g.expression(), '(a)', Nodes.Load( name='a', parens='1' ) )
+		self._matchTest( g.expression(), '(a+b)', Nodes.Add( parens='1', x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) )
+		self._matchTest( g.expression(), '(a+b)*c', Nodes.Mul( x=Nodes.Add( parens='1', x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ), y=Nodes.Load( name='c' ) ) )
 		
 		
 	def testParams(self):
@@ -1144,8 +1188,8 @@ class TestCase_Python25Parser (ParserTestCase):
 	def testConditionalExpr(self):
 		g = Python25Grammar()
 		self._matchTest( g.expression(), 'x   if y else   z', Nodes.ConditionalExpr( condition=Nodes.Load( name='y' ), expr=Nodes.Load( name='x' ), elseExpr=Nodes.Load( name='z' ) ) )
-		self._matchTest( g.expression(), '(x   if y else   z)   if w else   q', Nodes.ConditionalExpr( condition=Nodes.Load( name='w' ), expr=Nodes.ConditionalExpr( condition=Nodes.Load( name='y' ), expr=Nodes.Load( name='x' ), elseExpr=Nodes.Load( name='z' ) ), elseExpr=Nodes.Load( name='q' ) ) )
-		self._matchTest( g.expression(), 'w   if (x   if y else   z) else   q', Nodes.ConditionalExpr( condition=Nodes.ConditionalExpr( condition=Nodes.Load( name='y' ), expr=Nodes.Load( name='x' ), elseExpr=Nodes.Load( name='z' ) ), expr=Nodes.Load( name='w' ), elseExpr=Nodes.Load( name='q' ) ) )
+		self._matchTest( g.expression(), '(x   if y else   z)   if w else   q', Nodes.ConditionalExpr( condition=Nodes.Load( name='w' ), expr=Nodes.ConditionalExpr( parens='1', condition=Nodes.Load( name='y' ), expr=Nodes.Load( name='x' ), elseExpr=Nodes.Load( name='z' ) ), elseExpr=Nodes.Load( name='q' ) ) )
+		self._matchTest( g.expression(), 'w   if (x   if y else   z) else   q', Nodes.ConditionalExpr( condition=Nodes.ConditionalExpr( parens='1', condition=Nodes.Load( name='y' ), expr=Nodes.Load( name='x' ), elseExpr=Nodes.Load( name='z' ) ), expr=Nodes.Load( name='w' ), elseExpr=Nodes.Load( name='q' ) ) )
 		self._matchTest( g.expression(), 'w   if q else   x   if y else   z', Nodes.ConditionalExpr( condition=Nodes.Load( name='q' ), expr=Nodes.Load( name='w' ), elseExpr=Nodes.ConditionalExpr( condition=Nodes.Load( name='y' ), expr=Nodes.Load( name='x' ), elseExpr=Nodes.Load( name='z' ) ) ) )
 		self._matchFailTest( g.expression(), 'w   if x   if y else   z else   q' )
 
@@ -1175,7 +1219,7 @@ class TestCase_Python25Parser (ParserTestCase):
 		self._matchTest( g.statement(), 'a=b=x', Nodes.AssignStmt( targets=[ Nodes.SingleTarget( name='a' ), Nodes.SingleTarget( name='b' ) ], value=Nodes.Load( name='x' ) ) )
 		self._matchTest( g.statement(), 'a,b=c,d=x', Nodes.AssignStmt( targets=[ Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='a' ),  Nodes.SingleTarget( name='b' ) ] ),
 										   Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='c' ),  Nodes.SingleTarget( name='d' ) ] ) ], value=Nodes.Load( name='x' ) ) )
-		self._matchTest( g.statement(), 'a=yield x', Nodes.AssignStmt( targets=[ Nodes.SingleTarget( name='a' ) ], value=Nodes.YieldExpr( value=Nodes.Load( name='x' ) ) ) )
+		self._matchTest( g.statement(), 'a=(yield x)', Nodes.AssignStmt( targets=[ Nodes.SingleTarget( name='a' ) ], value=Nodes.YieldAtom( value=Nodes.Load( name='x' ) ) ) )
 		self._matchFailTest( g.statement(), '=x' )
 
 

@@ -7,6 +7,10 @@
 ##-*************************
 from BritefuryJ.DocModel import DMModule, DMObjectClass
 
+from Britefury.Dispatch.ObjectNodeMethodDispatch import ObjectNodeDispatchMethod, ObjectNodeMethodDispatchMetaClass
+
+
+
 
 module = DMModule( 'Python25', 'py', 'GSymCore.Languages.Python25.Python25' )
 
@@ -64,7 +68,6 @@ GeneratorExpr = module.newClass( 'GeneratorExpr', Expr, [ 'resultExpr', 'compreh
 DictKeyValuePair = module.newClass( 'DictKeyValuePair', Node, [ 'key', 'value' ] )
 DictLiteral = module.newClass( 'DictLiteral', Expr, [ 'values' ] )
 # Yield
-YieldExpr = module.newClass( 'YieldExpr', Expr, [ 'value' ] )
 YieldAtom = module.newClass( 'YieldAtom', Expr, [ 'value' ] )
 # Attribute reference
 AttributeRef = module.newClass( 'AttributeRef', Expr, [ 'target', 'name' ] )
@@ -80,20 +83,22 @@ CallArgList = module.newClass( 'CallArgList', Node, [ 'value' ] )
 CallKWArgList = module.newClass( 'CallKWArgList', Node, [ 'value' ] )
 Call = module.newClass( 'Call', Expr, [ 'target', 'args' ] )
 # Mathematical / bitwise operators
-Pow = module.newClass( 'Pow', Expr, [ 'x', 'y' ] )
-Invert = module.newClass( 'Invert', Expr, [ 'x' ] )
-Negate = module.newClass( 'Negate', Expr, [ 'x' ] )
-Pos = module.newClass( 'Pos', Expr, [ 'x' ] )
-Mul = module.newClass( 'Mul', Expr, [ 'x', 'y' ] )
-Div = module.newClass( 'Div', Expr, [ 'x', 'y' ] )
-Mod = module.newClass( 'Mod', Expr, [ 'x', 'y' ] )
-Add = module.newClass( 'Add', Expr, [ 'x', 'y' ] )
-Sub = module.newClass( 'Sub', Expr, [ 'x', 'y' ] )
-LShift = module.newClass( 'LShift', Expr, [ 'x', 'y' ] )
-RShift = module.newClass( 'RShift', Expr, [ 'x', 'y' ] )
-BitAnd = module.newClass( 'BitAnd', Expr, [ 'x', 'y' ] )
-BitXor = module.newClass( 'BitXor', Expr, [ 'x', 'y' ] )
-BitOr = module.newClass( 'BitOr', Expr, [ 'x', 'y' ] )
+UnaryOp = module.newClass( 'UnaryOp', Expr, [ 'x' ] )
+BinOp = module.newClass( 'BinOp', Expr, [ 'x', 'y' ] )
+Pow = module.newClass( 'Pow', BinOp, [] )
+Invert = module.newClass( 'Invert', UnaryOp, [] )
+Negate = module.newClass( 'Negate', UnaryOp, [] )
+Pos = module.newClass( 'Pos', UnaryOp, [] )
+Mul = module.newClass( 'Mul', BinOp, [] )
+Div = module.newClass( 'Div', BinOp, [] )
+Mod = module.newClass( 'Mod', BinOp, [] )
+Add = module.newClass( 'Add', BinOp, [] )
+Sub = module.newClass( 'Sub', BinOp, [] )
+LShift = module.newClass( 'LShift', BinOp, [] )
+RShift = module.newClass( 'RShift', BinOp, [] )
+BitAnd = module.newClass( 'BitAnd', BinOp, [] )
+BitXor = module.newClass( 'BitXor', BinOp, [] )
+BitOr = module.newClass( 'BitOr', BinOp, [] )
 # Comparison
 Cmp = module.newClass( 'Cmp', Expr, [ 'x', 'ops' ] )
 CmpOp = module.newClass( 'CmpOp', Node, [ 'y' ] )
@@ -108,9 +113,9 @@ CmpOpIs = module.newClass( 'CmpOpIs', CmpOp, [] )
 CmpOpNotIn = module.newClass( 'CmpOpNotIn', CmpOp, [] )
 CmpOpIn = module.newClass( 'CmpOpIn', CmpOp, [] )
 # Tests
-NotTest = module.newClass( 'NotTest', Expr, [ 'x' ] )
-AndTest = module.newClass( 'AndTest', Expr, [ 'x', 'y' ] )
-OrTest = module.newClass( 'OrTest', Expr, [ 'x', 'y' ] )
+NotTest = module.newClass( 'NotTest', UnaryOp, [] )
+AndTest = module.newClass( 'AndTest', BinOp, [] )
+OrTest = module.newClass( 'OrTest', BinOp, [] )
 # Parameters for lambda / function definition
 SimpleParam = module.newClass( 'SimpleParam', Node, [ 'name' ] )
 DefaultValueParam = module.newClass( 'DefaultValueParam', Node, [ 'name', 'defaultValue' ] )
@@ -169,3 +174,198 @@ ClassStmt = module.newClass( 'ClassStmt', CompoundStmt, [ 'name', 'bases' ] )
 
 
 
+
+
+
+
+
+PRECEDENCE_NONE = None
+
+PRECEDENCE_STMT = 200
+
+PRECEDENCE_COMPREHENSIONELEMENT = 175
+PRECEDENCE_CONDITIONALELEMENT = 175
+
+PRECEDENCE_CONTAINEREXPR = 150
+PRECEDENCE_TUPLEELEMENT = 150
+PRECEDENCE_TUPLE = 150
+
+PRECEDENCE_SEQUENCEELEMENT = 100
+PRECEDENCE_YIELDVALUE = 100
+PRECEDENCE_SUBSCRIPTINDEX = 100
+PRECEDENCE_ELLIPSIS = 100
+PRECEDENCE_ARG = 100
+PRECEDENCE_PARAM = 100
+
+PRECEDENCE_LAMBDAEXPR = 50
+
+PRECEDENCE_OR = 14
+PRECEDENCE_AND = 13
+PRECEDENCE_NOT = 12
+PRECEDENCE_CMP = 9
+PRECEDENCE_BITOR = 8
+PRECEDENCE_BITXOR = 7
+PRECEDENCE_BITAND = 6
+PRECEDENCE_SHIFT = 5
+PRECEDENCE_ADDSUB = 4
+PRECEDENCE_MULDIVMOD = 3
+PRECEDENCE_INVERT_NEGATE_POS = 2
+PRECEDENCE_POW = 1
+PRECEDENCE_CALL = 0
+PRECEDENCE_SUBSCRIPT = 0
+PRECEDENCE_ATTR = 0
+
+PRECEDENCE_EXPR = 0
+PRECEDENCE_LOADLOCAL = 0
+PRECEDENCE_LISTLITERAL = 0
+PRECEDENCE_LITERALVALUE = 0
+PRECEDENCE_LISTCOMPREHENSION = 0
+PRECEDENCE_GENERATOREXPRESSION = 0
+PRECEDENCE_CONDITIONALEXPRESSION = 0
+PRECEDENCE_DICTLITERAL = 0
+PRECEDENCE_YIELDEXPR = 0
+PRECEDENCE_IMPORTCONTENT = 0
+
+
+PRECEDENCE_TARGET = 0
+
+
+
+
+class NodePrecedence (object):
+	__metaclass__ = ObjectNodeMethodDispatchMetaClass
+	__dispatch_module__ = module
+	__dispatch_num_args__ = 0
+	
+	
+	@ObjectNodeDispatchMethod
+	def Stmt(self, node):
+		return PRECEDENCE_STMT
+	
+	@ObjectNodeDispatchMethod
+	def Expr(self, node):
+		return PRECEDENCE_EXPR
+	
+	@ObjectNodeDispatchMethod
+	def Pow(self, node):
+		return PRECEDENCE_POW
+	
+	@ObjectNodeDispatchMethod
+	def Invert(self, node):
+		return PRECEDENCE_INVERT_NEGATE_POS
+	
+	@ObjectNodeDispatchMethod
+	def Negate(self, node):
+		return PRECEDENCE_INVERT_NEGATE_POS
+
+	@ObjectNodeDispatchMethod
+	def Pos(self, node):
+		return PRECEDENCE_INVERT_NEGATE_POS
+	
+	@ObjectNodeDispatchMethod
+	def Mul(self, node):
+		return PRECEDENCE_MULDIVMOD
+	
+	@ObjectNodeDispatchMethod
+	def Div(self, node):
+		return PRECEDENCE_MULDIVMOD
+	
+	@ObjectNodeDispatchMethod
+	def Mod(self, node):
+		return PRECEDENCE_MULDIVMOD
+	
+	@ObjectNodeDispatchMethod
+	def Add(self, node):
+		return PRECEDENCE_ADDSUB
+	
+	@ObjectNodeDispatchMethod
+	def Sub(self, node):
+		return PRECEDENCE_ADDSUB
+	
+	@ObjectNodeDispatchMethod
+	def LShift(self, node):
+		return PRECEDENCE_SHIFT
+	
+	@ObjectNodeDispatchMethod
+	def RShift(self, node):
+		return PRECEDENCE_SHIFT
+	
+	@ObjectNodeDispatchMethod
+	def BitAnd(self, node):
+		return PRECEDENCE_BITAND
+
+	@ObjectNodeDispatchMethod
+	def BitXor(self, node):
+		return PRECEDENCE_BITXOR
+
+	@ObjectNodeDispatchMethod
+	def BitOr(self, node):
+		return PRECEDENCE_BITOR
+	
+	@ObjectNodeDispatchMethod
+	def Cmp(self, node):
+		return PRECEDENCE_CMP
+	
+	@ObjectNodeDispatchMethod
+	def NotTest(self, node):
+		return PRECEDENCE_NOT
+	
+	@ObjectNodeDispatchMethod
+	def AndTest(self, node):
+		return PRECEDENCE_AND
+	
+	@ObjectNodeDispatchMethod
+	def OrTest(self, node):
+		return PRECEDENCE_OR
+
+	@ObjectNodeDispatchMethod
+	def LambdaExpr(self, node):
+		return PRECEDENCE_LAMBDAEXPR
+
+	
+	
+	
+	
+	
+	
+class NodeContainmentPrecedence (NodePrecedence):
+	@ObjectNodeDispatchMethod
+	def TupleLiteral(self, node):
+		return PRECEDENCE_CONTAINEREXPR
+	
+	@ObjectNodeDispatchMethod
+	def ListLiteral(self, node):
+		return PRECEDENCE_CONTAINEREXPR
+	
+	@ObjectNodeDispatchMethod
+	def ComprehensionFor(self, node):
+		return PRECEDENCE_CONTAINEREXPR
+	
+	@ObjectNodeDispatchMethod
+	def ComprehensionIf(self, node):
+		return PRECEDENCE_CONTAINEREXPR
+	
+	@ObjectNodeDispatchMethod
+	def ListComp(self, node):
+		return PRECEDENCE_CONTAINEREXPR
+	
+	@ObjectNodeDispatchMethod
+	def GeneratorExpr(self, node):
+		return PRECEDENCE_CONTAINEREXPR
+
+	@ObjectNodeDispatchMethod
+	def DictKeyValuePair(self, node):
+		return PRECEDENCE_CONTAINEREXPR
+	
+	@ObjectNodeDispatchMethod
+	def DictLiteral(self, node):
+		return PRECEDENCE_CONTAINEREXPR
+	
+	@ObjectNodeDispatchMethod
+	def YieldAtom(self, node):
+		return PRECEDENCE_CONTAINEREXPR
+	
+	@ObjectNodeDispatchMethod
+	def Call(self, node):
+		return PRECEDENCE_CONTAINEREXPR
+	

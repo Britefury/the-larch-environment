@@ -455,6 +455,11 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable
 
 	
 	
+	
+	//
+	// Trackable interface
+	//
+	
 	public CommandTrackerFactory getTrackerFactory()
 	{
 		return DMObjectTrackerFactory.factory;
@@ -466,6 +471,11 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable
 	}
 	
 	
+	
+	
+	//
+	// toString()
+	//
 	
 	public String toString()
 	{

@@ -685,14 +685,6 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# Yield expression
 	@ObjectNodeDispatchMethod
-	def YieldExpr(self, ctx, state, node, value):
-		valueView = ctx.viewEvalFn( value, None, python25ViewState( PRECEDENCE_YIELDVALUE, self._parser.expression() ) )
-		return expressionNodeEditor( ctx, node,
-				   ctx.paragraph( python_paragraphStyle, [ capitalisedKeywordText( ctx, yieldKeyword ),  ctx.text( punctuation_textStyle, ' ' ),  valueView ] ),
-				   PRECEDENCE_YIELDEXPR,
-				   state )
-
-	@ObjectNodeDispatchMethod
 	def YieldAtom(self, ctx, state, node, value):
 		valueView = ctx.viewEvalFn( value, None, python25ViewState( PRECEDENCE_YIELDVALUE, self._parser.expression() ) )
 		return expressionNodeEditor( ctx, node,
