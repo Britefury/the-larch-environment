@@ -350,13 +350,10 @@ class RemoveUnNeededParensXform (object):
 
 	
 	
-_xform = Transformation.Transformation( DefaultIdentityFunction(), [ RemoveUnNeededParensXform() ] )
+_removeParensXform = Transformation.Transformation( DefaultIdentityFunction(), [ RemoveUnNeededParensXform() ] )
 
 def removeUnNeededParens(node):
-	node = DMNode.coerce( node )
-	node = _xform( node )
-	node = DMNode.coerce( node )
-	return node
+	return DMNode.coerce( _removeParensXform( DMNode.coerce( node ) ) )
 	
 
 	
@@ -415,6 +412,9 @@ class Test_Precedence (unittest.TestCase):
 		self._matchTest( self._parser.expression(), '(((a+b)))', Nodes.Add( parens='3', x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) )	
 		self._matchTest( self._parser.expression(), '(a*b)+c', Nodes.Add( x=Nodes.Mul( parens='1', x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ), y=Nodes.Load( name='c' ) ) )
 		self._matchTest( self._parser.expression(), '(a+b)*c', Nodes.Mul( x=Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ), y=Nodes.Load( name='c' ) ) )
+		self._matchTest( self._parser.expression(), '(a+b)/(a+b)', Nodes.Div( x=Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ), y=Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) ) )
+		self._matchTest( self._parser.expression(), '(a+b)/(c+d)+e', Nodes.Add( x=Nodes.Div( x=Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ), y=Nodes.Add( x=Nodes.Load( name='c' ), y=Nodes.Load( name='d' ) ) ), y=Nodes.Load( name='e' ) ) )
+		self._matchTest( self._parser.expression(), '((a+b)/(a+b)+c)*x', Nodes.Mul( x=Nodes.Add( x=Nodes.Div( x=Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ), y=Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) ), y=Nodes.Load( name='c' ) ), y=Nodes.Load( name='x' ) ) )
 		
 		
 	def test_LambdaConditional(self):
@@ -423,4 +423,9 @@ class Test_Precedence (unittest.TestCase):
 		self._matchTest( self._parser.expression(), '(lambda: x) if y else z', Nodes.ConditionalExpr( condition=Nodes.Load( name='y' ), expr=Nodes.LambdaExpr( params=[], expr=Nodes.Load( name='x' ) ), elseExpr=Nodes.Load( name='z' ) ) )
 		self._matchTest( self._parser.expression(), 'x if (lambda: y) else z', Nodes.ConditionalExpr( condition=Nodes.LambdaExpr( params=[], expr=Nodes.Load( name='y' ) ), expr=Nodes.Load( name='x' ), elseExpr=Nodes.Load( name='z' ) ) )
 		
+	def test_Statement(self):
+		self._matchTest( self._parser.statement(), '((a+b)/(a+b)+c)*x', Nodes.Mul( x=Nodes.Add( x=Nodes.Div( x=Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ), y=Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) ), y=Nodes.Load( name='c' ) ), y=Nodes.Load( name='x' ) ) )
+		self._matchTest( self._parser.statement(), 'y=((a+b)/(a+b)+c)*x', Nodes.AssignStmt( targets=[ Nodes.SingleTarget( name='y' ) ], value=Nodes.Mul( x=Nodes.Add( x=Nodes.Div( x=Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ), y=Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) ), y=Nodes.Load( name='c' ) ), y=Nodes.Load( name='x' ) ) ) )
+		self._matchTest( self._parser.statement(), 'y=(((a+b))/(a+b)+c)*x', Nodes.AssignStmt( targets=[ Nodes.SingleTarget( name='y' ) ], value=Nodes.Mul( x=Nodes.Add( x=Nodes.Div( x=Nodes.Add( parens='1', x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ), y=Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) ), y=Nodes.Load( name='c' ) ), y=Nodes.Load( name='x' ) ) ) )
+		self._matchTest( self._parser.statement(), 'x=(a+b)/(c+d)+e', Nodes.AssignStmt( targets=[ Nodes.SingleTarget( name='x' ) ], value=Nodes.Add( x=Nodes.Div( x=Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ), y=Nodes.Add( x=Nodes.Load( name='c' ), y=Nodes.Load( name='d' ) ) ), y=Nodes.Load( name='e' ) ) ) )
 		

@@ -51,6 +51,9 @@ class _TransformApplication (object):
 			if self._stack[-1]:
 				# Inner application transformed the content
 				self._stack.pop()
+				# Propagate; outer applications should use the identity transform too
+				if len( self._stack ) > 0:
+					self._stack[-1] = True
 				return transformedNode
 			else:
 				# Unmodified tree
