@@ -17,7 +17,7 @@ from BritefuryJ.Parser.Utils.OperatorParser import Prefix, Suffix, InfixLeft, In
 
 from Britefury.Tests.BritefuryJ.Parser.ParserTestCase import ParserTestCase
 
-from Britefury.Util.NodeUtil import makeNullNode, isNullNode
+from Britefury.Util.NodeUtil import makeNullNode, isNullNode, isStringNode
 
 from Britefury.Grammar.Grammar import Grammar, Rule, RuleList
 
@@ -50,7 +50,8 @@ def _incrementParens(node):
 		return node
 	p = node['parens']
 	numParens = 0
-	if not isNullNode:
+	if not isNullNode( p )   and   isStringNode( p ):
+		p = str( p )
 		try:
 			numParens = int( p )
 		except ValueError:
@@ -1100,6 +1101,7 @@ class TestCase_Python25Parser (ParserTestCase):
 		self._matchTest( g.expression(), 'a(m=a,*p,**w)', Nodes.Call( target=Nodes.Load( name='a' ), args=[ Nodes.CallKWArg( name='m', value=Nodes.Load( name='a' ) ), Nodes.CallArgList( value=Nodes.Load( name='p' ) ), Nodes.CallKWArgList( value=Nodes.Load( name='w' ) ) ] ) )
 		self._matchTest( g.expression(), 'a(*p,**w)', Nodes.Call( target=Nodes.Load( name='a' ), args=[ Nodes.CallArgList( value=Nodes.Load( name='p' ) ), Nodes.CallKWArgList( value=Nodes.Load( name='w' ) ) ] ) )
 		self._matchTest( g.expression(), 'a(**w)', Nodes.Call( target=Nodes.Load( name='a' ), args=[ Nodes.CallKWArgList( value=Nodes.Load( name='w' ) ) ] ) )
+		self._matchTest( g.expression(), 'a(**w+x)', Nodes.Call( target=Nodes.Load( name='a' ), args=[ Nodes.CallKWArgList( value=Nodes.Add( x=Nodes.Load( name='w' ), y=Nodes.Load( name='x' ) ) ) ] ) )
 		self._matchFailTest( g.expression(), 'a(m=a,f)' )
 		self._matchFailTest( g.expression(), 'a(*p,f)' )
 		self._matchFailTest( g.expression(), 'a(**w,f)' )
@@ -1148,6 +1150,7 @@ class TestCase_Python25Parser (ParserTestCase):
 	def testParens(self):
 		g = Python25Grammar()
 		self._matchTest( g.expression(), '(a)', Nodes.Load( name='a', parens='1' ) )
+		self._matchTest( g.expression(), '(((a)))', Nodes.Load( name='a', parens='3' ) )
 		self._matchTest( g.expression(), '(a+b)', Nodes.Add( parens='1', x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) )
 		self._matchTest( g.expression(), '(a+b)*c', Nodes.Mul( x=Nodes.Add( parens='1', x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ), y=Nodes.Load( name='c' ) ) )
 		
