@@ -9,12 +9,17 @@ from BritefuryJ.DocModel import DefaultIdentityFunction
 
 from Britefury.Dispatch.ObjectNodeMethodDispatch import ObjectNodeMethodDispatchMetaClass, ObjectNodeDispatchMethod, objectNodeMethodDispatch
 from Britefury.Dispatch.Dispatch import DispatchError
-from Britefury.Util.NodeUtil import isNullNode, makeNullNode
+from Britefury.Util.NodeUtil import isNullNode, isStringNode, makeNullNode
+from Britefury.Transformation import Transformation
 
 from GSymCore.Languages.Python25 import NodeClasses as Nodes
 
 
 PRECEDENCE_NONE = None
+PRECEDENCE_STMT = 1000
+PRECEDENCE_EXPR = 0
+PRECEDENCE_TARGET = None
+
 
 PRECEDENCE_CONDITIONAL = 100
 
@@ -36,12 +41,20 @@ PRECEDENCE_CALL = 0
 PRECEDENCE_SUBSCRIPT = 0
 PRECEDENCE_ATTR = 0
 
-PRECEDENCE_STMT = None
-PRECEDENCE_EXPR = 0
+PRECEDENCE_LITERALVALUE = 0
+PRECEDENCE_LOAD = 0
+PRECEDENCE_TUPLE = 0
+PRECEDENCE_LISTDISPLAY = 0
+PRECEDENCE_GENERATOREXPRESSION = 0
+PRECEDENCE_DICTDISPLAY = 0
+PRECEDENCE_YIELDEXPR = 0
 
+PRECEDENCE_CONTAINER_ELEMENT = 500
 PRECEDENCE_CONTAINER_ATTRIBUTEREFTARGET = 0
 PRECEDENCE_CONTAINER_SUBSCRIPTTARGET = 0
+PRECEDENCE_CONTAINER_SUBSCRIPTINDEX = 500
 PRECEDENCE_CONTAINER_CALLTARGET = 0
+PRECEDENCE_CONTAINER_CALLARG = 500
 
 # The lambda expression should only expect orTest or lambda expression
 PRECEDENCE_CONTAINER_LAMBDAEXPR = 50
@@ -54,6 +67,9 @@ PRECEDENCE_CONTAINER_COMPREHENSIONFOR = 25
 
 # The comprehension if statements should only expect orTest or lambda expression
 PRECEDENCE_CONTAINER_COMPREHENSIONIF = 50
+
+
+PRECEDENCE_IMPORTCONTENT = 0
 
 
 
@@ -190,14 +206,19 @@ def _areParensRequired(childNode, outerPrecedence):
 	childPrec = _precedence( childNode )
 	return childPrec is not None   and   outerPrecedence is not None   and   childPrec > outerPrecedence
 	
-def _decrementParens(node, xform):
+def getNumParens(node):
 	p = node['parens']
 	numParens = 0
-	if not isNullNode:
+	if not isNullNode( p )   and   isStringNode( p ):
+		p = str( p )
 		try:
 			numParens = int( p )
 		except ValueError:
 			pass
+	return numParens
+
+def _decrementParens(node, xform):
+	numParens = getNumParens( node )
 	numParens -= 1
 	numParens = max( numParens, 0 )
 	p = str( numParens )   if numParens > 0   else   makeNullNode()
@@ -328,11 +349,19 @@ class RemoveUnNeededParensXform (object):
 		return _transformOpMulti( node, xform, PRECEDENCE_CONTAINER_CONDITIONALEXPR, [ 'expr', 'condition' ] )
 
 	
+	
+_xform = Transformation.Transformation( DefaultIdentityFunction(), [ RemoveUnNeededParensXform() ] )
+
+def removeUnNeededParens(node):
+	node = DMNode.coerce( node )
+	node = _xform( node )
+	node = DMNode.coerce( node )
+	return node
+	
 
 	
 import unittest
 from BritefuryJ.DocModel import DMNode
-from Britefury.Transformation import Transformation
 from GSymCore.Languages.Python25 import Parser3
 
 
@@ -346,9 +375,8 @@ class Test_Precedence (unittest.TestCase):
 			print expected
 		self.assert_( result.isValid() )
 		
-		value = DMNode.coerce( result.value )
-		value = self._xform( value )
-		value = DMNode.coerce( value )
+		value = removeUnNeededParens( result.value )
+		
 		expected = DMNode.coerce( expected )
 
 		if result.end != len( input ):
@@ -373,11 +401,9 @@ class Test_Precedence (unittest.TestCase):
 		
 	def setUp(self):
 		self._parser = Parser3.Python25Grammar()
-		self._xform = Transformation.Transformation( DefaultIdentityFunction(), [ RemoveUnNeededParensXform() ] )
 	
 	def tearDown(self):
 		self._parser = None
-		self._xform = None
 		
 		
 	def test_Load(self):
@@ -386,6 +412,7 @@ class Test_Precedence (unittest.TestCase):
 		
 	def test_BinOp(self):
 		self._matchTest( self._parser.expression(), '(a+b)', Nodes.Add( parens='1', x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) )	
+		self._matchTest( self._parser.expression(), '(((a+b)))', Nodes.Add( parens='3', x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) )	
 		self._matchTest( self._parser.expression(), '(a*b)+c', Nodes.Add( x=Nodes.Mul( parens='1', x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ), y=Nodes.Load( name='c' ) ) )
 		self._matchTest( self._parser.expression(), '(a+b)*c', Nodes.Mul( x=Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ), y=Nodes.Load( name='c' ) ) )
 		
