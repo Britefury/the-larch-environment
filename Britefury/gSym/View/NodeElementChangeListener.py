@@ -115,27 +115,34 @@ class _NodeElementChangeListener (DVNode.NodeElementChangeListener):
 					# HACK HACK HACK
 				else:
 					# Cannot simply use contentString[prefixLen:-suffixLen], since suffixLen may be 0
-					origChangeRegion = contentString[prefixLen:len(contentString)-suffixLen]
-					newChangeRegion = newContentString[prefixLen:len(newContentString)-suffixLen]
-					matcher = difflib.SequenceMatcher( lambda x: x in ' \t', origChangeRegion, newChangeRegion )
-					opcodes = matcher.get_opcodes()
-					for tag, i1, i2, j1, j2 in matcher.get_opcodes():
+					if newPosition < prefixLen:
+						# Within prefix; leave it as it is
+						pass
+					elif newPosition >= len(contentString)-suffixLen:
+						# Within suffix; offset by change in length
+						newPosition += ( len(newContentString) - len(contentString) )
+					else:
+						origChangeRegion = contentString[prefixLen:len(contentString)-suffixLen]
+						newChangeRegion = newContentString[prefixLen:len(newContentString)-suffixLen]
+						matcher = difflib.SequenceMatcher( lambda x: x in ' \t', origChangeRegion, newChangeRegion )
+						# Get the opcodes from the matcher
+						opcodes = matcher.get_opcodes()
 						# Apply the prefix offset
-						i1 += prefixLen
-						i2 += prefixLen
-						j1 += prefixLen
-						j2 += prefixLen
-						if ( position > i1  or  ( position == i1  and  bias == Marker.Bias.END ) )   and   position < i2:
-							# Caret is in the range of this opcode
-							if tag == 'delete':
-								# Range deleted; move to position in destination; bias:START
-								newPosition = j1
-								newBias = Marker.Bias.START
-							elif tag == 'replace'  or  tag == 'equal'  or  tag == 'insert':
-								# Range replaced or equal; move position by delta
-								newPosition += j1 - i1
-							else:
-								raise ValueError, 'unreckognised tag'
+						opcodes = [ ( tag, i1 + prefixLen, i2 + prefixLen, j1 + prefixLen, j2 + prefixLen )   for tag, i1, i2, j1, j2 in opcodes ]
+						# Prepend and append some 'equal' opcodes that cover the prefix and suffix
+						opcodes = [ ( 'equal', 0, prefixLen, 0, prefixLen ) ]  +  opcodes  +  [ ( 'equal', len(contentString)-suffixLen, len(contentString), len(newContentString)-suffixLen, len(newContentString) ) ]
+						for tag, i1, i2, j1, j2 in matcher.get_opcodes():
+							if ( position > i1  or  ( position == i1  and  bias == Marker.Bias.END ) )   and   position < i2:
+								# Caret is in the range of this opcode
+								if tag == 'delete':
+									# Range deleted; move to position in destination; bias:START
+									newPosition = j1
+									newBias = Marker.Bias.START
+								elif tag == 'replace'  or  tag == 'equal'  or  tag == 'insert':
+									# Range replaced or equal; move position by delta
+									newPosition += j1 - i1
+								else:
+									raise ValueError, 'unreckognised tag'
 				elementTree = elementContent.getElementTree()
 				caret = elementTree.getCaret()
 				

@@ -490,18 +490,16 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable
 			
 			for (int i = 0; i < d.length; i++)
 			{
-				builder.append( " " );
 				Object x = d[i];
-				if ( x == null )
+				if ( x != null  &&  !isNull( x ) )
 				{
-					builder.append( "<null>" );
-				}
-				else
-				{
+					builder.append( " " );
+					builder.append( objClass.getField( i ).getName() );
+					builder.append( "=" );
 					builder.append( x.toString() );
 				}
 			}
-			builder.append( " )" );
+			builder.append( ")" );
 			
 			return builder.toString();
 		}
