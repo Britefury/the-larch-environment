@@ -93,6 +93,13 @@ class TestCase_Transformation (unittest.TestCase):
 		def stringNode(self, xform, node, x, y):
 			return [ 'stringNode', x + 'pq', xform( y ) ]
 
+	class TestTransformation3 (TransformationInterface):
+		def stringNode(self, xform, node, x, y):
+			if x.startswith( 'x' ):
+				return [ 'stringNode', 'pq' + x, xform( y ) ]
+			else:
+				raise DispatchError
+
 		
 		
 	def setUp(self):
@@ -160,3 +167,26 @@ class TestCase_Transformation (unittest.TestCase):
 		self.assert_( xf( self.data_bs )  ==  self.data_bs_x12 )
 		self.assert_( xf( self.data_nbss )  is not  self.data_nbss )
 		self.assert_( xf( self.data_nbss )  ==  self.data_nbss_x12 )
+		
+		
+	def test_propagation(self):
+		"""
+		Test propagation:
+		When:
+		   - the original data is a nested node, 3 levels deep: Node1( Node2( focusNode( innerNode() ) ) )
+		   - we perform a transformation that affects only 'focusNode'
+		Ensure that the result is what is expected:
+		   - the root node is not the same object (by identity), although the contents are equal, all the way down to the transformed version of 'focusNode'
+		   - Result should be Node1'( Node2'( focusNode'( innerNode() ) ) )
+		"""
+		
+		ix = self.IdentityTransformation()
+		xx1 = self.TestTransformation3()
+		xf = Transformation( ix, [ xx1 ] )
+
+		data = [ 'stringNode', 'a', [ 'stringNode', 'b', [ 'stringNode', 'x', [ 'twoStrings', 'a', 'b' ] ] ] ]
+		result = [ 'stringNode', 'a', [ 'stringNode', 'b', [ 'stringNode', 'pqx', [ 'twoStrings', 'a', 'b' ] ] ] ]
+		dataXf = xf( data )
+		self.assert_( dataXf is not data )
+		self.assert_( dataXf  ==  result )
+		
