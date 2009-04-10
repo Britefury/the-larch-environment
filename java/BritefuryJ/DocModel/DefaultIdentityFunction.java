@@ -40,7 +40,7 @@ public class DefaultIdentityFunction
 	
 	
 
-	
+	// Pass null as 'xform' to get a shallow copy
 	public DMObject __call__(DMObject x, TransformationFunction xform)
 	{
 		Object[] fieldData = x.getFieldValuesImmutable();
@@ -52,9 +52,17 @@ public class DefaultIdentityFunction
 		return new DMObject( x.getDMClass(), newData );
 	}
 	
-	public DMObject __call__(DMObject x, PyObject callable)
+	// Pass null as 'xformCallable' to get a shallow copy
+	public DMObject __call__(DMObject x, PyObject xformCallable)
 	{
-		return __call__( x, new PyTransformationFunction( callable ) );
+		if ( xformCallable == Py.None )
+		{
+			return __call__( x, (TransformationFunction)null );
+		}
+		else
+		{
+			return __call__( x, new PyTransformationFunction( xformCallable ) );
+		}
 	}
 	
 	
@@ -70,7 +78,14 @@ public class DefaultIdentityFunction
 		}
 		else if ( x instanceof DMObject )
 		{
-			return xform.apply( x );
+			if ( xform != null )
+			{
+				return xform.apply( x );
+			}
+			else
+			{
+				return x;
+			}
 		}
 		else
 		{

@@ -84,6 +84,7 @@ public abstract class DPContentLeafEditableEntry extends DPContentLeafEditable
 					}
 				}
 				left.moveMarkerToEnd( caret.getMarker() );
+				left.removeContentFromEnd( 1 );
 				return true;
 			}
 		}
@@ -115,6 +116,7 @@ public abstract class DPContentLeafEditableEntry extends DPContentLeafEditable
 					}
 				}
 				right.moveMarkerToStart( caret.getMarker() );
+				right.removeContentFromStart( 1 );
 				return true;
 			}
 		}

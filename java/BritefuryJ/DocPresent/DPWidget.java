@@ -281,6 +281,18 @@ abstract public class DPWidget
 	}
 	
 	
+	protected AffineTransform pushGraphicsTransform(Graphics2D graphics)
+	{
+		AffineTransform current = graphics.getTransform();
+		getTransformRelativeToRoot().apply( graphics );
+		return current;
+	}
+	
+	protected void popGraphicsTransform(Graphics2D graphics, AffineTransform x)
+	{
+		graphics.setTransform( x );
+	}
+	
 	
 	
 	//

@@ -352,11 +352,16 @@ class RemoveUnNeededParensXform (object):
 		return _transformOpMulti( node, xform, PRECEDENCE_CONTAINER_CONDITIONALEXPR, [ 'expr', 'condition' ] )
 
 	
-	
-_removeParensXform = Transformation.Transformation( DefaultIdentityFunction(), [ RemoveUnNeededParensXform() ] )
+_removeParensXform = Transformation.Transformation( _identity, [ RemoveUnNeededParensXform() ] )
 
-def removeUnNeededParens(node):
-	return DMNode.coerce( _removeParensXform( DMNode.coerce( node ) ) )
+def removeUnNeededParens(node, outerPrecedence):
+	x = _removeParensXform( DMNode.coerce( node ) )
+	bParens = _areParensRequired( x, outerPrecedence )
+	if bParens:
+		x = _decrementParens( x, None )
+	return DMNode.coerce( x )
+	
+
 	
 
 	
@@ -431,4 +436,5 @@ class Test_Precedence (unittest.TestCase):
 		self._matchTest( self._parser.statement(), 'y=((a+b)/(a+b)+c)*x', Nodes.AssignStmt( targets=[ Nodes.SingleTarget( name='y' ) ], value=Nodes.Mul( x=Nodes.Add( x=Nodes.Div( x=Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ), y=Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) ), y=Nodes.Load( name='c' ) ), y=Nodes.Load( name='x' ) ) ) )
 		self._matchTest( self._parser.statement(), 'y=(((a+b))/(a+b)+c)*x', Nodes.AssignStmt( targets=[ Nodes.SingleTarget( name='y' ) ], value=Nodes.Mul( x=Nodes.Add( x=Nodes.Div( x=Nodes.Add( parens='1', x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ), y=Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) ), y=Nodes.Load( name='c' ) ), y=Nodes.Load( name='x' ) ) ) )
 		self._matchTest( self._parser.statement(), 'x=(a+b)/(c+d)+e', Nodes.AssignStmt( targets=[ Nodes.SingleTarget( name='x' ) ], value=Nodes.Add( x=Nodes.Div( x=Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ), y=Nodes.Add( x=Nodes.Load( name='c' ), y=Nodes.Load( name='d' ) ) ), y=Nodes.Load( name='e' ) ) ) )
+		self._matchTest( self._parser.statement(), 'x=a/(b+c+d)', Nodes.AssignStmt( targets=[ Nodes.SingleTarget( name='x' ) ], value=Nodes.Div( x=Nodes.Load( name='a' ), y=Nodes.Add( x=Nodes.Add( x=Nodes.Load( name='b' ), y=Nodes.Load( name='c' ) ), y=Nodes.Load( name='d' ) ) ) ) )
 		
