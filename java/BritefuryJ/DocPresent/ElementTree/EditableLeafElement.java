@@ -74,6 +74,24 @@ public class EditableLeafElement extends LeafElement
 		contentChanged();
 	}
 	
+	public void removeContentFromStart(int length)
+	{
+		length = Math.min( length, getContentLength() );
+		int end = getContentLength();
+		content = content.substring( length, end );
+		getWidget().markerRemove( 0, length );
+		contentChanged();
+	}
+	
+	public void removeContentFromEnd(int length)
+	{
+		length = Math.min( length, getContentLength() );
+		int index = getContentLength() - length;
+		content = content.substring( 0, index );
+		getWidget().markerRemove( index, length );
+		contentChanged();
+	}
+	
 	public void replaceContent(Marker m, int length, String x)
 	{
 		int index = m.getIndex();

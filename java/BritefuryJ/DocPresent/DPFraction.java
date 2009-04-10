@@ -9,6 +9,7 @@ package BritefuryJ.DocPresent;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Shape;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -61,12 +62,16 @@ public class DPFraction extends DPContainer
 
 		public void drawCaretAtStart(Graphics2D graphics)
 		{
+			AffineTransform current = pushGraphicsTransform( graphics );
 			graphics.draw( new Line2D.Double( 0.0, -2.0, 0.0, allocation.y + 2.0 ) );
+			popGraphicsTransform( graphics, current );
 		}
 
 		public void drawCaretAtEnd(Graphics2D graphics)
 		{
-			graphics.draw( new Line2D.Double( 0.0, -2.0, 0.0, allocation.y + 2.0 ) );
+			AffineTransform current = pushGraphicsTransform( graphics );
+			graphics.draw( new Line2D.Double( allocation.x, -2.0, allocation.x, allocation.y + 2.0 ) );
+			popGraphicsTransform( graphics, current );
 		}
 
 

@@ -77,6 +77,24 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 		}
 	}
 	
+	public void removeContentFromStart(int length)
+	{
+		EditableLeafElement e = getElement();
+		if ( e != null )
+		{
+			e.removeContentFromStart( length );
+		}
+	}
+	
+	public void removeContentFromEnd(int length)
+	{
+		EditableLeafElement e = getElement();
+		if ( e != null )
+		{
+			e.removeContentFromEnd( length );
+		}
+	}
+	
 	public void replaceContent(Marker marker, int length, String x)
 	{
 		EditableLeafElement e = getElement();

@@ -107,13 +107,13 @@ def capitalisedKeywordText(ctx, keyword):
 
 
 
-def _parseText(parser, text):
+def _parseText(parser, text, outerPrecedence=None):
 	res = parser.parseString( text )
 	pos = res.getEnd()
 	if res.isValid():
 		if pos == len( text ):
 			value = res.getValue()
-			return removeUnNeededParens( value )
+			return removeUnNeededParens( value, outerPrecedence )
 		else:
 			print '<INCOMPLETE>'
 			print 'FULL TEXT:', text
@@ -126,16 +126,17 @@ def _parseText(parser, text):
 
 
 class ParsedExpressionContentListener (ElementContentListener):
-	def __init__(self, ctx, node, parser):
+	def __init__(self, ctx, node, parser, outerPrecedence):
 		#super( ParsedExpressionContentListener, self ).__init__()
 		self._ctx = ctx
 		self._node = node
 		self._parser = parser
+		self._outerPrecedence = outerPrecedence
 
 	def contentModified(self, element):
 		value = element.getContent()
 		if '\n' not in value:
-			parsed = _parseText( self._parser, value )
+			parsed = _parseText( self._parser, value, self._outerPrecedence )
 			if parsed is not None:
 				replace( self._ctx, self._node, parsed )
 				#replaceNodeContents( self._ctx, self._node, parsed )
@@ -299,7 +300,7 @@ def expressionNodeEditor(ctx, node, contents, precedence, state):
 	elif mode == MODE_EDITEXPRESSION:
 		contents = _precedenceParen( ctx, node, contents, precedence, outerPrecedence )
 		segment = ctx.segment( python_paragraphStyle, python_segmentCaretStopFactory, contents )
-		return ctx.contentListener( segment, ParsedExpressionContentListener( ctx, node, parser ) )
+		return ctx.contentListener( segment, ParsedExpressionContentListener( ctx, node, parser, outerPrecedence ) )
 	elif mode == MODE_EDITSTATEMENT:
 		contents = _precedenceParen( ctx, node, contents, precedence, outerPrecedence )
 		segment = ctx.segment( python_paragraphStyle, python_segmentCaretStopFactory, contents )
@@ -403,7 +404,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		#newLineFac = lambda index, child: ctx.whitespace( '\n' )
 		def newLineFac(index, child):
 			w = ctx.whitespace( '\n' )
-			listener = NewLineContentListener( ctx, node, self._parser.statement(), index+1, lineViews[index], lineViews[index+1]   if index+1 < len(lineViews)   else   None )
+			listener = NewLineContentListener( ctx, contents, self._parser.statement(), index, lineViews[index], lineViews[index+1]   if index+1 < len(lineViews)   else   None )
 			return ctx.contentListener( w, listener )
 		return ctx.listView( module_listViewLayout, None, None, newLineFac, lineViews )
 
@@ -590,7 +591,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	@ObjectNodeDispatchMethod
 	def ListComp(self, ctx, state, node, resultExpr, comprehensionItems):
 		exprView = ctx.viewEvalFn( resultExpr, None, python25ViewState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.expression() ) )
-		itemViews = ctx.mapViewEvalFn( comprehensionItems, None, python25ViewState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.comprehensionItem() ) )
+		itemViews = ctx.mapViewEvalFn( comprehensionItems, None, python25ViewState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.listCompItem() ) )
 		itemViewsSpaced = []
 		if len( itemViews ) > 0:
 			for x in itemViews[:-1]:
@@ -606,7 +607,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	@ObjectNodeDispatchMethod
 	def GeneratorExpr(self, ctx, state, node, resultExpr, comprehensionItems):
 		exprView = ctx.viewEvalFn( resultExpr, None, python25ViewState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.expression() ) )
-		itemViews = ctx.mapViewEvalFn( comprehensionItems, None, python25ViewState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.comprehensionItem() ) )
+		itemViews = ctx.mapViewEvalFn( comprehensionItems, None, python25ViewState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.genExpItem() ) )
 		itemViewsSpaced = []
 		if len( itemViews ) > 0:
 			for x in itemViews[:-1]:

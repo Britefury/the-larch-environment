@@ -153,7 +153,7 @@ class _NodeElementChangeListener (DVNode.NodeElementChangeListener):
 					#print contentString[:oldIndex].replace( '\n', '\\n' ) + '>|' + contentString[oldIndex:].replace( '\n', '\\n' )
 				#else:
 					#print contentString[:oldIndex].replace( '\n', '\\n' ) + '|<' + contentString[oldIndex:].replace( '\n', '\\n' )
-
+	
 				#if bias == Marker.Bias.START:
 					#print newContentString[:newIndex].replace( '\n', '\\n' ) + '>|' + newContentString[newIndex:].replace( '\n', '\\n' )
 				#else:
@@ -180,7 +180,8 @@ class _NodeElementChangeListener (DVNode.NodeElementChangeListener):
 						leaf.moveMarker( caret.getMarker(), leafPosition, newBias )
 					else:
 						segFilter = SegmentElement.SegmentFilter( leaf.getSegment() )
-						elemFilter = LeafElement.LeafFilterEditable()
+						#elemFilter = LeafElement.LeafFilterEditable()
+						elemFilter = LeafElement.LeafFilterEditableEntry()
 						
 						if leafPosition < leaf.getContentLength()/2:
 							left = leaf.getPreviousLeaf( segFilter, None, elemFilter )

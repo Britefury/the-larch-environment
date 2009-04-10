@@ -9,6 +9,7 @@ package BritefuryJ.DocPresent;
 
 import java.awt.Graphics2D;
 import java.awt.font.TextHitInfo;
+import java.awt.geom.AffineTransform;
 
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Metrics.HMetrics;
@@ -80,17 +81,23 @@ public class DPText extends DPContentLeafEditableEntry implements TextVisual.Tex
 	
 	public void drawCaret(Graphics2D graphics, Caret c)
 	{
+		AffineTransform current = pushGraphicsTransform( graphics );
 		visual.drawCaret( graphics, c.getMarker().getIndex() );
+		popGraphicsTransform( graphics, current );
 	}
 
 	public void drawCaretAtStart(Graphics2D graphics)
 	{
+		AffineTransform current = pushGraphicsTransform( graphics );
 		visual.drawCaretAtStart( graphics );
+		popGraphicsTransform( graphics, current );
 	}
 
 	public void drawCaretAtEnd(Graphics2D graphics)
 	{
+		AffineTransform current = pushGraphicsTransform( graphics );
 		visual.drawCaretAtEnd( graphics );
+		popGraphicsTransform( graphics, current );
 	}
 
 

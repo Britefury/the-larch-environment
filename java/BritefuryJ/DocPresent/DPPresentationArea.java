@@ -810,14 +810,10 @@ public class DPPresentationArea extends DPBin implements CaretListener
 			
 			if ( widget != null )
 			{
-				Xform2 x = widget.getTransformRelativeToRoot();
-				AffineTransform current = graphics.getTransform();
-				x.apply( graphics );
 				Color prevColour = graphics.getColor();
 				graphics.setColor( Color.blue );
 				widget.drawCaret( graphics, caret );
 				graphics.setColor( prevColour );
-				graphics.setTransform( current );
 			}
 		}
 	}

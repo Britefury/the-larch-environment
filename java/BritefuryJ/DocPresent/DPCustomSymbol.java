@@ -9,6 +9,7 @@ package BritefuryJ.DocPresent;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 
 import BritefuryJ.DocPresent.Caret.Caret;
@@ -100,23 +101,29 @@ public class DPCustomSymbol extends DPContentLeafEditableEntry
 	
 	public void drawCaret(Graphics2D graphics, Caret c)
 	{
+		AffineTransform current = pushGraphicsTransform( graphics );
 		int index = c.getMarker().getIndex();
 		double x = index == 0  ?  0.0  :  symbol.computeHMetrics().width;
 		Line2D.Double line = new Line2D.Double( x, 0.0, x, symbol.computeVMetrics().height );
 		graphics.draw( line );
+		popGraphicsTransform( graphics, current );
 	}
 
 	public void drawCaretAtStart(Graphics2D graphics)
 	{
+		AffineTransform current = pushGraphicsTransform( graphics );
 		double h = symbol.computeVMetrics().height;
 		graphics.draw( new Line2D.Double( 0.0, 0.0, 0.0, h) );
+		popGraphicsTransform( graphics, current );
 	}
 
 	public void drawCaretAtEnd(Graphics2D graphics)
 	{
+		AffineTransform current = pushGraphicsTransform( graphics );
 		double x = symbol.computeHMetrics().width;
 		double h = symbol.computeVMetrics().height;
 		graphics.draw( new Line2D.Double( x, 0.0, x, h) );
+		popGraphicsTransform( graphics, current );
 	}
 
 	
