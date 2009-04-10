@@ -131,7 +131,7 @@ class _NodeElementChangeListener (DVNode.NodeElementChangeListener):
 						opcodes = [ ( tag, i1 + prefixLen, i2 + prefixLen, j1 + prefixLen, j2 + prefixLen )   for tag, i1, i2, j1, j2 in opcodes ]
 						# Prepend and append some 'equal' opcodes that cover the prefix and suffix
 						opcodes = [ ( 'equal', 0, prefixLen, 0, prefixLen ) ]  +  opcodes  +  [ ( 'equal', len(contentString)-suffixLen, len(contentString), len(newContentString)-suffixLen, len(newContentString) ) ]
-						for tag, i1, i2, j1, j2 in matcher.get_opcodes():
+						for tag, i1, i2, j1, j2 in opcodes:
 							if ( position > i1  or  ( position == i1  and  bias == Marker.Bias.END ) )   and   position < i2:
 								# Caret is in the range of this opcode
 								if tag == 'delete':
