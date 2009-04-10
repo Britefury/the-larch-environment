@@ -186,12 +186,12 @@ class Python25Grammar (Grammar):
 		return separatedList( self.targetItem(), True, True, True ).action( lambda input, pos, xs: Nodes.TupleTarget( targets=xs ) )
 
 	@Rule
-	def targetList(self):
+	def targetListOrTargetItem(self):
 		return self.tupleTarget()  |  self.targetItem()
 
 	@Rule
 	def parenTarget(self):
-		return ( Literal( '(' )  +  self.targetList()  +  Literal( ')' ) ).action( lambda input, pos, xs: xs[1] )
+		return ( Literal( '(' )  +  self.targetListOrTargetItem()  +  Literal( ')' ) ).action( lambda input, pos, xs: _incrementParens( xs[1] ) )
 
 	@Rule
 	def listTarget(self):
@@ -215,11 +215,15 @@ class Python25Grammar (Grammar):
 
 	# Tuples
 	@Rule
-	def tupleLiteral(self):
+	def tupleAsExpressionList(self):
 		return separatedList( self.expression(), True, True, True ).action( lambda input, pos, xs: Nodes.TupleLiteral( values=xs ) )
 
 	@Rule
-	def oldTupleLiteral(self):
+	def tupleLiteral(self):
+		return ( Literal( '(' ) + self.tupleAsExpressionList() + ')' ).action( lambda input, pos, xs: xs[1] )  |  ( Literal( '(' ) + Literal( ')' ) ).action( lambda input, pos, xs: Nodes.TupleLiteral( values=[] ) )
+
+	@Rule
+	def oldTupleAsExpressionList(self):
 		return separatedList( self.expression(), True, True, True ).action( lambda input, pos, xs: Nodes.TupleLiteral( values=xs ) )
 
 
@@ -234,7 +238,7 @@ class Python25Grammar (Grammar):
 	# Parentheses
 	@Rule
 	def parenForm(self):
-		return( Literal( '(' ) + self.tupleOrExpression() + ')' ).action( lambda input, pos, xs: _incrementParens( xs[1] ) )
+		return ( Literal( '(' ) + self.expression() + ')' ).action( lambda input, pos, xs: _incrementParens( xs[1] ) )
 
 
 
@@ -248,7 +252,7 @@ class Python25Grammar (Grammar):
 	# List comprehension
 	@Rule
 	def listCompFor(self):
-		return ( Keyword( forKeyword )  +  self.targetList()  +  Keyword( inKeyword )  +  self.oldTupleOrExpression() ).action( lambda input, pos, xs: Nodes.ComprehensionFor( target=xs[1], source=xs[3] ) )
+		return ( Keyword( forKeyword )  +  self.targetListOrTargetItem()  +  Keyword( inKeyword )  +  self.oldTupleOrExpression() ).action( lambda input, pos, xs: Nodes.ComprehensionFor( target=xs[1], source=xs[3] ) )
 
 	@Rule
 	def listCompIf(self):
@@ -268,7 +272,7 @@ class Python25Grammar (Grammar):
 	# Generator expression
 	@Rule
 	def genExpFor(self):
-		return ( Keyword( forKeyword )  +  self.targetList()  +  Keyword( inKeyword )  +  self.orTest() ).action( lambda input, pos, xs: Nodes.ComprehensionFor( target=xs[1], source=xs[3] ) )
+		return ( Keyword( forKeyword )  +  self.targetListOrTargetItem()  +  Keyword( inKeyword )  +  self.orTest() ).action( lambda input, pos, xs: Nodes.ComprehensionFor( target=xs[1], source=xs[3] ) )
 
 	@Rule
 	def genExpIf(self):
@@ -300,14 +304,14 @@ class Python25Grammar (Grammar):
 	# Yield expression
 	@Rule
 	def yieldAtom(self):
-		return ( Literal( '(' )  +  Keyword( yieldKeyword )  +  self.expression()  +  Literal( ')' ) ).action( lambda input, pos, xs: Nodes.YieldAtom( value=xs[2] ) )
+		return ( Literal( '(' )  +  Keyword( yieldKeyword )  +  self.tupleOrExpression()  +  Literal( ')' ) ).action( lambda input, pos, xs: Nodes.YieldAtom( value=xs[2] ) )
 
 
 
 	# Enclosure
 	@Rule
 	def enclosure(self):
-		return self.parenForm() | self.listLiteral() | self.listComprehension() | self.generatorExpression() | self.dictLiteral() | self.yieldAtom()
+		return self.parenForm() | self.tupleLiteral() | self.listLiteral() | self.listComprehension() | self.generatorExpression() | self.dictLiteral() | self.yieldAtom()
 
 
 
@@ -574,11 +578,11 @@ class Python25Grammar (Grammar):
 	# Tuple or (old) expression
 	@Rule
 	def tupleOrExpression(self):
-		return self.tupleLiteral() | self.expression()
+		return self.tupleAsExpressionList() | self.expression()
 
 	@Rule
 	def oldTupleOrExpression(self):
-		return self.oldTupleLiteral() | self.oldExpression()
+		return self.oldTupleAsExpressionList() | self.oldExpression()
 
 
 
@@ -602,7 +606,7 @@ class Python25Grammar (Grammar):
 	# Assignment statement
 	@Rule
 	def assignmentStmt(self):
-		return ( OneOrMore( ( self.targetList()  +  '=' ).action( lambda input, pos, xs: xs[0] ) )  +  self.tupleOrExpressionOrYieldExpression() ).action( lambda input, pos, xs: Nodes.AssignStmt( targets=xs[0], value=xs[1] ) )
+		return ( OneOrMore( ( self.targetListOrTargetItem()  +  '=' ).action( lambda input, pos, xs: xs[0] ) )  +  self.tupleOrExpressionOrYieldExpression() ).action( lambda input, pos, xs: Nodes.AssignStmt( targets=xs[0], value=xs[1] ) )
 
 
 
@@ -629,7 +633,7 @@ class Python25Grammar (Grammar):
 	# Del statement
 	@Rule
 	def delStmt(self):
-		return ( Keyword( delKeyword )  +  self.targetList() ).action( lambda input, pos, xs: Nodes.DelStmt( target=xs[1] ) )
+		return ( Keyword( delKeyword )  +  self.targetListOrTargetItem() ).action( lambda input, pos, xs: Nodes.DelStmt( target=xs[1] ) )
 
 
 
@@ -817,7 +821,7 @@ class Python25Grammar (Grammar):
 	# For statement
 	@Rule
 	def forStmt(self):
-		return ( Keyword( forKeyword )  +  self.targetList()  +  Keyword( inKeyword )  +  self.tupleOrExpression()  +  ':' ).action( lambda input, pos, xs: Nodes.ForStmt( target=xs[1], source=xs[3], suite=[] ) )
+		return ( Keyword( forKeyword )  +  self.targetListOrTargetItem()  +  Keyword( inKeyword )  +  self.tupleOrExpression()  +  ':' ).action( lambda input, pos, xs: Nodes.ForStmt( target=xs[1], source=xs[3], suite=[] ) )
 
 
 
@@ -948,40 +952,52 @@ class TestCase_Python25Parser (ParserTestCase):
 
 	def testTargets(self):
 		g = Python25Grammar()
-		self._matchTest( g.targetList(), 'a', Nodes.SingleTarget( name='a' ) )
-		self._matchTest( g.targetList(), '(a)', Nodes.SingleTarget( name='a' ) )
+		self._matchTest( g.targetListOrTargetItem(), 'a', Nodes.SingleTarget( name='a' ) )
+		self._matchTest( g.targetListOrTargetItem(), '(a)', Nodes.SingleTarget( name='a', parens='1' ) )
 
-		self._matchTest( g.targetList(), '(a,)', Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='a' ) ] ) )
-		self._matchTest( g.targetList(), 'a,b', Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='a' ),  Nodes.SingleTarget( name='b' ) ] ) )
-		self._matchTest( g.targetList(), '(a,b)', Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='a' ),  Nodes.SingleTarget( name='b' ) ] ) )
-		self._matchTest( g.targetList(), '(a,b,)', Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='a' ),  Nodes.SingleTarget( name='b' ) ] ) )
-		self._matchTest( g.targetList(), '(a,b),(c,d)', Nodes.TupleTarget( targets=[ Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='a' ), Nodes.SingleTarget( name='b' ) ] ),
-											     Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='c' ), Nodes.SingleTarget( name='d' ) ] ) ] ) )
+		self._matchTest( g.targetListOrTargetItem(), '(a,)', Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='a' ) ], parens='1' ) )
+		self._matchTest( g.targetListOrTargetItem(), 'a,b', Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='a' ),  Nodes.SingleTarget( name='b' ) ] ) )
+		self._matchTest( g.targetListOrTargetItem(), '(a,b)', Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='a' ),  Nodes.SingleTarget( name='b' ) ], parens='1' ) )
+		self._matchTest( g.targetListOrTargetItem(), '(a,b,)', Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='a' ),  Nodes.SingleTarget( name='b' ) ], parens='1' ) )
+		self._matchTest( g.targetListOrTargetItem(), '(a,b),(c,d)', Nodes.TupleTarget( targets=[ Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='a' ), Nodes.SingleTarget( name='b' ) ], parens='1' ),
+											     Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='c' ), Nodes.SingleTarget( name='d' ) ], parens='1' ) ] ) )
 
-		self._matchFailTest( g.targetList(), '(a,) (b,)' )
+		self._matchFailTest( g.targetListOrTargetItem(), '(a,) (b,)' )
 
-		self._matchTest( g.targetList(), '[a]', Nodes.ListTarget( targets=[ Nodes.SingleTarget( name='a' ) ] ) )
-		self._matchTest( g.targetList(), '[a,]', Nodes.ListTarget( targets=[ Nodes.SingleTarget( name='a' ) ] ) )
-		self._matchTest( g.targetList(), '[a,b]', Nodes.ListTarget( targets=[ Nodes.SingleTarget( name='a' ),  Nodes.SingleTarget( name='b' ) ] ) )
-		self._matchTest( g.targetList(), '[a,b,]', Nodes.ListTarget( targets=[ Nodes.SingleTarget( name='a' ),  Nodes.SingleTarget( name='b' ) ] ) )
-		self._matchTest( g.targetList(), '[a],[b,]', Nodes.TupleTarget( targets=[ Nodes.ListTarget( targets=[ Nodes.SingleTarget( name='a' ) ] ), Nodes.ListTarget( targets=[ Nodes.SingleTarget( name='b' ) ] ) ] ) )
-		self._matchTest( g.targetList(), '[(a,)],[(b,)]', Nodes.TupleTarget( targets=[ Nodes.ListTarget( targets=[ Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='a' ) ] ) ] ),
-											       Nodes.ListTarget( targets=[ Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='b' ) ] ) ] ) ] ) )
+		self._matchTest( g.targetListOrTargetItem(), '[a]', Nodes.ListTarget( targets=[ Nodes.SingleTarget( name='a' ) ] ) )
+		self._matchTest( g.targetListOrTargetItem(), '[a,]', Nodes.ListTarget( targets=[ Nodes.SingleTarget( name='a' ) ] ) )
+		self._matchTest( g.targetListOrTargetItem(), '[a,b]', Nodes.ListTarget( targets=[ Nodes.SingleTarget( name='a' ),  Nodes.SingleTarget( name='b' ) ] ) )
+		self._matchTest( g.targetListOrTargetItem(), '[a,b,]', Nodes.ListTarget( targets=[ Nodes.SingleTarget( name='a' ),  Nodes.SingleTarget( name='b' ) ] ) )
+		self._matchTest( g.targetListOrTargetItem(), '[a],[b,]', Nodes.TupleTarget( targets=[ Nodes.ListTarget( targets=[ Nodes.SingleTarget( name='a' ) ] ), Nodes.ListTarget( targets=[ Nodes.SingleTarget( name='b' ) ] ) ] ) )
+		self._matchTest( g.targetListOrTargetItem(), '[(a,)],[(b,)]', Nodes.TupleTarget( targets=[ Nodes.ListTarget( targets=[ Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='a' ) ], parens='1' ) ] ),
+											       Nodes.ListTarget( targets=[ Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='b' ) ], parens='1' ) ] ) ] ) )
 
 		self._matchTest( g.subscript(), 'a[x]', Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.Load( name='x' ) ) )
 		self._matchTest( g.attributeRef() | g.subscript(), 'a[x]', Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.Load( name='x' ) ) )
 		self._matchTest( g.targetItem(), 'a[x]', Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.Load( name='x' ) ) )
-		self._matchTest( g.targetList(), 'a[x]', Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.Load( name='x' ) ) )
-		self._matchTest( g.targetList(), 'a[x][y]', Nodes.Subscript( target=Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.Load( name='x' ) ), index=Nodes.Load( name='y' ) ) )
-		self._matchTest( g.targetList(), 'a.b', Nodes.AttributeRef( target=Nodes.Load( name='a' ), name='b' ) )
-		self._matchTest( g.targetList(), 'a.b.c', Nodes.AttributeRef( target=Nodes.AttributeRef( target=Nodes.Load( name='a' ), name='b' ), name='c' ) )
+		self._matchTest( g.targetListOrTargetItem(), 'a[x]', Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.Load( name='x' ) ) )
+		self._matchTest( g.targetListOrTargetItem(), 'a[x][y]', Nodes.Subscript( target=Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.Load( name='x' ) ), index=Nodes.Load( name='y' ) ) )
+		self._matchTest( g.targetListOrTargetItem(), 'a.b', Nodes.AttributeRef( target=Nodes.Load( name='a' ), name='b' ) )
+		self._matchTest( g.targetListOrTargetItem(), 'a.b.c', Nodes.AttributeRef( target=Nodes.AttributeRef( target=Nodes.Load( name='a' ), name='b' ), name='c' ) )
 
-		self._matchTest( g.targetList(), 'a.b[x]', Nodes.Subscript( target=Nodes.AttributeRef( target=Nodes.Load( name='a' ), name='b' ), index=Nodes.Load( name='x' ) ) )
-		self._matchTest( g.targetList(), 'a[x].b', Nodes.AttributeRef( target=Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.Load( name='x' ) ), name='b' ) )
+		self._matchTest( g.targetListOrTargetItem(), 'a.b[x]', Nodes.Subscript( target=Nodes.AttributeRef( target=Nodes.Load( name='a' ), name='b' ), index=Nodes.Load( name='x' ) ) )
+		self._matchTest( g.targetListOrTargetItem(), 'a[x].b', Nodes.AttributeRef( target=Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.Load( name='x' ) ), name='b' ) )
+
+
+	def testTupleLiteral(self):
+		g = Python25Grammar()
+		self._matchTest( g.expression(), '()', Nodes.TupleLiteral( values=[] ) )
+		self._matchTest( g.expression(), '(())', Nodes.TupleLiteral( values=[], parens='1' ) )
+		self._matchTest( g.expression(), '(a)', Nodes.Load( name='a', parens='1' ) )
+		self._matchTest( g.expression(), '(a,)', Nodes.TupleLiteral( values=[ Nodes.Load( name='a' ) ] ) )
+		self._matchTest( g.expression(), '((a,))', Nodes.TupleLiteral( values=[ Nodes.Load( name='a' ) ], parens='1' ) )
+		self._matchTest( g.expression(), '(a,b)', Nodes.TupleLiteral( values=[ Nodes.Load( name='a' ), Nodes.Load( name='b' ) ] ) )
+		self._matchTest( g.expression(), '(a,b,)', Nodes.TupleLiteral( values=[ Nodes.Load( name='a' ), Nodes.Load( name='b' ) ] ) )
 
 
 	def testListLiteral(self):
 		g = Python25Grammar()
+		self._matchTest( g.expression(), '[]', Nodes.ListLiteral( values=[] ) )
 		self._matchTest( g.expression(), '[a,b]', Nodes.ListLiteral( values=[ Nodes.Load( name='a' ), Nodes.Load( name='b' ) ] ) )
 		self._matchTest( g.expression(), '[a,b,]', Nodes.ListLiteral( values=[ Nodes.Load( name='a' ), Nodes.Load( name='b' ) ] ) )
 
@@ -1429,9 +1445,19 @@ class TestCase_Python25Parser (ParserTestCase):
 
 
 if __name__ == '__main__':
-	#result, pos, dot = targetList.debugParseString( 'a.b' )
+	#result, pos, dot = targetListOrTargetItem.debugParseString( 'a.b' )
 	#result, pos, dot = subscript.debugParseString( 'a.b' )
 	#print dot
 
+	#g = Python25Grammar()
+	#g.statement().parseString( 'raise' )
+
+	from Britefury.InitBritefuryJ import initBritefuryJ
+	initBritefuryJ()
+
+	from BritefuryJ.ParserDebugViewer import ParseViewFrame
+
 	g = Python25Grammar()
-	g.statement().parseString( 'raise' )
+	result = g.statement().debugParseString( '(' )
+	ParseViewFrame( result )
+	

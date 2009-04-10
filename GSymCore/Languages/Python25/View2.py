@@ -110,7 +110,7 @@ def capitalisedKeywordText(ctx, keyword):
 def _parseText(parser, text):
 	res = parser.parseString( text )
 	pos = res.getEnd()
-	if res is not None:
+	if res.isValid():
 		if pos == len( text ):
 			value = res.getValue()
 			return removeUnNeededParens( value )
@@ -250,58 +250,6 @@ class NewLineContentListener (LineContentListenerWithParser):
 			
 			
 			
-#PRECEDENCE_NONE = None
-
-#PRECEDENCE_STMT = 200
-
-#PRECEDENCE_COMPREHENSIONELEMENT = 175
-#PRECEDENCE_CONDITIONALELEMENT = 175
-
-#PRECEDENCE_TUPLEELEMENT = 150
-#PRECEDENCE_TUPLE = 150
-
-#PRECEDENCE_SEQUENCEELEMENT = 100
-#PRECEDENCE_YIELDVALUE = 100
-#PRECEDENCE_SUBSCRIPTINDEX = 100
-#PRECEDENCE_ELLIPSIS = 100
-#PRECEDENCE_ARG = 100
-#PRECEDENCE_PARAM = 100
-
-#PRECEDENCE_LAMBDAEXPR = 50
-
-#PRECEDENCE_OR = 14
-#PRECEDENCE_AND = 13
-#PRECEDENCE_NOT = 12
-#PRECEDENCE_CMP = 9
-#PRECEDENCE_BITOR = 8
-#PRECEDENCE_BITXOR = 7
-#PRECEDENCE_BITAND = 6
-#PRECEDENCE_SHIFT = 5
-#PRECEDENCE_ADDSUB = 4
-#PRECEDENCE_MULDIVMOD = 3
-#PRECEDENCE_INVERT_NEGATE_POS = 2
-#PRECEDENCE_POW = 1
-#PRECEDENCE_CALL = 0
-#PRECEDENCE_SUBSCRIPT = 0
-#PRECEDENCE_ATTR = 0
-
-#PRECEDENCE_LOADLOCAL = 0
-#PRECEDENCE_LISTLITERAL = 0
-#PRECEDENCE_LITERALVALUE = 0
-#PRECEDENCE_LISTCOMPREHENSION = 0
-#PRECEDENCE_GENERATOREXPRESSION = 0
-#PRECEDENCE_CONDITIONALEXPRESSION = 0
-#PRECEDENCE_DICTLITERAL = 0
-#PRECEDENCE_YIELDEXPR = 0
-#PRECEDENCE_IMPORTCONTENT = 0
-
-
-#PRECEDENCE_TARGET = 0
-
-
-
-
-
 
 
 
@@ -309,7 +257,7 @@ def _paren(ctx, x):
 	return ctx.paragraph( python_paragraphStyle, [ ctx.text( punctuation_textStyle, '(' ), x, ctx.text( punctuation_textStyle, ')' ) ] )
 
 def _precedenceParen(ctx, node, x, xPrecedence, outerPrecedence):
-	if node.isInstanceOf( Nodes.Expr ):
+	if node.isInstanceOf( Nodes.Expr )  or  node.isInstanceOf( Nodes.Target ):
 		numParens = getNumParens( node )
 	else:
 		numParens = 0
@@ -353,6 +301,7 @@ def expressionNodeEditor(ctx, node, contents, precedence, state):
 		segment = ctx.segment( python_paragraphStyle, python_segmentCaretStopFactory, contents )
 		return ctx.contentListener( segment, ParsedExpressionContentListener( ctx, node, parser ) )
 	elif mode == MODE_EDITSTATEMENT:
+		contents = _precedenceParen( ctx, node, contents, precedence, outerPrecedence )
 		segment = ctx.segment( python_paragraphStyle, python_segmentCaretStopFactory, contents )
 		return ctx.contentListener( segment, ParsedLineContentListener( ctx, node, parser ) )
 	else:
@@ -364,6 +313,7 @@ def statementNodeEditor(ctx, node, contents, precedence, state):
 
 	if mode == MODE_EDITSTATEMENT:
 		#contents = addContentLineStops( ctx, contents, True )
+		contents = _precedenceParen( ctx, node, contents, precedence, outerPrecedence )
 		segment = ctx.segment( python_paragraphStyle, python_segmentCaretStopFactory, contents )
 		return ctx.contentListener( segment, ParsedLineContentListener( ctx, node, parser ) )
 	else:
@@ -622,7 +572,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# List comprehension / generator expression
 	@ObjectNodeDispatchMethod
 	def ComprehensionFor(self, ctx, state, node, target, source):
-		targetView = ctx.viewEvalFn( target, None, python25ViewState( PRECEDENCE_CONTAINER_COMPREHENSIONFOR, self._parser.targetList() ) )
+		targetView = ctx.viewEvalFn( target, None, python25ViewState( PRECEDENCE_CONTAINER_COMPREHENSIONFOR, self._parser.targetListOrTargetItem() ) )
 		sourceView = ctx.viewEvalFn( source, None, python25ViewState( PRECEDENCE_CONTAINER_COMPREHENSIONFOR, self._parser.oldTupleOrExpression() ) )
 		return expressionNodeEditor( ctx, node,
 				   ctx.paragraph( python_paragraphStyle, [ capitalisedKeywordText( ctx, forKeyword ), ctx.text( default_textStyle, ' ' ), targetView, ctx.text( default_textStyle, ' ' ), capitalisedKeywordText( ctx, inKeyword ), ctx.text( default_textStyle, ' ' ), sourceView ] ),
@@ -693,7 +643,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Yield expression
 	@ObjectNodeDispatchMethod
 	def YieldAtom(self, ctx, state, node, value):
-		valueView = ctx.viewEvalFn( value, None, python25ViewState( PRECEDENCE_YIELDVALUE, self._parser.expression() ) )
+		valueView = ctx.viewEvalFn( value, None, python25ViewState( PRECEDENCE_CONTAINER_YIELDATOM, self._parser.expression() ) )
 		return expressionNodeEditor( ctx, node,
 				   ctx.paragraph( python_paragraphStyle, [ ctx.text( punctuation_textStyle, '(' ),  capitalisedKeywordText( ctx, yieldKeyword ),  ctx.text( punctuation_textStyle, ' ' ),  valueView,  ctx.text( punctuation_textStyle, ')' ) ] ),
 				   PRECEDENCE_YIELDEXPR,
@@ -725,7 +675,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		upperView = _sliceIndex( upper )
 		return expressionNodeEditor( ctx, node,
 				   ctx.paragraph( python_paragraphStyle, lowerView + [ ctx.text( punctuation_textStyle, ':' ) ] + upperView ),
-				   PRECEDENCE_SUBSCRIPTINDEX,
+				   PRECEDENCE_NONE,
 				   state )
 
 	@ObjectNodeDispatchMethod
@@ -740,14 +690,14 @@ class Python25View (GSymViewObjectNodeDispatch):
 		strideView = _sliceIndex( stride )
 		return expressionNodeEditor( ctx, node,
 				   ctx.paragraph( python_paragraphStyle, lowerView + [ ctx.text( punctuation_textStyle, ':' ) ] +  upperView + [ ctx.text( punctuation_textStyle, ':' ) ] + strideView ),
-				   PRECEDENCE_SUBSCRIPTINDEX,
+				   PRECEDENCE_NONE,
 				   state )
 
 	@ObjectNodeDispatchMethod
 	def SubscriptEllipsis(self, ctx, state, node):
 		return expressionNodeEditor( ctx, node,
 				   ctx.text( punctuation_textStyle, '...' ),
-				   PRECEDENCE_ELLIPSIS,
+				   PRECEDENCE_NONE,
 				   state )
 
 	@ObjectNodeDispatchMethod
@@ -1055,7 +1005,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Assignment statement
 	@ObjectNodeDispatchMethod
 	def AssignStmt(self, ctx, state, node, targets, value):
-		targetViews = ctx.mapViewEvalFn( targets, None, python25ViewState( PRECEDENCE_STMT, self._parser.targetList() ) )
+		targetViews = ctx.mapViewEvalFn( targets, None, python25ViewState( PRECEDENCE_STMT, self._parser.targetListOrTargetItem() ) )
 		valueView = ctx.viewEvalFn( value, None, python25ViewState( PRECEDENCE_STMT, self._parser.tupleOrExpressionOrYieldExpression() ) )
 		targetElements = []
 		for t in targetViews:
@@ -1090,7 +1040,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Del statement
 	@ObjectNodeDispatchMethod
 	def DelStmt(self, ctx, state, node, target):
-		targetView = ctx.viewEvalFn( target, None, python25ViewState( PRECEDENCE_STMT, self._parser.targetList() ) )
+		targetView = ctx.viewEvalFn( target, None, python25ViewState( PRECEDENCE_STMT, self._parser.targetListOrTargetItem() ) )
 		return statementNodeEditor( ctx, node,
 				   ctx.paragraph( python_paragraphStyle, [ capitalisedKeywordText( ctx, delKeyword ),  ctx.text( default_textStyle, ' ' ),  targetView ] ),
 				   PRECEDENCE_STMT,
@@ -1330,7 +1280,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# For statement
 	@ObjectNodeDispatchMethod
 	def ForStmt(self, ctx, state, node, target, source, suite):
-		targetView = ctx.viewEvalFn( target, None, python25ViewState( PRECEDENCE_STMT, self._parser.targetList() ) )
+		targetView = ctx.viewEvalFn( target, None, python25ViewState( PRECEDENCE_STMT, self._parser.targetListOrTargetItem() ) )
 		sourceView = ctx.viewEvalFn( source, None, python25ViewState( PRECEDENCE_STMT, self._parser.tupleOrExpression() ) )
 		return compoundStatementEditor( ctx, node,
 						ctx.paragraph( python_paragraphStyle, [ capitalisedKeywordText( ctx, forKeyword ),  ctx.text( default_textStyle, ' ' ),  targetView,  ctx.text( default_textStyle, ' ' ),

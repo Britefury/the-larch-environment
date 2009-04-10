@@ -46,7 +46,7 @@ ImaginaryLiteral = module.newClass( 'ImaginaryLiteral', Literal, [ 'value' ] )
 #
 # Targets
 #
-Target = module.newClass( 'Target', Node, [] )
+Target = module.newClass( 'Target', Node, [ 'parens' ] )
 SingleTarget = module.newClass( 'SingleTarget', Target, [ 'name' ] )
 TupleTarget = module.newClass( 'TupleTarget', Target, [ 'targets' ] )
 ListTarget = module.newClass( 'ListTarget', Target, [ 'targets' ] )

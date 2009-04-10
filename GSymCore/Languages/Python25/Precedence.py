@@ -57,6 +57,9 @@ PRECEDENCE_CONTAINER_CALLTARGET = 0
 PRECEDENCE_CONTAINER_CALLARG = 500
 
 # The lambda expression should only expect orTest or lambda expression
+PRECEDENCE_CONTAINER_YIELDATOM = 200
+
+# The lambda expression should only expect orTest or lambda expression
 PRECEDENCE_CONTAINER_LAMBDAEXPR = 50
 
 # The condition and true-expression subtrees of a conditional expression should only expect orTest
