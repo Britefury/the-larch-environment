@@ -313,52 +313,7 @@ public abstract class DPContentLeaf extends DPWidget
 
 	// MARKER MOVEMENT METHODS
 	
-	protected Marker markerToLeft(Marker m, boolean bItemStep, boolean bSkipWhitespace)
-	{
-		if ( isMarkerAtStart( m ) )
-		{
-			DPContentLeaf left = getContentLeafToLeft();
-			boolean bSkippedWhitespace = false;
-			
-			if ( bSkipWhitespace )
-			{
-				while ( left != null  &&  left.isWhitespace() )
-				{
-					left = left.getContentLeafToLeft();
-					bSkippedWhitespace = true;
-				}
-			}
-			
-			if ( left != null )
-			{
-				if ( bItemStep )
-				{
-					return left.markerAtStart();
-				}
-				else
-				{
-					if ( bSkippedWhitespace )
-					{
-						return left.markerAtEnd();
-					}
-					else
-					{
-						return left.markerAtEndMinusOne();
-					}
-				}
-			}
-			else
-			{
-				return m;
-			}
-		}
-		else
-		{
-			return marker( m.getIndex() - 1, Marker.Bias.START );
-		}
-	}
-
-	protected void moveMarkerLeft(Marker marker, boolean bItemStep, boolean bSkipWhitespace)
+	protected void moveMarkerLeft(Marker marker, boolean bSkipWhitespace)
 	{
 		if ( isMarkerAtStart( marker ) )
 		{
@@ -377,20 +332,13 @@ public abstract class DPContentLeaf extends DPWidget
 
 			if ( left != null )
 			{
-				if ( bItemStep )
+				if ( bSkippedWhitespace )
 				{
-					left.moveMarkerToStart( marker );
+					left.moveMarkerToEnd( marker );
 				}
 				else
 				{
-					if ( bSkippedWhitespace )
-					{
-						left.moveMarkerToEnd( marker );
-					}
-					else
-					{
-						left.moveMarkerToEndMinusOne( marker );
-					}
+					left.moveMarkerToEndMinusOne( marker );
 				}
 			}
 		}
@@ -402,53 +350,7 @@ public abstract class DPContentLeaf extends DPWidget
 
 
 
-	protected Marker markerToRight(Marker m, boolean bItemStep, boolean bSkipWhitespace)
-	{
-		if ( isMarkerAtEnd( m ) )
-		{
-			DPContentLeaf right = getContentLeafToRight();
-			boolean bSkippedWhitespace = false;
-			
-
-			if ( bSkipWhitespace )
-			{
-				while ( right != null  &&  right.isWhitespace() )
-				{
-					right = right.getContentLeafToRight();
-					bSkippedWhitespace = true;
-				}
-			}
-
-			if ( right != null )
-			{
-				if ( bItemStep )
-				{
-					return right.markerAtEnd();
-				}
-				else
-				{
-					if ( bSkippedWhitespace )
-					{
-						return right.markerAtStart();
-					}
-					else
-					{
-						return right.markerAtStartPlusOne();
-					}
-				}
-			}
-			else
-			{
-				return m;
-			}
-		}
-		else
-		{
-			return marker( m.getIndex(), Marker.Bias.END );
-		}
-	}
-	
-	protected void moveMarkerRight(Marker marker, boolean bItemStep, boolean bSkipWhitespace)
+	protected void moveMarkerRight(Marker marker, boolean bSkipWhitespace)
 	{
 		if ( isMarkerAtEnd( marker ) )
 		{
@@ -467,20 +369,13 @@ public abstract class DPContentLeaf extends DPWidget
 
 			if ( right != null )
 			{
-				if ( bItemStep )
+				if ( bSkippedWhitespace )
 				{
-					right.moveMarkerToEnd( marker );
+					right.moveMarkerToStart( marker );
 				}
 				else
 				{
-					if ( bSkippedWhitespace )
-					{
-						right.moveMarkerToStart( marker );
-					}
-					else
-					{
-						right.moveMarkerToStartPlusOne( marker );
-					}
+					right.moveMarkerToStartPlusOne( marker );
 				}
 			}
 		}

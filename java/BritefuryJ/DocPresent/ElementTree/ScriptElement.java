@@ -12,7 +12,9 @@ import java.util.List;
 
 import BritefuryJ.DocPresent.DPScript;
 import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.ScriptStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 
 public class ScriptElement extends BranchElement
 {
@@ -31,20 +33,31 @@ public class ScriptElement extends BranchElement
 	public static int NUMCHILDREN = DPScript.NUMCHILDREN;
 	
 	
-	protected Element[] children;
+	protected ParagraphStyleSheet segmentParagraphStyleSheet;
+	protected TextStyleSheet segmentTextStyleSheet; 
+	protected Element children[];
+	protected SegmentElement segments[];
 	
 	
 	
 	public ScriptElement()
 	{
-		this( ScriptStyleSheet.defaultStyleSheet );
+		this( ScriptStyleSheet.defaultStyleSheet, ParagraphStyleSheet.defaultStyleSheet, TextStyleSheet.defaultStyleSheet );
 	}
 	
 	public ScriptElement(ScriptStyleSheet styleSheet)
 	{
+		this( styleSheet, ParagraphStyleSheet.defaultStyleSheet, TextStyleSheet.defaultStyleSheet );
+	}
+	
+	public ScriptElement(ScriptStyleSheet styleSheet, ParagraphStyleSheet segmentParagraphStyleSheet, TextStyleSheet segmentTextStyleSheet)
+	{
 		super( new DPScript( styleSheet ) );
 		
+		this.segmentParagraphStyleSheet = segmentParagraphStyleSheet;
+		this.segmentTextStyleSheet = segmentTextStyleSheet;
 		children = new Element[NUMCHILDREN];
+		segments = new SegmentElement[NUMCHILDREN];
 	}
 
 
@@ -60,26 +73,36 @@ public class ScriptElement extends BranchElement
 		Element existingChild = children[slot];
 		if ( child != existingChild )
 		{
-			if ( existingChild != null )
+			boolean bSegmentRequired = child != null;
+			boolean bSegmentPresent = existingChild != null;
+			
+			if ( bSegmentRequired  &&  !bSegmentPresent )
 			{
-				existingChild.setParent( null );
-				existingChild.setElementTree( null );
+				SegmentElement seg = new SegmentElement( segmentParagraphStyleSheet, segmentTextStyleSheet, isBeginGuardRequired( slot ), isEndGuardRequired( slot ) );
+				seg.setParent( this );
+				seg.setElementTree( tree );
+				segments[slot] = seg;
+				DPWidget segmentWidget = seg.getWidget();
+				getWidget().setChild( slot, segmentWidget );
 			}
 			
 			children[slot] = child;
-			DPWidget childWidget = null;
 			if ( child != null )
 			{
-				childWidget = child.getWidget();
+				segments[slot].setChild( child );
 			}
-			getWidget().setChild( slot, childWidget );
-			
-			
-			if ( child != null )
+
+			if ( bSegmentPresent  &&  !bSegmentRequired )
 			{
-				child.setParent( this );
-				child.setElementTree( tree );
+				
+				SegmentElement seg = segments[slot];
+				seg.setParent( null );
+				seg.setElementTree( null );
+				segments[slot] = null;
+				getWidget().setChild( slot, null );
 			}
+			
+			refreshSegmentGuards();
 			
 			onChildListChanged();
 		}
@@ -153,9 +176,9 @@ public class ScriptElement extends BranchElement
 		
 		for (int slot = 0; slot < NUMCHILDREN; slot++)
 		{
-			if ( children[slot] != null )
+			if ( segments[slot] != null )
 			{
-				xs.add( children[slot] );
+				xs.add( segments[slot] );
 			}
 		}
 		
@@ -175,9 +198,9 @@ public class ScriptElement extends BranchElement
 		
 		for (int slot = 0; slot < NUMCHILDREN; slot++)
 		{
-			if ( children[slot] != null )
+			if ( segments[slot] != null )
 			{
-				builder.append( children[slot].getContent() );
+				builder.append( segments[slot].getContent() );
 			}
 		}
 		
@@ -190,12 +213,75 @@ public class ScriptElement extends BranchElement
 		
 		for (int slot = 0; slot < NUMCHILDREN; slot++)
 		{
-			if ( children[slot] != null )
+			if ( segments[slot] != null )
 			{
-				length += children[slot].getContentLength();
+				length += segments[slot].getContentLength();
 			}
 		}
 		
 		return length;
+	}
+
+
+
+
+
+	protected boolean hasMainChild()
+	{
+		return children[MAIN] != null;
+	}
+	
+	protected boolean hasLeftChild()
+	{
+		return children[LEFTSUB] != null  ||  children[LEFTSUPER] != null;
+	}
+	
+	protected boolean hasRightChild()
+	{
+		return children[RIGHTSUB] != null  ||  children[RIGHTSUPER] != null;
+	}
+	
+	protected boolean hasSuperscriptChild()
+	{
+		return children[LEFTSUPER] != null  ||  children[RIGHTSUPER] != null;
+	}
+	
+	protected boolean hasSubscriptChild()
+	{
+		return children[LEFTSUB] != null  ||  children[RIGHTSUB] != null;
+	}
+	
+	
+	private boolean isBeginGuardRequired(int slot)
+	{
+		if ( slot == MAIN )
+		{
+			return hasLeftChild();
+		}
+		else
+		{
+			return true;
+		}
+	}
+
+	private boolean isEndGuardRequired(int slot)
+	{
+		if ( slot == MAIN )
+		{
+			return hasRightChild();
+		}
+		else
+		{
+			return true;
+		}
+	}
+	
+	
+	private void refreshSegmentGuards()
+	{
+		if ( children[MAIN] != null )
+		{
+			segments[MAIN].setGuardPolicy( isBeginGuardRequired( MAIN ), isEndGuardRequired( MAIN ) );
+		}
 	}
 }

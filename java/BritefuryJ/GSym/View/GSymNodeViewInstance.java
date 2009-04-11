@@ -31,7 +31,6 @@ import BritefuryJ.DocPresent.ElementTree.SegmentElement;
 import BritefuryJ.DocPresent.ElementTree.TextElement;
 import BritefuryJ.DocPresent.ElementTree.VBoxElement;
 import BritefuryJ.DocPresent.ElementTree.WhitespaceElement;
-import BritefuryJ.DocPresent.ElementTree.SegmentElement.CaretStopElementFactory;
 import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.FractionStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
@@ -168,16 +167,24 @@ public class GSymNodeViewInstance
 		return element;
 	}
 	
-	public Element segment(ParagraphStyleSheet styleSheet, CaretStopElementFactory stopFactory, Element child)
+	public Element segment(ParagraphStyleSheet styleSheet, TextStyleSheet textStyleSheet, boolean bGuardBegin, boolean bGuardEnd, Element child)
 	{
-		SegmentElement element = new SegmentElement( styleSheet, stopFactory );
+		SegmentElement element = new SegmentElement( styleSheet, textStyleSheet, bGuardBegin, bGuardEnd );
 		element.setChild( child );
 		return element;
 	}
 	
-	public Element script(ScriptStyleSheet styleSheet, Element mainChild, Element leftSuperChild, Element leftSubChild, Element rightSuperChild, Element rightSubChild)
+	public Element segment(boolean bGuardBegin, boolean bGuardEnd, Element child)
 	{
-		ScriptElement element = new ScriptElement( styleSheet );
+		SegmentElement element = new SegmentElement( ParagraphStyleSheet.defaultStyleSheet, TextStyleSheet.defaultStyleSheet, bGuardBegin, bGuardEnd );
+		element.setChild( child );
+		return element;
+	}
+	
+	
+	public Element script(ScriptStyleSheet styleSheet, ParagraphStyleSheet segmentParagraphStyleSheet, TextStyleSheet segmentTextStyleSheet, Element mainChild, Element leftSuperChild, Element leftSubChild, Element rightSuperChild, Element rightSubChild)
+	{
+		ScriptElement element = new ScriptElement( styleSheet, segmentParagraphStyleSheet, segmentTextStyleSheet );
 		element.setMainChild( mainChild );
 		if ( leftSuperChild != null )
 		{
@@ -197,6 +204,33 @@ public class GSymNodeViewInstance
 		}
 		return element;
 	}
+	
+	public Element script(ScriptStyleSheet styleSheet, Element mainChild, Element leftSuperChild, Element leftSubChild, Element rightSuperChild, Element rightSubChild)
+	{
+		return script( styleSheet, ParagraphStyleSheet.defaultStyleSheet, TextStyleSheet.defaultStyleSheet, mainChild, leftSuperChild, leftSubChild, rightSuperChild, rightSubChild );
+	}
+	
+	
+	public Element scriptLSuper(ScriptStyleSheet styleSheet, ParagraphStyleSheet segmentParagraphStyleSheet, TextStyleSheet segmentTextStyleSheet, Element mainChild, Element scriptChild)
+	{
+		return script( styleSheet, segmentParagraphStyleSheet, segmentTextStyleSheet, mainChild, scriptChild, null, null, null );
+	}
+	
+	public Element scriptLSub(ScriptStyleSheet styleSheet, ParagraphStyleSheet segmentParagraphStyleSheet, TextStyleSheet segmentTextStyleSheet, Element mainChild, Element scriptChild)
+	{
+		return script( styleSheet, segmentParagraphStyleSheet, segmentTextStyleSheet, mainChild, null, scriptChild, null, null );
+	}
+	
+	public Element scriptRSuper(ScriptStyleSheet styleSheet, ParagraphStyleSheet segmentParagraphStyleSheet, TextStyleSheet segmentTextStyleSheet, Element mainChild, Element scriptChild)
+	{
+		return script( styleSheet, segmentParagraphStyleSheet, segmentTextStyleSheet, mainChild, null, null, scriptChild, null );
+	}
+	
+	public Element scriptRSub(ScriptStyleSheet styleSheet, ParagraphStyleSheet segmentParagraphStyleSheet, TextStyleSheet segmentTextStyleSheet, Element mainChild, Element scriptChild)
+	{
+		return script( styleSheet, segmentParagraphStyleSheet, segmentTextStyleSheet, mainChild, null, null, null, scriptChild );
+	}
+	
 	
 	public Element scriptLSuper(ScriptStyleSheet styleSheet, Element mainChild, Element scriptChild)
 	{
@@ -220,12 +254,17 @@ public class GSymNodeViewInstance
 	
 	
 	
-	public Element fraction(FractionStyleSheet styleSheet, Element numerator, Element denominator)
+	public Element fraction(FractionStyleSheet styleSheet, ParagraphStyleSheet segmentParagraphStyleSheet, TextStyleSheet segmentTextStyleSheet, Element numerator, Element denominator, String barContent)
 	{
-		FractionElement element = new FractionElement( styleSheet );
+		FractionElement element = new FractionElement( styleSheet, segmentParagraphStyleSheet, segmentTextStyleSheet, barContent );
 		element.setNumeratorChild( numerator );
 		element.setDenominatorChild( denominator );
 		return element;
+	}
+	
+	public Element fraction(FractionStyleSheet styleSheet, Element numerator, Element denominator, String barContent)
+	{
+		return fraction( styleSheet, ParagraphStyleSheet.defaultStyleSheet, TextStyleSheet.defaultStyleSheet, numerator, denominator, barContent );
 	}
 	
 

@@ -391,27 +391,27 @@ public class DPScript extends DPContainer
 	
 	
 	
-	private boolean hasMainChild()
+	protected boolean hasMainChild()
 	{
 		return children[MAIN] != null;
 	}
 	
-	private boolean hasLeftChild()
+	protected boolean hasLeftChild()
 	{
 		return children[LEFTSUB] != null  ||  children[LEFTSUPER] != null;
 	}
 	
-	private boolean hasRightChild()
+	protected boolean hasRightChild()
 	{
 		return children[RIGHTSUB] != null  ||  children[RIGHTSUPER] != null;
 	}
 	
-	private boolean hasSuperscriptChild()
+	protected boolean hasSuperscriptChild()
 	{
 		return children[LEFTSUPER] != null  ||  children[RIGHTSUPER] != null;
 	}
 	
-	private boolean hasSubscriptChild()
+	protected boolean hasSubscriptChild()
 	{
 		return children[LEFTSUB] != null  ||  children[RIGHTSUB] != null;
 	}

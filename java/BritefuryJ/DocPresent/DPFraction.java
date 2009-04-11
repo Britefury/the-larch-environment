@@ -236,6 +236,12 @@ public class DPFraction extends DPContainer
 		setChild( DENOMINATOR, child );
 	}
 	
+	public void setBarChild(DPWidget child)
+	{
+		setChild( BAR, child );
+
+	}
+	
 
 	
 	

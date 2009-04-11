@@ -16,6 +16,7 @@ import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 
 public class SegmentElement extends BranchElement implements CollatedElementInterface
 {
+	
 	//
 	// Utility classes
 	//
@@ -46,38 +47,11 @@ public class SegmentElement extends BranchElement implements CollatedElementInte
 		}
 	}
 
-	
-	public static interface CaretStopElementFactory
-	{
-		public Element createCaretStopElement();
-	}
-	
-	public static class EmptyTextElementStopFactory implements CaretStopElementFactory
-	{
-		private TextStyleSheet styleSheet;
 		
-		public EmptyTextElementStopFactory()
-		{
-			this( TextStyleSheet.defaultStyleSheet );
-		}
-		
-		public EmptyTextElementStopFactory(TextStyleSheet styleSheet)
-		{
-			this.styleSheet = styleSheet;
-		}
-
-		public Element createCaretStopElement()
-		{
-			return new TextElement( styleSheet, "" );
-		}
-	}
 	
-	
-	public static EmptyTextElementStopFactory defaultStopFactory = new EmptyTextElementStopFactory();
-	
-	
-	protected CaretStopElementFactory stopFactory;
-	protected Element beginStop, endStop, endWhitespace;
+	protected TextStyleSheet textStyleSheet;
+	protected boolean bGuardBegin, bGuardEnd;
+	protected Element beginGuard, endGuard;
 	private ElementCollator collator;
 	protected Element child;
 	
@@ -86,20 +60,40 @@ public class SegmentElement extends BranchElement implements CollatedElementInte
 	// Constructor
 	//
 	
-	public SegmentElement(CaretStopElementFactory stopFactory)
+	public SegmentElement(boolean bGuardBegin, boolean bGuardEnd)
 	{
-		this( ParagraphStyleSheet.defaultStyleSheet, stopFactory );
+		this( ParagraphStyleSheet.defaultStyleSheet, TextStyleSheet.defaultStyleSheet, bGuardBegin, bGuardEnd );
 	}
 
-	public SegmentElement(ParagraphStyleSheet styleSheet, CaretStopElementFactory stopFactory)
+	public SegmentElement(ParagraphStyleSheet styleSheet, boolean bGuardBegin, boolean bGuardEnd)
+	{
+		this( styleSheet, TextStyleSheet.defaultStyleSheet, bGuardBegin, bGuardEnd );
+	}
+
+	public SegmentElement(ParagraphStyleSheet styleSheet, TextStyleSheet textStyleSheet, boolean bGuardBegin, boolean bGuardEnd)
 	{
 		super( new DPParagraph( styleSheet ) );
+		this.textStyleSheet = textStyleSheet;
+		this.bGuardBegin = bGuardBegin;
+		this.bGuardEnd = bGuardEnd;
 		
 		collator = new ElementCollator( this );
-		
-		this.stopFactory = stopFactory;
 	}
-
+	
+	
+	
+	
+	public void setGuardPolicy(boolean bGuardBegin, boolean bGuardEnd)
+	{
+		if ( bGuardBegin != this.bGuardBegin  ||  bGuardEnd != this.bGuardEnd )
+		{
+			this.bGuardBegin = bGuardBegin;
+			this.bGuardEnd = bGuardEnd;
+			onSubtreeStructureChanged();
+		}
+	}
+	
+	
 	
 	//
 	// Widget
@@ -147,21 +141,17 @@ public class SegmentElement extends BranchElement implements CollatedElementInte
 	{
 		ArrayList<Element> ch = new ArrayList<Element>();
 		
-		if ( beginStop != null )
+		if ( beginGuard != null )
 		{
-			ch.add( beginStop );
+			ch.add( beginGuard );
 		}
 		if ( child != null )
 		{
 			ch.add( child );
 		}
-		if ( endStop != null )
+		if ( endGuard != null )
 		{
-			ch.add( endStop );
-		}
-		else if ( endWhitespace != null )
-		{
-			ch.add( endWhitespace );
+			ch.add( endGuard );
 		}
 		
 		return ch;
@@ -173,7 +163,7 @@ public class SegmentElement extends BranchElement implements CollatedElementInte
 	// Collation methods
 	//
 	
-	private void refreshStops()
+	private void refreshGuards()
 	{
 		boolean bBegin = false, bEnd = false;
 		
@@ -189,78 +179,77 @@ public class SegmentElement extends BranchElement implements CollatedElementInte
 			}
 		}
 		
-		if ( bBegin  &&  beginStop == null )
+		if ( bGuardBegin )
 		{
-			beginStop = stopFactory.createCaretStopElement();
-			beginStop.setParent( this );
-			beginStop.setElementTree( tree );
-		}
-		else if ( !bBegin  &&  beginStop != null )
-		{
-			beginStop.setParent( null );
-			beginStop.setElementTree( null );
-			beginStop = null;
-		}
-		
-		if ( bEnd )
-		{
-			if ( endStop == null )
+			if ( bBegin  &&  !( beginGuard instanceof TextElement ) )
 			{
-				endStop = stopFactory.createCaretStopElement();
-				endStop.setParent( this );
-				endStop.setElementTree( tree );
+				beginGuard = new TextElement( textStyleSheet, "" );
+				beginGuard.setParent( this );
+				beginGuard.setElementTree( tree );
 			}
 			
-			if ( endWhitespace != null )
+			if ( !bBegin  &&  !( beginGuard instanceof WhitespaceElement ) )
 			{
-				endWhitespace.setParent( null );
-				endWhitespace.setElementTree( null );
-				endWhitespace = null;
+				beginGuard = new WhitespaceElement( "" );
+				beginGuard.setParent( this );
+				beginGuard.setElementTree( tree );
 			}
 		}
-		else
+		else if ( beginGuard != null )
 		{
-			if ( endStop != null )
+			beginGuard.setParent( null );
+			beginGuard.setElementTree( null );
+			beginGuard = null;
+		}
+		
+		
+		if ( bGuardEnd )
+		{
+			if ( bEnd  &&  !( endGuard instanceof TextElement ) )
 			{
-				endStop.setParent( null );
-				endStop.setElementTree( null );
-				endStop = null;
+				endGuard = new TextElement( textStyleSheet, "" );
+				endGuard.setParent( this );
+				endGuard.setElementTree( tree );
 			}
-
-			if ( endWhitespace == null )
+			
+			if ( !bEnd  &&  !( endGuard instanceof WhitespaceElement ) )
 			{
-				endWhitespace = new WhitespaceElement( "" );
-				endWhitespace.setParent( this );
-				endWhitespace.setElementTree( tree );
+				endGuard = new WhitespaceElement( "" );
+				endGuard.setParent( this );
+				endGuard.setElementTree( tree );
 			}
-
+		}
+		else if ( endGuard != null )
+		{
+			endGuard.setParent( null );
+			endGuard.setElementTree( null );
+			endGuard = null;
 		}
 	}
 
 	public void collateSubtree(List<Element> childElementsOut, List<CollatableBranchElement> collatedBranchesOut)
 	{
 		CollatableBranchFilter collationFilter = new ParagraphCollationFilter();
-		if ( beginStop != null )
+		if ( beginGuard != null )
 		{
-			childElementsOut.add( beginStop );
+			childElementsOut.add( beginGuard );
 		}
-		if ( child.isCollatableBranch()  &&  collationFilter.test( (CollatableBranchElement)child ) )
+		if ( child != null )
 		{
-			CollatableBranchElement b = (CollatableBranchElement)child;
-			collatedBranchesOut.add( b );
-			b.collateSubtree( childElementsOut, collatedBranchesOut, collationFilter );
+			if ( child.isCollatableBranch()  &&  collationFilter.test( (CollatableBranchElement)child ) )
+			{
+				CollatableBranchElement b = (CollatableBranchElement)child;
+				collatedBranchesOut.add( b );
+				b.collateSubtree( childElementsOut, collatedBranchesOut, collationFilter );
+			}
+			else
+			{
+				childElementsOut.add( child );
+			}
 		}
-		else
+		if ( endGuard != null )
 		{
-			childElementsOut.add( child );
-		}
-		if ( endStop != null )
-		{
-			childElementsOut.add( endStop );
-		}
-		else if ( endWhitespace != null )
-		{
-			childElementsOut.add( endWhitespace );
+			childElementsOut.add( endGuard );
 		}
 	}
 	
@@ -274,7 +263,7 @@ public class SegmentElement extends BranchElement implements CollatedElementInte
 	{
 		super.onSubtreeStructureChanged();
 		
-		refreshStops();
+		refreshGuards();
 		collator.refreshContainerWidgetContents();
 	}
 	
