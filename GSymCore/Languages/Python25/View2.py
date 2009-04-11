@@ -138,10 +138,12 @@ class ParsedExpressionContentListener (ElementContentListener):
 		if '\n' not in value:
 			parsed = _parseText( self._parser, value, self._outerPrecedence )
 			if parsed is not None:
-				replace( self._ctx, self._node, parsed )
+				if parsed != self._node:
+					replace( self._ctx, self._node, parsed )
 				#replaceNodeContents( self._ctx, self._node, parsed )
 			else:
-				replace( self._ctx, self._node, Nodes.UNPARSED( value=value ) )
+				if self._node != Nodes.UNPARSED( value=value ):
+					replace( self._ctx, self._node, Nodes.UNPARSED( value=value ) )
 				#replaceNodeContents( self._ctx, self._node, Nodes.UNPARSED( value=value ) )
 			return True
 		else:
@@ -299,8 +301,6 @@ def expressionNodeEditor(ctx, node, contents, precedence, state):
 		return contents
 	elif mode == MODE_EDITEXPRESSION:
 		contents = _precedenceParen( ctx, node, contents, precedence, outerPrecedence )
-		#segment = ctx.segment( python_paragraphStyle, default_textStyle, True, True, contents )
-		#return ctx.contentListener( segment, ParsedExpressionContentListener( ctx, node, parser, outerPrecedence ) )
 		return ctx.contentListener( contents, ParsedExpressionContentListener( ctx, node, parser, outerPrecedence ) )
 	elif mode == MODE_EDITSTATEMENT:
 		contents = _precedenceParen( ctx, node, contents, precedence, outerPrecedence )
@@ -314,7 +314,6 @@ def statementNodeEditor(ctx, node, contents, precedence, state):
 	outerPrecedence, parser, mode = state
 
 	if mode == MODE_EDITSTATEMENT:
-		#contents = addContentLineStops( ctx, contents, True )
 		contents = _precedenceParen( ctx, node, contents, precedence, outerPrecedence )
 		segment = ctx.segment( python_paragraphStyle, default_textStyle, True, True, contents )
 		return ctx.contentListener( segment, ParsedLineContentListener( ctx, node, parser ) )

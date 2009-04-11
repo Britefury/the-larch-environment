@@ -39,7 +39,7 @@ public abstract class ParserExpression implements ParserExpressionInterface
 
 	public ParseResult parseString(String input, int start, int stop)
 	{
-		return parseString( input, start, stop, "[ \t\n]*" );
+		return parseString( input, start, stop, "[ ]*" );
 	}
 	
 	public ParseResult parseString(String input, int start, int stop, String junkRegex)
@@ -72,7 +72,7 @@ public abstract class ParserExpression implements ParserExpressionInterface
 
 	public DebugParseResult debugParseString(String input, int start, int stop)
 	{
-		return debugParseString( input, start, stop, "[ \t\n]*" );
+		return debugParseString( input, start, stop, "[ ]*" );
 	}
 	
 	public DebugParseResult debugParseString(String input, int start, int stop, String junkRegex)
@@ -305,6 +305,23 @@ public abstract class ParserExpression implements ParserExpressionInterface
 	{
 		return false;
 	}
+	
+	public static boolean compareExpressions(ParserExpression x, ParserExpression y)
+	{
+		if ( x == null  &&  y == null )
+		{
+			return true;
+		}
+		else if ( x != null  &&  y != null )
+		{
+			return x.compareTo( y );
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
 	
 	
 	public String toString()

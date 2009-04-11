@@ -10,9 +10,8 @@ import string
 
 from BritefuryJ.DocModel import DMObject, DMNode, DefaultIdentityFunction
 
-from BritefuryJ.Parser import Action, Condition, Forward, Production, Suppress, Literal, Keyword, RegEx, Word, Sequence, Combine, Choice, Optional, Repetition, ZeroOrMore, OneOrMore, Peek, PeekNot
+from BritefuryJ.Parser import Action, Condition, Forward, Production, Suppress, Literal, Keyword, RegEx, Word, Sequence, Combine, Choice, Optional, Repetition, ZeroOrMore, OneOrMore, Peek, PeekNot, SeparatedList
 from BritefuryJ.Parser.Utils.Tokens import identifier, decimalInteger, hexInteger, integer, singleQuotedString, doubleQuotedString, quotedString, floatingPoint
-from BritefuryJ.Parser.Utils.SeparatedList import separatedList, delimitedSeparatedList
 from BritefuryJ.Parser.Utils.OperatorParser import Prefix, Suffix, InfixLeft, InfixRight, InfixChain, PrecedenceLevel, OperatorTable
 
 from Britefury.Tests.BritefuryJ.Parser.ParserTestCase import ParserTestCase
@@ -73,7 +72,7 @@ class Python25Grammar (Grammar):
 
 	@Rule
 	def dottedPythonIdentifer(self):
-		return ( separatedList( self.pythonIdentifier(), '.', True, False, False ) ).action( lambda input, pos, xs: '.'.join( xs ) )
+		return SeparatedList( self.pythonIdentifier(), '.', 1, -1, SeparatedList.TrailingSeparatorPolicy.NEVER ).action( lambda input, pos, xs: '.'.join( xs ) )
 
 
 
@@ -183,7 +182,8 @@ class Python25Grammar (Grammar):
 
 	@Rule
 	def tupleTarget(self):
-		return separatedList( self.targetItem(), True, True, True ).action( lambda input, pos, xs: Nodes.TupleTarget( targets=xs ) )
+		return SeparatedList( self.targetItem(), 1, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).listCondition( lambda input, pos, xs, bTrailingSep: len( xs ) != 1  or  bTrailingSep ).listAction(
+			lambda input, pos, xs, bTrailingSep: Nodes.TupleTarget( targets=xs, trailingSeparator='1' if bTrailingSep else makeNullNode() ) )
 
 	@Rule
 	def targetListOrTargetItem(self):
@@ -195,7 +195,8 @@ class Python25Grammar (Grammar):
 
 	@Rule
 	def listTarget(self):
-		return delimitedSeparatedList( self.targetItem(), '[', ']', False, True, False ).action( lambda input, pos, xs: Nodes.ListTarget( targets=xs ) )
+		return SeparatedList( self.targetItem(), '[', ']', 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).listAction(
+			lambda input, pos, xs, bTrailingSep: Nodes.ListTarget( targets=xs, trailingSeparator='1' if bTrailingSep else makeNullNode() ) )
 
 	@Rule
 	def targetItem(self):
@@ -216,22 +217,18 @@ class Python25Grammar (Grammar):
 	# Tuples
 	@Rule
 	def tupleAsExpressionList(self):
-		return separatedList( self.expression(), True, True, True ).action( lambda input, pos, xs: Nodes.TupleLiteral( values=xs ) )
+		return SeparatedList( self.expression(), 1, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).listCondition( lambda input, pos, xs, bTrailingSep: len( xs ) != 1  or  bTrailingSep ).listAction(
+			lambda input, pos, xs, bTrailingSep: Nodes.TupleLiteral( values=xs, trailingSeparator='1' if bTrailingSep else makeNullNode() ) )
 
 	@Rule
 	def tupleLiteral(self):
-		return ( Literal( '(' ) + self.tupleAsExpressionList() + ')' ).action( lambda input, pos, xs: xs[1] )  |  ( Literal( '(' ) + Literal( ')' ) ).action( lambda input, pos, xs: Nodes.TupleLiteral( values=[] ) )
+		return SeparatedList( self.expression(), '(', ')', 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).listCondition( lambda input, pos, xs, bTrailingSep: len( xs ) != 1  or  bTrailingSep ).listAction(
+			lambda input, pos, xs, bTrailingSep: Nodes.TupleLiteral( values=xs, trailingSeparator='1' if bTrailingSep else makeNullNode() ) )
 
 	@Rule
 	def oldTupleAsExpressionList(self):
-		return separatedList( self.expression(), True, True, True ).action( lambda input, pos, xs: Nodes.TupleLiteral( values=xs ) )
-
-
-
-	# Expression list
-	@Rule
-	def expressionList(self):
-		return separatedList( self.expression(), True, True, False ) 
+		return SeparatedList( self.oldExpression(), 1, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).listCondition( lambda input, pos, xs, bTrailingSep: len( xs ) != 1  or  bTrailingSep ).listAction(
+			lambda input, pos, xs, bTrailingSep: Nodes.TupleLiteral( values=xs, trailingSeparator='1' if bTrailingSep else makeNullNode() ) )
 
 
 
@@ -245,7 +242,8 @@ class Python25Grammar (Grammar):
 	# List literal
 	@Rule
 	def listLiteral(self):
-		return delimitedSeparatedList( self.expression(), '[', ']', False, True, False ).action( lambda input, pos, xs: Nodes.ListLiteral( values=xs ) )
+		return SeparatedList( self.expression(), '[', ']', 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).listAction(
+			lambda input, pos, xs, bTrailingSep: Nodes.ListLiteral( values=xs, trailingSeparator='1' if bTrailingSep else makeNullNode() ) )
 
 
 
@@ -296,7 +294,8 @@ class Python25Grammar (Grammar):
 
 	@Rule
 	def dictLiteral(self):
-		return delimitedSeparatedList( self.keyValuePair(), '{', '}', False, True, False ).action( lambda input, pos, xs: Nodes.DictLiteral( values=xs ) )
+		return SeparatedList( self.keyValuePair(), '{', '}', 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).listAction(
+			lambda input, pos, xs, bGotTrailingSep: Nodes.DictLiteral( values=xs, trailingSeparator='1' if bGotTrailingSep else makeNullNode() ) )
 
 
 
@@ -355,7 +354,8 @@ class Python25Grammar (Grammar):
 
 	@Rule
 	def subscriptTuple(self):
-		return separatedList( self.subscriptItem(), True, True, True ).action( lambda input, pos, xs: Nodes.SubscriptTuple( values=xs ) )
+		return SeparatedList( self.subscriptItem(), 1, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).listCondition( lambda input, pos, xs, bTrailingSep: len( xs ) != 1  or  bTrailingSep ).listAction(
+			lambda input, pos, xs, bTrailingSep: Nodes.SubscriptTuple( values=xs, trailingSeparator='1' if bTrailingSep else makeNullNode() ) )
 
 	@Rule
 	def subscriptIndex(self):
@@ -369,7 +369,7 @@ class Python25Grammar (Grammar):
 
 
 	# Call
-	def _checkCallArgs(self, input, pos, xs):
+	def _checkCallArgs(self, input, pos, xs, bTrailingSep):
 		bKW = False
 		bArgList = False
 		bKWArgList = False
@@ -418,14 +418,16 @@ class Python25Grammar (Grammar):
 	@Rule
 	def callArg(self):
 		return self.kwArgList() | self.argList() | self.kwArg() | self.expression()
-
+	
 	@Rule
 	def callArgs(self):
-		return separatedList( self.callArg(), False, True, False ).condition( self._checkCallArgs )
+		# Result is ( list_of_args, bTrailingSep )
+		return SeparatedList( self.callArg(), 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).listCondition( self._checkCallArgs ).listAction(
+			lambda input, pos, xs, bTrailingSep: [ xs, '1'   if bTrailingSep   else makeNullNode() ] )
 
 	@Rule
 	def call(self):
-		return ( self.primary() + Literal( '(' ) + self.callArgs() + Literal( ')' ) ).action( lambda input, pos, xs: Nodes.Call( target=xs[0], args=xs[2] ) )
+		return ( self.primary() + Literal( '(' ) + self.callArgs() + Literal( ')' ) ).action( lambda input, pos, xs: Nodes.Call( target=xs[0], args=xs[2][0], argsTrailingSeparator=xs[2][1] ) )
 
 
 
@@ -484,7 +486,7 @@ class Python25Grammar (Grammar):
 
 
 	# Parameters (lambda, def statement, etc)
-	def _checkParams(self, input, pos, xs):
+	def _checkParams(self, input, pos, xs, bTrailingSep):
 		bDefaultValParam = False
 		bParamList = False
 		bKWParamList = False
@@ -540,7 +542,8 @@ class Python25Grammar (Grammar):
 
 	@Rule
 	def params(self):
-		return separatedList( self.param(), False, True, False ).condition( self._checkParams )
+		return SeparatedList( self.param(), 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).listCondition( self._checkParams ).listAction(
+			lambda input, pos, xs, bTrailingSep: [ xs, '1'   if bTrailingSep   else makeNullNode() ] )
 
 
 
@@ -548,11 +551,13 @@ class Python25Grammar (Grammar):
 	# Lambda expression_checkParams
 	@Rule
 	def oldLambdaExpr(self):
-		return ( Keyword( lambdaKeyword )  +  self.params()  +  Literal( ':' )  +  self.oldExpression() ).action( lambda input, pos, xs: Nodes.LambdaExpr( params=xs[1], expr=xs[3] ) )
+		return ( Keyword( lambdaKeyword )  +  self.params()  +  Literal( ':' )  +  self.oldExpression() ).action(
+			lambda input, pos, xs: Nodes.LambdaExpr( params=xs[1][0], expr=xs[3], paramsTrailingSeparator=xs[1][1] ) )
 
 	@Rule
 	def lambdaExpr(self):
-		return ( Keyword( lambdaKeyword )  +  self.params()  +  Literal( ':' )  +  self.expression() ).action( lambda input, pos, xs: Nodes.LambdaExpr( params=xs[1], expr=xs[3] ) )
+		return ( Keyword( lambdaKeyword )  +  self.params()  +  Literal( ':' )  +  self.expression() ).action(
+			lambda input, pos, xs: Nodes.LambdaExpr( params=xs[1][0], expr=xs[3], paramsTrailingSeparator=xs[1][1] ) )
 
 
 
@@ -696,7 +701,7 @@ class Python25Grammar (Grammar):
 	# dotted name
 	@Rule
 	def moduleName(self):
-		return separatedList( self._moduleIdentifier(), '.', True, False, False ).action( lambda input, pos, xs: '.'.join( xs ) )
+		return SeparatedList( self._moduleIdentifier(), '.', 1, -1, SeparatedList.TrailingSeparatorPolicy.NEVER ).action( lambda input, pos, xs: '.'.join( xs ) )
 
 
 	# relative module name
@@ -722,7 +727,7 @@ class Python25Grammar (Grammar):
 	# 'import' <separatedList( moduleImport )>
 	@Rule
 	def simpleImport(self):
-		return ( Keyword( importKeyword )  +  separatedList( self.moduleImport(), True, False, False ) ).action( lambda input, pos, xs: Nodes.ImportStmt( modules=xs[1] ) )
+		return ( Keyword( importKeyword )  +  SeparatedList( self.moduleImport(), 1, -1, SeparatedList.TrailingSeparatorPolicy.NEVER ) ).action( lambda input, pos, xs: Nodes.ImportStmt( modules=xs[1] ) )
 
 
 	# ( <pythonIdentifier> 'as' <pythonIdentifier> )  |  <pythonIdentifier>
@@ -737,8 +742,8 @@ class Python25Grammar (Grammar):
 	def fromImport(self):
 		return ( Keyword( fromKeyword ) + self.relativeModule() + Keyword( importKeyword ) + \
 			 (  \
-				 separatedList( self.moduleContentImport(), True, False, False )  |  \
-				 ( Literal( '(' )  +  separatedList( self.moduleContentImport(), True, True, False )  +  Literal( ')' ) ).action( lambda input, pos, xs: xs[1] )  \
+				 SeparatedList( self.moduleContentImport(), 1, -1, SeparatedList.TrailingSeparatorPolicy.NEVER )  |  
+				 SeparatedList( self.moduleContentImport(), '(', ')', 1, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL )\
 				 )  \
 			 ).action( lambda input, pos, xs: Nodes.FromImportStmt( module=xs[1], imports=xs[3] ) )
 
@@ -764,7 +769,7 @@ class Python25Grammar (Grammar):
 
 	@Rule
 	def globalStmt(self):
-		return ( Keyword( globalKeyword )  +  separatedList( self.globalVar(), True, False, False ) ).action( lambda input, pos, xs: Nodes.GlobalStmt( vars=xs[1] ) )
+		return ( Keyword( globalKeyword )  +  SeparatedList( self.globalVar(), 1, -1, SeparatedList.TrailingSeparatorPolicy.NEVER ) ).action( lambda input, pos, xs: Nodes.GlobalStmt( vars=xs[1] ) )
 
 
 
@@ -870,21 +875,31 @@ class Python25Grammar (Grammar):
 	# Def statement
 	@Rule
 	def defStmt(self):
-		return ( Keyword( defKeyword )  +  self.pythonIdentifier()  +  '('  +  self.params()  +  ')'  +  ':' ).action( lambda input, pos, xs: Nodes.DefStmt( name=xs[1], params=xs[3], suite=[] ) )
+		return ( Keyword( defKeyword )  +  self.pythonIdentifier()  +  '('  +  self.params()  +  ')'  +  ':' ).action( lambda input, pos, xs: Nodes.DefStmt( name=xs[1], params=xs[3][0], paramsTrailingSeparator=xs[3][1], suite=[] ) )
 
 
 
 	# Decorator statement
 	@Rule
 	def decoStmt(self):
-		return ( Literal( '@' )  +  self.dottedPythonIdentifer()  +  Optional( Literal( '(' )  +  self.callArgs()  +  ')' ) ).action( lambda input, pos, xs: Nodes.DecoStmt( name=xs[1], args=( xs[2][1]   if xs[2] is not None   else   makeNullNode() ) ) )
+		def _action(input, pos, xs):
+			if xs[2] is not None:
+				args = xs[2][1][0]
+				trailingSeparator = xs[2][1][1]
+			else:
+				args = makeNullNode()
+				trailingSeparator = makeNullNode()
+			return Nodes.DecoStmt( name=xs[1], args=args, argsTrailingSeparator=trailingSeparator )
+				
+		return ( Literal( '@' )  +  self.dottedPythonIdentifer()  +  Optional( Literal( '(' )  +  self.callArgs()  +  ')' ) ).action( _action )
 
 
 
 	# Class statement
 	@Rule
 	def classStmt(self):
-		return ( Keyword( classKeyword )  +  self.pythonIdentifier()  +  Optional( Literal( '(' )  +  self.expressionList()  +  ')' )  +  ':' ).action( lambda input, pos, xs: Nodes.ClassStmt( name=xs[1], bases=( xs[2][1]   if xs[2] is not None   else   makeNullNode() ), suite=[] ) )
+		bases = SeparatedList( self.expression(), '(', ')', 1, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL )
+		return ( Keyword( classKeyword )  +  self.pythonIdentifier()  +  Optional( bases )  +  ':' ).action( lambda input, pos, xs: Nodes.ClassStmt( name=xs[1], bases=( xs[2]   if xs[2] is not None   else   makeNullNode() ), suite=[] ) )
 
 
 
@@ -955,22 +970,23 @@ class TestCase_Python25Parser (ParserTestCase):
 		self._matchTest( g.targetListOrTargetItem(), 'a', Nodes.SingleTarget( name='a' ) )
 		self._matchTest( g.targetListOrTargetItem(), '(a)', Nodes.SingleTarget( name='a', parens='1' ) )
 
-		self._matchTest( g.targetListOrTargetItem(), '(a,)', Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='a' ) ], parens='1' ) )
+		self._matchTest( g.targetListOrTargetItem(), '(a,)', Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='a' ) ], trailingSeparator='1', parens='1' ) )
 		self._matchTest( g.targetListOrTargetItem(), 'a,b', Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='a' ),  Nodes.SingleTarget( name='b' ) ] ) )
 		self._matchTest( g.targetListOrTargetItem(), '(a,b)', Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='a' ),  Nodes.SingleTarget( name='b' ) ], parens='1' ) )
-		self._matchTest( g.targetListOrTargetItem(), '(a,b,)', Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='a' ),  Nodes.SingleTarget( name='b' ) ], parens='1' ) )
+		self._matchTest( g.targetListOrTargetItem(), '(a,b,)', Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='a' ),  Nodes.SingleTarget( name='b' ) ], trailingSeparator='1', parens='1' ) )
 		self._matchTest( g.targetListOrTargetItem(), '(a,b),(c,d)', Nodes.TupleTarget( targets=[ Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='a' ), Nodes.SingleTarget( name='b' ) ], parens='1' ),
 											     Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='c' ), Nodes.SingleTarget( name='d' ) ], parens='1' ) ] ) )
 
 		self._matchFailTest( g.targetListOrTargetItem(), '(a,) (b,)' )
 
 		self._matchTest( g.targetListOrTargetItem(), '[a]', Nodes.ListTarget( targets=[ Nodes.SingleTarget( name='a' ) ] ) )
-		self._matchTest( g.targetListOrTargetItem(), '[a,]', Nodes.ListTarget( targets=[ Nodes.SingleTarget( name='a' ) ] ) )
+		self._matchTest( g.targetListOrTargetItem(), '[a,]', Nodes.ListTarget( targets=[ Nodes.SingleTarget( name='a' ) ], trailingSeparator='1' ) )
 		self._matchTest( g.targetListOrTargetItem(), '[a,b]', Nodes.ListTarget( targets=[ Nodes.SingleTarget( name='a' ),  Nodes.SingleTarget( name='b' ) ] ) )
-		self._matchTest( g.targetListOrTargetItem(), '[a,b,]', Nodes.ListTarget( targets=[ Nodes.SingleTarget( name='a' ),  Nodes.SingleTarget( name='b' ) ] ) )
-		self._matchTest( g.targetListOrTargetItem(), '[a],[b,]', Nodes.TupleTarget( targets=[ Nodes.ListTarget( targets=[ Nodes.SingleTarget( name='a' ) ] ), Nodes.ListTarget( targets=[ Nodes.SingleTarget( name='b' ) ] ) ] ) )
-		self._matchTest( g.targetListOrTargetItem(), '[(a,)],[(b,)]', Nodes.TupleTarget( targets=[ Nodes.ListTarget( targets=[ Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='a' ) ], parens='1' ) ] ),
-											       Nodes.ListTarget( targets=[ Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='b' ) ], parens='1' ) ] ) ] ) )
+		self._matchTest( g.targetListOrTargetItem(), '[a,b,]', Nodes.ListTarget( targets=[ Nodes.SingleTarget( name='a' ),  Nodes.SingleTarget( name='b' ) ], trailingSeparator='1' ) )
+		self._matchTest( g.targetListOrTargetItem(), '[a],[b,]', Nodes.TupleTarget( targets=[ Nodes.ListTarget( targets=[ Nodes.SingleTarget( name='a' ) ] ),
+												      Nodes.ListTarget( targets=[ Nodes.SingleTarget( name='b' ) ], trailingSeparator='1' ) ] ) )
+		self._matchTest( g.targetListOrTargetItem(), '[(a,)],[(b,)]', Nodes.TupleTarget( targets=[ Nodes.ListTarget( targets=[ Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='a' ) ], trailingSeparator='1', parens='1' ) ] ),
+											       Nodes.ListTarget( targets=[ Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='b' ) ], trailingSeparator='1', parens='1' ) ] ) ] ) )
 
 		self._matchTest( g.subscript(), 'a[x]', Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.Load( name='x' ) ) )
 		self._matchTest( g.attributeRef() | g.subscript(), 'a[x]', Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.Load( name='x' ) ) )
@@ -989,17 +1005,17 @@ class TestCase_Python25Parser (ParserTestCase):
 		self._matchTest( g.expression(), '()', Nodes.TupleLiteral( values=[] ) )
 		self._matchTest( g.expression(), '(())', Nodes.TupleLiteral( values=[], parens='1' ) )
 		self._matchTest( g.expression(), '(a)', Nodes.Load( name='a', parens='1' ) )
-		self._matchTest( g.expression(), '(a,)', Nodes.TupleLiteral( values=[ Nodes.Load( name='a' ) ] ) )
-		self._matchTest( g.expression(), '((a,))', Nodes.TupleLiteral( values=[ Nodes.Load( name='a' ) ], parens='1' ) )
+		self._matchTest( g.expression(), '(a,)', Nodes.TupleLiteral( values=[ Nodes.Load( name='a' ) ], trailingSeparator='1' ) )
+		self._matchTest( g.expression(), '((a,))', Nodes.TupleLiteral( values=[ Nodes.Load( name='a' ) ], trailingSeparator='1', parens='1' ) )
 		self._matchTest( g.expression(), '(a,b)', Nodes.TupleLiteral( values=[ Nodes.Load( name='a' ), Nodes.Load( name='b' ) ] ) )
-		self._matchTest( g.expression(), '(a,b,)', Nodes.TupleLiteral( values=[ Nodes.Load( name='a' ), Nodes.Load( name='b' ) ] ) )
+		self._matchTest( g.expression(), '(a,b,)', Nodes.TupleLiteral( values=[ Nodes.Load( name='a' ), Nodes.Load( name='b' ) ], trailingSeparator='1' ) )
 
 
 	def testListLiteral(self):
 		g = Python25Grammar()
 		self._matchTest( g.expression(), '[]', Nodes.ListLiteral( values=[] ) )
 		self._matchTest( g.expression(), '[a,b]', Nodes.ListLiteral( values=[ Nodes.Load( name='a' ), Nodes.Load( name='b' ) ] ) )
-		self._matchTest( g.expression(), '[a,b,]', Nodes.ListLiteral( values=[ Nodes.Load( name='a' ), Nodes.Load( name='b' ) ] ) )
+		self._matchTest( g.expression(), '[a,b,]', Nodes.ListLiteral( values=[ Nodes.Load( name='a' ), Nodes.Load( name='b' ) ], trailingSeparator='1' ) )
 
 
 	def testListComprehension(self):
@@ -1062,7 +1078,7 @@ class TestCase_Python25Parser (ParserTestCase):
 		self._matchTest( g.expression(), '{a:x,b:y}', Nodes.DictLiteral( values=[ Nodes.DictKeyValuePair( key=Nodes.Load( name='a' ), value=Nodes.Load( name='x' ) ),
 											  Nodes.DictKeyValuePair( key=Nodes.Load( name='b' ), value=Nodes.Load( name='y' ) ) ] ) )
 		self._matchTest( g.expression(), '{a:x,b:y,}', Nodes.DictLiteral( values=[ Nodes.DictKeyValuePair( key=Nodes.Load( name='a' ), value=Nodes.Load( name='x' ) ),
-											   Nodes.DictKeyValuePair( key=Nodes.Load( name='b' ), value=Nodes.Load( name='y' ) ) ] ) )
+											   Nodes.DictKeyValuePair( key=Nodes.Load( name='b' ), value=Nodes.Load( name='y' ) ) ], trailingSeparator='1' ) )
 
 
 	def testYieldAtom(self):
@@ -1105,7 +1121,7 @@ class TestCase_Python25Parser (ParserTestCase):
 		g = Python25Grammar()
 		self._matchTest( g.expression(), 'a()', Nodes.Call( target=Nodes.Load( name='a' ), args=[] ) )
 		self._matchTest( g.expression(), 'a(f)', Nodes.Call( target=Nodes.Load( name='a' ), args=[ Nodes.Load( name='f' ) ] ) )
-		self._matchTest( g.expression(), 'a(f,)', Nodes.Call( target=Nodes.Load( name='a' ), args=[ Nodes.Load( name='f' ) ] ) )
+		self._matchTest( g.expression(), 'a(f,)', Nodes.Call( target=Nodes.Load( name='a' ), args=[ Nodes.Load( name='f' ) ], argsTrailingSeparator='1' ) )
 		self._matchTest( g.expression(), 'a(f,g)', Nodes.Call( target=Nodes.Load( name='a' ), args=[ Nodes.Load( name='f' ), Nodes.Load( name='g' ) ] ) )
 		self._matchTest( g.expression(), 'a(f,g,m=a)', Nodes.Call( target=Nodes.Load( name='a' ), args=[ Nodes.Load( name='f' ), Nodes.Load( name='g' ), Nodes.CallKWArg( name='m', value=Nodes.Load( name='a' ) ) ] ) )
 		self._matchTest( g.expression(), 'a(f,g,m=a,n=b)', Nodes.Call( target=Nodes.Load( name='a' ), args=[ Nodes.Load( name='f' ), Nodes.Load( name='g' ), Nodes.CallKWArg( name='m', value=Nodes.Load( name='a' ) ), Nodes.CallKWArg( name='n', value=Nodes.Load( name='b' ) ) ] ) )
@@ -1173,20 +1189,20 @@ class TestCase_Python25Parser (ParserTestCase):
 		
 	def testParams(self):
 		g = Python25Grammar()
-		self._matchTest( g.params(), '', [] )
-		self._matchTest( g.params(), 'f', [ Nodes.SimpleParam( name='f' ) ] )
-		self._matchTest( g.params(), 'f,', [ Nodes.SimpleParam( name='f' ) ] )
-		self._matchTest( g.params(), 'f,g', [ Nodes.SimpleParam( name='f' ), Nodes.SimpleParam( name='g' ) ] )
-		self._matchTest( g.params(), 'f,g,m=a', [ Nodes.SimpleParam( name='f' ), Nodes.SimpleParam( name='g' ), Nodes.DefaultValueParam( name='m', defaultValue=Nodes.Load( name='a' ) ) ] )
-		self._matchTest( g.params(), 'f,g,m=a,n=b', [ Nodes.SimpleParam( name='f' ), Nodes.SimpleParam( name='g' ), Nodes.DefaultValueParam( name='m', defaultValue=Nodes.Load( name='a' ) ), Nodes.DefaultValueParam( name='n', defaultValue=Nodes.Load( name='b' ) ) ] )
-		self._matchTest( g.params(), 'f,g,m=a,n=b,*p', [ Nodes.SimpleParam( name='f' ), Nodes.SimpleParam( name='g' ), Nodes.DefaultValueParam( name='m', defaultValue=Nodes.Load( name='a' ) ), Nodes.DefaultValueParam( name='n', defaultValue=Nodes.Load( name='b' ) ), Nodes.ParamList( name='p' ) ] )
-		self._matchTest( g.params(), 'f,m=a,*p,**w', [ Nodes.SimpleParam( name='f' ), Nodes.DefaultValueParam( name='m', defaultValue=Nodes.Load( name='a' ) ), Nodes.ParamList( name='p' ), Nodes.KWParamList( name='w' ) ] )
-		self._matchTest( g.params(), 'f,m=a,*p', [ Nodes.SimpleParam( name='f' ), Nodes.DefaultValueParam( name='m', defaultValue=Nodes.Load( name='a' ) ), Nodes.ParamList( name='p' ) ] )
-		self._matchTest( g.params(), 'f,m=a,**w', [ Nodes.SimpleParam( name='f' ), Nodes.DefaultValueParam( name='m', defaultValue=Nodes.Load( name='a' ) ), Nodes.KWParamList( name='w' ) ] )
-		self._matchTest( g.params(), 'f,*p,**w', [ Nodes.SimpleParam( name='f' ), Nodes.ParamList( name='p' ), Nodes.KWParamList( name='w' ) ] )
-		self._matchTest( g.params(), 'm=a,*p,**w', [ Nodes.DefaultValueParam( name='m', defaultValue=Nodes.Load( name='a' ) ), Nodes.ParamList( name='p' ), Nodes.KWParamList( name='w' ) ] )
-		self._matchTest( g.params(), '*p,**w', [ Nodes.ParamList( name='p' ), Nodes.KWParamList( name='w' ) ] )
-		self._matchTest( g.params(), '**w', [ Nodes.KWParamList( name='w' ) ] )
+		self._matchTest( g.params(), '', [ [], makeNullNode() ] )
+		self._matchTest( g.params(), 'f', [ [ Nodes.SimpleParam( name='f' ) ], makeNullNode() ] )
+		self._matchTest( g.params(), 'f,', [ [ Nodes.SimpleParam( name='f' ) ], '1' ] )
+		self._matchTest( g.params(), 'f,g', [ [ Nodes.SimpleParam( name='f' ), Nodes.SimpleParam( name='g' ) ], makeNullNode() ] )
+		self._matchTest( g.params(), 'f,g,m=a', [ [ Nodes.SimpleParam( name='f' ), Nodes.SimpleParam( name='g' ), Nodes.DefaultValueParam( name='m', defaultValue=Nodes.Load( name='a' ) ) ], makeNullNode() ] )
+		self._matchTest( g.params(), 'f,g,m=a,n=b', [ [ Nodes.SimpleParam( name='f' ), Nodes.SimpleParam( name='g' ), Nodes.DefaultValueParam( name='m', defaultValue=Nodes.Load( name='a' ) ), Nodes.DefaultValueParam( name='n', defaultValue=Nodes.Load( name='b' ) ) ], makeNullNode() ] )
+		self._matchTest( g.params(), 'f,g,m=a,n=b,*p', [ [ Nodes.SimpleParam( name='f' ), Nodes.SimpleParam( name='g' ), Nodes.DefaultValueParam( name='m', defaultValue=Nodes.Load( name='a' ) ), Nodes.DefaultValueParam( name='n', defaultValue=Nodes.Load( name='b' ) ), Nodes.ParamList( name='p' ) ], makeNullNode() ] )
+		self._matchTest( g.params(), 'f,m=a,*p,**w', [ [ Nodes.SimpleParam( name='f' ), Nodes.DefaultValueParam( name='m', defaultValue=Nodes.Load( name='a' ) ), Nodes.ParamList( name='p' ), Nodes.KWParamList( name='w' ) ], makeNullNode() ] )
+		self._matchTest( g.params(), 'f,m=a,*p', [ [ Nodes.SimpleParam( name='f' ), Nodes.DefaultValueParam( name='m', defaultValue=Nodes.Load( name='a' ) ), Nodes.ParamList( name='p' ) ], makeNullNode() ] )
+		self._matchTest( g.params(), 'f,m=a,**w', [ [ Nodes.SimpleParam( name='f' ), Nodes.DefaultValueParam( name='m', defaultValue=Nodes.Load( name='a' ) ), Nodes.KWParamList( name='w' ) ], makeNullNode() ] )
+		self._matchTest( g.params(), 'f,*p,**w', [ [ Nodes.SimpleParam( name='f' ), Nodes.ParamList( name='p' ), Nodes.KWParamList( name='w' ) ], makeNullNode() ] )
+		self._matchTest( g.params(), 'm=a,*p,**w', [ [ Nodes.DefaultValueParam( name='m', defaultValue=Nodes.Load( name='a' ) ), Nodes.ParamList( name='p' ), Nodes.KWParamList( name='w' ) ], makeNullNode() ] )
+		self._matchTest( g.params(), '*p,**w', [ [ Nodes.ParamList( name='p' ), Nodes.KWParamList( name='w' ) ], makeNullNode() ] )
+		self._matchTest( g.params(), '**w', [ [ Nodes.KWParamList( name='w' ) ], makeNullNode() ] )
 		self._matchFailTest( g.params(), 'm=a,f' )
 		self._matchFailTest( g.params(), '*p,f' )
 		self._matchFailTest( g.params(), '**w,f' )
