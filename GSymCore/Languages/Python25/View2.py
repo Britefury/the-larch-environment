@@ -299,11 +299,12 @@ def expressionNodeEditor(ctx, node, contents, precedence, state):
 		return contents
 	elif mode == MODE_EDITEXPRESSION:
 		contents = _precedenceParen( ctx, node, contents, precedence, outerPrecedence )
-		segment = ctx.segment( python_paragraphStyle, python_segmentCaretStopFactory, contents )
-		return ctx.contentListener( segment, ParsedExpressionContentListener( ctx, node, parser, outerPrecedence ) )
+		#segment = ctx.segment( python_paragraphStyle, default_textStyle, True, True, contents )
+		#return ctx.contentListener( segment, ParsedExpressionContentListener( ctx, node, parser, outerPrecedence ) )
+		return ctx.contentListener( contents, ParsedExpressionContentListener( ctx, node, parser, outerPrecedence ) )
 	elif mode == MODE_EDITSTATEMENT:
 		contents = _precedenceParen( ctx, node, contents, precedence, outerPrecedence )
-		segment = ctx.segment( python_paragraphStyle, python_segmentCaretStopFactory, contents )
+		segment = ctx.segment( python_paragraphStyle, default_textStyle, True, True, contents )
 		return ctx.contentListener( segment, ParsedLineContentListener( ctx, node, parser ) )
 	else:
 		raise ValueError, 'invalid mode %d'  %  mode
@@ -315,7 +316,7 @@ def statementNodeEditor(ctx, node, contents, precedence, state):
 	if mode == MODE_EDITSTATEMENT:
 		#contents = addContentLineStops( ctx, contents, True )
 		contents = _precedenceParen( ctx, node, contents, precedence, outerPrecedence )
-		segment = ctx.segment( python_paragraphStyle, python_segmentCaretStopFactory, contents )
+		segment = ctx.segment( python_paragraphStyle, default_textStyle, True, True, contents )
 		return ctx.contentListener( segment, ParsedLineContentListener( ctx, node, parser ) )
 	else:
 		raise ValueError, 'invalid mode %d'  %  mode
@@ -324,7 +325,7 @@ def statementNodeEditor(ctx, node, contents, precedence, state):
 def compoundStatementEditor(ctx, node, headerContents, precedence, suite, state, statementParser, headerContainerFn=None):
 	outerPrecedence, parser, mode = state
 
-	headerSegment = ctx.segment( python_paragraphStyle, python_segmentCaretStopFactory, headerContents )
+	segment = ctx.segment( python_paragraphStyle, default_textStyle, True, True, headerContents )
 	headerParagraph = ctx.paragraph( python_paragraphStyle, [ headerSegment, ctx.whitespace( '\n' ) ] )
 	headerElement = ctx.contentListener( headerParagraph, ParsedLineContentListener( ctx, node, parser ) )
 	if headerContainerFn is not None:
@@ -774,7 +775,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		yView = ctx.viewEvalFn( y, None, python25ViewState( yPrec, self._parser.expression(), MODE_EDITEXPRESSION ) )
 		yElement = ctx.paragraph( python_paragraphStyle, [ ctx.text( punctuation_textStyle, '**' ), ctx.text( default_textStyle, ' ' ), yView ] )
 		return expressionNodeEditor( ctx, node,
-				   ctx.scriptRSuper( pow_scriptStyle, xView, yElement  ),
+				   ctx.scriptRSuper( pow_scriptStyle, xView, yElement ),
 				   PRECEDENCE_POW,
 				   state )
 
@@ -802,7 +803,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		xView = ctx.viewEvalFn( x, None, python25ViewState( xPrec, self._parser.expression(), MODE_EDITEXPRESSION ) )
 		yView = ctx.viewEvalFn( y, None, python25ViewState( yPrec, self._parser.expression(), MODE_EDITEXPRESSION ) )
 		return expressionNodeEditor( ctx, node,
-				   ctx.fraction( div_fractionStyle, xView, yView ),
+				   ctx.fraction( div_fractionStyle, xView, yView, '/' ),
 				   PRECEDENCE_MULDIVMOD,
 				   state )
 

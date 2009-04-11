@@ -74,9 +74,10 @@ public abstract class DPContentLeafEditableEntry extends DPContentLeafEditable
 			}
 			else
 			{
+				boolean bNonEntryContentCleared = false;
 				while ( !left.isEditableEntry() )
 				{
-					left.clearContent();
+					bNonEntryContentCleared |= left.clearContent();
 					left = left.getEditableContentLeafToLeft();
 					if ( left == null )
 					{
@@ -84,13 +85,16 @@ public abstract class DPContentLeafEditableEntry extends DPContentLeafEditable
 					}
 				}
 				left.moveMarkerToEnd( caret.getMarker() );
-				left.removeContentFromEnd( 1 );
+				if ( !bNonEntryContentCleared )
+				{
+					left.removeContentFromEnd( 1 );
+				}
 				return true;
 			}
 		}
 		else
 		{
-			removeContent( markerToLeft( caret.getMarker(), false, true ), 1 );
+			removeContent( caret.getMarker().getIndex() - 1, 1 );
 			return true;
 		}
 	}
@@ -106,9 +110,10 @@ public abstract class DPContentLeafEditableEntry extends DPContentLeafEditable
 			}
 			else
 			{
+				boolean bNonEntryContentCleared = false;
 				while ( !right.isEditableEntry() )
 				{
-					right.clearContent();
+					bNonEntryContentCleared |= right.clearContent();
 					right = right.getEditableContentLeafToRight();
 					if ( right == null )
 					{
@@ -116,7 +121,10 @@ public abstract class DPContentLeafEditableEntry extends DPContentLeafEditable
 					}
 				}
 				right.moveMarkerToStart( caret.getMarker() );
-				right.removeContentFromStart( 1 );
+				if ( !bNonEntryContentCleared )
+				{
+					right.removeContentFromStart( 1 );
+				}
 				return true;
 			}
 		}

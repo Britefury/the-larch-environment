@@ -66,30 +66,28 @@ public class EditableLeafElement extends LeafElement
 		contentChanged();
 	}
 
-	public void removeContent(Marker m, int length)
+	public void removeContent(int index, int length)
 	{
-		int index = m.getIndex();
+		length = Math.min( length, getContentLength() - index );
 		content = content.substring( 0, index ) + content.substring( index + length );
 		getWidget().markerRemove( index, length );
 		contentChanged();
 	}
 	
+	public void removeContent(Marker m, int length)
+	{
+		removeContent( m.getIndex(), length );
+	}
+	
 	public void removeContentFromStart(int length)
 	{
-		length = Math.min( length, getContentLength() );
-		int end = getContentLength();
-		content = content.substring( length, end );
-		getWidget().markerRemove( 0, length );
-		contentChanged();
+		removeContent( 0, length );
 	}
 	
 	public void removeContentFromEnd(int length)
 	{
 		length = Math.min( length, getContentLength() );
-		int index = getContentLength() - length;
-		content = content.substring( 0, index );
-		getWidget().markerRemove( index, length );
-		contentChanged();
+		removeContent( getContentLength() - length, length );
 	}
 	
 	public void replaceContent(Marker m, int length, String x)
@@ -108,7 +106,7 @@ public class EditableLeafElement extends LeafElement
 		contentChanged();
 	}
 	
-	public void clearContent()
+	public boolean clearContent()
 	{
 		int length = content.length();
 		if ( length > 0 )
@@ -116,6 +114,11 @@ public class EditableLeafElement extends LeafElement
 			content = "";
 			getWidget().markerRemove( 0, length );
 			contentChanged();
+			return true;
+		}
+		else
+		{
+			return false;
 		}
 	}
 }

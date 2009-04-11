@@ -15,70 +15,43 @@ import javax.swing.JFrame;
 
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.ElementTree.Element;
-import BritefuryJ.DocPresent.ElementTree.FractionElement;
 import BritefuryJ.DocPresent.ElementTree.ParagraphElement;
-import BritefuryJ.DocPresent.ElementTree.ScriptElement;
 import BritefuryJ.DocPresent.ElementTree.SegmentElement;
 import BritefuryJ.DocPresent.ElementTree.TextElement;
 import BritefuryJ.DocPresent.ElementTree.VBoxElement;
-import BritefuryJ.DocPresent.ElementTree.WhitespaceElement;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
 public class SegmentElementTest extends ElementTreeTestBase
 {
-	protected Element text(String text)
-	{
-		TextStyleSheet s0 = new TextStyleSheet();
-		return new TextElement( s0, text );
-	}
-	
-	
-	protected Element segment(Element x)
-	{
-		SegmentElement e = new SegmentElement( SegmentElement.defaultStopFactory );
-		e.setChild( x );
-		return e;
-	}
+	private static Font defaultFont = new Font( "Sans serif", Font.PLAIN, 14 );
 
 	
 	
-	protected Element line(Element x)
+	protected Element text(String t, Color colour)
+	{
+		TextStyleSheet s0 = new TextStyleSheet( defaultFont, colour );
+		return new TextElement( s0, t );
+	}
+	
+	protected Element text(String t)
+	{
+		return text( t, Color.black );
+	}
+	
+	
+	protected Element segment(Element x, boolean bGuardBegin, boolean bGuardEnd)
+	{
+		SegmentElement e = new SegmentElement( bGuardBegin, bGuardEnd );
+		e.setChild( x );
+		return e;
+	}
+	
+	
+	protected Element line(Element... x)
 	{
 		ParagraphElement para = new ParagraphElement();
-		Element[] children = { segment( x ), new WhitespaceElement( "\n" ) };
-		para.setChildren( Arrays.asList( children ) );
-		return para;
-	}
-	
-	
-	protected Element pow(Element x, Element y)
-	{
-		ScriptElement script = new ScriptElement();
-		
-		script.setMainChild( segment( x ) );
-		script.setRightSuperscriptChild( segment( y ) );
-		return script;
-	}
-	
-	
-	protected Element div(Element x, Element y)
-	{
-		FractionElement frac = new FractionElement();
-		
-		frac.setNumeratorChild( segment( x ) );
-		frac.setDenominatorChild( segment( y ) );
-		return frac;
-	}
-	
-	
-	
-	protected Element bin(Element x, String op, Element y)
-	{
-		TextStyleSheet opss = new TextStyleSheet( new Font( "Sans serif", Font.BOLD, 12 ), new Color( 0.0f, 0.5f, 0.0f ) );
-		ParagraphElement para = new ParagraphElement();
-		Element[] children = { x, new TextElement( opss, " " + op + " " ), y };
-		para.setChildren( Arrays.asList( children ) );
+		para.setChildren( Arrays.asList( x ) );
 		return para;
 	}
 	
@@ -89,11 +62,16 @@ public class SegmentElementTest extends ElementTreeTestBase
 		VBoxElement box = new VBoxElement( boxs );
 		ArrayList<Element> children = new ArrayList<Element>();
 		
-		children.add( line( text( "seg" ) ) );
-		children.add( line( bin( text( "a" ), "+", text( "b" ) ) ) );
-		children.add( line( pow( text( "a" ), text( "b" ) ) ) );
-		children.add( line( div( text( "a" ), text( "b" ) ) ) );
-		children.add( line( div( text( "a" ), bin( text( "x" ), "+", pow( text( "p" ), text( "q" ) ) ) ) ) );
+		
+		
+		children.add( line( text( "Bars (|) indicate segment boundaries" ) ) );
+		children.add( line( text( "One segment in middle of text |" ), segment( text( "no guards", Color.red ), false, false ), text( "| finish." ) ) );
+		children.add( line( text( "One segment in middle of text |" ), segment( text( "begin guard", Color.red ), true, false ), text( "| finish." ) ) );
+		children.add( line( text( "One segment in middle of text |" ), segment( text( "end guard", Color.red ), false, true ), text( "| finish." ) ) );
+		children.add( line( text( "One segment in middle of text |" ), segment( text( "begin & end guard", Color.red ), true, true ), text( "| finish." ) ) );
+		children.add( line( text( "Nested segment in middle outer seg |" ), segment( line( text( "....", Color.red ), segment( text( "both guards", Color.blue ), true, true ), text( "....", Color.red ) ), true, true ), text( "| finish." ) ) );
+		children.add( line( text( "Nested segment at beginning outer seg |" ), segment( line( segment( text( "both guards", Color.blue ), true, true ), text( "....", Color.red ) ), true, true ), text( "| finish." ) ) );
+		children.add( line( text( "Nested segment at end outer seg |" ), segment( line( text( "....", Color.red ), segment( text( "both guards", Color.blue ), true, true ) ), true, true ), text( "| finish." ) ) );
 		
 		box.setChildren( children );
 		

@@ -1198,11 +1198,11 @@ public class DPPresentationArea extends DPBin implements CaretListener
 				DPContentLeaf leaf = caret.getMarker().getWidget();
 				if ( event.getKeyCode() == KeyEvent.VK_LEFT )
 				{
-					leaf.moveMarkerLeft( caret.getMarker(), false, true );
+					leaf.moveMarkerLeft( caret.getMarker(), true );
 				}
 				else if ( event.getKeyCode() == KeyEvent.VK_RIGHT )
 				{
-					leaf.moveMarkerRight( caret.getMarker(), false, true );
+					leaf.moveMarkerRight( caret.getMarker(), true );
 				}
 				else if ( event.getKeyCode() == KeyEvent.VK_UP )
 				{
