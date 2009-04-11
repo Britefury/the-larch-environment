@@ -33,7 +33,7 @@ import GSymCore.Languages.Python25.NodeClasses as Nodes
 #
 # Octal integers not handled correctly
 #
-#
+# from-import statements are parsed, but information on whether the imports were wrapped in parens, or had a trailing separator, is not obtained
 #
 
 
@@ -898,8 +898,16 @@ class Python25Grammar (Grammar):
 	# Class statement
 	@Rule
 	def classStmt(self):
-		bases = SeparatedList( self.expression(), '(', ')', 1, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL )
-		return ( Keyword( classKeyword )  +  self.pythonIdentifier()  +  Optional( bases )  +  ':' ).action( lambda input, pos, xs: Nodes.ClassStmt( name=xs[1], bases=( xs[2]   if xs[2] is not None   else   makeNullNode() ), suite=[] ) )
+		bases = SeparatedList( self.expression(), '(', ')', 1, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).listAction( lambda input, pos, xs, bTrailingSep: [ xs, '1'   if bTrailingSep   else makeNullNode() ] )
+		def _action(input, pos, xs):
+			if xs[2] is not None:
+				bases = xs[2][0]
+				trailingSep = xs[2][1]
+			else:
+				bases = makeNullNode()
+				trailingSep = makeNullNode()
+			return Nodes.ClassStmt( name=xs[1], bases=bases, basesTrailingSeparator=trailingSep, suite=[] )
+		return ( Keyword( classKeyword )  +  self.pythonIdentifier()  +  Optional( bases )  +  ':' ).action( _action )
 
 
 
@@ -1433,6 +1441,7 @@ class TestCase_Python25Parser (ParserTestCase):
 		g = Python25Grammar()
 		self._matchTest( g.classStmt(), 'class Q:', Nodes.ClassStmt( name='Q', bases=makeNullNode(), suite=[] ) )
 		self._matchTest( g.classStmt(), 'class Q (x):', Nodes.ClassStmt( name='Q', bases=[ Nodes.Load( name='x' ) ], suite=[] ) )
+		self._matchTest( g.classStmt(), 'class Q (x,):', Nodes.ClassStmt( name='Q', bases=[ Nodes.Load( name='x' ) ], basesTrailingSeparator='1', suite=[] ) )
 		self._matchTest( g.classStmt(), 'class Q (x,y):', Nodes.ClassStmt( name='Q', bases=[ Nodes.Load( name='x' ), Nodes.Load( name='y' ) ], suite=[] ) )
 
 
