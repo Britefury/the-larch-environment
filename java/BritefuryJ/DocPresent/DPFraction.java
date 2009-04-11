@@ -25,6 +25,10 @@ import BritefuryJ.Math.Point2;
 
 public class DPFraction extends DPContainer
 {
+	private static double childScale = 0.9;
+
+	
+	
 	public static class DPFractionBar extends DPContentLeafEditableEntry
 	{
 		public DPFractionBar()
@@ -189,6 +193,10 @@ public class DPFraction extends DPContainer
 			{
 				ChildEntry entry = new ChildEntry( child );
 				registerChildEntry( entry );
+				if ( slot != BAR )
+				{
+					child.setScale( childScale, rootScale * childScale );
+				}
 				
 				int insertIndex = 0;
 				for (int i = 0; i < slot; i++)

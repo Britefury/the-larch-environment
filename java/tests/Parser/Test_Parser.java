@@ -30,10 +30,14 @@ import BritefuryJ.Parser.PeekNot;
 import BritefuryJ.Parser.Production;
 import BritefuryJ.Parser.RegEx;
 import BritefuryJ.Parser.Repetition;
+import BritefuryJ.Parser.SeparatedList;
 import BritefuryJ.Parser.Sequence;
 import BritefuryJ.Parser.Suppress;
 import BritefuryJ.Parser.Word;
 import BritefuryJ.Parser.ZeroOrMore;
+import BritefuryJ.Parser.SeparatedList.CannotApplyConditionAfterActionException;
+import BritefuryJ.Parser.SeparatedList.CannotApplyMoreThanOneActionException;
+import BritefuryJ.Parser.SeparatedList.CannotApplyMoreThanOneConditionException;
 
 public class Test_Parser extends ParserTestCase
 {
@@ -495,6 +499,269 @@ public class Test_Parser extends ParserTestCase
 		matchFailTest( parser, "ababcd" );
 		matchTest( parser, "ab", arrayToList2D( result1 ) );
 		matchTest( parser, "abab", arrayToList2D( result2 ) );
+	}
+	
+	
+	public void testSeparatedList() throws ParserExpression.ParserCoerceException, CannotApplyMoreThanOneConditionException, CannotApplyConditionAfterActionException, CannotApplyMoreThanOneActionException
+	{
+		assertTrue( new SeparatedList( identifier, new Literal( "," ), new Literal( "[" ), new Literal( "]" ), 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).compareTo(
+				new SeparatedList( identifier, new Literal( "," ), new Literal( "[" ), new Literal( "]" ), 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ) ) );
+		assertFalse( new SeparatedList( identifier, new Literal( "," ), new Literal( "[" ), new Literal( "]" ), 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).compareTo(
+				new SeparatedList( new Literal( "a" ), new Literal( "," ), new Literal( "[" ), new Literal( "]" ), 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ) ) );
+		assertFalse( new SeparatedList( identifier, new Literal( "," ), new Literal( "[" ), new Literal( "]" ), 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).compareTo(
+				new SeparatedList( identifier, new Literal( "." ), new Literal( "[" ), new Literal( "]" ), 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ) ) );
+		assertFalse( new SeparatedList( identifier, new Literal( "," ), new Literal( "[" ), new Literal( "]" ), 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).compareTo(
+				new SeparatedList( identifier, new Literal( "," ), new Literal( "{" ), new Literal( "]" ), 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ) ) );
+		assertFalse( new SeparatedList( identifier, new Literal( "," ), new Literal( "[" ), new Literal( "]" ), 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).compareTo(
+				new SeparatedList( identifier, new Literal( "," ), null, new Literal( "]" ), 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ) ) );
+		assertFalse( new SeparatedList( identifier, new Literal( "," ), new Literal( "[" ), new Literal( "]" ), 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).compareTo(
+				new SeparatedList( identifier, new Literal( "," ), new Literal( "[" ), new Literal( "}" ), 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ) ) );
+		assertFalse( new SeparatedList( identifier, new Literal( "," ), new Literal( "[" ), new Literal( "]" ), 1, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).compareTo(
+				new SeparatedList( identifier, new Literal( "," ), new Literal( "[" ), null, 1, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ) ) );
+		assertFalse( new SeparatedList( identifier, new Literal( "," ), new Literal( "[" ), new Literal( "]" ), 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).compareTo(
+				new SeparatedList( identifier, new Literal( "," ), new Literal( "[" ), new Literal( "]" ), 1, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ) ) );
+		assertFalse( new SeparatedList( identifier, new Literal( "," ), new Literal( "[" ), new Literal( "]" ), 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).compareTo(
+				new SeparatedList( identifier, new Literal( "," ), new Literal( "[" ), new Literal( "]" ), 0, 10, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ) ) );
+		assertFalse( new SeparatedList( identifier, new Literal( "," ), new Literal( "[" ), new Literal( "]" ), 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).compareTo(
+				new SeparatedList( identifier, new Literal( "," ), new Literal( "[" ), new Literal( "]" ), 0, -1, SeparatedList.TrailingSeparatorPolicy.NEVER ) ) );
+		
+		assertTrue( new SeparatedList( identifier, new Literal( "," ), new Literal( "[" ), new Literal( "]" ), 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).compareTo(
+				new SeparatedList( identifier, new Literal( "[" ), new Literal( "]" ), 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ) ) );
+		assertTrue( new SeparatedList( identifier, new Literal( "," ), null, null, 1, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).compareTo(
+				new SeparatedList( identifier, new Literal( "," ), 1, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ) ) );
+		assertTrue( new SeparatedList( identifier, new Literal( "," ), null, null, 1, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).compareTo(
+				new SeparatedList( identifier, 1, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ) ) );
+		assertTrue( new SeparatedList( new Literal( "a" ), new Literal( "," ), new Literal( "[" ), new Literal( "]" ), 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).compareTo(
+				new SeparatedList( "a", ",", "[", "]", 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ) ) );
+
+		
+		SeparatedList.ListCondition condition = new SeparatedList.ListCondition()
+		{
+			public boolean test(String input, int begin, List<Object> elements, boolean gotTrailingSeparator)
+			{
+				return elements.size() % 2  ==  0;
+			}
+		};
+		
+		SeparatedList.ListAction action = new SeparatedList.ListAction()
+		{
+			public Object invoke(String input, int begin, List<Object> elements, boolean gotTrailingSeparator)
+			{
+				if ( gotTrailingSeparator )
+				{
+					ArrayList<Object> values = new ArrayList<Object>();
+					values.addAll( elements );
+					values.add( "sep" );
+					return values;
+				}
+				else
+				{
+					return elements;
+				}
+			}
+		};
+		
+		ParserExpression parser0N = new SeparatedList( identifier, ",", 0, -1, SeparatedList.TrailingSeparatorPolicy.NEVER );
+		ParserExpression parser1N = new SeparatedList( identifier, ",", 1, -1, SeparatedList.TrailingSeparatorPolicy.NEVER );
+		ParserExpression parser2N = new SeparatedList( identifier, ",", 2, -1, SeparatedList.TrailingSeparatorPolicy.NEVER );
+		ParserExpression parser23N = new SeparatedList( identifier, ",", 2, 3, SeparatedList.TrailingSeparatorPolicy.NEVER );
+		ParserExpression parserDN = new SeparatedList( identifier, ",", "[", "]", 0, -1, SeparatedList.TrailingSeparatorPolicy.NEVER );
+		ParserExpression parser0O = new SeparatedList( identifier, ",", 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL );
+		ParserExpression parser1O = new SeparatedList( identifier, ",", 1, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL );
+		ParserExpression parser2O = new SeparatedList( identifier, ",", 2, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL );
+		ParserExpression parser23O = new SeparatedList( identifier, ",", 2, 3, SeparatedList.TrailingSeparatorPolicy.OPTIONAL );
+		ParserExpression parserDO = new SeparatedList( identifier, ",", "[", "]", 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL );
+		ParserExpression parser0R = new SeparatedList( identifier, ",", 0, -1, SeparatedList.TrailingSeparatorPolicy.REQUIRED );
+		ParserExpression parser1R = new SeparatedList( identifier, ",", 1, -1, SeparatedList.TrailingSeparatorPolicy.REQUIRED );
+		ParserExpression parser2R = new SeparatedList( identifier, ",", 2, -1, SeparatedList.TrailingSeparatorPolicy.REQUIRED );
+		ParserExpression parser23R = new SeparatedList( identifier, ",", 2, 3, SeparatedList.TrailingSeparatorPolicy.REQUIRED );
+		ParserExpression parserDR = new SeparatedList( identifier, ",", "[", "]", 0, -1, SeparatedList.TrailingSeparatorPolicy.REQUIRED );
+
+		ParserExpression parserDOC = new SeparatedList( identifier, ",", "[", "]", 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).listCondition( condition );
+		ParserExpression parserDOA = new SeparatedList( identifier, ",", "[", "]", 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).listAction( action );
+		ParserExpression parserDOCA = new SeparatedList( identifier, ",", "[", "]", 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).listCondition( condition ).listAction( action );
+
+		
+		
+		matchTestSX( parser0N, "", "[]" );
+		matchIncompleteTest( parser0N, "," );
+		matchTestSX( parser0N, "ab", "[ab]" );
+		matchIncompleteTest( parser0N, "ab," );
+		matchTestSX( parser0N, "ab,cd", "[ab cd]" );
+		matchIncompleteTest( parser0N, "ab,cd," );
+		matchTestSX( parser0N, "ab,cd,ef", "[ab cd ef]" );
+		matchIncompleteTest( parser0N, "ab,cd,ef," );
+		
+		matchFailTest( parser1N, "" );
+		matchFailTest( parser1N, "," );
+		matchTestSX( parser1N, "ab", "[ab]" );
+		matchIncompleteTest( parser1N, "ab," );
+		matchTestSX( parser1N, "ab,cd", "[ab cd]" );
+		matchIncompleteTest( parser1N, "ab,cd," );
+		matchTestSX( parser1N, "ab,cd,ef", "[ab cd ef]" );
+		matchIncompleteTest( parser1N, "ab,cd,ef," );
+		
+		matchFailTest( parser2N, "" );
+		matchFailTest( parser2N, "," );
+		matchFailTest( parser2N, "ab" );
+		matchFailTest( parser2N, "ab," );
+		matchTestSX( parser2N, "ab,cd", "[ab cd]" );
+		matchIncompleteTest( parser2N, "ab,cd," );
+		matchTestSX( parser2N, "ab,cd,ef", "[ab cd ef]" );
+		matchIncompleteTest( parser2N, "ab,cd,ef," );
+
+		matchFailTest( parser23N, "" );
+		matchFailTest( parser23N, "," );
+		matchFailTest( parser23N, "ab" );
+		matchFailTest( parser23N, "ab," );
+		matchTestSX( parser23N, "ab,cd", "[ab cd]" );
+		matchIncompleteTest( parser23N, "ab,cd," );
+		matchTestSX( parser23N, "ab,cd,ef", "[ab cd ef]" );
+		matchIncompleteTest( parser23N, "ab,cd,ef," );
+		matchIncompleteTest( parser23N, "ab,cd,ef,gh" );
+		matchIncompleteTest( parser23N, "ab,cd,ef,gh," );
+
+		matchTestSX( parserDN, "[]", "[]" );
+		matchFailTest( parserDN, "[,]" );
+		matchTestSX( parserDN, "[ab]", "[ab]" );
+		matchFailTest( parserDN, "[ab,]" );
+		matchTestSX( parserDN, "[ab,cd]", "[ab cd]" );
+		matchFailTest( parserDN, "[ab,cd,]" );
+		matchTestSX( parserDN, "[ab,cd,ef]", "[ab cd ef]" );
+		matchFailTest( parserDN, "[ab,cd,ef,]" );
+		
+
+		
+		matchTestSX( parser0O, "", "[]" );
+		matchIncompleteTest( parser0O, "," );
+		matchTestSX( parser0O, "ab", "[ab]" );
+		matchTestSX( parser0O, "ab,", "[ab]" );
+		matchTestSX( parser0O, "ab,cd", "[ab cd]" );
+		matchTestSX( parser0O, "ab,cd,", "[ab cd]" );
+		matchTestSX( parser0O, "ab,cd,ef", "[ab cd ef]" );
+		matchTestSX( parser0O, "ab,cd,ef,", "[ab cd ef]" );
+		
+		matchFailTest( parser1O, "" );
+		matchFailTest( parser1O, "," );
+		matchTestSX( parser1O, "ab", "[ab]" );
+		matchTestSX( parser1O, "ab,", "[ab]" );
+		matchTestSX( parser1O, "ab,cd", "[ab cd]" );
+		matchTestSX( parser1O, "ab,cd,", "[ab cd]" );
+		matchTestSX( parser1O, "ab,cd,ef", "[ab cd ef]" );
+		matchTestSX( parser1O, "ab,cd,ef,", "[ab cd ef]" );
+		
+		matchFailTest( parser2O, "" );
+		matchFailTest( parser2O, "," );
+		matchFailTest( parser2O, "ab" );
+		matchFailTest( parser2O, "ab," );
+		matchTestSX( parser2O, "ab,cd", "[ab cd]" );
+		matchTestSX( parser2O, "ab,cd,", "[ab cd]" );
+		matchTestSX( parser2O, "ab,cd,ef", "[ab cd ef]" );
+		matchTestSX( parser2O, "ab,cd,ef,", "[ab cd ef]" );
+	
+		matchFailTest( parser23O, "" );
+		matchFailTest( parser23O, "," );
+		matchFailTest( parser23O, "ab" );
+		matchFailTest( parser23O, "ab," );
+		matchTestSX( parser23O, "ab,cd", "[ab cd]" );
+		matchTestSX( parser23O, "ab,cd,", "[ab cd]" );
+		matchTestSX( parser23O, "ab,cd,ef", "[ab cd ef]" );
+		matchTestSX( parser23O, "ab,cd,ef,", "[ab cd ef]" );
+		matchIncompleteTest( parser23O, "ab,cd,ef,gh" );
+		matchIncompleteTest( parser23O, "ab,cd,ef,gh," );
+	
+		matchTestSX( parserDO, "[]", "[]" );
+		matchFailTest( parserDO, "[,]" );
+		matchTestSX( parserDO, "[ab]", "[ab]" );
+		matchTestSX( parserDO, "[ab,]", "[ab]" );
+		matchTestSX( parserDO, "[ab,cd]", "[ab cd]" );
+		matchTestSX( parserDO, "[ab,cd,]", "[ab cd]" );
+		matchTestSX( parserDO, "[ab,cd,ef]", "[ab cd ef]" );
+		matchTestSX( parserDO, "[ab,cd,ef,]", "[ab cd ef]" );
+		
+
+		
+		matchTestSX( parser0R, "", "[]" );
+		matchIncompleteTest( parser0R, "," );
+		matchIncompleteTest( parser0R, "ab" );
+		matchTestSX( parser0R, "ab,", "[ab]" );
+		matchIncompleteTest( parser0R, "ab,cd" );
+		matchTestSX( parser0R, "ab,cd,", "[ab cd]" );
+		matchIncompleteTest( parser0R, "ab,cd,ef" );
+		matchTestSX( parser0R, "ab,cd,ef,", "[ab cd ef]" );
+		
+		matchFailTest( parser1R, "" );
+		matchFailTest( parser1R, "," );
+		matchFailTest( parser1R, "ab" );
+		matchTestSX( parser1R, "ab,", "[ab]" );
+		matchIncompleteTest( parser1R, "ab,cd" );
+		matchTestSX( parser1R, "ab,cd,", "[ab cd]" );
+		matchIncompleteTest( parser1R, "ab,cd,ef" );
+		matchTestSX( parser1R, "ab,cd,ef,", "[ab cd ef]" );
+		
+		matchFailTest( parser2R, "" );
+		matchFailTest( parser2R, "," );
+		matchFailTest( parser2R, "ab" );
+		matchFailTest( parser2R, "ab," );
+		matchFailTest( parser2R, "ab,cd" );
+		matchTestSX( parser2R, "ab,cd,", "[ab cd]" );
+		matchIncompleteTest( parser2R, "ab,cd,ef" );
+		matchTestSX( parser2R, "ab,cd,ef,", "[ab cd ef]" );
+
+		matchFailTest( parser23R, "" );
+		matchFailTest( parser23R, "," );
+		matchFailTest( parser23R, "ab" );
+		matchFailTest( parser23R, "ab," );
+		matchFailTest( parser23R, "ab,cd" );
+		matchTestSX( parser23R, "ab,cd,", "[ab cd]" );
+		matchIncompleteTest( parser23R, "ab,cd,ef" );
+		matchTestSX( parser23R, "ab,cd,ef,", "[ab cd ef]" );
+		matchIncompleteTest( parser23O, "ab,cd,ef,gh" );
+		matchIncompleteTest( parser23O, "ab,cd,ef,gh," );
+		
+		matchTestSX( parserDR, "[]", "[]" );
+		matchFailTest( parserDR, "[,]" );
+		matchFailTest( parserDR, "[ab]" );
+		matchTestSX( parserDR, "[ab,]", "[ab]" );
+		matchFailTest( parserDR, "[ab,cd]");
+		matchTestSX( parserDR, "[ab,cd,]", "[ab cd]" );
+		matchFailTest( parserDR, "[ab,cd,ef]" );
+		matchTestSX( parserDR, "[ab,cd,ef,]", "[ab cd ef]" );
+
+	
+	
+		matchTestSX( parserDOC, "[]", "[]" );
+		matchFailTest( parserDOC, "[,]" );
+		matchFailTest( parserDOC, "[ab]" );
+		matchFailTest( parserDOC, "[ab,]" );
+		matchTestSX( parserDOC, "[ab,cd]", "[ab cd]" );
+		matchTestSX( parserDOC, "[ab,cd,]", "[ab cd]" );
+		matchFailTest( parserDOC, "[ab,cd,ef]" );
+		matchFailTest( parserDOC, "[ab,cd,ef,]" );
+		matchTestSX( parserDOC, "[ab,cd,ef,gh]", "[ab cd ef gh]" );
+		matchTestSX( parserDOC, "[ab,cd,ef,gh,]", "[ab cd ef gh]" );
+		
+		matchTestSX( parserDOA, "[]", "[]" );
+		matchFailTest( parserDOA, "[,]" );
+		matchTestSX( parserDOA, "[ab]", "[ab]" );
+		matchTestSX( parserDOA, "[ab,]", "[ab sep]" );
+		matchTestSX( parserDOA, "[ab,cd]", "[ab cd]" );
+		matchTestSX( parserDOA, "[ab,cd,]", "[ab cd sep]" );
+		matchTestSX( parserDOA, "[ab,cd,ef]", "[ab cd ef]" );
+		matchTestSX( parserDOA, "[ab,cd,ef,]", "[ab cd ef sep]" );
+		matchTestSX( parserDOA, "[ab,cd,ef,gh]", "[ab cd ef gh]" );
+		matchTestSX( parserDOA, "[ab,cd,ef,gh,]", "[ab cd ef gh sep]" );
+		
+		matchTestSX( parserDOCA, "[]", "[]" );
+		matchFailTest( parserDOCA, "[,]" );
+		matchFailTest( parserDOCA, "[ab]" );
+		matchFailTest( parserDOCA, "[ab,]" );
+		matchTestSX( parserDOCA, "[ab,cd]", "[ab cd]" );
+		matchTestSX( parserDOCA, "[ab,cd,]", "[ab cd sep]" );
+		matchFailTest( parserDOCA, "[ab,cd,ef]" );
+		matchFailTest( parserDOCA, "[ab,cd,ef,]" );
+		matchTestSX( parserDOCA, "[ab,cd,ef,gh]", "[ab cd ef gh]" );
+		matchTestSX( parserDOCA, "[ab,cd,ef,gh,]", "[ab cd ef gh sep]" );
 	}
 	
 	

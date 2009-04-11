@@ -48,8 +48,8 @@ ImaginaryLiteral = module.newClass( 'ImaginaryLiteral', Literal, [ 'value' ] )
 #
 Target = module.newClass( 'Target', Node, [ 'parens' ] )
 SingleTarget = module.newClass( 'SingleTarget', Target, [ 'name' ] )
-TupleTarget = module.newClass( 'TupleTarget', Target, [ 'targets' ] )
-ListTarget = module.newClass( 'ListTarget', Target, [ 'targets' ] )
+TupleTarget = module.newClass( 'TupleTarget', Target, [ 'targets', 'trailingSeparator' ] )
+ListTarget = module.newClass( 'ListTarget', Target, [ 'targets', 'trailingSeparator' ] )
 
 
 #
@@ -57,8 +57,8 @@ ListTarget = module.newClass( 'ListTarget', Target, [ 'targets' ] )
 #
 Load = module.newClass( 'Load', Expr, [ 'name' ] )
 # Tuple / list
-TupleLiteral = module.newClass( 'TupleLiteral', Expr, [ 'values' ] )
-ListLiteral = module.newClass( 'ListLiteral', Expr, [ 'values' ] )
+TupleLiteral = module.newClass( 'TupleLiteral', Expr, [ 'values', 'trailingSeparator' ] )
+ListLiteral = module.newClass( 'ListLiteral', Expr, [ 'values', 'trailingSeparator' ] )
 # List comprehension / generator expression
 ComprehensionFor = module.newClass( 'ComprehensionFor', Node, [ 'target', 'source' ] )
 ComprehensionIf = module.newClass( 'ComprehensionIf', Node, [ 'condition' ] )
@@ -66,7 +66,7 @@ ListComp = module.newClass( 'ListComp', Expr, [ 'resultExpr', 'comprehensionItem
 GeneratorExpr = module.newClass( 'GeneratorExpr', Expr, [ 'resultExpr', 'comprehensionItems' ] )
 # Dictionary
 DictKeyValuePair = module.newClass( 'DictKeyValuePair', Node, [ 'key', 'value' ] )
-DictLiteral = module.newClass( 'DictLiteral', Expr, [ 'values' ] )
+DictLiteral = module.newClass( 'DictLiteral', Expr, [ 'values', 'trailingSeparator' ] )
 # Yield
 YieldAtom = module.newClass( 'YieldAtom', Expr, [ 'value' ] )
 # Attribute reference
@@ -75,13 +75,13 @@ AttributeRef = module.newClass( 'AttributeRef', Expr, [ 'target', 'name' ] )
 SubscriptSlice = module.newClass( 'SubscriptSlice', Node, [ 'lower', 'upper' ] )
 SubscriptLongSlice = module.newClass( 'SubscriptLongSlice', Node, [ 'lower', 'upper', 'stride' ] )
 SubscriptEllipsis = module.newClass( 'SubscriptEllipsis', Node, [] )
-SubscriptTuple = module.newClass( 'SubscriptTuple', Node, [ 'values' ] )
+SubscriptTuple = module.newClass( 'SubscriptTuple', Node, [ 'values', 'trailingSeparator' ] )
 Subscript = module.newClass( 'Subscript', Expr, [ 'target', 'index' ] )
 # Call
 CallKWArg = module.newClass( 'CallKWArg', Node, [ 'name', 'value' ] )
 CallArgList = module.newClass( 'CallArgList', Node, [ 'value' ] )
 CallKWArgList = module.newClass( 'CallKWArgList', Node, [ 'value' ] )
-Call = module.newClass( 'Call', Expr, [ 'target', 'args' ] )
+Call = module.newClass( 'Call', Expr, [ 'target', 'args', 'argsTrailingSeparator' ] )
 # Mathematical / bitwise operators
 UnaryOp = module.newClass( 'UnaryOp', Expr, [ 'x' ] )
 BinOp = module.newClass( 'BinOp', Expr, [ 'x', 'y' ] )
@@ -122,7 +122,7 @@ DefaultValueParam = module.newClass( 'DefaultValueParam', Node, [ 'name', 'defau
 ParamList = module.newClass( 'ParamList', Node, [ 'name' ] )
 KWParamList = module.newClass( 'KWParamList', Node, [ 'name' ] )
 # Lambda
-LambdaExpr = module.newClass( 'LambdaExpr', Expr, [ 'params', 'expr' ] )
+LambdaExpr = module.newClass( 'LambdaExpr', Expr, [ 'params', 'expr', 'paramsTrailingSeparator' ] )
 # Conditional
 ConditionalExpr = module.newClass( 'ConditionalExpr', Expr, [ 'condition', 'expr', 'elseExpr' ] )
 
@@ -167,8 +167,8 @@ TryStmt = module.newClass( 'TryStmt', CompoundStmt, [] )
 ExceptStmt = module.newClass( 'ExceptStmt', CompoundStmt, [ 'exception', 'target' ] )
 FinallyStmt = module.newClass( 'FinallyStmt', CompoundStmt, [] )
 WithStmt = module.newClass( 'WithStmt', CompoundStmt, [ 'expr', 'target' ] )
-DefStmt = module.newClass( 'DefStmt', CompoundStmt, [ 'name', 'params' ] )
-DecoStmt = module.newClass( 'DecoStmt', CompoundStmt, [ 'name', 'args' ] )
+DefStmt = module.newClass( 'DefStmt', CompoundStmt, [ 'name', 'params', 'paramsTrailingSeparator' ] )
+DecoStmt = module.newClass( 'DecoStmt', CompoundStmt, [ 'name', 'args', 'argsTrailingSeparator' ] )
 ClassStmt = module.newClass( 'ClassStmt', CompoundStmt, [ 'name', 'bases' ] )
 
 

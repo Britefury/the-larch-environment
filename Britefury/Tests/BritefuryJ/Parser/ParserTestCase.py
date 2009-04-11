@@ -56,6 +56,7 @@ class ParserTestCase (unittest.TestCase):
 
 		bSame = value == expected
 		if not bSame:
+			print 'While parsing', input
 			print 'EXPECTED:'
 			print expected
 			print ''
@@ -90,6 +91,7 @@ class ParserTestCase (unittest.TestCase):
 
 		bSame = value == expected
 		if not bSame:
+			print 'While parsing', input
 			print 'EXPECTED:'
 			print expectedSX
 			print ''
@@ -102,6 +104,7 @@ class ParserTestCase (unittest.TestCase):
 		result = parser.parseString( input, ignoreChars )
 		
 		if result.isValid()   and   result.end == len( input ):
+			print 'While parsing', input
 			print 'EXPECTED:'
 			print '<fail>'
 			print ''
