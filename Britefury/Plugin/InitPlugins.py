@@ -10,8 +10,6 @@ import os
 from java.util import List
 from BritefuryJ.DocModel import DMIOReader
 
-from Britefury.DocModel.DMListInterface import DMListInterface
-
 from Britefury.gSym.gSymWorld import GSymWorld
 
 
