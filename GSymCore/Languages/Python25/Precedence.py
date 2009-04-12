@@ -380,7 +380,7 @@ class Test_Precedence (unittest.TestCase):
 			print expected
 		self.assert_( result.isValid() )
 		
-		value = removeUnNeededParens( result.value )
+		value = removeUnNeededParens( result.value, None )
 		
 		expected = DMNode.coerce( expected )
 

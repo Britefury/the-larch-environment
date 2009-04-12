@@ -108,8 +108,8 @@ class GrammarTestCase (ParserTestCase):
 		def ops(self):
 			opTable = OperatorTable( 
 				[
-					PrecedenceLevel( [ InfixLeft( Literal( '*' ),  'mul' ) ] ),
-					PrecedenceLevel( [ InfixLeft( Literal( '+' ),  'add' ) ] ),
+					PrecedenceLevel( [ InfixLeft( Literal( '*' ),  lambda input, pos, left, right: [ 'mul', left, right ] ) ] ),
+					PrecedenceLevel( [ InfixLeft( Literal( '+' ),  lambda input, pos, left, right: [ 'add', left, right ] ) ] ),
 				],  self.atom() )
 			
 			return opTable.buildParsers()
@@ -276,16 +276,14 @@ class GrammarTestCase (ParserTestCase):
 		self.assert_( isinstance( mul, Production ) )
 		self.assert_( mul.getSubExpression() is bf0 )
 
-		parser = g.expr()
-		
-		self._matchTest( parser, 'a', 'a' )
-		self._matchTest( parser, 'a*b', [ 'mul', 'a', 'b' ] )
-		self._matchTest( parser, 'a*b*c', [ 'mul', [ 'mul', 'a', 'b' ], 'c' ] )
-		self._matchTest( parser, 'a+b', [ 'add', 'a', 'b' ] )
-		self._matchTest( parser, 'a+b*c', [ 'add', 'a', [ 'mul', 'b', 'c' ] ] )
-		self._matchTest( parser, 'a*b+c', [ 'add', [ 'mul', 'a', 'b' ], 'c' ] )
-		self._matchTest( parser, '(a+b)*c', [ 'mul', [ 'add', 'a', 'b' ], 'c' ] )
-		self._matchTest( parser, 'a*(b+c)', [ 'mul', 'a', [ 'add', 'b', 'c' ] ] )
+		self._matchTest( g.expr(), 'a', 'a' )
+		self._matchTest( g.expr(), 'a*b', [ 'mul', 'a', 'b' ] )
+		self._matchTest( g.expr(), 'a*b*c', [ 'mul', [ 'mul', 'a', 'b' ], 'c' ] )
+		self._matchTest( g.expr(), 'a+b', [ 'add', 'a', 'b' ] )
+		self._matchTest( g.expr(), 'a+b*c', [ 'add', 'a', [ 'mul', 'b', 'c' ] ] )
+		self._matchTest( g.expr(), 'a*b+c', [ 'add', [ 'mul', 'a', 'b' ], 'c' ] )
+		self._matchTest( g.expr(), '(a+b)*c', [ 'mul', [ 'add', 'a', 'b' ], 'c' ] )
+		self._matchTest( g.expr(), 'a*(b+c)', [ 'mul', 'a', [ 'add', 'b', 'c' ] ] )
 
 		
 		

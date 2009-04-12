@@ -35,14 +35,15 @@ testModules = [ Britefury.Dispatch.Dispatch,
 		Britefury.Transformation.Transformation,
 		Britefury.Tests.BritefuryJ.Parser.Utils.Operators, Britefury.Tests.BritefuryJ.PatternMatch.Test_PatternMatcher,
 		Britefury.Tests.Britefury.Grammar.Grammar, Britefury.Tests.Britefury.Dispatch.TestObjectNodeMethodDispatch,
-		GSymCore.Languages.Python25.CodeGenerator,
+		#GSymCore.Languages.Python25.CodeGenerator,
 		GSymCore.Languages.Python25.CodeGenerator2,
 		GSymCore.Languages.Python25.Parser3,
 		GSymCore.Languages.Python25.Python25Importer2,
-		GSymCore.Languages.Python25.IdentityTransformation,
+		#GSymCore.Languages.Python25.IdentityTransformation,
 		GSymCore.Languages.Python25.Precedence,
-		GSymCore.Languages.Java.Parser,
-		GSymCore.Languages.LISP.Parser2 ]
+		#GSymCore.Languages.Java.Parser,
+		#GSymCore.Languages.LISP.Parser2 ]
+		]
 
 
 if __name__ == '__main__':
