@@ -18,14 +18,14 @@ from Britefury.gSym.gSymWorld import GSymWorld
 
 class TestCase_PatternMatcher (unittest.TestCase):
 	def test_lerpRefactor(self):
-		oneMinusT = MatchExpression.toMatchExpression( [ '-', '1.0', 't' << Anything() ] )
-		bTimesT = MatchExpression.toMatchExpression( [ '*', 'b' << Anything(), 't' << Anything() ] )
-		aTimesOneMinusT = MatchExpression.toMatchExpression( [ '*', 'a' << Anything(), oneMinusT ] )
+		oneMinusT = MatchExpression.toMatchExpression( [ '-', '1.0', Anything().bindTo( 't' ) ] )
+		bTimesT = MatchExpression.toMatchExpression( [ '*', Anything().bindTo( 'b' ), Anything().bindTo( 't' ) ] )
+		aTimesOneMinusT = MatchExpression.toMatchExpression( [ '*', Anything().bindTo( 'a' ), oneMinusT ] )
 		lerp = MatchExpression.toMatchExpression( [ '+', aTimesOneMinusT, bTimesT ] )
-		lerpRefactor = lerp.action( lambda input, begin, x, bindings: [ '+', bindings['a'], [ '*', [ '-', bindings['b'], bindings['a'] ], bindings['t'] ] ] )
+		lerpRefactor = lerp.action( lambda input, x, bindings: [ '+', bindings['a'], [ '*', [ '-', bindings['b'], bindings['a'] ], bindings['t'] ] ] )
 		
-		data = DMIOReader.readFromString( '(+ (* p (- 1.0 x)) (* q x))', GSymWorld.getInternalResolver() )
-		expected = DMIOReader.readFromString( '(+ p (* (- q p) x))', GSymWorld.getInternalResolver() )
+		data = DMIOReader.readFromString( '[+ [* p [- 1.0 x]] [* q x]]', GSymWorld.getInternalResolver() )
+		expected = DMIOReader.readFromString( '[+ p [* [- q p] x]]', GSymWorld.getInternalResolver() )
 		result = lerpRefactor.parseNode( data )
 		self.assert_( DMNode.coerce( result.getValue() )  ==  DMNode.coerce( expected ) )
 		
