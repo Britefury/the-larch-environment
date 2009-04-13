@@ -38,6 +38,9 @@ from Britefury.Dispatch.MethodDispatch import methodDispatch
 
 DIFF_THRESHOLD = 65536
 
+DIR_FORWARD = 0
+DIR_BACKWARD = 1
+
 
 
 class _NodeElementChangeListener (DVNode.NodeElementChangeListener):
@@ -179,34 +182,65 @@ class _NodeElementChangeListener (DVNode.NodeElementChangeListener):
 						#print 'Position was %d, now is %d; leaf (%s) offset is %d, moving to %d in leaf'  %  ( position, newPosition, leaf.getContent(), leafOffset, leafPosition )
 						leaf.moveMarker( caret.getMarker(), leafPosition, newBias )
 					else:
+						# The leaf is not editable. We must choose a nearby leaf to place the caret in
+						
 						segFilter = SegmentElement.SegmentFilter( leaf.getSegment() )
 						#elemFilter = LeafElement.LeafFilterEditable()
 						elemFilter = LeafElement.LeafFilterEditableEntry()
 						
-						if leafPosition < leaf.getContentLength()/2:
+						
+						# First, we must decide whether we should search backwards or forwards
+						direction = None
+						# If there is a newline character in the leaf, we should not cross over it
+						if '\n' in leaf.getContent():
+							leafIndex = newIndex - leafOffset
+							if '\n' in leaf.getContent()[leafIndex:]:
+								# Newline in content after the caret position; search backwards
+								direction = DIR_BACKWARD
+							elif '\n' in leaf.getContent()[:leafIndex]:
+								# Newline in ocntent before the caret position; search forwards
+								direction = DIR_FORWARD
+						
+						if direction is None:
+							# Decide which way to go by staying on the same side of the centre of the leaf
+							if float( leafPosition )  <  float( leaf.getContentLength() ) * 0.5:
+								direction = DIR_BACKWARD
+							else:
+								direction = DIR_FORWARD
+						
+						
+						if direction == DIR_BACKWARD:
+							# Search backwards
 							left = leaf.getPreviousLeaf( segFilter, None, elemFilter )
 							if left is not None:
 								#print left, "'" + left.getContent().replace( '\n', '\\n' ) + "'", left.getSegment() is leaf.getSegment()
 								left.moveMarkerToEnd( caret.getMarker() )
 							else:
+								# Searching backwards failed; search forwards
 								right = leaf.getNextLeaf( segFilter, None, elemFilter )
 								if right is not None:
 									#print right, "'" + right.getContent().replace( '\n', '\\n' ) + "'"
 									right.moveMarkerToStart( caret.getMarker() )
 								else:
+									# Searching backwards and forwards failed; place the cursor in the non-editable leaf and hope for the best
 									leaf.moveMarker( caret.getMarker(), leafPosition, newBias )
-						else:
+						elif direction == DIR_FORWARD:
+							# Search forwards
 							right = leaf.getNextLeaf( segFilter, None, elemFilter )
 							if right is not None:
 								#print right, "'" + right.getContent().replace( '\n', '\\n' ) + "'"
 								right.moveMarkerToStart( caret.getMarker() )
 							else:
+								# Searching forwards failed; search backwards
 								left = leaf.getPreviousLeaf( segFilter, None, elemFilter )
 								if left is not None:
 									#print left, "'" + left.getContent().replace( '\n', '\\n' ) + "'"
 									left.moveMarkerToEnd( caret.getMarker() )
 								else:
+									# Searching forwards and backwards failed; place the cursor in the non-editable leaf and hope for the best
 									leaf.moveMarker( caret.getMarker(), leafPosition, newBias )
+						else:
+							raise ValueError, 'invalid direction'
 
 		
 	def _getCursorPositionBiasAndContentString(self, node, element):
