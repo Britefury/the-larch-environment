@@ -137,6 +137,15 @@ public abstract class DPContentLeafEditableEntry extends DPContentLeafEditable
 	
 	protected boolean onKeyPress(Caret caret, KeyEvent event)
 	{
+		EditableEntryLeafElement entryElement = getElement();
+		if ( entryElement != null )
+		{
+			if ( entryElement.onKeyPress( event ) )
+			{
+				return true;
+			}
+		}
+		
 		if ( event.getKeyCode() == KeyEvent.VK_BACK_SPACE )
 		{
 			return handleBackspace( caret );
@@ -150,38 +159,41 @@ public abstract class DPContentLeafEditableEntry extends DPContentLeafEditable
 
 	protected boolean onKeyRelease(Caret caret, KeyEvent event)
 	{
+		EditableEntryLeafElement entryElement = getElement();
+		if ( entryElement != null )
+		{
+			if ( entryElement.onKeyRelease( event ) )
+			{
+				return true;
+			}
+		}
+		
 		return false;
 	}
 
 	protected boolean onKeyTyped(Caret caret, KeyEvent event)
 	{
+		EditableEntryLeafElement entryElement = getElement();
+		if ( entryElement != null )
+		{
+			if ( entryElement.onKeyTyped( event ) )
+			{
+				return true;
+			}
+		}
+		
 		if ( event.getKeyChar() != KeyEvent.VK_BACK_SPACE  &&  event.getKeyChar() != KeyEvent.VK_DELETE )
 		{
-			insertContent( caret.getMarker(), String.valueOf( event.getKeyChar() ) );
-			return true;
+			String str = String.valueOf( event.getKeyChar() );
+			if ( str.length() > 0 )
+			{
+				insertContent( caret.getMarker(), String.valueOf( event.getKeyChar() ) );
+				return true;
+			}
 		}
-		else
-		{
-			return false;
-		}
+
+		return false;
 	}
-	
-	
-	
-//	protected boolean onButtonDown(PointerButtonEvent event)
-//	{
-//		if ( event.getButton() == 1 )
-//		{
-//			Caret caret = presentationArea.getCaret();
-//			int markerPos = getMarkerPositonForPoint( event.getPointer().getLocalPos() );
-//			moveMarker( caret.getMarker(), markerPos, Marker.Bias.START );
-//			return true;
-//		}
-//		else
-//		{
-//			return false;
-//		}
-//	}
 	
 	
 	

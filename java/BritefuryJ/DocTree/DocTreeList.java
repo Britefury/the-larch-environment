@@ -17,7 +17,7 @@ import org.python.core.PySlice;
 import BritefuryJ.DocModel.DMListInterface;
 import BritefuryJ.JythonInterface.JythonSlice;
 
-public class DocTreeList implements DocTreeNode, DMListInterface
+public class DocTreeList extends DocTreeNode implements DMListInterface
 {
 	public class DocTreeListListIterator implements ListIterator<Object>
 	{
@@ -66,7 +66,7 @@ public class DocTreeList implements DocTreeNode, DMListInterface
 
 		public void add(Object x)
 		{
-			iter.add( x );
+			iter.add( DocTreeNode.coerce( x ) );
 		}
 
 		public void remove()
@@ -76,7 +76,7 @@ public class DocTreeList implements DocTreeNode, DMListInterface
 
 		public void set(Object x)
 		{
-			iter.set( x );
+			iter.set( DocTreeNode.coerce( x ) );
 		}
 	}
 	
@@ -117,22 +117,22 @@ public class DocTreeList implements DocTreeNode, DMListInterface
 
 	public boolean add(Object x)
 	{
-		return node.add( x );
+		return node.add( DocTreeNode.coerce( x ) );
 	}
 	
 	public void add(int index, Object x)
 	{
-		node.add( index, x );
+		node.add( index, DocTreeNode.coerce( x ) );
 	}
 	
 	public boolean addAll(Collection<? extends Object> xs)
 	{
-		return node.addAll( xs );
+		return node.addAll( DocTreeNode.coerceCollection( xs ) );
 	}
 	
 	public boolean addAll(int index, Collection<? extends Object> xs)
 	{
-		return node.addAll( index, xs );
+		return node.addAll( index, DocTreeNode.coerceCollection( xs ) );
 	}
 	
 
@@ -145,19 +145,19 @@ public class DocTreeList implements DocTreeNode, DMListInterface
 	
 	public boolean contains(Object x)
 	{
-		return node.contains( x );
+		return node.contains( DocTreeNode.coerce( x ) );
 	}
 	
 
-	public boolean containsAll(Collection<?> x)
+	public boolean containsAll(Collection<?> xs)
 	{
-		return node.containsAll( x );
+		return node.containsAll( DocTreeNode.coerceCollection( xs ) );
 	}
 	
 	
 	public boolean equals(Object xs)
 	{
-		return node.equals( xs );
+		return node.equals( DocTreeNode.coerce( xs ) );
 	}
 	
 	
@@ -169,12 +169,12 @@ public class DocTreeList implements DocTreeNode, DMListInterface
 	
 	public int indexOf(Object x)
 	{
-		return node.indexOf( x );
+		return node.indexOf( DocTreeNode.coerce( x ) );
 	}
 
 	public int indexOfById(Object x)
 	{
-		return node.indexOfById( x );
+		return node.indexOfById( DocTreeNode.coerce( x ) );
 	}
 
 	
@@ -192,7 +192,7 @@ public class DocTreeList implements DocTreeNode, DMListInterface
 	
 	public int lastIndexOf(Object x)
 	{
-		return node.lastIndexOf( x );
+		return node.lastIndexOf( DocTreeNode.coerce( x ) );
 	}
 
 	
@@ -213,22 +213,22 @@ public class DocTreeList implements DocTreeNode, DMListInterface
 	
 	public boolean remove(Object x)
 	{
-		return node.remove( x );
+		return node.remove( DocTreeNode.coerce( x ) );
 	}
 	
 	public boolean removeAll(Collection<?> x)
 	{
-		return node.removeAll( x );
+		return node.removeAll( DocTreeNode.coerceCollection( x ) );
 	}
 	
 	public boolean retainAll(Collection<?> x)
 	{
-		return node.retainAll( x );
+		return node.retainAll( DocTreeNode.coerceCollection( x ) );
 	}
 	
 	public Object set(int index, Object x)
 	{
-		return node.set( index, x );
+		return node.set( index, DocTreeNode.coerce( x ) );
 	}
 	
 	public int size()
@@ -263,17 +263,17 @@ public class DocTreeList implements DocTreeNode, DMListInterface
 	
 	public void append(Object x)
 	{
-		node.append( x );
+		node.append( DocTreeNode.coerce( x ) );
 	}
 	
 	public void extend(List<Object> xs)
 	{
-		node.extend( xs );
+		node.extend( DocTreeNode.coerceCollection( xs ) );
 	}
 	
 	public void insert(int i, Object x)
 	{
-		node.insert( i, x );
+		node.insert( i, DocTreeNode.coerce( x ) );
 	}
 	
 	public Object __getitem__(int i)
@@ -295,12 +295,12 @@ public class DocTreeList implements DocTreeNode, DMListInterface
 	
 	public void __setitem__(int i, Object x)
 	{
-		node.__setitem__( i, x );
+		node.__setitem__( i, DocTreeNode.coerce( x ) );
 	}
 	
 	public void __setitem__(PySlice i, List<Object> xs)
 	{
-		node.__setitem__(  i, xs );
+		node.__setitem__(  i, DocTreeNode.coerceCollection( xs ) );
 	}
 	
 	public void __delitem__(int i)
@@ -330,27 +330,27 @@ public class DocTreeList implements DocTreeNode, DMListInterface
 	
 	public int index(Object x)
 	{
-		return node.index( x );
+		return node.index( DocTreeNode.coerce( x ) );
 	}
 	
 	public int index(Object x, int j)
 	{
-		return node.index( x, j );
+		return node.index( DocTreeNode.coerce( x ), j );
 	}
 
 	public int index(Object x, int j, int k)
 	{
-		return node.index( x, j, k );
+		return node.index( DocTreeNode.coerce( x ), j, k );
 	}
 	
 	public int count(Object x)
 	{
-		return node.count( x );
+		return node.count( DocTreeNode.coerce( x ) );
 	}
 	
 	public DMListInterface __add__(List<Object> xs)
 	{
-		return node.__add__( xs );
+		return node.__add__( DocTreeNode.coerceCollection( xs ) );
 	}
 	
 	public DMListInterface __mul__(int n)

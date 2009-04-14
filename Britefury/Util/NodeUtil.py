@@ -10,11 +10,11 @@ from java.util import List
 
 from BritefuryJ.DocModel import DMListInterface, DMObjectInterface, DMNode
 
-from BritefuryJ.DocTree import DocTreeNode, DocTreeString, DocTreeList, DocTreeObject
+from BritefuryJ.DocTree import DocTreeNode, DocTreeList, DocTreeObject
 
 
 def isStringNode(x):
-	return isinstance( x, str )  or  isinstance( x, unicode )  or  isinstance( x, String )  or  isinstance( x, DocTreeString )
+	return isinstance( x, str )  or  isinstance( x, unicode )  or  isinstance( x, String )
 
 def isListNode(xs):
 	return isinstance( xs, List )  or  isinstance( xs, list )  or isinstance( xs, DMListInterface )  or  isinstance( xs, DocTreeList )

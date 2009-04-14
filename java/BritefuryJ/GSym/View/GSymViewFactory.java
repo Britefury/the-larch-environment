@@ -14,14 +14,27 @@ import BritefuryJ.DocView.DocView;
 
 public abstract class GSymViewFactory
 {
+	public static class CannotCreateViewOfTerminalNode extends Exception
+	{
+		private static final long serialVersionUID = 1L;
+	}
+	
+	
 	public abstract GSymNodeViewFunction createViewFunction();
 	public abstract DVNode.NodeElementChangeListener createChangeListener();
 	
-	public DocView createDocumentView(Object xs, CommandHistory commandHistory)
+	public DocView createDocumentView(Object xs, CommandHistory commandHistory) throws CannotCreateViewOfTerminalNode
 	{
 		DocTree tree = new DocTree();
-		DocTreeNode txs = tree.treeNode( xs );
-		GSymViewInstance viewInstance = new GSymViewInstance( tree, txs, this, commandHistory, createChangeListener() );
-		return viewInstance.getView();
+		Object txs = tree.treeNode( xs );
+		if ( txs instanceof DocTreeNode )
+		{
+			GSymViewInstance viewInstance = new GSymViewInstance( tree, (DocTreeNode)txs, this, commandHistory, createChangeListener() );
+			return viewInstance.getView();
+		}
+		else
+		{
+			throw new CannotCreateViewOfTerminalNode();
+		}
 	}
 }

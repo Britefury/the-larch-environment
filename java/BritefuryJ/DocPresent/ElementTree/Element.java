@@ -9,6 +9,7 @@ package BritefuryJ.DocPresent.ElementTree;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +32,7 @@ public abstract class Element
 	protected BranchElement parent;
 	protected ElementTree tree;
 	protected ElementContentListener contentListener;
+	protected ElementKeyboardListener keyboardListener;
 	protected DPWidget metaElement;
 	protected String debugName;
 	
@@ -52,6 +54,7 @@ public abstract class Element
 		parent = null;
 		tree = null;
 		contentListener = null;
+		keyboardListener = null;
 		metaElement = null;
 		debugName = null;
 	}
@@ -102,6 +105,18 @@ public abstract class Element
 	}
 	
 	
+	public ElementKeyboardListener getKeyboardListener()
+	{
+		return keyboardListener;
+	}
+	
+	public void setKeyboardListener(ElementKeyboardListener listener)
+	{
+		keyboardListener = listener;
+	}
+	
+	
+
 	
 	//
 	// Element tree and parent methods
@@ -466,6 +481,70 @@ public abstract class Element
 	{
 		this.debugName = debugName;
 	}
+	
+	
+	
+	
+
+
+	//
+	// Keyboard input event methods
+	//
+
+	public boolean onKeyPress(KeyEvent event)
+	{
+		if ( keyboardListener != null )
+		{
+			if ( keyboardListener.onKeyPress( event ) )
+			{
+				return true;
+			}
+		}
+
+		if ( parent != null )
+		{
+			return parent.onKeyPress( event );
+		}
+		
+		return false;
+	}
+
+	public boolean onKeyRelease(KeyEvent event)
+	{
+		if ( keyboardListener != null )
+		{
+			if ( keyboardListener.onKeyRelease( event ) )
+			{
+				return true;
+			}
+		}
+
+		if ( parent != null )
+		{
+			return parent.onKeyRelease( event );
+		}
+		
+		return false;
+	}
+
+	public boolean onKeyTyped(KeyEvent event)
+	{
+		if ( keyboardListener != null )
+		{
+			if ( keyboardListener.onKeyTyped( event ) )
+			{
+				return true;
+			}
+		}
+
+		if ( parent != null )
+		{
+			return parent.onKeyTyped( event );
+		}
+		
+		return false;
+	}
+
 	
 	
 	

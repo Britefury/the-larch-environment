@@ -6,7 +6,7 @@
 //##************************
 package BritefuryJ.DocTree;
 
-public class DocTreeNodeGeneric implements DocTreeNode
+public class DocTreeNodeGeneric extends DocTreeNode
 {
 	private Object node;
 	private DocTreeNode parentTreeNode;

@@ -6,9 +6,37 @@
 //##************************
 package BritefuryJ.DocTree;
 
-public interface DocTreeNode
+import java.util.ArrayList;
+import java.util.Collection;
+
+public abstract class DocTreeNode
 {
-	public Object getNode();
-	public DocTreeNode getParentTreeNode();
-	public int getIndexInParent();
+	public abstract Object getNode();
+	public abstract DocTreeNode getParentTreeNode();
+	public abstract int getIndexInParent();
+	
+	
+	protected static Object coerce(Object x)
+	{
+		if ( x instanceof DocTreeNode )
+		{
+			return ((DocTreeNode)x).getNode();
+		}
+		else
+		{
+			return x;
+		}
+	}
+
+
+	protected static ArrayList<Object> coerceCollection(Collection<? extends Object> xs)
+	{
+		ArrayList<Object> ys = new ArrayList<Object>();
+		ys.ensureCapacity( xs.size() );
+		for (Object x: xs)
+		{
+			ys.add( coerce( x ) );
+		}
+		return ys;
+	}
 }

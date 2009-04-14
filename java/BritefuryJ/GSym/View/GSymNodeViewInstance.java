@@ -20,6 +20,7 @@ import BritefuryJ.DocPresent.ElementTree.BorderElement;
 import BritefuryJ.DocPresent.ElementTree.Element;
 import BritefuryJ.DocPresent.ElementTree.ElementContentListener;
 import BritefuryJ.DocPresent.ElementTree.ElementFactory;
+import BritefuryJ.DocPresent.ElementTree.ElementKeyboardListener;
 import BritefuryJ.DocPresent.ElementTree.FractionElement;
 import BritefuryJ.DocPresent.ElementTree.HBoxElement;
 import BritefuryJ.DocPresent.ElementTree.HiddenContentElement;
@@ -291,6 +292,22 @@ public class GSymNodeViewInstance
 		for (Element child: children)
 		{
 			child.setContentListener( listener );
+		}
+		return children;
+	}
+	
+	
+	public Element keyboardListener(Element child, ElementKeyboardListener listener)
+	{
+		child.setKeyboardListener( listener );
+		return child;
+	}
+	
+	public List<Element> keyboardListener(List<Element> children, ElementKeyboardListener listener)
+	{
+		for (Element child: children)
+		{
+			child.setKeyboardListener( listener );
 		}
 		return children;
 	}

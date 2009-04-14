@@ -321,45 +321,48 @@ public class DocTree
 	}
 	
 	
-	public DocTreeNode treeNode(Object x)
+	public Object treeNode(Object x)
 	{
 		return treeNode( x, null, -1 );
 	}
 	
 	
-	public DocTreeNode treeNode(Object x, DocTreeNode parentTreeNode, int indexInParent)
+	public Object treeNode(Object x, DocTreeNode parentTreeNode, int indexInParent)
 	{
-		DocTreeKey key = new DocTreeKey( x, parentTreeNode, indexInParent );
-		
-		DocTreeNode node = table.get( key );
-		
-		if ( node != null )
+		if ( x instanceof String )
 		{
-			return node;
+			return x;
 		}
 		else
 		{
-			if ( x instanceof String )
+			DocTreeKey key = new DocTreeKey( x, parentTreeNode, indexInParent );
+			
+			DocTreeNode node = table.get( key );
+			
+			if ( node != null )
 			{
-				node = new DocTreeString( (String)x, parentTreeNode, indexInParent );
-			}
-			else if ( x instanceof DMListInterface )
-			{
-				node = new DocTreeList( this, (DMListInterface)x, parentTreeNode, indexInParent );
-			}
-			else if ( x instanceof DMObjectInterface )
-			{
-				node = new DocTreeObject( this, (DMObjectInterface)x, parentTreeNode, indexInParent );
+				return node;
 			}
 			else
 			{
-				System.out.println( "DocTree.treeNode(): wrapping " + x.getClass().getName() );
-				node = new DocTreeNodeGeneric( x, parentTreeNode, indexInParent );
+				if ( x instanceof DMListInterface )
+				{
+					node = new DocTreeList( this, (DMListInterface)x, parentTreeNode, indexInParent );
+				}
+				else if ( x instanceof DMObjectInterface )
+				{
+					node = new DocTreeObject( this, (DMObjectInterface)x, parentTreeNode, indexInParent );
+				}
+				else
+				{
+					System.out.println( "DocTree.treeNode(): wrapping " + x.getClass().getName() );
+					node = new DocTreeNodeGeneric( x, parentTreeNode, indexInParent );
+				}
+	
+				table.put( key, node );
+					
+				return node;
 			}
-
-			table.put( key, node );
-				
-			return node;
 		}
 	}
 }
