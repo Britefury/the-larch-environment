@@ -14,7 +14,6 @@ import BritefuryJ.DocModel.DMList;
 import BritefuryJ.DocModel.DMIORead.ParseSXErrorException;
 import BritefuryJ.DocTree.DocTree;
 import BritefuryJ.DocTree.DocTreeList;
-import BritefuryJ.DocTree.DocTreeString;
 import junit.framework.TestCase;
 
 public class Test_DocTree extends TestCase
@@ -42,19 +41,6 @@ public class Test_DocTree extends TestCase
 	
 	
 
-	public void testWrapString()
-	{
-		DocTree tree = new DocTree();
-		Object a = new DMList( Arrays.asList( new Object[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", } ) );
-		DocTreeList w_a = (DocTreeList)tree.treeNode( a );
-		DocTreeString w_5 = (DocTreeString)w_a.get( 5 );
-		assertEquals( w_5.toString(), "5" );
-		assertSame( w_5.getParentTreeNode(), w_a );
-		assertEquals( w_5.getIndexInParent(), 5 );
-	}
-	
-
-	
 	
 	
 	public void testDiamond()

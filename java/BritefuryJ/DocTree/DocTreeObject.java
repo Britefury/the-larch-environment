@@ -14,7 +14,7 @@ import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMObjectInterface;
 import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
 
-public class DocTreeObject implements DocTreeNode, DMObjectInterface
+public class DocTreeObject extends DocTreeNode implements DMObjectInterface
 {
 	private DocTree tree; 
 	private DMObjectInterface node;
@@ -67,7 +67,7 @@ public class DocTreeObject implements DocTreeNode, DMObjectInterface
 	
 	public int indexOfById(Object x)
 	{
-		return node.indexOfById( x );
+		return node.indexOfById( DocTreeNode.coerce( x ) );
 	}
 	
 	public Object get(int index)
@@ -92,12 +92,12 @@ public class DocTreeObject implements DocTreeNode, DMObjectInterface
 	
 	public void set(int index, Object value)
 	{
-		node.set( index, value );
+		node.set( index, DocTreeNode.coerce( value ) );
 	}
 	
 	public void set(String key, Object value) throws InvalidFieldNameException
 	{
-		node.set( key, value );
+		node.set( key, DocTreeNode.coerce( value ) );
 	}
 	
 	
@@ -135,11 +135,11 @@ public class DocTreeObject implements DocTreeNode, DMObjectInterface
 	
 	public void __setitem__(int fieldIndex, Object value)
 	{
-		node.__setitem__( fieldIndex, value );
+		node.__setitem__( fieldIndex, DocTreeNode.coerce( value ) );
 	}
 
 	public void __setitem__(String key, Object value)
 	{
-		node.__setitem__( key, value );
+		node.__setitem__( key, DocTreeNode.coerce( value ) );
 	}
 }

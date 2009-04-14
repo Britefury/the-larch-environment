@@ -107,6 +107,7 @@ public class DPPresentationArea extends DPBin implements CaretListener
 			
 			setFocusable( true );
 			setRequestFocusEnabled( true );
+			setFocusTraversalKeysEnabled( false );
 		}
 		
 		

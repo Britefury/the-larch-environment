@@ -8,7 +8,6 @@
 from Britefury.Util.NodeUtil import isListNode, nodeToSXString
 #from Britefury.DocTree.DocTreeNode import DocTreeNode
 from BritefuryJ.DocTree import DocTreeNode
-from BritefuryJ.DocTree import DocTreeString
 
 from Britefury.Dispatch.Dispatch import DispatchError, DispatchDataError
 
@@ -19,8 +18,6 @@ def methodDispatch(target, node, *args):
 		if len( node ) < 1:
 			raise DispatchDataError, 'methodDispatch(): require at least 1 element for dispatch'
 		name = node[0]
-		if isinstance( name, DocTreeString ):
-			name = name.toString()
 		try:
 			method = getattr( target, name )
 		except AttributeError:
@@ -39,8 +36,6 @@ def methodDispatchAndGetName(target, node, *args):
 		if len( node ) < 1:
 			raise DispatchDataError, 'methodDispatch(): require at least 1 element for dispatch'
 		name = node[0]
-		if isinstance( name, DocTreeString ):
-			name = name.toString()
 		try:
 			method = getattr( target, name )
 		except AttributeError:
