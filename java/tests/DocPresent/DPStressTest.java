@@ -4,27 +4,28 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package tests.DocPresent.ElementTree;
+package tests.DocPresent;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import javax.swing.JFrame;
 
+import BritefuryJ.DocPresent.DPParagraph;
+import BritefuryJ.DocPresent.DPPresentationArea;
+import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
-import BritefuryJ.DocPresent.ElementTree.Element;
-import BritefuryJ.DocPresent.ElementTree.ParagraphElement;
-import BritefuryJ.DocPresent.ElementTree.TextElement;
-import BritefuryJ.DocPresent.ElementTree.VBoxElement;
+import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
-public class ElementTreeStressTest extends ElementTreeTestBase
+public class DPStressTest
 {
-	// Uses around 447MB RAM on a 32-bit VM
+	// Used about 421MB ram on a 32-bit VM
 	private static int NUMLINES = 10240;
 	
 	
@@ -33,39 +34,39 @@ public class ElementTreeStressTest extends ElementTreeTestBase
 	TextStyleSheet puncStyle = new TextStyleSheet( f0, Color.blue );
 	ParagraphStyleSheet paraStyle = new ParagraphStyleSheet();
 
-	public Element name(String n)
+	public DPWidget name(String n)
 	{
-		return new TextElement( nameStyle, n );
+		return new DPText( nameStyle, n );
 	}
 	
-	public Element attr(Element x, String a)
+	public DPWidget attr(DPWidget x, String a)
 	{
-		TextElement dot = new TextElement( puncStyle, "." );
-		TextElement attrName = new TextElement( nameStyle, a );
-		ParagraphElement attr = new ParagraphElement( paraStyle );
-		attr.setChildren( Arrays.asList( new Element[] { x, dot, attrName } ) );
+		DPText dot = new DPText( puncStyle, "." );
+		DPText attrName = new DPText( nameStyle, a );
+		DPParagraph attr = new DPParagraph( paraStyle );
+		attr.extend( Arrays.asList( new DPWidget[] { x, dot, attrName } ) );
 		return attr;
 	}
 	
-	public Element call(Element x, Element... args)
+	public DPWidget call(DPWidget x, DPWidget... args)
 	{
-		TextElement openParen = new TextElement( puncStyle, "(" );
-		TextElement closeParen = new TextElement( puncStyle, ")" );
-		ArrayList<Element> elems = new ArrayList<Element>();
+		DPText openParen = new DPText( puncStyle, "(" );
+		DPText closeParen = new DPText( puncStyle, ")" );
+		ArrayList<DPWidget> elems = new ArrayList<DPWidget>();
 		elems.add( x );
 		elems.add( openParen );
 		for (int i = 0; i < args.length; i++)
 		{
 			if ( i > 0 )
 			{
-				elems.add( new TextElement( puncStyle, "," ) );
-				elems.add( new TextElement( puncStyle, " " ) );
+				elems.add( new DPText( puncStyle, "," ) );
+				elems.add( new DPText( puncStyle, " " ) );
 			}
 			elems.add( args[i] );
 		}
 		elems.add( closeParen );
-		ParagraphElement call = new ParagraphElement( paraStyle );
-		call.setChildren( elems );
+		DPParagraph call = new DPParagraph( paraStyle );
+		call.extend( elems );
 		return call;
 	}
 	
@@ -76,11 +77,11 @@ public class ElementTreeStressTest extends ElementTreeTestBase
 	
 	
 	
-	protected Element createContentNode()
+	protected DPWidget createContentNode()
 	{
 		VBoxStyleSheet boxs = new VBoxStyleSheet( DPVBox.Typesetting.NONE, DPVBox.Alignment.LEFT, 0.0, false, 0.0 );
-		VBoxElement box = new VBoxElement( boxs );
-		ArrayList<Element> children = new ArrayList<Element>();
+		DPVBox box = new DPVBox( boxs );
+		ArrayList<DPWidget> children = new ArrayList<DPWidget>();
 		
 		for (int i = 0; i < NUMLINES; i++)
 		{
@@ -94,15 +95,32 @@ public class ElementTreeStressTest extends ElementTreeTestBase
 
 
 
-	public ElementTreeStressTest()
+	public DPStressTest()
 	{
-		JFrame frame = new JFrame( "Element tree stress test - " + NUMLINES + " lines" );
-		initFrame( frame );
+		JFrame frame = new JFrame( "Document presentation system stress test - " + NUMLINES + " lines" );
+
+		//This stops the app on window close.
+		frame.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
+
+		DPPresentationArea area = new DPPresentationArea();
+	     
+	     
+	     
+	     
+		area.setChild( createContentNode() );
+	     
+	     
+	     
+		area.getComponent().setPreferredSize( new Dimension( 640, 480 ) );
+		frame.add( area.getComponent() );
+		frame.pack();
+		frame.setVisible(true);
 	}
 	
 	
 	public static void main(String[] args)
 	{
-		new ElementTreeStressTest();
+		new DPStressTest();
 	}
+
 }
