@@ -25,7 +25,10 @@ import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
 public class DPStressTest
 {
-	// Used about 357MB ram on a 32-bit VM  (down from 480MB)
+	// Memory usage history:
+	// 480MB
+	// 357MB: packed DPContainer.ChildEntry
+	// 353MB: packed TextVisual
 	private static int NUMLINES = 10240;
 	
 	
