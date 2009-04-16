@@ -269,27 +269,25 @@ public class TextVisual
 	}
 	
 	
-	public static interface TextVisualListener
+	public static interface TextVisualOwner
 	{
 		public void textVisualRequestResize(TextVisual t);
-		public void textVisualRequestRedraw(TextVisual t);
+		public DPPresentationArea getTextPresentationArea(TextVisual t);
+		public TextStyleSheet getTextStyleSheet(TextVisual t);
 	}
 	
 	
 	private TextLayout layout;
 	private String text;
-	private TextStyleSheet styleSheet;
-	private TextVisualListener listener;
-	private JComponent component;
+	private TextVisualOwner owner;
 	
 	private static TextLayoutTable layoutTable = new TextLayoutTable();
 	
 	
-	public TextVisual(String text, TextStyleSheet styleSheet, TextVisualListener listener)
+	public TextVisual(String text, TextVisualOwner owner)
 	{
 		this.text = text;
-		this.styleSheet = styleSheet;
-		this.listener = listener;
+		this.owner = owner;
 	}
 	
 	
@@ -312,18 +310,15 @@ public class TextVisual
 	
 	public void realise(DPPresentationArea a)
 	{
-		component = a.getComponent();
 	}
 	
 	public void realise(JComponent component)
 	{
-		this.component = component;
 	}
 	
 	
 	public void unrealise()
 	{
-		component = null;
 		layout = null;
 	}
 	
@@ -353,13 +348,14 @@ public class TextVisual
 		}
 		else
 		{
+			JComponent component = owner.getTextPresentationArea( this ).getComponent();
 			if ( component != null )
 			{
 				Graphics2D graphics = (Graphics2D)component.getGraphics();
 				if ( graphics != null )
 				{
 					FontRenderContext frc = graphics.getFontRenderContext();
-					LineMetrics lineMetrics = styleSheet.getFont().getLineMetrics( "", frc );
+					LineMetrics lineMetrics = owner.getTextStyleSheet( this ).getFont().getLineMetrics( "", frc );
 					return new VMetricsTypeset( lineMetrics.getAscent(), lineMetrics.getDescent(), lineMetrics.getLeading() );
 				}
 			}
@@ -375,7 +371,7 @@ public class TextVisual
 		if ( layout != null )
 		{
 			Color prevColour = graphics.getColor();
-			graphics.setColor( styleSheet.getColour() );
+			graphics.setColor( owner.getTextStyleSheet( this ).getColour() );
 			layout.draw( graphics, 0, layout.getAscent() );
 			graphics.setColor( prevColour );
 		}
@@ -390,7 +386,6 @@ public class TextVisual
 			graphics.translate( 0.0, ascent );
 
 			Shape[] carets = layout.getCaretShapes( offset );
-			graphics.translate( 0.0, ascent );
 			graphics.draw( carets[0] );
 			if ( carets[1] != null )
 			{
@@ -400,7 +395,7 @@ public class TextVisual
 		else
 		{
 			FontRenderContext frc = graphics.getFontRenderContext();
-			LineMetrics lineMetrics = styleSheet.getFont().getLineMetrics( "", frc );
+			LineMetrics lineMetrics = owner.getTextStyleSheet( this ).getFont().getLineMetrics( "", frc );
 			Line2D.Double line = new Line2D.Double( 0.0, 0.0, 0.0, lineMetrics.getAscent() + lineMetrics.getDescent() );
 			graphics.draw( line );
 		}
@@ -417,7 +412,7 @@ public class TextVisual
 		else
 		{
 			FontRenderContext frc = graphics.getFontRenderContext();
-			LineMetrics lineMetrics = styleSheet.getFont().getLineMetrics( "", frc );
+			LineMetrics lineMetrics = owner.getTextStyleSheet( this ).getFont().getLineMetrics( "", frc );
 			h = lineMetrics.getAscent() + lineMetrics.getDescent();
 		}
 		graphics.draw( new Line2D.Double( 0.0, 0.0, 0.0, h ) );
@@ -435,7 +430,7 @@ public class TextVisual
 		else
 		{
 			FontRenderContext frc = graphics.getFontRenderContext();
-			LineMetrics lineMetrics = styleSheet.getFont().getLineMetrics( "", frc );
+			LineMetrics lineMetrics = owner.getTextStyleSheet( this ).getFont().getLineMetrics( "", frc );
 			x = 0.0;
 			h = lineMetrics.getAscent() + lineMetrics.getDescent();
 		}
@@ -470,14 +465,13 @@ public class TextVisual
 	
 	private void requestResize()
 	{
-		if ( listener != null )
-		{
-			listener.textVisualRequestResize( this );
-		}
+		owner.textVisualRequestResize( this );
 	}
 	
 	private void refreshLayout()
 	{
+		JComponent component = owner.getTextPresentationArea( this ).getComponent();
+		TextStyleSheet styleSheet = owner.getTextStyleSheet( this );
 		if ( layout == null  &&  text.length() > 0  &&  component != null )
 		{
 			Graphics2D graphics = (Graphics2D)component.getGraphics();

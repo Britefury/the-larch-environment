@@ -166,8 +166,8 @@ public class DPParagraph extends DPContainerSequence
 				for (int i = 0; i < children.size() - 1; i++)
 				{
 					ChildEntry entryJ = children.get( i + 1 );
-					double iUpperX = entryI.pos.x + entryI.size.x;
-					double jLowerX = entryJ.pos.x;
+					double iUpperX = entryI.child.getPositionInParentSpace().x + entryI.child.getAllocationInParentSpace().x;
+					double jLowerX = entryJ.child.getPositionInParentSpace().x;
 					
 					double midX = ( iUpperX + jLowerX ) * 0.5;
 					
@@ -255,7 +255,7 @@ public class DPParagraph extends DPContainerSequence
 		for (int i = 0; i < midPoints.length; i++)
 		{
 			ChildEntry entry = childEntries.get( i );
-			midPoints[i] = entry.pos.x  +  entry.size.x * 0.5;
+			midPoints[i] = entry.child.getPositionInParentSpace().x  +  entry.child.getAllocationInParentSpace().x * 0.5;
 		}
 		
 		if ( pos < midPoints[0] )
@@ -728,8 +728,8 @@ public class DPParagraph extends DPContainerSequence
 			}
 			else
 			{
-				double distToPrev = localPos.x - ( prev.pos.x + prev.size.x );
-				double distToNext = next.pos.x - localPos.x;
+				double distToPrev = localPos.x - ( prev.child.getPositionInParentSpace().x + prev.child.getAllocationInParentSpace().x );
+				double distToNext = next.child.getPositionInParentSpace().x - localPos.x;
 				
 				return distToPrev > distToNext  ?  prevC  :  nextC;
 			}

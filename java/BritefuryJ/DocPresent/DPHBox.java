@@ -74,7 +74,7 @@ public class DPHBox extends DPAbstractBox
 		for (int i = 0; i < midPoints.length; i++)
 		{
 			ChildEntry entry = childEntries.get( i );
-			midPoints[i] = entry.pos.x  +  entry.size.x * 0.5;
+			midPoints[i] = entry.child.getPositionInParentSpace().x  +  entry.child.getAllocationInParentSpace().x * 0.5;
 		}
 		
 		if ( pos < midPoints[0] )

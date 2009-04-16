@@ -31,6 +31,13 @@ public class AABox2 implements Cloneable {
 		upper = new Point2( a.x > b.x  ?  a.x  :  b.x,  a.y > b.y  ?  a.y  :  b.y );
 	}
 	
+	public AABox2(Point2 a, Vector2 size)
+	{
+		assert size.x >= 0.0  &&  size.y >= 0.0;
+		lower = a;
+		upper = new Point2( a.x + size.x, a.y + size.y );
+	}
+	
 	
 	
 	public boolean containsPoint(Point2 p)

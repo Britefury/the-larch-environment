@@ -84,7 +84,7 @@ public class DPVBox extends DPAbstractBox
 		for (int i = 0; i < midPoints.length; i++)
 		{
 			ChildEntry entry = childEntries.get( i );
-			midPoints[i] = entry.pos.y  +  entry.size.y * 0.5;
+			midPoints[i] = entry.child.getPositionInParentSpace().y  +  entry.child.getAllocationInParentSpace().y * 0.5;
 		}
 		
 		if ( pos < midPoints[0] )
