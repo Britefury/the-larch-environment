@@ -109,7 +109,7 @@ public class NodeView
 			Color backgroundColour = bHighlight  ?  new Color( 0.7f, 0.85f, 1.0f )  :  Color.white;
 			backgroundColour = bSelected  ?  new Color( 1.0f, 1.0f, 0.6f )  :  backgroundColour;
 			graphics.setColor( backgroundColour );
-			graphics.fill( new Rectangle2D.Double( 0.0, 0.0, allocation.x, allocation.y ) );
+			graphics.fill( new Rectangle2D.Double( 0.0, 0.0, allocationX, allocationY ) );
 		}
 	}
 

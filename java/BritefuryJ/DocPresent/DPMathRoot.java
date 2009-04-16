@@ -126,14 +126,14 @@ public class DPMathRoot extends DPContainer
 			double yOffset = thickness * 0.5;
 			double glyphWidth = s.getGlyphWidth();
 			double glyphLineWidths[] = s.getGlyphLineWidths();
-			double h = allocation.y - thickness;
+			double h = allocationY - thickness;
 
 			Path2D.Double path = new Path2D.Double();
 			path.moveTo( 0.0, yOffset + h * 0.65 );
 			path.lineTo( glyphLineWidths[0], yOffset + h * 0.6 );
 			path.lineTo( glyphLineWidths[0] + glyphLineWidths[1], yOffset + h );
 			path.lineTo( glyphWidth, yOffset );
-			path.lineTo( allocation.x, yOffset );
+			path.lineTo( allocationX, yOffset );
 			
 			graphics.draw( path );
 			
