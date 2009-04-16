@@ -164,8 +164,102 @@ public class TextVisual
 				return getBeginIndex();
 			}
 		}
-		
 	}
+	
+	
+	
+	
+	private static class TextLayoutTable
+	{
+		private static class Key
+		{
+			private String text;
+			private Font font;
+			private boolean bMixedSizeCaps;
+			private int hash;
+			
+			
+			public Key(String text, Font font, boolean bMixedSizeCaps)
+			{
+				this.text = text;
+				this.font = font;
+				this.bMixedSizeCaps = bMixedSizeCaps;
+				this.hash = tripleHash( text.hashCode(), font.hashCode(), new Boolean( bMixedSizeCaps ).hashCode() );
+			}
+			
+			
+			public boolean equals(Object x)
+			{
+				if ( x instanceof Key )
+				{
+					Key kx = (Key)x;
+					return text.equals( kx.text )  &&  font.equals( kx.font )  &&  bMixedSizeCaps == kx.bMixedSizeCaps;
+				}
+				else
+				{
+					return false;
+				}
+			}
+			
+			public int hashCode()
+			{
+				return hash;
+			}
+
+		
+		
+			private static int tripleHash(int a, int b, int c)
+			{
+				int mult = 1000003;
+				int x = 0x345678;
+				x = ( x ^ c ) * mult;
+				mult += 82520 + 4;
+				x = ( x ^ b ) * mult;
+				mult += 82520 + 2;
+				x = ( x ^ a ) * mult;
+				return x + 97351;
+			}
+		}
+		
+		
+		
+		private HashMap<Key, TextLayout> layoutTable;
+
+
+		public TextLayoutTable()
+		{
+			layoutTable = new HashMap<Key, TextLayout>();
+		}
+		
+		
+		public TextLayout get(String text, Font font, boolean bMixedSizeCaps, FontRenderContext frc)
+		{
+			Key k = new Key( text, font, bMixedSizeCaps );
+			
+			TextLayout layout = layoutTable.get( k );
+			if ( layout == null )
+			{
+				if ( bMixedSizeCaps )
+				{
+					Font upperCaseFont = font;
+					Font lowerCaseFont = upperCaseFont.deriveFont( upperCaseFont.getSize2D() * 0.75f );
+
+					MixedSizeCapsAttributedCharacterIterator charIter = new MixedSizeCapsAttributedCharacterIterator( text, lowerCaseFont, upperCaseFont );
+					layout = new TextLayout( charIter, frc );
+				}
+				else
+				{
+					layout = new TextLayout( text, font, frc );
+				}
+				
+				layoutTable.put( k, layout );
+			}
+			
+			return layout;
+		}
+	}
+	
+	
 	
 	
 	
@@ -187,6 +281,8 @@ public class TextVisual
 	private TextStyleSheet styleSheet;
 	private TextVisualListener listener;
 	private JComponent component;
+	
+	private static TextLayoutTable layoutTable = new TextLayoutTable();
 	
 	
 	public TextVisual(String text, TextStyleSheet styleSheet, TextVisualListener listener)
@@ -387,18 +483,7 @@ public class TextVisual
 			Graphics2D graphics = (Graphics2D)component.getGraphics();
 			FontRenderContext frc = graphics.getFontRenderContext();
 			
-			if ( styleSheet.getMixedSizeCaps() )
-			{
-				Font upperCaseFont = styleSheet.getFont();
-				Font lowerCaseFont = upperCaseFont.deriveFont( upperCaseFont.getSize2D() * 0.75f );
-
-				MixedSizeCapsAttributedCharacterIterator charIter = new MixedSizeCapsAttributedCharacterIterator( text, lowerCaseFont, upperCaseFont );
-				layout = new TextLayout( charIter, frc );
-			}
-			else
-			{
-				layout = new TextLayout( text, styleSheet.getFont(), frc );
-			}
+			layout = layoutTable.get( text, styleSheet.getFont(), styleSheet.getMixedSizeCaps(), frc );
 		}
 	}
 }
