@@ -9,6 +9,7 @@ package BritefuryJ.DocPresent;
 
 import java.lang.Math;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import BritefuryJ.DocPresent.Metrics.HMetrics;
@@ -44,12 +45,12 @@ public class DPParagraph extends DPContainerSequence
 	
 	private static class Line
 	{
-		public List<DPWidget> children;
+		public DPWidget children[];
 		public VMetrics minV, prefV;
 		public double posY, sizeY;
 		
 		
-		public Line(List<DPWidget> children)
+		public Line(DPWidget children[])
 		{
 			this.children = children;
 		}
@@ -60,7 +61,7 @@ public class DPParagraph extends DPContainerSequence
 		{
 			double spacing = paragraph.getSpacing();
 
-			Metrics[] allocated = HMetrics.allocateSpacePacked( getChildrenMinimumHMetrics( children ), getChildrenPreferredHMetrics( children ), null, allocation );
+			Metrics[] allocated = HMetrics.allocateSpacePacked( getChildrenMinimumHMetrics( Arrays.asList( children ) ), getChildrenPreferredHMetrics( Arrays.asList( children ) ), null, allocation );
 			
 			double width = 0.0;
 			double x = lineX;
@@ -73,7 +74,7 @@ public class DPParagraph extends DPContainerSequence
 					chm = chm.minSpacing( spacing );
 				}
 				
-				DPWidget child = children.get( i );
+				DPWidget child = children[i];
 				ParagraphParentPacking packing = (ParagraphParentPacking)child.getParentPacking();
 
 				double childX = x + packing.padding;
@@ -147,20 +148,20 @@ public class DPParagraph extends DPContainerSequence
 
 		private DPWidget getChildClosestToLocalPoint(Point2 localPos, WidgetFilter filter)
 		{
-			if ( children.size() == 0 )
+			if ( children.length == 0 )
 			{
 				return null;
 			}
-			else if ( children.size() == 1 )
+			else if ( children.length == 1 )
 			{
-				return children.get( 0 );
+				return children[0];
 			}
 			else
 			{
-				DPWidget childI = children.get( 0 );
-				for (int i = 0; i < children.size() - 1; i++)
+				DPWidget childI = children[0];
+				for (int i = 0; i < children.length - 1; i++)
 				{
-					DPWidget childJ = children.get( i + 1 );
+					DPWidget childJ = children[i+1];
 					double iUpperX = childI.getPositionInParentSpace().x + childI.getAllocationInParentSpace().x;
 					double jLowerX = childJ.getPositionInParentSpace().x;
 					
@@ -174,14 +175,14 @@ public class DPParagraph extends DPContainerSequence
 					childI = childJ;
 				}
 				
-				return children.get( children.size() - 1 );
+				return children[children.length-1];
 			}
 		}
 	}
 
 	
 	
-	private ArrayList<Line> lines;
+	private Line lines[];
 
 	
 	
@@ -194,7 +195,7 @@ public class DPParagraph extends DPContainerSequence
 	{
 		super( styleSheet );
 		
-		lines = new ArrayList<Line>();
+		lines = new Line[0];
 	}
 
 
@@ -445,11 +446,11 @@ public class DPParagraph extends DPContainerSequence
 	
 	protected VMetrics computeMinimumVMetrics()
 	{
-		VMetrics[] lineMetrics = new VMetrics[lines.size()];
-		for (int i = 0; i < lines.size(); i++)
+		VMetrics[] lineMetrics = new VMetrics[lines.length];
+		for (int i = 0; i < lines.length; i++)
 		{
-			Line line = lines.get( i );
-			line.minV = combineVMetricsHorizontally( getChildrenRefreshedMinimumVMetrics( line.children ) );
+			Line line = lines[i];
+			line.minV = combineVMetricsHorizontally( getChildrenRefreshedMinimumVMetrics( Arrays.asList( line.children ) ) );
 			lineMetrics[i] = line.minV;
 		}
 		return combineVMetricsVertically( lineMetrics );
@@ -457,11 +458,11 @@ public class DPParagraph extends DPContainerSequence
 
 	protected VMetrics computePreferredVMetrics()
 	{
-		VMetrics[] lineMetrics = new VMetrics[lines.size()];
-		for (int i = 0; i < lines.size(); i++)
+		VMetrics[] lineMetrics = new VMetrics[lines.length];
+		for (int i = 0; i < lines.length; i++)
 		{
-			Line line = lines.get( i );
-			line.prefV = combineVMetricsHorizontally( getChildrenRefreshedPreferredVMetrics( line.children ) );
+			Line line = lines[i];
+			line.prefV = combineVMetricsHorizontally( getChildrenRefreshedPreferredVMetrics( Arrays.asList( line.children ) ) );
 			lineMetrics[i] = line.prefV;
 		}
 		return combineVMetricsVertically( lineMetrics );
@@ -481,6 +482,8 @@ public class DPParagraph extends DPContainerSequence
 		DPWidget bestLineBreakWidget = null;
 		LineBreakInterface bestLineBreakInterface = null;
 		int bestLineBreakIndex = -1;
+		
+		ArrayList<Line> lineList = new ArrayList<Line>();
 		
 		for (int i = 0; i < registeredChildren.size(); i++)
 		{
@@ -520,7 +523,9 @@ public class DPParagraph extends DPContainerSequence
 				if ( bestLineBreakIndex > lineStartIndex )
 				{
 					// Build a new line
-					lines.add( new Line( registeredChildren.subList( lineStartIndex, bestLineBreakIndex +1 ) ) );
+					DPWidget lineChildren[] = new DPWidget[bestLineBreakIndex + 1 - lineStartIndex];
+					lineChildren = registeredChildren.subList( lineStartIndex, bestLineBreakIndex +1 ).toArray( lineChildren );
+					lineList.add( new Line( lineChildren ) );
 				}
 				
 				// We want the for-loop to return to the break position
@@ -538,8 +543,13 @@ public class DPParagraph extends DPContainerSequence
 		if ( registeredChildren.size() > lineStartIndex )
 		{
 			// Build a new line
-			lines.add( new Line( registeredChildren.subList( lineStartIndex, registeredChildren.size() ) ) );
+			DPWidget lineChildren[] = new DPWidget[registeredChildren.size() - lineStartIndex];
+			lineChildren = registeredChildren.subList( lineStartIndex, registeredChildren.size() ).toArray( lineChildren );
+			lineList.add( new Line( lineChildren ) );
 		}
+		
+		lines = new Line[lineList.size()];
+		lines = lineList.toArray( lines );
 	}
 
 	
@@ -554,7 +564,6 @@ public class DPParagraph extends DPContainerSequence
 		
 		// Stage 1:
 		// Split the list of child nodes into lines
-		lines.clear();
 		splitIntoLines( allocation );
 		
 		
@@ -576,12 +585,12 @@ public class DPParagraph extends DPContainerSequence
 		super.allocateContentsY( allocation );
 		
 		// Allocate the lines, vertically
-		VMetrics[] linesMinV = new VMetrics[lines.size()];
-		VMetrics[] linesPrefV = new VMetrics[lines.size()];
+		VMetrics[] linesMinV = new VMetrics[lines.length];
+		VMetrics[] linesPrefV = new VMetrics[lines.length];
 		
-		for (int i = 0; i < lines.size(); i++)
+		for (int i = 0; i < lines.length; i++)
 		{
-			Line line = lines.get( i );
+			Line line = lines[i];
 			linesMinV[i] = line.minV;
 			linesPrefV[i] = line.prefV;
 		}
@@ -594,7 +603,7 @@ public class DPParagraph extends DPContainerSequence
 		{
 			VMetrics chm = (VMetrics)allocated[i];
 			
-			lines.get( i ).allocateY( this, y, chm.height );
+			lines[i].allocateY( this, y, chm.height );
 
 			height = y + chm.height;
 			y = height + chm.vspacing;
@@ -605,20 +614,20 @@ public class DPParagraph extends DPContainerSequence
 	
 	private Line getLineClosestToLocalPoint(Point2 localPos)
 	{
-		if ( lines.size() == 0 )
+		if ( lines.length == 0 )
 		{
 			return null;
 		}
-		else if ( lines.size() == 1 )
+		else if ( lines.length == 1 )
 		{
-			return lines.get( 0 );
+			return lines[0];
 		}
 		else
 		{
-			Line lineI = lines.get( 0 );
-			for (int i = 0; i < lines.size() - 1; i++)
+			Line lineI = lines[0];
+			for (int i = 0; i < lines.length - 1; i++)
 			{
-				Line lineJ = lines.get( i + 1 );
+				Line lineJ = lines[i+1];
 				double iUpperY = lineI.posY + lineI.sizeY;
 				double jLowerY = lineJ.posY;
 				
@@ -632,7 +641,7 @@ public class DPParagraph extends DPContainerSequence
 				lineI = lineJ;
 			}
 			
-			return lines.get( lines.size() - 1 );
+			return lines[lines.length-1];
 		}
 	}
 
