@@ -24,7 +24,7 @@ import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
 public class ElementTreeStressTest extends ElementTreeTestBase
 {
-	private static int NUMLINES = 10240;
+	private static int NUMLINES = 30000;
 	
 	
 	Font f0 = new Font( "Sans serif", Font.PLAIN, 12 );
