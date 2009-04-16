@@ -7,13 +7,12 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-
-import java.awt.event.KeyEvent;
 import java.awt.Graphics2D;
-import java.awt.geom.*;
+import java.awt.event.KeyEvent;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
+import java.util.List;
 
 import BritefuryJ.DocPresent.ElementTree.Element;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
@@ -109,9 +108,9 @@ abstract public class DPWidget
 	protected VMetrics minV, prefV;
 	protected Vector2 allocation;
 	
-	protected LinkedList<Runnable> waitingImmediateEvents;
+	protected ArrayList<Runnable> waitingImmediateEvents;
 	
-	protected LinkedList<PointerInterface> pointersWithinBounds;
+	protected ArrayList<PointerInterface> pointersWithinBounds;
 	
 	protected DndState dndState;
 	
@@ -148,8 +147,8 @@ abstract public class DPWidget
 		minV = new VMetrics();
 		prefV = new VMetrics();
 		allocation = new Vector2();
-		waitingImmediateEvents = new LinkedList<Runnable>();
-		pointersWithinBounds = new LinkedList<PointerInterface>();
+		waitingImmediateEvents = null;
+		pointersWithinBounds = null;
 	}
 	
 	
@@ -421,11 +420,14 @@ abstract public class DPWidget
 			presentationArea = area;
 			if ( presentationArea != null )
 			{
-				for (Runnable event: waitingImmediateEvents)
+				if ( waitingImmediateEvents != null )
 				{
-					presentationArea.queueImmediateEvent( event );
+					for (Runnable event: waitingImmediateEvents)
+					{
+						presentationArea.queueImmediateEvent( event );
+					}
+					waitingImmediateEvents = null;
 				}
-				waitingImmediateEvents.clear();
 			}
 		}
 	}
@@ -713,7 +715,14 @@ abstract public class DPWidget
 		}
 		else
 		{
-			waitingImmediateEvents.push( event );
+			if ( waitingImmediateEvents == null )
+			{
+				waitingImmediateEvents = new ArrayList<Runnable>();
+			}
+			if ( !waitingImmediateEvents.contains( event ) )
+			{
+				waitingImmediateEvents.add( event );
+			}
 		}
 			
 	}
@@ -726,7 +735,14 @@ abstract public class DPWidget
 		}
 		else
 		{
-			waitingImmediateEvents.remove( event );
+			if ( waitingImmediateEvents != null )
+			{
+				waitingImmediateEvents.remove( event );
+				if ( waitingImmediateEvents.isEmpty() )
+				{
+					waitingImmediateEvents = null;
+				}
+			}
 		}
 			
 	}
@@ -876,7 +892,14 @@ abstract public class DPWidget
 	
 	protected void handleMotion(PointerMotionEvent event)
 	{
-		pointersWithinBounds.add( event.pointer );
+		if ( pointersWithinBounds == null )
+		{
+			pointersWithinBounds = new ArrayList<PointerInterface>();
+		}
+		if ( !pointersWithinBounds.contains( event.pointer ) )
+		{
+			pointersWithinBounds.add( event.pointer );
+		}
 		onMotion( event );
 	}
 	
@@ -887,7 +910,14 @@ abstract public class DPWidget
 	
 	protected void handleLeave(PointerMotionEvent event)
 	{
-		pointersWithinBounds.remove( event.pointer );
+		if ( pointersWithinBounds != null )
+		{
+			pointersWithinBounds.remove( event.pointer );
+			if ( pointersWithinBounds.isEmpty() )
+			{
+				pointersWithinBounds = null;
+			}
+		}
 		onLeave( event );
 	}
 	
@@ -906,10 +936,13 @@ abstract public class DPWidget
 	@SuppressWarnings("unchecked")
 	protected void handleUnrealise(DPWidget unrealiseRoot)
 	{
-		LinkedList<PointerInterface> pointers = (LinkedList<PointerInterface>)pointersWithinBounds.clone();
-		for (PointerInterface pointer: pointers)
+		if ( pointersWithinBounds != null )
 		{
-			handleLeave( new PointerMotionEvent( pointer, PointerMotionEvent.Action.LEAVE ) );
+			ArrayList<PointerInterface> pointers = (ArrayList<PointerInterface>)pointersWithinBounds.clone();
+			for (PointerInterface pointer: pointers)
+			{
+				handleLeave( new PointerMotionEvent( pointer, PointerMotionEvent.Action.LEAVE ) );
+			}
 		}
 		onUnrealise( unrealiseRoot );
 		bRealised = false;		

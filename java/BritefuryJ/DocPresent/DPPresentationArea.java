@@ -27,6 +27,7 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.WeakHashMap;
@@ -542,7 +543,7 @@ public class DPPresentationArea extends DPBin implements CaretListener
 	
 	public void queueImmediateEvent(Runnable event)
 	{
-		if ( waitingImmediateEvents.isEmpty()  &&  immediateEventDispatcher == null )
+		if ( waitingImmediateEvents == null  &&  immediateEventDispatcher == null )
 		{
 			final DPPresentationArea presArea = this;
 			// We will be adding the first event; create the dispatcher and queue it
@@ -557,6 +558,11 @@ public class DPPresentationArea extends DPBin implements CaretListener
 			SwingUtilities.invokeLater( immediateEventDispatcher );
 		}
 		
+		if ( waitingImmediateEvents == null )
+		{
+			waitingImmediateEvents = new ArrayList<Runnable>();
+		}
+		
 		if ( !waitingImmediateEvents.contains( event ) )
 		{
 			waitingImmediateEvents.add( event );
@@ -565,9 +571,16 @@ public class DPPresentationArea extends DPBin implements CaretListener
 
 	public void dequeueImmediateEvent(Runnable event)
 	{
-		if ( waitingImmediateEvents.contains( event ) )
+		if ( waitingImmediateEvents != null )
 		{
-			waitingImmediateEvents.remove( event );
+			if ( waitingImmediateEvents.contains( event ) )
+			{
+				waitingImmediateEvents.remove( event );
+				if ( waitingImmediateEvents.isEmpty() )
+				{
+					waitingImmediateEvents = null;
+				}
+			}
 		}
 	}
 	
@@ -580,14 +593,17 @@ public class DPPresentationArea extends DPBin implements CaretListener
 	@SuppressWarnings("unchecked")
 	private void emitImmediateEvents()
 	{
-		List<Runnable> events = (List<Runnable>)waitingImmediateEvents.clone();
-		
-		for (Runnable event: events)
+		if ( waitingImmediateEvents != null )
 		{
-			event.run();
+			List<Runnable> events = (List<Runnable>)waitingImmediateEvents.clone();
+			
+			for (Runnable event: events)
+			{
+				event.run();
+			}
+			
+			waitingImmediateEvents = null;
 		}
-		
-		waitingImmediateEvents.clear();
 	}
 	
 	

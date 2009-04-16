@@ -129,14 +129,14 @@ public class Test_DMIOWriter extends TestCase
 	public void testUnquotedString()
 	{
 		matchTest( DMIOWriter.unquotedString, "abc123ABC_", "abc123ABC_" );
-		matchTest( DMIOWriter.unquotedString, "abc123ABC_+-*/%^&|!$@.,<>~", "abc123ABC_+-*/%^&|!$@.,<>~" );
-		matchFailTest( DMIOWriter.unquotedString, "abc123ABC_+-*/%^&|!$@.,<>=[]~(" );
-		matchFailTest( DMIOWriter.unquotedString, "abc123ABC_+-*/%^&|!$@.,<>=[]~)" );
-		matchFailTest( DMIOWriter.unquotedString, "abc123ABC_+-*/%^&|!$@.,<>=[]~\"" );
-		matchFailTest( DMIOWriter.unquotedString, "abc123ABC_+-*/%^&|!$@.,<>=[]~ " );
-		matchFailTest( DMIOWriter.unquotedString, "abc123ABC_+-*/%^&|!$@.,<>=[]~\t" );
-		matchFailTest( DMIOWriter.unquotedString, "abc123ABC_+-*/%^&|!$@.,<>=[]~\n" );
-		matchFailTest( DMIOWriter.unquotedString, "abc123ABC_+-*/%^&|!$@.,<>=[]~\\" );
+		matchTest( DMIOWriter.unquotedString, "abc123ABC_+-*/%^&|!$@.<>~", "abc123ABC_+-*/%^&|!$@.<>~" );
+		matchFailTest( DMIOWriter.unquotedString, "abc123ABC_+-*/%^&|!$@.<>=[]~(" );
+		matchFailTest( DMIOWriter.unquotedString, "abc123ABC_+-*/%^&|!$@.<>=[]~)" );
+		matchFailTest( DMIOWriter.unquotedString, "abc123ABC_+-*/%^&|!$@.<>=[]~\"" );
+		matchFailTest( DMIOWriter.unquotedString, "abc123ABC_+-*/%^&|!$@.<>=[]~ " );
+		matchFailTest( DMIOWriter.unquotedString, "abc123ABC_+-*/%^&|!$@.<>=[]~\t" );
+		matchFailTest( DMIOWriter.unquotedString, "abc123ABC_+-*/%^&|!$@.<>=[]~\n" );
+		matchFailTest( DMIOWriter.unquotedString, "abc123ABC_+-*/%^&|!$@.<>=[]~\\" );
 	}
 
 	public void testQuotedStringContents()

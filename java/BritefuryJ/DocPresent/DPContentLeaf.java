@@ -257,7 +257,7 @@ public abstract class DPContentLeaf extends DPWidget
 		{
 			markers.remove( m );
 		
-			if ( markers.size() == 0 )
+			if ( markers.isEmpty() )
 			{
 				markers = null;
 			}
