@@ -62,7 +62,7 @@ public abstract class DPContainer extends DPWidget
 	protected ArrayList<DPWidget> registeredChildren;
 	protected DPWidget pressGrabChild;
 	protected int pressGrabButton;
-	protected HashMap<PointerInterface, DPWidget> pointerChildTable, pointerDndChildTable;
+	protected HashMap<PointerInterface, DPWidget> pointerChildTable;
 	
 	
 	
@@ -81,9 +81,6 @@ public abstract class DPContainer extends DPWidget
 		super( styleSheet );
 		
 		registeredChildren = new ArrayList<DPWidget>();
-		
-		pointerChildTable = new HashMap<PointerInterface, DPWidget>();
-		pointerDndChildTable = new HashMap<PointerInterface, DPWidget>();
 	}
 	
 	
@@ -435,11 +432,11 @@ public abstract class DPContainer extends DPWidget
 						{
 							child.handleEnter( new PointerMotionEvent( childSpaceEvent.pointer, PointerMotionEvent.Action.ENTER ) );
 						}
-						pointerChildTable.put( event.pointer.concretePointer(), child );
+						putChildForPointer( event.pointer.concretePointer(), child );
 					}
 					else
 					{
-						pointerChildTable.remove( event.pointer.concretePointer() );
+						removeChildForPointer( event.pointer.concretePointer() );
 						onEnter( new PointerMotionEvent( event.pointer, PointerMotionEvent.Action.ENTER ) );
 					}
 				}
@@ -466,7 +463,7 @@ public abstract class DPContainer extends DPWidget
 		}
 		else
 		{
-			DPWidget pointerChild = pointerChildTable.get( event.pointer.concretePointer() );
+			DPWidget pointerChild = getChildForPointer( event.pointer.concretePointer() );
 			DPWidget oldPointerChild = pointerChild;
 			
 			if ( pointerChild != null )
@@ -474,7 +471,7 @@ public abstract class DPContainer extends DPWidget
 				if ( !isLocalSpacePointWithinBoundsOfChild( event.pointer.getLocalPos(), pointerChild ) )
 				{
 					pointerChild.handleLeave( new PointerMotionEvent( event.pointer.transformed( pointerChild.getParentToLocalXform() ), PointerMotionEvent.Action.LEAVE ) );
-					pointerChildTable.remove( event.pointer.concretePointer() );
+					removeChildForPointer( event.pointer.concretePointer() );
 					pointerChild = null;
 				}
 				else
@@ -490,7 +487,7 @@ public abstract class DPContainer extends DPWidget
 				{
 					child.handleEnter( event.transformed( child.getParentToLocalXform() ) );
 					pointerChild = child;
-					pointerChildTable.put( event.pointer.concretePointer(), pointerChild );
+					putChildForPointer( event.pointer.concretePointer(), pointerChild );
 				}
 			}
 			
@@ -519,7 +516,7 @@ public abstract class DPContainer extends DPWidget
 			if ( isLocalSpacePointWithinBoundsOfChild( localPos, child ) )
 			{
 				child.handleEnter( event.transformed( child.getParentToLocalXform() ) );
-				pointerChildTable.put( event.pointer.concretePointer(), child );
+				putChildForPointer( event.pointer.concretePointer(), child );
 				onLeaveIntoChild( new PointerMotionEvent( event.pointer, PointerMotionEvent.Action.LEAVE ), child );
 				break;
 			}
@@ -530,12 +527,12 @@ public abstract class DPContainer extends DPWidget
 	{
 		if ( pressGrabChild == null )
 		{
-			DPWidget pointerChild = pointerChildTable.get( event.pointer.concretePointer() );
+			DPWidget pointerChild = getChildForPointer( event.pointer.concretePointer() );
 			if ( pointerChild != null )
 			{
 				pointerChild.handleLeave( event.transformed( pointerChild.getParentToLocalXform() ) );
 				onEnterFromChild( new PointerMotionEvent( event.pointer, PointerMotionEvent.Action.ENTER ), pointerChild );
-				pointerChildTable.remove( event.pointer.concretePointer() );
+				removeChildForPointer( event.pointer.concretePointer() );
 			}
 		}
 
@@ -546,7 +543,7 @@ public abstract class DPContainer extends DPWidget
 	
 	protected boolean handleScroll(PointerScrollEvent event)
 	{
-		DPWidget pointerChild = pointerChildTable.get( event.pointer.concretePointer() );
+		DPWidget pointerChild = getChildForPointer( event.pointer.concretePointer() );
 		if ( pressGrabChild != null )
 		{
 			pressGrabChild.handleScroll( event.transformed( pressGrabChild.getParentToLocalXform() ) );
@@ -1070,6 +1067,50 @@ public abstract class DPContainer extends DPWidget
 			}
 		}
 	}
+	
+	
+	
+	
+	
+	//
+	//
+	// PRIVATE ACCESSOR METHODS FOR @pointerChildTable AND @pointerDndChildTable
+	//
+	//
+	
+	private DPWidget getChildForPointer(PointerInterface pointer)
+	{
+		if ( pointerChildTable != null )
+		{
+			return pointerChildTable.get( pointer );
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	private void putChildForPointer(PointerInterface pointer, DPWidget child)
+	{
+		if ( pointerChildTable == null )
+		{
+			pointerChildTable = new HashMap<PointerInterface, DPWidget>();
+		}
+		pointerChildTable.put( pointer, child );
+	}
+	
+	private void removeChildForPointer(PointerInterface pointer)
+	{
+		if ( pointerChildTable != null )
+		{
+			pointerChildTable.remove( pointer );
+			if ( pointerChildTable.size() == 0 )
+			{
+				pointerChildTable = null;
+			}
+		}
+	}
+
 	
 	
 	
