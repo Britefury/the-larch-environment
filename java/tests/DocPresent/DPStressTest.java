@@ -25,7 +25,7 @@ import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
 public class DPStressTest
 {
-	// Used about 421MB ram on a 32-bit VM
+	// Used about 357MB ram on a 32-bit VM  (down from 480MB)
 	private static int NUMLINES = 10240;
 	
 	
@@ -39,21 +39,19 @@ public class DPStressTest
 		return new DPText( nameStyle, n );
 	}
 	
-	public DPWidget attr(DPWidget x, String a)
+	public DPWidget[] attr(DPWidget x, String a)
 	{
 		DPText dot = new DPText( puncStyle, "." );
 		DPText attrName = new DPText( nameStyle, a );
-		DPParagraph attr = new DPParagraph( paraStyle );
-		attr.extend( Arrays.asList( new DPWidget[] { x, dot, attrName } ) );
-		return attr;
+		return new DPWidget[] { x, dot, attrName };
 	}
 	
-	public DPWidget call(DPWidget x, DPWidget... args)
+	public DPWidget call(DPWidget[] x, DPWidget... args)
 	{
 		DPText openParen = new DPText( puncStyle, "(" );
 		DPText closeParen = new DPText( puncStyle, ")" );
 		ArrayList<DPWidget> elems = new ArrayList<DPWidget>();
-		elems.add( x );
+		elems.addAll( Arrays.asList( x ) );
 		elems.add( openParen );
 		for (int i = 0; i < args.length; i++)
 		{
