@@ -120,8 +120,8 @@ abstract public class DPWidget
 	protected double scale, rootScale;
 	protected HMetrics minH, prefH;
 	protected VMetrics minV, prefV;
-	protected Point2 positionInParentSpace;
-	protected Vector2 allocation;
+	protected double positionInParentSpaceX, positionInParentSpaceY;
+	protected double allocationX, allocationY;
 	protected ParentPacking parentPacking;
 	
 	protected ArrayList<Runnable> waitingImmediateEvents;			// only initialised when non-empty; otherwise null
@@ -161,8 +161,8 @@ abstract public class DPWidget
 		prefH = new HMetrics();
 		minV = new VMetrics();
 		prefV = new VMetrics();
-		positionInParentSpace = new Point2();
-		allocation = new Vector2();
+		positionInParentSpaceX = positionInParentSpaceY = 0.0;
+		allocationX = allocationY = 0.0;
 		parentPacking = null;
 		waitingImmediateEvents = null;
 		pointersWithinBounds = null;
@@ -208,39 +208,39 @@ abstract public class DPWidget
 	
 	public Point2 getPositionInParentSpace()
 	{
-		return positionInParentSpace;
+		return new Point2( positionInParentSpaceX, positionInParentSpaceY );
 	}
 	
 	public Vector2 getAllocation()
 	{
-		return allocation;
+		return new Vector2( allocationX, allocationY );
 	}
 	
 	public Vector2 getAllocationInParentSpace()
 	{
-		return allocation.mul( scale );
+		return new Vector2( allocationX * scale, allocationY * scale );
 	}
 	
 	
 	public AABox2 getLocalAABox()
 	{
-		return new AABox2( new Point2(), new Point2( allocation ) );
+		return new AABox2( new Point2(), new Point2( allocationX, allocationY ) );
 	}
 	
 	public AABox2 getAABoxInParentSpace()
 	{
-		return new AABox2( positionInParentSpace, getAllocationInParentSpace() );
+		return new AABox2( getPositionInParentSpace(), getAllocationInParentSpace() );
 	}
 
 	
 	public Xform2 getLocalToParentXform()
 	{
-		return new Xform2( scale, positionInParentSpace.toVector2() );
+		return new Xform2( scale, new Vector2( positionInParentSpaceX, positionInParentSpaceY ) );
 	}
 	
 	public Xform2 getParentToLocalXform()
 	{
-		return Xform2.inverseOf( scale, positionInParentSpace.toVector2() );
+		return Xform2.inverseOf( scale, new Vector2( positionInParentSpaceX, positionInParentSpaceY ) );
 	}
 	
 	
@@ -874,12 +874,12 @@ abstract public class DPWidget
 	
 	protected void clip(Graphics2D graphics)
 	{
-		graphics.clip( new Rectangle2D.Double( 0.0, 0.0, allocation.x, allocation.y ) );
+		graphics.clip( new Rectangle2D.Double( 0.0, 0.0, allocationX, allocationY ) );
 	}
 
 	protected void clipIfAllocationInsufficient(Graphics2D graphics)
 	{
-		if ( allocation.x < minH.width  ||  allocation.y < minV.height )
+		if ( allocationX < minH.width  ||  allocationY < minV.height )
 		{
 			clip( graphics );
 		}
@@ -916,7 +916,7 @@ abstract public class DPWidget
 	
 	protected void queueFullRedraw()
 	{
-		queueRedraw( new Point2(), allocation );
+		queueRedraw( new Point2(), getAllocation() );
 	}
 	
 	
@@ -1095,9 +1095,9 @@ abstract public class DPWidget
 	
 	protected void allocateX(double width)
 	{
-		if ( !bSizeUpToDate  ||  width != allocation.x )
+		if ( !bSizeUpToDate  ||  width != allocationX )
 		{
-			allocation.x = width;
+			allocationX = width;
 			allocateContentsX( width );
 			bSizeUpToDate = false;
 		}
@@ -1105,9 +1105,9 @@ abstract public class DPWidget
 	
 	protected void allocateY(double height)
 	{
-		if ( !bSizeUpToDate  ||  height != allocation.y )
+		if ( !bSizeUpToDate  ||  height != allocationY )
 		{
-			allocation.y = height;
+			allocationY = height;
 			allocateContentsY( height );
 		}
 		bResizeQueued = false;
@@ -1137,7 +1137,7 @@ abstract public class DPWidget
 	
 	protected Point2 getCursorPosition()
 	{
-		return new Point2( allocation.mul( 0.5 ) );
+		return new Point2( allocationX * 0.5, allocationY * 0.5 );
 	}
 	
 	

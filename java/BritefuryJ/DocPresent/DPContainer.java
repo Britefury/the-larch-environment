@@ -239,7 +239,7 @@ public abstract class DPContainer extends DPWidget
 		double childWidth = localWidth / child.scale;
 		child.allocateX( childWidth );
 		
-		child.positionInParentSpace.x = localPosX;
+		child.positionInParentSpaceX = localPosX;
 	}
 	
 	protected void allocateChildY(DPWidget child, double localPosY, double localHeight)
@@ -247,7 +247,7 @@ public abstract class DPContainer extends DPWidget
 		double childHeight = localHeight / child.scale;
 		child.allocateY( childHeight );
 		
-		child.positionInParentSpace.y = localPosY;
+		child.positionInParentSpaceY = localPosY;
 	}
 	
 	
@@ -423,7 +423,7 @@ public abstract class DPContainer extends DPWidget
 				DPWidget savedPressGrabChild = pressGrabChild;
 				pressGrabChild = null;
 				
-				if ( localPos.x >= 0.0  &&  localPos.x <= allocation.x  &&  localPos.y >= 0.0  &&  localPos.y <= allocation.y )
+				if ( localPos.x >= 0.0  &&  localPos.x <= allocationX  &&  localPos.y >= 0.0  &&  localPos.y <= allocationY )
 				{
 					DPWidget child = getChildAtLocalPoint( localPos );
 					if ( child != null )

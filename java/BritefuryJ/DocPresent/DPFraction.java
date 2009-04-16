@@ -44,7 +44,7 @@ public class DPFraction extends DPContainer
 	
 		protected void draw(Graphics2D graphics)
 		{
-			Shape s = new Rectangle2D.Double( 0.0, 0.0, allocation.x, allocation.y );
+			Shape s = new Rectangle2D.Double( 0.0, 0.0, allocationX, allocationY );
 			graphics.setColor( getColour() );
 			graphics.fill( s );
 		}
@@ -67,14 +67,14 @@ public class DPFraction extends DPContainer
 		public void drawCaretAtStart(Graphics2D graphics)
 		{
 			AffineTransform current = pushGraphicsTransform( graphics );
-			graphics.draw( new Line2D.Double( 0.0, -2.0, 0.0, allocation.y + 2.0 ) );
+			graphics.draw( new Line2D.Double( 0.0, -2.0, 0.0, allocationY + 2.0 ) );
 			popGraphicsTransform( graphics, current );
 		}
 
 		public void drawCaretAtEnd(Graphics2D graphics)
 		{
 			AffineTransform current = pushGraphicsTransform( graphics );
-			graphics.draw( new Line2D.Double( allocation.x, -2.0, allocation.x, allocation.y + 2.0 ) );
+			graphics.draw( new Line2D.Double( allocationX, -2.0, allocationX, allocationY + 2.0 ) );
 			popGraphicsTransform( graphics, current );
 		}
 
@@ -114,7 +114,7 @@ public class DPFraction extends DPContainer
 
 		public int getMarkerPositonForPoint(Point2 localPos)
 		{
-			if ( localPos.x >= allocation.x * 0.5 )
+			if ( localPos.x >= allocationX * 0.5 )
 			{
 				return 1;
 			}

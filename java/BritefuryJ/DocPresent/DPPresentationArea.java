@@ -498,8 +498,8 @@ public class DPPresentationArea extends DPBin implements CaretListener
 	{
 		performAllocation();
 		
-		double ax = allocation.x == 0.0  ?  1.0  :  allocation.x;
-		double ay = allocation.y == 0.0  ?  1.0  :  allocation.y;
+		double ax = allocationX == 0.0  ?  1.0  :  allocationX;
+		double ay = allocationY == 0.0  ?  1.0  :  allocationY;
 		
 		windowTopLeftCornerInRootSpace = new Point2();
 		rootScaleInWindowSpace = Math.min( areaSize.x / ax, areaSize.y / ay );
