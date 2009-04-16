@@ -90,7 +90,21 @@ abstract public class DPWidget
 			destOps = new ArrayList<DndOperation>();
 		}
 	}
+	
+	
+	
+	
+	//
+	//
+	// Parent packing
+	//
+	//
+	
+	protected static class ParentPacking
+	{
+	};
 
+	
 	
 
 	//
@@ -108,6 +122,7 @@ abstract public class DPWidget
 	protected VMetrics minV, prefV;
 	protected Point2 positionInParentSpace;
 	protected Vector2 allocation;
+	protected ParentPacking parentPacking;
 	
 	protected ArrayList<Runnable> waitingImmediateEvents;
 	
@@ -149,6 +164,7 @@ abstract public class DPWidget
 		prefV = new VMetrics();
 		positionInParentSpace = new Point2();
 		allocation = new Vector2();
+		parentPacking = null;
 		waitingImmediateEvents = null;
 		pointersWithinBounds = null;
 	}
@@ -170,6 +186,21 @@ abstract public class DPWidget
 		this.element = element;
 	}
 	
+	
+	
+	//
+	// Parent packing methods
+	//
+	
+	public ParentPacking getParentPacking()
+	{
+		return parentPacking;
+	}
+	
+	public void setParentPacking(ParentPacking parentPacking)
+	{
+		this.parentPacking = parentPacking;
+	}
 	
 
 	//
@@ -357,7 +388,7 @@ abstract public class DPWidget
 	{
 		if ( parent != null )
 		{
-			parent.removeChild( this );
+			parent.replaceChildWithEmpty( this );
 		}
 		presentationArea = null;
 	}

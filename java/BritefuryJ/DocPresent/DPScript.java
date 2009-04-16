@@ -89,18 +89,16 @@ public class DPScript extends DPContainer
 			
 			if ( existingChild != null )
 			{
-				ChildEntry entry = childToEntry.get( existingChild );
-				unregisterChildEntry( entry );
-				childEntries.remove( entry );
+				unregisterChild( existingChild );
+				registeredChildren.remove( existingChild );
 			}
 			
 			children[slot] = child;
 			
 			if ( child != null )
 			{
-				ChildEntry entry = new ChildEntry( child );
-				childEntries.add( entry );
-				registerChildEntry( entry );
+				registeredChildren.add( child );
+				registerChild( child );
 				if ( slot != MAIN )
 				{
 					child.setScale( childScale, rootScale * childScale );
@@ -168,7 +166,7 @@ public class DPScript extends DPContainer
 
 	
 	
-	protected void removeChild(DPWidget child)
+	protected void replaceChildWithEmpty(DPWidget child)
 	{
 		int slot = Arrays.asList( children ).indexOf( child );
 		setChild( slot, null );
@@ -745,36 +743,36 @@ public class DPScript extends DPContainer
 
 	
 	
-	private ArrayList<ChildEntry> getChildEntries(int[] slots)
+	private ArrayList<DPWidget> getChildrenInSlots(int[] slots)
 	{
-		ArrayList<ChildEntry> entries = new ArrayList<ChildEntry>();
+		ArrayList<DPWidget> entries = new ArrayList<DPWidget>();
 		for (int slot: slots)
 		{
 			if ( children[slot] != null )
 			{
-				entries.add( childToEntry.get( children[slot] ) );
+				entries.add( children[slot] );
 			}
 		}
 		
 		return entries;
 	}
 	
-	private ArrayList<ChildEntry> getChildEntriesInColumn(int column)
+	private ArrayList<DPWidget> getChildrenInColumn(int column)
 	{
 		if ( column == LEFTCOLUMN )
 		{
 			int slots[] = { LEFTSUPER, LEFTSUB };
-			return getChildEntries( slots );
+			return getChildrenInSlots( slots );
 		}
 		else if ( column == MAINCOLUMN )
 		{
 			int slots[] = { MAIN };
-			return getChildEntries( slots );
+			return getChildrenInSlots( slots );
 		}
 		else if ( column == RIGHTCOLUMN )
 		{
 			int slots[] = { RIGHTSUPER, RIGHTSUB };
-			return getChildEntries( slots );
+			return getChildrenInSlots( slots );
 		}
 		else
 		{
@@ -783,21 +781,21 @@ public class DPScript extends DPContainer
 	}
 	
 	
-	private double getColumnXEdge(ArrayList<ChildEntry> column, boolean bRightEdge)
+	private double getColumnXEdge(ArrayList<DPWidget> column, boolean bRightEdge)
 	{
 		double columnEdgeX = 0.0;
 		for (int i = 0; i < column.size(); i++)
 		{
-			ChildEntry entry = column.get( i );
+			DPWidget child = column.get( i );
 			
 			double edgeX = 0.0;
 			if ( bRightEdge )
 			{
-				edgeX = entry.child.getPositionInParentSpace().x + entry.child.getAllocationInParentSpace().x;
+				edgeX = child.getPositionInParentSpace().x + child.getAllocationInParentSpace().x;
 			}
 			else
 			{
-				edgeX = entry.child.getPositionInParentSpace().x;
+				edgeX = child.getPositionInParentSpace().x;
 			}
 			
 			if ( i > 0 )
@@ -822,7 +820,7 @@ public class DPScript extends DPContainer
 	
 	
 	
-	private DPWidget getLeafClosestToLocalPointInColumn(ArrayList<ChildEntry> column, Point2 localPos, WidgetFilter filter)
+	private DPWidget getLeafClosestToLocalPointInColumn(ArrayList<DPWidget> column, Point2 localPos, WidgetFilter filter)
 	{
 		// Now determine which child entry is the closest
 		if ( column.size() == 1 )
@@ -832,22 +830,22 @@ public class DPScript extends DPContainer
 		}
 		else if ( column.size() == 2 )
 		{
-			ChildEntry entryI = column.get( 0 );
-			ChildEntry entryJ = column.get( 1 );
-			double iUpperY = entryI.child.getPositionInParentSpace().y + entryI.child.getAllocationInParentSpace().y;
-			double jLowerY = entryJ.child.getPositionInParentSpace().y;
+			DPWidget childI = column.get( 0 );
+			DPWidget childJ = column.get( 1 );
+			double iUpperY = childI.getPositionInParentSpace().y + childI.getAllocationInParentSpace().y;
+			double jLowerY = childJ.getPositionInParentSpace().y;
 				
 			double midY = ( iUpperY + jLowerY ) * 0.5;
 			
-			ChildEntry entryA = localPos.y < midY  ?  entryI  :  entryJ;
-			DPWidget c = getLeafClosestToLocalPointFromChild( entryA, localPos, filter );
+			DPWidget childA = localPos.y < midY  ?  childI  :  childJ;
+			DPWidget c = getLeafClosestToLocalPointFromChild( childA, localPos, filter );
 			if ( c != null )
 			{
 				return c;
 			}
 
-			ChildEntry entryB = entryA == entryI  ?  entryJ  :  entryI;
-			return getLeafClosestToLocalPointFromChild( entryB, localPos, filter );
+			DPWidget childB = childA == childI  ?  childJ  :  childI;
+			return getLeafClosestToLocalPointFromChild( childB, localPos, filter );
 		}
 		else
 		{
@@ -857,49 +855,49 @@ public class DPScript extends DPContainer
 	
 	protected DPWidget getChildLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter)
 	{
-		if ( childEntries.size() == 0 )
+		if ( registeredChildren.size() == 0 )
 		{
 			// No children
 			return null;
 		}
-		else if ( childEntries.size() == 1 )
+		else if ( registeredChildren.size() == 1 )
 		{
 			// Only 1 child
-			return childEntries.get( 0 ).child;
+			return registeredChildren.get( 0 );
 		}
 		else
 		{
 			// Group children by column
-			ArrayList< ArrayList<ChildEntry> > childEntriesByColumn = new ArrayList< ArrayList<ChildEntry> >();
+			ArrayList< ArrayList<DPWidget> > childrenByColumn = new ArrayList< ArrayList<DPWidget> >();
 			
 			int[] columns = { LEFTCOLUMN, MAINCOLUMN, RIGHTCOLUMN };
 			
 			for (int col: columns)
 			{
-				ArrayList<ChildEntry> childEntries = getChildEntriesInColumn( col );
+				ArrayList<DPWidget> childEntries = getChildrenInColumn( col );
 				
 				if ( childEntries.size() > 0 )
 				{
-					childEntriesByColumn.add( childEntries );
+					childrenByColumn.add( childEntries );
 				}
 			}
 			
 			
 			// Determine which column is closest
-			ArrayList<ChildEntry> closestColumn = null;
+			ArrayList<DPWidget> closestColumn = null;
 			int columnIndex = -1;
 			
-			if ( childEntriesByColumn.size() == 1 )
+			if ( childrenByColumn.size() == 1 )
 			{
-				closestColumn = childEntriesByColumn.get( 0 );
+				closestColumn = childrenByColumn.get( 0 );
 				columnIndex = 0;
 			}
 			else
 			{
-				ArrayList<ChildEntry> colI = childEntriesByColumn.get( 0 );
-				for (int i = 0; i < childEntriesByColumn.size() - 1; i++)
+				ArrayList<DPWidget> colI = childrenByColumn.get( 0 );
+				for (int i = 0; i < childrenByColumn.size() - 1; i++)
 				{
-					ArrayList<ChildEntry> colJ = childEntriesByColumn.get( i + 1 );
+					ArrayList<DPWidget> colJ = childrenByColumn.get( i + 1 );
 					double rightEdgeI = getColumnXEdge( colI, true );
 					double leftEdgeJ = getColumnXEdge( colJ, false );
 					
@@ -917,8 +915,8 @@ public class DPScript extends DPContainer
 				
 				if ( closestColumn == null )
 				{
-					columnIndex = childEntriesByColumn.size() - 1;
-					closestColumn = childEntriesByColumn.get( columnIndex );
+					columnIndex = childrenByColumn.size() - 1;
+					closestColumn = childrenByColumn.get( columnIndex );
 				}
 			}
 			
@@ -932,26 +930,22 @@ public class DPScript extends DPContainer
 			}
 			else
 			{
-				ChildEntry next = null;
-				DPWidget nextC = null;
-				for (int j = columnIndex + 1; j < childEntriesByColumn.size(); j++)
+				DPWidget next = null;
+				for (int j = columnIndex + 1; j < childrenByColumn.size(); j++)
 				{
-					nextC = getLeafClosestToLocalPointInColumn( childEntriesByColumn.get( j ), localPos, filter );
-					if ( nextC != null )
+					next = getLeafClosestToLocalPointInColumn( childrenByColumn.get( j ), localPos, filter );
+					if ( next != null )
 					{
-						next = childToEntry.get( c );
 						break;
 					}
 				}
 
-				ChildEntry prev = null;
-				DPWidget prevC = null;
+				DPWidget prev = null;
 				for (int j = columnIndex - 1; j >= 0; j--)
 				{
-					prevC = getLeafClosestToLocalPointInColumn( childEntriesByColumn.get( j ), localPos, filter );
-					if ( prevC != null )
+					prev = getLeafClosestToLocalPointInColumn( childrenByColumn.get( j ), localPos, filter );
+					if ( prev != null )
 					{
-						prev = childToEntry.get( c );
 						break;
 					}
 				}
@@ -963,18 +957,18 @@ public class DPScript extends DPContainer
 				}
 				else if ( prev == null  &&  next != null )
 				{
-					return nextC;
+					return next;
 				}
 				else if ( prev != null  &&  next == null )
 				{
-					return prevC;
+					return prev;
 				}
 				else
 				{
-					double distToPrev = localPos.y - ( prev.child.getPositionInParentSpace().y + prev.child.getAllocationInParentSpace().y );
-					double distToNext = next.child.getPositionInParentSpace().y - localPos.y;
+					double distToPrev = localPos.y - ( prev.getPositionInParentSpace().y + prev.getAllocationInParentSpace().y );
+					double distToNext = next.getPositionInParentSpace().y - localPos.y;
 					
-					return distToPrev > distToNext  ?  prevC  :  nextC;
+					return distToPrev > distToNext  ?  prev  :  next;
 				}
 			}
 		}

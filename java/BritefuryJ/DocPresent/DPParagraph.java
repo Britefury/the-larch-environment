@@ -9,7 +9,6 @@ package BritefuryJ.DocPresent;
 
 import java.lang.Math;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import BritefuryJ.DocPresent.Metrics.HMetrics;
@@ -32,14 +31,12 @@ public class DPParagraph extends DPContainerSequence
 	}
 
 
-	protected static class ParagraphChildEntry extends DPContainerSequence.ChildEntry
+	protected static class ParagraphParentPacking extends ParentPacking
 	{
 		public double padding;
 		
-		public ParagraphChildEntry(DPWidget child, double padding)
+		public ParagraphParentPacking(double padding)
 		{
-			super( child );
-			
 			this.padding = padding;
 		}
 	}
@@ -47,12 +44,12 @@ public class DPParagraph extends DPContainerSequence
 	
 	private static class Line
 	{
-		public List<ChildEntry> children;
+		public List<DPWidget> children;
 		public VMetrics minV, prefV;
 		public double posY, sizeY;
 		
 		
-		public Line(List<ChildEntry> children)
+		public Line(List<DPWidget> children)
 		{
 			this.children = children;
 		}
@@ -76,13 +73,14 @@ public class DPParagraph extends DPContainerSequence
 					chm = chm.minSpacing( spacing );
 				}
 				
-				ParagraphChildEntry entry = (ParagraphChildEntry)children.get( i ); 
+				DPWidget child = children.get( i );
+				ParagraphParentPacking packing = (ParagraphParentPacking)child.getParentPacking();
 
-				double childX = x + entry.padding;
+				double childX = x + packing.padding;
 				
-				paragraph.allocateChildX( entry.child, childX, chm.width );
+				paragraph.allocateChildX( child, childX, chm.width );
 
-				width = x + chm.width + entry.padding * 2.0;
+				width = x + chm.width + packing.padding * 2.0;
 				x = width + chm.hspacing;
 			}
 		}
@@ -101,10 +99,8 @@ public class DPParagraph extends DPContainerSequence
 				double delta = lineAllocation - vmt.height;
 				double y = lineY + vmt.ascent + delta * 0.5;
 				
-				for (ChildEntry entry: children)
+				for (DPWidget child: children)
 				{
-					ParagraphChildEntry paraEntry = (ParagraphChildEntry)entry;
-					DPWidget child = paraEntry.child;
 					double chAscent;
 					VMetrics chm = child.prefV;
 					if ( chm.isTypeset() )
@@ -124,9 +120,8 @@ public class DPParagraph extends DPContainerSequence
 			}
 			else
 			{
-				for (ChildEntry entry: children)
+				for (DPWidget child: children)
 				{
-					DPWidget child = entry.child;
 					double childHeight = Math.min( child.prefV.height, lineAllocation );
 					if ( alignment == Alignment.TOP )
 					{
@@ -150,7 +145,7 @@ public class DPParagraph extends DPContainerSequence
 		
 		
 
-		private ChildEntry getChildEntryClosestToLocalPoint(Point2 localPos, WidgetFilter filter)
+		private DPWidget getChildClosestToLocalPoint(Point2 localPos, WidgetFilter filter)
 		{
 			if ( children.size() == 0 )
 			{
@@ -162,21 +157,21 @@ public class DPParagraph extends DPContainerSequence
 			}
 			else
 			{
-				ChildEntry entryI = children.get( 0 );
+				DPWidget childI = children.get( 0 );
 				for (int i = 0; i < children.size() - 1; i++)
 				{
-					ChildEntry entryJ = children.get( i + 1 );
-					double iUpperX = entryI.child.getPositionInParentSpace().x + entryI.child.getAllocationInParentSpace().x;
-					double jLowerX = entryJ.child.getPositionInParentSpace().x;
+					DPWidget childJ = children.get( i + 1 );
+					double iUpperX = childI.getPositionInParentSpace().x + childI.getAllocationInParentSpace().x;
+					double jLowerX = childJ.getPositionInParentSpace().x;
 					
 					double midX = ( iUpperX + jLowerX ) * 0.5;
 					
 					if ( localPos.x < midX )
 					{
-						return entryI;
+						return childI;
 					}
 					
-					entryI = entryJ;
+					childI = childJ;
 				}
 				
 				return children.get( children.size() - 1 );
@@ -204,38 +199,6 @@ public class DPParagraph extends DPContainerSequence
 
 
 	
-	public void append(DPWidget child)
-	{
-		appendChildEntry( createChildEntryForChild( child ) );
-	}
-
-	public void extend(DPWidget[] children)
-	{
-		extend( Arrays.asList( children ) );
-	}
-
-	public void extend(List<DPWidget> children)
-	{
-		ChildEntry[] entries = new ChildEntry[children.size()];
-		
-		for (int i = 0; i < children.size(); i++)
-		{
-			entries[i] = createChildEntryForChild( children.get( i ) );
-		}
-		
-		extendChildEntries( entries );
-	}
-	
-	public void insert(int index, DPWidget child)
-	{
-		insertChildEntry( index, createChildEntryForChild( child ) );
-	}
-
-	public void remove(DPWidget child)
-	{
-		removeChildEntry( childToEntry.get( child ) );
-	}
-
 	
 
 	public int getInsertIndex(Point2 localPos)
@@ -250,12 +213,12 @@ public class DPParagraph extends DPContainerSequence
 	
 		double pos = localPos.x;
 		
-		double[] midPoints = new double[childEntries.size()];
+		double[] midPoints = new double[registeredChildren.size()];
 		
 		for (int i = 0; i < midPoints.length; i++)
 		{
-			ChildEntry entry = childEntries.get( i );
-			midPoints[i] = entry.child.getPositionInParentSpace().x  +  entry.child.getAllocationInParentSpace().x * 0.5;
+			DPWidget child = registeredChildren.get( i );
+			midPoints[i] = child.getPositionInParentSpace().x  +  child.getAllocationInParentSpace().x * 0.5;
 		}
 		
 		if ( pos < midPoints[0] )
@@ -284,9 +247,9 @@ public class DPParagraph extends DPContainerSequence
 
 	
 	
-	protected ParagraphChildEntry createChildEntryForChild(DPWidget child)
+	protected ParagraphParentPacking createParentPackingForChild(DPWidget child)
 	{
-		return new ParagraphChildEntry( child, getPadding() );
+		return new ParagraphParentPacking( getPadding() );
 	}
 
 	
@@ -298,7 +261,7 @@ public class DPParagraph extends DPContainerSequence
 	
 
 
-	private HMetrics combineHMetricsHorizontally(List<ChildEntry> entries, double initialX, HMetrics[] childHMetrics)
+	private HMetrics combineHMetricsHorizontally(List<DPWidget> childList, double initialX, HMetrics[] childHMetrics)
 	{
 		if ( childHMetrics.length == 0 )
 		{
@@ -312,7 +275,8 @@ public class DPParagraph extends DPContainerSequence
 			double x = initialX;
 			for (int i = 0; i < childHMetrics.length; i++)
 			{
-				ParagraphChildEntry childEntry = (ParagraphChildEntry)entries.get( i );
+				DPWidget child = childList.get( i );
+				ParagraphParentPacking packing = (ParagraphParentPacking)child.getParentPacking();
 				HMetrics chm = childHMetrics[i];
 				
 				if ( i != childHMetrics.length - 1)
@@ -320,7 +284,7 @@ public class DPParagraph extends DPContainerSequence
 					chm = chm.minSpacing( spacing );
 				}
 				
-				width = x + chm.width  +  childEntry.padding * 2.0;
+				width = x + chm.width  +  packing.padding * 2.0;
 				x = width + chm.hspacing;
 			}
 			
@@ -414,7 +378,7 @@ public class DPParagraph extends DPContainerSequence
 	
 	protected HMetrics computeMinimumHMetrics()
 	{
-		if ( childEntries.size() == 0 )
+		if ( registeredChildren.size() == 0 )
 		{
 			return new HMetrics();
 		}
@@ -433,10 +397,10 @@ public class DPParagraph extends DPContainerSequence
 			double lineWidth = 0.0;
 			double lineX = 0.0;
 			
-			for (int i = 0; i < childEntries.size(); i++)
+			for (int i = 0; i < registeredChildren.size(); i++)
 			{
-				ParagraphChildEntry childEntry = (ParagraphChildEntry)childEntries.get( i );
-				DPWidget child = childEntry.child;
+				DPWidget child = registeredChildren.get( i );
+				ParagraphParentPacking packing = (ParagraphParentPacking)child.getParentPacking();
 				if ( child.getLineBreakInterface() != null )
 				{
 					width = Math.max( width, lineWidth );
@@ -451,18 +415,18 @@ public class DPParagraph extends DPContainerSequence
 					HMetrics chm = child.refreshMinimumHMetrics();
 					
 					// Take spacing into account
-					if ( i != childEntries.size() - 1)
+					if ( i != registeredChildren.size() - 1)
 					{
 						// Spacing not appended to last child
 						
-						if ( childEntries.get( i+1 ).child.getLineBreakInterface() != null )
+						if ( registeredChildren.get( i+1 ).getLineBreakInterface() != null )
 						{
 							// Spacing not applied before a line break
 							chm = chm.minSpacing( spacing );
 						}
 					}
 					
-					lineWidth = lineX + chm.width  +  childEntry.padding * 2.0;
+					lineWidth = lineX + chm.width  +  packing.padding * 2.0;
 					lineX = lineWidth + chm.hspacing;
 				}
 			}
@@ -473,7 +437,7 @@ public class DPParagraph extends DPContainerSequence
 
 	protected HMetrics computePreferredHMetrics()
 	{
-		return combineHMetricsHorizontally( childEntries, 0.0, getChildrenRefreshedPreferredHMetrics() );
+		return combineHMetricsHorizontally( registeredChildren, 0.0, getChildrenRefreshedPreferredHMetrics() );
 	}
 	
 	
@@ -518,11 +482,11 @@ public class DPParagraph extends DPContainerSequence
 		LineBreakInterface bestLineBreakInterface = null;
 		int bestLineBreakIndex = -1;
 		
-		for (int i = 0; i < childEntries.size(); i++)
+		for (int i = 0; i < registeredChildren.size(); i++)
 		{
 			// Get the child
-			ParagraphChildEntry childEntry = (ParagraphChildEntry)childEntries.get( i );
-			DPWidget child = childEntry.child;
+			DPWidget child = registeredChildren.get( i );
+			ParagraphParentPacking packing = (ParagraphParentPacking)child.getParentPacking();
 			LineBreakInterface lineBreak = child.getLineBreakInterface();
 			if ( lineBreak != null )
 			{
@@ -540,13 +504,13 @@ public class DPParagraph extends DPContainerSequence
 			HMetrics chm = child.prefH;
 			
 			// Take spacing into account
-			if ( i != childEntries.size() - 1)
+			if ( i != registeredChildren.size() - 1)
 			{
 				// Spacing not applied before a line break
 				chm = chm.minSpacing( spacing );
 			}
 			
-			lineWidth = lineX + chm.width  +  childEntry.padding * 2.0;
+			lineWidth = lineX + chm.width  +  packing.padding * 2.0;
 			lineX = lineWidth + chm.hspacing;
 			
 			
@@ -556,7 +520,7 @@ public class DPParagraph extends DPContainerSequence
 				if ( bestLineBreakIndex > lineStartIndex )
 				{
 					// Build a new line
-					lines.add( new Line( childEntries.subList( lineStartIndex, bestLineBreakIndex +1 ) ) );
+					lines.add( new Line( registeredChildren.subList( lineStartIndex, bestLineBreakIndex +1 ) ) );
 				}
 				
 				// We want the for-loop to return to the break position
@@ -571,10 +535,10 @@ public class DPParagraph extends DPContainerSequence
 			}
 		}
 	
-		if ( childEntries.size() > lineStartIndex )
+		if ( registeredChildren.size() > lineStartIndex )
 		{
 			// Build a new line
-			lines.add( new Line( childEntries.subList( lineStartIndex, childEntries.size() ) ) );
+			lines.add( new Line( registeredChildren.subList( lineStartIndex, registeredChildren.size() ) ) );
 		}
 	}
 
@@ -678,37 +642,33 @@ public class DPParagraph extends DPContainerSequence
 		
 		if ( line != null )
 		{
-			ChildEntry entry = line.getChildEntryClosestToLocalPoint( localPos, filter );
+			DPWidget child = line.getChildClosestToLocalPoint( localPos, filter );
 			
-			DPWidget c = getLeafClosestToLocalPointFromChild( entry, localPos, filter );
+			DPWidget c = getLeafClosestToLocalPointFromChild( child, localPos, filter );
 			
 			if ( c != null )
 			{
 				return c;
 			}
 			
-			int index = childEntries.indexOf( entry );
+			int index = registeredChildren.indexOf( child );
 			
-			ChildEntry next = null;
-			DPWidget nextC = null;
-			for (int j = index + 1; j < childEntries.size(); j++)
+			DPWidget next = null;
+			for (int j = index + 1; j < registeredChildren.size(); j++)
 			{
-				nextC = getLeafClosestToLocalPointFromChild( childEntries.get( j ), localPos, filter );
-				if ( nextC != null )
+				next = getLeafClosestToLocalPointFromChild( registeredChildren.get( j ), localPos, filter );
+				if ( next != null )
 				{
-					next = childEntries.get( j );
 					break;
 				}
 			}
 
-			ChildEntry prev = null;
-			DPWidget prevC = null;
+			DPWidget prev = null;
 			for (int j = index - 1; j >= 0; j--)
 			{
-				prevC = getLeafClosestToLocalPointFromChild( childEntries.get( j ), localPos, filter );
-				if ( prevC != null )
+				prev = getLeafClosestToLocalPointFromChild( registeredChildren.get( j ), localPos, filter );
+				if ( prev != null )
 				{
-					prev = childEntries.get( j );
 					break;
 				}
 			}
@@ -720,18 +680,18 @@ public class DPParagraph extends DPContainerSequence
 			}
 			else if ( prev == null  &&  next != null )
 			{
-				return nextC;
+				return next;
 			}
 			else if ( prev != null  &&  next == null )
 			{
-				return prevC;
+				return prev;
 			}
 			else
 			{
-				double distToPrev = localPos.x - ( prev.child.getPositionInParentSpace().x + prev.child.getAllocationInParentSpace().x );
-				double distToNext = next.child.getPositionInParentSpace().x - localPos.x;
+				double distToPrev = localPos.x - ( prev.getPositionInParentSpace().x + prev.getAllocationInParentSpace().x );
+				double distToNext = next.getPositionInParentSpace().x - localPos.x;
 				
-				return distToPrev > distToNext  ?  prevC  :  nextC;
+				return distToPrev > distToNext  ?  prev  :  next;
 			}
 		}
 		else

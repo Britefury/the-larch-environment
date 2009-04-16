@@ -55,18 +55,16 @@ public class DPMathRoot extends DPContainer
 			
 			if ( prevChild != null )
 			{
-				ChildEntry entry = childToEntry.get( prevChild );
-				unregisterChildEntry( entry );
-				childEntries.remove( entry );
+				unregisterChild( prevChild );
+				registeredChildren.remove( prevChild );
 			}
 			
 			this.child = child;
 			
 			if ( this.child != null )
 			{
-				ChildEntry entry = new ChildEntry( this.child );
-				childEntries.add( entry );
-				registerChildEntry( entry );				
+				registeredChildren.add( child );
+				registerChild( child );				
 			}
 			
 			queueResize();
@@ -74,7 +72,7 @@ public class DPMathRoot extends DPContainer
 	}
 	
 	
-	protected void removeChild(DPWidget child)
+	protected void replaceChildWithEmpty(DPWidget child)
 	{
 		assert child == this.child;
 		setChild( null );
@@ -235,7 +233,7 @@ public class DPMathRoot extends DPContainer
 		}
 		else
 		{
-			return getLeafClosestToLocalPointFromChild( childEntries.get( 0 ), localPos, filter );
+			return getLeafClosestToLocalPointFromChild( registeredChildren.get( 0 ), localPos, filter );
 		}
 	}
 
