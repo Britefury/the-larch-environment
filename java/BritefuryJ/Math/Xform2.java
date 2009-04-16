@@ -101,4 +101,11 @@ public class Xform2 implements Cloneable
 	{
 		return "Xform2( translation=" + translation.toString() + ", scale=" + String.valueOf( scale ) + " )";
 	}
+	
+	
+	public static Xform2 inverseOf(double scale, Vector2 translation)
+	{
+		double invScale = 1.0 / scale;
+		return new Xform2( invScale, translation.mul( -invScale ) );
+	}
 }

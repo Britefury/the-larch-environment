@@ -24,7 +24,7 @@ import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
 public class ElementTreeStressTest extends ElementTreeTestBase
 {
-	// Uses around 447MB RAM on a 32-bit VM
+	// Uses around 418MB RAM on a 32-bit VM
 	private static int NUMLINES = 10240;
 	
 	
