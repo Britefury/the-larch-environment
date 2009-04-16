@@ -47,22 +47,24 @@ public class DPVBox extends DPAbstractBox
 	
 	
 	
-	public void append(DPWidget child, boolean bExpand, double padding)
+	public void append(DPWidget child,  boolean bExpand, double padding)
 	{
-		appendChildEntry( new BoxChildEntry( child, bExpand, padding ) );
+		append( child );
+		child.setParentPacking( new BoxParentPacking( bExpand, padding ) );
 	}
 
 	
 	public void insert(int index, DPWidget child, boolean bExpand, double padding)
 	{
-		insertChildEntry( index, new BoxChildEntry( child, bExpand, padding ) );
+		insert( index, child );
+		child.setParentPacking( new BoxParentPacking( bExpand, padding ) );
 	}
 	
 	
 	
-	protected BoxChildEntry createChildEntryForChild(DPWidget child)
+	protected BoxParentPacking createParentPackingForChild(DPWidget child)
 	{
-		return new BoxChildEntry( child, getExpand(), getPadding() );
+		return new BoxParentPacking( getExpand(), getPadding() );
 	}
 	
 	
@@ -79,12 +81,12 @@ public class DPVBox extends DPAbstractBox
 	
 		double pos = localPos.y;
 		
-		double[] midPoints = new double[childEntries.size()];
+		double[] midPoints = new double[registeredChildren.size()];
 		
 		for (int i = 0; i < midPoints.length; i++)
 		{
-			ChildEntry entry = childEntries.get( i );
-			midPoints[i] = entry.child.getPositionInParentSpace().y  +  entry.child.getAllocationInParentSpace().y * 0.5;
+			DPWidget child = registeredChildren.get( i );
+			midPoints[i] = child.getPositionInParentSpace().y  +  child.getAllocationInParentSpace().y * 0.5;
 		}
 		
 		if ( pos < midPoints[0] )
@@ -234,25 +236,24 @@ public class DPVBox extends DPAbstractBox
 		
 		Alignment alignment = getAlignment();
 
-		for (ChildEntry baseEntry: childEntries)
+		for (DPWidget child: registeredChildren)
 		{
-			BoxChildEntry entry = (BoxChildEntry)baseEntry;
-			double childWidth = Math.min( entry.child.prefH.width, allocation );
+			double childWidth = Math.min( child.prefH.width, allocation );
 			if ( alignment == Alignment.LEFT )
 			{
-				allocateChildX( entry.child, 0.0, childWidth );
+				allocateChildX( child, 0.0, childWidth );
 			}
 			else if ( alignment == Alignment.CENTRE )
 			{
-				allocateChildX( entry.child, ( allocation - childWidth )  *  0.5, childWidth );
+				allocateChildX( child, ( allocation - childWidth )  *  0.5, childWidth );
 			}
 			else if ( alignment == Alignment.RIGHT )
 			{
-				allocateChildX( entry.child, allocation - childWidth, childWidth );
+				allocateChildX( child, allocation - childWidth, childWidth );
 			}
 			else if ( alignment == Alignment.EXPAND )
 			{
-				allocateChildX( entry.child, 0.0, allocation );
+				allocateChildX( child, 0.0, allocation );
 			}
 		}
 	}
@@ -279,7 +280,7 @@ public class DPVBox extends DPAbstractBox
 			double childPadding = getChildPadding( i );
 			double childY = y + childPadding;
 			
-			allocateChildY( childEntries.get( i ).child, childY, chm.height );
+			allocateChildY( registeredChildren.get( i ), childY, chm.height );
 			
 			height = y + chm.height + childPadding * 2.0;
 			y = height + chm.vspacing;

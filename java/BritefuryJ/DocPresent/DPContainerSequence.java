@@ -7,7 +7,6 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -38,54 +37,45 @@ abstract public class DPContainerSequence extends DPContainer
 	@SuppressWarnings("unchecked")
 	public void setChildren(List<DPWidget> items)
 	{
-		HashSet<ChildEntry> oldEntrySet = new HashSet<ChildEntry>( childEntries );
+		HashSet<DPWidget> oldEntrySet = new HashSet<DPWidget>( registeredChildren );
 
 		// Set of added entries
-		HashSet<ChildEntry> added = new HashSet<ChildEntry>();
+		HashSet<DPWidget> added = new HashSet<DPWidget>();
 		
 		// Build an array containing the child entry list, *after* modification
-		ChildEntry[] itemEntriesArray = new ChildEntry[items.size()];
 		for (int i = 0; i < items.size(); i++)
 		{
-			// Reuse existing child entries if possible
-			ChildEntry entry = childToEntry.get( items.get( i ) );
-			
-			if ( entry == null )
+			if ( !oldEntrySet.contains( items.get( i ) ) )
 			{
-				// Create a new entry for the child/item
-				entry = createChildEntryForChild( items.get( i ) );
-
 				// @item is not already present in the list of children; it is new, so @entry will be added to the list
-				added.add( entry );
-				
-				// We cannot simply assume that the entry at position @i is removed, since this entry may have been moved to a different
-				// position in the sequence, and another entry/child removed. We have to determine what is removed later on
-			}
+				added.add( items.get( i ) );
 
-			itemEntriesArray[i] = entry;
+				// We cannot simply assume that the (existing) child at position @i is removed, since this child may have been moved to a different
+				// position in the sequence, and another child removed. We have to determine what is removed later on
+			}
 		}
 		
-		HashSet<ChildEntry> newEntrySet = new HashSet<ChildEntry>( Arrays.asList( itemEntriesArray ) );
+		HashSet<DPWidget> newEntrySet = new HashSet<DPWidget>( items );
 		
 		
 		// Compute set of removed entries
-		HashSet<ChildEntry> removed = (HashSet<ChildEntry>)oldEntrySet.clone();
+		HashSet<DPWidget> removed = (HashSet<DPWidget>)oldEntrySet.clone();
 		removed.removeAll( newEntrySet );
 		
 		// Unregister removed entries
-		for (ChildEntry entry: removed)
+		for (DPWidget child: removed)
 		{
-			unregisterChildEntry( entry );
+			unregisterChild( child );
 		}
 		
 		// Set contents of @childEntries list
-		childEntries.clear();
-		childEntries.addAll( Arrays.asList( itemEntriesArray ) );
+		registeredChildren.clear();
+		registeredChildren.addAll( items );
 
 		// Register added entries
-		for (ChildEntry entry: added)
+		for (DPWidget child: added)
 		{
-			registerChildEntry( entry );
+			registerChild( child );
 		}
 		
 		
@@ -99,7 +89,7 @@ abstract public class DPContainerSequence extends DPContainer
 	
 	public int size()
 	{
-		return childEntries.size();
+		return registeredChildren.size();
 	}
 	
 	public int __len__()
@@ -110,7 +100,7 @@ abstract public class DPContainerSequence extends DPContainer
 	
 	public DPWidget get(int index)
 	{
-		return childEntries.get( index ).child;
+		return registeredChildren.get( index );
 	}
 	
 	public DPWidget __getitem__(int index)
@@ -120,11 +110,11 @@ abstract public class DPContainerSequence extends DPContainer
 	
 	public DPWidget[] __getitem__(PySlice slice)
 	{
-		DPWidget[] in = new DPWidget[childEntries.size()];
+		DPWidget[] in = new DPWidget[registeredChildren.size()];
 		
 		for (int i = 0; i < in.length; i++)
 		{
-			in[i] = childEntries.get( i ).child;
+			in[i] = registeredChildren.get( i );
 		}
 		
 		return (DPWidget[])JythonSlice.arrayGetSlice( in, slice );
@@ -134,11 +124,10 @@ abstract public class DPContainerSequence extends DPContainer
 	
 	public void set(int index, DPWidget item)
 	{
-		ChildEntry newEntry = createChildEntryForChild( item );
-		ChildEntry oldEntry = childEntries.get( index );
-		unregisterChildEntry( oldEntry );
-		childEntries.set( index, newEntry );
-		registerChildEntry( newEntry );
+		DPWidget oldChild = registeredChildren.get( index );
+		unregisterChild( oldChild );
+		registeredChildren.set( index, item );
+		registerChild( item );
 		childListModified();
 		queueResize();
 	}
@@ -151,36 +140,31 @@ abstract public class DPContainerSequence extends DPContainer
 	@SuppressWarnings("unchecked")
 	public void __setitem__(PySlice slice, DPWidget[] items)
 	{
-		HashSet<ChildEntry> oldEntrySet = new HashSet<ChildEntry>( childEntries );
+		HashSet<DPWidget> oldEntrySet = new HashSet<DPWidget>( registeredChildren );
 		
-		ChildEntry[] itemEntriesArray = new ChildEntry[items.length];
-		for (int i = 0; i < items.length; i++)
-		{
-			itemEntriesArray[i] = createChildEntryForChild( items[i] );
-		}
-		ChildEntry[] oldChildEntriesArray = (ChildEntry[])childEntries.toArray();
-		ChildEntry[] newChildEntriesArray = (ChildEntry[])JythonSlice.arraySetSlice( oldChildEntriesArray, slice, itemEntriesArray );
+		DPWidget[] oldChildArray = (DPWidget[])registeredChildren.toArray();
+		DPWidget[] newChildEntriesArray = (DPWidget[])JythonSlice.arraySetSlice( oldChildArray, slice, items );
 		
-		HashSet<ChildEntry> newEntrySet = new HashSet<ChildEntry>( childEntries );
+		HashSet<DPWidget> newEntrySet = new HashSet<DPWidget>( registeredChildren );
 		
 		
-		HashSet<ChildEntry> removed = (HashSet<ChildEntry>)oldEntrySet.clone();
+		HashSet<DPWidget> removed = (HashSet<DPWidget>)oldEntrySet.clone();
 		removed.removeAll( newEntrySet );
-		HashSet<ChildEntry> added = (HashSet<ChildEntry>)newEntrySet.clone();
+		HashSet<DPWidget> added = (HashSet<DPWidget>)newEntrySet.clone();
 		added.removeAll( oldEntrySet );
 		
 		
-		for (ChildEntry entry: removed)
+		for (DPWidget child: removed)
 		{
-			unregisterChildEntry( entry );
+			unregisterChild( child );
 		}
 
-		childEntries.clear();
-		childEntries.addAll( Arrays.asList( newChildEntriesArray ) );
+		registeredChildren.clear();
+		registeredChildren.addAll( Arrays.asList( newChildEntriesArray ) );
 		
-		for (ChildEntry entry: added)
+		for (DPWidget child: added)
 		{
-			registerChildEntry( entry );
+			registerChild( child );
 		}
 		
 		
@@ -191,9 +175,9 @@ abstract public class DPContainerSequence extends DPContainer
 	
 	public void __delitem__(int index)
 	{
-		ChildEntry entry = childEntries.get( index );
-		unregisterChildEntry( entry );
-		childEntries.remove( index );
+		DPWidget child = registeredChildren.get( index );
+		unregisterChild( child );
+		registeredChildren.remove( index );
 		
 		childListModified();
 		queueResize();
@@ -201,19 +185,19 @@ abstract public class DPContainerSequence extends DPContainer
 	
 	public void __delitem__(PySlice slice)
 	{
-		ChildEntry[] in = (ChildEntry[])childEntries.toArray();
+		DPWidget[] in = (DPWidget[])registeredChildren.toArray();
 		
-		ChildEntry[] removedArray = (ChildEntry[])JythonSlice.arrayGetSlice( in, slice );
+		DPWidget[] removedArray = (DPWidget[])JythonSlice.arrayGetSlice( in, slice );
 		
-		ChildEntry[] newChildEntriesArray = (ChildEntry[])JythonSlice.arrayDelSlice( in, slice );
+		DPWidget[] newChildEntriesArray = (DPWidget[])JythonSlice.arrayDelSlice( in, slice );
 		
-		for (ChildEntry entry: removedArray)
+		for (DPWidget child: removedArray)
 		{
-			unregisterChildEntry( entry );
+			unregisterChild( child );
 		}
 
-		childEntries.clear();
-		childEntries.addAll( Arrays.asList( newChildEntriesArray ) );
+		registeredChildren.clear();
+		registeredChildren.addAll( Arrays.asList( newChildEntriesArray ) );
 		
 		childListModified();
 		queueResize();
@@ -222,55 +206,60 @@ abstract public class DPContainerSequence extends DPContainer
 	
 	
 	
-	protected void appendChildEntry(ChildEntry entry)
+	public void append(DPWidget child)
 	{
-		assert !hasChild( entry.child );
+		assert !hasChild( child );
 		
-		childEntries.add( entry );
-		registerChildEntry( entry );
+		registeredChildren.add( child );
+		registerChild( child );
 		childListModified();
 		queueResize();
 	}
 
 	
-	protected void extendChildEntries(ChildEntry[] entries)
+	public void extend(List<DPWidget> children)
 	{
-		for (ChildEntry entry: entries)
+		for (DPWidget child: children)
 		{
-			assert !hasChild( entry.child );
+			assert !hasChild( child );
 		}
 		
-		int start = childEntries.size();
-		childEntries.ensureCapacity( start + entries.length );
-		for (int i = 0; i < entries.length; i++)
+		int start = registeredChildren.size();
+		registeredChildren.ensureCapacity( start + children.size() );
+		for (int i = 0; i < children.size(); i++)
 		{
-			ChildEntry entry = entries[i];
-			childEntries.add( entry );
-			registerChildEntry( entry );
+			DPWidget child = children.get( i );
+			registeredChildren.add( child );
+			registerChild( child );
 		}
 
 		childListModified();
 		queueResize();
 	}
 	
-	
-	protected void insertChildEntry(int index, ChildEntry entry)
+	public void extend(DPWidget[] children)
 	{
-		assert !hasChild( entry.child );
+		extend( Arrays.asList( children ) );
+	}
+	
+	
+	protected void insert(int index, DPWidget child)
+	{
+		assert !hasChild( child );
 		
-		childEntries.add( index, entry );
-		registerChildEntry( entry );
+		registeredChildren.add( index, child );
+		registerChild( child );
 		childListModified();
 		queueResize();
 	}
 	
 	
-	protected void removeChildEntry(ChildEntry entry)
+	protected void remove(DPWidget child)
 	{
-		assert hasChild( entry.child );
+		assert hasChild( child );
 		
-		unregisterChildEntry( entry );
-		childEntries.remove( entry );
+		unregisterChild( child );
+		registeredChildren.remove( child );
 		
 		childListModified();
 		queueResize();
@@ -278,10 +267,9 @@ abstract public class DPContainerSequence extends DPContainer
 		
 
 
-	protected void removeChild(DPWidget child)
+	protected void replaceChildWithEmpty(DPWidget child)
 	{
-		ChildEntry entry = childToEntry.get( child );
-		int index = childEntries.indexOf( entry );
+		int index = registeredChildren.indexOf( child );
 		__setitem__( index, new DPEmpty() );
 	}
 		
@@ -293,12 +281,7 @@ abstract public class DPContainerSequence extends DPContainer
 	
 	protected List<DPWidget> getChildren()
 	{
-		ArrayList<DPWidget> xs = new ArrayList<DPWidget>();
-		for (ChildEntry entry: childEntries)
-		{
-			xs.add( entry.child );
-		}
-		return xs;
+		return registeredChildren;
 	}
 
 
@@ -308,135 +291,135 @@ abstract public class DPContainerSequence extends DPContainer
 
 
 
-	HMetrics[] getChildrenRefreshedMinimumHMetrics(List<ChildEntry> nodes)
+	HMetrics[] getChildrenRefreshedMinimumHMetrics(List<DPWidget> nodes)
 	{
 		HMetrics[] chm = new HMetrics[nodes.size()];
 		for (int i = 0; i < nodes.size(); i++)
 		{
-			chm[i] = nodes.get( i ).child.refreshMinimumHMetrics();
+			chm[i] = nodes.get( i ).refreshMinimumHMetrics();
 		}
 		return chm;
 	}
 
 	HMetrics[] getChildrenRefreshedMinimumHMetrics()
 	{
-		return getChildrenRefreshedMinimumHMetrics( childEntries );
+		return getChildrenRefreshedMinimumHMetrics( registeredChildren );
 	}
 
 	
-	HMetrics[] getChildrenRefreshedPreferredHMetrics(List<ChildEntry> nodes)
+	HMetrics[] getChildrenRefreshedPreferredHMetrics(List<DPWidget> nodes)
 	{
 		HMetrics[] chm = new HMetrics[nodes.size()];
 		for (int i = 0; i < nodes.size(); i++)
 		{
-			chm[i] = nodes.get( i ).child.refreshPreferredHMetrics();
+			chm[i] = nodes.get( i ).refreshPreferredHMetrics();
 		}
 		return chm;
 	}
 	
 	HMetrics[] getChildrenRefreshedPreferredHMetrics()
 	{
-		return getChildrenRefreshedPreferredHMetrics( childEntries );
+		return getChildrenRefreshedPreferredHMetrics( registeredChildren );
 	}
 	
 	
 	
-	VMetrics[] getChildrenRefreshedMinimumVMetrics(List<ChildEntry> nodes)
+	VMetrics[] getChildrenRefreshedMinimumVMetrics(List<DPWidget> nodes)
 	{
 		VMetrics[] chm = new VMetrics[nodes.size()];
 		for (int i = 0; i < nodes.size(); i++)
 		{
-			chm[i] = nodes.get( i ).child.refreshMinimumVMetrics();
+			chm[i] = nodes.get( i ).refreshMinimumVMetrics();
 		}
 		return chm;
 	}
 
 	VMetrics[] getChildrenRefreshedMinimumVMetrics()
 	{
-		return getChildrenRefreshedMinimumVMetrics( childEntries );
+		return getChildrenRefreshedMinimumVMetrics( registeredChildren );
 	}
 
 	
-	VMetrics[] getChildrenRefreshedPreferredVMetrics(List<ChildEntry> nodes)
+	VMetrics[] getChildrenRefreshedPreferredVMetrics(List<DPWidget> nodes)
 	{
 		VMetrics[] chm = new VMetrics[nodes.size()];
 		for (int i = 0; i < nodes.size(); i++)
 		{
-			chm[i] = nodes.get( i ).child.refreshPreferredVMetrics();
+			chm[i] = nodes.get( i ).refreshPreferredVMetrics();
 		}
 		return chm;
 	}
 
 	VMetrics[] getChildrenRefreshedPreferredVMetrics()
 	{
-		return getChildrenRefreshedPreferredVMetrics( childEntries );
+		return getChildrenRefreshedPreferredVMetrics( registeredChildren );
 	}
 
 
 	
 	
 	
-	static HMetrics[] getChildrenMinimumHMetrics(List<ChildEntry> nodes)
+	static HMetrics[] getChildrenMinimumHMetrics(List<DPWidget> nodes)
 	{
 		HMetrics[] chm = new HMetrics[nodes.size()];
 		for (int i = 0; i < nodes.size(); i++)
 		{
-			chm[i] = nodes.get( i ).child.minH;
+			chm[i] = nodes.get( i ).minH;
 		}
 		return chm;
 	}
 
 	HMetrics[] getChildrenMinimumHMetrics()
 	{
-		return getChildrenMinimumHMetrics( childEntries );
+		return getChildrenMinimumHMetrics( registeredChildren );
 	}
 
 	
-	static HMetrics[] getChildrenPreferredHMetrics(List<ChildEntry> nodes)
+	static HMetrics[] getChildrenPreferredHMetrics(List<DPWidget> nodes)
 	{
 		HMetrics[] chm = new HMetrics[nodes.size()];
 		for (int i = 0; i < nodes.size(); i++)
 		{
-			chm[i] = nodes.get( i ).child.prefH;
+			chm[i] = nodes.get( i ).prefH;
 		}
 		return chm;
 	}
 	
 	HMetrics[] getChildrenPreferredHMetrics()
 	{
-		return getChildrenPreferredHMetrics( childEntries );
+		return getChildrenPreferredHMetrics( registeredChildren );
 	}
 	
 	
 	
-	static VMetrics[] getChildrenMinimumVMetrics(List<ChildEntry> nodes)
+	static VMetrics[] getChildrenMinimumVMetrics(List<DPWidget> nodes)
 	{
 		VMetrics[] chm = new VMetrics[nodes.size()];
 		for (int i = 0; i < nodes.size(); i++)
 		{
-			chm[i] = nodes.get( i ).child.minV;
+			chm[i] = nodes.get( i ).minV;
 		}
 		return chm;
 	}
 
 	VMetrics[] getChildrenMinimumVMetrics()
 	{
-		return getChildrenMinimumVMetrics( childEntries );
+		return getChildrenMinimumVMetrics( registeredChildren );
 	}
 
 	
-	static VMetrics[] getChildrenPreferredVMetrics(List<ChildEntry> nodes)
+	static VMetrics[] getChildrenPreferredVMetrics(List<DPWidget> nodes)
 	{
 		VMetrics[] chm = new VMetrics[nodes.size()];
 		for (int i = 0; i < nodes.size(); i++)
 		{
-			chm[i] = nodes.get( i ).child.prefV;
+			chm[i] = nodes.get( i ).prefV;
 		}
 		return chm;
 	}
 
 	VMetrics[] getChildrenPreferredVMetrics()
 	{
-		return getChildrenPreferredVMetrics( childEntries );
+		return getChildrenPreferredVMetrics( registeredChildren );
 	}
 }

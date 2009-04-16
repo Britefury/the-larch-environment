@@ -182,17 +182,15 @@ public class DPFraction extends DPContainer
 			
 			if ( existingChild != null )
 			{
-				ChildEntry entry = childToEntry.get( existingChild );
-				unregisterChildEntry( entry );
-				childEntries.remove( entry );
+				unregisterChild( existingChild );
+				registeredChildren.remove( existingChild );
 			}
 			
 			children[slot] = child;
 			
 			if ( child != null )
 			{
-				ChildEntry entry = new ChildEntry( child );
-				registerChildEntry( entry );
+				registerChild( child );
 				if ( slot != BAR )
 				{
 					child.setScale( childScale, rootScale * childScale );
@@ -207,7 +205,7 @@ public class DPFraction extends DPContainer
 					}
 				}
 				
-				childEntries.add( insertIndex, entry );
+				registeredChildren.add( insertIndex, child );
 			}
 			
 			queueResize();
@@ -253,7 +251,7 @@ public class DPFraction extends DPContainer
 
 	
 	
-	protected void removeChild(DPWidget child)
+	protected void replaceChildWithEmpty(DPWidget child)
 	{
 		int slot = Arrays.asList( children ).indexOf( child );
 		setChild( slot, null );

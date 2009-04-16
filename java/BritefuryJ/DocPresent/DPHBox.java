@@ -40,20 +40,22 @@ public class DPHBox extends DPAbstractBox
 	
 	public void append(DPWidget child,  boolean bExpand, double padding)
 	{
-		appendChildEntry( new BoxChildEntry( child, bExpand, padding ) );
+		append( child );
+		child.setParentPacking( new BoxParentPacking( bExpand, padding ) );
 	}
 
 	
 	public void insert(int index, DPWidget child, boolean bExpand, double padding)
 	{
-		insertChildEntry( index, new BoxChildEntry( child, bExpand, padding ) );
+		insert( index, child );
+		child.setParentPacking( new BoxParentPacking( bExpand, padding ) );
 	}
 	
 	
 	
-	protected BoxChildEntry createChildEntryForChild(DPWidget child)
+	protected BoxParentPacking createParentPackingForChild(DPWidget child)
 	{
-		return new BoxChildEntry( child, getExpand(), getPadding() );
+		return new BoxParentPacking( getExpand(), getPadding() );
 	}
 	
 	
@@ -69,12 +71,12 @@ public class DPHBox extends DPAbstractBox
 	
 		double pos = localPos.x;
 		
-		double[] midPoints = new double[childEntries.size()];
+		double[] midPoints = new double[registeredChildren.size()];
 		
 		for (int i = 0; i < midPoints.length; i++)
 		{
-			ChildEntry entry = childEntries.get( i );
-			midPoints[i] = entry.child.getPositionInParentSpace().x  +  entry.child.getAllocationInParentSpace().x * 0.5;
+			DPWidget child = registeredChildren.get( i );
+			midPoints[i] = child.getPositionInParentSpace().x  +  child.getAllocationInParentSpace().x * 0.5;
 		}
 		
 		if ( pos < midPoints[0] )
@@ -234,7 +236,7 @@ public class DPHBox extends DPAbstractBox
 			double childPadding = getChildPadding( i );
 			double childX = x + childPadding;
 			
-			allocateChildX( childEntries.get( i ).child, childX, chm.width );
+			allocateChildX( registeredChildren.get( i ), childX, chm.width );
 
 			width = x + chm.width + childPadding * 2.0;
 			x = width + chm.hspacing;
@@ -255,10 +257,8 @@ public class DPHBox extends DPAbstractBox
 			double delta = allocation - vmt.height;
 			double y = vmt.ascent + delta * 0.5;
 			
-			for (ChildEntry entry: childEntries)
+			for (DPWidget child: registeredChildren)
 			{
-				BoxChildEntry boxEntry = (BoxChildEntry)entry;
-				DPWidget child = boxEntry.child;
 				double chAscent;
 				VMetrics chm = child.prefV;
 				if ( chm.isTypeset() )
@@ -278,9 +278,8 @@ public class DPHBox extends DPAbstractBox
 		}
 		else
 		{
-			for (ChildEntry entry: childEntries)
+			for (DPWidget child: registeredChildren)
 			{
-				DPWidget child = entry.child;
 				double childHeight = Math.min( child.prefV.height, allocation );
 				if ( alignment == Alignment.TOP )
 				{

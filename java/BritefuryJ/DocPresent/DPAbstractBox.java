@@ -8,7 +8,6 @@
 package BritefuryJ.DocPresent;
 
 import java.util.List;
-import java.util.Arrays;
 
 import BritefuryJ.DocPresent.Metrics.HMetrics;
 import BritefuryJ.DocPresent.Metrics.Metrics;
@@ -25,15 +24,13 @@ abstract public class DPAbstractBox extends DPContainerSequence
 	}
 
 
-	protected static class BoxChildEntry extends DPContainer.ChildEntry
+	protected static class BoxParentPacking extends ParentPacking
 	{
 		public int packFlags;
 		public double padding;
 		
-		public BoxChildEntry(DPWidget child, boolean bExpand, double padding)
+		public BoxParentPacking(boolean bExpand, double padding)
 		{
-			super( child );
-			
 			this.packFlags = Metrics.packFlags( bExpand );
 			this.padding = padding;
 		}
@@ -58,39 +55,6 @@ abstract public class DPAbstractBox extends DPContainerSequence
 
 
 	
-	public void append(DPWidget child)
-	{
-		appendChildEntry( createChildEntryForChild( child ) );
-	}
-
-	public void extend(DPWidget[] children)
-	{
-		extend( Arrays.asList( children ) );
-	}
-
-	public void extend(List<DPWidget> children)
-	{
-		ChildEntry[] entries = new ChildEntry[children.size()];
-		
-		for (int i = 0; i < children.size(); i++)
-		{
-			entries[i] = createChildEntryForChild( children.get( i ) );
-		}
-		
-		extendChildEntries( entries );
-	}
-
-	
-	public void insert(int index, DPWidget child)
-	{
-		insertChildEntry( index, createChildEntryForChild( child ) );
-	}
-
-	public void remove(DPWidget child)
-	{
-		removeChildEntry( childToEntry.get( child ) );
-	}
-
 	
 	protected void childListModified()
 	{
@@ -101,26 +65,26 @@ abstract public class DPAbstractBox extends DPContainerSequence
 
 
 
-	protected int[] getChildrenPackFlags(List<ChildEntry> nodes)
+	protected int[] getChildrenPackFlags(List<DPWidget> nodes)
 	{
 		int[] chm = new int[nodes.size()];
 		for (int i = 0; i < nodes.size(); i++)
 		{
-			chm[i] = ((BoxChildEntry)nodes.get( i )).packFlags;
+			chm[i] = ((BoxParentPacking)nodes.get( i ).getParentPacking()).packFlags;
 		}
 		return chm;
 	}
 
 	protected int[] getChildrenPackFlags()
 	{
-		return getChildrenPackFlags( childEntries );
+		return getChildrenPackFlags( registeredChildren );
 	}
 
 
 
 	protected double getChildPadding(int index)
 	{
-		return ((BoxChildEntry)childEntries.get( index )).padding;
+		return ((BoxParentPacking)registeredChildren.get( index ).getParentPacking()).padding;
 	}
 
 
