@@ -7,6 +7,7 @@
 //##************************
 package BritefuryJ.DocPresent;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.font.TextHitInfo;
 import java.awt.geom.AffineTransform;
@@ -35,7 +36,7 @@ public class DPText extends DPContentLeafEditableEntry implements TextVisual.Tex
 		
 		this.text = text;
 		
-		visual = new TextVisual( text, this );
+		visual = TextVisual.getTextVisual( getPresentationArea(), text, styleSheet.getFont(), styleSheet.getMixedSizeCaps() );
 	}
 	
 	
@@ -43,7 +44,14 @@ public class DPText extends DPContentLeafEditableEntry implements TextVisual.Tex
 	public void setText(String text)
 	{
 		this.text = text;
-		visual.setText( text );
+		
+		TextStyleSheet textStyleSheet = (TextStyleSheet)styleSheet;
+
+		visual = TextVisual.getTextVisual( getPresentationArea(), text, textStyleSheet.getFont(), textStyleSheet.getMixedSizeCaps() );
+		if ( isRealised() )
+		{
+			visual.realise( getPresentationArea() );
+		}
 	}
 	
 	public String getText()
@@ -62,20 +70,18 @@ public class DPText extends DPContentLeafEditableEntry implements TextVisual.Tex
 	protected void onRealise()
 	{
 		super.onRealise();
-		visual.realise( presentationArea );
-	}
-	
-	protected void onUnrealise(DPWidget unrealiseRoot)
-	{
-		super.onUnrealise( unrealiseRoot );
-		visual.unrealise();
+		visual.realise( getPresentationArea() );
 	}
 	
 	
 	
 	protected void draw(Graphics2D graphics)
 	{
+		Color prevColour = graphics.getColor();
+		TextStyleSheet textStyleSheet = (TextStyleSheet)styleSheet;
+		graphics.setColor( textStyleSheet.getColour() );
 		visual.draw( graphics );
+		graphics.setColor( prevColour );
 	}
 	
 	

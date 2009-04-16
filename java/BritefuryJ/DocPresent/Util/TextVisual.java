@@ -7,7 +7,6 @@
 //##************************
 package BritefuryJ.DocPresent.Util;
 
-import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Shape;
@@ -17,6 +16,8 @@ import java.awt.font.TextAttribute;
 import java.awt.font.TextHitInfo;
 import java.awt.font.TextLayout;
 import java.awt.geom.Line2D;
+import java.lang.ref.ReferenceQueue;
+import java.lang.ref.WeakReference;
 import java.text.AttributedCharacterIterator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -169,93 +170,124 @@ public class TextVisual
 	
 	
 	
-	private static class TextLayoutTable
+	private static class Key
 	{
-		private static class Key
+		private String text;
+		private Font font;
+		private boolean bMixedSizeCaps;
+		private int hash;
+		
+		
+		public Key(String text, Font font, boolean bMixedSizeCaps)
 		{
-			private String text;
-			private Font font;
-			private boolean bMixedSizeCaps;
-			private int hash;
-			
-			
-			public Key(String text, Font font, boolean bMixedSizeCaps)
-			{
-				this.text = text;
-				this.font = font;
-				this.bMixedSizeCaps = bMixedSizeCaps;
-				this.hash = tripleHash( text.hashCode(), font.hashCode(), new Boolean( bMixedSizeCaps ).hashCode() );
-			}
-			
-			
-			public boolean equals(Object x)
-			{
-				if ( x instanceof Key )
-				{
-					Key kx = (Key)x;
-					return text.equals( kx.text )  &&  font.equals( kx.font )  &&  bMixedSizeCaps == kx.bMixedSizeCaps;
-				}
-				else
-				{
-					return false;
-				}
-			}
-			
-			public int hashCode()
-			{
-				return hash;
-			}
-
-		
-		
-			private static int tripleHash(int a, int b, int c)
-			{
-				int mult = 1000003;
-				int x = 0x345678;
-				x = ( x ^ c ) * mult;
-				mult += 82520 + 4;
-				x = ( x ^ b ) * mult;
-				mult += 82520 + 2;
-				x = ( x ^ a ) * mult;
-				return x + 97351;
-			}
+			this.text = text;
+			this.font = font;
+			this.bMixedSizeCaps = bMixedSizeCaps;
+			this.hash = tripleHash( text.hashCode(), font.hashCode(), new Boolean( bMixedSizeCaps ).hashCode() );
 		}
 		
 		
-		
-		private HashMap<Key, TextLayout> layoutTable;
-
-
-		public TextLayoutTable()
+		public boolean equals(Object x)
 		{
-			layoutTable = new HashMap<Key, TextLayout>();
+			if ( x instanceof Key )
+			{
+				Key kx = (Key)x;
+				return text.equals( kx.text )  &&  font.equals( kx.font )  &&  bMixedSizeCaps == kx.bMixedSizeCaps;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		
+		public int hashCode()
+		{
+			return hash;
+		}
+
+	
+	
+		private static int tripleHash(int a, int b, int c)
+		{
+			int mult = 1000003;
+			int x = 0x345678;
+			x = ( x ^ c ) * mult;
+			mult += 82520 + 4;
+			x = ( x ^ b ) * mult;
+			mult += 82520 + 2;
+			x = ( x ^ a ) * mult;
+			return x + 97351;
+		}
+	}
+	
+	
+
+	
+	private static class TextVisualTable
+	{
+		private HashMap<Key, WeakReference<TextVisual>> layoutTable;
+		private ReferenceQueue<TextVisual> refQueue;
+
+
+		public TextVisualTable()
+		{
+			layoutTable = new HashMap<Key, WeakReference<TextVisual>>();
+			refQueue = new ReferenceQueue<TextVisual>();
 		}
 		
 		
-		public TextLayout get(String text, Font font, boolean bMixedSizeCaps, FontRenderContext frc)
+		@SuppressWarnings("unchecked")
+		public TextVisual get(String text, Font font, boolean bMixedSizeCaps)
 		{
 			Key k = new Key( text, font, bMixedSizeCaps );
 			
-			TextLayout layout = layoutTable.get( k );
-			if ( layout == null )
+			WeakReference<TextVisual> visualRef = layoutTable.get( k );
+			TextVisual visual = null;
+			if ( visualRef == null )
 			{
-				if ( bMixedSizeCaps )
+				visual = new TextVisual( text, font, bMixedSizeCaps );
+				layoutTable.put( k, new WeakReference<TextVisual>( visual, refQueue ) );
+				
+				// Check if there are any unused entries; if so, build a list of set references
+				WeakReference<TextVisual> deadRef = (WeakReference<TextVisual>)refQueue.poll();
+				HashSet<WeakReference<TextVisual>> deadReferences = null;
+				while ( deadRef != null )
 				{
-					Font upperCaseFont = font;
-					Font lowerCaseFont = upperCaseFont.deriveFont( upperCaseFont.getSize2D() * 0.75f );
-
-					MixedSizeCapsAttributedCharacterIterator charIter = new MixedSizeCapsAttributedCharacterIterator( text, lowerCaseFont, upperCaseFont );
-					layout = new TextLayout( charIter, frc );
-				}
-				else
-				{
-					layout = new TextLayout( text, font, frc );
+					// Found an unused entry; create the dead references set, if it is not already created
+					if ( deadReferences == null )
+					{
+						deadReferences = new HashSet<WeakReference<TextVisual>>();
+					}
+					deadReferences.add( deadRef );
+					
+					deadRef = (WeakReference<TextVisual>)refQueue.poll();
 				}
 				
-				layoutTable.put( k, layout );
+				if ( deadReferences != null )
+				{
+					// Map the set of dead references, back to their keys
+					HashSet<Key> deadKeys = new HashSet<Key>();
+					for (Map.Entry<Key, WeakReference<TextVisual>> entry: layoutTable.entrySet())
+					{
+						if ( deadReferences.contains( entry.getValue() ) )
+						{
+							deadKeys.add( entry.getKey() );
+						}
+					}
+					
+					// Remove them
+					for (Key deadKey: deadKeys)
+					{
+						layoutTable.remove( deadKey );
+					}
+				}
+			}
+			else
+			{
+				visual = visualRef.get();
 			}
 			
-			return layout;
+			return visual;
 		}
 	}
 	
@@ -277,17 +309,25 @@ public class TextVisual
 	}
 	
 	
+	
+	private static HashMap<DPPresentationArea, TextVisualTable> visualTables = new  HashMap<DPPresentationArea, TextVisualTable>();
+	
+	
 	private TextLayout layout;
 	private String text;
-	private TextVisualOwner owner;
+	private Font font;
+	private boolean bMixedSizeCaps;
+	private boolean bRealised;
+	private VMetricsTypeset emptyStringVMetrics; 
 	
-	private static TextLayoutTable layoutTable = new TextLayoutTable();
+
 	
 	
-	public TextVisual(String text, TextVisualOwner owner)
+	private TextVisual(String text, Font font, boolean bMixedSizeCaps)
 	{
 		this.text = text;
-		this.owner = owner;
+		this.font = font;
+		this.bMixedSizeCaps = bMixedSizeCaps;
 	}
 	
 	
@@ -297,29 +337,43 @@ public class TextVisual
 		return text;
 	}
 	
-	public void setText(String text)
-	{
-		if ( !text.equals( this.text ) )
-		{
-			this.text = text;
-			layoutChanged();
-		}
-	}
-	
 	
 	
 	public void realise(DPPresentationArea a)
 	{
-	}
-	
-	public void realise(JComponent component)
-	{
-	}
-	
-	
-	public void unrealise()
-	{
-		layout = null;
+		if ( !bRealised )
+		{
+			JComponent component = a.getComponent();
+			assert component != null;
+			if ( text.length() > 0 )
+			{
+				Graphics2D graphics = (Graphics2D)component.getGraphics();
+				FontRenderContext frc = graphics.getFontRenderContext();
+				
+				if ( bMixedSizeCaps )
+				{
+					Font upperCaseFont = font;
+					Font lowerCaseFont = upperCaseFont.deriveFont( upperCaseFont.getSize2D() * 0.75f );
+
+					MixedSizeCapsAttributedCharacterIterator charIter = new MixedSizeCapsAttributedCharacterIterator( text, lowerCaseFont, upperCaseFont );
+					layout = new TextLayout( charIter, frc );
+				}
+				else
+				{
+					layout = new TextLayout( text, font, frc );
+				}
+			}
+			else
+			{
+				Graphics2D graphics = (Graphics2D)component.getGraphics();
+				assert graphics != null;
+				FontRenderContext frc = graphics.getFontRenderContext();
+				LineMetrics lineMetrics = font.getLineMetrics( "", frc );
+				emptyStringVMetrics = new VMetricsTypeset( lineMetrics.getAscent(), lineMetrics.getDescent(), lineMetrics.getLeading() );
+			}
+			
+			bRealised = true;
+		}
 	}
 	
 	
@@ -327,8 +381,7 @@ public class TextVisual
 	
 	public HMetrics computeHMetrics()
 	{
-		refreshLayout();
-		if ( layout != null )
+		if ( bRealised && layout != null )
 		{
 			double width = layout.getBounds().getWidth();
 			return new HMetrics( width, layout.getAdvance() - width );
@@ -341,24 +394,19 @@ public class TextVisual
 	
 	public VMetrics computeVMetrics()
 	{
-		refreshLayout();
-		if ( layout != null )
+		if ( bRealised )
 		{
-			return new VMetricsTypeset( layout.getAscent(), layout.getDescent(), layout.getLeading() );
+			if ( layout != null )
+			{
+				return new VMetricsTypeset( layout.getAscent(), layout.getDescent(), layout.getLeading() );
+			}
+			else
+			{
+				return emptyStringVMetrics;
+			}
 		}
 		else
 		{
-			JComponent component = owner.getTextPresentationArea( this ).getComponent();
-			if ( component != null )
-			{
-				Graphics2D graphics = (Graphics2D)component.getGraphics();
-				if ( graphics != null )
-				{
-					FontRenderContext frc = graphics.getFontRenderContext();
-					LineMetrics lineMetrics = owner.getTextStyleSheet( this ).getFont().getLineMetrics( "", frc );
-					return new VMetricsTypeset( lineMetrics.getAscent(), lineMetrics.getDescent(), lineMetrics.getLeading() );
-				}
-			}
 			return new VMetrics();
 		}
 	}
@@ -367,19 +415,14 @@ public class TextVisual
 	
 	public void draw(Graphics2D graphics)
 	{
-		refreshLayout();
 		if ( layout != null )
 		{
-			Color prevColour = graphics.getColor();
-			graphics.setColor( owner.getTextStyleSheet( this ).getColour() );
 			layout.draw( graphics, 0, layout.getAscent() );
-			graphics.setColor( prevColour );
 		}
 	}
 	
 	public void drawCaret(Graphics2D graphics, int offset)
 	{
-		refreshLayout();
 		if ( layout != null )
 		{
 			double ascent = layout.getAscent();
@@ -395,7 +438,7 @@ public class TextVisual
 		else
 		{
 			FontRenderContext frc = graphics.getFontRenderContext();
-			LineMetrics lineMetrics = owner.getTextStyleSheet( this ).getFont().getLineMetrics( "", frc );
+			LineMetrics lineMetrics = font.getLineMetrics( "", frc );
 			Line2D.Double line = new Line2D.Double( 0.0, 0.0, 0.0, lineMetrics.getAscent() + lineMetrics.getDescent() );
 			graphics.draw( line );
 		}
@@ -403,7 +446,6 @@ public class TextVisual
 	
 	public void drawCaretAtStart(Graphics2D graphics)
 	{
-		refreshLayout();
 		double h = 0.0;
 		if ( layout != null )
 		{
@@ -412,7 +454,7 @@ public class TextVisual
 		else
 		{
 			FontRenderContext frc = graphics.getFontRenderContext();
-			LineMetrics lineMetrics = owner.getTextStyleSheet( this ).getFont().getLineMetrics( "", frc );
+			LineMetrics lineMetrics = font.getLineMetrics( "", frc );
 			h = lineMetrics.getAscent() + lineMetrics.getDescent();
 		}
 		graphics.draw( new Line2D.Double( 0.0, 0.0, 0.0, h ) );
@@ -420,7 +462,6 @@ public class TextVisual
 
 	public void drawCaretAtEnd(Graphics2D graphics)
 	{
-		refreshLayout();
 		double x = 0.0, h = 0.0;
 		if ( layout != null )
 		{
@@ -430,7 +471,7 @@ public class TextVisual
 		else
 		{
 			FontRenderContext frc = graphics.getFontRenderContext();
-			LineMetrics lineMetrics = owner.getTextStyleSheet( this ).getFont().getLineMetrics( "", frc );
+			LineMetrics lineMetrics = font.getLineMetrics( "", frc );
 			x = 0.0;
 			h = lineMetrics.getAscent() + lineMetrics.getDescent();
 		}
@@ -441,7 +482,6 @@ public class TextVisual
 	
 	public TextHitInfo hitTest(Point2 pos)
 	{
-		refreshLayout();
 		if ( layout != null )
 		{
 			return layout.hitTestChar( (float)pos.x, (float)( pos.y - layout.getAscent() ) );
@@ -455,29 +495,15 @@ public class TextVisual
 	
 	
 	
-	
-	
-	private void layoutChanged()
+	public static TextVisual getTextVisual(DPPresentationArea area, String text, Font font, boolean bMixedSizeCaps)
 	{
-		layout = null;
-		requestResize();
-	}
-	
-	private void requestResize()
-	{
-		owner.textVisualRequestResize( this );
-	}
-	
-	private void refreshLayout()
-	{
-		JComponent component = owner.getTextPresentationArea( this ).getComponent();
-		TextStyleSheet styleSheet = owner.getTextStyleSheet( this );
-		if ( layout == null  &&  text.length() > 0  &&  component != null )
+		TextVisualTable table = visualTables.get( area );
+		if ( table == null )
 		{
-			Graphics2D graphics = (Graphics2D)component.getGraphics();
-			FontRenderContext frc = graphics.getFontRenderContext();
-			
-			layout = layoutTable.get( text, styleSheet.getFont(), styleSheet.getMixedSizeCaps(), frc );
+			table = new TextVisualTable();
+			visualTables.put( area, table );
 		}
+		
+		return table.get( text, font, bMixedSizeCaps );
 	}
 }
