@@ -106,6 +106,7 @@ abstract public class DPWidget
 	protected double scale, rootScale;
 	protected HMetrics minH, prefH;
 	protected VMetrics minV, prefV;
+	protected Point2 positionInParentSpace;
 	protected Vector2 allocation;
 	
 	protected ArrayList<Runnable> waitingImmediateEvents;
@@ -146,6 +147,7 @@ abstract public class DPWidget
 		prefH = new HMetrics();
 		minV = new VMetrics();
 		prefV = new VMetrics();
+		positionInParentSpace = new Point2();
 		allocation = new Vector2();
 		waitingImmediateEvents = null;
 		pointersWithinBounds = null;
@@ -174,9 +176,19 @@ abstract public class DPWidget
 	// Geometry methods
 	//
 	
+	public Point2 getPositionInParentSpace()
+	{
+		return positionInParentSpace;
+	}
+	
 	public Vector2 getAllocation()
 	{
 		return allocation;
+	}
+	
+	public Vector2 getAllocationInParentSpace()
+	{
+		return allocation.mul( scale );
 	}
 	
 	
@@ -184,6 +196,23 @@ abstract public class DPWidget
 	{
 		return new AABox2( new Point2(), new Point2( allocation ) );
 	}
+	
+	public AABox2 getAABoxInParentSpace()
+	{
+		return new AABox2( positionInParentSpace, getAllocationInParentSpace() );
+	}
+
+	
+	public Xform2 getLocalToParentXform()
+	{
+		return new Xform2( scale, positionInParentSpace.toVector2() );
+	}
+	
+	public Xform2 getParentToLocalXform()
+	{
+		return Xform2.inverseOf( scale, positionInParentSpace.toVector2() );
+	}
+	
 	
 	
 	public Xform2 getTransformRelativeToRoot(Xform2 x)

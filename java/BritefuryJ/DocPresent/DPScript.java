@@ -793,11 +793,11 @@ public class DPScript extends DPContainer
 			double edgeX = 0.0;
 			if ( bRightEdge )
 			{
-				edgeX = entry.pos.x + entry.size.x;
+				edgeX = entry.child.getPositionInParentSpace().x + entry.child.getAllocationInParentSpace().x;
 			}
 			else
 			{
-				edgeX = entry.pos.x;
+				edgeX = entry.child.getPositionInParentSpace().x;
 			}
 			
 			if ( i > 0 )
@@ -834,8 +834,8 @@ public class DPScript extends DPContainer
 		{
 			ChildEntry entryI = column.get( 0 );
 			ChildEntry entryJ = column.get( 1 );
-			double iUpperY = entryI.pos.y + entryI.size.y;
-			double jLowerY = entryJ.pos.y;
+			double iUpperY = entryI.child.getPositionInParentSpace().y + entryI.child.getAllocationInParentSpace().y;
+			double jLowerY = entryJ.child.getPositionInParentSpace().y;
 				
 			double midY = ( iUpperY + jLowerY ) * 0.5;
 			
@@ -911,6 +911,8 @@ public class DPScript extends DPContainer
 						columnIndex = i;
 						break;
 					}
+					
+					colI = colJ;
 				}
 				
 				if ( closestColumn == null )
@@ -969,8 +971,8 @@ public class DPScript extends DPContainer
 				}
 				else
 				{
-					double distToPrev = localPos.y - ( prev.pos.y + prev.size.y );
-					double distToNext = next.pos.y - localPos.y;
+					double distToPrev = localPos.y - ( prev.child.getPositionInParentSpace().y + prev.child.getAllocationInParentSpace().y );
+					double distToNext = next.child.getPositionInParentSpace().y - localPos.y;
 					
 					return distToPrev > distToNext  ?  prevC  :  nextC;
 				}

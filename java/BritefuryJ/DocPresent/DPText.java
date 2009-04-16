@@ -18,7 +18,7 @@ import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.Util.TextVisual;
 import BritefuryJ.Math.Point2;
 
-public class DPText extends DPContentLeafEditableEntry implements TextVisual.TextVisualListener
+public class DPText extends DPContentLeafEditableEntry implements TextVisual.TextVisualOwner
 {
 	protected TextVisual visual;
 	protected String text;
@@ -35,7 +35,7 @@ public class DPText extends DPContentLeafEditableEntry implements TextVisual.Tex
 		
 		this.text = text;
 		
-		visual = new TextVisual( text, styleSheet, this );
+		visual = new TextVisual( text, this );
 	}
 	
 	
@@ -125,18 +125,21 @@ public class DPText extends DPContentLeafEditableEntry implements TextVisual.Tex
 	}
 
 	
-	public void textVisualRequestRedraw(TextVisual t)
-	{
-		queueFullRedraw();
-	}
-
-
 	public void textVisualRequestResize(TextVisual t)
 	{
 		queueResize();
 	}
 
 
+	public DPPresentationArea getTextPresentationArea(TextVisual t)
+	{
+		return presentationArea;
+	}
+	
+	public TextStyleSheet getTextStyleSheet(TextVisual t)
+	{
+		return (TextStyleSheet)styleSheet;
+	}
 
 
 	protected int getMarkerRange()
