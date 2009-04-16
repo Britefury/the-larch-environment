@@ -124,11 +124,10 @@ abstract public class DPWidget
 	protected Vector2 allocation;
 	protected ParentPacking parentPacking;
 	
-	protected ArrayList<Runnable> waitingImmediateEvents;
+	protected ArrayList<Runnable> waitingImmediateEvents;			// only initialised when non-empty; otherwise null
+	protected ArrayList<PointerInterface> pointersWithinBounds;		// only initialised when non-empty; otherwise null
 	
-	protected ArrayList<PointerInterface> pointersWithinBounds;
-	
-	protected DndState dndState;
+	protected DndState dndState;								// only initialised when in use; otherwise null
 	
 	protected Element element;
 	
