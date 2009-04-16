@@ -24,7 +24,6 @@ import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
 public class ElementTreeStressTest extends ElementTreeTestBase
 {
-	// Uses around 418MB RAM on a 32-bit VM
 	private static int NUMLINES = 10240;
 	
 	
@@ -98,6 +97,8 @@ public class ElementTreeStressTest extends ElementTreeTestBase
 	{
 		JFrame frame = new JFrame( "Element tree stress test - " + NUMLINES + " lines" );
 		initFrame( frame );
+		
+		System.gc();
 	}
 	
 	

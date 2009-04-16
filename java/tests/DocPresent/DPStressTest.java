@@ -29,6 +29,7 @@ public class DPStressTest
 	// 480MB
 	// 357MB: packed DPContainer.ChildEntry
 	// 353MB: packed TextVisual
+	// 164MB: shared TextLayout objects
 	private static int NUMLINES = 10240;
 	
 	
@@ -116,6 +117,8 @@ public class DPStressTest
 		frame.add( area.getComponent() );
 		frame.pack();
 		frame.setVisible(true);
+		
+		System.gc();
 	}
 	
 	
