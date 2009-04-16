@@ -26,10 +26,16 @@ import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 public class DPStressTest
 {
 	// Memory usage history:
-	// 480MB
+	// ~480MB: initial
 	// 357MB: packed DPContainer.ChildEntry
 	// 353MB: packed TextVisual
 	// 164MB: shared TextLayout objects
+	// 135MB: emptied out DPContainer.ChildEntry
+	// 126MB: removed DPContainer.ChildEntry
+	// 120MB: shared TextVisual objects
+	// 117MB: created pointer->child table in DPContainer on demand
+	// 117MB: replaced paragraph ArrayLists with arrays
+	// 111MB: replaced Vector2 and Point2 objects in DPWidget with doubles
 	private static int NUMLINES = 10240;
 	
 	
