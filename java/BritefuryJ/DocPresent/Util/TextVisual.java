@@ -242,8 +242,8 @@ public class TextVisual
 			Key k = new Key( text, font, bMixedSizeCaps );
 			
 			WeakReference<TextVisual> visualRef = layoutTable.get( k );
-			TextVisual visual = null;
-			if ( visualRef == null )
+			TextVisual visual = visualRef != null  ?  visualRef.get()  :  null;
+			if ( visualRef == null  ||  visual == null )
 			{
 				visual = new TextVisual( text, font, bMixedSizeCaps );
 				layoutTable.put( k, new WeakReference<TextVisual>( visual, refQueue ) );
@@ -282,10 +282,6 @@ public class TextVisual
 					}
 				}
 			}
-			else
-			{
-				visual = visualRef.get();
-			}
 			
 			return visual;
 		}
@@ -318,7 +314,8 @@ public class TextVisual
 	private Font font;
 	private boolean bMixedSizeCaps;
 	private boolean bRealised;
-	private VMetricsTypeset emptyStringVMetrics; 
+	private HMetrics hmetrics;
+	private VMetrics vmetrics;
 	
 
 	
@@ -328,6 +325,8 @@ public class TextVisual
 		this.text = text;
 		this.font = font;
 		this.bMixedSizeCaps = bMixedSizeCaps;
+		this.hmetrics = new HMetrics();
+		this.vmetrics = new VMetricsTypeset();
 	}
 	
 	
@@ -335,6 +334,18 @@ public class TextVisual
 	public String getText()
 	{
 		return text;
+	}
+	
+	
+	
+	public HMetrics getHMetrics()
+	{
+		return hmetrics;
+	}
+	
+	public VMetrics getVMetrics()
+	{
+		return vmetrics;
 	}
 	
 	
@@ -362,6 +373,10 @@ public class TextVisual
 				{
 					layout = new TextLayout( text, font, frc );
 				}
+
+				double width = layout.getBounds().getWidth();
+				hmetrics = new HMetrics( width, layout.getAdvance() - width );
+				vmetrics = new VMetricsTypeset( layout.getAscent(), layout.getDescent(), layout.getLeading() );
 			}
 			else
 			{
@@ -369,47 +384,15 @@ public class TextVisual
 				assert graphics != null;
 				FontRenderContext frc = graphics.getFontRenderContext();
 				LineMetrics lineMetrics = font.getLineMetrics( "", frc );
-				emptyStringVMetrics = new VMetricsTypeset( lineMetrics.getAscent(), lineMetrics.getDescent(), lineMetrics.getLeading() );
+				
+				hmetrics = new HMetrics();
+				vmetrics = new VMetricsTypeset( lineMetrics.getAscent(), lineMetrics.getDescent(), lineMetrics.getLeading() );
 			}
-			
+
 			bRealised = true;
 		}
 	}
 	
-	
-	
-	
-	public HMetrics computeHMetrics()
-	{
-		if ( bRealised && layout != null )
-		{
-			double width = layout.getBounds().getWidth();
-			return new HMetrics( width, layout.getAdvance() - width );
-		}
-		else
-		{
-			return new HMetrics();
-		}
-	}
-	
-	public VMetrics computeVMetrics()
-	{
-		if ( bRealised )
-		{
-			if ( layout != null )
-			{
-				return new VMetricsTypeset( layout.getAscent(), layout.getDescent(), layout.getLeading() );
-			}
-			else
-			{
-				return emptyStringVMetrics;
-			}
-		}
-		else
-		{
-			return new VMetrics();
-		}
-	}
 	
 	
 	
