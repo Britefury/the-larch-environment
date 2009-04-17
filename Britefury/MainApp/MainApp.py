@@ -115,9 +115,12 @@ class MainAppDocView (DocView.RefreshListener):
 	def _refreshView(self):
 		if self._view is not None:
 			t1 = datetime.now()
+			#self._view.beginProfiling()
 			self._view.refresh()
 			t2 = datetime.now()
+			#self._view.endProfiling()
 			print 'MainApp: REFRESH VIEW TIME = ', t2 - t1
+			#print 'MainApp: REFRESH VIEW PROFILE: JAVA TIME = %f, PYTHON TIME = %f'  %  ( self._view.getJavaTime(), self._view.getPythonTime() )
 
 	def _queueRefresh(self):
 		class Run (Runnable):
