@@ -271,25 +271,33 @@ public class DPParagraph extends DPContainerSequence
 		else
 		{
 			double spacing = getSpacing();
-			// Accumulate the width required for all the children
-			double width = 0.0;
-			double x = initialX;
-			for (int i = 0; i < childHMetrics.length; i++)
+			
+			if ( childHMetrics.length == 1  &&  spacing < childHMetrics[0].hspacing )
 			{
-				DPWidget child = childList.get( i );
-				ParagraphParentPacking packing = (ParagraphParentPacking)child.getParentPacking();
-				HMetrics chm = childHMetrics[i];
-				
-				if ( i != childHMetrics.length - 1)
+				return childHMetrics[0];
+			}
+			else
+			{
+				// Accumulate the width required for all the children
+				double width = 0.0;
+				double x = initialX;
+				for (int i = 0; i < childHMetrics.length; i++)
 				{
-					chm = chm.minSpacing( spacing );
+					DPWidget child = childList.get( i );
+					ParagraphParentPacking packing = (ParagraphParentPacking)child.getParentPacking();
+					HMetrics chm = childHMetrics[i];
+					
+					if ( i != childHMetrics.length - 1)
+					{
+						chm = chm.minSpacing( spacing );
+					}
+					
+					width = x + chm.width  +  packing.padding * 2.0;
+					x = width + chm.hspacing;
 				}
 				
-				width = x + chm.width  +  packing.padding * 2.0;
-				x = width + chm.hspacing;
+				return new HMetrics( width, x - width );
 			}
-			
-			return new HMetrics( width, x - width );
 		}
 	}
 	
@@ -299,6 +307,10 @@ public class DPParagraph extends DPContainerSequence
 		if ( childVMetrics.length == 0 )
 		{
 			return new VMetrics();
+		}
+		else if ( childVMetrics.length == 1 )
+		{
+			return childVMetrics[0];
 		}
 		else
 		{
