@@ -6,8 +6,6 @@
 //##************************
 package BritefuryJ.DocView;
 
-import java.util.HashSet;
-
 import BritefuryJ.Cell.Cell;
 import BritefuryJ.Cell.CellEvaluator;
 import BritefuryJ.Cell.CellInterface;
@@ -41,24 +39,25 @@ public class DVNode implements CellListener
 	}
 	
 	
+
+	
 	
 	private DocView view;
 	private Object docNode;
 	private DocTreeNode treeNode;
-	
-	private DVNode parent;
 	
 	private Cell elementCell;
 	private ProxyElement proxyElement;
 	private Element element;
 	private NodeElementFactory elementFactory;
 	
-	private HashSet<DVNode> children;
-	
 	private NodeElementChangeListener elementChangeListener;
 	private NodeRefreshListener refreshListener;
 	
 	private boolean bRefreshRequired;
+	
+	private DVNode parent, nextSibling;
+	private DVNode childrenHead, childrenTail;
 	
 	
 	
@@ -69,6 +68,8 @@ public class DVNode implements CellListener
 		this.docNode = treeNode.getNode();
 		
 		parent = null;
+		nextSibling = null;
+		childrenHead = childrenTail = null;
 		
 		
 		final DVNode self = this;
@@ -90,9 +91,6 @@ public class DVNode implements CellListener
 		elementCell = new Cell();
 		elementCell.setEvaluator( elementEval );
 		elementCell.addListener( this );
-		
-		
-		children = new HashSet<DVNode>();
 		
 		
 		this.elementChangeListener = elementChangeListener;
@@ -196,25 +194,29 @@ public class DVNode implements CellListener
 	
 	private void refreshNode()
 	{
-		if ( elementChangeListener != null )
+		boolean bEmitChangeEvents = element != null;
+		
+		if ( elementChangeListener != null  &&  bEmitChangeEvents )
 		{
 			elementChangeListener.elementChangeFrom( this, element );
 		}
 
 		// Compute the element for this node, and refresh all children
 		Element e = (Element)elementCell.getValue();
-		for (DVNode child: children)
+		
+		// Refresh each child
+		DVNode child = childrenHead;
+		while ( child != null )
 		{
 			child.refresh();
-			assert child.parent == null  ||  child.parent == this;
-			child.parent = this;
+			child = child.nextSibling;
 		}
 		
 		// Set the node element
 		updateNodeElement( e );
 		
 		
-		if ( elementChangeListener != null )
+		if ( elementChangeListener != null  &&  bEmitChangeEvents )
 		{
 			elementChangeListener.elementChangeTo( this, element );
 		}
@@ -234,21 +236,29 @@ public class DVNode implements CellListener
 	private Element computeNodeElement()
 	{
 		// Unregister existing child relationships
-		for (DVNode child: children)
+		DVNode child = childrenHead;
+		while ( child != null )
 		{
+			DVNode next = child.nextSibling;
+
 			view.nodeTable.unrefViewNode( child );
 			child.parent = null;
+			child.nextSibling = null;
+			
+			child = next;
 		}
-		children.clear();
+		childrenHead = childrenTail = null;
 		
 		if ( elementFactory != null )
 		{
 			Element e = elementFactory.createNodeElement( this, treeNode );
 			
 			// Register new child relationships
-			for (DVNode child: children)
+			child = childrenHead;
+			while ( child != null )
 			{
 				view.nodeTable.refViewNode( child );
+				child = child.nextSibling;
 			}
 			
 			return e;
@@ -275,11 +285,33 @@ public class DVNode implements CellListener
 	}
 	
 	
+	
+	
+	//
+	//
+	// Child / parent relationship methods
+	//
+	//
+	
 	public void registerChild(DVNode child)
 	{
-		children.add( child );
-	}
+		assert child.parent == null  ||  child.parent == this;
 
+		// Append child to the list of children
+		if ( childrenTail != null )
+		{
+			childrenTail.nextSibling = child;
+			childrenTail = child;
+		}
+
+		if ( childrenHead == null )
+		{
+			childrenHead = child;
+		}
+		
+		child.parent = this;
+	}
+	
 
 
 

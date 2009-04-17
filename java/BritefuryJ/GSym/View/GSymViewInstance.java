@@ -28,6 +28,8 @@ public class GSymViewInstance
 		
 		public NodeContentsFactory(GSymViewInstance viewInstance, GSymNodeViewFunction viewFunction, Object state)
 		{
+			assert viewFunction != null;
+			
 			this.viewInstance = viewInstance;
 			this.nodeViewFunction = viewFunction;
 			this.state = state;
@@ -40,7 +42,7 @@ public class GSymViewInstance
 			GSymNodeViewInstance nodeViewInstance = new GSymNodeViewInstance( treeNode.getNode(), viewInstance.getView(), viewInstance, viewNode );
 			
 			// Build the contents
-			return viewInstance.buildNodeViewContents( nodeViewInstance, treeNode, nodeViewFunction, state );
+			return nodeViewFunction.createElement( treeNode, nodeViewInstance, state );
 		}
 	}
 	
@@ -158,18 +160,6 @@ public class GSymViewInstance
 		}
 		
 		return factory;
-	}
-	
-	
-	protected Element buildNodeViewContents(GSymNodeViewInstance nodeViewInstance, DocTreeNode txs, GSymNodeViewFunction nodeViewFunction, Object state)
-	{
-		// Build the contents of a view node
-		if ( nodeViewFunction == null )
-		{
-			nodeViewFunction = generalNodeViewFunction;
-		}
-		
-		return nodeViewFunction.createElement( txs, nodeViewInstance, state );
 	}
 	
 	
