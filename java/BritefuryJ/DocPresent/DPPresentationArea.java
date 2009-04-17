@@ -696,7 +696,7 @@ public class DPPresentationArea extends DPBin implements CaretListener
 				rootMotionEvent( new PointerMotionEvent( rootSpaceMouse, PointerMotionEvent.Action.MOTION ) );
 			}			
 			long t2 = System.currentTimeMillis();
-			System.out.println( "DPPresentationArea.performAllocation(): Realloc time = " + (double)(t2-t1) * 0.001 );
+			System.out.println( "DPPresentationArea.performAllocation(): TYPESET TIME = " + (double)(t2-t1) * 0.001 );
 		}
 	}
 	

@@ -67,7 +67,6 @@ public class GSymNodeViewInstance
 
 	
 	
-	protected Object xs;
 	protected DocView view;
 	protected GSymViewInstance viewInstance;
 	protected DVNode viewNode;
@@ -75,7 +74,6 @@ public class GSymNodeViewInstance
 	
 	public GSymNodeViewInstance(Object xs, DocView view, GSymViewInstance viewInstance, DVNode viewNode)
 	{
-		this.xs = xs;
 		this.view = view;
 		this.viewInstance = viewInstance;
 		this.viewNode = viewNode;

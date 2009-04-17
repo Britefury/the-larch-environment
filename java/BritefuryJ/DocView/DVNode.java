@@ -10,11 +10,13 @@ import java.util.HashSet;
 
 import BritefuryJ.Cell.Cell;
 import BritefuryJ.Cell.CellEvaluator;
+import BritefuryJ.Cell.CellInterface;
+import BritefuryJ.Cell.CellListener;
 import BritefuryJ.DocPresent.ElementTree.Element;
 import BritefuryJ.DocPresent.ElementTree.ProxyElement;
 import BritefuryJ.DocTree.DocTreeNode;
 
-public class DVNode
+public class DVNode implements CellListener
 {
 	public static class CannotChangeDocNodeException extends Exception
 	{
@@ -33,6 +35,11 @@ public class DVNode
 		public void elementChangeTo(DVNode node, Element e);
 	}
 	
+	public static interface NodeRefreshListener
+	{
+		public void onNodeRequestRefresh(DVNode node);
+	}
+	
 	
 	
 	private DocView view;
@@ -41,7 +48,7 @@ public class DVNode
 	
 	private DVNode parent;
 	
-	private Cell refreshCell, elementCell;
+	private Cell elementCell;
 	private ProxyElement proxyElement;
 	private Element element;
 	private NodeElementFactory elementFactory;
@@ -49,6 +56,9 @@ public class DVNode
 	private HashSet<DVNode> children;
 	
 	private NodeElementChangeListener elementChangeListener;
+	private NodeRefreshListener refreshListener;
+	
+	private boolean bRefreshRequired;
 	
 	
 	
@@ -62,16 +72,7 @@ public class DVNode
 		
 		
 		final DVNode self = this;
-		CellEvaluator refreshEval = new CellEvaluator()
-		{
-			public Object evaluate()
-			{
-				self.refreshNode();
-				return null;
-			}
-		};
-		refreshCell = new Cell();
-		refreshCell.setEvaluator( refreshEval );
+		bRefreshRequired = true;
 		
 		
 		proxyElement = new ProxyElement();
@@ -88,6 +89,7 @@ public class DVNode
 		};
 		elementCell = new Cell();
 		elementCell.setEvaluator( elementEval );
+		elementCell.addListener( this );
 		
 		
 		children = new HashSet<DVNode>();
@@ -158,7 +160,7 @@ public class DVNode
 	
 	//
 	//
-	// Document view and node treemethods
+	// Document view and node / tree methods
 	//
 	//
 	
@@ -167,29 +169,7 @@ public class DVNode
 		return view;
 	}
 	
-	public DVNode getParentNodeView()
-	{
-		return parent;
-	}
-	
-	public boolean isDescendantOf(DVNode node)
-	{
-		DVNode n = this;
-		
-		while ( n != null )
-		{
-			if ( n == node )
-			{
-				return true;
-			}
-			
-			n = n.parent;
-		}
-		
-		return false;
-	}
-	
-	
+
 	public DocTreeNode getTreeNode()
 	{
 		return treeNode;
@@ -209,6 +189,11 @@ public class DVNode
 	//
 	//
 	
+	public void setRefreshListener(NodeRefreshListener listener)
+	{
+		refreshListener = listener;
+	}
+	
 	private void refreshNode()
 	{
 		if ( elementChangeListener != null )
@@ -221,6 +206,8 @@ public class DVNode
 		for (DVNode child: children)
 		{
 			child.refresh();
+			assert child.parent == null  ||  child.parent == this;
+			child.parent = this;
 		}
 		
 		// Set the node element
@@ -236,7 +223,11 @@ public class DVNode
 	
 	public void refresh()
 	{
-		refreshCell.getValue();
+		if ( bRefreshRequired )
+		{
+			refreshNode();
+			bRefreshRequired = false;
+		}
 	}
 	
 	
@@ -246,6 +237,7 @@ public class DVNode
 		for (DVNode child: children)
 		{
 			view.nodeTable.unrefViewNode( child );
+			child.parent = null;
 		}
 		children.clear();
 		
@@ -286,5 +278,67 @@ public class DVNode
 	public void registerChild(DVNode child)
 	{
 		children.add( child );
+	}
+
+
+
+
+
+	//
+	//
+	// Cell notifications
+	//
+	//
+	
+	public void onCellChanged(CellInterface cell)
+	{
+		assert cell == elementCell;
+		requestRefresh();
+	}
+
+	public void onCellEvaluator(CellInterface cell, CellEvaluator oldEval, CellEvaluator newEval)
+	{
+	}
+	
+	public void onCellValidity(CellInterface cell)
+	{
+	}
+	
+	
+	
+	//
+	//
+	// Child notifications
+	//
+	//
+	
+	public void onChildRefreshRequired()
+	{
+		requestRefresh();
+	}
+	
+	
+	
+	//
+	//
+	// Refresh request
+	//
+	//
+	
+	private void requestRefresh()
+	{
+		if ( !bRefreshRequired )
+		{
+			bRefreshRequired = true;
+			if ( parent != null )
+			{
+				parent.onChildRefreshRequired();
+			}
+			
+			if ( refreshListener != null )
+			{
+				refreshListener.onNodeRequestRefresh( this );
+			}
+		}
 	}
 }

@@ -6,25 +6,29 @@
 //##************************
 package BritefuryJ.DocView;
 
-import BritefuryJ.Cell.Cell;
-import BritefuryJ.Cell.CellEvaluator;
 import BritefuryJ.DocTree.DocTree;
 import BritefuryJ.DocTree.DocTreeNode;
 
-public class DocView
+public class DocView implements DVNode.NodeRefreshListener
 {
 	public interface RootNodeInitialiser
 	{
 		public void initRootNode(DVNode rootView, Object rootDocNode);
 	}
 	
+	public interface RefreshListener
+	{
+		public void onViewRequestRefresh(DocView view);
+	}
+	
 	
 	private DocTreeNode root;
 	private RootNodeInitialiser rootNodeInitialiser;
-	private Cell refreshCell;
 	protected DocViewNodeTable nodeTable;
 	private DVNode rootView;
 	private DVNode.NodeElementChangeListener elementChangeListener;
+	private boolean bRefreshRequired;
+	private RefreshListener refreshListener;
 	
 	
 	public DocView(DocTree tree, DocTreeNode root, RootNodeInitialiser rootNodeInitialiser, DVNode.NodeElementChangeListener elementChangeListener)
@@ -32,21 +36,17 @@ public class DocView
 		this.root = root;
 		this.rootNodeInitialiser = rootNodeInitialiser;
 		
-		final DocView view = this;
-		CellEvaluator refreshEval = new CellEvaluator()
-		{
-			public Object evaluate()
-			{
-				view.performRefresh();
-				return null;
-			}
-		};
-		refreshCell = new Cell();
-		refreshCell.setEvaluator( refreshEval );
-		
 		nodeTable = new DocViewNodeTable();
 		
 		this.elementChangeListener = elementChangeListener;
+		
+		bRefreshRequired = true;
+	}
+	
+	
+	public void setRefreshListener(RefreshListener listener)
+	{
+		refreshListener = listener;
 	}
 	
 	
@@ -56,6 +56,7 @@ public class DocView
 		{
 			rootView = buildNodeView( root );
 			rootNodeInitialiser.initRootNode( rootView, root );
+			rootView.setRefreshListener( this );
 		}
 		return rootView;
 	}
@@ -118,11 +119,25 @@ public class DocView
 	
 	public void refresh()
 	{
-		refreshCell.getValue();
+		if ( bRefreshRequired )
+		{
+			bRefreshRequired = false;
+			performRefresh();
+		}
 	}
 	
-	public Cell getRefreshCell()
+
+	
+	public void onNodeRequestRefresh(DVNode node)
 	{
-		return refreshCell;
+		if ( !bRefreshRequired )
+		{
+			bRefreshRequired = true;
+			
+			if ( refreshListener != null )
+			{
+				refreshListener.onViewRequestRefresh( this );
+			}
+		}
 	}
 }
