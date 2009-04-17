@@ -111,23 +111,23 @@ public class DPText extends DPContentLeafEditableEntry implements TextVisual.Tex
 	
 	protected HMetrics computeMinimumHMetrics()
 	{
-		return visual.computeHMetrics();
+		return visual.getHMetrics();
 	}
 	
 	protected HMetrics computePreferredHMetrics()
 	{
-		return visual.computeHMetrics();
+		return visual.getHMetrics();
 	}
 
 	
 	protected VMetrics computeMinimumVMetrics()
 	{
-		return visual.computeVMetrics();
+		return visual.getVMetrics();
 	}
 
 	protected VMetrics computePreferredVMetrics()
 	{
-		return visual.computeVMetrics();
+		return visual.getVMetrics();
 	}
 
 	
