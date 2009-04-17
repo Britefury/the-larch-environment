@@ -29,7 +29,14 @@ public class VMetricsTypeset extends VMetrics
 
 	public VMetricsTypeset scaled(double scale)
 	{
-		return new VMetricsTypeset( ascent * scale, descent * scale, vspacing * scale );
+		if ( scale == 1.0 )
+		{
+			return this;
+		}
+		else
+		{
+			return new VMetricsTypeset( ascent * scale, descent * scale, vspacing * scale );
+		}
 	}
 	
 	public VMetricsTypeset minSpacing(double spacing)

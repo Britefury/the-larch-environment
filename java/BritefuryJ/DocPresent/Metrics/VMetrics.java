@@ -37,7 +37,14 @@ public class VMetrics extends Metrics
 	
 	public VMetrics scaled(double scale)
 	{
-		return new VMetrics( height * scale, vspacing * scale );
+		if ( scale == 1.0 )
+		{
+			return this;
+		}
+		else
+		{
+			return new VMetrics( height * scale, vspacing * scale );
+		}
 	}
 	
 	public VMetrics minSpacing(double spacing)

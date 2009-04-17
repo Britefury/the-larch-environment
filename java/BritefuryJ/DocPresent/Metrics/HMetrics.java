@@ -44,7 +44,14 @@ public class HMetrics extends Metrics
 	
 	public HMetrics scaled(double scale)
 	{
-		return new HMetrics( width * scale, hspacing * scale );
+		if ( scale == 1.0 )
+		{
+			return this;
+		}
+		else
+		{
+			return new HMetrics( width * scale, hspacing * scale );
+		}
 	}
 	
 	
