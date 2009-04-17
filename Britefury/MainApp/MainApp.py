@@ -25,7 +25,7 @@ from BritefuryJ.DocPresent import *
 from BritefuryJ.DocPresent.ElementTree import *
 from BritefuryJ.DocPresent.StyleSheets import *
 
-from BritefuryJ.Cell import CellListener
+from BritefuryJ.DocView import DocView
 
 
 from Britefury.Kernel.Abstract import abstractmethod
@@ -77,7 +77,7 @@ class MainAppPluginInterface (object):
 		
 
 		
-class MainAppDocView (CellListener):
+class MainAppDocView (DocView.RefreshListener):
 	def __init__(self, app):
 		self._app = app
 		
@@ -95,7 +95,7 @@ class MainAppDocView (CellListener):
 	def setUnit(self, unit):
 		if unit is not None:
 			self._view = self.createView( unit )
-			self._view.getRefreshCell().addListener( self )
+			self._view.setRefreshListener( self )
 			self._refreshView()
 			self._elementTree.getRoot().setChild( self._view.getRootView().getElement() )
 		else:
@@ -117,7 +117,7 @@ class MainAppDocView (CellListener):
 			t1 = datetime.now()
 			self._view.refresh()
 			t2 = datetime.now()
-			print 'MainApp: refresh time = ', t2 - t1
+			print 'MainApp: REFRESH VIEW TIME = ', t2 - t1
 
 	def _queueRefresh(self):
 		class Run (Runnable):
@@ -139,14 +139,8 @@ class MainAppDocView (CellListener):
 
 		
 		
-	def onCellChanged(self, cell):
+	def onViewRequestRefresh(self, view):
 		self._queueRefresh()
-
-	def onCellEvaluator(self, cell, oldEval, newEval):
-		pass
-
-	def onCellValidity(self, cell):
-		pass
 		
 		
 
@@ -376,7 +370,6 @@ class MainApp (object):
 				self._onCommandHistoryChanged( history )
 		
 		if self._document is not None:
-			print 'command history tracking a ', type( self._document.unit.content )
 			self._commandHistory.track( self._document.unit.content )
 		self._commandHistory.setListener( Listener() )
 		self._bUnsavedData = False
@@ -513,8 +506,7 @@ class MainApp (object):
 							t2 = datetime.now()
 							if unit is not None:
 								document = GSymDocument( unit )
-								t3 = datetime.now()
-								print 'Import time=%s, convert to DMNode time=%s'  %  ( t2 - t1, t3 - t2 )
+								print 'MainApp: IMPORT TIME = %s'  %  ( t2 - t1, )
 								self.setDocument( document )
 		
 		self._importMenu.add( _action( menuLabel, _onImport ) )
