@@ -53,18 +53,17 @@ class _NodeElementChangeListener (DVNode.NodeElementChangeListener):
 		elementContent = node.getInnerElementNoRefresh()
 		if elementContent is not None:
 			startContent = elementContent.getContent()
-		else:
-			startContent = ''
-		position, bias, contentString = self._getCursorPositionBiasAndContentString( node, elementContent )
-		#print 'Node: ', node.getDocNode()[0], position, elementContent
-
-		# Set the caret node to node
-		if position is not None  and  bias is not None  and  elementContent is not None:
-			if isListNode( node.getDocNode() ):
-				#print 'Node: %s, position=%d'  %  ( node.getDocNode()[0], position )
-				pass
-			self._caretNode = node
-			self._posBiasContent = position, bias, contentString
+			
+			position, bias, contentString = self._getCursorPositionBiasAndContentString( node, elementContent )
+			#print 'Node: ', node.getDocNode()[0], position, elementContent
+		
+			# Set the caret node to node
+			if position is not None  and  bias is not None  and  elementContent is not None:
+				if isListNode( node.getDocNode() ):
+					#print 'Node: %s, position=%d'  %  ( node.getDocNode()[0], position )
+					pass
+				self._caretNode = node
+				self._posBiasContent = position, bias, contentString
 		
 		
 	def elementChangeTo(self, node, element):

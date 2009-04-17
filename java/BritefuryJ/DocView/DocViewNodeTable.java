@@ -49,20 +49,20 @@ public class DocViewNodeTable
 			removeDeadEntriesFromTable( refedNodes );
 			
 			
-			// Look in unrefed nodes to see if there is an existing node for @treeNode
-			DVNode viewNode = unrefedNodes.get( treeNode );
-			if ( viewNode != null )
+			if ( !unrefedNodes.isEmpty() )
 			{
-				// Found an unused view node; move it into the ref'ed table
-				unrefedNodes.remove( treeNode );
-				refedNodes.put( treeNode, new WeakReference<DVNode>( viewNode ) );
-				return viewNode;
-			}
+				// Look in unrefed nodes to see if there is an existing node for @treeNode
+				DVNode viewNode = unrefedNodes.get( treeNode );
+				if ( viewNode != null )
+				{
+					// Found an unused view node; move it into the ref'ed table
+					unrefedNodes.remove( treeNode );
+					refedNodes.put( treeNode, new WeakReference<DVNode>( viewNode ) );
+					return viewNode;
+				}
 			
 			
-			// Look for an unref'd node to re-use
-			if ( unrefedNodes.size() > 0 )
-			{
+				// Look for an unref'd node to re-use
 				// Take an entry
 				DocTreeNode key = unrefedNodes.keySet().iterator().next();
 				viewNode = unrefedNodes.get( key );
@@ -155,24 +155,27 @@ public class DocViewNodeTable
 		
 		private static void removeDeadEntriesFromTable(WeakHashMap<DocTreeNode, WeakReference<DVNode>> table)
 		{
-			HashSet<DocTreeNode> deadKeys = null;
-			for (Map.Entry<DocTreeNode, WeakReference<DVNode>> entry: table.entrySet())
+			if ( !table.isEmpty() )
 			{
-				if ( entry.getValue().get() == null )
+				HashSet<DocTreeNode> deadKeys = null;
+				for (Map.Entry<DocTreeNode, WeakReference<DVNode>> entry: table.entrySet())
 				{
-					if ( deadKeys == null )
+					if ( entry.getValue().get() == null )
 					{
-						deadKeys = new HashSet<DocTreeNode>();
+						if ( deadKeys == null )
+						{
+							deadKeys = new HashSet<DocTreeNode>();
+						}
+						deadKeys.add( entry.getKey() );
 					}
-					deadKeys.add( entry.getKey() );
 				}
-			}
-			
-			if ( deadKeys != null )
-			{
-				for (DocTreeNode key: deadKeys)
+				
+				if ( deadKeys != null )
 				{
-					table.remove( key );
+					for (DocTreeNode key: deadKeys)
+					{
+						table.remove( key );
+					}
 				}
 			}
 		}
