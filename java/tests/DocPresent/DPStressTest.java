@@ -36,7 +36,8 @@ public class DPStressTest
 	// 117MB: created pointer->child table in DPContainer on demand
 	// 117MB: replaced paragraph ArrayLists with arrays
 	// 111MB: replaced Vector2 and Point2 objects in DPWidget with doubles
-	private static int NUMLINES = 30000;
+	// 83MB: cached metrics in TextVisual objects, and modified Metrics.scaled() (and subclass) methods to only create a new metrics object in cases scale != 1.0
+	private static int NUMLINES = 10240;
 	
 	
 	Font f0 = new Font( "Sans serif", Font.PLAIN, 12 );
