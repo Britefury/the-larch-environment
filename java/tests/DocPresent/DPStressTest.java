@@ -25,7 +25,7 @@ import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
 public class DPStressTest
 {
-	// Memory usage history:
+	// Memory usage history (10240 lines):
 	// ~480MB: initial
 	// 357MB: packed DPContainer.ChildEntry
 	// 353MB: packed TextVisual
@@ -36,7 +36,7 @@ public class DPStressTest
 	// 117MB: created pointer->child table in DPContainer on demand
 	// 117MB: replaced paragraph ArrayLists with arrays
 	// 111MB: replaced Vector2 and Point2 objects in DPWidget with doubles
-	private static int NUMLINES = 10240;
+	private static int NUMLINES = 30000;
 	
 	
 	Font f0 = new Font( "Sans serif", Font.PLAIN, 12 );
@@ -114,8 +114,11 @@ public class DPStressTest
 	     
 	     
 	     
-	     
-		area.setChild( createContentNode() );
+		long t1 = System.currentTimeMillis();
+		DPWidget w = createContentNode();
+		long t2 = System.currentTimeMillis();
+		System.out.println( "Widget tree creation time: " + (double)( t2 - t1 ) / 1000.0 );
+		area.setChild( w );
 	     
 	     
 	     

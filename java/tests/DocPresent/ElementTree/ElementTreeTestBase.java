@@ -52,8 +52,12 @@ public abstract class ElementTreeTestBase
 		//This stops the app on window close.
 		frame.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
 		
-
-		tree.getRoot().setChild( createContentNode() );
+		
+		long t1 = System.currentTimeMillis();
+		Element element = createContentNode();
+		long t2 = System.currentTimeMillis();
+		System.out.println( "Element tree creation time: " + (double)( t2 - t1 ) / 1000.0 );
+		tree.getRoot().setChild( element );
 	     
 	     
 		DPPresentationArea area = tree.getPresentationArea();

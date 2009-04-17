@@ -41,7 +41,6 @@ import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 import BritefuryJ.DocTree.DocTreeNode;
 import BritefuryJ.DocView.DVNode;
-import BritefuryJ.DocView.DocView;
 import BritefuryJ.GSym.View.ListView.ListViewLayout;
 import BritefuryJ.GSym.View.ListView.PySeparatorElementFactory;
 import BritefuryJ.GSym.View.ListView.SeparatorElementFactory;
@@ -67,14 +66,12 @@ public class GSymNodeViewInstance
 
 	
 	
-	protected DocView view;
 	protected GSymViewInstance viewInstance;
 	protected DVNode viewNode;
 	
 	
-	public GSymNodeViewInstance(Object xs, DocView view, GSymViewInstance viewInstance, DVNode viewNode)
+	public GSymNodeViewInstance(GSymViewInstance viewInstance, DVNode viewNode)
 	{
-		this.view = view;
 		this.viewInstance = viewInstance;
 		this.viewNode = viewNode;
 	}
@@ -328,8 +325,10 @@ public class GSymNodeViewInstance
 
 	public Element viewEvalFn(DocTreeNode x, GSymNodeViewFunction nodeViewFunction, Object state)
 	{
+		viewInstance.getView().profile_pythonCallToJava();
+		
 		// A call to DocNode.buildNodeView builds the view, and puts it in the DocView's table
-		DVNode viewNode = view.buildNodeView( x );
+		DVNode viewNode = viewInstance.getView().buildNodeView( x );
 		viewNode.setNodeElementFactory( viewInstance.makeNodeElementFactory( nodeViewFunction, state ) );
 		
 		
@@ -345,6 +344,7 @@ public class GSymNodeViewInstance
 		
 		registerViewNodeRelationship( viewNode );
 		
+		viewInstance.getView().profile_javaReturnToPython();
 		return viewNode.getElementNoRefresh();
 	}
 	

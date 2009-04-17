@@ -39,10 +39,15 @@ public class GSymViewInstance
 		public Element createNodeElement(DVNode viewNode, DocTreeNode treeNode)
 		{
 			// Create the node view instance
-			GSymNodeViewInstance nodeViewInstance = new GSymNodeViewInstance( treeNode.getNode(), viewInstance.getView(), viewInstance, viewNode );
+			GSymNodeViewInstance nodeViewInstance = new GSymNodeViewInstance( viewInstance, viewNode );
 			
 			// Build the contents
-			return nodeViewFunction.createElement( treeNode, nodeViewInstance, state );
+			//return nodeViewFunction.createElement( treeNode, nodeViewInstance, state );
+			
+			viewInstance.getView().profile_javaCallToPython();
+			Element e = nodeViewFunction.createElement( treeNode, nodeViewInstance, state );
+			viewInstance.getView().profile_pythonReturnToJava();
+			return e;
 		}
 	}
 	
