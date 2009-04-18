@@ -140,13 +140,13 @@ class ParsedExpressionContentListener (ElementContentListener):
 		if '\n' not in value:
 			parsed = _parseText( self._parser, value, self._outerPrecedence )
 			if parsed is not None:
-				if parsed != self._node:
-					replace( self._ctx, self._node, parsed )
-				#replaceNodeContents( self._ctx, self._node, parsed )
+				#if parsed != self._node:
+					#replace( self._ctx, self._node, parsed )
+				replaceNodeContents( self._ctx, self._node, parsed )
 			else:
-				if self._node != Nodes.UNPARSED( value=value ):
-					replace( self._ctx, self._node, Nodes.UNPARSED( value=value ) )
-				#replaceNodeContents( self._ctx, self._node, Nodes.UNPARSED( value=value ) )
+				#if self._node != Nodes.UNPARSED( value=value ):
+					#replace( self._ctx, self._node, Nodes.UNPARSED( value=value ) )
+				replaceNodeContents( self._ctx, self._node, Nodes.UNPARSED( value=value ) )
 			return True
 		else:
 			return False

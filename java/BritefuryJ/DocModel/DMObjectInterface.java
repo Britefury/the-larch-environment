@@ -27,6 +27,7 @@ public interface DMObjectInterface extends DMNodeInterface
 	public String[] getFieldNames();
 	
 	public void update(Map<String, Object> table) throws InvalidFieldNameException;
+	public void become(DMObject obj);
 	
 	
 	public Object __getitem__(int fieldIndex);
