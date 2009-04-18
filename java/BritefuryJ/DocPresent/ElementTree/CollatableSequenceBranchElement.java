@@ -37,27 +37,40 @@ public abstract class CollatableSequenceBranchElement extends CollatableBranchEl
 
 	public void setChildren(List<Element> xs)
 	{
-		HashSet<Element> added, removed;
-		
-		added = new HashSet<Element>( xs );
-		removed = new HashSet<Element>( children );
-		added.removeAll( children );
-		removed.removeAll( xs );
-		
-		
-		for (Element x: removed)
+		if ( children.isEmpty() )
 		{
-			x.setParent( null );
-			x.setElementTree( null );
+			children.addAll( xs );
+			
+			for (Element x: xs)
+			{
+				x.setParent( this );
+				x.setElementTree( tree );
+			}
 		}
-		
-		children.clear();
-		children.addAll( xs );
-		
-		for (Element x: added)
+		else
 		{
-			x.setParent( this );
-			x.setElementTree( tree );
+			HashSet<Element> added, removed;
+			
+			added = new HashSet<Element>( xs );
+			removed = new HashSet<Element>( children );
+			added.removeAll( children );
+			removed.removeAll( xs );
+			
+			
+			for (Element x: removed)
+			{
+				x.setParent( null );
+				x.setElementTree( null );
+			}
+			
+			children.clear();
+			children.addAll( xs );
+			
+			for (Element x: added)
+			{
+				x.setParent( this );
+				x.setElementTree( tree );
+			}
 		}
 		
 		onChildListChanged();
