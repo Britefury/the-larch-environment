@@ -70,6 +70,37 @@ public class DMObjectCommandTracker extends CommandTracker
 
 	
 	
+	private static class BecomeCommand extends Command
+	{
+		private DMObject obj;
+		private DMObjectClass oldClass;
+		private Object oldFieldData[];
+		private DMObjectClass newClass;
+		private Object newFieldData[];
+		
+		public BecomeCommand(DMObject obj, DMObjectClass oldClass, Object oldFieldData[], DMObjectClass newClass, Object newFieldData[])
+		{
+			this.obj = obj;
+			this.oldClass = oldClass;
+			this.oldFieldData = oldFieldData;
+			this.newClass = newClass;
+			this.newFieldData = newFieldData;
+		}
+
+		
+		protected void execute()
+		{
+			obj.become( newClass, newFieldData );
+		}
+
+		protected void unexecute()
+		{
+			obj.become( oldClass, oldFieldData );
+		}
+	}
+
+	
+	
 	
 	
 	public DMObjectCommandTracker(CommandHistory commandHistory)
@@ -133,6 +164,25 @@ public class DMObjectCommandTracker extends CommandTracker
 		}
 		commandHistory.addCommand( new UpdateCommand( obj, indices, oldContents, newContents ) );
 		for (Object oldX: oldContents)
+		{
+			if ( oldX instanceof Trackable )
+			{
+				commandHistory.stopTracking( (Trackable)oldX );
+			}
+		}
+	}
+	
+	protected void onBecome(DMObject obj, DMObjectClass oldClass, Object oldFieldData[], DMObjectClass newClass, Object newFieldData[])
+	{
+		for (Object x: newFieldData)
+		{
+			if ( x instanceof Trackable )
+			{
+				commandHistory.track( (Trackable)x );
+			}
+		}
+		commandHistory.addCommand( new BecomeCommand( obj, oldClass, oldFieldData, newClass, newFieldData ) );
+		for (Object oldX: oldFieldData)
 		{
 			if ( oldX instanceof Trackable )
 			{

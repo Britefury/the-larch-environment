@@ -7,10 +7,11 @@
 ##-*************************
 from java.util import List
 
-from BritefuryJ.DocModel import DMList
+from BritefuryJ.DocModel import DMList, DMObject
 
 #from Britefury.DocTree.DocTreeNode import DocTreeNode
-from BritefuryJ.DocTree import DocTreeNode
+from BritefuryJ.DocTree import DocTreeNode, DocTreeList, DocTreeObject
+
 
 from Britefury.Util.NodeUtil import *
 
@@ -54,8 +55,14 @@ def replace(ctx, data, replacement):
 	
 def replaceNodeContents(ctx, node, replacement):
 	if isinstance( node, DocTreeNode ):
-		node[:] = _sanitiseInputData( replacement )
-		return node
+		if isinstance( data, DocTreeObject )  and  ( isinstance( replacement, DocTreeObject )  or  isinstance( replacement, DMObject ) ):
+			data.become( replacement )
+			return data
+		elif isinstance( data, DocTreeList )  and  isinstance( replacement, DMListInterface ):
+			node[:] = _sanitiseInputData( replacement )
+			return data
+		else:
+			raise TypeError, 'cannot replace contents of a %s with a %s'  %  ( type( node ), type( replacement ) )
 	else:
 		raise TypeError, 'EditOperations:replace(): @node must be a DocTreeNode'
 	

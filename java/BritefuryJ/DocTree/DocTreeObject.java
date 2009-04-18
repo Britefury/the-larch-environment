@@ -6,10 +6,12 @@
 //##************************
 package BritefuryJ.DocTree;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.python.core.Py;
 
+import BritefuryJ.DocModel.DMObject;
 import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMObjectInterface;
 import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
@@ -108,9 +110,25 @@ public class DocTreeObject extends DocTreeNode implements DMObjectInterface
 	
 	public void update(Map<String, Object> table) throws InvalidFieldNameException
 	{
-		node.update( table );
+		HashMap<String, Object> coercedTable = new HashMap<String, Object>();
+		coercedTable.putAll( table );
+		for (Map.Entry<String, Object> entry: coercedTable.entrySet())
+		{
+			entry.setValue( DocTreeNode.coerce( entry.getValue() ) );
+		}
+		node.update( coercedTable );
 	}
 	
+	public void become(DMObject obj)
+	{
+		node.become( obj );
+	}
+	
+	public void become(DocTreeObject obj)
+	{
+		node.become( (DMObject)obj.getNode() );
+	}
+
 	
 	
 	public Object __getitem__(int index)

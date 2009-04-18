@@ -165,6 +165,32 @@ public class Test_DMObject extends TestCase
 	}
 
 
+	public void test_become() throws InvalidFieldNameException, ClassAlreadyDefinedException
+	{
+		DMObjectClass A = m.newClass( "A", new String[] { "x", "y" } );
+		DMObjectClass B = m.newClass( "B", new String[] { "p", "q", "r" } );
+		DMObject a = A.newInstance( new Object[] { "a", "p" } );
+		DMObject b = B.newInstance( new Object[] { "c", "d", "e" } );
+		history.track( a );
+		
+		assertEquals( Arrays.asList( a.getFieldValuesImmutable() ), Arrays.asList( new Object[] { "a", "p" } ) );
+		assertTrue( a.isInstanceOf( A ) );
+
+		a.become( b );
+
+		assertEquals( Arrays.asList( a.getFieldValuesImmutable() ), Arrays.asList( new Object[] { "c", "d", "e" } ) );
+		assertTrue( a.isInstanceOf( B ) );
+
+		history.undo();
+		assertEquals( Arrays.asList( a.getFieldValuesImmutable() ), Arrays.asList( new Object[] { "a", "p" } ) );
+		assertTrue( a.isInstanceOf( A ) );
+
+		history.redo();
+		assertEquals( Arrays.asList( a.getFieldValuesImmutable() ), Arrays.asList( new Object[] { "c", "d", "e" } ) );
+		assertTrue( a.isInstanceOf( B ) );
+	}
+
+
 	public void test_setitem() throws InvalidFieldNameException, ClassAlreadyDefinedException
 	{
 		DMObjectClass A = m.newClass( "A", new String[] { "x", "y" } );

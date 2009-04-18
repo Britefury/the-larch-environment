@@ -350,6 +350,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable
 				i++;
 			}
 		}
+		cell.setLiteralValue( fieldData );
 		if ( commandTracker != null )
 		{
 			commandTracker.onUpdate( this, indices, oldContents, newContents );
@@ -371,12 +372,36 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable
 			newContents[i] = x;
 			fieldData[index] = x;
 		}
+		cell.setLiteralValue( fieldData );
 		if ( commandTracker != null )
 		{
 			commandTracker.onUpdate( this, indices, oldContents, newContents );
 		}
 	}
 
+	
+	
+	public void become(DMObject obj)
+	{
+		become( obj.objClass, (Object[])obj.cell.getLiteralValue() );
+	}
+
+	protected void become(DMObjectClass cls, Object[] data)
+	{
+		Object[] oldFieldData = (Object[])cell.getLiteralValue();
+		Object fieldData[] = new Object[data.length];
+		System.arraycopy( data, 0, fieldData, 0, data.length );
+		DMObjectClass oldClass = objClass;
+		objClass = cls;
+		cell.setLiteralValue( fieldData );
+		if ( commandTracker != null )
+		{
+			commandTracker.onBecome( this, oldClass, oldFieldData, cls, data );
+		}
+	}
+
+	
+	
 	
 	
 	public Object __getitem__(int fieldIndex)
@@ -452,7 +477,6 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable
 			xs[i] = newNull();
 		}
 	}
-
 	
 	
 	
