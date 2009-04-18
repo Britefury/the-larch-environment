@@ -19,7 +19,6 @@ public abstract class CollatableBranchElement extends BranchElement
 	protected enum CollationMode { UNINITIALISED, ROOT, CONTENTSCOLLATED };
 	
 	private ContainerStyleSheet styleSheet;
-	private DPContainer container;
 	protected CollationMode collationMode;
 	private ElementCollator collationRootCollator;
 
@@ -33,7 +32,6 @@ public abstract class CollatableBranchElement extends BranchElement
 		super( null );
 		
 		this.styleSheet = styleSheet;
-		this.container = null;
 		this.collationMode = CollationMode.UNINITIALISED;
 		this.collationRootCollator = null;
 	}
@@ -77,19 +75,16 @@ public abstract class CollatableBranchElement extends BranchElement
 		
 		if ( collationMode == CollationMode.ROOT )
 		{
-			container = createContainerWidget( styleSheet );
-			setWidget( container );
+			setWidget( createContainerWidget( styleSheet ) );
 			collationRootCollator = null;
 		}
 		else if ( collationMode == CollationMode.CONTENTSCOLLATED )
 		{
-			container = null;
 			setWidget( null );
 			collationRootCollator = null;
 		}
 		else
 		{
-			container = null;
 			setWidget( null );
 			collationRootCollator = null;
 		}
@@ -134,6 +129,18 @@ public abstract class CollatableBranchElement extends BranchElement
 	{
 		if ( tree != this.tree )
 		{
+			if ( tree != null  &&  this.tree == null )
+			{
+				if ( collationMode == CollationMode.UNINITIALISED )
+				{
+					setCollationMode( CollationMode.ROOT );
+				}
+				if ( collationMode == CollationMode.ROOT )
+				{
+					refreshContainerWidgetContents();
+				}
+			}
+			
 			super.setElementTree( tree );
 			
 			for (Element c: getChildren())
@@ -153,11 +160,14 @@ public abstract class CollatableBranchElement extends BranchElement
 	
 	protected void onChildListChanged()
 	{
-		if ( collationMode == CollationMode.UNINITIALISED )
+		if ( tree != null )
 		{
-			setCollationMode( CollationMode.ROOT );
+			if ( collationMode == CollationMode.UNINITIALISED )
+			{
+				setCollationMode( CollationMode.ROOT );
+			}
 		}
-		
+			
 		if ( collationMode == CollationMode.ROOT )
 		{
 			refreshContainerWidgetContents();
@@ -170,7 +180,8 @@ public abstract class CollatableBranchElement extends BranchElement
 		super.onChildListChanged();
 	}
 	
-
+	
+	
 	
 	
 	

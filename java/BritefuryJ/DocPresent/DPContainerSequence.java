@@ -34,48 +34,44 @@ abstract public class DPContainerSequence extends DPContainer
 
 	
 	
-	@SuppressWarnings("unchecked")
 	public void setChildren(List<DPWidget> items)
 	{
-		HashSet<DPWidget> oldEntrySet = new HashSet<DPWidget>( registeredChildren );
-
-		// Set of added entries
-		HashSet<DPWidget> added = new HashSet<DPWidget>();
-		
-		// Build an array containing the child entry list, *after* modification
-		for (int i = 0; i < items.size(); i++)
+		if ( registeredChildren.isEmpty() )
 		{
-			if ( !oldEntrySet.contains( items.get( i ) ) )
+			// Set contents of @childEntries list
+			registeredChildren.addAll( items );
+	
+			// Register added entries
+			for (DPWidget child: items)
 			{
-				// @item is not already present in the list of children; it is new, so @entry will be added to the list
-				added.add( items.get( i ) );
-
-				// We cannot simply assume that the (existing) child at position @i is removed, since this child may have been moved to a different
-				// position in the sequence, and another child removed. We have to determine what is removed later on
+				registerChild( child );
 			}
 		}
-		
-		HashSet<DPWidget> newEntrySet = new HashSet<DPWidget>( items );
-		
-		
-		// Compute set of removed entries
-		HashSet<DPWidget> removed = (HashSet<DPWidget>)oldEntrySet.clone();
-		removed.removeAll( newEntrySet );
-		
-		// Unregister removed entries
-		for (DPWidget child: removed)
+		else
 		{
-			unregisterChild( child );
-		}
-		
-		// Set contents of @childEntries list
-		registeredChildren.clear();
-		registeredChildren.addAll( items );
+			HashSet<DPWidget> added, removed;
+			
+			added = new HashSet<DPWidget>( items );
+			removed = new HashSet<DPWidget>( registeredChildren );
+			added.removeAll( registeredChildren );
+			removed.removeAll( items );
 
-		// Register added entries
-		for (DPWidget child: added)
-		{
-			registerChild( child );
+			
+			// Unregister removed entries
+			for (DPWidget child: removed)
+			{
+				unregisterChild( child );
+			}
+			
+			// Set contents of @childEntries list
+			registeredChildren.clear();
+			registeredChildren.addAll( items );
+	
+			// Register added entries
+			for (DPWidget child: added)
+			{
+				registerChild( child );
+			}
 		}
 		
 		
