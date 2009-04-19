@@ -54,9 +54,9 @@ public class HiddenContentElement extends EmptyElement
 	//
 	//
 	
-	public String getContent()
+	protected void getSubtreeContent(StringBuilder builder)
 	{
-		return content;
+		builder.append( content );
 	}
 	
 	public int getContentLength()

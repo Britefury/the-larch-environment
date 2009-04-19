@@ -8,6 +8,7 @@ package BritefuryJ.DocView;
 
 import BritefuryJ.DocTree.DocTree;
 import BritefuryJ.DocTree.DocTreeNode;
+import BritefuryJ.Utils.Profile.ProfileTimer;
 
 public class DocView implements DVNode.NodeRefreshListener
 {
@@ -32,9 +33,7 @@ public class DocView implements DVNode.NodeRefreshListener
 	
 	
 	private boolean bProfilingEnabled;
-	private int profile_pythonCount, profile_javaCount;
-	private long profile_pythonStart, profile_javaStart;
-	private double profile_pythonAccum, profile_javaAccum;
+	ProfileTimer pythonTimer, javaTimer, elementTimer, contentChangeTimer;
 	
 	
 	
@@ -55,9 +54,10 @@ public class DocView implements DVNode.NodeRefreshListener
 		bRefreshRequired = true;
 		
 		bProfilingEnabled = false;
-		profile_pythonCount = profile_javaCount = 0;
-		profile_pythonStart = profile_javaStart = 0;
-		profile_pythonAccum = profile_javaAccum = 0.0;
+		pythonTimer = new ProfileTimer();
+		javaTimer = new ProfileTimer();
+		elementTimer = new ProfileTimer();
+		contentChangeTimer = new ProfileTimer();
 	}
 	
 	
@@ -136,11 +136,13 @@ public class DocView implements DVNode.NodeRefreshListener
 	
 	public void refresh()
 	{
+		profile_beginJava();
 		if ( bRefreshRequired )
 		{
 			bRefreshRequired = false;
 			performRefresh();
 		}
+		profile_endJava();
 	}
 	
 
@@ -162,21 +164,31 @@ public class DocView implements DVNode.NodeRefreshListener
 	
 	
 	
+	public void profile_beginJava()
+	{
+		if ( bProfilingEnabled )
+		{
+			// Begin java segment
+			javaTimer.start();
+		}
+	}
+	
+	public void profile_endJava()
+	{
+		if ( bProfilingEnabled )
+		{
+			// End java segment
+			javaTimer.stop();
+		}
+	}
+
+	
+	
 	public void profile_javaCallToPython()
 	{
 		if ( bProfilingEnabled )
 		{
-			long current = System.currentTimeMillis();
-			
-			// End java segment
-			if ( profile_javaCount > 0 )
-			{
-				profile_javaAccum += (double)( current - profile_javaStart ) / 1000.0;
-			}
-			
-			// Begin python segment
-			profile_pythonStart = current;
-			profile_pythonCount++;
+			pythonTimer.start();
 		}
 	}
 	
@@ -184,17 +196,7 @@ public class DocView implements DVNode.NodeRefreshListener
 	{
 		if ( bProfilingEnabled )
 		{
-			long current = System.currentTimeMillis();
-			
-			// End python segment
-			if ( profile_pythonCount > 0 )
-			{
-				profile_pythonAccum += (double)( current - profile_pythonStart ) / 1000.0;
-				profile_pythonCount--;
-			}
-			
-			// Begin java segment
-			profile_javaStart = current;
+			pythonTimer.stop();
 		}
 	}
 
@@ -203,17 +205,7 @@ public class DocView implements DVNode.NodeRefreshListener
 	{
 		if ( bProfilingEnabled )
 		{
-			long current = System.currentTimeMillis();
-			
-			// End python segment
-			if ( profile_pythonCount > 0 )
-			{
-				profile_pythonAccum += (double)( current - profile_pythonStart ) / 1000.0;
-			}
-			
-			// Begin java segment
-			profile_javaStart = current;
-			profile_javaCount++;
+			javaTimer.start();
 		}
 	}
 	
@@ -221,17 +213,41 @@ public class DocView implements DVNode.NodeRefreshListener
 	{
 		if ( bProfilingEnabled )
 		{
-			long current = System.currentTimeMillis();
-			
-			// End java segment
-			if ( profile_javaCount > 0 )
-			{
-				profile_javaAccum += (double)( current - profile_javaStart ) / 1000.0;
-				profile_javaCount--;
-			}
-			
-			// Begin python segment
-			profile_pythonStart = current;
+			javaTimer.stop();
+		}
+	}
+	
+	
+	public void profile_pythonCallToElement()
+	{
+		if ( bProfilingEnabled )
+		{
+			elementTimer.start();
+		}
+	}
+	
+	public void profile_elementReturnToPython()
+	{
+		if ( bProfilingEnabled )
+		{
+			elementTimer.stop();
+		}
+	}
+	
+	
+	public void profile_javaCallToContentChange()
+	{
+		if ( bProfilingEnabled )
+		{
+			contentChangeTimer.start();
+		}
+	}
+	
+	public void profile_contentChangeReturnToJava()
+	{
+		if ( bProfilingEnabled )
+		{
+			contentChangeTimer.stop();
 		}
 	}
 	
@@ -239,25 +255,34 @@ public class DocView implements DVNode.NodeRefreshListener
 	public void beginProfiling()
 	{
 		bProfilingEnabled = true;
-		profile_pythonCount = profile_javaCount = 0;
-		profile_pythonStart = profile_javaStart = 0;
-		profile_pythonAccum = profile_javaAccum = 0.0;
+		pythonTimer.reset();
+		javaTimer.reset();
+		elementTimer.reset();
+		contentChangeTimer.reset();
 	}
 
 	public void endProfiling()
 	{
 		bProfilingEnabled = false;
-		assert profile_pythonCount == 0;
-		assert profile_javaCount == 0;
 	}
 	
 	public double getPythonTime()
 	{
-		return profile_pythonAccum;
+		return pythonTimer.getTime();
 	}
 
 	public double getJavaTime()
 	{
-		return profile_javaAccum;
+		return javaTimer.getTime();
+	}
+
+	public double getElementTime()
+	{
+		return elementTimer.getTime();
+	}
+	
+	public double getContentChangeTime()
+	{
+		return contentChangeTimer.getTime();
 	}
 }

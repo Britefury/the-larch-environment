@@ -36,9 +36,8 @@ public class EmptyElement extends Element
 	
 	
 	
-	public String getContent()
+	protected void getSubtreeContent(StringBuilder builder)
 	{
-		return "";
 	}
 	
 	public int getContentLength()

@@ -5,6 +5,8 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
+from weakref import WeakValueDictionary
+
 from java.awt.event import KeyEvent
 
 from BritefuryJ.Parser import ParserExpression
@@ -126,30 +128,59 @@ def _parseText(parser, text, outerPrecedence=None):
 		print '<FAIL>'
 		return None
 
-
+class _ListenerTable (object):
+	def __init__(self, createFn):
+		self._table = WeakValueDictionary()
+		self._createFn = createFn
+	
+		
+	def get(self, *args):
+		key = args
+		try:
+			return self._table[key]
+		except KeyError:
+			listener = self._createFn( *args )
+			self._table[key] = listener
+			return listener
+		
+	
+	
 class ParsedExpressionContentListener (ElementContentListener):
-	def __init__(self, ctx, node, parser, outerPrecedence):
+	__slots__ = [ '_parser', '_outerPrecedence' ]
+	
+	def __init__(self, parser, outerPrecedence, node=None):
 		#super( ParsedExpressionContentListener, self ).__init__()
-		self._ctx = ctx
-		self._node = node
 		self._parser = parser
 		self._outerPrecedence = outerPrecedence
 
 	def contentModified(self, element):
 		value = element.getContent()
+		ctx = element.getContext()
+		node = ctx.getTreeNode()
 		if '\n' not in value:
 			parsed = _parseText( self._parser, value, self._outerPrecedence )
 			if parsed is not None:
-				#if parsed != self._node:
-					#replace( self._ctx, self._node, parsed )
-				replaceNodeContents( self._ctx, self._node, parsed )
+				#if parsed != node:
+					#replace( ctx, node, parsed )
+				replaceNodeContents( ctx, node, parsed )
 			else:
-				#if self._node != Nodes.UNPARSED( value=value ):
-					#replace( self._ctx, self._node, Nodes.UNPARSED( value=value ) )
-				replaceNodeContents( self._ctx, self._node, Nodes.UNPARSED( value=value ) )
+				#if node != Nodes.UNPARSED( value=value ):
+					#replace( ctx, node, Nodes.UNPARSED( value=value ) )
+				replaceNodeContents( ctx, node, Nodes.UNPARSED( value=value ) )
 			return True
 		else:
 			return False
+		
+	
+	_listenerTable = None
+		
+	@staticmethod
+	def newListener(parser, outerPrecedence):
+		if ParsedExpressionContentListener._listenerTable is None:
+			ParsedExpressionContentListener._listenerTable = _ListenerTable( ParsedExpressionContentListener )
+		return ParsedExpressionContentListener._listenerTable.get( parser, outerPrecedence )
+		
+		
 
 
 _compoundStmtNames = set( [ 'ifStmt', 'elifStmt', 'elseStmt', 'whileStmt', 'forStmt', 'tryStmt', 'exceptStmt', 'finallyStmt', 'withStmt', 'defStmt', 'classStmt' ] )	
@@ -161,10 +192,11 @@ def _isCompoundStmt(node):
 
 
 
-class LineContentListenerWithParser(ElementContentListener):
-	def __init__(self, ctx, node, parser):
-		self._ctx = ctx
-		self._node = node
+class LineContentListenerWithParser (ElementContentListener):
+	__slots__ = [ '_parser' ]
+
+	
+	def __init__(self, parser):
 		self._parser = parser
 
 
@@ -195,37 +227,55 @@ class LineContentListenerWithParser(ElementContentListener):
 		return result
 
 
+	
+	
 class ParsedLineContentListener (LineContentListenerWithParser):
 	def contentModified(self, element):
+		ctx = element.getContext()
+		node = ctx.getTreeNode()
 		# Get the content
 		value = element.getContent()
-		self.handleContent( value )
+		self.handleContent( ctx, node, value )
 
 
-	def handleContent(self, value):
+	def handleContent(self, ctx, node, value):
 		# Split into lines
 		lineStrings = value.split( '\n' )
 		# Parse
 		parsedLines = self.parseLines( lineStrings )
 
-		if _isCompoundStmt( self._node ):
-			originalContents = self._node['suite']
+		if _isCompoundStmt( node ):
+			originalContents = node['suite']
 			if _isCompoundStmt( parsedLines[-1] ):
 				parsedLines[-1]['suite'].extend( originalContents )
 			else:
 				parsedLines.extend( originalContents )
 				
-		if len( parsedLines ) == 1  and  parsedLines[0] == self._node:
+		if len( parsedLines ) == 1  and  parsedLines[0] == node:
 			# Same data; ignore
 			pass
 		else:
-			replaceWithRange( self._ctx, self._node, parsedLines )
+			replaceWithRange( ctx, node, parsedLines )
 
+			
+	_listenerTable = None
+		
+	@staticmethod
+	def newListener(parser):
+		if ParsedLineContentListener._listenerTable is None:
+			ParsedLineContentListener._listenerTable = _ListenerTable( ParsedLineContentListener )
+		return ParsedLineContentListener._listenerTable.get( parser )
+			
+			
 			
 			
 class NewLineContentListener (LineContentListenerWithParser):
-	def __init__(self, ctx, node, parser, index, before, after):
-		super( NewLineContentListener, self ).__init__( ctx, node, parser )
+	__slots__ = [ '_suite', '_index', '_before', '_after' ]
+
+	
+	def __init__(self, parser, suite, index, before, after):
+		super( NewLineContentListener, self ).__init__( parser )
+		self._suite = suite
 		self._index = index
 		self._before = before
 		self._after = after
@@ -234,6 +284,8 @@ class NewLineContentListener (LineContentListenerWithParser):
 	def contentModified(self, element):
 		# Get the content
 		value = element.getContent()
+		ctx = element.getContext()
+		node = ctx.getTreeNode()
 		if value == '':
 			# Newline has been deleted
 			beforeContent = self._before.getContent()
@@ -249,50 +301,52 @@ class NewLineContentListener (LineContentListenerWithParser):
 			# Parse
 			parsedLines = self.parseLines( lineStrings )
 			
-			del self._node[self._index:endIndex]
-			insertRange( self._ctx, self._node, self._index, parsedLines )
+			del self._suite[self._index:endIndex]
+			insertRange( ctx, node, self._index, parsedLines )
 			
 			
 			
 class StatementKeyboardListener (ElementKeyboardListener):
-	def __init__(self, ctx, node):
-		self._ctx = ctx
-		self._node = node
+	def __init__(self):
+		pass
 		
 		
-	def onKeyTyped(self, event):
+	def onKeyTyped(self, element, event):
 		if event.getKeyChar() == '\t':
+			context = element.getContext()
+			node = context.getTreeNode()
+			
 			if event.getModifiers() & KeyEvent.SHIFT_MASK  !=  0:
-				self._dedent()
+				self._dedent( node )
 			else:
-				self._indent()
+				self._indent( node )
 			return True
 		else:
 			return False
 		
 		
-	def onKeyPress(self, event):
+	def onKeyPress(self, element, event):
 		return False
 	
-	def onKeyRelease(self, event):
+	def onKeyRelease(self, element, event):
 		return False
 	
 	
 	
-	def _indent(self):
-		suite = self._node.getParentTreeNode()
-		index = suite.indexOfById( self._node )
+	def _indent(self, node):
+		suite = node.getParentTreeNode()
+		index = suite.indexOfById( node )
 		if index > 0:
 			prev = suite[index-1]
 			if _isCompoundStmt( prev ):
 				prevSuite = prev['suite']
 				del suite[index]
-				prevSuite.append( self._node )
+				prevSuite.append( node )
 	
 	
-	def _dedent(self):
-		suite = self._node.getParentTreeNode()
-		index = suite.indexOfById( self._node )
+	def _dedent(self, context, node):
+		suite = node.getParentTreeNode()
+		index = suite.indexOfById( node )
 		if index == len( suite ) - 1:
 			compStmt = suite.getParentTreeNode()
 			outerSuite = compStmt.getParentTreeNode()
@@ -301,9 +355,11 @@ class StatementKeyboardListener (ElementKeyboardListener):
 				outerIndex = outerSuite.indexOfById( compStmt )
 				
 				del suite[-1]
-				outerSuite.insert( outerIndex + 1, self._node )
+				outerSuite.insert( outerIndex + 1, node )
 
-			
+
+
+_statementKeyboardListener = StatementKeyboardListener()
 			
 			
 
@@ -355,12 +411,12 @@ def expressionNodeEditor(ctx, node, contents, precedence, state):
 		return contents
 	elif mode == MODE_EDITEXPRESSION:
 		contents = _precedenceParen( ctx, node, contents, precedence, outerPrecedence )
-		return ctx.contentListener( contents, ParsedExpressionContentListener( ctx, node, parser, outerPrecedence ) )
+		return ctx.contentListener( contents, ParsedExpressionContentListener.newListener( parser, outerPrecedence ) )
 	elif mode == MODE_EDITSTATEMENT:
 		contents = _precedenceParen( ctx, node, contents, precedence, outerPrecedence )
 		segment = ctx.segment( python_paragraphStyle, default_textStyle, True, True, contents )
-		segment = ctx.contentListener( segment, ParsedLineContentListener( ctx, node, parser ) )
-		segment = ctx.keyboardListener( segment, StatementKeyboardListener( ctx, node ) )
+		segment = ctx.contentListener( segment, ParsedLineContentListener.newListener( parser ) )
+		segment = ctx.keyboardListener( segment, _statementKeyboardListener )
 		return segment
 	else:
 		raise ValueError, 'invalid mode %d'  %  mode
@@ -372,8 +428,8 @@ def statementNodeEditor(ctx, node, contents, precedence, state):
 	if mode == MODE_EDITSTATEMENT:
 		contents = _precedenceParen( ctx, node, contents, precedence, outerPrecedence )
 		segment = ctx.segment( python_paragraphStyle, default_textStyle, True, True, contents )
-		segment = ctx.contentListener( segment, ParsedLineContentListener( ctx, node, parser ) )
-		segment = ctx.keyboardListener( segment, StatementKeyboardListener( ctx, node ) )
+		segment = ctx.contentListener( segment, ParsedLineContentListener.newListener( parser ) )
+		segment = ctx.keyboardListener( segment, _statementKeyboardListener )
 		return segment
 	else:
 		raise ValueError, 'invalid mode %d'  %  mode
@@ -384,8 +440,8 @@ def compoundStatementEditor(ctx, node, headerContents, precedence, suite, state,
 
 	headerSegment = ctx.segment( python_paragraphStyle, default_textStyle, True, True, headerContents )
 	headerParagraph = ctx.paragraph( python_paragraphStyle, [ headerSegment, ctx.whitespace( '\n' ) ] )
-	headerElement = ctx.contentListener( headerParagraph, ParsedLineContentListener( ctx, node, parser ) )
-	headerElement = ctx.keyboardListener( headerElement, StatementKeyboardListener( ctx, node ) )
+	headerElement = ctx.contentListener( headerParagraph, ParsedLineContentListener.newListener( parser ) )
+	headerElement = ctx.keyboardListener( headerElement, _statementKeyboardListener )
 	if headerContainerFn is not None:
 		headerElement = headerContainerFn( headerElement )
 	statementElement = ctx.vbox( compoundStmt_vboxStyle, [ headerElement, ctx.indent( 30.0, suiteView( ctx, suite, statementParser ) ) ] )
@@ -435,7 +491,7 @@ def suiteView(ctx, suite, parser):
 	#newLineFac = lambda index, child: ctx.whitespace( '\n' )
 	def newLineFac(index, child):
 		w = ctx.whitespace( '\n' )
-		listener = NewLineContentListener( ctx, suite, parser, index, lineViews[index], lineViews[index+1]   if index+1 < len(lineViews)   else   None )
+		listener = NewLineContentListener( parser, suite, index, lineViews[index], lineViews[index+1]   if index+1 < len(lineViews)   else   None )
 		return ctx.contentListener( w, listener )
 	return ctx.listView( suite_listViewLayout, None, None, newLineFac, lineViews )
 
@@ -464,7 +520,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		#newLineFac = lambda index, child: ctx.whitespace( '\n' )
 		def newLineFac(index, child):
 			w = ctx.whitespace( '\n' )
-			listener = NewLineContentListener( ctx, contents, self._parser.statement(), index, lineViews[index], lineViews[index+1]   if index+1 < len(lineViews)   else   None )
+			listener = NewLineContentListener( self._parser.statement(), contents, index, lineViews[index], lineViews[index+1]   if index+1 < len(lineViews)   else   None )
 			return ctx.contentListener( w, listener )
 		return ctx.listView( module_listViewLayout, None, None, newLineFac, lineViews )
 
@@ -480,7 +536,6 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	@ObjectNodeDispatchMethod
 	def UNPARSED(self, ctx, state, node, value):
-		# value = value.toString()
 		return expressionNodeEditor( ctx, node,
 				   ctx.text( unparsed_textStyle, value ),
 				   None,
@@ -492,10 +547,6 @@ class Python25View (GSymViewObjectNodeDispatch):
 	def StringLiteral(self, ctx, state, node, format, quotation, value):
 		boxContents = []
 		
-		#format = format.toString()
-		#quotation = quotation.toString()
-		#value = value.toString()
-
 		if format == 'ascii':
 			pass
 		elif format == 'unicode':
@@ -529,10 +580,6 @@ class Python25View (GSymViewObjectNodeDispatch):
 	def IntLiteral(self, ctx, state, node, format, numType, value):
 		boxContents = []
 
-		#format = format.toString()
-		#numType = numType.toString()
-		#value = value.toString()
-
 		if numType == 'int':
 			if format == 'decimal':
 				valueString = '%d'  %  int( value )
@@ -557,7 +604,6 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Float literal
 	@ObjectNodeDispatchMethod
 	def FloatLiteral(self, ctx, state, node, value):
-		#value = value.toString()
 		return expressionNodeEditor( ctx, node,
 				   ctx.text( numericLiteral_textStyle, value ),
 				   PRECEDENCE_LITERALVALUE,
@@ -568,7 +614,6 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Imaginary literal
 	@ObjectNodeDispatchMethod
 	def ImaginaryLiteral(self, ctx, state, node, value):
-		#value = value.toString()
 		return expressionNodeEditor( ctx, node,
 				   ctx.text( numericLiteral_textStyle, value ),
 				   PRECEDENCE_LITERALVALUE,
@@ -579,7 +624,6 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Targets
 	@ObjectNodeDispatchMethod
 	def SingleTarget(self, ctx, state, node, name):
-		#name = name.toString()
 		return expressionNodeEditor( ctx, node,
 				   ctx.text( default_textStyle, name ),
 				   PRECEDENCE_TARGET,
@@ -605,7 +649,6 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Variable reference
 	@ObjectNodeDispatchMethod
 	def Load(self, ctx, state, node, name):
-		#name = name.toString()
 		return expressionNodeEditor( ctx, node,
 				   ctx.text( default_textStyle, name ),
 				   PRECEDENCE_LOAD,
@@ -718,7 +761,6 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Attribute ref
 	@ObjectNodeDispatchMethod
 	def AttributeRef(self, ctx, state, node, target, name):
-		#name = name.toString()
 		targetView = ctx.viewEvalFn( target, None, python25ViewState( PRECEDENCE_CONTAINER_ATTRIBUTEREFTARGET, self._parser.expression() ) )
 		return expressionNodeEditor( ctx, node,
 				   ctx.paragraph( python_paragraphStyle, [ targetView,  ctx.text( punctuation_textStyle, '.' ),  ctx.text( default_textStyle, name ) ] ),
@@ -788,7 +830,6 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Call
 	@ObjectNodeDispatchMethod
 	def CallKWArg(self, ctx, state, node, name, value):
-		#name = name.toString()
 		valueView = ctx.viewEvalFn( value, None, python25ViewState( PRECEDENCE_CONTAINER_CALLARG, self._parser.expression() ) )
 		return expressionNodeEditor( ctx, node,
 				   ctx.paragraph( python_paragraphStyle, [ ctx.text( default_textStyle, name ), ctx.text( punctuation_textStyle, '=' ), valueView ] ),
@@ -978,7 +1019,6 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Parameters
 	@ObjectNodeDispatchMethod
 	def SimpleParam(self, ctx, state, node, name):
-		#name = name.toString()
 		return expressionNodeEditor( ctx, node,
 				   ctx.text( default_textStyle, name ),
 				   PRECEDENCE_NONE,
@@ -986,7 +1026,6 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	@ObjectNodeDispatchMethod
 	def DefaultValueParam(self, ctx, state, node, name, defaultValue):
-		#name = name.toString()
 		valueView = ctx.viewEvalFn( defaultValue, None, python25ViewState( PRECEDENCE_NONE, self._parser.expression() ) )
 		return expressionNodeEditor( ctx, node,
 				   ctx.paragraph( python_paragraphStyle, [ ctx.text( default_textStyle, name ), ctx.text( punctuation_textStyle, '=' ), valueView ] ),
@@ -995,7 +1034,6 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	@ObjectNodeDispatchMethod
 	def ParamList(self, ctx, state, node, name):
-		#name = name.toString()
 		return expressionNodeEditor( ctx, node,
 				   ctx.paragraph( python_paragraphStyle, [ ctx.text( punctuation_textStyle, '*' ),  ctx.text( default_textStyle, name ) ] ),
 				   PRECEDENCE_NONE,
@@ -1003,7 +1041,6 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	@ObjectNodeDispatchMethod
 	def KWParamList(self, ctx, state, node, name):
-		#name = name.toString()
 		return expressionNodeEditor( ctx, node,
 				   ctx.paragraph( python_paragraphStyle, [ ctx.text( punctuation_textStyle, '**' ),  ctx.text( default_textStyle, name ) ] ),
 				   PRECEDENCE_NONE,
@@ -1089,7 +1126,6 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Augmented assignment statement
 	@ObjectNodeDispatchMethod
 	def AugAssignStmt(self, ctx, state, node, op, target, value):
-		#op = op.toString()
 		targetView = ctx.viewEvalFn( target, None, python25ViewState( PRECEDENCE_STMT, self._parser.targetItem() ) )
 		valueView = ctx.viewEvalFn( value, None, python25ViewState( PRECEDENCE_STMT, self._parser.tupleOrExpressionOrYieldExpression() ) )
 		return statementNodeEditor( ctx, node,
@@ -1174,7 +1210,6 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Import statement
 	@ObjectNodeDispatchMethod
 	def RelativeModule(self, ctx, state, node, name):
-		#name = name.toString()
 		return expressionNodeEditor( ctx, node,
 				   ctx.text( default_textStyle, name ),
 				   PRECEDENCE_IMPORTCONTENT,
@@ -1182,7 +1217,6 @@ class Python25View (GSymViewObjectNodeDispatch):
 	
 	@ObjectNodeDispatchMethod
 	def ModuleImport(self, ctx, state, node, name):
-		#name = name.toString()
 		return expressionNodeEditor( ctx, node,
 				   ctx.text( default_textStyle, name ),
 				   PRECEDENCE_IMPORTCONTENT,
@@ -1190,8 +1224,6 @@ class Python25View (GSymViewObjectNodeDispatch):
 	
 	@ObjectNodeDispatchMethod
 	def ModuleImportAs(self, ctx, state, node, name, asName):
-		#name = name.toString()
-		#asName = asName.toString()
 		return expressionNodeEditor( ctx, node,
 				   ctx.paragraph( python_paragraphStyle, [ ctx.text( default_textStyle, name ),  ctx.text( default_textStyle, ' ' ),  capitalisedKeywordText( ctx, asKeyword ),
 									    ctx.text( default_textStyle, ' ' ),  ctx.text( default_textStyle, asName ) ] ),
@@ -1200,7 +1232,6 @@ class Python25View (GSymViewObjectNodeDispatch):
 	
 	@ObjectNodeDispatchMethod
 	def ModuleContentImport(self, ctx, state, node, name):
-		#name = name.toString()
 		return expressionNodeEditor( ctx, node,
 				   ctx.text( default_textStyle, name ),
 				   PRECEDENCE_IMPORTCONTENT,
@@ -1208,8 +1239,6 @@ class Python25View (GSymViewObjectNodeDispatch):
 	
 	@ObjectNodeDispatchMethod
 	def ModuleContentImportAs(self, ctx, state, node, name, asName):
-		#name = name.toString()
-		#asName = asName.toString()
 		return expressionNodeEditor( ctx, node,
 				   ctx.paragraph( python_paragraphStyle, [ ctx.text( default_textStyle, name ),  ctx.text( default_textStyle, ' ' ),  capitalisedKeywordText( ctx, asKeyword ),
 									    ctx.text( default_textStyle, ' ' ),  ctx.text( default_textStyle, asName ) ] ),
@@ -1257,7 +1286,6 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Global statement
 	@ObjectNodeDispatchMethod
 	def GlobalVar(self, ctx, state, node, name):
-		#name = name.toString()
 		return statementNodeEditor( ctx, node,
 				   ctx.text( default_textStyle, name ),
 				   PRECEDENCE_STMT,
@@ -1427,7 +1455,6 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Def statement
 	@ObjectNodeDispatchMethod
 	def DefStmt(self, ctx, state, node, name, params, paramsTrailingSeparator, suite):
-		#name = name.toString()
 		paramViews = ctx.mapViewEvalFn( params, None, python25ViewState( PRECEDENCE_STMT, self._parser.param() ) )
 		paramElements = [ ctx.text( punctuation_textStyle, '(' ) ]
 		if len( params ) > 0:
@@ -1452,7 +1479,6 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Decorator statement
 	@ObjectNodeDispatchMethod
 	def DecoStmt(self, ctx, state, node, name, args, argsTrailingSeparator):
-		#name = name.toString()
 		if not isNullNode( args ):
 			argViews = ctx.mapViewEvalFn( args, None, python25ViewState( PRECEDENCE_STMT, self._parser.callArg() ) )
 			argElements = [ ctx.text( punctuation_textStyle, '(' ) ]
@@ -1475,7 +1501,6 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Def statement
 	@ObjectNodeDispatchMethod
 	def ClassStmt(self, ctx, state, node, name, bases, basesTrailingSeparator, suite):
-		#name = name.toString()
 		if not isNullNode( bases ):
 			baseViews = ctx.mapViewEvalFn( bases, None, python25ViewState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.expression() ) )
 			layout = tuple_listViewLayout   if isNullNode( basesTrailingSeparator )   else tuple_listViewLayoutSep
@@ -1499,7 +1524,6 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Comment statement
 	@ObjectNodeDispatchMethod
 	def CommentStmt(self, ctx, state, node, comment):
-		#comment = comment.toString()
 		return statementNodeEditor( ctx, node,
 				   ctx.text( comment_textStyle, '#' + comment ),
 				   PRECEDENCE_STMT,

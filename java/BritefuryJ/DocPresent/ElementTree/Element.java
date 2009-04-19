@@ -28,12 +28,17 @@ import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 
 public abstract class Element
 {
+	public static interface ElementContext
+	{
+	};
+	
 	protected DPWidget widget;
 	protected BranchElement parent;
 	protected ElementTree tree;
 	protected ElementContentListener contentListener;
 	protected ElementKeyboardListener keyboardListener;
 	protected DPWidget metaElement;
+	protected ElementContext context;
 	protected String debugName;
 	
 	
@@ -56,7 +61,24 @@ public abstract class Element
 		contentListener = null;
 		keyboardListener = null;
 		metaElement = null;
+		context = null;
 		debugName = null;
+	}
+	
+	
+	
+	//
+	// Owner
+	//
+	
+	public ElementContext getContext()
+	{
+		return context;
+	}
+	
+	public void setOwner(ElementContext context)
+	{
+		this.context = context;
 	}
 	
 	
@@ -299,7 +321,15 @@ public abstract class Element
 		return getWidget();
 	}
 	
-	public abstract String getContent();
+		
+	public String getContent()
+	{
+		StringBuilder builder = new StringBuilder();
+		getSubtreeContent( builder );
+		return builder.toString();
+	}
+	
+	protected abstract void getSubtreeContent(StringBuilder builder);
 	public abstract int getContentLength();
 
 
@@ -495,7 +525,7 @@ public abstract class Element
 	{
 		if ( keyboardListener != null )
 		{
-			if ( keyboardListener.onKeyPress( event ) )
+			if ( keyboardListener.onKeyPress( this, event ) )
 			{
 				return true;
 			}
@@ -513,7 +543,7 @@ public abstract class Element
 	{
 		if ( keyboardListener != null )
 		{
-			if ( keyboardListener.onKeyRelease( event ) )
+			if ( keyboardListener.onKeyRelease( this, event ) )
 			{
 				return true;
 			}
@@ -531,7 +561,7 @@ public abstract class Element
 	{
 		if ( keyboardListener != null )
 		{
-			if ( keyboardListener.onKeyTyped( event ) )
+			if ( keyboardListener.onKeyTyped( this, event ) )
 			{
 				return true;
 			}

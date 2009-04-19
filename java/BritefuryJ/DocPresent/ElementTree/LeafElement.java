@@ -194,9 +194,9 @@ public abstract class LeafElement extends Element
 	// Content methods
 	//
 	
-	public String getContent()
+	protected void getSubtreeContent(StringBuilder builder)
 	{
-		return content;
+		builder.append( content );
 	}
 	
 	public int getContentLength()

@@ -192,19 +192,15 @@ public class ScriptElement extends BranchElement
 	// Content methods
 	//
 	
-	public String getContent()
+	protected void getSubtreeContent(StringBuilder builder)
 	{
-		StringBuilder builder = new StringBuilder();
-		
 		for (int slot = 0; slot < NUMCHILDREN; slot++)
 		{
 			if ( segments[slot] != null )
 			{
-				builder.append( segments[slot].getContent() );
+				segments[slot].getSubtreeContent( builder );
 			}
 		}
-		
-		return builder.toString();
 	}
 	
 	public int getContentLength()

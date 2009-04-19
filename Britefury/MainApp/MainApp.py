@@ -19,6 +19,9 @@ from java.awt.event import WindowListener, ActionListener, KeyEvent
 
 from BritefuryJ.CommandHistory import CommandHistory, CommandHistoryListener
 
+from BritefuryJ.Cell import CellInterface
+from BritefuryJ.Utils.Profile import ProfileTimer
+
 from BritefuryJ.DocModel import DMIOReader, DMIOWriter, DMNode
 
 from BritefuryJ.DocPresent import *
@@ -115,12 +118,14 @@ class MainAppDocView (DocView.RefreshListener):
 	def _refreshView(self):
 		if self._view is not None:
 			t1 = datetime.now()
-			#self._view.beginProfiling()
+			ProfileTimer.initProfiling()
+			self._view.beginProfiling()
 			self._view.refresh()
 			t2 = datetime.now()
-			#self._view.endProfiling()
+			self._view.endProfiling()
+			ProfileTimer.shutdownProfiling()
 			print 'MainApp: REFRESH VIEW TIME = ', t2 - t1
-			#print 'MainApp: REFRESH VIEW PROFILE: JAVA TIME = %f, PYTHON TIME = %f'  %  ( self._view.getJavaTime(), self._view.getPythonTime() )
+			print 'MainApp: REFRESH VIEW PROFILE: JAVA TIME = %f, ELEMENT CREATE TIME = %f, PYTHON TIME = %f, CONTENT CHANGE TIME = %f'  %  ( self._view.getJavaTime(), self._view.getElementTime(), self._view.getPythonTime(), self._view.getContentChangeTime() )
 
 	def _queueRefresh(self):
 		class Run (Runnable):
