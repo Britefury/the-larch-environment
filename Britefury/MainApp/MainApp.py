@@ -125,7 +125,7 @@ class MainAppDocView (DocView.RefreshListener):
 			self._view.endProfiling()
 			ProfileTimer.shutdownProfiling()
 			print 'MainApp: REFRESH VIEW TIME = ', t2 - t1
-			print 'MainApp: REFRESH VIEW PROFILE: JAVA TIME = %f, ELEMENT CREATE TIME = %f, PYTHON TIME = %f, CONTENT CHANGE TIME = %f'  %  ( self._view.getJavaTime(), self._view.getElementTime(), self._view.getPythonTime(), self._view.getContentChangeTime() )
+			print 'MainApp: REFRESH VIEW PROFILE: JAVA TIME = %f, ELEMENT CREATE TIME = %f, PYTHON TIME = %f, CONTENT CHANGE TIME = %f, UPDATE NODE ELEMENT TIME = %f'  %  ( self._view.getJavaTime(), self._view.getElementTime(), self._view.getPythonTime(), self._view.getContentChangeTime(), self._view.getUpdateNodeElementTime() )
 
 	def _queueRefresh(self):
 		class Run (Runnable):

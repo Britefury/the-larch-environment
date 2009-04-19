@@ -197,9 +197,9 @@ public class DVNode implements CellListener
 		
 		if ( elementChangeListener != null  &&  bEmitChangeEvents )
 		{
-			view.profile_javaCallToContentChange();
+			view.profile_startContentChange();
 			elementChangeListener.elementChangeFrom( this, element );
-			view.profile_contentChangeReturnToJava();
+			view.profile_stopContentChange();
 		}
 
 		// Compute the element for this node, and refresh all children
@@ -214,14 +214,16 @@ public class DVNode implements CellListener
 		}
 		
 		// Set the node element
+		view.profile_startUpdateNodeElement();
 		updateNodeElement( e );
+		view.profile_stopUpdateNodeElement();
 		
 		
 		if ( elementChangeListener != null  &&  bEmitChangeEvents )
 		{
-			view.profile_javaCallToContentChange();
+			view.profile_startContentChange();
 			elementChangeListener.elementChangeTo( this, element );
-			view.profile_contentChangeReturnToJava();
+			view.profile_stopContentChange();
 		}
 	}
 	
@@ -238,6 +240,7 @@ public class DVNode implements CellListener
 	
 	private Element computeNodeElement()
 	{
+		view.profile_startJava();
 		// Unregister existing child relationships
 		DVNode child = childrenHead;
 		while ( child != null )
@@ -264,10 +267,12 @@ public class DVNode implements CellListener
 				child = child.nextSibling;
 			}
 			
+			view.profile_stopJava();
 			return e;
 		}
 		else
 		{
+			view.profile_stopJava();
 			return null;
 		}
 	}
@@ -275,15 +280,18 @@ public class DVNode implements CellListener
 	
 	private void updateNodeElement(Element e)
 	{
-		if ( e != null )
+		if ( e != element )
 		{
-			element = e;
-			proxyElement.setChild( element );
-		}
-		else
-		{
-			element = null;
-			proxyElement.setChild( null );
+			if ( e != null )
+			{
+				element = e;
+				proxyElement.setChild( element );
+			}
+			else
+			{
+				element = null;
+				proxyElement.setChild( null );
+			}
 		}
 	}
 	

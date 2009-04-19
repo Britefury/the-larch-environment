@@ -44,9 +44,9 @@ public class GSymViewInstance
 			// Build the contents
 			//return nodeViewFunction.createElement( treeNode, nodeViewInstance, state );
 			
-			viewInstance.getView().profile_javaCallToPython();
+			viewInstance.getView().profile_startPython();
 			Element e = nodeViewFunction.createElement( treeNode, nodeViewInstance, state );
-			viewInstance.getView().profile_pythonReturnToJava();
+			viewInstance.getView().profile_stopPython();
 			return e;
 		}
 	}

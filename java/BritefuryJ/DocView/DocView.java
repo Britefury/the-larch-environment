@@ -33,7 +33,7 @@ public class DocView implements DVNode.NodeRefreshListener
 	
 	
 	private boolean bProfilingEnabled;
-	ProfileTimer pythonTimer, javaTimer, elementTimer, contentChangeTimer;
+	ProfileTimer pythonTimer, javaTimer, elementTimer, contentChangeTimer, updateNodeElementTimer;
 	
 	
 	
@@ -58,6 +58,7 @@ public class DocView implements DVNode.NodeRefreshListener
 		javaTimer = new ProfileTimer();
 		elementTimer = new ProfileTimer();
 		contentChangeTimer = new ProfileTimer();
+		updateNodeElementTimer = new ProfileTimer();
 	}
 	
 	
@@ -136,13 +137,13 @@ public class DocView implements DVNode.NodeRefreshListener
 	
 	public void refresh()
 	{
-		profile_beginJava();
+		profile_startJava();
 		if ( bRefreshRequired )
 		{
 			bRefreshRequired = false;
 			performRefresh();
 		}
-		profile_endJava();
+		profile_stopJava();
 	}
 	
 
@@ -164,27 +165,7 @@ public class DocView implements DVNode.NodeRefreshListener
 	
 	
 	
-	public void profile_beginJava()
-	{
-		if ( bProfilingEnabled )
-		{
-			// Begin java segment
-			javaTimer.start();
-		}
-	}
-	
-	public void profile_endJava()
-	{
-		if ( bProfilingEnabled )
-		{
-			// End java segment
-			javaTimer.stop();
-		}
-	}
-
-	
-	
-	public void profile_javaCallToPython()
+	public void profile_startPython()
 	{
 		if ( bProfilingEnabled )
 		{
@@ -192,7 +173,7 @@ public class DocView implements DVNode.NodeRefreshListener
 		}
 	}
 	
-	public void profile_pythonReturnToJava()
+	public void profile_stopPython()
 	{
 		if ( bProfilingEnabled )
 		{
@@ -201,7 +182,7 @@ public class DocView implements DVNode.NodeRefreshListener
 	}
 
 	
-	public void profile_pythonCallToJava()
+	public void profile_startJava()
 	{
 		if ( bProfilingEnabled )
 		{
@@ -209,7 +190,7 @@ public class DocView implements DVNode.NodeRefreshListener
 		}
 	}
 	
-	public void profile_javaReturnToPython()
+	public void profile_stopJava()
 	{
 		if ( bProfilingEnabled )
 		{
@@ -218,7 +199,7 @@ public class DocView implements DVNode.NodeRefreshListener
 	}
 	
 	
-	public void profile_pythonCallToElement()
+	public void profile_startElement()
 	{
 		if ( bProfilingEnabled )
 		{
@@ -226,7 +207,7 @@ public class DocView implements DVNode.NodeRefreshListener
 		}
 	}
 	
-	public void profile_elementReturnToPython()
+	public void profile_stopElement()
 	{
 		if ( bProfilingEnabled )
 		{
@@ -235,7 +216,7 @@ public class DocView implements DVNode.NodeRefreshListener
 	}
 	
 	
-	public void profile_javaCallToContentChange()
+	public void profile_startContentChange()
 	{
 		if ( bProfilingEnabled )
 		{
@@ -243,13 +224,33 @@ public class DocView implements DVNode.NodeRefreshListener
 		}
 	}
 	
-	public void profile_contentChangeReturnToJava()
+	public void profile_stopContentChange()
 	{
 		if ( bProfilingEnabled )
 		{
 			contentChangeTimer.stop();
 		}
 	}
+	
+	
+	
+	public void profile_startUpdateNodeElement()
+	{
+		if ( bProfilingEnabled )
+		{
+			updateNodeElementTimer.start();
+		}
+	}
+	
+	public void profile_stopUpdateNodeElement()
+	{
+		if ( bProfilingEnabled )
+		{
+			updateNodeElementTimer.stop();
+		}
+	}
+	
+	
 	
 	
 	public void beginProfiling()
@@ -259,6 +260,7 @@ public class DocView implements DVNode.NodeRefreshListener
 		javaTimer.reset();
 		elementTimer.reset();
 		contentChangeTimer.reset();
+		updateNodeElementTimer.reset();
 	}
 
 	public void endProfiling()
@@ -284,5 +286,10 @@ public class DocView implements DVNode.NodeRefreshListener
 	public double getContentChangeTime()
 	{
 		return contentChangeTimer.getTime();
+	}
+	
+	public double getUpdateNodeElementTime()
+	{
+		return updateNodeElementTimer.getTime();
 	}
 }
