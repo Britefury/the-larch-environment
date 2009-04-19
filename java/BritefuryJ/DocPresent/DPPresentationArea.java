@@ -674,7 +674,7 @@ public class DPPresentationArea extends DPBin implements CaretListener
 	{
 		if ( bAllocationRequired )
 		{
-			long t1 = System.currentTimeMillis();
+			long t1 = System.nanoTime();
 			refreshMinimumHMetrics();
 			HMetrics h = refreshPreferredHMetrics();
 			if ( bHorizontalClamp )
@@ -695,8 +695,8 @@ public class DPPresentationArea extends DPBin implements CaretListener
 			{
 				rootMotionEvent( new PointerMotionEvent( rootSpaceMouse, PointerMotionEvent.Action.MOTION ) );
 			}			
-			long t2 = System.currentTimeMillis();
-			System.out.println( "DPPresentationArea.performAllocation(): TYPESET TIME = " + (double)(t2-t1) * 0.001 );
+			long t2 = System.nanoTime();
+			System.out.println( "DPPresentationArea.performAllocation(): TYPESET TIME = " + (double)(t2-t1) * 1.0e-9 );
 		}
 	}
 	

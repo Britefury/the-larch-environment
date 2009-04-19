@@ -388,7 +388,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable
 
 	protected void become(DMObjectClass cls, Object[] data)
 	{
-		Object[] oldFieldData = (Object[])cell.getLiteralValue();
+		Object oldFieldData[] = (Object[])cell.getLiteralValue();
 		Object fieldData[] = new Object[data.length];
 		System.arraycopy( data, 0, fieldData, 0, data.length );
 		DMObjectClass oldClass = objClass;

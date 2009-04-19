@@ -39,7 +39,7 @@ public class TextElement extends EditableEntryLeafElement
 	
 	protected void contentChanged()
 	{
-		getWidget().setText( getContent() );
+		getWidget().setText( content );
 		
 		super.contentChanged();
 	}

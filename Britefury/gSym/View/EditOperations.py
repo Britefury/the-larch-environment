@@ -55,12 +55,10 @@ def replace(ctx, data, replacement):
 	
 def replaceNodeContents(ctx, node, replacement):
 	if isinstance( node, DocTreeNode ):
-		if isinstance( data, DocTreeObject )  and  ( isinstance( replacement, DocTreeObject )  or  isinstance( replacement, DMObject ) ):
-			data.become( replacement )
-			return data
-		elif isinstance( data, DocTreeList )  and  isinstance( replacement, DMListInterface ):
+		if isinstance( node, DocTreeObject )  and  ( isinstance( replacement, DocTreeObject )  or  isinstance( replacement, DMObject ) ):
+			node.become( replacement )
+		elif isinstance( node, DocTreeList )  and  isinstance( replacement, DMListInterface ):
 			node[:] = _sanitiseInputData( replacement )
-			return data
 		else:
 			raise TypeError, 'cannot replace contents of a %s with a %s'  %  ( type( node ), type( replacement ) )
 	else:
@@ -78,7 +76,7 @@ def replaceWithRange(ctx, data, replacement):
 		parent[index:index+1] = _sanitiseInputData( replacement )
 		return parent[index:index+len(replacement)]
 	else:
-		raise TypeError, 'EditOperations:replaceWithRange(): @data must be a DocTreeNode'
+		raise TypeError, 'EditOperations:replaceWithRange(): @data must be a DocTreeNode; it is a %s'  %  ( type( data ), )
 	
 	
 	

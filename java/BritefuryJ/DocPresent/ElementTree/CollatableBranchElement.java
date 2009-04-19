@@ -189,16 +189,12 @@ public abstract class CollatableBranchElement extends BranchElement
 	// Content methods
 	//
 
-	public String getContent()
+	protected void getSubtreeContent(StringBuilder builder)
 	{
-		String result = "";
-		
 		for (Element child: getChildren())
 		{
-			result += child.getContent();
+			child.getSubtreeContent( builder );
 		}
-		
-		return result;
 	}
 	
 	public int getContentLength()

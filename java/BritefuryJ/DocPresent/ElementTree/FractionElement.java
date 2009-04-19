@@ -192,16 +192,12 @@ public class FractionElement extends BranchElement
 	// Content methods
 	//
 	
-	public String getContent()
+	protected void getSubtreeContent(StringBuilder builder)
 	{
-		StringBuilder builder = new StringBuilder();
-		
 		for (Element child: getChildren())
 		{
-			builder.append( child.getContent() );
+			child.getSubtreeContent( builder );
 		}
-		
-		return builder.toString();
 	}
 	
 	public int getContentLength()

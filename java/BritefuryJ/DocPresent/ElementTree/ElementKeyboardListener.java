@@ -10,7 +10,7 @@ import java.awt.event.KeyEvent;
 
 public interface ElementKeyboardListener
 {
-	public boolean onKeyPress(KeyEvent event);
-	public boolean onKeyRelease(KeyEvent event);
-	public boolean onKeyTyped(KeyEvent event);
+	public boolean onKeyPress(Element element, KeyEvent event);
+	public boolean onKeyRelease(Element element, KeyEvent event);
+	public boolean onKeyTyped(Element element, KeyEvent event);
 }

@@ -274,22 +274,16 @@ public class SegmentElement extends BranchElement implements CollatedElementInte
 	// Content methods
 	//
 	
-	public String getContent()
+	protected void getSubtreeContent(StringBuilder builder)
 	{
 		List<Element> ch = getChildren();
 		
-		if ( ch.size() == 0 )
+		if ( ch.size() > 0 )
 		{
-			return null;
-		}
-		else
-		{
-			String content = "";
 			for (Element c: ch)
 			{
-				content += c.getContent();
+				c.getSubtreeContent( builder );
 			}
-			return content;
 		}
 	}
 

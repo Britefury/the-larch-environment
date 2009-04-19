@@ -19,7 +19,6 @@ public class DVNode implements CellListener
 	public static class CannotChangeDocNodeException extends Exception
 	{
 		private static final long serialVersionUID = 1L;
-		
 	}
 
 	public static interface NodeElementFactory
@@ -198,7 +197,9 @@ public class DVNode implements CellListener
 		
 		if ( elementChangeListener != null  &&  bEmitChangeEvents )
 		{
+			view.profile_javaCallToContentChange();
 			elementChangeListener.elementChangeFrom( this, element );
+			view.profile_contentChangeReturnToJava();
 		}
 
 		// Compute the element for this node, and refresh all children
@@ -218,7 +219,9 @@ public class DVNode implements CellListener
 		
 		if ( elementChangeListener != null  &&  bEmitChangeEvents )
 		{
+			view.profile_javaCallToContentChange();
 			elementChangeListener.elementChangeTo( this, element );
+			view.profile_contentChangeReturnToJava();
 		}
 	}
 	
@@ -301,7 +304,6 @@ public class DVNode implements CellListener
 		if ( childrenTail != null )
 		{
 			childrenTail.nextSibling = child;
-			childrenTail = child;
 		}
 
 		if ( childrenHead == null )
@@ -309,6 +311,8 @@ public class DVNode implements CellListener
 			childrenHead = child;
 		}
 		
+		childrenTail = child;
+
 		child.parent = this;
 	}
 	

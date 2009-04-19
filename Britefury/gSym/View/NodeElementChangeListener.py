@@ -42,7 +42,6 @@ DIR_FORWARD = 0
 DIR_BACKWARD = 1
 
 
-
 class _NodeElementChangeListener (DVNode.NodeElementChangeListener):
 	def __init__(self):
 		self._caretNode = None
