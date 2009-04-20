@@ -45,7 +45,6 @@ public abstract class NodeElementChangeListenerDiff implements DVNode.NodeElemen
 	
 	public void elementChangeFrom(DVNode node, Element element)
 	{
-		System.out.println( "NodeElementChangeListenerDiff.elementChangeFrom" );
 		// Initialise to null values
 		caretNode = null;
 		textRepresentation = null;
@@ -81,7 +80,6 @@ public abstract class NodeElementChangeListenerDiff implements DVNode.NodeElemen
 
 	public void elementChangeTo(DVNode node, Element element)
 	{
-		System.out.println( "NodeElementChangeListenerDiff.elementChangeTo" );
 		if ( caretNode == node )
 		{
 			Element nodeElement = node.getInnerElementNoRefresh();
