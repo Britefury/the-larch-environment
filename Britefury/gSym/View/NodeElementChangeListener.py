@@ -38,6 +38,7 @@ from Britefury.Dispatch.MethodDispatch import methodDispatch
 
 class _NodeElementChangeListener (NodeElementChangeListenerDiff):
 	def computeNewPositionWithDiff(self, position, bias, newBiasArray, contentString, newContentString, prefixLen, suffixLen, origChangeRegion, newChangeRegion):
+		newPosition = position
 		newBias = newBiasArray[0]
 		
 		matcher = difflib.SequenceMatcher( lambda x: x in ' \t', origChangeRegion, newChangeRegion )
