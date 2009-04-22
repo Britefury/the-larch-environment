@@ -139,13 +139,18 @@ public abstract class BranchElement extends Element
 	}
 	
 	
-	public LeafElement getLeafAtContentPosition(int position)
+	
+	//
+	// Text representation methods
+	//
+	
+	public LeafElement getLeafAtTextRepresentationPosition(int position)
 	{
-		Element c = getChildAtContentPosition( position );
+		Element c = getChildAtTextRepresentationPosition( position );
 		
 		if ( c != null )
 		{
-			return c.getLeafAtContentPosition( position - getContentOffsetOfChild( c ) );
+			return c.getLeafAtTextRepresentationPosition( position - getTextRepresentationOffsetOfChild( c ) );
 		}
 		else
 		{
@@ -153,12 +158,12 @@ public abstract class BranchElement extends Element
 		}
 	}
 
-	public Element getChildAtContentPosition(int position)
+	public Element getChildAtTextRepresentationPosition(int position)
 	{
 		int offset = 0;
 		for (Element c: getChildren())
 		{
-			int end = offset + c.getContentLength();
+			int end = offset + c.getTextRepresentationLength();
 			if ( position >= offset  &&  position < end )
 			{
 				return c;
@@ -228,7 +233,7 @@ public abstract class BranchElement extends Element
 	
 
 	
-	public int getContentOffsetOfChild(Element elem)
+	public int getTextRepresentationOffsetOfChild(Element elem)
 	{
 		int offset = 0;
 		for (Element c: getChildren())
@@ -237,28 +242,28 @@ public abstract class BranchElement extends Element
 			{
 				return offset;
 			}
-			offset += c.getContentLength();
+			offset += c.getTextRepresentationLength();
 		}
 		
 		throw new DPContainer.CouldNotFindChildException();
 	}
 	
-	protected int getChildContentOffsetInSubtree(Element child, BranchElement subtreeRoot)
+	protected int getChildTextRepresentationOffsetInSubtree(Element child, BranchElement subtreeRoot)
 	{
-		return getContentOffsetOfChild( child )  +  getContentOffsetInSubtree( subtreeRoot );
+		return getTextRepresentationOffsetOfChild( child )  +  getTextRepresentationOffsetInSubtree( subtreeRoot );
 	}
 
 
 
-	public SegmentElement getLinearTextSectionFromChild(Element element)
+	public SegmentElement getSegmentFromChild(Element element)
 	{
 		return getSegment();
 	}
 	
 	
-	protected boolean onChildContentModified(Element child)
+	protected boolean onChildTextRepresentationModified(Element child)
 	{
-		return onContentModified();
+		return onTextRepresentationModified();
 	}
 
 

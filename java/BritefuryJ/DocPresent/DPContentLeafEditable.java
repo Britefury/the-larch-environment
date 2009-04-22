@@ -64,7 +64,7 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 		EditableLeafElement e = getElement();
 		if ( e != null )
 		{
-			e.insertContent( marker, x );
+			e.insertText( marker, x );
 		}
 	}
 
@@ -73,7 +73,7 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 		EditableLeafElement e = getElement();
 		if ( e != null )
 		{
-			e.removeContent( marker, length );
+			e.removeText( marker, length );
 		}
 	}
 	
@@ -82,7 +82,7 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 		EditableLeafElement e = getElement();
 		if ( e != null )
 		{
-			e.removeContent( index, length );
+			e.removeText( index, length );
 		}
 	}
 	
@@ -91,7 +91,7 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 		EditableLeafElement e = getElement();
 		if ( e != null )
 		{
-			e.removeContentFromStart( length );
+			e.removeTextFromStart( length );
 		}
 	}
 	
@@ -100,7 +100,7 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 		EditableLeafElement e = getElement();
 		if ( e != null )
 		{
-			e.removeContentFromEnd( length );
+			e.removeTextFromEnd( length );
 		}
 	}
 	
@@ -109,7 +109,7 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 		EditableLeafElement e = getElement();
 		if ( e != null )
 		{
-			e.replaceContent( marker, length, x );
+			e.replaceText( marker, length, x );
 		}
 	}
 	
@@ -118,7 +118,7 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 		EditableLeafElement e = getElement();
 		if ( e != null )
 		{
-			return e.clearContent();
+			return e.clearText();
 		}
 		else
 		{

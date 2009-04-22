@@ -23,9 +23,9 @@ public class TextElement extends EditableEntryLeafElement
 		super( new DPText( styleSheet, text ), text );
 	}
 
-	public TextElement(TextStyleSheet styleSheet, String text, String content)
+	public TextElement(TextStyleSheet styleSheet, String text, String textRepresentation)
 	{
-		super( new DPText( styleSheet, text ), content );
+		super( new DPText( styleSheet, text ), textRepresentation );
 	}
 
 
@@ -37,11 +37,11 @@ public class TextElement extends EditableEntryLeafElement
 	
 	
 	
-	protected void contentChanged()
+	protected void textRepresentationChanged()
 	{
-		getWidget().setText( content );
+		getWidget().setText( textRepresentation );
 		
-		super.contentChanged();
+		super.textRepresentationChanged();
 	}
 
 

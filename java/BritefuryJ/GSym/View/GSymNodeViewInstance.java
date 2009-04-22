@@ -18,7 +18,7 @@ import BritefuryJ.DocPresent.DPHBox;
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.ElementTree.BorderElement;
 import BritefuryJ.DocPresent.ElementTree.Element;
-import BritefuryJ.DocPresent.ElementTree.ElementContentListener;
+import BritefuryJ.DocPresent.ElementTree.ElementTextRepresentationListener;
 import BritefuryJ.DocPresent.ElementTree.ElementFactory;
 import BritefuryJ.DocPresent.ElementTree.ElementKeyboardListener;
 import BritefuryJ.DocPresent.ElementTree.FractionElement;
@@ -334,7 +334,7 @@ public class GSymNodeViewInstance implements Element.ElementContext
 	
 	
 	
-	public Element contentListener(Element child, ElementContentListener listener)
+	public Element contentListener(Element child, ElementTextRepresentationListener listener)
 	{
 		viewInstance.getView().profile_startElement();
 		child.setContentListener( listener );
@@ -342,7 +342,7 @@ public class GSymNodeViewInstance implements Element.ElementContext
 		return child;
 	}
 	
-	public List<Element> contentListener(List<Element> children, ElementContentListener listener)
+	public List<Element> contentListener(List<Element> children, ElementTextRepresentationListener listener)
 	{
 		viewInstance.getView().profile_startElement();
 		for (Element child: children)

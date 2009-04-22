@@ -19,14 +19,14 @@ public class FractionElement extends BranchElement
 {
 	public static class BarElement extends EditableEntryLeafElement
 	{
-		public BarElement(String content)
+		public BarElement(String textRepresentation)
 		{
-			this( FractionStyleSheet.BarStyleSheet.defaultStyleSheet, content );
+			this( FractionStyleSheet.BarStyleSheet.defaultStyleSheet, textRepresentation );
 		}
 
-		public BarElement(FractionStyleSheet.BarStyleSheet styleSheet, String content)
+		public BarElement(FractionStyleSheet.BarStyleSheet styleSheet, String textRepresentation)
 		{
-			super( new DPFraction.DPFractionBar( styleSheet ), content );
+			super( new DPFraction.DPFractionBar( styleSheet ), textRepresentation );
 		}
 
 
@@ -192,21 +192,21 @@ public class FractionElement extends BranchElement
 	// Content methods
 	//
 	
-	protected void getSubtreeContent(StringBuilder builder)
+	protected void computeSubtreeTextRepresentation(StringBuilder builder)
 	{
 		for (Element child: getChildren())
 		{
-			child.getSubtreeContent( builder );
+			child.computeSubtreeTextRepresentation( builder );
 		}
 	}
 	
-	public int getContentLength()
+	public int getTextRepresentationLength()
 	{
 		int length = 0;
 		
 		for (Element child: getChildren())
 		{
-			length += child.getContentLength();
+			length += child.getTextRepresentationLength();
 		}
 		
 		return length;

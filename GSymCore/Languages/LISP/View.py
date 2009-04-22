@@ -42,13 +42,13 @@ def _parseText(text):
 		return None
 
 
-class ParsedNodeContentListener (ElementContentListener):
+class ParsedNodeContentListener (ElementTextRepresentationListener):
 	def __init__(self, ctx, node):
 		#super( ParsedNodeContentListener, self ).__init__()
 		self._ctx = ctx
 		self._node = node
 
-	def contentModified(self, element):
+	def textRepresentationModified(self, element):
 		value = element.getContent()
 		parsed = _parseText( value )
 		if parsed is not None:

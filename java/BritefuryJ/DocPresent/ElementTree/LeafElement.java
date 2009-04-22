@@ -46,7 +46,7 @@ public abstract class LeafElement extends Element
 	// Fields
 	//
 	
-	protected String content;
+	protected String textRepresentation;
 	
 	
 	
@@ -56,11 +56,11 @@ public abstract class LeafElement extends Element
 	// Constructor
 	//
 	
-	protected LeafElement(DPContentLeaf widget, String content)
+	protected LeafElement(DPContentLeaf widget, String textRepresentation)
 	{
 		super( widget );
 		
-		this.content = content;
+		this.textRepresentation = textRepresentation;
 	}
 	
 	
@@ -117,7 +117,7 @@ public abstract class LeafElement extends Element
 	}
 	
 	
-	public LeafElement getLeafAtContentPosition(int position)
+	public LeafElement getLeafAtTextRepresentationPosition(int position)
 	{
 		return this;
 	}
@@ -194,14 +194,14 @@ public abstract class LeafElement extends Element
 	// Content methods
 	//
 	
-	protected void getSubtreeContent(StringBuilder builder)
+	protected void computeSubtreeTextRepresentation(StringBuilder builder)
 	{
-		builder.append( content );
+		builder.append( textRepresentation );
 	}
 	
-	public int getContentLength()
+	public int getTextRepresentationLength()
 	{
-		return content.length();
+		return textRepresentation.length();
 	}
 	
 	

@@ -63,7 +63,7 @@ public class ElementMarker
 				BranchElement b = (BranchElement)subtreeRoot;
 				if ( element != null  &&  element.isInSubtreeRootedAt( b ) )
 				{
-					return getPosition() + element.getContentOffsetInSubtree( b );
+					return getPosition() + element.getTextRepresentationOffsetInSubtree( b );
 				}
 				else
 				{
@@ -118,7 +118,7 @@ public class ElementMarker
 	
 	public void set(LeafElement element, int position, Bias bias)
 	{
-		widgetMarker.set( (DPContentLeaf)element.getWidgetAtContentStart(), position, bias );
+		widgetMarker.set( (DPContentLeaf)element.getWidgetAtTextRepresentationStart(), position, bias );
 	}
 	
 	

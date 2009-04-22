@@ -444,7 +444,7 @@ class Python25Grammar (Grammar):
 		opTable = OperatorTable( 
 			[
 				PrecedenceLevel( [ InfixRight( Literal( '**' ),  Nodes.Pow, 'x', 'y' ) ] ),
-				PrecedenceLevel( [ Prefix( Literal( '~' ),  Nodes.Invert, 'x' ),   Prefix( Literal( '-' ),  Nodes.Negate, 'x' ), Prefix( Literal( '+' ),  Nodes.Pos, 'x' ) ] ),
+				PrecedenceLevel( [ Prefix( Literal( '~' ),  Nodes.Invert, 'x' ),   Prefix( Literal( '-' ),  Nodes.Negate, 'x' ),   Prefix( Literal( '+' ),  Nodes.Pos, 'x' ) ] ),
 				PrecedenceLevel( [ InfixLeft( Literal( '*' ),  Nodes.Mul, 'x', 'y' ),   InfixLeft( Literal( '/' ),  Nodes.Div, 'x', 'y' ),   InfixLeft( Literal( '%' ),  Nodes.Mod, 'x', 'y' ) ] ),
 				PrecedenceLevel( [ InfixLeft( Literal( '+' ),  Nodes.Add, 'x', 'y' ),   InfixLeft( Literal( '-' ),  Nodes.Sub, 'x', 'y' ) ] ),
 				PrecedenceLevel( [ InfixLeft( Literal( '<<' ),  Nodes.LShift, 'x', 'y' ),   InfixLeft( Literal( '>>' ),  Nodes.RShift, 'x', 'y') ] ),

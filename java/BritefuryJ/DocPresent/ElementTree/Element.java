@@ -35,7 +35,7 @@ public abstract class Element
 	protected DPWidget widget;
 	protected BranchElement parent;
 	protected ElementTree tree;
-	protected ElementContentListener contentListener;
+	protected ElementTextRepresentationListener contentListener;
 	protected ElementKeyboardListener keyboardListener;
 	protected DPWidget metaElement;
 	protected ElementContext context;
@@ -116,12 +116,12 @@ public abstract class Element
 	// Listeners
 	//
 	
-	public ElementContentListener getContentListener()
+	public ElementTextRepresentationListener getContentListener()
 	{
 		return contentListener;
 	}
 	
-	public void setContentListener(ElementContentListener listener)
+	public void setContentListener(ElementTextRepresentationListener listener)
 	{
 		contentListener = listener;
 	}
@@ -266,13 +266,13 @@ public abstract class Element
 	}
 
 	
-	public LeafElement getLeafAtContentPosition(int position)
+	public LeafElement getLeafAtTextRepresentationPosition(int position)
 	{
 		return null;
 	}
 	
 	
-	public int getContentOffsetInSubtree(BranchElement subtreeRoot)
+	public int getTextRepresentationOffsetInSubtree(BranchElement subtreeRoot)
 	{
 		if ( this == subtreeRoot )
 		{
@@ -280,7 +280,7 @@ public abstract class Element
 		}
 		else
 		{
-			return parent.getChildContentOffsetInSubtree( this, subtreeRoot );
+			return parent.getChildTextRepresentationOffsetInSubtree( this, subtreeRoot );
 		}
 	}
 
@@ -288,19 +288,19 @@ public abstract class Element
 
 	
 	//
-	// Content methods
+	// Text representation methods
 	//
 	
-	protected void contentChanged()
+	protected void textRepresentationChanged()
 	{
-		onContentModified();
+		onTextRepresentationModified();
 	}
 	
-	protected boolean onContentModified()
+	protected boolean onTextRepresentationModified()
 	{
 		if ( contentListener != null )
 		{
-			if ( contentListener.contentModified( this ) )
+			if ( contentListener.textRepresentationModified( this ) )
 			{
 				return true;
 			}
@@ -308,7 +308,7 @@ public abstract class Element
 		
 		if ( parent != null )
 		{
-			return parent.onChildContentModified( this );
+			return parent.onChildTextRepresentationModified( this );
 		}
 		
 		return false;
@@ -316,21 +316,21 @@ public abstract class Element
 	
 	
 	
-	public DPWidget getWidgetAtContentStart()
+	public DPWidget getWidgetAtTextRepresentationStart()
 	{
 		return getWidget();
 	}
 	
 		
-	public String getContent()
+	public String getTextRepresentation()
 	{
 		StringBuilder builder = new StringBuilder();
-		getSubtreeContent( builder );
+		computeSubtreeTextRepresentation( builder );
 		return builder.toString();
 	}
 	
-	protected abstract void getSubtreeContent(StringBuilder builder);
-	public abstract int getContentLength();
+	protected abstract void computeSubtreeTextRepresentation(StringBuilder builder);
+	public abstract int getTextRepresentationLength();
 
 
 	
@@ -344,7 +344,7 @@ public abstract class Element
 	{
 		if ( parent != null )
 		{
-			return parent.getLinearTextSectionFromChild( this );
+			return parent.getSegmentFromChild( this );
 		}
 		else
 		{

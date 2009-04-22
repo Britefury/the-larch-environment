@@ -192,18 +192,18 @@ public class ScriptElement extends BranchElement
 	// Content methods
 	//
 	
-	protected void getSubtreeContent(StringBuilder builder)
+	protected void computeSubtreeTextRepresentation(StringBuilder builder)
 	{
 		for (int slot = 0; slot < NUMCHILDREN; slot++)
 		{
 			if ( segments[slot] != null )
 			{
-				segments[slot].getSubtreeContent( builder );
+				segments[slot].computeSubtreeTextRepresentation( builder );
 			}
 		}
 	}
 	
-	public int getContentLength()
+	public int getTextRepresentationLength()
 	{
 		int length = 0;
 		
@@ -211,7 +211,7 @@ public class ScriptElement extends BranchElement
 		{
 			if ( segments[slot] != null )
 			{
-				length += segments[slot].getContentLength();
+				length += segments[slot].getTextRepresentationLength();
 			}
 		}
 		

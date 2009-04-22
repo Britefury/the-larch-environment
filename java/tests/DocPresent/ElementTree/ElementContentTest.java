@@ -23,16 +23,16 @@ public class ElementContentTest extends TestCase
 	{
 		EmptyElement empty = new EmptyElement();
 		
-		assertEquals( empty.getContent(), "" );
-		assertEquals( empty.getContentLength(), 0 );
+		assertEquals( empty.getTextRepresentation(), "" );
+		assertEquals( empty.getTextRepresentationLength(), 0 );
 	}
 	
 	public void testText()
 	{
 		TextElement text = new TextElement( "Hello" );
 		
-		assertEquals( text.getContent(), "Hello" );
-		assertEquals( text.getContentLength(), 5 );
+		assertEquals( text.getTextRepresentation(), "Hello" );
+		assertEquals( text.getTextRepresentationLength(), 5 );
 	}
 	
 	
@@ -44,8 +44,8 @@ public class ElementContentTest extends TestCase
 		
 		b.setChild( t0 );
 
-		assertEquals( b.getContent(), "abc" );
-		assertEquals( b.getContentLength(), 3 );
+		assertEquals( b.getTextRepresentation(), "abc" );
+		assertEquals( b.getTextRepresentationLength(), 3 );
 	}
 	
 	
@@ -62,8 +62,8 @@ public class ElementContentTest extends TestCase
 		p.setChildren( Arrays.asList( t ) );
 		
 		
-		assertEquals( p.getContent(), "abcghimnostu" );
-		assertEquals( p.getContentLength(), 12 );
+		assertEquals( p.getTextRepresentation(), "abcghimnostu" );
+		assertEquals( p.getTextRepresentationLength(), 12 );
 	}
 	
 	
@@ -106,106 +106,106 @@ public class ElementContentTest extends TestCase
 		
 		
 		// Test getContent() and getContentLength() of all widgets
-		assertEquals( ta0.getContent(), "abc" );
-		assertEquals( ta0.getContentLength(), 3 );
+		assertEquals( ta0.getTextRepresentation(), "abc" );
+		assertEquals( ta0.getTextRepresentationLength(), 3 );
 		
-		assertEquals( pa.getContent(), "abcghimnostu" );
-		assertEquals( pa.getContentLength(), 12 );
+		assertEquals( pa.getTextRepresentation(), "abcghimnostu" );
+		assertEquals( pa.getTextRepresentationLength(), 12 );
 
-		assertEquals( e.getContent(), "" );
-		assertEquals( e.getContentLength(), 0 );
+		assertEquals( e.getTextRepresentation(), "" );
+		assertEquals( e.getTextRepresentationLength(), 0 );
 
-		assertEquals( pb.getContent(), "vwxyz" );
-		assertEquals( pb.getContentLength(), 5 );
+		assertEquals( pb.getTextRepresentation(), "vwxyz" );
+		assertEquals( pb.getTextRepresentationLength(), 5 );
 
-		assertEquals( b.getContent(), "vwxyz" );
-		assertEquals( b.getContentLength(), 5 );
+		assertEquals( b.getTextRepresentation(), "vwxyz" );
+		assertEquals( b.getTextRepresentationLength(), 5 );
 
-		assertEquals( root.getContent(), "abcghimnostuvwxyz1122" );
-		assertEquals( root.getContentLength(), 21 );
+		assertEquals( root.getTextRepresentation(), "abcghimnostuvwxyz1122" );
+		assertEquals( root.getTextRepresentationLength(), 21 );
 		
 		
 		// Test getContentOffsetOfChild() for containers
-		assertEquals( pa.getContentOffsetOfChild( ta0 ), 0 );
-		assertEquals( pa.getContentOffsetOfChild( ta1 ), 3 );
-		assertEquals( pa.getContentOffsetOfChild( ta2 ), 6 );
-		assertEquals( pa.getContentOffsetOfChild( ta3 ), 9 );
+		assertEquals( pa.getTextRepresentationOffsetOfChild( ta0 ), 0 );
+		assertEquals( pa.getTextRepresentationOffsetOfChild( ta1 ), 3 );
+		assertEquals( pa.getTextRepresentationOffsetOfChild( ta2 ), 6 );
+		assertEquals( pa.getTextRepresentationOffsetOfChild( ta3 ), 9 );
 
-		assertEquals( b.getContentOffsetOfChild( pb ), 0 );
+		assertEquals( b.getTextRepresentationOffsetOfChild( pb ), 0 );
 		
-		assertEquals( root.getContentOffsetOfChild( pa ), 0 );
-		assertEquals( root.getContentOffsetOfChild( e ), 12 );
-		assertEquals( root.getContentOffsetOfChild( b ), 12 );
-		assertEquals( root.getContentOffsetOfChild( tx ), 17 );
-		assertEquals( root.getContentOffsetOfChild( ty ), 19 );
+		assertEquals( root.getTextRepresentationOffsetOfChild( pa ), 0 );
+		assertEquals( root.getTextRepresentationOffsetOfChild( e ), 12 );
+		assertEquals( root.getTextRepresentationOffsetOfChild( b ), 12 );
+		assertEquals( root.getTextRepresentationOffsetOfChild( tx ), 17 );
+		assertEquals( root.getTextRepresentationOffsetOfChild( ty ), 19 );
 		
 		// Test getChildAtContentPosition() for containers
 		Element[] getChildAtContentPositionResultsPA = { ta0, ta0, ta0, ta1, ta1, ta1, ta2, ta2, ta2, ta3, ta3, ta3, null };
 		for (int i = 0; i < getChildAtContentPositionResultsPA.length; i++)
 		{
-			assertSame( pa.getChildAtContentPosition( i ), getChildAtContentPositionResultsPA[i] );
+			assertSame( pa.getChildAtTextRepresentationPosition( i ), getChildAtContentPositionResultsPA[i] );
 		}
 		
-		assertEquals( b.getChildAtContentPosition( 0 ), pb );
-		assertEquals( b.getChildAtContentPosition( 4 ), pb );
-		assertEquals( b.getChildAtContentPosition( 5 ), null );
+		assertEquals( b.getChildAtTextRepresentationPosition( 0 ), pb );
+		assertEquals( b.getChildAtTextRepresentationPosition( 4 ), pb );
+		assertEquals( b.getChildAtTextRepresentationPosition( 5 ), null );
 
-		assertEquals( root.getChildAtContentPosition( 0 ), pa );
-		assertEquals( root.getChildAtContentPosition( 1 ), pa );
-		assertEquals( root.getChildAtContentPosition( 11 ), pa );
-		assertEquals( root.getChildAtContentPosition( 12 ), b );
-		assertEquals( root.getChildAtContentPosition( 16 ), b );
-		assertEquals( root.getChildAtContentPosition( 17 ), tx );
-		assertEquals( root.getChildAtContentPosition( 18 ), tx );
-		assertEquals( root.getChildAtContentPosition( 19 ), ty );
-		assertEquals( root.getChildAtContentPosition( 20 ), ty );
-		assertEquals( root.getChildAtContentPosition( 21 ), null );
+		assertEquals( root.getChildAtTextRepresentationPosition( 0 ), pa );
+		assertEquals( root.getChildAtTextRepresentationPosition( 1 ), pa );
+		assertEquals( root.getChildAtTextRepresentationPosition( 11 ), pa );
+		assertEquals( root.getChildAtTextRepresentationPosition( 12 ), b );
+		assertEquals( root.getChildAtTextRepresentationPosition( 16 ), b );
+		assertEquals( root.getChildAtTextRepresentationPosition( 17 ), tx );
+		assertEquals( root.getChildAtTextRepresentationPosition( 18 ), tx );
+		assertEquals( root.getChildAtTextRepresentationPosition( 19 ), ty );
+		assertEquals( root.getChildAtTextRepresentationPosition( 20 ), ty );
+		assertEquals( root.getChildAtTextRepresentationPosition( 21 ), null );
 
 		
 		// Test getLeafAtContentPosition() for widgets
-		assertSame( ta0.getLeafAtContentPosition( 0 ), ta0 );
+		assertSame( ta0.getLeafAtTextRepresentationPosition( 0 ), ta0 );
 		
-		assertNull( e.getLeafAtContentPosition( 0 ) );
+		assertNull( e.getLeafAtTextRepresentationPosition( 0 ) );
 		
 		for (int i = 0; i < getChildAtContentPositionResultsPA.length; i++)
 		{
-			assertSame( pa.getLeafAtContentPosition( i ), getChildAtContentPositionResultsPA[i] );
+			assertSame( pa.getLeafAtTextRepresentationPosition( i ), getChildAtContentPositionResultsPA[i] );
 		}
 
-		assertEquals( root.getLeafAtContentPosition( 0 ), ta0 );
-		assertEquals( root.getLeafAtContentPosition( 1 ), ta0 );
-		assertEquals( root.getLeafAtContentPosition( 2 ), ta0 );
-		assertEquals( root.getLeafAtContentPosition( 3 ), ta1 );
-		assertEquals( root.getLeafAtContentPosition( 11 ), ta3 );
-		assertEquals( root.getLeafAtContentPosition( 12 ), tb0 );
-		assertEquals( root.getLeafAtContentPosition( 13 ), tb0 );
-		assertEquals( root.getLeafAtContentPosition( 14 ), tb1 );
-		assertEquals( root.getLeafAtContentPosition( 15 ), tb1 );
-		assertEquals( root.getLeafAtContentPosition( 16 ), tb2 );
-		assertEquals( root.getLeafAtContentPosition( 17 ), tx );
-		assertEquals( root.getLeafAtContentPosition( 18 ), tx );
-		assertEquals( root.getLeafAtContentPosition( 19 ), ty );
-		assertEquals( root.getLeafAtContentPosition( 20 ), ty );
-		assertEquals( root.getLeafAtContentPosition( 21 ), null );
+		assertEquals( root.getLeafAtTextRepresentationPosition( 0 ), ta0 );
+		assertEquals( root.getLeafAtTextRepresentationPosition( 1 ), ta0 );
+		assertEquals( root.getLeafAtTextRepresentationPosition( 2 ), ta0 );
+		assertEquals( root.getLeafAtTextRepresentationPosition( 3 ), ta1 );
+		assertEquals( root.getLeafAtTextRepresentationPosition( 11 ), ta3 );
+		assertEquals( root.getLeafAtTextRepresentationPosition( 12 ), tb0 );
+		assertEquals( root.getLeafAtTextRepresentationPosition( 13 ), tb0 );
+		assertEquals( root.getLeafAtTextRepresentationPosition( 14 ), tb1 );
+		assertEquals( root.getLeafAtTextRepresentationPosition( 15 ), tb1 );
+		assertEquals( root.getLeafAtTextRepresentationPosition( 16 ), tb2 );
+		assertEquals( root.getLeafAtTextRepresentationPosition( 17 ), tx );
+		assertEquals( root.getLeafAtTextRepresentationPosition( 18 ), tx );
+		assertEquals( root.getLeafAtTextRepresentationPosition( 19 ), ty );
+		assertEquals( root.getLeafAtTextRepresentationPosition( 20 ), ty );
+		assertEquals( root.getLeafAtTextRepresentationPosition( 21 ), null );
 		
-		assertEquals( b.getLeafAtContentPosition( 0 ), tb0 );
-		assertEquals( b.getLeafAtContentPosition( 1 ), tb0 );
-		assertEquals( b.getLeafAtContentPosition( 2 ), tb1 );
-		assertEquals( b.getLeafAtContentPosition( 3 ), tb1 );
-		assertEquals( b.getLeafAtContentPosition( 4 ), tb2 );
+		assertEquals( b.getLeafAtTextRepresentationPosition( 0 ), tb0 );
+		assertEquals( b.getLeafAtTextRepresentationPosition( 1 ), tb0 );
+		assertEquals( b.getLeafAtTextRepresentationPosition( 2 ), tb1 );
+		assertEquals( b.getLeafAtTextRepresentationPosition( 3 ), tb1 );
+		assertEquals( b.getLeafAtTextRepresentationPosition( 4 ), tb2 );
 		
 		
 		// Test getContentOffsetInSubtree() for widgets
-		assertEquals( ta0.getContentOffsetInSubtree( pa ), 0 );
-		assertEquals( ta3.getContentOffsetInSubtree( pa ), 9 );
-		assertEquals( ta0.getContentOffsetInSubtree( root ), 0 );
-		assertEquals( ta3.getContentOffsetInSubtree( root ), 9 );
-		assertEquals( tb0.getContentOffsetInSubtree( pb ), 0 );
-		assertEquals( tb2.getContentOffsetInSubtree( pb ), 4 );
-		assertEquals( tb0.getContentOffsetInSubtree( b ), 0 );
-		assertEquals( tb2.getContentOffsetInSubtree( b ), 4 );
-		assertEquals( tb0.getContentOffsetInSubtree( root ), 12 );
-		assertEquals( tb2.getContentOffsetInSubtree( root ), 16 );
+		assertEquals( ta0.getTextRepresentationOffsetInSubtree( pa ), 0 );
+		assertEquals( ta3.getTextRepresentationOffsetInSubtree( pa ), 9 );
+		assertEquals( ta0.getTextRepresentationOffsetInSubtree( root ), 0 );
+		assertEquals( ta3.getTextRepresentationOffsetInSubtree( root ), 9 );
+		assertEquals( tb0.getTextRepresentationOffsetInSubtree( pb ), 0 );
+		assertEquals( tb2.getTextRepresentationOffsetInSubtree( pb ), 4 );
+		assertEquals( tb0.getTextRepresentationOffsetInSubtree( b ), 0 );
+		assertEquals( tb2.getTextRepresentationOffsetInSubtree( b ), 4 );
+		assertEquals( tb0.getTextRepresentationOffsetInSubtree( root ), 12 );
+		assertEquals( tb2.getTextRepresentationOffsetInSubtree( root ), 16 );
 	}
 
 
@@ -244,87 +244,87 @@ public class ElementContentTest extends TestCase
 		
 		
 		// Test getContent() and getContentLength() of all widgets
-		assertEquals( ta0.getContent(), "abc" );
-		assertEquals( ta0.getContentLength(), 3 );
+		assertEquals( ta0.getTextRepresentation(), "abc" );
+		assertEquals( ta0.getTextRepresentationLength(), 3 );
 		
-		assertEquals( pa.getContent(), "abcghimnostu" );
-		assertEquals( pa.getContentLength(), 12 );
+		assertEquals( pa.getTextRepresentation(), "abcghimnostu" );
+		assertEquals( pa.getTextRepresentationLength(), 12 );
 
-		assertEquals( e.getContent(), "" );
-		assertEquals( e.getContentLength(), 0 );
+		assertEquals( e.getTextRepresentation(), "" );
+		assertEquals( e.getTextRepresentationLength(), 0 );
 
-		assertEquals( pb.getContent(), "vwxyz" );
-		assertEquals( pb.getContentLength(), 5 );
+		assertEquals( pb.getTextRepresentation(), "vwxyz" );
+		assertEquals( pb.getTextRepresentationLength(), 5 );
 
-		assertEquals( root.getContent(), "abcghimnostuvwxyz1122" );
-		assertEquals( root.getContentLength(), 21 );
+		assertEquals( root.getTextRepresentation(), "abcghimnostuvwxyz1122" );
+		assertEquals( root.getTextRepresentationLength(), 21 );
 		
 		
 		// Test getContentOffsetOfChild() for containers
-		assertEquals( pa.getContentOffsetOfChild( ta0 ), 0 );
-		assertEquals( pa.getContentOffsetOfChild( ta1 ), 3 );
-		assertEquals( pa.getContentOffsetOfChild( ta2 ), 6 );
-		assertEquals( pa.getContentOffsetOfChild( ta3 ), 9 );
+		assertEquals( pa.getTextRepresentationOffsetOfChild( ta0 ), 0 );
+		assertEquals( pa.getTextRepresentationOffsetOfChild( ta1 ), 3 );
+		assertEquals( pa.getTextRepresentationOffsetOfChild( ta2 ), 6 );
+		assertEquals( pa.getTextRepresentationOffsetOfChild( ta3 ), 9 );
 
-		assertEquals( root.getContentOffsetOfChild( pa ), 0 );
-		assertEquals( root.getContentOffsetOfChild( e ), 12 );
-		assertEquals( root.getContentOffsetOfChild( tx ), 17 );
-		assertEquals( root.getContentOffsetOfChild( ty ), 19 );
+		assertEquals( root.getTextRepresentationOffsetOfChild( pa ), 0 );
+		assertEquals( root.getTextRepresentationOffsetOfChild( e ), 12 );
+		assertEquals( root.getTextRepresentationOffsetOfChild( tx ), 17 );
+		assertEquals( root.getTextRepresentationOffsetOfChild( ty ), 19 );
 		
 		// Test getChildAtContentPosition() for containers
 		Element[] getChildAtContentPositionResultsPA = { ta0, ta0, ta0, ta1, ta1, ta1, ta2, ta2, ta2, ta3, ta3, ta3, null };
 		for (int i = 0; i < getChildAtContentPositionResultsPA.length; i++)
 		{
-			assertSame( pa.getChildAtContentPosition( i ), getChildAtContentPositionResultsPA[i] );
+			assertSame( pa.getChildAtTextRepresentationPosition( i ), getChildAtContentPositionResultsPA[i] );
 		}
 		
-		assertEquals( root.getChildAtContentPosition( 0 ), pa );
-		assertEquals( root.getChildAtContentPosition( 1 ), pa );
-		assertEquals( root.getChildAtContentPosition( 11 ), pa );
-		assertEquals( root.getChildAtContentPosition( 17 ), tx );
-		assertEquals( root.getChildAtContentPosition( 18 ), tx );
-		assertEquals( root.getChildAtContentPosition( 19 ), ty );
-		assertEquals( root.getChildAtContentPosition( 20 ), ty );
-		assertEquals( root.getChildAtContentPosition( 21 ), null );
+		assertEquals( root.getChildAtTextRepresentationPosition( 0 ), pa );
+		assertEquals( root.getChildAtTextRepresentationPosition( 1 ), pa );
+		assertEquals( root.getChildAtTextRepresentationPosition( 11 ), pa );
+		assertEquals( root.getChildAtTextRepresentationPosition( 17 ), tx );
+		assertEquals( root.getChildAtTextRepresentationPosition( 18 ), tx );
+		assertEquals( root.getChildAtTextRepresentationPosition( 19 ), ty );
+		assertEquals( root.getChildAtTextRepresentationPosition( 20 ), ty );
+		assertEquals( root.getChildAtTextRepresentationPosition( 21 ), null );
 
 		
 		// Test getLeafAtContentPosition() for widgets
-		assertSame( ta0.getLeafAtContentPosition( 0 ), ta0 );
+		assertSame( ta0.getLeafAtTextRepresentationPosition( 0 ), ta0 );
 		
-		assertNull( e.getLeafAtContentPosition( 0 ) );
+		assertNull( e.getLeafAtTextRepresentationPosition( 0 ) );
 		
 		for (int i = 0; i < getChildAtContentPositionResultsPA.length; i++)
 		{
-			assertSame( pa.getLeafAtContentPosition( i ), getChildAtContentPositionResultsPA[i] );
+			assertSame( pa.getLeafAtTextRepresentationPosition( i ), getChildAtContentPositionResultsPA[i] );
 		}
 
-		assertEquals( root.getLeafAtContentPosition( 0 ), ta0 );
-		assertEquals( root.getLeafAtContentPosition( 1 ), ta0 );
-		assertEquals( root.getLeafAtContentPosition( 2 ), ta0 );
-		assertEquals( root.getLeafAtContentPosition( 3 ), ta1 );
-		assertEquals( root.getLeafAtContentPosition( 11 ), ta3 );
-		assertEquals( root.getLeafAtContentPosition( 12 ), tb0 );
-		assertEquals( root.getLeafAtContentPosition( 13 ), tb0 );
-		assertEquals( root.getLeafAtContentPosition( 14 ), tb1 );
-		assertEquals( root.getLeafAtContentPosition( 15 ), tb1 );
-		assertEquals( root.getLeafAtContentPosition( 16 ), tb2 );
-		assertEquals( root.getLeafAtContentPosition( 17 ), tx );
-		assertEquals( root.getLeafAtContentPosition( 18 ), tx );
-		assertEquals( root.getLeafAtContentPosition( 19 ), ty );
-		assertEquals( root.getLeafAtContentPosition( 20 ), ty );
-		assertEquals( root.getLeafAtContentPosition( 21 ), null );
+		assertEquals( root.getLeafAtTextRepresentationPosition( 0 ), ta0 );
+		assertEquals( root.getLeafAtTextRepresentationPosition( 1 ), ta0 );
+		assertEquals( root.getLeafAtTextRepresentationPosition( 2 ), ta0 );
+		assertEquals( root.getLeafAtTextRepresentationPosition( 3 ), ta1 );
+		assertEquals( root.getLeafAtTextRepresentationPosition( 11 ), ta3 );
+		assertEquals( root.getLeafAtTextRepresentationPosition( 12 ), tb0 );
+		assertEquals( root.getLeafAtTextRepresentationPosition( 13 ), tb0 );
+		assertEquals( root.getLeafAtTextRepresentationPosition( 14 ), tb1 );
+		assertEquals( root.getLeafAtTextRepresentationPosition( 15 ), tb1 );
+		assertEquals( root.getLeafAtTextRepresentationPosition( 16 ), tb2 );
+		assertEquals( root.getLeafAtTextRepresentationPosition( 17 ), tx );
+		assertEquals( root.getLeafAtTextRepresentationPosition( 18 ), tx );
+		assertEquals( root.getLeafAtTextRepresentationPosition( 19 ), ty );
+		assertEquals( root.getLeafAtTextRepresentationPosition( 20 ), ty );
+		assertEquals( root.getLeafAtTextRepresentationPosition( 21 ), null );
 		
 		
 		
 		// Test getContentOffsetInSubtree() for widgets
-		assertEquals( ta0.getContentOffsetInSubtree( pa ), 0 );
-		assertEquals( ta3.getContentOffsetInSubtree( pa ), 9 );
-		assertEquals( ta0.getContentOffsetInSubtree( root ), 0 );
-		assertEquals( ta3.getContentOffsetInSubtree( root ), 9 );
-		assertEquals( tb0.getContentOffsetInSubtree( pb ), 0 );
-		assertEquals( tb2.getContentOffsetInSubtree( pb ), 4 );
-		assertEquals( tb0.getContentOffsetInSubtree( root ), 12 );
-		assertEquals( tb2.getContentOffsetInSubtree( root ), 16 );
+		assertEquals( ta0.getTextRepresentationOffsetInSubtree( pa ), 0 );
+		assertEquals( ta3.getTextRepresentationOffsetInSubtree( pa ), 9 );
+		assertEquals( ta0.getTextRepresentationOffsetInSubtree( root ), 0 );
+		assertEquals( ta3.getTextRepresentationOffsetInSubtree( root ), 9 );
+		assertEquals( tb0.getTextRepresentationOffsetInSubtree( pb ), 0 );
+		assertEquals( tb2.getTextRepresentationOffsetInSubtree( pb ), 4 );
+		assertEquals( tb0.getTextRepresentationOffsetInSubtree( root ), 12 );
+		assertEquals( tb2.getTextRepresentationOffsetInSubtree( root ), 16 );
 		
 		
 		
