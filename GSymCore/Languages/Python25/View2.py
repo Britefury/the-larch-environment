@@ -302,7 +302,7 @@ class NewLineContentListener (LineContentListenerWithParser):
 			parsedLines = self.parseLines( lineStrings )
 			
 			del self._suite[self._index:endIndex]
-			insertRange( ctx, node, self._index, parsedLines )
+			insertRange( ctx, self._suite, self._index, parsedLines )
 			
 			
 			
@@ -344,7 +344,7 @@ class StatementKeyboardListener (ElementKeyboardListener):
 				prevSuite.append( node )
 	
 	
-	def _dedent(self, context, node):
+	def _dedent(self, node):
 		suite = node.getParentTreeNode()
 		index = suite.indexOfById( node )
 		if index == len( suite ) - 1:

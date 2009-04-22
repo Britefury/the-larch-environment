@@ -15,6 +15,7 @@ import BritefuryJ.DocPresent.ElementTree.SegmentElement;
 import BritefuryJ.DocPresent.ElementTree.Caret.ElementCaret;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocView.DVNode;
+import BritefuryJ.DocView.DocView;
 
 public abstract class NodeElementChangeListenerDiff implements DVNode.NodeElementChangeListener
 {
@@ -41,39 +42,42 @@ public abstract class NodeElementChangeListenerDiff implements DVNode.NodeElemen
 		bias = Marker.Bias.START;
 		position = -1;
 	}
-
 	
-	public void elementChangeFrom(DVNode node, Element element)
+	
+	public void reset(DocView view)
 	{
-		// Initialise to null values
 		caretNode = null;
 		textRepresentation = null;
 		bias = Marker.Bias.START;
 		position = -1;
+	}
 
-		// Get and store initial state
-		Element nodeElement = node.getInnerElementNoRefresh();
-		if ( nodeElement != null )
+	
+	public void elementChangeFrom(DVNode node, Element element)
+	{
+		if ( caretNode == null )
 		{
-			ElementTree tree = nodeElement.getElementTree();
-			ElementCaret caret = tree.getCaret();
-
-			String text = nodeElement.getTextRepresentation();
-			
-			try
+			// Get and store initial state
+			Element nodeElement = node.getInnerElementNoRefresh();
+			if ( nodeElement != null )
 			{
-				position = caret.getMarker().getPositionInSubtree( nodeElement );
-			}
-			catch (DPWidget.IsNotInSubtreeException e)
-			{
-				position = -1;
-			}
-			
-			if ( position != -1 )
-			{
-				caretNode = node;
-				textRepresentation = text;
-				bias = caret.getMarker().getBias();
+				ElementTree tree = nodeElement.getElementTree();
+				ElementCaret caret = tree.getCaret();
+	
+				String text = nodeElement.getTextRepresentation();
+				int pos = -1;
+				
+				try
+				{
+					pos = caret.getMarker().getPositionInSubtree( nodeElement );
+					caretNode = node;
+					textRepresentation = text;
+					bias = caret.getMarker().getBias();
+					position = pos;
+				}
+				catch (DPWidget.IsNotInSubtreeException e)
+				{
+				}
 			}
 		}
 	}

@@ -28,6 +28,7 @@ public class DVNode implements CellListener
 	
 	public static interface NodeElementChangeListener
 	{
+		public void reset(DocView view);
 		public void elementChangeFrom(DVNode node, Element e);
 		public void elementChangeTo(DVNode node, Element e);
 	}
