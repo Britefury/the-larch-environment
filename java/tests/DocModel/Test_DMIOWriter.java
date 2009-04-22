@@ -10,13 +10,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import BritefuryJ.DocModel.DMIORead;
+import junit.framework.TestCase;
+import BritefuryJ.DocModel.DMIOReader;
+import BritefuryJ.DocModel.DMIOWriter;
 import BritefuryJ.DocModel.DMModule;
 import BritefuryJ.DocModel.DMObject;
 import BritefuryJ.DocModel.DMObjectClass;
-import BritefuryJ.DocModel.DMIOWriter;
 import BritefuryJ.DocModel.DMModule.ClassAlreadyDefinedException;
-import junit.framework.TestCase;
 
 public class Test_DMIOWriter extends TestCase
 {
@@ -52,7 +52,7 @@ public class Test_DMIOWriter extends TestCase
 	
 	public void matchTest(Pattern pattern, String input, String expected)
 	{
-		DMIORead.MatchResult res = DMIORead.match( pattern, input, 0 );
+		DMIOReader.MatchResult res = DMIOReader.match( pattern, input, 0 );
 		
 		if ( res.value == null )
 		{
@@ -76,7 +76,7 @@ public class Test_DMIOWriter extends TestCase
 
 	public void matchFailTest(Pattern pattern, String input)
 	{
-		DMIORead.MatchResult res = DMIORead.match( pattern, input, 0 );
+		DMIOReader.MatchResult res = DMIOReader.match( pattern, input, 0 );
 		
 		if ( res.value != null  &&  res.value.equals( input ) )
 		{

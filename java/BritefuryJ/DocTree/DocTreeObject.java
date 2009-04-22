@@ -160,4 +160,16 @@ public class DocTreeObject extends DocTreeNode implements DMObjectInterface
 	{
 		node.__setitem__( key, DocTreeNode.coerce( value ) );
 	}
+
+
+
+	public boolean equals(Object x)
+	{
+		return node.equals( DocTreeNode.coerce( x ) );
+	}
+	
+	public String toString()
+	{
+		return "DocTreeObject<< " + node.toString() + " >>";
+	}
 }

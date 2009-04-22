@@ -9,15 +9,69 @@ package tests.DocTree;
 import java.util.Arrays;
 import java.util.List;
 
-import BritefuryJ.DocModel.DMIORead;
+import junit.framework.TestCase;
+import BritefuryJ.DocModel.DMIOReader;
 import BritefuryJ.DocModel.DMList;
-import BritefuryJ.DocModel.DMIORead.ParseSXErrorException;
+import BritefuryJ.DocModel.DMModule;
+import BritefuryJ.DocModel.DMModuleResolver;
+import BritefuryJ.DocModel.DMObject;
+import BritefuryJ.DocModel.DMObjectClass;
+import BritefuryJ.DocModel.DMIOReader.BadModuleNameException;
+import BritefuryJ.DocModel.DMIOReader.ParseErrorException;
+import BritefuryJ.DocModel.DMModule.UnknownClassException;
+import BritefuryJ.DocModel.DMModuleResolver.CouldNotResolveModuleException;
 import BritefuryJ.DocTree.DocTree;
 import BritefuryJ.DocTree.DocTreeList;
-import junit.framework.TestCase;
+import BritefuryJ.DocTree.DocTreeObject;
 
 public class Test_DocTree extends TestCase
 {
+	private DMModule module;
+	private DMModuleResolver resolver;
+	private DMObjectClass A;
+	
+	
+	public void setUp()
+	{
+		module = new DMModule( "module", "m", "test.module" );
+		try
+		{
+			A = module.newClass( "A", new String[] { "x", "y" } );
+		}
+		catch (DMModule.ClassAlreadyDefinedException e)
+		{
+			throw new RuntimeException();
+		}
+		
+		
+		resolver = new DMModuleResolver()
+		{
+			public DMModule getModule(String location)
+			{
+				if ( location.equals( "test.module" ) )
+				{
+					return module;
+				}
+				else
+				{
+					return null;
+				}
+			}
+		};
+	}
+	
+	
+	public void tearDown()
+	{
+		module = null;
+		resolver = null;
+		A = null;
+	}
+
+	
+	
+	
+	
 	@SuppressWarnings("unchecked")
 	private static Object listRGet(List<Object> xs, int[] is)
 	{
@@ -96,10 +150,9 @@ public class Test_DocTree extends TestCase
 	
 	
 	@SuppressWarnings("unchecked")
-	public void testModifyTree() throws ParseSXErrorException
+	public void testModifyTree() throws ParseErrorException, BadModuleNameException, UnknownClassException, CouldNotResolveModuleException
 	{
-		
-		DMList module = new DMList( (List<Object>)DMIORead.readSX( "(module (expr (add (ref a) (ref b))))" ) );
+		DMList module = new DMList( (List<Object>)DMIOReader.readFromString( "[module [expr [add [ref a] [ref b]]]]", resolver ) );
 		
 		DocTree tree = new DocTree();
 		
@@ -115,10 +168,42 @@ public class Test_DocTree extends TestCase
 		DocTreeList tUnbound = (DocTreeList)((DocTreeList)tIf.get( 1 )).get( 0 );
 		
 		assertEquals( listRGet( module, new int[] { 1, 1, 1, 1, 0 } ), Arrays.asList( new Object[] { "unbound" } ) );
-		assertEquals( module, DMIORead.readSX( "(module (expr (add (if ((unbound))) (ref b))))" ) );
+		assertEquals( module, DMIOReader.readFromString( "[module [expr [add [if [[unbound]]] [ref b]]]]", resolver ) );
 		assertSame( tUnbound.getNode(),  listRGet( module, new int[] { 1, 1, 1, 1, 0 } ) );
 		assertSame( listRGet( tModule, new int[] { 1, 1, 1, 1, 0 } ), tUnbound );
 		assertSame( tUnbound.getParentTreeNode().getParentTreeNode().getParentTreeNode().getParentTreeNode().getParentTreeNode(), tModule );
 		assertEquals( tUnbound.getIndexInParent(), 0 );
+	}
+	
+	
+	
+	@SuppressWarnings("unchecked")
+	public void testEquals() throws ParseErrorException, BadModuleNameException, UnknownClassException, CouldNotResolveModuleException
+	{
+		DMModuleResolver resolver = new DMModuleResolver()
+		{
+			public DMModule getModule(String location) throws CouldNotResolveModuleException
+			{
+				throw new CouldNotResolveModuleException( location );
+			}
+		};
+		
+		DMList xs = new DMList( (List<Object>)DMIOReader.readFromString( "[module [expr [add [ref a] [ref b]]]]", resolver ) );
+		DMList ys = new DMList( (List<Object>)DMIOReader.readFromString( "[module [expr [add [ref a] [ref b]]]]", resolver ) );
+		
+		DocTree tree = new DocTree();
+		
+		DocTreeList tXs = (DocTreeList)tree.treeNode( xs );
+		
+		assertEquals( tXs, ys );
+		assertEquals( ys, tXs );
+
+
+		DMObject a1 = A.newInstance( new Object[] { "a", xs } );
+		DMObject a2 = A.newInstance( new Object[] { "a", ys } );
+		
+		DocTreeObject tA1 = (DocTreeObject)tree.treeNode( a1 );
+		assertEquals( tA1, a2 );
+		assertEquals( a2, tA1 );
 	}
 }

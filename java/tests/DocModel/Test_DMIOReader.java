@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import BritefuryJ.DocModel.DMIORead;
+import junit.framework.TestCase;
 import BritefuryJ.DocModel.DMIOReader;
 import BritefuryJ.DocModel.DMIOWriter;
 import BritefuryJ.DocModel.DMModule;
@@ -19,7 +19,6 @@ import BritefuryJ.DocModel.DMModuleResolver;
 import BritefuryJ.DocModel.DMObject;
 import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMIOWriter.InvalidDataTypeException;
-import junit.framework.TestCase;
 
 public class Test_DMIOReader extends TestCase
 {
@@ -70,7 +69,7 @@ public class Test_DMIOReader extends TestCase
 	
 	public void matchTest(Pattern pattern, String input, String expected)
 	{
-		DMIORead.MatchResult res = DMIORead.match( pattern, input, 0 );
+		DMIOReader.MatchResult res = DMIOReader.match( pattern, input, 0 );
 		
 		if ( res.value == null )
 		{
@@ -94,16 +93,16 @@ public class Test_DMIOReader extends TestCase
 
 	public void matchFailTest(Pattern pattern, String input)
 	{
-		DMIORead.MatchResult res = DMIORead.match( pattern, input, 0 );
+		DMIOReader.MatchResult res = DMIOReader.match( pattern, input, 0 );
 		
-		if ( res.value != null  &&  res.value.equals( input ) )
+		if ( res != null  &&  res.value.equals( input ) )
 		{
 			System.out.println( "MATCH SHOULD HAVE FAILED" );
 			System.out.println( "RESULT: " + res.value );
 		}
 		
 
-		assertTrue( res.value == null  ||  !res.value.equals( input ) );
+		assertTrue( res == null  ||  !res.value.equals( input ) );
 	}
 	
 	
@@ -162,41 +161,41 @@ public class Test_DMIOReader extends TestCase
 	
 	public void testWhitespace()
 	{
-		matchTest( DMIORead.whitespace, " \t\n", " \t\n" );
+		matchTest( DMIOReader.whitespace, " \t\n", " \t\n" );
 	}
 
 	public void testUnquotedString()
 	{
-		matchTest( DMIORead.unquotedString, "abc123ABC_", "abc123ABC_" );
-		matchTest( DMIORead.unquotedString, "abc123ABC_+-*/%^&|!$@.,<>=[]~", "abc123ABC_+-*/%^&|!$@.,<>=[]~" );
-		matchFailTest( DMIORead.unquotedString, "abc123ABC_+-*/%^&|!$@.,<>=[]~(" );
-		matchFailTest( DMIORead.unquotedString, "abc123ABC_+-*/%^&|!$@.,<>=[]~)" );
-		matchFailTest( DMIORead.unquotedString, "abc123ABC_+-*/%^&|!$@.,<>=[]~\"" );
-		matchFailTest( DMIORead.unquotedString, "abc123ABC_+-*/%^&|!$@.,<>=[]~ " );
-		matchFailTest( DMIORead.unquotedString, "abc123ABC_+-*/%^&|!$@.,<>=[]~\t" );
-		matchFailTest( DMIORead.unquotedString, "abc123ABC_+-*/%^&|!$@.,<>=[]~\n" );
-		matchFailTest( DMIORead.unquotedString, "abc123ABC_+-*/%^&|!$@.,<>=[]~\\" );
-		matchFailTest( DMIORead.unquotedString, "abc123ABC_`" );
+		matchTest( DMIOReader.unquotedString, "abc123ABC_", "abc123ABC_" );
+		matchTest( DMIOReader.unquotedString, "abc123ABC_+-*/%^&|!$@.<>~", "abc123ABC_+-*/%^&|!$@.<>~" );
+		matchFailTest( DMIOReader.unquotedString, "abc123ABC_+-*/%^&|!$@.,<>=[]~(" );
+		matchFailTest( DMIOReader.unquotedString, "abc123ABC_+-*/%^&|!$@.,<>=[]~)" );
+		matchFailTest( DMIOReader.unquotedString, "abc123ABC_+-*/%^&|!$@.,<>=[]~\"" );
+		matchFailTest( DMIOReader.unquotedString, "abc123ABC_+-*/%^&|!$@.,<>=[]~ " );
+		matchFailTest( DMIOReader.unquotedString, "abc123ABC_+-*/%^&|!$@.,<>=[]~\t" );
+		matchFailTest( DMIOReader.unquotedString, "abc123ABC_+-*/%^&|!$@.,<>=[]~\n" );
+		matchFailTest( DMIOReader.unquotedString, "abc123ABC_+-*/%^&|!$@.,<>=[]~\\" );
+		matchFailTest( DMIOReader.unquotedString, "abc123ABC_`" );
 	}
 
 	public void testQuotedString()
 	{
-		matchTest( DMIORead.quotedString, "\"abc123ABC_\"", "\"abc123ABC_\"" );
-		matchTest( DMIORead.quotedString, "\"abc123ABC_`\"", "\"abc123ABC_`\"" );
-		matchTest( DMIORead.quotedString, "\"abc123()ABC_\"", "\"abc123()ABC_\"" );
-		matchTest( DMIORead.quotedString, "\"abc123( )ABC_\"", "\"abc123( )ABC_\"" );
-		matchTest( DMIORead.quotedString, "\"abc123(\\\\)ABC_\"", "\"abc123(\\\\)ABC_\"" );
-		matchTest( DMIORead.quotedString, "\"abc123(\\n)ABC_\"", "\"abc123(\\n)ABC_\"" );
-		matchTest( DMIORead.quotedString, "\"abc123(\\r)ABC_\"", "\"abc123(\\r)ABC_\"" );
-		matchTest( DMIORead.quotedString, "\"abc123(\\t)ABC_\"", "\"abc123(\\t)ABC_\"" );
-		matchTest( DMIORead.quotedString, "\"abc123(\\x123abcx)ABC_\"", "\"abc123(\\x123abcx)ABC_\"" );
-		matchFailTest( DMIORead.quotedString, "\"abc123(\\x)ABC_\"" );
-		matchFailTest( DMIORead.quotedString, "\"abc123(\\x123)ABC_\"" );
+		matchTest( DMIOReader.quotedString, "\"abc123ABC_\"", "\"abc123ABC_\"" );
+		matchTest( DMIOReader.quotedString, "\"abc123ABC_`\"", "\"abc123ABC_`\"" );
+		matchTest( DMIOReader.quotedString, "\"abc123()ABC_\"", "\"abc123()ABC_\"" );
+		matchTest( DMIOReader.quotedString, "\"abc123( )ABC_\"", "\"abc123( )ABC_\"" );
+		matchTest( DMIOReader.quotedString, "\"abc123(\\\\)ABC_\"", "\"abc123(\\\\)ABC_\"" );
+		matchTest( DMIOReader.quotedString, "\"abc123(\\n)ABC_\"", "\"abc123(\\n)ABC_\"" );
+		matchTest( DMIOReader.quotedString, "\"abc123(\\r)ABC_\"", "\"abc123(\\r)ABC_\"" );
+		matchTest( DMIOReader.quotedString, "\"abc123(\\t)ABC_\"", "\"abc123(\\t)ABC_\"" );
+		matchTest( DMIOReader.quotedString, "\"abc123(\\x123abcx)ABC_\"", "\"abc123(\\x123abcx)ABC_\"" );
+		matchFailTest( DMIOReader.quotedString, "\"abc123(\\x)ABC_\"" );
+		matchFailTest( DMIOReader.quotedString, "\"abc123(\\x123)ABC_\"" );
 	}
 	
 	public void testHexCharEscape()
 	{
-		Pattern pat = Pattern.compile( DMIORead.hexCharEscape );
+		Pattern pat = Pattern.compile( DMIOReader.hexCharEscape );
 		matchFailTest( pat, "x" );
 		matchTest( pat, "\\x0x", "\\x0x" );
 		matchTest( pat, "\\xAx", "\\xAx" );
@@ -207,7 +206,7 @@ public class Test_DMIOReader extends TestCase
 
 	public void testWhitespaceEscape()
 	{
-		Pattern pat = Pattern.compile( DMIORead.whitespaceEscape );
+		Pattern pat = Pattern.compile( DMIOReader.whitespaceEscape );
 		matchFailTest( pat, "\\x" );
 		matchTest( pat, "\\n", "\\n" );
 		matchTest( pat, "\\r", "\\r" );
@@ -217,7 +216,7 @@ public class Test_DMIOReader extends TestCase
 
 	public void testEscapeSequence()
 	{
-		Pattern pat = Pattern.compile( DMIORead.escapeSequence );
+		Pattern pat = Pattern.compile( DMIOReader.escapeSequence );
 		matchTest( pat, "\\n", "\\n" );
 		matchTest( pat, "\\r", "\\r" );
 		matchTest( pat, "\\t", "\\t" );

@@ -9,16 +9,19 @@ package tests.ParserDebugViewer;
 import java.util.ArrayList;
 import java.util.Map;
 
-import BritefuryJ.DocModel.DMIORead;
-import BritefuryJ.DocModel.DMIORead.ParseSXErrorException;
-import BritefuryJ.PatternMatch.Forward;
-import BritefuryJ.PatternMatch.Production;
+import BritefuryJ.DocModel.DMIOReader;
+import BritefuryJ.DocModel.DMIOReader.BadModuleNameException;
+import BritefuryJ.DocModel.DMIOReader.ParseErrorException;
+import BritefuryJ.DocModel.DMModule.UnknownClassException;
+import BritefuryJ.DocModel.DMModuleResolver.CouldNotResolveModuleException;
 import BritefuryJ.ParserDebugViewer.ParseViewFrame;
 import BritefuryJ.PatternMatch.Anything;
 import BritefuryJ.PatternMatch.Choice;
 import BritefuryJ.PatternMatch.DebugMatchResult;
+import BritefuryJ.PatternMatch.Forward;
 import BritefuryJ.PatternMatch.MatchAction;
 import BritefuryJ.PatternMatch.MatchExpression;
+import BritefuryJ.PatternMatch.Production;
 import BritefuryJ.PatternMatch.RegEx;
 
 public class PatternMatchDebugViewerTest
@@ -26,10 +29,10 @@ public class PatternMatchDebugViewerTest
 	static MatchExpression identifier = new RegEx( "[A-Za-z_][A-Za-z0-9_]*" );
 
 	
-	public static void main(final String[] args) throws ParseSXErrorException
+	public static void main(final String[] args) throws ParseErrorException, BadModuleNameException, UnknownClassException, CouldNotResolveModuleException
 	{
-		String inputSX = "(call (getAttr (getAttr (call (getAttr (load x) blah) (params)) foo) blah) (params))";
-		Object input = DMIORead.readSX( inputSX );
+		String inputSX = "[call [getAttr [getAttr [call [getAttr [load x] blah] [params]] foo] blah] [params]]";
+		Object input = DMIOReader.readFromString( inputSX, null );
 		MatchExpression parser = buildParser();
 		DebugMatchResult result = parser.debugParseNode( input );
 		new ParseViewFrame( result );

@@ -446,10 +446,10 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable
 	
 	public boolean equals(Object x)
 	{
-		if ( x instanceof DMObject )
+		if ( x instanceof DMObjectInterface )
 		{
-			DMObject dx = (DMObject)x;
-			if ( dx.objClass == objClass )
+			DMObjectInterface dx = (DMObjectInterface)x;
+			if ( dx.getDMClass() == objClass )
 			{
 				for (int i = 0; i < objClass.getNumFields(); i++)
 				{

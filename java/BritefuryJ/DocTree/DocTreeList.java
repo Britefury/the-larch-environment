@@ -362,4 +362,10 @@ public class DocTreeList extends DocTreeNode implements DMListInterface
 	{
 		return node.__rmul__( n );
 	}
+	
+	
+	public String toString()
+	{
+		return "DocTreeList<< " + node.toString() + " >>";
+	}
 }
