@@ -128,6 +128,7 @@ public class DocView implements DVNode.NodeRefreshListener
 	
 	private void performRefresh()
 	{
+		elementChangeListener.reset( this );
 		getRootView().refresh();
 		
 		// Clear unused entries from the node table
