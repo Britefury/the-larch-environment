@@ -38,6 +38,6 @@ public class WhitespaceElement extends EditableLeafElement
 	
 	public DPWidget createMetaHeaderData()
 	{
-		return new DPText( "'" + content.replace( "\n", "\\n" ) + "'" );
+		return new DPText( "'" + textRepresentation.replace( "\n", "\\n" ) + "'" );
 	}
 }

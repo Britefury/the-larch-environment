@@ -12,7 +12,7 @@ import BritefuryJ.DocPresent.StyleSheets.WidgetStyleSheet;
 
 public class HiddenContentElement extends EmptyElement
 {
-	private String content;
+	private String textRepresentation;
 	
 	
 	public HiddenContentElement()
@@ -30,11 +30,11 @@ public class HiddenContentElement extends EmptyElement
 		this( WidgetStyleSheet.defaultStyleSheet, content );
 	}
 	
-	public HiddenContentElement(WidgetStyleSheet styleSheet, String content)
+	public HiddenContentElement(WidgetStyleSheet styleSheet, String textRepresentation)
 	{
 		super( new DPEmpty( styleSheet ) );
 		
-		this.content = content;
+		this.textRepresentation = textRepresentation;
 	}
 	
 	
@@ -50,22 +50,22 @@ public class HiddenContentElement extends EmptyElement
 
 	//
 	//
-	// CONTENT METHODS
+	// TEXT REPRESENTATION METHODS
 	//
 	//
 	
-	protected void getSubtreeContent(StringBuilder builder)
+	protected void computeSubtreeTextRepresentation(StringBuilder builder)
 	{
-		builder.append( content );
+		builder.append( textRepresentation );
 	}
 	
-	public int getContentLength()
+	public int getTextRepresentationLength()
 	{
-		return content.length();
+		return textRepresentation.length();
 	}
 	
-	public void setContent(String x)
+	public void setTextRepresentation(String x)
 	{
-		content = x;
+		textRepresentation = x;
 	}
 }

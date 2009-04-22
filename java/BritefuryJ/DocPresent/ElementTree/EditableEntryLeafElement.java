@@ -14,9 +14,9 @@ public class EditableEntryLeafElement extends EditableLeafElement
 	// Constructor
 	//
 	
-	protected EditableEntryLeafElement(DPContentLeafEditableEntry widget, String content)
+	protected EditableEntryLeafElement(DPContentLeafEditableEntry widget, String textRepresentation)
 	{
-		super( widget, content );
+		super( widget, textRepresentation );
 	}
 	
 	

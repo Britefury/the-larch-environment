@@ -58,7 +58,7 @@ public abstract class NodeElementChangeListenerDiff implements DVNode.NodeElemen
 			ElementTree tree = nodeElement.getElementTree();
 			ElementCaret caret = tree.getCaret();
 
-			String text = nodeElement.getContent();
+			String text = nodeElement.getTextRepresentation();
 			
 			try
 			{
@@ -88,8 +88,7 @@ public abstract class NodeElementChangeListenerDiff implements DVNode.NodeElemen
 			// Ensure that only the inner-most recursion level handles the caret
 			if ( nodeElement != null  &&  position != -1 )
 			{
-				System.out.println( "CURSOR POSITION CHANGE" );
-				String newTextRepresentation = nodeElement.getContent();
+				String newTextRepresentation = nodeElement.getTextRepresentation();
 				
 				int newPosition = position;
 				Marker.Bias newBias = bias;
@@ -202,7 +201,7 @@ public abstract class NodeElementChangeListenerDiff implements DVNode.NodeElemen
 				}
 				
 				
-				LeafElement leaf = nodeElement.getLeafAtContentPosition( newPosition );
+				LeafElement leaf = nodeElement.getLeafAtTextRepresentationPosition( newPosition );
 				if ( leaf != null )
 				{
 					int leafOffset = -1;
@@ -212,7 +211,7 @@ public abstract class NodeElementChangeListenerDiff implements DVNode.NodeElemen
 					}
 					else
 					{
-						leafOffset = leaf.getContentOffsetInSubtree( (BranchElement)nodeElement );
+						leafOffset = leaf.getTextRepresentationOffsetInSubtree( (BranchElement)nodeElement );
 					}
 					int leafPosition = newPosition - leafOffset;
 					
@@ -231,7 +230,7 @@ public abstract class NodeElementChangeListenerDiff implements DVNode.NodeElemen
 						
 						// First, we must decide whether we should search backwards or forwards
 						Direction direction = Direction.DIR_NONE;
-						String leafTextRepresentation = leaf.getContent();
+						String leafTextRepresentation = leaf.getTextRepresentation();
 						int leafTextReprLength = leafTextRepresentation.length();
 						
 						if ( leafTextRepresentation.contains( "\n" ) )

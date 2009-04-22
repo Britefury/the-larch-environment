@@ -189,27 +189,27 @@ public abstract class CollatableBranchElement extends BranchElement
 	// Content methods
 	//
 
-	protected void getSubtreeContent(StringBuilder builder)
+	protected void computeSubtreeTextRepresentation(StringBuilder builder)
 	{
 		for (Element child: getChildren())
 		{
-			child.getSubtreeContent( builder );
+			child.computeSubtreeTextRepresentation( builder );
 		}
 	}
 	
-	public int getContentLength()
+	public int getTextRepresentationLength()
 	{
 		int result = 0;
 		
 		for (Element child: getChildren())
 		{
-			result += child.getContentLength();
+			result += child.getTextRepresentationLength();
 		}
 		
 		return result;
 	}
 	
-	public DPWidget getWidgetAtContentStart()
+	public DPWidget getWidgetAtTextRepresentationStart()
 	{
 		if ( collationMode ==  CollationMode.ROOT )
 		{
@@ -220,7 +220,7 @@ public abstract class CollatableBranchElement extends BranchElement
 			List<Element> ch = getChildren();
 			if ( ch.size() > 0 )
 			{
-				return ch.get( 0 ).getWidgetAtContentStart();
+				return ch.get( 0 ).getWidgetAtTextRepresentationStart();
 			}
 			else
 			{
@@ -240,8 +240,8 @@ public abstract class CollatableBranchElement extends BranchElement
 	
 	public ElementMarker marker(int position, Marker.Bias bias)
 	{
-		Element child = getChildAtContentPosition( position );
-		return child.marker( position - getContentOffsetOfChild( child ), bias );
+		Element child = getChildAtTextRepresentationPosition( position );
+		return child.marker( position - getTextRepresentationOffsetOfChild( child ), bias );
 	}
 	
 	public ElementMarker markerAtStart()
@@ -273,8 +273,8 @@ public abstract class CollatableBranchElement extends BranchElement
 	
 	public void moveMarker(ElementMarker m, int position, Marker.Bias bias)
 	{
-		Element child = getChildAtContentPosition( position );
-		child.moveMarker( m, position - getContentOffsetOfChild( child ), bias );
+		Element child = getChildAtTextRepresentationPosition( position );
+		child.moveMarker( m, position - getTextRepresentationOffsetOfChild( child ), bias );
 	}
 	
 	public void moveMarkerToStart(ElementMarker m)

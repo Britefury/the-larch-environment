@@ -95,19 +95,19 @@ public class MathRootElement extends BranchElement
 	// Content methods
 	//
 	
-	protected void getSubtreeContent(StringBuilder builder)
+	protected void computeSubtreeTextRepresentation(StringBuilder builder)
 	{
 		if ( child != null )
 		{
-			child.getSubtreeContent( builder );
+			child.computeSubtreeTextRepresentation( builder );
 		}
 	}
 
-	public int getContentLength()
+	public int getTextRepresentationLength()
 	{
 		if ( child != null )
 		{
-			return child.getContentLength();
+			return child.getTextRepresentationLength();
 		}
 		else
 		{

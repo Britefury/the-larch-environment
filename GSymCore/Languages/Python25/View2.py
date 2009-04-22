@@ -145,7 +145,7 @@ class _ListenerTable (object):
 		
 	
 	
-class ParsedExpressionContentListener (ElementContentListener):
+class ParsedExpressionContentListener (ElementTextRepresentationListener):
 	__slots__ = [ '_parser', '_outerPrecedence' ]
 	
 	def __init__(self, parser, outerPrecedence, node=None):
@@ -153,8 +153,8 @@ class ParsedExpressionContentListener (ElementContentListener):
 		self._parser = parser
 		self._outerPrecedence = outerPrecedence
 
-	def contentModified(self, element):
-		value = element.getContent()
+	def textRepresentationModified(self, element):
+		value = element.getTextRepresentation()
 		ctx = element.getContext()
 		node = ctx.getTreeNode()
 		if '\n' not in value:
@@ -192,7 +192,7 @@ def _isCompoundStmt(node):
 
 
 
-class LineContentListenerWithParser (ElementContentListener):
+class LineContentListenerWithParser (ElementTextRepresentationListener):
 	__slots__ = [ '_parser' ]
 
 	
@@ -230,11 +230,11 @@ class LineContentListenerWithParser (ElementContentListener):
 	
 	
 class ParsedLineContentListener (LineContentListenerWithParser):
-	def contentModified(self, element):
+	def textRepresentationModified(self, element):
 		ctx = element.getContext()
 		node = ctx.getTreeNode()
 		# Get the content
-		value = element.getContent()
+		value = element.getTextRepresentation()
 		self.handleContent( ctx, node, value )
 
 
@@ -281,15 +281,15 @@ class NewLineContentListener (LineContentListenerWithParser):
 		self._after = after
 
 		
-	def contentModified(self, element):
+	def textRepresentationModified(self, element):
 		# Get the content
-		value = element.getContent()
+		value = element.getTextRepresentation()
 		ctx = element.getContext()
 		node = ctx.getTreeNode()
 		if value == '':
 			# Newline has been deleted
-			beforeContent = self._before.getContent()
-			afterContent = self._after.getContent()   if self._after is not None   else   ''
+			beforeContent = self._before.getTextRepresentation()
+			afterContent = self._after.getTextRepresentation()   if self._after is not None   else   ''
 			
 			endIndex = self._index + 2   if self._after is not None   else   self._index + 1
 			
@@ -498,7 +498,7 @@ def suiteView(ctx, suite, parser):
 
 
 def printElem(elem, level):
-	print '  ' * level, elem, elem.getContent()
+	print '  ' * level, elem, elem.getTextRepresentation()
 	if isinstance( elem, BranchElement ):
 		for x in elem.getChildren():
 			printElem( x, level + 1 )

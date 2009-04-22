@@ -82,21 +82,21 @@ public abstract class SequenceBranchElement extends BranchElement
 	}
 	
 	
-	protected void getSubtreeContent(StringBuilder builder)
+	protected void computeSubtreeTextRepresentation(StringBuilder builder)
 	{
 		for (Element child: children)
 		{
-			child.getSubtreeContent( builder );
+			child.computeSubtreeTextRepresentation( builder );
 		}
 	}
 	
-	public int getContentLength()
+	public int getTextRepresentationLength()
 	{
 		int length = 0;
 		
 		for (Element child: children)
 		{
-			length += child.getContentLength();
+			length += child.getTextRepresentationLength();
 		}
 		
 		return length;

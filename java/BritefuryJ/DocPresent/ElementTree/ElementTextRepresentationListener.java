@@ -7,7 +7,7 @@
 //##************************
 package BritefuryJ.DocPresent.ElementTree;
 
-public interface ElementContentListener
+public interface ElementTextRepresentationListener
 {
-	public boolean contentModified(Element element);
+	public boolean textRepresentationModified(Element element);
 }
