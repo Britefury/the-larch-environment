@@ -251,9 +251,16 @@ class ParsedLineContentListener (LineContentListenerWithParser):
 			else:
 				parsedLines.extend( originalContents )
 				
-		if len( parsedLines ) == 1  and  parsedLines[0] == node:
-			# Same data; ignore
-			pass
+		if len( parsedLines ) == 1:
+			print '1 line'
+			print parsedLines[0]
+			print node
+			if node == parsedLines[0]:
+				# Same data; ignore
+				print 'NO CHANGE'
+				pass
+			else:
+				replace( ctx, node, parsedLines[0] )
 		else:
 			replaceWithRange( ctx, node, parsedLines )
 
