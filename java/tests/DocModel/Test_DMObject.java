@@ -295,9 +295,14 @@ public class Test_DMObject extends TestCase
 	public void test_equals() throws ClassAlreadyDefinedException
 	{
 		DMObjectClass A = m.newClass( "A", new String[] { "x", "y" } );
-		DMObject c0 = A.newInstance( new Object[] { "c", "r" } );
-		DMObject c1 = A.newInstance( new Object[] { "c", "r" } );
 		
-		assertEquals( c0, c1 );
+		DMObject c0 = A.newInstance( new Object[] { "c", "r" } );
+		DMObject c0D = A.newInstance( new Object[] { "c", "r" } );
+		
+		DMObject c1 = A.newInstance( new Object[] { "c", c0 } );
+		DMObject c1D = A.newInstance( new Object[] { "c", c0D } );
+
+		assertEquals( c0, c0D );
+		assertEquals( c1, c1D );
 	}
 }

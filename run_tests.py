@@ -19,7 +19,6 @@ import Britefury.Tests.BritefuryJ.Parser.Utils.Operators
 import Britefury.Tests.BritefuryJ.PatternMatch.Test_PatternMatcher
 import Britefury.Tests.Britefury.Grammar.Grammar
 import Britefury.Tests.Britefury.Dispatch.TestObjectNodeMethodDispatch
-import GSymCore.Languages.Python25.CodeGenerator
 import GSymCore.Languages.Python25.CodeGenerator2
 import GSymCore.Languages.Python25.Parser3
 import GSymCore.Languages.Python25.Python25Importer2
@@ -35,7 +34,6 @@ testModules = [ Britefury.Dispatch.Dispatch,
 		Britefury.Transformation.Transformation,
 		Britefury.Tests.BritefuryJ.Parser.Utils.Operators, Britefury.Tests.BritefuryJ.PatternMatch.Test_PatternMatcher,
 		Britefury.Tests.Britefury.Grammar.Grammar, Britefury.Tests.Britefury.Dispatch.TestObjectNodeMethodDispatch,
-		#GSymCore.Languages.Python25.CodeGenerator,
 		GSymCore.Languages.Python25.CodeGenerator2,
 		GSymCore.Languages.Python25.Parser3,
 		GSymCore.Languages.Python25.Python25Importer2,
