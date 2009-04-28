@@ -5,12 +5,11 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from BritefuryJ.DocModel import DefaultIdentityFunction
+from BritefuryJ.Transformation import DefaultIdentityTransformationFunction, Transformation, TransformationFunction
 
 from Britefury.Dispatch.ObjectNodeMethodDispatch import ObjectNodeMethodDispatchMetaClass, ObjectNodeDispatchMethod, objectNodeMethodDispatch
 from Britefury.Dispatch.Dispatch import DispatchError
 from Britefury.Util.NodeUtil import isNullNode, isStringNode, makeNullNode
-from Britefury.Transformation import Transformation
 
 from GSymCore.Languages.Python25 import NodeClasses as Nodes
 
@@ -195,7 +194,7 @@ class NodeRightAssociativity (object):
 		return True
 
 
-_identity = DefaultIdentityFunction()
+_identity = DefaultIdentityTransformationFunction()
 _precedence = NodePrecedence()
 _rightAssoc = NodeRightAssociativity()
 def _updatedNodeCopy(node, xform, **fieldValues):
@@ -305,7 +304,10 @@ class RemoveUnNeededParensXform (object):
 	
 	
 	def __call__(self, node, xform):
-		return objectNodeMethodDispatch( self, node, xform )
+		try:
+			return objectNodeMethodDispatch( self, node, xform )
+		except DispatchError:
+			return TransformationFunction.cannotApplyTransformationValue
 	
 	@ObjectNodeDispatchMethod
 	def ComprehensionFor(self, xform, node):
@@ -352,7 +354,7 @@ class RemoveUnNeededParensXform (object):
 		return _transformOpMulti( node, xform, PRECEDENCE_CONTAINER_CONDITIONALEXPR, [ 'expr', 'condition' ] )
 
 	
-_removeParensXform = Transformation.Transformation( _identity, [ RemoveUnNeededParensXform() ] )
+_removeParensXform = Transformation( _identity, [ RemoveUnNeededParensXform() ] )
 
 def removeUnNeededParens(node, outerPrecedence):
 	x = _removeParensXform( DMNode.coerce( node ) )

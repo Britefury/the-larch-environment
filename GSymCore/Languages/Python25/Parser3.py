@@ -8,11 +8,13 @@
 
 import string
 
-from BritefuryJ.DocModel import DMObject, DMNode, DefaultIdentityFunction
+from BritefuryJ.DocModel import DMObject, DMNode
 
 from BritefuryJ.Parser import Action, Condition, Forward, Production, Suppress, Literal, Keyword, RegEx, Word, Sequence, Combine, Choice, Optional, Repetition, ZeroOrMore, OneOrMore, Peek, PeekNot, SeparatedList
 from BritefuryJ.Parser.Utils.Tokens import identifier, decimalInteger, hexInteger, integer, singleQuotedString, doubleQuotedString, quotedString, floatingPoint
 from BritefuryJ.Parser.Utils.OperatorParser import Prefix, Suffix, InfixLeft, InfixRight, InfixChain, PrecedenceLevel, OperatorTable
+
+from BritefuryJ.Transformation import DefaultIdentityTransformationFunction
 
 from Britefury.Tests.BritefuryJ.Parser.ParserTestCase import ParserTestCase
 
@@ -37,7 +39,7 @@ import GSymCore.Languages.Python25.NodeClasses as Nodes
 #
 
 
-_identity = DefaultIdentityFunction()
+_identity = DefaultIdentityTransformationFunction()
 def _updatedNodeCopy(node, xform, **fieldValues):
 	newNode = _identity( node, xform )
 	newNode.update( fieldValues )
@@ -45,7 +47,7 @@ def _updatedNodeCopy(node, xform, **fieldValues):
 
 
 def _incrementParens(node):
-	def _xform(node):
+	def _xform(node, innerNodeXform):
 		return node
 	p = node['parens']
 	numParens = 0
