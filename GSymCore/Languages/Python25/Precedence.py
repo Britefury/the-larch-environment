@@ -245,8 +245,12 @@ def _transformBinOp(node, xform):
 	if bXParens  or  bYParens:
 		if bXParens:
 			x = _decrementParens( x, xform )
+		else:
+			x = xform( x, xform )
 		if bYParens:
 			y = _decrementParens( y, xform )
+		else:
+			y = xform( y, xform )
 		result = _updatedNodeCopy( node, xform, x=x, y=y )
 		return result
 	else:
@@ -258,7 +262,8 @@ def _transformOp(node, xform, outerPrec, fieldName):
 	bParens = _areParensRequired( value, outerPrec )
 	if bParens:
 		value = _decrementParens( value, xform )
-		return _updatedNodeCopy( node, xform, **{ fieldName : value } )
+		result = _updatedNodeCopy( node, xform, **{ fieldName : value } )
+		return result
 	else:
 		raise DispatchError
 
@@ -425,6 +430,12 @@ class Test_Precedence (unittest.TestCase):
 		self._matchTest( self._parser.expression(), '(a+b)/(a+b)', Nodes.Div( x=Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ), y=Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) ) )
 		self._matchTest( self._parser.expression(), '(a+b)/(c+d)+e', Nodes.Add( x=Nodes.Div( x=Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ), y=Nodes.Add( x=Nodes.Load( name='c' ), y=Nodes.Load( name='d' ) ) ), y=Nodes.Load( name='e' ) ) )
 		self._matchTest( self._parser.expression(), '((a+b)/(a+b)+c)*x', Nodes.Mul( x=Nodes.Add( x=Nodes.Div( x=Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ), y=Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) ), y=Nodes.Load( name='c' ) ), y=Nodes.Load( name='x' ) ) )
+		self._matchTest( self._parser.expression(), '(a/b)*(c+d)', Nodes.Mul( x=Nodes.Div( parens='1', x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ), y=Nodes.Add( x=Nodes.Load( name='c' ), y=Nodes.Load( name='d' ) ) ) )
+		self._matchTest( self._parser.expression(), '-(a+b)', Nodes.Negate( x=Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) ) )	
+		self._matchTest( self._parser.expression(), '-(a/b)', Nodes.Negate( x=Nodes.Div( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) ) )	
+		self._matchTest( self._parser.expression(), '-a*b', Nodes.Mul( x=Nodes.Negate( x=Nodes.Load( name='a' ) ), y=Nodes.Load( name='b' ) ) )
+		self._matchTest( self._parser.expression(), '-(a/b)*c', Nodes.Mul( x=Nodes.Negate( x=Nodes.Div( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) ), y=Nodes.Load( name='c' ) ) )
+		self._matchTest( self._parser.expression(), '-(a/b)*(c+d)', Nodes.Mul( x=Nodes.Negate( x=Nodes.Div( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) ), y=Nodes.Add( x=Nodes.Load( name='c' ), y=Nodes.Load( name='d' ) ) ) )
 		
 		
 	def test_LambdaConditional(self):

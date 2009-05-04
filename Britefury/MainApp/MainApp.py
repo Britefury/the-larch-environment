@@ -48,7 +48,7 @@ from Britefury.MainApp.LocationBar import LocationBar, LocationBarListener
 
 
 
-_bProfile = True
+_bProfile = False
 
 
 
