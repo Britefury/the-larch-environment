@@ -271,32 +271,21 @@ public class SegmentElement extends BranchElement implements CollatedElementInte
 	
 	
 	//
-	// Content methods
+	// Text representation methods
 	//
 	
-	protected void computeSubtreeTextRepresentation(StringBuilder builder)
+	protected String computeSubtreeTextRepresentation()
 	{
+		StringBuilder builder = new StringBuilder();
 		List<Element> ch = getChildren();
-		
 		if ( ch.size() > 0 )
 		{
-			for (Element c: ch)
+			for (Element child: ch)
 			{
-				c.computeSubtreeTextRepresentation( builder );
+				builder.append( child.getTextRepresentation() );
 			}
 		}
-	}
-
-	public int getTextRepresentationLength()
-	{
-		List<Element> ch = getChildren();
-		int length = 0;
-		
-		for (Element c: ch)
-		{
-			length += c.getTextRepresentationLength();
-		}
-		return length;
+		return builder.toString();
 	}
 	
 	

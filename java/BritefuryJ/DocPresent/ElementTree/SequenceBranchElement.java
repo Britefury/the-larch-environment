@@ -82,23 +82,20 @@ public abstract class SequenceBranchElement extends BranchElement
 	}
 	
 	
-	protected void computeSubtreeTextRepresentation(StringBuilder builder)
-	{
-		for (Element child: children)
-		{
-			child.computeSubtreeTextRepresentation( builder );
-		}
-	}
 	
-	public int getTextRepresentationLength()
+	
+	
+	//
+	// Text representation methods
+	//
+	
+	protected String computeSubtreeTextRepresentation()
 	{
-		int length = 0;
-		
+		StringBuilder builder = new StringBuilder();
 		for (Element child: children)
 		{
-			length += child.getTextRepresentationLength();
+			builder.append( child.getTextRepresentation() );
 		}
-		
-		return length;
+		return builder.toString();
 	}
 }

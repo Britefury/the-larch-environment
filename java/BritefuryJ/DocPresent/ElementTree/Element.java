@@ -294,9 +294,18 @@ public abstract class Element
 	protected void textRepresentationChanged()
 	{
 		onTextRepresentationModified();
+		onTextRepresentationModifiedEvent();
 	}
 	
-	protected boolean onTextRepresentationModified()
+	protected void onTextRepresentationModified()
+	{
+		if ( parent != null )
+		{
+			parent.onTextRepresentationModified();
+		}
+	}
+	
+	protected boolean onTextRepresentationModifiedEvent()
 	{
 		if ( contentListener != null )
 		{
@@ -308,13 +317,11 @@ public abstract class Element
 		
 		if ( parent != null )
 		{
-			return parent.onChildTextRepresentationModified( this );
+			return parent.onChildTextRepresentationModifiedEvent( this );
 		}
 		
 		return false;
 	}
-	
-	
 	
 	public DPWidget getWidgetAtTextRepresentationStart()
 	{
@@ -322,14 +329,7 @@ public abstract class Element
 	}
 	
 		
-	public String getTextRepresentation()
-	{
-		StringBuilder builder = new StringBuilder();
-		computeSubtreeTextRepresentation( builder );
-		return builder.toString();
-	}
-	
-	protected abstract void computeSubtreeTextRepresentation(StringBuilder builder);
+	public abstract String getTextRepresentation();
 	public abstract int getTextRepresentationLength();
 
 

@@ -11,7 +11,7 @@ import org.python.core.PyObject;
 
 public abstract class TransformationFunction
 {
-	public static class PyTransformationFunction extends TransformationFunction
+	protected static class PyTransformationFunction extends TransformationFunction
 	{
 		private PyObject callable;
 		
@@ -35,7 +35,7 @@ public abstract class TransformationFunction
 	{
 	}
 	
-	public static CannotApplyTransformationValue cannotApplyTransformationValue;
+	public static CannotApplyTransformationValue cannotApplyTransformationValue = new CannotApplyTransformationValue();
 	
 
 	
