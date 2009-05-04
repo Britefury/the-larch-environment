@@ -186,29 +186,19 @@ public abstract class CollatableBranchElement extends BranchElement
 	
 	
 	//
-	// Content methods
+	// Text representation methods
 	//
 
-	protected void computeSubtreeTextRepresentation(StringBuilder builder)
+	protected String computeSubtreeTextRepresentation()
 	{
+		StringBuilder builder = new StringBuilder();
 		for (Element child: getChildren())
 		{
-			child.computeSubtreeTextRepresentation( builder );
+			builder.append( child.getTextRepresentation() );
 		}
+		return builder.toString();
 	}
-	
-	public int getTextRepresentationLength()
-	{
-		int result = 0;
-		
-		for (Element child: getChildren())
-		{
-			result += child.getTextRepresentationLength();
-		}
-		
-		return result;
-	}
-	
+
 	public DPWidget getWidgetAtTextRepresentationStart()
 	{
 		if ( collationMode ==  CollationMode.ROOT )

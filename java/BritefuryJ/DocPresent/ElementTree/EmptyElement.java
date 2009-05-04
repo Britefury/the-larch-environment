@@ -36,8 +36,9 @@ public class EmptyElement extends Element
 	
 	
 	
-	protected void computeSubtreeTextRepresentation(StringBuilder builder)
+	public String getTextRepresentation()
 	{
+		return "";
 	}
 	
 	public int getTextRepresentationLength()

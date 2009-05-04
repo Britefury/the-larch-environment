@@ -92,26 +92,11 @@ public class MathRootElement extends BranchElement
 	
 	
 	//
-	// Content methods
+	// Text representation methods
 	//
 	
-	protected void computeSubtreeTextRepresentation(StringBuilder builder)
+	protected String computeSubtreeTextRepresentation()
 	{
-		if ( child != null )
-		{
-			child.computeSubtreeTextRepresentation( builder );
-		}
-	}
-
-	public int getTextRepresentationLength()
-	{
-		if ( child != null )
-		{
-			return child.getTextRepresentationLength();
-		}
-		else
-		{
-			return 0;
-		}
+		return child != null  ?  child.getTextRepresentation()  :  "";
 	}
 }

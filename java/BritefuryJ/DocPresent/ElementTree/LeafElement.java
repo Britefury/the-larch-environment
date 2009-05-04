@@ -194,9 +194,9 @@ public abstract class LeafElement extends Element
 	// Content methods
 	//
 	
-	protected void computeSubtreeTextRepresentation(StringBuilder builder)
+	public String getTextRepresentation()
 	{
-		builder.append( textRepresentation );
+		return textRepresentation;
 	}
 	
 	public int getTextRepresentationLength()

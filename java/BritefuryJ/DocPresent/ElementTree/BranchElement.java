@@ -19,6 +19,8 @@ import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
 public abstract class BranchElement extends Element
 {
+	public String cachedTextRep;
+	
 	//
 	// Constructor
 	//
@@ -26,6 +28,7 @@ public abstract class BranchElement extends Element
 	protected BranchElement(DPContainer widget)
 	{
 		super( widget );
+		cachedTextRep = null;
 	}
 
 
@@ -72,6 +75,8 @@ public abstract class BranchElement extends Element
 	
 	protected void onSubtreeStructureChanged()
 	{
+		cachedTextRep = null;
+		
 		if ( parent != null )
 		{
 			parent.onSubtreeStructureChanged();
@@ -261,10 +266,36 @@ public abstract class BranchElement extends Element
 	}
 	
 	
-	protected boolean onChildTextRepresentationModified(Element child)
+	protected boolean onChildTextRepresentationModifiedEvent(Element child)
 	{
-		return onTextRepresentationModified();
+		return onTextRepresentationModifiedEvent();
 	}
+	
+	
+	public void onTextRepresentationModified()
+	{
+		cachedTextRep = null;
+		super.onTextRepresentationModified();
+	}
+	
+	
+	public String getTextRepresentation()
+	{
+		if ( cachedTextRep == null )
+		{
+			cachedTextRep = computeSubtreeTextRepresentation();
+		}
+		return cachedTextRep;
+	}
+	
+	public int getTextRepresentationLength()
+	{
+		return getTextRepresentation().length();
+	}
+	
+	
+	protected abstract String computeSubtreeTextRepresentation();
+	
 
 
 

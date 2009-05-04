@@ -189,26 +189,16 @@ public class FractionElement extends BranchElement
 
 
 	//
-	// Content methods
+	// Text representation methods
 	//
 	
-	protected void computeSubtreeTextRepresentation(StringBuilder builder)
+	protected String computeSubtreeTextRepresentation()
 	{
+		StringBuilder builder = new StringBuilder();
 		for (Element child: getChildren())
 		{
-			child.computeSubtreeTextRepresentation( builder );
+			builder.append( child.getTextRepresentation() );
 		}
-	}
-	
-	public int getTextRepresentationLength()
-	{
-		int length = 0;
-		
-		for (Element child: getChildren())
-		{
-			length += child.getTextRepresentationLength();
-		}
-		
-		return length;
+		return builder.toString();
 	}
 }

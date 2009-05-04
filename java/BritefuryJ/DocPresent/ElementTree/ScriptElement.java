@@ -189,33 +189,20 @@ public class ScriptElement extends BranchElement
 
 
 	//
-	// Content methods
+	// Text representation methods
 	//
 	
-	protected void computeSubtreeTextRepresentation(StringBuilder builder)
+	protected String computeSubtreeTextRepresentation()
 	{
+		StringBuilder builder = new StringBuilder();
 		for (int slot = 0; slot < NUMCHILDREN; slot++)
 		{
 			if ( segments[slot] != null )
 			{
-				segments[slot].computeSubtreeTextRepresentation( builder );
+				builder.append( segments[slot].getTextRepresentation() );
 			}
 		}
-	}
-	
-	public int getTextRepresentationLength()
-	{
-		int length = 0;
-		
-		for (int slot = 0; slot < NUMCHILDREN; slot++)
-		{
-			if ( segments[slot] != null )
-			{
-				length += segments[slot].getTextRepresentationLength();
-			}
-		}
-		
-		return length;
+		return builder.toString();
 	}
 
 
