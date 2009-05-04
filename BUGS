@@ -23,21 +23,3 @@ Comparing subtrees does not seem to work
 
 
 
-2009/May/04 - SolveCubic.py
-=========================
-
-type:
-
-x=-(a/b)*(x+y)
-
-extra parens are added on each edit
-
-
-
-2009/May/04 - Editing expressions
-=============================
-
-Editing a statement when replaceNodeContents() is used instead of
-replace(), does not replace the statement properly
-
-
