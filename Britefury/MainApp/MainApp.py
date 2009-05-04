@@ -48,6 +48,10 @@ from Britefury.MainApp.LocationBar import LocationBar, LocationBarListener
 
 
 
+_bProfile = True
+
+
+
 
 
 class GSymScriptEnvironment (object):
@@ -117,15 +121,17 @@ class MainAppDocView (DocView.RefreshListener):
 			
 	def _refreshView(self):
 		if self._view is not None:
-			#t1 = datetime.now()
-			#ProfileTimer.initProfiling()
-			#self._view.beginProfiling()
+			if _bProfile:
+				t1 = datetime.now()
+				ProfileTimer.initProfiling()
+				self._view.beginProfiling()
 			self._view.refresh()
-			#t2 = datetime.now()
-			#self._view.endProfiling()
-			#ProfileTimer.shutdownProfiling()
-			#print 'MainApp: REFRESH VIEW TIME = ', t2 - t1
-			#print 'MainApp: REFRESH VIEW PROFILE: JAVA TIME = %f, ELEMENT CREATE TIME = %f, PYTHON TIME = %f, CONTENT CHANGE TIME = %f, UPDATE NODE ELEMENT TIME = %f'  %  ( self._view.getJavaTime(), self._view.getElementTime(), self._view.getPythonTime(), self._view.getContentChangeTime(), self._view.getUpdateNodeElementTime() )
+			if _bProfile:
+				t2 = datetime.now()
+				self._view.endProfiling()
+				ProfileTimer.shutdownProfiling()
+				print 'MainApp: REFRESH VIEW TIME = ', t2 - t1
+				print 'MainApp: REFRESH VIEW PROFILE: JAVA TIME = %f, ELEMENT CREATE TIME = %f, PYTHON TIME = %f, CONTENT CHANGE TIME = %f, UPDATE NODE ELEMENT TIME = %f'  %  ( self._view.getJavaTime(), self._view.getElementTime(), self._view.getPythonTime(), self._view.getContentChangeTime(), self._view.getUpdateNodeElementTime() )
 
 	def _queueRefresh(self):
 		class Run (Runnable):
