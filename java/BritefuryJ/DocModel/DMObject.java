@@ -236,16 +236,22 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable
 	
 	public DMObjectClass getDMClass()
 	{
+		// Get the cell value, so that the access is tracked
+		cell.getValue();
 		return objClass;
 	}
 	
 	public boolean isInstanceOf(DMObjectClass cls)
 	{
+		// Get the cell value, so that the access is tracked
+		cell.getValue();
 		return objClass.isSubclassOf( cls );
 	}
 
 	public int getFieldIndex(String key)
 	{
+		// Get the cell value, so that the access is tracked
+		cell.getValue();
 		return objClass.getFieldIndex( key );
 	}
 
@@ -315,6 +321,8 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable
 	
 	public String[] getFieldNames()
 	{
+		// Get the cell value, so that the access is tracked
+		cell.getValue();
 		return objClass.getFieldNames();
 	}
 	
@@ -448,6 +456,8 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable
 	{
 		if ( x instanceof DMObjectInterface )
 		{
+			// Get the cell value, so that the access is tracked
+			cell.getValue();
 			DMObjectInterface dx = (DMObjectInterface)x;
 			if ( dx.getDMClass() == objClass )
 			{
