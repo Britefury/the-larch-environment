@@ -260,7 +260,8 @@ class ParsedLineContentListener (LineContentListenerWithParser):
 				#print 'NO CHANGE'
 				pass
 			else:
-				replace( ctx, node, parsedLines[0] )
+				#replace( ctx, node, parsedLines[0] )
+				replaceNodeContents( ctx, node, parsedLines[0] )
 		else:
 			replaceWithRange( ctx, node, parsedLines )
 
