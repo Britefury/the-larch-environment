@@ -40,7 +40,7 @@ public class TextElement extends EditableEntryLeafElement
 	protected void textRepresentationChanged()
 	{
 		getWidget().setText( textRepresentation );
-		
+
 		super.textRepresentationChanged();
 	}
 

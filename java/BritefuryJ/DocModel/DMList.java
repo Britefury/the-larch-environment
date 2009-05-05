@@ -362,10 +362,10 @@ public class DMList extends DMNode implements DMListInterface, Trackable
 	
 	
 	@SuppressWarnings("unchecked")
-	public boolean equals(Object xs)
+	public boolean equals(Object x)
 	{
 		ArrayList<Object> v = (ArrayList<Object>)cell.getValue();
-		return v.equals( xs );
+		return v.equals( x );
 	}
 	
 	
