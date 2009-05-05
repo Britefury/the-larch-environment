@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 import BritefuryJ.ParserHelpers.DebugNode;
 
 
-class ParserState
+public class ParserState
 {
 	private static class MemoEntry
 	{

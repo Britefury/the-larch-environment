@@ -2,49 +2,37 @@ TODOS:
 
 
 
+PYTHON LANGUAGE
+================
+Add line breaks
+
+
+
+OPTIMISATION
+============
+When viewing a list, use a special form of map that applies a transformation/wrapping function, uses a filter function,
+and takes the resulting element list and uses it as a list of children for a branch element. Ensure that modifications to the
+underlying list result in modifications to the child list, in order to avoid rebuilding the view all over again.
+
+
+
+
+
+
+
+
+
+
+
 - Computer Language Design:
   A Tutorial on Behavioral Reflection and its Implementation
   http://www2.parc.com/csl/groups/sda/projects/reflection96/docs/malenfant/ref96/ref96.html
 
-- Add sub-match to match
 
-- Problem: How to maintain structure
-  Eg. (add (loadLocal x) (loadLocal y))
-  What if (loadLocal y) is deleted?
-  A good solution is to replace it with (nilExpr), rather than simply deleting the entry, in order to retain the structure
-  The current system is very low-level.
-  A higher level system may be required; delete/remove shouldn't simply do this; it should be the responsibility of the parent
-  node to decide *how* a child is deleted (so that it can replace it, etc).
-  
-
-- DTHighlight
-   - Highlights remain when a highlighted node is removed from the widget tree, and then put back.
-- Typesetting:
-   - Add baseline alignment to DTFlow
-- Document presenation toolkit:
-   - Debug DTFlow
-- When a parse fails, commit the unparsed text, and then try refreshing the outer expression;
-  start with a[x]. Change the 'x' to 'x:2'. 'x:2' is not a valid expression.
-- Check out the Psyco optimiser, since it works on Linux and Windows.
-- GSym will screw up if the system attempts to render two views of the same document node:
-     The pattern matcher matches a pattern
-     binds one subtree to @a, the other to @b
-     ($viewEval @a)
-     ($viewEval @b)
-     ($viewEval @a)
-     Would cause an error, as the second view of @a would cause it to try to recreate the view of @a
 - Use the following presentation on unicode in Python to check gSym over:
     http://farmdev.com/talks/unicode/
 
     
-- For a web-app version, CherryPy could provide a suitable framework. (http://www.cherrypy.org)    
-    
-
-
-HANDLE/CORRECT THE FOLLOWING ERRORS IN THE VIEW:
-if the view function directly returns the result of a $viewEval; a DTWidget is expected, a DVNode causes a crash
-
-
 POSSIBLE COLLABORATION:
 
 Links to information on SAGE, the CAS (computer algebra system) written in Python.
@@ -60,22 +48,4 @@ http://video.google.com/videoplay?docid=-2726904509434151616
 
 	
 	
-
-CURSOR HANDLING SYSTEM STATUS:
-The cursor handling currently uses the focus system, rather than an ever-present cursor.
-It is now handled by the presentation toolkit, rather than by the document view.
-
-
-ALTERNATE CURSOR MANAGEMENT SYSTEM:
-Implement cursor location methods for:
-- DTHLine
-- DTScript
-- DTFlow
-- DTFlowWithSeparators
-Test cursor location methods for:
-- DTBox
-- DTEntry
-
-
-
 
