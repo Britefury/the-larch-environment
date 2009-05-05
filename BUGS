@@ -3,23 +3,4 @@ BUGS
 
 
 
-2009/Apr/22  -  ENTERING LIST COMPREHENSIONS:
-==========================
-
-When typing:
-	
-as = [a for x in y   if b]
-	
-change 'if b' to 'if b in x'. Typing the space between 'b' and 'in', results in no space, since the parser
-throws it away.
-
-
-
-2009/May/04 - Comparing subtrees
-==============================
-
-Comparing subtrees does not seem to work
-
-
-
 

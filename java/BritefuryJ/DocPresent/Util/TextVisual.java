@@ -31,7 +31,6 @@ import BritefuryJ.DocPresent.DPPresentationArea;
 import BritefuryJ.DocPresent.Metrics.HMetrics;
 import BritefuryJ.DocPresent.Metrics.VMetrics;
 import BritefuryJ.DocPresent.Metrics.VMetricsTypeset;
-import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.Math.Point2;
 
 
@@ -295,15 +294,6 @@ public class TextVisual
 	{
 		private static final long serialVersionUID = 1L;
 	}
-	
-	
-	public static interface TextVisualOwner
-	{
-		public void textVisualRequestResize(TextVisual t);
-		public DPPresentationArea getTextPresentationArea(TextVisual t);
-		public TextStyleSheet getTextStyleSheet(TextVisual t);
-	}
-	
 	
 	
 	private static HashMap<DPPresentationArea, TextVisualTable> visualTables = new  HashMap<DPPresentationArea, TextVisualTable>();

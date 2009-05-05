@@ -19,7 +19,7 @@ import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.Util.TextVisual;
 import BritefuryJ.Math.Point2;
 
-public class DPText extends DPContentLeafEditableEntry implements TextVisual.TextVisualOwner
+public class DPText extends DPContentLeafEditableEntry
 {
 	protected TextVisual visual;
 	protected String text;
@@ -43,14 +43,21 @@ public class DPText extends DPContentLeafEditableEntry implements TextVisual.Tex
 	
 	public void setText(String text)
 	{
+		System.out.println( "DPText.setText()" );
 		this.text = text;
 		
 		TextStyleSheet textStyleSheet = (TextStyleSheet)styleSheet;
 
-		visual = TextVisual.getTextVisual( getPresentationArea(), text, textStyleSheet.getFont(), textStyleSheet.getMixedSizeCaps() );
-		if ( isRealised() )
+		TextVisual v = TextVisual.getTextVisual( getPresentationArea(), text, textStyleSheet.getFont(), textStyleSheet.getMixedSizeCaps() );
+		if ( v != visual )
 		{
-			visual.realise( getPresentationArea() );
+			visual = v;
+			if ( isRealised() )
+			{
+				visual.realise( getPresentationArea() );
+			}
+	
+			queueResize();
 		}
 	}
 	
@@ -131,23 +138,6 @@ public class DPText extends DPContentLeafEditableEntry implements TextVisual.Tex
 	}
 
 	
-	public void textVisualRequestResize(TextVisual t)
-	{
-		queueResize();
-	}
-
-
-	public DPPresentationArea getTextPresentationArea(TextVisual t)
-	{
-		return presentationArea;
-	}
-	
-	public TextStyleSheet getTextStyleSheet(TextVisual t)
-	{
-		return (TextStyleSheet)styleSheet;
-	}
-
-
 	protected int getMarkerRange()
 	{
 		return text.length();
