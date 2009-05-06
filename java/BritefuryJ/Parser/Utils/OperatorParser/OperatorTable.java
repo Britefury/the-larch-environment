@@ -6,8 +6,8 @@
 //##************************
 package BritefuryJ.Parser.Utils.OperatorParser;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 import BritefuryJ.Parser.Forward;
 import BritefuryJ.Parser.ParserExpression;
@@ -71,24 +71,65 @@ public class OperatorTable
 	
 	public List<ParserExpression> buildParsers()
 	{
-		ParserExpression parser = rootParser;
-		ArrayList<Forward> levelParserForwardDeclarations = new ArrayList<Forward>();
-		ArrayList<ParserExpression> levelParsers = new ArrayList<ParserExpression>();
-		for (int i = 0; i < levels.size(); i++)
+		if ( hasReachUpLevels() )
 		{
-			levelParserForwardDeclarations.add( new Forward() );
+			ParserExpression prevLevelParser = rootParser;
+			ArrayList<Forward> levelParserOpOnlyForwardDeclarations = new ArrayList<Forward>();
+			ArrayList<ParserExpression> levelParsers = new ArrayList<ParserExpression>();
+			for (int i = 0; i < levels.size(); i++)
+			{
+				levelParserOpOnlyForwardDeclarations.add( new Forward() );
+			}
+			PrecedenceLevel prevLevel = null;
+			for (int i = 0; i < levels.size(); i++)
+			{
+				Forward opOnlyForward = levelParserOpOnlyForwardDeclarations.get( i );
+				PrecedenceLevel lvl = levels.get( i );
+				
+				ParserExpression levelParser = lvl.buildParserWithReachUp( this, levelParserOpOnlyForwardDeclarations, opOnlyForward, prevLevel, prevLevelParser, "oplvl_" + i );
+				levelParsers.add( levelParser );
+	
+				prevLevel = lvl;
+				prevLevelParser = levelParser;
+			}
+			
+			return levelParsers;
 		}
-		PrecedenceLevel prevLevel = null;
-		for (int i = 0; i < levels.size(); i++)
+		else
 		{
-			Forward f = levelParserForwardDeclarations.get( i );
-			PrecedenceLevel lvl = levels.get( i );
-			lvl.buildParser( this, levelParserForwardDeclarations, f, prevLevel, parser, "oplvl_" + i );
-			parser = f;
-			prevLevel = lvl;
-			levelParsers.add( f );
+			ParserExpression prevLevelParser = rootParser;
+			ArrayList<ParserExpression> levelParsers = new ArrayList<ParserExpression>();
+			PrecedenceLevel prevLevel = null;
+			for (int i = 0; i < levels.size(); i++)
+			{
+				PrecedenceLevel lvl = levels.get( i );
+				
+				ParserExpression levelParser = lvl.buildParser( this, prevLevel, prevLevelParser, "oplvl_" + i );
+				levelParsers.add( levelParser );
+	
+				prevLevel = lvl;
+				prevLevelParser = levelParser;
+			}
+			
+			return levelParsers;
+		}
+	}
+	
+	
+	
+	protected boolean hasReachUpLevels()
+	{
+		PrefixFilter pf = new PrefixFilter();
+		SuffixFilter sf = new SuffixFilter();
+
+		for (PrecedenceLevel lvl: levels)
+		{
+			if ( lvl.checkOperators( pf )  ||  lvl.checkOperators( sf ) )
+			{
+				return true;
+			}
 		}
 		
-		return levelParsers;
+		return false;
 	}
 }

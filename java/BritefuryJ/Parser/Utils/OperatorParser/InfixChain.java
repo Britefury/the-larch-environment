@@ -262,7 +262,29 @@ public class InfixChain extends Operator
 
 	
 	
-	protected ParserExpression buildParser(OperatorTable operatorTable,
+	protected ParserExpression buildParser(ParserExpression thisLevelParser, ParserExpression previousLevelParser)
+	{
+		// Copied from InfixLeft
+		ParserExpression rightSubexp = previousLevelParser;
+		
+		// <rightExp0> | <rightExp1> | ... | <rightExpN>
+		ParserExpression rightOpExps[] = new ParserExpression[operators.size()];
+		int i = 0;
+		for (ChainOperator operator: operators)
+		{
+			rightOpExps[i++] = operator.buildParseExpression( rightSubexp );
+		}
+		Choice rightChoice = new Choice( rightOpExps );
+		
+		
+		// <thisLeverParser> <rightChoice>+
+		ParserExpression p = new Sequence( new ParserExpression[] { thisLevelParser, rightChoice.oneOrMore() } );
+		// => action
+		return p.action( action );
+	}
+
+	
+	protected ParserExpression buildParserWithReachUp(OperatorTable operatorTable,
 			ArrayList<Forward> levelParserForwardDeclarations, PrecedenceLevel thisLevel,
 			ParserExpression thisLevelParser, PrecedenceLevel previousLevel,
 			ParserExpression previousLevelParser)

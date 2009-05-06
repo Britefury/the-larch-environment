@@ -79,10 +79,14 @@ public class Suffix extends UnaryOperator
 
 	
 	
-	protected ParserExpression buildParser(OperatorTable operatorTable,
-			ArrayList<Forward> levelParserForwardDeclarations, PrecedenceLevel thisLevel,
-			ParserExpression thisLevelParser, PrecedenceLevel previousLevel,
-			ParserExpression previousLevelParser)
+	protected ParserExpression buildParser(ParserExpression thisLevelParser, ParserExpression previousLevelParser)
+	{
+		ParserExpression p = new Sequence( new ParserExpression[] { thisLevelParser, opExpression } );
+		return p.action( action );
+	}
+
+	protected ParserExpression buildParserWithReachUp(OperatorTable operatorTable, ArrayList<Forward> levelParserForwardDeclarations, PrecedenceLevel thisLevel,
+			ParserExpression thisLevelParser, PrecedenceLevel previousLevel, ParserExpression previousLevelParser)
 	{
 		ParserExpression p = new Sequence( new ParserExpression[] { thisLevelParser, opExpression } );
 		return p.action( action );

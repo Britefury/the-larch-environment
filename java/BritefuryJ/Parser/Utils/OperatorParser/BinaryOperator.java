@@ -115,16 +115,24 @@ abstract class BinaryOperator extends Operator
 	
 	
 	
-	protected abstract ParserExpression buildOperatorParser(OperatorTable operatorTable, ArrayList<Forward> levelParserForwardDeclarations, PrecedenceLevel thisLevel,
+	protected abstract ParserExpression buildOperatorParser(ParserExpression thisLevelParser, ParserExpression previousLevelParser);
+
+	protected abstract ParserExpression buildOperatorParserWithReachUp(OperatorTable operatorTable, ArrayList<Forward> levelParserForwardDeclarations, PrecedenceLevel thisLevel,
 			ParserExpression thisLevelParser, PrecedenceLevel previousLevel, ParserExpression previousLevelParser);
 
 
-	protected ParserExpression buildParser(OperatorTable operatorTable,
+	protected ParserExpression buildParser(ParserExpression thisLevelParser, ParserExpression previousLevelParser)
+	{
+		ParserExpression p = buildOperatorParser( thisLevelParser, previousLevelParser );
+		return p.action( new BinaryOpAction( action ) );
+	}
+
+	protected ParserExpression buildParserWithReachUp(OperatorTable operatorTable,
 			ArrayList<Forward> levelParserForwardDeclarations, PrecedenceLevel thisLevel,
 			ParserExpression thisLevelParser, PrecedenceLevel previousLevel,
 			ParserExpression previousLevelParser)
 	{
-		ParserExpression p = buildOperatorParser( operatorTable, levelParserForwardDeclarations, thisLevel, thisLevelParser, previousLevel, previousLevelParser );
+		ParserExpression p = buildOperatorParserWithReachUp( operatorTable, levelParserForwardDeclarations, thisLevel, thisLevelParser, previousLevel, previousLevelParser );
 		return p.action( new BinaryOpAction( action ) );
 	}
 }

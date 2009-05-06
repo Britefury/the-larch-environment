@@ -48,7 +48,12 @@ public class InfixRight extends BinaryOperator
 	}
 	
 	
-	protected ParserExpression buildOperatorParser(OperatorTable operatorTable,
+	protected ParserExpression buildOperatorParser(ParserExpression thisLevelParser, ParserExpression previousLevelParser)
+	{
+		return new Sequence( new ParserExpression[] { previousLevelParser, opExpression, thisLevelParser } );
+	}
+
+	protected ParserExpression buildOperatorParserWithReachUp(OperatorTable operatorTable,
 			ArrayList<Forward> levelParserForwardDeclarations, PrecedenceLevel thisLevel,
 			ParserExpression thisLevelParser, PrecedenceLevel previousLevel,
 			ParserExpression previousLevelParser)

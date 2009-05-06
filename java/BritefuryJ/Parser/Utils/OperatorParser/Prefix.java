@@ -78,10 +78,14 @@ public class Prefix extends UnaryOperator
 
 	
 	
-	protected ParserExpression buildParser(OperatorTable operatorTable,
-			ArrayList<Forward> levelParserForwardDeclarations, PrecedenceLevel thisLevel,
-			ParserExpression thisLevelParser, PrecedenceLevel previousLevel,
-			ParserExpression previousLevelParser)
+	protected ParserExpression buildParser(ParserExpression thisLevelParser, ParserExpression previousLevelParser)
+	{
+		ParserExpression p = new Sequence( new ParserExpression[] { opExpression, thisLevelParser } );
+		return p.action( action );
+	}
+
+	protected ParserExpression buildParserWithReachUp(OperatorTable operatorTable, ArrayList<Forward> levelParserForwardDeclarations, PrecedenceLevel thisLevel,
+			ParserExpression thisLevelParser, PrecedenceLevel previousLevel, ParserExpression previousLevelParser)
 	{
 		ParserExpression p = new Sequence( new ParserExpression[] { opExpression, thisLevelParser } );
 		return p.action( action );
