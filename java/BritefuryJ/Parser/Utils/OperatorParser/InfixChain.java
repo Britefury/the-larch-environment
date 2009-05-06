@@ -291,15 +291,26 @@ public class InfixChain extends Operator
 	{
 		// Copied from InfixLeft
 		ParserExpression prefix = operatorTable.getLowestPrecedenceUnaryOperatorLevelParserAbove( levelParserForwardDeclarations, thisLevel, new OperatorTable.PrefixFilter() );
-		ParserExpression rightSubexp;
+		//ParserExpression suffix = operatorTable.getLowestPrecedenceUnaryOperatorLevelParserAbove( levelParserForwardDeclarations, thisLevel, new OperatorTable.SuffixFilter() );
+		ParserExpression left, right;
 		
+//		if ( suffix != null )
+//		{
+//			left = suffix.__or__( thisLevelParser );
+//		}
+//		else
+//		{
+//			left = thisLevelParser;
+//		}
+		left = thisLevelParser;
+
 		if ( prefix != null )
 		{
-			rightSubexp = previousLevelParser.__or__( prefix );
+			right = previousLevelParser.__or__( prefix );
 		}
 		else
 		{
-			rightSubexp = previousLevelParser;
+			right = previousLevelParser;
 		}
 		
 
@@ -308,13 +319,13 @@ public class InfixChain extends Operator
 		int i = 0;
 		for (ChainOperator operator: operators)
 		{
-			rightOpExps[i++] = operator.buildParseExpression( rightSubexp );
+			rightOpExps[i++] = operator.buildParseExpression( right );
 		}
 		Choice rightChoice = new Choice( rightOpExps );
 		
 		
 		// <thisLeverParser> <rightChoice>+
-		ParserExpression p = new Sequence( new ParserExpression[] { thisLevelParser, rightChoice.oneOrMore() } );
+		ParserExpression p = new Sequence( new ParserExpression[] { left, rightChoice.oneOrMore() } );
 		// => action
 		return p.action( action );
 	}

@@ -100,8 +100,10 @@ public class PrecedenceLevel
 		// Parser expression representing a choice between the various operators, but *NOT* the previous level parser
 		ParserExpression thisLevelOperators = new Choice( choices );
 		
-		opOnlyForwardDeclaration.setExpression( new Production( thisLevelOperators ).debug( debugName + "_oponly" ) );
-		thisLevelForward.setExpression( new Production( new Choice( new ParserExpression[] { thisLevelOperators, previousLevelParser } ) ).debug( debugName ) );
+		ParserExpression thisLevel = new Production( thisLevelOperators ).debug( debugName + "_oponly" );
+		
+		opOnlyForwardDeclaration.setExpression( thisLevel );
+		thisLevelForward.setExpression( new Production( new Choice( new ParserExpression[] { thisLevel, previousLevelParser } ) ).debug( debugName ) );
 		
 		return thisLevelForward;
 	}

@@ -59,8 +59,19 @@ public class InfixRight extends BinaryOperator
 			ParserExpression previousLevelParser)
 	{
 		ParserExpression prefix = operatorTable.getLowestPrecedenceUnaryOperatorLevelParserAbove( levelParserForwardDeclarations, thisLevel, new OperatorTable.PrefixFilter() );
-		ParserExpression right;
+		//ParserExpression suffix = operatorTable.getLowestPrecedenceUnaryOperatorLevelParserAbove( levelParserForwardDeclarations, thisLevel, new OperatorTable.SuffixFilter() );
+		ParserExpression left, right;
 		
+//		if ( suffix != null )
+//		{
+//			left = suffix.__or__( previousLevelParser );
+//		}
+//		else
+//		{
+//			left = previousLevelParser;
+//		}
+		left = previousLevelParser;
+
 		if ( prefix != null )
 		{
 			right = thisLevelParser.__or__( prefix );
@@ -70,6 +81,6 @@ public class InfixRight extends BinaryOperator
 			right = thisLevelParser;
 		}
 		
-		return new Sequence( new ParserExpression[] { previousLevelParser, opExpression, right } );
+		return new Sequence( new ParserExpression[] { left, opExpression, right } );
 	}
 }
