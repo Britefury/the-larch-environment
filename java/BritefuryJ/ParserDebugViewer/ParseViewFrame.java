@@ -32,6 +32,7 @@ import BritefuryJ.DocPresent.DPPresentationArea;
 import BritefuryJ.ParserHelpers.DebugNode;
 import BritefuryJ.ParserHelpers.DebugParseResultInterface;
 import BritefuryJ.ParserHelpers.ParseResultInterface;
+import BritefuryJ.ParserHelpers.ParserExpressionInterface;
 
 public class ParseViewFrame implements ParseView.ParseViewListener
 {
@@ -43,12 +44,12 @@ public class ParseViewFrame implements ParseView.ParseViewListener
 	private JLabel graphLabel;
 	private DPPresentationArea graph;
 	
-	private JPanel inputPanel, resultPanel;
-	private JLabel inputLabel, resultLabel;
-	private JTextPane inputTextPane, resultTextPane;
-	private StyledDocument inputDoc, resultDoc;
-	private JScrollPane inputScrollPane, resultScrollPane;
-	private JSplitPane textSplitPane, mainSplitPane;
+	private JPanel inputPanel, resultPanel, parserPanel;
+	private JLabel inputLabel, resultLabel, parserLabel;
+	private JTextPane inputTextPane, resultTextPane, parserTextPane;
+	private StyledDocument inputDoc, resultDoc, parserDoc;
+	private JScrollPane inputScrollPane, resultScrollPane, parserScrollPane;
+	private JSplitPane textSplitPane, parserSplitPane, mainSplitPane;
 	
 	public ParseViewFrame(DebugParseResultInterface result)
 	{
@@ -103,11 +104,30 @@ public class ParseViewFrame implements ParseView.ParseViewListener
 		resultPanel.add( resultLabel );
 		resultPanel.add( resultScrollPane );
 		
+		parserLabel = new JLabel( "Parser expression" );
+		parserTextPane = new JTextPane();
+		parserTextPane.setEditable( false );
+		parserDoc = parserTextPane.getStyledDocument();
+		parserDoc.addStyle( "parser", defaultStyle );
+		parserScrollPane = new JScrollPane( parserTextPane );
+		parserScrollPane.setVerticalScrollBarPolicy( JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED );
+		parserScrollPane.setPreferredSize( new Dimension( 200, 200 ) );
+		parserPanel = new JPanel();
+		parserPanel.setLayout( new BoxLayout( parserPanel, BoxLayout.PAGE_AXIS ) );
+		parserPanel.add( parserLabel );
+		parserPanel.add( parserScrollPane );
+		
 		textSplitPane = new JSplitPane( JSplitPane.HORIZONTAL_SPLIT, inputPanel, resultPanel );
 		textSplitPane.setOneTouchExpandable( true );
 		textSplitPane.setResizeWeight( 0.5 );
+		textSplitPane.setPreferredSize( new Dimension( 640, 180 ) );
 		
-		mainSplitPane = new JSplitPane( JSplitPane.VERTICAL_SPLIT, graphPanel, textSplitPane );
+		parserSplitPane = new JSplitPane( JSplitPane.VERTICAL_SPLIT, parserPanel, textSplitPane );
+		parserSplitPane.setOneTouchExpandable( true );
+		parserSplitPane.setResizeWeight( 0.25 );
+		parserSplitPane.setPreferredSize( new Dimension( 640, 120 ) );
+		
+		mainSplitPane = new JSplitPane( JSplitPane.VERTICAL_SPLIT, graphPanel, parserSplitPane );
 		mainSplitPane.setResizeWeight( 0.75 );
 		
 		
@@ -169,11 +189,16 @@ public class ParseViewFrame implements ParseView.ParseViewListener
 		{
 			inputDoc.remove( 0, inputDoc.getLength() );
 			resultDoc.remove( 0, resultDoc.getLength() );
+			parserDoc.remove( 0, parserDoc.getLength() );
 
 			if ( selection != null )
 			{
 				ParseResultInterface result = selection.getResult();
+				ParserExpressionInterface expression = selection.getExpression();
 				Object inputObject = selection.getInput();
+				
+				parserDoc.insertString( 0, expression.toString(), inputDoc.getStyle( "parser" ) );
+				
 				if ( inputObject instanceof String )
 				{
 					String input = (String)inputObject;

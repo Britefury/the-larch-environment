@@ -7,11 +7,16 @@
 package BritefuryJ.Parser.Utils.OperatorParser;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import BritefuryJ.Parser.DebugParseResult;
 import BritefuryJ.Parser.Forward;
+import BritefuryJ.Parser.Literal;
 import BritefuryJ.Parser.ParserExpression;
+import BritefuryJ.Parser.Utils.Tokens;
 import BritefuryJ.Parser.Utils.OperatorParser.PrecedenceLevel.OperatorParserPrecedenceLevelCannotMixOperatorTypesError;
+import BritefuryJ.ParserDebugViewer.ParseViewFrame;
 
 public class OperatorTable
 {
@@ -131,5 +136,41 @@ public class OperatorTable
 		}
 		
 		return false;
+	}
+	
+	
+	
+	public static void main(String[] args) throws OperatorParserPrecedenceLevelCannotMixOperatorTypesError
+	{
+		BinaryOperatorParseAction mulAction = new BinaryOperatorParseAction()
+		{
+			public Object invoke(String input, int begin, Object left, Object right)
+			{
+				return Arrays.asList( new Object[] { '*', left, right } );
+			}
+		};
+
+		UnaryOperatorParseAction notAction = new UnaryOperatorParseAction()
+		{
+			public Object invoke(String input, int begin, Object x)
+			{
+				return Arrays.asList( new Object[] { '!', x } );
+			}
+		};
+		
+		
+		InfixLeft mul = new InfixLeft( new Literal( "*" ), mulAction );
+		Suffix inv = new Suffix( new Literal( "!" ), notAction );
+		
+		PrecedenceLevel l0 = new PrecedenceLevel( Arrays.asList( new Operator[] { mul } ) );
+		PrecedenceLevel l1 = new PrecedenceLevel( Arrays.asList( new Operator[] { inv } ) );
+		
+		OperatorTable t = new OperatorTable( Arrays.asList( new PrecedenceLevel[] { l0, l1 } ), Tokens.identifier );
+		List<ParserExpression> parsers = t.buildParsers();
+		ParserExpression e = parsers.get( parsers.size() - 1 );
+		
+		DebugParseResult r = e.debugParseString( "a! * b * c" );
+		
+		ParseViewFrame f = new ParseViewFrame( r );
 	}
 }

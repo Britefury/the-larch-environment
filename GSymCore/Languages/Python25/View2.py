@@ -252,7 +252,10 @@ class ParsedLineContentListener (LineContentListenerWithParser):
 				parsedLines.extend( originalContents )
 				
 		if len( parsedLines ) == 1:
-			if node == parsedLines[0]:
+			## HACK
+			## TODO
+			## use Java equals() method for now due to a bug in Jython; should be fixed once the patch for issue 1338 (http://bugs.jython.org) is integrated
+			if node.equals( parsedLines[0] ):
 				# Same data; ignore
 				pass
 			else:
