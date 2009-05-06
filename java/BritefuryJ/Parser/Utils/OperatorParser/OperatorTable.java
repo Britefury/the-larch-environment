@@ -39,7 +39,7 @@ public class OperatorTable
 	
 	
 	private ParserExpression rootParser;
-	private List<PrecedenceLevel> levels;
+	private ArrayList<PrecedenceLevel> levels;
 	
 	
 	//
@@ -49,7 +49,8 @@ public class OperatorTable
 	public OperatorTable(List<PrecedenceLevel> levels, ParserExpression rootParser) throws OperatorParserPrecedenceLevelCannotMixOperatorTypesError
 	{
 		this.rootParser = rootParser;
-		this.levels = levels;
+		this.levels = new ArrayList<PrecedenceLevel>();
+		this.levels.addAll( levels );
 	}
 	
 	
