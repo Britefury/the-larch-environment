@@ -69,16 +69,40 @@ public class PrecedenceLevel
 	}
 	
 	
-	protected void buildParser(OperatorTable operatorTable, ArrayList<Forward> levelParserForwardDeclarations, Forward forwardDeclaration,
-			PrecedenceLevel previousLevel, ParserExpression previousLevelParser, String debugName)
+	protected ParserExpression buildParser(OperatorTable operatorTable, PrecedenceLevel previousLevel, ParserExpression previousLevelParser, String debugName)
 	{
-		ParserExpression[] choices = new ParserExpression[operators.size() + 1];
+		Forward thisLevelForward = new Forward();
+
+		ParserExpression[] choices = new ParserExpression[operators.size()+1];
 		for (int i = 0; i < operators.size(); i++)
 		{
-			choices[i] = operators.get( i ).buildParser( operatorTable, levelParserForwardDeclarations, this, forwardDeclaration, previousLevel, previousLevelParser );
+			choices[i] = operators.get( i ).buildParser( thisLevelForward, previousLevelParser );
 		}
 		choices[operators.size()] = previousLevelParser;
 		
-		forwardDeclaration.setExpression( new Production( new Choice( choices ) ).debug( debugName ) );
+		thisLevelForward.setExpression( new Production( new Choice( choices ) ).debug( debugName ) );
+		
+		return thisLevelForward;
+	}
+
+
+	protected ParserExpression buildParserWithReachUp(OperatorTable operatorTable, ArrayList<Forward> levelParserOpOnlyForwardDeclarations, Forward opOnlyForwardDeclaration,
+			PrecedenceLevel previousLevel, ParserExpression previousLevelParser, String debugName)
+	{
+		Forward thisLevelForward = new Forward();
+
+		ParserExpression[] choices = new ParserExpression[operators.size()];
+		for (int i = 0; i < operators.size(); i++)
+		{
+			choices[i] = operators.get( i ).buildParserWithReachUp( operatorTable, levelParserOpOnlyForwardDeclarations, this, thisLevelForward, previousLevel, previousLevelParser );
+		}
+		
+		// Parser expression representing a choice between the various operators, but *NOT* the previous level parser
+		ParserExpression thisLevelOperators = new Choice( choices );
+		
+		opOnlyForwardDeclaration.setExpression( new Production( thisLevelOperators ).debug( debugName + "_oponly" ) );
+		thisLevelForward.setExpression( new Production( new Choice( new ParserExpression[] { thisLevelOperators, previousLevelParser } ) ).debug( debugName ) );
+		
+		return thisLevelForward;
 	}
 }
