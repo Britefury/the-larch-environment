@@ -171,6 +171,6 @@ public class OperatorTable
 		
 		DebugParseResult r = e.debugParseString( "a! * b * c" );
 		
-		ParseViewFrame f = new ParseViewFrame( r );
+		new ParseViewFrame( r );
 	}
 }

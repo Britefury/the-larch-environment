@@ -202,7 +202,8 @@ class Python25Grammar (Grammar):
 
 	@Rule
 	def targetItem(self):
-		return ( ( self.attributeRef()  ^  self.subscript() )  |  self.parenTarget()  |  self.listTarget()  |  self.singleTarget() )
+		return self.attributeRefOrSubscript()  |  self.parenTarget()  |  self.listTarget()  |  self.singleTarget()
+		#return ( ( self.attributeRef()  ^  self.subscript() )  |  self.parenTarget()  |  self.listTarget()  |  self.singleTarget() )
 		#return self.parenTarget()  |  self.listTarget()  |  self.singleTarget()
 
 
@@ -435,8 +436,12 @@ class Python25Grammar (Grammar):
 
 	# Primary
 	@Rule
+	def attributeRefOrSubscript(self):
+		return self.attributeRef() | self.subscript()
+	
+	@Rule
 	def primary(self):
-		return self.call() | self.attributeRef() | self.subscript() | self.atom()
+		return self.call() | self.attributeRefOrSubscript() | self.atom()
 
 
 
@@ -999,7 +1004,7 @@ class TestCase_Python25Parser (ParserTestCase):
 											       Nodes.ListTarget( targets=[ Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='b' ) ], trailingSeparator='1', parens='1' ) ] ) ] ) )
 
 		self._matchTest( g.subscript(), 'a[x]', Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.Load( name='x' ) ) )
-		self._matchTest( g.attributeRef() | g.subscript(), 'a[x]', Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.Load( name='x' ) ) )
+		self._matchTest( g.attributeRefOrSubscript(), 'a[x]', Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.Load( name='x' ) ) )
 		self._matchTest( g.targetItem(), 'a[x]', Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.Load( name='x' ) ) )
 		self._matchTest( g.targetListOrTargetItem(), 'a[x]', Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.Load( name='x' ) ) )
 		self._matchTest( g.targetListOrTargetItem(), 'a[x][y]', Nodes.Subscript( target=Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.Load( name='x' ) ), index=Nodes.Load( name='y' ) ) )
