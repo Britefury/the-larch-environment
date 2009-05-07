@@ -60,18 +60,18 @@ public class InfixLeft extends BinaryOperator
 			ParserExpression previousLevelParser)
 	{
 		ParserExpression prefix = operatorTable.getLowestPrecedenceUnaryOperatorLevelParserAbove( levelParserForwardDeclarations, thisLevel, new OperatorTable.PrefixFilter() );
-		//ParserExpression suffix = operatorTable.getLowestPrecedenceUnaryOperatorLevelParserAbove( levelParserForwardDeclarations, thisLevel, new OperatorTable.SuffixFilter() );
+		ParserExpression suffix = operatorTable.getLowestPrecedenceUnaryOperatorLevelParserAbove( levelParserForwardDeclarations, thisLevel, new OperatorTable.SuffixFilter() );
 		ParserExpression left, right;
 		
-//		if ( suffix != null )
-//		{
-//			left = suffix.__or__( thisLevelParser );
-//		}
-//		else
-//		{
-//			left = thisLevelParser;
-//		}
-		left = thisLevelParser;
+		if ( suffix != null )
+		{
+			left = suffix.__or__( thisLevelParser );
+		}
+		else
+		{
+			left = thisLevelParser;
+		}
+//		left = thisLevelParser;
 
 		if ( prefix != null )
 		{
