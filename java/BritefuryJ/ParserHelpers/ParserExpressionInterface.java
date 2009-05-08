@@ -8,5 +8,5 @@ package BritefuryJ.ParserHelpers;
 
 public interface ParserExpressionInterface
 {
-	public String getDebugName();
+	public String getExpressionName();
 }

@@ -186,7 +186,7 @@ public abstract class MatchExpression implements ParserExpressionInterface
 		return this;
 	}
 	
-	public String getDebugName()
+	public String getExpressionName()
 	{
 		return debugName;
 	}

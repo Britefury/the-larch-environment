@@ -6,17 +6,15 @@
 //##************************
 package tests.Parser;
 
+import junit.framework.TestCase;
 import BritefuryJ.DocModel.DMIOReader;
 import BritefuryJ.DocModel.DMModuleResolver;
 import BritefuryJ.DocModel.DMIOReader.BadModuleNameException;
 import BritefuryJ.DocModel.DMIOReader.ParseErrorException;
 import BritefuryJ.DocModel.DMModule.UnknownClassException;
 import BritefuryJ.DocModel.DMModuleResolver.CouldNotResolveModuleException;
-import BritefuryJ.Parser.DebugParseResult;
 import BritefuryJ.Parser.ParseResult;
 import BritefuryJ.Parser.ParserExpression;
-import BritefuryJ.ParserDebugViewer.ParseViewFrame;
-import junit.framework.TestCase;
 
 abstract public class ParserTestCase extends TestCase
 {

@@ -17,6 +17,11 @@ public abstract class UnaryBranchExpression extends ParserExpression
 	public UnaryBranchExpression(ParserExpression subexp)
 	{
 		this.subexp = subexp;
+
+		if ( subexp == null )
+		{
+			throw new RuntimeException( "Sub expressions cannot be null" );
+		}
 	}
 	
 	public UnaryBranchExpression(Object subexp) throws ParserCoerceException

@@ -12,9 +12,10 @@ import org.python.core.PyObject;
 
 import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
+import BritefuryJ.Parser.ParseAction;
 import BritefuryJ.Parser.ParserExpression;
 
-abstract class UnaryOperator extends Operator
+public class UnaryOperator extends Operator
 {
 	protected static class BuildASTNodeAction implements UnaryOperatorParseAction
 	{
@@ -62,14 +63,93 @@ abstract class UnaryOperator extends Operator
 			return callable.__call__( Py.java2py( input ), new PyInteger( begin ), Py.java2py( x ) );
 		}
 	}
-
-
-
-
-	protected ParserExpression opExpression;
-
-	protected UnaryOperator(ParserExpression opExpression)
+	
+	
+	protected static class UnaryOperatorResultBuilder
 	{
-		this.opExpression = opExpression;
+		private UnaryOperatorParseAction action;
+		private int operatorPos;
+		
+		public UnaryOperatorResultBuilder(UnaryOperatorParseAction action, int operatorPos)
+		{
+			this.action = action;
+			this.operatorPos = operatorPos;
+		}
+		
+		
+		public int getOperatorPos()
+		{
+			return operatorPos;
+		}
+		
+
+		public Object buildResult(String input, int begin, Object x)
+		{
+			return action.invoke( input, begin, x );
+		}
+	}
+	
+
+	private static class UnaryOpAction implements ParseAction
+	{
+		private UnaryOperatorParseAction action;
+		
+		
+		public UnaryOpAction(UnaryOperatorParseAction action)
+		{
+			this.action = action;
+		}
+		
+		
+		public Object invoke(String input, int begin, Object x)
+		{
+			return new UnaryOperatorResultBuilder( action, begin );
+		}
+	}
+
+
+
+	protected UnaryOpAction action;
+
+	
+	
+	public UnaryOperator(ParserExpression opExpression, UnaryOperatorParseAction action)
+	{
+		super( opExpression );
+		this.action = new UnaryOpAction( action );
+	}
+
+	public UnaryOperator(ParserExpression opExpression, DMObjectClass nodeClass, String fieldName) throws InvalidFieldNameException
+	{
+		this( opExpression, new BuildASTNodeAction( nodeClass, fieldName ) );
+	}
+
+	public UnaryOperator(ParserExpression opExpression, PyObject callable)
+	{
+		this( opExpression, new PyUnaryOperatorParseAction( callable ) );
+	}
+
+	public UnaryOperator(String operator, UnaryOperatorParseAction action)
+	{
+		super( operator );
+		this.action = new UnaryOpAction( action );
+	}
+
+	public UnaryOperator(String operator, DMObjectClass nodeClass, String fieldName) throws InvalidFieldNameException
+	{
+		this( ParserExpression.coerce( operator ), new BuildASTNodeAction( nodeClass, fieldName ) );
+	}
+
+	public UnaryOperator(String operator, PyObject callable)
+	{
+		this( ParserExpression.coerce( operator ), new PyUnaryOperatorParseAction( callable ) );
+	}
+	
+	
+	
+	
+	protected ParserExpression applyAction(ParserExpression x)
+	{
+		return x.action( action );
 	}
 }

@@ -6,28 +6,14 @@
 //##************************
 package BritefuryJ.Parser.Utils.OperatorParser;
 
+import java.util.ArrayList;
+
 import BritefuryJ.Parser.ParserExpression;
+import BritefuryJ.Parser.Production;
 
-public abstract class Operator
+
+public abstract class OperatorLevel
 {
-	protected ParserExpression opExpression;
-
-
-	
-	protected Operator(ParserExpression opExpression)
-	{
-		this.opExpression = opExpression;
-	}
-
-	protected Operator(String operator)
-	{
-		this.opExpression = ParserExpression.coerce( operator );
-	}
-	
-	
-	
-	protected ParserExpression getOperatorExpression()
-	{
-		return opExpression;
-	}
+	protected abstract ParserExpression buildParser(OperatorTable operatorTable, ParserExpression previousLevelParser, ArrayList<Production> reachupForwardDeclarations);
+	protected abstract ParserExpression buildParserForReachUp(OperatorTable operatorTable, ParserExpression previousLevelParser);
 }
