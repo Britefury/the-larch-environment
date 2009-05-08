@@ -18,6 +18,14 @@ public abstract class BranchExpression extends ParserExpression
 	public BranchExpression(ParserExpression[] subexps)
 	{
 		this.subexps = subexps;
+		
+		for (ParserExpression x: subexps)
+		{
+			if ( x == null )
+			{
+				throw new RuntimeException( "Sub expressions cannot be null" );
+			}
+		}
 	}
 	
 	public BranchExpression(Object[] subexps) throws ParserCoerceException
@@ -36,6 +44,14 @@ public abstract class BranchExpression extends ParserExpression
 		
 		this.subexps = new ParserExpression[xs.size()];
 		xs.toArray( this.subexps );
+
+		for (ParserExpression x: this.subexps)
+		{
+			if ( x == null )
+			{
+				throw new RuntimeException( "Sub expressions cannot be null" );
+			}
+		}
 	}
 	
 	

@@ -6,25 +6,76 @@
 //##************************
 package BritefuryJ.Parser;
 
-import org.python.core.PyObject;
+import java.util.Arrays;
+import java.util.List;
 
-public class Production extends UnaryBranchExpression
+
+
+public class Production extends ParserExpression
 {
-	public Production(String subexp) throws ParserCoerceException
+	public static class CannotOverwriteProductionExpressionException extends Exception
 	{
-		super( subexp );
+		private static final long serialVersionUID = 1L;
+	};
+	
+	
+	protected String expressionName;
+	protected ParserExpression subexp;
+	
+	
+	public Production(String name)
+	{
+		this.expressionName = name;
+		this.subexp = null;
 	}
 	
-	public Production(ParserExpression subexp)
+	public Production(String name, ParserExpression subexp)
 	{
-		super( subexp );
+		this.expressionName = name;
+		this.subexp = subexp;
 	}
 	
-	public Production(ParserExpression subexp, String debugName)
+	public Production(String name, Object subexp) throws ParserCoerceException
 	{
-		super( subexp );
-		debug( debugName );
+		this.expressionName = name;
+		this.subexp = coerce( subexp );
 	}
+	
+	
+
+	public String getExpressionName()
+	{
+		return expressionName;
+	}
+
+	
+	
+	public ParserExpression setExpression(Object exp) throws ParserCoerceException, CannotOverwriteProductionExpressionException
+	{
+		if ( subexp != null )
+		{
+			throw new CannotOverwriteProductionExpressionException();
+		}
+		subexp = coerce( exp );
+		return this;
+	}
+	
+	public ParserExpression setExpression(ParserExpression exp) throws CannotOverwriteProductionExpressionException
+	{
+		if ( subexp != null )
+		{
+			throw new CannotOverwriteProductionExpressionException();
+		}
+		subexp = exp;
+		return this;
+	}
+	
+	public ParserExpression getExpression()
+	{
+		return subexp;
+	}
+
+	
 	
 	
 	protected ParseResult parseString(ParserState state, String input, int start, int stop)
@@ -34,41 +85,11 @@ public class Production extends UnaryBranchExpression
 
 
 
-	public ParserExpression action(ParseAction a)
+	public List<ParserExpression> getChildren()
 	{
-		return new Production( new Action( subexp, a ), debugName );
+		ParserExpression[] children = { subexp };
+		return Arrays.asList( children );
 	}
-
-	public ParserExpression action(PyObject a)
-	{
-		return new Production( new Action( subexp, a ), debugName );
-	}
-
-	public ParserExpression condition(ParseCondition cond)
-	{
-		return new Production( new Condition( subexp, cond ), debugName );
-	}
-	
-	public ParserExpression suppress()
-	{
-		return new Production( new Suppress( subexp ), debugName );
-	}
-
-	public ParserExpression optional()
-	{
-		return new Production( new Optional( subexp ), debugName );
-	}
-
-	public ParserExpression zeroOrMore()
-	{
-		return new Production( new ZeroOrMore( subexp ), debugName );
-	}
-
-	public ParserExpression oneOrMore()
-	{
-		return new Production( new OneOrMore( subexp ), debugName );
-	}
-
 
 	
 	
@@ -76,18 +97,31 @@ public class Production extends UnaryBranchExpression
 	{
 		if ( x instanceof Production )
 		{
-			return super.compareTo( x );
+			Production px = (Production)x;
+			if ( subexp == null  &&  px.subexp == null )
+			{
+				return true;
+			}
+			else if ( subexp != null  &&  px.subexp != null )
+			{
+				return subexp.compareTo( px.subexp ); 
+			}
 		}
-		else
-		{
-			return false;
-		}
+
+		return false;
 	}
 	
 
 
 	public String toString()
 	{
-		return "Production( " + subexp.toString() + " )";
+		if ( subexp == null )
+		{
+			return "Production( <null> )";
+		}
+		else
+		{
+			return "Production( <" + subexp.getExpressionName() + "> )";
+		}
 	}
 }

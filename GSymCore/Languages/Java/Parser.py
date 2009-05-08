@@ -9,7 +9,7 @@
 
 from BritefuryJ.Parser import *
 from BritefuryJ.Parser.Utils import *
-from BritefuryJ.Parser.Utils.OperatorParser import Prefix, Suffix, InfixLeft, InfixRight, InfixChain, PrecedenceLevel, OperatorTable
+from BritefuryJ.Parser.Utils.OperatorParser import PrefixLevel, SuffixLevel, InfixLeftLevel, InfixRightLevel, InfixChainLevel, UnaryOperator, BinaryOperator, OperatorTable
 
 
 from Britefury.Grammar.Grammar import Grammar, Rule

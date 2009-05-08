@@ -16,21 +16,15 @@ import org.python.core.PyObject;
 import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
 import BritefuryJ.Parser.Choice;
-import BritefuryJ.Parser.Forward;
 import BritefuryJ.Parser.ParseAction;
 import BritefuryJ.Parser.ParserExpression;
+import BritefuryJ.Parser.Production;
 import BritefuryJ.Parser.Sequence;
 
-public class InfixChain extends Operator
+public class InfixChainLevel extends OperatorLevel
 {
-	// Infix chain action interface
-	public interface InfixChainParseAction
-	{
-		public Object invoke(String input, int begin, Object x, List<Object> ys);
-	}
-	
 	// Build AST Node infix chain action
-	private static class BuildASTNodeInfixChainAction implements InfixChainParseAction
+	protected static class BuildASTNodeInfixChainAction implements InfixChainParseAction
 	{
 		private DMObjectClass nodeClass;
 		private String fieldNames[];
@@ -67,7 +61,7 @@ public class InfixChain extends Operator
 	}
 
 	// Python infix chain action
-	private static class PyInfixChainParseAction implements InfixChainParseAction
+	protected static class PyInfixChainParseAction implements InfixChainParseAction
 	{
 		private PyObject callable;
 		
@@ -84,7 +78,9 @@ public class InfixChain extends Operator
 	}
 
 	
-	// The parse action to supply to the Action node
+	
+	
+	// A parse action that wraps an InfixChainParseAction
 	private static class InfixChainAction implements ParseAction
 	{
 		private InfixChainParseAction action;
@@ -110,14 +106,8 @@ public class InfixChain extends Operator
 	
 	
 	
-	// Chain operator action interface
-	public interface ChainOperatorParseAction
-	{
-		public Object invoke(String input, int begin, Object x);
-	}
-	
 	// Build AST Node chain action
-	private static class BuildASTNodeChainOperatorAction implements ChainOperatorParseAction
+	protected static class BuildASTNodeChainOperatorAction implements InfixChainOperatorParseAction
 	{
 		private DMObjectClass nodeClass;
 		private String fieldNames[];
@@ -149,7 +139,7 @@ public class InfixChain extends Operator
 	}
 
 	// Python chain operator action
-	private static class PyChainOperatorParseAction implements ChainOperatorParseAction
+	protected static class PyChainOperatorParseAction implements InfixChainOperatorParseAction
 	{
 		private PyObject callable;
 		
@@ -168,12 +158,12 @@ public class InfixChain extends Operator
 	
 	
 	// The parse action to supply to the Action node
-	private static class ChainOpAction implements ParseAction
+	protected static class ChainOpAction implements ParseAction
 	{
-		private ChainOperatorParseAction action;
+		private InfixChainOperatorParseAction action;
 		
 		
-		public ChainOpAction(ChainOperatorParseAction action)
+		public ChainOpAction(InfixChainOperatorParseAction action)
 		{
 			this.action = action;
 		}
@@ -189,52 +179,9 @@ public class InfixChain extends Operator
 	}
 
 	
-
-	// Chain operator - defines an operator that can be used - supply a list of these to the InfixChain constructor
-	public static class ChainOperator extends Object
-	{
-		ParserExpression opExpression;
-		ChainOperatorParseAction action;
-		
-		public ChainOperator(ParserExpression opExpression, ChainOperatorParseAction action)
-		{
-			this.opExpression = opExpression;
-			this.action = action;
-		}
-
-		public ChainOperator(String operator, DMObjectClass nodeClass, String fieldName) throws InvalidFieldNameException
-		{
-			this( ParserExpression.coerce( operator ), new BuildASTNodeChainOperatorAction( nodeClass, fieldName ) );
-		}
-
-		public ChainOperator(String operator, PyObject callable)
-		{
-			this( ParserExpression.coerce( operator ), new PyChainOperatorParseAction( callable ) );
-		}
-
-		public ChainOperator(ParserExpression opExpression, DMObjectClass nodeClass, String fieldName) throws InvalidFieldNameException
-		{
-			this( opExpression, new BuildASTNodeChainOperatorAction( nodeClass, fieldName ) );
-		}
-
-		public ChainOperator(ParserExpression opExpression, PyObject callable)
-		{
-			this( opExpression, new PyChainOperatorParseAction( callable ) );
-		}
-		
-		
-		private ParserExpression buildParseExpression(ParserExpression right)
-		{
-			ParserExpression e = new Sequence( new ParserExpression[] { opExpression, right } );
-			return e.action( new ChainOpAction( action ) );
-		}
-	}
-
 	
 	
-	
-	
-	
+
 	
 	
 	
@@ -242,19 +189,19 @@ public class InfixChain extends Operator
 	private InfixChainAction action;
 	
 	
-	public InfixChain(List<ChainOperator> operators, InfixChainParseAction action)
+	public InfixChainLevel(List<ChainOperator> operators, InfixChainParseAction action)
 	{
 		this.operators = operators;
 		
 		this.action = new InfixChainAction( action );
 	}
 	
-	public InfixChain(List<ChainOperator> operators, DMObjectClass nodeClass, String leftFieldName, String rightListFieldName) throws InvalidFieldNameException
+	public InfixChainLevel(List<ChainOperator> operators, DMObjectClass nodeClass, String leftFieldName, String rightListFieldName) throws InvalidFieldNameException
 	{
 		this( operators, new BuildASTNodeInfixChainAction( nodeClass, leftFieldName, rightListFieldName ) );
 	}
 
-	public InfixChain(List<ChainOperator> operators, PyObject callable)
+	public InfixChainLevel(List<ChainOperator> operators, PyObject callable)
 	{
 		this( operators, new PyInfixChainParseAction( callable ) );
 	}
@@ -262,71 +209,28 @@ public class InfixChain extends Operator
 
 	
 	
-	protected ParserExpression buildParser(ParserExpression thisLevelParser, ParserExpression previousLevelParser)
+	protected ParserExpression buildParser(OperatorTable operatorTable, ParserExpression previousLevelParser, ArrayList<Production> reachupForwardDeclarations)
 	{
-		// Copied from InfixLeft
 		ParserExpression rightSubexp = previousLevelParser;
-		
+
 		// <rightExp0> | <rightExp1> | ... | <rightExpN>
-		ParserExpression rightOpExps[] = new ParserExpression[operators.size()];
-		int i = 0;
-		for (ChainOperator operator: operators)
+		ParserExpression[] rightOpExps = new ParserExpression[operators.size()];
+		for (int i = 0; i < operators.size(); i++)
 		{
-			rightOpExps[i++] = operator.buildParseExpression( rightSubexp );
+			ChainOperator operator = operators.get( i );
+			rightOpExps[i] = operator.buildParseExpression( rightSubexp );
 		}
 		Choice rightChoice = new Choice( rightOpExps );
 		
-		
+
 		// <thisLeverParser> <rightChoice>+
-		ParserExpression p = new Sequence( new ParserExpression[] { thisLevelParser, rightChoice.oneOrMore() } );
+		ParserExpression p = new Sequence( new ParserExpression[] { previousLevelParser, rightChoice.oneOrMore() } );
 		// => action
 		return p.action( action );
 	}
 
-	
-	protected ParserExpression buildParserWithReachUp(OperatorTable operatorTable,
-			ArrayList<Forward> levelParserForwardDeclarations, PrecedenceLevel thisLevel,
-			ParserExpression thisLevelParser, PrecedenceLevel previousLevel,
-			ParserExpression previousLevelParser)
+	protected ParserExpression buildParserForReachUp(OperatorTable operatorTable, ParserExpression previousLevelParser)
 	{
-		// Copied from InfixLeft
-		ParserExpression prefix = operatorTable.getLowestPrecedenceUnaryOperatorLevelParserAbove( levelParserForwardDeclarations, thisLevel, new OperatorTable.PrefixFilter() );
-		//ParserExpression suffix = operatorTable.getLowestPrecedenceUnaryOperatorLevelParserAbove( levelParserForwardDeclarations, thisLevel, new OperatorTable.SuffixFilter() );
-		ParserExpression left, right;
-		
-//		if ( suffix != null )
-//		{
-//			left = suffix.__or__( thisLevelParser );
-//		}
-//		else
-//		{
-//			left = thisLevelParser;
-//		}
-		left = thisLevelParser;
-
-		if ( prefix != null )
-		{
-			right = previousLevelParser.__or__( prefix );
-		}
-		else
-		{
-			right = previousLevelParser;
-		}
-		
-
-		// <rightExp0> | <rightExp1> | ... | <rightExpN>
-		ParserExpression rightOpExps[] = new ParserExpression[operators.size()];
-		int i = 0;
-		for (ChainOperator operator: operators)
-		{
-			rightOpExps[i++] = operator.buildParseExpression( right );
-		}
-		Choice rightChoice = new Choice( rightOpExps );
-		
-		
-		// <thisLeverParser> <rightChoice>+
-		ParserExpression p = new Sequence( new ParserExpression[] { left, rightChoice.oneOrMore() } );
-		// => action
-		return p.action( action );
+		return null;
 	}
 }

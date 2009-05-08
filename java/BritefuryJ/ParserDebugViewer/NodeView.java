@@ -232,7 +232,7 @@ public class NodeView
 	
 	private DPWidget makeTitleWidget(DebugNode data)
 	{
-		String debugName = data.getExpression().getDebugName();
+		String exprName = data.getExpression().getExpressionName();
 		
 		String className = data.getExpression().getClass().getName();
 		if ( className.contains( "." ) )
@@ -242,11 +242,11 @@ public class NodeView
 		}
 		
 		DPText classText = new DPText( classNameStyle, "[" + className + "]" );
-		if ( debugName != "" )
+		if ( exprName != null )
 		{
-			DPText debugText = new DPText( debugNameStyle, debugName );
+			DPText exprText = new DPText( debugNameStyle, exprName );
 			DPHBox textBox = new DPHBox( titleTextHBoxStyle );
-			DPWidget[] children = { debugText, classText };
+			DPWidget[] children = { exprText, classText };
 			textBox.setChildren( Arrays.asList( children ) );
 			return textBox;
 		}

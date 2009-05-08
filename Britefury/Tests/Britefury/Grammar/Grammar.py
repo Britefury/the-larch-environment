@@ -108,8 +108,8 @@ class GrammarTestCase (ParserTestCase):
 		def ops(self):
 			opTable = OperatorTable( 
 				[
-					PrecedenceLevel( [ InfixLeft( Literal( '*' ),  lambda input, pos, left, right: [ 'mul', left, right ] ) ] ),
-					PrecedenceLevel( [ InfixLeft( Literal( '+' ),  lambda input, pos, left, right: [ 'add', left, right ] ) ] ),
+					InfixLeftLevel( [ BinaryOperator( Literal( '*' ),  lambda input, pos, left, right: [ 'mul', left, right ] ) ] ),
+					InfixLeftLevel( [ BinaryOperator( Literal( '+' ),  lambda input, pos, left, right: [ 'add', left, right ] ) ] ),
 				],  self.atom() )
 			
 			return opTable.buildParsers()
@@ -131,11 +131,15 @@ class GrammarTestCase (ParserTestCase):
 		
 	def testProduction(self):
 		g = self.TestGrammarSimple()
+		g2 = self.TestGrammarRecursive()
 		
 		a1 = g.a()
+		a2 = g2.mul()
 		
 		self.assert_( isinstance( a1, Production ) )
-		self.assert_( a1.getDebugName() == 'a' )
+		self.assert_( a1.getExpressionName() == 'a' )
+		self.assert_( isinstance( a2, Production ) )
+		self.assert_( a2.getExpressionName() == 'mul' )
 
 		
 	def testRuleCacheing(self):
@@ -146,14 +150,6 @@ class GrammarTestCase (ParserTestCase):
 		self.assert_( a1 is a2 )
 		
 		
-	def testForward(self):
-		g = self.TestGrammarRecursive()
-		
-		m = g.mul()
-		
-		self.assert_( isinstance( m, Forward ) )
-		
-
 	def testSimpleGrammar(self):
 		g = self.TestGrammarSimple()
 		
@@ -225,42 +221,14 @@ class GrammarTestCase (ParserTestCase):
 		mul = g.mul()
 		
 		
-		self.assert_( isinstance( x[0], Forward ) )
-		self.assert_( isinstance( x[1], Forward ) )
-		bf0, bf1 = x
-		p0, p1 = [ bf.getExpression()   for bf in [bf0,bf1] ]
-		self.assert_( isinstance( p0, Production ) )
-		self.assert_( isinstance( p1, Production ) )
-		f0, f1 = [ p.getSubExpression()   for p in [p0,p1] ]
-		self.assert_( isinstance( f0, Forward ) )
-		self.assert_( isinstance( f1, Forward ) )
-		ip0, ip1 = [ f.getExpression()   for f in [f0,f1] ]
-		self.assert_( isinstance( ip0, Production ) )
-		self.assert_( isinstance( ip1, Production ) )
-		c0, c1 = [ ip.getSubExpression()   for ip in [ip0,ip1] ]
-		self.assert_( isinstance( c0, Choice ) )
-		self.assert_( isinstance( c1, Choice ) )
-		self.assert_( c0.getSubExpressions()[-1] is atom )
-		self.assert_( c1.getSubExpressions()[-1] is f0 )
-		a0, a1 = [ c.getSubExpressions()[0]   for c in [c0,c1] ]
-		self.assert_( isinstance( a0, Action ) )
-		self.assert_( isinstance( a1, Action ) )
-		s0, s1 = [ a.getSubExpression()   for a in [a0,a1] ]
-		s0l, s0r = s0.getSubExpressions()[0], s0.getSubExpressions()[2]
-		s1l, s1r = s1.getSubExpressions()[0], s1.getSubExpressions()[2]
-		self.assert_( s0l is f0 )
-		self.assert_( s0r is atom )
-		self.assert_( s1l is f1 )
-		self.assert_( s1r is f0 )
-		
 		self.assert_( isinstance( atom, Production ) )
-		atomC = atom.getSubExpression()
+		atomC = atom.getExpression()
 		self.assert_( isinstance( atomC, Choice ) )
 		atomC1 = atomC.getSubExpressions()[1]
 		self.assert_( atomC1 is paren )
 		
 		self.assert_( isinstance( paren, Production ) )
-		parenA = paren.getSubExpression()
+		parenA = paren.getExpression()
 		self.assert_( isinstance( parenA, Action ) )
 		parenS = parenA.getSubExpression()
 		self.assert_( isinstance( parenS, Sequence ) )
@@ -268,13 +236,13 @@ class GrammarTestCase (ParserTestCase):
 		self.assert_( parenSE is expr )
 		
 		self.assert_( isinstance( expr, Production ) )
-		self.assert_( expr.getSubExpression() is add )
+		self.assert_( expr.getExpression() is add )
 
 		self.assert_( isinstance( add, Production ) )
-		self.assert_( add.getSubExpression() is bf1 )
+		self.assert_( add.getExpression() is x[1] )
 
 		self.assert_( isinstance( mul, Production ) )
-		self.assert_( mul.getSubExpression() is bf0 )
+		self.assert_( mul.getExpression() is x[0] )
 
 		self._matchTest( g.expr(), 'a', 'a' )
 		self._matchTest( g.expr(), 'a*b', [ 'mul', 'a', 'b' ] )

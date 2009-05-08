@@ -6,28 +6,7 @@
 //##************************
 package BritefuryJ.Parser.Utils.OperatorParser;
 
-import BritefuryJ.Parser.ParserExpression;
-
-public abstract class Operator
+public interface InfixChainOperatorParseAction
 {
-	protected ParserExpression opExpression;
-
-
-	
-	protected Operator(ParserExpression opExpression)
-	{
-		this.opExpression = opExpression;
-	}
-
-	protected Operator(String operator)
-	{
-		this.opExpression = ParserExpression.coerce( operator );
-	}
-	
-	
-	
-	protected ParserExpression getOperatorExpression()
-	{
-		return opExpression;
-	}
+	public Object invoke(String input, int begin, Object x);
 }

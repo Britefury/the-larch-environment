@@ -11,136 +11,79 @@ import java.util.Arrays;
 import java.util.List;
 
 import BritefuryJ.Parser.DebugParseResult;
-import BritefuryJ.Parser.Forward;
 import BritefuryJ.Parser.Literal;
 import BritefuryJ.Parser.ParserExpression;
+import BritefuryJ.Parser.Production;
 import BritefuryJ.Parser.Utils.Tokens;
-import BritefuryJ.Parser.Utils.OperatorParser.PrecedenceLevel.OperatorParserPrecedenceLevelCannotMixOperatorTypesError;
 import BritefuryJ.ParserDebugViewer.ParseViewFrame;
 
 public class OperatorTable
 {
-	protected static interface OperatorFilter
-	{
-		public boolean test(Operator op);
-	}
-	
-	protected static class PrefixFilter implements OperatorFilter
-	{
-		public boolean test(Operator op)
-		{
-			return op instanceof Prefix;
-		}
-	}
-
-	protected static class SuffixFilter implements OperatorFilter
-	{
-		public boolean test(Operator op)
-		{
-			return op instanceof Suffix;
-		}
-	}
-	
-	
-	
 	private ParserExpression rootParser;
-	private ArrayList<PrecedenceLevel> levels;
+	private ArrayList<OperatorLevel> levels;
 	
 	
 	//
 	// Constructor
 	//
 	
-	public OperatorTable(List<PrecedenceLevel> levels, ParserExpression rootParser) throws OperatorParserPrecedenceLevelCannotMixOperatorTypesError
+	public OperatorTable(List<OperatorLevel> levels, ParserExpression rootParser)
 	{
 		this.rootParser = rootParser;
-		this.levels = new ArrayList<PrecedenceLevel>();
+		this.levels = new ArrayList<OperatorLevel>();
 		this.levels.addAll( levels );
 	}
 	
 	
 	
-	protected ParserExpression getLowestPrecedenceUnaryOperatorLevelParserAbove(ArrayList<Forward> levelParserForwardDeclarations, PrecedenceLevel aboveLevel, OperatorFilter opFilter)
+	protected ParserExpression getPrefixLevelForReachUp(ArrayList<Production> reachupForwardDeclarations, OperatorLevel aboveLevel)
 	{
 		int index = levels.indexOf( aboveLevel );
 		for (int i = levels.size() - 1; i >= index; i--)
 		{
-			if ( levels.get( i ).checkOperators( opFilter ) )
+			OperatorLevel lvl = levels.get( i );
+			if ( lvl instanceof PrefixLevel )
 			{
-				return levelParserForwardDeclarations.get( i );
+				PrefixLevel p = (PrefixLevel)lvl;
+				if ( p.isReachUpEnabled() )
+				{
+					return reachupForwardDeclarations.get( i );
+				}
 			}
 		}
 		return null;
 	}
 	
 	
-	public List<ParserExpression> buildParsers()
+	public List<ParserExpression> buildParsers() throws Production.CannotOverwriteProductionExpressionException
 	{
-		if ( hasReachUpLevels() )
-		{
-			ParserExpression prevLevelParser = rootParser;
-			ArrayList<Forward> levelParserOpOnlyForwardDeclarations = new ArrayList<Forward>();
-			ArrayList<ParserExpression> levelParsers = new ArrayList<ParserExpression>();
-			for (int i = 0; i < levels.size(); i++)
-			{
-				levelParserOpOnlyForwardDeclarations.add( new Forward() );
-			}
-			PrecedenceLevel prevLevel = null;
-			for (int i = 0; i < levels.size(); i++)
-			{
-				Forward opOnlyForward = levelParserOpOnlyForwardDeclarations.get( i );
-				PrecedenceLevel lvl = levels.get( i );
-				
-				ParserExpression levelParser = lvl.buildParserWithReachUp( this, levelParserOpOnlyForwardDeclarations, opOnlyForward, prevLevel, prevLevelParser, "oplvl_" + i );
-				levelParsers.add( levelParser );
-	
-				prevLevel = lvl;
-				prevLevelParser = levelParser;
-			}
-			
-			return levelParsers;
-		}
-		else
-		{
-			ParserExpression prevLevelParser = rootParser;
-			ArrayList<ParserExpression> levelParsers = new ArrayList<ParserExpression>();
-			PrecedenceLevel prevLevel = null;
-			for (int i = 0; i < levels.size(); i++)
-			{
-				PrecedenceLevel lvl = levels.get( i );
-				
-				ParserExpression levelParser = lvl.buildParser( this, prevLevel, prevLevelParser, "oplvl_" + i );
-				levelParsers.add( levelParser );
-	
-				prevLevel = lvl;
-				prevLevelParser = levelParser;
-			}
-			
-			return levelParsers;
-		}
-	}
-	
-	
-	
-	protected boolean hasReachUpLevels()
-	{
-		PrefixFilter pf = new PrefixFilter();
-		SuffixFilter sf = new SuffixFilter();
+		ParserExpression prevLevelParser = rootParser;
+		ArrayList<ParserExpression> levelParsers = new ArrayList<ParserExpression>();
+		ArrayList<Production> reachupForwardDeclarations = new ArrayList<Production>();
 
-		for (PrecedenceLevel lvl: levels)
+		for (int i = 0; i < levels.size(); i++)
 		{
-			if ( lvl.checkOperators( pf )  ||  lvl.checkOperators( sf ) )
-			{
-				return true;
-			}
+			reachupForwardDeclarations.add( new Production( "oplvl_reachup_" + i ) );
+		}
+
+		for (int i = 0; i < levels.size(); i++)
+		{
+			OperatorLevel lvl = levels.get( i );
+			
+			ParserExpression levelParser = new Production( "oplvl_" + i, lvl.buildParser( this, prevLevelParser, reachupForwardDeclarations ).__or__( prevLevelParser ) );
+			ParserExpression reachupParser = lvl.buildParserForReachUp( this, prevLevelParser );
+			levelParsers.add( levelParser );
+			reachupForwardDeclarations.get( i ).setExpression( reachupParser );
+			
+			prevLevelParser = levelParser;
 		}
 		
-		return false;
+		return levelParsers;
 	}
 	
 	
 	
-	public static void main(String[] args) throws OperatorParserPrecedenceLevelCannotMixOperatorTypesError
+	public static void main(String[] args) throws BritefuryJ.Parser.Production.CannotOverwriteProductionExpressionException
 	{
 		BinaryOperatorParseAction mulAction = new BinaryOperatorParseAction()
 		{
@@ -159,17 +102,19 @@ public class OperatorTable
 		};
 		
 		
-		InfixLeft mul = new InfixLeft( new Literal( "*" ), mulAction );
-		Suffix inv = new Suffix( new Literal( "!" ), notAction );
+		BinaryOperator mul = new BinaryOperator( new Literal( "*" ), mulAction );
+		UnaryOperator inv = new UnaryOperator( new Literal( "!" ), notAction );
 		
-		PrecedenceLevel l0 = new PrecedenceLevel( Arrays.asList( new Operator[] { mul } ) );
-		PrecedenceLevel l1 = new PrecedenceLevel( Arrays.asList( new Operator[] { inv } ) );
+		InfixRightLevel l0 = new InfixRightLevel( Arrays.asList( new BinaryOperator[] { mul } ) );
+		//PrefixLevel l1 = new PrefixLevel( Arrays.asList( new UnaryOperator[] { inv } ) );
+		SuffixLevel l1 = new SuffixLevel( Arrays.asList( new UnaryOperator[] { inv } ) );
 		
-		OperatorTable t = new OperatorTable( Arrays.asList( new PrecedenceLevel[] { l0, l1 } ), Tokens.identifier );
+		OperatorTable t = new OperatorTable( Arrays.asList( new OperatorLevel[] { l0, l1 } ), Tokens.identifier );
 		List<ParserExpression> parsers = t.buildParsers();
 		ParserExpression e = parsers.get( parsers.size() - 1 );
 		
-		DebugParseResult r = e.debugParseString( "a! * b * c" );
+		DebugParseResult r = e.debugParseString( "a * b * c!" );
+//		DebugParseResult r = e.debugParseString( "a!!!" );
 		
 		new ParseViewFrame( r );
 	}

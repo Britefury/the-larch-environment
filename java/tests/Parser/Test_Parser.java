@@ -18,7 +18,6 @@ import BritefuryJ.Parser.Choice;
 import BritefuryJ.Parser.Combine;
 import BritefuryJ.Parser.Condition;
 import BritefuryJ.Parser.DebugParseResult;
-import BritefuryJ.Parser.Forward;
 import BritefuryJ.Parser.Keyword;
 import BritefuryJ.Parser.Literal;
 import BritefuryJ.Parser.OneOrMore;
@@ -814,8 +813,8 @@ public class Test_Parser extends ParserTestCase
 			}
 		};
 		
-		ParserExpression mul = new Production( ( integer.__add__( new ZeroOrMore( mulop.__add__( integer ) ).action( flattenAction ) ) ) ).action( action );
-		ParserExpression add = new Production( ( mul.__add__( new ZeroOrMore( addop.__add__( mul ) ).action( flattenAction ) ) ) ).action( action );
+		Production mul = new Production( "mul", ( integer.__add__( new ZeroOrMore( mulop.__add__( integer ) ).action( flattenAction ) ) ).action( action ) );
+		Production add = new Production( "add", ( mul.__add__( new ZeroOrMore( addop.__add__( mul ) ).action( flattenAction ) ) ).action( action ) );
 		ParserExpression parser = add;
 		
 		matchTest( parser, "123", "123" );
@@ -839,37 +838,37 @@ public class Test_Parser extends ParserTestCase
 	}
 
 
-	public void testRightRecursion() throws ParserExpression.ParserCoerceException
+	public void testRightRecursion() throws ParserExpression.ParserCoerceException, Production.CannotOverwriteProductionExpressionException
 	{
-		ParserExpression x = new Production( "x" );
-		Forward y = new Forward();
-		y.setExpression( new Production( x.__add__( y ).__or__( "y" ) ) );
+		Production x = new Production( "_x", "x" );
+		Production y = new Production( "_y" );
+		y.setExpression( x.__add__( y ).__or__( "y" ) );
 		
 		matchTestSX( y, "xxxy", "[x [x [x y]]]" );
 	}
 
 
-	public void testDirectLeftRecursion() throws ParserExpression.ParserCoerceException
+	public void testDirectLeftRecursion() throws ParserExpression.ParserCoerceException, Production.CannotOverwriteProductionExpressionException
 	{
-		ParserExpression x = new Production( "x" );
-		Forward y = new Forward();
-		y.setExpression( new Production( y.__add__( x ).__or__( "y" ) ) );
+		Production x = new Production( "_x", "x" );
+		Production y = new Production( "_y" );
+		y.setExpression( y.__add__( x ).__or__( "y" ) );
 		
 		matchTestSX( y, "yxxx", "[[[y x] x] x]" );
 	}
 
-	public void testIndirectLeftRecursion() throws ParserExpression.ParserCoerceException
+	public void testIndirectLeftRecursion() throws ParserExpression.ParserCoerceException, Production.CannotOverwriteProductionExpressionException
 	{
-		Production x = new Production( "x" );
-		Forward z = new Forward();
-		Production y = new Production( z.__add__( x ).__or__( "z" ) );
-		z.setExpression( new Production( y.__or__( "y" ) ) );
+		Production x = new Production( "_x", "x" );
+		Production z = new Production( "_z" );
+		Production y = new Production( "_y", z.__add__( x ).__or__( "z" ) );
+		z.setExpression( y.__or__( "y" ) );
 		
 		matchTestSX( z, "zxxx", "[[[z x] x] x]" );
 		matchTestSX( z, "yxxx", "[[[y x] x] x]" );
 	}
 
-	public void testLeftRecursion()
+	public void testLeftRecursion() throws Production.CannotOverwriteProductionExpressionException
 	{
 		ParserExpression integer = new Word( "0123456789" );
 		ParserExpression plus = new Literal( "+" );
@@ -880,10 +879,10 @@ public class Test_Parser extends ParserTestCase
 		ParserExpression addop = plus.__or__(  minus );
 		ParserExpression mulop = star.__or__(  slash );
 
-		Forward mul = new Forward();
-		mul.setExpression( new Production( ( mul.__add__( mulop ).__add__( integer ) ).__or__( integer ) ) );
-		Forward add = new Forward();
-		add.setExpression( new Production( ( add.__add__( addop ).__add__( mul ) ).__or__( mul ) ) );
+		Production mul = new Production( "mul" );
+		mul.setExpression( ( mul.__add__( mulop ).__add__( integer ) ).__or__( integer ) );
+		Production add = new Production( "add" );
+		add.setExpression( ( add.__add__( addop ).__add__( mul ) ).__or__( mul ) );
 		ParserExpression parser = add;
 		
 		matchTest( parser, "123", "123" );
@@ -908,10 +907,8 @@ public class Test_Parser extends ParserTestCase
 
 
 
-	public void testLeftRecursionSimplifiedJavaPrimary() throws ParserExpression.ParserCoerceException
+	public void testLeftRecursionSimplifiedJavaPrimary() throws ParserExpression.ParserCoerceException, Production.CannotOverwriteProductionExpressionException
 	{
-		Forward primary = new Forward();
-		
 		ParseAction arrayAccessAction = new ParseAction()
 		{
 			@SuppressWarnings("unchecked")
@@ -952,35 +949,31 @@ public class Test_Parser extends ParserTestCase
 			}
 		};
 		
-		ParserExpression expression = new Production( new Literal( "i" ).__or__( new Literal( "j" ) ) ).debug( "expression" );
-		ParserExpression methodName = new Production( new Literal( "m" ).__or__( new Literal( "n" ) ) ).debug( "methodName" );
-		ParserExpression interfaceTypeName = new Production( new Literal( "I" ).__or__( new Literal( "J" ) ) ).debug( "interfaceTypeName" );
-		ParserExpression className = new Production( new Literal( "C" ).__or__( new Literal( "D" ) ) ).debug( "className" );
-
-		ParserExpression classOrInterfaceType = new Production( className.__or__( interfaceTypeName ) ).debug( "classOrInterfaceType" );
-
-		ParserExpression identifier = new Production( new Literal( "x" ).__or__( new Literal( "y" ).__or__( classOrInterfaceType ) ) ).debug( "identifier" );
-		ParserExpression expressionName = new Production( identifier ).debug( "expressionName" );
-
-		ParserExpression arrayAccess = new Production( ( primary.__add__( "[" ).__add__( expression ).__add__( "]" ) ).action( arrayAccessAction ).__or__(
-											( expressionName.__add__( "[" ).__add__( expression ).__add__( "]" ) ).action( arrayAccessAction ) ) ).debug( "arrayAccess" );
-		ParserExpression fieldAccess = new Production( ( primary.__add__( "." ).__add__( identifier ) ).action( fieldAccessAction ).__or__(
-				( new Literal( "super" ).__add__( "." ).__add__( identifier ) ).action( fieldAccessAction ) ) ).debug( "fieldAccess" );
-		ParserExpression methodInvocation = new Production( ( primary.__add__( "." ).__add__( methodName ).__add__( "()" ) ).action( objectMethodInvocationAction ).__or__(
-				( methodName.__add__( "()" ) ).action( thisMethodInvocationAction ) ) ).debug( "methodInvocation" );
+		Production primary = new Production( "primary" );
 		
-		ParserExpression classInstanceCreationExpression = new Production( ( new Literal( "new" ).__add__( classOrInterfaceType ).__add__( "()" ) ).__or__(
-				primary.__add__( "." ).__add__( "new" ).__add__( identifier ).__add__( "()" ) ) ).debug( "classInstanceCreationExpression" );
-		
-//		ParserExpression primaryNoNewArray = new Production( classInstanceCreationExpression.__or__( methodInvocation ).__or__( fieldAccess ).__or__( arrayAccess ).__or__( "this" ) ).debug( "primaryNoNewArray" );
+		ParserExpression expression = new Production( "expression", new Literal( "i" ).__or__( new Literal( "j" ) ) );
+		ParserExpression methodName = new Production( "methodName", new Literal( "m" ).__or__( new Literal( "n" ) ) );
+		ParserExpression interfaceTypeName = new Production( "interfaceTypeName", new Literal( "I" ).__or__( new Literal( "J" ) ) );
+		ParserExpression className = new Production( "className", new Literal( "C" ).__or__( new Literal( "D" ) ) );
 
-//		primary.setExpression( new Production( primaryNoNewArray ).debug( "primary" ) );
+		ParserExpression classOrInterfaceType = new Production( "classOrInterfaceType", className.__or__( interfaceTypeName ) );
+
+		ParserExpression identifier = new Production( "identifier", new Literal( "x" ).__or__( new Literal( "y" ).__or__( classOrInterfaceType ) ) );
+		ParserExpression expressionName = new Production( "expressionName", identifier );
+
+		ParserExpression arrayAccess = new Production( "arrayAccess", ( primary.__add__( "[" ).__add__( expression ).__add__( "]" ) ).action( arrayAccessAction ).__or__(
+											( expressionName.__add__( "[" ).__add__( expression ).__add__( "]" ) ).action( arrayAccessAction ) ) );
+		ParserExpression fieldAccess = new Production( "fieldAccess", ( primary.__add__( "." ).__add__( identifier ) ).action( fieldAccessAction ).__or__(
+				( new Literal( "super" ).__add__( "." ).__add__( identifier ) ).action( fieldAccessAction ) ) );
+		ParserExpression methodInvocation = new Production( "methodInvocation", ( primary.__add__( "." ).__add__( methodName ).__add__( "()" ) ).action( objectMethodInvocationAction ).__or__(
+				( methodName.__add__( "()" ) ).action( thisMethodInvocationAction ) ) );
 		
-//		ParserExpression fieldAccessOrArrayAccess = new Production( fieldAccess.__xor__( arrayAccess ) ).debug( "fieldAccessOrArrayAccess" );
-	
-		ParserExpression fieldAccessOrArrayAccess = new Production( fieldAccess.__or__( arrayAccess ) ).debug( "fieldAccessOrArrayAccess" );
-		ParserExpression primaryNoNewArray = new Production( classInstanceCreationExpression.__or__( methodInvocation ).__or__( fieldAccessOrArrayAccess ).__or__( "this" ) ).debug( "primaryNoNewArray" );
-		primary.setExpression( new Production( primaryNoNewArray ).debug( "primary" ) );
+		ParserExpression classInstanceCreationExpression = new Production( "classInstanceCreationExpression", ( new Literal( "new" ).__add__( classOrInterfaceType ).__add__( "()" ) ).__or__(
+				primary.__add__( "." ).__add__( "new" ).__add__( identifier ).__add__( "()" ) ) );
+		
+		ParserExpression fieldAccessOrArrayAccess = new Production( "fieldAccessOrArrayAccess", fieldAccess.__or__( arrayAccess ) );
+		ParserExpression primaryNoNewArray = new Production( "primaryNoNewArray", classInstanceCreationExpression.__or__( methodInvocation ).__or__( fieldAccessOrArrayAccess ).__or__( "this" ) );
+		primary.setExpression( primaryNoNewArray );
 		
 	
 		matchTestSX( primary, "this", "this" );
@@ -1013,10 +1006,8 @@ public class Test_Parser extends ParserTestCase
 	}
 	
 	
-	public static void main(String[] args) throws ParserCoerceException
+	public static void main(String[] args) throws ParserCoerceException, Production.CannotOverwriteProductionExpressionException
 	{
-		Forward primary = new Forward();
-		
 		ParseAction arrayAccessAction = new ParseAction()
 		{
 			@SuppressWarnings("unchecked")
@@ -1057,35 +1048,37 @@ public class Test_Parser extends ParserTestCase
 			}
 		};
 		
-		ParserExpression expression = new Production( new Literal( "i" ).__or__( new Literal( "j" ) ) ).debug( "expression" );
-		ParserExpression methodName = new Production( new Literal( "m" ).__or__( new Literal( "n" ) ) ).debug( "methodName" );
-		ParserExpression interfaceTypeName = new Production( new Literal( "I" ).__or__( new Literal( "J" ) ) ).debug( "interfaceTypeName" );
-		ParserExpression className = new Production( new Literal( "C" ).__or__( new Literal( "D" ) ) ).debug( "className" );
-
-		ParserExpression classOrInterfaceType = new Production( className.__or__( interfaceTypeName ) ).debug( "classOrInterfaceType" );
-
-		ParserExpression identifier = new Production( new Literal( "x" ).__or__( new Literal( "y" ).__or__( classOrInterfaceType ) ) ).debug( "identifier" );
-		ParserExpression expressionName = new Production( identifier ).debug( "expressionName" );
-
-		ParserExpression arrayAccess = new Production( ( primary.__add__( "[" ).__add__( expression ).__add__( "]" ) ).action( arrayAccessAction ).__or__(
-											( expressionName.__add__( "[" ).__add__( expression ).__add__( "]" ) ).action( arrayAccessAction ) ) ).debug( "arrayAccess" );
-		ParserExpression fieldAccess = new Production( ( primary.__add__( "." ).__add__( identifier ) ).action( fieldAccessAction ).__or__(
-				( new Literal( "super" ).__add__( "." ).__add__( identifier ) ).action( fieldAccessAction ) ) ).debug( "fieldAccess" );
-		ParserExpression methodInvocation = new Production( ( primary.__add__( "." ).__add__( methodName ).__add__( "()" ) ).action( objectMethodInvocationAction ).__or__(
-				( methodName.__add__( "()" ) ).action( thisMethodInvocationAction ) ) ).debug( "methodInvocation" );
+		Production primary = new Production( "primary" );
 		
-		ParserExpression classInstanceCreationExpression = new Production( ( new Literal( "new" ).__add__( classOrInterfaceType ).__add__( "()" ) ).__or__(
-				primary.__add__( "." ).__add__( "new" ).__add__( identifier ).__add__( "()" ) ) ).debug( "classInstanceCreationExpression" );
+		ParserExpression expression = new Production( "expression", new Literal( "i" ).__or__( new Literal( "j" ) ) );
+		ParserExpression methodName = new Production( "methodName", new Literal( "m" ).__or__( new Literal( "n" ) ) );
+		ParserExpression interfaceTypeName = new Production( "interfaceTypeName", new Literal( "I" ).__or__( new Literal( "J" ) ) );
+		ParserExpression className = new Production( "className", new Literal( "C" ).__or__( new Literal( "D" ) ) );
+
+		ParserExpression classOrInterfaceType = new Production( "classOrInterfaceType", className.__or__( interfaceTypeName ) );
+
+		ParserExpression identifier = new Production( "identifier", new Literal( "x" ).__or__( new Literal( "y" ).__or__( classOrInterfaceType ) ) );
+		ParserExpression expressionName = new Production( "expressionName", identifier );
+
+		ParserExpression arrayAccess = new Production( "arrayAccess", ( primary.__add__( "[" ).__add__( expression ).__add__( "]" ) ).action( arrayAccessAction ).__or__(
+											( expressionName.__add__( "[" ).__add__( expression ).__add__( "]" ) ).action( arrayAccessAction ) ) );
+		ParserExpression fieldAccess = new Production( "fieldAccess", ( primary.__add__( "." ).__add__( identifier ) ).action( fieldAccessAction ).__or__(
+				( new Literal( "super" ).__add__( "." ).__add__( identifier ) ).action( fieldAccessAction ) ) );
+		ParserExpression methodInvocation = new Production( "methodInvocation", ( primary.__add__( "." ).__add__( methodName ).__add__( "()" ) ).action( objectMethodInvocationAction ).__or__(
+				( methodName.__add__( "()" ) ).action( thisMethodInvocationAction ) ) );
+		
+		ParserExpression classInstanceCreationExpression = new Production( "classInstanceCreationExpression", ( new Literal( "new" ).__add__( classOrInterfaceType ).__add__( "()" ) ).__or__(
+				primary.__add__( "." ).__add__( "new" ).__add__( identifier ).__add__( "()" ) ) );
 		
 //		ParserExpression primaryNoNewArray = new Production( classInstanceCreationExpression.__or__( methodInvocation ).__or__( fieldAccess ).__or__( arrayAccess ).__or__( "this" ) ).debug( "primaryNoNewArray" );
 
 //		primary.setExpression( new Production( primaryNoNewArray ).debug( "primary" ) );
 		
 //		ParserExpression fieldAccessOrArrayAccess = new Production( fieldAccess.__xor__( arrayAccess ) ).debug( "fieldAccessOrArrayAccess" );
-
-		ParserExpression fieldAccessOrArrayAccess = new Production( fieldAccess.__or__( arrayAccess ) ).debug( "fieldAccessOrArrayAccess" );
-		ParserExpression primaryNoNewArray = new Production( classInstanceCreationExpression.__or__( methodInvocation ).__or__( fieldAccessOrArrayAccess ).__or__( "this" ) ).debug( "primaryNoNewArray" );
-		primary.setExpression( new Production( primaryNoNewArray ).debug( "primary" ) );
+	
+		ParserExpression fieldAccessOrArrayAccess = new Production( "fieldAccessOrArrayAccess", fieldAccess.__or__( arrayAccess ) );
+		ParserExpression primaryNoNewArray = new Production( "primaryNoNewArray", classInstanceCreationExpression.__or__( methodInvocation ).__or__( fieldAccessOrArrayAccess ).__or__( "this" ) );
+		primary.setExpression( primaryNoNewArray );
 
 		
 		DebugParseResult d = fieldAccessOrArrayAccess.debugParseString( "this[i]" );

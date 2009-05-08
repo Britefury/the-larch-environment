@@ -73,6 +73,6 @@ public class Forward extends MatchExpression
 	
 	public String toString()
 	{
-		return "Forward( <" + subexp.getDebugName() + "> )";
+		return "Forward( <" + subexp.getExpressionName() + "> )";
 	}
 }

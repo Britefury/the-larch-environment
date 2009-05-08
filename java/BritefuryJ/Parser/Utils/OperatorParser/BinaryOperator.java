@@ -6,42 +6,16 @@
 //##************************
 package BritefuryJ.Parser.Utils.OperatorParser;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.python.core.Py;
 import org.python.core.PyInteger;
 import org.python.core.PyObject;
 
 import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
-import BritefuryJ.Parser.Forward;
-import BritefuryJ.Parser.ParseAction;
 import BritefuryJ.Parser.ParserExpression;
 
-abstract class BinaryOperator extends Operator
+public class BinaryOperator extends Operator
 {
-	private class BinaryOpAction implements ParseAction
-	{
-		private BinaryOperatorParseAction action;
-		
-		
-		public BinaryOpAction(BinaryOperatorParseAction action)
-		{
-			this.action = action;
-		}
-		
-		
-		@SuppressWarnings("unchecked")
-		public Object invoke(String input, int begin, Object x)
-		{
-			List<Object> xs = (List<Object>)x;
-			
-			return action.invoke( input, begin, xs.get( 0 ), xs.get( 2 ) );
-		}
-	}
-	
-	
 	protected static class BuildASTNodeAction implements BinaryOperatorParseAction
 	{
 		private DMObjectClass nodeClass;
@@ -96,9 +70,7 @@ abstract class BinaryOperator extends Operator
 
 	
 	
-	protected ParserExpression opExpression;
 	protected BinaryOperatorParseAction action;
-	
 	
 	
 	
@@ -108,31 +80,39 @@ abstract class BinaryOperator extends Operator
 	
 	protected BinaryOperator(ParserExpression opExpression, BinaryOperatorParseAction action)
 	{
-		this.opExpression = opExpression;
+		super( opExpression );
 		this.action = action;
 	}
 
-	
-	
-	
-	protected abstract ParserExpression buildOperatorParser(ParserExpression thisLevelParser, ParserExpression previousLevelParser);
-
-	protected abstract ParserExpression buildOperatorParserWithReachUp(OperatorTable operatorTable, ArrayList<Forward> levelParserForwardDeclarations, PrecedenceLevel thisLevel,
-			ParserExpression thisLevelParser, PrecedenceLevel previousLevel, ParserExpression previousLevelParser);
-
-
-	protected ParserExpression buildParser(ParserExpression thisLevelParser, ParserExpression previousLevelParser)
+	public BinaryOperator(ParserExpression opExpression, DMObjectClass nodeClass, String leftFieldName, String rightFieldName) throws InvalidFieldNameException
 	{
-		ParserExpression p = buildOperatorParser( thisLevelParser, previousLevelParser );
-		return p.action( new BinaryOpAction( action ) );
+		this( opExpression, new BuildASTNodeAction( nodeClass, leftFieldName, rightFieldName ) );
 	}
 
-	protected ParserExpression buildParserWithReachUp(OperatorTable operatorTable,
-			ArrayList<Forward> levelParserForwardDeclarations, PrecedenceLevel thisLevel,
-			ParserExpression thisLevelParser, PrecedenceLevel previousLevel,
-			ParserExpression previousLevelParser)
+	public BinaryOperator(ParserExpression opExpression, PyObject callable)
 	{
-		ParserExpression p = buildOperatorParserWithReachUp( operatorTable, levelParserForwardDeclarations, thisLevel, thisLevelParser, previousLevel, previousLevelParser );
-		return p.action( new BinaryOpAction( action ) );
+		this( opExpression, new PyBinaryOperatorParseAction( callable ) );
+	}
+	
+	public BinaryOperator(String operator, BinaryOperatorParseAction action)
+	{
+		super( operator );
+		this.action = action;
+	}
+
+	public BinaryOperator(String operator, DMObjectClass nodeClass, String leftFieldName, String rightFieldName) throws InvalidFieldNameException
+	{
+		this( ParserExpression.coerce( operator ), new BuildASTNodeAction( nodeClass, leftFieldName, rightFieldName ) );
+	}
+
+	public BinaryOperator(String operator, PyObject callable)
+	{
+		this( ParserExpression.coerce( operator ), new PyBinaryOperatorParseAction( callable ) );
+	}
+	
+	
+	protected BinaryOperatorParseAction getAction()
+	{
+		return action;
 	}
 }

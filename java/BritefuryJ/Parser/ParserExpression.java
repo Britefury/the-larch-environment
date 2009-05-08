@@ -22,11 +22,6 @@ public abstract class ParserExpression implements ParserExpressionInterface
 	
 	
 	
-	protected String debugName = "";
-	
-	
-	
-	
 	public ParseResult parseString(String input)
 	{
 		return parseString( input, 0, input.length() );
@@ -148,15 +143,9 @@ public abstract class ParserExpression implements ParserExpressionInterface
 	
 	
 	
-	public ParserExpression debug(String debugName)
+	public String getExpressionName()
 	{
-		this.debugName = debugName;
-		return this;
-	}
-	
-	public String getDebugName()
-	{
-		return debugName;
+		return null;
 	}
 	
 	

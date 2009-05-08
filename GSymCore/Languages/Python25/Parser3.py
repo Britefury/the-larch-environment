@@ -10,9 +10,9 @@ import string
 
 from BritefuryJ.DocModel import DMObject, DMNode
 
-from BritefuryJ.Parser import Action, Condition, Forward, Production, Suppress, Literal, Keyword, RegEx, Word, Sequence, Combine, Choice, Optional, Repetition, ZeroOrMore, OneOrMore, Peek, PeekNot, SeparatedList
+from BritefuryJ.Parser import Action, Condition, Suppress, Literal, Keyword, RegEx, Word, Sequence, Combine, Choice, Optional, Repetition, ZeroOrMore, OneOrMore, Peek, PeekNot, SeparatedList
 from BritefuryJ.Parser.Utils.Tokens import identifier, decimalInteger, hexInteger, integer, singleQuotedString, doubleQuotedString, quotedString, floatingPoint
-from BritefuryJ.Parser.Utils.OperatorParser import Prefix, Suffix, InfixLeft, InfixRight, InfixChain, PrecedenceLevel, OperatorTable
+from BritefuryJ.Parser.Utils.OperatorParser import PrefixLevel, SuffixLevel, InfixLeftLevel, InfixRightLevel, InfixChainLevel, UnaryOperator, BinaryOperator, ChainOperator, OperatorTable
 
 from BritefuryJ.Transformation import DefaultIdentityTransformationFunction
 
@@ -450,30 +450,29 @@ class Python25Grammar (Grammar):
 	def _operators(self):
 		opTable = OperatorTable( 
 			[
-				PrecedenceLevel( [ InfixRight( Literal( '**' ),  Nodes.Pow, 'x', 'y' ) ] ),
-				PrecedenceLevel( [ Prefix( Literal( '~' ),  Nodes.Invert, 'x' ),   Prefix( Literal( '-' ),  Nodes.Negate, 'x' ),   Prefix( Literal( '+' ),  Nodes.Pos, 'x' ) ] ),
-				PrecedenceLevel( [ InfixLeft( Literal( '*' ),  Nodes.Mul, 'x', 'y' ),   InfixLeft( Literal( '/' ),  Nodes.Div, 'x', 'y' ),   InfixLeft( Literal( '%' ),  Nodes.Mod, 'x', 'y' ) ] ),
-				PrecedenceLevel( [ InfixLeft( Literal( '+' ),  Nodes.Add, 'x', 'y' ),   InfixLeft( Literal( '-' ),  Nodes.Sub, 'x', 'y' ) ] ),
-				PrecedenceLevel( [ InfixLeft( Literal( '<<' ),  Nodes.LShift, 'x', 'y' ),   InfixLeft( Literal( '>>' ),  Nodes.RShift, 'x', 'y') ] ),
-				PrecedenceLevel( [ InfixLeft( Literal( '&' ),  Nodes.BitAnd, 'x', 'y' ) ] ),
-				PrecedenceLevel( [ InfixLeft( Literal( '^' ),  Nodes.BitXor, 'x', 'y' ) ] ),
-				PrecedenceLevel( [ InfixLeft( Literal( '|' ),  Nodes.BitOr, 'x', 'y' ) ] ),
-				PrecedenceLevel( [ InfixChain( [
-						InfixChain.ChainOperator( Literal( '<=' ),  Nodes.CmpOpLte, 'y' ),
-						InfixChain.ChainOperator( Literal( '<' ),  Nodes.CmpOpLt, 'y' ),
-						InfixChain.ChainOperator( Literal( '>=' ),  Nodes.CmpOpGte, 'y' ),
-						InfixChain.ChainOperator( Literal( '>' ),  Nodes.CmpOpGt, 'y' ),
-						InfixChain.ChainOperator( Literal( '==' ),  Nodes.CmpOpEq, 'y' ),
-						InfixChain.ChainOperator( Literal( '!=' ),  Nodes.CmpOpNeq, 'y' ),
-						InfixChain.ChainOperator( Keyword( isKeyword ) + Keyword( notKeyword ),  Nodes.CmpOpIsNot, 'y' ),
-						InfixChain.ChainOperator( Keyword( isKeyword ),  Nodes.CmpOpIs, 'y' ),
-						InfixChain.ChainOperator( Keyword( notKeyword ) + Keyword( inKeyword ),  Nodes.CmpOpNotIn, 'y' ),
-						InfixChain.ChainOperator( Keyword( inKeyword ),  Nodes.CmpOpIn, 'y' ),
+				InfixRightLevel( [ BinaryOperator( Literal( '**' ),  Nodes.Pow, 'x', 'y' ) ] ),
+				PrefixLevel( [ UnaryOperator( Literal( '~' ),  Nodes.Invert, 'x' ),   UnaryOperator( Literal( '-' ),  Nodes.Negate, 'x' ),   UnaryOperator( Literal( '+' ),  Nodes.Pos, 'x' ) ], True ),
+				InfixLeftLevel( [ BinaryOperator( Literal( '*' ),  Nodes.Mul, 'x', 'y' ),   BinaryOperator( Literal( '/' ),  Nodes.Div, 'x', 'y' ),   BinaryOperator( Literal( '%' ),  Nodes.Mod, 'x', 'y' ) ] ),
+				InfixLeftLevel( [ BinaryOperator( Literal( '+' ),  Nodes.Add, 'x', 'y' ),   BinaryOperator( Literal( '-' ),  Nodes.Sub, 'x', 'y' ) ] ),
+				InfixLeftLevel( [ BinaryOperator( Literal( '<<' ),  Nodes.LShift, 'x', 'y' ),   BinaryOperator( Literal( '>>' ),  Nodes.RShift, 'x', 'y') ] ),
+				InfixLeftLevel( [ BinaryOperator( Literal( '&' ),  Nodes.BitAnd, 'x', 'y' ) ] ),
+				InfixLeftLevel( [ BinaryOperator( Literal( '^' ),  Nodes.BitXor, 'x', 'y' ) ] ),
+				InfixLeftLevel( [ BinaryOperator( Literal( '|' ),  Nodes.BitOr, 'x', 'y' ) ] ),
+				InfixChainLevel( [
+						ChainOperator( Literal( '<=' ),  Nodes.CmpOpLte, 'y' ),
+						ChainOperator( Literal( '<' ),  Nodes.CmpOpLt, 'y' ),
+						ChainOperator( Literal( '>=' ),  Nodes.CmpOpGte, 'y' ),
+						ChainOperator( Literal( '>' ),  Nodes.CmpOpGt, 'y' ),
+						ChainOperator( Literal( '==' ),  Nodes.CmpOpEq, 'y' ),
+						ChainOperator( Literal( '!=' ),  Nodes.CmpOpNeq, 'y' ),
+						ChainOperator( Keyword( isKeyword ) + Keyword( notKeyword ),  Nodes.CmpOpIsNot, 'y' ),
+						ChainOperator( Keyword( isKeyword ),  Nodes.CmpOpIs, 'y' ),
+						ChainOperator( Keyword( notKeyword ) + Keyword( inKeyword ),  Nodes.CmpOpNotIn, 'y' ),
+						ChainOperator( Keyword( inKeyword ),  Nodes.CmpOpIn, 'y' ),
 						],  Nodes.Cmp, 'x', 'ops' ),
-					] ),
-				PrecedenceLevel( [ Prefix( Keyword( notKeyword ),  Nodes.NotTest, 'x' ) ] ),
-				PrecedenceLevel( [ InfixLeft( Keyword( andKeyword ),  Nodes.AndTest, 'x', 'y' ) ] ),
-				PrecedenceLevel( [ InfixLeft( Keyword( orKeyword ),  Nodes.OrTest, 'x', 'y' ) ] ),
+				PrefixLevel( [ UnaryOperator( Keyword( notKeyword ),  Nodes.NotTest, 'x' ) ] ),
+				InfixLeftLevel( [ BinaryOperator( Keyword( andKeyword ),  Nodes.AndTest, 'x', 'y' ) ] ),
+				InfixLeftLevel( [ BinaryOperator( Keyword( orKeyword ),  Nodes.OrTest, 'x', 'y' ) ] ),
 				],  self.primary() )
 
 		return opTable.buildParsers()

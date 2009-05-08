@@ -10,7 +10,7 @@ import string
 
 from BritefuryJ.DocModel import DMList
 
-from BritefuryJ.Parser import Action, Condition, Forward, Production, Suppress, Literal, Keyword, RegEx, Word, Sequence, Combine, Choice, Optional, Repetition, ZeroOrMore, OneOrMore, Peek, PeekNot
+from BritefuryJ.Parser import Action, Condition, Production, Suppress, Literal, Keyword, RegEx, Word, Sequence, Combine, Choice, Optional, Repetition, ZeroOrMore, OneOrMore, Peek, PeekNot
 from BritefuryJ.Parser.Utils.Tokens import identifier, decimalInteger, hexInteger, integer, singleQuotedString, doubleQuotedString, quotedString, floatingPoint
 
 from Britefury.Tests.BritefuryJ.Parser.ParserTestCase import ParserTestCase

@@ -6,28 +6,31 @@
 //##************************
 package BritefuryJ.Parser.Utils.OperatorParser;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import BritefuryJ.Parser.ParserExpression;
 
-public abstract class Operator
+public abstract class BinaryOperatorLevel extends OperatorLevel
 {
-	protected ParserExpression opExpression;
-
-
+	protected ArrayList<BinaryOperator> operators;
 	
-	protected Operator(ParserExpression opExpression)
+	
+	//
+	//
+	// Constructor
+	//
+	//
+	
+	public BinaryOperatorLevel(List<BinaryOperator> ops)
 	{
-		this.opExpression = opExpression;
+		operators = new ArrayList<BinaryOperator>();
+		operators.addAll( ops );
 	}
 
-	protected Operator(String operator)
+
+	protected ParserExpression buildParserForReachUp(OperatorTable operatorTable, ParserExpression previousLevelParser)
 	{
-		this.opExpression = ParserExpression.coerce( operator );
-	}
-	
-	
-	
-	protected ParserExpression getOperatorExpression()
-	{
-		return opExpression;
+		return null;
 	}
 }
