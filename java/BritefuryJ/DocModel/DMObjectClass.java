@@ -15,7 +15,7 @@ import org.python.core.PyDictionary;
 import org.python.core.PyObject;
 
 import BritefuryJ.DocModel.DMModule.ClassAlreadyDefinedException;
-import BritefuryJ.PatternMatch.ObjectMatch;
+import BritefuryJ.TreeParser.ObjectMatch;
 
 
 public class DMObjectClass
@@ -210,32 +210,32 @@ public class DMObjectClass
 	
 	
 	
-	public ObjectMatch matchExpression() throws InvalidFieldNameException
+	public ObjectMatch treeParser() throws InvalidFieldNameException
 	{
 		return new ObjectMatch( this );
 	}
 	
-	public ObjectMatch matchExpression(Object fieldExps[]) throws InvalidFieldNameException
+	public ObjectMatch treeParser(Object fieldExps[]) throws InvalidFieldNameException
 	{
 		return new ObjectMatch( this, fieldExps );
 	}
 	
-	public ObjectMatch matchExpression(String fieldNames[], Object fieldExps[]) throws InvalidFieldNameException
+	public ObjectMatch treeParser(String fieldNames[], Object fieldExps[]) throws InvalidFieldNameException
 	{
 		return new ObjectMatch( this, fieldNames, fieldExps );
 	}
 	
-	public ObjectMatch matchExpression(PyObject values[], String names[]) throws InvalidFieldNameException
+	public ObjectMatch treeParser(PyObject values[], String names[]) throws InvalidFieldNameException
 	{
 		return new ObjectMatch( this, names, values );
 	}
 	
-	public ObjectMatch matchExpression(Map<String, Object> data) throws InvalidFieldNameException
+	public ObjectMatch treeParser(Map<String, Object> data) throws InvalidFieldNameException
 	{
 		return new ObjectMatch( this, data );
 	}
 	
-	public ObjectMatch matchExpression(PyDictionary data) throws InvalidFieldNameException
+	public ObjectMatch treeParser(PyDictionary data) throws InvalidFieldNameException
 	{
 		return new ObjectMatch( this, data );
 	}
