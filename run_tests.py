@@ -13,11 +13,11 @@ initBritefuryJ()
 
 import Britefury.Dispatch.Dispatch
 import Britefury.Dispatch.MethodDispatch
-#import Britefury.Dispatch.PatternDispatch
 import Britefury.Transformation.Transformation
 import Britefury.Tests.BritefuryJ.Parser.Utils.Operators
-import Britefury.Tests.BritefuryJ.PatternMatch.Test_PatternMatcher
+import Britefury.Tests.BritefuryJ.TreeParser.Test_TreeParser
 import Britefury.Tests.Britefury.Grammar.Grammar
+import Britefury.Tests.Britefury.TreeGrammar.TreeGrammar
 import Britefury.Tests.Britefury.Dispatch.TestObjectNodeMethodDispatch
 import GSymCore.Languages.Python25.CodeGenerator2
 import GSymCore.Languages.Python25.Parser3
@@ -30,10 +30,12 @@ import GSymCore.Languages.LISP.Parser2
 
 testModules = [ Britefury.Dispatch.Dispatch,
 		Britefury.Dispatch.MethodDispatch, 
-		#Britefury.Dispatch.PatternDispatch, 
 		Britefury.Transformation.Transformation,
-		Britefury.Tests.BritefuryJ.Parser.Utils.Operators, Britefury.Tests.BritefuryJ.PatternMatch.Test_PatternMatcher,
-		Britefury.Tests.Britefury.Grammar.Grammar, Britefury.Tests.Britefury.Dispatch.TestObjectNodeMethodDispatch,
+		Britefury.Tests.BritefuryJ.Parser.Utils.Operators,
+		Britefury.Tests.BritefuryJ.TreeParser.Test_TreeParser,
+		Britefury.Tests.Britefury.Grammar.Grammar,
+		Britefury.Tests.Britefury.TreeGrammar.TreeGrammar,
+		Britefury.Tests.Britefury.Dispatch.TestObjectNodeMethodDispatch,
 		GSymCore.Languages.Python25.CodeGenerator2,
 		GSymCore.Languages.Python25.Parser3,
 		GSymCore.Languages.Python25.Python25Importer2,

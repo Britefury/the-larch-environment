@@ -8,7 +8,7 @@
 
 import string
 
-from BritefuryJ.Parser import Action, Condition, Forward, Production, Suppress, Literal, Keyword, RegEx, Word, Sequence, Combine, Choice, Optional, Repetition, ZeroOrMore, OneOrMore, Peek, PeekNot
+from BritefuryJ.Parser import Action, Condition, Production, Suppress, Literal, Keyword, RegEx, Word, Sequence, Combine, Choice, Optional, Repetition, ZeroOrMore, OneOrMore, Peek, PeekNot
 from BritefuryJ.Parser.Utils.Tokens import identifier, decimalInteger, hexInteger, integer, singleQuotedString, doubleQuotedString, quotedString, floatingPoint
 from BritefuryJ.Parser.Utils.SeparatedList import separatedList, delimitedSeparatedList
 from BritefuryJ.Parser.Utils.OperatorParser import Prefix, Suffix, InfixLeft, InfixRight, PrecedenceLevel, OperatorTable
