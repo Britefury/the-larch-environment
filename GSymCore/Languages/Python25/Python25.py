@@ -10,8 +10,8 @@ from Britefury.gSym.View.NodeElementChangeListener import _NodeElementChangeList
 
 from BritefuryJ.GSym.View import PyGSymViewFactory
 
-from GSymCore.Languages.Python25.CodeGenerator2 import Python25CodeGenerator
-from GSymCore.Languages.Python25.View2 import Python25View
+from GSymCore.Languages.Python25.CodeGenerator import Python25CodeGenerator
+from GSymCore.Languages.Python25.View import Python25View
 from GSymCore.Languages.Python25 import NodeClasses as Nodes
 
 
