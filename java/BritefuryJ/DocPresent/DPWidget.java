@@ -466,8 +466,10 @@ abstract public class DPWidget
 				}
 			}
 			
-			path0.subList( 0, common ).clear();
-			path1.subList( 0, common ).clear();
+			int toRemove = Math.max( common - 1, 0 );
+			
+			path0.subList( 0, toRemove ).clear();
+			path1.subList( 0, toRemove ).clear();
 		}
 	}
 	
@@ -495,6 +497,19 @@ abstract public class DPWidget
 	
 	
 
+	
+	//
+	//
+	// SELECTION METHODS
+	//
+	//
+	
+	protected void drawSubtreeSelection(Graphics2D graphics, Marker startMarker, List<DPWidget> startPath, Marker endMarker, List<DPWidget> endPath)
+	{
+	}
+
+	
+	
 	
 	//
 	// Drag and drop methods

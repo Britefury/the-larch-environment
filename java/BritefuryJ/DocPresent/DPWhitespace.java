@@ -8,8 +8,11 @@
 package BritefuryJ.DocPresent;
 
 import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
 
 import BritefuryJ.DocPresent.Caret.Caret;
+import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Metrics.HMetrics;
 import BritefuryJ.DocPresent.Metrics.VMetrics;
 import BritefuryJ.DocPresent.StyleSheets.ContentLeafStyleSheet;
@@ -42,6 +45,12 @@ public class DPWhitespace extends DPContentLeafEditable
 	}
 
 	
+	
+	//
+	//
+	// CARET METHODS
+	//
+	//
 	
 	public void drawCaret(Graphics2D graphics, Caret c)
 	{
@@ -84,6 +93,23 @@ public class DPWhitespace extends DPContentLeafEditable
 	}
 
 	
+	//
+	//
+	// SELECTION METHODS
+	//
+	//
+	
+	public void drawSelection(Graphics2D graphics, Marker from, Marker to)
+	{
+		AffineTransform current = pushGraphicsTransform( graphics );
+		int startIndex = from != null  ?  from.getIndex()  :  0;
+		int endIndex = to != null  ?  to.getIndex()  :  1;
+		double startX = startIndex == 0  ?  0.0  :  allocationX;
+		double endX = endIndex == 0  ?  0.0  :  allocationX;
+		Rectangle2D.Double shape = new Rectangle2D.Double( startX, 0.0, endX - startX, allocationY);
+		graphics.fill( shape );
+		popGraphicsTransform( graphics, current );
+	}
 	
 	
 	protected HMetrics computeMinimumHMetrics()

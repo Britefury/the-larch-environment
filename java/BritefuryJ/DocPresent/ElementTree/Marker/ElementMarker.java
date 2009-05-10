@@ -116,11 +116,6 @@ public class ElementMarker
 		widgetMarker.setPositionAndBias( position, bias );
 	}
 	
-	public void set(LeafElement element, int position, Bias bias)
-	{
-		widgetMarker.set( (DPContentLeaf)element.getWidgetAtTextRepresentationStart(), position, bias );
-	}
-	
 	
 	public static int getIndex(int position, Bias bias)
 	{

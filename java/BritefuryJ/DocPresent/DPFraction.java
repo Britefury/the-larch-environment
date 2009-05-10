@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import BritefuryJ.DocPresent.Caret.Caret;
+import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Metrics.HMetrics;
 import BritefuryJ.DocPresent.Metrics.VMetrics;
 import BritefuryJ.DocPresent.Metrics.VMetricsTypeset;
@@ -50,6 +51,12 @@ public class DPFraction extends DPContainer
 		}
 		
 		
+		//
+		//
+		// CARET METHODS
+		//
+		//
+		
 		public void drawCaret(Graphics2D graphics, Caret c)
 		{
 			int index = c.getMarker().getIndex();
@@ -75,6 +82,26 @@ public class DPFraction extends DPContainer
 		{
 			AffineTransform current = pushGraphicsTransform( graphics );
 			graphics.draw( new Line2D.Double( allocationX, -2.0, allocationX, allocationY + 2.0 ) );
+			popGraphicsTransform( graphics, current );
+		}
+
+		
+		
+		//
+		//
+		// SELECTION METHODS
+		//
+		//
+		
+		public void drawSelection(Graphics2D graphics, Marker from, Marker to)
+		{
+			AffineTransform current = pushGraphicsTransform( graphics );
+			int startIndex = from != null  ?  from.getIndex()  :  0;
+			int endIndex = to != null  ?  to.getIndex()  :  1;
+			double startX = startIndex == 0  ?  0.0  :  allocationX;
+			double endX = endIndex == 0  ?  0.0  :  allocationX;
+			Rectangle2D.Double shape = new Rectangle2D.Double( startX, -2.0, endX - startX, allocationY + 4.0 );
+			graphics.fill( shape );
 			popGraphicsTransform( graphics, current );
 		}
 

@@ -7,7 +7,8 @@
 //##************************
 package BritefuryJ.DocPresent.Input;
 
-public class Modifier {
+public class Modifier
+{
 	public static int CTRL = 0x1;
 	public static int SHIFT = 0x2;
 	public static int ALT = 0x4;

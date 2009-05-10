@@ -30,6 +30,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.WeakHashMap;
 
 import javax.swing.JComponent;
@@ -44,8 +45,10 @@ import BritefuryJ.DocPresent.Input.InputTable;
 import BritefuryJ.DocPresent.Input.Modifier;
 import BritefuryJ.DocPresent.Input.Pointer;
 import BritefuryJ.DocPresent.Input.PointerInterface;
+import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Metrics.HMetrics;
 import BritefuryJ.DocPresent.Metrics.VMetrics;
+import BritefuryJ.DocPresent.Selection.Selection;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
@@ -341,6 +344,8 @@ public class DPPresentationArea extends DPBin implements CaretListener
 	private Point2 dragStartPosInWindowSpace;
 	private int dragButton;
 	
+	private boolean bMouseSelectionInProgress;
+	
 	private Vector2 areaSize;
 	
 	private Pointer rootSpaceMouse;
@@ -358,6 +363,9 @@ public class DPPresentationArea extends DPBin implements CaretListener
 	
 	private Caret caret;
 	private DPContentLeaf currentCaretLeaf;
+	private Selection selection;
+	private WeakHashMap<Selection, Object> selections;
+	
 	
 	private boolean bHorizontalClamp;
 	
@@ -394,9 +402,15 @@ public class DPPresentationArea extends DPBin implements CaretListener
 		
 		caret = new Caret();
 		caret.setCaretListener( this );
+		
 		currentCaretLeaf = null;
+
+		selection = null;
+		selections = new WeakHashMap<Selection, Object>();
 		
 		bStructureRefreshQueued = false;
+		
+		bMouseSelectionInProgress = false;
 	}
 	
 	
@@ -761,6 +775,13 @@ public class DPPresentationArea extends DPBin implements CaretListener
 			
 				bStructureRefreshQueued = true;
 				SwingUtilities.invokeLater( putCaretAtStart );
+				
+				
+				// Handle selections
+				for (Map.Entry<Selection, Object> entry: selections.entrySet())
+				{
+					entry.getKey().onStructureChanged();
+				}
 			}
 		}
 	}
@@ -807,6 +828,7 @@ public class DPPresentationArea extends DPBin implements CaretListener
 		graphics.translate( -windowTopLeftCornerInRootSpace.x, -windowTopLeftCornerInRootSpace.y );
 		
 		// Draw
+		drawSelection( graphics );
 		handleDraw( graphics, new AABox2( topLeftRootSpace, bottomRightRootSpace) );
 		//graphics.setTransform( transform );
 		drawCaret( graphics );
@@ -836,19 +858,50 @@ public class DPPresentationArea extends DPBin implements CaretListener
 	}
 	
 	
+	private void drawSelection(Graphics2D graphics)
+	{
+		if ( selection != null  &&  !selection.isEmpty() )
+		{
+			Marker startMarker = selection.getStartMarker();
+			Marker endMarker = selection.getEndMarker();
+			List<DPWidget> startPath = selection.getStartPathFromCommonRoot();
+			List<DPWidget> endPath = selection.getEndPathFromCommonRoot();
+
+			Color prevColour = graphics.getColor();
+			graphics.setColor( Color.yellow );
+			startPath.get( 0 ).drawSubtreeSelection( graphics, startMarker, startPath, endMarker, endPath );
+			graphics.setColor( prevColour );
+		}
+	}
+	
+	
+	
+	
+	//
+	//
+	// MOUSE EVENTS
+	//
+	//
+	
 	
 	protected void mouseDownEvent(int button, Point2 windowPos, int modifiers)
 	{
+		bMouseSelectionInProgress = false;
 		component.grabFocus();
 		Point2 rootPos = windowSpaceToRootSpace( windowPos );
 		rootSpaceMouse.setLocalPos( rootPos );
 		rootSpaceMouse.setModifiers( modifiers );
-		if ( ( modifiers & ( Modifier.ALT | Modifier.ALT_GRAPH | Modifier.CTRL | Modifier.SHIFT ) )  ==  0 )
+		if ( button == 1  &&  ( modifiers & ( Modifier.ALT | Modifier.ALT_GRAPH | Modifier.CTRL | Modifier.SHIFT ) )  ==  0 )
 		{
 			DPContentLeafEditableEntry leaf = (DPContentLeafEditableEntry)getLeafClosestToLocalPoint( rootPos, new DPContentLeafEditableEntry.EditableEntryLeafWidgetFilter() );
 			Xform2 x = leaf.getTransformRelativeToRoot();
 			x = x.inverse();
-			leaf.placeCursor( x.transform( rootPos ) );
+			
+			Marker prevPos = caret.getMarker().copy();
+			leaf.moveMarkerToPoint( caret.getMarker(), x.transform( rootPos ) );
+			
+			onCaretMove( prevPos, false );
+			bMouseSelectionInProgress = true;
 		}
 
 		if ( ( modifiers & Modifier.ALT )  ==  0 )
@@ -886,29 +939,33 @@ public class DPPresentationArea extends DPBin implements CaretListener
 			dragStartPosInWindowSpace = windowPos;
 		}
 		
+		if ( button == 1 )
+		{
+			bMouseSelectionInProgress = false;
+		}
+		
 		emitImmediateEvents();
 	}
 	
 	
-	
-	protected void rootMotionEvent(PointerMotionEvent event)
-	{
-		boolean bHandled = dndMotionEvent( event );
-		
-		if ( !bHandled )
-		{
-			handleMotion( event );
-		}
-	}
-
-	
-
 	
 	protected void mouseMotionEvent(Point2 windowPos, int modifiers)
 	{
 		Point2 rootPos = windowSpaceToRootSpace( windowPos );
 		rootSpaceMouse.setLocalPos( rootPos );
 		rootSpaceMouse.setModifiers( modifiers );
+		
+		if ( bMouseSelectionInProgress )
+		{
+			DPContentLeafEditableEntry leaf = (DPContentLeafEditableEntry)getLeafClosestToLocalPoint( rootPos, new DPContentLeafEditableEntry.EditableEntryLeafWidgetFilter() );
+			Xform2 x = leaf.getTransformRelativeToRoot();
+			x = x.inverse();
+
+			Marker prevPos = caret.getMarker().copy();
+			leaf.moveMarkerToPoint( caret.getMarker(), x.transform( rootPos ) );
+			
+			onCaretMove( prevPos, true );
+		}
 		
 		if ( dragButton == 0 )
 		{
@@ -939,6 +996,19 @@ public class DPPresentationArea extends DPBin implements CaretListener
 
 
 
+	protected void rootMotionEvent(PointerMotionEvent event)
+	{
+		boolean bHandled = dndMotionEvent( event );
+		
+		if ( !bHandled )
+		{
+			handleMotion( event );
+		}
+	}
+
+	
+
+	
 	protected void mouseEnterEvent(Point2 windowPos, int modifiers)
 	{
 		Point2 rootPos = windowSpaceToRootSpace( windowPos );
@@ -1213,6 +1283,7 @@ public class DPPresentationArea extends DPBin implements CaretListener
 			if ( caret.isValid() )
 			{
 				DPContentLeaf leaf = caret.getMarker().getWidget();
+				Marker prevPos = caret.getMarker().copy();
 				if ( event.getKeyCode() == KeyEvent.VK_LEFT )
 				{
 					leaf.moveMarkerLeft( caret.getMarker(), true );
@@ -1236,6 +1307,11 @@ public class DPPresentationArea extends DPBin implements CaretListener
 				else if ( event.getKeyCode() == KeyEvent.VK_END )
 				{
 					leaf.moveMarkerEnd( caret.getMarker() );
+				}
+				
+				if ( !caret.getMarker().equals( prevPos ) )
+				{
+					onCaretMove( prevPos, ( modifiers & Modifier.SHIFT ) != 0 );
 				}
 			}
 			return true;
@@ -1383,5 +1459,37 @@ public class DPPresentationArea extends DPBin implements CaretListener
 		}
 		
 		queueFullRedraw();
+	}
+	
+	private void onCaretMove(Marker prevPos, boolean bExtendSelection)
+	{
+		if ( bExtendSelection )
+		{
+			if ( selection == null )
+			{
+				selection = new Selection( this, prevPos, caret.getMarker().copy() );
+			}
+			else
+			{
+				selection.setMarker1( caret.getMarker().copy() );
+			}
+		}
+		else
+		{
+			selection = null;
+		}
+	}
+	
+	
+	
+	//
+	//
+	// SELECTION METHODS
+	//
+	//
+	
+	public void registerSelection(Selection sel)
+	{
+		selections.put( sel, null );
 	}
 }
