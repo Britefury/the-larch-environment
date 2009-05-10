@@ -7,6 +7,8 @@
 //##************************
 package BritefuryJ.DocPresent.Marker;
 
+import java.util.ArrayList;
+
 import BritefuryJ.DocPresent.DPContentLeaf;
 
 public class Marker
@@ -27,7 +29,7 @@ public class Marker
 	protected DPContentLeaf widget;
 	protected int position;
 	protected Bias bias;
-	protected MarkerListener listener;
+	protected ArrayList<MarkerListener> listeners;
 	
 	
 	
@@ -46,9 +48,25 @@ public class Marker
 	}
 	
 	
-	public void setMarkerListener(MarkerListener listener)
+	public void addMarkerListener(MarkerListener listener)
 	{
-		this.listener = listener;
+		if ( listeners == null )
+		{
+			listeners = new ArrayList<MarkerListener>();
+		}
+		listeners.add( listener );
+	}
+	
+	public void removeMarkerListener(MarkerListener listener)
+	{
+		if ( listeners != null )
+		{
+			listeners.remove( listener );
+			if ( listeners.isEmpty() )
+			{
+				listeners = null;
+			}
+		}
 	}
 	
 	
@@ -121,9 +139,12 @@ public class Marker
 	
 	protected void changed()
 	{
-		if ( listener != null )
+		if ( listeners != null )
 		{
-			listener.markerChanged( this );
+			for (MarkerListener listener: listeners)
+			{
+				listener.markerChanged( this );
+			}
 		}
 	}
 

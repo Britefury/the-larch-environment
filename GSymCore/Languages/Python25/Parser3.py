@@ -920,7 +920,7 @@ class Python25Grammar (Grammar):
 	# Comment statement
 	@Rule
 	def commentStmt(self):
-		return ( Literal( '#' )  +  Word( string.printable ) ).action( lambda input, pos, xs: Nodes.CommentStmt( comment=xs[1] ) )
+		return ( Literal( '#' )  +  Word( string.printable ).optional() ).action( lambda input, pos, xs: Nodes.CommentStmt( comment=xs[1]   if xs[1] is not None   else  '' ) )
 
 
 

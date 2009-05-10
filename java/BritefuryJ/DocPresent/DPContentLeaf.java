@@ -148,7 +148,7 @@ public abstract class DPContentLeaf extends DPWidget
 		
 		if ( getMarkerRange() == 0 && position == 0 )
 		{
-			bias = Marker.Bias.END;
+			bias = Marker.Bias.START;
 		}
 		
 		if ( position == getMarkerRange()  &&  bias == Marker.Bias.END )

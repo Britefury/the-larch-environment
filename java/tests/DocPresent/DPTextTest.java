@@ -31,13 +31,16 @@ public class DPTextTest
 
 		TextStyleSheet ts0 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );
 		TextStyleSheet ts1 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK, true );
+		TextStyleSheet ts2 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK, Color.RED );
 		DPText t0 = new DPText( ts0, "Hello World Abcdefghijklmnopqrstuvwxyz" );
 		DPText t1 = new DPText( ts1, "Hello World Abcdefghijklmnopqrstuvwxyz" );
+		DPText t2 = new DPText( ts2, "Hello World Abcdefghijklmnopqrstuvwxyz" );
 
 		VBoxStyleSheet b0s = new VBoxStyleSheet( DPVBox.Typesetting.NONE, DPVBox.Alignment.LEFT, 0.0, false, 0.0 );
 		DPVBox b0 = new DPVBox( b0s );
 		b0.append( t0 );
 		b0.append( t1 );
+		b0.append( t2 );
 
 		area.setChild( b0 );
 

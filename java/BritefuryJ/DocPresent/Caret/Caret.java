@@ -21,7 +21,7 @@ public class Caret implements MarkerListener
 	public Caret()
 	{
 		marker = new Marker();
-		marker.setMarkerListener( this );
+		marker.addMarkerListener( this );
 	}
 	
 	

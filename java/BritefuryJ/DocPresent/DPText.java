@@ -85,10 +85,20 @@ public class DPText extends DPContentLeafEditableEntry
 	
 	protected void draw(Graphics2D graphics)
 	{
-		Color prevColour = graphics.getColor();
 		TextStyleSheet textStyleSheet = (TextStyleSheet)styleSheet;
+
+		Color prevColour = graphics.getColor();
+
+		Color squiggleUnderlineColour = textStyleSheet.getSquiggleUnderlineColour();
+		if ( squiggleUnderlineColour != null )
+		{
+			graphics.setColor( squiggleUnderlineColour );
+			visual.drawSquiggleUnderline( graphics );
+		}
+
 		graphics.setColor( textStyleSheet.getColour() );
-		visual.draw( graphics );
+		visual.drawText( graphics );
+		
 		graphics.setColor( prevColour );
 	}
 	

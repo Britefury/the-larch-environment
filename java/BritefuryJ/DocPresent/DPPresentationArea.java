@@ -49,6 +49,7 @@ import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Metrics.HMetrics;
 import BritefuryJ.DocPresent.Metrics.VMetrics;
 import BritefuryJ.DocPresent.Selection.Selection;
+import BritefuryJ.DocPresent.Selection.SelectionListener;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
@@ -58,7 +59,7 @@ import BritefuryJ.Math.Xform2;
 
 
 
-public class DPPresentationArea extends DPBin implements CaretListener
+public class DPPresentationArea extends DPBin implements CaretListener, SelectionListener
 {
 	public static class CannotGetGraphics2DException extends RuntimeException
 	{
@@ -1467,7 +1468,7 @@ public class DPPresentationArea extends DPBin implements CaretListener
 		{
 			if ( selection == null )
 			{
-				selection = new Selection( this, prevPos, caret.getMarker().copy() );
+				setSelection( new Selection( this, prevPos, caret.getMarker().copy() ) );
 			}
 			else
 			{
@@ -1476,7 +1477,7 @@ public class DPPresentationArea extends DPBin implements CaretListener
 		}
 		else
 		{
-			selection = null;
+			setSelection( null );
 		}
 	}
 	
@@ -1491,5 +1492,41 @@ public class DPPresentationArea extends DPBin implements CaretListener
 	public void registerSelection(Selection sel)
 	{
 		selections.put( sel, null );
+	}
+	
+	
+	public void clearSelection()
+	{
+		setSelection( null );
+	}
+	
+	
+	private void setSelection(Selection s)
+	{
+		if ( s != selection )
+		{
+			if ( selection != null )
+			{
+				selection.removeSelectionListener( this );
+			}
+			
+			selection = s;
+	
+			if ( selection != null )
+			{
+				selection.addSelectionListener( this );
+			}
+			
+			queueFullRedraw();
+		}
+	}
+	
+	
+	public void selectionChanged(Selection s)
+	{
+		if ( s == selection )
+		{
+			queueFullRedraw();
+		}
 	}
 }

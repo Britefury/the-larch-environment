@@ -12,14 +12,16 @@ import BritefuryJ.DocPresent.DPContainer;
 import BritefuryJ.DocPresent.DPPresentationArea;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Marker.Marker;
+import BritefuryJ.DocPresent.Marker.MarkerListener;
 
-public class Selection
+public class Selection implements MarkerListener
 {
 	private Marker marker0, marker1;
 	
 	private Marker startMarker, endMarker;
 	private ArrayList<DPWidget> startPathFromCommonRoot, endPathFromCommonRoot;
 	private DPContainer commonRoot;
+	protected ArrayList<SelectionListener> listeners;
 	
 	
 	public Selection(DPPresentationArea area, Marker marker0, Marker marker1)
@@ -27,14 +29,29 @@ public class Selection
 		this.marker0 = marker0;
 		this.marker1 = marker1;
 		
+		this.marker0.addMarkerListener( this );
+		this.marker1.addMarkerListener( this );
+		
 		area.registerSelection( this );
 	}
 	
 	
 	public void set(Marker marker0, Marker marker1)
 	{
-		this.marker0 = marker0;
-		this.marker1 = marker1;
+		if ( marker0 != this.marker0 )
+		{
+			this.marker0.removeMarkerListener( this );
+			this.marker0 = marker0;
+			this.marker0.addMarkerListener( this );
+		}
+		
+		if ( marker1 != this.marker1 )
+		{
+			this.marker1.removeMarkerListener( this );
+			this.marker1 = marker1;
+			this.marker1.addMarkerListener( this );
+		}
+		
 		modified();
 	}
 	
@@ -61,14 +78,24 @@ public class Selection
 	
 	public void setMarker0(Marker marker0)
 	{
-		this.marker0 = marker0;
-		modified();
+		if ( marker0 != this.marker0 )
+		{
+			this.marker0.removeMarkerListener( this );
+			this.marker0 = marker0;
+			this.marker0.addMarkerListener( this );
+			modified();
+		}
 	}
 	
 	public void setMarker1(Marker marker1)
 	{
-		this.marker1 = marker1;
-		modified();
+		if ( marker1 != this.marker1 )
+		{
+			this.marker1.removeMarkerListener( this );
+			this.marker1 = marker1;
+			this.marker1.addMarkerListener( this );
+			modified();
+		}
 	}
 	
 	
@@ -104,6 +131,29 @@ public class Selection
 	}
 	
 	
+	
+	public void addSelectionListener(SelectionListener listener)
+	{
+		if ( listeners == null )
+		{
+			listeners = new ArrayList<SelectionListener>();
+		}
+		listeners.add( listener );
+	}
+	
+	public void removeSelectionListener(SelectionListener listener)
+	{
+		if ( listeners != null )
+		{
+			listeners.remove( listener );
+			if ( listeners.isEmpty() )
+			{
+				listeners = null;
+			}
+		}
+	}
+	
+
 	
 	public void onStructureChanged()
 	{
@@ -160,5 +210,11 @@ public class Selection
 				endPathFromCommonRoot = bInOrder  ?  path1  :  path0;
 			}
 		}
+	}
+
+
+	public void markerChanged(Marker m)
+	{
+		modified();
 	}
 }
