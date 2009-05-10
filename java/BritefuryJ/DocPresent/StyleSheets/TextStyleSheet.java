@@ -20,26 +20,37 @@ public class TextStyleSheet extends ContentLeafStyleSheet
 	
 	
 	protected Font font;
-	protected Color colour;
+	protected Color colour, squiggleUnderlineColour;
 	protected boolean bMixedSizeCaps;
 	
 	
 	public TextStyleSheet()
 	{
-		this( defaultFont, Color.black, false );
+		this( defaultFont, Color.black, null, false );
 	}
 	
 	public TextStyleSheet(Font font, Color colour)
 	{
-		this( font, colour, false );
+		this( font, colour, null, false );
 	}
 	
 	public TextStyleSheet(Font font, Color colour, boolean bMixedSizeCaps)
+	{
+		this( font, colour, null, bMixedSizeCaps );
+	}
+
+	public TextStyleSheet(Font font, Color colour, Color squiggleUnderlineColour)
+	{
+		this( font, colour, squiggleUnderlineColour, false );
+	}
+	
+	public TextStyleSheet(Font font, Color colour, Color squiggleUnderlineColour, boolean bMixedSizeCaps)
 	{
 		super();
 		
 		this.font = font;
 		this.colour = colour;
+		this.squiggleUnderlineColour = squiggleUnderlineColour;
 		this.bMixedSizeCaps = bMixedSizeCaps;
 	}
 	
@@ -54,6 +65,12 @@ public class TextStyleSheet extends ContentLeafStyleSheet
 	public Color getColour()
 	{
 		return colour;
+	}
+	
+	
+	public Color getSquiggleUnderlineColour()
+	{
+		return squiggleUnderlineColour;
 	}
 	
 	

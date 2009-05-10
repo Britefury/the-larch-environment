@@ -17,6 +17,7 @@ import java.awt.font.TextHitInfo;
 import java.awt.font.TextLayout;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
+import java.awt.geom.Path2D;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.text.AttributedCharacterIterator;
@@ -301,6 +302,7 @@ public class TextVisual
 	
 	
 	private TextLayout layout;
+	private Path2D.Double squiggleUnderlineShape;
 	private String text;
 	private Font font;
 	private boolean bMixedSizeCaps;
@@ -366,8 +368,22 @@ public class TextVisual
 				}
 
 				double width = layout.getBounds().getWidth();
+				double ascent = layout.getAscent(), descent = layout.getDescent();
 				hmetrics = new HMetrics( width, layout.getAdvance() - width );
 				vmetrics = new VMetricsTypeset( layout.getAscent(), layout.getDescent(), layout.getLeading() );
+				
+				// Squiggle shape
+				squiggleUnderlineShape = new Path2D.Double();
+				int numSquiggleSegments = (int)( width / descent  +  0.5 );
+				squiggleUnderlineShape.moveTo( 0.0, ascent + descent );
+				double squiggleDeltaX = width / (double)numSquiggleSegments;
+				double squiggleX = squiggleDeltaX;
+				
+				for (int i = 0; i < numSquiggleSegments; i++)
+				{
+					squiggleUnderlineShape.lineTo( squiggleX, ( i % 2 ) == 0  ?  ascent  :  ascent + descent );
+					squiggleX += squiggleDeltaX;
+				}
 			}
 			else
 			{
@@ -378,6 +394,8 @@ public class TextVisual
 				
 				hmetrics = new HMetrics();
 				vmetrics = new VMetricsTypeset( lineMetrics.getAscent(), lineMetrics.getDescent(), lineMetrics.getLeading() );
+				
+				squiggleUnderlineShape = null;
 			}
 
 			bRealised = true;
@@ -387,11 +405,19 @@ public class TextVisual
 	
 	
 	
-	public void draw(Graphics2D graphics)
+	public void drawText(Graphics2D graphics)
 	{
 		if ( layout != null )
 		{
 			layout.draw( graphics, 0, layout.getAscent() );
+		}
+	}
+	
+	public void drawSquiggleUnderline(Graphics2D graphics)
+	{
+		if ( squiggleUnderlineShape != null )
+		{
+			graphics.draw( squiggleUnderlineShape );
 		}
 	}
 	

@@ -17,8 +17,7 @@ from BritefuryJ.DocPresent.ElementTree import *
 
 default_textStyle = TextStyleSheet()
 
-nil_textStyle = TextStyleSheet( Font( 'SansSerif', Font.ITALIC, 14 ),  Color( 0.75, 0.0, 0.0 ) )
-unparsed_textStyle = TextStyleSheet( Font( 'SansSerif', Font.ITALIC, 14 ),  Color( 0.75, 0.0, 0.0 ) )
+unparsed_textStyle = TextStyleSheet( Font( 'SansSerif', Font.PLAIN, 14 ),  Color( 0.0, 0.0, 0.0 ), Color( 1.0, 0.0, 0.0 ) )
 keyword_textStyle = TextStyleSheet( Font( 'SansSerif', Font.BOLD, 14 ),  Color( 0.25, 0.0, 0.5 ) )
 capitalisedKeyword_textStyle = TextStyleSheet( Font( 'SansSerif', Font.BOLD, 14 ),  Color( 0.25, 0.0, 0.5 ), True )
 numericLiteral_textStyle = TextStyleSheet( Font( 'SansSerif', Font.PLAIN, 14 ),  Color( 0.0, 0.5, 0.5 ) )
