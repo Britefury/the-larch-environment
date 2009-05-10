@@ -374,7 +374,7 @@ def removeUnNeededParens(node, outerPrecedence):
 	
 import unittest
 from BritefuryJ.DocModel import DMNode
-from GSymCore.Languages.Python25 import Parser3
+from GSymCore.Languages.Python25 import Parser
 
 
 class Test_Precedence (unittest.TestCase):
@@ -412,7 +412,7 @@ class Test_Precedence (unittest.TestCase):
 		
 		
 	def setUp(self):
-		self._parser = Parser3.Python25Grammar()
+		self._parser = Parser.Python25Grammar()
 	
 	def tearDown(self):
 		self._parser = None

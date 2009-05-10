@@ -19,9 +19,9 @@ import Britefury.Tests.BritefuryJ.TreeParser.Test_TreeParser
 import Britefury.Tests.Britefury.Grammar.Grammar
 import Britefury.Tests.Britefury.TreeGrammar.TreeGrammar
 import Britefury.Tests.Britefury.Dispatch.TestObjectNodeMethodDispatch
-import GSymCore.Languages.Python25.CodeGenerator2
-import GSymCore.Languages.Python25.Parser3
-import GSymCore.Languages.Python25.Python25Importer2
+import GSymCore.Languages.Python25.CodeGenerator
+import GSymCore.Languages.Python25.Parser
+import GSymCore.Languages.Python25.Python25Importer
 import GSymCore.Languages.Python25.IdentityTransformation
 import GSymCore.Languages.Python25.Precedence
 import GSymCore.Languages.Java.Parser
@@ -36,10 +36,9 @@ testModules = [ Britefury.Dispatch.Dispatch,
 		Britefury.Tests.Britefury.Grammar.Grammar,
 		Britefury.Tests.Britefury.TreeGrammar.TreeGrammar,
 		Britefury.Tests.Britefury.Dispatch.TestObjectNodeMethodDispatch,
-		GSymCore.Languages.Python25.CodeGenerator2,
-		GSymCore.Languages.Python25.Parser3,
-		GSymCore.Languages.Python25.Python25Importer2,
-		#GSymCore.Languages.Python25.IdentityTransformation,
+		GSymCore.Languages.Python25.CodeGenerator,
+		GSymCore.Languages.Python25.Parser,
+		GSymCore.Languages.Python25.Python25Importer,
 		GSymCore.Languages.Python25.Precedence,
 		#GSymCore.Languages.Java.Parser,
 		#GSymCore.Languages.LISP.Parser2 ]

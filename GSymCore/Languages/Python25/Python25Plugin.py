@@ -7,7 +7,7 @@
 ##-*************************
 from Britefury.gSym.gSymDocument import GSymUnit
 
-from GSymCore.Languages.Python25.Python25Importer2 import importPy25File
+from GSymCore.Languages.Python25.Python25Importer import importPy25File
 from GSymCore.Languages.Python25 import NodeClasses as Nodes
 
 

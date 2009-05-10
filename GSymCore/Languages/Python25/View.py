@@ -29,7 +29,7 @@ from BritefuryJ.GSym.View.ListView import ParagraphListViewLayout, HorizontalLis
 
 
 
-from GSymCore.Languages.Python25.Parser3 import Python25Grammar
+from GSymCore.Languages.Python25.Parser import Python25Grammar
 from GSymCore.Languages.Python25.Styles import *
 from GSymCore.Languages.Python25.Keywords import *
 from GSymCore.Languages.Python25.Precedence import *
