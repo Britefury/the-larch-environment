@@ -11,9 +11,7 @@ import java.awt.event.KeyEvent;
 
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.ElementTree.EditableEntryLeafElement;
-import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleSheets.ContentLeafStyleSheet;
-import BritefuryJ.Math.Point2;
 
 public abstract class DPContentLeafEditableEntry extends DPContentLeafEditable
 {
@@ -197,14 +195,6 @@ public abstract class DPContentLeafEditableEntry extends DPContentLeafEditable
 	
 	
 	
-	protected void placeCursor(Point2 localPos)
-	{
-		Caret caret = presentationArea.getCaret();
-		int markerPos = getMarkerPositonForPoint( localPos );
-		moveMarker( caret.getMarker(), markerPos, Marker.Bias.START );
-	}
-
-
 
 
 	//

@@ -13,6 +13,7 @@ import java.awt.font.TextHitInfo;
 import java.awt.geom.AffineTransform;
 
 import BritefuryJ.DocPresent.Caret.Caret;
+import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Metrics.HMetrics;
 import BritefuryJ.DocPresent.Metrics.VMetrics;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
@@ -92,6 +93,12 @@ public class DPText extends DPContentLeafEditableEntry
 	}
 	
 	
+	//
+	//
+	// CARET METHODS
+	//
+	//
+	
 	public void drawCaret(Graphics2D graphics, Caret c)
 	{
 		AffineTransform current = pushGraphicsTransform( graphics );
@@ -115,6 +122,24 @@ public class DPText extends DPContentLeafEditableEntry
 
 
 
+	//
+	//
+	// SELECTION METHODS
+	//
+	//
+	
+	public void drawSelection(Graphics2D graphics, Marker from, Marker to)
+	{
+		AffineTransform current = pushGraphicsTransform( graphics );
+		int startIndex = from != null  ?  from.getIndex()  :  0;
+		int endIndex = to != null  ?  to.getIndex()  :  text.length();
+		visual.drawSelection( graphics, startIndex, endIndex );
+		popGraphicsTransform( graphics, current );
+	}
+	
+
+	
+	
 	
 	protected HMetrics computeMinimumHMetrics()
 	{

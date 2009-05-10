@@ -8,6 +8,7 @@
 package BritefuryJ.DocPresent;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.WeakHashMap;
 import java.awt.Graphics2D;
 
@@ -113,6 +114,22 @@ public abstract class DPContentLeaf extends DPWidget
 	
 	
 	
+	
+	//
+	//
+	// SELECTION METHODS
+	//
+	//
+	
+	public abstract void drawSelection(Graphics2D graphics, Marker from, Marker to);
+	
+
+	protected void drawSubtreeSelection(Graphics2D graphics, Marker startMarker, List<DPWidget> startPath, Marker endMarker, List<DPWidget> endPath)
+	{
+		drawSelection( graphics, startMarker, endMarker );
+	}
+	
+	
 
 	
 	
@@ -166,6 +183,14 @@ public abstract class DPContentLeaf extends DPWidget
 	}
 	
 	
+	public Marker markerAtPoint(Point2 localPos)
+	{
+		int markerPos = getMarkerPositonForPoint( localPos );
+		return marker( markerPos, Marker.Bias.START );
+	}
+
+
+
 	public void moveMarker(Marker m, int position, Marker.Bias bias)
 	{
 		if ( position > getMarkerRange() )
@@ -212,6 +237,12 @@ public abstract class DPContentLeaf extends DPWidget
 		moveMarker( m, Math.max( getMarkerRange() - 1, 0 ), Marker.Bias.START );
 	}
 	
+	public void moveMarkerToPoint(Marker m, Point2 localPos)
+	{
+		int markerPos = getMarkerPositonForPoint( localPos );
+		moveMarker( m, markerPos, Marker.Bias.START );
+	}
+
 	
 	
 	public boolean isMarkerAtStart(Marker m)
@@ -242,7 +273,7 @@ public abstract class DPContentLeaf extends DPWidget
 	
 	
 	
-	protected void registerMarker(Marker m)
+	private void registerMarker(Marker m)
 	{
 		if ( markers == null )
 		{
@@ -411,35 +442,41 @@ public abstract class DPContentLeaf extends DPWidget
 	
 	protected void moveMarkerHome(Marker marker)
 	{
-		Element segment = null, homeElement = null;
-		segment = element.getSegment();
-		homeElement = segment != null  ?  segment.getFirstEditableEntryLeafInSubtree()  :  null;
-		if ( segment != null  &&  element == homeElement  &&  isMarkerAtStart( marker ) )
+		if ( element != null )
 		{
-			segment = segment.getParent().getSegment();
+			Element segment = null, homeElement = null;
+			segment = element.getSegment();
 			homeElement = segment != null  ?  segment.getFirstEditableEntryLeafInSubtree()  :  null;
-		}
-		
-		if ( homeElement != null )
-		{
-			homeElement.getWidget().moveMarkerToStart( marker );
+			if ( segment != null  &&  element == homeElement  &&  isMarkerAtStart( marker ) )
+			{
+				segment = segment.getParent().getSegment();
+				homeElement = segment != null  ?  segment.getFirstEditableEntryLeafInSubtree()  :  null;
+			}
+			
+			if ( homeElement != null )
+			{
+				homeElement.getWidget().moveMarkerToStart( marker );
+			}
 		}
 	}
 	
 	protected void moveMarkerEnd(Marker marker)
 	{
-		Element segment = null, endElement = null;
-		segment = element.getSegment();
-		endElement = segment != null  ?  segment.getLastEditableEntryLeafInSubtree()  :  null;
-		if ( segment != null  &&  element == endElement  &&  isMarkerAtEnd( marker ) )
+		if ( element != null )
 		{
-			segment = segment.getParent().getSegment();
+			Element segment = null, endElement = null;
+			segment = element.getSegment();
 			endElement = segment != null  ?  segment.getLastEditableEntryLeafInSubtree()  :  null;
-		}
-		
-		if ( endElement != null )
-		{
-			endElement.getWidget().moveMarkerToEnd( marker );
+			if ( segment != null  &&  element == endElement  &&  isMarkerAtEnd( marker ) )
+			{
+				segment = segment.getParent().getSegment();
+				endElement = segment != null  ?  segment.getLastEditableEntryLeafInSubtree()  :  null;
+			}
+			
+			if ( endElement != null )
+			{
+				endElement.getWidget().moveMarkerToEnd( marker );
+			}
 		}
 	}
 	

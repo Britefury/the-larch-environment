@@ -15,6 +15,7 @@ import java.awt.font.LineMetrics;
 import java.awt.font.TextAttribute;
 import java.awt.font.TextHitInfo;
 import java.awt.font.TextLayout;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
@@ -394,6 +395,15 @@ public class TextVisual
 		}
 	}
 	
+	
+	
+	
+	//
+	//
+	// CARET METHODS
+	//
+	//
+	
 	public void drawCaret(Graphics2D graphics, int offset)
 	{
 		if ( layout != null )
@@ -450,6 +460,30 @@ public class TextVisual
 		}
 		graphics.draw( new Line2D.Double( x, 0.0, x, h ) );
 	}
+	
+	
+	
+	//
+	//
+	// SELECTION METHODS
+	//
+	//
+	
+	public void drawSelection(Graphics2D graphics, int startIndex, int endIndex)
+	{
+		if ( layout != null )
+		{
+			AffineTransform transform = graphics.getTransform();
+			double ascent = layout.getAscent();
+			graphics.translate( 0.0, ascent );
+			
+			Shape shape = layout.getLogicalHighlightShape( startIndex, endIndex );
+			graphics.fill( shape );
+			
+			graphics.setTransform( transform );
+		}
+	}
+
 	
 	
 	

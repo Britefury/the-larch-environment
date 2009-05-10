@@ -18,6 +18,7 @@ import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Event.PointerScrollEvent;
 import BritefuryJ.DocPresent.Input.PointerInterface;
+import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
@@ -191,6 +192,23 @@ public abstract class DPContainer extends DPWidget
 	protected abstract List<DPWidget> getChildren();
 	
 	
+	public boolean areChildrenInOrder(DPWidget child0, DPWidget child1)
+	{
+		List<DPWidget> children = getChildren();
+		int index0 = children.indexOf( child0 );
+		int index1 = children.indexOf( child1 );
+		
+		if ( index0 != -1  &&  index1 != -1 )
+		{
+			return index0 < index1;
+		}
+		else
+		{
+			throw new CouldNotFindChildException();
+		}
+	}
+	
+	
 	
 	
 	
@@ -203,6 +221,41 @@ public abstract class DPContainer extends DPWidget
 	}
 	
 
+	
+	
+	
+	//
+	//
+	// SELECTION METHODS
+	//
+	//
+	
+	protected void drawSubtreeSelection(Graphics2D graphics, Marker startMarker, List<DPWidget> startPath, Marker endMarker, List<DPWidget> endPath)
+	{
+		List<DPWidget> children = getChildren();
+		
+		int startIndex = startMarker != null  ?  children.indexOf( startPath.get( 1 ) )  :  0;
+		int endIndex = endMarker != null  ?  children.indexOf( endPath.get( 1) )  :  children.size() - 1;
+		
+		for (int i = startIndex; i <= endIndex; i++)
+		{
+			if ( i == startIndex  &&  startMarker != null )
+			{
+				children.get( i ).drawSubtreeSelection( graphics, startMarker, startPath.subList( 1, startPath.size() ), null, null );
+			}
+			else if ( i == endIndex  &&  endMarker != null )
+			{
+				children.get( i ).drawSubtreeSelection( graphics, null, null, endMarker, endPath.subList( 1, endPath.size() ) );
+			}
+			else
+			{
+				children.get( i ).drawSubtreeSelection( graphics, null, null, null, null );
+			}
+		}
+	}
+	
+	
+	
 	
 	
 	//

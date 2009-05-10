@@ -90,10 +90,18 @@ public class Marker
 	
 	public void set(DPContentLeaf widget, int position, Bias bias)
 	{
+		// ONLY call from 
 		this.widget = widget;
 		this.position = position;
 		this.bias = bias;
 		changed();
+	}
+	
+	
+	
+	public Marker copy()
+	{
+		return widget.marker( position, bias );
 	}
 	
 	
@@ -106,7 +114,7 @@ public class Marker
 	
 	public boolean isValid()
 	{
-		return widget != null;
+		return widget != null  &&  widget.isRealised();
 	}
 	
 	
@@ -122,14 +130,15 @@ public class Marker
 
 
 
-	public Marker clone()
+	public boolean equals(Marker m)
 	{
-		try {
-			return (Marker)super.clone();
-		}
-		catch (CloneNotSupportedException e)
+		if ( m == this )
 		{
-			return null;
+			return true;
+		}
+		else
+		{
+			return widget == m.widget  &&  position == m.position  &&  bias == m.bias;
 		}
 	}
 }
