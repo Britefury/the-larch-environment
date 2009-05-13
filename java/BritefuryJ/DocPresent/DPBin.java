@@ -64,7 +64,7 @@ public class DPBin extends DPContainer
 			if ( this.child != null )
 			{
 				registeredChildren.add( child );
-				registerChild( child );				
+				registerChild( child, null );				
 			}
 			
 			queueResize();

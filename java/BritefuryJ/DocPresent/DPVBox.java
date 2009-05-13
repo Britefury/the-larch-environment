@@ -62,13 +62,6 @@ public class DPVBox extends DPAbstractBox
 	
 	
 	
-	protected BoxParentPacking createParentPackingForChild(DPWidget child)
-	{
-		return new BoxParentPacking( getExpand(), getPadding() );
-	}
-	
-	
-	
 	public int getInsertIndex(Point2 localPos)
 	{
 		//Return the index at which an item could be inserted.
@@ -264,7 +257,8 @@ public class DPVBox extends DPAbstractBox
 		
 		double spacing = getSpacing();
 		
-		Metrics[] allocated = VMetrics.allocateSpacePacked( getChildrenMinimumVMetrics(), getChildrenPreferredVMetrics(), getChildrenPackFlags(), allocation );
+		double paddingAndSpacing = getTotalSpaceForPadding() + getTotalSpaceForSpacing();
+		Metrics[] allocated = VMetrics.allocateSpacePacked( getChildrenMinimumVMetrics(), getChildrenPreferredVMetrics(), getChildrenPackFlags(), allocation - paddingAndSpacing );
 		
 		double height = 0.0;
 		double y = 0.0;

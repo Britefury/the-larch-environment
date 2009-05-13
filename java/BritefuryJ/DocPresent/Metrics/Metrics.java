@@ -17,7 +17,24 @@ public abstract class Metrics
 	public abstract Metrics offsetLength(double deltaLength);
 
 
-	public static Metrics[] allocateSpacePacked(Metrics[] minimum, Metrics[] preferred, int[] packFlags, double allocation)
+	//
+	//
+	// NOTE:
+	// For padding and spacing; subtract the amount of space required for these from @allocation, before passing that value in
+	//
+	//
+	public static Metrics[] allocateSpacePacked(Metrics minimum[], Metrics[] preferred, double allocation)
+	{
+		return allocateSpacePacked( minimum, preferred, null, allocation );
+	}
+
+	//
+	//
+	// NOTE:
+	// For padding and spacing; subtract the amount of space required for these from @allocation, before passing that value in
+	//
+	//
+	public static Metrics[] allocateSpacePacked(Metrics minimum[], Metrics preferred[], int packFlags[], double allocation)
 	{
 		assert minimum.length == preferred.length;
 		
@@ -67,7 +84,7 @@ public abstract class Metrics
 				
 				for (int i = 0; i < preferred.length; i++)
 				{
-					if ( testPackFlagExpand( packFlags[i] ) )
+					if ( packFlags != null  &&  testPackFlagExpand( packFlags[i] ) )
 					{
 						childAlloc[i] = preferred[i].offsetLength( expandPerChild );
 					}
@@ -120,6 +137,11 @@ public abstract class Metrics
 	public static int packFlags(boolean bExpand)
 	{
 		return ( bExpand ? PACKFLAG_EXPAND : 0 );
+	}
+	
+	public static int combinePackFlags(int flags0, int flags1)
+	{
+		return flags0 | flags1;
 	}
 	
 	public static boolean testPackFlagExpand(int packFlags)

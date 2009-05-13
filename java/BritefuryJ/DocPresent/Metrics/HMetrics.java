@@ -67,6 +67,18 @@ public class HMetrics extends Metrics
 		}
 	}
 	
+	public HMetrics pad(double padding)
+	{
+		if ( padding != 0.0 )
+		{
+			return new HMetrics( width + padding  * 2.0, hspacing );
+		}
+		else
+		{
+			return this;
+		}
+	}
+	
 	public HMetrics offsetLength(double deltaLength)
 	{
 		return new HMetrics( width + deltaLength, hspacing );
@@ -90,11 +102,22 @@ public class HMetrics extends Metrics
 		return new HMetrics( width + hspacing + x.width, x.hspacing );
 	}
 	
-	public static HMetrics max(HMetrics x, HMetrics y)
+	public static HMetrics max(HMetrics a, HMetrics b)
 	{
-		double width = Math.max( x.width, y.width );
-		double advance = Math.max( x.width + x.hspacing, y.width + y.hspacing );
-		return new HMetrics( width, advance - width );
+		if ( a.width >= b.width  &&  a.hspacing >= b.hspacing )
+		{
+			return a;
+		}
+		else if ( b.width >= a.width  &&  b.hspacing >= a.hspacing )
+		{
+			return b;
+		}
+		else
+		{
+			double width = Math.max( a.width, b.width );
+			double advance = Math.max( a.width + a.hspacing, b.width + b.hspacing );
+			return new HMetrics( width, advance - width );
+		}
 	}
 	
 	

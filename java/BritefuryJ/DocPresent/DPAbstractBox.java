@@ -56,21 +56,14 @@ abstract public class DPAbstractBox extends DPContainerSequence
 
 	
 	
-	protected void childListModified()
-	{
-	}
-
-
-
-
-
 
 	protected int[] getChildrenPackFlags(List<DPWidget> nodes)
 	{
 		int[] chm = new int[nodes.size()];
 		for (int i = 0; i < nodes.size(); i++)
 		{
-			chm[i] = ((BoxParentPacking)nodes.get( i ).getParentPacking()).packFlags;
+			ParentPacking packing = nodes.get( i ).getParentPacking();
+			chm[i] = packing != null  ?  ((BoxParentPacking)packing).packFlags  :  Metrics.packFlags( getExpand() );  
 		}
 		return chm;
 	}
@@ -84,7 +77,26 @@ abstract public class DPAbstractBox extends DPContainerSequence
 
 	protected double getChildPadding(int index)
 	{
-		return ((BoxParentPacking)registeredChildren.get( index ).getParentPacking()).padding;
+		ParentPacking packing = registeredChildren.get( index ).getParentPacking();
+		return packing != null  ?  ((BoxParentPacking)packing).padding  :  getPadding();  
+	}
+	
+	
+	protected double getTotalSpaceForPadding()
+	{
+		double paddingSpace = 0.0;
+		for (DPWidget child: registeredChildren)
+		{
+			ParentPacking packing = child.getParentPacking();
+			double padding = packing != null  ?  ((BoxParentPacking)packing).padding  :  getPadding();
+			paddingSpace += padding * 2.0;
+		}
+		return paddingSpace;
+	}
+	
+	protected double getTotalSpaceForSpacing()
+	{
+		return getSpacing() * Math.max( registeredChildren.size() - 1, 0 );
 	}
 
 

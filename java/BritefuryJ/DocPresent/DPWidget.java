@@ -388,6 +388,7 @@ abstract public class DPWidget
 		if ( parent != null )
 		{
 			parent.replaceChildWithEmpty( this );
+			parent = null;
 		}
 		presentationArea = null;
 	}
