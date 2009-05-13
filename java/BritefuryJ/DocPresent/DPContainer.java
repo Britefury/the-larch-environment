@@ -127,13 +127,13 @@ public abstract class DPContainer extends DPWidget
 	// Child registration methods
 	//
 	
-	protected DPWidget registerChild(DPWidget child)
+	protected DPWidget registerChild(DPWidget child, ParentPacking packing)
 	{
 		child.unparent();
 		
 		child.setParent( this, presentationArea );
 		
-		child.setParentPacking( createParentPackingForChild( child ) );
+		child.setParentPacking( packing );
 		
 		if ( isRealised() )
 		{
@@ -159,9 +159,9 @@ public abstract class DPContainer extends DPWidget
 		structureChanged();
 	}
 	
-	protected ParentPacking createParentPackingForChild(DPWidget child)
+	
+	protected void childListModified()
 	{
-		return null;
 	}
 	
 	
@@ -1120,7 +1120,7 @@ public abstract class DPContainer extends DPWidget
 			}
 		}
 	}
-	
+
 	
 	
 	

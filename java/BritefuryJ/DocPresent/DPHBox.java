@@ -53,12 +53,6 @@ public class DPHBox extends DPAbstractBox
 	
 	
 	
-	protected BoxParentPacking createParentPackingForChild(DPWidget child)
-	{
-		return new BoxParentPacking( getExpand(), getPadding() );
-	}
-	
-	
 	public int getInsertIndex(Point2 localPos)
 	{
 		//Return the index at which an item could be inserted.
@@ -219,7 +213,8 @@ public class DPHBox extends DPAbstractBox
 	{
 		super.allocateContentsX( allocation );
 		
-		Metrics[] allocated = VMetrics.allocateSpacePacked( getChildrenMinimumHMetrics(), getChildrenPreferredHMetrics(), getChildrenPackFlags(), allocation );
+		double paddingAndSpacing = getTotalSpaceForPadding() + getTotalSpaceForSpacing();
+		Metrics[] allocated = Metrics.allocateSpacePacked( getChildrenMinimumHMetrics(), getChildrenPreferredHMetrics(), getChildrenPackFlags(), allocation - paddingAndSpacing );
 		
 		double spacing = getSpacing();
 		double width = 0.0;

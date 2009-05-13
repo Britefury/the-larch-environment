@@ -59,6 +59,18 @@ public class VMetrics extends Metrics
 		}
 	}
 	
+	public VMetrics pad(double padding)
+	{
+		if ( padding != 0.0 )
+		{
+			return new VMetrics( height + padding, vspacing );
+		}
+		else
+		{
+			return this;
+		}
+	}
+	
 	public VMetrics offsetLength(double deltaLength)
 	{
 		return new VMetrics( height + deltaLength, vspacing );
@@ -75,6 +87,31 @@ public class VMetrics extends Metrics
 	}
 	
 	
+	
+	public static VMetrics add(VMetrics x, VMetrics y)
+	{
+		return new VMetrics( x.height + x.vspacing + y.height, y.vspacing );
+	}
+	
+	public static VMetrics max(VMetrics x, VMetrics y)
+	{
+		if ( x.height >= y.height  &&  x.vspacing >= y.vspacing )
+		{
+			return x;
+		}
+		else if ( y.height >= x.height  &&  y.vspacing >= x.vspacing )
+		{
+			return y;
+		}
+		else
+		{
+			double height = Math.max( x.height, y.height );
+			double advance = Math.max( x.height + x.vspacing, y.height + y.vspacing );
+			return new VMetrics( height, advance - height );
+		}
+	}
+	
+
 	
 	public boolean isTypeset()
 	{

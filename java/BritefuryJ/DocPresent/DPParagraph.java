@@ -61,7 +61,9 @@ public class DPParagraph extends DPContainerSequence
 		{
 			double spacing = paragraph.getSpacing();
 
-			Metrics[] allocated = HMetrics.allocateSpacePacked( getChildrenMinimumHMetrics( Arrays.asList( children ) ), getChildrenPreferredHMetrics( Arrays.asList( children ) ), null, allocation );
+			List<DPWidget> childrenAsList = Arrays.asList( children );
+			double paddingAndSpacing = paragraph.getTotalSpaceForPadding( childrenAsList )  +  paragraph.getTotalSpaceForSpacing( childrenAsList );
+			Metrics[] allocated = HMetrics.allocateSpacePacked( getChildrenMinimumHMetrics( childrenAsList ), getChildrenPreferredHMetrics( childrenAsList ), null, allocation - paddingAndSpacing );
 			
 			double width = 0.0;
 			double x = lineX;
@@ -75,13 +77,13 @@ public class DPParagraph extends DPContainerSequence
 				}
 				
 				DPWidget child = children[i];
-				ParagraphParentPacking packing = (ParagraphParentPacking)child.getParentPacking();
+				double padding = paragraph.getChildPadding( child );
 
-				double childX = x + packing.padding;
+				double childX = x + padding;
 				
 				paragraph.allocateChildX( child, childX, chm.width );
 
-				width = x + chm.width + packing.padding * 2.0;
+				width = x + chm.width + padding * 2.0;
 				x = width + chm.hspacing;
 			}
 		}
@@ -248,20 +250,6 @@ public class DPParagraph extends DPContainerSequence
 
 	
 	
-	protected ParagraphParentPacking createParentPackingForChild(DPWidget child)
-	{
-		return new ParagraphParentPacking( getPadding() );
-	}
-
-	
-	protected void childListModified()
-	{
-	}
-
-
-	
-
-
 	private HMetrics combineHMetricsHorizontally(List<DPWidget> childList, double initialX, HMetrics[] childHMetrics)
 	{
 		if ( childHMetrics.length == 0 )
@@ -284,7 +272,7 @@ public class DPParagraph extends DPContainerSequence
 				for (int i = 0; i < childHMetrics.length; i++)
 				{
 					DPWidget child = childList.get( i );
-					ParagraphParentPacking packing = (ParagraphParentPacking)child.getParentPacking();
+					double padding = getChildPadding( child );
 					HMetrics chm = childHMetrics[i];
 					
 					if ( i != childHMetrics.length - 1)
@@ -292,7 +280,7 @@ public class DPParagraph extends DPContainerSequence
 						chm = chm.minSpacing( spacing );
 					}
 					
-					width = x + chm.width  +  packing.padding * 2.0;
+					width = x + chm.width  +  padding * 2.0;
 					x = width + chm.hspacing;
 				}
 				
@@ -413,7 +401,6 @@ public class DPParagraph extends DPContainerSequence
 			for (int i = 0; i < registeredChildren.size(); i++)
 			{
 				DPWidget child = registeredChildren.get( i );
-				ParagraphParentPacking packing = (ParagraphParentPacking)child.getParentPacking();
 				if ( child.getLineBreakInterface() != null )
 				{
 					width = Math.max( width, lineWidth );
@@ -425,6 +412,7 @@ public class DPParagraph extends DPContainerSequence
 				}
 				else
 				{
+					double padding = getChildPadding( child );
 					HMetrics chm = child.refreshMinimumHMetrics();
 					
 					// Take spacing into account
@@ -439,7 +427,7 @@ public class DPParagraph extends DPContainerSequence
 						}
 					}
 					
-					lineWidth = lineX + chm.width  +  packing.padding * 2.0;
+					lineWidth = lineX + chm.width  +  padding * 2.0;
 					lineX = lineWidth + chm.hspacing;
 				}
 			}
@@ -501,7 +489,7 @@ public class DPParagraph extends DPContainerSequence
 		{
 			// Get the child
 			DPWidget child = registeredChildren.get( i );
-			ParagraphParentPacking packing = (ParagraphParentPacking)child.getParentPacking();
+			double padding = getChildPadding( child );
 			LineBreakInterface lineBreak = child.getLineBreakInterface();
 			if ( lineBreak != null )
 			{
@@ -525,7 +513,7 @@ public class DPParagraph extends DPContainerSequence
 				chm = chm.minSpacing( spacing );
 			}
 			
-			lineWidth = lineX + chm.width  +  packing.padding * 2.0;
+			lineWidth = lineX + chm.width  +  padding * 2.0;
 			lineX = lineWidth + chm.hspacing;
 			
 			
@@ -731,6 +719,36 @@ public class DPParagraph extends DPContainerSequence
 		return getChildren();
 	}
 	
+	
+	
+	//
+	//
+	// CHILD PARENT PACKING METHODS
+	//
+	//
+	
+	private double getChildPadding(DPWidget child)
+	{
+		ParentPacking packing = child.getParentPacking();
+		return packing != null  ?  ((ParagraphParentPacking)packing).padding  :  getPadding();
+	}
+	
+	private double getTotalSpaceForPadding(List<DPWidget> nodes)
+	{
+		double paddingSpace = 0.0;
+		for (DPWidget child: nodes)
+		{
+			ParentPacking packing = child.getParentPacking();
+			double padding = packing != null  ?  ((ParagraphParentPacking)packing).padding  :  getPadding();
+			paddingSpace += padding * 2.0;
+		}
+		return paddingSpace;
+	}
+	
+	private double getTotalSpaceForSpacing(List<DPWidget> nodes)
+	{
+		return getSpacing() * Math.max( nodes.size() - 1, 0 );
+	}
 	
 	
 	
