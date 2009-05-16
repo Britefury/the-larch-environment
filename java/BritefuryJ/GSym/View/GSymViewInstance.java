@@ -40,6 +40,7 @@ public class GSymViewInstance
 		{
 			// Create the node view instance
 			GSymNodeViewInstance nodeViewInstance = new GSymNodeViewInstance( viewInstance, viewNode );
+			viewNode.setContext( nodeViewInstance );
 			
 			// Build the contents
 			//return nodeViewFunction.createElement( treeNode, nodeViewInstance, state );
@@ -86,6 +87,11 @@ public class GSymViewInstance
 		
 		public boolean equals(Object x)
 		{
+			if ( x == this )
+			{
+				return true;
+			}
+			
 			if ( x instanceof NodeContentsFactoryKey )
 			{
 				NodeContentsFactoryKey kx = (NodeContentsFactoryKey)x;
@@ -108,23 +114,23 @@ public class GSymViewInstance
 	
 	
 	private DocTree tree;
-	private DocTreeNode txs;
+	private DocTreeNode treeRootNode;
 	private GSymNodeViewFunction generalNodeViewFunction;
 	private DocView view;
 	private HashMap<Float, Border> indentationBorders;
 	private HashMap<NodeContentsFactoryKey, NodeContentsFactory> nodeContentsFactories;
 	
 	
-	public GSymViewInstance(DocTree tree, DocTreeNode txs, GSymViewFactory viewFactory, CommandHistory commandHistory, DVNode.NodeElementChangeListener changeListener)
+	public GSymViewInstance(DocTree tree, DocTreeNode treeRootNode, GSymViewFactory viewFactory, CommandHistory commandHistory)
 	{
 		this.tree = tree;
-		this.txs = txs;
+		this.treeRootNode = treeRootNode;
 		generalNodeViewFunction = viewFactory.createViewFunction();
 		if ( generalNodeViewFunction == null )
 		{
 			throw new RuntimeException();
 		}
-		view = new DocView( tree, txs, new RootInitialiser(), changeListener );
+		view = new DocView( tree, treeRootNode, new RootInitialiser() );
 		
 		indentationBorders = new HashMap<Float, Border>();
 		nodeContentsFactories = new HashMap<NodeContentsFactoryKey, NodeContentsFactory>();
@@ -168,6 +174,14 @@ public class GSymViewInstance
 	}
 	
 	
+	
+	public void setElementChangeListener(DVNode.NodeElementChangeListener elementChangeListener)
+	{
+		view.setElementChangeListener( elementChangeListener );
+	}
+	
+	
+	
 	protected DocView getView()
 	{
 		return view;
@@ -179,8 +193,8 @@ public class GSymViewInstance
 		return tree;
 	}
 	
-	public DocTreeNode getTXS()
+	public DocTreeNode getTreeRootNode()
 	{
-		return txs;
+		return treeRootNode;
 	}
 }

@@ -9,28 +9,25 @@ package BritefuryJ.GSym.View;
 import org.python.core.Py;
 import org.python.core.PyObject;
 
-import BritefuryJ.DocView.DVNode.NodeElementChangeListener;
-
 public class PyGSymViewFactory extends GSymViewFactory
 {
-	private PyObject changeListenerFactory, viewFunctionFactory;
+	private PyObject viewFunctionFactory, viewContextInitialiserFn;
 	
-	public PyGSymViewFactory(PyObject viewFunctionFactor, PyObject changeListenerFactory)
+	public PyGSymViewFactory(PyObject viewFunctionFactory, PyObject viewContextInitialiserFn)
 	{
-		this.viewFunctionFactory = viewFunctionFactor;
-		this.changeListenerFactory = changeListenerFactory;
+		this.viewFunctionFactory = viewFunctionFactory;
+		this.viewContextInitialiserFn = viewContextInitialiserFn;
 	}
 	
 	
-	public NodeElementChangeListener createChangeListener()
-	{
-		return (NodeElementChangeListener)Py.tojava( changeListenerFactory.__call__(), NodeElementChangeListener.class );
-	}
-
 	public GSymNodeViewFunction createViewFunction()
 	{
 		PyObject viewFn = viewFunctionFactory.__call__();
 		return new GSymNodeViewInstance.PyGSymNodeViewFunction( viewFn );
 	}
 
+	public void initialiseViewContext(GSymViewInstance viewContext)
+	{
+		viewContextInitialiserFn.__call__( Py.java2py( viewContext ) );
+	}
 }

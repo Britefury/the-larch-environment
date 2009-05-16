@@ -6,25 +6,27 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
 from Britefury.gSym.gSymLanguage import GSymLanguage
-from Britefury.gSym.View.NodeElementChangeListener import _NodeElementChangeListener
 
 from BritefuryJ.GSym.View import PyGSymViewFactory
 
 from GSymCore.Languages.Python25.CodeGenerator import Python25CodeGenerator
-from GSymCore.Languages.Python25.View import Python25View
+from GSymCore.Languages.Python25.View import Python25View, initialiseViewContext
 from GSymCore.Languages.Python25 import NodeClasses as Nodes
 
 
+
 def pyTransformModify(cur, new):
-	cur[1:] = new[1:]
+	cur['contents'] = new['contents']
 
 
-	
-viewFac = PyGSymViewFactory( Python25View, _NodeElementChangeListener )
+
+viewFac = PyGSymViewFactory( Python25View, initialiseViewContext )
+
 
 
 def initialiseModule(world):
 	world.registerDMModule( Nodes.module )
+
 
 
 language = GSymLanguage()

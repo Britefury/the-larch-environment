@@ -18,9 +18,9 @@ import BritefuryJ.DocPresent.DPHBox;
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.ElementTree.BorderElement;
 import BritefuryJ.DocPresent.ElementTree.Element;
-import BritefuryJ.DocPresent.ElementTree.ElementTextRepresentationListener;
 import BritefuryJ.DocPresent.ElementTree.ElementFactory;
 import BritefuryJ.DocPresent.ElementTree.ElementKeyboardListener;
+import BritefuryJ.DocPresent.ElementTree.ElementTextRepresentationListener;
 import BritefuryJ.DocPresent.ElementTree.FractionElement;
 import BritefuryJ.DocPresent.ElementTree.HBoxElement;
 import BritefuryJ.DocPresent.ElementTree.HiddenContentElement;
@@ -45,7 +45,7 @@ import BritefuryJ.GSym.View.ListView.ListViewLayout;
 import BritefuryJ.GSym.View.ListView.PySeparatorElementFactory;
 import BritefuryJ.GSym.View.ListView.SeparatorElementFactory;
 
-public class GSymNodeViewInstance implements Element.ElementContext
+public class GSymNodeViewInstance implements Element.ElementContext, DVNode.NodeContext
 {
 	protected static class PyGSymNodeViewFunction implements GSymNodeViewFunction
 	{
@@ -93,7 +93,7 @@ public class GSymNodeViewInstance implements Element.ElementContext
 		viewInstance.getView().profile_startElement();
 		BorderElement element = new BorderElement( border, styleSheet );
 		element.setChild( child );
-		element.setOwner( this );
+		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
@@ -104,7 +104,7 @@ public class GSymNodeViewInstance implements Element.ElementContext
 		Border border = viewInstance.indentationBorder( indentation );
 		BorderElement element = new BorderElement( border );
 		element.setChild( child );
-		element.setOwner( this );
+		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
@@ -113,7 +113,7 @@ public class GSymNodeViewInstance implements Element.ElementContext
 	{
 		viewInstance.getView().profile_startElement();
 		Element element = new TextElement( styleSheet, txt );
-		element.setOwner( this );
+		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
@@ -122,7 +122,7 @@ public class GSymNodeViewInstance implements Element.ElementContext
 	{
 		viewInstance.getView().profile_startElement();
 		Element element = new TextElement( styleSheet, txt, content );
-		element.setOwner( this );
+		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
@@ -131,7 +131,7 @@ public class GSymNodeViewInstance implements Element.ElementContext
 	{
 		viewInstance.getView().profile_startElement();
 		Element element = new HiddenContentElement( txt );
-		element.setOwner( this );
+		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
@@ -140,7 +140,7 @@ public class GSymNodeViewInstance implements Element.ElementContext
 	{
 		viewInstance.getView().profile_startElement();
 		Element element = new WhitespaceElement( txt, width );
-		element.setOwner( this );
+		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
@@ -149,7 +149,7 @@ public class GSymNodeViewInstance implements Element.ElementContext
 	{
 		viewInstance.getView().profile_startElement();
 		Element element = new WhitespaceElement( txt, 0.0 );
-		element.setOwner( this );
+		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
@@ -161,7 +161,7 @@ public class GSymNodeViewInstance implements Element.ElementContext
 		viewInstance.getView().profile_startElement();
 		HBoxElement element = new HBoxElement( styleSheet );
 		element.setChildren( children );
-		element.setOwner( this );
+		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
@@ -176,7 +176,7 @@ public class GSymNodeViewInstance implements Element.ElementContext
 		viewInstance.getView().profile_startElement();
 		VBoxElement element = new VBoxElement( styleSheet );
 		element.setChildren( children );
-		element.setOwner( this );
+		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
@@ -186,19 +186,37 @@ public class GSymNodeViewInstance implements Element.ElementContext
 		viewInstance.getView().profile_startElement();
 		ParagraphElement element = new ParagraphElement( styleSheet );
 		element.setChildren( children );
-		element.setOwner( this );
+		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
 	
-	public Element lineBreak(ContainerStyleSheet styleSheet, Element child)
+	public Element lineBreak(ContainerStyleSheet styleSheet, int lineBreakPriority, Element child)
 	{
 		viewInstance.getView().profile_startElement();
-		LineBreakElement element = new LineBreakElement( styleSheet );
-		element.setChild( child );
-		element.setOwner( this );
+		LineBreakElement element = new LineBreakElement( styleSheet, lineBreakPriority );
+		if ( child != null )
+		{
+			element.setChild( child );
+		}
+		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
+	}
+	
+	public Element lineBreak(int lineBreakPriority, Element child)
+	{
+		return lineBreak( ContainerStyleSheet.defaultStyleSheet, lineBreakPriority, child );
+	}
+	
+	public Element lineBreak(ContainerStyleSheet styleSheet, int lineBreakPriority)
+	{
+		return lineBreak( styleSheet, lineBreakPriority, null );
+	}
+	
+	public Element lineBreak(int lineBreakPriority)
+	{
+		return lineBreak( ContainerStyleSheet.defaultStyleSheet, lineBreakPriority, null );
 	}
 	
 	public Element segment(ParagraphStyleSheet styleSheet, TextStyleSheet textStyleSheet, boolean bGuardBegin, boolean bGuardEnd, Element child)
@@ -206,7 +224,7 @@ public class GSymNodeViewInstance implements Element.ElementContext
 		viewInstance.getView().profile_startElement();
 		SegmentElement element = new SegmentElement( styleSheet, textStyleSheet, bGuardBegin, bGuardEnd );
 		element.setChild( child );
-		element.setOwner( this );
+		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
@@ -216,7 +234,7 @@ public class GSymNodeViewInstance implements Element.ElementContext
 		viewInstance.getView().profile_startElement();
 		SegmentElement element = new SegmentElement( ParagraphStyleSheet.defaultStyleSheet, TextStyleSheet.defaultStyleSheet, bGuardBegin, bGuardEnd );
 		element.setChild( child );
-		element.setOwner( this );
+		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
@@ -243,7 +261,7 @@ public class GSymNodeViewInstance implements Element.ElementContext
 		{
 			element.setRightSubscriptChild( rightSubChild );
 		}
-		element.setOwner( this );
+		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
@@ -303,7 +321,7 @@ public class GSymNodeViewInstance implements Element.ElementContext
 		FractionElement element = new FractionElement( styleSheet, segmentParagraphStyleSheet, segmentTextStyleSheet, barContent );
 		element.setNumeratorChild( numerator );
 		element.setDenominatorChild( denominator );
-		element.setOwner( this );
+		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
@@ -318,7 +336,7 @@ public class GSymNodeViewInstance implements Element.ElementContext
 	{
 		viewInstance.getView().profile_startElement();
 		Element element = layout.createListElement( children, beginDelim, endDelim, separator );
-		element.setOwner( this );
+		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
@@ -327,27 +345,27 @@ public class GSymNodeViewInstance implements Element.ElementContext
 	{
 		viewInstance.getView().profile_startElement();
 		Element element = layout.createListElement( children, PyElementFactory.pyToElementFactory( beginDelim ), PyElementFactory.pyToElementFactory( endDelim ), PySeparatorElementFactory.pyToSeparatorElementFactory( separator ) );
-		element.setOwner( this );
+		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
 	
 	
 	
-	public Element contentListener(Element child, ElementTextRepresentationListener listener)
+	public Element textRepresentationListener(Element child, ElementTextRepresentationListener listener)
 	{
 		viewInstance.getView().profile_startElement();
-		child.setContentListener( listener );
+		child.setTextRepresentationListener( listener );
 		viewInstance.getView().profile_stopElement();
 		return child;
 	}
 	
-	public List<Element> contentListener(List<Element> children, ElementTextRepresentationListener listener)
+	public List<Element> textRepresentationListener(List<Element> children, ElementTextRepresentationListener listener)
 	{
 		viewInstance.getView().profile_startElement();
 		for (Element child: children)
 		{
-			child.setContentListener( listener );
+			child.setTextRepresentationListener( listener );
 		}
 		viewInstance.getView().profile_stopElement();
 		return children;
@@ -477,6 +495,22 @@ public class GSymNodeViewInstance implements Element.ElementContext
 	
 	
 	
+	public Element getViewNodeElement()
+	{
+		return viewNode.getElementNoRefresh();
+	}
+	
+	public Element getViewNodeContentElement()
+	{
+		return viewNode.getInnerElementNoRefresh();
+	}
+	
+	
+	
+	public GSymNodeViewInstance getParent()
+	{
+		return (GSymNodeViewInstance)viewNode.getParent().getContext();
+	}
 	
 	
 	

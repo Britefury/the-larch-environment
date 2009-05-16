@@ -42,14 +42,14 @@ public class DocView implements DVNode.NodeRefreshListener
 	
 	
 	
-	public DocView(DocTree tree, DocTreeNode root, RootNodeInitialiser rootNodeInitialiser, DVNode.NodeElementChangeListener elementChangeListener)
+	public DocView(DocTree tree, DocTreeNode root, RootNodeInitialiser rootNodeInitialiser)
 	{
 		this.root = root;
 		this.rootNodeInitialiser = rootNodeInitialiser;
 		
 		nodeTable = new DocViewNodeTable();
 		
-		this.elementChangeListener = elementChangeListener;
+		elementChangeListener = null;
 		
 		bRefreshRequired = true;
 		
@@ -65,6 +65,11 @@ public class DocView implements DVNode.NodeRefreshListener
 	public void setRefreshListener(RefreshListener listener)
 	{
 		refreshListener = listener;
+	}
+	
+	public void setElementChangeListener(DVNode.NodeElementChangeListener elementChangeListener)
+	{
+		this.elementChangeListener = elementChangeListener;
 	}
 	
 	

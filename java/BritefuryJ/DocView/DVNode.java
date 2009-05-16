@@ -14,7 +14,7 @@ import BritefuryJ.DocPresent.ElementTree.Element;
 import BritefuryJ.DocPresent.ElementTree.ProxyElement;
 import BritefuryJ.DocTree.DocTreeNode;
 
-public class DVNode implements CellListener
+public class DVNode implements CellListener 
 {
 	public static class CannotChangeDocNodeException extends Exception
 	{
@@ -38,6 +38,10 @@ public class DVNode implements CellListener
 		public void onNodeRequestRefresh(DVNode node);
 	}
 	
+	public static interface NodeContext
+	{
+	};
+	
 	
 
 	
@@ -58,6 +62,8 @@ public class DVNode implements CellListener
 	
 	private DVNode parent, nextSibling;
 	private DVNode childrenHead, childrenTail;
+	
+	private NodeContext nodeContext;
 	
 	
 	
@@ -94,6 +100,8 @@ public class DVNode implements CellListener
 		
 		
 		this.elementChangeListener = elementChangeListener;
+		
+		nodeContext = null;
 	}
 	
 	
@@ -167,6 +175,11 @@ public class DVNode implements CellListener
 		return view;
 	}
 	
+	public DVNode getParent()
+	{
+		return parent;
+	}
+	
 
 	public DocTreeNode getTreeNode()
 	{
@@ -176,6 +189,24 @@ public class DVNode implements CellListener
 	public Object getDocNode()
 	{
 		return docNode;
+	}
+	
+	
+	
+	//
+	//
+	// Context methods
+	//
+	//
+	
+	public NodeContext getContext()
+	{
+		return nodeContext;
+	}
+	
+	public void setContext(NodeContext context)
+	{
+		nodeContext = context;
 	}
 	
 	

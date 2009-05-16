@@ -2,9 +2,29 @@ TODOS:
 
 
 
+
+STRING DIFF
+==========
+Implement string differencing.
+
+
+LINE BREAKS
+==========
+Line breaks break the most convenient element. This looks bad in the case of:
+f(a, b, c, d, e(x, y))
+The break after the 'x,' is activated. It would be more appropriate to activate the one
+after 'd,'.
+Line breaks should respect nested structures.
+
+
+
 PYTHON LANGUAGE
 ================
-Add line breaks
+Handle print statements properly
+
+View configuration; spacing, etc
+
+Importer; handle comments that appear after code; on the same line
 
 
 
@@ -13,6 +33,45 @@ OPTIMISATION
 When viewing a list, use a special form of map that applies a transformation/wrapping function, uses a filter function,
 and takes the resulting element list and uses it as a list of children for a branch element. Ensure that modifications to the
 underlying list result in modifications to the child list, in order to avoid rebuilding the view all over again.
+
+
+
+ELEMENT TREE SUPPORT FOR TABLE WIDGET
+======================================
+Add element tree support for the table widget
+
+
+
+PARSER DEBUG VIEWER BNF VIEW
+============================
+Add BNF visualisation to the parser debug viewer.
+
+
+
+SELECTION
+=========
+Handle delete/replace selection of selections.
+
+
+
+CUT AND PASTE
+=============
+Handle cut and paste
+
+
+
+SEQUENCE VIEWS
+==============
+Add support for other kinds of sequence view (vertical, table, etc)
+
+
+
+JAVA LANGUAGE
+==============
+Complete Java language support
+
+
+
 
 
 

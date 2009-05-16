@@ -41,9 +41,9 @@ def _parseText(text):
 		return None
 
 
-class ParsedNodeContentListener (ElementContentListener):
+class ParsedNodeTextRepresentationListener (ElementTextRepresentationListener):
 	def __init__(self, ctx, node):
-		#super( ParsedNodeContentListener, self ).__init__()
+		#super( ParsedNodeTextRepresentationListener, self ).__init__()
 		self._ctx = ctx
 		self._node = node
 
@@ -60,7 +60,7 @@ class ParsedNodeContentListener (ElementContentListener):
 	
 	
 def nodeEditor(ctx, node, contents, state):
-	return ctx.contentListener( contents, ParsedNodeContentListener( ctx, node ) )
+	return ctx.textRepresentationListener( contents, ParsedNodeTextRepresentationListener( ctx, node ) )
 
 
 def stringNodeEditor(ctx, node, metadata, state):
@@ -69,7 +69,7 @@ def stringNodeEditor(ctx, node, metadata, state):
 		nodeText = repr( node.toString() )
 	else:
 		nodeText = node.toString()
-	return ctx.contentListener( ctx.text( string_textStyle, nodeText ), ParsedNodeContentListener( ctx, node ) )
+	return ctx.textRepresentationListener( ctx.text( string_textStyle, nodeText ), ParsedNodeTextRepresentationListener( ctx, node ) )
 
 
 

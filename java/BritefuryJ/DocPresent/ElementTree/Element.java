@@ -76,7 +76,7 @@ public abstract class Element
 		return context;
 	}
 	
-	public void setOwner(ElementContext context)
+	public void setContext(ElementContext context)
 	{
 		this.context = context;
 	}
@@ -116,12 +116,12 @@ public abstract class Element
 	// Listeners
 	//
 	
-	public ElementTextRepresentationListener getContentListener()
+	public ElementTextRepresentationListener getTextRepresentationListener()
 	{
 		return contentListener;
 	}
 	
-	public void setContentListener(ElementTextRepresentationListener listener)
+	public void setTextRepresentationListener(ElementTextRepresentationListener listener)
 	{
 		contentListener = listener;
 	}
