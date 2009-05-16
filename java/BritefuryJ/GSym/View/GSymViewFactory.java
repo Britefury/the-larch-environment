@@ -9,7 +9,6 @@ package BritefuryJ.GSym.View;
 import BritefuryJ.CommandHistory.CommandHistory;
 import BritefuryJ.DocTree.DocTree;
 import BritefuryJ.DocTree.DocTreeNode;
-import BritefuryJ.DocView.DVNode;
 import BritefuryJ.DocView.DocView;
 
 public abstract class GSymViewFactory
@@ -20,16 +19,18 @@ public abstract class GSymViewFactory
 	}
 	
 	
-	public abstract GSymNodeViewFunction createViewFunction();
-	public abstract DVNode.NodeElementChangeListener createChangeListener();
 	
-	public DocView createDocumentView(Object xs, CommandHistory commandHistory) throws CannotCreateViewOfTerminalNode
+	public abstract GSymNodeViewFunction createViewFunction();
+	public abstract void initialiseViewContext(GSymViewInstance viewContext);
+	
+	public DocView createDocumentView(Object docRootNode, CommandHistory commandHistory) throws CannotCreateViewOfTerminalNode
 	{
 		DocTree tree = new DocTree();
-		Object txs = tree.treeNode( xs );
-		if ( txs instanceof DocTreeNode )
+		Object docTreeRoot = tree.treeNode( docRootNode );
+		if ( docTreeRoot instanceof DocTreeNode )
 		{
-			GSymViewInstance viewInstance = new GSymViewInstance( tree, (DocTreeNode)txs, this, commandHistory, createChangeListener() );
+			GSymViewInstance viewInstance = new GSymViewInstance( tree, (DocTreeNode)docTreeRoot, this, commandHistory );
+			initialiseViewContext( viewInstance );
 			return viewInstance.getView();
 		}
 		else

@@ -67,7 +67,6 @@ class _TransformApplication (object):
 
 
 import unittest
-from Britefury.Dispatch.Dispatch import Dispatcher
 from Britefury.Dispatch.MethodDispatch import methodDispatch
 from Britefury.Transformation.TransformationInterface import TransformationInterface
 
