@@ -17,8 +17,6 @@ from Britefury.gSym.View.GSymView import GSymViewObjectNodeDispatch
 
 from Britefury.gSym.View.EditOperations import replace, replaceWithRange, replaceNodeContents, append, prepend, insertElement, insertRange, insertBefore, insertRangeBefore, insertAfter, insertRangeAfter
 
-from Britefury.gSym.View.NodeElementChangeListener import _NodeElementChangeListener
-
 
 from Britefury.Util.NodeUtil import *
 
@@ -27,6 +25,7 @@ from BritefuryJ.DocPresent.StyleSheets import *
 from BritefuryJ.DocPresent.ElementTree import *
 from BritefuryJ.DocPresent import *
 
+from BritefuryJ.GSym.View import NodeElementChangeListenerDiff
 from BritefuryJ.GSym.View.ListView import ParagraphListViewLayout, HorizontalListViewLayout, VerticalInlineListViewLayout, VerticalListViewLayout
 
 
@@ -1552,4 +1551,5 @@ class Python25View (GSymViewObjectNodeDispatch):
 	
 	
 def initialiseViewContext(viewContext):
-	viewContext.setElementChangeListener( _NodeElementChangeListener() )
+	#viewContext.setElementChangeListener( _NodeElementChangeListener() )
+	viewContext.setElementChangeListener( NodeElementChangeListenerDiff() )

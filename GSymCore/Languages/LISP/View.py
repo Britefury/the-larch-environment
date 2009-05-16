@@ -15,6 +15,7 @@ from BritefuryJ.DocPresent.StyleSheets import *
 from BritefuryJ.DocPresent.ElementTree import *
 
 from BritefuryJ.GSym.View.ListView import ParagraphListViewLayout, HorizontalListViewLayout, VerticalInlineListViewLayout, VerticalListViewLayout
+from BritefuryJ.GSym.View import NodeElementChangeListenerDiff
 
 
 from GSymCore.Languages.LISP.Parser2 import LispGrammar
@@ -157,3 +158,8 @@ def viewLispNode(node, ctx, state):
 	
 def LISPView():
 	return viewLispNode
+
+
+def initialiseViewContext(viewContext):
+	#viewContext.setElementChangeListener( _NodeElementChangeListener() )
+	viewContext.setElementChangeListener( NodeElementChangeListenerDiff() )

@@ -23,8 +23,6 @@ public class StringDiff
 		
 		public OpCode opcode;
 		public int aBegin, aEnd, bBegin, bEnd;
-		private Operation prev;
-		private int length;
 		
 		
 		public Operation(OpCode opcode, int aBegin, int aEnd, int bBegin, int bEnd)
@@ -34,19 +32,6 @@ public class StringDiff
 			this.aEnd = aEnd;
 			this.bBegin = bBegin;
 			this.bEnd = bEnd;
-			prev = null;
-			length = 0;
-		}
-		
-		private Operation(OpCode opcode, int aBegin, int aEnd, int bBegin, int bEnd, Operation prev)
-		{
-			this.opcode = opcode;
-			this.aBegin = aBegin;
-			this.aEnd = aEnd;
-			this.bBegin = bBegin;
-			this.bEnd = bEnd;
-			this.prev = prev;
-			length = this.prev.length + 1;
 		}
 		
 		
@@ -76,71 +61,100 @@ public class StringDiff
 			String range = "a[" + aBegin + ":" + aEnd + "] <-> b[" + bBegin + ":" + bEnd + "]";
 			return opcode + "( " + range + " )";
 		}
-		
-		
-		
-		private static Operation insertChar(String a, String b, int i, int j, Operation prev)
+
+	
+	
+		public void offset(int offset)
 		{
+			aBegin += offset;
+			aEnd += offset;
+			bBegin += offset;
+			bEnd += offset;
+		}
+	}
+	
+	
+	
+	private static class OperationLinked extends Operation
+	{
+		private OperationLinked prev;
+		private int cost, length;
+		
+		
+		
+		private OperationLinked(OpCode opcode, int aBegin, int aEnd, int bBegin, int bEnd, OperationLinked prev, int cost)
+		{
+			super( opcode, aBegin, aEnd, bBegin, bEnd );
+			this.prev = prev;
+			this.cost = cost;
+			if ( prev != null )
+			{
+				length = prev.length + 1;
+			}
+			else
+			{
+				length = 1;
+			}
+		}
+		
+		
+		
+		private Operation operation()
+		{
+			return new Operation( opcode, aBegin, aEnd, bBegin, bEnd );
+		}
+		
+		
+		
+		private static OperationLinked insertChar(String a, String b, int i, int j, int opCost, OperationLinked prev)
+		{
+			int cost = prev != null  ?  prev.cost + opCost  :  opCost;
 			if ( prev != null  &&  prev.opcode == OpCode.INSERT )
 			{
-				return new Operation( OpCode.INSERT, prev.aBegin, prev.aEnd, prev.bBegin, j, prev.prev );
+				return new OperationLinked( OpCode.INSERT, prev.aBegin, prev.aEnd, prev.bBegin, j, prev.prev, cost );
 			}
 			else
 			{
-				return new Operation( OpCode.INSERT, i, i, j-1, j, prev.prev );
+				return new OperationLinked( OpCode.INSERT, i, i, j-1, j, prev, cost );
 			}
 		}
 
-		private static Operation deleteChar(String a, String b, int i, int j, Operation prev)
+		private static OperationLinked deleteChar(String a, String b, int i, int j, int opCost, OperationLinked prev)
 		{
+			int cost = prev != null  ?  prev.cost + opCost  :  opCost;
 			if ( prev != null  &&  prev.opcode == OpCode.DELETE )
 			{
-				return new Operation( OpCode.DELETE, prev.aBegin, i, prev.bBegin, prev.bEnd, prev.prev );
+				return new OperationLinked( OpCode.DELETE, prev.aBegin, i, prev.bBegin, prev.bEnd, prev.prev, cost );
 			}
 			else
 			{
-				return new Operation( OpCode.DELETE, i-1, i, j, j, prev.prev );
+				return new OperationLinked( OpCode.DELETE, i-1, i, j, j, prev, cost );
 			}
 		}
 
-		private static Operation replaceChar(String a, String b, int i, int j, Operation prev)
+		private static OperationLinked replaceChar(String a, String b, int i, int j, int opCost, OperationLinked prev)
 		{
+			int cost = prev != null  ?  prev.cost + opCost  :  opCost;
 			OpCode opcode = a.charAt( i - 1 )  ==  b.charAt( j - 1 )  ?  OpCode.EQUAL  :  OpCode.REPLACE;
 			if ( prev != null  &&  prev.opcode == opcode )
 			{
-				return new Operation( opcode, prev.aBegin, i, prev.bBegin, j, prev.prev );
+				return new OperationLinked( opcode, prev.aBegin, i, prev.bBegin, j, prev.prev, cost );
 			}
 			else
 			{
-				return new Operation( opcode, i-1, i, j-1, j, prev.prev );
+				return new OperationLinked( opcode, i-1, i, j-1, j, prev, cost );
 			}
 		}
-	}
 	
 	
-	
-	private static class Node
-	{
-		public int i, j;
-		public int cost;
-		public Node prev;
-		
-		
-		public Node(int i, int j, int cost, Node prev)
+		public String toString()
 		{
-			this.i = i;
-			this.j = j;
-			this.cost = cost;
-			this.prev = prev;
-		}
-
-		public Node(int i, int j, int cost)
-		{
-			this.i = i;
-			this.j = j;
-			this.cost = cost;
+			String opString = super.toString();
+			String prevString = prev != null  ?  ", " + prev.toString()  :  "";
+			return opString + prevString;
 		}
 	}
+	
 	
 	
 	private static boolean isJunk(char c)
@@ -178,28 +192,29 @@ public class StringDiff
 	}
 	
 	
+	
+	
 	public static ArrayList<Operation> levenshteinDiff(String a, String b)
 	{
 		ArrayList<Operation> operations = new ArrayList<Operation>();
 
 		if ( a.length() > 0  &&  b.length() > 0 )
 		{
-			Node prevRow[] = new Node[a.length()+1];
-			Node curRow[] = new Node[a.length()+1];
+			OperationLinked prevRow[] = new OperationLinked[a.length()+1];
+			OperationLinked curRow[] = new OperationLinked[a.length()+1];
 			
 			// Initialise first row
 			int cost = 0;
-			prevRow[0] = new Node( 0, 0, 0 );
-			Node prevNode = prevRow[0];
+			prevRow[0] = null;
+			OperationLinked prevNode = prevRow[0];
 			for (int i = 1; i <= a.length(); i++)
 			{
-				// Moving right through the graph; DELETE char from @a
+				// Moving right through the graph; consuming chars from @a, not consuming chars from @b; DELETE chars from @a
 				cost += deleteCost( a.charAt( i - 1 ) );
-				Node node = new Node( i, 0, cost, prevNode );
+				OperationLinked node = OperationLinked.deleteChar( a, b, i, 0, deleteCost( a.charAt( i - 1 ) ), prevNode );
 				prevRow[i] = node;
 				prevNode = node;
 			}
-			
 			
 			// For each subsequent row
 			for (int j = 1; j <= b.length(); j++)
@@ -207,44 +222,41 @@ public class StringDiff
 				// Fill @cur row
 
 				// Current row, first element:
-				// Moving down through the graph; INSERT char from @b
-				curRow[0] = new Node( 0, j, prevRow[0].cost + insertCost( b.charAt( j - 1 ) ), prevRow[0] );
+				// Moving down through the graph; not consuming char from @a, consuming char from @b; INSERT char from @b
+				curRow[0] = OperationLinked.insertChar( a, b, 0, j, insertCost( b.charAt( j - 1 ) ), prevRow[0] );
 				prevNode = curRow[0];
 				// Current row, remaining elements
 				for (int i = 1; i <= a.length(); i++)
 				{
-					// Moving right through the graph; DELETE char from @a
-					int delCost = prevNode.cost + deleteCost( a.charAt( i - 1 ) );
-					// Moving down through the graph; INSERT char from @b
-					int insCost = prevRow[i].cost + insertCost( b.charAt( j - 1 ) );
-					// Moving down-right through the graph; REPLACE char from @a with char from @b
-					int replCost = prevRow[i-1].cost + replaceCost( a.charAt( i - 1 ), b.charAt( j - 1 ) );
+					// Moving right through the graph; consume char from @a, don't consume char from @b; DELETE char from @a
+					OperationLinked delOp = OperationLinked.deleteChar( a, b, i, j, deleteCost( a.charAt( i - 1 ) ), prevNode );
+					// Moving down through the graph; don't consume char from @a, consume char from @b; INSERT char from @b
+					OperationLinked insOp = OperationLinked.insertChar( a, b, i, j, insertCost( b.charAt( j - 1 ) ), prevRow[i] );
+					// Moving down-right through the graph; consume char from @a, consume char from @b; REPLACE char from @a with char from @b (chars may be equal)
+					OperationLinked replOp = OperationLinked.replaceChar( a, b, i, j, replaceCost( a.charAt( i - 1 ), b.charAt( j - 1 ) ), prevRow[i-1] );
 
-					Node node;
-					// Favour replace
-					if ( replCost <= delCost  &&  replCost <= insCost )
+					// Determine the best operation to use
+					// Start with delete
+					OperationLinked op = delOp;
+					
+					// Switch to insert if its better
+					if ( insOp.cost < op.cost  ||  ( insOp.cost == op.cost  &&  insOp.length <= op.length  ) )
 					{
-						node = new Node( i, j, replCost, prevRow[i-1] );
+						op = insOp;
 					}
-					else
+
+					// Switch to replace if its better
+					if ( replOp.cost < op.cost  ||  ( replOp.cost == op.cost  &&  replOp.length <= op.length  ) )
 					{
-						if ( insCost <= delCost )
-						{
-							node = new Node( i, j, insCost, prevRow[i] );
-						}
-						else
-						{
-							node = new Node( i, j, delCost, prevNode );
-						}
+						op = replOp;
 					}
 					
-					curRow[i] = node;
-					prevNode = node;
+					curRow[i] = op;
+					prevNode = op;
 				}
 				
-				
 				// Swap the rows over
-				Node rowSwap[] = prevRow;
+				OperationLinked rowSwap[] = prevRow;
 				prevRow = curRow;
 				curRow = rowSwap;
 			}
@@ -252,48 +264,10 @@ public class StringDiff
 			
 			// Now we have a node graph.
 			// Get the final node.
-			Node node = prevRow[a.length()];
-			Operation currentOp = null;
-			while ( node != null  &&  node.prev != null )
+			OperationLinked node = prevRow[a.length()];
+			while ( node != null )
 			{
-				Operation.OpCode opcode;
-				if ( node.i == node.prev.i )
-				{
-					// Moving down through the graph; INSERT char from @b
-					opcode = Operation.OpCode.INSERT;
-				}
-				else if ( node.j == node.prev.j )
-				{
-					// Moving right through the graph; DELETE char from @a
-					opcode = Operation.OpCode.DELETE;
-				}
-				else
-				{
-					// Moving down-right through the graph; REPLACE char from @a with char from @b
-					if ( a.charAt( node.prev.i ) == b.charAt( node.prev.j ) )
-					{
-						// Characters are same; EQUAL
-						opcode = Operation.OpCode.EQUAL;
-					}
-					else
-					{
-						opcode = Operation.OpCode.REPLACE;
-					}
-				}
-				
-				// Create the operation
-				if ( currentOp != null  &&  currentOp.opcode == opcode )
-				{
-					// Extend the operation to cover this character
-					currentOp.aBegin = node.prev.i;
-					currentOp.bBegin = node.prev.j;
-				}
-				else
-				{
-					currentOp = new Operation( opcode, node.prev.i, node.i, node.prev.j, node.j );
-					operations.add( currentOp );
-				}
-
+				operations.add( node.operation() );
 				node = node.prev;
 			}
 		}
@@ -310,6 +284,123 @@ public class StringDiff
 		else if ( a.length() == 0  &&  b.length() == 0 )
 		{
 			// Nothing to do
+		}
+		
+		return operations;
+	}
+	
+	
+	
+	
+	public static int getCommonPrefixLength(String a, String b)
+	{
+		for (int i = 0; i < Math.min( a.length(), b.length() ); i++)
+		{
+			if ( a.charAt( i ) != b.charAt( i ) )
+			{
+				return i;
+			}
+		}
+		
+		return Math.min( a.length(), b.length() );
+	}
+
+	public static int getCommonSuffixLength(String a, String b)
+	{
+		int j = a.length() - 1;
+		int k = b.length() - 1;
+		for (int i = 0; i < Math.min( a.length(), b.length() ); i++)
+		{
+			if ( a.charAt( j ) != b.charAt( k ) )
+			{
+				return i;
+			}
+			
+			j--;
+			k--;
+		}
+		
+		return Math.min( a.length(), b.length() );
+	}
+	
+	
+	
+	
+	public static ArrayList<Operation> diff(String a, String b)
+	{
+		ArrayList<Operation> operations = new ArrayList<Operation>();
+
+		int prefixLen = getCommonPrefixLength( a, b );
+		
+		if ( prefixLen == a.length()  ||  prefixLen == b.length() )
+		{
+			// @a is a substring at the start of @b
+			// OR
+			// @b is a substring at the start of @a
+			operations.add( new Operation( Operation.OpCode.EQUAL, 0, prefixLen, 0, prefixLen ) );
+			if ( a.length() > b.length() )
+			{
+				// delete chars from end of @a
+				operations.add( new Operation( Operation.OpCode.DELETE, prefixLen, a.length(), prefixLen, prefixLen ) );
+			}
+			else if ( b.length() > a.length() )
+			{
+				// insert chars from end of @b
+				operations.add( new Operation( Operation.OpCode.INSERT, prefixLen, prefixLen, prefixLen, b.length() ) );
+			}
+			
+			return operations;
+		}
+		
+		
+		int suffixLen = getCommonSuffixLength( a, b );
+
+		if ( suffixLen == a.length()  ||  suffixLen == b.length() )
+		{
+			// @a is a substring at the end of @b
+			// OR
+			// @b is a substring at the end of @a
+			int aOffset = 0, bOffset = 0;
+			if ( a.length() > b.length() )
+			{
+				// delete chars from start of @a
+				operations.add( new Operation( Operation.OpCode.DELETE, 0, a.length() - suffixLen, 0, 0 ) );
+				aOffset = a.length() - suffixLen;
+			}
+			else if ( b.length() > a.length() )
+			{
+				// insert chars from start of @b
+				operations.add( new Operation( Operation.OpCode.INSERT, 0, 0, 0, b.length() - suffixLen ) );
+				bOffset = b.length() - suffixLen;
+			}
+			operations.add( new Operation( Operation.OpCode.EQUAL, aOffset, a.length(), bOffset, b.length() ) );
+
+			return operations;
+		}
+		
+		
+		// Add an extra character to each end to give the differencing algorithm a little context to work with.
+		prefixLen = Math.max( prefixLen - 1, 0 );
+		suffixLen = Math.max( suffixLen - 1, 0 );
+		
+		
+		if ( prefixLen > 0 )
+		{
+			operations.add( new Operation( Operation.OpCode.EQUAL, 0, prefixLen, 0, prefixLen ) );
+		}
+		
+		
+		// Use Levenshtein algorithm for diff
+		ArrayList<Operation> levenshteinOps = levenshteinDiff( a.substring( prefixLen, a.length() - suffixLen ), b.substring( prefixLen, b.length() - suffixLen ) );
+		for (Operation op: levenshteinOps)
+		{
+			op.offset( prefixLen );
+		}
+		operations.addAll( levenshteinOps );
+
+		if ( suffixLen > 0 )
+		{
+			operations.add( new Operation( Operation.OpCode.EQUAL, a.length() - suffixLen, a.length(), b.length() - suffixLen, b.length() ) );
 		}
 		
 		return operations;

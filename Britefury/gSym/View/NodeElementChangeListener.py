@@ -27,7 +27,8 @@ from BritefuryJ.DocTree import DocTreeNode
 from BritefuryJ.DocView import DVNode
 from BritefuryJ.DocView import DocView
 
-from BritefuryJ.GSym.View import StringDiff, NodeElementChangeListenerDiff
+#from BritefuryJ.GSym.View import StringDiff, NodeElementChangeListenerDiff
+from BritefuryJ.GSym.View import NodeElementChangeListenerDiff
 
 from Britefury.Util.NodeUtil import isListNode, nodeToSXString
 
