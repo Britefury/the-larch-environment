@@ -6,6 +6,8 @@
 //##************************
 package BritefuryJ.GSym.View;
 
+import java.util.ArrayList;
+
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.ElementTree.BranchElement;
 import BritefuryJ.DocPresent.ElementTree.Element;
@@ -16,8 +18,9 @@ import BritefuryJ.DocPresent.ElementTree.Caret.ElementCaret;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocView.DVNode;
 import BritefuryJ.DocView.DocView;
+import BritefuryJ.Utils.StringDiff;
 
-public abstract class NodeElementChangeListenerDiff implements DVNode.NodeElementChangeListener
+public class NodeElementChangeListenerDiff implements DVNode.NodeElementChangeListener
 {
 	private static int DIFF_THRESHHOLD = 65536;
 	
@@ -163,9 +166,49 @@ public abstract class NodeElementChangeListenerDiff implements DVNode.NodeElemen
 							String origChangeRegion = textRepresentation.substring( prefixLen, textRepresentation.length() - suffixLen ).toString();
 							String newChangeRegion = newTextRepresentation.substring( prefixLen, newTextRepresentation.length() - suffixLen ).toString();
 							
-							Marker.Bias newBiasArray[] = new Marker.Bias[] { newBias };
-							newPosition = computeNewPositionWithDiff( position, bias, newBiasArray, textRepresentation, newTextRepresentation, prefixLen, suffixLen, origChangeRegion, newChangeRegion );
-							newBias = newBiasArray[0];
+							newPosition = position;
+							newBias = bias;
+							
+							
+							ArrayList<StringDiff.Operation> operations = StringDiff.levenshteinDiff( origChangeRegion, newChangeRegion );
+
+							// Apply the prefix offset
+							for (StringDiff.Operation op: operations)
+							{
+								op.offset( prefixLen );
+							}
+							
+							// Prepend and append some 'equal' operations that cover the prefix and suffix
+							if ( prefixLen > 0 )
+							{
+								operations.add( 0, new StringDiff.Operation( StringDiff.Operation.OpCode.EQUAL, 0, prefixLen, 0, prefixLen ) );
+							}
+							if ( suffixLen > 0 )
+							{
+								operations.add( new StringDiff.Operation( StringDiff.Operation.OpCode.EQUAL, textRepresentation.length() - suffixLen, textRepresentation.length(),
+										newTextRepresentation.length() - suffixLen, newTextRepresentation.length() ) );
+							}
+
+							// Find the operation which covers the caret
+							for (StringDiff.Operation op: operations)
+							{
+								if ( ( position > op.aBegin  ||  ( position == op.aBegin  &&  bias == Marker.Bias.END ) )  &&  position < op.aEnd )
+								{
+									// Caret is in the range of this operation
+									
+									if ( op.opcode == StringDiff.Operation.OpCode.DELETE )
+									{
+										// Range deleted; move to the start of the range in the destination string, bias:STARt
+										newPosition = op.bBegin;
+										newBias = Marker.Bias.START;
+									}
+									else
+									{
+										// Range replaced, equal, or inserted; offset position be delta between starts of ranges
+										newPosition += op.bBegin - op.aBegin;
+									}
+								}
+							}
 						}
 					}
 				}
@@ -322,10 +365,4 @@ public abstract class NodeElementChangeListenerDiff implements DVNode.NodeElemen
 			}
 		}
 	}
-	
-	
-	
-	
-	public abstract int computeNewPositionWithDiff(int position, Marker.Bias bias, Marker.Bias newBiasArray[], String contentString, String newContentString, int prefixLen, int suffixLen,
-			String origChangeRegion, String newChangeRegion);
 }

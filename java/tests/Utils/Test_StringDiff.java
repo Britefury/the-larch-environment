@@ -25,7 +25,7 @@ public class Test_StringDiff extends TestCase
 		
 		if ( !result.equals( expectedList ) )
 		{
-			System.out.println( "Operation list differs." );
+			System.out.println( "Operation lists differ." );
 			System.out.println( "Expected:" );
 			System.out.println( expectedList.toString() );
 			System.out.println( "Result:" );
@@ -35,6 +35,7 @@ public class Test_StringDiff extends TestCase
 		assertEquals( result, expectedList );
 		
 		levenshteinTestEdits( a, b );
+		diffTestEdits( a, b );
 	}
 	
 
@@ -74,6 +75,40 @@ public class Test_StringDiff extends TestCase
 	}
 	
 
+	protected void diffTestEdits(String a, String b)
+	{
+		ArrayList<Operation> ops = StringDiff.diff( a, b );
+		
+		
+		String c = a;
+		for (Operation op: ops)
+		{
+			if ( op.opcode == OpCode.EQUAL )
+			{
+				assertSame( op.bEnd - op.bBegin, op.aEnd - op.aBegin );
+				assertEquals( a.substring( op.aBegin, op.aEnd ), b.substring( op.bBegin, op.bEnd ) );
+			}
+			else if ( op.opcode == OpCode.REPLACE )
+			{
+				assertSame( op.bEnd - op.bBegin, op.aEnd - op.aBegin );
+				c = c.substring( 0, op.aBegin ).toString() +  b.substring( op.bBegin, op.bEnd ).toString()  +  c.substring( op.aEnd ).toString();
+			}
+			else if ( op.opcode == OpCode.INSERT )
+			{
+				assertSame( op.aBegin, op.aEnd );
+				assertNotSame( op.bBegin, op.bEnd );
+				c = c.substring( 0, op.aBegin ).toString() +  b.substring( op.bBegin, op.bEnd ).toString()  +  c.substring( op.aEnd ).toString();
+			}
+			else if ( op.opcode == OpCode.DELETE )
+			{
+				assertNotSame( op.aBegin, op.aEnd );
+				assertSame( op.bBegin, op.bEnd );
+				c = c.substring( 0, op.aBegin ).toString() +  c.substring( op.aEnd ).toString();
+			}
+		}
+		
+		assertEquals( c, b );
+	}
 	
 	
 	public void test_levenshteinDiff_insertAll()
@@ -179,6 +214,6 @@ public class Test_StringDiff extends TestCase
 
 	public void test_levenshteinDiff_other()
 	{
-		levenshteinTestEdits( "helloworld", "hello" );
+		levenshteinTestEdits( "This is a test to see if this works", "Some other test to see what happens" );
 	}
 }
