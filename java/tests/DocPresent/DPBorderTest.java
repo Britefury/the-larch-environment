@@ -8,22 +8,25 @@
 package tests.DocPresent;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.util.Arrays;
 
+import javax.swing.AbstractAction;
 import javax.swing.JFrame;
+import javax.swing.JMenu;
 
 import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPHBox;
-import BritefuryJ.DocPresent.DPPresentationArea;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
+import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Border.EmptyBorder;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
-public class DPBorderTest
+public class DPBorderTest extends DocPresentTestBase
 {
 	protected static DPText[] makeTexts(String header)
 	{
@@ -39,15 +42,8 @@ public class DPBorderTest
 	}
 	
 	
-	public static void main(final String[] args) {
-		JFrame frame = new JFrame( "VBox test" );
-
-		//This stops the app on window close.
-		frame.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
-
-		DPPresentationArea area = new DPPresentationArea();
-	     
-	     
+	protected DPWidget createWidget()
+	{
 		DPText[] c0 = makeTexts( "LEFT" );
 		DPText[] c1 = makeTexts( "CENTRE" );
 		DPText[] c2 = makeTexts( "RIGHT" );
@@ -84,18 +80,94 @@ public class DPBorderTest
 		box.append( b2 );
 		box.append( b3 );
 		
-		
-	     
-	     
-		area.setChild( box );
-	     
-	     
-	     
-		area.getComponent().setPreferredSize( new Dimension( 640, 480 ) );
-		frame.add( area.getComponent() );
-		frame.pack();
-		area.getComponent().requestFocusInWindow();
-		frame.setVisible(true);
+		return box;
 	}
 
+
+
+
+	private DPBorderTest()
+	{
+		JFrame frame = new JFrame( "DPBorder test" );
+		initFrame( frame );
+		
+
+		
+		AbstractAction setBorderChildAction = new AbstractAction( "Set border child" )
+		{
+			private static final long serialVersionUID = 1L;
+
+			public void actionPerformed(ActionEvent event)
+			{
+				DPVBox box = (DPVBox)contentWidget;
+				DPHBox hb = (DPHBox)box.get( 0 );
+				DPBorder b = (DPBorder)hb.get( 0 );
+				b.setChild( new DPText( "Test" ) );
+			}
+		};
+
+		AbstractAction setHBoxChild0Action = new AbstractAction( "Set hbox child 0" )
+		{
+			private static final long serialVersionUID = 1L;
+
+			public void actionPerformed(ActionEvent event)
+			{
+				DPVBox box = (DPVBox)contentWidget;
+				DPHBox hb = (DPHBox)box.get( 0 );
+				hb.set( 0, new DPText( "Test" ) );
+			}
+		};
+
+		AbstractAction setHBoxChildrenAction = new AbstractAction( "Set hbox children" )
+		{
+			private static final long serialVersionUID = 1L;
+
+			public void actionPerformed(ActionEvent event)
+			{
+				DPVBox box = (DPVBox)contentWidget;
+				DPHBox hb = (DPHBox)box.get( 0 );
+				hb.setChildren( Arrays.asList( new DPWidget[] { new DPText( "Test" ) } ) );
+			}
+		};
+
+		AbstractAction setVBoxChild0Action = new AbstractAction( "Set vbox child 0" )
+		{
+			private static final long serialVersionUID = 1L;
+
+			public void actionPerformed(ActionEvent event)
+			{
+				DPVBox box = (DPVBox)contentWidget;
+				box.set( 0, new DPText( "Test" ) );
+			}
+		};
+
+		AbstractAction setVBoxChildrenAction = new AbstractAction( "Set vbox children" )
+		{
+			private static final long serialVersionUID = 1L;
+
+			public void actionPerformed(ActionEvent event)
+			{
+				DPVBox box = (DPVBox)contentWidget;
+				box.setChildren( Arrays.asList( new DPWidget[] { new DPText( "A" ), new DPText( "B")  } ) );
+			}
+		};
+
+		
+		// Menu
+		JMenu actionMenu = new JMenu( "Action" );
+		actionMenu.add( setBorderChildAction );
+		actionMenu.add( setHBoxChild0Action );
+		actionMenu.add( setHBoxChildrenAction );
+		actionMenu.add( setVBoxChild0Action );
+		actionMenu.add( setVBoxChildrenAction );
+		
+		menuBar.add( actionMenu );
+	}
+
+
+
+	public static void main(String[] args)
+	{
+		new DPBorderTest();
+	}
 }

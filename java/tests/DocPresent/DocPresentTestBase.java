@@ -4,49 +4,29 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package tests.DocPresent.ElementTree;
+package tests.DocPresent;
 
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
 
-import javax.swing.AbstractAction;
 import javax.swing.JFrame;
-import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 
 import BritefuryJ.DocPresent.DPPresentationArea;
-import BritefuryJ.DocPresent.ElementTree.Element;
-import BritefuryJ.DocPresent.ElementTree.ElementTree;
+import BritefuryJ.DocPresent.DPWidget;
 
-public abstract class ElementTreeTestBase
+public abstract class DocPresentTestBase
 {
 	protected JMenuBar menuBar;
-	Element contentElement;
+	DPWidget contentWidget;
 	
-	protected abstract Element createContentNode();
+	protected abstract DPWidget createWidget();
 
 	public void initFrame(JFrame frame)
 	{
-		final ElementTree tree = new ElementTree();
+		DPPresentationArea area = new DPPresentationArea();
 		
-		
-		AbstractAction showMetaTreeAction = new AbstractAction( "Show element tree explorer" )
-		{
-			private static final long serialVersionUID = 1L;
-
-			public void actionPerformed(ActionEvent event)
-			{
-				tree.createTreeExplorer();
-			}
-		};
-		
-		
-		// Menu
-		JMenu debugMenu = new JMenu( "Debug" );
-		debugMenu.add( showMetaTreeAction );
 		
 		menuBar = new JMenuBar();
-		menuBar.add( debugMenu );
 		
 		frame.setJMenuBar( menuBar );
 		
@@ -57,13 +37,12 @@ public abstract class ElementTreeTestBase
 		
 		
 		long t1 = System.currentTimeMillis();
-		contentElement = createContentNode();
+		contentWidget = createWidget();
 		long t2 = System.currentTimeMillis();
-		System.out.println( "Element tree creation time: " + (double)( t2 - t1 ) / 1000.0 );
-		tree.getRoot().setChild( contentElement );
+		System.out.println( "Widget creation time: " + (double)( t2 - t1 ) / 1000.0 );
+		area.setChild( contentWidget );
 	     
 	     
-		DPPresentationArea area = tree.getPresentationArea();
 		area.getComponent().setPreferredSize( new Dimension( 640, 480 ) );
 		frame.add( area.getComponent() );
 		frame.pack();

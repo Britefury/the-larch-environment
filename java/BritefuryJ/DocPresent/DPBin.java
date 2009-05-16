@@ -46,11 +46,6 @@ public class DPBin extends DPContainer
 	{
 		if ( child != this.child )
 		{
-			if ( child != null )
-			{
-				child.unparent();
-			}
-			
 			DPWidget prevChild = this.child;
 			
 			if ( prevChild != null )

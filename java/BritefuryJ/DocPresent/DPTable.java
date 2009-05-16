@@ -95,7 +95,6 @@ public class DPTable extends DPContainer
 				{
 					if ( child != null )
 					{
-						child.unparent();
 						registeredChildren.add( child );
 					}
 				}
@@ -149,13 +148,6 @@ public class DPTable extends DPContainer
 			removed = new HashSet<DPWidget>( registeredChildren );
 			added.removeAll( registeredChildren );
 			removed.removeAll( items );
-
-			
-			// Unparent added children
-			for (DPWidget child: added)
-			{
-				child.unparent();
-			}
 
 			
 			// Unregister removed children
@@ -286,12 +278,6 @@ public class DPTable extends DPContainer
 			{
 				oldChildIndex = registeredChildren.indexOf( oldChild );
 				unregisterChild( oldChild );
-			}
-			
-			// Unparent @item
-			if ( item != null )
-			{
-				item.unparent();
 			}
 			
 			// If y is outside the bounds of the number of rows, add as many new rows as necessary

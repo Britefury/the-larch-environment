@@ -44,7 +44,6 @@ abstract public class DPContainerSequence extends DPContainer
 			// Register added entries
 			for (DPWidget child: items)
 			{
-				child.unparent();
 				registerChild( child, null );
 			}
 		}
@@ -56,14 +55,6 @@ abstract public class DPContainerSequence extends DPContainer
 			removed = new HashSet<DPWidget>( registeredChildren );
 			added.removeAll( registeredChildren );
 			removed.removeAll( items );
-
-			
-			// Unparent all children being added
-			for (DPWidget child: added)
-			{
-				child.unparent();
-				registerChild( child, null );
-			}
 
 			
 			// Unregister removed entries
@@ -131,7 +122,6 @@ abstract public class DPContainerSequence extends DPContainer
 	{
 		DPWidget oldChild = registeredChildren.get( index );
 		unregisterChild( oldChild );
-		child.unparent();
 		registeredChildren.set( index, child );
 		registerChild( child, null );
 		childListModified();
@@ -160,11 +150,6 @@ abstract public class DPContainerSequence extends DPContainer
 		added.removeAll( oldEntrySet );
 		
 		
-		for (DPWidget child: added)
-		{
-			child.unparent();
-		}
-
 		for (DPWidget child: removed)
 		{
 			unregisterChild( child );
@@ -221,7 +206,6 @@ abstract public class DPContainerSequence extends DPContainer
 	{
 		assert !hasChild( child );
 		
-		child.unparent();
 		registeredChildren.add( child );
 		registerChild( child, null );
 		childListModified();
@@ -234,7 +218,6 @@ abstract public class DPContainerSequence extends DPContainer
 		for (DPWidget child: children)
 		{
 			assert !hasChild( child );
-			child.unparent();
 		}
 		
 		int start = registeredChildren.size();
@@ -260,7 +243,6 @@ abstract public class DPContainerSequence extends DPContainer
 	{
 		assert !hasChild( child );
 		
-		child.unparent();
 		registeredChildren.add( index, child );
 		registerChild( child, null );
 		childListModified();
