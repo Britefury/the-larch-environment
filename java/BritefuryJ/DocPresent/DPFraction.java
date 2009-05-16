@@ -202,11 +202,6 @@ public class DPFraction extends DPContainer
 		DPWidget existingChild = children[slot];
 		if ( child != existingChild )
 		{
-			if ( child != null )
-			{
-				child.unparent();
-			}
-			
 			if ( existingChild != null )
 			{
 				unregisterChild( existingChild );

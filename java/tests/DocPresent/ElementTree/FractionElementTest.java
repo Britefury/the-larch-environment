@@ -8,9 +8,12 @@ package tests.DocPresent.ElementTree;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 
+import javax.swing.AbstractAction;
 import javax.swing.JFrame;
+import javax.swing.JMenu;
 
 import BritefuryJ.DocPresent.DPHBox;
 import BritefuryJ.DocPresent.DPVBox;
@@ -90,6 +93,34 @@ public class FractionElementTest extends ElementTreeTestBase
 	{
 		JFrame frame = new JFrame( "Fraction element test" );
 		initFrame( frame );
+		
+
+		
+		AbstractAction testEditAction = new AbstractAction( "Test edit" )
+		{
+			private static final long serialVersionUID = 1L;
+
+			public void actionPerformed(ActionEvent event)
+			{
+				VBoxElement box = (VBoxElement)contentElement;
+				
+				ArrayList<Element> children = new ArrayList<Element>();
+				
+				children.add( makeFraction( "1", "p" ) );
+				children.add( makeFraction( "1", "p+q" ) );
+				children.add( makeFraction( "1+b", "p" ) );
+				children.add( makeFraction( "1+b", "p+q" ) );
+				
+				box.setChildren( children );
+			}
+		};
+
+		
+		// Menu
+		JMenu actionMenu = new JMenu( "Action" );
+		actionMenu.add( testEditAction );
+		
+		menuBar.add( actionMenu );
 	}
 
 
