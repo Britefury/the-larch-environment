@@ -161,5 +161,4 @@ def LISPView():
 
 
 def initialiseViewContext(viewContext):
-	#viewContext.setElementChangeListener( _NodeElementChangeListener() )
 	viewContext.setElementChangeListener( NodeElementChangeListenerDiff() )
