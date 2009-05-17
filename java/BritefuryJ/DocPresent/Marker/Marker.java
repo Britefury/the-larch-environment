@@ -42,9 +42,13 @@ public class Marker
 	
 	public Marker(DPContentLeaf widget, int position, Bias bias)
 	{
+		checkPositionAndBias( widget, position, bias );
+		
 		this.widget = widget;
 		this.position = position;
 		this.bias = bias;
+		
+		this.widget.registerMarker( this );
 	}
 	
 	
@@ -108,11 +112,35 @@ public class Marker
 	
 	public void set(DPContentLeaf widget, int position, Bias bias)
 	{
-		// ONLY call from 
+		if ( widget != null )
+		{
+			checkPositionAndBias( widget, position, bias );
+		}
+		
+		if ( this.widget != null )
+		{
+			this.widget.unregisterMarker( this );
+		}
+		
 		this.widget = widget;
 		this.position = position;
 		this.bias = bias;
+		
+		this.widget.registerMarker( this );
+		
 		changed();
+	}
+	
+	
+	public void clear()
+	{
+		if ( widget != null )
+		{
+			widget.unregisterMarker( this );
+			position = 0;
+			bias = Bias.START;
+			changed();
+		}
 	}
 	
 	
@@ -120,6 +148,11 @@ public class Marker
 	public Marker copy()
 	{
 		return widget.marker( position, bias );
+	}
+	
+	public void moveTo(Marker marker)
+	{
+		set( marker.widget, marker.position, marker.bias );
 	}
 	
 	
@@ -160,6 +193,27 @@ public class Marker
 		else
 		{
 			return widget == m.widget  &&  position == m.position  &&  bias == m.bias;
+		}
+	}
+	
+	
+	
+	private static void checkPositionAndBias(DPContentLeaf w, int position, Bias bias)
+	{
+		int markerRange = w.getMarkerRange();
+		if ( position > markerRange )
+		{
+			throw new InvalidMarkerPosition();
+		}
+		
+		if ( markerRange == 0 && position == 0 )
+		{
+			bias = Marker.Bias.START;
+		}
+		
+		if ( position == markerRange  &&  bias == Marker.Bias.END )
+		{
+			throw new InvalidMarkerPosition();
 		}
 	}
 }

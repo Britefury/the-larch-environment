@@ -161,12 +161,12 @@ class MainAppDocView (DocView.RefreshListener):
 		
 class MainAppDocViewNormal (MainAppDocView):
 	def createView(self, unit):
-		return viewUnit( unit, self._app._world, self._app._commandHistory )
+		return viewUnit( unit, self._elementTree, self._app._world, self._app._commandHistory )
 		
 		
 class MainAppDocViewLisp (MainAppDocView):
 	def createView(self, unit):
-		return viewUnitLisp( unit, self._app._world, self._app._commandHistory )
+		return viewUnitLisp( unit, self._elementTree, self._app._world, self._app._commandHistory )
 		
 		
 		

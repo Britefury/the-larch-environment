@@ -134,7 +134,7 @@ public class DPFraction extends DPContainer
 		// Marker methods
 		//
 
-		protected int getMarkerRange()
+		public int getMarkerRange()
 		{
 			return 1;
 		}

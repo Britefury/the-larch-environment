@@ -151,7 +151,7 @@ public class DPWhitespace extends DPContentLeafEditable
 		}
 	}
 
-	protected int getMarkerRange()
+	public int getMarkerRange()
 	{
 		return 1;
 	}

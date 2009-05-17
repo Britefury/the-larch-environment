@@ -1549,6 +1549,28 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 
 	
+class Python25EditHandler (EditHandler):
+	def __init__(self, tree):
+		self._tree = tree
+		
+	def deleteSelection(self):
+		pass
+	
+	def replaceSelection(self, replacement):
+		pass
+	
+	def editCopy(self):
+		print 'Copying selection:'
+		print self._tree.getTextRepresentationInSelection( self._tree.getSelection() )
+	
+	def editCut(self):
+		pass
+	
+	def editPaste(self):
+		pass
+	
+	
 	
 def initialiseViewContext(viewContext):
 	viewContext.setElementChangeListener( NodeElementChangeListenerDiff() )
+	viewContext.setEditHandler( Python25EditHandler( viewContext.getElementTree() ) )

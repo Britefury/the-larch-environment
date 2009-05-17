@@ -16,7 +16,7 @@ import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.ScriptStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 
-public class ScriptElement extends BranchElement
+public class ScriptElement extends OrderedBranchElement
 {
 	public static class CouldNotFindChildException extends RuntimeException
 	{

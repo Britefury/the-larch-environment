@@ -44,7 +44,6 @@ public class DPText extends DPContentLeafEditableEntry
 	
 	public void setText(String text)
 	{
-		System.out.println( "DPText.setText()" );
 		this.text = text;
 		
 		TextStyleSheet textStyleSheet = (TextStyleSheet)styleSheet;
@@ -173,7 +172,7 @@ public class DPText extends DPContentLeafEditableEntry
 	}
 
 	
-	protected int getMarkerRange()
+	public int getMarkerRange()
 	{
 		return text.length();
 	}

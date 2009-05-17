@@ -24,35 +24,15 @@ public class Selection implements MarkerListener
 	protected ArrayList<SelectionListener> listeners;
 	
 	
-	public Selection(DPPresentationArea area, Marker marker0, Marker marker1)
+	public Selection(DPPresentationArea area)
 	{
-		this.marker0 = marker0;
-		this.marker1 = marker1;
+		marker0 = new Marker();
+		marker1 = new Marker();
 		
-		this.marker0.addMarkerListener( this );
-		this.marker1.addMarkerListener( this );
+		marker0.addMarkerListener( this );
+		marker1.addMarkerListener( this );
 		
 		area.registerSelection( this );
-	}
-	
-	
-	public void set(Marker marker0, Marker marker1)
-	{
-		if ( marker0 != this.marker0 )
-		{
-			this.marker0.removeMarkerListener( this );
-			this.marker0 = marker0;
-			this.marker0.addMarkerListener( this );
-		}
-		
-		if ( marker1 != this.marker1 )
-		{
-			this.marker1.removeMarkerListener( this );
-			this.marker1 = marker1;
-			this.marker1.addMarkerListener( this );
-		}
-		
-		modified();
 	}
 	
 	
@@ -75,27 +55,10 @@ public class Selection implements MarkerListener
 	}
 	
 	
-	
-	public void setMarker0(Marker marker0)
+	public void clear()
 	{
-		if ( marker0 != this.marker0 )
-		{
-			this.marker0.removeMarkerListener( this );
-			this.marker0 = marker0;
-			this.marker0.addMarkerListener( this );
-			modified();
-		}
-	}
-	
-	public void setMarker1(Marker marker1)
-	{
-		if ( marker1 != this.marker1 )
-		{
-			this.marker1.removeMarkerListener( this );
-			this.marker1 = marker1;
-			this.marker1.addMarkerListener( this );
-			modified();
-		}
+		marker0.clear();
+		marker1.clear();
 	}
 	
 	
@@ -165,9 +128,20 @@ public class Selection implements MarkerListener
 	
 	private void modified()
 	{
-		startMarker = endMarker = null;
-		startPathFromCommonRoot = endPathFromCommonRoot = null;
-		commonRoot = null;
+		if ( startMarker != null )
+		{
+			startMarker = endMarker = null;
+			startPathFromCommonRoot = endPathFromCommonRoot = null;
+			commonRoot = null;
+			
+			if ( listeners != null )
+			{
+				for (SelectionListener listener: listeners)
+				{
+					listener.selectionChanged( this );
+				}
+			}
+		}
 	}
 	
 	private void refresh()

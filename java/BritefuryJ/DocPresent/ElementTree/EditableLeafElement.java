@@ -36,7 +36,7 @@ public class EditableLeafElement extends LeafElement
 	
 	
 	//
-	// Content modification methods
+	// Text representation modification methods
 	//
 	
 	public void setTextRepresentation(String newTextRepresentation)
@@ -57,6 +57,9 @@ public class EditableLeafElement extends LeafElement
 	}
 	
 	
+	
+
+	// Text editing methods
 	
 	public void insertText(Marker marker, String x)
 	{

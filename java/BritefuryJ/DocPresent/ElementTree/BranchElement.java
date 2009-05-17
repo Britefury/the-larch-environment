@@ -15,6 +15,7 @@ import BritefuryJ.DocPresent.DPContainer;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Border.EmptyBorder;
+import BritefuryJ.DocPresent.ElementTree.Marker.ElementMarker;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
 public abstract class BranchElement extends Element
@@ -296,7 +297,11 @@ public abstract class BranchElement extends Element
 	
 	protected abstract String computeSubtreeTextRepresentation();
 	
-
+	
+	
+	protected abstract void getTextRepresentationBetweenPaths(StringBuilder builder, ElementMarker startMarker, ArrayList<Element> startPath, int startPathMyIndex,
+			ElementMarker endMarker, ArrayList<Element> endPath, int endPathMyIndex);
+	
 
 
 	//
