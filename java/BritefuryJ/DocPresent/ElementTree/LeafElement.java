@@ -215,6 +215,11 @@ public abstract class LeafElement extends Element
 		builder.append( textRepresentation.substring( marker.getIndex() ) );
 	}
 
+	protected String getTextRepresentationBetweenMarkers(ElementMarker startMarker, ElementMarker endMarker)
+	{
+		return textRepresentation.substring( startMarker.getIndex(), endMarker.getIndex() );
+	}
+
 
 
 	

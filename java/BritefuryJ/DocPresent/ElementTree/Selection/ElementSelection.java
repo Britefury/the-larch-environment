@@ -8,6 +8,7 @@ package BritefuryJ.DocPresent.ElementTree.Selection;
 
 import java.util.ArrayList;
 
+import BritefuryJ.DocPresent.DPContainer;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.ElementTree.BranchElement;
 import BritefuryJ.DocPresent.ElementTree.Element;
@@ -59,27 +60,63 @@ public class ElementSelection
 	
 	public ElementMarker getStartMarker()
 	{
-		return widgetSelection.getStartMarker() == marker0.getWidgetMarker()  ?  marker0  :  marker1;
+		if ( widgetSelection.isEmpty() )
+		{
+			return null;
+		}
+		else
+		{
+			return widgetSelection.getStartMarker() == marker0.getWidgetMarker()  ?  marker0  :  marker1;
+		}
 	}
 	
 	public ElementMarker getEndMarker()
 	{
-		return widgetSelection.getEndMarker() == marker0.getWidgetMarker()  ?  marker0  :  marker1;
+		if ( widgetSelection.isEmpty() )
+		{
+			return null;
+		}
+		else
+		{
+			return widgetSelection.getEndMarker() == marker0.getWidgetMarker()  ?  marker0  :  marker1;
+		}
 	}
 	
 	public ArrayList<Element> getStartPathFromCommonRoot()
 	{
-		return widgetPathToElementPath( widgetSelection.getStartPathFromCommonRoot() );
+		if ( widgetSelection.isEmpty() )
+		{
+			return null;
+		}
+		else
+		{
+			return widgetPathToElementPath( widgetSelection.getStartPathFromCommonRoot() );
+		}
 	}
 	
 	public ArrayList<Element> getEndPathFromCommonRoot()
 	{
-		return widgetPathToElementPath( widgetSelection.getEndPathFromCommonRoot() );
+		if ( widgetSelection.isEmpty() )
+		{
+			return null;
+		}
+		else
+		{
+			return widgetPathToElementPath( widgetSelection.getEndPathFromCommonRoot() );
+		}
 	}
 	
 	public BranchElement getCommonRoot()
 	{
-		return (BranchElement)widgetSelection.getCommonRoot().getElement();
+		if ( widgetSelection.isEmpty() )
+		{
+			return null;
+		}
+		else
+		{
+			DPContainer c = widgetSelection.getCommonRoot();
+			return c != null  ?  (BranchElement)c.getElement()  :  null;
+		}
 	}
 	
 	
