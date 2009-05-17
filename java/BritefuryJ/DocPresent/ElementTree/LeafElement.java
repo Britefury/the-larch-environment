@@ -16,6 +16,7 @@ import BritefuryJ.DocPresent.DPContentLeaf;
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.ElementTree.Caret.ElementCaret;
+import BritefuryJ.DocPresent.ElementTree.Marker.ElementMarker;
 
 public abstract class LeafElement extends Element
 {
@@ -191,7 +192,7 @@ public abstract class LeafElement extends Element
 	
 	
 	//
-	// Content methods
+	// Text representation methods
 	//
 	
 	public String getTextRepresentation()
@@ -204,6 +205,18 @@ public abstract class LeafElement extends Element
 		return textRepresentation.length();
 	}
 	
+	protected void getTextRepresentationFromStartToPath(StringBuilder builder, ElementMarker marker, ArrayList<Element> path, int pathMyIndex)
+	{
+		builder.append( textRepresentation.substring( 0, marker.getIndex() ) );
+	}
+
+	protected void getTextRepresentationFromPathToEnd(StringBuilder builder, ElementMarker marker, ArrayList<Element> path, int pathMyIndex)
+	{
+		builder.append( textRepresentation.substring( marker.getIndex() ) );
+	}
+
+
+
 	
 
 	

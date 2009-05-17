@@ -54,7 +54,7 @@ public abstract class DPContentLeaf extends DPWidget
 	// Marker range methods
 	//
 	
-	protected abstract int getMarkerRange();
+	public abstract int getMarkerRange();
 	
 	protected void markerRangeChanged(int oldLength, int newLength)
 	{
@@ -141,25 +141,7 @@ public abstract class DPContentLeaf extends DPWidget
 	
 	public Marker marker(int position, Marker.Bias bias)
 	{
-		if ( position > getMarkerRange() )
-		{
-			throw new Marker.InvalidMarkerPosition();
-		}
-		
-		if ( getMarkerRange() == 0 && position == 0 )
-		{
-			bias = Marker.Bias.START;
-		}
-		
-		if ( position == getMarkerRange()  &&  bias == Marker.Bias.END )
-		{
-			throw new Marker.InvalidMarkerPosition();
-		}
-
-		Marker m = new Marker( this, position, bias );
-		registerMarker( m );
-		
-		return m;
+		return new Marker( this, position, bias );
 	}
 	
 	public Marker markerAtStart()
@@ -193,28 +175,7 @@ public abstract class DPContentLeaf extends DPWidget
 
 	public void moveMarker(Marker m, int position, Marker.Bias bias)
 	{
-		if ( position > getMarkerRange() )
-		{
-			throw new Marker.InvalidMarkerPosition();
-		}
-		
-		if ( getMarkerRange() == 0 && position == 0 )
-		{
-			bias = Marker.Bias.START;
-		}
-		
-		if ( position == getMarkerRange()  &&  bias == Marker.Bias.END )
-		{
-			throw new Marker.InvalidMarkerPosition();
-		}
-		
-		DPContentLeaf oldWidget = m.getWidget();
-		if ( oldWidget != null )
-		{
-			oldWidget.unregisterMarker( m );
-		}
 		m.set( this, position, bias );
-		registerMarker( m );
 	}
 	
 	public void moveMarkerToStart(Marker m)
@@ -273,7 +234,7 @@ public abstract class DPContentLeaf extends DPWidget
 	
 	
 	
-	private void registerMarker(Marker m)
+	public void registerMarker(Marker m)
 	{
 		if ( markers == null )
 		{
@@ -282,7 +243,7 @@ public abstract class DPContentLeaf extends DPWidget
 		markers.put( m, null );
 	}
 	
-	protected void unregisterMarker(Marker m)
+	public void unregisterMarker(Marker m)
 	{
 		if ( markers != null )
 		{
@@ -686,7 +647,7 @@ public abstract class DPContentLeaf extends DPWidget
 						for (Marker x: xs)
 						{
 							unregisterMarker( x );
-							x.set( null, 0, Marker.Bias.START );
+							x.clear();
 						}
 					}
 				}

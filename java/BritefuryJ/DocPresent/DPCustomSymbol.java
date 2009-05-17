@@ -161,7 +161,7 @@ public class DPCustomSymbol extends DPContentLeafEditableEntry
 	// Marker methods
 	//
 	
-	protected int getMarkerRange()
+	public int getMarkerRange()
 	{
 		return 1;
 	}

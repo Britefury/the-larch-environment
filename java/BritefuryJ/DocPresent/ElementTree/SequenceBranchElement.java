@@ -15,7 +15,7 @@ import BritefuryJ.DocPresent.DPContainerSequence;
 import BritefuryJ.DocPresent.DPWidget;
 
 
-public abstract class SequenceBranchElement extends BranchElement
+public abstract class SequenceBranchElement extends OrderedBranchElement
 {
 	protected ArrayList<Element> children;
 	
@@ -79,23 +79,5 @@ public abstract class SequenceBranchElement extends BranchElement
 	public List<Element> getChildren()
 	{
 		return children;
-	}
-	
-	
-	
-	
-	
-	//
-	// Text representation methods
-	//
-	
-	protected String computeSubtreeTextRepresentation()
-	{
-		StringBuilder builder = new StringBuilder();
-		for (Element child: children)
-		{
-			builder.append( child.getTextRepresentation() );
-		}
-		return builder.toString();
 	}
 }

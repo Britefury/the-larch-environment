@@ -63,7 +63,12 @@ public abstract class DPContentLeafEditableEntry extends DPContentLeafEditable
 	
 	protected boolean handleBackspace(Caret caret)
 	{
-		if ( isMarkerAtStart( caret.getMarker() ) )
+		if ( presentationArea.isSelectionValid() )
+		{
+			presentationArea.deleteSelection();
+			return true;
+		}
+		else if ( isMarkerAtStart( caret.getMarker() ) )
 		{
 			DPContentLeafEditable left = getEditableContentLeafToLeft();
 			if ( left == null )
@@ -99,7 +104,12 @@ public abstract class DPContentLeafEditableEntry extends DPContentLeafEditable
 	
 	protected boolean handleDelete(Caret caret)
 	{
-		if ( isMarkerAtEnd( caret.getMarker() ) )
+		if ( presentationArea.isSelectionValid() )
+		{
+			presentationArea.deleteSelection();
+			return true;
+		}
+		else if ( isMarkerAtEnd( caret.getMarker() ) )
 		{
 			DPContentLeafEditable right = getEditableContentLeafToRight();
 			if ( right == null )
@@ -185,7 +195,14 @@ public abstract class DPContentLeafEditableEntry extends DPContentLeafEditable
 			String str = String.valueOf( event.getKeyChar() );
 			if ( str.length() > 0 )
 			{
-				insertContent( caret.getMarker(), String.valueOf( event.getKeyChar() ) );
+				if ( presentationArea.isSelectionValid() )
+				{
+					presentationArea.replaceSelection( str );
+				}
+				else
+				{
+					insertContent( caret.getMarker(), String.valueOf( event.getKeyChar() ) );
+				}
 				return true;
 			}
 		}

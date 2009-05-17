@@ -14,7 +14,7 @@ import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 
-public class SegmentElement extends BranchElement implements CollatedElementInterface
+public class SegmentElement extends OrderedBranchElement implements CollatedElementInterface
 {
 	
 	//

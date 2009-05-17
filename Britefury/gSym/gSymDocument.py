@@ -112,16 +112,16 @@ class GSymDocument (object):
 	
 	
 
-def viewUnit(unit, world, commandHistory):
+def viewUnit(unit, elementTree, world, commandHistory):
 	language = world.getModuleLanguage( unit.languageModuleName )
 	languageViewFactory = language.getViewFactory()
-	return languageViewFactory.createDocumentView( unit.content, commandHistory )
+	return languageViewFactory.createDocumentView( unit.content, elementTree, commandHistory )
 
 
-def viewUnitLisp(unit, world, commandHistory):
+def viewUnitLisp(unit, elementTree, world, commandHistory):
 	language = LISP.language
 	languageViewFactory = language.getViewFactory()
-	return languageViewFactory.createDocumentView( unit.content, commandHistory )
+	return languageViewFactory.createDocumentView( unit.content, elementTree, commandHistory )
 
 
 def transformUnit(unit, world, xform):

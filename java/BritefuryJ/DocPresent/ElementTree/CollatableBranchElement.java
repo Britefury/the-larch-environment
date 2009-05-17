@@ -14,7 +14,7 @@ import BritefuryJ.DocPresent.ElementTree.Marker.ElementMarker;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 
-public abstract class CollatableBranchElement extends BranchElement
+public abstract class CollatableBranchElement extends OrderedBranchElement
 {
 	protected enum CollationMode { UNINITIALISED, ROOT, CONTENTSCOLLATED };
 	

@@ -283,6 +283,10 @@ public abstract class Element
 			return parent.getChildTextRepresentationOffsetInSubtree( this, subtreeRoot );
 		}
 	}
+	
+	
+	protected abstract void getTextRepresentationFromStartToPath(StringBuilder builder, ElementMarker marker, ArrayList<Element> path, int pathMyIndex);
+	protected abstract void getTextRepresentationFromPathToEnd(StringBuilder builder, ElementMarker marker, ArrayList<Element> path, int pathMyIndex);
 
 
 

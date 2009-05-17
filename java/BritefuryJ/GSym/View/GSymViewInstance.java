@@ -9,9 +9,11 @@ package BritefuryJ.GSym.View;
 import java.util.HashMap;
 
 import BritefuryJ.CommandHistory.CommandHistory;
+import BritefuryJ.DocPresent.EditHandler;
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Border.EmptyBorder;
 import BritefuryJ.DocPresent.ElementTree.Element;
+import BritefuryJ.DocPresent.ElementTree.ElementTree;
 import BritefuryJ.DocTree.DocTree;
 import BritefuryJ.DocTree.DocTreeNode;
 import BritefuryJ.DocView.DVNode;
@@ -117,11 +119,12 @@ public class GSymViewInstance
 	private DocTreeNode treeRootNode;
 	private GSymNodeViewFunction generalNodeViewFunction;
 	private DocView view;
+	private ElementTree elementTree;
 	private HashMap<Float, Border> indentationBorders;
 	private HashMap<NodeContentsFactoryKey, NodeContentsFactory> nodeContentsFactories;
 	
 	
-	public GSymViewInstance(DocTree tree, DocTreeNode treeRootNode, GSymViewFactory viewFactory, CommandHistory commandHistory)
+	public GSymViewInstance(DocTree tree, DocTreeNode treeRootNode, ElementTree elementTree, GSymViewFactory viewFactory, CommandHistory commandHistory)
 	{
 		this.tree = tree;
 		this.treeRootNode = treeRootNode;
@@ -131,6 +134,7 @@ public class GSymViewInstance
 			throw new RuntimeException();
 		}
 		view = new DocView( tree, treeRootNode, new RootInitialiser() );
+		this.elementTree = elementTree;
 		
 		indentationBorders = new HashMap<Float, Border>();
 		nodeContentsFactories = new HashMap<NodeContentsFactoryKey, NodeContentsFactory>();
@@ -180,11 +184,21 @@ public class GSymViewInstance
 		view.setElementChangeListener( elementChangeListener );
 	}
 	
+	public void setEditHandler(EditHandler handler)
+	{
+		elementTree.setEditHandler( handler );
+	}
 	
 	
-	protected DocView getView()
+	
+	public DocView getView()
 	{
 		return view;
+	}
+	
+	public ElementTree getElementTree()
+	{
+		return elementTree;
 	}
 	
 	

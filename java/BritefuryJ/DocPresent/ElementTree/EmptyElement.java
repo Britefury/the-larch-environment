@@ -7,7 +7,10 @@
 //##************************
 package BritefuryJ.DocPresent.ElementTree;
 
+import java.util.ArrayList;
+
 import BritefuryJ.DocPresent.DPEmpty;
+import BritefuryJ.DocPresent.ElementTree.Marker.ElementMarker;
 import BritefuryJ.DocPresent.StyleSheets.WidgetStyleSheet;
 
 public class EmptyElement extends Element
@@ -44,5 +47,13 @@ public class EmptyElement extends Element
 	public int getTextRepresentationLength()
 	{
 		return 0;
+	}
+
+	protected void getTextRepresentationFromPathToEnd(StringBuilder builder, ElementMarker marker, ArrayList<Element> path, int pathMyIndex)
+	{
+	}
+
+	protected void getTextRepresentationFromStartToPath(StringBuilder builder, ElementMarker marker, ArrayList<Element> path, int pathMyIndex)
+	{
 	}
 }

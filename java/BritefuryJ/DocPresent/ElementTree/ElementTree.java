@@ -7,14 +7,19 @@
 //##************************
 package BritefuryJ.DocPresent.ElementTree;
 
+import java.util.ArrayList;
+
 import BritefuryJ.DocPresent.DPPresentationArea;
+import BritefuryJ.DocPresent.EditHandler;
 import BritefuryJ.DocPresent.ElementTree.Caret.ElementCaret;
+import BritefuryJ.DocPresent.ElementTree.Selection.ElementSelection;
 import BritefuryJ.DocPresent.ElementTree.TreeExplorer.ElementTreeExplorer;
 
 public class ElementTree
 {
 	protected RootElement root;
 	protected ElementCaret caret;
+	protected ElementSelection selection;
 	protected DPPresentationArea metaArea;
 	protected ElementTreeExplorer explorer;
 	
@@ -24,6 +29,7 @@ public class ElementTree
 		root = new RootElement();
 		root.setElementTree( this );
 		caret = new ElementCaret( this, getPresentationArea().getCaret() );
+		selection = new ElementSelection( this, getPresentationArea().getSelection() );
 		metaArea = null;
 		explorer = null;
 	}
@@ -43,6 +49,34 @@ public class ElementTree
 	{
 		return caret;
 	}
+	
+	
+	
+	
+	//
+	//
+	// SELECTION METHODS
+	//
+	//
+	
+	public ElementSelection getSelection()
+	{
+		return selection;
+	}
+	
+	public String getTextRepresentationInSelection(ElementSelection s)
+	{
+		StringBuilder builder = new StringBuilder();
+		BranchElement commonRoot = s.getCommonRoot();
+		ArrayList<Element> startPath = s.getStartPathFromCommonRoot();
+		ArrayList<Element> endPath = s.getEndPathFromCommonRoot();
+		
+		commonRoot.getTextRepresentationBetweenPaths( builder, s.getStartMarker(), startPath, 0, s.getEndMarker(), endPath, 0 );
+		
+		return builder.toString();
+	}
+	
+	
 	
 	
 	
@@ -77,5 +111,12 @@ public class ElementTree
 			explorer = new ElementTreeExplorer( this );
 		}
 		return explorer;
+	}
+	
+	
+	
+	public void setEditHandler(EditHandler handler)
+	{
+		getPresentationArea().setEditHandler( handler );
 	}
 }

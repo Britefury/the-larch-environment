@@ -13,7 +13,7 @@ import BritefuryJ.DocPresent.DPMathRoot;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.StyleSheets.MathRootStyleSheet;
 
-public class MathRootElement extends BranchElement
+public class MathRootElement extends OrderedBranchElement
 {
 	protected Element child;
 	

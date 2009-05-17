@@ -2,12 +2,6 @@ TODOS:
 
 
 
-
-STRING DIFF
-==========
-Implement string differencing.
-
-
 LINE BREAKS
 ==========
 Line breaks break the most convenient element. This looks bad in the case of:

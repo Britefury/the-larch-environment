@@ -14,7 +14,7 @@ import BritefuryJ.DocPresent.DPBin;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 
-public class BinElement extends BranchElement
+public class BinElement extends OrderedBranchElement
 {
 	protected Element child;
 	
