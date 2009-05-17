@@ -66,14 +66,29 @@ public class ElementTree
 	
 	public String getTextRepresentationInSelection(ElementSelection s)
 	{
-		StringBuilder builder = new StringBuilder();
-		BranchElement commonRoot = s.getCommonRoot();
-		ArrayList<Element> startPath = s.getStartPathFromCommonRoot();
-		ArrayList<Element> endPath = s.getEndPathFromCommonRoot();
-		
-		commonRoot.getTextRepresentationBetweenPaths( builder, s.getStartMarker(), startPath, 0, s.getEndMarker(), endPath, 0 );
-		
-		return builder.toString();
+		if ( s.isEmpty() )
+		{
+			return null;
+		}
+		else
+		{
+			BranchElement commonRoot = s.getCommonRoot();
+			ArrayList<Element> startPath = s.getStartPathFromCommonRoot();
+			ArrayList<Element> endPath = s.getEndPathFromCommonRoot();
+			
+			if ( commonRoot != null )
+			{
+				StringBuilder builder = new StringBuilder();
+
+				commonRoot.getTextRepresentationBetweenPaths( builder, s.getStartMarker(), startPath, 0, s.getEndMarker(), endPath, 0 );
+			
+				return builder.toString();
+			}
+			else
+			{
+				return ((LeafElement)startPath.get( 0 )).getTextRepresentationBetweenMarkers( s.getStartMarker(), s.getEndMarker() );
+			}
+		}
 	}
 	
 	
