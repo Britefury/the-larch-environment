@@ -130,6 +130,9 @@ ConditionalExpr = module.newClass( 'ConditionalExpr', Expr, [ 'condition', 'expr
 #
 # Statements
 #
+# Expression statement
+ExprStmt = module.newClass( 'ExprStmt', Stmt, [ 'expr' ] )
+# Other statements
 AssertStmt = module.newClass( 'AssertStmt', Stmt, [ 'condition', 'fail' ] )
 AssignStmt = module.newClass( 'AssignStmt', Stmt, [ 'targets', 'value' ] )
 AugAssignStmt = module.newClass( 'AugAssignStmt', Stmt, [ 'op', 'target', 'value' ] )

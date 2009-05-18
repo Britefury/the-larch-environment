@@ -77,19 +77,10 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 	
 	public static interface UndoListener
 	{
-		public void onUndo(DPPresentationArea area);
-		public void onRedo(DPPresentationArea area);
+		public void onUndo();
+		public void onRedo();
 	}
 	
-	
-	
-	
-	private enum KeyEventResult
-	{
-		NOT_HANDLED,
-		HANDLED,
-		HANDLED_AS_SPECIAL,
-	}
 	
 	
 	
@@ -98,7 +89,7 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 		private static final long serialVersionUID = 1L;
 		
 		public DPPresentationArea area;
-		private boolean bShown, bConfigured, bBlockKeyTypedEvents;
+		private boolean bShown, bConfigured;
 		
 		
 		public PresentationAreaComponent(DPPresentationArea area)
@@ -109,7 +100,6 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 			
 			bShown = false;
 			bConfigured = false;
-			bBlockKeyTypedEvents = false;
 			
 			addComponentListener( this );
 			addMouseListener( this );
@@ -207,30 +197,19 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 
 		public void keyPressed(KeyEvent e)
 		{
-			KeyEventResult result = area.keyPressEvent( e, getModifiers( e ) );
-			if ( result == KeyEventResult.HANDLED_AS_SPECIAL )
-			{
-				bBlockKeyTypedEvents = true;
-			}
+			area.keyPressEvent( e, getModifiers( e ) );
 		}
 
 
 		public void keyReleased(KeyEvent e)
 		{
-			KeyEventResult result = area.keyReleaseEvent( e, getModifiers( e ) );
-			if ( result == KeyEventResult.HANDLED_AS_SPECIAL )
-			{
-				bBlockKeyTypedEvents = false;
-			}
+			area.keyReleaseEvent( e, getModifiers( e ) );
 		}
 
 
 		public void keyTyped(KeyEvent e)
 		{
-			if ( !bBlockKeyTypedEvents )
-			{
-				area.keyTypedEvent( e, getModifiers( e ) );
-			}
+			area.keyTypedEvent( e, getModifiers( e ) );
 		}
 		
 		
@@ -893,6 +872,7 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 		graphics.translate( -windowTopLeftCornerInRootSpace.x, -windowTopLeftCornerInRootSpace.y );
 		
 		// Draw
+		handleDrawBackground( graphics, new AABox2( topLeftRootSpace, bottomRightRootSpace) );
 		drawSelection( graphics );
 		handleDraw( graphics, new AABox2( topLeftRootSpace, bottomRightRootSpace) );
 		//graphics.setTransform( transform );
@@ -1160,7 +1140,7 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 	}
 	
 	
-	protected KeyEventResult keyPressEvent(KeyEvent event, int modifiers)
+	protected boolean keyPressEvent(KeyEvent event, int modifiers)
 	{
 		rootSpaceMouse.setModifiers( modifiers );
 		
@@ -1170,49 +1150,44 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 
 		if ( bCtrl  &&  keyCode == KeyEvent.VK_Z )
 		{
-			System.out.println( "DPPresentationArea.keyPressEvent(): undo" );
 			if ( undoListener != null )
 			{
-				undoListener.onUndo( this );
+				undoListener.onUndo();
 			}
 			emitImmediateEvents();
-			return KeyEventResult.HANDLED_AS_SPECIAL;
+			return true;
 		}
 		else if ( bCtrlShift  &&  keyCode == KeyEvent.VK_Z )
 		{
-			System.out.println( "DPPresentationArea.keyPressEvent(): redo" );
 			if ( undoListener != null )
 			{
-				undoListener.onRedo( this );
+				undoListener.onRedo();
 			}
 			emitImmediateEvents();
-			return KeyEventResult.HANDLED_AS_SPECIAL;
+			return true;
 		}
 		else if ( bCtrl  &&  keyCode == KeyEvent.VK_C )
 		{
-			System.out.println( "DPPresentationArea.keyPressEvent(): copy" );
 			editCopy();
 			emitImmediateEvents();
-			return KeyEventResult.HANDLED_AS_SPECIAL;
+			return true;
 		}
 		else if ( bCtrl  &&  keyCode == KeyEvent.VK_X )
 		{
-			System.out.println( "DPPresentationArea.keyPressEvent(): cut" );
 			editCut();
 			emitImmediateEvents();
-			return KeyEventResult.HANDLED_AS_SPECIAL;
+			return true;
 		}
 		else if ( bCtrl  &&  keyCode == KeyEvent.VK_V )
 		{
-			System.out.println( "DPPresentationArea.keyPressEvent(): paste" );
 			editPaste();
 			emitImmediateEvents();
-			return KeyEventResult.HANDLED_AS_SPECIAL;
+			return true;
 		}
 		else if ( handleNavigationKeyPress( event, modifiers ) )
 		{
 			emitImmediateEvents();
-			return KeyEventResult.HANDLED;
+			return true;
 		}
 		else
 		{
@@ -1222,7 +1197,7 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 				{
 					listener.onStateKeyPress( event );
 				}
-				return KeyEventResult.NOT_HANDLED;
+				return false;
 			}
 			else
 			{
@@ -1235,30 +1210,30 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 						editable.onKeyPress( caret, event );
 					}
 					emitImmediateEvents();
-					return KeyEventResult.HANDLED;
+					return true;
 				}
 				else
 				{
 					emitImmediateEvents();
-					return KeyEventResult.NOT_HANDLED;
+					return false;
 				}
 			}
 		}
 	}
 	
-	protected KeyEventResult keyReleaseEvent(KeyEvent event, int modifiers)
+	protected boolean keyReleaseEvent(KeyEvent event, int modifiers)
 	{
 		rootSpaceMouse.setModifiers( modifiers );
 		
 		if ( isSpecialShortcut( event, modifiers ) )
 		{
 			emitImmediateEvents();
-			return KeyEventResult.HANDLED_AS_SPECIAL;
+			return true;
 		}
 		else if ( isNavigationKey( event ) )
 		{
 			emitImmediateEvents();
-			return KeyEventResult.HANDLED;
+			return true;
 		}
 		else
 		{
@@ -1268,7 +1243,7 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 				{
 					listener.onStateKeyRelease( event );
 				}
-				return KeyEventResult.NOT_HANDLED;
+				return false;
 			}
 			else
 			{
@@ -1281,12 +1256,12 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 						editable.onKeyRelease( caret, event );
 					}
 					emitImmediateEvents();
-					return KeyEventResult.HANDLED;
+					return true;
 				}
 				else
 				{
 					emitImmediateEvents();
-					return KeyEventResult.NOT_HANDLED;
+					return false;
 				}
 			}
 		}
@@ -1298,6 +1273,9 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 	{
 		rootSpaceMouse.setModifiers( modifiers );
 		
+		boolean bCtrl = ( modifiers & Modifier._KEYS_MASK )  ==  Modifier.CTRL;
+		boolean bAlt = ( modifiers & Modifier._KEYS_MASK )  ==  Modifier.ALT;
+
 		if ( isNavigationKey( event ) )
 		{
 			emitImmediateEvents();
@@ -1315,7 +1293,7 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 			}
 			else
 			{
-				if ( caret.isValid() )
+				if ( caret.isValid()  &&  !bCtrl  &&  !bAlt )
 				{
 					DPContentLeaf leaf = caret.getMarker().getWidget();
 					if ( leaf.isEditableEntry() )

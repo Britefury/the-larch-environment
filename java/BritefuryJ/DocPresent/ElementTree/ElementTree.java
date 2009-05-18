@@ -50,6 +50,11 @@ public class ElementTree
 		return caret;
 	}
 	
+	public void setUndoListener(DPPresentationArea.UndoListener undoListener)
+	{
+		getPresentationArea().setUndoListener( undoListener );
+	}
+	
 	
 	
 	

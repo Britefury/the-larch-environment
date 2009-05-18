@@ -1112,6 +1112,15 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 
 
+	
+	# Expression statement
+	@ObjectNodeDispatchMethod
+	def ExprStmt(self, ctx, state, node, expr):
+		exprView = ctx.viewEvalFn( expr, None, python25ViewState( PRECEDENCE_STMT, self._parser.expression() ) )
+		return statementNodeEditor( ctx, node, exprView, PRECEDENCE_STMT, state )
+
+	
+	
 	# Assert statement
 	@ObjectNodeDispatchMethod
 	def AssertStmt(self, ctx, state, node, condition, fail):

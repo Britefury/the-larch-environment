@@ -212,6 +212,43 @@ public abstract class Element
 		
 		path.add( this );
 	}
+	
+	
+	public static void getPathsFromCommonSubtreeRoot(Element e0, List<Element> path0, Element e1, List<Element> path1)
+	{
+		if ( e0 == e1 )
+		{
+			path0.add( e0 );
+			path1.add( e1 );
+		}
+		else
+		{
+			e0.getElementPathFromRoot( path0 );
+			e1.getElementPathFromRoot( path1 );
+			
+			int minLength = Math.min( path0.size(), path1.size() );
+			
+			int common = 0;
+			
+			for (int i = 0; i < minLength; i++)
+			{
+				Element p0 = path0.get( i );
+				Element p1 = path1.get( i );
+				
+				common = i;
+				
+				if ( p0 != p1 )
+				{
+					break;
+				}
+			}
+			
+			int toRemove = Math.max( common - 1, 0 );
+			
+			path0.subList( 0, toRemove ).clear();
+			path1.subList( 0, toRemove ).clear();
+		}
+	}
 
 
 	

@@ -84,11 +84,12 @@ class MainAppPluginInterface (object):
 		
 
 		
-class MainAppDocView (DocView.RefreshListener):
+class MainAppDocView (DocView.RefreshListener, DPPresentationArea.UndoListener):
 	def __init__(self, app):
 		self._app = app
 		
 		self._elementTree = ElementTree()
+		self._elementTree.setUndoListener( self )
 		self._area = self._elementTree.getPresentationArea()
 		self._area.getComponent().setPreferredSize( Dimension( 640, 480 ) )
 		
@@ -155,6 +156,13 @@ class MainAppDocView (DocView.RefreshListener):
 		
 	def onViewRequestRefresh(self, view):
 		self._queueRefresh()
+		
+		
+	def onUndo(self):
+		self._app._commandHistory.undo()
+		
+	def onRedo(self):
+		self._app._commandHistory.redo()
 		
 		
 

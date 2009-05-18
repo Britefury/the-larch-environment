@@ -606,6 +606,15 @@ class Python25Grammar (Grammar):
 
 
 
+	
+	# Expression statement
+	@Rule
+	def exprStmt(self):
+		return self.expression().action( lambda input, pos, xs: Nodes.ExprStmt( expr=xs ) )
+
+
+
+
 	# Assert statement
 	@Rule
 	def assertStmt(self):
@@ -797,10 +806,10 @@ class Python25Grammar (Grammar):
 	@Rule
 	def execStmt(self):
 		return self.execCodeInLocalsAndGlobalsStmt() | self.execCodeInLocalsStmt() | self.execCodeStmt()
-
-
-
-
+	
+	
+	
+	
 	# If statement
 	@Rule
 	def ifStmt(self):
@@ -938,7 +947,7 @@ class Python25Grammar (Grammar):
 
 	@Rule
 	def statement(self):
-		return self.simpleStmt() | self.compoundStmtHeader() | self.commentStmt() | self.expression()
+		return self.simpleStmt() | self.compoundStmtHeader() | self.commentStmt() | self.exprStmt()
 
 
 

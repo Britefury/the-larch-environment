@@ -217,6 +217,10 @@ public abstract class LeafElement extends Element
 
 	protected String getTextRepresentationBetweenMarkers(ElementMarker startMarker, ElementMarker endMarker)
 	{
+		if ( startMarker.getElement() != this  ||  endMarker.getElement() != this )
+		{
+			throw new RuntimeException();
+		}
 		return textRepresentation.substring( startMarker.getIndex(), endMarker.getIndex() );
 	}
 
