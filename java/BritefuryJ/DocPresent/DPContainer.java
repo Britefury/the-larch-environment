@@ -630,13 +630,24 @@ public abstract class DPContainer extends DPWidget
 	
 	
 	
-	protected void drawBackground(Graphics2D graphics)
+	protected void handleDrawBackground(Graphics2D graphics, AABox2 areaBox)
 	{
+		super.handleDrawBackground( graphics, areaBox );
+		
+		AffineTransform currentTransform = graphics.getTransform();
+		for (DPWidget child: registeredChildren)
+		{
+			if ( child.getAABoxInParentSpace().intersects( areaBox ) )
+			{
+				child.getLocalToParentXform().apply( graphics );
+				child.handleDrawBackground( graphics, child.getParentToLocalXform().transform( areaBox ) );
+				graphics.setTransform( currentTransform );
+			}
+		}
 	}
 	
 	protected void handleDraw(Graphics2D graphics, AABox2 areaBox)
 	{
-		drawBackground( graphics );
 		super.handleDraw( graphics, areaBox );
 		
 		AffineTransform currentTransform = graphics.getTransform();

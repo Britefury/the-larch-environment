@@ -454,7 +454,7 @@ class _StmtImporter (_Importer):
 	
 	# Expression
 	def Expr(self, node):
-		return _expr( node.value )
+		return Nodes.ExprStmt( expr=_expr( node.value ) )
 	
 
 	

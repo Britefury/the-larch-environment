@@ -878,6 +878,10 @@ abstract public class DPWidget
 	}
 	
 	
+	protected void drawBackground(Graphics2D graphics)
+	{
+	}
+	
 	protected void draw(Graphics2D graphics)
 	{
 	}
@@ -1021,6 +1025,11 @@ abstract public class DPWidget
 		}
 		onUnrealise( unrealiseRoot );
 		bRealised = false;		
+	}
+	
+	protected void handleDrawBackground(Graphics2D graphics, AABox2 areaBox)
+	{
+		drawBackground( graphics );
 	}
 	
 	protected void handleDraw(Graphics2D graphics, AABox2 areaBox)

@@ -45,16 +45,17 @@ public abstract class OrderedBranchElement extends BranchElement
 	
 	public void getTextRepresentationFromStartToPath(StringBuilder builder, ElementMarker marker, ArrayList<Element> path, int pathMyIndex)
 	{
+		Element pathChild = path.get( pathMyIndex + 1 );
 		for (Element child: getChildren())
 		{
-			if ( child == path.get( pathMyIndex ) )
+			if ( child != pathChild )
 			{
-				child.getTextRepresentationFromStartToPath( builder, marker, path, pathMyIndex + 1 );
-				break;
+				builder.append( child.getTextRepresentation() );
 			}
 			else
 			{
-				builder.append( child.getTextRepresentation() );
+				child.getTextRepresentationFromStartToPath( builder, marker, path, pathMyIndex + 1 );
+				break;
 			}
 		}
 	}
@@ -63,10 +64,10 @@ public abstract class OrderedBranchElement extends BranchElement
 	{
 		List<Element> children = getChildren();
 		int pathChildIndex = pathMyIndex + 1;
-		Element startChild = path.get( pathChildIndex );
-		int childIndex = children.indexOf( startChild );
+		Element pathChild = path.get( pathChildIndex );
+		int childIndex = children.indexOf( pathChild );
 		
-		startChild.getTextRepresentationFromStartToPath( builder, marker, path, pathChildIndex );
+		pathChild.getTextRepresentationFromPathToEnd( builder, marker, path, pathChildIndex );
 
 		for (Element child: children.subList( childIndex + 1, children.size() ))
 		{
@@ -83,17 +84,20 @@ public abstract class OrderedBranchElement extends BranchElement
 		int startPathChildIndex = startPathMyIndex + 1;
 		int endPathChildIndex = endPathMyIndex + 1;
 		
-		int startIndex = children.indexOf( startPath.get( startPathChildIndex ) );
-		int endIndex = children.indexOf( endPath.get( endPathMyIndex + 1 ) );
+		Element startChild = startPath.get( startPathChildIndex );
+		Element endChild = endPath.get( endPathChildIndex );
+		
+		int startIndex = children.indexOf( startChild );
+		int endIndex = children.indexOf( endChild );
 	
 		
-		startPath.get( startPathChildIndex ).getTextRepresentationFromPathToEnd( builder, startMarker, startPath, startPathChildIndex );
+		startChild.getTextRepresentationFromPathToEnd( builder, startMarker, startPath, startPathChildIndex );
 		
 		for (int i = startIndex + 1; i < endIndex; i++)
 		{
 			builder.append( children.get( i ).getTextRepresentation() );
 		}
 
-		endPath.get( endPathChildIndex ).getTextRepresentationFromStartToPath( builder, endMarker, endPath, endPathChildIndex );
+		endChild.getTextRepresentationFromStartToPath( builder, endMarker, endPath, endPathChildIndex );
 	}
 }
