@@ -14,6 +14,7 @@ import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Border.EmptyBorder;
 import BritefuryJ.DocPresent.ElementTree.Element;
 import BritefuryJ.DocPresent.ElementTree.ElementTree;
+import BritefuryJ.DocPresent.ElementTree.Selection.ElementSelection;
 import BritefuryJ.DocTree.DocTree;
 import BritefuryJ.DocTree.DocTreeNode;
 import BritefuryJ.DocView.DVNode;
@@ -42,7 +43,6 @@ public class GSymViewInstance
 		{
 			// Create the node view instance
 			GSymNodeViewInstance nodeViewInstance = new GSymNodeViewInstance( viewInstance, viewNode );
-			viewNode.setContext( nodeViewInstance );
 			
 			// Build the contents
 			//return nodeViewFunction.createElement( treeNode, nodeViewInstance, state );
@@ -188,6 +188,13 @@ public class GSymViewInstance
 	{
 		elementTree.setEditHandler( handler );
 	}
+	
+	
+	public ElementSelection getSelection()
+	{
+		return elementTree.getSelection();
+	}
+	
 	
 	
 	

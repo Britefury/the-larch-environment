@@ -74,6 +74,7 @@ public class GSymNodeViewInstance implements Element.ElementContext, DVNode.Node
 	{
 		this.viewInstance = viewInstance;
 		this.viewNode = viewNode;
+		this.viewNode.setContext( this );
 	}
 	
 	
@@ -509,10 +510,45 @@ public class GSymNodeViewInstance implements Element.ElementContext, DVNode.Node
 	
 	public GSymNodeViewInstance getParent()
 	{
-		return (GSymNodeViewInstance)viewNode.getParent().getContext();
+		DVNode parentViewNode = viewNode.getParent();
+		return parentViewNode != null  ?  (GSymNodeViewInstance)parentViewNode.getContext()  :  null;
 	}
 	
 	
+	
+	public ArrayList<GSymNodeViewInstance> getNodeViewInstancePathFromRoot()
+	{
+		ArrayList<GSymNodeViewInstance> path = new ArrayList<GSymNodeViewInstance>();
+		
+		GSymNodeViewInstance n = this;
+		while ( n != null )
+		{
+			path.add( 0, n );
+			n = n.getParent();
+		}
+		
+		return path;
+	}
+	
+	public ArrayList<GSymNodeViewInstance> getNodeViewInstancePathFromSubtreeRoot(GSymNodeViewInstance root)
+	{
+		ArrayList<GSymNodeViewInstance> path = new ArrayList<GSymNodeViewInstance>();
+		
+		GSymNodeViewInstance n = this;
+		while ( n != null )
+		{
+			path.add( 0, n );
+			if ( n == root )
+			{
+				return path;
+			}
+			n = n.getParent();
+		}
+
+		return null;
+	}
+	
+
 	
 	private static HBoxStyleSheet ahboxStyleSheet = new HBoxStyleSheet( DPHBox.Alignment.BASELINES, 0.0, false, 0.0 ); 
 }

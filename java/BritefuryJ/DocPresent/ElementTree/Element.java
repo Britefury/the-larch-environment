@@ -20,7 +20,6 @@ import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Border.EmptyBorder;
-import BritefuryJ.DocPresent.DPWidget.IsNotInSubtreeException;
 import BritefuryJ.DocPresent.ElementTree.Marker.ElementMarker;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
@@ -184,33 +183,36 @@ public abstract class Element
 		return e == r;
 	}
 	
-	public void getElementPathFromRoot(List<Element> path)
+	public ArrayList<Element> getElementPathFromRoot()
 	{
-		// Root to top
-		if ( parent != null )
+		ArrayList<Element> path = new ArrayList<Element>();
+		
+		Element element = this;
+		while ( element != null )
 		{
-			parent.getElementPathFromRoot( path );
+			path.add( 0, element );
+			element = element.getParent();
 		}
 		
-		path.add( this );
+		return path;
 	}
 	
-	public void getElementPathFromSubtreeRoot(BranchElement subtreeRoot, List<Element> path) throws IsNotInSubtreeException
+	public ArrayList<Element> getElementPathFromSubtreeRoot(BranchElement subtreeRoot)
 	{
-		// Root to top
-		if ( subtreeRoot != this )
-		{
-			if ( parent != null )
-			{
-				parent.getElementPathFromSubtreeRoot( subtreeRoot, path );
-			}
-			else
-			{
-				throw new IsNotInSubtreeException();
-			}
-		}
+		ArrayList<Element> path = new ArrayList<Element>();
 		
-		path.add( this );
+		Element element = this;
+		while ( element != null )
+		{
+			path.add( 0, element );
+			if ( element == subtreeRoot )
+			{
+				return path;
+			}
+			element = element.getParent();
+		}
+
+		return null;
 	}
 	
 	
@@ -223,30 +225,25 @@ public abstract class Element
 		}
 		else
 		{
-			e0.getElementPathFromRoot( path0 );
-			e1.getElementPathFromRoot( path1 );
+			ArrayList<Element> p0 = e0.getElementPathFromRoot();
+			ArrayList<Element> p1 = e1.getElementPathFromRoot();
 			
-			int minLength = Math.min( path0.size(), path1.size() );
+			int minLength = Math.min( p0.size(), p1.size() );
 			
-			int common = 0;
+			int numCommonElements = 0;
 			
 			for (int i = 0; i < minLength; i++)
 			{
-				Element p0 = path0.get( i );
-				Element p1 = path1.get( i );
+				numCommonElements = i;
 				
-				common = i;
-				
-				if ( p0 != p1 )
+				if ( p0.get( i ) != p1.get( i ) )
 				{
 					break;
 				}
 			}
 			
-			int toRemove = Math.max( common - 1, 0 );
-			
-			path0.subList( 0, toRemove ).clear();
-			path1.subList( 0, toRemove ).clear();
+			path0.addAll( p0.subList( numCommonElements, p0.size() ) );
+			path1.addAll( p1.subList( numCommonElements, p1.size() ) );
 		}
 	}
 

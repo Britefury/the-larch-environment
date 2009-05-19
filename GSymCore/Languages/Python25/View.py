@@ -32,6 +32,7 @@ from BritefuryJ.GSym.View.ListView import ParagraphListViewLayout, HorizontalLis
 
 from GSymCore.Languages.Python25.Parser import Python25Grammar
 from GSymCore.Languages.Python25.Styles import *
+from GSymCore.Languages.Python25.PythonEditOperations import *
 from GSymCore.Languages.Python25.Keywords import *
 from GSymCore.Languages.Python25.Precedence import *
 from GSymCore.Languages.Python25 import NodeClasses as Nodes
@@ -165,12 +166,14 @@ class ParsedExpressionTextRepresentationListener (ElementTextRepresentationListe
 			parsed = _parseText( self._parser, value, self._outerPrecedence )
 			if parsed is not None:
 				#if parsed != node:
-					#replace( node, parsed )
-				replaceNodeContents( ctx, node, parsed )
+					#replace( ctx, node, parsed )
+				#replaceNodeContents( ctx, node, Nodes.UNPARSED( value=value ) )
+				pyReplaceExpression( ctx, node, Nodes.UNPARSED( value=value ) )
 			else:
 				#if node != Nodes.UNPARSED( value=value ):
-					#replace( node, Nodes.UNPARSED( value=value ) )
-				replaceNodeContents( ctx, node, Nodes.UNPARSED( value=value ) )
+					#replace( ctx, node, Nodes.UNPARSED( value=value ) )
+				#replaceNodeContents( ctx, node, Nodes.UNPARSED( value=value ) )
+				pyReplaceExpression( ctx, node, Nodes.UNPARSED( value=value ) )
 			return True
 		else:
 			return False
@@ -250,26 +253,28 @@ class ParsedLineTextRepresentationListener (LineTextRepresentationListenerWithPa
 		lineStrings = value.split( '\n' )
 		# Parse
 		parsedLines = self.parseLines( lineStrings )
+		
+		pyReplaceStatementWithRange( ctx, node, parsedLines )
 
-		if _isCompoundStmt( node ):
-			originalContents = node['suite']
-			if _isCompoundStmt( parsedLines[-1] ):
-				parsedLines[-1]['suite'].extend( originalContents )
-			else:
-				parsedLines.extend( originalContents )
+		#if _isCompoundStmt( node ):
+			#originalContents = node['suite']
+			#if _isCompoundStmt( parsedLines[-1] ):
+				#parsedLines[-1]['suite'].extend( originalContents )
+			#else:
+				#parsedLines.extend( originalContents )
 				
-		if len( parsedLines ) == 1:
-			## HACK
-			## TODO
-			## use Java equals() method for now due to a bug in Jython; should be fixed once the patch for issue 1338 (http://bugs.jython.org) is integrated
-			if node.equals( parsedLines[0] ):
-				# Same data; ignore
-				pass
-			else:
-				#replace( node, parsedLines[0] )
-				replaceNodeContents( ctx, node, parsedLines[0] )
-		else:
-			replaceWithRange( ctx, node, parsedLines )
+		#if len( parsedLines ) == 1:
+			### HACK
+			### TODO
+			### use Java equals() method for now due to a bug in Jython; should be fixed once the patch for issue 1338 (http://bugs.jython.org) is integrated
+			#if node.equals( parsedLines[0] ):
+				## Same data; ignore
+				#pass
+			#else:
+				##replace( ctx, node, parsedLines[0] )
+				#replaceNodeContents( ctx, node, parsedLines[0] )
+		#else:
+			#replaceWithRange( ctx, node, parsedLines )
 
 			
 	_listenerTable = None
@@ -1551,6 +1556,14 @@ class Python25View (GSymViewObjectNodeDispatch):
 	
 
 	
+	# Indented block
+	@ObjectNodeDispatchMethod
+	def IndentedBlock(self, ctx, state, node, suite):
+		indentedSuite = ctx.indent( 30.0, suiteView( ctx, suite, self._parser.statement() ) )
+		return ctx.border( indentedBlock_border, ContainerStyleSheet.defaultStyleSheet, indentedSuite )
+		
+	
+	
 	# Comment statement
 	@ObjectNodeDispatchMethod
 	def CommentStmt(self, ctx, state, node, comment):
@@ -1567,9 +1580,7 @@ def _getStatementContextFromElement(element):
 	context = element.getContext()
 	
 	while not _isStmt( context.getDocNode() ):
-		elem = context.getViewNodeElement()
-		elem = elem.getParent()
-		context = elem.getContext()
+		context = context.getParent()
 	return context
 
 
@@ -1580,13 +1591,13 @@ def _getStatementContextFromElement(element):
 
 	
 class Python25EditHandler (EditHandler):
-	def __init__(self, tree):
-		self._tree = tree
+	def __init__(self, viewContext):
+		self._viewContext = viewContext
 		self._grammar = Python25Grammar()
 		
 		
 	def deleteSelection(self):
-		selection = self._tree.getSelection()
+		selection = self._viewContext.getSelection()
 		startMarker = selection.getStartMarker()
 		endMarker = selection.getEndMarker()
 		startContext = _getStatementContextFromElement( startMarker.getElement() )
@@ -1613,7 +1624,7 @@ class Python25EditHandler (EditHandler):
 					# Parsed
 					lineDoc = parsed
 			
-			replace( startContext.getTreeNode(), lineDoc )
+			replace( startContext, startContext.getTreeNode(), lineDoc )
 			selection.clear()
 	
 			
@@ -1622,7 +1633,7 @@ class Python25EditHandler (EditHandler):
 	
 	def editCopy(self):
 		print 'Copying selection:'
-		print self._tree.getTextRepresentationInSelection( self._tree.getSelection() )
+		print self._tree.getTextRepresentationInSelection( self._viewContext.getSelection() )
 	
 	def editCut(self):
 		pass
@@ -1634,4 +1645,4 @@ class Python25EditHandler (EditHandler):
 	
 def initialiseViewContext(viewContext):
 	viewContext.setElementChangeListener( NodeElementChangeListenerDiff() )
-	viewContext.setEditHandler( Python25EditHandler( viewContext.getElementTree() ) )
+	viewContext.setEditHandler( Python25EditHandler( viewContext ) )

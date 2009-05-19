@@ -64,6 +64,7 @@ public class EditableLeafElement extends LeafElement
 	public void insertText(Marker marker, String x)
 	{
 		int index = marker.getIndex();
+		index = Math.min( Math.max( index, 0 ), textRepresentation.length() );
 		textRepresentation = textRepresentation.substring( 0, index ) + x + textRepresentation.substring( index );
 		getWidget().markerInsert( index, x.length() );
 		textRepresentationChanged();
@@ -71,6 +72,7 @@ public class EditableLeafElement extends LeafElement
 
 	public void removeText(int index, int length)
 	{
+		index = Math.min( Math.max( index, 0 ), textRepresentation.length() );
 		length = Math.min( length, getTextRepresentationLength() - index );
 		textRepresentation = textRepresentation.substring( 0, index ) + textRepresentation.substring( index + length );
 		getWidget().markerRemove( index, length );
@@ -96,6 +98,7 @@ public class EditableLeafElement extends LeafElement
 	public void replaceText(Marker m, int length, String x)
 	{
 		int index = m.getIndex();
+		index = Math.min( Math.max( index, 0 ), textRepresentation.length() );
 		textRepresentation = textRepresentation.substring( 0, index )  +  x  +  textRepresentation.substring( index + length );
 		
 		if ( x.length() > length )

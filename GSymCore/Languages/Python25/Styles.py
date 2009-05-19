@@ -32,6 +32,8 @@ defHeader_border = EmptyBorder( 0.0, 0.0, 0.0, 0.0, 3.0, 3.0, Color( 0.913, 0.95
 classBackground_border = SolidBorder( 2.0, 5.0, 5.0, Color( 0.522, 0.420, 0.620 ), None )
 classHeader_border = EmptyBorder( 0.0, 0.0, 0.0, 0.0, 3.0, 3.0, Color( 0.933, 0.913, 0.953 ) )
 
+indentedBlock_border = SolidBorder( 2.0, 5.0, 5.0, Color.red, None )
+
 pow_scriptStyle = ScriptStyleSheet( 0.0, 0.0 )
 div_fractionStyle = FractionStyleSheet( Color( 0.0, 0.5, 0.0 ) )
 

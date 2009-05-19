@@ -39,6 +39,11 @@ public abstract class DMNode
 		return new DMList( x );
 	}
 	
+	public static Object coerce(DMObjectInterface x)
+	{
+		return new DMObject( x );
+	}
+	
 	@SuppressWarnings("unchecked")
 	public static Object coerce(Object x)
 	{
@@ -61,6 +66,10 @@ public abstract class DMNode
 		else if ( x instanceof List )
 		{
 			return coerce( (List<Object>)x );
+		}
+		else if ( x instanceof DMObjectInterface )
+		{
+			return coerce( (DMObjectInterface)x );
 		}
 		else if ( x instanceof PyJavaType )
 		{

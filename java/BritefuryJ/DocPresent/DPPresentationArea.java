@@ -1560,8 +1560,12 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 	
 	protected void deleteSelection()
 	{
-		if ( editHandler != null )
+		if ( editHandler != null  &&  !selection.isEmpty() )
 		{
+			if ( caret.getMarker().equals( selection.getEndMarker() ) )
+			{
+				caret.getMarker().moveTo( selection.getStartMarker() );
+			}
 			editHandler.deleteSelection();
 		}
 	}
@@ -1586,6 +1590,10 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 	{
 		if ( editHandler != null )
 		{
+			if ( caret.getMarker().equals( selection.getEndMarker() ) )
+			{
+				caret.getMarker().moveTo( selection.getStartMarker() );
+			}
 			editHandler.editCut();
 		}
 	}

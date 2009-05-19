@@ -408,33 +408,36 @@ abstract public class DPWidget
 	}
 	
 	
-	public void getWidgetPathFromRoot(List<DPWidget> path)
+	public ArrayList<DPWidget> getWidgetPathFromRoot()
 	{
-		// Root to top
-		if ( parent != null )
+		ArrayList<DPWidget> path = new ArrayList<DPWidget>();
+		
+		DPWidget widget = this;
+		while ( widget != null )
 		{
-			parent.getWidgetPathFromRoot( path );
+			path.add( 0, widget );
+			widget = widget.getParent();
 		}
 		
-		path.add( this );
+		return path;
 	}
 	
-	public void getWidgetPathFromSubtreeRoot(DPContainer subtreeRoot, List<DPWidget> path) throws IsNotInSubtreeException
+	public ArrayList<DPWidget> getWidgetPathFromSubtreeRoot(DPContainer subtreeRoot)
 	{
-		// Root to top
-		if ( subtreeRoot != this )
-		{
-			if ( parent != null )
-			{
-				parent.getWidgetPathFromSubtreeRoot( subtreeRoot, path );
-			}
-			else
-			{
-				throw new IsNotInSubtreeException();
-			}
-		}
+		ArrayList<DPWidget> path = new ArrayList<DPWidget>();
 		
-		path.add( this );
+		DPWidget widget = this;
+		while ( widget != null )
+		{
+			path.add( 0, widget );
+			if ( widget == subtreeRoot )
+			{
+				return path;
+			}
+			widget = widget.getParent();
+		}
+
+		return null;
 	}
 	
 	
@@ -447,30 +450,25 @@ abstract public class DPWidget
 		}
 		else
 		{
-			w0.getWidgetPathFromRoot( path0 );
-			w1.getWidgetPathFromRoot( path1 );
+			ArrayList<DPWidget> p0 = w0.getWidgetPathFromRoot();
+			ArrayList<DPWidget> p1 = w1.getWidgetPathFromRoot();
 			
-			int minLength = Math.min( path0.size(), path1.size() );
+			int minLength = Math.min( p0.size(), p1.size() );
 			
-			int common = 0;
+			int numCommonWidgets = 0;
 			
 			for (int i = 0; i < minLength; i++)
 			{
-				DPWidget p0 = path0.get( i );
-				DPWidget p1 = path1.get( i );
+				numCommonWidgets = i;
 				
-				common = i;
-				
-				if ( p0 != p1 )
+				if ( p0.get( i ) != p1.get( i ) )
 				{
 					break;
 				}
 			}
 			
-			int toRemove = Math.max( common - 1, 0 );
-			
-			path0.subList( 0, toRemove ).clear();
-			path1.subList( 0, toRemove ).clear();
+			path0.addAll( p0.subList( numCommonWidgets, p0.size() ) );
+			path1.addAll( p1.subList( numCommonWidgets, p1.size() ) );
 		}
 	}
 	

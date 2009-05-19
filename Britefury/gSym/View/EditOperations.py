@@ -16,30 +16,17 @@ from BritefuryJ.DocTree import DocTreeNode, DocTreeList, DocTreeObject
 from Britefury.Util.NodeUtil import *
 
 
-def _sanitiseInputData(data):
-	if isinstance( data, DocTreeNode ):
-		return _sanitiseInputData( data.getNode() )
-	elif isinstance( data, list ):
-		return DMList( [ _sanitiseInputData( x )   for x in data ] )
-	elif isinstance( data, tuple ):
-		return DMList( [ _sanitiseInputData( x )   for x in data ] )
-	elif isinstance( data, List ):
-		return DMList( [ _sanitiseInputData( x )   for x in data ] )
-	else:
-		return data
-	
-	
 def _dataForStr(data):
 	if isinstance( data, DocTreeNode ):
 		return _dataForStr( data.getNode() )
 	elif isinstance( data, List ):
-		return [ _sanitiseInputData( x )   for x in data ]
+		return [ x   for x in data ]
 	else:
 		return data
 	
 
 
-def replace(data, replacement):
+def replace(ctx, data, replacement):
 	if isinstance( data, DocTreeNode ):
 		parent = data.getParentTreeNode()
 		if parent is None:
@@ -47,7 +34,7 @@ def replace(data, replacement):
 		index = parent.indexOfById( data.getNode() )
 		if index == -1:
 			raise ValueError, 'could not replace'
-		parent[index] = _sanitiseInputData( replacement )
+		parent[index] = replacement
 		return parent[index]
 	else:
 		raise TypeError, 'EditOperations:replace(): @data must be a DocTreeNode'
@@ -58,7 +45,7 @@ def replaceNodeContents(ctx, node, replacement):
 		if isinstance( node, DocTreeObject )  and  ( isinstance( replacement, DocTreeObject )  or  isinstance( replacement, DMObject ) ):
 			node.become( replacement )
 		elif isinstance( node, DocTreeList )  and  isinstance( replacement, DMListInterface ):
-			node[:] = _sanitiseInputData( replacement )
+			node[:] = replacement
 		else:
 			raise TypeError, 'cannot replace contents of a %s with a %s'  %  ( type( node ), type( replacement ) )
 	else:
@@ -73,7 +60,7 @@ def replaceWithRange(ctx, data, replacement):
 		index = parent.indexOfById( data.getNode() )
 		if index == -1:
 			raise ValueError, 'could not replace with range'
-		parent[index:index+1] = _sanitiseInputData( replacement )
+		parent[index:index+1] = replacement
 		return parent[index:index+len(replacement)]
 	else:
 		raise TypeError, 'EditOperations:replaceWithRange(): @data must be a DocTreeNode; it is a %s'  %  ( type( data ), )
@@ -99,17 +86,17 @@ def prepend(ctx, xs, data):
 
 def insertElement(ctx, xs, index, data):
 	if isinstance( xs, DocTreeNode ):
-		#parent.insert( index, _sanitiseInputData( data ) )
-		xs.add( index, _sanitiseInputData( data ) )
+		#parent.insert( index, data )
+		xs.add( index, data )
 		return xs[index]
 	else:
 		raise TypeError, 'EditOperations:insertElement(): @xs must be a DocTreeNode'
 	
 def insertRange(ctx, xs, index, data):
 	if isinstance( xs, DocTreeNode ):
-		#parent.insert( index, _sanitiseInputData( data ) )
-		xs.addAll( index, _sanitiseInputData( data ) )
-		return xs[index]
+		#parent.insert( index, data )
+		xs.addAll( index, data )
+		return xs[index:index+len(data)]
 	else:
 		raise TypeError, 'EditOperations:insertRange(): @xs must be a DocTreeNode'
 	
@@ -119,8 +106,8 @@ def insertBefore(ctx, x, data):
 		index = parent.indexOfById( x.getNode() )
 		if index == -1:
 			raise ValueError, 'could not insert before'
-		#parent.insert( index, _sanitiseInputData( data ) )
-		parent.add( index, _sanitiseInputData( data ) )
+		#parent.insert( index, data )
+		parent.add( index, data )
 		return parent[index]
 	else:
 		raise TypeError, 'EditOperations:insertBefore(): @x must be a DocTreeNode'
@@ -132,8 +119,8 @@ def insertRangeBefore(ctx, x, data):
 		index = parent.indexOfById( x.getNode() )
 		if index == -1:
 			raise ValueError, 'could not insert range before'
-		parent[index:index] = _sanitiseInputData( data )
-		return parent[index]
+		parent[index:index] = data
+		return parent[index:index+len(data)]
 	else:
 		raise TypeError, 'EditOperations:insertRangeBefore(): @x must be a DocTreeNode'
 
@@ -145,8 +132,8 @@ def insertAfter(ctx, x, data):
 		if index == -1:
 			raise ValueError, 'could not insert after'
 		index += 1
-		#parent.insert( index, _sanitiseInputData( data ) )
-		parent.add( index, _sanitiseInputData( data ) )
+		#parent.insert( index, data )
+		parent.add( index, data )
 		return parent[index]
 	else:
 		raise TypeError, 'EditOperations:insertAfter(): @x must be a DocTreeNode'
@@ -159,8 +146,8 @@ def insertRangeAfter(ctx, x, data):
 		if index == -1:
 			raise ValueError, 'could not insert range after'
 		index += 1
-		parent[index:index] = _sanitiseInputData( data )
-		return parent[index]
+		parent[index:index] = data
+		return parent[index:index+len(data)]
 	else:
 		raise TypeError, 'EditOperations:insertRangeAfter(): @x must be a DocTreeNode'
 
