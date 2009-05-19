@@ -12,6 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import BritefuryJ.ParserHelpers.DebugNode;
+import BritefuryJ.Utils.HashUtils;
 
 
 public class ParserState
@@ -62,9 +63,47 @@ public class ParserState
 	}
 	
 	
+	private static class MemoKey
+	{
+		private int pos;
+		private ParserExpression rule;
+		private int hash;
+		
+		public MemoKey(int pos, ParserExpression rule)
+		{
+			this.pos = pos;
+			this.rule = rule;
+			this.hash = HashUtils.doubleHash( pos, rule.hashCode() );
+		}
+		
+		public int hashCode()
+		{
+			return hash;
+		}
+		
+		public boolean equals(Object x)
+		{
+			if ( x == this )
+			{
+				return true;
+			}
+			
+			if ( x instanceof MemoKey )
+			{
+				MemoKey mx = (MemoKey)x;
+				return pos == mx.pos  &&  rule == mx.rule;
+			}
+			else
+			{
+				return false;
+			}
+		}
+	}
 	
 	
-	private HashMap<Integer, HashMap<ParserExpression, MemoEntry> > memo;
+	
+	
+	private HashMap<MemoKey, MemoEntry> memo;
 	private RuleInvocation ruleInvocationStack;
 	private Pattern junkPattern;
 	private HashSet<MemoEntry> dependencies;
@@ -75,7 +114,7 @@ public class ParserState
 	
 	public ParserState(String junkRegex)
 	{
-		this.memo = new HashMap<Integer, HashMap<ParserExpression, MemoEntry> >();
+		this.memo = new HashMap<MemoKey, MemoEntry>();
 		junkPattern = Pattern.compile( junkRegex );
 		dependencies = null;
 	}
@@ -108,22 +147,14 @@ public class ParserState
 	@SuppressWarnings("unchecked")
 	ParseResult memoisedMatchString(ParserExpression rule, String input, int start, int stop)
 	{
-		MemoEntry memoEntry = recall( rule, input, start, stop );
+		MemoKey key = new MemoKey( start, rule );
+		MemoEntry memoEntry = memo.get( key );
 		
 		if ( memoEntry == null )
 		{
 			// Create the memo-entry, and memoise
 			memoEntry = new MemoEntry( rule, start );
-			Integer iStart = new Integer( start );
-			HashMap<ParserExpression, MemoEntry> posMemo = memo.get( iStart );
-			
-			if ( posMemo == null )
-			{
-				posMemo = new HashMap<ParserExpression, MemoEntry>();
-				memo.put( iStart, posMemo );
-			}
-			
-			posMemo.put( rule, memoEntry );
+			memo.put( key, memoEntry );
 			
 			
 			// Create a rule invocation record, and push onto the rule invocation stack
@@ -193,22 +224,6 @@ public class ParserState
 	}
 	
 	
-	private MemoEntry recall(ParserExpression rule, Object input, int start, int stop)
-	{
-		// Get the memo-entry from the memo table
-		Integer iStart = new Integer( start );
-		HashMap<ParserExpression, MemoEntry> posMemo = memo.get( iStart );
-		MemoEntry memoEntry = null;
-		
-		if ( posMemo != null )
-		{
-			memoEntry = posMemo.get( rule );
-		}
-
-		return memoEntry;
-	}
-	
-	
 	private void onLeftRecursionDetected(ParserExpression rule, Object input, int start, int stop, MemoEntry memoEntry)
 	{
 		// Left recursion has been detected
@@ -235,11 +250,7 @@ public class ParserState
 			{
 				for (MemoEntry d: memoEntry.dependents)
 				{
-					HashMap<ParserExpression, MemoEntry> posMemo = (HashMap<ParserExpression, MemoEntry>)memo.get( d.pos );
-					if ( posMemo != null )
-					{
-						posMemo.remove( d.rule );
-					}
+					memo.remove( new MemoKey( d.pos, d.rule ) );
 				}
 			}
 			

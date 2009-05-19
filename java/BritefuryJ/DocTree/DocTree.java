@@ -14,6 +14,7 @@ import java.util.HashSet;
 
 import BritefuryJ.DocModel.DMListInterface;
 import BritefuryJ.DocModel.DMObjectInterface;
+import BritefuryJ.Utils.HashUtils;
 
 
 public class DocTree
@@ -41,7 +42,7 @@ public class DocTree
 			}
 			this.index = index;
 			
-			this.hash = tripleHash( docNode.hashCode(), parentTreeNode != null  ?  parentTreeNode.hashCode()  :  0, index );
+			this.hash = HashUtils.tripleHash( docNode.hashCode(), parentTreeNode != null  ?  parentTreeNode.hashCode()  :  0, index );
 		}
 		
 		public Key(Object docNode, DocTreeNode parentTreeNode, int index, DocTreeNodeTable table)
@@ -53,7 +54,7 @@ public class DocTree
 			}
 			this.index = index;
 			
-			this.hash = tripleHash( docNode.hashCode(), parentTreeNode != null  ?  parentTreeNode.hashCode()  :  0, index );
+			this.hash = HashUtils.tripleHash( docNode.hashCode(), parentTreeNode != null  ?  parentTreeNode.hashCode()  :  0, index );
 		}
 		
 		
@@ -100,18 +101,6 @@ public class DocTree
 		public boolean hasWeakRef(Reference<? extends Object> r)
 		{
 			return r == docNode  ||  r == parentTreeNode;
-		}
-		
-		private static int tripleHash(int a, int b, int c)
-		{
-			int mult = 1000003;
-			int x = 0x345678;
-			x = ( x ^ c ) * mult;
-			mult += 82520 + 4;
-			x = ( x ^ b ) * mult;
-			mult += 82520 + 2;
-			x = ( x ^ a ) * mult;
-			return x + 97351;
 		}
 		
 		
