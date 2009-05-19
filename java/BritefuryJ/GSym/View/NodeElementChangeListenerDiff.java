@@ -218,7 +218,6 @@ public class NodeElementChangeListenerDiff implements DVNode.NodeElementChangeLi
 				ElementCaret caret = elementTree.getCaret();
 				
 				
-				int newIndex = newPosition  +  ( newBias == Marker.Bias.END  ?  1  :  0 );
 				
 				
 //				if ( bias == Marker.Bias.START )
@@ -240,12 +239,19 @@ public class NodeElementChangeListenerDiff implements DVNode.NodeElementChangeLi
 //				}
 				
 				
-				newPosition = Math.max( 0, newPosition );
-				if ( newPosition >= newTextRepresentation.length() )
+				if ( newPosition < 0 )
+				{
+					newPosition = 0;
+					newBias = Marker.Bias.START;
+				}
+				else if ( newPosition >= newTextRepresentation.length() )
 				{
 					newPosition = newTextRepresentation.length() - 1;
 					newBias = Marker.Bias.END;
 				}
+				
+				
+				int newIndex = newPosition  +  ( newBias == Marker.Bias.END  ?  1  :  0 );
 				
 				
 				LeafElement leaf = nodeElement.getLeafAtTextRepresentationPosition( newPosition );

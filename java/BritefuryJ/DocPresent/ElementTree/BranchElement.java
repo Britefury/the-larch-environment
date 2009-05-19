@@ -302,6 +302,10 @@ public abstract class BranchElement extends Element
 	protected abstract void getTextRepresentationBetweenPaths(StringBuilder builder, ElementMarker startMarker, ArrayList<Element> startPath, int startPathMyIndex,
 			ElementMarker endMarker, ArrayList<Element> endPath, int endPathMyIndex);
 	
+	
+	protected abstract void getTextRepresentationFromStartOfRootToMarkerFromChild(StringBuilder builder, ElementMarker marker, Element root, Element fromChild);
+	protected abstract void getTextRepresentationFromMarkerToEndOfRootFromChild(StringBuilder builder, ElementMarker marker, Element root, Element fromChild);
+
 
 
 	//

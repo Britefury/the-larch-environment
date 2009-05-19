@@ -69,9 +69,12 @@ public abstract class OrderedBranchElement extends BranchElement
 		
 		pathChild.getTextRepresentationFromPathToEnd( builder, marker, path, pathChildIndex );
 
-		for (Element child: children.subList( childIndex + 1, children.size() ))
+		if ( (childIndex + 1) < children.size() )
 		{
-			builder.append( child.getTextRepresentation() );
+			for (Element child: children.subList( childIndex + 1, children.size() ))
+			{
+				builder.append( child.getTextRepresentation() );
+			}
 		}
 	}
 
@@ -100,4 +103,45 @@ public abstract class OrderedBranchElement extends BranchElement
 
 		endChild.getTextRepresentationFromStartToPath( builder, endMarker, endPath, endPathChildIndex );
 	}
+
+
+	protected void getTextRepresentationFromStartOfRootToMarkerFromChild(StringBuilder builder, ElementMarker marker, Element root, Element fromChild)
+	{
+		if ( root != this  &&  parent != null )
+		{
+			parent.getTextRepresentationFromStartOfRootToMarkerFromChild( builder, marker, root, this );
+		}
+		
+		for (Element child: getChildren())
+		{
+			if ( child != fromChild )
+			{
+				builder.append( child.getTextRepresentation() );
+			}
+			else
+			{
+				break;
+			}
+		}
+	}
+	
+	protected void getTextRepresentationFromMarkerToEndOfRootFromChild(StringBuilder builder, ElementMarker marker, Element root, Element fromChild)
+	{
+		List<Element> children = getChildren();
+		int childIndex = children.indexOf( fromChild );
+		
+		if ( (childIndex + 1) < children.size() )
+		{
+			for (Element child: children.subList( childIndex + 1, children.size() ))
+			{
+				builder.append( child.getTextRepresentation() );
+			}
+		}
+
+		if ( root != this  &&  parent != null )
+		{
+			parent.getTextRepresentationFromMarkerToEndOfRootFromChild( builder, marker, root, this );
+		}
+	}
+
 }

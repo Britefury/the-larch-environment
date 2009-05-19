@@ -31,12 +31,12 @@ public class ElementMarker
 
 
 
-	public Element getElement()
+	public LeafElement getElement()
 	{
 		DPContentLeaf widget = widgetMarker.getWidget();
 		if ( widget != null )
 		{
-			return widget.getElement();
+			return (LeafElement)widget.getElement();
 		}
 		else
 		{
