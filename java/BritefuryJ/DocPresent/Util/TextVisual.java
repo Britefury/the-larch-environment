@@ -34,6 +34,7 @@ import BritefuryJ.DocPresent.Metrics.HMetrics;
 import BritefuryJ.DocPresent.Metrics.VMetrics;
 import BritefuryJ.DocPresent.Metrics.VMetricsTypeset;
 import BritefuryJ.Math.Point2;
+import BritefuryJ.Utils.HashUtils;
 
 
 
@@ -184,7 +185,7 @@ public class TextVisual
 			this.text = text;
 			this.font = font;
 			this.bMixedSizeCaps = bMixedSizeCaps;
-			this.hash = tripleHash( text.hashCode(), font.hashCode(), new Boolean( bMixedSizeCaps ).hashCode() );
+			this.hash = HashUtils.tripleHash( text.hashCode(), font.hashCode(), new Boolean( bMixedSizeCaps ).hashCode() );
 		}
 		
 		
@@ -204,20 +205,6 @@ public class TextVisual
 		public int hashCode()
 		{
 			return hash;
-		}
-
-	
-	
-		private static int tripleHash(int a, int b, int c)
-		{
-			int mult = 1000003;
-			int x = 0x345678;
-			x = ( x ^ c ) * mult;
-			mult += 82520 + 4;
-			x = ( x ^ b ) * mult;
-			mult += 82520 + 2;
-			x = ( x ^ a ) * mult;
-			return x + 97351;
 		}
 	}
 	
