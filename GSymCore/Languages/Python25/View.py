@@ -165,11 +165,11 @@ class ParsedExpressionTextRepresentationListener (ElementTextRepresentationListe
 			parsed = _parseText( self._parser, value, self._outerPrecedence )
 			if parsed is not None:
 				#if parsed != node:
-					#replace( ctx, node, parsed )
+					#replace( node, parsed )
 				replaceNodeContents( ctx, node, parsed )
 			else:
 				#if node != Nodes.UNPARSED( value=value ):
-					#replace( ctx, node, Nodes.UNPARSED( value=value ) )
+					#replace( node, Nodes.UNPARSED( value=value ) )
 				replaceNodeContents( ctx, node, Nodes.UNPARSED( value=value ) )
 			return True
 		else:
@@ -189,6 +189,9 @@ class ParsedExpressionTextRepresentationListener (ElementTextRepresentationListe
 
 _compoundStmtNames = set( [ 'ifStmt', 'elifStmt', 'elseStmt', 'whileStmt', 'forStmt', 'tryStmt', 'exceptStmt', 'finallyStmt', 'withStmt', 'defStmt', 'classStmt' ] )	
 
+
+def _isStmt(node):
+	return node.isInstanceOf( Nodes.Stmt )
 
 def _isCompoundStmt(node):
 	return node.isInstanceOf( Nodes.CompoundStmt )
@@ -263,7 +266,7 @@ class ParsedLineTextRepresentationListener (LineTextRepresentationListenerWithPa
 				# Same data; ignore
 				pass
 			else:
-				#replace( ctx, node, parsedLines[0] )
+				#replace( node, parsedLines[0] )
 				replaceNodeContents( ctx, node, parsedLines[0] )
 		else:
 			replaceWithRange( ctx, node, parsedLines )
@@ -1556,15 +1559,64 @@ class Python25View (GSymViewObjectNodeDispatch):
 				   PRECEDENCE_STMT,
 				   state )
 
+	
+	
+	
+	
+def _getStatementContextFromElement(element):
+	context = element.getContext()
+	
+	while not _isStmt( context.getDocNode() ):
+		elem = context.getViewNodeElement()
+		elem = elem.getParent()
+		context = elem.getContext()
+	return context
+
+
+
+	
+	
+	
 
 	
 class Python25EditHandler (EditHandler):
 	def __init__(self, tree):
 		self._tree = tree
+		self._grammar = Python25Grammar()
+		
 		
 	def deleteSelection(self):
-		pass
+		selection = self._tree.getSelection()
+		startMarker = selection.getStartMarker()
+		endMarker = selection.getEndMarker()
+		startContext = _getStatementContextFromElement( startMarker.getElement() )
+		endContext = _getStatementContextFromElement( endMarker.getElement() )
+		if startContext is endContext:
+			stmtElement = startContext.getViewNodeContentElement()
+			textBefore = stmtElement.getTextRepresentationFromStartToMarker( startMarker )
+			textAfter = stmtElement.getTextRepresentationFromMarkerToEnd( endMarker )
+			line = textBefore + textAfter
+			line = line.strip( '\n' )
+			
+			lineDoc = None
+			
+			if line.strip() == '':
+				# Blank line
+				lineDoc = Nodes.BlankLine()
+			else:
+				# Parse
+				parsed = _parseText( self._grammar.statement(), line )
+				if parsed is None:
+					# Parse failure; unparsed text
+					lineDoc = Nodes.UNPARSED( value=line )
+				else:
+					# Parsed
+					lineDoc = parsed
+			
+			replace( startContext.getTreeNode(), lineDoc )
+			selection.clear()
 	
+			
 	def replaceSelection(self, replacement):
 		pass
 	

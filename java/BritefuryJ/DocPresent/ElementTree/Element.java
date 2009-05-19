@@ -322,6 +322,20 @@ public abstract class Element
 	}
 	
 	
+	public String getTextRepresentationFromStartToMarker(ElementMarker marker)
+	{
+		StringBuilder builder = new StringBuilder();
+		marker.getElement().getTextRepresentationFromStartOfRootToMarker( builder, marker, this );
+		return builder.toString();
+	}
+	
+	public String getTextRepresentationFromMarkerToEnd(ElementMarker marker)
+	{
+		StringBuilder builder = new StringBuilder();
+		marker.getElement().getTextRepresentationFromMarkerToEndOfRoot( builder, marker, this );
+		return builder.toString();
+	}
+
 	protected abstract void getTextRepresentationFromStartToPath(StringBuilder builder, ElementMarker marker, ArrayList<Element> path, int pathMyIndex);
 	protected abstract void getTextRepresentationFromPathToEnd(StringBuilder builder, ElementMarker marker, ArrayList<Element> path, int pathMyIndex);
 

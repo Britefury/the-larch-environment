@@ -39,7 +39,7 @@ def _dataForStr(data):
 	
 
 
-def replace(ctx, data, replacement):
+def replace(data, replacement):
 	if isinstance( data, DocTreeNode ):
 		parent = data.getParentTreeNode()
 		if parent is None:

@@ -224,6 +224,25 @@ public abstract class LeafElement extends Element
 		return textRepresentation.substring( startMarker.getIndex(), endMarker.getIndex() );
 	}
 
+	protected void getTextRepresentationFromStartOfRootToMarker(StringBuilder builder, ElementMarker marker, Element root)
+	{
+		if ( this != root  &&  parent != null )
+		{
+			parent.getTextRepresentationFromStartOfRootToMarkerFromChild( builder, marker, root, this );
+		}
+		builder.append( textRepresentation.substring( 0, marker.getIndex() ) );
+	}
+	
+	protected void getTextRepresentationFromMarkerToEndOfRoot(StringBuilder builder, ElementMarker marker, Element root)
+	{
+		builder.append( textRepresentation.substring( marker.getIndex() ) );
+		if ( this != root  &&  parent != null )
+		{
+			parent.getTextRepresentationFromMarkerToEndOfRootFromChild( builder, marker, root, this );
+		}
+	}
+
+	
 
 
 	
@@ -265,7 +284,7 @@ public abstract class LeafElement extends Element
 		ElementCaret caret = tree.getCaret();
 		if ( caret != null )
 		{
-			Element e = caret.getMarker().getElement();
+			LeafElement e = caret.getMarker().getElement();
 			if ( e == this )
 			{
 				return metaHeaderHighlightBorder;
