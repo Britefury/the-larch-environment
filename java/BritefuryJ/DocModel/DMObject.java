@@ -126,6 +126,22 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable
 		cell.setLiteralValue( fieldData );
 		commandTracker = null;
 	}
+	
+	public DMObject(DMObjectInterface obj)
+	{
+		this.objClass = obj.getDMClass();
+		Object fieldData[] = new Object[objClass.getNumFields()];
+		fillArrayWithNulls( fieldData );
+		
+		for (int i = 0; i < fieldData.length; i++)
+		{
+			fieldData[i] = coerce( obj.get( i ) );
+		}
+
+		cell = new LiteralCell();
+		cell.setLiteralValue( fieldData );
+		commandTracker = null;
+	}
 
 	public DMObject(PyObject values[])
 	{

@@ -173,6 +173,7 @@ WithStmt = module.newClass( 'WithStmt', CompoundStmt, [ 'expr', 'target' ] )
 DefStmt = module.newClass( 'DefStmt', CompoundStmt, [ 'name', 'params', 'paramsTrailingSeparator' ] )
 DecoStmt = module.newClass( 'DecoStmt', CompoundStmt, [ 'name', 'args', 'argsTrailingSeparator' ] )
 ClassStmt = module.newClass( 'ClassStmt', CompoundStmt, [ 'name', 'bases', 'basesTrailingSeparator' ] )
+IndentedBlock = module.newClass( 'IndentedBlock', CompoundStmt, [] )
 
 
 
