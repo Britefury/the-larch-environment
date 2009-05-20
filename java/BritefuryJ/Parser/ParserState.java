@@ -17,52 +17,6 @@ import BritefuryJ.Utils.HashUtils;
 
 public class ParserState
 {
-	private static class MemoEntry
-	{
-		public ParserExpression rule;
-		public int pos;
-		public ParseResult answer;
-		public boolean bEvaluating, bLeftRecursionDetected;
-		public HashSet<MemoEntry> dependents;		// dependents; for a left-recursive application
-		
-		
-		public MemoEntry(ParserExpression rule, int pos)
-		{
-			this.rule = rule;
-			this.pos = pos;
-			answer = ParseResult.failure( pos );
-			bEvaluating = bLeftRecursionDetected = false;
-		}
-		
-		public void addDependent(MemoEntry dep)
-		{
-			if ( dependents == null )
-			{
-				dependents = new HashSet<MemoEntry>();
-			}
-			if ( dep.pos == pos )
-			{
-				dependents.add( dep );
-			}
-		}
-	};
-	
-	
-	private static class RuleInvocation
-	{
-		public ParserExpression rule;
-		public MemoEntry memoEntry;
-		public RuleInvocation outerInvocation;
-		
-		public RuleInvocation(ParserExpression rule, MemoEntry memoEntry, RuleInvocation outerInvocation)
-		{
-			this.rule = rule;
-			this.memoEntry = memoEntry;
-			this.outerInvocation = outerInvocation;
-		}
-	}
-	
-	
 	private static class MemoKey
 	{
 		private int pos;
@@ -103,8 +57,36 @@ public class ParserState
 	
 	
 	
+	private static class MemoEntry
+	{
+		public MemoKey key;
+		public ParseResult answer;
+		public boolean bEvaluating, bLeftRecursionDetected;
+		public HashSet<MemoEntry> dependents;		// dependents; for a left-recursive application
+		
+		
+		public MemoEntry(MemoKey key)
+		{
+			this.key = key;
+			answer = ParseResult.failure( key.pos );
+			bEvaluating = bLeftRecursionDetected = false;
+		}
+		
+		public void addDependent(MemoEntry dep)
+		{
+			if ( dependents == null )
+			{
+				dependents = new HashSet<MemoEntry>();
+			}
+			if ( dep.key.pos == key.pos )
+			{
+				dependents.add( dep );
+			}
+		}
+	};
+	
+	
 	private HashMap<MemoKey, MemoEntry> memo;
-	private RuleInvocation ruleInvocationStack;
 	private Pattern junkPattern;
 	private HashSet<MemoEntry> dependencies;
 	protected DebugNode debugStack;
@@ -153,15 +135,10 @@ public class ParserState
 		if ( memoEntry == null )
 		{
 			// Create the memo-entry, and memoise
-			memoEntry = new MemoEntry( rule, start );
+			memoEntry = new MemoEntry( key );
 			memo.put( key, memoEntry );
 			
 			
-			// Create a rule invocation record, and push onto the rule invocation stack
-			ruleInvocationStack = new RuleInvocation( rule, memoEntry, ruleInvocationStack );
-			memoEntry.bEvaluating = true;
-			
-
 			// Take a copy of the dependencies, and clear the global list
 			HashSet<MemoEntry> deps = dependencies != null  ?  (HashSet<MemoEntry>)dependencies.clone()  :  null;
 			if ( dependencies != null )
@@ -170,6 +147,10 @@ public class ParserState
 			}
 			
 			
+			// Mark the rule is 'evaluating'
+			memoEntry.bEvaluating = true;
+			
+
 			// Evaluate the rule, at position @start
 			ParseResult answer = rule.evaluateString( this, (String)input, start, stop );
 			
@@ -202,8 +183,7 @@ public class ParserState
 				answer = growLeftRecursiveParse( rule, input, start, stop, memoEntry, answer );
 			}
 			
-			// Pop the rule invocation off the rule invocation stack
-			ruleInvocationStack = ruleInvocationStack.outerInvocation;
+			// Rule no longer evaluating, got an answer
 			memoEntry.bEvaluating = false;
 			memoEntry.answer = answer;
 			
@@ -250,9 +230,10 @@ public class ParserState
 			{
 				for (MemoEntry d: memoEntry.dependents)
 				{
-					memo.remove( new MemoKey( d.pos, d.rule ) );
+					memo.remove( d.key );
 				}
 			}
+			memoEntry.dependents = null;
 			
 			// Try re-evaluation
 			ParseResult res = rule.evaluateString( this, (String)input, start, stop );
