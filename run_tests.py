@@ -22,7 +22,6 @@ import Britefury.Tests.Britefury.Dispatch.TestObjectNodeMethodDispatch
 import GSymCore.Languages.Python25.CodeGenerator
 import GSymCore.Languages.Python25.Parser
 import GSymCore.Languages.Python25.Python25Importer
-import GSymCore.Languages.Python25.IdentityTransformation
 import GSymCore.Languages.Python25.Precedence
 import GSymCore.Languages.Java.Parser
 import GSymCore.Languages.LISP.Parser2

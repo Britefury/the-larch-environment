@@ -1472,7 +1472,7 @@ class TestCase_Python25Parser (ParserTestCase):
 	def testFnCallStStmt(self):
 		g = Python25Grammar()
 		self._matchTest( g.expression(), 'x.y()', Nodes.Call( target=Nodes.AttributeRef( target=Nodes.Load( name='x' ), name='y' ), args=[] ) )
-		self._matchTest( g.statement(), 'x.y()', Nodes.Call( target=Nodes.AttributeRef( target=Nodes.Load( name='x' ), name='y' ), args=[] ) )
+		self._matchTest( g.statement(), 'x.y()', Nodes.ExprStmt( expr=Nodes.Call( target=Nodes.AttributeRef( target=Nodes.Load( name='x' ), name='y' ), args=[] ) ) )
 
 
 
