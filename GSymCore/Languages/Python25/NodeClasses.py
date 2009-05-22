@@ -27,7 +27,7 @@ CompoundStmt = module.newClass( 'CompoundStmt', Stmt, [ 'suite' ] )
 #
 # Module, blank line, comment, unparsed
 #
-PythonModule = module.newClass( 'PythonModule', Node, [ 'contents' ] )
+PythonModule = module.newClass( 'PythonModule', Node, [ 'suite' ] )
 BlankLine = module.newClass( 'BlankLine', Node, [] )
 CommentStmt = module.newClass( 'CommentStmt', Stmt, [ 'comment' ] )
 UNPARSED = module.newClass( 'UNPARSED', Node, [ 'value' ] )

@@ -39,7 +39,7 @@ public class Selection implements MarkerListener
 	
 	public boolean isEmpty()
 	{
-		return marker0.equals( marker1 );
+		return marker0.equals( marker1 )  ||  !marker0.isValid()  ||  !marker1.isValid();
 	}
 	
 	

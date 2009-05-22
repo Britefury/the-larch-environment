@@ -589,7 +589,7 @@ class _ModuleImporter (_Importer):
 	
 	# Module
 	def Module(self, structTab, node):
-		return Nodes.PythonModule( contents=_flattenedCompound( structTab, node.body ) )
+		return Nodes.PythonModule( suite=_flattenedCompound( structTab, node.body ) )
 	
 	
 	
@@ -883,7 +883,7 @@ class ImporterTestCase (unittest.TestCase):
 		
 		
 	def testModule(self):
-		self._moduleTest( 'a ** b', Nodes.PythonModule( contents=[ Nodes.ExprStmt( expr=Nodes.Pow( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) ) ] ) )
+		self._moduleTest( 'a ** b', Nodes.PythonModule( suite=[ Nodes.ExprStmt( expr=Nodes.Pow( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) ) ] ) )
 
 	def testStmt(self):
 		self._stmtTest( 'a ** b', Nodes.ExprStmt( expr=Nodes.Pow( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) ) )

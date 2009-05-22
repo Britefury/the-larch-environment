@@ -137,9 +137,19 @@ public class Marker
 		if ( widget != null )
 		{
 			widget.unregisterMarker( this );
+			widget = null;
 			position = 0;
 			bias = Bias.START;
 			changed();
+		}
+		else
+		{
+			if ( position != 0  ||  bias != Bias.START )
+			{
+				position = 0;
+				bias = Bias.START;
+				changed();
+			}
 		}
 	}
 	

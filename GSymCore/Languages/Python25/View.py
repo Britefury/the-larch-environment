@@ -534,12 +534,12 @@ class Python25View (GSymViewObjectNodeDispatch):
 		
 	# MISC
 	@ObjectNodeDispatchMethod
-	def PythonModule(self, ctx, state, node, contents):
-		lineViews = ctx.mapViewEvalFn( contents, None, python25ViewState( PRECEDENCE_NONE, self._parser.statement(), MODE_EDITSTATEMENT ) )
+	def PythonModule(self, ctx, state, node, suite):
+		lineViews = ctx.mapViewEvalFn( suite, None, python25ViewState( PRECEDENCE_NONE, self._parser.statement(), MODE_EDITSTATEMENT ) )
 		#newLineFac = lambda index, child: ctx.whitespace( '\n' )
 		def newLineFac(index, child):
 			w = ctx.whitespace( '\n' )
-			listener = NewLineTextRepresentationListener( self._parser.statement(), contents, index, lineViews[index], lineViews[index+1]   if index+1 < len(lineViews)   else   None )
+			listener = NewLineTextRepresentationListener( self._parser.statement(), suite, index, lineViews[index], lineViews[index+1]   if index+1 < len(lineViews)   else   None )
 			return ctx.textRepresentationListener( w, listener )
 		return ctx.listView( module_listViewLayout, None, None, newLineFac, lineViews )
 
@@ -1584,7 +1584,29 @@ def _getStatementContextFromElement(element):
 	return context
 
 
+def _getParentStatementContext(ctx):
+	ctx = ctx.getParent()
+	while ctx is not None  and  not _isStmt( ctx.getDocNode() )  and  not ctx.getDocNode().isInstanceOf( Nodes.PythonModule ):
+		ctx = ctx.getParent()
+	return ctx
 
+def _getStatementContextPath(ctx):
+	path = []
+	while ctx is not None:
+		path.insert( 0, ctx )
+		ctx = _getParentStatementContext( ctx )
+	return path
+
+def _getStatementContextPathsFromCommonRoot(ctx0, ctx1):
+	path0 = _getStatementContextPath( ctx0 )
+	path1 = _getStatementContextPath( ctx1 )
+	for i, ( p0, p1 ) in enumerate( zip( path0, path1 ) ):
+		if p0 is not p1:
+			del path0[:i-1]
+			del path1[:i-1]
+			break
+	return path0, path1
+		
 	
 	
 	
@@ -1600,32 +1622,60 @@ class Python25EditHandler (EditHandler):
 		selection = self._viewContext.getSelection()
 		startMarker = selection.getStartMarker()
 		endMarker = selection.getEndMarker()
+		
+		# Get the statements that contain the start and end markers
 		startContext = _getStatementContextFromElement( startMarker.getElement() )
 		endContext = _getStatementContextFromElement( endMarker.getElement() )
-		if startContext is endContext:
-			stmtElement = startContext.getViewNodeContentElement()
-			textBefore = stmtElement.getTextRepresentationFromStartToMarker( startMarker )
-			textAfter = stmtElement.getTextRepresentationFromMarkerToEnd( endMarker )
-			line = textBefore + textAfter
-			line = line.strip( '\n' )
-			
-			lineDoc = None
-			
-			if line.strip() == '':
-				# Blank line
-				lineDoc = Nodes.BlankLine()
+		# Get the statement elements
+		startStmtElement = startContext.getViewNodeContentElement()
+		endStmtElement = endContext.getViewNodeContentElement()
+		# Get the text before and after the selection
+		textBefore = startStmtElement.getTextRepresentationFromStartToMarker( startMarker )
+		textAfter = endStmtElement.getTextRepresentationFromMarkerToEnd( endMarker )
+		
+		# Compose a new line of text, and parse it
+		line = textBefore + textAfter
+		line = line.strip( '\n' )
+		
+		lineDoc = None
+		
+		if line.strip() == '':
+			# Blank line
+			lineDoc = Nodes.BlankLine()
+		else:
+			# Parse
+			parsed = _parseText( self._grammar.statement(), line )
+			if parsed is None:
+				# Parse failure; unparsed text
+				lineDoc = Nodes.UNPARSED( value=line )
 			else:
-				# Parse
-				parsed = _parseText( self._grammar.statement(), line )
-				if parsed is None:
-					# Parse failure; unparsed text
-					lineDoc = Nodes.UNPARSED( value=line )
-				else:
-					# Parsed
-					lineDoc = parsed
-			
-			replace( startContext, startContext.getTreeNode(), lineDoc )
+				# Parsed
+				lineDoc = parsed
+				
+				
+				
+		# Now, insert the parsed text into the document		
+		if startContext is endContext:
+			# Selection is within a single statement
+			pyReplaceStatement( startContext, startContext.getTreeNode(), lineDoc )
 			selection.clear()
+		else:
+			path0, path1 = _getStatementContextPathsFromCommonRoot( startContext, endContext )
+			
+			if len( path0 ) == 2  and  len( path1 ) == 2:
+				# Markers are in two statements, whose parents are the same suite
+				commonRoot = path0[0]
+				
+				suite = commonRoot.getDocNode()['suite']
+				startIndex = suite.indexOf( startContext.getDocNode() )
+				endIndex = suite.indexOf( endContext.getDocNode() )
+				
+				selection.clear()
+				pyReplaceStatement( startContext, endContext.getTreeNode(), lineDoc )
+				del suite[startIndex:endIndex]
+			else:
+				# More complicated configuration
+				pass
 	
 			
 	def replaceSelection(self, replacement):
@@ -1633,7 +1683,7 @@ class Python25EditHandler (EditHandler):
 	
 	def editCopy(self):
 		print 'Copying selection:'
-		print self._tree.getTextRepresentationInSelection( self._viewContext.getSelection() )
+		print self._viewContext.getElementTree().getTextRepresentationInSelection( self._viewContext.getSelection() )
 	
 	def editCut(self):
 		pass
