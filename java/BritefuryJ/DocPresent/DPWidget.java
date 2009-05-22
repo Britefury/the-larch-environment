@@ -455,6 +455,11 @@ abstract public class DPWidget
 			
 			int minLength = Math.min( p0.size(), p1.size() );
 			
+			if ( p0.get( 0 ) != p1.get( 0 ) )
+			{
+				throw new RuntimeException( "Bad path" );
+			}
+			
 			int numCommonWidgets = 0;
 			
 			for (int i = 0; i < minLength; i++)
@@ -467,8 +472,8 @@ abstract public class DPWidget
 				}
 			}
 			
-			path0.addAll( p0.subList( numCommonWidgets, p0.size() ) );
-			path1.addAll( p1.subList( numCommonWidgets, p1.size() ) );
+			path0.addAll( p0.subList( numCommonWidgets - 1, p0.size() ) );
+			path1.addAll( p1.subList( numCommonWidgets - 1, p1.size() ) );
 		}
 	}
 	

@@ -596,8 +596,8 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 	
 	# Module
 	@ObjectNodeDispatchMethod
-	def PythonModule(self, node, contents):
-		return '\n'.join( [ self( line )   for line in content ] )
+	def PythonModule(self, node, suite):
+		return '\n'.join( [ self( line )   for line in suite ] )
 
 	
 

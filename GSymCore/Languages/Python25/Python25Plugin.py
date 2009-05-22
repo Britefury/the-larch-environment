@@ -12,7 +12,7 @@ from GSymCore.Languages.Python25 import NodeClasses as Nodes
 
 
 def py25New():
-	return GSymUnit( 'GSymCore.Languages.Python25.Python25', Nodes.PythonModule( contents=[ Nodes.CommentStmt( comment='New Python 2.5 document' ) ] ) )
+	return GSymUnit( 'GSymCore.Languages.Python25.Python25', Nodes.PythonModule( suite=[ Nodes.CommentStmt( comment='New Python 2.5 document' ) ] ) )
 
 def py25ImportFile(filename):
 	content = importPy25File( filename )

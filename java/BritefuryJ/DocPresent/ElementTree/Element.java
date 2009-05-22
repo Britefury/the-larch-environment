@@ -242,8 +242,8 @@ public abstract class Element
 				}
 			}
 			
-			path0.addAll( p0.subList( numCommonElements, p0.size() ) );
-			path1.addAll( p1.subList( numCommonElements, p1.size() ) );
+			path0.addAll( p0.subList( numCommonElements - 1, p0.size() ) );
+			path1.addAll( p1.subList( numCommonElements - 1, p1.size() ) );
 		}
 	}
 

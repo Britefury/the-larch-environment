@@ -105,9 +105,9 @@ class DocAnalyser (object):
 	
 	
 	@ObjectNodeDispatchMethod
-	def PythonModule(self, node, contents):
+	def PythonModule(self, node, suite):
 		module = Python25ModuleInfo( node )
-		for x in contents:
+		for x in suite:
 			_moduleAnalyser( module, x )
 	
 	
