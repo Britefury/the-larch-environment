@@ -1661,21 +1661,58 @@ class Python25EditHandler (EditHandler):
 			selection.clear()
 		else:
 			path0, path1 = _getStatementContextPathsFromCommonRoot( startContext, endContext )
+			commonRoot = path0[0]
+			selection.clear()
 			
-			if len( path0 ) == 2  and  len( path1 ) == 2:
-				# Markers are in two statements, whose parents are the same suite
-				commonRoot = path0[0]
-				
-				suite = commonRoot.getDocNode()['suite']
-				startIndex = suite.indexOf( startContext.getDocNode() )
-				endIndex = suite.indexOf( endContext.getDocNode() )
-				
-				selection.clear()
-				pyReplaceStatement( startContext, endContext.getTreeNode(), lineDoc )
-				del suite[startIndex:endIndex]
+			if len( path0 ) == 1:
+				# Start marker is in the header of a compound statement
+				assert len( path1 ) > 1
 			else:
-				# More complicated configuration
-				pass
+				# Replace the line at @startContext with the new line
+				# and delete its remaining siblings
+				suite = path0[-2].getDocNode()['suite']
+				startIndex = suite.indexOf( startContext.getDocNode() )
+				
+				del suite[startIndex+1:]
+				pyReplaceStatement( commonRoot, startContext.getTreeNode(), lineDoc )
+				
+				
+				if len( path0 ) > 3:
+					# For each parent-child pair in path0 between the common root and @startContext (but not inclusive)
+					# delete all subsequent siblings
+					for childContext, parentContext in zip( reversed( path0[2:-1] ), reversed( path0[1:-2] ) ):
+						suite = parentContext.getDocNode()['suite']
+						startIndex = suite.indexOf( childContext.getDocNode() )
+						
+						del suite[startIndex+1:]
+						
+						
+			if len( path1 ) == 2:
+				# End marker is a child of @commonRoot
+				suite = commonRoot.getDocNode()['suite']
+				startIndex = suite.indexOf( path0[1].getDocNode() )
+				endIndex = suite.indexOf( endContext.getDocNode() )
+				del suite[startIndex+1:endIndex+1]
+			else:
+				# Delete statements from @commonRoot that lie between the start and end paths
+				suite = commonRoot.getDocNode()['suite']
+				startIndex = suite.indexOf( path0[1].getDocNode() )
+				endIndex = suite.indexOf( path1[1].getDocNode() )
+				del suite[startIndex+1:endIndex]
+				
+				if len( path1 ) > 3:
+					# For each parent-child pair in path0 between the common root and @startContext (but not inclusive)
+					# delete all subsequent siblings
+					for childContext, parentContext in zip( reversed( path1[2:-1] ), reversed( path1[1:-2] ) ):
+						suite = parentContext.getDocNode()['suite']
+						endIndex = suite.indexOf( childContext.getDocNode() )
+						del suite[:endIndex]
+				
+				# Delete all statements up to and including the one at @endContext from @endContext's parent
+				endParent = path1[-2]
+				suite = endParent.getDocNode()['suite']
+				endIndex = suite.indexOf( endContext.getDocNode() )
+				del suite[:endIndex+1]
 	
 			
 	def replaceSelection(self, replacement):
