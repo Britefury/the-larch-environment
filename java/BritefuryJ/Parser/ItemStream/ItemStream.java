@@ -176,8 +176,6 @@ public class ItemStream
 			
 			Item subItems[];
 			
-			System.out.println( startIndex + ", " + stopIndex + " : " + start + "->" + stop + " ; " + items[stopIndex].start );
-			
 			if ( stop > items[stopIndex].start )
 			{
 				subItems = new Item[stopIndex+1-startIndex];
