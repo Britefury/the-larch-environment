@@ -161,37 +161,50 @@ public class ItemStream
 	
 	public ItemStream subStream(int start, int stop)
 	{
-		int startIndex = itemIndexAt( start );
-		int stopIndex = itemIndexAt( stop );
-		
-		Item subItems[];
-		
-		if ( stop > items[stopIndex].start )
+		if ( items.length == 0 )
 		{
-			subItems = new Item[stopIndex+1-startIndex];
+			return this;
+		}
+		else if ( start == stop )
+		{
+			return new ItemStream( new Item[] {} );
 		}
 		else
 		{
-			subItems = new Item[stopIndex-startIndex];
+			int startIndex = itemIndexAt( start );
+			int stopIndex = itemIndexAt( stop );
+			
+			Item subItems[];
+			
+			System.out.println( startIndex + ", " + stopIndex + " : " + start + "->" + stop + " ; " + items[stopIndex].start );
+			
+			if ( stop > items[stopIndex].start )
+			{
+				subItems = new Item[stopIndex+1-startIndex];
+			}
+			else
+			{
+				subItems = new Item[stopIndex-startIndex];
+			}
+			
+			int pos = 0;
+			subItems[0] = items[startIndex].subItemFrom( start, 0 );
+			pos = subItems[0].stop;
+			
+			for (int i = startIndex + 1; i < stopIndex; i++)
+			{
+				Item subItem = items[i].copyAt( pos );
+				subItems[i-startIndex] = subItem;
+				pos = subItem.stop;
+			}
+			
+			if ( stop > items[stopIndex].start )
+			{
+				subItems[stopIndex-startIndex] = items[stopIndex].subItemTo( stop, pos );
+			}
+			
+			return new ItemStream( subItems );
 		}
-		
-		int pos = 0;
-		subItems[0] = items[startIndex].subItemFrom( start, 0 );
-		pos = subItems[0].stop;
-		
-		for (int i = startIndex + 1; i < stopIndex; i++)
-		{
-			Item subItem = items[i].copyAt( pos );
-			subItems[i-startIndex] = subItem;
-			pos = subItem.stop;
-		}
-		
-		if ( stop > items[stopIndex].start )
-		{
-			subItems[stopIndex-startIndex] = items[stopIndex].subItemTo( stop, pos );
-		}
-		
-		return new ItemStream( subItems );
 	}
 	
 	
