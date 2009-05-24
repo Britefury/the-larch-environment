@@ -8,7 +8,9 @@ package BritefuryJ.Parser.Utils.OperatorParser;
 
 import java.util.List;
 
+import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
+
 public interface InfixChainParseAction
 {
-	public Object invoke(String input, int begin, Object x, List<Object> ys);
+	public Object invoke(ItemStreamAccessor input, int begin, Object x, List<Object> ys);
 }

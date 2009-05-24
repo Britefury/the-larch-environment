@@ -14,6 +14,7 @@ import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
 import BritefuryJ.Parser.ParseAction;
 import BritefuryJ.Parser.ParserExpression;
+import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
 
 public class UnaryOperator extends Operator
 {
@@ -35,7 +36,7 @@ public class UnaryOperator extends Operator
 		}
 		
 		
-		public Object invoke(String input, int begin, Object x)
+		public Object invoke(ItemStreamAccessor input, int begin, Object x)
 		{
 			try
 			{
@@ -58,7 +59,7 @@ public class UnaryOperator extends Operator
 			this.callable = callable;
 		}
 
-		public Object invoke(String input, int begin, Object x)
+		public Object invoke(ItemStreamAccessor input, int begin, Object x)
 		{
 			return callable.__call__( Py.java2py( input ), new PyInteger( begin ), Py.java2py( x ) );
 		}
@@ -83,7 +84,7 @@ public class UnaryOperator extends Operator
 		}
 		
 
-		public Object buildResult(String input, int begin, Object x)
+		public Object buildResult(ItemStreamAccessor input, int begin, Object x)
 		{
 			return action.invoke( input, begin, x );
 		}
@@ -101,7 +102,7 @@ public class UnaryOperator extends Operator
 		}
 		
 		
-		public Object invoke(String input, int begin, Object x)
+		public Object invoke(ItemStreamAccessor input, int begin, Object x)
 		{
 			return new UnaryOperatorResultBuilder( action, begin );
 		}

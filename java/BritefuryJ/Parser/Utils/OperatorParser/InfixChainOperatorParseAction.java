@@ -6,7 +6,9 @@
 //##************************
 package BritefuryJ.Parser.Utils.OperatorParser;
 
+import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
+
 public interface InfixChainOperatorParseAction
 {
-	public Object invoke(String input, int begin, Object x);
+	public Object invoke(ItemStreamAccessor input, int begin, Object x);
 }

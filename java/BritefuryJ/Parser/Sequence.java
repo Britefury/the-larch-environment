@@ -9,6 +9,8 @@ package BritefuryJ.Parser;
 import java.util.ArrayList;
 import java.util.List;
 
+import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
+
 public class Sequence extends BranchExpression
 {
 	public Sequence(ParserExpression[] subexps)
@@ -27,19 +29,14 @@ public class Sequence extends BranchExpression
 	}
 	
 	
-	protected ParseResult parseString(ParserState state, String input, int start, int stop)
+	protected ParseResult parseStream(ParserState state, ItemStreamAccessor input, int start)
 	{
 		ArrayList<Object> value = new ArrayList<Object>();
 		
 		int pos = start;
 		for (int i = 0; i < subexps.length; i++)
 		{
-			if ( pos > stop )
-			{
-				return ParseResult.failure( pos );
-			}
-			
-			ParseResult result = subexps[i].evaluateString(  state, input, pos, stop );
+			ParseResult result = subexps[i].evaluateStream(  state, input, pos );
 			pos = result.end;
 			
 			if ( !result.isValid() )

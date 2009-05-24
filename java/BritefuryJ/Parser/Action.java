@@ -10,6 +10,8 @@ import org.python.core.Py;
 import org.python.core.PyInteger;
 import org.python.core.PyObject;
 
+import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
+
 public class Action extends UnaryBranchExpression
 {
 	private static class PyAction implements ParseAction
@@ -23,7 +25,7 @@ public class Action extends UnaryBranchExpression
 		}
 
 
-		public Object invoke(String input, int begin, Object x)
+		public Object invoke(ItemStreamAccessor input, int begin, Object x)
 		{
 			return callable.__call__( Py.java2py( input ), new PyInteger( begin ), Py.java2py( x ) );
 		}
@@ -63,13 +65,13 @@ public class Action extends UnaryBranchExpression
 	}
 	
 
-	protected ParseResult parseString(ParserState state, String input, int start, int stop)
+	protected ParseResult parseStream(ParserState state, ItemStreamAccessor input, int start)
 	{
-		ParseResult res = subexp.evaluateString( state, input, start, stop );
+		ParseResult res = subexp.evaluateStream( state, input, start );
 		
 		if ( res.isValid() )
 		{
-			return res.withValidUnsuppressedValue( a.invoke(  input, res.begin, res.value ) );
+			return res.withValidUnsuppressedValue( a.invoke( input, res.begin, res.value ) );
 		}
 		else
 		{

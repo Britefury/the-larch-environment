@@ -8,6 +8,8 @@ package BritefuryJ.Parser;
 
 import java.util.ArrayList;
 
+import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
+
 public class Repetition extends UnaryBranchExpression
 {
 	protected int minRepetitions, maxRepetitions;
@@ -58,7 +60,7 @@ public class Repetition extends UnaryBranchExpression
 	}
 	
 
-	protected ParseResult parseString(ParserState state, String input, int start, int stop)
+	protected ParseResult parseStream(ParserState state, ItemStreamAccessor input, int start)
 	{
 		ArrayList<Object> values = new ArrayList<Object>();
 		
@@ -66,9 +68,9 @@ public class Repetition extends UnaryBranchExpression
 		int errorPos = start;
 		int i = 0;
 		
-		while ( pos <= stop  &&  ( maxRepetitions == -1  ||  i < maxRepetitions ) )
+		while ( ( maxRepetitions == -1  ||  i < maxRepetitions ) )
 		{
-			ParseResult res = subexp.evaluateString( state, input, pos, stop );
+			ParseResult res = subexp.evaluateStream( state, input, pos );
 			errorPos = res.end;
 			
 			if ( !res.isValid() )

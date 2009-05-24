@@ -13,6 +13,7 @@ import org.python.core.PyObject;
 import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
 import BritefuryJ.Parser.ParserExpression;
+import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
 
 public class BinaryOperator extends Operator
 {
@@ -39,7 +40,7 @@ public class BinaryOperator extends Operator
 		}
 		
 		
-		public Object invoke(String input, int begin, Object x, Object y)
+		public Object invoke(ItemStreamAccessor input, int begin, Object x, Object y)
 		{
 			try
 			{
@@ -62,7 +63,7 @@ public class BinaryOperator extends Operator
 			this.callable = callable;
 		}
 
-		public Object invoke(String input, int begin, Object x, Object y)
+		public Object invoke(ItemStreamAccessor input, int begin, Object x, Object y)
 		{
 			return callable.__call__( Py.java2py( input ), new PyInteger( begin ), Py.java2py( x ), Py.java2py( y ) );
 		}

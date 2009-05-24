@@ -14,6 +14,7 @@ import BritefuryJ.Parser.DebugParseResult;
 import BritefuryJ.Parser.Literal;
 import BritefuryJ.Parser.ParserExpression;
 import BritefuryJ.Parser.Production;
+import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
 import BritefuryJ.Parser.Utils.Tokens;
 import BritefuryJ.ParserDebugViewer.ParseViewFrame;
 
@@ -87,7 +88,7 @@ public class OperatorTable
 	{
 		BinaryOperatorParseAction mulAction = new BinaryOperatorParseAction()
 		{
-			public Object invoke(String input, int begin, Object left, Object right)
+			public Object invoke(ItemStreamAccessor input, int begin, Object left, Object right)
 			{
 				return Arrays.asList( new Object[] { '*', left, right } );
 			}
@@ -95,7 +96,7 @@ public class OperatorTable
 
 		UnaryOperatorParseAction notAction = new UnaryOperatorParseAction()
 		{
-			public Object invoke(String input, int begin, Object x)
+			public Object invoke(ItemStreamAccessor input, int begin, Object x)
 			{
 				return Arrays.asList( new Object[] { '!', x } );
 			}

@@ -8,33 +8,22 @@ package BritefuryJ.Parser;
 
 import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
 
-public class Literal extends ParserExpression
+public class StructuralItem extends ParserExpression
 {
-	protected String matchString;
-	
-	
-	public Literal(String matchString)
+	public StructuralItem()
 	{
-		this.matchString = matchString;
 	}
-	
-	
-	public String getMatchString()
-	{
-		return matchString;
-	}
-	
 	
 	
 	protected ParseResult parseStream(ParserState state, ItemStreamAccessor input, int start)
 	{
 		start = state.skipJunkChars( input, start );
 		
-		int end = input.consumeString( start, matchString );
+		Object value[] = input.matchStructuralNode( start );
 		
-		if ( end != -1 )
+		if ( value != null )
 		{
-			return new ParseResult( matchString, start, end );
+			return new ParseResult( value[0], start, start + 1 );
 		}
 		
 		return ParseResult.failure( start );
@@ -43,10 +32,9 @@ public class Literal extends ParserExpression
 	
 	public boolean compareTo(ParserExpression x)
 	{
-		if ( x instanceof Literal )
+		if ( x instanceof StructuralItem )
 		{
-			Literal xl = (Literal)x;
-			return matchString.equals( xl.matchString );
+			return true;
 		}
 		else
 		{
@@ -56,6 +44,6 @@ public class Literal extends ParserExpression
 	
 	public String toString()
 	{
-		return "Literal( \"" + matchString + "\" )";
+		return "StructuralNode()";
 	}
 }

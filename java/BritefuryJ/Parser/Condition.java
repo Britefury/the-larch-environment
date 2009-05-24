@@ -10,6 +10,8 @@ import org.python.core.Py;
 import org.python.core.PyInteger;
 import org.python.core.PyObject;
 
+import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
+
 public class Condition extends UnaryBranchExpression
 {
 	private static class PyCondition implements ParseCondition
@@ -23,7 +25,7 @@ public class Condition extends UnaryBranchExpression
 		}
 
 
-		public boolean test(String input, int begin, Object x)
+		public boolean test(ItemStreamAccessor input, int begin, Object x)
 		{
 			return Py.py2boolean( callable.__call__( Py.java2py( input ), new PyInteger( begin ), Py.java2py( x ) ) );
 		}
@@ -65,9 +67,9 @@ public class Condition extends UnaryBranchExpression
 	}
 	
 
-	protected ParseResult parseString(ParserState state, String input, int start, int stop)
+	protected ParseResult parseStream(ParserState state, ItemStreamAccessor input, int start)
 	{
-		ParseResult res = subexp.evaluateString( state, input, start, stop );
+		ParseResult res = subexp.evaluateStream( state, input, start );
 		
 		if ( res.isValid() )
 		{

@@ -20,6 +20,7 @@ import BritefuryJ.Parser.ParseAction;
 import BritefuryJ.Parser.ParserExpression;
 import BritefuryJ.Parser.Production;
 import BritefuryJ.Parser.Sequence;
+import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
 
 public class InfixChainLevel extends OperatorLevel
 {
@@ -47,7 +48,7 @@ public class InfixChainLevel extends OperatorLevel
 		}
 		
 		
-		public Object invoke(String input, int begin, Object x, List<Object> ys)
+		public Object invoke(ItemStreamAccessor input, int begin, Object x, List<Object> ys)
 		{
 			try
 			{
@@ -71,7 +72,7 @@ public class InfixChainLevel extends OperatorLevel
 			this.callable = callable;
 		}
 
-		public Object invoke(String input, int begin, Object x, List<Object> ys)
+		public Object invoke(ItemStreamAccessor input, int begin, Object x, List<Object> ys)
 		{
 			return callable.__call__( Py.java2py( input ), new PyInteger( begin ), Py.java2py( x ), Py.java2py( ys ) );
 		}
@@ -93,7 +94,7 @@ public class InfixChainLevel extends OperatorLevel
 		
 		
 		@SuppressWarnings("unchecked")
-		public Object invoke(String input, int begin, Object x)
+		public Object invoke(ItemStreamAccessor input, int begin, Object x)
 		{
 			List<Object> xs = (List<Object>)x;
 			List<Object> ys = (List<Object>)xs.get( 1 );
@@ -125,7 +126,7 @@ public class InfixChainLevel extends OperatorLevel
 		}
 		
 		
-		public Object invoke(String input, int begin, Object x)
+		public Object invoke(ItemStreamAccessor input, int begin, Object x)
 		{
 			try
 			{
@@ -149,7 +150,7 @@ public class InfixChainLevel extends OperatorLevel
 			this.callable = callable;
 		}
 
-		public Object invoke(String input, int begin, Object x)
+		public Object invoke(ItemStreamAccessor input, int begin, Object x)
 		{
 			return callable.__call__( Py.java2py( input ), new PyInteger( begin ), Py.java2py( x ) );
 		}
@@ -170,7 +171,7 @@ public class InfixChainLevel extends OperatorLevel
 		
 		
 		@SuppressWarnings("unchecked")
-		public Object invoke(String input, int begin, Object x)
+		public Object invoke(ItemStreamAccessor input, int begin, Object x)
 		{
 			List<Object> xs = (List<Object>)x;
 

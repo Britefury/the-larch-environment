@@ -13,6 +13,8 @@ import org.python.core.Py;
 import org.python.core.PyInteger;
 import org.python.core.PyObject;
 
+import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
+
 public class SeparatedList extends ParserExpression
 {
 	public enum TrailingSeparatorPolicy
@@ -25,7 +27,7 @@ public class SeparatedList extends ParserExpression
 	
 	public static interface ListCondition
 	{
-		public boolean test(String input, int begin, List<Object> elements, boolean bGotTrailingSeparator);
+		public boolean test(ItemStreamAccessor input, int begin, List<Object> elements, boolean bGotTrailingSeparator);
 	}
 	
 	private static class PyListCondition implements ListCondition
@@ -37,7 +39,7 @@ public class SeparatedList extends ParserExpression
 			this.callable = callable;
 		}
 		
-		public boolean test(String input, int begin, List<Object> elements, boolean bGotTrailingSeparator)
+		public boolean test(ItemStreamAccessor input, int begin, List<Object> elements, boolean bGotTrailingSeparator)
 		{
 			return Py.py2boolean( callable.__call__( Py.java2py( input ), new PyInteger( begin ), Py.java2py( elements ), Py.java2py( bGotTrailingSeparator ) ) );
 		}
@@ -56,7 +58,7 @@ public class SeparatedList extends ParserExpression
 	
 	public static interface ListAction
 	{
-		public Object invoke(String input, int begin, List<Object> elements, boolean bGotTrailingSeparator);
+		public Object invoke(ItemStreamAccessor input, int begin, List<Object> elements, boolean bGotTrailingSeparator);
 	}
 	
 	private static class PyListAction implements ListAction
@@ -68,7 +70,7 @@ public class SeparatedList extends ParserExpression
 			this.callable = callable;
 		}
 		
-		public Object invoke(String input, int begin, List<Object> elements, boolean bGotTrailingSeparator)
+		public Object invoke(ItemStreamAccessor input, int begin, List<Object> elements, boolean bGotTrailingSeparator)
 		{
 			return callable.__call__( Py.java2py( input ), new PyInteger( begin ), Py.java2py( elements ), Py.java2py( bGotTrailingSeparator ) );
 		}
@@ -184,7 +186,7 @@ public class SeparatedList extends ParserExpression
 
 	
 	
-	protected ParseResult parseString(ParserState state, String input, int start, int stop)
+	protected ParseResult parseStream(ParserState state, ItemStreamAccessor input, int start)
 	{
 		ArrayList<Object> values = new ArrayList<Object>();
 		
@@ -196,7 +198,7 @@ public class SeparatedList extends ParserExpression
 		// Consume the begin delimiter
 		if ( beginDelim != null )
 		{
-			ParseResult res = beginDelim.evaluateString( state, input, pos, stop );
+			ParseResult res = beginDelim.evaluateStream( state, input, pos );
 			errorPos = res.end;
 			
 			if ( res.isValid() )
@@ -214,12 +216,12 @@ public class SeparatedList extends ParserExpression
 		// Consume the contents of the list
 		boolean bGotTrailingSeparator = false;
 		int elementPos = pos;
-		while ( pos <= stop  &&  ( i < maxElements  ||  maxElements == -1 ) )
+		while ( ( i < maxElements  ||  maxElements == -1 ) )
 		{
 			int itemPos = pos;
 			
 			// Consume the element
-			ParseResult res = element.evaluateString( state, input, itemPos, stop );
+			ParseResult res = element.evaluateStream( state, input, itemPos );
 			errorPos = res.end;
 			
 			if ( res.isValid() )
@@ -250,7 +252,7 @@ public class SeparatedList extends ParserExpression
 			
 			
 			// Try to consume a separator
-			ParseResult sepRes = separator.evaluateString( state, input, itemPos, stop );
+			ParseResult sepRes = separator.evaluateStream( state, input, itemPos );
 			
 			if ( sepRes.isValid() )
 			{
@@ -312,7 +314,7 @@ public class SeparatedList extends ParserExpression
 			// Consume the end delimiter
 			if ( endDelim != null )
 			{
-				ParseResult res = endDelim.evaluateString( state, input, pos, stop );
+				ParseResult res = endDelim.evaluateStream( state, input, pos );
 				errorPos = res.end;
 				
 				if ( res.isValid() )

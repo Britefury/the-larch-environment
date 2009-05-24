@@ -12,6 +12,8 @@ import java.util.List;
 
 import BritefuryJ.DocModel.DMModule;
 import BritefuryJ.DocModel.DMModuleResolver;
+import BritefuryJ.DocModel.DMObjectClass;
+import BritefuryJ.DocModel.DMModule.ClassAlreadyDefinedException;
 import BritefuryJ.Parser.Action;
 import BritefuryJ.Parser.BestChoice;
 import BritefuryJ.Parser.Choice;
@@ -32,9 +34,13 @@ import BritefuryJ.Parser.RegEx;
 import BritefuryJ.Parser.Repetition;
 import BritefuryJ.Parser.SeparatedList;
 import BritefuryJ.Parser.Sequence;
+import BritefuryJ.Parser.StructuralItem;
+import BritefuryJ.Parser.StructuralObject;
 import BritefuryJ.Parser.Suppress;
 import BritefuryJ.Parser.Word;
 import BritefuryJ.Parser.ZeroOrMore;
+import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
+import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
 import BritefuryJ.Parser.ParserExpression.ParserCoerceException;
 import BritefuryJ.Parser.SeparatedList.CannotApplyConditionAfterActionException;
 import BritefuryJ.Parser.SeparatedList.CannotApplyMoreThanOneActionException;
@@ -155,11 +161,64 @@ public class Test_Parser extends ParserTestCase
 	}
 	
 	
+	public void testStructuralNode()
+	{
+		assertTrue( new StructuralItem().compareTo( new StructuralItem() ) );
+
+		ItemStreamBuilder builder1 = new ItemStreamBuilder();
+		builder1.appendStructuralValue( new Integer( 12 ) );
+		
+		ItemStreamBuilder builder2 = new ItemStreamBuilder();
+		builder2.appendStructuralValue( new Integer( 12 ) );
+		builder2.appendStructuralValue( new Integer( 13 ) );
+
+		matchTest( new StructuralItem(), builder1.stream(), new Integer( 12 ) );
+		matchSubTest( new StructuralItem(), builder2.stream(), new Integer( 12 ), 1 );
+	}
+
+
+	public void testStructuralObject() throws ClassAlreadyDefinedException
+	{
+		DMObjectClass A = M.newClass( "A", new String[] {} );
+		DMObjectClass B = M.newClass( "B", A, new String[] {} );
+
+		assertTrue( new StructuralObject( A ).compareTo( new StructuralObject( A ) ) );
+		assertFalse( new StructuralObject( A ).compareTo( new StructuralObject( B ) ) );
+
+		ItemStreamBuilder builder1 = new ItemStreamBuilder();
+		builder1.appendStructuralValue( A.newInstance() );
+		
+		matchTest( new StructuralObject( A ), builder1.stream(), A.newInstance() );
+		matchFailTest( new StructuralObject( B ), builder1.stream() );
+		
+		
+		ItemStreamBuilder builder2 = new ItemStreamBuilder();
+		builder2.appendStructuralValue( A.newInstance() );
+		builder2.appendTextValue( " : " );
+		builder2.appendStructuralValue( B.newInstance() );
+
+		ItemStreamBuilder builder3 = new ItemStreamBuilder();
+		builder3.appendStructuralValue( B.newInstance() );
+		builder3.appendTextValue( " : " );
+		builder3.appendStructuralValue( B.newInstance() );
+
+		ItemStreamBuilder builder4 = new ItemStreamBuilder();
+		builder4.appendStructuralValue( A.newInstance() );
+		builder4.appendTextValue( " : " );
+		builder4.appendStructuralValue( A.newInstance() );
+
+		ParserExpression parser = new Sequence( new ParserExpression[] { new StructuralObject( A ), new Literal( ":" ), new StructuralObject( B ) } );
+		matchTest( parser, builder2.stream(), Arrays.asList( new Object[] { A.newInstance(), ":", B.newInstance() } ) );
+		matchTest( parser, builder3.stream(), Arrays.asList( new Object[] { B.newInstance(), ":", B.newInstance() } ) );
+		matchFailTest( parser, builder4.stream() );
+	}
+
+
 	public void testAction() throws ParserExpression.ParserCoerceException
 	{
 		ParseAction f = new ParseAction()
 		{
-			public Object invoke(String input, int begin, Object value)
+			public Object invoke(ItemStreamAccessor input, int begin, Object value)
 			{
 				String v = (String)value;
 				return v + v;
@@ -168,7 +227,7 @@ public class Test_Parser extends ParserTestCase
 
 		ParseAction g = new ParseAction()
 		{
-			public Object invoke(String input, int begin, Object value)
+			public Object invoke(ItemStreamAccessor input, int begin, Object value)
 			{
 				String v = (String)value;
 				return v + v + v;
@@ -190,7 +249,7 @@ public class Test_Parser extends ParserTestCase
 	{
 		ParseCondition f = new ParseCondition()
 		{
-			public boolean test(String input, int begin, Object value)
+			public boolean test(ItemStreamAccessor input, int begin, Object value)
 			{
 				String v = (String)value;
 				return v.startsWith( "hello" );
@@ -199,7 +258,7 @@ public class Test_Parser extends ParserTestCase
 
 		ParseCondition g = new ParseCondition()
 		{
-			public boolean test(String input, int begin, Object value)
+			public boolean test(ItemStreamAccessor input, int begin, Object value)
 			{
 				String v = (String)value;
 				return v.startsWith( "there" );
@@ -539,7 +598,7 @@ public class Test_Parser extends ParserTestCase
 		
 		SeparatedList.ListCondition condition = new SeparatedList.ListCondition()
 		{
-			public boolean test(String input, int begin, List<Object> elements, boolean gotTrailingSeparator)
+			public boolean test(ItemStreamAccessor input, int begin, List<Object> elements, boolean gotTrailingSeparator)
 			{
 				return elements.size() % 2  ==  0;
 			}
@@ -547,7 +606,7 @@ public class Test_Parser extends ParserTestCase
 		
 		SeparatedList.ListAction action = new SeparatedList.ListAction()
 		{
-			public Object invoke(String input, int begin, List<Object> elements, boolean gotTrailingSeparator)
+			public Object invoke(ItemStreamAccessor input, int begin, List<Object> elements, boolean gotTrailingSeparator)
 			{
 				if ( gotTrailingSeparator )
 				{
@@ -781,7 +840,7 @@ public class Test_Parser extends ParserTestCase
 		ParseAction flattenAction = new ParseAction()
 		{
 			@SuppressWarnings("unchecked")
-			public Object invoke(String input, int begin, Object x)
+			public Object invoke(ItemStreamAccessor input, int begin, Object x)
 			{
 				ArrayList<Object> y = new ArrayList<Object>();
 				List<Object> xx = (List<Object>)x;
@@ -796,7 +855,7 @@ public class Test_Parser extends ParserTestCase
 		ParseAction action = new ParseAction()
 		{
 			@SuppressWarnings("unchecked")
-			public Object invoke(String input, int begin, Object x)
+			public Object invoke(ItemStreamAccessor input, int begin, Object x)
 			{
 				List<Object> xx = (List<Object>)x;
 				if ( xx.get( 1 ).equals( new ArrayList<Object>() ) )
@@ -868,8 +927,11 @@ public class Test_Parser extends ParserTestCase
 		matchTestSX( z, "yxxx", "[[[y x] x] x]" );
 	}
 
-	public void testLeftRecursion() throws Production.CannotOverwriteProductionExpressionException
+	public void testLeftRecursion() throws Production.CannotOverwriteProductionExpressionException, ClassAlreadyDefinedException
 	{
+		DMObjectClass Num = M.newClass( "Num", new String[] { "x" } );
+		
+		
 		ParserExpression integer = new Word( "0123456789" );
 		ParserExpression plus = new Literal( "+" );
 		ParserExpression minus = new Literal( "-" );
@@ -879,8 +941,11 @@ public class Test_Parser extends ParserTestCase
 		ParserExpression addop = plus.__or__(  minus );
 		ParserExpression mulop = star.__or__(  slash );
 
+		Production number = new Production( "number" );
+		number.setExpression( integer.__or__( new StructuralObject( Num ) ) );
+		
 		Production mul = new Production( "mul" );
-		mul.setExpression( ( mul.__add__( mulop ).__add__( integer ) ).__or__( integer ) );
+		mul.setExpression( ( mul.__add__( mulop ).__add__( number ) ).__or__( number ) );
 		Production add = new Production( "add" );
 		add.setExpression( ( add.__add__( addop ).__add__( mul ) ).__or__( mul ) );
 		ParserExpression parser = add;
@@ -903,6 +968,11 @@ public class Test_Parser extends ParserTestCase
 		matchTestSX( parser, "1+2*3*4", "[1 + [[2 * 3] * 4]]" );
 		matchTestSX( parser, "1*2+3*4", "[[1 * 2] + [3 * 4]]" );
 		matchTestSX( parser, "1*2*3+4", "[[[1 * 2] * 3] + 4]" );
+		
+		
+		matchTestSX( parser, new ItemStreamBuilder( new Object[] { "1+", Num.newInstance( new Object[] { "2" } ), "*3*4" } ).stream(), "{m=Tests.PatternMatch : [1 + [[(m Num x=2) * 3] * 4]]}" );
+		matchTestSX( parser, new ItemStreamBuilder( new Object[] { "1*", Num.newInstance( new Object[] { "2" } ), "+3*4" } ).stream(), "{m=Tests.PatternMatch : [[1 * (m Num x=2)] + [3 * 4]]}" );
+		matchTestSX( parser, new ItemStreamBuilder( new Object[] { "1*", Num.newInstance( new Object[] { "2" } ), "*3+4" } ).stream(), "{m=Tests.PatternMatch : [[[1 * (m Num x=2)] * 3] + 4]}" );
 	}
 
 
@@ -912,7 +982,7 @@ public class Test_Parser extends ParserTestCase
 		ParseAction arrayAccessAction = new ParseAction()
 		{
 			@SuppressWarnings("unchecked")
-			public Object invoke(String input, int begin, Object value)
+			public Object invoke(ItemStreamAccessor input, int begin, Object value)
 			{
 				List<Object> v = (List<Object>)value;
 				return Arrays.asList( new Object[] { "arrayAccess", v.get( 0 ), v.get( 2 ) } );
@@ -922,7 +992,7 @@ public class Test_Parser extends ParserTestCase
 		ParseAction fieldAccessAction = new ParseAction()
 		{
 			@SuppressWarnings("unchecked")
-			public Object invoke(String input, int begin, Object value)
+			public Object invoke(ItemStreamAccessor input, int begin, Object value)
 			{
 				List<Object> v = (List<Object>)value;
 				return Arrays.asList( new Object[] { "fieldAccess", v.get( 0 ), v.get( 2 ) } );
@@ -932,7 +1002,7 @@ public class Test_Parser extends ParserTestCase
 		ParseAction objectMethodInvocationAction = new ParseAction()
 		{
 			@SuppressWarnings("unchecked")
-			public Object invoke(String input, int begin, Object value)
+			public Object invoke(ItemStreamAccessor input, int begin, Object value)
 			{
 				List<Object> v = (List<Object>)value;
 				return Arrays.asList( new Object[] { "methodInvoke", v.get( 0 ), v.get( 2 ) } );
@@ -942,7 +1012,7 @@ public class Test_Parser extends ParserTestCase
 		ParseAction thisMethodInvocationAction = new ParseAction()
 		{
 			@SuppressWarnings("unchecked")
-			public Object invoke(String input, int begin, Object value)
+			public Object invoke(ItemStreamAccessor input, int begin, Object value)
 			{
 				List<Object> v = (List<Object>)value;
 				return Arrays.asList( new Object[] { "methodInvoke", v.get( 0 ) } );
@@ -1011,7 +1081,7 @@ public class Test_Parser extends ParserTestCase
 		ParseAction arrayAccessAction = new ParseAction()
 		{
 			@SuppressWarnings("unchecked")
-			public Object invoke(String input, int begin, Object value)
+			public Object invoke(ItemStreamAccessor input, int begin, Object value)
 			{
 				List<Object> v = (List<Object>)value;
 				return Arrays.asList( new Object[] { "arrayAccess", v.get( 0 ), v.get( 2 ) } );
@@ -1021,7 +1091,7 @@ public class Test_Parser extends ParserTestCase
 		ParseAction fieldAccessAction = new ParseAction()
 		{
 			@SuppressWarnings("unchecked")
-			public Object invoke(String input, int begin, Object value)
+			public Object invoke(ItemStreamAccessor input, int begin, Object value)
 			{
 				List<Object> v = (List<Object>)value;
 				return Arrays.asList( new Object[] { "fieldAccess", v.get( 0 ), v.get( 2 ) } );
@@ -1031,7 +1101,7 @@ public class Test_Parser extends ParserTestCase
 		ParseAction objectMethodInvocationAction = new ParseAction()
 		{
 			@SuppressWarnings("unchecked")
-			public Object invoke(String input, int begin, Object value)
+			public Object invoke(ItemStreamAccessor input, int begin, Object value)
 			{
 				List<Object> v = (List<Object>)value;
 				return Arrays.asList( new Object[] { "methodInvoke", v.get( 0 ), v.get( 2 ) } );
@@ -1041,7 +1111,7 @@ public class Test_Parser extends ParserTestCase
 		ParseAction thisMethodInvocationAction = new ParseAction()
 		{
 			@SuppressWarnings("unchecked")
-			public Object invoke(String input, int begin, Object value)
+			public Object invoke(ItemStreamAccessor input, int begin, Object value)
 			{
 				List<Object> v = (List<Object>)value;
 				return Arrays.asList( new Object[] { "methodInvoke", v.get( 0 ) } );

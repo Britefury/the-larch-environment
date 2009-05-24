@@ -6,8 +6,9 @@
 //##************************
 package BritefuryJ.Parser;
 
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
 
 public class RegEx extends ParserExpression
 {
@@ -58,21 +59,18 @@ public class RegEx extends ParserExpression
 	
 	
 	
-	protected ParseResult parseString(ParserState state, String input, int start, int stop)
+	protected ParseResult parseStream(ParserState state, ItemStreamAccessor input, int start)
 	{
 		if ( bSkipJunkChars )
 		{
-			start = state.skipJunkChars( input, start, stop );
+			start = state.skipJunkChars( input, start );
 		}
 		
-		Matcher m = pattern.matcher( input.substring( start, stop ) );
+		String match = input.matchRegEx( start, pattern );
 		
-		boolean bFound = m.find();
-		if ( bFound  &&  m.start() == 0  &&  m.end() > 0 )
+		if ( match != null )
 		{
-			String matchString = m.group();
-			int end = start + matchString.length();
-			return new ParseResult( matchString, start, end );
+			return new ParseResult( match, start, start + match.length() );
 		}
 		else
 		{

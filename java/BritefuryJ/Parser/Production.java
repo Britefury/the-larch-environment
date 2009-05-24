@@ -9,6 +9,8 @@ package BritefuryJ.Parser;
 import java.util.Arrays;
 import java.util.List;
 
+import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
+
 
 
 public class Production extends ParserExpression
@@ -78,9 +80,9 @@ public class Production extends ParserExpression
 	
 	
 	
-	protected ParseResult parseString(ParserState state, String input, int start, int stop)
+	protected ParseResult parseStream(ParserState state, ItemStreamAccessor input, int start)
 	{
-		return state.memoisedMatchString( subexp, input, start, stop );
+		return state.memoisedMatchStream( subexp, input, start );
 	}
 
 

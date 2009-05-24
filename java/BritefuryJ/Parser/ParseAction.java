@@ -6,7 +6,9 @@
 //##************************
 package BritefuryJ.Parser;
 
+import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
+
 public interface ParseAction
 {
-	public Object invoke(String input, int begin, Object x);
+	public Object invoke(ItemStreamAccessor input, int begin, Object x);
 }

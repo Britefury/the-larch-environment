@@ -6,35 +6,40 @@
 //##************************
 package BritefuryJ.Parser;
 
+import BritefuryJ.DocModel.DMObject;
+import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
 
-public class Literal extends ParserExpression
+public class StructuralObject extends ParserExpression
 {
-	protected String matchString;
+	private DMObjectClass cls;
 	
 	
-	public Literal(String matchString)
+	public StructuralObject(DMObjectClass cls)
 	{
-		this.matchString = matchString;
+		super();
+		
+		this.cls = cls;
 	}
-	
-	
-	public String getMatchString()
-	{
-		return matchString;
-	}
-	
 	
 	
 	protected ParseResult parseStream(ParserState state, ItemStreamAccessor input, int start)
 	{
 		start = state.skipJunkChars( input, start );
 		
-		int end = input.consumeString( start, matchString );
+		Object value[] = input.matchStructuralNode( start );
 		
-		if ( end != -1 )
+		if ( value != null )
 		{
-			return new ParseResult( matchString, start, end );
+			Object x = value[0];
+			if ( x instanceof DMObject )
+			{
+				DMObject dx = (DMObject)x;
+				if ( dx.isInstanceOf( cls ) )
+				{
+					return new ParseResult( dx, start, start + 1 );
+				}
+			}
 		}
 		
 		return ParseResult.failure( start );
@@ -43,10 +48,16 @@ public class Literal extends ParserExpression
 	
 	public boolean compareTo(ParserExpression x)
 	{
-		if ( x instanceof Literal )
+		if ( x == this )
 		{
-			Literal xl = (Literal)x;
-			return matchString.equals( xl.matchString );
+			return true;
+		}
+		
+		if ( x instanceof StructuralObject )
+		{
+			StructuralObject sx = (StructuralObject)x;
+			
+			return cls == sx.cls;
 		}
 		else
 		{
@@ -56,6 +67,7 @@ public class Literal extends ParserExpression
 	
 	public String toString()
 	{
-		return "Literal( \"" + matchString + "\" )";
+		return "StructuralNode()";
 	}
+
 }

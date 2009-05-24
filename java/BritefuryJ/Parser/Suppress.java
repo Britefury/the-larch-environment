@@ -6,6 +6,8 @@
 //##************************
 package BritefuryJ.Parser;
 
+import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
+
 
 public class Suppress extends UnaryBranchExpression
 {
@@ -20,9 +22,9 @@ public class Suppress extends UnaryBranchExpression
 	}
 	
 	
-	protected ParseResult parseString(ParserState state, String input, int start, int stop)
+	protected ParseResult parseStream(ParserState state, ItemStreamAccessor input, int start)
 	{
-		return subexp.evaluateString( state, input, start, stop ).suppressed();
+		return subexp.evaluateStream( state, input, start ).suppressed();
 	}
 
 
