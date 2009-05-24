@@ -30,6 +30,8 @@ import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
+import BritefuryJ.Parser.ItemStream.ItemStream;
+import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
 import BritefuryJ.ParserHelpers.DebugNode;
 import BritefuryJ.ParserHelpers.ParseResultInterface;
 
@@ -300,11 +302,11 @@ public class NodeView
 		{
 			inputString = (String)inputObject;
 			inputString = inputString.substring( data.getResult().getBegin(), data.getResult().getEnd() );
-			
-			if ( inputString.length() > MAX_STRING_LENGTH )
-			{
-				inputString = inputString.substring( 0, MAX_STRING_LENGTH )  +  "...";
-			}
+		}
+		else if ( inputObject instanceof ItemStreamAccessor )
+		{
+			ItemStream stream = ((ItemStreamAccessor)inputObject).getStream();
+			inputString = stream.subStream( data.getResult().getBegin(), data.getResult().getEnd() ).toString();
 		}
 		else if ( inputObject instanceof List )
 		{
@@ -316,6 +318,11 @@ public class NodeView
 			inputString = inputObject.toString();
 		}
 			
+		if ( inputString.length() > MAX_STRING_LENGTH )
+		{
+			inputString = inputString.substring( 0, MAX_STRING_LENGTH )  +  "...";
+		}
+
 		return new DPText( inputStyle, inputString );
 	}
 
