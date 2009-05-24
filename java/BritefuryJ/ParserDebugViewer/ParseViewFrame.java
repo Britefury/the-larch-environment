@@ -29,6 +29,8 @@ import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
 
 import BritefuryJ.DocPresent.DPPresentationArea;
+import BritefuryJ.Parser.ItemStream.ItemStream;
+import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
 import BritefuryJ.ParserHelpers.DebugNode;
 import BritefuryJ.ParserHelpers.DebugParseResultInterface;
 import BritefuryJ.ParserHelpers.ParseResultInterface;
@@ -80,6 +82,14 @@ public class ParseViewFrame implements ParseView.ParseViewListener
 		Style parsedStyle = inputDoc.addStyle( "parsed", defaultStyle );
 		StyleConstants.setForeground( parsedStyle, new Color( 0.0f, 0.5f, 0.0f ) );
 		StyleConstants.setBold( parsedStyle, true );
+		Style structuralUnusedStyle = inputDoc.addStyle( "structural_unused", defaultStyle );
+		StyleConstants.setItalic( structuralUnusedStyle, true );
+		StyleConstants.setForeground( structuralUnusedStyle, new Color( 0.0f, 0.0f, 1.0f ) );
+		Style structuralUnconsumedStyle = inputDoc.addStyle( "structural_unconsumed", structuralUnusedStyle );
+		StyleConstants.setForeground( structuralUnconsumedStyle, new Color( 0.5f, 0.5f, 0.85f ) );
+		Style structuralParsedStyle = inputDoc.addStyle( "structural_parsed", structuralUnusedStyle );
+		StyleConstants.setForeground( structuralParsedStyle, new Color( 0.0f, 0.5f, 0.5f ) );
+		StyleConstants.setBold( structuralParsedStyle, true );
 		inputScrollPane = new JScrollPane( inputTextPane );
 		inputScrollPane.setVerticalScrollBarPolicy( JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED );
 		inputScrollPane.setPreferredSize( new Dimension( 200, 200 ) );
@@ -212,6 +222,86 @@ public class ParseViewFrame implements ParseView.ParseViewListener
 					{
 						inputDoc.insertString( inputDoc.getLength(), input.substring( 0, result.getEnd() ), inputDoc.getStyle( "unused" ) );
 						inputDoc.insertString( inputDoc.getLength(), input.substring( result.getEnd(), input.length() ), inputDoc.getStyle( "unconsumed" ) );
+					}
+				}
+				else if ( inputObject instanceof ItemStreamAccessor )
+				{
+					ItemStreamAccessor accessor = (ItemStreamAccessor)inputObject;
+					for (ItemStream.Item item: accessor.getStream().getItems())
+					{
+						if ( item.isStructural() )
+						{
+							if ( result.isValid() )
+							{
+								if ( item.getStop() <= result.getBegin() )
+								{
+									inputDoc.insertString( inputDoc.getLength(), item.toString(), inputDoc.getStyle( "structural_unused" ) );
+								}
+								else if ( item.getStop() <= result.getEnd() )
+								{
+									inputDoc.insertString( inputDoc.getLength(), item.toString(), inputDoc.getStyle( "structural_parsed" ) );
+								}
+								else
+								{
+									inputDoc.insertString( inputDoc.getLength(), item.toString(), inputDoc.getStyle( "structural_unused" ) );
+								}
+							}
+							else
+							{
+								if ( item.getStop() <= result.getEnd() )
+								{
+									inputDoc.insertString( inputDoc.getLength(), item.toString(), inputDoc.getStyle( "structural_unused" ) );
+								}
+								else
+								{
+									inputDoc.insertString( inputDoc.getLength(), item.toString(), inputDoc.getStyle( "structural_unconsumed" ) );
+								}
+							}
+						}
+						else
+						{
+							if ( result.isValid() )
+							{
+								int preUnusedStart = item.getStart();
+								int preUnusedStop = Math.min( result.getBegin(), item.getStop() );
+								
+								int parsedStart = Math.max( result.getBegin(), item.getStart() );
+								int parsedStop = Math.min( result.getEnd(), item.getStop() );
+	
+								int postUnusedStart = Math.max( result.getEnd(), item.getStart() );
+								int postUnusedStop = Math.min( accessor.length(), item.getStop() );
+	
+								if ( preUnusedStart < preUnusedStop )
+								{
+									inputDoc.insertString( inputDoc.getLength(), item.subItem( preUnusedStart, preUnusedStop, 0 ).toString(), inputDoc.getStyle( "unused" ) );
+								}
+								if ( parsedStart < parsedStop )
+								{
+									inputDoc.insertString( inputDoc.getLength(), item.subItem( parsedStart, parsedStop, 0 ).toString(), inputDoc.getStyle( "parsed" ) );
+								}
+								if ( postUnusedStart < postUnusedStop )
+								{
+									inputDoc.insertString( inputDoc.getLength(), item.subItem( postUnusedStart, postUnusedStop, 0 ).toString(), inputDoc.getStyle( "unused" ) );
+								}
+							}
+							else
+							{
+								int preUnusedStart = item.getStart();
+								int preUnusedStop = Math.min( result.getEnd(), item.getStop() );
+								
+								int unconsumedStart = Math.max( result.getEnd(), item.getStart() );
+								int unconsumedStop = Math.min( accessor.length(), item.getStop() );
+	
+								if ( preUnusedStart < preUnusedStop )
+								{
+									inputDoc.insertString( inputDoc.getLength(), item.subItem( preUnusedStart, preUnusedStop, 0 ).toString(), inputDoc.getStyle( "unused" ) );
+								}
+								if ( unconsumedStart < unconsumedStop )
+								{
+									inputDoc.insertString( inputDoc.getLength(), item.subItem( unconsumedStart, unconsumedStop, 0 ).toString(), inputDoc.getStyle( "unconsumed" ) );
+								}
+							}
+						}
 					}
 				}
 				else if ( inputObject instanceof List )

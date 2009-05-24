@@ -8,6 +8,8 @@ package BritefuryJ.Parser;
 
 import java.util.regex.Pattern;
 
+import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
+
 public class Keyword extends ParserExpression
 {
 	protected String keywordString, disallowedSubsequentChars;
@@ -39,21 +41,18 @@ public class Keyword extends ParserExpression
 	
 	
 	
-	protected ParseResult parseString(ParserState state, String input, int start, int stop)
+	protected ParseResult parseStream(ParserState state, ItemStreamAccessor input, int start)
 	{
-		start = state.skipJunkChars( input, start, stop );
+		start = state.skipJunkChars( input, start );
 		
-		int end = start + keywordString.length();
+		CharSequence itemText = input.getItemTextFrom( start );
+		int end = keywordString.length();
 		
-		if ( end <= stop )
+		if ( itemText.subSequence( 0, end ).equals( keywordString ) )
 		{
-			CharSequence sub = input.substring( start, end );
-			if ( keywordString.equals( sub ) )
+			if ( end == itemText.length()  ||  !postPattern.matcher( itemText.subSequence( end, end + 1 ) ).matches() )
 			{
-				if ( end == stop   ||   !(postPattern.matcher( input.substring( end, end+1 ) ).matches()) )
-				{
-					return new ParseResult( keywordString, start, end );
-				}
+				return new ParseResult( keywordString, start, end );
 			}
 		}
 		

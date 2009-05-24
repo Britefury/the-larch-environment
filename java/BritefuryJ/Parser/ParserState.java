@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
 import BritefuryJ.ParserHelpers.DebugNode;
 import BritefuryJ.Utils.HashUtils;
 
@@ -102,9 +103,9 @@ public class ParserState
 	}
 	
 	
-	public int skipJunkChars(String input, int start, int stop)
+	public int skipJunkChars(String input, int start)
 	{
-		Matcher m = junkPattern.matcher( input.subSequence( start, stop ) );
+		Matcher m = junkPattern.matcher( input.subSequence( start, input.length() ) );
 		if ( m.find() )
 		{
 			return start + m.end();
@@ -113,6 +114,11 @@ public class ParserState
 		{
 			return start;
 		}
+	}
+	
+	public int skipJunkChars(ItemStreamAccessor input, int start)
+	{
+		return input.skipRegEx( start, junkPattern );
 	}
 	
 	
@@ -127,7 +133,7 @@ public class ParserState
 	
 	
 	@SuppressWarnings("unchecked")
-	ParseResult memoisedMatchString(ParserExpression rule, String input, int start, int stop)
+	ParseResult memoisedMatchStream(ParserExpression rule, ItemStreamAccessor input, int start)
 	{
 		MemoKey key = new MemoKey( start, rule );
 		MemoEntry memoEntry = memo.get( key );
@@ -152,7 +158,7 @@ public class ParserState
 			
 
 			// Evaluate the rule, at position @start
-			ParseResult answer = rule.evaluateString( this, (String)input, start, stop );
+			ParseResult answer = rule.evaluateStream( this, input, start );
 			
 
 			// Merge dependency lists, into global list
@@ -180,7 +186,7 @@ public class ParserState
 			if ( memoEntry.bLeftRecursionDetected )
 			{
 				// Grow the left recursive parse
-				answer = growLeftRecursiveParse( rule, input, start, stop, memoEntry, answer );
+				answer = growLeftRecursiveParse( rule, input, start, memoEntry, answer );
 			}
 			
 			// Rule no longer evaluating, got an answer
@@ -197,14 +203,14 @@ public class ParserState
 				// is recursive; specifically left-recursive since we are at the same position in the stream
 
 				// Left recursion has been detected
-				onLeftRecursionDetected( rule, input, start, stop, memoEntry );
+				onLeftRecursionDetected( rule, input, start, memoEntry );
 			}
 			return memoEntry.answer;
 		}
 	}
 	
 	
-	private void onLeftRecursionDetected(ParserExpression rule, Object input, int start, int stop, MemoEntry memoEntry)
+	private void onLeftRecursionDetected(ParserExpression rule, Object input, int start, MemoEntry memoEntry)
 	{
 		// Left recursion has been detected
 		memoEntry.bLeftRecursionDetected = true;
@@ -219,7 +225,7 @@ public class ParserState
 
 
 
-	private ParseResult growLeftRecursiveParse(ParserExpression rule, Object input, int start, int stop, MemoEntry memoEntry, ParseResult answer)
+	private ParseResult growLeftRecursiveParse(ParserExpression rule, ItemStreamAccessor input, int start, MemoEntry memoEntry, ParseResult answer)
 	{
 		while ( true )
 		{
@@ -236,7 +242,7 @@ public class ParserState
 			memoEntry.dependents = null;
 			
 			// Try re-evaluation
-			ParseResult res = rule.evaluateString( this, (String)input, start, stop );
+			ParseResult res = rule.evaluateStream( this, input, start );
 			// Fail or no additional characters consumed?
 			if ( !res.isValid()  ||  res.end <= answer.end )
 			{

@@ -6,6 +6,8 @@
 //##************************
 package BritefuryJ.Parser;
 
+import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
+
 public class Optional extends UnaryBranchExpression
 {
 	public Optional(String subexp) throws ParserCoerceException
@@ -19,9 +21,9 @@ public class Optional extends UnaryBranchExpression
 	}
 	
 
-	protected ParseResult parseString(ParserState state, String input, int start, int stop)
+	protected ParseResult parseStream(ParserState state, ItemStreamAccessor input, int start)
 	{
-		ParseResult res = subexp.evaluateString( state, input, start, stop );
+		ParseResult res = subexp.evaluateStream( state, input, start );
 		
 		if ( res.isValid() )
 		{

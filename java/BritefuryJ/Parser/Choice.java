@@ -8,6 +8,8 @@ package BritefuryJ.Parser;
 
 import java.util.List;
 
+import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
+
 public class Choice extends BranchExpression
 {
 	public Choice(ParserExpression[] subexps)
@@ -26,13 +28,13 @@ public class Choice extends BranchExpression
 	}
 	
 	
-	protected ParseResult parseString(ParserState state, String input, int start, int stop)
+	protected ParseResult parseStream(ParserState state, ItemStreamAccessor input, int start)
 	{
 		int maxErrorPos = start;
 		
 		for (ParserExpression subexp: subexps)
 		{
-			ParseResult result = subexp.evaluateString(  state, input, start, stop );
+			ParseResult result = subexp.evaluateStream(  state, input, start );
 			if ( result.isValid() )
 			{
 				return result;

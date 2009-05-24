@@ -13,6 +13,7 @@ import BritefuryJ.Parser.Choice;
 import BritefuryJ.Parser.ParseAction;
 import BritefuryJ.Parser.ParserExpression;
 import BritefuryJ.Parser.Production;
+import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
 import BritefuryJ.Parser.Utils.OperatorParser.UnaryOperator.UnaryOperatorResultBuilder;
 
 public class PrefixLevel extends UnaryOperatorLevel
@@ -25,7 +26,7 @@ public class PrefixLevel extends UnaryOperatorLevel
 		
 		
 		@SuppressWarnings("unchecked")
-		public Object invoke(String input, int begin, Object x)
+		public Object invoke(ItemStreamAccessor input, int begin, Object x)
 		{
 			List<Object> xs = (List<Object>)x;
 			

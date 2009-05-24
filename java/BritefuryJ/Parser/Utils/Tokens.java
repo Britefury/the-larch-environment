@@ -10,10 +10,11 @@ import BritefuryJ.Parser.ParseResult;
 import BritefuryJ.Parser.ParserExpression;
 import BritefuryJ.Parser.ParserState;
 import BritefuryJ.Parser.RegEx;
+import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
 
 public class Tokens
 {
-	private static int consumeJavaEscape(String input, int start, int stop)
+	private static int consumeJavaEscape(CharSequence input, int start)
 	{
 		int pos = start;
 		char c = input.charAt( pos );
@@ -21,7 +22,7 @@ public class Tokens
 		{
 			pos++;
 			
-			if ( pos >= stop )
+			if ( pos >= input.length() )
 			{
 				return -1;
 			}
@@ -37,13 +38,13 @@ public class Tokens
 				// Octal escape
 				// Consume a 0-3, plus two octal chars
 				pos++;
-				if ( pos < stop )
+				if ( pos < input.length() )
 				{
 					c = input.charAt( pos );
 					if ( c >= '0'  &&  c <= '7' )
 					{
 						pos++;
-						if ( pos < stop )
+						if ( pos < input.length() )
 						{
 							c = input.charAt( pos );
 							if ( c >= '0'  &&  c <= '7' )
@@ -60,7 +61,7 @@ public class Tokens
 				// Octal escape
 				// Consume 1 or two octal chars
 				pos++;
-				if ( pos < stop )
+				if ( pos < input.length() )
 				{
 					c = input.charAt( pos );
 					if ( c >= '0'  &&  c <= '7' )
@@ -78,7 +79,7 @@ public class Tokens
 				// Consume 4 hex digits
 				for (int i = 0; i < 4; i++)
 				{
-					if ( pos >= stop )
+					if ( pos >= input.length() )
 					{
 						return -1;
 					}
@@ -111,27 +112,30 @@ public class Tokens
 		}
 		
 		
-		protected ParseResult parseString(ParserState state, String input, int start, int stop)
+		protected ParseResult parseStream(ParserState state, ItemStreamAccessor input, int start)
 		{
-			start = state.skipJunkChars( input, start, stop );
+			start = state.skipJunkChars( input, start );
 			
-			int pos = start; 
+			CharSequence itemText = input.getItemTextFrom( start );
 			
-			if ( pos < stop  &&  Character.isJavaIdentifierStart( input.charAt( pos ) ) )
+			if ( itemText != null )
 			{
-				pos++;
+				int offset = 0; 
 				
-				while ( pos < stop  &&  Character.isJavaIdentifierPart( input.charAt( pos ) ) )
+				if ( offset < itemText.length()  &&  Character.isJavaIdentifierStart( itemText.charAt( offset ) ) )
 				{
-					pos++;
+					offset++;
+					
+					while ( offset < itemText.length()  &&  Character.isJavaIdentifierPart( itemText.charAt( offset ) ) )
+					{
+						offset++;
+					}
+					
+					return new ParseResult( itemText.subSequence( 0, offset ).toString(), start, start + offset );
 				}
-				
-				return new ParseResult( input.substring( start, pos ), start, pos );
 			}
-			else
-			{
-				return ParseResult.failure( start );
-			}
+			
+			return ParseResult.failure( start );
 		}
 
 
@@ -154,32 +158,37 @@ public class Tokens
 		}
 		
 		
-		protected ParseResult parseString(ParserState state, String input, int start, int stop)
+		protected ParseResult parseStream(ParserState state, ItemStreamAccessor input, int start)
 		{
-			start = state.skipJunkChars( input, start, stop );
+			start = state.skipJunkChars( input, start );
 			
-			int pos = start; 
+			CharSequence itemText = input.getItemTextFrom( start );
 			
-			if ( pos < stop  &&  input.charAt( pos ) == '\'' )
+			if ( itemText != null )
 			{
-				pos++;
+				int offset = 0; 
 				
-				char c = input.charAt( pos );
-				if ( c == '\\' )
+				if ( offset < itemText.length()  &&  itemText.charAt( offset ) == '\'' )
 				{
-					pos = consumeJavaEscape( input, pos, stop );
-				}
-				else
-				{
-					pos++;
-				}
-				if ( pos != -1  &&  pos < stop )
-				{
-					c = input.charAt( pos );
-					if ( c == '\'' )
+					offset++;
+					
+					char c = itemText.charAt( offset );
+					if ( c == '\\' )
 					{
-						pos++;
-						return new ParseResult( input.substring( start, pos ), start, pos );
+						offset = consumeJavaEscape( itemText, offset );
+					}
+					else
+					{
+						offset++;
+					}
+					if ( offset != -1  &&  offset < itemText.length() )
+					{
+						c = itemText.charAt( offset );
+						if ( c == '\'' )
+						{
+							offset++;
+							return new ParseResult( itemText.subSequence( 0, offset ).toString(), start, start + offset );
+						}
 					}
 				}
 			}
@@ -208,40 +217,45 @@ public class Tokens
 		}
 		
 		
-		protected ParseResult parseString(ParserState state, String input, int start, int stop)
+		protected ParseResult parseStream(ParserState state, ItemStreamAccessor input, int start)
 		{
-			start = state.skipJunkChars( input, start, stop );
+			start = state.skipJunkChars( input, start );
 			
-			int pos = start; 
+			CharSequence itemText = input.getItemTextFrom( start );
 			
-			if ( pos < stop  &&  input.charAt( pos ) == '"' )
+			if ( itemText != null )
 			{
-				pos++;
+				int offset = 0; 
 				
-				char c = input.charAt( pos );
-				while ( pos < stop  &&  c != '"' )
+				if ( offset < itemText.length()  &&  itemText.charAt( offset ) == '"' )
 				{
-					if ( c == '\\' )
+					offset++;
+					
+					char c = itemText.charAt( offset );
+					while ( offset < itemText.length()  &&  c != '"' )
 					{
-						int escape = consumeJavaEscape( input, pos, stop );
-						if ( escape == -1 )
+						if ( c == '\\' )
 						{
-							return ParseResult.failure( start );
+							int escape = consumeJavaEscape( itemText, offset );
+							if ( escape == -1 )
+							{
+								return ParseResult.failure( start );
+							}
+							offset = escape;
 						}
-						pos = escape;
-					}
-					else
-					{
-						pos++;
+						else
+						{
+							offset++;
+						}
+						
+						c = itemText.charAt( offset );
 					}
 					
-					c = input.charAt( pos );
-				}
-				
-				if ( pos < stop  &&  c == '"' )
-				{
-					pos++;
-					return new ParseResult( input.substring( start, pos ), start, pos );
+					if ( offset < itemText.length()  &&  c == '"' )
+					{
+						offset++;
+						return new ParseResult( itemText.subSequence( 0, offset ).toString(), start, start + offset );
+					}
 				}
 			}
 

@@ -10,6 +10,8 @@ import java.util.Arrays;
 import java.util.List;
 import org.python.core.PyObject;
 
+import BritefuryJ.Parser.ItemStream.ItemStream;
+import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
 import BritefuryJ.ParserHelpers.DebugNode;
 import BritefuryJ.ParserHelpers.ParserExpressionInterface;
 
@@ -24,65 +26,109 @@ public abstract class ParserExpression implements ParserExpressionInterface
 	
 	public ParseResult parseString(String input)
 	{
-		return parseString( input, 0, input.length() );
+		return parseStream( new ItemStream( input ) );
 	}
 
 	public ParseResult parseString(String input, String junkRegex)
 	{
-		return parseString( input, 0, input.length(), junkRegex );
+		return parseStream( new ItemStream( input ), junkRegex );
 	}
 
-	public ParseResult parseString(String input, int start, int stop)
+	public ParseResult parseString(String input, int start)
 	{
-		return parseString( input, start, stop, "[ ]*" );
+		return parseStream( new ItemStream( input ), start );
 	}
 	
-	public ParseResult parseString(String input, int start, int stop, String junkRegex)
+	public ParseResult parseString(String input, int start, String junkRegex)
 	{
-		if ( stop == -1 )
-		{
-			stop = input.length();
-		}
-		
-		ParserState state = new ParserState( junkRegex );
-		ParseResult result = evaluateString( state, input, start, stop );
-		if ( result.isValid() )
-		{
-			result.end = state.skipJunkChars( input, result.end, stop );
-		}
-		
-		return result;
+		return parseStream( new ItemStream( input ), start, junkRegex );
 	}
 	
 	
 	public DebugParseResult debugParseString(String input)
 	{
-		return debugParseString( input, 0, input.length() );
+		return debugParseStream( new ItemStream( input ) );
 	}
 
 	public DebugParseResult debugParseString(String input, String junkRegex)
 	{
-		return debugParseString( input, 0, input.length(), junkRegex );
+		return debugParseStream( new ItemStream( input ), junkRegex );
 	}
 
-	public DebugParseResult debugParseString(String input, int start, int stop)
+	public DebugParseResult debugParseString(String input, int start)
 	{
-		return debugParseString( input, start, stop, "[ ]*" );
+		return debugParseStream( new ItemStream( input ), start );
 	}
 	
-	public DebugParseResult debugParseString(String input, int start, int stop, String junkRegex)
+	public DebugParseResult debugParseString(String input, int start, String junkRegex)
 	{
-		if ( stop == -1 )
-		{
-			stop = input.length();
-		}
-		
+		return debugParseStream( new ItemStream( input ), start, junkRegex );
+	}
+	
+	
+	
+	
+	public ParseResult parseStream(ItemStream input)
+	{
+		return parseStream( input, 0 );
+	}
+
+	public ParseResult parseStream(ItemStream input, String junkRegex)
+	{
+		return parseStream( input, 0, junkRegex );
+	}
+
+	public ParseResult parseStream(ItemStream input, int start)
+	{
+		return parseStream( input, start, "[ ]*" );
+	}
+	
+	public ParseResult parseStream(ItemStream input, int start, String junkRegex)
+	{
+		return parseStream( input.accessor(), start, junkRegex );
+	}
+
+	public ParseResult parseStream(ItemStreamAccessor input, int start, String junkRegex)
+	{
 		ParserState state = new ParserState( junkRegex );
-		state.enableDebugging();
-		DebugParseResult result = (DebugParseResult)evaluateString( state, input, start, stop );
+		ParseResult result = evaluateStream( state, input, start );
 		if ( result.isValid() )
 		{
-			result.end = state.skipJunkChars( input, result.end, stop );
+			result.end = state.skipJunkChars( input, result.end );
+		}
+		
+		return result;
+	}
+	
+	
+	public DebugParseResult debugParseStream(ItemStream input)
+	{
+		return debugParseStream( input, 0 );
+	}
+
+	public DebugParseResult debugParseStream(ItemStream input, String junkRegex)
+	{
+		return debugParseStream( input, 0, junkRegex );
+	}
+
+	public DebugParseResult debugParseStream(ItemStream input, int start)
+	{
+		return debugParseStream( input, start, "[ ]*" );
+	}
+	
+	public DebugParseResult debugParseStream(ItemStream input, int start, String junkRegex)
+	{
+		return debugParseStream( input.accessor(), start, junkRegex );
+	}
+
+	public DebugParseResult debugParseStream(ItemStreamAccessor input, int start, String junkRegex)
+	{
+		ParserState state = new ParserState( junkRegex );
+		state.enableDebugging();
+		DebugParseResult result = (DebugParseResult)evaluateStream( state, input, start );
+		if ( result.isValid() )
+		{
+			result.end = state.skipJunkChars( input, result.end );
 		}
 		
 		return result;
@@ -91,7 +137,7 @@ public abstract class ParserExpression implements ParserExpressionInterface
 	
 	
 	
-	protected ParseResult evaluateString(ParserState state, String input, int start, int stop)
+	protected ParseResult evaluateStream(ParserState state, ItemStreamAccessor input, int start)
 	{
 		if ( state.bDebuggingEnabled )
 		{
@@ -104,7 +150,7 @@ public abstract class ParserExpression implements ParserExpressionInterface
 			state.debugStack = node;
 			
 			// Get the parse result
-			ParseResult result = parseString( state, input, start, stop );
+			ParseResult result = parseStream( state, input, start );
 			node.setResult( result );
 			
 			// If @prev is valid, add @node as a call-child of @prev
@@ -135,11 +181,11 @@ public abstract class ParserExpression implements ParserExpressionInterface
 		}
 		else
 		{
-			return parseString( state, input, start, stop );
+			return parseStream( state, input, start );
 		}
 	}
 	
-	protected abstract ParseResult parseString(ParserState state, String input, int start, int stop);
+	protected abstract ParseResult parseStream(ParserState state, ItemStreamAccessor input, int start);
 	
 	
 	

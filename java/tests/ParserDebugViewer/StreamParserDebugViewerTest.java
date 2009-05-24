@@ -14,16 +14,18 @@ import BritefuryJ.Parser.Literal;
 import BritefuryJ.Parser.ParseAction;
 import BritefuryJ.Parser.ParserExpression;
 import BritefuryJ.Parser.Production;
+import BritefuryJ.Parser.StructuralItem;
 import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
+import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
 import BritefuryJ.ParserDebugViewer.ParseViewFrame;
 
-public class DebugViewerTest
+public class StreamParserDebugViewerTest
 {
 	public static void main(final String[] args) throws ParserExpression.ParserCoerceException, Production.CannotOverwriteProductionExpressionException
 	{
-		String input = "this[i][j].x.m()";
+		ItemStreamBuilder builder = new ItemStreamBuilder( new Object[] { "this[", new Integer( 5 ), "][j].x.m()" } );
 		ParserExpression parser = buildParser();
-		DebugParseResult result = parser.debugParseString( input );
+		DebugParseResult result = parser.debugParseStream( builder.stream() );
 		new ParseViewFrame( result );
 	}
 	
@@ -73,7 +75,7 @@ public class DebugViewerTest
 		
 		Production primary = new Production( "primary" );
 		
-		ParserExpression expression = new Production( "expression", new Literal( "i" ).__or__( new Literal( "j" ) ) );
+		ParserExpression expression = new Production( "expression", new Literal( "i" ).__or__( new Literal( "j" ) ).__or__( new StructuralItem() ) );
 		ParserExpression methodName = new Production( "methodName", new Literal( "m" ).__or__( new Literal( "n" ) ) );
 		ParserExpression interfaceTypeName = new Production( "interfaceTypeName", new Literal( "I" ).__or__( new Literal( "J" ) ) );
 		ParserExpression className = new Production( "className", new Literal( "C" ).__or__( new Literal( "D" ) ) );

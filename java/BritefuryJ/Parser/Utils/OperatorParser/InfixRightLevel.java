@@ -13,6 +13,7 @@ import BritefuryJ.Parser.Choice;
 import BritefuryJ.Parser.ParseAction;
 import BritefuryJ.Parser.ParserExpression;
 import BritefuryJ.Parser.Production;
+import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
 
 public class InfixRightLevel extends BinaryOperatorLevel
 {
@@ -36,7 +37,7 @@ public class InfixRightLevel extends BinaryOperatorLevel
 		}
 		
 
-		public Object buildResult(String input, int begin, Object y)
+		public Object buildResult(ItemStreamAccessor input, int begin, Object y)
 		{
 			return action.invoke( input, begin, x, y );
 		}
@@ -52,7 +53,7 @@ public class InfixRightLevel extends BinaryOperatorLevel
 		
 		
 		@SuppressWarnings("unchecked")
-		public Object invoke(String input, int begin, Object x)
+		public Object invoke(ItemStreamAccessor input, int begin, Object x)
 		{
 			List<Object> xs = (List<Object>)x;
 			
@@ -83,7 +84,7 @@ public class InfixRightLevel extends BinaryOperatorLevel
 		
 		
 		@SuppressWarnings("unchecked")
-		public Object invoke(String input, int begin, Object x)
+		public Object invoke(ItemStreamAccessor input, int begin, Object x)
 		{
 			List<Object> xs = (List<Object>)x;
 			Object left = xs.get( 0 );

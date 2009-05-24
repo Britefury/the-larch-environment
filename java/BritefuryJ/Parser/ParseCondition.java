@@ -6,7 +6,9 @@
 //##************************
 package BritefuryJ.Parser;
 
+import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
+
 public interface ParseCondition
 {
-	public boolean test(String input, int begin, Object x);
+	public boolean test(ItemStreamAccessor input, int begin, Object x);
 }
