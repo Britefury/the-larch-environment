@@ -20,6 +20,7 @@ from Britefury.gSym.View import EditOperations
 
 
 from GSymCore.Languages.Python25 import NodeClasses as Nodes
+from GSymCore.Languages.Python25.Precedence import *
 
 
 
@@ -85,4 +86,154 @@ def pyReplaceStatementWithRange(ctx, data, replacement):
 			return xs
 	else:
 		raise TypeError, 'PythonEditOperations:pyReplace(): @data must be a DocTreeNode'
+	
+
+	
+	
+	
+def parseText(parser, text, outerPrecedence=None):
+	res = parser.parseString( text )
+	pos = res.getEnd()
+	if res.isValid():
+		if pos == len( text ):
+			value = res.getValue()
+			return removeUnNeededParens( value, outerPrecedence )
+		else:
+			print '<INCOMPLETE>'
+			print 'FULL TEXT:', text
+			print 'PARSED:', text[:pos]
+			return None
+	else:
+		print 'FULL TEXT:', text
+		print '<FAIL>'
+		return None
+
+
+	
+	
+class PyLine (object):
+	def __init__(self, indent):
+		self.indent = indent
+		
+	def getAST(self, parser):
+		return None
+	
+	def withIndent(self, indent):
+		pass
+
+		
+class PyTextLine (PyLine):
+	def __init__(self, indent, text):
+		super( PyTextLine, self ).__init__( indent )
+		self.text = text
+		
+	def getAST(self, parser):
+		return parseText( parser, self.text )
+	
+	def withIndent(self, indent):
+		return _TextLine( indent, self.text )
+	
+	def __eq__(self, x):
+		if isinstance( x, PyTextLine ):
+			return self.indent == x.indent  and  self.text == x.text
+		else:
+			return self.text == x
+		
+	def __str__(self):
+		return '\t' * self.indent  +  str( self.text )
+		
+		
+		
+class PyASTLine (PyLine):
+	def __init__(self, indent, ast):
+		super( PyASTLine, self ).__init__( indent )
+		self.ast = ast
+		
+	def getAST(self, parser):
+		return self.ast
+	
+	def withIndent(self, indent):
+		return _ASTLine( indent, self.ast )
+		
+	def __eq__(self, x):
+		if isinstance( x, PyASTLine ):
+			return self.indent == x.indent  and  self.ast == x.ast
+		else:
+			return self.ast is x
+		
+	def __str__(self):
+		return '\t' * self.indent  +  str( self.ast )
+
+	
+		
+class PyLineList (object):
+	def __init__(self, nodes):
+		self.lines = []
+		for node in nodes:
+			self._visit( 0, node )
+	
+			
+	def indexOf(self, x):
+		for i, line in enumerate( self.lines ):
+			if line == x:
+				return i
+		return None
+	
+	
+	def replaceRangeWithAST(self, fromIndex, toIndex, astLines):
+		indent = self.lines[fromIndex].indent
+		self.lines[fromIndex:toIndex+1] = [ PyASTLine( indent, ast )   for ast in astLines ]
+			
+	
+	def parse(self, lineParser):
+		minIndent = min( [ line.indent   for line in self.lines ] )
+		
+		suite = []
+		suiteStack = [ suite ]
+		
+		currentIndent = minIndent
+		for line in self.lines:
+			indent = line.indent
+			
+			# Handle change in indentation
+			while indent > currentIndent:
+				if len( suite ) == 0  or  not _isCompoundStmt( suite[-1] ):
+					suite.append( Nodes.IndentedBlock( suite=[] ) )
+	
+				comp = suite[-1]
+				suite = comp['suite']
+				suite[:] = []
+				suiteStack.append( suite )
+				currentIndent += 1
+			
+			while indent < currentIndent:
+				del suiteStack[-1]
+				suite = suiteStack[-1]
+				currentIndent -= 1
+				
+			
+			# Add the node
+			ast = line.getAST( lineParser )
+			suite.append( ast )
+		
+		return suiteStack[0]
+	
+	
+	
+	def _visit(self, indent, node):
+		self.lines.append( PyASTLine( indent, node ) )
+		if _isCompoundStmt( node ):
+			for n in node['suite']:
+				self._visit( indent + 1, n )
+				
+				
+	def __str__(self):
+		return '\n'.join( [ str( line )   for line in self.lines ] )
+
+		
+		
+			
+		
+		
+			
 	

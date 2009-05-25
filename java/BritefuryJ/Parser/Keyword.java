@@ -48,11 +48,14 @@ public class Keyword extends ParserExpression
 		CharSequence itemText = input.getItemTextFrom( start );
 		int end = keywordString.length();
 		
-		if ( itemText.subSequence( 0, end ).equals( keywordString ) )
+		if ( end <= itemText.length() )
 		{
-			if ( end == itemText.length()  ||  !postPattern.matcher( itemText.subSequence( end, end + 1 ) ).matches() )
+			if ( itemText.subSequence( 0, end ).equals( keywordString ) )
 			{
-				return new ParseResult( keywordString, start, end );
+				if ( end == itemText.length()  ||  !postPattern.matcher( itemText.subSequence( end, end + 1 ) ).matches() )
+				{
+					return new ParseResult( keywordString, start, end );
+				}
 			}
 		}
 		
