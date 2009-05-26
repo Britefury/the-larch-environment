@@ -157,6 +157,11 @@ public class DocTreeList extends DocTreeNode implements DMListInterface
 	
 	public boolean equals(Object xs)
 	{
+		if ( this == xs )
+		{
+			return true;
+		}
+		
 		return node.equals( DocTreeNode.coerce( xs ) );
 	}
 	

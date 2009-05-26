@@ -1644,37 +1644,52 @@ class Python25EditHandler (EditHandler):
 			pyReplaceStatement( startContext, startContext.getTreeNode(), lineDoc )
 			selection.clear()
 		else:
+			# Get paths to start and end nodes, from the common root statement
 			path0, path1 = _getStatementContextPathsFromCommonRoot( startContext, endContext )
 			commonRoot = path0[0]
 			selection.clear()
 			
 			if len( path0 ) == 1:
+				# The path to the start node has only 1 entry; this means that the only statement
+				# on the path is the common root.
+				# The only way this can happen is if the start marker is within the bounds of the header
+				# of a compound statement
 				rootDoc = commonRoot.getDocNode()
+				
+				# Convert to a line list
 				lineList = PyLineList( [ rootDoc ] )
 				
+				# Replace the lines in the range startIndex->endIndex with the new parsed line
 				startIndex = lineList.indexOf( startContext.getDocNode() )
 				endIndex = lineList.indexOf( endContext.getDocNode() )
-				
 				lineList.replaceRangeWithAST( startIndex, endIndex, [ lineDoc ] )
 				
-				newRootAST = lineList.parse( self._grammar.statement() )
+				# Parse to ASTs
+				newRootASTs = lineList.parse( self._grammar.statement() )
 				
-				replaceWithRange( commonRoot, commonRoot.getTreeNode(), newRootAST )
+				# Insert into document
+				replaceWithRange( commonRoot, commonRoot.getTreeNode(), newRootASTs )
 			else:
+				# Get the suite from the common root statement
 				suite = commonRoot.getDocNode()['suite']
+				
+				# Get the indices of the child statements that contain the start and end markers respectively
 				startStmtIndex = suite.indexOfById( path0[1].getDocNode() )
 				endStmtIndex = suite.indexOfById( path1[1].getDocNode() )
 				assert startStmtIndex != -1  and  endStmtIndex != -1
+				
+				# Convert to a line list
 				lineList = PyLineList( suite[startStmtIndex:endStmtIndex+1] )
 				
+				# Replace the lines in the range startIndex->endIndex with the new parsed line
 				startIndex = lineList.indexOf( startContext.getDocNode() )
 				endIndex = lineList.indexOf( endContext.getDocNode() )
-				
 				lineList.replaceRangeWithAST( startIndex, endIndex, [ lineDoc ] )
 				
-				newRootAST = lineList.parse( self._grammar.statement() )
+				# Parse to ASTs
+				newASTs = lineList.parse( self._grammar.statement() )
 				
-				suite[startStmtIndex:endStmtIndex+1] = newRootAST 
+				suite[startStmtIndex:endStmtIndex+1] = newASTs 
 				
 				
 	def replaceSelection(self, replacement):

@@ -2,5 +2,9 @@ BUGS
 ====
 
 
-
+Deleting a selection (say from a class definition body) causes a serious problem
+when the start/end markers lie within the whitespace elements that do not reside
+within statements, as the delete-selection mechanism misunderstands the operation
+and assumes that the markers reside within the class definition header, so the
+entire text of the class body is parsed as one line.
 

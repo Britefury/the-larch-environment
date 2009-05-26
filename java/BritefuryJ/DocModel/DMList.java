@@ -91,6 +91,10 @@ public class DMList extends DMNode implements DMListInterface, Trackable
 		
 		public boolean equals(Object xs)
 		{
+			if ( this == xs )
+			{
+				return true;
+			}
 			return src.getInternalContainer().subList( start, stop ).equals( xs );
 		}
 		
@@ -364,6 +368,11 @@ public class DMList extends DMNode implements DMListInterface, Trackable
 	@SuppressWarnings("unchecked")
 	public boolean equals(Object x)
 	{
+		if ( this == x )
+		{
+			return true;
+		}
+		
 		ArrayList<Object> v = (ArrayList<Object>)cell.getValue();
 		return v.equals( x );
 	}
@@ -735,7 +744,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable
 	{
 		return __mul__( n );
 	}
-
+	
 	
 	
 	public String toString()

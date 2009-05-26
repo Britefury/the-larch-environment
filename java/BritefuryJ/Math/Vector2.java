@@ -39,6 +39,11 @@ public class Vector2 implements Cloneable
 	
 	public boolean equals(Vector2 b)
 	{
+		if ( this == b )
+		{
+			return true;
+		}
+		
 		return x == b.x  &&  y == b.y;
 	}
 	

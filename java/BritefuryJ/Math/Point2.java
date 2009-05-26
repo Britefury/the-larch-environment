@@ -46,6 +46,11 @@ public class Point2 {
 	
 	public boolean equals(Point2 b)
 	{
+		if ( this == b )
+		{
+			return true;
+		}
+		
 		return x == b.x  &&  y == b.y;
 	}
 

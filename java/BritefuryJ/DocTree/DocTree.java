@@ -66,6 +66,11 @@ public class DocTree
 		
 		public boolean equals(Object x)
 		{
+			if ( this == x )
+			{
+				return true;
+			}
+			
 			if ( x instanceof Key )
 			{
 				Key kx = (Key)x;
