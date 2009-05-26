@@ -38,6 +38,11 @@ class TreeParserState
 		
 		public boolean equals(Object x)
 		{
+			if ( this == x )
+			{
+				return true;
+			}
+			
 			if ( x instanceof MemoKey )
 			{
 				MemoKey mx = (MemoKey)x;

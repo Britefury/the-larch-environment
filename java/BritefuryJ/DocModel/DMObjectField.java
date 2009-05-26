@@ -25,6 +25,11 @@ public class DMObjectField
 	
 	public boolean equals(Object x)
 	{
+		if ( this == x )
+		{
+			return true;
+		}
+		
 		if ( x instanceof DMObjectField )
 		{
 			DMObjectField fx = (DMObjectField)x;

@@ -165,6 +165,11 @@ public class DocTreeObject extends DocTreeNode implements DMObjectInterface
 
 	public boolean equals(Object x)
 	{
+		if ( this == x )
+		{
+			return true;
+		}
+		
 		return node.equals( DocTreeNode.coerce( x ) );
 	}
 	

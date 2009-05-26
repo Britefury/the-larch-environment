@@ -470,6 +470,11 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable
 	
 	public boolean equals(Object x)
 	{
+		if ( this == x )
+		{
+			return true;
+		}
+		
 		if ( x instanceof DMObjectInterface )
 		{
 			// Get the cell value, so that the access is tracked

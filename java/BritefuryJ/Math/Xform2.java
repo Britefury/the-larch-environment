@@ -55,6 +55,11 @@ public class Xform2 implements Cloneable
 	
 	public boolean equals(Xform2 b)
 	{
+		if ( this == b )
+		{
+			return true;
+		}
+		
 		return scale == b.scale  &&  translation.equals( b.translation );
 	}
 

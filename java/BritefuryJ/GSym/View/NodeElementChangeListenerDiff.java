@@ -16,6 +16,7 @@ import BritefuryJ.DocPresent.ElementTree.LeafElement;
 import BritefuryJ.DocPresent.ElementTree.SegmentElement;
 import BritefuryJ.DocPresent.ElementTree.Caret.ElementCaret;
 import BritefuryJ.DocPresent.Marker.Marker;
+import BritefuryJ.DocPresent.Marker.Marker.Bias;
 import BritefuryJ.DocView.DVNode;
 import BritefuryJ.DocView.DocView;
 import BritefuryJ.Utils.StringDiff;
@@ -126,9 +127,34 @@ public class NodeElementChangeListenerDiff implements DVNode.NodeElementChangeLi
 					int origChangeRegionLength = textRepresentation.length() - prefixLen - suffixLen;
 					int newChangeRegionLength = newTextRepresentation.length() - prefixLen - suffixLen;
 					
-					// If the m*n > DIFF_THRESHOLD, use a simpler method; this prevents slow downs
-					if ( ( origChangeRegionLength * newChangeRegionLength)  >  DIFF_THRESHHOLD )
+					if ( origChangeRegionLength <= 0  ||  newChangeRegionLength <= 0 )
 					{
+						if ( origChangeRegionLength <= 0  &&  newChangeRegionLength > 0 )
+						{
+							// Text inserted
+							if ( newPosition >= textRepresentation.length() - suffixLen )
+							{
+								newPosition = newTextRepresentation.length() - ( textRepresentation.length() - newPosition );
+							}
+						}
+						else if ( origChangeRegionLength > 0  &&  newChangeRegionLength <= 0 )
+						{
+							// Text deleted
+							if ( newPosition >= prefixLen  &&  newPosition < textRepresentation.length() - suffixLen )
+							{
+								newPosition = prefixLen;
+								newBias = Bias.START;
+							}
+						}
+						else if ( origChangeRegionLength < 0  &&  newChangeRegionLength < 0 )
+						{
+							throw new RuntimeException( "origChangeRegionLength and newChangeRegionLength are both < 0" );
+						}
+					}
+					else if ( ( origChangeRegionLength * newChangeRegionLength)  >  DIFF_THRESHHOLD )
+					{
+						// If the m*n > DIFF_THRESHOLD, use a simpler method; this prevents slow downs
+
 						// HACK HACK HACK
 						// FIXME FIXME FIXME
 						System.out.println( "Computing caret position using non-diff hack; " + textRepresentation.length() + " (" + prefixLen + ":" + origChangeRegionLength + ":" + suffixLen + ")  ->  " +
