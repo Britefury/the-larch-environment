@@ -8,6 +8,7 @@
 from weakref import WeakValueDictionary
 
 from java.util import List
+from java.awt.event import KeyEvent
 
 from BritefuryJ.DocModel import DMList, DMObject, DMObjectInterface
 
@@ -46,6 +47,50 @@ def isCompoundStmt(node):
 	return isinstance( node, DMObjectInterface )  and  node.isInstanceOf( Nodes.CompoundStmt )
 
 
+
+
+#
+#
+# DOM / CONTEXT NAVIGATION
+#
+#
+
+def _getStatementContextFromElement(element):
+	context = element.getContext()
+	
+	while not isStmt( context.getDocNode() ):
+		context = context.getParent()
+	return context
+
+
+def _getParentStatementContext(ctx):
+	ctx = ctx.getParent()
+	while ctx is not None  and  not isStmt( ctx.getDocNode() )  and  not ctx.getDocNode().isInstanceOf( Nodes.PythonModule ):
+		ctx = ctx.getParent()
+	return ctx
+
+def _getStatementContextPath(ctx):
+	path = []
+	while ctx is not None:
+		path.insert( 0, ctx )
+		ctx = _getParentStatementContext( ctx )
+	return path
+
+def _getStatementContextPathsFromCommonRoot(ctx0, ctx1):
+	path0 = _getStatementContextPath( ctx0 )
+	path1 = _getStatementContextPath( ctx1 )
+	commonLength = min( len( path0 ), len( path1 ) )
+	for i, ( p0, p1 ) in enumerate( zip( path0, path1 ) ):
+		if p0 is not p1:
+			commonLength = i
+			break
+	return path0[commonLength-1:], path1[commonLength-1:]
+		
+	
+	
+	
+
+	
 
 
 
@@ -290,18 +335,30 @@ class ParsedLineTextRepresentationListener (LineTextRepresentationListenerWithPa
 			
 			
 			
-class NewLineTextRepresentationListener (LineTextRepresentationListenerWithParser):
-	__slots__ = [ '_suite', '_index', '_before', '_after' ]
+class StatementNewLineTextRepresentationListener (LineTextRepresentationListenerWithParser):
+	def __init__(self, parser):
+		super( StatementNewLineTextRepresentationListener, self ).__init__( parser )
 
 	
-	def __init__(self, parser, suite, index, before, after):
-		super( NewLineTextRepresentationListener, self ).__init__( parser )
-		self._suite = suite
-		self._index = index
-		self._before = before
-		self._after = after
+	def _getNextStatementContext(self, statementContext):
+		while statementContext is not None:
+			parentContext = _getParentStatementContext( statementContext )
+			suite = parentContext.getTreeNode()['suite']
 
+			contextElement = statementContext.getViewNodeElement()
+			vbox = contextElement.getParent()
+			vboxChildren = vbox.getChildren()
+			index = vboxChildren.indexOf( contextElement )
+			
+			if index < len( vboxChildren ) - 1:
+				return vboxChildren[index+1].getContext()
+			
+			statementContext = parentContext
 		
+		return None
+		
+		
+
 	def textRepresentationModified(self, element):
 		# Get the content
 		value = element.getTextRepresentation()
@@ -309,24 +366,92 @@ class NewLineTextRepresentationListener (LineTextRepresentationListenerWithParse
 		node = ctx.getTreeNode()
 		if value == '':
 			# Newline has been deleted
-			beforeContent = self._before.getTextRepresentation()
-			afterContent = self._after.getTextRepresentation()   if self._after is not None   else   ''
+			statementContext = _getStatementContextFromElement( element )
+			statementTextRep = statementContext.getViewNodeContentElement().getTextRepresentation().strip( '\n' )
 			
-			endIndex = self._index + 2   if self._after is not None   else   self._index + 1
+			if isCompoundStmt( statementContext.getDocNode() ):
+				# Edited new-line that is from the header of a compound statement, join the first statement
+				if len( statementContext.getDocNode()['suite'] ) > 0:
+					# The statement is a compound statement, and has at least 1 child; join with first child
+					# The new line between the header and the first child statement will have been removed by the delete operation, so the first line will be the combined header/child
+					value = statementTextRep.split( '\n' )[0]
 			
-			value = beforeContent + afterContent
-			
+					# Split into lines
+					lineStrings = value.split( '\n' )
+					# Parse
+					parsedLines = self.parseLines( lineStrings )
+					
+					nextDocNode = statementContext.getDocNode()['suite'][0]
+					nextTreeNode = statementContext.getTreeNode()['suite'][0]
 
-			# Split into lines
-			lineStrings = value.split( '\n' )
-			# Parse
-			parsedLines = self.parseLines( lineStrings )
+					if isCompoundStmt( nextTreeNode ):
+						block = Nodes.IndentedBlock( suite=nextDocNode['suite'] )
+						EditOperations.replace( statementContext, nextTreeNode, block )
+					else:
+						EditOperations.remove( statementContext, nextTreeNode )
+					
+					if isCompoundStmt( parsedLines[-1] ):
+						comp = parsedLines[-1]
+						comp['suite'] = statementContext.getDocNode()['suite']
+					else:
+						if len( statementContext.getDocNode()['suite'] ) > 0:
+							comp = Nodes.IndentedBlock()
+							parsedLines.append( comp )
+							comp['suite'] = statementContext.getDocNode()['suite']
+
+					EditOperations.replaceWithRange( statementContext, statementContext.getTreeNode(), parsedLines )
+					return
+				
+
+				# The statement is a compound statement and has no children; join with next statement; fall through
+				
+				
+			# Join the statement with the one after
+			nextContext = self._getNextStatementContext( statementContext )
 			
-			del self._suite[self._index:endIndex]
-			EditOperations.insertRange( ctx, self._suite, self._index, parsedLines )
+			if nextContext is not None:
+				nextTextRep = nextContext.getViewNodeContentElement().getTextRepresentation().strip( '\n' )
+				if isCompoundStmt( nextContext.getDocNode() ):
+					nextTextRep = nextTextRep.split( '\n' )[0]
+				value = statementTextRep + nextTextRep
+		
+				# Split into lines
+				lineStrings = value.split( '\n' )
+				# Parse
+				parsedLines = self.parseLines( lineStrings )
+
+				if _getParentStatementContext( statementContext ) is _getParentStatementContext( nextContext ):
+					# Siblings
+					if isCompoundStmt( nextContext.getDocNode() ):
+						if isCompoundStmt( parsedLines[-1] ):
+							comp = parsedLines[-1]
+						else:
+							comp = Nodes.IndentedBlock()
+							parsedLines.append( comp )
+						
+						comp['suite'] = nextContext.getDocNode()['suite']
+					
+					EditOperations.remove( nextContext, nextContext.getTreeNode() )
+					EditOperations.replaceWithRange( statementContext, statementContext.getTreeNode(), parsedLines )
+				else:
+					# Not siblings
+					if isCompoundStmt( nextContext.getDocNode() ):
+						block = Nodes.IndentedBlock( suite=nextContext.getDocNode()['suite'] )
+						EditOperations.replace( nextContext, nextContext.getTreeNode(), block )
+					else:
+						EditOperations.remove( nextContext, nextContext.getTreeNode() )
+					
+					EditOperations.replaceWithRange( statementContext, statementContext.getTreeNode(), parsedLines )
 			
 			
 			
+	_listenerTable = None
+		
+	@staticmethod
+	def newListener(parser):
+		if StatementNewLineTextRepresentationListener._listenerTable is None:
+			StatementNewLineTextRepresentationListener._listenerTable = _ListenerTable( StatementNewLineTextRepresentationListener )
+		return StatementNewLineTextRepresentationListener._listenerTable.get( parser )
 
 
 
@@ -513,42 +638,6 @@ class PyLineList (object):
 		
 			
 		
-def _getStatementContextFromElement(element):
-	context = element.getContext()
-	
-	while not isStmt( context.getDocNode() ):
-		context = context.getParent()
-	return context
-
-
-def _getParentStatementContext(ctx):
-	ctx = ctx.getParent()
-	while ctx is not None  and  not isStmt( ctx.getDocNode() )  and  not ctx.getDocNode().isInstanceOf( Nodes.PythonModule ):
-		ctx = ctx.getParent()
-	return ctx
-
-def _getStatementContextPath(ctx):
-	path = []
-	while ctx is not None:
-		path.insert( 0, ctx )
-		ctx = _getParentStatementContext( ctx )
-	return path
-
-def _getStatementContextPathsFromCommonRoot(ctx0, ctx1):
-	path0 = _getStatementContextPath( ctx0 )
-	path1 = _getStatementContextPath( ctx1 )
-	commonLength = min( len( path0 ), len( path1 ) )
-	for i, ( p0, p1 ) in enumerate( zip( path0, path1 ) ):
-		if p0 is not p1:
-			commonLength = i
-			break
-	return path0[commonLength-1:], path1[commonLength-1:]
-		
-	
-	
-	
-
-	
 class Python25EditHandler (EditHandler):
 	def __init__(self, viewContext):
 		self._viewContext = viewContext

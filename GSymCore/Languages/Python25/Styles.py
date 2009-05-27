@@ -48,11 +48,8 @@ list_listViewLayoutSep = ParagraphListViewLayout( python_paragraphStyle, lambda:
 dict_listViewLayout = ParagraphListViewLayout( python_paragraphStyle, lambda: TextElement( default_textStyle, ' ' ), 0, ListViewLayout.TrailingSeparator.NEVER )
 dict_listViewLayoutSep = ParagraphListViewLayout( python_paragraphStyle, lambda: TextElement( default_textStyle, ' ' ), 0, ListViewLayout.TrailingSeparator.NEVER )
 
-module_listViewLayout = VerticalListViewLayout( VBoxStyleSheet( DPVBox.Typesetting.ALIGN_WITH_TOP, DPVBox.Alignment.EXPAND, 0.0, False, 0.0 ), \
-						ParagraphStyleSheet(), 0.0, ListViewLayout.TrailingSeparator.ALWAYS )
+suite_vboxStyle = VBoxStyleSheet( DPVBox.Typesetting.ALIGN_WITH_TOP, DPVBox.Alignment.LEFT, 0.0, False, 0.0 )
 
-suite_listViewLayout = VerticalListViewLayout( VBoxStyleSheet( DPVBox.Typesetting.ALIGN_WITH_TOP, DPVBox.Alignment.EXPAND, 0.0, False, 0.0 ), \
-						ParagraphStyleSheet(), 0.0, ListViewLayout.TrailingSeparator.ALWAYS )
 
 #lineEditorStyle = GSymStyleSheet( highlightBackgroundColour=Colour3f( 0.85, 0.85, 1.0 ) )
 
