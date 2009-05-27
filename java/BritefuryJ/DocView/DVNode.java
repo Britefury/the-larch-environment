@@ -204,9 +204,10 @@ public class DVNode implements CellListener
 		return nodeContext;
 	}
 	
-	public void setContext(NodeContext context)
+	public void setContext(NodeContext context, Element.ElementContext elementContext)
 	{
 		nodeContext = context;
+		proxyElement.setContext( elementContext );
 	}
 	
 	

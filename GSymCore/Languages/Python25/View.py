@@ -114,7 +114,6 @@ def capitalisedKeywordText(ctx, keyword):
 
 
 
-			
 _statementKeyboardListener = StatementKeyboardListener()
 
 			
@@ -169,11 +168,7 @@ def expressionNodeEditor(ctx, node, contents, precedence, state):
 		contents = _precedenceParen( ctx, node, contents, precedence, outerPrecedence )
 		return ctx.textRepresentationListener( contents, ParsedExpressionTextRepresentationListener.newListener( parser, outerPrecedence ) )
 	elif mode == MODE_EDITSTATEMENT:
-		contents = _precedenceParen( ctx, node, contents, precedence, outerPrecedence )
-		segment = ctx.segment( python_paragraphStyle, default_textStyle, True, True, contents )
-		segment = ctx.textRepresentationListener( segment, ParsedLineTextRepresentationListener.newListener( parser ) )
-		segment = ctx.keyboardListener( segment, _statementKeyboardListener )
-		return segment
+		return statementNodeEditor( ctx, node, contents, precedence, state )
 	else:
 		raise ValueError, 'invalid mode %d'  %  mode
 
@@ -185,6 +180,11 @@ def statementNodeEditor(ctx, node, contents, precedence, state):
 		contents = _precedenceParen( ctx, node, contents, precedence, outerPrecedence )
 		segment = ctx.segment( python_paragraphStyle, default_textStyle, True, True, contents )
 		segment = ctx.textRepresentationListener( segment, ParsedLineTextRepresentationListener.newListener( parser ) )
+
+		newLine = ctx.whitespace( '\n' )
+		newLine = ctx.textRepresentationListener( newLine, StatementNewLineTextRepresentationListener.newListener( parser ) )
+
+		segment = ctx.paragraph( python_paragraphStyle, [ segment, newLine ] )
 		segment = ctx.keyboardListener( segment, _statementKeyboardListener )
 		return segment
 	else:
@@ -193,9 +193,22 @@ def statementNodeEditor(ctx, node, contents, precedence, state):
 
 def compoundStatementEditor(ctx, node, headerContents, precedence, suite, state, statementParser, headerContainerFn=None):
 	outerPrecedence, parser, mode = state
+	
+	# THE EDIT OPERATIONS RELY ON THE ELEMENT STRUCTURE USED HERE:
+	#	VBox - compound stmt
+	#		Paragraph - header
+	#			Segment - header
+	#				header content
+	#			NewLine - header
+	#		Indent - suite
+	#			suite view
 
 	headerSegment = ctx.segment( python_paragraphStyle, default_textStyle, True, True, headerContents )
-	headerParagraph = ctx.paragraph( python_paragraphStyle, [ headerSegment, ctx.whitespace( '\n' ) ] )
+
+	newLine = ctx.whitespace( '\n' )
+	newLine = ctx.textRepresentationListener( newLine, StatementNewLineTextRepresentationListener.newListener( parser ) )
+
+	headerParagraph = ctx.paragraph( python_paragraphStyle, [ headerSegment, newLine ] )
 	headerElement = ctx.textRepresentationListener( headerParagraph, ParsedLineTextRepresentationListener.newListener( parser ) )
 	headerElement = ctx.keyboardListener( headerElement, _statementKeyboardListener )
 	if headerContainerFn is not None:
@@ -243,13 +256,12 @@ def tupleView(ctx, state, node, xs, trailingSeparator, parser):
 
 
 def suiteView(ctx, suite, parser):
+	# THE EDIT OPERATIONS RELY ON THE ELEMENT STRUCTURE USED HERE:
+	#	VBox - suite
+	#		children*
+
 	lineViews = ctx.mapViewEvalFn( suite, None, python25ViewState( PRECEDENCE_NONE, parser, MODE_EDITSTATEMENT ) )
-	#newLineFac = lambda index, child: ctx.whitespace( '\n' )
-	def newLineFac(index, child):
-		w = ctx.whitespace( '\n' )
-		listener = NewLineTextRepresentationListener( parser, suite, index, lineViews[index], lineViews[index+1]   if index+1 < len(lineViews)   else   None )
-		return ctx.textRepresentationListener( w, listener )
-	return ctx.listView( suite_listViewLayout, None, None, newLineFac, lineViews )
+	return ctx.vbox( suite_vboxStyle, lineViews )
 
 
 
@@ -272,13 +284,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# MISC
 	@ObjectNodeDispatchMethod
 	def PythonModule(self, ctx, state, node, suite):
-		lineViews = ctx.mapViewEvalFn( suite, None, python25ViewState( PRECEDENCE_NONE, self._parser.statement(), MODE_EDITSTATEMENT ) )
-		#newLineFac = lambda index, child: ctx.whitespace( '\n' )
-		def newLineFac(index, child):
-			w = ctx.whitespace( '\n' )
-			listener = NewLineTextRepresentationListener( self._parser.statement(), suite, index, lineViews[index], lineViews[index+1]   if index+1 < len(lineViews)   else   None )
-			return ctx.textRepresentationListener( w, listener )
-		return ctx.listView( module_listViewLayout, None, None, newLineFac, lineViews )
+		return suiteView( ctx, suite, self._parser.statement() )
 
 
 

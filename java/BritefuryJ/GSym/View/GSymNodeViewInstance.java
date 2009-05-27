@@ -74,7 +74,7 @@ public class GSymNodeViewInstance implements Element.ElementContext, DVNode.Node
 	{
 		this.viewInstance = viewInstance;
 		this.viewNode = viewNode;
-		this.viewNode.setContext( this );
+		this.viewNode.setContext( this, this );
 	}
 	
 	
