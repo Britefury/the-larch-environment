@@ -41,11 +41,13 @@ from GSymCore.Languages.Python25.Precedence import *
 #
 
 def isStmt(node):
-	return isinstance( node, DMObjectInterface )  and  node.isInstanceOf( Nodes.Stmt )
+	return isinstance( node, DMObjectInterface )  and  ( node.isInstanceOf( Nodes.Stmt )  or  node.isInstanceOf( Nodes.BlankLine )  or  node.isInstanceOf( Nodes.UNPARSED ) )
 
 def isCompoundStmt(node):
 	return isinstance( node, DMObjectInterface )  and  node.isInstanceOf( Nodes.CompoundStmt )
 
+def isIndentedBlock(node):
+	return isinstance( node, DMObjectInterface )  and  node.isInstanceOf( Nodes.IndentedBlock )
 
 
 
@@ -57,6 +59,8 @@ def isCompoundStmt(node):
 
 def _getStatementContextFromElement(element):
 	context = element.getContext()
+	
+	assert context is not None
 	
 	while not isStmt( context.getDocNode() ):
 		context = context.getParent()
@@ -342,16 +346,12 @@ class StatementNewLineTextRepresentationListener (LineTextRepresentationListener
 	
 	def _getNextStatementContext(self, statementContext):
 		while statementContext is not None:
+			nextContext = statementContext.getNextSibling()
+			if nextContext is not None:
+				return nextContext
+
 			parentContext = _getParentStatementContext( statementContext )
 			suite = parentContext.getTreeNode()['suite']
-
-			contextElement = statementContext.getViewNodeElement()
-			vbox = contextElement.getParent()
-			vboxChildren = vbox.getChildren()
-			index = vboxChildren.indexOf( contextElement )
-			
-			if index < len( vboxChildren ) - 1:
-				return vboxChildren[index+1].getContext()
 			
 			statementContext = parentContext
 		
@@ -431,8 +431,8 @@ class StatementNewLineTextRepresentationListener (LineTextRepresentationListener
 						
 						comp['suite'] = nextContext.getDocNode()['suite']
 					
-					EditOperations.remove( nextContext, nextContext.getTreeNode() )
 					EditOperations.replaceWithRange( statementContext, statementContext.getTreeNode(), parsedLines )
+					EditOperations.remove( nextContext, nextContext.getTreeNode() )
 				else:
 					# Not siblings
 					if isCompoundStmt( nextContext.getDocNode() ):
@@ -466,9 +466,9 @@ class StatementKeyboardListener (ElementKeyboardListener):
 			node = context.getTreeNode()
 			
 			if event.getModifiers() & KeyEvent.SHIFT_MASK  !=  0:
-				self._dedent( node )
+				self._dedent( context, node )
 			else:
-				self._indent( node )
+				self._indent( context, node )
 			return True
 		else:
 			return False
@@ -482,30 +482,77 @@ class StatementKeyboardListener (ElementKeyboardListener):
 	
 	
 	
-	def _indent(self, node):
+	def _indent(self, context, node):
+		# If @node comes after a compunt statement, move it to the end of that statement
 		suite = node.getParentTreeNode()
 		index = suite.indexOfById( node )
+		next = suite[index+1]   if index < len( suite ) - 1   else None
 		if index > 0:
 			prev = suite[index-1]
 			if isCompoundStmt( prev ):
 				prevSuite = prev['suite']
+				
+				nodes = [ node ]
+				
+				# If @node is followed by an indented block, join the contents of the indented block onto @prevSuite
+				if next is not None   and   isIndentedBlock( next ):
+					nodes.extend( next['suite'] )
+					EditOperations.remove( context, next )
+						
 				del suite[index]
-				prevSuite.append( node )
+				prevSuite.extend( nodes )
+				
+				# Now, 
+				return
+			
+
+		if next is not None   and   isIndentedBlock( next ):
+			# If @node is followed by an indented block, insert into the indented block
+			EditOperations.remove( context, node )
+			next['suite'].insert( 0, node )
+		else:
+			# Else, move @node into its own indented block
+			indentedNode = Nodes.IndentedBlock( suite=[ node ] )
+			EditOperations.replace( context, node, indentedNode )
+			
 	
 	
-	def _dedent(self, node):
+	def _dedent(self, context, node):
 		suite = node.getParentTreeNode()
-		index = suite.indexOfById( node )
-		if index == len( suite ) - 1:
-			compStmt = suite.getParentTreeNode()
-			outerSuite = compStmt.getParentTreeNode()
-			# If @outerSuite is None, then this suite is from the module node
-			if outerSuite is not None:
+		compStmt = suite.getParentTreeNode()
+		outerSuite = compStmt.getParentTreeNode()   if compStmt is not None   else None
+		outerIndex = outerSuite.indexOfById( compStmt )   if outerSuite is not None   else None
+
+		# If @outerSuite is None, then this suite is from the module node, in which case we cannot dedent
+		if outerSuite is not None:
+			index = suite.indexOfById( node )
+			if index == len( suite ) - 1:
+				# If @node is at the end of a suite, move it into the parent suite
 				outerIndex = outerSuite.indexOfById( compStmt )
 				
 				del suite[-1]
 				outerSuite.insert( outerIndex + 1, node )
-
+				
+				# If @node was inside an indented block, which will now be empty: remove the indented block
+				if len( suite ) == 0   and   isIndentedBlock( compStmt ):
+					EditOperations.remove( context, compStmt )
+				return
+			elif index == 0  and  isIndentedBlock( compStmt ):
+				# @node is the first node in an indented block; move it out.
+				# The indented block has 2 or more child statements, otherwise the previous if-statment
+				# would have been taken
+				EditOperations.remove( context, node )
+				outerSuite.insert( outerIndex, node )
+			else:
+				# Remove @node and all subsequent nodes from @suite.
+				# Place @node into @outerSuite
+				# Place all subsequent nodes into an indented block
+				subsequentNodes = suite[index+1:]
+				del suite[index:]
+				outerSuite.insert( outerIndex + 1, Nodes.IndentedBlock( suite=subsequentNodes ) )
+				outerSuite.insert( outerIndex + 1, node )
+		
+		
 
 
 

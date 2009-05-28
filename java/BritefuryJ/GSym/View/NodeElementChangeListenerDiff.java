@@ -148,7 +148,11 @@ public class NodeElementChangeListenerDiff implements DVNode.NodeElementChangeLi
 						}
 						else if ( origChangeRegionLength < 0  &&  newChangeRegionLength < 0 )
 						{
-							throw new RuntimeException( "origChangeRegionLength and newChangeRegionLength are both < 0" );
+							if ( newPosition >= prefixLen )
+							{
+								newPosition -= ( newTextRepresentation.length() - textRepresentation.length() );
+								newPosition = Math.max( newPosition, prefixLen );
+							}
 						}
 					}
 					else if ( ( origChangeRegionLength * newChangeRegionLength)  >  DIFF_THRESHHOLD )

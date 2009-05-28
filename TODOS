@@ -44,13 +44,19 @@ Add BNF visualisation to the parser debug viewer.
 
 SELECTION
 =========
-Handle delete/replace selection of selections.
+Handle replace selection.
 
 
 
 CUT AND PASTE
 =============
 Handle cut and paste
+
+
+
+INDENT / DEDENT
+===============
+Fix indent / dedent operations.
 
 
 
