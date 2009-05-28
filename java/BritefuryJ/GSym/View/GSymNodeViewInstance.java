@@ -17,6 +17,7 @@ import BritefuryJ.Cell.CellInterface;
 import BritefuryJ.DocPresent.DPHBox;
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.ElementTree.BorderElement;
+import BritefuryJ.DocPresent.ElementTree.BranchElement;
 import BritefuryJ.DocPresent.ElementTree.Element;
 import BritefuryJ.DocPresent.ElementTree.ElementFactory;
 import BritefuryJ.DocPresent.ElementTree.ElementKeyboardListener;
@@ -508,10 +509,134 @@ public class GSymNodeViewInstance implements Element.ElementContext, DVNode.Node
 	
 	
 	
+	private GSymNodeViewInstance getPreviousSiblingFromChildElement(GSymNodeViewInstance parent, Element fromChild)
+	{
+		if ( fromChild == null )
+		{
+			return null;
+		}
+		BranchElement parentElement = (BranchElement)fromChild.getParent();
+		if ( parentElement == parent.getViewNodeElement() )
+		{
+			return null;
+		}
+		
+		List<Element> children = parentElement.getChildren();
+		int index = children.indexOf( fromChild );
+		for (int i = index - 1; i >= 0; i--)
+		{
+			GSymNodeViewInstance sibling = getLastChildFromParentElement( parent, children.get( i ) );
+			if ( sibling != null )
+			{
+				return sibling;
+			}
+		}
+		
+		return getNextSiblingFromChildElement( parent, parentElement.getParent() );
+	}
+	
+	private GSymNodeViewInstance getLastChildFromParentElement(GSymNodeViewInstance parent, Element element)
+	{
+		if ( element.getContext() != parent )
+		{
+			// We have recursed down the element tree far enough when we encounter an element with a different context
+			return (GSymNodeViewInstance)element.getContext();
+		}
+		else if ( element instanceof BranchElement )
+		{
+			BranchElement branch = (BranchElement)element;
+			List<Element> children = branch.getChildren();
+			for (int i = children.size() - 1; i >= 0; i--)
+			{
+				GSymNodeViewInstance sibling = getLastChildFromParentElement( parent, children.get( i ) );
+				if ( sibling != null )
+				{
+					return sibling;
+				}
+			}
+		}
+		return null;
+	}
+	
+
+	
+	private GSymNodeViewInstance getNextSiblingFromChildElement(GSymNodeViewInstance parent, Element fromChild)
+	{
+		if ( fromChild == null )
+		{
+			return null;
+		}
+		BranchElement parentElement = (BranchElement)fromChild.getParent();
+		if ( parentElement == parent.getViewNodeElement() )
+		{
+			return null;
+		}
+		
+		List<Element> children = parentElement.getChildren();
+		int index = children.indexOf( fromChild );
+		for (int i = index + 1; i < children.size(); i++)
+		{
+			GSymNodeViewInstance sibling = getFirstChildFromParentElement( parent, children.get( i ) );
+			if ( sibling != null )
+			{
+				return sibling;
+			}
+		}
+		
+		return getNextSiblingFromChildElement( parent, parentElement.getParent() );
+	}
+	
+	private GSymNodeViewInstance getFirstChildFromParentElement(GSymNodeViewInstance parent, Element element)
+	{
+		if ( element.getContext() != parent )
+		{
+			// We have recursed down the element tree far enough when we encounter an element with a different context
+			return (GSymNodeViewInstance)element.getContext();
+		}
+		else if ( element instanceof BranchElement )
+		{
+			BranchElement branch = (BranchElement)element;
+			for (Element child: branch.getChildren())
+			{
+				GSymNodeViewInstance sibling = getFirstChildFromParentElement( parent, child );
+				if ( sibling != null )
+				{
+					return sibling;
+				}
+			}
+		}
+		return null;
+	}
+	
+
+	
 	public GSymNodeViewInstance getParent()
 	{
 		DVNode parentViewNode = viewNode.getParent();
 		return parentViewNode != null  ?  (GSymNodeViewInstance)parentViewNode.getContext()  :  null;
+	}
+	
+
+	public GSymNodeViewInstance getPrevSibling()
+	{
+		return getPreviousSiblingFromChildElement( getParent(), getViewNodeElement() );
+	}
+	
+	public GSymNodeViewInstance getNextSibling()
+	{
+		return getNextSiblingFromChildElement( this, getViewNodeElement() );
+	}
+	
+	
+	
+	public GSymNodeViewInstance getFirstChild()
+	{
+		return getFirstChildFromParentElement( getParent(), getViewNodeElement() );
+	}
+	
+	public GSymNodeViewInstance getLastChild()
+	{
+		return getNextSiblingFromChildElement( this, getViewNodeElement() );
 	}
 	
 	
@@ -546,6 +671,12 @@ public class GSymNodeViewInstance implements Element.ElementContext, DVNode.Node
 		}
 
 		return null;
+	}
+	
+	
+	public GSymViewInstance getViewContext()
+	{
+		return viewInstance;
 	}
 	
 
