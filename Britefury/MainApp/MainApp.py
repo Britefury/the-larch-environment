@@ -11,10 +11,12 @@ import os
 from datetime import datetime
 
 from java.lang import Runnable
-from javax.swing import JFrame, AbstractAction, JMenuItem, JMenu, JMenuBar, KeyStroke, JOptionPane, JFileChooser, JOptionPane, JTextField, JLabel, BoxLayout, JPanel, BorderFactory
+from javax.swing import AbstractAction, Action, TransferHandler, KeyStroke, BoxLayout, BorderFactory
+from javax.swing import JComponent, JFrame, JMenuItem, JMenu, JMenuBar, JMenuItem, JOptionPane, JFileChooser, JOptionPane, JTextField, JLabel, JPanel
 from javax.swing.filechooser import FileNameExtensionFilter
-from java.awt import Dimension, Font, Color
-from java.awt.event import WindowListener, ActionListener, KeyEvent
+from java.awt import Dimension, Font, Color, KeyboardFocusManager
+from java.awt.event import WindowListener, ActionListener, ActionEvent, KeyEvent
+from java.beans import PropertyChangeListener
 
 
 from BritefuryJ.CommandHistory import CommandHistory, CommandHistoryListener
@@ -84,12 +86,11 @@ class MainAppPluginInterface (object):
 		
 
 		
-class MainAppDocView (DocView.RefreshListener, DPPresentationArea.UndoListener):
+class MainAppDocView (DocView.RefreshListener):
 	def __init__(self, app):
 		self._app = app
 		
 		self._elementTree = ElementTree()
-		self._elementTree.setUndoListener( self )
 		self._area = self._elementTree.getPresentationArea()
 		self._area.getComponent().setPreferredSize( Dimension( 640, 480 ) )
 		
@@ -158,13 +159,6 @@ class MainAppDocView (DocView.RefreshListener, DPPresentationArea.UndoListener):
 		self._queueRefresh()
 		
 		
-	def onUndo(self):
-		self._app._commandHistory.undo()
-		
-	def onRedo(self):
-		self._app._commandHistory.redo()
-		
-		
 
 		
 class MainAppDocViewNormal (MainAppDocView):
@@ -188,7 +182,25 @@ def _action(name, f):
 	
 		
 		
+
 		
+# Transfer action listener
+class _GSymTransferActionListener (ActionListener):
+	def __init__(self):
+		pass
+		
+	def actionPerformed(self, e):
+		manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+		focusOwner = manager.getPermanentFocusOwner()
+		if focusOwner is not None:
+			action = e.getActionCommand()
+			a = focusOwner.getActionMap().get( action )
+			if a is not None:
+				a.actionPerformed( ActionEvent( focusOwner, ActionEvent.ACTION_PERFORMED, None ) )
+				
+				
+
+				
 
 
 
@@ -206,6 +218,15 @@ class MainApp (object):
 		
 		
 		
+		# Action map
+		actionMap = self._docView.getComponent().getActionMap()
+		actionMap.put( TransferHandler.getCutAction().getValue( Action.NAME ), TransferHandler.getCutAction() )
+		actionMap.put( TransferHandler.getCopyAction().getValue( Action.NAME ), TransferHandler.getCopyAction() )
+		actionMap.put( TransferHandler.getPasteAction().getValue( Action.NAME ), TransferHandler.getPasteAction() )
+		
+		
+		
+
 		# FILE -> NEW MENU
 		
 		self._newMenu = JMenu( 'New' )
@@ -231,11 +252,50 @@ class MainApp (object):
 		
 		# EDIT MENU
 		
+		transferActionListener = _GSymTransferActionListener()
+		
 		editMenu = JMenu( 'Edit' )
-		editMenu.add( _action( 'Undo', self._onUndo ) )
-		editMenu.getItem( 0 ).setAccelerator( KeyStroke.getKeyStroke( 'ctrl z' ) )
-		editMenu.add( _action( 'Redo', self._onRedo ) )
-		editMenu.getItem( 1 ).setAccelerator( KeyStroke.getKeyStroke( 'ctrl shift z' ) )
+		
+		editUndoItem = JMenuItem( 'Undo' )
+		undoAction = _action( 'undo', self._onUndo )
+		editUndoItem.setActionCommand( undoAction.getValue( Action.NAME ) )
+		editUndoItem.addActionListener( undoAction )
+		editUndoItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_Z, ActionEvent.CTRL_MASK ) )
+		editUndoItem.setMnemonic( KeyEvent.VK_U )
+		editMenu.add( editUndoItem )
+
+		editRedoItem = JMenuItem( 'Redo' )
+		redoAction = _action( 'redo', self._onRedo )
+		editRedoItem.setActionCommand( redoAction.getValue( Action.NAME ) )
+		editRedoItem.addActionListener( redoAction )
+		editRedoItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_Z, ActionEvent.CTRL_MASK | ActionEvent.SHIFT_MASK ) )
+		editRedoItem.setMnemonic( KeyEvent.VK_R )
+		editMenu.add( editRedoItem )
+
+		
+		editMenu.addSeparator()
+		
+		editCutItem = JMenuItem( 'Cut' )
+		editCutItem.setActionCommand( TransferHandler.getCutAction().getValue( Action.NAME ) )
+		editCutItem.addActionListener( transferActionListener )
+		editCutItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_X, ActionEvent.CTRL_MASK ) )
+		editCutItem.setMnemonic( KeyEvent.VK_T )
+		editMenu.add( editCutItem )
+		
+		editCopyItem = JMenuItem( 'Copy' )
+		editCopyItem.setActionCommand( TransferHandler.getCopyAction().getValue( Action.NAME ) )
+		editCopyItem.addActionListener( transferActionListener )
+		editCopyItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_C, ActionEvent.CTRL_MASK ) )
+		editCopyItem.setMnemonic( KeyEvent.VK_C )
+		editMenu.add( editCopyItem )
+		
+		editPasteItem = JMenuItem( 'Paste' )
+		editPasteItem.setActionCommand( TransferHandler.getPasteAction().getValue( Action.NAME ) )
+		editPasteItem.addActionListener( transferActionListener )
+		editPasteItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_V, ActionEvent.CTRL_MASK ) )
+		editPasteItem.setMnemonic( KeyEvent.VK_P )
+		editMenu.add( editPasteItem )
+		
 
 		
 		

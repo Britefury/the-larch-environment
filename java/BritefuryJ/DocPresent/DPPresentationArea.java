@@ -13,6 +13,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.datatransfer.Transferable;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.HierarchyEvent;
@@ -35,6 +36,7 @@ import java.util.WeakHashMap;
 
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
+import javax.swing.TransferHandler;
 
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Caret.CaretListener;
@@ -75,18 +77,76 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 	
 	
 	
-	public static interface UndoListener
-	{
-		public void onUndo();
-		public void onRedo();
-	}
-	
-	
-	
-	
 	static private class PresentationAreaComponent extends JComponent implements ComponentListener, MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, HierarchyListener
 	{
 		private static final long serialVersionUID = 1L;
+		
+		
+		
+		private class PresAreaTransferHandler extends TransferHandler
+		{
+			private static final long serialVersionUID = 1L;
+			
+			public boolean canImport(TransferHandler.TransferSupport support)
+			{
+				if ( area.editHandler != null )
+				{
+					return area.editHandler.canImport( support );
+				}
+				else
+				{
+					return false;
+				}
+			}
+
+			public boolean importData(TransferHandler.TransferSupport info)
+			{
+				if ( area.editHandler != null )
+				{
+					return area.editHandler.importData( info );
+				}
+				else
+				{
+					return false;
+				}
+			}
+			
+			
+			
+			public int getSourceActions(JComponent component)
+			{
+				if ( area.editHandler != null )
+				{
+					return area.editHandler.getSourceActions();
+				}
+				else
+				{
+					return NONE;
+				}
+			}
+			
+			public Transferable createTransferable(JComponent component)
+			{
+				if ( area.editHandler != null )
+				{
+					return area.editHandler.createTransferable();
+				}
+				else
+				{
+					return null;
+				}
+			}
+			
+			public void exportDone(JComponent component, Transferable data, int action)
+			{
+				if ( area.editHandler != null )
+				{
+					area.editHandler.exportDone( data, action );
+				}
+			}
+		}
+		
+		
 		
 		public DPPresentationArea area;
 		private boolean bShown, bConfigured;
@@ -112,6 +172,8 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 			setFocusable( true );
 			setRequestFocusEnabled( true );
 			setFocusTraversalKeysEnabled( false );
+			
+			setTransferHandler( new PresAreaTransferHandler() );
 		}
 		
 		
@@ -357,8 +419,6 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 	
 	private Runnable immediateEventDispatcher;
 	
-	private UndoListener undoListener;
-	
 	private boolean bAllocationRequired;
 	
 	private Caret caret;
@@ -430,12 +490,6 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 	}
 	
 	
-	public void setUndoListener(UndoListener l)
-	{
-		undoListener = l;
-	}
-	
-
 	public JComponent getComponent()
 	{
 		return component;
@@ -1135,61 +1189,11 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 	
 	
 	
-	private boolean isSpecialShortcut(KeyEvent event, int modifiers)
-	{
-		boolean bCtrl = ( modifiers & Modifier._KEYS_MASK )  ==  Modifier.CTRL;
-		boolean bCtrlShift = ( modifiers & Modifier._KEYS_MASK )  ==  ( Modifier.CTRL | Modifier.SHIFT );
-		int keyCode = event.getKeyCode();
-
-		return ( bCtrl  &&  keyCode == 'z' )  ||  ( bCtrlShift  &&  keyCode == 'z' )  ||  ( bCtrl  &&  keyCode == 'c' )  ||  ( bCtrl  &&  keyCode == 'x' )  ||  ( bCtrl  &&  keyCode == 'v' );
-	}
-	
-	
 	protected boolean keyPressEvent(KeyEvent event, int modifiers)
 	{
 		rootSpaceMouse.setModifiers( modifiers );
 		
-		boolean bCtrl = ( modifiers & Modifier._KEYS_MASK )  ==  Modifier.CTRL;
-		boolean bCtrlShift = ( modifiers & Modifier._KEYS_MASK )  ==  ( Modifier.CTRL | Modifier.SHIFT );
-		int keyCode = event.getKeyCode();
-
-		if ( bCtrl  &&  keyCode == KeyEvent.VK_Z )
-		{
-			if ( undoListener != null )
-			{
-				undoListener.onUndo();
-			}
-			emitImmediateEvents();
-			return true;
-		}
-		else if ( bCtrlShift  &&  keyCode == KeyEvent.VK_Z )
-		{
-			if ( undoListener != null )
-			{
-				undoListener.onRedo();
-			}
-			emitImmediateEvents();
-			return true;
-		}
-		else if ( bCtrl  &&  keyCode == KeyEvent.VK_C )
-		{
-			editCopy();
-			emitImmediateEvents();
-			return true;
-		}
-		else if ( bCtrl  &&  keyCode == KeyEvent.VK_X )
-		{
-			editCut();
-			emitImmediateEvents();
-			return true;
-		}
-		else if ( bCtrl  &&  keyCode == KeyEvent.VK_V )
-		{
-			editPaste();
-			emitImmediateEvents();
-			return true;
-		}
-		else if ( handleNavigationKeyPress( event, modifiers ) )
+		if ( handleNavigationKeyPress( event, modifiers ) )
 		{
 			emitImmediateEvents();
 			return true;
@@ -1230,12 +1234,7 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 	{
 		rootSpaceMouse.setModifiers( modifiers );
 		
-		if ( isSpecialShortcut( event, modifiers ) )
-		{
-			emitImmediateEvents();
-			return true;
-		}
-		else if ( isNavigationKey( event ) )
+		if ( isNavigationKey( event ) )
 		{
 			emitImmediateEvents();
 			return true;
@@ -1580,34 +1579,6 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 		if ( editHandler != null )
 		{
 			editHandler.replaceSelection( replacement );
-		}
-	}
-
-	protected void editCopy()
-	{
-		if ( editHandler != null )
-		{
-			editHandler.editCopy();
-		}
-	}
-
-	protected void editCut()
-	{
-		if ( editHandler != null )
-		{
-			if ( caret.getMarker().equals( selection.getEndMarker() ) )
-			{
-				caret.getMarker().moveTo( selection.getStartMarker() );
-			}
-			editHandler.editCut();
-		}
-	}
-
-	protected void editPaste()
-	{
-		if ( editHandler != null )
-		{
-			editHandler.editPaste();
 		}
 	}
 }

@@ -14,6 +14,7 @@ import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Border.EmptyBorder;
 import BritefuryJ.DocPresent.ElementTree.Element;
 import BritefuryJ.DocPresent.ElementTree.ElementTree;
+import BritefuryJ.DocPresent.ElementTree.Caret.ElementCaret;
 import BritefuryJ.DocPresent.ElementTree.Selection.ElementSelection;
 import BritefuryJ.DocTree.DocTree;
 import BritefuryJ.DocTree.DocTreeNode;
@@ -194,6 +195,11 @@ public class GSymViewInstance
 		return elementTree.getEditHandler();
 	}
 	
+	
+	public ElementCaret getCaret()
+	{
+		return elementTree.getCaret();
+	}
 	
 	public ElementSelection getSelection()
 	{

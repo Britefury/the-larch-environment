@@ -6,11 +6,27 @@
 //##************************
 package BritefuryJ.DocPresent;
 
+import java.awt.datatransfer.Transferable;
+
+import javax.swing.TransferHandler;
+
 public interface EditHandler
 {
+	public static int COPY = TransferHandler.COPY;
+	public static int COPY_OR_MOVE = TransferHandler.COPY_OR_MOVE;
+	public static int LINK = TransferHandler.LINK;
+	public static int MOVE = TransferHandler.MOVE;
+	public static int NONE = TransferHandler.NONE;
+	
+	
 	void deleteSelection();
 	void replaceSelection(String replacement);
-	void editCopy();
-	void editCut();
-	void editPaste();
+	
+	
+	public boolean canImport(TransferHandler.TransferSupport support);
+	public boolean importData(TransferHandler.TransferSupport info);
+
+	public int getSourceActions();
+	public Transferable createTransferable();
+	public void exportDone(Transferable data, int action);
 }
