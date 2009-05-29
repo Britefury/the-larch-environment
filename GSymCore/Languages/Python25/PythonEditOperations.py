@@ -31,6 +31,7 @@ from Britefury.gSym.View import EditOperations
 from GSymCore.Languages.Python25 import NodeClasses as Nodes
 from GSymCore.Languages.Python25.Parser import Python25Grammar
 from GSymCore.Languages.Python25.Precedence import *
+from GSymCore.Languages.Python25.CodeGenerator import Python25CodeGenerator
 
 
 
@@ -45,6 +46,9 @@ def isStmt(node):
 
 def isCompoundStmt(node):
 	return isinstance( node, DMObjectInterface )  and  node.isInstanceOf( Nodes.CompoundStmt )
+
+def isPythonModule(node):
+	return isinstance( node, DMObjectInterface )  and  node.isInstanceOf( Nodes.PythonModule )
 
 def isIndentedBlock(node):
 	return isinstance( node, DMObjectInterface )  and  node.isInstanceOf( Nodes.IndentedBlock )
@@ -97,7 +101,147 @@ def _getStatementContextPathsFromCommonRoot(ctx0, ctx1):
 	
 
 
+#
+#
+# LINE LIST
+#
+#
 
+class PyLine (object):
+	def __init__(self, indent):
+		self.indent = indent
+		
+	def getAST(self, parser):
+		return None
+	
+	def withIndent(self, indent):
+		pass
+
+		
+class PyTextLine (PyLine):
+	def __init__(self, indent, text):
+		super( PyTextLine, self ).__init__( indent )
+		self.text = text
+		
+	def getAST(self, parser):
+		return parseText( parser, self.text )
+	
+	def withIndent(self, indent):
+		return _TextLine( indent, self.text )
+	
+	def __eq__(self, x):
+		if isinstance( x, PyTextLine ):
+			return self.indent == x.indent  and  self.text == x.text
+		else:
+			return self.text == x
+		
+	def __str__(self):
+		return '\t' * self.indent  +  str( self.text )
+		
+		
+		
+class PyASTLine (PyLine):
+	def __init__(self, indent, ast):
+		super( PyASTLine, self ).__init__( indent )
+		self.ast = ast
+		
+	def getAST(self, parser):
+		return self.ast
+	
+	def withIndent(self, indent):
+		return _ASTLine( indent, self.ast )
+		
+	def __eq__(self, x):
+		if isinstance( x, PyASTLine ):
+			return self.indent == x.indent  and  self.ast is x.ast
+		else:
+			return self.ast is x
+		
+	def __str__(self):
+		return '\t' * self.indent  +  str( self.ast )
+
+	
+		
+class PyLineList (object):
+	def __init__(self, nodes):
+		self.lines = []
+		for node in nodes:
+			self._visit( 0, node )
+	
+			
+	def indexOf(self, x):
+		for i, line in enumerate( self.lines ):
+			if line == x:
+				return i
+		return None
+	
+	
+	def replaceRangeWithAST(self, startIndex, endIndex, astLines):
+		indent = self.lines[startIndex].indent
+		self.lines[startIndex:endIndex] = [ PyASTLine( indent, ast )   for ast in astLines ]
+			
+	
+	def indentRange(self, startIndex, endIndex):
+		for line in self.lines[startIndex:endIndex]:
+			line.indent += 1
+			
+	def dedentRange(self, startIndex, endIndex):
+		for line in self.lines[startIndex:endIndex]:
+			line.indent = max( line.indent - 1, 0 )
+			
+	
+	def parse(self, lineParser):
+		suite = []
+		suiteStack = [ suite ]
+		
+		currentIndent = 0
+		for line in self.lines:
+			indent = line.indent
+			
+			# Handle change in indentation
+			while indent > currentIndent:
+				if len( suite ) == 0  or  not isCompoundStmt( suite[-1] ):
+					suite.append( Nodes.IndentedBlock( suite=[] ) )
+	
+				comp = suite[-1]
+				suite = comp['suite']
+				suiteStack.append( suite )
+				currentIndent += 1
+			
+			while indent < currentIndent:
+				del suiteStack[-1]
+				suite = suiteStack[-1]
+				currentIndent -= 1
+				
+			
+			# Add the node
+			ast = line.getAST( lineParser )
+			if isCompoundStmt( ast ):
+				ast['suite'] = []
+			suite.append( ast )
+		
+		return suiteStack[0]
+	
+	
+	
+	def _visit(self, indent, node):
+		if not isIndentedBlock( node )   and   not isPythonModule( node ):
+			self.lines.append( PyASTLine( indent, node ) )
+		if isCompoundStmt( node )  or  isPythonModule( node ):
+			for n in node['suite']:
+				self._visit( indent + 1, n )
+				
+				
+	def __str__(self):
+		return '\n'.join( [ ( '-->' + str( line ) )   for line in self.lines ] )
+
+		
+		
+			
+		
+
+	
+	
 #
 #
 # DOCUMENT EDITING
@@ -110,10 +254,7 @@ def pyReplaceExpression(ctx, data, replacement):
 
 def pyReplaceStatement(ctx, data, replacement):
 	if isinstance( data, DocTreeNode ):
-		## HACK
-		## TODO
-		## use Java equals() method for now due to a bug in Jython; should be fixed once the patch for issue 1338 (http://bugs.jython.org) is integrated
-		if data.equals( replacement ):
+		if data == replacement:
 			# Same data; ignore
 			return data
 		else:
@@ -133,7 +274,7 @@ def pyReplaceStatement(ctx, data, replacement):
 					if index == -1:
 						raise ValueError, 'could not replace'
 					if len( parent )  > ( index + 1 ):
-						if parent[index+1].isInstanceOf( Nodes.IndentedBlock ):
+						if isIndentedBlock( parent[index+1] ):
 							# Join the indented block
 							indentedBlock = parent[index+1]
 							originalSuite = indentedBlock['suite']
@@ -229,7 +370,8 @@ class ParsedExpressionTextRepresentationListener (ElementTextRepresentationListe
 				#if parsed != node:
 					#replace( ctx, node, parsed )
 				#replaceNodeContents( ctx, node, Nodes.UNPARSED( value=value ) )
-				pyReplaceExpression( ctx, node, Nodes.UNPARSED( value=value ) )
+				if parsed != node:
+					pyReplaceExpression( ctx, node, parsed )
 			else:
 				#if node != Nodes.UNPARSED( value=value ):
 					#replace( ctx, node, Nodes.UNPARSED( value=value ) )
@@ -315,10 +457,7 @@ class ParsedLineTextRepresentationListener (LineTextRepresentationListenerWithPa
 				#parsedLines.extend( originalContents )
 				
 		#if len( parsedLines ) == 1:
-			### HACK
-			### TODO
-			### use Java equals() method for now due to a bug in Jython; should be fixed once the patch for issue 1338 (http://bugs.jython.org) is integrated
-			#if node.equals( parsedLines[0] ):
+			#if node == parsedLines[0]:
 				## Same data; ignore
 				#pass
 			#else:
@@ -466,9 +605,9 @@ class StatementKeyboardListener (ElementKeyboardListener):
 			node = context.getTreeNode()
 			
 			if event.getModifiers() & KeyEvent.SHIFT_MASK  !=  0:
-				self._dedent( context, node )
+				context.getViewContext().getEditHandler().dedent( context, node )
 			else:
-				self._indent( context, node )
+				context.getViewContext().getEditHandler().indent( context, node )
 			return True
 		else:
 			return False
@@ -482,7 +621,63 @@ class StatementKeyboardListener (ElementKeyboardListener):
 	
 	
 	
-	def _indent(self, context, node):
+
+
+
+
+
+
+
+
+
+class Python25EditHandler (EditHandler):
+	def __init__(self, viewContext):
+		self._viewContext = viewContext
+		self._grammar = Python25Grammar()
+		
+		
+			
+	def indent(self, context, node):
+		selection = self._viewContext.getSelection()
+		
+		if selection.isEmpty():
+			self._indentLine( context, node )
+		else:
+			startMarker = selection.getStartMarker()
+			endMarker = selection.getEndMarker()
+			
+			# Get the statements that contain the start and end markers
+			startContext = _getStatementContextFromElement( startMarker.getElement() )
+			endContext = _getStatementContextFromElement( endMarker.getElement() )
+			
+			if startContext is endContext:
+				self._indentLine( context, node )
+			else:
+				self._indentSelection( selection )
+			
+			
+			
+	def dedent(self, context, node):
+		selection = self._viewContext.getSelection()
+		
+		if selection.isEmpty():
+			self._dedentLine( context, node )
+		else:
+			startMarker = selection.getStartMarker()
+			endMarker = selection.getEndMarker()
+			
+			# Get the statements that contain the start and end markers
+			startContext = _getStatementContextFromElement( startMarker.getElement() )
+			endContext = _getStatementContextFromElement( endMarker.getElement() )
+			
+			if startContext is endContext:
+				self._indentLine( context, node )
+			else:
+				self._dedentSelection( selection )
+				
+			
+			
+	def _indentLine(self, context, node):
 		# If @node comes after a compunt statement, move it to the end of that statement
 		suite = node.getParentTreeNode()
 		index = suite.indexOfById( node )
@@ -517,7 +712,7 @@ class StatementKeyboardListener (ElementKeyboardListener):
 			
 	
 	
-	def _dedent(self, context, node):
+	def _dedentLine(self, context, node):
 		suite = node.getParentTreeNode()
 		compStmt = suite.getParentTreeNode()
 		outerSuite = compStmt.getParentTreeNode()   if compStmt is not None   else None
@@ -551,146 +746,93 @@ class StatementKeyboardListener (ElementKeyboardListener):
 				del suite[index:]
 				outerSuite.insert( outerIndex + 1, Nodes.IndentedBlock( suite=subsequentNodes ) )
 				outerSuite.insert( outerIndex + 1, node )
-		
-		
-
-
-
-
-
-
-
-
-
-class PyLine (object):
-	def __init__(self, indent):
-		self.indent = indent
-		
-	def getAST(self, parser):
-		return None
-	
-	def withIndent(self, indent):
-		pass
-
-		
-class PyTextLine (PyLine):
-	def __init__(self, indent, text):
-		super( PyTextLine, self ).__init__( indent )
-		self.text = text
-		
-	def getAST(self, parser):
-		return parseText( parser, self.text )
-	
-	def withIndent(self, indent):
-		return _TextLine( indent, self.text )
-	
-	def __eq__(self, x):
-		if isinstance( x, PyTextLine ):
-			return self.indent == x.indent  and  self.text == x.text
-		else:
-			return self.text == x
-		
-	def __str__(self):
-		return '\t' * self.indent  +  str( self.text )
-		
-		
-		
-class PyASTLine (PyLine):
-	def __init__(self, indent, ast):
-		super( PyASTLine, self ).__init__( indent )
-		self.ast = ast
-		
-	def getAST(self, parser):
-		return self.ast
-	
-	def withIndent(self, indent):
-		return _ASTLine( indent, self.ast )
-		
-	def __eq__(self, x):
-		if isinstance( x, PyASTLine ):
-			return self.indent == x.indent  and  self.ast == x.ast
-		else:
-			return self.ast is x
-		
-	def __str__(self):
-		return '\t' * self.indent  +  str( self.ast )
-
-	
-		
-class PyLineList (object):
-	def __init__(self, nodes):
-		self.lines = []
-		for node in nodes:
-			self._visit( 0, node )
-	
-			
-	def indexOf(self, x):
-		for i, line in enumerate( self.lines ):
-			if line == x:
-				return i
-		return None
-	
-	
-	def replaceRangeWithAST(self, fromIndex, toIndex, astLines):
-		indent = self.lines[fromIndex].indent
-		self.lines[fromIndex:toIndex+1] = [ PyASTLine( indent, ast )   for ast in astLines ]
-			
-	
-	def parse(self, lineParser):
-		minIndent = min( [ line.indent   for line in self.lines ] )
-		
-		suite = []
-		suiteStack = [ suite ]
-		
-		currentIndent = minIndent
-		for line in self.lines:
-			indent = line.indent
-			
-			# Handle change in indentation
-			while indent > currentIndent:
-				if len( suite ) == 0  or  not isCompoundStmt( suite[-1] ):
-					suite.append( Nodes.IndentedBlock( suite=[] ) )
-	
-				comp = suite[-1]
-				suite = comp['suite']
-				suite[:] = []
-				suiteStack.append( suite )
-				currentIndent += 1
-			
-			while indent < currentIndent:
-				del suiteStack[-1]
-				suite = suiteStack[-1]
-				currentIndent -= 1
-				
-			
-			# Add the node
-			ast = line.getAST( lineParser )
-			suite.append( ast )
-		
-		return suiteStack[0]
-	
-	
-	
-	def _visit(self, indent, node):
-		self.lines.append( PyASTLine( indent, node ) )
-		if isCompoundStmt( node ):
-			for n in node['suite']:
-				self._visit( indent + 1, n )
 				
 				
-	def __str__(self):
-		return '\n'.join( [ str( line )   for line in self.lines ] )
+				
+				
+	def _indentSelection(self, selection):
+		startMarker = selection.getStartMarker()
+		endMarker = selection.getEndMarker()
+		
+		# Get the statements that contain the start and end markers
+		startContext = _getStatementContextFromElement( startMarker.getElement() )
+		endContext = _getStatementContextFromElement( endMarker.getElement() )
+		# Get the statement elements
+		startStmtElement = startContext.getViewNodeContentElement()
+		endStmtElement = endContext.getViewNodeContentElement()
 
-		
-		
+		# Get paths to start and end nodes, from the common root statement
+		path0, path1 = _getStatementContextPathsFromCommonRoot( startContext, endContext )
+		root = path0[0]
+				
+		if len( path0 ) == 1:
+			# Start of selection is in the header of a compound statement; we need to work from one node up
+			r = _getParentStatementContext( root )
+			if r is not None:
+				root = r
 			
+		rootDoc = root.getDocNode()
 		
-class Python25EditHandler (EditHandler):
-	def __init__(self, viewContext):
-		self._viewContext = viewContext
-		self._grammar = Python25Grammar()
+		# Convert to a line list
+		lineList = PyLineList( rootDoc['suite'] )
 		
+		# Replace the lines in the range startIndex->endIndex with the new parsed line
+		startIndex = lineList.indexOf( startContext.getDocNode() )
+		endIndex = lineList.indexOf( endContext.getDocNode() )
+		lineList.indentRange( startIndex, endIndex + 1 )
 		
+		# Parse to ASTs
+		newRootASTs = lineList.parse( self._grammar.statement() )
+		
+		# Insert into document
+		rootDoc['suite'] = newRootASTs
+			
+				
+	
+	
+	def _dedentSelection(self, selection):
+		startMarker = selection.getStartMarker()
+		endMarker = selection.getEndMarker()
+		
+		# Get the statements that contain the start and end markers
+		startContext = _getStatementContextFromElement( startMarker.getElement() )
+		endContext = _getStatementContextFromElement( endMarker.getElement() )
+		# Get the statement elements
+		startStmtElement = startContext.getViewNodeContentElement()
+		endStmtElement = endContext.getViewNodeContentElement()
+
+		# Get paths to start and end nodes, from the common root statement
+		path0, path1 = _getStatementContextPathsFromCommonRoot( startContext, endContext )
+		commonRoot = path0[0]
+		
+		if len( path0 ) == 1:
+			# Start marker is in the header of a compound statement
+			# Move up one
+			commonRoot = _getParentStatementContext( commonRoot )
+			if commonRoot is None:
+				return
+		
+		rootParent = _getParentStatementContext( commonRoot )
+		
+		if rootParent is not None:
+			rootParentDoc = rootParent.getDocNode()
+			
+			# Convert to a line list
+			lineList = PyLineList( rootParentDoc['suite'] )
+			
+			# Replace the lines in the range startIndex->endIndex with the new parsed line
+			startIndex = lineList.indexOf( startContext.getDocNode() )
+			endIndex = lineList.indexOf( endContext.getDocNode() )
+			lineList.dedentRange( startIndex, endIndex + 1 )
+			
+			# Parse to ASTs
+			newRootASTs = lineList.parse( self._grammar.statement() )
+			
+			# Insert into document
+			rootParentDoc['suite'] = newRootASTs
+
+			
+			
 			
 	def deleteSelection(self):
 		selection = self._viewContext.getSelection()
@@ -752,13 +894,13 @@ class Python25EditHandler (EditHandler):
 				# Replace the lines in the range startIndex->endIndex with the new parsed line
 				startIndex = lineList.indexOf( startContext.getDocNode() )
 				endIndex = lineList.indexOf( endContext.getDocNode() )
-				lineList.replaceRangeWithAST( startIndex, endIndex, [ lineDoc ] )
+				lineList.replaceRangeWithAST( startIndex, endIndex + 1, [ lineDoc ] )
 				
 				# Parse to ASTs
 				newRootASTs = lineList.parse( self._grammar.statement() )
 				
 				# Insert into document
-				replaceWithRange( commonRoot, commonRoot.getTreeNode(), newRootASTs )
+				EditOperations.replaceWithRange( commonRoot, commonRoot.getTreeNode(), newRootASTs )
 			else:
 				# Get the suite from the common root statement
 				suite = commonRoot.getDocNode()['suite']
@@ -774,7 +916,7 @@ class Python25EditHandler (EditHandler):
 				# Replace the lines in the range startIndex->endIndex with the new parsed line
 				startIndex = lineList.indexOf( startContext.getDocNode() )
 				endIndex = lineList.indexOf( endContext.getDocNode() )
-				lineList.replaceRangeWithAST( startIndex, endIndex, [ lineDoc ] )
+				lineList.replaceRangeWithAST( startIndex, endIndex + 1, [ lineDoc ] )
 				
 				# Parse to ASTs
 				newASTs = lineList.parse( self._grammar.statement() )

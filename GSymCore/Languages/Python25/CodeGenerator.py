@@ -31,6 +31,10 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 	__dispatch_num_args__ = 0
 	
 	
+	def __init__(self, bErrorChecking=True):
+		super( Python25CodeGenerator, self ).__init__()
+		self._bErrorChecking = bErrorChecking
+	
 	
 	# Misc
 	@ObjectNodeDispatchMethod
@@ -585,6 +589,16 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 		if not isNullNode( bases ):
 			text += ' ('  +  ', '.join( [ self( h )   for h in bases ] )  +  ')'
 		return text  +  ':\n'  +  _indent( suiteText )
+	
+	
+	
+	# Indented block
+	@ObjectNodeDispatchMethod
+	def IndentedBlock(self, node, suite):
+		if self._bErrorChecking:
+			raise ValueError, 'Indentation error'
+		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
+		return _indent( suiteText )
 	
 	
 	

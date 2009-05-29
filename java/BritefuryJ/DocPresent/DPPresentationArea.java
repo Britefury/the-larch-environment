@@ -487,6 +487,11 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 		editHandler = handler;
 	}
 	
+	public EditHandler getEditHandler()
+	{
+		return editHandler;
+	}
+	
 	
 
 
