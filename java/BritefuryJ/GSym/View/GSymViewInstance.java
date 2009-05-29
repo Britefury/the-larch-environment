@@ -189,6 +189,11 @@ public class GSymViewInstance
 		elementTree.setEditHandler( handler );
 	}
 	
+	public EditHandler getEditHandler()
+	{
+		return elementTree.getEditHandler();
+	}
+	
 	
 	public ElementSelection getSelection()
 	{

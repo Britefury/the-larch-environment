@@ -139,4 +139,9 @@ public class ElementTree
 	{
 		getPresentationArea().setEditHandler( handler );
 	}
+
+	public EditHandler getEditHandler()
+	{
+		return getPresentationArea().getEditHandler();
+	}
 }
