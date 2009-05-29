@@ -2,7 +2,19 @@ TODOS:
 
 
 
-LINE BREAKS
+EMACS CONTROLS
+==========
+Emacs navigation
+
+
+
+QUERY LANGUAGE
+===========
+Tie in with emacs navigation
+
+
+
+PARAGRAPH LINE BREAKS
 ==========
 Line breaks break the most convenient element. This looks bad in the case of:
 f(a, b, c, d, e(x, y))
@@ -51,12 +63,6 @@ Handle replace selection.
 CUT AND PASTE
 =============
 Handle cut and paste
-
-
-
-INDENT / DEDENT
-===============
-Fix indent / dedent operations.
 
 
 

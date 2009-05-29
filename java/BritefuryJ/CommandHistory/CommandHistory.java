@@ -183,14 +183,17 @@ public class CommandHistory
 			thaw();
 		}
 		
-		Entry entry = past.get( past.size() - 1 );
-		past.remove( past.size() - 1 );
-		unexecuteEntry( entry );
-		future.add( entry );
-		
-		if ( listener != null )
+		if ( past.size() > 1 )
 		{
-			listener.onCommandHistoryChanged( this );
+			Entry entry = past.get( past.size() - 1 );
+			past.remove( past.size() - 1 );
+			unexecuteEntry( entry );
+			future.add( entry );
+			
+			if ( listener != null )
+			{
+				listener.onCommandHistoryChanged( this );
+			}
 		}
 	}
 	
@@ -202,14 +205,17 @@ public class CommandHistory
 			thaw();
 		}
 		
-		Entry entry = future.get( future.size() - 1 );
-		future.remove( future.size() - 1 );
-		executeEntry( entry );
-		past.add( entry );
-		
-		if ( listener != null )
+		if ( future.size() > 1 )
 		{
-			listener.onCommandHistoryChanged( this );
+			Entry entry = future.get( future.size() - 1 );
+			future.remove( future.size() - 1 );
+			executeEntry( entry );
+			past.add( entry );
+			
+			if ( listener != null )
+			{
+				listener.onCommandHistoryChanged( this );
+			}
 		}
 	}
 	
