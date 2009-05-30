@@ -6,6 +6,10 @@
 //##************************
 package BritefuryJ.DocModel;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -23,8 +27,10 @@ import BritefuryJ.CommandHistory.Trackable;
 import BritefuryJ.JythonInterface.JythonIndex;
 import BritefuryJ.JythonInterface.JythonSlice;
 
-public class DMList extends DMNode implements DMListInterface, Trackable
+public class DMList extends DMNode implements DMListInterface, Trackable, Serializable
 {
+	private static final long serialVersionUID = 1L;
+
 	public static class ListView implements List<Object>
 	{
 		private DMList src;
@@ -854,5 +860,27 @@ public class DMList extends DMNode implements DMListInterface, Trackable
 	public void setTracker(CommandTracker tracker)
 	{
 		commandTracker = (DMListCommandTracker)tracker;
+	}
+	
+	
+	
+	
+	//
+	// Serialisation
+	//
+	
+	@SuppressWarnings("unchecked")
+	private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException
+	{
+		cell = new LiteralCell();
+		ArrayList<Object> value = (ArrayList<Object>)stream.readObject();
+		cell.setLiteralValue( value );
+		
+		commandTracker = null;
+	}
+	
+	private void writeObject(ObjectOutputStream stream) throws IOException
+	{
+		stream.writeObject( cell.getLiteralValue() );
 	}
 }

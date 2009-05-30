@@ -20,6 +20,19 @@ import BritefuryJ.DocModel.DMModule.ClassAlreadyDefinedException;
 
 public class Test_DMIOWriter extends TestCase
 {
+	protected static class TestWriter extends DMIOWriter
+	{
+		protected static void test_escape(StringBuilder builder, String x)
+		{
+			escape( builder, x );
+		}
+		
+		protected static String test_quoteString(String s)
+		{
+			return quoteString( s );
+		}
+	}
+	
 	private DMModule module, module2;
 	private DMObjectClass A, A2;
 	
@@ -52,7 +65,7 @@ public class Test_DMIOWriter extends TestCase
 	
 	public void matchTest(Pattern pattern, String input, String expected)
 	{
-		DMIOReader.MatchResult res = DMIOReader.match( pattern, input, 0 );
+		DMIOReader.MatchResult res = Test_DMIOReader.TestReader.test_match( pattern, input, 0 );
 		
 		if ( res.value == null )
 		{
@@ -76,7 +89,7 @@ public class Test_DMIOWriter extends TestCase
 
 	public void matchFailTest(Pattern pattern, String input)
 	{
-		DMIOReader.MatchResult res = DMIOReader.match( pattern, input, 0 );
+		DMIOReader.MatchResult res = Test_DMIOReader.TestReader.test_match( pattern, input, 0 );
 		
 		if ( res.value != null  &&  res.value.equals( input ) )
 		{
@@ -92,7 +105,7 @@ public class Test_DMIOWriter extends TestCase
 	public void escapeTest(String input, String expected)
 	{
 		StringBuilder builder = new StringBuilder();
-		DMIOWriter.escape( builder, input );
+		TestWriter.test_escape( builder, input );
 		assertEquals( builder.toString(), expected );
 	}
 
@@ -163,21 +176,21 @@ public class Test_DMIOWriter extends TestCase
 	
 	public void testQuoteString()
 	{
-		assertEquals( DMIOWriter.quoteString( "a" ), "\"a\"" );
-		assertEquals( DMIOWriter.quoteString( "a b" ), "\"a b\"" );
-		assertEquals( DMIOWriter.quoteString( "abcdefgh" ), "\"abcdefgh\"" );
-		assertEquals( DMIOWriter.quoteString( "abcdefgh`" ), "\"abcdefgh`\"" );
-		assertEquals( DMIOWriter.quoteString( "\nabcdefgh" ), "\"\\nabcdefgh\"" );
-		assertEquals( DMIOWriter.quoteString( "abcd\nefgh" ), "\"abcd\\nefgh\"" );
-		assertEquals( DMIOWriter.quoteString( "abcdefgh\n" ), "\"abcdefgh\\n\"" );
-		assertEquals( DMIOWriter.quoteString( "\nab\ncd\nef\ngh\n" ), "\"\\nab\\ncd\\nef\\ngh\\n\"" );
-		assertEquals( DMIOWriter.quoteString( "ab\ncd\nef\ngh\n" ), "\"ab\\ncd\\nef\\ngh\\n\"" );
-		assertEquals( DMIOWriter.quoteString( "\nab\ncd\nef\ngh" ), "\"\\nab\\ncd\\nef\\ngh\"" );
-		assertEquals( DMIOWriter.quoteString( "ab\ncd\nef\ngh" ), "\"ab\\ncd\\nef\\ngh\"" );
-		assertEquals( DMIOWriter.quoteString( "abcd\refgh" ), "\"abcd\\refgh\"" );
-		assertEquals( DMIOWriter.quoteString( "abcd\tefgh" ), "\"abcd\\tefgh\"" );
-		assertEquals( DMIOWriter.quoteString( "abcd\\efgh" ), "\"abcd\\\\efgh\"" );
-		assertEquals( DMIOWriter.quoteString( "abcd" + new Character( (char)0x1258 ).toString() + "efgh" ), "\"abcd\\x1258xefgh\"" );
+		assertEquals( TestWriter.test_quoteString( "a" ), "\"a\"" );
+		assertEquals( TestWriter.test_quoteString( "a b" ), "\"a b\"" );
+		assertEquals( TestWriter.test_quoteString( "abcdefgh" ), "\"abcdefgh\"" );
+		assertEquals( TestWriter.test_quoteString( "abcdefgh`" ), "\"abcdefgh`\"" );
+		assertEquals( TestWriter.test_quoteString( "\nabcdefgh" ), "\"\\nabcdefgh\"" );
+		assertEquals( TestWriter.test_quoteString( "abcd\nefgh" ), "\"abcd\\nefgh\"" );
+		assertEquals( TestWriter.test_quoteString( "abcdefgh\n" ), "\"abcdefgh\\n\"" );
+		assertEquals( TestWriter.test_quoteString( "\nab\ncd\nef\ngh\n" ), "\"\\nab\\ncd\\nef\\ngh\\n\"" );
+		assertEquals( TestWriter.test_quoteString( "ab\ncd\nef\ngh\n" ), "\"ab\\ncd\\nef\\ngh\\n\"" );
+		assertEquals( TestWriter.test_quoteString( "\nab\ncd\nef\ngh" ), "\"\\nab\\ncd\\nef\\ngh\"" );
+		assertEquals( TestWriter.test_quoteString( "ab\ncd\nef\ngh" ), "\"ab\\ncd\\nef\\ngh\"" );
+		assertEquals( TestWriter.test_quoteString( "abcd\refgh" ), "\"abcd\\refgh\"" );
+		assertEquals( TestWriter.test_quoteString( "abcd\tefgh" ), "\"abcd\\tefgh\"" );
+		assertEquals( TestWriter.test_quoteString( "abcd\\efgh" ), "\"abcd\\\\efgh\"" );
+		assertEquals( TestWriter.test_quoteString( "abcd" + new Character( (char)0x1258 ).toString() + "efgh" ), "\"abcd\\x1258xefgh\"" );
 	}
 	
 	

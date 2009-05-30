@@ -6,6 +6,10 @@
 //##************************
 package BritefuryJ.DocModel;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.Map;
 
 import org.python.core.Py;
@@ -18,10 +22,21 @@ import BritefuryJ.Cell.LiteralCell;
 import BritefuryJ.CommandHistory.CommandTracker;
 import BritefuryJ.CommandHistory.CommandTrackerFactory;
 import BritefuryJ.CommandHistory.Trackable;
+import BritefuryJ.DocModel.DMModule.UnknownClassException;
+import BritefuryJ.DocModel.DMModuleResolver.CouldNotResolveModuleException;
 import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
 
-public class DMObject extends DMNode implements DMObjectInterface, Trackable
+public class DMObject extends DMNode implements DMObjectInterface, Trackable, Serializable
 {
+	public static class NotADMObjectStreamClassException extends RuntimeException
+	{
+		private static final long serialVersionUID = 1L;
+	};
+	
+	
+	private static final long serialVersionUID = 1L;
+
+	
 	private DMObjectClass objClass;
 	private LiteralCell cell;
 	private DMObjectCommandTracker commandTracker;
@@ -561,6 +576,70 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable
 		else
 		{
 			return "(" + objClass.getName() + " :)";
+		}
+	}
+
+
+
+
+	//
+	// Serialisation
+	//
+	
+	private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException, CouldNotResolveModuleException, UnknownClassException, InvalidFieldNameException
+	{
+		if ( stream instanceof DMObjectInputStream )
+		{
+			DMObjectClass objClass = ((DMObjectInputStream)stream).readDMObjectClass();
+
+			String keys[] = (String[])stream.readObject();
+			Object values[] = (Object[])stream.readObject();
+			
+			
+			assert keys.length == values.length;
+			
+			this.objClass = objClass;
+			Object fieldData[] = new Object[objClass.getNumFields()];
+			fillArrayWithNulls( fieldData );
+		
+			for (int i = 0; i < keys.length; i++)
+			{
+				int index = objClass.getFieldIndex( keys[i] );
+				if ( index == -1 )
+				{
+					throw new InvalidFieldNameException( keys[i] );
+				}
+				else
+				{
+					fieldData[index] = coerce( values[i] );
+				}
+			}
+	
+			cell = new LiteralCell();
+			cell.setLiteralValue( fieldData );
+			commandTracker = null;
+		}
+		else
+		{
+			throw new NotADMObjectStreamClassException();
+		}
+	}
+	
+	private void writeObject(ObjectOutputStream stream) throws IOException
+	{
+		if ( stream instanceof DMObjectOutputStream )
+		{
+			((DMObjectOutputStream)stream).writeDMObjectClass( objClass );
+			
+			String fieldNames[] = objClass.getFieldNames();
+			Object fieldData[] = (Object[])cell.getLiteralValue();
+			
+			stream.writeObject( fieldNames );
+			stream.writeObject( fieldData );
+		}
+		else
+		{
+			throw new NotADMObjectStreamClassException();
 		}
 	}
 }

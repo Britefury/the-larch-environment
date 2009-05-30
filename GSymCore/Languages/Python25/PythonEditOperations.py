@@ -7,12 +7,20 @@
 ##-*************************
 from weakref import WeakValueDictionary
 
+import cPickle
+
+
+from java.lang import Object
 from java.io import IOException
 from java.util import List
 from java.awt.event import KeyEvent
-from java.awt.datatransfer import UnsupportedFlavorException, DataFlavor, StringSelection
+from java.awt.datatransfer import UnsupportedFlavorException, DataFlavor, StringSelection, Transferable
+
+from Britefury.Kernel.Abstract import abstractmethod
 
 from BritefuryJ.DocModel import DMList, DMObject, DMObjectInterface
+
+from BritefuryJ.Transformation import DefaultIdentityTransformationFunction
 
 from BritefuryJ.DocTree import DocTreeNode, DocTreeList, DocTreeObject
 
@@ -35,6 +43,10 @@ from GSymCore.Languages.Python25.Parser import Python25Grammar
 from GSymCore.Languages.Python25.Precedence import *
 from GSymCore.Languages.Python25.CodeGenerator import Python25CodeGenerator
 
+
+
+class NotImplementedError (Exception):
+	pass
 
 
 #
@@ -118,6 +130,13 @@ class PyLine (object):
 	
 	def withIndent(self, indent):
 		pass
+	
+	
+	@abstractmethod
+	def copy(self):
+		pass
+	
+	
 
 		
 class PyTextLine (PyLine):
@@ -138,13 +157,22 @@ class PyTextLine (PyLine):
 			return self.text == x
 		
 	def __str__(self):
-		return '\t' * self.indent  +  str( self.text )
+		return '>>' + '\t' * self.indent  +  str( self.text )
+	
+	
+	def copy(self):
+		return PyTextLine( self.indent, self.text )
+	
+	
 		
-		
-		
+_identity = DefaultIdentityTransformationFunction()
+_innerFn = lambda x, f: x
+
 class PyASTLine (PyLine):
 	def __init__(self, indent, ast):
 		super( PyASTLine, self ).__init__( indent )
+		if isinstance( ast, DocTreeNode ):
+			ast = ast.getNode()
 		self.ast = ast
 		
 	def getAST(self, parser):
@@ -160,7 +188,13 @@ class PyASTLine (PyLine):
 			return self.ast is x
 		
 	def __str__(self):
-		return '\t' * self.indent  +  str( self.ast )
+		return '>>' + '\t' * self.indent  +  str( self.ast )
+	
+	def copy(self):
+		ast = _identity( self.text, _innerFn )
+		if isCompoundStmt( ast ):
+			ast['suite'] = []
+		return PyASTLine( self.indent, ast )
 
 	
 		
@@ -234,8 +268,15 @@ class PyLineList (object):
 				self._visit( indent + 1, n )
 				
 				
+				
+	def copy(self):
+		x = PyLineList( [] )
+		x.lines = [ line.copy()   for line in self.lines ]
+		return x
+				
+				
 	def __str__(self):
-		return '\n'.join( [ ( '-->' + str( line ) )   for line in self.lines ] )
+		return '\n'.join( [ str( line )   for line in self.lines ] )
 
 		
 		
@@ -623,12 +664,59 @@ class StatementKeyboardListener (ElementKeyboardListener):
 	
 	
 	
+	
+	
+	
+class Python25BufferFlavor (DataFlavor):
+	def __init__(self):
+		super( Python25BufferFlavor, self ).__init__( Object, DataFlavor.javaJVMLocalObjectMimeType )
 
 
+_python25BufferDataFlavor = Python25BufferFlavor()
+	
 
 
+class Python25Transferable (Transferable):
+	def __init__(self, data):
+		self.data = data
+
+	def getTransferData(self, flavor):
+		if flavor is _python25BufferDataFlavor:
+			return self.data
+		else:
+			raise UnsupportedFlavorException
+	
+	def getTransferDataFlavors(self):
+		return [ _python25BufferDataFlavor ]
+	
+	def isDataFlavorSupported(self, flavor):
+		return flavor is _python25BufferDataFlavor
+	
 
 
+	
+class Python25Buffer (object):
+	pass
+
+
+class Python25BufferString (Python25Buffer):
+	def __init__(self, text):
+		self.text = text
+		
+		
+class Python25BufferLinePair (Python25Buffer):
+	def __init__(self, line1, line2):
+		self.line1 = line1
+		self.line2 = line2
+		
+		
+class Python25BufferSubtree (Python25Buffer):
+	def __init__(self, prefix, lineList, suffix):
+		self.prefix = prefix
+		self.lineList = lineList
+		self.suffix = suffix
+	
+	
 
 
 
@@ -837,102 +925,141 @@ class Python25EditHandler (EditHandler):
 			
 			
 	def deleteSelection(self):
+		self.replaceSelection( None )
+	
+	
+	def replaceSelection(self, replacement):
 		selection = self._viewContext.getSelection()
 		
 		if not selection.isEmpty():
-			startMarker = selection.getStartMarker()
-			endMarker = selection.getEndMarker()
-			
-			# Get the statements that contain the start and end markers
-			startContext = _getStatementContextFromElement( startMarker.getElement() )
-			endContext = _getStatementContextFromElement( endMarker.getElement() )
-			# Get the statement elements
-			startStmtElement = startContext.getViewNodeContentElement()
-			endStmtElement = endContext.getViewNodeContentElement()
-			# Get the text before and after the selection
-			textBefore = startStmtElement.getTextRepresentationFromStartToMarker( startMarker )
-			textAfter = endStmtElement.getTextRepresentationFromMarkerToEnd( endMarker )
-			
-			# Compose a new line of text, and parse it
-			line = textBefore + textAfter
-			line = line.strip( '\n' )
-			
-			lineDoc = None
-			
-			if line.strip() == '':
-				# Blank line
-				lineDoc = Nodes.BlankLine()
+			if replacement is not None   and   isinstance( replacement, Python25BufferSubtree ):
+				raise NotImplementedError
 			else:
-				# Parse
-				parsed = parseText( self._grammar.statement(), line )
-				if parsed is None:
-					# Parse failure; unparsed text
-					lineDoc = Nodes.UNPARSED( value=line )
+				startMarker = selection.getStartMarker()
+				endMarker = selection.getEndMarker()
+				
+				# Get the statements that contain the start and end markers
+				startContext = _getStatementContextFromElement( startMarker.getElement() )
+				endContext = _getStatementContextFromElement( endMarker.getElement() )
+				# Get the statement elements
+				startStmtElement = startContext.getViewNodeContentElement()
+				endStmtElement = endContext.getViewNodeContentElement()
+				# Get the text before and after the selection
+				textBefore = startStmtElement.getTextRepresentationFromStartToMarker( startMarker )
+				textAfter = endStmtElement.getTextRepresentationFromMarkerToEnd( endMarker )
+				
+				if replacement is None:
+					# Compose a new line of text, and parse it
+					line = textBefore + textAfter
+				
+					lineDocs = [ self._parseLine( line.strip( '\n' ) ) ]
+				elif isinstance( replacement, str )   or   isinstance( replacement, unicode ):
+					# Compose a new line of text, and parse it
+					line = textBefore + replacement + textAfter
+				
+					lineDocs = [ self._parseLine( line.strip( '\n' ) ) ]
+				elif isinstance( replacement, Python25BufferString ):
+					# Compose a new line of text, and parse it
+					line = textBefore + replacement.text + textAfter
+				
+					lineDocs = [ self._parseLine( line.strip( '\n' ) ) ]
+				elif isinstance( replacement, Python25BufferLinePair ):
+					# Compose two new lines of text, and parse
+					line1 = textBefore + replacement.line2
+					line2 = replacement.line2 + textAfter
+				
+					lineDocs = [ self._parseLine( line1.strip( '\n' ) ),  self._parseLine( line2.strip( '\n' ) ) ]
+					
+					
+						
+						
+						
+				# Now, insert the parsed text into the document		
+				if startContext is endContext:
+					# Selection is within a single statement
+					pyReplaceStatementWithRange( startContext, startContext.getTreeNode(), lineDocs )
+					selection.clear()
 				else:
-					# Parsed
-					lineDoc = parsed
+					# Get paths to start and end nodes, from the common root statement
+					path0, path1 = _getStatementContextPathsFromCommonRoot( startContext, endContext )
+					commonRoot = path0[0]
+					selection.clear()
 					
-					
-					
-			# Now, insert the parsed text into the document		
-			if startContext is endContext:
-				# Selection is within a single statement
-				pyReplaceStatement( startContext, startContext.getTreeNode(), lineDoc )
-				selection.clear()
-			else:
-				# Get paths to start and end nodes, from the common root statement
-				path0, path1 = _getStatementContextPathsFromCommonRoot( startContext, endContext )
-				commonRoot = path0[0]
-				selection.clear()
-				
-				if len( path0 ) == 1:
-					# The path to the start node has only 1 entry; this means that the only statement
-					# on the path is the common root.
-					# The only way this can happen is if the start marker is within the bounds of the header
-					# of a compound statement
-					rootDoc = commonRoot.getDocNode()
-					
-					# Convert to a line list
-					lineList = PyLineList( [ rootDoc ] )
-					
-					# Replace the lines in the range startIndex->endIndex with the new parsed line
-					startIndex = lineList.indexOf( startContext.getDocNode() )
-					endIndex = lineList.indexOf( endContext.getDocNode() )
-					lineList.replaceRangeWithAST( startIndex, endIndex + 1, [ lineDoc ] )
-					
-					# Parse to ASTs
-					newRootASTs = lineList.parse( self._grammar.statement() )
-					
-					# Insert into document
-					EditOperations.replaceWithRange( commonRoot, commonRoot.getTreeNode(), newRootASTs )
-				else:
-					# Get the suite from the common root statement
-					suite = commonRoot.getDocNode()['suite']
-					
-					# Get the indices of the child statements that contain the start and end markers respectively
-					startStmtIndex = suite.indexOfById( path0[1].getDocNode() )
-					endStmtIndex = suite.indexOfById( path1[1].getDocNode() )
-					assert startStmtIndex != -1  and  endStmtIndex != -1
-					
-					# Convert to a line list
-					lineList = PyLineList( suite[startStmtIndex:endStmtIndex+1] )
-					
-					# Replace the lines in the range startIndex->endIndex with the new parsed line
-					startIndex = lineList.indexOf( startContext.getDocNode() )
-					endIndex = lineList.indexOf( endContext.getDocNode() )
-					lineList.replaceRangeWithAST( startIndex, endIndex + 1, [ lineDoc ] )
-					
-					# Parse to ASTs
-					newASTs = lineList.parse( self._grammar.statement() )
-					
-					suite[startStmtIndex:endStmtIndex+1] = newASTs 
+					if len( path0 ) == 1:
+						# The path to the start node has only 1 entry; this means that the only statement
+						# on the path is the common root.
+						# The only way this can happen is if the start marker is within the bounds of the header
+						# of a compound statement
+						rootDoc = commonRoot.getDocNode()
+						
+						# Convert to a line list
+						lineList = PyLineList( [ rootDoc ] )
+						
+						# Replace the lines in the range startIndex->endIndex with the new parsed line
+						startIndex = lineList.indexOf( startContext.getDocNode() )
+						endIndex = lineList.indexOf( endContext.getDocNode() )
+						lineList.replaceRangeWithAST( startIndex, endIndex + 1, lineDocs )
+						
+						# Parse to ASTs
+						newRootASTs = lineList.parse( self._grammar.statement() )
+						
+						# Insert into document
+						EditOperations.replaceWithRange( commonRoot, commonRoot.getTreeNode(), newRootASTs )
+					else:
+						# Get the suite from the common root statement
+						suite = commonRoot.getDocNode()['suite']
+						
+						# Get the indices of the child statements that contain the start and end markers respectively
+						startStmtIndex = suite.indexOfById( path0[1].getDocNode() )
+						endStmtIndex = suite.indexOfById( path1[1].getDocNode() )
+						assert startStmtIndex != -1  and  endStmtIndex != -1
+						
+						# Convert to a line list
+						lineList = PyLineList( suite[startStmtIndex:endStmtIndex+1] )
+						
+						# Replace the lines in the range startIndex->endIndex with the new parsed line
+						startIndex = lineList.indexOf( startContext.getDocNode() )
+						endIndex = lineList.indexOf( endContext.getDocNode() )
+						lineList.replaceRangeWithAST( startIndex, endIndex + 1, lineDocs )
+						
+						# Parse to ASTs
+						newASTs = lineList.parse( self._grammar.statement() )
+						
+						suite[startStmtIndex:endStmtIndex+1] = newASTs 
 				
 				
-	def replaceSelection(self, replacement):
-		pass
 	
 	
 	
+	
+	def _insertBufferAtMarker(self, marker, b):
+		if isinstance( b, Python25BufferString )  or  isinstance( b, Python25BufferLinePair )  or  isinstance( b, str )  or  isinstance( b, unicode ):
+			markerStmtContext = _getStatementContextFromElement( marker.getElement() )
+			markerStmtElement = markerStmtContext.getViewNodeContentElement()
+			textBefore = markerStmtElement.getTextRepresentationFromStartToMarker( marker )
+			textAfter = markerStmtElement.getTextRepresentationFromMarkerToEnd( marker )
+			if isinstance( b, str )  or  isinstance( b, unicode ):
+				line = textBefore + b + textAfter
+				lineDoc = self._parseLine( line.strip() )
+				pyReplaceStatement( markerStmtContext, markerStmtContext.getTreeNode(), lineDoc )
+			elif isinstance( b, Python25BufferString ):
+				line = textBefore + b.text + textAfter
+				lineDoc = self._parseLine( line.strip() )
+				pyReplaceStatement( markerStmtContext, markerStmtContext.getTreeNode(), lineDoc )
+			elif isinstance( b, Python25BufferLinePair ):
+				# Even if the second line has indentation, its not enough to determine what to apply, so don't
+				line1, line2 = b.line1, b.line2
+				if not line2.startswith( line2.strip() ):
+					stripped = line2.strip()
+					contentIndex = line2.index( stripped )
+					line2 = line2[contentIndex:]
+				
+				line1 = textBefore + line1
+				line2 = line2 + textAfter
+				lineDocs = [ self._parseLine( line1.strip() ), self._parseLine( line2.strip() ) ]
+				pyReplaceStatementWithRange( markerStmtContext, markerStmtContext.getTreeNode(), lineDocs )
+		else:
+			raise NotImplementedError
 	
 	
 	
@@ -957,8 +1084,7 @@ class Python25EditHandler (EditHandler):
 			if startContext is endContext:
 				# Selection within a single statement
 				text = self._viewContext.getElementTree().getTextRepresentationInSelection( selection )
-				print 'Python25EditHandler.createTransferable(): copied', text
-				return StringSelection( text )
+				return Python25Transferable( Python25BufferString( text ) )
 			else:
 				# Get the statement elements
 				startStmtElement = startContext.getViewNodeContentElement()
@@ -966,7 +1092,22 @@ class Python25EditHandler (EditHandler):
 				# Get the text before and after the selection
 				textInFirstLine = startStmtElement.getTextRepresentationFromMarkerToEnd( startMarker )
 				textInLastLine = endStmtElement.getTextRepresentationFromStartToMarker( endMarker )
-				return None
+				
+				path0, path1 = _getStatementContextPathsFromCommonRoot( startContext, endContext )
+				
+				if len( path0 ) == 2  and  len( path1 ) == 2:
+					# Both statements fromt the same suite
+					commonRootCtx = path0[0]
+					suite = commonRootCtx.getDocNode()['suite']
+					startIndex = suite.indexOfById( startContext.getDocNode() )
+					endIndex = suite.indexOfById( endContext.getDocNode() )
+					if endIndex == startIndex + 1:
+						return Python25Transferable( Python25BufferLinePair( textInFirstLine, textInLastLine ) )
+				
+				# Handle the subtree case
+				raise NotImplementedError
+
+		return None
 
 				
 				
@@ -979,7 +1120,7 @@ class Python25EditHandler (EditHandler):
 			
 
 	def canImport(self, support):					# -> bool,   support <- TransferHandler.TransferSupport
-		if support.isDataFlavorSupported( DataFlavor.stringFlavor ):
+		if support.isDataFlavorSupported( _python25BufferDataFlavor ):
 			return True
 		else:
 			return False
@@ -990,7 +1131,7 @@ class Python25EditHandler (EditHandler):
 		if not self.canImport( info ):
 			return False
 		try:
-			data = info.getTransferable().getTransferData( DataFlavor.stringFlavor )
+			data = info.getTransferable().getTransferData( _python25BufferDataFlavor )
 		except UnsupportedFlavorException:
 			return False
 		except IOException:
@@ -1001,34 +1142,30 @@ class Python25EditHandler (EditHandler):
 			return False
 		else:
 			# Paste
-			lines = data.split( '\n' )
-			if len( lines ) == 1:
+			selection = self._viewContext.getSelection()
+			if not selection.isEmpty():
+				self.replaceSelection( data )
+				return True
+			else:
 				caret = self._viewContext.getCaret()
 				caretMarker = caret.getMarker()
 				if caretMarker.isValid():
-					caretStmtContext = _getStatementContextFromElement( caretMarker.getElement() )
-					caretStmtElement = caretStmtContext.getViewNodeContentElement()
-					textBefore = caretStmtElement.getTextRepresentationFromStartToMarker( caretMarker )
-					textAfter = caretStmtElement.getTextRepresentationFromMarkerToEnd( caretMarker )
-					line = textBefore + lines[0] + textAfter
-					
-					if line.strip() == '':
-						# Blank line
-						lineDoc = Nodes.BlankLine()
-					else:
-						# Parse
-						parsed = parseText( self._grammar.statement(), line.strip() )
-						if parsed is None:
-							# Parse failure; unparsed text
-							lineDoc = Nodes.UNPARSED( value=line )
-						else:
-							# Parsed
-							lineDoc = parsed
-					
-					pyReplaceStatement( caretStmtContext, caretStmtContext.getTreeNode(), lineDoc )
-					
+					self._insertBufferAtMarker( caretMarker, data )
 					return True
-			return False
+				return False
 	
 
-
+	def _parseLine(self, line):
+		if line.strip() == '':
+			# Blank line
+			return Nodes.BlankLine()
+		else:
+			# Parse
+			parsed = parseText( self._grammar.statement(), line )
+			if parsed is None:
+				# Parse failure; unparsed text
+				return Nodes.UNPARSED( value=line )
+			else:
+				# Parsed
+				return parsed
+		
