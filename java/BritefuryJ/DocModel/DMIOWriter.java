@@ -38,7 +38,7 @@ public class DMIOWriter
 	
 	
 	
-	private DMIOWriter()
+	protected DMIOWriter()
 	{
 		moduleToName = new HashMap<DMModule, String>();
 		names = new HashSet<String>();
@@ -49,7 +49,7 @@ public class DMIOWriter
 	
 
 	
-	public static void writeString(StringBuilder builder, String content)
+	private static void writeString(StringBuilder builder, String content)
 	{
 		Matcher m = unquotedString.matcher( content );
 		boolean bFound = m.find();
@@ -63,7 +63,7 @@ public class DMIOWriter
 		}
 	}
 	
-	public void writeList(StringBuilder builder, List<Object> content) throws InvalidDataTypeException
+	private void writeList(StringBuilder builder, List<Object> content) throws InvalidDataTypeException
 	{
 		builder.append( "[" );
 		if ( content.size() > 0 )
@@ -78,7 +78,7 @@ public class DMIOWriter
 		builder.append( "]" );
 	}
 	
-	public void writeObject(StringBuilder builder, DMObject obj) throws InvalidDataTypeException
+	private void writeObject(StringBuilder builder, DMObject obj) throws InvalidDataTypeException
 	{
 		DMObjectClass cls = obj.getDMClass();
 		DMModule mod = cls.getModule();
@@ -122,7 +122,7 @@ public class DMIOWriter
 	
 	
 	@SuppressWarnings("unchecked")
-	public void writeItem(StringBuilder builder, Object content) throws InvalidDataTypeException
+	private void writeItem(StringBuilder builder, Object content) throws InvalidDataTypeException
 	{
 		if ( content instanceof String )
 		{
@@ -152,7 +152,7 @@ public class DMIOWriter
 	}
 	
 	
-	public String writeDocument(Object content) throws InvalidDataTypeException
+	private String writeDocument(Object content) throws InvalidDataTypeException
 	{
 		StringBuilder builder = new StringBuilder();
 		writeItem( builder, content );
@@ -204,7 +204,7 @@ public class DMIOWriter
 
 
 
-	public static void escape(StringBuilder builder, String x)
+	protected static void escape(StringBuilder builder, String x)
 	{
 		for (int i = 0; i < x.length(); i++)
 		{
@@ -233,7 +233,7 @@ public class DMIOWriter
 		}
 	}
 	
-	public static String quoteString(String s)
+	protected static String quoteString(String s)
 	{
 		StringBuilder builder = new StringBuilder();
 		

@@ -209,23 +209,21 @@ public class NodeElementChangeListenerDiff implements DVNode.NodeElementChangeLi
 							}
 							
 							// Prepend and append some 'equal' operations that cover the prefix and suffix
-							if ( prefixLen > 0 )
-							{
-								operations.add( 0, new StringDiff.Operation( StringDiff.Operation.OpCode.EQUAL, 0, prefixLen, 0, prefixLen ) );
-							}
 							if ( suffixLen > 0 )
 							{
-								operations.add( new StringDiff.Operation( StringDiff.Operation.OpCode.EQUAL, textRepresentation.length() - suffixLen, textRepresentation.length(),
+								operations.add( 0, new StringDiff.Operation( StringDiff.Operation.OpCode.EQUAL, textRepresentation.length() - suffixLen, textRepresentation.length(),
 										newTextRepresentation.length() - suffixLen, newTextRepresentation.length() ) );
+							}
+							if ( prefixLen > 0 )
+							{
+								operations.add( new StringDiff.Operation( StringDiff.Operation.OpCode.EQUAL, 0, prefixLen, 0, prefixLen ) );
 							}
 
 							// Find the operation which covers the caret
 							for (StringDiff.Operation op: operations)
 							{
-								if ( ( position > op.aBegin  ||  ( position == op.aBegin  &&  bias == Marker.Bias.END ) )  &&  position < op.aEnd )
+								if ( position >= op.aBegin  &&  position < op.aEnd )
 								{
-									// Caret is in the range of this operation
-									
 									if ( op.opcode == StringDiff.Operation.OpCode.DELETE )
 									{
 										// Range deleted; move to the start of the range in the destination string, bias:STARt
@@ -235,7 +233,7 @@ public class NodeElementChangeListenerDiff implements DVNode.NodeElementChangeLi
 									else
 									{
 										// Range replaced, equal, or inserted; offset position be delta between starts of ranges
-										newPosition += op.bBegin - op.aBegin;
+										newPosition = position + op.bBegin - op.aBegin;
 									}
 								}
 							}

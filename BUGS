@@ -11,8 +11,3 @@ x=a+b+c+d+e+f+g
 
 before 'f', paste ' xyz '
 
-
-
-Pasteing:
-=======
-Pasteing does not move caret forward

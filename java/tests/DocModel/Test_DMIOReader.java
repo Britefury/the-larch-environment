@@ -22,6 +22,20 @@ import BritefuryJ.DocModel.DMIOWriter.InvalidDataTypeException;
 
 public class Test_DMIOReader extends TestCase
 {
+	protected static class TestReader extends DMIOReader
+	{
+		protected TestReader(String source, DMModuleResolver resolver)
+		{
+			super( source, resolver );
+		}
+
+		protected static MatchResult test_match(Pattern pattern, String source, int position)
+		{
+			return match( pattern, source, position );
+		}
+	}
+
+	
 	private DMModule module;
 	private DMModuleResolver resolver;
 	private DMObjectClass A;
@@ -69,7 +83,7 @@ public class Test_DMIOReader extends TestCase
 	
 	public void matchTest(Pattern pattern, String input, String expected)
 	{
-		DMIOReader.MatchResult res = DMIOReader.match( pattern, input, 0 );
+		DMIOReader.MatchResult res = TestReader.test_match( pattern, input, 0 );
 		
 		if ( res.value == null )
 		{
@@ -93,7 +107,7 @@ public class Test_DMIOReader extends TestCase
 
 	public void matchFailTest(Pattern pattern, String input)
 	{
-		DMIOReader.MatchResult res = DMIOReader.match( pattern, input, 0 );
+		DMIOReader.MatchResult res = TestReader.test_match( pattern, input, 0 );
 		
 		if ( res != null  &&  res.value.equals( input ) )
 		{

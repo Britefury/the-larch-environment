@@ -84,7 +84,7 @@ public class DMIOReader
 	
 	
 	
-	public static MatchResult match(Pattern pattern, String source, int position)
+	protected static MatchResult match(Pattern pattern, String source, int position)
 	{
 		Matcher m = pattern.matcher( source.substring( position, source.length() ) );
 		
@@ -101,7 +101,7 @@ public class DMIOReader
 		}
 	}
 	
-	public static String evalString(String s)
+	private static String evalString(String s)
 	{
 		assert( s.charAt( 0 ) == '\"' );
 		assert( s.charAt( s.length() - 1 ) == '\"');
@@ -134,7 +134,7 @@ public class DMIOReader
 	}
 	
 	
-	public static MatchResult matchAtom(String source, int position)
+	private static MatchResult matchAtom(String source, int position)
 	{
 		// Quoted string
 		MatchResult res = match( quotedString, source, position );
@@ -178,7 +178,7 @@ public class DMIOReader
 	DMModuleResolver resolver;
 	
 	
-	private DMIOReader(String source, DMModuleResolver resolver)
+	protected DMIOReader(String source, DMModuleResolver resolver)
 	{
 		stack = new ArrayList<Object>();
 		nameStack = new ArrayList<String>();
@@ -479,7 +479,7 @@ public class DMIOReader
 	}
 	
 	
-	public Object readDocument() throws ParseErrorException, BadModuleNameException, UnknownClassException, CouldNotResolveModuleException
+	private Object readDocument() throws ParseErrorException, BadModuleNameException, UnknownClassException, CouldNotResolveModuleException
 	{
 		eatWhitespace();
 		
