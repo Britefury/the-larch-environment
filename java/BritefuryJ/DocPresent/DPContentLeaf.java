@@ -557,12 +557,6 @@ public abstract class DPContentLeaf extends DPWidget
 	}
 	
 	
-	public DPContentLeaf getLeafAtContentPosition(int position)
-	{
-		return this;
-	}
-	
-	
 	protected DPWidget getLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter)
 	{
 		if ( filter.testLeaf( this ) )

@@ -24,7 +24,6 @@ from Britefury.gSym.gSymWorld import GSymWorld
 
 from Britefury.MainApp.MainApp import MainApp
 
-
 def main():
 	initGSymEnvironment()
 	

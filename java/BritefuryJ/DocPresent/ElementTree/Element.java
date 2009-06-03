@@ -445,19 +445,6 @@ public abstract class Element
 	
 	
 	
-	public boolean isMarkerAtStart(ElementMarker m)
-	{
-		return getWidget().isMarkerAtStart( m.getWidgetMarker() );
-	}
-	
-	public boolean isMarkerAtEnd(ElementMarker m)
-	{
-		return getWidget().isMarkerAtEnd( m.getWidgetMarker() );
-	}
-	
-	
-	
-	
 	//
 	// Meta-element
 	//

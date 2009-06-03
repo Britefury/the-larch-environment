@@ -1231,12 +1231,6 @@ abstract public class DPWidget
 
 
 
-	public DPContentLeaf getLeafAtContentPosition(int position)
-	{
-		return null;
-	}
-	
-	
 	protected abstract DPWidget getLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter);
 	
 	
@@ -1324,17 +1318,6 @@ abstract public class DPWidget
 		moveMarkerToStart( m );
 	}
 	
-	
-	
-	public boolean isMarkerAtStart(Marker m)
-	{
-		return false;
-	}
-	
-	public boolean isMarkerAtEnd(Marker m)
-	{
-		return false;
-	}
 	
 	
 	
