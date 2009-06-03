@@ -5,7 +5,6 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from java.lang import String
 from java.util import List
 
 from BritefuryJ.DocModel import DMListInterface, DMObjectInterface, DMNode
@@ -14,7 +13,7 @@ from BritefuryJ.DocTree import DocTreeNode, DocTreeList, DocTreeObject
 
 
 def isStringNode(x):
-	return isinstance( x, str )  or  isinstance( x, unicode )  or  isinstance( x, String )
+	return isinstance( x, str )  or  isinstance( x, unicode )
 
 def isListNode(xs):
 	return isinstance( xs, List )  or  isinstance( xs, list )  or isinstance( xs, DMListInterface )  or  isinstance( xs, DocTreeList )
@@ -23,7 +22,7 @@ def isObjectNode(xs):
 	return isinstance( xs, DMObjectInterface )  or  isinstance( xs, DocTreeObject )
 
 def isNullNode(x):
-	return isStringNode( x )  and  DMNode.isNull( x.toString() )
+	return isStringNode( x )  and  DMNode.isNull( x )
 
 def makeNullNode():
 	return DMNode.newNull()

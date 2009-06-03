@@ -191,7 +191,7 @@ class PyASTLine (PyLine):
 		return '>>' + '\t' * self.indent  +  str( self.ast )
 	
 	def copy(self):
-		ast = _identity( self.text, _innerFn )
+		ast = _identity( self.ast, _innerFn )
 		if isCompoundStmt( ast ):
 			ast['suite'] = []
 		return PyASTLine( self.indent, ast )
@@ -212,10 +212,31 @@ class PyLineList (object):
 		return None
 	
 	
+	def subList(self, startIndex, endIndex):
+		x = PyLineList( [] )
+		x.lines = [ line.copy()   for line in self.lines[startIndex:endIndex] ]
+		minIndent = min( [ line.indent   for line in x.lines ] )   if len( x.lines ) > 0   else   0
+		for line in x.lines:
+			line.indent -= minIndent
+		return x
+	
+	
 	def replaceRangeWithAST(self, startIndex, endIndex, astLines):
 		indent = self.lines[startIndex].indent
 		self.lines[startIndex:endIndex] = [ PyASTLine( indent, ast )   for ast in astLines ]
-			
+		
+		
+	def insertLineList(self, index, lineList, indentOffset):
+		insertion = [ line.copy()   for line in lineList.lines ]
+		for line in insertion:
+			line.indent += indentOffset
+		self.lines[index:index] = insertion
+	
+	def insertASTLine(self, index, ast, indentation):
+		self.lines.insert( index, PyASTLine( indentation, ast ) )
+		
+	def deleteLine(self, index):
+		del self.lines[index]
 	
 	def indentRange(self, startIndex, endIndex):
 		for line in self.lines[startIndex:endIndex]:
@@ -223,7 +244,7 @@ class PyLineList (object):
 			
 	def dedentRange(self, startIndex, endIndex):
 		for line in self.lines[startIndex:endIndex]:
-			line.indent = max( line.indent - 1, 0 )
+			line.indent -= 1
 			
 	
 	def parse(self, lineParser):
@@ -233,6 +254,7 @@ class PyLineList (object):
 		currentIndent = 0
 		for line in self.lines:
 			indent = line.indent
+			indent = max( indent, 0 )
 			
 			# Handle change in indentation
 			while indent > currentIndent:
@@ -1033,11 +1055,11 @@ class Python25EditHandler (EditHandler):
 	
 	
 	def _insertBufferAtMarker(self, marker, b):
+		markerStmtContext = _getStatementContextFromElement( marker.getElement() )
+		markerStmtElement = markerStmtContext.getViewNodeContentElement()
+		textBefore = markerStmtElement.getTextRepresentationFromStartToMarker( marker )
+		textAfter = markerStmtElement.getTextRepresentationFromMarkerToEnd( marker )
 		if isinstance( b, Python25BufferString )  or  isinstance( b, Python25BufferLinePair )  or  isinstance( b, str )  or  isinstance( b, unicode ):
-			markerStmtContext = _getStatementContextFromElement( marker.getElement() )
-			markerStmtElement = markerStmtContext.getViewNodeContentElement()
-			textBefore = markerStmtElement.getTextRepresentationFromStartToMarker( marker )
-			textAfter = markerStmtElement.getTextRepresentationFromMarkerToEnd( marker )
 			if isinstance( b, str )  or  isinstance( b, unicode ):
 				line = textBefore + b + textAfter
 				lineDoc = self._parseLine( line.strip() )
@@ -1058,8 +1080,51 @@ class Python25EditHandler (EditHandler):
 				line2 = line2 + textAfter
 				lineDocs = [ self._parseLine( line1.strip() ), self._parseLine( line2.strip() ) ]
 				pyReplaceStatementWithRange( markerStmtContext, markerStmtContext.getTreeNode(), lineDocs )
-		else:
-			raise NotImplementedError
+		elif isinstance( b, Python25BufferSubtree ):
+			# Compute the text and ASTs for the lines that surround the marker / insertion point
+			preLine = ( textBefore + b.prefix ).strip( '\n' )
+			postLine = ( b.suffix + textAfter ).strip( '\n' )
+			preDoc = self._parseLine( preLine )   if preLine != ''   else None
+			postDoc = self._parseLine( postLine )   if postLine != ''   else None
+
+			# Get the indentation of the first line of the source data
+			destIndent = b.lineList.lines[0].indent   if len( b.lineList.lines ) > 0   else 0
+
+			# Recurse up the destination document from the caret statement, the number of levels
+			# necessary to fit the source block, so that indentation matches
+			rootContext = markerStmtContext
+			for i in xrange( 0, destIndent+1 ):
+				parentContext = _getParentStatementContext( rootContext )
+				if parentContext is None:
+					break
+				rootContext = parentContext
+			rootDoc = rootContext.getDocNode()
+			
+			# Convert the destination data to a line list, and get the position of the caret
+			lineList = PyLineList( rootDoc['suite'] )
+			index = lineList.indexOf( markerStmtContext.getDocNode() )
+			indentAtCaret = lineList.lines[index].indent
+			
+			# Compute the indentation offset that should be applied to the source data so that
+			# the first line matches the caret in the destination
+			indentOffset = indentAtCaret - destIndent
+			
+			lineList.deleteLine( index )
+			if postDoc is not None:
+				postIndent = b.lineList.lines[-1].indent + indentOffset   if len( b.lineList.lines ) > 0   else indentAtCaret
+				lineList.insertASTLine( index, postDoc, postIndent )
+			lineList.insertLineList( index, b.lineList, indentOffset )
+			if preDoc is not None:
+				lineList.insertASTLine( index, preDoc, indentAtCaret )
+			
+			# Parse to ASTs
+			newASTs = lineList.parse( self._grammar.statement() )
+			
+			rootDoc['suite'] = newASTs
+			
+
+			
+			
 	
 	
 	
@@ -1089,7 +1154,7 @@ class Python25EditHandler (EditHandler):
 				# Get the statement elements
 				startStmtElement = startContext.getViewNodeContentElement()
 				endStmtElement = endContext.getViewNodeContentElement()
-				# Get the text before and after the selection
+				# Get the text between the selection start and the end of the start line, and the start of the end line and the selection end
 				textInFirstLine = startStmtElement.getTextRepresentationFromMarkerToEnd( startMarker )
 				textInLastLine = endStmtElement.getTextRepresentationFromStartToMarker( endMarker )
 				
@@ -1103,9 +1168,38 @@ class Python25EditHandler (EditHandler):
 					endIndex = suite.indexOfById( endContext.getDocNode() )
 					if endIndex == startIndex + 1:
 						return Python25Transferable( Python25BufferLinePair( textInFirstLine, textInLastLine ) )
-				
+
+
+				#
 				# Handle the subtree case
-				raise NotImplementedError
+				#
+				path0, path1 = _getStatementContextPathsFromCommonRoot( startContext, endContext )
+				commonRoot = path0[0]
+				
+				rootDoc = commonRoot.getDocNode()
+				
+				# Convert to a line list
+				lineList = PyLineList( [ rootDoc ] )
+
+				# Compute the range of the line list
+				startIndex = lineList.indexOf( startContext.getDocNode() )
+				endIndex = lineList.indexOf( endContext.getDocNode() )
+				
+				# Determine if the start marker is at the start of the start statement
+				if textInFirstLine == startStmtElement.getTextRepresentation():
+					textInFirstLine = ''
+				else:
+					startIndex += 1
+					
+				if textInLastLine == endStmtElement.getTextRepresentation():
+					textInLastLine = ''
+				else:
+					endIndex -= 1
+					
+				subList = lineList.subList( startIndex, endIndex + 1 )
+				
+				return Python25Transferable( Python25BufferSubtree( textInFirstLine, subList, textInLastLine ) )
+					
 
 		return None
 

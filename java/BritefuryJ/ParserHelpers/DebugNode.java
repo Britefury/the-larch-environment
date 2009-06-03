@@ -46,7 +46,7 @@ public class DebugNode
 	}
 			
 	
-	protected DebugNode getPrev()
+	public DebugNode getPrev()
 	{
 		return prev;
 	}

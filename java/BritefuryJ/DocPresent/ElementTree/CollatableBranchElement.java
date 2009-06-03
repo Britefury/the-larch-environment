@@ -287,34 +287,6 @@ public abstract class CollatableBranchElement extends OrderedBranchElement
 	
 	
 	
-	public boolean isMarkerAtStart(ElementMarker m)
-	{
-		List<Element> children = getChildren();
-		if ( children.size() > 0 )
-		{
-			return children.get( 0 ).isMarkerAtStart( m );
-		}
-		else
-		{
-			return false;
-		}
-	}
-	
-	public boolean isMarkerAtEnd(ElementMarker m)
-	{
-		List<Element> children = getChildren();
-		if ( children.size() > 0 )
-		{
-			return children.get( children.size() - 1 ).isMarkerAtEnd( m );
-		}
-		else
-		{
-			return false;
-		}
-	}
-
-
-
 	//
 	// Element type methods
 	//
