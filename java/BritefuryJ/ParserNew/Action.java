@@ -39,18 +39,6 @@ public class Action extends UnaryBranchExpression
 	protected boolean bMergeUp;
 	
 	
-	public Action(Object subexp, ParseAction a)
-	{
-		this( subexp, a, false );
-	}
-	
-	public Action(Object subexp, ParseAction a, boolean bMergeUp)
-	{
-		super( subexp );
-		this.a = a;
-		this.bMergeUp = bMergeUp;
-	}
-	
 	public Action(ParserExpression subexp, ParseAction a)
 	{
 		this( subexp, a, false );
@@ -61,17 +49,6 @@ public class Action extends UnaryBranchExpression
 		super( subexp );
 		this.a = a;
 		this.bMergeUp = bMergeUp;
-	}
-	
-	
-	public Action(Object subexp, PyObject a)
-	{
-		this( subexp, new PyAction( a ) );
-	}
-	
-	public Action(Object subexp, PyObject a, boolean bMergeUp)
-	{
-		this( subexp, new PyAction( a ), bMergeUp );
 	}
 	
 	public Action(ParserExpression subexp, PyObject a)
@@ -103,6 +80,20 @@ public class Action extends UnaryBranchExpression
 		if ( res.isValid() )
 		{
 			return res.actionValue( this.a.invoke( input, 0, 1, res.value, res.bindings ), bMergeUp );
+		}
+		else
+		{
+			return res;
+		}
+	}
+
+	protected ParseResult evaluateString(ParserState state, String input, int start)
+	{
+		ParseResult res = subexp.handleString( state, input, start );
+		
+		if ( res.isValid() )
+		{
+			return res.actionValue( this.a.invoke( input, start, res.end, res.value, res.bindings ), bMergeUp );
 		}
 		else
 		{
@@ -173,22 +164,12 @@ public class Action extends UnaryBranchExpression
 	
 	
 	
-	static Action mergeUpAction(Object subexp, ParseAction a)
+	public static Action mergeUpAction(ParserExpression subexp, ParseAction a)
 	{
 		return new Action( subexp, a, true );
 	}
 
-	static Action mergeUpAction(ParserExpression subexp, ParseAction a)
-	{
-		return new Action( subexp, a, true );
-	}
-
-	static Action mergeUpAction(Object subexp, PyObject a)
-	{
-		return new Action( subexp, a, true );
-	}
-
-	static Action mergeUpAction(ParserExpression subexp, PyObject a)
+	public static Action mergeUpAction(ParserExpression subexp, PyObject a)
 	{
 		return new Action( subexp, a, true );
 	}
