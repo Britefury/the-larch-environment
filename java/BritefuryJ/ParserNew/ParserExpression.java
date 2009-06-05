@@ -100,63 +100,78 @@ public abstract class ParserExpression implements ParserExpressionInterface
 	
 	public ParseResult parseString(String input)
 	{
-		return parseStream( new ItemStream( input ), (ParseAction)null );
+		return parseString( input, "[ ]*", (ParseAction)null );
 	}
 
 	public ParseResult parseString(String input, String junkRegex)
 	{
-		return parseStream( new ItemStream( input ), junkRegex, (ParseAction)null );
+		return parseString( input, junkRegex, (ParseAction)null );
 	}
 
 	public ParseResult parseString(String input, ParseAction delegateAction)
 	{
-		return parseStream( new ItemStream( input ), delegateAction );
+		return parseString( input, "[ ]*", delegateAction );
 	}
 
 	public ParseResult parseString(String input, String junkRegex, ParseAction delegateAction)
 	{
-		return parseStream( new ItemStream( input ), junkRegex, delegateAction );
+		ParserState state = new ParserState( junkRegex, delegateAction );
+		ParseResult result = handleString( state, input, 0 );
+		if ( result.isValid() )
+		{
+			result.end = state.skipJunkChars( input, result.end );
+		}
+		
+		return result;
 	}
 
 	public ParseResult parseString(String input, PyObject delegateAction)
 	{
-		return parseStream( new ItemStream( input ), delegateAction );
+		return parseString( input, "[ ]*", new Action.PyAction( delegateAction ) );
 	}
 
 	public ParseResult parseString(String input, String junkRegex, PyObject delegateAction)
 	{
-		return parseStream( new ItemStream( input ), junkRegex, delegateAction );
+		return parseString( input, junkRegex, new Action.PyAction( delegateAction ) );
 	}
 
 	
 	public DebugParseResult debugParseString(String input)
 	{
-		return debugParseStream( new ItemStream( input ), (ParseAction)null );
+		return debugParseString( input, "[ ]*", (ParseAction)null );
 	}
 
 	public DebugParseResult debugParseString(String input, String junkRegex)
 	{
-		return debugParseStream( new ItemStream( input ), junkRegex, (ParseAction)null );
+		return debugParseString( input, junkRegex, (ParseAction)null );
 	}
 
 	public DebugParseResult debugParseString(String input, ParseAction delegateAction)
 	{
-		return debugParseStream( new ItemStream( input ), delegateAction );
+		return debugParseString( input, "[ ]*", delegateAction );
 	}
 
 	public DebugParseResult debugParseString(String input, String junkRegex, ParseAction delegateAction)
 	{
-		return debugParseStream( new ItemStream( input ), junkRegex, delegateAction );
+		ParserState state = new ParserState( junkRegex, delegateAction );
+		state.enableDebugging();
+		DebugParseResult result = (DebugParseResult)evaluateString( state, input, 0 );
+		if ( result.isValid() )
+		{
+			result.end = state.skipJunkChars( input, result.end );
+		}
+		
+		return result;
 	}
 
 	public DebugParseResult debugParseString(String input, PyObject delegateAction)
 	{
-		return debugParseStream( new ItemStream( input ), delegateAction );
+		return debugParseString( input, "[ ]*", new Action.PyAction( delegateAction ) );
 	}
 
 	public DebugParseResult debugParseString(String input, String junkRegex, PyObject delegateAction)
 	{
-		return debugParseStream( new ItemStream( input ), junkRegex, delegateAction );
+		return debugParseString( input, junkRegex, new Action.PyAction( delegateAction ) );
 	}
 
 	
@@ -453,6 +468,21 @@ public abstract class ParserExpression implements ParserExpressionInterface
 		}
 	}	
 	
+	protected ParseResult handleString(ParserState state, String input, int start)
+	{
+		if ( state.bDebuggingEnabled )
+		{
+			debugBegin( state, input );
+			// Get the parse result
+			ParseResult result = evaluateString( state, input, start );
+			return debugEnd( state, input, result );
+		}
+		else
+		{
+			return evaluateString( state, input, start );
+		}
+	}	
+	
 	protected ParseResult handleStream(ParserState state, ItemStreamAccessor input, int start)
 	{
 		if ( state.bDebuggingEnabled )
@@ -500,6 +530,7 @@ public abstract class ParserExpression implements ParserExpressionInterface
 	
 	
 	protected abstract ParseResult evaluateNode(ParserState state, Object input);
+	protected abstract ParseResult evaluateString(ParserState state, String input, int start);
 	protected abstract ParseResult evaluateStream(ParserState state, ItemStreamAccessor input, int start);
 	protected abstract ParseResult evaluateList(ParserState state, List<Object> input, int start);
 	protected abstract ParseResult evaluateObject(ParserState state, DMObjectInterface input);
@@ -637,44 +668,6 @@ public abstract class ParserExpression implements ParserExpressionInterface
 	
 	
 	
-/*	@SuppressWarnings("unchecked")
-	public static ParserExpression coerce(Object x)
-	{
-		if ( x instanceof ParserExpression )
-		{
-			return (ParserExpression)x;
-		}
-		else if ( x instanceof String )
-		{
-			return new Literal( (String)x );
-		}
-		else if ( x instanceof PyString )
-		{
-			return new Literal( ((PyString)x).toString() );
-		}
-		else if ( x instanceof List )
-		{
-			return new ListMatch( (List<Object>)x );
-		}
-		else if ( x.getClass().isArray() )
-		{
-			return new ListMatch( Arrays.asList( (Object[])x ) );
-		}
-		else
-		{
-			return new Literal( x.toString() );
-		}
-	}
-
-	public static ParserExpression coerce(String x)
-	{
-		return new Literal( x );
-	}*/
-
-
-
-
-
 	public List<ParserExpression> getChildren()
 	{
 		ParserExpression[] children = {};
