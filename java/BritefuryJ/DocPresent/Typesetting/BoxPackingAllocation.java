@@ -240,7 +240,7 @@ public class BoxPackingAllocation
 			double padding = childPadding != null  ?  childPadding[i]  :  0.0;
 			
 			// Compute the spacing
-			// Use 'prefferred' spacing, if the child was allocated its preferred amount of space, or more
+			// Use 'preferred' spacing, if the child was allocated its preferred amount of space, or more
 			double childSpacing = ( child.allocationX >= child.prefWidth * TSBox.ONE_MINUS_EPSILON )  ?  child.prefHSpacing  :  child.minHSpacing;
 			// padding consumes child spacing
 			childSpacing = Math.max( childSpacing - padding, 0.0 );
@@ -258,13 +258,75 @@ public class BoxPackingAllocation
 		}
 	}
 
+	public static void allocateHorizontalPackingY(TSBox box, TSBox children[], VAlignment alignment)
+	{
+		if ( alignment == VAlignment.BASELINES  &&  box.bHasBaseline )
+		{
+			// Compute the amount of space allocated (do not allow to fall below minimum requirement)
+			double allocation = Math.max( box.allocationY, box.getMinHeight() );
+			
+			// Compute the 'fraction' between the minimum and preferred heights
+			double fraction = ( allocation - box.getMinHeight() ) / ( box.getPrefHeight() - box.getMinHeight() );
+			
+			// Compute the amount of allocated ascent and descent
+			double allocationAscent = box.getMinAscent()  +  ( box.getPrefAscent() - box.getMinAscent() ) * fraction;
+			double allocationDescent = box.getMinDescent()  +  ( box.getPrefDescent() - box.getMinDescent() ) * fraction;
+			
+			// Compute the difference (clamped to >0) between the allocation and the preferred height 
+			double delta = Math.max( allocation - box.getPrefHeight(), 0.0 );
+			
+			// Compute the baseline position (distribute the 'delta' around the contents)
+			double baselineY = allocationAscent + delta * 0.5; 
+			
+			for (TSBox child: children)
+			{
+				double childAscent = Math.min( allocationAscent, child.getPrefAscent() );
+				double childDescent = Math.min( allocationDescent, child.getPrefDescent() );
+				
+				box.allocateChildY( child, baselineY - childAscent, childAscent + childDescent );
+			}
+		}
+		else
+		{
+			for (TSBox child: children)
+			{
+				double allocation = Math.max( box.allocationY, child.getMinHeight() );
+				if ( alignment == VAlignment.EXPAND )
+				{
+					box.allocateChildY( child, 0.0, allocation );
+				}
+				else
+				{
+					double childHeight = Math.min( allocation, child.getPrefHeight() );
+					
+					if ( alignment == VAlignment.TOP  ||  ( alignment == VAlignment.BASELINES  &&  !box.bHasBaseline ) )
+					{
+						box.allocateChildY( child, 0.0, childHeight );
+					}
+					else if ( alignment == VAlignment.CENTRE )
+					{
+						box.allocateChildY( child, ( allocation - childHeight )  *  0.5, childHeight );
+					}
+					else if ( alignment == VAlignment.BOTTOM )
+					{
+						box.allocateChildY( child, allocation - childHeight, childHeight );
+					}
+					else
+					{
+						throw new RuntimeException( "Invalid v-alignment" );
+					}
+				}
+			}
+		}
+	}
+
 
 	
 	public static void allocateVerticalPackingX(TSBox box, TSBox children[], HAlignment alignment)
 	{
+		double allocation = Math.max( box.allocationX, box.minWidth );
 		for (TSBox child: children)
 		{
-			double allocation = Math.max( box.allocationX, child.minWidth );
 			if ( alignment == HAlignment.EXPAND )
 			{
 				box.allocateChildX( child, 0.0, allocation );
