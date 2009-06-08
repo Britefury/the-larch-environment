@@ -259,6 +259,39 @@ public class BoxPackingAllocation
 	}
 
 
+	
+	public static void allocateVerticalPackingX(TSBox box, TSBox children[], HAlignment alignment)
+	{
+		for (TSBox child: children)
+		{
+			double allocation = Math.max( box.allocationX, child.minWidth );
+			if ( alignment == HAlignment.EXPAND )
+			{
+				box.allocateChildX( child, 0.0, allocation );
+			}
+			else
+			{
+				double childWidth = Math.min( allocation, child.prefWidth );
+				
+				if ( alignment == HAlignment.LEFT )
+				{
+					box.allocateChildX( child, 0.0, childWidth );
+				}
+				else if ( alignment == HAlignment.CENTRE )
+				{
+					box.allocateChildX( child, ( allocation - childWidth )  *  0.5, childWidth );
+				}
+				else if ( alignment == HAlignment.RIGHT )
+				{
+					box.allocateChildX( child, allocation - childWidth, childWidth );
+				}
+				else
+				{
+					throw new RuntimeException( "Invalid h-alignment" );
+				}
+			}
+		}
+	}
 
 	public static void allocateVerticalPackingY(TSBox box, TSBox children[], double spacing, double childPadding[], int packFlags[])
 	{

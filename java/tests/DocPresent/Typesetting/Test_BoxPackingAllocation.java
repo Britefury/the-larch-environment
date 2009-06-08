@@ -8,6 +8,7 @@ package tests.DocPresent.Typesetting;
 
 import BritefuryJ.DocPresent.Typesetting.BoxPackingAllocation;
 import BritefuryJ.DocPresent.Typesetting.BoxPackingRequisition;
+import BritefuryJ.DocPresent.Typesetting.HAlignment;
 import BritefuryJ.DocPresent.Typesetting.TSBox;
 import junit.framework.TestCase;
 
@@ -513,5 +514,171 @@ public class Test_BoxPackingAllocation extends TestCase
 					new double[] { 10.0, 195.0 },
 					new double[] { 10.0, 145.0 },
 					new double[] { 10.0, 145.0 } } );
+	}
+
+
+
+
+
+	private void vpackXTest(TSBox children[], HAlignment alignment, TSBox expectedBox, double boxAllocation, double expectedSize[], double expectedPosition[])
+	{ 
+		TSBox box = new TSBox();
+		BoxPackingRequisition.maximumX( box, children );
+		if ( !box.equals( expectedBox ) )
+		{
+			System.out.println( "PARENT BOX IS NOT AS EXPECTED" );
+			System.out.println( "EXPECTED" );
+			System.out.println( expectedBox );
+			System.out.println( "RESULT" );
+			System.out.println( box );
+		}
+		assertEquals( box, expectedBox );
+		box.setAllocationX( boxAllocation );
+		BoxPackingAllocation.allocateVerticalPackingX( box, children, alignment );
+		for (int i = 0; i < children.length; i++)
+		{
+			if ( children[i].getAllocationX() != expectedSize[i] )
+			{
+				System.out.println( "Child allocation for " + i + " is not as expected; expected=" + expectedSize[i] + ", result=" + children[i].getAllocationX() );
+			}
+			assertEquals( children[i].getAllocationX(), expectedSize[i] );
+
+			if ( children[i].getPositionInParentSpaceX() != expectedPosition[i] )
+			{
+				System.out.println( "Child position for " + i + " is not as expected; expected=" + expectedPosition[i] + ", result=" + children[i].getPositionInParentSpaceX() );
+			}
+			assertEquals( children[i].getPositionInParentSpaceX(), expectedPosition[i] );
+		}
+	}
+	
+	private void vpackXTests(TSBox children[], HAlignment alignment, TSBox expectedBox, double boxAllocations[], double expectedSize[][], double expectedPosition[][])
+	{
+		for (int i = 0; i  < boxAllocations.length; i++)
+		{
+			vpackXTest( children, alignment, expectedBox, boxAllocations[i], expectedSize[i], expectedPosition[i] );
+		}
+	}
+
+
+
+	public void test_vpackX()
+	{
+		// vpackX( [ <200-300,0-0>, <100-200,0-0> ], alignment=LEFT )
+		// 	boxAllocation=400   ->   [ 300, 200 ] @ [ 0, 0 ]		- no expansion, no expansion
+		// 	boxAllocation=300   ->   [ 300, 200 ] @ [ 0, 0 ]		- pref size, no expansion
+		// 	boxAllocation=250   ->   [ 250, 200 ] @ [ 0, 0 ]		- between min and pref, no expansion
+		// 	boxAllocation=200   ->   [ 200, 200 ] @ [ 0, 0 ]		- min size, pref size
+		// 	boxAllocation=150   ->   [ 200, 150 ] @ [ 0, 0 ]		- below min size, between min and pref
+		// 	boxAllocation=100   ->   [ 200, 100 ] @ [ 0, 0 ]		- below min size, min size
+		// 	boxAllocation=50   ->   [ 200, 100 ] @ [ 0, 0 ]		- below min size, below min size
+		vpackXTests( new TSBox[] { xbox( 200.0, 300.0, 0.0, 0.0 ),  xbox( 100.0, 200.0, 0.0, 0.0 ) }, HAlignment.LEFT,
+				xbox( 200.0, 300.0, 0.0, 0.0 ),
+				new double[] { 400.0, 300.0, 250.0, 200.0, 150.0, 100.0, 50.0 },
+				new double[][] {
+					new double[] { 300.0, 200.0 },
+					new double[] { 300.0, 200.0 },
+					new double[] { 250.0, 200.0 },
+					new double[] { 200.0, 200.0 },
+					new double[] { 200.0, 150.0 },
+					new double[] { 200.0, 100.0 },
+					new double[] { 200.0, 100.0 } },
+				new double[][] {
+					new double[] { 0.0, 0.0 },
+					new double[] { 0.0, 0.0 },
+					new double[] { 0.0, 0.0 },
+					new double[] { 0.0, 0.0 },
+					new double[] { 0.0, 0.0 },
+					new double[] { 0.0, 0.0 },
+					new double[] { 0.0, 0.0 } } );
+
+	
+	
+		// vpackX( [ <200-300,0-0>, <100-200,0-0> ], alignment=CENTRE )
+		// 	boxAllocation=400   ->   [ 300, 200 ] @ [ 50, 100 ]	- no expansion, no expansion
+		// 	boxAllocation=300   ->   [ 300, 200 ] @ [ 0, 50 ]		- pref size, no expansion
+		// 	boxAllocation=250   ->   [ 250, 200 ] @ [ 0, 25 ]		- between min and pref, no expansion
+		// 	boxAllocation=200   ->   [ 200, 200 ] @ [ 0, 0 ]		- min size, pref size
+		// 	boxAllocation=150   ->   [ 200, 150 ] @ [ 0, 0 ]		- below min size, between min and pref
+		// 	boxAllocation=100   ->   [ 200, 100 ] @ [ 0, 0 ]		- below min size, min size
+		// 	boxAllocation=50   ->   [ 200, 100 ] @ [ 0, 0 ]		- below min size, below min size
+		vpackXTests( new TSBox[] { xbox( 200.0, 300.0, 0.0, 0.0 ),  xbox( 100.0, 200.0, 0.0, 0.0 ) }, HAlignment.CENTRE,
+				xbox( 200.0, 300.0, 0.0, 0.0 ),
+				new double[] { 400.0, 300.0, 250.0, 200.0, 150.0, 100.0, 50.0 },
+				new double[][] {
+					new double[] { 300.0, 200.0 },
+					new double[] { 300.0, 200.0 },
+					new double[] { 250.0, 200.0 },
+					new double[] { 200.0, 200.0 },
+					new double[] { 200.0, 150.0 },
+					new double[] { 200.0, 100.0 },
+					new double[] { 200.0, 100.0 } },
+				new double[][] {
+					new double[] { 50.0, 100.0 },
+					new double[] { 0.0, 50.0 },
+					new double[] { 0.0, 25.0 },
+					new double[] { 0.0, 0.0 },
+					new double[] { 0.0, 0.0 },
+					new double[] { 0.0, 0.0 },
+					new double[] { 0.0, 0.0 } } );
+
+		
+		
+		// vpackX( [ <200-300,0-0>, <100-200,0-0> ], alignment=RIGHT )
+		// 	boxAllocation=400   ->   [ 300, 200 ] @ [ 100, 200 ]	- no expansion, no expansion
+		// 	boxAllocation=300   ->   [ 300, 200 ] @ [ 0, 100 ]		- pref size, no expansion
+		// 	boxAllocation=250   ->   [ 250, 200 ] @ [ 0, 50 ]		- between min and pref, no expansion
+		// 	boxAllocation=200   ->   [ 200, 200 ] @ [ 0, 0 ]		- min size, pref size
+		// 	boxAllocation=150   ->   [ 200, 150 ] @ [ 0, 0 ]		- below min size, between min and pref
+		// 	boxAllocation=100   ->   [ 200, 100 ] @ [ 0, 0 ]		- below min size, min size
+		// 	boxAllocation=50   ->   [ 200, 100 ] @ [ 0, 0 ]		- below min size, below min size
+		vpackXTests( new TSBox[] { xbox( 200.0, 300.0, 0.0, 0.0 ),  xbox( 100.0, 200.0, 0.0, 0.0 ) }, HAlignment.RIGHT,
+				xbox( 200.0, 300.0, 0.0, 0.0 ),
+				new double[] { 400.0, 300.0, 250.0, 200.0, 150.0, 100.0, 50.0 },
+				new double[][] {
+					new double[] { 300.0, 200.0 },
+					new double[] { 300.0, 200.0 },
+					new double[] { 250.0, 200.0 },
+					new double[] { 200.0, 200.0 },
+					new double[] { 200.0, 150.0 },
+					new double[] { 200.0, 100.0 },
+					new double[] { 200.0, 100.0 } },
+				new double[][] {
+					new double[] { 100.0, 200.0 },
+					new double[] { 0.0, 100.0 },
+					new double[] { 0.0, 50.0 },
+					new double[] { 0.0, 0.0 },
+					new double[] { 0.0, 0.0 },
+					new double[] { 0.0, 0.0 },
+					new double[] { 0.0, 0.0 } } );
+
+	
+	
+		// vpackX( [ <200-300,0-0>, <100-200,0-0> ], alignment=EXPAND )
+		// 	boxAllocation=400   ->   [ 400, 400 ] @ [ 0, 0 ]		- expansion, expansion
+		// 	boxAllocation=300   ->   [ 300, 300 ] @ [ 0, 0 ]		- pref size, expansion
+		// 	boxAllocation=250   ->   [ 250, 250 ] @ [ 0, 0 ]		- between min and pref, expansion
+		// 	boxAllocation=200   ->   [ 200, 200 ] @ [ 0, 0 ]		- min size, pref size
+		// 	boxAllocation=150   ->   [ 200, 150 ] @ [ 0, 0 ]		- below min size, between min and pref
+		// 	boxAllocation=100   ->   [ 200, 100 ] @ [ 0, 0 ]		- below min size, min size
+		// 	boxAllocation=50   ->   [ 200, 100 ] @ [ 0, 0 ]		- below min size, below min size
+		vpackXTests( new TSBox[] { xbox( 200.0, 300.0, 0.0, 0.0 ),  xbox( 100.0, 200.0, 0.0, 0.0 ) }, HAlignment.EXPAND,
+				xbox( 200.0, 300.0, 0.0, 0.0 ),
+				new double[] { 400.0, 300.0, 250.0, 200.0, 150.0, 100.0, 50.0 },
+				new double[][] {
+					new double[] { 400.0, 400.0 },
+					new double[] { 300.0, 300.0 },
+					new double[] { 250.0, 250.0 },
+					new double[] { 200.0, 200.0 },
+					new double[] { 200.0, 150.0 },
+					new double[] { 200.0, 100.0 },
+					new double[] { 200.0, 100.0 } },
+				new double[][] {
+					new double[] { 0.0, 0.0 },
+					new double[] { 0.0, 0.0 },
+					new double[] { 0.0, 0.0 },
+					new double[] { 0.0, 0.0 },
+					new double[] { 0.0, 0.0 },
+					new double[] { 0.0, 0.0 },
+					new double[] { 0.0, 0.0 } } );
 	}
 }
