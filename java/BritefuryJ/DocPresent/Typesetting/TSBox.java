@@ -18,16 +18,19 @@ public class TSBox
 	protected double scale;
 	protected double minWidth, prefWidth, minHSpacing, prefHSpacing;
 	protected double minAscent, prefAscent, minDescent, prefDescent, minVSpacing, prefVSpacing;
-	protected boolean bHasBaseline;		// If false, then ascent = height, descent = 0
+	
 	protected double positionInParentSpaceX, positionInParentSpaceY;
 	protected double allocationX, allocationY;
 	
+	protected boolean bHasBaseline;		// If false, then ascent = height, descent = 0
+	protected int lineBreakPriority;
 	
 	
 	public TSBox()
 	{
 		scale = 1.0;
 		bHasBaseline = false;
+		lineBreakPriority = -1;
 	}
 	
 	public TSBox(double width, double hSpacing, double height, double vSpacing)
@@ -38,6 +41,7 @@ public class TSBox
 		minAscent = prefAscent = height;
 		minVSpacing = prefVSpacing = vSpacing;
 		bHasBaseline = false;
+		lineBreakPriority = -1;
 	}
 	
 	public TSBox(double width, double hSpacing, double ascent, double descent, double vSpacing)
@@ -49,6 +53,7 @@ public class TSBox
 		minDescent = prefDescent = descent;
 		minVSpacing = prefVSpacing = vSpacing;
 		bHasBaseline = true;
+		lineBreakPriority = -1;
 	}
 
 	public TSBox(double minWidth, double prefWidth, double minHSpacing, double prefHSpacing, double minHeight, double prefHeight, double minVSpacing, double prefVSpacing)
@@ -63,6 +68,7 @@ public class TSBox
 		this.minVSpacing = minVSpacing;
 		this.prefVSpacing = prefVSpacing;
 		bHasBaseline = false;
+		lineBreakPriority = -1;
 	}
 
 	public TSBox(double minWidth, double prefWidth, double minHSpacing, double prefHSpacing,
@@ -80,9 +86,28 @@ public class TSBox
 		this.minVSpacing = minVSpacing;
 		this.prefVSpacing = prefVSpacing;
 		bHasBaseline = true;
+		lineBreakPriority = -1;
 	}
 	
 	
+	private TSBox(TSBox box)
+	{
+		scale = 1.0;
+		minWidth = box.minWidth;
+		prefWidth = box.prefWidth;
+		minHSpacing = box.minHSpacing;
+		prefHSpacing = box.prefHSpacing;
+		minAscent = box.minAscent;
+		prefAscent = box.prefAscent;
+		minDescent = box.minDescent;
+		prefDescent = box.prefDescent;
+		minVSpacing = box.minVSpacing;
+		prefVSpacing = box.prefVSpacing;
+		bHasBaseline = box.bHasBaseline;
+		lineBreakPriority = -1;
+	}
+	
+
 	public double getScale()
 	{
 		return scale;
@@ -363,5 +388,15 @@ public class TSBox
 	public static boolean testPackFlagExpand(int packFlags)
 	{
 		return ( packFlags & PACKFLAG_EXPAND )  !=  0;
+	}
+	
+	
+	
+	
+	public TSBox lineBreakBox(int priority)
+	{
+		TSBox b = new TSBox( this );
+		b.lineBreakPriority = priority;
+		return b;
 	}
 }

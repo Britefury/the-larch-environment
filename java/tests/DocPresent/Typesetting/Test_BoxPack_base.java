@@ -1,0 +1,46 @@
+//##* This program is free software; you can use it, redistribute it and/or modify it
+//##* under the terms of the GNU General Public License version 2 as published by the
+//##* Free Software Foundation. The full text of the GNU General Public License
+//##* version 2 can be found in the file named 'COPYING' that accompanies this
+//##* program. This source code is (C)copyright Geoffrey French 2008.
+//##************************
+package tests.DocPresent.Typesetting;
+
+import BritefuryJ.DocPresent.Typesetting.TSBox;
+import junit.framework.TestCase;
+
+public class Test_BoxPack_base extends TestCase
+{
+	protected TSBox xbox(double width, double hspacing)
+	{
+		return new TSBox( width, hspacing, 0.0, 0.0 );
+	}
+	
+	protected TSBox ybox(double height, double vspacing)
+	{
+		return new TSBox( 0.0, 0.0, height, vspacing );
+	}
+	
+	protected TSBox ybbox(double ascent, double descent, double vspacing)
+	{
+		return new TSBox( 0.0, 0.0, ascent, descent, vspacing );
+	}
+
+
+
+
+	protected TSBox xbox(double minWidth, double prefWidth, double minHSpacing, double prefHSpacing)
+	{
+		return new TSBox( minWidth, prefWidth, minHSpacing, prefHSpacing, 0.0, 0.0, 0.0, 0.0 );
+	}
+	
+	protected TSBox ybox(double minHeight, double prefHeight, double minVSpacing, double prefVSpacing)
+	{
+		return new TSBox( 0.0, 0.0, 0.0, 0.0, minHeight, prefHeight, minVSpacing, prefVSpacing );
+	}
+	
+	protected TSBox ybbox(double minAscent, double prefAscent, double minDescent, double prefDescent, double minVSpacing, double prefVSpacing)
+	{
+		return new TSBox( 0.0, 0.0, 0.0, 0.0, minAscent, prefAscent, minDescent, prefDescent, minVSpacing, prefVSpacing );
+	}
+}

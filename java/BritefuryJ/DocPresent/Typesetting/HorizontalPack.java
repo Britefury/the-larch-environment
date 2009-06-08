@@ -6,35 +6,9 @@
 //##************************
 package BritefuryJ.DocPresent.Typesetting;
 
-
-public class BoxPackingRequisition
+public class HorizontalPack
 {
-	public static void maximumX(TSBox box, TSBox children[])
-	{
-		// The resulting box should have the following properties:
-		// - maximum width of all children
-		// - sum of width and h-spacing should be the max of that of all children
-
-		
-		box.clearRequisitionX();
-		
-		double minWidth = 0.0, minAdvance = 0.0;
-		double prefWidth = 0.0, prefAdvance = 0.0;
-		for (TSBox child: children)
-		{
-			double childMinAdvance = child.minWidth + child.minHSpacing;
-			double childPrefAdvance = child.prefWidth + child.prefHSpacing;
-			minWidth = Math.max( minWidth, child.minWidth );
-			prefWidth = Math.max( prefWidth, child.prefWidth );
-			minAdvance = Math.max( minAdvance, childMinAdvance );
-			prefAdvance = Math.max( prefAdvance, childPrefAdvance );
-		}
-		
-		box.setRequisitionX( minWidth, prefWidth, minAdvance - minWidth, prefAdvance - prefWidth );
-	}
-	
-	
-	public static void accumulateX(TSBox box, TSBox children[], double spacing, double childPadding[])
+	public static void computeRequisitionX(TSBox box, TSBox children[], double spacing, double childPadding[])
 	{
 		// Accumulate the width required for all the children
 		
@@ -68,10 +42,9 @@ public class BoxPackingRequisition
 		box.setRequisitionX( minWidth, prefWidth, minX - minWidth, prefX - prefWidth );
 	}
 
-
-
-
-	public static void maximumY(TSBox box, TSBox children[], VAlignment alignment)
+	
+	
+	public static void computeRequisitionY(TSBox box, TSBox children[], VAlignment alignment)
 	{
 		// The resulting box should have the following properties:
 		// In the case where alignment is BASELINES:
@@ -177,38 +150,214 @@ public class BoxPackingRequisition
 			box.setRequisitionY( minHeight, prefHeight, minAdvance - minHeight, prefAdvance - prefHeight );
 		}
 	}
-	
-	
-	public static void accumulateY(TSBox box, TSBox children[], double spacing, double childPadding[])
+
+
+
+
+	public static void allocateSpaceX(TSBox box, TSBox children[], int packFlags[])
 	{
-		// Accumulate the width required for all the children
+		int numExpand = 0;
 		
+		// Count the number of children that should expand to use additional space
+		if ( packFlags != null )
+		{
+			assert packFlags.length == children.length;
+			for (int i = 0; i < packFlags.length; i++)
+			{
+				int f = packFlags[i];
+				if ( TSBox.testPackFlagExpand( f ) )
+				{
+					numExpand++;
+				}
+			}
+		}
+		
+		
+		// Compute the amount of space required
+		double minSizeTotal = 0.0, prefSizeTotal = 0.0;
+		if ( children.length > 0 )
+		{
+			for (TSBox child: children)
+			{
+				minSizeTotal += child.getMinWidth();
+				prefSizeTotal += child.getPrefWidth();
+			}
+		}
+		double minSpacingTotal = box.getMinWidth() - minSizeTotal; 
+
+		if ( box.allocationX >= box.getPrefWidth() * TSBox.ONE_MINUS_EPSILON )		// if allocation >= prefferred
+		{
+			if ( box.allocationX <= box.getPrefWidth() * TSBox.ONE_PLUS_EPSILON  ||  numExpand == 0 )			// if allocation == preferred   or   numExpand == 0
+			{
+				// Allocate children their preferred width
+				for (TSBox child: children)
+				{
+					box.allocateChildSpaceX( child, child.getPrefWidth() );
+				}
+			}
+			else
+			{
+				// Allocate children their preferred size, plus any extra to those for which the expand flag is set
+				double totalExpand = box.allocationX - box.getPrefWidth();
+				double expandPerChild = totalExpand / (double)numExpand;
+				
+				int i = 0;
+				for (TSBox child: children)
+				{
+					if ( packFlags != null  &&  TSBox.testPackFlagExpand( packFlags[i] ) )
+					{
+						box.allocateChildSpaceX( child, child.getPrefWidth() + expandPerChild );
+					}
+					else
+					{
+						box.allocateChildSpaceX( child, child.getPrefWidth() );
+					}
+					i++;
+				}
+			}
+		}
+		else if ( box.allocationX <= box.getMinWidth() * TSBox.ONE_PLUS_EPSILON )		// if allocation <= minimum
+		{
+			// Allocation is smaller than minimum size
+			
+			// Allocate children their preferred size
+			for (TSBox child: children)
+			{
+				box.allocateChildSpaceX( child, child.getMinWidth() );
+			}
+		}
+		else
+		{
+			// Allocation is between minimum and preferred size
+			
+			// For spacing, use minimum spacing as opposed to preferred spacing
+			
+			// Compute the difference between the minimum and preferred sizes
+			double pref = box.getPrefWidth() - minSpacingTotal;
+			double deltaMinPref = pref - minSizeTotal;
+
+			// Compute the amount of space over the minimum that is available to share
+			double allocToShare = box.allocationX - minSpacingTotal - minSizeTotal;
+			
+			// Compute the fraction that determines the interpolation factor used to blend the minimum and preferred sizes
+			double fraction = allocToShare / deltaMinPref;
+			
+			if ( children.length >= 1 )
+			{
+				for (TSBox child: children)
+				{
+					double delta = child.getPrefWidth() - child.getMinWidth();
+					box.allocateChildSpaceX( child, child.getMinWidth() + delta * fraction );
+				}
+			}
+		}
+	}
+	
+	
+
+	public static void allocateX(TSBox box, TSBox children[], double spacing, double childPadding[], int packFlags[])
+	{
 		// Each packed child consists of:
 		//	- start padding
-		//	- child height
+		//	- child width
 		//	- end padding
 		//	- any remaining spacing not 'consumed' by padding; spacing - padding  or  0 if padding > spacing
 		
 		// There should be at least the specified amount of spacing between each child, or the child's own h-spacing if it is greater
+
+		allocateSpaceX( box, children, packFlags );
 		
-		double minHeight = 0.0, prefHeight = 0.0;
-		double minY = 0.0, prefY = 0.0;
+		double size = 0.0;
+		double pos = 0.0;
 		for (int i = 0; i < children.length; i++)
 		{
-			TSBox chBox = children[i];
-			
+			TSBox child = children[i];
+
+			// Get the padding
 			double padding = childPadding != null  ?  childPadding[i]  :  0.0;
 			
-			double minChildSpacing = Math.max( chBox.minVSpacing - padding, 0.0 );
-			double prefChildSpacing = Math.max( chBox.prefVSpacing - padding, 0.0 );
-			double interCellSpacing = ( i < children.length - 1 )  ?  spacing  :  0.0;  
+			// Compute the spacing
+			// Use 'preferred' spacing, if the child was allocated its preferred amount of space, or more
+			double childSpacing = ( child.allocationX >= child.prefWidth * TSBox.ONE_MINUS_EPSILON )  ?  child.prefHSpacing  :  child.minHSpacing;
+			// padding consumes child spacing
+			childSpacing = Math.max( childSpacing - padding, 0.0 );
+			double interCellSpacing = ( i < children.length - 1 )  ?  spacing  :  0.0;
+
+			// Offset the child position using padding
+			double childX = pos + padding;
 			
-			minHeight = minY + chBox.getMinHeight()  +  padding * 2.0;
-			prefHeight = prefY + chBox.getPrefHeight()  +  padding * 2.0;
-			minY = minHeight + minChildSpacing + interCellSpacing;
-			prefY = prefHeight + prefChildSpacing + interCellSpacing;
+			// Allocate child position
+			box.allocateChildPositionX( child, childX );
+
+			// Accumulate width and x
+			size = pos + child.allocationX + padding * 2.0;
+			pos = size + childSpacing + interCellSpacing;
 		}
-		
-		box.setRequisitionY( minHeight, prefHeight, minY - minHeight, prefY - prefHeight );
+	}
+
+
+	
+	
+	public static void allocateY(TSBox box, TSBox children[], VAlignment alignment)
+	{
+		if ( alignment == VAlignment.BASELINES  &&  box.bHasBaseline )
+		{
+			// Compute the amount of space allocated (do not allow to fall below minimum requirement)
+			double allocation = Math.max( box.allocationY, box.getMinHeight() );
+			
+			// Compute the 'fraction' between the minimum and preferred heights
+			double fraction = ( allocation - box.getMinHeight() ) / ( box.getPrefHeight() - box.getMinHeight() );
+			fraction = Math.min( fraction, 1.0 );
+			
+			// Compute the amount of allocated ascent and descent
+			double allocationAscent = box.getMinAscent()  +  ( box.getPrefAscent() - box.getMinAscent() ) * fraction;
+			double allocationDescent = box.getMinDescent()  +  ( box.getPrefDescent() - box.getMinDescent() ) * fraction;
+			
+			// Compute the difference (clamped to >0) between the allocation and the preferred height 
+			double delta = Math.max( allocation - box.getPrefHeight(), 0.0 );
+			
+			// Compute the baseline position (distribute the 'delta' around the contents)
+			double baselineY = allocationAscent + delta * 0.5; 
+			
+			for (TSBox child: children)
+			{
+				double childAscent = Math.min( allocationAscent, child.getPrefAscent() );
+				double childDescent = Math.min( allocationDescent, child.getPrefDescent() );
+				
+				box.allocateChildY( child, baselineY - childAscent, childAscent + childDescent );
+			}
+		}
+		else
+		{
+			double allocation = Math.max( box.allocationY, box.getMinHeight() );
+			for (TSBox child: children)
+			{
+				if ( alignment == VAlignment.EXPAND )
+				{
+					box.allocateChildY( child, 0.0, allocation );
+				}
+				else
+				{
+					double childHeight = Math.min( allocation, child.getPrefHeight() );
+					
+					if ( alignment == VAlignment.TOP )
+					{
+						box.allocateChildY( child, 0.0, childHeight );
+					}
+					else if ( alignment == VAlignment.CENTRE  ||  ( alignment == VAlignment.BASELINES  &&  !box.bHasBaseline ) )
+					{
+						box.allocateChildY( child, ( allocation - childHeight )  *  0.5, childHeight );
+					}
+					else if ( alignment == VAlignment.BOTTOM )
+					{
+						box.allocateChildY( child, allocation - childHeight, childHeight );
+					}
+					else
+					{
+						throw new RuntimeException( "Invalid v-alignment" );
+					}
+				}
+			}
+		}
 	}
 }
