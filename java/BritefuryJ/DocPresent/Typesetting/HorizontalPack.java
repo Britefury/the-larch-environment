@@ -321,8 +321,20 @@ public class HorizontalPack
 			
 			for (TSBox child: children)
 			{
-				double childAscent = Math.min( allocationAscent, child.getPrefAscent() );
-				double childDescent = Math.min( allocationDescent, child.getPrefDescent() );
+				double childAscent, childDescent;
+				
+				if ( child.bHasBaseline )
+				{
+					childAscent = Math.min( allocationAscent, child.getPrefAscent() );
+					childDescent = Math.min( allocationDescent, child.getPrefDescent() );
+				}
+				else
+				{
+					double halfHeight = child.getPrefHeight() * 0.5;
+					double offset = box.getMinAscent() * 0.5;
+					childAscent = Math.min( allocationAscent, halfHeight + offset );
+					childDescent = Math.min( allocationDescent, halfHeight - offset );
+				}
 				
 				box.allocateChildY( child, baselineY - childAscent, childAscent + childDescent );
 			}
