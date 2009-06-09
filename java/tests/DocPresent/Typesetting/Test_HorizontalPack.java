@@ -756,6 +756,37 @@ public class Test_HorizontalPack extends Test_BoxPack_base
 	
 	
 	
+		// Ensure that 'baselines' mode acts like 'centre' mode when no children have baselines
+		// vpackX( [ <200-300,0-0>, <100-200,0-0> ], alignment=BASELINES )
+		// 	boxAllocation=400   ->   [ 300, 200 ] @ [ 50, 100 ]	- no expansion, no expansion
+		// 	boxAllocation=300   ->   [ 300, 200 ] @ [ 0, 50 ]		- pref size, no expansion
+		// 	boxAllocation=250   ->   [ 250, 200 ] @ [ 0, 25 ]		- between min and pref, no expansion
+		// 	boxAllocation=200   ->   [ 200, 200 ] @ [ 0, 0 ]		- min size, pref size
+		// 	boxAllocation=150   ->   [ 200, 200 ] @ [ 0, 0 ]		- below min size, parent box min size prevents child size from going below 200
+		// 	boxAllocation=100   ->   [ 200, 200 ] @ [ 0, 0 ]		- below min size, parent box min size prevents child size from going below 200
+		// 	boxAllocation=50   ->   [ 200, 200 ] @ [ 0, 0 ]		- below min size, parent box min size prevents child size from going below 200
+		hpackYTests( new TSBox[] { ybox( 200.0, 300.0, 0.0, 0.0 ),  ybox( 100.0, 200.0, 0.0, 0.0 ) }, VAlignment.BASELINES,
+				ybox( 200.0, 300.0, 0.0, 0.0 ),
+				new double[] { 400.0, 300.0, 250.0, 200.0, 150.0, 100.0, 50.0 },
+				new double[][] {
+					new double[] { 300.0, 200.0 },
+					new double[] { 300.0, 200.0 },
+					new double[] { 250.0, 200.0 },
+					new double[] { 200.0, 200.0 },
+					new double[] { 200.0, 200.0 },
+					new double[] { 200.0, 200.0 },
+					new double[] { 200.0, 200.0 } },
+				new double[][] {
+					new double[] { 50.0, 100.0 },
+					new double[] { 0.0, 50.0 },
+					new double[] { 0.0, 25.0 },
+					new double[] { 0.0, 0.0 },
+					new double[] { 0.0, 0.0 },
+					new double[] { 0.0, 0.0 },
+					new double[] { 0.0, 0.0 } } );
+
+		
+		
 		// hpackY( [ <200-300:100-200,0-0>, <100-200:200-300,0-0> ], alignment=BASELINES )
 		// 	boxAllocation=800   ->   [ 500, 500 ] @ [ 100, 200 ]		- centre, cetnre
 		// 	boxAllocation=600   ->   [ 500, 500 ] @ [ 0, 100 ]			- matches parent box pref size
@@ -777,5 +808,29 @@ public class Test_HorizontalPack extends Test_BoxPack_base
 					new double[] { 0.0, 50.0 },
 					new double[] { 0.0, 0.0 },
 					new double[] { 0.0, 0.0 } } );
+
+	
+	
+		// hpackY( [ <200-300:100-200,0-0>, <100-200:200-300,0-0>, <100-400,0-0> ], alignment=BASELINES )
+		// 	boxAllocation=800   ->   [ 500, 500 ] @ [ 100, 200 ]		- centre, cetnre
+		// 	boxAllocation=600   ->   [ 500, 500 ] @ [ 0, 100 ]			- matches parent box pref size
+		// 	boxAllocation=500   ->   [ 450, 450 ] @ [ 0, 100 ]			- between parent box min and pref size
+		// 	boxAllocation=400   ->   [ 300, 300 ] @ [ 0, 100 ]			- matches parent box min size
+		// 	boxAllocation=300   ->   [ 300, 300 ] @ [ 0, 100 ]			- below parent box min size
+		hpackYTests( new TSBox[] { ybbox( 200.0, 300.0, 100.0, 200.0, 0.0, 0.0 ),  ybbox( 100.0, 200.0, 200.0, 300.0, 0.0, 0.0 ),  ybox( 100.0, 400.0, 0.0, 0.0 ) }, VAlignment.BASELINES,
+				ybbox( 200.0, 300.0, 200.0, 300.0, 0.0, 0.0 ),
+				new double[] { 800.0, 600.0, 500.0, 400.0, 300.0 },
+				new double[][] {
+					new double[] { 500.0, 500.0, 400.0 },
+					new double[] { 500.0, 500.0, 400.0 },
+					new double[] { 450.0, 450.0, 350.0 },
+					new double[] { 400.0, 400.0, 300.0 },
+					new double[] { 400.0, 400.0, 300.0 } },
+				new double[][] {
+					new double[] { 100.0, 200.0, 100.0 },
+					new double[] { 0.0, 100.0, 0.0 },
+					new double[] { 0.0, 50.0, 0.0 },
+					new double[] { 0.0, 0.0, 0.0 },
+					new double[] { 0.0, 0.0, 0.0 } } );
 	}
 }
