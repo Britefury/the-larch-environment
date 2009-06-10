@@ -44,25 +44,22 @@ public class VerticalPack
 		
 		// There should be at least the specified amount of spacing between each child, or the child's own h-spacing if it is greater
 		
-		double minHeight = 0.0, prefHeight = 0.0;
-		double minY = 0.0, prefY = 0.0;
+		double reqHeight = 0.0;
+		double reqY = 0.0;
 		for (int i = 0; i < children.length; i++)
 		{
 			TSBox chBox = children[i];
 			
 			double padding = childPadding != null  ?  childPadding[i]  :  0.0;
 			
-			double minChildSpacing = Math.max( chBox.minVSpacing - padding, 0.0 );
-			double prefChildSpacing = Math.max( chBox.prefVSpacing - padding, 0.0 );
+			double reqChildSpacing = Math.max( chBox.reqVSpacing - padding, 0.0 );
 			double interCellSpacing = ( i < children.length - 1 )  ?  spacing  :  0.0;  
 			
-			minHeight = minY + chBox.getMinHeight()  +  padding * 2.0;
-			prefHeight = prefY + chBox.getPrefHeight()  +  padding * 2.0;
-			minY = minHeight + minChildSpacing + interCellSpacing;
-			prefY = prefHeight + prefChildSpacing + interCellSpacing;
+			reqHeight = reqY + chBox.getReqHeight()  +  padding * 2.0;
+			reqY = reqHeight + reqChildSpacing + interCellSpacing;
 		}
 		
-		box.setRequisitionY( minHeight, prefHeight, minY - minHeight, prefY - prefHeight );
+		box.setRequisitionY( reqHeight, reqY - reqHeight);
 	}
 
 
@@ -124,31 +121,29 @@ public class VerticalPack
 		
 		
 		// Compute the amount of space required
-		double minSizeTotal = 0.0, prefSizeTotal = 0.0;
+		double reqSizeTotal = 0.0;
 		if ( children.length > 0 )
 		{
 			for (TSBox child: children)
 			{
-				minSizeTotal += child.getMinHeight();
-				prefSizeTotal += child.getPrefHeight();
+				reqSizeTotal += child.getReqHeight();
 			}
 		}
-		double minSpacingTotal = box.getMinHeight() - minSizeTotal; 
 
-		if ( box.allocationY >= box.getPrefHeight() * TSBox.ONE_MINUS_EPSILON )		// if allocation >= prefferred
+		if ( box.allocationY >= box.getReqHeight() * TSBox.ONE_MINUS_EPSILON )		// if allocation >= required
 		{
-			if ( box.allocationY <= box.getPrefHeight() * TSBox.ONE_PLUS_EPSILON  ||  numExpand == 0 )			// if allocation == preferred   or   numExpand == 0
+			if ( box.allocationY <= box.getReqHeight() * TSBox.ONE_PLUS_EPSILON  ||  numExpand == 0 )			// if allocation == preferred   or   numExpand == 0
 			{
 				// Allocate children their preferred width
 				for (TSBox child: children)
 				{
-					box.allocateChildSpaceY( child, child.getPrefHeight() );
+					box.allocateChildSpaceY( child, child.getReqHeight() );
 				}
 			}
 			else
 			{
 				// Allocate children their preferred size, plus any extra to those for which the expand flag is set
-				double totalExpand = box.allocationY - box.getPrefHeight();
+				double totalExpand = box.allocationY - box.getReqHeight();
 				double expandPerChild = totalExpand / (double)numExpand;
 				
 				int i = 0;
@@ -156,49 +151,24 @@ public class VerticalPack
 				{
 					if ( packFlags != null  &&  TSBox.testPackFlagExpand( packFlags[i] ) )
 					{
-						box.allocateChildSpaceY( child, child.getPrefHeight() + expandPerChild );
+						box.allocateChildSpaceY( child, child.getReqHeight() + expandPerChild );
 					}
 					else
 					{
-						box.allocateChildSpaceY( child, child.getPrefHeight() );
+						box.allocateChildSpaceY( child, child.getReqHeight() );
 					}
 					i++;
 				}
 			}
 		}
-		else if ( box.allocationY <= box.getMinHeight() * TSBox.ONE_PLUS_EPSILON )		// if allocation <= minimum
+		else			// if allocation < required
 		{
-			// Allocation is smaller than minimum size
+			// Allocation is smaller than required size
 			
-			// Allocate children their preferred size
+			// Allocate children their required size
 			for (TSBox child: children)
 			{
-				box.allocateChildSpaceY( child, child.getMinHeight() );
-			}
-		}
-		else
-		{
-			// Allocation is between minimum and preferred size
-			
-			// For spacing, use minimum spacing as opposed to preferred spacing
-			
-			// Compute the difference between the minimum and preferred sizes
-			double pref = box.getPrefHeight() - minSpacingTotal;
-			double deltaMinPref = pref - minSizeTotal;
-
-			// Compute the amount of space over the minimum that is available to share
-			double allocToShare = box.allocationY - minSpacingTotal - minSizeTotal;
-			
-			// Compute the fraction that determines the interpolation factor used to blend the minimum and preferred sizes
-			double fraction = allocToShare / deltaMinPref;
-			
-			if ( children.length >= 1 )
-			{
-				for (TSBox child: children)
-				{
-					double delta = child.getPrefHeight() - child.getMinHeight();
-					box.allocateChildSpaceY( child, child.getMinHeight() + delta * fraction );
-				}
+				box.allocateChildSpaceY( child, child.getReqHeight() );
 			}
 		}
 	}
@@ -224,11 +194,8 @@ public class VerticalPack
 			// Get the padding
 			double padding = childPadding != null  ?  childPadding[i]  :  0.0;
 			
-			// Compute the spacing
-			// Use 'prefferred' spacing, if the child was allocated its preferred amount of space, or more
-			double childSpacing = ( child.allocationY >= child.getPrefHeight() * TSBox.ONE_MINUS_EPSILON )  ?  child.prefVSpacing  :  child.minVSpacing;
-			// padding consumes child spacing
-			childSpacing = Math.max( childSpacing - padding, 0.0 );
+			// Compute the spacing; padding consumes child spacing
+			double childSpacing = Math.max( child.reqVSpacing - padding, 0.0 );
 			double interCellSpacing = ( i < children.length - 1 )  ?  spacing  :  0.0;
 
 			// Offset the child position using padding
