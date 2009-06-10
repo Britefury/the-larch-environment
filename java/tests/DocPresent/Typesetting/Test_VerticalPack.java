@@ -38,20 +38,20 @@ public class Test_VerticalPack extends Test_BoxPack_base
 		VerticalPack.computeRequisitionX( result, new TSBox[] { xbox( 10.0, 1.0 ) } );
 		assertEquals( result, xbox( 10.0, 1.0 ) );
 
-		// max( [ <10,1>, <20,1> ] )  ->  <20,1>
+		// requisitionX( [ <10,1>, <20,1> ] )  ->  <20,1>
 		VerticalPack.computeRequisitionX( result, new TSBox[] { xbox( 10.0, 1.0 ),  xbox( 20.0, 1.0 ) } );
 		assertEquals( result, xbox( 20.0, 1.0 ) );
 
-		// max( [ <1,10>, <2,20> ] )  ->  <2,20>
+		// requisitionX( [ <1,10>, <2,20> ] )  ->  <2,20>
 		VerticalPack.computeRequisitionX( result, new TSBox[] { xbox( 1.0, 10.0 ),  xbox( 2.0, 20.0 ) } );
 		assertEquals( result, xbox( 2.0, 20.0 ) );
 
-		// max( [ <10,3>, <11,1> ] )  ->  <11,2>
+		// requisitionX( [ <10,3>, <11,1> ] )  ->  <11,2>
 		// The first box advances X the most overall, although the second has the greater width
 		VerticalPack.computeRequisitionX( result, new TSBox[] { xbox( 10.0, 3.0 ),  xbox( 11.0, 1.0 ) } );
 		assertEquals( result, xbox( 11.0, 2.0 ) );
 
-		// max( [ <10,5>, <5,10> ] )  ->  <10,5>
+		// requisitionX( [ <10,5>, <5,10> ] )  ->  <10,5>
 		// Both advance X by the same amount (15 units), but the first has the greater width
 		VerticalPack.computeRequisitionX( result, new TSBox[] { xbox( 10.0, 5.0 ),  xbox( 5.0, 10.0 ) } );
 		assertEquals( result, xbox( 10.0, 5.0 ) );
@@ -69,61 +69,61 @@ public class Test_VerticalPack extends Test_BoxPack_base
 
 		TSBox result = new TSBox();
 		
-		// accum()  ->  <0,0>
+		// requisitionY()  ->  <0,0>
 		VerticalPack.computeRequisitionY( result, new TSBox[] {},  0.0, null );
 		assertEquals( result, new TSBox() );
 
-		// accum( [ <0,0> ] )  ->  <0,0>
+		// requisitionY( [ <0,0> ] )  ->  <0,0>
 		VerticalPack.computeRequisitionY( result, new TSBox[] { new TSBox() },  0.0, null );
 		assertEquals( result, new TSBox() );
 
-		// accum( [ <0,0>:pad=1 ] )  ->  <2,0>
+		// requisitionY( [ <0,0>:pad=1 ] )  ->  <2,0>
 		VerticalPack.computeRequisitionY( result, new TSBox[] { new TSBox() },  0.0, new double[] { 1.0 } );
 		assertEquals( result, ybox( 2.0, 0.0 ) );
 
-		// accum( [ <10,0>:pad=2 ] )  ->  <14,0>
+		// requisitionY( [ <10,0>:pad=2 ] )  ->  <14,0>
 		VerticalPack.computeRequisitionY( result, new TSBox[] { ybox( 10.0, 0.0 ) },  0.0, new double[] { 2.0 } );
 		assertEquals( result, ybox( 14.0, 0.0 ) );
 
 		// Padding 'consumes' h-spacing
-		// accum( [ <10,1>:pad=2 ] )  ->  <14,0>
+		// requisitionY( [ <10,1>:pad=2 ] )  ->  <14,0>
 		VerticalPack.computeRequisitionY( result, new TSBox[] { ybox( 10.0, 1.0 ) },  0.0, new double[] { 2.0 } );
 		assertEquals( result, ybox( 14.0, 0.0 ) );
 
 		// Padding 'consumes' all h-spacing
-		// accum( [ <10,3>:pad=2 ] )  ->  <14,1>
+		// requisitionY( [ <10,3>:pad=2 ] )  ->  <14,1>
 		VerticalPack.computeRequisitionY( result, new TSBox[] { ybox( 10.0, 3.0 ) },  0.0, new double[] { 2.0 } );
 		assertEquals( result, ybox( 14.0, 1.0 ) );
 
-		// accum( [ <0,0>, <0,0> ] )  ->  <0,0>
+		// requisitionY( [ <0,0>, <0,0> ] )  ->  <0,0>
 		VerticalPack.computeRequisitionY( result, new TSBox[] { new TSBox(), new TSBox() },  0.0, null );
 		assertEquals( result, new TSBox() );
 
 		// Width accumulates
-		// accum( [ <10,0>, <5,0> ] )  ->  <15,0>
+		// requisitionY( [ <10,0>, <5,0> ] )  ->  <15,0>
 		VerticalPack.computeRequisitionY( result, new TSBox[] { ybox( 10.0, 0.0 ), ybox( 5.0, 0.0 ) },  0.0, null );
 		assertEquals( result, ybox( 15.0, 0.0 ) );
 
 		// H-spacing of child puts space before next child
-		// accum( [ <10,2>, <5,0> ] )  ->  <17,0>
+		// requisitionY( [ <10,2>, <5,0> ] )  ->  <17,0>
 		VerticalPack.computeRequisitionY( result, new TSBox[] { ybox( 10.0, 2.0 ), ybox( 5.0, 0.0 ) },  0.0, null );
 		assertEquals( result, ybox( 17.0, 0.0 ) );
 
 		// H-spacing of last child gets put onto the result
-		// accum( [ <10,2>, <5,1> ] )  ->  <17,1>
+		// requisitionY( [ <10,2>, <5,1> ] )  ->  <17,1>
 		VerticalPack.computeRequisitionY( result, new TSBox[] { ybox( 10.0, 2.0 ), ybox( 5.0, 1.0 ) },  0.0, null );
 		assertEquals( result, ybox( 17.0, 1.0 ) );
 
 		// Spacing between children adds extra width
-		// accum( [ <0,0>, <0,0> ], spacing=1 )  ->  <1,0>
+		// requisitionY( [ <0,0>, <0,0> ], spacing=1 )  ->  <1,0>
 		VerticalPack.computeRequisitionY( result, new TSBox[] { new TSBox(), new TSBox() },  1.0, null );
 		assertEquals( result, ybox( 1.0, 0.0 ) );
-		// accum( [ <10,0>, <5,0> ], spacing=1 )  ->  <15,0>
+		// requisitionY( [ <10,0>, <5,0> ], spacing=1 )  ->  <15,0>
 		VerticalPack.computeRequisitionY( result, new TSBox[] { ybox( 10.0, 0.0 ), ybox( 5.0, 0.0 ) },  1.0, null );
 		assertEquals( result, ybox( 16.0, 0.0 ) );
 
 		// Spacing between children is added to the child's own spacing
-		// accum( [ <10,2>, <5,1> ], spacing=1 )  ->  <18,1>
+		// requisitionY( [ <10,2>, <5,1> ], spacing=1 )  ->  <18,1>
 		VerticalPack.computeRequisitionY( result, new TSBox[] { ybox( 10.0, 2.0 ), ybox( 5.0, 1.0 ) },  1.0, null );
 		assertEquals( result, ybox( 18.0, 1.0 ) );
 	}
