@@ -45,6 +45,7 @@ public class VerticalPack
 		// There should be at least the specified amount of spacing between each child, or the child's own h-spacing if it is greater
 		
 		double reqHeight = 0.0;
+		double reqAdvance = 0.0;
 		double reqY = 0.0;
 		for (int i = 0; i < children.length; i++)
 		{
@@ -53,13 +54,13 @@ public class VerticalPack
 			double padding = childPadding != null  ?  childPadding[i]  :  0.0;
 			
 			double reqChildSpacing = Math.max( chBox.reqVSpacing - padding, 0.0 );
-			double interCellSpacing = ( i < children.length - 1 )  ?  spacing  :  0.0;  
 			
 			reqHeight = reqY + chBox.getReqHeight()  +  padding * 2.0;
-			reqY = reqHeight + reqChildSpacing + interCellSpacing;
+			reqAdvance = reqHeight + reqChildSpacing;
+			reqY = reqAdvance + spacing;
 		}
 		
-		box.setRequisitionY( reqHeight, reqY - reqHeight);
+		box.setRequisitionY( reqHeight, reqAdvance - reqHeight);
 	}
 
 
@@ -196,7 +197,6 @@ public class VerticalPack
 			
 			// Compute the spacing; padding consumes child spacing
 			double childSpacing = Math.max( child.reqVSpacing - padding, 0.0 );
-			double interCellSpacing = ( i < children.length - 1 )  ?  spacing  :  0.0;
 
 			// Offset the child position using padding
 			double childY = pos + padding;
@@ -206,7 +206,7 @@ public class VerticalPack
 
 			// Accumulate width and x
 			size = pos + child.allocationY + padding * 2.0;
-			pos = size + childSpacing + interCellSpacing;
+			pos = size + childSpacing + spacing;
 		}
 	}
 }

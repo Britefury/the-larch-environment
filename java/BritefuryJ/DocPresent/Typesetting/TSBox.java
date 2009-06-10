@@ -23,14 +23,16 @@ public class TSBox
 	protected double allocationX, allocationY;
 	
 	protected boolean bHasBaseline;		// If false, then ascent = height, descent = 0
-	protected int lineBreakPriority;
+
+	protected boolean bLineBreak;
+	protected int lineBreakCost;
 	
 	
 	public TSBox()
 	{
 		scale = 1.0;
 		bHasBaseline = false;
-		lineBreakPriority = -1;
+		lineBreakCost = -1;
 	}
 	
 	public TSBox(double width, double hSpacing, double height, double vSpacing)
@@ -41,7 +43,7 @@ public class TSBox
 		reqAscent = height;
 		reqVSpacing = vSpacing;
 		bHasBaseline = false;
-		lineBreakPriority = -1;
+		lineBreakCost = -1;
 	}
 	
 	public TSBox(double width, double hSpacing, double ascent, double descent, double vSpacing)
@@ -53,7 +55,7 @@ public class TSBox
 		reqDescent = descent;
 		reqVSpacing = vSpacing;
 		bHasBaseline = true;
-		lineBreakPriority = -1;
+		lineBreakCost = -1;
 	}
 
 	public TSBox(double minWidth, double prefWidth, double minHSpacing, double prefHSpacing, double height, double vSpacing)
@@ -66,7 +68,7 @@ public class TSBox
 		this.reqAscent = height;
 		this.reqVSpacing = vSpacing;
 		bHasBaseline = false;
-		lineBreakPriority = -1;
+		lineBreakCost = -1;
 	}
 
 	public TSBox(double minWidth, double prefWidth, double minHSpacing, double prefHSpacing, double ascent, double descent, double vSpacing)
@@ -80,7 +82,7 @@ public class TSBox
 		this.reqDescent = descent;
 		this.reqVSpacing = vSpacing;
 		bHasBaseline = true;
-		lineBreakPriority = -1;
+		lineBreakCost = -1;
 	}
 	
 	
@@ -95,7 +97,8 @@ public class TSBox
 		reqDescent = box.reqDescent;
 		reqVSpacing = box.reqVSpacing;
 		bHasBaseline = box.bHasBaseline;
-		lineBreakPriority = -1;
+		bLineBreak = box.bLineBreak;
+		lineBreakCost = box.lineBreakCost;
 	}
 	
 
@@ -338,11 +341,18 @@ public class TSBox
 	
 	
 	
+	public TSBox copy()
+	{
+		return new TSBox( this );
+	}
 	
-	public TSBox lineBreakBox(int priority)
+	
+	
+	public TSBox lineBreakBox(int cost)
 	{
 		TSBox b = new TSBox( this );
-		b.lineBreakPriority = priority;
+		b.bLineBreak = true;
+		b.lineBreakCost = cost;
 		return b;
 	}
 }

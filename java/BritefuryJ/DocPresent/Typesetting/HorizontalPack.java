@@ -21,25 +21,27 @@ public class HorizontalPack
 		// There should be at least the specified amount of spacing between each child, or the child's own h-spacing if it is greater
 		
 		double minWidth = 0.0, prefWidth = 0.0;
+		double minAdvance = 0.0, prefAdvance = 0.0;
 		double minX = 0.0, prefX = 0.0;
 		for (int i = 0; i < children.length; i++)
 		{
-			TSBox chBox = children[i];
+			TSBox child = children[i];
 			
 			double padding = childPadding != null  ?  childPadding[i]  :  0.0;
 			
 			// Filter out any h-spacing that is within the amount of padding
-			double minChildSpacing = Math.max( chBox.minHSpacing - padding, 0.0 );
-			double prefChildSpacing = Math.max( chBox.prefHSpacing - padding, 0.0 );
-			double interCellSpacing = ( i < children.length - 1 )  ?  spacing  :  0.0;  
+			double minChildSpacing = Math.max( child.minHSpacing - padding, 0.0 );
+			double prefChildSpacing = Math.max( child.prefHSpacing - padding, 0.0 );
 			
-			minWidth = minX + chBox.minWidth  +  padding * 2.0;
-			prefWidth = prefX + chBox.prefWidth  +  padding * 2.0;
-			minX = minWidth + minChildSpacing + interCellSpacing;
-			prefX = prefWidth + prefChildSpacing + interCellSpacing;
+			minWidth = minX + child.minWidth  +  padding * 2.0;
+			prefWidth = prefX + child.prefWidth  +  padding * 2.0;
+			minAdvance = minWidth + minChildSpacing;
+			prefAdvance = prefWidth + prefChildSpacing;
+			minX = minAdvance + spacing;
+			prefX = prefAdvance + spacing;
 		}
 		
-		box.setRequisitionX( minWidth, prefWidth, minX - minWidth, prefX - prefWidth );
+		box.setRequisitionX( minWidth, prefWidth, minAdvance - minWidth, prefAdvance - prefWidth );
 	}
 
 	
@@ -246,7 +248,6 @@ public class HorizontalPack
 			double childSpacing = ( child.allocationX >= child.prefWidth * TSBox.ONE_MINUS_EPSILON )  ?  child.prefHSpacing  :  child.minHSpacing;
 			// padding consumes child spacing
 			childSpacing = Math.max( childSpacing - padding, 0.0 );
-			double interCellSpacing = ( i < children.length - 1 )  ?  spacing  :  0.0;
 
 			// Offset the child position using padding
 			double childX = pos + padding;
@@ -256,7 +257,7 @@ public class HorizontalPack
 
 			// Accumulate width and x
 			size = pos + child.allocationX + padding * 2.0;
-			pos = size + childSpacing + interCellSpacing;
+			pos = size + childSpacing + spacing;
 		}
 	}
 
