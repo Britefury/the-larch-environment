@@ -186,17 +186,17 @@ public class Test_HorizontalPack extends Test_BoxPack_base
 		
 		// Now test the situation where baseline alignment is used, but the some children do not have baselines
 
-		// max( [ <6:3,0>, <8,0> ] )  ->  max( [ <6:3,0>, <4+3:4-3,0> ] )  ->  max( [ <6:3,0>, <7:1,0> ] )  ->  <7:3,0>
+		// max( [ <6:3,0>, <8,0> ] )  ->  max( [ <6:3,0>, <4:4,0> ] )  ->  <6:4,0>
 		HorizontalPack.computeRequisitionY( result, new TSBox[] { ybbox( 6.0, 3.0, 0.0 ),  ybox( 8.0, 0.0 ) }, VAlignment.BASELINES );
-		assertEquals( result, ybbox( 7.0, 3.0, 0.0 ) );
+		assertEquals( result, ybbox( 6.0, 4.0, 0.0 ) );
 
-		// max( [ <6:3,2>, <8,1> ] )  ->  max( [ <6:3,2>, <4+3:4-3,1> ] )  ->  max( [ <6:3,2>, <7:1,1> ] )  ->  <7:3,2>
-		HorizontalPack.computeRequisitionY( result, new TSBox[] { ybbox( 6.0, 3.0, 2.0 ),  ybox( 8.0, 1.0 ) }, VAlignment.BASELINES );
-		assertEquals( result, ybbox( 7.0, 3.0, 2.0 ) );
+		// max( [ <6:3,3>, <8,1> ] )  ->  max( [ <6:3,3>, <4:4,1> ] )  ->  <6:4,2>
+		HorizontalPack.computeRequisitionY( result, new TSBox[] { ybbox( 6.0, 3.0, 3.0 ),  ybox( 8.0, 1.0 ) }, VAlignment.BASELINES );
+		assertEquals( result, ybbox( 6.0, 4.0, 2.0 ) );
 
-		// max( [ <6:3,1>, <8,2> ] )  ->  max( [ <6:3,1>, <4+3:4-3,2> ] )  ->  max( [ <6:3,1>, <7:1,2> ] )  ->  <7:3,1>
+		// max( [ <6:3,1>, <8,2> ] )  ->  max( [ <6:3,1>, <4:4,2> ] )  ->  <6:4,2>
 		HorizontalPack.computeRequisitionY( result, new TSBox[] { ybbox( 6.0, 3.0, 1.0 ),  ybox( 8.0, 2.0 ) }, VAlignment.BASELINES );
-		assertEquals( result, ybbox( 7.0, 3.0, 1.0 ) );
+		assertEquals( result, ybbox( 6.0, 4.0, 2.0 ) );
 	}
 
 
@@ -635,29 +635,20 @@ public class Test_HorizontalPack extends Test_BoxPack_base
 
 	public void test_hpackY()
 	{
-		// vpackX( [ <200-300,0-0>, <100-200,0-0> ], alignment=TOP )
+		// vpackX( [ <300,0>, <200,0> ], alignment=TOP )
 		// 	boxAllocation=400   ->   [ 300, 200 ] @ [ 0, 0 ]		- no expansion, no expansion
-		// 	boxAllocation=300   ->   [ 300, 200 ] @ [ 0, 0 ]		- pref size, no expansion
-		// 	boxAllocation=250   ->   [ 250, 200 ] @ [ 0, 0 ]		- between min and pref, no expansion
-		// 	boxAllocation=200   ->   [ 200, 200 ] @ [ 0, 0 ]		- min size, pref size
-		// 	boxAllocation=150   ->   [ 200, 200 ] @ [ 0, 0 ]		- below min size, parent box min size prevents child size from going below 200
-		// 	boxAllocation=100   ->   [ 200, 200 ] @ [ 0, 0 ]		- below min size, parent box min size prevents child size from going below 200
-		// 	boxAllocation=50   ->   [ 200, 200 ] @ [ 0, 0 ]		- below min size, parent box min size prevents child size from going below 200
-		hpackYTests( new TSBox[] { ybox( 200.0, 300.0, 0.0, 0.0 ),  ybox( 100.0, 200.0, 0.0, 0.0 ) }, VAlignment.TOP,
-				ybox( 200.0, 300.0, 0.0, 0.0 ),
-				new double[] { 400.0, 300.0, 250.0, 200.0, 150.0, 100.0, 50.0 },
+		// 	boxAllocation=300   ->   [ 300, 200 ] @ [ 0, 0 ]		- req size, no expansion
+		// 	boxAllocation=200   ->   [ 300, 200 ] @ [ 0, 0 ]		- below req size, req size
+		// 	boxAllocation=100   ->   [ 300, 200 ] @ [ 0, 0 ]		- below req size, below req size
+		hpackYTests( new TSBox[] { ybox( 300.0, 0.0 ),  ybox( 200.0, 0.0 ) }, VAlignment.TOP,
+				ybox( 300.0, 0.0 ),
+				new double[] { 400.0, 300.0, 200.0, 100.0 },
 				new double[][] {
 					new double[] { 300.0, 200.0 },
 					new double[] { 300.0, 200.0 },
-					new double[] { 250.0, 200.0 },
-					new double[] { 200.0, 200.0 },
-					new double[] { 200.0, 200.0 },
-					new double[] { 200.0, 200.0 },
-					new double[] { 200.0, 200.0 } },
+					new double[] { 300.0, 200.0 },
+					new double[] { 300.0, 200.0 } },
 				new double[][] {
-					new double[] { 0.0, 0.0 },
-					new double[] { 0.0, 0.0 },
-					new double[] { 0.0, 0.0 },
 					new double[] { 0.0, 0.0 },
 					new double[] { 0.0, 0.0 },
 					new double[] { 0.0, 0.0 },
@@ -665,89 +656,62 @@ public class Test_HorizontalPack extends Test_BoxPack_base
 
 	
 	
-		// vpackX( [ <200-300,0-0>, <100-200,0-0> ], alignment=CENTRE )
+		// vpackX( [ <300,0>, <200,0> ], alignment=CENTRE )
 		// 	boxAllocation=400   ->   [ 300, 200 ] @ [ 50, 100 ]	- no expansion, no expansion
-		// 	boxAllocation=300   ->   [ 300, 200 ] @ [ 0, 50 ]		- pref size, no expansion
-		// 	boxAllocation=250   ->   [ 250, 200 ] @ [ 0, 25 ]		- between min and pref, no expansion
-		// 	boxAllocation=200   ->   [ 200, 200 ] @ [ 0, 0 ]		- min size, pref size
-		// 	boxAllocation=150   ->   [ 200, 200 ] @ [ 0, 0 ]		- below min size, parent box min size prevents child size from going below 200
-		// 	boxAllocation=100   ->   [ 200, 200 ] @ [ 0, 0 ]		- below min size, parent box min size prevents child size from going below 200
-		// 	boxAllocation=50   ->   [ 200, 200 ] @ [ 0, 0 ]		- below min size, parent box min size prevents child size from going below 200
-		hpackYTests( new TSBox[] { ybox( 200.0, 300.0, 0.0, 0.0 ),  ybox( 100.0, 200.0, 0.0, 0.0 ) }, VAlignment.CENTRE,
-				ybox( 200.0, 300.0, 0.0, 0.0 ),
-				new double[] { 400.0, 300.0, 250.0, 200.0, 150.0, 100.0, 50.0 },
+		// 	boxAllocation=300   ->   [ 300, 200 ] @ [ 0, 50 ]		- req size, no expansion
+		// 	boxAllocation=200   ->   [ 200, 200 ] @ [ 0, 50 ]		- below req size, req size  (parent box size of 300 results in second child being centred in a larger box)
+		// 	boxAllocation=100   ->   [ 200, 200 ] @ [ 0, 50 ]		- below req size, below req size  (parent box size of 300 results in second child being centred in a larger box)
+		hpackYTests( new TSBox[] { ybox( 300.0, 0.0 ),  ybox( 200.0, 0.0 ) }, VAlignment.CENTRE,
+				ybox( 300.0, 0.0 ),
+				new double[] { 400.0, 300.0, 200.0, 100.0 },
 				new double[][] {
 					new double[] { 300.0, 200.0 },
 					new double[] { 300.0, 200.0 },
-					new double[] { 250.0, 200.0 },
-					new double[] { 200.0, 200.0 },
-					new double[] { 200.0, 200.0 },
-					new double[] { 200.0, 200.0 },
-					new double[] { 200.0, 200.0 } },
+					new double[] { 300.0, 200.0 },
+					new double[] { 300.0, 200.0 } },
 				new double[][] {
 					new double[] { 50.0, 100.0 },
 					new double[] { 0.0, 50.0 },
-					new double[] { 0.0, 25.0 },
-					new double[] { 0.0, 0.0 },
-					new double[] { 0.0, 0.0 },
-					new double[] { 0.0, 0.0 },
-					new double[] { 0.0, 0.0 } } );
+					new double[] { 0.0, 50.0 },
+					new double[] { 0.0, 50.0 } } );
 
 		
 		
-		// vpackX( [ <200-300,0-0>, <100-200,0-0> ], alignment=BOTTOM )
+		// vpackX( [ <300,0>, <200,0> ], alignment=BOTTOM )
 		// 	boxAllocation=400   ->   [ 300, 200 ] @ [ 100, 200 ]	- no expansion, no expansion
-		// 	boxAllocation=300   ->   [ 300, 200 ] @ [ 0, 100 ]		- pref size, no expansion
-		// 	boxAllocation=250   ->   [ 250, 200 ] @ [ 0, 50 ]		- between min and pref, no expansion
-		// 	boxAllocation=200   ->   [ 200, 200 ] @ [ 0, 0 ]		- min size, pref size
-		// 	boxAllocation=150   ->   [ 200, 200 ] @ [ 0, 0 ]		- below min size, parent box min size prevents child size from going below 200
-		// 	boxAllocation=100   ->   [ 200, 200 ] @ [ 0, 0 ]		- below min size, parent box min size prevents child size from going below 200
-		// 	boxAllocation=50   ->   [ 200, 200 ] @ [ 0, 0 ]		- below min size, parent box min size prevents child size from going below 200
-		hpackYTests( new TSBox[] { ybox( 200.0, 300.0, 0.0, 0.0 ),  ybox( 100.0, 200.0, 0.0, 0.0 ) }, VAlignment.BOTTOM,
-				ybox( 200.0, 300.0, 0.0, 0.0 ),
-				new double[] { 400.0, 300.0, 250.0, 200.0, 150.0, 100.0, 50.0 },
+		// 	boxAllocation=300   ->   [ 300, 200 ] @ [ 0, 100 ]		- req size, no expansion
+		// 	boxAllocation=200   ->   [ 200, 200 ] @ [ 0, 0 ]		- below req size, req size  (parent box size of 300 results in second child being at the bottom of a larger box)
+		// 	boxAllocation=100   ->   [ 200, 200 ] @ [ 0, 0 ]		- below req size, below req size  (parent box size of 300 results in second child being at the bottom of a larger box)
+		hpackYTests( new TSBox[] { ybox( 300.0, 0.0 ),  ybox( 200.0, 0.0 ) }, VAlignment.BOTTOM,
+				ybox( 300.0, 0.0 ),
+				new double[] { 400.0, 300.0, 200.0, 100.0 },
 				new double[][] {
 					new double[] { 300.0, 200.0 },
 					new double[] { 300.0, 200.0 },
-					new double[] { 250.0, 200.0 },
-					new double[] { 200.0, 200.0 },
-					new double[] { 200.0, 200.0 },
-					new double[] { 200.0, 200.0 },
-					new double[] { 200.0, 200.0 } },
+					new double[] { 300.0, 200.0 },
+					new double[] { 300.0, 200.0 } },
 				new double[][] {
 					new double[] { 100.0, 200.0 },
 					new double[] { 0.0, 100.0 },
-					new double[] { 0.0, 50.0 },
-					new double[] { 0.0, 0.0 },
-					new double[] { 0.0, 0.0 },
-					new double[] { 0.0, 0.0 },
-					new double[] { 0.0, 0.0 } } );
+					new double[] { 0.0, 100.0 },
+					new double[] { 0.0, 100.0 } } );
 
 	
 	
-		// hpackY( [ <200-300,0-0>, <100-200,0-0> ], alignment=EXPAND )
+		// hpackY( [ <300,0>, <200,0> ], alignment=EXPAND )
 		// 	boxAllocation=400   ->   [ 400, 400 ] @ [ 0, 0 ]		- expansion, expansion
 		// 	boxAllocation=300   ->   [ 300, 300 ] @ [ 0, 0 ]		- pref size, expansion
-		// 	boxAllocation=250   ->   [ 250, 250 ] @ [ 0, 0 ]		- between min and pref, expansion
-		// 	boxAllocation=200   ->   [ 200, 200 ] @ [ 0, 0 ]		- min size, pref size
-		// 	boxAllocation=150   ->   [ 200, 200 ] @ [ 0, 0 ]		- below min size, parent box min size prevents child size from going below 200
-		// 	boxAllocation=100   ->   [ 200, 200 ] @ [ 0, 0 ]		- below min size, parent box min size prevents child size from going below 200
-		// 	boxAllocation=50   ->   [ 200, 200 ] @ [ 0, 0 ]		- below min size, parent box min size prevents child size from going below 200
-		hpackYTests( new TSBox[] { ybox( 200.0, 300.0, 0.0, 0.0 ),  ybox( 100.0, 200.0, 0.0, 0.0 ) }, VAlignment.EXPAND,
-				ybox( 200.0, 300.0, 0.0, 0.0 ),
-				new double[] { 400.0, 300.0, 250.0, 200.0, 150.0, 100.0, 50.0 },
+		// 	boxAllocation=200   ->   [ 300, 200 ] @ [ 0, 0 ]		- below req size, req size
+		// 	boxAllocation=100   ->   [ 300, 200 ] @ [ 0, 0 ]		- below req size, below req size
+		hpackYTests( new TSBox[] { ybox( 300.0, 0.0 ),  ybox( 200.0, 0.0 ) }, VAlignment.EXPAND,
+				ybox( 300.0, 0.0 ),
+				new double[] { 400.0, 300.0, 200.0, 100.0 },
 				new double[][] {
 					new double[] { 400.0, 400.0 },
 					new double[] { 300.0, 300.0 },
-					new double[] { 250.0, 250.0 },
-					new double[] { 200.0, 200.0 },
-					new double[] { 200.0, 200.0 },
-					new double[] { 200.0, 200.0 },
-					new double[] { 200.0, 200.0 } },
+					new double[] { 300.0, 300.0 },
+					new double[] { 300.0, 300.0 } },
 				new double[][] {
-					new double[] { 0.0, 0.0 },
-					new double[] { 0.0, 0.0 },
-					new double[] { 0.0, 0.0 },
 					new double[] { 0.0, 0.0 },
 					new double[] { 0.0, 0.0 },
 					new double[] { 0.0, 0.0 },
@@ -757,80 +721,59 @@ public class Test_HorizontalPack extends Test_BoxPack_base
 	
 	
 		// Ensure that 'baselines' mode acts like 'centre' mode when no children have baselines
-		// vpackX( [ <200-300,0-0>, <100-200,0-0> ], alignment=BASELINES )
+		// vpackX( [ <300,0>, <200,0> ], alignment=BASELINES )
 		// 	boxAllocation=400   ->   [ 300, 200 ] @ [ 50, 100 ]	- no expansion, no expansion
-		// 	boxAllocation=300   ->   [ 300, 200 ] @ [ 0, 50 ]		- pref size, no expansion
-		// 	boxAllocation=250   ->   [ 250, 200 ] @ [ 0, 25 ]		- between min and pref, no expansion
-		// 	boxAllocation=200   ->   [ 200, 200 ] @ [ 0, 0 ]		- min size, pref size
-		// 	boxAllocation=150   ->   [ 200, 200 ] @ [ 0, 0 ]		- below min size, parent box min size prevents child size from going below 200
-		// 	boxAllocation=100   ->   [ 200, 200 ] @ [ 0, 0 ]		- below min size, parent box min size prevents child size from going below 200
-		// 	boxAllocation=50   ->   [ 200, 200 ] @ [ 0, 0 ]		- below min size, parent box min size prevents child size from going below 200
-		hpackYTests( new TSBox[] { ybox( 200.0, 300.0, 0.0, 0.0 ),  ybox( 100.0, 200.0, 0.0, 0.0 ) }, VAlignment.BASELINES,
-				ybox( 200.0, 300.0, 0.0, 0.0 ),
-				new double[] { 400.0, 300.0, 250.0, 200.0, 150.0, 100.0, 50.0 },
+		// 	boxAllocation=300   ->   [ 300, 200 ] @ [ 0, 50 ]		- req size, no expansion
+		// 	boxAllocation=200   ->   [ 200, 200 ] @ [ 0, 50 ]		- below req size, req size  (parent box size of 300 results in second child being centred in a larger box)
+		// 	boxAllocation=100   ->   [ 200, 200 ] @ [ 0, 50 ]		- below req size, below req size  (parent box size of 300 results in second child being centred in a larger box)
+		hpackYTests( new TSBox[] { ybox( 300.0, 0.0 ),  ybox( 200.0, 0.0 ) }, VAlignment.BASELINES,
+				ybox( 300.0, 0.0 ),
+				new double[] { 400.0, 300.0, 200.0, 100.0 },
 				new double[][] {
 					new double[] { 300.0, 200.0 },
 					new double[] { 300.0, 200.0 },
-					new double[] { 250.0, 200.0 },
-					new double[] { 200.0, 200.0 },
-					new double[] { 200.0, 200.0 },
-					new double[] { 200.0, 200.0 },
-					new double[] { 200.0, 200.0 } },
+					new double[] { 300.0, 200.0 },
+					new double[] { 300.0, 200.0 } },
 				new double[][] {
 					new double[] { 50.0, 100.0 },
 					new double[] { 0.0, 50.0 },
-					new double[] { 0.0, 25.0 },
-					new double[] { 0.0, 0.0 },
-					new double[] { 0.0, 0.0 },
-					new double[] { 0.0, 0.0 },
-					new double[] { 0.0, 0.0 } } );
+					new double[] { 0.0, 50.0 },
+					new double[] { 0.0, 50.0 } } );
 
 		
 		
-		// hpackY( [ <200-300:100-200,0-0>, <100-200:200-300,0-0> ], alignment=BASELINES )
-		// 	boxAllocation=800   ->   [ 500, 500 ] @ [ 100, 200 ]		- centre, cetnre
-		// 	boxAllocation=600   ->   [ 500, 500 ] @ [ 0, 100 ]			- matches parent box pref size
-		// 	boxAllocation=500   ->   [ 450, 450 ] @ [ 0, 100 ]			- between parent box min and pref size
-		// 	boxAllocation=400   ->   [ 300, 300 ] @ [ 0, 100 ]			- matches parent box min size
-		// 	boxAllocation=300   ->   [ 300, 300 ] @ [ 0, 100 ]			- below parent box min size
-		hpackYTests( new TSBox[] { ybbox( 200.0, 300.0, 100.0, 200.0, 0.0, 0.0 ),  ybbox( 100.0, 200.0, 200.0, 300.0, 0.0, 0.0 ) }, VAlignment.BASELINES,
-				ybbox( 200.0, 300.0, 200.0, 300.0, 0.0, 0.0 ),
-				new double[] { 800.0, 600.0, 500.0, 400.0, 300.0 },
+		// hpackY( [ <300:200,0>, <200:300,0> ], alignment=BASELINES )
+		// 	boxAllocation=800   ->   [ 500, 500 ] @ [ 100, 200 ]		- centre, centre
+		// 	boxAllocation=600   ->   [ 500, 500 ] @ [ 0, 100 ]			- matches parent box req size
+		// 	boxAllocation=300   ->   [ 500, 500 ] @ [ 0, 100 ]			- below parent box req size
+		hpackYTests( new TSBox[] { ybbox( 300.0, 200.0, 0.0 ),  ybbox( 200.0, 300.0, 0.0 ) }, VAlignment.BASELINES,
+				ybbox( 300.0, 300.0, 0.0 ),
+				new double[] { 800.0, 600.0, 300.0 },
 				new double[][] {
 					new double[] { 500.0, 500.0 },
 					new double[] { 500.0, 500.0 },
-					new double[] { 450.0, 450.0 },
-					new double[] { 400.0, 400.0 },
-					new double[] { 400.0, 400.0 } },
+					new double[] { 500.0, 500.0 } },
 				new double[][] {
 					new double[] { 100.0, 200.0 },
 					new double[] { 0.0, 100.0 },
-					new double[] { 0.0, 50.0 },
-					new double[] { 0.0, 0.0 },
-					new double[] { 0.0, 0.0 } } );
+					new double[] { 0.0, 100.0 } } );
 
 	
 	
-		// hpackY( [ <200-300:100-200,0-0>, <100-200:200-300,0-0>, <100-400,0-0> ], alignment=BASELINES )
-		// 	boxAllocation=800   ->   [ 500, 500 ] @ [ 100, 200 ]		- centre, cetnre
-		// 	boxAllocation=600   ->   [ 500, 500 ] @ [ 0, 100 ]			- matches parent box pref size
-		// 	boxAllocation=500   ->   [ 450, 450 ] @ [ 0, 100 ]			- between parent box min and pref size
-		// 	boxAllocation=400   ->   [ 300, 300 ] @ [ 0, 100 ]			- matches parent box min size
-		// 	boxAllocation=300   ->   [ 300, 300 ] @ [ 0, 100 ]			- below parent box min size
-		hpackYTests( new TSBox[] { ybbox( 200.0, 300.0, 100.0, 200.0, 0.0, 0.0 ),  ybbox( 100.0, 200.0, 200.0, 300.0, 0.0, 0.0 ),  ybox( 100.0, 400.0, 0.0, 0.0 ) }, VAlignment.BASELINES,
-				ybbox( 200.0, 300.0, 200.0, 300.0, 0.0, 0.0 ),
-				new double[] { 800.0, 600.0, 500.0, 400.0, 300.0 },
+		// hpackY( [ <300:200,0>, <200:300,0>, <400,0> ], alignment=BASELINES )
+		// 	boxAllocation=800   ->   [ 500, 500, 400 ] @ [ 100, 200, 200 ]		- centre, cetnre
+		// 	boxAllocation=600   ->   [ 500, 500, 400 ] @ [ 0, 100, 100 ]			- matches parent box req size
+		// 	boxAllocation=300   ->   [ 500, 500, 400 ] @ [ 0, 100, 100 ]			- below parent box req size
+		hpackYTests( new TSBox[] { ybbox( 300.0, 200.0, 0.0 ),  ybbox( 200.0, 300.0, 0.0 ),  ybox( 400.0, 0.0 ) }, VAlignment.BASELINES,
+				ybbox( 300.0, 300.0, 0.0 ),
+				new double[] { 800.0, 600.0, 300.0 },
 				new double[][] {
 					new double[] { 500.0, 500.0, 400.0 },
 					new double[] { 500.0, 500.0, 400.0 },
-					new double[] { 450.0, 450.0, 350.0 },
-					new double[] { 400.0, 400.0, 300.0 },
-					new double[] { 400.0, 400.0, 300.0 } },
+					new double[] { 500.0, 500.0, 400.0 } },
 				new double[][] {
-					new double[] { 100.0, 200.0, 100.0 },
-					new double[] { 0.0, 100.0, 0.0 },
-					new double[] { 0.0, 50.0, 0.0 },
-					new double[] { 0.0, 0.0, 0.0 },
-					new double[] { 0.0, 0.0, 0.0 } } );
+					new double[] { 100.0, 200.0, 200.0 },
+					new double[] { 0.0, 100.0, 100.0 },
+					new double[] { 0.0, 100.0, 100.0 } } );
 	}
 }

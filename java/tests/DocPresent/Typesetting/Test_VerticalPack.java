@@ -157,7 +157,7 @@ public class Test_VerticalPack extends Test_BoxPack_base
 		{
 			if ( children[i].getAllocationY() != expectedSpaceAllocation[i] )
 			{
-				System.out.println( "Child allocation for " + i + " is not as expected; expected=" + expectedSpaceAllocation[i] + ", result=" + children[i].getAllocationX() + ", boxAllocation=" + boxAllocation );
+				System.out.println( "Child allocation for " + i + " is not as expected; expected=" + expectedSpaceAllocation[i] + ", result=" + children[i].getAllocationY() + ", boxAllocation=" + boxAllocation );
 			}
 			assertEquals( children[i].getAllocationY(), expectedSpaceAllocation[i] );
 		}
@@ -172,7 +172,7 @@ public class Test_VerticalPack extends Test_BoxPack_base
 		{
 			TSBox c = children[i];
 			baselineChildren[i] = new TSBox( c.getMinWidth(), c.getPrefWidth(), c.getMinHSpacing(), c.getPrefHSpacing(), 
-					c.getMinHeight() * 0.5, c.getPrefHeight() * 0.5, c.getMinHeight() * 0.5, c.getPrefHeight() * 0.5, c.getMinVSpacing(), c.getPrefVSpacing() );
+					c.getReqHeight() * 0.5, c.getReqHeight() * 0.5, c.getReqVSpacing());
 		}
 
 		for (int i = 0; i  < boxAllocations.length; i++)
@@ -192,122 +192,94 @@ public class Test_VerticalPack extends Test_BoxPack_base
 
 
 
-	public void test_allocateWidth()
+	public void test_allocateHeight()
 	{
 		// We need to test for the following conditions:
-		//	- allocation < minimum
+		//	- allocation < required
 		//		- spacing and padding have no effect
 		//		- expand has no effect
-		//	- allocation == minimum
+		//	- allocation == required
 		//		- allocation must include spacing and padding
 		//		- expand has no effect
-		//	- minimum < allocation < preferred
-		//		- allocation must include spacing and padding
-		//		- expand has no effect
-		//	- allocation == preferred
-		//		- allocation must include spacing and padding
-		//		- expand has no effect
-		//	- allocation > preferred
+		//	- allocation > required
 		//		- allocation must include spacing and padding
 		//		- expansion distributed among children		
 		
 		
-		// hpackXSpace( [ <100-200,0-0> ], spacing=0, padding=0, packFlags=0 )
-		// 	boxAllocation=300   ->   [ 200 ]		- no expansion
-		// 	boxAllocation=200   ->   [ 200 ]		- all allocated to 1 child
+		// hpackXSpace( [ <150,0> ], spacing=0, padding=0, packFlags=0 )
+		// 	boxAllocation=300   ->   [ 150 ]		- no expansion
 		// 	boxAllocation=150   ->   [ 150 ]		- all allocated to 1 child
-		// 	boxAllocation=100   ->   [ 100 ]		- all allocated to 1 child
-		// 	boxAllocation=50   ->   [ 100 ]		- will not go below minimum
+		// 	boxAllocation=50   ->   [ 150 ]		- will not go below requirement
 		// No padding, no expand
-		vpackYSpaceTests( new TSBox[] { ybox( 100.0, 200.0, 0.0, 0.0 ) }, 0.0, null, null,
-				ybox( 100.0, 200.0, 0.0, 0.0 ),
-				new double[] { 300.0, 200.0, 150.0, 100.0, 50.0 },
+		vpackYSpaceTests( new TSBox[] { ybox( 150.0, 0.0 ) }, 0.0, null, null,
+				ybox( 150.0, 0.0 ),
+				new double[] { 300.0, 150.0, 50.0 },
 				new double[][] {
-					new double[] { 200.0 },
-					new double[] { 200.0 },
 					new double[] { 150.0 },
-					new double[] { 100.0 },
-					new double[] { 100.0 } } );
+					new double[] { 150.0 },
+					new double[] { 150.0 } } );
 		
 		
-		// hpackXSpace( [ <100-200,0-0> ], spacing=0, padding=10, packFlags=0 )
+		// hpackXSpace( [ <150,0> ], spacing=0, padding=10, packFlags=0 )
 		// 	boxAllocation=300   ->   [ 200 ]		- no expansion
-		// 	boxAllocation=220   ->   [ 200 ]		- all allocated to 1 child, 20 to padding
-		// 	boxAllocation=200   ->   [ 180 ]		- all allocated to 1 child, 20 to padding
-		// 	boxAllocation=150   ->   [ 130 ]		- all allocated to 1 child, 20 to padding
-		// 	boxAllocation=120   ->   [ 100 ]		- all allocated to 1 child, 20 to padding
-		// 	boxAllocation=100   ->   [ 100 ]		- will not go below minimum, 20 to padding
-		// 	boxAllocation=50   ->   [ 100 ]		- will not go below minimum, 20 to padding
+		// 	boxAllocation=170   ->   [ 150 ]		- all allocated to 1 child, 20 to padding
+		// 	boxAllocation=150   ->   [ 150 ]		- all allocated to 1 child, 20 to padding
+		// 	boxAllocation=50   ->   [ 150 ]		- will not go below requirement, 20 to padding
 		// 10 padding, no expand
-		vpackYSpaceTests( new TSBox[] { ybox( 100.0, 200.0, 0.0, 0.0 ) }, 0.0, new double[] { 10.0 }, null,
-				ybox( 120.0, 220.0, 0.0, 0.0 ),
-				new double[] { 300.0, 220.0, 200.0, 150.0, 120.0, 100.0, 50.0 },
+		vpackYSpaceTests( new TSBox[] { ybox( 150.0, 0.0 ) }, 0.0, new double[] { 10.0 }, null,
+				ybox( 170.0, 0.0 ),
+				new double[] { 300.0, 170.0, 150.0, 50.0 },
 				new double[][] {
-					new double[] { 200.0 },
-					new double[] { 200.0 },
-					new double[] { 180.0 },
-					new double[] { 130.0 },
-					new double[] { 100.0 },
-					new double[] { 100.0 },
-					new double[] { 100.0 } } );
+					new double[] { 150.0 },
+					new double[] { 150.0 },
+					new double[] { 150.0 },
+					new double[] { 150.0 } } );
 		
 		
-		// hpackXSpace( [ <100-200,0-0> ], spacing=0, padding=0, packFlags=EXPAND )
+		// hpackXSpace( [ <150,0> ], spacing=0, padding=0, packFlags=EXPAND )
 		// 	boxAllocation=300   ->   [ 300 ]		- expansion; extra space allocated to child
-		// 	boxAllocation=200   ->   [ 200 ]		- all allocated to 1 child
 		// 	boxAllocation=150   ->   [ 150 ]		- all allocated to 1 child
-		// 	boxAllocation=100   ->   [ 100 ]		- all allocated to 1 child
-		// 	boxAllocation=50   ->   [ 100 ]		- will not go below minimum
+		// 	boxAllocation=50   ->   [ 150 ]		- will not go below requirement
 		// No padding, expand
-		vpackYSpaceTests( new TSBox[] { ybox( 100.0, 200.0, 0.0, 0.0 ) }, 0.0, null, new int[] { TSBox.packFlags( true ) },
-				ybox( 100.0, 200.0, 0.0, 0.0 ),
-				new double[] { 300.0, 200.0, 150.0, 100.0, 50.0 },
+		vpackYSpaceTests( new TSBox[] { ybox( 150.0, 0.0 ) }, 0.0, null, new int[] { TSBox.packFlags( true ) },
+				ybox( 150.0, 0.0 ),
+				new double[] { 300.0, 150.0, 50.0 },
 				new double[][] {
 					new double[] { 300.0 },
-					new double[] { 200.0 },
 					new double[] { 150.0 },
-					new double[] { 100.0 },
-					new double[] { 100.0 } } );
+					new double[] { 150.0 } } );
 
 
-		// hpackXSpace( [ <100-200,0-0> ], spacing=0, padding=10, packFlags=EXPAND )
-		// 	boxAllocation=300   ->   [ 280 ]		- expansion; extra space allocated to child, 20 go to padding
-		// 	boxAllocation=220   ->   [ 200 ]		- all allocated to 1 child, 20 to padding
-		// 	boxAllocation=200   ->   [ 180 ]		- all allocated to 1 child, 20 to padding
-		// 	boxAllocation=150   ->   [ 130 ]		- all allocated to 1 child, 20 to padding
-		// 	boxAllocation=120   ->   [ 100 ]		- all allocated to 1 child, 20 to padding
-		// 	boxAllocation=100   ->   [ 100 ]		- will not go below minimum, 20 to padding
-		// 	boxAllocation=50   ->   [ 100 ]		- will not go below minimum, 20 to padding
+		// hpackXSpace( [ <150,0> ], spacing=0, padding=10, packFlags=EXPAND )
+		// 	boxAllocation=300   ->   [ 280 ]		- no expansion
+		// 	boxAllocation=170   ->   [ 150 ]		- all allocated to 1 child, 20 to padding
+		// 	boxAllocation=150   ->   [ 150 ]		- all allocated to 1 child, 20 to padding
+		// 	boxAllocation=50   ->   [ 150 ]		- will not go below requirement, 20 to padding
 		// 10 padding, expand
-		vpackYSpaceTests( new TSBox[] { ybox( 100.0, 200.0, 0.0, 0.0 ) }, 0.0, new double[] { 10.0 }, new int[] { TSBox.packFlags( true ) },
-				ybox( 120.0, 220.0, 0.0, 0.0 ),
-				new double[] { 300.0, 220.0, 200.0, 150.0, 120.0, 100.0, 50.0 },
+		vpackYSpaceTests( new TSBox[] { ybox( 150.0, 0.0 ) }, 0.0, new double[] { 10.0 }, new int[] { TSBox.packFlags( true ) },
+				ybox( 170.0, 0.0 ),
+				new double[] { 300.0, 170.0, 150.0, 50.0 },
 				new double[][] {
 					new double[] { 280.0 },
-					new double[] { 200.0 },
-					new double[] { 180.0 },
-					new double[] { 130.0 },
-					new double[] { 100.0 },
-					new double[] { 100.0 },
-					new double[] { 100.0 } } );
-
-		
-		// h-spacing applied to 1 child should not make a difference, since it is the last child
-		// hpackXSpace( [ <100-200,10-10> ], spacing=0, padding=0, packFlags=0 )
-		// 	boxAllocation=300   ->   [ 200 ]		- no expansion
-		// 	boxAllocation=200   ->   [ 200 ]		- all allocated to 1 child
-		// 	boxAllocation=150   ->   [ 150 ]		- all allocated to 1 child
-		// 	boxAllocation=100   ->   [ 100 ]		- all allocated to 1 child
-		// 	boxAllocation=50   ->   [ 100 ]		- will not go below minimum
-		vpackYSpaceTests( new TSBox[] { ybox( 100.0, 200.0, 10.0, 10.0 ) }, 0.0, null, null,
-				ybox( 100.0, 200.0, 10.0, 10.0 ),
-				new double[] { 300.0, 200.0, 150.0, 100.0, 50.0 },
-				new double[][] {
-					new double[] { 200.0 },
-					new double[] { 200.0 },
 					new double[] { 150.0 },
-					new double[] { 100.0 },
-					new double[] { 100.0 } } );
+					new double[] { 150.0 },
+					new double[] { 150.0 } } );
+		
+		
+
+		// h-spacing applied to 1 child should not make a difference, since it is the last child
+		// hpackXSpace( [ <150,10> ], spacing=0, padding=0, packFlags=0 )
+		// 	boxAllocation=300   ->   [ 150 ]		- no expansion
+		// 	boxAllocation=150   ->   [ 150 ]		- all allocated to 1 child
+		// 	boxAllocation=50   ->   [ 150 ]		- will not go below requirement
+		// No padding, no expand
+		vpackYSpaceTests( new TSBox[] { ybox( 150.0, 10.0 ) }, 0.0, null, null,
+				ybox( 150.0, 10.0 ),
+				new double[] { 300.0, 150.0, 50.0 },
+				new double[][] {
+					new double[] { 150.0 },
+					new double[] { 150.0 },
+					new double[] { 150.0 } } );
 		
 
 		
@@ -317,72 +289,56 @@ public class Test_VerticalPack extends Test_BoxPack_base
 		
 		
 		
-		// hpackXSpace( [ <100-200,0-0>, <50-70,0-0> ], spacing=0, padding=0, packFlags=0 )
-		// 	boxAllocation=300   ->   [ 200, 70 ]		- no expansion
-		// 	boxAllocation=270   ->   [ 200, 70 ]		- preferred sizes
-		// 	boxAllocation=210   ->   [ 150, 60 ]		- space above minimum distributed evenly
-		// 	boxAllocation=150   ->   [ 100, 50 ]		- minimum sizes
-		// 	boxAllocation=100   ->   [ 100, 50 ]		- will not go below minimum
-		vpackYSpaceTests( new TSBox[] { ybox( 100.0, 200.0, 0.0, 0.0 ),  ybox( 50.0, 70.0, 0.0, 0.0 ) }, 0.0, null, null,
-				ybox( 150.0, 270.0, 0.0, 0.0 ),
-				new double[] { 300.0, 270.0, 210.0, 150.0, 100.0 },
+		// hpackXSpace( [ <150,0>, <100,0> ], spacing=0, padding=0, packFlags=0 )
+		// 	boxAllocation=300   ->   [ 150, 100 ]		- no expansion
+		// 	boxAllocation=250   ->   [ 150, 100 ]		- required sizes
+		// 	boxAllocation=100   ->   [ 150, 100 ]		- will not go below requirement
+		vpackYSpaceTests( new TSBox[] { ybox( 150.0, 0.0 ), ybox( 100.0, 0.0 ) }, 0.0, null, null,
+				ybox( 250.0, 0.0 ),
+				new double[] { 300.0, 250.0, 100.0 },
 				new double[][] {
-					new double[] { 200.0, 70.0 },
-					new double[] { 200.0, 70.0 },
-					new double[] { 150.0, 60.0 },
-					new double[] { 100.0, 50.0 },
-					new double[] { 100.0, 50.0 } } );
+					new double[] { 150.0, 100.0 },
+					new double[] { 150.0, 100.0 },
+					new double[] { 150.0, 100.0 } } );
 		
 		
-		// hpackXSpace( [ <100-200,0-0>, <50-70,0-0> ], spacing=0, padding=0, packFlags=[ EXPAND, 0 ] )
-		// 	boxAllocation=300   ->   [ 230, 70 ]		- space above preferred goes to first child, none to second
-		// 	boxAllocation=270   ->   [ 200, 70 ]		- preferred sizes
-		// 	boxAllocation=210   ->   [ 150, 60 ]		- space above minimum distributed evenly
-		// 	boxAllocation=150   ->   [ 100, 50 ]		- minimum sizes
-		// 	boxAllocation=100   ->   [ 100, 50 ]		- will not go below minimum
-		vpackYSpaceTests( new TSBox[] { ybox( 100.0, 200.0, 0.0, 0.0 ),  ybox( 50.0, 70.0, 0.0, 0.0 ) }, 0.0, null, new int[] { TSBox.packFlags( true ), TSBox.packFlags( false ) },
-				ybox( 150.0, 270.0, 0.0, 0.0 ),
-				new double[] { 300.0, 270.0, 210.0, 150.0, 100.0 },
-				new double[][] {
-					new double[] { 230.0, 70.0 },
-					new double[] { 200.0, 70.0 },
-					new double[] { 150.0, 60.0 },
-					new double[] { 100.0, 50.0 },
-					new double[] { 100.0, 50.0 } } );
-		
-
-		// hpackXSpace( [ <100-200,0-0>, <50-70,0-0> ], spacing=0, padding=0, packFlags=[ 0, EXPAND ] )
-		// 	boxAllocation=300   ->   [ 200, 100 ]		- space above preferred goes to secnd child, none to first
-		// 	boxAllocation=270   ->   [ 200, 70 ]		- preferred sizes
-		// 	boxAllocation=210   ->   [ 150, 60 ]		- space above minimum distributed evenly
-		// 	boxAllocation=150   ->   [ 100, 50 ]		- minimum sizes
-		// 	boxAllocation=100   ->   [ 100, 50 ]		- will not go below minimum
-		vpackYSpaceTests( new TSBox[] { ybox( 100.0, 200.0, 0.0, 0.0 ),  ybox( 50.0, 70.0, 0.0, 0.0 ) }, 0.0, null, new int[] { TSBox.packFlags( false ), TSBox.packFlags( true ) },
-				ybox( 150.0, 270.0, 0.0, 0.0 ),
-				new double[] { 300.0, 270.0, 210.0, 150.0, 100.0 },
+		// hpackXSpace( [ <150,0>, <100,0> ], spacing=0, padding=0, packFlags=[ EXPAND, 0 ] )
+		// 	boxAllocation=300   ->   [ 200, 100 ]		- space above preferred goes to first child, none to second
+		// 	boxAllocation=250   ->   [ 150, 100 ]		- required sizes
+		// 	boxAllocation=100   ->   [ 150, 100 ]		- will not go below requirement
+		vpackYSpaceTests( new TSBox[] { ybox( 150.0, 0.0 ), ybox( 100.0, 0.0 ) }, 0.0, null, new int[] { TSBox.packFlags( true ), TSBox.packFlags( false ) },
+				ybox( 250.0, 0.0 ),
+				new double[] { 300.0, 250.0, 100.0 },
 				new double[][] {
 					new double[] { 200.0, 100.0 },
-					new double[] { 200.0, 70.0 },
-					new double[] { 150.0, 60.0 },
-					new double[] { 100.0, 50.0 },
-					new double[] { 100.0, 50.0 } } );
+					new double[] { 150.0, 100.0 },
+					new double[] { 150.0, 100.0 } } );
 		
 
-		// hpackXSpace( [ <100-200,0-0>, <50-70,0-0> ], spacing=0, padding=0, packFlags=[ EXPAND, EXPAND ] )
-		// 	boxAllocation=300   ->   [ 215, 85 ]		- space above preferred gets distributed between both children
-		// 	boxAllocation=270   ->   [ 200, 70 ]		- preferred sizes
-		// 	boxAllocation=210   ->   [ 150, 60 ]		- space above minimum distributed evenly
-		// 	boxAllocation=150   ->   [ 100, 50 ]		- minimum sizes
-		// 	boxAllocation=100   ->   [ 100, 50 ]		- will not go below minimum
-		vpackYSpaceTests( new TSBox[] { ybox( 100.0, 200.0, 0.0, 0.0 ),  ybox( 50.0, 70.0, 0.0, 0.0 ) }, 0.0, null, new int[] { TSBox.packFlags( true ), TSBox.packFlags( true ) },
-				ybox( 150.0, 270.0, 0.0, 0.0 ),
-				new double[] { 300.0, 270.0, 210.0, 150.0, 100.0 },
+		// hpackXSpace( [ <150,0>, <100,0> ], spacing=0, padding=0, packFlags=[ 0, EXPAND ] )
+		// 	boxAllocation=300   ->   [ 150, 150 ]		- space above preferred goes to second child, none to first
+		// 	boxAllocation=250   ->   [ 150, 100 ]		- required sizes
+		// 	boxAllocation=100   ->   [ 150, 100 ]		- will not go below requirement
+		vpackYSpaceTests( new TSBox[] { ybox( 150.0, 0.0 ), ybox( 100.0, 0.0 ) }, 0.0, null, new int[] { TSBox.packFlags( false ), TSBox.packFlags( true ) },
+				ybox( 250.0, 0.0 ),
+				new double[] { 300.0, 250.0, 100.0 },
 				new double[][] {
-					new double[] { 215.0, 85.0 },
-					new double[] { 200.0, 70.0 },
-					new double[] { 150.0, 60.0 },
-					new double[] { 100.0, 50.0 },
-					new double[] { 100.0, 50.0 } } );
+					new double[] { 150.0, 150.0 },
+					new double[] { 150.0, 100.0 },
+					new double[] { 150.0, 100.0 } } );
+		
+
+		// hpackXSpace( [ <150,0>, <100,0> ], spacing=0, padding=0, packFlags=[ EXPAND, EXPAND ] )
+		// 	boxAllocation=300   ->   [ 175, 125 ]		- space above preferred gets distributed between both children
+		// 	boxAllocation=250   ->   [ 150, 100 ]		- required sizes
+		// 	boxAllocation=100   ->   [ 150, 100 ]		- will not go below requirement
+		vpackYSpaceTests( new TSBox[] { ybox( 150.0, 0.0 ), ybox( 100.0, 0.0 ) }, 0.0, null, new int[] { TSBox.packFlags( true ), TSBox.packFlags( true ) },
+				ybox( 250.0, 0.0 ),
+				new double[] { 300.0, 250.0, 100.0 },
+				new double[][] {
+					new double[] { 175.0, 125.0 },
+					new double[] { 150.0, 100.0 },
+					new double[] { 150.0, 100.0 } } );
 	}
 
 
@@ -437,7 +393,7 @@ public class Test_VerticalPack extends Test_BoxPack_base
 		{
 			TSBox c = children[i];
 			baselineChildren[i] = new TSBox( c.getMinWidth(), c.getPrefWidth(), c.getMinHSpacing(), c.getPrefHSpacing(), 
-					c.getMinHeight() * 0.5, c.getPrefHeight() * 0.5, c.getMinHeight() * 0.5, c.getPrefHeight() * 0.5, c.getMinVSpacing(), c.getPrefVSpacing() );
+					c.getReqHeight() * 0.5, c.getReqHeight() * 0.5, c.getReqVSpacing() );
 		}
 
 		for (int i = 0; i  < boxAllocations.length; i++)
@@ -455,96 +411,72 @@ public class Test_VerticalPack extends Test_BoxPack_base
 
 	public void test_allocateY()
 	{
-		// vpackY( [ <100-200,0-0>, <50-70,0-0> ], spacing=0, padding=0, packFlags=0 )
-		// 	boxAllocation=300   ->   [ 200, 70 ] @ [ 0, 200 ]		- no expansion
-		// 	boxAllocation=270   ->   [ 200, 70 ] @ [ 0, 200 ]		- preferred sizes
-		// 	boxAllocation=210   ->   [ 150, 60 ] @ [ 0, 150 ]		- space above minimum distributed evenly
-		// 	boxAllocation=150   ->   [ 100, 50 ] @ [ 0, 100 ]		- minimum sizes
-		// 	boxAllocation=100   ->   [ 100, 50 ] @ [ 0, 100 ]		- will not go below minimum
-		vpackYTests( new TSBox[] { ybox( 100.0, 200.0, 0.0, 0.0 ),  ybox( 50.0, 70.0, 0.0, 0.0 ) }, 0.0, null, null,
-				ybox( 150.0, 270.0, 0.0, 0.0 ),
-				new double[] { 300.0, 270.0, 210.0, 150.0, 100.0 },
+		// vpackY( [ <200,0>, <50,0> ], spacing=0, padding=0, packFlags=0 )
+		// 	boxAllocation=300   ->   [ 200, 50 ] @ [ 0, 200 ]		- no expansion
+		// 	boxAllocation=250   ->   [ 200, 50 ] @ [ 0, 200 ]		- required sizes
+		// 	boxAllocation=100   ->   [ 200, 50 ] @ [ 0, 200 ]		- will not go below requirement
+		vpackYTests( new TSBox[] { ybox( 200.0, 0.0 ),  ybox( 50.0, 0.0 ) }, 0.0, null, null,
+				ybox( 250.0, 0.0 ),
+				new double[] { 300.0, 250.0, 100.0 },
 				new double[][] {
-					new double[] { 200.0, 70.0 },
-					new double[] { 200.0, 70.0 },
-					new double[] { 150.0, 60.0 },
-					new double[] { 100.0, 50.0 },
-					new double[] { 100.0, 50.0 } },
+					new double[] { 200.0, 50.0 },
+					new double[] { 200.0, 50.0 },
+					new double[] { 200.0, 50.0 } },
 				new double[][] {
 					new double[] { 0.0, 200.0 },
 					new double[] { 0.0, 200.0 },
-					new double[] { 0.0, 150.0 },
-					new double[] { 0.0, 100.0 },
-					new double[] { 0.0, 100.0 } } );
+					new double[] { 0.0, 200.0 } } );
 
 	
-		// vpackY( [ <100-200,0-0>, <50-70,0-0> ], spacing=10, padding=0, packFlags=0 )
-		// 	boxAllocation=300   ->   [ 200, 70 ] @ [ 0, 210 ]		- no expansion
-		// 	boxAllocation=280   ->   [ 200, 70 ] @ [ 0, 210 ]		- preferred sizes
-		// 	boxAllocation=220   ->   [ 150, 60 ] @ [ 0, 160 ]		- space above minimum distributed evenly
-		// 	boxAllocation=160   ->   [ 100, 50 ] @ [ 0, 110 ]		- minimum sizes
-		// 	boxAllocation=100   ->   [ 100, 50 ] @ [ 0, 110 ]		- will not go below minimum
-		vpackYTests( new TSBox[] { ybox( 100.0, 200.0, 0.0, 0.0 ),  ybox( 50.0, 70.0, 0.0, 0.0 ) }, 10.0, null, null,
-				ybox( 160.0, 280.0, 0.0, 0.0 ),
-				new double[] { 300.0, 280.0, 220.0, 160.0, 100.0 },
+		// vpackY( [ <200,0>, <50,0> ], spacing=10, padding=0, packFlags=0 )
+		// 	boxAllocation=300   ->   [ 200, 50 ] @ [ 0, 210 ]		- no expansion
+		// 	boxAllocation=260   ->   [ 200, 50 ] @ [ 0, 210 ]		- required sizes
+		// 	boxAllocation=100   ->   [ 200, 50 ] @ [ 0, 210 ]		- will not go below requirement
+		vpackYTests( new TSBox[] { ybox( 200.0, 0.0 ),  ybox( 50.0, 0.0 ) }, 10.0, null, null,
+				ybox( 260.0, 0.0 ),
+				new double[] { 300.0, 260.0, 100.0 },
 				new double[][] {
-					new double[] { 200.0, 70.0 },
-					new double[] { 200.0, 70.0 },
-					new double[] { 150.0, 60.0 },
-					new double[] { 100.0, 50.0 },
-					new double[] { 100.0, 50.0 } },
-				new double[][] {
-					new double[] { 0.0, 210.0 },
-					new double[] { 0.0, 210.0 },
-					new double[] { 0.0, 160.0 },
-					new double[] { 0.0, 110.0 },
-					new double[] { 0.0, 110.0 } } );
+						new double[] { 200.0, 50.0 },
+						new double[] { 200.0, 50.0 },
+						new double[] { 200.0, 50.0 } },
+					new double[][] {
+						new double[] { 0.0, 210.0 },
+						new double[] { 0.0, 210.0 },
+						new double[] { 0.0, 210.0 } } );
 
 	
-		// vpackY( [ <100-200,0-0>, <50-70,0-0> ], spacing=0, padding=[ 10, 20 ], packFlags=0 )
-		// 	boxAllocation=400   ->   [ 200, 70 ] @ [ 0, 240 ]		- no expansion
-		// 	boxAllocation=330   ->   [ 200, 70 ] @ [ 0, 240 ]		- preferred sizes
-		// 	boxAllocation=270   ->   [ 150, 60 ] @ [ 0, 190 ]		- space above minimum distributed evenly
-		// 	boxAllocation=210   ->   [ 100, 50 ] @ [ 0, 140 ]		- minimum sizes
-		// 	boxAllocation=100   ->   [ 100, 50 ] @ [ 0, 140 ]		- will not go below minimum
-		vpackYTests( new TSBox[] { ybox( 100.0, 200.0, 0.0, 0.0 ),  ybox( 50.0, 70.0, 0.0, 0.0 ) }, 0.0, new double[] { 10.0, 20.0 }, null,
-				ybox( 210.0, 330.0, 0.0, 0.0 ),
-				new double[] { 400.0, 330.0, 270.0, 210.0, 100.0 },
+		// vpackY( [ <200,0>, <50,0> ], spacing=0, padding=[ 10, 20 ], packFlags=0 )
+		// 	boxAllocation=400   ->   [ 200, 50 ] @ [ 10, 240 ]		- no expansion
+		// 	boxAllocation=310   ->   [ 200, 50 ] @ [ 10, 240 ]		- required sizes
+		// 	boxAllocation=100   ->   [ 200, 50 ] @ [ 10, 240 ]		- will not go below requirement
+		vpackYTests( new TSBox[] { ybox( 200.0, 0.0 ),  ybox( 50.0, 0.0 ) }, 0.0, new double[] { 10.0, 20.0 }, null,
+				ybox( 310.0, 0.0 ),
+				new double[] { 400.0, 310.0, 100.0 },
 				new double[][] {
-					new double[] { 200.0, 70.0 },
-					new double[] { 200.0, 70.0 },
-					new double[] { 150.0, 60.0 },
-					new double[] { 100.0, 50.0 },
-					new double[] { 100.0, 50.0 } },
-				new double[][] {
-					new double[] { 10.0, 240.0 },
-					new double[] { 10.0, 240.0 },
-					new double[] { 10.0, 190.0 },
-					new double[] { 10.0, 140.0 },
-					new double[] { 10.0, 140.0 } } );
+						new double[] { 200.0, 50.0 },
+						new double[] { 200.0, 50.0 },
+						new double[] { 200.0, 50.0 } },
+					new double[][] {
+						new double[] { 10.0, 240.0 },
+						new double[] { 10.0, 240.0 },
+						new double[] { 10.0, 240.0 } } );
 
 		
-		// vpackY( [ <100-200,15-15>, <50-70,0-0> ], spacing=0, padding=[ 10, 20 ], packFlags=0 )
-		// 	boxAllocation=400   ->   [ 200, 70 ] @ [ 0, 245 ]		- no expansion
-		// 	boxAllocation=335   ->   [ 200, 70 ] @ [ 0, 245 ]		- preferred sizes
-		// 	boxAllocation=275   ->   [ 150, 60 ] @ [ 0, 195 ]		- space above minimum distributed evenly
-		// 	boxAllocation=215   ->   [ 100, 50 ] @ [ 0, 145 ]		- minimum sizes
-		// 	boxAllocation=100   ->   [ 100, 50 ] @ [ 0, 145 ]		- will not go below minimum
-		vpackYTests( new TSBox[] { ybox( 100.0, 200.0, 15.0, 15.0 ),  ybox( 50.0, 70.0, 0.0, 0.0 ) }, 0.0, new double[] { 10.0, 20.0 }, null,
-				ybox( 215.0, 335.0, 0.0, 0.0 ),
-				new double[] { 400.0, 335.0, 275.0, 215.0, 100.0 },
+		// vpackY( [ <200,15>, <50,0> ], spacing=0, padding=[ 10, 20 ], packFlags=0 )
+		// 	boxAllocation=400   ->   [ 200, 50 ] @ [ 10, 245 ]		- no expansion
+		// 	boxAllocation=315   ->   [ 200, 50 ] @ [ 10, 245 ]		- required sizes
+		// 	boxAllocation=100   ->   [ 200, 50 ] @ [ 10, 245 ]		- will not go below requirement
+		vpackYTests( new TSBox[] { ybox( 200.0, 15.0 ),  ybox( 50.0, 0.0 ) }, 0.0, new double[] { 10.0, 20.0 }, null,
+				ybox( 315.0, 0.0 ),
+				new double[] { 400.0, 315.0, 100.0 },
 				new double[][] {
-					new double[] { 200.0, 70.0 },
-					new double[] { 200.0, 70.0 },
-					new double[] { 150.0, 60.0 },
-					new double[] { 100.0, 50.0 },
-					new double[] { 100.0, 50.0 } },
-				new double[][] {
-					new double[] { 10.0, 245.0 },
-					new double[] { 10.0, 245.0 },
-					new double[] { 10.0, 195.0 },
-					new double[] { 10.0, 145.0 },
-					new double[] { 10.0, 145.0 } } );
+						new double[] { 200.0, 50.0 },
+						new double[] { 200.0, 50.0 },
+						new double[] { 200.0, 50.0 } },
+					new double[][] {
+						new double[] { 10.0, 245.0 },
+						new double[] { 10.0, 245.0 },
+						new double[] { 10.0, 245.0 } } );
 	}
 
 

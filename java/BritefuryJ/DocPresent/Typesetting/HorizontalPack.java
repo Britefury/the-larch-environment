@@ -64,90 +64,55 @@ public class HorizontalPack
 		
 		if ( alignment == VAlignment.BASELINES )
 		{
-			double minAscent = 0.0, minDescent = 0.0, minDescentAndSpacing = 0.0, minHeight = 0.0, minAdvance = 0.0, minHalfHeight = 0.0, minHalfHeightAndSpacing = 0.0;
-			double prefAscent = 0.0, prefDescent = 0.0, prefDescentAndSpacing = 0.0, prefHeight = 0.0, prefAdvance = 0.0, prefHalfHeight = 0.0, prefHalfHeightAndSpacing = 0.0;
+			double reqAscent = 0.0, reqDescent = 0.0, reqDescentAndSpacing = 0.0, reqHeight = 0.0, reqAdvance = 0.0;
 			int baselineCount = 0;
 			for (TSBox child: children)
 			{
 				if ( child.hasBaseline() )
 				{
-					double childMinDescentAndSpacing = child.minDescent + child.minVSpacing;
-					double childPrefDescentAndSpacing = child.prefDescent + child.prefVSpacing;
-					minAscent = Math.max( minAscent, child.minAscent );
-					prefAscent = Math.max( prefAscent, child.prefAscent );
-					minDescent = Math.max( minDescent, child.minDescent );
-					prefDescent = Math.max( prefDescent, child.prefDescent );
-					minDescentAndSpacing = Math.max( minDescentAndSpacing, childMinDescentAndSpacing );
-					prefDescentAndSpacing = Math.max( prefDescentAndSpacing, childPrefDescentAndSpacing );
+					double childReqDescentAndSpacing = child.reqDescent + child.reqVSpacing;
+					reqAscent = Math.max( reqAscent, child.reqAscent );
+					reqDescent = Math.max( reqDescent, child.reqDescent );
+					reqDescentAndSpacing = Math.max( reqDescentAndSpacing, childReqDescentAndSpacing );
 					baselineCount++;
 				}
 				else
 				{
-					double childMinHeight = child.getMinHeight();
-					double childPrefHeight = child.getPrefHeight();
-					double childMinAdvance = childMinHeight + child.minVSpacing;
-					double childPrefAdvance = childPrefHeight + child.prefVSpacing;
-					minHeight = Math.max( minHeight, childMinHeight );
-					prefHeight = Math.max( prefHeight, childPrefHeight );
-					minAdvance = Math.max( minAdvance, childMinAdvance );
-					prefAdvance = Math.max( prefAdvance, childPrefAdvance );
+					double childReqHeight = child.getReqHeight();
+					double childReqAdvance = childReqHeight + child.reqVSpacing;
+					reqHeight = Math.max( reqHeight, childReqHeight );
+					reqAdvance = Math.max( reqAdvance, childReqAdvance );
 
-					double childMinHalfHeight = childMinHeight * 0.5;
-					double childPrefHalfHeight = childPrefHeight * 0.5;
-					double childMinHalfHeightAndSpacing = childMinHalfHeight + child.minVSpacing;
-					double childPrefHalfHeightAndSpacing = childPrefHalfHeight + child.prefVSpacing;
-					minHalfHeight = Math.max( minHalfHeight, childMinHalfHeight );
-					prefHalfHeight = Math.max( prefHalfHeight, childPrefHalfHeight );
-					minHalfHeightAndSpacing = Math.max( minHalfHeightAndSpacing, childMinHalfHeightAndSpacing );
-					prefHalfHeightAndSpacing = Math.max( prefHalfHeightAndSpacing, childPrefHalfHeightAndSpacing );
+					double childReqHalfHeight = childReqHeight * 0.5;
+					reqAscent = Math.max( reqAscent, childReqHalfHeight );
+					reqDescent = Math.max( reqDescent, childReqHalfHeight );
+					reqDescentAndSpacing = Math.max( reqDescentAndSpacing, childReqHalfHeight + child.reqVSpacing );
 				}
 			}
 			
 			if ( baselineCount == 0 )
 			{
 				// No children had baselines; result in a box that has no baseline
-				box.setRequisitionY( minHeight, prefHeight, minAdvance - minHeight, prefAdvance - prefHeight );
+				box.setRequisitionY( reqHeight, reqAdvance - reqHeight );
 			}
 			else
 			{
-				if ( baselineCount < children.length )
-				{
-					// Some children did not have baselines; combine requirements
-					
-					// For the children that do not have a baseline, assume that there is one that is 'x' units below their centre,
-					// where x is half the size of the ascent of the typeset children
-					double offset = minAscent * 0.5;
-					double noBaselineMinAscent = minHalfHeight + offset, noBaselinePrefAscent = prefHalfHeight + offset;
-					double noBaselineMinDescent = minHalfHeight - offset, noBaselinePrefDescent = prefHalfHeight - offset;
-					double noBaselineMinDescentAndSpacing = minHalfHeightAndSpacing - offset, noBaselinePrefDescentAndSpacing = prefHalfHeightAndSpacing - offset;
-					minAscent = Math.max( minAscent, noBaselineMinAscent );
-					prefAscent = Math.max( prefAscent, noBaselinePrefAscent );
-					minDescent = Math.max( minDescent, noBaselineMinDescent );
-					prefDescent = Math.max( prefDescent, noBaselinePrefDescent );
-					minDescentAndSpacing = Math.max( minDescentAndSpacing, noBaselineMinDescentAndSpacing );
-					prefDescentAndSpacing = Math.max( prefDescentAndSpacing, noBaselinePrefDescentAndSpacing );
-				}
-				
-				box.setRequisitionY( minAscent, prefAscent, minDescent, prefDescent, minDescentAndSpacing - minDescent, prefDescentAndSpacing - prefDescent );
+				box.setRequisitionY( reqAscent, reqDescent, reqDescentAndSpacing - reqDescent );
 			}
 		}
 		else
 		{
-			double minHeight = 0.0, prefHeight = 0.0;
-			double minAdvance = 0.0, prefAdvance = 0.0;
+			double reqHeight = 0.0;
+			double reqAdvance = 0.0;
 			for (TSBox child: children)
 			{
-				double childMinHeight = child.getMinHeight();
-				double childPrefHeight = child.getPrefHeight();
-				double childMinAdvance = childMinHeight + child.minVSpacing;
-				double childPrefAdvance = childPrefHeight + child.prefVSpacing;
-				minHeight = Math.max( minHeight, childMinHeight );
-				prefHeight = Math.max( prefHeight, childPrefHeight );
-				minAdvance = Math.max( minAdvance, childMinAdvance );
-				prefAdvance = Math.max( prefAdvance, childPrefAdvance );
+				double childMinHeight = child.getReqHeight();
+				double childMinAdvance = childMinHeight + child.reqVSpacing;
+				reqHeight = Math.max( reqHeight, childMinHeight );
+				reqAdvance = Math.max( reqAdvance, childMinAdvance );
 			}
 			
-			box.setRequisitionY( minHeight, prefHeight, minAdvance - minHeight, prefAdvance - prefHeight );
+			box.setRequisitionY( reqHeight, reqAdvance - reqHeight );
 		}
 	}
 
@@ -303,21 +268,13 @@ public class HorizontalPack
 		if ( alignment == VAlignment.BASELINES  &&  box.bHasBaseline )
 		{
 			// Compute the amount of space allocated (do not allow to fall below minimum requirement)
-			double allocation = Math.max( box.allocationY, box.getMinHeight() );
-			
-			// Compute the 'fraction' between the minimum and preferred heights
-			double fraction = ( allocation - box.getMinHeight() ) / ( box.getPrefHeight() - box.getMinHeight() );
-			fraction = Math.min( fraction, 1.0 );
-			
-			// Compute the amount of allocated ascent and descent
-			double allocationAscent = box.getMinAscent()  +  ( box.getPrefAscent() - box.getMinAscent() ) * fraction;
-			double allocationDescent = box.getMinDescent()  +  ( box.getPrefDescent() - box.getMinDescent() ) * fraction;
+			double allocation = Math.max( box.allocationY, box.getReqHeight() );
 			
 			// Compute the difference (clamped to >0) between the allocation and the preferred height 
-			double delta = Math.max( allocation - box.getPrefHeight(), 0.0 );
+			double delta = Math.max( allocation - box.getReqHeight(), 0.0 );
 			
 			// Compute the baseline position (distribute the 'delta' around the contents)
-			double baselineY = allocationAscent + delta * 0.5; 
+			double baselineY = box.getReqAscent() + delta * 0.5; 
 			
 			for (TSBox child: children)
 			{
@@ -325,15 +282,14 @@ public class HorizontalPack
 				
 				if ( child.bHasBaseline )
 				{
-					childAscent = Math.min( allocationAscent, child.getPrefAscent() );
-					childDescent = Math.min( allocationDescent, child.getPrefDescent() );
+					childAscent = child.getReqAscent();
+					childDescent = child.getReqDescent();
 				}
 				else
 				{
-					double halfHeight = child.getPrefHeight() * 0.5;
-					double offset = box.getMinAscent() * 0.5;
-					childAscent = Math.min( allocationAscent, halfHeight + offset );
-					childDescent = Math.min( allocationDescent, halfHeight - offset );
+					double halfHeight = child.getReqHeight() * 0.5;
+					childAscent = halfHeight;
+					childDescent = halfHeight;
 				}
 				
 				box.allocateChildY( child, baselineY - childAscent, childAscent + childDescent );
@@ -341,7 +297,7 @@ public class HorizontalPack
 		}
 		else
 		{
-			double allocation = Math.max( box.allocationY, box.getMinHeight() );
+			double allocation = Math.max( box.allocationY, box.getReqHeight() );
 			for (TSBox child: children)
 			{
 				if ( alignment == VAlignment.EXPAND )
@@ -350,7 +306,7 @@ public class HorizontalPack
 				}
 				else
 				{
-					double childHeight = Math.min( allocation, child.getPrefHeight() );
+					double childHeight = Math.min( allocation, child.getReqHeight() );
 					
 					if ( alignment == VAlignment.TOP )
 					{

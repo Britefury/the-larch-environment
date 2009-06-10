@@ -16,6 +16,11 @@ public class Test_BoxPack_base extends TestCase
 		return new TSBox( width, hspacing, 0.0, 0.0 );
 	}
 	
+	protected TSBox xbox(double minWidth, double prefWidth, double minHSpacing, double prefHSpacing)
+	{
+		return new TSBox( minWidth, prefWidth, minHSpacing, prefHSpacing, 0.0, 0.0 );
+	}
+	
 	protected TSBox ybox(double height, double vspacing)
 	{
 		return new TSBox( 0.0, 0.0, height, vspacing );
@@ -24,23 +29,5 @@ public class Test_BoxPack_base extends TestCase
 	protected TSBox ybbox(double ascent, double descent, double vspacing)
 	{
 		return new TSBox( 0.0, 0.0, ascent, descent, vspacing );
-	}
-
-
-
-
-	protected TSBox xbox(double minWidth, double prefWidth, double minHSpacing, double prefHSpacing)
-	{
-		return new TSBox( minWidth, prefWidth, minHSpacing, prefHSpacing, 0.0, 0.0, 0.0, 0.0 );
-	}
-	
-	protected TSBox ybox(double minHeight, double prefHeight, double minVSpacing, double prefVSpacing)
-	{
-		return new TSBox( 0.0, 0.0, 0.0, 0.0, minHeight, prefHeight, minVSpacing, prefVSpacing );
-	}
-	
-	protected TSBox ybbox(double minAscent, double prefAscent, double minDescent, double prefDescent, double minVSpacing, double prefVSpacing)
-	{
-		return new TSBox( 0.0, 0.0, 0.0, 0.0, minAscent, prefAscent, minDescent, prefDescent, minVSpacing, prefVSpacing );
 	}
 }

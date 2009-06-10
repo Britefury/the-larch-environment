@@ -17,7 +17,7 @@ public class TSBox
 	
 	protected double scale;
 	protected double minWidth, prefWidth, minHSpacing, prefHSpacing;
-	protected double minAscent, prefAscent, minDescent, prefDescent, minVSpacing, prefVSpacing;
+	protected double reqAscent, reqDescent, reqVSpacing;
 	
 	protected double positionInParentSpaceX, positionInParentSpaceY;
 	protected double allocationX, allocationY;
@@ -38,8 +38,8 @@ public class TSBox
 		scale = 1.0;
 		minWidth = prefWidth = width;
 		minHSpacing = prefHSpacing = hSpacing;
-		minAscent = prefAscent = height;
-		minVSpacing = prefVSpacing = vSpacing;
+		reqAscent = height;
+		reqVSpacing = vSpacing;
 		bHasBaseline = false;
 		lineBreakPriority = -1;
 	}
@@ -49,42 +49,36 @@ public class TSBox
 		scale = 1.0;
 		minWidth = prefWidth = width;
 		minHSpacing = prefHSpacing = hSpacing;
-		minAscent = prefAscent = ascent;
-		minDescent = prefDescent = descent;
-		minVSpacing = prefVSpacing = vSpacing;
+		reqAscent = ascent;
+		reqDescent = descent;
+		reqVSpacing = vSpacing;
 		bHasBaseline = true;
 		lineBreakPriority = -1;
 	}
 
-	public TSBox(double minWidth, double prefWidth, double minHSpacing, double prefHSpacing, double minHeight, double prefHeight, double minVSpacing, double prefVSpacing)
+	public TSBox(double minWidth, double prefWidth, double minHSpacing, double prefHSpacing, double height, double vSpacing)
 	{
 		scale = 1.0;
 		this.minWidth = minWidth;
 		this.prefWidth = prefWidth;
 		this.minHSpacing = minHSpacing;
 		this.prefHSpacing = prefHSpacing;
-		this.minAscent = minHeight;
-		this.prefAscent = prefHeight;
-		this.minVSpacing = minVSpacing;
-		this.prefVSpacing = prefVSpacing;
+		this.reqAscent = height;
+		this.reqVSpacing = vSpacing;
 		bHasBaseline = false;
 		lineBreakPriority = -1;
 	}
 
-	public TSBox(double minWidth, double prefWidth, double minHSpacing, double prefHSpacing,
-			double minAscent, double prefAscent, double minDescent, double prefDescent, double minVSpacing, double prefVSpacing)
+	public TSBox(double minWidth, double prefWidth, double minHSpacing, double prefHSpacing, double ascent, double descent, double vSpacing)
 	{
 		scale = 1.0;
 		this.minWidth = minWidth;
 		this.prefWidth = prefWidth;
 		this.minHSpacing = minHSpacing;
 		this.prefHSpacing = prefHSpacing;
-		this.minAscent = minAscent;
-		this.prefAscent = prefAscent;
-		this.minDescent = minDescent;
-		this.prefDescent = prefDescent;
-		this.minVSpacing = minVSpacing;
-		this.prefVSpacing = prefVSpacing;
+		this.reqAscent = ascent;
+		this.reqDescent = descent;
+		this.reqVSpacing = vSpacing;
 		bHasBaseline = true;
 		lineBreakPriority = -1;
 	}
@@ -97,12 +91,9 @@ public class TSBox
 		prefWidth = box.prefWidth;
 		minHSpacing = box.minHSpacing;
 		prefHSpacing = box.prefHSpacing;
-		minAscent = box.minAscent;
-		prefAscent = box.prefAscent;
-		minDescent = box.minDescent;
-		prefDescent = box.prefDescent;
-		minVSpacing = box.minVSpacing;
-		prefVSpacing = box.prefVSpacing;
+		reqAscent = box.reqAscent;
+		reqDescent = box.reqDescent;
+		reqVSpacing = box.reqVSpacing;
 		bHasBaseline = box.bHasBaseline;
 		lineBreakPriority = -1;
 	}
@@ -135,44 +126,24 @@ public class TSBox
 	}
 	
 
-	public double getMinAscent()
+	public double getReqAscent()
 	{
-		return minAscent;
+		return reqAscent;
 	}
 	
-	public double getPrefAscent()
+	public double getReqDescent()
 	{
-		return prefAscent;
+		return reqDescent;
 	}
 	
-	public double getMinDescent()
+	public double getReqHeight()
 	{
-		return minDescent;
+		return reqAscent + reqDescent;
 	}
 	
-	public double getPrefDescent()
+	public double getReqVSpacing()
 	{
-		return prefDescent;
-	}
-	
-	public double getMinHeight()
-	{
-		return minAscent + minDescent;
-	}
-	
-	public double getPrefHeight()
-	{
-		return prefAscent + prefDescent;
-	}
-	
-	public double getMinVSpacing()
-	{
-		return minVSpacing;
-	}
-	
-	public double getPrefVSpacing()
-	{
-		return prefVSpacing;
+		return reqVSpacing;
 	}
 	
 	
@@ -213,7 +184,7 @@ public class TSBox
 	{
 		scale = 1.0;
 		minWidth = prefWidth = minHSpacing = prefHSpacing = 0.0;
-		minAscent = prefAscent = minDescent = prefDescent = minVSpacing = prefVSpacing = 0.0;
+		reqAscent = reqDescent = reqVSpacing = 0.0;
 		bHasBaseline = false;
 		positionInParentSpaceX = positionInParentSpaceY = allocationX = allocationY = 0.0;
 	}
@@ -225,7 +196,7 @@ public class TSBox
 	
 	public void clearRequisitionY()
 	{
-		minAscent = prefAscent = minDescent = prefDescent = minVSpacing = prefVSpacing = 0.0;
+		reqAscent = reqDescent = reqVSpacing = 0.0;
 	}
 	
 	
@@ -248,38 +219,17 @@ public class TSBox
 
 	public void setRequisitionY(double height, double vSpacing)
 	{
-		minAscent = prefAscent = height;
-		minDescent = prefDescent = 0.0;
-		minVSpacing = prefVSpacing = vSpacing;
+		reqAscent = height;
+		reqDescent = 0.0;
+		reqVSpacing = vSpacing;
 		bHasBaseline = false;
 	}
 	
 	public void setRequisitionY(double ascent, double descent, double vSpacing)
 	{
-		minAscent = prefAscent = ascent;
-		minDescent = prefDescent = descent;
-		minVSpacing = prefVSpacing = vSpacing;
-		bHasBaseline = true;
-	}
-	
-	public void setRequisitionY(double minHeight, double prefHeight, double minVSpacing, double prefVSpacing)
-	{
-		this.minAscent = minHeight; 
-		this.prefAscent = prefHeight;
-		minDescent = prefDescent = 0.0;
-		this.minVSpacing = minVSpacing; 
-		this.prefVSpacing = prefVSpacing;
-		bHasBaseline = false;
-	}
-	
-	public void setRequisitionY(double minAscent, double prefAscent, double minDescent, double prefDescent, double minVSpacing, double prefVSpacing)
-	{
-		this.minAscent = minAscent; 
-		this.prefAscent = prefAscent;
-		this.minDescent = minDescent; 
-		this.prefDescent = prefDescent;
-		this.minVSpacing = minVSpacing; 
-		this.prefVSpacing = prefVSpacing;
+		reqAscent = ascent;
+		reqDescent = descent;
+		reqVSpacing = vSpacing;
 		bHasBaseline = true;
 	}
 	
@@ -344,9 +294,7 @@ public class TSBox
 			
 			return scale == b.scale  &&
 					minWidth == b.minWidth  &&  prefWidth == b.prefWidth  &&  minHSpacing == b.minHSpacing  &&  prefHSpacing == b.prefHSpacing  &&
-					minAscent == b.minAscent  &&  prefAscent == b.prefAscent  &&  minDescent == b.minDescent  &&  prefDescent == b.prefDescent  &&
-					minVSpacing == b.minVSpacing  &&  prefVSpacing == b.prefVSpacing  &&
-					bHasBaseline == b.bHasBaseline  &&
+					reqAscent == b.reqAscent  &&  reqDescent == b.reqDescent  &&  reqVSpacing == b.reqVSpacing  &&  bHasBaseline == b.bHasBaseline  &&
 					positionInParentSpaceX == b.positionInParentSpaceX  &&  positionInParentSpaceY == b.positionInParentSpaceY  &&  
 					allocationX == b.allocationX  &&  allocationY == b.allocationY;
 		}
@@ -360,9 +308,7 @@ public class TSBox
 	public String toString()
 	{
 		return "TSBox( minWidth=" + minWidth + ", prefWidth=" + prefWidth +  ", minHSpacing=" + minHSpacing + ", prefHSpacing=" + prefHSpacing +
-			", minAscent=" + minAscent + ", prefAscent=" + prefAscent + ", minDescent=" + minDescent + ", prefDescent=" + prefDescent +
-			", minVSpacing=" + minVSpacing + ", prefVSpacing=" + prefVSpacing +
-			", bHasBaseline=" + bHasBaseline +
+			", reqAscent=" + reqAscent + ", reqDescent=" + reqDescent + ", reqVSpacing=" + reqVSpacing +  ", bHasBaseline=" + bHasBaseline +
 			", positionInParentSpaceX=" + positionInParentSpaceX + ", positionInParentSpaceY=" + positionInParentSpaceY +
 			", allocationX=" + allocationX + ", allocationY=" + allocationY + ")";
 	}
