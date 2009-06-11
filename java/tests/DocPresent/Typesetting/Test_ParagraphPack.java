@@ -9,6 +9,7 @@ package tests.DocPresent.Typesetting;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import BritefuryJ.DocPresent.Typesetting.BoxPackingParams;
 import BritefuryJ.DocPresent.Typesetting.ParagraphPack;
 import BritefuryJ.DocPresent.Typesetting.TSBox;
 import BritefuryJ.DocPresent.Typesetting.VAlignment;
@@ -62,21 +63,21 @@ public class Test_ParagraphPack extends Test_BoxPack_base
 		assertEquals( result, new TSBox() );
 
 		// requisitionX( [ <0,0>:pad=1 ] )  ->  <2,0>
-		ParagraphPack.computeRequisitionX( result, new TSBox[] { new TSBox() },  0.0, 0.0, new double[] { 1.0 } );
+		ParagraphPack.computeRequisitionX( result, new TSBox[] { new TSBox() },  0.0, 0.0, new BoxPackingParams[] { new BoxPackingParams( 1.0 ) } );
 		assertEquals( result, xbox( 2.0, 0.0 ) );
 
 		// requisitionX( [ <10,0>:pad=2 ] )  ->  <14,0>
-		ParagraphPack.computeRequisitionX( result, new TSBox[] { xbox( 10.0, 0.0 ) },  0.0, 0.0, new double[] { 2.0 } );
+		ParagraphPack.computeRequisitionX( result, new TSBox[] { xbox( 10.0, 0.0 ) },  0.0, 0.0, new BoxPackingParams[] { new BoxPackingParams( 2.0 ) } );
 		assertEquals( result, xbox( 14.0, 0.0 ) );
 
 		// Padding 'consumes' h-spacing
 		// requisitionX( [ <10,1>:pad=2 ] )  ->  <14,0>
-		ParagraphPack.computeRequisitionX( result, new TSBox[] { xbox( 10.0, 1.0 ) },  0.0, 0.0, new double[] { 2.0 } );
+		ParagraphPack.computeRequisitionX( result, new TSBox[] { xbox( 10.0, 1.0 ) },  0.0, 0.0, new BoxPackingParams[] { new BoxPackingParams( 2.0 ) } );
 		assertEquals( result, xbox( 14.0, 0.0 ) );
 
 		// Padding 'consumes' all h-spacing
 		// requisitionX( [ <10,3>:pad=2 ] )  ->  <14,1>
-		ParagraphPack.computeRequisitionX( result, new TSBox[] { xbox( 10.0, 3.0 ) },  0.0, 0.0, new double[] { 2.0 } );
+		ParagraphPack.computeRequisitionX( result, new TSBox[] { xbox( 10.0, 3.0 ) },  0.0, 0.0, new BoxPackingParams[] { new BoxPackingParams( 2.0 ) } );
 		assertEquals( result, xbox( 14.0, 1.0 ) );
 
 		// requisitionX( [ <0,0>, <0,0> ] )  ->  <0,0>
@@ -131,7 +132,8 @@ public class Test_ParagraphPack extends Test_BoxPack_base
 		// requisitionX( [ <10,0>, <20,0>, break(<0,0>), <15,0> ], padding=[0,10,100,0] )  ->  <35-45,0-0>
 		// Padding around line break should only affect the preferred width, not the minimum width
 		// Padding before line break should effect both
-		ParagraphPack.computeRequisitionX( result, new TSBox[] { xbox( 10.0, 0.0 ), xbox( 20.0, 0.0 ), lineBreakBox( 0 ), xbox( 15.0, 0.0 ) },  0.0, 0.0, new double[] { 0.0, 10.0, 100.0, 0.0 } );
+		ParagraphPack.computeRequisitionX( result, new TSBox[] { xbox( 10.0, 0.0 ), xbox( 20.0, 0.0 ), lineBreakBox( 0 ), xbox( 15.0, 0.0 ) },  0.0, 0.0,
+				new BoxPackingParams[] { new BoxPackingParams( 0.0 ), new BoxPackingParams( 10.0 ), new BoxPackingParams( 100.0 ), new BoxPackingParams( 0.0 ) } );
 		assertEquals( result, xbox( 50.0, 265.0, 0.0, 0.0 ) );
 
 		// Two lines, the second of greater length than the first, with spacing
@@ -191,10 +193,10 @@ public class Test_ParagraphPack extends Test_BoxPack_base
 	//
 	//
 
-	private void ppackXTest(TSBox children[], double indentation, double hSpacing, double childPadding[],TSBox expectedBox, double boxAllocation, double expectedSize[], double expectedPosition[])
+	private void ppackXTest(TSBox children[], double indentation, double hSpacing, BoxPackingParams packingParams[],TSBox expectedBox, double boxAllocation, double expectedSize[], double expectedPosition[])
 	{ 
 		TSBox box = new TSBox();
-		ParagraphPack.computeRequisitionX( box, children, indentation, hSpacing, childPadding );
+		ParagraphPack.computeRequisitionX( box, children, indentation, hSpacing, packingParams );
 		if ( !box.equals( expectedBox ) )
 		{
 			System.out.println( "PARENT BOX IS NOT AS EXPECTED" );
@@ -205,7 +207,7 @@ public class Test_ParagraphPack extends Test_BoxPack_base
 		}
 		assertEquals( box, expectedBox );
 		box.setAllocationX( boxAllocation );
-		ParagraphPack.allocateX( box, children, indentation, hSpacing, childPadding );
+		ParagraphPack.allocateX( box, children, indentation, hSpacing, packingParams );
 		for (int i = 0; i < children.length; i++)
 		{
 			if ( children[i].getAllocationX() != expectedSize[i] )
@@ -222,7 +224,7 @@ public class Test_ParagraphPack extends Test_BoxPack_base
 		}
 	}
 	
-	private void ppackXTests(TSBox children[], double indentation, double hSpacing, double childPadding[], TSBox expectedBox, double boxAllocations[], double expectedSize[][], double expectedPosition[][])
+	private void ppackXTests(TSBox children[], double indentation, double hSpacing, BoxPackingParams packingParams[], TSBox expectedBox, double boxAllocations[], double expectedSize[][], double expectedPosition[][])
 	{
 		TSBox childrenCopy[] = new TSBox[children.length];
 		for (int i = 0; i  < boxAllocations.length; i++)
@@ -231,7 +233,7 @@ public class Test_ParagraphPack extends Test_BoxPack_base
 			{
 				childrenCopy[j] = children[j].copy();
 			}
-			ppackXTest( childrenCopy, indentation, hSpacing, childPadding, expectedBox, boxAllocations[i], expectedSize[i], expectedPosition[i] );
+			ppackXTest( childrenCopy, indentation, hSpacing, packingParams, expectedBox, boxAllocations[i], expectedSize[i], expectedPosition[i] );
 		}
 	}
 
@@ -318,15 +320,15 @@ public class Test_ParagraphPack extends Test_BoxPack_base
 	//
 	// REQUISITION Y TESTS
 
-	private void ppackYTest(TSBox children[], double indentation, double hSpacing, double vSpacing, VAlignment vAlignment, double childPadding[],
+	private void ppackYTest(TSBox children[], double indentation, double hSpacing, double vSpacing, VAlignment vAlignment, BoxPackingParams packingParams[],
 			TSBox expectedBox, double boxAllocation, double expectedSize[], double expectedPosition[])
 	{ 
 		TSBox box = new TSBox();
 		
 		// X
-		ParagraphPack.computeRequisitionX( box, children, indentation, hSpacing, childPadding );
+		ParagraphPack.computeRequisitionX( box, children, indentation, hSpacing, packingParams );
 		box.setAllocationX( boxAllocation );
-		ArrayList<ParagraphPack.Line> lines = ParagraphPack.allocateX( box, children, indentation, hSpacing, childPadding );
+		ArrayList<ParagraphPack.Line> lines = ParagraphPack.allocateX( box, children, indentation, hSpacing, packingParams );
 		
 		// Y
 		ParagraphPack.computeRequisitionY( box, lines, vSpacing, vAlignment );
