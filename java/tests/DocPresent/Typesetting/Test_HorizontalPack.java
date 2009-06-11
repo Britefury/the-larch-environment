@@ -19,7 +19,7 @@ public class Test_HorizontalPack extends Test_BoxPack_base
 	//
 	//
 	
-	public void test_testRequisitionX()
+	public void test_requisitionX()
 	{
 		// Each packed child consists of:
 		//	- start padding
