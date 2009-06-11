@@ -8,9 +8,9 @@ package tests.DocPresent.Typesetting;
 
 import java.util.ArrayList;
 
-import BritefuryJ.DocPresent.Typesetting.HorizontalPack;
 import BritefuryJ.DocPresent.Typesetting.ParagraphPack;
 import BritefuryJ.DocPresent.Typesetting.TSBox;
+import BritefuryJ.DocPresent.Typesetting.VAlignment;
 
 public class Test_ParagraphPack extends Test_BoxPack_base
 {
@@ -32,7 +32,7 @@ public class Test_ParagraphPack extends Test_BoxPack_base
 	
 	//
 	//
-	// REQUISITION TESTS
+	// REQUISITION X TESTS
 	//
 	//
 	
@@ -186,14 +186,14 @@ public class Test_ParagraphPack extends Test_BoxPack_base
 
 	//
 	//
-	// ALLOCATION TESTS
+	// ALLOCATION X TESTS
 	//
 	//
 
-	private void ppackXTest(TSBox children[], double indentation, double spacing, double childPadding[],TSBox expectedBox, double boxAllocation, double expectedSize[], double expectedPosition[])
+	private void ppackXTest(TSBox children[], double indentation, double hSpacing, double childPadding[],TSBox expectedBox, double boxAllocation, double expectedSize[], double expectedPosition[])
 	{ 
 		TSBox box = new TSBox();
-		ParagraphPack.computeRequisitionX( box, children, indentation, spacing, childPadding );
+		ParagraphPack.computeRequisitionX( box, children, indentation, hSpacing, childPadding );
 		if ( !box.equals( expectedBox ) )
 		{
 			System.out.println( "PARENT BOX IS NOT AS EXPECTED" );
@@ -204,7 +204,7 @@ public class Test_ParagraphPack extends Test_BoxPack_base
 		}
 		assertEquals( box, expectedBox );
 		box.setAllocationX( boxAllocation );
-		ArrayList<ParagraphPack.Line> lines = ParagraphPack.allocateX( box, children, indentation, spacing, childPadding );
+		ParagraphPack.allocateX( box, children, indentation, hSpacing, childPadding );
 		for (int i = 0; i < children.length; i++)
 		{
 			if ( children[i].getAllocationX() != expectedSize[i] )
@@ -221,7 +221,7 @@ public class Test_ParagraphPack extends Test_BoxPack_base
 		}
 	}
 	
-	private void ppackXTests(TSBox children[], double indentation, double spacing, double childPadding[], TSBox expectedBox, double boxAllocations[], double expectedSize[][], double expectedPosition[][])
+	private void ppackXTests(TSBox children[], double indentation, double hSpacing, double childPadding[], TSBox expectedBox, double boxAllocations[], double expectedSize[][], double expectedPosition[][])
 	{
 		TSBox childrenCopy[] = new TSBox[children.length];
 		for (int i = 0; i  < boxAllocations.length; i++)
@@ -230,7 +230,7 @@ public class Test_ParagraphPack extends Test_BoxPack_base
 			{
 				childrenCopy[j] = children[j].copy();
 			}
-			ppackXTest( childrenCopy, indentation, spacing, childPadding, expectedBox, boxAllocations[i], expectedSize[i], expectedPosition[i] );
+			ppackXTest( childrenCopy, indentation, hSpacing, childPadding, expectedBox, boxAllocations[i], expectedSize[i], expectedPosition[i] );
 		}
 	}
 
@@ -258,7 +258,7 @@ public class Test_ParagraphPack extends Test_BoxPack_base
 		// Test line break costs
 		// hpackX( [ <25,0>, break(1:<5,0>), <15,0>, break(2:<5,0>), <15,0> ], indentation=5, spacing=0, padding=0 )
 		// 	boxAllocation=65   ->     [ 25, 5, 15, 5, 15 ] @ [ 0, 25, 30, 45, 50 ]		- sufficient space - 1 line
-		// 	boxAllocation=55   ->     [ 25, 5, 15, 0, 15 ] @ [ 0, 25, 30, 0, 5 ]			- break at first line break, due to lower cost
+		// 	boxAllocation=55   ->     [ 25, 0, 15, 5, 15 ] @ [ 0, 0, 5, 20, 25 ]			- break at first line break, due to lower cost
 		ppackXTests( new TSBox[] { xbox( 25.0, 0.0 ), lineBreakBox( 5.0, 1 ), xbox( 15.0, 0.0 ), lineBreakBox( 5.0, 2 ), xbox( 15.0, 0.0 ) }, 5.0, 0.0, null,
 				xbox( 25.0, 65.0, 0.0, 0.0 ),
 				new double[] { 70.0, 55.0 },
@@ -268,5 +268,92 @@ public class Test_ParagraphPack extends Test_BoxPack_base
 				new double[][] {
 					new double[] { 0, 25, 30, 45, 50 },
 					new double[] { 0, 0, 5, 20, 25 } } );
+
+	
+	
+	
+		// The last item in this case is sufficiently large that breaking at the first line break (which has a lower cost) would not be sufficient; the second line break
+		// would need to be used as well. However, this means that the first two lines are shorter than they need to be. In this case, only the second
+		// line break should be used, despite having a higher cost.
+		// hpackX( [ <25,0>, break(1:<5,0>), <15,0>, break(2:<5,0>), <40,0> ], indentation=0, spacing=0, padding=0 )
+		// 	boxAllocation=55   ->     [ 25, 5, 15, 0, 40 ] @ [ 0, 25, 30, 0, 5 ]
+		ppackXTests( new TSBox[] { xbox( 25.0, 0.0 ), lineBreakBox( 5.0, 1 ), xbox( 15.0, 0.0 ), lineBreakBox( 5.0, 2 ), xbox( 40.0, 0.0 ) }, 5.0, 0.0, null,
+				xbox( 45.0, 90.0, 0.0, 0.0 ),
+				new double[] { 55.0 },
+				new double[][] {
+					new double[] { 25, 5, 15, 0, 40 } },
+				new double[][] {
+					new double[] { 0, 25, 30, 0, 5 } } );
+
+	
+	
+	
+		// In this case, the maximum allowed width 'hits' a line break
+		// hpackX( [ <25,0>, break(0:<20,0>), <15,0>, break(0:<20,0>), break(0:<20,0>), break(0:<20,0>), <15,0> ], indentation=0, spacing=0, padding=0 )
+		// 	boxAllocation=135   ->     [ 25, 20, 15, 20, 20, 20, 15 ] @ [ 0, 25, 45, 60, 80, 100, 120 ]		- sufficient space - 1 line
+		// 	boxAllocation=105   ->     [ 25, 20, 15, 20, 20, 0, 15 ] @ [ 0, 25, 45, 60, 80, 0, 0 ]			- end of line in last line break
+		// 	boxAllocation=85   ->     [ 25, 20, 15, 20, 0, 20, 15 ] @ [ 0, 25, 45, 60, 0, 0, 20 ]				- end of line in second last line break
+		// 	boxAllocation=65   ->     [ 25, 20, 15, 0, 20, 20, 15 ] @ [ 0, 25, 45, 0, 0, 20, 40 ]				- end of line in third last line break
+		ppackXTests( new TSBox[] { xbox( 25.0, 0.0 ), lineBreakBox( 20.0, 0 ), xbox( 15.0, 0.0 ), lineBreakBox( 20.0, 0 ), lineBreakBox( 20.0, 0 ), lineBreakBox( 20.0, 0 ), xbox( 15.0, 0.0 ) }, 0.0, 0.0, null,
+				xbox( 25.0, 135.0, 0.0, 0.0 ),
+				new double[] { 135.0, 105.0, 85.0, 65.0 },
+				new double[][] {
+					new double[] { 25, 20, 15, 20, 20, 20, 15 },
+					new double[] { 25, 20, 15, 20, 20, 0, 15 },
+					new double[] { 25, 20, 15, 20, 0, 20, 15 },
+					new double[] { 25, 20, 15, 0, 20, 20, 15 } },
+				new double[][] {
+					new double[] { 0, 25, 45, 60, 80, 100, 120 },
+					new double[] { 0, 25, 45, 60, 80, 0, 0 },
+					new double[] { 0, 25, 45, 60, 0, 0, 20 },
+					new double[] { 0, 25, 45, 0, 0, 20, 40 } } );
 	}
+
+
+
+
+	
+	//
+	//
+	// REQUISITION Y TESTS
+
+	private void reqYTest(TSBox children[], double indentation, double hSpacing, double vSpacing, VAlignment vAlignment, double childPadding[],
+			TSBox expectedBox, double boxAllocation, double expectedSize[], double expectedPosition[])
+	{ 
+		TSBox box = new TSBox();
+		
+		// X
+		ParagraphPack.computeRequisitionX( box, children, indentation, hSpacing, childPadding );
+		box.setAllocationX( boxAllocation );
+		ArrayList<ParagraphPack.Line> lines = ParagraphPack.allocateX( box, children, indentation, hSpacing, childPadding );
+		
+		// Y
+		ParagraphPack.computeRequisitionY( box, lines, vSpacing, vAlignment );
+		
+		if ( !box.equals( expectedBox ) )
+		{
+			System.out.println( "PARENT BOX IS NOT AS EXPECTED" );
+			System.out.println( "EXPECTED" );
+			System.out.println( expectedBox );
+			System.out.println( "RESULT" );
+			System.out.println( box );
+		}
+		assertEquals( box, expectedBox );
+
+		for (int i = 0; i < children.length; i++)
+		{
+			if ( children[i].getAllocationX() != expectedSize[i] )
+			{
+				System.out.println( "Child allocation for " + i + " is not as expected; expected=" + expectedSize[i] + ", result=" + children[i].getAllocationX() + ", boxAllocation=" + boxAllocation );
+			}
+			assertEquals( children[i].getAllocationX(), expectedSize[i] );
+
+			if ( children[i].getPositionInParentSpaceX() != expectedPosition[i] )
+			{
+				System.out.println( "Child position for " + i + " is not as expected; expected=" + expectedPosition[i] + ", result=" + children[i].getPositionInParentSpaceX() + ", boxAllocation=" + boxAllocation );
+			}
+			assertEquals( children[i].getPositionInParentSpaceX(), expectedPosition[i] );
+		}
+	}
+	
 }

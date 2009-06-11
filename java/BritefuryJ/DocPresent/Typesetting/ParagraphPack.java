@@ -7,6 +7,7 @@
 package BritefuryJ.DocPresent.Typesetting;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ParagraphPack
 {
@@ -29,11 +30,33 @@ public class ParagraphPack
 				child.positionInParentSpaceX += indentation;
 			}
 		}
+		
+		
+		public TSBox getLineBox()
+		{
+			return lineBox;
+		}
+		
+		public TSBox[] getChildBoxes()
+		{
+			return children;
+		}
+		
+		
+		private void computeRequisitionY(VAlignment vAlignment)
+		{
+			HorizontalPack.computeRequisitionY( lineBox, children, vAlignment );
+		}
+
+		private void allocateY(VAlignment vAlignment)
+		{
+			HorizontalPack.allocateY( lineBox, children, vAlignment );
+		}
 	}
 	
 	
 
-	public static void computeRequisitionX(TSBox box, TSBox children[], double indentation, double spacing, double childPadding[])
+	public static void computeRequisitionX(TSBox box, TSBox children[], double indentation, double hSpacing, double childPadding[])
 	{
 		// Accumulate the width required for all the children
 		
@@ -59,7 +82,7 @@ public class ParagraphPack
 			
 			prefWidth = prefX + child.prefWidth  +  padding * 2.0;
 			prefAdvance = prefWidth + prefChildSpacing;
-			prefX = prefAdvance + spacing;
+			prefX = prefAdvance + hSpacing;
 
 		
 			if ( child.bLineBreak )
@@ -79,7 +102,7 @@ public class ParagraphPack
 				
 				lineWidth = lineX + child.minWidth  +  padding * 2.0;
 				lineAdvance = lineWidth + minChildSpacing;
-				lineX = lineAdvance + spacing;
+				lineX = lineAdvance + hSpacing;
 			}
 		}
 		
@@ -91,11 +114,25 @@ public class ParagraphPack
 		box.setRequisitionX( minWidth, prefWidth, minAdvance - minWidth, prefAdvance - prefWidth );
 	}
 
+	
+	public static void computeRequisitionY(TSBox box, List<Line> lines, double vSpacing, VAlignment vAlignment)
+	{
+		TSBox lineBoxes[] = new TSBox[lines.size()];
+		
+		int i = 0;
+		for (Line line: lines)
+		{
+			line.computeRequisitionY( vAlignment );
+			lineBoxes[i++] = line.lineBox;
+		}
+		
+		VerticalPack.computeRequisitionY( box, lineBoxes, vSpacing, null );
+	}
 
 
 
 
-	public static ArrayList<Line> allocateX(TSBox box, TSBox children[], double indentation, double spacing, double childPadding[])
+	public static ArrayList<Line> allocateX(TSBox box, TSBox children[], double indentation, double hSpacing, double childPadding[])
 	{
 		boolean bFirstLine = true;
 		
@@ -141,7 +178,7 @@ public class ParagraphPack
 			// Accumulate width, advance, and x
 			lineWidth = lineX + child.prefWidth  +  padding * 2.0;
 			lineAdvance = lineWidth + childSpacing;
-			lineX = lineAdvance + spacing;
+			lineX = lineAdvance + hSpacing;
 			
 			// Note the x position after the best and most recent line breaks
 			if ( child == bestLineBreak )
@@ -186,7 +223,7 @@ public class ParagraphPack
 					linePadding= new double[lineLength];
 					System.arraycopy( childPadding, lineStartIndex, linePadding, 0, lineLength );
 				}
-				lines.add( new Line( lineChildren, bFirstLine  ?  0.0  :  indentation, spacing, linePadding, box.allocationX ) );
+				lines.add( new Line( lineChildren, bFirstLine  ?  0.0  :  indentation, hSpacing, linePadding, box.allocationX ) );
 				
 				// Next line
 				lineStartIndex = lineBreakIndex + 1;
@@ -215,10 +252,33 @@ public class ParagraphPack
 				linePadding= new double[lineLength];
 				System.arraycopy( childPadding, lineStartIndex, linePadding, 0, lineLength );
 			}
-			lines.add( new Line( lineChildren, bFirstLine  ?  0.0  :  indentation, spacing, linePadding, box.allocationX ) );
+			lines.add( new Line( lineChildren, bFirstLine  ?  0.0  :  indentation, hSpacing, linePadding, box.allocationX ) );
 		}
 		
 		
 		return lines;
 	}
+
+
+
+
+
+	public static void allocateY(TSBox box, List<Line> lines, double vSpacing, VAlignment vAlignment)
+	{
+		TSBox lineBoxes[] = new TSBox[lines.size()];
+		
+		int i = 0;
+		for (Line line: lines)
+		{
+			lineBoxes[i++] = line.lineBox;
+		}
+		
+		VerticalPack.allocateY( box, lineBoxes, vSpacing, null, null );
+		
+		for (Line line: lines)
+		{
+			line.allocateY( vAlignment );
+		}
+	}
+
 }
