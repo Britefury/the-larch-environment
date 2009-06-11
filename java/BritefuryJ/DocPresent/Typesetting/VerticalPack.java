@@ -32,7 +32,7 @@ public class VerticalPack
 		box.setRequisitionX( minWidth, prefWidth, minAdvance - minWidth, prefAdvance - prefWidth );
 	}
 
-	public static void computeRequisitionY(TSBox box, TSBox children[], double spacing, double childPadding[])
+	public static void computeRequisitionY(TSBox box, TSBox children[], double spacing, BoxPackingParams packingParams[])
 	{
 		// Accumulate the width required for all the children
 		
@@ -51,7 +51,8 @@ public class VerticalPack
 		{
 			TSBox chBox = children[i];
 			
-			double padding = childPadding != null  ?  childPadding[i]  :  0.0;
+			BoxPackingParams params = packingParams != null  ?  packingParams[i]  :  null;
+			double padding = params != null  ?  params.padding  :  0.0;
 			
 			double reqChildSpacing = Math.max( chBox.reqVSpacing - padding, 0.0 );
 			
@@ -102,20 +103,22 @@ public class VerticalPack
 	
 	
 	
-	public static void allocateSpaceY(TSBox box, TSBox children[], int packFlags[])
+	public static void allocateSpaceY(TSBox box, TSBox children[], BoxPackingParams packingParams[])
 	{
 		int numExpand = 0;
 		
 		// Count the number of children that should expand to use additional space
-		if ( packFlags != null )
+		if ( packingParams != null )
 		{
-			assert packFlags.length == children.length;
-			for (int i = 0; i < packFlags.length; i++)
+			assert packingParams.length == children.length;
+			for (BoxPackingParams params: packingParams)
 			{
-				int f = packFlags[i];
-				if ( TSBox.testPackFlagExpand( f ) )
+				if ( params != null )
 				{
-					numExpand++;
+					if ( TSBox.testPackFlagExpand( params.packFlags ) )
+					{
+						numExpand++;
+					}
 				}
 			}
 		}
@@ -150,7 +153,8 @@ public class VerticalPack
 				int i = 0;
 				for (TSBox child: children)
 				{
-					if ( packFlags != null  &&  TSBox.testPackFlagExpand( packFlags[i] ) )
+					BoxPackingParams params = packingParams != null  ?  packingParams[i]  :  null;
+					if ( params != null  &&  TSBox.testPackFlagExpand( params.packFlags ) )
 					{
 						box.allocateChildSpaceY( child, child.getReqHeight() + expandPerChild );
 					}
@@ -174,7 +178,7 @@ public class VerticalPack
 		}
 	}
 	
-	public static void allocateY(TSBox box, TSBox children[], double spacing, double childPadding[], int packFlags[])
+	public static void allocateY(TSBox box, TSBox children[], double spacing, BoxPackingParams packingParams[])
 	{
 		// Each packed child consists of:
 		//	- start padding
@@ -184,7 +188,7 @@ public class VerticalPack
 		
 		// There should be at least the specified amount of spacing between each child, or the child's own h-spacing if it is greater
 
-		allocateSpaceY( box, children, packFlags );
+		allocateSpaceY( box, children, packingParams );
 		
 		double size = 0.0;
 		double pos = 0.0;
@@ -193,7 +197,8 @@ public class VerticalPack
 			TSBox child = children[i];
 
 			// Get the padding
-			double padding = childPadding != null  ?  childPadding[i]  :  0.0;
+			BoxPackingParams params = packingParams != null  ?  packingParams[i]  :  null;
+			double padding = params != null  ?  params.padding  :  0.0;
 			
 			// Compute the spacing; padding consumes child spacing
 			double childSpacing = Math.max( child.reqVSpacing - padding, 0.0 );

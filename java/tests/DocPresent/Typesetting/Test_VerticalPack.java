@@ -6,6 +6,7 @@
 //##************************
 package tests.DocPresent.Typesetting;
 
+import BritefuryJ.DocPresent.Typesetting.BoxPackingParams;
 import BritefuryJ.DocPresent.Typesetting.HAlignment;
 import BritefuryJ.DocPresent.Typesetting.TSBox;
 import BritefuryJ.DocPresent.Typesetting.VerticalPack;
@@ -78,21 +79,21 @@ public class Test_VerticalPack extends Test_BoxPack_base
 		assertEquals( result, new TSBox() );
 
 		// requisitionY( [ <0,0>:pad=1 ] )  ->  <2,0>
-		VerticalPack.computeRequisitionY( result, new TSBox[] { new TSBox() },  0.0, new double[] { 1.0 } );
+		VerticalPack.computeRequisitionY( result, new TSBox[] { new TSBox() },  0.0, new BoxPackingParams[] { new BoxPackingParams( 1.0 ) } );
 		assertEquals( result, ybox( 2.0, 0.0 ) );
 
 		// requisitionY( [ <10,0>:pad=2 ] )  ->  <14,0>
-		VerticalPack.computeRequisitionY( result, new TSBox[] { ybox( 10.0, 0.0 ) },  0.0, new double[] { 2.0 } );
+		VerticalPack.computeRequisitionY( result, new TSBox[] { ybox( 10.0, 0.0 ) },  0.0, new BoxPackingParams[] { new BoxPackingParams( 2.0 ) } );
 		assertEquals( result, ybox( 14.0, 0.0 ) );
 
 		// Padding 'consumes' h-spacing
 		// requisitionY( [ <10,1>:pad=2 ] )  ->  <14,0>
-		VerticalPack.computeRequisitionY( result, new TSBox[] { ybox( 10.0, 1.0 ) },  0.0, new double[] { 2.0 } );
+		VerticalPack.computeRequisitionY( result, new TSBox[] { ybox( 10.0, 1.0 ) },  0.0, new BoxPackingParams[] { new BoxPackingParams( 2.0 ) } );
 		assertEquals( result, ybox( 14.0, 0.0 ) );
 
 		// Padding 'consumes' all h-spacing
 		// requisitionY( [ <10,3>:pad=2 ] )  ->  <14,1>
-		VerticalPack.computeRequisitionY( result, new TSBox[] { ybox( 10.0, 3.0 ) },  0.0, new double[] { 2.0 } );
+		VerticalPack.computeRequisitionY( result, new TSBox[] { ybox( 10.0, 3.0 ) },  0.0, new BoxPackingParams[] { new BoxPackingParams( 2.0 ) } );
 		assertEquals( result, ybox( 14.0, 1.0 ) );
 
 		// requisitionY( [ <0,0>, <0,0> ] )  ->  <0,0>
@@ -138,10 +139,10 @@ public class Test_VerticalPack extends Test_BoxPack_base
 	//
 	//
 
-	private void vpackYSpaceTest(TSBox children[], double spacing, double childPadding[], int packFlags[], TSBox expectedBox, double boxAllocation, double expectedSpaceAllocation[])
+	private void vpackYSpaceTest(TSBox children[], double spacing, BoxPackingParams packingParams[], TSBox expectedBox, double boxAllocation, double expectedSpaceAllocation[])
 	{ 
 		TSBox box = new TSBox();
-		VerticalPack.computeRequisitionY( box, children, spacing, childPadding );
+		VerticalPack.computeRequisitionY( box, children, spacing, packingParams );
 		if ( !box.equals( expectedBox ) )
 		{
 			System.out.println( "PARENT BOX IS NOT AS EXPECTED" );
@@ -152,7 +153,7 @@ public class Test_VerticalPack extends Test_BoxPack_base
 		}
 		assertEquals( box, expectedBox );
 		box.setAllocationY( boxAllocation );
-		VerticalPack.allocateSpaceY( box, children, packFlags );
+		VerticalPack.allocateSpaceY( box, children, packingParams );
 		for (int i = 0; i < children.length; i++)
 		{
 			if ( children[i].getAllocationY() != expectedSpaceAllocation[i] )
@@ -164,7 +165,7 @@ public class Test_VerticalPack extends Test_BoxPack_base
 	}
 
 	
-	private void vpackYSpaceTests(TSBox children[], double spacing, double childPadding[], int packFlags[], TSBox expectedBox, double boxAllocations[], double expectedSpaceAllocations[][])
+	private void vpackYSpaceTests(TSBox children[], double spacing, BoxPackingParams packingParams[], TSBox expectedBox, double boxAllocations[], double expectedSpaceAllocations[][])
 	{
 		TSBox baselineChildren[] = new TSBox[children.length];
 		
@@ -177,12 +178,12 @@ public class Test_VerticalPack extends Test_BoxPack_base
 
 		for (int i = 0; i  < boxAllocations.length; i++)
 		{
-			vpackYSpaceTest( children, spacing, childPadding, packFlags, expectedBox, boxAllocations[i], expectedSpaceAllocations[i] );
+			vpackYSpaceTest( children, spacing, packingParams, expectedBox, boxAllocations[i], expectedSpaceAllocations[i] );
 		}
 
 		for (int i = 0; i  < boxAllocations.length; i++)
 		{
-			vpackYSpaceTest( baselineChildren, spacing, childPadding, packFlags, expectedBox, boxAllocations[i], expectedSpaceAllocations[i] );
+			vpackYSpaceTest( baselineChildren, spacing, packingParams, expectedBox, boxAllocations[i], expectedSpaceAllocations[i] );
 		}
 	}
 
@@ -211,7 +212,7 @@ public class Test_VerticalPack extends Test_BoxPack_base
 		// 	boxAllocation=150   ->   [ 150 ]		- all allocated to 1 child
 		// 	boxAllocation=50   ->   [ 150 ]		- will not go below requirement
 		// No padding, no expand
-		vpackYSpaceTests( new TSBox[] { ybox( 150.0, 0.0 ) }, 0.0, null, null,
+		vpackYSpaceTests( new TSBox[] { ybox( 150.0, 0.0 ) }, 0.0, null,
 				ybox( 150.0, 0.0 ),
 				new double[] { 300.0, 150.0, 50.0 },
 				new double[][] {
@@ -226,7 +227,7 @@ public class Test_VerticalPack extends Test_BoxPack_base
 		// 	boxAllocation=150   ->   [ 150 ]		- all allocated to 1 child, 20 to padding
 		// 	boxAllocation=50   ->   [ 150 ]		- will not go below requirement, 20 to padding
 		// 10 padding, no expand
-		vpackYSpaceTests( new TSBox[] { ybox( 150.0, 0.0 ) }, 0.0, new double[] { 10.0 }, null,
+		vpackYSpaceTests( new TSBox[] { ybox( 150.0, 0.0 ) }, 0.0, new BoxPackingParams[] { new BoxPackingParams( 10.0 ) },
 				ybox( 170.0, 0.0 ),
 				new double[] { 300.0, 170.0, 150.0, 50.0 },
 				new double[][] {
@@ -241,7 +242,7 @@ public class Test_VerticalPack extends Test_BoxPack_base
 		// 	boxAllocation=150   ->   [ 150 ]		- all allocated to 1 child
 		// 	boxAllocation=50   ->   [ 150 ]		- will not go below requirement
 		// No padding, expand
-		vpackYSpaceTests( new TSBox[] { ybox( 150.0, 0.0 ) }, 0.0, null, new int[] { TSBox.packFlags( true ) },
+		vpackYSpaceTests( new TSBox[] { ybox( 150.0, 0.0 ) }, 0.0, new BoxPackingParams[] { new BoxPackingParams( true ) },
 				ybox( 150.0, 0.0 ),
 				new double[] { 300.0, 150.0, 50.0 },
 				new double[][] {
@@ -256,7 +257,7 @@ public class Test_VerticalPack extends Test_BoxPack_base
 		// 	boxAllocation=150   ->   [ 150 ]		- all allocated to 1 child, 20 to padding
 		// 	boxAllocation=50   ->   [ 150 ]		- will not go below requirement, 20 to padding
 		// 10 padding, expand
-		vpackYSpaceTests( new TSBox[] { ybox( 150.0, 0.0 ) }, 0.0, new double[] { 10.0 }, new int[] { TSBox.packFlags( true ) },
+		vpackYSpaceTests( new TSBox[] { ybox( 150.0, 0.0 ) }, 0.0, new BoxPackingParams[] { new BoxPackingParams( 10.0, true ) },
 				ybox( 170.0, 0.0 ),
 				new double[] { 300.0, 170.0, 150.0, 50.0 },
 				new double[][] {
@@ -273,7 +274,7 @@ public class Test_VerticalPack extends Test_BoxPack_base
 		// 	boxAllocation=150   ->   [ 150 ]		- all allocated to 1 child
 		// 	boxAllocation=50   ->   [ 150 ]		- will not go below requirement
 		// No padding, no expand
-		vpackYSpaceTests( new TSBox[] { ybox( 150.0, 10.0 ) }, 0.0, null, null,
+		vpackYSpaceTests( new TSBox[] { ybox( 150.0, 10.0 ) }, 0.0, null,
 				ybox( 150.0, 10.0 ),
 				new double[] { 300.0, 150.0, 50.0 },
 				new double[][] {
@@ -293,7 +294,7 @@ public class Test_VerticalPack extends Test_BoxPack_base
 		// 	boxAllocation=300   ->   [ 150, 100 ]		- no expansion
 		// 	boxAllocation=250   ->   [ 150, 100 ]		- required sizes
 		// 	boxAllocation=100   ->   [ 150, 100 ]		- will not go below requirement
-		vpackYSpaceTests( new TSBox[] { ybox( 150.0, 0.0 ), ybox( 100.0, 0.0 ) }, 0.0, null, null,
+		vpackYSpaceTests( new TSBox[] { ybox( 150.0, 0.0 ), ybox( 100.0, 0.0 ) }, 0.0, null,
 				ybox( 250.0, 0.0 ),
 				new double[] { 300.0, 250.0, 100.0 },
 				new double[][] {
@@ -306,7 +307,7 @@ public class Test_VerticalPack extends Test_BoxPack_base
 		// 	boxAllocation=300   ->   [ 200, 100 ]		- space above preferred goes to first child, none to second
 		// 	boxAllocation=250   ->   [ 150, 100 ]		- required sizes
 		// 	boxAllocation=100   ->   [ 150, 100 ]		- will not go below requirement
-		vpackYSpaceTests( new TSBox[] { ybox( 150.0, 0.0 ), ybox( 100.0, 0.0 ) }, 0.0, null, new int[] { TSBox.packFlags( true ), TSBox.packFlags( false ) },
+		vpackYSpaceTests( new TSBox[] { ybox( 150.0, 0.0 ), ybox( 100.0, 0.0 ) }, 0.0, new BoxPackingParams[] { new BoxPackingParams( true ), new BoxPackingParams( false ) },
 				ybox( 250.0, 0.0 ),
 				new double[] { 300.0, 250.0, 100.0 },
 				new double[][] {
@@ -319,7 +320,7 @@ public class Test_VerticalPack extends Test_BoxPack_base
 		// 	boxAllocation=300   ->   [ 150, 150 ]		- space above preferred goes to second child, none to first
 		// 	boxAllocation=250   ->   [ 150, 100 ]		- required sizes
 		// 	boxAllocation=100   ->   [ 150, 100 ]		- will not go below requirement
-		vpackYSpaceTests( new TSBox[] { ybox( 150.0, 0.0 ), ybox( 100.0, 0.0 ) }, 0.0, null, new int[] { TSBox.packFlags( false ), TSBox.packFlags( true ) },
+		vpackYSpaceTests( new TSBox[] { ybox( 150.0, 0.0 ), ybox( 100.0, 0.0 ) }, 0.0, new BoxPackingParams[] { new BoxPackingParams( false ), new BoxPackingParams( true ) },
 				ybox( 250.0, 0.0 ),
 				new double[] { 300.0, 250.0, 100.0 },
 				new double[][] {
@@ -332,7 +333,7 @@ public class Test_VerticalPack extends Test_BoxPack_base
 		// 	boxAllocation=300   ->   [ 175, 125 ]		- space above preferred gets distributed between both children
 		// 	boxAllocation=250   ->   [ 150, 100 ]		- required sizes
 		// 	boxAllocation=100   ->   [ 150, 100 ]		- will not go below requirement
-		vpackYSpaceTests( new TSBox[] { ybox( 150.0, 0.0 ), ybox( 100.0, 0.0 ) }, 0.0, null, new int[] { TSBox.packFlags( true ), TSBox.packFlags( true ) },
+		vpackYSpaceTests( new TSBox[] { ybox( 150.0, 0.0 ), ybox( 100.0, 0.0 ) }, 0.0, new BoxPackingParams[] { new BoxPackingParams( true ), new BoxPackingParams( true ) },
 				ybox( 250.0, 0.0 ),
 				new double[] { 300.0, 250.0, 100.0 },
 				new double[][] {
@@ -353,10 +354,10 @@ public class Test_VerticalPack extends Test_BoxPack_base
 	//
 	//
 
-	private void vpackYTest(TSBox children[], double spacing, double childPadding[], int packFlags[], TSBox expectedBox, double boxAllocation, double expectedSize[], double expectedPosition[])
+	private void vpackYTest(TSBox children[], double spacing, BoxPackingParams packingParams[], TSBox expectedBox, double boxAllocation, double expectedSize[], double expectedPosition[])
 	{ 
 		TSBox box = new TSBox();
-		VerticalPack.computeRequisitionY( box, children, spacing, childPadding );
+		VerticalPack.computeRequisitionY( box, children, spacing, packingParams );
 		if ( !box.equals( expectedBox ) )
 		{
 			System.out.println( "PARENT BOX IS NOT AS EXPECTED" );
@@ -367,7 +368,7 @@ public class Test_VerticalPack extends Test_BoxPack_base
 		}
 		assertEquals( box, expectedBox );
 		box.setAllocationY( boxAllocation );
-		VerticalPack.allocateY( box, children, spacing, childPadding, packFlags );
+		VerticalPack.allocateY( box, children, spacing, packingParams );
 		for (int i = 0; i < children.length; i++)
 		{
 			if ( children[i].getAllocationY() != expectedSize[i] )
@@ -385,7 +386,7 @@ public class Test_VerticalPack extends Test_BoxPack_base
 	}
 
 	
-	private void vpackYTests(TSBox children[], double spacing, double childPadding[], int packFlags[], TSBox expectedBox, double boxAllocations[], double expectedSize[][], double expectedPosition[][])
+	private void vpackYTests(TSBox children[], double spacing, BoxPackingParams packingParams[], TSBox expectedBox, double boxAllocations[], double expectedSize[][], double expectedPosition[][])
 	{
 		TSBox baselineChildren[] = new TSBox[children.length];
 		
@@ -398,12 +399,12 @@ public class Test_VerticalPack extends Test_BoxPack_base
 
 		for (int i = 0; i  < boxAllocations.length; i++)
 		{
-			vpackYTest( children, spacing, childPadding, packFlags, expectedBox, boxAllocations[i], expectedSize[i], expectedPosition[i] );
+			vpackYTest( children, spacing, packingParams, expectedBox, boxAllocations[i], expectedSize[i], expectedPosition[i] );
 		}
 
 		for (int i = 0; i  < boxAllocations.length; i++)
 		{
-			vpackYTest( baselineChildren, spacing, childPadding, packFlags, expectedBox, boxAllocations[i], expectedSize[i], expectedPosition[i] );
+			vpackYTest( baselineChildren, spacing, packingParams, expectedBox, boxAllocations[i], expectedSize[i], expectedPosition[i] );
 		}
 	}
 
@@ -415,7 +416,7 @@ public class Test_VerticalPack extends Test_BoxPack_base
 		// 	boxAllocation=300   ->   [ 200, 50 ] @ [ 0, 200 ]		- no expansion
 		// 	boxAllocation=250   ->   [ 200, 50 ] @ [ 0, 200 ]		- required sizes
 		// 	boxAllocation=100   ->   [ 200, 50 ] @ [ 0, 200 ]		- will not go below requirement
-		vpackYTests( new TSBox[] { ybox( 200.0, 0.0 ),  ybox( 50.0, 0.0 ) }, 0.0, null, null,
+		vpackYTests( new TSBox[] { ybox( 200.0, 0.0 ),  ybox( 50.0, 0.0 ) }, 0.0, null,
 				ybox( 250.0, 0.0 ),
 				new double[] { 300.0, 250.0, 100.0 },
 				new double[][] {
@@ -432,7 +433,7 @@ public class Test_VerticalPack extends Test_BoxPack_base
 		// 	boxAllocation=300   ->   [ 200, 50 ] @ [ 0, 210 ]		- no expansion
 		// 	boxAllocation=260   ->   [ 200, 50 ] @ [ 0, 210 ]		- required sizes
 		// 	boxAllocation=100   ->   [ 200, 50 ] @ [ 0, 210 ]		- will not go below requirement
-		vpackYTests( new TSBox[] { ybox( 200.0, 0.0 ),  ybox( 50.0, 0.0 ) }, 10.0, null, null,
+		vpackYTests( new TSBox[] { ybox( 200.0, 0.0 ),  ybox( 50.0, 0.0 ) }, 10.0, null,
 				ybox( 260.0, 0.0 ),
 				new double[] { 300.0, 260.0, 100.0 },
 				new double[][] {
@@ -449,7 +450,7 @@ public class Test_VerticalPack extends Test_BoxPack_base
 		// 	boxAllocation=400   ->   [ 200, 50 ] @ [ 10, 240 ]		- no expansion
 		// 	boxAllocation=310   ->   [ 200, 50 ] @ [ 10, 240 ]		- required sizes
 		// 	boxAllocation=100   ->   [ 200, 50 ] @ [ 10, 240 ]		- will not go below requirement
-		vpackYTests( new TSBox[] { ybox( 200.0, 0.0 ),  ybox( 50.0, 0.0 ) }, 0.0, new double[] { 10.0, 20.0 }, null,
+		vpackYTests( new TSBox[] { ybox( 200.0, 0.0 ),  ybox( 50.0, 0.0 ) }, 0.0, new BoxPackingParams[] { new BoxPackingParams( 10.0 ), new BoxPackingParams( 20.0 ) },
 				ybox( 310.0, 0.0 ),
 				new double[] { 400.0, 310.0, 100.0 },
 				new double[][] {
@@ -466,7 +467,7 @@ public class Test_VerticalPack extends Test_BoxPack_base
 		// 	boxAllocation=400   ->   [ 200, 50 ] @ [ 10, 245 ]		- no expansion
 		// 	boxAllocation=315   ->   [ 200, 50 ] @ [ 10, 245 ]		- required sizes
 		// 	boxAllocation=100   ->   [ 200, 50 ] @ [ 10, 245 ]		- will not go below requirement
-		vpackYTests( new TSBox[] { ybox( 200.0, 15.0 ),  ybox( 50.0, 0.0 ) }, 0.0, new double[] { 10.0, 20.0 }, null,
+		vpackYTests( new TSBox[] { ybox( 200.0, 15.0 ),  ybox( 50.0, 0.0 ) }, 0.0, new BoxPackingParams[] { new BoxPackingParams( 10.0 ), new BoxPackingParams( 20.0 ) },
 				ybox( 315.0, 0.0 ),
 				new double[] { 400.0, 315.0, 100.0 },
 				new double[][] {

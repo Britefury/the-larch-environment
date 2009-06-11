@@ -8,7 +8,7 @@ package BritefuryJ.DocPresent.Typesetting;
 
 public class HorizontalPack
 {
-	public static void computeRequisitionX(TSBox box, TSBox children[], double spacing, double childPadding[])
+	public static void computeRequisitionX(TSBox box, TSBox children[], double spacing, BoxPackingParams packingParams[])
 	{
 		// Accumulate the width required for all the children
 		
@@ -27,7 +27,8 @@ public class HorizontalPack
 		{
 			TSBox child = children[i];
 			
-			double padding = childPadding != null  ?  childPadding[i]  :  0.0;
+			BoxPackingParams params = packingParams != null  ?  packingParams[i]  :  null;
+			double padding = params != null  ?  params.padding  :  0.0;
 			
 			// Filter out any h-spacing that is within the amount of padding
 			double minChildSpacing = Math.max( child.minHSpacing - padding, 0.0 );
@@ -121,20 +122,22 @@ public class HorizontalPack
 
 
 
-	public static void allocateSpaceX(TSBox box, TSBox children[], int packFlags[])
+	public static void allocateSpaceX(TSBox box, TSBox children[], BoxPackingParams packingParams[])
 	{
 		int numExpand = 0;
 		
 		// Count the number of children that should expand to use additional space
-		if ( packFlags != null )
+		if ( packingParams != null )
 		{
-			assert packFlags.length == children.length;
-			for (int i = 0; i < packFlags.length; i++)
+			assert packingParams.length == children.length;
+			for (BoxPackingParams params: packingParams)
 			{
-				int f = packFlags[i];
-				if ( TSBox.testPackFlagExpand( f ) )
+				if ( params != null )
 				{
-					numExpand++;
+					if ( TSBox.testPackFlagExpand( params.packFlags ) )
+					{
+						numExpand++;
+					}
 				}
 			}
 		}
@@ -171,7 +174,8 @@ public class HorizontalPack
 				int i = 0;
 				for (TSBox child: children)
 				{
-					if ( packFlags != null  &&  TSBox.testPackFlagExpand( packFlags[i] ) )
+					BoxPackingParams params = packingParams != null  ?  packingParams[i]  :  null;
+					if ( params != null  &&  TSBox.testPackFlagExpand( params.packFlags ) )
 					{
 						box.allocateChildSpaceX( child, child.getPrefWidth() + expandPerChild );
 					}
@@ -222,7 +226,7 @@ public class HorizontalPack
 	
 	
 
-	public static void allocateX(TSBox box, TSBox children[], double spacing, double childPadding[], int packFlags[])
+	public static void allocateX(TSBox box, TSBox children[], double spacing, BoxPackingParams packingParams[])
 	{
 		// Each packed child consists of:
 		//	- start padding
@@ -232,7 +236,7 @@ public class HorizontalPack
 		
 		// There should be at least the specified amount of spacing between each child, or the child's own h-spacing if it is greater
 
-		allocateSpaceX( box, children, packFlags );
+		allocateSpaceX( box, children, packingParams );
 		
 		double size = 0.0;
 		double pos = 0.0;
@@ -241,7 +245,8 @@ public class HorizontalPack
 			TSBox child = children[i];
 
 			// Get the padding
-			double padding = childPadding != null  ?  childPadding[i]  :  0.0;
+			BoxPackingParams params = packingParams != null  ?  packingParams[i]  :  null;
+			double padding = params != null  ?  params.padding  :  0.0;
 			
 			// Compute the spacing
 			// Use 'preferred' spacing, if the child was allocated its preferred amount of space, or more

@@ -17,14 +17,14 @@ public class ParagraphPack
 		public TSBox children[];
 		
 		
-		private Line(TSBox ch[], double indentation, double spacing, double childPadding[], double allocation)
+		private Line(TSBox ch[], double indentation, double spacing, BoxPackingParams packingParams[], double allocation)
 		{
 			children = ch;
 			
 			lineBox = new TSBox();
-			HorizontalPack.computeRequisitionX( lineBox, children, spacing, childPadding );
+			HorizontalPack.computeRequisitionX( lineBox, children, spacing, packingParams );
 			lineBox.allocationX = allocation - indentation;
-			HorizontalPack.allocateX( lineBox, children, spacing, childPadding, null );
+			HorizontalPack.allocateX( lineBox, children, spacing, packingParams );
 			for (TSBox child: children)
 			{
 				child.positionInParentSpaceX += indentation;
@@ -56,7 +56,7 @@ public class ParagraphPack
 	
 	
 
-	public static void computeRequisitionX(TSBox box, TSBox children[], double indentation, double hSpacing, double childPadding[])
+	public static void computeRequisitionX(TSBox box, TSBox children[], double indentation, double hSpacing, BoxPackingParams packingParams[])
 	{
 		// Accumulate the width required for all the children
 		
@@ -75,7 +75,8 @@ public class ParagraphPack
 		{
 			TSBox child = children[i];
 			
-			double padding = childPadding != null  ?  childPadding[i]  :  0.0;
+			BoxPackingParams params = packingParams != null  ?  packingParams[i]  :  null;
+			double padding = params != null  ?  params.padding  :  0.0;
 			
 			// Filter out any h-spacing that is within the amount of padding
 			double prefChildSpacing = Math.max( child.prefHSpacing - padding, 0.0 );
@@ -132,7 +133,7 @@ public class ParagraphPack
 
 
 
-	public static ArrayList<Line> allocateX(TSBox box, TSBox children[], double indentation, double hSpacing, double childPadding[])
+	public static ArrayList<Line> allocateX(TSBox box, TSBox children[], double indentation, double hSpacing, BoxPackingParams packingParams[])
 	{
 		boolean bFirstLine = true;
 		
@@ -155,7 +156,8 @@ public class ParagraphPack
 		{
 			TSBox child = children[i];
 			
-			double padding = childPadding != null  ?  childPadding[i]  :  0.0;
+			BoxPackingParams params = packingParams != null  ?  packingParams[i]  :  null;
+			double padding = params != null  ?  params.padding  :  0.0;
 			
 			// Filter out any h-spacing that is within the amount of padding
 			double childSpacing = Math.max( child.prefHSpacing - padding, 0.0 );
@@ -217,13 +219,13 @@ public class ParagraphPack
 				int lineLength = lineBreakIndex - lineStartIndex;
 				TSBox lineChildren[] = new TSBox[lineLength];
 				System.arraycopy( children, lineStartIndex, lineChildren, 0, lineLength );
-				double linePadding[] =  null;
-				if ( childPadding != null )
+				BoxPackingParams linePackingParams[] =  null;
+				if ( packingParams != null )
 				{
-					linePadding= new double[lineLength];
-					System.arraycopy( childPadding, lineStartIndex, linePadding, 0, lineLength );
+					linePackingParams = new BoxPackingParams[lineLength];
+					System.arraycopy( packingParams, lineStartIndex, linePackingParams, 0, lineLength );
 				}
-				lines.add( new Line( lineChildren, bFirstLine  ?  0.0  :  indentation, hSpacing, linePadding, box.allocationX ) );
+				lines.add( new Line( lineChildren, bFirstLine  ?  0.0  :  indentation, hSpacing, linePackingParams, box.allocationX ) );
 				
 				// Next line
 				lineStartIndex = lineBreakIndex + 1;
@@ -246,13 +248,13 @@ public class ParagraphPack
 			int lineLength = children.length - lineStartIndex;
 			TSBox lineChildren[] = new TSBox[lineLength];
 			System.arraycopy( children, lineStartIndex, lineChildren, 0, lineLength );
-			double linePadding[] =  null;
-			if ( childPadding != null )
+			BoxPackingParams linePackingParams[] =  null;
+			if ( packingParams != null )
 			{
-				linePadding= new double[lineLength];
-				System.arraycopy( childPadding, lineStartIndex, linePadding, 0, lineLength );
+				linePackingParams = new BoxPackingParams[lineLength];
+				System.arraycopy( packingParams, lineStartIndex, linePackingParams, 0, lineLength );
 			}
-			lines.add( new Line( lineChildren, bFirstLine  ?  0.0  :  indentation, hSpacing, linePadding, box.allocationX ) );
+			lines.add( new Line( lineChildren, bFirstLine  ?  0.0  :  indentation, hSpacing, linePackingParams, box.allocationX ) );
 		}
 		
 		
@@ -273,7 +275,7 @@ public class ParagraphPack
 			lineBoxes[i++] = line.lineBox;
 		}
 		
-		VerticalPack.allocateY( box, lineBoxes, vSpacing, null, null );
+		VerticalPack.allocateY( box, lineBoxes, vSpacing, null );
 		
 		for (Line line: lines)
 		{

@@ -6,6 +6,7 @@
 //##************************
 package tests.DocPresent.Typesetting;
 
+import BritefuryJ.DocPresent.Typesetting.BoxPackingParams;
 import BritefuryJ.DocPresent.Typesetting.HorizontalPack;
 import BritefuryJ.DocPresent.Typesetting.TSBox;
 import BritefuryJ.DocPresent.Typesetting.VAlignment;
@@ -37,21 +38,21 @@ public class Test_HorizontalPack extends Test_BoxPack_base
 		assertEquals( result, new TSBox() );
 
 		// requisitionX( [ <0,0>:pad=1 ] )  ->  <2,0>
-		HorizontalPack.computeRequisitionX( result, new TSBox[] { new TSBox() },  0.0, new double[] { 1.0 } );
+		HorizontalPack.computeRequisitionX( result, new TSBox[] { new TSBox() },  0.0, new BoxPackingParams[] { new BoxPackingParams( 1.0 ) } );
 		assertEquals( result, xbox( 2.0, 0.0 ) );
 
 		// requisitionX( [ <10,0>:pad=2 ] )  ->  <14,0>
-		HorizontalPack.computeRequisitionX( result, new TSBox[] { xbox( 10.0, 0.0 ) },  0.0, new double[] { 2.0 } );
+		HorizontalPack.computeRequisitionX( result, new TSBox[] { xbox( 10.0, 0.0 ) },  0.0, new BoxPackingParams[] { new BoxPackingParams( 2.0 ) } );
 		assertEquals( result, xbox( 14.0, 0.0 ) );
 
 		// Padding 'consumes' h-spacing
 		// requisitionX( [ <10,1>:pad=2 ] )  ->  <14,0>
-		HorizontalPack.computeRequisitionX( result, new TSBox[] { xbox( 10.0, 1.0 ) },  0.0, new double[] { 2.0 } );
+		HorizontalPack.computeRequisitionX( result, new TSBox[] { xbox( 10.0, 1.0 ) },  0.0, new BoxPackingParams[] { new BoxPackingParams( 2.0 ) } );
 		assertEquals( result, xbox( 14.0, 0.0 ) );
 
 		// Padding 'consumes' all h-spacing
 		// requisitionX( [ <10,3>:pad=2 ] )  ->  <14,1>
-		HorizontalPack.computeRequisitionX( result, new TSBox[] { xbox( 10.0, 3.0 ) },  0.0, new double[] { 2.0 } );
+		HorizontalPack.computeRequisitionX( result, new TSBox[] { xbox( 10.0, 3.0 ) },  0.0, new BoxPackingParams[] { new BoxPackingParams( 2.0 ) } );
 		assertEquals( result, xbox( 14.0, 1.0 ) );
 
 		// requisitionX( [ <0,0>, <0,0> ] )  ->  <0,0>
@@ -211,10 +212,10 @@ public class Test_HorizontalPack extends Test_BoxPack_base
 	//
 	//
 
-	private void hpackXSpaceTest(TSBox children[], double spacing, double childPadding[], int packFlags[], TSBox expectedBox, double boxAllocation, double expectedSpaceAllocation[])
+	private void hpackXSpaceTest(TSBox children[], double spacing, BoxPackingParams packingParams[], TSBox expectedBox, double boxAllocation, double expectedSpaceAllocation[])
 	{ 
 		TSBox box = new TSBox();
-		HorizontalPack.computeRequisitionX( box, children, spacing, childPadding );
+		HorizontalPack.computeRequisitionX( box, children, spacing, packingParams );
 		if ( !box.equals( expectedBox ) )
 		{
 			System.out.println( "PARENT BOX IS NOT AS EXPECTED" );
@@ -225,7 +226,7 @@ public class Test_HorizontalPack extends Test_BoxPack_base
 		}
 		assertEquals( box, expectedBox );
 		box.setAllocationX( boxAllocation );
-		HorizontalPack.allocateSpaceX( box, children, packFlags );
+		HorizontalPack.allocateSpaceX( box, children, packingParams );
 		for (int i = 0; i < children.length; i++)
 		{
 			if ( children[i].getAllocationX() != expectedSpaceAllocation[i] )
@@ -237,11 +238,11 @@ public class Test_HorizontalPack extends Test_BoxPack_base
 	}
 
 	
-	private void hpackXSpaceTests(TSBox children[], double spacing, double childPadding[], int packFlags[], TSBox expectedBox, double boxAllocations[], double expectedSpaceAllocations[][])
+	private void hpackXSpaceTests(TSBox children[], double spacing, BoxPackingParams packingParams[], TSBox expectedBox, double boxAllocations[], double expectedSpaceAllocations[][])
 	{
 		for (int i = 0; i  < boxAllocations.length; i++)
 		{
-			hpackXSpaceTest( children, spacing, childPadding, packFlags, expectedBox, boxAllocations[i], expectedSpaceAllocations[i] );
+			hpackXSpaceTest( children, spacing, packingParams, expectedBox, boxAllocations[i], expectedSpaceAllocations[i] );
 		}
 	}
 
@@ -274,7 +275,7 @@ public class Test_HorizontalPack extends Test_BoxPack_base
 		// 	boxAllocation=100   ->   [ 100 ]		- all allocated to 1 child
 		// 	boxAllocation=50   ->   [ 100 ]		- will not go below minimum
 		// No padding, no expand
-		hpackXSpaceTests( new TSBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ) }, 0.0, null, null,
+		hpackXSpaceTests( new TSBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ) }, 0.0, null,
 				xbox( 100.0, 200.0, 0.0, 0.0 ),
 				new double[] { 300.0, 200.0, 150.0, 100.0, 50.0 },
 				new double[][] {
@@ -294,7 +295,7 @@ public class Test_HorizontalPack extends Test_BoxPack_base
 		// 	boxAllocation=100   ->   [ 100 ]		- will not go below minimum, 20 to padding
 		// 	boxAllocation=50   ->   [ 100 ]		- will not go below minimum, 20 to padding
 		// 10 padding, no expand
-		hpackXSpaceTests( new TSBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ) }, 0.0, new double[] { 10.0 }, null,
+		hpackXSpaceTests( new TSBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ) }, 0.0, new BoxPackingParams[] { new BoxPackingParams( 10.0 ) },
 				xbox( 120.0, 220.0, 0.0, 0.0 ),
 				new double[] { 300.0, 220.0, 200.0, 150.0, 120.0, 100.0, 50.0 },
 				new double[][] {
@@ -314,7 +315,7 @@ public class Test_HorizontalPack extends Test_BoxPack_base
 		// 	boxAllocation=100   ->   [ 100 ]		- all allocated to 1 child
 		// 	boxAllocation=50   ->   [ 100 ]		- will not go below minimum
 		// No padding, expand
-		hpackXSpaceTests( new TSBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ) }, 0.0, null, new int[] { TSBox.packFlags( true ) },
+		hpackXSpaceTests( new TSBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ) }, 0.0, new BoxPackingParams[] { new BoxPackingParams( true ) },
 				xbox( 100.0, 200.0, 0.0, 0.0 ),
 				new double[] { 300.0, 200.0, 150.0, 100.0, 50.0 },
 				new double[][] {
@@ -334,7 +335,7 @@ public class Test_HorizontalPack extends Test_BoxPack_base
 		// 	boxAllocation=100   ->   [ 100 ]		- will not go below minimum, 20 to padding
 		// 	boxAllocation=50   ->   [ 100 ]		- will not go below minimum, 20 to padding
 		// 10 padding, expand
-		hpackXSpaceTests( new TSBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ) }, 0.0, new double[] { 10.0 }, new int[] { TSBox.packFlags( true ) },
+		hpackXSpaceTests( new TSBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ) }, 0.0, new BoxPackingParams[] { new BoxPackingParams( 10.0, true ) },
 				xbox( 120.0, 220.0, 0.0, 0.0 ),
 				new double[] { 300.0, 220.0, 200.0, 150.0, 120.0, 100.0, 50.0 },
 				new double[][] {
@@ -354,7 +355,7 @@ public class Test_HorizontalPack extends Test_BoxPack_base
 		// 	boxAllocation=150   ->   [ 150 ]		- all allocated to 1 child
 		// 	boxAllocation=100   ->   [ 100 ]		- all allocated to 1 child
 		// 	boxAllocation=50   ->   [ 100 ]		- will not go below minimum
-		hpackXSpaceTests( new TSBox[] { xbox( 100.0, 200.0, 10.0, 10.0 ) }, 0.0, null, null,
+		hpackXSpaceTests( new TSBox[] { xbox( 100.0, 200.0, 10.0, 10.0 ) }, 0.0, null,
 				xbox( 100.0, 200.0, 10.0, 10.0 ),
 				new double[] { 300.0, 200.0, 150.0, 100.0, 50.0 },
 				new double[][] {
@@ -378,7 +379,7 @@ public class Test_HorizontalPack extends Test_BoxPack_base
 		// 	boxAllocation=210   ->   [ 150, 60 ]		- space above minimum distributed evenly
 		// 	boxAllocation=150   ->   [ 100, 50 ]		- minimum sizes
 		// 	boxAllocation=100   ->   [ 100, 50 ]		- will not go below minimum
-		hpackXSpaceTests( new TSBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ),  xbox( 50.0, 70.0, 0.0, 0.0 ) }, 0.0, null, null,
+		hpackXSpaceTests( new TSBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ),  xbox( 50.0, 70.0, 0.0, 0.0 ) }, 0.0, null,
 				xbox( 150.0, 270.0, 0.0, 0.0 ),
 				new double[] { 300.0, 270.0, 210.0, 150.0, 100.0 },
 				new double[][] {
@@ -395,7 +396,7 @@ public class Test_HorizontalPack extends Test_BoxPack_base
 		// 	boxAllocation=210   ->   [ 150, 60 ]		- space above minimum distributed evenly
 		// 	boxAllocation=150   ->   [ 100, 50 ]		- minimum sizes
 		// 	boxAllocation=100   ->   [ 100, 50 ]		- will not go below minimum
-		hpackXSpaceTests( new TSBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ),  xbox( 50.0, 70.0, 0.0, 0.0 ) }, 0.0, null, new int[] { TSBox.packFlags( true ), TSBox.packFlags( false ) },
+		hpackXSpaceTests( new TSBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ),  xbox( 50.0, 70.0, 0.0, 0.0 ) }, 0.0, new BoxPackingParams[] { new BoxPackingParams( true ), new BoxPackingParams( false ) },
 				xbox( 150.0, 270.0, 0.0, 0.0 ),
 				new double[] { 300.0, 270.0, 210.0, 150.0, 100.0 },
 				new double[][] {
@@ -412,7 +413,7 @@ public class Test_HorizontalPack extends Test_BoxPack_base
 		// 	boxAllocation=210   ->   [ 150, 60 ]		- space above minimum distributed evenly
 		// 	boxAllocation=150   ->   [ 100, 50 ]		- minimum sizes
 		// 	boxAllocation=100   ->   [ 100, 50 ]		- will not go below minimum
-		hpackXSpaceTests( new TSBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ),  xbox( 50.0, 70.0, 0.0, 0.0 ) }, 0.0, null, new int[] { TSBox.packFlags( false ), TSBox.packFlags( true ) },
+		hpackXSpaceTests( new TSBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ),  xbox( 50.0, 70.0, 0.0, 0.0 ) }, 0.0, new BoxPackingParams[] { new BoxPackingParams( false ), new BoxPackingParams( true ) },
 				xbox( 150.0, 270.0, 0.0, 0.0 ),
 				new double[] { 300.0, 270.0, 210.0, 150.0, 100.0 },
 				new double[][] {
@@ -429,7 +430,7 @@ public class Test_HorizontalPack extends Test_BoxPack_base
 		// 	boxAllocation=210   ->   [ 150, 60 ]		- space above minimum distributed evenly
 		// 	boxAllocation=150   ->   [ 100, 50 ]		- minimum sizes
 		// 	boxAllocation=100   ->   [ 100, 50 ]		- will not go below minimum
-		hpackXSpaceTests( new TSBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ),  xbox( 50.0, 70.0, 0.0, 0.0 ) }, 0.0, null, new int[] { TSBox.packFlags( true ), TSBox.packFlags( true ) },
+		hpackXSpaceTests( new TSBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ),  xbox( 50.0, 70.0, 0.0, 0.0 ) }, 0.0, new BoxPackingParams[] { new BoxPackingParams( true ), new BoxPackingParams( true ) },
 				xbox( 150.0, 270.0, 0.0, 0.0 ),
 				new double[] { 300.0, 270.0, 210.0, 150.0, 100.0 },
 				new double[][] {
@@ -452,10 +453,10 @@ public class Test_HorizontalPack extends Test_BoxPack_base
 	//
 	//
 
-	private void hpackXTest(TSBox children[], double spacing, double childPadding[], int packFlags[], TSBox expectedBox, double boxAllocation, double expectedSize[], double expectedPosition[])
+	private void hpackXTest(TSBox children[], double spacing, BoxPackingParams packingParams[], TSBox expectedBox, double boxAllocation, double expectedSize[], double expectedPosition[])
 	{ 
 		TSBox box = new TSBox();
-		HorizontalPack.computeRequisitionX( box, children, spacing, childPadding );
+		HorizontalPack.computeRequisitionX( box, children, spacing, packingParams );
 		if ( !box.equals( expectedBox ) )
 		{
 			System.out.println( "PARENT BOX IS NOT AS EXPECTED" );
@@ -466,7 +467,7 @@ public class Test_HorizontalPack extends Test_BoxPack_base
 		}
 		assertEquals( box, expectedBox );
 		box.setAllocationX( boxAllocation );
-		HorizontalPack.allocateX( box, children, spacing, childPadding, packFlags );
+		HorizontalPack.allocateX( box, children, spacing, packingParams );
 		for (int i = 0; i < children.length; i++)
 		{
 			if ( children[i].getAllocationX() != expectedSize[i] )
@@ -483,11 +484,11 @@ public class Test_HorizontalPack extends Test_BoxPack_base
 		}
 	}
 	
-	private void hpackXTests(TSBox children[], double spacing, double childPadding[], int packFlags[], TSBox expectedBox, double boxAllocations[], double expectedSize[][], double expectedPosition[][])
+	private void hpackXTests(TSBox children[], double spacing, BoxPackingParams packingParams[], TSBox expectedBox, double boxAllocations[], double expectedSize[][], double expectedPosition[][])
 	{
 		for (int i = 0; i  < boxAllocations.length; i++)
 		{
-			hpackXTest( children, spacing, childPadding, packFlags, expectedBox, boxAllocations[i], expectedSize[i], expectedPosition[i] );
+			hpackXTest( children, spacing, packingParams, expectedBox, boxAllocations[i], expectedSize[i], expectedPosition[i] );
 		}
 	}
 
@@ -501,7 +502,7 @@ public class Test_HorizontalPack extends Test_BoxPack_base
 		// 	boxAllocation=210   ->   [ 150, 60 ] @ [ 0, 150 ]		- space above minimum distributed evenly
 		// 	boxAllocation=150   ->   [ 100, 50 ] @ [ 0, 100 ]		- minimum sizes
 		// 	boxAllocation=100   ->   [ 100, 50 ] @ [ 0, 100 ]		- will not go below minimum
-		hpackXTests( new TSBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ),  xbox( 50.0, 70.0, 0.0, 0.0 ) }, 0.0, null, null,
+		hpackXTests( new TSBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ),  xbox( 50.0, 70.0, 0.0, 0.0 ) }, 0.0, null,
 				xbox( 150.0, 270.0, 0.0, 0.0 ),
 				new double[] { 300.0, 270.0, 210.0, 150.0, 100.0 },
 				new double[][] {
@@ -524,7 +525,7 @@ public class Test_HorizontalPack extends Test_BoxPack_base
 		// 	boxAllocation=220   ->   [ 150, 60 ] @ [ 0, 160 ]		- space above minimum distributed evenly
 		// 	boxAllocation=160   ->   [ 100, 50 ] @ [ 0, 110 ]		- minimum sizes
 		// 	boxAllocation=100   ->   [ 100, 50 ] @ [ 0, 110 ]		- will not go below minimum
-		hpackXTests( new TSBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ),  xbox( 50.0, 70.0, 0.0, 0.0 ) }, 10.0, null, null,
+		hpackXTests( new TSBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ),  xbox( 50.0, 70.0, 0.0, 0.0 ) }, 10.0, null,
 				xbox( 160.0, 280.0, 0.0, 0.0 ),
 				new double[] { 300.0, 280.0, 220.0, 160.0, 100.0 },
 				new double[][] {
@@ -547,7 +548,7 @@ public class Test_HorizontalPack extends Test_BoxPack_base
 		// 	boxAllocation=270   ->   [ 150, 60 ] @ [ 0, 190 ]		- space above minimum distributed evenly
 		// 	boxAllocation=210   ->   [ 100, 50 ] @ [ 0, 140 ]		- minimum sizes
 		// 	boxAllocation=100   ->   [ 100, 50 ] @ [ 0, 140 ]		- will not go below minimum
-		hpackXTests( new TSBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ),  xbox( 50.0, 70.0, 0.0, 0.0 ) }, 0.0, new double[] { 10.0, 20.0 }, null,
+		hpackXTests( new TSBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ),  xbox( 50.0, 70.0, 0.0, 0.0 ) }, 0.0, new BoxPackingParams[] { new BoxPackingParams( 10.0 ), new BoxPackingParams( 20.0 ) },
 				xbox( 210.0, 330.0, 0.0, 0.0 ),
 				new double[] { 400.0, 330.0, 270.0, 210.0, 100.0 },
 				new double[][] {
@@ -570,7 +571,7 @@ public class Test_HorizontalPack extends Test_BoxPack_base
 		// 	boxAllocation=275   ->   [ 150, 60 ] @ [ 0, 195 ]		- space above minimum distributed evenly
 		// 	boxAllocation=215   ->   [ 100, 50 ] @ [ 0, 145 ]		- minimum sizes
 		// 	boxAllocation=100   ->   [ 100, 50 ] @ [ 0, 145 ]		- will not go below minimum
-		hpackXTests( new TSBox[] { xbox( 100.0, 200.0, 15.0, 15.0 ),  xbox( 50.0, 70.0, 0.0, 0.0 ) }, 0.0, new double[] { 10.0, 20.0 }, null,
+		hpackXTests( new TSBox[] { xbox( 100.0, 200.0, 15.0, 15.0 ),  xbox( 50.0, 70.0, 0.0, 0.0 ) }, 0.0, new BoxPackingParams[] { new BoxPackingParams( 10.0 ), new BoxPackingParams( 20.0 ) },
 				xbox( 215.0, 335.0, 0.0, 0.0 ),
 				new double[] { 400.0, 335.0, 275.0, 215.0, 100.0 },
 				new double[][] {
