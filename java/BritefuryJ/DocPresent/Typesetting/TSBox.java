@@ -248,6 +248,17 @@ public class TSBox
 	}
 	
 
+	public void setPositionInParentSpaceX(double x)
+	{
+		positionInParentSpaceX = x;
+	}
+	
+	public void setPositionInParentSpaceY(double y)
+	{
+		positionInParentSpaceY = y;
+	}
+	
+
 	
 	protected void allocateChildX(TSBox child, double localPosX, double localWidth)
 	{

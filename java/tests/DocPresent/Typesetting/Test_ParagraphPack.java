@@ -7,6 +7,7 @@
 package tests.DocPresent.Typesetting;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import BritefuryJ.DocPresent.Typesetting.ParagraphPack;
 import BritefuryJ.DocPresent.Typesetting.TSBox;
@@ -317,7 +318,7 @@ public class Test_ParagraphPack extends Test_BoxPack_base
 	//
 	// REQUISITION Y TESTS
 
-	private void reqYTest(TSBox children[], double indentation, double hSpacing, double vSpacing, VAlignment vAlignment, double childPadding[],
+	private void ppackYTest(TSBox children[], double indentation, double hSpacing, double vSpacing, VAlignment vAlignment, double childPadding[],
 			TSBox expectedBox, double boxAllocation, double expectedSize[], double expectedPosition[])
 	{ 
 		TSBox box = new TSBox();
@@ -329,31 +330,106 @@ public class Test_ParagraphPack extends Test_BoxPack_base
 		
 		// Y
 		ParagraphPack.computeRequisitionY( box, lines, vSpacing, vAlignment );
+		ParagraphPack.allocateY( box, lines, vSpacing, vAlignment );
 		
-		if ( !box.equals( expectedBox ) )
+		TSBox b = box.copy();
+		b.setAllocationX( 0.0 );
+		b.setPositionInParentSpaceX( 0.0 );
+		if ( !b.equals( expectedBox ) )
 		{
 			System.out.println( "PARENT BOX IS NOT AS EXPECTED" );
 			System.out.println( "EXPECTED" );
 			System.out.println( expectedBox );
 			System.out.println( "RESULT" );
-			System.out.println( box );
+			System.out.println( b );
 		}
-		assertEquals( box, expectedBox );
-
+		assertEquals( b, expectedBox );
+		
 		for (int i = 0; i < children.length; i++)
 		{
-			if ( children[i].getAllocationX() != expectedSize[i] )
+			double lineY = 0.0;
+			for (ParagraphPack.Line line: lines)
 			{
-				System.out.println( "Child allocation for " + i + " is not as expected; expected=" + expectedSize[i] + ", result=" + children[i].getAllocationX() + ", boxAllocation=" + boxAllocation );
+				if ( Arrays.asList( line.getChildBoxes() ).contains( children[i] ) )
+				{
+					lineY = line.getLineBox().getPositionInParentSpaceY(); 
+				}
 			}
-			assertEquals( children[i].getAllocationX(), expectedSize[i] );
+			
+			if ( children[i].getAllocationX() != expectedSize[i*2] )
+			{
+				System.out.println( "Child allocation width for " + i + " is not as expected; expected=" + expectedSize[i*2] + ", result=" + children[i].getAllocationX() );
+			}
+			assertEquals( children[i].getAllocationX(), expectedSize[i*2] );
 
-			if ( children[i].getPositionInParentSpaceX() != expectedPosition[i] )
+			if ( children[i].getAllocationY() != expectedSize[i*2+1] )
 			{
-				System.out.println( "Child position for " + i + " is not as expected; expected=" + expectedPosition[i] + ", result=" + children[i].getPositionInParentSpaceX() + ", boxAllocation=" + boxAllocation );
+				System.out.println( "Child allocation height for " + i + " is not as expected; expected=" + expectedSize[i*2+1] + ", result=" + children[i].getAllocationY() );
 			}
-			assertEquals( children[i].getPositionInParentSpaceX(), expectedPosition[i] );
+			assertEquals( children[i].getAllocationY(), expectedSize[i*2+1] );
+
+			
+			if ( children[i].getPositionInParentSpaceX() != expectedPosition[i*2] )
+			{
+				System.out.println( "Child position X for " + i + " is not as expected; expected=" + expectedPosition[i*2] + ", result=" + children[i].getPositionInParentSpaceX() );
+			}
+			assertEquals( children[i].getPositionInParentSpaceX(), expectedPosition[i*2] );
+			
+			if ( children[i].getPositionInParentSpaceY()+lineY != expectedPosition[i*2+1] )
+			{
+				System.out.println( "Child position Y for " + i + " is not as expected; expected=" + expectedPosition[i*2+1] + ", result=" + (children[i].getPositionInParentSpaceY()+lineY) );
+			}
+			assertEquals( children[i].getPositionInParentSpaceY()+lineY, expectedPosition[i*2+1] );
 		}
 	}
 	
+	
+	
+	public void test_requisitionY_allocateY()
+	{
+		// Sufficient space - 1 line
+		// hpackX( [ <25,0,15,0>, break(<5,0>), <15,0,20,0>, break(<5,0>), <15,0,10,0> ], indentation=5, spacing=0, padding=0 )
+		//	parentBox = <25, 65, 0, 0, 20, 0>
+		// 		boxAllocation=65   ->     [ 25,15,  5,0,  15,20,  5,0,  15,10 ]  @  [ 0,0,  25,0,  30,0,  45,0,  50,0 ]
+		ppackYTest( new TSBox[] { box( 25, 0, 15, 0 ), lineBreakBox( 5, 0 ), box( 15, 0, 20, 0 ), lineBreakBox( 5, 0 ), box( 15, 0, 10, 0 ) }, 5.0, 0.0, 0.0, VAlignment.TOP, null,
+				box( 25, 65, 0, 0, 20, 0 ),
+				65,
+				new double[] { 25,15,  5,0,  15,20,  5,0,  15,10 },
+				new double[] { 0,0,  25,0,  30,0,  45,0,  50,0 } );
+
+
+		// Break at last line break
+		// hpackX( [ <25,0,15,0>, break(<5,0>), <15,0,20,0>, break(<5,0>), <15,0,10,0> ], indentation=5, spacing=0, padding=0 )
+		//	parentBox = <25, 65, 0, 0, 30, 0>
+		// 		boxAllocation=55   ->     [ 25,15,  5,0,  15,20,  0,0,  15,10 ]  @  [ 0,0,  25,0,  30,0,  0,0,  5,20 ]
+		ppackYTest( new TSBox[] { box( 25, 0, 15, 0 ), lineBreakBox( 5, 0 ), box( 15, 0, 20, 0 ), lineBreakBox( 5, 0 ), box( 15, 0, 10, 0 ) }, 5.0, 0.0, 0.0, VAlignment.TOP, null,
+				box( 25, 65, 0, 0, 30, 0 ),
+				55,
+				new double[] { 25,15,  5,0,  15,20,  0,0,  15,10 },
+				new double[] { 0,0,  25,0,  30,0,  0,0,  5,20 } );
+
+	
+		// Break at both line breaks
+		// hpackX( [ <25,0,15,0>, break(<5,0>), <15,0,20,0>, break(<5,0>), <15,0,10,0> ], indentation=5, spacing=0, padding=0 )
+		//	parentBox = <25, 65, 0, 0, 45, 0>
+		// 		boxAllocation=35   ->     [ 25,15,  0,0,  15,20,  0,0,  15,10 ]  @  [ 0,0,  0,0,  5,15,  0,0,  5,35 ]
+		ppackYTest( new TSBox[] { box( 25, 0, 15, 0 ), lineBreakBox( 5, 0 ), box( 15, 0, 20, 0 ), lineBreakBox( 5, 0 ), box( 15, 0, 10, 0 ) }, 5.0, 0.0, 0.0, VAlignment.TOP, null,
+				box( 25, 65, 0, 0, 45, 0 ),
+				35,
+				new double[] { 25,15,  0,0,  15,20,  0,0,  15,10 },
+				new double[] { 0,0,  0,0,  5,15,  0,0,  5,35 } );
+
+	
+	
+
+		// Check v-spacing
+		// hpackX( [ <25,0,15,0>, break(<5,0>), <15,0,20,0>, break(<5,0>), <15,0,10,0> ], indentation=5, spacing=0, padding=0 )
+		//	parentBox = <25, 65, 0, 0, 45, 0>
+		// 		boxAllocation=35   ->     [ 25,15,  0,0,  15,20,  0,0,  15,10 ]  @  [ 0,0,  0,0,  5,0,  0,0,  5,0 ]
+		ppackYTest( new TSBox[] { box( 25, 0, 15, 0 ), lineBreakBox( 5, 0 ), box( 15, 0, 20, 0 ), lineBreakBox( 5, 0 ), box( 15, 0, 10, 0 ) }, 5.0, 0.0, 5.0, VAlignment.TOP, null,
+				box( 25, 65, 0, 0, 55, 0 ),
+				35,
+				new double[] { 25,15,  0,0,  15,20,  0,0,  15,10 },
+				new double[] { 0,0,  0,0,  5,20,  0,0,  5,45 } );
+	}
 }
