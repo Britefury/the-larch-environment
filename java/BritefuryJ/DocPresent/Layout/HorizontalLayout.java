@@ -4,11 +4,11 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.DocPresent.Typesetting;
+package BritefuryJ.DocPresent.Layout;
 
-public class HorizontalPack
+public class HorizontalLayout
 {
-	public static void computeRequisitionX(TSBox box, TSBox children[], double spacing, BoxPackingParams packingParams[])
+	public static void computeRequisitionX(LBox box, LBox children[], double spacing, BoxPackingParams packingParams[])
 	{
 		// Accumulate the width required for all the children
 		
@@ -25,7 +25,7 @@ public class HorizontalPack
 		double minX = 0.0, prefX = 0.0;
 		for (int i = 0; i < children.length; i++)
 		{
-			TSBox child = children[i];
+			LBox child = children[i];
 			
 			BoxPackingParams params = packingParams != null  ?  packingParams[i]  :  null;
 			double padding = params != null  ?  params.padding  :  0.0;
@@ -47,7 +47,7 @@ public class HorizontalPack
 
 	
 	
-	public static void computeRequisitionY(TSBox box, TSBox children[], VAlignment alignment)
+	public static void computeRequisitionY(LBox box, LBox children[], VAlignment alignment)
 	{
 		// The resulting box should have the following properties:
 		// In the case where alignment is BASELINES:
@@ -69,7 +69,7 @@ public class HorizontalPack
 		{
 			double reqAscent = 0.0, reqDescent = 0.0, reqDescentAndSpacing = 0.0, reqHeight = 0.0, reqAdvance = 0.0;
 			int baselineCount = 0;
-			for (TSBox child: children)
+			for (LBox child: children)
 			{
 				if ( child.hasBaseline() )
 				{
@@ -107,7 +107,7 @@ public class HorizontalPack
 		{
 			double reqHeight = 0.0;
 			double reqAdvance = 0.0;
-			for (TSBox child: children)
+			for (LBox child: children)
 			{
 				double childMinHeight = child.getReqHeight();
 				double childMinAdvance = childMinHeight + child.reqVSpacing;
@@ -122,7 +122,7 @@ public class HorizontalPack
 
 
 
-	public static void allocateSpaceX(TSBox box, TSBox children[], BoxPackingParams packingParams[])
+	public static void allocateSpaceX(LBox box, LBox children[], BoxPackingParams packingParams[])
 	{
 		int numExpand = 0;
 		
@@ -134,7 +134,7 @@ public class HorizontalPack
 			{
 				if ( params != null )
 				{
-					if ( TSBox.testPackFlagExpand( params.packFlags ) )
+					if ( LBox.testPackFlagExpand( params.packFlags ) )
 					{
 						numExpand++;
 					}
@@ -147,7 +147,7 @@ public class HorizontalPack
 		double minSizeTotal = 0.0, prefSizeTotal = 0.0;
 		if ( children.length > 0 )
 		{
-			for (TSBox child: children)
+			for (LBox child: children)
 			{
 				minSizeTotal += child.getMinWidth();
 				prefSizeTotal += child.getPrefWidth();
@@ -155,12 +155,12 @@ public class HorizontalPack
 		}
 		double minSpacingTotal = box.getMinWidth() - minSizeTotal; 
 
-		if ( box.allocationX >= box.getPrefWidth() * TSBox.ONE_MINUS_EPSILON )		// if allocation >= prefferred
+		if ( box.allocationX >= box.getPrefWidth() * LBox.ONE_MINUS_EPSILON )		// if allocation >= prefferred
 		{
-			if ( box.allocationX <= box.getPrefWidth() * TSBox.ONE_PLUS_EPSILON  ||  numExpand == 0 )			// if allocation == preferred   or   numExpand == 0
+			if ( box.allocationX <= box.getPrefWidth() * LBox.ONE_PLUS_EPSILON  ||  numExpand == 0 )			// if allocation == preferred   or   numExpand == 0
 			{
 				// Allocate children their preferred width
-				for (TSBox child: children)
+				for (LBox child: children)
 				{
 					box.allocateChildSpaceX( child, child.getPrefWidth() );
 				}
@@ -172,10 +172,10 @@ public class HorizontalPack
 				double expandPerChild = totalExpand / (double)numExpand;
 				
 				int i = 0;
-				for (TSBox child: children)
+				for (LBox child: children)
 				{
 					BoxPackingParams params = packingParams != null  ?  packingParams[i]  :  null;
-					if ( params != null  &&  TSBox.testPackFlagExpand( params.packFlags ) )
+					if ( params != null  &&  LBox.testPackFlagExpand( params.packFlags ) )
 					{
 						box.allocateChildSpaceX( child, child.getPrefWidth() + expandPerChild );
 					}
@@ -187,12 +187,12 @@ public class HorizontalPack
 				}
 			}
 		}
-		else if ( box.allocationX <= box.getMinWidth() * TSBox.ONE_PLUS_EPSILON )		// if allocation <= minimum
+		else if ( box.allocationX <= box.getMinWidth() * LBox.ONE_PLUS_EPSILON )		// if allocation <= minimum
 		{
 			// Allocation is smaller than minimum size
 			
 			// Allocate children their preferred size
-			for (TSBox child: children)
+			for (LBox child: children)
 			{
 				box.allocateChildSpaceX( child, child.getMinWidth() );
 			}
@@ -215,7 +215,7 @@ public class HorizontalPack
 			
 			if ( children.length >= 1 )
 			{
-				for (TSBox child: children)
+				for (LBox child: children)
 				{
 					double delta = child.getPrefWidth() - child.getMinWidth();
 					box.allocateChildSpaceX( child, child.getMinWidth() + delta * fraction );
@@ -226,7 +226,7 @@ public class HorizontalPack
 	
 	
 
-	public static void allocateX(TSBox box, TSBox children[], double spacing, BoxPackingParams packingParams[])
+	public static void allocateX(LBox box, LBox children[], double spacing, BoxPackingParams packingParams[])
 	{
 		// Each packed child consists of:
 		//	- start padding
@@ -242,7 +242,7 @@ public class HorizontalPack
 		double pos = 0.0;
 		for (int i = 0; i < children.length; i++)
 		{
-			TSBox child = children[i];
+			LBox child = children[i];
 
 			// Get the padding
 			BoxPackingParams params = packingParams != null  ?  packingParams[i]  :  null;
@@ -250,7 +250,7 @@ public class HorizontalPack
 			
 			// Compute the spacing
 			// Use 'preferred' spacing, if the child was allocated its preferred amount of space, or more
-			double childSpacing = ( child.allocationX >= child.prefWidth * TSBox.ONE_MINUS_EPSILON )  ?  child.prefHSpacing  :  child.minHSpacing;
+			double childSpacing = ( child.allocationX >= child.prefWidth * LBox.ONE_MINUS_EPSILON )  ?  child.prefHSpacing  :  child.minHSpacing;
 			// padding consumes child spacing
 			childSpacing = Math.max( childSpacing - padding, 0.0 );
 
@@ -269,7 +269,7 @@ public class HorizontalPack
 
 	
 	
-	public static void allocateY(TSBox box, TSBox children[], VAlignment alignment)
+	public static void allocateY(LBox box, LBox children[], VAlignment alignment)
 	{
 		if ( alignment == VAlignment.BASELINES  &&  box.bHasBaseline )
 		{
@@ -282,7 +282,7 @@ public class HorizontalPack
 			// Compute the baseline position (distribute the 'delta' around the contents)
 			double baselineY = box.getReqAscent() + delta * 0.5; 
 			
-			for (TSBox child: children)
+			for (LBox child: children)
 			{
 				double childAscent, childDescent;
 				
@@ -304,7 +304,7 @@ public class HorizontalPack
 		else
 		{
 			double allocation = Math.max( box.allocationY, box.getReqHeight() );
-			for (TSBox child: children)
+			for (LBox child: children)
 			{
 				if ( alignment == VAlignment.EXPAND )
 				{
@@ -338,13 +338,13 @@ public class HorizontalPack
 
 
 
-	public static void allocateSpaceX(TSBox box, TSBox children[], boolean bExpand)
+	public static void allocateSpaceX(LBox box, LBox children[], boolean bExpand)
 	{
 		// Compute the amount of space required
 		double minSizeTotal = 0.0, prefSizeTotal = 0.0;
 		if ( children.length > 0 )
 		{
-			for (TSBox child: children)
+			for (LBox child: children)
 			{
 				minSizeTotal += child.getMinWidth();
 				prefSizeTotal += child.getPrefWidth();
@@ -352,12 +352,12 @@ public class HorizontalPack
 		}
 		double minSpacingTotal = box.getMinWidth() - minSizeTotal; 
 
-		if ( box.allocationX >= box.getPrefWidth() * TSBox.ONE_MINUS_EPSILON )		// if allocation >= prefferred
+		if ( box.allocationX >= box.getPrefWidth() * LBox.ONE_MINUS_EPSILON )		// if allocation >= prefferred
 		{
-			if ( box.allocationX <= box.getPrefWidth() * TSBox.ONE_PLUS_EPSILON )			// if allocation == preferred
+			if ( box.allocationX <= box.getPrefWidth() * LBox.ONE_PLUS_EPSILON )			// if allocation == preferred
 			{
 				// Allocate children their preferred width
-				for (TSBox child: children)
+				for (LBox child: children)
 				{
 					box.allocateChildSpaceX( child, child.getPrefWidth() );
 				}
@@ -369,19 +369,19 @@ public class HorizontalPack
 				double expandPerChild = bExpand  ?  totalExpand / (double)children.length  :  0.0;
 				
 				int i = 0;
-				for (TSBox child: children)
+				for (LBox child: children)
 				{
 					box.allocateChildSpaceX( child, child.getPrefWidth() + expandPerChild );
 					i++;
 				}
 			}
 		}
-		else if ( box.allocationX <= box.getMinWidth() * TSBox.ONE_PLUS_EPSILON )		// if allocation <= minimum
+		else if ( box.allocationX <= box.getMinWidth() * LBox.ONE_PLUS_EPSILON )		// if allocation <= minimum
 		{
 			// Allocation is smaller than minimum size
 			
 			// Allocate children their preferred size
-			for (TSBox child: children)
+			for (LBox child: children)
 			{
 				box.allocateChildSpaceX( child, child.getMinWidth() );
 			}
@@ -404,7 +404,7 @@ public class HorizontalPack
 			
 			if ( children.length >= 1 )
 			{
-				for (TSBox child: children)
+				for (LBox child: children)
 				{
 					double delta = child.getPrefWidth() - child.getMinWidth();
 					box.allocateChildSpaceX( child, child.getMinWidth() + delta * fraction );
@@ -415,7 +415,7 @@ public class HorizontalPack
 	
 	
 
-	public static void allocateX(TSBox box, TSBox children[], double spacing, boolean bExpand)
+	public static void allocateX(LBox box, LBox children[], double spacing, boolean bExpand)
 	{
 		// Each packed child consists of:
 		//	- start padding
@@ -431,11 +431,11 @@ public class HorizontalPack
 		double pos = 0.0;
 		for (int i = 0; i < children.length; i++)
 		{
-			TSBox child = children[i];
+			LBox child = children[i];
 
 			// Compute the spacing
 			// Use 'preferred' spacing, if the child was allocated its preferred amount of space, or more
-			double childSpacing = ( child.allocationX >= child.prefWidth * TSBox.ONE_MINUS_EPSILON )  ?  child.prefHSpacing  :  child.minHSpacing;
+			double childSpacing = ( child.allocationX >= child.prefWidth * LBox.ONE_MINUS_EPSILON )  ?  child.prefHSpacing  :  child.minHSpacing;
 			// padding consumes child spacing
 			childSpacing = Math.max( childSpacing, 0.0 );
 

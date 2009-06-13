@@ -4,11 +4,11 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.DocPresent.Typesetting;
+package BritefuryJ.DocPresent.Layout;
 
-public class VerticalPack
+public class VerticalLayout
 {
-	public static void computeRequisitionX(TSBox box, TSBox children[])
+	public static void computeRequisitionX(LBox box, LBox children[])
 	{
 		// The resulting box should have the following properties:
 		// - maximum width of all children
@@ -19,7 +19,7 @@ public class VerticalPack
 		
 		double minWidth = 0.0, minAdvance = 0.0;
 		double prefWidth = 0.0, prefAdvance = 0.0;
-		for (TSBox child: children)
+		for (LBox child: children)
 		{
 			double childMinAdvance = child.minWidth + child.minHSpacing;
 			double childPrefAdvance = child.prefWidth + child.prefHSpacing;
@@ -32,7 +32,7 @@ public class VerticalPack
 		box.setRequisitionX( minWidth, prefWidth, minAdvance - minWidth, prefAdvance - prefWidth );
 	}
 
-	public static void computeRequisitionY(TSBox box, TSBox children[], double spacing, BoxPackingParams packingParams[])
+	public static void computeRequisitionY(LBox box, LBox children[], double spacing, BoxPackingParams packingParams[])
 	{
 		// Accumulate the width required for all the children
 		
@@ -49,7 +49,7 @@ public class VerticalPack
 		double reqY = 0.0;
 		for (int i = 0; i < children.length; i++)
 		{
-			TSBox chBox = children[i];
+			LBox chBox = children[i];
 			
 			BoxPackingParams params = packingParams != null  ?  packingParams[i]  :  null;
 			double padding = params != null  ?  params.padding  :  0.0;
@@ -67,10 +67,10 @@ public class VerticalPack
 
 
 
-	public static void allocateX(TSBox box, TSBox children[], HAlignment alignment)
+	public static void allocateX(LBox box, LBox children[], HAlignment alignment)
 	{
 		double allocation = Math.max( box.allocationX, box.minWidth );
-		for (TSBox child: children)
+		for (LBox child: children)
 		{
 			if ( alignment == HAlignment.EXPAND )
 			{
@@ -103,7 +103,7 @@ public class VerticalPack
 	
 	
 	
-	public static void allocateSpaceY(TSBox box, TSBox children[], BoxPackingParams packingParams[])
+	public static void allocateSpaceY(LBox box, LBox children[], BoxPackingParams packingParams[])
 	{
 		int numExpand = 0;
 		
@@ -115,7 +115,7 @@ public class VerticalPack
 			{
 				if ( params != null )
 				{
-					if ( TSBox.testPackFlagExpand( params.packFlags ) )
+					if ( LBox.testPackFlagExpand( params.packFlags ) )
 					{
 						numExpand++;
 					}
@@ -128,18 +128,18 @@ public class VerticalPack
 		double reqSizeTotal = 0.0;
 		if ( children.length > 0 )
 		{
-			for (TSBox child: children)
+			for (LBox child: children)
 			{
 				reqSizeTotal += child.getReqHeight();
 			}
 		}
 
-		if ( box.allocationY >= box.getReqHeight() * TSBox.ONE_MINUS_EPSILON )		// if allocation >= required
+		if ( box.allocationY >= box.getReqHeight() * LBox.ONE_MINUS_EPSILON )		// if allocation >= required
 		{
-			if ( box.allocationY <= box.getReqHeight() * TSBox.ONE_PLUS_EPSILON  ||  numExpand == 0 )			// if allocation == preferred   or   numExpand == 0
+			if ( box.allocationY <= box.getReqHeight() * LBox.ONE_PLUS_EPSILON  ||  numExpand == 0 )			// if allocation == preferred   or   numExpand == 0
 			{
 				// Allocate children their preferred width
-				for (TSBox child: children)
+				for (LBox child: children)
 				{
 					box.allocateChildSpaceY( child, child.getReqHeight() );
 				}
@@ -151,10 +151,10 @@ public class VerticalPack
 				double expandPerChild = totalExpand / (double)numExpand;
 				
 				int i = 0;
-				for (TSBox child: children)
+				for (LBox child: children)
 				{
 					BoxPackingParams params = packingParams != null  ?  packingParams[i]  :  null;
-					if ( params != null  &&  TSBox.testPackFlagExpand( params.packFlags ) )
+					if ( params != null  &&  LBox.testPackFlagExpand( params.packFlags ) )
 					{
 						box.allocateChildSpaceY( child, child.getReqHeight() + expandPerChild );
 					}
@@ -171,14 +171,14 @@ public class VerticalPack
 			// Allocation is smaller than required size
 			
 			// Allocate children their required size
-			for (TSBox child: children)
+			for (LBox child: children)
 			{
 				box.allocateChildSpaceY( child, child.getReqHeight() );
 			}
 		}
 	}
 	
-	public static void allocateY(TSBox box, TSBox children[], double spacing, BoxPackingParams packingParams[])
+	public static void allocateY(LBox box, LBox children[], double spacing, BoxPackingParams packingParams[])
 	{
 		// Each packed child consists of:
 		//	- start padding
@@ -194,7 +194,7 @@ public class VerticalPack
 		double pos = 0.0;
 		for (int i = 0; i < children.length; i++)
 		{
-			TSBox child = children[i];
+			LBox child = children[i];
 
 			// Get the padding
 			BoxPackingParams params = packingParams != null  ?  packingParams[i]  :  null;
@@ -219,24 +219,24 @@ public class VerticalPack
 
 
 
-	public static void allocateSpaceY(TSBox box, TSBox children[], boolean bExpand)
+	public static void allocateSpaceY(LBox box, LBox children[], boolean bExpand)
 	{
 		// Compute the amount of space required
 		double reqSizeTotal = 0.0;
 		if ( children.length > 0 )
 		{
-			for (TSBox child: children)
+			for (LBox child: children)
 			{
 				reqSizeTotal += child.getReqHeight();
 			}
 		}
 
-		if ( box.allocationY >= box.getReqHeight() * TSBox.ONE_MINUS_EPSILON )		// if allocation >= required
+		if ( box.allocationY >= box.getReqHeight() * LBox.ONE_MINUS_EPSILON )		// if allocation >= required
 		{
-			if ( box.allocationY <= box.getReqHeight() * TSBox.ONE_PLUS_EPSILON )			// if allocation == preferred   or   numExpand == 0
+			if ( box.allocationY <= box.getReqHeight() * LBox.ONE_PLUS_EPSILON )			// if allocation == preferred   or   numExpand == 0
 			{
 				// Allocate children their preferred width
-				for (TSBox child: children)
+				for (LBox child: children)
 				{
 					box.allocateChildSpaceY( child, child.getReqHeight() );
 				}
@@ -248,7 +248,7 @@ public class VerticalPack
 				double expandPerChild = bExpand  ?  totalExpand / (double)children.length  :  0.0;
 				
 				int i = 0;
-				for (TSBox child: children)
+				for (LBox child: children)
 				{
 					box.allocateChildSpaceY( child, child.getReqHeight() + expandPerChild );
 					i++;
@@ -260,14 +260,14 @@ public class VerticalPack
 			// Allocation is smaller than required size
 			
 			// Allocate children their required size
-			for (TSBox child: children)
+			for (LBox child: children)
 			{
 				box.allocateChildSpaceY( child, child.getReqHeight() );
 			}
 		}
 	}
 	
-	public static void allocateY(TSBox box, TSBox children[], double spacing, boolean bExpand)
+	public static void allocateY(LBox box, LBox children[], double spacing, boolean bExpand)
 	{
 		// Each packed child consists of:
 		//	- start padding
@@ -283,7 +283,7 @@ public class VerticalPack
 		double pos = 0.0;
 		for (int i = 0; i < children.length; i++)
 		{
-			TSBox child = children[i];
+			LBox child = children[i];
 
 			// Compute the spacing; padding consumes child spacing
 			double childSpacing = Math.max( child.reqVSpacing, 0.0 );

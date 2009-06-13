@@ -4,40 +4,40 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.DocPresent.Typesetting;
+package BritefuryJ.DocPresent.Layout;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ParagraphPack
+public class ParagraphLayout
 {
 	public static class Line
 	{
-		public TSBox lineBox;
-		public TSBox children[];
+		public LBox lineBox;
+		public LBox children[];
 		
 		
-		private Line(TSBox ch[], double indentation, double spacing, BoxPackingParams packingParams[], double allocation)
+		private Line(LBox ch[], double indentation, double spacing, BoxPackingParams packingParams[], double allocation)
 		{
 			children = ch;
 			
-			lineBox = new TSBox();
-			HorizontalPack.computeRequisitionX( lineBox, children, spacing, packingParams );
+			lineBox = new LBox();
+			HorizontalLayout.computeRequisitionX( lineBox, children, spacing, packingParams );
 			lineBox.allocationX = allocation - indentation;
-			HorizontalPack.allocateX( lineBox, children, spacing, packingParams );
-			for (TSBox child: children)
+			HorizontalLayout.allocateX( lineBox, children, spacing, packingParams );
+			for (LBox child: children)
 			{
 				child.positionInParentSpaceX += indentation;
 			}
 		}
 		
 		
-		public TSBox getLineBox()
+		public LBox getLineBox()
 		{
 			return lineBox;
 		}
 		
-		public TSBox[] getChildBoxes()
+		public LBox[] getChildBoxes()
 		{
 			return children;
 		}
@@ -45,18 +45,18 @@ public class ParagraphPack
 		
 		private void computeRequisitionY(VAlignment vAlignment)
 		{
-			HorizontalPack.computeRequisitionY( lineBox, children, vAlignment );
+			HorizontalLayout.computeRequisitionY( lineBox, children, vAlignment );
 		}
 
 		private void allocateY(VAlignment vAlignment)
 		{
-			HorizontalPack.allocateY( lineBox, children, vAlignment );
+			HorizontalLayout.allocateY( lineBox, children, vAlignment );
 		}
 	}
 	
 	
 
-	public static void computeRequisitionX(TSBox box, TSBox children[], double indentation, double hSpacing, BoxPackingParams packingParams[])
+	public static void computeRequisitionX(LBox box, LBox children[], double indentation, double hSpacing, BoxPackingParams packingParams[])
 	{
 		// Accumulate the width required for all the children
 		
@@ -73,7 +73,7 @@ public class ParagraphPack
 		double minX = 0.0, lineX = 0.0, prefX = 0.0;
 		for (int i = 0; i < children.length; i++)
 		{
-			TSBox child = children[i];
+			LBox child = children[i];
 			
 			BoxPackingParams params = packingParams != null  ?  packingParams[i]  :  null;
 			double padding = params != null  ?  params.padding  :  0.0;
@@ -116,9 +116,9 @@ public class ParagraphPack
 	}
 
 	
-	public static void computeRequisitionY(TSBox box, List<Line> lines, double vSpacing, VAlignment vAlignment)
+	public static void computeRequisitionY(LBox box, List<Line> lines, double vSpacing, VAlignment vAlignment)
 	{
-		TSBox lineBoxes[] = new TSBox[lines.size()];
+		LBox lineBoxes[] = new LBox[lines.size()];
 		
 		int i = 0;
 		for (Line line: lines)
@@ -127,13 +127,13 @@ public class ParagraphPack
 			lineBoxes[i++] = line.lineBox;
 		}
 		
-		VerticalPack.computeRequisitionY( box, lineBoxes, vSpacing, null );
+		VerticalLayout.computeRequisitionY( box, lineBoxes, vSpacing, null );
 	}
 
 
 
 
-	public static ArrayList<Line> allocateX(TSBox box, TSBox children[], double indentation, double hSpacing, BoxPackingParams packingParams[])
+	public static ArrayList<Line> allocateX(LBox box, LBox children[], double indentation, double hSpacing, BoxPackingParams packingParams[])
 	{
 		boolean bFirstLine = true;
 		
@@ -144,17 +144,17 @@ public class ParagraphPack
 		double lineAdvance = 0.0;
 		double lineX = 0.0;
 		
-		TSBox bestLineBreak = null;
+		LBox bestLineBreak = null;
 		int bestLineBreakIndex = -1;
 		double xAtBestLineBreak = 0.0, xAfterBestLineBreak = 0.0;
 		
-		TSBox lastLineBreak = null;
+		LBox lastLineBreak = null;
 		int lastLineBreakIndex = -1;
 		double xAfterLastLineBreak = 0.0;
 		
 		for (int i = 0; i < children.length; i++)
 		{
-			TSBox child = children[i];
+			LBox child = children[i];
 			
 			BoxPackingParams params = packingParams != null  ?  packingParams[i]  :  null;
 			double padding = params != null  ?  params.padding  :  0.0;
@@ -217,7 +217,7 @@ public class ParagraphPack
 				
 				// Build a list of child boxes for the line
 				int lineLength = lineBreakIndex - lineStartIndex;
-				TSBox lineChildren[] = new TSBox[lineLength];
+				LBox lineChildren[] = new LBox[lineLength];
 				System.arraycopy( children, lineStartIndex, lineChildren, 0, lineLength );
 				BoxPackingParams linePackingParams[] =  null;
 				if ( packingParams != null )
@@ -246,7 +246,7 @@ public class ParagraphPack
 		{
 			// Create the last line
 			int lineLength = children.length - lineStartIndex;
-			TSBox lineChildren[] = new TSBox[lineLength];
+			LBox lineChildren[] = new LBox[lineLength];
 			System.arraycopy( children, lineStartIndex, lineChildren, 0, lineLength );
 			BoxPackingParams linePackingParams[] =  null;
 			if ( packingParams != null )
@@ -265,9 +265,9 @@ public class ParagraphPack
 
 
 
-	public static void allocateY(TSBox box, List<Line> lines, double vSpacing, VAlignment vAlignment)
+	public static void allocateY(LBox box, List<Line> lines, double vSpacing, VAlignment vAlignment)
 	{
-		TSBox lineBoxes[] = new TSBox[lines.size()];
+		LBox lineBoxes[] = new LBox[lines.size()];
 		
 		int i = 0;
 		for (Line line: lines)
@@ -275,7 +275,7 @@ public class ParagraphPack
 			lineBoxes[i++] = line.lineBox;
 		}
 		
-		VerticalPack.allocateY( box, lineBoxes, vSpacing, null );
+		VerticalLayout.allocateY( box, lineBoxes, vSpacing, null );
 		
 		for (Line line: lines)
 		{

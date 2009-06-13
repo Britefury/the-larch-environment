@@ -4,15 +4,15 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package tests.DocPresent.Typesetting;
+package tests.DocPresent.Layout;
 
-import BritefuryJ.DocPresent.Typesetting.HAlignment;
-import BritefuryJ.DocPresent.Typesetting.TSBox;
-import BritefuryJ.DocPresent.Typesetting.TablePack;
-import BritefuryJ.DocPresent.Typesetting.TablePackingParams;
-import BritefuryJ.DocPresent.Typesetting.VAlignment;
+import BritefuryJ.DocPresent.Layout.HAlignment;
+import BritefuryJ.DocPresent.Layout.LBox;
+import BritefuryJ.DocPresent.Layout.TableLayout;
+import BritefuryJ.DocPresent.Layout.TablePackingParams;
+import BritefuryJ.DocPresent.Layout.VAlignment;
 
-public class Test_TablePack extends Test_BoxPack_base
+public class Test_TableLayout extends Test_Layout_base
 {
 	private TablePackingParams pack(int x, int y)
 	{
@@ -34,9 +34,9 @@ public class Test_TablePack extends Test_BoxPack_base
 		return new TablePackingParams( x, colspan, paddingX, y, rowspan, paddingY );
 	}
 	
-	private TSBox alloced(double x, double y, double w, double h)
+	private LBox alloced(double x, double y, double w, double h)
 	{
-		TSBox box = new TSBox();
+		LBox box = new LBox();
 		box.setAllocationX( w );
 		box.setAllocationY( h );
 		box.setPositionInParentSpaceX( x );
@@ -53,12 +53,12 @@ public class Test_TablePack extends Test_BoxPack_base
 	//
 	//
 	
-	private void tablePackReqTest(TSBox children[], TablePackingParams packingParams[], int numColumns, int numRows, double spacingX, double spacingY, boolean bExpandX, boolean bExpandY,
-			HAlignment colAlignment, VAlignment rowAlignment, TSBox expectedColumnBoxes[], TSBox expectedRowBoxes[], TSBox expectedParentBox)
+	private void tablePackReqTest(LBox children[], TablePackingParams packingParams[], int numColumns, int numRows, double spacingX, double spacingY, boolean bExpandX, boolean bExpandY,
+			HAlignment colAlignment, VAlignment rowAlignment, LBox expectedColumnBoxes[], LBox expectedRowBoxes[], LBox expectedParentBox)
 	{
-		TSBox box = new TSBox();
-		TSBox columnBoxes[] = TablePack.computeRequisitionX( box, children, packingParams, numColumns, numRows, spacingX, spacingY, bExpandX, bExpandY, colAlignment, rowAlignment );
-		TSBox rowBoxes[] = TablePack.computeRequisitionY( box, children, packingParams, numColumns, numRows, spacingX, spacingY, bExpandX, bExpandY, colAlignment, rowAlignment );
+		LBox box = new LBox();
+		LBox columnBoxes[] = TableLayout.computeRequisitionX( box, children, packingParams, numColumns, numRows, spacingX, spacingY, bExpandX, bExpandY, colAlignment, rowAlignment );
+		LBox rowBoxes[] = TableLayout.computeRequisitionY( box, children, packingParams, numColumns, numRows, spacingX, spacingY, bExpandX, bExpandY, colAlignment, rowAlignment );
 		
 		for (int i = 0; i < numColumns; i++)
 		{
@@ -102,17 +102,17 @@ public class Test_TablePack extends Test_BoxPack_base
 	{
 		// 1x1
 		tablePackReqTest(
-				new TSBox[] {
+				new LBox[] {
 						box( 10, 0, 10, 0 ) ,
 				},
 				new TablePackingParams[] {
 						pack( 0, 0 ),
 				},
 				1, 1, 0.0, 0.0, false, false, HAlignment.CENTRE, VAlignment.CENTRE,
-				new TSBox[] {
+				new LBox[] {
 						box( 10, 0, 0, 0 ),
 				},
-				new TSBox[] {
+				new LBox[] {
 						box( 0, 0, 10, 0 ),
 				},
 				box( 10, 0, 10, 0 )
@@ -121,7 +121,7 @@ public class Test_TablePack extends Test_BoxPack_base
 	
 		// 2x2
 		tablePackReqTest(
-				new TSBox[] {
+				new LBox[] {
 						box( 10, 0, 10, 0 ),		box( 5, 0, 5, 0 ),
 						box( 15, 0, 2, 0 ),		box( 4, 0, 4, 0 ),
 				},
@@ -130,10 +130,10 @@ public class Test_TablePack extends Test_BoxPack_base
 						pack( 0, 1 ),			pack( 1, 1 ),
 				},
 				2, 2, 0.0, 0.0, false, false, HAlignment.CENTRE, VAlignment.CENTRE,
-				new TSBox[] {
+				new LBox[] {
 						box( 15, 0, 0, 0 ),		box( 5, 0, 0, 0 ),
 				},
-				new TSBox[] {
+				new LBox[] {
 						box( 0, 0, 10, 0 ),
 						box( 0, 0, 4, 0 ),
 				},
@@ -143,7 +143,7 @@ public class Test_TablePack extends Test_BoxPack_base
 	
 		// 2x2 with spacing
 		tablePackReqTest(
-				new TSBox[] {
+				new LBox[] {
 						box( 10, 0, 10, 0 ),		box( 5, 0, 5, 0 ),
 						box( 15, 0, 2, 0 ),		box( 4, 0, 4, 0 ),
 				},
@@ -152,10 +152,10 @@ public class Test_TablePack extends Test_BoxPack_base
 						pack( 0, 1 ),			pack( 1, 1 ),
 				},
 				2, 2, 1.0, 1.0, false, false, HAlignment.CENTRE, VAlignment.CENTRE,
-				new TSBox[] {
+				new LBox[] {
 						box( 15, 0, 0, 0 ),		box( 5, 0, 0, 0 ),
 				},
-				new TSBox[] {
+				new LBox[] {
 						box( 0, 0, 10, 0 ),
 						box( 0, 0, 4, 0 ),
 				},
@@ -167,7 +167,7 @@ public class Test_TablePack extends Test_BoxPack_base
 		
 		// 3x3
 		tablePackReqTest(
-				new TSBox[] {
+				new LBox[] {
 						box( 10, 0, 10, 0 ),		box( 5, 0, 5, 0 ),		box( 20, 0, 5, 0 ),
 						box( 15, 0, 2, 0 ),		box( 8, 0, 4, 0 ),		box( 10, 0, 4, 0 ),
 						box( 5, 0, 4, 0 ),		box( 6, 0, 8, 0 ),		box( 10, 0, 6, 0 ),
@@ -178,10 +178,10 @@ public class Test_TablePack extends Test_BoxPack_base
 						pack( 0, 2 ),			pack( 1, 2 ),			pack( 2, 2 ),
 				},
 				3, 3, 0.0, 0.0, false, false, HAlignment.CENTRE, VAlignment.CENTRE,
-				new TSBox[] {
+				new LBox[] {
 						box( 15, 0, 0, 0 ),		box( 8, 0, 0, 0 ),		box( 20, 0, 0, 0 ),
 				},
-				new TSBox[] {
+				new LBox[] {
 						box( 0, 0, 10, 0 ),
 						box( 0, 0, 4, 0 ),
 						box( 0, 0, 8, 0 ),
@@ -193,7 +193,7 @@ public class Test_TablePack extends Test_BoxPack_base
 	
 		// 3x3 with spacing
 		tablePackReqTest(
-				new TSBox[] {
+				new LBox[] {
 						box( 10, 0, 10, 0 ),		box( 5, 0, 5, 0 ),		box( 20, 0, 5, 0 ),
 						box( 15, 0, 2, 0 ),		box( 8, 0, 4, 0 ),		box( 10, 0, 4, 0 ),
 						box( 5, 0, 4, 0 ),		box( 6, 0, 8, 0 ),		box( 10, 0, 6, 0 ),
@@ -204,10 +204,10 @@ public class Test_TablePack extends Test_BoxPack_base
 						pack( 0, 2 ),			pack( 1, 2 ),			pack( 2, 2 ),
 				},
 				3, 3, 1.0, 2.0, false, false, HAlignment.CENTRE, VAlignment.CENTRE,
-				new TSBox[] {
+				new LBox[] {
 						box( 15, 0, 0, 0 ),		box( 8, 0, 0, 0 ),		box( 20, 0, 0, 0 ),
 				},
-				new TSBox[] {
+				new LBox[] {
 						box( 0, 0, 10, 0 ),
 						box( 0, 0, 4, 0 ),
 						box( 0, 0, 8, 0 ),
@@ -220,7 +220,7 @@ public class Test_TablePack extends Test_BoxPack_base
 	
 		// 3x3 with a gap
 		tablePackReqTest(
-				new TSBox[] {
+				new LBox[] {
 						box( 10, 0, 10, 0 ),		box( 5, 0, 5, 0 ),		box( 20, 0, 5, 0 ),
 						box( 15, 0, 2, 0 ),							box( 10, 0, 4, 0 ),
 						box( 5, 0, 4, 0 ),		box( 6, 0, 8, 0 ),		box( 10, 0, 6, 0 ),
@@ -231,10 +231,10 @@ public class Test_TablePack extends Test_BoxPack_base
 						pack( 0, 2 ),			pack( 1, 2 ),			pack( 2, 2 ),
 				},
 				3, 3, 0.0, 0.0, false, false, HAlignment.CENTRE, VAlignment.CENTRE,
-				new TSBox[] {
+				new LBox[] {
 						box( 15, 0, 0, 0 ),		box( 6, 0, 0, 0 ),		box( 20, 0, 0, 0 ),
 				},
-				new TSBox[] {
+				new LBox[] {
 						box( 0, 0, 10, 0 ),
 						box( 0, 0, 4, 0 ),
 						box( 0, 0, 8, 0 ),
@@ -247,7 +247,7 @@ public class Test_TablePack extends Test_BoxPack_base
 		
 		// 3x3 with a gap and a child with colspan
 		tablePackReqTest(
-				new TSBox[] {
+				new LBox[] {
 						box( 10, 0, 10, 0 ),		box( 5, 0, 5, 0 ),		box( 20, 0, 5, 0 ),
 						box( 15, 0, 2, 0 ),		box( 40, 0, 6, 0 ),
 						box( 5, 0, 4, 0 ),		box( 10, 0, 8, 0 ),		box( 10, 0, 6, 0 ),
@@ -258,10 +258,10 @@ public class Test_TablePack extends Test_BoxPack_base
 						pack( 0, 2 ),			pack( 1, 2 ),			pack( 2, 2 ),
 				},
 				3, 3, 0.0, 0.0, false, false, HAlignment.CENTRE, VAlignment.CENTRE,
-				new TSBox[] {
+				new LBox[] {
 						box( 15, 0, 0, 0 ),		box( 15, 0, 0, 0 ),		box( 25, 0, 0, 0 ),
 				},
-				new TSBox[] {
+				new LBox[] {
 						box( 0, 0, 10, 0 ),
 						box( 0, 0, 6, 0 ),
 						box( 0, 0, 8, 0 ),
@@ -274,7 +274,7 @@ public class Test_TablePack extends Test_BoxPack_base
 		
 		// 3x3 with a gap and a child with rowspan
 		tablePackReqTest(
-				new TSBox[] {
+				new LBox[] {
 						box( 10, 0, 10, 0 ),		box( 5, 0, 5, 0 ),		box( 20, 0, 5, 0 ),
 						box( 15, 0, 2, 0 ),		box( 8, 0, 20, 0 ),		box( 10, 0, 4, 0 ),
 						box( 5, 0, 4, 0 ),							box( 10, 0, 6, 0 ),
@@ -285,10 +285,10 @@ public class Test_TablePack extends Test_BoxPack_base
 						pack( 0, 2 ),								pack( 2, 2 ),
 				},
 				3, 3, 0.0, 0.0, false, false, HAlignment.CENTRE, VAlignment.CENTRE,
-				new TSBox[] {
+				new LBox[] {
 						box( 15, 0, 0, 0 ),		box( 8, 0, 0, 0 ),		box( 20, 0, 0, 0 ),
 				},
-				new TSBox[] {
+				new LBox[] {
 						box( 0, 0, 10, 0 ),
 						box( 0, 0, 9, 0 ),
 						box( 0, 0, 11, 0 ),
@@ -301,7 +301,7 @@ public class Test_TablePack extends Test_BoxPack_base
 		
 		// 3x3 with caps and a child with colspan and rowspan
 		tablePackReqTest(
-				new TSBox[] {
+				new LBox[] {
 						box( 10, 0, 10, 0 ),		box( 5, 0, 5, 0 ),		box( 20, 0, 5, 0 ),
 						box( 15, 0, 2, 0 ),		box( 35, 0, 20, 0 ),		
 						box( 5, 0, 4, 0 ),							
@@ -312,10 +312,10 @@ public class Test_TablePack extends Test_BoxPack_base
 						pack( 0, 2 ),								
 				},
 				3, 3, 0.0, 0.0, false, false, HAlignment.CENTRE, VAlignment.CENTRE,
-				new TSBox[] {
+				new LBox[] {
 						box( 15, 0, 0, 0 ),		box( 10, 0, 0, 0 ),		box( 25, 0, 0, 0 ),
 				},
-				new TSBox[] {
+				new LBox[] {
 						box( 0, 0, 10, 0 ),
 						box( 0, 0, 9, 0 ),
 						box( 0, 0, 11, 0 ),
@@ -328,7 +328,7 @@ public class Test_TablePack extends Test_BoxPack_base
 		
 		// 3x3 with baseline v-alignment
 		tablePackReqTest(
-				new TSBox[] {
+				new LBox[] {
 						box( 10, 0, 10, 0 ),		box( 5, 0, 5, 0 ),		box( 20, 0, 5, 0 ),
 						box( 15, 0, 4, 4, 0 ),		box( 8, 0, 2, 6, 0 ),		box( 10, 0, 5, 2, 0 ),
 						box( 5, 0, 4, 0 ),		box( 6, 0, 8, 0 ),		box( 10, 0, 6, 0 ),
@@ -339,10 +339,10 @@ public class Test_TablePack extends Test_BoxPack_base
 						pack( 0, 2 ),			pack( 1, 2 ),			pack( 2, 2 ),
 				},
 				3, 3, 0.0, 0.0, false, false, HAlignment.CENTRE, VAlignment.BASELINES,
-				new TSBox[] {
+				new LBox[] {
 						box( 15, 0, 0, 0 ),		box( 8, 0, 0, 0 ),		box( 20, 0, 0, 0 ),
 				},
-				new TSBox[] {
+				new LBox[] {
 						box( 0, 0, 5, 5, 0 ),
 						box( 0, 0, 5, 6, 0 ),
 						box( 0, 0, 4, 4, 0 ),
@@ -361,11 +361,11 @@ public class Test_TablePack extends Test_BoxPack_base
 	//
 	//
 	
-	private void tablePackAllocTest(TSBox children[], TablePackingParams packingParams[], int numColumns, int numRows, double spacingX, double spacingY, boolean bExpandX, boolean bExpandY,
+	private void tablePackAllocTest(LBox children[], TablePackingParams packingParams[], int numColumns, int numRows, double spacingX, double spacingY, boolean bExpandX, boolean bExpandY,
 			HAlignment colAlignment, VAlignment rowAlignment,
-			double allocX, double allocY, TSBox expectedChildAllocations[], TSBox expectedColAllocations[], TSBox expectedRowAllocations[])
+			double allocX, double allocY, LBox expectedChildAllocations[], LBox expectedColAllocations[], LBox expectedRowAllocations[])
 	{
-		TSBox expectedChildren[] = new TSBox[children.length];
+		LBox expectedChildren[] = new LBox[children.length];
 		for (int i = 0; i < children.length; i++)
 		{
 			expectedChildren[i] = children[i].copy();
@@ -373,20 +373,20 @@ public class Test_TablePack extends Test_BoxPack_base
 		}
 
 		
-		TSBox box = new TSBox();
+		LBox box = new LBox();
 
-		TSBox columnBoxes[] = TablePack.computeRequisitionX( box, children, packingParams, numColumns, numRows, spacingX, spacingY, bExpandX, bExpandY, colAlignment, rowAlignment );
+		LBox columnBoxes[] = TableLayout.computeRequisitionX( box, children, packingParams, numColumns, numRows, spacingX, spacingY, bExpandX, bExpandY, colAlignment, rowAlignment );
 		
 		box.setAllocationX( allocX );
-		TablePack.allocateX( box, columnBoxes, children, packingParams, numColumns, numRows, spacingX, spacingY, bExpandX, bExpandY, colAlignment, rowAlignment );
-		TSBox rowBoxes[] = TablePack.computeRequisitionY( box, children, packingParams, numColumns, numRows, spacingX, spacingY, bExpandX, bExpandY, colAlignment, rowAlignment);
+		TableLayout.allocateX( box, columnBoxes, children, packingParams, numColumns, numRows, spacingX, spacingY, bExpandX, bExpandY, colAlignment, rowAlignment );
+		LBox rowBoxes[] = TableLayout.computeRequisitionY( box, children, packingParams, numColumns, numRows, spacingX, spacingY, bExpandX, bExpandY, colAlignment, rowAlignment);
 		box.setAllocationY( allocY );
-		TablePack.allocateY( box, rowBoxes, children, packingParams, numColumns, numRows, spacingX, spacingY, bExpandX, bExpandY, colAlignment, rowAlignment );
+		TableLayout.allocateY( box, rowBoxes, children, packingParams, numColumns, numRows, spacingX, spacingY, bExpandX, bExpandY, colAlignment, rowAlignment );
 		
 		
 		for (int i = 0; i < numColumns; i++)
 		{
-			TSBox expectedColumnBox = columnBoxes[i].copy();
+			LBox expectedColumnBox = columnBoxes[i].copy();
 			expectedColumnBox.setAllocationFrom( expectedColAllocations[i] );
 			if ( !columnBoxes[i].equals( expectedColumnBox ) )
 			{
@@ -401,7 +401,7 @@ public class Test_TablePack extends Test_BoxPack_base
 		
 		for (int i = 0; i < numRows; i++)
 		{
-			TSBox expectedRowBox = rowBoxes[i].copy();
+			LBox expectedRowBox = rowBoxes[i].copy();
 			expectedRowBox.setAllocationFrom( expectedRowAllocations[i] );
 			if ( !rowBoxes[i].equals( expectedRowBox ) )
 			{
@@ -437,7 +437,7 @@ public class Test_TablePack extends Test_BoxPack_base
 	{
 		// 1x1
 		tablePackAllocTest(
-				new TSBox[] {
+				new LBox[] {
 						box( 10, 0, 10, 0 ) ,
 				},
 				new TablePackingParams[] {
@@ -445,20 +445,20 @@ public class Test_TablePack extends Test_BoxPack_base
 				},
 				1, 1, 0.0, 0.0, false, false, HAlignment.LEFT, VAlignment.TOP,
 				10, 10,
-				new TSBox[] {
+				new LBox[] {
 						alloced( 0, 0, 10, 10 ),
 				},
-				new TSBox[] {
+				new LBox[] {
 						alloced( 0, 0, 10, 0 ),
 				},
-				new TSBox[] {
+				new LBox[] {
 						alloced( 0, 0, 0, 10 ),
 				}
 			);
 
 		// 1x1, extra space, left-top
 		tablePackAllocTest(
-				new TSBox[] {
+				new LBox[] {
 						box( 10, 0, 10, 0 ) ,
 				},
 				new TablePackingParams[] {
@@ -466,20 +466,20 @@ public class Test_TablePack extends Test_BoxPack_base
 				},
 				1, 1, 0.0, 0.0, true, true, HAlignment.LEFT, VAlignment.TOP,
 				20, 20,
-				new TSBox[] {
+				new LBox[] {
 						alloced( 0, 0, 10, 10 ),
 				},
-				new TSBox[] {
+				new LBox[] {
 						alloced( 0, 0, 20, 0 ),
 				},
-				new TSBox[] {
+				new LBox[] {
 						alloced( 0, 0, 0, 20 ),
 				}
 			);
 
 		// 1x1, extra space, centre-centre
 		tablePackAllocTest(
-				new TSBox[] {
+				new LBox[] {
 						box( 10, 0, 10, 0 ) ,
 				},
 				new TablePackingParams[] {
@@ -487,20 +487,20 @@ public class Test_TablePack extends Test_BoxPack_base
 				},
 				1, 1, 0.0, 0.0, true, true, HAlignment.CENTRE, VAlignment.CENTRE,
 				20, 20,
-				new TSBox[] {
+				new LBox[] {
 						alloced( 5, 5, 10, 10 ),
 				},
-				new TSBox[] {
+				new LBox[] {
 						alloced( 0, 0, 20, 0 ),
 				},
-				new TSBox[] {
+				new LBox[] {
 						alloced( 0, 0, 0, 20 ),
 				}
 			);
 
 		// 1x1, extra space, right-bottom
 		tablePackAllocTest(
-				new TSBox[] {
+				new LBox[] {
 						box( 10, 0, 10, 0 ) ,
 				},
 				new TablePackingParams[] {
@@ -508,20 +508,20 @@ public class Test_TablePack extends Test_BoxPack_base
 				},
 				1, 1, 0.0, 0.0, true, true, HAlignment.RIGHT, VAlignment.BOTTOM,
 				20, 20,
-				new TSBox[] {
+				new LBox[] {
 						alloced( 10, 10, 10, 10 ),
 				},
-				new TSBox[] {
+				new LBox[] {
 						alloced( 0, 0, 20, 0 ),
 				},
-				new TSBox[] {
+				new LBox[] {
 						alloced( 0, 0, 0, 20 ),
 				}
 			);
 
 		// 1x1, extra space, expand-expand
 		tablePackAllocTest(
-				new TSBox[] {
+				new LBox[] {
 						box( 10, 0, 10, 0 ) ,
 				},
 				new TablePackingParams[] {
@@ -529,13 +529,13 @@ public class Test_TablePack extends Test_BoxPack_base
 				},
 				1, 1, 0.0, 0.0, true, true, HAlignment.EXPAND, VAlignment.EXPAND,
 				20, 20,
-				new TSBox[] {
+				new LBox[] {
 						alloced( 0, 0, 20, 20 ),
 				},
-				new TSBox[] {
+				new LBox[] {
 						alloced( 0, 0, 20, 0 ),
 				},
-				new TSBox[] {
+				new LBox[] {
 						alloced( 0, 0, 0, 20 ),
 				}
 			);
@@ -544,7 +544,7 @@ public class Test_TablePack extends Test_BoxPack_base
 	
 		// 3x3, extra space, no expand, top-left alignment
 		tablePackAllocTest(
-				new TSBox[] {
+				new LBox[] {
 						box( 10, 0, 10, 0 ),		box( 5, 0, 5, 0 ),		box( 5, 0, 5, 0 ),
 						box( 5, 0, 2, 0 ),		box( 4, 0, 5, 0 ),		box( 10, 0, 4, 0 ),
 						box( 5, 0, 2, 0 ),		box( 2, 0, 2, 0 ),		box( 10, 0, 5, 0 ),
@@ -556,15 +556,15 @@ public class Test_TablePack extends Test_BoxPack_base
 				},
 				3, 3, 0.0, 0.0, false, false, HAlignment.LEFT, VAlignment.TOP,
 				40, 35,
-				new TSBox[] {
+				new LBox[] {
 						alloced( 0, 0, 10, 10 ),	alloced( 10, 0, 5, 5 ),		alloced( 15, 0, 5, 5 ),
 						alloced( 0, 10, 5, 2 ),		alloced( 10, 10, 4, 5 ),	alloced( 15, 10, 10, 4 ),
 						alloced( 0, 15, 5, 2 ),		alloced( 10, 15, 2, 2 ),	alloced( 15, 15, 10, 5 ),
 				},
-				new TSBox[] {
+				new LBox[] {
 						alloced( 0, 0, 10, 0 ),		alloced( 10, 0, 5, 0 ),		alloced( 15, 0, 10, 0 ),
 				},
-				new TSBox[] {
+				new LBox[] {
 						alloced( 0, 0, 0, 10 ),
 						alloced( 0, 10, 0, 5 ),
 						alloced( 0, 15, 0, 5 ),
@@ -578,7 +578,7 @@ public class Test_TablePack extends Test_BoxPack_base
 		
 		// 3x3, extra space, no expand, expand-expand alignment
 		tablePackAllocTest(
-				new TSBox[] {
+				new LBox[] {
 						box( 10, 0, 10, 0 ),		box( 5, 0, 5, 0 ),		box( 5, 0, 5, 0 ),
 						box( 5, 0, 2, 0 ),		box( 4, 0, 5, 0 ),		box( 10, 0, 4, 0 ),
 						box( 5, 0, 2, 0 ),		box( 2, 0, 2, 0 ),		box( 10, 0, 5, 0 ),
@@ -590,15 +590,15 @@ public class Test_TablePack extends Test_BoxPack_base
 				},
 				3, 3, 0.0, 0.0, false, false, HAlignment.EXPAND, VAlignment.EXPAND,
 				40, 35,
-				new TSBox[] {
+				new LBox[] {
 						alloced( 0, 0, 10, 10 ),	alloced( 10, 0, 5, 10 ),	alloced( 15, 0, 10, 10 ),
 						alloced( 0, 10, 10, 5 ),	alloced( 10, 10, 5, 5 ),	alloced( 15, 10, 10, 5 ),
 						alloced( 0, 15, 10, 5 ),	alloced( 10, 15, 5, 5 ),	alloced( 15, 15, 10, 5 ),
 				},
-				new TSBox[] {
+				new LBox[] {
 						alloced( 0, 0, 10, 0 ),		alloced( 10, 0, 5, 0 ),		alloced( 15, 0, 10, 0 ),
 				},
-				new TSBox[] {
+				new LBox[] {
 						alloced( 0, 0, 0, 10 ),
 						alloced( 0, 10, 0, 5 ),
 						alloced( 0, 15, 0, 5 ),
@@ -612,7 +612,7 @@ public class Test_TablePack extends Test_BoxPack_base
 		
 		// 3x3, extra space, expand in x and y, top-left alignment
 		tablePackAllocTest(
-				new TSBox[] {
+				new LBox[] {
 						box( 10, 0, 10, 0 ),		box( 5, 0, 5, 0 ),		box( 5, 0, 5, 0 ),
 						box( 5, 0, 2, 0 ),		box( 4, 0, 5, 0 ),		box( 10, 0, 4, 0 ),
 						box( 5, 0, 2, 0 ),		box( 2, 0, 2, 0 ),		box( 10, 0, 5, 0 ),
@@ -624,15 +624,15 @@ public class Test_TablePack extends Test_BoxPack_base
 				},
 				3, 3, 0.0, 0.0, true, true, HAlignment.LEFT, VAlignment.TOP,
 				40, 35,
-				new TSBox[] {
+				new LBox[] {
 						alloced( 0, 0, 10, 10 ),	alloced( 15, 0, 5, 5 ),		alloced( 25, 0, 5, 5 ),
 						alloced( 0, 15, 5, 2 ),		alloced( 15, 15, 4, 5 ),	alloced( 25, 15, 10, 4 ),
 						alloced( 0, 25, 5, 2 ),		alloced( 15, 25, 2, 2 ),	alloced( 25, 25, 10, 5 ),
 				},
-				new TSBox[] {
+				new LBox[] {
 						alloced( 0, 0, 15, 0 ),		alloced( 15, 0, 10, 0 ),	alloced( 25, 0, 15, 0 ),
 				},
-				new TSBox[] {
+				new LBox[] {
 						alloced( 0, 0, 0, 15 ),
 						alloced( 0, 15, 0, 10 ),
 						alloced( 0, 25, 0, 10 ),
@@ -645,7 +645,7 @@ public class Test_TablePack extends Test_BoxPack_base
 		
 		// 3x3, extra space, expand in x and y, expand-expand alignment
 		tablePackAllocTest(
-				new TSBox[] {
+				new LBox[] {
 						box( 10, 0, 10, 0 ),		box( 5, 0, 5, 0 ),		box( 5, 0, 5, 0 ),
 						box( 5, 0, 2, 0 ),		box( 4, 0, 5, 0 ),		box( 10, 0, 4, 0 ),
 						box( 5, 0, 2, 0 ),		box( 2, 0, 2, 0 ),		box( 10, 0, 5, 0 ),
@@ -657,15 +657,15 @@ public class Test_TablePack extends Test_BoxPack_base
 				},
 				3, 3, 0.0, 0.0, true, true, HAlignment.EXPAND, VAlignment.EXPAND,
 				40, 35,
-				new TSBox[] {
+				new LBox[] {
 						alloced( 0, 0, 15, 15 ),	alloced( 15, 0, 10, 15 ),	alloced( 25, 0, 15, 15 ),
 						alloced( 0, 15, 15, 10 ),	alloced( 15, 15, 10, 10 ),	alloced( 25, 15, 15, 10 ),
 						alloced( 0, 25, 15, 10 ),	alloced( 15, 25, 10, 10 ),	alloced( 25, 25, 15, 10 ),
 				},
-				new TSBox[] {
+				new LBox[] {
 						alloced( 0, 0, 15, 0 ),		alloced( 15, 0, 10, 0 ),	alloced( 25, 0, 15, 0 ),
 				},
-				new TSBox[] {
+				new LBox[] {
 						alloced( 0, 0, 0, 15 ),
 						alloced( 0, 15, 0, 10 ),
 						alloced( 0, 25, 0, 10 ),
@@ -677,7 +677,7 @@ public class Test_TablePack extends Test_BoxPack_base
 		
 		// 3x3, gap, colspan and rowspan, extra space, expand in x and y, expand-expand alignment
 		tablePackAllocTest(
-				new TSBox[] {
+				new LBox[] {
 						box( 10, 0, 10, 0 ),		box( 5, 0, 5, 0 ),		box( 5, 0, 5, 0 ),
 						box( 5, 0, 5, 0 ),		box( 5, 0, 5, 0 ),
 						box( 5, 0, 5, 0 ),		
@@ -689,15 +689,15 @@ public class Test_TablePack extends Test_BoxPack_base
 				},
 				3, 3, 0.0, 0.0, true, true, HAlignment.EXPAND, VAlignment.EXPAND,
 				35, 35,
-				new TSBox[] {
+				new LBox[] {
 						alloced( 0, 0, 15, 15 ),	alloced( 15, 0, 10, 15 ),	alloced( 25, 0, 10, 15 ),
 						alloced( 0, 15, 15, 10 ),	alloced( 15, 15, 20, 20 ),
 						alloced( 0, 25, 15, 10 ),
 				},
-				new TSBox[] {
+				new LBox[] {
 						alloced( 0, 0, 15, 0 ),		alloced( 15, 0, 10, 0 ),	alloced( 25, 0, 10, 0 ),
 				},
-				new TSBox[] {
+				new LBox[] {
 						alloced( 0, 0, 0, 15 ),
 						alloced( 0, 15, 0, 10 ),
 						alloced( 0, 25, 0, 10 ),
@@ -709,7 +709,7 @@ public class Test_TablePack extends Test_BoxPack_base
 		
 		// 3x3, gap, colspan and rowspan, padding, extra space, expand in x and y, expand-expand alignment
 		tablePackAllocTest(
-				new TSBox[] {
+				new LBox[] {
 						box( 10, 0, 10, 0 ),		box( 5, 0, 5, 0 ),		box( 5, 0, 5, 0 ),
 						box( 5, 0, 5, 0 ),		box( 5, 0, 5, 0 ),
 						box( 5, 0, 5, 0 ),		
@@ -721,15 +721,15 @@ public class Test_TablePack extends Test_BoxPack_base
 				},
 				3, 3, 0.0, 0.0, true, true, HAlignment.EXPAND, VAlignment.EXPAND,
 				41, 41,
-				new TSBox[] {
+				new LBox[] {
 						alloced( 1, 1, 15, 15 ),	alloced( 18, 1, 10, 15 ),	alloced( 30, 1, 10, 15 ),
 						alloced( 1, 18, 15, 10 ),	alloced( 18, 18, 22, 22 ),
 						alloced( 1, 30, 15, 10 ),
 				},
-				new TSBox[] {
+				new LBox[] {
 						alloced( 0, 0, 17, 0 ),		alloced( 17, 0, 12, 0 ),	alloced( 29, 0, 12, 0 ),
 				},
-				new TSBox[] {
+				new LBox[] {
 						alloced( 0, 0, 0, 17 ),
 						alloced( 0, 17, 0, 12 ),
 						alloced( 0, 29, 0, 12 ),
