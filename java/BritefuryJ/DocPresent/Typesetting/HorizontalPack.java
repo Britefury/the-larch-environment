@@ -334,4 +334,121 @@ public class HorizontalPack
 			}
 		}
 	}
+
+
+
+
+	public static void allocateSpaceX(TSBox box, TSBox children[], boolean bExpand)
+	{
+		// Compute the amount of space required
+		double minSizeTotal = 0.0, prefSizeTotal = 0.0;
+		if ( children.length > 0 )
+		{
+			for (TSBox child: children)
+			{
+				minSizeTotal += child.getMinWidth();
+				prefSizeTotal += child.getPrefWidth();
+			}
+		}
+		double minSpacingTotal = box.getMinWidth() - minSizeTotal; 
+
+		if ( box.allocationX >= box.getPrefWidth() * TSBox.ONE_MINUS_EPSILON )		// if allocation >= prefferred
+		{
+			if ( box.allocationX <= box.getPrefWidth() * TSBox.ONE_PLUS_EPSILON )			// if allocation == preferred
+			{
+				// Allocate children their preferred width
+				for (TSBox child: children)
+				{
+					box.allocateChildSpaceX( child, child.getPrefWidth() );
+				}
+			}
+			else
+			{
+				// Allocate children their preferred size, plus any extra to those for which the expand flag is set
+				double totalExpand = box.allocationX - box.getPrefWidth();
+				double expandPerChild = bExpand  ?  totalExpand / (double)children.length  :  0.0;
+				
+				int i = 0;
+				for (TSBox child: children)
+				{
+					box.allocateChildSpaceX( child, child.getPrefWidth() + expandPerChild );
+					i++;
+				}
+			}
+		}
+		else if ( box.allocationX <= box.getMinWidth() * TSBox.ONE_PLUS_EPSILON )		// if allocation <= minimum
+		{
+			// Allocation is smaller than minimum size
+			
+			// Allocate children their preferred size
+			for (TSBox child: children)
+			{
+				box.allocateChildSpaceX( child, child.getMinWidth() );
+			}
+		}
+		else
+		{
+			// Allocation is between minimum and preferred size
+			
+			// For spacing, use minimum spacing as opposed to preferred spacing
+			
+			// Compute the difference between the minimum and preferred sizes
+			double pref = box.getPrefWidth() - minSpacingTotal;
+			double deltaMinPref = pref - minSizeTotal;
+
+			// Compute the amount of space over the minimum that is available to share
+			double allocToShare = box.allocationX - minSpacingTotal - minSizeTotal;
+			
+			// Compute the fraction that determines the interpolation factor used to blend the minimum and preferred sizes
+			double fraction = allocToShare / deltaMinPref;
+			
+			if ( children.length >= 1 )
+			{
+				for (TSBox child: children)
+				{
+					double delta = child.getPrefWidth() - child.getMinWidth();
+					box.allocateChildSpaceX( child, child.getMinWidth() + delta * fraction );
+				}
+			}
+		}
+	}
+	
+	
+
+	public static void allocateX(TSBox box, TSBox children[], double spacing, boolean bExpand)
+	{
+		// Each packed child consists of:
+		//	- start padding
+		//	- child width
+		//	- end padding
+		//	- any remaining spacing not 'consumed' by padding; spacing - padding  or  0 if padding > spacing
+		
+		// There should be at least the specified amount of spacing between each child, or the child's own h-spacing if it is greater
+
+		allocateSpaceX( box, children, bExpand );
+		
+		double size = 0.0;
+		double pos = 0.0;
+		for (int i = 0; i < children.length; i++)
+		{
+			TSBox child = children[i];
+
+			// Compute the spacing
+			// Use 'preferred' spacing, if the child was allocated its preferred amount of space, or more
+			double childSpacing = ( child.allocationX >= child.prefWidth * TSBox.ONE_MINUS_EPSILON )  ?  child.prefHSpacing  :  child.minHSpacing;
+			// padding consumes child spacing
+			childSpacing = Math.max( childSpacing, 0.0 );
+
+			// Allocate child position
+			box.allocateChildPositionX( child, pos );
+
+			// Accumulate width and x
+			size = pos + child.allocationX;
+			pos = size + childSpacing + spacing;
+		}
+	}
+
+
+	
+	
 }

@@ -38,6 +38,11 @@ public class Test_BoxPack_base extends TestCase
 		return new TSBox( width, hspacing, height, vspacing );
 	}
 
+	protected TSBox box(double width, double hspacing, double ascent, double descent, double vspacing)
+	{
+		return new TSBox( width, hspacing, ascent, descent, vspacing );
+	}
+
 	protected TSBox box(double minWidth, double prefWidth, double minHSpacing, double prefHSpacing, double height, double vspacing)
 	{
 		return new TSBox( minWidth, prefWidth, minHSpacing, prefHSpacing, height, vspacing );
