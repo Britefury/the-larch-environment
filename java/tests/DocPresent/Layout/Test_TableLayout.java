@@ -34,16 +34,6 @@ public class Test_TableLayout extends Test_Layout_base
 		return new TablePackingParams( x, colspan, paddingX, y, rowspan, paddingY );
 	}
 	
-	private LBox alloced(double x, double y, double w, double h)
-	{
-		LBox box = new LBox();
-		box.setAllocationX( w );
-		box.setAllocationY( h );
-		box.setPositionInParentSpaceX( x );
-		box.setPositionInParentSpaceY( y );
-		return box;
-	}
-	
 	
 	
 	
@@ -53,7 +43,7 @@ public class Test_TableLayout extends Test_Layout_base
 	//
 	//
 	
-	private void tablePackReqTest(LBox children[], TablePackingParams packingParams[], int numColumns, int numRows, double spacingX, double spacingY, boolean bExpandX, boolean bExpandY,
+	private void reqTest(LBox children[], TablePackingParams packingParams[], int numColumns, int numRows, double spacingX, double spacingY, boolean bExpandX, boolean bExpandY,
 			HAlignment colAlignment, VAlignment rowAlignment, LBox expectedColumnBoxes[], LBox expectedRowBoxes[], LBox expectedParentBox)
 	{
 		LBox box = new LBox();
@@ -62,46 +52,22 @@ public class Test_TableLayout extends Test_Layout_base
 		
 		for (int i = 0; i < numColumns; i++)
 		{
-			if ( !columnBoxes[i].equals( expectedColumnBoxes[i] ) )
-			{
-				System.out.println( "COLUMN BOX FOR COLUMN " + i + " IS NOT AS EXPECTED" );
-				System.out.println( "EXPECTED" );
-				System.out.println( expectedColumnBoxes[i] );
-				System.out.println( "RESULT" );
-				System.out.println( columnBoxes[i] );
-			}
-			assertEquals( columnBoxes[i], expectedColumnBoxes[i] );
+			assertBoxesEqual( columnBoxes[i], expectedColumnBoxes[i], "COLUMN BOX FOR COLUMN " + i );
 		}
 		
 		for (int i = 0; i < numRows; i++)
 		{
-			if ( !rowBoxes[i].equals( expectedRowBoxes[i] ) )
-			{
-				System.out.println( "ROW BOX FOR ROW " + i + " IS NOT AS EXPECTED" );
-				System.out.println( "EXPECTED" );
-				System.out.println( expectedRowBoxes[i] );
-				System.out.println( "RESULT" );
-				System.out.println( rowBoxes[i] );
-			}
-			assertEquals( rowBoxes[i], expectedRowBoxes[i] );
+			assertBoxesEqual( rowBoxes[i], expectedRowBoxes[i], "ROW BOX FOR ROW " + i );
 		}
 
-		if ( !box.equals( expectedParentBox ) )
-		{
-			System.out.println( "PARENT BOX IS NOT AS EXPECTED" );
-			System.out.println( "EXPECTED" );
-			System.out.println( expectedParentBox );
-			System.out.println( "RESULT" );
-			System.out.println( box );
-		}
-		assertEquals( box, expectedParentBox );
+		assertBoxesEqual( box, expectedParentBox, "PARENT BOX" );
 	}
 	
 	
 	public void test_requisition()
 	{
 		// 1x1
-		tablePackReqTest(
+		reqTest(
 				new LBox[] {
 						box( 10, 0, 10, 0 ) ,
 				},
@@ -120,7 +86,7 @@ public class Test_TableLayout extends Test_Layout_base
 
 	
 		// 2x2
-		tablePackReqTest(
+		reqTest(
 				new LBox[] {
 						box( 10, 0, 10, 0 ),		box( 5, 0, 5, 0 ),
 						box( 15, 0, 2, 0 ),		box( 4, 0, 4, 0 ),
@@ -142,7 +108,7 @@ public class Test_TableLayout extends Test_Layout_base
 
 	
 		// 2x2 with spacing
-		tablePackReqTest(
+		reqTest(
 				new LBox[] {
 						box( 10, 0, 10, 0 ),		box( 5, 0, 5, 0 ),
 						box( 15, 0, 2, 0 ),		box( 4, 0, 4, 0 ),
@@ -166,7 +132,7 @@ public class Test_TableLayout extends Test_Layout_base
 
 		
 		// 3x3
-		tablePackReqTest(
+		reqTest(
 				new LBox[] {
 						box( 10, 0, 10, 0 ),		box( 5, 0, 5, 0 ),		box( 20, 0, 5, 0 ),
 						box( 15, 0, 2, 0 ),		box( 8, 0, 4, 0 ),		box( 10, 0, 4, 0 ),
@@ -192,7 +158,7 @@ public class Test_TableLayout extends Test_Layout_base
 	
 	
 		// 3x3 with spacing
-		tablePackReqTest(
+		reqTest(
 				new LBox[] {
 						box( 10, 0, 10, 0 ),		box( 5, 0, 5, 0 ),		box( 20, 0, 5, 0 ),
 						box( 15, 0, 2, 0 ),		box( 8, 0, 4, 0 ),		box( 10, 0, 4, 0 ),
@@ -219,7 +185,7 @@ public class Test_TableLayout extends Test_Layout_base
 	
 	
 		// 3x3 with a gap
-		tablePackReqTest(
+		reqTest(
 				new LBox[] {
 						box( 10, 0, 10, 0 ),		box( 5, 0, 5, 0 ),		box( 20, 0, 5, 0 ),
 						box( 15, 0, 2, 0 ),							box( 10, 0, 4, 0 ),
@@ -246,7 +212,7 @@ public class Test_TableLayout extends Test_Layout_base
 		
 		
 		// 3x3 with a gap and a child with colspan
-		tablePackReqTest(
+		reqTest(
 				new LBox[] {
 						box( 10, 0, 10, 0 ),		box( 5, 0, 5, 0 ),		box( 20, 0, 5, 0 ),
 						box( 15, 0, 2, 0 ),		box( 40, 0, 6, 0 ),
@@ -273,7 +239,7 @@ public class Test_TableLayout extends Test_Layout_base
 		
 		
 		// 3x3 with a gap and a child with rowspan
-		tablePackReqTest(
+		reqTest(
 				new LBox[] {
 						box( 10, 0, 10, 0 ),		box( 5, 0, 5, 0 ),		box( 20, 0, 5, 0 ),
 						box( 15, 0, 2, 0 ),		box( 8, 0, 20, 0 ),		box( 10, 0, 4, 0 ),
@@ -300,7 +266,7 @@ public class Test_TableLayout extends Test_Layout_base
 		
 		
 		// 3x3 with caps and a child with colspan and rowspan
-		tablePackReqTest(
+		reqTest(
 				new LBox[] {
 						box( 10, 0, 10, 0 ),		box( 5, 0, 5, 0 ),		box( 20, 0, 5, 0 ),
 						box( 15, 0, 2, 0 ),		box( 35, 0, 20, 0 ),		
@@ -327,7 +293,7 @@ public class Test_TableLayout extends Test_Layout_base
 		
 		
 		// 3x3 with baseline v-alignment
-		tablePackReqTest(
+		reqTest(
 				new LBox[] {
 						box( 10, 0, 10, 0 ),		box( 5, 0, 5, 0 ),		box( 20, 0, 5, 0 ),
 						box( 15, 0, 4, 4, 0 ),		box( 8, 0, 2, 6, 0 ),		box( 10, 0, 5, 2, 0 ),
@@ -361,7 +327,7 @@ public class Test_TableLayout extends Test_Layout_base
 	//
 	//
 	
-	private void tablePackAllocTest(LBox children[], TablePackingParams packingParams[], int numColumns, int numRows, double spacingX, double spacingY, boolean bExpandX, boolean bExpandY,
+	private void allocTest(LBox children[], TablePackingParams packingParams[], int numColumns, int numRows, double spacingX, double spacingY, boolean bExpandX, boolean bExpandY,
 			HAlignment colAlignment, VAlignment rowAlignment,
 			double allocX, double allocY, LBox expectedChildAllocations[], LBox expectedColAllocations[], LBox expectedRowAllocations[])
 	{
@@ -388,43 +354,19 @@ public class Test_TableLayout extends Test_Layout_base
 		{
 			LBox expectedColumnBox = columnBoxes[i].copy();
 			expectedColumnBox.setAllocationFrom( expectedColAllocations[i] );
-			if ( !columnBoxes[i].equals( expectedColumnBox ) )
-			{
-				System.out.println( "COLUMN ALLOCATION FOR COLUMN " + i + " IS NOT AS EXPECTED" );
-				System.out.println( "EXPECTED" );
-				System.out.println( expectedColumnBox );
-				System.out.println( "RESULT" );
-				System.out.println( columnBoxes[i] );
-			}
-			assertEquals( columnBoxes[i], expectedColumnBox );
+			assertBoxesEqual( columnBoxes[i], expectedColumnBox, "COLUMN ALLOCATION FOR COLUMN " + i );
 		}
 		
 		for (int i = 0; i < numRows; i++)
 		{
 			LBox expectedRowBox = rowBoxes[i].copy();
 			expectedRowBox.setAllocationFrom( expectedRowAllocations[i] );
-			if ( !rowBoxes[i].equals( expectedRowBox ) )
-			{
-				System.out.println( "ROW ALLOCATION FOR ROW " + i + " IS NOT AS EXPECTED" );
-				System.out.println( "EXPECTED" );
-				System.out.println( expectedRowBox );
-				System.out.println( "RESULT" );
-				System.out.println( rowBoxes[i] );
-			}
-			assertEquals( rowBoxes[i], expectedRowBox );
+			assertBoxesEqual( rowBoxes[i], expectedRowBox, "ROW ALLOCATION FOR ROW " + i );
 		}
 		
 		for (int i = 0; i < children.length; i++)
 		{
-			if ( !children[i].equals( expectedChildren[i] ) )
-			{
-				System.out.println( "CHILD ALLOCATION FOR " + i + " IS NOT AS EXPECTED" );
-				System.out.println( "EXPECTED" );
-				System.out.println( expectedChildren[i] );
-				System.out.println( "RESULT" );
-				System.out.println( children[i] );
-			}
-			assertEquals( children[i], expectedChildren[i] );
+			assertBoxesEqual( children[i], expectedChildren[i], "CHILD ALLOCATION FOR ROW " + i );
 		}
 		
 		box.setAllocationX( 0.0 );
@@ -436,7 +378,7 @@ public class Test_TableLayout extends Test_Layout_base
 	public void test_allocation()
 	{
 		// 1x1
-		tablePackAllocTest(
+		allocTest(
 				new LBox[] {
 						box( 10, 0, 10, 0 ) ,
 				},
@@ -446,18 +388,18 @@ public class Test_TableLayout extends Test_Layout_base
 				1, 1, 0.0, 0.0, false, false, HAlignment.LEFT, VAlignment.TOP,
 				10, 10,
 				new LBox[] {
-						alloced( 0, 0, 10, 10 ),
+						alloc( 0, 0, 10, 10 ),
 				},
 				new LBox[] {
-						alloced( 0, 0, 10, 0 ),
+						alloc( 0, 0, 10, 0 ),
 				},
 				new LBox[] {
-						alloced( 0, 0, 0, 10 ),
+						alloc( 0, 0, 0, 10 ),
 				}
 			);
 
 		// 1x1, extra space, left-top
-		tablePackAllocTest(
+		allocTest(
 				new LBox[] {
 						box( 10, 0, 10, 0 ) ,
 				},
@@ -467,18 +409,18 @@ public class Test_TableLayout extends Test_Layout_base
 				1, 1, 0.0, 0.0, true, true, HAlignment.LEFT, VAlignment.TOP,
 				20, 20,
 				new LBox[] {
-						alloced( 0, 0, 10, 10 ),
+						alloc( 0, 0, 10, 10 ),
 				},
 				new LBox[] {
-						alloced( 0, 0, 20, 0 ),
+						alloc( 0, 0, 20, 0 ),
 				},
 				new LBox[] {
-						alloced( 0, 0, 0, 20 ),
+						alloc( 0, 0, 0, 20 ),
 				}
 			);
 
 		// 1x1, extra space, centre-centre
-		tablePackAllocTest(
+		allocTest(
 				new LBox[] {
 						box( 10, 0, 10, 0 ) ,
 				},
@@ -488,18 +430,18 @@ public class Test_TableLayout extends Test_Layout_base
 				1, 1, 0.0, 0.0, true, true, HAlignment.CENTRE, VAlignment.CENTRE,
 				20, 20,
 				new LBox[] {
-						alloced( 5, 5, 10, 10 ),
+						alloc( 5, 5, 10, 10 ),
 				},
 				new LBox[] {
-						alloced( 0, 0, 20, 0 ),
+						alloc( 0, 0, 20, 0 ),
 				},
 				new LBox[] {
-						alloced( 0, 0, 0, 20 ),
+						alloc( 0, 0, 0, 20 ),
 				}
 			);
 
 		// 1x1, extra space, right-bottom
-		tablePackAllocTest(
+		allocTest(
 				new LBox[] {
 						box( 10, 0, 10, 0 ) ,
 				},
@@ -509,18 +451,18 @@ public class Test_TableLayout extends Test_Layout_base
 				1, 1, 0.0, 0.0, true, true, HAlignment.RIGHT, VAlignment.BOTTOM,
 				20, 20,
 				new LBox[] {
-						alloced( 10, 10, 10, 10 ),
+						alloc( 10, 10, 10, 10 ),
 				},
 				new LBox[] {
-						alloced( 0, 0, 20, 0 ),
+						alloc( 0, 0, 20, 0 ),
 				},
 				new LBox[] {
-						alloced( 0, 0, 0, 20 ),
+						alloc( 0, 0, 0, 20 ),
 				}
 			);
 
 		// 1x1, extra space, expand-expand
-		tablePackAllocTest(
+		allocTest(
 				new LBox[] {
 						box( 10, 0, 10, 0 ) ,
 				},
@@ -530,20 +472,20 @@ public class Test_TableLayout extends Test_Layout_base
 				1, 1, 0.0, 0.0, true, true, HAlignment.EXPAND, VAlignment.EXPAND,
 				20, 20,
 				new LBox[] {
-						alloced( 0, 0, 20, 20 ),
+						alloc( 0, 0, 20, 20 ),
 				},
 				new LBox[] {
-						alloced( 0, 0, 20, 0 ),
+						alloc( 0, 0, 20, 0 ),
 				},
 				new LBox[] {
-						alloced( 0, 0, 0, 20 ),
+						alloc( 0, 0, 0, 20 ),
 				}
 			);
 
 
 	
 		// 3x3, extra space, no expand, top-left alignment
-		tablePackAllocTest(
+		allocTest(
 				new LBox[] {
 						box( 10, 0, 10, 0 ),		box( 5, 0, 5, 0 ),		box( 5, 0, 5, 0 ),
 						box( 5, 0, 2, 0 ),		box( 4, 0, 5, 0 ),		box( 10, 0, 4, 0 ),
@@ -557,17 +499,17 @@ public class Test_TableLayout extends Test_Layout_base
 				3, 3, 0.0, 0.0, false, false, HAlignment.LEFT, VAlignment.TOP,
 				40, 35,
 				new LBox[] {
-						alloced( 0, 0, 10, 10 ),	alloced( 10, 0, 5, 5 ),		alloced( 15, 0, 5, 5 ),
-						alloced( 0, 10, 5, 2 ),		alloced( 10, 10, 4, 5 ),	alloced( 15, 10, 10, 4 ),
-						alloced( 0, 15, 5, 2 ),		alloced( 10, 15, 2, 2 ),	alloced( 15, 15, 10, 5 ),
+						alloc( 0, 0, 10, 10 ),	alloc( 10, 0, 5, 5 ),		alloc( 15, 0, 5, 5 ),
+						alloc( 0, 10, 5, 2 ),		alloc( 10, 10, 4, 5 ),	alloc( 15, 10, 10, 4 ),
+						alloc( 0, 15, 5, 2 ),		alloc( 10, 15, 2, 2 ),	alloc( 15, 15, 10, 5 ),
 				},
 				new LBox[] {
-						alloced( 0, 0, 10, 0 ),		alloced( 10, 0, 5, 0 ),		alloced( 15, 0, 10, 0 ),
+						alloc( 0, 0, 10, 0 ),		alloc( 10, 0, 5, 0 ),		alloc( 15, 0, 10, 0 ),
 				},
 				new LBox[] {
-						alloced( 0, 0, 0, 10 ),
-						alloced( 0, 10, 0, 5 ),
-						alloced( 0, 15, 0, 5 ),
+						alloc( 0, 0, 0, 10 ),
+						alloc( 0, 10, 0, 5 ),
+						alloc( 0, 15, 0, 5 ),
 				}
 			);
 
@@ -577,7 +519,7 @@ public class Test_TableLayout extends Test_Layout_base
 
 		
 		// 3x3, extra space, no expand, expand-expand alignment
-		tablePackAllocTest(
+		allocTest(
 				new LBox[] {
 						box( 10, 0, 10, 0 ),		box( 5, 0, 5, 0 ),		box( 5, 0, 5, 0 ),
 						box( 5, 0, 2, 0 ),		box( 4, 0, 5, 0 ),		box( 10, 0, 4, 0 ),
@@ -591,17 +533,17 @@ public class Test_TableLayout extends Test_Layout_base
 				3, 3, 0.0, 0.0, false, false, HAlignment.EXPAND, VAlignment.EXPAND,
 				40, 35,
 				new LBox[] {
-						alloced( 0, 0, 10, 10 ),	alloced( 10, 0, 5, 10 ),	alloced( 15, 0, 10, 10 ),
-						alloced( 0, 10, 10, 5 ),	alloced( 10, 10, 5, 5 ),	alloced( 15, 10, 10, 5 ),
-						alloced( 0, 15, 10, 5 ),	alloced( 10, 15, 5, 5 ),	alloced( 15, 15, 10, 5 ),
+						alloc( 0, 0, 10, 10 ),	alloc( 10, 0, 5, 10 ),	alloc( 15, 0, 10, 10 ),
+						alloc( 0, 10, 10, 5 ),	alloc( 10, 10, 5, 5 ),	alloc( 15, 10, 10, 5 ),
+						alloc( 0, 15, 10, 5 ),	alloc( 10, 15, 5, 5 ),	alloc( 15, 15, 10, 5 ),
 				},
 				new LBox[] {
-						alloced( 0, 0, 10, 0 ),		alloced( 10, 0, 5, 0 ),		alloced( 15, 0, 10, 0 ),
+						alloc( 0, 0, 10, 0 ),		alloc( 10, 0, 5, 0 ),		alloc( 15, 0, 10, 0 ),
 				},
 				new LBox[] {
-						alloced( 0, 0, 0, 10 ),
-						alloced( 0, 10, 0, 5 ),
-						alloced( 0, 15, 0, 5 ),
+						alloc( 0, 0, 0, 10 ),
+						alloc( 0, 10, 0, 5 ),
+						alloc( 0, 15, 0, 5 ),
 				}
 			);
 
@@ -611,7 +553,7 @@ public class Test_TableLayout extends Test_Layout_base
 
 		
 		// 3x3, extra space, expand in x and y, top-left alignment
-		tablePackAllocTest(
+		allocTest(
 				new LBox[] {
 						box( 10, 0, 10, 0 ),		box( 5, 0, 5, 0 ),		box( 5, 0, 5, 0 ),
 						box( 5, 0, 2, 0 ),		box( 4, 0, 5, 0 ),		box( 10, 0, 4, 0 ),
@@ -625,17 +567,17 @@ public class Test_TableLayout extends Test_Layout_base
 				3, 3, 0.0, 0.0, true, true, HAlignment.LEFT, VAlignment.TOP,
 				40, 35,
 				new LBox[] {
-						alloced( 0, 0, 10, 10 ),	alloced( 15, 0, 5, 5 ),		alloced( 25, 0, 5, 5 ),
-						alloced( 0, 15, 5, 2 ),		alloced( 15, 15, 4, 5 ),	alloced( 25, 15, 10, 4 ),
-						alloced( 0, 25, 5, 2 ),		alloced( 15, 25, 2, 2 ),	alloced( 25, 25, 10, 5 ),
+						alloc( 0, 0, 10, 10 ),	alloc( 15, 0, 5, 5 ),		alloc( 25, 0, 5, 5 ),
+						alloc( 0, 15, 5, 2 ),		alloc( 15, 15, 4, 5 ),	alloc( 25, 15, 10, 4 ),
+						alloc( 0, 25, 5, 2 ),		alloc( 15, 25, 2, 2 ),	alloc( 25, 25, 10, 5 ),
 				},
 				new LBox[] {
-						alloced( 0, 0, 15, 0 ),		alloced( 15, 0, 10, 0 ),	alloced( 25, 0, 15, 0 ),
+						alloc( 0, 0, 15, 0 ),		alloc( 15, 0, 10, 0 ),	alloc( 25, 0, 15, 0 ),
 				},
 				new LBox[] {
-						alloced( 0, 0, 0, 15 ),
-						alloced( 0, 15, 0, 10 ),
-						alloced( 0, 25, 0, 10 ),
+						alloc( 0, 0, 0, 15 ),
+						alloc( 0, 15, 0, 10 ),
+						alloc( 0, 25, 0, 10 ),
 				}
 			);
 
@@ -644,7 +586,7 @@ public class Test_TableLayout extends Test_Layout_base
 
 		
 		// 3x3, extra space, expand in x and y, expand-expand alignment
-		tablePackAllocTest(
+		allocTest(
 				new LBox[] {
 						box( 10, 0, 10, 0 ),		box( 5, 0, 5, 0 ),		box( 5, 0, 5, 0 ),
 						box( 5, 0, 2, 0 ),		box( 4, 0, 5, 0 ),		box( 10, 0, 4, 0 ),
@@ -658,17 +600,17 @@ public class Test_TableLayout extends Test_Layout_base
 				3, 3, 0.0, 0.0, true, true, HAlignment.EXPAND, VAlignment.EXPAND,
 				40, 35,
 				new LBox[] {
-						alloced( 0, 0, 15, 15 ),	alloced( 15, 0, 10, 15 ),	alloced( 25, 0, 15, 15 ),
-						alloced( 0, 15, 15, 10 ),	alloced( 15, 15, 10, 10 ),	alloced( 25, 15, 15, 10 ),
-						alloced( 0, 25, 15, 10 ),	alloced( 15, 25, 10, 10 ),	alloced( 25, 25, 15, 10 ),
+						alloc( 0, 0, 15, 15 ),	alloc( 15, 0, 10, 15 ),	alloc( 25, 0, 15, 15 ),
+						alloc( 0, 15, 15, 10 ),	alloc( 15, 15, 10, 10 ),	alloc( 25, 15, 15, 10 ),
+						alloc( 0, 25, 15, 10 ),	alloc( 15, 25, 10, 10 ),	alloc( 25, 25, 15, 10 ),
 				},
 				new LBox[] {
-						alloced( 0, 0, 15, 0 ),		alloced( 15, 0, 10, 0 ),	alloced( 25, 0, 15, 0 ),
+						alloc( 0, 0, 15, 0 ),		alloc( 15, 0, 10, 0 ),	alloc( 25, 0, 15, 0 ),
 				},
 				new LBox[] {
-						alloced( 0, 0, 0, 15 ),
-						alloced( 0, 15, 0, 10 ),
-						alloced( 0, 25, 0, 10 ),
+						alloc( 0, 0, 0, 15 ),
+						alloc( 0, 15, 0, 10 ),
+						alloc( 0, 25, 0, 10 ),
 				}
 			);
 
@@ -676,7 +618,7 @@ public class Test_TableLayout extends Test_Layout_base
 
 		
 		// 3x3, gap, colspan and rowspan, extra space, expand in x and y, expand-expand alignment
-		tablePackAllocTest(
+		allocTest(
 				new LBox[] {
 						box( 10, 0, 10, 0 ),		box( 5, 0, 5, 0 ),		box( 5, 0, 5, 0 ),
 						box( 5, 0, 5, 0 ),		box( 5, 0, 5, 0 ),
@@ -690,17 +632,17 @@ public class Test_TableLayout extends Test_Layout_base
 				3, 3, 0.0, 0.0, true, true, HAlignment.EXPAND, VAlignment.EXPAND,
 				35, 35,
 				new LBox[] {
-						alloced( 0, 0, 15, 15 ),	alloced( 15, 0, 10, 15 ),	alloced( 25, 0, 10, 15 ),
-						alloced( 0, 15, 15, 10 ),	alloced( 15, 15, 20, 20 ),
-						alloced( 0, 25, 15, 10 ),
+						alloc( 0, 0, 15, 15 ),	alloc( 15, 0, 10, 15 ),	alloc( 25, 0, 10, 15 ),
+						alloc( 0, 15, 15, 10 ),	alloc( 15, 15, 20, 20 ),
+						alloc( 0, 25, 15, 10 ),
 				},
 				new LBox[] {
-						alloced( 0, 0, 15, 0 ),		alloced( 15, 0, 10, 0 ),	alloced( 25, 0, 10, 0 ),
+						alloc( 0, 0, 15, 0 ),		alloc( 15, 0, 10, 0 ),	alloc( 25, 0, 10, 0 ),
 				},
 				new LBox[] {
-						alloced( 0, 0, 0, 15 ),
-						alloced( 0, 15, 0, 10 ),
-						alloced( 0, 25, 0, 10 ),
+						alloc( 0, 0, 0, 15 ),
+						alloc( 0, 15, 0, 10 ),
+						alloc( 0, 25, 0, 10 ),
 				}
 			);
 
@@ -708,7 +650,7 @@ public class Test_TableLayout extends Test_Layout_base
 
 		
 		// 3x3, gap, colspan and rowspan, padding, extra space, expand in x and y, expand-expand alignment
-		tablePackAllocTest(
+		allocTest(
 				new LBox[] {
 						box( 10, 0, 10, 0 ),		box( 5, 0, 5, 0 ),		box( 5, 0, 5, 0 ),
 						box( 5, 0, 5, 0 ),		box( 5, 0, 5, 0 ),
@@ -722,17 +664,17 @@ public class Test_TableLayout extends Test_Layout_base
 				3, 3, 0.0, 0.0, true, true, HAlignment.EXPAND, VAlignment.EXPAND,
 				41, 41,
 				new LBox[] {
-						alloced( 1, 1, 15, 15 ),	alloced( 18, 1, 10, 15 ),	alloced( 30, 1, 10, 15 ),
-						alloced( 1, 18, 15, 10 ),	alloced( 18, 18, 22, 22 ),
-						alloced( 1, 30, 15, 10 ),
+						alloc( 1, 1, 15, 15 ),	alloc( 18, 1, 10, 15 ),	alloc( 30, 1, 10, 15 ),
+						alloc( 1, 18, 15, 10 ),	alloc( 18, 18, 22, 22 ),
+						alloc( 1, 30, 15, 10 ),
 				},
 				new LBox[] {
-						alloced( 0, 0, 17, 0 ),		alloced( 17, 0, 12, 0 ),	alloced( 29, 0, 12, 0 ),
+						alloc( 0, 0, 17, 0 ),		alloc( 17, 0, 12, 0 ),	alloc( 29, 0, 12, 0 ),
 				},
 				new LBox[] {
-						alloced( 0, 0, 0, 17 ),
-						alloced( 0, 17, 0, 12 ),
-						alloced( 0, 29, 0, 12 ),
+						alloc( 0, 0, 0, 17 ),
+						alloc( 0, 17, 0, 12 ),
+						alloc( 0, 29, 0, 12 ),
 				}
 			);
 	}

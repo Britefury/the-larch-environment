@@ -52,4 +52,31 @@ public class Test_Layout_base extends TestCase
 	{
 		return new LBox( minWidth, prefWidth, minHSpacing, prefHSpacing, ascent, descent, vspacing );
 	}
+
+
+
+	protected LBox alloc(double x, double y, double w, double h)
+	{
+		LBox box = new LBox();
+		box.setAllocationX( w );
+		box.setAllocationY( h );
+		box.setPositionInParentSpaceX( x );
+		box.setPositionInParentSpaceY( y );
+		return box;
+	}
+	
+	
+	
+	protected void assertBoxesEqual(LBox result, LBox expected, String description)
+	{
+		if ( !result.equals( expected ) )
+		{
+			System.out.println( description + " IS NOT AS EXPECTED" );
+			System.out.println( "EXPECTED" );
+			System.out.println( expected );
+			System.out.println( "RESULT" );
+			System.out.println( result );
+		}
+		assertEquals( result, expected );
+	}
 }

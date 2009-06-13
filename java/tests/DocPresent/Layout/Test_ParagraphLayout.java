@@ -193,19 +193,13 @@ public class Test_ParagraphLayout extends Test_Layout_base
 	//
 	//
 
-	private void ppackXTest(LBox children[], double indentation, double hSpacing, BoxPackingParams packingParams[],LBox expectedBox, double boxAllocation, double expectedSize[], double expectedPosition[])
+	private void allocXTest(LBox children[], double indentation, double hSpacing, BoxPackingParams packingParams[],LBox expectedBox, double boxAllocation, double expectedSize[], double expectedPosition[])
 	{ 
 		LBox box = new LBox();
 		ParagraphLayout.computeRequisitionX( box, children, indentation, hSpacing, packingParams );
-		if ( !box.equals( expectedBox ) )
-		{
-			System.out.println( "PARENT BOX IS NOT AS EXPECTED" );
-			System.out.println( "EXPECTED" );
-			System.out.println( expectedBox );
-			System.out.println( "RESULT" );
-			System.out.println( box );
-		}
-		assertEquals( box, expectedBox );
+		
+		assertBoxesEqual( box, expectedBox, "PARENT BOX" );
+
 		box.setAllocationX( boxAllocation );
 		ParagraphLayout.allocateX( box, children, indentation, hSpacing, packingParams );
 		for (int i = 0; i < children.length; i++)
@@ -224,7 +218,7 @@ public class Test_ParagraphLayout extends Test_Layout_base
 		}
 	}
 	
-	private void ppackXTests(LBox children[], double indentation, double hSpacing, BoxPackingParams packingParams[], LBox expectedBox, double boxAllocations[], double expectedSize[][], double expectedPosition[][])
+	private void allocXTests(LBox children[], double indentation, double hSpacing, BoxPackingParams packingParams[], LBox expectedBox, double boxAllocations[], double expectedSize[][], double expectedPosition[][])
 	{
 		LBox childrenCopy[] = new LBox[children.length];
 		for (int i = 0; i  < boxAllocations.length; i++)
@@ -233,7 +227,7 @@ public class Test_ParagraphLayout extends Test_Layout_base
 			{
 				childrenCopy[j] = children[j].copy();
 			}
-			ppackXTest( childrenCopy, indentation, hSpacing, packingParams, expectedBox, boxAllocations[i], expectedSize[i], expectedPosition[i] );
+			allocXTest( childrenCopy, indentation, hSpacing, packingParams, expectedBox, boxAllocations[i], expectedSize[i], expectedPosition[i] );
 		}
 	}
 
@@ -245,7 +239,7 @@ public class Test_ParagraphLayout extends Test_Layout_base
 		// 	boxAllocation=65   ->     [ 25, 5, 15, 5, 15 ] @ [ 0, 25, 30, 45, 50 ]		- sufficient space - 1 line
 		// 	boxAllocation=55   ->     [ 25, 5, 15, 0, 15 ] @ [ 0, 25, 30, 0, 5 ]			- break at last line break
 		// 	boxAllocation=35   ->     [ 25, 0, 15, 0, 15 ] @ [ 0, 0, 5, 0, 5 ]			- break at both line breaks
-		ppackXTests( new LBox[] { xbox( 25.0, 0.0 ), lineBreakBox( 5.0, 0 ), xbox( 15.0, 0.0 ), lineBreakBox( 5.0, 0 ), xbox( 15.0, 0.0 ) }, 5.0, 0.0, null,
+		allocXTests( new LBox[] { xbox( 25.0, 0.0 ), lineBreakBox( 5.0, 0 ), xbox( 15.0, 0.0 ), lineBreakBox( 5.0, 0 ), xbox( 15.0, 0.0 ) }, 5.0, 0.0, null,
 				xbox( 25.0, 65.0, 0.0, 0.0 ),
 				new double[] { 70.0, 55.0, 35.0 },
 				new double[][] {
@@ -262,7 +256,7 @@ public class Test_ParagraphLayout extends Test_Layout_base
 		// hpackX( [ <25,0>, break(1:<5,0>), <15,0>, break(2:<5,0>), <15,0> ], indentation=5, spacing=0, padding=0 )
 		// 	boxAllocation=65   ->     [ 25, 5, 15, 5, 15 ] @ [ 0, 25, 30, 45, 50 ]		- sufficient space - 1 line
 		// 	boxAllocation=55   ->     [ 25, 0, 15, 5, 15 ] @ [ 0, 0, 5, 20, 25 ]			- break at first line break, due to lower cost
-		ppackXTests( new LBox[] { xbox( 25.0, 0.0 ), lineBreakBox( 5.0, 1 ), xbox( 15.0, 0.0 ), lineBreakBox( 5.0, 2 ), xbox( 15.0, 0.0 ) }, 5.0, 0.0, null,
+		allocXTests( new LBox[] { xbox( 25.0, 0.0 ), lineBreakBox( 5.0, 1 ), xbox( 15.0, 0.0 ), lineBreakBox( 5.0, 2 ), xbox( 15.0, 0.0 ) }, 5.0, 0.0, null,
 				xbox( 25.0, 65.0, 0.0, 0.0 ),
 				new double[] { 70.0, 55.0 },
 				new double[][] {
@@ -280,7 +274,7 @@ public class Test_ParagraphLayout extends Test_Layout_base
 		// line break should be used, despite having a higher cost.
 		// hpackX( [ <25,0>, break(1:<5,0>), <15,0>, break(2:<5,0>), <40,0> ], indentation=0, spacing=0, padding=0 )
 		// 	boxAllocation=55   ->     [ 25, 5, 15, 0, 40 ] @ [ 0, 25, 30, 0, 5 ]
-		ppackXTests( new LBox[] { xbox( 25.0, 0.0 ), lineBreakBox( 5.0, 1 ), xbox( 15.0, 0.0 ), lineBreakBox( 5.0, 2 ), xbox( 40.0, 0.0 ) }, 5.0, 0.0, null,
+		allocXTests( new LBox[] { xbox( 25.0, 0.0 ), lineBreakBox( 5.0, 1 ), xbox( 15.0, 0.0 ), lineBreakBox( 5.0, 2 ), xbox( 40.0, 0.0 ) }, 5.0, 0.0, null,
 				xbox( 45.0, 90.0, 0.0, 0.0 ),
 				new double[] { 55.0 },
 				new double[][] {
@@ -297,7 +291,7 @@ public class Test_ParagraphLayout extends Test_Layout_base
 		// 	boxAllocation=105   ->     [ 25, 20, 15, 20, 20, 0, 15 ] @ [ 0, 25, 45, 60, 80, 0, 0 ]			- end of line in last line break
 		// 	boxAllocation=85   ->     [ 25, 20, 15, 20, 0, 20, 15 ] @ [ 0, 25, 45, 60, 0, 0, 20 ]				- end of line in second last line break
 		// 	boxAllocation=65   ->     [ 25, 20, 15, 0, 20, 20, 15 ] @ [ 0, 25, 45, 0, 0, 20, 40 ]				- end of line in third last line break
-		ppackXTests( new LBox[] { xbox( 25.0, 0.0 ), lineBreakBox( 20.0, 0 ), xbox( 15.0, 0.0 ), lineBreakBox( 20.0, 0 ), lineBreakBox( 20.0, 0 ), lineBreakBox( 20.0, 0 ), xbox( 15.0, 0.0 ) }, 0.0, 0.0, null,
+		allocXTests( new LBox[] { xbox( 25.0, 0.0 ), lineBreakBox( 20.0, 0 ), xbox( 15.0, 0.0 ), lineBreakBox( 20.0, 0 ), lineBreakBox( 20.0, 0 ), lineBreakBox( 20.0, 0 ), xbox( 15.0, 0.0 ) }, 0.0, 0.0, null,
 				xbox( 25.0, 135.0, 0.0, 0.0 ),
 				new double[] { 135.0, 105.0, 85.0, 65.0 },
 				new double[][] {
@@ -320,7 +314,7 @@ public class Test_ParagraphLayout extends Test_Layout_base
 	//
 	// REQUISITION Y TESTS
 
-	private void ppackYTest(LBox children[], double indentation, double hSpacing, double vSpacing, VAlignment vAlignment, BoxPackingParams packingParams[],
+	private void allocYTest(LBox children[], double indentation, double hSpacing, double vSpacing, VAlignment vAlignment, BoxPackingParams packingParams[],
 			LBox expectedBox, double boxAllocation, double expectedSize[], double expectedPosition[])
 	{ 
 		LBox box = new LBox();
@@ -337,15 +331,8 @@ public class Test_ParagraphLayout extends Test_Layout_base
 		LBox b = box.copy();
 		b.setAllocationX( 0.0 );
 		b.setPositionInParentSpaceX( 0.0 );
-		if ( !b.equals( expectedBox ) )
-		{
-			System.out.println( "PARENT BOX IS NOT AS EXPECTED" );
-			System.out.println( "EXPECTED" );
-			System.out.println( expectedBox );
-			System.out.println( "RESULT" );
-			System.out.println( b );
-		}
-		assertEquals( b, expectedBox );
+		
+		assertBoxesEqual( b, expectedBox, "PARENT BOX" );
 		
 		for (int i = 0; i < children.length; i++)
 		{
@@ -393,7 +380,7 @@ public class Test_ParagraphLayout extends Test_Layout_base
 		// hpackX( [ <25,0,15,0>, break(<5,0>), <15,0,20,0>, break(<5,0>), <15,0,10,0> ], indentation=5, spacing=0, padding=0 )
 		//	parentBox = <25, 65, 0, 0, 20, 0>
 		// 		boxAllocation=65   ->     [ 25,15,  5,0,  15,20,  5,0,  15,10 ]  @  [ 0,0,  25,0,  30,0,  45,0,  50,0 ]
-		ppackYTest( new LBox[] { box( 25, 0, 15, 0 ), lineBreakBox( 5, 0 ), box( 15, 0, 20, 0 ), lineBreakBox( 5, 0 ), box( 15, 0, 10, 0 ) }, 5.0, 0.0, 0.0, VAlignment.TOP, null,
+		allocYTest( new LBox[] { box( 25, 0, 15, 0 ), lineBreakBox( 5, 0 ), box( 15, 0, 20, 0 ), lineBreakBox( 5, 0 ), box( 15, 0, 10, 0 ) }, 5.0, 0.0, 0.0, VAlignment.TOP, null,
 				box( 25, 65, 0, 0, 20, 0 ),
 				65,
 				new double[] { 25,15,  5,0,  15,20,  5,0,  15,10 },
@@ -404,7 +391,7 @@ public class Test_ParagraphLayout extends Test_Layout_base
 		// hpackX( [ <25,0,15,0>, break(<5,0>), <15,0,20,0>, break(<5,0>), <15,0,10,0> ], indentation=5, spacing=0, padding=0 )
 		//	parentBox = <25, 65, 0, 0, 30, 0>
 		// 		boxAllocation=55   ->     [ 25,15,  5,0,  15,20,  0,0,  15,10 ]  @  [ 0,0,  25,0,  30,0,  0,0,  5,20 ]
-		ppackYTest( new LBox[] { box( 25, 0, 15, 0 ), lineBreakBox( 5, 0 ), box( 15, 0, 20, 0 ), lineBreakBox( 5, 0 ), box( 15, 0, 10, 0 ) }, 5.0, 0.0, 0.0, VAlignment.TOP, null,
+		allocYTest( new LBox[] { box( 25, 0, 15, 0 ), lineBreakBox( 5, 0 ), box( 15, 0, 20, 0 ), lineBreakBox( 5, 0 ), box( 15, 0, 10, 0 ) }, 5.0, 0.0, 0.0, VAlignment.TOP, null,
 				box( 25, 65, 0, 0, 30, 0 ),
 				55,
 				new double[] { 25,15,  5,0,  15,20,  0,0,  15,10 },
@@ -415,7 +402,7 @@ public class Test_ParagraphLayout extends Test_Layout_base
 		// hpackX( [ <25,0,15,0>, break(<5,0>), <15,0,20,0>, break(<5,0>), <15,0,10,0> ], indentation=5, spacing=0, padding=0 )
 		//	parentBox = <25, 65, 0, 0, 45, 0>
 		// 		boxAllocation=35   ->     [ 25,15,  0,0,  15,20,  0,0,  15,10 ]  @  [ 0,0,  0,0,  5,15,  0,0,  5,35 ]
-		ppackYTest( new LBox[] { box( 25, 0, 15, 0 ), lineBreakBox( 5, 0 ), box( 15, 0, 20, 0 ), lineBreakBox( 5, 0 ), box( 15, 0, 10, 0 ) }, 5.0, 0.0, 0.0, VAlignment.TOP, null,
+		allocYTest( new LBox[] { box( 25, 0, 15, 0 ), lineBreakBox( 5, 0 ), box( 15, 0, 20, 0 ), lineBreakBox( 5, 0 ), box( 15, 0, 10, 0 ) }, 5.0, 0.0, 0.0, VAlignment.TOP, null,
 				box( 25, 65, 0, 0, 45, 0 ),
 				35,
 				new double[] { 25,15,  0,0,  15,20,  0,0,  15,10 },
@@ -428,7 +415,7 @@ public class Test_ParagraphLayout extends Test_Layout_base
 		// hpackX( [ <25,0,15,0>, break(<5,0>), <15,0,20,0>, break(<5,0>), <15,0,10,0> ], indentation=5, spacing=0, padding=0 )
 		//	parentBox = <25, 65, 0, 0, 45, 0>
 		// 		boxAllocation=35   ->     [ 25,15,  0,0,  15,20,  0,0,  15,10 ]  @  [ 0,0,  0,0,  5,0,  0,0,  5,0 ]
-		ppackYTest( new LBox[] { box( 25, 0, 15, 0 ), lineBreakBox( 5, 0 ), box( 15, 0, 20, 0 ), lineBreakBox( 5, 0 ), box( 15, 0, 10, 0 ) }, 5.0, 0.0, 5.0, VAlignment.TOP, null,
+		allocYTest( new LBox[] { box( 25, 0, 15, 0 ), lineBreakBox( 5, 0 ), box( 15, 0, 20, 0 ), lineBreakBox( 5, 0 ), box( 15, 0, 10, 0 ) }, 5.0, 0.0, 5.0, VAlignment.TOP, null,
 				box( 25, 65, 0, 0, 55, 0 ),
 				35,
 				new double[] { 25,15,  0,0,  15,20,  0,0,  15,10 },
