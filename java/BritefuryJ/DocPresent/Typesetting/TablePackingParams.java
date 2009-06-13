@@ -9,18 +9,15 @@ package BritefuryJ.DocPresent.Typesetting;
 public class TablePackingParams extends PackingParams
 {
 	public int x, y, colSpan, rowSpan;
-	public int packFlagsX, packFlagsY;
 	public double paddingX, paddingY;
 	
-	public TablePackingParams(int x, int colSpan, boolean bExpandX, double paddingX, int y, int rowSpan, boolean bExpandY, double paddingY)
+	public TablePackingParams(int x, int colSpan, double paddingX, int y, int rowSpan, double paddingY)
 	{
 		this.x = x;
 		this.colSpan = colSpan;
-		this.packFlagsX = TSBox.packFlags( bExpandX );
 		this.paddingX = paddingX;
 		this.y = y;
 		this.rowSpan = rowSpan;
-		this.packFlagsY = TSBox.packFlags( bExpandY );
 		this.paddingY = paddingY;
 	}
 }
