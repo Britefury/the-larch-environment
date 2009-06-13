@@ -6,6 +6,7 @@
 //##************************
 package BritefuryJ.DocPresent.Layout;
 
+
 public class LBox
 {
 	protected static double EPSILON = 1.0e-9;
@@ -237,6 +238,19 @@ public class LBox
 	}
 	
 	
+	public void maxRequisitionX(LBox box)
+	{
+		double minW = Math.max( minWidth, box.minWidth );
+		double minA = Math.max( minWidth + minHSpacing, box.minWidth + box.minHSpacing );
+		double prefW = Math.max( prefWidth, box.prefWidth );
+		double prefA = Math.max( prefWidth + prefHSpacing, box.prefWidth + box.prefHSpacing );
+		setRequisitionX( minW, prefW, minA - minW, prefA - prefW );
+	}
+	
+	
+	
+
+	
 	public void setAllocationX(double allocation)
 	{
 		allocationX = allocation;
@@ -266,7 +280,6 @@ public class LBox
 		positionInParentSpaceX = box.positionInParentSpaceX;
 		positionInParentSpaceY = box.positionInParentSpaceY;
 	}
-	
 	
 	
 	protected void allocateChildX(LBox child, double localPosX, double localWidth)
