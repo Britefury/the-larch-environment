@@ -4,12 +4,13 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.DocPresent.Typesetting;
+package BritefuryJ.DocPresent.Layout;
 
-public enum HAlignment
+public enum VAlignment
 {
-	LEFT,
+	TOP,
 	CENTRE,
-	RIGHT,
-	EXPAND
+	BOTTOM,
+	EXPAND,
+	BASELINES
 }

@@ -4,13 +4,26 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.DocPresent.Typesetting;
+package BritefuryJ.DocPresent.Layout;
 
-public enum VAlignment
+public class BoxPackingParams extends PackingParams
 {
-	TOP,
-	CENTRE,
-	BOTTOM,
-	EXPAND,
-	BASELINES
+	public double padding;
+	public int packFlags;
+	
+	public BoxPackingParams(double padding)
+	{
+		this( padding, false );
+	}
+
+	public BoxPackingParams(boolean bExpand)
+	{
+		this( 0.0, bExpand );
+	}
+
+	public BoxPackingParams(double padding, boolean bExpand)
+	{
+		this.padding = padding;
+		this.packFlags = LBox.packFlags( bExpand );
+	}
 }

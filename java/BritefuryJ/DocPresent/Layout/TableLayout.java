@@ -4,32 +4,32 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.DocPresent.Typesetting;
+package BritefuryJ.DocPresent.Layout;
 
 
 
 
-public class TablePack
+public class TableLayout
 {
-	private static TSBox[] computeColumnXBoxes(TSBox children[], TablePackingParams packingParams[], int numColumns, int numRows, double spacingX)
+	private static LBox[] computeColumnXBoxes(LBox children[], TablePackingParams packingParams[], int numColumns, int numRows, double spacingX)
 	{
-		TSBox columnBoxes[] = new TSBox[numColumns];
+		LBox columnBoxes[] = new LBox[numColumns];
 		for (int i = 0; i < numColumns; i++)
 		{
-			columnBoxes[i] = new TSBox();
+			columnBoxes[i] = new LBox();
 		}
 		
 		
 		// First phase; fill only with children who span 1 column
 		int i = 0;
-		for (TSBox child: children)
+		for (LBox child: children)
 		{
 			TablePackingParams packing = packingParams[i];
 			
 			if ( packing.colSpan == 1 )
 			{
 				double totalPad = packing.paddingX * 2.0;
-				TSBox b = columnBoxes[packing.x];
+				LBox b = columnBoxes[packing.x];
 				b.minWidth = Math.max( b.minWidth, child.minWidth + totalPad );
 				b.prefWidth = Math.max( b.prefWidth, child.prefWidth + totalPad );
 			}
@@ -39,7 +39,7 @@ public class TablePack
 		
 		// Second phase; fill with children who span >1 columns
 		i = 0;
-		for (TSBox child: children)
+		for (LBox child: children)
 		{
 			TablePackingParams packing = packingParams[i];
 			
@@ -51,7 +51,7 @@ public class TablePack
 				double minWidthAvailable = 0.0, prefWidthAvailable = 0.0;
 				for (int c = packing.x; c < endColumn; c++)
 				{
-					TSBox colBox = columnBoxes[c];
+					LBox colBox = columnBoxes[c];
 					
 					double spacing = c != endColumn-1  ?  spacingX  :  0.0;
 					
@@ -87,25 +87,25 @@ public class TablePack
 
 
 
-	private static TSBox[] computeRowYBoxes(TSBox children[], TablePackingParams packingParams[], int numColumns, int numRows, double spacingY)
+	private static LBox[] computeRowYBoxes(LBox children[], TablePackingParams packingParams[], int numColumns, int numRows, double spacingY)
 	{
-		TSBox rowBoxes[] = new TSBox[numRows];
+		LBox rowBoxes[] = new LBox[numRows];
 		for (int i = 0; i < numColumns; i++)
 		{
-			rowBoxes[i] = new TSBox();
+			rowBoxes[i] = new LBox();
 		}
 		
 		
 		// First phase; fill only with children who span 1 row
 		int i = 0;
-		for (TSBox child: children)
+		for (LBox child: children)
 		{
 			TablePackingParams packing = packingParams[i];
 			
 			if ( packing.rowSpan == 1 )
 			{
 				double totalPad = packing.paddingY * 2.0;
-				TSBox b = rowBoxes[packing.y];
+				LBox b = rowBoxes[packing.y];
 				b.setRequisitionY( Math.max( b.getReqHeight(), child.getReqHeight() + totalPad ),  0.0 );
 			}
 			i++;
@@ -114,7 +114,7 @@ public class TablePack
 		
 		// Second phase; fill with children who span >1 columns
 		i = 0;
-		for (TSBox child: children)
+		for (LBox child: children)
 		{
 			TablePackingParams packing = packingParams[i];
 			
@@ -126,7 +126,7 @@ public class TablePack
 				double heightAvailable = 0.0;
 				for (int r = packing.y; r < endRow; r++)
 				{
-					TSBox rowBox = rowBoxes[r];
+					LBox rowBox = rowBoxes[r];
 					
 					double spacing = r != endRow-1  ?  spacingY  :  0.0;
 					
@@ -143,7 +143,7 @@ public class TablePack
 					
 					for (int r = packing.y; r < endRow; r++)
 					{
-						TSBox rowBox = rowBoxes[r];
+						LBox rowBox = rowBoxes[r];
 						rowBox.setRequisitionY( rowBox.getReqHeight() + additionalHeightPerRow, 0.0 );
 					}
 				}
@@ -159,25 +159,25 @@ public class TablePack
 
 
 
-	private static TSBox[] computeRowYBoxesWithBaselines(TSBox children[], TablePackingParams packingParams[], int numColumns, int numRows, double spacingY)
+	private static LBox[] computeRowYBoxesWithBaselines(LBox children[], TablePackingParams packingParams[], int numColumns, int numRows, double spacingY)
 	{
-		TSBox rowBoxes[] = new TSBox[numRows];
+		LBox rowBoxes[] = new LBox[numRows];
 		for (int i = 0; i < numColumns; i++)
 		{
-			rowBoxes[i] = new TSBox();
+			rowBoxes[i] = new LBox();
 			rowBoxes[i].bHasBaseline = true;
 		}
 		
 		
 		// First phase; fill only with children who span 1 row
 		int i = 0;
-		for (TSBox child: children)
+		for (LBox child: children)
 		{
 			TablePackingParams packing = packingParams[i];
 			
 			if ( packing.rowSpan == 1 )
 			{
-				TSBox b = rowBoxes[packing.y];
+				LBox b = rowBoxes[packing.y];
 				
 				double ascent, descent;
 
@@ -200,7 +200,7 @@ public class TablePack
 		
 		// Second phase; fill with children who span >1 columns
 		i = 0;
-		for (TSBox child: children)
+		for (LBox child: children)
 		{
 			TablePackingParams packing = packingParams[i];
 			
@@ -212,7 +212,7 @@ public class TablePack
 				double heightAvailable = 0.0;
 				for (int r = packing.y; r < endRow; r++)
 				{
-					TSBox rowBox = rowBoxes[r];
+					LBox rowBox = rowBoxes[r];
 					
 					double spacing = r != endRow-1  ?  spacingY  :  0.0;
 					
@@ -229,7 +229,7 @@ public class TablePack
 					
 					for (int r = packing.y; r < endRow; r++)
 					{
-						TSBox rowBox = rowBoxes[r];
+						LBox rowBox = rowBoxes[r];
 						rowBox.reqDescent += additionalHeightPerRow;
 					}
 				}
@@ -243,13 +243,13 @@ public class TablePack
 	
 	
 	
-	public static TSBox[] computeRequisitionX(TSBox box, TSBox children[], TablePackingParams packingParams[], int numColumns, int numRows,
+	public static LBox[] computeRequisitionX(LBox box, LBox children[], TablePackingParams packingParams[], int numColumns, int numRows,
 			double spacingX, double spacingY, boolean bExpandX, boolean bExpandY, HAlignment colAlignment, VAlignment rowAlignment)
 	{
-		TSBox columnBoxes[] = computeColumnXBoxes( children, packingParams, numColumns, numRows, spacingX );
+		LBox columnBoxes[] = computeColumnXBoxes( children, packingParams, numColumns, numRows, spacingX );
 		
 		double minWidth = 0.0, prefWidth = 0.0;
-		for (TSBox colBox: columnBoxes)
+		for (LBox colBox: columnBoxes)
 		{
 			minWidth += colBox.minWidth;
 			prefWidth += colBox.prefWidth;
@@ -265,10 +265,10 @@ public class TablePack
 
 
 
-	public static TSBox[] computeRequisitionY(TSBox box, TSBox children[], TablePackingParams packingParams[], int numColumns, int numRows,
+	public static LBox[] computeRequisitionY(LBox box, LBox children[], TablePackingParams packingParams[], int numColumns, int numRows,
 			double spacingX, double spacingY, boolean bExpandX, boolean bExpandY, HAlignment colAlignment, VAlignment rowAlignment)
 	{
-		TSBox rowBoxes[];
+		LBox rowBoxes[];
 		
 		if ( rowAlignment == VAlignment.BASELINES )
 		{
@@ -280,7 +280,7 @@ public class TablePack
 		}
 		
 		double reqHeight = 0.0;
-		for (TSBox rowBox: rowBoxes)
+		for (LBox rowBox: rowBoxes)
 		{
 			reqHeight += rowBox.getReqHeight();
 		}
@@ -295,21 +295,21 @@ public class TablePack
 	
 	
 	
-	public static void allocateX(TSBox box, TSBox columnBoxes[], TSBox children[], TablePackingParams packingParams[], int numColumns, int numRows,
+	public static void allocateX(LBox box, LBox columnBoxes[], LBox children[], TablePackingParams packingParams[], int numColumns, int numRows,
 			double spacingX, double spacingY, boolean bExpandX, boolean bExpandY, HAlignment colAlignment, VAlignment rowAlignment)
 	{
 		// Allocate space to the columns
-		HorizontalPack.allocateX( box, columnBoxes, spacingX, bExpandX );
+		HorizontalLayout.allocateX( box, columnBoxes, spacingX, bExpandX );
 		
 		// Allocate children
 		int i = 0;
-		for (TSBox child: children)
+		for (LBox child: children)
 		{
 			TablePackingParams packing = (TablePackingParams)packingParams[i];
 
 			int startCol = packing.x;
 			int endCol = packing.x + packing.colSpan;
-			TSBox startColBox = columnBoxes[startCol], endColBox = columnBoxes[endCol-1];
+			LBox startColBox = columnBoxes[startCol], endColBox = columnBoxes[endCol-1];
 			double xStart = startColBox.positionInParentSpaceX + packing.paddingX;
 			double xEnd = endColBox.positionInParentSpaceX  +  endColBox.allocationX - packing.paddingX;
 			double widthAvailable = xEnd - xStart;
@@ -349,21 +349,21 @@ public class TablePack
 	
 	
 	
-	public static void allocateY(TSBox box, TSBox rowBoxes[], TSBox children[], TablePackingParams packingParams[], int numColumns, int numRows,
+	public static void allocateY(LBox box, LBox rowBoxes[], LBox children[], TablePackingParams packingParams[], int numColumns, int numRows,
 			double spacingX, double spacingY, boolean bExpandX, boolean bExpandY, HAlignment colAlignment, VAlignment rowAlignment)
 	{
 		// Allocate space to the columns
-		VerticalPack.allocateY( box, rowBoxes, spacingY, bExpandY );
+		VerticalLayout.allocateY( box, rowBoxes, spacingY, bExpandY );
 		
 		// Allocate children
 		int i = 0;
-		for (TSBox child: children)
+		for (LBox child: children)
 		{
 			TablePackingParams packing = (TablePackingParams)packingParams[i];
 
 			if ( packing.rowSpan == 1  &&  rowAlignment == VAlignment.BASELINES  &&  child.bHasBaseline  &&  rowBoxes[packing.y].bHasBaseline )
 			{
-				TSBox rowBox = rowBoxes[packing.y];
+				LBox rowBox = rowBoxes[packing.y];
 
 				double yOffset = rowBox.reqAscent - child.reqAscent;			// Row ascent includes padding; so yOffset also includes padding
 				double yStart = rowBox.positionInParentSpaceY;
@@ -374,7 +374,7 @@ public class TablePack
 			{
 				int startRow = packing.y;
 				int endRow = packing.y + packing.rowSpan;
-				TSBox startRowBox = rowBoxes[startRow], endRowBox = rowBoxes[endRow-1];
+				LBox startRowBox = rowBoxes[startRow], endRowBox = rowBoxes[endRow-1];
 				double yStart = startRowBox.positionInParentSpaceY + packing.paddingY;
 				double yEnd = endRowBox.positionInParentSpaceY + endRowBox.allocationY - packing.paddingY;
 				double heightAvailable = yEnd - yStart;

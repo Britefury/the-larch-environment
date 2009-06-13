@@ -4,9 +4,9 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.DocPresent.Typesetting;
+package BritefuryJ.DocPresent.Layout;
 
-public class TSBox
+public class LBox
 {
 	protected static double EPSILON = 1.0e-9;
 	protected static double ONE_MINUS_EPSILON = 1.0 - EPSILON;
@@ -28,14 +28,14 @@ public class TSBox
 	protected int lineBreakCost;
 	
 	
-	public TSBox()
+	public LBox()
 	{
 		scale = 1.0;
 		bHasBaseline = false;
 		lineBreakCost = -1;
 	}
 	
-	public TSBox(double width, double hSpacing, double height, double vSpacing)
+	public LBox(double width, double hSpacing, double height, double vSpacing)
 	{
 		scale = 1.0;
 		minWidth = prefWidth = width;
@@ -46,7 +46,7 @@ public class TSBox
 		lineBreakCost = -1;
 	}
 	
-	public TSBox(double width, double hSpacing, double ascent, double descent, double vSpacing)
+	public LBox(double width, double hSpacing, double ascent, double descent, double vSpacing)
 	{
 		scale = 1.0;
 		minWidth = prefWidth = width;
@@ -58,7 +58,7 @@ public class TSBox
 		lineBreakCost = -1;
 	}
 
-	public TSBox(double minWidth, double prefWidth, double minHSpacing, double prefHSpacing, double height, double vSpacing)
+	public LBox(double minWidth, double prefWidth, double minHSpacing, double prefHSpacing, double height, double vSpacing)
 	{
 		scale = 1.0;
 		this.minWidth = minWidth;
@@ -71,7 +71,7 @@ public class TSBox
 		lineBreakCost = -1;
 	}
 
-	public TSBox(double minWidth, double prefWidth, double minHSpacing, double prefHSpacing, double ascent, double descent, double vSpacing)
+	public LBox(double minWidth, double prefWidth, double minHSpacing, double prefHSpacing, double ascent, double descent, double vSpacing)
 	{
 		scale = 1.0;
 		this.minWidth = minWidth;
@@ -86,7 +86,7 @@ public class TSBox
 	}
 	
 	
-	private TSBox(TSBox box)
+	private LBox(LBox box)
 	{
 		scale = 1.0;
 		minWidth = box.minWidth;
@@ -259,7 +259,7 @@ public class TSBox
 	}
 	
 
-	public void setAllocationFrom(TSBox box)
+	public void setAllocationFrom(LBox box)
 	{
 		allocationX = box.allocationX;
 		allocationY = box.allocationY;
@@ -269,36 +269,36 @@ public class TSBox
 	
 	
 	
-	protected void allocateChildX(TSBox child, double localPosX, double localWidth)
+	protected void allocateChildX(LBox child, double localPosX, double localWidth)
 	{
 		child.allocationX = localWidth / child.scale;
 		child.positionInParentSpaceX = localPosX;
 	}
 	
-	protected void allocateChildY(TSBox child, double localPosY, double localHeight)
+	protected void allocateChildY(LBox child, double localPosY, double localHeight)
 	{
 		child.allocationY = localHeight / child.scale;
 		child.positionInParentSpaceY = localPosY;
 	}
 	
 	
-	protected void allocateChildSpaceX(TSBox child, double localWidth)
+	protected void allocateChildSpaceX(LBox child, double localWidth)
 	{
 		child.allocationX = localWidth / child.scale;
 	}
 	
-	protected void allocateChildSpaceY(TSBox child, double localHeight)
+	protected void allocateChildSpaceY(LBox child, double localHeight)
 	{
 		child.allocationY = localHeight / child.scale;
 	}
 	
 	
-	protected void allocateChildPositionX(TSBox child, double localPosX)
+	protected void allocateChildPositionX(LBox child, double localPosX)
 	{
 		child.positionInParentSpaceX = localPosX;
 	}
 	
-	protected void allocateChildPositionY(TSBox child, double localPosY)
+	protected void allocateChildPositionY(LBox child, double localPosY)
 	{
 		child.positionInParentSpaceY = localPosY;
 	}
@@ -311,9 +311,9 @@ public class TSBox
 			return true;
 		}
 		
-		if ( x instanceof TSBox )
+		if ( x instanceof LBox )
 		{
-			TSBox b = (TSBox)x;
+			LBox b = (LBox)x;
 			
 			return scale == b.scale  &&
 					minWidth == b.minWidth  &&  prefWidth == b.prefWidth  &&  minHSpacing == b.minHSpacing  &&  prefHSpacing == b.prefHSpacing  &&
@@ -361,16 +361,16 @@ public class TSBox
 	
 	
 	
-	public TSBox copy()
+	public LBox copy()
 	{
-		return new TSBox( this );
+		return new LBox( this );
 	}
 	
 	
 	
-	public TSBox lineBreakBox(int cost)
+	public LBox lineBreakBox(int cost)
 	{
-		TSBox b = new TSBox( this );
+		LBox b = new LBox( this );
 		b.bLineBreak = true;
 		b.lineBreakCost = cost;
 		return b;
