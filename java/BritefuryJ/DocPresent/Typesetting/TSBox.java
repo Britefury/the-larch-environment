@@ -259,6 +259,15 @@ public class TSBox
 	}
 	
 
+	public void setAllocationFrom(TSBox box)
+	{
+		allocationX = box.allocationX;
+		allocationY = box.allocationY;
+		positionInParentSpaceX = box.positionInParentSpaceX;
+		positionInParentSpaceY = box.positionInParentSpaceY;
+	}
+	
+	
 	
 	protected void allocateChildX(TSBox child, double localPosX, double localWidth)
 	{

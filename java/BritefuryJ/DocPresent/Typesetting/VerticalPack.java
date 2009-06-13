@@ -214,4 +214,86 @@ public class VerticalPack
 			pos = size + childSpacing + spacing;
 		}
 	}
+
+
+
+
+
+	public static void allocateSpaceY(TSBox box, TSBox children[], boolean bExpand)
+	{
+		// Compute the amount of space required
+		double reqSizeTotal = 0.0;
+		if ( children.length > 0 )
+		{
+			for (TSBox child: children)
+			{
+				reqSizeTotal += child.getReqHeight();
+			}
+		}
+
+		if ( box.allocationY >= box.getReqHeight() * TSBox.ONE_MINUS_EPSILON )		// if allocation >= required
+		{
+			if ( box.allocationY <= box.getReqHeight() * TSBox.ONE_PLUS_EPSILON )			// if allocation == preferred   or   numExpand == 0
+			{
+				// Allocate children their preferred width
+				for (TSBox child: children)
+				{
+					box.allocateChildSpaceY( child, child.getReqHeight() );
+				}
+			}
+			else
+			{
+				// Allocate children their preferred size, plus any extra to those for which the expand flag is set
+				double totalExpand = box.allocationY - box.getReqHeight();
+				double expandPerChild = bExpand  ?  totalExpand / (double)children.length  :  0.0;
+				
+				int i = 0;
+				for (TSBox child: children)
+				{
+					box.allocateChildSpaceY( child, child.getReqHeight() + expandPerChild );
+					i++;
+				}
+			}
+		}
+		else			// if allocation < required
+		{
+			// Allocation is smaller than required size
+			
+			// Allocate children their required size
+			for (TSBox child: children)
+			{
+				box.allocateChildSpaceY( child, child.getReqHeight() );
+			}
+		}
+	}
+	
+	public static void allocateY(TSBox box, TSBox children[], double spacing, boolean bExpand)
+	{
+		// Each packed child consists of:
+		//	- start padding
+		//	- child width
+		//	- end padding
+		//	- any remaining spacing not 'consumed' by padding; spacing - padding  or  0 if padding > spacing
+		
+		// There should be at least the specified amount of spacing between each child, or the child's own h-spacing if it is greater
+
+		allocateSpaceY( box, children, bExpand );
+		
+		double size = 0.0;
+		double pos = 0.0;
+		for (int i = 0; i < children.length; i++)
+		{
+			TSBox child = children[i];
+
+			// Compute the spacing; padding consumes child spacing
+			double childSpacing = Math.max( child.reqVSpacing, 0.0 );
+
+			// Allocate child position
+			box.allocateChildPositionY( child, pos );
+
+			// Accumulate width and x
+			size = pos + child.allocationY;
+			pos = size + childSpacing + spacing;
+		}
+	}
 }

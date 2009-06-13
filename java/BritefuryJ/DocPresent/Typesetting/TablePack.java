@@ -7,6 +7,8 @@
 package BritefuryJ.DocPresent.Typesetting;
 
 
+
+
 public class TablePack
 {
 	private static TSBox[] computeColumnXBoxes(TSBox children[], TablePackingParams packingParams[], int numColumns, int numRows, double spacingX)
@@ -241,7 +243,8 @@ public class TablePack
 	
 	
 	
-	public static TSBox[] computeRequisitionX(TSBox box, TSBox children[], TablePackingParams packingParams[], int numColumns, int numRows, double spacingX, double spacingY)
+	public static TSBox[] computeRequisitionX(TSBox box, TSBox children[], TablePackingParams packingParams[], int numColumns, int numRows,
+			double spacingX, double spacingY, boolean bExpandX, boolean bExpandY, HAlignment colAlignment, VAlignment rowAlignment)
 	{
 		TSBox columnBoxes[] = computeColumnXBoxes( children, packingParams, numColumns, numRows, spacingX );
 		
@@ -262,7 +265,8 @@ public class TablePack
 
 
 
-	public static TSBox[] computeRequisitionY(TSBox box, TSBox children[], TablePackingParams packingParams[], int numColumns, int numRows, double spacingX, double spacingY, VAlignment rowAlignment)
+	public static TSBox[] computeRequisitionY(TSBox box, TSBox children[], TablePackingParams packingParams[], int numColumns, int numRows,
+			double spacingX, double spacingY, boolean bExpandX, boolean bExpandY, HAlignment colAlignment, VAlignment rowAlignment)
 	{
 		TSBox rowBoxes[];
 		
@@ -291,5 +295,111 @@ public class TablePack
 	
 	
 	
+	public static void allocateX(TSBox box, TSBox columnBoxes[], TSBox children[], TablePackingParams packingParams[], int numColumns, int numRows,
+			double spacingX, double spacingY, boolean bExpandX, boolean bExpandY, HAlignment colAlignment, VAlignment rowAlignment)
+	{
+		// Allocate space to the columns
+		HorizontalPack.allocateX( box, columnBoxes, spacingX, bExpandX );
+		
+		// Allocate children
+		int i = 0;
+		for (TSBox child: children)
+		{
+			TablePackingParams packing = (TablePackingParams)packingParams[i];
+
+			int startCol = packing.x;
+			int endCol = packing.x + packing.colSpan;
+			TSBox startColBox = columnBoxes[startCol], endColBox = columnBoxes[endCol-1];
+			double xStart = startColBox.positionInParentSpaceX + packing.paddingX;
+			double xEnd = endColBox.positionInParentSpaceX  +  endColBox.allocationX - packing.paddingX;
+			double widthAvailable = xEnd - xStart;
+			double cellWidth = Math.max( widthAvailable, child.minWidth );
+			
+			if ( cellWidth <= child.prefWidth )
+			{
+				box.allocateChildX( child, xStart, cellWidth );
+			}
+			else
+			{
+				if ( colAlignment == HAlignment.LEFT )
+				{
+					box.allocateChildX( child, xStart, child.prefWidth );
+				}
+				else if ( colAlignment == HAlignment.RIGHT )
+				{
+					box.allocateChildX( child, Math.max( xEnd - child.prefWidth, 0.0 ), child.prefWidth );
+				}
+				else if ( colAlignment == HAlignment.CENTRE )
+				{
+					box.allocateChildX( child, Math.max( xStart + ( widthAvailable - child.prefWidth ) * 0.5, 0.0 ), child.prefWidth );
+				}
+				else if ( colAlignment == HAlignment.EXPAND )
+				{
+					box.allocateChildX( child, xStart, cellWidth );
+				}
+			}
+			
+			i++;
+		}
+	}
 	
+
+
+	
+	
+	
+	
+	public static void allocateY(TSBox box, TSBox rowBoxes[], TSBox children[], TablePackingParams packingParams[], int numColumns, int numRows,
+			double spacingX, double spacingY, boolean bExpandX, boolean bExpandY, HAlignment colAlignment, VAlignment rowAlignment)
+	{
+		// Allocate space to the columns
+		VerticalPack.allocateY( box, rowBoxes, spacingY, bExpandY );
+		
+		// Allocate children
+		int i = 0;
+		for (TSBox child: children)
+		{
+			TablePackingParams packing = (TablePackingParams)packingParams[i];
+
+			if ( packing.rowSpan == 1  &&  rowAlignment == VAlignment.BASELINES  &&  child.bHasBaseline  &&  rowBoxes[packing.y].bHasBaseline )
+			{
+				TSBox rowBox = rowBoxes[packing.y];
+
+				double yOffset = rowBox.reqAscent - child.reqAscent;			// Row ascent includes padding; so yOffset also includes padding
+				double yStart = rowBox.positionInParentSpaceY;
+				double yPos = yStart + Math.max( yOffset, 0.0 );
+				box.allocateChildY( child, yPos, child.getReqHeight() );
+			}
+			else
+			{
+				int startRow = packing.y;
+				int endRow = packing.y + packing.rowSpan;
+				TSBox startRowBox = rowBoxes[startRow], endRowBox = rowBoxes[endRow-1];
+				double yStart = startRowBox.positionInParentSpaceY + packing.paddingY;
+				double yEnd = endRowBox.positionInParentSpaceY + endRowBox.allocationY - packing.paddingY;
+				double heightAvailable = yEnd - yStart;
+				double reqHeight = child.getReqHeight();
+				double cellHeight = Math.max( heightAvailable, reqHeight );
+				
+				if ( rowAlignment == VAlignment.TOP )
+				{
+					box.allocateChildY( child, yStart, reqHeight );
+				}
+				else if ( rowAlignment == VAlignment.BOTTOM )
+				{
+					box.allocateChildY( child, Math.max( yEnd - reqHeight, 0.0 ), reqHeight );
+				}
+				else if ( rowAlignment == VAlignment.CENTRE )
+				{
+					box.allocateChildY( child, Math.max( yStart + ( heightAvailable - reqHeight ) * 0.5, 0.0 ), reqHeight );
+				}
+				else if ( rowAlignment == VAlignment.EXPAND )
+				{
+					box.allocateChildY( child, yStart, cellHeight );
+				}
+			}
+			
+			i++;
+		}
+	}
 }
