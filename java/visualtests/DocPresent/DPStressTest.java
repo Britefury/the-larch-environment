@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package tests.DocPresent;
+package visualtests.DocPresent;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -25,7 +25,7 @@ import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
 public class DPStressTest
 {
-	// Memory usage history (10240 lines):
+	// Memory usage history (10240 lines): (java 1.6.0_7 32-bit)
 	// ~480MB: initial
 	// 357MB: packed DPContainer.ChildEntry
 	// 353MB: packed TextVisual

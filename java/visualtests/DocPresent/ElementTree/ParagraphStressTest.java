@@ -5,7 +5,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 1999-2008.
 //##************************
-package tests.DocPresent.ElementTree;
+package visualtests.DocPresent.ElementTree;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -25,37 +25,8 @@ import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
-public class ParagraphElementTest extends ElementTreeTestBase
+public class ParagraphStressTest extends ElementTreeTestBase
 {
-	protected Element makeParagraphElement(String prefix, int numChildren)
-	{
-		Font f0 = new Font( "Sans serif", Font.PLAIN, 12 );
-		TextStyleSheet s0 = new TextStyleSheet( f0, Color.black );
-		
-		ArrayList<Element> ch = new ArrayList<Element>();
-		
-		for (int i = 0; i < numChildren; i++)
-		{
-			ch.add( new TextElement( s0, prefix + String.valueOf( i ) ) );
-			
-			if ( i != numChildren - 1 )
-			{
-				TextElement space = new TextElement( s0, " " );
-				ContainerStyleSheet lbs = new ContainerStyleSheet();
-				LineBreakElement lb = new LineBreakElement( lbs );
-				lb.setChild( space );
-				ch.add( lb );
-			}
-		}
-		
-		ParagraphStyleSheet p0 = new ParagraphStyleSheet( DPParagraph.Alignment.BASELINES, 0.0, 0.0, 30.0 );
-		ParagraphElement para = new ParagraphElement( p0 ); 
-		
-		para.setChildren( ch );
-		return para;
-	}
-
-	
 	protected Element makeNestedParagraphElement(String prefix, double indentation, int numChildren, int level)
 	{
 		Font f0 = new Font( "Sans serif", Font.PLAIN, 12 );
@@ -95,12 +66,14 @@ public class ParagraphElementTest extends ElementTreeTestBase
 	
 	protected Element createContentNode()
 	{
-		VBoxStyleSheet boxs = new VBoxStyleSheet( DPVBox.Typesetting.NONE, DPVBox.Alignment.LEFT, 50.0, false, 0.0 );
+		VBoxStyleSheet boxs = new VBoxStyleSheet( DPVBox.Typesetting.NONE, DPVBox.Alignment.LEFT, 0.0, false, 0.0 );
 		VBoxElement box = new VBoxElement( boxs );
 		ArrayList<Element> children = new ArrayList<Element>();
 		
-		children.add( makeParagraphElement( "word_", 15 ) );
-		children.add( makeNestedParagraphElement( "word_", 0.0, 3, 4 ) );
+		for (int i = 0; i < 256; i++)
+		{
+			children.add( makeNestedParagraphElement( "word_", 30.0, 2, 2 ) );
+		}
 		
 		box.setChildren( children );
 		
@@ -109,15 +82,15 @@ public class ParagraphElementTest extends ElementTreeTestBase
 
 
 
-	public ParagraphElementTest()
+	public ParagraphStressTest()
 	{
-		JFrame frame = new JFrame( "Paragraph element test" );
+		JFrame frame = new JFrame( "Paragraph element stress test" );
 		initFrame( frame );
 	}
 	
 	
 	public static void main(String[] args)
 	{
-		new ParagraphElementTest();
+		new ParagraphStressTest();
 	}
 }
