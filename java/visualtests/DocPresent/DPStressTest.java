@@ -25,7 +25,7 @@ import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
 public class DPStressTest
 {
-	// Memory usage history (10240 lines): (java 1.6.0_7 32-bit)
+	// Memory usage history (10240 lines): (32-bit JVM, measurement is process size)
 	// ~480MB: initial
 	// 357MB: packed DPContainer.ChildEntry
 	// 353MB: packed TextVisual
@@ -37,6 +37,18 @@ public class DPStressTest
 	// 117MB: replaced paragraph ArrayLists with arrays
 	// 111MB: replaced Vector2 and Point2 objects in DPWidget with doubles
 	// 83MB: cached metrics in TextVisual objects, and modified Metrics.scaled() (and subclass) methods to only create a new metrics object in cases scale != 1.0
+	
+	
+	// Profiling:
+	// 2009/06/14
+	// java 1.6.0_14 32-bit
+	// 10240 lines
+	// 
+	//
+	// State						JVM version			# lines			Process size			Measured mem usage			Widget tree creation time		typeset time
+	//
+	// Original (after previous tests)	1.6.0_14				10240			80.7MB				56.6MB					0.839s					0.410s
+	
 	private static int NUMLINES = 10240;
 	
 	
@@ -127,8 +139,6 @@ public class DPStressTest
 		frame.add( area.getComponent() );
 		frame.pack();
 		frame.setVisible(true);
-		
-		System.gc();
 	}
 	
 	

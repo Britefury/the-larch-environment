@@ -813,7 +813,7 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 				rootMotionEvent( new PointerMotionEvent( rootSpaceMouse, PointerMotionEvent.Action.MOTION ) );
 			}			
 			long t2 = System.nanoTime();
-			System.out.println( "DPPresentationArea.performAllocation(): TYPESET TIME = " + (double)(t2-t1) * 1.0e-9 );
+			System.out.println( "DPPresentationArea.performAllocation(): TYPESET TIME = " + (double)(t2-t1) * 1.0e-9  +  ", used memory = "  + ( Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory() ) );
 		}
 	}
 	
