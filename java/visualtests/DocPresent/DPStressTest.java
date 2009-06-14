@@ -115,10 +115,10 @@ public class DPStressTest
 	     
 	     
 	     
-		long t1 = System.currentTimeMillis();
+		long t1 = System.nanoTime();
 		DPWidget w = createContentNode();
-		long t2 = System.currentTimeMillis();
-		System.out.println( "Widget tree creation time: " + (double)( t2 - t1 ) / 1000.0 );
+		long t2 = System.nanoTime();
+		System.out.println( "Widget tree creation time: " + (double)( t2 - t1 ) / 1000000000.0 );
 		area.setChild( w );
 	     
 	     
