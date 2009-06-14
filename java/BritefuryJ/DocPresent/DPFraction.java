@@ -215,7 +215,7 @@ public class DPFraction extends DPContainer
 				registerChild( child, null );
 				if ( slot != BAR )
 				{
-					child.setScale( childScale, rootScale * childScale );
+					child.setScale( childScale );
 				}
 				
 				int insertIndex = 0;

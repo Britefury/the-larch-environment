@@ -110,13 +110,13 @@ public abstract class DPContainer extends DPWidget
 	}
 	
 
-	protected void refreshScale(double scale, double rootScale)
+	protected void refreshScale(double scale)
 	{
-		super.refreshScale( scale, rootScale );
+		super.refreshScale( scale );
 		
 		for (DPWidget child: registeredChildren)
 		{
-			child.setScale( 1.0, rootScale );
+			child.setScale( 1.0 );
 		}
 	}
 	

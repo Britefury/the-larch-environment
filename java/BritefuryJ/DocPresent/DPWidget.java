@@ -117,7 +117,7 @@ abstract public class DPWidget
 	protected DPContainer parent;
 	protected DPPresentationArea presentationArea;
 	protected boolean bRealised, bResizeQueued, bSizeUpToDate;
-	protected double scale, rootScale;
+	protected double scale;
 	protected HMetrics minH, prefH;
 	protected VMetrics minV, prefV;
 	protected double positionInParentSpaceX, positionInParentSpaceY;
@@ -156,7 +156,7 @@ abstract public class DPWidget
 	public DPWidget(WidgetStyleSheet styleSheet)
 	{
 		this.styleSheet = styleSheet;
-		scale = rootScale = 1.0;
+		scale = 1.0;
 		minH = new HMetrics();
 		prefH = new HMetrics();
 		minV = new VMetrics();
@@ -890,7 +890,7 @@ abstract public class DPWidget
 	}
 	
 	
-	protected void onSetScale(double scale, double rootScale)
+	protected void onSetScale(double scale)
 	{
 	}
 	
@@ -1042,18 +1042,17 @@ abstract public class DPWidget
 	
 	
 	
-	protected void refreshScale(double scale, double rootScale)
+	protected void refreshScale(double scale)
 	{
-		onSetScale( scale, rootScale );
+		onSetScale( scale );
 	}
 	
-	protected void setScale(double scale, double rootScale)
+	protected void setScale(double scale)
 	{
-		if ( scale != this.scale  ||  rootScale != this.rootScale )
+		if ( scale != this.scale )
 		{
 			this.scale = scale;
-			this.rootScale = rootScale;
-			refreshScale( scale, rootScale );
+			refreshScale( scale );
 		}
 	}
 	
