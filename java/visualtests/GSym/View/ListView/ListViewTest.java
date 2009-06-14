@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package tests.GSym.View.ListView;
+package visualtests.GSym.View.ListView;
 
 import java.awt.Color;
 import java.awt.Dimension;

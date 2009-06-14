@@ -5,7 +5,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 1999-2008.
 //##************************
-package tests.DocPresent.ElementTree;
+package visualtests.DocPresent.ElementTree;
 
 import java.awt.Color;
 import java.awt.Font;
