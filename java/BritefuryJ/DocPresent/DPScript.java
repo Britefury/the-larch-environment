@@ -96,7 +96,7 @@ public class DPScript extends DPContainer
 				registerChild( child, null );
 				if ( slot != MAIN )
 				{
-					child.setScale( childScale, rootScale * childScale );
+					child.setScale( childScale );
 				}
 			}
 			
