@@ -14,9 +14,8 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 
 import BritefuryJ.DocPresent.Caret.Caret;
+import BritefuryJ.DocPresent.Layout.LBox;
 import BritefuryJ.DocPresent.Marker.Marker;
-import BritefuryJ.DocPresent.Metrics.HMetrics;
-import BritefuryJ.DocPresent.Metrics.VMetrics;
 import BritefuryJ.DocPresent.StyleSheets.CustomSymbolStyleSheet;
 import BritefuryJ.Math.Point2;
 
@@ -25,8 +24,10 @@ public class DPCustomSymbol extends DPContentLeafEditableEntry
 {
 	public interface SymbolInterface
 	{
-		public HMetrics computeHMetrics();
-		public VMetrics computeVMetrics();
+		public double getWidth();
+		public double getHeight();
+		public void setBoxRequisitionX(LBox box);
+		public void setBoxRequisitionY(LBox box);
 		public void draw(Graphics2D graphics);
 	}
 	
@@ -72,25 +73,14 @@ public class DPCustomSymbol extends DPContentLeafEditableEntry
 	
 	
 	
-	protected HMetrics computeMinimumHMetrics()
+	protected void updateRequisitionX()
 	{
-		return symbol.computeHMetrics();
-	}
-	
-	protected HMetrics computePreferredHMetrics()
-	{
-		return symbol.computeHMetrics();
+		symbol.setBoxRequisitionX( layoutBox );
 	}
 
-
-	protected VMetrics computeMinimumVMetrics()
+	protected void updateRequisitionY()
 	{
-		return symbol.computeVMetrics();
-	}
-
-	protected VMetrics computePreferredVMetrics()
-	{
-		return symbol.computeVMetrics();
+		symbol.setBoxRequisitionY( layoutBox );
 	}
 	
 	
@@ -111,8 +101,8 @@ public class DPCustomSymbol extends DPContentLeafEditableEntry
 	{
 		AffineTransform current = pushGraphicsTransform( graphics );
 		int index = c.getMarker().getIndex();
-		double x = index == 0  ?  0.0  :  symbol.computeHMetrics().width;
-		Line2D.Double line = new Line2D.Double( x, 0.0, x, symbol.computeVMetrics().height );
+		double x = index == 0  ?  0.0  :  symbol.getWidth();
+		Line2D.Double line = new Line2D.Double( x, 0.0, x, symbol.getHeight() );
 		graphics.draw( line );
 		popGraphicsTransform( graphics, current );
 	}
@@ -120,7 +110,7 @@ public class DPCustomSymbol extends DPContentLeafEditableEntry
 	public void drawCaretAtStart(Graphics2D graphics)
 	{
 		AffineTransform current = pushGraphicsTransform( graphics );
-		double h = symbol.computeVMetrics().height;
+		double h = symbol.getHeight();
 		graphics.draw( new Line2D.Double( 0.0, 0.0, 0.0, h) );
 		popGraphicsTransform( graphics, current );
 	}
@@ -128,8 +118,8 @@ public class DPCustomSymbol extends DPContentLeafEditableEntry
 	public void drawCaretAtEnd(Graphics2D graphics)
 	{
 		AffineTransform current = pushGraphicsTransform( graphics );
-		double x = symbol.computeHMetrics().width;
-		double h = symbol.computeVMetrics().height;
+		double x = symbol.getWidth();
+		double h = symbol.getHeight();
 		graphics.draw( new Line2D.Double( x, 0.0, x, h) );
 		popGraphicsTransform( graphics, current );
 	}
@@ -147,9 +137,9 @@ public class DPCustomSymbol extends DPContentLeafEditableEntry
 		AffineTransform current = pushGraphicsTransform( graphics );
 		int startIndex = from != null  ?  from.getIndex()  :  0;
 		int endIndex = to != null  ?  to.getIndex()  :  1;
-		double startX = startIndex == 0  ?  0.0  :  symbol.computeHMetrics().width;
-		double endX = endIndex == 0  ?  0.0  :  symbol.computeHMetrics().width;
-		Rectangle2D.Double shape = new Rectangle2D.Double( startX, 0.0, endX - startX, symbol.computeVMetrics().height );
+		double startX = startIndex == 0  ?  0.0  :  symbol.getWidth();
+		double endX = endIndex == 0  ?  0.0  :  symbol.getWidth();
+		Rectangle2D.Double shape = new Rectangle2D.Double( startX, 0.0, endX - startX, symbol.getHeight() );
 		graphics.fill( shape );
 		popGraphicsTransform( graphics, current );
 	}
@@ -168,7 +158,7 @@ public class DPCustomSymbol extends DPContentLeafEditableEntry
 	
 	public int getMarkerPositonForPoint(Point2 localPos)
 	{
-		if ( localPos.x  >=  symbol.computeHMetrics().width * 0.5 )
+		if ( localPos.x  >=  symbol.getWidth() * 0.5 )
 		{
 			return 1;
 		}

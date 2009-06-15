@@ -17,23 +17,36 @@ public class ScriptLayout
 
 	
 	
-	public static LBox[] computeRequisitionX(LBox box, LBox leftSuper, LBox leftSub, LBox main, LBox rightSuper, LBox rightSub, double spacing, double scriptSpacing)
+	public static void computeRequisitionX(LBox box, LBox columnBoxes[], LBox leftSuper, LBox leftSub, LBox main, LBox rightSuper, LBox rightSub, double spacing, double scriptSpacing)
 	{
 		// Compute boxes for the left, main, and right columns
-		LBox leftColumn = leftSuper != null  ?  leftSuper.copy()  :  new LBox();
+		columnBoxes[0].clearRequisitionX();
+		columnBoxes[1].clearRequisitionX();
+		columnBoxes[2].clearRequisitionX();
+		if ( leftSuper != null )
+		{
+			columnBoxes[0].setRequisitionX( leftSuper );
+		}
 		if ( leftSub != null )
 		{
-			leftColumn.maxRequisitionX( leftSub );
+			columnBoxes[0].maxRequisitionX( leftSub );
 		}
 		
-		LBox mainColumn = main != null  ?  main  :  new LBox();
+		if ( main != null )
+		{
+			columnBoxes[1].setRequisitionX( main );
+		}
 		
-		LBox rightColumn = rightSuper != null  ?  rightSuper.copy()  :  new LBox();
+		if ( rightSuper != null )
+		{
+			columnBoxes[2].setRequisitionX( rightSuper );
+		}
 		if ( rightSub != null )
 		{
-			rightColumn.maxRequisitionX( rightSub );
+			columnBoxes[2].maxRequisitionX( rightSub );
 		}
-		
+
+		LBox leftColumn = columnBoxes[0], rightColumn = columnBoxes[2];
 		
 		// Compute the spacing that is placed between the columns
 		double leftSpacing = 0.0, mainSpacing = 0.0;
@@ -72,13 +85,11 @@ public class ScriptLayout
 		
 		// Set the requisition
 		box.setRequisitionX( minW, prefW, minHSpacing, prefHSpacing );
-		
-		return new LBox[] { leftColumn, mainColumn, rightColumn };
 	}
 
 
 
-	public static double[] computeRequisitionY(LBox box, LBox leftSuper, LBox leftSub, LBox main, LBox rightSuper, LBox rightSub, double spacing, double scriptSpacing)
+	public static void computeRequisitionY(LBox box, double rowBaselineY[], LBox leftSuper, LBox leftSub, LBox main, LBox rightSuper, LBox rightSub, double spacing, double scriptSpacing)
 	{
 		double superBaselineY = 0.0, mainBaselineY = 0.0, subBaselineY = 0.0;
 		
@@ -221,7 +232,9 @@ public class ScriptLayout
 		
 		box.setRequisitionY( mainBaselineY, descent, spacing );
 		
-		return new double[] { superBaselineY, mainBaselineY, subBaselineY };
+		rowBaselineY[0] = superBaselineY;
+		rowBaselineY[1] = mainBaselineY;
+		rowBaselineY[2] = subBaselineY;
 	}
 
 

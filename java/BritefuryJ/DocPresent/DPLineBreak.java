@@ -33,12 +33,14 @@ public class DPLineBreak extends DPBin implements LineBreakInterface
 	{
 		super( styleSheet );
 		this.lineBreakPriority = lineBreakPriority;
+		layoutBox.setLineBreakCost( lineBreakPriority );
 	}
 	
 	
 	void setLineBreakPriority(int lineBreakPriority)
 	{
 		this.lineBreakPriority = lineBreakPriority;
+		layoutBox.setLineBreakCost( lineBreakPriority );
 		queueResize();
 	}
 	
@@ -48,6 +50,22 @@ public class DPLineBreak extends DPBin implements LineBreakInterface
 		return lineBreakPriority;
 	}
 	
+	
+	
+	protected void updateRequisitionX()
+	{
+		super.updateRequisitionX();
+		
+		layoutBox.setLineBreakCost( lineBreakPriority );
+	}
+
+	protected void updateRequisitionY()
+	{
+		super.updateRequisitionY();
+		
+		layoutBox.setLineBreakCost( lineBreakPriority );
+	}
+
 	
 	
 	public LineBreakInterface getLineBreakInterface()

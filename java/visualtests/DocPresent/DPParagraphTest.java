@@ -20,6 +20,8 @@ import BritefuryJ.DocPresent.DPPresentationArea;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.Layout.HAlignment;
+import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
@@ -59,38 +61,38 @@ public class DPParagraphTest
 	}
 	
 	
-	protected DPVBox makeTextVBox(DPVBox.Alignment alignment, double spacing, double padding)
+	protected DPVBox makeTextVBox(HAlignment alignment, double spacing, double padding)
 	{
 		TextStyleSheet style = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.blue );
 		DPWidget t1 = new DPText( style, "Vert1" );
 		DPWidget t2 = new DPText( style, "Vert2" );
 		DPWidget t3 = new DPText( style, "Vert3" );
 		DPWidget[] children = { t1, t2, t3 };
-		VBoxStyleSheet boxs = new VBoxStyleSheet( DPVBox.Typesetting.NONE, alignment, spacing, false, padding );
+		VBoxStyleSheet boxs = new VBoxStyleSheet( alignment, spacing, false, padding );
 		DPVBox box = new DPVBox( boxs );
 		box.extend( children );
 		return box;
 	}
 	
-	protected DPParagraph makeParagraph(String title, DPParagraph.Alignment alignment, double spacing, double padding, double indentation, int lineBreakStep, TextStyleSheet textStyle)
+	protected DPParagraph makeParagraph(String title, VAlignment alignment, double spacing, double vSpacing, double padding, double indentation, int lineBreakStep, TextStyleSheet textStyle)
 	{
 		ArrayList<DPWidget> children = makeTextNodes( title + ": " + textBlock, textStyle );
 		if ( lineBreakStep > 0 )
 		{
 			children = addLineBreaks( children, lineBreakStep );
 		}
-		ParagraphStyleSheet boxs = new ParagraphStyleSheet( alignment, spacing, padding, indentation );
+		ParagraphStyleSheet boxs = new ParagraphStyleSheet( alignment, spacing, vSpacing, padding, indentation );
 		DPParagraph box = new DPParagraph( boxs );
 		box.extend( children );
 		return box;
 	}
 	
-	protected DPParagraph makeParagraphWithNestedPara(String title, DPParagraph.Alignment alignment, double spacing, double padding, double indentation, int lineBreakStep, TextStyleSheet textStyle, TextStyleSheet nestedTextStyle)
+	protected DPParagraph makeParagraphWithNestedPara(String title, VAlignment alignment, double spacing, double vSpacing, double padding, double indentation, int lineBreakStep, TextStyleSheet textStyle, TextStyleSheet nestedTextStyle)
 	{
 		ArrayList<DPWidget> children = makeTextNodes( title + ": " + textBlock, textStyle );
 		children = addLineBreaks( children, lineBreakStep );
-		children.add( children.size()/2, makeParagraph( title + " (inner)", alignment, spacing, padding, indentation, lineBreakStep, nestedTextStyle ) );
-		ParagraphStyleSheet boxs = new ParagraphStyleSheet( alignment, spacing, padding, indentation );
+		children.add( children.size()/2, makeParagraph( title + " (inner)", alignment, spacing, vSpacing, padding, indentation, lineBreakStep, nestedTextStyle ) );
+		ParagraphStyleSheet boxs = new ParagraphStyleSheet( alignment, spacing, vSpacing, padding, indentation );
 		DPParagraph box = new DPParagraph( boxs );
 		box.extend( children );
 		return box;
@@ -102,16 +104,16 @@ public class DPParagraphTest
 		TextStyleSheet blackText = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.black );
 		TextStyleSheet redText = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.red );
 		
-		DPWidget b1 = makeParagraph( "ONE-LINE", DPParagraph.Alignment.BASELINES, 0.0, 0.0, 0.0, 0, blackText );
-		DPWidget b2 = makeParagraph( "PER-WORD", DPParagraph.Alignment.BASELINES, 0.0, 0.0, 0.0, 1, blackText );
-		DPWidget b3 = makeParagraph( "EVERY-4-WORDS", DPParagraph.Alignment.BASELINES, 0.0, 0.0, 0.0, 4, blackText);
-		DPWidget b4 = makeParagraphWithNestedPara( "NESTED-1", DPParagraph.Alignment.BASELINES, 0.0, 0.0, 0.0, 1, blackText, redText );
-		DPWidget b5 = makeParagraphWithNestedPara( "NESTED-2", DPParagraph.Alignment.BASELINES, 0.0, 0.0, 0.0, 2, blackText, redText );
-		DPWidget b6 = makeParagraphWithNestedPara( "NESTED-4", DPParagraph.Alignment.BASELINES, 0.0, 0.0, 0.0, 4, blackText, redText );
-		DPWidget b7 = makeParagraph( "PER-WORD INDENTED", DPParagraph.Alignment.BASELINES, 0.0, 0.0, 50.0, 1, blackText );
-		DPWidget b8 = makeParagraphWithNestedPara( "NESTED-2-INDENTED", DPParagraph.Alignment.BASELINES, 0.0, 0.0, 50.0, 2, blackText, redText );
+		DPWidget b1 = makeParagraph( "ONE-LINE", VAlignment.BASELINES, 0.0, 0.0, 0.0, 0.0, 0, blackText );
+		DPWidget b2 = makeParagraph( "PER-WORD", VAlignment.BASELINES, 0.0, 0.0, 0.0, 0.0, 1, blackText );
+		DPWidget b3 = makeParagraph( "EVERY-4-WORDS", VAlignment.BASELINES, 0.0, 0.0, 0.0, 0.0, 4, blackText);
+		DPWidget b4 = makeParagraphWithNestedPara( "NESTED-1", VAlignment.BASELINES, 0.0, 0.0, 0.0, 0.0, 1, blackText, redText );
+		DPWidget b5 = makeParagraphWithNestedPara( "NESTED-2", VAlignment.BASELINES, 0.0, 0.0, 0.0, 0.0, 2, blackText, redText );
+		DPWidget b6 = makeParagraphWithNestedPara( "NESTED-4", VAlignment.BASELINES, 0.0, 0.0, 0.0, 0.0, 4, blackText, redText );
+		DPWidget b7 = makeParagraph( "PER-WORD INDENTED", VAlignment.BASELINES, 0.0, 0.0, 0.0, 50.0, 1, blackText );
+		DPWidget b8 = makeParagraphWithNestedPara( "NESTED-2-INDENTED", VAlignment.BASELINES, 0.0, 0.0, 0.0, 50.0, 2, blackText, redText );
 		DPWidget[] children = { b1, b2, b3, b4, b5, b6, b7, b8 };
-		VBoxStyleSheet boxs = new VBoxStyleSheet( DPVBox.Typesetting.NONE, DPVBox.Alignment.EXPAND, 30.0, false, 0.0 );
+		VBoxStyleSheet boxs = new VBoxStyleSheet( HAlignment.EXPAND, 30.0, false, 0.0 );
 		DPVBox box = new DPVBox( boxs );
 		box.extend( children );
 		return box;

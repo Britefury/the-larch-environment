@@ -11,9 +11,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import BritefuryJ.DocPresent.Metrics.HMetrics;
-import BritefuryJ.DocPresent.Metrics.VMetrics;
-import BritefuryJ.DocPresent.Metrics.VMetricsTypeset;
+import BritefuryJ.DocPresent.Layout.LBox;
+import BritefuryJ.DocPresent.Layout.ScriptLayout;
 import BritefuryJ.DocPresent.StyleSheets.ScriptStyleSheet;
 import BritefuryJ.Math.Point2;
 
@@ -35,19 +34,10 @@ public class DPScript extends DPContainer
 	private static double childScale = 0.7;
 	
 	
-	private static double superOffset = 0.333;
-	private static double subOffset = 0.333;
-
-	private static double superOffsetFraction = superOffset  /  ( superOffset + subOffset );
-	private static double subOffsetFraction = subOffset  /  ( superOffset + subOffset );
-	
-	
 	
 	protected DPWidget[] children;
-	protected HMetrics leftMinH, leftPrefH;
-	protected HMetrics mainMinH, mainPrefH;
-	protected HMetrics rightMinH, rightPrefH;
-	protected double superscriptAscent, mainAscent, subscriptAscent;
+	protected LBox columnBoxes[];
+	protected double rowBaselineY[];
 	
 	
 	
@@ -61,13 +51,11 @@ public class DPScript extends DPContainer
 		super( styleSheet );
 		
 		children = new DPWidget[NUMCHILDREN];
-		leftMinH = new HMetrics();
-		leftPrefH = new HMetrics();
-		rightMinH = new HMetrics();
-		rightPrefH = new HMetrics();
-		superscriptAscent = 0.0;
-		mainAscent = 0.0;
-		subscriptAscent = 0.0;
+		columnBoxes = new LBox[3];
+		columnBoxes[0] = new LBox( null );
+		columnBoxes[1] = new LBox( null );
+		columnBoxes[2] = new LBox( null );
+		rowBaselineY = new double[3];
 	}
 
 	
@@ -94,10 +82,6 @@ public class DPScript extends DPContainer
 			{
 				registeredChildren.add( child );
 				registerChild( child, null );
-				if ( slot != MAIN )
-				{
-					child.setScale( childScale );
-				}
 			}
 			
 			queueResize();
@@ -187,202 +171,6 @@ public class DPScript extends DPContainer
 	
 	
 	
-	private HMetrics[] getChildRefreshedMinimumHMetrics()
-	{
-		HMetrics[] metrics = new HMetrics[NUMCHILDREN];
-		
-		for (int i = 0; i < NUMCHILDREN; i++)
-		{
-			if ( children[i] != null )
-			{
-				metrics[i] = children[i].refreshMinimumHMetrics();
-			}
-			else
-			{
-				metrics[i] = new HMetrics();
-			}
-		}
-		
-		return metrics;
-	}
-	
-	private HMetrics[] getChildRefreshedPreferredHMetrics()
-	{
-		HMetrics[] metrics = new HMetrics[NUMCHILDREN];
-		
-		for (int i = 0; i < NUMCHILDREN; i++)
-		{
-			if ( children[i] != null )
-			{
-				metrics[i] = children[i].refreshPreferredHMetrics();
-			}
-			else
-			{
-				metrics[i] = new HMetrics();
-			}
-		}
-		
-		return metrics;
-	}
-	
-	
-	private VMetricsTypeset[] getChildRefreshedMinimumVMetrics()
-	{
-		VMetricsTypeset[] metrics = new VMetricsTypeset[NUMCHILDREN];
-		
-		for (int i = 0; i < NUMCHILDREN; i++)
-		{
-			if ( children[i] != null )
-			{
-				VMetrics v = children[i].refreshMinimumVMetrics();
-				if ( v.isTypeset() )
-				{
-					metrics[i] = (VMetricsTypeset)v;
-				}
-				else
-				{
-					metrics[i] = new VMetricsTypeset( v.height, 0.0, v.vspacing );
-				}
-			}
-			else
-			{
-				metrics[i] = new VMetricsTypeset();
-			}
-		}
-		
-		return metrics;
-	}
-	
-	private VMetricsTypeset[] getChildRefreshedPreferredVMetrics()
-	{
-		VMetricsTypeset[] metrics = new VMetricsTypeset[NUMCHILDREN];
-		
-		for (int i = 0; i < NUMCHILDREN; i++)
-		{
-			if ( children[i] != null )
-			{
-				VMetrics v = children[i].refreshPreferredVMetrics();
-				if ( v.isTypeset() )
-				{
-					metrics[i] = (VMetricsTypeset)v;
-				}
-				else
-				{
-					metrics[i] = new VMetricsTypeset( v.height, 0.0, v.vspacing );
-				}
-			}
-			else
-			{
-				metrics[i] = new VMetricsTypeset();
-			}
-		}
-		
-		return metrics;
-	}
-	
-	
-
-	
-	
-	
-	
-	private HMetrics[] getChildMinimumHMetrics()
-	{
-		HMetrics[] metrics = new HMetrics[NUMCHILDREN];
-		
-		for (int i = 0; i < NUMCHILDREN; i++)
-		{
-			if ( children[i] != null )
-			{
-				metrics[i] = children[i].minH;
-			}
-			else
-			{
-				metrics[i] = new HMetrics();
-			}
-		}
-		
-		return metrics;
-	}
-	
-	private HMetrics[] getChildPreferredHMetrics()
-	{
-		HMetrics[] metrics = new HMetrics[NUMCHILDREN];
-		
-		for (int i = 0; i < NUMCHILDREN; i++)
-		{
-			if ( children[i] != null )
-			{
-				metrics[i] = children[i].prefH;
-			}
-			else
-			{
-				metrics[i] = new HMetrics();
-			}
-		}
-		
-		return metrics;
-	}
-	
-	
-	private VMetricsTypeset[] getChildMinimumVMetrics()
-	{
-		VMetricsTypeset[] metrics = new VMetricsTypeset[NUMCHILDREN];
-		
-		for (int i = 0; i < NUMCHILDREN; i++)
-		{
-			if ( children[i] != null )
-			{
-				VMetrics v = children[i].minV;
-				if ( v.isTypeset() )
-				{
-					metrics[i] = (VMetricsTypeset)v;
-				}
-				else
-				{
-					metrics[i] = new VMetricsTypeset( v.height, 0.0, v.vspacing );
-				}
-			}
-			else
-			{
-				metrics[i] = new VMetricsTypeset();
-			}
-		}
-		
-		return metrics;
-	}
-	
-	private VMetricsTypeset[] getChildPreferredVMetrics()
-	{
-		VMetricsTypeset[] metrics = new VMetricsTypeset[NUMCHILDREN];
-		
-		for (int i = 0; i < NUMCHILDREN; i++)
-		{
-			if ( children[i] != null )
-			{
-				VMetrics v = children[i].prefV;
-				if ( v.isTypeset() )
-				{
-					metrics[i] = (VMetricsTypeset)v;
-				}
-				else
-				{
-					metrics[i] = new VMetricsTypeset( v.height, 0.0, v.vspacing );
-				}
-			}
-			else
-			{
-				metrics[i] = new VMetricsTypeset();
-			}
-		}
-		
-		return metrics;
-	}
-	
-	
-
-	
-	
 	
 	protected boolean hasMainChild()
 	{
@@ -411,331 +199,96 @@ public class DPScript extends DPContainer
 	
 	
 	
-	private HMetrics[] combineHMetricsHorizontally(HMetrics[] childHMetrics)
-	{
-		HMetrics left = HMetrics.max( childHMetrics[LEFTSUB], childHMetrics[LEFTSUPER] );
-		HMetrics main = childHMetrics[MAIN];
-		HMetrics right = HMetrics.max( childHMetrics[RIGHTSUB], childHMetrics[RIGHTSUPER] );
 
-		if ( hasLeftChild()   &&   ( hasMainChild()  ||  hasRightChild() ) )
+	protected void updateRequisitionX()
+	{
+		LBox boxes[] = new LBox[NUMCHILDREN];
+		for (int i = 0; i < NUMCHILDREN; i++)
 		{
-			left = left.minSpacing( getSpacing() );
+			if ( i != MAIN )
+			{
+				boxes[i] = children[i] != null  ?  children[i].refreshRequisitionX().scaled( children[i], childScale )  :  null;
+			}
+			else
+			{
+				boxes[i] = children[i] != null  ?  children[i].refreshRequisitionX()  :  null;
+			}
 		}
 		
-		if ( hasMainChild()  &&  hasRightChild() )
-		{
-			main = main.minSpacing( getSpacing() );
-		}
-		
-		
-		HMetrics sum = left.add( main ).add( right );
-		HMetrics[] result = { left, main, right, sum };
-		
-		return result;
+		ScriptLayout.computeRequisitionX( layoutBox, columnBoxes, boxes[LEFTSUPER], boxes[LEFTSUB], boxes[MAIN], boxes[RIGHTSUPER], boxes[RIGHTSUB], getSpacing(), getScriptSpacing() );
 	}
-	
-	
-	
-	private VMetricsTypeset combineVMetricsVertically(VMetricsTypeset[] childVMetrics)
+
+	protected void updateRequisitionY()
 	{
-		double Ma = childVMetrics[MAIN].ascent;
-		double Md = childVMetrics[MAIN].descent;
-		double Mh = childVMetrics[MAIN].height;
-
-		double Pa = Math.max( childVMetrics[LEFTSUPER].ascent, childVMetrics[RIGHTSUPER].ascent );
-		double Pd = Math.max( childVMetrics[LEFTSUPER].descent, childVMetrics[RIGHTSUPER].descent );
-
-		double Ba = Math.max( childVMetrics[LEFTSUB].ascent, childVMetrics[RIGHTSUB].ascent );
-		double Bd = Math.max( childVMetrics[LEFTSUB].descent, childVMetrics[RIGHTSUB].descent );
-		
-		
-		// top: TOP
-		// bottom: BOTTOM
-		// All y-co-ordinates are relative to an arbitrary co-ordinate system until the end of the calculation
-		//
-		// q: spacing between super bottom and sub top
-		// r: min distance between super baseline and main baseline (1/3 of Mh)
-		// s: min distance between main baseline and sub baseline (1/3 of Mh)
-		// r and s can be thought of as springs
-		double superTop, mainTop, superBaseline, superBottom, subTop, mainBaseline, mainBottom, subBaseline, subBottom, bottom, top, q, r, s;
-		
-		if ( hasSuperscriptChild()  &&  hasSubscriptChild() )
+		LBox boxes[] = new LBox[NUMCHILDREN];
+		for (int i = 0; i < NUMCHILDREN; i++)
 		{
-			q = getScriptSpacing();
-			
-			// Start with main-baseline = 0
-			mainBaseline = 0.0;
-			
-			// We can compute main-top and main-bottom immediately
-			mainTop = mainBaseline - Ma;
-			mainBottom = mainBaseline + Md;
-			
-			// Next compute super-baseline and sub-baseline
-			// The distance between c and h is max( Pd + Ba + q, r + s )
-			r = Mh * superOffset;
-			s = Mh * subOffset;
-			double deltaBaseline = Math.max( Pd + Ba + q,   r + s );
-		
-			// Divide cToH between r and s according to their proportion
-			r = deltaBaseline  *  superOffsetFraction;
-			s = deltaBaseline  *  subOffsetFraction;
-			
-			// We can now compute superscript-baseline and subscript-baseline
-			superBaseline = mainBaseline - r;
-			subBaseline = mainBaseline + s;
-			
-			// We can compute super-top and super-bottom
-			superTop = superBaseline - Pa;
-			superBottom = superBaseline + Pd;
-			
-			// We can compute subscript-top and subscript-bottom
-			subTop = subBaseline - Ba;
-			subBottom = subBaseline + Bd;
-			
-			// We can now compute the top and the bottom
-			top = Math.min( mainTop, superTop );
-			bottom = Math.max( mainBottom, subBottom );
-			
-			superscriptAscent = superBaseline - top;
-			mainAscent = mainBaseline - top;
-			subscriptAscent = subBaseline - top;
-		}
-		else if ( hasSuperscriptChild() )
-		{
-			// Start with main-baseline = 0
-			mainBaseline = 0.0;
-			
-			// We can compute main-top and main-bottom immediately
-			mainTop = mainBaseline - Ma;
-			mainBottom = mainBaseline + Md;
-			
-			// R
-			r = Mh * superOffset;
-			
-			// Superscript-baseline
-			superBaseline = mainBaseline - r;
-
-			// We can compute super-top and super-bottom
-			superTop = superBaseline - Pa;
-			superBottom = superBaseline + Pd;
-			
-			// We can now compute the top and the bottom
-			top = Math.min( mainTop, superTop );
-			bottom = Math.max( mainBottom, superBottom );
-			
-			superscriptAscent = superBaseline - top;
-			mainAscent = mainBaseline - top;
-			subscriptAscent = mainBaseline - top;
-		}
-		else if ( hasSubscriptChild() )
-		{
-			// Start with main-baseline = 0
-			mainBaseline = 0.0;
-			
-			// We can compute main-top and main-bottom immediately
-			mainTop = mainBaseline - Ma;
-			mainBottom = mainBaseline + Md;
-			
-			// S
-			s = Mh * subOffset;
-			
-			// We can now compute subscript-baseline
-			subBaseline = mainBaseline + s;
-			
-			// We can compute sub-top and sub-bottom 
-			subTop = subBaseline - Ba;
-			subBottom = subBaseline + Bd;
-			
-			// We can now compute the top and the bottom
-			top = Math.min( mainTop, subTop );
-			bottom = Math.max( mainBottom, subBottom );
-			
-			superscriptAscent = mainBaseline - top;
-			mainAscent = mainBaseline - top;
-			subscriptAscent = subBaseline - top;
-		}
-		else
-		{
-			mainBaseline = 0.0;
-			
-			top = -Ma;
-			bottom = Md;
-			
-			superscriptAscent = mainBaseline - top;
-			mainAscent = mainBaseline - top;
-			subscriptAscent = mainBaseline - top;
+			if ( i != MAIN )
+			{
+				boxes[i] = children[i] != null  ?  children[i].refreshRequisitionY().scaled( children[i], childScale )  :  null;
+			}
+			else
+			{
+				boxes[i] = children[i] != null  ?  children[i].refreshRequisitionY()  :  null;
+			}
 		}
 		
-		
-		double height = bottom - top;
-		
-		double descent = height - mainAscent;
-		return new VMetricsTypeset( mainAscent, descent, getSpacing() );
+		ScriptLayout.computeRequisitionY( layoutBox, rowBaselineY, boxes[LEFTSUPER], boxes[LEFTSUB], boxes[MAIN], boxes[RIGHTSUPER], boxes[RIGHTSUB], getSpacing(), getScriptSpacing() );
 	}
 	
 
-	protected HMetrics computeMinimumHMetrics()
-	{
-		HMetrics[] xs = combineHMetricsHorizontally( getChildRefreshedMinimumHMetrics() );
-		
-		leftMinH = xs[0];
-		mainMinH = xs[1];
-		rightMinH = xs[2];
-		
-		return xs[3];
-	}
-
-	protected HMetrics computePreferredHMetrics()
-	{
-		HMetrics[] xs = combineHMetricsHorizontally( getChildRefreshedPreferredHMetrics() );
-		
-		leftPrefH = xs[0];
-		mainPrefH = xs[1];
-		rightPrefH = xs[2];
-		
-		return xs[3];
-	}
+	
 
 	
-	protected VMetrics computeMinimumVMetrics()
+	protected void updateAllocationX()
 	{
-		return combineVMetricsVertically( getChildRefreshedMinimumVMetrics() );
-	}
-
-	protected VMetrics computePreferredVMetrics()
-	{
-		return combineVMetricsVertically( getChildRefreshedPreferredVMetrics() );
-	}
-
-	
-	
-	
-	protected void allocateContentsX(double allocation)
-	{
-		super.allocateContentsX( allocation );
+		super.updateAllocationX( );
 		
-		double t;
-		if ( prefH.width > minH.width )
+		LBox boxes[] = new LBox[NUMCHILDREN];
+		double prevChildWidths[] = new double[NUMCHILDREN];
+		for (int i = 0; i < NUMCHILDREN; i++)
 		{
-			t = ( allocation - minH.width )  /  ( prefH.width - minH.width );
-			t = Math.max( t, 0.0 );
-			t = Math.min( t, 1.0 );
-		}
-		else
-		{
-			t = 1.0;
+			boxes[i] = children[i] != null  ?  children[i].layoutBox  :  null;
+			prevChildWidths[i] = children[i] != null  ?  children[i].layoutBox.getAllocationX()  :  0.0;
 		}
 		
-		HMetrics[] childMinH = getChildMinimumHMetrics();
-		HMetrics[] childPrefH = getChildPreferredHMetrics();
+		ScriptLayout.allocateX( layoutBox, boxes[LEFTSUPER], boxes[LEFTSUB], boxes[MAIN], boxes[RIGHTSUPER], boxes[RIGHTSUB], columnBoxes, getSpacing(), getScriptSpacing() );
 		
-		HMetrics overallH = HMetrics.lerp( minH, prefH, t );
-		HMetrics leftH = HMetrics.lerp( leftMinH, leftPrefH, t );
-		HMetrics mainH = HMetrics.lerp( mainMinH, mainPrefH, t );
-	
-		double padding = Math.max( ( allocation - overallH.width )  *  0.5, 0.0 );
-		double x = padding;
-		
-		// Allocate left children
-		if ( children[LEFTSUPER] != null )
+		for (int i = 0; i < NUMCHILDREN; i++)
 		{
-			HMetrics childH = HMetrics.lerp( childMinH[LEFTSUPER], childPrefH[LEFTSUPER], t );
-			allocateChildX( children[LEFTSUPER], x  +  ( leftH.width - childH.width ), childH.width );
-		}
-		if ( children[LEFTSUB] != null )
-		{
-			HMetrics childH = HMetrics.lerp( childMinH[LEFTSUB], childPrefH[LEFTSUB], t );
-			allocateChildX( children[LEFTSUB], x  +  ( leftH.width - childH.width ), childH.width ); 
-		}
-		
-		if ( hasLeftChild() )
-		{
-			leftH = leftH.minSpacing( getSpacing() );
-		}
-		
-		x += leftH.width + leftH.hspacing;
-		
-		
-		// Allocate main child
-		if ( children[MAIN] != null )
-		{
-			allocateChildX( children[MAIN], x, mainH.width );
-			mainH = mainH.minSpacing( getSpacing() );
-		}
-		
-		x += mainH.width + mainH.hspacing;
-		
-		
-		// Allocate right children
-		if ( children[RIGHTSUPER] != null )
-		{
-			HMetrics childH = HMetrics.lerp( childMinH[RIGHTSUPER], childPrefH[RIGHTSUPER], t );
-			allocateChildX( children[RIGHTSUPER], x, childH.width );
-		}
-		if ( children[RIGHTSUB] != null )
-		{
-			HMetrics childH = HMetrics.lerp( childMinH[RIGHTSUB], childPrefH[RIGHTSUB], t );
-			allocateChildX( children[RIGHTSUB], x, childH.width ); 
+			if ( children[i] != null )
+			{
+				children[i].refreshAllocationX( prevChildWidths[i] );
+			}
 		}
 	}
 
 	
-	protected void allocateContentsY(double allocation)
+	protected void updateAllocationY()
 	{
-		super.allocateContentsY( allocation );
-
-		double padding = Math.max( ( allocation - prefV.height ) * 0.5, 0.0 );
+		super.updateAllocationY( );
 		
-		
-		VMetricsTypeset[] childrenV;
-		if ( allocation >= prefV.height )
+		LBox boxes[] = new LBox[NUMCHILDREN];
+		double prevChildHeights[] = new double[NUMCHILDREN];
+		for (int i = 0; i < NUMCHILDREN; i++)
 		{
-			childrenV = getChildPreferredVMetrics();
-		}
-		else
-		{
-			childrenV = getChildMinimumVMetrics();
-		}
-
-		
-		// Allocate superscript children
-		double y = padding + superscriptAscent;
-		if ( children[LEFTSUPER] != null )
-		{
-			VMetricsTypeset childV = childrenV[LEFTSUPER];
-			allocateChildY( children[LEFTSUPER], y - childV.ascent, childV.height );
-		}
-		if ( children[RIGHTSUPER] != null )
-		{
-			VMetricsTypeset childV = childrenV[RIGHTSUPER];
-			allocateChildY( children[RIGHTSUPER], y - childV.ascent, childV.height );
+			boxes[i] = children[i] != null  ?  children[i].layoutBox  :  null;
+			prevChildHeights[i] = children[i] != null  ?  children[i].layoutBox.getAllocationY()  :  0.0;
 		}
 		
+		ScriptLayout.allocateY( layoutBox, boxes[LEFTSUPER], boxes[LEFTSUB], boxes[MAIN], boxes[RIGHTSUPER], boxes[RIGHTSUB], rowBaselineY, getSpacing(), getScriptSpacing() );
 		
-		// Allocate main child
-		y = padding + mainAscent;
-		if ( children[MAIN] != null )
+		for (int i = 0; i < NUMCHILDREN; i++)
 		{
-			VMetricsTypeset childV = childrenV[MAIN];
-			allocateChildY( children[MAIN], y - childV.ascent, childV.height );
-		}
-		
-
-		// Allocate subscript children
-		y = padding + subscriptAscent;
-		if ( children[LEFTSUB] != null )
-		{
-			VMetricsTypeset childV = childrenV[LEFTSUB];
-			allocateChildY( children[LEFTSUB], y - childV.ascent, childV.height );
-		}
-		if ( children[RIGHTSUB] != null )
-		{
-			VMetricsTypeset childV = childrenV[RIGHTSUB];
-			allocateChildY( children[RIGHTSUB], y - childV.ascent, childV.height );
+			if ( children[i] != null )
+			{
+				children[i].refreshAllocationY( prevChildHeights[i] );
+			}
 		}
 	}
 	
 
+	
 	
 	
 	private ArrayList<DPWidget> getChildrenInSlots(int[] slots)

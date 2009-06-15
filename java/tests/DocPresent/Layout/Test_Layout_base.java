@@ -13,51 +13,51 @@ public class Test_Layout_base extends TestCase
 {
 	protected LBox xbox(double width, double hspacing)
 	{
-		return new LBox( width, hspacing, 0.0, 0.0 );
+		return new LBox( null, width, hspacing, 0.0, 0.0 );
 	}
 	
 	protected LBox xbox(double minWidth, double prefWidth, double minHSpacing, double prefHSpacing)
 	{
-		return new LBox( minWidth, prefWidth, minHSpacing, prefHSpacing, 0.0, 0.0 );
+		return new LBox( null, minWidth, prefWidth, minHSpacing, prefHSpacing, 0.0, 0.0 );
 	}
 	
 	
 	protected LBox ybox(double height, double vspacing)
 	{
-		return new LBox( 0.0, 0.0, height, vspacing );
+		return new LBox( null, 0.0, 0.0, height, vspacing );
 	}
 	
 	protected LBox ybbox(double ascent, double descent, double vspacing)
 	{
-		return new LBox( 0.0, 0.0, ascent, descent, vspacing );
+		return new LBox( null, 0.0, 0.0, ascent, descent, vspacing );
 	}
 	
 	
 	protected LBox box(double width, double hspacing, double height, double vspacing)
 	{
-		return new LBox( width, hspacing, height, vspacing );
+		return new LBox( null, width, hspacing, height, vspacing );
 	}
 
 	protected LBox box(double width, double hspacing, double ascent, double descent, double vspacing)
 	{
-		return new LBox( width, hspacing, ascent, descent, vspacing );
+		return new LBox( null, width, hspacing, ascent, descent, vspacing );
 	}
 
 	protected LBox box(double minWidth, double prefWidth, double minHSpacing, double prefHSpacing, double height, double vspacing)
 	{
-		return new LBox( minWidth, prefWidth, minHSpacing, prefHSpacing, height, vspacing );
+		return new LBox( null, minWidth, prefWidth, minHSpacing, prefHSpacing, height, vspacing );
 	}
 
 	protected LBox box(double minWidth, double prefWidth, double minHSpacing, double prefHSpacing, double ascent, double descent, double vspacing)
 	{
-		return new LBox( minWidth, prefWidth, minHSpacing, prefHSpacing, ascent, descent, vspacing );
+		return new LBox( null, minWidth, prefWidth, minHSpacing, prefHSpacing, ascent, descent, vspacing );
 	}
 
 
 
 	protected LBox alloc(double x, double y, double w, double h)
 	{
-		LBox box = new LBox();
+		LBox box = new LBox( null );
 		box.setAllocationX( w );
 		box.setAllocationY( h );
 		box.setPositionInParentSpaceX( x );

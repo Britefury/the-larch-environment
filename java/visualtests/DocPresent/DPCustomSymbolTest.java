@@ -18,8 +18,7 @@ import javax.swing.JFrame;
 
 import BritefuryJ.DocPresent.DPCustomSymbol;
 import BritefuryJ.DocPresent.DPPresentationArea;
-import BritefuryJ.DocPresent.Metrics.HMetrics;
-import BritefuryJ.DocPresent.Metrics.VMetrics;
+import BritefuryJ.DocPresent.Layout.LBox;
 import BritefuryJ.DocPresent.StyleSheets.CustomSymbolStyleSheet;
 
 
@@ -44,15 +43,25 @@ public class DPCustomSymbolTest
 				graphics.draw( new Line2D.Double( 0.0, 20.0, 10.0, 15.0 ) );
 				graphics.draw( new Line2D.Double( 10.0, 15.0, 20.0, 20.0 ) );
 			}
-		
-			public HMetrics computeHMetrics()
+			
+			public double getWidth()
 			{
-				return new HMetrics( 20.0 );
+				return 20.0;
 			}
-
-			public VMetrics computeVMetrics()
+			
+			public double getHeight()
 			{
-				return new VMetrics( 20.0, 2.0 );
+				return 22.0;
+			}
+			
+			public void setBoxRequisitionX(LBox box)
+			{
+				box.setRequisitionX( 20.0, 0.0 );
+			}
+		
+			public void setBoxRequisitionY(LBox box)
+			{
+				box.setRequisitionY( 20.0, 2.0, 0.0 );
 			}
 		};
      

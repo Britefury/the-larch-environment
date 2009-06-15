@@ -14,7 +14,6 @@ import org.python.core.Py;
 import org.python.core.PyObject;
 
 import BritefuryJ.Cell.CellInterface;
-import BritefuryJ.DocPresent.DPHBox;
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.ElementTree.BorderElement;
 import BritefuryJ.DocPresent.ElementTree.BranchElement;
@@ -33,6 +32,7 @@ import BritefuryJ.DocPresent.ElementTree.SegmentElement;
 import BritefuryJ.DocPresent.ElementTree.TextElement;
 import BritefuryJ.DocPresent.ElementTree.VBoxElement;
 import BritefuryJ.DocPresent.ElementTree.WhitespaceElement;
+import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.FractionStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
@@ -681,5 +681,5 @@ public class GSymNodeViewInstance implements Element.ElementContext, DVNode.Node
 	
 
 	
-	private static HBoxStyleSheet ahboxStyleSheet = new HBoxStyleSheet( DPHBox.Alignment.BASELINES, 0.0, false, 0.0 ); 
+	private static HBoxStyleSheet ahboxStyleSheet = new HBoxStyleSheet( VAlignment.BASELINES, 0.0, false, 0.0 ); 
 }

@@ -10,8 +10,6 @@ package BritefuryJ.DocPresent;
 import java.util.Arrays;
 import java.util.List;
 
-import BritefuryJ.DocPresent.Metrics.HMetrics;
-import BritefuryJ.DocPresent.Metrics.VMetrics;
 import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 import BritefuryJ.Math.Point2;
 
@@ -104,70 +102,49 @@ public class DPBin extends DPContainer
 	
 	
 
-	protected HMetrics computeMinimumHMetrics()
+	protected void updateRequisitionX()
 	{
 		if ( child != null )
 		{
-			return child.refreshMinimumHMetrics();
+			layoutBox.setRequisitionX( child.refreshRequisitionX() );
 		}
 		else
 		{
-			return new HMetrics();
-		}
-	}
-	
-	protected HMetrics computePreferredHMetrics()
-	{
-		if ( child != null )
-		{
-			return child.refreshPreferredHMetrics();
-		}
-		else
-		{
-			return new HMetrics();
-		}
-	}
-	
-	protected VMetrics computeMinimumVMetrics()
-	{
-		if ( child != null )
-		{
-			return child.refreshMinimumVMetrics();
-		}
-		else
-		{
-			return new VMetrics();
+			layoutBox.clearRequisitionX();
 		}
 	}
 
-	protected VMetrics computePreferredVMetrics()
+	protected void updateRequisitionY()
 	{
 		if ( child != null )
 		{
-			return child.refreshPreferredVMetrics();
+			layoutBox.setRequisitionY( child.refreshRequisitionY() );
 		}
 		else
 		{
-			return new VMetrics();
+			layoutBox.clearRequisitionY();
 		}
 	}
 	
 	
 	
-	
-	protected void allocateContentsX(double width)
+	protected void updateAllocationX()
 	{
 		if ( child != null )
 		{
-			allocateChildX( child, 0.0, width );
+			double prevWidth = child.layoutBox.getAllocationX();
+			layoutBox.allocateChildX( child.layoutBox );
+			child.refreshAllocationX( prevWidth );
 		}
 	}
 
-	protected void allocateContentsY(double height)
+	protected void updateAllocationY()
 	{
 		if ( child != null )
 		{
-			allocateChildY( child, 0.0, height );
+			double prevHeight = child.layoutBox.getAllocationY();
+			layoutBox.allocateChildY( child.layoutBox );
+			child.refreshAllocationY( prevHeight );
 		}
 	}
 	

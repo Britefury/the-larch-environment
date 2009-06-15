@@ -27,18 +27,18 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		//	- end padding
 		//	- any remaining spacing not 'consumed' by padding; spacing - padding  or  0 if padding > spacing
 
-		LBox result = new LBox();
+		LBox result = new LBox( null );
 		
 		// requisitionX()  ->  <0,0>
 		HorizontalLayout.computeRequisitionX( result, new LBox[] {},  0.0, null );
-		assertEquals( result, new LBox() );
+		assertEquals( result, new LBox( null ) );
 
 		// requisitionX( [ <0,0> ] )  ->  <0,0>
-		HorizontalLayout.computeRequisitionX( result, new LBox[] { new LBox() },  0.0, null );
-		assertEquals( result, new LBox() );
+		HorizontalLayout.computeRequisitionX( result, new LBox[] { new LBox( null ) },  0.0, null );
+		assertEquals( result, new LBox( null ) );
 
 		// requisitionX( [ <0,0>:pad=1 ] )  ->  <2,0>
-		HorizontalLayout.computeRequisitionX( result, new LBox[] { new LBox() },  0.0, new BoxPackingParams[] { new BoxPackingParams( 1.0 ) } );
+		HorizontalLayout.computeRequisitionX( result, new LBox[] { new LBox( null ) },  0.0, new BoxPackingParams[] { new BoxPackingParams( 1.0 ) } );
 		assertEquals( result, xbox( 2.0, 0.0 ) );
 
 		// requisitionX( [ <10,0>:pad=2 ] )  ->  <14,0>
@@ -56,8 +56,8 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		assertEquals( result, xbox( 14.0, 1.0 ) );
 
 		// requisitionX( [ <0,0>, <0,0> ] )  ->  <0,0>
-		HorizontalLayout.computeRequisitionX( result, new LBox[] { new LBox(), new LBox() },  0.0, null );
-		assertEquals( result, new LBox() );
+		HorizontalLayout.computeRequisitionX( result, new LBox[] { new LBox( null ), new LBox( null ) },  0.0, null );
+		assertEquals( result, new LBox( null ) );
 
 		// Width accumulates
 		// requisitionX( [ <10,0>, <5,0> ] )  ->  <15,0>
@@ -76,7 +76,7 @@ public class Test_HorizontalLayout extends Test_Layout_base
 
 		// Spacing between children adds extra width
 		// requisitionX( [ <0,0>, <0,0> ], spacing=1 )  ->  <1,0>
-		HorizontalLayout.computeRequisitionX( result, new LBox[] { new LBox(), new LBox() },  1.0, null );
+		HorizontalLayout.computeRequisitionX( result, new LBox[] { new LBox( null ), new LBox( null ) },  1.0, null );
 		assertEquals( result, xbox( 1.0, 0.0 ) );
 		// requisitionX( [ <10,0>, <5,0> ], spacing=1 )  ->  <15,0>
 		HorizontalLayout.computeRequisitionX( result, new LBox[] { xbox( 10.0, 0.0 ), xbox( 5.0, 0.0 ) },  1.0, null );
@@ -93,22 +93,22 @@ public class Test_HorizontalLayout extends Test_Layout_base
 
 	public void test_requisitionY()
 	{
-		LBox result = new LBox();
+		LBox result = new LBox( null );
 		
 		
 		// First, test the simple cases of no baseline alignment, or with baseline alignment with children that do not have baselines
 		
 		// Empty list should result in empty
 		HorizontalLayout.computeRequisitionY( result, new LBox[] {}, VAlignment.CENTRE );
-		assertEquals( result, new LBox() );
+		assertEquals( result, new LBox( null ) );
 		HorizontalLayout.computeRequisitionY( result, new LBox[] {}, VAlignment.BASELINES );
-		assertEquals( result, new LBox() );
+		assertEquals( result, new LBox( null ) );
 
 		// List of one empty box should result in empty
-		HorizontalLayout.computeRequisitionY( result, new LBox[] { new LBox() }, VAlignment.CENTRE );
-		assertEquals( result, new LBox() );
-		HorizontalLayout.computeRequisitionY( result, new LBox[] { new LBox() }, VAlignment.BASELINES );
-		assertEquals( result, new LBox() );
+		HorizontalLayout.computeRequisitionY( result, new LBox[] { new LBox( null ) }, VAlignment.CENTRE );
+		assertEquals( result, new LBox( null ) );
+		HorizontalLayout.computeRequisitionY( result, new LBox[] { new LBox( null ) }, VAlignment.BASELINES );
+		assertEquals( result, new LBox( null ) );
 
 		// 1 Box of height 1 should result in same
 		HorizontalLayout.computeRequisitionY( result, new LBox[] { ybox( 1.0, 0.0 ) }, VAlignment.CENTRE );
@@ -214,7 +214,7 @@ public class Test_HorizontalLayout extends Test_Layout_base
 
 	private void allocXSpaceTest(LBox children[], double spacing, BoxPackingParams packingParams[], LBox expectedBox, double boxAllocation, double expectedSpaceAllocation[])
 	{ 
-		LBox box = new LBox();
+		LBox box = new LBox( null );
 		HorizontalLayout.computeRequisitionX( box, children, spacing, packingParams );
 		
 		assertBoxesEqual( box, expectedBox, "PARENT BOX" );
@@ -449,7 +449,7 @@ public class Test_HorizontalLayout extends Test_Layout_base
 
 	private void allocXTest(LBox children[], double spacing, BoxPackingParams packingParams[], LBox expectedBox, double boxAllocation, double expectedSize[], double expectedPosition[])
 	{ 
-		LBox box = new LBox();
+		LBox box = new LBox( null );
 		HorizontalLayout.computeRequisitionX( box, children, spacing, packingParams );
 
 		assertBoxesEqual( box, expectedBox, "PARENT BOX" );
@@ -583,7 +583,7 @@ public class Test_HorizontalLayout extends Test_Layout_base
 
 	private void allocYTest(LBox children[], VAlignment alignment, LBox expectedBox, double boxAllocation, double expectedSize[], double expectedPosition[])
 	{ 
-		LBox box = new LBox();
+		LBox box = new LBox( null );
 		HorizontalLayout.computeRequisitionY( box, children, alignment );
 
 		assertBoxesEqual( box, expectedBox, "PARENT BOX" );

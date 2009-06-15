@@ -13,8 +13,6 @@ import java.awt.geom.Rectangle2D;
 
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Marker.Marker;
-import BritefuryJ.DocPresent.Metrics.HMetrics;
-import BritefuryJ.DocPresent.Metrics.VMetrics;
 import BritefuryJ.DocPresent.StyleSheets.ContentLeafStyleSheet;
 import BritefuryJ.Math.Point2;
 
@@ -101,6 +99,8 @@ public class DPWhitespace extends DPContentLeafEditable
 	
 	public void drawSelection(Graphics2D graphics, Marker from, Marker to)
 	{
+		double allocationX = layoutBox.getAllocationX();
+		double allocationY = layoutBox.getAllocationY();
 		AffineTransform current = pushGraphicsTransform( graphics );
 		int startIndex = from != null  ?  from.getIndex()  :  0;
 		int endIndex = to != null  ?  to.getIndex()  :  1;
@@ -112,28 +112,17 @@ public class DPWhitespace extends DPContentLeafEditable
 	}
 	
 	
-	protected HMetrics computeMinimumHMetrics()
+	protected void updateRequisitionX()
 	{
-		return new HMetrics( width );
+		layoutBox.setRequisitionX( width, 0.0 );
 	}
 
-	protected HMetrics computePreferredHMetrics()
+	protected void updateRequisitionY()
 	{
-		return new HMetrics( width );
+		layoutBox.clearRequisitionY();
 	}
 
 	
-	protected VMetrics computeMinimumVMetrics()
-	{
-		return new VMetrics();
-	}
-	
-	protected VMetrics computePreferredVMetrics()
-	{
-		return new VMetrics();
-	}
-
-
 
 	//
 	// Marker methods

@@ -7,8 +7,6 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-import BritefuryJ.DocPresent.Metrics.HMetrics;
-import BritefuryJ.DocPresent.Metrics.VMetrics;
 import BritefuryJ.DocPresent.StyleSheets.WidgetStyleSheet;
 import BritefuryJ.Math.Point2;
 
@@ -26,26 +24,16 @@ public class DPEmpty extends DPWidget
 
 	
 	
-	protected HMetrics computeMinimumHMetrics()
+	protected void updateRequisitionX()
 	{
-		return new HMetrics();
+		layoutBox.clearRequisitionX();
 	}
 
-	protected HMetrics computePreferredHMetrics()
+	protected void updateRequisitionY()
 	{
-		return new HMetrics();
-	}
-
-
-	protected VMetrics computeMinimumVMetrics()
-	{
-		return new VMetrics();
+		layoutBox.clearRequisitionY();
 	}
 	
-	protected VMetrics computePreferredVMetrics()
-	{
-		return new VMetrics();
-	}
 
 
 

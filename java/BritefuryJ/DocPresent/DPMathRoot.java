@@ -14,8 +14,6 @@ import java.awt.geom.Path2D;
 import java.util.Arrays;
 import java.util.List;
 
-import BritefuryJ.DocPresent.Metrics.HMetrics;
-import BritefuryJ.DocPresent.Metrics.VMetrics;
 import BritefuryJ.DocPresent.StyleSheets.MathRootStyleSheet;
 import BritefuryJ.Math.Point2;
 
@@ -107,6 +105,9 @@ public class DPMathRoot extends DPContainer
 		
 		if ( child != null )
 		{
+			double allocationX = layoutBox.getAllocationX();
+			double allocationY = layoutBox.getAllocationY();
+
 			MathRootStyleSheet s = (MathRootStyleSheet)styleSheet;
 			
 			Stroke curStroke = graphics.getStroke();
@@ -139,85 +140,65 @@ public class DPMathRoot extends DPContainer
 
 	
 	
-	protected HMetrics computeMinimumHMetrics()
+	protected void updateRequisitionX()
 	{
 		if ( child != null )
 		{
 			MathRootStyleSheet s = (MathRootStyleSheet)styleSheet;
 			
-			return child.refreshMinimumHMetrics().border( s.getGlyphWidth(), 0.0 );
+			layoutBox.setRequisitionX( child.refreshRequisitionX() );
+			layoutBox.borderX( s.getGlyphWidth(), 0.0 );
 		}
 		else
 		{
-			return new HMetrics();
-		}
-	}
-	
-	protected HMetrics computePreferredHMetrics()
-	{
-		if ( child != null )
-		{
-			MathRootStyleSheet s = (MathRootStyleSheet)styleSheet;
-			
-			return child.refreshPreferredHMetrics().border( s.getGlyphWidth(), 0.0 );
-		}
-		else
-		{
-			return new HMetrics();
-		}
-	}
-	
-	protected VMetrics computeMinimumVMetrics()
-	{
-		if ( child != null )
-		{
-			MathRootStyleSheet s = (MathRootStyleSheet)styleSheet;
-			
-			return child.refreshMinimumVMetrics().border( s.getBarSpacing() + s.getThickness(), 0.0 );
-		}
-		else
-		{
-			return new VMetrics();
+			layoutBox.clearRequisitionX();
 		}
 	}
 
-	protected VMetrics computePreferredVMetrics()
+	protected void updateRequisitionY()
 	{
 		if ( child != null )
 		{
 			MathRootStyleSheet s = (MathRootStyleSheet)styleSheet;
 			
-			return child.refreshPreferredVMetrics().border( s.getBarSpacing() + s.getThickness(), 0.0 );
+			layoutBox.setRequisitionY( child.refreshRequisitionY() );
+			layoutBox.borderY( s.getBarSpacing() + s.getThickness(), 0.0 );
 		}
 		else
 		{
-			return new VMetrics();
+			layoutBox.clearRequisitionY();
 		}
 	}
 	
+
 	
 	
-	
-	protected void allocateContentsX(double width)
+	protected void updateAllocationX()
 	{
 		if ( child != null )
 		{
 			MathRootStyleSheet s = (MathRootStyleSheet)styleSheet;
+
+			double prevWidth = child.layoutBox.getAllocationX();
 			double offset = s.getGlyphWidth();
-			allocateChildX( child, offset, width - offset );
+			layoutBox.allocateChildX( child.layoutBox, offset, layoutBox.getAllocationX() - offset );
+			child.refreshAllocationX( prevWidth );
 		}
 	}
 
-	protected void allocateContentsY(double height)
+	protected void updateAllocationY()
 	{
 		if ( child != null )
 		{
 			MathRootStyleSheet s = (MathRootStyleSheet)styleSheet;
+
+			double prevHeight = child.layoutBox.getAllocationY();
 			double offset = s.getBarSpacing() + s.getThickness();
-			allocateChildY( child, offset, height - offset );
+			layoutBox.allocateChildY( child.layoutBox, offset, layoutBox.getAllocationY() - offset );
+			child.refreshAllocationY( prevHeight );
 		}
 	}
-	
+
 	
 	
 	protected DPWidget getChildLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter)

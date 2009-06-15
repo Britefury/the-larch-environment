@@ -19,7 +19,7 @@ public class Test_FractionLayout extends Test_Layout_base
 	
 	private void reqTest(LBox numerator, LBox bar, LBox denominator, double hPadding, double vSpacing, double baselinePos, LBox expectedParentBox)
 	{
-		LBox box = new LBox();
+		LBox box = new LBox( null );
 		FractionLayout.computeRequisitionX( box, numerator, bar, denominator, hPadding, vSpacing, baselinePos );
 		FractionLayout.computeRequisitionY( box, numerator, bar, denominator, hPadding, vSpacing, baselinePos );
 
@@ -71,22 +71,22 @@ public class Test_FractionLayout extends Test_Layout_base
 		LBox expectedNumerator = null, expectedBar = null, expectedDenominator = null;
 		if ( numerator != null )
 		{
-			expectedNumerator = numerator.copy();
-			expectedNumerator.setAllocationFrom( expectecNumAlloc );
+			expectedNumerator = numerator.copy( null );
+			expectedNumerator.setAllocation( expectecNumAlloc );
 		}
 		if ( bar != null )
 		{
-			expectedBar = bar.copy();
-			expectedBar.setAllocationFrom( expectedBarAlloc );
+			expectedBar = bar.copy( null );
+			expectedBar.setAllocation( expectedBarAlloc );
 		}
 		if ( denominator != null )
 		{
-			expectedDenominator = denominator.copy();
-			expectedDenominator.setAllocationFrom( expectedDenomAlloc );
+			expectedDenominator = denominator.copy( null );
+			expectedDenominator.setAllocation( expectedDenomAlloc );
 		}
 		
 		
-		LBox box = new LBox();
+		LBox box = new LBox( null );
 		FractionLayout.computeRequisitionX( box, numerator, bar, denominator, hPadding, vSpacing, baselinePos );
 		box.setAllocationX( allocX );
 		FractionLayout.allocateX( box, numerator, bar, denominator, hPadding, vSpacing, baselinePos );

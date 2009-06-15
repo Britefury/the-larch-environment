@@ -19,9 +19,9 @@ import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Event.PointerScrollEvent;
 import BritefuryJ.DocPresent.Input.PointerInterface;
+import BritefuryJ.DocPresent.Layout.LBox;
+import BritefuryJ.DocPresent.Layout.PackingParams;
 import BritefuryJ.DocPresent.Marker.Marker;
-import BritefuryJ.DocPresent.Metrics.HMetrics;
-import BritefuryJ.DocPresent.Metrics.VMetrics;
 import BritefuryJ.DocPresent.StyleSheets.WidgetStyleSheet;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
@@ -117,12 +117,8 @@ abstract public class DPWidget
 	protected DPContainer parent;
 	protected DPPresentationArea presentationArea;
 	protected boolean bRealised, bResizeQueued, bSizeUpToDate;
-	protected double scale;
-	protected HMetrics minH, prefH;
-	protected VMetrics minV, prefV;
-	protected double positionInParentSpaceX, positionInParentSpaceY;
-	protected double allocationX, allocationY;
-	protected ParentPacking parentPacking;
+	protected LBox layoutBox;
+	protected PackingParams parentPacking;
 	
 	protected ArrayList<Runnable> waitingImmediateEvents;			// only initialised when non-empty; otherwise null
 	protected ArrayList<PointerInterface> pointersWithinBounds;		// only initialised when non-empty; otherwise null
@@ -156,13 +152,7 @@ abstract public class DPWidget
 	public DPWidget(WidgetStyleSheet styleSheet)
 	{
 		this.styleSheet = styleSheet;
-		scale = 1.0;
-		minH = new HMetrics();
-		prefH = new HMetrics();
-		minV = new VMetrics();
-		prefV = new VMetrics();
-		positionInParentSpaceX = positionInParentSpaceY = 0.0;
-		allocationX = allocationY = 0.0;
+		layoutBox = new LBox( this );
 		parentPacking = null;
 		waitingImmediateEvents = null;
 		pointersWithinBounds = null;
@@ -191,12 +181,12 @@ abstract public class DPWidget
 	// Parent packing methods
 	//
 	
-	public ParentPacking getParentPacking()
+	public PackingParams getParentPacking()
 	{
 		return parentPacking;
 	}
 	
-	public void setParentPacking(ParentPacking parentPacking)
+	public void setParentPacking(PackingParams parentPacking)
 	{
 		this.parentPacking = parentPacking;
 	}
@@ -208,23 +198,23 @@ abstract public class DPWidget
 	
 	public Point2 getPositionInParentSpace()
 	{
-		return new Point2( positionInParentSpaceX, positionInParentSpaceY );
+		return layoutBox.getPositionInParentSpace();
 	}
 	
 	public Vector2 getAllocation()
 	{
-		return new Vector2( allocationX, allocationY );
+		return layoutBox.getAllocation();
 	}
 	
 	public Vector2 getAllocationInParentSpace()
 	{
-		return new Vector2( allocationX * scale, allocationY * scale );
+		return layoutBox.getAllocation();
 	}
 	
 	
 	public AABox2 getLocalAABox()
 	{
-		return new AABox2( new Point2(), new Point2( allocationX, allocationY ) );
+		return new AABox2( new Point2(), new Point2( getAllocation() ) );
 	}
 	
 	public AABox2 getAABoxInParentSpace()
@@ -235,12 +225,12 @@ abstract public class DPWidget
 	
 	public Xform2 getLocalToParentXform()
 	{
-		return new Xform2( scale, new Vector2( positionInParentSpaceX, positionInParentSpaceY ) );
+		return new Xform2( 1.0, getPositionInParentSpace().toVector2() );
 	}
 	
 	public Xform2 getParentToLocalXform()
 	{
-		return Xform2.inverseOf( scale, new Vector2( positionInParentSpaceX, positionInParentSpaceY ) );
+		return Xform2.inverseOf( 1.0, getPositionInParentSpace().toVector2() );
 	}
 	
 	
@@ -897,12 +887,12 @@ abstract public class DPWidget
 	
 	protected void clip(Graphics2D graphics)
 	{
-		graphics.clip( new Rectangle2D.Double( 0.0, 0.0, allocationX, allocationY ) );
+		graphics.clip( new Rectangle2D.Double( 0.0, 0.0, layoutBox.getAllocationX(), layoutBox.getAllocationY() ) );
 	}
 
 	protected void clipIfAllocationInsufficient(Graphics2D graphics)
 	{
-		if ( allocationX < minH.width  ||  allocationY < minV.height )
+		if ( layoutBox.getAllocationX()  <  layoutBox.getMinWidth()  ||  layoutBox.getAllocationY()  <  layoutBox.getReqHeight() )
 		{
 			clip( graphics );
 		}
@@ -1042,23 +1032,6 @@ abstract public class DPWidget
 	
 	
 	
-	protected void refreshScale(double scale)
-	{
-		onSetScale( scale );
-	}
-	
-	protected void setScale(double scale)
-	{
-		if ( scale != this.scale )
-		{
-			this.scale = scale;
-			refreshScale( scale );
-		}
-	}
-	
-	
-	
-	
 	//
 	//
 	// LAYOUT METHODS
@@ -1066,76 +1039,53 @@ abstract public class DPWidget
 	//
 	
 	
-	abstract protected HMetrics computeMinimumHMetrics();
-	abstract protected HMetrics computePreferredHMetrics();
-	
-	abstract protected VMetrics computeMinimumVMetrics();
-	abstract protected VMetrics computePreferredVMetrics();
+	abstract protected void updateRequisitionX();
+	abstract protected void updateRequisitionY();
 
 	
-	protected void allocateContentsX(double allocation)
+	protected void updateAllocationX()
 	{
 	}
 	
-	protected void allocateContentsY(double allocation)
+	protected void updateAllocationY()
 	{
 	}
 	
 	
 	
-	protected HMetrics refreshMinimumHMetrics()
+	protected LBox refreshRequisitionX()
 	{
 		if ( !bSizeUpToDate )
 		{
-			minH = computeMinimumHMetrics().scaled( scale );
+			updateRequisitionX();
 		}
-		return minH;
+		return layoutBox;
 	}
 	
-	protected HMetrics refreshPreferredHMetrics()
+	protected LBox refreshRequisitionY()
 	{
 		if ( !bSizeUpToDate )
 		{
-			prefH = computePreferredHMetrics().scaled( scale );
+			updateRequisitionY();
 		}
-		return prefH;
-	}
-	
-	protected VMetrics refreshMinimumVMetrics()
-	{
-		if ( !bSizeUpToDate )
-		{
-			minV = computeMinimumVMetrics().scaled( scale );
-		}
-		return minV;
-	}
-	
-	protected VMetrics refreshPreferredVMetrics()
-	{
-		if ( !bSizeUpToDate )
-		{
-			prefV = computePreferredVMetrics().scaled( scale );
-		}
-		return prefV;
+		return layoutBox;
 	}
 	
 	
-	protected void allocateX(double width)
+	protected void refreshAllocationX(double prevWidth)
 	{
-		if ( !bSizeUpToDate  ||  width != allocationX )
+		if ( !bSizeUpToDate  ||  layoutBox.getAllocationX() != prevWidth )
 		{
-			allocationX = width;
-			allocateContentsX( width );
+			updateAllocationX();
 			bSizeUpToDate = false;
 		}
 	}
 	
-	protected void allocateY(double height)
+	protected void refreshAllocationY(double prevHeight)
 	{
-		if ( !bSizeUpToDate  ||  height != allocationY )
+		if ( !bSizeUpToDate  ||  layoutBox.getAllocationY() != prevHeight )
 		{
-			allocationY = height;
-			allocateContentsY( height );
+			updateAllocationY();
 		}
 		bResizeQueued = false;
 		bSizeUpToDate = true;
@@ -1164,7 +1114,7 @@ abstract public class DPWidget
 	
 	protected Point2 getCursorPosition()
 	{
-		return new Point2( allocationX * 0.5, allocationY * 0.5 );
+		return new Point2( layoutBox.getAllocationX() * 0.5, layoutBox.getAllocationY() * 0.5 );
 	}
 	
 	

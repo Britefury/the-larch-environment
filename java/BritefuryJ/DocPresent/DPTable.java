@@ -13,45 +13,18 @@ import java.util.List;
 import org.python.core.Py;
 import org.python.core.PyTuple;
 
-import BritefuryJ.DocPresent.Metrics.HMetrics;
-import BritefuryJ.DocPresent.Metrics.Metrics;
-import BritefuryJ.DocPresent.Metrics.VMetrics;
-import BritefuryJ.DocPresent.Metrics.VMetricsTypeset;
+import BritefuryJ.DocPresent.Layout.HAlignment;
+import BritefuryJ.DocPresent.Layout.LBox;
+import BritefuryJ.DocPresent.Layout.TableLayout;
+import BritefuryJ.DocPresent.Layout.TablePackingParams;
+import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.StyleSheets.TableStyleSheet;
 import BritefuryJ.Math.Point2;
-import BritefuryJ.Utils.BinarySearch;
 
 public class DPTable extends DPContainer
 {
-	public enum RowAlignment { TOP, CENTRE, BOTTOM, EXPAND, BASELINES };
-	public enum ColumnAlignment { LEFT, CENTRE, RIGHT, EXPAND };
-
-	
-	protected static class TableParentPacking extends ParentPacking
-	{
-		public int x, y, colSpan, rowSpan;
-		public int packFlagsX, packFlagsY;
-		public double paddingX, paddingY;
-		
-		public TableParentPacking(int x, int colSpan, boolean bExpandX, double paddingX, int y, int rowSpan, boolean bExpandY, double paddingY)
-		{
-			this.x = x;
-			this.colSpan = colSpan;
-			this.packFlagsX = Metrics.packFlags( bExpandX );
-			this.paddingX = paddingX;
-			this.y = y;
-			this.rowSpan = rowSpan;
-			this.packFlagsY = Metrics.packFlags( bExpandY );
-			this.paddingY = paddingY;
-		}
-	}
-	
-	
-	
 	private DPWidget[][] children;
-	private double columnBounds[], rowBounds[];
-	private double minColWidths[], prefColWidths[], minRowHeights[], prefRowHeights[];
-	private VMetricsTypeset minRowVMetrics[], prefRowVMetrics[];
+	private LBox columnBoxes[], rowBoxes[];
 	private int rowPositions[];
 	private int numColumns, numRows;		// Can be -1, indicating that these values must be refreshed
 
@@ -120,7 +93,7 @@ public class DPTable extends DPContainer
 				{
 					if ( child != null )
 					{
-						registerChild( child, new TableParentPacking( x, 1, getExpandX(), getPaddingX(), y, 1, getExpandY(), getPaddingY() ) );
+						registerChild( child, new TablePackingParams( x, 1, getPaddingX(), y, 1, getPaddingY() ) );
 					}
 					x++;
 				}
@@ -169,7 +142,7 @@ public class DPTable extends DPContainer
 					if ( child != null )
 					{
 						registeredChildren.add( child );
-						child.setParentPacking( new TableParentPacking( x, 1, getExpandX(), getPaddingX(), y, 1, getExpandY(), getPaddingY() ) );
+						child.setParentPacking( new TablePackingParams( x, 1, getPaddingX(), y, 1, getPaddingY() ) );
 					}
 					x++;
 				}
@@ -254,7 +227,7 @@ public class DPTable extends DPContainer
 	{
 		// Get the child that is being replaced
 		DPWidget oldChild = null;
-		TableParentPacking oldPacking = null;
+		TablePackingParams oldPacking = null;
 		int oldEndX = -1, oldEndY = -1;
 		if ( y < children.length )
 		{
@@ -263,7 +236,7 @@ public class DPTable extends DPContainer
 				oldChild = children[y][x];
 				if ( oldChild != null )
 				{
-					oldPacking = (TableParentPacking)oldChild.getParentPacking();
+					oldPacking = (TablePackingParams)oldChild.getParentPacking();
 					oldEndX = x + oldPacking.colSpan;
 					oldEndY = y + oldPacking.rowSpan;
 				}
@@ -348,7 +321,7 @@ public class DPTable extends DPContainer
 			// Register the child
 			if ( item != null )
 			{
-				registerChild( item, new TableParentPacking( x, colSpan, getExpandX(), getPaddingX(), y, rowSpan, getExpandY(), getPaddingY() ) );
+				registerChild( item, new TablePackingParams( x, colSpan, getPaddingX(), y, rowSpan, getPaddingY() ) );
 			}
 
 			childListModified();
@@ -358,7 +331,7 @@ public class DPTable extends DPContainer
 		{
 			if ( item != null )
 			{
-				item.setParentPacking( new TableParentPacking( x, colSpan, getExpandX(), getPaddingX(), y, rowSpan, getExpandY(), getPaddingY() ) );
+				item.setParentPacking( new TablePackingParams( x, colSpan, getPaddingX(), y, rowSpan, getPaddingY() ) );
 				// Queue a resize; width / height may have changed
 				queueResize();
 			}
@@ -441,22 +414,22 @@ public class DPTable extends DPContainer
 	
 	public int getChildX(DPWidget child)
 	{
-		return ((TableParentPacking)child.getParentPacking()).x;
+		return ((TablePackingParams)child.getParentPacking()).x;
 	}
 	
 	public int getChildY(DPWidget child)
 	{
-		return ((TableParentPacking)child.getParentPacking()).y;
+		return ((TablePackingParams)child.getParentPacking()).y;
 	}
 	
 	public int getChildColSpan(DPWidget child)
 	{
-		return ((TableParentPacking)child.getParentPacking()).colSpan;
+		return ((TablePackingParams)child.getParentPacking()).colSpan;
 	}
 	
 	public int getChildRowSpan(DPWidget child)
 	{
-		return ((TableParentPacking)child.getParentPacking()).rowSpan;
+		return ((TablePackingParams)child.getParentPacking()).rowSpan;
 	}
 	
 	
@@ -470,7 +443,7 @@ public class DPTable extends DPContainer
 			
 			for (DPWidget child: registeredChildren)
 			{
-				TableParentPacking packing = (TableParentPacking)child.getParentPacking();
+				TablePackingParams packing = (TablePackingParams)child.getParentPacking();
 				numColumns = Math.max( numColumns, packing.x + packing.colSpan );
 				numRows = Math.max( numRows, packing.y + packing.rowSpan );
 			}
@@ -478,597 +451,103 @@ public class DPTable extends DPContainer
 	}
 	
 	
-	private double[] computeWidthByColumn(HMetrics hmetricsTable[][])
+	protected void updateRequisitionX()
 	{
 		refreshSize();
 		
-		double spacingX = getSpacingX();
-		
-		double columnWidth[] = new double[numColumns];
-		Arrays.fill( columnWidth, 0.0 );
-		
-		
-		// First phase; fill only with children who span 1 column
-		for (DPWidget child: registeredChildren)
+		LBox[] childBoxes = new LBox[registeredChildren.size()];
+		TablePackingParams[] packingParams = new TablePackingParams[registeredChildren.size()];
+		for (int i = 0; i < registeredChildren.size(); i++)
 		{
-			TableParentPacking packing = (TableParentPacking)child.getParentPacking();
-			
-			if ( packing.colSpan == 1 )
-			{
-				HMetrics chm = hmetricsTable[packing.y][packing.x];
-				columnWidth[packing.x] = Math.max( columnWidth[packing.x], chm.width + packing.paddingX * 2.0 );
-			}
-		}
-		
-		
-		// Second phase; fill with children who span >1 columns
-		for (DPWidget child: registeredChildren)
-		{
-			TableParentPacking packing = (TableParentPacking)child.getParentPacking();
-			
-			if ( packing.colSpan > 1 )
-			{
-				// First, total up the space available by combining the columns
-				int endColumn = packing.x + packing.colSpan;
-				
-				double widthAvailable = 0.0;
-				for (int c = packing.x; c < endColumn; c++)
-				{
-					double colW = columnWidth[c];
-					
-					if ( c != endColumn - 1 )
-					{
-						colW += spacingX;
-					}
-					
-					widthAvailable += colW;
-				}
-				
-				
-				// Now compare with what is required
-				HMetrics chm = hmetricsTable[packing.y][packing.x];
-
-				if ( widthAvailable < chm.width )
-				{
-					// Need more width; compute how much we need, and distrubute among columns
-					double additionalWidth = chm.width - widthAvailable;
-					double additionalWidthPerColumn = additionalWidth / (double)packing.colSpan;
-					
-					for (int c = packing.x; c < endColumn; c++)
-					{
-						columnWidth[c] += additionalWidthPerColumn;
-					}
-				}
-			}
+			childBoxes[i] = registeredChildren.get( i ).refreshRequisitionX();
+			packingParams[i] = (TablePackingParams)registeredChildren.get( i ).getParentPacking();
 		}
 
-		return columnWidth;
+		columnBoxes = TableLayout.computeRequisitionX( layoutBox, childBoxes, packingParams, numColumns, numRows, getSpacingX(), getSpacingY(), getExpandX(), getExpandY(), getColumnAlignment(), getRowAlignment() );
 	}
 
-	private double[] computeHeightByRow(VMetrics vmetricsTable[][])
+	protected void updateRequisitionY()
 	{
 		refreshSize();
-
-		double spacingY = getSpacingY();
 		
-		double rowHeight[] = new double[numRows];
-		Arrays.fill( rowHeight, 0.0 );
-		
-		
-		// First phase; fill only with children who span 1 row
-		for (DPWidget child: registeredChildren)
+		LBox[] childBoxes = new LBox[registeredChildren.size()];
+		TablePackingParams[] packingParams = new TablePackingParams[registeredChildren.size()];
+		for (int i = 0; i < registeredChildren.size(); i++)
 		{
-			TableParentPacking packing = (TableParentPacking)child.getParentPacking();
-			
-			if ( packing.rowSpan == 1 )
-			{
-				VMetrics chm = vmetricsTable[packing.y][packing.x];
-				rowHeight[packing.y] = Math.max( rowHeight[packing.y], chm.height + packing.paddingY * 2.0 );
-			}
-		}
-		
-		
-		// Second phase; fill with children who span >1 rows
-		for (DPWidget child: registeredChildren)
-		{
-			TableParentPacking packing = (TableParentPacking)child.getParentPacking();
-			
-			if ( packing.rowSpan > 1 )
-			{
-				// First, total up the space available by combining the rows
-				int endRow = packing.y + packing.rowSpan;
-				
-				double heightAvailable = 0.0;
-				for (int r = packing.y; r < endRow; r++)
-				{
-					double rowH = rowHeight[r];
-					
-					if ( r != endRow - 1 )
-					{
-						rowH += spacingY;
-					}
-					
-					heightAvailable += rowH;
-				}
-				
-				
-				// Now compare with what is required
-				VMetrics chm = vmetricsTable[packing.y][packing.x];
-
-				if ( heightAvailable < chm.height )
-				{
-					// Need more height; compute how much we need, and distrubute among rows
-					double additionalHeight = chm.height - heightAvailable;
-					double additionalHeightPerRow = additionalHeight / (double)packing.rowSpan;
-					
-					for (int r = packing.y; r < endRow; r++)
-					{
-						rowHeight[r] += additionalHeightPerRow;
-					}
-				}
-			}
+			childBoxes[i] = registeredChildren.get( i ).refreshRequisitionY();
+			packingParams[i] = (TablePackingParams)registeredChildren.get( i ).getParentPacking();
 		}
 
-		return rowHeight;
-	}
-
-	private VMetricsTypeset[] computeVMetricsTypesetByRow(VMetrics vmetricsTable[][])
-	{
-		refreshSize();
-
-		double spacingY = getSpacingY();
-		
-		double rowAscent[] = new double[numRows];
-		double rowDescent[] = new double[numRows];
-		Arrays.fill( rowAscent, 0.0 );
-		Arrays.fill( rowDescent, 0.0 );
-		
-		
-		// First phase; fill only with children who span 1 row
-		for (DPWidget child: registeredChildren)
-		{
-			TableParentPacking packing = (TableParentPacking)child.getParentPacking();
-			
-			if ( packing.rowSpan == 1 )
-			{
-				double chAscent, chDescent;
-				VMetrics chm = vmetricsTable[packing.y][packing.x];
-				if ( chm.isTypeset() )
-				{
-					VMetricsTypeset chmt = (VMetricsTypeset)chm;
-					chAscent = chmt.ascent;
-					chDescent = chmt.descent;
-				}
-				else
-				{
-					chAscent = chm.height * 0.5  -  NON_TYPESET_CHILD_BASELINE_OFFSET;
-					chDescent = chm.height * 0.5  +  NON_TYPESET_CHILD_BASELINE_OFFSET;
-				}
-				rowAscent[packing.y] = Math.max( rowAscent[packing.y], chAscent + packing.paddingY );
-				rowDescent[packing.y] = Math.max( rowDescent[packing.y], chDescent + packing.paddingY );
-			}
-		}
-		
-		
-		// Second phase; fill with children who span >1 rows
-		for (DPWidget child: registeredChildren)
-		{
-			TableParentPacking packing = (TableParentPacking)child.getParentPacking();
-			
-			if ( packing.rowSpan > 1 )
-			{
-				// First, total up the space available by combining the rows
-				int endRow = packing.y + packing.rowSpan;
-				
-				double heightAvailable = 0.0;
-				for (int r = packing.y; r < endRow; r++)
-				{
-					double rowH = rowAscent[r] + rowDescent[r];
-					
-					if ( r != endRow - 1 )
-					{
-						rowH += spacingY;
-					}
-					
-					heightAvailable += rowH;
-				}
-				
-				
-				// Now compare with what is required
-				VMetrics chm = vmetricsTable[packing.y][packing.x];
-
-				if ( heightAvailable < chm.height )
-				{
-					// Need more height; compute how much we need, and distrubute among rows
-					double additionalHeight = chm.height - heightAvailable;
-					double additionalHeightPerRow = additionalHeight / (double)packing.rowSpan;
-					
-					for (int r = packing.y; r < endRow; r++)
-					{
-						rowDescent[r] += additionalHeightPerRow;
-					}
-				}
-			}
-		}
-
-		VMetricsTypeset rowMetrics[] = new VMetricsTypeset[numRows];
-		for (int r = 0; r < numRows; r++)
-		{
-			rowMetrics[r] = new VMetricsTypeset( rowAscent[r], rowDescent[r], 0.0 );
-		}
-
-		return rowMetrics;
-	}
-
-	
-	
-	
-	
-	private HMetrics columnWidthsToHMetrics(double columnWidths[])
-	{
-		double spacingX = getSpacingX();
-		double totalWidth = 0.0;
-		for (double w: columnWidths)
-		{
-			totalWidth += w;
-		}
-		totalWidth += spacingX * (double)Math.max( columnWidths.length - 1, 0 );
-		
-		return new HMetrics( totalWidth, 0.0 );
-	}
-	
-	private VMetrics rowHeightsToVMetrics(double rowHeights[])
-	{
-		double spacingY = getSpacingY();
-		double totalHeight = 0.0;
-		for (double h: rowHeights)
-		{
-			totalHeight += h;
-		}
-		totalHeight += spacingY * (double)Math.max( rowHeights.length - 1, 0 );
-		
-		return new VMetrics( totalHeight, 0.0 );
-	}
-	
-	private VMetrics rowVMetricsTypesetToVMetrics(VMetricsTypeset rowMetrics[])
-	{
-		double spacingY = getSpacingY();
-		double totalHeight = 0.0;
-		for (VMetricsTypeset m: rowMetrics)
-		{
-			totalHeight += m.height;
-		}
-		totalHeight += spacingY * (double)Math.max( rowMetrics.length - 1, 0 );
-		
-		return new VMetrics( totalHeight, 0.0 );
-	}
-	
-	
-	protected HMetrics computeMinimumHMetrics()
-	{
-		refreshSize();
-
-		HMetrics metricsTable[][] = new HMetrics[children.length][];
-		for (int r = 0; r < children.length; r++)
-		{
-			DPWidget row[] = children[r];
-			HMetrics rowMetrics[] = new HMetrics[row.length];
-			metricsTable[r] = rowMetrics;
-			for (int c = 0; c < row.length; c++)
-			{
-				DPWidget child = row[c];
-				if ( child != null )
-				{
-					rowMetrics[c] = child.refreshMinimumHMetrics();
-				}
-			}
-		}
-		
-		minColWidths = computeWidthByColumn( metricsTable );
-		return columnWidthsToHMetrics( minColWidths );
-	}
-
-	protected HMetrics computePreferredHMetrics()
-	{
-		refreshSize();
-
-		HMetrics metricsTable[][] = new HMetrics[children.length][];
-		for (int r = 0; r < children.length; r++)
-		{
-			DPWidget row[] = children[r];
-			HMetrics rowMetrics[] = new HMetrics[row.length];
-			metricsTable[r] = rowMetrics;
-			for (int c = 0; c < row.length; c++)
-			{
-				DPWidget child = row[c];
-				if ( child != null )
-				{
-					rowMetrics[c] = child.refreshPreferredHMetrics();
-				}
-			}
-		}
-		
-		prefColWidths = computeWidthByColumn( metricsTable );
-		return columnWidthsToHMetrics( prefColWidths );
+		rowBoxes = TableLayout.computeRequisitionY( layoutBox, childBoxes, packingParams, numColumns, numRows, getSpacingX(), getSpacingY(), getExpandX(), getExpandY(), getColumnAlignment(), getRowAlignment() );
 	}
 	
 
-	protected VMetrics computeMinimumVMetrics()
-	{
-		refreshSize();
-
-		VMetrics metricsTable[][] = new VMetrics[children.length][];
-		for (int r = 0; r < children.length; r++)
-		{
-			DPWidget row[] = children[r];
-			VMetrics rowMetrics[] = new VMetrics[row.length];
-			metricsTable[r] = rowMetrics;
-			for (int c = 0; c < row.length; c++)
-			{
-				DPWidget child = row[c];
-				if ( child != null )
-				{
-					rowMetrics[c] = child.refreshMinimumVMetrics();
-				}
-			}
-		}
-		
-		
-		if ( getRowAlignment() == RowAlignment.BASELINES )
-		{
-			minRowHeights = null;
-			minRowVMetrics = computeVMetricsTypesetByRow( metricsTable );
-			return rowVMetricsTypesetToVMetrics( minRowVMetrics );
-		}
-		else
-		{
-			minRowHeights = computeHeightByRow( metricsTable );
-			minRowVMetrics = null;
-			return rowHeightsToVMetrics( minRowHeights );
-		}
-	}
-
-	protected VMetrics computePreferredVMetrics()
-	{
-		refreshSize();
-
-		VMetrics metricsTable[][] = new VMetrics[children.length][];
-		for (int r = 0; r < children.length; r++)
-		{
-			DPWidget row[] = children[r];
-			VMetrics rowMetrics[] = new VMetrics[row.length];
-			metricsTable[r] = rowMetrics;
-			for (int c = 0; c < row.length; c++)
-			{
-				DPWidget child = row[c];
-				if ( child != null )
-				{
-					rowMetrics[c] = child.refreshPreferredVMetrics();
-				}
-			}
-		}
-		
-		if ( getRowAlignment() == RowAlignment.BASELINES )
-		{
-			prefRowHeights = null;
-			prefRowVMetrics = computeVMetricsTypesetByRow( metricsTable );
-			return rowVMetricsTypesetToVMetrics( prefRowVMetrics );
-		}
-		else
-		{
-			prefRowHeights = computeHeightByRow( metricsTable );
-			prefRowVMetrics = null;
-			return rowHeightsToVMetrics( prefRowHeights );
-		}
-	}
 
 	
 	
-	protected void allocateContentsX(double allocation)
+	protected void updateAllocationX()
 	{
-		super.allocateContentsX( allocation );
+		super.updateAllocationX();
 		
 		refreshSize();
-
-		// Compute packing flags, per-column
-		int columnPackFlags[] = new int[numColumns];
+		
+		LBox childBoxes[] = new LBox[registeredChildren.size()];
+		double prevWidths[] = new double[registeredChildren.size()];
+		TablePackingParams[] packingParams = new TablePackingParams[registeredChildren.size()];
+		for (int i = 0; i < registeredChildren.size(); i++)
+		{
+			DPWidget child = registeredChildren.get( i );
+			childBoxes[i] = child.layoutBox;
+			prevWidths[i] = child.layoutBox.getAllocationX();
+			packingParams[i] = (TablePackingParams)child.getParentPacking();
+		}
+		
+		TableLayout.allocateX( layoutBox, columnBoxes, childBoxes, packingParams, numColumns, numRows, getSpacingX(), getSpacingY(), getExpandX(), getExpandY(), getColumnAlignment(), getRowAlignment() );
+		
+		int i = 0;
 		for (DPWidget child: registeredChildren)
 		{
-			TableParentPacking packing = (TableParentPacking)child.getParentPacking();
-			int endCol = packing.x + packing.colSpan;
-			for (int c = packing.x; c < endCol; c++)
-			{
-				columnPackFlags[c] = Metrics.combinePackFlags( columnPackFlags[c], packing.packFlagsX );
-			}
-		}
-		
-		// Generate arrays of metrics; minimum and preferred
-		HMetrics minHM[] = new HMetrics[numColumns];
-		HMetrics prefHM[] = new HMetrics[numColumns];
-		for (int c = 0; c < numColumns; c++)
-		{
-			minHM[c] = new HMetrics( minColWidths[c], 0.0 );
-			prefHM[c] = new HMetrics( prefColWidths[c], 0.0 );
-		}
-		
-		// Allocate space to the columns
-		// Padding was taken into account in the computeMinimumHMetrics() and computePreferredHMetrics() methods, which updated minColWidths and prefColWidths; only take spacing
-		// into account
-		double spacingX = getSpacingX();
-		double totalSpacing = spacingX * Math.max( numColumns - 1, 0 );
-		HMetrics allocated[] = (HMetrics[])Metrics.allocateSpacePacked( minHM, prefHM, columnPackFlags, allocation - totalSpacing );
-		columnBounds = new double[numColumns-1];
-		double columnX[] = new double[numColumns+1];
-		double x = 0.0;
-		for (int c = 0; c < numColumns; c++)
-		{
-			columnX[c] = x;
-			x += allocated[c].width;
-			if ( c != numColumns - 1 )
-			{
-				columnBounds[c] = x + spacingX * 0.5;
-				x += spacingX;
-			}
-		}
-		columnX[numColumns] = x;
-		
-		// Allocate children
-		ColumnAlignment colAlignment = getColumnAlignment();
-		for (DPWidget child: registeredChildren)
-		{
-			TableParentPacking packing = (TableParentPacking)child.getParentPacking();
-			HMetrics chm = child.prefH;
-			
-			int startCol = packing.x;
-			int endCol = packing.x + packing.colSpan;
-			double spacing = endCol == numColumns  ?  0.0  :  spacingX;
-			double xStart = columnX[startCol] + packing.paddingX;
-			double xEnd = columnX[endCol] - ( packing.paddingX + spacing );
-			double widthAvailable = xEnd - xStart;
-			
-			if ( widthAvailable <= chm.width )
-			{
-				allocateChildX( child, xStart, widthAvailable );
-			}
-			else
-			{
-				if ( colAlignment == ColumnAlignment.LEFT )
-				{
-					allocateChildX( child, xStart, chm.width );
-				}
-				else if ( colAlignment == ColumnAlignment.RIGHT )
-				{
-					allocateChildX( child, xEnd - chm.width, chm.width );
-				}
-				else if ( colAlignment == ColumnAlignment.CENTRE )
-				{
-					allocateChildX( child, xStart + ( widthAvailable - chm.width ) * 0.5, chm.width );
-				}
-				else if ( colAlignment == ColumnAlignment.EXPAND )
-				{
-					allocateChildX( child, xStart, widthAvailable );
-				}
-			}
+			child.refreshAllocationX( prevWidths[i] );
+			i++;
 		}
 	}
 	
 	
 	
-	protected void allocateContentsY(double allocation)
+	protected void updateAllocationY()
 	{
-		super.allocateContentsY( allocation );
+		super.updateAllocationY();
 		
 		refreshSize();
-
-		// Compute packing flags, per-column
-		int rowPackFlags[] = new int[numRows];
+		
+		LBox childBoxes[] = new LBox[registeredChildren.size()];
+		double prevHeights[] = new double[registeredChildren.size()];
+		TablePackingParams[] packingParams = new TablePackingParams[registeredChildren.size()];
+		for (int i = 0; i < registeredChildren.size(); i++)
+		{
+			DPWidget child = registeredChildren.get( i );
+			childBoxes[i] = child.layoutBox;
+			prevHeights[i] = child.layoutBox.getAllocationY();
+			packingParams[i] = (TablePackingParams)child.getParentPacking();
+		}
+		
+		TableLayout.allocateY( layoutBox, rowBoxes, childBoxes, packingParams, numColumns, numRows, getSpacingX(), getSpacingY(), getExpandX(), getExpandY(), getColumnAlignment(), getRowAlignment() );
+		
+		int i = 0;
 		for (DPWidget child: registeredChildren)
 		{
-			TableParentPacking packing = (TableParentPacking)child.getParentPacking();
-			int endRow = packing.y + packing.rowSpan;
-			for (int r = packing.y; r < endRow; r++)
-			{
-				rowPackFlags[r] = Metrics.combinePackFlags( rowPackFlags[r], packing.packFlagsY );
-			}
-		}
-		
-		// Generate arrays of metrics; minimum and preferred
-		VMetrics minVM[], prefVM[];
-		RowAlignment rowAlignment = getRowAlignment();
-		if ( rowAlignment == RowAlignment.BASELINES )
-		{
-			minVM = minRowVMetrics;
-			prefVM = prefRowVMetrics;
-		}
-		else
-		{
-			minVM= new VMetrics[numRows];
-			prefVM = new VMetrics[numRows];
-			for (int r = 0; r < numRows; r++)
-			{
-				minVM[r] = new VMetrics( minRowHeights[r], 0.0 );
-				prefVM[r] = new VMetrics( prefRowHeights[r], 0.0 );
-			}
-		}
-		
-		// Allocate space to the rows
-		// Padding was taken into account in the computeMinimumVMetrics() and computePreferredVMetrics() methods, which updated minRowHeights and prefRowHeights; only take spacing
-		// into account
-		double spacingY = getSpacingY();
-		double totalSpacing = spacingY * Math.max( numRows - 1, 0 );
-		VMetrics allocated[] = (VMetrics[])Metrics.allocateSpacePacked( minVM, prefVM, rowPackFlags, allocation - totalSpacing );
-		rowBounds = new double[numRows-1];
-		double rowY[] = new double[numRows+1];
-		double y = 0.0;
-		for (int i = 0; i < numRows; i++)
-		{
-			rowY[i] = y;
-			y += allocated[i].height;
-			if ( i != numRows - 1 )
-			{
-				rowBounds[i] = y + spacingY * 0.5;
-				y += spacingY;
-			}
-		}
-		rowY[numRows] = y;
-		
-		// Allocate children
-		for (DPWidget child: registeredChildren)
-		{
-			TableParentPacking packing = (TableParentPacking)child.getParentPacking();
-			VMetrics chm = child.prefV;
-			
-			if ( packing.rowSpan == 1  &&  prefRowVMetrics != null  &&  chm.isTypeset() )
-			{
-				int startRow = packing.y;
-
-				VMetricsTypeset chmt = (VMetricsTypeset)chm;
-				VMetricsTypeset rwmt = prefRowVMetrics[packing.y];
-				
-				double yOffset = rwmt.ascent - chmt.ascent;			// Row ascent includes padding; so yOffset also includes padding
-				double yStart = rowY[startRow];
-				double yPos = yStart + yOffset;
-				allocateChildY( child, yPos, chmt.height );
-			}
-			else
-			{
-				int startRow = packing.y;
-				int endRow = packing.y + packing.rowSpan;
-				double spacing = endRow == numRows  ?  0.0  :  spacingY;
-				double yStart = rowY[startRow] + packing.paddingY;
-				double yEnd = rowY[endRow] - ( packing.paddingY + spacing );
-				double heightAvailable = yEnd - yStart;
-				
-				if ( rowAlignment == RowAlignment.TOP )
-				{
-					allocateChildY( child, yStart, chm.height );
-				}
-				else if ( rowAlignment == RowAlignment.BOTTOM )
-				{
-					allocateChildY( child, yEnd - chm.height, chm.height );
-				}
-				else if ( rowAlignment == RowAlignment.CENTRE )
-				{
-					allocateChildY( child, yStart + ( heightAvailable - chm.height ) * 0.5, chm.height );
-				}
-				else if ( rowAlignment == RowAlignment.EXPAND )
-				{
-					allocateChildY( child, yStart, heightAvailable );
-				}
-				else if ( rowAlignment == RowAlignment.BASELINES )
-				{
-					allocateChildY( child, yStart + ( heightAvailable - chm.height ) * 0.5, chm.height );
-				}
-			}
+			child.refreshAllocationY( prevHeights[i] );
+			i++;
 		}
 	}
 	
+
 	
 	
 	
 	private boolean doesChildCoverCell(DPWidget child, int x, int y)
 	{
-		TableParentPacking packing = (TableParentPacking)child.getParentPacking();
+		TablePackingParams packing = (TablePackingParams)child.getParentPacking();
 
 		return x <= ( packing.x + packing.colSpan )  &&  y <= ( packing.y + packing.rowSpan );
 	}
@@ -1141,12 +620,82 @@ public class DPTable extends DPContainer
 
 	
 	
+	private int getColumnForLocalPoint(Point2 localPos)
+	{
+		if ( columnBoxes.length == 0 )
+		{
+			return -1;
+		}
+		else if ( columnBoxes.length == 1 )
+		{
+			return 0;
+		}
+		else
+		{
+			LBox columnI = columnBoxes[0];
+			for (int i = 0; i < columnBoxes.length - 1; i++)
+			{
+				LBox columnJ = columnBoxes[i+1];
+				double iUpperX = columnI.getPositionInParentSpaceX() + columnI.getAllocationX();
+				double jLowerX = columnJ.getPositionInParentSpaceX();
+				
+				double midX = ( iUpperX + jLowerX ) * 0.5;
+				
+				if ( localPos.x < midX )
+				{
+					return i;
+				}
+				
+				columnI = columnJ;
+			}
+			
+			return columnBoxes.length-1;
+		}
+	}
+
+	
+	
+	private int getRowForLocalPoint(Point2 localPos)
+	{
+		if ( rowBoxes.length == 0 )
+		{
+			return -1;
+		}
+		else if ( rowBoxes.length == 1 )
+		{
+			return 0;
+		}
+		else
+		{
+			LBox rowI = rowBoxes[0];
+			for (int i = 0; i < rowBoxes.length - 1; i++)
+			{
+				LBox rowJ = rowBoxes[i+1];
+				double iUpperY = rowI.getPositionInParentSpaceY() + rowI.getAllocationY();
+				double jLowerY = rowJ.getPositionInParentSpaceY();
+				
+				double midY = ( iUpperY + jLowerY ) * 0.5;
+				
+				if ( localPos.y < midY )
+				{
+					return i;
+				}
+				
+				rowI = rowJ;
+			}
+			
+			return rowBoxes.length-1;
+		}
+	}
+
+	
+	
 	protected DPWidget getChildLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter)
 	{
 		refreshSize();
 
-		int x = BinarySearch.binarySearchInsertionPoint( columnBounds, localPos.x );
-		int y = BinarySearch.binarySearchInsertionPoint( rowBounds, localPos.y );
+		int x = getColumnForLocalPoint( localPos );
+		int y = getRowForLocalPoint( localPos );
 		DPWidget child = getChildCoveringCell( x, y );
 		if ( child != null )
 		{
@@ -1180,12 +729,12 @@ public class DPTable extends DPContainer
 	//
 	//
 	
-	protected RowAlignment getRowAlignment()
+	protected VAlignment getRowAlignment()
 	{
 		return ((TableStyleSheet)styleSheet).getRowAlignment();
 	}
 
-	protected ColumnAlignment getColumnAlignment()
+	protected HAlignment getColumnAlignment()
 	{
 		return ((TableStyleSheet)styleSheet).getColumnAlignment();
 	}
@@ -1200,12 +749,7 @@ public class DPTable extends DPContainer
 	{
 		return ((TableStyleSheet)styleSheet).getExpandX();
 	}
-
-	protected double getPaddingX()
-	{
-		return ((TableStyleSheet)styleSheet).getPaddingX();
-	}
-
+	
 	
 	protected double getSpacingY()
 	{
@@ -1215,6 +759,13 @@ public class DPTable extends DPContainer
 	protected boolean getExpandY()
 	{
 		return ((TableStyleSheet)styleSheet).getExpandY();
+	}
+
+
+
+	protected double getPaddingX()
+	{
+		return ((TableStyleSheet)styleSheet).getPaddingX();
 	}
 
 	protected double getPaddingY()

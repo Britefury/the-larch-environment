@@ -17,10 +17,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import BritefuryJ.DocPresent.Caret.Caret;
+import BritefuryJ.DocPresent.Layout.FractionLayout;
+import BritefuryJ.DocPresent.Layout.LBox;
 import BritefuryJ.DocPresent.Marker.Marker;
-import BritefuryJ.DocPresent.Metrics.HMetrics;
-import BritefuryJ.DocPresent.Metrics.VMetrics;
-import BritefuryJ.DocPresent.Metrics.VMetricsTypeset;
 import BritefuryJ.DocPresent.StyleSheets.FractionStyleSheet;
 import BritefuryJ.Math.Point2;
 
@@ -45,7 +44,7 @@ public class DPFraction extends DPContainer
 	
 		protected void draw(Graphics2D graphics)
 		{
-			Shape s = new Rectangle2D.Double( 0.0, 0.0, allocationX, allocationY );
+			Shape s = new Rectangle2D.Double( 0.0, 0.0, layoutBox.getAllocationX(), layoutBox.getAllocationY() );
 			graphics.setColor( getColour() );
 			graphics.fill( s );
 		}
@@ -73,6 +72,7 @@ public class DPFraction extends DPContainer
 
 		public void drawCaretAtStart(Graphics2D graphics)
 		{
+			double allocationY = layoutBox.getAllocationY();
 			AffineTransform current = pushGraphicsTransform( graphics );
 			graphics.draw( new Line2D.Double( 0.0, -2.0, 0.0, allocationY + 2.0 ) );
 			popGraphicsTransform( graphics, current );
@@ -80,6 +80,8 @@ public class DPFraction extends DPContainer
 
 		public void drawCaretAtEnd(Graphics2D graphics)
 		{
+			double allocationX = layoutBox.getAllocationX();
+			double allocationY = layoutBox.getAllocationY();
 			AffineTransform current = pushGraphicsTransform( graphics );
 			graphics.draw( new Line2D.Double( allocationX, -2.0, allocationX, allocationY + 2.0 ) );
 			popGraphicsTransform( graphics, current );
@@ -95,6 +97,8 @@ public class DPFraction extends DPContainer
 		
 		public void drawSelection(Graphics2D graphics, Marker from, Marker to)
 		{
+			double allocationX = layoutBox.getAllocationX();
+			double allocationY = layoutBox.getAllocationY();
 			AffineTransform current = pushGraphicsTransform( graphics );
 			int startIndex = from != null  ?  from.getIndex()  :  0;
 			int endIndex = to != null  ?  to.getIndex()  :  1;
@@ -107,27 +111,15 @@ public class DPFraction extends DPContainer
 
 
 		
-		protected HMetrics computeMinimumHMetrics()
+		protected void updateRequisitionX()
 		{
-			return new HMetrics();
-		}
-		
-		protected HMetrics computePreferredHMetrics()
-		{
-			return new HMetrics();
+			layoutBox.clearRequisitionX();
 		}
 
-		
-		protected VMetrics computeMinimumVMetrics()
+		protected void updateRequisitionY()
 		{
-			return new VMetrics();
+			layoutBox.clearRequisitionY();
 		}
-
-		protected VMetrics computePreferredVMetrics()
-		{
-			return new VMetrics();
-		}
-		
 		
 		
 		//
@@ -141,6 +133,7 @@ public class DPFraction extends DPContainer
 
 		public int getMarkerPositonForPoint(Point2 localPos)
 		{
+			double allocationX = layoutBox.getAllocationX();
 			if ( localPos.x >= allocationX * 0.5 )
 			{
 				return 1;
@@ -213,10 +206,6 @@ public class DPFraction extends DPContainer
 			if ( child != null )
 			{
 				registerChild( child, null );
-				if ( slot != BAR )
-				{
-					child.setScale( childScale );
-				}
 				
 				int insertIndex = 0;
 				for (int i = 0; i < slot; i++)
@@ -299,215 +288,93 @@ public class DPFraction extends DPContainer
 	
 	
 	
-	private HMetrics[] getChildRefreshedMinimumHMetrics()
+
+	
+	
+	
+	
+	protected void updateRequisitionX()
 	{
-		HMetrics[] metrics = new HMetrics[NUMCHILDREN];
+		LBox boxes[] = new LBox[NUMCHILDREN];
+		for (int i = 0; i < NUMCHILDREN; i++)
+		{
+			if ( i != BAR )
+			{
+				boxes[i] = children[i] != null  ?  children[i].refreshRequisitionX().scaled( children[i], childScale )  :  null;
+			}
+			else
+			{
+				boxes[i] = children[i] != null  ?  children[i].refreshRequisitionX()  :  null;
+			}
+		}
+		
+		FractionLayout.computeRequisitionX( layoutBox, boxes[NUMERATOR], boxes[BAR], boxes[DENOMINATOR], getHPadding(), getVSpacing(), getYOffset() );
+	}
+
+	protected void updateRequisitionY()
+	{
+		LBox boxes[] = new LBox[NUMCHILDREN];
+		for (int i = 0; i < NUMCHILDREN; i++)
+		{
+			if ( i != BAR )
+			{
+				boxes[i] = children[i] != null  ?  children[i].refreshRequisitionY().scaled( children[i], childScale )  :  null;
+			}
+			else
+			{
+				boxes[i] = children[i] != null  ?  children[i].refreshRequisitionY()  :  null;
+			}
+		}
+		
+		FractionLayout.computeRequisitionY( layoutBox, boxes[NUMERATOR], boxes[BAR], boxes[DENOMINATOR], getHPadding(), getVSpacing(), getYOffset() );
+	}
+	
+
+	
+	protected void updateAllocationX()
+	{
+		super.updateAllocationX( );
+		
+		LBox boxes[] = new LBox[NUMCHILDREN];
+		double prevChildWidths[] = new double[NUMCHILDREN];
+		for (int i = 0; i < NUMCHILDREN; i++)
+		{
+			boxes[i] = children[i] != null  ?  children[i].layoutBox  :  null;
+			prevChildWidths[i] = children[i] != null  ?  children[i].layoutBox.getAllocationX()  :  0.0;
+		}
+		
+		FractionLayout.allocateX( layoutBox, boxes[NUMERATOR], boxes[BAR], boxes[DENOMINATOR], getHPadding(), getVSpacing(), getYOffset() );
 		
 		for (int i = 0; i < NUMCHILDREN; i++)
 		{
 			if ( children[i] != null )
 			{
-				metrics[i] = children[i].refreshMinimumHMetrics();
-			}
-			else
-			{
-				metrics[i] = new HMetrics();
+				children[i].refreshAllocationX( prevChildWidths[i] );
 			}
 		}
-		
-		return metrics;
 	}
+
 	
-	private HMetrics[] getChildRefreshedPreferredHMetrics()
+	protected void updateAllocationY()
 	{
-		HMetrics[] metrics = new HMetrics[NUMCHILDREN];
+		super.updateAllocationY( );
+		
+		LBox boxes[] = new LBox[NUMCHILDREN];
+		double prevChildHeights[] = new double[NUMCHILDREN];
+		for (int i = 0; i < NUMCHILDREN; i++)
+		{
+			boxes[i] = children[i] != null  ?  children[i].layoutBox  :  null;
+			prevChildHeights[i] = children[i] != null  ?  children[i].layoutBox.getAllocationY()  :  0.0;
+		}
+		
+		FractionLayout.allocateY( layoutBox, boxes[NUMERATOR], boxes[BAR], boxes[DENOMINATOR], getHPadding(), getVSpacing(), getYOffset() );
 		
 		for (int i = 0; i < NUMCHILDREN; i++)
 		{
 			if ( children[i] != null )
 			{
-				metrics[i] = children[i].refreshPreferredHMetrics();
+				children[i].refreshAllocationY( prevChildHeights[i] );
 			}
-			else
-			{
-				metrics[i] = new HMetrics();
-			}
-		}
-		
-		return metrics;
-	}
-	
-	
-	private VMetricsTypeset[] getChildRefreshedMinimumVMetrics()
-	{
-		VMetricsTypeset[] metrics = new VMetricsTypeset[NUMCHILDREN];
-		
-		for (int i = 0; i < NUMCHILDREN; i++)
-		{
-			if ( children[i] != null )
-			{
-				VMetrics v = children[i].refreshMinimumVMetrics();
-				if ( v.isTypeset() )
-				{
-					metrics[i] = (VMetricsTypeset)v;
-				}
-				else
-				{
-					metrics[i] = new VMetricsTypeset( v.height, 0.0, v.vspacing );
-				}
-			}
-			else
-			{
-				metrics[i] = new VMetricsTypeset();
-			}
-		}
-		
-		return metrics;
-	}
-	
-	private VMetricsTypeset[] getChildRefreshedPreferredVMetrics()
-	{
-		VMetricsTypeset[] metrics = new VMetricsTypeset[NUMCHILDREN];
-		
-		for (int i = 0; i < NUMCHILDREN; i++)
-		{
-			if ( children[i] != null )
-			{
-				VMetrics v = children[i].refreshPreferredVMetrics();
-				if ( v.isTypeset() )
-				{
-					metrics[i] = (VMetricsTypeset)v;
-				}
-				else
-				{
-					metrics[i] = new VMetricsTypeset( v.height, 0.0, v.vspacing );
-				}
-			}
-			else
-			{
-				metrics[i] = new VMetricsTypeset();
-			}
-		}
-		
-		return metrics;
-	}
-	
-	
-
-	
-	
-	
-	
-	private double computeBarHeight()
-	{
-		return 1.5;
-	}
-	
-	
-	private HMetrics combineHMetricsHorizontally(HMetrics[] childHMetrics)
-	{
-		HMetrics m = HMetrics.max( childHMetrics[NUMERATOR], childHMetrics[DENOMINATOR] );
-		return new HMetrics( m.width  +  getHPadding() * 2.0, m.hspacing );
-	}
-	
-	
-	private VMetrics combineVMetricsVertically(VMetrics[] childVMetrics)
-	{
-		double spacing = getVSpacing();
-		double yOffset = getYOffset();
-		
-		// Accumulate the height required for all the children
-		double barHeight = computeBarHeight() * 0.5;
-		double ascent = childVMetrics[NUMERATOR].height + childVMetrics[NUMERATOR].minSpacing( spacing ).vspacing + barHeight  +  yOffset;
-		double descent = barHeight + spacing + childVMetrics[DENOMINATOR].height  -  yOffset;
-		
-
-		return new VMetricsTypeset( ascent, descent, childVMetrics[DENOMINATOR].vspacing );
-	}
-	
-	
-
-	protected HMetrics computeMinimumHMetrics()
-	{
-		return combineHMetricsHorizontally( getChildRefreshedMinimumHMetrics() );
-	}
-
-	protected HMetrics computePreferredHMetrics()
-	{
-		return combineHMetricsHorizontally( getChildRefreshedPreferredHMetrics() );
-	}
-
-	
-	protected VMetrics computeMinimumVMetrics()
-	{
-		return combineVMetricsVertically( getChildRefreshedMinimumVMetrics() );
-	}
-
-	protected VMetrics computePreferredVMetrics()
-	{
-		return combineVMetricsVertically( getChildRefreshedPreferredVMetrics() );
-	}
-
-	
-	
-	
-	protected void allocateContentsX(double allocation)
-	{
-		super.allocateContentsX( allocation );
-		
-		double padding = getHPadding();
-		
-		double childrenAlloc = allocation - padding * 2.0;
-		
-		if ( children[NUMERATOR] != null )
-		{
-			double childWidth = Math.min( children[NUMERATOR].prefH.width, childrenAlloc );
-			allocateChildX( children[NUMERATOR], padding + ( childrenAlloc - childWidth ) * 0.5, childWidth );
-		}
-		
-		if ( children[BAR] != null )
-		{
-			double numeratorWidth = children[NUMERATOR] != null  ?  children[NUMERATOR].prefH.width  :  0.0;
-			double denominatorWidth = children[DENOMINATOR] != null  ?  children[DENOMINATOR].prefH.width  :  0.0;
-			double childWidth = Math.min( Math.max( numeratorWidth, denominatorWidth ) + padding * 2.0, allocation );
-			allocateChildX( children[BAR], 0.0, childWidth );
-		}
-		
-		if ( children[DENOMINATOR] != null )
-		{
-			double childWidth = Math.min( children[DENOMINATOR].prefH.width, childrenAlloc );
-			allocateChildX( children[DENOMINATOR], padding + ( childrenAlloc - childWidth ) * 0.5, childWidth );
-		}
-	}
-
-	
-	protected void allocateContentsY(double allocation)
-	{
-		super.allocateContentsY( allocation );
-		
-		double y = 0.0;
-		double spacing = getVSpacing();
-		
-		if ( children[NUMERATOR] != null )
-		{
-			double childHeight = Math.min( children[NUMERATOR].prefV.height, allocation );
-			allocateChildY( children[NUMERATOR], y, childHeight );
-			
-			y += childHeight  +  children[NUMERATOR].prefV.minSpacing( spacing ).vspacing;
-		}
-		
-		if ( children[BAR] != null )
-		{
-			double childHeight = computeBarHeight();
-			allocateChildY( children[BAR], y, childHeight );
-			
-			y += childHeight  +  spacing;
-		}
-		
-		if ( children[DENOMINATOR] != null )
-		{
-			double childHeight = Math.min( children[DENOMINATOR].prefV.height, allocation );
-			allocateChildY( children[DENOMINATOR], y, childHeight );
 		}
 	}
 	

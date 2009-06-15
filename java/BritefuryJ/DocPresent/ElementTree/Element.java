@@ -21,6 +21,7 @@ import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Border.EmptyBorder;
 import BritefuryJ.DocPresent.ElementTree.Marker.ElementMarker;
+import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
@@ -451,7 +452,7 @@ public abstract class Element
 	
 	protected static TextStyleSheet headerDebugTextStyle = new TextStyleSheet( new Font( "Sans serif", Font.BOLD, 14 ), new Color( 0.0f, 0.5f, 0.5f ) );
 	protected static TextStyleSheet headerDescriptionTextStyle = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 14 ), new Color( 0.0f, 0.0f, 0.75f ) );
-	protected static HBoxStyleSheet metaHeaderHBoxStyle = new HBoxStyleSheet( DPHBox.Alignment.BASELINES, 10.0, false, 0.0 );
+	protected static HBoxStyleSheet metaHeaderHBoxStyle = new HBoxStyleSheet( VAlignment.BASELINES, 10.0, false, 0.0 );
 	protected static EmptyBorder metaHeaderEmptyBorder = new EmptyBorder();
 
 

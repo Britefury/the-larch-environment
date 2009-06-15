@@ -14,8 +14,6 @@ import java.awt.geom.AffineTransform;
 
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Marker.Marker;
-import BritefuryJ.DocPresent.Metrics.HMetrics;
-import BritefuryJ.DocPresent.Metrics.VMetrics;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.Util.TextVisual;
 import BritefuryJ.Math.Point2;
@@ -149,28 +147,16 @@ public class DPText extends DPContentLeafEditableEntry
 
 	
 	
-	
-	protected HMetrics computeMinimumHMetrics()
+	protected void updateRequisitionX()
 	{
-		return visual.getHMetrics();
-	}
-	
-	protected HMetrics computePreferredHMetrics()
-	{
-		return visual.getHMetrics();
+		visual.setBoxRequisitionX( layoutBox );
 	}
 
+	protected void updateRequisitionY()
+	{
+		visual.setBoxRequisitionY( layoutBox );
+	}
 	
-	protected VMetrics computeMinimumVMetrics()
-	{
-		return visual.getVMetrics();
-	}
-
-	protected VMetrics computePreferredVMetrics()
-	{
-		return visual.getVMetrics();
-	}
-
 	
 	public int getMarkerRange()
 	{

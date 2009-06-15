@@ -6,29 +6,26 @@
 //##************************
 package tests.DocPresent.Layout;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import BritefuryJ.DocPresent.Layout.BoxPackingParams;
-import BritefuryJ.DocPresent.Layout.ParagraphLayout;
 import BritefuryJ.DocPresent.Layout.LBox;
+import BritefuryJ.DocPresent.Layout.ParagraphLayout;
 import BritefuryJ.DocPresent.Layout.VAlignment;
 
 public class Test_ParagraphLayout extends Test_Layout_base
 {
 	protected LBox lineBreakBox(int cost)
 	{
-		return new LBox().lineBreakBox( cost );
+		return new LBox( null ).lineBreakBox( null, cost );
 	}
 	
 	protected LBox lineBreakBox(double width, int cost)
 	{
-		return new LBox( width, 0.0, 0.0, 0.0 ).lineBreakBox( cost );
+		return new LBox( null, width, 0.0, 0.0, 0.0 ).lineBreakBox( null, cost );
 	}
 	
 	protected LBox lineBreakBox(double width, double hSpacing, int cost)
 	{
-		return new LBox( width, hSpacing, 0.0, 0.0 ).lineBreakBox( cost );
+		return new LBox( null, width, hSpacing, 0.0, 0.0 ).lineBreakBox( null, cost );
 	}
 	
 	
@@ -50,20 +47,20 @@ public class Test_ParagraphLayout extends Test_Layout_base
 
 		
 		
-		LBox result = new LBox();
+		LBox result = new LBox( null );
 		
 		
 		// First, perform the same tests as a normal horizontal layout.
 		// requisitionX()  ->  <0,0>
 		ParagraphLayout.computeRequisitionX( result, new LBox[] {},  0.0, 0.0, null );
-		assertEquals( result, new LBox() );
+		assertEquals( result, new LBox( null ) );
 
 		// requisitionX( [ <0,0> ] )  ->  <0,0>
-		ParagraphLayout.computeRequisitionX( result, new LBox[] { new LBox() },  0.0, 0.0, null );
-		assertEquals( result, new LBox() );
+		ParagraphLayout.computeRequisitionX( result, new LBox[] { new LBox( null ) },  0.0, 0.0, null );
+		assertEquals( result, new LBox( null ) );
 
 		// requisitionX( [ <0,0>:pad=1 ] )  ->  <2,0>
-		ParagraphLayout.computeRequisitionX( result, new LBox[] { new LBox() },  0.0, 0.0, new BoxPackingParams[] { new BoxPackingParams( 1.0 ) } );
+		ParagraphLayout.computeRequisitionX( result, new LBox[] { new LBox( null ) },  0.0, 0.0, new BoxPackingParams[] { new BoxPackingParams( 1.0 ) } );
 		assertEquals( result, xbox( 2.0, 0.0 ) );
 
 		// requisitionX( [ <10,0>:pad=2 ] )  ->  <14,0>
@@ -81,8 +78,8 @@ public class Test_ParagraphLayout extends Test_Layout_base
 		assertEquals( result, xbox( 14.0, 1.0 ) );
 
 		// requisitionX( [ <0,0>, <0,0> ] )  ->  <0,0>
-		ParagraphLayout.computeRequisitionX( result, new LBox[] { new LBox(), new LBox() },  0.0, 0.0, null );
-		assertEquals( result, new LBox() );
+		ParagraphLayout.computeRequisitionX( result, new LBox[] { new LBox( null ), new LBox( null ) },  0.0, 0.0, null );
+		assertEquals( result, new LBox( null ) );
 
 		// Width accumulates
 		// requisitionX( [ <10,0>, <5,0> ] )  ->  <15,0>
@@ -101,7 +98,7 @@ public class Test_ParagraphLayout extends Test_Layout_base
 
 		// Spacing between children adds extra width
 		// requisitionX( [ <0,0>, <0,0> ], spacing=1 )  ->  <1,0>
-		ParagraphLayout.computeRequisitionX( result, new LBox[] { new LBox(), new LBox() },  0.0, 1.0, null );
+		ParagraphLayout.computeRequisitionX( result, new LBox[] { new LBox( null ), new LBox( null ) },  0.0, 1.0, null );
 		assertEquals( result, xbox( 1.0, 0.0 ) );
 		// requisitionX( [ <10,0>, <5,0> ], spacing=1 )  ->  <15,0>
 		ParagraphLayout.computeRequisitionX( result, new LBox[] { xbox( 10.0, 0.0 ), xbox( 5.0, 0.0 ) },  0.0, 1.0, null );
@@ -195,7 +192,7 @@ public class Test_ParagraphLayout extends Test_Layout_base
 
 	private void allocXTest(LBox children[], double indentation, double hSpacing, BoxPackingParams packingParams[],LBox expectedBox, double boxAllocation, double expectedSize[], double expectedPosition[])
 	{ 
-		LBox box = new LBox();
+		LBox box = new LBox( null );
 		ParagraphLayout.computeRequisitionX( box, children, indentation, hSpacing, packingParams );
 		
 		assertBoxesEqual( box, expectedBox, "PARENT BOX" );
@@ -225,7 +222,7 @@ public class Test_ParagraphLayout extends Test_Layout_base
 		{
 			for (int j = 0; j < children.length; j++)
 			{
-				childrenCopy[j] = children[j].copy();
+				childrenCopy[j] = children[j].copy( null );
 			}
 			allocXTest( childrenCopy, indentation, hSpacing, packingParams, expectedBox, boxAllocations[i], expectedSize[i], expectedPosition[i] );
 		}
@@ -317,18 +314,18 @@ public class Test_ParagraphLayout extends Test_Layout_base
 	private void allocYTest(LBox children[], double indentation, double hSpacing, double vSpacing, VAlignment vAlignment, BoxPackingParams packingParams[],
 			LBox expectedBox, double boxAllocation, double expectedSize[], double expectedPosition[])
 	{ 
-		LBox box = new LBox();
+		LBox box = new LBox( null );
 		
 		// X
 		ParagraphLayout.computeRequisitionX( box, children, indentation, hSpacing, packingParams );
 		box.setAllocationX( boxAllocation );
-		ArrayList<ParagraphLayout.Line> lines = ParagraphLayout.allocateX( box, children, indentation, hSpacing, packingParams );
+		ParagraphLayout.Line lines[] = ParagraphLayout.allocateX( box, children, indentation, hSpacing, packingParams );
 		
 		// Y
 		ParagraphLayout.computeRequisitionY( box, lines, vSpacing, vAlignment );
 		ParagraphLayout.allocateY( box, lines, vSpacing, vAlignment );
 		
-		LBox b = box.copy();
+		LBox b = box.copy( null );
 		b.setAllocationX( 0.0 );
 		b.setPositionInParentSpaceX( 0.0 );
 		
@@ -336,15 +333,6 @@ public class Test_ParagraphLayout extends Test_Layout_base
 		
 		for (int i = 0; i < children.length; i++)
 		{
-			double lineY = 0.0;
-			for (ParagraphLayout.Line line: lines)
-			{
-				if ( Arrays.asList( line.getChildBoxes() ).contains( children[i] ) )
-				{
-					lineY = line.getLineBox().getPositionInParentSpaceY(); 
-				}
-			}
-			
 			if ( children[i].getAllocationX() != expectedSize[i*2] )
 			{
 				System.out.println( "Child allocation width for " + i + " is not as expected; expected=" + expectedSize[i*2] + ", result=" + children[i].getAllocationX() );
@@ -364,11 +352,11 @@ public class Test_ParagraphLayout extends Test_Layout_base
 			}
 			assertEquals( children[i].getPositionInParentSpaceX(), expectedPosition[i*2] );
 			
-			if ( children[i].getPositionInParentSpaceY()+lineY != expectedPosition[i*2+1] )
+			if ( children[i].getPositionInParentSpaceY() != expectedPosition[i*2+1] )
 			{
-				System.out.println( "Child position Y for " + i + " is not as expected; expected=" + expectedPosition[i*2+1] + ", result=" + (children[i].getPositionInParentSpaceY()+lineY) );
+				System.out.println( "Child position Y for " + i + " is not as expected; expected=" + expectedPosition[i*2+1] + ", result=" + children[i].getPositionInParentSpaceY() );
 			}
-			assertEquals( children[i].getPositionInParentSpaceY()+lineY, expectedPosition[i*2+1] );
+			assertEquals( children[i].getPositionInParentSpaceY(), expectedPosition[i*2+1] );
 		}
 	}
 	
