@@ -28,6 +28,7 @@ import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.VAlignment;
+import BritefuryJ.DocPresent.Layout.VTypesetting;
 import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
@@ -128,14 +129,14 @@ public class NodeView
 	static TextStyleSheet valueStyle = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 16 ), Color.black );
 	static TextStyleSheet failStyle = new TextStyleSheet( new Font( "Sans serif", Font.ITALIC, 16 ), new Color( 0.5f, 0.0f, 0.0f ) );
 	static HBoxStyleSheet titleTextHBoxStyle = new HBoxStyleSheet( VAlignment.BASELINES, 10.0, false, 0.0 );
-	static VBoxStyleSheet titleVBoxStyle = new VBoxStyleSheet( HAlignment.CENTRE, 0.0, false, 0.0 );
+	static VBoxStyleSheet titleVBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.CENTRE, 0.0, false, 0.0 );
 	static Border titleSuccessBorder = new EmptyBorder( 0.0, 0.0, 0.0, 0.0, new Color( 0.85f, 0.95f, 0.85f ) );
 	static Border titleFailBorder = new EmptyBorder( 0.0, 0.0, 0.0, 0.0, new Color( 1.0f, 0.85f, 0.85f ) );
-	static VBoxStyleSheet contentVBoxStyle = new VBoxStyleSheet( HAlignment.LEFT, 0.0, false, 0.0 );
-	static VBoxStyleSheet nodeVBoxStyle = new VBoxStyleSheet( HAlignment.EXPAND, 0.0, false, 0.0 );
+	static VBoxStyleSheet contentVBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.LEFT, 0.0, false, 0.0 );
+	static VBoxStyleSheet nodeVBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.EXPAND, 0.0, false, 0.0 );
 	static Border nodeBorder = new SolidBorder( 1.0, Color.black, null );
 	
-	static VBoxStyleSheet childrenVBoxStyle = new VBoxStyleSheet( HAlignment.LEFT, 3.0, false, 3.0 );
+	static VBoxStyleSheet childrenVBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.LEFT, 3.0, false, 3.0 );
 	static HBoxStyleSheet mainHBoxStyle = new HBoxStyleSheet( VAlignment.CENTRE, 80.0, false, 0.0 );
 	
 	

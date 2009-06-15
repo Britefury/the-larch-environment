@@ -29,8 +29,8 @@ lisp_paragraphStyle = ParagraphStyleSheet( VAlignment.BASELINES, 0.0, 0.0, 0.0, 
 
 horizontal_listViewLayout = ParagraphListViewLayout( lisp_paragraphStyle, lambda: TextElement( default_textStyle, ' ' ), 0, ListViewLayout.TrailingSeparator.NEVER )
 
-verticalInline_listViewLayout = VerticalInlineListViewLayout( VBoxStyleSheet( HAlignment.LEFT, 0.0, False, 0.0 ), \
+verticalInline_listViewLayout = VerticalInlineListViewLayout( VBoxStyleSheet( VTypesetting.ALIGN_WITH_TOP, HAlignment.LEFT, 0.0, False, 0.0 ), \
 						ParagraphStyleSheet(), 30.0, ListViewLayout.TrailingSeparator.NEVER )
 
-vertical_listViewLayout = VerticalListViewLayout( VBoxStyleSheet( HAlignment.LEFT, 0.0, False, 0.0 ), \
+vertical_listViewLayout = VerticalListViewLayout( VBoxStyleSheet( VTypesetting.ALIGN_WITH_TOP, HAlignment.LEFT, 0.0, False, 0.0 ), \
 						ParagraphStyleSheet(), 30.0, ListViewLayout.TrailingSeparator.NEVER )

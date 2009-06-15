@@ -13,6 +13,7 @@ import BritefuryJ.DocPresent.Layout.BoxPackingParams;
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.LAllocBox;
 import BritefuryJ.DocPresent.Layout.LReqBox;
+import BritefuryJ.DocPresent.Layout.VTypesetting;
 import BritefuryJ.DocPresent.Layout.VerticalLayout;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 import BritefuryJ.Math.Point2;
@@ -127,7 +128,7 @@ public class DPVBox extends DPAbstractBox
 			packingParams[i] = (BoxPackingParams)registeredChildren.get( i ).getParentPacking();
 		}
 
-		VerticalLayout.computeRequisitionY( layoutReqBox, childBoxes, getSpacing(), packingParams );
+		VerticalLayout.computeRequisitionY( layoutReqBox, childBoxes, getTypesetting(), getSpacing(), packingParams );
 	}
 
 	
@@ -200,6 +201,11 @@ public class DPVBox extends DPAbstractBox
 	
 	
 	
+	protected VTypesetting getTypesetting()
+	{
+		return ((VBoxStyleSheet)styleSheet).getTypesetting();
+	}
+
 	protected HAlignment getAlignment()
 	{
 		return ((VBoxStyleSheet)styleSheet).getAlignment();

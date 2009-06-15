@@ -19,6 +19,7 @@ import BritefuryJ.DocPresent.DPPresentationArea;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.VAlignment;
+import BritefuryJ.DocPresent.Layout.VTypesetting;
 import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
@@ -38,7 +39,7 @@ public class DPHBoxTypesetTest
 	}
 	
 	
-/*	protected static DPHBox makeTypesetHBox(DPVBox.Typesetting typesetting, String header)
+	protected static DPHBox makeTypesetHBox(VTypesetting typesetting, String header)
 	{
 		DPText[] txt = makeTexts( header );
 		VBoxStyleSheet vs = new VBoxStyleSheet( typesetting, HAlignment.LEFT, 0.0, false, 0.0 );
@@ -64,11 +65,11 @@ public class DPHBoxTypesetTest
 
 		DPPresentationArea area = new DPPresentationArea();
 		
-		DPHBox t0 = makeTypesetHBox( "NONE" );
-		DPHBox t1 = makeTypesetHBox( DPVBox.Typesetting.ALIGN_WITH_TOP, "ALIGN_WITH_TOP" );
-		DPHBox t2 = makeTypesetHBox( DPVBox.Typesetting.ALIGN_WITH_BOTTOM, "ALIGN_WITH_BOTTOM" );
+		DPHBox t0 = makeTypesetHBox( VTypesetting.NONE, "NONE" );
+		DPHBox t1 = makeTypesetHBox( VTypesetting.ALIGN_WITH_TOP, "ALIGN_WITH_TOP" );
+		DPHBox t2 = makeTypesetHBox( VTypesetting.ALIGN_WITH_BOTTOM, "ALIGN_WITH_BOTTOM" );
 		
-		VBoxStyleSheet boxs = new VBoxStyleSheet( HAlignment.EXPAND, 20.0, false, 0.0 );
+		VBoxStyleSheet boxs = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.EXPAND, 20.0, false, 0.0 );
 		DPVBox box = new DPVBox( boxs );
 		box.append( t0 );
 		box.append( t1 );
@@ -83,5 +84,5 @@ public class DPHBoxTypesetTest
 		frame.add( area.getComponent() );
 		frame.pack();
 		frame.setVisible(true);
-	}*/
+	}
 }

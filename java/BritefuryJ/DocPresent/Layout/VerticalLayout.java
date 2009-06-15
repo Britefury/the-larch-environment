@@ -8,6 +8,43 @@ package BritefuryJ.DocPresent.Layout;
 
 public class VerticalLayout
 {
+	private static void applyTypesettingToRequisitionY(LReqBox box, LReqBox children[], VTypesetting typesetting, double height, double vspacing)
+	{
+		if ( typesetting == VTypesetting.NONE )
+		{
+			box.setRequisitionY( height, vspacing );
+		}
+		else if ( typesetting == VTypesetting.ALIGN_WITH_TOP )
+		{
+			LReqBox top = children[0];
+			if ( top.bHasBaseline )
+			{
+				box.setRequisitionY( top.reqAscent, height - top.reqAscent, vspacing );
+			}
+			else
+			{
+				box.setRequisitionY( top.getReqHeight(), height - top.getReqHeight(), vspacing );
+			}
+		}
+		else if ( typesetting == VTypesetting.ALIGN_WITH_BOTTOM )
+		{
+			LReqBox bottom = children[children.length-1];
+			if ( bottom.bHasBaseline )
+			{
+				box.setRequisitionY( height - bottom.reqDescent, bottom.reqDescent, vspacing );
+			}
+			else
+			{
+				box.setRequisitionY( height, 0.0, vspacing );
+			}
+		}
+		else
+		{
+			throw new RuntimeException( "Invalid typesetting value" );
+		}
+	}
+
+
 	public static void computeRequisitionX(LReqBox box, LReqBox children[])
 	{
 		// The resulting box should have the following properties:
@@ -32,36 +69,47 @@ public class VerticalLayout
 		box.setRequisitionX( minWidth, prefWidth, minAdvance - minWidth, prefAdvance - prefWidth );
 	}
 
-	public static void computeRequisitionY(LReqBox box, LReqBox children[], double spacing, BoxPackingParams packingParams[])
+	public static void computeRequisitionY(LReqBox box, LReqBox children[], VTypesetting typesetting, double spacing, BoxPackingParams packingParams[])
 	{
-		// Accumulate the width required for all the children
-		
-		// Each packed child consists of:
-		//	- start padding
-		//	- child height
-		//	- end padding
-		//	- any remaining spacing not 'consumed' by padding; spacing - padding  or  0 if padding > spacing
-		
-		// There should be at least the specified amount of spacing between each child, or the child's own h-spacing if it is greater
-		
-		double reqHeight = 0.0;
-		double reqAdvance = 0.0;
-		double reqY = 0.0;
-		for (int i = 0; i < children.length; i++)
+		if ( children.length == 0 )
 		{
-			LReqBox chBox = children[i];
-			
-			BoxPackingParams params = packingParams != null  ?  packingParams[i]  :  null;
-			double padding = params != null  ?  params.padding  :  0.0;
-			
-			double reqChildSpacing = Math.max( chBox.reqVSpacing - padding, 0.0 );
-			
-			reqHeight = reqY + chBox.getReqHeight()  +  padding * 2.0;
-			reqAdvance = reqHeight + reqChildSpacing;
-			reqY = reqAdvance + spacing;
+			box.setRequisitionY( 0.0, 0.0 );
 		}
-		
-		box.setRequisitionY( reqHeight, reqAdvance - reqHeight);
+		else if ( children.length == 1 )
+		{
+			box.setRequisitionY( children[0] );
+		}
+		else
+		{
+			// Accumulate the height required for all the children
+			
+			// Each packed child consists of:
+			//	- start padding
+			//	- child height
+			//	- end padding
+			//	- any remaining spacing not 'consumed' by padding; spacing - padding  or  0 if padding > spacing
+			
+			// There should be at least the specified amount of spacing between each child, or the child's own v-spacing if it is greater
+			
+			double reqHeight = 0.0;
+			double reqAdvance = 0.0;
+			double reqY = 0.0;
+			for (int i = 0; i < children.length; i++)
+			{
+				LReqBox chBox = children[i];
+				
+				BoxPackingParams params = packingParams != null  ?  packingParams[i]  :  null;
+				double padding = params != null  ?  params.padding  :  0.0;
+				
+				double reqChildSpacing = Math.max( chBox.reqVSpacing - padding, 0.0 );
+				
+				reqHeight = reqY + chBox.getReqHeight()  +  padding * 2.0;
+				reqAdvance = reqHeight + reqChildSpacing;
+				reqY = reqAdvance + spacing;
+			}
+			
+			applyTypesettingToRequisitionY( box, children, typesetting, reqHeight, reqAdvance - reqHeight );
+		}
 	}
 
 
