@@ -46,9 +46,10 @@ public class DPStressTest
 	// 10240 lines
 	// 
 	//
-	// State						JVM version			# lines			Process size			Measured mem usage			Widget tree creation time		typeset time
+	// State						JVM version	# lines	Process size			Measured mem usage		Mem usage at start		Widget tree creation time		typeset time
 	//
-	// Original (after previous tests)	1.6.0_14				10240			80.7MB				56.6MB					0.839s					0.410s
+	// Original (after previous tests)	1.6.0_14		10240	80.7MB				56.6MB				--					0.839s					0.410s
+	// Using new layout system		1.6.0_14		10240	71.4MB				46.4MB				0.6MB				0.705s					0.294s
 	
 	private static int NUMLINES = 10240;
 	
