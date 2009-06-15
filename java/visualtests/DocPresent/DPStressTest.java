@@ -126,6 +126,7 @@ public class DPStressTest
 
 		DPPresentationArea area = new DPPresentationArea();
 	     
+		System.out.println( "Start memory usage = "  + ( Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory() ) );
 	     
 	     
 		long t1 = System.nanoTime();

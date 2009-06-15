@@ -802,7 +802,7 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 			double prevWidth = layoutBox.getAllocationX();
 			if ( bHorizontalClamp )
 			{
-				layoutBox.setAllocationX( Math.max( reqX.getMinWidth(), areaSize.x / rootScaleInWindowSpace ) );
+				layoutBox.setAllocationX( areaSize.x / rootScaleInWindowSpace );
 			}
 			else
 			{
