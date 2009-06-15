@@ -18,6 +18,7 @@ import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Event.PointerScrollEvent;
 import BritefuryJ.DocPresent.Input.PointerInterface;
+import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Layout.PackingParams;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
@@ -110,6 +111,12 @@ public abstract class DPContainer extends DPWidget
 		return getLocalPointRelativeToAncestor( ancestor, localP );
 	}
 	
+	
+	protected double getChildScale(DPWidget child)
+	{
+		return 1.0;
+	}
+	
 
 	
 	
@@ -154,7 +161,6 @@ public abstract class DPContainer extends DPWidget
 	protected void childListModified()
 	{
 	}
-	
 	
 	
 	

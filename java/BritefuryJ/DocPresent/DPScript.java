@@ -146,6 +146,13 @@ public class DPScript extends DPContainer
 
 	
 	
+	protected double getChildScale(DPWidget child)
+	{
+		return child == children[MAIN]  ?  1.0  :  childScale;
+	}
+	
+
+	
 	protected void replaceChildWithEmpty(DPWidget child)
 	{
 		int slot = Arrays.asList( children ).indexOf( child );
@@ -250,7 +257,14 @@ public class DPScript extends DPContainer
 		double prevChildWidths[] = new double[NUMCHILDREN];
 		for (int i = 0; i < NUMCHILDREN; i++)
 		{
-			reqBoxes[i] = children[i] != null  ?  children[i].layoutReqBox  :  null;
+			if ( i != MAIN )
+			{
+				reqBoxes[i] = children[i] != null  ?  children[i].layoutReqBox.scaled( childScale )  :  null;
+			}
+			else
+			{
+				reqBoxes[i] = children[i] != null  ?  children[i].layoutReqBox  :  null;
+			}
 			allocBoxes[i] = children[i] != null  ?  children[i].layoutAllocBox  :  null;
 			prevChildWidths[i] = children[i] != null  ?  children[i].getAllocationX()  :  0.0;
 		}
@@ -263,6 +277,10 @@ public class DPScript extends DPContainer
 		{
 			if ( children[i] != null )
 			{
+				if ( i != MAIN )
+				{
+					allocBoxes[i].scaleAllocationX( 1.0 / childScale );
+				}
 				children[i].refreshAllocationX( prevChildWidths[i] );
 			}
 		}
@@ -278,7 +296,14 @@ public class DPScript extends DPContainer
 		double prevChildHeights[] = new double[NUMCHILDREN];
 		for (int i = 0; i < NUMCHILDREN; i++)
 		{
-			reqBoxes[i] = children[i] != null  ?  children[i].layoutReqBox  :  null;
+			if ( i != MAIN )
+			{
+				reqBoxes[i] = children[i] != null  ?  children[i].layoutReqBox.scaled( childScale )  :  null;
+			}
+			else
+			{
+				reqBoxes[i] = children[i] != null  ?  children[i].layoutReqBox  :  null;
+			}
 			allocBoxes[i] = children[i] != null  ?  children[i].layoutAllocBox  :  null;
 			prevChildHeights[i] = children[i] != null  ?  children[i].getAllocationY()  :  0.0;
 		}
@@ -291,6 +316,10 @@ public class DPScript extends DPContainer
 		{
 			if ( children[i] != null )
 			{
+				if ( i != MAIN )
+				{
+					allocBoxes[i].scaleAllocationY( 1.0 / childScale );
+				}
 				children[i].refreshAllocationY( prevChildHeights[i] );
 			}
 		}

@@ -219,9 +219,19 @@ abstract public class DPWidget
 		return layoutAllocBox.getAllocation();
 	}
 	
+	public double getAllocationInParentSpaceX()
+	{
+		return layoutAllocBox.getAllocationX()  *  getScale();
+	}
+	
+	public double getAllocationInParentSpaceY()
+	{
+		return layoutAllocBox.getAllocationY()  *  getScale();
+	}
+	
 	public Vector2 getAllocationInParentSpace()
 	{
-		return layoutAllocBox.getAllocation();
+		return layoutAllocBox.getAllocation().mul( getScale() );
 	}
 	
 	
@@ -236,14 +246,19 @@ abstract public class DPWidget
 	}
 
 	
+	private double getScale()
+	{
+		return parent != null  ?  parent.getChildScale( this )  :  1.0;
+	}
+	
 	public Xform2 getLocalToParentXform()
 	{
-		return new Xform2( 1.0, getPositionInParentSpace().toVector2() );
+		return new Xform2( getScale(), getPositionInParentSpace().toVector2() );
 	}
 	
 	public Xform2 getParentToLocalXform()
 	{
-		return Xform2.inverseOf( 1.0, getPositionInParentSpace().toVector2() );
+		return Xform2.inverseOf( getScale(), getPositionInParentSpace().toVector2() );
 	}
 	
 	

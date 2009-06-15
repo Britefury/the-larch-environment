@@ -152,6 +152,11 @@ public class LAllocBox
 		allocationX *= scale;
 	}
 
+	public void scaleAllocationY(double scale)
+	{
+		allocationY *= scale;
+	}
+
 
 
 
