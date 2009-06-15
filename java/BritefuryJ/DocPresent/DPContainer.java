@@ -446,7 +446,7 @@ public abstract class DPContainer extends DPWidget
 				DPWidget savedPressGrabChild = pressGrabChild;
 				pressGrabChild = null;
 				
-				if ( localPos.x >= 0.0  &&  localPos.x <= layoutBox.getAllocationX()  &&  localPos.y >= 0.0  &&  localPos.y <= layoutBox.getAllocationY() )
+				if ( localPos.x >= 0.0  &&  localPos.x <= getAllocationX()  &&  localPos.y >= 0.0  &&  localPos.y <= getAllocationY() )
 				{
 					DPWidget child = getChildAtLocalPoint( localPos );
 					if ( child != null )

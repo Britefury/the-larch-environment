@@ -47,7 +47,7 @@ import BritefuryJ.DocPresent.Input.InputTable;
 import BritefuryJ.DocPresent.Input.Modifier;
 import BritefuryJ.DocPresent.Input.Pointer;
 import BritefuryJ.DocPresent.Input.PointerInterface;
-import BritefuryJ.DocPresent.Layout.LBox;
+import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Selection.Selection;
 import BritefuryJ.DocPresent.Selection.SelectionListener;
@@ -614,8 +614,8 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 	{
 		performAllocation();
 		
-		double allocationX = layoutBox.getAllocationX();
-		double allocationY = layoutBox.getAllocationY();
+		double allocationX = getAllocationX();
+		double allocationY = getAllocationY();
 
 		double ax = allocationX == 0.0  ?  1.0  :  allocationX;
 		double ay = allocationY == 0.0  ?  1.0  :  allocationY;
@@ -796,26 +796,26 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 			long t1 = System.nanoTime();
 			
 			// Get X requisition
-			LBox reqX = refreshRequisitionX();
+			LReqBox reqX = refreshRequisitionX();
 			
 			// Allocate X
-			double prevWidth = layoutBox.getAllocationX();
+			double prevWidth = layoutAllocBox.getAllocationX();
 			if ( bHorizontalClamp )
 			{
-				layoutBox.setAllocationX( areaSize.x / rootScaleInWindowSpace );
+				layoutAllocBox.setAllocationX( areaSize.x / rootScaleInWindowSpace );
 			}
 			else
 			{
-				layoutBox.setAllocationX( reqX.getPrefWidth() );
+				layoutAllocBox.setAllocationX( reqX.getPrefWidth() );
 			}
 			refreshAllocationX( prevWidth );
 			
 			// Get Y requisition
-			LBox reqY = refreshRequisitionY();
+			LReqBox reqY = refreshRequisitionY();
 			
 			// Allocate Y
-			double prevHeight = layoutBox.getAllocationY();
-			layoutBox.setAllocationY( reqY.getReqHeight() );
+			double prevHeight = layoutAllocBox.getAllocationY();
+			layoutAllocBox.setAllocationY( reqY.getReqHeight() );
 			refreshAllocationY( prevHeight );
 			
 			bAllocationRequired = false;

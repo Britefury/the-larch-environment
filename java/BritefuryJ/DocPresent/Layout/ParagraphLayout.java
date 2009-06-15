@@ -12,55 +12,69 @@ public class ParagraphLayout
 {
 	public static class Line
 	{
-		public LBox lineBox;
-		public LBox children[];
+		protected LReqBox lineReqBox;
+		protected LAllocBox lineAllocBox;
+		protected LReqBox children[];
+		protected LAllocBox childrenAlloc[];
 		
 		
-		private Line(LBox ch[], double indentation, double spacing, BoxPackingParams packingParams[], double allocation)
+		private Line(LReqBox ch[], LAllocBox chAlloc[], double indentation, double spacing, BoxPackingParams packingParams[], double allocation)
 		{
 			children = ch;
+			childrenAlloc = chAlloc;
 			
-			lineBox = new LBox( null );
-			HorizontalLayout.computeRequisitionX( lineBox, children, spacing, packingParams );
-			lineBox.allocationX = allocation - indentation;
-			HorizontalLayout.allocateX( lineBox, children, spacing, packingParams );
-			for (LBox child: children)
+			lineReqBox = new LReqBox();
+			lineAllocBox = new LAllocBox( null );
+			HorizontalLayout.computeRequisitionX( lineReqBox, children, spacing, packingParams );
+			lineAllocBox.allocationX = allocation - indentation;
+			HorizontalLayout.allocateX( lineReqBox, children, lineAllocBox, childrenAlloc, spacing, packingParams );
+			for (LAllocBox childAlloc: childrenAlloc)
 			{
-				child.positionInParentSpaceX += indentation;
+				childAlloc.positionInParentSpaceX += indentation;
 			}
 		}
 		
 		
-		public LBox getLineBox()
+		public LReqBox getLineBox()
 		{
-			return lineBox;
+			return lineReqBox;
 		}
 		
-		public LBox[] getChildBoxes()
+		public LAllocBox getLineAllocBox()
+		{
+			return lineAllocBox;
+		}
+		
+		public LReqBox[] getChildBoxes()
 		{
 			return children;
+		}
+		
+		public LAllocBox[] getChildAllocBoxes()
+		{
+			return childrenAlloc;
 		}
 		
 		
 		private void computeRequisitionY(VAlignment vAlignment)
 		{
-			HorizontalLayout.computeRequisitionY( lineBox, children, vAlignment );
+			HorizontalLayout.computeRequisitionY( lineReqBox, children, vAlignment );
 		}
 
 		private void allocateY(VAlignment vAlignment)
 		{
-			HorizontalLayout.allocateY( lineBox, children, vAlignment );
+			HorizontalLayout.allocateY( lineReqBox, children, lineAllocBox, childrenAlloc, vAlignment );
 			
-			for (LBox child: children)
+			for (LAllocBox childAlloc: childrenAlloc)
 			{
-				child.positionInParentSpaceY  +=  lineBox.positionInParentSpaceY;
+				childAlloc.positionInParentSpaceY  +=  lineAllocBox.positionInParentSpaceY;
 			}
 		}
 	}
 	
 	
 
-	public static void computeRequisitionX(LBox box, LBox children[], double indentation, double hSpacing, BoxPackingParams packingParams[])
+	public static void computeRequisitionX(LReqBox box, LReqBox children[], double indentation, double hSpacing, BoxPackingParams packingParams[])
 	{
 		// Accumulate the width required for all the children
 		
@@ -77,7 +91,7 @@ public class ParagraphLayout
 		double minX = 0.0, lineX = 0.0, prefX = 0.0;
 		for (int i = 0; i < children.length; i++)
 		{
-			LBox child = children[i];
+			LReqBox child = children[i];
 			
 			BoxPackingParams params = packingParams != null  ?  packingParams[i]  :  null;
 			double padding = params != null  ?  params.padding  :  0.0;
@@ -120,15 +134,15 @@ public class ParagraphLayout
 	}
 
 	
-	public static void computeRequisitionY(LBox box, Line lines[], double vSpacing, VAlignment vAlignment)
+	public static void computeRequisitionY(LReqBox box, Line lines[], double vSpacing, VAlignment vAlignment)
 	{
-		LBox lineBoxes[] = new LBox[lines.length];
+		LReqBox lineBoxes[] = new LReqBox[lines.length];
 		
 		int i = 0;
 		for (Line line: lines)
 		{
 			line.computeRequisitionY( vAlignment );
-			lineBoxes[i++] = line.lineBox;
+			lineBoxes[i++] = line.lineReqBox;
 		}
 		
 		VerticalLayout.computeRequisitionY( box, lineBoxes, vSpacing, null );
@@ -137,7 +151,7 @@ public class ParagraphLayout
 
 
 
-	public static Line[] allocateX(LBox box, LBox children[], double indentation, double hSpacing, BoxPackingParams packingParams[])
+	public static Line[] allocateX(LReqBox box, LReqBox children[], LAllocBox allocBox, LAllocBox childrenAlloc[], double indentation, double hSpacing, BoxPackingParams packingParams[])
 	{
 		boolean bFirstLine = true;
 		
@@ -148,17 +162,17 @@ public class ParagraphLayout
 		double lineAdvance = 0.0;
 		double lineX = 0.0;
 		
-		LBox bestLineBreak = null;
+		LReqBox bestLineBreak = null;
 		int bestLineBreakIndex = -1;
 		double xAtBestLineBreak = 0.0, xAfterBestLineBreak = 0.0;
 		
-		LBox lastLineBreak = null;
+		LReqBox lastLineBreak = null;
 		int lastLineBreakIndex = -1;
 		double xAfterLastLineBreak = 0.0;
 		
 		for (int i = 0; i < children.length; i++)
 		{
-			LBox child = children[i];
+			LReqBox child = children[i];
 			
 			BoxPackingParams params = packingParams != null  ?  packingParams[i]  :  null;
 			double padding = params != null  ?  params.padding  :  0.0;
@@ -198,14 +212,14 @@ public class ParagraphLayout
 			}
 			
 			
-			if ( lineWidth > box.allocationX  &&  bestLineBreak != null  &&  i > lineStartIndex )
+			if ( lineWidth > allocBox.allocationX  &&  bestLineBreak != null  &&  i > lineStartIndex )
 			{
 				// We need to start a new line
 				
 				// Pick a line break
 				int lineBreakIndex;
 				double xAfterLineBreak;
-				if ( ( lineWidth - xAtBestLineBreak )  >  box.allocationX  &&  child != lastLineBreak  &&  lastLineBreak != null )
+				if ( ( lineWidth - xAtBestLineBreak )  >  allocBox.allocationX  &&  child != lastLineBreak  &&  lastLineBreak != null )
 				{
 					// We still go over the allocation limit even if we do split at the best line break.
 					// In this case, choose the most recent line break instead
@@ -221,15 +235,17 @@ public class ParagraphLayout
 				
 				// Build a list of child boxes for the line
 				int lineLength = lineBreakIndex - lineStartIndex;
-				LBox lineChildren[] = new LBox[lineLength];
+				LReqBox lineChildren[] = new LReqBox[lineLength];
+				LAllocBox lineChildrenAlloc[] = new LAllocBox[lineLength];
 				System.arraycopy( children, lineStartIndex, lineChildren, 0, lineLength );
+				System.arraycopy( childrenAlloc, lineStartIndex, lineChildrenAlloc, 0, lineLength );
 				BoxPackingParams linePackingParams[] =  null;
 				if ( packingParams != null )
 				{
 					linePackingParams = new BoxPackingParams[lineLength];
 					System.arraycopy( packingParams, lineStartIndex, linePackingParams, 0, lineLength );
 				}
-				lines.add( new Line( lineChildren, bFirstLine  ?  0.0  :  indentation, hSpacing, linePackingParams, box.allocationX ) );
+				lines.add( new Line( lineChildren, lineChildrenAlloc, bFirstLine  ?  0.0  :  indentation, hSpacing, linePackingParams, allocBox.allocationX ) );
 				
 				// Next line
 				lineStartIndex = lineBreakIndex + 1;
@@ -255,15 +271,17 @@ public class ParagraphLayout
 		{
 			// Create the last line
 			int lineLength = children.length - lineStartIndex;
-			LBox lineChildren[] = new LBox[lineLength];
+			LReqBox lineChildren[] = new LReqBox[lineLength];
+			LAllocBox lineChildrenAlloc[] = new LAllocBox[lineLength];
 			System.arraycopy( children, lineStartIndex, lineChildren, 0, lineLength );
+			System.arraycopy( childrenAlloc, lineStartIndex, lineChildrenAlloc, 0, lineLength );
 			BoxPackingParams linePackingParams[] =  null;
 			if ( packingParams != null )
 			{
 				linePackingParams = new BoxPackingParams[lineLength];
 				System.arraycopy( packingParams, lineStartIndex, linePackingParams, 0, lineLength );
 			}
-			lines.add( new Line( lineChildren, bFirstLine  ?  0.0  :  indentation, hSpacing, linePackingParams, box.allocationX ) );
+			lines.add( new Line( lineChildren, lineChildrenAlloc, bFirstLine  ?  0.0  :  indentation, hSpacing, linePackingParams, allocBox.allocationX ) );
 		}
 		
 		
@@ -275,17 +293,19 @@ public class ParagraphLayout
 
 
 
-	public static void allocateY(LBox box, Line lines[], double vSpacing, VAlignment vAlignment)
+	public static void allocateY(LReqBox box, LAllocBox allocBox, Line lines[], double vSpacing, VAlignment vAlignment)
 	{
-		LBox lineBoxes[] = new LBox[lines.length];
+		LReqBox lineReqBoxes[] = new LReqBox[lines.length];
+		LAllocBox lineAllocBoxes[] = new LAllocBox[lines.length];
 		
 		int i = 0;
 		for (Line line: lines)
 		{
-			lineBoxes[i++] = line.lineBox;
+			lineReqBoxes[i] = line.lineReqBox;
+			lineAllocBoxes[i++] = line.lineAllocBox;
 		}
 		
-		VerticalLayout.allocateY( box, lineBoxes, vSpacing, null );
+		VerticalLayout.allocateY( box, lineReqBoxes, allocBox, lineAllocBoxes, vSpacing, null );
 		
 		for (Line line: lines)
 		{

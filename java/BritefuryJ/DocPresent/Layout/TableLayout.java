@@ -11,25 +11,25 @@ package BritefuryJ.DocPresent.Layout;
 
 public class TableLayout
 {
-	private static LBox[] computeColumnXBoxes(LBox children[], TablePackingParams packingParams[], int numColumns, int numRows, double spacingX)
+	private static LReqBox[] computeColumnXBoxes(LReqBox children[], TablePackingParams packingParams[], int numColumns, int numRows, double spacingX)
 	{
-		LBox columnBoxes[] = new LBox[numColumns];
+		LReqBox columnBoxes[] = new LReqBox[numColumns];
 		for (int i = 0; i < numColumns; i++)
 		{
-			columnBoxes[i] = new LBox( null );
+			columnBoxes[i] = new LReqBox();
 		}
 		
 		
 		// First phase; fill only with children who span 1 column
 		int i = 0;
-		for (LBox child: children)
+		for (LReqBox child: children)
 		{
 			TablePackingParams packing = packingParams[i];
 			
 			if ( packing.colSpan == 1 )
 			{
 				double totalPad = packing.paddingX * 2.0;
-				LBox b = columnBoxes[packing.x];
+				LReqBox b = columnBoxes[packing.x];
 				b.minWidth = Math.max( b.minWidth, child.minWidth + totalPad );
 				b.prefWidth = Math.max( b.prefWidth, child.prefWidth + totalPad );
 			}
@@ -39,7 +39,7 @@ public class TableLayout
 		
 		// Second phase; fill with children who span >1 columns
 		i = 0;
-		for (LBox child: children)
+		for (LReqBox child: children)
 		{
 			TablePackingParams packing = packingParams[i];
 			
@@ -51,7 +51,7 @@ public class TableLayout
 				double minWidthAvailable = 0.0, prefWidthAvailable = 0.0;
 				for (int c = packing.x; c < endColumn; c++)
 				{
-					LBox colBox = columnBoxes[c];
+					LReqBox colBox = columnBoxes[c];
 					
 					double spacing = c != endColumn-1  ?  spacingX  :  0.0;
 					
@@ -87,25 +87,25 @@ public class TableLayout
 
 
 
-	private static LBox[] computeRowYBoxes(LBox children[], TablePackingParams packingParams[], int numColumns, int numRows, double spacingY)
+	private static LReqBox[] computeRowYBoxes(LReqBox children[], TablePackingParams packingParams[], int numColumns, int numRows, double spacingY)
 	{
-		LBox rowBoxes[] = new LBox[numRows];
+		LReqBox rowBoxes[] = new LReqBox[numRows];
 		for (int i = 0; i < numColumns; i++)
 		{
-			rowBoxes[i] = new LBox( null );
+			rowBoxes[i] = new LReqBox();
 		}
 		
 		
 		// First phase; fill only with children who span 1 row
 		int i = 0;
-		for (LBox child: children)
+		for (LReqBox child: children)
 		{
 			TablePackingParams packing = packingParams[i];
 			
 			if ( packing.rowSpan == 1 )
 			{
 				double totalPad = packing.paddingY * 2.0;
-				LBox b = rowBoxes[packing.y];
+				LReqBox b = rowBoxes[packing.y];
 				b.setRequisitionY( Math.max( b.getReqHeight(), child.getReqHeight() + totalPad ),  0.0 );
 			}
 			i++;
@@ -114,7 +114,7 @@ public class TableLayout
 		
 		// Second phase; fill with children who span >1 columns
 		i = 0;
-		for (LBox child: children)
+		for (LReqBox child: children)
 		{
 			TablePackingParams packing = packingParams[i];
 			
@@ -126,7 +126,7 @@ public class TableLayout
 				double heightAvailable = 0.0;
 				for (int r = packing.y; r < endRow; r++)
 				{
-					LBox rowBox = rowBoxes[r];
+					LReqBox rowBox = rowBoxes[r];
 					
 					double spacing = r != endRow-1  ?  spacingY  :  0.0;
 					
@@ -143,7 +143,7 @@ public class TableLayout
 					
 					for (int r = packing.y; r < endRow; r++)
 					{
-						LBox rowBox = rowBoxes[r];
+						LReqBox rowBox = rowBoxes[r];
 						rowBox.setRequisitionY( rowBox.getReqHeight() + additionalHeightPerRow, 0.0 );
 					}
 				}
@@ -159,25 +159,25 @@ public class TableLayout
 
 
 
-	private static LBox[] computeRowYBoxesWithBaselines(LBox children[], TablePackingParams packingParams[], int numColumns, int numRows, double spacingY)
+	private static LReqBox[] computeRowYBoxesWithBaselines(LReqBox children[], TablePackingParams packingParams[], int numColumns, int numRows, double spacingY)
 	{
-		LBox rowBoxes[] = new LBox[numRows];
+		LReqBox rowBoxes[] = new LReqBox[numRows];
 		for (int i = 0; i < numColumns; i++)
 		{
-			rowBoxes[i] = new LBox( null );
+			rowBoxes[i] = new LReqBox();
 			rowBoxes[i].bHasBaseline = true;
 		}
 		
 		
 		// First phase; fill only with children who span 1 row
 		int i = 0;
-		for (LBox child: children)
+		for (LReqBox child: children)
 		{
 			TablePackingParams packing = packingParams[i];
 			
 			if ( packing.rowSpan == 1 )
 			{
-				LBox b = rowBoxes[packing.y];
+				LReqBox b = rowBoxes[packing.y];
 				
 				double ascent, descent;
 
@@ -200,7 +200,7 @@ public class TableLayout
 		
 		// Second phase; fill with children who span >1 columns
 		i = 0;
-		for (LBox child: children)
+		for (LReqBox child: children)
 		{
 			TablePackingParams packing = packingParams[i];
 			
@@ -212,7 +212,7 @@ public class TableLayout
 				double heightAvailable = 0.0;
 				for (int r = packing.y; r < endRow; r++)
 				{
-					LBox rowBox = rowBoxes[r];
+					LReqBox rowBox = rowBoxes[r];
 					
 					double spacing = r != endRow-1  ?  spacingY  :  0.0;
 					
@@ -229,7 +229,7 @@ public class TableLayout
 					
 					for (int r = packing.y; r < endRow; r++)
 					{
-						LBox rowBox = rowBoxes[r];
+						LReqBox rowBox = rowBoxes[r];
 						rowBox.reqDescent += additionalHeightPerRow;
 					}
 				}
@@ -243,13 +243,13 @@ public class TableLayout
 	
 	
 	
-	public static LBox[] computeRequisitionX(LBox box, LBox children[], TablePackingParams packingParams[], int numColumns, int numRows,
+	public static LReqBox[] computeRequisitionX(LReqBox box, LReqBox children[], TablePackingParams packingParams[], int numColumns, int numRows,
 			double spacingX, double spacingY, boolean bExpandX, boolean bExpandY, HAlignment colAlignment, VAlignment rowAlignment)
 	{
-		LBox columnBoxes[] = computeColumnXBoxes( children, packingParams, numColumns, numRows, spacingX );
+		LReqBox columnBoxes[] = computeColumnXBoxes( children, packingParams, numColumns, numRows, spacingX );
 		
 		double minWidth = 0.0, prefWidth = 0.0;
-		for (LBox colBox: columnBoxes)
+		for (LReqBox colBox: columnBoxes)
 		{
 			minWidth += colBox.minWidth;
 			prefWidth += colBox.prefWidth;
@@ -265,10 +265,10 @@ public class TableLayout
 
 
 
-	public static LBox[] computeRequisitionY(LBox box, LBox children[], TablePackingParams packingParams[], int numColumns, int numRows,
+	public static LReqBox[] computeRequisitionY(LReqBox box, LReqBox children[], TablePackingParams packingParams[], int numColumns, int numRows,
 			double spacingX, double spacingY, boolean bExpandX, boolean bExpandY, HAlignment colAlignment, VAlignment rowAlignment)
 	{
-		LBox rowBoxes[];
+		LReqBox rowBoxes[];
 		
 		if ( rowAlignment == VAlignment.BASELINES )
 		{
@@ -280,7 +280,7 @@ public class TableLayout
 		}
 		
 		double reqHeight = 0.0;
-		for (LBox rowBox: rowBoxes)
+		for (LReqBox rowBox: rowBoxes)
 		{
 			reqHeight += rowBox.getReqHeight();
 		}
@@ -295,51 +295,52 @@ public class TableLayout
 	
 	
 	
-	public static void allocateX(LBox box, LBox columnBoxes[], LBox children[], TablePackingParams packingParams[], int numColumns, int numRows,
+	public static void allocateX(LReqBox box, LReqBox columnBoxes[], LReqBox children[],
+			LAllocBox allocBox, LAllocBox columnAllocBoxes[], LAllocBox childrenAlloc[], 
+			TablePackingParams packingParams[], int numColumns, int numRows,
 			double spacingX, double spacingY, boolean bExpandX, boolean bExpandY, HAlignment colAlignment, VAlignment rowAlignment)
 	{
 		// Allocate space to the columns
-		HorizontalLayout.allocateX( box, columnBoxes, spacingX, bExpandX );
+		HorizontalLayout.allocateX( box, columnBoxes, allocBox, columnAllocBoxes, spacingX, bExpandX );
 		
 		// Allocate children
-		int i = 0;
-		for (LBox child: children)
+		for (int i = 0; i < children.length; i++)
 		{
+			LReqBox child = children[i];
+			LAllocBox childAlloc = childrenAlloc[i];
 			TablePackingParams packing = (TablePackingParams)packingParams[i];
 
 			int startCol = packing.x;
 			int endCol = packing.x + packing.colSpan;
-			LBox startColBox = columnBoxes[startCol], endColBox = columnBoxes[endCol-1];
-			double xStart = startColBox.positionInParentSpaceX + packing.paddingX;
-			double xEnd = endColBox.positionInParentSpaceX  +  endColBox.allocationX - packing.paddingX;
+			LAllocBox startColAlloc = columnAllocBoxes[startCol], endColAlloc = columnAllocBoxes[endCol-1];
+			double xStart = startColAlloc.positionInParentSpaceX + packing.paddingX;
+			double xEnd = endColAlloc.positionInParentSpaceX  +  endColAlloc.allocationX - packing.paddingX;
 			double widthAvailable = xEnd - xStart;
 			double cellWidth = Math.max( widthAvailable, child.minWidth );
 			
 			if ( cellWidth <= child.prefWidth )
 			{
-				box.allocateChildX( child, xStart, cellWidth );
+				allocBox.allocateChildX( childAlloc, xStart, cellWidth );
 			}
 			else
 			{
 				if ( colAlignment == HAlignment.LEFT )
 				{
-					box.allocateChildX( child, xStart, child.prefWidth );
+					allocBox.allocateChildX( childAlloc, xStart, child.prefWidth );
 				}
 				else if ( colAlignment == HAlignment.RIGHT )
 				{
-					box.allocateChildX( child, Math.max( xEnd - child.prefWidth, 0.0 ), child.prefWidth );
+					allocBox.allocateChildX( childAlloc, Math.max( xEnd - child.prefWidth, 0.0 ), child.prefWidth );
 				}
 				else if ( colAlignment == HAlignment.CENTRE )
 				{
-					box.allocateChildX( child, Math.max( xStart + ( widthAvailable - child.prefWidth ) * 0.5, 0.0 ), child.prefWidth );
+					allocBox.allocateChildX( childAlloc, Math.max( xStart + ( widthAvailable - child.prefWidth ) * 0.5, 0.0 ), child.prefWidth );
 				}
 				else if ( colAlignment == HAlignment.EXPAND )
 				{
-					box.allocateChildX( child, xStart, cellWidth );
+					allocBox.allocateChildX( childAlloc, xStart, cellWidth );
 				}
 			}
-			
-			i++;
 		}
 	}
 	
@@ -349,57 +350,59 @@ public class TableLayout
 	
 	
 	
-	public static void allocateY(LBox box, LBox rowBoxes[], LBox children[], TablePackingParams packingParams[], int numColumns, int numRows,
+	public static void allocateY(LReqBox box, LReqBox rowBoxes[], LReqBox children[],
+			LAllocBox allocBox, LAllocBox rowAllocBoxes[], LAllocBox childrenAlloc[],
+			TablePackingParams packingParams[], int numColumns, int numRows,
 			double spacingX, double spacingY, boolean bExpandX, boolean bExpandY, HAlignment colAlignment, VAlignment rowAlignment)
 	{
 		// Allocate space to the columns
-		VerticalLayout.allocateY( box, rowBoxes, spacingY, bExpandY );
+		VerticalLayout.allocateY( box, rowBoxes, allocBox, rowAllocBoxes, spacingY, bExpandY );
 		
 		// Allocate children
-		int i = 0;
-		for (LBox child: children)
+		for (int i = 0; i < children.length; i++)
 		{
+			LReqBox child = children[i];
+			LAllocBox childAlloc = childrenAlloc[i];
 			TablePackingParams packing = (TablePackingParams)packingParams[i];
 
 			if ( packing.rowSpan == 1  &&  rowAlignment == VAlignment.BASELINES  &&  child.bHasBaseline  &&  rowBoxes[packing.y].bHasBaseline )
 			{
-				LBox rowBox = rowBoxes[packing.y];
+				LReqBox rowBox = rowBoxes[packing.y];
+				LAllocBox rowAlloc = rowAllocBoxes[packing.y];
 
 				double yOffset = rowBox.reqAscent - child.reqAscent;			// Row ascent includes padding; so yOffset also includes padding
-				double yStart = rowBox.positionInParentSpaceY;
+				double yStart = rowAlloc.positionInParentSpaceY;
 				double yPos = yStart + Math.max( yOffset, 0.0 );
-				box.allocateChildY( child, yPos, child.getReqHeight() );
+				allocBox.allocateChildY( childAlloc, yPos, child.getReqHeight() );
 			}
 			else
 			{
 				int startRow = packing.y;
 				int endRow = packing.y + packing.rowSpan;
-				LBox startRowBox = rowBoxes[startRow], endRowBox = rowBoxes[endRow-1];
-				double yStart = startRowBox.positionInParentSpaceY + packing.paddingY;
-				double yEnd = endRowBox.positionInParentSpaceY + endRowBox.allocationY - packing.paddingY;
+				LAllocBox startRowAlloc = rowAllocBoxes[startRow], endRowAlloc = rowAllocBoxes[endRow-1];
+				double yStart = startRowAlloc.positionInParentSpaceY + packing.paddingY;
+				double yEnd = endRowAlloc.positionInParentSpaceY + endRowAlloc.allocationY - packing.paddingY;
 				double heightAvailable = yEnd - yStart;
 				double reqHeight = child.getReqHeight();
 				double cellHeight = Math.max( heightAvailable, reqHeight );
 				
 				if ( rowAlignment == VAlignment.TOP )
 				{
-					box.allocateChildY( child, yStart, reqHeight );
+					allocBox.allocateChildY( childAlloc, yStart, reqHeight );
 				}
 				else if ( rowAlignment == VAlignment.BOTTOM )
 				{
-					box.allocateChildY( child, Math.max( yEnd - reqHeight, 0.0 ), reqHeight );
+					allocBox.allocateChildY( childAlloc, Math.max( yEnd - reqHeight, 0.0 ), reqHeight );
 				}
 				else if ( rowAlignment == VAlignment.CENTRE )
 				{
-					box.allocateChildY( child, Math.max( yStart + ( heightAvailable - reqHeight ) * 0.5, 0.0 ), reqHeight );
+					allocBox.allocateChildY( childAlloc, Math.max( yStart + ( heightAvailable - reqHeight ) * 0.5, 0.0 ), reqHeight );
 				}
 				else if ( rowAlignment == VAlignment.EXPAND )
 				{
-					box.allocateChildY( child, yStart, cellHeight );
+					allocBox.allocateChildY( childAlloc, yStart, cellHeight );
 				}
 			}
-			
-			i++;
 		}
 	}
 }

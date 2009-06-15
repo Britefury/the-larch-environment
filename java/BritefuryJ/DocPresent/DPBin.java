@@ -106,11 +106,11 @@ public class DPBin extends DPContainer
 	{
 		if ( child != null )
 		{
-			layoutBox.setRequisitionX( child.refreshRequisitionX() );
+			layoutReqBox.setRequisitionX( child.refreshRequisitionX() );
 		}
 		else
 		{
-			layoutBox.clearRequisitionX();
+			layoutReqBox.clearRequisitionX();
 		}
 	}
 
@@ -118,11 +118,11 @@ public class DPBin extends DPContainer
 	{
 		if ( child != null )
 		{
-			layoutBox.setRequisitionY( child.refreshRequisitionY() );
+			layoutReqBox.setRequisitionY( child.refreshRequisitionY() );
 		}
 		else
 		{
-			layoutBox.clearRequisitionY();
+			layoutReqBox.clearRequisitionY();
 		}
 	}
 	
@@ -132,8 +132,8 @@ public class DPBin extends DPContainer
 	{
 		if ( child != null )
 		{
-			double prevWidth = child.layoutBox.getAllocationX();
-			layoutBox.allocateChildX( child.layoutBox );
+			double prevWidth = child.layoutAllocBox.getAllocationX();
+			layoutAllocBox.allocateChildX( child.layoutAllocBox );
 			child.refreshAllocationX( prevWidth );
 		}
 	}
@@ -142,8 +142,8 @@ public class DPBin extends DPContainer
 	{
 		if ( child != null )
 		{
-			double prevHeight = child.layoutBox.getAllocationY();
-			layoutBox.allocateChildY( child.layoutBox );
+			double prevHeight = child.layoutAllocBox.getAllocationY();
+			layoutAllocBox.allocateChildY( child.layoutAllocBox );
 			child.refreshAllocationY( prevHeight );
 		}
 	}

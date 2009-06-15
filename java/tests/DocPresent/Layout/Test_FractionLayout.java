@@ -7,7 +7,8 @@
 package tests.DocPresent.Layout;
 
 import BritefuryJ.DocPresent.Layout.FractionLayout;
-import BritefuryJ.DocPresent.Layout.LBox;
+import BritefuryJ.DocPresent.Layout.LAllocBox;
+import BritefuryJ.DocPresent.Layout.LReqBox;
 
 public class Test_FractionLayout extends Test_Layout_base
 {
@@ -17,9 +18,9 @@ public class Test_FractionLayout extends Test_Layout_base
 	//
 	//
 	
-	private void reqTest(LBox numerator, LBox bar, LBox denominator, double hPadding, double vSpacing, double baselinePos, LBox expectedParentBox)
+	private void reqTest(LReqBox numerator, LReqBox bar, LReqBox denominator, double hPadding, double vSpacing, double baselinePos, LReqBox expectedParentBox)
 	{
-		LBox box = new LBox( null );
+		LReqBox box = new LReqBox();
 		FractionLayout.computeRequisitionX( box, numerator, bar, denominator, hPadding, vSpacing, baselinePos );
 		FractionLayout.computeRequisitionY( box, numerator, bar, denominator, hPadding, vSpacing, baselinePos );
 
@@ -65,48 +66,32 @@ public class Test_FractionLayout extends Test_Layout_base
 	//
 	//
 	
-	private void allocTest(LBox numerator, LBox bar, LBox denominator, double hPadding, double vSpacing, double baselinePos,
-			double allocX, double allocY, LBox expectecNumAlloc, LBox expectedBarAlloc, LBox expectedDenomAlloc)
+	private void allocTest(LReqBox numerator, LReqBox bar, LReqBox denominator, double hPadding, double vSpacing, double baselinePos,
+			double allocX, double allocY, LAllocBox expectecNumAlloc, LAllocBox expectedBarAlloc, LAllocBox expectedDenomAlloc)
 	{
-		LBox expectedNumerator = null, expectedBar = null, expectedDenominator = null;
-		if ( numerator != null )
-		{
-			expectedNumerator = numerator.copy( null );
-			expectedNumerator.setAllocation( expectecNumAlloc );
-		}
-		if ( bar != null )
-		{
-			expectedBar = bar.copy( null );
-			expectedBar.setAllocation( expectedBarAlloc );
-		}
-		if ( denominator != null )
-		{
-			expectedDenominator = denominator.copy( null );
-			expectedDenominator.setAllocation( expectedDenomAlloc );
-		}
-		
-		
-		LBox box = new LBox( null );
+		LReqBox box = new LReqBox();
+		LAllocBox allocBox = new LAllocBox( null );
+		LAllocBox numAlloc = new LAllocBox( null ), barAlloc = new LAllocBox( null ), denomAlloc = new LAllocBox( null );
 		FractionLayout.computeRequisitionX( box, numerator, bar, denominator, hPadding, vSpacing, baselinePos );
-		box.setAllocationX( allocX );
-		FractionLayout.allocateX( box, numerator, bar, denominator, hPadding, vSpacing, baselinePos );
+		allocBox.setAllocationX( allocX );
+		FractionLayout.allocateX( box, numerator, bar, denominator, allocBox, numAlloc, barAlloc, denomAlloc, hPadding, vSpacing, baselinePos );
 
 		FractionLayout.computeRequisitionY( box, numerator, bar, denominator, hPadding, vSpacing, baselinePos );
-		box.setAllocationY( allocY );
-		FractionLayout.allocateY( box, numerator, bar, denominator, hPadding, vSpacing, baselinePos );
+		allocBox.setAllocationY( allocY );
+		FractionLayout.allocateY( box, numerator, bar, denominator, allocBox, numAlloc, barAlloc, denomAlloc, hPadding, vSpacing, baselinePos );
 
 		
 		if ( numerator != null )
 		{
-			assertBoxesEqual( numerator, expectedNumerator, "NUMERATOR ALLOCATION" );
+			assertAllocsEqual( numAlloc, expectecNumAlloc, "NUMERATOR ALLOCATION" );
 		}
 		if ( bar != null )
 		{
-			assertBoxesEqual( bar, expectedBar, "BAR ALLOCATION" );
+			assertAllocsEqual( barAlloc, expectedBarAlloc, "BAR ALLOCATION" );
 		}
 		if ( denominator != null )
 		{
-			assertBoxesEqual( denominator, expectedDenominator, "DENOMINATOR ALLOCATION" );
+			assertAllocsEqual( denomAlloc, expectedDenomAlloc, "DENOMINATOR ALLOCATION" );
 		}
 	}
 

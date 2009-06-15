@@ -17,7 +17,7 @@ public class ScriptLayout
 
 	
 	
-	public static void computeRequisitionX(LBox box, LBox columnBoxes[], LBox leftSuper, LBox leftSub, LBox main, LBox rightSuper, LBox rightSub, double spacing, double scriptSpacing)
+	public static void computeRequisitionX(LReqBox box, LReqBox columnBoxes[], LReqBox leftSuper, LReqBox leftSub, LReqBox main, LReqBox rightSuper, LReqBox rightSub, double spacing, double scriptSpacing)
 	{
 		// Compute boxes for the left, main, and right columns
 		columnBoxes[0].clearRequisitionX();
@@ -46,7 +46,7 @@ public class ScriptLayout
 			columnBoxes[2].maxRequisitionX( rightSub );
 		}
 
-		LBox leftColumn = columnBoxes[0], rightColumn = columnBoxes[2];
+		LReqBox leftColumn = columnBoxes[0], rightColumn = columnBoxes[2];
 		
 		// Compute the spacing that is placed between the columns
 		double leftSpacing = 0.0, mainSpacing = 0.0;
@@ -89,7 +89,7 @@ public class ScriptLayout
 
 
 
-	public static void computeRequisitionY(LBox box, double rowBaselineY[], LBox leftSuper, LBox leftSub, LBox main, LBox rightSuper, LBox rightSub, double spacing, double scriptSpacing)
+	public static void computeRequisitionY(LReqBox box, double rowBaselineY[], LReqBox leftSuper, LReqBox leftSub, LReqBox main, LReqBox rightSuper, LReqBox rightSub, double spacing, double scriptSpacing)
 	{
 		double superBaselineY = 0.0, mainBaselineY = 0.0, subBaselineY = 0.0;
 		
@@ -239,12 +239,14 @@ public class ScriptLayout
 
 
 	
-	public static void allocateX(LBox box, LBox leftSuper, LBox leftSub, LBox main, LBox rightSuper, LBox rightSub, LBox columnBoxes[], double spacing, double scriptSpacing)
+	public static void allocateX(LReqBox box, LReqBox leftSuper, LReqBox leftSub, LReqBox main, LReqBox rightSuper, LReqBox rightSub, LReqBox columnBoxes[],
+			LAllocBox allocBox, LAllocBox leftSuperAlloc, LAllocBox leftSubAlloc, LAllocBox mainAlloc, LAllocBox rightSuperAlloc, LAllocBox rightSubAlloc,
+			double spacing, double scriptSpacing)
 	{
 		double t;
 		if ( box.prefWidth > box.minWidth )
 		{
-			t = ( box.allocationX - box.minWidth )  /  ( box.prefWidth - box.minWidth );
+			t = ( allocBox.allocationX - box.minWidth )  /  ( box.prefWidth - box.minWidth );
 			t = Math.max( t, 0.0 );
 			t = Math.min( t, 1.0 );
 		}
@@ -253,7 +255,7 @@ public class ScriptLayout
 			t = 1.0;
 		}
 		
-		LBox leftColumn = columnBoxes[0], mainColumn = columnBoxes[1];
+		LReqBox leftColumn = columnBoxes[0], mainColumn = columnBoxes[1];
 		
 		double overallWidth = box.minWidth  +  ( box.prefWidth - box.minWidth ) * t;
 		double leftWidth = leftColumn.minWidth  +  ( leftColumn.prefWidth - leftColumn.minWidth ) * t;
@@ -261,19 +263,19 @@ public class ScriptLayout
 		double mainWidth = mainColumn.minWidth  +  ( mainColumn.prefWidth - mainColumn.minWidth ) * t;
 		double mainHSpacing = mainColumn.minHSpacing  +  ( mainColumn.prefHSpacing - mainColumn.minHSpacing ) * t;
 	
-		double padding = Math.max( ( box.allocationX - overallWidth )  *  0.5, 0.0 );
+		double padding = Math.max( ( allocBox.allocationX - overallWidth )  *  0.5, 0.0 );
 		double x = padding;
 		
 		// Allocate left children
 		if ( leftSuper != null )
 		{
 			double childWidth = leftSuper.minWidth  +  ( leftSuper.prefWidth - leftSuper.minWidth ) * t;
-			box.allocateChildX( leftSuper, x  +  ( leftWidth - childWidth ), childWidth );
+			allocBox.allocateChildX( leftSuperAlloc, x  +  ( leftWidth - childWidth ), childWidth );
 		}
 		if ( leftSub != null )
 		{
 			double childWidth = leftSub.minWidth  +  ( leftSub.prefWidth - leftSub.minWidth ) * t;
-			box.allocateChildX( leftSub, x  +  ( leftWidth - childWidth ), childWidth ); 
+			allocBox.allocateChildX( leftSubAlloc, x  +  ( leftWidth - childWidth ), childWidth ); 
 		}
 		
 		if ( leftSuper != null  ||  leftSub != null )
@@ -287,7 +289,7 @@ public class ScriptLayout
 		// Allocate main child
 		if ( main != null )
 		{
-			box.allocateChildX( main, x, mainWidth );
+			allocBox.allocateChildX( mainAlloc, x, mainWidth );
 			mainHSpacing = Math.max( mainHSpacing, spacing );
 		}
 		
@@ -298,19 +300,21 @@ public class ScriptLayout
 		if ( rightSuper != null )
 		{
 			double childWidth = rightSuper.minWidth  +  ( rightSuper.prefWidth - rightSuper.minWidth ) * t;
-			box.allocateChildX( rightSuper, x, childWidth );
+			allocBox.allocateChildX( rightSuperAlloc, x, childWidth );
 		}
 		if ( rightSub != null )
 		{
 			double childWidth = rightSub.minWidth  +  ( rightSub.prefWidth - rightSub.minWidth ) * t;
-			box.allocateChildX( rightSub, x, childWidth ); 
+			allocBox.allocateChildX( rightSubAlloc, x, childWidth ); 
 		}
 	}
 
 	
-	public static void allocateY(LBox box, LBox leftSuper, LBox leftSub, LBox main, LBox rightSuper, LBox rightSub, double rowBaselineY[], double spacing, double scriptSpacing)
+	public static void allocateY(LReqBox box, LReqBox leftSuper, LReqBox leftSub, LReqBox main, LReqBox rightSuper, LReqBox rightSub, double rowBaselineY[],
+			LAllocBox allocBox, LAllocBox leftSuperAlloc, LAllocBox leftSubAlloc, LAllocBox mainAlloc, LAllocBox rightSuperAlloc, LAllocBox rightSubAlloc,
+			double spacing, double scriptSpacing)
 	{
-		double padding = Math.max( ( box.allocationY - box.getReqHeight() ) * 0.5, 0.0 );
+		double padding = Math.max( ( allocBox.allocationY - box.getReqHeight() ) * 0.5, 0.0 );
 		
 		
 		double superBaselineY = rowBaselineY[0], mainBaselineY = rowBaselineY[1], subBaselineY = rowBaselineY[2];
@@ -319,11 +323,11 @@ public class ScriptLayout
 		double y = padding + superBaselineY;
 		if ( leftSuper != null )
 		{
-			box.allocateChildY( leftSuper, y - leftSuper.reqAscent, leftSuper.getReqHeight() );
+			allocBox.allocateChildY( leftSuperAlloc, y - leftSuper.reqAscent, leftSuper.getReqHeight() );
 		}
 		if ( rightSuper != null )
 		{
-			box.allocateChildY( rightSuper, y - rightSuper.reqAscent, rightSuper.getReqHeight() );
+			allocBox.allocateChildY( rightSuperAlloc, y - rightSuper.reqAscent, rightSuper.getReqHeight() );
 		}
 		
 		
@@ -331,7 +335,7 @@ public class ScriptLayout
 		y = padding + mainBaselineY;
 		if ( main != null )
 		{
-			box.allocateChildY( main, y - main.reqAscent, main.getReqHeight() );
+			allocBox.allocateChildY( mainAlloc, y - main.reqAscent, main.getReqHeight() );
 		}
 		
 
@@ -339,11 +343,11 @@ public class ScriptLayout
 		y = padding + subBaselineY;
 		if ( leftSub != null )
 		{
-			box.allocateChildY( leftSub, y - leftSub.reqAscent, leftSub.getReqHeight() );
+			allocBox.allocateChildY( leftSubAlloc, y - leftSub.reqAscent, leftSub.getReqHeight() );
 		}
 		if ( rightSub != null )
 		{
-			box.allocateChildY( rightSub, y - rightSub.reqAscent, rightSub.getReqHeight() );
+			allocBox.allocateChildY( rightSubAlloc, y - rightSub.reqAscent, rightSub.getReqHeight() );
 		}
 	}
 

@@ -18,7 +18,7 @@ import javax.swing.JFrame;
 
 import BritefuryJ.DocPresent.DPCustomSymbol;
 import BritefuryJ.DocPresent.DPPresentationArea;
-import BritefuryJ.DocPresent.Layout.LBox;
+import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.StyleSheets.CustomSymbolStyleSheet;
 
 
@@ -54,12 +54,12 @@ public class DPCustomSymbolTest
 				return 22.0;
 			}
 			
-			public void setBoxRequisitionX(LBox box)
+			public void setBoxRequisitionX(LReqBox box)
 			{
 				box.setRequisitionX( 20.0, 0.0 );
 			}
 		
-			public void setBoxRequisitionY(LBox box)
+			public void setBoxRequisitionY(LReqBox box)
 			{
 				box.setRequisitionY( 20.0, 2.0, 0.0 );
 			}

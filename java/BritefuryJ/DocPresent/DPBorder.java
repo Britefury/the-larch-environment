@@ -71,7 +71,7 @@ public class DPBorder extends DPBin
 	
 	protected void drawBackground(Graphics2D graphics)
 	{
-		border.draw( graphics, 0.0, 0.0, layoutBox.getAllocationX(), layoutBox.getAllocationY() );
+		border.draw( graphics, 0.0, 0.0, getAllocationX(), getAllocationY() );
 	}
 	
 
@@ -80,26 +80,26 @@ public class DPBorder extends DPBin
 	{
 		if ( child != null )
 		{
-			layoutBox.setRequisitionX( child.refreshRequisitionX() );
+			layoutReqBox.setRequisitionX( child.refreshRequisitionX() );
 		}
 		else
 		{
-			layoutBox.clearRequisitionX();
+			layoutReqBox.clearRequisitionX();
 		}
-		layoutBox.borderX( border.getLeftMargin(), border.getRightMargin() );
+		layoutReqBox.borderX( border.getLeftMargin(), border.getRightMargin() );
 	}
 
 	protected void updateRequisitionY()
 	{
 		if ( child != null )
 		{
-			layoutBox.setRequisitionY( child.refreshRequisitionY() );
+			layoutReqBox.setRequisitionY( child.refreshRequisitionY() );
 		}
 		else
 		{
-			layoutBox.clearRequisitionY();
+			layoutReqBox.clearRequisitionY();
 		}
-		layoutBox.borderY( border.getTopMargin(), border.getBottomMargin() );
+		layoutReqBox.borderY( border.getTopMargin(), border.getBottomMargin() );
 	}
 
 	
@@ -110,8 +110,8 @@ public class DPBorder extends DPBin
 		if ( child != null )
 		{
 			double hborder = border.getLeftMargin() + border.getRightMargin();
-			double prevWidth = child.layoutBox.getAllocationX();
-			layoutBox.allocateChildX( child.layoutBox, border.getLeftMargin(), layoutBox.getAllocationX() - hborder );
+			double prevWidth = child.layoutAllocBox.getAllocationX();
+			layoutAllocBox.allocateChildX( child.layoutAllocBox, border.getLeftMargin(), layoutAllocBox.getAllocationX() - hborder );
 			child.refreshAllocationX( prevWidth );
 		}
 	}
@@ -121,8 +121,8 @@ public class DPBorder extends DPBin
 		if ( child != null )
 		{
 			double vborder = border.getTopMargin() + border.getBottomMargin();
-			double prevHeight = child.layoutBox.getAllocationY();
-			layoutBox.allocateChildY( child.layoutBox, border.getTopMargin(), layoutBox.getAllocationY() - vborder );
+			double prevHeight = child.layoutAllocBox.getAllocationY();
+			layoutAllocBox.allocateChildY( child.layoutAllocBox, border.getTopMargin(), layoutAllocBox.getAllocationY() - vborder );
 			child.refreshAllocationY( prevHeight );
 		}
 	}

@@ -36,6 +36,8 @@ public class DPText extends DPContentLeafEditableEntry
 		this.text = text;
 		
 		visual = TextVisual.getTextVisual( getPresentationArea(), text, styleSheet.getFont(), styleSheet.getMixedSizeCaps() );
+		
+		layoutReqBox = visual.getRequisition();
 	}
 	
 	
@@ -50,6 +52,7 @@ public class DPText extends DPContentLeafEditableEntry
 		if ( v != visual )
 		{
 			visual = v;
+			layoutReqBox = visual.getRequisition();
 			if ( isRealised() )
 			{
 				visual.realise( getPresentationArea() );
@@ -100,6 +103,20 @@ public class DPText extends DPContentLeafEditableEntry
 	}
 	
 	
+
+	
+	protected void updateRequisitionX()
+	{
+		layoutReqBox = visual.getRequisition();
+	}
+
+	protected void updateRequisitionY()
+	{
+		layoutReqBox = visual.getRequisition();
+	}
+
+	
+	
 	//
 	//
 	// CARET METHODS
@@ -145,17 +162,6 @@ public class DPText extends DPContentLeafEditableEntry
 	}
 	
 
-	
-	
-	protected void updateRequisitionX()
-	{
-		visual.setBoxRequisitionX( layoutBox );
-	}
-
-	protected void updateRequisitionY()
-	{
-		visual.setBoxRequisitionY( layoutBox );
-	}
 	
 	
 	public int getMarkerRange()

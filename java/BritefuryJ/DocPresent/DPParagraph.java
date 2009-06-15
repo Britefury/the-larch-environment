@@ -10,7 +10,8 @@ package BritefuryJ.DocPresent;
 import java.util.List;
 
 import BritefuryJ.DocPresent.Layout.BoxPackingParams;
-import BritefuryJ.DocPresent.Layout.LBox;
+import BritefuryJ.DocPresent.Layout.LAllocBox;
+import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Layout.ParagraphLayout;
 import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
@@ -96,7 +97,7 @@ public class DPParagraph extends DPContainerSequence
 	
 	protected void updateRequisitionX()
 	{
-		LBox[] childBoxes = new LBox[registeredChildren.size()];
+		LReqBox[] childBoxes = new LReqBox[registeredChildren.size()];
 		BoxPackingParams[] packingParams = new BoxPackingParams[registeredChildren.size()];
 		for (int i = 0; i < registeredChildren.size(); i++)
 		{
@@ -104,21 +105,17 @@ public class DPParagraph extends DPContainerSequence
 			packingParams[i] = (BoxPackingParams)registeredChildren.get( i ).getParentPacking();
 		}
 
-		ParagraphLayout.computeRequisitionX( layoutBox, childBoxes, getIndentation(), getSpacing(), packingParams );
+		ParagraphLayout.computeRequisitionX( layoutReqBox, childBoxes, getIndentation(), getSpacing(), packingParams );
 	}
 
 	protected void updateRequisitionY()
 	{
-		for (int y = 0; y < lines.length; y++)
+		for (DPWidget child: registeredChildren)
 		{
-			LBox[] lineChildren = lines[y].getChildBoxes();
-			for (int x = 0; x < lineChildren.length; x++)
-			{
-				lineChildren[x].getElement().refreshRequisitionY();
-			}
+			child.refreshRequisitionY();
 		}
 
-		ParagraphLayout.computeRequisitionY( layoutBox, lines, getVSpacing(), getAlignment() );
+		ParagraphLayout.computeRequisitionY( layoutReqBox, lines, getVSpacing(), getAlignment() );
 	}
 	
 
@@ -127,11 +124,12 @@ public class DPParagraph extends DPContainerSequence
 	{
 		super.updateAllocationX();
 		
-		LBox childBoxes[] = getChildrenLayoutBoxes();
+		LReqBox childBoxes[] = getChildrenRequisitionBoxes();
+		LAllocBox childAllocBoxes[] = getChildrenAllocationBoxes();
 		double prevWidths[] = getChildrenAllocationX();
 		BoxPackingParams packing[] = (BoxPackingParams[])getChildrenPackingParams( new BoxPackingParams[registeredChildren.size()] );
 		
-		lines = ParagraphLayout.allocateX( layoutBox, childBoxes, getIndentation(), getSpacing(), packing );
+		lines = ParagraphLayout.allocateX( layoutReqBox, childBoxes, layoutAllocBox, childAllocBoxes, getIndentation(), getSpacing(), packing );
 		
 		int i = 0;
 		for (DPWidget child: registeredChildren)
@@ -150,7 +148,7 @@ public class DPParagraph extends DPContainerSequence
 		double prevHeights[][] = new double[lines.length][];
 		for (int y = 0; y < lines.length; y++)
 		{
-			LBox[] lineChildren = lines[y].getChildBoxes();
+			LAllocBox[] lineChildren = lines[y].getChildAllocBoxes();
 			prevHeights[y] = new double[lineChildren.length];
 			for (int x = 0; x < lineChildren.length; x++)
 			{
@@ -158,11 +156,11 @@ public class DPParagraph extends DPContainerSequence
 			}
 		}
 		
-		ParagraphLayout.allocateY( layoutBox, lines, getSpacing(), getAlignment() );
+		ParagraphLayout.allocateY( layoutReqBox, layoutAllocBox, lines, getSpacing(), getAlignment() );
 		
 		for (int y = 0; y < lines.length; y++)
 		{
-			LBox[] lineChildren = lines[y].getChildBoxes();
+			LAllocBox[] lineChildren = lines[y].getChildAllocBoxes();
 			for (int x = 0; x < lineChildren.length; x++)
 			{
 				lineChildren[x].getElement().refreshAllocationY( prevHeights[y][x] );
@@ -188,8 +186,8 @@ public class DPParagraph extends DPContainerSequence
 			for (int i = 0; i < lines.length - 1; i++)
 			{
 				ParagraphLayout.Line lineJ = lines[i+1];
-				double iUpperY = lineI.getLineBox().getPositionInParentSpaceY() + lineI.getLineBox().getAllocationY();
-				double jLowerY = lineJ.getLineBox().getPositionInParentSpaceY();
+				double iUpperY = lineI.getLineAllocBox().getPositionInParentSpaceY() + lineI.getLineAllocBox().getAllocationY();
+				double jLowerY = lineJ.getLineAllocBox().getPositionInParentSpaceY();
 				
 				double midY = ( iUpperY + jLowerY ) * 0.5;
 				
@@ -207,7 +205,7 @@ public class DPParagraph extends DPContainerSequence
 
 	private DPWidget getLineChildClosestToLocalPoint(ParagraphLayout.Line line, Point2 localPos)
 	{
-		LBox children[] = line.getChildBoxes();
+		LAllocBox children[] = line.getChildAllocBoxes();
 		if ( children.length == 0 )
 		{
 			return null;
@@ -218,10 +216,10 @@ public class DPParagraph extends DPContainerSequence
 		}
 		else
 		{
-			LBox childI = children[0];
+			LAllocBox childI = children[0];
 			for (int i = 0; i < children.length - 1; i++)
 			{
-				LBox childJ = children[i+1];
+				LAllocBox childJ = children[i+1];
 				double iUpperX = childI.getPositionInParentSpaceX() + childI.getAllocationX();
 				double jLowerX = childJ.getPositionInParentSpaceX();
 				

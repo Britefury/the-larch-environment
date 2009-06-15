@@ -13,7 +13,8 @@ import java.util.List;
 
 import org.python.core.PySlice;
 
-import BritefuryJ.DocPresent.Layout.LBox;
+import BritefuryJ.DocPresent.Layout.LAllocBox;
+import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Layout.PackingParams;
 import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 import BritefuryJ.JythonInterface.JythonSlice;
@@ -282,9 +283,9 @@ abstract public class DPContainerSequence extends DPContainer
 
 
 
-	LBox[] getChildrenRefreshedRequistionXBoxes(List<DPWidget> nodes)
+	LReqBox[] getChildrenRefreshedRequistionXBoxes(List<DPWidget> nodes)
 	{
-		LBox[] boxes = new LBox[nodes.size()];
+		LReqBox[] boxes = new LReqBox[nodes.size()];
 		for (int i = 0; i < nodes.size(); i++)
 		{
 			boxes[i] = nodes.get( i ).refreshRequisitionX();
@@ -292,15 +293,15 @@ abstract public class DPContainerSequence extends DPContainer
 		return boxes;
 	}
 
-	LBox[] getChildrenRefreshedRequistionXBoxes()
+	LReqBox[] getChildrenRefreshedRequistionXBoxes()
 	{
 		return getChildrenRefreshedRequistionXBoxes( registeredChildren );
 	}
 
 
-	LBox[] getChildrenRefreshedRequistionYBoxes(List<DPWidget> nodes)
+	LReqBox[] getChildrenRefreshedRequistionYBoxes(List<DPWidget> nodes)
 	{
-		LBox[] boxes = new LBox[nodes.size()];
+		LReqBox[] boxes = new LReqBox[nodes.size()];
 		for (int i = 0; i < nodes.size(); i++)
 		{
 			boxes[i] = nodes.get( i ).refreshRequisitionY();
@@ -308,7 +309,7 @@ abstract public class DPContainerSequence extends DPContainer
 		return boxes;
 	}
 
-	LBox[] getChildrenRefreshedRequistionYBoxes()
+	LReqBox[] getChildrenRefreshedRequistionYBoxes()
 	{
 		return getChildrenRefreshedRequistionYBoxes( registeredChildren );
 	}
@@ -316,19 +317,36 @@ abstract public class DPContainerSequence extends DPContainer
 	
 	
 	
-	LBox[] getChildrenLayoutBoxes(List<DPWidget> nodes)
+	LReqBox[] getChildrenRequisitionBoxes(List<DPWidget> nodes)
 	{
-		LBox[] boxes = new LBox[nodes.size()];
+		LReqBox[] boxes = new LReqBox[nodes.size()];
 		for (int i = 0; i < nodes.size(); i++)
 		{
-			boxes[i] = nodes.get( i ).layoutBox;
+			boxes[i] = nodes.get( i ).layoutReqBox;
 		}
 		return boxes;
 	}
 
-	LBox[] getChildrenLayoutBoxes()
+	LReqBox[] getChildrenRequisitionBoxes()
 	{
-		return getChildrenLayoutBoxes( registeredChildren );
+		return getChildrenRequisitionBoxes( registeredChildren );
+	}
+	
+	
+	
+	LAllocBox[] getChildrenAllocationBoxes(List<DPWidget> nodes)
+	{
+		LAllocBox[] boxes = new LAllocBox[nodes.size()];
+		for (int i = 0; i < nodes.size(); i++)
+		{
+			boxes[i] = nodes.get( i ).layoutAllocBox;
+		}
+		return boxes;
+	}
+
+	LAllocBox[] getChildrenAllocationBoxes()
+	{
+		return getChildrenAllocationBoxes( registeredChildren );
 	}
 	
 	

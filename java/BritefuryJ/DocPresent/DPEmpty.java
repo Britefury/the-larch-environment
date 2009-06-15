@@ -26,12 +26,12 @@ public class DPEmpty extends DPWidget
 	
 	protected void updateRequisitionX()
 	{
-		layoutBox.clearRequisitionX();
+		layoutReqBox.clearRequisitionX();
 	}
 
 	protected void updateRequisitionY()
 	{
-		layoutBox.clearRequisitionY();
+		layoutReqBox.clearRequisitionY();
 	}
 	
 
