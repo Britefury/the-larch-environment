@@ -11,6 +11,7 @@ from BritefuryJ.GSym.View.ListView import ListViewLayout, ParagraphListViewLayou
 
 from BritefuryJ.DocPresent import *
 from BritefuryJ.DocPresent.StyleSheets import *
+from BritefuryJ.DocPresent.Layout import *
 from BritefuryJ.DocPresent.Border import *
 from BritefuryJ.DocPresent.ElementTree import *
 
@@ -37,9 +38,9 @@ indentedBlock_border = SolidBorder( 2.0, 5.0, 5.0, Color.red, None )
 pow_scriptStyle = ScriptStyleSheet( 0.0, 0.0 )
 div_fractionStyle = FractionStyleSheet( Color( 0.0, 0.5, 0.0 ) )
 
-python_paragraphStyle = ParagraphStyleSheet( DPParagraph.Alignment.BASELINES, 0.0, 0.0, 30.0 )
+python_paragraphStyle = ParagraphStyleSheet( VAlignment.BASELINES, 0.0, 0.0, 0.0, 30.0 )
 
-compoundStmt_vboxStyle = VBoxStyleSheet( DPVBox.Typesetting.ALIGN_WITH_TOP, DPVBox.Alignment.EXPAND, 0.0, False, 0.0 )
+compoundStmt_vboxStyle = VBoxStyleSheet( HAlignment.EXPAND, 0.0, False, 0.0 )
 
 tuple_listViewLayout = ParagraphListViewLayout( python_paragraphStyle, lambda: TextElement( default_textStyle, ' ' ), 0, ListViewLayout.TrailingSeparator.NEVER )
 tuple_listViewLayoutSep = ParagraphListViewLayout( python_paragraphStyle, lambda: TextElement( default_textStyle, ' ' ), 0, ListViewLayout.TrailingSeparator.ALWAYS )
@@ -48,7 +49,7 @@ list_listViewLayoutSep = ParagraphListViewLayout( python_paragraphStyle, lambda:
 dict_listViewLayout = ParagraphListViewLayout( python_paragraphStyle, lambda: TextElement( default_textStyle, ' ' ), 0, ListViewLayout.TrailingSeparator.NEVER )
 dict_listViewLayoutSep = ParagraphListViewLayout( python_paragraphStyle, lambda: TextElement( default_textStyle, ' ' ), 0, ListViewLayout.TrailingSeparator.NEVER )
 
-suite_vboxStyle = VBoxStyleSheet( DPVBox.Typesetting.ALIGN_WITH_TOP, DPVBox.Alignment.LEFT, 0.0, False, 0.0 )
+suite_vboxStyle = VBoxStyleSheet( HAlignment.LEFT, 0.0, False, 0.0 )
 
 
 #lineEditorStyle = GSymStyleSheet( highlightBackgroundColour=Colour3f( 0.85, 0.85, 1.0 ) )
