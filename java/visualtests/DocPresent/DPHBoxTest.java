@@ -19,6 +19,7 @@ import BritefuryJ.DocPresent.DPHBox;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.VAlignment;
+import BritefuryJ.DocPresent.Layout.VTypesetting;
 import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
@@ -79,7 +80,7 @@ public class DPHBoxTest
 		DPHBox b4 = new DPHBox( b4s );
 		b4.extend( c4 );
 		
-		VBoxStyleSheet boxS = new VBoxStyleSheet( HAlignment.EXPAND, 20.0, false, 0.0 );
+		VBoxStyleSheet boxS = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.EXPAND, 20.0, false, 0.0 );
 		DPVBox box = new DPVBox( boxS );
 		box.append( b0 );
 		box.append( b1 );

@@ -40,7 +40,7 @@ div_fractionStyle = FractionStyleSheet( Color( 0.0, 0.5, 0.0 ) )
 
 python_paragraphStyle = ParagraphStyleSheet( VAlignment.BASELINES, 0.0, 0.0, 0.0, 30.0 )
 
-compoundStmt_vboxStyle = VBoxStyleSheet( HAlignment.EXPAND, 0.0, False, 0.0 )
+compoundStmt_vboxStyle = VBoxStyleSheet( VTypesetting.ALIGN_WITH_TOP, HAlignment.EXPAND, 0.0, False, 0.0 )
 
 tuple_listViewLayout = ParagraphListViewLayout( python_paragraphStyle, lambda: TextElement( default_textStyle, ' ' ), 0, ListViewLayout.TrailingSeparator.NEVER )
 tuple_listViewLayoutSep = ParagraphListViewLayout( python_paragraphStyle, lambda: TextElement( default_textStyle, ' ' ), 0, ListViewLayout.TrailingSeparator.ALWAYS )
@@ -49,7 +49,7 @@ list_listViewLayoutSep = ParagraphListViewLayout( python_paragraphStyle, lambda:
 dict_listViewLayout = ParagraphListViewLayout( python_paragraphStyle, lambda: TextElement( default_textStyle, ' ' ), 0, ListViewLayout.TrailingSeparator.NEVER )
 dict_listViewLayoutSep = ParagraphListViewLayout( python_paragraphStyle, lambda: TextElement( default_textStyle, ' ' ), 0, ListViewLayout.TrailingSeparator.NEVER )
 
-suite_vboxStyle = VBoxStyleSheet( HAlignment.LEFT, 0.0, False, 0.0 )
+suite_vboxStyle = VBoxStyleSheet( VTypesetting.ALIGN_WITH_TOP, HAlignment.LEFT, 0.0, False, 0.0 )
 
 
 #lineEditorStyle = GSymStyleSheet( highlightBackgroundColour=Colour3f( 0.85, 0.85, 1.0 ) )

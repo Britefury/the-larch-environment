@@ -66,11 +66,11 @@ def nodeEditor(ctx, node, contents, state):
 
 
 def stringNodeEditor(ctx, node, metadata, state):
-	res = _parser.unquotedString().parseString( node.toString() )
+	res = _parser.unquotedString().parseString( node )
 	if res.isValid():
-		nodeText = node.toString()
+		nodeText = node
 	else:
-		nodeText = repr( node.toString() )
+		nodeText = repr( node )
 	return ctx.textRepresentationListener( ctx.text( string_textStyle, nodeText ), ParsedNodeTextRepresentationListener( ctx, node ) )
 
 

@@ -145,7 +145,7 @@ public class ParagraphLayout
 			lineBoxes[i++] = line.lineReqBox;
 		}
 		
-		VerticalLayout.computeRequisitionY( box, lineBoxes, vSpacing, null );
+		VerticalLayout.computeRequisitionY( box, lineBoxes, VTypesetting.NONE, vSpacing, null );
 	}
 
 

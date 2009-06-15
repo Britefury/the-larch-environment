@@ -22,6 +22,7 @@ import BritefuryJ.DocPresent.ElementTree.TextElement;
 import BritefuryJ.DocPresent.ElementTree.VBoxElement;
 import BritefuryJ.DocPresent.ElementTree.WhitespaceElement;
 import BritefuryJ.DocPresent.Layout.HAlignment;
+import BritefuryJ.DocPresent.Layout.VTypesetting;
 import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
@@ -116,7 +117,7 @@ public class ListViewTest
 		
 		Element titleElem = new TextElement( s0, title );
 		
-		VBoxStyleSheet boxs = new VBoxStyleSheet( HAlignment.LEFT, 0.0, false, 0.0 );
+		VBoxStyleSheet boxs = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.LEFT, 0.0, false, 0.0 );
 		VBoxElement vbox = new VBoxElement( boxs );
 		vbox.setChildren( Arrays.asList( new Element[] { titleElem, ls } ) );
 		return vbox;
@@ -125,7 +126,7 @@ public class ListViewTest
 	
 	protected Element createContentNode()
 	{
-		VBoxStyleSheet boxs = new VBoxStyleSheet( HAlignment.LEFT, 15.0, false, 0.0 );
+		VBoxStyleSheet boxs = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.LEFT, 15.0, false, 0.0 );
 		VBoxElement box = new VBoxElement( boxs );
 		ArrayList<Element> children = new ArrayList<Element>();
 		
@@ -133,7 +134,7 @@ public class ListViewTest
 		
 		ParagraphStyleSheet paraStyle = new ParagraphStyleSheet();
 		HBoxStyleSheet hboxStyle = new HBoxStyleSheet();
-		VBoxStyleSheet vboxStyle = new VBoxStyleSheet( HAlignment.LEFT, 0.0, false, 0.0 );
+		VBoxStyleSheet vboxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.LEFT, 0.0, false, 0.0 );
 		
 		String[] txt = new String[] { "abcdef", "123456", "hello", "world", "this", "is", "a", "test", "of", "the", "list", "layout", "system" };
 		

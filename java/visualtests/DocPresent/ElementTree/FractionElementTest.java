@@ -22,6 +22,7 @@ import BritefuryJ.DocPresent.ElementTree.TextElement;
 import BritefuryJ.DocPresent.ElementTree.VBoxElement;
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.VAlignment;
+import BritefuryJ.DocPresent.Layout.VTypesetting;
 import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
@@ -73,7 +74,7 @@ public class FractionElementTest extends ElementTreeTestBase
 	
 	protected Element createContentNode()
 	{
-		VBoxStyleSheet boxs = new VBoxStyleSheet( HAlignment.LEFT, 0.0, false, 0.0 );
+		VBoxStyleSheet boxs = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.LEFT, 0.0, false, 0.0 );
 		VBoxElement box = new VBoxElement( boxs );
 		ArrayList<Element> children = new ArrayList<Element>();
 		

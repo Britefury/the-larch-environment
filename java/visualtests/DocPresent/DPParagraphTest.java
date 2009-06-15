@@ -22,6 +22,7 @@ import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.VAlignment;
+import BritefuryJ.DocPresent.Layout.VTypesetting;
 import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
@@ -65,14 +66,14 @@ public class DPParagraphTest
 	}
 	
 	
-	protected DPVBox makeTextVBox(HAlignment alignment, double spacing, double padding)
+	protected DPVBox makeTextVBox(VTypesetting typesetting, HAlignment alignment, double spacing, double padding)
 	{
 		TextStyleSheet style = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.blue );
 		DPWidget t1 = new DPText( style, "Vert1" );
 		DPWidget t2 = new DPText( style, "Vert2" );
 		DPWidget t3 = new DPText( style, "Vert3" );
 		DPWidget[] children = { t1, t2, t3 };
-		VBoxStyleSheet boxs = new VBoxStyleSheet( alignment, spacing, false, padding );
+		VBoxStyleSheet boxs = new VBoxStyleSheet( typesetting, alignment, spacing, false, padding );
 		DPVBox box = new DPVBox( boxs );
 		box.extend( children );
 		return box;
@@ -117,7 +118,7 @@ public class DPParagraphTest
 		DPWidget b7 = makeParagraph( "PER-WORD INDENTED", VAlignment.BASELINES, 0.0, 0.0, 0.0, 50.0, 1, blackText );
 		DPWidget b8 = makeParagraphWithNestedPara( "NESTED-2-INDENTED", VAlignment.BASELINES, 0.0, 0.0, 0.0, 50.0, 2, blackText, redText );
 		DPWidget[] children = { b1, b2, b3, b4, b5, b6, b7, b8 };
-		VBoxStyleSheet boxs = new VBoxStyleSheet( HAlignment.EXPAND, 30.0, false, 0.0 );
+		VBoxStyleSheet boxs = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.EXPAND, 30.0, false, 0.0 );
 		DPVBox box = new DPVBox( boxs );
 		box.extend( children );
 		return box;
