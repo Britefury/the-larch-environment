@@ -11,7 +11,8 @@ import java.util.List;
 
 import BritefuryJ.DocPresent.Layout.BoxPackingParams;
 import BritefuryJ.DocPresent.Layout.HorizontalLayout;
-import BritefuryJ.DocPresent.Layout.LBox;
+import BritefuryJ.DocPresent.Layout.LAllocBox;
+import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
 import BritefuryJ.Math.Point2;
@@ -97,7 +98,7 @@ public class DPHBox extends DPAbstractBox
 	
 	protected void updateRequisitionX()
 	{
-		LBox[] childBoxes = new LBox[registeredChildren.size()];
+		LReqBox[] childBoxes = new LReqBox[registeredChildren.size()];
 		BoxPackingParams[] packingParams = new BoxPackingParams[registeredChildren.size()];
 		for (int i = 0; i < registeredChildren.size(); i++)
 		{
@@ -105,18 +106,18 @@ public class DPHBox extends DPAbstractBox
 			packingParams[i] = (BoxPackingParams)registeredChildren.get( i ).getParentPacking();
 		}
 
-		HorizontalLayout.computeRequisitionX( layoutBox, childBoxes, getSpacing(), packingParams );
+		HorizontalLayout.computeRequisitionX( layoutReqBox, childBoxes, getSpacing(), packingParams );
 	}
 
 	protected void updateRequisitionY()
 	{
-		LBox[] childBoxes = new LBox[registeredChildren.size()];
+		LReqBox[] childBoxes = new LReqBox[registeredChildren.size()];
 		for (int i = 0; i < registeredChildren.size(); i++)
 		{
 			childBoxes[i] = registeredChildren.get( i ).refreshRequisitionY();
 		}
 
-		HorizontalLayout.computeRequisitionY( layoutBox, childBoxes, getAlignment() );
+		HorizontalLayout.computeRequisitionY( layoutReqBox, childBoxes, getAlignment() );
 	}
 	
 
@@ -126,11 +127,12 @@ public class DPHBox extends DPAbstractBox
 	{
 		super.updateAllocationX();
 		
-		LBox childBoxes[] = getChildrenLayoutBoxes();
+		LReqBox childBoxes[] = getChildrenRequisitionBoxes();
+		LAllocBox childAllocBoxes[] = getChildrenAllocationBoxes();
 		double prevWidths[] = getChildrenAllocationX();
 		BoxPackingParams packing[] = (BoxPackingParams[])getChildrenPackingParams( new BoxPackingParams[registeredChildren.size()] );
 		
-		HorizontalLayout.allocateX( layoutBox, childBoxes, getSpacing(), packing );
+		HorizontalLayout.allocateX( layoutReqBox, childBoxes, layoutAllocBox, childAllocBoxes, getSpacing(), packing );
 		
 		int i = 0;
 		for (DPWidget child: registeredChildren)
@@ -146,10 +148,11 @@ public class DPHBox extends DPAbstractBox
 	{
 		super.updateAllocationY();
 		
-		LBox childBoxes[] = getChildrenLayoutBoxes();
+		LReqBox childBoxes[] = getChildrenRequisitionBoxes();
+		LAllocBox childAllocBoxes[] = getChildrenAllocationBoxes();
 		double prevHeights[] = getChildrenAllocationY();
 		
-		HorizontalLayout.allocateY( layoutBox, childBoxes, getAlignment() );
+		HorizontalLayout.allocateY( layoutReqBox, childBoxes, layoutAllocBox, childAllocBoxes, getAlignment() );
 		
 		int i = 0;
 		for (DPWidget child: registeredChildren)

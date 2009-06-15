@@ -18,7 +18,7 @@ public class FractionLayout
 	}
 	
 	
-	public static void computeRequisitionX(LBox box, LBox numerator, LBox bar, LBox denominator, double hPadding, double vSpacing, double baselinePos)
+	public static void computeRequisitionX(LReqBox box, LReqBox numerator, LReqBox bar, LReqBox denominator, double hPadding, double vSpacing, double baselinePos)
 	{
 		double minWidth = 0.0, prefWidth = 0.0;
 		if ( numerator != null )
@@ -36,7 +36,7 @@ public class FractionLayout
 		box.setRequisitionX( minWidth + padding, prefWidth + padding, 0.0, 0.0 );
 	}
 
-	public static void computeRequisitionY(LBox box, LBox numerator, LBox bar, LBox denominator, double hPadding, double vSpacing, double baselineOffset)
+	public static void computeRequisitionY(LReqBox box, LReqBox numerator, LReqBox bar, LReqBox denominator, double hPadding, double vSpacing, double baselineOffset)
 	{
 		double numHeight = numerator != null  ?  numerator.getReqHeight()  :  0.0;
 		double numSpacing = numerator != null  ?  numerator.getReqVSpacing()  :  0.0;
@@ -54,9 +54,10 @@ public class FractionLayout
 
 
 
-	public static void allocateX(LBox box, LBox numerator, LBox bar, LBox denominator, double hPadding, double vSpacing, double baselineOffset)
+	public static void allocateX(LReqBox box, LReqBox numerator, LReqBox bar, LReqBox denominator,
+			LAllocBox boxAlloc, LAllocBox numeratorAlloc, LAllocBox barAlloc, LAllocBox denominatorAlloc, double hPadding, double vSpacing, double baselineOffset)
 	{
-		double width = Math.min( Math.max( box.allocationX, box.minWidth ), box.prefWidth );
+		double width = Math.min( Math.max( boxAlloc.allocationX, box.minWidth ), box.prefWidth );
 		double childrenAlloc = width - hPadding * 2.0;
 		
 		
@@ -66,7 +67,7 @@ public class FractionLayout
 			double childWidth = Math.min( Math.max( childrenAlloc, numerator.minWidth ), numerator.prefWidth );
 			numDenomAlloc = Math.max( numDenomAlloc, childWidth );
 			double childPos = Math.max( hPadding  +  ( childrenAlloc - childWidth ) * 0.5, 0.0 );
-			box.allocateChildX( numerator, childPos, childWidth );
+			boxAlloc.allocateChildX( numeratorAlloc, childPos, childWidth );
 		}
 		
 		if ( denominator != null )
@@ -74,24 +75,25 @@ public class FractionLayout
 			double childWidth = Math.min( Math.max( childrenAlloc, denominator.minWidth ), denominator.prefWidth );
 			numDenomAlloc = Math.max( numDenomAlloc, childWidth );
 			double childPos = Math.max( hPadding  +  ( childrenAlloc - childWidth ) * 0.5, 0.0 );
-			box.allocateChildX( denominator, childPos, childWidth );
+			boxAlloc.allocateChildX( denominatorAlloc, childPos, childWidth );
 		}
 
 		if ( bar != null )
 		{
-			box.allocateChildX( bar, 0.0, width );
+			boxAlloc.allocateChildX( barAlloc, 0.0, width );
 		}
 		
 	}
 
-	public static void allocateY(LBox box, LBox numerator, LBox bar, LBox denominator, double hPadding, double vSpacing, double baselineOffset)
+	public static void allocateY(LReqBox box, LReqBox numerator, LReqBox bar, LReqBox denominator,
+			LAllocBox boxAlloc, LAllocBox numeratorAlloc, LAllocBox barAlloc, LAllocBox denominatorAlloc, double hPadding, double vSpacing, double baselineOffset)
 	{
 		double y = 0.0;
 		
 		if ( numerator != null )
 		{
 			double childHeight = numerator.getReqHeight();
-			box.allocateChildY( numerator, y, childHeight );
+			boxAlloc.allocateChildY( numeratorAlloc, y, childHeight );
 			
 			y += childHeight  +  Math.max( numerator.getReqVSpacing(), vSpacing );
 		}
@@ -103,7 +105,7 @@ public class FractionLayout
 		if ( bar != null )
 		{
 			double childHeight = BARHEIGHT;
-			box.allocateChildY( bar, y, childHeight );
+			boxAlloc.allocateChildY( barAlloc, y, childHeight );
 			
 			y += childHeight  +  vSpacing;
 		}
@@ -115,7 +117,7 @@ public class FractionLayout
 		if ( denominator != null )
 		{
 			double childHeight = denominator.getReqHeight();
-			box.allocateChildY( denominator, y, childHeight );
+			boxAlloc.allocateChildY( denominatorAlloc, y, childHeight );
 		}
 	}
 }

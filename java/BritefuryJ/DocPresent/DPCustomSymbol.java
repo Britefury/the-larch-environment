@@ -14,7 +14,7 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 
 import BritefuryJ.DocPresent.Caret.Caret;
-import BritefuryJ.DocPresent.Layout.LBox;
+import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleSheets.CustomSymbolStyleSheet;
 import BritefuryJ.Math.Point2;
@@ -26,8 +26,8 @@ public class DPCustomSymbol extends DPContentLeafEditableEntry
 	{
 		public double getWidth();
 		public double getHeight();
-		public void setBoxRequisitionX(LBox box);
-		public void setBoxRequisitionY(LBox box);
+		public void setBoxRequisitionX(LReqBox box);
+		public void setBoxRequisitionY(LReqBox box);
 		public void draw(Graphics2D graphics);
 	}
 	
@@ -75,12 +75,12 @@ public class DPCustomSymbol extends DPContentLeafEditableEntry
 	
 	protected void updateRequisitionX()
 	{
-		symbol.setBoxRequisitionX( layoutBox );
+		symbol.setBoxRequisitionX( layoutReqBox );
 	}
 
 	protected void updateRequisitionY()
 	{
-		symbol.setBoxRequisitionY( layoutBox );
+		symbol.setBoxRequisitionY( layoutReqBox );
 	}
 	
 	

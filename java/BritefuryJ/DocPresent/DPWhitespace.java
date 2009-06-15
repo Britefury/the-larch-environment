@@ -99,8 +99,8 @@ public class DPWhitespace extends DPContentLeafEditable
 	
 	public void drawSelection(Graphics2D graphics, Marker from, Marker to)
 	{
-		double allocationX = layoutBox.getAllocationX();
-		double allocationY = layoutBox.getAllocationY();
+		double allocationX = getAllocationX();
+		double allocationY = getAllocationY();
 		AffineTransform current = pushGraphicsTransform( graphics );
 		int startIndex = from != null  ?  from.getIndex()  :  0;
 		int endIndex = to != null  ?  to.getIndex()  :  1;
@@ -114,12 +114,12 @@ public class DPWhitespace extends DPContentLeafEditable
 	
 	protected void updateRequisitionX()
 	{
-		layoutBox.setRequisitionX( width, 0.0 );
+		layoutReqBox.setRequisitionX( width, 0.0 );
 	}
 
 	protected void updateRequisitionY()
 	{
-		layoutBox.clearRequisitionY();
+		layoutReqBox.clearRequisitionY();
 	}
 
 	

@@ -11,7 +11,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import BritefuryJ.DocPresent.Layout.LBox;
+import BritefuryJ.DocPresent.Layout.LAllocBox;
+import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Layout.ScriptLayout;
 import BritefuryJ.DocPresent.StyleSheets.ScriptStyleSheet;
 import BritefuryJ.Math.Point2;
@@ -36,7 +37,7 @@ public class DPScript extends DPContainer
 	
 	
 	protected DPWidget[] children;
-	protected LBox columnBoxes[];
+	protected LReqBox columnBoxes[];
 	protected double rowBaselineY[];
 	
 	
@@ -51,10 +52,10 @@ public class DPScript extends DPContainer
 		super( styleSheet );
 		
 		children = new DPWidget[NUMCHILDREN];
-		columnBoxes = new LBox[3];
-		columnBoxes[0] = new LBox( null );
-		columnBoxes[1] = new LBox( null );
-		columnBoxes[2] = new LBox( null );
+		columnBoxes = new LReqBox[3];
+		columnBoxes[0] = new LReqBox();
+		columnBoxes[1] = new LReqBox();
+		columnBoxes[2] = new LReqBox();
 		rowBaselineY = new double[3];
 	}
 
@@ -202,12 +203,12 @@ public class DPScript extends DPContainer
 
 	protected void updateRequisitionX()
 	{
-		LBox boxes[] = new LBox[NUMCHILDREN];
+		LReqBox boxes[] = new LReqBox[NUMCHILDREN];
 		for (int i = 0; i < NUMCHILDREN; i++)
 		{
 			if ( i != MAIN )
 			{
-				boxes[i] = children[i] != null  ?  children[i].refreshRequisitionX().scaled( children[i], childScale )  :  null;
+				boxes[i] = children[i] != null  ?  children[i].refreshRequisitionX().scaled( childScale )  :  null;
 			}
 			else
 			{
@@ -215,17 +216,17 @@ public class DPScript extends DPContainer
 			}
 		}
 		
-		ScriptLayout.computeRequisitionX( layoutBox, columnBoxes, boxes[LEFTSUPER], boxes[LEFTSUB], boxes[MAIN], boxes[RIGHTSUPER], boxes[RIGHTSUB], getSpacing(), getScriptSpacing() );
+		ScriptLayout.computeRequisitionX( layoutReqBox, columnBoxes, boxes[LEFTSUPER], boxes[LEFTSUB], boxes[MAIN], boxes[RIGHTSUPER], boxes[RIGHTSUB], getSpacing(), getScriptSpacing() );
 	}
 
 	protected void updateRequisitionY()
 	{
-		LBox boxes[] = new LBox[NUMCHILDREN];
+		LReqBox boxes[] = new LReqBox[NUMCHILDREN];
 		for (int i = 0; i < NUMCHILDREN; i++)
 		{
 			if ( i != MAIN )
 			{
-				boxes[i] = children[i] != null  ?  children[i].refreshRequisitionY().scaled( children[i], childScale )  :  null;
+				boxes[i] = children[i] != null  ?  children[i].refreshRequisitionY().scaled( childScale )  :  null;
 			}
 			else
 			{
@@ -233,7 +234,7 @@ public class DPScript extends DPContainer
 			}
 		}
 		
-		ScriptLayout.computeRequisitionY( layoutBox, rowBaselineY, boxes[LEFTSUPER], boxes[LEFTSUB], boxes[MAIN], boxes[RIGHTSUPER], boxes[RIGHTSUB], getSpacing(), getScriptSpacing() );
+		ScriptLayout.computeRequisitionY( layoutReqBox, rowBaselineY, boxes[LEFTSUPER], boxes[LEFTSUB], boxes[MAIN], boxes[RIGHTSUPER], boxes[RIGHTSUB], getSpacing(), getScriptSpacing() );
 	}
 	
 
@@ -244,15 +245,19 @@ public class DPScript extends DPContainer
 	{
 		super.updateAllocationX( );
 		
-		LBox boxes[] = new LBox[NUMCHILDREN];
+		LReqBox reqBoxes[] = new LReqBox[NUMCHILDREN];
+		LAllocBox allocBoxes[] = new LAllocBox[NUMCHILDREN];
 		double prevChildWidths[] = new double[NUMCHILDREN];
 		for (int i = 0; i < NUMCHILDREN; i++)
 		{
-			boxes[i] = children[i] != null  ?  children[i].layoutBox  :  null;
-			prevChildWidths[i] = children[i] != null  ?  children[i].layoutBox.getAllocationX()  :  0.0;
+			reqBoxes[i] = children[i] != null  ?  children[i].layoutReqBox  :  null;
+			allocBoxes[i] = children[i] != null  ?  children[i].layoutAllocBox  :  null;
+			prevChildWidths[i] = children[i] != null  ?  children[i].getAllocationX()  :  0.0;
 		}
 		
-		ScriptLayout.allocateX( layoutBox, boxes[LEFTSUPER], boxes[LEFTSUB], boxes[MAIN], boxes[RIGHTSUPER], boxes[RIGHTSUB], columnBoxes, getSpacing(), getScriptSpacing() );
+		ScriptLayout.allocateX( layoutReqBox, reqBoxes[LEFTSUPER], reqBoxes[LEFTSUB], reqBoxes[MAIN], reqBoxes[RIGHTSUPER], reqBoxes[RIGHTSUB], columnBoxes,
+				layoutAllocBox, allocBoxes[LEFTSUPER], allocBoxes[LEFTSUB], allocBoxes[MAIN], allocBoxes[RIGHTSUPER], allocBoxes[RIGHTSUB],
+				getSpacing(), getScriptSpacing() );
 		
 		for (int i = 0; i < NUMCHILDREN; i++)
 		{
@@ -268,15 +273,19 @@ public class DPScript extends DPContainer
 	{
 		super.updateAllocationY( );
 		
-		LBox boxes[] = new LBox[NUMCHILDREN];
+		LReqBox reqBoxes[] = new LReqBox[NUMCHILDREN];
+		LAllocBox allocBoxes[] = new LAllocBox[NUMCHILDREN];
 		double prevChildHeights[] = new double[NUMCHILDREN];
 		for (int i = 0; i < NUMCHILDREN; i++)
 		{
-			boxes[i] = children[i] != null  ?  children[i].layoutBox  :  null;
-			prevChildHeights[i] = children[i] != null  ?  children[i].layoutBox.getAllocationY()  :  0.0;
+			reqBoxes[i] = children[i] != null  ?  children[i].layoutReqBox  :  null;
+			allocBoxes[i] = children[i] != null  ?  children[i].layoutAllocBox  :  null;
+			prevChildHeights[i] = children[i] != null  ?  children[i].getAllocationY()  :  0.0;
 		}
 		
-		ScriptLayout.allocateY( layoutBox, boxes[LEFTSUPER], boxes[LEFTSUB], boxes[MAIN], boxes[RIGHTSUPER], boxes[RIGHTSUB], rowBaselineY, getSpacing(), getScriptSpacing() );
+		ScriptLayout.allocateY( layoutReqBox, reqBoxes[LEFTSUPER], reqBoxes[LEFTSUB], reqBoxes[MAIN], reqBoxes[RIGHTSUPER], reqBoxes[RIGHTSUB], rowBaselineY,
+				layoutAllocBox, allocBoxes[LEFTSUPER], allocBoxes[LEFTSUB], allocBoxes[MAIN], allocBoxes[RIGHTSUPER], allocBoxes[RIGHTSUB],
+				getSpacing(), getScriptSpacing() );
 		
 		for (int i = 0; i < NUMCHILDREN; i++)
 		{

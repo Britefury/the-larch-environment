@@ -18,7 +18,8 @@ import java.util.List;
 
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Layout.FractionLayout;
-import BritefuryJ.DocPresent.Layout.LBox;
+import BritefuryJ.DocPresent.Layout.LAllocBox;
+import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleSheets.FractionStyleSheet;
 import BritefuryJ.Math.Point2;
@@ -44,7 +45,7 @@ public class DPFraction extends DPContainer
 	
 		protected void draw(Graphics2D graphics)
 		{
-			Shape s = new Rectangle2D.Double( 0.0, 0.0, layoutBox.getAllocationX(), layoutBox.getAllocationY() );
+			Shape s = new Rectangle2D.Double( 0.0, 0.0, getAllocationX(), getAllocationY() );
 			graphics.setColor( getColour() );
 			graphics.fill( s );
 		}
@@ -72,7 +73,7 @@ public class DPFraction extends DPContainer
 
 		public void drawCaretAtStart(Graphics2D graphics)
 		{
-			double allocationY = layoutBox.getAllocationY();
+			double allocationY = getAllocationY();
 			AffineTransform current = pushGraphicsTransform( graphics );
 			graphics.draw( new Line2D.Double( 0.0, -2.0, 0.0, allocationY + 2.0 ) );
 			popGraphicsTransform( graphics, current );
@@ -80,8 +81,8 @@ public class DPFraction extends DPContainer
 
 		public void drawCaretAtEnd(Graphics2D graphics)
 		{
-			double allocationX = layoutBox.getAllocationX();
-			double allocationY = layoutBox.getAllocationY();
+			double allocationX = getAllocationX();
+			double allocationY = getAllocationY();
 			AffineTransform current = pushGraphicsTransform( graphics );
 			graphics.draw( new Line2D.Double( allocationX, -2.0, allocationX, allocationY + 2.0 ) );
 			popGraphicsTransform( graphics, current );
@@ -97,8 +98,8 @@ public class DPFraction extends DPContainer
 		
 		public void drawSelection(Graphics2D graphics, Marker from, Marker to)
 		{
-			double allocationX = layoutBox.getAllocationX();
-			double allocationY = layoutBox.getAllocationY();
+			double allocationX = getAllocationX();
+			double allocationY = getAllocationY();
 			AffineTransform current = pushGraphicsTransform( graphics );
 			int startIndex = from != null  ?  from.getIndex()  :  0;
 			int endIndex = to != null  ?  to.getIndex()  :  1;
@@ -113,12 +114,12 @@ public class DPFraction extends DPContainer
 		
 		protected void updateRequisitionX()
 		{
-			layoutBox.clearRequisitionX();
+			layoutReqBox.clearRequisitionX();
 		}
 
 		protected void updateRequisitionY()
 		{
-			layoutBox.clearRequisitionY();
+			layoutReqBox.clearRequisitionY();
 		}
 		
 		
@@ -133,7 +134,7 @@ public class DPFraction extends DPContainer
 
 		public int getMarkerPositonForPoint(Point2 localPos)
 		{
-			double allocationX = layoutBox.getAllocationX();
+			double allocationX = getAllocationX();
 			if ( localPos.x >= allocationX * 0.5 )
 			{
 				return 1;
@@ -295,12 +296,12 @@ public class DPFraction extends DPContainer
 	
 	protected void updateRequisitionX()
 	{
-		LBox boxes[] = new LBox[NUMCHILDREN];
+		LReqBox boxes[] = new LReqBox[NUMCHILDREN];
 		for (int i = 0; i < NUMCHILDREN; i++)
 		{
 			if ( i != BAR )
 			{
-				boxes[i] = children[i] != null  ?  children[i].refreshRequisitionX().scaled( children[i], childScale )  :  null;
+				boxes[i] = children[i] != null  ?  children[i].refreshRequisitionX().scaled( childScale )  :  null;
 			}
 			else
 			{
@@ -308,17 +309,17 @@ public class DPFraction extends DPContainer
 			}
 		}
 		
-		FractionLayout.computeRequisitionX( layoutBox, boxes[NUMERATOR], boxes[BAR], boxes[DENOMINATOR], getHPadding(), getVSpacing(), getYOffset() );
+		FractionLayout.computeRequisitionX( layoutReqBox, boxes[NUMERATOR], boxes[BAR], boxes[DENOMINATOR], getHPadding(), getVSpacing(), getYOffset() );
 	}
 
 	protected void updateRequisitionY()
 	{
-		LBox boxes[] = new LBox[NUMCHILDREN];
+		LReqBox boxes[] = new LReqBox[NUMCHILDREN];
 		for (int i = 0; i < NUMCHILDREN; i++)
 		{
 			if ( i != BAR )
 			{
-				boxes[i] = children[i] != null  ?  children[i].refreshRequisitionY().scaled( children[i], childScale )  :  null;
+				boxes[i] = children[i] != null  ?  children[i].refreshRequisitionY().scaled( childScale )  :  null;
 			}
 			else
 			{
@@ -326,7 +327,7 @@ public class DPFraction extends DPContainer
 			}
 		}
 		
-		FractionLayout.computeRequisitionY( layoutBox, boxes[NUMERATOR], boxes[BAR], boxes[DENOMINATOR], getHPadding(), getVSpacing(), getYOffset() );
+		FractionLayout.computeRequisitionY( layoutReqBox, boxes[NUMERATOR], boxes[BAR], boxes[DENOMINATOR], getHPadding(), getVSpacing(), getYOffset() );
 	}
 	
 
@@ -335,15 +336,19 @@ public class DPFraction extends DPContainer
 	{
 		super.updateAllocationX( );
 		
-		LBox boxes[] = new LBox[NUMCHILDREN];
+		LReqBox reqBoxes[] = new LReqBox[NUMCHILDREN];
+		LAllocBox allocBoxes[] = new LAllocBox[NUMCHILDREN];
 		double prevChildWidths[] = new double[NUMCHILDREN];
 		for (int i = 0; i < NUMCHILDREN; i++)
 		{
-			boxes[i] = children[i] != null  ?  children[i].layoutBox  :  null;
-			prevChildWidths[i] = children[i] != null  ?  children[i].layoutBox.getAllocationX()  :  0.0;
+			reqBoxes[i] = children[i] != null  ?  children[i].layoutReqBox  :  null;
+			allocBoxes[i] = children[i] != null  ?  children[i].layoutAllocBox  :  null;
+			prevChildWidths[i] = children[i] != null  ?  children[i].layoutAllocBox.getAllocationX()  :  0.0;
 		}
 		
-		FractionLayout.allocateX( layoutBox, boxes[NUMERATOR], boxes[BAR], boxes[DENOMINATOR], getHPadding(), getVSpacing(), getYOffset() );
+		FractionLayout.allocateX( layoutReqBox, reqBoxes[NUMERATOR], reqBoxes[BAR], reqBoxes[DENOMINATOR],
+				layoutAllocBox, allocBoxes[NUMERATOR], allocBoxes[BAR], allocBoxes[DENOMINATOR], 
+				getHPadding(), getVSpacing(), getYOffset() );
 		
 		for (int i = 0; i < NUMCHILDREN; i++)
 		{
@@ -359,15 +364,19 @@ public class DPFraction extends DPContainer
 	{
 		super.updateAllocationY( );
 		
-		LBox boxes[] = new LBox[NUMCHILDREN];
+		LReqBox reqBoxes[] = new LReqBox[NUMCHILDREN];
+		LAllocBox allocBoxes[] = new LAllocBox[NUMCHILDREN];
 		double prevChildHeights[] = new double[NUMCHILDREN];
 		for (int i = 0; i < NUMCHILDREN; i++)
 		{
-			boxes[i] = children[i] != null  ?  children[i].layoutBox  :  null;
-			prevChildHeights[i] = children[i] != null  ?  children[i].layoutBox.getAllocationY()  :  0.0;
+			reqBoxes[i] = children[i] != null  ?  children[i].layoutReqBox  :  null;
+			allocBoxes[i] = children[i] != null  ?  children[i].layoutAllocBox  :  null;
+			prevChildHeights[i] = children[i] != null  ?  children[i].layoutAllocBox.getAllocationY()  :  0.0;
 		}
 		
-		FractionLayout.allocateY( layoutBox, boxes[NUMERATOR], boxes[BAR], boxes[DENOMINATOR], getHPadding(), getVSpacing(), getYOffset() );
+		FractionLayout.allocateY( layoutReqBox, reqBoxes[NUMERATOR], reqBoxes[BAR], reqBoxes[DENOMINATOR],
+				layoutAllocBox, allocBoxes[NUMERATOR], allocBoxes[BAR], allocBoxes[DENOMINATOR], 
+				getHPadding(), getVSpacing(), getYOffset() );
 		
 		for (int i = 0; i < NUMCHILDREN; i++)
 		{

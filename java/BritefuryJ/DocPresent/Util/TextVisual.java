@@ -30,7 +30,7 @@ import javax.swing.JComponent;
 import javax.swing.text.Segment;
 
 import BritefuryJ.DocPresent.DPPresentationArea;
-import BritefuryJ.DocPresent.Layout.LBox;
+import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Utils.HashUtils;
 
@@ -297,7 +297,7 @@ public class TextVisual
 	private Font font;
 	private boolean bMixedSizeCaps;
 	private boolean bRealised;
-	private double reqWidth, reqHSpacing, reqAscent, reqDescent, reqVSpacing;
+	private LReqBox reqBox;
 	
 
 	
@@ -307,7 +307,7 @@ public class TextVisual
 		this.text = text;
 		this.font = font;
 		this.bMixedSizeCaps = bMixedSizeCaps;
-		reqWidth = reqHSpacing = reqAscent = reqDescent = reqVSpacing = 0.0;
+		reqBox = new LReqBox();
 	}
 	
 	
@@ -318,16 +318,11 @@ public class TextVisual
 	}
 	
 	
-	
-	public void setBoxRequisitionX(LBox box)
+	public LReqBox getRequisition()
 	{
-		box.setRequisitionX( reqWidth, reqHSpacing );
+		return reqBox;
 	}
 	
-	public void setBoxRequisitionY(LBox box)
-	{
-		box.setRequisitionY( reqAscent, reqDescent, reqVSpacing );
-	}
 	
 	
 	public void realise(DPPresentationArea a)
@@ -357,11 +352,8 @@ public class TextVisual
 				double width = layout.getBounds().getWidth();
 				double ascent = layout.getAscent(), descent = layout.getDescent();
 				
-				reqWidth = width;
-				reqHSpacing = layout.getAdvance() - width;
-				reqAscent = layout.getAscent();
-				reqDescent = layout.getDescent();
-				reqVSpacing = layout.getLeading();
+				reqBox.setRequisitionX( width, layout.getAdvance() - width );
+				reqBox.setRequisitionY( layout.getAscent(), layout.getDescent(), layout.getLeading() );
 				
 				// Squiggle shape
 				squiggleUnderlineShape = new Path2D.Double();
@@ -383,10 +375,8 @@ public class TextVisual
 				FontRenderContext frc = graphics.getFontRenderContext();
 				LineMetrics lineMetrics = font.getLineMetrics( "", frc );
 				
-				reqWidth = reqHSpacing = 0.0;
-				reqAscent = lineMetrics.getAscent();
-				reqDescent = lineMetrics.getDescent();
-				reqVSpacing = lineMetrics.getLeading();
+				reqBox.setRequisitionX( 0.0, 0.0 );
+				reqBox.setRequisitionY( lineMetrics.getAscent(), lineMetrics.getDescent(), lineMetrics.getLeading() );
 				
 				squiggleUnderlineShape = null;
 			}

@@ -105,8 +105,8 @@ public class DPMathRoot extends DPContainer
 		
 		if ( child != null )
 		{
-			double allocationX = layoutBox.getAllocationX();
-			double allocationY = layoutBox.getAllocationY();
+			double allocationX = getAllocationX();
+			double allocationY = getAllocationY();
 
 			MathRootStyleSheet s = (MathRootStyleSheet)styleSheet;
 			
@@ -146,12 +146,12 @@ public class DPMathRoot extends DPContainer
 		{
 			MathRootStyleSheet s = (MathRootStyleSheet)styleSheet;
 			
-			layoutBox.setRequisitionX( child.refreshRequisitionX() );
-			layoutBox.borderX( s.getGlyphWidth(), 0.0 );
+			layoutReqBox.setRequisitionX( child.refreshRequisitionX() );
+			layoutReqBox.borderX( s.getGlyphWidth(), 0.0 );
 		}
 		else
 		{
-			layoutBox.clearRequisitionX();
+			layoutReqBox.clearRequisitionX();
 		}
 	}
 
@@ -161,12 +161,12 @@ public class DPMathRoot extends DPContainer
 		{
 			MathRootStyleSheet s = (MathRootStyleSheet)styleSheet;
 			
-			layoutBox.setRequisitionY( child.refreshRequisitionY() );
-			layoutBox.borderY( s.getBarSpacing() + s.getThickness(), 0.0 );
+			layoutReqBox.setRequisitionY( child.refreshRequisitionY() );
+			layoutReqBox.borderY( s.getBarSpacing() + s.getThickness(), 0.0 );
 		}
 		else
 		{
-			layoutBox.clearRequisitionY();
+			layoutReqBox.clearRequisitionY();
 		}
 	}
 	
@@ -179,9 +179,9 @@ public class DPMathRoot extends DPContainer
 		{
 			MathRootStyleSheet s = (MathRootStyleSheet)styleSheet;
 
-			double prevWidth = child.layoutBox.getAllocationX();
+			double prevWidth = child.getAllocationX();
 			double offset = s.getGlyphWidth();
-			layoutBox.allocateChildX( child.layoutBox, offset, layoutBox.getAllocationX() - offset );
+			layoutAllocBox.allocateChildX( child.layoutAllocBox, offset, getAllocationX() - offset );
 			child.refreshAllocationX( prevWidth );
 		}
 	}
@@ -192,9 +192,9 @@ public class DPMathRoot extends DPContainer
 		{
 			MathRootStyleSheet s = (MathRootStyleSheet)styleSheet;
 
-			double prevHeight = child.layoutBox.getAllocationY();
+			double prevHeight = child.getAllocationY();
 			double offset = s.getBarSpacing() + s.getThickness();
-			layoutBox.allocateChildY( child.layoutBox, offset, layoutBox.getAllocationY() - offset );
+			layoutAllocBox.allocateChildY( child.layoutAllocBox, offset, getAllocationY() - offset );
 			child.refreshAllocationY( prevHeight );
 		}
 	}

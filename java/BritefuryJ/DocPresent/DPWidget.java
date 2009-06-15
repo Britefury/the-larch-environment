@@ -19,7 +19,8 @@ import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Event.PointerScrollEvent;
 import BritefuryJ.DocPresent.Input.PointerInterface;
-import BritefuryJ.DocPresent.Layout.LBox;
+import BritefuryJ.DocPresent.Layout.LAllocBox;
+import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Layout.PackingParams;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleSheets.WidgetStyleSheet;
@@ -117,7 +118,8 @@ abstract public class DPWidget
 	protected DPContainer parent;
 	protected DPPresentationArea presentationArea;
 	protected boolean bRealised, bResizeQueued, bSizeUpToDate;
-	protected LBox layoutBox;
+	protected LReqBox layoutReqBox;
+	protected LAllocBox layoutAllocBox;
 	protected PackingParams parentPacking;
 	
 	protected ArrayList<Runnable> waitingImmediateEvents;			// only initialised when non-empty; otherwise null
@@ -152,7 +154,8 @@ abstract public class DPWidget
 	public DPWidget(WidgetStyleSheet styleSheet)
 	{
 		this.styleSheet = styleSheet;
-		layoutBox = new LBox( this );
+		layoutReqBox = new LReqBox();
+		layoutAllocBox = new LAllocBox( this );
 		parentPacking = null;
 		waitingImmediateEvents = null;
 		pointersWithinBounds = null;
@@ -198,17 +201,27 @@ abstract public class DPWidget
 	
 	public Point2 getPositionInParentSpace()
 	{
-		return layoutBox.getPositionInParentSpace();
+		return layoutAllocBox.getPositionInParentSpace();
+	}
+	
+	public double getAllocationX()
+	{
+		return layoutAllocBox.getAllocationX();
+	}
+	
+	public double getAllocationY()
+	{
+		return layoutAllocBox.getAllocationY();
 	}
 	
 	public Vector2 getAllocation()
 	{
-		return layoutBox.getAllocation();
+		return layoutAllocBox.getAllocation();
 	}
 	
 	public Vector2 getAllocationInParentSpace()
 	{
-		return layoutBox.getAllocation();
+		return layoutAllocBox.getAllocation();
 	}
 	
 	
@@ -887,12 +900,12 @@ abstract public class DPWidget
 	
 	protected void clip(Graphics2D graphics)
 	{
-		graphics.clip( new Rectangle2D.Double( 0.0, 0.0, layoutBox.getAllocationX(), layoutBox.getAllocationY() ) );
+		graphics.clip( new Rectangle2D.Double( 0.0, 0.0, getAllocationX(), getAllocationY() ) );
 	}
 
 	protected void clipIfAllocationInsufficient(Graphics2D graphics)
 	{
-		if ( layoutBox.getAllocationX()  <  layoutBox.getMinWidth()  ||  layoutBox.getAllocationY()  <  layoutBox.getReqHeight() )
+		if ( getAllocationX()  <  layoutReqBox.getMinWidth()  ||  getAllocationY()  <  layoutReqBox.getReqHeight() )
 		{
 			clip( graphics );
 		}
@@ -1053,28 +1066,28 @@ abstract public class DPWidget
 	
 	
 	
-	protected LBox refreshRequisitionX()
+	protected LReqBox refreshRequisitionX()
 	{
 		if ( !bSizeUpToDate )
 		{
 			updateRequisitionX();
 		}
-		return layoutBox;
+		return layoutReqBox;
 	}
 	
-	protected LBox refreshRequisitionY()
+	protected LReqBox refreshRequisitionY()
 	{
 		if ( !bSizeUpToDate )
 		{
 			updateRequisitionY();
 		}
-		return layoutBox;
+		return layoutReqBox;
 	}
 	
 	
 	protected void refreshAllocationX(double prevWidth)
 	{
-		if ( !bSizeUpToDate  ||  layoutBox.getAllocationX() != prevWidth )
+		if ( !bSizeUpToDate  ||  layoutAllocBox.getAllocationX() != prevWidth )
 		{
 			updateAllocationX();
 			bSizeUpToDate = false;
@@ -1083,7 +1096,7 @@ abstract public class DPWidget
 	
 	protected void refreshAllocationY(double prevHeight)
 	{
-		if ( !bSizeUpToDate  ||  layoutBox.getAllocationY() != prevHeight )
+		if ( !bSizeUpToDate  ||  layoutAllocBox.getAllocationY() != prevHeight )
 		{
 			updateAllocationY();
 		}
@@ -1114,7 +1127,7 @@ abstract public class DPWidget
 	
 	protected Point2 getCursorPosition()
 	{
-		return new Point2( layoutBox.getAllocationX() * 0.5, layoutBox.getAllocationY() * 0.5 );
+		return new Point2( getAllocationX() * 0.5, getAllocationY() * 0.5 );
 	}
 	
 	

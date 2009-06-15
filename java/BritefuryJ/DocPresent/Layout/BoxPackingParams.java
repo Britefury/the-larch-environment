@@ -24,6 +24,6 @@ public class BoxPackingParams extends PackingParams
 	public BoxPackingParams(double padding, boolean bExpand)
 	{
 		this.padding = padding;
-		this.packFlags = LBox.packFlags( bExpand );
+		this.packFlags = LReqBox.packFlags( bExpand );
 	}
 }
