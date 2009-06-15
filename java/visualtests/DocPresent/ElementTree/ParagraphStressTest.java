@@ -13,13 +13,13 @@ import java.util.ArrayList;
 
 import javax.swing.JFrame;
 
-import BritefuryJ.DocPresent.DPParagraph;
-import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.ElementTree.Element;
 import BritefuryJ.DocPresent.ElementTree.LineBreakElement;
 import BritefuryJ.DocPresent.ElementTree.ParagraphElement;
 import BritefuryJ.DocPresent.ElementTree.TextElement;
 import BritefuryJ.DocPresent.ElementTree.VBoxElement;
+import BritefuryJ.DocPresent.Layout.HAlignment;
+import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
@@ -55,7 +55,7 @@ public class ParagraphStressTest extends ElementTreeTestBase
 			}
 		}
 		
-		ParagraphStyleSheet p0 = new ParagraphStyleSheet( DPParagraph.Alignment.BASELINES, 0.0, 0.0, indentation );
+		ParagraphStyleSheet p0 = new ParagraphStyleSheet( VAlignment.BASELINES, 0.0, 0.0, 0.0, indentation );
 		ParagraphElement para = new ParagraphElement( p0 ); 
 		
 		para.setChildren( ch );
@@ -66,7 +66,7 @@ public class ParagraphStressTest extends ElementTreeTestBase
 	
 	protected Element createContentNode()
 	{
-		VBoxStyleSheet boxs = new VBoxStyleSheet( DPVBox.Typesetting.NONE, DPVBox.Alignment.LEFT, 0.0, false, 0.0 );
+		VBoxStyleSheet boxs = new VBoxStyleSheet( HAlignment.LEFT, 0.0, false, 0.0 );
 		VBoxElement box = new VBoxElement( boxs );
 		ArrayList<Element> children = new ArrayList<Element>();
 		
