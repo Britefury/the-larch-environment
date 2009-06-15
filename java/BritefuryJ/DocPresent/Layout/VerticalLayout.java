@@ -69,16 +69,17 @@ public class VerticalLayout
 
 	public static void allocateX(LBox box, LBox children[], HAlignment alignment)
 	{
-		double allocation = Math.max( box.allocationX, box.minWidth );
+		double allocation = box.allocationX;
 		for (LBox child: children)
 		{
+			double childAllocation = Math.max( allocation, child.minWidth );
 			if ( alignment == HAlignment.EXPAND )
 			{
-				box.allocateChildX( child, 0.0, allocation );
+				box.allocateChildX( child, 0.0, childAllocation );
 			}
 			else
 			{
-				double childWidth = Math.min( allocation, child.prefWidth );
+				double childWidth = Math.min( childAllocation, child.prefWidth );
 				
 				if ( alignment == HAlignment.LEFT )
 				{
@@ -86,11 +87,11 @@ public class VerticalLayout
 				}
 				else if ( alignment == HAlignment.CENTRE )
 				{
-					box.allocateChildX( child, ( allocation - childWidth )  *  0.5, childWidth );
+					box.allocateChildX( child, ( childAllocation - childWidth )  *  0.5, childWidth );
 				}
 				else if ( alignment == HAlignment.RIGHT )
 				{
-					box.allocateChildX( child, allocation - childWidth, childWidth );
+					box.allocateChildX( child, childAllocation - childWidth, childWidth );
 				}
 				else
 				{

@@ -221,10 +221,6 @@ public class ParagraphLayout
 				
 				// Build a list of child boxes for the line
 				int lineLength = lineBreakIndex - lineStartIndex;
-				if ( lineLength < 1 )
-				{
-					System.out.println( "ParagraphLayout.allocateX(): i=" + i + ", lineBreakIndex=" + lineBreakIndex + ", lineStartIndex=" + lineStartIndex + ", bestLineBreakIndex=" + bestLineBreakIndex + ", lastLineBreakIndex=" + lastLineBreakIndex );
-				}
 				LBox lineChildren[] = new LBox[lineLength];
 				System.arraycopy( children, lineStartIndex, lineChildren, 0, lineLength );
 				BoxPackingParams linePackingParams[] =  null;

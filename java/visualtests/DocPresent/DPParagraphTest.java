@@ -56,6 +56,10 @@ public class DPParagraphTest
 				b.setChild( space );
 				nodesOut.add( b );
 			}
+			else
+			{
+				nodesOut.add( new DPText( " " ) );
+			}
 		}
 		return nodesOut;
 	}
