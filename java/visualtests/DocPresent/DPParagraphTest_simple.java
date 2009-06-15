@@ -21,6 +21,8 @@ import BritefuryJ.DocPresent.DPPresentationArea;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.Layout.HAlignment;
+import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
@@ -73,15 +75,15 @@ public class DPParagraphTest_simple
 		ArrayList<DPWidget> c1 = makeTexts( "INDENTED" );
 		c1 = addLineBreaks( c1, 1 );
 		
-		ParagraphStyleSheet b0s = new ParagraphStyleSheet( DPParagraph.Alignment.BASELINES, 10.0, 0.0, 0.0 );
+		ParagraphStyleSheet b0s = new ParagraphStyleSheet( VAlignment.BASELINES, 10.0, 0.0, 0.0, 0.0 );
 		DPParagraph b0 = new DPParagraph( b0s );
 		b0.extend( c0 );
 		
-		ParagraphStyleSheet b1s = new ParagraphStyleSheet( DPParagraph.Alignment.BASELINES, 10.0, 0.0, 30.0 );
+		ParagraphStyleSheet b1s = new ParagraphStyleSheet( VAlignment.BASELINES, 10.0, 0.0, 0.0, 30.0 );
 		DPParagraph b1 = new DPParagraph( b1s );
 		b1.extend( c1 );
 		
-		VBoxStyleSheet boxS = new VBoxStyleSheet( DPVBox.Typesetting.NONE, DPVBox.Alignment.EXPAND, 20.0, false, 0.0 );
+		VBoxStyleSheet boxS = new VBoxStyleSheet( HAlignment.EXPAND, 20.0, false, 0.0 );
 		DPVBox box = new DPVBox( boxS );
 		box.append( b0 );
 		box.append( b1 );

@@ -16,6 +16,7 @@ import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Border.EmptyBorder;
 import BritefuryJ.DocPresent.ElementTree.Marker.ElementMarker;
+import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
 public abstract class BranchElement extends Element
@@ -313,7 +314,7 @@ public abstract class BranchElement extends Element
 	//
 	
 	static EmptyBorder metaIndentBorder = new EmptyBorder( 25.0, 0.0, 0.0, 0.0 );
-	static VBoxStyleSheet metaVBoxStyle = new VBoxStyleSheet( DPVBox.Typesetting.ALIGN_WITH_BOTTOM, DPVBox.Alignment.LEFT, 0.0, false, 0.0 );
+	static VBoxStyleSheet metaVBoxStyle = new VBoxStyleSheet( HAlignment.LEFT, 0.0, false, 0.0 );
 	
 	public DPBorder getMetaHeaderBorderWidget()
 	{

@@ -7,13 +7,12 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-import java.lang.Math;
 import java.util.List;
 
-import BritefuryJ.DocPresent.Metrics.HMetrics;
-import BritefuryJ.DocPresent.Metrics.Metrics;
-import BritefuryJ.DocPresent.Metrics.VMetrics;
-import BritefuryJ.DocPresent.Metrics.VMetricsTypeset;
+import BritefuryJ.DocPresent.Layout.BoxPackingParams;
+import BritefuryJ.DocPresent.Layout.HAlignment;
+import BritefuryJ.DocPresent.Layout.LBox;
+import BritefuryJ.DocPresent.Layout.VerticalLayout;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 import BritefuryJ.Math.Point2;
 
@@ -22,10 +21,6 @@ import BritefuryJ.Math.Point2;
 
 public class DPVBox extends DPAbstractBox
 {
-	public enum Alignment { LEFT, CENTRE, RIGHT, EXPAND };
-	public enum Typesetting { NONE, ALIGN_WITH_TOP, ALIGN_WITH_BOTTOM };
-	
-	
 	public static class InvalidTypesettingException extends RuntimeException
 	{
 		private static final long serialVersionUID = 1L;
@@ -50,14 +45,14 @@ public class DPVBox extends DPAbstractBox
 	public void append(DPWidget child,  boolean bExpand, double padding)
 	{
 		append( child );
-		child.setParentPacking( new BoxParentPacking( bExpand, padding ) );
+		child.setParentPacking( new BoxPackingParams( padding, bExpand ) );
 	}
 
 	
 	public void insert(int index, DPWidget child, boolean bExpand, double padding)
 	{
 		insert( index, child );
-		child.setParentPacking( new BoxParentPacking( bExpand, padding ) );
+		child.setParentPacking( new BoxPackingParams( padding, bExpand ) );
 	}
 	
 	
@@ -108,176 +103,68 @@ public class DPVBox extends DPAbstractBox
 	
 
 	
-	private VMetrics computeVMetricsTypesetting(VMetrics[] childVMetrics, double height, double vspacing)
+	
+	
+	protected void updateRequisitionX()
 	{
-		VMetrics topMetrics = childVMetrics[0], bottomMetrics = childVMetrics[childVMetrics.length-1];
-
-		Typesetting typesetting = getTypesetting();
-		if ( typesetting == Typesetting.NONE )
+		LBox[] childBoxes = new LBox[registeredChildren.size()];
+		for (int i = 0; i < registeredChildren.size(); i++)
 		{
-			return new VMetrics( height, vspacing );
+			childBoxes[i] = registeredChildren.get( i ).refreshRequisitionX();
 		}
-		else
+
+		VerticalLayout.computeRequisitionX( layoutBox, childBoxes );
+	}
+
+	protected void updateRequisitionY()
+	{
+		LBox[] childBoxes = new LBox[registeredChildren.size()];
+		BoxPackingParams[] packingParams = new BoxPackingParams[registeredChildren.size()];
+		for (int i = 0; i < registeredChildren.size(); i++)
 		{
-			// Need the metrics for the top and bottom entries
-			VMetricsTypeset topTSMetrics = null, bottomTSMetrics = null;
-			
-			if ( topMetrics.isTypeset() )
-			{
-				topTSMetrics = (VMetricsTypeset)topMetrics;
-			}
-
-			if ( bottomMetrics.isTypeset() )
-			{
-				bottomTSMetrics = (VMetricsTypeset)bottomMetrics;
-			}
-
-			if ( typesetting == Typesetting.ALIGN_WITH_TOP )
-			{
-				if ( topTSMetrics != null )
-				{
-					return new VMetricsTypeset( topTSMetrics.ascent, height - topTSMetrics.ascent, vspacing );
-				}
-				else
-				{
-					return new VMetricsTypeset( topMetrics.height, height - topMetrics.height, vspacing );
-				}
-			}
-			else if ( typesetting == Typesetting.ALIGN_WITH_BOTTOM )
-			{
-				if ( bottomTSMetrics != null )
-				{
-					return new VMetricsTypeset( height - bottomTSMetrics.descent, bottomTSMetrics.descent, vspacing );
-				}
-				else
-				{
-					return new VMetricsTypeset( height, 0.0, vspacing );
-				}
-			}
+			childBoxes[i] = registeredChildren.get( i ).refreshRequisitionY();
+			packingParams[i] = (BoxPackingParams)registeredChildren.get( i ).getParentPacking();
 		}
+
+		VerticalLayout.computeRequisitionY( layoutBox, childBoxes, getSpacing(), packingParams );
+	}
+
+	
+
+	
+	
+	protected void updateAllocationX()
+	{
+		super.updateAllocationX( );
 		
-		throw new InvalidTypesettingException();
-	}
-
-
-	
-	private VMetrics combineVMetrics(VMetrics[] childVMetrics)
-	{
-		if ( childVMetrics.length == 0 )
-		{
-			return new VMetrics();
-		}
-		else
-		{
-			double spacing = getSpacing();
-			
-			// Accumulate the height required for all the children
-			double height = 0.0;
-			double y = 0.0;
-			for (int i = 0; i < childVMetrics.length; i++)
-			{
-				VMetrics chm = childVMetrics[i];
-				
-				if ( i != childVMetrics.length - 1)
-				{
-					chm = chm.minSpacing( spacing );
-				}
-				
-				height = y + chm.height  +  getChildPadding( i ) * 2.0;
-				y = height + chm.vspacing;
-			}
-			
-			//return computeVMetricsTypesetting( childVMetrics, height, y - height );
-			VMetrics vm = computeVMetricsTypesetting( childVMetrics, height, y - height );
-			return vm;
-		}
-	}
-
-	
-
-	
-	
-	protected HMetrics computeMinimumHMetrics()
-	{
-		return HMetrics.max( getChildrenRefreshedMinimumHMetrics() );
-	}
-
-	protected HMetrics computePreferredHMetrics()
-	{
-		return HMetrics.max( getChildrenRefreshedPreferredHMetrics() );
-	}
-
-	
-	protected VMetrics computeMinimumVMetrics()
-	{
-		return combineVMetrics( getChildrenRefreshedMinimumVMetrics() );
-	}
-
-	protected VMetrics computePreferredVMetrics()
-	{
-		return combineVMetrics( getChildrenRefreshedPreferredVMetrics() );
-	}
-
-
-	
-
-	
-	
-	protected void allocateContentsX(double allocation)
-	{
-		super.allocateContentsX( allocation );
+		LBox childBoxes[] = getChildrenLayoutBoxes();
+		double prevWidths[] = getChildrenAllocationX();
 		
-		Alignment alignment = getAlignment();
-
+		VerticalLayout.allocateX( layoutBox, childBoxes, getAlignment() );
+		
+		int i = 0;
 		for (DPWidget child: registeredChildren)
 		{
-			double childWidth = Math.min( child.prefH.width, allocation );
-			if ( alignment == Alignment.LEFT )
-			{
-				allocateChildX( child, 0.0, childWidth );
-			}
-			else if ( alignment == Alignment.CENTRE )
-			{
-				allocateChildX( child, ( allocation - childWidth )  *  0.5, childWidth );
-			}
-			else if ( alignment == Alignment.RIGHT )
-			{
-				allocateChildX( child, allocation - childWidth, childWidth );
-			}
-			else if ( alignment == Alignment.EXPAND )
-			{
-				allocateChildX( child, 0.0, allocation );
-			}
+			child.refreshAllocationX( prevWidths[i] );
+			i++;
 		}
 	}
 
-	protected void allocateContentsY(double allocation)
+	protected void updateAllocationY()
 	{
-		super.allocateContentsY( allocation );
+		super.updateAllocationY( );
 		
-		double spacing = getSpacing();
+		LBox childBoxes[] = getChildrenLayoutBoxes();
+		double prevHeights[] = getChildrenAllocationY();
+		BoxPackingParams packing[] = (BoxPackingParams[])getChildrenPackingParams( new BoxPackingParams[registeredChildren.size()] );
 		
-		double paddingAndSpacing = getTotalSpaceForPadding() + getTotalSpaceForSpacing();
-		Metrics[] allocated = VMetrics.allocateSpacePacked( getChildrenMinimumVMetrics(), getChildrenPreferredVMetrics(), getChildrenPackFlags(), allocation - paddingAndSpacing );
+		VerticalLayout.allocateY( layoutBox, childBoxes, getSpacing(), packing );
 		
-		double height = 0.0;
-		double y = 0.0;
-		for (int i = 0; i < allocated.length; i++)
+		int i = 0;
+		for (DPWidget child: registeredChildren)
 		{
-			VMetrics chm = (VMetrics)allocated[i];
-			
-			if ( i != allocated.length - 1)
-			{
-				chm = chm.minSpacing( spacing );
-			}
-			
-			double childPadding = getChildPadding( i );
-			double childY = y + childPadding;
-			
-			allocateChildY( registeredChildren.get( i ), childY, chm.height );
-			
-			height = y + chm.height + childPadding * 2.0;
-			y = height + chm.vspacing;
+			child.refreshAllocationY( prevHeights[i] );
+			i++;
 		}
 	}
 	
@@ -310,12 +197,7 @@ public class DPVBox extends DPAbstractBox
 	
 	
 	
-	protected Typesetting getTypesetting()
-	{
-		return ((VBoxStyleSheet)styleSheet).getTypesetting();
-	}
-
-	protected Alignment getAlignment()
+	protected HAlignment getAlignment()
 	{
 		return ((VBoxStyleSheet)styleSheet).getAlignment();
 	}

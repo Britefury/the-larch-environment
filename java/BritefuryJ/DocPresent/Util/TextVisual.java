@@ -30,9 +30,7 @@ import javax.swing.JComponent;
 import javax.swing.text.Segment;
 
 import BritefuryJ.DocPresent.DPPresentationArea;
-import BritefuryJ.DocPresent.Metrics.HMetrics;
-import BritefuryJ.DocPresent.Metrics.VMetrics;
-import BritefuryJ.DocPresent.Metrics.VMetricsTypeset;
+import BritefuryJ.DocPresent.Layout.LBox;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Utils.HashUtils;
 
@@ -299,8 +297,7 @@ public class TextVisual
 	private Font font;
 	private boolean bMixedSizeCaps;
 	private boolean bRealised;
-	private HMetrics hmetrics;
-	private VMetrics vmetrics;
+	private double reqWidth, reqHSpacing, reqAscent, reqDescent, reqVSpacing;
 	
 
 	
@@ -310,8 +307,7 @@ public class TextVisual
 		this.text = text;
 		this.font = font;
 		this.bMixedSizeCaps = bMixedSizeCaps;
-		this.hmetrics = new HMetrics();
-		this.vmetrics = new VMetricsTypeset();
+		reqWidth = reqHSpacing = reqAscent = reqDescent = reqVSpacing = 0.0;
 	}
 	
 	
@@ -323,16 +319,15 @@ public class TextVisual
 	
 	
 	
-	public HMetrics getHMetrics()
+	public void setBoxRequisitionX(LBox box)
 	{
-		return hmetrics;
+		box.setRequisitionX( reqWidth, reqHSpacing );
 	}
 	
-	public VMetrics getVMetrics()
+	public void setBoxRequisitionY(LBox box)
 	{
-		return vmetrics;
+		box.setRequisitionY( reqAscent, reqDescent, reqVSpacing );
 	}
-	
 	
 	
 	public void realise(DPPresentationArea a)
@@ -361,8 +356,12 @@ public class TextVisual
 
 				double width = layout.getBounds().getWidth();
 				double ascent = layout.getAscent(), descent = layout.getDescent();
-				hmetrics = new HMetrics( width, layout.getAdvance() - width );
-				vmetrics = new VMetricsTypeset( layout.getAscent(), layout.getDescent(), layout.getLeading() );
+				
+				reqWidth = width;
+				reqHSpacing = layout.getAdvance() - width;
+				reqAscent = layout.getAscent();
+				reqDescent = layout.getDescent();
+				reqVSpacing = layout.getLeading();
 				
 				// Squiggle shape
 				squiggleUnderlineShape = new Path2D.Double();
@@ -384,8 +383,10 @@ public class TextVisual
 				FontRenderContext frc = graphics.getFontRenderContext();
 				LineMetrics lineMetrics = font.getLineMetrics( "", frc );
 				
-				hmetrics = new HMetrics();
-				vmetrics = new VMetricsTypeset( lineMetrics.getAscent(), lineMetrics.getDescent(), lineMetrics.getLeading() );
+				reqWidth = reqHSpacing = 0.0;
+				reqAscent = lineMetrics.getAscent();
+				reqDescent = lineMetrics.getDescent();
+				reqVSpacing = lineMetrics.getLeading();
 				
 				squiggleUnderlineShape = null;
 			}

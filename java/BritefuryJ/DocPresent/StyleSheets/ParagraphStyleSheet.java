@@ -7,35 +7,36 @@
 //##************************
 package BritefuryJ.DocPresent.StyleSheets;
 
-import BritefuryJ.DocPresent.DPParagraph;
+import BritefuryJ.DocPresent.Layout.VAlignment;
 
 public class ParagraphStyleSheet extends ContainerStyleSheet
 {
 	public static ParagraphStyleSheet defaultStyleSheet = new ParagraphStyleSheet();
 	
 	
-	private double spacing, padding, indentation;
-	private DPParagraph.Alignment alignment;
+	private double spacing, vSpacing, padding, indentation;
+	private VAlignment alignment;
 	
 	
 	public ParagraphStyleSheet()
 	{
-		this( DPParagraph.Alignment.BASELINES, 0.0, 0.0, 0.0 );
+		this( VAlignment.BASELINES, 0.0, 0.0, 0.0, 0.0 );
 	}
 	
-	public ParagraphStyleSheet(DPParagraph.Alignment alignment, double spacing, double padding, double indentation)
+	public ParagraphStyleSheet(VAlignment alignment, double spacing, double vSpacing, double padding, double indentation)
 	{
 		super();
 		
 		this.alignment = alignment;
 		this.spacing = spacing;
+		this.vSpacing = vSpacing;
 		this.padding = padding;
 		this.indentation = indentation;
 	}
 	
 	
 	
-	public DPParagraph.Alignment getAlignment()
+	public VAlignment getAlignment()
 	{
 		return alignment;
 	}
@@ -43,6 +44,11 @@ public class ParagraphStyleSheet extends ContainerStyleSheet
 	public double getSpacing()
 	{
 		return spacing;
+	}
+
+	public double getVSpacing()
+	{
+		return vSpacing;
 	}
 
 	public double getPadding()

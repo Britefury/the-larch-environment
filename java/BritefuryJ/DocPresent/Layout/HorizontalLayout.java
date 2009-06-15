@@ -109,10 +109,10 @@ public class HorizontalLayout
 			double reqAdvance = 0.0;
 			for (LBox child: children)
 			{
-				double childMinHeight = child.getReqHeight();
-				double childMinAdvance = childMinHeight + child.reqVSpacing;
-				reqHeight = Math.max( reqHeight, childMinHeight );
-				reqAdvance = Math.max( reqAdvance, childMinAdvance );
+				double childReqHeight = child.getReqHeight();
+				double childReqAdvance = childReqHeight + child.reqVSpacing;
+				reqHeight = Math.max( reqHeight, childReqHeight );
+				reqAdvance = Math.max( reqAdvance, childReqAdvance );
 			}
 			
 			box.setRequisitionY( reqHeight, reqAdvance - reqHeight );

@@ -7,11 +7,6 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-import java.util.List;
-
-import BritefuryJ.DocPresent.Metrics.HMetrics;
-import BritefuryJ.DocPresent.Metrics.Metrics;
-import BritefuryJ.DocPresent.Metrics.VMetrics;
 import BritefuryJ.DocPresent.StyleSheets.AbstractBoxStyleSheet;
 
 
@@ -22,24 +17,6 @@ abstract public class DPAbstractBox extends DPContainerSequence
 	{
 		private static final long serialVersionUID = 1L;
 	}
-
-
-	protected static class BoxParentPacking extends ParentPacking
-	{
-		public int packFlags;
-		public double padding;
-		
-		public BoxParentPacking(boolean bExpand, double padding)
-		{
-			this.packFlags = Metrics.packFlags( bExpand );
-			this.padding = padding;
-		}
-	}
-
-	
-	
-	HMetrics childrenHMetrics;
-	VMetrics childrenVMetrics;
 
 	
 	
@@ -56,49 +33,6 @@ abstract public class DPAbstractBox extends DPContainerSequence
 
 	
 	
-
-	protected int[] getChildrenPackFlags(List<DPWidget> nodes)
-	{
-		int[] chm = new int[nodes.size()];
-		for (int i = 0; i < nodes.size(); i++)
-		{
-			ParentPacking packing = nodes.get( i ).getParentPacking();
-			chm[i] = packing != null  ?  ((BoxParentPacking)packing).packFlags  :  Metrics.packFlags( getExpand() );  
-		}
-		return chm;
-	}
-
-	protected int[] getChildrenPackFlags()
-	{
-		return getChildrenPackFlags( registeredChildren );
-	}
-
-
-
-	protected double getChildPadding(int index)
-	{
-		ParentPacking packing = registeredChildren.get( index ).getParentPacking();
-		return packing != null  ?  ((BoxParentPacking)packing).padding  :  getPadding();  
-	}
-	
-	
-	protected double getTotalSpaceForPadding()
-	{
-		double paddingSpace = 0.0;
-		for (DPWidget child: registeredChildren)
-		{
-			ParentPacking packing = child.getParentPacking();
-			double padding = packing != null  ?  ((BoxParentPacking)packing).padding  :  getPadding();
-			paddingSpace += padding * 2.0;
-		}
-		return paddingSpace;
-	}
-	
-	protected double getTotalSpaceForSpacing()
-	{
-		return getSpacing() * Math.max( registeredChildren.size() - 1, 0 );
-	}
-
 
 
 

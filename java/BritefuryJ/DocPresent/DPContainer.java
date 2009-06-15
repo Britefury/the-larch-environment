@@ -18,6 +18,7 @@ import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Event.PointerScrollEvent;
 import BritefuryJ.DocPresent.Input.PointerInterface;
+import BritefuryJ.DocPresent.Layout.PackingParams;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 import BritefuryJ.Math.AABox2;
@@ -110,16 +111,6 @@ public abstract class DPContainer extends DPWidget
 	}
 	
 
-	protected void refreshScale(double scale)
-	{
-		super.refreshScale( scale );
-		
-		for (DPWidget child: registeredChildren)
-		{
-			child.setScale( 1.0 );
-		}
-	}
-	
 	
 	
 	
@@ -127,7 +118,7 @@ public abstract class DPContainer extends DPWidget
 	// Child registration methods
 	//
 	
-	protected DPWidget registerChild(DPWidget child, ParentPacking packing)
+	protected DPWidget registerChild(DPWidget child, PackingParams packing)
 	{
 		child.unparent();
 		
@@ -283,27 +274,6 @@ public abstract class DPContainer extends DPWidget
 	{
 		onChildResizeRequest( child );
 	}
-	
-	
-	
-	
-	protected void allocateChildX(DPWidget child, double localPosX, double localWidth)
-	{
-		double childWidth = localWidth / child.scale;
-		child.allocateX( childWidth );
-		
-		child.positionInParentSpaceX = localPosX;
-	}
-	
-	protected void allocateChildY(DPWidget child, double localPosY, double localHeight)
-	{
-		double childHeight = localHeight / child.scale;
-		child.allocateY( childHeight );
-		
-		child.positionInParentSpaceY = localPosY;
-	}
-	
-	
 	
 	
 	
@@ -476,7 +446,7 @@ public abstract class DPContainer extends DPWidget
 				DPWidget savedPressGrabChild = pressGrabChild;
 				pressGrabChild = null;
 				
-				if ( localPos.x >= 0.0  &&  localPos.x <= allocationX  &&  localPos.y >= 0.0  &&  localPos.y <= allocationY )
+				if ( localPos.x >= 0.0  &&  localPos.x <= layoutBox.getAllocationX()  &&  localPos.y >= 0.0  &&  localPos.y <= layoutBox.getAllocationY() )
 				{
 					DPWidget child = getChildAtLocalPoint( localPos );
 					if ( child != null )

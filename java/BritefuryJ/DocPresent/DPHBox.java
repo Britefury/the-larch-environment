@@ -7,13 +7,12 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-import java.lang.Math;
 import java.util.List;
 
-import BritefuryJ.DocPresent.Metrics.HMetrics;
-import BritefuryJ.DocPresent.Metrics.Metrics;
-import BritefuryJ.DocPresent.Metrics.VMetrics;
-import BritefuryJ.DocPresent.Metrics.VMetricsTypeset;
+import BritefuryJ.DocPresent.Layout.BoxPackingParams;
+import BritefuryJ.DocPresent.Layout.HorizontalLayout;
+import BritefuryJ.DocPresent.Layout.LBox;
+import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
 import BritefuryJ.Math.Point2;
 
@@ -21,10 +20,6 @@ import BritefuryJ.Math.Point2;
 
 public class DPHBox extends DPAbstractBox
 {
-	public enum Alignment { TOP, CENTRE, BOTTOM, EXPAND, BASELINES };
-	
-	
-	
 	public DPHBox()
 	{
 		this( HBoxStyleSheet.defaultStyleSheet );
@@ -41,14 +36,14 @@ public class DPHBox extends DPAbstractBox
 	public void append(DPWidget child,  boolean bExpand, double padding)
 	{
 		append( child );
-		child.setParentPacking( new BoxParentPacking( bExpand, padding ) );
+		child.setParentPacking( new BoxPackingParams( padding, bExpand ) );
 	}
 
 	
 	public void insert(int index, DPWidget child, boolean bExpand, double padding)
 	{
 		insert( index, child );
-		child.setParentPacking( new BoxParentPacking( bExpand, padding ) );
+		child.setParentPacking( new BoxPackingParams( padding, bExpand ) );
 	}
 	
 	
@@ -99,200 +94,68 @@ public class DPHBox extends DPAbstractBox
 
 	
 	
-	private HMetrics combineHMetricsHorizontally(HMetrics[] childHMetrics)
+	
+	protected void updateRequisitionX()
 	{
-		if ( childHMetrics.length == 0 )
+		LBox[] childBoxes = new LBox[registeredChildren.size()];
+		BoxPackingParams[] packingParams = new BoxPackingParams[registeredChildren.size()];
+		for (int i = 0; i < registeredChildren.size(); i++)
 		{
-			return new HMetrics();
+			childBoxes[i] = registeredChildren.get( i ).refreshRequisitionX();
+			packingParams[i] = (BoxPackingParams)registeredChildren.get( i ).getParentPacking();
 		}
-		else
+
+		HorizontalLayout.computeRequisitionX( layoutBox, childBoxes, getSpacing(), packingParams );
+	}
+
+	protected void updateRequisitionY()
+	{
+		LBox[] childBoxes = new LBox[registeredChildren.size()];
+		for (int i = 0; i < registeredChildren.size(); i++)
 		{
-			double spacing = getSpacing();
-			// Accumulate the width required for all the children
-			double width = 0.0;
-			double x = 0.0;
-			for (int i = 0; i < childHMetrics.length; i++)
-			{
-				HMetrics chm = childHMetrics[i];
-				
-				if ( i != childHMetrics.length - 1 )
-				{
-					chm = chm.minSpacing( spacing );
-				}
-				
-				width = x + chm.width  +  getChildPadding( i ) * 2.0;
-				x = width + chm.hspacing;
-			}
-			
-			return new HMetrics( width, x - width );
+			childBoxes[i] = registeredChildren.get( i ).refreshRequisitionY();
 		}
+
+		HorizontalLayout.computeRequisitionY( layoutBox, childBoxes, getAlignment() );
 	}
 	
 
-	private VMetrics combineVMetricsHorizontally(VMetrics[] childVMetrics)
-	{
-		if ( childVMetrics.length == 0 )
-		{
-			return new VMetrics();
-		}
-		else
-		{
-			Alignment alignment = getAlignment();
-			if ( alignment == Alignment.BASELINES )
-			{
-				double ascent = 0.0, descent = 0.0;
-				double descentAndSpacing = 0.0;
-				for (int i = 0; i < childVMetrics.length; i++)
-				{
-					VMetrics chm = childVMetrics[i];
-					double chAscent, chDescent;
-					if ( chm.isTypeset() )
-					{
-						VMetricsTypeset tchm = (VMetricsTypeset)chm;
-						chAscent = tchm.ascent;
-						chDescent = tchm.descent;
-					}
-					else
-					{
-						chAscent = chm.height * 0.5  -  NON_TYPESET_CHILD_BASELINE_OFFSET;
-						chDescent = chm.height * 0.5  +  NON_TYPESET_CHILD_BASELINE_OFFSET;
-					}
-					ascent = Math.max( ascent, chAscent );
-					descent = Math.max( descent, chDescent );
-					double chDescentAndSpacing = chDescent + chm.vspacing;
-					descentAndSpacing = Math.max( descentAndSpacing, chDescentAndSpacing );
-				}
-				
-				return new VMetricsTypeset( ascent, descent, descentAndSpacing - descent );
-			}
-			else
-			{
-				double height = 0.0;
-				double advance = 0.0;
-				for (int i = 0; i < childVMetrics.length; i++)
-				{
-					VMetrics chm = childVMetrics[i];
-					double chAdvance = chm.height + chm.vspacing;
-					height = Math.max( height, chm.height );
-					advance = Math.max( advance, chAdvance );
-				}
-				
-				
-				return new VMetrics( height, advance - height );
-			}
-		}
-	}
-
-	
-	
-	protected HMetrics computeMinimumHMetrics()
-	{
-		return combineHMetricsHorizontally( getChildrenRefreshedMinimumHMetrics() );
-	}
-
-	protected HMetrics computePreferredHMetrics()
-	{
-		return combineHMetricsHorizontally( getChildrenRefreshedPreferredHMetrics() );
-	}
-
-	
-	protected VMetrics computeMinimumVMetrics()
-	{
-		return combineVMetricsHorizontally( getChildrenRefreshedMinimumVMetrics() );
-	}
-
-	protected VMetrics computePreferredVMetrics()
-	{
-		return combineVMetricsHorizontally( getChildrenRefreshedPreferredVMetrics() );
-	}
-
-
 	
 
-	protected void allocateContentsX(double allocation)
+	protected void updateAllocationX()
 	{
-		super.allocateContentsX( allocation );
+		super.updateAllocationX();
 		
-		double paddingAndSpacing = getTotalSpaceForPadding() + getTotalSpaceForSpacing();
-		Metrics[] allocated = Metrics.allocateSpacePacked( getChildrenMinimumHMetrics(), getChildrenPreferredHMetrics(), getChildrenPackFlags(), allocation - paddingAndSpacing );
+		LBox childBoxes[] = getChildrenLayoutBoxes();
+		double prevWidths[] = getChildrenAllocationX();
+		BoxPackingParams packing[] = (BoxPackingParams[])getChildrenPackingParams( new BoxPackingParams[registeredChildren.size()] );
 		
-		double spacing = getSpacing();
-		double width = 0.0;
-		double x = 0.0;
-		for (int i = 0; i < allocated.length; i++)
+		HorizontalLayout.allocateX( layoutBox, childBoxes, getSpacing(), packing );
+		
+		int i = 0;
+		for (DPWidget child: registeredChildren)
 		{
-			HMetrics chm = (HMetrics)allocated[i];
-			
-			if ( i != allocated.length - 1)
-			{
-				chm = chm.minSpacing( spacing );
-			}
-
-			double childPadding = getChildPadding( i );
-			double childX = x + childPadding;
-			
-			allocateChildX( registeredChildren.get( i ), childX, chm.width );
-
-			width = x + chm.width + childPadding * 2.0;
-			x = width + chm.hspacing;
+			child.refreshAllocationX( prevWidths[i] );
+			i++;
 		}
 	}
 	
 	
 	
-	protected void allocateContentsY(double allocation)
+	protected void updateAllocationY()
 	{
-		super.allocateContentsY( allocation );
+		super.updateAllocationY();
 		
-		Alignment alignment = getAlignment();
-		if ( alignment == Alignment.BASELINES )
+		LBox childBoxes[] = getChildrenLayoutBoxes();
+		double prevHeights[] = getChildrenAllocationY();
+		
+		HorizontalLayout.allocateY( layoutBox, childBoxes, getAlignment() );
+		
+		int i = 0;
+		for (DPWidget child: registeredChildren)
 		{
-			VMetricsTypeset vmt = (VMetricsTypeset)prefV;
-			
-			double delta = allocation - vmt.height;
-			double y = vmt.ascent + delta * 0.5;
-			
-			for (DPWidget child: registeredChildren)
-			{
-				double chAscent;
-				VMetrics chm = child.prefV;
-				if ( chm.isTypeset() )
-				{
-					VMetricsTypeset tchm = (VMetricsTypeset)chm;
-					chAscent = tchm.ascent;
-				}
-				else
-				{
-					chAscent = chm.height * 0.5  -  NON_TYPESET_CHILD_BASELINE_OFFSET;
-				}
-
-				double childY = Math.max( y - chAscent, 0.0 );
-				double childHeight = Math.min( chm.height, allocation );
-				allocateChildY( child, childY, childHeight );
-			}
-		}
-		else
-		{
-			for (DPWidget child: registeredChildren)
-			{
-				double childHeight = Math.min( child.prefV.height, allocation );
-				if ( alignment == Alignment.TOP )
-				{
-					allocateChildY( child, 0.0, childHeight );
-				}
-				else if ( alignment == Alignment.CENTRE )
-				{
-					allocateChildY( child, ( allocation - childHeight ) * 0.5, childHeight );
-				}
-				else if ( alignment == Alignment.BOTTOM )
-				{
-					allocateChildY( child, allocation - childHeight, childHeight );
-				}
-				else if ( alignment == Alignment.EXPAND )
-				{
-					allocateChildY( child, 0.0, allocation );
-				}
-			}
+			child.refreshAllocationY( prevHeights[i] );
+			i++;
 		}
 	}
 	
@@ -316,7 +179,7 @@ public class DPHBox extends DPAbstractBox
 	}
 	
 	
-	protected Alignment getAlignment()
+	protected VAlignment getAlignment()
 	{
 		return ((HBoxStyleSheet)styleSheet).getAlignment();
 	}

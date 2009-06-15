@@ -7,22 +7,22 @@
 //##************************
 package BritefuryJ.DocPresent.StyleSheets;
 
-import BritefuryJ.DocPresent.DPHBox;
+import BritefuryJ.DocPresent.Layout.VAlignment;
 
 public class HBoxStyleSheet extends AbstractBoxStyleSheet
 {
 	public static HBoxStyleSheet defaultStyleSheet = new HBoxStyleSheet();
 	
 	
-	protected DPHBox.Alignment alignment;
+	protected VAlignment alignment;
 
 
 	public HBoxStyleSheet()
 	{
-		this( DPHBox.Alignment.CENTRE, 0.0, false, 0.0 );
+		this( VAlignment.CENTRE, 0.0, false, 0.0 );
 	}
 	
-	public HBoxStyleSheet(DPHBox.Alignment alignment, double spacing, boolean bExpand, double padding)
+	public HBoxStyleSheet(VAlignment alignment, double spacing, boolean bExpand, double padding)
 	{
 		super( spacing, bExpand, padding );
 		
@@ -30,7 +30,7 @@ public class HBoxStyleSheet extends AbstractBoxStyleSheet
 	}
 
 	
-	public DPHBox.Alignment getAlignment()
+	public VAlignment getAlignment()
 	{
 		return alignment;
 	}

@@ -6,6 +6,11 @@
 //##************************
 package BritefuryJ.DocPresent.Layout;
 
+import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.Math.Point2;
+import BritefuryJ.Math.Vector2;
+
+
 
 public class LBox
 {
@@ -15,8 +20,7 @@ public class LBox
 	
 	
 	
-	
-	protected double scale;
+	protected DPWidget element;
 	protected double minWidth, prefWidth, minHSpacing, prefHSpacing;
 	protected double reqAscent, reqDescent, reqVSpacing;
 	
@@ -29,16 +33,16 @@ public class LBox
 	protected int lineBreakCost;
 	
 	
-	public LBox()
+	public LBox(DPWidget element)
 	{
-		scale = 1.0;
+		this.element = element;
 		bHasBaseline = false;
 		lineBreakCost = -1;
 	}
 	
-	public LBox(double width, double hSpacing, double height, double vSpacing)
+	public LBox(DPWidget element, double width, double hSpacing, double height, double vSpacing)
 	{
-		scale = 1.0;
+		this.element = element;
 		minWidth = prefWidth = width;
 		minHSpacing = prefHSpacing = hSpacing;
 		reqAscent = height;
@@ -47,9 +51,9 @@ public class LBox
 		lineBreakCost = -1;
 	}
 	
-	public LBox(double width, double hSpacing, double ascent, double descent, double vSpacing)
+	public LBox(DPWidget element, double width, double hSpacing, double ascent, double descent, double vSpacing)
 	{
-		scale = 1.0;
+		this.element = element;
 		minWidth = prefWidth = width;
 		minHSpacing = prefHSpacing = hSpacing;
 		reqAscent = ascent;
@@ -59,9 +63,9 @@ public class LBox
 		lineBreakCost = -1;
 	}
 
-	public LBox(double minWidth, double prefWidth, double minHSpacing, double prefHSpacing, double height, double vSpacing)
+	public LBox(DPWidget element, double minWidth, double prefWidth, double minHSpacing, double prefHSpacing, double height, double vSpacing)
 	{
-		scale = 1.0;
+		this.element = element;
 		this.minWidth = minWidth;
 		this.prefWidth = prefWidth;
 		this.minHSpacing = minHSpacing;
@@ -72,9 +76,9 @@ public class LBox
 		lineBreakCost = -1;
 	}
 
-	public LBox(double minWidth, double prefWidth, double minHSpacing, double prefHSpacing, double ascent, double descent, double vSpacing)
+	public LBox(DPWidget element, double minWidth, double prefWidth, double minHSpacing, double prefHSpacing, double ascent, double descent, double vSpacing)
 	{
-		scale = 1.0;
+		this.element = element;
 		this.minWidth = minWidth;
 		this.prefWidth = prefWidth;
 		this.minHSpacing = minHSpacing;
@@ -87,9 +91,9 @@ public class LBox
 	}
 	
 	
-	private LBox(LBox box)
+	private LBox(DPWidget element, LBox box)
 	{
-		scale = 1.0;
+		this.element = element;
 		minWidth = box.minWidth;
 		prefWidth = box.prefWidth;
 		minHSpacing = box.minHSpacing;
@@ -102,13 +106,29 @@ public class LBox
 		lineBreakCost = box.lineBreakCost;
 	}
 	
-
-	public double getScale()
+	private LBox(DPWidget element, LBox box, double scale)
 	{
-		return scale;
+		this.element = element;
+		minWidth = box.minWidth * scale;
+		prefWidth = box.prefWidth * scale;
+		minHSpacing = box.minHSpacing * scale;
+		prefHSpacing = box.prefHSpacing * scale;
+		reqAscent = box.reqAscent * scale;
+		reqDescent = box.reqDescent * scale;
+		reqVSpacing = box.reqVSpacing * scale;
+		bHasBaseline = box.bHasBaseline;
+		bLineBreak = box.bLineBreak;
+		lineBreakCost = box.lineBreakCost;
 	}
 	
 	
+	
+	public DPWidget getElement()
+	{
+		return element;
+	}
+	
+
 	public double getMinWidth()
 	{
 		return minWidth;
@@ -168,7 +188,11 @@ public class LBox
 		return positionInParentSpaceY;
 	}
 	
-
+	public Point2 getPositionInParentSpace()
+	{
+		return new Point2( positionInParentSpaceX, positionInParentSpaceY );
+	}
+	
 	public double getAllocationX()
 	{
 		return allocationX;
@@ -179,6 +203,11 @@ public class LBox
 		return allocationY;
 	}
 	
+	public Vector2 getAllocation()
+	{
+		return new Vector2( allocationX, allocationY );
+	}
+
 
 	
 	
@@ -186,7 +215,6 @@ public class LBox
 	
 	public void clear()
 	{
-		scale = 1.0;
 		minWidth = prefWidth = minHSpacing = prefHSpacing = 0.0;
 		reqAscent = reqDescent = reqVSpacing = 0.0;
 		bHasBaseline = false;
@@ -219,6 +247,14 @@ public class LBox
 		this.prefHSpacing = prefHSpacing;
 	}
 	
+	public void setRequisitionX(LBox box)
+	{
+		this.minWidth = box.minWidth; 
+		this.prefWidth = box.prefWidth;
+		this.minHSpacing = box.minHSpacing; 
+		this.prefHSpacing = box.prefHSpacing;
+	}
+	
 	
 
 	public void setRequisitionY(double height, double vSpacing)
@@ -237,6 +273,14 @@ public class LBox
 		bHasBaseline = true;
 	}
 	
+	public void setRequisitionY(LBox box)
+	{
+		reqAscent = box.reqAscent;
+		reqDescent = box.reqDescent;
+		reqVSpacing = box.reqVSpacing;
+		bHasBaseline = box.bHasBaseline;
+	}
+	
 	
 	public void maxRequisitionX(LBox box)
 	{
@@ -248,6 +292,14 @@ public class LBox
 	}
 	
 	
+	
+	
+	public void setLineBreakCost(int cost)
+	{
+		lineBreakCost = cost;
+		bLineBreak = true;
+	}
+
 	
 
 	
@@ -273,7 +325,7 @@ public class LBox
 	}
 	
 
-	public void setAllocationFrom(LBox box)
+	public void setAllocation(LBox box)
 	{
 		allocationX = box.allocationX;
 		allocationY = box.allocationY;
@@ -282,27 +334,40 @@ public class LBox
 	}
 	
 	
-	protected void allocateChildX(LBox child, double localPosX, double localWidth)
+	public void allocateChildX(LBox child, double localPosX, double localWidth)
 	{
-		child.allocationX = localWidth / child.scale;
+		child.allocationX = localWidth;
 		child.positionInParentSpaceX = localPosX;
 	}
 	
-	protected void allocateChildY(LBox child, double localPosY, double localHeight)
+	public void allocateChildY(LBox child, double localPosY, double localHeight)
 	{
-		child.allocationY = localHeight / child.scale;
+		child.allocationY = localHeight;
 		child.positionInParentSpaceY = localPosY;
+	}
+	
+	
+	public void allocateChildX(LBox child)
+	{
+		child.allocationX = allocationX;
+		child.positionInParentSpaceX = 0.0;
+	}
+	
+	public void allocateChildY(LBox child)
+	{
+		child.allocationY = allocationY;
+		child.positionInParentSpaceY = 0.0;
 	}
 	
 	
 	protected void allocateChildSpaceX(LBox child, double localWidth)
 	{
-		child.allocationX = localWidth / child.scale;
+		child.allocationX = localWidth;
 	}
 	
 	protected void allocateChildSpaceY(LBox child, double localHeight)
 	{
-		child.allocationY = localHeight / child.scale;
+		child.allocationY = localHeight;
 	}
 	
 	
@@ -317,6 +382,35 @@ public class LBox
 	}
 	
 	
+	public void scaleAllocationX(double scale)
+	{
+		allocationX *= scale;
+	}
+	
+	
+	public void borderX(double leftMargin, double rightMargin)
+	{
+		minWidth += leftMargin + rightMargin;
+		prefWidth += leftMargin + rightMargin;
+		minHSpacing = Math.max( minHSpacing - rightMargin, 0.0 );
+		prefHSpacing = Math.max( prefHSpacing - rightMargin, 0.0 );
+	}
+	
+	public void borderY(double topMargin, double bottomMargin)
+	{
+		if ( bHasBaseline )
+		{
+			reqAscent += topMargin;
+			reqDescent += bottomMargin;
+			reqVSpacing = Math.max( reqVSpacing - bottomMargin, 0.0 );
+		}
+		else
+		{
+			reqAscent += topMargin + bottomMargin;
+			reqVSpacing = Math.max( reqVSpacing - bottomMargin, 0.0 );
+		}
+	}
+	
 	public boolean equals(Object x)
 	{
 		if ( x == this )
@@ -328,8 +422,7 @@ public class LBox
 		{
 			LBox b = (LBox)x;
 			
-			return scale == b.scale  &&
-					minWidth == b.minWidth  &&  prefWidth == b.prefWidth  &&  minHSpacing == b.minHSpacing  &&  prefHSpacing == b.prefHSpacing  &&
+			return minWidth == b.minWidth  &&  prefWidth == b.prefWidth  &&  minHSpacing == b.minHSpacing  &&  prefHSpacing == b.prefHSpacing  &&
 					reqAscent == b.reqAscent  &&  reqDescent == b.reqDescent  &&  reqVSpacing == b.reqVSpacing  &&  bHasBaseline == b.bHasBaseline  &&
 					positionInParentSpaceX == b.positionInParentSpaceX  &&  positionInParentSpaceY == b.positionInParentSpaceY  &&  
 					allocationX == b.allocationX  &&  allocationY == b.allocationY;
@@ -374,16 +467,21 @@ public class LBox
 	
 	
 	
-	public LBox copy()
+	public LBox copy(DPWidget element)
 	{
-		return new LBox( this );
+		return new LBox( element, this );
+	}
+	
+	public LBox scaled(DPWidget element, double scale)
+	{
+		return new LBox( element, this, scale );
 	}
 	
 	
 	
-	public LBox lineBreakBox(int cost)
+	public LBox lineBreakBox(DPWidget element, int cost)
 	{
-		LBox b = new LBox( this );
+		LBox b = new LBox( element, this );
 		b.bLineBreak = true;
 		b.lineBreakCost = cost;
 		return b;

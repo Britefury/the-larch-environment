@@ -7,15 +7,12 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-import java.lang.Math;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import BritefuryJ.DocPresent.Metrics.HMetrics;
-import BritefuryJ.DocPresent.Metrics.Metrics;
-import BritefuryJ.DocPresent.Metrics.VMetrics;
-import BritefuryJ.DocPresent.Metrics.VMetricsTypeset;
+import BritefuryJ.DocPresent.Layout.BoxPackingParams;
+import BritefuryJ.DocPresent.Layout.LBox;
+import BritefuryJ.DocPresent.Layout.ParagraphLayout;
+import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
 import BritefuryJ.Math.Point2;
 
@@ -23,168 +20,15 @@ import BritefuryJ.Math.Point2;
 
 public class DPParagraph extends DPContainerSequence
 {
-	public enum Alignment { TOP, CENTRE, BOTTOM, EXPAND, BASELINES };
-
-	
 	public static class CouldNotFindInsertionPointException extends RuntimeException
 	{
 		private static final long serialVersionUID = 1L;
 	}
 
 
-	protected static class ParagraphParentPacking extends ParentPacking
-	{
-		public double padding;
-		
-		public ParagraphParentPacking(double padding)
-		{
-			this.padding = padding;
-		}
-	}
 
 	
-	private static class Line
-	{
-		public DPWidget children[];
-		public VMetrics minV, prefV;
-		public double posY, sizeY;
-		
-		
-		public Line(DPWidget children[])
-		{
-			this.children = children;
-		}
-
-	
-		
-		private void allocateX(DPParagraph paragraph, double lineX, double allocation)
-		{
-			double spacing = paragraph.getSpacing();
-
-			List<DPWidget> childrenAsList = Arrays.asList( children );
-			double paddingAndSpacing = paragraph.getTotalSpaceForPadding( childrenAsList )  +  paragraph.getTotalSpaceForSpacing( childrenAsList );
-			Metrics[] allocated = HMetrics.allocateSpacePacked( getChildrenMinimumHMetrics( childrenAsList ), getChildrenPreferredHMetrics( childrenAsList ), null, allocation - paddingAndSpacing );
-			
-			double width = 0.0;
-			double x = lineX;
-			for (int i = 0; i < allocated.length; i++)
-			{
-				HMetrics chm = (HMetrics)allocated[i];
-				
-				if ( i != allocated.length - 1)
-				{
-					chm = chm.minSpacing( spacing );
-				}
-				
-				DPWidget child = children[i];
-				double padding = paragraph.getChildPadding( child );
-
-				double childX = x + padding;
-				
-				paragraph.allocateChildX( child, childX, chm.width );
-
-				width = x + chm.width + padding * 2.0;
-				x = width + chm.hspacing;
-			}
-		}
-
-		private void allocateY(DPParagraph paragraph, double lineY, double lineAllocation)
-		{
-			Alignment alignment = paragraph.getAlignment();
-			
-			posY = lineY;
-			sizeY = lineAllocation;
-			
-			if ( alignment == Alignment.BASELINES )
-			{
-				VMetricsTypeset vmt = (VMetricsTypeset)prefV;
-				
-				double delta = lineAllocation - vmt.height;
-				double y = lineY + vmt.ascent + delta * 0.5;
-				
-				for (DPWidget child: children)
-				{
-					double chAscent;
-					VMetrics chm = child.prefV;
-					if ( chm.isTypeset() )
-					{
-						VMetricsTypeset tchm = (VMetricsTypeset)chm;
-						chAscent = tchm.ascent;
-					}
-					else
-					{
-						chAscent = chm.height * 0.5  -  NON_TYPESET_CHILD_BASELINE_OFFSET;
-					}
-
-					double childY = Math.max( y - chAscent, 0.0 );
-					double childHeight = Math.min( chm.height, lineAllocation );
-					paragraph.allocateChildY( child, childY, childHeight );
-				}
-			}
-			else
-			{
-				for (DPWidget child: children)
-				{
-					double childHeight = Math.min( child.prefV.height, lineAllocation );
-					if ( alignment == Alignment.TOP )
-					{
-						paragraph.allocateChildY( child, 0.0, childHeight );
-					}
-					else if ( alignment == Alignment.CENTRE )
-					{
-						paragraph.allocateChildY( child, ( lineAllocation - childHeight ) * 0.5, childHeight );
-					}
-					else if ( alignment == Alignment.BOTTOM )
-					{
-						paragraph.allocateChildY( child, lineAllocation - childHeight, childHeight );
-					}
-					else if ( alignment == Alignment.EXPAND )
-					{
-						paragraph.allocateChildY( child, 0.0, lineAllocation );
-					}
-				}
-			}
-		}
-		
-		
-
-		private DPWidget getChildClosestToLocalPoint(Point2 localPos, WidgetFilter filter)
-		{
-			if ( children.length == 0 )
-			{
-				return null;
-			}
-			else if ( children.length == 1 )
-			{
-				return children[0];
-			}
-			else
-			{
-				DPWidget childI = children[0];
-				for (int i = 0; i < children.length - 1; i++)
-				{
-					DPWidget childJ = children[i+1];
-					double iUpperX = childI.getPositionInParentSpace().x + childI.getAllocationInParentSpace().x;
-					double jLowerX = childJ.getPositionInParentSpace().x;
-					
-					double midX = ( iUpperX + jLowerX ) * 0.5;
-					
-					if ( localPos.x < midX )
-					{
-						return childI;
-					}
-					
-					childI = childJ;
-				}
-				
-				return children[children.length-1];
-			}
-		}
-	}
-
-	
-	
-	private Line lines[];
+	private ParagraphLayout.Line lines[];
 
 	
 	
@@ -197,7 +41,7 @@ public class DPParagraph extends DPContainerSequence
 	{
 		super( styleSheet );
 		
-		lines = new Line[0];
+		lines = new ParagraphLayout.Line[0];
 	}
 
 
@@ -250,369 +94,85 @@ public class DPParagraph extends DPContainerSequence
 
 	
 	
-	private HMetrics combineHMetricsHorizontally(List<DPWidget> childList, double initialX, HMetrics[] childHMetrics)
+	protected void updateRequisitionX()
 	{
-		if ( childHMetrics.length == 0 )
-		{
-			return new HMetrics();
-		}
-		else
-		{
-			double spacing = getSpacing();
-			
-			if ( childHMetrics.length == 1  &&  spacing < childHMetrics[0].hspacing )
-			{
-				return childHMetrics[0];
-			}
-			else
-			{
-				// Accumulate the width required for all the children
-				double width = 0.0;
-				double x = initialX;
-				for (int i = 0; i < childHMetrics.length; i++)
-				{
-					DPWidget child = childList.get( i );
-					double padding = getChildPadding( child );
-					HMetrics chm = childHMetrics[i];
-					
-					if ( i != childHMetrics.length - 1)
-					{
-						chm = chm.minSpacing( spacing );
-					}
-					
-					width = x + chm.width  +  padding * 2.0;
-					x = width + chm.hspacing;
-				}
-				
-				return new HMetrics( width, x - width );
-			}
-		}
-	}
-	
-
-	private VMetrics combineVMetricsHorizontally(VMetrics[] childVMetrics)
-	{
-		if ( childVMetrics.length == 0 )
-		{
-			return new VMetrics();
-		}
-		else if ( childVMetrics.length == 1 )
-		{
-			return childVMetrics[0];
-		}
-		else
-		{
-			Alignment alignment = getAlignment();
-			if ( alignment == Alignment.BASELINES )
-			{
-				double ascent = 0.0, descent = 0.0;
-				double descentAndSpacing = 0.0;
-				for (int i = 0; i < childVMetrics.length; i++)
-				{
-					VMetrics chm = childVMetrics[i];
-					double chAscent, chDescent;
-					if ( chm.isTypeset() )
-					{
-						VMetricsTypeset tchm = (VMetricsTypeset)chm;
-						chAscent = tchm.ascent;
-						chDescent = tchm.descent;
-					}
-					else
-					{
-						chAscent = chm.height * 0.5  -  NON_TYPESET_CHILD_BASELINE_OFFSET;
-						chDescent = chm.height * 0.5  +  NON_TYPESET_CHILD_BASELINE_OFFSET;
-					}
-					ascent = Math.max( ascent, chAscent );
-					descent = Math.max( descent, chDescent );
-					double chDescentAndSpacing = chDescent + chm.vspacing;
-					descentAndSpacing = Math.max( descentAndSpacing, chDescentAndSpacing );
-				}
-				
-				return new VMetricsTypeset( ascent, descent, descentAndSpacing - descent );
-			}
-			else
-			{
-				double height = 0.0;
-				double advance = 0.0;
-				for (int i = 0; i < childVMetrics.length; i++)
-				{
-					VMetrics chm = childVMetrics[i];
-					double chAdvance = chm.height + chm.vspacing;
-					height = Math.max( height, chm.height );
-					advance = Math.max( advance, chAdvance );
-				}
-				
-				
-				return new VMetrics( height, advance - height );
-			}
-		}
-	}
-	
-	private VMetrics combineVMetricsVertically(VMetrics[] childVMetrics)
-	{
-		if ( childVMetrics.length == 0 )
-		{
-			return new VMetrics();
-		}
-		else if ( childVMetrics.length == 1 )
-		{
-			return childVMetrics[0];
-		}
-		else
-		{
-			// Accumulate the height required for all the children
-			double height = 0.0;
-			double y = 0.0;
-			for (int i = 0; i < childVMetrics.length; i++)
-			{
-				VMetrics chm = childVMetrics[i];
-				
-				height = y + chm.height;
-				y = height + chm.vspacing;
-			}
-			
-			return new VMetrics( height, y - height );
-		}
-	}
-
-	
-	
-	protected HMetrics computeMinimumHMetrics()
-	{
-		if ( registeredChildren.size() == 0 )
-		{
-			return new HMetrics();
-		}
-		else
-		{
-			double spacing = getSpacing();
-			double indentation = getIndentation();
-
-			// To compute the minimum required h-metrics, assume all line breaks are used.
-			
-			// Overall width and advance
-			double width = 0.0;
-			double advance = 0.0;
-			
-			// Width and advance for a line
-			double lineWidth = 0.0;
-			double lineX = 0.0;
-			
-			for (int i = 0; i < registeredChildren.size(); i++)
-			{
-				DPWidget child = registeredChildren.get( i );
-				if ( child.getLineBreakInterface() != null )
-				{
-					width = Math.max( width, lineWidth );
-					advance = Math.max( advance, lineX );
-					
-					// new line; start X and indentation
-					lineWidth = 0.0;
-					lineX = indentation;
-				}
-				else
-				{
-					double padding = getChildPadding( child );
-					HMetrics chm = child.refreshMinimumHMetrics();
-					
-					// Take spacing into account
-					if ( i != registeredChildren.size() - 1)
-					{
-						// Spacing not appended to last child
-						
-						if ( registeredChildren.get( i+1 ).getLineBreakInterface() != null )
-						{
-							// Spacing not applied before a line break
-							chm = chm.minSpacing( spacing );
-						}
-					}
-					
-					lineWidth = lineX + chm.width  +  padding * 2.0;
-					lineX = lineWidth + chm.hspacing;
-				}
-			}
-			
-			return new HMetrics( width, advance - width );
-		}
-	}
-
-	protected HMetrics computePreferredHMetrics()
-	{
-		return combineHMetricsHorizontally( registeredChildren, 0.0, getChildrenRefreshedPreferredHMetrics() );
-	}
-	
-	
-	
-	
-	protected VMetrics computeMinimumVMetrics()
-	{
-		VMetrics[] lineMetrics = new VMetrics[lines.length];
-		for (int i = 0; i < lines.length; i++)
-		{
-			Line line = lines[i];
-			line.minV = combineVMetricsHorizontally( getChildrenRefreshedMinimumVMetrics( Arrays.asList( line.children ) ) );
-			lineMetrics[i] = line.minV;
-		}
-		return combineVMetricsVertically( lineMetrics );
-	}
-
-	protected VMetrics computePreferredVMetrics()
-	{
-		VMetrics[] lineMetrics = new VMetrics[lines.length];
-		for (int i = 0; i < lines.length; i++)
-		{
-			Line line = lines[i];
-			line.prefV = combineVMetricsHorizontally( getChildrenRefreshedPreferredVMetrics( Arrays.asList( line.children ) ) );
-			lineMetrics[i] = line.prefV;
-		}
-		return combineVMetricsVertically( lineMetrics );
-	}
-
-	
-	
-	private void splitIntoLines(double allocation)
-	{
-		double spacing = getSpacing();
-		double indentation = getIndentation();
-
-		// Width and advance for a line
-		int lineStartIndex = 0;
-		double lineWidth = 0.0;
-		double lineX = 0.0;
-		DPWidget bestLineBreakWidget = null;
-		LineBreakInterface bestLineBreakInterface = null;
-		int bestLineBreakIndex = -1;
-		
-		ArrayList<Line> lineList = new ArrayList<Line>();
-		
+		LBox[] childBoxes = new LBox[registeredChildren.size()];
+		BoxPackingParams[] packingParams = new BoxPackingParams[registeredChildren.size()];
 		for (int i = 0; i < registeredChildren.size(); i++)
 		{
-			// Get the child
-			DPWidget child = registeredChildren.get( i );
-			double padding = getChildPadding( child );
-			LineBreakInterface lineBreak = child.getLineBreakInterface();
-			if ( lineBreak != null )
-			{
-				// Keep track of the best line break candidate
-				if ( bestLineBreakWidget == null  ||  bestLineBreakInterface.getLineBreakPriority()  <=  lineBreak.getLineBreakPriority() )
-				{
-					bestLineBreakWidget = child;
-					bestLineBreakInterface = lineBreak;
-					bestLineBreakIndex = i;
-				}
-			}
-			
-			
-			// Accumulate width; use preferred size
-			HMetrics chm = child.prefH;
-			
-			// Take spacing into account
-			if ( i != registeredChildren.size() - 1)
-			{
-				// Spacing not applied before a line break
-				chm = chm.minSpacing( spacing );
-			}
-			
-			lineWidth = lineX + chm.width  +  padding * 2.0;
-			lineX = lineWidth + chm.hspacing;
-			
-			
-			// A line break is required if the @lineWidth has gone over @allocation
-			if ( lineWidth > allocation  &&  bestLineBreakWidget != null )
-			{
-				if ( bestLineBreakIndex > lineStartIndex )
-				{
-					// Build a new line
-					DPWidget lineChildren[] = new DPWidget[bestLineBreakIndex + 1 - lineStartIndex];
-					lineChildren = registeredChildren.subList( lineStartIndex, bestLineBreakIndex +1 ).toArray( lineChildren );
-					lineList.add( new Line( lineChildren ) );
-				}
-				
-				// We want the for-loop to return to the break position
-				i = bestLineBreakIndex;		// @i will be @lineBestBreakIndex at the beginning of the next loop
+			childBoxes[i] = registeredChildren.get( i ).refreshRequisitionX();
+			packingParams[i] = (BoxPackingParams)registeredChildren.get( i ).getParentPacking();
+		}
 
-				// Start the next line
-				lineStartIndex = bestLineBreakIndex + 1;
-				lineWidth = 0.0;
-				lineX = indentation;
-				bestLineBreakWidget = null;
-				bestLineBreakIndex = -1;
-			}
-		}
-	
-		if ( registeredChildren.size() > lineStartIndex )
-		{
-			// Build a new line
-			DPWidget lineChildren[] = new DPWidget[registeredChildren.size() - lineStartIndex];
-			lineChildren = registeredChildren.subList( lineStartIndex, registeredChildren.size() ).toArray( lineChildren );
-			lineList.add( new Line( lineChildren ) );
-		}
-		
-		lines = new Line[lineList.size()];
-		lines = lineList.toArray( lines );
+		ParagraphLayout.computeRequisitionX( layoutBox, childBoxes, getIndentation(), getSpacing(), packingParams );
 	}
 
-	
-	
-	
-	protected void allocateContentsX(double allocation)
+	protected void updateRequisitionY()
 	{
-		super.allocateContentsX( allocation );
-
-		double indentation = getIndentation();
-		
-		
-		// Stage 1:
-		// Split the list of child nodes into lines
-		splitIntoLines( allocation );
-		
-		
-		// Stage 2:
-		// Allocate each line
-		boolean bFirst = true;
-		for (Line line: lines)
+		for (int y = 0; y < lines.length; y++)
 		{
-			line.allocateX( this, bFirst ? 0.0 : indentation, allocation );
-			bFirst = false;
+			LBox[] lineChildren = lines[y].getChildBoxes();
+			for (int x = 0; x < lineChildren.length; x++)
+			{
+				lineChildren[x].getElement().refreshRequisitionY();
+			}
 		}
+
+		ParagraphLayout.computeRequisitionY( layoutBox, lines, getVSpacing(), getAlignment() );
 	}
 	
-	
-	
 
-	protected void allocateContentsY(double allocation)
+	
+	protected void updateAllocationX()
 	{
-		super.allocateContentsY( allocation );
+		super.updateAllocationX();
 		
-		// Allocate the lines, vertically
-		VMetrics[] linesMinV = new VMetrics[lines.length];
-		VMetrics[] linesPrefV = new VMetrics[lines.length];
+		LBox childBoxes[] = getChildrenLayoutBoxes();
+		double prevWidths[] = getChildrenAllocationX();
+		BoxPackingParams packing[] = (BoxPackingParams[])getChildrenPackingParams( new BoxPackingParams[registeredChildren.size()] );
 		
-		for (int i = 0; i < lines.length; i++)
+		lines = ParagraphLayout.allocateX( layoutBox, childBoxes, getIndentation(), getSpacing(), packing );
+		
+		int i = 0;
+		for (DPWidget child: registeredChildren)
 		{
-			Line line = lines[i];
-			linesMinV[i] = line.minV;
-			linesPrefV[i] = line.prefV;
-		}
-		
-		Metrics[] allocated = VMetrics.allocateSpacePacked( linesMinV, linesPrefV, null, allocation );
-		
-		double height = 0.0;
-		double y = 0.0;
-		for (int i = 0; i < allocated.length; i++)
-		{
-			VMetrics chm = (VMetrics)allocated[i];
-			
-			lines[i].allocateY( this, y, chm.height );
-
-			height = y + chm.height;
-			y = height + chm.vspacing;
+			child.refreshAllocationX( prevWidths[i] );
+			i++;
 		}
 	}
 	
 	
 	
-	private Line getLineClosestToLocalPoint(Point2 localPos)
+	protected void updateAllocationY()
+	{
+		super.updateAllocationY();
+		
+		double prevHeights[][] = new double[lines.length][];
+		for (int y = 0; y < lines.length; y++)
+		{
+			LBox[] lineChildren = lines[y].getChildBoxes();
+			prevHeights[y] = new double[lineChildren.length];
+			for (int x = 0; x < lineChildren.length; x++)
+			{
+				prevHeights[y][x] = lineChildren[x].getAllocationY();
+			}
+		}
+		
+		ParagraphLayout.allocateY( layoutBox, lines, getSpacing(), getAlignment() );
+		
+		for (int y = 0; y < lines.length; y++)
+		{
+			LBox[] lineChildren = lines[y].getChildBoxes();
+			for (int x = 0; x < lineChildren.length; x++)
+			{
+				lineChildren[x].getElement().refreshAllocationY( prevHeights[y][x] );
+			}
+		}
+	}
+	
+
+	
+	private ParagraphLayout.Line getLineClosestToLocalPoint(Point2 localPos)
 	{
 		if ( lines.length == 0 )
 		{
@@ -624,12 +184,12 @@ public class DPParagraph extends DPContainerSequence
 		}
 		else
 		{
-			Line lineI = lines[0];
+			ParagraphLayout.Line lineI = lines[0];
 			for (int i = 0; i < lines.length - 1; i++)
 			{
-				Line lineJ = lines[i+1];
-				double iUpperY = lineI.posY + lineI.sizeY;
-				double jLowerY = lineJ.posY;
+				ParagraphLayout.Line lineJ = lines[i+1];
+				double iUpperY = lineI.getLineBox().getPositionInParentSpaceY() + lineI.getLineBox().getAllocationY();
+				double jLowerY = lineJ.getLineBox().getPositionInParentSpaceY();
 				
 				double midY = ( iUpperY + jLowerY ) * 0.5;
 				
@@ -645,13 +205,47 @@ public class DPParagraph extends DPContainerSequence
 		}
 	}
 
+	private DPWidget getLineChildClosestToLocalPoint(ParagraphLayout.Line line, Point2 localPos)
+	{
+		LBox children[] = line.getChildBoxes();
+		if ( children.length == 0 )
+		{
+			return null;
+		}
+		else if ( children.length == 1 )
+		{
+			return children[0].getElement();
+		}
+		else
+		{
+			LBox childI = children[0];
+			for (int i = 0; i < children.length - 1; i++)
+			{
+				LBox childJ = children[i+1];
+				double iUpperX = childI.getPositionInParentSpaceX() + childI.getAllocationX();
+				double jLowerX = childJ.getPositionInParentSpaceX();
+				
+				double midX = ( iUpperX + jLowerX ) * 0.5;
+				
+				if ( localPos.x < midX )
+				{
+					return childI.getElement();
+				}
+				
+				childI = childJ;
+			}
+			
+			return children[children.length-1].getElement();
+		}
+	}
+
 	protected DPWidget getChildLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter)
 	{
-		Line line = getLineClosestToLocalPoint( localPos );
+		ParagraphLayout.Line line = getLineClosestToLocalPoint( localPos );
 		
 		if ( line != null )
 		{
-			DPWidget child = line.getChildClosestToLocalPoint( localPos, filter );
+			DPWidget child = getLineChildClosestToLocalPoint( line, localPos );
 			
 			DPWidget c = getLeafClosestToLocalPointFromChild( child, localPos, filter );
 			
@@ -723,42 +317,11 @@ public class DPParagraph extends DPContainerSequence
 	
 	//
 	//
-	// CHILD PARENT PACKING METHODS
-	//
-	//
-	
-	private double getChildPadding(DPWidget child)
-	{
-		ParentPacking packing = child.getParentPacking();
-		return packing != null  ?  ((ParagraphParentPacking)packing).padding  :  getPadding();
-	}
-	
-	private double getTotalSpaceForPadding(List<DPWidget> nodes)
-	{
-		double paddingSpace = 0.0;
-		for (DPWidget child: nodes)
-		{
-			ParentPacking packing = child.getParentPacking();
-			double padding = packing != null  ?  ((ParagraphParentPacking)packing).padding  :  getPadding();
-			paddingSpace += padding * 2.0;
-		}
-		return paddingSpace;
-	}
-	
-	private double getTotalSpaceForSpacing(List<DPWidget> nodes)
-	{
-		return getSpacing() * Math.max( nodes.size() - 1, 0 );
-	}
-	
-	
-	
-	//
-	//
 	// STYLESHEET METHODS
 	//
 	//
 
-	public Alignment getAlignment()
+	public VAlignment getAlignment()
 	{
 		return ((ParagraphStyleSheet)styleSheet).getAlignment();
 	}
@@ -766,6 +329,11 @@ public class DPParagraph extends DPContainerSequence
 	public double getSpacing()
 	{
 		return ((ParagraphStyleSheet)styleSheet).getSpacing();
+	}
+
+	public double getVSpacing()
+	{
+		return ((ParagraphStyleSheet)styleSheet).getVSpacing();
 	}
 
 	public double getPadding()

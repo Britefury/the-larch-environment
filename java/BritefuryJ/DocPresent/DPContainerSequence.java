@@ -13,8 +13,8 @@ import java.util.List;
 
 import org.python.core.PySlice;
 
-import BritefuryJ.DocPresent.Metrics.HMetrics;
-import BritefuryJ.DocPresent.Metrics.VMetrics;
+import BritefuryJ.DocPresent.Layout.LBox;
+import BritefuryJ.DocPresent.Layout.PackingParams;
 import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 import BritefuryJ.JythonInterface.JythonSlice;
 
@@ -282,138 +282,105 @@ abstract public class DPContainerSequence extends DPContainer
 
 
 
-
-
-
-	HMetrics[] getChildrenRefreshedMinimumHMetrics(List<DPWidget> nodes)
+	LBox[] getChildrenRefreshedRequistionXBoxes(List<DPWidget> nodes)
 	{
-		HMetrics[] chm = new HMetrics[nodes.size()];
+		LBox[] boxes = new LBox[nodes.size()];
 		for (int i = 0; i < nodes.size(); i++)
 		{
-			chm[i] = nodes.get( i ).refreshMinimumHMetrics();
+			boxes[i] = nodes.get( i ).refreshRequisitionX();
 		}
-		return chm;
+		return boxes;
 	}
 
-	HMetrics[] getChildrenRefreshedMinimumHMetrics()
+	LBox[] getChildrenRefreshedRequistionXBoxes()
 	{
-		return getChildrenRefreshedMinimumHMetrics( registeredChildren );
+		return getChildrenRefreshedRequistionXBoxes( registeredChildren );
 	}
 
-	
-	HMetrics[] getChildrenRefreshedPreferredHMetrics(List<DPWidget> nodes)
+
+	LBox[] getChildrenRefreshedRequistionYBoxes(List<DPWidget> nodes)
 	{
-		HMetrics[] chm = new HMetrics[nodes.size()];
+		LBox[] boxes = new LBox[nodes.size()];
 		for (int i = 0; i < nodes.size(); i++)
 		{
-			chm[i] = nodes.get( i ).refreshPreferredHMetrics();
+			boxes[i] = nodes.get( i ).refreshRequisitionY();
 		}
-		return chm;
+		return boxes;
+	}
+
+	LBox[] getChildrenRefreshedRequistionYBoxes()
+	{
+		return getChildrenRefreshedRequistionYBoxes( registeredChildren );
 	}
 	
-	HMetrics[] getChildrenRefreshedPreferredHMetrics()
+	
+	
+	
+	LBox[] getChildrenLayoutBoxes(List<DPWidget> nodes)
 	{
-		return getChildrenRefreshedPreferredHMetrics( registeredChildren );
-	}
-	
-	
-	
-	VMetrics[] getChildrenRefreshedMinimumVMetrics(List<DPWidget> nodes)
-	{
-		VMetrics[] chm = new VMetrics[nodes.size()];
+		LBox[] boxes = new LBox[nodes.size()];
 		for (int i = 0; i < nodes.size(); i++)
 		{
-			chm[i] = nodes.get( i ).refreshMinimumVMetrics();
+			boxes[i] = nodes.get( i ).layoutBox;
 		}
-		return chm;
+		return boxes;
 	}
 
-	VMetrics[] getChildrenRefreshedMinimumVMetrics()
+	LBox[] getChildrenLayoutBoxes()
 	{
-		return getChildrenRefreshedMinimumVMetrics( registeredChildren );
+		return getChildrenLayoutBoxes( registeredChildren );
 	}
-
 	
-	VMetrics[] getChildrenRefreshedPreferredVMetrics(List<DPWidget> nodes)
+	
+	
+	
+	@SuppressWarnings("unchecked")
+	<T extends PackingParams> T[] getChildrenPackingParams(List<DPWidget> nodes, T packingParams[])
 	{
-		VMetrics[] chm = new VMetrics[nodes.size()];
 		for (int i = 0; i < nodes.size(); i++)
 		{
-			chm[i] = nodes.get( i ).refreshPreferredVMetrics();
+			packingParams[i] = (T)nodes.get( i ).getParentPacking();
 		}
-		return chm;
+		return packingParams;
 	}
 
-	VMetrics[] getChildrenRefreshedPreferredVMetrics()
+	<T extends PackingParams> T[] getChildrenPackingParams(T packingParams[])
 	{
-		return getChildrenRefreshedPreferredVMetrics( registeredChildren );
+		return getChildrenPackingParams( registeredChildren, packingParams );
 	}
-
-
 	
 	
 	
-	static HMetrics[] getChildrenMinimumHMetrics(List<DPWidget> nodes)
+	
+	double[] getChildrenAllocationX(List<DPWidget> nodes)
 	{
-		HMetrics[] chm = new HMetrics[nodes.size()];
+		double[] values = new double[nodes.size()];
 		for (int i = 0; i < nodes.size(); i++)
 		{
-			chm[i] = nodes.get( i ).minH;
+			values[i] = nodes.get( i ).getAllocation().x;
 		}
-		return chm;
+		return values;
 	}
 
-	HMetrics[] getChildrenMinimumHMetrics()
+	double[] getChildrenAllocationX()
 	{
-		return getChildrenMinimumHMetrics( registeredChildren );
+		return getChildrenAllocationX( registeredChildren );
 	}
 
-	
-	static HMetrics[] getChildrenPreferredHMetrics(List<DPWidget> nodes)
+
+
+	double[] getChildrenAllocationY(List<DPWidget> nodes)
 	{
-		HMetrics[] chm = new HMetrics[nodes.size()];
+		double[] values = new double[nodes.size()];
 		for (int i = 0; i < nodes.size(); i++)
 		{
-			chm[i] = nodes.get( i ).prefH;
+			values[i] = nodes.get( i ).getAllocation().y;
 		}
-		return chm;
-	}
-	
-	HMetrics[] getChildrenPreferredHMetrics()
-	{
-		return getChildrenPreferredHMetrics( registeredChildren );
-	}
-	
-	
-	
-	static VMetrics[] getChildrenMinimumVMetrics(List<DPWidget> nodes)
-	{
-		VMetrics[] chm = new VMetrics[nodes.size()];
-		for (int i = 0; i < nodes.size(); i++)
-		{
-			chm[i] = nodes.get( i ).minV;
-		}
-		return chm;
+		return values;
 	}
 
-	VMetrics[] getChildrenMinimumVMetrics()
+	double[] getChildrenAllocationY()
 	{
-		return getChildrenMinimumVMetrics( registeredChildren );
-	}
-
-	
-	static VMetrics[] getChildrenPreferredVMetrics(List<DPWidget> nodes)
-	{
-		VMetrics[] chm = new VMetrics[nodes.size()];
-		for (int i = 0; i < nodes.size(); i++)
-		{
-			chm[i] = nodes.get( i ).prefV;
-		}
-		return chm;
-	}
-
-	VMetrics[] getChildrenPreferredVMetrics()
-	{
-		return getChildrenPreferredVMetrics( registeredChildren );
+		return getChildrenAllocationY( registeredChildren );
 	}
 }

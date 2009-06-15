@@ -7,7 +7,6 @@
 package BritefuryJ.DocPresent.Layout;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class ParagraphLayout
 {
@@ -21,7 +20,7 @@ public class ParagraphLayout
 		{
 			children = ch;
 			
-			lineBox = new LBox();
+			lineBox = new LBox( null );
 			HorizontalLayout.computeRequisitionX( lineBox, children, spacing, packingParams );
 			lineBox.allocationX = allocation - indentation;
 			HorizontalLayout.allocateX( lineBox, children, spacing, packingParams );
@@ -51,6 +50,11 @@ public class ParagraphLayout
 		private void allocateY(VAlignment vAlignment)
 		{
 			HorizontalLayout.allocateY( lineBox, children, vAlignment );
+			
+			for (LBox child: children)
+			{
+				child.positionInParentSpaceY  +=  lineBox.positionInParentSpaceY;
+			}
 		}
 	}
 	
@@ -116,9 +120,9 @@ public class ParagraphLayout
 	}
 
 	
-	public static void computeRequisitionY(LBox box, List<Line> lines, double vSpacing, VAlignment vAlignment)
+	public static void computeRequisitionY(LBox box, Line lines[], double vSpacing, VAlignment vAlignment)
 	{
-		LBox lineBoxes[] = new LBox[lines.size()];
+		LBox lineBoxes[] = new LBox[lines.length];
 		
 		int i = 0;
 		for (Line line: lines)
@@ -133,7 +137,7 @@ public class ParagraphLayout
 
 
 
-	public static ArrayList<Line> allocateX(LBox box, LBox children[], double indentation, double hSpacing, BoxPackingParams packingParams[])
+	public static Line[] allocateX(LBox box, LBox children[], double indentation, double hSpacing, BoxPackingParams packingParams[])
 	{
 		boolean bFirstLine = true;
 		
@@ -201,7 +205,7 @@ public class ParagraphLayout
 				// Pick a line break
 				int lineBreakIndex;
 				double xAfterLineBreak;
-				if ( ( lineWidth - xAtBestLineBreak )  >  box.allocationX  &&  child != lastLineBreak )
+				if ( ( lineWidth - xAtBestLineBreak )  >  box.allocationX  &&  child != lastLineBreak  &&  lastLineBreak != null )
 				{
 					// We still go over the allocation limit even if we do split at the best line break.
 					// In this case, choose the most recent line break instead
@@ -217,6 +221,10 @@ public class ParagraphLayout
 				
 				// Build a list of child boxes for the line
 				int lineLength = lineBreakIndex - lineStartIndex;
+				if ( lineLength < 1 )
+				{
+					System.out.println( "ParagraphLayout.allocateX(): i=" + i + ", lineBreakIndex=" + lineBreakIndex + ", lineStartIndex=" + lineStartIndex + ", bestLineBreakIndex=" + bestLineBreakIndex + ", lastLineBreakIndex=" + lastLineBreakIndex );
+				}
 				LBox lineChildren[] = new LBox[lineLength];
 				System.arraycopy( children, lineStartIndex, lineChildren, 0, lineLength );
 				BoxPackingParams linePackingParams[] =  null;
@@ -238,6 +246,11 @@ public class ParagraphLayout
 				lineAdvance += indentation;
 				lineX += indentation;
 				
+				bestLineBreak = null;
+				bestLineBreakIndex = -1;
+				xAtBestLineBreak = 0.0;
+				xAfterBestLineBreak = 0.0;
+
 				bFirstLine = false;
 			}
 		}
@@ -258,16 +271,17 @@ public class ParagraphLayout
 		}
 		
 		
-		return lines;
+		Line[] lineArray = new Line[lines.size()];
+		return lines.toArray( lineArray );
 	}
 
 
 
 
 
-	public static void allocateY(LBox box, List<Line> lines, double vSpacing, VAlignment vAlignment)
+	public static void allocateY(LBox box, Line lines[], double vSpacing, VAlignment vAlignment)
 	{
-		LBox lineBoxes[] = new LBox[lines.size()];
+		LBox lineBoxes[] = new LBox[lines.length];
 		
 		int i = 0;
 		for (Line line: lines)

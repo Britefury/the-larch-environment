@@ -16,6 +16,8 @@ import BritefuryJ.DocPresent.DPPresentationArea;
 import BritefuryJ.DocPresent.DPTable;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
+import BritefuryJ.DocPresent.Layout.HAlignment;
+import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.StyleSheets.TableStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
@@ -37,7 +39,7 @@ public class DPTableTest
 	
 	protected static DPTable makeTable0()
 	{
-		TableStyleSheet tbls0 = new TableStyleSheet( DPTable.RowAlignment.BASELINES, DPTable.ColumnAlignment.CENTRE, 5.0, false, 0.0, 5.0, false, 0.0 );
+		TableStyleSheet tbls0 = new TableStyleSheet( VAlignment.BASELINES, HAlignment.CENTRE, 5.0, false, 0.0, 5.0, false, 0.0 );
 		DPTable table = new DPTable( tbls0 );
 		for (int row = 0; row < 6; row++)
 		{
@@ -95,7 +97,7 @@ public class DPTableTest
 
 		DPPresentationArea area = new DPPresentationArea();
 	     
-		VBoxStyleSheet boxS = new VBoxStyleSheet( DPVBox.Typesetting.NONE, DPVBox.Alignment.EXPAND, 20.0, false, 0.0 );
+		VBoxStyleSheet boxS = new VBoxStyleSheet( HAlignment.EXPAND, 20.0, false, 0.0 );
 		DPVBox box = new DPVBox( boxS );
 		box.append( makeTable0() );
 		box.append( makeTable1() );

@@ -21,15 +21,15 @@ public class Test_VerticalLayout extends Test_Layout_base
 	
 	public void test_requisitionX()
 	{
-		LBox result = new LBox();
+		LBox result = new LBox( null );
 		
 		// Empty list should result in empty
 		VerticalLayout.computeRequisitionX( result, new LBox[] {} );
-		assertEquals( result, new LBox() );
+		assertEquals( result, new LBox( null ) );
 
 		// List of one empty box should result in empty
-		VerticalLayout.computeRequisitionX( result, new LBox[] { new LBox() } );
-		assertEquals( result, new LBox() );
+		VerticalLayout.computeRequisitionX( result, new LBox[] { new LBox( null ) } );
+		assertEquals( result, new LBox( null ) );
 
 		// 1 Box of width 1 should result in same
 		VerticalLayout.computeRequisitionX( result, new LBox[] { xbox( 1.0, 0.0 ) } );
@@ -68,18 +68,18 @@ public class Test_VerticalLayout extends Test_Layout_base
 		//	- end padding
 		//	- any remaining spacing not 'consumed' by padding; spacing - padding  or  0 if padding > spacing
 
-		LBox result = new LBox();
+		LBox result = new LBox( null );
 		
 		// requisitionY()  ->  <0,0>
 		VerticalLayout.computeRequisitionY( result, new LBox[] {},  0.0, null );
-		assertEquals( result, new LBox() );
+		assertEquals( result, new LBox( null ) );
 
 		// requisitionY( [ <0,0> ] )  ->  <0,0>
-		VerticalLayout.computeRequisitionY( result, new LBox[] { new LBox() },  0.0, null );
-		assertEquals( result, new LBox() );
+		VerticalLayout.computeRequisitionY( result, new LBox[] { new LBox( null ) },  0.0, null );
+		assertEquals( result, new LBox( null ) );
 
 		// requisitionY( [ <0,0>:pad=1 ] )  ->  <2,0>
-		VerticalLayout.computeRequisitionY( result, new LBox[] { new LBox() },  0.0, new BoxPackingParams[] { new BoxPackingParams( 1.0 ) } );
+		VerticalLayout.computeRequisitionY( result, new LBox[] { new LBox( null ) },  0.0, new BoxPackingParams[] { new BoxPackingParams( 1.0 ) } );
 		assertEquals( result, ybox( 2.0, 0.0 ) );
 
 		// requisitionY( [ <10,0>:pad=2 ] )  ->  <14,0>
@@ -97,8 +97,8 @@ public class Test_VerticalLayout extends Test_Layout_base
 		assertEquals( result, ybox( 14.0, 1.0 ) );
 
 		// requisitionY( [ <0,0>, <0,0> ] )  ->  <0,0>
-		VerticalLayout.computeRequisitionY( result, new LBox[] { new LBox(), new LBox() },  0.0, null );
-		assertEquals( result, new LBox() );
+		VerticalLayout.computeRequisitionY( result, new LBox[] { new LBox( null ), new LBox( null ) },  0.0, null );
+		assertEquals( result, new LBox( null ) );
 
 		// Width accumulates
 		// requisitionY( [ <10,0>, <5,0> ] )  ->  <15,0>
@@ -117,7 +117,7 @@ public class Test_VerticalLayout extends Test_Layout_base
 
 		// Spacing between children adds extra width
 		// requisitionY( [ <0,0>, <0,0> ], spacing=1 )  ->  <1,0>
-		VerticalLayout.computeRequisitionY( result, new LBox[] { new LBox(), new LBox() },  1.0, null );
+		VerticalLayout.computeRequisitionY( result, new LBox[] { new LBox( null ), new LBox( null ) },  1.0, null );
 		assertEquals( result, ybox( 1.0, 0.0 ) );
 		// requisitionY( [ <10,0>, <5,0> ], spacing=1 )  ->  <15,0>
 		VerticalLayout.computeRequisitionY( result, new LBox[] { ybox( 10.0, 0.0 ), ybox( 5.0, 0.0 ) },  1.0, null );
@@ -141,7 +141,7 @@ public class Test_VerticalLayout extends Test_Layout_base
 
 	private void allocYSpaceTest(LBox children[], double spacing, BoxPackingParams packingParams[], LBox expectedBox, double boxAllocation, double expectedSpaceAllocation[])
 	{ 
-		LBox box = new LBox();
+		LBox box = new LBox( null );
 		VerticalLayout.computeRequisitionY( box, children, spacing, packingParams );
 
 		assertBoxesEqual( box, expectedBox, "PARENT BOX" );
@@ -166,7 +166,7 @@ public class Test_VerticalLayout extends Test_Layout_base
 		for (int i = 0; i < children.length; i++)
 		{
 			LBox c = children[i];
-			baselineChildren[i] = new LBox( c.getMinWidth(), c.getPrefWidth(), c.getMinHSpacing(), c.getPrefHSpacing(), 
+			baselineChildren[i] = new LBox( null, c.getMinWidth(), c.getPrefWidth(), c.getMinHSpacing(), c.getPrefHSpacing(), 
 					c.getReqHeight() * 0.5, c.getReqHeight() * 0.5, c.getReqVSpacing());
 		}
 
@@ -350,7 +350,7 @@ public class Test_VerticalLayout extends Test_Layout_base
 
 	private void allocYTest(LBox children[], double spacing, BoxPackingParams packingParams[], LBox expectedBox, double boxAllocation, double expectedSize[], double expectedPosition[])
 	{ 
-		LBox box = new LBox();
+		LBox box = new LBox( null );
 		VerticalLayout.computeRequisitionY( box, children, spacing, packingParams );
 
 		assertBoxesEqual( box, expectedBox, "PARENT BOX" );
@@ -381,7 +381,7 @@ public class Test_VerticalLayout extends Test_Layout_base
 		for (int i = 0; i < children.length; i++)
 		{
 			LBox c = children[i];
-			baselineChildren[i] = new LBox( c.getMinWidth(), c.getPrefWidth(), c.getMinHSpacing(), c.getPrefHSpacing(), 
+			baselineChildren[i] = new LBox( null, c.getMinWidth(), c.getPrefWidth(), c.getMinHSpacing(), c.getPrefHSpacing(), 
 					c.getReqHeight() * 0.5, c.getReqHeight() * 0.5, c.getReqVSpacing() );
 		}
 
@@ -475,7 +475,7 @@ public class Test_VerticalLayout extends Test_Layout_base
 
 	private void allocXTest(LBox children[], HAlignment alignment, LBox expectedBox, double boxAllocation, double expectedSize[], double expectedPosition[])
 	{ 
-		LBox box = new LBox();
+		LBox box = new LBox( null );
 		VerticalLayout.computeRequisitionX( box, children );
 
 		assertBoxesEqual( box, expectedBox, "PARENT BOX" );

@@ -18,6 +18,8 @@ import BritefuryJ.DocPresent.DPPresentationArea;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.Layout.HAlignment;
+import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
@@ -54,7 +56,7 @@ public class DPFractionTest
 		DPText labelA = new DPText( s1, "Label A yYgGjJpPqQ" );
 		DPText labelB = new DPText( s2, "Label B yYgGjJpPqQ" );
 		
-		HBoxStyleSheet boxs = new HBoxStyleSheet( DPHBox.Alignment.BASELINES, 0.0, false, 0.0 );
+		HBoxStyleSheet boxs = new HBoxStyleSheet( VAlignment.BASELINES, 0.0, false, 0.0 );
 		DPHBox box = new DPHBox( boxs );
 		box.append( labelA );
 		box.append( frac );
@@ -67,7 +69,7 @@ public class DPFractionTest
 	
 	protected DPWidget createContentNode()
 	{
-		VBoxStyleSheet boxs = new VBoxStyleSheet( DPVBox.Typesetting.NONE, DPVBox.Alignment.LEFT, 0.0, false, 0.0 );
+		VBoxStyleSheet boxs = new VBoxStyleSheet( HAlignment.LEFT, 0.0, false, 0.0 );
 		DPVBox box = new DPVBox( boxs );
 		
 		box.append( makeFraction( "a", "p" ) );

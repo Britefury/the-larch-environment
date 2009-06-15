@@ -15,6 +15,7 @@ import javax.swing.JFrame;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPPresentationArea;
 import BritefuryJ.DocPresent.DPVBox;
+import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
@@ -48,23 +49,23 @@ public class DPVBoxTest
 		DPText[] c2 = makeTexts( "RIGHT" );
 		DPText[] c3 = makeTexts( "EXPAND" );
 		
-		VBoxStyleSheet b0s = new VBoxStyleSheet( DPVBox.Typesetting.NONE, DPVBox.Alignment.LEFT, 0.0, false, 0.0 );
+		VBoxStyleSheet b0s = new VBoxStyleSheet( HAlignment.LEFT, 0.0, false, 0.0 );
 		DPVBox b0 = new DPVBox( b0s );
 		b0.extend( c0 );
 		
-		VBoxStyleSheet b1s = new VBoxStyleSheet( DPVBox.Typesetting.NONE, DPVBox.Alignment.CENTRE, 0.0, false, 0.0 );
+		VBoxStyleSheet b1s = new VBoxStyleSheet( HAlignment.CENTRE, 0.0, false, 0.0 );
 		DPVBox b1 = new DPVBox( b1s );
 		b1.extend( c1 );
 		
-		VBoxStyleSheet b2s = new VBoxStyleSheet( DPVBox.Typesetting.NONE, DPVBox.Alignment.RIGHT, 0.0, false, 0.0 );
+		VBoxStyleSheet b2s = new VBoxStyleSheet( HAlignment.RIGHT, 0.0, false, 0.0 );
 		DPVBox b2 = new DPVBox( b2s );
 		b2.extend( c2 );
 		
-		VBoxStyleSheet b3s = new VBoxStyleSheet( DPVBox.Typesetting.NONE, DPVBox.Alignment.EXPAND, 0.0, true, 0.0 );
+		VBoxStyleSheet b3s = new VBoxStyleSheet( HAlignment.EXPAND, 0.0, true, 0.0 );
 		DPVBox b3 = new DPVBox( b3s );
 		b3.extend( c3 );
 		
-		VBoxStyleSheet boxS = new VBoxStyleSheet( DPVBox.Typesetting.NONE, DPVBox.Alignment.EXPAND, 20.0, false, 0.0 );
+		VBoxStyleSheet boxS = new VBoxStyleSheet( HAlignment.EXPAND, 20.0, false, 0.0 );
 		DPVBox box = new DPVBox( boxS );
 		box.append( b0 );
 		box.append( b1 );

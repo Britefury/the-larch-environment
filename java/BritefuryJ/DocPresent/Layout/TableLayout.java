@@ -16,7 +16,7 @@ public class TableLayout
 		LBox columnBoxes[] = new LBox[numColumns];
 		for (int i = 0; i < numColumns; i++)
 		{
-			columnBoxes[i] = new LBox();
+			columnBoxes[i] = new LBox( null );
 		}
 		
 		
@@ -92,7 +92,7 @@ public class TableLayout
 		LBox rowBoxes[] = new LBox[numRows];
 		for (int i = 0; i < numColumns; i++)
 		{
-			rowBoxes[i] = new LBox();
+			rowBoxes[i] = new LBox( null );
 		}
 		
 		
@@ -164,7 +164,7 @@ public class TableLayout
 		LBox rowBoxes[] = new LBox[numRows];
 		for (int i = 0; i < numColumns; i++)
 		{
-			rowBoxes[i] = new LBox();
+			rowBoxes[i] = new LBox( null );
 			rowBoxes[i].bHasBaseline = true;
 		}
 		

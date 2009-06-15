@@ -47,9 +47,8 @@ import BritefuryJ.DocPresent.Input.InputTable;
 import BritefuryJ.DocPresent.Input.Modifier;
 import BritefuryJ.DocPresent.Input.Pointer;
 import BritefuryJ.DocPresent.Input.PointerInterface;
+import BritefuryJ.DocPresent.Layout.LBox;
 import BritefuryJ.DocPresent.Marker.Marker;
-import BritefuryJ.DocPresent.Metrics.HMetrics;
-import BritefuryJ.DocPresent.Metrics.VMetrics;
 import BritefuryJ.DocPresent.Selection.Selection;
 import BritefuryJ.DocPresent.Selection.SelectionListener;
 import BritefuryJ.Math.AABox2;
@@ -615,6 +614,9 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 	{
 		performAllocation();
 		
+		double allocationX = layoutBox.getAllocationX();
+		double allocationY = layoutBox.getAllocationY();
+
 		double ax = allocationX == 0.0  ?  1.0  :  allocationX;
 		double ay = allocationY == 0.0  ?  1.0  :  allocationY;
 		
@@ -792,19 +794,30 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 		if ( bAllocationRequired )
 		{
 			long t1 = System.nanoTime();
-			refreshMinimumHMetrics();
-			HMetrics h = refreshPreferredHMetrics();
+			
+			// Get X requisition
+			LBox reqX = refreshRequisitionX();
+			
+			// Allocate X
+			double prevWidth = layoutBox.getAllocationX();
 			if ( bHorizontalClamp )
 			{
-				allocateX( areaSize.x / rootScaleInWindowSpace );
+				layoutBox.setAllocationX( Math.max( reqX.getMinWidth(), areaSize.x / rootScaleInWindowSpace ) );
 			}
 			else
 			{
-				allocateX( h.width );
+				layoutBox.setAllocationX( reqX.getPrefWidth() );
 			}
-			refreshMinimumVMetrics();
-			VMetrics v = refreshPreferredVMetrics();
-			allocateY( v.height );
+			refreshAllocationX( prevWidth );
+			
+			// Get Y requisition
+			LBox reqY = refreshRequisitionY();
+			
+			// Allocate Y
+			double prevHeight = layoutBox.getAllocationY();
+			layoutBox.setAllocationY( reqY.getReqHeight() );
+			refreshAllocationY( prevHeight );
+			
 			bAllocationRequired = false;
 			
 			// Send motion events; pointer hasn't moved, but the widgets have
@@ -816,26 +829,6 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 			System.out.println( "DPPresentationArea.performAllocation(): TYPESET TIME = " + (double)(t2-t1) * 1.0e-9  +  ", used memory = "  + ( Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory() ) );
 		}
 	}
-	
-	
-	protected void allocateContentsX(double allocation)
-	{
-		if ( child != null )
-		{
-			allocateChildX( child, 0.0, allocation );
-		}
-	}
-	
-	
-	protected void allocateContentsY(double allocation)
-	{
-		if ( child != null )
-		{
-			double height = Math.min( allocation, prefV.height );
-			allocateChildY( child, 0.0, height );
-		}
-	}
-	
 	
 	
 	

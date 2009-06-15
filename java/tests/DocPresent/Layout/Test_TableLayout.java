@@ -46,7 +46,7 @@ public class Test_TableLayout extends Test_Layout_base
 	private void reqTest(LBox children[], TablePackingParams packingParams[], int numColumns, int numRows, double spacingX, double spacingY, boolean bExpandX, boolean bExpandY,
 			HAlignment colAlignment, VAlignment rowAlignment, LBox expectedColumnBoxes[], LBox expectedRowBoxes[], LBox expectedParentBox)
 	{
-		LBox box = new LBox();
+		LBox box = new LBox( null );
 		LBox columnBoxes[] = TableLayout.computeRequisitionX( box, children, packingParams, numColumns, numRows, spacingX, spacingY, bExpandX, bExpandY, colAlignment, rowAlignment );
 		LBox rowBoxes[] = TableLayout.computeRequisitionY( box, children, packingParams, numColumns, numRows, spacingX, spacingY, bExpandX, bExpandY, colAlignment, rowAlignment );
 		
@@ -334,12 +334,12 @@ public class Test_TableLayout extends Test_Layout_base
 		LBox expectedChildren[] = new LBox[children.length];
 		for (int i = 0; i < children.length; i++)
 		{
-			expectedChildren[i] = children[i].copy();
-			expectedChildren[i].setAllocationFrom( expectedChildAllocations[i] );
+			expectedChildren[i] = children[i].copy( null );
+			expectedChildren[i].setAllocation( expectedChildAllocations[i] );
 		}
 
 		
-		LBox box = new LBox();
+		LBox box = new LBox( null );
 
 		LBox columnBoxes[] = TableLayout.computeRequisitionX( box, children, packingParams, numColumns, numRows, spacingX, spacingY, bExpandX, bExpandY, colAlignment, rowAlignment );
 		
@@ -352,15 +352,15 @@ public class Test_TableLayout extends Test_Layout_base
 		
 		for (int i = 0; i < numColumns; i++)
 		{
-			LBox expectedColumnBox = columnBoxes[i].copy();
-			expectedColumnBox.setAllocationFrom( expectedColAllocations[i] );
+			LBox expectedColumnBox = columnBoxes[i].copy( null );
+			expectedColumnBox.setAllocation( expectedColAllocations[i] );
 			assertBoxesEqual( columnBoxes[i], expectedColumnBox, "COLUMN ALLOCATION FOR COLUMN " + i );
 		}
 		
 		for (int i = 0; i < numRows; i++)
 		{
-			LBox expectedRowBox = rowBoxes[i].copy();
-			expectedRowBox.setAllocationFrom( expectedRowAllocations[i] );
+			LBox expectedRowBox = rowBoxes[i].copy( null );
+			expectedRowBox.setAllocation( expectedRowAllocations[i] );
 			assertBoxesEqual( rowBoxes[i], expectedRowBox, "ROW ALLOCATION FOR ROW " + i );
 		}
 		

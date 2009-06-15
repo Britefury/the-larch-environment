@@ -17,6 +17,7 @@ import javax.swing.WindowConstants;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPPresentationArea;
 import BritefuryJ.DocPresent.DPVBox;
+import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
@@ -36,7 +37,7 @@ public class DPTextTest
 		DPText t1 = new DPText( ts1, "Hello World Abcdefghijklmnopqrstuvwxyz" );
 		DPText t2 = new DPText( ts2, "Hello World Abcdefghijklmnopqrstuvwxyz" );
 
-		VBoxStyleSheet b0s = new VBoxStyleSheet( DPVBox.Typesetting.NONE, DPVBox.Alignment.LEFT, 0.0, false, 0.0 );
+		VBoxStyleSheet b0s = new VBoxStyleSheet( HAlignment.LEFT, 0.0, false, 0.0 );
 		DPVBox b0 = new DPVBox( b0s );
 		b0.append( t0 );
 		b0.append( t1 );
