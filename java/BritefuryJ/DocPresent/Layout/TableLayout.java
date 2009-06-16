@@ -394,7 +394,7 @@ public class TableLayout
 				{
 					allocBox.allocateChildY( childAlloc, Math.max( yEnd - reqHeight, 0.0 ), reqHeight );
 				}
-				else if ( rowAlignment == VAlignment.CENTRE )
+				else if ( rowAlignment == VAlignment.CENTRE  ||  rowAlignment == VAlignment.BASELINES )
 				{
 					allocBox.allocateChildY( childAlloc, Math.max( yStart + ( heightAvailable - reqHeight ) * 0.5, 0.0 ), reqHeight );
 				}
