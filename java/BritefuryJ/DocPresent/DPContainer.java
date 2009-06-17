@@ -91,26 +91,6 @@ public abstract class DPContainer extends DPWidget
 	// Geometry methods
 	//
 	
-	public boolean isLocalSpacePointWithinBoundsOfChild(Point2 p, DPWidget child)
-	{
-		return child.getAABoxInParentSpace().containsPoint( p );
-	}
-
-	
-	
-	protected Xform2 getChildTransformRelativeToAncestor(DPWidget child, DPWidget ancestor, Xform2 x) throws IsNotInSubtreeException
-	{
-		Xform2 localX = x.concat( child.getLocalToParentXform() );
-		return getTransformRelativeToAncestor( ancestor, localX );
-	}
-
-	protected Point2 getChildLocalPointRelativeToAncestor(DPWidget child, DPWidget ancestor, Point2 p) throws IsNotInSubtreeException
-	{
-		Point2 localP = child.getLocalToParentXform().transform( p );
-		return getLocalPointRelativeToAncestor( ancestor, localP );
-	}
-	
-	
 	protected double getChildScale(DPWidget child)
 	{
 		return 1.0;
@@ -216,7 +196,6 @@ public abstract class DPContainer extends DPWidget
 		}
 	}
 	
-
 	
 	
 	
@@ -297,7 +276,7 @@ public abstract class DPContainer extends DPWidget
 	{
 		for (DPWidget child: registeredChildren)
 		{
-			if ( child.getAABoxInParentSpace().containsPoint( localPos ) )
+			if ( child.containsParentSpacePoint( localPos ) )
 			{
 				return child;
 			}
@@ -442,7 +421,7 @@ public abstract class DPContainer extends DPWidget
 			{
 				pressGrabButton = 0;
 				Point2 localPos = event.pointer.getLocalPos();
-				if ( !isLocalSpacePointWithinBoundsOfChild( localPos, pressGrabChild ) )
+				if ( !pressGrabChild.containsParentSpacePoint( localPos ) )
 				{
 					pressGrabChild.handleLeave( new PointerMotionEvent( childSpaceEvent.pointer, PointerMotionEvent.Action.LEAVE ) );
 				}
@@ -496,7 +475,7 @@ public abstract class DPContainer extends DPWidget
 			
 			if ( pointerChild != null )
 			{
-				if ( !isLocalSpacePointWithinBoundsOfChild( event.pointer.getLocalPos(), pointerChild ) )
+				if ( !pointerChild.containsParentSpacePoint( event.pointer.getLocalPos() ) )
 				{
 					pointerChild.handleLeave( new PointerMotionEvent( event.pointer.transformed( pointerChild.getParentToLocalXform() ), PointerMotionEvent.Action.LEAVE ) );
 					removeChildForPointer( event.pointer.concretePointer() );
@@ -541,7 +520,7 @@ public abstract class DPContainer extends DPWidget
 		for (int i = registeredChildren.size() - 1; i >= 0; i--)
 		{
 			DPWidget child = registeredChildren.get( i );
-			if ( isLocalSpacePointWithinBoundsOfChild( localPos, child ) )
+			if ( child.containsParentSpacePoint( localPos ) )
 			{
 				child.handleEnter( event.transformed( child.getParentToLocalXform() ) );
 				putChildForPointer( event.pointer.concretePointer(), child );
@@ -884,14 +863,7 @@ public abstract class DPContainer extends DPWidget
 		
 		if ( parent != null )
 		{
-			try
-			{
-				return parent.getContentLeafAboveOrBelowFromChild( this, bBelow, getLocalPointRelativeToAncestor( parent, localCursorPos ), bSkipWhitespace );
-			}
-			catch (IsNotInSubtreeException e)
-			{
-				throw new RuntimeException();
-			}
+			return parent.getContentLeafAboveOrBelowFromChild( this, bBelow, getLocalPointRelativeToAncestor( parent, localCursorPos ), bSkipWhitespace );
 		}
 		else
 		{
@@ -923,24 +895,24 @@ public abstract class DPContainer extends DPWidget
 	
 
 	
-	protected DPWidget getChildLeafClosestToLocalPointHorizontal(Point2 localPos, WidgetFilter filter)
+	protected DPWidget getChildLeafClosestToLocalPointHorizontal(List<DPWidget> searchList, Point2 localPos, WidgetFilter filter)
 	{
-		if ( registeredChildren.size() == 0 )
+		if ( searchList.size() == 0 )
 		{
 			return null;
 		}
-		else if ( registeredChildren.size() == 1 )
+		else if ( searchList.size() == 1 )
 		{
-			return getLeafClosestToLocalPointFromChild( registeredChildren.get( 0 ), localPos, filter );
+			return getLeafClosestToLocalPointFromChild( searchList.get( 0 ), localPos, filter );
 		}
 		else
 		{
 			DPWidget start = null;
 			int startIndex = -1;
-			DPWidget childI = registeredChildren.get( 0 );
-			for (int i = 0; i < registeredChildren.size() - 1; i++)
+			DPWidget childI = searchList.get( 0 );
+			for (int i = 0; i < searchList.size() - 1; i++)
 			{
-				DPWidget childJ = registeredChildren.get( i + 1 );
+				DPWidget childJ = searchList.get( i + 1 );
 				double iUpperX = childI.getPositionInParentSpace().x + childI.getAllocationInParentSpace().x;
 				double jLowerX = childJ.getPositionInParentSpace().x;
 				
@@ -958,8 +930,8 @@ public abstract class DPContainer extends DPWidget
 			
 			if ( start == null )
 			{
-				startIndex = registeredChildren.size() - 1;
-				start = registeredChildren.get( startIndex );
+				startIndex = searchList.size() - 1;
+				start = searchList.get( startIndex );
 			}
 			
 			DPWidget c = getLeafClosestToLocalPointFromChild( start, localPos, filter );
@@ -971,12 +943,12 @@ public abstract class DPContainer extends DPWidget
 			{
 				DPWidget next = null;
 				DPWidget nextC = null;
-				for (int j = startIndex + 1; j < registeredChildren.size(); j++)
+				for (int j = startIndex + 1; j < searchList.size(); j++)
 				{
-					nextC = getLeafClosestToLocalPointFromChild( registeredChildren.get( j ), localPos, filter );
+					nextC = getLeafClosestToLocalPointFromChild( searchList.get( j ), localPos, filter );
 					if ( nextC != null )
 					{
-						next = registeredChildren.get( j );
+						next = searchList.get( j );
 						break;
 					}
 				}
@@ -985,10 +957,10 @@ public abstract class DPContainer extends DPWidget
 				DPWidget prevC = null;
 				for (int j = startIndex - 1; j >= 0; j--)
 				{
-					prevC = getLeafClosestToLocalPointFromChild( registeredChildren.get( j ), localPos, filter );
+					prevC = getLeafClosestToLocalPointFromChild( searchList.get( j ), localPos, filter );
 					if ( prevC != null )
 					{
-						prev = registeredChildren.get( j );
+						prev = searchList.get( j );
 						break;
 					}
 				}
@@ -1017,24 +989,24 @@ public abstract class DPContainer extends DPWidget
 		}
 	}
 	
-	protected DPWidget getChildLeafClosestToLocalPointVertical(Point2 localPos, WidgetFilter filter)
+	protected DPWidget getChildLeafClosestToLocalPointVertical(List<DPWidget> searchList, Point2 localPos, WidgetFilter filter)
 	{
-		if ( registeredChildren.size() == 0 )
+		if ( searchList.size() == 0 )
 		{
 			return null;
 		}
-		else if ( registeredChildren.size() == 1 )
+		else if ( searchList.size() == 1 )
 		{
-			return getLeafClosestToLocalPointFromChild( registeredChildren.get( 0 ), localPos, filter );
+			return getLeafClosestToLocalPointFromChild( searchList.get( 0 ), localPos, filter );
 		}
 		else
 		{
 			DPWidget start = null;
 			int startIndex = -1;
-			DPWidget childI = registeredChildren.get( 0 );
-			for (int i = 0; i < registeredChildren.size() - 1; i++)
+			DPWidget childI = searchList.get( 0 );
+			for (int i = 0; i < searchList.size() - 1; i++)
 			{
-				DPWidget childJ = registeredChildren.get( i + 1 );
+				DPWidget childJ = searchList.get( i + 1 );
 				double iUpperY = childI.getPositionInParentSpace().y + childI.getAllocationInParentSpace().y;
 				double jLowerY = childJ.getPositionInParentSpace().y;
 				
@@ -1052,8 +1024,8 @@ public abstract class DPContainer extends DPWidget
 			
 			if ( start == null )
 			{
-				startIndex = registeredChildren.size() - 1;
-				start = registeredChildren.get( startIndex );
+				startIndex = searchList.size() - 1;
+				start = searchList.get( startIndex );
 			}
 			
 			DPWidget c = getLeafClosestToLocalPointFromChild( start, localPos, filter );
@@ -1064,9 +1036,9 @@ public abstract class DPContainer extends DPWidget
 			else
 			{
 				DPWidget next = null;
-				for (int j = startIndex + 1; j < registeredChildren.size(); j++)
+				for (int j = startIndex + 1; j < searchList.size(); j++)
 				{
-					next = getLeafClosestToLocalPointFromChild( registeredChildren.get( j ), localPos, filter );
+					next = getLeafClosestToLocalPointFromChild( searchList.get( j ), localPos, filter );
 					if ( next != null )
 					{
 						break;
@@ -1076,7 +1048,7 @@ public abstract class DPContainer extends DPWidget
 				DPWidget prev = null;
 				for (int j = startIndex - 1; j >= 0; j--)
 				{
-					prev = getLeafClosestToLocalPointFromChild( registeredChildren.get( j ), localPos, filter );
+					prev = getLeafClosestToLocalPointFromChild( searchList.get( j ), localPos, filter );
 					if ( prev != null )
 					{
 						break;

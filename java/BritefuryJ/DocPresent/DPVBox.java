@@ -7,6 +7,7 @@
 //##************************
 package BritefuryJ.DocPresent;
 
+import java.util.Arrays;
 import java.util.List;
 
 import BritefuryJ.DocPresent.Layout.BoxPackingParams;
@@ -59,60 +60,16 @@ public class DPVBox extends DPAbstractBox
 	
 	
 	
-	public int getInsertIndex(Point2 localPos)
-	{
-		//Return the index at which an item could be inserted.
-		// localPos is checked against the contents of the box in order to determine the insert index
-		
-		if ( size() == 0 )
-		{
-			return 0;
-		}
-	
-		double pos = localPos.y;
-		
-		double[] midPoints = new double[registeredChildren.size()];
-		
-		for (int i = 0; i < midPoints.length; i++)
-		{
-			DPWidget child = registeredChildren.get( i );
-			midPoints[i] = child.getPositionInParentSpace().y  +  child.getAllocationInParentSpace().y * 0.5;
-		}
-		
-		if ( pos < midPoints[0] )
-		{
-			return size();
-		}
-		else if ( pos > midPoints[midPoints.length-1] )
-		{
-			return 0;
-		}
-		else
-		{
-			for (int i = 0; i < midPoints.length-1; i++)
-			{
-				double lower = midPoints[i];
-				double upper = midPoints[i+1];
-				if ( pos >= lower  &&  pos <= upper )
-				{
-					return i + 1;
-				}
-			}
-			
-			throw new CouldNotFindInsertionPointException();
-		}
-	}
-	
-
-	
 	
 	
 	protected void updateRequisitionX()
 	{
-		LReqBox[] childBoxes = new LReqBox[registeredChildren.size()];
-		for (int i = 0; i < registeredChildren.size(); i++)
+		refreshCollation();
+		
+		LReqBox[] childBoxes = new LReqBox[collationLeaves.length];
+		for (int i = 0; i < collationLeaves.length; i++)
 		{
-			childBoxes[i] = registeredChildren.get( i ).refreshRequisitionX();
+			childBoxes[i] = collationLeaves[i].refreshRequisitionX();
 		}
 
 		VerticalLayout.computeRequisitionX( layoutReqBox, childBoxes );
@@ -120,12 +77,12 @@ public class DPVBox extends DPAbstractBox
 
 	protected void updateRequisitionY()
 	{
-		LReqBox[] childBoxes = new LReqBox[registeredChildren.size()];
-		BoxPackingParams[] packingParams = new BoxPackingParams[registeredChildren.size()];
-		for (int i = 0; i < registeredChildren.size(); i++)
+		LReqBox[] childBoxes = new LReqBox[collationLeaves.length];
+		BoxPackingParams[] packingParams = new BoxPackingParams[collationLeaves.length];
+		for (int i = 0; i < collationLeaves.length; i++)
 		{
-			childBoxes[i] = registeredChildren.get( i ).refreshRequisitionY();
-			packingParams[i] = (BoxPackingParams)registeredChildren.get( i ).getParentPacking();
+			childBoxes[i] = collationLeaves[i].refreshRequisitionY();
+			packingParams[i] = (BoxPackingParams)collationLeaves[i].getParentPacking();
 		}
 
 		VerticalLayout.computeRequisitionY( layoutReqBox, childBoxes, getTypesetting(), getSpacing(), packingParams );
@@ -139,14 +96,14 @@ public class DPVBox extends DPAbstractBox
 	{
 		super.updateAllocationX( );
 		
-		LReqBox childBoxes[] = getChildrenRequisitionBoxes();
-		LAllocBox childAllocBoxes[] = getChildrenAllocationBoxes();
-		double prevWidths[] = getChildrenAllocationX();
+		LReqBox childBoxes[] = getCollatedChildrenRequisitionBoxes();
+		LAllocBox childAllocBoxes[] = getCollatedChildrenAllocationBoxes();
+		double prevWidths[] = getCollatedChildrenAllocationX();
 		
 		VerticalLayout.allocateX( layoutReqBox, childBoxes, layoutAllocBox, childAllocBoxes, getAlignment() );
 		
 		int i = 0;
-		for (DPWidget child: registeredChildren)
+		for (DPWidget child: collationLeaves)
 		{
 			child.refreshAllocationX( prevWidths[i] );
 			i++;
@@ -157,15 +114,15 @@ public class DPVBox extends DPAbstractBox
 	{
 		super.updateAllocationY( );
 		
-		LReqBox childBoxes[] = getChildrenRequisitionBoxes();
-		LAllocBox childAllocBoxes[] = getChildrenAllocationBoxes();
-		double prevHeights[] = getChildrenAllocationY();
-		BoxPackingParams packing[] = (BoxPackingParams[])getChildrenPackingParams( new BoxPackingParams[registeredChildren.size()] );
+		LReqBox childBoxes[] = getCollatedChildrenRequisitionBoxes();
+		LAllocBox childAllocBoxes[] = getCollatedChildrenAllocationBoxes();
+		double prevHeights[] = getCollatedChildrenAllocationY();
+		BoxPackingParams packing[] = (BoxPackingParams[])getCollatedChildrenPackingParams( new BoxPackingParams[collationLeaves.length] );
 		
 		VerticalLayout.allocateY( layoutReqBox, childBoxes, layoutAllocBox, childAllocBoxes, getSpacing(), packing );
 		
 		int i = 0;
-		for (DPWidget child: registeredChildren)
+		for (DPWidget child: collationLeaves)
 		{
 			child.refreshAllocationY( prevHeights[i] );
 			i++;
@@ -176,7 +133,7 @@ public class DPVBox extends DPAbstractBox
 	
 	protected DPWidget getChildLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter)
 	{
-		return getChildLeafClosestToLocalPointVertical( localPos, filter );
+		return getChildLeafClosestToLocalPointVertical( Arrays.asList( collationLeaves ), localPos, filter );
 	}
 
 

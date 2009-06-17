@@ -991,7 +991,7 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 		if ( button == 1  &&  ( modifiers & ( Modifier.ALT | Modifier.ALT_GRAPH | Modifier.CTRL | Modifier.SHIFT ) )  ==  0 )
 		{
 			DPContentLeafEditableEntry leaf = (DPContentLeafEditableEntry)getLeafClosestToLocalPoint( rootPos, new DPContentLeafEditableEntry.EditableEntryLeafWidgetFilter() );
-			Xform2 x = leaf.getTransformRelativeToRoot();
+			Xform2 x = leaf.getLocalToRootXform();
 			x = x.inverse();
 			
 			Marker prevPos = caret.getMarker().copy();
@@ -1055,7 +1055,7 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 		if ( bMouseSelectionInProgress )
 		{
 			DPContentLeafEditableEntry leaf = (DPContentLeafEditableEntry)getLeafClosestToLocalPoint( rootPos, new DPContentLeafEditableEntry.EditableEntryLeafWidgetFilter() );
-			Xform2 x = leaf.getTransformRelativeToRoot();
+			Xform2 x = leaf.getLocalToRootXform();
 			x = x.inverse();
 
 			Marker prevPos = caret.getMarker().copy();
