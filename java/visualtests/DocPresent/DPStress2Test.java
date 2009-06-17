@@ -28,37 +28,13 @@ import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
 public class DPStress2Test
 {
-	// Memory usage history (10240 lines): (32-bit JVM, measurement is process size)
-	// ~480MB: initial
-	// 357MB: packed DPContainer.ChildEntry
-	// 353MB: packed TextVisual
-	// 164MB: shared TextLayout objects
-	// 135MB: emptied out DPContainer.ChildEntry
-	// 126MB: removed DPContainer.ChildEntry
-	// 120MB: shared TextVisual objects
-	// 117MB: created pointer->child table in DPContainer on demand
-	// 117MB: replaced paragraph ArrayLists with arrays
-	// 111MB: replaced Vector2 and Point2 objects in DPWidget with doubles
-	// 83MB: cached metrics in TextVisual objects, and modified Metrics.scaled() (and subclass) methods to only create a new metrics object in cases scale != 1.0
-	
-	
-	// Profiling:
-	// 2009/06/14
-	// java 1.6.0_14 32-bit
-	// 10240 lines
-	// 
-	//
 	// Version							Platform		# lines	Process size			Measured mem usage		Mem usage at start		Widget tree creation time		typeset time
 	//
-	// [1] Same as with last measurements	A			10240	80.7MB				56.6MB				--					0.839s					0.410s
-	// [2] New layout system				A			10240	71.4MB				46.4MB				0.6MB				0.705s					0.294s
-	// [3] Split layout into req/alloc			A			10240	57.1MB				32.8MB				0.6MB				0.569s					0.307s
+	// [1] With collation					A			10240	62.7MB				38.6MB				0.6MB				0.611s					0.536s
 	//
 	//
 	// States:
-	// [1] No changes from last iteration, just more detailed measurements
-	// [2] Replaced hmetrics + vmetrics with a single structure, that also contains fields for position and allocated space
-	// [3] Split layout box into requisition and allocation; requisition structures shared among text elements; managed by TextVisual
+	// [1] HBoxes, VBoxes and Paragraphs can collate contents from children that are span elements
 	//
 	// Platform A:
 	//	CPU: Intel Core Duo 1.86GHz
