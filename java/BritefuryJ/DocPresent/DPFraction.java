@@ -421,7 +421,7 @@ public class DPFraction extends DPContainer
 
 	protected DPWidget getChildLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter)
 	{
-		return getChildLeafClosestToLocalPointVertical( localPos, filter );
+		return getChildLeafClosestToLocalPointVertical( registeredChildren, localPos, filter );
 	}
 
 

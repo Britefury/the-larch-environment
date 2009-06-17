@@ -19,7 +19,7 @@ import BritefuryJ.Math.Point2;
 
 
 
-public class DPParagraph extends DPContainerSequence
+public class DPParagraph extends DPContainerSequenceCollated
 {
 	public static class CouldNotFindInsertionPointException extends RuntimeException
 	{
@@ -49,60 +49,16 @@ public class DPParagraph extends DPContainerSequence
 	
 	
 
-	public int getInsertIndex(Point2 localPos)
-	{
-		//Return the index at which an item could be inserted.
-		// localPos is checked against the contents of the box in order to determine the insert index
-		
-		if ( size() == 0 )
-		{
-			return 0;
-		}
-	
-		double pos = localPos.x;
-		
-		double[] midPoints = new double[registeredChildren.size()];
-		
-		for (int i = 0; i < midPoints.length; i++)
-		{
-			DPWidget child = registeredChildren.get( i );
-			midPoints[i] = child.getPositionInParentSpace().x  +  child.getAllocationInParentSpace().x * 0.5;
-		}
-		
-		if ( pos < midPoints[0] )
-		{
-			return size();
-		}
-		else if ( pos > midPoints[midPoints.length-1] )
-		{
-			return 0;
-		}
-		else
-		{
-			for (int i = 0; i < midPoints.length-1; i++)
-			{
-				double lower = midPoints[i];
-				double upper = midPoints[i+1];
-				if ( pos >= lower  &&  pos <= upper )
-				{
-					return i + 1;
-				}
-			}
-			
-			throw new CouldNotFindInsertionPointException();
-		}
-	}
-
-	
-	
 	protected void updateRequisitionX()
 	{
-		LReqBox[] childBoxes = new LReqBox[registeredChildren.size()];
-		BoxPackingParams[] packingParams = new BoxPackingParams[registeredChildren.size()];
-		for (int i = 0; i < registeredChildren.size(); i++)
+		refreshCollation();
+		
+		LReqBox[] childBoxes = new LReqBox[collationLeaves.length];
+		BoxPackingParams[] packingParams = new BoxPackingParams[collationLeaves.length];
+		for (int i = 0; i < collationLeaves.length; i++)
 		{
-			childBoxes[i] = registeredChildren.get( i ).refreshRequisitionX();
-			packingParams[i] = (BoxPackingParams)registeredChildren.get( i ).getParentPacking();
+			childBoxes[i] = collationLeaves[i].refreshRequisitionX();
+			packingParams[i] = (BoxPackingParams)collationLeaves[i].getParentPacking();
 		}
 
 		ParagraphLayout.computeRequisitionX( layoutReqBox, childBoxes, getIndentation(), getSpacing(), packingParams );
@@ -110,7 +66,7 @@ public class DPParagraph extends DPContainerSequence
 
 	protected void updateRequisitionY()
 	{
-		for (DPWidget child: registeredChildren)
+		for (DPWidget child: collationLeaves)
 		{
 			child.refreshRequisitionY();
 		}
@@ -124,15 +80,15 @@ public class DPParagraph extends DPContainerSequence
 	{
 		super.updateAllocationX();
 		
-		LReqBox childBoxes[] = getChildrenRequisitionBoxes();
-		LAllocBox childAllocBoxes[] = getChildrenAllocationBoxes();
-		double prevWidths[] = getChildrenAllocationX();
-		BoxPackingParams packing[] = (BoxPackingParams[])getChildrenPackingParams( new BoxPackingParams[registeredChildren.size()] );
+		LReqBox childBoxes[] = getCollatedChildrenRequisitionBoxes();
+		LAllocBox childAllocBoxes[] = getCollatedChildrenAllocationBoxes();
+		double prevWidths[] = getCollatedChildrenAllocationX();
+		BoxPackingParams packing[] = (BoxPackingParams[])getCollatedChildrenPackingParams( new BoxPackingParams[collationLeaves.length] );
 		
 		lines = ParagraphLayout.allocateX( layoutReqBox, childBoxes, layoutAllocBox, childAllocBoxes, getIndentation(), getSpacing(), packing );
 		
 		int i = 0;
-		for (DPWidget child: registeredChildren)
+		for (DPWidget child: collationLeaves)
 		{
 			child.refreshAllocationX( prevWidths[i] );
 			i++;

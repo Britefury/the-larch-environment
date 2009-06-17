@@ -1,9 +1,8 @@
-//##************************
 //##* This program is free software; you can use it, redistribute it and/or modify it
 //##* under the terms of the GNU General Public License version 2 as published by the
 //##* Free Software Foundation. The full text of the GNU General Public License
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
-//##* program. This source code is (C)copyright Geoffrey French 1999-2008.
+//##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
 package visualtests.DocPresent;
 
@@ -17,6 +16,7 @@ import javax.swing.JFrame;
 import BritefuryJ.DocPresent.DPLineBreak;
 import BritefuryJ.DocPresent.DPParagraph;
 import BritefuryJ.DocPresent.DPPresentationArea;
+import BritefuryJ.DocPresent.DPSpan;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
@@ -27,8 +27,7 @@ import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
-
-public class DPParagraphTest
+public class DPParagraphCollationTest
 {
 	static String textBlock = "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
 	
@@ -79,11 +78,23 @@ public class DPParagraphTest
 		return box;
 	}
 	
-	protected DPParagraph makeParagraphWithNestedPara(String title, VAlignment alignment, double spacing, double vSpacing, double padding, double indentation, int lineBreakStep, TextStyleSheet textStyle, TextStyleSheet nestedTextStyle)
+	protected DPSpan makeSpan(String title, int lineBreakStep, TextStyleSheet textStyle)
+	{
+		ArrayList<DPWidget> children = makeTextNodes( title + ": " + textBlock, textStyle );
+		if ( lineBreakStep > 0 )
+		{
+			children = addLineBreaks( children, lineBreakStep );
+		}
+		DPSpan span = new DPSpan();
+		span.extend( children );
+		return span;
+	}
+	
+	protected DPParagraph makeParagraphWithNestedSpan(String title, VAlignment alignment, double spacing, double vSpacing, double padding, double indentation, int lineBreakStep, TextStyleSheet textStyle, TextStyleSheet nestedTextStyle)
 	{
 		ArrayList<DPWidget> children = makeTextNodes( title + ": " + textBlock, textStyle );
 		children = addLineBreaks( children, lineBreakStep );
-		children.add( children.size()/2, makeParagraph( title + " (inner)", alignment, spacing, vSpacing, padding, indentation, lineBreakStep, nestedTextStyle ) );
+		children.add( children.size()/2, makeSpan( title + " (inner)", lineBreakStep, nestedTextStyle ) );
 		ParagraphStyleSheet boxs = new ParagraphStyleSheet( alignment, spacing, vSpacing, padding, indentation );
 		DPParagraph box = new DPParagraph( boxs );
 		box.extend( children );
@@ -99,11 +110,11 @@ public class DPParagraphTest
 		DPWidget b1 = makeParagraph( "ONE-LINE", VAlignment.BASELINES, 0.0, 0.0, 0.0, 0.0, 0, blackText );
 		DPWidget b2 = makeParagraph( "PER-WORD", VAlignment.BASELINES, 0.0, 0.0, 0.0, 0.0, 1, blackText );
 		DPWidget b3 = makeParagraph( "EVERY-4-WORDS", VAlignment.BASELINES, 0.0, 0.0, 0.0, 0.0, 4, blackText);
-		DPWidget b4 = makeParagraphWithNestedPara( "NESTED-1", VAlignment.BASELINES, 0.0, 0.0, 0.0, 0.0, 1, blackText, redText );
-		DPWidget b5 = makeParagraphWithNestedPara( "NESTED-2", VAlignment.BASELINES, 0.0, 0.0, 0.0, 0.0, 2, blackText, redText );
-		DPWidget b6 = makeParagraphWithNestedPara( "NESTED-4", VAlignment.BASELINES, 0.0, 0.0, 0.0, 0.0, 4, blackText, redText );
+		DPWidget b4 = makeParagraphWithNestedSpan( "NESTED-1", VAlignment.BASELINES, 0.0, 0.0, 0.0, 0.0, 1, blackText, redText );
+		DPWidget b5 = makeParagraphWithNestedSpan( "NESTED-2", VAlignment.BASELINES, 0.0, 0.0, 0.0, 0.0, 2, blackText, redText );
+		DPWidget b6 = makeParagraphWithNestedSpan( "NESTED-4", VAlignment.BASELINES, 0.0, 0.0, 0.0, 0.0, 4, blackText, redText );
 		DPWidget b7 = makeParagraph( "PER-WORD INDENTED", VAlignment.BASELINES, 0.0, 0.0, 0.0, 50.0, 1, blackText );
-		DPWidget b8 = makeParagraphWithNestedPara( "NESTED-2-INDENTED", VAlignment.BASELINES, 0.0, 0.0, 0.0, 50.0, 2, blackText, redText );
+		DPWidget b8 = makeParagraphWithNestedSpan( "NESTED-2-INDENTED", VAlignment.BASELINES, 0.0, 0.0, 0.0, 50.0, 2, blackText, redText );
 		DPWidget[] children = { b1, b2, b3, b4, b5, b6, b7, b8 };
 		VBoxStyleSheet boxs = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.EXPAND, 30.0, false, 0.0 );
 		DPVBox box = new DPVBox( boxs );
@@ -113,9 +124,9 @@ public class DPParagraphTest
 
 
 
-	public DPParagraphTest()
+	public DPParagraphCollationTest()
 	{
-		JFrame frame = new JFrame( "Paragraph test" );
+		JFrame frame = new JFrame( "Paragraph collation test" );
 
 		//This stops the app on window close.
 		frame.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
@@ -138,6 +149,7 @@ public class DPParagraphTest
 	
 	public static void main(String[] args)
 	{
-		new DPParagraphTest();
+		new DPParagraphCollationTest();
 	}
+
 }

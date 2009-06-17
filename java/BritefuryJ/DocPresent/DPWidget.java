@@ -45,7 +45,7 @@ abstract public class DPWidget
 	//
 	//
 	
-	public static class IsNotInSubtreeException extends Exception
+	public static class IsNotInSubtreeException extends RuntimeException
 	{
 		static final long serialVersionUID = 0L;
 	}
@@ -246,7 +246,7 @@ abstract public class DPWidget
 	}
 
 	
-	private double getScale()
+	protected double getScale()
 	{
 		return parent != null  ?  parent.getChildScale( this )  :  1.0;
 	}
@@ -263,104 +263,178 @@ abstract public class DPWidget
 	
 	
 	
-	public Xform2 getTransformRelativeToRoot(Xform2 x)
+	public Xform2 getLocalToRootXform(Xform2 x)
 	{
-		try
-		{
-			return getTransformRelativeToAncestor( null, x );
-		}
-		catch (IsNotInSubtreeException e)
-		{
-			throw new RuntimeException();
-		}
+		return getLocalToAncestorXform( null, x );
 	}
 	
-	public Xform2 getTransformRelativeToRoot()
+	public Xform2 getLocalToRootXform()
 	{
-		return getTransformRelativeToRoot( new Xform2() );
+		return getLocalToRootXform( new Xform2() );
 	}
 	
 	
 	
-	public Xform2 getTransformRelativeToAncestor(DPWidget ancestor, Xform2 x) throws IsNotInSubtreeException
+	public Xform2 getRootToLocalXform(Xform2 x)
 	{
-		if ( ancestor == this )
+		return getAncestorToLocalXform( null, x );
+	}
+	
+	public Xform2 getRootToLocalXform()
+	{
+		return getRootToLocalXform( new Xform2() );
+	}
+	
+	
+	
+	public Xform2 getLocalToAncestorXform(DPWidget ancestor, Xform2 x)
+	{
+		DPWidget node = this;
+		
+		while ( node != ancestor )
 		{
-			return x;
+			DPWidget parentNode = node.parent;
+			if ( parentNode != null )
+			{
+				x = x.concat( node.getLocalToParentXform() );
+				node = parentNode;
+			}
+			else
+			{
+				if ( ancestor != null )
+				{
+					// Did not reach ancestor
+					throw new IsNotInSubtreeException();
+				}
+				else
+				{
+					return x;
+				}
+			}
 		}
-		else if ( parent != null )
+		
+		return x;
+	}
+	
+	public Xform2 getLocalToAncestorXform(DPWidget ancestor)
+	{
+		if ( ancestor == parent )
 		{
-			return parent.getChildTransformRelativeToAncestor( this, ancestor, x );
+			// Early out
+			return getLocalToParentXform();
 		}
 		else
 		{
-			if ( ancestor != null )
-			{
-				throw new IsNotInSubtreeException();
-			}
-			return x;
+			return getLocalToAncestorXform( ancestor, new Xform2() );
 		}
 	}
 	
-	public Xform2 getTransformRelativeToAncestor(DPWidget ancestor) throws IsNotInSubtreeException
+	
+	
+	public Xform2 getAncestorToLocalXform(DPWidget ancestor, Xform2 x)
 	{
-		return getTransformRelativeToAncestor( ancestor, new Xform2() );
+		DPWidget node = this;
+		
+		while ( node != ancestor )
+		{
+			DPWidget parentNode = node.parent;
+			if ( parentNode != null )
+			{
+				x = node.getParentToLocalXform().concat( x );
+				node = parentNode;
+			}
+			else
+			{
+				if ( ancestor != null )
+				{
+					// Did not reach ancestor
+					throw new IsNotInSubtreeException();
+				}
+				else
+				{
+					return x;
+				}
+			}
+		}
+		
+		return x;
+	}
+	
+	public Xform2 getAncestorToLocalXform(DPWidget ancestor)
+	{
+		if ( ancestor == parent )
+		{
+			// Early out
+			return getParentToLocalXform();
+		}
+		else
+		{
+			return getAncestorToLocalXform( ancestor, new Xform2() );
+		}
 	}
 	
 	
 	
 	public Xform2 getTransformRelativeTo(DPWidget toWidget, Xform2 x)
 	{
-		Xform2 myXform = getTransformRelativeToRoot();
-		Xform2 toWidgetXform = toWidget.getTransformRelativeToRoot();
+		Xform2 myXform = getLocalToRootXform();
+		Xform2 toWidgetXform = toWidget.getLocalToRootXform();
 		return myXform.concat( toWidgetXform.inverse() );
 	}
 	
 	
 	public Point2 getLocalPointRelativeToRoot(Point2 p)
 	{
-		try
-		{
-			return getLocalPointRelativeToAncestor( null, p );
-		}
-		catch (IsNotInSubtreeException e)
-		{
-			throw new RuntimeException();
-		}
+		return getLocalPointRelativeToAncestor( null, p );
 	}
 	
-	public Point2 getLocalPointRelativeToAncestor(DPWidget ancestor, Point2 p) throws IsNotInSubtreeException
+	public Point2 getLocalPointRelativeToAncestor(DPWidget ancestor, Point2 p)
 	{
-		if ( ancestor == this )
+		DPWidget node = this;
+		
+		while ( node != ancestor )
 		{
-			return p;
-		}
-		else if ( parent != null )
-		{
-			return parent.getChildLocalPointRelativeToAncestor( this, ancestor, p );
-		}
-		else
-		{
-			if ( ancestor != null )
+			DPWidget parentNode = node.parent;
+			if ( parentNode != null )
 			{
-				throw new IsNotInSubtreeException();
+				p = node.getLocalToParentXform().transform( p );
+				node = parentNode;
 			}
-			return p;
+			else
+			{
+				if ( ancestor != null )
+				{
+					// Did not reach ancestor
+					throw new IsNotInSubtreeException();
+				}
+				else
+				{
+					return p;
+				}
+			}
 		}
+		
+		return p;
 	}
 	
 	public Point2 getLocalPointRelativeTo(DPWidget toWidget, Point2 p)
 	{
 		Point2 pointInRoot = getLocalPointRelativeToRoot( p );
-		Xform2 toWidgetXform = toWidget.getTransformRelativeToRoot();
+		Xform2 toWidgetXform = toWidget.getLocalToRootXform();
 		return toWidgetXform.inverse().transform( pointInRoot );
+	}
+	
+	
+	protected boolean containsParentSpacePoint(Point2 p)
+	{
+		return getAABoxInParentSpace().containsPoint( p );
 	}
 	
 	
 	protected AffineTransform pushGraphicsTransform(Graphics2D graphics)
 	{
 		AffineTransform current = graphics.getTransform();
-		getTransformRelativeToRoot().apply( graphics );
+		getLocalToRootXform().apply( graphics );
 		return current;
 	}
 	

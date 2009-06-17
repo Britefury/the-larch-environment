@@ -9,61 +9,66 @@ package BritefuryJ.Math;
 
 import BritefuryJ.Math.Point2;
 
-public class AABox2 implements Cloneable {
-	private Point2 lower, upper;
+public class AABox2 implements Cloneable
+{
+	private double lowerX, lowerY, upperX, upperY;
 	
 	
 	public AABox2()
 	{
-		lower = new Point2( 1.0, 1.0 );
-		upper = new Point2( -1.0, -1.0 );
+		lowerX = lowerY = 1.0;
+		upperX = upperY = -1.0;
 	}
 	
 	public AABox2(Point2 a)
 	{
-		lower = a.clone();
-		upper = lower;
+		lowerX = upperX = a.x;
+		lowerY = upperY = a.y;
 	}
 	
 	public AABox2(Point2 a, Point2 b)
 	{
-		lower = new Point2( a.x < b.x  ?  a.x  :  b.x,  a.y < b.y  ?  a.y  :  b.y );
-		upper = new Point2( a.x > b.x  ?  a.x  :  b.x,  a.y > b.y  ?  a.y  :  b.y );
+		lowerX = a.x < b.x  ?  a.x  :  b.x;
+		lowerY = a.y < b.y  ?  a.y  :  b.y;
+		upperX = a.x < b.x  ?  b.x  :  a.x;
+		upperY = a.y < b.y  ?  b.y  :  a.y;
 	}
 	
 	public AABox2(Point2 a, Vector2 size)
 	{
 		assert size.x >= 0.0  &&  size.y >= 0.0;
-		lower = a;
-		upper = new Point2( a.x + size.x, a.y + size.y );
+		lowerX = a.x;
+		lowerY = a.y;
+		upperX = a.x + size.x;
+		upperY = a.y + size.y;
 	}
 	
 	
 	
 	public boolean containsPoint(Point2 p)
 	{
-		return p.x >= lower.x  &&  p.x <= upper.x  &&  p.y >= lower.y  &&  p.y <= upper.y;
+		return p.x >= lowerX  &&  p.x <= upperX  &&  p.y >= lowerY  &&  p.y <= upperY;
 	}
 	
 	public boolean intersects(AABox2 b)
 	{
-		return lower.x <= b.upper.x  &&  lower.y <= b.upper.y   &&   upper.x >= b.lower.x  &&  upper.y >= b.lower.y;
+		return lowerX <= b.upperX  &&  lowerY <= b.upperY   &&   upperX >= b.lowerX  &&  upperY >= b.lowerY;
 	}
 	
 	
 	public Point2 getLower()
 	{
-		return lower;
+		return new Point2( lowerX, lowerY );
 	}
 	
 	public Point2 getUpper()
 	{
-		return upper;
+		return new Point2( upperX, upperY );
 	}
 	
 
 	public String toString()
 	{
-		return "AABox2(" + lower.toString() + " -> " + upper.toString() + ")";
+		return "AABox2( " + lowerX + "," + lowerY + " -> " + lowerX + "," + lowerY + " )";
 	}
 }
