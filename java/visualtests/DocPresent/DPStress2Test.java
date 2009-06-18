@@ -31,10 +31,12 @@ public class DPStress2Test
 	// Version							Platform		# lines	Process size			Measured mem usage		Mem usage at start		Widget tree creation time		typeset time
 	//
 	// [1] With collation					A			10240	62.7MB				38.6MB				0.6MB				0.611s					0.536s
+	// [2] With collation finished			A			10240	63.4MB				37.9MB				0.6MB				0.624s					0.524s
 	//
 	//
 	// States:
 	// [1] HBoxes, VBoxes and Paragraphs can collate contents from children that are span elements
+	// [2] Collation system finished
 	//
 	// Platform A:
 	//	CPU: Intel Core Duo 1.86GHz
