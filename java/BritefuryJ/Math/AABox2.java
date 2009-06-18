@@ -20,6 +20,14 @@ public class AABox2 implements Cloneable
 		upperX = upperY = -1.0;
 	}
 	
+	public AABox2(double lowerX, double lowerY, double upperX, double upperY)
+	{
+		this.lowerX = lowerX;
+		this.lowerY = lowerY;
+		this.upperX = upperX;
+		this.upperY = upperY;
+	}
+	
 	public AABox2(Point2 a)
 	{
 		lowerX = upperX = a.x;

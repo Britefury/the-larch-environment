@@ -204,6 +204,16 @@ abstract public class DPWidget
 		return layoutAllocBox.getPositionInParentSpace();
 	}
 	
+	public double getPositionInParentSpaceX()
+	{
+		return layoutAllocBox.getPositionInParentSpaceX();
+	}
+	
+	public double getPositionInParentSpaceY()
+	{
+		return layoutAllocBox.getPositionInParentSpaceY();
+	}
+	
 	public double getAllocationX()
 	{
 		return layoutAllocBox.getAllocationX();

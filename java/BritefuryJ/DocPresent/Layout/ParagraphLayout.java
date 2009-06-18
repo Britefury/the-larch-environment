@@ -16,9 +16,10 @@ public class ParagraphLayout
 		protected LAllocBox lineAllocBox;
 		protected LReqBox children[];
 		protected LAllocBox childrenAlloc[];
+		protected int startIndex, endIndex;
 		
 		
-		private Line(LReqBox ch[], LAllocBox chAlloc[], double indentation, double spacing, BoxPackingParams packingParams[], double allocation)
+		private Line(LReqBox ch[], LAllocBox chAlloc[], double indentation, double spacing, BoxPackingParams packingParams[], double allocation, int startIndex, int endIndex)
 		{
 			children = ch;
 			childrenAlloc = chAlloc;
@@ -32,6 +33,9 @@ public class ParagraphLayout
 			{
 				childAlloc.positionInParentSpaceX += indentation;
 			}
+			
+			this.startIndex = startIndex;
+			this.endIndex = endIndex;
 		}
 		
 		
@@ -55,6 +59,16 @@ public class ParagraphLayout
 			return childrenAlloc;
 		}
 		
+		public int getRangeStart()
+		{
+			return startIndex;
+		}
+		
+		public int getRangeEnd()
+		{
+			return endIndex;
+		}
+		
 		
 		private void computeRequisitionY(VAlignment vAlignment)
 		{
@@ -69,6 +83,63 @@ public class ParagraphLayout
 			{
 				childAlloc.positionInParentSpaceY  +=  lineAllocBox.positionInParentSpaceY;
 			}
+		}
+		
+		
+		public static Line createRangeTestLine(int startIndex, int endIndex)
+		{
+			return new Line( new LReqBox[] {}, new LAllocBox[] {}, 0.0, 0.0, new BoxPackingParams[] {}, 0.0, startIndex, endIndex );
+		}
+		
+		
+		
+		public static int searchForStartLine(Line lines[], int startIndex)
+		{
+			int lo = 0;
+			int hi = lines.length;
+			while ( lo < hi )
+			{
+				int mid = ( lo + hi ) / 2;
+				if ( startIndex < lines[mid].startIndex )
+				{
+					hi = mid;
+				}
+				else if ( startIndex >= lines[mid].endIndex )
+				{
+					lo = mid + 1;
+				}
+				else
+				{
+					return mid;
+				}
+			}
+			
+			return Math.min( lo, lines.length - 1 );
+		}
+
+	
+		public static int searchForEndLine(Line lines[], int endIndex)
+		{
+			int lo = 0;
+			int hi = lines.length;
+			while ( lo < hi )
+			{
+				int mid = ( lo + hi ) / 2;
+				if ( endIndex < lines[mid].startIndex )
+				{
+					hi = mid;
+				}
+				else if ( endIndex >= lines[mid].endIndex )
+				{
+					lo = mid + 1;
+				}
+				else
+				{
+					return mid;
+				}
+			}
+			
+			return lo-1;
 		}
 	}
 	
@@ -245,7 +316,7 @@ public class ParagraphLayout
 					linePackingParams = new BoxPackingParams[lineLength];
 					System.arraycopy( packingParams, lineStartIndex, linePackingParams, 0, lineLength );
 				}
-				lines.add( new Line( lineChildren, lineChildrenAlloc, bFirstLine  ?  0.0  :  indentation, hSpacing, linePackingParams, allocBox.allocationX ) );
+				lines.add( new Line( lineChildren, lineChildrenAlloc, bFirstLine  ?  0.0  :  indentation, hSpacing, linePackingParams, allocBox.allocationX, lineStartIndex, lineBreakIndex ) );
 				
 				// Next line
 				lineStartIndex = lineBreakIndex + 1;
@@ -281,7 +352,7 @@ public class ParagraphLayout
 				linePackingParams = new BoxPackingParams[lineLength];
 				System.arraycopy( packingParams, lineStartIndex, linePackingParams, 0, lineLength );
 			}
-			lines.add( new Line( lineChildren, lineChildrenAlloc, bFirstLine  ?  0.0  :  indentation, hSpacing, linePackingParams, allocBox.allocationX ) );
+			lines.add( new Line( lineChildren, lineChildrenAlloc, bFirstLine  ?  0.0  :  indentation, hSpacing, linePackingParams, allocBox.allocationX, lineStartIndex, children.length ) );
 		}
 		
 		

@@ -994,11 +994,18 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 			Xform2 x = leaf.getLocalToRootXform();
 			x = x.inverse();
 			
-			Marker prevPos = caret.getMarker().copy();
-			leaf.moveMarkerToPoint( caret.getMarker(), x.transform( rootPos ) );
+			if ( caret.isValid() )
+			{
+				Marker prevPos = caret.getMarker().copy();
+				leaf.moveMarkerToPoint( caret.getMarker(), x.transform( rootPos ) );
 			
-			onCaretMove( prevPos, true );
-			bMouseSelectionInProgress = true;
+				onCaretMove( prevPos, true );
+				bMouseSelectionInProgress = true;
+			}
+			else
+			{
+				leaf.moveMarkerToPoint( caret.getMarker(), x.transform( rootPos ) );
+			}
 		}
 
 		if ( ( modifiers & Modifier.ALT )  ==  0 )
