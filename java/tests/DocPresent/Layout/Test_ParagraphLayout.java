@@ -419,4 +419,41 @@ public class Test_ParagraphLayout extends Test_Layout_base
 				new double[] { 25,15,  0,0,  15,20,  0,0,  15,10 },
 				new double[] { 0,0,  0,0,  5,20,  0,0,  5,45 } );
 	}
+	
+	
+	
+	
+	public void test_lineSearch()
+	{
+		ParagraphLayout.Line lines[] = new ParagraphLayout.Line[] { ParagraphLayout.Line.createRangeTestLine( 0, 8 ),
+				ParagraphLayout.Line.createRangeTestLine( 10, 19 ),
+				ParagraphLayout.Line.createRangeTestLine( 20, 30 ) };
+		
+		assertEquals( ParagraphLayout.Line.searchForStartLine( lines, 0 ), 0 );
+		assertEquals( ParagraphLayout.Line.searchForEndLine( lines, 0 ), 0 );
+
+		assertEquals( ParagraphLayout.Line.searchForStartLine( lines, 1 ), 0 );
+		assertEquals( ParagraphLayout.Line.searchForEndLine( lines, 1 ), 0 );
+
+		assertEquals( ParagraphLayout.Line.searchForStartLine( lines, 8 ), 1 );
+		assertEquals( ParagraphLayout.Line.searchForEndLine( lines, 8 ), 0 );
+
+		assertEquals( ParagraphLayout.Line.searchForStartLine( lines, 9 ), 1 );
+		assertEquals( ParagraphLayout.Line.searchForEndLine( lines, 9 ), 0 );
+
+		assertEquals( ParagraphLayout.Line.searchForStartLine( lines, 10 ), 1 );
+		assertEquals( ParagraphLayout.Line.searchForEndLine( lines, 10 ), 1 );
+
+		assertEquals( ParagraphLayout.Line.searchForStartLine( lines, 19 ), 2 );
+		assertEquals( ParagraphLayout.Line.searchForEndLine( lines, 19 ), 1 );
+
+		assertEquals( ParagraphLayout.Line.searchForStartLine( lines, 20 ), 2 );
+		assertEquals( ParagraphLayout.Line.searchForEndLine( lines, 20 ), 2 );
+
+		assertEquals( ParagraphLayout.Line.searchForStartLine( lines, 29 ), 2 );
+		assertEquals( ParagraphLayout.Line.searchForEndLine( lines, 29 ), 2 );
+
+		assertEquals( ParagraphLayout.Line.searchForStartLine( lines, 30 ), 2 );
+		assertEquals( ParagraphLayout.Line.searchForEndLine( lines, 30 ), 2 );
+	}
 }

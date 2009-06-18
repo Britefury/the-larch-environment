@@ -15,6 +15,7 @@ import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Layout.ParagraphLayout;
 import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
+import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 
 
@@ -256,6 +257,76 @@ public class DPParagraph extends DPContainerSequenceCollated
 			return null;
 		}
 	}
+	
+
+	
+	
+	
+	protected AABox2[] computeCollatedBranchBoundsBoxes(DPContainer collatedBranch, int rangeStart, int rangeEnd)
+	{
+		int startLineIndex = ParagraphLayout.Line.searchForStartLine( lines, rangeStart );
+		int endLineIndex = ParagraphLayout.Line.searchForEndLine( lines, rangeEnd );
+		
+		if ( startLineIndex == endLineIndex )
+		{
+			ParagraphLayout.Line line = lines[startLineIndex];
+			LAllocBox lineChildAllocBoxes[] = line.getChildAllocBoxes();
+			int lineRangeStart = line.getRangeStart();
+			LAllocBox startBox = lineChildAllocBoxes[rangeStart-lineRangeStart];
+			LAllocBox endBox = lineChildAllocBoxes[rangeEnd-lineRangeStart];
+			LAllocBox lineBox = line.getLineAllocBox();
+			double xStart = startBox.getPositionInParentSpaceX();
+			double xEnd = endBox.getPositionInParentSpaceX()  +  endBox.getAllocationX();
+			double yStart = lineBox.getPositionInParentSpaceY();
+			double yEnd = yStart + lineBox.getAllocationY();
+			AABox2 box = new AABox2( xStart, yStart, xEnd, yEnd );
+			return new AABox2[] { box };
+		}
+		else
+		{
+			AABox2 boxes[] = new AABox2[endLineIndex + 1 - startLineIndex];
+
+			ParagraphLayout.Line startLine = lines[startLineIndex];
+			int startChildIndex = rangeStart - startLine.getRangeStart();
+			startChildIndex = Math.min( startChildIndex, startLine.getChildAllocBoxes().length - 1 );
+			LAllocBox startChildBox = startLine.getChildAllocBoxes()[startChildIndex];
+			LAllocBox startLineBox = startLine.getLineAllocBox();
+			double xStart = startChildBox.getPositionInParentSpaceX();
+			double xEnd = startLineBox.getAllocationX();
+			double yStart = startLineBox.getPositionInParentSpaceY();
+			double yEnd = yStart + startLineBox.getAllocationY();
+			AABox2 startBox = new AABox2( xStart, yStart, xEnd, yEnd );
+
+			ParagraphLayout.Line endLine = lines[startLineIndex];
+			int endChildIndex = rangeEnd - endLine.getRangeStart();
+			endChildIndex = Math.min( endChildIndex, endLine.getChildAllocBoxes().length - 1 );
+			LAllocBox endChildBox = endLine.getChildAllocBoxes()[endChildIndex];
+			LAllocBox endLineBox = endLine.getLineAllocBox();
+			xStart = 0.0;
+			xEnd = endChildBox.getPositionInParentSpaceX() + endChildBox.getAllocationX();
+			yStart = endLineBox.getPositionInParentSpaceY();
+			yEnd = yStart + endLineBox.getAllocationY();
+			AABox2 endBox = new AABox2( xStart, yStart, xEnd, yEnd );
+			
+			boxes[0] = startBox;
+			boxes[boxes.length-1] = endBox;
+			
+			int j = 1;
+			for (int i = startLineIndex + 1; i < endLineIndex; i++)
+			{
+				LAllocBox lineBox = lines[i].getLineAllocBox();
+				xStart = 0.0;
+				xEnd = lineBox.getAllocationX();
+				yStart = lineBox.getPositionInParentSpaceY();
+				yEnd = yStart + lineBox.getAllocationY();
+				boxes[j++] = new AABox2( xStart, yStart, xEnd, yEnd );
+			}
+			
+			return boxes;
+		}
+	}
+
+	
 	
 	
 	//

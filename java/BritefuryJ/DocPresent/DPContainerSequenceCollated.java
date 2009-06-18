@@ -6,17 +6,14 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Deque;
 import java.util.List;
-import java.util.Stack;
 
 import BritefuryJ.DocPresent.Layout.LAllocBox;
 import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Layout.PackingParams;
 import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
+import BritefuryJ.Math.AABox2;
 
 public abstract class DPContainerSequenceCollated extends DPContainerSequence
 {
@@ -44,53 +41,57 @@ public abstract class DPContainerSequenceCollated extends DPContainerSequence
 	//
 	//
 	
-	protected void gather(ArrayList<DPWidget> leaves, ArrayList<Collateable> branches)
+	protected void gatherCount(DPContainer branch, int counts[])
 	{
-		ArrayList<DPWidget> stack = new ArrayList<DPWidget>();
-		
-		stack.add( this );
-		
-		while ( !stack.isEmpty() )
+		for (DPWidget w: branch.registeredChildren)
 		{
-			DPWidget item = stack.get( stack.size() - 1 );
-			stack.remove( stack.size() - 1 );
-			
-			if ( item instanceof Collateable  ||  item == this )
+			if ( w instanceof Collateable )
 			{
-				if ( item != this )
-				{
-					branches.add( (Collateable)item );
-				}
-				
-				
-				DPContainer container = (DPContainer)item;
-				List<DPWidget> children = container.getChildren();
-				
-				for (int i = children.size() - 1; i >= 0; i--)
-				{
-					stack.add( children.get( i ) );
-				}
+				counts[1]++;
+				gatherCount( (DPContainer)w, counts );
 			}
 			else
 			{
-				leaves.add( item );
+				counts[0]++;
 			}
 		}
 	}
+	
+	protected void gatherItems(DPContainer branch, int indices[])
+	{
+		for (DPWidget w: branch.registeredChildren)
+		{
+			if ( w instanceof Collateable )
+			{
+				Collateable c = (Collateable)w;
+				int start = indices[0];
+				collationBranches[indices[1]++] = c;
+				int end = indices[0];
+				c.setCollationRange( start, end );
+				gatherItems( (DPContainer)w, indices );
+			}
+			else
+			{
+				collationLeaves[indices[0]++] = w;
+			}
+		}
+	}
+	
 	
 	protected void refreshCollation()
 	{
 		if ( collationLeaves == null )
 		{
-			ArrayList<DPWidget> leaves = new ArrayList<DPWidget>();
-			ArrayList<Collateable> branches = new ArrayList<Collateable>();
+			int counts[] = new int [2];
+			gatherCount( this, counts );
 			
-			gather( leaves, branches );
+			collationLeaves = new DPWidget[counts[0]];
+			collationBranches = new Collateable[counts[1]];
 			
-			collationLeaves = new DPWidget[leaves.size()];
-			collationLeaves = leaves.toArray( collationLeaves );
-			collationBranches = new Collateable[branches.size()];
-			collationBranches = branches.toArray( collationBranches );
+			counts[0] = 0;
+			counts[1] = 0;
+			gatherItems( this, counts );
+			
 			
 			for (Collateable branch: collationBranches)
 			{
@@ -124,13 +125,22 @@ public abstract class DPContainerSequenceCollated extends DPContainerSequence
 		collationLeaves = null;
 		collationBranches = null;
 	}
+	
+	
+	
+	
+	protected abstract AABox2[] computeCollatedBranchBoundsBoxes(DPContainer collatedBranch, int rangeStart, int rangeEnd);
 
 
 
 
 
 
-
+	List<DPWidget> getCollatedChildren()
+	{
+		refreshCollation();
+		return Arrays.asList( collationLeaves );
+	}
 
 
 	LReqBox[] getCollatedChildrenRefreshedRequistionXBoxes()

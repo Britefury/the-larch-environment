@@ -9,4 +9,5 @@ package BritefuryJ.DocPresent;
 public interface Collateable
 {
 	public void setCollationRoot(DPContainerSequenceCollated root);
+	public void setCollationRange(int start, int end);
 }

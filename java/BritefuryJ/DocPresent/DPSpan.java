@@ -6,12 +6,17 @@
 //##************************
 package BritefuryJ.DocPresent;
 
+import java.util.List;
+
+import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
 
 public class DPSpan extends DPContainerSequence implements Collateable
 {
 	protected DPContainerSequenceCollated collationRoot;
+	protected int collationRangeStart, collationRangeEnd;
+	protected AABox2 boundsBoxes[];
 	
 	
 	public DPSpan()
@@ -20,6 +25,8 @@ public class DPSpan extends DPContainerSequence implements Collateable
 		
 		layoutReqBox = null;
 		layoutAllocBox = null;
+		collationRangeStart = -1;
+		collationRangeEnd = -1;
 	}
 
 	
@@ -38,6 +45,16 @@ public class DPSpan extends DPContainerSequence implements Collateable
 	public Point2 getPositionInParentSpace()
 	{
 		return new Point2( 0.0, 0.0 );
+	}
+	
+	public double getPositionInParentSpaceX()
+	{
+		return 0.0;
+	}
+	
+	public double getPositionInParentSpaceY()
+	{
+		return 0.0;
 	}
 	
 	public double getAllocationX()
@@ -74,7 +91,17 @@ public class DPSpan extends DPContainerSequence implements Collateable
 	
 	protected boolean containsParentSpacePoint(Point2 p)
 	{
-		return getAABoxInParentSpace().containsPoint( p );
+		refreshBoundsBoxes();
+		
+		for (AABox2 box: boundsBoxes)
+		{
+			if ( box.containsPoint( p ) )
+			{
+				return true;
+			}
+		}
+		
+		return false;
 	}
 	
 
@@ -125,5 +152,40 @@ public class DPSpan extends DPContainerSequence implements Collateable
 	public void setCollationRoot(DPContainerSequenceCollated root)
 	{
 		collationRoot = root;
+		boundsBoxes = null;
+	}
+
+	public void setCollationRange(int start, int end)
+	{
+		collationRangeStart = start;
+		collationRangeEnd = end;
+	}
+	
+	
+	protected void refreshBoundsBoxes()
+	{
+		if ( boundsBoxes == null )
+		{
+			if ( collationRangeEnd > collationRangeStart )
+			{
+				boundsBoxes = collationRoot.computeCollatedBranchBoundsBoxes( this, collationRangeStart, collationRangeEnd );
+			}
+			else
+			{
+				boundsBoxes = new AABox2[0];
+			}
+		}
+	}
+
+
+
+
+	//
+	// Focus navigation methods
+	//
+	
+	protected List<DPWidget> horizontalNavigationList()
+	{
+		return getChildren();
 	}
 }

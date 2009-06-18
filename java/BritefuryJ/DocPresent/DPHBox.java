@@ -16,6 +16,7 @@ import BritefuryJ.DocPresent.Layout.LAllocBox;
 import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
+import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 
 
@@ -127,6 +128,17 @@ public class DPHBox extends DPAbstractBox
 
 
 
+	protected AABox2[] computeCollatedBranchBoundsBoxes(DPContainer collatedBranch, int rangeStart, int rangeEnd)
+	{
+		DPWidget startLeaf = collationLeaves[rangeStart];
+		DPWidget endLeaf = collationLeaves[rangeEnd-1];
+		double xStart = startLeaf.getPositionInParentSpaceX();
+		double xEnd = endLeaf.getPositionInParentSpaceX()  +  endLeaf.getAllocationInParentSpaceX();
+		AABox2 box = new AABox2( xStart, 0.0, xEnd, getAllocationY() );
+		return new AABox2[] { box };
+	}
+
+	
 	
 	//
 	// Focus navigation methods

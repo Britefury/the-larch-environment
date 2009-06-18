@@ -17,6 +17,7 @@ import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Layout.VTypesetting;
 import BritefuryJ.DocPresent.Layout.VerticalLayout;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
+import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 
 
@@ -137,6 +138,18 @@ public class DPVBox extends DPAbstractBox
 	}
 
 
+	
+	protected AABox2[] computeCollatedBranchBoundsBoxes(DPContainer collatedBranch, int rangeStart, int rangeEnd)
+	{
+		DPWidget startLeaf = collationLeaves[rangeStart];
+		DPWidget endLeaf = collationLeaves[rangeEnd-1];
+		double yStart = startLeaf.getPositionInParentSpaceY();
+		double yEnd = endLeaf.getPositionInParentSpaceY()  +  endLeaf.getAllocationInParentSpaceY();
+		AABox2 box = new AABox2( 0.0, yStart, getAllocationX(), yEnd );
+		return new AABox2[] { box };
+	}
+
+	
 	
 	//
 	// Focus navigation methods
