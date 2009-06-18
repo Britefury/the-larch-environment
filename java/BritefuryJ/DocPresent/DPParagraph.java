@@ -333,9 +333,136 @@ public class DPParagraph extends DPContainerSequenceCollated
 	// Focus navigation methods
 	//
 	
+	protected DPContentLeaf getContentLeafAboveOrBelowFromChild(DPWidget child, boolean bBelow, Point2 localCursorPos, boolean bSkipWhitespace)
+	{
+		int childIndex = getCollatedChildren().indexOf( child );
+		int lineIndex = ParagraphLayout.Line.searchForEndLine( lines, childIndex );
+		Point2 cursorPosInRootSpace = getLocalPointRelativeToRoot( localCursorPos );
+		if ( bBelow )
+		{
+			for (int i = lineIndex + 1; i < lines.length; i++)
+			{
+				ParagraphLayout.Line line = lines[i];
+				DPContentLeaf l = getTopOrBottomContentLeafFromLine( line, false, cursorPosInRootSpace, bSkipWhitespace );
+				if ( l != null )
+				{
+					return l;
+				}
+			}
+		}
+		else
+		{
+			for (int i = lineIndex - 1; i >= 0; i--)
+			{
+				ParagraphLayout.Line line = lines[i];
+				DPContentLeaf l = getTopOrBottomContentLeafFromLine( line, true, cursorPosInRootSpace, bSkipWhitespace );
+				if ( l != null )
+				{
+					return l;
+				}
+			}
+		}
+		
+		if ( parent != null )
+		{
+			return parent.getContentLeafAboveOrBelowFromChild( this, bBelow, getLocalPointRelativeToAncestor( parent, localCursorPos ), bSkipWhitespace );
+		}
+		else
+		{
+			return null;
+		}
+	}
+
+	
+	
+	protected DPContentLeaf getTopOrBottomContentLeafFromLine(ParagraphLayout.Line line, boolean bBottom, Point2 cursorPosInRootSpace, boolean bSkipWhitespace)
+	{
+		double closestDistance = 0.0;
+		DPContentLeaf closestNode = null;
+		for (LAllocBox allocBox: line.getChildAllocBoxes())
+		{
+			DPWidget item = allocBox.getElement();
+			
+			AABox2 bounds = item.getLocalAABox();
+			double lower = item.getLocalPointRelativeToRoot( bounds.getLower() ).x;
+			double upper = item.getLocalPointRelativeToRoot( bounds.getUpper() ).x;
+			if ( cursorPosInRootSpace.x >=  lower  &&  cursorPosInRootSpace.x <= upper )
+			{
+				DPContentLeaf l = item.getTopOrBottomContentLeaf( bBottom, cursorPosInRootSpace, bSkipWhitespace );
+				if ( l != null )
+				{
+					return l;
+				}
+			}
+			else
+			{
+				double distance;
+				if ( cursorPosInRootSpace.x < lower )
+				{
+					// Cursor to the left of the box
+					distance = lower - cursorPosInRootSpace.x;
+				}
+				else // cursorPosInRootSpace.x > upper
+				{
+					// Cursor to the right of the box
+					distance = cursorPosInRootSpace.x - upper;
+				}
+				
+				if ( closestNode == null  ||  distance < closestDistance )
+				{
+					DPContentLeaf l = item.getTopOrBottomContentLeaf( bBottom, cursorPosInRootSpace, bSkipWhitespace );
+					if ( l != null )
+					{
+						closestDistance = distance;
+						closestNode = l;
+					}
+				}
+			}
+		}
+		
+		if ( closestNode != null )
+		{
+			return closestNode;
+		}
+		
+		return null;
+	}
+
+	
+	protected DPContentLeaf getTopOrBottomContentLeaf(boolean bBottom, Point2 cursorPosInRootSpace, boolean bSkipWhitespace)
+	{
+		if ( bBottom )
+		{
+			for (int i = lines.length - 1; i >= 0; i--)
+			{
+				ParagraphLayout.Line line = lines[i];
+				DPContentLeaf l = getTopOrBottomContentLeafFromLine( line, bBottom, cursorPosInRootSpace, bSkipWhitespace );
+				if ( l != null )
+				{
+					return l;
+				}
+			}
+		}
+		else
+		{
+			for (ParagraphLayout.Line line: lines)
+			{
+				DPContentLeaf l = getTopOrBottomContentLeafFromLine( line, bBottom, cursorPosInRootSpace, bSkipWhitespace );
+				if ( l != null )
+				{
+					return l;
+				}
+			}
+		}
+		
+		return null;
+	}
+
+	
+	
 	protected List<DPWidget> horizontalNavigationList()
 	{
-		return getChildren();
+		return getCollatedChildren();
 	}
 	
 	

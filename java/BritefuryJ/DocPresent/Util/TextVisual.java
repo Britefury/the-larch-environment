@@ -18,6 +18,7 @@ import java.awt.font.TextLayout;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
+import java.awt.geom.Point2D;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.text.AttributedCharacterIterator;
@@ -505,6 +506,33 @@ public class TextVisual
 		else
 		{
 			return null;
+		}
+	}
+	
+	
+	
+	public Point2 getCharacterBoundaryPosition(int characterIndex)
+	{
+		if ( layout != null )
+		{
+			TextHitInfo hit = null;
+			if ( characterIndex == 0 )
+			{
+				hit = layout.getNextRightHit( characterIndex );
+				hit = layout.getNextLeftHit( hit );
+			}
+			else
+			{
+				hit = layout.getNextLeftHit( characterIndex );
+				hit = layout.getNextRightHit( hit );
+			}
+			Point2D.Double point = new Point2D.Double();
+			layout.hitToPoint( hit, point );
+			return new Point2( point.x, point.y );
+		}
+		else
+		{
+			return new Point2( reqBox.getMinWidth() * 0.5, reqBox.getReqHeight() * 0.5 );
 		}
 	}
 	

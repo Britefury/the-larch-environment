@@ -157,12 +157,12 @@ public class DPVBox extends DPAbstractBox
 	
 	protected List<DPWidget> horizontalNavigationList()
 	{
-		return getChildren();
+		return getCollatedChildren();
 	}
 	
 	protected List<DPWidget> verticalNavigationList()
 	{
-		return getChildren();
+		return getCollatedChildren();
 	}
 
 

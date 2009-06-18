@@ -146,7 +146,7 @@ public class DPHBox extends DPAbstractBox
 	
 	protected List<DPWidget> horizontalNavigationList()
 	{
-		return getChildren();
+		return getCollatedChildren();
 	}
 	
 	
