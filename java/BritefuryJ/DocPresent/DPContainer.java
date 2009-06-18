@@ -717,7 +717,7 @@ public abstract class DPContainer extends DPWidget
 				DPContentLeaf closestNode = null;
 				for (DPWidget item: navList)
 				{
-					AABox2 bounds = getLocalAABox();
+					AABox2 bounds = item.getLocalAABox();
 					double lower = item.getLocalPointRelativeToRoot( bounds.getLower() ).x;
 					double upper = item.getLocalPointRelativeToRoot( bounds.getUpper() ).x;
 					if ( cursorPosInRootSpace.x >=  lower  &&  cursorPosInRootSpace.x <= upper )

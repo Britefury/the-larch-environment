@@ -181,4 +181,11 @@ public class DPText extends DPContentLeafEditableEntry
 			return 0;
 		}
 	}
+
+
+	protected Point2 getMarkerPosition(Marker marker)
+	{
+		int index = marker.getIndex();
+		return visual.getCharacterBoundaryPosition( index );
+	}
 }

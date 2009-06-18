@@ -379,7 +379,7 @@ public abstract class DPContentLeaf extends DPWidget
 	
 	protected void moveMarkerUp(Marker marker, boolean bSkipWhitespace)
 	{
-		Point2 cursorPos = getCursorPosition();
+		Point2 cursorPos = getMarkerPosition( marker );
 		DPContentLeaf above = getContentLeafAbove( cursorPos, bSkipWhitespace );
 		if ( above != null )
 		{
@@ -391,7 +391,7 @@ public abstract class DPContentLeaf extends DPWidget
 	
 	protected void moveMarkerDown(Marker marker, boolean bSkipWhitespace)
 	{
-		Point2 cursorPos = getCursorPosition();
+		Point2 cursorPos = getMarkerPosition( marker );
 		DPContentLeaf below = getContentLeafBelow( cursorPos, bSkipWhitespace );
 		if ( below != null )
 		{

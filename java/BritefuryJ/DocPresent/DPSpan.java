@@ -6,8 +6,6 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-import java.util.List;
-
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
@@ -184,8 +182,39 @@ public class DPSpan extends DPContainerSequence implements Collateable
 	// Focus navigation methods
 	//
 	
-	protected List<DPWidget> horizontalNavigationList()
+	protected DPContentLeaf getContentLeafToLeftFromChild(DPWidget child)
 	{
-		return getChildren();
+		if ( collationRoot != null )
+		{
+			return collationRoot.getContentLeafToLeftFromChild( child );
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	protected DPContentLeaf getContentLeafToRightFromChild(DPWidget child)
+	{
+		if ( collationRoot != null )
+		{
+			return collationRoot.getContentLeafToRightFromChild( child );
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	protected DPContentLeaf getContentLeafAboveOrBelowFromChild(DPWidget child, boolean bBelow, Point2 localCursorPos, boolean bSkipWhitespace)
+	{
+		if ( collationRoot != null )
+		{
+			return collationRoot.getContentLeafAboveOrBelowFromChild( child, bBelow, localCursorPos, bSkipWhitespace );
+		}
+		else
+		{
+			return null;
+		}
 	}
 }

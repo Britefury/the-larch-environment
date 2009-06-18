@@ -1224,7 +1224,7 @@ abstract public class DPWidget
 		return null;
 	}
 	
-	protected Point2 getCursorPosition()
+	protected Point2 getMarkerPosition(Marker marker)
 	{
 		return new Point2( getAllocationX() * 0.5, getAllocationY() * 0.5 );
 	}
