@@ -17,8 +17,7 @@ import BritefuryJ.Math.AABox2;
 
 public abstract class DPContainerSequenceCollated extends DPContainerSequence
 {
-	protected DPWidget collationLeaves[];
-	protected Collateable collationBranches[];
+	protected DPWidget collationLeaves[], collationBranches[];
 	
 	
 	
@@ -65,10 +64,10 @@ public abstract class DPContainerSequenceCollated extends DPContainerSequence
 			{
 				Collateable c = (Collateable)w;
 				int start = indices[0];
-				collationBranches[indices[1]++] = c;
+				collationBranches[indices[1]++] = w;
+				gatherItems( (DPContainer)w, indices );
 				int end = indices[0];
 				c.setCollationRange( start, end );
-				gatherItems( (DPContainer)w, indices );
 			}
 			else
 			{
@@ -86,17 +85,11 @@ public abstract class DPContainerSequenceCollated extends DPContainerSequence
 			gatherCount( this, counts );
 			
 			collationLeaves = new DPWidget[counts[0]];
-			collationBranches = new Collateable[counts[1]];
+			collationBranches = new DPWidget[counts[1]];
 			
 			counts[0] = 0;
 			counts[1] = 0;
 			gatherItems( this, counts );
-			
-			
-			for (Collateable branch: collationBranches)
-			{
-				branch.setCollationRoot( this );
-			}
 		}
 	}
 	
@@ -104,6 +97,7 @@ public abstract class DPContainerSequenceCollated extends DPContainerSequence
 	
 	protected void childListModified()
 	{
+		super.childListModified();
 		resetCollation();
 	}
 
@@ -115,16 +109,20 @@ public abstract class DPContainerSequenceCollated extends DPContainerSequence
 	
 	private void resetCollation()
 	{
-		if ( collationBranches != null )
-		{
-			for (Collateable branch: collationBranches)
-			{
-				branch.setCollationRoot( null );
-			}
-		}
 		collationLeaves = null;
 		collationBranches = null;
 	}
+	
+	
+	protected void onSizeRefreshed()
+	{
+		super.onSizeRefreshed();
+		for (DPWidget c: collationBranches)
+		{
+			c.onSizeRefreshed();
+		}
+	}
+
 	
 	
 	

@@ -100,19 +100,14 @@ def viewLispNode(node, ctx, state):
 		# Check the contents, to determine the layout
 		mode = MODE_HORIZONTAL
 		if len( node ) > 0:
-			if isStringNode( node[0] ):
-				for x in node[1:]:
-					if not isStringNode( x ):
-						mode = MODE_VERTICALINLINE
-						break
-			else:
-				mode = MODE_VERTICAL
+			for x in node:
+				if not isStringNode( x ):
+					mode = MODE_VERTICAL
+					break
 		
 		# Create the layout
 		if mode == MODE_HORIZONTAL:
-			layout = horizontal_listViewLayout
-		elif mode == MODE_VERTICALINLINE:
-			layout = verticalInline_listViewLayout
+			layout = paragraph_listViewLayout
 		elif mode == MODE_VERTICAL:
 			layout = vertical_listViewLayout
 		else:
@@ -124,25 +119,42 @@ def viewLispNode(node, ctx, state):
 		return nodeEditor( ctx, node, v, state )
 	elif isObjectNode( node ):
 		cls = node.getDMClass()
-		# Header
-		className = ctx.paragraph( lisp_paragraphStyle, [ ctx.text( className_textStyle, cls.getName() ), ctx.text( string_textStyle, ' ' ), ctx.text( punctuation_textStyle, ':' ) ] )
-		itemViews = [ className ]
 		
-		# Create views of each item
+		# Determine how this node is to be displayed
 		mode = MODE_HORIZONTAL
 		for i in xrange( 0, cls.getNumFields() ):
 			value = node.get( i )
-			fieldName = cls.getField( i ).getName()
 			if not isNullNode( value ):
 				# If we encounter a non-string value, then this object cannot be displayed in a single line
 				if not isStringNode( value ):
 					mode = MODE_VERTICALINLINE
-				line = ctx.paragraph( lisp_paragraphStyle, [ ctx.text( fieldName_textStyle, fieldName ), ctx.text( punctuation_textStyle, '=' ), lispViewEval( value, ctx, state ) ] )
+					break
+		
+		# Header
+		if mode == MODE_HORIZONTAL:
+			className = ctx.span( [ ctx.text( className_textStyle, cls.getName() ), ctx.text( string_textStyle, ' ' ), ctx.text( punctuation_textStyle, ':' ) ] )
+		elif mode == MODE_VERTICALINLINE:
+			className = ctx.paragraph( lisp_paragraphStyle, [ ctx.text( className_textStyle, cls.getName() ), ctx.text( string_textStyle, ' ' ), ctx.text( punctuation_textStyle, ':' ) ] )
+		else:
+			raise ValueError, 'invalid mode'
+		
+		itemViews = [ className ]
+		# Create views of each item
+		for i in xrange( 0, cls.getNumFields() ):
+			value = node.get( i )
+			fieldName = cls.getField( i ).getName()
+			if not isNullNode( value ):
+				if mode == MODE_HORIZONTAL:
+					line = ctx.span( [ ctx.text( fieldName_textStyle, fieldName ), ctx.text( punctuation_textStyle, '=' ), lispViewEval( value, ctx, state ) ] )
+				elif mode == MODE_VERTICALINLINE:
+					line = ctx.paragraph( lisp_paragraphStyle, [ ctx.text( fieldName_textStyle, fieldName ), ctx.text( punctuation_textStyle, '=' ), lispViewEval( value, ctx, state ) ] )
+				else:
+					raise ValueError, 'invalid mode'
 				itemViews.append( line )
 				
 		# Create the layout
 		if mode == MODE_HORIZONTAL:
-			layout = horizontal_listViewLayout
+			layout = paragraph_listViewLayout
 		elif mode == MODE_VERTICALINLINE:
 			layout = verticalInline_listViewLayout
 		else:

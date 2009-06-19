@@ -590,6 +590,8 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 	public void oneToOne()
 	{
 		rootScaleInWindowSpace = 1.0;
+		
+		bAllocationRequired = true;
 		queueFullRedraw();
 	}
 	
@@ -597,6 +599,8 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 	{
 		windowTopLeftCornerInRootSpace = new Point2();
 		rootScaleInWindowSpace = 1.0;
+		
+		bAllocationRequired = true;
 		queueFullRedraw();
 	}
 	
@@ -623,6 +627,8 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 		windowTopLeftCornerInRootSpace = new Point2();
 		rootScaleInWindowSpace = Math.min( areaSize.x / ax, areaSize.y / ay );
 		rootScaleInWindowSpace = rootScaleInWindowSpace == 0.0  ?  1.0  :  rootScaleInWindowSpace;
+		
+		bAllocationRequired = true;
 		queueFullRedraw();
 	}
 	
@@ -633,6 +639,7 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 		Point2 newCentreInRootSpace = windowSpaceToRootSpace( centreInWindowSpace );
 		windowTopLeftCornerInRootSpace = windowTopLeftCornerInRootSpace.sub( newCentreInRootSpace.sub( centreInRootSpace ) );
 
+		bAllocationRequired = true;
 		queueFullRedraw();
 	}
 	
@@ -802,7 +809,8 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 			double prevWidth = layoutAllocBox.getAllocationX();
 			if ( bHorizontalClamp )
 			{
-				layoutAllocBox.setAllocationX( areaSize.x / rootScaleInWindowSpace );
+				double scaleFactor = Math.min( rootScaleInWindowSpace, 1.0 );
+				layoutAllocBox.setAllocationX( areaSize.x / scaleFactor );
 			}
 			else
 			{
@@ -991,20 +999,23 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 		if ( button == 1  &&  ( modifiers & ( Modifier.ALT | Modifier.ALT_GRAPH | Modifier.CTRL | Modifier.SHIFT ) )  ==  0 )
 		{
 			DPContentLeafEditableEntry leaf = (DPContentLeafEditableEntry)getLeafClosestToLocalPoint( rootPos, new DPContentLeafEditableEntry.EditableEntryLeafWidgetFilter() );
-			Xform2 x = leaf.getLocalToRootXform();
-			x = x.inverse();
-			
-			if ( caret.isValid() )
+			if ( leaf != null )
 			{
-				Marker prevPos = caret.getMarker().copy();
-				leaf.moveMarkerToPoint( caret.getMarker(), x.transform( rootPos ) );
-			
-				onCaretMove( prevPos, true );
-				bMouseSelectionInProgress = true;
-			}
-			else
-			{
-				leaf.moveMarkerToPoint( caret.getMarker(), x.transform( rootPos ) );
+				Xform2 x = leaf.getLocalToRootXform();
+				x = x.inverse();
+				
+				if ( caret.isValid() )
+				{
+					Marker prevPos = caret.getMarker().copy();
+					leaf.moveMarkerToPoint( caret.getMarker(), x.transform( rootPos ) );
+				
+					onCaretMove( prevPos, true );
+					bMouseSelectionInProgress = true;
+				}
+				else
+				{
+					leaf.moveMarkerToPoint( caret.getMarker(), x.transform( rootPos ) );
+				}
 			}
 		}
 

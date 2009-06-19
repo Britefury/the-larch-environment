@@ -1199,6 +1199,12 @@ abstract public class DPWidget
 		{
 			updateAllocationY();
 		}
+		onSizeRefreshed();
+	}
+	
+	
+	protected void onSizeRefreshed()
+	{
 		bResizeQueued = false;
 		bSizeUpToDate = true;
 	}

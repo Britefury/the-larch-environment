@@ -7,25 +7,11 @@
 //##************************
 package BritefuryJ.DocPresent.ElementTree;
 
-import java.util.List;
-
-import BritefuryJ.DocPresent.DPContainer;
 import BritefuryJ.DocPresent.DPParagraph;
-import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
 
-public class ParagraphElement extends CollatedBranchElement
+public class ParagraphElement extends SequenceBranchElement
 {
-	private static class ParagraphCollationFilter implements CollatableBranchFilter
-	{
-		public boolean test(CollatableBranchElement branch)
-		{
-			return branch.isParagraph()  ||  branch.isProxy();
-		}
-	}
-	
-	
 	public ParagraphElement()
 	{
 		this( ParagraphStyleSheet.defaultStyleSheet );
@@ -33,43 +19,12 @@ public class ParagraphElement extends CollatedBranchElement
 
 	public ParagraphElement(ParagraphStyleSheet styleSheet)
 	{
-		super( styleSheet );
+		super( new DPParagraph( styleSheet ) );
 	}
 
-	
 
 	public DPParagraph getWidget()
 	{
-		return (DPParagraph)getContainer();
-	}
-	
-	protected DPContainer createContainerWidget(ContainerStyleSheet styleSheet)
-	{
-		return new DPParagraph( (ParagraphStyleSheet)styleSheet );
-	}
-
-	
-	
-	public void collateSubtree(List<Element> childElementsOut, List<CollatableBranchElement> collatedBranchesOut)
-	{
-		collateSubtree( childElementsOut, collatedBranchesOut, new ParagraphCollationFilter() );
-	}
-
-
-	public void setCollatedContainerChildWidgets(List<DPWidget> childWidgets)
-	{
-		getWidget().setChildren( childWidgets );
-	}
-	
-
-	
-	
-	//
-	// Element type methods
-	//
-	
-	protected boolean isParagraph()
-	{
-		return true;
+		return (DPParagraph)widget;
 	}
 }

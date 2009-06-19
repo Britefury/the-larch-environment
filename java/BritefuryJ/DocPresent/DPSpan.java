@@ -132,6 +132,8 @@ public class DPSpan extends DPContainerSequence implements Collateable
 	
 	protected void childListModified()
 	{
+		super.childListModified();
+		
 		if ( collationRoot != null )
 		{
 			collationRoot.onCollatedBranchChildListModified( this );
@@ -151,6 +153,11 @@ public class DPSpan extends DPContainerSequence implements Collateable
 	{
 		collationRoot = root;
 		boundsBoxes = null;
+	}
+
+	public DPContainerSequenceCollated getCollationRoot()
+	{
+		return collationRoot;
 	}
 
 	public void setCollationRange(int start, int end)
@@ -174,8 +181,42 @@ public class DPSpan extends DPContainerSequence implements Collateable
 			}
 		}
 	}
+	
+	
+	
+	protected void onRealise()
+	{
+		if ( parent instanceof Collateable )
+		{
+			setCollationRoot( ((Collateable)parent).getCollationRoot() );
+		}
+		else if ( parent instanceof DPContainerSequenceCollated )
+		{
+			setCollationRoot( (DPContainerSequenceCollated)parent );
+		}
+	}
+	
+	protected void onUnrealise(DPWidget unrealiseRoot)
+	{
+		super.onUnrealise( unrealiseRoot );
+		setCollationRoot( null );
+	}
+	
+	
+	protected void setParent(DPContainer parent, DPPresentationArea area)
+	{
+		if ( parent != this.parent   &&   parent != null )
+		{
+			if ( !(parent instanceof Collateable)  &&  !(parent instanceof DPContainerSequenceCollated) )
+			{
+				throw new RuntimeException( "Collateable elements must be placed in either a) another collateable element, or b) a collated element; " + parent.getClass().getName() + " does not qualify" );
+			}
+		}
 
+		super.setParent( parent, area );
+	}
 
+	
 
 
 	//

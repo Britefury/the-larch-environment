@@ -10,12 +10,14 @@ package visualtests.DocPresent.ElementTree;
 import java.awt.Color;
 import java.awt.Font;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import javax.swing.JFrame;
 
 import BritefuryJ.DocPresent.ElementTree.Element;
 import BritefuryJ.DocPresent.ElementTree.LineBreakElement;
 import BritefuryJ.DocPresent.ElementTree.ParagraphElement;
+import BritefuryJ.DocPresent.ElementTree.SpanElement;
 import BritefuryJ.DocPresent.ElementTree.TextElement;
 import BritefuryJ.DocPresent.ElementTree.VBoxElement;
 import BritefuryJ.DocPresent.Layout.HAlignment;
@@ -28,7 +30,7 @@ import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
 public class ParagraphStressTest extends ElementTreeTestBase
 {
-	protected Element makeNestedParagraphElement(String prefix, double indentation, int numChildren, int level)
+	protected Element makeNestedSpanElement(String prefix, double indentation, int numChildren, int level)
 	{
 		Font f0 = new Font( "Sans serif", Font.PLAIN, 12 );
 		TextStyleSheet s0 = new TextStyleSheet( f0, Color.black );
@@ -43,7 +45,7 @@ public class ParagraphStressTest extends ElementTreeTestBase
 			}
 			else
 			{
-				ch.add( makeNestedParagraphElement( prefix + String.valueOf( i ) + "_", indentation, numChildren, level - 1 ) );
+				ch.add( makeNestedSpanElement( prefix + String.valueOf( i ) + "_", indentation, numChildren, level - 1 ) );
 			}
 			
 			if ( i != numChildren - 1 )
@@ -56,10 +58,19 @@ public class ParagraphStressTest extends ElementTreeTestBase
 			}
 		}
 		
+		SpanElement span = new SpanElement(); 
+		
+		span.setChildren( ch );
+		return span;
+	}
+
+	
+	protected Element makeNestedParagraphElement(String prefix, double indentation, int numChildren, int level)
+	{
 		ParagraphStyleSheet p0 = new ParagraphStyleSheet( VAlignment.BASELINES, 0.0, 0.0, 0.0, indentation );
 		ParagraphElement para = new ParagraphElement( p0 ); 
 		
-		para.setChildren( ch );
+		para.setChildren( Arrays.asList( new Element[] { makeNestedSpanElement( prefix, indentation, numChildren, level ) } ) );
 		return para;
 	}
 

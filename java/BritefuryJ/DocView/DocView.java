@@ -6,6 +6,13 @@
 //##************************
 package BritefuryJ.DocView;
 
+import java.util.Arrays;
+
+import BritefuryJ.DocPresent.ElementTree.Element;
+import BritefuryJ.DocPresent.ElementTree.VBoxElement;
+import BritefuryJ.DocPresent.Layout.HAlignment;
+import BritefuryJ.DocPresent.Layout.VTypesetting;
+import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 import BritefuryJ.DocTree.DocTree;
 import BritefuryJ.DocTree.DocTreeNode;
 import BritefuryJ.Utils.Profile.ProfileTimer;
@@ -30,10 +37,13 @@ public class DocView implements DVNode.NodeRefreshListener
 	private DVNode.NodeElementChangeListener elementChangeListener;
 	private boolean bRefreshRequired;
 	private RefreshListener refreshListener;
+	private VBoxElement rootBox;
 	
 	
 	private boolean bProfilingEnabled;
-	ProfileTimer pythonTimer, javaTimer, elementTimer, contentChangeTimer, updateNodeElementTimer;
+	private ProfileTimer pythonTimer, javaTimer, elementTimer, contentChangeTimer, updateNodeElementTimer;
+	
+	private static VBoxStyleSheet rootBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.EXPAND, 0.0, true, 0.0 );
 	
 	
 	
@@ -52,6 +62,8 @@ public class DocView implements DVNode.NodeRefreshListener
 		elementChangeListener = null;
 		
 		bRefreshRequired = true;
+		
+		rootBox = null;
 		
 		bProfilingEnabled = false;
 		pythonTimer = new ProfileTimer();
@@ -73,7 +85,7 @@ public class DocView implements DVNode.NodeRefreshListener
 	}
 	
 	
-	public DVNode getRootView()
+	protected DVNode getRootView()
 	{
 		if ( rootView == null )
 		{
@@ -82,6 +94,19 @@ public class DocView implements DVNode.NodeRefreshListener
 			rootView.setRefreshListener( this );
 		}
 		return rootView;
+	}
+	
+	
+	public Element getRootViewElement()
+	{
+		if ( rootBox == null )
+		{
+			performRefresh();
+			DVNode rootView = getRootView();
+			rootBox = new VBoxElement( rootBoxStyle );
+			rootBox.setChildren( Arrays.asList( new Element[] { rootView.getElement() } ) );
+		}
+		return rootBox;
 	}
 	
 	

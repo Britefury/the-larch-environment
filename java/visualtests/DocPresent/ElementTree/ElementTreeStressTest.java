@@ -15,6 +15,7 @@ import javax.swing.JFrame;
 
 import BritefuryJ.DocPresent.ElementTree.Element;
 import BritefuryJ.DocPresent.ElementTree.ParagraphElement;
+import BritefuryJ.DocPresent.ElementTree.SpanElement;
 import BritefuryJ.DocPresent.ElementTree.TextElement;
 import BritefuryJ.DocPresent.ElementTree.VBoxElement;
 import BritefuryJ.DocPresent.Layout.HAlignment;
@@ -42,7 +43,7 @@ public class ElementTreeStressTest extends ElementTreeTestBase
 	{
 		TextElement dot = new TextElement( puncStyle, "." );
 		TextElement attrName = new TextElement( nameStyle, a );
-		ParagraphElement attr = new ParagraphElement( paraStyle );
+		SpanElement attr = new SpanElement();
 		attr.setChildren( Arrays.asList( new Element[] { x, dot, attrName } ) );
 		return attr;
 	}
@@ -64,7 +65,7 @@ public class ElementTreeStressTest extends ElementTreeTestBase
 			elems.add( args[i] );
 		}
 		elems.add( closeParen );
-		ParagraphElement call = new ParagraphElement( paraStyle );
+		SpanElement call = new SpanElement();
 		call.setChildren( elems );
 		return call;
 	}
@@ -84,7 +85,10 @@ public class ElementTreeStressTest extends ElementTreeTestBase
 		
 		for (int i = 0; i < NUMLINES; i++)
 		{
-			children.add( call( attr( name( "obj" ), "method" ), name( "a" ), name( "b" ), name( "c" ), name( "d" ), name( "e" ), name( "f" ) ) );
+			ParagraphElement para = new ParagraphElement( paraStyle );
+			Element child = call( attr( name( "obj" ), "method" ), name( "a" ), name( "b" ), name( "c" ), name( "d" ), name( "e" ), name( "f" ) );
+			para.setChildren( Arrays.asList( new Element[] { child } ) );
+			children.add( para );
 		}
 		
 		box.setChildren( children );

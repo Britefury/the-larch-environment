@@ -264,6 +264,8 @@ public class DPParagraph extends DPContainerSequenceCollated
 	
 	protected AABox2[] computeCollatedBranchBoundsBoxes(DPContainer collatedBranch, int rangeStart, int rangeEnd)
 	{
+		refreshCollation();
+		
 		int startLineIndex = ParagraphLayout.Line.searchForStartLine( lines, rangeStart );
 		int endLineIndex = ParagraphLayout.Line.searchForEndLine( lines, rangeEnd );
 		
@@ -272,8 +274,10 @@ public class DPParagraph extends DPContainerSequenceCollated
 			ParagraphLayout.Line line = lines[startLineIndex];
 			LAllocBox lineChildAllocBoxes[] = line.getChildAllocBoxes();
 			int lineRangeStart = line.getRangeStart();
-			LAllocBox startBox = lineChildAllocBoxes[rangeStart-lineRangeStart];
-			LAllocBox endBox = lineChildAllocBoxes[rangeEnd-lineRangeStart];
+			int startInLine = Math.min( rangeStart - lineRangeStart, lineChildAllocBoxes.length - 1 );
+			int endInLine = Math.min( ( rangeEnd - 1 ) - lineRangeStart, lineChildAllocBoxes.length - 1 );
+			LAllocBox startBox = lineChildAllocBoxes[startInLine];
+			LAllocBox endBox = lineChildAllocBoxes[endInLine];
 			LAllocBox lineBox = line.getLineAllocBox();
 			double xStart = startBox.getPositionInParentSpaceX();
 			double xEnd = endBox.getPositionInParentSpaceX()  +  endBox.getAllocationX();
@@ -287,9 +291,9 @@ public class DPParagraph extends DPContainerSequenceCollated
 			AABox2 boxes[] = new AABox2[endLineIndex + 1 - startLineIndex];
 
 			ParagraphLayout.Line startLine = lines[startLineIndex];
-			int startChildIndex = rangeStart - startLine.getRangeStart();
-			startChildIndex = Math.min( startChildIndex, startLine.getChildAllocBoxes().length - 1 );
-			LAllocBox startChildBox = startLine.getChildAllocBoxes()[startChildIndex];
+			int startInLine = rangeStart - startLine.getRangeStart();
+			startInLine = Math.min( startInLine, startLine.getChildAllocBoxes().length - 1 );
+			LAllocBox startChildBox = startLine.getChildAllocBoxes()[startInLine];
 			LAllocBox startLineBox = startLine.getLineAllocBox();
 			double xStart = startChildBox.getPositionInParentSpaceX();
 			double xEnd = startLineBox.getAllocationX();
@@ -298,9 +302,9 @@ public class DPParagraph extends DPContainerSequenceCollated
 			AABox2 startBox = new AABox2( xStart, yStart, xEnd, yEnd );
 
 			ParagraphLayout.Line endLine = lines[startLineIndex];
-			int endChildIndex = rangeEnd - endLine.getRangeStart();
-			endChildIndex = Math.min( endChildIndex, endLine.getChildAllocBoxes().length - 1 );
-			LAllocBox endChildBox = endLine.getChildAllocBoxes()[endChildIndex];
+			int endInLine = ( rangeEnd - 1 ) - endLine.getRangeStart();
+			endInLine = Math.min( endInLine, endLine.getChildAllocBoxes().length - 1 );
+			LAllocBox endChildBox = endLine.getChildAllocBoxes()[endInLine];
 			LAllocBox endLineBox = endLine.getLineAllocBox();
 			xStart = 0.0;
 			xEnd = endChildBox.getPositionInParentSpaceX() + endChildBox.getAllocationX();

@@ -567,9 +567,9 @@ public class Test_VerticalLayout extends Test_Layout_base
 		// 	boxAllocation=300   ->   [ 300, 200 ] @ [ 0, 0 ]		- pref size, no expansion
 		// 	boxAllocation=250   ->   [ 250, 200 ] @ [ 0, 0 ]		- between min and pref, no expansion
 		// 	boxAllocation=200   ->   [ 200, 200 ] @ [ 0, 0 ]		- min size, pref size
-		// 	boxAllocation=150   ->   [ 200, 150 ] @ [ 0, 0 ]		- below min size, between min and pref
-		// 	boxAllocation=100   ->   [ 200, 100 ] @ [ 0, 0 ]		- below min size, min size
-		// 	boxAllocation=50   ->   [ 200, 100 ] @ [ 0, 0 ]		- below min size, below min size
+		// 	boxAllocation=150   ->   [ 150, 150 ] @ [ 0, 0 ]		- below min size, between min and pref
+		// 	boxAllocation=100   ->   [ 100, 100 ] @ [ 0, 0 ]		- below min size, min size
+		// 	boxAllocation=50   ->     [ 50, 50 ] @ [ 0, 0 ]			- below min size, below min size
 		allocXTests( new LReqBox[] { xbox( 200.0, 300.0, 0.0, 0.0 ),  xbox( 100.0, 200.0, 0.0, 0.0 ) }, HAlignment.LEFT,
 				xbox( 200.0, 300.0, 0.0, 0.0 ),
 				new double[] { 400.0, 300.0, 250.0, 200.0, 150.0, 100.0, 50.0 },
@@ -578,9 +578,9 @@ public class Test_VerticalLayout extends Test_Layout_base
 					new double[] { 300.0, 200.0 },
 					new double[] { 250.0, 200.0 },
 					new double[] { 200.0, 200.0 },
-					new double[] { 200.0, 150.0 },
-					new double[] { 200.0, 100.0 },
-					new double[] { 200.0, 100.0 } },
+					new double[] { 150.0, 150.0 },
+					new double[] { 100.0, 100.0 },
+					new double[] { 50.0, 50.0 } },
 				new double[][] {
 					new double[] { 0.0, 0.0 },
 					new double[] { 0.0, 0.0 },
@@ -597,9 +597,9 @@ public class Test_VerticalLayout extends Test_Layout_base
 		// 	boxAllocation=300   ->   [ 300, 200 ] @ [ 0, 50 ]		- pref size, no expansion
 		// 	boxAllocation=250   ->   [ 250, 200 ] @ [ 0, 25 ]		- between min and pref, no expansion
 		// 	boxAllocation=200   ->   [ 200, 200 ] @ [ 0, 0 ]		- min size, pref size
-		// 	boxAllocation=150   ->   [ 200, 200 ] @ [ 0, 0 ]		- below min size, between min and pref
-		// 	boxAllocation=100   ->   [ 200, 200 ] @ [ 0, 0 ]		- below min size, min size
-		// 	boxAllocation=50   ->   [ 200, 200 ] @ [ 0, 0 ]		- below min size, below min size
+		// 	boxAllocation=150   ->   [ 150, 150 ] @ [ 0, 0 ]		- below min size, between min and pref
+		// 	boxAllocation=100   ->   [ 100, 100 ] @ [ 0, 0 ]		- below min size, min size
+		// 	boxAllocation=50   ->     [ 50, 50 ] @ [ 0, 0 ]		- below min size, below min size
 		allocXTests( new LReqBox[] { xbox( 200.0, 300.0, 0.0, 0.0 ),  xbox( 100.0, 200.0, 0.0, 0.0 ) }, HAlignment.CENTRE,
 				xbox( 200.0, 300.0, 0.0, 0.0 ),
 				new double[] { 400.0, 300.0, 250.0, 200.0, 150.0, 100.0, 50.0 },
@@ -608,9 +608,9 @@ public class Test_VerticalLayout extends Test_Layout_base
 					new double[] { 300.0, 200.0 },
 					new double[] { 250.0, 200.0 },
 					new double[] { 200.0, 200.0 },
-					new double[] { 200.0, 150.0 },
-					new double[] { 200.0, 100.0 },
-					new double[] { 200.0, 100.0 } },
+					new double[] { 150.0, 150.0 },
+					new double[] { 100.0, 100.0 },
+					new double[] { 50.0, 50.0 } },
 				new double[][] {
 					new double[] { 50.0, 100.0 },
 					new double[] { 0.0, 50.0 },
@@ -627,9 +627,9 @@ public class Test_VerticalLayout extends Test_Layout_base
 		// 	boxAllocation=300   ->   [ 300, 200 ] @ [ 0, 100 ]		- pref size, no expansion
 		// 	boxAllocation=250   ->   [ 250, 200 ] @ [ 0, 50 ]		- between min and pref, no expansion
 		// 	boxAllocation=200   ->   [ 200, 200 ] @ [ 0, 0 ]		- min size, pref size
-		// 	boxAllocation=150   ->   [ 200, 200 ] @ [ 0, 0 ]		- below min size, between min and pref
-		// 	boxAllocation=100   ->   [ 200, 200 ] @ [ 0, 0 ]		- below min size, min size
-		// 	boxAllocation=50   ->   [ 200, 200 ] @ [ 0, 0 ]		- below min size, below min size
+		// 	boxAllocation=150   ->   [ 150, 150 ] @ [ 0, 0 ]		- below min size, between min and pref
+		// 	boxAllocation=100   ->   [ 100, 100 ] @ [ 0, 0 ]		- below min size, min size
+		// 	boxAllocation=50   ->     [ 50, 50 ] @ [ 0, 0 ]		- below min size, below min size
 		allocXTests( new LReqBox[] { xbox( 200.0, 300.0, 0.0, 0.0 ),  xbox( 100.0, 200.0, 0.0, 0.0 ) }, HAlignment.RIGHT,
 				xbox( 200.0, 300.0, 0.0, 0.0 ),
 				new double[] { 400.0, 300.0, 250.0, 200.0, 150.0, 100.0, 50.0 },
@@ -638,9 +638,9 @@ public class Test_VerticalLayout extends Test_Layout_base
 					new double[] { 300.0, 200.0 },
 					new double[] { 250.0, 200.0 },
 					new double[] { 200.0, 200.0 },
-					new double[] { 200.0, 150.0 },
-					new double[] { 200.0, 100.0 },
-					new double[] { 200.0, 100.0 } },
+					new double[] { 150.0, 150.0 },
+					new double[] { 100.0, 100.0 },
+					new double[] { 50.0, 50.0 } },
 				new double[][] {
 					new double[] { 100.0, 200.0 },
 					new double[] { 0.0, 100.0 },
@@ -657,9 +657,9 @@ public class Test_VerticalLayout extends Test_Layout_base
 		// 	boxAllocation=300   ->   [ 300, 300 ] @ [ 0, 0 ]		- pref size, expansion
 		// 	boxAllocation=250   ->   [ 250, 250 ] @ [ 0, 0 ]		- between min and pref, expansion
 		// 	boxAllocation=200   ->   [ 200, 200 ] @ [ 0, 0 ]		- min size, pref size
-		// 	boxAllocation=150   ->   [ 200, 200 ] @ [ 0, 0 ]		- below min size, between min and pref
-		// 	boxAllocation=100   ->   [ 200, 200 ] @ [ 0, 0 ]		- below min size, min size
-		// 	boxAllocation=50   ->   [ 200, 200 ] @ [ 0, 0 ]		- below min size, below min size
+		// 	boxAllocation=150   ->   [ 150, 150 ] @ [ 0, 0 ]		- below min size, between min and pref
+		// 	boxAllocation=100   ->   [ 100, 100 ] @ [ 0, 0 ]		- below min size, min size
+		// 	boxAllocation=50   ->     [ 50, 50 ] @ [ 0, 0 ]		- below min size, below min size
 		allocXTests( new LReqBox[] { xbox( 200.0, 300.0, 0.0, 0.0 ),  xbox( 100.0, 200.0, 0.0, 0.0 ) }, HAlignment.EXPAND,
 				xbox( 200.0, 300.0, 0.0, 0.0 ),
 				new double[] { 400.0, 300.0, 250.0, 200.0, 150.0, 100.0, 50.0 },
@@ -668,9 +668,9 @@ public class Test_VerticalLayout extends Test_Layout_base
 					new double[] { 300.0, 300.0 },
 					new double[] { 250.0, 250.0 },
 					new double[] { 200.0, 200.0 },
-					new double[] { 200.0, 150.0 },
-					new double[] { 200.0, 100.0 },
-					new double[] { 200.0, 100.0 } },
+					new double[] { 150.0, 150.0 },
+					new double[] { 100.0, 100.0 },
+					new double[] { 50.0, 50.0 } },
 				new double[][] {
 					new double[] { 0.0, 0.0 },
 					new double[] { 0.0, 0.0 },

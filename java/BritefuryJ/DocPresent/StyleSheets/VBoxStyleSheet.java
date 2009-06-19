@@ -21,7 +21,7 @@ public class VBoxStyleSheet extends AbstractBoxStyleSheet
 
 	public VBoxStyleSheet()
 	{
-		this( VTypesetting.NONE, HAlignment.CENTRE, 0.0, false, 0.0 );
+		this( VTypesetting.NONE, HAlignment.EXPAND, 0.0, false, 0.0 );
 	}
 	
 	public VBoxStyleSheet(VTypesetting typesetting, HAlignment alignment, double spacing, boolean bExpand, double padding)
