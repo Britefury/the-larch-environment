@@ -14,7 +14,7 @@ import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 
-public class SegmentElement extends OrderedBranchElement implements CollatedElementInterface
+public class SegmentElement extends OrderedBranchElement
 {
 	
 	//
@@ -39,20 +39,9 @@ public class SegmentElement extends OrderedBranchElement implements CollatedElem
 
 	
 	
-	private static class ParagraphCollationFilter implements CollatableBranchFilter
-	{
-		public boolean test(CollatableBranchElement branch)
-		{
-			return branch.isParagraph()  ||  branch.isProxy();
-		}
-	}
-
-		
-	
 	protected TextStyleSheet textStyleSheet;
 	protected boolean bGuardBegin, bGuardEnd;
 	protected Element beginGuard, endGuard;
-	private ElementCollator collator;
 	protected Element child;
 	
 	
@@ -76,8 +65,6 @@ public class SegmentElement extends OrderedBranchElement implements CollatedElem
 		this.textStyleSheet = textStyleSheet;
 		this.bGuardBegin = bGuardBegin;
 		this.bGuardEnd = bGuardEnd;
-		
-		collator = new ElementCollator( this );
 	}
 	
 	
@@ -225,46 +212,29 @@ public class SegmentElement extends OrderedBranchElement implements CollatedElem
 			endGuard.setElementTree( null );
 			endGuard = null;
 		}
-	}
-
-	public void collateSubtree(List<Element> childElementsOut, List<CollatableBranchElement> collatedBranchesOut)
-	{
-		CollatableBranchFilter collationFilter = new ParagraphCollationFilter();
+		
+		ArrayList<DPWidget> ch = new ArrayList<DPWidget>();
 		if ( beginGuard != null )
 		{
-			childElementsOut.add( beginGuard );
+			ch.add( beginGuard.getWidget() );
 		}
 		if ( child != null )
 		{
-			if ( child.isCollatableBranch()  &&  collationFilter.test( (CollatableBranchElement)child ) )
-			{
-				CollatableBranchElement b = (CollatableBranchElement)child;
-				collatedBranchesOut.add( b );
-				b.collateSubtree( childElementsOut, collatedBranchesOut, collationFilter );
-			}
-			else
-			{
-				childElementsOut.add( child );
-			}
+			ch.add( child.getWidget() );
 		}
 		if ( endGuard != null )
 		{
-			childElementsOut.add( endGuard );
+			ch.add( endGuard.getWidget() );
 		}
+		
+		getWidget().setChildren( ch );
 	}
-	
-	public void setCollatedContainerChildWidgets(List<DPWidget> childWidgets)
-	{
-		getWidget().setChildren( childWidgets );
-	}
-	
-	
+
 	protected void onSubtreeStructureChanged()
 	{
 		super.onSubtreeStructureChanged();
 		
 		refreshGuards();
-		collator.refreshContainerWidgetContents();
 	}
 	
 	

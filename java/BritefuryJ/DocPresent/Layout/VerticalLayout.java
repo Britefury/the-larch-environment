@@ -75,10 +75,6 @@ public class VerticalLayout
 		{
 			box.setRequisitionY( 0.0, 0.0 );
 		}
-		else if ( children.length == 1 )
-		{
-			box.setRequisitionY( children[0] );
-		}
 		else
 		{
 			// Accumulate the height required for all the children
@@ -123,14 +119,13 @@ public class VerticalLayout
 			LReqBox child = children[i];
 			LAllocBox childAlloc = childrenAlloc[i];
 			
-			double childAllocation = Math.max( allocation, child.minWidth );
 			if ( alignment == HAlignment.EXPAND )
 			{
-				allocBox.allocateChildX( childAlloc, 0.0, childAllocation );
+				allocBox.allocateChildX( childAlloc, 0.0, allocation );
 			}
 			else
 			{
-				double childWidth = Math.min( childAllocation, child.prefWidth );
+				double childWidth = Math.min( allocation, child.prefWidth );
 				
 				if ( alignment == HAlignment.LEFT )
 				{
@@ -138,11 +133,11 @@ public class VerticalLayout
 				}
 				else if ( alignment == HAlignment.CENTRE )
 				{
-					allocBox.allocateChildX( childAlloc, ( childAllocation - childWidth )  *  0.5, childWidth );
+					allocBox.allocateChildX( childAlloc, ( allocation - childWidth )  *  0.5, childWidth );
 				}
 				else if ( alignment == HAlignment.RIGHT )
 				{
-					allocBox.allocateChildX( childAlloc, childAllocation - childWidth, childWidth );
+					allocBox.allocateChildX( childAlloc, allocation - childWidth, childWidth );
 				}
 				else
 				{

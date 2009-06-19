@@ -106,7 +106,7 @@ class MainAppDocView (DocView.RefreshListener):
 			self._view = self.createView( unit )
 			self._view.setRefreshListener( self )
 			self._refreshView()
-			self._elementTree.getRoot().setChild( self._view.getRootView().getElement() )
+			self._elementTree.getRoot().setChild( self._view.getRootViewElement() )
 		else:
 			self._view = None
 			

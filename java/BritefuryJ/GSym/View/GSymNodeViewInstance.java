@@ -29,6 +29,7 @@ import BritefuryJ.DocPresent.ElementTree.ParagraphElement;
 import BritefuryJ.DocPresent.ElementTree.PyElementFactory;
 import BritefuryJ.DocPresent.ElementTree.ScriptElement;
 import BritefuryJ.DocPresent.ElementTree.SegmentElement;
+import BritefuryJ.DocPresent.ElementTree.SpanElement;
 import BritefuryJ.DocPresent.ElementTree.TextElement;
 import BritefuryJ.DocPresent.ElementTree.VBoxElement;
 import BritefuryJ.DocPresent.ElementTree.WhitespaceElement;
@@ -187,6 +188,16 @@ public class GSymNodeViewInstance implements Element.ElementContext, DVNode.Node
 	{
 		viewInstance.getView().profile_startElement();
 		ParagraphElement element = new ParagraphElement( styleSheet );
+		element.setChildren( children );
+		element.setContext( this );
+		viewInstance.getView().profile_stopElement();
+		return element;
+	}
+	
+	public Element span(List<Element> children)
+	{
+		viewInstance.getView().profile_startElement();
+		SpanElement element = new SpanElement();
 		element.setChildren( children );
 		element.setContext( this );
 		viewInstance.getView().profile_stopElement();

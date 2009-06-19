@@ -6,7 +6,18 @@
 //##************************
 package BritefuryJ.DocPresent.ElementTree;
 
-public interface CollatableBranchFilter
+import BritefuryJ.DocPresent.DPSpan;
+
+public class SpanElement extends SequenceBranchElement
 {
-	public boolean test(CollatableBranchElement branch);
+	public SpanElement()
+	{
+		super( new DPSpan() );
+	}
+
+
+	public DPSpan getWidget()
+	{
+		return (DPSpan)widget;
+	}
 }
