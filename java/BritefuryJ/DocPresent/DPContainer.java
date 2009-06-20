@@ -7,12 +7,11 @@
 //##************************
 package BritefuryJ.DocPresent;
 
+import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
 
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
@@ -65,6 +64,7 @@ public abstract class DPContainer extends DPWidget
 	protected DPWidget pressGrabChild;
 	protected int pressGrabButton;
 	protected HashMap<PointerInterface, DPWidget> pointerChildTable;
+	public String cachedTextRep;
 	
 	
 	
@@ -83,6 +83,7 @@ public abstract class DPContainer extends DPWidget
 		super( styleSheet );
 		
 		registeredChildren = new ArrayList<DPWidget>();
+		cachedTextRep = null;
 	}
 	
 	
@@ -117,7 +118,7 @@ public abstract class DPContainer extends DPWidget
 			child.handleRealise();
 		}
 		
-		structureChanged();
+		onSubtreeStructureChanged();
 		
 		return child;
 	}
@@ -133,11 +134,11 @@ public abstract class DPContainer extends DPWidget
 		
 		child.setParent( null, null );
 		
-		structureChanged();
+		onSubtreeStructureChanged();
 	}
 	
 	
-	protected void childListModified()
+	protected void onChildListModified()
 	{
 	}
 	
@@ -188,11 +189,13 @@ public abstract class DPContainer extends DPWidget
 	
 	
 	
-	protected void structureChanged()
+	protected void onSubtreeStructureChanged()
 	{
+		cachedTextRep = null;
+		
 		if ( parent != null )
 		{
-			parent.structureChanged();
+			parent.onSubtreeStructureChanged();
 		}
 	}
 	
@@ -1119,6 +1122,212 @@ public abstract class DPContainer extends DPWidget
 			{
 				pointerChildTable = null;
 			}
+		}
+	}
+
+	
+
+	
+	
+	//
+	//
+	// TEXT REPRESENTATION METHODS
+	//
+	//
+	
+	public DPContentLeaf getLeafAtTextRepresentationPosition(int position)
+	{
+		DPWidget c = getChildAtTextRepresentationPosition( position );
+		
+		if ( c != null )
+		{
+			return c.getLeafAtTextRepresentationPosition( position - getTextRepresentationOffsetOfChild( c ) );
+		}
+		else
+		{
+			return null;
+		}
+	}
+
+	public DPWidget getChildAtTextRepresentationPosition(int position)
+	{
+		int offset = 0;
+		for (DPWidget c: getChildren())
+		{
+			int end = offset + c.getTextRepresentationLength();
+			if ( position >= offset  &&  position < end )
+			{
+				return c;
+			}
+			offset = end;
+		}
+		
+		return null;
+	}
+
+	
+	public int getTextRepresentationOffsetOfChild(DPWidget elem)
+	{
+		int offset = 0;
+		for (DPWidget c: getChildren())
+		{
+			if ( c == elem )
+			{
+				return offset;
+			}
+			offset += c.getTextRepresentationLength();
+		}
+		
+		throw new DPContainer.CouldNotFindChildException();
+	}
+	
+	protected int getChildTextRepresentationOffsetInSubtree(DPWidget child, DPContainer subtreeRoot)
+	{
+		return getTextRepresentationOffsetOfChild( child )  +  getTextRepresentationOffsetInSubtree( subtreeRoot );
+	}
+
+
+
+	protected boolean onChildTextRepresentationModifiedEvent(DPWidget child)
+	{
+		return onTextRepresentationModifiedEvent();
+	}
+	
+	
+	public void onTextRepresentationModified()
+	{
+		cachedTextRep = null;
+		super.onTextRepresentationModified();
+	}
+	
+	
+	public String getTextRepresentation()
+	{
+		if ( cachedTextRep == null )
+		{
+			cachedTextRep = computeSubtreeTextRepresentation();
+		}
+		return cachedTextRep;
+	}
+	
+	public int getTextRepresentationLength()
+	{
+		return getTextRepresentation().length();
+	}
+	
+	
+	
+
+	protected String computeSubtreeTextRepresentation()
+	{
+		StringBuilder builder = new StringBuilder();
+		for (DPWidget child: getChildren())
+		{
+			builder.append( child.getTextRepresentation() );
+		}
+		return builder.toString();
+	}
+	
+	
+	
+	public void getTextRepresentationFromStartToPath(StringBuilder builder, Marker marker, ArrayList<DPWidget> path, int pathMyIndex)
+	{
+		DPWidget pathChild = path.get( pathMyIndex + 1 );
+		for (DPWidget child: getChildren())
+		{
+			if ( child != pathChild )
+			{
+				builder.append( child.getTextRepresentation() );
+			}
+			else
+			{
+				child.getTextRepresentationFromStartToPath( builder, marker, path, pathMyIndex + 1 );
+				break;
+			}
+		}
+	}
+	
+	public void getTextRepresentationFromPathToEnd(StringBuilder builder, Marker marker, ArrayList<DPWidget> path, int pathMyIndex)
+	{
+		List<DPWidget> children = getChildren();
+		int pathChildIndex = pathMyIndex + 1;
+		DPWidget pathChild = path.get( pathChildIndex );
+		int childIndex = children.indexOf( pathChild );
+		
+		pathChild.getTextRepresentationFromPathToEnd( builder, marker, path, pathChildIndex );
+
+		if ( (childIndex + 1) < children.size() )
+		{
+			for (DPWidget child: children.subList( childIndex + 1, children.size() ))
+			{
+				builder.append( child.getTextRepresentation() );
+			}
+		}
+	}
+
+	public void getTextRepresentationBetweenPaths(StringBuilder builder, Marker startMarker, ArrayList<DPWidget> startPath, int startPathMyIndex,
+			Marker endMarker, ArrayList<DPWidget> endPath, int endPathMyIndex)
+	{
+		List<DPWidget> children = getChildren();
+		
+	
+		int startPathChildIndex = startPathMyIndex + 1;
+		int endPathChildIndex = endPathMyIndex + 1;
+		
+		DPWidget startChild = startPath.get( startPathChildIndex );
+		DPWidget endChild = endPath.get( endPathChildIndex );
+		
+		int startIndex = children.indexOf( startChild );
+		int endIndex = children.indexOf( endChild );
+	
+		
+		startChild.getTextRepresentationFromPathToEnd( builder, startMarker, startPath, startPathChildIndex );
+		
+		for (int i = startIndex + 1; i < endIndex; i++)
+		{
+			builder.append( children.get( i ).getTextRepresentation() );
+		}
+
+		endChild.getTextRepresentationFromStartToPath( builder, endMarker, endPath, endPathChildIndex );
+	}
+
+
+	protected void getTextRepresentationFromStartOfRootToMarkerFromChild(StringBuilder builder, Marker marker, DPWidget root, DPWidget fromChild)
+	{
+		if ( root != this  &&  parent != null )
+		{
+			parent.getTextRepresentationFromStartOfRootToMarkerFromChild( builder, marker, root, this );
+		}
+		
+		for (DPWidget child: getChildren())
+		{
+			if ( child != fromChild )
+			{
+				builder.append( child.getTextRepresentation() );
+			}
+			else
+			{
+				break;
+			}
+		}
+	}
+	
+	protected void getTextRepresentationFromMarkerToEndOfRootFromChild(StringBuilder builder, Marker marker, DPWidget root, DPWidget fromChild)
+	{
+		List<DPWidget> children = getChildren();
+		int childIndex = children.indexOf( fromChild );
+		
+		if ( (childIndex + 1) < children.size() )
+		{
+			for (DPWidget child: children.subList( childIndex + 1, children.size() ))
+			{
+				builder.append( child.getTextRepresentation() );
+			}
+		}
+
+		if ( root != this  &&  parent != null )
+		{
+			parent.getTextRepresentationFromMarkerToEndOfRootFromChild( builder, marker, root, this );
 		}
 	}
 

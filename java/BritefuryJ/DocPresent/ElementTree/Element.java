@@ -15,9 +15,13 @@ import java.util.List;
 
 import BritefuryJ.DocPresent.DPBin;
 import BritefuryJ.DocPresent.DPBorder;
+import BritefuryJ.DocPresent.DPContentLeaf;
 import BritefuryJ.DocPresent.DPHBox;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.ElementContext;
+import BritefuryJ.DocPresent.ElementKeyboardListener;
+import BritefuryJ.DocPresent.ElementTextRepresentationListener;
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Border.EmptyBorder;
 import BritefuryJ.DocPresent.ElementTree.Marker.ElementMarker;
@@ -28,17 +32,11 @@ import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 
 public abstract class Element
 {
-	public static interface ElementContext
-	{
-	};
-	
 	protected DPWidget widget;
 	protected BranchElement parent;
 	protected ElementTree tree;
-	protected ElementTextRepresentationListener contentListener;
 	protected ElementKeyboardListener keyboardListener;
 	protected DPWidget metaElement;
-	protected ElementContext context;
 	protected String debugName;
 	
 	
@@ -58,10 +56,8 @@ public abstract class Element
 		
 		parent = null;
 		tree = null;
-		contentListener = null;
 		keyboardListener = null;
 		metaElement = null;
-		context = null;
 		debugName = null;
 	}
 	
@@ -73,12 +69,12 @@ public abstract class Element
 	
 	public ElementContext getContext()
 	{
-		return context;
+		return getWidget().getContext();
 	}
 	
 	public void setContext(ElementContext context)
 	{
-		this.context = context;
+		getWidget().setContext( context );
 	}
 	
 	
@@ -118,12 +114,12 @@ public abstract class Element
 	
 	public ElementTextRepresentationListener getTextRepresentationListener()
 	{
-		return contentListener;
+		return getWidget().getTextRepresentationListener();
 	}
 	
 	public void setTextRepresentationListener(ElementTextRepresentationListener listener)
 	{
-		contentListener = listener;
+		getWidget().setTextRepresentationListener( listener );
 	}
 	
 	
@@ -300,90 +296,51 @@ public abstract class Element
 		return getLastLeafInSubtree( null, new LeafElement.LeafFilterEditableEntry() );
 	}
 
-	
-	public LeafElement getLeafAtTextRepresentationPosition(int position)
-	{
-		return null;
-	}
-	
-	
-	public int getTextRepresentationOffsetInSubtree(BranchElement subtreeRoot)
-	{
-		if ( this == subtreeRoot )
-		{
-			return 0;
-		}
-		else
-		{
-			return parent.getChildTextRepresentationOffsetInSubtree( this, subtreeRoot );
-		}
-	}
-	
-	
-	public String getTextRepresentationFromStartToMarker(ElementMarker marker)
-	{
-		StringBuilder builder = new StringBuilder();
-		marker.getElement().getTextRepresentationFromStartOfRootToMarker( builder, marker, this );
-		return builder.toString();
-	}
-	
-	public String getTextRepresentationFromMarkerToEnd(ElementMarker marker)
-	{
-		StringBuilder builder = new StringBuilder();
-		marker.getElement().getTextRepresentationFromMarkerToEndOfRoot( builder, marker, this );
-		return builder.toString();
-	}
 
-	protected abstract void getTextRepresentationFromStartToPath(StringBuilder builder, ElementMarker marker, ArrayList<Element> path, int pathMyIndex);
-	protected abstract void getTextRepresentationFromPathToEnd(StringBuilder builder, ElementMarker marker, ArrayList<Element> path, int pathMyIndex);
-
-
-
+	
+	
+	
+	
 	
 	//
 	// Text representation methods
 	//
 	
-	protected void textRepresentationChanged()
+	public LeafElement getLeafAtTextRepresentationPosition(int position)
 	{
-		onTextRepresentationModified();
-		onTextRepresentationModifiedEvent();
+		DPContentLeaf w = getWidget().getLeafAtTextRepresentationPosition( position );
+		return w != null  ?  (LeafElement)w.getElement()  :  null;
 	}
 	
-	protected void onTextRepresentationModified()
+	
+	public int getTextRepresentationOffsetInSubtree(BranchElement subtreeRoot)
 	{
-		if ( parent != null )
-		{
-			parent.onTextRepresentationModified();
-		}
+		return getWidget().getTextRepresentationOffsetInSubtree( subtreeRoot.getWidget() );
 	}
 	
-	protected boolean onTextRepresentationModifiedEvent()
+	
+	public String getTextRepresentationFromStartToMarker(ElementMarker marker)
 	{
-		if ( contentListener != null )
-		{
-			if ( contentListener.textRepresentationModified( this ) )
-			{
-				return true;
-			}
-		}
-		
-		if ( parent != null )
-		{
-			return parent.onChildTextRepresentationModifiedEvent( this );
-		}
-		
-		return false;
+		return getWidget().getTextRepresentationFromStartToMarker( marker.getWidgetMarker() );
 	}
 	
-	public DPWidget getWidgetAtTextRepresentationStart()
+	public String getTextRepresentationFromMarkerToEnd(ElementMarker marker)
 	{
-		return getWidget();
+		return getWidget().getTextRepresentationFromMarkerToEnd( marker.getWidgetMarker() );
 	}
+
+
+
 	
-		
-	public abstract String getTextRepresentation();
-	public abstract int getTextRepresentationLength();
+	public String getTextRepresentation()
+	{
+		return getWidget().getTextRepresentation();
+	}
+
+	public int getTextRepresentationLength()
+	{
+		return getWidget().getTextRepresentationLength();
+	}
 
 
 	
@@ -612,39 +569,6 @@ public abstract class Element
 			return parent.onKeyTyped( event );
 		}
 		
-		return false;
-	}
-
-	
-	
-	
-	
-	//
-	// Element type methods
-	//
-	
-	protected boolean isBranch()
-	{
-		return false;
-	}
-	
-	protected boolean isCollatableBranch()
-	{
-		return false;
-	}
-	
-	protected boolean isProxy()
-	{
-		return false;
-	}
-	
-	protected boolean isParagraph()
-	{
-		return false;
-	}
-	
-	protected boolean isSegment()
-	{
 		return false;
 	}
 }

@@ -8,9 +8,7 @@
 package BritefuryJ.DocPresent.ElementTree.Marker;
 
 import BritefuryJ.DocPresent.DPContentLeaf;
-import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.DPWidget.IsNotInSubtreeException;
-import BritefuryJ.DocPresent.ElementTree.BranchElement;
 import BritefuryJ.DocPresent.ElementTree.Element;
 import BritefuryJ.DocPresent.ElementTree.ElementTree;
 import BritefuryJ.DocPresent.ElementTree.LeafElement;
@@ -51,41 +49,7 @@ public class ElementMarker
 	
 	public int getPositionInSubtree(Element subtreeRoot) throws IsNotInSubtreeException
 	{
-		Element element = getElement();
-		if ( subtreeRoot == element )
-		{
-			return getPosition();
-		}
-		else
-		{
-			if ( subtreeRoot instanceof BranchElement )
-			{
-				BranchElement b = (BranchElement)subtreeRoot;
-				if ( element != null  &&  element.isInSubtreeRootedAt( b ) )
-				{
-					return getPosition() + element.getTextRepresentationOffsetInSubtree( b );
-				}
-				else
-				{
-					throw new DPWidget.IsNotInSubtreeException();
-				}
-			}
-			else if ( subtreeRoot instanceof LeafElement )
-			{
-				if ( element != null  &&  element == subtreeRoot )
-				{
-					return getPosition();
-				}
-				else
-				{
-					throw new DPWidget.IsNotInSubtreeException();
-				}
-			}
-			else
-			{
-				throw new DPWidget.IsNotInSubtreeException();
-			}
-		}
+		return widgetMarker.getPositionInSubtree( subtreeRoot.getWidget() );
 	}
 	
 	public Bias getBias()

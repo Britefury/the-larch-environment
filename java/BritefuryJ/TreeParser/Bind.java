@@ -10,6 +10,17 @@ import java.util.List;
 
 public class Bind extends UnaryBranchExpression
 {
+	//
+	//
+	//
+	//
+	// WARNING: UNRESOLVED PROBLEM:
+	// Bindings can effect parse results; the state of the bindings is not considered by the memoisation system,
+	// likely resulting in incorrect parse results.
+	//
+	//
+	//
+	//
 	protected String name;
 	
 	

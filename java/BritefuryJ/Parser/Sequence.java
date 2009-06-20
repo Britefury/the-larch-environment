@@ -36,7 +36,7 @@ public class Sequence extends BranchExpression
 		int pos = start;
 		for (int i = 0; i < subexps.length; i++)
 		{
-			ParseResult result = subexps[i].evaluateStream(  state, input, pos );
+			ParseResult result = subexps[i].evaluateStream( state, input, pos );
 			pos = result.end;
 			
 			if ( !result.isValid() )

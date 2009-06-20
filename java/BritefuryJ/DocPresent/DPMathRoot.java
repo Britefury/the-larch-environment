@@ -213,6 +213,23 @@ public class DPMathRoot extends DPContainer
 		}
 	}
 
+
+	
+	
+	
+	//
+	//
+	// TEXT REPRESENTATION METHODS
+	//
+	//
+	
+	protected String computeSubtreeTextRepresentation()
+	{
+		return child != null  ?  child.getTextRepresentation()  :  "";
+	}
+
+	
+	
 	
 	//
 	// Focus navigation methods

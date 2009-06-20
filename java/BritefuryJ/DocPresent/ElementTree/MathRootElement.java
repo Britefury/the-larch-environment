@@ -13,7 +13,7 @@ import BritefuryJ.DocPresent.DPMathRoot;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.StyleSheets.MathRootStyleSheet;
 
-public class MathRootElement extends OrderedBranchElement
+public class MathRootElement extends BranchElement
 {
 	protected Element child;
 	
@@ -86,17 +86,5 @@ public class MathRootElement extends OrderedBranchElement
 			Element[] ch = { child };
 			return Arrays.asList( ch );
 		}
-	}
-	
-	
-	
-	
-	//
-	// Text representation methods
-	//
-	
-	protected String computeSubtreeTextRepresentation()
-	{
-		return child != null  ?  child.getTextRepresentation()  :  "";
 	}
 }

@@ -54,7 +54,7 @@ public class Keyword extends ParserExpression
 			{
 				if ( end == itemText.length()  ||  !postPattern.matcher( itemText.subSequence( end, end + 1 ) ).matches() )
 				{
-					return new ParseResult( keywordString, start, end );
+					return new ParseResult( keywordString, start, start + end );
 				}
 			}
 		}

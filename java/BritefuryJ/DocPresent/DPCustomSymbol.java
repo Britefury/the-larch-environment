@@ -36,14 +36,14 @@ public class DPCustomSymbol extends DPContentLeafEditableEntry
 	
 	
 	
-	public DPCustomSymbol(SymbolInterface symbol)
+	public DPCustomSymbol(SymbolInterface symbol, String textRepresentation)
 	{
-		this( CustomSymbolStyleSheet.defaultStyleSheet, symbol );
+		this( CustomSymbolStyleSheet.defaultStyleSheet, symbol, textRepresentation );
 	}
 	
-	public DPCustomSymbol(CustomSymbolStyleSheet styleSheet, SymbolInterface symbol)
+	public DPCustomSymbol(CustomSymbolStyleSheet styleSheet, SymbolInterface symbol, String textRepresentation)
 	{
-		super( styleSheet );
+		super( styleSheet, textRepresentation );
 		
 		this.symbol = symbol;
 		

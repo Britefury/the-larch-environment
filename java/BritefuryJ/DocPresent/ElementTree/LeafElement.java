@@ -118,12 +118,6 @@ public abstract class LeafElement extends Element
 	}
 	
 	
-	public LeafElement getLeafAtTextRepresentationPosition(int position)
-	{
-		return this;
-	}
-
-
 	public LeafElement getPreviousLeaf()
 	{
 		return getPreviousLeaf( null, null, null );
@@ -194,26 +188,6 @@ public abstract class LeafElement extends Element
 	//
 	// Text representation methods
 	//
-	
-	public String getTextRepresentation()
-	{
-		return textRepresentation;
-	}
-	
-	public int getTextRepresentationLength()
-	{
-		return textRepresentation.length();
-	}
-	
-	protected void getTextRepresentationFromStartToPath(StringBuilder builder, ElementMarker marker, ArrayList<Element> path, int pathMyIndex)
-	{
-		builder.append( textRepresentation.substring( 0, marker.getIndex() ) );
-	}
-
-	protected void getTextRepresentationFromPathToEnd(StringBuilder builder, ElementMarker marker, ArrayList<Element> path, int pathMyIndex)
-	{
-		builder.append( textRepresentation.substring( marker.getIndex() ) );
-	}
 
 	protected String getTextRepresentationBetweenMarkers(ElementMarker startMarker, ElementMarker endMarker)
 	{
@@ -224,25 +198,6 @@ public abstract class LeafElement extends Element
 		return textRepresentation.substring( startMarker.getIndex(), endMarker.getIndex() );
 	}
 
-	protected void getTextRepresentationFromStartOfRootToMarker(StringBuilder builder, ElementMarker marker, Element root)
-	{
-		if ( this != root  &&  parent != null )
-		{
-			parent.getTextRepresentationFromStartOfRootToMarkerFromChild( builder, marker, root, this );
-		}
-		builder.append( textRepresentation.substring( 0, marker.getIndex() ) );
-	}
-	
-	protected void getTextRepresentationFromMarkerToEndOfRoot(StringBuilder builder, ElementMarker marker, Element root)
-	{
-		builder.append( textRepresentation.substring( marker.getIndex() ) );
-		if ( this != root  &&  parent != null )
-		{
-			parent.getTextRepresentationFromMarkerToEndOfRootFromChild( builder, marker, root, this );
-		}
-	}
-
-	
 
 
 	

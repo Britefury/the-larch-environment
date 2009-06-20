@@ -5,23 +5,23 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 1999-2008.
 //##************************
-package visualtests.DocPresent.ElementTree;
+package tests.DocPresent;
 
 import java.util.Arrays;
 
-import BritefuryJ.DocPresent.ElementTree.BinElement;
-import BritefuryJ.DocPresent.ElementTree.Element;
-import BritefuryJ.DocPresent.ElementTree.EmptyElement;
-import BritefuryJ.DocPresent.ElementTree.HBoxElement;
-import BritefuryJ.DocPresent.ElementTree.ParagraphElement;
-import BritefuryJ.DocPresent.ElementTree.TextElement;
+import BritefuryJ.DocPresent.DPBin;
+import BritefuryJ.DocPresent.DPEmpty;
+import BritefuryJ.DocPresent.DPHBox;
+import BritefuryJ.DocPresent.DPParagraph;
+import BritefuryJ.DocPresent.DPText;
+import BritefuryJ.DocPresent.DPWidget;
 import junit.framework.TestCase;
 
 public class ElementContentTest extends TestCase
 {
 	public void testEmpty()
 	{
-		EmptyElement empty = new EmptyElement();
+		DPEmpty empty = new DPEmpty();
 		
 		assertEquals( empty.getTextRepresentation(), "" );
 		assertEquals( empty.getTextRepresentationLength(), 0 );
@@ -29,7 +29,7 @@ public class ElementContentTest extends TestCase
 	
 	public void testText()
 	{
-		TextElement text = new TextElement( "Hello" );
+		DPText text = new DPText( "Hello" );
 		
 		assertEquals( text.getTextRepresentation(), "Hello" );
 		assertEquals( text.getTextRepresentationLength(), 5 );
@@ -38,9 +38,9 @@ public class ElementContentTest extends TestCase
 	
 	public void testBin()
 	{
-		TextElement t0 = new TextElement( "abc" );
+		DPText t0 = new DPText( "abc" );
 
-		BinElement b = new BinElement();
+		DPBin b = new DPBin();
 		
 		b.setChild( t0 );
 
@@ -51,13 +51,13 @@ public class ElementContentTest extends TestCase
 	
 	public void testPara()
 	{
-		TextElement t0 = new TextElement( "abc" );
-		TextElement t1 = new TextElement( "ghi" );
-		TextElement t2 = new TextElement( "mno" );
-		TextElement t3 = new TextElement( "stu" );
+		DPText t0 = new DPText( "abc" );
+		DPText t1 = new DPText( "ghi" );
+		DPText t2 = new DPText( "mno" );
+		DPText t3 = new DPText( "stu" );
 		
-		HBoxElement p = new HBoxElement();
-		Element[] t = { t0, t1, t2, t3 };
+		DPHBox p = new DPHBox();
+		DPWidget[] t = { t0, t1, t2, t3 };
 		
 		p.setChildren( Arrays.asList( t ) );
 		
@@ -70,38 +70,38 @@ public class ElementContentTest extends TestCase
 	
 	public void testStructure()
 	{
-		TextElement ta0 = new TextElement( "abc" );
-		TextElement ta1 = new TextElement( "ghi" );
-		TextElement ta2 = new TextElement( "mno" );
-		TextElement ta3 = new TextElement( "stu" );
+		DPText ta0 = new DPText( "abc" );
+		DPText ta1 = new DPText( "ghi" );
+		DPText ta2 = new DPText( "mno" );
+		DPText ta3 = new DPText( "stu" );
 
-		HBoxElement pa = new HBoxElement();
-		Element[] ta = { ta0, ta1, ta2, ta3 };
+		DPHBox pa = new DPHBox();
+		DPWidget[] ta = { ta0, ta1, ta2, ta3 };
 		pa.setChildren( Arrays.asList( ta ) );
 		
-		EmptyElement e = new EmptyElement();
+		DPEmpty e = new DPEmpty();
 		
 
 	
-		TextElement tb0 = new TextElement( "vw" );
-		TextElement tb1 = new TextElement( "xy" );
-		TextElement tb2 = new TextElement( "z" );
+		DPText tb0 = new DPText( "vw" );
+		DPText tb1 = new DPText( "xy" );
+		DPText tb2 = new DPText( "z" );
 
-		HBoxElement pb = new HBoxElement();
-		Element[] tb = { tb0, tb1, tb2 };
+		DPHBox pb = new DPHBox();
+		DPWidget[] tb = { tb0, tb1, tb2 };
 		pb.setChildren( Arrays.asList( tb ) );
 		
-		BinElement b = new BinElement();
+		DPBin b = new DPBin();
 		b.setChild( pb );
 
 		
 		
-		TextElement tx = new TextElement( "11" );
-		TextElement ty = new TextElement( "22" );
+		DPText tx = new DPText( "11" );
+		DPText ty = new DPText( "22" );
 		
 		
-		HBoxElement root = new HBoxElement();
-		Element[] rootChildren = { pa, e, b, tx, ty };
+		DPHBox root = new DPHBox();
+		DPWidget[] rootChildren = { pa, e, b, tx, ty };
 		root.setChildren( Arrays.asList( rootChildren ) );
 		
 		
@@ -140,7 +140,7 @@ public class ElementContentTest extends TestCase
 		assertEquals( root.getTextRepresentationOffsetOfChild( ty ), 19 );
 		
 		// Test getChildAtContentPosition() for containers
-		Element[] getChildAtContentPositionResultsPA = { ta0, ta0, ta0, ta1, ta1, ta1, ta2, ta2, ta2, ta3, ta3, ta3, null };
+		DPWidget[] getChildAtContentPositionResultsPA = { ta0, ta0, ta0, ta1, ta1, ta1, ta2, ta2, ta2, ta3, ta3, ta3, null };
 		for (int i = 0; i < getChildAtContentPositionResultsPA.length; i++)
 		{
 			assertSame( pa.getChildAtTextRepresentationPosition( i ), getChildAtContentPositionResultsPA[i] );
@@ -212,34 +212,34 @@ public class ElementContentTest extends TestCase
 
 	public void testParagraphStructure()
 	{
-		TextElement ta0 = new TextElement( "abc" );
-		TextElement ta1 = new TextElement( "ghi" );
-		TextElement ta2 = new TextElement( "mno" );
-		TextElement ta3 = new TextElement( "stu" );
+		DPText ta0 = new DPText( "abc" );
+		DPText ta1 = new DPText( "ghi" );
+		DPText ta2 = new DPText( "mno" );
+		DPText ta3 = new DPText( "stu" );
 
-		ParagraphElement pa = new ParagraphElement();
-		Element[] ta = { ta0, ta1, ta2, ta3 };
+		DPParagraph pa = new DPParagraph();
+		DPWidget[] ta = { ta0, ta1, ta2, ta3 };
 		pa.setChildren( Arrays.asList( ta ) );
 		
-		EmptyElement e = new EmptyElement();
+		DPEmpty e = new DPEmpty();
 		
 
 	
-		TextElement tb0 = new TextElement( "vw" );
-		TextElement tb1 = new TextElement( "xy" );
-		TextElement tb2 = new TextElement( "z" );
+		DPText tb0 = new DPText( "vw" );
+		DPText tb1 = new DPText( "xy" );
+		DPText tb2 = new DPText( "z" );
 
-		ParagraphElement pb = new ParagraphElement();
-		Element[] tb = { tb0, tb1, tb2 };
+		DPParagraph pb = new DPParagraph();
+		DPWidget[] tb = { tb0, tb1, tb2 };
 		pb.setChildren( Arrays.asList( tb ) );
 		
 		
-		TextElement tx = new TextElement( "11" );
-		TextElement ty = new TextElement( "22" );
+		DPText tx = new DPText( "11" );
+		DPText ty = new DPText( "22" );
 		
 		
-		ParagraphElement root = new ParagraphElement();
-		Element[] rootChildren = { pa, e, pb, tx, ty };
+		DPParagraph root = new DPParagraph();
+		DPWidget[] rootChildren = { pa, e, pb, tx, ty };
 		root.setChildren( Arrays.asList( rootChildren ) );
 		
 		
@@ -272,7 +272,7 @@ public class ElementContentTest extends TestCase
 		assertEquals( root.getTextRepresentationOffsetOfChild( ty ), 19 );
 		
 		// Test getChildAtContentPosition() for containers
-		Element[] getChildAtContentPositionResultsPA = { ta0, ta0, ta0, ta1, ta1, ta1, ta2, ta2, ta2, ta3, ta3, ta3, null };
+		DPWidget[] getChildAtContentPositionResultsPA = { ta0, ta0, ta0, ta1, ta1, ta1, ta2, ta2, ta2, ta3, ta3, ta3, null };
 		for (int i = 0; i < getChildAtContentPositionResultsPA.length; i++)
 		{
 			assertSame( pa.getChildAtTextRepresentationPosition( i ), getChildAtContentPositionResultsPA[i] );
@@ -325,12 +325,5 @@ public class ElementContentTest extends TestCase
 		assertEquals( tb2.getTextRepresentationOffsetInSubtree( pb ), 4 );
 		assertEquals( tb0.getTextRepresentationOffsetInSubtree( root ), 12 );
 		assertEquals( tb2.getTextRepresentationOffsetInSubtree( root ), 16 );
-		
-		
-		
-		// Check that paragraph is working correctly
-		assertNotNull( root.getWidget() );
-		assertNull( pa.getWidget() );
-		assertNull( pb.getWidget() );
 	}
 }

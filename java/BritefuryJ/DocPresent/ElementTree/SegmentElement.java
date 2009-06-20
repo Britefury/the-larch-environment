@@ -14,7 +14,7 @@ import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 
-public class SegmentElement extends OrderedBranchElement
+public class SegmentElement extends BranchElement
 {
 	
 	//
@@ -240,36 +240,8 @@ public class SegmentElement extends OrderedBranchElement
 	
 	
 	
-	//
-	// Text representation methods
-	//
-	
-	protected String computeSubtreeTextRepresentation()
-	{
-		StringBuilder builder = new StringBuilder();
-		List<Element> ch = getChildren();
-		if ( ch.size() > 0 )
-		{
-			for (Element child: ch)
-			{
-				builder.append( child.getTextRepresentation() );
-			}
-		}
-		return builder.toString();
-	}
-	
-	
-	
-	
-	
 	public SegmentElement getSegment()
 	{
 		return this;
-	}
-
-	
-	protected boolean isSegment()
-	{
-		return true;
 	}
 }

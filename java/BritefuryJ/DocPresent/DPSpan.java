@@ -130,9 +130,9 @@ public class DPSpan extends DPContainerSequence implements Collateable
 
 	
 	
-	protected void childListModified()
+	protected void onChildListModified()
 	{
-		super.childListModified();
+		super.onChildListModified();
 		
 		if ( collationRoot != null )
 		{
@@ -171,7 +171,7 @@ public class DPSpan extends DPContainerSequence implements Collateable
 	{
 		if ( boundsBoxes == null )
 		{
-			if ( collationRangeEnd > collationRangeStart )
+			if ( collationRoot != null  &&  collationRangeEnd > collationRangeStart )
 			{
 				boundsBoxes = collationRoot.computeCollatedBranchBoundsBoxes( this, collationRangeStart, collationRangeEnd );
 			}

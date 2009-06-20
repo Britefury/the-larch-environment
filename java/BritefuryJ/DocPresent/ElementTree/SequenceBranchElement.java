@@ -15,7 +15,7 @@ import BritefuryJ.DocPresent.DPContainerSequence;
 import BritefuryJ.DocPresent.DPWidget;
 
 
-public abstract class SequenceBranchElement extends OrderedBranchElement
+public abstract class SequenceBranchElement extends BranchElement
 {
 	protected ArrayList<Element> children;
 	

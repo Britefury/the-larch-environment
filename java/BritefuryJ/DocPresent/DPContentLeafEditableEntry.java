@@ -30,14 +30,14 @@ public abstract class DPContentLeafEditableEntry extends DPContentLeafEditable
 	//
 	
 	
-	protected DPContentLeafEditableEntry()
+	protected DPContentLeafEditableEntry(String textRepresentation)
 	{
-		super();
+		super( textRepresentation );
 	}
 	
-	protected DPContentLeafEditableEntry(ContentLeafStyleSheet styleSheet)
+	protected DPContentLeafEditableEntry(ContentLeafStyleSheet styleSheet, String textRepresentation)
 	{
-		super( styleSheet );
+		super( styleSheet, textRepresentation );
 	}
 	
 
@@ -80,7 +80,7 @@ public abstract class DPContentLeafEditableEntry extends DPContentLeafEditable
 				boolean bNonEntryContentCleared = false;
 				while ( !left.isEditableEntry() )
 				{
-					bNonEntryContentCleared |= left.clearContent();
+					bNonEntryContentCleared |= left.clearText();
 					left = left.getEditableContentLeafToLeft();
 					if ( left == null )
 					{
@@ -90,14 +90,14 @@ public abstract class DPContentLeafEditableEntry extends DPContentLeafEditable
 				left.moveMarkerToEnd( caret.getMarker() );
 				if ( !bNonEntryContentCleared )
 				{
-					left.removeContentFromEnd( 1 );
+					left.removeTextFromEnd( 1 );
 				}
 				return true;
 			}
 		}
 		else
 		{
-			removeContent( caret.getMarker().getIndex() - 1, 1 );
+			removeText( caret.getMarker().getIndex() - 1, 1 );
 			return true;
 		}
 	}
@@ -121,7 +121,7 @@ public abstract class DPContentLeafEditableEntry extends DPContentLeafEditable
 				boolean bNonEntryContentCleared = false;
 				while ( !right.isEditableEntry() )
 				{
-					bNonEntryContentCleared |= right.clearContent();
+					bNonEntryContentCleared |= right.clearText();
 					right = right.getEditableContentLeafToRight();
 					if ( right == null )
 					{
@@ -131,14 +131,14 @@ public abstract class DPContentLeafEditableEntry extends DPContentLeafEditable
 				right.moveMarkerToStart( caret.getMarker() );
 				if ( !bNonEntryContentCleared )
 				{
-					right.removeContentFromStart( 1 );
+					right.removeTextFromStart( 1 );
 				}
 				return true;
 			}
 		}
 		else
 		{
-			removeContent( caret.getMarker(), 1 );
+			removeText( caret.getMarker(), 1 );
 			return true;
 		}
 	}
@@ -201,7 +201,7 @@ public abstract class DPContentLeafEditableEntry extends DPContentLeafEditable
 				}
 				else
 				{
-					insertContent( caret.getMarker(), String.valueOf( event.getKeyChar() ) );
+					insertText( caret.getMarker(), String.valueOf( event.getKeyChar() ) );
 				}
 				return true;
 			}

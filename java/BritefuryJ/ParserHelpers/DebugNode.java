@@ -17,9 +17,10 @@ public class DebugNode
 	private ParseResultInterface result;
 	
 	private Object input;
+	private int start;
 	
 	
-	public DebugNode(DebugNode prev, ParserExpressionInterface expression, Object input)
+	public DebugNode(DebugNode prev, ParserExpressionInterface expression, Object input, int start)
 	{
 		callChildren = new ArrayList<DebugNode>();
 		memoChildren = new ArrayList<DebugNode>();
@@ -27,6 +28,7 @@ public class DebugNode
 		this.expression = expression;
 		this.result = null;
 		this.input = input;
+		this.start = start;
 	}
 	
 	
@@ -76,5 +78,10 @@ public class DebugNode
 	public Object getInput()
 	{
 		return input;
+	}
+	
+	public int getStart()
+	{
+		return start;
 	}
 }

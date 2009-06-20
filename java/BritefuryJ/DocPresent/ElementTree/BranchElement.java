@@ -22,8 +22,6 @@ import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
 public abstract class BranchElement extends Element
 {
-	public String cachedTextRep;
-	
 	//
 	// Constructor
 	//
@@ -31,7 +29,6 @@ public abstract class BranchElement extends Element
 	protected BranchElement(DPContainer widget)
 	{
 		super( widget );
-		cachedTextRep = null;
 	}
 
 
@@ -78,8 +75,6 @@ public abstract class BranchElement extends Element
 	
 	protected void onSubtreeStructureChanged()
 	{
-		cachedTextRep = null;
-		
 		if ( parent != null )
 		{
 			parent.onSubtreeStructureChanged();
@@ -148,41 +143,6 @@ public abstract class BranchElement extends Element
 	
 	
 	
-	//
-	// Text representation methods
-	//
-	
-	public LeafElement getLeafAtTextRepresentationPosition(int position)
-	{
-		Element c = getChildAtTextRepresentationPosition( position );
-		
-		if ( c != null )
-		{
-			return c.getLeafAtTextRepresentationPosition( position - getTextRepresentationOffsetOfChild( c ) );
-		}
-		else
-		{
-			return null;
-		}
-	}
-
-	public Element getChildAtTextRepresentationPosition(int position)
-	{
-		int offset = 0;
-		for (Element c: getChildren())
-		{
-			int end = offset + c.getTextRepresentationLength();
-			if ( position >= offset  &&  position < end )
-			{
-				return c;
-			}
-			offset = end;
-		}
-		
-		return null;
-	}
-
-	
 	protected LeafElement getPreviousLeafFromChild(Element child, ElementFilter subtreeRootFilter, ElementFilter branchFilter, ElementFilter leafFilter)
 	{
 		if ( subtreeRootFilter == null  ||  subtreeRootFilter.test( this ) )
@@ -241,74 +201,36 @@ public abstract class BranchElement extends Element
 	
 
 	
-	public int getTextRepresentationOffsetOfChild(Element elem)
-	{
-		int offset = 0;
-		for (Element c: getChildren())
-		{
-			if ( c == elem )
-			{
-				return offset;
-			}
-			offset += c.getTextRepresentationLength();
-		}
-		
-		throw new DPContainer.CouldNotFindChildException();
-	}
-	
-	protected int getChildTextRepresentationOffsetInSubtree(Element child, BranchElement subtreeRoot)
-	{
-		return getTextRepresentationOffsetOfChild( child )  +  getTextRepresentationOffsetInSubtree( subtreeRoot );
-	}
-
-
-
 	public SegmentElement getSegmentFromChild(Element element)
 	{
 		return getSegment();
 	}
 	
 	
-	protected boolean onChildTextRepresentationModifiedEvent(Element child)
+
+	
+	
+	//
+	// Text representation methods
+	//
+	
+	protected void getTextRepresentationBetweenPaths(StringBuilder builder, ElementMarker startMarker, ArrayList<Element> startPath, int startPathMyIndex,
+			ElementMarker endMarker, ArrayList<Element> endPath, int endPathMyIndex)
 	{
-		return onTextRepresentationModifiedEvent();
-	}
-	
-	
-	public void onTextRepresentationModified()
-	{
-		cachedTextRep = null;
-		super.onTextRepresentationModified();
-	}
-	
-	
-	public String getTextRepresentation()
-	{
-		if ( cachedTextRep == null )
+		ArrayList<DPWidget> startWidgetPath = new ArrayList<DPWidget>();
+		ArrayList<DPWidget> endWidgetPath = new ArrayList<DPWidget>();
+		for (Element e: startPath)
 		{
-			cachedTextRep = computeSubtreeTextRepresentation();
+			startWidgetPath.add( e.getWidget() );
 		}
-		return cachedTextRep;
+		for (Element e: endPath)
+		{
+			endWidgetPath.add( e.getWidget() );
+		}
+		getWidget().getTextRepresentationBetweenPaths( builder, startMarker.getWidgetMarker(), startWidgetPath, startPathMyIndex, endMarker.getWidgetMarker(), endWidgetPath, endPathMyIndex );
 	}
 	
-	public int getTextRepresentationLength()
-	{
-		return getTextRepresentation().length();
-	}
 	
-	
-	protected abstract String computeSubtreeTextRepresentation();
-	
-	
-	
-	protected abstract void getTextRepresentationBetweenPaths(StringBuilder builder, ElementMarker startMarker, ArrayList<Element> startPath, int startPathMyIndex,
-			ElementMarker endMarker, ArrayList<Element> endPath, int endPathMyIndex);
-	
-	
-	protected abstract void getTextRepresentationFromStartOfRootToMarkerFromChild(StringBuilder builder, ElementMarker marker, Element root, Element fromChild);
-	protected abstract void getTextRepresentationFromMarkerToEndOfRootFromChild(StringBuilder builder, ElementMarker marker, Element root, Element fromChild);
-
-
 
 	//
 	// Meta-element
@@ -378,17 +300,5 @@ public abstract class BranchElement extends Element
 			}
 		}
 		super.shutdownMetaElement();
-	}
-
-	
-	
-	
-	//
-	// Element type methods
-	//
-	
-	protected boolean isBranch()
-	{
-		return true;
 	}
 }

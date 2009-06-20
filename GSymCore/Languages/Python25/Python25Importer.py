@@ -827,7 +827,7 @@ class ImporterTestCase (unittest.TestCase):
 		result = importPy25Source( source, '<text_expr>', 'exec' )
 		result = DMNode.coerce( result )
 		expectedResult = DMNode.coerce( expectedResult )
-		result = result['contents'][0]
+		result = result['suite'][0]
 		self.assert_( result.isInstanceOf( Nodes.ExprStmt ) )
 		result = result['expr']
 		if result != expectedResult:
@@ -841,7 +841,7 @@ class ImporterTestCase (unittest.TestCase):
 		result = importPy25Source( source, '<test_stmt>', 'exec' )
 		result = DMNode.coerce( result )
 		expectedResult = DMNode.coerce( expectedResult )
-		result = result['contents'][0]
+		result = result['suite'][0]
 		if result != expectedResult:
 			print 'EXPECTED:'
 			print expectedResult
@@ -853,7 +853,7 @@ class ImporterTestCase (unittest.TestCase):
 		result = importPy25Source( source, '<test_stmt>', 'exec' )
 		result = DMNode.coerce( result )
 		expectedResult = DMNode.coerce( expectedResult )
-		result = result['contents']
+		result = result['suite']
 		if result != expectedResult:
 			print 'EXPECTED:'
 			print expectedResult

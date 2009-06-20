@@ -12,6 +12,7 @@ import BritefuryJ.Cell.Cell;
 import BritefuryJ.Cell.CellEvaluator;
 import BritefuryJ.Cell.CellInterface;
 import BritefuryJ.Cell.CellListener;
+import BritefuryJ.DocPresent.ElementContext;
 import BritefuryJ.DocPresent.ElementTree.Element;
 import BritefuryJ.DocPresent.ElementTree.SpanElement;
 import BritefuryJ.DocTree.DocTreeNode;
@@ -206,7 +207,7 @@ public class DVNode implements CellListener
 		return nodeContext;
 	}
 	
-	public void setContext(NodeContext context, Element.ElementContext elementContext)
+	public void setContext(NodeContext context, ElementContext elementContext)
 	{
 		nodeContext = context;
 		proxyElement.setContext( elementContext );

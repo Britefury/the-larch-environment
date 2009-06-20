@@ -14,7 +14,7 @@ import BritefuryJ.DocPresent.DPBin;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 
-public class BinElement extends OrderedBranchElement
+public class BinElement extends BranchElement
 {
 	protected Element child;
 	
@@ -87,17 +87,5 @@ public class BinElement extends OrderedBranchElement
 			Element[] ch = { child };
 			return Arrays.asList( ch );
 		}
-	}
-	
-	
-	
-	
-	//
-	// Text representation methods
-	//
-	
-	protected String computeSubtreeTextRepresentation()
-	{
-		return child != null  ?  child.getTextRepresentation()  :  "";
 	}
 }

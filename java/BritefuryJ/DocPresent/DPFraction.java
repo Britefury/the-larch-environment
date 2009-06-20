@@ -32,14 +32,14 @@ public class DPFraction extends DPContainer
 	
 	public static class DPFractionBar extends DPContentLeafEditableEntry
 	{
-		public DPFractionBar()
+		public DPFractionBar(String textRepresentation)
 		{
-			this( FractionStyleSheet.BarStyleSheet.defaultStyleSheet );
+			this( FractionStyleSheet.BarStyleSheet.defaultStyleSheet, textRepresentation );
 		}
 
-		public DPFractionBar(FractionStyleSheet.BarStyleSheet styleSheet)
+		public DPFractionBar(FractionStyleSheet.BarStyleSheet styleSheet, String textRepresentation)
 		{
-			super( styleSheet );
+			super( styleSheet, textRepresentation );
 		}
 
 	
@@ -172,16 +172,26 @@ public class DPFraction extends DPContainer
 	
 	public DPFraction()
 	{
-		this( FractionStyleSheet.defaultStyleSheet );
+		this( FractionStyleSheet.defaultStyleSheet, "/" );
+	}
+	
+	public DPFraction(String barTextRepresentation)
+	{
+		this( FractionStyleSheet.defaultStyleSheet, barTextRepresentation );
 	}
 	
 	public DPFraction(FractionStyleSheet styleSheet)
+	{
+		this( styleSheet, "/" );
+	}
+	
+	public DPFraction(FractionStyleSheet styleSheet, String barTextRepresentation)
 	{
 		super( styleSheet );
 		
 		children = new DPWidget[NUMCHILDREN];
 		
-		setChild( BAR, new DPFractionBar( styleSheet.getBarStyleSheet() ) );
+		setChild( BAR, new DPFractionBar( styleSheet.getBarStyleSheet(), barTextRepresentation ) );
 	}
 
 	

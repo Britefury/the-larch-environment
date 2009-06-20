@@ -407,12 +407,12 @@ public abstract class ParserExpression implements ParserExpressionInterface
 
 	
 	
-	private void debugBegin(ParserState state, Object input)
+	private void debugBegin(ParserState state, Object input, int start)
 	{
 		// Get the current top of the debug stack (outer call)
 		DebugNode prev = state.debugStack;
 		// Create the debug info node
-		DebugNode node = new DebugNode( prev, this, input );
+		DebugNode node = new DebugNode( prev, this, input, start );
 
 		// Push @node onto the debug stack
 		state.debugStack = node;
@@ -457,7 +457,7 @@ public abstract class ParserExpression implements ParserExpressionInterface
 	{
 		if ( state.bDebuggingEnabled )
 		{
-			debugBegin( state, input );
+			debugBegin( state, input, 0 );
 			// Get the parse result
 			ParseResult result = evaluateNode( state, input );
 			return debugEnd( state, input, result );
@@ -472,7 +472,7 @@ public abstract class ParserExpression implements ParserExpressionInterface
 	{
 		if ( state.bDebuggingEnabled )
 		{
-			debugBegin( state, input );
+			debugBegin( state, input, start );
 			// Get the parse result
 			ParseResult result = evaluateString( state, input, start );
 			return debugEnd( state, input, result );
@@ -487,7 +487,7 @@ public abstract class ParserExpression implements ParserExpressionInterface
 	{
 		if ( state.bDebuggingEnabled )
 		{
-			debugBegin( state, input );
+			debugBegin( state, input, start );
 			// Get the parse result
 			ParseResult result = evaluateStream( state, input, start );
 			return debugEnd( state, input, result );
@@ -502,7 +502,7 @@ public abstract class ParserExpression implements ParserExpressionInterface
 	{
 		if ( state.bDebuggingEnabled )
 		{
-			debugBegin( state, input );
+			debugBegin( state, input, start );
 			// Get the parse result
 			ParseResult result = evaluateList( state, input, start );
 			return debugEnd( state, input, result );
@@ -517,7 +517,7 @@ public abstract class ParserExpression implements ParserExpressionInterface
 	{
 		if ( state.bDebuggingEnabled )
 		{
-			debugBegin( state, input );
+			debugBegin( state, input, 0 );
 			// Get the parse result
 			ParseResult result = evaluateObject( state, input );
 			return debugEnd( state, input, result );

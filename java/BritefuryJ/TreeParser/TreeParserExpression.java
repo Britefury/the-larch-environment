@@ -85,7 +85,7 @@ public abstract class TreeParserExpression implements ParserExpressionInterface
 			// Get the current top of the debug stack (outer call)
 			DebugNode prev = state.debugStack;
 			// Create the debug info node
-			DebugNode node = new DebugNode( prev, this, input );
+			DebugNode node = new DebugNode( prev, this, input, 0 );
 
 			// Push @node onto the debug stack
 			state.debugStack = node;
@@ -133,7 +133,7 @@ public abstract class TreeParserExpression implements ParserExpressionInterface
 			// Get the current top of the debug stack (outer call)
 			DebugNode prev = state.debugStack;
 			// Create the debug info node
-			DebugNode node = new DebugNode( prev, this, input );
+			DebugNode node = new DebugNode( prev, this, input, start );
 
 			// Push @node onto the debug stack
 			state.debugStack = node;
