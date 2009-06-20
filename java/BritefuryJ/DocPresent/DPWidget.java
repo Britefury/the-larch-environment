@@ -128,6 +128,7 @@ abstract public class DPWidget
 	protected DndState dndState;								// only initialised when in use; otherwise null
 	
 	protected ElementTextRepresentationListener textRepresentationListener;
+	protected ElementKeyboardListener keyboardListener;
 	
 	protected Element element;
 	protected ElementContext context;
@@ -1425,6 +1426,21 @@ abstract public class DPWidget
 		textRepresentationListener = listener;
 	}
 	
+
+	public ElementKeyboardListener getKeyboardListener()
+	{
+		return keyboardListener;
+	}
+	
+	public void setKeyboardListener(ElementKeyboardListener listener)
+	{
+		keyboardListener = listener;
+	}
+	
+	
+
+	
+	
 	
 	
 	//
@@ -1513,6 +1529,71 @@ abstract public class DPWidget
 		
 	public abstract String getTextRepresentation();
 	public abstract int getTextRepresentationLength();
+	
+	
+	
+	
+	
+	//
+	//
+	// KEYBOARD EVENTS
+	//
+	//
+	
+	protected boolean propagateKeyPress(KeyEvent event)
+	{
+		if ( keyboardListener != null )
+		{
+			if ( keyboardListener.onKeyPress( this, event ) )
+			{
+				return true;
+			}
+		}
+
+		if ( parent != null )
+		{
+			return parent.propagateKeyPress( event );
+		}
+		
+		return false;
+	}
+
+	protected boolean propagateKeyRelease(KeyEvent event)
+	{
+		if ( keyboardListener != null )
+		{
+			if ( keyboardListener.onKeyRelease( this, event ) )
+			{
+				return true;
+			}
+		}
+
+		if ( parent != null )
+		{
+			return parent.propagateKeyRelease( event );
+		}
+		
+		return false;
+	}
+
+	protected boolean propagateKeyTyped(KeyEvent event)
+	{
+		if ( keyboardListener != null )
+		{
+			if ( keyboardListener.onKeyTyped( this, event ) )
+			{
+				return true;
+			}
+		}
+
+		if ( parent != null )
+		{
+			return parent.propagateKeyTyped( event );
+		}
+		
+		return false;
+	}
+	
 
 	
 	

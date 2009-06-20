@@ -8,11 +8,9 @@ package BritefuryJ.DocPresent;
 
 import java.awt.event.KeyEvent;
 
-import BritefuryJ.DocPresent.ElementTree.Element;
-
 public interface ElementKeyboardListener
 {
-	public boolean onKeyPress(Element element, KeyEvent event);
-	public boolean onKeyRelease(Element element, KeyEvent event);
-	public boolean onKeyTyped(Element element, KeyEvent event);
+	public boolean onKeyPress(DPWidget element, KeyEvent event);
+	public boolean onKeyRelease(DPWidget element, KeyEvent event);
+	public boolean onKeyTyped(DPWidget element, KeyEvent event);
 }

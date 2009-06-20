@@ -9,7 +9,6 @@ package BritefuryJ.DocPresent.ElementTree;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +34,6 @@ public abstract class Element
 	protected DPWidget widget;
 	protected BranchElement parent;
 	protected ElementTree tree;
-	protected ElementKeyboardListener keyboardListener;
 	protected DPWidget metaElement;
 	protected String debugName;
 	
@@ -56,7 +54,6 @@ public abstract class Element
 		
 		parent = null;
 		tree = null;
-		keyboardListener = null;
 		metaElement = null;
 		debugName = null;
 	}
@@ -125,12 +122,12 @@ public abstract class Element
 	
 	public ElementKeyboardListener getKeyboardListener()
 	{
-		return keyboardListener;
+		return getWidget().getKeyboardListener();
 	}
 	
 	public void setKeyboardListener(ElementKeyboardListener listener)
 	{
-		keyboardListener = listener;
+		getWidget().setKeyboardListener( listener );
 	}
 	
 	
@@ -507,68 +504,5 @@ public abstract class Element
 	public void setDebugName(String debugName)
 	{
 		this.debugName = debugName;
-	}
-	
-	
-	
-	
-
-
-	//
-	// Keyboard input event methods
-	//
-
-	public boolean onKeyPress(KeyEvent event)
-	{
-		if ( keyboardListener != null )
-		{
-			if ( keyboardListener.onKeyPress( this, event ) )
-			{
-				return true;
-			}
-		}
-
-		if ( parent != null )
-		{
-			return parent.onKeyPress( event );
-		}
-		
-		return false;
-	}
-
-	public boolean onKeyRelease(KeyEvent event)
-	{
-		if ( keyboardListener != null )
-		{
-			if ( keyboardListener.onKeyRelease( this, event ) )
-			{
-				return true;
-			}
-		}
-
-		if ( parent != null )
-		{
-			return parent.onKeyRelease( event );
-		}
-		
-		return false;
-	}
-
-	public boolean onKeyTyped(KeyEvent event)
-	{
-		if ( keyboardListener != null )
-		{
-			if ( keyboardListener.onKeyTyped( this, event ) )
-			{
-				return true;
-			}
-		}
-
-		if ( parent != null )
-		{
-			return parent.onKeyTyped( event );
-		}
-		
-		return false;
 	}
 }
