@@ -14,13 +14,14 @@ import org.python.core.Py;
 import org.python.core.PyObject;
 
 import BritefuryJ.Cell.CellInterface;
+import BritefuryJ.DocPresent.ElementContext;
+import BritefuryJ.DocPresent.ElementKeyboardListener;
+import BritefuryJ.DocPresent.ElementTextRepresentationListener;
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.ElementTree.BorderElement;
 import BritefuryJ.DocPresent.ElementTree.BranchElement;
 import BritefuryJ.DocPresent.ElementTree.Element;
 import BritefuryJ.DocPresent.ElementTree.ElementFactory;
-import BritefuryJ.DocPresent.ElementTree.ElementKeyboardListener;
-import BritefuryJ.DocPresent.ElementTree.ElementTextRepresentationListener;
 import BritefuryJ.DocPresent.ElementTree.FractionElement;
 import BritefuryJ.DocPresent.ElementTree.HBoxElement;
 import BritefuryJ.DocPresent.ElementTree.HiddenContentElement;
@@ -47,7 +48,7 @@ import BritefuryJ.GSym.View.ListView.ListViewLayout;
 import BritefuryJ.GSym.View.ListView.PySeparatorElementFactory;
 import BritefuryJ.GSym.View.ListView.SeparatorElementFactory;
 
-public class GSymNodeViewInstance implements Element.ElementContext, DVNode.NodeContext
+public class GSymNodeViewInstance implements ElementContext, DVNode.NodeContext
 {
 	protected static class PyGSymNodeViewFunction implements GSymNodeViewFunction
 	{

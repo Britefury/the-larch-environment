@@ -289,7 +289,7 @@ public class NodeView
 		}
 		else
 		{
-			rangeText = ":" + String.valueOf( result.getEnd() );
+			rangeText = String.valueOf( data.getStart() ) + "   :   " + String.valueOf( result.getEnd() );
 		}
 
 		return new DPText( rangeStyle, rangeText );

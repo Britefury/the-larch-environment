@@ -50,7 +50,7 @@ class ParsedNodeTextRepresentationListener (ElementTextRepresentationListener):
 		self._node = node
 
 	def textRepresentationModified(self, element):
-		value = element.getContent()
+		value = element.getTextRepresentation()
 		parsed = _parseText( value )
 		if parsed is not None:
 			replace( self._ctx, self._node, parsed )

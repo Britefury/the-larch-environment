@@ -16,7 +16,7 @@ import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.ScriptStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 
-public class ScriptElement extends OrderedBranchElement
+public class ScriptElement extends BranchElement
 {
 	public static class CouldNotFindChildException extends RuntimeException
 	{
@@ -184,27 +184,6 @@ public class ScriptElement extends OrderedBranchElement
 		
 		return xs;
 	}
-
-
-
-
-	//
-	// Text representation methods
-	//
-	
-	protected String computeSubtreeTextRepresentation()
-	{
-		StringBuilder builder = new StringBuilder();
-		for (int slot = 0; slot < NUMCHILDREN; slot++)
-		{
-			if ( segments[slot] != null )
-			{
-				builder.append( segments[slot].getTextRepresentation() );
-			}
-		}
-		return builder.toString();
-	}
-
 
 
 

@@ -170,7 +170,7 @@ public class DPTable extends DPContainer
 		}
 		
 		
-		childListModified();
+		onChildListModified();
 		queueResize();
 	}
 	
@@ -326,7 +326,7 @@ public class DPTable extends DPContainer
 				registerChild( item, new TablePackingParams( x, colSpan, getPaddingX(), y, rowSpan, getPaddingY() ) );
 			}
 
-			childListModified();
+			onChildListModified();
 			queueResize();
 		}
 		else

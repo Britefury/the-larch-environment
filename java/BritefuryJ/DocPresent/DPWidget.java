@@ -127,7 +127,10 @@ abstract public class DPWidget
 	
 	protected DndState dndState;								// only initialised when in use; otherwise null
 	
+	protected ElementTextRepresentationListener textRepresentationListener;
+	
 	protected Element element;
+	protected ElementContext context;
 	
 	
 	
@@ -159,6 +162,7 @@ abstract public class DPWidget
 		parentPacking = null;
 		waitingImmediateEvents = null;
 		pointersWithinBounds = null;
+		context = null;
 	}
 	
 	
@@ -177,6 +181,23 @@ abstract public class DPWidget
 	{
 		this.element = element;
 	}
+	
+	
+	
+	//
+	// Owner
+	//
+	
+	public ElementContext getContext()
+	{
+		return context;
+	}
+	
+	public void setContext(ElementContext context)
+	{
+		this.context = context;
+	}
+
 	
 	
 	
@@ -1384,6 +1405,115 @@ abstract public class DPWidget
 	{
 		moveMarkerToStart( m );
 	}
+	
+	
+	
+	//
+	//
+	// LISTENER METHODS
+	//
+	//
+	
+	
+	public ElementTextRepresentationListener getTextRepresentationListener()
+	{
+		return textRepresentationListener;
+	}
+	
+	public void setTextRepresentationListener(ElementTextRepresentationListener listener)
+	{
+		textRepresentationListener = listener;
+	}
+	
+	
+	
+	//
+	//
+	// TEXT REPRESENTATION METHODS
+	//
+	//
+	
+	
+	public DPContentLeaf getLeafAtTextRepresentationPosition(int position)
+	{
+		return null;
+	}
+	
+	
+	public int getTextRepresentationOffsetInSubtree(DPContainer subtreeRoot)
+	{
+		if ( this == subtreeRoot )
+		{
+			return 0;
+		}
+		else
+		{
+			return parent.getChildTextRepresentationOffsetInSubtree( this, subtreeRoot );
+		}
+	}
+	
+	
+	public String getTextRepresentationFromStartToMarker(Marker marker)
+	{
+		StringBuilder builder = new StringBuilder();
+		marker.getWidget().getTextRepresentationFromStartOfRootToMarker( builder, marker, this );
+		return builder.toString();
+	}
+	
+	public String getTextRepresentationFromMarkerToEnd(Marker marker)
+	{
+		StringBuilder builder = new StringBuilder();
+		marker.getWidget().getTextRepresentationFromMarkerToEndOfRoot( builder, marker, this );
+		return builder.toString();
+	}
+
+	protected abstract void getTextRepresentationFromStartToPath(StringBuilder builder, Marker marker, ArrayList<DPWidget> path, int pathMyIndex);
+	protected abstract void getTextRepresentationFromPathToEnd(StringBuilder builder, Marker marker, ArrayList<DPWidget> path, int pathMyIndex);
+
+
+
+	
+	protected void textRepresentationChanged()
+	{
+		onTextRepresentationModified();
+		onTextRepresentationModifiedEvent();
+	}
+	
+	protected void onTextRepresentationModified()
+	{
+		if ( parent != null )
+		{
+			parent.onTextRepresentationModified();
+		}
+	}
+	
+	protected boolean onTextRepresentationModifiedEvent()
+	{
+		if ( textRepresentationListener != null )
+		{
+			if ( textRepresentationListener.textRepresentationModified( this ) )
+			{
+				return true;
+			}
+		}
+		
+		if ( parent != null )
+		{
+			return parent.onChildTextRepresentationModifiedEvent( this );
+		}
+		
+		return false;
+	}
+	
+	public DPWidget getWidgetAtTextRepresentationStart()
+	{
+		return this;
+	}
+	
+		
+	public abstract String getTextRepresentation();
+	public abstract int getTextRepresentationLength();
+
 	
 	
 	

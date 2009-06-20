@@ -76,7 +76,7 @@ abstract public class DPContainerSequence extends DPContainer
 		}
 		
 		
-		childListModified();
+		onChildListModified();
 		queueResize();
 	}
 	
@@ -125,7 +125,7 @@ abstract public class DPContainerSequence extends DPContainer
 		unregisterChild( oldChild );
 		registeredChildren.set( index, child );
 		registerChild( child, null );
-		childListModified();
+		onChildListModified();
 		queueResize();
 	}
 	
@@ -165,7 +165,7 @@ abstract public class DPContainerSequence extends DPContainer
 		}
 		
 		
-		childListModified();
+		onChildListModified();
 		queueResize();
 	}
 	
@@ -176,7 +176,7 @@ abstract public class DPContainerSequence extends DPContainer
 		unregisterChild( child );
 		registeredChildren.remove( index );
 		
-		childListModified();
+		onChildListModified();
 		queueResize();
 	}
 	
@@ -196,7 +196,7 @@ abstract public class DPContainerSequence extends DPContainer
 		registeredChildren.clear();
 		registeredChildren.addAll( Arrays.asList( newChildEntriesArray ) );
 		
-		childListModified();
+		onChildListModified();
 		queueResize();
 	}
 	
@@ -209,7 +209,7 @@ abstract public class DPContainerSequence extends DPContainer
 		
 		registeredChildren.add( child );
 		registerChild( child, null );
-		childListModified();
+		onChildListModified();
 		queueResize();
 	}
 
@@ -230,7 +230,7 @@ abstract public class DPContainerSequence extends DPContainer
 			registerChild( child, null );
 		}
 
-		childListModified();
+		onChildListModified();
 		queueResize();
 	}
 	
@@ -246,7 +246,7 @@ abstract public class DPContainerSequence extends DPContainer
 		
 		registeredChildren.add( index, child );
 		registerChild( child, null );
-		childListModified();
+		onChildListModified();
 		queueResize();
 	}
 	
@@ -258,7 +258,7 @@ abstract public class DPContainerSequence extends DPContainer
 		unregisterChild( child );
 		registeredChildren.remove( child );
 		
-		childListModified();
+		onChildListModified();
 		queueResize();
 	}
 		

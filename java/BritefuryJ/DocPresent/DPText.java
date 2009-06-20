@@ -21,17 +21,27 @@ import BritefuryJ.Math.Point2;
 public class DPText extends DPContentLeafEditableEntry
 {
 	protected TextVisual visual;
-	protected String text;
+	String text;
 	
 	
 	public DPText(String text)
 	{
-		this( TextStyleSheet.defaultStyleSheet, text );
+		this( TextStyleSheet.defaultStyleSheet, text, text );
+	}
+	
+	public DPText(String text, String textRepresentation)
+	{
+		this( TextStyleSheet.defaultStyleSheet, text, textRepresentation );
 	}
 	
 	public DPText(TextStyleSheet styleSheet, String text)
 	{
-		super( styleSheet );
+		this( styleSheet, text, text );
+	}
+
+	public DPText(TextStyleSheet styleSheet, String text, String textRepresentation)
+	{
+		super( styleSheet, textRepresentation );
 		
 		this.text = text;
 		
@@ -45,7 +55,25 @@ public class DPText extends DPContentLeafEditableEntry
 	public void setText(String text)
 	{
 		this.text = text;
-		
+		onTextModified();
+	}
+	
+	public void setText(String text, String textRepresentation)
+	{
+		this.text = text;
+		setTextRepresentation( textRepresentation );
+		onTextModified();
+	}
+	
+	public String getText()
+	{
+		return text;
+	}
+	
+	
+	
+	private void onTextModified()
+	{
 		TextStyleSheet textStyleSheet = (TextStyleSheet)styleSheet;
 
 		TextVisual v = TextVisual.getTextVisual( getPresentationArea(), text, textStyleSheet.getFont(), textStyleSheet.getMixedSizeCaps() );
@@ -60,11 +88,6 @@ public class DPText extends DPContentLeafEditableEntry
 	
 			queueResize();
 		}
-	}
-	
-	public String getText()
-	{
-		return "'" + text + "'";
 	}
 	
 	
@@ -156,7 +179,7 @@ public class DPText extends DPContentLeafEditableEntry
 	{
 		AffineTransform current = pushGraphicsTransform( graphics );
 		int startIndex = from != null  ?  from.getIndex()  :  0;
-		int endIndex = to != null  ?  to.getIndex()  :  text.length();
+		int endIndex = to != null  ?  to.getIndex()  :  textRepresentation.length();
 		visual.drawSelection( graphics, startIndex, endIndex );
 		popGraphicsTransform( graphics, current );
 	}
@@ -166,7 +189,7 @@ public class DPText extends DPContentLeafEditableEntry
 	
 	public int getMarkerRange()
 	{
-		return text.length();
+		return textRepresentation.length();
 	}
 
 	public int getMarkerPositonForPoint(Point2 localPos)

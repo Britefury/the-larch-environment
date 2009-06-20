@@ -15,7 +15,7 @@ import BritefuryJ.DocPresent.StyleSheets.FractionStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 
-public class FractionElement extends OrderedBranchElement
+public class FractionElement extends BranchElement
 {
 	public static class BarElement extends EditableEntryLeafElement
 	{
@@ -26,7 +26,7 @@ public class FractionElement extends OrderedBranchElement
 
 		public BarElement(FractionStyleSheet.BarStyleSheet styleSheet, String textRepresentation)
 		{
-			super( new DPFraction.DPFractionBar( styleSheet ), textRepresentation );
+			super( new DPFraction.DPFractionBar( styleSheet, textRepresentation ), textRepresentation );
 		}
 
 
@@ -184,21 +184,5 @@ public class FractionElement extends OrderedBranchElement
 		}
 		
 		return xs;
-	}
-
-
-
-	//
-	// Text representation methods
-	//
-	
-	protected String computeSubtreeTextRepresentation()
-	{
-		StringBuilder builder = new StringBuilder();
-		for (Element child: getChildren())
-		{
-			builder.append( child.getTextRepresentation() );
-		}
-		return builder.toString();
 	}
 }

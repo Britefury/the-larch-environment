@@ -7,19 +7,37 @@
 //##************************
 package BritefuryJ.DocPresent;
 
+import java.util.ArrayList;
+
+import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleSheets.WidgetStyleSheet;
 import BritefuryJ.Math.Point2;
 
 public class DPEmpty extends DPWidget
 {
+	String textRepresentation;
+	
+	
 	public DPEmpty()
 	{
-		this( WidgetStyleSheet.defaultStyleSheet );
+		this( WidgetStyleSheet.defaultStyleSheet, "" );
+	}
+	
+	public DPEmpty(String textRepresentation)
+	{
+		this( WidgetStyleSheet.defaultStyleSheet, textRepresentation );
 	}
 	
 	public DPEmpty(WidgetStyleSheet styleSheet)
 	{
+		this( styleSheet, "" );
+	}
+
+	public DPEmpty(WidgetStyleSheet styleSheet, String textRepresentation)
+	{
 		super( styleSheet );
+		
+		this.textRepresentation = textRepresentation;
 	}
 
 	
@@ -47,5 +65,32 @@ public class DPEmpty extends DPWidget
 		{
 			return null;
 		}
+	}
+	
+	
+	
+	//
+	//
+	// TEXT REPRESENTATION METHODS
+	//
+	//
+	
+	
+	public String getTextRepresentation()
+	{
+		return textRepresentation;
+	}
+	
+	public int getTextRepresentationLength()
+	{
+		return textRepresentation.length();
+	}
+
+	protected void getTextRepresentationFromPathToEnd(StringBuilder builder, Marker marker, ArrayList<DPWidget> path, int pathMyIndex)
+	{
+	}
+
+	protected void getTextRepresentationFromStartToPath(StringBuilder builder, Marker marker, ArrayList<DPWidget> path, int pathMyIndex)
+	{
 	}
 }

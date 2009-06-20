@@ -8,9 +8,6 @@
 import unittest
 import sys
 
-from Britefury.InitBritefuryJ import initBritefuryJ
-initBritefuryJ()
-
 import Britefury.Dispatch.Dispatch
 import Britefury.Dispatch.MethodDispatch
 import Britefury.Transformation.Transformation

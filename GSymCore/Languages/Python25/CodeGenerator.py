@@ -50,16 +50,19 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 	# String literal
 	@ObjectNodeDispatchMethod
 	def StringLiteral(self, node, format, quotation, value):
-		return repr( value.toString() )
+		if isinstance( value, unicode ):
+			return repr( value )[1:]
+		else:
+			return repr( value )
 	
 	
 	
 	# Integer literal
 	@ObjectNodeDispatchMethod
 	def IntLiteral(self, node, format, numType, value):
-		format = format.toString()
-		numType = numType.toString()
-		value = value.toString()
+		format = format
+		numType = numType
+		value = value
 
 		if numType == 'int':
 			if format == 'decimal':
@@ -86,21 +89,21 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 	# Float literal
 	@ObjectNodeDispatchMethod
 	def FloatLiteral(self, node, value):
-		return value.toString()
+		return value
 
 	
 	
 	# Imaginary literal
 	@ObjectNodeDispatchMethod
 	def ImaginaryLiteral(self, node, value):
-		return value.toString()
+		return value
 	
 	
 	
 	# Target
 	@ObjectNodeDispatchMethod
 	def SingleTarget(self, node, name):
-		return name.toString()
+		return name
 	
 	@ObjectNodeDispatchMethod
 	def TupleTarget(self, node, targets):
@@ -205,7 +208,7 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 	# Call	
 	@ObjectNodeDispatchMethod
 	def CallKWArg(self, node, name, value):
-		return name.toString() + '=' + self( value )
+		return name + '=' + self( value )
 	
 	@ObjectNodeDispatchMethod
 	def CallArgList(self, node, value):
@@ -348,19 +351,19 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 	# Parameters	
 	@ObjectNodeDispatchMethod
 	def SimpleParam(self, node, name):
-		return name.toString()
+		return name
 	
 	@ObjectNodeDispatchMethod
 	def DefaultValueParam(self, node, name, defaultValue):
-		return name.toString()  +  '='  +  self( defaultValue )
+		return name  +  '='  +  self( defaultValue )
 	
 	@ObjectNodeDispatchMethod
 	def ParamList(self, node, name):
-		return '*'  +  name.toString()
+		return '*'  +  name
 	
 	@ObjectNodeDispatchMethod
 	def KWParamList(self, node, name):
-		return '**'  +  name.toString()
+		return '**'  +  name
 	
 	
 	
@@ -393,7 +396,7 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 	# Augmented assignment statement
 	@ObjectNodeDispatchMethod
 	def AugAssignStmt(self, node, op, target, value):
-		return self( target )  +  ' '  +  op.toString()  +  ' '  +  self( value )
+		return self( target )  +  ' '  +  op  +  ' '  +  self( value )
 	
 	
 	# Pass statement
@@ -445,23 +448,23 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 	# Import statement
 	@ObjectNodeDispatchMethod
 	def RelativeModule(self, node, name):
-		return name.toString()
+		return name
 	
 	@ObjectNodeDispatchMethod
 	def ModuleImport(self, node, name):
-		return name.toString()
+		return name
 	
 	@ObjectNodeDispatchMethod
 	def ModuleImportAs(self, node, name, asName):
-		return name.toString() + ' as ' + asName.toString()
+		return name + ' as ' + asName
 	
 	@ObjectNodeDispatchMethod
 	def ModuleContentImport(self, node, name):
-		return name.toString()
+		return name
 	
 	@ObjectNodeDispatchMethod
 	def ModuleContentImportAs(self, node, name, asName):
-		return name.toString() + ' as ' + asName.toString()
+		return name + ' as ' + asName
 	
 	@ObjectNodeDispatchMethod
 	def ImportStmt(self, node, modules):
@@ -569,13 +572,13 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 	@ObjectNodeDispatchMethod
 	def DefStmt(self, node, name, params, suite):
 		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
-		return 'def '  +  name.toString()  +  '('  +  ', '.join( [ self( p )   for p in params ] )  +  '):\n'  +  _indent( suiteText )
+		return 'def '  +  name  +  '('  +  ', '.join( [ self( p )   for p in params ] )  +  '):\n'  +  _indent( suiteText )
 	
 
 	# Deco statement
 	@ObjectNodeDispatchMethod
 	def DecoStmt(self, node, name, args):
-		text = '@' + name.toString()
+		text = '@' + name
 		if not isNullNode( args ):
 			text += '( ' + ', '.join( [ self( a )   for a in args ] ) + ' )'
 		return text

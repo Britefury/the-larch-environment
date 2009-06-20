@@ -25,7 +25,7 @@ public class TextElement extends EditableEntryLeafElement
 
 	public TextElement(TextStyleSheet styleSheet, String text, String textRepresentation)
 	{
-		super( new DPText( styleSheet, text ), textRepresentation );
+		super( new DPText( styleSheet, text, textRepresentation ), textRepresentation );
 	}
 
 
@@ -37,15 +37,6 @@ public class TextElement extends EditableEntryLeafElement
 	
 	
 	
-	protected void textRepresentationChanged()
-	{
-		getWidget().setText( textRepresentation );
-
-		super.textRepresentationChanged();
-	}
-
-
-
 
 	//
 	// Meta-element
@@ -53,6 +44,6 @@ public class TextElement extends EditableEntryLeafElement
 	
 	public DPWidget createMetaHeaderData()
 	{
-		return new DPText( getWidget().getText() );
+		return new DPText( "'" + getWidget().getText() + "'" );
 	}
 }

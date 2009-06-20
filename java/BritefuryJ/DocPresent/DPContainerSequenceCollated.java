@@ -95,9 +95,9 @@ public abstract class DPContainerSequenceCollated extends DPContainerSequence
 	
 	
 	
-	protected void childListModified()
+	protected void onChildListModified()
 	{
-		super.childListModified();
+		super.onChildListModified();
 		resetCollation();
 	}
 

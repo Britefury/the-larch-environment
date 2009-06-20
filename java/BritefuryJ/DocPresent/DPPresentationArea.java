@@ -854,7 +854,7 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 	}
 	
 	
-	protected void structureChanged()
+	protected void onSubtreeStructureChanged()
 	{
 		if ( !caret.isValid() )
 		{

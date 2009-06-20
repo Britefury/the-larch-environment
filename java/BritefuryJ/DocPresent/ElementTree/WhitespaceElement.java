@@ -20,7 +20,7 @@ public class WhitespaceElement extends EditableLeafElement
 
 	public WhitespaceElement(String whitespace, double width)
 	{
-		super( new DPWhitespace(  width ), whitespace );
+		super( new DPWhitespace( whitespace, width ), whitespace );
 	}
 
 

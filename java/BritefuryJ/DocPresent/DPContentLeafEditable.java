@@ -28,14 +28,14 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	//
 	
 	
-	protected DPContentLeafEditable()
+	protected DPContentLeafEditable(String textRepresentation)
 	{
-		super();
+		super( textRepresentation );
 	}
 	
-	protected DPContentLeafEditable(ContentLeafStyleSheet styleSheet)
+	protected DPContentLeafEditable(ContentLeafStyleSheet styleSheet, String textRepresentation)
 	{
-		super( styleSheet );
+		super( styleSheet, textRepresentation );
 	}
 
 
@@ -56,69 +56,89 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	
 	
 	//
-	// Content modification
+	// Text representation modification
 	//
 	
-	public void insertContent(Marker marker, String x)
+	public void setTextRepresentation(String newTextRepresentation)
 	{
-		EditableLeafElement e = getElement();
-		if ( e != null )
+		int oldLength = textRepresentation.length();
+		int newLength = newTextRepresentation.length();
+		
+		textRepresentation = newTextRepresentation;
+
+		if ( newLength > oldLength )
 		{
-			e.insertText( marker, x );
+			markerInsert( oldLength, newLength - oldLength );
 		}
+		else if ( newLength < oldLength )
+		{
+			markerRemove( newLength, oldLength - newLength );
+		}
+		
+		textRepresentationChanged();
+	}
+	
+	
+	public void insertText(Marker marker, String x)
+	{
+		int index = marker.getIndex();
+		index = Math.min( Math.max( index, 0 ), textRepresentation.length() );
+		textRepresentation = textRepresentation.substring( 0, index ) + x + textRepresentation.substring( index );
+		markerInsert( index, x.length() );
+		textRepresentationChanged();
 	}
 
-	public void removeContent(Marker marker, int length)
+	public void removeText(int index, int length)
 	{
-		EditableLeafElement e = getElement();
-		if ( e != null )
-		{
-			e.removeText( marker, length );
-		}
+		index = Math.min( Math.max( index, 0 ), textRepresentation.length() );
+		length = Math.min( length, getTextRepresentationLength() - index );
+		textRepresentation = textRepresentation.substring( 0, index ) + textRepresentation.substring( index + length );
+		markerRemove( index, length );
+		textRepresentationChanged();
 	}
 	
-	public void removeContent(int index, int length)
+	public void removeText(Marker marker, int length)
 	{
-		EditableLeafElement e = getElement();
-		if ( e != null )
-		{
-			e.removeText( index, length );
-		}
+		removeText( marker.getIndex(), length );
 	}
 	
-	public void removeContentFromStart(int length)
+	public void removeTextFromStart(int length)
 	{
-		EditableLeafElement e = getElement();
-		if ( e != null )
-		{
-			e.removeTextFromStart( length );
-		}
+		removeText( 0, length );
 	}
 	
-	public void removeContentFromEnd(int length)
+	public void removeTextFromEnd(int length)
 	{
-		EditableLeafElement e = getElement();
-		if ( e != null )
-		{
-			e.removeTextFromEnd( length );
-		}
+		length = Math.min( length, getTextRepresentationLength() );
+		removeText( getTextRepresentationLength() - length, length );
 	}
 	
-	public void replaceContent(Marker marker, int length, String x)
+	public void replaceText(Marker marker, int length, String x)
 	{
-		EditableLeafElement e = getElement();
-		if ( e != null )
+		int index = marker.getIndex();
+		index = Math.min( Math.max( index, 0 ), textRepresentation.length() );
+		textRepresentation = textRepresentation.substring( 0, index )  +  x  +  textRepresentation.substring( index + length );
+		
+		if ( x.length() > length )
 		{
-			e.replaceText( marker, length, x );
+			markerInsert( index + length, x.length() - length );
 		}
+		else if ( x.length() < length )
+		{
+			markerRemove( index + x.length(), length - x.length() );
+		}
+		textRepresentationChanged();
 	}
 	
-	public boolean clearContent()
+	public boolean clearText()
 	{
-		EditableLeafElement e = getElement();
-		if ( e != null )
+		int length = textRepresentation.length();
+		if ( length > 0 )
 		{
-			return e.clearText();
+			textRepresentation = "";
+			markerRemove( 0, length );
+			textRepresentationChanged();
+			return true;
 		}
 		else
 		{

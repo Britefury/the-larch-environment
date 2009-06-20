@@ -9,7 +9,10 @@ package BritefuryJ.DocPresent.Marker;
 
 import java.util.ArrayList;
 
+import BritefuryJ.DocPresent.DPContainer;
 import BritefuryJ.DocPresent.DPContentLeaf;
+import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.DPWidget.IsNotInSubtreeException;
 
 public class Marker
 {
@@ -85,6 +88,45 @@ public class Marker
 		return position;
 	}
 	
+	public int getPositionInSubtree(DPWidget subtreeRoot) throws IsNotInSubtreeException
+	{
+		DPWidget element = getWidget();
+		if ( subtreeRoot == element )
+		{
+			return getPosition();
+		}
+		else
+		{
+			if ( subtreeRoot instanceof DPContainer )
+			{
+				DPContainer b = (DPContainer)subtreeRoot;
+				if ( element != null  &&  element.isInSubtreeRootedAt( b ) )
+				{
+					return getPosition() + element.getTextRepresentationOffsetInSubtree( b );
+				}
+				else
+				{
+					throw new DPWidget.IsNotInSubtreeException();
+				}
+			}
+			else if ( subtreeRoot instanceof DPContentLeaf )
+			{
+				if ( element != null  &&  element == subtreeRoot )
+				{
+					return getPosition();
+				}
+				else
+				{
+					throw new DPWidget.IsNotInSubtreeException();
+				}
+			}
+			else
+			{
+				throw new DPWidget.IsNotInSubtreeException();
+			}
+		}
+	}
+
 	public Bias getBias()
 	{
 		return bias;
@@ -94,6 +136,12 @@ public class Marker
 	public int getIndex()
 	{
 		return bias == Bias.END  ?  position + 1  :  position;
+	}
+	
+	public int getIndexInSubtree(DPWidget subtreeRoot) throws IsNotInSubtreeException
+	{
+		int p = getPositionInSubtree( subtreeRoot );
+		return getBias() == Bias.END  ?  p + 1  :  p;
 	}
 	
 

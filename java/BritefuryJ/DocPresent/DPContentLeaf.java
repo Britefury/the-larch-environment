@@ -7,10 +7,10 @@
 //##************************
 package BritefuryJ.DocPresent;
 
+import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.WeakHashMap;
-import java.awt.Graphics2D;
 
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.ElementTree.Element;
@@ -34,17 +34,20 @@ public abstract class DPContentLeaf extends DPWidget
 
 	
 	private WeakHashMap<Marker, Object> markers;
+	protected String textRepresentation;
 	
 	
 	
-	DPContentLeaf()
+	DPContentLeaf(String textRepresentation)
 	{
-		this( ContentLeafStyleSheet.defaultStyleSheet );
+		this( ContentLeafStyleSheet.defaultStyleSheet, textRepresentation );
 	}
 	
-	DPContentLeaf(ContentLeafStyleSheet styleSheet)
+	DPContentLeaf(ContentLeafStyleSheet styleSheet, String textRepresentation)
 	{
 		super( styleSheet );
+		
+		this.textRepresentation = textRepresentation;
 	}
 	
 	
@@ -641,6 +644,66 @@ public abstract class DPContentLeaf extends DPWidget
 			}
 		}
 	}
+	
+	
+	
+	//
+	//
+	// TEXT REPRESENTATION METHODS
+	//
+	//
+	public String getTextRepresentation()
+	{
+		return textRepresentation;
+	}
+	
+	public int getTextRepresentationLength()
+	{
+		return textRepresentation.length();
+	}
+	
+	protected void getTextRepresentationFromStartToPath(StringBuilder builder, Marker marker, ArrayList<DPWidget> path, int pathMyIndex)
+	{
+		builder.append( textRepresentation.substring( 0, marker.getIndex() ) );
+	}
+
+	protected void getTextRepresentationFromPathToEnd(StringBuilder builder, Marker marker, ArrayList<DPWidget> path, int pathMyIndex)
+	{
+		builder.append( textRepresentation.substring( marker.getIndex() ) );
+	}
+
+	protected String getTextRepresentationBetweenMarkers(Marker startMarker, Marker endMarker)
+	{
+		if ( startMarker.getWidget() != this  ||  endMarker.getWidget() != this )
+		{
+			throw new RuntimeException();
+		}
+		return textRepresentation.substring( startMarker.getIndex(), endMarker.getIndex() );
+	}
+
+	protected void getTextRepresentationFromStartOfRootToMarker(StringBuilder builder, Marker marker, DPWidget root)
+	{
+		if ( this != root  &&  parent != null )
+		{
+			parent.getTextRepresentationFromStartOfRootToMarkerFromChild( builder, marker, root, this );
+		}
+		builder.append( textRepresentation.substring( 0, marker.getIndex() ) );
+	}
+	
+	protected void getTextRepresentationFromMarkerToEndOfRoot(StringBuilder builder, Marker marker, DPWidget root)
+	{
+		builder.append( textRepresentation.substring( marker.getIndex() ) );
+		if ( this != root  &&  parent != null )
+		{
+			parent.getTextRepresentationFromMarkerToEndOfRootFromChild( builder, marker, root, this );
+		}
+	}
+	
+	public DPContentLeaf getLeafAtTextRepresentationPosition(int position)
+	{
+		return this;
+	}
+
 	
 	
 	

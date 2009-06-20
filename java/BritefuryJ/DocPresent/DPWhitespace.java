@@ -21,24 +21,24 @@ public class DPWhitespace extends DPContentLeafEditable
 	protected double width;
 	
 	
-	public DPWhitespace()
+	public DPWhitespace(String whitespace)
 	{
-		this( ContentLeafStyleSheet.defaultStyleSheet, 0.0 );
+		this( ContentLeafStyleSheet.defaultStyleSheet, whitespace, 0.0 );
 	}
 	
-	public DPWhitespace(ContentLeafStyleSheet styleSheet)
+	public DPWhitespace(ContentLeafStyleSheet styleSheet, String whitespace)
 	{
-		this( styleSheet, 0.0 );
+		this( styleSheet, whitespace, 0.0 );
 	}
 	
-	public DPWhitespace(double width)
+	public DPWhitespace(String whitespace, double width)
 	{
-		this( ContentLeafStyleSheet.defaultStyleSheet, width );
+		this( ContentLeafStyleSheet.defaultStyleSheet, whitespace, width );
 	}
 
-	public DPWhitespace(ContentLeafStyleSheet styleSheet, double width)
+	public DPWhitespace(ContentLeafStyleSheet styleSheet, String whitespace, double width)
 	{
-		super( styleSheet );
+		super( styleSheet, whitespace );
 		this.width = width;
 	}
 
