@@ -211,4 +211,52 @@ public class DPText extends DPContentLeafEditableEntry
 		int index = marker.getIndex();
 		return visual.getCharacterBoundaryPosition( index );
 	}
+	
+	
+	
+	//
+	//
+	// TEXT MODIFICATION METHODS
+	//
+	//
+	
+	public void insertText(Marker marker, String x)
+	{
+		super.insertText( marker, x );
+		
+		int index = marker.getIndex();
+		index = Math.min( Math.max( index, 0 ), text.length() );
+		text = text.substring( 0, index ) + x + text.substring( index );
+		onTextModified();
+	}
+
+	public void removeText(int index, int length)
+	{
+		super.removeText( index, length );
+		
+		index = Math.min( Math.max( index, 0 ), text.length() );
+		length = Math.min( length, text.length() - index );
+		text = text.substring( 0, index ) + text.substring( index + length );
+		onTextModified();
+	}
+	
+
+	public void replaceText(Marker marker, int length, String x)
+	{
+		super.replaceText( marker, length, x );
+		
+		int index = marker.getIndex();
+		index = Math.min( Math.max( index, 0 ), text.length() );
+		text = text.substring( 0, index )  +  x  +  text.substring( index + length );
+		onTextModified();
+	}
+	
+	public boolean clearText()
+	{
+		boolean bResult = super.clearText();
+		
+		setText( "" );
+		
+		return bResult;
+	}
 }

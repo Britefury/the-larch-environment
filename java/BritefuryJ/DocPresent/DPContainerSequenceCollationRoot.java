@@ -15,18 +15,18 @@ import BritefuryJ.DocPresent.Layout.PackingParams;
 import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 import BritefuryJ.Math.AABox2;
 
-public abstract class DPContainerSequenceCollated extends DPContainerSequence
+public abstract class DPContainerSequenceCollationRoot extends DPContainerSequence
 {
 	protected DPWidget collationLeaves[], collationBranches[];
 	
 	
 	
-	public DPContainerSequenceCollated()
+	public DPContainerSequenceCollationRoot()
 	{
 		this( ContainerStyleSheet.defaultStyleSheet );
 	}
 
-	public DPContainerSequenceCollated(ContainerStyleSheet styleSheet)
+	public DPContainerSequenceCollationRoot(ContainerStyleSheet styleSheet)
 	{
 		super( styleSheet );
 	}

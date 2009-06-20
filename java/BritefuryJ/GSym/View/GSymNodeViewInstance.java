@@ -233,10 +233,10 @@ public class GSymNodeViewInstance implements ElementContext, DVNode.NodeContext
 		return lineBreak( ContainerStyleSheet.defaultStyleSheet, lineBreakPriority, null );
 	}
 	
-	public Element segment(ParagraphStyleSheet styleSheet, TextStyleSheet textStyleSheet, boolean bGuardBegin, boolean bGuardEnd, Element child)
+	public Element segment(TextStyleSheet textStyleSheet, boolean bGuardBegin, boolean bGuardEnd, Element child)
 	{
 		viewInstance.getView().profile_startElement();
-		SegmentElement element = new SegmentElement( styleSheet, textStyleSheet, bGuardBegin, bGuardEnd );
+		SegmentElement element = new SegmentElement( textStyleSheet, bGuardBegin, bGuardEnd );
 		element.setChild( child );
 		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
@@ -246,7 +246,7 @@ public class GSymNodeViewInstance implements ElementContext, DVNode.NodeContext
 	public Element segment(boolean bGuardBegin, boolean bGuardEnd, Element child)
 	{
 		viewInstance.getView().profile_startElement();
-		SegmentElement element = new SegmentElement( ParagraphStyleSheet.defaultStyleSheet, TextStyleSheet.defaultStyleSheet, bGuardBegin, bGuardEnd );
+		SegmentElement element = new SegmentElement( TextStyleSheet.defaultStyleSheet, bGuardBegin, bGuardEnd );
 		element.setChild( child );
 		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
@@ -254,10 +254,10 @@ public class GSymNodeViewInstance implements ElementContext, DVNode.NodeContext
 	}
 	
 	
-	public Element script(ScriptStyleSheet styleSheet, ParagraphStyleSheet segmentParagraphStyleSheet, TextStyleSheet segmentTextStyleSheet, Element mainChild, Element leftSuperChild, Element leftSubChild, Element rightSuperChild, Element rightSubChild)
+	public Element script(ScriptStyleSheet styleSheet, TextStyleSheet segmentTextStyleSheet, Element mainChild, Element leftSuperChild, Element leftSubChild, Element rightSuperChild, Element rightSubChild)
 	{
 		viewInstance.getView().profile_startElement();
-		ScriptElement element = new ScriptElement( styleSheet, segmentParagraphStyleSheet, segmentTextStyleSheet );
+		ScriptElement element = new ScriptElement( styleSheet, segmentTextStyleSheet );
 		element.setMainChild( mainChild );
 		if ( leftSuperChild != null )
 		{
@@ -282,28 +282,28 @@ public class GSymNodeViewInstance implements ElementContext, DVNode.NodeContext
 	
 	public Element script(ScriptStyleSheet styleSheet, Element mainChild, Element leftSuperChild, Element leftSubChild, Element rightSuperChild, Element rightSubChild)
 	{
-		return script( styleSheet, ParagraphStyleSheet.defaultStyleSheet, TextStyleSheet.defaultStyleSheet, mainChild, leftSuperChild, leftSubChild, rightSuperChild, rightSubChild );
+		return script( styleSheet, TextStyleSheet.defaultStyleSheet, mainChild, leftSuperChild, leftSubChild, rightSuperChild, rightSubChild );
 	}
 	
 	
-	public Element scriptLSuper(ScriptStyleSheet styleSheet, ParagraphStyleSheet segmentParagraphStyleSheet, TextStyleSheet segmentTextStyleSheet, Element mainChild, Element scriptChild)
+	public Element scriptLSuper(ScriptStyleSheet styleSheet, TextStyleSheet segmentTextStyleSheet, Element mainChild, Element scriptChild)
 	{
-		return script( styleSheet, segmentParagraphStyleSheet, segmentTextStyleSheet, mainChild, scriptChild, null, null, null );
+		return script( styleSheet, segmentTextStyleSheet, mainChild, scriptChild, null, null, null );
 	}
 	
-	public Element scriptLSub(ScriptStyleSheet styleSheet, ParagraphStyleSheet segmentParagraphStyleSheet, TextStyleSheet segmentTextStyleSheet, Element mainChild, Element scriptChild)
+	public Element scriptLSub(ScriptStyleSheet styleSheet, TextStyleSheet segmentTextStyleSheet, Element mainChild, Element scriptChild)
 	{
-		return script( styleSheet, segmentParagraphStyleSheet, segmentTextStyleSheet, mainChild, null, scriptChild, null, null );
+		return script( styleSheet, segmentTextStyleSheet, mainChild, null, scriptChild, null, null );
 	}
 	
-	public Element scriptRSuper(ScriptStyleSheet styleSheet, ParagraphStyleSheet segmentParagraphStyleSheet, TextStyleSheet segmentTextStyleSheet, Element mainChild, Element scriptChild)
+	public Element scriptRSuper(ScriptStyleSheet styleSheet, TextStyleSheet segmentTextStyleSheet, Element mainChild, Element scriptChild)
 	{
-		return script( styleSheet, segmentParagraphStyleSheet, segmentTextStyleSheet, mainChild, null, null, scriptChild, null );
+		return script( styleSheet, segmentTextStyleSheet, mainChild, null, null, scriptChild, null );
 	}
 	
-	public Element scriptRSub(ScriptStyleSheet styleSheet, ParagraphStyleSheet segmentParagraphStyleSheet, TextStyleSheet segmentTextStyleSheet, Element mainChild, Element scriptChild)
+	public Element scriptRSub(ScriptStyleSheet styleSheet, TextStyleSheet segmentTextStyleSheet, Element mainChild, Element scriptChild)
 	{
-		return script( styleSheet, segmentParagraphStyleSheet, segmentTextStyleSheet, mainChild, null, null, null, scriptChild );
+		return script( styleSheet, segmentTextStyleSheet, mainChild, null, null, null, scriptChild );
 	}
 	
 	
@@ -329,10 +329,10 @@ public class GSymNodeViewInstance implements ElementContext, DVNode.NodeContext
 	
 	
 	
-	public Element fraction(FractionStyleSheet styleSheet, ParagraphStyleSheet segmentParagraphStyleSheet, TextStyleSheet segmentTextStyleSheet, Element numerator, Element denominator, String barContent)
+	public Element fraction(FractionStyleSheet styleSheet, TextStyleSheet segmentTextStyleSheet, Element numerator, Element denominator, String barContent)
 	{
 		viewInstance.getView().profile_startElement();
-		FractionElement element = new FractionElement( styleSheet, segmentParagraphStyleSheet, segmentTextStyleSheet, barContent );
+		FractionElement element = new FractionElement( styleSheet, segmentTextStyleSheet, barContent );
 		element.setNumeratorChild( numerator );
 		element.setDenominatorChild( denominator );
 		element.setContext( this );
@@ -342,7 +342,7 @@ public class GSymNodeViewInstance implements ElementContext, DVNode.NodeContext
 	
 	public Element fraction(FractionStyleSheet styleSheet, Element numerator, Element denominator, String barContent)
 	{
-		return fraction( styleSheet, ParagraphStyleSheet.defaultStyleSheet, TextStyleSheet.defaultStyleSheet, numerator, denominator, barContent );
+		return fraction( styleSheet, TextStyleSheet.defaultStyleSheet, numerator, denominator, barContent );
 	}
 	
 

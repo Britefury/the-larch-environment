@@ -1634,6 +1634,25 @@ abstract public class DPWidget
 
 	
 	
+	//
+	//
+	// SEGMENT METHODS
+	//
+	//
+	
+	public DPSegment getSegment()
+	{
+		if ( parent != null )
+		{
+			return parent.getSegment();
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	
 	
 	
 	//

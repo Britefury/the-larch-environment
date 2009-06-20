@@ -20,7 +20,7 @@ import BritefuryJ.Math.Point2;
 
 
 
-public class DPParagraph extends DPContainerSequenceCollated
+public class DPParagraph extends DPContainerSequenceCollationRoot
 {
 	public static class CouldNotFindInsertionPointException extends RuntimeException
 	{

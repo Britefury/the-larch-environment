@@ -60,6 +60,7 @@ public class DPMathRoot extends DPContainer
 				registerChild( child, null );				
 			}
 			
+			onChildListModified();
 			queueResize();
 		}
 	}

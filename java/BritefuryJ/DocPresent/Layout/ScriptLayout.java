@@ -97,7 +97,7 @@ public class ScriptLayout
 		if ( main != null )
 		{
 			Ma = main.reqAscent;
-			Md = main.reqAscent;
+			Md = main.reqDescent;
 			Mh = main.getReqHeight();
 		}
 
@@ -120,6 +120,8 @@ public class ScriptLayout
 		
 		if ( ( leftSuper != null  ||  rightSuper != null )  &&  ( leftSub != null  ||  rightSub != null ) )
 		{
+			// We have both superscript and subscript children; either left or right
+			
 			q = scriptSpacing;
 			
 			// Start with main-baseline = 0
@@ -161,6 +163,8 @@ public class ScriptLayout
 		}
 		else if ( leftSuper != null  ||  rightSuper != null )
 		{
+			// We have only superscipt children
+			
 			// Start with main-baseline = 0
 			mainBaseline = 0.0;
 			
@@ -188,6 +192,8 @@ public class ScriptLayout
 		}
 		else if ( leftSub != null  ||  rightSub != null )
 		{
+			// We have only subscipt children
+			
 			// Start with main-baseline = 0
 			mainBaseline = 0.0;
 			

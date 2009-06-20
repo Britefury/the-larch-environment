@@ -216,7 +216,14 @@ public class ParagraphLayout
 			lineBoxes[i++] = line.lineReqBox;
 		}
 		
-		VerticalLayout.computeRequisitionY( box, lineBoxes, VTypesetting.NONE, vSpacing, null );
+		if ( lines.length == 1 )
+		{
+			box.setRequisitionY( lineBoxes[0] );
+		}
+		else
+		{
+			VerticalLayout.computeRequisitionY( box, lineBoxes, VTypesetting.NONE, vSpacing, null );
+		}
 	}
 
 
@@ -376,7 +383,14 @@ public class ParagraphLayout
 			lineAllocBoxes[i++] = line.lineAllocBox;
 		}
 		
-		VerticalLayout.allocateY( box, lineReqBoxes, allocBox, lineAllocBoxes, vSpacing, null );
+		if ( lines.length == 1 )
+		{
+			allocBox.allocateChildY( lineAllocBoxes[0], 0.0, lineReqBoxes[0].getReqHeight() );
+		}
+		else
+		{
+			VerticalLayout.allocateY( box, lineReqBoxes, allocBox, lineAllocBoxes, vSpacing, null );
+		}
 		
 		for (Line line: lines)
 		{

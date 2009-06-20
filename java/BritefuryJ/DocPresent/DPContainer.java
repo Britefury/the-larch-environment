@@ -118,8 +118,6 @@ public abstract class DPContainer extends DPWidget
 			child.handleRealise();
 		}
 		
-		onSubtreeStructureChanged();
-		
 		return child;
 	}
 	
@@ -133,13 +131,12 @@ public abstract class DPContainer extends DPWidget
 		child.setParentPacking( null );
 		
 		child.setParent( null, null );
-		
-		onSubtreeStructureChanged();
 	}
 	
 	
 	protected void onChildListModified()
 	{
+		onSubtreeStructureChanged();
 	}
 	
 	

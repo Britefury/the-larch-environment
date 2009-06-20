@@ -8,11 +8,11 @@
 package BritefuryJ.DocPresent.ElementTree;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import BritefuryJ.DocPresent.DPScript;
 import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.ScriptStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 
@@ -33,31 +33,31 @@ public class ScriptElement extends BranchElement
 	public static int NUMCHILDREN = DPScript.NUMCHILDREN;
 	
 	
-	protected ParagraphStyleSheet segmentParagraphStyleSheet;
 	protected TextStyleSheet segmentTextStyleSheet; 
 	protected Element children[];
 	protected SegmentElement segments[];
+	protected ParagraphElement paras[];
 	
 	
 	
 	public ScriptElement()
 	{
-		this( ScriptStyleSheet.defaultStyleSheet, ParagraphStyleSheet.defaultStyleSheet, TextStyleSheet.defaultStyleSheet );
+		this( ScriptStyleSheet.defaultStyleSheet, TextStyleSheet.defaultStyleSheet );
 	}
 	
 	public ScriptElement(ScriptStyleSheet styleSheet)
 	{
-		this( styleSheet, ParagraphStyleSheet.defaultStyleSheet, TextStyleSheet.defaultStyleSheet );
+		this( styleSheet, TextStyleSheet.defaultStyleSheet );
 	}
 	
-	public ScriptElement(ScriptStyleSheet styleSheet, ParagraphStyleSheet segmentParagraphStyleSheet, TextStyleSheet segmentTextStyleSheet)
+	public ScriptElement(ScriptStyleSheet styleSheet, TextStyleSheet segmentTextStyleSheet)
 	{
 		super( new DPScript( styleSheet ) );
 		
-		this.segmentParagraphStyleSheet = segmentParagraphStyleSheet;
 		this.segmentTextStyleSheet = segmentTextStyleSheet;
 		children = new Element[NUMCHILDREN];
 		segments = new SegmentElement[NUMCHILDREN];
+		paras = new ParagraphElement[NUMCHILDREN];
 	}
 
 
@@ -78,12 +78,15 @@ public class ScriptElement extends BranchElement
 			
 			if ( bSegmentRequired  &&  !bSegmentPresent )
 			{
-				SegmentElement seg = new SegmentElement( segmentParagraphStyleSheet, segmentTextStyleSheet, isBeginGuardRequired( slot ), isEndGuardRequired( slot ) );
-				seg.setParent( this );
-				seg.setElementTree( tree );
+				SegmentElement seg = new SegmentElement( segmentTextStyleSheet, isBeginGuardRequired( slot ), isEndGuardRequired( slot ) );
 				segments[slot] = seg;
-				DPWidget segmentWidget = seg.getWidget();
-				getWidget().setChild( slot, segmentWidget );
+				ParagraphElement para = new ParagraphElement();
+				para.setChildren( Arrays.asList( new Element[] { seg } ) );
+				para.setParent( this );
+				para.setElementTree( tree );
+				paras[slot] = para;
+				DPWidget paraWidget = para.getWidget();
+				getWidget().setChild( slot, paraWidget );
 			}
 			
 			children[slot] = child;
@@ -94,11 +97,11 @@ public class ScriptElement extends BranchElement
 
 			if ( bSegmentPresent  &&  !bSegmentRequired )
 			{
-				
-				SegmentElement seg = segments[slot];
-				seg.setParent( null );
-				seg.setElementTree( null );
+				ParagraphElement para = paras[slot];
+				para.setParent( null );
+				para.setElementTree( null );
 				segments[slot] = null;
+				paras[slot] = null;
 				getWidget().setChild( slot, null );
 			}
 			

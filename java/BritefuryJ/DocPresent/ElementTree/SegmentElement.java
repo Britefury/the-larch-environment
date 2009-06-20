@@ -6,43 +6,15 @@
 //##************************
 package BritefuryJ.DocPresent.ElementTree;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import BritefuryJ.DocPresent.DPParagraph;
+import BritefuryJ.DocPresent.DPSegment;
 import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.WidgetFilter;
-import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 
 public class SegmentElement extends BranchElement
 {
-	
-	//
-	// Utility classes
-	//
-	
-	public static class SegmentFilter implements WidgetFilter
-	{
-		private SegmentElement segment;
-		
-		
-		public SegmentFilter(SegmentElement seg)
-		{
-			segment = seg;
-		}
-		
-		public boolean testElement(DPWidget element)
-		{
-			return element.getElement().getSegment() == segment;
-		}
-	}
-
-	
-	
-	protected TextStyleSheet textStyleSheet;
-	protected boolean bGuardBegin, bGuardEnd;
-	protected Element beginGuard, endGuard;
 	protected Element child;
 	
 	
@@ -52,20 +24,12 @@ public class SegmentElement extends BranchElement
 	
 	public SegmentElement(boolean bGuardBegin, boolean bGuardEnd)
 	{
-		this( ParagraphStyleSheet.defaultStyleSheet, TextStyleSheet.defaultStyleSheet, bGuardBegin, bGuardEnd );
+		this( TextStyleSheet.defaultStyleSheet, bGuardBegin, bGuardEnd );
 	}
 
-	public SegmentElement(ParagraphStyleSheet styleSheet, boolean bGuardBegin, boolean bGuardEnd)
+	public SegmentElement(TextStyleSheet textStyleSheet, boolean bGuardBegin, boolean bGuardEnd)
 	{
-		this( styleSheet, TextStyleSheet.defaultStyleSheet, bGuardBegin, bGuardEnd );
-	}
-
-	public SegmentElement(ParagraphStyleSheet styleSheet, TextStyleSheet textStyleSheet, boolean bGuardBegin, boolean bGuardEnd)
-	{
-		super( new DPParagraph( styleSheet ) );
-		this.textStyleSheet = textStyleSheet;
-		this.bGuardBegin = bGuardBegin;
-		this.bGuardEnd = bGuardEnd;
+		super( new DPSegment( textStyleSheet, bGuardBegin, bGuardEnd ) );
 	}
 	
 	
@@ -73,12 +37,7 @@ public class SegmentElement extends BranchElement
 	
 	public void setGuardPolicy(boolean bGuardBegin, boolean bGuardEnd)
 	{
-		if ( bGuardBegin != this.bGuardBegin  ||  bGuardEnd != this.bGuardEnd )
-		{
-			this.bGuardBegin = bGuardBegin;
-			this.bGuardEnd = bGuardEnd;
-			onSubtreeStructureChanged();
-		}
+		getWidget().setGuardPolicy( bGuardBegin, bGuardEnd );
 	}
 	
 	
@@ -87,9 +46,9 @@ public class SegmentElement extends BranchElement
 	// Widget
 	//
 	
-	public DPParagraph getWidget()
+	public DPSegment getWidget()
 	{
-		return (DPParagraph)widget;
+		return (DPSegment)widget;
 	}
 	
 	
@@ -114,6 +73,13 @@ public class SegmentElement extends BranchElement
 				this.child.setElementTree( tree );
 			}
 			
+			DPWidget childWidget = null;
+			if ( child != null )
+			{
+				childWidget = child.getWidget();
+			}
+			getWidget().setChild( childWidget );
+
 			onChildListChanged();
 		}
 	}
@@ -127,122 +93,15 @@ public class SegmentElement extends BranchElement
 	
 	public List<Element> getChildren()
 	{
-		ArrayList<Element> ch = new ArrayList<Element>();
-		
-		if ( beginGuard != null )
+		if ( child == null )
 		{
-			ch.add( beginGuard );
+			Element[] ch = {};
+			return Arrays.asList( ch );
 		}
-		if ( child != null )
+		else
 		{
-			ch.add( child );
+			Element[] ch = { child };
+			return Arrays.asList( ch );
 		}
-		if ( endGuard != null )
-		{
-			ch.add( endGuard );
-		}
-		
-		return ch;
-	}
-
-	
-	
-	//
-	// Collation methods
-	//
-	
-	private void refreshGuards()
-	{
-		boolean bBegin = false, bEnd = false;
-		
-		if ( child != null )
-		{
-			Element firstLeaf = child.getFirstLeafInSubtree();
-			Element lastLeaf = child.getLastLeafInSubtree();
-			
-			if ( firstLeaf != null  &&  lastLeaf != null )
-			{
-				bBegin = firstLeaf.getSegment() != this;
-				bEnd = lastLeaf.getSegment() != this;
-			}
-		}
-		
-		if ( bGuardBegin )
-		{
-			if ( bBegin  &&  !( beginGuard instanceof TextElement ) )
-			{
-				beginGuard = new TextElement( textStyleSheet, "" );
-				beginGuard.setParent( this );
-				beginGuard.setElementTree( tree );
-			}
-			
-			if ( !bBegin  &&  !( beginGuard instanceof WhitespaceElement ) )
-			{
-				beginGuard = new WhitespaceElement( "" );
-				beginGuard.setParent( this );
-				beginGuard.setElementTree( tree );
-			}
-		}
-		else if ( beginGuard != null )
-		{
-			beginGuard.setParent( null );
-			beginGuard.setElementTree( null );
-			beginGuard = null;
-		}
-		
-		
-		if ( bGuardEnd )
-		{
-			if ( bEnd  &&  !( endGuard instanceof TextElement ) )
-			{
-				endGuard = new TextElement( textStyleSheet, "" );
-				endGuard.setParent( this );
-				endGuard.setElementTree( tree );
-			}
-			
-			if ( !bEnd  &&  !( endGuard instanceof WhitespaceElement ) )
-			{
-				endGuard = new WhitespaceElement( "" );
-				endGuard.setParent( this );
-				endGuard.setElementTree( tree );
-			}
-		}
-		else if ( endGuard != null )
-		{
-			endGuard.setParent( null );
-			endGuard.setElementTree( null );
-			endGuard = null;
-		}
-		
-		ArrayList<DPWidget> ch = new ArrayList<DPWidget>();
-		if ( beginGuard != null )
-		{
-			ch.add( beginGuard.getWidget() );
-		}
-		if ( child != null )
-		{
-			ch.add( child.getWidget() );
-		}
-		if ( endGuard != null )
-		{
-			ch.add( endGuard.getWidget() );
-		}
-		
-		getWidget().setChildren( ch );
-	}
-
-	protected void onSubtreeStructureChanged()
-	{
-		super.onSubtreeStructureChanged();
-		
-		refreshGuards();
-	}
-	
-	
-	
-	
-	public SegmentElement getSegment()
-	{
-		return this;
 	}
 }

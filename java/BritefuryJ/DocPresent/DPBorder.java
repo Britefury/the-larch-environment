@@ -78,6 +78,7 @@ public class DPBorder extends DPBin
 	
 	protected void updateRequisitionX()
 	{
+		DPWidget child = getChild();
 		if ( child != null )
 		{
 			layoutReqBox.setRequisitionX( child.refreshRequisitionX() );
@@ -91,6 +92,7 @@ public class DPBorder extends DPBin
 
 	protected void updateRequisitionY()
 	{
+		DPWidget child = getChild();
 		if ( child != null )
 		{
 			layoutReqBox.setRequisitionY( child.refreshRequisitionY() );
@@ -107,6 +109,7 @@ public class DPBorder extends DPBin
 	
 	protected void updateAllocationX()
 	{
+		DPWidget child = getChild();
 		if ( child != null )
 		{
 			double hborder = border.getLeftMargin() + border.getRightMargin();
@@ -118,6 +121,7 @@ public class DPBorder extends DPBin
 
 	protected void updateAllocationY()
 	{
+		DPWidget child = getChild();
 		if ( child != null )
 		{
 			double vborder = border.getTopMargin() + border.getBottomMargin();

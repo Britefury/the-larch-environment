@@ -8,12 +8,12 @@ package BritefuryJ.GSym.View;
 
 import java.util.ArrayList;
 
+import BritefuryJ.DocPresent.DPSegment;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.ElementTree.BranchElement;
 import BritefuryJ.DocPresent.ElementTree.Element;
 import BritefuryJ.DocPresent.ElementTree.ElementTree;
 import BritefuryJ.DocPresent.ElementTree.LeafElement;
-import BritefuryJ.DocPresent.ElementTree.SegmentElement;
 import BritefuryJ.DocPresent.ElementTree.Caret.ElementCaret;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Marker.Marker.Bias;
@@ -305,7 +305,7 @@ public class NodeElementChangeListenerDiff implements DVNode.NodeElementChangeLi
 					{
 						// The leaf is not editable. We must choose a nearby leaf to place the caret in
 						
-						SegmentElement.SegmentFilter segFilter = new SegmentElement.SegmentFilter( leaf.getSegment() );
+						DPSegment.SegmentFilter segFilter = new DPSegment.SegmentFilter( leaf.getWidget().getSegment() );
 						
 						
 						// First, we must decide whether we should search backwards or forwards

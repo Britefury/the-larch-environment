@@ -10,9 +10,12 @@ package visualtests.DocPresent;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Color;
+import java.util.Arrays;
 
 import javax.swing.JFrame;
 
+import BritefuryJ.DocPresent.DPFraction;
+import BritefuryJ.DocPresent.DPParagraph;
 import BritefuryJ.DocPresent.DPPresentationArea;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
@@ -43,22 +46,56 @@ public class DPScriptTest
 	
 	protected DPWidget makeScriptWidget(String mainText, String leftSuperText, String leftSubText, String rightSuperText, String rightSubText)
 	{
-		Font f0 = new Font( "Sans serif", Font.PLAIN, 16 );
-		TextStyleSheet s0 = new TextStyleSheet( f0, Color.black );
-		TextStyleSheet s1 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 10 ), Color.blue );
-		TextStyleSheet s2 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 24 ), Color.red );
-		DPText main = new DPText( s0, mainText);
+		TextStyleSheet sMain = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 16 ), Color.black );
+		TextStyleSheet sScript = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 16 ), Color.black );
+		TextStyleSheet sPre = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.blue );
+		TextStyleSheet sPost = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 24 ), Color.red );
+		DPText main = new DPText( sMain, mainText);
 		
 		DPScript script = new DPScript();
 		
 		script.setMainChild( main );
-		script.setLeftSuperscriptChild( makeText( leftSuperText, s0 ) );
-		script.setLeftSubscriptChild( makeText( leftSubText, s0 ) );
-		script.setRightSuperscriptChild( makeText( rightSuperText, s0 ) );
-		script.setRightSubscriptChild( makeText( rightSubText, s0 ) );
+		script.setLeftSuperscriptChild( makeText( leftSuperText, sScript ) );
+		script.setLeftSubscriptChild( makeText( leftSubText, sScript ) );
+		script.setRightSuperscriptChild( makeText( rightSuperText, sScript ) );
+		script.setRightSubscriptChild( makeText( rightSubText, sScript ) );
 
-		DPText labelA = new DPText( s1, "Label A yYgGjJpPqQ" );
-		DPText labelB = new DPText( s2, "Label B yYgGjJpPqQ" );
+		DPText labelA = new DPText( sPre, "Label A yYgGjJpPqQ" );
+		DPText labelB = new DPText( sPost, "Label B yYgGjJpPqQ" );
+		
+		HBoxStyleSheet boxs = new HBoxStyleSheet( VAlignment.BASELINES, 0.0, false, 0.0 );
+		DPHBox box = new DPHBox( boxs );
+		box.append( labelA );
+		box.append( script );
+		box.append( labelB );
+		
+		return box;
+	}
+
+	
+	
+	protected DPWidget makeScriptFraction(String mainText, String numText, String denomText)
+	{
+		TextStyleSheet sMain = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 16 ), Color.black );
+		TextStyleSheet sScript = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 16 ), Color.black );
+		TextStyleSheet sPre = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.blue );
+		TextStyleSheet sPost = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 24 ), Color.red );
+		DPText main = new DPText( sMain, mainText );
+		
+		DPFraction fraction = new DPFraction();
+		fraction.setNumeratorChild( makeText( numText, sScript ) );
+		fraction.setDenominatorChild( makeText( denomText, sScript ) );
+		
+		DPParagraph para = new DPParagraph();
+		para.setChildren( Arrays.asList( new DPWidget[] { fraction } ) );
+		
+		DPScript script = new DPScript();
+		
+		script.setMainChild( main );
+		script.setRightSuperscriptChild( para );
+
+		DPText labelA = new DPText( sPre, "Label A yYgGjJpPqQ" );
+		DPText labelB = new DPText( sPost, "Label B yYgGjJpPqQ" );
 		
 		HBoxStyleSheet boxs = new HBoxStyleSheet( VAlignment.BASELINES, 0.0, false, 0.0 );
 		DPHBox box = new DPHBox( boxs );
@@ -89,6 +126,8 @@ public class DPScriptTest
 			
 			box.append( script );
 		}
+		
+		box.append( makeScriptFraction( "MAIN", "a", "b" ) );
 		
 		return box;
 	}

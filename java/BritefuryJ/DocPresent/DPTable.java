@@ -402,6 +402,7 @@ public class DPTable extends DPContainer
 			if ( index != -1 )
 			{
 				row[index] = new DPEmpty();
+				break;
 			}
 		}
 	}

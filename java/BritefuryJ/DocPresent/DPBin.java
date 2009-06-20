@@ -7,7 +7,6 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-import java.util.Arrays;
 import java.util.List;
 
 import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
@@ -16,11 +15,6 @@ import BritefuryJ.Math.Point2;
 
 public class DPBin extends DPContainer
 {
-	protected DPWidget child;
-	protected double childScale;
-	
-	
-	
 	public DPBin()
 	{
 		this( ContainerStyleSheet.defaultStyleSheet );
@@ -29,37 +23,40 @@ public class DPBin extends DPContainer
 	public DPBin(ContainerStyleSheet styleSheet)
 	{
 		super( styleSheet );
-		
-		childScale = 1.0;
 	}
 	
 	
 	
 	public DPWidget getChild()
 	{
-		return child;
+		if ( registeredChildren.size() > 0 )
+		{
+			return registeredChildren.get( 0 );
+		}
+		else
+		{
+			return null;
+		}
 	}
 	
 	public void setChild(DPWidget child)
 	{
-		if ( child != this.child )
+		DPWidget prevChild = getChild();
+		if ( child != prevChild )
 		{
-			DPWidget prevChild = this.child;
-			
 			if ( prevChild != null )
 			{
 				unregisterChild( prevChild );
-				registeredChildren.remove( prevChild );
+				registeredChildren.remove( 0 );
 			}
 			
-			this.child = child;
-			
-			if ( this.child != null )
+			if ( child != null )
 			{
 				registeredChildren.add( child );
 				registerChild( child, null );				
 			}
 			
+			onChildListModified();
 			queueResize();
 		}
 	}
@@ -67,7 +64,7 @@ public class DPBin extends DPContainer
 	
 	protected void replaceChildWithEmpty(DPWidget child)
 	{
-		assert child == this.child;
+		assert child == this.getChild();
 		setChild( null );
 	}
 	
@@ -75,35 +72,13 @@ public class DPBin extends DPContainer
 
 	protected List<DPWidget> getChildren()
 	{
-		if ( child != null )
-		{
-			DPWidget[] children = { child };
-			return Arrays.asList( children );
-		}
-		else
-		{
-			DPWidget[] children = {};
-			return Arrays.asList( children );
-		}
+		return registeredChildren;
 	}
 
 	
-	public double getChildScale()
-	{
-		return childScale;
-	}
-	
-	public void setChildScale(double scale)
-	{
-		childScale = scale;
-		queueResize();
-	}
-	
-	
-	
-
 	protected void updateRequisitionX()
 	{
+		DPWidget child = getChild();
 		if ( child != null )
 		{
 			layoutReqBox.setRequisitionX( child.refreshRequisitionX() );
@@ -116,6 +91,7 @@ public class DPBin extends DPContainer
 
 	protected void updateRequisitionY()
 	{
+		DPWidget child = getChild();
 		if ( child != null )
 		{
 			layoutReqBox.setRequisitionY( child.refreshRequisitionY() );
@@ -130,6 +106,7 @@ public class DPBin extends DPContainer
 	
 	protected void updateAllocationX()
 	{
+		DPWidget child = getChild();
 		if ( child != null )
 		{
 			double prevWidth = child.layoutAllocBox.getAllocationX();
@@ -140,6 +117,7 @@ public class DPBin extends DPContainer
 
 	protected void updateAllocationY()
 	{
+		DPWidget child = getChild();
 		if ( child != null )
 		{
 			double prevHeight = child.layoutAllocBox.getAllocationY();
@@ -152,6 +130,7 @@ public class DPBin extends DPContainer
 	
 	protected DPWidget getChildLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter)
 	{
+		DPWidget child = getChild();
 		if ( child == null )
 		{
 			return null;
@@ -169,10 +148,10 @@ public class DPBin extends DPContainer
 	
 	protected List<DPWidget> horizontalNavigationList()
 	{
+		DPWidget child = getChild();
 		if ( child != null )
 		{
-			DPWidget[] navList = { child };
-			return Arrays.asList( navList );
+			return registeredChildren;
 		}
 		else
 		{
@@ -188,6 +167,7 @@ public class DPBin extends DPContainer
 	
 	protected String computeSubtreeTextRepresentation()
 	{
+		DPWidget child = getChild();
 		return child != null  ?  child.getTextRepresentation()  :  "";
 	}
 }

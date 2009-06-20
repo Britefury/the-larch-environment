@@ -7,12 +7,12 @@
 package BritefuryJ.DocPresent.ElementTree;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import BritefuryJ.DocPresent.DPFraction;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.StyleSheets.FractionStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 
 public class FractionElement extends BranchElement
@@ -42,43 +42,50 @@ public class FractionElement extends BranchElement
 	
 	protected Element numeratorChild, barChild, denominatorChild;
 	protected SegmentElement numSegment, denomSegment;
+	protected ParagraphElement numPara, denomPara;
 	
 	
 	
 	public FractionElement()
 	{
-		this( FractionStyleSheet.defaultStyleSheet, ParagraphStyleSheet.defaultStyleSheet, TextStyleSheet.defaultStyleSheet, "/" );
+		this( FractionStyleSheet.defaultStyleSheet, TextStyleSheet.defaultStyleSheet, "/" );
 	}
 	
 	public FractionElement(String barContent)
 	{
-		this( FractionStyleSheet.defaultStyleSheet, ParagraphStyleSheet.defaultStyleSheet, TextStyleSheet.defaultStyleSheet, barContent );
+		this( FractionStyleSheet.defaultStyleSheet, TextStyleSheet.defaultStyleSheet, barContent );
 	}
 	
 	public FractionElement(FractionStyleSheet styleSheet)
 	{
-		this( styleSheet, ParagraphStyleSheet.defaultStyleSheet, TextStyleSheet.defaultStyleSheet, "/" );
+		this( styleSheet, TextStyleSheet.defaultStyleSheet, "/" );
 	}
 	
 	public FractionElement(FractionStyleSheet styleSheet, String barContent)
 	{
-		this( styleSheet, ParagraphStyleSheet.defaultStyleSheet, TextStyleSheet.defaultStyleSheet, barContent );
+		this( styleSheet, TextStyleSheet.defaultStyleSheet, barContent );
 	}
 
-	public FractionElement(FractionStyleSheet styleSheet, ParagraphStyleSheet segmentParagraphStyleSheet, TextStyleSheet segmentTextStyleSheet, String barContent)
+	public FractionElement(FractionStyleSheet styleSheet, TextStyleSheet segmentTextStyleSheet, String barContent)
 	{
 		super( new DPFraction( styleSheet ) );
 		
-		numSegment = new SegmentElement( segmentParagraphStyleSheet, segmentTextStyleSheet, true, true );
-		denomSegment = new SegmentElement( segmentParagraphStyleSheet, segmentTextStyleSheet, true, true );
+		numSegment = new SegmentElement( segmentTextStyleSheet, true, true );
+		denomSegment = new SegmentElement( segmentTextStyleSheet, true, true );
 		
-		getWidget().setNumeratorChild( numSegment.getWidget() );
-		numSegment.setParent( this );
-		numSegment.setElementTree( tree );
+		numPara = new ParagraphElement();
+		denomPara = new ParagraphElement();
 		
-		getWidget().setDenominatorChild( denomSegment.getWidget() );
-		denomSegment.setParent( this );
-		denomSegment.setElementTree( tree );
+		numPara.setChildren( Arrays.asList( new Element[] { numSegment } ) );
+		denomPara.setChildren( Arrays.asList( new Element[] { denomSegment } ) );
+
+		getWidget().setNumeratorChild( numPara.getWidget() );
+		numPara.setParent( this );
+		numPara.setElementTree( tree );
+		
+		getWidget().setDenominatorChild( denomPara.getWidget() );
+		denomPara.setParent( this );
+		denomPara.setElementTree( tree );
 		
 		setBarChild( new BarElement( styleSheet.getBarStyleSheet(), barContent ) );
 	}
@@ -170,7 +177,7 @@ public class FractionElement extends BranchElement
 		
 		if ( numSegment != null )
 		{
-			xs.add( numSegment );
+			xs.add( numPara );
 		}
 		
 		if ( barChild != null )
@@ -180,7 +187,7 @@ public class FractionElement extends BranchElement
 		
 		if ( denomSegment != null )
 		{
-			xs.add( denomSegment );
+			xs.add( denomPara );
 		}
 		
 		return xs;

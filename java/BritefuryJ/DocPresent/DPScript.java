@@ -85,6 +85,7 @@ public class DPScript extends DPContainer
 				registerChild( child, null );
 			}
 			
+			onChildListModified();
 			queueResize();
 		}
 	}

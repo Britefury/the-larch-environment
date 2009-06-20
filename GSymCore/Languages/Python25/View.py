@@ -178,7 +178,7 @@ def statementNodeEditor(ctx, node, contents, precedence, state):
 
 	if mode == MODE_EDITSTATEMENT:
 		contents = _precedenceParen( ctx, node, contents, precedence, outerPrecedence )
-		segment = ctx.segment( python_paragraphStyle, default_textStyle, True, True, contents )
+		segment = ctx.segment( default_textStyle, True, True, contents )
 		segment = ctx.textRepresentationListener( segment, ParsedLineTextRepresentationListener.newListener( parser ) )
 
 		newLine = ctx.whitespace( '\n' )
@@ -203,7 +203,7 @@ def compoundStatementEditor(ctx, node, headerContents, precedence, suite, state,
 	#		Indent - suite
 	#			suite view
 
-	headerSegment = ctx.segment( python_paragraphStyle, default_textStyle, True, True, headerContents )
+	headerSegment = ctx.segment( default_textStyle, True, True, headerContents )
 
 	newLine = ctx.whitespace( '\n' )
 	newLine = ctx.textRepresentationListener( newLine, StatementNewLineTextRepresentationListener.newListener( parser ) )
