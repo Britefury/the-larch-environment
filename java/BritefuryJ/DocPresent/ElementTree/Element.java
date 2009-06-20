@@ -165,132 +165,41 @@ public abstract class Element
 	// Element tree structure methods
 	//
 	
-	public boolean isInSubtreeRootedAt(BranchElement r)
-	{
-		Element e = this;
-		
-		while ( e != null  &&  e != r )
-		{
-			e = e.getParent();
-		}
-		
-		return e == r;
-	}
-	
-	public ArrayList<Element> getElementPathFromRoot()
-	{
-		ArrayList<Element> path = new ArrayList<Element>();
-		
-		Element element = this;
-		while ( element != null )
-		{
-			path.add( 0, element );
-			element = element.getParent();
-		}
-		
-		return path;
-	}
-	
-	public ArrayList<Element> getElementPathFromSubtreeRoot(BranchElement subtreeRoot)
-	{
-		ArrayList<Element> path = new ArrayList<Element>();
-		
-		Element element = this;
-		while ( element != null )
-		{
-			path.add( 0, element );
-			if ( element == subtreeRoot )
-			{
-				return path;
-			}
-			element = element.getParent();
-		}
-
-		return null;
-	}
-	
-	
 	public static void getPathsFromCommonSubtreeRoot(Element e0, List<Element> path0, Element e1, List<Element> path1)
 	{
-		if ( e0 == e1 )
+		ArrayList<DPWidget> wpath0 = new ArrayList<DPWidget>();
+		ArrayList<DPWidget> wpath1 = new ArrayList<DPWidget>();
+		DPWidget.getPathsFromCommonSubtreeRoot( e0.getWidget(), wpath0, e1.getWidget(), wpath1 );
+		for (DPWidget w: wpath0)
 		{
-			path0.add( e0 );
-			path1.add( e1 );
+			path0.add( w.getElement() );
 		}
-		else
+		for (DPWidget w: wpath1)
 		{
-			ArrayList<Element> p0 = e0.getElementPathFromRoot();
-			ArrayList<Element> p1 = e1.getElementPathFromRoot();
-			
-			int minLength = Math.min( p0.size(), p1.size() );
-			
-			int numCommonElements = 0;
-			
-			for (int i = 0; i < minLength; i++)
-			{
-				numCommonElements = i;
-				
-				if ( p0.get( i ) != p1.get( i ) )
-				{
-					break;
-				}
-			}
-			
-			path0.addAll( p0.subList( numCommonElements - 1, p0.size() ) );
-			path1.addAll( p1.subList( numCommonElements - 1, p1.size() ) );
+			path1.add( w.getElement() );
 		}
 	}
 
 
 	
-	public List<LeafElement> getLeavesInSubtree(ElementFilter branchFilter, ElementFilter leafFilter)
-	{
-		return new ArrayList<LeafElement>();
-	}
-	
-	public List<LeafElement> getLeavesInSubtree()
-	{
-		return getLeavesInSubtree( null, null );
-	}
-	
-	public LeafElement getFirstLeafInSubtree(ElementFilter branchFilter, ElementFilter leafFilter)
-	{
-		return null;
-	}
-
 	public LeafElement getFirstLeafInSubtree()
 	{
-		return getFirstLeafInSubtree( null, null );
-	}
-
-	public LeafElement getFirstEditableLeafInSubtree()
-	{
-		return getFirstLeafInSubtree( null, new LeafElement.LeafFilterEditable() );
+		return (LeafElement)getWidget().getFirstLeafInSubtree().getElement();
 	}
 
 	public LeafElement getFirstEditableEntryLeafInSubtree()
 	{
-		return getFirstLeafInSubtree( null, new LeafElement.LeafFilterEditableEntry() );
-	}
-
-	public LeafElement getLastLeafInSubtree(ElementFilter branchFilter, ElementFilter leafFilter)
-	{
-		return null;
+		return (LeafElement)getWidget().getFirstEditableEntryLeafInSubtree().getElement();
 	}
 
 	public LeafElement getLastLeafInSubtree()
 	{
-		return getLastLeafInSubtree( null, null );
-	}
-
-	public LeafElement getLastEditableLeafInSubtree()
-	{
-		return getLastLeafInSubtree( null, new LeafElement.LeafFilterEditable() );
+		return (LeafElement)getWidget().getLastLeafInSubtree().getElement();
 	}
 
 	public LeafElement getLastEditableEntryLeafInSubtree()
 	{
-		return getLastLeafInSubtree( null, new LeafElement.LeafFilterEditableEntry() );
+		return (LeafElement)getWidget().getLastEditableEntryLeafInSubtree().getElement();
 	}
 
 
@@ -351,7 +260,7 @@ public abstract class Element
 	{
 		if ( parent != null )
 		{
-			return parent.getSegmentFromChild( this );
+			return parent.getSegment();
 		}
 		else
 		{

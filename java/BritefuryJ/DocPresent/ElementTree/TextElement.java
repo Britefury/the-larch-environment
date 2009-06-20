@@ -20,12 +20,12 @@ public class TextElement extends EditableEntryLeafElement
 
 	public TextElement(TextStyleSheet styleSheet, String text)
 	{
-		super( new DPText( styleSheet, text ), text );
+		super( new DPText( styleSheet, text ) );
 	}
 
 	public TextElement(TextStyleSheet styleSheet, String text, String textRepresentation)
 	{
-		super( new DPText( styleSheet, text, textRepresentation ), textRepresentation );
+		super( new DPText( styleSheet, text, textRepresentation ) );
 	}
 
 

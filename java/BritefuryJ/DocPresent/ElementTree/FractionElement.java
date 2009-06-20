@@ -26,7 +26,7 @@ public class FractionElement extends BranchElement
 
 		public BarElement(FractionStyleSheet.BarStyleSheet styleSheet, String textRepresentation)
 		{
-			super( new DPFraction.DPFractionBar( styleSheet, textRepresentation ), textRepresentation );
+			super( new DPFraction.DPFractionBar( styleSheet, textRepresentation ) );
 		}
 
 

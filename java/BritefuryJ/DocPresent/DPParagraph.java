@@ -209,12 +209,24 @@ public class DPParagraph extends DPContainerSequenceCollated
 				return c;
 			}
 			
-			int index = registeredChildren.indexOf( child );
+			int index = 0;
+			for (DPWidget w: collationLeaves)
+			{
+				if ( w == child )
+				{
+					break;
+				}
+				index++;
+			}
+			if ( index == collationLeaves.length )
+			{
+				throw new RuntimeException( "This shouldn't have happened" );
+			}
 			
 			DPWidget next = null;
-			for (int j = index + 1; j < registeredChildren.size(); j++)
+			for (int j = index + 1; j < collationLeaves.length; j++)
 			{
-				next = getLeafClosestToLocalPointFromChild( registeredChildren.get( j ), localPos, filter );
+				next = getLeafClosestToLocalPointFromChild( collationLeaves[j], localPos, filter );
 				if ( next != null )
 				{
 					break;
@@ -224,7 +236,7 @@ public class DPParagraph extends DPContainerSequenceCollated
 			DPWidget prev = null;
 			for (int j = index - 1; j >= 0; j--)
 			{
-				prev = getLeafClosestToLocalPointFromChild( registeredChildren.get( j ), localPos, filter );
+				prev = getLeafClosestToLocalPointFromChild( collationLeaves[j], localPos, filter );
 				if ( prev != null )
 				{
 					break;

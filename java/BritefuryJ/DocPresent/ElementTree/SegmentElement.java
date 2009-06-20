@@ -11,6 +11,7 @@ import java.util.List;
 
 import BritefuryJ.DocPresent.DPParagraph;
 import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.WidgetFilter;
 import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 
@@ -21,7 +22,7 @@ public class SegmentElement extends BranchElement
 	// Utility classes
 	//
 	
-	public static class SegmentFilter implements ElementFilter
+	public static class SegmentFilter implements WidgetFilter
 	{
 		private SegmentElement segment;
 		
@@ -31,9 +32,9 @@ public class SegmentElement extends BranchElement
 			segment = seg;
 		}
 		
-		public boolean test(Element element)
+		public boolean testElement(DPWidget element)
 		{
-			return element.getSegment() == segment;
+			return element.getElement().getSegment() == segment;
 		}
 	}
 

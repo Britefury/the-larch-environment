@@ -451,6 +451,122 @@ public abstract class DPContentLeaf extends DPWidget
 	
 	//
 	//
+	// ELEMENT TREE STRUCTURE METHODS
+	//
+	//
+	
+	public DPContentLeaf getFirstLeafInSubtree(WidgetFilter branchFilter, WidgetFilter leafFilter)
+	{
+		if ( leafFilter == null  ||  leafFilter.testElement( this ) )
+		{
+			return this;
+		}
+		else
+		{
+			return null;
+		}
+	}
+
+	public DPContentLeaf getLastLeafInSubtree(WidgetFilter branchFilter, WidgetFilter leafFilter)
+	{
+		if ( leafFilter == null  ||  leafFilter.testElement( this ) )
+		{
+			return this;
+		}
+		else
+		{
+			return null;
+		}
+	}
+
+	
+
+	public DPContentLeaf getPreviousLeaf()
+	{
+		return getPreviousLeaf( null, null, null );
+	}
+
+	public DPContentLeaf getNextLeaf()
+	{
+		return getNextLeaf( null, null, null );
+	}
+
+
+	public DPContentLeaf getPreviousLeaf(WidgetFilter subtreeRootFilter, WidgetFilter branchFilter, WidgetFilter leafFilter)
+	{
+		if ( parent != null )
+		{
+			return parent.getPreviousLeafFromChild( this, subtreeRootFilter, branchFilter, leafFilter );
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	public DPContentLeaf getNextLeaf(WidgetFilter subtreeRootFilter, WidgetFilter branchFilter, WidgetFilter leafFilter)
+	{
+		if ( parent != null )
+		{
+			return parent.getNextLeafFromChild( this, subtreeRootFilter, branchFilter, leafFilter );
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	
+	public DPContentLeaf getPreviousEditableLeaf(WidgetFilter subtreeRootFilter, WidgetFilter branchFilter)
+	{
+		return getPreviousLeaf( subtreeRootFilter, branchFilter, new DPContentLeafEditable.EditableLeafElementFilter() );
+	}
+
+	public DPContentLeaf getNextEditableLeaf(WidgetFilter subtreeRootFilter, WidgetFilter branchFilter)
+	{
+		return getNextLeaf( subtreeRootFilter, branchFilter, new DPContentLeafEditable.EditableLeafElementFilter() );
+	}
+
+
+	public DPContentLeaf getPreviousEditableLeaf()
+	{
+		return getPreviousEditableLeaf( null, null );
+	}
+
+	public DPContentLeaf getNextEditableLeaf()
+	{
+		return getNextEditableLeaf( null, null );
+	}
+
+
+	public DPContentLeaf getPreviousEditableEntryLeaf(WidgetFilter subtreeRootFilter, WidgetFilter branchFilter)
+	{
+		return getPreviousLeaf( subtreeRootFilter, branchFilter, new DPContentLeafEditableEntry.EditableEntryLeafElementFilter() );
+	}
+
+	public DPContentLeaf getNextEditableEntryLeaf(WidgetFilter subtreeRootFilter, WidgetFilter branchFilter)
+	{
+		return getNextLeaf( subtreeRootFilter, branchFilter, new DPContentLeafEditableEntry.EditableEntryLeafElementFilter() );
+	}
+
+
+	public DPContentLeaf getPreviousEditableEntryLeaf()
+	{
+		return getPreviousEditableEntryLeaf( null, null );
+	}
+
+	public DPContentLeaf getNextEditableEntryLeaf()
+	{
+		return getNextEditableEntryLeaf( null, null );
+	}
+
+	
+	
+	
+
+	
+	//
+	//
 	// CONTENT LEAF METHODS
 	//
 	//
@@ -555,7 +671,7 @@ public abstract class DPContentLeaf extends DPWidget
 	
 	protected DPWidget getLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter)
 	{
-		if ( filter.testLeaf( this ) )
+		if ( filter == null  ||  filter.testElement( this ) )
 		{
 			return this;
 		}
@@ -672,7 +788,7 @@ public abstract class DPContentLeaf extends DPWidget
 		builder.append( textRepresentation.substring( marker.getIndex() ) );
 	}
 
-	protected String getTextRepresentationBetweenMarkers(Marker startMarker, Marker endMarker)
+	public String getTextRepresentationBetweenMarkers(Marker startMarker, Marker endMarker)
 	{
 		if ( startMarker.getWidget() != this  ||  endMarker.getWidget() != this )
 		{

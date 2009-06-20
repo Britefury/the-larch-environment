@@ -477,8 +477,12 @@ abstract public class DPWidget
 	
 	
 	
+	
+	
+	//
 	//
 	// Tree structure methods
+	//
 	//
 	
 	public boolean isRealised()
@@ -532,7 +536,7 @@ abstract public class DPWidget
 	}
 	
 	
-	public ArrayList<DPWidget> getWidgetPathFromRoot()
+	public ArrayList<DPWidget> getElementPathFromRoot()
 	{
 		ArrayList<DPWidget> path = new ArrayList<DPWidget>();
 		
@@ -546,7 +550,7 @@ abstract public class DPWidget
 		return path;
 	}
 	
-	public ArrayList<DPWidget> getWidgetPathFromSubtreeRoot(DPContainer subtreeRoot)
+	public ArrayList<DPWidget> getElementPathFromSubtreeRoot(DPContainer subtreeRoot)
 	{
 		ArrayList<DPWidget> path = new ArrayList<DPWidget>();
 		
@@ -565,6 +569,39 @@ abstract public class DPWidget
 	}
 	
 	
+
+	public DPContentLeaf getFirstLeafInSubtree(WidgetFilter branchFilter, WidgetFilter leafFilter)
+	{
+		return null;
+	}
+
+	public DPContentLeaf getFirstLeafInSubtree()
+	{
+		return getFirstLeafInSubtree( null, null );
+	}
+
+	public DPContentLeaf getFirstEditableEntryLeafInSubtree()
+	{
+		return getFirstLeafInSubtree( null, new DPContentLeafEditableEntry.EditableEntryLeafElementFilter() );
+	}
+
+	public DPContentLeaf getLastLeafInSubtree(WidgetFilter branchFilter, WidgetFilter leafFilter)
+	{
+		return null;
+	}
+
+	public DPContentLeaf getLastLeafInSubtree()
+	{
+		return getLastLeafInSubtree( null, null );
+	}
+
+	public DPContentLeaf getLastEditableEntryLeafInSubtree()
+	{
+		return getLastLeafInSubtree( null, new DPContentLeafEditableEntry.EditableEntryLeafElementFilter() );
+	}
+
+	
+	
 	public static void getPathsFromCommonSubtreeRoot(DPWidget w0, List<DPWidget> path0, DPWidget w1, List<DPWidget> path1)
 	{
 		if ( w0 == w1 )
@@ -574,8 +611,8 @@ abstract public class DPWidget
 		}
 		else
 		{
-			ArrayList<DPWidget> p0 = w0.getWidgetPathFromRoot();
-			ArrayList<DPWidget> p1 = w1.getWidgetPathFromRoot();
+			ArrayList<DPWidget> p0 = w0.getElementPathFromRoot();
+			ArrayList<DPWidget> p1 = w1.getElementPathFromRoot();
 			
 			int minLength = Math.min( p0.size(), p1.size() );
 			
@@ -1521,7 +1558,7 @@ abstract public class DPWidget
 		return false;
 	}
 	
-	public DPWidget getWidgetAtTextRepresentationStart()
+	public DPWidget getElementAtTextRepresentationStart()
 	{
 		return this;
 	}

@@ -57,7 +57,7 @@ public class DPEmpty extends DPWidget
 
 	protected DPWidget getLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter)
 	{
-		if ( filter.testEmpty( this ) )
+		if ( filter == null  ||  filter.testElement( this ) )
 		{
 			return this;
 		}

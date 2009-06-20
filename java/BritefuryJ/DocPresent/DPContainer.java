@@ -641,6 +641,110 @@ public abstract class DPContainer extends DPWidget
 	//
 	//
 
+	public DPContentLeaf getFirstLeafInSubtree(WidgetFilter branchFilter, WidgetFilter leafFilter)
+	{
+		if ( branchFilter == null  ||  branchFilter.testElement( this ) )
+		{
+			for (DPWidget child: getChildren())
+			{
+				DPContentLeaf leaf = child.getFirstLeafInSubtree( branchFilter, leafFilter );
+				if ( leaf != null )
+				{
+					return leaf;
+				}
+			}
+			return null;
+		}
+		else
+		{
+			return null;
+		}
+	}
+
+	public DPContentLeaf getLastLeafInSubtree(WidgetFilter branchFilter, WidgetFilter leafFilter)
+	{
+		if ( branchFilter == null  ||  branchFilter.testElement( this ) )
+		{
+			List<DPWidget> children = getChildren();
+			for (int i = children.size() - 1; i >= 0; i--)
+			{
+				DPContentLeaf leaf = children.get( i ).getLastLeafInSubtree( branchFilter, leafFilter );
+				if ( leaf != null )
+				{
+					return leaf;
+				}
+			}
+			return null;
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	
+
+	
+	protected DPContentLeaf getPreviousLeafFromChild(DPWidget child, WidgetFilter subtreeRootFilter, WidgetFilter branchFilter, WidgetFilter leafFilter)
+	{
+		if ( subtreeRootFilter == null  ||  subtreeRootFilter.testElement( this ) )
+		{
+			List<DPWidget> children = getChildren();
+			int index = children.indexOf( child );
+			if ( index != -1 )
+			{
+				for (int i = index - 1; i >= 0; i--)
+				{
+					DPWidget e = children.get( i );
+					DPContentLeaf l = e.getLastLeafInSubtree( branchFilter, leafFilter );
+					if ( l != null )
+					{
+						return l;
+					}
+				}
+			}
+			
+			if ( parent != null )
+			{
+				return parent.getPreviousLeafFromChild( this, subtreeRootFilter, branchFilter, leafFilter );
+			}
+		}
+		
+		return null;
+	}
+	
+	protected DPContentLeaf getNextLeafFromChild(DPWidget child, WidgetFilter subtreeRootFilter, WidgetFilter branchFilter, WidgetFilter leafFilter)
+	{
+		if ( subtreeRootFilter == null  ||  subtreeRootFilter.testElement( this ) )
+		{
+			List<DPWidget> children = getChildren();
+			int index = children.indexOf( child );
+			if ( index != -1 )
+			{
+				for (int i = index + 1; i < children.size(); i++)
+				{
+					DPWidget e = children.get( i );
+					DPContentLeaf l = e.getFirstLeafInSubtree( branchFilter, leafFilter );
+					if ( l != null )
+					{
+						return l;
+					}
+				}
+			}
+		
+			if ( parent != null )
+			{
+				return parent.getNextLeafFromChild( this, subtreeRootFilter, branchFilter, leafFilter );
+			}
+		}
+
+		return null;
+	}
+	
+
+	
+
+	
 	public DPContentLeaf getLeftContentLeaf()
 	{
 		// Check the child nodes
@@ -879,14 +983,7 @@ public abstract class DPContainer extends DPWidget
 	
 	protected DPWidget getLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter)
 	{
-		if ( filter.testContainer( this ) )
-		{
-			return getChildLeafClosestToLocalPoint( localPos, filter );
-		}
-		else
-		{
-			return null;
-		}
+		return getChildLeafClosestToLocalPoint( localPos, filter );
 	}
 
 	protected abstract DPWidget getChildLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter);

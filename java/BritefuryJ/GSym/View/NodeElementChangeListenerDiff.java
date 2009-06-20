@@ -306,7 +306,6 @@ public class NodeElementChangeListenerDiff implements DVNode.NodeElementChangeLi
 						// The leaf is not editable. We must choose a nearby leaf to place the caret in
 						
 						SegmentElement.SegmentFilter segFilter = new SegmentElement.SegmentFilter( leaf.getSegment() );
-						LeafElement.LeafFilterEditableEntry elemFilter = new LeafElement.LeafFilterEditableEntry();
 						
 						
 						// First, we must decide whether we should search backwards or forwards
@@ -347,7 +346,7 @@ public class NodeElementChangeListenerDiff implements DVNode.NodeElementChangeLi
 						if ( direction == Direction.BACKWARD )
 						{
 							// Search backwards
-							LeafElement left = leaf.getPreviousLeaf( segFilter, null, elemFilter );
+							LeafElement left = leaf.getPreviousEditableEntryLeaf( segFilter, null );
 							if ( left != null )
 							{
 								left.moveMarkerToEnd( caret.getMarker() );
@@ -355,7 +354,7 @@ public class NodeElementChangeListenerDiff implements DVNode.NodeElementChangeLi
 							else
 							{
 								// Searching backwards failed; search forwards
-								LeafElement right = leaf.getNextLeaf( segFilter, null, elemFilter );
+								LeafElement right = leaf.getNextEditableEntryLeaf( segFilter, null );
 								if ( right != null )
 								{
 									right.moveMarkerToStart( caret.getMarker() );
@@ -370,7 +369,7 @@ public class NodeElementChangeListenerDiff implements DVNode.NodeElementChangeLi
 						else if ( direction == Direction.FORWARD )
 						{
 							// Search forwards
-							LeafElement right = leaf.getNextLeaf( segFilter, null, elemFilter );
+							LeafElement right = leaf.getNextEditableEntryLeaf( segFilter, null );
 							if ( right != null )
 							{
 								right.moveMarkerToStart( caret.getMarker() );
@@ -378,7 +377,7 @@ public class NodeElementChangeListenerDiff implements DVNode.NodeElementChangeLi
 							else
 							{
 								// Searching forwards failed; search backwards
-								LeafElement left = leaf.getPreviousLeaf( segFilter, null, elemFilter );
+								LeafElement left = leaf.getPreviousEditableEntryLeaf( segFilter, null );
 								if ( left != null )
 								{
 									left.moveMarkerToEnd( caret.getMarker() );

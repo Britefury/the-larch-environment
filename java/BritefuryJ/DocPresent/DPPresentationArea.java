@@ -998,7 +998,7 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 		rootSpaceMouse.setModifiers( modifiers );
 		if ( button == 1  &&  ( modifiers & ( Modifier.ALT | Modifier.ALT_GRAPH | Modifier.CTRL | Modifier.SHIFT ) )  ==  0 )
 		{
-			DPContentLeafEditableEntry leaf = (DPContentLeafEditableEntry)getLeafClosestToLocalPoint( rootPos, new DPContentLeafEditableEntry.EditableEntryLeafWidgetFilter() );
+			DPContentLeafEditableEntry leaf = (DPContentLeafEditableEntry)getLeafClosestToLocalPoint( rootPos, new DPContentLeafEditableEntry.EditableEntryLeafElementFilter() );
 			if ( leaf != null )
 			{
 				Xform2 x = leaf.getLocalToRootXform();
@@ -1072,7 +1072,7 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 		
 		if ( bMouseSelectionInProgress )
 		{
-			DPContentLeafEditableEntry leaf = (DPContentLeafEditableEntry)getLeafClosestToLocalPoint( rootPos, new DPContentLeafEditableEntry.EditableEntryLeafWidgetFilter() );
+			DPContentLeafEditableEntry leaf = (DPContentLeafEditableEntry)getLeafClosestToLocalPoint( rootPos, new DPContentLeafEditableEntry.EditableEntryLeafElementFilter() );
 			Xform2 x = leaf.getLocalToRootXform();
 			x = x.inverse();
 
