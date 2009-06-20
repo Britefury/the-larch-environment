@@ -20,7 +20,7 @@ public class WhitespaceElement extends EditableLeafElement
 
 	public WhitespaceElement(String whitespace, double width)
 	{
-		super( new DPWhitespace( whitespace, width ), whitespace );
+		super( new DPWhitespace( whitespace, width ) );
 	}
 
 
@@ -38,6 +38,6 @@ public class WhitespaceElement extends EditableLeafElement
 	
 	public DPWidget createMetaHeaderData()
 	{
-		return new DPText( "'" + textRepresentation.replace( "\n", "\\n" ) + "'" );
+		return new DPText( "'" + getWidget().getTextRepresentation().replace( "\n", "\\n" ) + "'" );
 	}
 }

@@ -6,20 +6,7 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-public abstract class WidgetFilter
+public interface WidgetFilter
 {
-	public boolean testContainer(DPContainer container)
-	{
-		return true;
-	}
-	
-	public boolean testLeaf(DPContentLeaf leaf)
-	{
-		return true;
-	}
-	
-	public boolean testEmpty(DPEmpty emtpy)
-	{
-		return false;
-	}
+	public boolean testElement(DPWidget element);
 }

@@ -15,11 +15,11 @@ import BritefuryJ.DocPresent.StyleSheets.ContentLeafStyleSheet;
 
 public abstract class DPContentLeafEditableEntry extends DPContentLeafEditable
 {
-	public static class EditableEntryLeafWidgetFilter extends WidgetFilter
+	public static class EditableEntryLeafElementFilter implements WidgetFilter
 	{
-		public boolean testLeaf(DPContentLeaf leaf)
+		public boolean testElement(DPWidget element)
 		{
-			return leaf instanceof DPContentLeafEditableEntry;
+			return element instanceof DPContentLeafEditableEntry;
 		}
 	}
 	

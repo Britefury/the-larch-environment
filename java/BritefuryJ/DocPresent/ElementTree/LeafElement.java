@@ -8,11 +8,10 @@
 package BritefuryJ.DocPresent.ElementTree;
 
 import java.awt.Color;
-import java.util.ArrayList;
-import java.util.List;
 
 import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPContentLeaf;
+import BritefuryJ.DocPresent.WidgetFilter;
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.ElementTree.Caret.ElementCaret;
@@ -21,47 +20,12 @@ import BritefuryJ.DocPresent.ElementTree.Marker.ElementMarker;
 public abstract class LeafElement extends Element
 {
 	//
-	// Utility classes
-	//
-	
-	public static class LeafFilterEditable implements ElementFilter
-	{
-		public boolean test(Element element)
-		{
-			return ((LeafElement)element).isEditable();
-		}
-	}
-	
-	public static class LeafFilterEditableEntry implements ElementFilter
-	{
-		public boolean test(Element element)
-		{
-			return ((LeafElement)element).isEditableEntry();
-		}
-	}
-	
-	
-	
-	
-	//
-	// Fields
-	//
-	
-	protected String textRepresentation;
-	
-	
-	
-	
-	
-	//
 	// Constructor
 	//
 	
-	protected LeafElement(DPContentLeaf widget, String textRepresentation)
+	protected LeafElement(DPContentLeaf widget)
 	{
 		super( widget );
-		
-		this.textRepresentation = textRepresentation;
 	}
 	
 	
@@ -83,106 +47,74 @@ public abstract class LeafElement extends Element
 	// Element tree structure methods
 	//
 	
-	public List<LeafElement> getLeavesInSubtree(ElementFilter branchFilter, ElementFilter leafFilter)
-	{
-		ArrayList<LeafElement> leaves = new ArrayList<LeafElement>();
-		if ( leafFilter == null  ||  leafFilter.test( this ) )
-		{
-			leaves.add( this );
-		}
-		return leaves;
-	}
-	
-	public LeafElement getFirstLeafInSubtree(ElementFilter branchFilter, ElementFilter leafFilter)
-	{
-		if ( leafFilter == null  ||  leafFilter.test( this ) )
-		{
-			return this;
-		}
-		else
-		{
-			return null;
-		}
-	}
-
-	public LeafElement getLastLeafInSubtree(ElementFilter branchFilter, ElementFilter leafFilter)
-	{
-		if ( leafFilter == null  ||  leafFilter.test( this ) )
-		{
-			return this;
-		}
-		else
-		{
-			return null;
-		}
-	}
-	
-	
 	public LeafElement getPreviousLeaf()
 	{
-		return getPreviousLeaf( null, null, null );
+		return (LeafElement)getWidget().getPreviousLeaf().getElement();
 	}
 
-	public LeafElement getPreviousLeaf(ElementFilter subtreeRootFilter, ElementFilter branchFilter, ElementFilter leafFilter)
-	{
-		if ( parent != null )
-		{
-			return parent.getPreviousLeafFromChild( this, subtreeRootFilter, branchFilter, leafFilter );
-		}
-		else
-		{
-			return null;
-		}
-	}
-	
 	public LeafElement getNextLeaf()
 	{
-		return getNextLeaf( null, null, null );
+		return (LeafElement)getWidget().getNextLeaf().getElement();
 	}
 
-	public LeafElement getNextLeaf(ElementFilter subtreeRootFilter, ElementFilter branchFilter, ElementFilter leafFilter)
-	{
-		if ( parent != null )
-		{
-			return parent.getNextLeafFromChild( this, subtreeRootFilter, branchFilter, leafFilter );
-		}
-		else
-		{
-			return null;
-		}
-	}
 	
-	public LeafElement getPreviousEditableLeaf(ElementFilter subtreeRootFilter, ElementFilter branchFilter)
+	public LeafElement getPreviousLeaf(WidgetFilter subtreeRootFilter, WidgetFilter branchFilter, WidgetFilter leafFilter)
 	{
-		return getPreviousLeaf( subtreeRootFilter, branchFilter, new LeafFilterEditable() );
+		return (LeafElement)getWidget().getPreviousLeaf( subtreeRootFilter, branchFilter, leafFilter ).getElement();
 	}
 
-	public LeafElement getPreviousEditableEntryLeaf(ElementFilter subtreeRootFilter, ElementFilter branchFilter)
+	public LeafElement getNextLeaf(WidgetFilter subtreeRootFilter, WidgetFilter branchFilter, WidgetFilter leafFilter)
 	{
-		return getPreviousLeaf( subtreeRootFilter, branchFilter, new LeafFilterEditableEntry() );
+		return (LeafElement)getWidget().getNextLeaf( subtreeRootFilter, branchFilter, leafFilter ).getElement();
 	}
+
+	
 
 	public LeafElement getPreviousEditableLeaf()
 	{
-		return getPreviousEditableLeaf( null, null );
-	}
-
-	public LeafElement getNextEditableLeaf(ElementFilter subtreeRootFilter, ElementFilter branchFilter)
-	{
-		return getNextLeaf( subtreeRootFilter, branchFilter, new LeafFilterEditable() );
-	}
-
-	public LeafElement getNextEditableEntryLeaf(ElementFilter subtreeRootFilter, ElementFilter branchFilter)
-	{
-		return getNextLeaf( subtreeRootFilter, branchFilter, new LeafFilterEditableEntry() );
+		return (LeafElement)getWidget().getPreviousEditableLeaf().getElement();
 	}
 
 	public LeafElement getNextEditableLeaf()
 	{
-		return getNextEditableLeaf( null, null );
+		return (LeafElement)getWidget().getNextEditableLeaf().getElement();
 	}
 
 	
+	public LeafElement getPreviousEditableLeaf(WidgetFilter subtreeRootFilter, WidgetFilter branchFilter)
+	{
+		return (LeafElement)getWidget().getPreviousEditableLeaf( subtreeRootFilter, branchFilter ).getElement();
+	}
+
+	public LeafElement getNextEditableLeaf(WidgetFilter subtreeRootFilter, WidgetFilter branchFilter)
+	{
+		return (LeafElement)getWidget().getNextEditableLeaf( subtreeRootFilter, branchFilter ).getElement();
+	}
+
+	
+	
+	public LeafElement getPreviousEditableEntryLeaf()
+	{
+		return (LeafElement)getWidget().getPreviousEditableEntryLeaf().getElement();
+	}
+
+	public LeafElement getNextEditableEntryLeaf()
+	{
+		return (LeafElement)getWidget().getNextEditableEntryLeaf().getElement();
+	}
+
+	
+	public LeafElement getPreviousEditableEntryLeaf(WidgetFilter subtreeRootFilter, WidgetFilter branchFilter)
+	{
+		return (LeafElement)getWidget().getPreviousEditableEntryLeaf( subtreeRootFilter, branchFilter ).getElement();
+	}
+
+	public LeafElement getNextEditableEntryLeaf(WidgetFilter subtreeRootFilter, WidgetFilter branchFilter)
+	{
+		return (LeafElement)getWidget().getNextEditableEntryLeaf( subtreeRootFilter, branchFilter ).getElement();
+	}
+
+
 	
 	
 	//
@@ -191,11 +123,7 @@ public abstract class LeafElement extends Element
 
 	protected String getTextRepresentationBetweenMarkers(ElementMarker startMarker, ElementMarker endMarker)
 	{
-		if ( startMarker.getElement() != this  ||  endMarker.getElement() != this )
-		{
-			throw new RuntimeException();
-		}
-		return textRepresentation.substring( startMarker.getIndex(), endMarker.getIndex() );
+		return getWidget().getTextRepresentationBetweenMarkers( startMarker.getWidgetMarker(), endMarker.getWidgetMarker() );
 	}
 
 
