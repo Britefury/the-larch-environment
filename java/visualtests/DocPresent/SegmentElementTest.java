@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package visualtests.DocPresent.ElementTree;
+package visualtests.DocPresent;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -13,55 +13,64 @@ import java.util.Arrays;
 
 import javax.swing.JFrame;
 
-import BritefuryJ.DocPresent.ElementTree.Element;
-import BritefuryJ.DocPresent.ElementTree.ParagraphElement;
-import BritefuryJ.DocPresent.ElementTree.SegmentElement;
-import BritefuryJ.DocPresent.ElementTree.TextElement;
-import BritefuryJ.DocPresent.ElementTree.VBoxElement;
+import BritefuryJ.DocPresent.DPParagraph;
+import BritefuryJ.DocPresent.DPSegment;
+import BritefuryJ.DocPresent.DPSpan;
+import BritefuryJ.DocPresent.DPText;
+import BritefuryJ.DocPresent.DPVBox;
+import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.VTypesetting;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
-public class SegmentElementTest extends ElementTreeTestBase
+public class SegmentElementTest extends DocPresentTestBase
 {
 	private static Font defaultFont = new Font( "Sans serif", Font.PLAIN, 14 );
 
 	
 	
-	protected Element text(String t, Color colour)
+	protected DPWidget text(String t, Color colour)
 	{
 		TextStyleSheet s0 = new TextStyleSheet( defaultFont, colour );
-		return new TextElement( s0, t );
+		return new DPText( s0, t );
 	}
 	
-	protected Element text(String t)
+	protected DPWidget text(String t)
 	{
 		return text( t, Color.black );
 	}
 	
 	
-	protected Element segment(Element x, boolean bGuardBegin, boolean bGuardEnd)
+	protected DPWidget segment(DPWidget x, boolean bGuardBegin, boolean bGuardEnd)
 	{
-		SegmentElement e = new SegmentElement( bGuardBegin, bGuardEnd );
+		DPSegment e = new DPSegment( bGuardBegin, bGuardEnd );
 		e.setChild( x );
 		return e;
 	}
 	
 	
-	protected Element line(Element... x)
+	protected DPWidget span(DPWidget... x)
 	{
-		ParagraphElement para = new ParagraphElement();
+		DPSpan s = new DPSpan();
+		s.setChildren( Arrays.asList( x ) );
+		return s;
+	}
+	
+	
+	protected DPWidget line(DPWidget... x)
+	{
+		DPParagraph para = new DPParagraph();
 		para.setChildren( Arrays.asList( x ) );
 		return para;
 	}
 	
 	
-	protected Element createContentNode()
+	protected DPWidget createWidget()
 	{
 		VBoxStyleSheet boxs = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.LEFT, 0.0, false, 0.0 );
-		VBoxElement box = new VBoxElement( boxs );
-		ArrayList<Element> children = new ArrayList<Element>();
+		DPVBox box = new DPVBox( boxs );
+		ArrayList<DPWidget> children = new ArrayList<DPWidget>();
 		
 		
 		
@@ -70,9 +79,9 @@ public class SegmentElementTest extends ElementTreeTestBase
 		children.add( line( text( "One segment in middle of text |" ), segment( text( "begin guard", Color.red ), true, false ), text( "| finish." ) ) );
 		children.add( line( text( "One segment in middle of text |" ), segment( text( "end guard", Color.red ), false, true ), text( "| finish." ) ) );
 		children.add( line( text( "One segment in middle of text |" ), segment( text( "begin & end guard", Color.red ), true, true ), text( "| finish." ) ) );
-		children.add( line( text( "Nested segment in middle outer seg |" ), segment( line( text( "....", Color.red ), segment( text( "both guards", Color.blue ), true, true ), text( "....", Color.red ) ), true, true ), text( "| finish." ) ) );
-		children.add( line( text( "Nested segment at beginning outer seg |" ), segment( line( segment( text( "both guards", Color.blue ), true, true ), text( "....", Color.red ) ), true, true ), text( "| finish." ) ) );
-		children.add( line( text( "Nested segment at end outer seg |" ), segment( line( text( "....", Color.red ), segment( text( "both guards", Color.blue ), true, true ) ), true, true ), text( "| finish." ) ) );
+		children.add( line( text( "Nested segment in middle outer seg |" ), segment( span( text( "....", Color.red ), segment( text( "both guards", Color.blue ), true, true ), text( "....", Color.red ) ), true, true ), text( "| finish." ) ) );
+		children.add( line( text( "Nested segment at beginning outer seg |" ), segment( span( segment( text( "both guards", Color.blue ), true, true ), text( "....", Color.red ) ), true, true ), text( "| finish." ) ) );
+		children.add( line( text( "Nested segment at end outer seg |" ), segment( span( text( "....", Color.red ), segment( text( "both guards", Color.blue ), true, true ) ), true, true ), text( "| finish." ) ) );
 		
 		box.setChildren( children );
 		

@@ -17,6 +17,7 @@ import BritefuryJ.DocPresent.Layout.LAllocBox;
 import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Layout.PackingParams;
 import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
+import BritefuryJ.JythonInterface.JythonIndex;
 import BritefuryJ.JythonInterface.JythonSlice;
 
 
@@ -39,13 +40,43 @@ abstract public class DPContainerSequence extends DPContainer
 	{
 		if ( registeredChildren.isEmpty() )
 		{
-			// Set contents of @childEntries list
-			registeredChildren.addAll( items );
-	
-			// Register added entries
-			for (DPWidget child: items)
+			if ( items.size() > 0 )
 			{
-				registerChild( child, null );
+				// Set contents of @childEntries list
+				registeredChildren.addAll( items );
+		
+				// Register added entries
+				for (DPWidget child: items)
+				{
+					registerChild( child, null );
+				}
+	
+				onChildListModified();
+				queueResize();
+			}
+		}
+		else if ( registeredChildren.size() == 1 )
+		{
+			// Special case for when there is only 1 child
+			if ( items.size() == 0 )
+			{
+				unregisterChild( registeredChildren.get( 0 ) );
+				onChildListModified();
+				queueResize();
+			}
+			else if ( items.size() == 1 )
+			{
+				DPWidget prevChild = registeredChildren.get( 0 );
+				DPWidget newChild = items.get( 0 );
+				
+				if ( newChild != prevChild )
+				{
+					unregisterChild( prevChild );
+					registeredChildren.set( 0, newChild );
+					registerChild( newChild, null );
+					onChildListModified();
+					queueResize();
+				}
 			}
 		}
 		else
@@ -73,11 +104,10 @@ abstract public class DPContainerSequence extends DPContainer
 			{
 				registerChild( child, null );
 			}
+
+			onChildListModified();
+			queueResize();
 		}
-		
-		
-		onChildListModified();
-		queueResize();
 	}
 	
 	
@@ -102,6 +132,8 @@ abstract public class DPContainerSequence extends DPContainer
 	
 	public DPWidget __getitem__(int index)
 	{
+		index = JythonIndex.pyIndexToJava( index, size(), "BranchElement index out of range" );
+
 		return get( index );
 	}
 	
@@ -131,6 +163,8 @@ abstract public class DPContainerSequence extends DPContainer
 	
 	public void __setitem__(int index, DPWidget item)
 	{
+		index = JythonIndex.pyIndexToJava( index, size(), "BranchElement assignment index out of range" );
+
 		set( index, item );
 	}
 
@@ -172,6 +206,8 @@ abstract public class DPContainerSequence extends DPContainer
 	
 	public void __delitem__(int index)
 	{
+		index = JythonIndex.pyIndexToJava( index, size(), "BranchElement assignment index out of range" );
+
 		DPWidget child = registeredChildren.get( index );
 		unregisterChild( child );
 		registeredChildren.remove( index );
@@ -267,7 +303,7 @@ abstract public class DPContainerSequence extends DPContainer
 	protected void replaceChildWithEmpty(DPWidget child)
 	{
 		int index = registeredChildren.indexOf( child );
-		__setitem__( index, new DPEmpty() );
+		set( index, new DPEmpty() );
 	}
 		
 	
@@ -283,7 +319,7 @@ abstract public class DPContainerSequence extends DPContainer
 
 
 
-	LReqBox[] getChildrenRefreshedRequistionXBoxes(List<DPWidget> nodes)
+	protected LReqBox[] getChildrenRefreshedRequistionXBoxes(List<DPWidget> nodes)
 	{
 		LReqBox[] boxes = new LReqBox[nodes.size()];
 		for (int i = 0; i < nodes.size(); i++)
@@ -293,13 +329,13 @@ abstract public class DPContainerSequence extends DPContainer
 		return boxes;
 	}
 
-	LReqBox[] getChildrenRefreshedRequistionXBoxes()
+	protected LReqBox[] getChildrenRefreshedRequistionXBoxes()
 	{
 		return getChildrenRefreshedRequistionXBoxes( registeredChildren );
 	}
 
 
-	LReqBox[] getChildrenRefreshedRequistionYBoxes(List<DPWidget> nodes)
+	protected LReqBox[] getChildrenRefreshedRequistionYBoxes(List<DPWidget> nodes)
 	{
 		LReqBox[] boxes = new LReqBox[nodes.size()];
 		for (int i = 0; i < nodes.size(); i++)
@@ -309,7 +345,7 @@ abstract public class DPContainerSequence extends DPContainer
 		return boxes;
 	}
 
-	LReqBox[] getChildrenRefreshedRequistionYBoxes()
+	protected LReqBox[] getChildrenRefreshedRequistionYBoxes()
 	{
 		return getChildrenRefreshedRequistionYBoxes( registeredChildren );
 	}
@@ -317,7 +353,7 @@ abstract public class DPContainerSequence extends DPContainer
 	
 	
 	
-	LReqBox[] getChildrenRequisitionBoxes(List<DPWidget> nodes)
+	protected LReqBox[] getChildrenRequisitionBoxes(List<DPWidget> nodes)
 	{
 		LReqBox[] boxes = new LReqBox[nodes.size()];
 		for (int i = 0; i < nodes.size(); i++)
@@ -327,14 +363,14 @@ abstract public class DPContainerSequence extends DPContainer
 		return boxes;
 	}
 
-	LReqBox[] getChildrenRequisitionBoxes()
+	protected LReqBox[] getChildrenRequisitionBoxes()
 	{
 		return getChildrenRequisitionBoxes( registeredChildren );
 	}
 	
 	
 	
-	LAllocBox[] getChildrenAllocationBoxes(List<DPWidget> nodes)
+	protected LAllocBox[] getChildrenAllocationBoxes(List<DPWidget> nodes)
 	{
 		LAllocBox[] boxes = new LAllocBox[nodes.size()];
 		for (int i = 0; i < nodes.size(); i++)
@@ -344,7 +380,7 @@ abstract public class DPContainerSequence extends DPContainer
 		return boxes;
 	}
 
-	LAllocBox[] getChildrenAllocationBoxes()
+	protected LAllocBox[] getChildrenAllocationBoxes()
 	{
 		return getChildrenAllocationBoxes( registeredChildren );
 	}
@@ -353,7 +389,7 @@ abstract public class DPContainerSequence extends DPContainer
 	
 	
 	@SuppressWarnings("unchecked")
-	<T extends PackingParams> T[] getChildrenPackingParams(List<DPWidget> nodes, T packingParams[])
+	protected <T extends PackingParams> T[] getChildrenPackingParams(List<DPWidget> nodes, T packingParams[])
 	{
 		for (int i = 0; i < nodes.size(); i++)
 		{
@@ -362,7 +398,7 @@ abstract public class DPContainerSequence extends DPContainer
 		return packingParams;
 	}
 
-	<T extends PackingParams> T[] getChildrenPackingParams(T packingParams[])
+	protected <T extends PackingParams> T[] getChildrenPackingParams(T packingParams[])
 	{
 		return getChildrenPackingParams( registeredChildren, packingParams );
 	}
@@ -370,7 +406,7 @@ abstract public class DPContainerSequence extends DPContainer
 	
 	
 	
-	double[] getChildrenAllocationX(List<DPWidget> nodes)
+	protected double[] getChildrenAllocationX(List<DPWidget> nodes)
 	{
 		double[] values = new double[nodes.size()];
 		for (int i = 0; i < nodes.size(); i++)
@@ -380,14 +416,14 @@ abstract public class DPContainerSequence extends DPContainer
 		return values;
 	}
 
-	double[] getChildrenAllocationX()
+	protected double[] getChildrenAllocationX()
 	{
 		return getChildrenAllocationX( registeredChildren );
 	}
 
 
 
-	double[] getChildrenAllocationY(List<DPWidget> nodes)
+	protected double[] getChildrenAllocationY(List<DPWidget> nodes)
 	{
 		double[] values = new double[nodes.size()];
 		for (int i = 0; i < nodes.size(); i++)
@@ -397,7 +433,7 @@ abstract public class DPContainerSequence extends DPContainer
 		return values;
 	}
 
-	double[] getChildrenAllocationY()
+	protected double[] getChildrenAllocationY()
 	{
 		return getChildrenAllocationY( registeredChildren );
 	}

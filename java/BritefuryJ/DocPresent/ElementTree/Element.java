@@ -16,6 +16,7 @@ import BritefuryJ.DocPresent.DPBin;
 import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPContentLeaf;
 import BritefuryJ.DocPresent.DPHBox;
+import BritefuryJ.DocPresent.DPSegment;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.ElementContext;
@@ -258,9 +259,10 @@ public abstract class Element
 	
 	public SegmentElement getSegment()
 	{
-		if ( parent != null )
+		DPSegment seg = getWidget().getSegment();
+		if ( seg != null )
 		{
-			return parent.getSegment();
+			return (SegmentElement)seg.getElement();
 		}
 		else
 		{

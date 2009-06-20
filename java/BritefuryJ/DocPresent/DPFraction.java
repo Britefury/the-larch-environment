@@ -230,6 +230,7 @@ public class DPFraction extends DPContainer
 				registeredChildren.add( insertIndex, child );
 			}
 			
+			onChildListModified();
 			queueResize();
 		}
 	}
