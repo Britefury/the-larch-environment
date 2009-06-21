@@ -1068,7 +1068,7 @@ abstract public class DPWidget
 		{
 			if ( parent != null )
 			{
-				parent.childResizeRequest( this );
+				parent.queueResize();
 			}
 			bResizeQueued = true;
 		}
@@ -1165,7 +1165,6 @@ abstract public class DPWidget
 	{
 		bRealised = true;
 		onRealise();
-		handleQueueResize();
 	}
 	
 	@SuppressWarnings("unchecked")

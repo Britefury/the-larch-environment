@@ -259,19 +259,6 @@ public abstract class DPContainer extends DPWidget
 	
 	
 	
-	protected void onChildResizeRequest(DPWidget child)
-	{
-		queueResize();
-	}
-	
-	protected void childResizeRequest(DPWidget child)
-	{
-		onChildResizeRequest( child );
-	}
-	
-	
-	
-	
 	protected void childRedrawRequest(DPWidget child, Point2 childPos, Vector2 childSize)
 	{
 		Xform2 childToContainer = child.getLocalToParentXform();
