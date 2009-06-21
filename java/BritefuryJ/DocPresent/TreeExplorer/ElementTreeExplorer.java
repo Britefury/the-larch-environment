@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.DocPresent.ElementTree.TreeExplorer;
+package BritefuryJ.DocPresent.TreeExplorer;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -18,14 +18,11 @@ import javax.swing.JMenuBar;
 
 import BritefuryJ.DocPresent.DPPresentationArea;
 import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.ElementTree.Element;
-import BritefuryJ.DocPresent.ElementTree.ElementTree;
-import BritefuryJ.DocPresent.ElementTree.Caret.ElementCaret;
+import BritefuryJ.DocPresent.Caret.Caret;
 
 public class ElementTreeExplorer implements WindowListener
 {
-	protected ElementTree tree;
-	protected DPPresentationArea metaArea;
+	protected DPPresentationArea tree, metaArea;
 	protected boolean bVisible;
 	
 	
@@ -61,7 +58,7 @@ public class ElementTreeExplorer implements WindowListener
 
 	
 	
-	public ElementTreeExplorer(ElementTree t)
+	public ElementTreeExplorer(DPPresentationArea t)
 	{
 		JFrame frame = new JFrame( "Tree explorer" );
 
@@ -100,10 +97,10 @@ public class ElementTreeExplorer implements WindowListener
 
 			public void actionPerformed(ActionEvent event)
 			{
-				ElementCaret caret = tree.getCaret();
+				Caret caret = tree.getCaret();
 				if ( caret != null )
 				{
-					Element caretElement = caret.getMarker().getElement();
+					DPWidget caretElement = caret.getMarker().getWidget();
 					if ( caretElement != null )
 					{
 						DPWidget metaCaretWidget = caretElement.getMetaElement();

@@ -13,7 +13,7 @@ import BritefuryJ.DocPresent.DPPresentationArea;
 import BritefuryJ.DocPresent.EditHandler;
 import BritefuryJ.DocPresent.ElementTree.Caret.ElementCaret;
 import BritefuryJ.DocPresent.ElementTree.Selection.ElementSelection;
-import BritefuryJ.DocPresent.ElementTree.TreeExplorer.ElementTreeExplorer;
+import BritefuryJ.DocPresent.TreeExplorer.ElementTreeExplorer;
 
 public class ElementTree
 {
@@ -94,37 +94,9 @@ public class ElementTree
 	
 	
 	
-	public DPPresentationArea initialiseMetaTree()
-	{
-		if ( metaArea == null )
-		{
-			metaArea = new DPPresentationArea();
-			metaArea.disableHorizontalClamping();
-			metaArea.setChild( root.initialiseMetaElement() );
-		}
-		
-		return metaArea;
-	}
-	
-	public void shutdownMetaTree()
-	{
-		if ( metaArea != null )
-		{
-			root.shutdownMetaElement();
-			metaArea = null;
-		}
-	}
-	
-	
-	
-	
 	public ElementTreeExplorer createTreeExplorer()
 	{
-		if ( explorer == null  ||  !explorer.isVisible() )
-		{
-			explorer = new ElementTreeExplorer( this );
-		}
-		return explorer;
+		return getPresentationArea().createTreeExplorer();
 	}
 	
 	

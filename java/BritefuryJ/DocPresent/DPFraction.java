@@ -12,7 +12,6 @@ import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -22,11 +21,12 @@ import BritefuryJ.DocPresent.Layout.LAllocBox;
 import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleSheets.FractionStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.Math.Point2;
 
 public class DPFraction extends DPContainer
 {
-	private static double childScale = 0.9;
+	private static double childScale = 0.85;
 
 	
 	
@@ -165,31 +165,38 @@ public class DPFraction extends DPContainer
 
 	public static int NUMCHILDREN = 3;
 	
-	protected DPWidget[] children;
+	protected DPWidget children[];
+	protected DPSegment segs[];
+	protected DPParagraph paras[];
+	TextStyleSheet segmentTextStyleSheet;
 
 	
 	
 	
 	public DPFraction()
 	{
-		this( FractionStyleSheet.defaultStyleSheet, "/" );
+		this( FractionStyleSheet.defaultStyleSheet, TextStyleSheet.defaultStyleSheet, "/" );
 	}
 	
 	public DPFraction(String barTextRepresentation)
 	{
-		this( FractionStyleSheet.defaultStyleSheet, barTextRepresentation );
+		this( FractionStyleSheet.defaultStyleSheet, TextStyleSheet.defaultStyleSheet, barTextRepresentation );
 	}
 	
-	public DPFraction(FractionStyleSheet styleSheet)
+	public DPFraction(FractionStyleSheet styleSheet, TextStyleSheet segmentTextStyleSheet)
 	{
-		this( styleSheet, "/" );
+		this( styleSheet, segmentTextStyleSheet, "/" );
 	}
 	
-	public DPFraction(FractionStyleSheet styleSheet, String barTextRepresentation)
+	public DPFraction(FractionStyleSheet styleSheet, TextStyleSheet segmentTextStyleSheet, String barTextRepresentation)
 	{
 		super( styleSheet );
 		
+		this.segmentTextStyleSheet = segmentTextStyleSheet;
+		
 		children = new DPWidget[NUMCHILDREN];
+		segs = new DPSegment[NUMCHILDREN];
+		paras = new DPParagraph[NUMCHILDREN];
 		
 		setChild( BAR, new DPFractionBar( styleSheet.getBarStyleSheet(), barTextRepresentation ) );
 	}
@@ -201,33 +208,75 @@ public class DPFraction extends DPContainer
 		return children[slot];
 	}
 	
+	public DPWidget getWrappedChild(int slot)
+	{
+		return slot == BAR  ?  children[slot]  :  paras[slot];
+	}
+	
 	public void setChild(int slot, DPWidget child)
 	{
 		DPWidget existingChild = children[slot];
 		if ( child != existingChild )
 		{
-			if ( existingChild != null )
+			if ( slot == BAR )
 			{
-				unregisterChild( existingChild );
-				registeredChildren.remove( existingChild );
-			}
-			
-			children[slot] = child;
-			
-			if ( child != null )
-			{
-				registerChild( child, null );
-				
-				int insertIndex = 0;
-				for (int i = 0; i < slot; i++)
+				if ( existingChild != null )
 				{
-					if ( children[i] != null )
-					{
-						insertIndex++;
-					}
+					unregisterChild( existingChild );
+					registeredChildren.remove( existingChild );
 				}
 				
-				registeredChildren.add( insertIndex, child );
+				children[slot] = child;
+				
+				if ( child != null )
+				{
+					int insertIndex = children[0] != null  ?  1  :  0;
+					registeredChildren.add( insertIndex, child );
+					registerChild( child, null );
+				}
+			}
+			else
+			{
+				boolean bSegmentRequired = child != null  &&  slot != BAR;
+				boolean bSegmentPresent = existingChild != null  &&  slot != BAR;
+
+				if ( bSegmentRequired  &&  !bSegmentPresent )
+				{
+					DPSegment seg = new DPSegment( segmentTextStyleSheet, true, true );
+					segs[slot] = seg;
+					DPParagraph para = new DPParagraph();
+					para.setChildren( Arrays.asList( new DPWidget[] { seg } ) );
+					paras[slot] = para;
+					
+					int insertIndex = 0;
+					for (int i = 0; i < slot; i++)
+					{
+						if ( children[i] != null )
+						{
+							insertIndex++;
+						}
+					}
+					
+					registeredChildren.add( insertIndex, para );
+					registerChild( para, null );
+				}
+	
+				
+				children[slot] = child;
+				if ( child != null )
+				{
+					segs[slot].setChild( child );
+				}
+				
+				
+				if ( bSegmentPresent  &&  !bSegmentRequired )
+				{
+					DPParagraph para = paras[slot];
+					unregisterChild( para );
+					registeredChildren.remove( para );
+					segs[slot] = null;
+					paras[slot] = null;
+				}
 			}
 			
 			onChildListModified();
@@ -254,10 +303,21 @@ public class DPFraction extends DPContainer
 	}
 	
 	
+	public DPWidget getWrappedNumeratorChild()
+	{
+		return paras[NUMERATOR];
+	}
+	
+	public DPWidget getWrappedDenominatorChild()
+	{
+		return paras[DENOMINATOR];
+	}
+	
+
+	
 	public void setNumeratorChild(DPWidget child)
 	{
 		setChild( NUMERATOR, child );
-
 	}
 	
 	public void setDenominatorChild(DPWidget child)
@@ -268,13 +328,12 @@ public class DPFraction extends DPContainer
 	public void setBarChild(DPWidget child)
 	{
 		setChild( BAR, child );
-
 	}
 	
 
 	
 	
-	protected double getChildScale(DPWidget child)
+	protected double getInternalChildScale(DPWidget child)
 	{
 		return child == children[BAR]  ?  1.0  :  childScale;
 	}
@@ -292,24 +351,9 @@ public class DPFraction extends DPContainer
 	
 	protected List<DPWidget> getChildren()
 	{
-		ArrayList<DPWidget> ch = new ArrayList<DPWidget>();
-		
-		for (int slot = 0; slot < NUMCHILDREN; slot++)
-		{
-			if ( children[slot] != null )
-			{
-				ch.add( children[slot] );
-			}
-		}
-		
-		return ch;
+		return Arrays.asList( children );
 	}
 
-	
-	
-	
-
-	
 	
 	
 	
@@ -320,7 +364,7 @@ public class DPFraction extends DPContainer
 		{
 			if ( i != BAR )
 			{
-				boxes[i] = children[i] != null  ?  children[i].refreshRequisitionX().scaled( childScale )  :  null;
+				boxes[i] = paras[i] != null  ?  paras[i].refreshRequisitionX().scaled( childScale )  :  null;
 			}
 			else
 			{
@@ -338,7 +382,7 @@ public class DPFraction extends DPContainer
 		{
 			if ( i != BAR )
 			{
-				boxes[i] = children[i] != null  ?  children[i].refreshRequisitionY().scaled( childScale )  :  null;
+				boxes[i] = paras[i] != null  ?  paras[i].refreshRequisitionY().scaled( childScale )  :  null;
 			}
 			else
 			{
@@ -362,14 +406,16 @@ public class DPFraction extends DPContainer
 		{
 			if ( i != BAR )
 			{
-				reqBoxes[i] = children[i] != null  ?  children[i].layoutReqBox.scaled( childScale )  :  null;
+				reqBoxes[i] = paras[i] != null  ?  paras[i].layoutReqBox.scaled( childScale )  :  null;
+				allocBoxes[i] = paras[i] != null  ?  paras[i].layoutAllocBox  :  null;
+				prevChildWidths[i] = paras[i] != null  ?  paras[i].layoutAllocBox.getAllocationX()  :  0.0;
 			}
 			else
 			{
 				reqBoxes[i] = children[i] != null  ?  children[i].layoutReqBox  :  null;
+				allocBoxes[i] = children[i] != null  ?  children[i].layoutAllocBox  :  null;
+				prevChildWidths[i] = children[i] != null  ?  children[i].layoutAllocBox.getAllocationX()  :  0.0;
 			}
-			allocBoxes[i] = children[i] != null  ?  children[i].layoutAllocBox  :  null;
-			prevChildWidths[i] = children[i] != null  ?  children[i].layoutAllocBox.getAllocationX()  :  0.0;
 		}
 		
 		FractionLayout.allocateX( layoutReqBox, reqBoxes[NUMERATOR], reqBoxes[BAR], reqBoxes[DENOMINATOR],
@@ -378,13 +424,17 @@ public class DPFraction extends DPContainer
 		
 		for (int i = 0; i < NUMCHILDREN; i++)
 		{
-			if ( children[i] != null )
+			if ( paras[i] != null )
 			{
 				if ( i != BAR )
 				{
 					allocBoxes[i].scaleAllocationX( 1.0 / childScale );
+					paras[i].refreshAllocationX( prevChildWidths[i] );
 				}
-				children[i].refreshAllocationX( prevChildWidths[i] );
+				else
+				{
+					children[i].refreshAllocationX( prevChildWidths[i] );
+				}
 			}
 		}
 	}
@@ -401,14 +451,16 @@ public class DPFraction extends DPContainer
 		{
 			if ( i != BAR )
 			{
-				reqBoxes[i] = children[i] != null  ?  children[i].layoutReqBox.scaled( childScale )  :  null;
+				reqBoxes[i] = paras[i] != null  ?  paras[i].layoutReqBox.scaled( childScale )  :  null;
+				allocBoxes[i] = paras[i] != null  ?  paras[i].layoutAllocBox  :  null;
+				prevChildHeights[i] = paras[i] != null  ?  paras[i].layoutAllocBox.getAllocationY()  :  0.0;
 			}
 			else
 			{
 				reqBoxes[i] = children[i] != null  ?  children[i].layoutReqBox  :  null;
+				allocBoxes[i] = children[i] != null  ?  children[i].layoutAllocBox  :  null;
+				prevChildHeights[i] = children[i] != null  ?  children[i].layoutAllocBox.getAllocationY()  :  0.0;
 			}
-			allocBoxes[i] = children[i] != null  ?  children[i].layoutAllocBox  :  null;
-			prevChildHeights[i] = children[i] != null  ?  children[i].layoutAllocBox.getAllocationY()  :  0.0;
 		}
 		
 		FractionLayout.allocateY( layoutReqBox, reqBoxes[NUMERATOR], reqBoxes[BAR], reqBoxes[DENOMINATOR],
@@ -417,13 +469,17 @@ public class DPFraction extends DPContainer
 		
 		for (int i = 0; i < NUMCHILDREN; i++)
 		{
-			if ( children[i] != null )
+			if ( paras[i] != null )
 			{
 				if ( i != BAR )
 				{
 					allocBoxes[i].scaleAllocationY( 1.0 / childScale );
+					paras[i].refreshAllocationY( prevChildHeights[i] );
 				}
-				children[i].refreshAllocationY( prevChildHeights[i] );
+				else
+				{
+					children[i].refreshAllocationY( prevChildHeights[i] );
+				}
 			}
 		}
 	}
@@ -448,17 +504,7 @@ public class DPFraction extends DPContainer
 
 	protected List<DPWidget> verticalNavigationList()
 	{
-		ArrayList<DPWidget> xs = new ArrayList<DPWidget>();
-		
-		for (DPWidget x: children)
-		{
-			if ( x != null )
-			{
-				xs.add( x );
-			}
-		}
-		
-		return xs;
+		return registeredChildren;
 	}
 	
 	

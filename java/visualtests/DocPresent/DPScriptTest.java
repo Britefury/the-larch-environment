@@ -44,22 +44,37 @@ public class DPScriptTest
 	}
 
 	
-	protected DPWidget makeScriptWidget(String mainText, String leftSuperText, String leftSubText, String rightSuperText, String rightSubText)
+	protected DPWidget makeFraction(DPWidget num, DPWidget denom)
 	{
-		TextStyleSheet sMain = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 16 ), Color.black );
-		TextStyleSheet sScript = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 16 ), Color.black );
-		TextStyleSheet sPre = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.blue );
-		TextStyleSheet sPost = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 24 ), Color.red );
-		DPText main = new DPText( sMain, mainText);
+		DPFraction frac = new DPFraction();
 		
+		frac.setNumeratorChild( num );
+		frac.setDenominatorChild( denom );
+
+		return frac;
+	}
+
+	
+	protected DPWidget makeScript(DPWidget main, DPWidget leftSuper, DPWidget leftSub, DPWidget rightSuper, DPWidget rightSub)
+	{
 		DPScript script = new DPScript();
 		
 		script.setMainChild( main );
-		script.setLeftSuperscriptChild( makeText( leftSuperText, sScript ) );
-		script.setLeftSubscriptChild( makeText( leftSubText, sScript ) );
-		script.setRightSuperscriptChild( makeText( rightSuperText, sScript ) );
-		script.setRightSubscriptChild( makeText( rightSubText, sScript ) );
+		script.setLeftSuperscriptChild( leftSuper );
+		script.setLeftSubscriptChild( leftSub );
+		script.setRightSuperscriptChild( rightSuper );
+		script.setRightSubscriptChild( rightSub );
+		
+		return script;
+	}
 
+	protected DPWidget makeScriptLine(DPWidget main, DPWidget leftSuper, DPWidget leftSub, DPWidget rightSuper, DPWidget rightSub)
+	{
+		TextStyleSheet sPre = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.blue );
+		TextStyleSheet sPost = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 24 ), Color.red );
+		
+		DPWidget script = makeScript( main, leftSuper, leftSub, rightSuper, rightSub );
+		
 		DPText labelA = new DPText( sPre, "Label A yYgGjJpPqQ" );
 		DPText labelB = new DPText( sPost, "Label B yYgGjJpPqQ" );
 		
@@ -110,24 +125,42 @@ public class DPScriptTest
 	
 	protected DPWidget createContentNode()
 	{
+		TextStyleSheet sMain = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 16 ), Color.black );
+		TextStyleSheet sScript = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 16 ), Color.black );
+		TextStyleSheet blackStyle = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 24 ), Color.black );
+
 		VBoxStyleSheet boxs = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.LEFT, 0.0, false, 0.0 );
 		DPVBox box = new DPVBox( boxs );
 		
 		for (int i = 0; i < 16; i++)
 		{
-			String leftSuperText, leftSubText, rightSuperText, rightSubText;
+			DPWidget leftSuperText, leftSubText, rightSuperText, rightSubText;
 			
-			leftSuperText = ( i & 1 ) != 0   ?   "left super"  :  null; 
-			leftSubText = ( i & 2 ) != 0   ?   "left sub"  :  null; 
-			rightSuperText = ( i & 4 ) != 0   ?   "right super"  :  null; 
-			rightSubText = ( i & 8 ) != 0   ?   "right sub"  :  null;
+			leftSuperText = ( i & 1 ) != 0   ?   makeText( "left super", sScript )  :  null; 
+			leftSubText = ( i & 2 ) != 0   ?   makeText( "left sub", sScript )  :  null; 
+			rightSuperText = ( i & 4 ) != 0   ?   makeText( "right super", sScript )  :  null; 
+			rightSubText = ( i & 8 ) != 0   ?   makeText( "right sub", sScript )  :  null;
 			
-			DPWidget script = makeScriptWidget( "MAIN" + String.valueOf( i ), leftSuperText, leftSubText, rightSuperText, rightSubText );
+			DPWidget script = makeScriptLine( makeText( "MAIN" + String.valueOf( i ), sMain ), leftSuperText, leftSubText, rightSuperText, rightSubText );
 			
 			box.append( script );
 		}
 		
-		box.append( makeScriptFraction( "MAIN", "a", "b" ) );
+		box.append( makeText( "---", blackStyle ) );
+
+		for (int i = 0; i < 16; i++)
+		{
+			DPWidget leftSuperText, leftSubText, rightSuperText, rightSubText;
+			
+			leftSuperText = ( i & 1 ) != 0   ?   makeFraction( makeText( "a", sScript ), makeText( "x", sScript ) )  :  makeText( "a", sScript ); 
+			leftSubText = ( i & 2 ) != 0   ?   makeFraction( makeText( "b", sScript ), makeText( "x", sScript ) )  :  makeText( "b", sScript ); 
+			rightSuperText = ( i & 4 ) != 0   ?   makeFraction( makeText( "c", sScript ), makeText( "x", sScript ) )  :  makeText( "c", sScript ); 
+			rightSubText = ( i & 8 ) != 0   ?   makeFraction( makeText( "d", sScript ), makeText( "x", sScript ) )  :  makeText( "d", sScript );
+			
+			DPWidget script = makeScriptLine( makeText( "MAIN" + String.valueOf( i ), sMain ), leftSuperText, leftSubText, rightSuperText, rightSubText );
+			
+			box.append( script );
+		}
 		
 		return box;
 	}

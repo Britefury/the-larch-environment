@@ -6,6 +6,7 @@
 //##************************
 package BritefuryJ.DocPresent;
 
+import java.util.Arrays;
 import java.util.List;
 
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
@@ -114,7 +115,16 @@ public class DPSegment extends DPContainerCollateable
 	
 	protected List<DPWidget> getChildren()
 	{
-		return registeredChildren;
+		if ( child != null )
+		{
+			DPWidget[] children = { child };
+			return Arrays.asList( children );
+		}
+		else
+		{
+			DPWidget[] children = {};
+			return Arrays.asList( children );
+		}
 	}
 
 	

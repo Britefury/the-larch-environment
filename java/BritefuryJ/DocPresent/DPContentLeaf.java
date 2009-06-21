@@ -7,14 +7,16 @@
 //##************************
 package BritefuryJ.DocPresent;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.WeakHashMap;
 
+import BritefuryJ.DocPresent.Border.Border;
+import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.ElementTree.Element;
-import BritefuryJ.DocPresent.ElementTree.LeafElement;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleSheets.ContentLeafStyleSheet;
 import BritefuryJ.Math.Point2;
@@ -90,28 +92,30 @@ public abstract class DPContentLeaf extends DPWidget
 	
 	protected void onCaretEnter(Caret c)
 	{
+		DPBorder border = getMetaHeaderBorderWidget(); 
+		if ( border != null )
+		{
+			border.setBorder( metaHeaderHighlightBorder );
+		}
 	}
 	
 	protected void onCaretLeave(Caret c)
 	{
+		DPBorder border = getMetaHeaderBorderWidget(); 
+		if ( border != null )
+		{
+			border.setBorder( metaHeaderEmptyBorder );
+		}
 	}
 	
 	
 	protected void handleCaretEnter(Caret c)
 	{
 		onCaretEnter( c );
-		if ( element != null )
-		{
-			((LeafElement)element).onCaretEnter();
-		}
 	}
 	
 	protected void handleCaretLeave(Caret c)
 	{
-		if ( element != null )
-		{
-			((LeafElement)element).onCaretLeave();
-		}
 		onCaretLeave( c );
 	}
 	
@@ -225,7 +229,10 @@ public abstract class DPContentLeaf extends DPWidget
 	{
 		if ( m.getWidget() == this )
 		{
-			return m.getIndex() == getMarkerRange();
+			// The index (position and bias) is at the last position,
+			// OR
+			// range is 0, and position is 0, bias is 1, which would make index 1
+			return m.getIndex() == getMarkerRange()  ||  m.getPosition() == getMarkerRange();
 		}
 		else
 		{
@@ -821,6 +828,29 @@ public abstract class DPContentLeaf extends DPWidget
 	}
 
 	
+	
+	
+	//
+	// Meta element methods
+	//
+	
+	protected static SolidBorder metaHeaderHighlightBorder = new SolidBorder( 1.0, 5.0, 5.0, new Color( 0.75f, 0.0f, 0.0f ), new Color( 1.0f, 0.9f, 0.8f ) );
+
+	protected Border getMetaHeaderBorder()
+	{
+		Caret caret = presentationArea.getCaret();
+		if ( caret != null )
+		{
+			DPContentLeaf e = caret.getMarker().getWidget();
+			if ( e == this )
+			{
+				return metaHeaderHighlightBorder;
+			}
+		}
+		return metaHeaderEmptyBorder;
+	}
+	
+
 	
 	
 	//
