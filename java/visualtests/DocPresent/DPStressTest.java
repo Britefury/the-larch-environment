@@ -48,6 +48,7 @@ public class DPStressTest
 	// [3] Split layout into req/alloc			A			10240	57.1MB				32.8MB				0.6MB				0.569s					0.307s
 	// [4] With collation					A			10240	58.4MB				36.2MB				0.6MB				0.566s					0.336s
 	// [5] With collation finished			A			10240	58.4MB				35.6MB				0.6MB				0.572s					0.335s
+	// [6] Element tree functionality			A			10240	65.0MB				41.1MB				0.7MB				0.584s					0.496s
 	//
 	//
 	// States:
@@ -56,6 +57,7 @@ public class DPStressTest
 	// [3] Split layout box into requisition and allocation; requisition structures shared among text elements; managed by TextVisual
 	// [4] HBoxes, VBoxes and Paragraphs can collate contents from children that are span elements
 	// [5] Collation system finished
+	// [6] All ElementTree functionality merged into document presentation system
 	//
 	// Platform A:
 	//	CPU: Intel Core Duo 1.86GHz
