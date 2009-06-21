@@ -14,26 +14,26 @@ import org.python.core.Py;
 import org.python.core.PyObject;
 
 import BritefuryJ.Cell.CellInterface;
+import BritefuryJ.DocPresent.DPBorder;
+import BritefuryJ.DocPresent.DPContainer;
+import BritefuryJ.DocPresent.DPEmpty;
+import BritefuryJ.DocPresent.DPFraction;
+import BritefuryJ.DocPresent.DPHBox;
+import BritefuryJ.DocPresent.DPLineBreak;
+import BritefuryJ.DocPresent.DPParagraph;
+import BritefuryJ.DocPresent.DPScript;
+import BritefuryJ.DocPresent.DPSegment;
+import BritefuryJ.DocPresent.DPSpan;
+import BritefuryJ.DocPresent.DPText;
+import BritefuryJ.DocPresent.DPVBox;
+import BritefuryJ.DocPresent.DPWhitespace;
+import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.ElementContext;
+import BritefuryJ.DocPresent.ElementFactory;
 import BritefuryJ.DocPresent.ElementKeyboardListener;
 import BritefuryJ.DocPresent.ElementTextRepresentationListener;
+import BritefuryJ.DocPresent.PyElementFactory;
 import BritefuryJ.DocPresent.Border.Border;
-import BritefuryJ.DocPresent.ElementTree.BorderElement;
-import BritefuryJ.DocPresent.ElementTree.BranchElement;
-import BritefuryJ.DocPresent.ElementTree.Element;
-import BritefuryJ.DocPresent.ElementTree.ElementFactory;
-import BritefuryJ.DocPresent.ElementTree.FractionElement;
-import BritefuryJ.DocPresent.ElementTree.HBoxElement;
-import BritefuryJ.DocPresent.ElementTree.HiddenContentElement;
-import BritefuryJ.DocPresent.ElementTree.LineBreakElement;
-import BritefuryJ.DocPresent.ElementTree.ParagraphElement;
-import BritefuryJ.DocPresent.ElementTree.PyElementFactory;
-import BritefuryJ.DocPresent.ElementTree.ScriptElement;
-import BritefuryJ.DocPresent.ElementTree.SegmentElement;
-import BritefuryJ.DocPresent.ElementTree.SpanElement;
-import BritefuryJ.DocPresent.ElementTree.TextElement;
-import BritefuryJ.DocPresent.ElementTree.VBoxElement;
-import BritefuryJ.DocPresent.ElementTree.WhitespaceElement;
 import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.FractionStyleSheet;
@@ -61,9 +61,9 @@ public class GSymNodeViewInstance implements ElementContext, DVNode.NodeContext
 		}
 
 	
-		public Element createElement(DocTreeNode x, GSymNodeViewInstance ctx, Object state)
+		public DPWidget createElement(DocTreeNode x, GSymNodeViewInstance ctx, Object state)
 		{
-			return (Element)Py.tojava( callable.__call__( Py.java2py( x ), Py.java2py( ctx ), Py.java2py( state ) ), Element.class );
+			return (DPWidget)Py.tojava( callable.__call__( Py.java2py( x ), Py.java2py( ctx ), Py.java2py( state ) ), DPWidget.class );
 		}
 	}
 
@@ -92,67 +92,67 @@ public class GSymNodeViewInstance implements ElementContext, DVNode.NodeContext
 	
 	
 	
-	public Element border(Border border, ContainerStyleSheet styleSheet, Element child)
+	public DPWidget border(Border border, ContainerStyleSheet styleSheet, DPWidget child)
 	{
 		viewInstance.getView().profile_startElement();
-		BorderElement element = new BorderElement( border, styleSheet );
+		DPBorder element = new DPBorder( border, styleSheet );
 		element.setChild( child );
 		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
 	
-	public Element indent(float indentation, Element child)
+	public DPWidget indent(float indentation, DPWidget child)
 	{
 		viewInstance.getView().profile_startElement();
 		Border border = viewInstance.indentationBorder( indentation );
-		BorderElement element = new BorderElement( border );
+		DPBorder element = new DPBorder( border );
 		element.setChild( child );
 		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
 	
-	public Element text(TextStyleSheet styleSheet, String txt)
+	public DPWidget text(TextStyleSheet styleSheet, String txt)
 	{
 		viewInstance.getView().profile_startElement();
-		Element element = new TextElement( styleSheet, txt );
+		DPWidget element = new DPText( styleSheet, txt );
 		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
 	
-	public Element textWithContent(TextStyleSheet styleSheet, String txt, String content)
+	public DPWidget textWithContent(TextStyleSheet styleSheet, String txt, String content)
 	{
 		viewInstance.getView().profile_startElement();
-		Element element = new TextElement( styleSheet, txt, content );
+		DPWidget element = new DPText( styleSheet, txt, content );
 		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
 	
-	public Element hiddenText(String txt)
+	public DPWidget hiddenText(String txt)
 	{
 		viewInstance.getView().profile_startElement();
-		Element element = new HiddenContentElement( txt );
+		DPWidget element = new DPEmpty( txt );
 		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
 	
-	public Element whitespace(String txt, float width)
+	public DPWidget whitespace(String txt, float width)
 	{
 		viewInstance.getView().profile_startElement();
-		Element element = new WhitespaceElement( txt, width );
+		DPWidget element = new DPWhitespace( txt, width );
 		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
 
-	public Element whitespace(String txt)
+	public DPWidget whitespace(String txt)
 	{
 		viewInstance.getView().profile_startElement();
-		Element element = new WhitespaceElement( txt, 0.0 );
+		DPWidget element = new DPWhitespace( txt, 0.0 );
 		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
@@ -160,55 +160,55 @@ public class GSymNodeViewInstance implements ElementContext, DVNode.NodeContext
 	
 	
 	
-	public Element hbox(HBoxStyleSheet styleSheet, List<Element> children)
+	public DPWidget hbox(HBoxStyleSheet styleSheet, List<DPWidget> children)
 	{
 		viewInstance.getView().profile_startElement();
-		HBoxElement element = new HBoxElement( styleSheet );
+		DPHBox element = new DPHBox( styleSheet );
 		element.setChildren( children );
 		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
 	
-	public Element ahbox(List<Element> children)
+	public DPWidget ahbox(List<DPWidget> children)
 	{
 		return hbox( ahboxStyleSheet, children );
 	}
 	
-	public Element vbox(VBoxStyleSheet styleSheet, List<Element> children)
+	public DPWidget vbox(VBoxStyleSheet styleSheet, List<DPWidget> children)
 	{
 		viewInstance.getView().profile_startElement();
-		VBoxElement element = new VBoxElement( styleSheet );
+		DPVBox element = new DPVBox( styleSheet );
 		element.setChildren( children );
 		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
 	
-	public Element paragraph(ParagraphStyleSheet styleSheet, List<Element> children)
+	public DPWidget paragraph(ParagraphStyleSheet styleSheet, List<DPWidget> children)
 	{
 		viewInstance.getView().profile_startElement();
-		ParagraphElement element = new ParagraphElement( styleSheet );
+		DPParagraph element = new DPParagraph( styleSheet );
 		element.setChildren( children );
 		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
 	
-	public Element span(List<Element> children)
+	public DPWidget span(List<DPWidget> children)
 	{
 		viewInstance.getView().profile_startElement();
-		SpanElement element = new SpanElement();
+		DPSpan element = new DPSpan();
 		element.setChildren( children );
 		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
 	
-	public Element lineBreak(ContainerStyleSheet styleSheet, int lineBreakPriority, Element child)
+	public DPWidget lineBreak(ContainerStyleSheet styleSheet, int lineBreakPriority, DPWidget child)
 	{
 		viewInstance.getView().profile_startElement();
-		LineBreakElement element = new LineBreakElement( styleSheet, lineBreakPriority );
+		DPLineBreak element = new DPLineBreak( styleSheet, lineBreakPriority );
 		if ( child != null )
 		{
 			element.setChild( child );
@@ -218,35 +218,35 @@ public class GSymNodeViewInstance implements ElementContext, DVNode.NodeContext
 		return element;
 	}
 	
-	public Element lineBreak(int lineBreakPriority, Element child)
+	public DPWidget lineBreak(int lineBreakPriority, DPWidget child)
 	{
 		return lineBreak( ContainerStyleSheet.defaultStyleSheet, lineBreakPriority, child );
 	}
 	
-	public Element lineBreak(ContainerStyleSheet styleSheet, int lineBreakPriority)
+	public DPWidget lineBreak(ContainerStyleSheet styleSheet, int lineBreakPriority)
 	{
 		return lineBreak( styleSheet, lineBreakPriority, null );
 	}
 	
-	public Element lineBreak(int lineBreakPriority)
+	public DPWidget lineBreak(int lineBreakPriority)
 	{
 		return lineBreak( ContainerStyleSheet.defaultStyleSheet, lineBreakPriority, null );
 	}
 	
-	public Element segment(TextStyleSheet textStyleSheet, boolean bGuardBegin, boolean bGuardEnd, Element child)
+	public DPWidget segment(TextStyleSheet textStyleSheet, boolean bGuardBegin, boolean bGuardEnd, DPWidget child)
 	{
 		viewInstance.getView().profile_startElement();
-		SegmentElement element = new SegmentElement( textStyleSheet, bGuardBegin, bGuardEnd );
+		DPSegment element = new DPSegment( textStyleSheet, bGuardBegin, bGuardEnd );
 		element.setChild( child );
 		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
 	
-	public Element segment(boolean bGuardBegin, boolean bGuardEnd, Element child)
+	public DPWidget segment(boolean bGuardBegin, boolean bGuardEnd, DPWidget child)
 	{
 		viewInstance.getView().profile_startElement();
-		SegmentElement element = new SegmentElement( TextStyleSheet.defaultStyleSheet, bGuardBegin, bGuardEnd );
+		DPSegment element = new DPSegment( TextStyleSheet.defaultStyleSheet, bGuardBegin, bGuardEnd );
 		element.setChild( child );
 		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
@@ -254,10 +254,10 @@ public class GSymNodeViewInstance implements ElementContext, DVNode.NodeContext
 	}
 	
 	
-	public Element script(ScriptStyleSheet styleSheet, TextStyleSheet segmentTextStyleSheet, Element mainChild, Element leftSuperChild, Element leftSubChild, Element rightSuperChild, Element rightSubChild)
+	public DPWidget script(ScriptStyleSheet styleSheet, TextStyleSheet segmentTextStyleSheet, DPWidget mainChild, DPWidget leftSuperChild, DPWidget leftSubChild, DPWidget rightSuperChild, DPWidget rightSubChild)
 	{
 		viewInstance.getView().profile_startElement();
-		ScriptElement element = new ScriptElement( styleSheet, segmentTextStyleSheet );
+		DPScript element = new DPScript( styleSheet, segmentTextStyleSheet );
 		element.setMainChild( mainChild );
 		if ( leftSuperChild != null )
 		{
@@ -280,59 +280,59 @@ public class GSymNodeViewInstance implements ElementContext, DVNode.NodeContext
 		return element;
 	}
 	
-	public Element script(ScriptStyleSheet styleSheet, Element mainChild, Element leftSuperChild, Element leftSubChild, Element rightSuperChild, Element rightSubChild)
+	public DPWidget script(ScriptStyleSheet styleSheet, DPWidget mainChild, DPWidget leftSuperChild, DPWidget leftSubChild, DPWidget rightSuperChild, DPWidget rightSubChild)
 	{
 		return script( styleSheet, TextStyleSheet.defaultStyleSheet, mainChild, leftSuperChild, leftSubChild, rightSuperChild, rightSubChild );
 	}
 	
 	
-	public Element scriptLSuper(ScriptStyleSheet styleSheet, TextStyleSheet segmentTextStyleSheet, Element mainChild, Element scriptChild)
+	public DPWidget scriptLSuper(ScriptStyleSheet styleSheet, TextStyleSheet segmentTextStyleSheet, DPWidget mainChild, DPWidget scriptChild)
 	{
 		return script( styleSheet, segmentTextStyleSheet, mainChild, scriptChild, null, null, null );
 	}
 	
-	public Element scriptLSub(ScriptStyleSheet styleSheet, TextStyleSheet segmentTextStyleSheet, Element mainChild, Element scriptChild)
+	public DPWidget scriptLSub(ScriptStyleSheet styleSheet, TextStyleSheet segmentTextStyleSheet, DPWidget mainChild, DPWidget scriptChild)
 	{
 		return script( styleSheet, segmentTextStyleSheet, mainChild, null, scriptChild, null, null );
 	}
 	
-	public Element scriptRSuper(ScriptStyleSheet styleSheet, TextStyleSheet segmentTextStyleSheet, Element mainChild, Element scriptChild)
+	public DPWidget scriptRSuper(ScriptStyleSheet styleSheet, TextStyleSheet segmentTextStyleSheet, DPWidget mainChild, DPWidget scriptChild)
 	{
 		return script( styleSheet, segmentTextStyleSheet, mainChild, null, null, scriptChild, null );
 	}
 	
-	public Element scriptRSub(ScriptStyleSheet styleSheet, TextStyleSheet segmentTextStyleSheet, Element mainChild, Element scriptChild)
+	public DPWidget scriptRSub(ScriptStyleSheet styleSheet, TextStyleSheet segmentTextStyleSheet, DPWidget mainChild, DPWidget scriptChild)
 	{
 		return script( styleSheet, segmentTextStyleSheet, mainChild, null, null, null, scriptChild );
 	}
 	
 	
-	public Element scriptLSuper(ScriptStyleSheet styleSheet, Element mainChild, Element scriptChild)
+	public DPWidget scriptLSuper(ScriptStyleSheet styleSheet, DPWidget mainChild, DPWidget scriptChild)
 	{
 		return script( styleSheet, mainChild, scriptChild, null, null, null );
 	}
 	
-	public Element scriptLSub(ScriptStyleSheet styleSheet, Element mainChild, Element scriptChild)
+	public DPWidget scriptLSub(ScriptStyleSheet styleSheet, DPWidget mainChild, DPWidget scriptChild)
 	{
 		return script( styleSheet, mainChild, null, scriptChild, null, null );
 	}
 	
-	public Element scriptRSuper(ScriptStyleSheet styleSheet, Element mainChild, Element scriptChild)
+	public DPWidget scriptRSuper(ScriptStyleSheet styleSheet, DPWidget mainChild, DPWidget scriptChild)
 	{
 		return script( styleSheet, mainChild, null, null, scriptChild, null );
 	}
 	
-	public Element scriptRSub(ScriptStyleSheet styleSheet, Element mainChild, Element scriptChild)
+	public DPWidget scriptRSub(ScriptStyleSheet styleSheet, DPWidget mainChild, DPWidget scriptChild)
 	{
 		return script( styleSheet, mainChild, null, null, null, scriptChild );
 	}
 	
 	
 	
-	public Element fraction(FractionStyleSheet styleSheet, TextStyleSheet segmentTextStyleSheet, Element numerator, Element denominator, String barContent)
+	public DPWidget fraction(FractionStyleSheet styleSheet, TextStyleSheet segmentTextStyleSheet, DPWidget numerator, DPWidget denominator, String barContent)
 	{
 		viewInstance.getView().profile_startElement();
-		FractionElement element = new FractionElement( styleSheet, segmentTextStyleSheet, barContent );
+		DPFraction element = new DPFraction( styleSheet, segmentTextStyleSheet, barContent );
 		element.setNumeratorChild( numerator );
 		element.setDenominatorChild( denominator );
 		element.setContext( this );
@@ -340,25 +340,25 @@ public class GSymNodeViewInstance implements ElementContext, DVNode.NodeContext
 		return element;
 	}
 	
-	public Element fraction(FractionStyleSheet styleSheet, Element numerator, Element denominator, String barContent)
+	public DPWidget fraction(FractionStyleSheet styleSheet, DPWidget numerator, DPWidget denominator, String barContent)
 	{
 		return fraction( styleSheet, TextStyleSheet.defaultStyleSheet, numerator, denominator, barContent );
 	}
 	
 
-	public Element listView(ListViewLayout layout, ElementFactory beginDelim, ElementFactory endDelim, SeparatorElementFactory separator, List<Element> children)
+	public DPWidget listView(ListViewLayout layout, ElementFactory beginDelim, ElementFactory endDelim, SeparatorElementFactory separator, List<DPWidget> children)
 	{
 		viewInstance.getView().profile_startElement();
-		Element element = layout.createListElement( children, beginDelim, endDelim, separator );
+		DPWidget element = layout.createListElement( children, beginDelim, endDelim, separator );
 		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
 	
-	public Element listView(ListViewLayout layout, PyObject beginDelim, PyObject endDelim, PyObject separator, List<Element> children)
+	public DPWidget listView(ListViewLayout layout, PyObject beginDelim, PyObject endDelim, PyObject separator, List<DPWidget> children)
 	{
 		viewInstance.getView().profile_startElement();
-		Element element = layout.createListElement( children, PyElementFactory.pyToElementFactory( beginDelim ), PyElementFactory.pyToElementFactory( endDelim ), PySeparatorElementFactory.pyToSeparatorElementFactory( separator ) );
+		DPWidget element = layout.createListElement( children, PyElementFactory.pyToElementFactory( beginDelim ), PyElementFactory.pyToElementFactory( endDelim ), PySeparatorElementFactory.pyToSeparatorElementFactory( separator ) );
 		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
@@ -366,7 +366,7 @@ public class GSymNodeViewInstance implements ElementContext, DVNode.NodeContext
 	
 	
 	
-	public Element textRepresentationListener(Element child, ElementTextRepresentationListener listener)
+	public DPWidget textRepresentationListener(DPWidget child, ElementTextRepresentationListener listener)
 	{
 		viewInstance.getView().profile_startElement();
 		child.setTextRepresentationListener( listener );
@@ -374,10 +374,10 @@ public class GSymNodeViewInstance implements ElementContext, DVNode.NodeContext
 		return child;
 	}
 	
-	public List<Element> textRepresentationListener(List<Element> children, ElementTextRepresentationListener listener)
+	public List<DPWidget> textRepresentationListener(List<DPWidget> children, ElementTextRepresentationListener listener)
 	{
 		viewInstance.getView().profile_startElement();
-		for (Element child: children)
+		for (DPWidget child: children)
 		{
 			child.setTextRepresentationListener( listener );
 		}
@@ -386,7 +386,7 @@ public class GSymNodeViewInstance implements ElementContext, DVNode.NodeContext
 	}
 	
 	
-	public Element keyboardListener(Element child, ElementKeyboardListener listener)
+	public DPWidget keyboardListener(DPWidget child, ElementKeyboardListener listener)
 	{
 		viewInstance.getView().profile_startElement();
 		child.setKeyboardListener( listener );
@@ -394,10 +394,10 @@ public class GSymNodeViewInstance implements ElementContext, DVNode.NodeContext
 		return child;
 	}
 	
-	public List<Element> keyboardListener(List<Element> children, ElementKeyboardListener listener)
+	public List<DPWidget> keyboardListener(List<DPWidget> children, ElementKeyboardListener listener)
 	{
 		viewInstance.getView().profile_startElement();
-		for (Element child: children)
+		for (DPWidget child: children)
 		{
 			child.setKeyboardListener( listener );
 		}
@@ -406,22 +406,22 @@ public class GSymNodeViewInstance implements ElementContext, DVNode.NodeContext
 	}
 	
 	
-	public Element viewEval(DocTreeNode x)
+	public DPWidget viewEval(DocTreeNode x)
 	{
 		return viewEvalFn( x, (GSymNodeViewFunction)null, null );
 	}
 
-	public Element viewEval(DocTreeNode x, Object state)
+	public DPWidget viewEval(DocTreeNode x, Object state)
 	{
 		return viewEvalFn( x, (GSymNodeViewFunction)null, state );
 	}
 
-	public Element viewEvalFn(DocTreeNode x, GSymNodeViewFunction nodeViewFunction)
+	public DPWidget viewEvalFn(DocTreeNode x, GSymNodeViewFunction nodeViewFunction)
 	{
 		return viewEvalFn( x, nodeViewFunction, null );
 	}
 
-	public Element viewEvalFn(DocTreeNode x, GSymNodeViewFunction nodeViewFunction, Object state)
+	public DPWidget viewEvalFn(DocTreeNode x, GSymNodeViewFunction nodeViewFunction, Object state)
 	{
 		viewInstance.getView().profile_startJava();
 		
@@ -446,12 +446,12 @@ public class GSymNodeViewInstance implements ElementContext, DVNode.NodeContext
 		return viewNode.getElementNoRefresh();
 	}
 	
-	public Element viewEvalFn(DocTreeNode x, PyObject nodeViewFunction)
+	public DPWidget viewEvalFn(DocTreeNode x, PyObject nodeViewFunction)
 	{
 		return viewEvalFn( x, new PyGSymNodeViewFunction( nodeViewFunction ), null );
 	}
 
-	public Element viewEvalFn(DocTreeNode x, PyObject nodeViewFunction, Object state)
+	public DPWidget viewEvalFn(DocTreeNode x, PyObject nodeViewFunction, Object state)
 	{
 		return viewEvalFn( x, new PyGSymNodeViewFunction( nodeViewFunction ), state );
 	}
@@ -459,24 +459,24 @@ public class GSymNodeViewInstance implements ElementContext, DVNode.NodeContext
 	
 	
 	
-	public List<Element> mapViewEval(List<DocTreeNode> xs)
+	public List<DPWidget> mapViewEval(List<DocTreeNode> xs)
 	{
 		return mapViewEvalFn( xs, (GSymNodeViewFunction)null, null );
 	}
 
-	public List<Element> mapViewEval(List<DocTreeNode> xs, Object state)
+	public List<DPWidget> mapViewEval(List<DocTreeNode> xs, Object state)
 	{
 		return mapViewEvalFn( xs, (GSymNodeViewFunction)null, state );
 	}
 
-	public List<Element> mapViewEvalFn(List<DocTreeNode> xs, GSymNodeViewFunction nodeViewFunction)
+	public List<DPWidget> mapViewEvalFn(List<DocTreeNode> xs, GSymNodeViewFunction nodeViewFunction)
 	{
 		return mapViewEvalFn( xs, nodeViewFunction, null );
 	}
 
-	public List<Element> mapViewEvalFn(List<DocTreeNode> xs, GSymNodeViewFunction nodeViewFunction, Object state)
+	public List<DPWidget> mapViewEvalFn(List<DocTreeNode> xs, GSymNodeViewFunction nodeViewFunction, Object state)
 	{
-		ArrayList<Element> children = new ArrayList<Element>();
+		ArrayList<DPWidget> children = new ArrayList<DPWidget>();
 		children.ensureCapacity( xs.size() );
 		for (DocTreeNode x: xs)
 		{
@@ -485,12 +485,12 @@ public class GSymNodeViewInstance implements ElementContext, DVNode.NodeContext
 		return children;
 	}
 	
-	public List<Element> mapViewEvalFn(List<DocTreeNode> xs, PyObject nodeViewFunction)
+	public List<DPWidget> mapViewEvalFn(List<DocTreeNode> xs, PyObject nodeViewFunction)
 	{
 		return mapViewEvalFn( xs, new PyGSymNodeViewFunction( nodeViewFunction ), null );
 	}
 
-	public List<Element> mapViewEvalFn(List<DocTreeNode> xs, PyObject nodeViewFunction, Object state)
+	public List<DPWidget> mapViewEvalFn(List<DocTreeNode> xs, PyObject nodeViewFunction, Object state)
 	{
 		return mapViewEvalFn( xs, new PyGSymNodeViewFunction( nodeViewFunction ), state );
 	}
@@ -509,31 +509,31 @@ public class GSymNodeViewInstance implements ElementContext, DVNode.NodeContext
 	
 	
 	
-	public Element getViewNodeElement()
+	public DPWidget getViewNodeElement()
 	{
 		return viewNode.getElementNoRefresh();
 	}
 	
-	public Element getViewNodeContentElement()
+	public DPWidget getViewNodeContentElement()
 	{
 		return viewNode.getInnerElementNoRefresh();
 	}
 	
 	
 	
-	private GSymNodeViewInstance getPreviousSiblingFromChildElement(GSymNodeViewInstance parent, Element fromChild)
+	private GSymNodeViewInstance getPreviousSiblingFromChildElement(GSymNodeViewInstance parent, DPWidget fromChild)
 	{
 		if ( fromChild == null )
 		{
 			return null;
 		}
-		BranchElement parentElement = (BranchElement)fromChild.getParent();
+		DPContainer parentElement = fromChild.getParent();
 		if ( parentElement == parent.getViewNodeElement() )
 		{
 			return null;
 		}
 		
-		List<Element> children = parentElement.getChildren();
+		List<DPWidget> children = parentElement.getChildren();
 		int index = children.indexOf( fromChild );
 		for (int i = index - 1; i >= 0; i--)
 		{
@@ -547,17 +547,17 @@ public class GSymNodeViewInstance implements ElementContext, DVNode.NodeContext
 		return getNextSiblingFromChildElement( parent, parentElement.getParent() );
 	}
 	
-	private GSymNodeViewInstance getLastChildFromParentElement(GSymNodeViewInstance parent, Element element)
+	private GSymNodeViewInstance getLastChildFromParentElement(GSymNodeViewInstance parent, DPWidget element)
 	{
 		if ( element.getContext() != parent )
 		{
 			// We have recursed down the element tree far enough when we encounter an element with a different context
 			return (GSymNodeViewInstance)element.getContext();
 		}
-		else if ( element instanceof BranchElement )
+		else if ( element instanceof DPContainer )
 		{
-			BranchElement branch = (BranchElement)element;
-			List<Element> children = branch.getChildren();
+			DPContainer branch = (DPContainer)element;
+			List<DPWidget> children = branch.getChildren();
 			for (int i = children.size() - 1; i >= 0; i--)
 			{
 				GSymNodeViewInstance sibling = getLastChildFromParentElement( parent, children.get( i ) );
@@ -572,19 +572,19 @@ public class GSymNodeViewInstance implements ElementContext, DVNode.NodeContext
 	
 
 	
-	private GSymNodeViewInstance getNextSiblingFromChildElement(GSymNodeViewInstance parent, Element fromChild)
+	private GSymNodeViewInstance getNextSiblingFromChildElement(GSymNodeViewInstance parent, DPWidget fromChild)
 	{
 		if ( fromChild == null )
 		{
 			return null;
 		}
-		BranchElement parentElement = (BranchElement)fromChild.getParent();
+		DPContainer parentElement = fromChild.getParent();
 		if ( parentElement == parent.getViewNodeElement() )
 		{
 			return null;
 		}
 		
-		List<Element> children = parentElement.getChildren();
+		List<DPWidget> children = parentElement.getChildren();
 		int index = children.indexOf( fromChild );
 		for (int i = index + 1; i < children.size(); i++)
 		{
@@ -598,17 +598,17 @@ public class GSymNodeViewInstance implements ElementContext, DVNode.NodeContext
 		return getNextSiblingFromChildElement( parent, parentElement.getParent() );
 	}
 	
-	private GSymNodeViewInstance getFirstChildFromParentElement(GSymNodeViewInstance parent, Element element)
+	private GSymNodeViewInstance getFirstChildFromParentElement(GSymNodeViewInstance parent, DPWidget element)
 	{
 		if ( element.getContext() != parent )
 		{
 			// We have recursed down the element tree far enough when we encounter an element with a different context
 			return (GSymNodeViewInstance)element.getContext();
 		}
-		else if ( element instanceof BranchElement )
+		else if ( element instanceof DPContainer )
 		{
-			BranchElement branch = (BranchElement)element;
-			for (Element child: branch.getChildren())
+			DPContainer branch = (DPContainer)element;
+			for (DPWidget child: branch.getChildren())
 			{
 				GSymNodeViewInstance sibling = getFirstChildFromParentElement( parent, child );
 				if ( sibling != null )

@@ -10,11 +10,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import BritefuryJ.DocPresent.ElementTree.Element;
-import BritefuryJ.DocPresent.ElementTree.ElementFactory;
-import BritefuryJ.DocPresent.ElementTree.ParagraphElement;
-import BritefuryJ.DocPresent.ElementTree.VBoxElement;
-//import BritefuryJ.DocPresent.ElementTree.WhitespaceElement;
+import BritefuryJ.DocPresent.DPParagraph;
+import BritefuryJ.DocPresent.DPVBox;
+import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.ElementFactory;
 import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
@@ -34,12 +33,12 @@ public class VerticalInlineListViewLayout extends IndentedListViewLayout
 	}
 	
 	
-	private Element createLineParagraph(int index, Element child, SeparatorElementFactory separator)
+	private DPWidget createLineParagraph(int index, DPWidget child, SeparatorElementFactory separator)
 	{
 		if ( separator != null )
 		{
-			ParagraphElement paragraph = new ParagraphElement( lineParagraphStyleSheet );
-			paragraph.setChildren( Arrays.asList( new Element[] { child, separator.createElement( index, child ) } ) );
+			DPParagraph paragraph = new DPParagraph( lineParagraphStyleSheet );
+			paragraph.setChildren( Arrays.asList( new DPWidget[] { child, separator.createElement( index, child ) } ) );
 			return paragraph;
 		}
 		else
@@ -49,13 +48,13 @@ public class VerticalInlineListViewLayout extends IndentedListViewLayout
 	}
 	
 
-	public Element createListElement(List<Element> children, ElementFactory beginDelim, ElementFactory endDelim, SeparatorElementFactory separator)
+	public DPWidget createListElement(List<DPWidget> children, ElementFactory beginDelim, ElementFactory endDelim, SeparatorElementFactory separator)
 	{
 		if ( children.size() <= 1 )
 		{
 			// Paragraph with contents: [ beginDelim ] + children + [ endDelim ]
-			ParagraphElement paragraph = new ParagraphElement( lineParagraphStyleSheet );
-			ArrayList<Element> childElems = new ArrayList<Element>();
+			DPParagraph paragraph = new DPParagraph( lineParagraphStyleSheet );
+			ArrayList<DPWidget> childElems = new ArrayList<DPWidget>();
 			if ( beginDelim != null )
 			{
 				childElems.add( beginDelim.createElement() );
@@ -80,12 +79,12 @@ public class VerticalInlineListViewLayout extends IndentedListViewLayout
 		else
 		{
 			// First line
-			Element first = null;
+			DPWidget first = null;
 			if ( beginDelim != null  ||  separator != null )
 			{
-				ParagraphElement firstPara = new ParagraphElement( lineParagraphStyleSheet );
-				Element child = children.get( 0 );
-				ArrayList<Element> firstChildElems = new ArrayList<Element>();
+				DPParagraph firstPara = new DPParagraph( lineParagraphStyleSheet );
+				DPWidget child = children.get( 0 );
+				ArrayList<DPWidget> firstChildElems = new ArrayList<DPWidget>();
 				firstChildElems.ensureCapacity( 3 );
 				if ( beginDelim != null )
 				{
@@ -106,7 +105,7 @@ public class VerticalInlineListViewLayout extends IndentedListViewLayout
 			
 			
 			// Middle lines
-			ArrayList<Element> childElems = new ArrayList<Element>();
+			ArrayList<DPWidget> childElems = new ArrayList<DPWidget>();
 			childElems.ensureCapacity( children.size() );
 			for (int i = 1; i < children.size() - 1; i++)
 			{
@@ -123,19 +122,19 @@ public class VerticalInlineListViewLayout extends IndentedListViewLayout
 				childElems.add( createLineParagraph( children.size() - 1, children.get( children.size() - 1 ), null ) );
 			}
 			
-			VBoxElement middleVBox = new VBoxElement( styleSheet );
+			DPVBox middleVBox = new DPVBox( styleSheet );
 			middleVBox.setChildren( childElems );
-			Element indent = indent( middleVBox );
+			DPWidget indent = indent( middleVBox );
 			
 			
-			VBoxElement mainVBox = new VBoxElement( styleSheet );
+			DPVBox mainVBox = new DPVBox( styleSheet );
 			if ( endDelim != null )
 			{
-				mainVBox.setChildren( Arrays.asList( new Element[] { first, indent, endDelim.createElement() } ) );
+				mainVBox.setChildren( Arrays.asList( new DPWidget[] { first, indent, endDelim.createElement() } ) );
 			}
 			else
 			{
-				mainVBox.setChildren( Arrays.asList( new Element[] { first, indent } ) );
+				mainVBox.setChildren( Arrays.asList( new DPWidget[] { first, indent } ) );
 			}
 			
 			return mainVBox;

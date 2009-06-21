@@ -8,13 +8,12 @@ package BritefuryJ.GSym.View;
 
 import java.util.ArrayList;
 
+import BritefuryJ.DocPresent.DPContainer;
+import BritefuryJ.DocPresent.DPContentLeaf;
+import BritefuryJ.DocPresent.DPPresentationArea;
 import BritefuryJ.DocPresent.DPSegment;
 import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.ElementTree.BranchElement;
-import BritefuryJ.DocPresent.ElementTree.Element;
-import BritefuryJ.DocPresent.ElementTree.ElementTree;
-import BritefuryJ.DocPresent.ElementTree.LeafElement;
-import BritefuryJ.DocPresent.ElementTree.Caret.ElementCaret;
+import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Marker.Marker.Bias;
 import BritefuryJ.DocView.DVNode;
@@ -57,16 +56,16 @@ public class NodeElementChangeListenerDiff implements DVNode.NodeElementChangeLi
 	}
 
 	
-	public void elementChangeFrom(DVNode node, Element element)
+	public void elementChangeFrom(DVNode node, DPWidget element)
 	{
 		if ( caretNode == null )
 		{
 			// Get and store initial state
-			Element nodeElement = node.getInnerElementNoRefresh();
+			DPWidget nodeElement = node.getInnerElementNoRefresh();
 			if ( nodeElement != null )
 			{
-				ElementTree tree = nodeElement.getElementTree();
-				ElementCaret caret = tree.getCaret();
+				DPPresentationArea tree = nodeElement.getPresentationArea();
+				Caret caret = tree.getCaret();
 	
 				String text = nodeElement.getTextRepresentation();
 				int pos = -1;
@@ -86,11 +85,11 @@ public class NodeElementChangeListenerDiff implements DVNode.NodeElementChangeLi
 		}
 	}
 
-	public void elementChangeTo(DVNode node, Element element)
+	public void elementChangeTo(DVNode node, DPWidget element)
 	{
 		if ( caretNode == node )
 		{
-			Element nodeElement = node.getInnerElementNoRefresh();
+			DPWidget nodeElement = node.getInnerElementNoRefresh();
 			
 			// Invoking child.refresh() above can cause this method to be invoked on another node; recursively;
 			// Ensure that only the inner-most recursion level handles the caret
@@ -242,8 +241,8 @@ public class NodeElementChangeListenerDiff implements DVNode.NodeElementChangeLi
 				}
 				
 				
-				ElementTree elementTree = nodeElement.getElementTree();
-				ElementCaret caret = elementTree.getCaret();
+				DPPresentationArea elementTree = nodeElement.getPresentationArea();
+				Caret caret = elementTree.getCaret();
 				
 				
 				
@@ -282,7 +281,7 @@ public class NodeElementChangeListenerDiff implements DVNode.NodeElementChangeLi
 				int newIndex = newPosition  +  ( newBias == Marker.Bias.END  ?  1  :  0 );
 				
 				
-				LeafElement leaf = nodeElement.getLeafAtTextRepresentationPosition( newPosition );
+				DPContentLeaf leaf = nodeElement.getLeafAtTextRepresentationPosition( newPosition );
 				if ( leaf != null )
 				{
 					int leafOffset = -1;
@@ -292,7 +291,7 @@ public class NodeElementChangeListenerDiff implements DVNode.NodeElementChangeLi
 					}
 					else
 					{
-						leafOffset = leaf.getTextRepresentationOffsetInSubtree( (BranchElement)nodeElement );
+						leafOffset = leaf.getTextRepresentationOffsetInSubtree( (DPContainer)nodeElement );
 					}
 					int leafPosition = newPosition - leafOffset;
 					
@@ -305,7 +304,7 @@ public class NodeElementChangeListenerDiff implements DVNode.NodeElementChangeLi
 					{
 						// The leaf is not editable. We must choose a nearby leaf to place the caret in
 						
-						DPSegment.SegmentFilter segFilter = new DPSegment.SegmentFilter( leaf.getWidget().getSegment() );
+						DPSegment.SegmentFilter segFilter = new DPSegment.SegmentFilter( leaf.getSegment() );
 						
 						
 						// First, we must decide whether we should search backwards or forwards
@@ -346,7 +345,7 @@ public class NodeElementChangeListenerDiff implements DVNode.NodeElementChangeLi
 						if ( direction == Direction.BACKWARD )
 						{
 							// Search backwards
-							LeafElement left = leaf.getPreviousEditableEntryLeaf( segFilter, null );
+							DPContentLeaf left = leaf.getPreviousEditableEntryLeaf( segFilter, null );
 							if ( left != null )
 							{
 								left.moveMarkerToEnd( caret.getMarker() );
@@ -354,7 +353,7 @@ public class NodeElementChangeListenerDiff implements DVNode.NodeElementChangeLi
 							else
 							{
 								// Searching backwards failed; search forwards
-								LeafElement right = leaf.getNextEditableEntryLeaf( segFilter, null );
+								DPContentLeaf right = leaf.getNextEditableEntryLeaf( segFilter, null );
 								if ( right != null )
 								{
 									right.moveMarkerToStart( caret.getMarker() );
@@ -369,7 +368,7 @@ public class NodeElementChangeListenerDiff implements DVNode.NodeElementChangeLi
 						else if ( direction == Direction.FORWARD )
 						{
 							// Search forwards
-							LeafElement right = leaf.getNextEditableEntryLeaf( segFilter, null );
+							DPContentLeaf right = leaf.getNextEditableEntryLeaf( segFilter, null );
 							if ( right != null )
 							{
 								right.moveMarkerToStart( caret.getMarker() );
@@ -377,7 +376,7 @@ public class NodeElementChangeListenerDiff implements DVNode.NodeElementChangeLi
 							else
 							{
 								// Searching forwards failed; search backwards
-								LeafElement left = leaf.getPreviousEditableEntryLeaf( segFilter, null );
+								DPContentLeaf left = leaf.getPreviousEditableEntryLeaf( segFilter, null );
 								if ( left != null )
 								{
 									left.moveMarkerToEnd( caret.getMarker() );

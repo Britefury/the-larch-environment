@@ -35,6 +35,7 @@ public class DPStress2Test
 	//
 	//
 	// States:
+	// [A] Defunct element tree version, for comparison
 	// [1] HBoxes, VBoxes and Paragraphs can collate contents from children that are span elements
 	// [2] Collation system finished
 	//

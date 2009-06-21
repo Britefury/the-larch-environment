@@ -6,7 +6,6 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-import BritefuryJ.DocPresent.ElementTree.EditableLeafElement;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleSheets.ContentLeafStyleSheet;
 
@@ -41,20 +40,6 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 
 
 
-	//
-	// Specialised getElement()
-	//
-	
-	public EditableLeafElement getElement()
-	{
-		return (EditableLeafElement)element;
-	}
-	
-	
-
-	
-	
-	
 	//
 	// Text representation modification
 	//

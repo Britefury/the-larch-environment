@@ -9,7 +9,6 @@ from java.awt import Font, Color
 
 from BritefuryJ.DocPresent import *
 from BritefuryJ.DocPresent.StyleSheets import *
-from BritefuryJ.DocPresent.ElementTree import *
 
 
 

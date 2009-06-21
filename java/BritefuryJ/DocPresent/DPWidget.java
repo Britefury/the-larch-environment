@@ -18,7 +18,6 @@ import java.util.List;
 
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Border.EmptyBorder;
-import BritefuryJ.DocPresent.ElementTree.Element;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Event.PointerScrollEvent;
@@ -137,7 +136,6 @@ abstract public class DPWidget
 	protected ElementTextRepresentationListener textRepresentationListener;
 	protected ElementKeyboardListener keyboardListener;
 	
-	protected Element element;
 	protected ElementContext context;
 
 	protected DPWidget metaElement;
@@ -176,22 +174,6 @@ abstract public class DPWidget
 		context = null;
 	}
 	
-	
-	
-	
-	//
-	// Element methods
-	//
-	
-	public Element getElement()
-	{
-		return element;
-	}
-	
-	public void setElement(Element element)
-	{
-		this.element = element;
-	}
 	
 	
 	

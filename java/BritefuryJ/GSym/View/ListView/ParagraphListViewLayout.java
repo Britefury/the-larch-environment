@@ -11,11 +11,11 @@ import java.util.List;
 
 import org.python.core.PyObject;
 
-import BritefuryJ.DocPresent.ElementTree.Element;
-import BritefuryJ.DocPresent.ElementTree.ElementFactory;
-import BritefuryJ.DocPresent.ElementTree.LineBreakElement;
-import BritefuryJ.DocPresent.ElementTree.ParagraphElement;
-import BritefuryJ.DocPresent.ElementTree.PyElementFactory;
+import BritefuryJ.DocPresent.DPLineBreak;
+import BritefuryJ.DocPresent.DPParagraph;
+import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.ElementFactory;
+import BritefuryJ.DocPresent.PyElementFactory;
 import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
 
 public class ParagraphListViewLayout extends ListViewLayout
@@ -40,11 +40,11 @@ public class ParagraphListViewLayout extends ListViewLayout
 	}
 	
 	
-	public Element createListElement(List<Element> children, ElementFactory beginDelim, ElementFactory endDelim, SeparatorElementFactory separator)
+	public DPWidget createListElement(List<DPWidget> children, ElementFactory beginDelim, ElementFactory endDelim, SeparatorElementFactory separator)
 	{
-		ParagraphElement paragraph = new ParagraphElement( styleSheet );
+		DPParagraph paragraph = new DPParagraph( styleSheet );
 		
-		ArrayList<Element> childElems = new ArrayList<Element>();
+		ArrayList<DPWidget> childElems = new ArrayList<DPWidget>();
 		childElems.ensureCapacity( children.size() + 2 );
 		
 		if ( beginDelim != null )
@@ -56,13 +56,13 @@ public class ParagraphListViewLayout extends ListViewLayout
 		{
 			for (int i = 0; i < children.size() - 1; i++)
 			{
-				Element child = children.get( i );
+				DPWidget child = children.get( i );
 				childElems.add( child );
 				if ( separator != null )
 				{
 					childElems.add( separator.createElement( i, child ) );
 				}
-				LineBreakElement lineBreak = new LineBreakElement( lineBreakPriority );
+				DPLineBreak lineBreak = new DPLineBreak( lineBreakPriority );
 				if ( spacingFactory != null )
 				{
 					lineBreak.setChild( spacingFactory.createElement() );
@@ -70,7 +70,7 @@ public class ParagraphListViewLayout extends ListViewLayout
 				childElems.add( lineBreak );
 			}
 
-			Element lastChild = children.get( children.size() - 1 );
+			DPWidget lastChild = children.get( children.size() - 1 );
 			childElems.add( lastChild );
 			
 			if ( trailingSeparatorRequired( children, trailingSeparator ) )

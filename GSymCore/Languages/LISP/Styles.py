@@ -12,7 +12,6 @@ from BritefuryJ.GSym.View.ListView import ListViewLayout, SpanListViewLayout, Pa
 from BritefuryJ.DocPresent import *
 from BritefuryJ.DocPresent.StyleSheets import *
 from BritefuryJ.DocPresent.Layout import *
-from BritefuryJ.DocPresent.ElementTree import *
 
 
 
@@ -27,7 +26,7 @@ fieldName_textStyle = TextStyleSheet( Font( 'SansSerif', Font.PLAIN, 14 ),  Colo
 lisp_paragraphStyle = ParagraphStyleSheet( VAlignment.BASELINES, 0.0, 0.0, 0.0, 60.0 )
 
 
-paragraph_listViewLayout = ParagraphListViewLayout( ParagraphStyleSheet(), lambda: TextElement( default_textStyle, ' ' ), 0, ListViewLayout.TrailingSeparator.NEVER )
+paragraph_listViewLayout = ParagraphListViewLayout( ParagraphStyleSheet(), lambda: DPText( default_textStyle, ' ' ), 0, ListViewLayout.TrailingSeparator.NEVER )
 
 verticalInline_listViewLayout = VerticalInlineListViewLayout( VBoxStyleSheet( VTypesetting.ALIGN_WITH_TOP, HAlignment.LEFT, 0.0, False, 0.0 ), \
 						ParagraphStyleSheet(), 30.0, ListViewLayout.TrailingSeparator.NEVER )

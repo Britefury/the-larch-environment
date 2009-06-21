@@ -70,7 +70,7 @@ public class DPBin extends DPContainer
 	
 	
 
-	protected List<DPWidget> getChildren()
+	public List<DPWidget> getChildren()
 	{
 		return registeredChildren;
 	}

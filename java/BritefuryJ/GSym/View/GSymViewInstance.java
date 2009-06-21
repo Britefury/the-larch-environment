@@ -9,13 +9,13 @@ package BritefuryJ.GSym.View;
 import java.util.HashMap;
 
 import BritefuryJ.CommandHistory.CommandHistory;
+import BritefuryJ.DocPresent.DPPresentationArea;
+import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.EditHandler;
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Border.EmptyBorder;
-import BritefuryJ.DocPresent.ElementTree.Element;
-import BritefuryJ.DocPresent.ElementTree.ElementTree;
-import BritefuryJ.DocPresent.ElementTree.Caret.ElementCaret;
-import BritefuryJ.DocPresent.ElementTree.Selection.ElementSelection;
+import BritefuryJ.DocPresent.Caret.Caret;
+import BritefuryJ.DocPresent.Selection.Selection;
 import BritefuryJ.DocTree.DocTree;
 import BritefuryJ.DocTree.DocTreeNode;
 import BritefuryJ.DocView.DVNode;
@@ -40,7 +40,7 @@ public class GSymViewInstance
 		}
 
 
-		public Element createNodeElement(DVNode viewNode, DocTreeNode treeNode)
+		public DPWidget createNodeElement(DVNode viewNode, DocTreeNode treeNode)
 		{
 			// Create the node view instance
 			GSymNodeViewInstance nodeViewInstance = new GSymNodeViewInstance( viewInstance, viewNode );
@@ -49,7 +49,7 @@ public class GSymViewInstance
 			//return nodeViewFunction.createElement( treeNode, nodeViewInstance, state );
 			
 			viewInstance.getView().profile_startPython();
-			Element e = nodeViewFunction.createElement( treeNode, nodeViewInstance, state );
+			DPWidget e = nodeViewFunction.createElement( treeNode, nodeViewInstance, state );
 			viewInstance.getView().profile_stopPython();
 			return e;
 		}
@@ -120,12 +120,12 @@ public class GSymViewInstance
 	private DocTreeNode treeRootNode;
 	private GSymNodeViewFunction generalNodeViewFunction;
 	private DocView view;
-	private ElementTree elementTree;
+	private DPPresentationArea elementTree;
 	private HashMap<Float, Border> indentationBorders;
 	private HashMap<NodeContentsFactoryKey, NodeContentsFactory> nodeContentsFactories;
 	
 	
-	public GSymViewInstance(DocTree tree, DocTreeNode treeRootNode, ElementTree elementTree, GSymViewFactory viewFactory, CommandHistory commandHistory)
+	public GSymViewInstance(DocTree tree, DocTreeNode treeRootNode, DPPresentationArea elementTree, GSymViewFactory viewFactory, CommandHistory commandHistory)
 	{
 		this.tree = tree;
 		this.treeRootNode = treeRootNode;
@@ -196,12 +196,12 @@ public class GSymViewInstance
 	}
 	
 	
-	public ElementCaret getCaret()
+	public Caret getCaret()
 	{
 		return elementTree.getCaret();
 	}
 	
-	public ElementSelection getSelection()
+	public Selection getSelection()
 	{
 		return elementTree.getSelection();
 	}
@@ -214,7 +214,7 @@ public class GSymViewInstance
 		return view;
 	}
 	
-	public ElementTree getElementTree()
+	public DPPresentationArea getElementTree()
 	{
 		return elementTree;
 	}

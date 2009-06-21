@@ -16,7 +16,6 @@ import java.util.WeakHashMap;
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Caret.Caret;
-import BritefuryJ.DocPresent.ElementTree.Element;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleSheets.ContentLeafStyleSheet;
 import BritefuryJ.Math.Point2;
@@ -413,41 +412,37 @@ public abstract class DPContentLeaf extends DPWidget
 	
 	protected void moveMarkerHome(Marker marker)
 	{
-		if ( element != null )
+		DPSegment segment = null;
+		DPContentLeaf homeElement = null;
+		segment = getSegment();
+		homeElement = segment != null  ?  segment.getFirstEditableEntryLeafInSubtree()  :  null;
+		if ( segment != null  &&  this == homeElement  &&  isMarkerAtStart( marker ) )
 		{
-			Element segment = null, homeElement = null;
-			segment = element.getSegment();
+			segment = segment.getParent().getSegment();
 			homeElement = segment != null  ?  segment.getFirstEditableEntryLeafInSubtree()  :  null;
-			if ( segment != null  &&  element == homeElement  &&  isMarkerAtStart( marker ) )
-			{
-				segment = segment.getParent().getSegment();
-				homeElement = segment != null  ?  segment.getFirstEditableEntryLeafInSubtree()  :  null;
-			}
-			
-			if ( homeElement != null )
-			{
-				homeElement.getWidget().moveMarkerToStart( marker );
-			}
+		}
+		
+		if ( homeElement != null )
+		{
+			homeElement.moveMarkerToStart( marker );
 		}
 	}
 	
 	protected void moveMarkerEnd(Marker marker)
 	{
-		if ( element != null )
+		DPSegment segment = null;
+		DPContentLeaf endElement = null;
+		segment = getSegment();
+		endElement = segment != null  ?  segment.getLastEditableEntryLeafInSubtree()  :  null;
+		if ( segment != null  &&  this == endElement  &&  isMarkerAtEnd( marker ) )
 		{
-			Element segment = null, endElement = null;
-			segment = element.getSegment();
+			segment = segment.getParent().getSegment();
 			endElement = segment != null  ?  segment.getLastEditableEntryLeafInSubtree()  :  null;
-			if ( segment != null  &&  element == endElement  &&  isMarkerAtEnd( marker ) )
-			{
-				segment = segment.getParent().getSegment();
-				endElement = segment != null  ?  segment.getLastEditableEntryLeafInSubtree()  :  null;
-			}
-			
-			if ( endElement != null )
-			{
-				endElement.getWidget().moveMarkerToEnd( marker );
-			}
+		}
+		
+		if ( endElement != null )
+		{
+			endElement.moveMarkerToEnd( marker );
 		}
 	}
 	

@@ -8,8 +8,8 @@ package BritefuryJ.DocView;
 
 import java.util.Arrays;
 
-import BritefuryJ.DocPresent.ElementTree.Element;
-import BritefuryJ.DocPresent.ElementTree.VBoxElement;
+import BritefuryJ.DocPresent.DPVBox;
+import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.VTypesetting;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
@@ -37,7 +37,7 @@ public class DocView implements DVNode.NodeRefreshListener
 	private DVNode.NodeElementChangeListener elementChangeListener;
 	private boolean bRefreshRequired;
 	private RefreshListener refreshListener;
-	private VBoxElement rootBox;
+	private DPVBox rootBox;
 	
 	
 	private boolean bProfilingEnabled;
@@ -97,14 +97,14 @@ public class DocView implements DVNode.NodeRefreshListener
 	}
 	
 	
-	public Element getRootViewElement()
+	public DPWidget getRootViewElement()
 	{
 		if ( rootBox == null )
 		{
 			performRefresh();
 			DVNode rootView = getRootView();
-			rootBox = new VBoxElement( rootBoxStyle );
-			rootBox.setChildren( Arrays.asList( new Element[] { rootView.getElement() } ) );
+			rootBox = new DPVBox( rootBoxStyle );
+			rootBox.setChildren( Arrays.asList( new DPWidget[] { rootView.getElement() } ) );
 		}
 		return rootBox;
 	}

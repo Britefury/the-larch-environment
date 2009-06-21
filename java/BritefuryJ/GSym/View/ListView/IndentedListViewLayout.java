@@ -6,10 +6,10 @@
 //##************************
 package BritefuryJ.GSym.View.ListView;
 
+import BritefuryJ.DocPresent.DPBorder;
+import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Border.EmptyBorder;
-import BritefuryJ.DocPresent.ElementTree.BorderElement;
-import BritefuryJ.DocPresent.ElementTree.Element;
 
 abstract class IndentedListViewLayout extends ListViewLayout
 {
@@ -30,11 +30,11 @@ abstract class IndentedListViewLayout extends ListViewLayout
 	}
 	
 	
-	protected Element indent(Element child)
+	protected DPWidget indent(DPWidget child)
 	{
 		if ( indentationBorder != null )
 		{
-			BorderElement indent = new BorderElement( indentationBorder );
+			DPBorder indent = new DPBorder( indentationBorder );
 			indent.setChild( child );
 			return indent;
 		}

@@ -241,7 +241,7 @@ public class DPScript extends DPContainer
 	
 	
 	
-	protected List<DPWidget> getChildren()
+	public List<DPWidget> getChildren()
 	{
 		return Arrays.asList( children );
 	}
