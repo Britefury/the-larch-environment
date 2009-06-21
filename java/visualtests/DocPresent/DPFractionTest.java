@@ -9,12 +9,14 @@ package visualtests.DocPresent;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.util.Arrays;
 
 import javax.swing.JFrame;
 
 import BritefuryJ.DocPresent.DPFraction;
 import BritefuryJ.DocPresent.DPHBox;
 import BritefuryJ.DocPresent.DPPresentationArea;
+import BritefuryJ.DocPresent.DPSpan;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
@@ -40,20 +42,23 @@ public class DPFractionTest
 	}
 
 	
-	protected DPWidget makeFraction(String numeratorText, String denominatorText)
+	protected DPWidget makeFraction(DPWidget num, DPWidget denom)
 	{
-		Font f0 = new Font( "Sans serif", Font.PLAIN, 16 );
-		TextStyleSheet s0 = new TextStyleSheet( f0, new Color( 0.0f, 0.5f, 0.0f ) );
-		TextStyleSheet s1 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 10 ), Color.blue );
-		TextStyleSheet s2 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 24 ), Color.red );
-		DPText num = new DPText( s0, numeratorText );
-		DPText denom = new DPText( s0, denominatorText );
-		
 		DPFraction frac = new DPFraction();
 		
 		frac.setNumeratorChild( num );
 		frac.setDenominatorChild( denom );
 
+		return frac;
+	}
+
+	protected DPWidget makeFractionLine(DPWidget num, DPWidget denom)
+	{
+		TextStyleSheet s1 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 10 ), Color.blue );
+		TextStyleSheet s2 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 24 ), Color.red );
+		
+		DPWidget frac = makeFraction( num, denom );
+		
 		DPText labelA = new DPText( s1, "Label A yYgGjJpPqQ" );
 		DPText labelB = new DPText( s2, "Label B yYgGjJpPqQ" );
 		
@@ -66,18 +71,37 @@ public class DPFractionTest
 		return box;
 	}
 
+	protected DPWidget span(DPWidget... x)
+	{
+		DPSpan s = new DPSpan();
+		s.setChildren( Arrays.asList( x ) );
+		return s;
+	}
 	
 	
 	protected DPWidget createContentNode()
 	{
-		VBoxStyleSheet boxs = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.LEFT, 0.0, false, 0.0 );
+		TextStyleSheet s0 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 16 ), new Color( 0.0f, 0.5f, 0.0f ) );
+		TextStyleSheet blackStyle = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 24 ), Color.black );
+
+		VBoxStyleSheet boxs = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.LEFT, 10.0, false, 0.0 );
 		DPVBox box = new DPVBox( boxs );
 		
-		box.append( makeFraction( "a", "p" ) );
-		box.append( makeFraction( "a", "p+q" ) );
-		box.append( makeFraction( "a+b", "p" ) );
-		box.append( makeFraction( "a+b", "p+q" ) );
+		box.append( makeFractionLine( makeText( "a", s0 ), makeText( "p", s0 ) ) );
+		box.append( makeFractionLine( makeText( "a", s0 ), makeText( "p+q", s0 ) ) );
+		box.append( makeFractionLine( makeText( "a+b", s0 ), makeText( "p", s0 ) ) );
+		box.append( makeFractionLine( makeText( "a+b", s0 ), makeText( "p+q", s0 ) ) );
+
+		box.append( makeText( "---", blackStyle ) );
 		
+		box.append( makeFractionLine( span( makeText( "a+", s0 ), makeFraction( makeText( "x", s0 ), makeText( "y", s0 ) ) ),
+				makeText( "p+q", s0 ) ) );
+		box.append( makeFractionLine( span( makeFraction( makeText( "x", s0 ), makeText( "y", s0 ) ),  makeText( "+b", s0 ) ),
+				makeText( "p+q", s0 ) ) );
+		box.append( makeFractionLine( makeText( "a+b", s0 ),
+				span( makeText( "p+", s0 ), makeFraction( makeText( "x", s0 ), makeText( "y", s0 ) ) ) ) );
+		box.append( makeFractionLine( makeText( "a+b", s0 ),
+				span( makeFraction( makeText( "x", s0 ), makeText( "y", s0 ) ),  makeText( "+q", s0 ) ) ) );
 		
 		return box;
 	}

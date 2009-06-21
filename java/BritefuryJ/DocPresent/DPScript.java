@@ -15,6 +15,7 @@ import BritefuryJ.DocPresent.Layout.LAllocBox;
 import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Layout.ScriptLayout;
 import BritefuryJ.DocPresent.StyleSheets.ScriptStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.Math.Point2;
 
 
@@ -37,21 +38,29 @@ public class DPScript extends DPContainer
 	
 	
 	protected DPWidget[] children;
+	protected DPSegment segs[];
+	protected DPParagraph paras[];
 	protected LReqBox columnBoxes[];
+	TextStyleSheet segmentTextStyleSheet;
 	protected double rowBaselineY[];
 	
 	
 	
 	public DPScript()
 	{
-		this( ScriptStyleSheet.defaultStyleSheet );
+		this( ScriptStyleSheet.defaultStyleSheet, TextStyleSheet.defaultStyleSheet );
 	}
 	
-	public DPScript(ScriptStyleSheet styleSheet)
+	public DPScript(ScriptStyleSheet styleSheet, TextStyleSheet segmentTextStyleSheet)
 	{
 		super( styleSheet );
 		
+		this.segmentTextStyleSheet = segmentTextStyleSheet;
+		
 		children = new DPWidget[NUMCHILDREN];
+		segs = new DPSegment[NUMCHILDREN];
+		paras = new DPParagraph[NUMCHILDREN];
+
 		columnBoxes = new LReqBox[3];
 		columnBoxes[0] = new LReqBox();
 		columnBoxes[1] = new LReqBox();
@@ -66,30 +75,74 @@ public class DPScript extends DPContainer
 		return children[slot];
 	}
 	
+	public DPWidget getWrappedChild(int slot)
+	{
+		return paras[slot];
+	}
+	
 	public void setChild(int slot, DPWidget child)
 	{
 		DPWidget existingChild = children[slot];
 		if ( child != existingChild )
 		{
-			if ( existingChild != null )
+			boolean bSegmentRequired = child != null;
+			boolean bSegmentPresent = existingChild != null;
+
+			if ( bSegmentRequired  &&  !bSegmentPresent )
 			{
-				unregisterChild( existingChild );
-				registeredChildren.remove( existingChild );
+				DPSegment seg = new DPSegment( segmentTextStyleSheet, isBeginGuardRequired( slot ), isEndGuardRequired( slot ) );
+				segs[slot] = seg;
+				DPParagraph para = new DPParagraph();
+				para.setChildren( Arrays.asList( new DPWidget[] { seg } ) );
+				paras[slot] = para;
+				
+				int insertIndex = 0;
+				for (int i = 0; i < slot; i++)
+				{
+					if ( children[i] != null )
+					{
+						insertIndex++;
+					}
+				}
+				
+				registeredChildren.add( insertIndex, para );
+				registerChild( para, null );
 			}
+
 			
 			children[slot] = child;
-			
 			if ( child != null )
 			{
-				registeredChildren.add( child );
-				registerChild( child, null );
+				segs[slot].setChild( child );
 			}
+			
+			
+			if ( bSegmentPresent  &&  !bSegmentRequired )
+			{
+				DPParagraph para = paras[slot];
+				unregisterChild( para );
+				registeredChildren.remove( para );
+				segs[slot] = null;
+				paras[slot] = null;
+			}
+			
+			
+			refreshSegmentGuards();				
+
 			
 			onChildListModified();
 			queueResize();
 		}
 	}
 	
+	
+	private void refreshSegmentGuards()
+	{
+		if ( children[MAIN] != null )
+		{
+			segs[MAIN].setGuardPolicy( isBeginGuardRequired( MAIN ), isEndGuardRequired( MAIN ) );
+		}
+	}
 	
 	
 	
@@ -116,6 +169,32 @@ public class DPScript extends DPContainer
 	public DPWidget getRightSubscriptChild()
 	{
 		return getChild( RIGHTSUB );
+	}
+	
+	
+	public DPWidget getWrappedMainChild()
+	{
+		return getWrappedChild( MAIN );
+	}
+	
+	public DPWidget getWrappedLeftSuperscriptChild()
+	{
+		return getWrappedChild( LEFTSUPER );
+	}
+	
+	public DPWidget getWrappedLeftSubscriptChild()
+	{
+		return getWrappedChild( LEFTSUB );
+	}
+	
+	public DPWidget getWrappedRightSuperscriptChild()
+	{
+		return getWrappedChild( RIGHTSUPER );
+	}
+	
+	public DPWidget getWrappedRightSubscriptChild()
+	{
+		return getWrappedChild( RIGHTSUB );
 	}
 	
 	
@@ -147,9 +226,9 @@ public class DPScript extends DPContainer
 
 	
 	
-	protected double getChildScale(DPWidget child)
+	protected double getInternalChildScale(DPWidget child)
 	{
-		return child == children[MAIN]  ?  1.0  :  childScale;
+		return child == paras[MAIN]  ?  1.0  :  childScale;
 	}
 	
 
@@ -164,17 +243,7 @@ public class DPScript extends DPContainer
 	
 	protected List<DPWidget> getChildren()
 	{
-		ArrayList<DPWidget> ch = new ArrayList<DPWidget>();
-		
-		for (int slot = 0; slot < NUMCHILDREN; slot++)
-		{
-			if ( children[slot] != null )
-			{
-				ch.add( children[slot] );
-			}
-		}
-		
-		return ch;
+		return Arrays.asList( children );
 	}
 
 	
@@ -207,6 +276,29 @@ public class DPScript extends DPContainer
 	}
 	
 	
+	private boolean isBeginGuardRequired(int slot)
+	{
+		if ( slot == MAIN )
+		{
+			return hasLeftChild();
+		}
+		else
+		{
+			return true;
+		}
+	}
+
+	private boolean isEndGuardRequired(int slot)
+	{
+		if ( slot == MAIN )
+		{
+			return hasRightChild();
+		}
+		else
+		{
+			return true;
+		}
+	}
 	
 
 	protected void updateRequisitionX()
@@ -216,11 +308,11 @@ public class DPScript extends DPContainer
 		{
 			if ( i != MAIN )
 			{
-				boxes[i] = children[i] != null  ?  children[i].refreshRequisitionX().scaled( childScale )  :  null;
+				boxes[i] = paras[i] != null  ?  paras[i].refreshRequisitionX().scaled( childScale )  :  null;
 			}
 			else
 			{
-				boxes[i] = children[i] != null  ?  children[i].refreshRequisitionX()  :  null;
+				boxes[i] = paras[i] != null  ?  paras[i].refreshRequisitionX()  :  null;
 			}
 		}
 		
@@ -234,11 +326,11 @@ public class DPScript extends DPContainer
 		{
 			if ( i != MAIN )
 			{
-				boxes[i] = children[i] != null  ?  children[i].refreshRequisitionY().scaled( childScale )  :  null;
+				boxes[i] = paras[i] != null  ?  paras[i].refreshRequisitionY().scaled( childScale )  :  null;
 			}
 			else
 			{
-				boxes[i] = children[i] != null  ?  children[i].refreshRequisitionY()  :  null;
+				boxes[i] = paras[i] != null  ?  paras[i].refreshRequisitionY()  :  null;
 			}
 		}
 		
@@ -260,14 +352,14 @@ public class DPScript extends DPContainer
 		{
 			if ( i != MAIN )
 			{
-				reqBoxes[i] = children[i] != null  ?  children[i].layoutReqBox.scaled( childScale )  :  null;
+				reqBoxes[i] = paras[i] != null  ?  paras[i].layoutReqBox.scaled( childScale )  :  null;
 			}
 			else
 			{
-				reqBoxes[i] = children[i] != null  ?  children[i].layoutReqBox  :  null;
+				reqBoxes[i] = paras[i] != null  ?  paras[i].layoutReqBox  :  null;
 			}
-			allocBoxes[i] = children[i] != null  ?  children[i].layoutAllocBox  :  null;
-			prevChildWidths[i] = children[i] != null  ?  children[i].getAllocationX()  :  0.0;
+			allocBoxes[i] = paras[i] != null  ?  paras[i].layoutAllocBox  :  null;
+			prevChildWidths[i] = paras[i] != null  ?  paras[i].getAllocationX()  :  0.0;
 		}
 		
 		ScriptLayout.allocateX( layoutReqBox, reqBoxes[LEFTSUPER], reqBoxes[LEFTSUB], reqBoxes[MAIN], reqBoxes[RIGHTSUPER], reqBoxes[RIGHTSUB], columnBoxes,
@@ -276,13 +368,13 @@ public class DPScript extends DPContainer
 		
 		for (int i = 0; i < NUMCHILDREN; i++)
 		{
-			if ( children[i] != null )
+			if ( paras[i] != null )
 			{
 				if ( i != MAIN )
 				{
 					allocBoxes[i].scaleAllocationX( 1.0 / childScale );
 				}
-				children[i].refreshAllocationX( prevChildWidths[i] );
+				paras[i].refreshAllocationX( prevChildWidths[i] );
 			}
 		}
 	}
@@ -299,14 +391,14 @@ public class DPScript extends DPContainer
 		{
 			if ( i != MAIN )
 			{
-				reqBoxes[i] = children[i] != null  ?  children[i].layoutReqBox.scaled( childScale )  :  null;
+				reqBoxes[i] = paras[i] != null  ?  paras[i].layoutReqBox.scaled( childScale )  :  null;
 			}
 			else
 			{
-				reqBoxes[i] = children[i] != null  ?  children[i].layoutReqBox  :  null;
+				reqBoxes[i] = paras[i] != null  ?  paras[i].layoutReqBox  :  null;
 			}
-			allocBoxes[i] = children[i] != null  ?  children[i].layoutAllocBox  :  null;
-			prevChildHeights[i] = children[i] != null  ?  children[i].getAllocationY()  :  0.0;
+			allocBoxes[i] = paras[i] != null  ?  paras[i].layoutAllocBox  :  null;
+			prevChildHeights[i] = paras[i] != null  ?  paras[i].getAllocationY()  :  0.0;
 		}
 		
 		ScriptLayout.allocateY( layoutReqBox, reqBoxes[LEFTSUPER], reqBoxes[LEFTSUB], reqBoxes[MAIN], reqBoxes[RIGHTSUPER], reqBoxes[RIGHTSUB], rowBaselineY,
@@ -315,13 +407,13 @@ public class DPScript extends DPContainer
 		
 		for (int i = 0; i < NUMCHILDREN; i++)
 		{
-			if ( children[i] != null )
+			if ( paras[i] != null )
 			{
 				if ( i != MAIN )
 				{
 					allocBoxes[i].scaleAllocationY( 1.0 / childScale );
 				}
-				children[i].refreshAllocationY( prevChildHeights[i] );
+				paras[i].refreshAllocationY( prevChildHeights[i] );
 			}
 		}
 	}
@@ -335,9 +427,9 @@ public class DPScript extends DPContainer
 		ArrayList<DPWidget> entries = new ArrayList<DPWidget>();
 		for (int slot: slots)
 		{
-			if ( children[slot] != null )
+			if ( paras[slot] != null )
 			{
-				entries.add( children[slot] );
+				entries.add( paras[slot] );
 			}
 		}
 		
@@ -568,17 +660,7 @@ public class DPScript extends DPContainer
 	
 	protected List<DPWidget> horizontalNavigationList()
 	{
-		ArrayList<DPWidget> xs = new ArrayList<DPWidget>();
-		
-		for (DPWidget x: children)
-		{
-			if ( x != null )
-			{
-				xs.add( x );
-			}
-		}
-		
-		return xs;
+		return registeredChildren;
 	}
 	
 	

@@ -40,6 +40,7 @@ import javax.swing.TransferHandler;
 
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Caret.CaretListener;
+import BritefuryJ.DocPresent.TreeExplorer.ElementTreeExplorer;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Event.PointerScrollEvent;
@@ -432,7 +433,12 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 	private boolean bStructureRefreshQueued;
 	
 	
-		
+	protected DPPresentationArea metaArea;
+	protected ElementTreeExplorer explorer;
+
+	
+	
+	
 	
 	public DPPresentationArea()
 	{
@@ -526,6 +532,35 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 		return !selection.isEmpty();
 	}
 	
+	
+	
+	public String getTextRepresentationInSelection(Selection s)
+	{
+		if ( s.isEmpty() )
+		{
+			return null;
+		}
+		else
+		{
+			DPContainer commonRoot = s.getCommonRoot();
+			ArrayList<DPWidget> startPath = s.getStartPathFromCommonRoot();
+			ArrayList<DPWidget> endPath = s.getEndPathFromCommonRoot();
+			
+			if ( commonRoot != null )
+			{
+				StringBuilder builder = new StringBuilder();
+
+				commonRoot.getTextRepresentationBetweenPaths( builder, s.getStartMarker(), startPath, 0, s.getEndMarker(), endPath, 0 );
+			
+				return builder.toString();
+			}
+			else
+			{
+				return ((DPContentLeaf)startPath.get( 0 )).getTextRepresentationBetweenMarkers( s.getStartMarker(), s.getEndMarker() );
+			}
+		}
+	}
+
 	
 	
 	
@@ -1591,5 +1626,47 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 		{
 			editHandler.replaceSelection( replacement );
 		}
+	}
+	
+	
+	
+	
+	//
+	//
+	// META-TREE METHODS
+	//
+	//
+
+	public DPPresentationArea initialiseMetaTree()
+	{
+		if ( metaArea == null )
+		{
+			metaArea = new DPPresentationArea();
+			metaArea.disableHorizontalClamping();
+			metaArea.setChild( initialiseMetaElement() );
+		}
+		
+		return metaArea;
+	}
+	
+	public void shutdownMetaTree()
+	{
+		if ( metaArea != null )
+		{
+			shutdownMetaElement();
+			metaArea = null;
+		}
+	}
+	
+	
+	
+	
+	public ElementTreeExplorer createTreeExplorer()
+	{
+		if ( explorer == null  ||  !explorer.isVisible() )
+		{
+			explorer = new ElementTreeExplorer( this );
+		}
+		return explorer;
 	}
 }

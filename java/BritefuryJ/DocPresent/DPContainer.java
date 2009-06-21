@@ -13,13 +13,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import BritefuryJ.DocPresent.Border.EmptyBorder;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Event.PointerScrollEvent;
 import BritefuryJ.DocPresent.Input.PointerInterface;
+import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.PackingParams;
+import BritefuryJ.DocPresent.Layout.VTypesetting;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
@@ -92,7 +96,7 @@ public abstract class DPContainer extends DPWidget
 	// Geometry methods
 	//
 	
-	protected double getChildScale(DPWidget child)
+	protected double getInternalChildScale(DPWidget child)
 	{
 		return 1.0;
 	}
@@ -137,6 +141,7 @@ public abstract class DPContainer extends DPWidget
 	protected void onChildListModified()
 	{
 		onSubtreeStructureChanged();
+		refreshMetaElement();
 	}
 	
 	
@@ -163,12 +168,17 @@ public abstract class DPContainer extends DPWidget
 	}
 	
 	
-	protected abstract List<DPWidget> getChildren();
+	protected List<DPWidget> getInternalChildren()
+	{
+		return registeredChildren;
+	}
 	
+	protected abstract List<DPWidget> getChildren();
+
 	
 	public boolean areChildrenInOrder(DPWidget child0, DPWidget child1)
 	{
-		List<DPWidget> children = getChildren();
+		List<DPWidget> children = getInternalChildren();
 		int index0 = children.indexOf( child0 );
 		int index1 = children.indexOf( child1 );
 		
@@ -207,7 +217,7 @@ public abstract class DPContainer extends DPWidget
 	
 	protected void drawSubtreeSelection(Graphics2D graphics, Marker startMarker, List<DPWidget> startPath, Marker endMarker, List<DPWidget> endPath)
 	{
-		List<DPWidget> children = getChildren();
+		List<DPWidget> children = getInternalChildren();
 		
 		int startIndex = startMarker != null  ?  children.indexOf( startPath.get( 1 ) )  :  0;
 		int endIndex = endMarker != null  ?  children.indexOf( endPath.get( 1) )  :  children.size() - 1;
@@ -642,7 +652,7 @@ public abstract class DPContainer extends DPWidget
 	{
 		if ( branchFilter == null  ||  branchFilter.testElement( this ) )
 		{
-			for (DPWidget child: getChildren())
+			for (DPWidget child: getInternalChildren())
 			{
 				DPContentLeaf leaf = child.getFirstLeafInSubtree( branchFilter, leafFilter );
 				if ( leaf != null )
@@ -662,7 +672,7 @@ public abstract class DPContainer extends DPWidget
 	{
 		if ( branchFilter == null  ||  branchFilter.testElement( this ) )
 		{
-			List<DPWidget> children = getChildren();
+			List<DPWidget> children = getInternalChildren();
 			for (int i = children.size() - 1; i >= 0; i--)
 			{
 				DPContentLeaf leaf = children.get( i ).getLastLeafInSubtree( branchFilter, leafFilter );
@@ -686,7 +696,7 @@ public abstract class DPContainer extends DPWidget
 	{
 		if ( subtreeRootFilter == null  ||  subtreeRootFilter.testElement( this ) )
 		{
-			List<DPWidget> children = getChildren();
+			List<DPWidget> children = getInternalChildren();
 			int index = children.indexOf( child );
 			if ( index != -1 )
 			{
@@ -714,7 +724,7 @@ public abstract class DPContainer extends DPWidget
 	{
 		if ( subtreeRootFilter == null  ||  subtreeRootFilter.testElement( this ) )
 		{
-			List<DPWidget> children = getChildren();
+			List<DPWidget> children = getInternalChildren();
 			int index = children.indexOf( child );
 			if ( index != -1 )
 			{
@@ -1246,7 +1256,7 @@ public abstract class DPContainer extends DPWidget
 	public DPWidget getChildAtTextRepresentationPosition(int position)
 	{
 		int offset = 0;
-		for (DPWidget c: getChildren())
+		for (DPWidget c: getInternalChildren())
 		{
 			int end = offset + c.getTextRepresentationLength();
 			if ( position >= offset  &&  position < end )
@@ -1263,7 +1273,7 @@ public abstract class DPContainer extends DPWidget
 	public int getTextRepresentationOffsetOfChild(DPWidget elem)
 	{
 		int offset = 0;
-		for (DPWidget c: getChildren())
+		for (DPWidget c: getInternalChildren())
 		{
 			if ( c == elem )
 			{
@@ -1315,7 +1325,7 @@ public abstract class DPContainer extends DPWidget
 	protected String computeSubtreeTextRepresentation()
 	{
 		StringBuilder builder = new StringBuilder();
-		for (DPWidget child: getChildren())
+		for (DPWidget child: getInternalChildren())
 		{
 			builder.append( child.getTextRepresentation() );
 		}
@@ -1327,7 +1337,7 @@ public abstract class DPContainer extends DPWidget
 	public void getTextRepresentationFromStartToPath(StringBuilder builder, Marker marker, ArrayList<DPWidget> path, int pathMyIndex)
 	{
 		DPWidget pathChild = path.get( pathMyIndex + 1 );
-		for (DPWidget child: getChildren())
+		for (DPWidget child: getInternalChildren())
 		{
 			if ( child != pathChild )
 			{
@@ -1343,7 +1353,7 @@ public abstract class DPContainer extends DPWidget
 	
 	public void getTextRepresentationFromPathToEnd(StringBuilder builder, Marker marker, ArrayList<DPWidget> path, int pathMyIndex)
 	{
-		List<DPWidget> children = getChildren();
+		List<DPWidget> children = getInternalChildren();
 		int pathChildIndex = pathMyIndex + 1;
 		DPWidget pathChild = path.get( pathChildIndex );
 		int childIndex = children.indexOf( pathChild );
@@ -1362,7 +1372,7 @@ public abstract class DPContainer extends DPWidget
 	public void getTextRepresentationBetweenPaths(StringBuilder builder, Marker startMarker, ArrayList<DPWidget> startPath, int startPathMyIndex,
 			Marker endMarker, ArrayList<DPWidget> endPath, int endPathMyIndex)
 	{
-		List<DPWidget> children = getChildren();
+		List<DPWidget> children = getInternalChildren();
 		
 	
 		int startPathChildIndex = startPathMyIndex + 1;
@@ -1393,7 +1403,7 @@ public abstract class DPContainer extends DPWidget
 			parent.getTextRepresentationFromStartOfRootToMarkerFromChild( builder, marker, root, this );
 		}
 		
-		for (DPWidget child: getChildren())
+		for (DPWidget child: getInternalChildren())
 		{
 			if ( child != fromChild )
 			{
@@ -1408,7 +1418,7 @@ public abstract class DPContainer extends DPWidget
 	
 	protected void getTextRepresentationFromMarkerToEndOfRootFromChild(StringBuilder builder, Marker marker, DPWidget root, DPWidget fromChild)
 	{
-		List<DPWidget> children = getChildren();
+		List<DPWidget> children = getInternalChildren();
 		int childIndex = children.indexOf( fromChild );
 		
 		if ( (childIndex + 1) < children.size() )
@@ -1423,6 +1433,80 @@ public abstract class DPContainer extends DPWidget
 		{
 			parent.getTextRepresentationFromMarkerToEndOfRootFromChild( builder, marker, root, this );
 		}
+	}
+
+	
+	
+	
+	
+	//
+	// Meta-element
+	//
+	
+	static EmptyBorder metaIndentBorder = new EmptyBorder( 25.0, 0.0, 0.0, 0.0 );
+	static VBoxStyleSheet metaVBoxStyle = new VBoxStyleSheet( VTypesetting.ALIGN_WITH_BOTTOM, HAlignment.LEFT, 0.0, false, 0.0 );
+	
+	public DPBorder getMetaHeaderBorderWidget()
+	{
+		if ( metaElement != null )
+		{
+			DPVBox metaVBox = (DPVBox)metaElement;
+			return (DPBorder)metaVBox.get( 0 );
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	public DPWidget createMetaElement()
+	{
+		DPVBox metaChildrenVBox = new DPVBox( metaVBoxStyle );
+		for (DPWidget child: getChildren())
+		{
+			DPWidget metaChild = child.initialiseMetaElement();
+			metaChildrenVBox.append( metaChild );
+		}
+		
+		DPBorder indentMetaChildren = new DPBorder( metaIndentBorder );
+		indentMetaChildren.setChild( metaChildrenVBox );
+		
+		DPVBox metaVBox = new DPVBox( metaVBoxStyle );
+		metaVBox.append( createMetaHeader() );
+		metaVBox.append( indentMetaChildren );
+		
+		return metaVBox;
+	}
+	
+	public void refreshMetaElement()
+	{
+		if ( metaElement != null )
+		{
+			DPVBox metaVBox = (DPVBox)metaElement;
+			
+			DPBorder indentMetaChildren = (DPBorder)metaVBox.get( 1 );
+			DPVBox metaChildrenVBox = (DPVBox)indentMetaChildren.getChild();
+
+			ArrayList<DPWidget> childMetaElements = new ArrayList<DPWidget>();
+			for (DPWidget child: getChildren())
+			{
+				DPWidget metaChild = child.initialiseMetaElement();
+				childMetaElements.add( metaChild );
+			}
+			metaChildrenVBox.setChildren( childMetaElements );
+		}
+	}
+
+	public void shutdownMetaElement()
+	{
+		if ( metaElement != null )
+		{
+			for (DPWidget child: getChildren())
+			{
+				child.shutdownMetaElement();
+			}
+		}
+		super.shutdownMetaElement();
 	}
 
 	

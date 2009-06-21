@@ -734,7 +734,7 @@ public class DPTable extends DPContainer
 	
 	protected List<DPWidget> horizontalNavigationList()
 	{
-		return getChildren();
+		return getInternalChildren();
 	}
 	
 

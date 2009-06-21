@@ -7,36 +7,23 @@
 //##************************
 package BritefuryJ.DocPresent.ElementTree;
 
-import java.awt.Color;
-import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
 
-import BritefuryJ.DocPresent.DPBin;
-import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPContentLeaf;
-import BritefuryJ.DocPresent.DPHBox;
 import BritefuryJ.DocPresent.DPSegment;
-import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.ElementContext;
 import BritefuryJ.DocPresent.ElementKeyboardListener;
 import BritefuryJ.DocPresent.ElementTextRepresentationListener;
-import BritefuryJ.DocPresent.Border.Border;
-import BritefuryJ.DocPresent.Border.EmptyBorder;
 import BritefuryJ.DocPresent.ElementTree.Marker.ElementMarker;
-import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.Marker.Marker;
-import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 
 public abstract class Element
 {
 	protected DPWidget widget;
 	protected BranchElement parent;
 	protected ElementTree tree;
-	protected DPWidget metaElement;
-	protected String debugName;
 	
 	
 	
@@ -55,8 +42,6 @@ public abstract class Element
 		
 		parent = null;
 		tree = null;
-		metaElement = null;
-		debugName = null;
 	}
 	
 	
@@ -311,109 +296,8 @@ public abstract class Element
 	
 	
 	
-	//
-	// Meta-element
-	//
-	
-	protected static TextStyleSheet headerDebugTextStyle = new TextStyleSheet( new Font( "Sans serif", Font.BOLD, 14 ), new Color( 0.0f, 0.5f, 0.5f ) );
-	protected static TextStyleSheet headerDescriptionTextStyle = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 14 ), new Color( 0.0f, 0.0f, 0.75f ) );
-	protected static HBoxStyleSheet metaHeaderHBoxStyle = new HBoxStyleSheet( VAlignment.BASELINES, 10.0, false, 0.0 );
-	protected static EmptyBorder metaHeaderEmptyBorder = new EmptyBorder();
-
-
-	public DPWidget createMetaHeaderData()
-	{
-		return null;
-	}
-	
-	public DPWidget createMetaHeaderDebug()
-	{
-		if ( debugName != null )
-		{
-			return new DPText( headerDebugTextStyle, "<" + debugName + ">" );
-		}
-		else
-		{
-			return null;
-		}
-	}
-	
-	public DPWidget createMetaDescription()
-	{
-		String description = toString();
-		description = description.replace( "BritefuryJ.DocPresent.ElementTree.", "" );
-		return new DPText( headerDescriptionTextStyle, description );
-	}
-	
-	protected Border getMetaHeaderBorder()
-	{
-		return metaHeaderEmptyBorder;
-	}
-	
-	public DPWidget createMetaHeader()
-	{
-		DPHBox hbox = new DPHBox( metaHeaderHBoxStyle );
-		DPWidget data = createMetaHeaderData();
-		DPWidget debug = createMetaHeaderDebug();
-		DPWidget descr = createMetaDescription();
-		if ( data != null )
-		{
-			hbox.append( data );
-		}
-		if ( debug != null )
-		{
-			hbox.append( debug );
-		}
-		hbox.append( descr );
-		
-
-		DPBorder border = new DPBorder( getMetaHeaderBorder() );
-		border.setChild( hbox );
-		return border;
-	}
-	
-	public DPBorder getMetaHeaderBorderWidget()
-	{
-		if ( metaElement != null )
-		{
-			DPBin bin = (DPBin)metaElement;
-			return (DPBorder)bin.getChild();
-		}
-		else
-		{
-			return null;
-		}
-	}
-	
-	public DPWidget createMetaElement()
-	{
-		DPBin bin = new DPBin();
-		bin.setChild( createMetaHeader() );
-		return bin;
-	}
-	
-	public DPWidget initialiseMetaElement()
-	{
-		if ( metaElement == null )
-		{
-			metaElement = createMetaElement();
-		}
-		return metaElement;
-	}
-	
-	public void shutdownMetaElement()
-	{
-		metaElement = null;
-	}
-	
-	public DPWidget getMetaElement()
-	{
-		return metaElement;
-	}
-	
-	
 	public void setDebugName(String debugName)
 	{
-		this.debugName = debugName;
+		getWidget().setDebugName( debugName );
 	}
 }

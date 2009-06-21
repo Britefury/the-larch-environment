@@ -20,8 +20,9 @@ public class Marker
 	{
 		static final long serialVersionUID = 0L;
 		
-		public InvalidMarkerPosition()
+		public InvalidMarkerPosition(String message)
 		{
+			super( message );
 		}
 	}
 
@@ -261,7 +262,7 @@ public class Marker
 		int markerRange = w.getMarkerRange();
 		if ( position > markerRange )
 		{
-			throw new InvalidMarkerPosition();
+			throw new InvalidMarkerPosition( "Cannot place marker at " + position + ":" + bias + " - range is " + markerRange );
 		}
 		
 		if ( markerRange == 0 && position == 0 )
@@ -271,7 +272,7 @@ public class Marker
 		
 		if ( position == markerRange  &&  bias == Marker.Bias.END )
 		{
-			throw new InvalidMarkerPosition();
+			throw new InvalidMarkerPosition( "Cannot place marker at " + position + ":" + bias + " - range is " + markerRange );
 		}
 	}
 }
