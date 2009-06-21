@@ -20,7 +20,6 @@ from Britefury.Util.NodeUtil import *
 
 
 from BritefuryJ.DocPresent.StyleSheets import *
-from BritefuryJ.DocPresent.ElementTree import *
 from BritefuryJ.DocPresent import *
 
 from BritefuryJ.GSym.View import NodeElementChangeListenerDiff

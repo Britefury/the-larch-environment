@@ -409,7 +409,7 @@ public class DPTable extends DPContainer
 
 	
 	
-	protected List<DPWidget> getChildren()
+	public List<DPWidget> getChildren()
 	{
 		return registeredChildren;
 	}

@@ -15,12 +15,11 @@ import java.util.Arrays;
 import javax.swing.JFrame;
 
 import BritefuryJ.DocPresent.DPPresentationArea;
-import BritefuryJ.DocPresent.ElementTree.Element;
-import BritefuryJ.DocPresent.ElementTree.ElementFactory;
-import BritefuryJ.DocPresent.ElementTree.ElementTree;
-import BritefuryJ.DocPresent.ElementTree.TextElement;
-import BritefuryJ.DocPresent.ElementTree.VBoxElement;
-import BritefuryJ.DocPresent.ElementTree.WhitespaceElement;
+import BritefuryJ.DocPresent.DPText;
+import BritefuryJ.DocPresent.DPVBox;
+import BritefuryJ.DocPresent.DPWhitespace;
+import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.ElementFactory;
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.VTypesetting;
 import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
@@ -36,11 +35,11 @@ import BritefuryJ.GSym.View.ListView.VerticalListViewLayout;
 
 public class ListViewTest
 {
-	protected Element makeText(String text, TextStyleSheet styleSheet)
+	protected DPWidget makeText(String text, TextStyleSheet styleSheet)
 	{
 		if ( text != null )
 		{
-			return new TextElement( styleSheet, text );
+			return new DPText( styleSheet, text );
 		}
 		else
 		{
@@ -60,9 +59,9 @@ public class ListViewTest
 		}
 		
 		
-		public Element createElement()
+		public DPWidget createElement()
 		{
-			return new TextElement( styleSheet, text );
+			return new DPText( styleSheet, text );
 		}
 	}
 	
@@ -78,9 +77,9 @@ public class ListViewTest
 		}
 		
 		
-		public Element createElement(int index, Element child)
+		public DPWidget createElement(int index, DPWidget child)
 		{
-			return new TextElement( styleSheet, text );
+			return new DPText( styleSheet, text );
 		}
 	}
 	
@@ -94,41 +93,41 @@ public class ListViewTest
 		}
 		
 		
-		public Element createElement()
+		public DPWidget createElement()
 		{
-			return new WhitespaceElement( " ", spacing );
+			return new DPWhitespace( " ", spacing );
 		}
 	}
 	
 	
-	protected Element makeListView(ListViewLayout layout, String[] txt, String title, String beginDelim, String endDelim, String separator)
+	protected DPWidget makeListView(ListViewLayout layout, String[] txt, String title, String beginDelim, String endDelim, String separator)
 	{
 		TextStyleSheet s0 = new TextStyleSheet( new Font( "Sans serif", Font.BOLD, 16 ), Color.blue );
 		TextStyleSheet s1 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.black );
 		TextStyleSheet s2 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), new Color( 0.0f, 0.5f, 0.0f ) );
 
-		Element children[] = new TextElement[txt.length];
+		DPWidget children[] = new DPText[txt.length];
 		for (int i = 0; i < txt.length; i++)
 		{
-			children[i] = new TextElement( s1, txt[i] );
+			children[i] = new DPText( s1, txt[i] );
 		}
-		Element ls = layout.createListElement( Arrays.asList( children ), new TextElementFactory( beginDelim, s2 ), new TextElementFactory( endDelim, s2 ), new TextSeparatorElementFactory( separator, s2 ) );
+		DPWidget ls = layout.createListElement( Arrays.asList( children ), new TextElementFactory( beginDelim, s2 ), new TextElementFactory( endDelim, s2 ), new TextSeparatorElementFactory( separator, s2 ) );
 		
 		
-		Element titleElem = new TextElement( s0, title );
+		DPWidget titleElem = new DPText( s0, title );
 		
 		VBoxStyleSheet boxs = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.LEFT, 0.0, false, 0.0 );
-		VBoxElement vbox = new VBoxElement( boxs );
-		vbox.setChildren( Arrays.asList( new Element[] { titleElem, ls } ) );
+		DPVBox vbox = new DPVBox( boxs );
+		vbox.setChildren( Arrays.asList( new DPWidget[] { titleElem, ls } ) );
 		return vbox;
 	}
 
 	
-	protected Element createContentNode()
+	protected DPWidget createContentNode()
 	{
 		VBoxStyleSheet boxs = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.LEFT, 15.0, false, 0.0 );
-		VBoxElement box = new VBoxElement( boxs );
-		ArrayList<Element> children = new ArrayList<Element>();
+		DPVBox box = new DPVBox( boxs );
+		ArrayList<DPWidget> children = new ArrayList<DPWidget>();
 		
 
 		
@@ -162,12 +161,11 @@ public class ListViewTest
 		//This stops the app on window close.
 		frame.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
 		
-		ElementTree tree = new ElementTree();
+		DPPresentationArea area = new DPPresentationArea();
 
-		tree.getRoot().setChild( createContentNode() );
+		area.setChild( createContentNode() );
 	     
 	     
-		DPPresentationArea area = tree.getPresentationArea();
 		area.getComponent().setPreferredSize( new Dimension( 640, 480 ) );
 		frame.add( area.getComponent() );
 		frame.pack();

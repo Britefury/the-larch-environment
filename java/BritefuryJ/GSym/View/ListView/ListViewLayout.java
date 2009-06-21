@@ -8,19 +8,19 @@ package BritefuryJ.GSym.View.ListView;
 
 import java.util.List;
 
-import BritefuryJ.DocPresent.ElementTree.Element;
-import BritefuryJ.DocPresent.ElementTree.ElementFactory;
+import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.ElementFactory;
 
 public abstract class ListViewLayout
 {
 	public enum TrailingSeparator { NEVER, ONE_ELEMENT, ALWAYS };
 	
 
-	public abstract Element createListElement(List<Element> children, ElementFactory beginDelim, ElementFactory endDelim, SeparatorElementFactory separator);
+	public abstract DPWidget createListElement(List<DPWidget> children, ElementFactory beginDelim, ElementFactory endDelim, SeparatorElementFactory separator);
 	
 	
 	
-	protected boolean trailingSeparatorRequired(List<Element> children, TrailingSeparator trailingSeparator)
+	protected boolean trailingSeparatorRequired(List<DPWidget> children, TrailingSeparator trailingSeparator)
 	{
 		return children.size() > 0  &&  ( trailingSeparator == TrailingSeparator.ALWAYS  ||  ( trailingSeparator == TrailingSeparator.ONE_ELEMENT && children.size() == 1 ) );
 	}

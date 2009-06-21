@@ -349,7 +349,7 @@ public class DPFraction extends DPContainer
 	
 	
 	
-	protected List<DPWidget> getChildren()
+	public List<DPWidget> getChildren()
 	{
 		return Arrays.asList( children );
 	}

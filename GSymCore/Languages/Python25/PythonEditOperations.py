@@ -26,7 +26,6 @@ from BritefuryJ.DocTree import DocTreeNode, DocTreeList, DocTreeObject
 
 
 from BritefuryJ.DocPresent.StyleSheets import *
-from BritefuryJ.DocPresent.ElementTree import *
 from BritefuryJ.DocPresent import *
 
 

@@ -310,7 +310,7 @@ abstract public class DPContainerSequence extends DPContainer
 
 	
 	
-	protected List<DPWidget> getChildren()
+	public List<DPWidget> getChildren()
 	{
 		return registeredChildren;
 	}

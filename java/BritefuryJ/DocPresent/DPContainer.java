@@ -173,7 +173,7 @@ public abstract class DPContainer extends DPWidget
 		return registeredChildren;
 	}
 	
-	protected abstract List<DPWidget> getChildren();
+	public abstract List<DPWidget> getChildren();
 
 	
 	public boolean areChildrenInOrder(DPWidget child0, DPWidget child1)

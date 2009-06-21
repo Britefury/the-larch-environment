@@ -74,7 +74,7 @@ public class DPMathRoot extends DPContainer
 	
 	
 
-	protected List<DPWidget> getChildren()
+	public List<DPWidget> getChildren()
 	{
 		if ( child != null )
 		{

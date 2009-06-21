@@ -12,9 +12,9 @@ import BritefuryJ.Cell.Cell;
 import BritefuryJ.Cell.CellEvaluator;
 import BritefuryJ.Cell.CellInterface;
 import BritefuryJ.Cell.CellListener;
+import BritefuryJ.DocPresent.DPSpan;
+import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.ElementContext;
-import BritefuryJ.DocPresent.ElementTree.Element;
-import BritefuryJ.DocPresent.ElementTree.SpanElement;
 import BritefuryJ.DocTree.DocTreeNode;
 
 public class DVNode implements CellListener 
@@ -26,14 +26,14 @@ public class DVNode implements CellListener
 
 	public static interface NodeElementFactory
 	{
-		public Element createNodeElement(DVNode viewNode, DocTreeNode treeNode);
+		public DPWidget createNodeElement(DVNode viewNode, DocTreeNode treeNode);
 	}
 	
 	public static interface NodeElementChangeListener
 	{
 		public void reset(DocView view);
-		public void elementChangeFrom(DVNode node, Element e);
-		public void elementChangeTo(DVNode node, Element e);
+		public void elementChangeFrom(DVNode node, DPWidget e);
+		public void elementChangeTo(DVNode node, DPWidget e);
 	}
 	
 	public static interface NodeRefreshListener
@@ -54,8 +54,8 @@ public class DVNode implements CellListener
 	private DocTreeNode treeNode;
 	
 	private Cell elementCell;
-	private SpanElement proxyElement;
-	private Element element;
+	private DPSpan proxyElement;
+	private DPWidget element;
 	private NodeElementFactory elementFactory;
 	
 	private NodeElementChangeListener elementChangeListener;
@@ -85,7 +85,7 @@ public class DVNode implements CellListener
 		bRefreshRequired = true;
 		
 		
-		proxyElement = new SpanElement();
+		proxyElement = new DPSpan();
 		element = null;
 
 		elementFactory = null;
@@ -147,19 +147,19 @@ public class DVNode implements CellListener
 	//
 	//
 	
-	public Element getElementNoRefresh()
+	public DPWidget getElementNoRefresh()
 	{
 		return proxyElement;
 	}
 	
-	public Element getElement()
+	public DPWidget getElement()
 	{
 		refresh();
 		return proxyElement;
 	}
 	
 	
-	public Element getInnerElementNoRefresh()
+	public DPWidget getInnerElementNoRefresh()
 	{
 		return element;
 	}
@@ -239,7 +239,7 @@ public class DVNode implements CellListener
 		}
 
 		// Compute the element for this node, and refresh all children
-		Element e = (Element)elementCell.getValue();
+		DPWidget e = (DPWidget)elementCell.getValue();
 		
 		// Refresh each child
 		DVNode child = childrenHead;
@@ -274,7 +274,7 @@ public class DVNode implements CellListener
 	}
 	
 	
-	private Element computeNodeElement()
+	private DPWidget computeNodeElement()
 	{
 		view.profile_startJava();
 		// Unregister existing child relationships
@@ -293,7 +293,7 @@ public class DVNode implements CellListener
 		
 		if ( elementFactory != null )
 		{
-			Element e = elementFactory.createNodeElement( this, treeNode );
+			DPWidget e = elementFactory.createNodeElement( this, treeNode );
 			
 			// Register new child relationships
 			child = childrenHead;
@@ -314,19 +314,19 @@ public class DVNode implements CellListener
 	}
 
 	
-	private void updateNodeElement(Element e)
+	private void updateNodeElement(DPWidget e)
 	{
 		if ( e != element )
 		{
 			if ( e != null )
 			{
 				element = e;
-				proxyElement.setChildren( Arrays.asList( new Element[] { element } ) );
+				proxyElement.setChildren( Arrays.asList( new DPWidget[] { element } ) );
 			}
 			else
 			{
 				element = null;
-				proxyElement.setChildren( Arrays.asList( new Element[] {} ) );
+				proxyElement.setChildren( Arrays.asList( new DPWidget[] {} ) );
 			}
 		}
 	}

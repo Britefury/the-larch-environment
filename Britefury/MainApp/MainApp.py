@@ -27,7 +27,6 @@ from BritefuryJ.Utils.Profile import ProfileTimer
 from BritefuryJ.DocModel import DMIOReader, DMIOWriter, DMNode
 
 from BritefuryJ.DocPresent import *
-from BritefuryJ.DocPresent.ElementTree import *
 from BritefuryJ.DocPresent.StyleSheets import *
 
 from BritefuryJ.DocView import DocView
@@ -90,15 +89,14 @@ class MainAppDocView (DocView.RefreshListener):
 	def __init__(self, app):
 		self._app = app
 		
-		self._elementTree = ElementTree()
-		self._area = self._elementTree.getPresentationArea()
-		self._area.getComponent().setPreferredSize( Dimension( 640, 480 ) )
+		self._elementTree = DPPresentationArea()
+		self._elementTree.getComponent().setPreferredSize( Dimension( 640, 480 ) )
 		
 		self._view = None
 		
 		
 	def getComponent(self):
-		return self._area.getComponent()
+		return self._elementTree.getComponent()
 	
 		
 	def setUnit(self, unit):
@@ -106,14 +104,13 @@ class MainAppDocView (DocView.RefreshListener):
 			self._view = self.createView( unit )
 			self._view.setRefreshListener( self )
 			self._refreshView()
-			self._elementTree.getRoot().setChild( self._view.getRootViewElement() )
+			self._elementTree.setChild( self._view.getRootViewElement() )
 		else:
 			self._view = None
 			
 			textStyle = TextStyleSheet( Font( 'SansSerif', Font.BOLD, 12 ), Color( 0.0, 0.0, 0.5 ) )
-			textElem = TextElement( textStyle, '<empty>' )
-			rootElem = self._elementTree.getRoot()
-			self._elementTree.getRoot().setChild( textElem )
+			textElem = DPText( textStyle, '<empty>' )
+			self._elementTree.setChild( textElem )
 			
 	
 	@abstractmethod
@@ -139,7 +136,7 @@ class MainAppDocView (DocView.RefreshListener):
 		class Run (Runnable):
 			def run(r):
 				self._refreshView()
-		self._area.queueImmediateEvent( Run() )
+		self._elementTree.queueImmediateEvent( Run() )
 	
 	
 	
@@ -148,10 +145,10 @@ class MainAppDocView (DocView.RefreshListener):
 	
 		
 	def reset(self):
-		self._area.reset()
+		self._elementTree.reset()
 			
 	def oneToOne(self):
-		self._area.oneToOne()
+		self._elementTree.oneToOne()
 
 		
 		

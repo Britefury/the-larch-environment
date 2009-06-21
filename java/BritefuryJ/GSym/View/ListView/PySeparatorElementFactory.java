@@ -9,7 +9,7 @@ package BritefuryJ.GSym.View.ListView;
 import org.python.core.Py;
 import org.python.core.PyObject;
 
-import BritefuryJ.DocPresent.ElementTree.Element;
+import BritefuryJ.DocPresent.DPWidget;
 
 public class PySeparatorElementFactory implements SeparatorElementFactory
 {
@@ -21,9 +21,9 @@ public class PySeparatorElementFactory implements SeparatorElementFactory
 	}
 	
 	
-	public Element createElement(int index, Element child)
+	public DPWidget createElement(int index, DPWidget child)
 	{
-		return (Element)Py.tojava( callable.__call__( Py.java2py( index ), Py.java2py( child ) ), Element.class );
+		return (DPWidget)Py.tojava( callable.__call__( Py.java2py( index ), Py.java2py( child ) ), DPWidget.class );
 	}
 	
 	

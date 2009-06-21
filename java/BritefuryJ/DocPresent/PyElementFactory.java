@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.DocPresent.ElementTree;
+package BritefuryJ.DocPresent;
 
 import org.python.core.Py;
 import org.python.core.PyObject;
@@ -19,9 +19,9 @@ public class PyElementFactory implements ElementFactory
 	}
 	
 	
-	public Element createElement()
+	public DPWidget createElement()
 	{
-		return (Element)Py.tojava( callable.__call__(), Element.class );
+		return (DPWidget)Py.tojava( callable.__call__(), DPWidget.class );
 	}
 	
 	

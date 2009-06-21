@@ -113,7 +113,7 @@ public class DPSegment extends DPContainerCollateable
 	}
 
 	
-	protected List<DPWidget> getChildren()
+	public List<DPWidget> getChildren()
 	{
 		if ( child != null )
 		{
