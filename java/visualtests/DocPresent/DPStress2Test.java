@@ -32,12 +32,14 @@ public class DPStress2Test
 	//
 	// [1] With collation					A			10240	62.7MB				38.6MB				0.6MB				0.611s					0.536s
 	// [2] With collation finished			A			10240	63.4MB				37.9MB				0.6MB				0.624s					0.524s
+	// [3] Element tree functionality			A			10240	69.4MB				44.8MB				0.7MB				0.631s					0.563s
 	//
 	//
 	// States:
 	// [A] Defunct element tree version, for comparison
 	// [1] HBoxes, VBoxes and Paragraphs can collate contents from children that are span elements
 	// [2] Collation system finished
+	// [3] All ElementTree functionality merged into document presentation system
 	//
 	// Platform A:
 	//	CPU: Intel Core Duo 1.86GHz
