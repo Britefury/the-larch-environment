@@ -68,11 +68,6 @@ public class AnyObject extends ParserExpression
 		return ParseResult.failure( start );
 	}
 
-	protected ParseResult evaluateObjectFields(ParserState state, DMObjectInterface input)
-	{
-		return ParseResult.failure( 0 );
-	}
-
 
 
 	public boolean compareTo(ParserExpression x)

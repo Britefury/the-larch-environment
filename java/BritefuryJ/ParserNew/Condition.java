@@ -14,61 +14,47 @@ import org.python.core.PyObject;
 
 import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
 
-public class Action extends UnaryBranchExpression
+public class Condition extends UnaryBranchExpression
 {
-	protected static class PyAction implements ParseAction
+	private static class PyCondition implements ParseCondition
 	{
 		private PyObject callable;
 		
 		
-		public PyAction(PyObject callable)
+		public PyCondition(PyObject callable)
 		{
 			this.callable = callable;
 		}
 
 
-		public Object invoke(Object input, int pos, int end, Object value, Map<String, Object> bindings)
+		public boolean test(Object input, int pos, int end, Object value, Map<String, Object> bindings)
 		{
-			return callable.__call__( new PyObject[] { Py.java2py( input ), Py.java2py( pos ), Py.java2py( end ), Py.java2py( value ), Py.java2py( bindings ) } );
+			return Py.py2boolean( callable.__call__( new PyObject[] { Py.java2py( input ), Py.java2py( pos ), Py.java2py( end ), Py.java2py( value ), Py.java2py( bindings ) } ) );
 		}
 	}
+
 	
 	
-	protected ParseAction a;
-	protected boolean bMergeUp;
+	protected ParseCondition cond;
 	
 	
-	public Action(ParserExpression subexp, ParseAction a)
-	{
-		this( subexp, a, false );
-	}
-	
-	public Action(ParserExpression subexp, ParseAction a, boolean bMergeUp)
+	public Condition(ParserExpression subexp, ParseCondition cond)
 	{
 		super( subexp );
-		this.a = a;
-		this.bMergeUp = bMergeUp;
+		this.cond = cond;
 	}
 	
-	public Action(ParserExpression subexp, PyObject a)
+
+	public Condition(ParserExpression subexp, PyObject cond)
 	{
-		this( subexp, new PyAction( a ) );
+		this( subexp, new PyCondition( cond ) );
 	}
 	
-	public Action(ParserExpression subexp, PyObject a, boolean bMergeUp)
-	{
-		this( subexp, new PyAction( a ), bMergeUp );
-	}
+
 	
-	
-	public ParseAction getAction()
+	public ParseCondition getCondition()
 	{
-		return a;
-	}
-	
-	public boolean getMergeUp()
-	{
-		return bMergeUp;
+		return cond;
 	}
 	
 
@@ -78,7 +64,14 @@ public class Action extends UnaryBranchExpression
 		
 		if ( res.isValid() )
 		{
-			return res.actionValue( this.a.invoke( input, 0, 1, res.value, res.bindings ), bMergeUp );
+			if ( cond.test( input, 0, 1, res.value, res.bindings ) )
+			{
+				return res;
+			}
+			else
+			{
+				return ParseResult.failure( res.end );
+			}
 		}
 		else
 		{
@@ -92,7 +85,14 @@ public class Action extends UnaryBranchExpression
 		
 		if ( res.isValid() )
 		{
-			return res.actionValue( this.a.invoke( input, start, res.end, res.value, res.bindings ), bMergeUp );
+			if ( cond.test( input, start, res.end, res.value, res.bindings ) )
+			{
+				return res;
+			}
+			else
+			{
+				return ParseResult.failure( res.end );
+			}
 		}
 		else
 		{
@@ -106,7 +106,14 @@ public class Action extends UnaryBranchExpression
 		
 		if ( res.isValid() )
 		{
-			return res.actionValue( this.a.invoke( input, start, res.end, res.value, res.bindings ), bMergeUp );
+			if ( cond.test( input, start, res.end, res.value, res.bindings ) )
+			{
+				return res;
+			}
+			else
+			{
+				return ParseResult.failure( res.end );
+			}
 		}
 		else
 		{
@@ -120,7 +127,14 @@ public class Action extends UnaryBranchExpression
 		
 		if ( res.isValid() )
 		{
-			return res.actionValue( this.a.invoke( input, start, res.end, res.value, res.bindings ), bMergeUp );
+			if ( cond.test( input, start, res.end, res.value, res.bindings ) )
+			{
+				return res;
+			}
+			else
+			{
+				return ParseResult.failure( res.end );
+			}
 		}
 		else
 		{
@@ -128,13 +142,14 @@ public class Action extends UnaryBranchExpression
 		}
 	}
 
-
+	
+	
 	public boolean compareTo(ParserExpression x)
 	{
-		if ( x instanceof Action )
+		if ( x instanceof Condition )
 		{
-			Action ax = (Action)x;
-			return super.compareTo( x )  &&  a == ax.a  &&  bMergeUp == ax.bMergeUp;
+			Condition xc = (Condition)x;
+			return super.compareTo( x )  &&  cond == xc.cond;
 		}
 		else
 		{
@@ -144,18 +159,6 @@ public class Action extends UnaryBranchExpression
 	
 	public String toString()
 	{
-		return "Action( " + subexp.toString() + " -> " + a.toString() + ", " + bMergeUp + " )";
-	}
-	
-	
-	
-	public static Action mergeUpAction(ParserExpression subexp, ParseAction a)
-	{
-		return new Action( subexp, a, true );
-	}
-
-	public static Action mergeUpAction(ParserExpression subexp, PyObject a)
-	{
-		return new Action( subexp, a, true );
+		return "Condition( " + subexp.toString() + " when " + cond.toString() + " )";
 	}
 }

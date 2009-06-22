@@ -8,7 +8,6 @@ package BritefuryJ.ParserNew;
 
 import java.util.List;
 
-import BritefuryJ.DocModel.DMObjectInterface;
 import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
 
 public class AnyList extends ParserExpression
@@ -66,11 +65,6 @@ public class AnyList extends ParserExpression
 		}
 
 		return ParseResult.failure( start );
-	}
-
-	protected ParseResult evaluateObjectFields(ParserState state, DMObjectInterface input)
-	{
-		return ParseResult.failure( 0 );
 	}
 
 

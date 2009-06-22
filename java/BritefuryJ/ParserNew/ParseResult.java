@@ -7,7 +7,6 @@
 package BritefuryJ.ParserNew;
 
 import java.util.HashMap;
-import java.util.Map;
 
 import BritefuryJ.ParserHelpers.DebugNode;
 import BritefuryJ.ParserHelpers.ParseResultInterface;
@@ -117,32 +116,24 @@ public class ParseResult implements ParseResultInterface
 	}
 	
 	
-	protected ParseResult bind(String name, Object bindingValue, int start)
+	protected ParseResult bind(String name, Object bindingValue)
 	{
 		HashMap<String, Object> b = new HashMap<String, Object>();
 		
 		if ( bindings != null )
 		{
-			if ( bindings.containsKey( name ) )
-			{
-				if ( !bindingValue.equals( bindings.get( name ) ) )
-				{
-					return failure( start );
-				}
-				else
-				{
-					return this;
-				}
-			}
-			else
-			{
-				b.putAll( bindings );
-			}
+			b.putAll( bindings );
 		}
 		
 		b.put( name, bindingValue );
 		
 		return new ParseResult( value, begin, end, bSuppressed, bValid, bMerge, b );
+	}
+	
+	
+	protected ParseResult bindValueTo(String name)
+	{
+		return bind( name, getValue() );
 	}
 	
 	
@@ -160,41 +151,25 @@ public class ParseResult implements ParseResultInterface
 	
 	
 	
-	protected HashMap<String, Object> addBindingsTo(HashMap<String, Object> joinedBindings) throws NameAlreadyBoundException
+	protected static HashMap<String, Object> addBindings(HashMap<String, Object> a, HashMap<String, Object> b)
 	{
-		if ( bindings == null )
+		if ( a == null )
 		{
-			return joinedBindings;
+			return b;
 		}
 		else
 		{
-			if ( joinedBindings == null )
+			if ( b == null )
 			{
-				joinedBindings = new HashMap<String, Object>();
-				joinedBindings.putAll( bindings );
+				return a;
 			}
 			else
 			{
-				for (Map.Entry<String, Object> entry: bindings.entrySet())
-				{
-					String name = entry.getKey();
-					Object value = entry.getValue();
-					if ( joinedBindings.containsKey( name ) )
-					{
-						Object existingValue = joinedBindings.get( name );
-						if ( !value.equals( existingValue ) )
-						{
-							throw new NameAlreadyBoundException();
-						}
-					}
-					else
-					{
-						joinedBindings.put( name, value );
-					}
-				}
+				HashMap<String, Object> x = new HashMap<String, Object>();
+				x.putAll( a );
+				x.putAll( b );
+				return x;
 			}
-
-			return joinedBindings;
 		}
 	}
 	

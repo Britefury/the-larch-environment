@@ -11,7 +11,6 @@ import java.util.List;
 
 import org.python.core.PyObject;
 
-import BritefuryJ.DocModel.DMObjectInterface;
 import BritefuryJ.Parser.ItemStream.ItemStream;
 import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
 import BritefuryJ.ParserHelpers.DebugNode;
@@ -337,76 +336,6 @@ public abstract class ParserExpression implements ParserExpressionInterface
 	
 	
 	
-	public ParseResult parseObjectFields(DMObjectInterface input)
-	{
-		return parseObjectFields( input, "[ ]*", (ParseAction)null );
-	}
-
-	public ParseResult parseObjectFields(DMObjectInterface input, String junkRegex)
-	{
-		return parseObjectFields( input, junkRegex, (ParseAction)null );
-	}
-
-	public ParseResult parseObjectFields(DMObjectInterface input, ParseAction delegateAction)
-	{
-		return parseObjectFields( input, "[ ]*", delegateAction );
-	}
-
-	public ParseResult parseObjectFields(DMObjectInterface input, String junkRegex, ParseAction delegateAction)
-	{
-		ParserState state = new ParserState( junkRegex, delegateAction );
-		ParseResult result = handleObjectFields( state, input );
-		
-		return result;
-	}
-
-	public ParseResult parseObjectFields(DMObjectInterface input, PyObject delegateAction)
-	{
-		return parseObjectFields( input, "[ ]*", new Action.PyAction( delegateAction ) );
-	}
-
-	public ParseResult parseObjectFields(DMObjectInterface input, String junkRegex, PyObject delegateAction)
-	{
-		return parseObjectFields( input, junkRegex, new Action.PyAction( delegateAction ) );
-	}
-
-	
-	public DebugParseResult debugParseObjectFields(DMObjectInterface input)
-	{
-		return debugParseObjectFields( input, "[ ]*", (ParseAction)null );
-	}
-
-	public DebugParseResult debugParseObjectFields(DMObjectInterface input, String junkRegex)
-	{
-		return debugParseObjectFields( input, junkRegex, (ParseAction)null );
-	}
-
-	public DebugParseResult debugParseObjectFields(DMObjectInterface input, ParseAction delegateAction)
-	{
-		return debugParseObjectFields( input, "[ ]*", delegateAction );
-	}
-
-	public DebugParseResult debugParseObjectFields(DMObjectInterface input, String junkRegex, ParseAction delegateAction)
-	{
-		ParserState state = new ParserState( junkRegex, delegateAction );
-		state.enableDebugging();
-		DebugParseResult result = (DebugParseResult)handleObjectFields( state, input );
-		
-		return result;
-	}
-
-	public DebugParseResult debugParseObjectFields(DMObjectInterface input, PyObject delegateAction)
-	{
-		return debugParseObjectFields( input, "[ ]*", new Action.PyAction( delegateAction ) );
-	}
-
-	public DebugParseResult debugParseObjectFields(DMObjectInterface input, String junkRegex, PyObject delegateAction)
-	{
-		return debugParseObjectFields( input, junkRegex, new Action.PyAction( delegateAction ) );
-	}
-
-	
-	
 	private void debugBegin(ParserState state, Object input, int start)
 	{
 		// Get the current top of the debug stack (outer call)
@@ -513,27 +442,11 @@ public abstract class ParserExpression implements ParserExpressionInterface
 		}
 	}	
 	
-	protected ParseResult handleObjectFields(ParserState state, DMObjectInterface input)
-	{
-		if ( state.bDebuggingEnabled )
-		{
-			debugBegin( state, input, 0 );
-			// Get the parse result
-			ParseResult result = evaluateObjectFields( state, input );
-			return debugEnd( state, input, result );
-		}
-		else
-		{
-			return evaluateObjectFields( state, input );
-		}
-	}	
-	
 	
 	protected abstract ParseResult evaluateNode(ParserState state, Object input);
 	protected abstract ParseResult evaluateStringChars(ParserState state, String input, int start);
 	protected abstract ParseResult evaluateStreamItems(ParserState state, ItemStreamAccessor input, int start);
 	protected abstract ParseResult evaluateListItems(ParserState state, List<Object> input, int start);
-	protected abstract ParseResult evaluateObjectFields(ParserState state, DMObjectInterface input);
 	
 	
 	
@@ -677,7 +590,7 @@ public abstract class ParserExpression implements ParserExpressionInterface
 	
 	public boolean compareTo(ParserExpression x)
 	{
-		return false;
+		return true;
 	}
 	
 	
