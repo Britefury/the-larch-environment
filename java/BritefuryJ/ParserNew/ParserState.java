@@ -160,7 +160,7 @@ public class ParserState
 			
 
 			// Evaluate the rule, at position @start
-			ParseResult answer = rule.evaluateStream( this, input, start );
+			ParseResult answer = rule.evaluateStreamItems( this, input, start );
 			
 
 			// Merge dependency lists, into global list
@@ -244,7 +244,7 @@ public class ParserState
 			memoEntry.dependents = null;
 			
 			// Try re-evaluation
-			ParseResult res = rule.evaluateStream( this, input, start );
+			ParseResult res = rule.evaluateStreamItems( this, input, start );
 			// Fail or no additional characters consumed?
 			if ( !res.isValid()  ||  res.end <= answer.end )
 			{
