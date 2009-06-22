@@ -10,16 +10,23 @@ import java.util.List;
 
 import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
 
-public class AnyNode extends ParserExpression
+public class AnyString extends ParserExpression
 {
-	public AnyNode()
+	public AnyString()
 	{
 	}
 	
 	
 	protected ParseResult evaluateNode(ParserState state, Object input)
 	{
-		return new ParseResult( input, 0, 1 );
+		if ( input instanceof String  ||  input instanceof ItemStreamAccessor )
+		{
+			return new ParseResult( input, 0, 1 );
+		}
+		else
+		{
+			return ParseResult.failure( 0 );
+		}
 	}
 
 	protected ParseResult evaluateStringChars(ParserState state, String input, int start)
@@ -29,16 +36,6 @@ public class AnyNode extends ParserExpression
 
 	protected ParseResult evaluateStreamItems(ParserState state, ItemStreamAccessor input, int start)
 	{
-		if ( start < input.length() )
-		{
-			Object valueArray[] = input.matchStructuralNode( start );
-			
-			if ( valueArray != null )
-			{
-				return new ParseResult( valueArray[0], 0, 1 );
-			}
-		}
-		
 		return ParseResult.failure( start );
 	}
 
@@ -46,7 +43,12 @@ public class AnyNode extends ParserExpression
 	{
 		if ( start < input.size() )
 		{
-			return new ParseResult( input.get( start ), start, start + 1 );
+			Object x = input.get( start );
+			
+			if ( x instanceof String  ||  x instanceof ItemStreamAccessor )
+			{
+				return new ParseResult( x, start, start + 1 );
+			}
 		}
 
 		return ParseResult.failure( start );
@@ -56,7 +58,7 @@ public class AnyNode extends ParserExpression
 
 	public boolean compareTo(ParserExpression x)
 	{
-		if ( x instanceof AnyNode )
+		if ( x instanceof AnyString )
 		{
 			return super.compareTo( x );
 		}
@@ -68,6 +70,6 @@ public class AnyNode extends ParserExpression
 	
 	public String toString()
 	{
-		return "AnyNode()";
+		return "AnyString()";
 	}
 }

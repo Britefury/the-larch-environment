@@ -10,53 +10,75 @@ import java.util.List;
 
 import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
 
-public class AnyNode extends ParserExpression
+public class ClearBindings extends UnaryBranchExpression
 {
-	public AnyNode()
+	public ClearBindings(ParserExpression subexp)
 	{
+		super( subexp );
 	}
+	
 	
 	
 	protected ParseResult evaluateNode(ParserState state, Object input)
 	{
-		return new ParseResult( input, 0, 1 );
+		ParseResult res = subexp.handleNode( state, input );
+		
+		if ( res.isValid() )
+		{
+			return res.clearBindings();
+		}
+		else
+		{
+			return res;
+		}
 	}
 
 	protected ParseResult evaluateStringChars(ParserState state, String input, int start)
 	{
-		return ParseResult.failure( start );
+		ParseResult res = subexp.handleStringChars( state, input, start );
+		
+		if ( res.isValid() )
+		{
+			return res.clearBindings();
+		}
+		else
+		{
+			return res;
+		}
 	}
 
 	protected ParseResult evaluateStreamItems(ParserState state, ItemStreamAccessor input, int start)
 	{
-		if ( start < input.length() )
-		{
-			Object valueArray[] = input.matchStructuralNode( start );
-			
-			if ( valueArray != null )
-			{
-				return new ParseResult( valueArray[0], 0, 1 );
-			}
-		}
+		ParseResult res = subexp.handleStreamItems( state, input, start );
 		
-		return ParseResult.failure( start );
+		if ( res.isValid() )
+		{
+			return res.clearBindings();
+		}
+		else
+		{
+			return res;
+		}
 	}
 
 	protected ParseResult evaluateListItems(ParserState state, List<Object> input, int start)
 	{
-		if ( start < input.size() )
+		ParseResult res = subexp.handleListItems( state, input, start );
+		
+		if ( res.isValid() )
 		{
-			return new ParseResult( input.get( start ), start, start + 1 );
+			return res.clearBindings();
 		}
-
-		return ParseResult.failure( start );
+		else
+		{
+			return res;
+		}
 	}
-
-
-
+	
+	
 	public boolean compareTo(ParserExpression x)
 	{
-		if ( x instanceof AnyNode )
+		if ( x instanceof ClearBindings )
 		{
 			return super.compareTo( x );
 		}
@@ -68,6 +90,6 @@ public class AnyNode extends ParserExpression
 	
 	public String toString()
 	{
-		return "AnyNode()";
+		return "ClearBindings( " + subexp.toString() + " )";
 	}
 }
