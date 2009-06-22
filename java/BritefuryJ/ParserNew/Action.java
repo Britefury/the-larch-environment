@@ -87,9 +87,9 @@ public class Action extends UnaryBranchExpression
 		}
 	}
 
-	protected ParseResult evaluateString(ParserState state, String input, int start)
+	protected ParseResult evaluateStringChars(ParserState state, String input, int start)
 	{
-		ParseResult res = subexp.handleString( state, input, start );
+		ParseResult res = subexp.handleStringChars( state, input, start );
 		
 		if ( res.isValid() )
 		{
@@ -101,9 +101,9 @@ public class Action extends UnaryBranchExpression
 		}
 	}
 
-	protected ParseResult evaluateStream(ParserState state, ItemStreamAccessor input, int start)
+	protected ParseResult evaluateStreamItems(ParserState state, ItemStreamAccessor input, int start)
 	{
-		ParseResult res = subexp.handleStream( state, input, start );
+		ParseResult res = subexp.handleStreamItems( state, input, start );
 		
 		if ( res.isValid() )
 		{
@@ -115,9 +115,9 @@ public class Action extends UnaryBranchExpression
 		}
 	}
 	
-	protected ParseResult evaluateList(ParserState state, List<Object> input, int start)
+	protected ParseResult evaluateListItems(ParserState state, List<Object> input, int start)
 	{
-		ParseResult res = subexp.handleList( state, input, start );
+		ParseResult res = subexp.handleListItems( state, input, start );
 		
 		if ( res.isValid() )
 		{
@@ -129,9 +129,9 @@ public class Action extends UnaryBranchExpression
 		}
 	}
 
-	protected ParseResult evaluateObject(ParserState state, DMObjectInterface input)
+	protected ParseResult evaluateObjectFields(ParserState state, DMObjectInterface input)
 	{
-		ParseResult res = subexp.handleObject( state, input );
+		ParseResult res = subexp.handleObjectFields( state, input );
 		
 		if ( res.isValid() )
 		{
