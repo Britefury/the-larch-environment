@@ -23,6 +23,16 @@ import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
 import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
 
+/*
+ * ObjectNode
+ * 
+ * ObjectNode:node( input )				->  input instanceof DMObject  ?  ObjectNode.matchObjectContents( input )  :  fail
+ * ObjectNode:string( input, start )			->  fail
+ * ObjectNode:stream( input, start )			->  item = input.consumeStructuralItem(); item instanceof DMObject  ?  ObjectNode.matchObjectContents( input )  :  fail
+ * ObjectNode:list( input, start )				->  input[start] instanceof DMObject  ?  ObjectNode.matchObjectContents( input[start] )  :  fail
+ * 
+ * ObjectNode.matchObjectContents( input )	->  [ result[fieldName] = s:node( fieldValue )   for fieldName, fieldValue in fieldSubexps ]
+ */
 public class ObjectNode extends ParserExpression
 {
 	protected DMObjectClass objClass;

@@ -11,40 +11,18 @@ import java.util.List;
 import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
 
 /*
- * Bind
+ * Optional
  * 
- * Bind:node( input )			->  bindTo( Bind.subexp:node( input ), Bind.name )
- * Bind:string( input, start )	->  bindTo( Bind.subexp:string( input, start ), Bind.name )
- * Bind:stream( input, start )	->  bindTo( Bind.subexp:stream( input, start ), Bind.name )
- * Bind:list( input, start )		->  bindTo( Bind.subexp:list( input, start ), Bind.name )
+ * Optional:node( input )			->  result = Optional.subexp:node( input ); result.isValid()  ?  result  :  null_result
+ * Optional:string( input, start )		->  result = Optional.subexp:string( input, start ); result.isValid()  ?  result  :  null_result
+ * Optional:stream( input, start )	->  result = Optional.subexp:stream( input, start ); result.isValid()  ?  result  :  null_result
+ * Optional:list( input, start )		->  result = Optional.subexp:list( input, start ); result.isValid()  ?  result  :  null_result
  */
-public class Bind extends UnaryBranchExpression
+public class Optional extends UnaryBranchExpression
 {
-	//
-	//
-	//
-	//
-	// WARNING: UNRESOLVED PROBLEM:
-	// Bindings can effect parse results; the state of the bindings is not considered by the memoisation system,
-	// likely resulting in incorrect parse results.
-	//
-	//
-	//
-	//
-	protected String name;
-	
-	
-	public Bind(String name, ParserExpression subexp)
+	public Optional(ParserExpression subexp)
 	{
 		super( subexp );
-		this.name = name;
-	}
-	
-	
-	
-	public String getName()
-	{
-		return name;
 	}
 	
 
@@ -54,11 +32,11 @@ public class Bind extends UnaryBranchExpression
 		
 		if ( res.isValid() )
 		{
-			return res.bindValueTo( name );
+			return res;
 		}
 		else
 		{
-			return res;
+			return new ParseResult( null, 0, 0 );
 		}
 	}
 
@@ -68,11 +46,11 @@ public class Bind extends UnaryBranchExpression
 		
 		if ( res.isValid() )
 		{
-			return res.bindValueTo( name );
+			return res;
 		}
 		else
 		{
-			return res;
+			return new ParseResult( null, start, start );
 		}
 	}
 
@@ -82,11 +60,11 @@ public class Bind extends UnaryBranchExpression
 		
 		if ( res.isValid() )
 		{
-			return res.bindValueTo( name );
+			return res;
 		}
 		else
 		{
-			return res;
+			return new ParseResult( null, start, start );
 		}
 	}
 
@@ -96,21 +74,21 @@ public class Bind extends UnaryBranchExpression
 		
 		if ( res.isValid() )
 		{
-			return res.bindValueTo( name );
+			return res;
 		}
 		else
 		{
-			return res;
+			return new ParseResult( null, start, start );
 		}
 	}
 
 	
+	
 	public boolean compareTo(ParserExpression x)
 	{
-		if ( x instanceof Bind )
+		if ( x instanceof Optional )
 		{
-			Bind bx = (Bind)x;
-			return super.compareTo( x )  &&  name.equals( bx.name );
+			return super.compareTo( x );
 		}
 		else
 		{
@@ -118,8 +96,9 @@ public class Bind extends UnaryBranchExpression
 		}
 	}
 	
+
 	public String toString()
 	{
-		return "Bind( " + name + ": " + subexp.toString() + " )";
+		return "Optional( " + subexp.toString() + " )";
 	}
 }

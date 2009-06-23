@@ -10,6 +10,14 @@ import java.util.List;
 
 import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
 
+/*
+ * Choice
+ * 
+ * Choice:node( input )		->  first_success_of( [ s:node( input )   for s in Bind.subexps ] )
+ * Choice:string( input, start )	->  first_success_of( [ s:string( input, start )   for s in Bind.subexps ] )
+ * Choice:stream( input, start )	->  first_success_of( [ s:stream( input, start )   for s in Bind.subexps ] )
+ * Choice:list( input, start )	->  first_success_of( [ s:list( input, start )   for s in Bind.subexps ] )
+ */
 public class Choice extends BranchExpression
 {
 	public Choice(ParserExpression[] subexps)

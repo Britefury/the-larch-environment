@@ -10,6 +10,14 @@ import java.util.List;
 
 import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
 
+/*
+ * Literal
+ * 
+ * Literal:node( input )			->  input == Literal.matchString  ?  input  :  fail
+ * Literal:string( input, start )		->  input[start:start+Literal.matchString.length()] == Literal.matchString  ?  input[start:start+Literal.matchString.length()] : fail
+ * Literal:stream( input, start )		->  input[start:start+Literal.matchString.length()] == Literal.matchString  ?  input[start:start+Literal.matchString.length()] : fail
+ * Literal:list( input, start )			->  input[start] == Literal.matchString  ?  input[start]  :  fail
+ */
 public class Literal extends ParserExpression
 {
 	protected String matchString;
@@ -30,6 +38,10 @@ public class Literal extends ParserExpression
 	
 	protected ParseResult evaluateNode(ParserState state, Object input)
 	{
+		if ( input.equals( matchString ) )
+		{
+			return new ParseResult( matchString, 0, 1 );
+		}
 		return ParseResult.failure( 0 );
 	}
 
@@ -62,7 +74,15 @@ public class Literal extends ParserExpression
 
 	protected ParseResult evaluateListItems(ParserState state, List<Object> input, int start)
 	{
-		return ParseResult.failure( start );
+		if ( start < input.size() )
+		{
+			Object x = input.get( start );
+			if ( x.equals( matchString ) )
+			{
+				return new ParseResult( matchString, start, start + 1 );
+			}
+		}
+		return ParseResult.failure( 0 );
 	}
 	
 	

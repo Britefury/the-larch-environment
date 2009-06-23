@@ -18,6 +18,15 @@ import BritefuryJ.ParserHelpers.ParserExpressionInterface;
 
 public abstract class ParserExpression implements ParserExpressionInterface
 {
+	public static class ParserCoerceException extends Exception
+	{
+		private static final long serialVersionUID = 1L;
+	};
+	
+	
+	
+
+	
 	protected String debugName = "";
 	
 	
@@ -608,5 +617,29 @@ public abstract class ParserExpression implements ParserExpressionInterface
 	protected boolean isSequence()
 	{
 		return false;
+	}
+
+
+
+
+	public static ParserExpression coerce(Object x) throws ParserCoerceException
+	{
+		if ( x instanceof ParserExpression )
+		{
+			return (ParserExpression)x;
+		}
+		else if ( x instanceof String )
+		{
+			return new Literal( (String)x );
+		}
+		else
+		{
+			throw new ParserCoerceException();
+		}
+	}
+
+	public static ParserExpression coerce(String x)
+	{
+		return new Literal( x );
 	}
 }

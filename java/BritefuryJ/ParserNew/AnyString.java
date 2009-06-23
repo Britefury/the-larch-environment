@@ -10,6 +10,14 @@ import java.util.List;
 
 import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
 
+/*
+ * AnyString
+ * 
+ * AnyString:node( input )			->  input instanceof Stream | String  ?  input  :  fail
+ * AnyString:string( input, start )	->  fail
+ * AnyString:stream( input, start )	->  fail
+ * AnyString:list( input, start )		->  input[start] instanceof Stream | String  ?  input[start]  :  fail
+ */
 public class AnyString extends ParserExpression
 {
 	public AnyString()

@@ -14,6 +14,14 @@ import org.python.core.PyObject;
 
 import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
 
+/*
+ * Condition
+ * 
+ * Condition:node( input )			->  res = Condition.subexp:node( input );  Condition.cond.test( res )  ?  res  :  fail
+ * Condition:string( input, start )	->  res = Condition.subexp:string( input, start );  Condition.cond.test( res )  ?  res  :  fail
+ * Condition:stream( input, start )	->  res = Condition.subexp:stream( input, start );  Condition.cond.test( res )  ?  res  :  fail
+ * Condition:list( input, start )		->  res = Condition.subexp:list( input, start );  Condition.cond.test( res )  ?  res  :  fail
+ */
 public class Condition extends UnaryBranchExpression
 {
 	private static class PyCondition implements ParseCondition

@@ -11,6 +11,14 @@ import java.util.List;
 import BritefuryJ.DocModel.DMObjectInterface;
 import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
 
+/*
+ * AnyObject
+ * 
+ * AnyObject:node( input )			->  input instanceof DMObject  ?  input  :  fail
+ * AnyObject:string( input, start )	->  fail
+ * AnyObject:stream( input, start )	->  item = input.consumeStructuralItem(); item instanceof DMObject  ?  item  :  fail
+ * AnyObject:list( input, start )		->  input[start] instanceof DMObject  ?  input[start]  :  fail
+ */
 public class AnyObject extends ParserExpression
 {
 	public AnyObject()

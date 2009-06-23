@@ -10,6 +10,14 @@ import java.util.List;
 
 import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
 
+/*
+ * ClearBindings
+ * 
+ * ClearBindings:node( input )			->  clearBindings( Bind.subexp:node( input ) )
+ * ClearBindings:string( input, start )		->  clearBindings( Bind.subexp:string( input, start ) )
+ * ClearBindings:stream( input, start )		->  clearBindings( Bind.subexp:stream( input, start ) )
+ * ClearBindings:list( input, start )		->  clearBindings( Bind.subexp:list( input, start ) )
+ */
 public class ClearBindings extends UnaryBranchExpression
 {
 	public ClearBindings(ParserExpression subexp)

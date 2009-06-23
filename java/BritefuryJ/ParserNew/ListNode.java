@@ -12,6 +12,16 @@ import java.util.List;
 
 import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
 
+/*
+ * ListNode
+ * 
+ * ListNode:node( input )				->  input instanceof List  ?  ListNode.matchListContents( input )  :  fail
+ * ListNode:string( input, start )			->  fail
+ * ListNode:stream( input, start )		->  item = input.consumeStructuralItem(); item instanceof List  ?  ListNode.matchListContents( input )  :  fail
+ * ListNode:list( input, start )			->  input[start] instanceof List  ?  ListNode.matchListContents( input[start], 0 )  :  fail
+ * 
+ * ListNode.matchListContents( input )	->  start = 0; [ start, result = s:list( input, start )   for s in ListNode.subexps ]
+ */
 public class ListNode extends BranchExpression
 {
 	public ListNode(ParserExpression[] subexps)
@@ -21,15 +31,15 @@ public class ListNode extends BranchExpression
 	
 	
 	@SuppressWarnings("unchecked")
-	private ParseResult matchListContents(ParserState state, List<Object> input, int start, int stop)
+	private ParseResult matchListContents(ParserState state, List<Object> input)
 	{
 		ArrayList<Object> value = new ArrayList<Object>();
 		HashMap<String, Object> bindings = null;
 		
-		int pos = start;
+		int pos = 0;
 		for (int i = 0; i < subexps.length; i++)
 		{
-			if ( pos > stop )
+			if ( pos > input.size() )
 			{
 				return ParseResult.failure( pos );
 			}
@@ -59,9 +69,9 @@ public class ListNode extends BranchExpression
 			}
 		}
 		
-		if ( pos == stop )
+		if ( pos == input.size() )
 		{
-			return new ParseResult( value, start, pos, bindings );
+			return new ParseResult( value, 0, pos, bindings );
 		}
 		else
 		{
@@ -76,7 +86,7 @@ public class ListNode extends BranchExpression
 		if ( input instanceof List )
 		{
 			List<Object> node = (List<Object>)input;
-			ParseResult res = matchListContents( state, node, 0, node.size() );
+			ParseResult res = matchListContents( state, node );
 			if ( res.isValid() )
 			{
 				return res.withRange( 0, 1 );
@@ -104,7 +114,7 @@ public class ListNode extends BranchExpression
 				if ( valueArray[0] instanceof List )
 				{
 					List<Object> xs = (List<Object>)valueArray[0];
-					ParseResult res = matchListContents( state, xs, 0, xs.size() );
+					ParseResult res = matchListContents( state, xs );
 					if ( res.isValid() )
 					{
 						return res.withRange( start, start + 1 );
@@ -125,7 +135,7 @@ public class ListNode extends BranchExpression
 			if ( x instanceof List )
 			{
 				List<Object> xs = (List<Object>)x;
-				ParseResult res = matchListContents( state, xs, 0, xs.size() );
+				ParseResult res = matchListContents( state, xs );
 				if ( res.isValid() )
 				{
 					return res.withRange( start, start + 1 );
