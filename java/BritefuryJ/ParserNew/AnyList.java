@@ -10,6 +10,14 @@ import java.util.List;
 
 import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
 
+/*
+ * AnyList
+ * 
+ * AnyList:node( input )		->  input instanceof List  ?  input  :  fail
+ * AnyList:string( input, start )	->  fail
+ * AnyList:stream( input, start )	->  item = input.consumeStructuralItem(); item instanceof List  ?  item  :  fail
+ * AnyList:list( input, start )	->  input[start] instanceof List  ?  input[start]  :  fail
+ */
 public class AnyList extends ParserExpression
 {
 	public AnyList()

@@ -10,6 +10,14 @@ import java.util.List;
 
 import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
 
+/*
+ * Delegate
+ * 
+ * Delegate:node( input )			->  state.delegateAction.action( Delegate.subexp:node( input ) )
+ * Delegate:string( input, start )		->  state.delegateActio.action( Delegate.subexp:string( input, start ) )
+ * Delegate:stream( input, start )	->  state.delegateActio.action( Delegate.subexp:stream( input, start ) )
+ * Delegate:list( input, start )		->  state.delegateActio.action( Delegate.subexp:list( input, start ) )
+ */
 public class Delegate extends UnaryBranchExpression
 {
 	public Delegate()

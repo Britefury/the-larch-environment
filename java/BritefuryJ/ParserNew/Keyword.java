@@ -11,6 +11,16 @@ import java.util.regex.Pattern;
 
 import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
 
+/*
+ * Keyword
+ * 
+ * Keyword:node( input )			->  input == Keyword.keywordString  ?  input  :  fail
+ * Keyword:string( input, start )		->  input[start:start+Keyword.keywordString.length()] == Keyword.keywordString  &&
+ * 									input[start+Keyword.keywordString.length()] not in Keyword.disallowedSubsequentChars  ?  input[start:start+Keyword.keywordString.length()] : fail
+ * Keyword:stream( input, start )	->  input[start:start+Keyword.keywordString.length()] == Keyword.keywordString  &&
+ * 								input[start+Keyword.keywordString.length()] not in Keyword.disallowedSubsequentChars  ?  input[start:start+Keyword.keywordString.length()] : fail
+ * Keyword:list( input, start )		->  input[start] == Keyword.keywordString  ?  input[start]  :  fail
+ */
 public class Keyword extends ParserExpression
 {
 	protected String keywordString, disallowedSubsequentChars;
@@ -44,6 +54,10 @@ public class Keyword extends ParserExpression
 	
 	protected ParseResult evaluateNode(ParserState state, Object input)
 	{
+		if ( input.equals( keywordString ) )
+		{
+			return new ParseResult( keywordString, 0, 1 );
+		}
 		return ParseResult.failure( 0 );
 	}
 
@@ -90,7 +104,15 @@ public class Keyword extends ParserExpression
 
 	protected ParseResult evaluateListItems(ParserState state, List<Object> input, int start)
 	{
-		return ParseResult.failure( start );
+		if ( start < input.size() )
+		{
+			Object x = input.get( start );
+			if ( x.equals( keywordString ) )
+			{
+				return new ParseResult( keywordString, start, start + 1 );
+			}
+		}
+		return ParseResult.failure( 0 );
 	}
 
 	

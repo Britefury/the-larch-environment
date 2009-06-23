@@ -10,6 +10,14 @@ import java.util.List;
 
 import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
 
+/*
+ * LiteralValue
+ * 
+ * LiteralValue:node( input )			->  input == LiteralValue.matchValue  ?  input  :  fail
+ * LiteralValue:string( input, start )		->  fail
+ * LiteralValue:stream( input, start )		->  item = input.structuralItem(); item == LiteralValue.matchValue  ?  item  :  fail
+ * LiteralValue:list( input, start )			->  input[start] == LiteralValue.matchValue  ?  input[start]  :  fail
+ */
 public class LiteralNode extends ParserExpression
 {
 	protected Object matchValue;

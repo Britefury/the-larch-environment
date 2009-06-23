@@ -14,6 +14,15 @@ import org.python.core.PyObject;
 
 import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
 
+
+/*
+ * Action
+ * 
+ * Action:node( input )		->  Action.action( Action.subexp:node( input ) )
+ * Action:string( input, start )	->  Action.action( Action.subexp:string( input, start ) )
+ * Action:stream( input, start )	->  Action.action( Action.subexp:stream( input, start ) )
+ * Action:list( input, start )		->  Action.action( Action.subexp:list( input, start ) )
+ */
 public class Action extends UnaryBranchExpression
 {
 	protected static class PyAction implements ParseAction

@@ -10,41 +10,26 @@ import java.util.List;
 
 import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
 
+
+
 /*
- * Bind
+ * PeekNot
  * 
- * Bind:node( input )			->  bindTo( Bind.subexp:node( input ), Bind.name )
- * Bind:string( input, start )	->  bindTo( Bind.subexp:string( input, start ), Bind.name )
- * Bind:stream( input, start )	->  bindTo( Bind.subexp:stream( input, start ), Bind.name )
- * Bind:list( input, start )		->  bindTo( Bind.subexp:list( input, start ), Bind.name )
+ * PeekNot:node( input )			->  result = PeekNot.subexp:node( input ); result.isValid()  ?  fail  :  suppressed
+ * PeekNot:string( input, start )		->  result = PeekNot.subexp:string( input, start ); result.isValid()  ?  fail  :  suppressed
+ * PeekNot:stream( input, start )	->  result = PeekNot.subexp:stream( input, start ); result.isValid()  ?  fail  :  suppressed
+ * PeekNot:list( input, start )		->  result = PeekNot.subexp:list( input, start ); result.isValid()  ?  fail  :  suppressed
  */
-public class Bind extends UnaryBranchExpression
+public class PeekNot extends UnaryBranchExpression
 {
-	//
-	//
-	//
-	//
-	// WARNING: UNRESOLVED PROBLEM:
-	// Bindings can effect parse results; the state of the bindings is not considered by the memoisation system,
-	// likely resulting in incorrect parse results.
-	//
-	//
-	//
-	//
-	protected String name;
-	
-	
-	public Bind(String name, ParserExpression subexp)
+	public PeekNot(String subexp) throws ParserCoerceException
 	{
 		super( subexp );
-		this.name = name;
 	}
 	
-	
-	
-	public String getName()
+	public PeekNot(ParserExpression subexp)
 	{
-		return name;
+		super( subexp );
 	}
 	
 
@@ -54,11 +39,11 @@ public class Bind extends UnaryBranchExpression
 		
 		if ( res.isValid() )
 		{
-			return res.bindValueTo( name );
+			return ParseResult.failure( 0 );
 		}
 		else
 		{
-			return res;
+			return ParseResult.suppressedNoValue( 0, 0 );
 		}
 	}
 
@@ -68,11 +53,11 @@ public class Bind extends UnaryBranchExpression
 		
 		if ( res.isValid() )
 		{
-			return res.bindValueTo( name );
+			return ParseResult.failure( start );
 		}
 		else
 		{
-			return res;
+			return ParseResult.suppressedNoValue( start, start );
 		}
 	}
 
@@ -82,11 +67,11 @@ public class Bind extends UnaryBranchExpression
 		
 		if ( res.isValid() )
 		{
-			return res.bindValueTo( name );
+			return ParseResult.failure( start );
 		}
 		else
 		{
-			return res;
+			return ParseResult.suppressedNoValue( start, start );
 		}
 	}
 
@@ -96,21 +81,20 @@ public class Bind extends UnaryBranchExpression
 		
 		if ( res.isValid() )
 		{
-			return res.bindValueTo( name );
+			return ParseResult.failure( start );
 		}
 		else
 		{
-			return res;
+			return ParseResult.suppressedNoValue( start, start );
 		}
 	}
 
 	
 	public boolean compareTo(ParserExpression x)
 	{
-		if ( x instanceof Bind )
+		if ( x instanceof PeekNot )
 		{
-			Bind bx = (Bind)x;
-			return super.compareTo( x )  &&  name.equals( bx.name );
+			return super.compareTo( x );
 		}
 		else
 		{
@@ -118,8 +102,9 @@ public class Bind extends UnaryBranchExpression
 		}
 	}
 	
+
 	public String toString()
 	{
-		return "Bind( " + name + ": " + subexp.toString() + " )";
+		return "PeekNot( " + subexp.toString() + " )";
 	}
 }
