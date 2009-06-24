@@ -32,11 +32,6 @@ public class ItemStreamBuilder
 		}
 		
 		
-		public boolean isTextual()
-		{
-			return textValue != null  &&  structuralValue == null;
-		}
-		
 		public boolean isStructural()
 		{
 			return structuralValue != null;

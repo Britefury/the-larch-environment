@@ -45,18 +45,6 @@ public class DocTree
 			this.hash = HashUtils.tripleHash( docNode.hashCode(), parentTreeNode != null  ?  parentTreeNode.hashCode()  :  0, index );
 		}
 		
-		public Key(Object docNode, DocTreeNode parentTreeNode, int index, DocTreeNodeTable table)
-		{
-			this.docNode = new WeakReference<Object>( docNode, table.refQueue );
-			if ( parentTreeNode != null )
-			{
-				this.parentTreeNode = new WeakReference<DocTreeNode>( parentTreeNode, table.refQueue );
-			}
-			this.index = index;
-			
-			this.hash = HashUtils.tripleHash( docNode.hashCode(), parentTreeNode != null  ?  parentTreeNode.hashCode()  :  0, index );
-		}
-		
 		
 		public int hashCode()
 		{
@@ -86,19 +74,6 @@ public class DocTree
 			else
 			{
 				return false;
-			}
-		}
-		
-		
-		public DocTreeKey docTreeKey()
-		{
-			if ( parentTreeNode != null )
-			{
-				return new DocTreeKey( docNode.get(), parentTreeNode.get(), index );
-			}
-			else
-			{
-				return new DocTreeKey( docNode.get(), null, index );
 			}
 		}
 		
@@ -167,11 +142,6 @@ public class DocTree
 			}
 		}
 		
-		public int getIndex()
-		{
-			return index;
-		}
-		
 		
 		public Key key() throws DocTreeKeyError
 		{
@@ -182,17 +152,6 @@ public class DocTree
 				throw new DocTreeKeyError();
 			}
 			return new Key( docNode, parent, index );
-		}
-
-		public Key key(DocTreeNodeTable table) throws DocTreeKeyError
-		{
-			Object docNode = getDocNode();
-			DocTreeNode parent = getParentTreeNode();
-			if ( docNode == null  ||  ( parentTreeNode != null  &&  parent == null ) )
-			{
-				throw new DocTreeKeyError();
-			}
-			return new Key( docNode, parent, index, table );
 		}
 
 	
@@ -249,30 +208,6 @@ public class DocTree
 			}
 			catch (DocTreeKeyError e)
 			{
-			}
-		}
-		
-		public void remove(DocTreeKey k)
-		{
-			removeDeadEntries();
-			try
-			{
-				table.remove( k.key() );
-			}
-			catch (DocTreeKeyError e)
-			{
-			}
-		}
-		
-		public boolean containsKey(DocTreeKey k)
-		{
-			try
-			{
-				return table.containsKey( k.key() );
-			}
-			catch (DocTreeKeyError e)
-			{
-				return false;
 			}
 		}
 		

@@ -8,6 +8,7 @@ package BritefuryJ.ParserNew;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -18,6 +19,54 @@ import BritefuryJ.Utils.HashUtils;
 
 public class ParserState
 {
+	private enum Mode
+	{
+		NODE,
+		STRING,
+		STREAM,
+		LIST
+	}
+	
+	
+	private static class SourceKey
+	{
+		private Object input;
+		private Mode mode;
+		private int hash;
+		
+		public SourceKey(Object input, Mode mode)
+		{
+			this.input = input;
+			this.mode = mode;
+			this.hash = HashUtils.doubleHash( System.identityHashCode( input ), mode.hashCode() );
+		}
+		
+		public int hashCode()
+		{
+			return hash;
+		}
+		
+		public boolean equals(Object x)
+		{
+			if ( x == this )
+			{
+				return true;
+			}
+			
+			if ( x instanceof SourceKey )
+			{
+				SourceKey sx = (SourceKey)x;
+				return input == sx.input  &&  mode == sx.mode;
+			}
+			else
+			{
+				return false;
+			}
+		}
+	}
+
+	
+	
 	private static class MemoKey
 	{
 		private int pos;
@@ -60,16 +109,18 @@ public class ParserState
 	
 	private static class MemoEntry
 	{
-		public MemoKey key;
+		public SourceKey sourceKey;
+		public MemoKey memoKey;
 		public ParseResult answer;
 		public boolean bEvaluating, bLeftRecursionDetected;
 		public HashSet<MemoEntry> dependents;		// dependents; for a left-recursive application
 		
 		
-		public MemoEntry(MemoKey key)
+		public MemoEntry(SourceKey sourceKey, MemoKey memoKey)
 		{
-			this.key = key;
-			answer = ParseResult.failure( key.pos );
+			this.sourceKey = sourceKey;
+			this.memoKey = memoKey;
+			answer = ParseResult.failure( memoKey.pos );
 			bEvaluating = bLeftRecursionDetected = false;
 		}
 		
@@ -79,7 +130,7 @@ public class ParserState
 			{
 				dependents = new HashSet<MemoEntry>();
 			}
-			if ( dep.key.pos == key.pos )
+			if ( dep.memoKey.pos == memoKey.pos )
 			{
 				dependents.add( dep );
 			}
@@ -87,7 +138,12 @@ public class ParserState
 	};
 	
 	
-	private HashMap<MemoKey, MemoEntry> memo;
+	private HashMap<SourceKey, HashMap<MemoKey, MemoEntry>> table;
+	private SourceKey currentSourceKey;
+	private Object currentInput;
+	private Mode currentMode;
+	private HashMap<MemoKey, MemoEntry> currentMemo;
+	
 	private Pattern junkPattern;
 	private HashSet<MemoEntry> dependencies;
 	protected DebugNode debugStack;
@@ -98,7 +154,7 @@ public class ParserState
 	
 	public ParserState(String junkRegex, ParseAction delegateAction)
 	{
-		this.memo = new HashMap<MemoKey, MemoEntry>();
+		this.table = new HashMap<SourceKey, HashMap<MemoKey, MemoEntry>>();
 		junkPattern = Pattern.compile( junkRegex );
 		dependencies = null;
 		this.delegateAction = delegateAction;
@@ -132,19 +188,52 @@ public class ParserState
 	
 
 	
+	ParseResult memoisedMatchNode(ParserExpression rule, Object input)
+	{
+		return memoisedMatch( rule, Mode.NODE, input, 0 );
+	}
 	
+	ParseResult memoisedMatchString(ParserExpression rule, String input, int start)
+	{
+		return memoisedMatch( rule, Mode.STRING, input, start );
+	}
 	
-	@SuppressWarnings("unchecked")
 	ParseResult memoisedMatchStream(ParserExpression rule, ItemStreamAccessor input, int start)
 	{
-		MemoKey key = new MemoKey( start, rule );
-		MemoEntry memoEntry = memo.get( key );
+		return memoisedMatch( rule, Mode.STREAM, input, start );
+	}
+	
+	ParseResult memoisedMatchList(ParserExpression rule, List<Object> input, int start)
+	{
+		return memoisedMatch( rule, Mode.LIST, input, start );
+	}
+	
+
+	@SuppressWarnings("unchecked")
+	ParseResult memoisedMatch(ParserExpression rule, Mode mode, Object input, int start)
+	{
+		if ( input != currentInput  ||  mode != currentMode )
+		{
+			currentSourceKey = new SourceKey( input, mode );
+			currentInput = input;
+			currentMode = mode;
+
+			currentMemo = table.get( currentSourceKey );
+			if ( currentMemo == null )
+			{
+				currentMemo = new HashMap<MemoKey, MemoEntry>();
+				table.put( currentSourceKey, currentMemo );
+			}
+		}
+		
+		MemoKey memoKey = new MemoKey( start, rule );
+		MemoEntry memoEntry = currentMemo.get( memoKey );
 		
 		if ( memoEntry == null )
 		{
 			// Create the memo-entry, and memoise
-			memoEntry = new MemoEntry( key );
-			memo.put( key, memoEntry );
+			memoEntry = new MemoEntry( currentSourceKey, memoKey );
+			currentMemo.put( memoKey, memoEntry );
 			
 			
 			// Take a copy of the dependencies, and clear the global list
@@ -160,7 +249,7 @@ public class ParserState
 			
 
 			// Evaluate the rule, at position @start
-			ParseResult answer = rule.evaluateStreamItems( this, input, start );
+			ParseResult answer = applyRule( rule, mode, input, start );
 			
 
 			// Merge dependency lists, into global list
@@ -188,7 +277,7 @@ public class ParserState
 			if ( memoEntry.bLeftRecursionDetected )
 			{
 				// Grow the left recursive parse
-				answer = growLeftRecursiveParse( rule, input, start, memoEntry, answer );
+				answer = growLeftRecursiveParse( rule, mode, input, start, memoEntry, answer );
 			}
 			
 			// Rule no longer evaluating, got an answer
@@ -205,14 +294,14 @@ public class ParserState
 				// is recursive; specifically left-recursive since we are at the same position in the stream
 
 				// Left recursion has been detected
-				onLeftRecursionDetected( rule, input, start, memoEntry );
+				onLeftRecursionDetected( memoEntry );
 			}
 			return memoEntry.answer;
 		}
 	}
 	
 	
-	private void onLeftRecursionDetected(ParserExpression rule, Object input, int start, MemoEntry memoEntry)
+	private void onLeftRecursionDetected(MemoEntry memoEntry)
 	{
 		// Left recursion has been detected
 		memoEntry.bLeftRecursionDetected = true;
@@ -227,7 +316,7 @@ public class ParserState
 
 
 
-	private ParseResult growLeftRecursiveParse(ParserExpression rule, ItemStreamAccessor input, int start, MemoEntry memoEntry, ParseResult answer)
+	private ParseResult growLeftRecursiveParse(ParserExpression rule, Mode mode, Object input, int start, MemoEntry memoEntry, ParseResult answer)
 	{
 		while ( true )
 		{
@@ -238,13 +327,20 @@ public class ParserState
 			{
 				for (MemoEntry d: memoEntry.dependents)
 				{
-					memo.remove( d.key );
+					if ( d.sourceKey == currentSourceKey )
+					{
+						currentMemo.remove( d.memoKey );
+					}
+					else
+					{
+						table.get( d.sourceKey ).remove( d.memoKey );
+					}
 				}
 			}
 			memoEntry.dependents = null;
 			
 			// Try re-evaluation
-			ParseResult res = rule.evaluateStreamItems( this, input, start );
+			ParseResult res = applyRule( rule, mode, input, start );
 			// Fail or no additional characters consumed?
 			if ( !res.isValid()  ||  res.end <= answer.end )
 			{
@@ -259,6 +355,33 @@ public class ParserState
 		memoEntry.bLeftRecursionDetected = false;
 
 		return answer;
+	}
+	
+	
+	
+	@SuppressWarnings("unchecked")
+	private ParseResult applyRule(ParserExpression rule, Mode mode, Object input, int start)
+	{
+		if ( mode == Mode.STRING )
+		{
+			return rule.handleStringChars( this, (String)input, start );
+		}
+		else if ( mode == Mode.STREAM )
+		{
+			return rule.handleStreamItems( this, (ItemStreamAccessor)input, start );
+		}
+		else if ( mode == Mode.NODE )
+		{
+			return rule.handleNode( this, input );
+		}
+		else if ( mode == Mode.LIST )
+		{
+			return rule.handleListItems( this, (List<Object>)input, start );
+		}
+		else
+		{
+			throw new RuntimeException( "Invalid mode" );
+		}
 	}
 }
 

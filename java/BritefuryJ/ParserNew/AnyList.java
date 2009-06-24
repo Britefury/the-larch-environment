@@ -27,7 +27,7 @@ public class AnyList extends ParserExpression
 	
 	protected ParseResult evaluateNode(ParserState state, Object input)
 	{
-		if ( input instanceof List )
+		if ( input instanceof List<?> )
 		{
 			return new ParseResult( input, 0, 1 );
 		}
@@ -50,7 +50,7 @@ public class AnyList extends ParserExpression
 			
 			if ( valueArray != null )
 			{
-				if ( valueArray[0] instanceof List )
+				if ( valueArray[0] instanceof List<?> )
 				{
 					return new ParseResult( valueArray[0], 0, 1 );
 				}
@@ -66,7 +66,7 @@ public class AnyList extends ParserExpression
 		{
 			Object x = input.get( start );
 			
-			if ( x instanceof List )
+			if ( x instanceof List<?> )
 			{
 				return new ParseResult( x, start, start + 1 );
 			}

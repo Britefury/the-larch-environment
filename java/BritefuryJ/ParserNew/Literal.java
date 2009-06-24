@@ -36,13 +36,30 @@ public class Literal extends ParserExpression
 	
 	
 	
+	private ParseResult matchNode(Object input, int start)
+	{
+		if ( input instanceof String )
+		{
+			if ( input.equals( matchString ) )
+			{
+				return new ParseResult( input, start, start + 1 );
+			}
+		}
+		else if ( input instanceof ItemStreamAccessor )
+		{
+			ItemStreamAccessor stream = (ItemStreamAccessor)input;
+			if ( stream.consumeString( start, matchString ) == stream.length() )
+			{
+				return new ParseResult( matchString, start, start + 1 );
+			}
+		}
+		
+		return ParseResult.failure( start );
+	}
+	
 	protected ParseResult evaluateNode(ParserState state, Object input)
 	{
-		if ( input.equals( matchString ) )
-		{
-			return new ParseResult( matchString, 0, 1 );
-		}
-		return ParseResult.failure( 0 );
+		return matchNode( input, 0 );
 	}
 
 	protected ParseResult evaluateStringChars(ParserState state, String input, int start)
@@ -76,11 +93,7 @@ public class Literal extends ParserExpression
 	{
 		if ( start < input.size() )
 		{
-			Object x = input.get( start );
-			if ( x.equals( matchString ) )
-			{
-				return new ParseResult( matchString, start, start + 1 );
-			}
+			return matchNode( input.get( start ), start );
 		}
 		return ParseResult.failure( 0 );
 	}

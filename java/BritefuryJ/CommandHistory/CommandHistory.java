@@ -47,11 +47,6 @@ public class CommandHistory
 		{
 			return command;
 		}
-		
-		public Command getCommand()
-		{
-			return command;
-		}
 	}
 
 	private static class MultiEntry extends Entry
@@ -61,12 +56,6 @@ public class CommandHistory
 		public MultiEntry()
 		{
 			commands = new ArrayList<Command>();
-		}
-		
-		public MultiEntry(SingleEntry entry)
-		{
-			commands = new ArrayList<Command>();
-			commands.add( entry.getCommand() );
 		}
 		
 		public void execute()
