@@ -299,7 +299,7 @@ public class DMIOReader
 		}
 		// Ensure that it is a list
 		Object item = getTopOfStack();
-		if ( !( item instanceof ArrayList ) )
+		if ( !( item instanceof ArrayList<?> ) )
 		{
 			throw new ParseErrorException( pos, "']' attempting to close non-list" );
 		}

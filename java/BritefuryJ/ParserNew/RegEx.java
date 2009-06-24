@@ -7,6 +7,7 @@
 package BritefuryJ.ParserNew;
 
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
@@ -21,33 +22,51 @@ import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
  * 								input[start+Keyword.keywordString.length()] not in Keyword.disallowedSubsequentChars  ?  input[start:start+Keyword.keywordString.length()] : fail
  * Keyword:list( input, start )		->  input[start] == Keyword.keywordString  ?  input[start]  :  fail
  */
-public class Keyword extends ParserExpression
+public class RegEx extends ParserExpression
 {
-	protected String keywordString, disallowedSubsequentChars;
-	private Pattern postPattern;
+	protected String re;
+	protected int flags;
+	protected boolean bSkipJunkChars;
+	protected Pattern pattern;
 	
 	
-	public Keyword(String keywordString)
+	public RegEx(String re)
 	{
-		this( keywordString, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_" );
+		this( re, 0, true );
 	}
 	
-	public Keyword(String keywordString, String disallowedSubsequentChars)
+	public RegEx(String re, int flags)
 	{
-		this.keywordString = keywordString;
-		this.disallowedSubsequentChars = disallowedSubsequentChars;
-		postPattern = Pattern.compile( "[" + Pattern.quote( disallowedSubsequentChars ) + "]*" );
+		this( re, flags, true );
+	}
+	
+	public RegEx(String re, boolean bSkipJunkChars)
+	{
+		this( re, 0, bSkipJunkChars );
+	}
+	
+	public RegEx(String re, int flags, boolean bSkipJunkChars)
+	{
+		pattern = Pattern.compile( re, flags );
+		this.re = re;
+		this.flags = flags;
+		this.bSkipJunkChars = bSkipJunkChars;
 	}
 	
 	
-	public String getKeywordString()
+	public String getRE()
 	{
-		return keywordString;
+		return re;
 	}
 	
-	public String getDisallowedSubsequentChars()
+	public int getREFlags()
 	{
-		return disallowedSubsequentChars;
+		return flags;
+	}
+	
+	public boolean getSkipJunkChars()
+	{
+		return bSkipJunkChars;
 	}
 	
 	
@@ -56,23 +75,32 @@ public class Keyword extends ParserExpression
 	{
 		if ( input instanceof String )
 		{
-			if ( input.equals( keywordString ) )
+			String s = (String)input;
+			Matcher m = pattern.matcher( s );
+			
+			boolean bFound = m.find();
+			if ( bFound  &&  m.start() == 0  &&  m.end() > 0 )
 			{
-				return new ParseResult( input, start, start + 1 );
+				if ( m.group().length() == s.length() )
+				{
+					return new ParseResult( s, start, start + 1 );
+				}
 			}
 		}
 		else if ( input instanceof ItemStreamAccessor )
 		{
 			ItemStreamAccessor stream = (ItemStreamAccessor)input;
-			if ( stream.consumeString( start, keywordString ) == stream.length() )
+			String match = stream.matchRegEx( start, pattern );
+			if ( match != null  &&  match.length() == stream.length() )
 			{
-				return new ParseResult( keywordString, start, start + 1 );
+				return new ParseResult( input, start, start + 1 );
 			}
 		}
 		
 		return ParseResult.failure( start );
 	}
 	
+
 	protected ParseResult evaluateNode(ParserState state, Object input)
 	{
 		return matchNode( input, 0 );
@@ -80,19 +108,19 @@ public class Keyword extends ParserExpression
 
 	protected ParseResult evaluateStringChars(ParserState state, String input, int start)
 	{
-		start = state.skipJunkChars( input, start );
-		
-		int end = start + keywordString.length();
-		
-		if ( end <= input.length() )
+		if ( bSkipJunkChars )
 		{
-			if ( input.subSequence( start, end ).equals( keywordString ) )
-			{
-				if ( end == input.length()  ||  !postPattern.matcher( input.subSequence( end, end + 1 ) ).matches() )
-				{
-					return new ParseResult( keywordString, start, start + end );
-				}
-			}
+			start = state.skipJunkChars( input, start );
+		}
+		
+
+		Matcher m = pattern.matcher( input.subSequence( start, input.length() ) );
+		
+		boolean bFound = m.find();
+		if ( bFound  &&  m.start() == 0  &&  m.end() > 0 )
+		{
+			String match = m.group();
+			return new ParseResult( match, start, start + match.length() );
 		}
 		
 		return ParseResult.failure( start );
@@ -100,23 +128,21 @@ public class Keyword extends ParserExpression
 
 	protected ParseResult evaluateStreamItems(ParserState state, ItemStreamAccessor input, int start)
 	{
-		start = state.skipJunkChars( input, start );
-		
-		CharSequence itemText = input.getItemTextFrom( start );
-		int end = keywordString.length();
-		
-		if ( end <= itemText.length() )
+		if ( bSkipJunkChars )
 		{
-			if ( itemText.subSequence( 0, end ).equals( keywordString ) )
-			{
-				if ( end == itemText.length()  ||  !postPattern.matcher( itemText.subSequence( end, end + 1 ) ).matches() )
-				{
-					return new ParseResult( keywordString, start, start + end );
-				}
-			}
+			start = state.skipJunkChars( input, start );
 		}
 		
-		return ParseResult.failure( start );
+		String match = input.matchRegEx( start, pattern );
+		
+		if ( match != null )
+		{
+			return new ParseResult( match, start, start + match.length() );
+		}
+		else
+		{
+			return ParseResult.failure( start );
+		}
 	}
 
 	protected ParseResult evaluateListItems(ParserState state, List<Object> input, int start)
@@ -129,13 +155,13 @@ public class Keyword extends ParserExpression
 	}
 
 	
-	
+
 	public boolean compareTo(ParserExpression x)
 	{
-		if ( x instanceof Keyword )
+		if ( x instanceof RegEx )
 		{
-			Keyword xk = (Keyword)x;
-			return keywordString.equals( xk.keywordString )  &&  disallowedSubsequentChars.equals(  xk.disallowedSubsequentChars );
+			RegEx xr = (RegEx)x;
+			return re.equals( xr.re )  &&  flags == xr.flags  &&  bSkipJunkChars == xr.bSkipJunkChars;
 		}
 		else
 		{
@@ -145,6 +171,6 @@ public class Keyword extends ParserExpression
 	
 	public String toString()
 	{
-		return "Keyword( \"" + keywordString + "\", \"" + disallowedSubsequentChars + "\" )";
+		return "RegEx( \"" + re + "\", " + String.valueOf( flags ) + ", " + String.valueOf( bSkipJunkChars ) + "  )";
 	}
 }

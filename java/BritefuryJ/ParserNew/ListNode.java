@@ -83,7 +83,7 @@ public class ListNode extends BranchExpression
 	@SuppressWarnings("unchecked")
 	protected ParseResult evaluateNode(ParserState state, Object input)
 	{
-		if ( input instanceof List )
+		if ( input instanceof List<?> )
 		{
 			List<Object> node = (List<Object>)input;
 			ParseResult res = matchListContents( state, node );
