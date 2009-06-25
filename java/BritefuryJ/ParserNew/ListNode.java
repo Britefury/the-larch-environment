@@ -29,6 +29,11 @@ public class ListNode extends BranchExpression
 		super( subexps );
 	}
 	
+	public ListNode(Object[] subexps) throws ParserCoerceException
+	{
+		super( subexps );
+	}
+	
 	
 	@SuppressWarnings("unchecked")
 	private ParseResult matchListContents(ParserState state, List<Object> input)

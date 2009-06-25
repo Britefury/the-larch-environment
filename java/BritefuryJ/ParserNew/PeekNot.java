@@ -22,12 +22,12 @@ import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
  */
 public class PeekNot extends UnaryBranchExpression
 {
-	public PeekNot(String subexp) throws ParserCoerceException
+	public PeekNot(ParserExpression subexp)
 	{
 		super( subexp );
 	}
 	
-	public PeekNot(ParserExpression subexp)
+	public PeekNot(Object subexp) throws ParserCoerceException
 	{
 		super( subexp );
 	}

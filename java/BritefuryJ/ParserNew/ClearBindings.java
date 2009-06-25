@@ -25,6 +25,11 @@ public class ClearBindings extends UnaryBranchExpression
 		super( subexp );
 	}
 	
+	public ClearBindings(Object subexp) throws ParserCoerceException
+	{
+		super( subexp );
+	}
+	
 	
 	
 	protected ParseResult evaluateNode(ParserState state, Object input)

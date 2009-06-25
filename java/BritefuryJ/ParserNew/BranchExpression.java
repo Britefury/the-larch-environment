@@ -19,6 +19,17 @@ public abstract class BranchExpression extends ParserExpression
 		this.subexps = subexps;
 	}
 	
+	public BranchExpression(Object[] subexps) throws ParserCoerceException
+	{
+		this.subexps = new ParserExpression[subexps.length];
+		
+		int i = 0;
+		for (Object x: subexps)
+		{
+			this.subexps[i++] = coerce( x );
+		}
+	}
+	
 	
 	public List<ParserExpression> getSubExpressions()
 	{

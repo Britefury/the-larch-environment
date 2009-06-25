@@ -27,6 +27,18 @@ public abstract class ParserExpression implements ParserExpressionInterface
 	
 
 	
+	protected enum Mode
+	{
+		NODE,
+		STRING,
+		STREAM,
+		LIST
+	}
+
+
+
+
+
 	protected String debugName = "";
 	
 	
@@ -597,6 +609,22 @@ public abstract class ParserExpression implements ParserExpressionInterface
 	}
 	
 	
+	public static boolean compareExpressions(ParserExpression x, ParserExpression y)
+	{
+		if ( x == null  &&  y == null )
+		{
+			return true;
+		}
+		else if ( x != null  &&  y != null )
+		{
+			return x.compareTo( y );
+		}
+		else
+		{
+			return false;
+		}
+	}
+
 	public boolean compareTo(ParserExpression x)
 	{
 		return true;

@@ -25,6 +25,11 @@ public class Choice extends BranchExpression
 		super( subexps );
 	}
 	
+	public Choice(Object[] subexps) throws ParserCoerceException
+	{
+		super( subexps );
+	}
+	
 	
 	protected ParseResult evaluateNode(ParserState state, Object input)
 	{

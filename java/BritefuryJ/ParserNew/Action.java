@@ -70,6 +70,30 @@ public class Action extends UnaryBranchExpression
 	}
 	
 	
+	public Action(Object subexp, ParseAction a) throws ParserCoerceException
+	{
+		this( subexp, a, false );
+	}
+	
+	public Action(Object subexp, ParseAction a, boolean bMergeUp) throws ParserCoerceException
+	{
+		super( subexp );
+		this.a = a;
+		this.bMergeUp = bMergeUp;
+	}
+	
+	public Action(Object subexp, PyObject a) throws ParserCoerceException
+	{
+		this( subexp, new PyAction( a ) );
+	}
+	
+	public Action(Object subexp, PyObject a, boolean bMergeUp) throws ParserCoerceException
+	{
+		this( subexp, new PyAction( a ), bMergeUp );
+	}
+	
+	
+
 	public ParseAction getAction()
 	{
 		return a;
