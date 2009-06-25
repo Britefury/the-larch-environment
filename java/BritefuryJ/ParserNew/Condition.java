@@ -51,9 +51,20 @@ public class Condition extends UnaryBranchExpression
 		super( subexp );
 		this.cond = cond;
 	}
-	
 
 	public Condition(ParserExpression subexp, PyObject cond)
+	{
+		this( subexp, new PyCondition( cond ) );
+	}
+	
+
+	public Condition(Object subexp, ParseCondition cond) throws ParserCoerceException
+	{
+		super( subexp );
+		this.cond = cond;
+	}
+
+	public Condition(Object subexp, PyObject cond) throws ParserCoerceException
 	{
 		this( subexp, new PyCondition( cond ) );
 	}

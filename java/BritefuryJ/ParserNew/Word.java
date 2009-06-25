@@ -11,44 +11,35 @@ import java.util.regex.Pattern;
 
 import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
 
-/*
- * Keyword
- * 
- * Keyword:node( input )			->  input == Keyword.keywordString  ?  input  :  fail
- * Keyword:string( input, start )		->  input[start:start+Keyword.keywordString.length()] == Keyword.keywordString  &&
- * 									input[start+Keyword.keywordString.length()] not in Keyword.disallowedSubsequentChars  ?  input[start:start+Keyword.keywordString.length()] : fail
- * Keyword:stream( input, start )	->  input[start:start+Keyword.keywordString.length()] == Keyword.keywordString  &&
- * 								input[start+Keyword.keywordString.length()] not in Keyword.disallowedSubsequentChars  ?  input[start:start+Keyword.keywordString.length()] : fail
- * Keyword:list( input, start )		->  input[start] == Keyword.keywordString  ?  input[start]  :  fail
- */
-public class RegEx extends TerminalString
+public class Word extends TerminalString
 {
-	protected String re;
-	protected int flags;
+	protected String initChars, bodyChars;
 	protected Pattern pattern;
 	
 	
-	public RegEx(String re)
+	public Word(String bodyChars)
 	{
-		this( re, 0 );
+		initChars = "";
+		this.bodyChars = bodyChars;
+		pattern = Pattern.compile( "[" + Pattern.quote(  bodyChars ) + "]*" );
 	}
 	
-	public RegEx(String re, int flags)
+	public Word(String initChars, String bodyChars)
 	{
-		pattern = Pattern.compile( re, flags );
-		this.re = re;
-		this.flags = flags;
+		this.initChars = initChars;
+		this.bodyChars = bodyChars;
+		pattern = Pattern.compile( "[" + Pattern.quote(  initChars ) + "][" + Pattern.quote(  bodyChars ) + "]*" );
 	}
 	
 	
-	public String getRE()
+	public String getInitChars()
 	{
-		return re;
+		return initChars;
 	}
 	
-	public int getREFlags()
+	public String getBodyChars()
 	{
-		return flags;
+		return bodyChars;
 	}
 	
 	
@@ -82,13 +73,13 @@ public class RegEx extends TerminalString
 	}
 
 	
-
+	
 	public boolean compareTo(ParserExpression x)
 	{
-		if ( x instanceof RegEx )
+		if ( x instanceof Word )
 		{
-			RegEx xr = (RegEx)x;
-			return re.equals( xr.re )  &&  flags == xr.flags;
+			Word xw = (Word)x;
+			return initChars.equals( xw.initChars )  &&  bodyChars.equals( xw.bodyChars );
 		}
 		else
 		{
@@ -98,6 +89,6 @@ public class RegEx extends TerminalString
 	
 	public String toString()
 	{
-		return "RegEx( \"" + re + "\", " + String.valueOf( flags ) + "  )";
+		return "Word( \"" + initChars + "\", \"" + bodyChars + "\" )";
 	}
 }

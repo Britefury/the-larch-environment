@@ -6,7 +6,6 @@
 //##************************
 package BritefuryJ.ParserNew;
 
-import java.util.List;
 import java.util.regex.Pattern;
 
 import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
@@ -21,7 +20,7 @@ import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
  * 								input[start+Keyword.keywordString.length()] not in Keyword.disallowedSubsequentChars  ?  input[start:start+Keyword.keywordString.length()] : fail
  * Keyword:list( input, start )		->  input[start] == Keyword.keywordString  ?  input[start]  :  fail
  */
-public class Keyword extends ParserExpression
+public class Keyword extends TerminalString
 {
 	protected String keywordString, disallowedSubsequentChars;
 	private Pattern postPattern;
@@ -52,36 +51,8 @@ public class Keyword extends ParserExpression
 	
 	
 	
-	private ParseResult matchNode(Object input, int start)
+	protected ParseResult consumeString(String input, int start)
 	{
-		if ( input instanceof String )
-		{
-			if ( input.equals( keywordString ) )
-			{
-				return new ParseResult( input, start, start + 1 );
-			}
-		}
-		else if ( input instanceof ItemStreamAccessor )
-		{
-			ItemStreamAccessor stream = (ItemStreamAccessor)input;
-			if ( stream.consumeString( start, keywordString ) == stream.length() )
-			{
-				return new ParseResult( keywordString, start, start + 1 );
-			}
-		}
-		
-		return ParseResult.failure( start );
-	}
-	
-	protected ParseResult evaluateNode(ParserState state, Object input)
-	{
-		return matchNode( input, 0 );
-	}
-
-	protected ParseResult evaluateStringChars(ParserState state, String input, int start)
-	{
-		start = state.skipJunkChars( input, start );
-		
 		int end = start + keywordString.length();
 		
 		if ( end <= input.length() )
@@ -97,11 +68,9 @@ public class Keyword extends ParserExpression
 		
 		return ParseResult.failure( start );
 	}
-
-	protected ParseResult evaluateStreamItems(ParserState state, ItemStreamAccessor input, int start)
+	
+	protected ParseResult consumeStream(ItemStreamAccessor input, int start)
 	{
-		start = state.skipJunkChars( input, start );
-		
 		CharSequence itemText = input.getItemTextFrom( start );
 		int end = keywordString.length();
 		
@@ -118,16 +87,6 @@ public class Keyword extends ParserExpression
 		
 		return ParseResult.failure( start );
 	}
-
-	protected ParseResult evaluateListItems(ParserState state, List<Object> input, int start)
-	{
-		if ( start < input.size() )
-		{
-			return matchNode( input.get( start ), start );
-		}
-		return ParseResult.failure( 0 );
-	}
-
 	
 	
 	public boolean compareTo(ParserExpression x)

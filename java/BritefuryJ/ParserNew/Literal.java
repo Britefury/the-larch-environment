@@ -6,8 +6,6 @@
 //##************************
 package BritefuryJ.ParserNew;
 
-import java.util.List;
-
 import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
 
 /*
@@ -18,7 +16,7 @@ import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
  * Literal:stream( input, start )		->  input[start:start+Literal.matchString.length()] == Literal.matchString  ?  input[start:start+Literal.matchString.length()] : fail
  * Literal:list( input, start )			->  input[start] == Literal.matchString  ?  input[start]  :  fail
  */
-public class Literal extends ParserExpression
+public class Literal extends TerminalString
 {
 	protected String matchString;
 	
@@ -36,36 +34,8 @@ public class Literal extends ParserExpression
 	
 	
 	
-	private ParseResult matchNode(Object input, int start)
+	protected ParseResult consumeString(String input, int start)
 	{
-		if ( input instanceof String )
-		{
-			if ( input.equals( matchString ) )
-			{
-				return new ParseResult( input, start, start + 1 );
-			}
-		}
-		else if ( input instanceof ItemStreamAccessor )
-		{
-			ItemStreamAccessor stream = (ItemStreamAccessor)input;
-			if ( stream.consumeString( start, matchString ) == stream.length() )
-			{
-				return new ParseResult( matchString, start, start + 1 );
-			}
-		}
-		
-		return ParseResult.failure( start );
-	}
-	
-	protected ParseResult evaluateNode(ParserState state, Object input)
-	{
-		return matchNode( input, 0 );
-	}
-
-	protected ParseResult evaluateStringChars(ParserState state, String input, int start)
-	{
-		start = state.skipJunkChars( input, start );
-		
 		int end = start + matchString.length();
 		if ( end <= input.length()  &&  input.subSequence( start, end ).equals( matchString ) )
 		{
@@ -75,10 +45,8 @@ public class Literal extends ParserExpression
 		return ParseResult.failure( start );
 	}
 	
-	protected ParseResult evaluateStreamItems(ParserState state, ItemStreamAccessor input, int start)
+	protected ParseResult consumeStream(ItemStreamAccessor input, int start)
 	{
-		start = state.skipJunkChars( input, start );
-		
 		int end = input.consumeString( start, matchString );
 		
 		if ( end != -1 )
@@ -89,16 +57,8 @@ public class Literal extends ParserExpression
 		return ParseResult.failure( start );
 	}
 
-	protected ParseResult evaluateListItems(ParserState state, List<Object> input, int start)
-	{
-		if ( start < input.size() )
-		{
-			return matchNode( input.get( start ), start );
-		}
-		return ParseResult.failure( 0 );
-	}
-	
-	
+
+
 	public boolean compareTo(ParserExpression x)
 	{
 		if ( x instanceof Literal )

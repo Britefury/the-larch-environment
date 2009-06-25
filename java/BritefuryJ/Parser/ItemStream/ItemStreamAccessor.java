@@ -38,12 +38,13 @@ public class ItemStreamAccessor
 	public int consumeString(int start, String x)
 	{
 		updateCurrentItem( start );
-		if ( currentItem.isTextual() )
+		if ( currentItem instanceof ItemStream.TextItem )
 		{
 			if ( start + x.length() <= currentItem.stop )
 			{
 				int offset = start - currentItem.start;
-				if ( currentItem.textValue.substring( offset, offset + x.length() ).equals( x ) )
+				ItemStream.TextItem t = (ItemStream.TextItem)currentItem;
+				if ( t.textValue.substring( offset, offset + x.length() ).equals( x ) )
 				{
 					return start + x.length();
 				}
@@ -56,10 +57,11 @@ public class ItemStreamAccessor
 	public int consumeRegEx(int start, Pattern pattern)
 	{
 		updateCurrentItem( start );
-		if ( currentItem.isTextual() )
+		if ( currentItem instanceof ItemStream.TextItem )
 		{
-			int offset = start - currentItem.start;
-			Matcher m = pattern.matcher( currentItem.textValue.substring( offset, currentItem.stop - currentItem.start ) );
+			ItemStream.TextItem t = (ItemStream.TextItem)currentItem;
+			int offset = start - t.start;
+			Matcher m = pattern.matcher( t.textValue.substring( offset, t.stop - t.start ) );
 			
 			boolean bFound = m.find();
 			if ( bFound  &&  m.start() == 0  &&  m.end() > 0 )
@@ -74,10 +76,11 @@ public class ItemStreamAccessor
 	public int skipRegEx(int start,  Pattern pattern)
 	{
 		updateCurrentItem( start );
-		if ( currentItem.isTextual() )
+		if ( currentItem instanceof ItemStream.TextItem )
 		{
-			int offset = start - currentItem.start;
-			Matcher m = pattern.matcher( currentItem.textValue.substring( offset, currentItem.stop - currentItem.start ) );
+			ItemStream.TextItem t = (ItemStream.TextItem)currentItem;
+			int offset = start - t.start;
+			Matcher m = pattern.matcher( t.textValue.substring( offset, t.stop - t.start ) );
 			
 			boolean bFound = m.find();
 			if ( bFound  &&  m.start() == 0  &&  m.end() > 0 )
@@ -92,10 +95,11 @@ public class ItemStreamAccessor
 	public String matchRegEx(int start, Pattern pattern)
 	{
 		updateCurrentItem( start );
-		if ( currentItem.isTextual() )
+		if ( currentItem instanceof ItemStream.TextItem )
 		{
-			int offset = start - currentItem.start;
-			Matcher m = pattern.matcher( currentItem.textValue.substring( offset, currentItem.stop - currentItem.start ) );
+			ItemStream.TextItem t = (ItemStream.TextItem)currentItem;
+			int offset = start - t.start;
+			Matcher m = pattern.matcher( t.textValue.substring( offset, t.stop - t.start ) );
 			
 			boolean bFound = m.find();
 			if ( bFound  &&  m.start() == 0  &&  m.end() > 0 )
@@ -110,11 +114,12 @@ public class ItemStreamAccessor
 	public boolean matchesRegEx(int start, int stop, Pattern pattern)
 	{
 		updateCurrentItem( start );
-		if ( currentItem.isTextual() )
+		if ( currentItem instanceof ItemStream.TextItem )
 		{
-			int offset = start - currentItem.start;
-			stop = Math.min( stop, currentItem.stop );
-			Matcher m = pattern.matcher( currentItem.textValue.substring( offset, stop - currentItem.start ) );
+			ItemStream.TextItem t = (ItemStream.TextItem)currentItem;
+			int offset = start - t.start;
+			stop = Math.min( stop, t.stop );
+			Matcher m = pattern.matcher( t.textValue.substring( offset, stop - t.start ) );
 			return m.matches();
 		}
 		
@@ -136,9 +141,10 @@ public class ItemStreamAccessor
 	public Object[] matchStructuralNode(int start)
 	{
 		updateCurrentItem( start );
-		if ( currentItem.isStructural() )
+		if ( currentItem instanceof ItemStream.StructuralItem )
 		{
-			return new Object[] { currentItem.structuralValue };
+			ItemStream.StructuralItem s = (ItemStream.StructuralItem)currentItem;
+			return new Object[] { s.structuralValue };
 		}
 		
 		return null;
@@ -149,9 +155,10 @@ public class ItemStreamAccessor
 	public CharSequence getItemTextFrom(int start)
 	{
 		updateCurrentItem( start );
-		if ( currentItem.isTextual() )
+		if ( currentItem instanceof ItemStream.TextItem )
 		{
-			return currentItem.textValue.subSequence( start - currentItem.start, currentItem.stop - currentItem.start );
+			ItemStream.TextItem t = (ItemStream.TextItem)currentItem;
+			return t.textValue.subSequence( start - currentItem.start, currentItem.stop - currentItem.start );
 		}
 		
 		return null;

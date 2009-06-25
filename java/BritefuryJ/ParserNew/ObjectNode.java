@@ -53,7 +53,7 @@ public class ObjectNode extends ParserExpression
 		initialise();
 	}
 
-	public ObjectNode(DMObjectClass objClass, ParserExpression[] fieldExps) throws InvalidFieldNameException
+	public ObjectNode(DMObjectClass objClass, Object[] fieldExps) throws InvalidFieldNameException, ParserCoerceException
 	{
 		assert fieldNames.length == fieldExps.length;
 		
@@ -67,7 +67,7 @@ public class ObjectNode extends ParserExpression
 			if ( fieldExps[i] != null )
 			{
 				fn.add( objClass.getField( i ).getName() );
-				fe.add( fieldExps[i] );
+				fe.add( coerce( fieldExps[i] ) );
 			}
 		}
 		
@@ -80,7 +80,7 @@ public class ObjectNode extends ParserExpression
 		initialise();
 	}
 
-	public ObjectNode(DMObjectClass objClass, String[] fieldNames, ParserExpression[] fieldExps) throws InvalidFieldNameException
+	public ObjectNode(DMObjectClass objClass, String[] fieldNames, Object[] fieldExps) throws InvalidFieldNameException, ParserCoerceException
 	{
 		assert fieldNames.length == fieldExps.length;
 		
@@ -89,13 +89,13 @@ public class ObjectNode extends ParserExpression
 		this.fieldExps = new ParserExpression[fieldExps.length];
 		for (int i = 0; i < fieldExps.length; i++)
 		{
-			this.fieldExps[i] = fieldExps[i];
+			this.fieldExps[i] = coerce( fieldExps[i] );
 		}
 		
 		initialise();
 	}
 	
-	public ObjectNode(DMObjectClass objClass, String[] fieldNames, PyObject[] fieldExps) throws InvalidFieldNameException
+	public ObjectNode(DMObjectClass objClass, String[] fieldNames, PyObject[] fieldExps) throws InvalidFieldNameException, ParserCoerceException
 	{
 		assert fieldNames.length == fieldExps.length;
 		
@@ -104,13 +104,13 @@ public class ObjectNode extends ParserExpression
 		this.fieldExps = new ParserExpression[fieldExps.length];
 		for (int i = 0; i < fieldExps.length; i++)
 		{
-			this.fieldExps[i] = Py.tojava( fieldExps[i], ParserExpression.class );
+			this.fieldExps[i] = coerce( Py.tojava( fieldExps[i], Object.class ) );
 		}
 		
 		initialise();
 	}
 	
-	public ObjectNode(PyObject[] values, String[] names) throws InvalidFieldNameException
+	public ObjectNode(PyObject[] values, String[] names) throws InvalidFieldNameException, ParserCoerceException
 	{
 		assert values.length == ( names.length + 1 );
 		
@@ -123,24 +123,24 @@ public class ObjectNode extends ParserExpression
 		fieldExps = new ParserExpression[names.length];
 		for (int i = 0; i < names.length; i++)
 		{
-			fieldExps[i] = Py.tojava( values[i+1], ParserExpression.class );
+			fieldExps[i] = coerce( Py.tojava( values[i+1], Object.class ) );
 		}
 		
 		
 		initialise();
 	}
 	
-	public ObjectNode(DMObjectClass objClass, Map<String, ParserExpression> data) throws InvalidFieldNameException
+	public ObjectNode(DMObjectClass objClass, Map<String, Object> data) throws InvalidFieldNameException, ParserCoerceException
 	{
 		this.objClass = objClass;
 		fieldNames = new String[data.size()];
 		fieldExps = new ParserExpression[data.size()];
 		
 		int i = 0;
-		for (Map.Entry<String, ParserExpression> e: data.entrySet())
+		for (Map.Entry<String, Object> e: data.entrySet())
 		{
 			fieldNames[i] = e.getKey();
-			fieldExps[i] = e.getValue();
+			fieldExps[i] = coerce( e.getValue() );
 			i++;
 		}
 		
@@ -149,7 +149,7 @@ public class ObjectNode extends ParserExpression
 	
 	
 	@SuppressWarnings("unchecked")
-	public ObjectNode(DMObjectClass objClass, PyDictionary data) throws InvalidFieldNameException
+	public ObjectNode(DMObjectClass objClass, PyDictionary data) throws InvalidFieldNameException, ParserCoerceException
 	{
 		this.objClass = objClass;
 		this.fieldNames = new String[data.size()];
@@ -170,7 +170,7 @@ public class ObjectNode extends ParserExpression
 				throw Py.TypeError( "All keys must be of type string" );
 			}
 		
-			fieldExps[i] = Py.tojava( (PyObject)entry.getValue(), ParserExpression.class );
+			fieldExps[i] = coerce( Py.tojava( (PyObject)entry.getValue(), Object.class ) );
 			i++;
 		}
 		

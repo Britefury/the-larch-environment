@@ -40,6 +40,12 @@ public class Bind extends UnaryBranchExpression
 		this.name = name;
 	}
 	
+	public Bind(String name, Object subexp) throws ParserCoerceException
+	{
+		super( subexp );
+		this.name = name;
+	}
+	
 	
 	
 	public String getName()

@@ -26,6 +26,11 @@ public class Peek extends UnaryBranchExpression
 		super( subexp );
 	}
 	
+	public Peek(Object subexp) throws ParserCoerceException
+	{
+		super( subexp );
+	}
+	
 
 	protected ParseResult evaluateNode(ParserState state, Object input)
 	{

@@ -25,6 +25,11 @@ public class Optional extends UnaryBranchExpression
 		super( subexp );
 	}
 	
+	public Optional(Object subexp) throws ParserCoerceException
+	{
+		super( subexp );
+	}
+	
 
 	protected ParseResult evaluateNode(ParserState state, Object input)
 	{

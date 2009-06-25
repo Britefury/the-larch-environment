@@ -19,22 +19,13 @@ import BritefuryJ.Utils.HashUtils;
 
 public class ParserState
 {
-	private enum Mode
-	{
-		NODE,
-		STRING,
-		STREAM,
-		LIST
-	}
-	
-	
 	private static class SourceKey
 	{
 		private Object input;
-		private Mode mode;
+		private ParserExpression.Mode mode;
 		private int hash;
 		
-		public SourceKey(Object input, Mode mode)
+		public SourceKey(Object input, ParserExpression.Mode mode)
 		{
 			this.input = input;
 			this.mode = mode;
@@ -141,7 +132,7 @@ public class ParserState
 	private HashMap<SourceKey, HashMap<MemoKey, MemoEntry>> table;
 	private SourceKey currentSourceKey;
 	private Object currentInput;
-	private Mode currentMode;
+	private ParserExpression.Mode currentMode;
 	private HashMap<MemoKey, MemoEntry> currentMemo;
 	
 	private Pattern junkPattern;
@@ -190,27 +181,27 @@ public class ParserState
 	
 	ParseResult memoisedMatchNode(ParserExpression rule, Object input)
 	{
-		return memoisedMatch( rule, Mode.NODE, input, 0 );
+		return memoisedMatch( rule, ParserExpression.Mode.NODE, input, 0 );
 	}
 	
 	ParseResult memoisedMatchString(ParserExpression rule, String input, int start)
 	{
-		return memoisedMatch( rule, Mode.STRING, input, start );
+		return memoisedMatch( rule, ParserExpression.Mode.STRING, input, start );
 	}
 	
 	ParseResult memoisedMatchStream(ParserExpression rule, ItemStreamAccessor input, int start)
 	{
-		return memoisedMatch( rule, Mode.STREAM, input, start );
+		return memoisedMatch( rule, ParserExpression.Mode.STREAM, input, start );
 	}
 	
 	ParseResult memoisedMatchList(ParserExpression rule, List<Object> input, int start)
 	{
-		return memoisedMatch( rule, Mode.LIST, input, start );
+		return memoisedMatch( rule, ParserExpression.Mode.LIST, input, start );
 	}
 	
 
 	@SuppressWarnings("unchecked")
-	ParseResult memoisedMatch(ParserExpression rule, Mode mode, Object input, int start)
+	ParseResult memoisedMatch(ParserExpression rule, ParserExpression.Mode mode, Object input, int start)
 	{
 		if ( input != currentInput  ||  mode != currentMode )
 		{
@@ -316,7 +307,7 @@ public class ParserState
 
 
 
-	private ParseResult growLeftRecursiveParse(ParserExpression rule, Mode mode, Object input, int start, MemoEntry memoEntry, ParseResult answer)
+	private ParseResult growLeftRecursiveParse(ParserExpression rule, ParserExpression.Mode mode, Object input, int start, MemoEntry memoEntry, ParseResult answer)
 	{
 		while ( true )
 		{
@@ -360,21 +351,21 @@ public class ParserState
 	
 	
 	@SuppressWarnings("unchecked")
-	private ParseResult applyRule(ParserExpression rule, Mode mode, Object input, int start)
+	private ParseResult applyRule(ParserExpression rule, ParserExpression.Mode mode, Object input, int start)
 	{
-		if ( mode == Mode.STRING )
+		if ( mode == ParserExpression.Mode.STRING )
 		{
 			return rule.handleStringChars( this, (String)input, start );
 		}
-		else if ( mode == Mode.STREAM )
+		else if ( mode == ParserExpression.Mode.STREAM )
 		{
 			return rule.handleStreamItems( this, (ItemStreamAccessor)input, start );
 		}
-		else if ( mode == Mode.NODE )
+		else if ( mode == ParserExpression.Mode.NODE )
 		{
 			return rule.handleNode( this, input );
 		}
-		else if ( mode == Mode.LIST )
+		else if ( mode == ParserExpression.Mode.LIST )
 		{
 			return rule.handleListItems( this, (List<Object>)input, start );
 		}
