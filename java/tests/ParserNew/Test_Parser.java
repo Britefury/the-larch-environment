@@ -16,7 +16,13 @@ import BritefuryJ.DocModel.DMModuleResolver;
 import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMModule.ClassAlreadyDefinedException;
 import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
+import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
+import BritefuryJ.ParserDebugViewer.ParseViewFrame;
 import BritefuryJ.ParserNew.Action;
+import BritefuryJ.ParserNew.AnyList;
+import BritefuryJ.ParserNew.AnyNode;
+import BritefuryJ.ParserNew.AnyObject;
+import BritefuryJ.ParserNew.AnyString;
 import BritefuryJ.ParserNew.Choice;
 import BritefuryJ.ParserNew.Combine;
 import BritefuryJ.ParserNew.Condition;
@@ -39,23 +45,22 @@ import BritefuryJ.ParserNew.Sequence;
 import BritefuryJ.ParserNew.Suppress;
 import BritefuryJ.ParserNew.Word;
 import BritefuryJ.ParserNew.ZeroOrMore;
-import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
 import BritefuryJ.ParserNew.ParserExpression.ParserCoerceException;
 import BritefuryJ.ParserNew.SeparatedList.CannotApplyConditionAfterActionException;
 import BritefuryJ.ParserNew.SeparatedList.CannotApplyMoreThanOneActionException;
 import BritefuryJ.ParserNew.SeparatedList.CannotApplyMoreThanOneConditionException;
-import BritefuryJ.ParserDebugViewer.ParseViewFrame;
 
 public class Test_Parser extends ParserTestCase
 {
 	public static ParserExpression identifier = new RegEx( "[A-Za-z_][A-Za-z0-9_]*" );
 
 	protected DMModule M;
+	protected DMObjectClass XYZ;
 	protected DMModuleResolver resolver = new DMModuleResolver()
 	{
 		public DMModule getModule(String location) throws CouldNotResolveModuleException
 		{
-			return location.equals( "Tests.PatternMatch" )  ?  M  :  null;
+			return location.equals( "M" )  ?  M  :  null;
 		}
 	};
 	
@@ -70,7 +75,15 @@ public class Test_Parser extends ParserTestCase
 	
 	public void setUp()
 	{
-		M = new DMModule( "PatternMatchTest", "m", "Tests.PatternMatch" );
+		M = new DMModule( "M", "m", "M" );
+		try
+		{
+			XYZ = M.newClass( "XYZ", new String[] { "a" } );
+		}
+		catch (ClassAlreadyDefinedException e)
+		{
+			throw new RuntimeException();
+		}
 	}
 	
 	public void tearDown()
@@ -98,6 +111,63 @@ public class Test_Parser extends ParserTestCase
 
 	
 	
+	
+	public void testAnyNode()
+	{
+		assertTrue( new AnyNode().compareTo( new AnyNode() ) );
+		matchFailTestStringAndStream( new AnyNode(), "abc" );
+		matchTestNodeSX( new AnyNode(), "a", "a" );
+		matchTestListSX( new AnyNode(), "[a]", "a" );
+		matchTestListSX( new AnyNode(), "[[a]]", "[a]" );
+	}
+
+	public void testAnyList()
+	{
+		assertTrue( new AnyList().compareTo( new AnyList() ) );
+		matchFailTestStringAndStream( new AnyList(), "abc" );
+		matchTestNodeSX( new AnyList(), "[a b c]", "[a b c]" );
+		matchFailTestNodeSX( new AnyList(), "a" );
+		matchTestListSX( new AnyList(), "[[a b c]]", "[a b c]" );
+		matchFailTestListSX( new AnyList(), "[a b c]" );
+	}
+
+	public void testAnyString()
+	{
+		assertTrue( new AnyString().compareTo( new AnyString() ) );
+		matchFailTestStringAndStream( new AnyString(), "abc" );
+		matchTestNodeSX( new AnyString(), "a", "a" );
+		matchFailTestNodeSX( new AnyString(), "[a]" );
+		matchTestListSX( new AnyString(), "[a]", "a" );
+		matchFailTestListSX( new AnyString(), "[[a b c]]" );
+	}
+
+	public void testAnyObject()
+	{
+		assertTrue( new AnyObject().compareTo( new AnyObject() ) );
+		matchFailTestStringAndStream( new AnyObject(), "abc" );
+		matchTestNodeSX( new AnyObject(), "{m=M : (m XYZ a=xyz)}", "{m=M : (m XYZ a=xyz)}" );
+		matchFailTestNodeSX( new AnyObject(), "[a]" );
+		matchFailTestNodeSX( new AnyObject(), "a" );
+		matchTestListSX( new AnyObject(), "{m=M : [(m XYZ a=xyz)]}", "{m=M : (m XYZ a=xyz)}" );
+		matchFailTestListSX( new AnyObject(), "[a]", "a" );
+		matchFailTestListSX( new AnyObject(), "[[a b c]]" );
+	}
+
+
+	public void testBind()
+	{
+		ParserExpression parser1 = identifier.bindTo(  "x" );
+		
+		matchTestNodeSX( parser1, "abc", "abc" );
+		//bindingsNodeTestSX( parser1, "abc", "[[x abc]]" );
+
+	
+		ParserExpression parser2 = identifier.bindTo( "x" ).bindTo( "y" );
+		
+		matchTestNodeSX( parser2, "abc", "abc" );
+		//bindingsNodeTestSX( parser2, "abc", "[[x abc] [y abc]]" );
+	}
+
 	
 	public void testLiteral()
 	{
@@ -961,9 +1031,9 @@ public class Test_Parser extends ParserTestCase
 		builder3.appendStructuralValue( Num.newInstance( new Object[] { "2" } ) );
 		builder3.appendTextValue( "*3+4" );
 
-		matchTestStreamSX( parser, builder1.stream(), "{m=Tests.PatternMatch : [1 + [[(m Num x=2) * 3] * 4]]}" );
-		matchTestStreamSX( parser, builder2.stream(), "{m=Tests.PatternMatch : [[1 * (m Num x=2)] + [3 * 4]]}" );
-		matchTestStreamSX( parser, builder3.stream(), "{m=Tests.PatternMatch : [[[1 * (m Num x=2)] * 3] + 4]}" );
+		matchTestStreamSX( parser, builder1.stream(), "{m=M : [1 + [[(m Num x=2) * 3] * 4]]}" );
+		matchTestStreamSX( parser, builder2.stream(), "{m=M : [[1 * (m Num x=2)] + [3 * 4]]}" );
+		matchTestStreamSX( parser, builder3.stream(), "{m=M : [[[1 * (m Num x=2)] * 3] + 4]}" );
 	}
 
 
