@@ -4,47 +4,46 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package tests.Parser;
+package tests.ParserNew;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import BritefuryJ.DocModel.DMModule;
 import BritefuryJ.DocModel.DMModuleResolver;
 import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMModule.ClassAlreadyDefinedException;
-import BritefuryJ.Parser.Action;
-import BritefuryJ.Parser.BestChoice;
-import BritefuryJ.Parser.Choice;
-import BritefuryJ.Parser.Combine;
-import BritefuryJ.Parser.Condition;
-import BritefuryJ.Parser.DebugParseResult;
-import BritefuryJ.Parser.Keyword;
-import BritefuryJ.Parser.Literal;
-import BritefuryJ.Parser.OneOrMore;
-import BritefuryJ.Parser.Optional;
-import BritefuryJ.Parser.ParseAction;
-import BritefuryJ.Parser.ParseCondition;
-import BritefuryJ.Parser.ParserExpression;
-import BritefuryJ.Parser.Peek;
-import BritefuryJ.Parser.PeekNot;
-import BritefuryJ.Parser.Production;
-import BritefuryJ.Parser.RegEx;
-import BritefuryJ.Parser.Repetition;
-import BritefuryJ.Parser.SeparatedList;
-import BritefuryJ.Parser.Sequence;
-import BritefuryJ.Parser.StructuralItem;
-import BritefuryJ.Parser.StructuralObject;
-import BritefuryJ.Parser.Suppress;
-import BritefuryJ.Parser.Word;
-import BritefuryJ.Parser.ZeroOrMore;
-import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
+import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
+import BritefuryJ.ParserNew.Action;
+import BritefuryJ.ParserNew.Choice;
+import BritefuryJ.ParserNew.Combine;
+import BritefuryJ.ParserNew.Condition;
+import BritefuryJ.ParserNew.DebugParseResult;
+import BritefuryJ.ParserNew.Keyword;
+import BritefuryJ.ParserNew.Literal;
+import BritefuryJ.ParserNew.ObjectNode;
+import BritefuryJ.ParserNew.OneOrMore;
+import BritefuryJ.ParserNew.Optional;
+import BritefuryJ.ParserNew.ParseAction;
+import BritefuryJ.ParserNew.ParseCondition;
+import BritefuryJ.ParserNew.ParserExpression;
+import BritefuryJ.ParserNew.Peek;
+import BritefuryJ.ParserNew.PeekNot;
+import BritefuryJ.ParserNew.Production;
+import BritefuryJ.ParserNew.RegEx;
+import BritefuryJ.ParserNew.Repetition;
+import BritefuryJ.ParserNew.SeparatedList;
+import BritefuryJ.ParserNew.Sequence;
+import BritefuryJ.ParserNew.Suppress;
+import BritefuryJ.ParserNew.Word;
+import BritefuryJ.ParserNew.ZeroOrMore;
 import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
-import BritefuryJ.Parser.ParserExpression.ParserCoerceException;
-import BritefuryJ.Parser.SeparatedList.CannotApplyConditionAfterActionException;
-import BritefuryJ.Parser.SeparatedList.CannotApplyMoreThanOneActionException;
-import BritefuryJ.Parser.SeparatedList.CannotApplyMoreThanOneConditionException;
+import BritefuryJ.ParserNew.ParserExpression.ParserCoerceException;
+import BritefuryJ.ParserNew.SeparatedList.CannotApplyConditionAfterActionException;
+import BritefuryJ.ParserNew.SeparatedList.CannotApplyMoreThanOneActionException;
+import BritefuryJ.ParserNew.SeparatedList.CannotApplyMoreThanOneConditionException;
 import BritefuryJ.ParserDebugViewer.ParseViewFrame;
 
 public class Test_Parser extends ParserTestCase
@@ -104,9 +103,9 @@ public class Test_Parser extends ParserTestCase
 	{
 		assertTrue( new Literal( "abc" ).compareTo( new Literal( "abc" ) ) );
 		assertFalse( new Literal( "abc" ).compareTo( new Literal( "def" ) ) );
-		matchTest( new Literal( "abcxyz" ), "abcxyz", "abcxyz" );
-		matchFailTest( new Literal( "abcxyz" ), "qwerty" );
-		matchSubTest( new Literal( "abcxyz" ), "abcxyz123", "abcxyz", 6 );
+		matchTestStringAndStream( new Literal( "abcxyz" ), "abcxyz", "abcxyz" );
+		matchFailTestStringAndStream( new Literal( "abcxyz" ), "qwerty" );
+		matchSubTestStringAndStream( new Literal( "abcxyz" ), "abcxyz123", "abcxyz", 6 );
 	}
 
 
@@ -117,11 +116,11 @@ public class Test_Parser extends ParserTestCase
 		assertTrue( new Keyword( "abc", "xyz" ).compareTo( new Keyword( "abc", "xyz" ) ) );
 		assertFalse( new Keyword( "abc", "xyz" ).compareTo( new Keyword( "def", "xyz" ) ) );
 		assertFalse( new Keyword( "abc", "xyz" ).compareTo( new Keyword( "abc", "pqr" ) ) );
-		matchTest( new Keyword( "hello" ), "hello", "hello" );
-		matchFailTest( new Keyword( "hello" ), "helloq" );
-		matchSubTest( new Keyword( "hello", "abc" ), "hello", "hello", 5 );
-		matchSubTest( new Keyword( "hello", "abc" ), "helloxx", "hello", 5 );
-		matchFailTest( new Keyword( "hello", "abc" ), "helloaa" );
+		matchTestStringAndStream( new Keyword( "hello" ), "hello", "hello" );
+		matchFailTestStringAndStream( new Keyword( "hello" ), "helloq" );
+		matchSubTestStringAndStream( new Keyword( "hello", "abc" ), "hello", "hello", 5 );
+		matchSubTestStringAndStream( new Keyword( "hello", "abc" ), "helloxx", "hello", 5 );
+		matchFailTestStringAndStream( new Keyword( "hello", "abc" ), "helloaa" );
 	}
 	
 	
@@ -129,11 +128,11 @@ public class Test_Parser extends ParserTestCase
 	{
 		assertTrue( new RegEx( "[A-Za-z_][A-Za-z0-9_]*" ).compareTo( new RegEx( "[A-Za-z_][A-Za-z0-9_]*" ) ) );
 		assertFalse( new RegEx( "[A-Za-z_][A-Za-z0-9_]*" ).compareTo( new RegEx( "[A-Za-z_][A-Za-z0-9_]*abc" ) ) );
-		matchTest( new RegEx( "[A-Za-z_][A-Za-z0-9_]*" ), "abc_123", "abc_123" );
-		matchFailTest( new RegEx( "[A-Za-z_][A-Za-z0-9_]*" ), "9abc" );
-		matchSubTest( new RegEx( "[A-Za-z_][A-Za-z0-9_]*" ), "abc_xyz...", "abc_xyz", 7 );
-		matchTest( new RegEx( "[A-Za-z_]*" ), "abc_", "abc_" );
-		matchFailTest( new RegEx( "[A-Za-z_]*" ), "." );
+		matchTestStringAndStream( new RegEx( "[A-Za-z_][A-Za-z0-9_]*" ), "abc_123", "abc_123" );
+		matchFailTestStringAndStream( new RegEx( "[A-Za-z_][A-Za-z0-9_]*" ), "9abc" );
+		matchSubTestStringAndStream( new RegEx( "[A-Za-z_][A-Za-z0-9_]*" ), "abc_xyz...", "abc_xyz", 7 );
+		matchTestStringAndStream( new RegEx( "[A-Za-z_]*" ), "abc_", "abc_" );
+		matchFailTestStringAndStream( new RegEx( "[A-Za-z_]*" ), "." );
 	}
 	
 	
@@ -141,84 +140,84 @@ public class Test_Parser extends ParserTestCase
 	{
 		assertTrue( new Word( "abc" ).compareTo( new Word( "abc" ) ) );
 		assertFalse( new Word( "abc" ).compareTo( new Word( "def" ) ) );
-		matchTest( new Word( "abc" ), "aabbcc", "aabbcc" );
-		matchTest( new Word( "abc" ), "ccbbaa", "ccbbaa" );
-		matchSubTest( new Word( "abc" ), "aabbccxx", "aabbcc", 6 );
-		matchSubTest( new Word( "abc" ), "aabbccxxaa", "aabbcc", 6 );
-		matchFailTest( new Word( "abc" ), "x" );
+		matchTestStringAndStream( new Word( "abc" ), "aabbcc", "aabbcc" );
+		matchTestStringAndStream( new Word( "abc" ), "ccbbaa", "ccbbaa" );
+		matchSubTestStringAndStream( new Word( "abc" ), "aabbccxx", "aabbcc", 6 );
+		matchSubTestStringAndStream( new Word( "abc" ), "aabbccxxaa", "aabbcc", 6 );
+		matchFailTestStringAndStream( new Word( "abc" ), "x" );
 		
 		assertTrue( new Word( "abc", "xyz" ).compareTo( new Word( "abc", "xyz" ) ) );
 		assertFalse( new Word( "abc", "xyz" ).compareTo( new Word( "def", "xyz" ) ) );
 		assertFalse( new Word( "abc", "xyz" ).compareTo( new Word( "abc", "pqr" ) ) );
-		matchTest( new Word( "abc", "def" ), "addeeff", "addeeff" );
-		matchTest( new Word( "abc", "def" ), "affeedd", "affeedd" );
-		matchSubTest( new Word( "abc", "def" ), "affeeddxx", "affeedd", 7 );
-		matchSubTest( new Word( "abc", "def" ), "affeeddxxa", "affeedd", 7 );
-		matchSubTest( new Word( "abc", "def" ), "affeeddxxf", "affeedd", 7 );
-		matchFailTest( new Word( "abc", "def" ), "ddeeff" );
-		matchFailTest( new Word( "abc", "def" ), "x" );
-		matchFailTest( new Word( "abc", "def" ), "dadeeff" );
+		matchTestStringAndStream( new Word( "abc", "def" ), "addeeff", "addeeff" );
+		matchTestStringAndStream( new Word( "abc", "def" ), "affeedd", "affeedd" );
+		matchSubTestStringAndStream( new Word( "abc", "def" ), "affeeddxx", "affeedd", 7 );
+		matchSubTestStringAndStream( new Word( "abc", "def" ), "affeeddxxa", "affeedd", 7 );
+		matchSubTestStringAndStream( new Word( "abc", "def" ), "affeeddxxf", "affeedd", 7 );
+		matchFailTestStringAndStream( new Word( "abc", "def" ), "ddeeff" );
+		matchFailTestStringAndStream( new Word( "abc", "def" ), "x" );
+		matchFailTestStringAndStream( new Word( "abc", "def" ), "dadeeff" );
 	}
 	
 	
-	public void testStructuralNode()
-	{
-		assertTrue( new StructuralItem().compareTo( new StructuralItem() ) );
-
-		ItemStreamBuilder builder1 = new ItemStreamBuilder();
-		builder1.appendStructuralValue( new Integer( 12 ) );
-		
-		ItemStreamBuilder builder2 = new ItemStreamBuilder();
-		builder2.appendStructuralValue( new Integer( 12 ) );
-		builder2.appendStructuralValue( new Integer( 13 ) );
-
-		matchTest( new StructuralItem(), builder1.stream(), new Integer( 12 ) );
-		matchSubTest( new StructuralItem(), builder2.stream(), new Integer( 12 ), 1 );
-	}
-
-
-	public void testStructuralObject() throws ClassAlreadyDefinedException
-	{
-		DMObjectClass A = M.newClass( "A", new String[] {} );
-		DMObjectClass B = M.newClass( "B", A, new String[] {} );
-
-		assertTrue( new StructuralObject( A ).compareTo( new StructuralObject( A ) ) );
-		assertFalse( new StructuralObject( A ).compareTo( new StructuralObject( B ) ) );
-
-		ItemStreamBuilder builder1 = new ItemStreamBuilder();
-		builder1.appendStructuralValue( A.newInstance() );
-		
-		matchTest( new StructuralObject( A ), builder1.stream(), A.newInstance() );
-		matchFailTest( new StructuralObject( B ), builder1.stream() );
-		
-		
-		ItemStreamBuilder builder2 = new ItemStreamBuilder();
-		builder2.appendStructuralValue( A.newInstance() );
-		builder2.appendTextValue( " : " );
-		builder2.appendStructuralValue( B.newInstance() );
-
-		ItemStreamBuilder builder3 = new ItemStreamBuilder();
-		builder3.appendStructuralValue( B.newInstance() );
-		builder3.appendTextValue( " : " );
-		builder3.appendStructuralValue( B.newInstance() );
-
-		ItemStreamBuilder builder4 = new ItemStreamBuilder();
-		builder4.appendStructuralValue( A.newInstance() );
-		builder4.appendTextValue( " : " );
-		builder4.appendStructuralValue( A.newInstance() );
-
-		ParserExpression parser = new Sequence( new ParserExpression[] { new StructuralObject( A ), new Literal( ":" ), new StructuralObject( B ) } );
-		matchTest( parser, builder2.stream(), Arrays.asList( new Object[] { A.newInstance(), ":", B.newInstance() } ) );
-		matchTest( parser, builder3.stream(), Arrays.asList( new Object[] { B.newInstance(), ":", B.newInstance() } ) );
-		matchFailTest( parser, builder4.stream() );
-	}
+//	public void testStructuralNode()
+//	{
+//		assertTrue( new StructuralItem().compareTo( new StructuralItem() ) );
+//
+//		ItemStreamBuilder builder1 = new ItemStreamBuilder();
+//		builder1.appendStructuralValue( new Integer( 12 ) );
+//		
+//		ItemStreamBuilder builder2 = new ItemStreamBuilder();
+//		builder2.appendStructuralValue( new Integer( 12 ) );
+//		builder2.appendStructuralValue( new Integer( 13 ) );
+//
+//		matchTestStream( new StructuralItem(), builder1.stream(), new Integer( 12 ) );
+//		matchSubTestStream( new StructuralItem(), builder2.stream(), new Integer( 12 ), 1 );
+//	}
+//
+//
+//	public void testStructuralObject() throws ClassAlreadyDefinedException
+//	{
+//		DMObjectClass A = M.newClass( "A", new String[] {} );
+//		DMObjectClass B = M.newClass( "B", A, new String[] {} );
+//
+//		assertTrue( new StructuralObject( A ).compareTo( new StructuralObject( A ) ) );
+//		assertFalse( new StructuralObject( A ).compareTo( new StructuralObject( B ) ) );
+//
+//		ItemStreamBuilder builder1 = new ItemStreamBuilder();
+//		builder1.appendStructuralValue( A.newInstance() );
+//		
+//		matchTestStream( new StructuralObject( A ), builder1.stream(), A.newInstance() );
+//		matchFailTestStream( new StructuralObject( B ), builder1.stream() );
+//		
+//		
+//		ItemStreamBuilder builder2 = new ItemStreamBuilder();
+//		builder2.appendStructuralValue( A.newInstance() );
+//		builder2.appendTextValue( " : " );
+//		builder2.appendStructuralValue( B.newInstance() );
+//
+//		ItemStreamBuilder builder3 = new ItemStreamBuilder();
+//		builder3.appendStructuralValue( B.newInstance() );
+//		builder3.appendTextValue( " : " );
+//		builder3.appendStructuralValue( B.newInstance() );
+//
+//		ItemStreamBuilder builder4 = new ItemStreamBuilder();
+//		builder4.appendStructuralValue( A.newInstance() );
+//		builder4.appendTextValue( " : " );
+//		builder4.appendStructuralValue( A.newInstance() );
+//
+//		ParserExpression parser = new Sequence( new ParserExpression[] { new StructuralObject( A ), new Literal( ":" ), new StructuralObject( B ) } );
+//		matchTestStream( parser, builder2.stream(), Arrays.asList( new Object[] { A.newInstance(), ":", B.newInstance() } ) );
+//		matchTestStream( parser, builder3.stream(), Arrays.asList( new Object[] { B.newInstance(), ":", B.newInstance() } ) );
+//		matchFailTestStream( parser, builder4.stream() );
+//	}
 
 
 	public void testAction() throws ParserExpression.ParserCoerceException
 	{
 		ParseAction f = new ParseAction()
 		{
-			public Object invoke(ItemStreamAccessor input, int begin, Object value)
+			public Object invoke(Object input, int begin, int end, Object value, Map<String, Object> bindings)
 			{
 				String v = (String)value;
 				return v + v;
@@ -227,7 +226,7 @@ public class Test_Parser extends ParserTestCase
 
 		ParseAction g = new ParseAction()
 		{
-			public Object invoke(ItemStreamAccessor input, int begin, Object value)
+			public Object invoke(Object input, int begin, int end, Object value, Map<String, Object> bindings)
 			{
 				String v = (String)value;
 				return v + v + v;
@@ -241,7 +240,7 @@ public class Test_Parser extends ParserTestCase
 		
 		ParserExpression parser = new Literal( "abc" ).action( f );
 		
-		matchTest( parser, "abc", "abcabc" );
+		matchTestStringAndStream( parser, "abc", "abcabc" );
 	}
 
 
@@ -249,7 +248,7 @@ public class Test_Parser extends ParserTestCase
 	{
 		ParseCondition f = new ParseCondition()
 		{
-			public boolean test(ItemStreamAccessor input, int begin, Object value)
+			public boolean test(Object input, int begin, int end, Object value, Map<String, Object> bindings)
 			{
 				String v = (String)value;
 				return v.startsWith( "hello" );
@@ -258,7 +257,7 @@ public class Test_Parser extends ParserTestCase
 
 		ParseCondition g = new ParseCondition()
 		{
-			public boolean test(ItemStreamAccessor input, int begin, Object value)
+			public boolean test(Object input, int begin, int end, Object value, Map<String, Object> bindings)
 			{
 				String v = (String)value;
 				return v.startsWith( "there" );
@@ -272,8 +271,8 @@ public class Test_Parser extends ParserTestCase
 		
 		ParserExpression parser = new Word( "abcdefghijklmnopqrstuvwxyz" ).condition( f );
 		
-		matchTest( parser, "helloworld", "helloworld" );
-		matchFailTest( parser, "xabcdef" );
+		matchTestStringAndStream( parser, "helloworld", "helloworld" );
+		matchFailTestStringAndStream( parser, "xabcdef" );
 	}
 	
 	
@@ -294,8 +293,8 @@ public class Test_Parser extends ParserTestCase
 		
 		String[] result = { "ab", "qw", "fh" };
 		
-		matchTest( parser, "abqwfh", Arrays.asList( result ) );
-		matchFailTest( parser, "abfh" );
+		matchTestStringAndStream( parser, "abqwfh", Arrays.asList( result ) );
+		matchFailTestStringAndStream( parser, "abfh" );
 	}
 
 
@@ -314,8 +313,8 @@ public class Test_Parser extends ParserTestCase
 		Object[] subs = { new Literal( "ab" ), new Literal( "qw" ), new Literal( "fh" ) };
 		ParserExpression parser = new Combine( subs );
 		
-		matchTest( parser, "abqwfh", "abqwfh" );
-		matchFailTest( parser, "abfh" );
+		matchTestStringAndStream( parser, "abqwfh", "abqwfh" );
+		matchFailTestStringAndStream( parser, "abfh" );
 
 	
 	
@@ -325,12 +324,12 @@ public class Test_Parser extends ParserTestCase
 		Object[] subsB = { new Sequence( subsB1 ), new Sequence( subsB2 ), new Sequence( subsB3 ) };
 		ParserExpression parser2 = new Combine( subsB );
 		String[] result2 = { "ab", "cd", "ef", "gh", "ij", "kl" };
-		matchTest( parser2, "abcdefghijkl", Arrays.asList( result2 ) );
+		matchTestStringAndStream( parser2, "abcdefghijkl", Arrays.asList( result2 ) );
 
 		Object[] subsC = { new Sequence( subsB1 ), new Sequence( subsB2 ), new Sequence( subsB3 ), new Literal( "xyz" ) };
 		ParserExpression parser3 = new Combine( subsC );
 		String[] result3 = { "ab", "cd", "ef", "gh", "ij", "kl", "xyz" };
-		matchTest( parser3, "abcdefghijklxyz", Arrays.asList( result3 ) );
+		matchTestStringAndStream( parser3, "abcdefghijklxyz", Arrays.asList( result3 ) );
 	}
 
 
@@ -345,8 +344,8 @@ public class Test_Parser extends ParserTestCase
 		
 		String[] result = { "ab", "fh" };
 		
-		matchTest( parser, "abqwfh", Arrays.asList( result ) );
-		matchFailTest( parser, "abfh" );
+		matchTestStringAndStream( parser, "abqwfh", Arrays.asList( result ) );
+		matchFailTestStringAndStream( parser, "abfh" );
 	}
 
 
@@ -365,35 +364,12 @@ public class Test_Parser extends ParserTestCase
 		Object[] subs = { new Literal( "ab" ), new Literal( "qw" ), new Literal( "fh" ) };
 		ParserExpression parser = new Choice( subs );
 		
-		matchTest( parser, "ab", "ab" );
-		matchTest( parser, "qw", "qw" );
-		matchTest( parser, "fh", "fh" );
-		matchFailTest( parser, "xy" );
-		matchSubTest( new Literal( "ab" ).__or__( "abcd" ), "ab", "ab", 2 );
-		matchSubTest( new Literal( "ab" ).__or__( "abcd" ), "abcd", "ab", 2 );
-	}
-
-	public void testBestChoice() throws ParserExpression.ParserCoerceException
-	{
-		Object[] abqwfh = { new Literal( "ab" ), new Literal( "qw" ), new Literal( "fh" ) };
-		Object[] abqw = { new Literal( "ab" ), new Literal( "qw" ) };
-		Object[] qbqwfh = { new Literal( "qb" ), new Literal( "qw" ), new Literal( "fh" ) };
-		
-		assertTrue( new BestChoice( abqwfh ).compareTo( new BestChoice( abqwfh ) ) );
-		assertFalse( new BestChoice( abqwfh ).compareTo( new BestChoice( abqw ) ) );
-		assertFalse( new BestChoice( abqwfh ).compareTo( new BestChoice( qbqwfh ) ) );
-		assertTrue( new BestChoice( abqwfh ).compareTo( new Literal( "ab" ).__xor__( new Literal( "qw" ) ).__xor__( new Literal( "fh" ) ) ) );
-		assertTrue( new BestChoice( abqwfh ).compareTo( new Literal( "ab" ).__xor__( "qw" ).__xor__( "fh" ) ) );
-
-		Object[] subs = { new Literal( "ab" ), new Literal( "qw" ), new Literal( "fh" ) };
-		ParserExpression parser = new BestChoice( subs );
-		
-		matchTest( parser, "ab", "ab" );
-		matchTest( parser, "qw", "qw" );
-		matchTest( parser, "fh", "fh" );
-		matchFailTest( parser, "xy" );
-		matchSubTest( new Literal( "ab" ).__xor__( "abcd" ), "ab", "ab", 2 );
-		matchSubTest( new Literal( "ab" ).__xor__( "abcd" ), "abcd", "abcd", 4 );
+		matchTestStringAndStream( parser, "ab", "ab" );
+		matchTestStringAndStream( parser, "qw", "qw" );
+		matchTestStringAndStream( parser, "fh", "fh" );
+		matchFailTestStringAndStream( parser, "xy" );
+		matchSubTestStringAndStream( new Literal( "ab" ).__or__( "abcd" ), "ab", "ab", 2 );
+		matchSubTestStringAndStream( new Literal( "ab" ).__or__( "abcd" ), "abcd", "ab", 2 );
 	}
 
 
@@ -405,9 +381,9 @@ public class Test_Parser extends ParserTestCase
 
 		ParserExpression parser = new Word( "a", "b" ).optional();
 		
-		matchTest( parser, "", null );
-		matchTest( parser, "abb", "abb" );
-		matchSubTest( parser, "abbabb", "abb", 3 );
+		matchTestStringAndStream( parser, "", null );
+		matchTestStringAndStream( parser, "abb", "abb" );
+		matchSubTestStringAndStream( parser, "abbabb", "abb", 3 );
 	}
 
 
@@ -435,41 +411,41 @@ public class Test_Parser extends ParserTestCase
 		String[][] result4 = { { "ab", "cd", },   { "abb", "cdd" },   { "abbb", "cddd" },   { "abbbb", "cdddd" } };
 		String[][] result5 = { { "ab", "cd", },   { "abb", "cdd" },   { "abbb", "cddd" },   { "abbbb", "cdddd" },   { "abbbbb", "cddddd" } };
 		
-		matchTest( parser_2, "", arrayToList2D( result0 ) );
-		matchTest( parser02, "", arrayToList2D( result0 ) );
-		matchTest( parser02N, "", null );
-		matchFailTest( parser24, "" );
-		matchFailTest( parser2_, "" );
+		matchTestStringAndStream( parser_2, "", arrayToList2D( result0 ) );
+		matchTestStringAndStream( parser02, "", arrayToList2D( result0 ) );
+		matchTestStringAndStream( parser02N, "", null );
+		matchFailTestStringAndStream( parser24, "" );
+		matchFailTestStringAndStream( parser2_, "" );
 		
-		matchTest( parser_2, "abcd", arrayToList2D( result1 ) );
-		matchTest( parser02, "abcd", arrayToList2D( result1 ) );
-		matchTest( parser02N, "abcd", arrayToList2D( result1 ) );
-		matchFailTest( parser24, "abcd" );
-		matchFailTest( parser2_, "abcd" );
+		matchTestStringAndStream( parser_2, "abcd", arrayToList2D( result1 ) );
+		matchTestStringAndStream( parser02, "abcd", arrayToList2D( result1 ) );
+		matchTestStringAndStream( parser02N, "abcd", arrayToList2D( result1 ) );
+		matchFailTestStringAndStream( parser24, "abcd" );
+		matchFailTestStringAndStream( parser2_, "abcd" );
 		
-		matchTest( parser_2, "abcdabbcdd", arrayToList2D( result2 ) );
-		matchTest( parser02, "abcdabbcdd", arrayToList2D( result2  ) );
-		matchTest( parser02N, "abcdabbcdd", arrayToList2D( result2  ) );
-		matchTest( parser24, "abcdabbcdd", arrayToList2D( result2  ) );
-		matchTest( parser2_, "abcdabbcdd", arrayToList2D( result2  ) );
+		matchTestStringAndStream( parser_2, "abcdabbcdd", arrayToList2D( result2 ) );
+		matchTestStringAndStream( parser02, "abcdabbcdd", arrayToList2D( result2  ) );
+		matchTestStringAndStream( parser02N, "abcdabbcdd", arrayToList2D( result2  ) );
+		matchTestStringAndStream( parser24, "abcdabbcdd", arrayToList2D( result2  ) );
+		matchTestStringAndStream( parser2_, "abcdabbcdd", arrayToList2D( result2  ) );
 		
-		matchSubTest( parser_2, "abcdabbcddabbbcddd", arrayToList2D( result2 ), 10 );
-		matchSubTest( parser02, "abcdabbcddabbbcddd", arrayToList2D( result2 ), 10 );
-		matchSubTest( parser02N, "abcdabbcddabbbcddd", arrayToList2D( result2 ), 10 );
-		matchTest( parser24, "abcdabbcddabbbcddd", arrayToList2D( result3 ) );
-		matchTest( parser2_, "abcdabbcddabbbcddd", arrayToList2D( result3 ) );
+		matchSubTestStringAndStream( parser_2, "abcdabbcddabbbcddd", arrayToList2D( result2 ), 10 );
+		matchSubTestStringAndStream( parser02, "abcdabbcddabbbcddd", arrayToList2D( result2 ), 10 );
+		matchSubTestStringAndStream( parser02N, "abcdabbcddabbbcddd", arrayToList2D( result2 ), 10 );
+		matchTestStringAndStream( parser24, "abcdabbcddabbbcddd", arrayToList2D( result3 ) );
+		matchTestStringAndStream( parser2_, "abcdabbcddabbbcddd", arrayToList2D( result3 ) );
 		
-		matchSubTest( parser_2, "abcdabbcddabbbcdddabbbbcdddd", arrayToList2D( result2 ), 10 );
-		matchSubTest( parser02, "abcdabbcddabbbcdddabbbbcdddd", arrayToList2D( result2 ), 10 );
-		matchSubTest( parser02N, "abcdabbcddabbbcdddabbbbcdddd", arrayToList2D( result2 ), 10 );
-		matchTest( parser24, "abcdabbcddabbbcdddabbbbcdddd", arrayToList2D( result4 ) );
-		matchTest( parser2_, "abcdabbcddabbbcdddabbbbcdddd", arrayToList2D( result4 ) );
+		matchSubTestStringAndStream( parser_2, "abcdabbcddabbbcdddabbbbcdddd", arrayToList2D( result2 ), 10 );
+		matchSubTestStringAndStream( parser02, "abcdabbcddabbbcdddabbbbcdddd", arrayToList2D( result2 ), 10 );
+		matchSubTestStringAndStream( parser02N, "abcdabbcddabbbcdddabbbbcdddd", arrayToList2D( result2 ), 10 );
+		matchTestStringAndStream( parser24, "abcdabbcddabbbcdddabbbbcdddd", arrayToList2D( result4 ) );
+		matchTestStringAndStream( parser2_, "abcdabbcddabbbcdddabbbbcdddd", arrayToList2D( result4 ) );
 		
-		matchSubTest( parser_2, "abcdabbcddabbbcdddabbbbcddddabbbbbcddddd", arrayToList2D( result2 ), 10 );
-		matchSubTest( parser02, "abcdabbcddabbbcdddabbbbcddddabbbbbcddddd", arrayToList2D( result2 ), 10 );
-		matchSubTest( parser02N, "abcdabbcddabbbcdddabbbbcddddabbbbbcddddd", arrayToList2D( result2 ), 10 );
-		matchSubTest( parser24, "abcdabbcddabbbcdddabbbbcddddabbbbbcddddd", arrayToList2D( result4 ), 28 );
-		matchTest( parser2_, "abcdabbcddabbbcdddabbbbcddddabbbbbcddddd", arrayToList2D( result5 ) );
+		matchSubTestStringAndStream( parser_2, "abcdabbcddabbbcdddabbbbcddddabbbbbcddddd", arrayToList2D( result2 ), 10 );
+		matchSubTestStringAndStream( parser02, "abcdabbcddabbbcdddabbbbcddddabbbbbcddddd", arrayToList2D( result2 ), 10 );
+		matchSubTestStringAndStream( parser02N, "abcdabbcddabbbcdddabbbbcddddabbbbbcddddd", arrayToList2D( result2 ), 10 );
+		matchSubTestStringAndStream( parser24, "abcdabbcddabbbcdddabbbbcddddabbbbbcddddd", arrayToList2D( result4 ), 28 );
+		matchTestStringAndStream( parser2_, "abcdabbcddabbbcdddabbbbcddddabbbbbcddddd", arrayToList2D( result5 ) );
 	}
 
 
@@ -489,14 +465,14 @@ public class Test_Parser extends ParserTestCase
 		String[][] result1 = { { "ab", "cd", } };
 		String[][] result2 = { { "ab", "cd", },   { "abb", "cdd" } };
 		
-		matchTest( parserO, "", arrayToList2D( result0 ) );
-		matchTest( parserN, "", null );
+		matchTestStringAndStream( parserO, "", arrayToList2D( result0 ) );
+		matchTestStringAndStream( parserN, "", null );
 		
-		matchTest( parserO, "abcd", arrayToList2D( result1 ) );
-		matchTest( parserN, "abcd", arrayToList2D( result1 ) );
+		matchTestStringAndStream( parserO, "abcd", arrayToList2D( result1 ) );
+		matchTestStringAndStream( parserN, "abcd", arrayToList2D( result1 ) );
 		
-		matchTest( parserO, "abcdabbcdd", arrayToList2D( result2 ) );
-		matchTest( parserN, "abcdabbcdd", arrayToList2D( result2 ) );
+		matchTestStringAndStream( parserO, "abcdabbcdd", arrayToList2D( result2 ) );
+		matchTestStringAndStream( parserN, "abcdabbcdd", arrayToList2D( result2 ) );
 	}
 
 
@@ -513,13 +489,13 @@ public class Test_Parser extends ParserTestCase
 		String[][] result2 = { { "ab", "cd", },   { "abb", "cdd" } };
 		String[][] result3 = { { "ab", "cd", },   { "abb", "cdd" },   { "abbb", "cddd" } };
 		
-		matchFailTest( parser, "" );
+		matchFailTestStringAndStream( parser, "" );
 		
-		matchTest( parser, "abcd", arrayToList2D( result1 ) );
+		matchTestStringAndStream( parser, "abcd", arrayToList2D( result1 ) );
 		
-		matchTest( parser, "abcdabbcdd", arrayToList2D( result2 ) );
+		matchTestStringAndStream( parser, "abcdabbcdd", arrayToList2D( result2 ) );
 		
-		matchTest( parser, "abcdabbcddabbbcddd", arrayToList2D( result3 ) );
+		matchTestStringAndStream( parser, "abcdabbcddabbbcddd", arrayToList2D( result3 ) );
 	}
 
 
@@ -535,11 +511,11 @@ public class Test_Parser extends ParserTestCase
 		String[][] result1 = { { "ab" } };
 		String[][] result2 = { { "ab", "ab" } };
 
-		matchFailTest( parser, "" );
-		matchFailTest( parser, "ab" );
-		matchFailTest( parser, "abab" );
-		matchSubTest( parser, "abcd", arrayToList2D( result1 ), 2 );
-		matchSubTest( parser, "ababcd", arrayToList2D( result2 ), 4 );
+		matchFailTestStringAndStream( parser, "" );
+		matchFailTestStringAndStream( parser, "ab" );
+		matchFailTestStringAndStream( parser, "abab" );
+		matchSubTestStringAndStream( parser, "abcd", arrayToList2D( result1 ), 2 );
+		matchSubTestStringAndStream( parser, "ababcd", arrayToList2D( result2 ), 4 );
 	}
 
 
@@ -555,11 +531,11 @@ public class Test_Parser extends ParserTestCase
 		String[][] result1 = { { "ab" } };
 		String[][] result2 = { { "ab", "ab" } };
 
-		matchFailTest( parser, "" );
-		matchFailTest( parser, "abcd" );
-		matchFailTest( parser, "ababcd" );
-		matchTest( parser, "ab", arrayToList2D( result1 ) );
-		matchTest( parser, "abab", arrayToList2D( result2 ) );
+		matchFailTestStringAndStream( parser, "" );
+		matchFailTestStringAndStream( parser, "abcd" );
+		matchFailTestStringAndStream( parser, "ababcd" );
+		matchTestStringAndStream( parser, "ab", arrayToList2D( result1 ) );
+		matchTestStringAndStream( parser, "abab", arrayToList2D( result2 ) );
 	}
 	
 	
@@ -598,7 +574,7 @@ public class Test_Parser extends ParserTestCase
 		
 		SeparatedList.ListCondition condition = new SeparatedList.ListCondition()
 		{
-			public boolean test(ItemStreamAccessor input, int begin, List<Object> elements, boolean gotTrailingSeparator)
+			public boolean test(Object input, int begin, int end, List<Object> elements, Map<String, Object> bindings, boolean gotTrailingSeparator)
 			{
 				return elements.size() % 2  ==  0;
 			}
@@ -606,7 +582,7 @@ public class Test_Parser extends ParserTestCase
 		
 		SeparatedList.ListAction action = new SeparatedList.ListAction()
 		{
-			public Object invoke(ItemStreamAccessor input, int begin, List<Object> elements, boolean gotTrailingSeparator)
+			public Object invoke(Object input, int begin, int end, List<Object> elements, Map<String, Object> bindings, boolean gotTrailingSeparator)
 			{
 				if ( gotTrailingSeparator )
 				{
@@ -644,185 +620,185 @@ public class Test_Parser extends ParserTestCase
 
 		
 		
-		matchTestSX( parser0N, "", "[]" );
-		matchIncompleteTest( parser0N, "," );
-		matchTestSX( parser0N, "ab", "[ab]" );
-		matchIncompleteTest( parser0N, "ab," );
-		matchTestSX( parser0N, "ab,cd", "[ab cd]" );
-		matchIncompleteTest( parser0N, "ab,cd," );
-		matchTestSX( parser0N, "ab,cd,ef", "[ab cd ef]" );
-		matchIncompleteTest( parser0N, "ab,cd,ef," );
+		matchTestStringAndStreamSX( parser0N, "", "[]" );
+		matchIncompleteTestStringAndStream( parser0N, "," );
+		matchTestStringAndStreamSX( parser0N, "ab", "[ab]" );
+		matchIncompleteTestStringAndStream( parser0N, "ab," );
+		matchTestStringAndStreamSX( parser0N, "ab,cd", "[ab cd]" );
+		matchIncompleteTestStringAndStream( parser0N, "ab,cd," );
+		matchTestStringAndStreamSX( parser0N, "ab,cd,ef", "[ab cd ef]" );
+		matchIncompleteTestStringAndStream( parser0N, "ab,cd,ef," );
 		
-		matchFailTest( parser1N, "" );
-		matchFailTest( parser1N, "," );
-		matchTestSX( parser1N, "ab", "[ab]" );
-		matchIncompleteTest( parser1N, "ab," );
-		matchTestSX( parser1N, "ab,cd", "[ab cd]" );
-		matchIncompleteTest( parser1N, "ab,cd," );
-		matchTestSX( parser1N, "ab,cd,ef", "[ab cd ef]" );
-		matchIncompleteTest( parser1N, "ab,cd,ef," );
+		matchFailTestStringAndStream( parser1N, "" );
+		matchFailTestStringAndStream( parser1N, "," );
+		matchTestStringAndStreamSX( parser1N, "ab", "[ab]" );
+		matchIncompleteTestStringAndStream( parser1N, "ab," );
+		matchTestStringAndStreamSX( parser1N, "ab,cd", "[ab cd]" );
+		matchIncompleteTestStringAndStream( parser1N, "ab,cd," );
+		matchTestStringAndStreamSX( parser1N, "ab,cd,ef", "[ab cd ef]" );
+		matchIncompleteTestStringAndStream( parser1N, "ab,cd,ef," );
 		
-		matchFailTest( parser2N, "" );
-		matchFailTest( parser2N, "," );
-		matchFailTest( parser2N, "ab" );
-		matchFailTest( parser2N, "ab," );
-		matchTestSX( parser2N, "ab,cd", "[ab cd]" );
-		matchIncompleteTest( parser2N, "ab,cd," );
-		matchTestSX( parser2N, "ab,cd,ef", "[ab cd ef]" );
-		matchIncompleteTest( parser2N, "ab,cd,ef," );
+		matchFailTestStringAndStream( parser2N, "" );
+		matchFailTestStringAndStream( parser2N, "," );
+		matchFailTestStringAndStream( parser2N, "ab" );
+		matchFailTestStringAndStream( parser2N, "ab," );
+		matchTestStringAndStreamSX( parser2N, "ab,cd", "[ab cd]" );
+		matchIncompleteTestStringAndStream( parser2N, "ab,cd," );
+		matchTestStringAndStreamSX( parser2N, "ab,cd,ef", "[ab cd ef]" );
+		matchIncompleteTestStringAndStream( parser2N, "ab,cd,ef," );
 
-		matchFailTest( parser23N, "" );
-		matchFailTest( parser23N, "," );
-		matchFailTest( parser23N, "ab" );
-		matchFailTest( parser23N, "ab," );
-		matchTestSX( parser23N, "ab,cd", "[ab cd]" );
-		matchIncompleteTest( parser23N, "ab,cd," );
-		matchTestSX( parser23N, "ab,cd,ef", "[ab cd ef]" );
-		matchIncompleteTest( parser23N, "ab,cd,ef," );
-		matchIncompleteTest( parser23N, "ab,cd,ef,gh" );
-		matchIncompleteTest( parser23N, "ab,cd,ef,gh," );
+		matchFailTestStringAndStream( parser23N, "" );
+		matchFailTestStringAndStream( parser23N, "," );
+		matchFailTestStringAndStream( parser23N, "ab" );
+		matchFailTestStringAndStream( parser23N, "ab," );
+		matchTestStringAndStreamSX( parser23N, "ab,cd", "[ab cd]" );
+		matchIncompleteTestStringAndStream( parser23N, "ab,cd," );
+		matchTestStringAndStreamSX( parser23N, "ab,cd,ef", "[ab cd ef]" );
+		matchIncompleteTestStringAndStream( parser23N, "ab,cd,ef," );
+		matchIncompleteTestStringAndStream( parser23N, "ab,cd,ef,gh" );
+		matchIncompleteTestStringAndStream( parser23N, "ab,cd,ef,gh," );
 
-		matchTestSX( parserDN, "[]", "[]" );
-		matchFailTest( parserDN, "[,]" );
-		matchTestSX( parserDN, "[ab]", "[ab]" );
-		matchFailTest( parserDN, "[ab,]" );
-		matchTestSX( parserDN, "[ab,cd]", "[ab cd]" );
-		matchFailTest( parserDN, "[ab,cd,]" );
-		matchTestSX( parserDN, "[ab,cd,ef]", "[ab cd ef]" );
-		matchFailTest( parserDN, "[ab,cd,ef,]" );
+		matchTestStringAndStreamSX( parserDN, "[]", "[]" );
+		matchFailTestStringAndStream( parserDN, "[,]" );
+		matchTestStringAndStreamSX( parserDN, "[ab]", "[ab]" );
+		matchFailTestStringAndStream( parserDN, "[ab,]" );
+		matchTestStringAndStreamSX( parserDN, "[ab,cd]", "[ab cd]" );
+		matchFailTestStringAndStream( parserDN, "[ab,cd,]" );
+		matchTestStringAndStreamSX( parserDN, "[ab,cd,ef]", "[ab cd ef]" );
+		matchFailTestStringAndStream( parserDN, "[ab,cd,ef,]" );
 		
 
 		
-		matchTestSX( parser0O, "", "[]" );
-		matchIncompleteTest( parser0O, "," );
-		matchTestSX( parser0O, "ab", "[ab]" );
-		matchTestSX( parser0O, "ab,", "[ab]" );
-		matchTestSX( parser0O, "ab,cd", "[ab cd]" );
-		matchTestSX( parser0O, "ab,cd,", "[ab cd]" );
-		matchTestSX( parser0O, "ab,cd,ef", "[ab cd ef]" );
-		matchTestSX( parser0O, "ab,cd,ef,", "[ab cd ef]" );
+		matchTestStringAndStreamSX( parser0O, "", "[]" );
+		matchIncompleteTestStringAndStream( parser0O, "," );
+		matchTestStringAndStreamSX( parser0O, "ab", "[ab]" );
+		matchTestStringAndStreamSX( parser0O, "ab,", "[ab]" );
+		matchTestStringAndStreamSX( parser0O, "ab,cd", "[ab cd]" );
+		matchTestStringAndStreamSX( parser0O, "ab,cd,", "[ab cd]" );
+		matchTestStringAndStreamSX( parser0O, "ab,cd,ef", "[ab cd ef]" );
+		matchTestStringAndStreamSX( parser0O, "ab,cd,ef,", "[ab cd ef]" );
 		
-		matchFailTest( parser1O, "" );
-		matchFailTest( parser1O, "," );
-		matchTestSX( parser1O, "ab", "[ab]" );
-		matchTestSX( parser1O, "ab,", "[ab]" );
-		matchTestSX( parser1O, "ab,cd", "[ab cd]" );
-		matchTestSX( parser1O, "ab,cd,", "[ab cd]" );
-		matchTestSX( parser1O, "ab,cd,ef", "[ab cd ef]" );
-		matchTestSX( parser1O, "ab,cd,ef,", "[ab cd ef]" );
+		matchFailTestStringAndStream( parser1O, "" );
+		matchFailTestStringAndStream( parser1O, "," );
+		matchTestStringAndStreamSX( parser1O, "ab", "[ab]" );
+		matchTestStringAndStreamSX( parser1O, "ab,", "[ab]" );
+		matchTestStringAndStreamSX( parser1O, "ab,cd", "[ab cd]" );
+		matchTestStringAndStreamSX( parser1O, "ab,cd,", "[ab cd]" );
+		matchTestStringAndStreamSX( parser1O, "ab,cd,ef", "[ab cd ef]" );
+		matchTestStringAndStreamSX( parser1O, "ab,cd,ef,", "[ab cd ef]" );
 		
-		matchFailTest( parser2O, "" );
-		matchFailTest( parser2O, "," );
-		matchFailTest( parser2O, "ab" );
-		matchFailTest( parser2O, "ab," );
-		matchTestSX( parser2O, "ab,cd", "[ab cd]" );
-		matchTestSX( parser2O, "ab,cd,", "[ab cd]" );
-		matchTestSX( parser2O, "ab,cd,ef", "[ab cd ef]" );
-		matchTestSX( parser2O, "ab,cd,ef,", "[ab cd ef]" );
+		matchFailTestStringAndStream( parser2O, "" );
+		matchFailTestStringAndStream( parser2O, "," );
+		matchFailTestStringAndStream( parser2O, "ab" );
+		matchFailTestStringAndStream( parser2O, "ab," );
+		matchTestStringAndStreamSX( parser2O, "ab,cd", "[ab cd]" );
+		matchTestStringAndStreamSX( parser2O, "ab,cd,", "[ab cd]" );
+		matchTestStringAndStreamSX( parser2O, "ab,cd,ef", "[ab cd ef]" );
+		matchTestStringAndStreamSX( parser2O, "ab,cd,ef,", "[ab cd ef]" );
 	
-		matchFailTest( parser23O, "" );
-		matchFailTest( parser23O, "," );
-		matchFailTest( parser23O, "ab" );
-		matchFailTest( parser23O, "ab," );
-		matchTestSX( parser23O, "ab,cd", "[ab cd]" );
-		matchTestSX( parser23O, "ab,cd,", "[ab cd]" );
-		matchTestSX( parser23O, "ab,cd,ef", "[ab cd ef]" );
-		matchTestSX( parser23O, "ab,cd,ef,", "[ab cd ef]" );
-		matchIncompleteTest( parser23O, "ab,cd,ef,gh" );
-		matchIncompleteTest( parser23O, "ab,cd,ef,gh," );
+		matchFailTestStringAndStream( parser23O, "" );
+		matchFailTestStringAndStream( parser23O, "," );
+		matchFailTestStringAndStream( parser23O, "ab" );
+		matchFailTestStringAndStream( parser23O, "ab," );
+		matchTestStringAndStreamSX( parser23O, "ab,cd", "[ab cd]" );
+		matchTestStringAndStreamSX( parser23O, "ab,cd,", "[ab cd]" );
+		matchTestStringAndStreamSX( parser23O, "ab,cd,ef", "[ab cd ef]" );
+		matchTestStringAndStreamSX( parser23O, "ab,cd,ef,", "[ab cd ef]" );
+		matchIncompleteTestStringAndStream( parser23O, "ab,cd,ef,gh" );
+		matchIncompleteTestStringAndStream( parser23O, "ab,cd,ef,gh," );
 	
-		matchTestSX( parserDO, "[]", "[]" );
-		matchFailTest( parserDO, "[,]" );
-		matchTestSX( parserDO, "[ab]", "[ab]" );
-		matchTestSX( parserDO, "[ab,]", "[ab]" );
-		matchTestSX( parserDO, "[ab,cd]", "[ab cd]" );
-		matchTestSX( parserDO, "[ab,cd,]", "[ab cd]" );
-		matchTestSX( parserDO, "[ab,cd,ef]", "[ab cd ef]" );
-		matchTestSX( parserDO, "[ab,cd,ef,]", "[ab cd ef]" );
+		matchTestStringAndStreamSX( parserDO, "[]", "[]" );
+		matchFailTestStringAndStream( parserDO, "[,]" );
+		matchTestStringAndStreamSX( parserDO, "[ab]", "[ab]" );
+		matchTestStringAndStreamSX( parserDO, "[ab,]", "[ab]" );
+		matchTestStringAndStreamSX( parserDO, "[ab,cd]", "[ab cd]" );
+		matchTestStringAndStreamSX( parserDO, "[ab,cd,]", "[ab cd]" );
+		matchTestStringAndStreamSX( parserDO, "[ab,cd,ef]", "[ab cd ef]" );
+		matchTestStringAndStreamSX( parserDO, "[ab,cd,ef,]", "[ab cd ef]" );
 		
 
 		
-		matchTestSX( parser0R, "", "[]" );
-		matchIncompleteTest( parser0R, "," );
-		matchIncompleteTest( parser0R, "ab" );
-		matchTestSX( parser0R, "ab,", "[ab]" );
-		matchIncompleteTest( parser0R, "ab,cd" );
-		matchTestSX( parser0R, "ab,cd,", "[ab cd]" );
-		matchIncompleteTest( parser0R, "ab,cd,ef" );
-		matchTestSX( parser0R, "ab,cd,ef,", "[ab cd ef]" );
+		matchTestStringAndStreamSX( parser0R, "", "[]" );
+		matchIncompleteTestStringAndStream( parser0R, "," );
+		matchIncompleteTestStringAndStream( parser0R, "ab" );
+		matchTestStringAndStreamSX( parser0R, "ab,", "[ab]" );
+		matchIncompleteTestStringAndStream( parser0R, "ab,cd" );
+		matchTestStringAndStreamSX( parser0R, "ab,cd,", "[ab cd]" );
+		matchIncompleteTestStringAndStream( parser0R, "ab,cd,ef" );
+		matchTestStringAndStreamSX( parser0R, "ab,cd,ef,", "[ab cd ef]" );
 		
-		matchFailTest( parser1R, "" );
-		matchFailTest( parser1R, "," );
-		matchFailTest( parser1R, "ab" );
-		matchTestSX( parser1R, "ab,", "[ab]" );
-		matchIncompleteTest( parser1R, "ab,cd" );
-		matchTestSX( parser1R, "ab,cd,", "[ab cd]" );
-		matchIncompleteTest( parser1R, "ab,cd,ef" );
-		matchTestSX( parser1R, "ab,cd,ef,", "[ab cd ef]" );
+		matchFailTestStringAndStream( parser1R, "" );
+		matchFailTestStringAndStream( parser1R, "," );
+		matchFailTestStringAndStream( parser1R, "ab" );
+		matchTestStringAndStreamSX( parser1R, "ab,", "[ab]" );
+		matchIncompleteTestStringAndStream( parser1R, "ab,cd" );
+		matchTestStringAndStreamSX( parser1R, "ab,cd,", "[ab cd]" );
+		matchIncompleteTestStringAndStream( parser1R, "ab,cd,ef" );
+		matchTestStringAndStreamSX( parser1R, "ab,cd,ef,", "[ab cd ef]" );
 		
-		matchFailTest( parser2R, "" );
-		matchFailTest( parser2R, "," );
-		matchFailTest( parser2R, "ab" );
-		matchFailTest( parser2R, "ab," );
-		matchFailTest( parser2R, "ab,cd" );
-		matchTestSX( parser2R, "ab,cd,", "[ab cd]" );
-		matchIncompleteTest( parser2R, "ab,cd,ef" );
-		matchTestSX( parser2R, "ab,cd,ef,", "[ab cd ef]" );
+		matchFailTestStringAndStream( parser2R, "" );
+		matchFailTestStringAndStream( parser2R, "," );
+		matchFailTestStringAndStream( parser2R, "ab" );
+		matchFailTestStringAndStream( parser2R, "ab," );
+		matchFailTestStringAndStream( parser2R, "ab,cd" );
+		matchTestStringAndStreamSX( parser2R, "ab,cd,", "[ab cd]" );
+		matchIncompleteTestStringAndStream( parser2R, "ab,cd,ef" );
+		matchTestStringAndStreamSX( parser2R, "ab,cd,ef,", "[ab cd ef]" );
 
-		matchFailTest( parser23R, "" );
-		matchFailTest( parser23R, "," );
-		matchFailTest( parser23R, "ab" );
-		matchFailTest( parser23R, "ab," );
-		matchFailTest( parser23R, "ab,cd" );
-		matchTestSX( parser23R, "ab,cd,", "[ab cd]" );
-		matchIncompleteTest( parser23R, "ab,cd,ef" );
-		matchTestSX( parser23R, "ab,cd,ef,", "[ab cd ef]" );
-		matchIncompleteTest( parser23O, "ab,cd,ef,gh" );
-		matchIncompleteTest( parser23O, "ab,cd,ef,gh," );
+		matchFailTestStringAndStream( parser23R, "" );
+		matchFailTestStringAndStream( parser23R, "," );
+		matchFailTestStringAndStream( parser23R, "ab" );
+		matchFailTestStringAndStream( parser23R, "ab," );
+		matchFailTestStringAndStream( parser23R, "ab,cd" );
+		matchTestStringAndStreamSX( parser23R, "ab,cd,", "[ab cd]" );
+		matchIncompleteTestStringAndStream( parser23R, "ab,cd,ef" );
+		matchTestStringAndStreamSX( parser23R, "ab,cd,ef,", "[ab cd ef]" );
+		matchIncompleteTestStringAndStream( parser23O, "ab,cd,ef,gh" );
+		matchIncompleteTestStringAndStream( parser23O, "ab,cd,ef,gh," );
 		
-		matchTestSX( parserDR, "[]", "[]" );
-		matchFailTest( parserDR, "[,]" );
-		matchFailTest( parserDR, "[ab]" );
-		matchTestSX( parserDR, "[ab,]", "[ab]" );
-		matchFailTest( parserDR, "[ab,cd]");
-		matchTestSX( parserDR, "[ab,cd,]", "[ab cd]" );
-		matchFailTest( parserDR, "[ab,cd,ef]" );
-		matchTestSX( parserDR, "[ab,cd,ef,]", "[ab cd ef]" );
+		matchTestStringAndStreamSX( parserDR, "[]", "[]" );
+		matchFailTestStringAndStream( parserDR, "[,]" );
+		matchFailTestStringAndStream( parserDR, "[ab]" );
+		matchTestStringAndStreamSX( parserDR, "[ab,]", "[ab]" );
+		matchFailTestStringAndStream( parserDR, "[ab,cd]");
+		matchTestStringAndStreamSX( parserDR, "[ab,cd,]", "[ab cd]" );
+		matchFailTestStringAndStream( parserDR, "[ab,cd,ef]" );
+		matchTestStringAndStreamSX( parserDR, "[ab,cd,ef,]", "[ab cd ef]" );
 
 	
 	
-		matchTestSX( parserDOC, "[]", "[]" );
-		matchFailTest( parserDOC, "[,]" );
-		matchFailTest( parserDOC, "[ab]" );
-		matchFailTest( parserDOC, "[ab,]" );
-		matchTestSX( parserDOC, "[ab,cd]", "[ab cd]" );
-		matchTestSX( parserDOC, "[ab,cd,]", "[ab cd]" );
-		matchFailTest( parserDOC, "[ab,cd,ef]" );
-		matchFailTest( parserDOC, "[ab,cd,ef,]" );
-		matchTestSX( parserDOC, "[ab,cd,ef,gh]", "[ab cd ef gh]" );
-		matchTestSX( parserDOC, "[ab,cd,ef,gh,]", "[ab cd ef gh]" );
+		matchTestStringAndStreamSX( parserDOC, "[]", "[]" );
+		matchFailTestStringAndStream( parserDOC, "[,]" );
+		matchFailTestStringAndStream( parserDOC, "[ab]" );
+		matchFailTestStringAndStream( parserDOC, "[ab,]" );
+		matchTestStringAndStreamSX( parserDOC, "[ab,cd]", "[ab cd]" );
+		matchTestStringAndStreamSX( parserDOC, "[ab,cd,]", "[ab cd]" );
+		matchFailTestStringAndStream( parserDOC, "[ab,cd,ef]" );
+		matchFailTestStringAndStream( parserDOC, "[ab,cd,ef,]" );
+		matchTestStringAndStreamSX( parserDOC, "[ab,cd,ef,gh]", "[ab cd ef gh]" );
+		matchTestStringAndStreamSX( parserDOC, "[ab,cd,ef,gh,]", "[ab cd ef gh]" );
 		
-		matchTestSX( parserDOA, "[]", "[]" );
-		matchFailTest( parserDOA, "[,]" );
-		matchTestSX( parserDOA, "[ab]", "[ab]" );
-		matchTestSX( parserDOA, "[ab,]", "[ab sep]" );
-		matchTestSX( parserDOA, "[ab,cd]", "[ab cd]" );
-		matchTestSX( parserDOA, "[ab,cd,]", "[ab cd sep]" );
-		matchTestSX( parserDOA, "[ab,cd,ef]", "[ab cd ef]" );
-		matchTestSX( parserDOA, "[ab,cd,ef,]", "[ab cd ef sep]" );
-		matchTestSX( parserDOA, "[ab,cd,ef,gh]", "[ab cd ef gh]" );
-		matchTestSX( parserDOA, "[ab,cd,ef,gh,]", "[ab cd ef gh sep]" );
+		matchTestStringAndStreamSX( parserDOA, "[]", "[]" );
+		matchFailTestStringAndStream( parserDOA, "[,]" );
+		matchTestStringAndStreamSX( parserDOA, "[ab]", "[ab]" );
+		matchTestStringAndStreamSX( parserDOA, "[ab,]", "[ab sep]" );
+		matchTestStringAndStreamSX( parserDOA, "[ab,cd]", "[ab cd]" );
+		matchTestStringAndStreamSX( parserDOA, "[ab,cd,]", "[ab cd sep]" );
+		matchTestStringAndStreamSX( parserDOA, "[ab,cd,ef]", "[ab cd ef]" );
+		matchTestStringAndStreamSX( parserDOA, "[ab,cd,ef,]", "[ab cd ef sep]" );
+		matchTestStringAndStreamSX( parserDOA, "[ab,cd,ef,gh]", "[ab cd ef gh]" );
+		matchTestStringAndStreamSX( parserDOA, "[ab,cd,ef,gh,]", "[ab cd ef gh sep]" );
 		
-		matchTestSX( parserDOCA, "[]", "[]" );
-		matchFailTest( parserDOCA, "[,]" );
-		matchFailTest( parserDOCA, "[ab]" );
-		matchFailTest( parserDOCA, "[ab,]" );
-		matchTestSX( parserDOCA, "[ab,cd]", "[ab cd]" );
-		matchTestSX( parserDOCA, "[ab,cd,]", "[ab cd sep]" );
-		matchFailTest( parserDOCA, "[ab,cd,ef]" );
-		matchFailTest( parserDOCA, "[ab,cd,ef,]" );
-		matchTestSX( parserDOCA, "[ab,cd,ef,gh]", "[ab cd ef gh]" );
-		matchTestSX( parserDOCA, "[ab,cd,ef,gh,]", "[ab cd ef gh sep]" );
+		matchTestStringAndStreamSX( parserDOCA, "[]", "[]" );
+		matchFailTestStringAndStream( parserDOCA, "[,]" );
+		matchFailTestStringAndStream( parserDOCA, "[ab]" );
+		matchFailTestStringAndStream( parserDOCA, "[ab,]" );
+		matchTestStringAndStreamSX( parserDOCA, "[ab,cd]", "[ab cd]" );
+		matchTestStringAndStreamSX( parserDOCA, "[ab,cd,]", "[ab cd sep]" );
+		matchFailTestStringAndStream( parserDOCA, "[ab,cd,ef]" );
+		matchFailTestStringAndStream( parserDOCA, "[ab,cd,ef,]" );
+		matchTestStringAndStreamSX( parserDOCA, "[ab,cd,ef,gh]", "[ab cd ef gh]" );
+		matchTestStringAndStreamSX( parserDOCA, "[ab,cd,ef,gh,]", "[ab cd ef gh sep]" );
 	}
 	
 	
@@ -840,7 +816,7 @@ public class Test_Parser extends ParserTestCase
 		ParseAction flattenAction = new ParseAction()
 		{
 			@SuppressWarnings("unchecked")
-			public Object invoke(ItemStreamAccessor input, int begin, Object x)
+			public Object invoke(Object input, int begin, int end, Object x, Map<String, Object> bindings)
 			{
 				ArrayList<Object> y = new ArrayList<Object>();
 				List<Object> xx = (List<Object>)x;
@@ -855,7 +831,7 @@ public class Test_Parser extends ParserTestCase
 		ParseAction action = new ParseAction()
 		{
 			@SuppressWarnings("unchecked")
-			public Object invoke(ItemStreamAccessor input, int begin, Object x)
+			public Object invoke(Object input, int begin, int end, Object x, Map<String, Object> bindings)
 			{
 				List<Object> xx = (List<Object>)x;
 				if ( xx.get( 1 ).equals( new ArrayList<Object>() ) )
@@ -876,24 +852,24 @@ public class Test_Parser extends ParserTestCase
 		Production add = new Production( "add", ( mul.__add__( new ZeroOrMore( addop.__add__( mul ) ).action( flattenAction ) ) ).action( action ) );
 		ParserExpression parser = add;
 		
-		matchTest( parser, "123", "123" );
+		matchTestStringAndStream( parser, "123", "123" );
 		
-		matchTestSX( parser, "1*2", "[1 * 2]" );
-		matchTestSX( parser, "1*2*3", "[1 * 2 * 3]" );
+		matchTestStringAndStreamSX( parser, "1*2", "[1 * 2]" );
+		matchTestStringAndStreamSX( parser, "1*2*3", "[1 * 2 * 3]" );
 
-		matchTestSX( parser, "1+2", "[1 + 2]" );
-		matchTestSX( parser, "1+2+3", "[1 + 2 + 3]" );
+		matchTestStringAndStreamSX( parser, "1+2", "[1 + 2]" );
+		matchTestStringAndStreamSX( parser, "1+2+3", "[1 + 2 + 3]" );
 
-		matchTestSX( parser, "1+2*3", "[1 + [2 * 3]]" );
-		matchTestSX( parser, "1*2+3", "[[1 * 2] + 3]" );
+		matchTestStringAndStreamSX( parser, "1+2*3", "[1 + [2 * 3]]" );
+		matchTestStringAndStreamSX( parser, "1*2+3", "[[1 * 2] + 3]" );
 
-		matchTestSX( parser, "1*2+3+4", "[[1 * 2] + 3 + 4]" );
-		matchTestSX( parser, "1+2*3+4", "[1 + [2 * 3] + 4]" );
-		matchTestSX( parser, "1+2+3*4", "[1 + 2 + [3 * 4]]" );
+		matchTestStringAndStreamSX( parser, "1*2+3+4", "[[1 * 2] + 3 + 4]" );
+		matchTestStringAndStreamSX( parser, "1+2*3+4", "[1 + [2 * 3] + 4]" );
+		matchTestStringAndStreamSX( parser, "1+2+3*4", "[1 + 2 + [3 * 4]]" );
 
-		matchTestSX( parser, "1+2*3*4", "[1 + [2 * 3 * 4]]" );
-		matchTestSX( parser, "1*2+3*4", "[[1 * 2] + [3 * 4]]" );
-		matchTestSX( parser, "1*2*3+4", "[[1 * 2 * 3] + 4]" );
+		matchTestStringAndStreamSX( parser, "1+2*3*4", "[1 + [2 * 3 * 4]]" );
+		matchTestStringAndStreamSX( parser, "1*2+3*4", "[[1 * 2] + [3 * 4]]" );
+		matchTestStringAndStreamSX( parser, "1*2*3+4", "[[1 * 2 * 3] + 4]" );
 	}
 
 
@@ -903,7 +879,7 @@ public class Test_Parser extends ParserTestCase
 		Production y = new Production( "_y" );
 		y.setExpression( x.__add__( y ).__or__( "y" ) );
 		
-		matchTestSX( y, "xxxy", "[x [x [x y]]]" );
+		matchTestStringAndStreamSX( y, "xxxy", "[x [x [x y]]]" );
 	}
 
 
@@ -913,7 +889,7 @@ public class Test_Parser extends ParserTestCase
 		Production y = new Production( "_y" );
 		y.setExpression( y.__add__( x ).__or__( "y" ) );
 		
-		matchTestSX( y, "yxxx", "[[[y x] x] x]" );
+		matchTestStringAndStreamSX( y, "yxxx", "[[[y x] x] x]" );
 	}
 
 	public void testIndirectLeftRecursion() throws ParserExpression.ParserCoerceException, Production.CannotOverwriteProductionExpressionException
@@ -923,11 +899,11 @@ public class Test_Parser extends ParserTestCase
 		Production y = new Production( "_y", z.__add__( x ).__or__( "z" ) );
 		z.setExpression( y.__or__( "y" ) );
 		
-		matchTestSX( z, "zxxx", "[[[z x] x] x]" );
-		matchTestSX( z, "yxxx", "[[[y x] x] x]" );
+		matchTestStringAndStreamSX( z, "zxxx", "[[[z x] x] x]" );
+		matchTestStringAndStreamSX( z, "yxxx", "[[[y x] x] x]" );
 	}
 
-	public void testLeftRecursion() throws Production.CannotOverwriteProductionExpressionException, ClassAlreadyDefinedException
+	public void testLeftRecursion() throws Production.CannotOverwriteProductionExpressionException, ClassAlreadyDefinedException, InvalidFieldNameException
 	{
 		DMObjectClass Num = M.newClass( "Num", new String[] { "x" } );
 		
@@ -942,7 +918,7 @@ public class Test_Parser extends ParserTestCase
 		ParserExpression mulop = star.__or__(  slash );
 
 		Production number = new Production( "number" );
-		number.setExpression( integer.__or__( new StructuralObject( Num ) ) );
+		number.setExpression( integer.__or__( new ObjectNode( Num ) ) );
 		
 		Production mul = new Production( "mul" );
 		mul.setExpression( ( mul.__add__( mulop ).__add__( number ) ).__or__( number ) );
@@ -950,26 +926,26 @@ public class Test_Parser extends ParserTestCase
 		add.setExpression( ( add.__add__( addop ).__add__( mul ) ).__or__( mul ) );
 		ParserExpression parser = add;
 		
-		matchTest( parser, "123", "123" );
+		matchTestStringAndStream( parser, "123", "123" );
 		
-		matchTestSX( parser, "1*2", "[1 * 2]" );
-		matchTestSX( parser, "1*2*3", "[[1 * 2] * 3]" );
+		matchTestStringAndStreamSX( parser, "1*2", "[1 * 2]" );
+		matchTestStringAndStreamSX( parser, "1*2*3", "[[1 * 2] * 3]" );
 
-		matchTestSX( parser, "1+2", "[1 + 2]" );
-		matchTestSX( parser, "1+2+3", "[[1 + 2] + 3]" );
+		matchTestStringAndStreamSX( parser, "1+2", "[1 + 2]" );
+		matchTestStringAndStreamSX( parser, "1+2+3", "[[1 + 2] + 3]" );
 
-		matchTestSX( parser, "1+2*3", "[1 + [2 * 3]]" );
-		matchTestSX( parser, "1*2+3", "[[1 * 2] + 3]" );
+		matchTestStringAndStreamSX( parser, "1+2*3", "[1 + [2 * 3]]" );
+		matchTestStringAndStreamSX( parser, "1*2+3", "[[1 * 2] + 3]" );
 
-		matchTestSX( parser, "1*2+3+4", "[[[1 * 2] + 3] + 4]" );
-		matchTestSX( parser, "1+2*3+4", "[[1 + [2 * 3]] + 4]" );
-		matchTestSX( parser, "1+2+3*4", "[[1 + 2] + [3 * 4]]" );
+		matchTestStringAndStreamSX( parser, "1*2+3+4", "[[[1 * 2] + 3] + 4]" );
+		matchTestStringAndStreamSX( parser, "1+2*3+4", "[[1 + [2 * 3]] + 4]" );
+		matchTestStringAndStreamSX( parser, "1+2+3*4", "[[1 + 2] + [3 * 4]]" );
 
-		matchTestSX( parser, "1+2*3*4", "[1 + [[2 * 3] * 4]]" );
-		matchTestSX( parser, "1*2+3*4", "[[1 * 2] + [3 * 4]]" );
-		matchTestSX( parser, "1*2*3+4", "[[[1 * 2] * 3] + 4]" );
+		matchTestStringAndStreamSX( parser, "1+2*3*4", "[1 + [[2 * 3] * 4]]" );
+		matchTestStringAndStreamSX( parser, "1*2+3*4", "[[1 * 2] + [3 * 4]]" );
+		matchTestStringAndStreamSX( parser, "1*2*3+4", "[[[1 * 2] * 3] + 4]" );
 		
-		
+
 		ItemStreamBuilder builder1 = new ItemStreamBuilder();
 		builder1.appendTextValue( "1+" );
 		builder1.appendStructuralValue( Num.newInstance( new Object[] { "2" } ) );
@@ -985,9 +961,9 @@ public class Test_Parser extends ParserTestCase
 		builder3.appendStructuralValue( Num.newInstance( new Object[] { "2" } ) );
 		builder3.appendTextValue( "*3+4" );
 
-		matchTestSX( parser, builder1.stream(), "{m=Tests.PatternMatch : [1 + [[(m Num x=2) * 3] * 4]]}" );
-		matchTestSX( parser, builder2.stream(), "{m=Tests.PatternMatch : [[1 * (m Num x=2)] + [3 * 4]]}" );
-		matchTestSX( parser, builder3.stream(), "{m=Tests.PatternMatch : [[[1 * (m Num x=2)] * 3] + 4]}" );
+		matchTestStreamSX( parser, builder1.stream(), "{m=Tests.PatternMatch : [1 + [[(m Num x=2) * 3] * 4]]}" );
+		matchTestStreamSX( parser, builder2.stream(), "{m=Tests.PatternMatch : [[1 * (m Num x=2)] + [3 * 4]]}" );
+		matchTestStreamSX( parser, builder3.stream(), "{m=Tests.PatternMatch : [[[1 * (m Num x=2)] * 3] + 4]}" );
 	}
 
 
@@ -997,7 +973,7 @@ public class Test_Parser extends ParserTestCase
 		ParseAction arrayAccessAction = new ParseAction()
 		{
 			@SuppressWarnings("unchecked")
-			public Object invoke(ItemStreamAccessor input, int begin, Object value)
+			public Object invoke(Object input, int begin, int end, Object value, Map<String, Object> bindings)
 			{
 				List<Object> v = (List<Object>)value;
 				return Arrays.asList( new Object[] { "arrayAccess", v.get( 0 ), v.get( 2 ) } );
@@ -1007,7 +983,7 @@ public class Test_Parser extends ParserTestCase
 		ParseAction fieldAccessAction = new ParseAction()
 		{
 			@SuppressWarnings("unchecked")
-			public Object invoke(ItemStreamAccessor input, int begin, Object value)
+			public Object invoke(Object input, int begin, int end, Object value, Map<String, Object> bindings)
 			{
 				List<Object> v = (List<Object>)value;
 				return Arrays.asList( new Object[] { "fieldAccess", v.get( 0 ), v.get( 2 ) } );
@@ -1017,7 +993,7 @@ public class Test_Parser extends ParserTestCase
 		ParseAction objectMethodInvocationAction = new ParseAction()
 		{
 			@SuppressWarnings("unchecked")
-			public Object invoke(ItemStreamAccessor input, int begin, Object value)
+			public Object invoke(Object input, int begin, int end, Object value, Map<String, Object> bindings)
 			{
 				List<Object> v = (List<Object>)value;
 				return Arrays.asList( new Object[] { "methodInvoke", v.get( 0 ), v.get( 2 ) } );
@@ -1027,7 +1003,7 @@ public class Test_Parser extends ParserTestCase
 		ParseAction thisMethodInvocationAction = new ParseAction()
 		{
 			@SuppressWarnings("unchecked")
-			public Object invoke(ItemStreamAccessor input, int begin, Object value)
+			public Object invoke(Object input, int begin, int end, Object value, Map<String, Object> bindings)
 			{
 				List<Object> v = (List<Object>)value;
 				return Arrays.asList( new Object[] { "methodInvoke", v.get( 0 ) } );
@@ -1061,33 +1037,33 @@ public class Test_Parser extends ParserTestCase
 		primary.setExpression( primaryNoNewArray );
 		
 	
-		matchTestSX( primary, "this", "this" );
-		matchTestSX( primary, "this.x", "[fieldAccess this x]" );
-		matchTestSX( primary, "this.x[i]", "[arrayAccess [fieldAccess this x] i]" );
-		matchTestSX( primary, "this.x.y", "[fieldAccess [fieldAccess this x] y]" );
-		matchTestSX( primary, "this.x.m()", "[methodInvoke [fieldAccess this x] m]" );
-		matchTestSX( primary, "this.x.m().n()", "[methodInvoke [methodInvoke [fieldAccess this x] m] n]" );
-		matchTestSX( primary, "x[i][j].y", "[fieldAccess [arrayAccess [arrayAccess x i] j] y]" );
+		matchTestStringAndStreamSX( primary, "this", "this" );
+		matchTestStringAndStreamSX( primary, "this.x", "[fieldAccess this x]" );
+		matchTestStringAndStreamSX( primary, "this.x[i]", "[arrayAccess [fieldAccess this x] i]" );
+		matchTestStringAndStreamSX( primary, "this.x.y", "[fieldAccess [fieldAccess this x] y]" );
+		matchTestStringAndStreamSX( primary, "this.x.m()", "[methodInvoke [fieldAccess this x] m]" );
+		matchTestStringAndStreamSX( primary, "this.x.m().n()", "[methodInvoke [methodInvoke [fieldAccess this x] m] n]" );
+		matchTestStringAndStreamSX( primary, "x[i][j].y", "[fieldAccess [arrayAccess [arrayAccess x i] j] y]" );
 
-		matchTestSX( methodInvocation, "this.m()", "[methodInvoke this m]" );
-		matchTestSX( methodInvocation, "this.m().n()", "[methodInvoke [methodInvoke this m] n]" );
-		matchTestSX( methodInvocation, "this.x.m()", "[methodInvoke [fieldAccess this x] m]" );
-		matchTestSX( methodInvocation, "this.x.y.m()", "[methodInvoke [fieldAccess [fieldAccess this x] y] m]" );
-		matchTestSX( methodInvocation, "this[i].m()", "[methodInvoke [arrayAccess this i] m]" );
-		matchTestSX( methodInvocation, "this[i][j].m()", "[methodInvoke [arrayAccess [arrayAccess this i] j] m]" );
-		matchTestSX( arrayAccess, "this[i]", "[arrayAccess this i]" );
-		matchTestSX( arrayAccess, "this[i][j]", "[arrayAccess [arrayAccess this i] j]" );
-		matchTestSX( arrayAccess, "this.x[i]", "[arrayAccess [fieldAccess this x] i]" );
-		matchTestSX( arrayAccess, "this.x.y[i]", "[arrayAccess [fieldAccess [fieldAccess this x] y] i]" );
-		matchTestSX( arrayAccess, "this.m()[i]", "[arrayAccess [methodInvoke this m] i]" );
-		matchTestSX( arrayAccess, "this.m().n()[i]", "[arrayAccess [methodInvoke [methodInvoke this m] n] i]" );
-		matchTestSX( fieldAccess, "this.x", "[fieldAccess this x]" );
-		matchTestSX( fieldAccess, "this.x.y", "[fieldAccess [fieldAccess this x] y]" );
-		matchTestSX( fieldAccess, "this[i].x", "[fieldAccess [arrayAccess this i] x]" );
-		matchTestSX( fieldAccess, "this[i][j].x", "[fieldAccess [arrayAccess [arrayAccess this i] j] x]" );
-		matchTestSX( fieldAccessOrArrayAccess, "this[i]", "[arrayAccess this i]" );
-		matchTestSX( fieldAccessOrArrayAccess, "this[i].x", "[fieldAccess [arrayAccess this i] x]" );
-		matchTestSX( fieldAccessOrArrayAccess, "this.x[i]", "[arrayAccess [fieldAccess this x] i]" );
+		matchTestStringAndStreamSX( methodInvocation, "this.m()", "[methodInvoke this m]" );
+		matchTestStringAndStreamSX( methodInvocation, "this.m().n()", "[methodInvoke [methodInvoke this m] n]" );
+		matchTestStringAndStreamSX( methodInvocation, "this.x.m()", "[methodInvoke [fieldAccess this x] m]" );
+		matchTestStringAndStreamSX( methodInvocation, "this.x.y.m()", "[methodInvoke [fieldAccess [fieldAccess this x] y] m]" );
+		matchTestStringAndStreamSX( methodInvocation, "this[i].m()", "[methodInvoke [arrayAccess this i] m]" );
+		matchTestStringAndStreamSX( methodInvocation, "this[i][j].m()", "[methodInvoke [arrayAccess [arrayAccess this i] j] m]" );
+		matchTestStringAndStreamSX( arrayAccess, "this[i]", "[arrayAccess this i]" );
+		matchTestStringAndStreamSX( arrayAccess, "this[i][j]", "[arrayAccess [arrayAccess this i] j]" );
+		matchTestStringAndStreamSX( arrayAccess, "this.x[i]", "[arrayAccess [fieldAccess this x] i]" );
+		matchTestStringAndStreamSX( arrayAccess, "this.x.y[i]", "[arrayAccess [fieldAccess [fieldAccess this x] y] i]" );
+		matchTestStringAndStreamSX( arrayAccess, "this.m()[i]", "[arrayAccess [methodInvoke this m] i]" );
+		matchTestStringAndStreamSX( arrayAccess, "this.m().n()[i]", "[arrayAccess [methodInvoke [methodInvoke this m] n] i]" );
+		matchTestStringAndStreamSX( fieldAccess, "this.x", "[fieldAccess this x]" );
+		matchTestStringAndStreamSX( fieldAccess, "this.x.y", "[fieldAccess [fieldAccess this x] y]" );
+		matchTestStringAndStreamSX( fieldAccess, "this[i].x", "[fieldAccess [arrayAccess this i] x]" );
+		matchTestStringAndStreamSX( fieldAccess, "this[i][j].x", "[fieldAccess [arrayAccess [arrayAccess this i] j] x]" );
+		matchTestStringAndStreamSX( fieldAccessOrArrayAccess, "this[i]", "[arrayAccess this i]" );
+		matchTestStringAndStreamSX( fieldAccessOrArrayAccess, "this[i].x", "[fieldAccess [arrayAccess this i] x]" );
+		matchTestStringAndStreamSX( fieldAccessOrArrayAccess, "this.x[i]", "[arrayAccess [fieldAccess this x] i]" );
 	}
 	
 	
@@ -1096,7 +1072,7 @@ public class Test_Parser extends ParserTestCase
 		ParseAction arrayAccessAction = new ParseAction()
 		{
 			@SuppressWarnings("unchecked")
-			public Object invoke(ItemStreamAccessor input, int begin, Object value)
+			public Object invoke(Object input, int begin, int end, Object value, Map<String, Object> bindings)
 			{
 				List<Object> v = (List<Object>)value;
 				return Arrays.asList( new Object[] { "arrayAccess", v.get( 0 ), v.get( 2 ) } );
@@ -1106,7 +1082,7 @@ public class Test_Parser extends ParserTestCase
 		ParseAction fieldAccessAction = new ParseAction()
 		{
 			@SuppressWarnings("unchecked")
-			public Object invoke(ItemStreamAccessor input, int begin, Object value)
+			public Object invoke(Object input, int begin, int end, Object value, Map<String, Object> bindings)
 			{
 				List<Object> v = (List<Object>)value;
 				return Arrays.asList( new Object[] { "fieldAccess", v.get( 0 ), v.get( 2 ) } );
@@ -1116,7 +1092,7 @@ public class Test_Parser extends ParserTestCase
 		ParseAction objectMethodInvocationAction = new ParseAction()
 		{
 			@SuppressWarnings("unchecked")
-			public Object invoke(ItemStreamAccessor input, int begin, Object value)
+			public Object invoke(Object input, int begin, int end, Object value, Map<String, Object> bindings)
 			{
 				List<Object> v = (List<Object>)value;
 				return Arrays.asList( new Object[] { "methodInvoke", v.get( 0 ), v.get( 2 ) } );
@@ -1126,7 +1102,7 @@ public class Test_Parser extends ParserTestCase
 		ParseAction thisMethodInvocationAction = new ParseAction()
 		{
 			@SuppressWarnings("unchecked")
-			public Object invoke(ItemStreamAccessor input, int begin, Object value)
+			public Object invoke(Object input, int begin, int end, Object value, Map<String, Object> bindings)
 			{
 				List<Object> v = (List<Object>)value;
 				return Arrays.asList( new Object[] { "methodInvoke", v.get( 0 ) } );
@@ -1166,7 +1142,7 @@ public class Test_Parser extends ParserTestCase
 		primary.setExpression( primaryNoNewArray );
 
 		
-		DebugParseResult d = fieldAccessOrArrayAccess.debugParseString( "this[i]" );
+		DebugParseResult d = fieldAccessOrArrayAccess.debugParseStringChars( "this[i]" );
 		new ParseViewFrame( d );
 	}
 }

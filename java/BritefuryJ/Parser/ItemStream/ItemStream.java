@@ -53,7 +53,6 @@ public class ItemStream
 	public static class TextItem extends Item
 	{
 		protected String textValue;
-		protected int start, stop;
 		
 		
 		public TextItem(String textValue, int start, int stop)

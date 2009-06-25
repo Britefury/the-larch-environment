@@ -79,19 +79,23 @@ public class ItemStreamAccessor
 		if ( currentItem instanceof ItemStream.TextItem )
 		{
 			ItemStream.TextItem t = (ItemStream.TextItem)currentItem;
-			int offset = start - t.start;
-			Matcher m = pattern.matcher( t.textValue.substring( offset, t.stop - t.start ) );
-			
-			boolean bFound = m.find();
-			if ( bFound  &&  m.start() == 0  &&  m.end() > 0 )
+			if ( start < t.stop )
 			{
-				return start + m.group().length();
+				int offset = start - t.start;
+				Matcher m = pattern.matcher( t.textValue.substring( offset, t.stop - t.start ) );
+				
+				boolean bFound = m.find();
+				if ( bFound  &&  m.start() == 0  &&  m.end() > 0 )
+				{
+					return start + m.group().length();
+				}
 			}
 		}
 		
 		return start;
 	}
-	
+
+
 	public String matchRegEx(int start, Pattern pattern)
 	{
 		updateCurrentItem( start );
