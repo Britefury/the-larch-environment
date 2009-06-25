@@ -79,23 +79,6 @@ public class ItemStreamBuilder
 		items = new ArrayList<Item>();
 	}
 	
-	public ItemStreamBuilder(Object values[])
-	{
-		this();
-		
-		for (Object v: values)
-		{
-			if ( v instanceof String )
-			{
-				appendTextValue( (String)v );
-			}
-			else
-			{
-				appendStructuralValue( v );
-			}
-		}
-	}
-	
 	
 	public void appendTextValue(String text)
 	{

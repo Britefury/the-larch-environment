@@ -118,6 +118,11 @@ public class Choice extends BranchExpression
 		return new Choice( appendToSubexps( x ) );
 	}
 
+	public ParserExpression __or__(Object x) throws ParserCoerceException
+	{
+		return new Choice( appendToSubexps( coerce( x ) ) );
+	}
+
 
 	public boolean compareTo(ParserExpression x)
 	{

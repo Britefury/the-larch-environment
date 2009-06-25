@@ -494,14 +494,25 @@ public abstract class ParserExpression implements ParserExpressionInterface
 	
 	
 
-/*	public ParserExpression __add__(ParserExpression x)
+	public ParserExpression __add__(ParserExpression x)
 	{
 		return new Sequence( withSibling( x ) );
 	}
 
-	public ParserExpression __add__(Object x)
+	public ParserExpression __add__(Object x) throws ParserCoerceException
 	{
 		return new Sequence( withSibling( coerce( x ) ) );
+	}
+
+	
+	public ParserExpression __sub__(ParserExpression x)
+	{
+		return new Combine( withSibling( x ) );
+	}
+
+	public ParserExpression __sub__(Object x) throws ParserCoerceException
+	{
+		return new Combine( withSibling( coerce( x ) ) );
 	}
 
 	
@@ -510,24 +521,13 @@ public abstract class ParserExpression implements ParserExpressionInterface
 		return new Choice( withSibling( x ) );
 	}
 
-	public ParserExpression __or__(Object x)
+	public ParserExpression __or__(Object x) throws ParserCoerceException
 	{
 		return new Choice( withSibling( coerce( x ) ) );
 	}
 
 	
-	public ParserExpression __xor__(ParserExpression x)
-	{
-		return new BestChoice( withSibling( x ) );
-	}
-
-	public ParserExpression __xor__(Object x)
-	{
-		return new BestChoice( withSibling( coerce( x ) ) );
-	}
-
-	
-	public ParserExpression __and__(TreeParseCondition cond)
+	public ParserExpression __and__(ParseCondition cond)
 	{
 		return condition( cond );
 	}
@@ -535,7 +535,7 @@ public abstract class ParserExpression implements ParserExpressionInterface
 	public ParserExpression __and__(PyObject cond)
 	{
 		return condition( cond );
-	}*/
+	}
 
 
 
@@ -560,7 +560,7 @@ public abstract class ParserExpression implements ParserExpressionInterface
 		return Action.mergeUpAction( this, a );
 	}
 	
-	/*public ParserExpression condition(TreeParseCondition cond)
+	public ParserExpression condition(ParseCondition cond)
 	{
 		return new Condition( this, cond );
 	}
@@ -598,7 +598,7 @@ public abstract class ParserExpression implements ParserExpressionInterface
 	public ParserExpression oneOrMore()
 	{
 		return new OneOrMore( this );
-	}*/
+	}
 	
 	
 	
