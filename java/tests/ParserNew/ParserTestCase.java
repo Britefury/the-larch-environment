@@ -262,7 +262,7 @@ abstract public class ParserTestCase extends TestCase
 
 	public void matchTestNodeSX(ParserExpression parser, String inputSX, String expectedSX)
 	{
-		matchTestStringSX( parser, inputSX, expectedSX, "[ \t\n]*" );
+		matchTestNodeSX( parser, inputSX, expectedSX, "[ \t\n]*" );
 	}
 
 	public void matchTestNodeSX(ParserExpression parser, String inputSX, String expectedSX, String ignoreCharsRegex)
@@ -327,7 +327,7 @@ abstract public class ParserTestCase extends TestCase
 	public void matchTestListSX(ParserExpression parser, String inputSX, String expectedSX, String ignoreCharsRegex)
 	{
 		List<Object> input = (List<Object>)readInputSX( inputSX );
-		Object expected = (List<Object>)readExpectedSX( expectedSX );
+		Object expected = readExpectedSX( expectedSX );
 		matchTestList( parser, input, expected, ignoreCharsRegex );
 	}
 	
