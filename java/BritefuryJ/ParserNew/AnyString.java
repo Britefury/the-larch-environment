@@ -27,7 +27,7 @@ public class AnyString extends ParserExpression
 	
 	protected ParseResult evaluateNode(ParserState state, Object input)
 	{
-		if ( input instanceof String  ||  input instanceof ItemStreamAccessor )
+		if ( input instanceof String )
 		{
 			return new ParseResult( input, 0, 1 );
 		}
@@ -44,6 +44,19 @@ public class AnyString extends ParserExpression
 
 	protected ParseResult evaluateStreamItems(ParserState state, ItemStreamAccessor input, int start)
 	{
+		if ( start < input.length() )
+		{
+			Object valueArray[] = input.matchStructuralNode( start );
+			
+			if ( valueArray != null )
+			{
+				if ( valueArray[0] instanceof String )
+				{
+					return new ParseResult( valueArray[0], 0, 1 );
+				}
+			}
+		}
+		
 		return ParseResult.failure( start );
 	}
 
@@ -53,7 +66,7 @@ public class AnyString extends ParserExpression
 		{
 			Object x = input.get( start );
 			
-			if ( x instanceof String  ||  x instanceof ItemStreamAccessor )
+			if ( x instanceof String )
 			{
 				return new ParseResult( x, start, start + 1 );
 			}
