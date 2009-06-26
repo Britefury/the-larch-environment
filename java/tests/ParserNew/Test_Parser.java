@@ -31,7 +31,9 @@ import BritefuryJ.ParserNew.Condition;
 import BritefuryJ.ParserNew.DebugParseResult;
 import BritefuryJ.ParserNew.Delegate;
 import BritefuryJ.ParserNew.Keyword;
+import BritefuryJ.ParserNew.ListNode;
 import BritefuryJ.ParserNew.Literal;
+import BritefuryJ.ParserNew.LiteralNode;
 import BritefuryJ.ParserNew.ObjectNode;
 import BritefuryJ.ParserNew.OneOrMore;
 import BritefuryJ.ParserNew.Optional;
@@ -52,6 +54,9 @@ import BritefuryJ.ParserNew.ParserExpression.ParserCoerceException;
 import BritefuryJ.ParserNew.SeparatedList.CannotApplyConditionAfterActionException;
 import BritefuryJ.ParserNew.SeparatedList.CannotApplyMoreThanOneActionException;
 import BritefuryJ.ParserNew.SeparatedList.CannotApplyMoreThanOneConditionException;
+import BritefuryJ.TreeParser.ListMatch;
+import BritefuryJ.TreeParser.ObjectMatch;
+import BritefuryJ.TreeParser.TreeParserExpression;
 
 public class Test_Parser extends ParserTestCase
 {
@@ -59,7 +64,7 @@ public class Test_Parser extends ParserTestCase
 	public ParserExpression foo, bar, bar2;
 
 	protected DMModule M;
-	protected DMObjectClass Foo, Bar, Bar2;
+	protected DMObjectClass Foo, Bar, Bar2, A, Add, Sub, Mul;
 	protected DMModuleResolver resolver = new DMModuleResolver()
 	{
 		public DMModule getModule(String location) throws CouldNotResolveModuleException
@@ -85,6 +90,10 @@ public class Test_Parser extends ParserTestCase
 			Foo = M.newClass( "Foo", new String[] { "a" } );
 			Bar = M.newClass( "Bar", new String[] { "b" } );
 			Bar2 = M.newClass( "Bar2", Bar, new String[] { "c" } );
+			A = M.newClass( "A", new String[] { "x", "y" } );
+			Add = M.newClass( "Add", new String[] { "a", "b" } );
+			Sub = M.newClass( "Sub", new String[] { "a", "b" } );
+			Mul = M.newClass( "Mul", new String[] { "a", "b" } );
 		}
 		catch (ClassAlreadyDefinedException e)
 		{
@@ -215,6 +224,11 @@ public class Test_Parser extends ParserTestCase
 		
 		matchTestNodeSX( new AnyNode().action( f_l ), "[a b c]", "[a b c a b c]" );
 		matchTestListSX( new AnyNode().action( f_l ), "[[a b c]]", "[a b c a b c]" );
+		
+		
+		
+		
+		// TODO: Test merge up action
 	}
 
 
@@ -502,33 +516,206 @@ public class Test_Parser extends ParserTestCase
 		assertTrue( new Keyword( "abc", "xyz" ).compareTo( new Keyword( "abc", "xyz" ) ) );
 		assertFalse( new Keyword( "abc", "xyz" ).compareTo( new Keyword( "def", "xyz" ) ) );
 		assertFalse( new Keyword( "abc", "xyz" ).compareTo( new Keyword( "abc", "pqr" ) ) );
+		
 		matchTestStringAndStream( new Keyword( "hello" ), "hello", "hello" );
 		matchFailTestStringAndStream( new Keyword( "hello" ), "helloq" );
 		matchSubTestStringAndStream( new Keyword( "hello", "abc" ), "hello", "hello", 5 );
 		matchSubTestStringAndStream( new Keyword( "hello", "abc" ), "helloxx", "hello", 5 );
 		matchFailTestStringAndStream( new Keyword( "hello", "abc" ), "helloaa" );
+		
+		matchTestStream( new Keyword( "hello" ), new ItemStreamBuilder( new ItemStreamBuilder.Item[] { new ItemStreamBuilder.StructuralItem( "hello" ) } ).stream(), "hello" );
+
+		matchTestNode( new Keyword( "hello" ), "hello", "hello" );
+
+		matchTestListSX( new Keyword( "hello" ), "[hello]", "hello" );
 	}
+	
+	
+	public void testListNode() throws ParserCoerceException
+	{
+		ParserExpression parser1 = new ListNode( new Object[] { new Literal( "abc" ) } );
+		matchTestNodeSX( parser1, "[abc]", "[abc]" );
+		matchFailTestNodeSX( parser1, "[abcde]" );
+		matchFailTestNodeSX( parser1, "[abc de]" );
+		matchFailTestString( parser1, "abc" );
+		matchTestStreamSX( parser1, new ItemStreamBuilder( new ItemStreamBuilder.Item[] { new ItemStreamBuilder.StructuralItem( readInputSX( "[abc]" ) ) } ).stream(), "[abc]" );
+		matchTestListSX( parser1, "[[abc]]", "[abc]" );
+
+		ParserExpression parser2 = new ListNode( new Object[] { new Literal( "abc" ), new Literal( "def" ) } );
+		matchTestNodeSX( parser2, "[abc def]", "[abc def]" );
+		matchFailTestNodeSX( parser2, "[abcx def]" );
+		matchFailTestNodeSX( parser2, "[abc defx]" );
+		matchFailTestNodeSX( parser2, "[abcx defx]" );
+
+		ParserExpression parser3 = new ListNode( new Object[] { new Literal( "abc" ), new ListNode( new Object[] { new Literal( "d" ), new Literal( "e" ) } ) } );
+		matchTestNodeSX( parser3, "[abc [d e]]", "[abc [d e]]" );
+		matchFailTestNodeSX( parser3, "[abc [de]]" );
+		matchFailTestNodeSX( parser3, "[abc de]" );
+		matchFailTestNodeSX( parser3, "[abc [dx e]]" );
+		matchFailTestNodeSX( parser3, "[abc [d ex]]" );
+		matchFailTestNodeSX( parser3, "[abc [dx ex]]" );
+
+		ParserExpression parser4 = new ListNode( new Object[] { new Literal( "abc" ), new ListNode( new Object[] { new Literal( "d" ) } ).bindTo( "x" ) } );
+		matchTestNodeSX( parser4, "[abc [d]]", "[abc [d]]" );
+		matchFailTestNodeSX( parser4, "[abc d]" );
+		bindingsTestNodeSX( parser4, "[abc [d]]", "[[x [d]]]" );
+		matchFailTestString( parser4, "abcd" );
+		matchTestStreamSX( parser4, new ItemStreamBuilder( new ItemStreamBuilder.Item[] { new ItemStreamBuilder.StructuralItem( readInputSX( "[abc [d]]" ) ) } ).stream(), "[abc [d]]" );
+		bindingsTestStreamSX( parser4, new ItemStreamBuilder( new ItemStreamBuilder.Item[] { new ItemStreamBuilder.StructuralItem( readInputSX( "[abc [d]]" ) ) } ).stream(), "[[x [d]]]" );
+		matchTestListSX( parser4, "[[abc [d]]]", "[abc [d]]" );
+		bindingsTestListSX( parser4, "[[abc [d]]]", "[[x [d]]]" );
+
+		ParserExpression parser5 = new ListNode( new Object[] { identifier.bindTo( "x" ), identifier.bindTo( "x" ) } );
+		matchTestNodeSX( parser5, "[abc abc]", "[abc abc]" );
+		bindingsTestNodeSX( parser5, "[abc abc]", "[[x abc]]" );
+		matchTestNodeSX( parser5, "[abc d]", "[abc d]" );
+		bindingsTestNodeSX( parser5, "[abc d]", "[[x d]]" );
+
+		ParserExpression parser6 = new ListNode( new Object[] { identifier.bindTo( "x" ), new ListNode( new Object[] { identifier.bindTo( "x" ) } ) } );
+		matchTestNodeSX( parser6, "[abc [abc]]", "[abc [abc]]" );
+		bindingsTestNodeSX( parser6, "[abc [abc]]", "[[x abc]]" );
+		matchTestNodeSX( parser6, "[abc [d]]", "[abc [d]]" );
+		bindingsTestNodeSX( parser6, "[abc [d]]", "[[x d]]" );
+	}
+
 	
 	
 	public void testLiteral()
 	{
 		assertTrue( new Literal( "abc" ).compareTo( new Literal( "abc" ) ) );
 		assertFalse( new Literal( "abc" ).compareTo( new Literal( "def" ) ) );
+		
 		matchTestStringAndStream( new Literal( "abcxyz" ), "abcxyz", "abcxyz" );
 		matchFailTestStringAndStream( new Literal( "abcxyz" ), "qwerty" );
 		matchSubTestStringAndStream( new Literal( "abcxyz" ), "abcxyz123", "abcxyz", 6 );
+
+		
+		matchTestStream( new Literal( "hello" ), new ItemStreamBuilder( new ItemStreamBuilder.Item[] { new ItemStreamBuilder.StructuralItem( "hello" ) } ).stream(), "hello" );
+
+		matchTestNode( new Literal( "hello" ), "hello", "hello" );
+
+		matchTestListSX( new Literal( "hello" ), "[hello]", "hello" );
 	}
+
+
+	public void testLiteralNode()
+	{
+		assertTrue( new LiteralNode( "abc" ).compareTo( new LiteralNode( "abc" ) ) );
+		assertFalse( new LiteralNode( "abc" ).compareTo( new LiteralNode( "def" ) ) );
+		
+		matchTestNode( new LiteralNode( "hello" ), "hello", "hello" );
+		matchFailTestStringAndStream( new LiteralNode( "hello" ), "hello" );
+		matchTestStream( new LiteralNode( "hello" ), new ItemStreamBuilder( new ItemStreamBuilder.Item[] { new ItemStreamBuilder.StructuralItem( "hello" ) } ).stream(), "hello" );
+		matchTestListSX( new LiteralNode( "hello" ), "[hello]", "hello" );
+
+		matchTestNodeSX( new LiteralNode( Foo.newInstance( new Object[] { "x" } ) ), "{m=M : (m Foo a=x)}", "{m=M : (m Foo a=x)}" );
+		matchTestStreamSX( new LiteralNode( Foo.newInstance( new Object[] { "x" } ) ),
+				new ItemStreamBuilder( new ItemStreamBuilder.Item[] { new ItemStreamBuilder.StructuralItem( readInputSX( "{m=M : (m Foo a=x)}" ) ) } ).stream(), "{m=M : (m Foo a=x)}" );
+		matchTestListSX( new LiteralNode( Foo.newInstance( new Object[] { "x" } ) ), "{m=M : [(m Foo a=x)]}", "{m=M : (m Foo a=x)}" );
+	}
+
+
+	public void testObjectNode() throws InvalidFieldNameException, ParserCoerceException
+	{
+		ParserExpression parser1 = new ObjectNode( A, new String[] { "x" }, new Object[] { new Literal( "abc" ) } );
+		matchTestNodeSX( parser1, "{m=M : (m A x=abc y=xyz)}", "{m=M : (m A x=abc y=xyz)}" );
+		matchTestNodeSX( parser1, "{m=M : (m A x=abc y=pqr)}", "{m=M : (m A x=abc y=pqr)}" );
+		matchFailTestNodeSX( parser1, "{m=M : (m A x=pqr y=xyz)}" );
+		matchFailTestString( parser1, "abc" );
+		matchTestStreamSX( parser1, new ItemStreamBuilder( new ItemStreamBuilder.Item[] { new ItemStreamBuilder.StructuralItem( readInputSX( "{m=M : (m A x=abc y=xyz)}" ) ) } ).stream(),
+				"{m=M : (m A x=abc y=xyz)}" );
+		matchTestListSX( parser1, "{m=M : [(m A x=abc y=xyz)]}", "{m=M : (m A x=abc y=xyz)}" );
+		
+		ParserExpression parser2 = new ObjectNode( A, new String[] { "y" }, new Object[] { new Literal( "xyz" ) } );
+		matchTestNodeSX( parser2, "{m=M : (m A x=abc y=xyz)}", "{m=M : (m A x=abc y=xyz)}" );
+		matchTestNodeSX( parser2, "{m=M : (m A x=pqr y=xyz)}", "{m=M : (m A x=pqr y=xyz)}" );
+		matchFailTestNodeSX( parser2, "{m=M : (m A x=abc y=pqr)}" );
+		
+		ParserExpression parser3 = new ObjectNode( A, new String[] { "x", "y" }, new Object[] { new Literal( "abc" ), new Literal( "xyz" ) } );
+		matchTestNodeSX( parser3, "{m=M : (m A x=abc y=xyz)}", "{m=M : (m A x=abc y=xyz)}" );
+		matchFailTestNodeSX( parser3, "{m=M : (m A x=pqr y=xyz)}" );
+		matchFailTestNodeSX( parser3, "{m=M : (m A x=abc y=pqr)}" );
+		
+		ParserExpression parser4 = new ObjectNode( A, new String[] { "x", "y" }, new Object[] { new Literal( "abc" ), new ListNode( new Object[] { new Literal( "d" ), new Literal( "e" ) } ) } );
+		matchTestNodeSX( parser4, "{m=M : (m A x=abc y=[d e])}", "{m=M : (m A x=abc y=[d e])}" );
+		matchFailTestNodeSX( parser4, "{m=M : (m A x=pqr y=xyz)}" );
+		matchFailTestNodeSX( parser4, "{m=M : (m A x=abc y=[p q])}" );
+		
+		ParserExpression parser5 = new ObjectNode( A, new String[] { "x", "y" }, new Object[] { new Literal( "abc" ), new ListNode( new Object[] { new Literal( "d" ) } ).bindTo( "x" ) } );
+		matchTestNodeSX( parser5, "{m=M : (m A x=abc y=[d])}", "{m=M : (m A x=abc y=[d])}" );
+		bindingsTestNodeSX( parser5, "{m=M : (m A x=abc y=[d])}", "[[x [d]]]" );
+		
+		ParserExpression parser6 = new ObjectNode( A, new String[] { "x", "y" }, new Object[] { identifier.bindTo( "x" ), identifier.bindTo( "x" ) } );
+		matchTestNodeSX( parser6, "{m=M : (m A x=abc y=abc)}", "{m=M : (m A x=abc y=abc)}" );
+		matchTestNodeSX( parser6, "{m=M : (m A x=def y=def)}", "{m=M : (m A x=def y=def)}" );
+		bindingsTestNodeSX( parser6, "{m=M : (m A x=abc y=abc)}", "[[x abc]]" );
+		bindingsTestNodeSX( parser6, "{m=M : (m A x=abc y=def)}", "[[x def]]" );
+		bindingsTestStreamSX( parser6, new ItemStreamBuilder( new ItemStreamBuilder.Item[] { new ItemStreamBuilder.StructuralItem( readInputSX( "{m=M : (m A x=abc y=def)}" ) ) } ).stream(),
+		"[[x def]]" );
+		bindingsTestListSX( parser6, "{m=M : [(m A x=abc y=def)]}", "[[x def]]" );
+	}
+
+
+	
+	
+	public void testOneOrMore() throws ParserExpression.ParserCoerceException
+	{
+		assertTrue( new OneOrMore( new Literal( "ab" ) ).compareTo( new OneOrMore( new Literal( "ab" ) ) ) );
+		assertFalse( new OneOrMore( new Literal( "ab" ) ).compareTo( new OneOrMore( new Literal( "cd" ) ) ) );
+		assertTrue( new OneOrMore( new Literal( "ab" ) ).compareTo( new OneOrMore( "ab" ) ) );
+	
+		ParserExpression parser = new OneOrMore( new Word( "a", "b" ).__add__( new Word( "c", "d" ) ) );
+		
+		String[][] result1 = { { "ab", "cd", } };
+		String[][] result2 = { { "ab", "cd", },   { "abb", "cdd" } };
+		String[][] result3 = { { "ab", "cd", },   { "abb", "cdd" },   { "abbb", "cddd" } };
+		
+		matchFailTestStringAndStream( parser, "" );
+		
+		matchTestStringAndStream( parser, "abcd", arrayToList2D( result1 ) );
+		matchTestStringAndStream( parser, "abcdabbcdd", arrayToList2D( result2 ) );
+		matchTestStringAndStream( parser, "abcdabbcddabbbcddd", arrayToList2D( result3 ) );
+		
+		ParserExpression parser2 = new OneOrMore( new Word( "a", "b" ) );
+		matchTestListSX( parser2, "[ab abb abbb]", "[ab abb abbb]" );
+		matchTestStreamSX( parser2, new ItemStreamBuilder( new ItemStreamBuilder.Item[] { new ItemStreamBuilder.TextItem( "ab" ), new ItemStreamBuilder.StructuralItem( "ab" ) } ).stream(),
+		"[ab ab]" );
+	}
+
+
+
+	public void testOptional() throws ParserExpression.ParserCoerceException
+	{
+		assertTrue( new Optional( new Literal( "ab" ) ).compareTo( new Optional( new Literal( "ab" ) ) ) );
+		assertFalse( new Optional( new Literal( "ab" ) ).compareTo( new Optional( new Literal( "cd" ) ) ) );
+		assertTrue( new Optional( new Literal( "ab" ) ).compareTo( new Optional( "ab" ) ) );
+	
+		ParserExpression parser = new Word( "a", "b" ).optional();
+		
+		matchTestStringAndStream( parser, "", null );
+		matchTestStringAndStream( parser, "abb", "abb" );
+		matchSubTestStringAndStream( parser, "abbabb", "abb", 3 );
+	}
+
 
 
 	public void testRegEx()
 	{
 		assertTrue( new RegEx( "[A-Za-z_][A-Za-z0-9_]*" ).compareTo( new RegEx( "[A-Za-z_][A-Za-z0-9_]*" ) ) );
 		assertFalse( new RegEx( "[A-Za-z_][A-Za-z0-9_]*" ).compareTo( new RegEx( "[A-Za-z_][A-Za-z0-9_]*abc" ) ) );
+	
 		matchTestStringAndStream( new RegEx( "[A-Za-z_][A-Za-z0-9_]*" ), "abc_123", "abc_123" );
 		matchFailTestStringAndStream( new RegEx( "[A-Za-z_][A-Za-z0-9_]*" ), "9abc" );
 		matchSubTestStringAndStream( new RegEx( "[A-Za-z_][A-Za-z0-9_]*" ), "abc_xyz...", "abc_xyz", 7 );
 		matchTestStringAndStream( new RegEx( "[A-Za-z_]*" ), "abc_", "abc_" );
 		matchFailTestStringAndStream( new RegEx( "[A-Za-z_]*" ), "." );
+	
+
+		matchTestStream( new RegEx( "[A-Za-z_][A-Za-z0-9_]*" ), new ItemStreamBuilder( new ItemStreamBuilder.Item[] { new ItemStreamBuilder.StructuralItem( "abc_123" ) } ).stream(), "abc_123" );
+
+		matchTestNode( new RegEx( "[A-Za-z_][A-Za-z0-9_]*" ), "abc_123", "abc_123" );
+
+		matchTestListSX( new RegEx( "[A-Za-z_][A-Za-z0-9_]*" ), "[abc_123]", "abc_123" );
 	}
 	
 	
@@ -536,6 +723,7 @@ public class Test_Parser extends ParserTestCase
 	{
 		assertTrue( new Word( "abc" ).compareTo( new Word( "abc" ) ) );
 		assertFalse( new Word( "abc" ).compareTo( new Word( "def" ) ) );
+		
 		matchTestStringAndStream( new Word( "abc" ), "aabbcc", "aabbcc" );
 		matchTestStringAndStream( new Word( "abc" ), "ccbbaa", "ccbbaa" );
 		matchSubTestStringAndStream( new Word( "abc" ), "aabbccxx", "aabbcc", 6 );
@@ -545,6 +733,7 @@ public class Test_Parser extends ParserTestCase
 		assertTrue( new Word( "abc", "xyz" ).compareTo( new Word( "abc", "xyz" ) ) );
 		assertFalse( new Word( "abc", "xyz" ).compareTo( new Word( "def", "xyz" ) ) );
 		assertFalse( new Word( "abc", "xyz" ).compareTo( new Word( "abc", "pqr" ) ) );
+		
 		matchTestStringAndStream( new Word( "abc", "def" ), "addeeff", "addeeff" );
 		matchTestStringAndStream( new Word( "abc", "def" ), "affeedd", "affeedd" );
 		matchSubTestStringAndStream( new Word( "abc", "def" ), "affeeddxx", "affeedd", 7 );
@@ -553,6 +742,14 @@ public class Test_Parser extends ParserTestCase
 		matchFailTestStringAndStream( new Word( "abc", "def" ), "ddeeff" );
 		matchFailTestStringAndStream( new Word( "abc", "def" ), "x" );
 		matchFailTestStringAndStream( new Word( "abc", "def" ), "dadeeff" );
+	
+		
+
+		matchTestStream( new Word( "abc", "def" ), new ItemStreamBuilder( new ItemStreamBuilder.Item[] { new ItemStreamBuilder.StructuralItem( "addeeff" ) } ).stream(), "addeeff" );
+
+		matchTestNode( new Word( "abc", "def" ), "addeeff", "addeeff" );
+
+		matchTestListSX( new Word( "abc", "def" ), "[addeeff]", "addeeff" );
 	}
 	
 	
@@ -647,20 +844,6 @@ public class Test_Parser extends ParserTestCase
 	}
 
 
-	public void testOptional() throws ParserExpression.ParserCoerceException
-	{
-		assertTrue( new Optional( new Literal( "ab" ) ).compareTo( new Optional( new Literal( "ab" ) ) ) );
-		assertFalse( new Optional( new Literal( "ab" ) ).compareTo( new Optional( new Literal( "cd" ) ) ) );
-		assertTrue( new Optional( new Literal( "ab" ) ).compareTo( new Optional( "ab" ) ) );
-
-		ParserExpression parser = new Word( "a", "b" ).optional();
-		
-		matchTestStringAndStream( parser, "", null );
-		matchTestStringAndStream( parser, "abb", "abb" );
-		matchSubTestStringAndStream( parser, "abbabb", "abb", 3 );
-	}
-
-
 	public void testRepetition() throws ParserExpression.ParserCoerceException
 	{
 		assertTrue( new Repetition( new Literal( "ab" ), 0, 1, false ).compareTo( new Repetition( new Literal( "ab" ), 0, 1, false ) ) );
@@ -747,29 +930,6 @@ public class Test_Parser extends ParserTestCase
 		
 		matchTestStringAndStream( parserO, "abcdabbcdd", arrayToList2D( result2 ) );
 		matchTestStringAndStream( parserN, "abcdabbcdd", arrayToList2D( result2 ) );
-	}
-
-
-
-	public void testOneOrMore() throws ParserExpression.ParserCoerceException
-	{
-		assertTrue( new OneOrMore( new Literal( "ab" ) ).compareTo( new OneOrMore( new Literal( "ab" ) ) ) );
-		assertFalse( new OneOrMore( new Literal( "ab" ) ).compareTo( new OneOrMore( new Literal( "cd" ) ) ) );
-		assertTrue( new OneOrMore( new Literal( "ab" ) ).compareTo( new OneOrMore( "ab" ) ) );
-
-		ParserExpression parser = new OneOrMore( new Word( "a", "b" ).__add__( new Word( "c", "d" ) ) );
-		
-		String[][] result1 = { { "ab", "cd", } };
-		String[][] result2 = { { "ab", "cd", },   { "abb", "cdd" } };
-		String[][] result3 = { { "ab", "cd", },   { "abb", "cdd" },   { "abbb", "cddd" } };
-		
-		matchFailTestStringAndStream( parser, "" );
-		
-		matchTestStringAndStream( parser, "abcd", arrayToList2D( result1 ) );
-		
-		matchTestStringAndStream( parser, "abcdabbcdd", arrayToList2D( result2 ) );
-		
-		matchTestStringAndStream( parser, "abcdabbcddabbbcddd", arrayToList2D( result3 ) );
 	}
 
 
