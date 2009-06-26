@@ -17,6 +17,7 @@ import BritefuryJ.DocModel.DMIOReader.BadModuleNameException;
 import BritefuryJ.DocModel.DMIOReader.ParseErrorException;
 import BritefuryJ.DocModel.DMModule.UnknownClassException;
 import BritefuryJ.DocModel.DMModuleResolver.CouldNotResolveModuleException;
+import BritefuryJ.ParserNew.ParseAction;
 import BritefuryJ.ParserNew.ParseResult;
 import BritefuryJ.ParserNew.ParserExpression;
 import BritefuryJ.Parser.ItemStream.ItemStream;
@@ -28,7 +29,7 @@ abstract public class ParserTestCase extends TestCase
 
 	
 	
-	private Object readInputSX(String expectedSX)
+	protected Object readInputSX(String expectedSX)
 	{
 		Object expected = null;
 		try
@@ -59,7 +60,7 @@ abstract public class ParserTestCase extends TestCase
 	}
 	
 	
-	private Object readExpectedSX(String expectedSX)
+	protected Object readExpectedSX(String expectedSX)
 	{
 		Object expected = null;
 		try
@@ -110,28 +111,38 @@ abstract public class ParserTestCase extends TestCase
 	
 	public void matchTestStringAndStreamSX(ParserExpression parser, String input, String expectedSX)
 	{
-		matchTestStringAndStreamSX( parser, input, expectedSX, "[ \t\n]*" );
+		matchTestStringAndStreamSX( parser, input, expectedSX, "[ \t\n]*", null );
 	}
 
-	public void matchTestStringAndStreamSX(ParserExpression parser, String input, String expectedSX, String ignoreCharsRegex)
+	public void matchTestStringAndStreamSX(ParserExpression parser, String input, String expectedSX, ParseAction delegateAction)
+	{
+		matchTestStringAndStreamSX( parser, input, expectedSX, "[ \t\n]*", delegateAction );
+	}
+
+	public void matchTestStringAndStreamSX(ParserExpression parser, String input, String expectedSX, String ignoreCharsRegex, ParseAction delegateAction)
 	{
 		Object expected = readExpectedSX( expectedSX );
-		matchTestStringAndStream( parser, input, expected, ignoreCharsRegex );
+		matchTestStringAndStream( parser, input, expected, ignoreCharsRegex, delegateAction );
 	}
 	
 	
 	public void matchTestStringAndStream(ParserExpression parser, String input, Object expected)
 	{
-		matchTestStringAndStream( parser, input, expected, "[ \t\n]*" );
+		matchTestStringAndStream( parser, input, expected, "[ \t\n]*", null );
 	}
 
-	public void matchTestStringAndStream(ParserExpression parser, String input, Object expected, String ignoreCharsRegex)
+	public void matchTestStringAndStream(ParserExpression parser, String input, Object expected, ParseAction delegateAction)
+	{
+		matchTestStringAndStream( parser, input, expected, "[ \t\n]*", delegateAction );
+	}
+
+	public void matchTestStringAndStream(ParserExpression parser, String input, Object expected, String ignoreCharsRegex, ParseAction delegateAction)
 	{
 		ItemStreamBuilder builder = new ItemStreamBuilder();
 		builder.appendTextValue( input );
 		
-		matchTestString( parser, input, expected, ignoreCharsRegex );
-		matchTestStream( parser, builder.stream(), expected, ignoreCharsRegex );
+		matchTestString( parser, input, expected, ignoreCharsRegex, delegateAction );
+		matchTestStream( parser, builder.stream(), expected, ignoreCharsRegex, delegateAction );
 	}
 
 	
@@ -139,28 +150,38 @@ abstract public class ParserTestCase extends TestCase
 	
 	public void bindingsTestStringAndStreamSX(ParserExpression parser, String input, String expectedBindingsSX)
 	{
-		bindingsTestStringAndStreamSX( parser, input, expectedBindingsSX, "[ \t\n]*" );
+		bindingsTestStringAndStreamSX( parser, input, expectedBindingsSX, "[ \t\n]*", null );
 	}
 
-	public void bindingsTestStringAndStreamSX(ParserExpression parser, String input, String expectedBindingsSX, String ignoreCharsRegex)
+	public void bindingsTestStringAndStreamSX(ParserExpression parser, String input, String expectedBindingsSX, ParseAction delegateAction)
+	{
+		bindingsTestStringAndStreamSX( parser, input, expectedBindingsSX, "[ \t\n]*", delegateAction );
+	}
+
+	public void bindingsTestStringAndStreamSX(ParserExpression parser, String input, String expectedBindingsSX, String ignoreCharsRegex, ParseAction delegateAction)
 	{
 		Map<String, Object> expectedBindings = readExpectedBindingsSX( expectedBindingsSX );
-		bindingsTestStringAndStream( parser, input, expectedBindings, ignoreCharsRegex );
+		bindingsTestStringAndStream( parser, input, expectedBindings, ignoreCharsRegex, delegateAction );
 	}
 	
 	
 	public void bindingsTestStringAndStream(ParserExpression parser, String input, Map<String, Object> expectedBindings)
 	{
-		bindingsTestStringAndStream( parser, input, expectedBindings, "[ \t\n]*" );
+		bindingsTestStringAndStream( parser, input, expectedBindings, "[ \t\n]*", null );
 	}
 
-	public void bindingsTestStringAndStream(ParserExpression parser, String input, Map<String, Object> expectedBindings, String ignoreCharsRegex)
+	public void bindingsTestStringAndStream(ParserExpression parser, String input, Map<String, Object> expectedBindings, ParseAction delegateAction)
+	{
+		bindingsTestStringAndStream( parser, input, expectedBindings, "[ \t\n]*", delegateAction );
+	}
+
+	public void bindingsTestStringAndStream(ParserExpression parser, String input, Map<String, Object> expectedBindings, String ignoreCharsRegex, ParseAction delegateAction)
 	{
 		ItemStreamBuilder builder = new ItemStreamBuilder();
 		builder.appendTextValue( input );
 		
-		bindingsTestString( parser, input, expectedBindings, ignoreCharsRegex );
-		bindingsTestStream( parser, builder.stream(), expectedBindings, ignoreCharsRegex );
+		bindingsTestString( parser, input, expectedBindings, ignoreCharsRegex, delegateAction );
+		bindingsTestStream( parser, builder.stream(), expectedBindings, ignoreCharsRegex, delegateAction );
 	}
 
 	
@@ -168,24 +189,34 @@ abstract public class ParserTestCase extends TestCase
 	
 	public void matchTestStringSX(ParserExpression parser, String input, String expectedSX)
 	{
-		matchTestStringSX( parser, input, expectedSX, "[ \t\n]*" );
+		matchTestStringSX( parser, input, expectedSX, "[ \t\n]*", null );
 	}
 
-	public void matchTestStringSX(ParserExpression parser, String input, String expectedSX, String ignoreCharsRegex)
+	public void matchTestStringSX(ParserExpression parser, String input, String expectedSX, ParseAction delegateAction)
+	{
+		matchTestStringSX( parser, input, expectedSX, "[ \t\n]*", delegateAction );
+	}
+
+	public void matchTestStringSX(ParserExpression parser, String input, String expectedSX, String ignoreCharsRegex, ParseAction delegateAction)
 	{
 		Object expected = readExpectedSX( expectedSX );
-		matchTestString( parser, input, expected, ignoreCharsRegex );
+		matchTestString( parser, input, expected, ignoreCharsRegex, delegateAction );
 	}
 	
 	
 	public void matchTestString(ParserExpression parser, String input, Object expected)
 	{
-		matchTestString( parser, input, expected, "[ \t\n]*" );
+		matchTestString( parser, input, expected, "[ \t\n]*", null );
 	}
 
-	public void matchTestString(ParserExpression parser, String input, Object expected, String ignoreCharsRegex)
+	public void matchTestString(ParserExpression parser, String input, Object expected, ParseAction delegateAction)
 	{
-		ParseResult result = parser.parseStringChars( input, ignoreCharsRegex );
+		matchTestString( parser, input, expected, "[ \t\n]*", delegateAction );
+	}
+
+	public void matchTestString(ParserExpression parser, String input, Object expected, String ignoreCharsRegex, ParseAction delegateAction)
+	{
+		ParseResult result = parser.parseStringChars( input, ignoreCharsRegex, delegateAction );
 		
 		if ( !result.isValid() )
 		{
@@ -240,22 +271,32 @@ abstract public class ParserTestCase extends TestCase
 	
 	public void bindingsTestStringSX(ParserExpression parser, String input, String expectedBindingsSX)
 	{
-		bindingsTestStringSX( parser, input, expectedBindingsSX, "[ \t\n]*" );
+		bindingsTestStringSX( parser, input, expectedBindingsSX, "[ \t\n]*", null );
 	}
 
-	public void bindingsTestStringSX(ParserExpression parser, String input, String expectedBindingsSX, String ignoreCharsRegex)
+	public void bindingsTestStringSX(ParserExpression parser, String input, String expectedBindingsSX, ParseAction delegateAction)
 	{
-		bindingsTestString( parser, input, readExpectedBindingsSX( expectedBindingsSX ), ignoreCharsRegex );
+		bindingsTestStringSX( parser, input, expectedBindingsSX, "[ \t\n]*", delegateAction );
+	}
+
+	public void bindingsTestStringSX(ParserExpression parser, String input, String expectedBindingsSX, String ignoreCharsRegex, ParseAction delegateAction)
+	{
+		bindingsTestString( parser, input, readExpectedBindingsSX( expectedBindingsSX ), ignoreCharsRegex, delegateAction );
 	}
 	
 	public void bindingsTestString(ParserExpression parser, String input, Map<String, Object> expectedBindings)
 	{
-		bindingsTestString( parser, input, expectedBindings, "[ \t\n]*" );
+		bindingsTestString( parser, input, expectedBindings, "[ \t\n]*", null );
 	}
 
-	public void bindingsTestString(ParserExpression parser, String input, Map<String, Object> expectedBindings, String ignoreCharsRegex)
+	public void bindingsTestString(ParserExpression parser, String input, Map<String, Object> expectedBindings, ParseAction delegateAction)
 	{
-		ParseResult result = parser.parseStringChars( input, ignoreCharsRegex );
+		bindingsTestString( parser, input, expectedBindings, "[ \t\n]*", delegateAction );
+	}
+
+	public void bindingsTestString(ParserExpression parser, String input, Map<String, Object> expectedBindings, String ignoreCharsRegex, ParseAction delegateAction)
+	{
+		ParseResult result = parser.parseStringChars( input, ignoreCharsRegex, delegateAction );
 		
 		if ( !result.isValid() )
 		{
@@ -290,24 +331,34 @@ abstract public class ParserTestCase extends TestCase
 	
 	public void matchTestStreamSX(ParserExpression parser, ItemStream input, String expectedSX)
 	{
-		matchTestStreamSX( parser, input, expectedSX, "[ \t\n]*" );
+		matchTestStreamSX( parser, input, expectedSX, "[ \t\n]*", null );
 	}
 
-	public void matchTestStreamSX(ParserExpression parser, ItemStream input, String expectedSX, String ignoreCharsRegex)
+	public void matchTestStreamSX(ParserExpression parser, ItemStream input, String expectedSX, ParseAction delegateAction)
+	{
+		matchTestStreamSX( parser, input, expectedSX, "[ \t\n]*", delegateAction );
+	}
+
+	public void matchTestStreamSX(ParserExpression parser, ItemStream input, String expectedSX, String ignoreCharsRegex, ParseAction delegateAction)
 	{
 		Object expected = readExpectedSX( expectedSX );
-		matchTestStream( parser, input, expected, ignoreCharsRegex );
+		matchTestStream( parser, input, expected, ignoreCharsRegex, delegateAction );
 	}
 	
 
 	public void matchTestStream(ParserExpression parser, ItemStream input, Object expected)
 	{
-		matchTestStream( parser, input, expected, "[ \t\n]*" );
+		matchTestStream( parser, input, expected, "[ \t\n]*", null );
 	}
 
-	public void matchTestStream(ParserExpression parser, ItemStream input, Object expected, String ignoreCharsRegex)
+	public void matchTestStream(ParserExpression parser, ItemStream input, Object expected, ParseAction delegateAction)
 	{
-		ParseResult result = parser.parseStreamItems( input, ignoreCharsRegex );
+		matchTestStream( parser, input, expected, "[ \t\n]*", delegateAction );
+	}
+
+	public void matchTestStream(ParserExpression parser, ItemStream input, Object expected, String ignoreCharsRegex, ParseAction delegateAction)
+	{
+		ParseResult result = parser.parseStreamItems( input, ignoreCharsRegex, delegateAction );
 		
 		if ( !result.isValid() )
 		{
@@ -361,22 +412,32 @@ abstract public class ParserTestCase extends TestCase
 
 	public void bindingsTestStreamSX(ParserExpression parser, ItemStream input, String expectedBindingsSX)
 	{
-		bindingsTestStreamSX( parser, input, expectedBindingsSX, "[ \t\n]*" );
+		bindingsTestStreamSX( parser, input, expectedBindingsSX, "[ \t\n]*", null );
 	}
 
-	public void bindingsTestStreamSX(ParserExpression parser, ItemStream input, String expectedBindingsSX, String ignoreCharsRegex)
+	public void bindingsTestStreamSX(ParserExpression parser, ItemStream input, String expectedBindingsSX, ParseAction delegateAction)
 	{
-		bindingsTestStream( parser, input, readExpectedBindingsSX( expectedBindingsSX ), ignoreCharsRegex );
+		bindingsTestStreamSX( parser, input, expectedBindingsSX, "[ \t\n]*", delegateAction );
+	}
+
+	public void bindingsTestStreamSX(ParserExpression parser, ItemStream input, String expectedBindingsSX, String ignoreCharsRegex, ParseAction delegateAction)
+	{
+		bindingsTestStream( parser, input, readExpectedBindingsSX( expectedBindingsSX ), ignoreCharsRegex, delegateAction );
 	}
 	
 	public void bindingsTestStream(ParserExpression parser, ItemStream input, Map<String, Object> expectedBindings)
 	{
-		bindingsTestStream( parser, input, expectedBindings, "[ \t\n]*" );
+		bindingsTestStream( parser, input, expectedBindings, "[ \t\n]*", null );
 	}
 
-	public void bindingsTestStream(ParserExpression parser, ItemStream input, Map<String, Object> expectedBindings, String ignoreCharsRegex)
+	public void bindingsTestStream(ParserExpression parser, ItemStream input, Map<String, Object> expectedBindings, ParseAction delegateAction)
 	{
-		ParseResult result = parser.parseStreamItems( input, ignoreCharsRegex );
+		bindingsTestStream( parser, input, expectedBindings, "[ \t\n]*", delegateAction );
+	}
+
+	public void bindingsTestStream(ParserExpression parser, ItemStream input, Map<String, Object> expectedBindings, String ignoreCharsRegex, ParseAction delegateAction)
+	{
+		ParseResult result = parser.parseStreamItems( input, ignoreCharsRegex, delegateAction );
 		
 		if ( !result.isValid() )
 		{
@@ -412,25 +473,35 @@ abstract public class ParserTestCase extends TestCase
 
 	public void matchTestNodeSX(ParserExpression parser, String inputSX, String expectedSX)
 	{
-		matchTestNodeSX( parser, inputSX, expectedSX, "[ \t\n]*" );
+		matchTestNodeSX( parser, inputSX, expectedSX, "[ \t\n]*", null );
 	}
 
-	public void matchTestNodeSX(ParserExpression parser, String inputSX, String expectedSX, String ignoreCharsRegex)
+	public void matchTestNodeSX(ParserExpression parser, String inputSX, String expectedSX, ParseAction delegateAction)
+	{
+		matchTestNodeSX( parser, inputSX, expectedSX, "[ \t\n]*", delegateAction );
+	}
+
+	public void matchTestNodeSX(ParserExpression parser, String inputSX, String expectedSX, String ignoreCharsRegex, ParseAction delegateAction)
 	{
 		Object input = readInputSX( inputSX );
 		Object expected = readExpectedSX( expectedSX );
-		matchTestNode( parser, input, expected, ignoreCharsRegex );
+		matchTestNode( parser, input, expected, ignoreCharsRegex, delegateAction );
 	}
 	
 	
 	public void matchTestNode(ParserExpression parser, Object input, Object expected)
 	{
-		matchTestNode( parser, input, expected, "[ \t\n]*" );
+		matchTestNode( parser, input, expected, "[ \t\n]*", null );
 	}
 
-	public void matchTestNode(ParserExpression parser, Object input, Object expected, String ignoreCharsRegex)
+	public void matchTestNode(ParserExpression parser, Object input, Object expected, ParseAction delegateAction)
 	{
-		ParseResult result = parser.parseNode( input, ignoreCharsRegex );
+		matchTestNode( parser, input, expected, "[ \t\n]*", delegateAction );
+	}
+
+	public void matchTestNode(ParserExpression parser, Object input, Object expected, String ignoreCharsRegex, ParseAction delegateAction)
+	{
+		ParseResult result = parser.parseNode( input, ignoreCharsRegex, delegateAction );
 		
 		if ( !result.isValid() )
 		{
@@ -470,22 +541,32 @@ abstract public class ParserTestCase extends TestCase
 	
 	public void bindingsTestNodeSX(ParserExpression parser, String inputSX, String expectedBindingsSX)
 	{
-		bindingsTestNodeSX( parser, inputSX, expectedBindingsSX, "[ \t\n]*" );
+		bindingsTestNodeSX( parser, inputSX, expectedBindingsSX, "[ \t\n]*", null );
 	}
 
-	public void bindingsTestNodeSX(ParserExpression parser, String inputSX, String expectedBindingsSX, String ignoreCharsRegex)
+	public void bindingsTestNodeSX(ParserExpression parser, String inputSX, String expectedBindingsSX, ParseAction delegateAction)
 	{
-		bindingsTestNode( parser, readInputSX( inputSX ), readExpectedBindingsSX( expectedBindingsSX ), ignoreCharsRegex );
+		bindingsTestNodeSX( parser, inputSX, expectedBindingsSX, "[ \t\n]*", delegateAction );
+	}
+
+	public void bindingsTestNodeSX(ParserExpression parser, String inputSX, String expectedBindingsSX, String ignoreCharsRegex, ParseAction delegateAction)
+	{
+		bindingsTestNode( parser, readInputSX( inputSX ), readExpectedBindingsSX( expectedBindingsSX ), ignoreCharsRegex, delegateAction );
 	}
 	
 	public void bindingsTestNode(ParserExpression parser, Object input, Map<String, Object> expectedBindings)
 	{
-		bindingsTestNode( parser, input, expectedBindings, "[ \t\n]*" );
+		bindingsTestNode( parser, input, expectedBindings, "[ \t\n]*", null );
 	}
 
-	public void bindingsTestNode(ParserExpression parser, Object input, Map<String, Object> expectedBindings, String ignoreCharsRegex)
+	public void bindingsTestNode(ParserExpression parser, Object input, Map<String, Object> expectedBindings, ParseAction delegateAction)
 	{
-		ParseResult result = parser.parseNode( input, ignoreCharsRegex );
+		bindingsTestNode( parser, input, expectedBindings, "[ \t\n]*", delegateAction );
+	}
+
+	public void bindingsTestNode(ParserExpression parser, Object input, Map<String, Object> expectedBindings, String ignoreCharsRegex, ParseAction delegateAction)
+	{
+		ParseResult result = parser.parseNode( input, ignoreCharsRegex, delegateAction );
 		
 		if ( !result.isValid() )
 		{
@@ -513,26 +594,36 @@ abstract public class ParserTestCase extends TestCase
 
 	public void matchTestListSX(ParserExpression parser, String inputSX, String expectedSX)
 	{
-		matchTestListSX( parser, inputSX, expectedSX, "[ \t\n]*" );
+		matchTestListSX( parser, inputSX, expectedSX, "[ \t\n]*", null );
+	}
+
+	public void matchTestListSX(ParserExpression parser, String inputSX, String expectedSX, ParseAction delegateAction)
+	{
+		matchTestListSX( parser, inputSX, expectedSX, "[ \t\n]*", delegateAction );
 	}
 
 	@SuppressWarnings("unchecked")
-	public void matchTestListSX(ParserExpression parser, String inputSX, String expectedSX, String ignoreCharsRegex)
+	public void matchTestListSX(ParserExpression parser, String inputSX, String expectedSX, String ignoreCharsRegex, ParseAction delegateAction)
 	{
 		List<Object> input = (List<Object>)readInputSX( inputSX );
 		Object expected = readExpectedSX( expectedSX );
-		matchTestList( parser, input, expected, ignoreCharsRegex );
+		matchTestList( parser, input, expected, ignoreCharsRegex, delegateAction );
 	}
 	
 	
 	public void matchTestList(ParserExpression parser, List<Object> input, Object expected)
 	{
-		matchTestList( parser, input, expected, "[ \t\n]*" );
+		matchTestList( parser, input, expected, "[ \t\n]*", null );
 	}
 
-	public void matchTestList(ParserExpression parser, List<Object> input, Object expected, String ignoreCharsRegex)
+	public void matchTestList(ParserExpression parser, List<Object> input, Object expected, ParseAction delegateAction)
 	{
-		ParseResult result = parser.parseListItems( input, ignoreCharsRegex );
+		matchTestList( parser, input, expected, "[ \t\n]*", delegateAction );
+	}
+
+	public void matchTestList(ParserExpression parser, List<Object> input, Object expected, String ignoreCharsRegex, ParseAction delegateAction)
+	{
+		ParseResult result = parser.parseListItems( input, ignoreCharsRegex, delegateAction );
 		
 		if ( !result.isValid() )
 		{
@@ -585,24 +676,34 @@ abstract public class ParserTestCase extends TestCase
 	
 	public void bindingsTestListSX(ParserExpression parser, String inputSX, String expectedBindingsSX)
 	{
-		bindingsTestListSX( parser, inputSX, expectedBindingsSX, "[ \t\n]*" );
+		bindingsTestListSX( parser, inputSX, expectedBindingsSX, "[ \t\n]*", null );
+	}
+
+	public void bindingsTestListSX(ParserExpression parser, String inputSX, String expectedBindingsSX, ParseAction delegateAction)
+	{
+		bindingsTestListSX( parser, inputSX, expectedBindingsSX, "[ \t\n]*", delegateAction );
 	}
 
 	@SuppressWarnings("unchecked")
-	public void bindingsTestListSX(ParserExpression parser, String inputSX, String expectedBindingsSX, String ignoreCharsRegex)
+	public void bindingsTestListSX(ParserExpression parser, String inputSX, String expectedBindingsSX, String ignoreCharsRegex, ParseAction delegateAction)
 	{
 		List<Object> input = (List<Object>)readInputSX( inputSX );
-		bindingsTestList( parser, input, readExpectedBindingsSX( expectedBindingsSX ), ignoreCharsRegex );
+		bindingsTestList( parser, input, readExpectedBindingsSX( expectedBindingsSX ), ignoreCharsRegex, delegateAction );
 	}
 	
 	public void bindingsTestList(ParserExpression parser, List<Object> input, Map<String, Object> expectedBindings)
 	{
-		bindingsTestList( parser, input, expectedBindings, "[ \t\n]*" );
+		bindingsTestList( parser, input, expectedBindings, "[ \t\n]*", null );
 	}
 
-	public void bindingsTestList(ParserExpression parser, List<Object> input, Map<String, Object> expectedBindings, String ignoreCharsRegex)
+	public void bindingsTestList(ParserExpression parser, List<Object> input, Map<String, Object> expectedBindings, ParseAction delegateAction)
 	{
-		ParseResult result = parser.parseListItems( input, ignoreCharsRegex );
+		bindingsTestList( parser, input, expectedBindings, "[ \t\n]*", delegateAction );
+	}
+
+	public void bindingsTestList(ParserExpression parser, List<Object> input, Map<String, Object> expectedBindings, String ignoreCharsRegex, ParseAction delegateAction)
+	{
+		ParseResult result = parser.parseListItems( input, ignoreCharsRegex, delegateAction );
 		
 		if ( !result.isValid() )
 		{

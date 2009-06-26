@@ -11,7 +11,7 @@ import java.util.ArrayList;
 
 public class ItemStreamBuilder
 {
-	private abstract static class Item
+	public abstract static class Item
 	{
 		abstract public int length();
 		
@@ -20,7 +20,7 @@ public class ItemStreamBuilder
 
 	
 	
-	private static class TextItem extends Item
+	public static class TextItem extends Item
 	{
 		private StringBuilder textValue;
 		
@@ -46,12 +46,12 @@ public class ItemStreamBuilder
 
 	
 	
-	private static class StructuralItem extends Item
+	public static class StructuralItem extends Item
 	{
 		private Object structuralValue;
 		
 		
-		public StructuralItem(Object structuralValue, String textValue)
+		public StructuralItem(Object structuralValue)
 		{
 			this.structuralValue = structuralValue;
 		}
@@ -79,6 +79,22 @@ public class ItemStreamBuilder
 		items = new ArrayList<Item>();
 	}
 	
+	public ItemStreamBuilder(String text)
+	{
+		items = new ArrayList<Item>();
+		appendTextValue( text );
+	}
+	
+	public ItemStreamBuilder(Item items[])
+	{
+		this.items = new ArrayList<Item>();
+		
+		for (Item i: items)
+		{
+			this.items.add( i );
+		}
+	}
+	
 	
 	public void appendTextValue(String text)
 	{
@@ -96,7 +112,7 @@ public class ItemStreamBuilder
 	
 	public void appendStructuralValue(Object structuralValue)
 	{
-		items.add( new StructuralItem( structuralValue, null ) );
+		items.add( new StructuralItem( structuralValue ) );
 	}
 	
 	

@@ -42,7 +42,14 @@ public class Delegate extends UnaryBranchExpression
 		
 		if ( res.isValid() )
 		{
-			return res.actionValue( state.delegateAction.invoke( input, 0, 1, res.value, res.bindings ), false );
+			if ( state.delegateAction != null )
+			{
+				return res.actionValue( state.delegateAction.invoke( input, 0, 1, res.value, res.bindings ), false );
+			}
+			else
+			{
+				throw new RuntimeException( "No delegate action" );
+			}
 		}
 		else
 		{
@@ -56,7 +63,14 @@ public class Delegate extends UnaryBranchExpression
 		
 		if ( res.isValid() )
 		{
-			return res.actionValue( state.delegateAction.invoke( input, start, res.end, res.value, res.bindings ), false );
+			if ( state.delegateAction != null )
+			{
+				return res.actionValue( state.delegateAction.invoke( input, start, res.end, res.value, res.bindings ), false );
+			}
+			else
+			{
+				throw new RuntimeException( "No delegate action" );
+			}
 		}
 		else
 		{
@@ -70,7 +84,14 @@ public class Delegate extends UnaryBranchExpression
 		
 		if ( res.isValid() )
 		{
-			return res.actionValue( state.delegateAction.invoke( input, start, res.end, res.value, res.bindings ), false );
+			if ( state.delegateAction != null )
+			{
+				return res.actionValue( state.delegateAction.invoke( input, start, res.end, res.value, res.bindings ), false );
+			}
+			else
+			{
+				throw new RuntimeException( "No delegate action" );
+			}
 		}
 		else
 		{
@@ -84,7 +105,14 @@ public class Delegate extends UnaryBranchExpression
 		
 		if ( res.isValid() )
 		{
-			return res.actionValue( state.delegateAction.invoke( input, start, res.end, res.value, res.bindings ), false );
+			if ( state.delegateAction != null )
+			{
+				return res.actionValue( state.delegateAction.invoke( input, start, res.end, res.value, res.bindings ), false );
+			}
+			else
+			{
+				throw new RuntimeException( "No delegate action" );
+			}
 		}
 		else
 		{
