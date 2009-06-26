@@ -53,9 +53,10 @@ import BritefuryJ.ParserNew.SeparatedList.CannotApplyMoreThanOneConditionExcepti
 public class Test_Parser extends ParserTestCase
 {
 	public static ParserExpression identifier = new RegEx( "[A-Za-z_][A-Za-z0-9_]*" );
+	public ParserExpression foo, bar, bar2;
 
 	protected DMModule M;
-	protected DMObjectClass XYZ;
+	protected DMObjectClass Foo, Bar, Bar2;
 	protected DMModuleResolver resolver = new DMModuleResolver()
 	{
 		public DMModule getModule(String location) throws CouldNotResolveModuleException
@@ -78,7 +79,9 @@ public class Test_Parser extends ParserTestCase
 		M = new DMModule( "M", "m", "M" );
 		try
 		{
-			XYZ = M.newClass( "XYZ", new String[] { "a" } );
+			Foo = M.newClass( "Foo", new String[] { "a" } );
+			Bar = M.newClass( "Bar", new String[] { "b" } );
+			Bar2 = M.newClass( "Bar2", Bar, new String[] { "c" } );
 		}
 		catch (ClassAlreadyDefinedException e)
 		{
@@ -112,14 +115,90 @@ public class Test_Parser extends ParserTestCase
 	
 	
 	
-	public void testAnyNode()
+	//	public void testStructuralNode()
+	//	{
+	//		assertTrue( new StructuralItem().compareTo( new StructuralItem() ) );
+	//
+	//		ItemStreamBuilder builder1 = new ItemStreamBuilder();
+	//		builder1.appendStructuralValue( new Integer( 12 ) );
+	//		
+	//		ItemStreamBuilder builder2 = new ItemStreamBuilder();
+	//		builder2.appendStructuralValue( new Integer( 12 ) );
+	//		builder2.appendStructuralValue( new Integer( 13 ) );
+	//
+	//		matchTestStream( new StructuralItem(), builder1.stream(), new Integer( 12 ) );
+	//		matchSubTestStream( new StructuralItem(), builder2.stream(), new Integer( 12 ), 1 );
+	//	}
+	//
+	//
+	//	public void testStructuralObject() throws ClassAlreadyDefinedException
+	//	{
+	//		DMObjectClass A = M.newClass( "A", new String[] {} );
+	//		DMObjectClass B = M.newClass( "B", A, new String[] {} );
+	//
+	//		assertTrue( new StructuralObject( A ).compareTo( new StructuralObject( A ) ) );
+	//		assertFalse( new StructuralObject( A ).compareTo( new StructuralObject( B ) ) );
+	//
+	//		ItemStreamBuilder builder1 = new ItemStreamBuilder();
+	//		builder1.appendStructuralValue( A.newInstance() );
+	//		
+	//		matchTestStream( new StructuralObject( A ), builder1.stream(), A.newInstance() );
+	//		matchFailTestStream( new StructuralObject( B ), builder1.stream() );
+	//		
+	//		
+	//		ItemStreamBuilder builder2 = new ItemStreamBuilder();
+	//		builder2.appendStructuralValue( A.newInstance() );
+	//		builder2.appendTextValue( " : " );
+	//		builder2.appendStructuralValue( B.newInstance() );
+	//
+	//		ItemStreamBuilder builder3 = new ItemStreamBuilder();
+	//		builder3.appendStructuralValue( B.newInstance() );
+	//		builder3.appendTextValue( " : " );
+	//		builder3.appendStructuralValue( B.newInstance() );
+	//
+	//		ItemStreamBuilder builder4 = new ItemStreamBuilder();
+	//		builder4.appendStructuralValue( A.newInstance() );
+	//		builder4.appendTextValue( " : " );
+	//		builder4.appendStructuralValue( A.newInstance() );
+	//
+	//		ParserExpression parser = new Sequence( new ParserExpression[] { new StructuralObject( A ), new Literal( ":" ), new StructuralObject( B ) } );
+	//		matchTestStream( parser, builder2.stream(), Arrays.asList( new Object[] { A.newInstance(), ":", B.newInstance() } ) );
+	//		matchTestStream( parser, builder3.stream(), Arrays.asList( new Object[] { B.newInstance(), ":", B.newInstance() } ) );
+	//		matchFailTestStream( parser, builder4.stream() );
+	//	}
+	
+	
+	public void testAction() throws ParserExpression.ParserCoerceException
 	{
-		assertTrue( new AnyNode().compareTo( new AnyNode() ) );
-		matchFailTestStringAndStream( new AnyNode(), "abc" );
-		matchTestNodeSX( new AnyNode(), "a", "a" );
-		matchTestListSX( new AnyNode(), "[a]", "a" );
-		matchTestListSX( new AnyNode(), "[[a]]", "[a]" );
+		ParseAction f = new ParseAction()
+		{
+			public Object invoke(Object input, int begin, int end, Object value, Map<String, Object> bindings)
+			{
+				String v = (String)value;
+				return v + v;
+			}
+		};
+
+		ParseAction g = new ParseAction()
+		{
+			public Object invoke(Object input, int begin, int end, Object value, Map<String, Object> bindings)
+			{
+				String v = (String)value;
+				return v + v + v;
+			}
+		};
+
+		assertTrue( new Action( "abc", f ).compareTo( new Action( "abc", f ) ) );
+		assertFalse( new Action( "abc", f ).compareTo( new Action( "def", f ) ) );
+		assertFalse( new Action( "abc", f ).compareTo( new Action( "abc", g ) ) );
+		assertTrue( new Action( "abc", f ).compareTo( new Literal( "abc" ).action( f ) ) );
+		
+		ParserExpression parser = new Literal( "abc" ).action( f );
+		
+		matchTestStringAndStream( parser, "abc", "abcabc" );
 	}
+
+
 
 	public void testAnyList()
 	{
@@ -129,6 +208,27 @@ public class Test_Parser extends ParserTestCase
 		matchFailTestNodeSX( new AnyList(), "a" );
 		matchTestListSX( new AnyList(), "[[a b c]]", "[a b c]" );
 		matchFailTestListSX( new AnyList(), "[a b c]" );
+	}
+
+	public void testAnyNode()
+	{
+		assertTrue( new AnyNode().compareTo( new AnyNode() ) );
+		matchFailTestStringAndStream( new AnyNode(), "abc" );
+		matchTestNodeSX( new AnyNode(), "a", "a" );
+		matchTestListSX( new AnyNode(), "[a]", "a" );
+		matchTestListSX( new AnyNode(), "[[a]]", "[a]" );
+	}
+
+	public void testAnyObject()
+	{
+		assertTrue( new AnyObject().compareTo( new AnyObject() ) );
+		matchFailTestStringAndStream( new AnyObject(), "abc" );
+		matchTestNodeSX( new AnyObject(), "{m=M : (m Foo a=xyz)}", "{m=M : (m Foo a=xyz)}" );
+		matchFailTestNodeSX( new AnyObject(), "[a]" );
+		matchFailTestNodeSX( new AnyObject(), "a" );
+		matchTestListSX( new AnyObject(), "{m=M : [(m Foo a=xyz)]}", "{m=M : (m Foo a=xyz)}" );
+		matchFailTestListSX( new AnyObject(), "[a]", "a" );
+		matchFailTestListSX( new AnyObject(), "[[a b c]]" );
 	}
 
 	public void testAnyString()
@@ -141,34 +241,223 @@ public class Test_Parser extends ParserTestCase
 		matchFailTestListSX( new AnyString(), "[[a b c]]" );
 	}
 
-	public void testAnyObject()
-	{
-		assertTrue( new AnyObject().compareTo( new AnyObject() ) );
-		matchFailTestStringAndStream( new AnyObject(), "abc" );
-		matchTestNodeSX( new AnyObject(), "{m=M : (m XYZ a=xyz)}", "{m=M : (m XYZ a=xyz)}" );
-		matchFailTestNodeSX( new AnyObject(), "[a]" );
-		matchFailTestNodeSX( new AnyObject(), "a" );
-		matchTestListSX( new AnyObject(), "{m=M : [(m XYZ a=xyz)]}", "{m=M : (m XYZ a=xyz)}" );
-		matchFailTestListSX( new AnyObject(), "[a]", "a" );
-		matchFailTestListSX( new AnyObject(), "[[a b c]]" );
-	}
 
-
-	public void testBind()
+	public void testBind() throws InvalidFieldNameException
 	{
 		ParserExpression parser1 = identifier.bindTo(  "x" );
 		
-		matchTestNodeSX( parser1, "abc", "abc" );
-		//bindingsNodeTestSX( parser1, "abc", "[[x abc]]" );
+		matchTestStringSX( parser1, "abc", "abc" );
+		bindingsTestStringSX( parser1, "abc", "[[x abc]]" );
 
-	
 		ParserExpression parser2 = identifier.bindTo( "x" ).bindTo( "y" );
 		
-		matchTestNodeSX( parser2, "abc", "abc" );
-		//bindingsNodeTestSX( parser2, "abc", "[[x abc] [y abc]]" );
+		matchTestStringSX( parser2, "abc", "abc" );
+		bindingsTestStringSX( parser2, "abc", "[[x abc] [y abc]]" );
+		
+		bindingsTestNodeSX( new ObjectNode( Foo ).bindTo( "x" ),"{m=M : (m Foo a=a)}", "{m=M : [[x (m Foo a=a)]]}" );
+		bindingsTestListSX( new AnyString().bindTo( "x" ),"[a]", "{m=M : [[x a]]}" );
 	}
 
 	
+	public void testChoice() throws ParserExpression.ParserCoerceException, InvalidFieldNameException
+	{
+		Object[] abqwfh = { new Literal( "ab" ), new Literal( "qw" ), new Literal( "fh" ) };
+		Object[] abqw = { new Literal( "ab" ), new Literal( "qw" ) };
+		Object[] qbqwfh = { new Literal( "qb" ), new Literal( "qw" ), new Literal( "fh" ) };
+		
+		assertTrue( new Choice( abqwfh ).compareTo( new Choice( abqwfh ) ) );
+		assertFalse( new Choice( abqwfh ).compareTo( new Choice( abqw ) ) );
+		assertFalse( new Choice( abqwfh ).compareTo( new Choice( qbqwfh ) ) );
+		assertTrue( new Choice( abqwfh ).compareTo( new Literal( "ab" ).__or__( new Literal( "qw" ) ).__or__( new Literal( "fh" ) ) ) );
+		assertTrue( new Choice( abqwfh ).compareTo( new Literal( "ab" ).__or__( "qw" ).__or__( "fh" ) ) );
+
+		
+		ParserExpression parser = new Choice( new Object[] { new Literal( "ab" ), new Literal( "qw" ), new Literal( "fh" ) } );
+		ParserExpression parserWithBindings = new Choice( new Object[] { new Literal( "ab" ).bindTo( "x" ), new Literal( "cd" ).bindTo( "y" ), new Literal( "ef" ).bindTo( "z" ) } );
+		
+		matchTestStringAndStream( parser, "ab", "ab" );
+		matchTestStringAndStream( parser, "qw", "qw" );
+		matchTestStringAndStream( parser, "fh", "fh" );
+		matchFailTestStringAndStream( parser, "xy" );
+		matchSubTestStringAndStream( new Literal( "ab" ).__or__( "abcd" ), "ab", "ab", 2 );
+		matchSubTestStringAndStream( new Literal( "ab" ).__or__( "abcd" ), "abcd", "ab", 2 );
+		
+		bindingsTestStringAndStreamSX( parserWithBindings, "ab", "[[x ab]]" );
+		bindingsTestStringAndStreamSX( parserWithBindings, "cd", "[[y cd]]" );
+		bindingsTestStringAndStreamSX( parserWithBindings, "ef", "[[z ef]]" );
+
+
+		
+		ParserExpression nodeParser = new Choice( new Object[] { new ObjectNode( Foo ), new ObjectNode( Bar2 ) } );
+		ParserExpression nodeParserWithBindings = new Choice( new Object[] { new ObjectNode( Foo ).bindTo( "x" ), new ObjectNode( Bar2 ).bindTo( "y" ) } );
+
+		matchTestNodeSX( nodeParser, "{m=M : (m Foo a=x)}", "{m=M : (m Foo a=x)}" );
+		matchTestNodeSX( nodeParser, "{m=M : (m Bar2 b=x c=y)}", "{m=M : (m Bar2 b=x c=y)}" );
+		matchFailTestNodeSX( nodeParser, "{m=M : (m Bar b=x)}" );
+		
+		bindingsTestNodeSX( nodeParserWithBindings, "{m=M : (m Foo a=x)}", "{m=M : [[x (m Foo a=x)]]}" );
+		bindingsTestNodeSX( nodeParserWithBindings, "{m=M : (m Bar2 b=x c=y)}", "{m=M : [[y (m Bar2 b=x c=y)]]}" );
+	}
+
+
+	public void testClearBindings() throws InvalidFieldNameException
+	{
+		ParserExpression parser1 = identifier.bindTo(  "x" );
+		
+		matchTestStringSX( parser1, "abc", "abc" );
+		bindingsTestStringSX( parser1, "abc", "[[x abc]]" );
+	
+		ParserExpression parser2 = parser1.clearBindings();
+		
+		matchTestStringSX( parser2, "abc", "abc" );
+		bindingsTestStringSX( parser2, "abc", "[]" );
+		
+		
+		matchTestNodeSX( new ObjectNode( Foo ).bindTo( "x" ).clearBindings(), "{m=M : (m Foo a=x)}", "{m=M : (m Foo a=x)}" );
+		bindingsTestNodeSX( new ObjectNode( Foo ).bindTo( "x" ).clearBindings(), "{m=M : (m Foo a=x)}", "[]" );
+
+		matchTestListSX( new AnyString().bindTo( "x" ).clearBindings(), "[a]", "a" );
+		bindingsTestListSX( new AnyString().bindTo( "x" ).clearBindings(), "[a]", "[]" );
+	}
+
+	
+	public void testCombine() throws ParserExpression.ParserCoerceException, InvalidFieldNameException
+	{
+		Object[] abqwfh = { new Literal( "ab" ), new Literal( "qw" ), new Literal( "fh" ) };
+		Object[] abqw = { new Literal( "ab" ), new Literal( "qw" ) };
+		Object[] qbqwfh = { new Literal( "qb" ), new Literal( "qw" ), new Literal( "fh" ) };
+		
+		assertTrue( new Combine( abqwfh ).compareTo( new Combine( abqwfh ) ) );
+		assertFalse( new Combine( abqwfh ).compareTo( new Combine( abqw ) ) );
+		assertFalse( new Combine( abqwfh ).compareTo( new Combine( qbqwfh ) ) );
+		assertTrue( new Combine( abqwfh ).compareTo( new Literal( "ab" ).__sub__( new Literal( "qw" ) ).__sub__( new Literal( "fh" ) ) ) );
+		assertTrue( new Combine( abqwfh ).compareTo( new Literal( "ab" ).__sub__( "qw" ).__sub__( "fh" ) ) );
+	
+		ParserExpression parser = new Combine( new Object[] { new Literal( "ab" ), new Literal( "qw" ), new Literal( "fh" ) } );
+		
+		matchTestStringAndStream( parser, "abqwfh", "abqwfh" );
+		matchFailTestStringAndStream( parser, "abfh" );
+	
+	
+	
+		Object[] subsB1 = { new Literal( "ab" ), new Literal( "cd" ) };
+		Object[] subsB2 = { new Literal( "ef" ), new Literal( "gh" ) };
+		Object[] subsB3 = { new Literal( "ij" ), new Literal( "kl" ) };
+		Object[] subsB = { new Sequence( subsB1 ), new Sequence( subsB2 ), new Sequence( subsB3 ) };
+		ParserExpression parser2 = new Combine( subsB );
+		String[] result2 = { "ab", "cd", "ef", "gh", "ij", "kl" };
+		matchTestStringAndStream( parser2, "abcdefghijkl", Arrays.asList( result2 ) );
+	
+		Object[] subsC = { new Sequence( subsB1 ), new Sequence( subsB2 ), new Sequence( subsB3 ), new Literal( "xyz" ) };
+		ParserExpression parser3 = new Combine( subsC );
+		String[] result3 = { "ab", "cd", "ef", "gh", "ij", "kl", "xyz" };
+		matchTestStringAndStream( parser3, "abcdefghijklxyz", Arrays.asList( result3 ) );
+
+	
+	
+		ParserExpression parserWithBindings = new Combine( new Object[] { new Literal( "ab" ).bindTo( "x" ), new Literal( "qw" ).bindTo( "y" ), new Literal( "fh" ).bindTo( "x" ) } );
+		
+		matchTestStringAndStream( parserWithBindings, "abqwfh", "abqwfh" );
+		bindingsTestStringAndStreamSX( parserWithBindings, "abqwfh", "[[x fh] [y qw]]" );
+
+	
+	
+		ParserExpression objectParserWithBindings = new Combine( new Object[] { new ObjectNode( Foo ).bindTo( "x" ), new ObjectNode( Bar ).bindTo( "y" ), new ObjectNode( Foo ).bindTo( "x" ) } );
+		matchFailTestNodeSX( objectParserWithBindings, "{m=M : [(m Foo a=x) (m Bar b=y) (m Foo a=z)]}" );
+
+		ParserExpression listParserWithBindings = new Combine( new Object[] { new AnyList().bindTo( "x" ), new AnyList().bindTo( "y" ), new AnyList().bindTo( "x" ) } );
+		matchTestListSX( listParserWithBindings, "[[a] [b] [c]]", "[a b c]" );
+		bindingsTestListSX( listParserWithBindings, "[[a] [b] [c]]", "[[x [c]] [y [b]]]" );
+	}
+
+
+
+	//	public void testStructuralNode()
+	//	{
+	//		assertTrue( new StructuralItem().compareTo( new StructuralItem() ) );
+	//
+	//		ItemStreamBuilder builder1 = new ItemStreamBuilder();
+	//		builder1.appendStructuralValue( new Integer( 12 ) );
+	//		
+	//		ItemStreamBuilder builder2 = new ItemStreamBuilder();
+	//		builder2.appendStructuralValue( new Integer( 12 ) );
+	//		builder2.appendStructuralValue( new Integer( 13 ) );
+	//
+	//		matchTestStream( new StructuralItem(), builder1.stream(), new Integer( 12 ) );
+	//		matchSubTestStream( new StructuralItem(), builder2.stream(), new Integer( 12 ), 1 );
+	//	}
+	//
+	//
+	//	public void testStructuralObject() throws ClassAlreadyDefinedException
+	//	{
+	//		DMObjectClass A = M.newClass( "A", new String[] {} );
+	//		DMObjectClass B = M.newClass( "B", A, new String[] {} );
+	//
+	//		assertTrue( new StructuralObject( A ).compareTo( new StructuralObject( A ) ) );
+	//		assertFalse( new StructuralObject( A ).compareTo( new StructuralObject( B ) ) );
+	//
+	//		ItemStreamBuilder builder1 = new ItemStreamBuilder();
+	//		builder1.appendStructuralValue( A.newInstance() );
+	//		
+	//		matchTestStream( new StructuralObject( A ), builder1.stream(), A.newInstance() );
+	//		matchFailTestStream( new StructuralObject( B ), builder1.stream() );
+	//		
+	//		
+	//		ItemStreamBuilder builder2 = new ItemStreamBuilder();
+	//		builder2.appendStructuralValue( A.newInstance() );
+	//		builder2.appendTextValue( " : " );
+	//		builder2.appendStructuralValue( B.newInstance() );
+	//
+	//		ItemStreamBuilder builder3 = new ItemStreamBuilder();
+	//		builder3.appendStructuralValue( B.newInstance() );
+	//		builder3.appendTextValue( " : " );
+	//		builder3.appendStructuralValue( B.newInstance() );
+	//
+	//		ItemStreamBuilder builder4 = new ItemStreamBuilder();
+	//		builder4.appendStructuralValue( A.newInstance() );
+	//		builder4.appendTextValue( " : " );
+	//		builder4.appendStructuralValue( A.newInstance() );
+	//
+	//		ParserExpression parser = new Sequence( new ParserExpression[] { new StructuralObject( A ), new Literal( ":" ), new StructuralObject( B ) } );
+	//		matchTestStream( parser, builder2.stream(), Arrays.asList( new Object[] { A.newInstance(), ":", B.newInstance() } ) );
+	//		matchTestStream( parser, builder3.stream(), Arrays.asList( new Object[] { B.newInstance(), ":", B.newInstance() } ) );
+	//		matchFailTestStream( parser, builder4.stream() );
+	//	}
+	
+	
+	public void testCondition() throws ParserExpression.ParserCoerceException
+	{
+		ParseCondition f = new ParseCondition()
+		{
+			public boolean test(Object input, int begin, int end, Object value, Map<String, Object> bindings)
+			{
+				String v = (String)value;
+				return v.startsWith( "hello" );
+			}
+		};
+
+		ParseCondition g = new ParseCondition()
+		{
+			public boolean test(Object input, int begin, int end, Object value, Map<String, Object> bindings)
+			{
+				String v = (String)value;
+				return v.startsWith( "there" );
+			}
+		};
+
+		assertTrue( new Condition( "abc", f ).compareTo( new Condition( "abc", f ) ) );
+		assertFalse( new Condition( "abc", f ).compareTo( new Condition( "def", f ) ) );
+		assertFalse( new Condition( "abc", f ).compareTo( new Condition( "abc", g ) ) );
+		assertTrue( new Condition( "abc", f ).compareTo( new Literal( "abc" ).condition( f ) ) );
+		
+		ParserExpression parser = new Word( "abcdefghijklmnopqrstuvwxyz" ).condition( f );
+		
+		matchTestStringAndStream( parser, "helloworld", "helloworld" );
+		matchFailTestStringAndStream( parser, "xabcdef" );
+	}
+
+
+
 	public void testLiteral()
 	{
 		assertTrue( new Literal( "abc" ).compareTo( new Literal( "abc" ) ) );
@@ -283,69 +572,6 @@ public class Test_Parser extends ParserTestCase
 //	}
 
 
-	public void testAction() throws ParserExpression.ParserCoerceException
-	{
-		ParseAction f = new ParseAction()
-		{
-			public Object invoke(Object input, int begin, int end, Object value, Map<String, Object> bindings)
-			{
-				String v = (String)value;
-				return v + v;
-			}
-		};
-
-		ParseAction g = new ParseAction()
-		{
-			public Object invoke(Object input, int begin, int end, Object value, Map<String, Object> bindings)
-			{
-				String v = (String)value;
-				return v + v + v;
-			}
-		};
-
-		assertTrue( new Action( "abc", f ).compareTo( new Action( "abc", f ) ) );
-		assertFalse( new Action( "abc", f ).compareTo( new Action( "def", f ) ) );
-		assertFalse( new Action( "abc", f ).compareTo( new Action( "abc", g ) ) );
-		assertTrue( new Action( "abc", f ).compareTo( new Literal( "abc" ).action( f ) ) );
-		
-		ParserExpression parser = new Literal( "abc" ).action( f );
-		
-		matchTestStringAndStream( parser, "abc", "abcabc" );
-	}
-
-
-	public void testCondition() throws ParserExpression.ParserCoerceException
-	{
-		ParseCondition f = new ParseCondition()
-		{
-			public boolean test(Object input, int begin, int end, Object value, Map<String, Object> bindings)
-			{
-				String v = (String)value;
-				return v.startsWith( "hello" );
-			}
-		};
-
-		ParseCondition g = new ParseCondition()
-		{
-			public boolean test(Object input, int begin, int end, Object value, Map<String, Object> bindings)
-			{
-				String v = (String)value;
-				return v.startsWith( "there" );
-			}
-		};
-
-		assertTrue( new Condition( "abc", f ).compareTo( new Condition( "abc", f ) ) );
-		assertFalse( new Condition( "abc", f ).compareTo( new Condition( "def", f ) ) );
-		assertFalse( new Condition( "abc", f ).compareTo( new Condition( "abc", g ) ) );
-		assertTrue( new Condition( "abc", f ).compareTo( new Literal( "abc" ).condition( f ) ) );
-		
-		ParserExpression parser = new Word( "abcdefghijklmnopqrstuvwxyz" ).condition( f );
-		
-		matchTestStringAndStream( parser, "helloworld", "helloworld" );
-		matchFailTestStringAndStream( parser, "xabcdef" );
-	}
-	
-	
 	public void testSequence() throws ParserExpression.ParserCoerceException
 	{
 		Object[] abqwfh = { new Literal( "ab" ), new Literal( "qw" ), new Literal( "fh" ) };
@@ -368,41 +594,6 @@ public class Test_Parser extends ParserTestCase
 	}
 
 
-	public void testCombine() throws ParserExpression.ParserCoerceException
-	{
-		Object[] abqwfh = { new Literal( "ab" ), new Literal( "qw" ), new Literal( "fh" ) };
-		Object[] abqw = { new Literal( "ab" ), new Literal( "qw" ) };
-		Object[] qbqwfh = { new Literal( "qb" ), new Literal( "qw" ), new Literal( "fh" ) };
-		
-		assertTrue( new Combine( abqwfh ).compareTo( new Combine( abqwfh ) ) );
-		assertFalse( new Combine( abqwfh ).compareTo( new Combine( abqw ) ) );
-		assertFalse( new Combine( abqwfh ).compareTo( new Combine( qbqwfh ) ) );
-		assertTrue( new Combine( abqwfh ).compareTo( new Literal( "ab" ).__sub__( new Literal( "qw" ) ).__sub__( new Literal( "fh" ) ) ) );
-		assertTrue( new Combine( abqwfh ).compareTo( new Literal( "ab" ).__sub__( "qw" ).__sub__( "fh" ) ) );
-
-		Object[] subs = { new Literal( "ab" ), new Literal( "qw" ), new Literal( "fh" ) };
-		ParserExpression parser = new Combine( subs );
-		
-		matchTestStringAndStream( parser, "abqwfh", "abqwfh" );
-		matchFailTestStringAndStream( parser, "abfh" );
-
-	
-	
-		Object[] subsB1 = { new Literal( "ab" ), new Literal( "cd" ) };
-		Object[] subsB2 = { new Literal( "ef" ), new Literal( "gh" ) };
-		Object[] subsB3 = { new Literal( "ij" ), new Literal( "kl" ) };
-		Object[] subsB = { new Sequence( subsB1 ), new Sequence( subsB2 ), new Sequence( subsB3 ) };
-		ParserExpression parser2 = new Combine( subsB );
-		String[] result2 = { "ab", "cd", "ef", "gh", "ij", "kl" };
-		matchTestStringAndStream( parser2, "abcdefghijkl", Arrays.asList( result2 ) );
-
-		Object[] subsC = { new Sequence( subsB1 ), new Sequence( subsB2 ), new Sequence( subsB3 ), new Literal( "xyz" ) };
-		ParserExpression parser3 = new Combine( subsC );
-		String[] result3 = { "ab", "cd", "ef", "gh", "ij", "kl", "xyz" };
-		matchTestStringAndStream( parser3, "abcdefghijklxyz", Arrays.asList( result3 ) );
-	}
-
-
 	public void testSuppress() throws ParserExpression.ParserCoerceException
 	{
 		assertTrue( new Suppress( new Literal( "ab" ) ).compareTo( new Suppress( new Literal( "ab" ) ) ) );
@@ -416,30 +607,6 @@ public class Test_Parser extends ParserTestCase
 		
 		matchTestStringAndStream( parser, "abqwfh", Arrays.asList( result ) );
 		matchFailTestStringAndStream( parser, "abfh" );
-	}
-
-
-	public void testChoice() throws ParserExpression.ParserCoerceException
-	{
-		Object[] abqwfh = { new Literal( "ab" ), new Literal( "qw" ), new Literal( "fh" ) };
-		Object[] abqw = { new Literal( "ab" ), new Literal( "qw" ) };
-		Object[] qbqwfh = { new Literal( "qb" ), new Literal( "qw" ), new Literal( "fh" ) };
-		
-		assertTrue( new Choice( abqwfh ).compareTo( new Choice( abqwfh ) ) );
-		assertFalse( new Choice( abqwfh ).compareTo( new Choice( abqw ) ) );
-		assertFalse( new Choice( abqwfh ).compareTo( new Choice( qbqwfh ) ) );
-		assertTrue( new Choice( abqwfh ).compareTo( new Literal( "ab" ).__or__( new Literal( "qw" ) ).__or__( new Literal( "fh" ) ) ) );
-		assertTrue( new Choice( abqwfh ).compareTo( new Literal( "ab" ).__or__( "qw" ).__or__( "fh" ) ) );
-
-		Object[] subs = { new Literal( "ab" ), new Literal( "qw" ), new Literal( "fh" ) };
-		ParserExpression parser = new Choice( subs );
-		
-		matchTestStringAndStream( parser, "ab", "ab" );
-		matchTestStringAndStream( parser, "qw", "qw" );
-		matchTestStringAndStream( parser, "fh", "fh" );
-		matchFailTestStringAndStream( parser, "xy" );
-		matchSubTestStringAndStream( new Literal( "ab" ).__or__( "abcd" ), "ab", "ab", 2 );
-		matchSubTestStringAndStream( new Literal( "ab" ).__or__( "abcd" ), "abcd", "ab", 2 );
 	}
 
 

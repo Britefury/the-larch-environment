@@ -6,7 +6,9 @@
 //##************************
 package tests.ParserNew;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import junit.framework.TestCase;
 import BritefuryJ.DocModel.DMIOReader;
@@ -87,6 +89,23 @@ abstract public class ParserTestCase extends TestCase
 		return expected;
 	}
 	
+	@SuppressWarnings("unchecked")
+	private Map<String, Object> readExpectedBindingsSX(String expectedBindingsSX)
+	{
+		List<Object> expected = (List<Object>)readExpectedSX( expectedBindingsSX );
+		HashMap<String, Object> expectedBindings = new HashMap<String, Object>();
+		for (Object x: expected)
+		{
+			List<Object> pair = (List<Object>)x;
+			if ( pair.size() != 2 )
+			{
+				throw new RuntimeException( "Bindings pair must contain two elements" );
+			}
+			expectedBindings.put( (String)pair.get( 0 ), pair.get( 1 ) );
+		}
+		return expectedBindings;
+	}
+	
 	
 	
 	public void matchTestStringAndStreamSX(ParserExpression parser, String input, String expectedSX)
@@ -115,6 +134,37 @@ abstract public class ParserTestCase extends TestCase
 		matchTestStream( parser, builder.stream(), expected, ignoreCharsRegex );
 	}
 
+	
+	
+	
+	public void bindingsTestStringAndStreamSX(ParserExpression parser, String input, String expectedBindingsSX)
+	{
+		bindingsTestStringAndStreamSX( parser, input, expectedBindingsSX, "[ \t\n]*" );
+	}
+
+	public void bindingsTestStringAndStreamSX(ParserExpression parser, String input, String expectedBindingsSX, String ignoreCharsRegex)
+	{
+		Map<String, Object> expectedBindings = readExpectedBindingsSX( expectedBindingsSX );
+		bindingsTestStringAndStream( parser, input, expectedBindings, ignoreCharsRegex );
+	}
+	
+	
+	public void bindingsTestStringAndStream(ParserExpression parser, String input, Map<String, Object> expectedBindings)
+	{
+		bindingsTestStringAndStream( parser, input, expectedBindings, "[ \t\n]*" );
+	}
+
+	public void bindingsTestStringAndStream(ParserExpression parser, String input, Map<String, Object> expectedBindings, String ignoreCharsRegex)
+	{
+		ItemStreamBuilder builder = new ItemStreamBuilder();
+		builder.appendTextValue( input );
+		
+		bindingsTestString( parser, input, expectedBindings, ignoreCharsRegex );
+		bindingsTestStream( parser, builder.stream(), expectedBindings, ignoreCharsRegex );
+	}
+
+	
+	
 	
 	public void matchTestStringSX(ParserExpression parser, String input, String expectedSX)
 	{
@@ -188,6 +238,55 @@ abstract public class ParserTestCase extends TestCase
 
 	
 	
+	public void bindingsTestStringSX(ParserExpression parser, String input, String expectedBindingsSX)
+	{
+		bindingsTestStringSX( parser, input, expectedBindingsSX, "[ \t\n]*" );
+	}
+
+	public void bindingsTestStringSX(ParserExpression parser, String input, String expectedBindingsSX, String ignoreCharsRegex)
+	{
+		bindingsTestString( parser, input, readExpectedBindingsSX( expectedBindingsSX ), ignoreCharsRegex );
+	}
+	
+	public void bindingsTestString(ParserExpression parser, String input, Map<String, Object> expectedBindings)
+	{
+		bindingsTestString( parser, input, expectedBindings, "[ \t\n]*" );
+	}
+
+	public void bindingsTestString(ParserExpression parser, String input, Map<String, Object> expectedBindings, String ignoreCharsRegex)
+	{
+		ParseResult result = parser.parseStringChars( input, ignoreCharsRegex );
+		
+		if ( !result.isValid() )
+		{
+			System.out.println( "PARSE FAILURE while parsing " + input + ", stopped at " + String.valueOf( result.getEnd() ) + ": " + input.substring(  0, result.getEnd() ) );
+		}
+		assertTrue( result.isValid() );
+		
+		String expectedStr = expectedBindings.toString();
+		
+		if ( result.getEnd() != input.length() )
+		{
+			System.out.println( "INCOMPLETE PARSE while parsing " + input );
+			System.out.println( "Parsed " + String.valueOf( result.getEnd() ) + "/" + String.valueOf( input.length() ) + " characters" );
+			System.out.println( "Parsed text " + input.substring( 0, result.getEnd() ) );
+		}
+		assertEquals( result.getEnd(), input.length() );
+		
+		
+		boolean bValuesMatch = result.getBindings() == null  ?  expectedBindings.size() == 0  :  expectedBindings.equals( result.getBindings() );
+		if ( !bValuesMatch )
+		{
+			System.out.println( "VALUE DIFFERS FROM EXPECTED" );
+			System.out.println( "EXPECTED:" );
+			System.out.println( expectedStr );
+			System.out.println( "RESULT:" );
+			System.out.println( result.getBindings() );
+		}
+		assertTrue( bValuesMatch );
+	}
+
+	
 	
 	public void matchTestStreamSX(ParserExpression parser, ItemStream input, String expectedSX)
 	{
@@ -260,6 +359,57 @@ abstract public class ParserTestCase extends TestCase
 	
 	
 
+	public void bindingsTestStreamSX(ParserExpression parser, ItemStream input, String expectedBindingsSX)
+	{
+		bindingsTestStreamSX( parser, input, expectedBindingsSX, "[ \t\n]*" );
+	}
+
+	public void bindingsTestStreamSX(ParserExpression parser, ItemStream input, String expectedBindingsSX, String ignoreCharsRegex)
+	{
+		bindingsTestStream( parser, input, readExpectedBindingsSX( expectedBindingsSX ), ignoreCharsRegex );
+	}
+	
+	public void bindingsTestStream(ParserExpression parser, ItemStream input, Map<String, Object> expectedBindings)
+	{
+		bindingsTestStream( parser, input, expectedBindings, "[ \t\n]*" );
+	}
+
+	public void bindingsTestStream(ParserExpression parser, ItemStream input, Map<String, Object> expectedBindings, String ignoreCharsRegex)
+	{
+		ParseResult result = parser.parseStreamItems( input, ignoreCharsRegex );
+		
+		if ( !result.isValid() )
+		{
+			System.out.println( "PARSE FAILURE while parsing " + input + ", stopped at " + String.valueOf( result.getEnd() ) + ": " + input.subStream(  0, result.getEnd() ) );
+		}
+		assertTrue( result.isValid() );
+		
+		String expectedStr = expectedBindings.toString();
+		
+		if ( result.getEnd() != input.length() )
+		{
+			System.out.println( "INCOMPLETE PARSE while parsing " + input );
+			System.out.println( "Parsed " + String.valueOf( result.getEnd() ) + "/" + String.valueOf( input.length() ) + " characters" );
+			System.out.println( "Parsed text " + input.subStream( 0, result.getEnd() ) );
+		}
+		assertEquals( result.getEnd(), input.length() );
+		
+		
+		boolean bValuesMatch = result.getBindings() == null  ?  expectedBindings.size() == 0  :  expectedBindings.equals( result.getBindings() );
+		if ( !bValuesMatch )
+		{
+			System.out.println( "VALUE DIFFERS FROM EXPECTED" );
+			System.out.println( "EXPECTED:" );
+			System.out.println( expectedStr );
+			System.out.println( "RESULT:" );
+			System.out.println( result.getBindings() );
+		}
+		assertTrue( bValuesMatch );
+	}
+
+	
+	
+
 	public void matchTestNodeSX(ParserExpression parser, String inputSX, String expectedSX)
 	{
 		matchTestNodeSX( parser, inputSX, expectedSX, "[ \t\n]*" );
@@ -318,6 +468,49 @@ abstract public class ParserTestCase extends TestCase
 
 	
 	
+	public void bindingsTestNodeSX(ParserExpression parser, String inputSX, String expectedBindingsSX)
+	{
+		bindingsTestNodeSX( parser, inputSX, expectedBindingsSX, "[ \t\n]*" );
+	}
+
+	public void bindingsTestNodeSX(ParserExpression parser, String inputSX, String expectedBindingsSX, String ignoreCharsRegex)
+	{
+		bindingsTestNode( parser, readInputSX( inputSX ), readExpectedBindingsSX( expectedBindingsSX ), ignoreCharsRegex );
+	}
+	
+	public void bindingsTestNode(ParserExpression parser, Object input, Map<String, Object> expectedBindings)
+	{
+		bindingsTestNode( parser, input, expectedBindings, "[ \t\n]*" );
+	}
+
+	public void bindingsTestNode(ParserExpression parser, Object input, Map<String, Object> expectedBindings, String ignoreCharsRegex)
+	{
+		ParseResult result = parser.parseNode( input, ignoreCharsRegex );
+		
+		if ( !result.isValid() )
+		{
+			System.out.println( "PARSE FAILURE while parsing " + input );
+		}
+		assertTrue( result.isValid() );
+		
+		String expectedStr = expectedBindings.toString();
+		
+		boolean bValuesMatch = result.getBindings() == null  ?  expectedBindings.size() == 0  :  expectedBindings.equals( result.getBindings() );
+		if ( !bValuesMatch )
+		{
+			System.out.println( "VALUE DIFFERS FROM EXPECTED" );
+			System.out.println( "EXPECTED:" );
+			System.out.println( expectedStr );
+			System.out.println( "RESULT:" );
+			System.out.println( result.getBindings() );
+		}
+		assertTrue( bValuesMatch );
+	}
+
+	
+	
+
+
 	public void matchTestListSX(ParserExpression parser, String inputSX, String expectedSX)
 	{
 		matchTestListSX( parser, inputSX, expectedSX, "[ \t\n]*" );
@@ -390,7 +583,59 @@ abstract public class ParserTestCase extends TestCase
 
 	
 	
+	public void bindingsTestListSX(ParserExpression parser, String inputSX, String expectedBindingsSX)
+	{
+		bindingsTestListSX( parser, inputSX, expectedBindingsSX, "[ \t\n]*" );
+	}
+
+	@SuppressWarnings("unchecked")
+	public void bindingsTestListSX(ParserExpression parser, String inputSX, String expectedBindingsSX, String ignoreCharsRegex)
+	{
+		List<Object> input = (List<Object>)readInputSX( inputSX );
+		bindingsTestList( parser, input, readExpectedBindingsSX( expectedBindingsSX ), ignoreCharsRegex );
+	}
 	
+	public void bindingsTestList(ParserExpression parser, List<Object> input, Map<String, Object> expectedBindings)
+	{
+		bindingsTestList( parser, input, expectedBindings, "[ \t\n]*" );
+	}
+
+	public void bindingsTestList(ParserExpression parser, List<Object> input, Map<String, Object> expectedBindings, String ignoreCharsRegex)
+	{
+		ParseResult result = parser.parseListItems( input, ignoreCharsRegex );
+		
+		if ( !result.isValid() )
+		{
+			System.out.println( "PARSE FAILURE while parsing " + input + ", stopped at " + String.valueOf( result.getEnd() ) + ": " + input.subList(  0, result.getEnd() ) );
+		}
+		assertTrue( result.isValid() );
+		
+		String expectedStr = expectedBindings.toString();
+		
+		if ( result.getEnd() != input.size() )
+		{
+			System.out.println( "INCOMPLETE PARSE while parsing " + input );
+			System.out.println( "Parsed " + String.valueOf( result.getEnd() ) + "/" + String.valueOf( input.size() ) + " characters" );
+			System.out.println( "Parsed items " + input.subList( 0, result.getEnd() ) );
+		}
+		assertEquals( result.getEnd(), input.size() );
+		
+		
+		boolean bValuesMatch = result.getBindings() == null  ?  expectedBindings.size() == 0  :  expectedBindings.equals( result.getBindings() );
+		if ( !bValuesMatch )
+		{
+			System.out.println( "VALUE DIFFERS FROM EXPECTED" );
+			System.out.println( "EXPECTED:" );
+			System.out.println( expectedStr );
+			System.out.println( "RESULT:" );
+			System.out.println( result.getBindings() );
+		}
+		assertTrue( bValuesMatch );
+	}
+
+	
+	
+
 	
 	public void matchSubTestStringAndStreamSX(ParserExpression parser, String input, String expectedSX, int end)
 	{
