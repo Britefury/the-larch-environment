@@ -48,6 +48,10 @@ public class DMIOWriter
 
 	
 
+	private static void writeNull(StringBuilder builder)
+	{
+		builder.append( "`null`" );
+	}
 	
 	private static void writeString(StringBuilder builder, String content)
 	{
@@ -124,7 +128,11 @@ public class DMIOWriter
 	@SuppressWarnings("unchecked")
 	private void writeItem(StringBuilder builder, Object content) throws InvalidDataTypeException
 	{
-		if ( content instanceof String )
+		if ( content == null )
+		{
+			writeNull( builder );
+		}
+		else if ( content instanceof String )
 		{
 			writeString( builder, (String)content );
 		}

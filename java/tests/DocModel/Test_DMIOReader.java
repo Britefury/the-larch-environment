@@ -150,7 +150,7 @@ public class Test_DMIOReader extends TestCase
 			fail();
 		}
 		
-		boolean bEqual = res.equals( expected );
+		boolean bEqual = res == expected  ||  res.equals( expected );
 
 		try
 		{
@@ -158,9 +158,9 @@ public class Test_DMIOReader extends TestCase
 			{
 				System.out.println( "VALUES ARE NOT THE SAME" );
 				System.out.println( "EXPECTED:" );
-				System.out.println( DMIOWriter.writeAsString( expected ) );
+				System.out.println( expected == null  ?  "<null>"  :  DMIOWriter.writeAsString( expected ) );
 				System.out.println( "RESULT:" );
-				System.out.println( DMIOWriter.writeAsString( res ) );
+				System.out.println( res == null  ?  "<null>"  :  DMIOWriter.writeAsString( res ) );
 			}
 		}
 		catch (InvalidDataTypeException e)
@@ -263,6 +263,11 @@ public class Test_DMIOReader extends TestCase
 		readTest( "\"\"", "" );
 	}
 	
+	public void testReadNull()
+	{
+		readTest( "`null`", null );
+	}
+
 	public void testReadList()
 	{
 		ArrayList<Object> h = new ArrayList<Object>();

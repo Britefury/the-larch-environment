@@ -214,6 +214,12 @@ public class Test_DMIOWriter extends TestCase
 	}
 	
 	
+	public void testWriteNull()
+	{
+		writeTest( null, "`null`" );
+	}
+	
+	
 	public void testWriteEmptyString()
 	{
 		Object[] xs = { "" };

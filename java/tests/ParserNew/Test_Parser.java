@@ -695,6 +695,12 @@ public class Test_Parser extends ParserTestCase
 		matchTestStringAndStream( parser, "", null );
 		matchTestStringAndStream( parser, "abb", "abb" );
 		matchSubTestStringAndStream( parser, "abbabb", "abb", 3 );
+		
+		matchTestNode( parser, "abb", "abb" );
+		matchTestNode( parser, "", null );
+
+		matchTestListSX( parser, "[abb]", "abb" );
+		matchTestListSX( parser, "[]", null );
 	}
 
 
