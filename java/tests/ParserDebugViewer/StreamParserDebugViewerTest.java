@@ -9,16 +9,16 @@ package tests.ParserDebugViewer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
-import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
+import BritefuryJ.Parser.AnyNode;
+import BritefuryJ.Parser.DebugParseResult;
+import BritefuryJ.Parser.Literal;
+import BritefuryJ.Parser.ParseAction;
+import BritefuryJ.Parser.ParserExpression;
+import BritefuryJ.Parser.Production;
 import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
 import BritefuryJ.ParserDebugViewer.ParseViewFrame;
-import BritefuryJ.ParserOld.DebugParseResult;
-import BritefuryJ.ParserOld.Literal;
-import BritefuryJ.ParserOld.ParseAction;
-import BritefuryJ.ParserOld.ParserExpression;
-import BritefuryJ.ParserOld.Production;
-import BritefuryJ.ParserOld.StructuralItem;
 
 public class StreamParserDebugViewerTest
 {
@@ -33,7 +33,7 @@ public class StreamParserDebugViewerTest
 
 		
 		ParserExpression parser = buildParser();
-		DebugParseResult result = parser.debugParseStream( builder1.stream() );
+		DebugParseResult result = parser.debugParseStreamItems( builder1.stream() );
 		new ParseViewFrame( result );
 	}
 	
@@ -44,7 +44,7 @@ public class StreamParserDebugViewerTest
 		ParseAction arrayAccessAction = new ParseAction()
 		{
 			@SuppressWarnings("unchecked")
-			public Object invoke(ItemStreamAccessor input, int begin, Object value)
+			public Object invoke(Object input, int begin, int end, Object value, Map<String, Object> bindings)
 			{
 				List<Object> v = (List<Object>)value;
 				return Arrays.asList( new Object[] { "arrayAccess", v.get( 0 ), v.get( 2 ) } );
@@ -54,7 +54,7 @@ public class StreamParserDebugViewerTest
 		ParseAction fieldAccessAction = new ParseAction()
 		{
 			@SuppressWarnings("unchecked")
-			public Object invoke(ItemStreamAccessor input, int begin, Object value)
+			public Object invoke(Object input, int begin, int end, Object value, Map<String, Object> bindings)
 			{
 				List<Object> v = (List<Object>)value;
 				return Arrays.asList( new Object[] { "fieldAccess", v.get( 0 ), v.get( 2 ) } );
@@ -64,7 +64,7 @@ public class StreamParserDebugViewerTest
 		ParseAction objectMethodInvocationAction = new ParseAction()
 		{
 			@SuppressWarnings("unchecked")
-			public Object invoke(ItemStreamAccessor input, int begin, Object value)
+			public Object invoke(Object input, int begin, int end, Object value, Map<String, Object> bindings)
 			{
 				List<Object> v = (List<Object>)value;
 				return Arrays.asList( new Object[] { "methodInvoke", v.get( 0 ), v.get( 2 ) } );
@@ -74,7 +74,7 @@ public class StreamParserDebugViewerTest
 		ParseAction thisMethodInvocationAction = new ParseAction()
 		{
 			@SuppressWarnings("unchecked")
-			public Object invoke(ItemStreamAccessor input, int begin, Object value)
+			public Object invoke(Object input, int begin, int end, Object value, Map<String, Object> bindings)
 			{
 				List<Object> v = (List<Object>)value;
 				return Arrays.asList( new Object[] { "methodInvoke", v.get( 0 ) } );
@@ -83,7 +83,7 @@ public class StreamParserDebugViewerTest
 		
 		Production primary = new Production( "primary" );
 		
-		ParserExpression expression = new Production( "expression", new Literal( "i" ).__or__( new Literal( "j" ) ).__or__( new StructuralItem() ) );
+		ParserExpression expression = new Production( "expression", new Literal( "i" ).__or__( new Literal( "j" ) ).__or__( new AnyNode() ) );
 		ParserExpression methodName = new Production( "methodName", new Literal( "m" ).__or__( new Literal( "n" ) ) );
 		ParserExpression interfaceTypeName = new Production( "interfaceTypeName", new Literal( "I" ).__or__( new Literal( "J" ) ) );
 		ParserExpression className = new Production( "className", new Literal( "C" ).__or__( new Literal( "D" ) ) );

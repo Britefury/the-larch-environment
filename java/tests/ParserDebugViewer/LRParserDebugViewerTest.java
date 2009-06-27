@@ -7,10 +7,10 @@
 package tests.ParserDebugViewer;
 
 import BritefuryJ.ParserDebugViewer.ParseViewFrame;
-import BritefuryJ.ParserOld.DebugParseResult;
-import BritefuryJ.ParserOld.Literal;
-import BritefuryJ.ParserOld.ParserExpression;
-import BritefuryJ.ParserOld.Production;
+import BritefuryJ.Parser.DebugParseResult;
+import BritefuryJ.Parser.Literal;
+import BritefuryJ.Parser.ParserExpression;
+import BritefuryJ.Parser.Production;
 
 public class LRParserDebugViewerTest
 {
@@ -22,7 +22,7 @@ public class LRParserDebugViewerTest
 			testSource += "x";
 		}
 		ParserExpression parser = buildParser();
-		DebugParseResult result = parser.debugParseString( testSource );
+		DebugParseResult result = parser.debugParseStringChars( testSource );
 		new ParseViewFrame( result );
 	}
 	

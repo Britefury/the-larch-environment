@@ -8,14 +8,14 @@ package tests.ParserDebugViewer;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
-import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
+import BritefuryJ.Parser.DebugParseResult;
+import BritefuryJ.Parser.Literal;
+import BritefuryJ.Parser.ParseAction;
+import BritefuryJ.Parser.ParserExpression;
+import BritefuryJ.Parser.Production;
 import BritefuryJ.ParserDebugViewer.ParseViewFrame;
-import BritefuryJ.ParserOld.DebugParseResult;
-import BritefuryJ.ParserOld.Literal;
-import BritefuryJ.ParserOld.ParseAction;
-import BritefuryJ.ParserOld.ParserExpression;
-import BritefuryJ.ParserOld.Production;
 
 public class DebugViewerTest
 {
@@ -23,7 +23,7 @@ public class DebugViewerTest
 	{
 		String input = "this[i][j].x.m()";
 		ParserExpression parser = buildParser();
-		DebugParseResult result = parser.debugParseString( input );
+		DebugParseResult result = parser.debugParseStringChars( input );
 		new ParseViewFrame( result );
 	}
 	
@@ -34,7 +34,7 @@ public class DebugViewerTest
 		ParseAction arrayAccessAction = new ParseAction()
 		{
 			@SuppressWarnings("unchecked")
-			public Object invoke(ItemStreamAccessor input, int begin, Object value)
+			public Object invoke(Object input, int begin, int end, Object value, Map<String, Object> bindings)
 			{
 				List<Object> v = (List<Object>)value;
 				return Arrays.asList( new Object[] { "arrayAccess", v.get( 0 ), v.get( 2 ) } );
@@ -44,7 +44,7 @@ public class DebugViewerTest
 		ParseAction fieldAccessAction = new ParseAction()
 		{
 			@SuppressWarnings("unchecked")
-			public Object invoke(ItemStreamAccessor input, int begin, Object value)
+			public Object invoke(Object input, int begin, int end, Object value, Map<String, Object> bindings)
 			{
 				List<Object> v = (List<Object>)value;
 				return Arrays.asList( new Object[] { "fieldAccess", v.get( 0 ), v.get( 2 ) } );
@@ -54,7 +54,7 @@ public class DebugViewerTest
 		ParseAction objectMethodInvocationAction = new ParseAction()
 		{
 			@SuppressWarnings("unchecked")
-			public Object invoke(ItemStreamAccessor input, int begin, Object value)
+			public Object invoke(Object input, int begin, int end, Object value, Map<String, Object> bindings)
 			{
 				List<Object> v = (List<Object>)value;
 				return Arrays.asList( new Object[] { "methodInvoke", v.get( 0 ), v.get( 2 ) } );
@@ -64,7 +64,7 @@ public class DebugViewerTest
 		ParseAction thisMethodInvocationAction = new ParseAction()
 		{
 			@SuppressWarnings("unchecked")
-			public Object invoke(ItemStreamAccessor input, int begin, Object value)
+			public Object invoke(Object input, int begin, int end, Object value, Map<String, Object> bindings)
 			{
 				List<Object> v = (List<Object>)value;
 				return Arrays.asList( new Object[] { "methodInvoke", v.get( 0 ) } );

@@ -15,7 +15,8 @@ import org.python.core.PyDictionary;
 import org.python.core.PyObject;
 
 import BritefuryJ.DocModel.DMModule.ClassAlreadyDefinedException;
-import BritefuryJ.TreeParser.ObjectMatch;
+import BritefuryJ.Parser.ObjectNode;
+import BritefuryJ.Parser.ParserExpression.ParserCoerceException;
 
 
 public class DMObjectClass
@@ -210,34 +211,34 @@ public class DMObjectClass
 	
 	
 	
-	public ObjectMatch treeParser() throws InvalidFieldNameException
+	public ObjectNode parser() throws InvalidFieldNameException
 	{
-		return new ObjectMatch( this );
+		return new ObjectNode( this );
 	}
 	
-	public ObjectMatch treeParser(Object fieldExps[]) throws InvalidFieldNameException
+	public ObjectNode parser(Object fieldExps[]) throws InvalidFieldNameException, ParserCoerceException
 	{
-		return new ObjectMatch( this, fieldExps );
+		return new ObjectNode( this, fieldExps );
 	}
 	
-	public ObjectMatch treeParser(String fieldNames[], Object fieldExps[]) throws InvalidFieldNameException
+	public ObjectNode parser(String fieldNames[], Object fieldExps[]) throws InvalidFieldNameException, ParserCoerceException
 	{
-		return new ObjectMatch( this, fieldNames, fieldExps );
+		return new ObjectNode( this, fieldNames, fieldExps );
 	}
 	
-	public ObjectMatch treeParser(PyObject values[], String names[]) throws InvalidFieldNameException
+	public ObjectNode parser(PyObject values[], String names[]) throws InvalidFieldNameException, ParserCoerceException
 	{
-		return new ObjectMatch( this, names, values );
+		return new ObjectNode( this, names, values );
 	}
 	
-	public ObjectMatch treeParser(Map<String, Object> data) throws InvalidFieldNameException
+	public ObjectNode parser(Map<String, Object> data) throws InvalidFieldNameException, ParserCoerceException
 	{
-		return new ObjectMatch( this, data );
+		return new ObjectNode( this, data );
 	}
 	
-	public ObjectMatch treeParser(PyDictionary data) throws InvalidFieldNameException
+	public ObjectNode parser(PyDictionary data) throws InvalidFieldNameException, ParserCoerceException
 	{
-		return new ObjectMatch( this, data );
+		return new ObjectNode( this, data );
 	}
 	
 	

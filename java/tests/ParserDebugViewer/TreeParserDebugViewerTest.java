@@ -15,48 +15,50 @@ import BritefuryJ.DocModel.DMIOReader.ParseErrorException;
 import BritefuryJ.DocModel.DMModule.UnknownClassException;
 import BritefuryJ.DocModel.DMModuleResolver.CouldNotResolveModuleException;
 import BritefuryJ.ParserDebugViewer.ParseViewFrame;
-import BritefuryJ.TreeParser.Anything;
-import BritefuryJ.TreeParser.Choice;
-import BritefuryJ.TreeParser.DebugMatchResult;
-import BritefuryJ.TreeParser.TreeParseAction;
-import BritefuryJ.TreeParser.TreeParserExpression;
-import BritefuryJ.TreeParser.Production;
-import BritefuryJ.TreeParser.RegEx;
-import BritefuryJ.TreeParser.Production.CannotOverwriteProductionExpressionException;
+import BritefuryJ.Parser.AnyNode;
+import BritefuryJ.Parser.Choice;
+import BritefuryJ.Parser.DebugParseResult;
+import BritefuryJ.Parser.ListNode;
+import BritefuryJ.Parser.ParseAction;
+import BritefuryJ.Parser.ParserExpression;
+import BritefuryJ.Parser.Production;
+import BritefuryJ.Parser.RegEx;
+import BritefuryJ.Parser.ParserExpression.ParserCoerceException;
+import BritefuryJ.Parser.Production.CannotOverwriteProductionExpressionException;
 
 public class TreeParserDebugViewerTest
 {
-	static TreeParserExpression identifier = new RegEx( "[A-Za-z_][A-Za-z0-9_]*" );
+	static ParserExpression identifier = new RegEx( "[A-Za-z_][A-Za-z0-9_]*" );
 
 	
-	public static void main(final String[] args) throws ParseErrorException, BadModuleNameException, UnknownClassException, CouldNotResolveModuleException, CannotOverwriteProductionExpressionException
+	public static void main(final String[] args) throws ParseErrorException, BadModuleNameException, UnknownClassException, CouldNotResolveModuleException, CannotOverwriteProductionExpressionException, ParserCoerceException
 	{
 		String inputSX = "[call [getAttr [getAttr [call [getAttr [load x] blah] [params]] foo] blah] [params]]";
 		Object input = DMIOReader.readFromString( inputSX, null );
-		TreeParserExpression parser = buildParser();
-		DebugMatchResult result = parser.debugParseNode( input );
+		ParserExpression parser = buildParser();
+		DebugParseResult result = parser.debugParseNode( input );
 		new ParseViewFrame( result );
 	}
 	
 	
 	
-	private static TreeParserExpression buildParser() throws CannotOverwriteProductionExpressionException
+	private static ParserExpression buildParser() throws CannotOverwriteProductionExpressionException, ParserCoerceException
 	{
-		TreeParseAction methodCallRefactorAction = new TreeParseAction()
+		ParseAction methodCallRefactorAction = new ParseAction()
 		{
-			public Object invoke(Object input, Object x, Map<String, Object> bindings, Object arg)
+			public Object invoke(Object input, int begin, int end, Object x, Map<String, Object> bindings)
 			{
 				return deepArrayToList( new Object[] { "invokeMethod", bindings.get( "target" ), bindings.get( "name" ), bindings.get( "params" ) } );
 			}
 		};
 		
-		TreeParserExpression load = TreeParserExpression.coerce( new Object[] { "load", new Anything() } );
-		TreeParserExpression params = TreeParserExpression.coerce( new Object[] { "params" } );
+		ParserExpression load = new ListNode( new Object[] { "load", new AnyNode() } );
+		ParserExpression params = new ListNode( new Object[] { "params" } );
 		
 		Production expression = new Production( "expression" );
-		TreeParserExpression methodCall = new Production( "methodCall", MethodCallRefactorHelper.methodCall( expression.bindTo( "target" ), identifier.bindTo( "name" ), params.bindTo( "params" ) ).action( methodCallRefactorAction ) );
-		TreeParserExpression call = new Production( "call", MethodCallRefactorHelper.call( expression, params ) );
-		TreeParserExpression getAttr = new Production( "getAttr", MethodCallRefactorHelper.getAttr( expression, identifier ) );
+		ParserExpression methodCall = new Production( "methodCall", MethodCallRefactorHelper.methodCall( expression.bindTo( "target" ), identifier.bindTo( "name" ), params.bindTo( "params" ) ).action( methodCallRefactorAction ) );
+		ParserExpression call = new Production( "call", MethodCallRefactorHelper.call( expression, params ) );
+		ParserExpression getAttr = new Production( "getAttr", MethodCallRefactorHelper.getAttr( expression, identifier ) );
 		expression.setExpression( new Choice( new Object[] { methodCall, call, getAttr, load } ) );
 		
 		return expression;
@@ -65,17 +67,17 @@ public class TreeParserDebugViewerTest
 
 	private static class MethodCallRefactorHelper
 	{
-		static TreeParserExpression getAttr(TreeParserExpression target, TreeParserExpression name)
+		static ParserExpression getAttr(ParserExpression target, ParserExpression name) throws ParserCoerceException
 		{
-			return TreeParserExpression.coerce( new Object[] { "getAttr", target, name } );
+			return new ListNode( new Object[] { "getAttr", target, name } );
 		}
 		
-		static TreeParserExpression call(TreeParserExpression target, TreeParserExpression params)
+		static ParserExpression call(ParserExpression target, ParserExpression params) throws ParserCoerceException
 		{
-			return TreeParserExpression.coerce( new Object[] { "call", target, params } );
+			return new ListNode( new Object[] { "call", target, params } );
 		}
 
-		static TreeParserExpression methodCall(TreeParserExpression target, TreeParserExpression name, TreeParserExpression params)
+		static ParserExpression methodCall(ParserExpression target, ParserExpression name, ParserExpression params) throws ParserCoerceException
 		{
 			return call( getAttr( target, name ), params );
 		}
