@@ -8,9 +8,9 @@ package tests.Parser.Utils;
 
 import BritefuryJ.DocModel.DMModule;
 import BritefuryJ.DocModel.DMModuleResolver;
-import BritefuryJ.Parser.ParserExpression;
 import BritefuryJ.Parser.Utils.Tokens;
-import tests.Parser.ParserTestCase;
+import BritefuryJ.ParserOld.ParserExpression;
+import tests.ParserOld.ParserTestCase;
 
 public class Test_Tokens extends ParserTestCase
 {

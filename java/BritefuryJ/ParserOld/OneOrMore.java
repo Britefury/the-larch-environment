@@ -4,30 +4,25 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.Parser.Utils.OperatorParser;
+package BritefuryJ.ParserOld;
 
-import BritefuryJ.ParserOld.ParserExpression;
 
-public abstract class Operator
+public class OneOrMore extends Repetition
 {
-	protected ParserExpression opExpression;
-
-
-	
-	protected Operator(ParserExpression opExpression)
+	public OneOrMore(ParserExpression subexp)
 	{
-		this.opExpression = opExpression;
+		super( subexp, 1, -1 );
 	}
 
-	protected Operator(String operator)
+	public OneOrMore(Object subexp) throws ParserCoerceException
 	{
-		this.opExpression = ParserExpression.coerce( operator );
+		super( subexp, 1, -1 );
 	}
-	
-	
-	
-	protected ParserExpression getOperatorExpression()
+
+
+
+	public String toString()
 	{
-		return opExpression;
+		return "OneOrMore( " + subexp.toString() + " )";
 	}
 }

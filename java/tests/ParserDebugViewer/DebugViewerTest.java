@@ -9,13 +9,13 @@ package tests.ParserDebugViewer;
 import java.util.Arrays;
 import java.util.List;
 
-import BritefuryJ.Parser.DebugParseResult;
-import BritefuryJ.Parser.Literal;
-import BritefuryJ.Parser.ParseAction;
-import BritefuryJ.Parser.ParserExpression;
-import BritefuryJ.Parser.Production;
 import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
 import BritefuryJ.ParserDebugViewer.ParseViewFrame;
+import BritefuryJ.ParserOld.DebugParseResult;
+import BritefuryJ.ParserOld.Literal;
+import BritefuryJ.ParserOld.ParseAction;
+import BritefuryJ.ParserOld.ParserExpression;
+import BritefuryJ.ParserOld.Production;
 
 public class DebugViewerTest
 {
