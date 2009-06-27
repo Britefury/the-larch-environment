@@ -49,6 +49,7 @@ import BritefuryJ.Parser.Word;
 import BritefuryJ.Parser.ZeroOrMore;
 import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
 import BritefuryJ.Parser.ParserExpression.ParserCoerceException;
+import BritefuryJ.Parser.Production.CannotOverwriteProductionExpressionException;
 import BritefuryJ.Parser.SeparatedList.CannotApplyConditionAfterActionException;
 import BritefuryJ.Parser.SeparatedList.CannotApplyMoreThanOneActionException;
 import BritefuryJ.Parser.SeparatedList.CannotApplyMoreThanOneConditionException;
@@ -1577,8 +1578,154 @@ public class Test_Parser extends ParserTestCase
 		DebugParseResult d = fieldAccessOrArrayAccess.debugParseStringChars( "this[i]" );
 		new ParseViewFrame( d );
 	}
+
+
+
+
+
+	static Object deepArrayToList(Object[] xs)
+	{
+		ArrayList<Object> l = new ArrayList<Object>();
+		
+		for (Object x: xs)
+		{
+			if ( x.getClass().isArray() )
+			{
+				l.add( deepArrayToList( (Object[])x ) );
+			}
+			else
+			{
+				l.add( x );
+			}
+		}
+		
+		return l;
+	}
+
+	
+	public void testLerpRefactor() throws ParserCoerceException
+	{
+		ParseCondition lerpCondition = new ParseCondition()
+		{
+			public boolean test(Object input, int begin, int end, Object x, Map<String, Object> bindings)
+			{
+				Object t1 = bindings.get( "t1" );
+				Object t2 = bindings.get( "t2" );
+				return t1 != null  &&  t2 != null  &&  t1.equals( t2 );
+			}
+		};
+		
+		ParseAction lerpAction = new ParseAction()
+		{
+			public Object invoke(Object input, int begin, int end, Object x, Map<String, Object> bindings)
+			{
+				return deepArrayToList( new Object[] { "+", bindings.get( "a" ), new Object[] { "*", new Object[] { "-", bindings.get( "b" ), bindings.get( "a" ) }, bindings.get( "t1" ) } } );
+			}
+		};
+		
+		ParserExpression oneMinusT = new ListNode( new Object[] { "-", "1.0", new AnyNode().bindTo( "t1" ) } );
+		bindingsTestNodeSX( oneMinusT, "[- 1.0 x]", "[[t1 x]]" );
+
+		ParserExpression bTimesT = new ListNode( new Object[] { "*", new AnyNode().bindTo( "b" ), new AnyNode().bindTo( "t2" ) } );
+		bindingsTestNodeSX( bTimesT, "[* q x]", "[[b q] [t2 x]]" );
+
+		ParserExpression aTimesOneMinusT = new ListNode( new Object[] { "*", new AnyNode().bindTo( "a" ), oneMinusT } );
+		bindingsTestNodeSX( aTimesOneMinusT, "[* p [- 1.0 x]]", "[[a p] [t1 x]]" );
+		
+		ParserExpression lerp = new ListNode( new Object[] { "+", aTimesOneMinusT, bTimesT } ).condition( lerpCondition );
+		bindingsTestNodeSX( lerp, "[+ [* p [- 1.0 x]] [* q x]]", "[[a p] [b q] [t1 x] [t2 x]]" );
+
+		ParserExpression lerpRefactor = lerp.action( lerpAction );
+		matchTestNodeSX( lerpRefactor, "[+ [* p [- 1.0 x]] [* q x]]", "[+ p [* [- q p] x]]" );
+	}
+
+	
+	
+	public void testLerpRefactorObject() throws InvalidFieldNameException, ParserCoerceException
+	{
+		ParseCondition lerpCondition = new ParseCondition()
+		{
+			public boolean test(Object input, int begin, int end, Object x, Map<String, Object> bindings)
+			{
+				Object t1 = bindings.get( "t1" );
+				Object t2 = bindings.get( "t2" );
+				return t1 != null  &&  t2 != null  &&  t1.equals( t2 );
+			}
+		};
+		
+		ParseAction lerpAction = new ParseAction()
+		{
+			public Object invoke(Object input, int begin, int end, Object x, Map<String, Object> bindings)
+			{
+				return Add.newInstance( new Object[] { bindings.get( "a" ), Mul.newInstance( new Object[] {  Sub.newInstance( new Object[] { bindings.get( "b" ), bindings.get( "a" ) } ), bindings.get( "t1" ) } ) } );
+			}
+		};
+		
+		ParserExpression oneMinusT = new ObjectNode( Sub, new Object[] { "1.0", new AnyNode().bindTo( "t1" ) } );
+		bindingsTestNodeSX( oneMinusT, "{m=M : (m Sub a=1.0 b=x)}", "[[t1 x]]" );
+
+		ParserExpression bTimesT = new ObjectNode( Mul, new Object[] { new AnyNode().bindTo( "b" ), new AnyNode().bindTo( "t2" ) } );
+		bindingsTestNodeSX( bTimesT, "{m=M : (m Mul a=q b=x)}", "[[b q] [t2 x]]" );
+
+		ParserExpression aTimesOneMinusT = new ObjectNode( Mul, new Object[] { new AnyNode().bindTo( "a" ), oneMinusT } );
+		bindingsTestNodeSX( aTimesOneMinusT, "{m=M : (m Mul a=p b=(m Sub a=1.0 b=x))}", "[[a p] [t1 x]]" );
+		
+		ParserExpression lerp = new ObjectNode( Add, new Object[] { aTimesOneMinusT, bTimesT } ).condition( lerpCondition );
+		bindingsTestNodeSX( lerp, "{m=M : (m Add a=(m Mul a=p b=(m Sub a=1.0 b=x)) b=(m Mul a=q b=x))}", "[[a p] [b q] [t1 x] [t2 x]]" );
+
+		ParserExpression lerpRefactor = lerp.action( lerpAction );
+		matchTestNodeSX( lerpRefactor, "{m=M : (m Add a=(m Mul a=p b=(m Sub a=1.0 b=x)) b=(m Mul a=q b=x))}", "{m=M : (m Add a=p b=(m Mul a=(m Sub a=q b=p) b=x))}" );
+	}
+
+	
+	
+	private static class MethodCallRefactorHelper
+	{
+		static ParserExpression getAttr(ParserExpression target, ParserExpression name) throws ParserCoerceException
+		{
+			return new ListNode( new Object[] { "getAttr", target, name } );
+		}
+		
+		static ParserExpression call(ParserExpression target, ParserExpression params) throws ParserCoerceException
+		{
+			return new ListNode( new Object[] { "call", target, params } );
+		}
+
+		static ParserExpression methodCall(ParserExpression target, ParserExpression name, ParserExpression params) throws ParserCoerceException
+		{
+			return call( getAttr( target, name ), params );
+		}
+	}
+
+
+	public void testMethodCallRefactor() throws ParserCoerceException, CannotOverwriteProductionExpressionException
+	{
+		ParseAction methodCallRefactorAction = new ParseAction()
+		{
+			public Object invoke(Object input, int begin, int end, Object x, Map<String, Object> bindings)
+			{
+				return deepArrayToList( new Object[] { "invokeMethod", bindings.get( "target" ), bindings.get( "name" ), bindings.get( "params" ) } );
+			}
+		};
+		
+		ParserExpression load = new ListNode( new Object[] { "load", new AnyNode() } );
+		ParserExpression params = new ListNode( new Object[] { "params" } );
+		
+		Production expression = new Production( "expression" );
+		ParserExpression methodCall = new Production( "methodCall", MethodCallRefactorHelper.methodCall( expression.bindTo( "target" ), identifier.bindTo( "name" ), params.bindTo( "params" ) ).action( methodCallRefactorAction ) );
+		ParserExpression call = new Production( "call", MethodCallRefactorHelper.call( expression, params ) );
+		ParserExpression getAttr = new Production( "getAttr", MethodCallRefactorHelper.getAttr( expression, identifier ) );
+		expression.setExpression( new Choice( new Object[] { methodCall, call, getAttr, load } ) );
+		
+		matchTestNodeSX( expression, "[load x]", "[load x]" );
+		matchTestNodeSX( expression, "[call [load x] [params]]", "[call [load x] [params]]" );
+		matchTestNodeSX( expression, "[getAttr [load x] blah]", "[getAttr [load x] blah]" );
+		matchTestNodeSX( expression, "[call [getAttr [load x] blah] [params]]", "[invokeMethod [load x] blah [params]]" );
+		matchTestNodeSX( expression, "[call [getAttr [getAttr [load y] foo] blah] [params]]", "[invokeMethod [getAttr [load y] foo] blah [params]]" );
+		matchTestNodeSX( expression, "[call [getAttr [call [load y] [params]] blah] [params]]", "[invokeMethod [call [load y] [params]] blah [params]]" );
+		matchTestNodeSX( expression, "[call [getAttr [call [getAttr [load x] foo] [params]] blah] [params]]", "[invokeMethod [invokeMethod [load x] foo [params]] blah [params]]" );
+		matchTestNodeSX( expression, "[call [getAttr [call [call [getAttr [load x] blah] [params]] [params]] blah] [params]]", "[invokeMethod [call [invokeMethod [load x] blah [params]] [params]] blah [params]]" );
+		matchTestNodeSX( expression, "[call [getAttr [getAttr [call [getAttr [load x] blah] [params]] foo] blah] [params]]", "[invokeMethod [getAttr [invokeMethod [load x] blah [params]] foo] blah [params]]" );
+	}
 }
 
-
-/*
-*/
