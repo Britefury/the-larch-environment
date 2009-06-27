@@ -190,7 +190,7 @@ public class ItemStreamAccessor
 		currentItem = stream.itemAt( pos );
 		
 		// TODO: remove this:
-		if ( pos < currentItem.start  ||  pos > currentItem.stop )
+		if ( currentItem != null  &&  ( pos < currentItem.start  ||  pos > currentItem.stop ) )
 		{
 			throw new RuntimeException( "outside range: pos=" + pos + ", range=" + currentItem.start + ":" + currentItem.stop );
 		}

@@ -86,7 +86,7 @@ public class Test_DocTree extends TestCase
 	
 	private static DMList[] buildDiamondDoc()
 	{
-		DMList dd = new DMList( Arrays.asList( new Object[] { "d" } ) );
+		DMList dd = new DMList( Arrays.asList( new Object[] { null } ) );
 		DMList dc = new DMList( Arrays.asList( new Object[] { dd } ) );
 		DMList db = new DMList( Arrays.asList( new Object[] { dd } ) );
 		DMList da = new DMList( Arrays.asList( new Object[] { db, dc } ) );
@@ -105,7 +105,7 @@ public class Test_DocTree extends TestCase
 		DMList db = (DMList)da.get( 0 );
 		DMList dd = (DMList)db.get( 0 );
 		
-		assertEquals( dd.get( 0 ), "d" );
+		assertEquals( dd.get( 0 ), null );
 		
 		DMList dc = (DMList)da.get( 1 );
 		
@@ -130,6 +130,8 @@ public class Test_DocTree extends TestCase
 		
 		assertNotSame( tbd, tcd );
 		assertSame( tbd.getNode(), tcd.getNode() );
+		assertEquals( tbd.get( 0 ), null );
+		assertEquals( tcd.get( 0 ), null );
 		
 		// Modify
 		DMList de = new DMList( Arrays.asList( new Object[] { dd } ) );

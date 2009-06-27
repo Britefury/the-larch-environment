@@ -906,6 +906,78 @@ abstract public class ParserTestCase extends TestCase
 	
 	
 	
+	public void matchSubTestListSX(ParserExpression parser, String inputSX, String expectedSX, int end)
+	{
+		matchSubTestListSX( parser, inputSX, expectedSX, end, "[ \t\n]*" );
+	}
+
+	@SuppressWarnings("unchecked")
+	public void matchSubTestListSX(ParserExpression parser, String inputSX, String expectedSX, int end, String ignoreCharsRegex)
+	{
+		List<Object> input = (List<Object>)readInputSX( inputSX );
+		Object expected = readExpectedSX( expectedSX );
+		matchSubTestList( parser, input, expected, end, ignoreCharsRegex );
+	}
+	
+	
+	public void matchSubTestList(ParserExpression parser, List<Object> input, Object expected, int end)
+	{
+		matchSubTestList( parser, input, expected, end, "[ \t\n]*" );
+	}
+	
+	public void matchSubTestList(ParserExpression parser, List<Object> input, Object expected, int end, String ignoreCharsRegex)
+	{
+		ParseResult result = parser.parseListItems( input, ignoreCharsRegex );
+
+		if ( !result.isValid() )
+		{
+			System.out.println( "PARSE FAILURE while parsing " + input.subList(  0, end ) + ", stopped at " + String.valueOf( result.getEnd() ) + ": " + input.subList(  0, result.getEnd() ) );
+			System.out.println( "EXPECTED:" );
+			System.out.println( expected.toString() );
+		}
+		assertTrue( result.isValid() );
+		
+		Object value = result.getValue();
+		String valueStr = value != null  ?  value.toString()  :  "<null>";
+		String valueClassName = value != null  ?  value.getClass().getName()  :  "<null>";
+		String expectedStr = expected != null  ?  expected.toString()  :  "<null>";
+		String expectedClassName = expected != null  ?  expected.getClass().getName()  :  "<null>";
+		
+		if ( result.getEnd() != end )
+		{
+			System.out.println( "DID NOT PARSE CORRECT AMOUNT while parsing " + input.subList( 0, end ) );
+			System.out.println( "Parsed " + String.valueOf( result.getEnd() ) + "/" + String.valueOf( end ) + " characters" );
+			System.out.println( input.subList( 0, result.getEnd() ) );
+			System.out.println( "EXPECTED: (a " + expectedClassName + ")" );
+			System.out.println( expectedStr );
+			System.out.println( "RESULT: (a " + valueClassName + ")" );
+			System.out.println( valueStr );
+		}
+		assertEquals( result.getEnd(), end );
+		
+		
+		boolean bValuesMatch = true;
+		if ( value == null )
+		{
+			bValuesMatch = expected == null;
+		}
+		else
+		{
+			bValuesMatch = value.equals( expected );
+		}
+		if ( !bValuesMatch )
+		{
+			System.out.println( "VALUE DIFFERS FROM EXPECTED" );
+			System.out.println( "EXPECTED: (a " + expectedClassName + ")" );
+			System.out.println( expectedStr );
+			System.out.println( "RESULT: (a " + valueClassName + ")" );
+			System.out.println( valueStr );
+		}
+		assertTrue( bValuesMatch );
+	}
+
+
+
 	public void matchFailTestStringAndStream(ParserExpression parser, String input)
 	{
 		matchFailTestStringAndStream( parser, input, "[ \t\n]*" );

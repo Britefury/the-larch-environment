@@ -67,6 +67,7 @@ public class Repetition extends UnaryBranchExpression
 		return ParseResult.failure( 0 );
 	}
 	
+	@SuppressWarnings("unchecked")
 	protected ParseResult evaluateStringChars(ParserState state, String input, int start)
 	{
 		ArrayList<Object> values = new ArrayList<Object>();
@@ -91,7 +92,14 @@ public class Repetition extends UnaryBranchExpression
 
 				if ( !res.isSuppressed() )
 				{
-					values.add( res.value );
+					if ( res.isMergeable() )
+					{
+						values.addAll( (List<Object>)res.value );
+					}
+					else
+					{
+						values.add( res.value );
+					}
 				}
 				pos = res.end;
 				i++;
@@ -116,6 +124,7 @@ public class Repetition extends UnaryBranchExpression
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	protected ParseResult evaluateStreamItems(ParserState state, ItemStreamAccessor input, int start)
 	{
 		ArrayList<Object> values = new ArrayList<Object>();
@@ -140,7 +149,14 @@ public class Repetition extends UnaryBranchExpression
 
 				if ( !res.isSuppressed() )
 				{
-					values.add( res.value );
+					if ( res.isMergeable() )
+					{
+						values.addAll( (List<Object>)res.value );
+					}
+					else
+					{
+						values.add( res.value );
+					}
 				}
 				pos = res.end;
 				i++;
@@ -165,6 +181,7 @@ public class Repetition extends UnaryBranchExpression
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	protected ParseResult evaluateListItems(ParserState state, List<Object> input, int start)
 	{
 		ArrayList<Object> values = new ArrayList<Object>();
@@ -189,7 +206,14 @@ public class Repetition extends UnaryBranchExpression
 
 				if ( !res.isSuppressed() )
 				{
-					values.add( res.value );
+					if ( res.isMergeable() )
+					{
+						values.addAll( (List<Object>)res.value );
+					}
+					else
+					{
+						values.add( res.value );
+					}
 				}
 				pos = res.end;
 				i++;

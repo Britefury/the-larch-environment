@@ -233,8 +233,15 @@ public class ItemStream
 	
 	protected Item itemAt(int pos)
 	{
-		int index = itemIndexAt( pos );
-		return items[index];
+		if ( items.length > 0 )
+		{
+			int index = itemIndexAt( pos );
+			return items[index];
+		}
+		else
+		{
+			return null;
+		}
 	}
 
 	protected int itemIndexAt(int pos)

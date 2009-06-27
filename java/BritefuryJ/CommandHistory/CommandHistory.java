@@ -172,7 +172,7 @@ public class CommandHistory
 			thaw();
 		}
 		
-		if ( past.size() > 1 )
+		if ( past.size() >= 1 )
 		{
 			Entry entry = past.get( past.size() - 1 );
 			past.remove( past.size() - 1 );
@@ -194,7 +194,7 @@ public class CommandHistory
 			thaw();
 		}
 		
-		if ( future.size() > 1 )
+		if ( future.size() >= 1 )
 		{
 			Entry entry = future.get( future.size() - 1 );
 			future.remove( future.size() - 1 );

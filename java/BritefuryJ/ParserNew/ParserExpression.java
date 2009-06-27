@@ -590,6 +590,26 @@ public abstract class ParserExpression implements ParserExpressionInterface
 		return new Optional( this );
 	}
 	
+	public ParserExpression peek()
+	{
+		return new Peek( this );
+	}
+	
+	public ParserExpression peekNot()
+	{
+		return new PeekNot( this );
+	}
+	
+	public ParserExpression repeat(int minRepetitions, int maxRepetitions)
+	{
+		return new Repetition( this, minRepetitions, maxRepetitions );
+	}
+	
+	public ParserExpression repeat(int minRepetitions, int maxRepetitions, boolean bNullIfZero)
+	{
+		return new Repetition( this, minRepetitions, maxRepetitions, bNullIfZero );
+	}
+	
 	public ParserExpression zeroOrMore()
 	{
 		return new ZeroOrMore( this );

@@ -7,6 +7,7 @@
 package BritefuryJ.ParserNew;
 
 import java.util.HashMap;
+import java.util.List;
 
 import BritefuryJ.ParserHelpers.DebugNode;
 import BritefuryJ.ParserHelpers.ParseResultInterface;
@@ -208,7 +209,7 @@ public class ParseResult implements ParseResultInterface
 	
 	public boolean isMergeable()
 	{
-		return bMerge;
+		return bMerge  &&  value instanceof List<?>;
 	}
 	
 	public HashMap<String, Object> getBindings()
