@@ -31,6 +31,7 @@ public class Sequence extends BranchExpression
 		return ParseResult.failure( 0 );
 	}
 	
+	@SuppressWarnings("unchecked")
 	protected ParseResult evaluateStringChars(ParserState state, String input, int start)
 	{
 		ArrayList<Object> value = new ArrayList<Object>();
@@ -52,7 +53,14 @@ public class Sequence extends BranchExpression
 
 				if ( !result.isSuppressed() )
 				{
-					value.add( result.value );
+					if ( result.isMergeable() )
+					{
+						value.addAll( (List<Object>)result.value );
+					}
+					else
+					{
+						value.add( result.value );
+					}
 				}
 			}
 		}
@@ -60,6 +68,7 @@ public class Sequence extends BranchExpression
 		return new ParseResult( value, start, pos, bindings );
 	}
 
+	@SuppressWarnings("unchecked")
 	protected ParseResult evaluateStreamItems(ParserState state, ItemStreamAccessor input, int start)
 	{
 		ArrayList<Object> value = new ArrayList<Object>();
@@ -81,7 +90,14 @@ public class Sequence extends BranchExpression
 
 				if ( !result.isSuppressed() )
 				{
-					value.add( result.value );
+					if ( result.isMergeable() )
+					{
+						value.addAll( (List<Object>)result.value );
+					}
+					else
+					{
+						value.add( result.value );
+					}
 				}
 			}
 		}
@@ -89,6 +105,7 @@ public class Sequence extends BranchExpression
 		return new ParseResult( value, start, pos, bindings );
 	}
 
+	@SuppressWarnings("unchecked")
 	protected ParseResult evaluateListItems(ParserState state, List<Object> input, int start)
 	{
 		ArrayList<Object> value = new ArrayList<Object>();
@@ -110,7 +127,14 @@ public class Sequence extends BranchExpression
 
 				if ( !result.isSuppressed() )
 				{
-					value.add( result.value );
+					if ( result.isMergeable() )
+					{
+						value.addAll( (List<Object>)result.value );
+					}
+					else
+					{
+						value.add( result.value );
+					}
 				}
 			}
 		}

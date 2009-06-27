@@ -47,7 +47,11 @@ public abstract class DMNode
 	@SuppressWarnings("unchecked")
 	public static Object coerce(Object x)
 	{
-		if ( x instanceof DMNode )
+		if ( x == null )
+		{
+			return x;
+		}
+		else if ( x instanceof DMNode )
 		{
 			return x;
 		}

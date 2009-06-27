@@ -16,7 +16,6 @@ import BritefuryJ.Cell.Cell;
 import BritefuryJ.Cell.CellEvaluator;
 import BritefuryJ.CommandHistory.CommandHistory;
 import BritefuryJ.DocModel.DMIOReader;
-import BritefuryJ.DocModel.DMIOWriter;
 import BritefuryJ.DocModel.DMList;
 import BritefuryJ.DocModel.DMIOReader.BadModuleNameException;
 import BritefuryJ.DocModel.DMIOReader.ParseErrorException;
@@ -44,7 +43,7 @@ public class Test_DMList extends TestCase
 		try
 		{
 			Object expected = DMIOReader.readFromString( expectedSX, null );
-			assertTrue( xs.equals( expected ) );
+			assertEquals( expected, xs );
 		}
 		catch (ParseErrorException e)
 		{
@@ -126,8 +125,8 @@ public class Test_DMList extends TestCase
 	
 	public void testConstructor()
 	{
-		DMList xs = readDMListSX( "[a b c]" );
-		cmpListSX( xs, "[a b c]" );
+		DMList xs = readDMListSX( "[a b c `null`]" );
+		cmpListSX( xs, "[a b c `null`]" );
 		
 		assertEquals( xs.get( 0 ), "a" );
 		assertEquals( xs.get( 1 ), "b" );
@@ -140,8 +139,8 @@ public class Test_DMList extends TestCase
 	
 	public void testClone()
 	{
-		DMList xs = readDMListSX( "[a b c]" );
-		cmpListSX( (DMList)xs.clone(), "[a b c]" );
+		DMList xs = readDMListSX( "[a b c `null`]" );
+		cmpListSX( (DMList)xs.clone(), "[a b c `null`]" );
 	}
 
 	public void testCell()
@@ -172,11 +171,17 @@ public class Test_DMList extends TestCase
 		DMList xs = readTrackedDMListSX( "[a b c]" );
 		xs.add( "xyz" );
 		cmpListSX( xs, "[a b c xyz]" );
+		xs.add( null );
+		cmpListSX( xs, "[a b c xyz `null`]" );
 		
+		history.undo();
+		cmpListSX( xs, "[a b c xyz]" );
 		history.undo();
 		cmpListSX( xs, "[a b c]" );
 		history.redo();
 		cmpListSX( xs, "[a b c xyz]" );
+		history.redo();
+		cmpListSX( xs, "[a b c xyz `null`]" );
 	}
 
 
@@ -186,11 +191,17 @@ public class Test_DMList extends TestCase
 		DMList xs = readTrackedDMListSX( "[a b c]" );
 		xs.add( 2, "xyz" );
 		cmpListSX( xs, "[a b xyz c]" );
+		xs.add( 2, null );
+		cmpListSX( xs, "[a b `null` xyz c]" );
 		
+		history.undo();
+		cmpListSX( xs, "[a b xyz c]" );
 		history.undo();
 		cmpListSX( xs, "[a b c]" );
 		history.redo();
 		cmpListSX( xs, "[a b xyz c]" );
+		history.redo();
+		cmpListSX( xs, "[a b `null` xyz c]" );
 	}
 
 
@@ -198,28 +209,28 @@ public class Test_DMList extends TestCase
 	public void testAddAll()
 	{
 		DMList xs = readTrackedDMListSX( "[a b c]" );
-		DMList ys = readDMListSX( "[x y z]" );
+		DMList ys = readDMListSX( "[x y z `null`]" );
 		xs.addAll( ys );
-		cmpListSX( xs, "[a b c x y z]" );
+		cmpListSX( xs, "[a b c x y z `null`]" );
 		
 		history.undo();
 		cmpListSX( xs, "[a b c]" );
 		history.redo();
-		cmpListSX( xs, "[a b c x y z]" );
+		cmpListSX( xs, "[a b c x y z `null`]" );
 	}
 
 
 	public void testAddAll_insert()
 	{
 		DMList xs = readTrackedDMListSX( "[a b c]" );
-		DMList ys = readDMListSX( "[x y z]" );
+		DMList ys = readDMListSX( "[x y z `null`]" );
 		xs.addAll( 2, ys );
-		cmpListSX( xs, "[a b x y z c]" );
+		cmpListSX( xs, "[a b x y z `null` c]" );
 		
 		history.undo();
 		cmpListSX( xs, "[a b c]" );
 		history.redo();
-		cmpListSX( xs, "[a b x y z c]" );
+		cmpListSX( xs, "[a b x y z `null` c]" );
 	}
 
 
@@ -239,20 +250,23 @@ public class Test_DMList extends TestCase
 
 	public void testContains()
 	{
-		DMList xs = readDMListSX( "[a b c]" );
+		DMList xs = readDMListSX( "[a b c `null`]" );
 		assertTrue( xs.contains( "a" ) );
 		assertTrue( xs.contains( "b" ) );
 		assertTrue( xs.contains( "c" ) );
+		assertTrue( xs.contains( null ) );
 		assertFalse( xs.contains( "d" ) );
 	}
 
 
 	public void testContainsAll()
 	{
-		DMList xs = readDMListSX( "[a b c]" );
+		DMList xs = readDMListSX( "[a b c `null`]" );
 		DMList ys = readDMListSX( "[c a]" );
 		DMList zs = readDMListSX( "[c d]" );
+		DMList zzs = readDMListSX( "[c `null`]" );
 		assertTrue( xs.containsAll( ys ) );
+		assertTrue( xs.containsAll( zzs ) );
 		assertFalse( xs.containsAll( zs ) );
 	}
 
@@ -260,8 +274,8 @@ public class Test_DMList extends TestCase
 
 	public void testEquals()
 	{
-		DMList xs = readDMListSX( "[a b c]" );
-		DMList ys = readDMListSX( "[a b c]" );
+		DMList xs = readDMListSX( "[a b c `null`]" );
+		DMList ys = readDMListSX( "[a b c `null`]" );
 		assertTrue( xs.equals( ys ) );
 	}
 
@@ -269,20 +283,22 @@ public class Test_DMList extends TestCase
 
 	public void testGet()
 	{
-		DMList xs = readDMListSX( "[a b c]" );
+		DMList xs = readDMListSX( "[a b c `null`]" );
 		assertEquals( xs.get( 0 ), "a" );
 		assertEquals( xs.get( 1 ), "b" );
 		assertEquals( xs.get( 2 ), "c" );
+		assertEquals( xs.get( 3 ), null );
 	}
 
 
 
 	public void testIndexOf()
 	{
-		DMList xs = readDMListSX( "[a b c]" );
+		DMList xs = readDMListSX( "[a b c `null`]" );
 		assertEquals( xs.indexOf( "a" ), 0 );
 		assertEquals( xs.indexOf( "b" ), 1 );
 		assertEquals( xs.indexOf( "c" ), 2 );
+		assertEquals( xs.indexOf( null ), 3 );
 	}
 
 
@@ -295,57 +311,65 @@ public class Test_DMList extends TestCase
 	
 	public void testIterator()
 	{
-		DMList xs = readDMListSX( "[a b c]" );
+		DMList xs = readDMListSX( "[a b c `null`]" );
 		assertEquals( xs, iterToList( xs.iterator() ) );
 	}
 
 
 	public void testLastIndexOf()
 	{
-		DMList xs = readDMListSX( "[a b c a b c]" );
-		assertEquals( xs.lastIndexOf( "a" ), 3 );
-		assertEquals( xs.lastIndexOf( "b" ), 4 );
-		assertEquals( xs.lastIndexOf( "c" ), 5 );
+		DMList xs = readDMListSX( "[a b c `null` a b c `null`]" );
+		assertEquals( xs.lastIndexOf( "a" ), 4 );
+		assertEquals( xs.lastIndexOf( "b" ), 5 );
+		assertEquals( xs.lastIndexOf( "c" ), 6 );
+		assertEquals( xs.lastIndexOf( null ), 7 );
 	}
 
 
 	public void testListIterator()
 	{
-		DMList xs = readDMListSX( "[a b c]" );
+		DMList xs = readDMListSX( "[a b c `null`]" );
 		assertEquals( xs, iterToList( xs.listIterator() ) );
 	}
 
 
 	public void testListIteratorFrom()
 	{
-		DMList xs = readDMListSX( "[a b c]" );
-		cmpListSX( iterToList( xs.listIterator( 0 ) ), "[a b c]" );
-		cmpListSX( iterToList( xs.listIterator( 1 ) ), "[b c]" );
-		cmpListSX( iterToList( xs.listIterator( 2 ) ), "[c]" );
-		cmpListSX( iterToList( xs.listIterator( 3 ) ), "[]" );
+		DMList xs = readDMListSX( "[a b c `null`]" );
+		cmpListSX( iterToList( xs.listIterator( 0 ) ), "[a b c `null`]" );
+		cmpListSX( iterToList( xs.listIterator( 1 ) ), "[b c `null`]" );
+		cmpListSX( iterToList( xs.listIterator( 2 ) ), "[c `null`]" );
+		cmpListSX( iterToList( xs.listIterator( 3 ) ), "[`null`]" );
+		cmpListSX( iterToList( xs.listIterator( 4 ) ), "[]" );
 	}
 
 
 	public void testRemove()
 	{
-		DMList xs = readTrackedDMListSX( "[a b c]" );
+		DMList xs = readTrackedDMListSX( "[a b c `null`]" );
 		xs.remove( 1 );
-		cmpListSX( xs, "[a c]" );
+		cmpListSX( xs, "[a c `null`]" );
 		
 		history.undo();
-		cmpListSX( xs, "[a b c]" );
+		cmpListSX( xs, "[a b c `null`]" );
 		history.redo();
-		cmpListSX( xs, "[a c]" );
+		cmpListSX( xs, "[a c `null`]" );
 	}
 
 	public void testRemoveObject()
 	{
-		DMList xs = readTrackedDMListSX( "[a b c]" );
+		DMList xs = readTrackedDMListSX( "[a b c `null`]" );
 		xs.remove( "b" );
+		cmpListSX( xs, "[a c `null`]" );
+		xs.remove( null );
 		cmpListSX( xs, "[a c]" );
 		
 		history.undo();
-		cmpListSX( xs, "[a b c]" );
+		cmpListSX( xs, "[a c `null`]" );
+		history.undo();
+		cmpListSX( xs, "[a b c `null`]" );
+		history.redo();
+		cmpListSX( xs, "[a c `null`]" );
 		history.redo();
 		cmpListSX( xs, "[a c]" );
 	}
@@ -354,13 +378,13 @@ public class Test_DMList extends TestCase
 	public void testSet()
 	{
 		DMList xs = readTrackedDMListSX( "[a b c]" );
-		xs.set( 1, "x" );
-		cmpListSX( xs, "[a x c]" );
+		xs.set( 1, null );
+		cmpListSX( xs, "[a `null` c]" );
 		
 		history.undo();
 		cmpListSX( xs, "[a b c]" );
 		history.redo();
-		cmpListSX( xs, "[a x c]" );
+		cmpListSX( xs, "[a `null` c]" );
 	}
 
 
@@ -421,7 +445,6 @@ public class Test_DMList extends TestCase
 		cmpListSX( xs, "[a b [c d [[p q [s t]] f]]]" );
 
 		history.redo();
-		System.out.println( DMIOWriter.writeAsString( xs ) );
 		cmpListSX( xs, "[a b [c d [[p q [s h]] f]]]" );
 	}
 	

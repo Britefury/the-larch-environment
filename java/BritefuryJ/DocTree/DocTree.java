@@ -258,7 +258,7 @@ public class DocTree
 	
 	public Object treeNode(Object x, DocTreeNode parentTreeNode, int indexInParent)
 	{
-		if ( x instanceof String )
+		if ( x == null  ||  x instanceof String )
 		{
 			return x;
 		}

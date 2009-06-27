@@ -71,36 +71,36 @@ public class Test_DMObject extends TestCase
 	public void test_DMObject_getFieldValuesImmutable() throws InvalidFieldNameException, ClassAlreadyDefinedException
 	{
 		DMObjectClass A = m.newClass( "A", new String[] { "x", "y" } );
-		DMObject a = A.newInstance( new Object[] { "a", "p" } );
+		DMObject a = A.newInstance( new Object[] { "a", null } );
 		history.track( a );
 		
-		assertEquals( Arrays.asList( a.getFieldValuesImmutable() ), Arrays.asList( new Object[] { "a", "p" } ) );
+		assertEquals( Arrays.asList( a.getFieldValuesImmutable() ), Arrays.asList( new Object[] { "a", null } ) );
 	}
 
 	
 	public void test_get() throws InvalidFieldNameException, ClassAlreadyDefinedException
 	{
 		DMObjectClass A = m.newClass( "A", new String[] { "x", "y" } );
-		DMObject a = A.newInstance( new Object[] { "a", "p" } );
+		DMObject a = A.newInstance( new Object[] { "a", null } );
 		history.track( a );
 		
 		assertEquals( a.get( 0 ), "a" );
-		assertEquals( a.get( 1 ), "p" );
+		assertEquals( a.get( 1 ), null );
 		assertEquals( a.get( "x" ), "a" );
-		assertEquals( a.get( "y" ), "p" );
+		assertEquals( a.get( "y" ), null );
 	}
 
 
 	public void test_getitem() throws InvalidFieldNameException, ClassAlreadyDefinedException
 	{
 		DMObjectClass A = m.newClass( "A", new String[] { "x", "y" } );
-		DMObject a = A.newInstance( new Object[] { "a", "p" } );
+		DMObject a = A.newInstance( new Object[] { "a", null } );
 		history.track( a );
 		
 		assertEquals( a.__getitem__( 0 ), "a" );
-		assertEquals( a.__getitem__( 1 ), "p" );
+		assertEquals( a.__getitem__( 1 ), null );
 		assertEquals( a.__getitem__( "x" ), "a" );
-		assertEquals( a.__getitem__( "y" ), "p" );
+		assertEquals( a.__getitem__( "y" ), null );
 	}
 
 
@@ -115,8 +115,8 @@ public class Test_DMObject extends TestCase
 		assertEquals( Arrays.asList( a.getFieldValuesImmutable() ), Arrays.asList( new Object[] { "b", "q" } ) );
 		
 		a.set( "x", "c" );
-		a.set( "y", "r" );
-		assertEquals( Arrays.asList( a.getFieldValuesImmutable() ), Arrays.asList( new Object[] { "c", "r" } ) );
+		a.set( "y", null );
+		assertEquals( Arrays.asList( a.getFieldValuesImmutable() ), Arrays.asList( new Object[] { "c", null } ) );
 
 		history.undo();
 		assertEquals( Arrays.asList( a.getFieldValuesImmutable() ), Arrays.asList( new Object[] { "c", "q" } ) );
@@ -140,7 +140,7 @@ public class Test_DMObject extends TestCase
 		assertEquals( Arrays.asList( a.getFieldValuesImmutable() ), Arrays.asList( new Object[] { "c", "q" } ) );
 		
 		history.redo();
-		assertEquals( Arrays.asList( a.getFieldValuesImmutable() ), Arrays.asList( new Object[] { "c", "r" } ) );
+		assertEquals( Arrays.asList( a.getFieldValuesImmutable() ), Arrays.asList( new Object[] { "c", null } ) );
 	}
 
 
@@ -152,16 +152,16 @@ public class Test_DMObject extends TestCase
 		
 		HashMap<String, Object> data = new HashMap<String, Object>();
 		data.put( "x", "d" );
-		data.put( "y", "s" );
+		data.put( "y", null );
 		a.update( data );
 
-		assertEquals( Arrays.asList( a.getFieldValuesImmutable() ), Arrays.asList( new Object[] { "d", "s" } ) );
+		assertEquals( Arrays.asList( a.getFieldValuesImmutable() ), Arrays.asList( new Object[] { "d", null } ) );
 
 		history.undo();
 		assertEquals( Arrays.asList( a.getFieldValuesImmutable() ), Arrays.asList( new Object[] { "a", "p" } ) );
 
 		history.redo();
-		assertEquals( Arrays.asList( a.getFieldValuesImmutable() ), Arrays.asList( new Object[] { "d", "s" } ) );
+		assertEquals( Arrays.asList( a.getFieldValuesImmutable() ), Arrays.asList( new Object[] { "d", null } ) );
 	}
 
 
@@ -198,9 +198,9 @@ public class Test_DMObject extends TestCase
 		history.track( a );
 		
 		a.__setitem__( 0, "e" );
-		a.__setitem__( "y", "t" );
+		a.__setitem__( "y", null );
 
-		assertEquals( Arrays.asList( a.getFieldValuesImmutable() ), Arrays.asList( new Object[] { "e", "t" } ) );
+		assertEquals( Arrays.asList( a.getFieldValuesImmutable() ), Arrays.asList( new Object[] { "e", null } ) );
 	}
 
 	
@@ -217,7 +217,7 @@ public class Test_DMObject extends TestCase
 		DMObject a2 = new DMObject( A, data );
 		
 		DMObject a3 = A.newInstance( new Object[] { "a", "b" } );
-		DMObject a4 = A.newInstance( new String[] { "y", "x" }, new Object[] { "a", "b" } );
+		DMObject a4 = A.newInstance( new String[] { "y", "x" }, new Object[] { "a", null } );
 		DMObject a5 = A.newInstance( data );
 
 		assertEquals( Arrays.asList( a0.getFieldValuesImmutable() ), Arrays.asList( new Object[] { "a", "b" } ) );
@@ -225,7 +225,7 @@ public class Test_DMObject extends TestCase
 		assertEquals( Arrays.asList( a2.getFieldValuesImmutable() ), Arrays.asList( new Object[] { "d", "s" } ) );
 
 		assertEquals( Arrays.asList( a3.getFieldValuesImmutable() ), Arrays.asList( new Object[] { "a", "b" } ) );
-		assertEquals( Arrays.asList( a4.getFieldValuesImmutable() ), Arrays.asList( new Object[] { "b", "a" } ) );
+		assertEquals( Arrays.asList( a4.getFieldValuesImmutable() ), Arrays.asList( new Object[] { null, "a" } ) );
 		assertEquals( Arrays.asList( a5.getFieldValuesImmutable() ), Arrays.asList( new Object[] { "d", "s" } ) );
 	}
 	
@@ -296,8 +296,8 @@ public class Test_DMObject extends TestCase
 	{
 		DMObjectClass A = m.newClass( "A", new String[] { "x", "y" } );
 		
-		DMObject c0 = A.newInstance( new Object[] { "c", "r" } );
-		DMObject c0D = A.newInstance( new Object[] { "c", "r" } );
+		DMObject c0 = A.newInstance( new Object[] { "c", null } );
+		DMObject c0D = A.newInstance( new Object[] { "c", null } );
 		
 		DMObject c1 = A.newInstance( new Object[] { "c", c0 } );
 		DMObject c1D = A.newInstance( new Object[] { "c", c0D } );
