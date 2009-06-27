@@ -6,11 +6,11 @@
 //##************************
 package BritefuryJ.Parser.Utils;
 
+import BritefuryJ.Parser.ParseResult;
+import BritefuryJ.Parser.ParserExpression;
+import BritefuryJ.Parser.RegEx;
+import BritefuryJ.Parser.TerminalString;
 import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
-import BritefuryJ.ParserOld.ParseResult;
-import BritefuryJ.ParserOld.ParserExpression;
-import BritefuryJ.ParserOld.ParserState;
-import BritefuryJ.ParserOld.RegEx;
 
 public class Tokens
 {
@@ -105,17 +105,34 @@ public class Tokens
 	}
 		
 	
-	private static class JavaIdentifier extends ParserExpression
+	private static class JavaIdentifier extends TerminalString
 	{
 		public JavaIdentifier()
 		{
 		}
 		
 		
-		protected ParseResult parseStream(ParserState state, ItemStreamAccessor input, int start)
+		protected ParseResult consumeString(String input, int start)
 		{
-			start = state.skipJunkChars( input, start );
+			int offset = start; 
 			
+			if ( offset < input.length()  &&  Character.isJavaIdentifierStart( input.charAt( offset ) ) )
+			{
+				offset++;
+				
+				while ( offset < input.length()  &&  Character.isJavaIdentifierPart( input.charAt( offset ) ) )
+				{
+					offset++;
+				}
+				
+				return new ParseResult( input.subSequence( start, offset ).toString(), start, offset );
+			}
+			
+			return ParseResult.failure( start );
+		}
+
+		protected ParseResult consumeStream(ItemStreamAccessor input, int start)
+		{
 			CharSequence itemText = input.getItemTextFrom( start );
 			
 			if ( itemText != null )
@@ -151,17 +168,47 @@ public class Tokens
 	}
 
 	
-	private static class JavaCharacterLiteral extends ParserExpression
+	private static class JavaCharacterLiteral extends TerminalString
 	{
 		public JavaCharacterLiteral()
 		{
 		}
 		
 		
-		protected ParseResult parseStream(ParserState state, ItemStreamAccessor input, int start)
+		protected ParseResult consumeString(String input, int start)
 		{
-			start = state.skipJunkChars( input, start );
+			int offset = start; 
 			
+			if ( offset < input.length()  &&  input.charAt( offset ) == '\'' )
+			{
+				offset++;
+				
+				char c = input.charAt( offset );
+				if ( c == '\\' )
+				{
+					offset = consumeJavaEscape( input, offset );
+				}
+				else
+				{
+					offset++;
+				}
+				if ( offset != -1  &&  offset < input.length() )
+				{
+					c = input.charAt( offset );
+					if ( c == '\'' )
+					{
+						offset++;
+						return new ParseResult( input.subSequence( start, offset ).toString(), start, offset );
+					}
+				}
+			}
+			
+			return ParseResult.failure( start );
+		}
+
+
+		protected ParseResult consumeStream(ItemStreamAccessor input, int start)
+		{
 			CharSequence itemText = input.getItemTextFrom( start );
 			
 			if ( itemText != null )
@@ -210,17 +257,54 @@ public class Tokens
 	
 	
 
-	private static class JavaStringLiteral extends ParserExpression
+	private static class JavaStringLiteral extends TerminalString
 	{
 		public JavaStringLiteral()
 		{
 		}
 		
 		
-		protected ParseResult parseStream(ParserState state, ItemStreamAccessor input, int start)
+		protected ParseResult consumeString(String input, int start)
 		{
-			start = state.skipJunkChars( input, start );
+			int offset = start; 
 			
+			if ( offset < input.length()  &&  input.charAt( offset ) == '"' )
+			{
+				offset++;
+				
+				char c = input.charAt( offset );
+				while ( offset < input.length()  &&  c != '"' )
+				{
+					if ( c == '\\' )
+					{
+						int escape = consumeJavaEscape( input, offset );
+						if ( escape == -1 )
+						{
+							return ParseResult.failure( start );
+						}
+						offset = escape;
+					}
+					else
+					{
+						offset++;
+					}
+					
+					c = input.charAt( offset );
+				}
+				
+				if ( offset < input.length()  &&  c == '"' )
+				{
+					offset++;
+					return new ParseResult( input.subSequence( start, offset ).toString(), start, offset );
+				}
+			}
+
+			return ParseResult.failure( start );
+		}
+
+
+		protected ParseResult consumeStream(ItemStreamAccessor input, int start)
+		{
 			CharSequence itemText = input.getItemTextFrom( start );
 			
 			if ( itemText != null )

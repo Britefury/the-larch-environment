@@ -10,8 +10,8 @@ import org.python.core.PyObject;
 
 import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
-import BritefuryJ.ParserOld.ParserExpression;
-import BritefuryJ.ParserOld.Sequence;
+import BritefuryJ.Parser.ParserExpression;
+import BritefuryJ.Parser.Sequence;
 
 public class ChainOperator extends Operator
 {

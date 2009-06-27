@@ -10,13 +10,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
+import BritefuryJ.Parser.DebugParseResult;
+import BritefuryJ.Parser.Literal;
+import BritefuryJ.Parser.ParserExpression;
+import BritefuryJ.Parser.Production;
 import BritefuryJ.Parser.Utils.Tokens;
 import BritefuryJ.ParserDebugViewer.ParseViewFrame;
-import BritefuryJ.ParserOld.DebugParseResult;
-import BritefuryJ.ParserOld.Literal;
-import BritefuryJ.ParserOld.ParserExpression;
-import BritefuryJ.ParserOld.Production;
 
 public class OperatorTable
 {
@@ -28,11 +27,11 @@ public class OperatorTable
 	// Constructor
 	//
 	
-	public OperatorTable(List<OperatorLevel> levels, ParserExpression rootParser)
+	public OperatorTable(OperatorLevel levels[], ParserExpression rootParser)
 	{
 		this.rootParser = rootParser;
 		this.levels = new ArrayList<OperatorLevel>();
-		this.levels.addAll( levels );
+		this.levels.addAll( Arrays.asList( levels ) );
 	}
 	
 	
@@ -84,11 +83,11 @@ public class OperatorTable
 	
 	
 	
-	public static void main(String[] args) throws BritefuryJ.ParserOld.Production.CannotOverwriteProductionExpressionException
+	public static void main(String[] args) throws BritefuryJ.Parser.Production.CannotOverwriteProductionExpressionException
 	{
 		BinaryOperatorParseAction mulAction = new BinaryOperatorParseAction()
 		{
-			public Object invoke(ItemStreamAccessor input, int begin, Object left, Object right)
+			public Object invoke(Object input, int begin, int end, Object left, Object right)
 			{
 				return Arrays.asList( new Object[] { '*', left, right } );
 			}
@@ -96,7 +95,7 @@ public class OperatorTable
 
 		UnaryOperatorParseAction notAction = new UnaryOperatorParseAction()
 		{
-			public Object invoke(ItemStreamAccessor input, int begin, Object x)
+			public Object invoke(Object input, int begin, int end, Object x)
 			{
 				return Arrays.asList( new Object[] { '!', x } );
 			}
@@ -106,15 +105,15 @@ public class OperatorTable
 		BinaryOperator mul = new BinaryOperator( new Literal( "*" ), mulAction );
 		UnaryOperator inv = new UnaryOperator( new Literal( "!" ), notAction );
 		
-		InfixRightLevel l0 = new InfixRightLevel( Arrays.asList( new BinaryOperator[] { mul } ) );
+		InfixRightLevel l0 = new InfixRightLevel( new BinaryOperator[] { mul } );
 		//PrefixLevel l1 = new PrefixLevel( Arrays.asList( new UnaryOperator[] { inv } ) );
 		SuffixLevel l1 = new SuffixLevel( Arrays.asList( new UnaryOperator[] { inv } ) );
 		
-		OperatorTable t = new OperatorTable( Arrays.asList( new OperatorLevel[] { l0, l1 } ), Tokens.identifier );
+		OperatorTable t = new OperatorTable( new OperatorLevel[] { l0, l1 }, Tokens.identifier );
 		List<ParserExpression> parsers = t.buildParsers();
 		ParserExpression e = parsers.get( parsers.size() - 1 );
 		
-		DebugParseResult r = e.debugParseString( "a * b * c!" );
+		DebugParseResult r = e.debugParseStringChars( "a * b * c!" );
 //		DebugParseResult r = e.debugParseString( "a!!!" );
 		
 		new ParseViewFrame( r );

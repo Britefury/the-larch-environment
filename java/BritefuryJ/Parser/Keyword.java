@@ -61,7 +61,7 @@ public class Keyword extends TerminalString
 			{
 				if ( end == input.length()  ||  !postPattern.matcher( input.subSequence( end, end + 1 ) ).matches() )
 				{
-					return new ParseResult( keywordString, start, start + end );
+					return new ParseResult( keywordString, start, end );
 				}
 			}
 		}

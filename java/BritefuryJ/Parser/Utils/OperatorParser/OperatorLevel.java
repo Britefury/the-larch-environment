@@ -8,8 +8,8 @@ package BritefuryJ.Parser.Utils.OperatorParser;
 
 import java.util.ArrayList;
 
-import BritefuryJ.ParserOld.ParserExpression;
-import BritefuryJ.ParserOld.Production;
+import BritefuryJ.Parser.ParserExpression;
+import BritefuryJ.Parser.Production;
 
 
 public abstract class OperatorLevel

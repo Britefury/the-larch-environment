@@ -25,7 +25,7 @@ from GSymCore.Languages.LISP.Styles import *
 
 
 def _parseText(text):
-	res, pos = Parser.parser.parseString( text )
+	res, pos = Parser.parser.parseStringChars( text )
 	if res is not None:
 		if pos == len( text ):
 			return res.result
@@ -63,7 +63,7 @@ def nodeEditor(ctx, node, contents, state):
 
 
 def stringNodeEditor(ctx, node, metadata, state):
-	res, pos = Parser.unquotedString.parseString( node.toString() )
+	res, pos = Parser.unquotedString.parseStringChars( node.toString() )
 	if res is None:
 		nodeText = repr( node.toString() )
 	else:

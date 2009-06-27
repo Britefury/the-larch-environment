@@ -7,7 +7,6 @@
 package BritefuryJ.Parser;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -43,7 +42,7 @@ public class SeparatedList extends ParserExpression
 		
 		public boolean test(Object input, int begin, int end, List<Object> elements, Map<String, Object> bindings, boolean bGotTrailingSeparator)
 		{
-			return Py.py2boolean( callable.__call__( new PyObject[] { Py.java2py( input ), new PyInteger( begin ), Py.java2py( elements ), Py.java2py( bindings ), Py.java2py( bGotTrailingSeparator ) } ) );
+			return Py.py2boolean( callable.__call__( new PyObject[] { Py.java2py( input ), new PyInteger( begin ), new PyInteger( end ), Py.java2py( elements ), Py.java2py( bindings ), Py.java2py( bGotTrailingSeparator ) } ) );
 		}
 	}
 	
@@ -74,7 +73,7 @@ public class SeparatedList extends ParserExpression
 		
 		public Object invoke(Object input, int begin, int end, List<Object> elements, Map<String, Object> bindings, boolean bGotTrailingSeparator)
 		{
-			return callable.__call__( new PyObject[] { Py.java2py( input ), new PyInteger( begin ), Py.java2py( elements ), Py.java2py( bindings ), Py.java2py( bGotTrailingSeparator ) } );
+			return callable.__call__( new PyObject[] { Py.java2py( input ), new PyInteger( begin ), new PyInteger( end ), Py.java2py( elements ), Py.java2py( bindings ), Py.java2py( bGotTrailingSeparator ) } );
 		}
 	}
 
@@ -213,7 +212,7 @@ public class SeparatedList extends ParserExpression
 	protected ParseResult evaluate(Mode mode, ParserState state, Object input, int start)
 	{
 		ArrayList<Object> values = new ArrayList<Object>();
-		HashMap<String, Object> bindings = null;
+		Map<String, Object> bindings = null;
 		
 		int pos = start;
 		int errorPos = start;

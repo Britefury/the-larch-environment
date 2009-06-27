@@ -6,15 +6,16 @@
 //##************************
 package BritefuryJ.Parser.Utils.OperatorParser;
 
+import java.util.Map;
+
 import org.python.core.Py;
 import org.python.core.PyInteger;
 import org.python.core.PyObject;
 
 import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
-import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
-import BritefuryJ.ParserOld.ParseAction;
-import BritefuryJ.ParserOld.ParserExpression;
+import BritefuryJ.Parser.ParseAction;
+import BritefuryJ.Parser.ParserExpression;
 
 public class UnaryOperator extends Operator
 {
@@ -36,7 +37,7 @@ public class UnaryOperator extends Operator
 		}
 		
 		
-		public Object invoke(ItemStreamAccessor input, int begin, Object x)
+		public Object invoke(Object input, int begin, int end, Object x)
 		{
 			try
 			{
@@ -59,9 +60,9 @@ public class UnaryOperator extends Operator
 			this.callable = callable;
 		}
 
-		public Object invoke(ItemStreamAccessor input, int begin, Object x)
+		public Object invoke(Object input, int begin, int end, Object x)
 		{
-			return callable.__call__( Py.java2py( input ), new PyInteger( begin ), Py.java2py( x ) );
+			return callable.__call__( new PyObject[] { Py.java2py( input ), new PyInteger( begin ), new PyInteger( end ), Py.java2py( x ) } );
 		}
 	}
 	
@@ -69,24 +70,37 @@ public class UnaryOperator extends Operator
 	protected static class UnaryOperatorResultBuilder
 	{
 		private UnaryOperatorParseAction action;
-		private int operatorPos;
+		private int operatorBegin, operatorEnd;
+		private Map<String, Object> opBindings;
 		
-		public UnaryOperatorResultBuilder(UnaryOperatorParseAction action, int operatorPos)
+		public UnaryOperatorResultBuilder(UnaryOperatorParseAction action, int operatorBegin, int operatorEnd, Map<String, Object> opBindings)
 		{
 			this.action = action;
-			this.operatorPos = operatorPos;
+			this.operatorBegin = operatorBegin;
+			this.operatorEnd = operatorEnd;
+			this.opBindings = opBindings;
 		}
 		
 		
-		public int getOperatorPos()
+		public int getOperatorBegin()
 		{
-			return operatorPos;
+			return operatorBegin;
+		}
+		
+		public int getOperatorEnd()
+		{
+			return operatorEnd;
+		}
+		
+		public Map<String, Object> getOperatorBindings()
+		{
+			return opBindings;
 		}
 		
 
-		public Object buildResult(ItemStreamAccessor input, int begin, Object x)
+		public Object buildResult(Object input, int begin, int end, Object x)
 		{
-			return action.invoke( input, begin, x );
+			return action.invoke( input, begin, end, x );
 		}
 	}
 	
@@ -102,9 +116,9 @@ public class UnaryOperator extends Operator
 		}
 		
 		
-		public Object invoke(ItemStreamAccessor input, int begin, Object x)
+		public Object invoke(Object input, int begin, int end, Object x, Map<String, Object> bindings)
 		{
-			return new UnaryOperatorResultBuilder( action, begin );
+			return new UnaryOperatorResultBuilder( action, begin, end, bindings );
 		}
 	}
 

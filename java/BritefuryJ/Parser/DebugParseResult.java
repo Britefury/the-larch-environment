@@ -6,7 +6,7 @@
 //##************************
 package BritefuryJ.Parser;
 
-import java.util.HashMap;
+import java.util.Map;
 
 import BritefuryJ.ParserHelpers.DebugNode;
 import BritefuryJ.ParserHelpers.DebugParseResultInterface;
@@ -16,7 +16,7 @@ public class DebugParseResult extends ParseResult implements DebugParseResultInt
 	public DebugNode debugNode;
 	
 	
-	protected DebugParseResult(Object value, int begin, int end, boolean bSuppressed, boolean bValid, boolean bMerge, HashMap<String, Object> bindings, DebugNode debugNode)
+	protected DebugParseResult(Object value, int begin, int end, boolean bSuppressed, boolean bValid, boolean bMerge, Map<String, Object> bindings, DebugNode debugNode)
 	{
 		super( value, begin, end, bSuppressed, bValid, bMerge, bindings );
 		this.debugNode = debugNode;

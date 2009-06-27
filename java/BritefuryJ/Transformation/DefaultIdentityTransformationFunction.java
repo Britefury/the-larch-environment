@@ -38,7 +38,7 @@ public class DefaultIdentityTransformationFunction extends TransformationFunctio
 	
 	private Object applyToChild(Object x, TransformationFunction innerNodeXform)
 	{
-		if ( x instanceof String  ||  x instanceof PyString  ||  x instanceof PyUnicode )
+		if ( x == null  ||  x instanceof String  ||  x instanceof PyString  ||  x instanceof PyUnicode )
 		{
 			return x;
 		}

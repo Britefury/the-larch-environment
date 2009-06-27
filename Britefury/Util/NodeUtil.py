@@ -21,12 +21,6 @@ def isListNode(xs):
 def isObjectNode(xs):
 	return isinstance( xs, DMObjectInterface )  or  isinstance( xs, DocTreeObject )
 
-def isNullNode(x):
-	return isStringNode( x )  and  DMNode.isNull( x )
-
-def makeNullNode():
-	return DMNode.newNull()
-
 
 
 def nodeToSXString(x, level=3):

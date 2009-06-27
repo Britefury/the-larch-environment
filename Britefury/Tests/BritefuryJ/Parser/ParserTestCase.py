@@ -34,7 +34,7 @@ class ParserTestCase (unittest.TestCase):
 	
 	
 	def _matchTest(self, parser, input, expected, ignoreChars=_whitespaceRegex):
-		result = parser.parseString( input, ignoreChars )
+		result = parser.parseStringChars( input, ignoreChars )
 		
 		if not result.isValid():
 			print 'PARSE FAILURE while parsing %s, stopped at %d: %s'  %  ( input, result.end, input[:result.end] )
@@ -67,7 +67,7 @@ class ParserTestCase (unittest.TestCase):
 
 
 	def _matchTestSX(self, parser, input, expectedSX, ignoreChars=_whitespaceRegex):
-		result = parser.parseString( input, ignoreChars )
+		result = parser.parseStringChars( input, ignoreChars )
 
 		expected = DMIOReader.readFromString( expectedSX, self.resolver )
 		
@@ -101,7 +101,7 @@ class ParserTestCase (unittest.TestCase):
 
 		
 	def _matchFailTest(self, parser, input, ignoreChars=_whitespaceRegex):
-		result = parser.parseString( input, ignoreChars )
+		result = parser.parseStringChars( input, ignoreChars )
 		
 		if result.isValid()   and   result.end == len( input ):
 			print 'While parsing', input

@@ -49,7 +49,6 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 		this.objClass = objClass;
 
 		Object fieldData[] = new Object[objClass.getNumFields()];
-		fillArrayWithNulls( fieldData );
 		
 		cell = new LiteralCell();
 		cell.setLiteralValue( fieldData );
@@ -60,7 +59,6 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 	{
 		this.objClass = objClass;
 		Object fieldData[] = new Object[objClass.getNumFields()];
-		fillArrayWithNulls( fieldData );
 		
 		int numToCopy = Math.min( values.length, fieldData.length );
 		for (int i = 0; i < numToCopy; i++)
@@ -77,7 +75,6 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 	{
 		this.objClass = objClass;
 		Object fieldData[] = new Object[objClass.getNumFields()];
-		fillArrayWithNulls( fieldData );
 		
 		int numToCopy = Math.min( values.length, fieldData.length );
 		for (int i = 0; i < numToCopy; i++)
@@ -96,7 +93,6 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 		
 		this.objClass = objClass;
 		Object fieldData[] = new Object[objClass.getNumFields()];
-		fillArrayWithNulls( fieldData );
 	
 		for (int i = 0; i < keys.length; i++)
 		{
@@ -122,7 +118,6 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 		
 		this.objClass = objClass;
 		Object fieldData[] = new Object[objClass.getNumFields()];
-		fillArrayWithNulls( fieldData );
 	
 		for (int i = 0; i < names.length; i++)
 		{
@@ -146,7 +141,6 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 	{
 		this.objClass = obj.getDMClass();
 		Object fieldData[] = new Object[objClass.getNumFields()];
-		fillArrayWithNulls( fieldData );
 		
 		for (int i = 0; i < fieldData.length; i++)
 		{
@@ -162,7 +156,6 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 	{
 		objClass = Py.tojava( values[0], DMObjectClass.class );
 		Object fieldData[] = new Object[objClass.getNumFields()];
-		fillArrayWithNulls( fieldData );
 		
 		int numToCopy = Math.min( values.length - 1, fieldData.length );
 		for (int i = 0; i < numToCopy; i++)
@@ -181,7 +174,6 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 		
 		objClass = Py.tojava( values[0], DMObjectClass.class );
 		Object fieldData[] = new Object[objClass.getNumFields()];
-		fillArrayWithNulls( fieldData );
 		
 		for (int i = 0; i < names.length; i++)
 		{
@@ -205,7 +197,6 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 	{
 		this.objClass = objClass;
 		Object fieldData[] = new Object[objClass.getNumFields()];
-		fillArrayWithNulls( fieldData );
 		
 		for (Map.Entry<String, Object> entry: data.entrySet())
 		{
@@ -230,7 +221,6 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 	{
 		this.objClass = objClass;
 		Object fieldData[] = new Object[objClass.getNumFields()];
-		fillArrayWithNulls( fieldData );
 		
 		for (Object e: data.entrySet())
 		{
@@ -501,9 +491,19 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 				{
 					Object v = get( i );
 					Object xv = dx.get( i );
-					if ( !v.equals( xv ) )
+					if ( v == null  ||  xv == null )
 					{
-						return false;
+						if ( ( v != null )  !=  ( xv != null ) )
+						{
+							return false;
+						}
+					}
+					else
+					{
+						if ( !v.equals( xv ) )
+						{
+							return false;
+						}
 					}
 				}
 				
@@ -512,16 +512,6 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 		}
 		
 		return false;
-	}
-	
-	
-	
-	private void fillArrayWithNulls(Object[] xs)
-	{
-		for (int i = 0; i < xs.length; i++)
-		{
-			xs[i] = newNull();
-		}
 	}
 	
 	
@@ -561,13 +551,10 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 			for (int i = 0; i < d.length; i++)
 			{
 				Object x = d[i];
-				if ( x != null  &&  !isNull( x ) )
-				{
-					builder.append( " " );
-					builder.append( objClass.getField( i ).getName() );
-					builder.append( "=" );
-					builder.append( x.toString() );
-				}
+				builder.append( " " );
+				builder.append( objClass.getField( i ).getName() );
+				builder.append( "=" );
+				builder.append( x != null  ?  x.toString()  :  "<null>" );
 			}
 			builder.append( ")" );
 			
@@ -600,7 +587,6 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 			
 			this.objClass = objClass;
 			Object fieldData[] = new Object[objClass.getNumFields()];
-			fillArrayWithNulls( fieldData );
 		
 			for (int i = 0; i < keys.length; i++)
 			{

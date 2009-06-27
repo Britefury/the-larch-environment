@@ -61,7 +61,7 @@ class GrammarTestCase (ParserTestCase):
 		
 		@Rule
 		def mul(self):
-			return ( self.mul() + '*' + self.atom() ).action( lambda input, begin, xs: [ 'mul', xs[0], xs[2] ] )  |  self.atom()
+			return ( self.mul() + '*' + self.atom() ).action( lambda input, begin, end, xs, bindings: [ 'mul', xs[0], xs[2] ] )  |  self.atom()
 		
 		@Rule
 		def expr(self):
@@ -72,7 +72,7 @@ class GrammarTestCase (ParserTestCase):
 	class TestGrammarRecursiveOverload (TestGrammarRecursive):
 		@Rule
 		def add(self):
-			return ( self.add() + '+' + self.mul() ).action( lambda input, begin, xs: [ 'add', xs[0], xs[2] ] )  |  self.mul()
+			return ( self.add() + '+' + self.mul() ).action( lambda input, begin, end, xs, bindings: [ 'add', xs[0], xs[2] ] )  |  self.mul()
 		
 		@Rule
 		def expr(self):
@@ -83,7 +83,7 @@ class GrammarTestCase (ParserTestCase):
 	class TestGrammarIndirectRecursiveOverload (TestGrammarRecursiveOverload):
 		@Rule
 		def paren(self):
-			return ( Literal( '(' ) + self.expr() + Literal( ')' ) ).action( lambda input, begin, xs: xs[1] )
+			return ( Literal( '(' ) + self.expr() + Literal( ')' ) ).action( lambda input, begin, end, xs, bindings: xs[1] )
 		
 		@Rule
 		def atom(self):
@@ -98,7 +98,7 @@ class GrammarTestCase (ParserTestCase):
 		
 		@Rule
 		def paren(self):
-			return ( Literal( '(' ) + self.expr() + Literal( ')' ) ).action( lambda input, begin, xs: xs[1] )
+			return ( Literal( '(' ) + self.expr() + Literal( ')' ) ).action( lambda input, begin, end, xs, bindings: xs[1] )
 		
 		@Rule
 		def atom(self):
@@ -108,8 +108,8 @@ class GrammarTestCase (ParserTestCase):
 		def ops(self):
 			opTable = OperatorTable( 
 				[
-					InfixLeftLevel( [ BinaryOperator( Literal( '*' ),  lambda input, pos, left, right: [ 'mul', left, right ] ) ] ),
-					InfixLeftLevel( [ BinaryOperator( Literal( '+' ),  lambda input, pos, left, right: [ 'add', left, right ] ) ] ),
+					InfixLeftLevel( [ BinaryOperator( Literal( '*' ),  lambda input, pos, end, left, right: [ 'mul', left, right ] ) ] ),
+					InfixLeftLevel( [ BinaryOperator( Literal( '+' ),  lambda input, pos, end, left, right: [ 'add', left, right ] ) ] ),
 				],  self.atom() )
 			
 			return opTable.buildParsers()

@@ -64,7 +64,12 @@ public abstract class TerminalString extends ParserExpression
 	{
 		start = state.skipJunkChars( input, start );
 		
-		return consumeString( input, start );
+		if ( start < input.length() )
+		{
+			return consumeString( input, start );
+		}
+
+		return ParseResult.failure( start );
 	}
 	
 	protected ParseResult evaluateStreamItems(ParserState state, ItemStreamAccessor input, int start)

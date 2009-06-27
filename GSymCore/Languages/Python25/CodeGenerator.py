@@ -8,8 +8,6 @@
 from Britefury.gSym.gSymCodeGenerator import GSymCodeGeneratorObjectNodeDispatch
 from Britefury.Dispatch.ObjectNodeMethodDispatch import ObjectNodeDispatchMethod
 
-from Britefury.Util.NodeUtil import isNullNode
-
 import GSymCore.Languages.Python25.NodeClasses as Nodes
 
 
@@ -183,12 +181,12 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 	# Subscript
 	@ObjectNodeDispatchMethod
 	def SubscriptSlice(self, node, lower, upper):
-		txt = lambda x:  self( x )   if not isNullNode( x )   else ''
+		txt = lambda x:  self( x )   if x is not None   else ''
 		return txt( lower ) + ':' + txt( upper )
 
 	@ObjectNodeDispatchMethod
 	def SubscriptLongSlice(self, node, lower, upper, stride):
-		txt = lambda x:  self( x )   if not isNullNode( x )   else ''
+		txt = lambda x:  self( x )   if x is not None   else ''
 		return txt( lower ) + ':' + txt( upper ) + ':' + txt( stride )
 	
 	@ObjectNodeDispatchMethod
@@ -426,7 +424,7 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 	# Raise statement
 	@ObjectNodeDispatchMethod
 	def RaiseStmt(self, node, excType, excValue, traceback):
-		params = ', '.join( [ self( x )   for x in excType, excValue, traceback   if not isNullNode( x ) ] )
+		params = ', '.join( [ self( x )   for x in excType, excValue, traceback   if x is not None ] )
 		if params != '':
 			return 'raise ' + params
 		else:
@@ -579,7 +577,7 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 	@ObjectNodeDispatchMethod
 	def DecoStmt(self, node, name, args):
 		text = '@' + name
-		if not isNullNode( args ):
+		if args is not None:
 			text += '( ' + ', '.join( [ self( a )   for a in args ] ) + ' )'
 		return text
 	
@@ -589,7 +587,7 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 	def ClassStmt(self, node, name, bases, suite):
 		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
 		text = 'class '  +  name
-		if not isNullNode( bases ):
+		if bases is not None:
 			text += ' ('  +  ', '.join( [ self( h )   for h in bases ] )  +  ')'
 		return text  +  ':\n'  +  _indent( suiteText )
 	

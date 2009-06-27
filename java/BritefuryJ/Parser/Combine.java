@@ -7,8 +7,8 @@
 package BritefuryJ.Parser;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
 
@@ -35,7 +35,7 @@ public class Combine extends BranchExpression
 	protected ParseResult evaluateStringChars(ParserState state, String input, int start)
 	{
 		ArrayList<Object> values = new ArrayList<Object>();
-		HashMap<String, Object> bindings = null;
+		Map<String, Object> bindings = null;
 		boolean bFinalValueIsString = true;
 		
 		int pos = start;
@@ -101,7 +101,7 @@ public class Combine extends BranchExpression
 	protected ParseResult evaluateStreamItems(ParserState state, ItemStreamAccessor input, int start)
 	{
 		ArrayList<Object> values = new ArrayList<Object>();
-		HashMap<String, Object> bindings = null;
+		Map<String, Object> bindings = null;
 		boolean bFinalValueIsString = true;
 		
 		int pos = start;
@@ -167,7 +167,7 @@ public class Combine extends BranchExpression
 	protected ParseResult evaluateListItems(ParserState state, List<Object> input, int start)
 	{
 		ArrayList<Object> values = new ArrayList<Object>();
-		HashMap<String, Object> bindings = null;
+		Map<String, Object> bindings = null;
 		boolean bFinalValueIsString = true;
 		
 		int pos = start;

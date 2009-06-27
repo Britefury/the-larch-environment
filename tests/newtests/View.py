@@ -33,7 +33,7 @@ def keywordText(ctx, keyword):
 
 
 def _parseText(parser, text):
-	res, pos = parser.parseString( text )
+	res, pos = parser.parseStringChars( text )
 	if res is not None:
 		if pos == len( text ):
 			return res.result

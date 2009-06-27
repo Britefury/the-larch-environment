@@ -7,9 +7,9 @@
 package BritefuryJ.Parser.Utils.OperatorParser;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 
-import BritefuryJ.ParserOld.ParserExpression;
+import BritefuryJ.Parser.ParserExpression;
 
 public abstract class BinaryOperatorLevel extends OperatorLevel
 {
@@ -22,10 +22,10 @@ public abstract class BinaryOperatorLevel extends OperatorLevel
 	//
 	//
 	
-	public BinaryOperatorLevel(List<BinaryOperator> ops)
+	public BinaryOperatorLevel(BinaryOperator ops[])
 	{
 		operators = new ArrayList<BinaryOperator>();
-		operators.addAll( ops );
+		operators.addAll( Arrays.asList( ops ) );
 	}
 
 

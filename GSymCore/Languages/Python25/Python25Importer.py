@@ -9,7 +9,6 @@ import _ast
 
 
 import GSymCore.Languages.Python25.NodeClasses as Nodes
-from Britefury.Util.NodeUtil import makeNullNode
 
 
 
@@ -149,7 +148,7 @@ class _ImportFromImporter (_Importer):
 	
 class _DecoratorImporter (_Importer):
 	def Name(self, node):
-		return Nodes.DecoStmt( name=node.id, args=makeNullNode() )
+		return Nodes.DecoStmt( name=node.id, args=None )
 
 	def Call(self, node):
 		_starArg = lambda name, x:   [ [ name, _expr( x ) ] ]   if x is not None   else   []
@@ -180,7 +179,7 @@ def _getOpNodeName(op):
 class _ExprImporter (_Importer):
 	def __call__(self, node, method=None):
 		if node is None:
-			return makeNullNode()
+			return None
 		else:
 			if method is None:
 				name = _getNodeTypeName( node )
@@ -292,7 +291,7 @@ class _ExprImporter (_Importer):
 	def Slice(self, node):
 		def _s(x):
 			s = _expr( x )
-			return s   if s is not None   else   makeNullNode()
+			return s   if s is not None   else   None
 		if node.step is None:
 			return Nodes.SubscriptSlice( lower=_s( node.lower ), upper=_s( node.upper ) )
 		else:
@@ -373,7 +372,7 @@ _augAssignOpTable = { 'Add' : '+=',  'Sub' : '-=',  'Mult' : '*=',  'Div' : '/='
 class _StmtImporter (_Importer):
 	# Assert statement
 	def Assert(self, node):
-		return Nodes.AssertStmt( condition=_expr( node.test ), fail=_expr( node.msg )   if node.msg is not None   else   makeNullNode() )
+		return Nodes.AssertStmt( condition=_expr( node.test ), fail=_expr( node.msg )   if node.msg is not None   else   None )
 	
 	
 	# Assignment statement
@@ -470,7 +469,7 @@ class _ExceptHandlerImporter (_Importer):
 		return method( structTab, node )
 	# Import statement
 	def ExceptHandler(self, structTab, node):
-		return Nodes.ExceptStmt( exception=_expr( node.type )   if node.type is not None   else makeNullNode(), target=_target( node.name )   if node.name is not None   else makeNullNode(), suite=_flattenedCompound( structTab, node.body ) )
+		return Nodes.ExceptStmt( exception=_expr( node.type )   if node.type is not None   else None, target=_target( node.name )   if node.name is not None   else None, suite=_flattenedCompound( structTab, node.body ) )
 		
 	def ExceptHandlerType(self, structTab, node):
 		return self.ExceptHandler( structTab, node )
@@ -551,7 +550,7 @@ class _CompoundStmtImporter (_Importer):
 	
 	# With
 	def With(self, structTab, node):
-		return [ Nodes.WithStmt( expr=_expr( node.expr ), target=_target( node.vars )   if node.vars is not None   else   makeNullNode(), suite=_flattenedCompound( structTab, node.body ) ) ]
+		return [ Nodes.WithStmt( expr=_expr( node.expr ), target=_target( node.vars )   if node.vars is not None   else   None, suite=_flattenedCompound( structTab, node.body ) ) ]
 	
 	
 	# Function
@@ -566,7 +565,7 @@ class _CompoundStmtImporter (_Importer):
 	# Class
 	def ClassDef(self, structTab, node):
 		if len( node.bases ) == 0:
-			bases = makeNullNode()
+			bases = None
 		elif len( node.bases ) == 1:
 			bases = [ _expr( node.bases[0] ) ]
 		else:
@@ -961,12 +960,12 @@ class ImporterTestCase (unittest.TestCase):
 		
 	def testSlice(self):	
 		self._exprTest( 'a[b:c]',  Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.SubscriptSlice( lower=Nodes.Load( name='b' ), upper=Nodes.Load( name='c' ) ) ) )
-		self._exprTest( 'a[b:]',  Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.SubscriptSlice( lower=Nodes.Load( name='b' ), upper=makeNullNode() ) ) )
-		self._exprTest( 'a[:c]',  Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.SubscriptSlice( lower=makeNullNode(), upper=Nodes.Load( name='c' ) ) ) )
+		self._exprTest( 'a[b:]',  Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.SubscriptSlice( lower=Nodes.Load( name='b' ), upper=None ) ) )
+		self._exprTest( 'a[:c]',  Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.SubscriptSlice( lower=None, upper=Nodes.Load( name='c' ) ) ) )
 		self._exprTest( 'a[b:c:d]',  Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.SubscriptLongSlice( lower=Nodes.Load( name='b' ), upper=Nodes.Load( name='c' ), stride=Nodes.Load( name='d' ) ) ) )
 		self._exprTest( 'a[b:c:]',  Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.SubscriptLongSlice( lower=Nodes.Load( name='b' ), upper=Nodes.Load( name='c' ), stride=Nodes.Load( name='None' ) ) ) )
-		self._exprTest( 'a[b::d]',  Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.SubscriptLongSlice( lower=Nodes.Load( name='b' ), upper=makeNullNode(), stride=Nodes.Load( name='d' ) ) ) )
-		self._exprTest( 'a[:c:d]',  Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.SubscriptLongSlice( lower=makeNullNode(), upper=Nodes.Load( name='c' ), stride=Nodes.Load( name='d' ) ) ) )
+		self._exprTest( 'a[b::d]',  Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.SubscriptLongSlice( lower=Nodes.Load( name='b' ), upper=None, stride=Nodes.Load( name='d' ) ) ) )
+		self._exprTest( 'a[:c:d]',  Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.SubscriptLongSlice( lower=None, upper=Nodes.Load( name='c' ), stride=Nodes.Load( name='d' ) ) ) )
 		self._exprTest( 'a[b:c,d:e]',  Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.TupleLiteral( values=[ Nodes.SubscriptSlice( lower=Nodes.Load( name='b' ), upper=Nodes.Load( name='c' ) ), Nodes.SubscriptSlice( lower=Nodes.Load( name='d' ), upper=Nodes.Load( name='e' ) ) ] ) ) )
 		self._exprTest( 'a[b:c,d:e:f]',  Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.TupleLiteral( values=[ Nodes.SubscriptSlice( lower=Nodes.Load( name='b' ), upper=Nodes.Load( name='c' ) ), Nodes.SubscriptLongSlice( lower=Nodes.Load( name='d' ), upper=Nodes.Load( name='e' ), stride=Nodes.Load( name='f' ) ) ] ) ) )
 		
@@ -1050,7 +1049,7 @@ class ImporterTestCase (unittest.TestCase):
 
 	
 	def testAssert(self):
-		self._stmtTest( 'assert a', Nodes.AssertStmt( condition=Nodes.Load( name='a' ), fail=makeNullNode() ) )
+		self._stmtTest( 'assert a', Nodes.AssertStmt( condition=Nodes.Load( name='a' ), fail=None ) )
 		self._stmtTest( 'assert a,b', Nodes.AssertStmt( condition=Nodes.Load( name='a' ), fail=Nodes.Load( name='b' ) ) )
 		
 
@@ -1092,9 +1091,9 @@ class ImporterTestCase (unittest.TestCase):
 		
 		
 	def testRaiseStmt(self):
-		self._stmtTest( 'raise', Nodes.RaiseStmt( excType=makeNullNode(), excValue=makeNullNode(), traceback=makeNullNode() ) )
-		self._stmtTest( 'raise x', Nodes.RaiseStmt( excType=Nodes.Load( name='x' ), excValue=makeNullNode(), traceback=makeNullNode() ) )
-		self._stmtTest( 'raise x,y', Nodes.RaiseStmt( excType=Nodes.Load( name='x' ), excValue=Nodes.Load( name='y' ), traceback=makeNullNode() ) )
+		self._stmtTest( 'raise', Nodes.RaiseStmt( excType=None, excValue=None, traceback=None ) )
+		self._stmtTest( 'raise x', Nodes.RaiseStmt( excType=Nodes.Load( name='x' ), excValue=None, traceback=None ) )
+		self._stmtTest( 'raise x,y', Nodes.RaiseStmt( excType=Nodes.Load( name='x' ), excValue=Nodes.Load( name='y' ), traceback=None ) )
 		self._stmtTest( 'raise x,y,z', Nodes.RaiseStmt( excType=Nodes.Load( name='x' ), excValue=Nodes.Load( name='y' ), traceback=Nodes.Load( name='z' ) ) )
 		
 		
@@ -1129,8 +1128,8 @@ class ImporterTestCase (unittest.TestCase):
 	
 		
 	def testExecStmt(self):
-		self._stmtTest( 'exec a', Nodes.ExecStmt( source=Nodes.Load( name='a' ), locals=makeNullNode(), globals=makeNullNode() ) )
-		self._stmtTest( 'exec a in b', Nodes.ExecStmt( source=Nodes.Load( name='a' ), locals=makeNullNode(), globals=Nodes.Load( name='b' ) ) )
+		self._stmtTest( 'exec a', Nodes.ExecStmt( source=Nodes.Load( name='a' ), locals=None, globals=None ) )
+		self._stmtTest( 'exec a in b', Nodes.ExecStmt( source=Nodes.Load( name='a' ), locals=None, globals=Nodes.Load( name='b' ) ) )
 		self._stmtTest( 'exec a in b,c', Nodes.ExecStmt( source=Nodes.Load( name='a' ), locals=Nodes.Load( name='c' ), globals=Nodes.Load( name='b' ) ) )
 		
 		
@@ -1231,9 +1230,9 @@ except:
 	p
 finally:
 	z"""
-		self._compStmtTest( src1, [ Nodes.BlankLine(), Nodes.TryStmt( suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='x' ) ) ] ),  Nodes.ExceptStmt( exception=makeNullNode(), target=makeNullNode(), suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='p' ) ) ] ),   Nodes.ExceptStmt( exception=Nodes.Load( name='a' ), target=makeNullNode(), suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='q' ) ) ] ),    Nodes.ExceptStmt( exception=Nodes.Load( name='a' ), target=Nodes.SingleTarget( name='b' ), suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='r' ) ) ] ) ] )
-		self._compStmtTest( src2, [ Nodes.BlankLine(), Nodes.TryStmt( suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='x' ) ) ] ),  Nodes.ExceptStmt( exception=makeNullNode(), target=makeNullNode(), suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='p' ) ) ] ),   Nodes.ElseStmt( suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='z' ) ) ] ) ] )
-		self._compStmtTest( src3, [ Nodes.BlankLine(), Nodes.TryStmt( suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='x' ) ) ] ),  Nodes.ExceptStmt( exception=makeNullNode(), target=makeNullNode(), suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='p' ) ) ] ),   Nodes.FinallyStmt( suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='z' ) ) ] ) ] )
+		self._compStmtTest( src1, [ Nodes.BlankLine(), Nodes.TryStmt( suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='x' ) ) ] ),  Nodes.ExceptStmt( exception=None, target=None, suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='p' ) ) ] ),   Nodes.ExceptStmt( exception=Nodes.Load( name='a' ), target=None, suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='q' ) ) ] ),    Nodes.ExceptStmt( exception=Nodes.Load( name='a' ), target=Nodes.SingleTarget( name='b' ), suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='r' ) ) ] ) ] )
+		self._compStmtTest( src2, [ Nodes.BlankLine(), Nodes.TryStmt( suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='x' ) ) ] ),  Nodes.ExceptStmt( exception=None, target=None, suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='p' ) ) ] ),   Nodes.ElseStmt( suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='z' ) ) ] ) ] )
+		self._compStmtTest( src3, [ Nodes.BlankLine(), Nodes.TryStmt( suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='x' ) ) ] ),  Nodes.ExceptStmt( exception=None, target=None, suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='p' ) ) ] ),   Nodes.FinallyStmt( suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='z' ) ) ] ) ] )
 
 		
 		
@@ -1248,7 +1247,7 @@ finally:
 #with a as b:
 	#x
 #"""
-		#self._compStmtTest( src1, [ [ 'withStmt', [ 'var', 'a' ], makeNullNode(), [ [ 'var', 'x' ] ] ] ] )
+		#self._compStmtTest( src1, [ [ 'withStmt', [ 'var', 'a' ], None, [ [ 'var', 'x' ] ] ] ] )
 		#self._compStmtTest( src2, [ [ 'withStmt', [ 'var', 'a' ], [ 'singleTarget', 'b' ], [ [ 'var', 'x' ] ] ] ] )
 
 	
@@ -1281,7 +1280,7 @@ def f():
 	x"""
 		self._compStmtTest( src1, [ Nodes.BlankLine(), Nodes.DefStmt( name='f', params=[], suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='x' ) ) ] ) ] )
 		self._compStmtTest( src2, [ Nodes.BlankLine(), Nodes.DefStmt( name='f', params=[ Nodes.SimpleParam( name='a' ), Nodes.DefaultValueParam( name='b', defaultValue=Nodes.Load( name='q' ) ), Nodes.ParamList( name='c' ), Nodes.KWParamList( name='d' ) ], suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='x' ) ) ] ) ] )
-		self._compStmtTest( src3, [ Nodes.BlankLine(), Nodes.DecoStmt( name='p', args=makeNullNode() ), Nodes.DefStmt( name='f', params=[], suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='x' ) ) ] ) ] )
+		self._compStmtTest( src3, [ Nodes.BlankLine(), Nodes.DecoStmt( name='p', args=None ), Nodes.DefStmt( name='f', params=[], suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='x' ) ) ] ) ] )
 		self._compStmtTest( src4, [ Nodes.BlankLine(), Nodes.DecoStmt( name='p', args=[ Nodes.Load( name='h' ) ] ), Nodes.DefStmt( name='f', params=[], suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='x' ) ) ] ) ] )
 		self._compStmtTest( src5, [ Nodes.BlankLine(), Nodes.DecoStmt( name='p', args=[ Nodes.Load( name='h' ) ] ), Nodes.DecoStmt( name='q', args=[ Nodes.Load( name='j' ) ] ), Nodes.DefStmt( name='f', params=[], suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='x' ) ) ] ) ] )
 
@@ -1302,7 +1301,7 @@ class Q (object):
 class Q (a,b):
 	x
 """
-		self._compStmtTest( src1, [ Nodes.BlankLine(), Nodes.ClassStmt( name='Q', bases=makeNullNode(), suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='x' ) ) ] ) ] )
+		self._compStmtTest( src1, [ Nodes.BlankLine(), Nodes.ClassStmt( name='Q', bases=None, suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='x' ) ) ] ) ] )
 		self._compStmtTest( src2, [ Nodes.BlankLine(), Nodes.ClassStmt( name='Q', bases=[ Nodes.Load( name='object' ) ], suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='x' ) ) ] ) ] )
 		self._compStmtTest( src3, [ Nodes.BlankLine(), Nodes.ClassStmt( name='Q', bases=[ Nodes.Load( name='a' ), Nodes.Load( name='b' ) ], suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='x' ) ) ] ) ] )
 

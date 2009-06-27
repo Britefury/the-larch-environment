@@ -8,7 +8,6 @@ package BritefuryJ.Parser;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -185,7 +184,7 @@ public class ObjectNode extends ParserExpression
 		if ( input.isInstanceOf( objClass ) )
 		{
 			DMObject value = input.getDMClass().newInstance();
-			HashMap<String, Object> bindings = null;
+			Map<String, Object> bindings = null;
 			
 			for (int i = 0; i < fieldExpTable.length; i++)
 			{

@@ -8,13 +8,13 @@ package BritefuryJ.Parser.Utils.OperatorParser;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
+import BritefuryJ.Parser.Choice;
+import BritefuryJ.Parser.ParseAction;
+import BritefuryJ.Parser.ParserExpression;
+import BritefuryJ.Parser.Production;
 import BritefuryJ.Parser.Utils.OperatorParser.UnaryOperator.UnaryOperatorResultBuilder;
-import BritefuryJ.ParserOld.Choice;
-import BritefuryJ.ParserOld.ParseAction;
-import BritefuryJ.ParserOld.ParserExpression;
-import BritefuryJ.ParserOld.Production;
 
 public class SuffixLevel extends UnaryOperatorLevel
 {
@@ -26,19 +26,19 @@ public class SuffixLevel extends UnaryOperatorLevel
 		
 		
 		@SuppressWarnings("unchecked")
-		public Object invoke(ItemStreamAccessor input, int begin, Object x)
+		public Object invoke(Object input, int begin, int end, Object x, Map<String, Object> bindings)
 		{
 			List<Object> xs = (List<Object>)x;
 			
-			Object result = xs.get( 0 );
+			Object expression = xs.get( 0 );
 			List<UnaryOperatorResultBuilder> builders = (List<UnaryOperatorResultBuilder>)xs.get( 1 );
 			
 			for (UnaryOperatorResultBuilder b: builders)
 			{
-				result = b.buildResult( input, begin, result );
+				expression = b.buildResult( input, begin, b.getOperatorEnd(), expression );
 			}
 			
-			return result;
+			return expression;
 		}
 	}
 	
@@ -71,7 +71,7 @@ public class SuffixLevel extends UnaryOperatorLevel
 		}
 		ParserExpression ops = new Choice( choices );
 		
-		return previousLevelParser.__add__( ops.oneOrMore() ).action( levelAction );
+		return previousLevelParser.__add__( ops.oneOrMore().clearBindings() ).action( levelAction );
 	}
 
 
@@ -85,6 +85,6 @@ public class SuffixLevel extends UnaryOperatorLevel
 		}
 		ParserExpression ops = new Choice( choices );
 		
-		return previousLevelParser.__add__( ops.oneOrMore() ).action( levelAction );
+		return previousLevelParser.__add__( ops.oneOrMore().clearBindings() ).action( levelAction );
 	}
 }
