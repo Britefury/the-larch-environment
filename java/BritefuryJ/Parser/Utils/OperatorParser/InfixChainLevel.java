@@ -15,12 +15,12 @@ import org.python.core.PyObject;
 
 import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
-import BritefuryJ.Parser.Choice;
-import BritefuryJ.Parser.ParseAction;
-import BritefuryJ.Parser.ParserExpression;
-import BritefuryJ.Parser.Production;
-import BritefuryJ.Parser.Sequence;
 import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
+import BritefuryJ.ParserOld.Choice;
+import BritefuryJ.ParserOld.ParseAction;
+import BritefuryJ.ParserOld.ParserExpression;
+import BritefuryJ.ParserOld.Production;
+import BritefuryJ.ParserOld.Sequence;
 
 public class InfixChainLevel extends OperatorLevel
 {

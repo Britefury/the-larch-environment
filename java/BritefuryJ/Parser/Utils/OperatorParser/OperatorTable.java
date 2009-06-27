@@ -10,13 +10,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import BritefuryJ.Parser.DebugParseResult;
-import BritefuryJ.Parser.Literal;
-import BritefuryJ.Parser.ParserExpression;
-import BritefuryJ.Parser.Production;
 import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
 import BritefuryJ.Parser.Utils.Tokens;
 import BritefuryJ.ParserDebugViewer.ParseViewFrame;
+import BritefuryJ.ParserOld.DebugParseResult;
+import BritefuryJ.ParserOld.Literal;
+import BritefuryJ.ParserOld.ParserExpression;
+import BritefuryJ.ParserOld.Production;
 
 public class OperatorTable
 {
@@ -84,7 +84,7 @@ public class OperatorTable
 	
 	
 	
-	public static void main(String[] args) throws BritefuryJ.Parser.Production.CannotOverwriteProductionExpressionException
+	public static void main(String[] args) throws BritefuryJ.ParserOld.Production.CannotOverwriteProductionExpressionException
 	{
 		BinaryOperatorParseAction mulAction = new BinaryOperatorParseAction()
 		{

@@ -12,8 +12,8 @@ import org.python.core.PyObject;
 
 import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
-import BritefuryJ.Parser.ParserExpression;
 import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
+import BritefuryJ.ParserOld.ParserExpression;
 
 public class BinaryOperator extends Operator
 {

@@ -9,12 +9,12 @@ package BritefuryJ.Parser.Utils.OperatorParser;
 import java.util.ArrayList;
 import java.util.List;
 
-import BritefuryJ.Parser.Choice;
-import BritefuryJ.Parser.ParseAction;
-import BritefuryJ.Parser.ParserExpression;
-import BritefuryJ.Parser.Production;
 import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
 import BritefuryJ.Parser.Utils.OperatorParser.UnaryOperator.UnaryOperatorResultBuilder;
+import BritefuryJ.ParserOld.Choice;
+import BritefuryJ.ParserOld.ParseAction;
+import BritefuryJ.ParserOld.ParserExpression;
+import BritefuryJ.ParserOld.Production;
 
 public class SuffixLevel extends UnaryOperatorLevel
 {

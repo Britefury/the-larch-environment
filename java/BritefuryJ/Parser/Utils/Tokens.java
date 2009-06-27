@@ -6,11 +6,11 @@
 //##************************
 package BritefuryJ.Parser.Utils;
 
-import BritefuryJ.Parser.ParseResult;
-import BritefuryJ.Parser.ParserExpression;
-import BritefuryJ.Parser.ParserState;
-import BritefuryJ.Parser.RegEx;
 import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
+import BritefuryJ.ParserOld.ParseResult;
+import BritefuryJ.ParserOld.ParserExpression;
+import BritefuryJ.ParserOld.ParserState;
+import BritefuryJ.ParserOld.RegEx;
 
 public class Tokens
 {

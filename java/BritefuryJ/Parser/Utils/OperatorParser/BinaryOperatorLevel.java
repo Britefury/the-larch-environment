@@ -9,7 +9,7 @@ package BritefuryJ.Parser.Utils.OperatorParser;
 import java.util.ArrayList;
 import java.util.List;
 
-import BritefuryJ.Parser.ParserExpression;
+import BritefuryJ.ParserOld.ParserExpression;
 
 public abstract class BinaryOperatorLevel extends OperatorLevel
 {

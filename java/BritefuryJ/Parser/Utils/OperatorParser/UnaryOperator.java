@@ -12,9 +12,9 @@ import org.python.core.PyObject;
 
 import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
-import BritefuryJ.Parser.ParseAction;
-import BritefuryJ.Parser.ParserExpression;
 import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
+import BritefuryJ.ParserOld.ParseAction;
+import BritefuryJ.ParserOld.ParserExpression;
 
 public class UnaryOperator extends Operator
 {
