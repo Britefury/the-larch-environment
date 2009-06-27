@@ -155,6 +155,21 @@ public class DMIOReader
 	}
 	
 	
+	private static MatchResult matchNull(String source, int position)
+	{
+		String nullString = "`null`";
+		
+		if ( source.substring( position, position + nullString.length() ).equals( nullString ) )
+		{
+			return new MatchResult( nullString, position + nullString.length() );
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	
 	private void eatWhitespace()
 	{
 		// Whitespace
@@ -443,6 +458,15 @@ public class DMIOReader
 					pos = res.position;
 					String s = res.value;
 					closeItem( s );
+					continue;
+				}
+				
+				// Null
+				res = matchNull( source, pos );
+				if ( res != null )
+				{
+					pos = res.position;
+					closeItem( null );
 					continue;
 				}
 				
