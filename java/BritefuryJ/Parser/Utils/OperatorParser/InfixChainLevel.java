@@ -8,6 +8,7 @@ package BritefuryJ.Parser.Utils.OperatorParser;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.python.core.Py;
 import org.python.core.PyInteger;
@@ -15,12 +16,11 @@ import org.python.core.PyObject;
 
 import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
-import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
-import BritefuryJ.ParserOld.Choice;
-import BritefuryJ.ParserOld.ParseAction;
-import BritefuryJ.ParserOld.ParserExpression;
-import BritefuryJ.ParserOld.Production;
-import BritefuryJ.ParserOld.Sequence;
+import BritefuryJ.Parser.Choice;
+import BritefuryJ.Parser.ParseAction;
+import BritefuryJ.Parser.ParserExpression;
+import BritefuryJ.Parser.Production;
+import BritefuryJ.Parser.Sequence;
 
 public class InfixChainLevel extends OperatorLevel
 {
@@ -48,7 +48,7 @@ public class InfixChainLevel extends OperatorLevel
 		}
 		
 		
-		public Object invoke(ItemStreamAccessor input, int begin, Object x, List<Object> ys)
+		public Object invoke(Object input, int begin, int end, Object x, List<Object> ys)
 		{
 			try
 			{
@@ -72,9 +72,9 @@ public class InfixChainLevel extends OperatorLevel
 			this.callable = callable;
 		}
 
-		public Object invoke(ItemStreamAccessor input, int begin, Object x, List<Object> ys)
+		public Object invoke(Object input, int begin, int end, Object x, List<Object> ys)
 		{
-			return callable.__call__( Py.java2py( input ), new PyInteger( begin ), Py.java2py( x ), Py.java2py( ys ) );
+			return callable.__call__( new PyObject[] { Py.java2py( input ), new PyInteger( begin ), new PyInteger( end ), Py.java2py( x ), Py.java2py( ys ) } );
 		}
 	}
 
@@ -94,12 +94,12 @@ public class InfixChainLevel extends OperatorLevel
 		
 		
 		@SuppressWarnings("unchecked")
-		public Object invoke(ItemStreamAccessor input, int begin, Object x)
+		public Object invoke(Object input, int begin, int end, Object x, Map<String, Object> bindings)
 		{
 			List<Object> xs = (List<Object>)x;
 			List<Object> ys = (List<Object>)xs.get( 1 );
 
-			return action.invoke( input, begin, xs.get( 0 ), ys );
+			return action.invoke( input, begin, end, xs.get( 0 ), ys );
 		}
 	}
 
@@ -126,7 +126,7 @@ public class InfixChainLevel extends OperatorLevel
 		}
 		
 		
-		public Object invoke(ItemStreamAccessor input, int begin, Object x)
+		public Object invoke(Object input, int begin, int end, Object x)
 		{
 			try
 			{
@@ -150,9 +150,9 @@ public class InfixChainLevel extends OperatorLevel
 			this.callable = callable;
 		}
 
-		public Object invoke(ItemStreamAccessor input, int begin, Object x)
+		public Object invoke(Object input, int begin, int end, Object x)
 		{
-			return callable.__call__( Py.java2py( input ), new PyInteger( begin ), Py.java2py( x ) );
+			return callable.__call__( new PyObject[] { Py.java2py( input ), new PyInteger( begin ), new PyInteger( end ), Py.java2py( x ) } );
 		}
 	}
 
@@ -171,11 +171,11 @@ public class InfixChainLevel extends OperatorLevel
 		
 		
 		@SuppressWarnings("unchecked")
-		public Object invoke(ItemStreamAccessor input, int begin, Object x)
+		public Object invoke(Object input, int begin, int end, Object x, Map<String, Object> bindings)
 		{
 			List<Object> xs = (List<Object>)x;
 
-			return action.invoke( input, begin, xs.get( 1 ) );
+			return action.invoke( input, begin, end, xs.get( 1 ) );
 		}
 	}
 

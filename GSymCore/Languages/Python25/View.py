@@ -247,7 +247,7 @@ def spanPrefixOpView(ctx, state, node, x, op, precedence, expressionParser):
 
 def tupleView(ctx, state, node, xs, trailingSeparator, parser):
 	xViews = ctx.mapViewEvalFn( xs, None, python25ViewState( PRECEDENCE_CONTAINER_ELEMENT, parser ) )
-	layout = tuple_listViewLayout   if isNullNode( trailingSeparator )   else tuple_listViewLayoutSep
+	layout = tuple_listViewLayout   if trailingSeparator is None   else tuple_listViewLayoutSep
 	return expressionNodeEditor( ctx, node,
 			   ctx.listView( layout, None, None, _CommaFactory( ctx ), xViews ),
 			   PRECEDENCE_TUPLE,
@@ -398,7 +398,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	@ObjectNodeDispatchMethod
 	def ListTarget(self, ctx, state, node, targets, trailingSeparator):
 		targetViews = ctx.mapViewEvalFn( targets, None, python25ViewState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.targetItem() ) )
-		layout = list_listViewLayout   if isNullNode( trailingSeparator )   else list_listViewLayoutSep		
+		layout = list_listViewLayout   if trailingSeparator is None   else list_listViewLayoutSep		
 		return expressionNodeEditor( ctx, node,
 				   ctx.listView( layout, _OpenBracketFactory( ctx ), _CloseBracketFactory( ctx ), _CommaFactory( ctx ), targetViews ),
 				   PRECEDENCE_TARGET,
@@ -428,7 +428,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	@ObjectNodeDispatchMethod
 	def ListLiteral(self, ctx, state, node, values, trailingSeparator):
 		valueViews = ctx.mapViewEvalFn( values, None, python25ViewState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.expression() ) )
-		layout = list_listViewLayout   if isNullNode( trailingSeparator )   else list_listViewLayoutSep		
+		layout = list_listViewLayout   if trailingSeparator is None   else list_listViewLayoutSep		
 		return expressionNodeEditor( ctx, node,
 				   ctx.listView( layout, _OpenBracketFactory( ctx ), _CloseBracketFactory( ctx ), _CommaFactory( ctx ), valueViews ),
 				   PRECEDENCE_LISTDISPLAY,
@@ -501,7 +501,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	@ObjectNodeDispatchMethod
 	def DictLiteral(self, ctx, state, node, values, trailingSeparator):
 		valueViews = ctx.mapViewEvalFn( values, None, python25ViewState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.keyValuePair() ) )
-		layout = dict_listViewLayout   if isNullNode( trailingSeparator )   else dict_listViewLayoutSep		
+		layout = dict_listViewLayout   if trailingSeparator is None   else dict_listViewLayoutSep		
 		return expressionNodeEditor( ctx, node,
 				   ctx.listView( layout, _OpenBraceFactory( ctx ), _CloseBraceFactory( ctx ), _CommaFactory( ctx ), valueViews ),
 				   PRECEDENCE_DICTDISPLAY,
@@ -534,7 +534,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	@ObjectNodeDispatchMethod
 	def SubscriptSlice(self, ctx, state, node, lower, upper):
 		def _sliceIndex(i):
-			if isNullNode( i ):
+			if i is None:
 				return []
 			else:
 				return [ ctx.viewEvalFn( i, None, python25ViewState( PRECEDENCE_CONTAINER_SUBSCRIPTINDEX, self._parser.expression() ) ) ]
@@ -548,7 +548,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	@ObjectNodeDispatchMethod
 	def SubscriptLongSlice(self, ctx, state, node, lower, upper, stride):
 		def _sliceIndex(i):
-			if isNullNode( i ):
+			if i is None:
 				return []
 			else:
 				return [ ctx.viewEvalFn( i, None, python25ViewState( PRECEDENCE_CONTAINER_SUBSCRIPTINDEX, self._parser.expression() ) ) ]
@@ -571,7 +571,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	@ObjectNodeDispatchMethod
 	def SubscriptTuple(self, ctx, state, node, values, trailingSeparator):
 		valueViews = ctx.mapViewEvalFn( values, None, python25ViewState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.subscriptItem() ) )
-		layout = tuple_listViewLayout   if isNullNode( trailingSeparator )   else tuple_listViewLayoutSep
+		layout = tuple_listViewLayout   if trailingSeparator is None   else tuple_listViewLayoutSep
 		return expressionNodeEditor( ctx, node,
 				   ctx.listView( layout, None, None, _CommaFactory( ctx ), valueViews ),
 				   PRECEDENCE_TUPLE,
@@ -625,7 +625,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 				argElements.append( ctx.text( punctuation_textStyle, ',' ) )
 				argElements.append( ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY, ctx.text( punctuation_textStyle, ' ' ) ) )
 			argElements.append( argViews[-1] )
-			if not isNullNode( argsTrailingSeparator ):
+			if argsTrailingSeparator is not None:
 				argElements.append( ctx.text( punctuation_textStyle, ',' ) )
 				argElements.append( ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY, ctx.text( punctuation_textStyle, ' ' ) ) )
 		return expressionNodeEditor( ctx, node,
@@ -834,7 +834,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 				paramElements.append( ctx.text( punctuation_textStyle, ',' ) )
 				paramElements.append( ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY, ctx.text( punctuation_textStyle, ' ' ) ) )
 			paramElements.append( paramViews[-1] )
-			if not isNullNode( paramsTrailingSeparator ):
+			if paramsTrailingSeparator is not None:
 				paramElements.append( ctx.text( punctuation_textStyle, ',' ) )
 				paramElements.append( ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY, ctx.text( punctuation_textStyle, ' ' ) ) )
 				
@@ -877,7 +877,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	def AssertStmt(self, ctx, state, node, condition, fail):
 		conditionView = ctx.viewEvalFn( condition, None, python25ViewState( PRECEDENCE_STMT, self._parser.expression() ) )
 		elements = [ capitalisedKeywordText( ctx, assertKeyword ), ctx.text( default_textStyle, ' ' ), conditionView ]
-		if not isNullNode( fail ):
+		if fail is not None:
 			failView = ctx.viewEvalFn( fail, None, python25ViewState( PRECEDENCE_STMT, self._parser.expression() ) )
 			elements.extend( [ ctx.text( punctuation_textStyle, ',' ), ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY, ctx.text( punctuation_textStyle, ' ' ) ), failView ] )
 		return statementNodeEditor( ctx, node,
@@ -953,7 +953,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Raise statement
 	@ObjectNodeDispatchMethod
 	def RaiseStmt(self, ctx, state, node, excType, excValue, traceback):
-		xs = [ x   for x in excType, excValue, traceback  if not isNullNode( x ) ]
+		xs = [ x   for x in excType, excValue, traceback  if x is not None ]
 		xViews = ctx.mapViewEvalFn( xs, None, python25ViewState( PRECEDENCE_STMT, self._parser.expression() ) )
 		xElements = []
 		if len( xs ) > 0:
@@ -1088,10 +1088,10 @@ class Python25View (GSymViewObjectNodeDispatch):
 	def ExecStmt(self, ctx, state, node, source, locals, globals):
 		sourceView = ctx.viewEvalFn( source, None, python25ViewState( PRECEDENCE_STMT, self._parser.orOp() ) )
 		elements = [ sourceView ]
-		if not isNullNode( locals ):
+		if locals is not None:
 			localsView = ctx.viewEvalFn( locals, None, python25ViewState( PRECEDENCE_STMT, self._parser.expression() ) )
 			elements.extend( [ ctx.text( default_textStyle, ' ' ),  capitalisedKeywordText( ctx, inKeyword ),  ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY, ctx.text( punctuation_textStyle, ' ' ) ),  localsView ] )
-		if not isNullNode( globals ):
+		if globals is not None:
 			globalsView = ctx.viewEvalFn( globals, None, python25ViewState( PRECEDENCE_STMT, self._parser.expression() ) )
 			elements.extend( [ ctx.text( default_textStyle, ',' ),  ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY, ctx.text( punctuation_textStyle, ' ' ) ),  globalsView ] )
 		return statementNodeEditor( ctx, node,
@@ -1184,10 +1184,10 @@ class Python25View (GSymViewObjectNodeDispatch):
 	@ObjectNodeDispatchMethod
 	def ExceptStmt(self, ctx, state, node, exception, target, suite):
 		elements = []
-		if not isNullNode( exception ):
+		if exception is not None:
 			excView = ctx.viewEvalFn( exception, None, python25ViewState( PRECEDENCE_STMT, self._parser.expression() ) )
 			elements.extend( [ ctx.text( default_textStyle, ' ' ),  excView ] )
-		if not isNullNode( target ):
+		if target is not None:
 			targetView = ctx.viewEvalFn( target, None, python25ViewState( PRECEDENCE_STMT, self._parser.expression() ) )
 			elements.extend( [ ctx.text( default_textStyle, ',' ),  ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY, ctx.text( punctuation_textStyle, ' ' ) ),  targetView ] )
 		elements.append( ctx.text( punctuation_textStyle, ':' ) )
@@ -1217,7 +1217,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	def WithStmt(self, ctx, state, node, expr, target, suite):
 		exprView = ctx.viewEvalFn( expr, None, python25ViewState( PRECEDENCE_STMT, self._parser.expression() ) )
 		elements = [ exprView ]
-		if not isNullNode( target ):
+		if target is not None:
 			targetView = ctx.viewEvalFn( target, None, python25ViewState( PRECEDENCE_STMT, self._parser.expression() ) )
 			elements.extend( [ ctx.text( default_textStyle, ' ' ),  capitalisedKeywordText( ctx, asKeyword ),  ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY, ctx.text( punctuation_textStyle, ' ' ) ),  targetView ] )
 		elements.append( ctx.text( punctuation_textStyle, ':' ) )
@@ -1239,7 +1239,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 			for p in paramViews[:-1]:
 				paramElements.extend( [ p,  ctx.text( punctuation_textStyle, ', ' ) ] )
 			paramElements.append( paramViews[-1] )
-			if not isNullNode( paramsTrailingSeparator ):
+			if paramsTrailingSeparator is not None:
 				paramElements.append( ctx.text( punctuation_textStyle, ', ' ) )
 				
 		paramElements.append( ctx.text( punctuation_textStyle, ')' ) )
@@ -1257,14 +1257,14 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Decorator statement
 	@ObjectNodeDispatchMethod
 	def DecoStmt(self, ctx, state, node, name, args, argsTrailingSeparator):
-		if not isNullNode( args ):
+		if args is not None:
 			argViews = ctx.mapViewEvalFn( args, None, python25ViewState( PRECEDENCE_STMT, self._parser.callArg() ) )
 			argElements = [ ctx.text( punctuation_textStyle, '(' ) ]
 			if len( args ) > 0:
 				for a in argViews[:-1]:
 					argElements.extend( [ a, ctx.text( punctuation_textStyle, ', ' ) ] )
 				argElements.append( argViews[-1] )
-				if not isNullNode( argsTrailingSeparator ):
+				if argsTrailingSeparator is not None:
 					argElements.append( ctx.text( punctuation_textStyle, ', ' ) )
 			argElements.append( ctx.text( punctuation_textStyle, ')' ) )
 		else:
@@ -1279,9 +1279,9 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Def statement
 	@ObjectNodeDispatchMethod
 	def ClassStmt(self, ctx, state, node, name, bases, basesTrailingSeparator, suite):
-		if not isNullNode( bases ):
+		if bases is not None:
 			baseViews = ctx.mapViewEvalFn( bases, None, python25ViewState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.expression() ) )
-			layout = tuple_listViewLayout   if isNullNode( basesTrailingSeparator )   else tuple_listViewLayoutSep
+			layout = tuple_listViewLayout   if basesTrailingSeparator is None   else tuple_listViewLayoutSep
 			baseElements = [ ctx.text( punctuation_textStyle, '(' ),  ctx.listView( layout, None, None, _CommaFactory( ctx ), baseViews ),  ctx.text( punctuation_textStyle, ')' ) ]
 		else:
 			baseElements = []

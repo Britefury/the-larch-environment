@@ -5,7 +5,7 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from Britefury.Util.NodeUtil import isListNode, isObjectNode, isStringNode, isNullNode
+from Britefury.Util.NodeUtil import isListNode, isObjectNode, isStringNode
 
 from Britefury.gSym.View.EditOperations import replace, replaceWithRange, replaceNodeContents, append, prepend, insertBefore, insertRangeBefore, insertAfter, insertRangeAfter
 
@@ -26,7 +26,7 @@ _parser = LispGrammar()
 
 
 def _parseText(text):
-	res = _parser.expression().parseString( text )
+	res = _parser.expression().parseStringChars( text )
 	if res.isValid():
 		pos = res.getEnd()
 		if pos == len( text ):
@@ -65,7 +65,7 @@ def nodeEditor(ctx, node, contents, state):
 
 
 def stringNodeEditor(ctx, node, metadata, state):
-	res = _parser.unquotedString().parseString( node )
+	res = _parser.unquotedString().parseStringChars( node )
 	if res.isValid():
 		nodeText = node
 	else:
@@ -123,7 +123,7 @@ def viewLispNode(node, ctx, state):
 		mode = MODE_HORIZONTAL
 		for i in xrange( 0, cls.getNumFields() ):
 			value = node.get( i )
-			if not isNullNode( value ):
+			if value is not None:
 				# If we encounter a non-string value, then this object cannot be displayed in a single line
 				if not isStringNode( value ):
 					mode = MODE_VERTICALINLINE
@@ -142,7 +142,7 @@ def viewLispNode(node, ctx, state):
 		for i in xrange( 0, cls.getNumFields() ):
 			value = node.get( i )
 			fieldName = cls.getField( i ).getName()
-			if not isNullNode( value ):
+			if value is not None:
 				if mode == MODE_HORIZONTAL:
 					line = ctx.span( [ ctx.text( fieldName_textStyle, fieldName ), ctx.text( punctuation_textStyle, '=' ), lispViewEval( value, ctx, state ) ] )
 				elif mode == MODE_VERTICALINLINE:

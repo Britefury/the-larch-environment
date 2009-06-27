@@ -8,13 +8,13 @@ package BritefuryJ.Parser.Utils.OperatorParser;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
+import BritefuryJ.Parser.Choice;
+import BritefuryJ.Parser.ParseAction;
+import BritefuryJ.Parser.ParserExpression;
+import BritefuryJ.Parser.Production;
 import BritefuryJ.Parser.Utils.OperatorParser.UnaryOperator.UnaryOperatorResultBuilder;
-import BritefuryJ.ParserOld.Choice;
-import BritefuryJ.ParserOld.ParseAction;
-import BritefuryJ.ParserOld.ParserExpression;
-import BritefuryJ.ParserOld.Production;
 
 public class PrefixLevel extends UnaryOperatorLevel
 {
@@ -26,20 +26,21 @@ public class PrefixLevel extends UnaryOperatorLevel
 		
 		
 		@SuppressWarnings("unchecked")
-		public Object invoke(ItemStreamAccessor input, int begin, Object x)
+		public Object invoke(Object input, int begin, int end, Object x, Map<String, Object> bindings)
 		{
+			// Bindings will be from sub-expression only
 			List<Object> xs = (List<Object>)x;
 			
 			List<UnaryOperatorResultBuilder> builders = (List<UnaryOperatorResultBuilder>)xs.get( 0 );
-			Object result = xs.get( 1 );
+			Object expression = xs.get( 1 );
 			
 			for (int i = builders.size() - 1; i >= 0; i--)
 			{
 				UnaryOperatorResultBuilder b = builders.get( i );
-				result = b.buildResult( input, b.getOperatorPos(), result );
+				expression = b.buildResult( input, b.getOperatorBegin(), end, expression );
 			}
 			
-			return result;
+			return expression;
 		}
 	}
 	
@@ -85,7 +86,7 @@ public class PrefixLevel extends UnaryOperatorLevel
 		}
 		ParserExpression ops = new Choice( choices );
 		
-		return ops.oneOrMore().__add__( previousLevelParser ).action( levelAction );
+		return ops.oneOrMore().clearBindings().__add__( previousLevelParser ).action( levelAction );
 	}
 
 
@@ -99,6 +100,6 @@ public class PrefixLevel extends UnaryOperatorLevel
 		}
 		ParserExpression ops = new Choice( choices );
 		
-		return ops.oneOrMore().__add__( previousLevelParser ).action( levelAction );
+		return ops.oneOrMore().clearBindings().__add__( previousLevelParser ).action( levelAction );
 	}
 }

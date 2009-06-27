@@ -9,7 +9,7 @@ from BritefuryJ.Transformation import DefaultIdentityTransformationFunction, Tra
 
 from Britefury.Dispatch.ObjectNodeMethodDispatch import ObjectNodeMethodDispatchMetaClass, ObjectNodeDispatchMethod, objectNodeMethodDispatch
 from Britefury.Dispatch.Dispatch import DispatchError
-from Britefury.Util.NodeUtil import isNullNode, isStringNode, makeNullNode
+from Britefury.Util.NodeUtil import isStringNode
 
 from GSymCore.Languages.Python25 import NodeClasses as Nodes
 
@@ -211,7 +211,7 @@ def _areParensRequired(childNode, outerPrecedence):
 def getNumParens(node):
 	p = node['parens']
 	numParens = 0
-	if not isNullNode( p )   and   isStringNode( p ):
+	if p is not None   and   isStringNode( p ):
 		p = str( p )
 		try:
 			numParens = int( p )
@@ -223,7 +223,7 @@ def _decrementParens(node, xform):
 	numParens = getNumParens( node )
 	numParens -= 1
 	numParens = max( numParens, 0 )
-	p = str( numParens )   if numParens > 0   else   makeNullNode()
+	p = str( numParens )   if numParens > 0   else   None
 	return _updatedNodeCopy( node, xform, parens=p )
 
 
@@ -379,7 +379,7 @@ from GSymCore.Languages.Python25 import Parser
 
 class Test_Precedence (unittest.TestCase):
 	def _matchTest(self, parser, input, expected):
-		result = parser.parseString( input )
+		result = parser.parseStringChars( input )
 		
 		if not result.isValid():
 			print 'PARSE FAILURE while parsing %s, stopped at %d: %s'  %  ( input, result.end, input[:result.end] )

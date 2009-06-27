@@ -9,8 +9,8 @@ package tests.Parser.Utils;
 import BritefuryJ.DocModel.DMModule;
 import BritefuryJ.DocModel.DMModuleResolver;
 import BritefuryJ.Parser.Utils.Tokens;
-import BritefuryJ.ParserOld.ParserExpression;
-import tests.ParserOld.ParserTestCase;
+import BritefuryJ.Parser.ParserExpression;
+import tests.Parser.ParserTestCase;
 
 public class Test_Tokens extends ParserTestCase
 {
@@ -46,79 +46,79 @@ public class Test_Tokens extends ParserTestCase
 	public void testIdentifier()
 	{
 		ParserExpression parser = Tokens.identifier;
-		matchTest( parser, "ab", "ab" );
-		matchTest( parser, "ab12", "ab12" );
-		matchFailTest( parser, "12ab" );
-		matchTest( parser, "_ab", "_ab" );
+		matchTestStringAndStream( parser, "ab", "ab" );
+		matchTestStringAndStream( parser, "ab12", "ab12" );
+		matchFailTestStringAndStream( parser, "12ab" );
+		matchTestStringAndStream( parser, "_ab", "_ab" );
 	}
 
 	public void testJavaIdentifier()
 	{
 		ParserExpression parser = Tokens.javaIdentifier;
-		matchTest( parser, "ab", "ab" );
-		matchTest( parser, "ab12", "ab12" );
-		matchFailTest( parser, "12ab" );
-		matchTest( parser, "_ab", "_ab" );
+		matchTestStringAndStream( parser, "ab", "ab" );
+		matchTestStringAndStream( parser, "ab12", "ab12" );
+		matchFailTestStringAndStream( parser, "12ab" );
+		matchTestStringAndStream( parser, "_ab", "_ab" );
 	}
 	
 
 	public void testDecimalInteger()
 	{
 		ParserExpression parser = Tokens.decimalInteger;
-		matchTest( parser, "123", "123" );
-		matchTest( parser, "-123", "-123" );
+		matchTestStringAndStream( parser, "123", "123" );
+		matchTestStringAndStream( parser, "-123", "-123" );
 	}
 
 	public void testDecimalIntegerNoOctal()
 	{
 		ParserExpression parser = Tokens.decimalIntegerNoOctal;
-		matchTest( parser, "123", "123" );
-		matchTest( parser, "0", "0" );
-		matchSubTest( parser, "0123", "0", 1 );
+		matchTestStringAndStream( parser, "123", "123" );
+		matchTestStringAndStream( parser, "0", "0" );
+		matchSubTestStringAndStream( parser, "0123", "0", 1 );
 	}
 
 
 	public void testHexadecimalInteger()
 	{
 		ParserExpression parser = Tokens.hexInteger;
-		matchTest( parser, "0x123", "0x123" );
-		matchTest( parser, "0X123", "0X123" );
-		matchTest( parser, "0x0123456789abcdef", "0x0123456789abcdef" );
-		matchTest( parser, "0x0123456789ABCDEF", "0x0123456789ABCDEF" );
+		matchTestStringAndStream( parser, "0x123", "0x123" );
+		matchTestStringAndStream( parser, "0X123", "0X123" );
+		matchTestStringAndStream( parser, "0x0123456789abcdef", "0x0123456789abcdef" );
+		matchTestStringAndStream( parser, "0x0123456789ABCDEF", "0x0123456789ABCDEF" );
 	}
 
 	public void testOctalInteger()
 	{
 		ParserExpression parser = Tokens.octalInteger;
-		matchFailTest( parser, "12" );
-		matchFailTest( parser, "0" );
-		matchTest( parser, "01", "01" );
-		matchTest( parser, "01234567", "01234567" );
-		matchSubTest( parser, "0123456789", "01234567", 8 );
+		matchFailTestStringAndStream( parser, "12" );
+		matchFailTestStringAndStream( parser, "0" );
+		matchTestStringAndStream( parser, "01", "01" );
+		matchTestStringAndStream( parser, "01234567", "01234567" );
+		matchSubTestStringAndStream( parser, "0123456789", "01234567", 8 );
 	}
 
 	public void testFloatingPoint()
 	{
 		ParserExpression parser = Tokens.floatingPoint;
-		matchTest( parser, "3.14", "3.14" );
-		matchTest( parser, "-3.14", "-3.14" );
-		matchTest( parser, "3.", "3." );
-		matchTest( parser, "-3.", "-3." );
-		matchTest( parser, ".14", ".14" );
-		matchTest( parser, "-.14", "-.14" );
+		matchTestStringAndStream( parser, "3.14", "3.14" );
+		matchTestStringAndStream( parser, "-3.14", "-3.14" );
+		matchTestStringAndStream( parser, "3.", "3." );
+		matchTestStringAndStream( parser, "-3.", "-3." );
+		matchTestStringAndStream( parser, ".14", ".14" );
+		matchTestStringAndStream( parser, "-.14", "-.14" );
 
-		matchTest( parser, "3.14e5", "3.14e5" );
-		matchTest( parser, "3.14e-5", "3.14e-5" );
-		matchTest( parser, "-3.14e5", "-3.14e5" );
-		matchTest( parser, "-3.14e-5", "-3.14e-5" );
-		matchTest( parser, "3.e5", "3.e5" );
-		matchTest( parser, "3.e-5", "3.e-5" );
-		matchTest( parser, "-3.e5", "-3.e5" );
-		matchTest( parser, "-3.e-5", "-3.e-5" );
-		matchTest( parser, ".14e5", ".14e5" );
-		matchTest( parser, ".14e-5", ".14e-5" );
-		matchTest( parser, "-.14e5", "-.14e5" );
-		matchTest( parser, "-.14e-5", "-.14e-5" );
+		matchTestStringAndStream( parser, "3.14e5", "3.14e5" );
+		matchTestStringAndStream( parser, "3.14e-5", "3.14e-5" );
+		matchTestStringAndStream( parser, "-3.14e5", "-3.14e5" );
+		matchTestStringAndStream( parser, "-3.14e-5", "-3.14e-5" );
+		matchTestStringAndStream( parser, "3.e5", "3.e5" );
+		matchTestStringAndStream( parser, "3.e-5", "3.e-5" );
+		matchTestStringAndStream( parser, "-3.e5", "-3.e5" );
+		matchTestStringAndStream( parser, "-3.e-5", "-3.e-5" );
+		matchTestStringAndStream( parser, ".14e5", ".14e5" );
+		matchTestStringAndStream( parser, ".14e-5", ".14e-5" );
+		matchTestStringAndStream( parser, "-.14e5", "-.14e5" );
+		matchTestStringAndStream( parser, "-.14e-5", "-.14e-5" );
 	}
 
 	
@@ -126,90 +126,90 @@ public class Test_Tokens extends ParserTestCase
 	public void testJavaCharacterLiteral()
 	{
 		ParserExpression parser = Tokens.javaCharacterLiteral;
-		matchTest( parser, "'a'", "'a'" );
-		matchFailTest( parser, "'a" );
-		matchTest( parser, "'\\b'", "'\\b'" );
-		matchTest( parser, "'\\t'", "'\\t'" );
-		matchTest( parser, "'\\n'", "'\\n'" );
-		matchTest( parser, "'\\f'", "'\\f'" );
-		matchTest( parser, "'\\r'", "'\\r'" );
-		matchTest( parser, "'\\\"'", "'\\\"'" );
-		matchTest( parser, "'\\''", "'\\''" );
-		matchTest( parser, "'\\\\'", "'\\\\'" );
-		matchFailTest( parser, "'\\a'" );
-		matchTest( parser, "'\\0'", "'\\0'" );
-		matchTest( parser, "'\\1'", "'\\1'" );
-		matchTest( parser, "'\\2'", "'\\2'" );
-		matchTest( parser, "'\\3'", "'\\3'" );
-		matchTest( parser, "'\\4'", "'\\4'" );
-		matchTest( parser, "'\\5'", "'\\5'" );
-		matchTest( parser, "'\\6'", "'\\6'" );
-		matchTest( parser, "'\\7'", "'\\7'" );
-		matchTest( parser, "'\\77'", "'\\77'" );
-		matchFailTest( parser, "'\\777'" );
-		matchFailTest( parser, "'\\477'" );
-		matchTest( parser, "'\\377'", "'\\377'" );
-		matchTest( parser, "'\\u0123'", "'\\u0123'" );
-		matchTest( parser, "'\\u01aF'", "'\\u01aF'" );
-		matchFailTest( parser, "'\\u01a'" );
-		matchFailTest( parser, "'\\u01a043'" );
+		matchTestStringAndStream( parser, "'a'", "'a'" );
+		matchFailTestStringAndStream( parser, "'a" );
+		matchTestStringAndStream( parser, "'\\b'", "'\\b'" );
+		matchTestStringAndStream( parser, "'\\t'", "'\\t'" );
+		matchTestStringAndStream( parser, "'\\n'", "'\\n'" );
+		matchTestStringAndStream( parser, "'\\f'", "'\\f'" );
+		matchTestStringAndStream( parser, "'\\r'", "'\\r'" );
+		matchTestStringAndStream( parser, "'\\\"'", "'\\\"'" );
+		matchTestStringAndStream( parser, "'\\''", "'\\''" );
+		matchTestStringAndStream( parser, "'\\\\'", "'\\\\'" );
+		matchFailTestStringAndStream( parser, "'\\a'" );
+		matchTestStringAndStream( parser, "'\\0'", "'\\0'" );
+		matchTestStringAndStream( parser, "'\\1'", "'\\1'" );
+		matchTestStringAndStream( parser, "'\\2'", "'\\2'" );
+		matchTestStringAndStream( parser, "'\\3'", "'\\3'" );
+		matchTestStringAndStream( parser, "'\\4'", "'\\4'" );
+		matchTestStringAndStream( parser, "'\\5'", "'\\5'" );
+		matchTestStringAndStream( parser, "'\\6'", "'\\6'" );
+		matchTestStringAndStream( parser, "'\\7'", "'\\7'" );
+		matchTestStringAndStream( parser, "'\\77'", "'\\77'" );
+		matchFailTestStringAndStream( parser, "'\\777'" );
+		matchFailTestStringAndStream( parser, "'\\477'" );
+		matchTestStringAndStream( parser, "'\\377'", "'\\377'" );
+		matchTestStringAndStream( parser, "'\\u0123'", "'\\u0123'" );
+		matchTestStringAndStream( parser, "'\\u01aF'", "'\\u01aF'" );
+		matchFailTestStringAndStream( parser, "'\\u01a'" );
+		matchFailTestStringAndStream( parser, "'\\u01a043'" );
 	}
 
 	
 	public void testSingleQuotedString()
 	{
 		ParserExpression parser = Tokens.singleQuotedString;
-		matchTest( parser, "'abc'", "'abc'" );
-		matchTest( parser, "'ab\\'c'", "'ab\\'c'" );
-		matchSubTest( parser, "'abc'113", "'abc'", 5 );
+		matchTestStringAndStream( parser, "'abc'", "'abc'" );
+		matchTestStringAndStream( parser, "'ab\\'c'", "'ab\\'c'" );
+		matchSubTestStringAndStream( parser, "'abc'113", "'abc'", 5 );
 	}
 
 
 	public void testDoubleQuotedString()
 	{
 		ParserExpression parser = Tokens.doubleQuotedString;
-		matchTest( parser, "\"abc\"", "\"abc\"" );
-		matchTest( parser, "\"ab\\\"c\"", "\"ab\\\"c\"" );
-		matchSubTest( parser, "\"abc\"113\"", "\"abc\"", 5 );
+		matchTestStringAndStream( parser, "\"abc\"", "\"abc\"" );
+		matchTestStringAndStream( parser, "\"ab\\\"c\"", "\"ab\\\"c\"" );
+		matchSubTestStringAndStream( parser, "\"abc\"113\"", "\"abc\"", 5 );
 	}
 
 
 	public void testQuotedString()
 	{
 		ParserExpression parser = Tokens.quotedString;
-		matchTest( parser, "'abc'", "'abc'" );
-		matchTest( parser, "'ab\\'c'", "'ab\\'c'" );
-		matchSubTest( parser, "'abc'113", "'abc'", 5 );
-		matchTest( parser, "\"abc\"", "\"abc\"" );
-		matchTest( parser, "\"ab\\\"c\"", "\"ab\\\"c\"" );
-		matchSubTest( parser, "\"abc\"113\"", "\"abc\"", 5 );
+		matchTestStringAndStream( parser, "'abc'", "'abc'" );
+		matchTestStringAndStream( parser, "'ab\\'c'", "'ab\\'c'" );
+		matchSubTestStringAndStream( parser, "'abc'113", "'abc'", 5 );
+		matchTestStringAndStream( parser, "\"abc\"", "\"abc\"" );
+		matchTestStringAndStream( parser, "\"ab\\\"c\"", "\"ab\\\"c\"" );
+		matchSubTestStringAndStream( parser, "\"abc\"113\"", "\"abc\"", 5 );
 	}
 
 
 	public void testUnicodeString()
 	{
 		ParserExpression parser = Tokens.unicodeString;
-		matchTest( parser, "u'abc'", "u'abc'" );
-		matchTest( parser, "u'ab\\'c'", "u'ab\\'c'" );
-		matchSubTest( parser, "u'abc'113", "u'abc'", 6 );
-		matchTest( parser, "u\"abc\"", "u\"abc\"" );
-		matchTest( parser, "u\"ab\\\"c\"", "u\"ab\\\"c\"" );
-		matchSubTest( parser, "u\"abc\"113\"", "u\"abc\"", 6 );
+		matchTestStringAndStream( parser, "u'abc'", "u'abc'" );
+		matchTestStringAndStream( parser, "u'ab\\'c'", "u'ab\\'c'" );
+		matchSubTestStringAndStream( parser, "u'abc'113", "u'abc'", 6 );
+		matchTestStringAndStream( parser, "u\"abc\"", "u\"abc\"" );
+		matchTestStringAndStream( parser, "u\"ab\\\"c\"", "u\"ab\\\"c\"" );
+		matchSubTestStringAndStream( parser, "u\"abc\"113\"", "u\"abc\"", 6 );
 	}
 	
 	
 	public void testJavaStringLiteral()
 	{
 		ParserExpression parser = Tokens.javaStringLiteral;
-		matchTest( parser, "\"abc\"", "\"abc\"" );
-		matchSubTest( parser, "\"abc\"q", "\"abc\"", 5 );
-		matchTest( parser, "\"abc\\b\\t\\n\\f\\r\\\"\\\'\\\\xyz\"", "\"abc\\b\\t\\n\\f\\r\\\"\\\'\\\\xyz\"" );
-		matchFailTest( parser, "\"abc\\a\\t\\n\\f\\r\\\"\\\'\\\\xyz\"" );
-		matchTest( parser, "\"abc\\0\\1\\2\\3\\4\\5\\6\\7xyz\"", "\"abc\\0\\1\\2\\3\\4\\5\\6\\7xyz\"" );
-		matchTest( parser, "\"abc\\347xyz\"", "\"abc\\347xyz\"" );
-		matchTest( parser, "\"abc\\u0123xyz\"", "\"abc\\u0123xyz\"" );
-		matchTest( parser, "\"abc\\u01aFxyz\"", "\"abc\\u01aFxyz\"" );
-		matchFailTest( parser, "\"abc\\u347xyz\"" );
+		matchTestStringAndStream( parser, "\"abc\"", "\"abc\"" );
+		matchSubTestStringAndStream( parser, "\"abc\"q", "\"abc\"", 5 );
+		matchTestStringAndStream( parser, "\"abc\\b\\t\\n\\f\\r\\\"\\\'\\\\xyz\"", "\"abc\\b\\t\\n\\f\\r\\\"\\\'\\\\xyz\"" );
+		matchFailTestStringAndStream( parser, "\"abc\\a\\t\\n\\f\\r\\\"\\\'\\\\xyz\"" );
+		matchTestStringAndStream( parser, "\"abc\\0\\1\\2\\3\\4\\5\\6\\7xyz\"", "\"abc\\0\\1\\2\\3\\4\\5\\6\\7xyz\"" );
+		matchTestStringAndStream( parser, "\"abc\\347xyz\"", "\"abc\\347xyz\"" );
+		matchTestStringAndStream( parser, "\"abc\\u0123xyz\"", "\"abc\\u0123xyz\"" );
+		matchTestStringAndStream( parser, "\"abc\\u01aFxyz\"", "\"abc\\u01aFxyz\"" );
+		matchFailTestStringAndStream( parser, "\"abc\\u347xyz\"" );
 	}
 
 

@@ -28,7 +28,7 @@ from GSymCore.Languages.LISP.Styles import *
 
 
 def _parseText(text):
-	res, pos = Parser.parser.parseString( text )
+	res, pos = Parser.parser.parseStringChars( text )
 	if res is not None:
 		if pos == len( text ):
 			return res.result
@@ -73,7 +73,7 @@ MODE_VERTICAL = 2
 
 
 def viewStringNode(node, state):
-	res, pos = Parser.unquotedString.parseString( node )
+	res, pos = Parser.unquotedString.parseStringChars( node )
 	if res is not None:
 		unparsed = UnparsedText( node )
 	else:

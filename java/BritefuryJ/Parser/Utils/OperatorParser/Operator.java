@@ -6,7 +6,7 @@
 //##************************
 package BritefuryJ.Parser.Utils.OperatorParser;
 
-import BritefuryJ.ParserOld.ParserExpression;
+import BritefuryJ.Parser.ParserExpression;
 
 public abstract class Operator
 {

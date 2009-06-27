@@ -7,8 +7,8 @@
 package BritefuryJ.Parser;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
 
@@ -71,7 +71,7 @@ public class Repetition extends UnaryBranchExpression
 	protected ParseResult evaluateStringChars(ParserState state, String input, int start)
 	{
 		ArrayList<Object> values = new ArrayList<Object>();
-		HashMap<String, Object> bindings = null;
+		Map<String, Object> bindings = null;
 		
 		int pos = start;
 		int errorPos = start;
@@ -128,7 +128,7 @@ public class Repetition extends UnaryBranchExpression
 	protected ParseResult evaluateStreamItems(ParserState state, ItemStreamAccessor input, int start)
 	{
 		ArrayList<Object> values = new ArrayList<Object>();
-		HashMap<String, Object> bindings = null;
+		Map<String, Object> bindings = null;
 		
 		int pos = start;
 		int errorPos = start;
@@ -185,7 +185,7 @@ public class Repetition extends UnaryBranchExpression
 	protected ParseResult evaluateListItems(ParserState state, List<Object> input, int start)
 	{
 		ArrayList<Object> values = new ArrayList<Object>();
-		HashMap<String, Object> bindings = null;
+		Map<String, Object> bindings = null;
 		
 		int pos = start;
 		int errorPos = start;

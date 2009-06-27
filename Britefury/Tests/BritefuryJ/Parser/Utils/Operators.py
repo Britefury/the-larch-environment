@@ -514,16 +514,16 @@ class TestCase_Operators (ParserTestCase, TestCase_Impl):
 		return SuffixLevel( x )
 	
 	def _infixChainLvl(self, prefix, xs):
-		return InfixChainLevel( xs, lambda input, begin, x, ys: [ prefix, x ] + ys )
+		return InfixChainLevel( xs, lambda input, begin, end, x, ys: [ prefix, x ] + ys )
 	
 	def _unOp(self, x):
-		return UnaryOperator( x, lambda input, begin, subexp: [ x, subexp ] )
+		return UnaryOperator( x, lambda input, begin, end, subexp: [ x, subexp ] )
 	
 	def _binOp(self, x):
-		return BinaryOperator( x, lambda input, begin, left, right: [ x, left, right ] )
+		return BinaryOperator( x, lambda input, begin, end, left, right: [ x, left, right ] )
 	
 	def _chainOp(self, x):
-		return ChainOperator( x, lambda input, begin, subexp: [ x, subexp ] )
+		return ChainOperator( x, lambda input, begin, end, subexp: [ x, subexp ] )
 	
 	
 		

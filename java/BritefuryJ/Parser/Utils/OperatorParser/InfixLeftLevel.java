@@ -8,26 +8,27 @@ package BritefuryJ.Parser.Utils.OperatorParser;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
-import BritefuryJ.ParserOld.Choice;
-import BritefuryJ.ParserOld.ParseAction;
-import BritefuryJ.ParserOld.ParserExpression;
-import BritefuryJ.ParserOld.Production;
+import BritefuryJ.Parser.Choice;
+import BritefuryJ.Parser.ParseAction;
+import BritefuryJ.Parser.ParserExpression;
+import BritefuryJ.Parser.Production;
 
 public class InfixLeftLevel extends BinaryOperatorLevel
 {
 	protected static class InfixLeftOperatorResultBuilder
 	{
 		private BinaryOperatorParseAction action;
-		private int operatorPos;
-		private Object x;
+		private int operatorPos, rightEnd;
+		private Object right;
 		
-		public InfixLeftOperatorResultBuilder(BinaryOperatorParseAction action, int operatorPos, Object x)
+		public InfixLeftOperatorResultBuilder(BinaryOperatorParseAction action, int operatorPos, int rightEnd, Object right)
 		{
 			this.action = action;
 			this.operatorPos = operatorPos;
-			this.x = x;
+			this.rightEnd = rightEnd;
+			this.right = right;
 		}
 		
 		
@@ -37,9 +38,9 @@ public class InfixLeftLevel extends BinaryOperatorLevel
 		}
 		
 
-		public Object buildResult(ItemStreamAccessor input, int begin, Object y)
+		public Object buildResult(Object input, int begin, Object left)
 		{
-			return action.invoke( input, begin, y, x );
+			return action.invoke( input, begin, rightEnd, left, right );
 		}
 	}
 	
@@ -52,24 +53,28 @@ public class InfixLeftLevel extends BinaryOperatorLevel
 		
 		
 		@SuppressWarnings("unchecked")
-		public Object invoke(ItemStreamAccessor input, int begin, Object x)
+		public Object invoke(Object input, int begin, int end, Object x, Map<String, Object> bindings)
 		{
 			List<Object> xs = (List<Object>)x;
 			
-			Object result = xs.get( 0 );
-			List<InfixLeftOperatorResultBuilder> builders = (List<InfixLeftOperatorResultBuilder>)xs.get( 1 );
+			Object expression = xs.get( 0 );		// Left sub-expression
+			List<InfixLeftOperatorResultBuilder> builders = (List<InfixLeftOperatorResultBuilder>)xs.get( 1 );		// Builders
 			
 			for (InfixLeftOperatorResultBuilder b: builders)
 			{
-				result = b.buildResult( input, begin, result );
+				expression = b.buildResult( input, begin, expression );
 			}
 			
-			return result;
+			return expression;
 		}
 	}
 	
 	
-	
+	//
+	//
+	// Constructs a InfixLeftOperatorResultBuilder for each operator-right pair  
+	//
+	//
 	private static class InfixLeftOpAction implements ParseAction
 	{
 		private BinaryOperatorParseAction action;
@@ -82,11 +87,11 @@ public class InfixLeftLevel extends BinaryOperatorLevel
 		
 		
 		@SuppressWarnings("unchecked")
-		public Object invoke(ItemStreamAccessor input, int begin, Object x)
+		public Object invoke(Object input, int begin, int end, Object x, Map<String, Object> bindings)
 		{
 			List<Object> xs = (List<Object>)x;
 			Object right = xs.get( 1 );
-			return new InfixLeftOperatorResultBuilder( action, begin, right );
+			return new InfixLeftOperatorResultBuilder( action, begin, end, right );
 		}
 	}
 
@@ -103,7 +108,7 @@ public class InfixLeftLevel extends BinaryOperatorLevel
 	//
 	//
 	
-	public InfixLeftLevel(List<BinaryOperator> ops)
+	public InfixLeftLevel(BinaryOperator ops[])
 	{
 		super( ops );
 		

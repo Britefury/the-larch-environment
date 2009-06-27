@@ -7,7 +7,7 @@
 ##-*************************
 from Britefury.Dispatch.ObjectNodeMethodDispatch import ObjectNodeMethodDispatchMetaClass, ObjectNodeDispatchMethod, objectNodeMethodDispatch
 from Britefury.Dispatch.Dispatch import DispatchError
-from Britefury.Util.NodeUtil import isNullNode, isStringNode, makeNullNode
+from Britefury.Util.NodeUtil import isStringNode
 
 from GSymCore.Languages.Python25 import NodeClasses as Nodes
 

@@ -154,20 +154,28 @@ public class ParserState
 	
 	public int skipJunkChars(String input, int start)
 	{
-		Matcher m = junkPattern.matcher( input.subSequence( start, input.length() ) );
-		if ( m.find() )
+		if ( start < input.length() )
 		{
-			return start + m.end();
+			Matcher m = junkPattern.matcher( input.subSequence( start, input.length() ) );
+			if ( m.find() )
+			{
+				return start + m.end();
+			}
+		}
+
+		return start;
+	}
+	
+	public int skipJunkChars(ItemStreamAccessor input, int start)
+	{
+		if ( start <= input.length() )
+		{
+			return input.skipRegEx( start, junkPattern );
 		}
 		else
 		{
 			return start;
 		}
-	}
-	
-	public int skipJunkChars(ItemStreamAccessor input, int start)
-	{
-		return input.skipRegEx( start, junkPattern );
 	}
 	
 	

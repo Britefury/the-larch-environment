@@ -486,6 +486,7 @@ public class Test_Parser extends ParserTestCase
 		matchSubTestStringAndStream( new Keyword( "hello", "abc" ), "hello", "hello", 5 );
 		matchSubTestStringAndStream( new Keyword( "hello", "abc" ), "helloxx", "hello", 5 );
 		matchFailTestStringAndStream( new Keyword( "hello", "abc" ), "helloaa" );
+		matchTestStringAndStreamSX( new Keyword( "hello" ).__add__( new Keyword( "there" ) ), "hello there", "[hello there]" );
 		
 		matchTestStream( new Keyword( "hello" ), new ItemStreamBuilder( new ItemStreamBuilder.Item[] { new ItemStreamBuilder.StructuralItem( "hello" ) } ).stream(), "hello" );
 

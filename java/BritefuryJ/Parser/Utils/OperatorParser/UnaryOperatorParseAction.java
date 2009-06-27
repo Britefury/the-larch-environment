@@ -6,10 +6,9 @@
 //##************************
 package BritefuryJ.Parser.Utils.OperatorParser;
 
-import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
 
 
 public interface UnaryOperatorParseAction
 {
-	public Object invoke(ItemStreamAccessor input, int begin, Object x);
+	public Object invoke(Object input, int begin, int end, Object x);
 }

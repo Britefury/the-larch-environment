@@ -255,6 +255,8 @@ public class Test_DMIOWriter extends TestCase
 	{
 		DMObject a = A.newInstance( new Object[] { "0", "1" } );
 		writeTest( a, "{m=test.module : (m A x=0 y=1)}" );
+		DMObject a1 = A.newInstance( new Object[] { "0" } );
+		writeTest( a1, "{m=test.module : (m A x=0)}" );
 	}
 
 

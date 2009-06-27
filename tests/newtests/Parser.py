@@ -13,8 +13,6 @@ from Britefury.Parser.GrammarUtils.Tokens import identifier, decimalInteger, hex
 from Britefury.Parser.GrammarUtils.SeparatedList import separatedList, delimitedSeparatedList
 from Britefury.Parser.GrammarUtils.Operators import Prefix, Suffix, InfixLeft, InfixRight, buildOperatorParserWithAllLevels
 
-from Britefury.Util.NodeUtil import makeNullNode
-
 from GSymCore.Languages.Python25.Keywords import *
 
 
@@ -186,7 +184,7 @@ attributeRef  <<  Production( primary + '.' + attrName ).action( lambda input, p
 
 
 # Subscript and slice
-_sliceItem = lambda x: x   if x is not None   else   makeNullNode()
+_sliceItem = lambda x: x   if x is not None   else   None
 subscriptSlice = Production( ( Optional( expression ) + ':' + Optional( expression )  ).action( lambda input, pos, xs: [ 'subscriptSlice', _sliceItem( xs[0] ), _sliceItem( xs[2] ) ] ) ).debug( 'subscriptSlice' )
 subscriptLongSlice = Production( ( Optional( expression )  + ':' + Optional( expression )  + ':' + Optional( expression )  ).action( lambda input, pos, xs: [ 'subscriptLongSlice', _sliceItem( xs[0] ), _sliceItem( xs[2] ), _sliceItem( xs[4] ) ] ) ).debug( 'subscriptLongSlice' )
 subscriptEllipsis = Production( '...' ).action( lambda input, pos, xs: [ 'ellipsis' ] ).debug( 'subscriptEllipsis' )
@@ -342,7 +340,7 @@ tupleOrExpressionOrYieldExpression = tupleOrExpression | yieldExpression
 
 
 # Assert statement
-assertStmt = Production( Keyword( assertKeyword ) + expression  +  Optional( Literal( ',' ) + expression ) ).action( lambda input, pos, xs: [ 'assertStmt', xs[1], xs[2][1]   if xs[2] is not None  else  makeNullNode() ] ).debug( 'assertStmt' )
+assertStmt = Production( Keyword( assertKeyword ) + expression  +  Optional( Literal( ',' ) + expression ) ).action( lambda input, pos, xs: [ 'assertStmt', xs[1], xs[2][1]   if xs[2] is not None  else  None ] ).debug( 'assertStmt' )
 
 
 
@@ -380,7 +378,7 @@ yieldStmt = Production( Keyword( yieldKeyword )  +  expression ).action( lambda 
 # Raise statement
 def _raiseFlatten(xs, level):
 	if xs is None:
-		return [ makeNullNode() ] * level
+		return [ None ] * level
 	else:
 		if xs[0] == ',':
 			xs = xs[1:]
@@ -440,8 +438,8 @@ globalStmt = Production( Keyword( globalKeyword )  +  separatedList( globalVar, 
 
 
 # Exec statement
-execCodeStmt = Production( Keyword( execKeyword )  +  orOp ).action( lambda input, pos, xs: [ 'execStmt', xs[1], makeNullNode(), makeNullNode() ] )
-execCodeInLocalsStmt = Production( Keyword( execKeyword )  +  orOp  +  Keyword( inKeyword )  +  expression ).action( lambda input, pos, xs: [ 'execStmt', xs[1], xs[3], makeNullNode() ] )
+execCodeStmt = Production( Keyword( execKeyword )  +  orOp ).action( lambda input, pos, xs: [ 'execStmt', xs[1], None, None ] )
+execCodeInLocalsStmt = Production( Keyword( execKeyword )  +  orOp  +  Keyword( inKeyword )  +  expression ).action( lambda input, pos, xs: [ 'execStmt', xs[1], xs[3], None ] )
 execCodeInLocalsAndGlobalsStmt = Production( Keyword( execKeyword )  +  orOp  +  Keyword( inKeyword )  +  expression  +  ','  +  expression ).action( lambda input, pos, xs: [ 'execStmt', xs[1], xs[3], xs[5] ] )
 execStmt = Production( execCodeInLocalsAndGlobalsStmt | execCodeInLocalsStmt | execCodeStmt )
 
@@ -478,8 +476,8 @@ tryStmt = Production( Keyword( tryKeyword )  +  ':' ).action( lambda input, pos,
 
 
 # Except statement
-exceptAllStmt = Production( Keyword( exceptKeyword ) + ':' ).action( lambda input, pos, xs: [ 'exceptStmt', makeNullNode(), makeNullNode(), [] ] )
-exceptExcStmt = Production( Keyword( exceptKeyword )  +  expression + ':' ).action( lambda input, pos, xs: [ 'exceptStmt', xs[1], makeNullNode(), [] ] )
+exceptAllStmt = Production( Keyword( exceptKeyword ) + ':' ).action( lambda input, pos, xs: [ 'exceptStmt', None, None, [] ] )
+exceptExcStmt = Production( Keyword( exceptKeyword )  +  expression + ':' ).action( lambda input, pos, xs: [ 'exceptStmt', xs[1], None, [] ] )
 exceptExcIntoTargetStmt = Production( Keyword( exceptKeyword )  +  expression  +  ','  +  targetItem + ':' ).action( lambda input, pos, xs: [ 'exceptStmt', xs[1], xs[3], [] ] )
 exceptStmt = Production( exceptExcIntoTargetStmt | exceptExcStmt | exceptAllStmt )
 
@@ -491,7 +489,7 @@ finallyStmt = Production( Keyword( finallyKeyword )  +  ':' ).action( lambda inp
 
 
 # With statement
-withStmt = Production( Keyword( withKeyword )  +  expression  +  Optional( Keyword( asKeyword )  +  targetItem )  +  ':' ).action( lambda input, pos, xs: [ 'withStmt', xs[1], xs[2][1]   if xs[2] is not None   else   makeNullNode(), [] ] )
+withStmt = Production( Keyword( withKeyword )  +  expression  +  Optional( Keyword( asKeyword )  +  targetItem )  +  ':' ).action( lambda input, pos, xs: [ 'withStmt', xs[1], xs[2][1]   if xs[2] is not None   else   None, [] ] )
 
 
 
@@ -501,12 +499,12 @@ defStmt = Production( Keyword( defKeyword )  +  pythonIdentifier  +  '('  +  par
 
 
 # Decorator statement
-decoStmt = Production( Literal( '@' )  +  dottedPythonIdentifer  +  Optional( Literal( '(' )  +  callArgs  +  ')' ) ).action( lambda input, pos, xs: [ 'decoStmt', xs[1], xs[2][1]   if xs[2] is not None   else   makeNullNode() ] )
+decoStmt = Production( Literal( '@' )  +  dottedPythonIdentifer  +  Optional( Literal( '(' )  +  callArgs  +  ')' ) ).action( lambda input, pos, xs: [ 'decoStmt', xs[1], xs[2][1]   if xs[2] is not None   else   None ] )
 
 
 
 # Class statement
-classStmt = Production( Keyword( classKeyword )  +  pythonIdentifier  +  Optional( Literal( '(' )  +  expressionList  +  ')' )  +  ':' ).action( lambda input, pos, xs: [ 'classStmt', xs[1], xs[2][1]   if xs[2] is not None   else   makeNullNode(), [] ] )
+classStmt = Production( Keyword( classKeyword )  +  pythonIdentifier  +  Optional( Literal( '(' )  +  expressionList  +  ')' )  +  ':' ).action( lambda input, pos, xs: [ 'classStmt', xs[1], xs[2][1]   if xs[2] is not None   else   None, [] ] )
 
 
 
@@ -661,17 +659,17 @@ class TestCase_Python25Parser (ParserTestCase):
 	def testSubscript(self):
 		self._matchTest( expression, 'a[x]', [ 'subscript', [ 'var', 'a' ], [ 'var', 'x' ] ] )
 		self._matchTest( expression, 'a[x:p]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptSlice', [ 'var', 'x' ], [ 'var', 'p' ] ] ] )
-		self._matchTest( expression, 'a[x:]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptSlice', [ 'var', 'x' ], makeNullNode() ] ] )
-		self._matchTest( expression, 'a[:p]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptSlice', makeNullNode(), [ 'var', 'p' ] ] ] )
-		self._matchTest( expression, 'a[:]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptSlice', makeNullNode(), makeNullNode() ] ] )
+		self._matchTest( expression, 'a[x:]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptSlice', [ 'var', 'x' ], None ] ] )
+		self._matchTest( expression, 'a[:p]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptSlice', None, [ 'var', 'p' ] ] ] )
+		self._matchTest( expression, 'a[:]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptSlice', None, None ] ] )
 		self._matchTest( expression, 'a[x:p:f]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptLongSlice', [ 'var', 'x' ], [ 'var', 'p' ], [ 'var', 'f' ] ] ] )
-		self._matchTest( expression, 'a[x:p:]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptLongSlice', [ 'var', 'x' ], [ 'var', 'p' ], makeNullNode() ] ] )
-		self._matchTest( expression, 'a[x::f]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptLongSlice', [ 'var', 'x' ], makeNullNode(), [ 'var', 'f' ] ] ] )
-		self._matchTest( expression, 'a[:p:f]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptLongSlice', makeNullNode(), [ 'var', 'p' ], [ 'var', 'f' ] ] ] )
-		self._matchTest( expression, 'a[::]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptLongSlice', makeNullNode(), makeNullNode(), makeNullNode() ] ] )
-		self._matchTest( expression, 'a[::f]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptLongSlice', makeNullNode(), makeNullNode(), [ 'var', 'f' ] ] ] )
-		self._matchTest( expression, 'a[x::]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptLongSlice', [ 'var', 'x' ], makeNullNode(), makeNullNode() ] ] )
-		self._matchTest( expression, 'a[:p:]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptLongSlice', makeNullNode(), [ 'var', 'p' ], makeNullNode() ] ] )
+		self._matchTest( expression, 'a[x:p:]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptLongSlice', [ 'var', 'x' ], [ 'var', 'p' ], None ] ] )
+		self._matchTest( expression, 'a[x::f]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptLongSlice', [ 'var', 'x' ], None, [ 'var', 'f' ] ] ] )
+		self._matchTest( expression, 'a[:p:f]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptLongSlice', None, [ 'var', 'p' ], [ 'var', 'f' ] ] ] )
+		self._matchTest( expression, 'a[::]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptLongSlice', None, None, None ] ] )
+		self._matchTest( expression, 'a[::f]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptLongSlice', None, None, [ 'var', 'f' ] ] ] )
+		self._matchTest( expression, 'a[x::]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptLongSlice', [ 'var', 'x' ], None, None ] ] )
+		self._matchTest( expression, 'a[:p:]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptLongSlice', None, [ 'var', 'p' ], None ] ] )
 		self._matchTest( expression, 'a[x,y]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptTuple', [ 'var', 'x' ], [ 'var', 'y' ] ] ] )
 		self._matchTest( expression, 'a[x:p,y:q]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptTuple', [ 'subscriptSlice', [ 'var', 'x' ], [ 'var', 'p' ] ], [ 'subscriptSlice', [ 'var', 'y' ], [ 'var', 'q' ] ] ] ] )
 		self._matchTest( expression, 'a[x:p:f,y:q:g]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptTuple', [ 'subscriptLongSlice', [ 'var', 'x' ], [ 'var', 'p' ], [ 'var', 'f' ] ], [ 'subscriptLongSlice', [ 'var', 'y' ], [ 'var', 'q' ], [ 'var', 'g' ] ] ] ] )
@@ -752,7 +750,7 @@ class TestCase_Python25Parser (ParserTestCase):
 		
 		
 	def testAssertStmt(self):
-		self._matchTest( statement, 'assert x', [ 'assertStmt', [ 'var', 'x' ], makeNullNode() ] )
+		self._matchTest( statement, 'assert x', [ 'assertStmt', [ 'var', 'x' ], None ] )
 		self._matchTest( statement, 'assert x,y', [ 'assertStmt', [ 'var', 'x' ], [ 'var', 'y' ] ] )
 	
 	
@@ -794,9 +792,9 @@ class TestCase_Python25Parser (ParserTestCase):
 		
 		
 	def testRaiseStmt(self):
-		self._matchTest( statement, 'raise', [ 'raiseStmt', makeNullNode(), makeNullNode(), makeNullNode() ] )
-		self._matchTest( statement, 'raise x', [ 'raiseStmt', [ 'var', 'x' ], makeNullNode(), makeNullNode() ] )
-		self._matchTest( statement, 'raise x,y', [ 'raiseStmt', [ 'var', 'x' ], [ 'var', 'y' ], makeNullNode() ] )
+		self._matchTest( statement, 'raise', [ 'raiseStmt', None, None, None ] )
+		self._matchTest( statement, 'raise x', [ 'raiseStmt', [ 'var', 'x' ], None, None ] )
+		self._matchTest( statement, 'raise x,y', [ 'raiseStmt', [ 'var', 'x' ], [ 'var', 'y' ], None ] )
 		self._matchTest( statement, 'raise x,y,z', [ 'raiseStmt', [ 'var', 'x' ], [ 'var', 'y' ], [ 'var', 'z' ] ] )
 		
 		
@@ -858,8 +856,8 @@ class TestCase_Python25Parser (ParserTestCase):
 	
 		
 	def testExecStmt(self):
-		self._matchTest( statement, 'exec a', [ 'execStmt', [ 'var', 'a' ], makeNullNode(), makeNullNode() ] )
-		self._matchTest( statement, 'exec a in b', [ 'execStmt', [ 'var', 'a' ], [ 'var', 'b' ], makeNullNode() ] )
+		self._matchTest( statement, 'exec a', [ 'execStmt', [ 'var', 'a' ], None, None ] )
+		self._matchTest( statement, 'exec a in b', [ 'execStmt', [ 'var', 'a' ], [ 'var', 'b' ], None ] )
 		self._matchTest( statement, 'exec a in b,c', [ 'execStmt', [ 'var', 'a' ], [ 'var', 'b' ], [ 'var', 'c' ] ] )
 		
 		
@@ -888,8 +886,8 @@ class TestCase_Python25Parser (ParserTestCase):
 		
 		
 	def testExceptStmt(self):
-		self._matchTest( exceptStmt, 'except:', [ 'exceptStmt', makeNullNode(), makeNullNode(), [] ] )
-		self._matchTest( exceptStmt, 'except x:', [ 'exceptStmt', [ 'var', 'x' ], makeNullNode(), [] ] )
+		self._matchTest( exceptStmt, 'except:', [ 'exceptStmt', None, None, [] ] )
+		self._matchTest( exceptStmt, 'except x:', [ 'exceptStmt', [ 'var', 'x' ], None, [] ] )
 		self._matchTest( exceptStmt, 'except x, y:', [ 'exceptStmt', [ 'var', 'x' ], [ 'singleTarget', 'y' ], [] ] )
 		
 		
@@ -898,7 +896,7 @@ class TestCase_Python25Parser (ParserTestCase):
 		
 		
 	def testWithStmt(self):
-		self._matchTest( withStmt, 'with a:', [ 'withStmt', [ 'var', 'a' ], makeNullNode(), [] ] )
+		self._matchTest( withStmt, 'with a:', [ 'withStmt', [ 'var', 'a' ], None, [] ] )
 		self._matchTest( withStmt, 'with a as b:', [ 'withStmt', [ 'var', 'a' ], [ 'singleTarget', 'b' ], [] ] )
 		
 		
@@ -908,12 +906,12 @@ class TestCase_Python25Parser (ParserTestCase):
 		
 		
 	def testDecoStmt(self):
-		self._matchTest( decoStmt, '@f', [ 'decoStmt', 'f', makeNullNode() ] )
+		self._matchTest( decoStmt, '@f', [ 'decoStmt', 'f', None ] )
 		self._matchTest( decoStmt, '@f(x)', [ 'decoStmt', 'f', [ [ 'var', 'x' ] ] ] )
 		
 		
 	def testClassStmt(self):
-		self._matchTest( classStmt, 'class Q:', [ 'classStmt', 'Q', makeNullNode(), [] ] )
+		self._matchTest( classStmt, 'class Q:', [ 'classStmt', 'Q', None, [] ] )
 		self._matchTest( classStmt, 'class Q (x):', [ 'classStmt', 'Q', [ [ 'var', 'x' ] ], [] ] )
 		self._matchTest( classStmt, 'class Q (x,y):', [ 'classStmt', 'Q', [ [ 'var', 'x' ], [ 'var', 'y' ] ], [] ] )
 		

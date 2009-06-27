@@ -7,8 +7,8 @@
 package BritefuryJ.Parser;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
 
@@ -39,7 +39,7 @@ public class ListNode extends BranchExpression
 	private ParseResult matchListContents(ParserState state, List<Object> input)
 	{
 		ArrayList<Object> value = new ArrayList<Object>();
-		HashMap<String, Object> bindings = null;
+		Map<String, Object> bindings = null;
 		
 		int pos = 0;
 		for (int i = 0; i < subexps.length; i++)

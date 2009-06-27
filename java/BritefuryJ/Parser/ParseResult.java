@@ -8,6 +8,7 @@ package BritefuryJ.Parser;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import BritefuryJ.ParserHelpers.DebugNode;
 import BritefuryJ.ParserHelpers.ParseResultInterface;
@@ -23,7 +24,7 @@ public class ParseResult implements ParseResultInterface
 	protected Object value;
 	protected int begin, end;
 	protected boolean bSuppressed, bValid, bMerge;
-	protected HashMap<String, Object> bindings;
+	protected Map<String, Object> bindings;
 	
 	
 	public ParseResult()
@@ -43,7 +44,7 @@ public class ParseResult implements ParseResultInterface
 		bValid = true;
 	}
 	
-	public ParseResult(Object value, int begin, int end, HashMap<String, Object> bindings)
+	public ParseResult(Object value, int begin, int end, Map<String, Object> bindings)
 	{
 		this.value = value;
 		this.begin = begin;
@@ -81,7 +82,7 @@ public class ParseResult implements ParseResultInterface
 		this.bValid = bValid;
 	}
 	
-	protected ParseResult(Object value, int begin, int end, boolean bSuppressed, boolean bValid, boolean bMerge, HashMap<String, Object> bindings)
+	protected ParseResult(Object value, int begin, int end, boolean bSuppressed, boolean bValid, boolean bMerge, Map<String, Object> bindings)
 	{
 		this.value = value;
 		this.begin = begin;
@@ -152,7 +153,7 @@ public class ParseResult implements ParseResultInterface
 	
 	
 	
-	protected static HashMap<String, Object> addBindings(HashMap<String, Object> a, HashMap<String, Object> b)
+	public static Map<String, Object> addBindings(Map<String, Object> a, Map<String, Object> b)
 	{
 		if ( a == null )
 		{
@@ -212,7 +213,7 @@ public class ParseResult implements ParseResultInterface
 		return bMerge  &&  value instanceof List<?>;
 	}
 	
-	public HashMap<String, Object> getBindings()
+	public Map<String, Object> getBindings()
 	{
 		return bindings;
 	}

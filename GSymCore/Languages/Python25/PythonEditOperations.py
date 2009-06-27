@@ -374,7 +374,7 @@ def pyReplaceStatementWithRange(ctx, data, replacement):
 #
 
 def parseText(parser, text, outerPrecedence=None):
-	res = parser.parseString( text )
+	res = parser.parseStringChars( text )
 	pos = res.getEnd()
 	if res.isValid():
 		if pos == len( text ):

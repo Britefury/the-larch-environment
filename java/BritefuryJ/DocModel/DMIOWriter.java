@@ -113,7 +113,7 @@ public class DMIOWriter
 		for (int i = 0; i < cls.getNumFields(); i++)
 		{
 			Object x = obj.get( i );
-			if ( !DMNode.isNull( x ) )
+			if ( x != null )
 			{
 				builder.append( " " );
 				builder.append( cls.getField( i ).getName() );

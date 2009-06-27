@@ -90,17 +90,4 @@ public abstract class DMNode
 			return x;
 		}
 	}
-	
-
-	
-	
-	public static boolean isNull(Object x)
-	{
-		return "<nil>".equals( x );
-	}
-	
-	public static String newNull()
-	{
-		return new String( "<nil>" );
-	}
 }
