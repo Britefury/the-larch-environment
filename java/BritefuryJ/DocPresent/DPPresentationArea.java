@@ -11,6 +11,8 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.datatransfer.Transferable;
@@ -34,13 +36,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import javax.swing.BoundedRangeModel;
 import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JScrollBar;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Caret.CaretListener;
-import BritefuryJ.DocPresent.TreeExplorer.ElementTreeExplorer;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Event.PointerScrollEvent;
@@ -52,6 +58,7 @@ import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Selection.Selection;
 import BritefuryJ.DocPresent.Selection.SelectionListener;
+import BritefuryJ.DocPresent.TreeExplorer.ElementTreeExplorer;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
@@ -399,6 +406,91 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 	
 	
 	
+	public static class ScrollablePresentationAreaComponent extends JPanel implements ChangeListener
+	{
+		private static final long serialVersionUID = 1L;
+
+		private DPPresentationArea area;
+		private PresentationAreaComponent presentation;
+		private JScrollBar horizScroll, vertScroll;
+		
+		public ScrollablePresentationAreaComponent(DPPresentationArea area)
+		{
+			this.area = area;
+			
+			presentation = new PresentationAreaComponent( area );
+			
+			horizScroll = new JScrollBar( JScrollBar.HORIZONTAL );
+			vertScroll = new JScrollBar( JScrollBar.VERTICAL );
+			
+			GridBagLayout grid = new GridBagLayout();
+			setLayout( grid );
+			
+			GridBagConstraints c;
+			
+			c = new GridBagConstraints();
+			c.fill = GridBagConstraints.BOTH;
+			c.weightx = c.weighty = 1.0;
+			grid.setConstraints( presentation, c );
+			add( presentation );
+			
+			c = new GridBagConstraints();
+			c.fill = GridBagConstraints.VERTICAL;
+			c.gridwidth = GridBagConstraints.REMAINDER;
+			grid.setConstraints( vertScroll, c );
+			add( vertScroll );
+
+			c = new GridBagConstraints();
+			c.fill = GridBagConstraints.HORIZONTAL;
+			grid.setConstraints( horizScroll, c );
+			add( horizScroll );
+			
+			horizScroll.getModel().addChangeListener( this );
+			vertScroll.getModel().addChangeListener( this );
+		}
+		
+		
+		
+		private void setRange(Vector2 rootSize, Vector2 extents, Point2 value)
+		{
+			BoundedRangeModel x = horizScroll.getModel();
+			BoundedRangeModel y = vertScroll.getModel();
+			
+			double maxX = Math.max( rootSize.x, extents.x );
+			double maxY = Math.max( rootSize.y, extents.y );
+			double valueX = Math.max( Math.min( value.x, maxX - extents.x ), 0.0 );
+			double valueY = Math.max( Math.min( value.y, maxY - extents.y ), 0.0 );
+			
+			x.setRangeProperties( (int)valueX, (int)extents.x, 0, (int)maxX, false );
+			y.setRangeProperties( (int)valueY, (int)extents.y, 0, (int)maxY, false );
+			
+			horizScroll.setBlockIncrement( (int)extents.x );
+			vertScroll.setBlockIncrement( (int)extents.y );
+		}
+
+
+
+		public void stateChanged(ChangeEvent event)
+		{
+			if ( event.getSource() == horizScroll.getModel() )
+			{
+				BoundedRangeModel x = horizScroll.getModel();
+				area.scrollBarX( (double)x.getValue() );
+			}
+			else if ( event.getSource() == vertScroll.getModel() )
+			{
+				BoundedRangeModel y = vertScroll.getModel();
+				area.scrollBarY( (double)y.getValue() );
+			}
+			else
+			{
+				throw new RuntimeException( "Invalid event source" );
+			}
+		}
+	}
+	
+	
+	
 	private HashMap<PointerInterface, DndDrag> dndTable;
 	
 	private Point2 windowTopLeftCornerInRootSpace;
@@ -415,7 +507,7 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 	
 	private WeakHashMap<StateKeyListener, Object> stateKeyListeners;
 	
-	private PresentationAreaComponent component;
+	private ScrollablePresentationAreaComponent component;
 	
 	private Runnable immediateEventDispatcher;
 	
@@ -455,7 +547,7 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 		
 		areaSize = new Vector2();
 		
-		component = new PresentationAreaComponent( this );
+		component = new ScrollablePresentationAreaComponent( this );
 
 		rootSpaceMouse = new Pointer();
 		inputTable = new InputTable( rootSpaceMouse );
@@ -625,6 +717,7 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 	public void oneToOne()
 	{
 		rootScaleInWindowSpace = 1.0;
+		updateRange();
 		
 		bAllocationRequired = true;
 		queueFullRedraw();
@@ -634,6 +727,7 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 	{
 		windowTopLeftCornerInRootSpace = new Point2();
 		rootScaleInWindowSpace = 1.0;
+		updateRange();
 		
 		bAllocationRequired = true;
 		queueFullRedraw();
@@ -646,6 +740,7 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 		Point2 bottomRight = widget.getLocalPointRelativeToRoot( new Point2( widget.getAllocation() ) );
 		Point2 centre = Point2.average( topLeft, bottomRight );
 		windowTopLeftCornerInRootSpace = centre.sub( areaSize.mul( 0.5 ) );
+		updateRange();
 		queueFullRedraw();
 	}
 	
@@ -663,6 +758,7 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 		rootScaleInWindowSpace = Math.min( areaSize.x / ax, areaSize.y / ay );
 		rootScaleInWindowSpace = rootScaleInWindowSpace == 0.0  ?  1.0  :  rootScaleInWindowSpace;
 		
+		updateRange();
 		bAllocationRequired = true;
 		queueFullRedraw();
 	}
@@ -674,6 +770,7 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 		Point2 newCentreInRootSpace = windowSpaceToRootSpace( centreInWindowSpace );
 		windowTopLeftCornerInRootSpace = windowTopLeftCornerInRootSpace.sub( newCentreInRootSpace.sub( centreInRootSpace ) );
 
+		updateRange();
 		bAllocationRequired = true;
 		queueFullRedraw();
 	}
@@ -687,12 +784,37 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 	public void panRootSpace(Vector2 pan)
 	{
 		windowTopLeftCornerInRootSpace = windowTopLeftCornerInRootSpace.add( pan );
+		updateRange();
 		queueFullRedraw();
 	}
 	
 	public void panWindowSpace(Vector2 pan)
 	{
 		panRootSpace( windowSpaceToRootSpace( pan ) );
+	}
+	
+	private void updateRange()
+	{
+		double allocationX = getAllocationX();
+		double allocationY = getAllocationY();
+
+		double ax = allocationX == 0.0  ?  1.0  :  allocationX;
+		double ay = allocationY == 0.0  ?  1.0  :  allocationY;
+
+		component.setRange( new Vector2( ax * rootScaleInWindowSpace, ay * rootScaleInWindowSpace ), areaSize, windowTopLeftCornerInRootSpace.scale( rootScaleInWindowSpace ) );
+		
+	}
+	
+	private void scrollBarX(double x)
+	{
+		windowTopLeftCornerInRootSpace.x = x / rootScaleInWindowSpace;
+		queueFullRedraw();
+	}
+	
+	private void scrollBarY(double y)
+	{
+		windowTopLeftCornerInRootSpace.y = y / rootScaleInWindowSpace;
+		queueFullRedraw();
 	}
 	
 	
@@ -793,7 +915,7 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 	
 	protected void queueFullRedraw()
 	{
-		component.repaint( component.getVisibleRect() );
+		component.presentation.repaint( component.presentation.getVisibleRect() );
 	}
 	
 	protected void queueRedraw(Point2 localPos, Vector2 localSize)
@@ -806,7 +928,7 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 		int x = (int)pos.x, y = (int)pos.y;
 		int w = (int)(pos.x + size.x + 0.5) - x;
 		int h = (int)(pos.y + size.y + 0.5) - y;
-		component.repaint( new Rectangle( x, y, w, h ) ); 
+		component.presentation.repaint( new Rectangle( x, y, w, h ) ); 
 	}
 	
 	
@@ -861,6 +983,7 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 			layoutAllocBox.setAllocationY( reqY.getReqHeight() );
 			refreshAllocationY( prevHeight );
 			
+			updateRange();
 			bAllocationRequired = false;
 			
 			// Send motion events; pointer hasn't moved, but the widgets have
@@ -937,6 +1060,7 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 		if ( !size.equals( areaSize ) )
 		{
 			areaSize = size;
+			updateRange();
 			bAllocationRequired = true;
 		}
 		emitImmediateEvents();
@@ -1027,7 +1151,7 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 	protected void mouseDownEvent(int button, Point2 windowPos, int modifiers)
 	{
 		bMouseSelectionInProgress = false;
-		component.grabFocus();
+		component.presentation.grabFocus();
 		Point2 rootPos = windowSpaceToRootSpace( windowPos );
 		rootSpaceMouse.setLocalPos( rootPos );
 		rootSpaceMouse.setModifiers( modifiers );
@@ -1130,6 +1254,7 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 			if ( dragButton == 1  ||  dragButton == 2 )
 			{
 				windowTopLeftCornerInRootSpace = windowTopLeftCornerInRootSpace.sub( windowSpaceToRootSpace( delta ) );
+				updateRange();
 				queueFullRedraw();
 			}
 			else if ( dragButton == 3 )
