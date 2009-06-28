@@ -413,6 +413,7 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 		private DPPresentationArea area;
 		private PresentationAreaComponent presentation;
 		private JScrollBar horizScroll, vertScroll;
+		private boolean bIgnoreChanges;
 		
 		public ScrollablePresentationAreaComponent(DPPresentationArea area)
 		{
@@ -447,12 +448,15 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 			
 			horizScroll.getModel().addChangeListener( this );
 			vertScroll.getModel().addChangeListener( this );
+			
+			bIgnoreChanges = false;
 		}
 		
 		
 		
 		private void setRange(Vector2 rootSize, Vector2 extents, Point2 value)
 		{
+			bIgnoreChanges = true;
 			BoundedRangeModel x = horizScroll.getModel();
 			BoundedRangeModel y = vertScroll.getModel();
 			
@@ -466,6 +470,7 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 			
 			horizScroll.setBlockIncrement( (int)extents.x );
 			vertScroll.setBlockIncrement( (int)extents.y );
+			bIgnoreChanges = false;
 		}
 
 
@@ -474,13 +479,19 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 		{
 			if ( event.getSource() == horizScroll.getModel() )
 			{
-				BoundedRangeModel x = horizScroll.getModel();
-				area.scrollBarX( (double)x.getValue() );
+				if ( !bIgnoreChanges )
+				{
+					BoundedRangeModel x = horizScroll.getModel();
+					area.scrollBarX( (double)x.getValue() );
+				}
 			}
 			else if ( event.getSource() == vertScroll.getModel() )
 			{
-				BoundedRangeModel y = vertScroll.getModel();
-				area.scrollBarY( (double)y.getValue() );
+				if ( !bIgnoreChanges )
+				{
+					BoundedRangeModel y = vertScroll.getModel();
+					area.scrollBarY( (double)y.getValue() );
+				}
 			}
 			else
 			{
