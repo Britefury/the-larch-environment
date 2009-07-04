@@ -42,25 +42,25 @@ _unquotedStringChars = ( string.digits + string.letters + string.punctuation ).r
 class LispGrammar (Grammar):
 	@Rule
 	def unicodeStringS(self):
-		return ( ( Literal( 'u' )  |  Literal( 'U' ) ) + singleQuotedString ).action( lambda input, pos, xs: 'u' + xs[1] )
+		return ( ( Literal( 'u' )  |  Literal( 'U' ) ) + singleQuotedString ).action( lambda input, begin, end, xs, bindings: 'u' + xs[1] )
 	
 	@Rule
 	def unicodeStringD(self):
-		return ( ( Literal( 'u' )  |  Literal( 'U' ) ) + doubleQuotedString ).action( lambda input, pos, xs: 'u' + xs[1] )
+		return ( ( Literal( 'u' )  |  Literal( 'U' ) ) + doubleQuotedString ).action( lambda input, begin, end, xs, bindings: 'u' + xs[1] )
 	
 	
 
 	@Rule
 	def unquotedString(self):
-		return Word( _unquotedStringChars ).action( lambda input, pos, xs: xs )
+		return Word( _unquotedStringChars ).action( lambda input, begin, end, xs, bindings: xs )
 	
 	@Rule
 	def _quotedString(self):
-		return ( self.unicodeStringS()  |  self.unicodeStringD()  |  singleQuotedString  |  doubleQuotedString ).action( lambda input, pos, xs: eval( xs ) )
+		return ( self.unicodeStringS()  |  self.unicodeStringD()  |  singleQuotedString  |  doubleQuotedString ).action( lambda input, begin, end, xs, bindings: eval( xs ) )
 	
 	@Rule
 	def _list(self):
-		return ( Literal( '(' )  +  ZeroOrMore( self.expression() )  +  Literal( ')' ) ).action( lambda input, pos, xs: xs[1] )
+		return ( Literal( '(' )  +  ZeroOrMore( self.expression() )  +  Literal( ')' ) ).action( lambda input, begin, end, xs, bindings: xs[1] )
 	
 	@Rule
 	def expression(self):

@@ -214,7 +214,7 @@ public abstract class DPContentLeaf extends DPWidget
 	
 	public boolean isMarkerAtStart(Marker m)
 	{
-		if ( m.getWidget() == this )
+		if ( m.getElement() == this )
 		{
 			return m.getIndex() == 0;
 		}
@@ -226,7 +226,7 @@ public abstract class DPContentLeaf extends DPWidget
 	
 	public boolean isMarkerAtEnd(Marker m)
 	{
-		if ( m.getWidget() == this )
+		if ( m.getElement() == this )
 		{
 			// The index (position and bias) is at the last position,
 			// OR
@@ -792,7 +792,7 @@ public abstract class DPContentLeaf extends DPWidget
 
 	public String getTextRepresentationBetweenMarkers(Marker startMarker, Marker endMarker)
 	{
-		if ( startMarker.getWidget() != this  ||  endMarker.getWidget() != this )
+		if ( startMarker.getElement() != this  ||  endMarker.getElement() != this )
 		{
 			throw new RuntimeException();
 		}
@@ -836,7 +836,7 @@ public abstract class DPContentLeaf extends DPWidget
 		Caret caret = presentationArea.getCaret();
 		if ( caret != null )
 		{
-			DPContentLeaf e = caret.getMarker().getWidget();
+			DPContentLeaf e = caret.getMarker().getElement();
 			if ( e == this )
 			{
 				return metaHeaderHighlightBorder;

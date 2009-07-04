@@ -31,18 +31,18 @@ def _listParseAction(tokens):
 def _p(xs):
 	print xs
 	return xs
-unicodeStringS = Production( ( Literal( 'u' )  |  Literal( 'U' ) ) + singleQuotedString ).action( lambda input, pos, xs: 'u' + xs[1] )
-unicodeStringD = Production( ( Literal( 'u' )  |  Literal( 'U' ) ) + doubleQuotedString ).action( lambda input, pos, xs: 'u' + xs[1] )
+unicodeStringS = Production( ( Literal( 'u' )  |  Literal( 'U' ) ) + singleQuotedString ).action( lambda input, begin, end, xs, bindings: 'u' + xs[1] )
+unicodeStringD = Production( ( Literal( 'u' )  |  Literal( 'U' ) ) + doubleQuotedString ).action( lambda input, begin, end, xs, bindings: 'u' + xs[1] )
 
 
 _unquotedStringChars = ( string.digits + string.letters + string.punctuation ).replace( '(', '' ).replace( ')', '' ).replace( '\'', '' ).replace( '`', '' ).replace( '{', '' ).replace( '}', '' )
 
 
-unquotedString = Production( Word( _unquotedStringChars ) ).action( lambda input, pos, xs: xs )
-_quotedString = Production( unicodeStringS  |  unicodeStringD  |  singleQuotedString  |  doubleQuotedString ).action( lambda input, pos, xs: eval( xs ) )
+unquotedString = Production( Word( _unquotedStringChars ) ).action( lambda input, begin, end, xs, bindings: xs )
+_quotedString = Production( unicodeStringS  |  unicodeStringD  |  singleQuotedString  |  doubleQuotedString ).action( lambda input, begin, end, xs, bindings: eval( xs ) )
 
 parser = Forward()
-_list = Production( Literal( '(' )  +  ZeroOrMore( parser )  +  Literal( ')' ) ).action( lambda input, pos, xs: xs[1] )
+_list = Production( Literal( '(' )  +  ZeroOrMore( parser )  +  Literal( ')' ) ).action( lambda input, begin, end, xs, bindings: xs[1] )
 parser  <<  Production( _quotedString | unquotedString | _list )
 
 

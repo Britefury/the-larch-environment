@@ -1394,7 +1394,7 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 			{
 				if ( caret.isValid() )
 				{
-					DPContentLeaf leaf = caret.getMarker().getWidget();
+					DPContentLeaf leaf = caret.getMarker().getElement();
 					if ( leaf.isEditableEntry() )
 					{
 						DPContentLeafEditableEntry editable = (DPContentLeafEditableEntry)leaf;
@@ -1435,7 +1435,7 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 			{
 				if ( caret.isValid() )
 				{
-					DPContentLeaf leaf = caret.getMarker().getWidget();
+					DPContentLeaf leaf = caret.getMarker().getElement();
 					if ( leaf.isEditableEntry() )
 					{
 						DPContentLeafEditableEntry editable = (DPContentLeafEditableEntry)leaf;
@@ -1481,7 +1481,7 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 			{
 				if ( caret.isValid()  &&  !bCtrl  &&  !bAlt )
 				{
-					DPContentLeaf leaf = caret.getMarker().getWidget();
+					DPContentLeaf leaf = caret.getMarker().getElement();
 					if ( leaf.isEditableEntry() )
 					{
 						DPContentLeafEditableEntry editable = (DPContentLeafEditableEntry)leaf;
@@ -1521,7 +1521,7 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 		{
 			if ( caret.isValid() )
 			{
-				DPContentLeaf leaf = caret.getMarker().getWidget();
+				DPContentLeaf leaf = caret.getMarker().getElement();
 				Marker prevPos = caret.getMarker().copy();
 				if ( event.getKeyCode() == KeyEvent.VK_LEFT )
 				{

@@ -351,7 +351,7 @@ public class DPFraction extends DPContainer
 	
 	public List<DPWidget> getChildren()
 	{
-		return Arrays.asList( children );
+		return registeredChildren;
 	}
 
 	
