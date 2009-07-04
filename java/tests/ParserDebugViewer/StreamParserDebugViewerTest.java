@@ -28,7 +28,8 @@ public class StreamParserDebugViewerTest
 		xs.add( "5" );
 		ItemStreamBuilder builder1 = new ItemStreamBuilder();
 		builder1.appendTextValue( "this[" );
-		builder1.appendStructuralValue( xs );
+		builder1.appendTextValue( "i" );
+		//builder1.appendStructuralValue( xs );
 		builder1.appendTextValue( "][j].x.m()" );
 
 		

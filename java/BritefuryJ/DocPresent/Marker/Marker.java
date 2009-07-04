@@ -79,7 +79,7 @@ public class Marker
 	
 	
 	
-	public DPContentLeaf getWidget()
+	public DPContentLeaf getElement()
 	{
 		return widget;
 	}
@@ -91,7 +91,7 @@ public class Marker
 	
 	public int getPositionInSubtree(DPWidget subtreeRoot) throws IsNotInSubtreeException
 	{
-		DPWidget element = getWidget();
+		DPWidget element = getElement();
 		if ( subtreeRoot == element )
 		{
 			return getPosition();

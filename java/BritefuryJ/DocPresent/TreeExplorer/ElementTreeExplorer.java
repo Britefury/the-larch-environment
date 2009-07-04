@@ -100,7 +100,7 @@ public class ElementTreeExplorer implements WindowListener
 				Caret caret = tree.getCaret();
 				if ( caret != null )
 				{
-					DPWidget caretElement = caret.getMarker().getWidget();
+					DPWidget caretElement = caret.getMarker().getElement();
 					if ( caretElement != null )
 					{
 						DPWidget metaCaretWidget = caretElement.getMetaElement();

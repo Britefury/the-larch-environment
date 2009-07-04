@@ -41,7 +41,7 @@ public class Caret implements MarkerListener
 	{
 		if ( marker != null )
 		{
-			return marker.getWidget();
+			return marker.getElement();
 		}
 		else
 		{

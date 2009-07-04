@@ -1500,14 +1500,14 @@ abstract public class DPWidget
 	public String getTextRepresentationFromStartToMarker(Marker marker)
 	{
 		StringBuilder builder = new StringBuilder();
-		marker.getWidget().getTextRepresentationFromStartOfRootToMarker( builder, marker, this );
+		marker.getElement().getTextRepresentationFromStartOfRootToMarker( builder, marker, this );
 		return builder.toString();
 	}
 	
 	public String getTextRepresentationFromMarkerToEnd(Marker marker)
 	{
 		StringBuilder builder = new StringBuilder();
-		marker.getWidget().getTextRepresentationFromMarkerToEndOfRoot( builder, marker, this );
+		marker.getElement().getTextRepresentationFromMarkerToEndOfRoot( builder, marker, this );
 		return builder.toString();
 	}
 

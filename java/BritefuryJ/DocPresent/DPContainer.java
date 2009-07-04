@@ -1451,8 +1451,15 @@ public abstract class DPContainer extends DPWidget
 		DPVBox metaChildrenVBox = new DPVBox( metaVBoxStyle );
 		for (DPWidget child: getChildren())
 		{
-			DPWidget metaChild = child.initialiseMetaElement();
-			metaChildrenVBox.append( metaChild );
+			if ( child != null )
+			{
+				DPWidget metaChild = child.initialiseMetaElement();
+				metaChildrenVBox.append( metaChild );
+			}
+			else
+			{
+				System.out.println( "DPContainer.createMetaElement(): null child in " + getClass().getName() );
+			}
 		}
 		
 		DPBorder indentMetaChildren = new DPBorder( metaIndentBorder );

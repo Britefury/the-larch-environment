@@ -150,9 +150,9 @@ public class Selection implements MarkerListener
 		{
 			if ( !isEmpty() )
 			{
-				DPWidget w0 = marker0.getWidget();
+				DPWidget w0 = marker0.getElement();
 				ArrayList<DPWidget> path0 = new ArrayList<DPWidget>();
-				DPWidget w1 = marker1.getWidget();
+				DPWidget w1 = marker1.getElement();
 				ArrayList<DPWidget> path1 = new ArrayList<DPWidget>();
 				DPWidget.getPathsFromCommonSubtreeRoot( w0, path0, w1, path1 );
 				
