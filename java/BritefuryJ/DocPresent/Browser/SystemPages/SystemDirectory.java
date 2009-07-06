@@ -10,6 +10,17 @@ public class SystemDirectory
 {
 	protected static void initialise()
 	{
+		BorderTestPage.initialise();
+		FractionTestPage.initialise();
+		HBoxTestPage.initialise();
+		HBoxTypesetTestPage.initialise();
+		MathRootTestPage.initialise();
+		ParagraphCollationTestPage.initialise();
+		ParagraphTestPage.initialise();
+		ScriptTestPage.initialise();
+		SegmentTestPage.initialise();
+		TableTestPage.initialise();
 		TextTestPage.initialise();
+		VBoxTestPage.initialise();
 	}
 }
