@@ -23,14 +23,9 @@ import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
 public class BorderTestPage extends SystemPage
 {
-	protected static void initialise()
+	protected BorderTestPage()
 	{
-		new BorderTestPage().register( "border" );
-	}
-	
-	
-	private BorderTestPage()
-	{
+		register( "tests.border" );
 	}
 	
 	

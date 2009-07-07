@@ -19,14 +19,9 @@ import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
 public class VBoxTestPage extends SystemPage
 {
-	protected static void initialise()
+	protected VBoxTestPage()
 	{
-		new VBoxTestPage().register( "vbox" );
-	}
-	
-	
-	private VBoxTestPage()
-	{
+		register( "tests.vbox" );
 	}
 	
 	

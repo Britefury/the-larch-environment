@@ -538,6 +538,9 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 	
 	protected DPPresentationArea metaArea;
 	protected ElementTreeExplorer explorer;
+	
+	
+	protected PageController pageController; 
 
 	
 	
@@ -582,6 +585,18 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 		bStructureRefreshQueued = false;
 		
 		bMouseSelectionInProgress = false;
+	}
+	
+	
+	
+	public void setPageController(PageController pageController)
+	{
+		this.pageController = pageController;
+	}
+	
+	public PageController getPageController()
+	{
+		return pageController;
 	}
 	
 	
@@ -1634,12 +1649,17 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 	
 	
 	
-	private void setCursorDrag(PointerInterface pointer)
+	protected void setCursorDrag(PointerInterface pointer)
 	{
 		component.setCursor( new Cursor( Cursor.HAND_CURSOR ) );
 	}
 	
-	private void setCursorArrow(PointerInterface pointer)
+	protected void setCursorHand(PointerInterface pointer)
+	{
+		component.setCursor( new Cursor( Cursor.HAND_CURSOR ) );
+	}
+	
+	protected void setCursorArrow(PointerInterface pointer)
 	{
 		component.setCursor( new Cursor( Cursor.DEFAULT_CURSOR ) );
 	}

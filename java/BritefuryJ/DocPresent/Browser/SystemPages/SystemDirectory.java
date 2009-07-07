@@ -6,21 +6,35 @@
 //##************************
 package BritefuryJ.DocPresent.Browser.SystemPages;
 
+import java.util.List;
+
+import org.python.util.Generic;
+
 public class SystemDirectory
 {
+	private static List<SystemPage> testPages = Generic.list();
+	
+	
+	
 	protected static void initialise()
 	{
-		BorderTestPage.initialise();
-		FractionTestPage.initialise();
-		HBoxTestPage.initialise();
-		HBoxTypesetTestPage.initialise();
-		MathRootTestPage.initialise();
-		ParagraphCollationTestPage.initialise();
-		ParagraphTestPage.initialise();
-		ScriptTestPage.initialise();
-		SegmentTestPage.initialise();
-		TableTestPage.initialise();
-		TextTestPage.initialise();
-		VBoxTestPage.initialise();
+		testPages.add( new BorderTestPage() );
+		testPages.add( new FractionTestPage() );
+		testPages.add( new HBoxTestPage() );
+		testPages.add( new HBoxTypesetTestPage() );
+		testPages.add( new MathRootTestPage() );
+		testPages.add( new ParagraphCollationTestPage() );
+		testPages.add( new ParagraphTestPage() );
+		testPages.add( new ScriptTestPage() );
+		testPages.add( new SegmentTestPage() );
+		testPages.add( new TableTestPage() );
+		testPages.add( new TextTestPage() );
+		testPages.add( new VBoxTestPage() );
+	}
+	
+	
+	protected static List<SystemPage> getTestPages()
+	{
+		return testPages;
 	}
 }

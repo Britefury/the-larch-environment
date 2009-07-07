@@ -19,17 +19,22 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import BritefuryJ.DocPresent.DPHBox;
+import BritefuryJ.DocPresent.DPLink;
 import BritefuryJ.DocPresent.DPPresentationArea;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.PageController;
 import BritefuryJ.DocPresent.Browser.SystemPages.SystemLocationResolver;
 import BritefuryJ.DocPresent.Layout.HAlignment;
+import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.Layout.VTypesetting;
+import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
-public class Browser
+public class Browser implements PageController
 {
 	private DPPresentationArea area;
 	private JTextField locationField;
@@ -47,6 +52,7 @@ public class Browser
 		this.location = location;
 		
 		area = new DPPresentationArea();
+		area.setPageController( this );
 		
 		
 		JLabel locationLabel = new JLabel( "Location:" );
@@ -101,6 +107,7 @@ public class Browser
 	public void setLocation(String location)
 	{
 		this.location = location;
+		locationField.setText( location );
 		resolve();
 	}
 	
@@ -151,16 +158,21 @@ public class Browser
 	}
 	
 	
-
+	
 	private DPWidget createResolveErrorElement()
 	{
 		VBoxStyleSheet pageBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.CENTRE, 40.0, false, 10.0 );
 		DPVBox pageBox = new DPVBox( pageBoxStyle );
 		
+
+		HBoxStyleSheet linkBoxStyle = new HBoxStyleSheet( VAlignment.BASELINES, 0.0, false, 10.0 );
+		DPHBox linkBox = new DPHBox( linkBoxStyle );
+		
+		linkBox.append( new DPLink( "WELCOME PAGE", "" ) );
+		
+		
 		TextStyleSheet titleStyle = new TextStyleSheet( new Font( "Serif", Font.BOLD, 32 ), Color.BLACK );
 		DPText title = new DPText( titleStyle, "Could Not Resolve Location" );
-		
-
 		
 		VBoxStyleSheet errorBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.CENTRE, 10.0, false, 0.0 );
 		DPVBox errorBox = new DPVBox( errorBoxStyle );
@@ -174,6 +186,7 @@ public class Browser
 		errorBox.append( loc );
 		errorBox.append( error );
 
+		pageBox.append( linkBox );
 		pageBox.append( title );
 		pageBox.append( errorBox );
 		
@@ -186,10 +199,14 @@ public class Browser
 		VBoxStyleSheet pageBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.CENTRE, 40.0, false, 10.0 );
 		DPVBox pageBox = new DPVBox( pageBoxStyle );
 		
+		HBoxStyleSheet linkBoxStyle = new HBoxStyleSheet( VAlignment.BASELINES, 0.0, false, 10.0 );
+		DPHBox linkBox = new DPHBox( linkBoxStyle );
+		
+		linkBox.append( new DPLink( "SYSTEM PAGE", "system" ) );
+		
+		
 		TextStyleSheet titleStyle = new TextStyleSheet( new Font( "Serif", Font.BOLD, 32 ), Color.BLACK );
 		DPText title = new DPText( titleStyle, "Welcome to gSym" );
-		
-
 		
 		VBoxStyleSheet contentBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.CENTRE, 10.0, false, 0.0 );
 		DPVBox contentBox = new DPVBox( contentBoxStyle );
@@ -200,6 +217,7 @@ public class Browser
 		
 		contentBox.append( ins );
 
+		pageBox.append( linkBox );
 		pageBox.append( title );
 		pageBox.append( contentBox );
 		
@@ -210,6 +228,15 @@ public class Browser
 	private void onLocationField(String location)
 	{
 		this.location = location;
+		resolve();
+	}
+
+
+
+	public void goToLocation(String location)
+	{
+		this.location = location;
+		locationField.setText( location );
 		resolve();
 	}
 }

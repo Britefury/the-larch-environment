@@ -26,14 +26,9 @@ import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
 public class ScriptTestPage extends SystemPage
 {
-	protected static void initialise()
+	protected ScriptTestPage()
 	{
-		new ScriptTestPage().register( "script" );
-	}
-	
-	
-	private ScriptTestPage()
-	{
+		register( "tests.script" );
 	}
 	
 	
