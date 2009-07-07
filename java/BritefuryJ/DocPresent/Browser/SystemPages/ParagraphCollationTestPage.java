@@ -25,14 +25,9 @@ import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
 public class ParagraphCollationTestPage extends SystemPage
 {
-	protected static void initialise()
+	protected ParagraphCollationTestPage()
 	{
-		new ParagraphCollationTestPage().register( "paracollate" );
-	}
-	
-	
-	private ParagraphCollationTestPage()
-	{
+		register( "tests.paracollate" );
 	}
 	
 	

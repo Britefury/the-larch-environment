@@ -9,77 +9,65 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 import java.awt.Color;
 import java.awt.Font;
 
-import BritefuryJ.DocPresent.DPHBox;
 import BritefuryJ.DocPresent.DPLink;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Browser.Page;
 import BritefuryJ.DocPresent.Layout.HAlignment;
-import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.Layout.VTypesetting;
-import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
-public abstract class SystemPage extends Page
+public class SystemRootPage extends Page
 {
-	protected String systemLocation;
-	
-	
-	protected void register(String systemLocation) 
+	protected SystemRootPage()
 	{
-		this.systemLocation = systemLocation;
-		SystemLocationResolver.getSystemResolver().registerPage( systemLocation, this );
+		SystemLocationResolver.getSystemResolver().registerPage( "system", this );
 	}
 	
-	protected String getSystemLocation()
-	{
-		return systemLocation;
-	}
 	
-	protected String getLocation()
-	{
-		return SystemLocationResolver.systemLocationToLocation( systemLocation );
-	}
-
-
-
+	
 	public DPWidget getContentsElement()
 	{
 		VBoxStyleSheet pageBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.EXPAND, 40.0, false, 10.0 );
 		DPVBox pageBox = new DPVBox( pageBoxStyle );
 		
-		VBoxStyleSheet linkVBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.RIGHT, 40.0, false, 10.0 );
-		HBoxStyleSheet linkBoxStyle = new HBoxStyleSheet( VAlignment.BASELINES, 0.0, false, 10.0 );
-		DPVBox linkVBox = new DPVBox( linkVBoxStyle );
-		DPHBox linkBox = new DPHBox( linkBoxStyle );
-		
-		linkBox.append( new DPLink( "SYSTEM PAGE", "system" ) );
-		linkVBox.append( linkBox );
-
-		
 		VBoxStyleSheet titleBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.CENTRE, 0.0, false, 0.0 );
 		DPVBox titleBox = new DPVBox( titleBoxStyle );
 		
 		TextStyleSheet titleStyle = new TextStyleSheet( new Font( "Serif", Font.BOLD, 32 ), Color.BLACK );
-		DPText title = new DPText( titleStyle, "System page: " + getTitle() );
+		DPText title = new DPText( titleStyle, "gSym System Page" );
 		titleBox.append( title );
 		
-		pageBox.append( linkVBox );
 		pageBox.append( titleBox );
 		pageBox.append( createContents() );
 		
 		return pageBox;
 	}
 
-
-	protected DPLink createLink()
+	
+	protected DPWidget createContents()
 	{
-		return new DPLink( getTitle(), getLocation() );
+		VBoxStyleSheet contentsBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.LEFT, 0.0, false, 0.0 );
+		DPVBox contentsBox = new DPVBox( contentsBoxStyle );
+		
+		TextStyleSheet titleStyle = new TextStyleSheet( new Font( "Serif", Font.BOLD, 18 ), Color.BLACK );
+		DPText title = new DPText( titleStyle, "Tests:" );
+		contentsBox.append( title );
+		
+		for (SystemPage page: SystemDirectory.getTestPages())
+		{
+			contentsBox.append( page.createLink() );
+		}
+		
+		return contentsBox;
 	}
 
-	
-	protected abstract String getTitle();
-	protected abstract DPWidget createContents();
+
+
+	protected DPLink createLink(String linkText)
+	{
+		return new DPLink( linkText, "system" );
+	}
 }

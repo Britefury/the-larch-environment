@@ -21,7 +21,7 @@ import BritefuryJ.Math.Point2;
 public class DPText extends DPContentLeafEditableEntry
 {
 	protected TextVisual visual;
-	String text;
+	protected String text;
 	
 	
 	public DPText(String text)

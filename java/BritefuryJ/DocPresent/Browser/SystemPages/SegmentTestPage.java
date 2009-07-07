@@ -24,14 +24,9 @@ import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
 public class SegmentTestPage extends SystemPage
 {
-	protected static void initialise()
+	protected SegmentTestPage()
 	{
-		new SegmentTestPage().register( "segment" );
-	}
-	
-	
-	private SegmentTestPage()
-	{
+		register( "tests.segment" );
 	}
 	
 	

@@ -22,14 +22,9 @@ import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
 public class TableTestPage extends SystemPage
 {
-	protected static void initialise()
+	protected TableTestPage()
 	{
-		new TableTestPage().register( "table" );
-	}
-	
-	
-	private TableTestPage()
-	{
+		register( "tests.table" );
 	}
 	
 	

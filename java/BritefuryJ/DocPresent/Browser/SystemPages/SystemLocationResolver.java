@@ -13,26 +13,39 @@ import BritefuryJ.DocPresent.Browser.Page;
 
 public class SystemLocationResolver implements LocationResolver
 {
-	private static String prefix = "system.";
+	private static String rootLocation = "system";
+	private static String prefix = rootLocation + ".";
 	
-	private HashMap<String, SystemPage> pages = new HashMap<String, SystemPage>();
+	private HashMap<String, Page> pages = new HashMap<String, Page>();
 
 	private static SystemLocationResolver systemResolver = new SystemLocationResolver();
 	
-	static
-	{
-		SystemDirectory.initialise();
-	}
+	private SystemRootPage rootPage;
 	
+	private boolean bInitialised;
 	
 	
 	private SystemLocationResolver()
 	{
+		bInitialised = false;
+	}
+	
+	
+	private void initialise()
+	{
+		if ( !bInitialised )
+		{
+			bInitialised = true;
+
+			SystemDirectory.initialise();
+			rootPage = new SystemRootPage();
+		}
 	}
 	
 	
 	public static SystemLocationResolver getSystemResolver()
 	{
+		systemResolver.initialise();
 		return systemResolver;
 	}
 
@@ -40,7 +53,11 @@ public class SystemLocationResolver implements LocationResolver
 	
 	public Page resolveLocation(String location)
 	{
-		if ( location.startsWith( prefix ) )
+		if ( location.equals( rootLocation ) )
+		{
+			return rootPage;
+		}
+		else if ( location.startsWith( prefix ) )
 		{
 			String systemLocation = location.substring( prefix.length() );
 			return pages.get( systemLocation );
@@ -52,8 +69,15 @@ public class SystemLocationResolver implements LocationResolver
 	}
 	
 	
-	public void registerPage(String systemLocation, SystemPage page)
+	public void registerPage(String systemLocation, Page page)
 	{
 		pages.put( systemLocation, page );
+	}
+	
+	
+	
+	protected static String systemLocationToLocation(String systemLocation)
+	{
+		return prefix + systemLocation;
 	}
 }

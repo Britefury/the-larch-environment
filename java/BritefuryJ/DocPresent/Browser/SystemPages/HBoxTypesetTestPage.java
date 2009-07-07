@@ -22,14 +22,9 @@ import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
 public class HBoxTypesetTestPage extends SystemPage
 {
-	protected static void initialise()
+	protected HBoxTypesetTestPage()
 	{
-		new HBoxTypesetTestPage().register( "hboxts" );
-	}
-	
-	
-	private HBoxTypesetTestPage()
-	{
+		register( "tests.hboxts" );
 	}
 	
 	

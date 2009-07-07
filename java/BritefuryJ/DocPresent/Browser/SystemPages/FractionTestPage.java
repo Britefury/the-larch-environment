@@ -25,14 +25,9 @@ import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
 public class FractionTestPage extends SystemPage
 {
-	protected static void initialise()
+	protected FractionTestPage()
 	{
-		new FractionTestPage().register( "fraction" );
-	}
-	
-	
-	private FractionTestPage()
-	{
+		register( "tests.fraction" );
 	}
 	
 	

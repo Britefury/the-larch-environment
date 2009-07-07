@@ -24,14 +24,9 @@ import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
 public class ParagraphTestPage extends SystemPage
 {
-	protected static void initialise()
+	protected ParagraphTestPage()
 	{
-		new ParagraphTestPage().register( "paragraph" );
-	}
-	
-	
-	private ParagraphTestPage()
-	{
+		register( "tests.paragraph" );
 	}
 	
 	

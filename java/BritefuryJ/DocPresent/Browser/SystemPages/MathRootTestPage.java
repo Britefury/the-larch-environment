@@ -21,14 +21,9 @@ import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
 public class MathRootTestPage extends SystemPage
 {
-	protected static void initialise()
+	protected MathRootTestPage()
 	{
-		new MathRootTestPage().register( "mathroot" );
-	}
-	
-	
-	private MathRootTestPage()
-	{
+		register( "tests.mathroot" );
 	}
 	
 	
