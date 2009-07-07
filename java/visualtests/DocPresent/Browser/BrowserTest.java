@@ -9,14 +9,19 @@ package visualtests.DocPresent.Browser;
 import java.awt.Dimension;
 
 import javax.swing.JFrame;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.WindowConstants;
 
 import BritefuryJ.DocPresent.Browser.Browser;
 
 public class BrowserTest
 {
-	public static void main(final String[] args)
+	public static void main(final String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException
 	{
+		UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
+
+		
 		JFrame frame = new JFrame( "Broswer test" );
 		frame.setDefaultCloseOperation( WindowConstants.DISPOSE_ON_CLOSE );
 		
@@ -27,5 +32,4 @@ public class BrowserTest
 		frame.pack();
 		frame.setVisible(true);
 	}
-
 }
