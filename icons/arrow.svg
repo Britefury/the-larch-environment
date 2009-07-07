@@ -14,10 +14,13 @@
    id="svg2"
    sodipodi:version="0.32"
    inkscape:version="0.45pre1"
-   sodipodi:docbase="C:\Users\Geoff\Documents"
+   sodipodi:docbase="C:\code\gsym\trunk\icons"
    sodipodi:docname="arrow.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
-   sodipodi:modified="true">
+   inkscape:export-filename="C:\code\gsym\trunk\icons\arrow.svg.png"
+   inkscape:export-xdpi="90"
+   inkscape:export-ydpi="90"
+   sodipodi:modified="TRUE">
   <defs
      id="defs4">
     <linearGradient
@@ -25,11 +28,11 @@
       <stop
          id="stop9039"
          offset="0"
-         style="stop-color:#09c009;stop-opacity:1;" />
+         style="stop-color:#0975c0;stop-opacity:1;" />
       <stop
          id="stop9041"
          offset="1"
-         style="stop-color:#156d15;stop-opacity:1;" />
+         style="stop-color:#15496d;stop-opacity:1;" />
     </linearGradient>
     <linearGradient
        id="linearGradient4155">
@@ -56,10 +59,10 @@
        xlink:href="#linearGradient9037"
        id="linearGradient9043"
        gradientUnits="userSpaceOnUse"
-       x1="328.38205"
-       y1="407.78189"
-       x2="316.19824"
-       y2="583.57654" />
+       x1="320.46753"
+       y1="595.97107"
+       x2="321.03488"
+       y2="474.53232" />
     <linearGradient
        inkscape:collect="always"
        xlink:href="#linearGradient4155"
@@ -80,15 +83,15 @@
      objecttolerance="10"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="3.4472044"
-     inkscape:cx="417.03688"
-     inkscape:cy="594.53257"
+     inkscape:zoom="2.2743067"
+     inkscape:cx="426.27046"
+     inkscape:cy="554.52038"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
-     inkscape:window-width="1920"
+     inkscape:window-width="1916"
      inkscape:window-height="1150"
-     inkscape:window-x="-8"
-     inkscape:window-y="-8" />
+     inkscape:window-x="-1"
+     inkscape:window-y="1" />
   <metadata
      id="metadata7">
     <rdf:RDF>

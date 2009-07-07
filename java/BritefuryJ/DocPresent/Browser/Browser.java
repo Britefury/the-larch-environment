@@ -6,23 +6,10 @@
 //##************************
 package BritefuryJ.DocPresent.Browser;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.MediaTracker;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.JToolBar;
 
 import BritefuryJ.DocPresent.DPHBox;
 import BritefuryJ.DocPresent.DPLink;
@@ -41,68 +28,29 @@ import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
 public class Browser implements PageController
 {
-	private static String COMMAND_BACK = "back";
-	private static String COMMAND_FORWARD = "forward";
+	protected interface BrowserListener
+	{
+		public void onBrowserGoToLocation(Browser browser, String location);
+	}
+	
 	
 	private DPPresentationArea area;
-	private JToolBar toolbar;
-	private JTextField locationField;
-	private JPanel locationPanel, panel;
-	private String location;
+	private BrowserHistory history;
 	
 	private LocationResolver resolver;
 	private Page page;
+	private BrowserListener listener;
 	
 	
 	
-	public Browser(LocationResolver resolver, String location)
+	public Browser(LocationResolver resolver, String location, BrowserListener listener)
 	{
 		this.resolver = resolver;
-		this.location = location;
+		history = new BrowserHistory( location );
+		this.listener = listener;
 		
 		area = new DPPresentationArea();
 		area.setPageController( this );
-		
-		
-		toolbar = new JToolBar();
-		toolbar.setFloatable( false );
-		initialiseToolbar( toolbar );
-		
-		
-		JLabel locationLabel = new JLabel( "Location:" );
-		locationLabel.setBorder( BorderFactory.createEmptyBorder( 0, 5, 0, 10 ) );
-		locationField = new JTextField( location );
-		locationField.setMaximumSize( new Dimension( locationField.getMaximumSize().width, locationField.getMinimumSize().height ) );
-		locationField.setBorder( BorderFactory.createLineBorder( Color.black, 1 ) );
-	
-		ActionListener locationActionListener = new ActionListener()
-		{
-			public void actionPerformed(ActionEvent event)
-			{
-				onLocationField( locationField.getText() );
-			}
-		};
-		
-		locationField.addActionListener( locationActionListener );
-		
-		
-		locationPanel = new JPanel();
-		locationPanel.setLayout( new BoxLayout( locationPanel, BoxLayout.X_AXIS ) );
-		locationPanel.add( locationLabel );
-		locationPanel.add( locationField );
-		locationPanel.setBorder( BorderFactory.createEmptyBorder( 5, 0, 5, 5 ) );
-
-		
-		
-		JPanel header = new JPanel( new BorderLayout() );
-		header.add( toolbar, BorderLayout.PAGE_START );
-		header.add( locationPanel, BorderLayout.PAGE_END );
-	
-	
-		panel = new JPanel();
-		panel.setLayout( new BorderLayout() );
-		panel.add( header, BorderLayout.PAGE_START );
-		panel.add( area.getComponent(), BorderLayout.CENTER );
 		
 		
 		resolve();
@@ -112,22 +60,46 @@ public class Browser implements PageController
 	
 	public JComponent getComponent()
 	{
-		return panel;
+		return area.getComponent();
 	}
 	
 	
 	
 	public String getLocation()
 	{
-		return location;
+		return history.getCurrentContext().getLocation();
 	}
 	
 	public void setLocation(String location)
 	{
-		this.location = location;
-		locationField.setText( location );
+		history.visit( location );
 		resolve();
 	}
+	
+	
+	
+	
+	
+	
+	
+	protected void back()
+	{
+		if ( history.canGoBack() )
+		{
+			history.back();
+			resolve();
+		}
+	}
+	
+	protected void forward()
+	{
+		if ( history.canGoForward() )
+		{
+			history.forward();
+			resolve();
+		}
+	}
+
 	
 	
 	
@@ -138,6 +110,8 @@ public class Browser implements PageController
 			page.setBrowser( null );
 			page = null;
 		}
+		
+		String location = history.getCurrentContext().getLocation();
 		
 		if ( location.equals( "" ) )
 		{
@@ -154,7 +128,7 @@ public class Browser implements PageController
 			
 			if ( page == null )
 			{
-				area.setChild( createResolveErrorElement() );
+				area.setChild( createResolveErrorElement( location ) );
 			}
 			else
 			{
@@ -177,7 +151,7 @@ public class Browser implements PageController
 	
 	
 	
-	private DPWidget createResolveErrorElement()
+	private DPWidget createResolveErrorElement(String location)
 	{
 		VBoxStyleSheet pageBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.CENTRE, 40.0, false, 10.0 );
 		DPVBox pageBox = new DPVBox( pageBoxStyle );
@@ -243,80 +217,10 @@ public class Browser implements PageController
 	}
 	
 	
-	private void onLocationField(String location)
-	{
-		this.location = location;
-		resolve();
-	}
-
-
-
 	public void goToLocation(String location)
 	{
-		this.location = location;
-		locationField.setText( location );
+		history.visit( location );
+		listener.onBrowserGoToLocation( this, location );
 		resolve();
-	}
-	
-	
-	
-	private void initialiseToolbar(JToolBar toolbar)
-	{
-		ActionListener backListener = new ActionListener()
-		{
-			public void actionPerformed(ActionEvent event)
-			{
-				onBack();
-			}
-		};
-
-		ActionListener forwardListener = new ActionListener()
-		{
-			public void actionPerformed(ActionEvent event)
-			{
-				onForward();
-			}
-		};
-		
-		
-		toolbar.add( makeToolButton( "back arrow.png", COMMAND_BACK, "Go back", "Back", backListener ) );
-		toolbar.add( makeToolButton( "forward arrow.png", COMMAND_FORWARD, "Go forward", "Forward", forwardListener ) );
-	}
-	
-	
-	private JButton makeToolButton(String imageFilename, String actionCommand, String tooltipText, String altText, ActionListener listener)
-	{
-		String imagePath = "icons/" + imageFilename;
-		
-		JButton button = new JButton();
-		button.setActionCommand( actionCommand );
-		button.setToolTipText( tooltipText );
-		button.addActionListener( listener );
-		button.setFocusable( false );
-		
-		ImageIcon icon = new ImageIcon( imagePath, altText );
-		if ( icon.getImageLoadStatus() != MediaTracker.ABORTED  &&  icon.getImageLoadStatus() != MediaTracker.ERRORED )
-		{
-			button.setIcon( icon );
-		}
-		else
-		{
-			button.setText( altText );
-			System.err.println( "Could not load image " + imagePath );
-		}
-		
-		return button;
-	}
-	
-	
-	
-	private void onBack()
-	{
-		System.out.println( "Browser.onBack" );
-	}
-	
-	private void onForward()
-	{
-		System.out.println( "Browser.onForward" );
 	}
 }

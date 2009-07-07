@@ -13,7 +13,7 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.WindowConstants;
 
-import BritefuryJ.DocPresent.Browser.Browser;
+import BritefuryJ.DocPresent.Browser.TabbedBrowser;
 
 public class BrowserTest
 {
@@ -22,11 +22,11 @@ public class BrowserTest
 		UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
 
 		
-		JFrame frame = new JFrame( "Broswer test" );
+		JFrame frame = new JFrame( "Browser test" );
 		frame.setDefaultCloseOperation( WindowConstants.DISPOSE_ON_CLOSE );
 		
 		
-		Browser browser = new Browser( null, "" );
+		TabbedBrowser browser = new TabbedBrowser( null, "" );
 		browser.getComponent().setPreferredSize( new Dimension( 800, 600 ) );
 		frame.add( browser.getComponent() );
 		frame.pack();
