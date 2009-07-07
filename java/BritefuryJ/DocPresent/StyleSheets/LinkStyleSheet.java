@@ -8,23 +8,13 @@ package BritefuryJ.DocPresent.StyleSheets;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.font.TextAttribute;
-import java.util.Map;
 
-@SuppressWarnings("unchecked")
 public class LinkStyleSheet extends TextStyleSheet
 {
 	private static Font defaultFont = new Font( "Sans serif", Font.PLAIN, 14 );
 	public static LinkStyleSheet defaultStyleSheet = new LinkStyleSheet();
 	
 	
-	static
-	{
-		Map<TextAttribute, Object> attribs = (Map<TextAttribute, Object>)defaultFont.getAttributes();
-		attribs.put( TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON );
-	}
-
-
 	public LinkStyleSheet()
 	{
 		super( defaultFont, Color.blue, null, false );

@@ -6,18 +6,23 @@
 //##************************
 package BritefuryJ.DocPresent.Browser;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.MediaTracker;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.JToolBar;
 
 import BritefuryJ.DocPresent.DPHBox;
 import BritefuryJ.DocPresent.DPLink;
@@ -36,7 +41,11 @@ import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
 public class Browser implements PageController
 {
+	private static String COMMAND_BACK = "back";
+	private static String COMMAND_FORWARD = "forward";
+	
 	private DPPresentationArea area;
+	private JToolBar toolbar;
 	private JTextField locationField;
 	private JPanel locationPanel, panel;
 	private String location;
@@ -55,8 +64,13 @@ public class Browser implements PageController
 		area.setPageController( this );
 		
 		
+		toolbar = new JToolBar();
+		toolbar.setFloatable( false );
+		initialiseToolbar( toolbar );
+		
+		
 		JLabel locationLabel = new JLabel( "Location:" );
-		locationLabel.setBorder( BorderFactory.createEmptyBorder( 0, 5, 0, 5 ) );
+		locationLabel.setBorder( BorderFactory.createEmptyBorder( 0, 5, 0, 10 ) );
 		locationField = new JTextField( location );
 		locationField.setMaximumSize( new Dimension( locationField.getMaximumSize().width, locationField.getMinimumSize().height ) );
 		locationField.setBorder( BorderFactory.createLineBorder( Color.black, 1 ) );
@@ -78,13 +92,17 @@ public class Browser implements PageController
 		locationPanel.add( locationField );
 		locationPanel.setBorder( BorderFactory.createEmptyBorder( 5, 0, 5, 5 ) );
 
+		
+		
+		JPanel header = new JPanel( new BorderLayout() );
+		header.add( toolbar, BorderLayout.PAGE_START );
+		header.add( locationPanel, BorderLayout.PAGE_END );
 	
 	
 		panel = new JPanel();
-		panel.setLayout( new BoxLayout( panel, BoxLayout.Y_AXIS ) );
-		panel.add( locationPanel );
-		panel.add( area.getComponent() );
-		panel.setBorder( BorderFactory.createEmptyBorder( 5, 0, 5, 5 ) );
+		panel.setLayout( new BorderLayout() );
+		panel.add( header, BorderLayout.PAGE_START );
+		panel.add( area.getComponent(), BorderLayout.CENTER );
 		
 		
 		resolve();
@@ -121,7 +139,7 @@ public class Browser implements PageController
 			page = null;
 		}
 		
-		if ( location == "" )
+		if ( location.equals( "" ) )
 		{
 			area.setChild( createWelcomeElement() );
 		}
@@ -238,5 +256,67 @@ public class Browser implements PageController
 		this.location = location;
 		locationField.setText( location );
 		resolve();
+	}
+	
+	
+	
+	private void initialiseToolbar(JToolBar toolbar)
+	{
+		ActionListener backListener = new ActionListener()
+		{
+			public void actionPerformed(ActionEvent event)
+			{
+				onBack();
+			}
+		};
+
+		ActionListener forwardListener = new ActionListener()
+		{
+			public void actionPerformed(ActionEvent event)
+			{
+				onForward();
+			}
+		};
+		
+		
+		toolbar.add( makeToolButton( "back arrow.png", COMMAND_BACK, "Go back", "Back", backListener ) );
+		toolbar.add( makeToolButton( "forward arrow.png", COMMAND_FORWARD, "Go forward", "Forward", forwardListener ) );
+	}
+	
+	
+	private JButton makeToolButton(String imageFilename, String actionCommand, String tooltipText, String altText, ActionListener listener)
+	{
+		String imagePath = "icons/" + imageFilename;
+		
+		JButton button = new JButton();
+		button.setActionCommand( actionCommand );
+		button.setToolTipText( tooltipText );
+		button.addActionListener( listener );
+		button.setFocusable( false );
+		
+		ImageIcon icon = new ImageIcon( imagePath, altText );
+		if ( icon.getImageLoadStatus() != MediaTracker.ABORTED  &&  icon.getImageLoadStatus() != MediaTracker.ERRORED )
+		{
+			button.setIcon( icon );
+		}
+		else
+		{
+			button.setText( altText );
+			System.err.println( "Could not load image " + imagePath );
+		}
+		
+		return button;
+	}
+	
+	
+	
+	private void onBack()
+	{
+		System.out.println( "Browser.onBack" );
+	}
+	
+	private void onForward()
+	{
+		System.out.println( "Browser.onForward" );
 	}
 }
