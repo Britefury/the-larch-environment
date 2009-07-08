@@ -6,13 +6,12 @@
 //##************************
 package BritefuryJ.DocPresent.Browser.SystemPages;
 
+import java.util.ArrayList;
 import java.util.List;
-
-import org.python.util.Generic;
 
 public class SystemDirectory
 {
-	private static List<SystemPage> testPages = Generic.list();
+	private static ArrayList<SystemPage> testPages = new ArrayList<SystemPage>();
 	
 	
 	

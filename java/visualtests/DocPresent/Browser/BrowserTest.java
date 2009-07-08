@@ -6,14 +6,20 @@
 //##************************
 package visualtests.DocPresent.Browser;
 
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 
 import javax.swing.JFrame;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.WindowConstants;
 
+import BritefuryJ.DocPresent.DPStaticText;
+import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.Browser.RootPage;
 import BritefuryJ.DocPresent.Browser.TabbedBrowser;
+import BritefuryJ.DocPresent.StyleSheets.StaticTextStyleSheet;
 
 public class BrowserTest
 {
@@ -26,7 +32,16 @@ public class BrowserTest
 		frame.setDefaultCloseOperation( WindowConstants.DISPOSE_ON_CLOSE );
 		
 		
-		TabbedBrowser browser = new TabbedBrowser( null, "" );
+		RootPage rootPage = new RootPage()
+		{
+			public DPWidget getPageContents()
+			{
+				StaticTextStyleSheet instructionsStyle = new StaticTextStyleSheet( new Font( "SansSerif", Font.PLAIN, 16 ), Color.BLACK );
+				return new DPStaticText( instructionsStyle, "Please enter a location in the location box above." );
+			}
+		};
+		
+		TabbedBrowser browser = new TabbedBrowser( null, rootPage, "" );
 		browser.getComponent().setPreferredSize( new Dimension( 800, 600 ) );
 		frame.add( browser.getComponent() );
 		frame.pack();

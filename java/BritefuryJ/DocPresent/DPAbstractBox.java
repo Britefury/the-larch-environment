@@ -7,6 +7,7 @@
 //##************************
 package BritefuryJ.DocPresent;
 
+import BritefuryJ.DocPresent.Layout.PackingParams;
 import BritefuryJ.DocPresent.StyleSheets.AbstractBoxStyleSheet;
 
 
@@ -34,6 +35,10 @@ abstract public class DPAbstractBox extends DPContainerSequenceCollationRoot
 	
 	
 
+	protected PackingParams getDefaultPackingParams()
+	{
+		return ((AbstractBoxStyleSheet)styleSheet).getDefaultPackingParams();
+	}
 
 
 	public double getSpacing()

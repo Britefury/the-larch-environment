@@ -16,6 +16,7 @@ import org.python.core.PyTuple;
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.LAllocBox;
 import BritefuryJ.DocPresent.Layout.LReqBox;
+import BritefuryJ.DocPresent.Layout.PackingParams;
 import BritefuryJ.DocPresent.Layout.TableLayout;
 import BritefuryJ.DocPresent.Layout.TablePackingParams;
 import BritefuryJ.DocPresent.Layout.VAlignment;
@@ -738,6 +739,15 @@ public class DPTable extends DPContainer
 	}
 	
 
+	//
+	// Packing parameters
+	//
+	
+	protected PackingParams getDefaultPackingParams()
+	{
+		// All child elements are given packing parameters at registration
+		throw new RuntimeException( "Default packing parameters cannot be created for table element" );
+	}
 	
 	
 	//

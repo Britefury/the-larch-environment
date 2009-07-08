@@ -10,29 +10,19 @@ import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.StyleSheets.LinkStyleSheet;
 
-public class DPLink extends DPText
+public class DPLink extends DPStaticText
 {
 	protected String targetLocation;
 	
 	
 	public DPLink(String text, String targetLocation)
 	{
-		this( LinkStyleSheet.defaultStyleSheet, text, text, targetLocation );
-	}
-	
-	public DPLink(String text, String textRepresentation, String targetLocation)
-	{
-		this( LinkStyleSheet.defaultStyleSheet, text, textRepresentation, targetLocation );
+		this( LinkStyleSheet.defaultStyleSheet, text, targetLocation );
 	}
 	
 	public DPLink(LinkStyleSheet styleSheet, String text, String targetLocation)
 	{
-		this( styleSheet, text, text, targetLocation );
-	}
-
-	public DPLink(LinkStyleSheet styleSheet, String text, String textRepresentation, String targetLocation)
-	{
-		super( styleSheet, text, textRepresentation );
+		super( styleSheet, text );
 		this.targetLocation = targetLocation;
 	}
 
@@ -50,11 +40,11 @@ public class DPLink extends DPText
 
 	protected void onLeave(PointerMotionEvent event)
 	{
-		super.onLeave( event );
 		if ( isRealised() )
 		{
 			presentationArea.setCursorArrow( event.getPointer() );
 		}
+		super.onLeave( event );
 	}
 
 
@@ -63,8 +53,16 @@ public class DPLink extends DPText
 	{
 		super.onButtonDown( event );
 		
-		PageController pageController = presentationArea.getPageController();
-		pageController.goToLocation( targetLocation );
-		return true;
+		if ( isRealised() )
+		{
+			if ( event.button == 1 )
+			{
+				PageController pageController = presentationArea.getPageController();
+				pageController.goToLocation( targetLocation );
+				return true;
+			}
+		}
+		
+		return false;
 	}
 }

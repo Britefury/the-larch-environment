@@ -814,9 +814,46 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 		queueFullRedraw();
 	}
 	
+	public void scrollRootSpace(Vector2 pan)
+	{
+
+		if ( pan.x < 0.0 )
+		{
+			windowTopLeftCornerInRootSpace.x = Math.max( windowTopLeftCornerInRootSpace.x + pan.x,  Math.min( windowTopLeftCornerInRootSpace.x, 0.0 ) );
+		}
+		else if ( pan.x > 0.0 )
+		{
+			double windowWidthInRootSpace = areaSize.x / rootScaleInWindowSpace;
+			double allocationX = getAllocationX();
+			double ax = allocationX == 0.0  ?  1.0  :  allocationX;
+			double maxX = Math.max( ax - windowWidthInRootSpace, 0.0 );
+			windowTopLeftCornerInRootSpace.x = Math.min( windowTopLeftCornerInRootSpace.x + pan.x,  Math.max( windowTopLeftCornerInRootSpace.x, maxX ) );
+		}
+		if ( pan.y < 0.0 )
+		{
+			windowTopLeftCornerInRootSpace.y = Math.max( windowTopLeftCornerInRootSpace.y + pan.y,  Math.min( windowTopLeftCornerInRootSpace.y, 0.0 ) );
+		}
+		else if ( pan.y > 0.0 )
+		{
+			double windowHeightInRootSpace = areaSize.y / rootScaleInWindowSpace;
+			double allocationY = getAllocationY();
+			double ay = allocationY == 0.0  ?  1.0  :  allocationY;
+			double maxY = Math.max( ay - windowHeightInRootSpace, 0.0 );
+			windowTopLeftCornerInRootSpace.y = Math.min( windowTopLeftCornerInRootSpace.y + pan.y,  Math.max( windowTopLeftCornerInRootSpace.y, maxY ) );
+		}
+		updateRange();
+		queueFullRedraw();
+	}
+	
 	public void panWindowSpace(Vector2 pan)
 	{
 		panRootSpace( windowSpaceToRootSpace( pan ) );
+	}
+	
+	public void scrollWindowSpace(Vector2 pan)
+	{
+		
+		scrollRootSpace( windowSpaceToRootSpace( pan ) );
 	}
 	
 	private void updateRange()
@@ -1379,7 +1416,7 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 		else
 		{
 			double delta = (double)wheelClicks;
-			panWindowSpace( new Vector2( 0.0, delta * 75.0 ) );
+			scrollWindowSpace( new Vector2( 0.0, delta * 75.0 ) );
 		}
 	}
 	

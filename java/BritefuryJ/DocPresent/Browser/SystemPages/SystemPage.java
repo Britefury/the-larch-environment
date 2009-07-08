@@ -9,17 +9,14 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 import java.awt.Color;
 import java.awt.Font;
 
-import BritefuryJ.DocPresent.DPHBox;
 import BritefuryJ.DocPresent.DPLink;
-import BritefuryJ.DocPresent.DPText;
+import BritefuryJ.DocPresent.DPStaticText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Browser.Page;
 import BritefuryJ.DocPresent.Layout.HAlignment;
-import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.Layout.VTypesetting;
-import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.StaticTextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
 public abstract class SystemPage extends Page
@@ -47,27 +44,23 @@ public abstract class SystemPage extends Page
 
 	public DPWidget getContentsElement()
 	{
-		VBoxStyleSheet pageBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.EXPAND, 40.0, false, 10.0 );
+		VBoxStyleSheet pageBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.EXPAND, 40.0, false, 0.0 );
 		DPVBox pageBox = new DPVBox( pageBoxStyle );
 		
-		VBoxStyleSheet linkVBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.RIGHT, 40.0, false, 10.0 );
-		HBoxStyleSheet linkBoxStyle = new HBoxStyleSheet( VAlignment.BASELINES, 0.0, false, 10.0 );
-		DPVBox linkVBox = new DPVBox( linkVBoxStyle );
-		DPHBox linkBox = new DPHBox( linkBoxStyle );
-		
-		linkBox.append( new DPLink( "SYSTEM PAGE", "system" ) );
-		linkVBox.append( linkBox );
-
+		VBoxStyleSheet headBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.EXPAND, 0.0, false, 0.0 );
+		DPVBox headBox = new DPVBox( headBoxStyle );
 		
 		VBoxStyleSheet titleBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.CENTRE, 0.0, false, 0.0 );
 		DPVBox titleBox = new DPVBox( titleBoxStyle );
 		
-		TextStyleSheet titleStyle = new TextStyleSheet( new Font( "Serif", Font.BOLD, 32 ), Color.BLACK );
-		DPText title = new DPText( titleStyle, "System page: " + getTitle() );
+		StaticTextStyleSheet titleStyle = new StaticTextStyleSheet( new Font( "Serif", Font.BOLD, 32 ), Color.BLACK );
+		DPStaticText title = new DPStaticText( titleStyle, "System page: " + getTitle() );
 		titleBox.append( title );
 		
-		pageBox.append( linkVBox );
-		pageBox.append( titleBox );
+		headBox.append( SystemRootPage.createLinkHeader( SystemRootPage.LINKHEADER_ROOTPAGE | SystemRootPage.LINKHEADER_SYSTEMPAGE ) );
+		headBox.append( titleBox );
+
+		pageBox.append( headBox );
 		pageBox.append( createContents() );
 		
 		return pageBox;
