@@ -115,6 +115,7 @@ public abstract class DPContainer extends DPWidget
 		
 		child.setParent( this, presentationArea );
 		
+		packing = packing != null  ?  packing  :  getDefaultPackingParams();
 		child.setParentPacking( packing );
 		
 		if ( isRealised() )
@@ -127,6 +128,12 @@ public abstract class DPContainer extends DPWidget
 	
 	protected void unregisterChild(DPWidget child)
 	{
+		if ( pressGrabChild == child )
+		{
+			pressGrabChild = null;
+			pressGrabButton = -1;
+		}
+		
 		if ( isRealised() )
 		{
 			child.handleUnrealise( child );
@@ -143,6 +150,9 @@ public abstract class DPContainer extends DPWidget
 		onSubtreeStructureChanged();
 		refreshMetaElement();
 	}
+	
+	
+	protected abstract PackingParams getDefaultPackingParams();
 	
 	
 	

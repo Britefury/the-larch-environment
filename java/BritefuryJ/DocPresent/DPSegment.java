@@ -9,6 +9,7 @@ package BritefuryJ.DocPresent;
 import java.util.Arrays;
 import java.util.List;
 
+import BritefuryJ.DocPresent.Layout.PackingParams;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 
 public class DPSegment extends DPContainerCollateable
@@ -250,6 +251,15 @@ public class DPSegment extends DPContainerCollateable
 	}
 	
 	
+	//
+	// Packing parameters
+	//
+	
+	protected PackingParams getDefaultPackingParams()
+	{
+		return null;
+	}
+
 	
 	
 	public DPSegment getSegment()

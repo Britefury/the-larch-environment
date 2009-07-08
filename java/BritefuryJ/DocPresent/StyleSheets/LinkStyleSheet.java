@@ -9,7 +9,7 @@ package BritefuryJ.DocPresent.StyleSheets;
 import java.awt.Color;
 import java.awt.Font;
 
-public class LinkStyleSheet extends TextStyleSheet
+public class LinkStyleSheet extends StaticTextStyleSheet
 {
 	private static Font defaultFont = new Font( "Sans serif", Font.PLAIN, 14 );
 	public static LinkStyleSheet defaultStyleSheet = new LinkStyleSheet();
@@ -17,26 +17,16 @@ public class LinkStyleSheet extends TextStyleSheet
 	
 	public LinkStyleSheet()
 	{
-		super( defaultFont, Color.blue, null, false );
+		super( defaultFont, Color.blue, false );
 	}
 	
 	public LinkStyleSheet(Font font, Color colour)
 	{
-		super( font, colour, null, false );
+		super( font, colour, false );
 	}
 	
 	public LinkStyleSheet(Font font, Color colour, boolean bMixedSizeCaps)
 	{
-		super( font, colour, null, bMixedSizeCaps );
-	}
-
-	public LinkStyleSheet(Font font, Color colour, Color squiggleUnderlineColour)
-	{
-		super( font, colour, squiggleUnderlineColour, false );
-	}
-	
-	public LinkStyleSheet(Font font, Color colour, Color squiggleUnderlineColour, boolean bMixedSizeCaps)
-	{
-		super( font, colour, squiggleUnderlineColour, bMixedSizeCaps );
+		super( font, colour, bMixedSizeCaps );
 	}
 }

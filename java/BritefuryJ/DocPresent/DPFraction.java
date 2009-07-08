@@ -19,6 +19,7 @@ import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Layout.FractionLayout;
 import BritefuryJ.DocPresent.Layout.LAllocBox;
 import BritefuryJ.DocPresent.Layout.LReqBox;
+import BritefuryJ.DocPresent.Layout.PackingParams;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleSheets.FractionStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
@@ -489,6 +490,17 @@ public class DPFraction extends DPContainer
 	protected DPWidget getChildLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter)
 	{
 		return getChildLeafClosestToLocalPointVertical( registeredChildren, localPos, filter );
+	}
+
+
+	
+	//
+	// Packing parameters
+	//
+	
+	protected PackingParams getDefaultPackingParams()
+	{
+		return null;
 	}
 
 

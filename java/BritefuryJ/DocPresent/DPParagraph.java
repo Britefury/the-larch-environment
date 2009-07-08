@@ -12,6 +12,7 @@ import java.util.List;
 import BritefuryJ.DocPresent.Layout.BoxPackingParams;
 import BritefuryJ.DocPresent.Layout.LAllocBox;
 import BritefuryJ.DocPresent.Layout.LReqBox;
+import BritefuryJ.DocPresent.Layout.PackingParams;
 import BritefuryJ.DocPresent.Layout.ParagraphLayout;
 import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
@@ -488,6 +489,12 @@ public class DPParagraph extends DPContainerSequenceCollationRoot
 	// STYLESHEET METHODS
 	//
 	//
+
+	protected PackingParams getDefaultPackingParams()
+	{
+		return ((ParagraphStyleSheet)styleSheet).getDefaultPackingParams();
+	}
+
 
 	public VAlignment getAlignment()
 	{

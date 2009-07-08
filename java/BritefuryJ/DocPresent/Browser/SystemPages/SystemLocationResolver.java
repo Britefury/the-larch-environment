@@ -14,7 +14,7 @@ import BritefuryJ.DocPresent.Browser.Page;
 public class SystemLocationResolver implements LocationResolver
 {
 	private static String rootLocation = "system";
-	private static String prefix = rootLocation + ".";
+	private static String prefix = rootLocation + "/";
 	
 	private HashMap<String, Page> pages = new HashMap<String, Page>();
 

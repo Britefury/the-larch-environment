@@ -9,6 +9,7 @@ package BritefuryJ.DocPresent;
 
 import java.util.List;
 
+import BritefuryJ.DocPresent.Layout.PackingParams;
 import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 import BritefuryJ.Math.Point2;
 
@@ -140,6 +141,19 @@ public class DPBin extends DPContainer
 			return getLeafClosestToLocalPointFromChild( registeredChildren.get( 0 ), localPos, filter );
 		}
 	}
+
+	
+	
+	//
+	// Packing parameters
+	//
+	
+	protected PackingParams getDefaultPackingParams()
+	{
+		return null;
+	}
+
+
 
 	
 	//

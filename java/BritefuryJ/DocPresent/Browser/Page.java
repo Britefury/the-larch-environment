@@ -6,24 +6,35 @@
 //##************************
 package BritefuryJ.DocPresent.Browser;
 
+import java.util.ArrayList;
+
 import BritefuryJ.DocPresent.DPWidget;
 
 public abstract class Page
 {
-	private Browser browser;
+	private ArrayList<Browser> browsers = new ArrayList<Browser>();
 	
+
 	
 	public void contentsModified()
 	{
-		browser.onPageContentsModified( this );
+		for (Browser browser: browsers)
+		{
+			browser.onPageContentsModified( this );
+		}
 	}
 	
 	
 	public abstract DPWidget getContentsElement();
 
 
-	protected void setBrowser(Browser browser)
+	protected void addBrowser(Browser browser)
 	{
-		this.browser = browser;
+		browsers.add( browser );
+	}
+
+	protected void removeBrowser(Browser browser)
+	{
+		browsers.remove( browser );
 	}
 }

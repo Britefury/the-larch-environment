@@ -14,6 +14,7 @@ import java.awt.geom.Path2D;
 import java.util.Arrays;
 import java.util.List;
 
+import BritefuryJ.DocPresent.Layout.PackingParams;
 import BritefuryJ.DocPresent.StyleSheets.MathRootStyleSheet;
 import BritefuryJ.Math.Point2;
 
@@ -216,6 +217,14 @@ public class DPMathRoot extends DPContainer
 
 
 	
+	//
+	// Packing parameters
+	//
+	
+	protected PackingParams getDefaultPackingParams()
+	{
+		return null;
+	}
 	
 	
 	//

@@ -16,23 +16,24 @@ import java.awt.geom.RoundRectangle2D;
 
 public class SolidBorder extends Border
 {
-	private double thickness, roundingX, roundingY;
+	private double thickness, inset, roundingX, roundingY;
 	private Color colour, backgroundColour;
 	
 	
 	public SolidBorder()
 	{
-		this( 0.0, 0.0, 0.0, Color.black, null );
+		this( 1.0, 1.0, 0.0, 0.0, Color.black, null );
 	}
 	
-	public SolidBorder(double thickness, Color colour, Color backgroundColour)
+	public SolidBorder(double thickness, double inset, Color colour, Color backgroundColour)
 	{
-		this( thickness, 0.0, 0.0, colour, backgroundColour );
+		this( thickness, inset, 0.0, 0.0, colour, backgroundColour );
 	}
 	
-	public SolidBorder(double thickness, double roundingX, double roundingY, Color colour, Color backgroundColour)
+	public SolidBorder(double thickness, double inset, double roundingX, double roundingY, Color colour, Color backgroundColour)
 	{
 		this.thickness = thickness;
+		this.inset = inset;
 		this.roundingX = roundingX;
 		this.roundingY = roundingY;
 		this.colour = colour;
@@ -43,22 +44,22 @@ public class SolidBorder extends Border
 
 	public double getLeftMargin()
 	{
-		return thickness;
+		return thickness + inset;
 	}
 
 	public double getRightMargin()
 	{
-		return thickness;
+		return thickness + inset;
 	}
 
 	public double getTopMargin()
 	{
-		return thickness;
+		return thickness + inset;
 	}
 
 	public double getBottomMargin()
 	{
-		return thickness;
+		return thickness + inset;
 	}
 
 

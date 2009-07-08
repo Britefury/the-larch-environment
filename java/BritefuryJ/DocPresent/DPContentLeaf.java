@@ -829,7 +829,7 @@ public abstract class DPContentLeaf extends DPWidget
 	// Meta element methods
 	//
 	
-	protected static SolidBorder metaHeaderHighlightBorder = new SolidBorder( 1.0, 5.0, 5.0, new Color( 0.75f, 0.0f, 0.0f ), new Color( 1.0f, 0.9f, 0.8f ) );
+	protected static SolidBorder metaHeaderHighlightBorder = new SolidBorder( 1.0, 1.0, 5.0, 5.0, new Color( 0.75f, 0.0f, 0.0f ), new Color( 1.0f, 0.9f, 0.8f ) );
 
 	protected Border getMetaHeaderBorder()
 	{

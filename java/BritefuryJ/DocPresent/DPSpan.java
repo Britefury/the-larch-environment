@@ -6,10 +6,22 @@
 //##************************
 package BritefuryJ.DocPresent;
 
+import BritefuryJ.DocPresent.Layout.PackingParams;
+
 public class DPSpan extends DPContainerSequenceCollateable
 {
 	public DPSpan()
 	{
 		super();
+	}
+
+
+	//
+	// Packing parameters
+	//
+	
+	protected PackingParams getDefaultPackingParams()
+	{
+		return null;
 	}
 }

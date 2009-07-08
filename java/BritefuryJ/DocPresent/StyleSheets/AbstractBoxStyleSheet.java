@@ -7,6 +7,9 @@
 //##************************
 package BritefuryJ.DocPresent.StyleSheets;
 
+import BritefuryJ.DocPresent.Layout.BoxPackingParams;
+import BritefuryJ.DocPresent.Layout.PackingParams;
+
 public class AbstractBoxStyleSheet extends ContainerStyleSheet
 {
 	public static AbstractBoxStyleSheet defaultStyleSheet = new AbstractBoxStyleSheet();
@@ -14,6 +17,7 @@ public class AbstractBoxStyleSheet extends ContainerStyleSheet
 	
 	protected double spacing, padding;
 	protected boolean bExpand;
+	protected BoxPackingParams defaultPackingParams;
 
 
 	public AbstractBoxStyleSheet()
@@ -28,6 +32,8 @@ public class AbstractBoxStyleSheet extends ContainerStyleSheet
 		this.spacing = spacing;
 		this.bExpand = bExpand;
 		this.padding = padding;
+		
+		defaultPackingParams = new BoxPackingParams( padding, bExpand );
 	}
 
 	
@@ -44,5 +50,12 @@ public class AbstractBoxStyleSheet extends ContainerStyleSheet
 	public double getPadding()
 	{
 		return padding;
+	}
+
+
+
+	public PackingParams getDefaultPackingParams()
+	{
+		return defaultPackingParams;
 	}
 }

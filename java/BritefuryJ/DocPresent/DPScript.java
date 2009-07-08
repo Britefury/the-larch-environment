@@ -13,6 +13,7 @@ import java.util.List;
 
 import BritefuryJ.DocPresent.Layout.LAllocBox;
 import BritefuryJ.DocPresent.Layout.LReqBox;
+import BritefuryJ.DocPresent.Layout.PackingParams;
 import BritefuryJ.DocPresent.Layout.ScriptLayout;
 import BritefuryJ.DocPresent.StyleSheets.ScriptStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
@@ -653,6 +654,18 @@ public class DPScript extends DPContainer
 		}
 	}
 
+
+	
+	//
+	// Packing parameters
+	//
+	
+	protected PackingParams getDefaultPackingParams()
+	{
+		return null;
+	}
+
+	
 	
 	//
 	// Focus navigation methods

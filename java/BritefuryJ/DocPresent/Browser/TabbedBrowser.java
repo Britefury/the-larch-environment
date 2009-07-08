@@ -12,7 +12,7 @@ import java.awt.Dimension;
 import java.awt.MediaTracker;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.List;
+import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -24,8 +24,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
 
-import org.python.util.Generic;
-
 public class TabbedBrowser implements Browser.BrowserListener
 {
 	private static String COMMAND_BACK = "back";
@@ -36,18 +34,20 @@ public class TabbedBrowser implements Browser.BrowserListener
 	private JPanel locationPanel, panel;
 	
 	private LocationResolver resolver;
+	private RootPage rootPage;
 	
-	private List<Browser> browsers;
+	private ArrayList<Browser> browsers;
 	private Browser currentBrowser;
 	
 	
 	
-	public TabbedBrowser(LocationResolver resolver, String location)
+	public TabbedBrowser(LocationResolver resolver, RootPage rootPage, String location)
 	{
 		this.resolver = resolver;
+		this.rootPage = rootPage;
 		
 		currentBrowser = createBrowser( location );
-		browsers = Generic.list();
+		browsers = new ArrayList<Browser>();
 		browsers.add( currentBrowser );
 		
 
@@ -171,7 +171,7 @@ public class TabbedBrowser implements Browser.BrowserListener
 	
 	private Browser createBrowser(String location)
 	{
-		return new Browser( resolver, location, this );
+		return new Browser( resolver, rootPage, location, this );
 	}
 	
 	
