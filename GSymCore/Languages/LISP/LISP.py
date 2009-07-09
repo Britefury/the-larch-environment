@@ -7,9 +7,7 @@
 ##-*************************
 from Britefury.gSym.gSymLanguage import GSymLanguage
 
-from BritefuryJ.GSym.View import PyGSymViewFactory
-
-from GSymCore.Languages.LISP.View import LISPView, initialiseViewContext
+from GSymCore.Languages.LISP.View import viewLocationAsPage
 
 
 def pyTransformModify(cur, new):
@@ -17,9 +15,6 @@ def pyTransformModify(cur, new):
 
 
 	
-viewFac = PyGSymViewFactory( LISPView, initialiseViewContext )
-
-
 language = GSymLanguage()
-language.registerViewFactory( viewFac )
+language.registerViewLocationAsPageFn( viewLocationAsPage )
 language.registerTransformModifyFn( pyTransformModify )

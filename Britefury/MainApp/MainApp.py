@@ -27,6 +27,7 @@ from BritefuryJ.Utils.Profile import ProfileTimer
 from BritefuryJ.DocModel import DMIOReader, DMIOWriter, DMNode
 
 from BritefuryJ.DocPresent import *
+from BritefuryJ.DocPresent.Browser import *
 from BritefuryJ.DocPresent.StyleSheets import *
 
 from BritefuryJ.DocView import DocView
@@ -40,12 +41,10 @@ from Britefury.Event.QueuedEvent import queueEvent
 
 from Britefury.gSym.gSymWorld import GSymWorld
 from Britefury.gSym.gSymEnvironment import GSymEnvironment
-from Britefury.gSym.gSymDocument import GSymDocument, GSymUnit, viewUnit, viewUnitLisp, transformUnit
+from Britefury.gSym.gSymDocument import GSymDocument, GSymUnit, viewUnitLocationAsPage, viewUnitLispLocationAsPage, transformUnit
 
 from Britefury.Plugin import InitPlugins
 
-
-from Britefury.MainApp.LocationBar import LocationBar, LocationBarListener
 
 
 
@@ -85,91 +84,6 @@ class MainAppPluginInterface (object):
 		
 
 		
-class MainAppDocView (DocView.RefreshListener):
-	def __init__(self, app):
-		self._app = app
-		
-		self._elementTree = DPPresentationArea()
-		self._elementTree.getComponent().setPreferredSize( Dimension( 640, 480 ) )
-		
-		self._view = None
-		
-		
-	def getComponent(self):
-		return self._elementTree.getComponent()
-	
-		
-	def setUnit(self, unit):
-		if unit is not None:
-			self._view = self.createView( unit )
-			self._view.setRefreshListener( self )
-			self._refreshView()
-			self._elementTree.setChild( self._view.getRootViewElement() )
-		else:
-			self._view = None
-			
-			textStyle = TextStyleSheet( Font( 'SansSerif', Font.BOLD, 12 ), Color( 0.0, 0.0, 0.5 ) )
-			textElem = DPText( textStyle, '<empty>' )
-			self._elementTree.setChild( textElem )
-			
-	
-	@abstractmethod
-	def createView(self, unit):
-		pass
-		
-			
-	def _refreshView(self):
-		if self._view is not None:
-			if _bProfile:
-				t1 = datetime.now()
-				ProfileTimer.initProfiling()
-				self._view.beginProfiling()
-			self._view.refresh()
-			if _bProfile:
-				t2 = datetime.now()
-				self._view.endProfiling()
-				ProfileTimer.shutdownProfiling()
-				print 'MainApp: REFRESH VIEW TIME = ', t2 - t1
-				print 'MainApp: REFRESH VIEW PROFILE: JAVA TIME = %f, ELEMENT CREATE TIME = %f, PYTHON TIME = %f, CONTENT CHANGE TIME = %f, UPDATE NODE ELEMENT TIME = %f'  %  ( self._view.getJavaTime(), self._view.getElementTime(), self._view.getPythonTime(), self._view.getContentChangeTime(), self._view.getUpdateNodeElementTime() )
-
-	def _queueRefresh(self):
-		class Run (Runnable):
-			def run(r):
-				self._refreshView()
-		self._elementTree.queueImmediateEvent( Run() )
-	
-	
-	
-	def createTreeExplorer(self):
-		self._elementTree.createTreeExplorer()
-	
-		
-	def reset(self):
-		self._elementTree.reset()
-			
-	def oneToOne(self):
-		self._elementTree.oneToOne()
-
-		
-		
-	def onViewRequestRefresh(self, view):
-		self._queueRefresh()
-		
-		
-
-		
-class MainAppDocViewNormal (MainAppDocView):
-	def createView(self, unit):
-		return viewUnit( unit, self._elementTree, self._app._world, self._app._commandHistory )
-		
-		
-class MainAppDocViewLisp (MainAppDocView):
-	def createView(self, unit):
-		return viewUnitLisp( unit, self._elementTree, self._app._world, self._app._commandHistory )
-		
-		
-		
-
 		
 def _action(name, f):
 	class Act (AbstractAction):
@@ -196,11 +110,33 @@ class _GSymTransferActionListener (ActionListener):
 				a.actionPerformed( ActionEvent( focusOwner, ActionEvent.ACTION_PERFORMED, None ) )
 				
 				
-
+class _AppLocationResolver (LocationResolver):
+	def __init__(self, app):
+		self._app = app
+		
+		
+	def resolveLocation(self, location):
+		unit = self._app._document.unit   if self._app._document is not None   else   None
+		if unit is not None:
+			return viewUnitLocationAsPage( unit, location, self._app._world, self._app._commandHistory )
+		else:
+			return None
 				
 
+class _AppLocationResolverLISP (LocationResolver):
+	def __init__(self, app):
+		self._app = app
+		
+		
+	def resolveLocation(self, location):
+		unit = self._app._document.unit   if self._app._document is not None   else   None
+		if unit is not None:
+			return viewUnitLispLocationAsPage( unit, location, self._app._world, self._app._commandHistory )
+		else:
+			return None
+				
 
-
+				
 class MainApp (object):
 	def __init__(self, world, unit):
 		document = GSymDocument( unit )   if unit is not None   else   None
@@ -210,20 +146,15 @@ class MainApp (object):
 		
 		self._world = world
 		
-		self._docView = MainAppDocViewNormal( self )
+		self._resolver = _AppLocationResolver( self )
+		self._lispResolver = _AppLocationResolverLISP( self )
+		
+		self._browser = TabbedBrowser( self._resolver, '' )
+		self._browser.getComponent().setPreferredSize( Dimension( 800, 600 ) )
 
 		
 		
 		
-		# Action map
-		actionMap = self._docView.getComponent().getActionMap()
-		actionMap.put( TransferHandler.getCutAction().getValue( Action.NAME ), TransferHandler.getCutAction() )
-		actionMap.put( TransferHandler.getCopyAction().getValue( Action.NAME ), TransferHandler.getCopyAction() )
-		actionMap.put( TransferHandler.getPasteAction().getValue( Action.NAME ), TransferHandler.getPasteAction() )
-		
-		
-		
-
 		# FILE -> NEW MENU
 		
 		self._newMenu = JMenu( 'New' )
@@ -319,10 +250,6 @@ class MainApp (object):
 		scriptMenu = JMenu( 'Script' )
 		scriptMenu.add( _action( _( 'Script window' ), self._onScriptWindowMenuItem ) )
 		
-		def _testAction():
-			self._documentRoot[2][1][2][1][1][1][1] = 'this'
-		
-		scriptMenu.add( _action( _( 'test' ), _testAction ) )
 		
 		menuBar = JMenuBar();
 		menuBar.add( fileMenu )
@@ -337,24 +264,11 @@ class MainApp (object):
 		
 		
 		
-		# LOCATION AND FORMAT
-		
-		class _LocationBarListener (LocationBarListener):
-			def _onLocation(listener_self, location, format):
-				self._onLocation( location, format )
-
-		self._locationBar = LocationBar( _LocationBarListener(), '', '' )
-		
-		
-		
-		
-		
 		# WINDOW
 		
 		windowPanel = JPanel()
 		windowPanel.setLayout( BoxLayout( windowPanel, BoxLayout.Y_AXIS ) )
-		#windowPanel.add( self._locationBar.getComponent() )
-		windowPanel.add( self._docView.getComponent() )
+		windowPanel.add( self._browser.getComponent() )
 		
 		
 		
@@ -375,7 +289,7 @@ class MainApp (object):
 		#
 		# LISP window
 		#
-		self._lispDocView = None
+		self._lispBrowser = None
 		self._lispFrame = None
 		self._bLispWindowVisible = False
 
@@ -428,7 +342,8 @@ class MainApp (object):
 		
 	def _initialise(self):
 		pass
-		
+	
+	
 
 
 	def setDocument(self, document):
@@ -454,16 +369,14 @@ class MainApp (object):
 		self._bUnsavedData = False
 		
 
-		unit = self._document.unit   if self._document is not None   else   None
-		self._docView.setUnit( unit )
+		self._browser.reset( '' )
 		
 		self._setLispDocument()
 			
 			
 	def _setLispDocument(self):
-		if self._lispDocView is not None:
-			unit = self._document.unit   if self._document is not None   else   None
-			self._lispDocView.setUnit( unit )
+		if self._lispBrowser is not None:
+			self._lispBrowser.reset( '' )
 
 			
 			
@@ -660,21 +573,22 @@ class MainApp (object):
 					pass
 			
 			
-			self._lispDocView = MainAppDocViewLisp( self )
+			self._lispBrowser = TabbedBrowser( self._lispResolver, '' )
+			self._lispBrowser.getComponent().setPreferredSize( Dimension( 800, 600 ) )
 			self._lispFrame = JFrame( 'LISP View Window' )
 			self._lispFrame.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
-			self._lispFrame.add( self._lispDocView.getComponent() )
+			self._lispFrame.add( self._lispBrowser.getComponent() )
 			self._lispFrame.pack()
 			self._lispFrame.setVisible( True )
 			self._setLispDocument()
 		else:
-			self._lispDocView = None
+			self._lispBrowser = None
 			self._lispFrame.dispose()
 			self._lispFrame = None
 	
 	
 	def _onShowElementTreeExplorer(self):
-		self._docView.createTreeExplorer()
+		self._browser.createTreeExplorer()
 
 
 	def _onScriptWindowMenuItem(self):
@@ -686,30 +600,17 @@ class MainApp (object):
 
 
 	def _onReset(self):
-		self._docView.reset()
-		if self._lispDocView is not None:
-			self._lispDocView.reset()
+		self._browser.viewportReset()
+		if self._lispBrowser is not None:
+			self._lispBrowser.viewportReset()
 
 	def _onOneToOne(self):
-		self._docView.oneToOne()
-		if self._lispDocView is not None:
-			self._lispDocView.oneToOne()
+		self._browser.viewportOneToOne()
+		if self._lispBrowser is not None:
+			self._lispBrowser.viewportOneToOne()
 			
 			
 			
-	
-	def _onLocation(self, location, format):
-		self._changeLocation( location, format )
-	
-
-	def setLocation(self, location, format):
-		self._locationBar.setLocationAndFormat( location, format )
-		self._changeLocation( location )
-		
-		
-	def _changeLocation(self, location, format):
-		print 'MainApp._changeLocation: ', location, format
-		
 
 		
 

@@ -7,20 +7,14 @@
 ##-*************************
 from Britefury.gSym.gSymLanguage import GSymLanguage
 
-from BritefuryJ.GSym.View import PyGSymViewFactory
-
 from GSymCore.Languages.Python25.CodeGenerator import Python25CodeGenerator
-from GSymCore.Languages.Python25.View import Python25View, initialiseViewContext
+from GSymCore.Languages.Python25.View import viewLocationAsPage
 from GSymCore.Languages.Python25 import NodeClasses as Nodes
 
 
 
 def pyTransformModify(cur, new):
 	cur['contents'] = new['contents']
-
-
-
-viewFac = PyGSymViewFactory( Python25View, initialiseViewContext )
 
 
 
@@ -31,7 +25,7 @@ def initialiseModule(world):
 
 language = GSymLanguage()
 language.registerCodeGeneratorFactory( 'ascii', Python25CodeGenerator )
-language.registerViewFactory( viewFac )
+language.registerViewLocationAsPageFn( viewLocationAsPage )
 language.registerTransformModifyFn( pyTransformModify )
 
 

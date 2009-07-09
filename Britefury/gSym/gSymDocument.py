@@ -112,19 +112,20 @@ class GSymDocument (object):
 	
 	
 
-def viewUnit(unit, elementTree, world, commandHistory):
+def viewUnitLocationAsPage(unit, location, world, commandHistory):
 	language = world.getModuleLanguage( unit.languageModuleName )
-	languageViewFactory = language.getViewFactory()
-	return languageViewFactory.createDocumentView( unit.content, elementTree, commandHistory )
+	viewLocationAsPageFn = language.getViewLocationAsPageFn()
+	return viewLocationAsPageFn( unit.content, location, commandHistory )
 
 
-def viewUnitLisp(unit, elementTree, world, commandHistory):
+def viewUnitLispLocationAsPage(unit, location, world, commandHistory):
 	language = LISP.language
-	languageViewFactory = language.getViewFactory()
-	return languageViewFactory.createDocumentView( unit.content, elementTree, commandHistory )
+	viewLocationAsPageFn = language.getViewLocationAsPageFn()
+	return viewLocationAsPageFn( unit.content, location, commandHistory )
 
 
 def transformUnit(unit, world, xform):
+	assert False, 'not implemented'
 	language = world.getModuleLanguage( unit.languageModuleName )
 	transformModifyFn = language.getTransformModifyFn()
 	xs2 = xform( unit.contentxs )

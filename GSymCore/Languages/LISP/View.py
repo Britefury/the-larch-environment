@@ -11,10 +11,11 @@ from Britefury.gSym.View.EditOperations import replace, replaceWithRange, replac
 
 
 from BritefuryJ.DocPresent import *
+from BritefuryJ.DocPresent.Browser import Page
 from BritefuryJ.DocPresent.StyleSheets import *
 
+from BritefuryJ.GSym.View import GSymViewInstance
 from BritefuryJ.GSym.View.ListView import ParagraphListViewLayout, HorizontalListViewLayout, VerticalInlineListViewLayout, VerticalListViewLayout
-from BritefuryJ.GSym.View import NodeElementChangeListenerDiff
 
 
 from GSymCore.Languages.LISP.Parser2 import LispGrammar
@@ -167,9 +168,23 @@ def viewLispNode(node, ctx, state):
 	
 	
 	
-def LISPView():
-	return viewLispNode
+class _LISPViewPage (Page):
+	def __init__(self, docRootNode, location, commandHistory):
+		self._docRootNode = docRootNode
+		self._location = location
+		self._frame = DPFrame()
+		viewContext = GSymViewInstance( docRootNode, self._frame, viewLispNode, self._viewRootFn, commandHistory )
+		
+		
+	def getContentsElement(self):
+		return self._frame
+		
+		
+	def _viewRootFn(self, node, ctx, state):
+		return viewLispNode( node, ctx, state )
+
+	
 
 
-def initialiseViewContext(viewContext):
-	pass
+def viewLocationAsPage(docRootNode, location, commandHistory):
+	return _LISPViewPage( docRootNode, location, commandHistory )

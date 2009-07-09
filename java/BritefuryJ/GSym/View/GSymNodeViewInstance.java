@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.WeakHashMap;
 
-import org.python.core.Py;
 import org.python.core.PyObject;
 
 import BritefuryJ.Cell.CellInterface;
@@ -50,25 +49,6 @@ import BritefuryJ.GSym.View.ListView.SeparatorElementFactory;
 
 public class GSymNodeViewInstance implements ElementContext, DVNode.NodeContext
 {
-	protected static class PyGSymNodeViewFunction implements GSymNodeViewFunction
-	{
-		private PyObject callable;
-		
-		
-		public PyGSymNodeViewFunction(PyObject callable)
-		{
-			this.callable = callable;
-		}
-
-	
-		public DPWidget createElement(DocTreeNode x, GSymNodeViewInstance ctx, Object state)
-		{
-			return (DPWidget)Py.tojava( callable.__call__( Py.java2py( x ), Py.java2py( ctx ), Py.java2py( state ) ), DPWidget.class );
-		}
-	}
-
-	
-	
 	protected GSymViewInstance viewInstance;
 	protected DVNode viewNode;
 	

@@ -8,10 +8,12 @@ package BritefuryJ.GSym.View;
 
 import java.util.HashMap;
 
+import org.python.core.PyObject;
+
 import BritefuryJ.CommandHistory.CommandHistory;
+import BritefuryJ.DocPresent.DPFrame;
 import BritefuryJ.DocPresent.DPPresentationArea;
 import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.EditHandler;
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Border.EmptyBorder;
 import BritefuryJ.DocPresent.Caret.Caret;
@@ -20,9 +22,20 @@ import BritefuryJ.DocTree.DocTree;
 import BritefuryJ.DocTree.DocTreeNode;
 import BritefuryJ.DocView.DVNode;
 import BritefuryJ.DocView.DocView;
+import BritefuryJ.Utils.Profile.ProfileTimer;
 
-public class GSymViewInstance
+public class GSymViewInstance implements DocView.RefreshListener
 {
+	static boolean ENABLE_PROFILING = false;
+	
+	
+	
+	public static class CannotViewTerminalDocNode extends Exception
+	{
+		private static final long serialVersionUID = 1L;
+	}
+
+	
 	protected static class NodeContentsFactory implements DVNode.NodeElementFactory
 	{
 		private GSymViewInstance viewInstance;
@@ -108,32 +121,55 @@ public class GSymViewInstance
 	
 	
 	
+	private Object docRootNode;
 	private DocTree tree;
 	private DocTreeNode treeRootNode;
+	
 	private GSymNodeViewFunction generalNodeViewFunction;
+	
 	private DocView view;
-	private DPPresentationArea elementTree;
+	
+	private DPFrame frame;
+	
 	private HashMap<Float, Border> indentationBorders;
 	private HashMap<NodeContentsFactoryKey, NodeContentsFactory> nodeContentsFactories;
 	
 	
-	public GSymViewInstance(DocTree tree, DocTreeNode treeRootNode, DPPresentationArea elementTree, GSymViewFactory viewFactory, CommandHistory commandHistory)
+	public GSymViewInstance(Object docRootNode, DPFrame frame, GSymNodeViewFunction generalNodeViewFunction, GSymNodeViewFunction rootNodeViewFunction, CommandHistory commandHistory) throws CannotViewTerminalDocNode
 	{
-		this.tree = tree;
-		this.treeRootNode = treeRootNode;
-		generalNodeViewFunction = viewFactory.createViewFunction();
-		if ( generalNodeViewFunction == null )
-		{
-			throw new RuntimeException();
-		}
-		this.elementTree = elementTree;
+		this.docRootNode = docRootNode;
+		tree = new DocTree();
+		Object docTreeRoot = tree.treeNode( docRootNode );
 		
-		indentationBorders = new HashMap<Float, Border>();
-		nodeContentsFactories = new HashMap<NodeContentsFactoryKey, NodeContentsFactory>();
-
-		view = new DocView( tree, treeRootNode, makeNodeElementFactory( null, null ) );
-		view.setElementChangeListener( new NodeElementChangeListenerDiff() );
+		if ( docTreeRoot instanceof DocTreeNode )
+		{
+			treeRootNode = (DocTreeNode)docTreeRoot;
+			this.generalNodeViewFunction = generalNodeViewFunction; 
+			
+			this.frame = frame;
+			
+			indentationBorders = new HashMap<Float, Border>();
+			nodeContentsFactories = new HashMap<NodeContentsFactoryKey, NodeContentsFactory>();
+	
+			view = new DocView( tree, treeRootNode, makeNodeElementFactory( rootNodeViewFunction, null ) );
+			view.setElementChangeListener( new NodeElementChangeListenerDiff() );
+			view.setRefreshListener( this );
+			this.frame.setChild( view.getRootViewElement() );
+		}
+		else
+		{
+			throw new CannotViewTerminalDocNode();
+		}
 	}
+	
+	
+	public GSymViewInstance(Object docRootNode, DPFrame frame, PyObject generalNodeViewFunction, PyObject rootNodeViewFunction, CommandHistory commandHistory) throws CannotViewTerminalDocNode
+	{
+		this( docRootNode, frame, new PyGSymNodeViewFunction( generalNodeViewFunction ), new PyGSymNodeViewFunction( generalNodeViewFunction ), commandHistory );
+	}
+
+	
+	
 	
 	
 	protected Border indentationBorder(float indentation)
@@ -174,25 +210,16 @@ public class GSymViewInstance
 	
 	
 	
-	public void setEditHandler(EditHandler handler)
-	{
-		elementTree.setEditHandler( handler );
-	}
-	
-	public EditHandler getEditHandler()
-	{
-		return elementTree.getEditHandler();
-	}
-	
-	
 	public Caret getCaret()
 	{
-		return elementTree.getCaret();
+		DPPresentationArea elementTree = frame.getPresentationArea();
+		return elementTree != null  ?  elementTree.getCaret()  :  null;
 	}
 	
 	public Selection getSelection()
 	{
-		return elementTree.getSelection();
+		DPPresentationArea elementTree = frame.getPresentationArea();
+		return elementTree != null  ?  elementTree.getSelection()  :  null;
 	}
 	
 	
@@ -203,11 +230,22 @@ public class GSymViewInstance
 		return view;
 	}
 	
-	public DPPresentationArea getElementTree()
+	public DPFrame getFrame()
 	{
-		return elementTree;
+		return frame;
 	}
 	
+	public DPPresentationArea getElementTree()
+	{
+		return frame.getPresentationArea();
+	}
+	
+	
+	
+	public Object getDocRootNode()
+	{
+		return docRootNode;
+	}
 	
 	public DocTree getTree()
 	{
@@ -217,5 +255,44 @@ public class GSymViewInstance
 	public DocTreeNode getTreeRootNode()
 	{
 		return treeRootNode;
+	}
+
+
+
+
+	public void onViewRequestRefresh(DocView view)
+	{
+		Runnable r = new Runnable()
+		{
+			public void run()
+			{
+				refreshView();
+			}
+		};
+		frame.queueImmediateEvent( r );
+	}
+	
+	
+	private void refreshView()
+	{
+		long t1 = 0;
+		if ( ENABLE_PROFILING )
+		{
+			t1 = System.nanoTime();
+			ProfileTimer.initProfiling();
+			view.beginProfiling();
+		}
+		view.refresh();
+		if ( ENABLE_PROFILING )
+		{
+			long t2 = System.nanoTime();
+			view.endProfiling();
+			ProfileTimer.shutdownProfiling();
+			double deltaT = ( t2 - t1 )  *  1.0e-9;
+			System.out.println( "MainApp: REFRESH VIEW TIME = " + deltaT );
+			System.out.println( "MainApp: REFRESH VIEW PROFILE: JAVA TIME = " + view.getJavaTime() + ", ELEMENT CREATE TIME = " + view.getElementTime() +
+					", PYTHON TIME = " + view.getPythonTime() + ", CONTENT CHANGE TIME = " + view.getContentChangeTime() +
+					", UPDATE NODE ELEMENT TIME = " + view.getUpdateNodeElementTime() );
+		}
 	}
 }

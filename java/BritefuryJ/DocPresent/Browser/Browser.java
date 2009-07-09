@@ -9,20 +9,26 @@ package BritefuryJ.DocPresent.Browser;
 import java.awt.Color;
 import java.awt.Font;
 
+import javax.swing.Action;
+import javax.swing.ActionMap;
 import javax.swing.JComponent;
+import javax.swing.TransferHandler;
 
 import BritefuryJ.DocPresent.DPHBox;
 import BritefuryJ.DocPresent.DPLink;
 import BritefuryJ.DocPresent.DPPresentationArea;
+import BritefuryJ.DocPresent.DPStaticText;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.PageController;
 import BritefuryJ.DocPresent.Browser.SystemPages.SystemLocationResolver;
+import BritefuryJ.DocPresent.Browser.SystemPages.SystemRootPage;
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.Layout.VTypesetting;
 import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.StaticTextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
@@ -38,21 +44,24 @@ public class Browser implements PageController
 	private BrowserHistory history;
 	
 	private LocationResolver resolver;
-	private RootPage rootPage;
 	private Page page;
 	private BrowserListener listener;
 	
 	
 	
-	public Browser(LocationResolver resolver, RootPage rootPage, String location, BrowserListener listener)
+	public Browser(LocationResolver resolver, String location, BrowserListener listener)
 	{
 		this.resolver = resolver;
-		this.rootPage = rootPage;
 		history = new BrowserHistory( location );
 		this.listener = listener;
 		
 		area = new DPPresentationArea();
 		area.setPageController( this );
+		
+		ActionMap actionMap = area.getComponent().getActionMap();
+		actionMap.put( TransferHandler.getCutAction().getValue( Action.NAME ), TransferHandler.getCutAction() );
+		actionMap.put( TransferHandler.getCopyAction().getValue( Action.NAME ), TransferHandler.getCopyAction() );
+		actionMap.put( TransferHandler.getPasteAction().getValue( Action.NAME ), TransferHandler.getPasteAction() );
 		
 		
 		resolve();
@@ -78,6 +87,23 @@ public class Browser implements PageController
 		resolve();
 	}
 	
+	
+	
+	public void createTreeExplorer()
+	{
+		area.createTreeExplorer();
+	}
+	
+	public void viewportReset()
+	{
+		area.reset();
+	}
+
+	public void viewportOneToOne()
+	{
+		area.oneToOne();
+	}
+
 	
 	
 	
@@ -115,23 +141,23 @@ public class Browser implements PageController
 		
 		String location = history.getCurrentContext().getLocation();
 		
-		if ( location.equals( "" ) )
+		page = SystemLocationResolver.getSystemResolver().resolveLocation( location );
+		
+		if ( page == null  &&  resolver != null )
 		{
-			page = rootPage;
-		}
-		else
-		{
-			page = SystemLocationResolver.getSystemResolver().resolveLocation( location );
-			
-			if ( page == null  &&  resolver != null )
-			{
-				page = resolver.resolveLocation( location );
-			}
+			page = resolver.resolveLocation( location );
 		}
 
 		if ( page == null )
 		{
-			area.setChild( createResolveErrorElement( location ) );
+			if ( location.equals( "" ) )
+			{
+				area.setChild( createDefaultRootElement() );
+			}
+			else
+			{
+				area.setChild( createResolveErrorElement( location ) );
+			}
 		}
 		else
 		{
@@ -183,6 +209,38 @@ public class Browser implements PageController
 		pageBox.append( linkBox );
 		pageBox.append( title );
 		pageBox.append( errorBox );
+		
+		return pageBox;
+	}
+	
+	
+	private DPWidget createDefaultRootElement()
+	{
+		VBoxStyleSheet pageBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.EXPAND, 0.0, false, 0.0 );
+		DPVBox pageBox = new DPVBox( pageBoxStyle );
+		
+		VBoxStyleSheet contentBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.EXPAND, 40.0, false, 0.0 );
+		DPVBox contentBox = new DPVBox( contentBoxStyle );
+		
+		VBoxStyleSheet titleBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.CENTRE, 40.0, false, 0.0 );
+		DPVBox titleBox = new DPVBox( titleBoxStyle );
+		
+
+		pageBox.append( SystemRootPage.createLinkHeader( SystemRootPage.LINKHEADER_SYSTEMPAGE ) );
+		
+		StaticTextStyleSheet titleStyle = new StaticTextStyleSheet( new Font( "Serif", Font.BOLD, 32 ), Color.BLACK );
+		DPStaticText title = new DPStaticText( titleStyle, "Default root page" );
+		
+		StaticTextStyleSheet contentsStyle = new StaticTextStyleSheet( new Font( "SansSerif", Font.PLAIN, 16 ), Color.BLACK );
+		DPStaticText contents = new DPStaticText( contentsStyle, "Empty document" );
+
+		titleBox.append( title );
+		
+		contentBox.append( titleBox );
+		contentBox.append( contents );
+
+		pageBox.append( contentBox );
+
 		
 		return pageBox;
 	}
