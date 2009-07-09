@@ -222,32 +222,35 @@ public class DPText extends DPContentLeafEditableEntry
 	
 	public void insertText(Marker marker, String x)
 	{
-		super.insertText( marker, x );
-		
 		int index = marker.getIndex();
 		index = Math.min( Math.max( index, 0 ), text.length() );
 		text = text.substring( 0, index ) + x + text.substring( index );
+
+		super.insertText( marker, x );
+
 		onTextModified();
 	}
 
 	public void removeText(int index, int length)
 	{
-		super.removeText( index, length );
-		
 		index = Math.min( Math.max( index, 0 ), text.length() );
 		length = Math.min( length, text.length() - index );
 		text = text.substring( 0, index ) + text.substring( index + length );
+
+		super.removeText( index, length );
+
 		onTextModified();
 	}
 	
 
 	public void replaceText(Marker marker, int length, String x)
 	{
-		super.replaceText( marker, length, x );
-		
 		int index = marker.getIndex();
 		index = Math.min( Math.max( index, 0 ), text.length() );
 		text = text.substring( 0, index )  +  x  +  text.substring( index + length );
+
+		super.replaceText( marker, length, x );
+
 		onTextModified();
 	}
 	

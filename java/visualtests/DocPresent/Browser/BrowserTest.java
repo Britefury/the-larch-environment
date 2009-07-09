@@ -34,6 +34,12 @@ public class BrowserTest
 		
 		RootPage rootPage = new RootPage()
 		{
+			public DPWidget getTitleElement()
+			{
+				StaticTextStyleSheet titleStyle = new StaticTextStyleSheet( new Font( "Serif", Font.BOLD, 32 ), Color.BLACK );
+				return new DPStaticText( titleStyle, "Browser test" );
+			}
+
 			public DPWidget getPageContents()
 			{
 				StaticTextStyleSheet instructionsStyle = new StaticTextStyleSheet( new Font( "SansSerif", Font.PLAIN, 16 ), Color.BLACK );

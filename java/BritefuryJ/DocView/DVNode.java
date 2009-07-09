@@ -130,7 +130,7 @@ public class DVNode implements CellListener
 	/*
 	 * Set the node element factory
 	 */
-	public void setNodeElementFactory(NodeElementFactory factory)
+	protected void setNodeElementFactory(NodeElementFactory factory)
 	{
 		if ( factory != elementFactory )
 		{

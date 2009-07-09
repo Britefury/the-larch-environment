@@ -33,7 +33,6 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.WeakHashMap;
 
 import javax.swing.BoundedRangeModel;
@@ -68,7 +67,7 @@ import BritefuryJ.Math.Xform2;
 
 
 
-public class DPPresentationArea extends DPBin implements CaretListener, SelectionListener
+public class DPPresentationArea extends DPFrame implements CaretListener, SelectionListener
 {
 	public static class CannotGetGraphics2DException extends RuntimeException
 	{
@@ -96,59 +95,72 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 			
 			public boolean canImport(TransferHandler.TransferSupport support)
 			{
-				if ( area.editHandler != null )
+				DPFrame frame = area.getCaretFrame();
+				if ( frame != null )
 				{
-					return area.editHandler.canImport( support );
+					EditHandler editHandler = frame.getEditHandler();
+					if ( editHandler != null )
+					{
+						return editHandler.canImport( support );
+					}
 				}
-				else
-				{
-					return false;
-				}
+				return false;
 			}
 
 			public boolean importData(TransferHandler.TransferSupport info)
 			{
-				if ( area.editHandler != null )
+				DPFrame frame = area.getCaretFrame();
+				if ( frame != null )
 				{
-					return area.editHandler.importData( info );
+					EditHandler editHandler = frame.getEditHandler();
+					if ( editHandler != null )
+					{
+						return editHandler.importData( info );
+					}
 				}
-				else
-				{
-					return false;
-				}
+				return false;
 			}
 			
 			
 			
 			public int getSourceActions(JComponent component)
 			{
-				if ( area.editHandler != null )
+				DPFrame frame = area.getSelectionFrame();
+				if ( frame != null )
 				{
-					return area.editHandler.getSourceActions();
+					EditHandler editHandler = frame.getEditHandler();
+					if ( editHandler != null )
+					{	
+						return editHandler.getSourceActions();
+					}
 				}
-				else
-				{
-					return NONE;
-				}
+				return NONE;
 			}
 			
 			public Transferable createTransferable(JComponent component)
 			{
-				if ( area.editHandler != null )
+				DPFrame frame = area.getSelectionFrame();
+				if ( frame != null )
 				{
-					return area.editHandler.createTransferable();
+					EditHandler editHandler = frame.getEditHandler();
+					if ( editHandler != null )
+					{
+						return editHandler.createTransferable();
+					}
 				}
-				else
-				{
-					return null;
-				}
+				return null;
 			}
 			
 			public void exportDone(JComponent component, Transferable data, int action)
 			{
-				if ( area.editHandler != null )
+				DPFrame frame = area.getSelectionFrame();
+				if ( frame != null )
 				{
-					area.editHandler.exportDone( data, action );
+					EditHandler editHandler = frame.getEditHandler();
+					if ( editHandler != null )
+					{
+						editHandler.exportDone( data, action );
+					}
 				}
 			}
 		}
@@ -527,8 +539,6 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 	private Caret caret;
 	private DPContentLeaf currentCaretLeaf;
 	private Selection selection;
-	private WeakHashMap<Selection, Object> selections;
-	private EditHandler editHandler;
 	
 	
 	private boolean bHorizontalClamp;
@@ -577,10 +587,7 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 		
 		currentCaretLeaf = null;
 
-		selections = new WeakHashMap<Selection, Object>();
-		selection = new Selection( this );
-		
-		editHandler = null;
+		selection = new Selection();
 		
 		bStructureRefreshQueued = false;
 		
@@ -681,27 +688,6 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 
 	
 	
-	
-	//
-	//
-	// EDIT HANDLER
-	//
-	//
-	
-	public void setEditHandler(EditHandler handler)
-	{
-		editHandler = handler;
-	}
-	
-	public EditHandler getEditHandler()
-	{
-		return editHandler;
-	}
-	
-	
-
-
-
 	
 	//
 	// Space conversion and navigation methods
@@ -1103,10 +1089,7 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 				
 				
 				// Handle selections
-				for (Map.Entry<Selection, Object> entry: selections.entrySet())
-				{
-					entry.getKey().onStructureChanged();
-				}
+				selection.onStructureChanged();
 			}
 		}
 	}
@@ -1778,11 +1761,6 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 	//
 	//
 	
-	public void registerSelection(Selection sel)
-	{
-		selections.put( sel, null );
-	}
-	
 	
 	
 	public void selectionChanged(Selection s)
@@ -1803,21 +1781,64 @@ public class DPPresentationArea extends DPBin implements CaretListener, Selectio
 	
 	protected void deleteSelection()
 	{
-		if ( editHandler != null  &&  !selection.isEmpty() )
+		DPFrame selectionFrame = getSelectionFrame();
+		if ( selectionFrame != null  &&  !selection.isEmpty() )
 		{
-			if ( caret.getMarker().equals( selection.getEndMarker() ) )
+			EditHandler editHandler = selectionFrame.getEditHandler();
+			if ( editHandler != null )
 			{
-				caret.getMarker().moveTo( selection.getStartMarker() );
+				if ( caret.getMarker().equals( selection.getEndMarker() ) )
+				{
+					caret.getMarker().moveTo( selection.getStartMarker() );
+				}
+				editHandler.deleteSelection();
 			}
-			editHandler.deleteSelection();
 		}
 	}
 
 	protected void replaceSelection(String replacement)
 	{
-		if ( editHandler != null )
+		DPFrame selectionFrame = getSelectionFrame();
+		if ( selectionFrame != null )
 		{
-			editHandler.replaceSelection( replacement );
+			EditHandler editHandler = selectionFrame.getEditHandler();
+			if ( editHandler != null )
+			{
+				editHandler.replaceSelection( replacement );
+			}
+		}
+	}
+	
+	
+	
+	
+	//
+	//
+	// FRAME METHODS
+	//
+	//
+	
+	protected DPFrame getCaretFrame()
+	{
+		if ( caret.isValid() )
+		{
+			return caret.getMarker().getElement().getFrame();
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	protected DPFrame getSelectionFrame()
+	{
+		if ( !selection.isEmpty() )
+		{
+			return selection.getCommonRoot().getFrame();
+		}
+		else
+		{
+			return null;
 		}
 	}
 	

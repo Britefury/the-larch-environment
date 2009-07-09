@@ -19,11 +19,6 @@ import BritefuryJ.Utils.Profile.ProfileTimer;
 
 public class DocView implements DVNode.NodeRefreshListener
 {
-	public interface RootNodeInitialiser
-	{
-		public void initRootNode(DVNode rootView, Object rootDocNode);
-	}
-	
 	public interface RefreshListener
 	{
 		public void onViewRequestRefresh(DocView view);
@@ -31,7 +26,7 @@ public class DocView implements DVNode.NodeRefreshListener
 	
 	
 	private DocTreeNode root;
-	private RootNodeInitialiser rootNodeInitialiser;
+	private DVNode.NodeElementFactory rootElementFactory;
 	protected DocViewNodeTable nodeTable;
 	private DVNode rootView;
 	private DVNode.NodeElementChangeListener elementChangeListener;
@@ -52,10 +47,10 @@ public class DocView implements DVNode.NodeRefreshListener
 	
 	
 	
-	public DocView(DocTree tree, DocTreeNode root, RootNodeInitialiser rootNodeInitialiser)
+	public DocView(DocTree tree, DocTreeNode root, DVNode.NodeElementFactory rootElementFactory)
 	{
 		this.root = root;
-		this.rootNodeInitialiser = rootNodeInitialiser;
+		this.rootElementFactory = rootElementFactory;
 		
 		nodeTable = new DocViewNodeTable();
 		
@@ -89,8 +84,7 @@ public class DocView implements DVNode.NodeRefreshListener
 	{
 		if ( rootView == null )
 		{
-			rootView = buildNodeView( root );
-			rootNodeInitialiser.initRootNode( rootView, root );
+			rootView = buildNodeView( root, rootElementFactory );
 			rootView.setRefreshListener( this );
 		}
 		return rootView;
@@ -111,7 +105,7 @@ public class DocView implements DVNode.NodeRefreshListener
 	
 	
 	
-	public DVNode buildNodeView(DocTreeNode treeNode)
+	public DVNode buildNodeView(DocTreeNode treeNode, DVNode.NodeElementFactory elementFactory)
 	{
 		if ( treeNode == null )
 		{
@@ -136,6 +130,8 @@ public class DocView implements DVNode.NodeRefreshListener
 					nodeTable.put( treeNode, viewNode );
 				}
 			}
+			
+			viewNode.setNodeElementFactory( elementFactory );
 			
 			return viewNode;
 		}
