@@ -56,7 +56,7 @@ public class DocView implements DVNode.NodeRefreshListener
 		
 		elementChangeListener = null;
 		
-		bRefreshRequired = true;
+		bRefreshRequired = false;
 		
 		rootBox = null;
 		

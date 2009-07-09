@@ -11,7 +11,7 @@ class GSymLanguage (object):
 	def __init__(self):
 		super( GSymLanguage, self ).__init__()
 		self._codeGeneratorFactories = {}
-		self._viewFactory = None
+		self._viewLocationAsPageFn = None
 		self._transformModifyFn = None
 		
 		
@@ -20,8 +20,8 @@ class GSymLanguage (object):
 
 
 
-	def registerViewFactory(self, factory):
-		self._viewFactory = factory
+	def registerViewLocationAsPageFn(self, viewLocationAsPageFn):
+		self._viewLocationAsPageFn = viewLocationAsPageFn
 
 	
 	def registerTransformModifyFn(self, transformModifyFn):
@@ -31,8 +31,8 @@ class GSymLanguage (object):
 	def getCodeGeneratorFactory(self, format):
 		return self._codeGeneratorFactories[format]
 	
-	def getViewFactory(self):
-		return self._viewFactory
+	def getViewLocationAsPageFn(self):
+		return self._viewLocationAsPageFn
 	
 	def getTransformModifyFn(self):
 		return self._transformModifyFn

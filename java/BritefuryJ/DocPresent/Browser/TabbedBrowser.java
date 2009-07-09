@@ -34,17 +34,15 @@ public class TabbedBrowser implements Browser.BrowserListener
 	private JPanel locationPanel, panel;
 	
 	private LocationResolver resolver;
-	private RootPage rootPage;
 	
 	private ArrayList<Browser> browsers;
 	private Browser currentBrowser;
 	
 	
 	
-	public TabbedBrowser(LocationResolver resolver, RootPage rootPage, String location)
+	public TabbedBrowser(LocationResolver resolver, String location)
 	{
 		this.resolver = resolver;
-		this.rootPage = rootPage;
 		
 		currentBrowser = createBrowser( location );
 		browsers = new ArrayList<Browser>();
@@ -100,6 +98,32 @@ public class TabbedBrowser implements Browser.BrowserListener
 	}
 	
 	
+	
+	public void reset(String location)
+	{
+		browsers.clear();
+		browsers.add( currentBrowser );
+		currentBrowser.viewportReset();
+		currentBrowser.setLocation( location );
+	}
+	
+	
+	public void createTreeExplorer()
+	{
+		currentBrowser.createTreeExplorer();
+	}
+
+	public void viewportReset()
+	{
+		currentBrowser.viewportReset();
+	}
+
+	public void viewportOneToOne()
+	{
+		currentBrowser.viewportOneToOne();
+	}
+
+
 	
 	private void onLocationField(String location)
 	{
@@ -171,7 +195,7 @@ public class TabbedBrowser implements Browser.BrowserListener
 	
 	private Browser createBrowser(String location)
 	{
-		return new Browser( resolver, rootPage, location, this );
+		return new Browser( resolver, location, this );
 	}
 	
 	
