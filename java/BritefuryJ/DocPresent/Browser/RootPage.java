@@ -6,16 +6,11 @@
 //##************************
 package BritefuryJ.DocPresent.Browser;
 
-import java.awt.Color;
-import java.awt.Font;
-
-import BritefuryJ.DocPresent.DPStaticText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Browser.SystemPages.SystemRootPage;
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.VTypesetting;
-import BritefuryJ.DocPresent.StyleSheets.StaticTextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
 public abstract class RootPage extends Page
@@ -25,21 +20,27 @@ public abstract class RootPage extends Page
 		VBoxStyleSheet pageBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.EXPAND, 0.0, false, 0.0 );
 		DPVBox pageBox = new DPVBox( pageBoxStyle );
 		
-		VBoxStyleSheet contentBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.CENTRE, 40.0, false, 0.0 );
+		VBoxStyleSheet contentBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.EXPAND, 40.0, false, 0.0 );
 		DPVBox contentBox = new DPVBox( contentBoxStyle );
 		
-		StaticTextStyleSheet titleStyle = new StaticTextStyleSheet( new Font( "Serif", Font.BOLD, 32 ), Color.BLACK );
-		DPStaticText title = new DPStaticText( titleStyle, "Welcome to gSym" );
+		VBoxStyleSheet titleBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.CENTRE, 40.0, false, 0.0 );
+		DPVBox titleBox = new DPVBox( titleBoxStyle );
 		
-		contentBox.append( title );
-		contentBox.append( getPageContents() );
 
 		pageBox.append( SystemRootPage.createLinkHeader( SystemRootPage.LINKHEADER_SYSTEMPAGE ) );
+		
+		titleBox.append( getTitleElement() );
+		
+		contentBox.append( titleBox );
+		contentBox.append( getPageContents() );
 
 		pageBox.append( contentBox );
+
 		
 		return pageBox;
 	}
 	
+	
+	public abstract DPWidget getTitleElement();
 	public abstract DPWidget getPageContents();
 }

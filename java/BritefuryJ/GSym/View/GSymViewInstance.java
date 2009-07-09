@@ -56,14 +56,6 @@ public class GSymViewInstance
 	}
 	
 	
-	private class RootInitialiser implements DocView.RootNodeInitialiser
-	{
-		public void initRootNode(DVNode rootView, Object rootDocNode)
-		{
-			rootView.setNodeElementFactory( makeNodeElementFactory( null, null ) );
-		}
-	}
-	
 	private static class NodeContentsFactoryKey
 	{
 		private GSymNodeViewFunction nodeViewFunction;
@@ -134,11 +126,13 @@ public class GSymViewInstance
 		{
 			throw new RuntimeException();
 		}
-		view = new DocView( tree, treeRootNode, new RootInitialiser() );
 		this.elementTree = elementTree;
 		
 		indentationBorders = new HashMap<Float, Border>();
 		nodeContentsFactories = new HashMap<NodeContentsFactoryKey, NodeContentsFactory>();
+
+		view = new DocView( tree, treeRootNode, makeNodeElementFactory( null, null ) );
+		view.setElementChangeListener( new NodeElementChangeListenerDiff() );
 	}
 	
 	
@@ -179,11 +173,6 @@ public class GSymViewInstance
 	}
 	
 	
-	
-	public void setElementChangeListener(DVNode.NodeElementChangeListener elementChangeListener)
-	{
-		view.setElementChangeListener( elementChangeListener );
-	}
 	
 	public void setEditHandler(EditHandler handler)
 	{

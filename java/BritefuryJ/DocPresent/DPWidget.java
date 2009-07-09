@@ -1646,6 +1646,26 @@ abstract public class DPWidget
 	
 	
 	//
+	//
+	// FRAME METHODS
+	//
+	//
+	
+	public DPFrame getFrame()
+	{
+		if ( parent != null )
+		{
+			return parent.getFrame();
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	
+	
+	//
 	// Meta-element
 	//
 	

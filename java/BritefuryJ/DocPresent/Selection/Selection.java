@@ -9,7 +9,6 @@ package BritefuryJ.DocPresent.Selection;
 import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.DPContainer;
-import BritefuryJ.DocPresent.DPPresentationArea;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Marker.MarkerListener;
@@ -24,15 +23,13 @@ public class Selection implements MarkerListener
 	protected ArrayList<SelectionListener> listeners;
 	
 	
-	public Selection(DPPresentationArea area)
+	public Selection()
 	{
 		marker0 = new Marker();
 		marker1 = new Marker();
 		
 		marker0.addMarkerListener( this );
 		marker1.addMarkerListener( this );
-		
-		area.registerSelection( this );
 	}
 	
 	

@@ -26,13 +26,13 @@ punctuation_textStyle = TextStyleSheet( Font( 'SansSerif', Font.PLAIN, 14 ),  Co
 operator_textStyle = TextStyleSheet( Font( 'SansSerif', Font.BOLD, 14 ),  Color( 0.0, 0.5, 0.0 ) )
 comment_textStyle = TextStyleSheet( Font( 'SansSerif', Font.PLAIN, 14 ),  Color( 0.4, 0.4, 0.4 ) )
 
-defBackground_border = SolidBorder( 2.0, 5.0, 5.0, Color( 0.420, 0.620, 0.522 ), None )
+defBackground_border = SolidBorder( 2.0, 2.0, 5.0, 5.0, Color( 0.420, 0.620, 0.522 ), None )
 defHeader_border = EmptyBorder( 0.0, 0.0, 0.0, 0.0, 3.0, 3.0, Color( 0.913, 0.953, 0.933 ) )
 
-classBackground_border = SolidBorder( 2.0, 5.0, 5.0, Color( 0.522, 0.420, 0.620 ), None )
+classBackground_border = SolidBorder( 2.0, 2.0, 5.0, 5.0, Color( 0.522, 0.420, 0.620 ), None )
 classHeader_border = EmptyBorder( 0.0, 0.0, 0.0, 0.0, 3.0, 3.0, Color( 0.933, 0.913, 0.953 ) )
 
-indentedBlock_border = SolidBorder( 2.0, 5.0, 5.0, Color.red, None )
+indentedBlock_border = SolidBorder( 2.0, 2.0, 5.0, 5.0, Color.red, None )
 
 pow_scriptStyle = ScriptStyleSheet( 0.0, 0.0 )
 div_fractionStyle = FractionStyleSheet( Color( 0.0, 0.5, 0.0 ) )

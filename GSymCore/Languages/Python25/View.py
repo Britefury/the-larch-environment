@@ -1322,6 +1322,5 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 
 def initialiseViewContext(viewContext):
-	viewContext.setElementChangeListener( NodeElementChangeListenerDiff() )
 	viewContext.setEditHandler( Python25EditHandler( viewContext ) )
 

@@ -172,4 +172,4 @@ def LISPView():
 
 
 def initialiseViewContext(viewContext):
-	viewContext.setElementChangeListener( NodeElementChangeListenerDiff() )
+	pass
