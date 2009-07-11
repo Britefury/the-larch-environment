@@ -12,7 +12,8 @@ import BritefuryJ.Math.Xform2;
 
 
 
-public class PointerMotionEvent extends PointerEvent {
+public class PointerMotionEvent extends PointerEvent
+{
 	public enum Action
 	{
 		ENTER,

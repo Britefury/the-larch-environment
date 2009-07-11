@@ -128,7 +128,8 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 			}
 			else
 			{
-				fieldData[index] = coerce( Py.tojava( values[i], Object.class ) );
+				PyObject value = values[i];
+				fieldData[index] = coerce( Py.tojava( value, Object.class ) );
 			}
 		}
 

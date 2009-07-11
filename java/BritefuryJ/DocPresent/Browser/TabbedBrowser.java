@@ -103,8 +103,8 @@ public class TabbedBrowser implements Browser.BrowserListener
 	{
 		browsers.clear();
 		browsers.add( currentBrowser );
+		currentBrowser.reset( location );
 		currentBrowser.viewportReset();
-		currentBrowser.setLocation( location );
 	}
 	
 	

@@ -8,6 +8,7 @@
 package BritefuryJ.DocPresent;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +19,7 @@ import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleSheets.ContentLeafStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.Math.Point2;
 
 public abstract class DPContentLeaf extends DPWidget
@@ -822,6 +824,16 @@ public abstract class DPContentLeaf extends DPWidget
 		return this;
 	}
 
+	protected void onTextRepresentationModified()
+	{
+		super.onTextRepresentationModified();
+		
+		refreshMetaHeader();
+	}
+	
+	
+	
+	
 	
 	
 	
@@ -829,8 +841,14 @@ public abstract class DPContentLeaf extends DPWidget
 	// Meta element methods
 	//
 	
+	protected static TextStyleSheet headerTextRepTextStyle = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 14 ), Color.BLACK );
 	protected static SolidBorder metaHeaderHighlightBorder = new SolidBorder( 1.0, 1.0, 5.0, 5.0, new Color( 0.75f, 0.0f, 0.0f ), new Color( 1.0f, 0.9f, 0.8f ) );
 
+	public DPWidget createMetaHeaderData()
+	{
+		return new DPText( headerTextRepTextStyle, "'" + textRepresentation + "'" );
+	}
+	
 	protected Border getMetaHeaderBorder()
 	{
 		Caret caret = presentationArea.getCaret();
@@ -845,6 +863,7 @@ public abstract class DPContentLeaf extends DPWidget
 		return metaHeaderEmptyBorder;
 	}
 	
+
 
 	
 	

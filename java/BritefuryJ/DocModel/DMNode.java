@@ -12,38 +12,10 @@ import org.python.core.Py;
 import org.python.core.PyJavaType;
 import org.python.core.PyObject;
 import org.python.core.PyObjectDerived;
-import org.python.core.PyString;
-import org.python.core.PyUnicode;
+
 
 public abstract class DMNode
 {
-	public static Object coerce(String x)
-	{
-		// Create a clone of the string to ensure that all String objects in the document are
-		// distinct, even if their contents are the same
-		return new String( x );
-	}
-	
-	public static Object coerce(PyString x)
-	{
-		return coerce( x.toString() );
-	}
-	
-	public static Object coerce(PyUnicode x)
-	{
-		return coerce( x.toString() );
-	}
-	
-	public static Object coerce(List<Object> x)
-	{
-		return new DMList( x );
-	}
-	
-	public static Object coerce(DMObjectInterface x)
-	{
-		return new DMObject( x );
-	}
-	
 	@SuppressWarnings("unchecked")
 	public static Object coerce(Object x)
 	{
@@ -55,33 +27,32 @@ public abstract class DMNode
 		{
 			return x;
 		}
-		else if ( x instanceof PyString )
-		{
-			return coerce( (PyString)x );
-		}
-		else if ( x instanceof PyUnicode )
-		{
-			return coerce( (PyUnicode)x );
-		}
 		else if ( x instanceof String )
 		{
-			return coerce( (String)x );
+			// Create a clone of the string to ensure that all String objects in the document are
+			// distinct, even if their contents are the same
+			return new String( (String)x );
 		}
 		else if ( x instanceof List )
 		{
-			return coerce( (List<Object>)x );
+			return new DMList( (List<Object>)x );
 		}
 		else if ( x instanceof DMObjectInterface )
 		{
-			return coerce( (DMObjectInterface)x );
+			return new DMObject( (DMObjectInterface)x );
 		}
-		else if ( x instanceof PyJavaType )
+		else if ( x instanceof PyJavaType  ||  x instanceof PyObjectDerived )
 		{
-			return coerce( Py.tojava( (PyObject)x, Object.class ) );
-		}
-		else if ( x instanceof PyObjectDerived )
-		{
-			return coerce( Py.tojava( (PyObject)x, Object.class ) );
+			Object xx = Py.tojava( (PyObject)x, Object.class );
+			if ( xx instanceof PyJavaType  ||  xx instanceof PyObjectDerived )
+			{
+				System.out.println( "DMNode.coerce(): Could not unwrap " + x );
+				return null;
+			}
+			else
+			{
+				return coerce( xx );
+			}
 		}
 		else
 		{

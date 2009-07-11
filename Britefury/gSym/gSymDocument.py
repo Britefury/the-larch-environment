@@ -49,37 +49,29 @@ GSymWorld.registerInternalDMModule( module )
 
 
 
-class GSymUnit (object):
-	def __init__(self, languageModuleName, content):
-		self.languageModuleName = languageModuleName
-		self.content = DMNode.coerce( content )
-		
-		
-		
-	def write(self):
-		return nodeClass_GSymUnit( languageModuleName=self.languageModuleName, content=self.content )
+def gSymUnit(languageModuleName, content):
+	return nodeClass_GSymUnit( languageModuleName=languageModuleName, content=content )
+
+def gSymUnit_getLanguageModuleName(unit):
+	if not unit.isInstanceOf( nodeClass_GSymUnit ):
+		raise GSymDocumentInvalidStructure
+	return unit['languageModuleName']
+	
+def gSymUnit_getContent(unit):
+	if not unit.isInstanceOf( nodeClass_GSymUnit ):
+		raise GSymDocumentInvalidStructure
+	return unit['content']
 	
 
-	@staticmethod
-	def read(unit):
-		if not isObjectNode( unit ):
-			raise GSymDocumentInvalidStructure
-		
-		if not unit.isInstanceOf( nodeClass_GSymUnit ):
-			raise GSymDocumentInvalidStructure
-		
-		return GSymUnit( unit['languageModuleName'], unit['content'] )
-		
 
-		
-		
+	
 class GSymDocument (object):
 	def __init__(self, unit):
-		self.unit = unit
+		self.unit = DMNode.coerce( unit )
 	
 	
 	def write(self):
-		return nodeClass_GSymDocument( version='0.1-alpha', content=self.unit.write() )
+		return nodeClass_GSymDocument( version='0.1-alpha', content=self.unit )
 
 	
 	
@@ -104,31 +96,29 @@ class GSymDocument (object):
 		if versionCmp > 0:
 			raise GSymDocumentUnsupportedVersion
 		
-		
-		
-		return GSymDocument( GSymUnit.read( content ) )
+		return GSymDocument( content )
 	
 	
 	
 	
 
-def viewUnitLocationAsPage(unit, location, world, commandHistory):
-	language = world.getModuleLanguage( unit.languageModuleName )
+def viewUnitLocationAsPage(unit, location, world, commandHistory, app):
+	language = world.getModuleLanguage( gSymUnit_getLanguageModuleName( unit ) )
 	viewLocationAsPageFn = language.getViewLocationAsPageFn()
-	return viewLocationAsPageFn( unit.content, location, commandHistory )
+	return viewLocationAsPageFn( gSymUnit_getContent( unit ), location, commandHistory, app )
 
 
-def viewUnitLispLocationAsPage(unit, location, world, commandHistory):
+def viewUnitLispLocationAsPage(unit, location, world, commandHistory, app):
 	language = LISP.language
 	viewLocationAsPageFn = language.getViewLocationAsPageFn()
-	return viewLocationAsPageFn( unit.content, location, commandHistory )
+	return viewLocationAsPageFn( gSymUnit_getContent( unit ), location, commandHistory, app )
 
 
 def transformUnit(unit, world, xform):
 	assert False, 'not implemented'
-	language = world.getModuleLanguage( unit.languageModuleName )
+	language = world.getModuleLanguage( gSymUnit_getLanguageModuleName( unit ) )
 	transformModifyFn = language.getTransformModifyFn()
-	xs2 = xform( unit.contentxs )
+	xs2 = xform( gSymUnit_getContent( unit ) )
 	xs2 = DMList( xs2 )
 	transformModifyFn( xs, xs2 )
 	return xs2

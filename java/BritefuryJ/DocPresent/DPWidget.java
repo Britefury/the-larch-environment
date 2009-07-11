@@ -1127,27 +1127,38 @@ abstract public class DPWidget
 	
 	protected void handleMotion(PointerMotionEvent event)
 	{
+		PointerInterface pointer = event.pointer.concretePointer();
 		if ( pointersWithinBounds == null )
 		{
 			pointersWithinBounds = new ArrayList<PointerInterface>();
 		}
-		if ( !pointersWithinBounds.contains( event.pointer ) )
+		if ( !pointersWithinBounds.contains( pointer ) )
 		{
-			pointersWithinBounds.add( event.pointer );
+			pointersWithinBounds.add( pointer );
 		}
 		onMotion( event );
 	}
 	
 	protected void handleEnter(PointerMotionEvent event)
 	{
+		PointerInterface pointer = event.pointer.concretePointer();
+		if ( pointersWithinBounds == null )
+		{
+			pointersWithinBounds = new ArrayList<PointerInterface>();
+		}
+		if ( !pointersWithinBounds.contains( pointer ) )
+		{
+			pointersWithinBounds.add( pointer );
+		}
 		onEnter( event );
 	}
 	
 	protected void handleLeave(PointerMotionEvent event)
 	{
+		PointerInterface pointer = event.pointer.concretePointer();
 		if ( pointersWithinBounds != null )
 		{
-			pointersWithinBounds.remove( event.pointer );
+			pointersWithinBounds.remove( pointer );
 			if ( pointersWithinBounds.isEmpty() )
 			{
 				pointersWithinBounds = null;
@@ -1184,6 +1195,10 @@ abstract public class DPWidget
 	
 	protected void handleDrawBackground(Graphics2D graphics, AABox2 areaBox)
 	{
+		/*Stroke s = new BasicStroke( 1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL );
+		graphics.setStroke( s );
+		graphics.setPaint( new Color( 0.0f, 0.0f, 0.0f, 0.1f ) );
+		graphics.draw( new Rectangle2D.Double( 0.0, 0.0, getAllocationX(), getAllocationY() ) );*/
 		drawBackground( graphics );
 	}
 	
@@ -1739,6 +1754,30 @@ abstract public class DPWidget
 		}
 	}
 	
+	public void refreshMetaHeader()
+	{
+		if ( metaElement != null )
+		{
+			DPBorder border = getMetaHeaderBorderWidget();
+			DPHBox hbox = (DPHBox)border.getChild();
+			
+			DPWidget data = createMetaHeaderData();
+			DPWidget debug = createMetaHeaderDebug();
+			DPWidget descr = createMetaDescription();
+			hbox.clear();
+			
+			if ( data != null )
+			{
+				hbox.append( data );
+			}
+			if ( debug != null )
+			{
+				hbox.append( debug );
+			}
+			hbox.append( descr );
+		}
+	}
+
 	public DPWidget createMetaElement()
 	{
 		DPBin bin = new DPBin();

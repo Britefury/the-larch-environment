@@ -29,7 +29,6 @@ public class GSymViewInstance implements DocView.RefreshListener
 	static boolean ENABLE_PROFILING = false;
 	
 	
-	
 	public static class CannotViewTerminalDocNode extends Exception
 	{
 		private static final long serialVersionUID = 1L;
@@ -134,12 +133,16 @@ public class GSymViewInstance implements DocView.RefreshListener
 	private HashMap<Float, Border> indentationBorders;
 	private HashMap<NodeContentsFactoryKey, NodeContentsFactory> nodeContentsFactories;
 	
+	private Object owner;
 	
-	public GSymViewInstance(Object docRootNode, DPFrame frame, GSymNodeViewFunction generalNodeViewFunction, GSymNodeViewFunction rootNodeViewFunction, CommandHistory commandHistory) throws CannotViewTerminalDocNode
+	
+	public GSymViewInstance(Object docRootNode, DPFrame frame, GSymNodeViewFunction generalNodeViewFunction, GSymNodeViewFunction rootNodeViewFunction,
+			CommandHistory commandHistory, Object owner) throws CannotViewTerminalDocNode
 	{
 		this.docRootNode = docRootNode;
 		tree = new DocTree();
 		Object docTreeRoot = tree.treeNode( docRootNode );
+		this.owner = owner;
 		
 		if ( docTreeRoot instanceof DocTreeNode )
 		{
@@ -163,12 +166,19 @@ public class GSymViewInstance implements DocView.RefreshListener
 	}
 	
 	
-	public GSymViewInstance(Object docRootNode, DPFrame frame, PyObject generalNodeViewFunction, PyObject rootNodeViewFunction, CommandHistory commandHistory) throws CannotViewTerminalDocNode
+	public GSymViewInstance(Object docRootNode, DPFrame frame, PyObject generalNodeViewFunction, PyObject rootNodeViewFunction,
+			CommandHistory commandHistory, Object owner) throws CannotViewTerminalDocNode
 	{
-		this( docRootNode, frame, new PyGSymNodeViewFunction( generalNodeViewFunction ), new PyGSymNodeViewFunction( generalNodeViewFunction ), commandHistory );
+		this( docRootNode, frame, new PyGSymNodeViewFunction( generalNodeViewFunction ), new PyGSymNodeViewFunction( generalNodeViewFunction ), commandHistory, owner );
 	}
 
 	
+	
+	
+	public Object getOwner()
+	{
+		return owner;
+	}
 	
 	
 	

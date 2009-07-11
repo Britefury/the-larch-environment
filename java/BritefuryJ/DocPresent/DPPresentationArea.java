@@ -523,7 +523,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	
 	private boolean bMouseSelectionInProgress;
 	
-	private Vector2 areaSize;
+	private Vector2 windowSize;
 	
 	private Pointer rootSpaceMouse;
 	private InputTable inputTable;
@@ -569,7 +569,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 		dragStartPosInWindowSpace = new Point2();
 		dragButton = 0;
 		
-		areaSize = new Vector2();
+		windowSize = new Vector2();
 		
 		component = new ScrollablePresentationAreaComponent( this );
 
@@ -751,7 +751,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 		Point2 topLeft = widget.getLocalPointRelativeToRoot( new Point2( 0.0, 0.0 ) );
 		Point2 bottomRight = widget.getLocalPointRelativeToRoot( new Point2( widget.getAllocation() ) );
 		Point2 centre = Point2.average( topLeft, bottomRight );
-		windowTopLeftCornerInRootSpace = centre.sub( areaSize.mul( 0.5 ) );
+		windowTopLeftCornerInRootSpace = centre.sub( windowSize.mul( 0.5 ) );
 		updateRange();
 		queueFullRedraw();
 	}
@@ -767,7 +767,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 		double ay = allocationY == 0.0  ?  1.0  :  allocationY;
 		
 		windowTopLeftCornerInRootSpace = new Point2();
-		rootScaleInWindowSpace = Math.min( areaSize.x / ax, areaSize.y / ay );
+		rootScaleInWindowSpace = Math.min( windowSize.x / ax, windowSize.y / ay );
 		rootScaleInWindowSpace = rootScaleInWindowSpace == 0.0  ?  1.0  :  rootScaleInWindowSpace;
 		
 		updateRange();
@@ -790,7 +790,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	public void zoomAboutCentre(double zoomFactor)
 	{
 		// We want to zoom about the centre of the document, not the top left corner
-		zoom( zoomFactor, new Point2( areaSize.mul( 0.5 ) ) );
+		zoom( zoomFactor, new Point2( windowSize.mul( 0.5 ) ) );
 	}
 	
 	public void panRootSpace(Vector2 pan)
@@ -809,7 +809,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 		}
 		else if ( pan.x > 0.0 )
 		{
-			double windowWidthInRootSpace = areaSize.x / rootScaleInWindowSpace;
+			double windowWidthInRootSpace = windowSize.x / rootScaleInWindowSpace;
 			double allocationX = getAllocationX();
 			double ax = allocationX == 0.0  ?  1.0  :  allocationX;
 			double maxX = Math.max( ax - windowWidthInRootSpace, 0.0 );
@@ -821,7 +821,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 		}
 		else if ( pan.y > 0.0 )
 		{
-			double windowHeightInRootSpace = areaSize.y / rootScaleInWindowSpace;
+			double windowHeightInRootSpace = windowSize.y / rootScaleInWindowSpace;
 			double allocationY = getAllocationY();
 			double ay = allocationY == 0.0  ?  1.0  :  allocationY;
 			double maxY = Math.max( ay - windowHeightInRootSpace, 0.0 );
@@ -850,7 +850,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 		double ax = allocationX == 0.0  ?  1.0  :  allocationX;
 		double ay = allocationY == 0.0  ?  1.0  :  allocationY;
 
-		component.setRange( new Vector2( ax * rootScaleInWindowSpace, ay * rootScaleInWindowSpace ), areaSize, windowTopLeftCornerInRootSpace.scale( rootScaleInWindowSpace ) );
+		component.setRange( new Vector2( ax * rootScaleInWindowSpace, ay * rootScaleInWindowSpace ), windowSize, windowTopLeftCornerInRootSpace.scale( rootScaleInWindowSpace ) );
 		
 	}
 	
@@ -1016,7 +1016,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 			if ( bHorizontalClamp )
 			{
 				double scaleFactor = Math.min( rootScaleInWindowSpace, 1.0 );
-				layoutAllocBox.setAllocationX( areaSize.x / scaleFactor );
+				layoutAllocBox.setAllocationX( windowSize.x / scaleFactor );
 			}
 			else
 			{
@@ -1036,7 +1036,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 			bAllocationRequired = false;
 			
 			// Send motion events; pointer hasn't moved, but the widgets have
-			if ( !dndTable.containsKey( rootSpaceMouse.concretePointer() ) )
+			if ( !dndTable.containsKey( rootSpaceMouse.concretePointer() )  &&  pointersWithinBounds != null  &&  pointersWithinBounds.contains( rootSpaceMouse.concretePointer() ) )
 			{
 				rootMotionEvent( new PointerMotionEvent( rootSpaceMouse, PointerMotionEvent.Action.MOTION ) );
 			}			
@@ -1103,9 +1103,9 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	
 	protected void configureEvent(Vector2 size)
 	{
-		if ( !size.equals( areaSize ) )
+		if ( !size.equals( windowSize ) )
 		{
-			areaSize = size;
+			windowSize = size;
 			updateRange();
 			bAllocationRequired = true;
 		}
@@ -1366,7 +1366,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 		Point2 rootPos = windowSpaceToRootSpace( windowPos );
 		rootSpaceMouse.setLocalPos( rootPos );
 		rootSpaceMouse.setModifiers( modifiers );
-		handleButtonDown( new PointerButtonEvent( rootSpaceMouse, button, PointerButtonEvent.Action.DOWN2 ) );
+		handleButtonDown2( new PointerButtonEvent( rootSpaceMouse, button, PointerButtonEvent.Action.DOWN2 ) );
 	}
 
 
@@ -1375,7 +1375,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 		Point2 rootPos = windowSpaceToRootSpace( windowPos );
 		rootSpaceMouse.setLocalPos( rootPos );
 		rootSpaceMouse.setModifiers( modifiers );
-		handleButtonDown( new PointerButtonEvent( rootSpaceMouse, button, PointerButtonEvent.Action.DOWN3 ) );
+		handleButtonDown3( new PointerButtonEvent( rootSpaceMouse, button, PointerButtonEvent.Action.DOWN3 ) );
 	}
 	
 	

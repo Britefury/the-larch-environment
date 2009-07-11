@@ -111,6 +111,22 @@ abstract public class DPContainerSequence extends DPContainer
 	}
 	
 	
+	public void clear()
+	{
+		// Unregister removed entries
+		for (DPWidget child: registeredChildren)
+		{
+			unregisterChild( child );
+		}
+		
+		// Set contents of @childEntries list
+		registeredChildren.clear();
+
+		onChildListModified();
+		queueResize();
+	}
+	
+	
 
 	
 	

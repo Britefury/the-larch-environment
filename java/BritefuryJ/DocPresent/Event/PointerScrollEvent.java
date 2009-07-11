@@ -10,7 +10,8 @@ package BritefuryJ.DocPresent.Event;
 import BritefuryJ.DocPresent.Input.PointerInterface;
 import BritefuryJ.Math.Xform2;
 
-public class PointerScrollEvent extends PointerEvent {
+public class PointerScrollEvent extends PointerEvent
+{
 	public int scrollX, scrollY;
 	
 	

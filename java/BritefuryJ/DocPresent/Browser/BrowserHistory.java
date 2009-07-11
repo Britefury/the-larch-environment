@@ -65,4 +65,11 @@ class BrowserHistory
 			currentContext = future.pop();
 		}
 	}
+	
+	
+	public void clear()
+	{
+		past.clear();
+		future.clear();
+	}
 }

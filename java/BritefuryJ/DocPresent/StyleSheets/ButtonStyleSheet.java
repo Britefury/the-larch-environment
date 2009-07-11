@@ -22,7 +22,8 @@ public class ButtonStyleSheet extends ContainerStyleSheet
 	
 	public ButtonStyleSheet()
 	{
-		this( Color.black, new Color( 0.7f, 0.8f, 1.0f ), new Color( 0.55f, 0.6f, 1.0f ) );
+//		this( new Color( 0.55f, 0.75f, 1.0f ), new Color( 0.85f, 0.95f, 1.0f ), new Color( 0.75f, 0.85f, 1.0f ) );
+		this( new Color( 0.4f, 0.7f, 1.0f ), new Color( 0.9f, 0.92f, 1.0f ), null );
 	}
 	
 	public ButtonStyleSheet(Color borderColour, Color backgroundColour, Color highlightBackgColour)
@@ -31,8 +32,8 @@ public class ButtonStyleSheet extends ContainerStyleSheet
 		this.backgroundColour = backgroundColour;
 		this.highlightBackgColour = highlightBackgColour;
 		
-		border = new SolidBorder( 1.0, 2.0, 2.0, 2.0, borderColour, backgroundColour );
-		highlightBorder = new SolidBorder( 1.0, 2.0, 2.0, 2.0, borderColour, highlightBackgColour );
+		border = new SolidBorder( 1.0, 2.0, 10.0, 10.0, borderColour, backgroundColour );
+		highlightBorder = new SolidBorder( 1.0, 2.0, 10.0, 10.0, borderColour, highlightBackgColour );
 	}
 	
 	

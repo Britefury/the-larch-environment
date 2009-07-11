@@ -8,6 +8,9 @@ package BritefuryJ.DocPresent;
 
 import java.awt.Graphics2D;
 
+import org.python.core.Py;
+import org.python.core.PyObject;
+
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
@@ -20,6 +23,22 @@ public class DPButton extends DPBin
 		public void onButtonClicked(DPButton button);
 	}
 	
+	protected static class PyButtonListener implements ButtonListener
+	{
+		private PyObject callable;
+		
+		
+		public PyButtonListener(PyObject callable)
+		{
+			this.callable = callable;
+		}
+		
+		public void onButtonClicked(DPButton button)
+		{
+			callable.__call__( Py.java2py( button ) );
+		}
+	}
+	
 	
 	
 	protected ButtonListener listener;
@@ -28,7 +47,7 @@ public class DPButton extends DPBin
 	
 	public DPButton()
 	{
-		this( ButtonStyleSheet.defaultStyleSheet, null );
+		this( ButtonStyleSheet.defaultStyleSheet, (ButtonListener)null );
 	}
 
 	public DPButton(ButtonListener listener)
@@ -36,9 +55,14 @@ public class DPButton extends DPBin
 		this( ButtonStyleSheet.defaultStyleSheet, listener );
 	}
 
+	public DPButton(PyObject listener)
+	{
+		this( ButtonStyleSheet.defaultStyleSheet, new PyButtonListener( listener ) );
+	}
+
 	public DPButton(ButtonStyleSheet styleSheet)
 	{
-		this( styleSheet, null );
+		this( styleSheet, (ButtonListener)null );
 	}
 
 	public DPButton(ButtonStyleSheet styleSheet, ButtonListener listener)
@@ -46,6 +70,11 @@ public class DPButton extends DPBin
 		super( styleSheet );
 		
 		this.listener = listener;
+	}
+	
+	public DPButton(ButtonStyleSheet styleSheet, PyObject listener)
+	{
+		this( styleSheet, new PyButtonListener( listener ) );
 	}
 	
 	
@@ -59,9 +88,10 @@ public class DPButton extends DPBin
 	
 	protected void drawBackground(Graphics2D graphics)
 	{
+		super.drawBackground( graphics );
 		ButtonStyleSheet buttonStyle = (ButtonStyleSheet)styleSheet;
 		
-		if ( pointersWithinBounds.size() > 0 )
+		if ( pointersWithinBounds != null  &&  pointersWithinBounds.size() > 0 )
 		{
 			buttonStyle.getHighlightBorder().draw( graphics, 0.0, 0.0, getAllocationX(), getAllocationY() );
 		}
