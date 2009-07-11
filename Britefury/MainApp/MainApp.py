@@ -12,7 +12,7 @@ from datetime import datetime
 
 from java.lang import Runnable
 from javax.swing import AbstractAction, Action, TransferHandler, KeyStroke, BoxLayout, BorderFactory
-from javax.swing import JComponent, JFrame, JMenuItem, JMenu, JMenuBar, JMenuItem, JOptionPane, JFileChooser, JOptionPane, JTextField, JLabel, JPanel
+from javax.swing import JComponent, JFrame, JMenuItem, JMenu, JMenuBar, JMenuItem, JPopupMenu, JOptionPane, JFileChooser, JOptionPane, JTextField, JLabel, JPanel
 from javax.swing.filechooser import FileNameExtensionFilter
 from java.awt import Dimension, Font, Color, KeyboardFocusManager
 from java.awt.event import WindowListener, ActionListener, ActionEvent, KeyEvent
@@ -41,10 +41,11 @@ from Britefury.Event.QueuedEvent import queueEvent
 
 from Britefury.gSym.gSymWorld import GSymWorld
 from Britefury.gSym.gSymEnvironment import GSymEnvironment
-from Britefury.gSym.gSymDocument import GSymDocument, GSymUnit, viewUnitLocationAsPage, viewUnitLispLocationAsPage, transformUnit
+from Britefury.gSym.gSymDocument import GSymDocument, viewUnitLocationAsPage, viewUnitLispLocationAsPage, transformUnit
 
 from Britefury.Plugin import InitPlugins
 
+from GSymCore.Project import Project
 
 
 
@@ -76,8 +77,8 @@ class MainAppPluginInterface (object):
 		self._app = app
 		
 		
-	def registerNewDocumentFactory(self, menuLabel, newDocFn):
-		self._app.registerNewDocumentFactory( menuLabel, newDocFn )
+	def registerNewPageFactory(self, menuLabel, newDocFn):
+		self._app.registerNewPageFactory( menuLabel, newDocFn )
 		
 	def registerImporter(self, menuLabel, fileType, filePattern, importFn):
 		self._app.registerImporter( menuLabel, fileType, filePattern, importFn )
@@ -118,7 +119,7 @@ class _AppLocationResolver (LocationResolver):
 	def resolveLocation(self, location):
 		unit = self._app._document.unit   if self._app._document is not None   else   None
 		if unit is not None:
-			return viewUnitLocationAsPage( unit, location, self._app._world, self._app._commandHistory )
+			return viewUnitLocationAsPage( unit, location, self._app._world, self._app._commandHistory, self._app )
 		else:
 			return None
 				
@@ -131,7 +132,7 @@ class _AppLocationResolverLISP (LocationResolver):
 	def resolveLocation(self, location):
 		unit = self._app._document.unit   if self._app._document is not None   else   None
 		if unit is not None:
-			return viewUnitLispLocationAsPage( unit, location, self._app._world, self._app._commandHistory )
+			return viewUnitLispLocationAsPage( unit, location, self._app._world, self._app._commandHistory, self._app )
 		else:
 			return None
 				
@@ -139,7 +140,9 @@ class _AppLocationResolverLISP (LocationResolver):
 				
 class MainApp (object):
 	def __init__(self, world, unit):
-		document = GSymDocument( unit )   if unit is not None   else   None
+		if unit is None:
+			unit = Project.newProject()
+		document = GSymDocument( unit )
 		self._document = None
 		self._commandHistory = None
 		self._bUnsavedData = False
@@ -155,26 +158,17 @@ class MainApp (object):
 		
 		
 		
-		# FILE -> NEW MENU
+		# NEW PAGE POPUP MENU
+		self._newPageFactories = []
+		self._pageImporters = []
 		
-		self._newMenu = JMenu( 'New' )
-		self._newMenu.add( _action( 'Empty', self._onNewEmpty ) )
-		
-		
-		
-		# FILE -> IMPORT MENU
-		
-		self._importMenu = JMenu( 'Import' )
-
-
 		
 		# FILE MENU
 		
 		fileMenu = JMenu( 'File' )
-		fileMenu.add( self._newMenu )
+		fileMenu.add( _action( 'New project', self._onNewProject ) )
 		fileMenu.add( _action( 'Open', self._onOpen ) )
 		fileMenu.add( _action( 'Save', self._onSave ) )
-		fileMenu.add( self._importMenu )
 
 
 		
@@ -348,8 +342,8 @@ class MainApp (object):
 
 	def setDocument(self, document):
 		if self._document is not None:
-			print 'command history no longer tracking tracking a ', type( self._document.unit.content )
-			self._commandHistory.stopTracking( self._document.unit.content )
+			print 'command history no longer tracking tracking a ', type( self._document.unit )
+			self._commandHistory.stopTracking( self._document.unit )
 
 		self._document = document
 		
@@ -364,7 +358,7 @@ class MainApp (object):
 				self._onCommandHistoryChanged( history )
 		
 		if self._document is not None:
-			self._commandHistory.track( self._document.unit.content )
+			self._commandHistory.track( self._document.unit )
 		self._commandHistory.setListener( Listener() )
 		self._bUnsavedData = False
 		
@@ -387,29 +381,30 @@ class MainApp (object):
 
 		
 		
-	def _onNewEmpty(self):
+	def _onNewProject(self):
 		bProceed = True
 		if self._bUnsavedData:
 			response = JOptionPane.showOptionDialog( self._frame, 'You have not saved your work. Proceed?', 'New Project', JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, None, [ 'New', 'Cancel' ], 'Cancel' )
 			bProceed = response == JOptionPane.YES_OPTION
 		if bProceed:
-			self.setDocument( None )
+			self.setDocument( GSymDocument( Project.newProject() ) )
 
 
-	def registerNewDocumentFactory(self, menuLabel, newUnitFn):
-		def _onNew():
-			bProceed = True
-			if self._bUnsavedData:
-				response = JOptionPane.showOptionDialog( self._frame, 'You have not saved your work. Proceed?', 'New Project', JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, None, [ 'New', 'Cancel' ], 'Cancel' )
-				bProceed = response == JOptionPane.YES_OPTION
-			if bProceed:
-				unit = newUnitFn()
-				if unit  is not None:
-					self.setDocument( GSymDocument( unit ) )
-
-		self._newMenu.add( _action( menuLabel, _onNew ) )
+	def registerNewPageFactory(self, menuLabel, newUnitFn):
+		self._newPageFactories.append( ( menuLabel, newUnitFn ) )
 
 		
+	def promptNewPage(self, unitReceiverFn):
+		def _make_newPage(newUnitFn):
+			def newPage():
+				unit = newUnitFn()
+				unitReceiverFn( unit )
+			return newPage
+		newPageMenu = JPopupMenu( 'New page' )
+		for menuLabel, newUnitFn in self._newPageFactories:
+			newPageMenu.add( _action( menuLabel, _make_newPage( newUnitFn ) ) )
+		pos = self._frame.getMousePosition( True )
+		newPageMenu.show( self._frame, pos.x, pos.y )
 		
 		
 		
@@ -478,13 +473,9 @@ class MainApp (object):
 			return False
 
 
-	def registerImporter(self, menuLabel, fileType, filePattern, importFn):
-		def _onImport():
-			bProceed = True
-			if self._bUnsavedData:
-				response = JOptionPane.showOptionDialog( self._frame, 'You have not saved your work. Proceed?', 'Import', JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, None, [ 'Open', 'Cancel' ], 'Cancel' )
-				bProceed = response == JOptionPane.YES_OPTION
-			if bProceed:
+	def promptImportPage(self, unitReceiverFn):
+		def _make_importPage(fileType, filePattern, importUnitFn):
+			def _import():
 				openDialog = JFileChooser()
 				openDialog.setFileFilter( FileNameExtensionFilter( fileType, [ filePattern ] ) )
 				response = openDialog.showDialog( self._frame, 'Import' )
@@ -494,14 +485,25 @@ class MainApp (object):
 						filename = sf.getPath()
 						if filename is not None:
 							t1 = datetime.now()
-							unit = importFn( filename )
+							unit = importUnitFn( filename )
 							t2 = datetime.now()
 							if unit is not None:
-								document = GSymDocument( unit )
+								unitName = os.path.splitext( filename )[0]
+								unitName = os.path.split( unitName )[1]
 								print 'MainApp: IMPORT TIME = %s'  %  ( t2 - t1, )
-								self.setDocument( document )
-		
-		self._importMenu.add( _action( menuLabel, _onImport ) )
+								unitReceiverFn( unitName, unit )
+			return _import
+
+		importPageMenu = JPopupMenu( 'Import page' )
+		for menuLabel, fileType, filePattern, importUnitFn in self._pageImporters:
+			importPageMenu.add( _action( menuLabel, _make_importPage( fileType, filePattern, importUnitFn ) ) )
+
+		pos = self._frame.getMousePosition( True )
+		importPageMenu.show( self._frame, pos.x, pos.y )
+			
+			
+	def registerImporter(self, menuLabel, fileType, filePattern, importFn):
+		self._pageImporters.append( ( menuLabel, fileType, filePattern, importFn ) )
 
 		
 		

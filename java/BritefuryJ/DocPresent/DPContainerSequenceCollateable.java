@@ -12,9 +12,9 @@ import BritefuryJ.Math.Vector2;
 
 public abstract class DPContainerSequenceCollateable extends DPContainerSequence implements Collateable
 {
-	protected DPContainerSequenceCollationRoot collationRoot;
-	protected int collationRangeStart, collationRangeEnd;
-	protected AABox2 boundsBoxes[];
+	private DPContainerSequenceCollationRoot collationRoot;
+	private int collationRangeStart, collationRangeEnd;
+	private AABox2 boundsBoxes[];
 	
 	
 	public DPContainerSequenceCollateable()
@@ -57,32 +57,32 @@ public abstract class DPContainerSequenceCollateable extends DPContainerSequence
 	
 	public double getAllocationX()
 	{
-		return collationRoot.getAllocationX();
+		return collationRoot != null  ?  collationRoot.getAllocationX()  :  0.0;
 	}
 	
 	public double getAllocationY()
 	{
-		return collationRoot.getAllocationY();
+		return collationRoot != null  ?  collationRoot.getAllocationY()  :  0.0;
 	}
 	
 	public Vector2 getAllocation()
 	{
-		return collationRoot.getAllocation();
+		return collationRoot != null  ?  collationRoot.getAllocation()  :  new Vector2();
 	}
 	
 	public double getAllocationInParentSpaceX()
 	{
-		return collationRoot.getAllocationX();
+		return collationRoot != null  ?  collationRoot.getAllocationInParentSpaceX()  :  0.0;
 	}
 	
 	public double getAllocationInParentSpaceY()
 	{
-		return collationRoot.getAllocationY();
+		return collationRoot != null  ?  collationRoot.getAllocationInParentSpaceY()  :  0.0;
 	}
 	
 	public Vector2 getAllocationInParentSpace()
 	{
-		return collationRoot.getAllocation();
+		return collationRoot != null  ?  collationRoot.getAllocationInParentSpace()  :  new Vector2();
 	}
 
 	
@@ -200,6 +200,14 @@ public abstract class DPContainerSequenceCollateable extends DPContainerSequence
 	{
 		super.onUnrealise( unrealiseRoot );
 		setCollationRoot( null );
+	}
+	
+	
+	protected void handleQueueResize()
+	{
+		super.handleQueueResize();
+		
+		boundsBoxes = null;
 	}
 	
 	

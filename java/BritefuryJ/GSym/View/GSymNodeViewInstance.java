@@ -14,15 +14,18 @@ import org.python.core.PyObject;
 
 import BritefuryJ.Cell.CellInterface;
 import BritefuryJ.DocPresent.DPBorder;
+import BritefuryJ.DocPresent.DPButton;
 import BritefuryJ.DocPresent.DPContainer;
 import BritefuryJ.DocPresent.DPEmpty;
 import BritefuryJ.DocPresent.DPFraction;
 import BritefuryJ.DocPresent.DPHBox;
 import BritefuryJ.DocPresent.DPLineBreak;
+import BritefuryJ.DocPresent.DPLink;
 import BritefuryJ.DocPresent.DPParagraph;
 import BritefuryJ.DocPresent.DPScript;
 import BritefuryJ.DocPresent.DPSegment;
 import BritefuryJ.DocPresent.DPSpan;
+import BritefuryJ.DocPresent.DPStaticText;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWhitespace;
@@ -34,11 +37,14 @@ import BritefuryJ.DocPresent.ElementTextRepresentationListener;
 import BritefuryJ.DocPresent.PyElementFactory;
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Layout.VAlignment;
+import BritefuryJ.DocPresent.StyleSheets.ButtonStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.FractionStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.LinkStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.ScriptStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.StaticTextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 import BritefuryJ.DocTree.DocTreeNode;
@@ -140,6 +146,67 @@ public class GSymNodeViewInstance implements ElementContext, DVNode.NodeContext
 	
 	
 	
+	public DPWidget staticText(StaticTextStyleSheet styleSheet, String txt)
+	{
+		viewInstance.getView().profile_startElement();
+		DPWidget element = new DPStaticText( styleSheet, txt );
+		element.setContext( this );
+		viewInstance.getView().profile_stopElement();
+		return element;
+	}
+	
+
+	public DPWidget link(LinkStyleSheet styleSheet, String txt, String targetLocation)
+	{
+		viewInstance.getView().profile_startElement();
+		DPWidget element = new DPLink( styleSheet, txt, targetLocation );
+		element.setContext( this );
+		viewInstance.getView().profile_stopElement();
+		return element;
+	}
+	
+	public DPWidget link(LinkStyleSheet styleSheet, String txt, DPLink.LinkListener listener)
+	{
+		viewInstance.getView().profile_startElement();
+		DPWidget element = new DPLink( styleSheet, txt, listener );
+		element.setContext( this );
+		viewInstance.getView().profile_stopElement();
+		return element;
+	}
+	
+	public DPWidget link(LinkStyleSheet styleSheet, String txt, PyObject listener)
+	{
+		viewInstance.getView().profile_startElement();
+		DPWidget element = new DPLink( styleSheet, txt, listener );
+		element.setContext( this );
+		viewInstance.getView().profile_stopElement();
+		return element;
+	}
+	
+
+	
+	public DPWidget button(ButtonStyleSheet styleSheet, DPButton.ButtonListener listener, DPWidget child)
+	{
+		viewInstance.getView().profile_startElement();
+		DPButton element = new DPButton( styleSheet, listener );
+		element.setChild( child );
+		element.setContext( this );
+		viewInstance.getView().profile_stopElement();
+		return element;
+	}
+	
+	public DPWidget button(ButtonStyleSheet styleSheet, PyObject listener, DPWidget child)
+	{
+		viewInstance.getView().profile_startElement();
+		DPButton element = new DPButton( styleSheet, listener );
+		element.setChild( child );
+		element.setContext( this );
+		viewInstance.getView().profile_stopElement();
+		return element;
+	}
+	
+
+
 	public DPWidget hbox(HBoxStyleSheet styleSheet, List<DPWidget> children)
 	{
 		viewInstance.getView().profile_startElement();

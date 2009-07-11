@@ -380,7 +380,7 @@ public abstract class DPContainer extends DPWidget
 				}
 			}
 			
-			if ( pressGrabChild != null )
+			if ( pressGrabChild == null )
 			{
 				return onButtonDown( event );
 			}
@@ -515,12 +515,12 @@ public abstract class DPContainer extends DPWidget
 			}
 		}
 		
-		onMotion( event );
+		super.handleMotion( event );
 	}
 	
 	protected void handleEnter(PointerMotionEvent event)
 	{
-		onEnter( event );
+		super.handleEnter( event );
 		
 		Point2 localPos = event.pointer.getLocalPos();
 		
@@ -550,7 +550,7 @@ public abstract class DPContainer extends DPWidget
 			}
 		}
 
-		onLeave( event );
+		super.handleLeave( event );
 	}
 	
 	

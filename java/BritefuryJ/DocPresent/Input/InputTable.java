@@ -11,7 +11,8 @@ package BritefuryJ.DocPresent.Input;
 import BritefuryJ.DocPresent.Input.Pointer;
 
 
-public class InputTable {
+public class InputTable
+{
 	protected Pointer mouse;
 	
 	

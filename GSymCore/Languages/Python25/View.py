@@ -1319,12 +1319,13 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 
 class _Python25ViewPage (Page):
-	def __init__(self, pythonDocRootNode, location, commandHistory):
+	def __init__(self, pythonDocRootNode, location, commandHistory, app):
 		self._pythonDocRootNode = pythonDocRootNode
 		self._location = location
 		self._frame = DPFrame()
 		self._viewFn = Python25View()
-		viewContext = GSymViewInstance( pythonDocRootNode, self._frame, self._viewFn, self._viewRootFn, commandHistory )
+		self._app = app
+		viewContext = GSymViewInstance( pythonDocRootNode, self._frame, self._viewFn, self._viewRootFn, commandHistory, self )
 		self._frame.setEditHandler( Python25EditHandler( viewContext ) )
 		
 		
@@ -1338,7 +1339,7 @@ class _Python25ViewPage (Page):
 	
 
 
-def viewLocationAsPage(pythonDocRootNode, location, commandHistory):
-	return _Python25ViewPage( pythonDocRootNode, location, commandHistory )
+def viewLocationAsPage(pythonDocRootNode, location, commandHistory, app):
+	return _Python25ViewPage( pythonDocRootNode, location, commandHistory, app )
 
 

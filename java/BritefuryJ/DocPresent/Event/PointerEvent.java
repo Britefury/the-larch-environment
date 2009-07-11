@@ -12,7 +12,8 @@ import BritefuryJ.Math.Xform2;
 
 
 
-public class PointerEvent extends Event {
+public class PointerEvent extends Event
+{
 	public PointerInterface pointer;
 	
 	

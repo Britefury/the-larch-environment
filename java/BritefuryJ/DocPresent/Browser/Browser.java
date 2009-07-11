@@ -89,6 +89,15 @@ public class Browser implements PageController
 	
 	
 	
+	public void reset(String location)
+	{
+		history.visit( location );
+		history.clear();
+		viewportReset();
+		resolve();
+	}
+	
+	
 	public void createTreeExplorer()
 	{
 		area.createTreeExplorer();
@@ -115,6 +124,7 @@ public class Browser implements PageController
 		if ( history.canGoBack() )
 		{
 			history.back();
+			listener.onBrowserGoToLocation( this, history.getCurrentContext().getLocation() );
 			resolve();
 		}
 	}
@@ -124,6 +134,7 @@ public class Browser implements PageController
 		if ( history.canGoForward() )
 		{
 			history.forward();
+			listener.onBrowserGoToLocation( this, history.getCurrentContext().getLocation() );
 			resolve();
 		}
 	}
