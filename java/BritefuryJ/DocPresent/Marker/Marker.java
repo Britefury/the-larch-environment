@@ -175,7 +175,10 @@ public class Marker
 		this.position = position;
 		this.bias = bias;
 		
-		this.widget.registerMarker( this );
+		if ( this.widget != null )
+		{
+			this.widget.registerMarker( this );
+		}
 		
 		changed();
 	}
@@ -206,7 +209,14 @@ public class Marker
 	
 	public Marker copy()
 	{
-		return widget.marker( position, bias );
+		if ( widget != null )
+		{
+			return widget.marker( position, bias );
+		}
+		else
+		{
+			return new Marker();
+		}
 	}
 	
 	public void moveTo(Marker marker)
