@@ -846,7 +846,7 @@ public abstract class DPContentLeaf extends DPWidget
 
 	public DPWidget createMetaHeaderData()
 	{
-		return new DPText( headerTextRepTextStyle, "'" + textRepresentation + "'" );
+		return new DPText( headerTextRepTextStyle, "'" + textRepresentation.replace( "\n", "\\n" ) + "'" );
 	}
 	
 	protected Border getMetaHeaderBorder()
