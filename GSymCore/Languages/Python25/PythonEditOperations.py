@@ -316,9 +316,9 @@ def pyReplaceExpression(ctx, data, replacement):
 	return EditOperations.replaceNodeContents( ctx, data, replacement )
 
 
-def pyReplaceStatement(ctx, data, replacement):
+def pyReplaceStatement(ctx, data, replacement, bDontReplaceIfEqual=True):
 	if isinstance( data, DocTreeNode ):
-		if data == replacement:
+		if data == replacement  and  bDontReplaceIfEqual:
 			# Same data; ignore
 			return data
 		else:
@@ -358,7 +358,7 @@ def pyReplaceStatementWithRange(ctx, data, replacement):
 			return [ pyReplaceStatement( ctx, data, replacement[0] ) ]
 		else:
 			xs = EditOperations.insertRangeBefore( ctx, data, replacement[:-1] )
-			xs += [ pyReplaceStatement( ctx, data, replacement[-1] ) ]
+			xs += [ pyReplaceStatement( ctx, data, replacement[-1], False ) ]
 			return xs
 	else:
 		raise TypeError, 'PythonEditOperations:pyReplace(): @data must be a DocTreeNode'
