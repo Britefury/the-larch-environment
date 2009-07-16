@@ -6,7 +6,27 @@
 //##************************
 package BritefuryJ.DocPresent.Diagram;
 
-public interface HoverListener
+import java.awt.Graphics2D;
+
+public class GroupNode extends DiagramNode
 {
-	public void onHover();
+	protected DiagramNode children[];
+	
+	
+	public GroupNode(DiagramNode children[])
+	{
+		super();
+		this.children = children;
+	}
+
+
+
+
+	public void draw(Graphics2D graphics, DrawContext context)
+	{
+		for (DiagramNode child: children)
+		{
+			child.draw( graphics, context );
+		}
+	}
 }
