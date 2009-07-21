@@ -26,7 +26,13 @@ import BritefuryJ.Utils.Profile.ProfileTimer;
 
 public class GSymViewInstance implements DocView.RefreshListener
 {
-	static boolean ENABLE_PROFILING = false;
+	//
+	//
+	// PROFILING
+	//
+	//
+	
+	static boolean ENABLE_PROFILING = true;
 	
 	
 	public static class CannotViewTerminalDocNode extends Exception

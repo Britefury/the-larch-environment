@@ -6,8 +6,8 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Paint;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
@@ -47,8 +47,10 @@ public class DPFraction extends DPContainer
 		protected void draw(Graphics2D graphics)
 		{
 			Shape s = new Rectangle2D.Double( 0.0, 0.0, getAllocationX(), getAllocationY() );
-			graphics.setColor( getColour() );
+			Paint curPaint = graphics.getPaint();
+			graphics.setPaint( getBarPaint() );
 			graphics.fill( s );
+			graphics.setPaint( curPaint );
 		}
 		
 		
@@ -151,9 +153,9 @@ public class DPFraction extends DPContainer
 		// STYLESHEET METHODS
 		//
 		
-		protected Color getColour()
+		protected Paint getBarPaint()
 		{
-			return ((FractionStyleSheet.BarStyleSheet)styleSheet).getColour();
+			return ((FractionStyleSheet.BarStyleSheet)styleSheet).getBarPaint();
 		}
 	}
 	

@@ -7,8 +7,8 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Paint;
 import java.awt.font.TextHitInfo;
 import java.awt.geom.AffineTransform;
 
@@ -45,7 +45,7 @@ public class DPText extends DPContentLeafEditableEntry
 		
 		this.text = text;
 		
-		visual = TextVisual.getTextVisual( getPresentationArea(), text, styleSheet.getFont(), styleSheet.getMixedSizeCaps() );
+		visual = TextVisual.getTextVisual( getPresentationArea(), this.text, styleSheet.getFont(), styleSheet.getMixedSizeCaps() );
 		
 		layoutReqBox = visual.getRequisition();
 	}
@@ -85,7 +85,7 @@ public class DPText extends DPContentLeafEditableEntry
 			{
 				visual.realise( getPresentationArea() );
 			}
-	
+			
 			queueResize();
 		}
 	}
@@ -110,19 +110,19 @@ public class DPText extends DPContentLeafEditableEntry
 	{
 		TextStyleSheet textStyleSheet = (TextStyleSheet)styleSheet;
 
-		Color prevColour = graphics.getColor();
+		Paint prevPaint = graphics.getPaint();
 
-		Color squiggleUnderlineColour = textStyleSheet.getSquiggleUnderlineColour();
-		if ( squiggleUnderlineColour != null )
+		Paint squiggleUnderlinePaint = textStyleSheet.getSquiggleUnderlinePaint();
+		if ( squiggleUnderlinePaint != null )
 		{
-			graphics.setColor( squiggleUnderlineColour );
+			graphics.setPaint( squiggleUnderlinePaint );
 			visual.drawSquiggleUnderline( graphics );
 		}
 
-		graphics.setColor( textStyleSheet.getColour() );
+		graphics.setPaint( textStyleSheet.getTextPaint() );
 		visual.drawText( graphics );
 		
-		graphics.setColor( prevColour );
+		graphics.setPaint( prevPaint );
 	}
 	
 	
@@ -148,8 +148,13 @@ public class DPText extends DPContentLeafEditableEntry
 	
 	public void drawCaret(Graphics2D graphics, Caret c)
 	{
+		int index = c.getMarker().getIndex();
+		if ( index < 0  ||  ( text.length() > 0  ?  ( index > text.length() )  :  ( index > 1 ) ) )
+		{
+			throw new RuntimeException( "DPText.drawCaret(): caret marker is out of range; " + index + " is not within the range[0-" + text.length() + "]." );
+		}
 		AffineTransform current = pushGraphicsTransform( graphics );
-		visual.drawCaret( graphics, c.getMarker().getIndex() );
+		visual.drawCaret( graphics, index );
 		popGraphicsTransform( graphics, current );
 	}
 
@@ -225,10 +230,9 @@ public class DPText extends DPContentLeafEditableEntry
 		int index = marker.getIndex();
 		index = Math.min( Math.max( index, 0 ), text.length() );
 		text = text.substring( 0, index ) + x + text.substring( index );
+		onTextModified();
 
 		super.insertText( marker, x );
-
-		onTextModified();
 	}
 
 	public void removeText(int index, int length)
@@ -236,10 +240,9 @@ public class DPText extends DPContentLeafEditableEntry
 		index = Math.min( Math.max( index, 0 ), text.length() );
 		length = Math.min( length, text.length() - index );
 		text = text.substring( 0, index ) + text.substring( index + length );
+		onTextModified();
 
 		super.removeText( index, length );
-
-		onTextModified();
 	}
 	
 
@@ -248,10 +251,9 @@ public class DPText extends DPContentLeafEditableEntry
 		int index = marker.getIndex();
 		index = Math.min( Math.max( index, 0 ), text.length() );
 		text = text.substring( 0, index )  +  x  +  text.substring( index + length );
+		onTextModified();
 
 		super.replaceText( marker, length, x );
-
-		onTextModified();
 	}
 	
 	public boolean clearText()

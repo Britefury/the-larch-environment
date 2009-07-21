@@ -827,96 +827,100 @@ class Python25Grammar (Grammar):
 
 
 
+	#
+	# Compound statement headers
+	#
+		
 	# If statement
 	@Rule
-	def ifStmt(self):
-		return ( Keyword( ifKeyword )  +  self.expression()  +  ':' ).action( lambda input, begin, end, xs, bindings: Nodes.IfStmt( condition=xs[1], suite=[] ) )
+	def ifStmtHeader(self):
+		return ( Keyword( ifKeyword )  +  self.expression()  +  ':' ).action( lambda input, begin, end, xs, bindings: Nodes.IfStmtHeader( condition=xs[1] ) )
 
 
 
 	# Elif statement
 	@Rule
-	def elifStmt(self):
-		return ( Keyword( elifKeyword )  +  self.expression()  +  ':' ).action( lambda input, begin, end, xs, bindings: Nodes.ElifStmt( condition=xs[1], suite=[] ) )
+	def elifStmtHeader(self):
+		return ( Keyword( elifKeyword )  +  self.expression()  +  ':' ).action( lambda input, begin, end, xs, bindings: Nodes.ElifStmtHeader( condition=xs[1] ) )
 
 
 
 	# Else statement
 	@Rule
-	def elseStmt(self):
-		return( Keyword( elseKeyword )  +  ':' ).action( lambda input, begin, end, xs, bindings: Nodes.ElseStmt( suite=[] ) )
+	def elseStmtHeader(self):
+		return( Keyword( elseKeyword )  +  ':' ).action( lambda input, begin, end, xs, bindings: Nodes.ElseStmtHeader() )
 
 
 
 	# While statement
 	@Rule
-	def whileStmt(self):
-		return ( Keyword( whileKeyword )  +  self.expression()  +  ':' ).action( lambda input, begin, end, xs, bindings: Nodes.WhileStmt( condition=xs[1], suite=[] ) )
+	def whileStmtHeader(self):
+		return ( Keyword( whileKeyword )  +  self.expression()  +  ':' ).action( lambda input, begin, end, xs, bindings: Nodes.WhileStmtHeader( condition=xs[1] ) )
 
 
 
 	# For statement
 	@Rule
-	def forStmt(self):
+	def forStmtHeader(self):
 		return ( Keyword( forKeyword )  +  self.targetListOrTargetItem()  +  Keyword( inKeyword )  +  self.tupleOrExpression()  +  ':' ).action(
-			lambda input, begin, end, xs, bindings: Nodes.ForStmt( target=xs[1], source=xs[3], suite=[] ) )
+			lambda input, begin, end, xs, bindings: Nodes.ForStmtHeader( target=xs[1], source=xs[3] ) )
 
 
 
 	# Try statement
 	@Rule
-	def tryStmt(self):
-		return ( Keyword( tryKeyword )  +  ':' ).action( lambda input, begin, end, xs, bindings: Nodes.TryStmt( suite=[] ) )
+	def tryStmtHeader(self):
+		return ( Keyword( tryKeyword )  +  ':' ).action( lambda input, begin, end, xs, bindings: Nodes.TryStmtHeader() )
 
 
 
 
 	# Except statement
 	@Rule
-	def exceptAllStmt(self):
-		return ( Keyword( exceptKeyword ) + ':' ).action( lambda input, begin, end, xs, bindings: Nodes.ExceptStmt( exception=None, target=None, suite=[] ) )
+	def exceptAllStmtHeader(self):
+		return ( Keyword( exceptKeyword ) + ':' ).action( lambda input, begin, end, xs, bindings: Nodes.ExceptStmtHeader( exception=None, target=None ) )
 
 	@Rule
-	def exceptExcStmt(self):
-		return ( Keyword( exceptKeyword )  +  self.expression() + ':' ).action( lambda input, begin, end, xs, bindings: Nodes.ExceptStmt( exception=xs[1], target=None, suite=[] ) )
+	def exceptExcStmtHeader(self):
+		return ( Keyword( exceptKeyword )  +  self.expression() + ':' ).action( lambda input, begin, end, xs, bindings: Nodes.ExceptStmtHeader( exception=xs[1], target=None ) )
 
 	@Rule
-	def exceptExcIntoTargetStmt(self):
-		return ( Keyword( exceptKeyword )  +  self.expression()  +  ','  +  self.targetItem() + ':' ).action( lambda input, begin, end, xs, bindings: Nodes.ExceptStmt( exception=xs[1], target=xs[3], suite=[] ) )
+	def exceptExcIntoTargetStmtHeader(self):
+		return ( Keyword( exceptKeyword )  +  self.expression()  +  ','  +  self.targetItem() + ':' ).action( lambda input, begin, end, xs, bindings: Nodes.ExceptStmtHeader( exception=xs[1], target=xs[3] ) )
 
 	@Rule
-	def exceptStmt(self):
-		return self.exceptExcIntoTargetStmt() | self.exceptExcStmt() | self.exceptAllStmt()
+	def exceptStmtHeader(self):
+		return self.exceptExcIntoTargetStmtHeader() | self.exceptExcStmtHeader() | self.exceptAllStmtHeader()
 
 
 
 
 	# Finally statement
 	@Rule
-	def finallyStmt(self):
-		return ( Keyword( finallyKeyword )  +  ':' ).action( lambda input, begin, end, xs, bindings: Nodes.FinallyStmt( suite=[] ) )
+	def finallyStmtHeader(self):
+		return ( Keyword( finallyKeyword )  +  ':' ).action( lambda input, begin, end, xs, bindings: Nodes.FinallyStmtHeader() )
 
 
 
 	# With statement
 	@Rule
-	def withStmt(self):
+	def withStmtHeader(self):
 		return ( Keyword( withKeyword )  +  self.expression()  +  Optional( Keyword( asKeyword )  +  self.targetItem() )  +  ':' ).action(
-			lambda input, begin, end, xs, bindings: Nodes.WithStmt( expr=xs[1], target=xs[2][1]   if xs[2] is not None   else   None, suite=[] ) )
+			lambda input, begin, end, xs, bindings: Nodes.WithStmtHeader( expr=xs[1], target=xs[2][1]   if xs[2] is not None   else   None ) )
 
 
 
 	# Def statement
 	@Rule
-	def defStmt(self):
+	def defStmtHeader(self):
 		return ( Keyword( defKeyword )  +  self.pythonIdentifier()  +  '('  +  self.params()  +  ')'  +  ':' ).action(
-			lambda input, begin, end, xs, bindings: Nodes.DefStmt( name=xs[1], params=xs[3][0], paramsTrailingSeparator=xs[3][1], suite=[] ) )
+			lambda input, begin, end, xs, bindings: Nodes.DefStmtHeader( name=xs[1], params=xs[3][0], paramsTrailingSeparator=xs[3][1] ) )
 
 
 
 	# Decorator statement
 	@Rule
-	def decoStmt(self):
+	def decoStmtHeader(self):
 		def _action(input, begin, end, xs, bindings):
 			if xs[2] is not None:
 				args = xs[2][1][0]
@@ -924,7 +928,7 @@ class Python25Grammar (Grammar):
 			else:
 				args = None
 				trailingSeparator = None
-			return Nodes.DecoStmt( name=xs[1], args=args, argsTrailingSeparator=trailingSeparator )
+			return Nodes.DecoStmtHeader( name=xs[1], args=args, argsTrailingSeparator=trailingSeparator )
 
 		return ( Literal( '@' )  +  self.dottedPythonIdentifer()  +  Optional( Literal( '(' )  +  self.callArgs()  +  ')' ) ).action( _action )
 
@@ -932,7 +936,7 @@ class Python25Grammar (Grammar):
 
 	# Class statement
 	@Rule
-	def classStmt(self):
+	def classStmtHeader(self):
 		bases = SeparatedList( self.expression(), '(', ')', 1, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).listAction( lambda input, begin, end, xs, bindings, bTrailingSep: [ xs, '1'   if bTrailingSep   else None ] )
 		def _action(input, begin, end, xs, bindings):
 			if xs[2] is not None:
@@ -941,7 +945,7 @@ class Python25Grammar (Grammar):
 			else:
 				bases = None
 				trailingSep = None
-			return Nodes.ClassStmt( name=xs[1], bases=bases, basesTrailingSeparator=trailingSep, suite=[] )
+			return Nodes.ClassStmtHeader( name=xs[1], bases=bases, basesTrailingSeparator=trailingSep )
 		return ( Keyword( classKeyword )  +  self.pythonIdentifier()  +  Optional( bases )  +  ':' ).action( _action )
 
 
@@ -963,7 +967,8 @@ class Python25Grammar (Grammar):
 
 	@Rule
 	def compoundStmtHeader(self):
-		return self.ifStmt() | self.elifStmt() | self.elseStmt() | self.whileStmt() | self.forStmt() | self.tryStmt() | self.exceptStmt() | self.finallyStmt() | self.withStmt() | self.defStmt() | self.decoStmt() | self.classStmt()
+		return self.ifStmtHeader() | self.elifStmtHeader() | self.elseStmtHeader() | self.whileStmtHeader() | self.forStmtHeader() | self.tryStmtHeader() | self.exceptStmtHeader() | self.finallyStmtHeader() | \
+		       self.withStmtHeader() | self.defStmtHeader() | self.decoStmtHeader() | self.classStmtHeader()
 
 	@Rule
 	def statement(self):
@@ -980,107 +985,107 @@ import unittest
 class TestCase_Python25Parser (ParserTestCase):
 	def test_shortStringLiteral(self):
 		g = Python25Grammar()
-		self._matchTest( g.expression(), '\'abc\'', Nodes.StringLiteral( format='ascii', quotation='single', value='abc' ) )
-		self._matchTest( g.expression(), '\"abc\"', Nodes.StringLiteral( format='ascii', quotation='double', value='abc' ) )
-		self._matchTest( g.expression(), 'u\'abc\'', Nodes.StringLiteral( format='unicode', quotation='single', value='abc' ) )
-		self._matchTest( g.expression(), 'u\"abc\"', Nodes.StringLiteral( format='unicode', quotation='double', value='abc' ) )
-		self._matchTest( g.expression(), 'r\'abc\'', Nodes.StringLiteral( format='ascii-regex', quotation='single', value='abc' ) )
-		self._matchTest( g.expression(), 'r\"abc\"', Nodes.StringLiteral( format='ascii-regex', quotation='double', value='abc' ) )
-		self._matchTest( g.expression(), 'ur\'abc\'', Nodes.StringLiteral( format='unicode-regex', quotation='single', value='abc' ) )
-		self._matchTest( g.expression(), 'ur\"abc\"', Nodes.StringLiteral( format='unicode-regex', quotation='double', value='abc' ) )
+		self._parseStringTest( g.expression(), '\'abc\'', Nodes.StringLiteral( format='ascii', quotation='single', value='abc' ) )
+		self._parseStringTest( g.expression(), '\"abc\"', Nodes.StringLiteral( format='ascii', quotation='double', value='abc' ) )
+		self._parseStringTest( g.expression(), 'u\'abc\'', Nodes.StringLiteral( format='unicode', quotation='single', value='abc' ) )
+		self._parseStringTest( g.expression(), 'u\"abc\"', Nodes.StringLiteral( format='unicode', quotation='double', value='abc' ) )
+		self._parseStringTest( g.expression(), 'r\'abc\'', Nodes.StringLiteral( format='ascii-regex', quotation='single', value='abc' ) )
+		self._parseStringTest( g.expression(), 'r\"abc\"', Nodes.StringLiteral( format='ascii-regex', quotation='double', value='abc' ) )
+		self._parseStringTest( g.expression(), 'ur\'abc\'', Nodes.StringLiteral( format='unicode-regex', quotation='single', value='abc' ) )
+		self._parseStringTest( g.expression(), 'ur\"abc\"', Nodes.StringLiteral( format='unicode-regex', quotation='double', value='abc' ) )
 
 
 	def test_integerLiteral(self):
 		g = Python25Grammar()
-		self._matchTest( g.expression(), '123', Nodes.IntLiteral( format='decimal', numType='int', value='123' ) )
-		self._matchTest( g.expression(), '123L', Nodes.IntLiteral( format='decimal', numType='long', value='123' ) )
-		self._matchTest( g.expression(), '0x123', Nodes.IntLiteral( format='hex', numType='int', value='0x123' ) )
-		self._matchTest( g.expression(), '0x123L', Nodes.IntLiteral( format='hex', numType='long', value='0x123' ) )
+		self._parseStringTest( g.expression(), '123', Nodes.IntLiteral( format='decimal', numType='int', value='123' ) )
+		self._parseStringTest( g.expression(), '123L', Nodes.IntLiteral( format='decimal', numType='long', value='123' ) )
+		self._parseStringTest( g.expression(), '0x123', Nodes.IntLiteral( format='hex', numType='int', value='0x123' ) )
+		self._parseStringTest( g.expression(), '0x123L', Nodes.IntLiteral( format='hex', numType='long', value='0x123' ) )
 
 
 	def test_floatLiteral(self):
 		g = Python25Grammar()
-		self._matchTest( g.expression(), '123.0', Nodes.FloatLiteral( value='123.0' ) )
+		self._parseStringTest( g.expression(), '123.0', Nodes.FloatLiteral( value='123.0' ) )
 
 
 	def test_imaginaryLiteral(self):
 		g = Python25Grammar()
-		self._matchTest( g.expression(), '123.0j', Nodes.ImaginaryLiteral( value='123.0j' ) )
+		self._parseStringTest( g.expression(), '123.0j', Nodes.ImaginaryLiteral( value='123.0j' ) )
 
 
 	def testTargets(self):
 		g = Python25Grammar()
-		self._matchTest( g.targetListOrTargetItem(), 'a', Nodes.SingleTarget( name='a' ) )
-		self._matchTest( g.targetListOrTargetItem(), '(a)', Nodes.SingleTarget( name='a', parens='1' ) )
+		self._parseStringTest( g.targetListOrTargetItem(), 'a', Nodes.SingleTarget( name='a' ) )
+		self._parseStringTest( g.targetListOrTargetItem(), '(a)', Nodes.SingleTarget( name='a', parens='1' ) )
 
-		self._matchTest( g.targetListOrTargetItem(), '(a,)', Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='a' ) ], trailingSeparator='1', parens='1' ) )
-		self._matchTest( g.targetListOrTargetItem(), 'a,b', Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='a' ),  Nodes.SingleTarget( name='b' ) ] ) )
-		self._matchTest( g.targetListOrTargetItem(), '(a,b)', Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='a' ),  Nodes.SingleTarget( name='b' ) ], parens='1' ) )
-		self._matchTest( g.targetListOrTargetItem(), '(a,b,)', Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='a' ),  Nodes.SingleTarget( name='b' ) ], trailingSeparator='1', parens='1' ) )
-		self._matchTest( g.targetListOrTargetItem(), '(a,b),(c,d)', Nodes.TupleTarget( targets=[ Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='a' ), Nodes.SingleTarget( name='b' ) ], parens='1' ),
+		self._parseStringTest( g.targetListOrTargetItem(), '(a,)', Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='a' ) ], trailingSeparator='1', parens='1' ) )
+		self._parseStringTest( g.targetListOrTargetItem(), 'a,b', Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='a' ),  Nodes.SingleTarget( name='b' ) ] ) )
+		self._parseStringTest( g.targetListOrTargetItem(), '(a,b)', Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='a' ),  Nodes.SingleTarget( name='b' ) ], parens='1' ) )
+		self._parseStringTest( g.targetListOrTargetItem(), '(a,b,)', Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='a' ),  Nodes.SingleTarget( name='b' ) ], trailingSeparator='1', parens='1' ) )
+		self._parseStringTest( g.targetListOrTargetItem(), '(a,b),(c,d)', Nodes.TupleTarget( targets=[ Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='a' ), Nodes.SingleTarget( name='b' ) ], parens='1' ),
 													 Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='c' ), Nodes.SingleTarget( name='d' ) ], parens='1' ) ] ) )
 
-		self._matchFailTest( g.targetListOrTargetItem(), '(a,) (b,)' )
+		self._parseStringFailTest( g.targetListOrTargetItem(), '(a,) (b,)' )
 
-		self._matchTest( g.targetListOrTargetItem(), '[a]', Nodes.ListTarget( targets=[ Nodes.SingleTarget( name='a' ) ] ) )
-		self._matchTest( g.targetListOrTargetItem(), '[a,]', Nodes.ListTarget( targets=[ Nodes.SingleTarget( name='a' ) ], trailingSeparator='1' ) )
-		self._matchTest( g.targetListOrTargetItem(), '[a,b]', Nodes.ListTarget( targets=[ Nodes.SingleTarget( name='a' ),  Nodes.SingleTarget( name='b' ) ] ) )
-		self._matchTest( g.targetListOrTargetItem(), '[a,b,]', Nodes.ListTarget( targets=[ Nodes.SingleTarget( name='a' ),  Nodes.SingleTarget( name='b' ) ], trailingSeparator='1' ) )
-		self._matchTest( g.targetListOrTargetItem(), '[a],[b,]', Nodes.TupleTarget( targets=[ Nodes.ListTarget( targets=[ Nodes.SingleTarget( name='a' ) ] ),
+		self._parseStringTest( g.targetListOrTargetItem(), '[a]', Nodes.ListTarget( targets=[ Nodes.SingleTarget( name='a' ) ] ) )
+		self._parseStringTest( g.targetListOrTargetItem(), '[a,]', Nodes.ListTarget( targets=[ Nodes.SingleTarget( name='a' ) ], trailingSeparator='1' ) )
+		self._parseStringTest( g.targetListOrTargetItem(), '[a,b]', Nodes.ListTarget( targets=[ Nodes.SingleTarget( name='a' ),  Nodes.SingleTarget( name='b' ) ] ) )
+		self._parseStringTest( g.targetListOrTargetItem(), '[a,b,]', Nodes.ListTarget( targets=[ Nodes.SingleTarget( name='a' ),  Nodes.SingleTarget( name='b' ) ], trailingSeparator='1' ) )
+		self._parseStringTest( g.targetListOrTargetItem(), '[a],[b,]', Nodes.TupleTarget( targets=[ Nodes.ListTarget( targets=[ Nodes.SingleTarget( name='a' ) ] ),
 												      Nodes.ListTarget( targets=[ Nodes.SingleTarget( name='b' ) ], trailingSeparator='1' ) ] ) )
-		self._matchTest( g.targetListOrTargetItem(), '[(a,)],[(b,)]', Nodes.TupleTarget( targets=[ Nodes.ListTarget( targets=[ Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='a' ) ], trailingSeparator='1', parens='1' ) ] ),
+		self._parseStringTest( g.targetListOrTargetItem(), '[(a,)],[(b,)]', Nodes.TupleTarget( targets=[ Nodes.ListTarget( targets=[ Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='a' ) ], trailingSeparator='1', parens='1' ) ] ),
 													   Nodes.ListTarget( targets=[ Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='b' ) ], trailingSeparator='1', parens='1' ) ] ) ] ) )
 
-		self._matchTest( g.subscript(), 'a[x]', Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.Load( name='x' ) ) )
-		self._matchTest( g.attributeRefOrSubscript(), 'a[x]', Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.Load( name='x' ) ) )
-		self._matchTest( g.targetItem(), 'a[x]', Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.Load( name='x' ) ) )
-		self._matchTest( g.targetListOrTargetItem(), 'a[x]', Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.Load( name='x' ) ) )
-		self._matchTest( g.targetListOrTargetItem(), 'a[x][y]', Nodes.Subscript( target=Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.Load( name='x' ) ), index=Nodes.Load( name='y' ) ) )
-		self._matchTest( g.targetListOrTargetItem(), 'a.b', Nodes.AttributeRef( target=Nodes.Load( name='a' ), name='b' ) )
-		self._matchTest( g.targetListOrTargetItem(), 'a.b.c', Nodes.AttributeRef( target=Nodes.AttributeRef( target=Nodes.Load( name='a' ), name='b' ), name='c' ) )
+		self._parseStringTest( g.subscript(), 'a[x]', Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.Load( name='x' ) ) )
+		self._parseStringTest( g.attributeRefOrSubscript(), 'a[x]', Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.Load( name='x' ) ) )
+		self._parseStringTest( g.targetItem(), 'a[x]', Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.Load( name='x' ) ) )
+		self._parseStringTest( g.targetListOrTargetItem(), 'a[x]', Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.Load( name='x' ) ) )
+		self._parseStringTest( g.targetListOrTargetItem(), 'a[x][y]', Nodes.Subscript( target=Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.Load( name='x' ) ), index=Nodes.Load( name='y' ) ) )
+		self._parseStringTest( g.targetListOrTargetItem(), 'a.b', Nodes.AttributeRef( target=Nodes.Load( name='a' ), name='b' ) )
+		self._parseStringTest( g.targetListOrTargetItem(), 'a.b.c', Nodes.AttributeRef( target=Nodes.AttributeRef( target=Nodes.Load( name='a' ), name='b' ), name='c' ) )
 
-		self._matchTest( g.targetListOrTargetItem(), 'a.b[x]', Nodes.Subscript( target=Nodes.AttributeRef( target=Nodes.Load( name='a' ), name='b' ), index=Nodes.Load( name='x' ) ) )
-		self._matchTest( g.targetListOrTargetItem(), 'a[x].b', Nodes.AttributeRef( target=Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.Load( name='x' ) ), name='b' ) )
+		self._parseStringTest( g.targetListOrTargetItem(), 'a.b[x]', Nodes.Subscript( target=Nodes.AttributeRef( target=Nodes.Load( name='a' ), name='b' ), index=Nodes.Load( name='x' ) ) )
+		self._parseStringTest( g.targetListOrTargetItem(), 'a[x].b', Nodes.AttributeRef( target=Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.Load( name='x' ) ), name='b' ) )
 
 
 	def testTupleLiteral(self):
 		g = Python25Grammar()
-		self._matchTest( g.expression(), '()', Nodes.TupleLiteral( values=[] ) )
-		self._matchTest( g.expression(), '(())', Nodes.TupleLiteral( values=[], parens='1' ) )
-		self._matchTest( g.expression(), '(a)', Nodes.Load( name='a', parens='1' ) )
-		self._matchTest( g.expression(), '(a,)', Nodes.TupleLiteral( values=[ Nodes.Load( name='a' ) ], trailingSeparator='1' ) )
-		self._matchTest( g.expression(), '((a,))', Nodes.TupleLiteral( values=[ Nodes.Load( name='a' ) ], trailingSeparator='1', parens='1' ) )
-		self._matchTest( g.expression(), '(a,b)', Nodes.TupleLiteral( values=[ Nodes.Load( name='a' ), Nodes.Load( name='b' ) ] ) )
-		self._matchTest( g.expression(), '(a,b,)', Nodes.TupleLiteral( values=[ Nodes.Load( name='a' ), Nodes.Load( name='b' ) ], trailingSeparator='1' ) )
+		self._parseStringTest( g.expression(), '()', Nodes.TupleLiteral( values=[] ) )
+		self._parseStringTest( g.expression(), '(())', Nodes.TupleLiteral( values=[], parens='1' ) )
+		self._parseStringTest( g.expression(), '(a)', Nodes.Load( name='a', parens='1' ) )
+		self._parseStringTest( g.expression(), '(a,)', Nodes.TupleLiteral( values=[ Nodes.Load( name='a' ) ], trailingSeparator='1' ) )
+		self._parseStringTest( g.expression(), '((a,))', Nodes.TupleLiteral( values=[ Nodes.Load( name='a' ) ], trailingSeparator='1', parens='1' ) )
+		self._parseStringTest( g.expression(), '(a,b)', Nodes.TupleLiteral( values=[ Nodes.Load( name='a' ), Nodes.Load( name='b' ) ] ) )
+		self._parseStringTest( g.expression(), '(a,b,)', Nodes.TupleLiteral( values=[ Nodes.Load( name='a' ), Nodes.Load( name='b' ) ], trailingSeparator='1' ) )
 
 
 	def testListLiteral(self):
 		g = Python25Grammar()
-		self._matchTest( g.expression(), '[]', Nodes.ListLiteral( values=[] ) )
-		self._matchTest( g.expression(), '[a,b]', Nodes.ListLiteral( values=[ Nodes.Load( name='a' ), Nodes.Load( name='b' ) ] ) )
-		self._matchTest( g.expression(), '[a,b,]', Nodes.ListLiteral( values=[ Nodes.Load( name='a' ), Nodes.Load( name='b' ) ], trailingSeparator='1' ) )
+		self._parseStringTest( g.expression(), '[]', Nodes.ListLiteral( values=[] ) )
+		self._parseStringTest( g.expression(), '[a,b]', Nodes.ListLiteral( values=[ Nodes.Load( name='a' ), Nodes.Load( name='b' ) ] ) )
+		self._parseStringTest( g.expression(), '[a,b,]', Nodes.ListLiteral( values=[ Nodes.Load( name='a' ), Nodes.Load( name='b' ) ], trailingSeparator='1' ) )
 
 
 	def testListComprehension(self):
 		g = Python25Grammar()
-		self._matchTest( g.expression(), '[i  for i in a]', Nodes.ListComp( resultExpr=Nodes.Load( name='i' ),
+		self._parseStringTest( g.expression(), '[i  for i in a]', Nodes.ListComp( resultExpr=Nodes.Load( name='i' ),
 										    comprehensionItems=[ Nodes.ComprehensionFor( target=Nodes.SingleTarget( name='i' ), source=Nodes.Load( name='a' ) ) ]
 										    ) )
-		self._matchFailTest( g.expression(), '[i  if x]', )
-		self._matchTest( g.expression(), '[i  for i in a  if x]', Nodes.ListComp( resultExpr=Nodes.Load( name='i' ),
+		self._parseStringFailTest( g.expression(), '[i  if x]', )
+		self._parseStringTest( g.expression(), '[i  for i in a  if x]', Nodes.ListComp( resultExpr=Nodes.Load( name='i' ),
 											  comprehensionItems=[ Nodes.ComprehensionFor( target=Nodes.SingleTarget( name='i' ), source=Nodes.Load( name='a' ) ),
 													       Nodes.ComprehensionIf( condition=Nodes.Load( name='x' ) ) ]
 											  ) )
-		self._matchTest( g.expression(), '[i  for i in a  for j in b]', Nodes.ListComp( resultExpr=Nodes.Load( name='i' ),
+		self._parseStringTest( g.expression(), '[i  for i in a  for j in b]', Nodes.ListComp( resultExpr=Nodes.Load( name='i' ),
 												comprehensionItems=[ Nodes.ComprehensionFor( target=Nodes.SingleTarget( name='i' ), source=Nodes.Load( name='a' ) ),
 														     Nodes.ComprehensionFor( target=Nodes.SingleTarget( name='j' ), source=Nodes.Load( name='b' ) ) ]
 												) )
-		self._matchTest( g.expression(), '[i  for i in a  if x  for j in b]', Nodes.ListComp( resultExpr=Nodes.Load( name='i' ),
+		self._parseStringTest( g.expression(), '[i  for i in a  if x  for j in b]', Nodes.ListComp( resultExpr=Nodes.Load( name='i' ),
 												      comprehensionItems=[ Nodes.ComprehensionFor( target=Nodes.SingleTarget( name='i' ), source=Nodes.Load( name='a' ) ),
 															   Nodes.ComprehensionIf( condition=Nodes.Load( name='x' ) ),
 															   Nodes.ComprehensionFor( target=Nodes.SingleTarget( name='j' ), source=Nodes.Load( name='b' ) ) ]
 												      ) )
-		self._matchTest( g.expression(), '[i  for i in a  if x  for j in b  if y]', Nodes.ListComp( resultExpr=Nodes.Load( name='i' ),
+		self._parseStringTest( g.expression(), '[i  for i in a  if x  for j in b  if y]', Nodes.ListComp( resultExpr=Nodes.Load( name='i' ),
 													    comprehensionItems=[ Nodes.ComprehensionFor( target=Nodes.SingleTarget( name='i' ), source=Nodes.Load( name='a' ) ),
 																 Nodes.ComprehensionIf( condition=Nodes.Load( name='x' ) ),
 																 Nodes.ComprehensionFor( target=Nodes.SingleTarget( name='j' ), source=Nodes.Load( name='b' ) ),
@@ -1091,24 +1096,24 @@ class TestCase_Python25Parser (ParserTestCase):
 
 	def testGeneratorExpression(self):
 		g = Python25Grammar()
-		self._matchTest( g.expression(), '(i  for i in a)', Nodes.GeneratorExpr( resultExpr=Nodes.Load( name='i' ),
+		self._parseStringTest( g.expression(), '(i  for i in a)', Nodes.GeneratorExpr( resultExpr=Nodes.Load( name='i' ),
 											 comprehensionItems=[ Nodes.ComprehensionFor( target=Nodes.SingleTarget( name='i' ), source=Nodes.Load( name='a' ) ) ]
 											 ) )
-		self._matchFailTest( g.expression(), '(i  if x)', )
-		self._matchTest( g.expression(), '(i  for i in a  if x)', Nodes.GeneratorExpr( resultExpr=Nodes.Load( name='i' ),
+		self._parseStringFailTest( g.expression(), '(i  if x)', )
+		self._parseStringTest( g.expression(), '(i  for i in a  if x)', Nodes.GeneratorExpr( resultExpr=Nodes.Load( name='i' ),
 											       comprehensionItems=[ Nodes.ComprehensionFor( target=Nodes.SingleTarget( name='i' ), source=Nodes.Load( name='a' ) ),
 														    Nodes.ComprehensionIf( condition=Nodes.Load( name='x' ) ) ]
 											       ) )
-		self._matchTest( g.expression(), '(i  for i in a  for j in b)', Nodes.GeneratorExpr( resultExpr=Nodes.Load( name='i' ),
+		self._parseStringTest( g.expression(), '(i  for i in a  for j in b)', Nodes.GeneratorExpr( resultExpr=Nodes.Load( name='i' ),
 												     comprehensionItems=[ Nodes.ComprehensionFor( target=Nodes.SingleTarget( name='i' ), source=Nodes.Load( name='a' ) ),
 															  Nodes.ComprehensionFor( target=Nodes.SingleTarget( name='j' ), source=Nodes.Load( name='b' ) ) ]
 												     ) )
-		self._matchTest( g.expression(), '(i  for i in a  if x  for j in b)', Nodes.GeneratorExpr( resultExpr=Nodes.Load( name='i' ),
+		self._parseStringTest( g.expression(), '(i  for i in a  if x  for j in b)', Nodes.GeneratorExpr( resultExpr=Nodes.Load( name='i' ),
 													   comprehensionItems=[ Nodes.ComprehensionFor( target=Nodes.SingleTarget( name='i' ), source=Nodes.Load( name='a' ) ),
 																Nodes.ComprehensionIf( condition=Nodes.Load( name='x' ) ),
 																Nodes.ComprehensionFor( target=Nodes.SingleTarget( name='j' ), source=Nodes.Load( name='b' ) ) ]
 													   ) )
-		self._matchTest( g.expression(), '(i  for i in a  if x  for j in b  if y)', Nodes.GeneratorExpr( resultExpr=Nodes.Load( name='i' ),
+		self._parseStringTest( g.expression(), '(i  for i in a  if x  for j in b  if y)', Nodes.GeneratorExpr( resultExpr=Nodes.Load( name='i' ),
 														 comprehensionItems=[ Nodes.ComprehensionFor( target=Nodes.SingleTarget( name='i' ), source=Nodes.Load( name='a' ) ),
 																      Nodes.ComprehensionIf( condition=Nodes.Load( name='x' ) ),
 																      Nodes.ComprehensionFor( target=Nodes.SingleTarget( name='j' ), source=Nodes.Load( name='b' ) ),
@@ -1118,42 +1123,42 @@ class TestCase_Python25Parser (ParserTestCase):
 
 	def testDictLiteral(self):
 		g = Python25Grammar()
-		self._matchTest( g.expression(), '{a:x,b:y}', Nodes.DictLiteral( values=[ Nodes.DictKeyValuePair( key=Nodes.Load( name='a' ), value=Nodes.Load( name='x' ) ),
+		self._parseStringTest( g.expression(), '{a:x,b:y}', Nodes.DictLiteral( values=[ Nodes.DictKeyValuePair( key=Nodes.Load( name='a' ), value=Nodes.Load( name='x' ) ),
 											  Nodes.DictKeyValuePair( key=Nodes.Load( name='b' ), value=Nodes.Load( name='y' ) ) ] ) )
-		self._matchTest( g.expression(), '{a:x,b:y,}', Nodes.DictLiteral( values=[ Nodes.DictKeyValuePair( key=Nodes.Load( name='a' ), value=Nodes.Load( name='x' ) ),
+		self._parseStringTest( g.expression(), '{a:x,b:y,}', Nodes.DictLiteral( values=[ Nodes.DictKeyValuePair( key=Nodes.Load( name='a' ), value=Nodes.Load( name='x' ) ),
 											   Nodes.DictKeyValuePair( key=Nodes.Load( name='b' ), value=Nodes.Load( name='y' ) ) ], trailingSeparator='1' ) )
 
 
 	def testYieldAtom(self):
 		g = Python25Grammar()
-		self._matchTest( g.expression(), '(yield 2+3)', Nodes.YieldAtom( value=Nodes.Add( x=Nodes.IntLiteral( format='decimal', numType='int', value='2' ), y=Nodes.IntLiteral( format='decimal', numType='int', value='3' ) ) ) )
+		self._parseStringTest( g.expression(), '(yield 2+3)', Nodes.YieldAtom( value=Nodes.Add( x=Nodes.IntLiteral( format='decimal', numType='int', value='2' ), y=Nodes.IntLiteral( format='decimal', numType='int', value='3' ) ) ) )
 
 
 
 	def testAttributeRef(self):
 		g = Python25Grammar()
-		self._matchTest( g.expression(), 'a.b', Nodes.AttributeRef( target=Nodes.Load( name='a' ), name='b' ) )
+		self._parseStringTest( g.expression(), 'a.b', Nodes.AttributeRef( target=Nodes.Load( name='a' ), name='b' ) )
 
 
 	def testSubscript(self):
 		g = Python25Grammar()
-		self._matchTest( g.expression(), 'a[x]', Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.Load( name='x' ) ) )
-		self._matchTest( g.expression(), 'a[x:p]', Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.SubscriptSlice( lower=Nodes.Load( name='x' ), upper=Nodes.Load( name='p' ) ) ) )
-		self._matchTest( g.expression(), 'a[x:]', Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.SubscriptSlice( lower=Nodes.Load( name='x' ), upper=None ) ) )
-		self._matchTest( g.expression(), 'a[:p]', Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.SubscriptSlice( lower=None, upper=Nodes.Load( name='p' ) ) ) )
-		self._matchTest( g.expression(), 'a[:]', Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.SubscriptSlice( lower=None, upper=None ) ) )
-		self._matchTest( g.expression(), 'a[x:p:f]', Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.SubscriptLongSlice( lower=Nodes.Load( name='x' ), upper=Nodes.Load( name='p' ), stride=Nodes.Load( name='f' ) ) ) )
-		self._matchTest( g.expression(), 'a[x:p:]', Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.SubscriptLongSlice( lower=Nodes.Load( name='x' ), upper=Nodes.Load( name='p' ), stride=None ) ) )
-		self._matchTest( g.expression(), 'a[x::f]', Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.SubscriptLongSlice( lower=Nodes.Load( name='x' ), upper=None, stride=Nodes.Load( name='f' ) ) ) )
-		self._matchTest( g.expression(), 'a[:p:f]', Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.SubscriptLongSlice( lower=None, upper=Nodes.Load( name='p' ), stride=Nodes.Load( name='f' ) ) ) )
-		self._matchTest( g.expression(), 'a[::]', Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.SubscriptLongSlice( lower=None, upper=None, stride=None ) ) )
-		self._matchTest( g.expression(), 'a[::f]', Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.SubscriptLongSlice( lower=None, upper=None, stride=Nodes.Load( name='f' ) ) ) )
-		self._matchTest( g.expression(), 'a[x::]', Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.SubscriptLongSlice( lower=Nodes.Load( name='x' ), upper=None, stride=None ) ) )
-		self._matchTest( g.expression(), 'a[:p:]', Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.SubscriptLongSlice( lower=None, upper=Nodes.Load( name='p' ), stride=None ) ) )
-		self._matchTest( g.expression(), 'a[x,y]', Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.SubscriptTuple( values=[ Nodes.Load( name='x' ), Nodes.Load( name='y' ) ] ) ) )
-		self._matchTest( g.expression(), 'a[x:p,y:q]', Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.SubscriptTuple( values=[ Nodes.SubscriptSlice( lower=Nodes.Load( name='x' ), upper=Nodes.Load( name='p' ) ), Nodes.SubscriptSlice( lower=Nodes.Load( name='y' ), upper=Nodes.Load( name='q' ) ) ] ) ) )
-		self._matchTest( g.expression(), 'a[x:p:f,y:q:g]', Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.SubscriptTuple( values=[ Nodes.SubscriptLongSlice( lower=Nodes.Load( name='x' ), upper=Nodes.Load( name='p' ), stride=Nodes.Load( name='f' ) ), Nodes.SubscriptLongSlice( lower=Nodes.Load( name='y' ), upper=Nodes.Load( name='q' ), stride=Nodes.Load( name='g' ) ) ] ) ) )
-		self._matchTest( g.expression(), 'a[x:p:f,y:q:g,...]', Nodes.Subscript( target=Nodes.Load( name='a' ),
+		self._parseStringTest( g.expression(), 'a[x]', Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.Load( name='x' ) ) )
+		self._parseStringTest( g.expression(), 'a[x:p]', Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.SubscriptSlice( lower=Nodes.Load( name='x' ), upper=Nodes.Load( name='p' ) ) ) )
+		self._parseStringTest( g.expression(), 'a[x:]', Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.SubscriptSlice( lower=Nodes.Load( name='x' ), upper=None ) ) )
+		self._parseStringTest( g.expression(), 'a[:p]', Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.SubscriptSlice( lower=None, upper=Nodes.Load( name='p' ) ) ) )
+		self._parseStringTest( g.expression(), 'a[:]', Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.SubscriptSlice( lower=None, upper=None ) ) )
+		self._parseStringTest( g.expression(), 'a[x:p:f]', Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.SubscriptLongSlice( lower=Nodes.Load( name='x' ), upper=Nodes.Load( name='p' ), stride=Nodes.Load( name='f' ) ) ) )
+		self._parseStringTest( g.expression(), 'a[x:p:]', Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.SubscriptLongSlice( lower=Nodes.Load( name='x' ), upper=Nodes.Load( name='p' ), stride=None ) ) )
+		self._parseStringTest( g.expression(), 'a[x::f]', Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.SubscriptLongSlice( lower=Nodes.Load( name='x' ), upper=None, stride=Nodes.Load( name='f' ) ) ) )
+		self._parseStringTest( g.expression(), 'a[:p:f]', Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.SubscriptLongSlice( lower=None, upper=Nodes.Load( name='p' ), stride=Nodes.Load( name='f' ) ) ) )
+		self._parseStringTest( g.expression(), 'a[::]', Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.SubscriptLongSlice( lower=None, upper=None, stride=None ) ) )
+		self._parseStringTest( g.expression(), 'a[::f]', Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.SubscriptLongSlice( lower=None, upper=None, stride=Nodes.Load( name='f' ) ) ) )
+		self._parseStringTest( g.expression(), 'a[x::]', Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.SubscriptLongSlice( lower=Nodes.Load( name='x' ), upper=None, stride=None ) ) )
+		self._parseStringTest( g.expression(), 'a[:p:]', Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.SubscriptLongSlice( lower=None, upper=Nodes.Load( name='p' ), stride=None ) ) )
+		self._parseStringTest( g.expression(), 'a[x,y]', Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.SubscriptTuple( values=[ Nodes.Load( name='x' ), Nodes.Load( name='y' ) ] ) ) )
+		self._parseStringTest( g.expression(), 'a[x:p,y:q]', Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.SubscriptTuple( values=[ Nodes.SubscriptSlice( lower=Nodes.Load( name='x' ), upper=Nodes.Load( name='p' ) ), Nodes.SubscriptSlice( lower=Nodes.Load( name='y' ), upper=Nodes.Load( name='q' ) ) ] ) ) )
+		self._parseStringTest( g.expression(), 'a[x:p:f,y:q:g]', Nodes.Subscript( target=Nodes.Load( name='a' ), index=Nodes.SubscriptTuple( values=[ Nodes.SubscriptLongSlice( lower=Nodes.Load( name='x' ), upper=Nodes.Load( name='p' ), stride=Nodes.Load( name='f' ) ), Nodes.SubscriptLongSlice( lower=Nodes.Load( name='y' ), upper=Nodes.Load( name='q' ), stride=Nodes.Load( name='g' ) ) ] ) ) )
+		self._parseStringTest( g.expression(), 'a[x:p:f,y:q:g,...]', Nodes.Subscript( target=Nodes.Load( name='a' ),
 											index=Nodes.SubscriptTuple( values=[ Nodes.SubscriptLongSlice( lower=Nodes.Load( name='x' ), upper=Nodes.Load( name='p' ), stride=Nodes.Load( name='f' ) ),
 															     Nodes.SubscriptLongSlice( lower=Nodes.Load( name='y' ), upper=Nodes.Load( name='q' ), stride=Nodes.Load( name='g' ) ),
 															     Nodes.SubscriptEllipsis() ] ) ) )
@@ -1162,102 +1167,102 @@ class TestCase_Python25Parser (ParserTestCase):
 
 	def testCall(self):
 		g = Python25Grammar()
-		self._matchTest( g.expression(), 'a()', Nodes.Call( target=Nodes.Load( name='a' ), args=[] ) )
-		self._matchTest( g.expression(), 'a(f)', Nodes.Call( target=Nodes.Load( name='a' ), args=[ Nodes.Load( name='f' ) ] ) )
-		self._matchTest( g.expression(), 'a(f,)', Nodes.Call( target=Nodes.Load( name='a' ), args=[ Nodes.Load( name='f' ) ], argsTrailingSeparator='1' ) )
-		self._matchTest( g.expression(), 'a(f,g)', Nodes.Call( target=Nodes.Load( name='a' ), args=[ Nodes.Load( name='f' ), Nodes.Load( name='g' ) ] ) )
-		self._matchTest( g.expression(), 'a(f,g,m=a)', Nodes.Call( target=Nodes.Load( name='a' ), args=[ Nodes.Load( name='f' ), Nodes.Load( name='g' ), Nodes.CallKWArg( name='m', value=Nodes.Load( name='a' ) ) ] ) )
-		self._matchTest( g.expression(), 'a(f,g,m=a,n=b)', Nodes.Call( target=Nodes.Load( name='a' ), args=[ Nodes.Load( name='f' ), Nodes.Load( name='g' ), Nodes.CallKWArg( name='m', value=Nodes.Load( name='a' ) ), Nodes.CallKWArg( name='n', value=Nodes.Load( name='b' ) ) ] ) )
-		self._matchTest( g.expression(), 'a(f,g,m=a,n=b,*p)', Nodes.Call( target=Nodes.Load( name='a' ), args=[ Nodes.Load( name='f' ), Nodes.Load( name='g' ), Nodes.CallKWArg( name='m', value=Nodes.Load( name='a' ) ), Nodes.CallKWArg( name='n', value=Nodes.Load( name='b' ) ), Nodes.CallArgList( value=Nodes.Load( name='p' ) ) ] ) )
-		self._matchTest( g.expression(), 'a(f,m=a,*p,**w)', Nodes.Call( target=Nodes.Load( name='a' ), args=[ Nodes.Load( name='f' ), Nodes.CallKWArg( name='m', value=Nodes.Load( name='a' ) ), Nodes.CallArgList( value=Nodes.Load( name='p' ) ), Nodes.CallKWArgList( value=Nodes.Load( name='w' ) ) ] ) )
-		self._matchTest( g.expression(), 'a(f,m=a,*p)', Nodes.Call( target=Nodes.Load( name='a' ), args=[ Nodes.Load( name='f' ), Nodes.CallKWArg( name='m', value=Nodes.Load( name='a' ) ), Nodes.CallArgList( value=Nodes.Load( name='p' ) ) ] ) )
-		self._matchTest( g.expression(), 'a(f,m=a,**w)', Nodes.Call( target=Nodes.Load( name='a' ), args=[ Nodes.Load( name='f' ), Nodes.CallKWArg( name='m', value=Nodes.Load( name='a' ) ), Nodes.CallKWArgList( value=Nodes.Load( name='w' ) ) ] ) )
-		self._matchTest( g.expression(), 'a(f,*p,**w)', Nodes.Call( target=Nodes.Load( name='a' ), args=[ Nodes.Load( name='f' ), Nodes.CallArgList( value=Nodes.Load( name='p' ) ), Nodes.CallKWArgList( value=Nodes.Load( name='w' ) ) ] ) )
-		self._matchTest( g.expression(), 'a(m=a,*p,**w)', Nodes.Call( target=Nodes.Load( name='a' ), args=[ Nodes.CallKWArg( name='m', value=Nodes.Load( name='a' ) ), Nodes.CallArgList( value=Nodes.Load( name='p' ) ), Nodes.CallKWArgList( value=Nodes.Load( name='w' ) ) ] ) )
-		self._matchTest( g.expression(), 'a(*p,**w)', Nodes.Call( target=Nodes.Load( name='a' ), args=[ Nodes.CallArgList( value=Nodes.Load( name='p' ) ), Nodes.CallKWArgList( value=Nodes.Load( name='w' ) ) ] ) )
-		self._matchTest( g.expression(), 'a(**w)', Nodes.Call( target=Nodes.Load( name='a' ), args=[ Nodes.CallKWArgList( value=Nodes.Load( name='w' ) ) ] ) )
-		self._matchTest( g.expression(), 'a(**w+x)', Nodes.Call( target=Nodes.Load( name='a' ), args=[ Nodes.CallKWArgList( value=Nodes.Add( x=Nodes.Load( name='w' ), y=Nodes.Load( name='x' ) ) ) ] ) )
-		self._matchFailTest( g.expression(), 'a(m=a,f)' )
-		self._matchFailTest( g.expression(), 'a(*p,f)' )
-		self._matchFailTest( g.expression(), 'a(**w,f)' )
-		self._matchFailTest( g.expression(), 'a(*p,m=a)' )
-		self._matchFailTest( g.expression(), 'a(**w,m=a)' )
-		self._matchFailTest( g.expression(), 'a(**w,*p)' )
+		self._parseStringTest( g.expression(), 'a()', Nodes.Call( target=Nodes.Load( name='a' ), args=[] ) )
+		self._parseStringTest( g.expression(), 'a(f)', Nodes.Call( target=Nodes.Load( name='a' ), args=[ Nodes.Load( name='f' ) ] ) )
+		self._parseStringTest( g.expression(), 'a(f,)', Nodes.Call( target=Nodes.Load( name='a' ), args=[ Nodes.Load( name='f' ) ], argsTrailingSeparator='1' ) )
+		self._parseStringTest( g.expression(), 'a(f,g)', Nodes.Call( target=Nodes.Load( name='a' ), args=[ Nodes.Load( name='f' ), Nodes.Load( name='g' ) ] ) )
+		self._parseStringTest( g.expression(), 'a(f,g,m=a)', Nodes.Call( target=Nodes.Load( name='a' ), args=[ Nodes.Load( name='f' ), Nodes.Load( name='g' ), Nodes.CallKWArg( name='m', value=Nodes.Load( name='a' ) ) ] ) )
+		self._parseStringTest( g.expression(), 'a(f,g,m=a,n=b)', Nodes.Call( target=Nodes.Load( name='a' ), args=[ Nodes.Load( name='f' ), Nodes.Load( name='g' ), Nodes.CallKWArg( name='m', value=Nodes.Load( name='a' ) ), Nodes.CallKWArg( name='n', value=Nodes.Load( name='b' ) ) ] ) )
+		self._parseStringTest( g.expression(), 'a(f,g,m=a,n=b,*p)', Nodes.Call( target=Nodes.Load( name='a' ), args=[ Nodes.Load( name='f' ), Nodes.Load( name='g' ), Nodes.CallKWArg( name='m', value=Nodes.Load( name='a' ) ), Nodes.CallKWArg( name='n', value=Nodes.Load( name='b' ) ), Nodes.CallArgList( value=Nodes.Load( name='p' ) ) ] ) )
+		self._parseStringTest( g.expression(), 'a(f,m=a,*p,**w)', Nodes.Call( target=Nodes.Load( name='a' ), args=[ Nodes.Load( name='f' ), Nodes.CallKWArg( name='m', value=Nodes.Load( name='a' ) ), Nodes.CallArgList( value=Nodes.Load( name='p' ) ), Nodes.CallKWArgList( value=Nodes.Load( name='w' ) ) ] ) )
+		self._parseStringTest( g.expression(), 'a(f,m=a,*p)', Nodes.Call( target=Nodes.Load( name='a' ), args=[ Nodes.Load( name='f' ), Nodes.CallKWArg( name='m', value=Nodes.Load( name='a' ) ), Nodes.CallArgList( value=Nodes.Load( name='p' ) ) ] ) )
+		self._parseStringTest( g.expression(), 'a(f,m=a,**w)', Nodes.Call( target=Nodes.Load( name='a' ), args=[ Nodes.Load( name='f' ), Nodes.CallKWArg( name='m', value=Nodes.Load( name='a' ) ), Nodes.CallKWArgList( value=Nodes.Load( name='w' ) ) ] ) )
+		self._parseStringTest( g.expression(), 'a(f,*p,**w)', Nodes.Call( target=Nodes.Load( name='a' ), args=[ Nodes.Load( name='f' ), Nodes.CallArgList( value=Nodes.Load( name='p' ) ), Nodes.CallKWArgList( value=Nodes.Load( name='w' ) ) ] ) )
+		self._parseStringTest( g.expression(), 'a(m=a,*p,**w)', Nodes.Call( target=Nodes.Load( name='a' ), args=[ Nodes.CallKWArg( name='m', value=Nodes.Load( name='a' ) ), Nodes.CallArgList( value=Nodes.Load( name='p' ) ), Nodes.CallKWArgList( value=Nodes.Load( name='w' ) ) ] ) )
+		self._parseStringTest( g.expression(), 'a(*p,**w)', Nodes.Call( target=Nodes.Load( name='a' ), args=[ Nodes.CallArgList( value=Nodes.Load( name='p' ) ), Nodes.CallKWArgList( value=Nodes.Load( name='w' ) ) ] ) )
+		self._parseStringTest( g.expression(), 'a(**w)', Nodes.Call( target=Nodes.Load( name='a' ), args=[ Nodes.CallKWArgList( value=Nodes.Load( name='w' ) ) ] ) )
+		self._parseStringTest( g.expression(), 'a(**w+x)', Nodes.Call( target=Nodes.Load( name='a' ), args=[ Nodes.CallKWArgList( value=Nodes.Add( x=Nodes.Load( name='w' ), y=Nodes.Load( name='x' ) ) ) ] ) )
+		self._parseStringFailTest( g.expression(), 'a(m=a,f)' )
+		self._parseStringFailTest( g.expression(), 'a(*p,f)' )
+		self._parseStringFailTest( g.expression(), 'a(**w,f)' )
+		self._parseStringFailTest( g.expression(), 'a(*p,m=a)' )
+		self._parseStringFailTest( g.expression(), 'a(**w,m=a)' )
+		self._parseStringFailTest( g.expression(), 'a(**w,*p)' )
 
 
 
 	def testOperators(self):
 		g = Python25Grammar()
-		self._matchTest( g.expression(), 'a**b', Nodes.Pow( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) )
-		self._matchTest( g.expression(), '~a', Nodes.Invert( x=Nodes.Load( name='a' ) ) )
-		self._matchTest( g.expression(), '-a', Nodes.Negate( x=Nodes.Load( name='a' ) ) )
-		self._matchTest( g.expression(), '+a', Nodes.Pos( x=Nodes.Load( name='a' ) ) )
-		self._matchTest( g.expression(), 'a*b', Nodes.Mul( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) )
-		self._matchTest( g.expression(), 'a/b', Nodes.Div( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) )
-		self._matchTest( g.expression(), 'a%b', Nodes.Mod( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) )
-		self._matchTest( g.expression(), 'a+b', Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) )
-		self._matchTest( g.expression(), 'a-b', Nodes.Sub( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) )
-		self._matchTest( g.expression(), 'a<<b', Nodes.LShift( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) )
-		self._matchTest( g.expression(), 'a>>b', Nodes.RShift( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) )
-		self._matchTest( g.expression(), 'a&b', Nodes.BitAnd( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) )
-		self._matchTest( g.expression(), 'a^b', Nodes.BitXor( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) )
-		self._matchTest( g.expression(), 'a|b', Nodes.BitOr( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) )
-		self._matchTest( g.expression(), 'a<=b', Nodes.Cmp( x=Nodes.Load( name='a' ), ops=[ Nodes.CmpOpLte( y=Nodes.Load( name='b' ) ) ] ) )
-		self._matchTest( g.expression(), 'a<b', Nodes.Cmp( x=Nodes.Load( name='a' ), ops=[ Nodes.CmpOpLt( y=Nodes.Load( name='b' ) ) ] ) )
-		self._matchTest( g.expression(), 'a>=b', Nodes.Cmp( x=Nodes.Load( name='a' ), ops=[ Nodes.CmpOpGte( y=Nodes.Load( name='b' ) ) ] ) )
-		self._matchTest( g.expression(), 'a>b', Nodes.Cmp( x=Nodes.Load( name='a' ), ops=[ Nodes.CmpOpGt( y=Nodes.Load( name='b' ) ) ] ) )
-		self._matchTest( g.expression(), 'a==b', Nodes.Cmp( x=Nodes.Load( name='a' ), ops=[ Nodes.CmpOpEq( y=Nodes.Load( name='b' ) ) ] ) )
-		self._matchTest( g.expression(), 'a!=b', Nodes.Cmp( x=Nodes.Load( name='a' ), ops=[ Nodes.CmpOpNeq( y=Nodes.Load( name='b' ) ) ] ) )
-		self._matchTest( g.expression(), 'a is not b', Nodes.Cmp( x=Nodes.Load( name='a' ), ops=[ Nodes.CmpOpIsNot( y=Nodes.Load( name='b' ) ) ] ) )
-		self._matchTest( g.expression(), 'a is b', Nodes.Cmp( x=Nodes.Load( name='a' ), ops=[ Nodes.CmpOpIs( y=Nodes.Load( name='b' ) ) ] ) )
-		self._matchTest( g.expression(), 'a not in b', Nodes.Cmp( x=Nodes.Load( name='a' ), ops=[ Nodes.CmpOpNotIn( y=Nodes.Load( name='b' ) ) ] ) )
-		self._matchTest( g.expression(), 'a in b', Nodes.Cmp( x=Nodes.Load( name='a' ), ops=[ Nodes.CmpOpIn( y=Nodes.Load( name='b' ) ) ] ) )
-		self._matchTest( g.expression(), 'not a', Nodes.NotTest( x=Nodes.Load( name='a' ) ) )
-		self._matchTest( g.expression(), 'a and b', Nodes.AndTest( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) )
-		self._matchTest( g.expression(), 'a or b', Nodes.OrTest( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) )
+		self._parseStringTest( g.expression(), 'a**b', Nodes.Pow( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) )
+		self._parseStringTest( g.expression(), '~a', Nodes.Invert( x=Nodes.Load( name='a' ) ) )
+		self._parseStringTest( g.expression(), '-a', Nodes.Negate( x=Nodes.Load( name='a' ) ) )
+		self._parseStringTest( g.expression(), '+a', Nodes.Pos( x=Nodes.Load( name='a' ) ) )
+		self._parseStringTest( g.expression(), 'a*b', Nodes.Mul( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) )
+		self._parseStringTest( g.expression(), 'a/b', Nodes.Div( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) )
+		self._parseStringTest( g.expression(), 'a%b', Nodes.Mod( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) )
+		self._parseStringTest( g.expression(), 'a+b', Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) )
+		self._parseStringTest( g.expression(), 'a-b', Nodes.Sub( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) )
+		self._parseStringTest( g.expression(), 'a<<b', Nodes.LShift( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) )
+		self._parseStringTest( g.expression(), 'a>>b', Nodes.RShift( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) )
+		self._parseStringTest( g.expression(), 'a&b', Nodes.BitAnd( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) )
+		self._parseStringTest( g.expression(), 'a^b', Nodes.BitXor( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) )
+		self._parseStringTest( g.expression(), 'a|b', Nodes.BitOr( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) )
+		self._parseStringTest( g.expression(), 'a<=b', Nodes.Cmp( x=Nodes.Load( name='a' ), ops=[ Nodes.CmpOpLte( y=Nodes.Load( name='b' ) ) ] ) )
+		self._parseStringTest( g.expression(), 'a<b', Nodes.Cmp( x=Nodes.Load( name='a' ), ops=[ Nodes.CmpOpLt( y=Nodes.Load( name='b' ) ) ] ) )
+		self._parseStringTest( g.expression(), 'a>=b', Nodes.Cmp( x=Nodes.Load( name='a' ), ops=[ Nodes.CmpOpGte( y=Nodes.Load( name='b' ) ) ] ) )
+		self._parseStringTest( g.expression(), 'a>b', Nodes.Cmp( x=Nodes.Load( name='a' ), ops=[ Nodes.CmpOpGt( y=Nodes.Load( name='b' ) ) ] ) )
+		self._parseStringTest( g.expression(), 'a==b', Nodes.Cmp( x=Nodes.Load( name='a' ), ops=[ Nodes.CmpOpEq( y=Nodes.Load( name='b' ) ) ] ) )
+		self._parseStringTest( g.expression(), 'a!=b', Nodes.Cmp( x=Nodes.Load( name='a' ), ops=[ Nodes.CmpOpNeq( y=Nodes.Load( name='b' ) ) ] ) )
+		self._parseStringTest( g.expression(), 'a is not b', Nodes.Cmp( x=Nodes.Load( name='a' ), ops=[ Nodes.CmpOpIsNot( y=Nodes.Load( name='b' ) ) ] ) )
+		self._parseStringTest( g.expression(), 'a is b', Nodes.Cmp( x=Nodes.Load( name='a' ), ops=[ Nodes.CmpOpIs( y=Nodes.Load( name='b' ) ) ] ) )
+		self._parseStringTest( g.expression(), 'a not in b', Nodes.Cmp( x=Nodes.Load( name='a' ), ops=[ Nodes.CmpOpNotIn( y=Nodes.Load( name='b' ) ) ] ) )
+		self._parseStringTest( g.expression(), 'a in b', Nodes.Cmp( x=Nodes.Load( name='a' ), ops=[ Nodes.CmpOpIn( y=Nodes.Load( name='b' ) ) ] ) )
+		self._parseStringTest( g.expression(), 'not a', Nodes.NotTest( x=Nodes.Load( name='a' ) ) )
+		self._parseStringTest( g.expression(), 'a and b', Nodes.AndTest( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) )
+		self._parseStringTest( g.expression(), 'a or b', Nodes.OrTest( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) )
 
 
 	def testOperatorPrecedence(self):
 		g = Python25Grammar()
-		self._matchTest( g.expression(), 'a + b < c', Nodes.Cmp( x=Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ), ops=[ Nodes.CmpOpLt( y=Nodes.Load( name='c' ) ) ] ) )
+		self._parseStringTest( g.expression(), 'a + b < c', Nodes.Cmp( x=Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ), ops=[ Nodes.CmpOpLt( y=Nodes.Load( name='c' ) ) ] ) )
 
 
 	def testParens(self):
 		g = Python25Grammar()
-		self._matchTest( g.expression(), '(a)', Nodes.Load( name='a', parens='1' ) )
-		self._matchTest( g.expression(), '(((a)))', Nodes.Load( name='a', parens='3' ) )
-		self._matchTest( g.expression(), '(a+b)', Nodes.Add( parens='1', x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) )
-		self._matchTest( g.expression(), '(a+b)*c', Nodes.Mul( x=Nodes.Add( parens='1', x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ), y=Nodes.Load( name='c' ) ) )
+		self._parseStringTest( g.expression(), '(a)', Nodes.Load( name='a', parens='1' ) )
+		self._parseStringTest( g.expression(), '(((a)))', Nodes.Load( name='a', parens='3' ) )
+		self._parseStringTest( g.expression(), '(a+b)', Nodes.Add( parens='1', x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) )
+		self._parseStringTest( g.expression(), '(a+b)*c', Nodes.Mul( x=Nodes.Add( parens='1', x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ), y=Nodes.Load( name='c' ) ) )
 
 
 	def testParams(self):
 		g = Python25Grammar()
-		self._matchTest( g.params(), '', [ [], None ] )
-		self._matchTest( g.params(), 'f', [ [ Nodes.SimpleParam( name='f' ) ], None ] )
-		self._matchTest( g.params(), 'f,', [ [ Nodes.SimpleParam( name='f' ) ], '1' ] )
-		self._matchTest( g.params(), 'f,g', [ [ Nodes.SimpleParam( name='f' ), Nodes.SimpleParam( name='g' ) ], None ] )
-		self._matchTest( g.params(), 'f,g,m=a', [ [ Nodes.SimpleParam( name='f' ), Nodes.SimpleParam( name='g' ), Nodes.DefaultValueParam( name='m', defaultValue=Nodes.Load( name='a' ) ) ], None ] )
-		self._matchTest( g.params(), 'f,g,m=a,n=b', [ [ Nodes.SimpleParam( name='f' ), Nodes.SimpleParam( name='g' ), Nodes.DefaultValueParam( name='m', defaultValue=Nodes.Load( name='a' ) ), Nodes.DefaultValueParam( name='n', defaultValue=Nodes.Load( name='b' ) ) ], None ] )
-		self._matchTest( g.params(), 'f,g,m=a,n=b,*p', [ [ Nodes.SimpleParam( name='f' ), Nodes.SimpleParam( name='g' ), Nodes.DefaultValueParam( name='m', defaultValue=Nodes.Load( name='a' ) ), Nodes.DefaultValueParam( name='n', defaultValue=Nodes.Load( name='b' ) ), Nodes.ParamList( name='p' ) ], None ] )
-		self._matchTest( g.params(), 'f,m=a,*p,**w', [ [ Nodes.SimpleParam( name='f' ), Nodes.DefaultValueParam( name='m', defaultValue=Nodes.Load( name='a' ) ), Nodes.ParamList( name='p' ), Nodes.KWParamList( name='w' ) ], None ] )
-		self._matchTest( g.params(), 'f,m=a,*p', [ [ Nodes.SimpleParam( name='f' ), Nodes.DefaultValueParam( name='m', defaultValue=Nodes.Load( name='a' ) ), Nodes.ParamList( name='p' ) ], None ] )
-		self._matchTest( g.params(), 'f,m=a,**w', [ [ Nodes.SimpleParam( name='f' ), Nodes.DefaultValueParam( name='m', defaultValue=Nodes.Load( name='a' ) ), Nodes.KWParamList( name='w' ) ], None ] )
-		self._matchTest( g.params(), 'f,*p,**w', [ [ Nodes.SimpleParam( name='f' ), Nodes.ParamList( name='p' ), Nodes.KWParamList( name='w' ) ], None ] )
-		self._matchTest( g.params(), 'm=a,*p,**w', [ [ Nodes.DefaultValueParam( name='m', defaultValue=Nodes.Load( name='a' ) ), Nodes.ParamList( name='p' ), Nodes.KWParamList( name='w' ) ], None ] )
-		self._matchTest( g.params(), '*p,**w', [ [ Nodes.ParamList( name='p' ), Nodes.KWParamList( name='w' ) ], None ] )
-		self._matchTest( g.params(), '**w', [ [ Nodes.KWParamList( name='w' ) ], None ] )
-		self._matchFailTest( g.params(), 'm=a,f' )
-		self._matchFailTest( g.params(), '*p,f' )
-		self._matchFailTest( g.params(), '**w,f' )
-		self._matchFailTest( g.params(), '*p,m=a' )
-		self._matchFailTest( g.params(), '**w,m=a' )
-		self._matchFailTest( g.params(), '**w,*p' )
+		self._parseStringTest( g.params(), '', [ [], None ] )
+		self._parseStringTest( g.params(), 'f', [ [ Nodes.SimpleParam( name='f' ) ], None ] )
+		self._parseStringTest( g.params(), 'f,', [ [ Nodes.SimpleParam( name='f' ) ], '1' ] )
+		self._parseStringTest( g.params(), 'f,g', [ [ Nodes.SimpleParam( name='f' ), Nodes.SimpleParam( name='g' ) ], None ] )
+		self._parseStringTest( g.params(), 'f,g,m=a', [ [ Nodes.SimpleParam( name='f' ), Nodes.SimpleParam( name='g' ), Nodes.DefaultValueParam( name='m', defaultValue=Nodes.Load( name='a' ) ) ], None ] )
+		self._parseStringTest( g.params(), 'f,g,m=a,n=b', [ [ Nodes.SimpleParam( name='f' ), Nodes.SimpleParam( name='g' ), Nodes.DefaultValueParam( name='m', defaultValue=Nodes.Load( name='a' ) ), Nodes.DefaultValueParam( name='n', defaultValue=Nodes.Load( name='b' ) ) ], None ] )
+		self._parseStringTest( g.params(), 'f,g,m=a,n=b,*p', [ [ Nodes.SimpleParam( name='f' ), Nodes.SimpleParam( name='g' ), Nodes.DefaultValueParam( name='m', defaultValue=Nodes.Load( name='a' ) ), Nodes.DefaultValueParam( name='n', defaultValue=Nodes.Load( name='b' ) ), Nodes.ParamList( name='p' ) ], None ] )
+		self._parseStringTest( g.params(), 'f,m=a,*p,**w', [ [ Nodes.SimpleParam( name='f' ), Nodes.DefaultValueParam( name='m', defaultValue=Nodes.Load( name='a' ) ), Nodes.ParamList( name='p' ), Nodes.KWParamList( name='w' ) ], None ] )
+		self._parseStringTest( g.params(), 'f,m=a,*p', [ [ Nodes.SimpleParam( name='f' ), Nodes.DefaultValueParam( name='m', defaultValue=Nodes.Load( name='a' ) ), Nodes.ParamList( name='p' ) ], None ] )
+		self._parseStringTest( g.params(), 'f,m=a,**w', [ [ Nodes.SimpleParam( name='f' ), Nodes.DefaultValueParam( name='m', defaultValue=Nodes.Load( name='a' ) ), Nodes.KWParamList( name='w' ) ], None ] )
+		self._parseStringTest( g.params(), 'f,*p,**w', [ [ Nodes.SimpleParam( name='f' ), Nodes.ParamList( name='p' ), Nodes.KWParamList( name='w' ) ], None ] )
+		self._parseStringTest( g.params(), 'm=a,*p,**w', [ [ Nodes.DefaultValueParam( name='m', defaultValue=Nodes.Load( name='a' ) ), Nodes.ParamList( name='p' ), Nodes.KWParamList( name='w' ) ], None ] )
+		self._parseStringTest( g.params(), '*p,**w', [ [ Nodes.ParamList( name='p' ), Nodes.KWParamList( name='w' ) ], None ] )
+		self._parseStringTest( g.params(), '**w', [ [ Nodes.KWParamList( name='w' ) ], None ] )
+		self._parseStringFailTest( g.params(), 'm=a,f' )
+		self._parseStringFailTest( g.params(), '*p,f' )
+		self._parseStringFailTest( g.params(), '**w,f' )
+		self._parseStringFailTest( g.params(), '*p,m=a' )
+		self._parseStringFailTest( g.params(), '**w,m=a' )
+		self._parseStringFailTest( g.params(), '**w,*p' )
 
 
 
 	def testLambda(self):
 		g = Python25Grammar()
-		self._matchTest( g.expression(), 'lambda f,m=a,*p,**w: f+m+p+w', Nodes.LambdaExpr( 
+		self._parseStringTest( g.expression(), 'lambda f,m=a,*p,**w: f+m+p+w', Nodes.LambdaExpr( 
 			params=[ Nodes.SimpleParam( name='f' ), Nodes.DefaultValueParam( name='m', defaultValue=Nodes.Load( name='a' ) ), Nodes.ParamList( name='p' ), Nodes.KWParamList( name='w' ) ],
 			expr=Nodes.Add( x=Nodes.Add( x=Nodes.Add( x=Nodes.Load( name='f' ), y=Nodes.Load( name='m' ) ), y=Nodes.Load( name='p' ) ), y=Nodes.Load( name='w' ) ) ) )
 
@@ -1265,20 +1270,20 @@ class TestCase_Python25Parser (ParserTestCase):
 
 	def testConditionalExpr(self):
 		g = Python25Grammar()
-		self._matchTest( g.expression(), 'x   if y else   z', Nodes.ConditionalExpr( condition=Nodes.Load( name='y' ), expr=Nodes.Load( name='x' ), elseExpr=Nodes.Load( name='z' ) ) )
-		self._matchTest( g.expression(), '(x   if y else   z)   if w else   q', Nodes.ConditionalExpr( condition=Nodes.Load( name='w' ), expr=Nodes.ConditionalExpr( parens='1', condition=Nodes.Load( name='y' ), expr=Nodes.Load( name='x' ), elseExpr=Nodes.Load( name='z' ) ), elseExpr=Nodes.Load( name='q' ) ) )
-		self._matchTest( g.expression(), 'w   if (x   if y else   z) else   q', Nodes.ConditionalExpr( condition=Nodes.ConditionalExpr( parens='1', condition=Nodes.Load( name='y' ), expr=Nodes.Load( name='x' ), elseExpr=Nodes.Load( name='z' ) ), expr=Nodes.Load( name='w' ), elseExpr=Nodes.Load( name='q' ) ) )
-		self._matchTest( g.expression(), 'w   if q else   x   if y else   z', Nodes.ConditionalExpr( condition=Nodes.Load( name='q' ), expr=Nodes.Load( name='w' ), elseExpr=Nodes.ConditionalExpr( condition=Nodes.Load( name='y' ), expr=Nodes.Load( name='x' ), elseExpr=Nodes.Load( name='z' ) ) ) )
-		self._matchFailTest( g.expression(), 'w   if x   if y else   z else   q' )
+		self._parseStringTest( g.expression(), 'x   if y else   z', Nodes.ConditionalExpr( condition=Nodes.Load( name='y' ), expr=Nodes.Load( name='x' ), elseExpr=Nodes.Load( name='z' ) ) )
+		self._parseStringTest( g.expression(), '(x   if y else   z)   if w else   q', Nodes.ConditionalExpr( condition=Nodes.Load( name='w' ), expr=Nodes.ConditionalExpr( parens='1', condition=Nodes.Load( name='y' ), expr=Nodes.Load( name='x' ), elseExpr=Nodes.Load( name='z' ) ), elseExpr=Nodes.Load( name='q' ) ) )
+		self._parseStringTest( g.expression(), 'w   if (x   if y else   z) else   q', Nodes.ConditionalExpr( condition=Nodes.ConditionalExpr( parens='1', condition=Nodes.Load( name='y' ), expr=Nodes.Load( name='x' ), elseExpr=Nodes.Load( name='z' ) ), expr=Nodes.Load( name='w' ), elseExpr=Nodes.Load( name='q' ) ) )
+		self._parseStringTest( g.expression(), 'w   if q else   x   if y else   z', Nodes.ConditionalExpr( condition=Nodes.Load( name='q' ), expr=Nodes.Load( name='w' ), elseExpr=Nodes.ConditionalExpr( condition=Nodes.Load( name='y' ), expr=Nodes.Load( name='x' ), elseExpr=Nodes.Load( name='z' ) ) ) )
+		self._parseStringFailTest( g.expression(), 'w   if x   if y else   z else   q' )
 
 
 
 	def testTupleOrExpression(self):
 		g = Python25Grammar()
-		self._matchTest( g.tupleOrExpression(), 'a', Nodes.Load( name='a' ) )
-		self._matchTest( g.tupleOrExpression(), 'a,b', Nodes.TupleLiteral( values=[ Nodes.Load( name='a' ), Nodes.Load( name='b' ) ] ) )
-		self._matchTest( g.tupleOrExpression(), 'a,2', Nodes.TupleLiteral( values=[ Nodes.Load( name='a' ), Nodes.IntLiteral( format='decimal', numType='int', value='2' ) ] ) )
-		self._matchTest( g.tupleOrExpression(), 'lambda x, y: x+y,2', Nodes.TupleLiteral(
+		self._parseStringTest( g.tupleOrExpression(), 'a', Nodes.Load( name='a' ) )
+		self._parseStringTest( g.tupleOrExpression(), 'a,b', Nodes.TupleLiteral( values=[ Nodes.Load( name='a' ), Nodes.Load( name='b' ) ] ) )
+		self._parseStringTest( g.tupleOrExpression(), 'a,2', Nodes.TupleLiteral( values=[ Nodes.Load( name='a' ), Nodes.IntLiteral( format='decimal', numType='int', value='2' ) ] ) )
+		self._parseStringTest( g.tupleOrExpression(), 'lambda x, y: x+y,2', Nodes.TupleLiteral(
 			values=[ Nodes.LambdaExpr( params=[ Nodes.SimpleParam( name='x' ), Nodes.SimpleParam( name='y' ) ],
 						   expr=Nodes.Add( x=Nodes.Load( name='x' ), y=Nodes.Load( name='y' ) ) ),
 				 Nodes.IntLiteral( format='decimal', numType='int', value='2' ) ] ) )
@@ -1287,203 +1292,209 @@ class TestCase_Python25Parser (ParserTestCase):
 
 	def testAssertStmt(self):
 		g = Python25Grammar()
-		self._matchTest( g.statement(), 'assert x', Nodes.AssertStmt( condition=Nodes.Load( name='x' ), fail=None ) )
-		self._matchTest( g.statement(), 'assert x,y', Nodes.AssertStmt( condition=Nodes.Load( name='x' ), fail=Nodes.Load( name='y' ) ) )
+		self._parseStringTest( g.statement(), 'assert x', Nodes.AssertStmt( condition=Nodes.Load( name='x' ), fail=None ) )
+		self._parseStringTest( g.statement(), 'assert x,y', Nodes.AssertStmt( condition=Nodes.Load( name='x' ), fail=Nodes.Load( name='y' ) ) )
 
 
 	def testAssignmentStmt(self):
 		g = Python25Grammar()
-		self._matchTest( g.statement(), 'a=x', Nodes.AssignStmt( targets=[ Nodes.SingleTarget( name='a' ) ], value=Nodes.Load( name='x' ) ) )
-		self._matchTest( g.statement(), 'a=b=x', Nodes.AssignStmt( targets=[ Nodes.SingleTarget( name='a' ), Nodes.SingleTarget( name='b' ) ], value=Nodes.Load( name='x' ) ) )
-		self._matchTest( g.statement(), 'a,b=c,d=x', Nodes.AssignStmt( targets=[ Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='a' ),  Nodes.SingleTarget( name='b' ) ] ),
+		self._parseStringTest( g.statement(), 'a=x', Nodes.AssignStmt( targets=[ Nodes.SingleTarget( name='a' ) ], value=Nodes.Load( name='x' ) ) )
+		self._parseStringTest( g.statement(), 'a=b=x', Nodes.AssignStmt( targets=[ Nodes.SingleTarget( name='a' ), Nodes.SingleTarget( name='b' ) ], value=Nodes.Load( name='x' ) ) )
+		self._parseStringTest( g.statement(), 'a,b=c,d=x', Nodes.AssignStmt( targets=[ Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='a' ),  Nodes.SingleTarget( name='b' ) ] ),
 											 Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='c' ),  Nodes.SingleTarget( name='d' ) ] ) ], value=Nodes.Load( name='x' ) ) )
-		self._matchTest( g.statement(), 'a=(yield x)', Nodes.AssignStmt( targets=[ Nodes.SingleTarget( name='a' ) ], value=Nodes.YieldAtom( value=Nodes.Load( name='x' ) ) ) )
-		self._matchFailTest( g.statement(), '=x' )
+		self._parseStringTest( g.statement(), 'a=(yield x)', Nodes.AssignStmt( targets=[ Nodes.SingleTarget( name='a' ) ], value=Nodes.YieldAtom( value=Nodes.Load( name='x' ) ) ) )
+		self._parseStringFailTest( g.statement(), '=x' )
 
 
 	def testAugAssignStmt(self):
 		g = Python25Grammar()
-		self._matchTest( g.statement(), 'a += b', Nodes.AugAssignStmt( op='+=', target=Nodes.SingleTarget( name='a' ), value=Nodes.Load( name='b' ) ) )
-		self._matchTest( g.statement(), 'a -= b', Nodes.AugAssignStmt( op='-=', target=Nodes.SingleTarget( name='a' ), value=Nodes.Load( name='b' ) ) )
-		self._matchTest( g.statement(), 'a *= b', Nodes.AugAssignStmt( op='*=', target=Nodes.SingleTarget( name='a' ), value=Nodes.Load( name='b' ) ) )
-		self._matchTest( g.statement(), 'a /= b', Nodes.AugAssignStmt( op='/=', target=Nodes.SingleTarget( name='a' ), value=Nodes.Load( name='b' ) ) )
-		self._matchTest( g.statement(), 'a %= b', Nodes.AugAssignStmt( op='%=', target=Nodes.SingleTarget( name='a' ), value=Nodes.Load( name='b' ) ) )
-		self._matchTest( g.statement(), 'a **= b', Nodes.AugAssignStmt( op='**=', target=Nodes.SingleTarget( name='a' ), value=Nodes.Load( name='b' ) ) )
-		self._matchTest( g.statement(), 'a >>= b', Nodes.AugAssignStmt( op='>>=', target=Nodes.SingleTarget( name='a' ), value=Nodes.Load( name='b' ) ) )
-		self._matchTest( g.statement(), 'a <<= b', Nodes.AugAssignStmt( op='<<=', target=Nodes.SingleTarget( name='a' ), value=Nodes.Load( name='b' ) ) )
-		self._matchTest( g.statement(), 'a &= b', Nodes.AugAssignStmt( op='&=', target=Nodes.SingleTarget( name='a' ), value=Nodes.Load( name='b' ) ) )
-		self._matchTest( g.statement(), 'a ^= b', Nodes.AugAssignStmt( op='^=', target=Nodes.SingleTarget( name='a' ), value=Nodes.Load( name='b' ) ) )
-		self._matchTest( g.statement(), 'a |= b', Nodes.AugAssignStmt( op='|=', target=Nodes.SingleTarget( name='a' ), value=Nodes.Load( name='b' ) ) )
+		self._parseStringTest( g.statement(), 'a += b', Nodes.AugAssignStmt( op='+=', target=Nodes.SingleTarget( name='a' ), value=Nodes.Load( name='b' ) ) )
+		self._parseStringTest( g.statement(), 'a -= b', Nodes.AugAssignStmt( op='-=', target=Nodes.SingleTarget( name='a' ), value=Nodes.Load( name='b' ) ) )
+		self._parseStringTest( g.statement(), 'a *= b', Nodes.AugAssignStmt( op='*=', target=Nodes.SingleTarget( name='a' ), value=Nodes.Load( name='b' ) ) )
+		self._parseStringTest( g.statement(), 'a /= b', Nodes.AugAssignStmt( op='/=', target=Nodes.SingleTarget( name='a' ), value=Nodes.Load( name='b' ) ) )
+		self._parseStringTest( g.statement(), 'a %= b', Nodes.AugAssignStmt( op='%=', target=Nodes.SingleTarget( name='a' ), value=Nodes.Load( name='b' ) ) )
+		self._parseStringTest( g.statement(), 'a **= b', Nodes.AugAssignStmt( op='**=', target=Nodes.SingleTarget( name='a' ), value=Nodes.Load( name='b' ) ) )
+		self._parseStringTest( g.statement(), 'a >>= b', Nodes.AugAssignStmt( op='>>=', target=Nodes.SingleTarget( name='a' ), value=Nodes.Load( name='b' ) ) )
+		self._parseStringTest( g.statement(), 'a <<= b', Nodes.AugAssignStmt( op='<<=', target=Nodes.SingleTarget( name='a' ), value=Nodes.Load( name='b' ) ) )
+		self._parseStringTest( g.statement(), 'a &= b', Nodes.AugAssignStmt( op='&=', target=Nodes.SingleTarget( name='a' ), value=Nodes.Load( name='b' ) ) )
+		self._parseStringTest( g.statement(), 'a ^= b', Nodes.AugAssignStmt( op='^=', target=Nodes.SingleTarget( name='a' ), value=Nodes.Load( name='b' ) ) )
+		self._parseStringTest( g.statement(), 'a |= b', Nodes.AugAssignStmt( op='|=', target=Nodes.SingleTarget( name='a' ), value=Nodes.Load( name='b' ) ) )
 
 
 	def testPassStmt(self):
 		g = Python25Grammar()
-		self._matchTest( g.statement(), 'pass', Nodes.PassStmt() )
+		self._parseStringTest( g.statement(), 'pass', Nodes.PassStmt() )
 
 
 	def testDelStmt(self):
 		g = Python25Grammar()
-		self._matchTest( g.statement(), 'del x', Nodes.DelStmt( target=Nodes.SingleTarget( name='x' ) ) )
+		self._parseStringTest( g.statement(), 'del x', Nodes.DelStmt( target=Nodes.SingleTarget( name='x' ) ) )
 
 
 	def testReturnStmt(self):
 		g = Python25Grammar()
-		self._matchTest( g.statement(), 'return x', Nodes.ReturnStmt( value=Nodes.Load( name='x' ) ) )
+		self._parseStringTest( g.statement(), 'return x', Nodes.ReturnStmt( value=Nodes.Load( name='x' ) ) )
 
 
 	def testYieldStmt(self):
 		g = Python25Grammar()
-		self._matchTest( g.statement(), 'yield x', Nodes.YieldStmt( value=Nodes.Load( name='x' ) ) )
+		self._parseStringTest( g.statement(), 'yield x', Nodes.YieldStmt( value=Nodes.Load( name='x' ) ) )
 
 
 	def testRaiseStmt(self):
 		g = Python25Grammar()
-		self._matchTest( g.statement(), 'raise', Nodes.RaiseStmt( excType=None, excValue=None, traceback=None ) )
-		self._matchTest( g.statement(), 'raise x', Nodes.RaiseStmt( excType=Nodes.Load( name='x' ), excValue=None, traceback=None ) )
-		self._matchTest( g.statement(), 'raise x,y', Nodes.RaiseStmt( excType=Nodes.Load( name='x' ), excValue=Nodes.Load( name='y' ), traceback=None ) )
-		self._matchTest( g.statement(), 'raise x,y,z', Nodes.RaiseStmt( excType=Nodes.Load( name='x' ), excValue=Nodes.Load( name='y' ), traceback=Nodes.Load( name='z' ) ) )
+		self._parseStringTest( g.statement(), 'raise', Nodes.RaiseStmt( excType=None, excValue=None, traceback=None ) )
+		self._parseStringTest( g.statement(), 'raise x', Nodes.RaiseStmt( excType=Nodes.Load( name='x' ), excValue=None, traceback=None ) )
+		self._parseStringTest( g.statement(), 'raise x,y', Nodes.RaiseStmt( excType=Nodes.Load( name='x' ), excValue=Nodes.Load( name='y' ), traceback=None ) )
+		self._parseStringTest( g.statement(), 'raise x,y,z', Nodes.RaiseStmt( excType=Nodes.Load( name='x' ), excValue=Nodes.Load( name='y' ), traceback=Nodes.Load( name='z' ) ) )
 
 
 	def testBreakStmt(self):
 		g = Python25Grammar()
-		self._matchTest( g.statement(), 'break', Nodes.BreakStmt() )
+		self._parseStringTest( g.statement(), 'break', Nodes.BreakStmt() )
 
 
 	def testContinueStmt(self):
 		g = Python25Grammar()
-		self._matchTest( g.statement(), 'continue', Nodes.ContinueStmt() )
+		self._parseStringTest( g.statement(), 'continue', Nodes.ContinueStmt() )
 
 
 	def testImportStmt(self):
 		g = Python25Grammar()
-		self._matchTest( g._moduleIdentifier(), 'abc', 'abc' )
-		self._matchTest( g.moduleName(), 'abc', 'abc' )
-		self._matchTest( g.moduleName(), 'abc.xyz', 'abc.xyz' )
-		self._matchTest( g._relModDotsModule(), 'abc.xyz', 'abc.xyz' )
-		self._matchTest( g._relModDotsModule(), '...abc.xyz', '...abc.xyz' )
-		self._matchTest( g._relModDots(), '...', '...' )
-		self._matchTest( g.relativeModule(), 'abc.xyz', Nodes.RelativeModule( name='abc.xyz' ) )
-		self._matchTest( g.relativeModule(), '...abc.xyz', Nodes.RelativeModule( name='...abc.xyz' ) )
-		self._matchTest( g.relativeModule(), '...', Nodes.RelativeModule( name='...' ) )
-		self._matchTest( g.moduleImport(), 'abc.xyz', Nodes.ModuleImport( name='abc.xyz' ) )
-		self._matchTest( g.moduleImport(), 'abc.xyz as q', Nodes.ModuleImportAs( name='abc.xyz', asName='q' ) )
-		self._matchTest( g.simpleImport(), 'import a', Nodes.ImportStmt( modules=[ Nodes.ModuleImport( name='a' ) ] ) )
-		self._matchTest( g.simpleImport(), 'import a.b', Nodes.ImportStmt( modules=[ Nodes.ModuleImport( name='a.b' ) ] ) )
-		self._matchTest( g.simpleImport(), 'import a.b as x', Nodes.ImportStmt( modules=[ Nodes.ModuleImportAs( name='a.b', asName='x' ) ] ) )
-		self._matchTest( g.simpleImport(), 'import a.b as x, c.d as y', Nodes.ImportStmt( modules=[ Nodes.ModuleImportAs( name='a.b', asName='x' ), Nodes.ModuleImportAs( name='c.d', asName='y' ) ] ) )
-		self._matchTest( g.moduleContentImport(), 'xyz', Nodes.ModuleContentImport( name='xyz' ) )
-		self._matchTest( g.moduleContentImport(), 'xyz as q', Nodes.ModuleContentImportAs( name='xyz', asName='q' ) )
-		self._matchTest( g.fromImport(), 'from x import a', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImport( name='a' ) ] ) )
-		self._matchTest( g.fromImport(), 'from x import a as p', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ) ] ) )
-		self._matchTest( g.fromImport(), 'from x import a as p, b as q', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ), Nodes.ModuleContentImportAs( name='b', asName='q' ) ] ) )
-		self._matchTest( g.fromImport(), 'from x import (a)', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImport( name='a' ) ] ) )
-		self._matchTest( g.fromImport(), 'from x import (a,)', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImport( name='a' ) ] ) )
-		self._matchTest( g.fromImport(), 'from x import (a as p)', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ) ] ) )
-		self._matchTest( g.fromImport(), 'from x import (a as p,)', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ) ] ) )
-		self._matchTest( g.fromImport(), 'from x import ( a as p, b as q )', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ), Nodes.ModuleContentImportAs( name='b', asName='q' ) ] ) )
-		self._matchTest( g.fromImport(), 'from x import ( a as p, b as q, )', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ), Nodes.ModuleContentImportAs( name='b', asName='q' ) ] ) )
-		self._matchTest( g.fromImportAll(), 'from x import *', Nodes.FromImportAllStmt( module=Nodes.RelativeModule( name='x' ) ) )
-		self._matchTest( g.importStmt(), 'import a', Nodes.ImportStmt( modules=[ Nodes.ModuleImport( name='a' ) ] ) )
-		self._matchTest( g.importStmt(), 'import a.b', Nodes.ImportStmt( modules=[ Nodes.ModuleImport( name='a.b' ) ] ) )
-		self._matchTest( g.importStmt(), 'import a.b as x', Nodes.ImportStmt( modules=[ Nodes.ModuleImportAs( name='a.b', asName='x' ) ] ) )
-		self._matchTest( g.importStmt(), 'import a.b as x, c.d as y', Nodes.ImportStmt( modules=[ Nodes.ModuleImportAs( name='a.b', asName='x' ), Nodes.ModuleImportAs( name='c.d', asName='y' ) ] ) )
-		self._matchTest( g.importStmt(), 'from x import a', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImport( name='a' ) ] ) )
-		self._matchTest( g.importStmt(), 'from x import a as p', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ) ] ) )
-		self._matchTest( g.importStmt(), 'from x import a as p, b as q', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ), Nodes.ModuleContentImportAs( name='b', asName='q' ) ] ) )
-		self._matchTest( g.importStmt(), 'from x import (a)', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImport( name='a' ) ] ) )
-		self._matchTest( g.importStmt(), 'from x import (a,)', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImport( name='a' ) ] ) )
-		self._matchTest( g.importStmt(), 'from x import (a as p)', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ) ] ) )
-		self._matchTest( g.importStmt(), 'from x import (a as p,)', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ) ] ) )
-		self._matchTest( g.importStmt(), 'from x import ( a as p, b as q )', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ), Nodes.ModuleContentImportAs( name='b', asName='q' ) ] ) )
-		self._matchTest( g.importStmt(), 'from x import ( a as p, b as q, )', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ), Nodes.ModuleContentImportAs( name='b', asName='q' ) ] ) )
-		self._matchTest( g.importStmt(), 'from x import *', Nodes.FromImportAllStmt( module=Nodes.RelativeModule( name='x' ) ) )
+		self._parseStringTest( g._moduleIdentifier(), 'abc', 'abc' )
+		self._parseStringTest( g.moduleName(), 'abc', 'abc' )
+		self._parseStringTest( g.moduleName(), 'abc.xyz', 'abc.xyz' )
+		self._parseStringTest( g._relModDotsModule(), 'abc.xyz', 'abc.xyz' )
+		self._parseStringTest( g._relModDotsModule(), '...abc.xyz', '...abc.xyz' )
+		self._parseStringTest( g._relModDots(), '...', '...' )
+		self._parseStringTest( g.relativeModule(), 'abc.xyz', Nodes.RelativeModule( name='abc.xyz' ) )
+		self._parseStringTest( g.relativeModule(), '...abc.xyz', Nodes.RelativeModule( name='...abc.xyz' ) )
+		self._parseStringTest( g.relativeModule(), '...', Nodes.RelativeModule( name='...' ) )
+		self._parseStringTest( g.moduleImport(), 'abc.xyz', Nodes.ModuleImport( name='abc.xyz' ) )
+		self._parseStringTest( g.moduleImport(), 'abc.xyz as q', Nodes.ModuleImportAs( name='abc.xyz', asName='q' ) )
+		self._parseStringTest( g.simpleImport(), 'import a', Nodes.ImportStmt( modules=[ Nodes.ModuleImport( name='a' ) ] ) )
+		self._parseStringTest( g.simpleImport(), 'import a.b', Nodes.ImportStmt( modules=[ Nodes.ModuleImport( name='a.b' ) ] ) )
+		self._parseStringTest( g.simpleImport(), 'import a.b as x', Nodes.ImportStmt( modules=[ Nodes.ModuleImportAs( name='a.b', asName='x' ) ] ) )
+		self._parseStringTest( g.simpleImport(), 'import a.b as x, c.d as y', Nodes.ImportStmt( modules=[ Nodes.ModuleImportAs( name='a.b', asName='x' ), Nodes.ModuleImportAs( name='c.d', asName='y' ) ] ) )
+		self._parseStringTest( g.moduleContentImport(), 'xyz', Nodes.ModuleContentImport( name='xyz' ) )
+		self._parseStringTest( g.moduleContentImport(), 'xyz as q', Nodes.ModuleContentImportAs( name='xyz', asName='q' ) )
+		self._parseStringTest( g.fromImport(), 'from x import a', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImport( name='a' ) ] ) )
+		self._parseStringTest( g.fromImport(), 'from x import a as p', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ) ] ) )
+		self._parseStringTest( g.fromImport(), 'from x import a as p, b as q', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ), Nodes.ModuleContentImportAs( name='b', asName='q' ) ] ) )
+		self._parseStringTest( g.fromImport(), 'from x import (a)', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImport( name='a' ) ] ) )
+		self._parseStringTest( g.fromImport(), 'from x import (a,)', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImport( name='a' ) ] ) )
+		self._parseStringTest( g.fromImport(), 'from x import (a as p)', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ) ] ) )
+		self._parseStringTest( g.fromImport(), 'from x import (a as p,)', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ) ] ) )
+		self._parseStringTest( g.fromImport(), 'from x import ( a as p, b as q )', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ), Nodes.ModuleContentImportAs( name='b', asName='q' ) ] ) )
+		self._parseStringTest( g.fromImport(), 'from x import ( a as p, b as q, )', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ), Nodes.ModuleContentImportAs( name='b', asName='q' ) ] ) )
+		self._parseStringTest( g.fromImportAll(), 'from x import *', Nodes.FromImportAllStmt( module=Nodes.RelativeModule( name='x' ) ) )
+		self._parseStringTest( g.importStmt(), 'import a', Nodes.ImportStmt( modules=[ Nodes.ModuleImport( name='a' ) ] ) )
+		self._parseStringTest( g.importStmt(), 'import a.b', Nodes.ImportStmt( modules=[ Nodes.ModuleImport( name='a.b' ) ] ) )
+		self._parseStringTest( g.importStmt(), 'import a.b as x', Nodes.ImportStmt( modules=[ Nodes.ModuleImportAs( name='a.b', asName='x' ) ] ) )
+		self._parseStringTest( g.importStmt(), 'import a.b as x, c.d as y', Nodes.ImportStmt( modules=[ Nodes.ModuleImportAs( name='a.b', asName='x' ), Nodes.ModuleImportAs( name='c.d', asName='y' ) ] ) )
+		self._parseStringTest( g.importStmt(), 'from x import a', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImport( name='a' ) ] ) )
+		self._parseStringTest( g.importStmt(), 'from x import a as p', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ) ] ) )
+		self._parseStringTest( g.importStmt(), 'from x import a as p, b as q', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ), Nodes.ModuleContentImportAs( name='b', asName='q' ) ] ) )
+		self._parseStringTest( g.importStmt(), 'from x import (a)', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImport( name='a' ) ] ) )
+		self._parseStringTest( g.importStmt(), 'from x import (a,)', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImport( name='a' ) ] ) )
+		self._parseStringTest( g.importStmt(), 'from x import (a as p)', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ) ] ) )
+		self._parseStringTest( g.importStmt(), 'from x import (a as p,)', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ) ] ) )
+		self._parseStringTest( g.importStmt(), 'from x import ( a as p, b as q )', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ), Nodes.ModuleContentImportAs( name='b', asName='q' ) ] ) )
+		self._parseStringTest( g.importStmt(), 'from x import ( a as p, b as q, )', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ), Nodes.ModuleContentImportAs( name='b', asName='q' ) ] ) )
+		self._parseStringTest( g.importStmt(), 'from x import *', Nodes.FromImportAllStmt( module=Nodes.RelativeModule( name='x' ) ) )
 
 
 	def testGlobalStmt(self):
 		g = Python25Grammar()
-		self._matchTest( g.statement(), 'global x', Nodes.GlobalStmt( vars=[ Nodes.GlobalVar( name='x' ) ] ) )
-		self._matchTest( g.statement(), 'global x, y', Nodes.GlobalStmt( vars=[ Nodes.GlobalVar( name='x' ), Nodes.GlobalVar( name='y' ) ] ) )
+		self._parseStringTest( g.statement(), 'global x', Nodes.GlobalStmt( vars=[ Nodes.GlobalVar( name='x' ) ] ) )
+		self._parseStringTest( g.statement(), 'global x, y', Nodes.GlobalStmt( vars=[ Nodes.GlobalVar( name='x' ), Nodes.GlobalVar( name='y' ) ] ) )
 
 
 	def testExecStmt(self):
 		g = Python25Grammar()
-		self._matchTest( g.statement(), 'exec a', Nodes.ExecStmt( source=Nodes.Load( name='a' ), locals=None, globals=None ) )
-		self._matchTest( g.statement(), 'exec a in b', Nodes.ExecStmt( source=Nodes.Load( name='a' ), locals=Nodes.Load( name='b' ), globals=None ) )
-		self._matchTest( g.statement(), 'exec a in b,c', Nodes.ExecStmt( source=Nodes.Load( name='a' ), locals=Nodes.Load( name='b' ), globals=Nodes.Load( name='c' ) ) )
+		self._parseStringTest( g.statement(), 'exec a', Nodes.ExecStmt( source=Nodes.Load( name='a' ), locals=None, globals=None ) )
+		self._parseStringTest( g.statement(), 'exec a in b', Nodes.ExecStmt( source=Nodes.Load( name='a' ), locals=Nodes.Load( name='b' ), globals=None ) )
+		self._parseStringTest( g.statement(), 'exec a in b,c', Nodes.ExecStmt( source=Nodes.Load( name='a' ), locals=Nodes.Load( name='b' ), globals=Nodes.Load( name='c' ) ) )
 
 
-	def testIfStmt(self):
+		
+		
+	#
+	# Compound statement headers
+	#
+		
+	def testIfStmtHeader(self):
 		g = Python25Grammar()
-		self._matchTest( g.ifStmt(), 'if a:', Nodes.IfStmt( condition=Nodes.Load( name='a' ), suite=[] ) )
+		self._parseStringTest( g.ifStmtHeader(), 'if a:', Nodes.IfStmtHeader( condition=Nodes.Load( name='a' ) ) )
 
 
-	def testElIfStmt(self):
+	def testElIfStmtHeader(self):
 		g = Python25Grammar()
-		self._matchTest( g.elifStmt(), 'elif a:', Nodes.ElifStmt( condition=Nodes.Load( name='a' ), suite=[] ) )
+		self._parseStringTest( g.elifStmtHeader(), 'elif a:', Nodes.ElifStmtHeader( condition=Nodes.Load( name='a' ) ) )
 
 
-	def testElseStmt(self):
+	def testElseStmtHeader(self):
 		g = Python25Grammar()
-		self._matchTest( g.elseStmt(), 'else:', Nodes.ElseStmt( suite=[] ) )
+		self._parseStringTest( g.elseStmtHeader(), 'else:', Nodes.ElseStmtHeader() )
 
 
-	def testWhileStmt(self):
+	def testWhileStmtHeader(self):
 		g = Python25Grammar()
-		self._matchTest( g.whileStmt(), 'while a:', Nodes.WhileStmt( condition=Nodes.Load( name='a' ), suite=[] ) )
+		self._parseStringTest( g.whileStmtHeader(), 'while a:', Nodes.WhileStmtHeader( condition=Nodes.Load( name='a' ) ) )
 
 
-	def testForStmt(self):
+	def testForStmtHeader(self):
 		g = Python25Grammar()
-		self._matchTest( g.forStmt(), 'for x in y:', Nodes.ForStmt( target=Nodes.SingleTarget( name='x' ), source=Nodes.Load( name='y' ), suite=[] ) )
+		self._parseStringTest( g.forStmtHeader(), 'for x in y:', Nodes.ForStmtHeader( target=Nodes.SingleTarget( name='x' ), source=Nodes.Load( name='y' ) ) )
 
 
-	def testTryStmt(self):
+	def testTryStmtHeader(self):
 		g = Python25Grammar()
-		self._matchTest( g.tryStmt(), 'try:', Nodes.TryStmt( suite=[] ) )
+		self._parseStringTest( g.tryStmtHeader(), 'try:', Nodes.TryStmtHeader() )
 
 
-	def testExceptStmt(self):
+	def testExceptStmtHeader(self):
 		g = Python25Grammar()
-		self._matchTest( g.exceptStmt(), 'except:', Nodes.ExceptStmt( exception=None, target=None, suite=[] ) )
-		self._matchTest( g.exceptStmt(), 'except x:', Nodes.ExceptStmt( exception=Nodes.Load( name='x' ), target=None, suite=[] ) )
-		self._matchTest( g.exceptStmt(), 'except x, y:', Nodes.ExceptStmt( exception=Nodes.Load( name='x' ), target=Nodes.SingleTarget( name='y' ), suite=[] ) )
+		self._parseStringTest( g.exceptStmtHeader(), 'except:', Nodes.ExceptStmtHeader( exception=None, target=None ) )
+		self._parseStringTest( g.exceptStmtHeader(), 'except x:', Nodes.ExceptStmtHeader( exception=Nodes.Load( name='x' ), target=None ) )
+		self._parseStringTest( g.exceptStmtHeader(), 'except x, y:', Nodes.ExceptStmtHeader( exception=Nodes.Load( name='x' ), target=Nodes.SingleTarget( name='y' ) ) )
 
 
-	def testFinallyStmt(self):
+	def testFinallyStmtHeader(self):
 		g = Python25Grammar()
-		self._matchTest( g.finallyStmt(), 'finally:', Nodes.FinallyStmt( suite=[] ) )
+		self._parseStringTest( g.finallyStmtHeader(), 'finally:', Nodes.FinallyStmtHeader() )
 
 
-	def testWithStmt(self):
+	def testWithStmtHeader(self):
 		g = Python25Grammar()
-		self._matchTest( g.withStmt(), 'with a:', Nodes.WithStmt( expr=Nodes.Load( name='a' ), target=None, suite=[] ) )
-		self._matchTest( g.withStmt(), 'with a as b:', Nodes.WithStmt( expr=Nodes.Load( name='a' ), target=Nodes.SingleTarget( name='b' ), suite=[] ) )
+		self._parseStringTest( g.withStmtHeader(), 'with a:', Nodes.WithStmtHeader( expr=Nodes.Load( name='a' ), target=None ) )
+		self._parseStringTest( g.withStmtHeader(), 'with a as b:', Nodes.WithStmtHeader( expr=Nodes.Load( name='a' ), target=Nodes.SingleTarget( name='b' ) ) )
 
 
-	def testDefStmt(self):
+	def testDecoStmtHeader(self):
 		g = Python25Grammar()
-		self._matchTest( g.defStmt(), 'def f():', Nodes.DefStmt( name='f', params=[], suite=[] ) )
-		self._matchTest( g.defStmt(), 'def f(x):', Nodes.DefStmt( name='f', params=[ Nodes.SimpleParam( name='x' ) ], suite=[] ) )
+		self._parseStringTest( g.decoStmtHeader(), '@f', Nodes.DecoStmtHeader( name='f', args=None ) )
+		self._parseStringTest( g.decoStmtHeader(), '@f(x)', Nodes.DecoStmtHeader( name='f', args=[ Nodes.Load( name='x' ) ] ) )
 
 
-	def testDecoStmt(self):
+	def testDefStmtHeader(self):
 		g = Python25Grammar()
-		self._matchTest( g.decoStmt(), '@f', Nodes.DecoStmt( name='f', args=None ) )
-		self._matchTest( g.decoStmt(), '@f(x)', Nodes.DecoStmt( name='f', args=[ Nodes.Load( name='x' ) ] ) )
+		self._parseStringTest( g.defStmtHeader(), 'def f():', Nodes.DefStmtHeader( name='f', params=[] ) )
+		self._parseStringTest( g.defStmtHeader(), 'def f(x):', Nodes.DefStmtHeader( name='f', params=[ Nodes.SimpleParam( name='x' ) ] ) )
 
 
-	def testClassStmt(self):
+	def testClassStmtHeader(self):
 		g = Python25Grammar()
-		self._matchTest( g.classStmt(), 'class Q:', Nodes.ClassStmt( name='Q', bases=None, suite=[] ) )
-		self._matchTest( g.classStmt(), 'class Q (x):', Nodes.ClassStmt( name='Q', bases=[ Nodes.Load( name='x' ) ], suite=[] ) )
-		self._matchTest( g.classStmt(), 'class Q (x,):', Nodes.ClassStmt( name='Q', bases=[ Nodes.Load( name='x' ) ], basesTrailingSeparator='1', suite=[] ) )
-		self._matchTest( g.classStmt(), 'class Q (x,y):', Nodes.ClassStmt( name='Q', bases=[ Nodes.Load( name='x' ), Nodes.Load( name='y' ) ], suite=[] ) )
+		self._parseStringTest( g.classStmtHeader(), 'class Q:', Nodes.ClassStmtHeader( name='Q', bases=None ) )
+		self._parseStringTest( g.classStmtHeader(), 'class Q (x):', Nodes.ClassStmtHeader( name='Q', bases=[ Nodes.Load( name='x' ) ] ) )
+		self._parseStringTest( g.classStmtHeader(), 'class Q (x,):', Nodes.ClassStmtHeader( name='Q', bases=[ Nodes.Load( name='x' ) ], basesTrailingSeparator='1' ) )
+		self._parseStringTest( g.classStmtHeader(), 'class Q (x,y):', Nodes.ClassStmtHeader( name='Q', bases=[ Nodes.Load( name='x' ), Nodes.Load( name='y' ) ] ) )
 
 
 	def testCommentStmt(self):
 		g = Python25Grammar()
-		self._matchTest( g.commentStmt(), '#x', Nodes.CommentStmt( comment='x' ) )
-		self._matchTest( g.commentStmt(), '#' + string.printable, Nodes.CommentStmt( comment=string.printable ) )
+		self._parseStringTest( g.commentStmt(), '#x', Nodes.CommentStmt( comment='x' ) )
+		self._parseStringTest( g.commentStmt(), '#' + string.printable, Nodes.CommentStmt( comment=string.printable ) )
 
 
 
@@ -1491,15 +1502,15 @@ class TestCase_Python25Parser (ParserTestCase):
 
 	def testFnCallStStmt(self):
 		g = Python25Grammar()
-		self._matchTest( g.expression(), 'x.y()', Nodes.Call( target=Nodes.AttributeRef( target=Nodes.Load( name='x' ), name='y' ), args=[] ) )
-		self._matchTest( g.statement(), 'x.y()', Nodes.ExprStmt( expr=Nodes.Call( target=Nodes.AttributeRef( target=Nodes.Load( name='x' ), name='y' ), args=[] ) ) )
+		self._parseStringTest( g.expression(), 'x.y()', Nodes.Call( target=Nodes.AttributeRef( target=Nodes.Load( name='x' ), name='y' ), args=[] ) )
+		self._parseStringTest( g.statement(), 'x.y()', Nodes.ExprStmt( expr=Nodes.Call( target=Nodes.AttributeRef( target=Nodes.Load( name='x' ), name='y' ), args=[] ) ) )
 
 
 
 
 	def testDictInList(self):
 		g = Python25Grammar()
-		self._matchTest( g.statement(), 'y = [ x, { a : b } ]', Nodes.AssignStmt( targets=[ Nodes.SingleTarget( name='y' ) ], value=Nodes.ListLiteral( values=[ Nodes.Load( name='x' ), Nodes.DictLiteral( values=[ Nodes.DictKeyValuePair( key=Nodes.Load( name='a' ), value=Nodes.Load( name='b' ) ) ] ) ] ) ) )
+		self._parseStringTest( g.statement(), 'y = [ x, { a : b } ]', Nodes.AssignStmt( targets=[ Nodes.SingleTarget( name='y' ) ], value=Nodes.ListLiteral( values=[ Nodes.Load( name='x' ), Nodes.DictLiteral( values=[ Nodes.DictKeyValuePair( key=Nodes.Load( name='a' ), value=Nodes.Load( name='b' ) ) ] ) ] ) ) )
 
 
 

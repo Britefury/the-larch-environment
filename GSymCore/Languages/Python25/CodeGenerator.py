@@ -382,7 +382,7 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 	# Assert statement
 	@ObjectNodeDispatchMethod
 	def AssertStmt(self, node, condition, fail):
-		return 'assert '  +  self( condition )  +  ( ', ' + self( fail )   if fail != '<nil>'   else  '' )
+		return 'assert '  +  self( condition )  +  ( ', ' + self( fail )   if fail is not None   else  '' )
 	
 	
 	# Assignment statement
@@ -491,95 +491,109 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 	@ObjectNodeDispatchMethod
 	def ExecStmt(self, node, source, locals, globals):
 		txt = 'exec '  +  self( source )
-		if locals != '<nil>':
+		if locals is not None:
 			txt += ' in '  +  self( locals )
-		if globals != '<nil>':
+		if globals is not None:
 			txt += ', '  +  self( globals )
 		return txt
 	
 	
+
+	def _elseSuiteToText(self, suite):
+		if suite is not None:
+			suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
+			return 'else:\n'  +  _indent( suiteText )
+		else:
+			return ''
+			
+	
+	
+	def _finallySuiteToText(self, suite):
+		if suite is not None:
+			suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
+			return 'finally:\n'  +  _indent( suiteText )
+		else:
+			return ''
+			
+	
+	
 	# If statement
 	@ObjectNodeDispatchMethod
-	def IfStmt(self, node, condition, suite):
+	def IfStmt(self, node, condition, suite, elifBlocks, elseSuite):
 		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
-		return 'if '  +  self( condition ) + ':\n'  +  _indent( suiteText )
+		elifText = ''.join( [ self( b )   for b in elifBlocks ] )
+		return 'if '  +  self( condition ) + ':\n'  +  _indent( suiteText )  +  elifText  +  self._elseSuiteToText( elseSuite )
 	
 
-	# Elif statement
+	# Elif block
 	@ObjectNodeDispatchMethod
-	def ElifStmt(self, node, condition, suite):
+	def ElifBlock(self, node, condition, suite):
 		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
 		return 'elif '  +  self( condition ) + ':\n'  +  _indent( suiteText )
 	
 
-	# Else statement
-	@ObjectNodeDispatchMethod
-	def ElseStmt(self, node, suite):
-		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
-		return 'else:\n'  +  _indent( suiteText )
-	
-
 	# While statement
 	@ObjectNodeDispatchMethod
-	def WhileStmt(self, node, condition, suite):
+	def WhileStmt(self, node, condition, suite, elseSuite):
 		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
-		return 'while '  +  self( condition ) + ':\n'  +  _indent( suiteText )
+		return 'while '  +  self( condition ) + ':\n'  +  _indent( suiteText )  +  self._elseSuiteToText( elseSuite )
 	
 
 	# For statement
 	@ObjectNodeDispatchMethod
-	def ForStmt(self, node, target, source, suite):
+	def ForStmt(self, node, target, source, suite, elseSuite):
 		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
-		return 'for '  +  self( target )  +  ' in '  +  self( source )  +  ':\n'  +  _indent( suiteText )
+		return 'for '  +  self( target )  +  ' in '  +  self( source )  +  ':\n'  +  _indent( suiteText )  +  self._elseSuiteToText( elseSuite )
 	
 
 	# Try statement
 	@ObjectNodeDispatchMethod
-	def TryStmt(self, node, suite):
+	def TryStmt(self, node, suite, exceptBlocks, elseSuite, finallySuite):
 		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
-		return 'try:\n'  +  _indent( suiteText )
+		exceptText = ''.join( [ self( b )   for b in exceptBlocks ] )
+		return 'try:\n'  +  _indent( suiteText )  +  exceptText  +  self._elseSuiteToText( elseSuite )  +  self._finallySuiteToText( finallySuite )
 	
 
 	# Except statement
 	@ObjectNodeDispatchMethod
-	def ExceptStmt(self, node, exception, target, suite):
+	def ExceptBlock(self, node, exception, target, suite):
 		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
 		txt = 'except'
-		if exception != '<nil>':
+		if exception is not None:
 			txt += ' ' + self( exception )
-		if target != '<nil>':
+		if target is not None:
 			txt += ', ' + self( target )
 		return txt + ':\n'  +  _indent( suiteText )
-	
-
-	# Finally statement
-	@ObjectNodeDispatchMethod
-	def FinallyStmt(self, node, suite):
-		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
-		return 'finally:\n'  +  _indent( suiteText )
 	
 
 	# With statement
 	@ObjectNodeDispatchMethod
 	def WithStmt(self, node, expr, target, suite):
 		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
-		return 'with '  +  self( expr )  +  ( ' as ' + self( target )   if target != '<nil>'   else   '' )  +  ':\n'  +  _indent( suiteText )
+		return 'with '  +  self( expr )  +  ( ' as ' + self( target )   if target is not None   else   '' )  +  ':\n'  +  _indent( suiteText )
 	
 	
-	# Def statement
+	# Decorator
 	@ObjectNodeDispatchMethod
-	def DefStmt(self, node, name, params, suite):
-		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
-		return 'def '  +  name  +  '('  +  ', '.join( [ self( p )   for p in params ] )  +  '):\n'  +  _indent( suiteText )
-	
-
-	# Deco statement
-	@ObjectNodeDispatchMethod
-	def DecoStmt(self, node, name, args):
+	def Decorator(self, node, name, args):
 		text = '@' + name
 		if args is not None:
 			text += '( ' + ', '.join( [ self( a )   for a in args ] ) + ' )'
 		return text
+	
+	
+	def _decoratorsToText(self, decorators):
+		if len( decorators ) == 0:
+			return ''
+		else:
+			return '\n'.join( [ self( deco )   for deco in decorators ] ) + '\n'
+	
+
+	# Def statement
+	@ObjectNodeDispatchMethod
+	def DefStmt(self, node, decorators, name, params, suite):
+		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
+		return self._decoratorsToText( decorators )  +  'def '  +  name  +  '('  +  ', '.join( [ self( p )   for p in params ] )  +  '):\n'  +  _indent( suiteText )
 	
 
 	# Class statement
@@ -743,20 +757,20 @@ class TestCase_Python25CodeGenerator (unittest.TestCase):
 		
 	def test_subscript_slice(self):
 		self._testSX( '(py Subscript target=(py Load name=a) index=(py SubscriptSlice lower=(py Load name=a) upper=(py Load name=b)))', 'a[a:b]' )
-		self._testSX( '(py Subscript target=(py Load name=a) index=(py SubscriptSlice lower=(py Load name=a) upper=<nil>))', 'a[a:]' )
-		self._testSX( '(py Subscript target=(py Load name=a) index=(py SubscriptSlice lower=<nil> upper=(py Load name=b)))', 'a[:b]' )
-		self._testSX( '(py Subscript target=(py Load name=a) index=(py SubscriptSlice lower=<nil> upper=<nil>))', 'a[:]' )
+		self._testSX( '(py Subscript target=(py Load name=a) index=(py SubscriptSlice lower=(py Load name=a) upper=`null`))', 'a[a:]' )
+		self._testSX( '(py Subscript target=(py Load name=a) index=(py SubscriptSlice lower=`null` upper=(py Load name=b)))', 'a[:b]' )
+		self._testSX( '(py Subscript target=(py Load name=a) index=(py SubscriptSlice lower=`null` upper=`null`))', 'a[:]' )
 		
 
 	def test_subscript_longSlice(self):
 		self._testSX( '(py Subscript target=(py Load name=a) index=(py SubscriptLongSlice lower=(py Load name=a) upper=(py Load name=b) stride=(py Load name=c)))', 'a[a:b:c]' )
-		self._testSX( '(py Subscript target=(py Load name=a) index=(py SubscriptLongSlice lower=(py Load name=a) upper=(py Load name=b) stride=<nil>))', 'a[a:b:]' )
-		self._testSX( '(py Subscript target=(py Load name=a) index=(py SubscriptLongSlice lower=(py Load name=a) upper=<nil> stride=(py Load name=c)))', 'a[a::c]' )
-		self._testSX( '(py Subscript target=(py Load name=a) index=(py SubscriptLongSlice lower=(py Load name=a) upper=<nil> stride=<nil>))', 'a[a::]' )
-		self._testSX( '(py Subscript target=(py Load name=a) index=(py SubscriptLongSlice lower=<nil> upper=(py Load name=b) stride=(py Load name=c)))', 'a[:b:c]' )
-		self._testSX( '(py Subscript target=(py Load name=a) index=(py SubscriptLongSlice lower=<nil> upper=(py Load name=b) stride=<nil>))', 'a[:b:]' )
-		self._testSX( '(py Subscript target=(py Load name=a) index=(py SubscriptLongSlice lower=<nil> upper=<nil> stride=(py Load name=c)))', 'a[::c]' )
-		self._testSX( '(py Subscript target=(py Load name=a) index=(py SubscriptLongSlice lower=<nil> upper=<nil> stride=<nil>))', 'a[::]' )
+		self._testSX( '(py Subscript target=(py Load name=a) index=(py SubscriptLongSlice lower=(py Load name=a) upper=(py Load name=b) stride=`null`))', 'a[a:b:]' )
+		self._testSX( '(py Subscript target=(py Load name=a) index=(py SubscriptLongSlice lower=(py Load name=a) upper=`null` stride=(py Load name=c)))', 'a[a::c]' )
+		self._testSX( '(py Subscript target=(py Load name=a) index=(py SubscriptLongSlice lower=(py Load name=a) upper=`null` stride=`null`))', 'a[a::]' )
+		self._testSX( '(py Subscript target=(py Load name=a) index=(py SubscriptLongSlice lower=`null` upper=(py Load name=b) stride=(py Load name=c)))', 'a[:b:c]' )
+		self._testSX( '(py Subscript target=(py Load name=a) index=(py SubscriptLongSlice lower=`null` upper=(py Load name=b) stride=`null`))', 'a[:b:]' )
+		self._testSX( '(py Subscript target=(py Load name=a) index=(py SubscriptLongSlice lower=`null` upper=`null` stride=(py Load name=c)))', 'a[::c]' )
+		self._testSX( '(py Subscript target=(py Load name=a) index=(py SubscriptLongSlice lower=`null` upper=`null` stride=`null`))', 'a[::]' )
 
 		
 	def test_subscript_tuple(self):
@@ -807,8 +821,14 @@ class TestCase_Python25CodeGenerator (unittest.TestCase):
 		
 		
 		
+	
+	#
+	# Simple statements
+	#
+	
+	
 	def test_assertStmt(self):
-		self._testSX( '(py AssertStmt condition=(py Load name=x) fail=<nil>)', 'assert x' )
+		self._testSX( '(py AssertStmt condition=(py Load name=x) fail=`null`)', 'assert x' )
 		self._testSX( '(py AssertStmt condition=(py Load name=x) fail=(py Load name=y))', 'assert x, y' )
 		
 		
@@ -838,9 +858,9 @@ class TestCase_Python25CodeGenerator (unittest.TestCase):
 		
 		
 	def test_raiseStmt(self):
-		self._testSX( '(py RaiseStmt excType=<nil> excValue=<nil> traceback=<nil>)', 'raise' )
-		self._testSX( '(py RaiseStmt excType=(py Load name=a) excValue=<nil> traceback=<nil>)', 'raise a' )
-		self._testSX( '(py RaiseStmt excType=(py Load name=a) excValue=(py Load name=b) traceback=<nil>)', 'raise a, b' )
+		self._testSX( '(py RaiseStmt excType=`null` excValue=`null` traceback=`null`)', 'raise' )
+		self._testSX( '(py RaiseStmt excType=(py Load name=a) excValue=`null` traceback=`null`)', 'raise a' )
+		self._testSX( '(py RaiseStmt excType=(py Load name=a) excValue=(py Load name=b) traceback=`null`)', 'raise a, b' )
 		self._testSX( '(py RaiseStmt excType=(py Load name=a) excValue=(py Load name=b) traceback=(py Load name=c))', 'raise a, b, c' )
 		
 		
@@ -875,62 +895,70 @@ class TestCase_Python25CodeGenerator (unittest.TestCase):
 		
 		
 	def test_ExecStmt(self):
-		self._testSX( '(py ExecStmt source=(py Load name=a) locals=<nil> globals=<nil>)', 'exec a' )
-		self._testSX( '(py ExecStmt source=(py Load name=a) locals=(py Load name=b) globals=<nil>)', 'exec a in b' )
+		self._testSX( '(py ExecStmt source=(py Load name=a) locals=`null` globals=`null`)', 'exec a' )
+		self._testSX( '(py ExecStmt source=(py Load name=a) locals=(py Load name=b) globals=`null`)', 'exec a in b' )
 		self._testSX( '(py ExecStmt source=(py Load name=a) locals=(py Load name=b) globals=(py Load name=c))', 'exec a in b, c' )
 		
 		
 		
+	
+	#
+	# Compound statements
+	#
+	
 	def test_IfStmt(self):
-		self._testSX( '(py IfStmt condition=(py Load name=bA) suite=[(py Load name=b)])', 'if bA:\n\tb\n' )
+		self._testSX( '(py IfStmt condition=(py Load name=bA) suite=[(py Load name=b)] elifBlocks=[])', 'if bA:\n\tb\n' )
+		self._testSX( '(py IfStmt condition=(py Load name=bA) suite=[(py Load name=b)] elifBlocks=[] elseSuite=[(py Load name=c)])', 'if bA:\n\tb\nelse:\n\tc\n' )
+		self._testSX( '(py IfStmt condition=(py Load name=bA) suite=[(py Load name=b)] elifBlocks=[(py ElifBlock condition=(py Load name=bA) suite=[(py Load name=b)])] elseSuite=[(py Load name=c)])',
+			      'if bA:\n\tb\nelif bA:\n\tb\nelse:\n\tc\n' )
 
 
-	def test_ElifStmt(self):
-		self._testSX( '(py ElifStmt condition=(py Load name=bA) suite=[(py Load name=b)])', 'elif bA:\n\tb\n' )
-
-
-	def test_ElseStmt(self):
-		self._testSX( '(py ElseStmt suite=[(py Load name=b)])', 'else:\n\tb\n' )
+	def test_ElifBlock(self):
+		self._testSX( '(py ElifBlock condition=(py Load name=bA) suite=[(py Load name=b)])', 'elif bA:\n\tb\n' )
 
 
 	def test_WhileStmt(self):
 		self._testSX( '(py WhileStmt condition=(py Load name=bA) suite=[(py Load name=b)])', 'while bA:\n\tb\n' )
+		self._testSX( '(py WhileStmt condition=(py Load name=bA) suite=[(py Load name=b)] elseSuite=[(py Load name=c)])', 'while bA:\n\tb\nelse:\n\tc\n' )
 
 
 	def test_ForStmt(self):
 		self._testSX( '(py ForStmt target=(py Load name=a) source=(py Load name=b) suite=[(py Load name=c)])', 'for a in b:\n\tc\n' )
+		self._testSX( '(py ForStmt target=(py Load name=a) source=(py Load name=b) suite=[(py Load name=c)] elseSuite=[(py Load name=d)])', 'for a in b:\n\tc\nelse:\n\td\n' )
 
 
 	def test_TryStmt(self):
-		self._testSX( '(py TryStmt suite=[(py Load name=b)])', 'try:\n\tb\n' )
+		self._testSX( '(py TryStmt suite=[(py Load name=b)] exceptBlocks=[])', 'try:\n\tb\n' )
+		self._testSX( '(py TryStmt suite=[(py Load name=b)] exceptBlocks=[] elseSuite=[(py Load name=d)])', 'try:\n\tb\nelse:\n\td\n' )
+		self._testSX( '(py TryStmt suite=[(py Load name=b)] exceptBlocks=[] elseSuite=[(py Load name=d)] finallySuite=[(py Load name=e)])', 'try:\n\tb\nelse:\n\td\nfinally:\n\te\n' )
+		self._testSX( '(py TryStmt suite=[(py Load name=b)] exceptBlocks=[(py ExceptBlock exception=`null` target=`null` suite=[(py Load name=b)])] elseSuite=[(py Load name=d)] finallySuite=[(py Load name=e)])',
+			      'try:\n\tb\nexcept:\n\tb\nelse:\n\td\nfinally:\n\te\n' )
 
 
-	def test_exceptStmt(self):
-		self._testSX( '(py ExceptStmt exception=<nil> target=<nil> suite=[(py Load name=b)])', 'except:\n\tb\n' )
-		self._testSX( '(py ExceptStmt exception=(py Load name=a) target=<nil> suite=[(py Load name=b)])', 'except a:\n\tb\n' )
-		self._testSX( '(py ExceptStmt exception=(py Load name=a) target=(py Load name=x) suite=[(py Load name=b)])', 'except a, x:\n\tb\n' )
-
-
-	def test_finallyStmt(self):
-		self._testSX( '(py FinallyStmt suite=[(py Load name=b)])', 'finally:\n\tb\n' )
+	def test_exceptBlock(self):
+		self._testSX( '(py ExceptBlock exception=`null` target=`null` suite=[(py Load name=b)])', 'except:\n\tb\n' )
+		self._testSX( '(py ExceptBlock exception=(py Load name=a) target=`null` suite=[(py Load name=b)])', 'except a:\n\tb\n' )
+		self._testSX( '(py ExceptBlock exception=(py Load name=a) target=(py Load name=x) suite=[(py Load name=b)])', 'except a, x:\n\tb\n' )
 
 
 	def test_withStmt(self):
-		self._testSX( '(py WithStmt expr=(py Load name=a) target=<nil> suite=[(py Load name=b)])', 'with a:\n\tb\n' )
+		self._testSX( '(py WithStmt expr=(py Load name=a) target=`null` suite=[(py Load name=b)])', 'with a:\n\tb\n' )
 		self._testSX( '(py WithStmt expr=(py Load name=a) target=(py Load name=x) suite=[(py Load name=b)])', 'with a as x:\n\tb\n' )
 
 
-	def test_defStmt(self):
-		self._testSX( '(py DefStmt name=myFunc params=[(py SimpleParam name=a) (py DefaultValueParam name=b defaultValue=(py Load name=c)) (py ParamList name=d) (py KWParamList name=e)] suite=[(py Load name=b)])', 'def myFunc(a, b=c, *d, **e):\n\tb\n' )
-
-
-	def test_decoStmt(self):
-		self._testSX( '(py DecoStmt name=myDeco args=<nil>)', '@myDeco' )
-		self._testSX( '(py DecoStmt name=myDeco args=[(py Load name=a) (py Load name=b)])', '@myDeco( a, b )' )
+	def test_decorator(self):
+		self._testSX( '(py Decorator name=myDeco args=`null`)', '@myDeco' )
+		self._testSX( '(py Decorator name=myDeco args=[(py Load name=a) (py Load name=b)])', '@myDeco( a, b )' )
 
 		
+	def test_defStmt(self):
+		self._testSX( '(py DefStmt decorators=[] name=myFunc params=[(py SimpleParam name=a) (py DefaultValueParam name=b defaultValue=(py Load name=c)) (py ParamList name=d) (py KWParamList name=e)] suite=[(py Load name=b)])', 'def myFunc(a, b=c, *d, **e):\n\tb\n' )
+		self._testSX( '(py DefStmt decorators=[(py Decorator name=myDeco args=`null`)] name=myFunc params=[(py SimpleParam name=a) (py DefaultValueParam name=b defaultValue=(py Load name=c)) (py ParamList name=d) (py KWParamList name=e)] suite=[(py Load name=b)])', '@myDeco\ndef myFunc(a, b=c, *d, **e):\n\tb\n' )
+		self._testSX( '(py DefStmt decorators=[(py Decorator name=myDeco args=`null`) (py Decorator name=myDeco args=[(py Load name=a) (py Load name=b)])] name=myFunc params=[(py SimpleParam name=a) (py DefaultValueParam name=b defaultValue=(py Load name=c)) (py ParamList name=d) (py KWParamList name=e)] suite=[(py Load name=b)])', '@myDeco\n@myDeco( a, b )\ndef myFunc(a, b=c, *d, **e):\n\tb\n' )
+
+
 	def test_classStmt(self):
-		self._testSX( '(py ClassStmt name=A bases=<nil> suite=[(py Load name=b)])', 'class A:\n\tb\n' )
+		self._testSX( '(py ClassStmt name=A bases=`null` suite=[(py Load name=b)])', 'class A:\n\tb\n' )
 		self._testSX( '(py ClassStmt name=A bases=[(py Load name=object)] suite=[(py Load name=b)])', 'class A (object):\n\tb\n' )
 		self._testSX( '(py ClassStmt name=A bases=[(py Load name=object) (py Load name=Q)] suite=[(py Load name=b)])', 'class A (object, Q):\n\tb\n' )
 

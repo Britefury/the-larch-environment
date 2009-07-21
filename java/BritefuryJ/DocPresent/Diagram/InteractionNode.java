@@ -54,9 +54,16 @@ public class InteractionNode extends DiagramNode
 	// User API
 	public DiagramNode hoverMonitor(HoverMonitor hoverMonitor)
 	{
-		InteractionNode i = new InteractionNode( this );
-		i.hoverMonitor = hoverMonitor;
-		return i;
+		if ( this.hoverMonitor == null )
+		{
+			InteractionNode i = new InteractionNode( this );
+			i.hoverMonitor = hoverMonitor;
+			return i;
+		}
+		else
+		{
+			return new InteractionNode( this, hoverMonitor );
+		}
 	}
 	
 	public DiagramNode hoverHighlight(DiagramNode hoverHighlight)
@@ -68,9 +75,16 @@ public class InteractionNode extends DiagramNode
 	
 	public DiagramNode onInteraction(InteractionListener interactionListener)
 	{
-		InteractionNode i = new InteractionNode( this );
-		i.interactionListener = interactionListener;
-		return i;
+		if ( this.interactionListener == null )
+		{
+			InteractionNode i = new InteractionNode( this );
+			i.interactionListener = interactionListener;
+			return i;
+		}
+		else
+		{
+			return new InteractionNode( this, interactionListener );
+		}
 	}
 	
 	

@@ -8,6 +8,7 @@ package BritefuryJ.DocPresent.StyleSheets;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Paint;
 
 public class LinkStyleSheet extends StaticTextStyleSheet
 {
@@ -20,13 +21,13 @@ public class LinkStyleSheet extends StaticTextStyleSheet
 		super( defaultFont, Color.blue, false );
 	}
 	
-	public LinkStyleSheet(Font font, Color colour)
+	public LinkStyleSheet(Font font, Paint textPaint)
 	{
-		super( font, colour, false );
+		super( font, textPaint, false );
 	}
 	
-	public LinkStyleSheet(Font font, Color colour, boolean bMixedSizeCaps)
+	public LinkStyleSheet(Font font, Paint textPaint, boolean bMixedSizeCaps)
 	{
-		super( font, colour, bMixedSizeCaps );
+		super( font, textPaint, bMixedSizeCaps );
 	}
 }

@@ -9,6 +9,7 @@ package BritefuryJ.DocPresent.StyleSheets;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Paint;
 
 public class TextStyleSheet extends ContentLeafStyleSheet
 {
@@ -20,7 +21,7 @@ public class TextStyleSheet extends ContentLeafStyleSheet
 	
 	
 	protected Font font;
-	protected Color colour, squiggleUnderlineColour;
+	protected Paint textPaint, squiggleUnderlinePaint;
 	protected boolean bMixedSizeCaps;
 	
 	
@@ -29,28 +30,28 @@ public class TextStyleSheet extends ContentLeafStyleSheet
 		this( defaultFont, Color.black, null, false );
 	}
 	
-	public TextStyleSheet(Font font, Color colour)
+	public TextStyleSheet(Font font, Paint textPaint)
 	{
-		this( font, colour, null, false );
+		this( font, textPaint, null, false );
 	}
 	
-	public TextStyleSheet(Font font, Color colour, boolean bMixedSizeCaps)
+	public TextStyleSheet(Font font, Paint textPaint, boolean bMixedSizeCaps)
 	{
-		this( font, colour, null, bMixedSizeCaps );
+		this( font, textPaint, null, bMixedSizeCaps );
 	}
 
-	public TextStyleSheet(Font font, Color colour, Color squiggleUnderlineColour)
+	public TextStyleSheet(Font font, Paint textPaint, Paint squiggleUnderlinePaint)
 	{
-		this( font, colour, squiggleUnderlineColour, false );
+		this( font, textPaint, squiggleUnderlinePaint, false );
 	}
 	
-	public TextStyleSheet(Font font, Color colour, Color squiggleUnderlineColour, boolean bMixedSizeCaps)
+	public TextStyleSheet(Font font, Paint textPaint, Paint squiggleUnderlinePaint, boolean bMixedSizeCaps)
 	{
 		super();
 		
 		this.font = font;
-		this.colour = colour;
-		this.squiggleUnderlineColour = squiggleUnderlineColour;
+		this.textPaint = textPaint;
+		this.squiggleUnderlinePaint = squiggleUnderlinePaint;
 		this.bMixedSizeCaps = bMixedSizeCaps;
 	}
 	
@@ -62,15 +63,15 @@ public class TextStyleSheet extends ContentLeafStyleSheet
 	}
 	
 	
-	public Color getColour()
+	public Paint getTextPaint()
 	{
-		return colour;
+		return textPaint;
 	}
 	
 	
-	public Color getSquiggleUnderlineColour()
+	public Paint getSquiggleUnderlinePaint()
 	{
-		return squiggleUnderlineColour;
+		return squiggleUnderlinePaint;
 	}
 	
 	

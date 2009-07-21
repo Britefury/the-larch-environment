@@ -8,6 +8,7 @@ package BritefuryJ.DocPresent.StyleSheets;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Paint;
 
 public class StaticTextStyleSheet extends WidgetStyleSheet
 {
@@ -19,7 +20,7 @@ public class StaticTextStyleSheet extends WidgetStyleSheet
 	
 	
 	protected Font font;
-	protected Color colour;
+	protected Paint textPaint;
 	protected boolean bMixedSizeCaps;
 	
 	
@@ -28,17 +29,17 @@ public class StaticTextStyleSheet extends WidgetStyleSheet
 		this( defaultFont, Color.black, false );
 	}
 	
-	public StaticTextStyleSheet(Font font, Color colour)
+	public StaticTextStyleSheet(Font font, Paint textPaint)
 	{
-		this( font, colour, false );
+		this( font, textPaint, false );
 	}
 	
-	public StaticTextStyleSheet(Font font, Color colour, boolean bMixedSizeCaps)
+	public StaticTextStyleSheet(Font font, Paint textPaint, boolean bMixedSizeCaps)
 	{
 		super();
 		
 		this.font = font;
-		this.colour = colour;
+		this.textPaint = textPaint;
 		this.bMixedSizeCaps = bMixedSizeCaps;
 	}
 	
@@ -50,9 +51,9 @@ public class StaticTextStyleSheet extends WidgetStyleSheet
 	}
 	
 	
-	public Color getColour()
+	public Paint getTextPaint()
 	{
-		return colour;
+		return textPaint;
 	}
 	
 	

@@ -418,6 +418,10 @@ public class TextVisual
 	{
 		if ( layout != null )
 		{
+			if ( offset < 0  ||  offset > layout.getCharacterCount() )
+			{
+				throw new RuntimeException( "TextVisual.drawCaret(): offset is out of range; offset=" + offset + ", text range=[0-" + text.length() + "], layout range=[0-" + layout.getCharacterCount() + "]." );
+			}
 			double ascent = layout.getAscent();
 			graphics.translate( 0.0, ascent );
 

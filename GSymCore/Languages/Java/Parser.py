@@ -118,5 +118,5 @@ from Britefury.Tests.BritefuryJ.Parser import ParserTestCase
 class TestCase_JavaGrammar (ParserTestCase.ParserTestCase):
 	def test_identifier(self):
 		g = JavaGrammar()
-		self._matchTest( g.identifier(), 'abc', 'abc' )
+		self._parseStringTest( g.identifier(), 'abc', 'abc' )
 	

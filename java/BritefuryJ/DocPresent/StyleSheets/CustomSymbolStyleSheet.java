@@ -8,13 +8,14 @@
 package BritefuryJ.DocPresent.StyleSheets;
 
 import java.awt.Color;
+import java.awt.Paint;
 
 public class CustomSymbolStyleSheet extends ContentLeafStyleSheet
 {
 	public static CustomSymbolStyleSheet defaultStyleSheet = new CustomSymbolStyleSheet();
 	
 	
-	private Color colour;
+	private Paint symbolPaint;
 	
 	
 	public CustomSymbolStyleSheet()
@@ -22,16 +23,16 @@ public class CustomSymbolStyleSheet extends ContentLeafStyleSheet
 		this( Color.black );
 	}
 	
-	public CustomSymbolStyleSheet(Color colour)
+	public CustomSymbolStyleSheet(Paint symbolPaint)
 	{
 		super();
 		
-		this.colour = colour;
+		this.symbolPaint = symbolPaint;
 	}
 	
 	
-	public Color getColour()
+	public Paint getSymbolPaint()
 	{
-		return colour;
+		return symbolPaint;
 	}
 }
