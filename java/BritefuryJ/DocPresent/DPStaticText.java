@@ -6,8 +6,8 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Paint;
 
 import BritefuryJ.DocPresent.StyleSheets.StaticTextStyleSheet;
 import BritefuryJ.DocPresent.Util.TextVisual;
@@ -81,12 +81,12 @@ public class DPStaticText extends DPStatic
 	{
 		StaticTextStyleSheet textStyleSheet = (StaticTextStyleSheet)styleSheet;
 
-		Color prevColour = graphics.getColor();
+		Paint prevColour = graphics.getPaint();
 
-		graphics.setColor( textStyleSheet.getColour() );
+		graphics.setPaint( textStyleSheet.getTextPaint() );
 		visual.drawText( graphics );
 		
-		graphics.setColor( prevColour );
+		graphics.setPaint( prevColour );
 	}
 	
 	

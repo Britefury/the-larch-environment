@@ -119,7 +119,7 @@ public class DPMathRoot extends DPContainer
 			
 			Stroke stroke = new BasicStroke( (float)thickness, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL );
 			graphics.setStroke( stroke );
-			graphics.setPaint( s.getColour() );
+			graphics.setPaint( s.getSymbolPaint() );
 			
 			double yOffset = thickness * 0.5;
 			double glyphWidth = s.getGlyphWidth();

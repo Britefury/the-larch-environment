@@ -396,9 +396,9 @@ def _makeTestMethod(parserSpec, name, tests):
 		parser = buildOperatorParser( eval( parserSpec ), identifier )
 		for input, result in tests:
 			if result is None:
-				self._matchFailTest( parser, input )
+				self._parseStringFailTest( parser, input )
 			else:
-				self._matchTestSX( parser, input, result )
+				self._parseStringTestSX( parser, input, result )
 	m.__name__ = name
 	return m
 
@@ -532,10 +532,10 @@ class TestCase_Operators (ParserTestCase, TestCase_Impl):
 
 		parser = buildOperatorParser( [ self._infixLeftLvl( [ self._binOp( '*' ) ] ),  self._prefixLvl( [ self._unOp( '~' ) ] ) ], atom )
 
-		self._matchTestSX( parser, 'x * y * z',    '[* [* x y] z]' )
-		self._matchTestSX( parser, '~x * y * z',    '[~ [* [* x y] z]]' )
-		self._matchTestSX( parser, 'x * ~y * z',    '[* x [~ [* y z]]]' )
-		self._matchTestSX( parser, 'x * y * ~z',     '[* [* x y] [~ z]]' )
+		self._parseStringTestSX( parser, 'x * y * z',    '[* [* x y] z]' )
+		self._parseStringTestSX( parser, '~x * y * z',    '[~ [* [* x y] z]]' )
+		self._parseStringTestSX( parser, 'x * ~y * z',    '[* x [~ [* y z]]]' )
+		self._parseStringTestSX( parser, 'x * y * ~z',     '[* [* x y] [~ z]]' )
 
 
 
@@ -544,10 +544,10 @@ class TestCase_Operators (ParserTestCase, TestCase_Impl):
 
 		parser = buildOperatorParser( [ self._infixLeftLvl( [ self._binOp( '*' ) ] ),  self._suffixLvl( [ self._unOp( '!' ) ] ) ], atom )
 
-		self._matchTestSX( parser, 'x * y * z',    '[* [* x y] z]' )
-		self._matchTestSX( parser, 'x * y * z!',    '[! [* [* x y] z]]' )
-		self._matchFailTest( parser, 'x * y! * z' )
-		self._matchFailTest( parser, 'x! * y * z' )
+		self._parseStringTestSX( parser, 'x * y * z',    '[* [* x y] z]' )
+		self._parseStringTestSX( parser, 'x * y * z!',    '[! [* [* x y] z]]' )
+		self._parseStringFailTest( parser, 'x * y! * z' )
+		self._parseStringFailTest( parser, 'x! * y * z' )
 
 
 
@@ -556,10 +556,10 @@ class TestCase_Operators (ParserTestCase, TestCase_Impl):
 
 		parser = buildOperatorParser( [ self._infixRightLvl( [ self._binOp( '$' ) ] ),  self._prefixLvl( [ self._unOp( '~' ) ] ) ], atom )
 
-		self._matchTestSX( parser, 'x $ y $ z',    '[$ x [$ y z]]' )
-		self._matchTestSX( parser, 'x $ y $ ~z',    '[$ x [$ y [~ z]]]' )
-		self._matchTestSX( parser, 'x $ ~y $ z',    '[$ x [~ [$ y z]]]' )
-		self._matchTestSX( parser, '~x $ y $ z',    '[~ [$ x [$ y z]]]' )
+		self._parseStringTestSX( parser, 'x $ y $ z',    '[$ x [$ y z]]' )
+		self._parseStringTestSX( parser, 'x $ y $ ~z',    '[$ x [$ y [~ z]]]' )
+		self._parseStringTestSX( parser, 'x $ ~y $ z',    '[$ x [~ [$ y z]]]' )
+		self._parseStringTestSX( parser, '~x $ y $ z',    '[~ [$ x [$ y z]]]' )
 
 
 
@@ -568,10 +568,10 @@ class TestCase_Operators (ParserTestCase, TestCase_Impl):
 
 		parser = buildOperatorParser( [ self._infixRightLvl( [ self._binOp( '$' ) ] ),  self._suffixLvl( [ self._unOp( '!' ) ] ) ], atom )
 
-		self._matchTestSX( parser, 'x $ y $ z',    '[$ x [$ y z]]' )
-		self._matchTestSX( parser, 'x $ y $ z!',    '[! [$ x [$ y z]]]' )
-		self._matchFailTest( parser, 'x $ y! $ z' )
-		self._matchFailTest( parser, 'x! $ y $ z' )
+		self._parseStringTestSX( parser, 'x $ y $ z',    '[$ x [$ y z]]' )
+		self._parseStringTestSX( parser, 'x $ y $ z!',    '[! [$ x [$ y z]]]' )
+		self._parseStringFailTest( parser, 'x $ y! $ z' )
+		self._parseStringFailTest( parser, 'x! $ y $ z' )
 
 
 
@@ -582,10 +582,10 @@ class TestCase_Operators (ParserTestCase, TestCase_Impl):
 
 		parser = buildOperatorParser( [ self._infixRightLvl( [ self._binOp( '$' ) ] ),  self._infixRightLvl( [ self._binOp( '@' ) ] ),  self._prefixLvl( [ self._unOp( '~' ) ] ) ], atom )
 
-		self._matchTestSX( parser, 'x $ y $ z $ w',    '[$ x [$ y [$ z w]]]' )
-		self._matchTestSX( parser, 'x $ y @ z $ w',    '[@ [$ x y] [$ z w]]' )
-		self._matchTestSX( parser, 'x $ y @ z $ ~w',    '[@ [$ x y] [$ z [~ w]]]' )
-		self._matchTestSX( parser, 'x $ y @ ~z $ w',    '[@ [$ x y] [~ [$ z w]]]' )
-		self._matchTestSX( parser, 'x $ ~y @ z $ w',    '[$ x [~ [@ y [$ z w]]]]' )
-		self._matchTestSX( parser, '~x $ y @ z $ w',    '[~ [@ [$ x y] [$ z w]]]' )
+		self._parseStringTestSX( parser, 'x $ y $ z $ w',    '[$ x [$ y [$ z w]]]' )
+		self._parseStringTestSX( parser, 'x $ y @ z $ w',    '[@ [$ x y] [$ z w]]' )
+		self._parseStringTestSX( parser, 'x $ y @ z $ ~w',    '[@ [$ x y] [$ z [~ w]]]' )
+		self._parseStringTestSX( parser, 'x $ y @ ~z $ w',    '[@ [$ x y] [~ [$ z w]]]' )
+		self._parseStringTestSX( parser, 'x $ ~y @ z $ w',    '[$ x [~ [@ y [$ z w]]]]' )
+		self._parseStringTestSX( parser, '~x $ y @ z $ w',    '[~ [@ [$ x y] [$ z w]]]' )
 		

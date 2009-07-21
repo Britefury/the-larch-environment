@@ -378,7 +378,7 @@ from GSymCore.Languages.Python25 import Parser
 
 
 class Test_Precedence (unittest.TestCase):
-	def _matchTest(self, parser, input, expected):
+	def _parseStringTest(self, parser, input, expected):
 		result = parser.parseStringChars( input )
 		
 		if not result.isValid():
@@ -419,35 +419,35 @@ class Test_Precedence (unittest.TestCase):
 		
 		
 	def test_Load(self):
-		self._matchTest( self._parser.expression(), 'a', Nodes.Load( name='a' ) )
-		self._matchTest( self._parser.expression(), '(a)', Nodes.Load( parens='1', name='a' ) )	
+		self._parseStringTest( self._parser.expression(), 'a', Nodes.Load( name='a' ) )
+		self._parseStringTest( self._parser.expression(), '(a)', Nodes.Load( parens='1', name='a' ) )	
 		
 	def test_BinOp(self):
-		self._matchTest( self._parser.expression(), '(a+b)', Nodes.Add( parens='1', x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) )	
-		self._matchTest( self._parser.expression(), '(((a+b)))', Nodes.Add( parens='3', x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) )	
-		self._matchTest( self._parser.expression(), '(a*b)+c', Nodes.Add( x=Nodes.Mul( parens='1', x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ), y=Nodes.Load( name='c' ) ) )
-		self._matchTest( self._parser.expression(), '(a+b)*c', Nodes.Mul( x=Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ), y=Nodes.Load( name='c' ) ) )
-		self._matchTest( self._parser.expression(), '(a+b)/(a+b)', Nodes.Div( x=Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ), y=Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) ) )
-		self._matchTest( self._parser.expression(), '(a+b)/(c+d)+e', Nodes.Add( x=Nodes.Div( x=Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ), y=Nodes.Add( x=Nodes.Load( name='c' ), y=Nodes.Load( name='d' ) ) ), y=Nodes.Load( name='e' ) ) )
-		self._matchTest( self._parser.expression(), '((a+b)/(a+b)+c)*x', Nodes.Mul( x=Nodes.Add( x=Nodes.Div( x=Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ), y=Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) ), y=Nodes.Load( name='c' ) ), y=Nodes.Load( name='x' ) ) )
-		self._matchTest( self._parser.expression(), '(a/b)*(c+d)', Nodes.Mul( x=Nodes.Div( parens='1', x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ), y=Nodes.Add( x=Nodes.Load( name='c' ), y=Nodes.Load( name='d' ) ) ) )
-		self._matchTest( self._parser.expression(), '-(a+b)', Nodes.Negate( x=Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) ) )	
-		self._matchTest( self._parser.expression(), '-(a/b)', Nodes.Negate( x=Nodes.Div( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) ) )	
-		self._matchTest( self._parser.expression(), '-a*b', Nodes.Mul( x=Nodes.Negate( x=Nodes.Load( name='a' ) ), y=Nodes.Load( name='b' ) ) )
-		self._matchTest( self._parser.expression(), '-(a/b)*c', Nodes.Mul( x=Nodes.Negate( x=Nodes.Div( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) ), y=Nodes.Load( name='c' ) ) )
-		self._matchTest( self._parser.expression(), '-(a/b)*(c+d)', Nodes.Mul( x=Nodes.Negate( x=Nodes.Div( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) ), y=Nodes.Add( x=Nodes.Load( name='c' ), y=Nodes.Load( name='d' ) ) ) )
+		self._parseStringTest( self._parser.expression(), '(a+b)', Nodes.Add( parens='1', x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) )	
+		self._parseStringTest( self._parser.expression(), '(((a+b)))', Nodes.Add( parens='3', x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) )	
+		self._parseStringTest( self._parser.expression(), '(a*b)+c', Nodes.Add( x=Nodes.Mul( parens='1', x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ), y=Nodes.Load( name='c' ) ) )
+		self._parseStringTest( self._parser.expression(), '(a+b)*c', Nodes.Mul( x=Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ), y=Nodes.Load( name='c' ) ) )
+		self._parseStringTest( self._parser.expression(), '(a+b)/(a+b)', Nodes.Div( x=Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ), y=Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) ) )
+		self._parseStringTest( self._parser.expression(), '(a+b)/(c+d)+e', Nodes.Add( x=Nodes.Div( x=Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ), y=Nodes.Add( x=Nodes.Load( name='c' ), y=Nodes.Load( name='d' ) ) ), y=Nodes.Load( name='e' ) ) )
+		self._parseStringTest( self._parser.expression(), '((a+b)/(a+b)+c)*x', Nodes.Mul( x=Nodes.Add( x=Nodes.Div( x=Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ), y=Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) ), y=Nodes.Load( name='c' ) ), y=Nodes.Load( name='x' ) ) )
+		self._parseStringTest( self._parser.expression(), '(a/b)*(c+d)', Nodes.Mul( x=Nodes.Div( parens='1', x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ), y=Nodes.Add( x=Nodes.Load( name='c' ), y=Nodes.Load( name='d' ) ) ) )
+		self._parseStringTest( self._parser.expression(), '-(a+b)', Nodes.Negate( x=Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) ) )	
+		self._parseStringTest( self._parser.expression(), '-(a/b)', Nodes.Negate( x=Nodes.Div( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) ) )	
+		self._parseStringTest( self._parser.expression(), '-a*b', Nodes.Mul( x=Nodes.Negate( x=Nodes.Load( name='a' ) ), y=Nodes.Load( name='b' ) ) )
+		self._parseStringTest( self._parser.expression(), '-(a/b)*c', Nodes.Mul( x=Nodes.Negate( x=Nodes.Div( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) ), y=Nodes.Load( name='c' ) ) )
+		self._parseStringTest( self._parser.expression(), '-(a/b)*(c+d)', Nodes.Mul( x=Nodes.Negate( x=Nodes.Div( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) ), y=Nodes.Add( x=Nodes.Load( name='c' ), y=Nodes.Load( name='d' ) ) ) )
 		
 		
 	def test_LambdaConditional(self):
-		self._matchTest( self._parser.expression(), 'lambda: (x if y else z)', Nodes.LambdaExpr( params=[], expr=Nodes.ConditionalExpr( condition=Nodes.Load( name='y' ), expr=Nodes.Load( name='x' ), elseExpr=Nodes.Load( name='z' ) ) ) )
-		self._matchTest( self._parser.expression(), 'lambda: x if y else z', Nodes.LambdaExpr( params=[], expr=Nodes.ConditionalExpr( condition=Nodes.Load( name='y' ), expr=Nodes.Load( name='x' ), elseExpr=Nodes.Load( name='z' ) ) ) )
-		self._matchTest( self._parser.expression(), '(lambda: x) if y else z', Nodes.ConditionalExpr( condition=Nodes.Load( name='y' ), expr=Nodes.LambdaExpr( params=[], expr=Nodes.Load( name='x' ) ), elseExpr=Nodes.Load( name='z' ) ) )
-		self._matchTest( self._parser.expression(), 'x if (lambda: y) else z', Nodes.ConditionalExpr( condition=Nodes.LambdaExpr( params=[], expr=Nodes.Load( name='y' ) ), expr=Nodes.Load( name='x' ), elseExpr=Nodes.Load( name='z' ) ) )
+		self._parseStringTest( self._parser.expression(), 'lambda: (x if y else z)', Nodes.LambdaExpr( params=[], expr=Nodes.ConditionalExpr( condition=Nodes.Load( name='y' ), expr=Nodes.Load( name='x' ), elseExpr=Nodes.Load( name='z' ) ) ) )
+		self._parseStringTest( self._parser.expression(), 'lambda: x if y else z', Nodes.LambdaExpr( params=[], expr=Nodes.ConditionalExpr( condition=Nodes.Load( name='y' ), expr=Nodes.Load( name='x' ), elseExpr=Nodes.Load( name='z' ) ) ) )
+		self._parseStringTest( self._parser.expression(), '(lambda: x) if y else z', Nodes.ConditionalExpr( condition=Nodes.Load( name='y' ), expr=Nodes.LambdaExpr( params=[], expr=Nodes.Load( name='x' ) ), elseExpr=Nodes.Load( name='z' ) ) )
+		self._parseStringTest( self._parser.expression(), 'x if (lambda: y) else z', Nodes.ConditionalExpr( condition=Nodes.LambdaExpr( params=[], expr=Nodes.Load( name='y' ) ), expr=Nodes.Load( name='x' ), elseExpr=Nodes.Load( name='z' ) ) )
 		
 	def test_Statement(self):
-		self._matchTest( self._parser.statement(), '((a+b)/(a+b)+c)*x', Nodes.ExprStmt( expr=Nodes.Mul( x=Nodes.Add( x=Nodes.Div( x=Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ), y=Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) ), y=Nodes.Load( name='c' ) ), y=Nodes.Load( name='x' ) ) ) )
-		self._matchTest( self._parser.statement(), 'y=((a+b)/(a+b)+c)*x', Nodes.AssignStmt( targets=[ Nodes.SingleTarget( name='y' ) ], value=Nodes.Mul( x=Nodes.Add( x=Nodes.Div( x=Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ), y=Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) ), y=Nodes.Load( name='c' ) ), y=Nodes.Load( name='x' ) ) ) )
-		self._matchTest( self._parser.statement(), 'y=(((a+b))/(a+b)+c)*x', Nodes.AssignStmt( targets=[ Nodes.SingleTarget( name='y' ) ], value=Nodes.Mul( x=Nodes.Add( x=Nodes.Div( x=Nodes.Add( parens='1', x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ), y=Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) ), y=Nodes.Load( name='c' ) ), y=Nodes.Load( name='x' ) ) ) )
-		self._matchTest( self._parser.statement(), 'x=(a+b)/(c+d)+e', Nodes.AssignStmt( targets=[ Nodes.SingleTarget( name='x' ) ], value=Nodes.Add( x=Nodes.Div( x=Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ), y=Nodes.Add( x=Nodes.Load( name='c' ), y=Nodes.Load( name='d' ) ) ), y=Nodes.Load( name='e' ) ) ) )
-		self._matchTest( self._parser.statement(), 'x=a/(b+c+d)', Nodes.AssignStmt( targets=[ Nodes.SingleTarget( name='x' ) ], value=Nodes.Div( x=Nodes.Load( name='a' ), y=Nodes.Add( x=Nodes.Add( x=Nodes.Load( name='b' ), y=Nodes.Load( name='c' ) ), y=Nodes.Load( name='d' ) ) ) ) )
+		self._parseStringTest( self._parser.statement(), '((a+b)/(a+b)+c)*x', Nodes.ExprStmt( expr=Nodes.Mul( x=Nodes.Add( x=Nodes.Div( x=Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ), y=Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) ), y=Nodes.Load( name='c' ) ), y=Nodes.Load( name='x' ) ) ) )
+		self._parseStringTest( self._parser.statement(), 'y=((a+b)/(a+b)+c)*x', Nodes.AssignStmt( targets=[ Nodes.SingleTarget( name='y' ) ], value=Nodes.Mul( x=Nodes.Add( x=Nodes.Div( x=Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ), y=Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) ), y=Nodes.Load( name='c' ) ), y=Nodes.Load( name='x' ) ) ) )
+		self._parseStringTest( self._parser.statement(), 'y=(((a+b))/(a+b)+c)*x', Nodes.AssignStmt( targets=[ Nodes.SingleTarget( name='y' ) ], value=Nodes.Mul( x=Nodes.Add( x=Nodes.Div( x=Nodes.Add( parens='1', x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ), y=Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) ), y=Nodes.Load( name='c' ) ), y=Nodes.Load( name='x' ) ) ) )
+		self._parseStringTest( self._parser.statement(), 'x=(a+b)/(c+d)+e', Nodes.AssignStmt( targets=[ Nodes.SingleTarget( name='x' ) ], value=Nodes.Add( x=Nodes.Div( x=Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ), y=Nodes.Add( x=Nodes.Load( name='c' ), y=Nodes.Load( name='d' ) ) ), y=Nodes.Load( name='e' ) ) ) )
+		self._parseStringTest( self._parser.statement(), 'x=a/(b+c+d)', Nodes.AssignStmt( targets=[ Nodes.SingleTarget( name='x' ) ], value=Nodes.Div( x=Nodes.Load( name='a' ), y=Nodes.Add( x=Nodes.Add( x=Nodes.Load( name='b' ), y=Nodes.Load( name='c' ) ), y=Nodes.Load( name='d' ) ) ) ) )
 		

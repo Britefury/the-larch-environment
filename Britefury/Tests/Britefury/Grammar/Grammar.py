@@ -155,10 +155,10 @@ class GrammarTestCase (ParserTestCase):
 		
 		parser = g.expr()
 		
-		self._matchTest( parser, 'ab', [ 'a', 'b' ] )
-		self._matchFailTest( parser, 'cb' )
-		self._matchFailTest( parser, 'ad' )
-		self._matchFailTest( parser, 'cd' )
+		self._parseStringTest( parser, 'ab', [ 'a', 'b' ] )
+		self._parseStringFailTest( parser, 'cb' )
+		self._parseStringFailTest( parser, 'ad' )
+		self._parseStringFailTest( parser, 'cd' )
 
 		
 	def testGrammarSimpleOverload(self):
@@ -166,10 +166,10 @@ class GrammarTestCase (ParserTestCase):
 		
 		parser = g.expr()
 		
-		self._matchTest( parser, 'ab', [ 'a', 'b' ] )
-		self._matchTest( parser, 'cb', [ 'c', 'b' ] )
-		self._matchTest( parser, 'ad', [ 'a', 'd' ] )
-		self._matchTest( parser, 'cd', [ 'c', 'd' ] )
+		self._parseStringTest( parser, 'ab', [ 'a', 'b' ] )
+		self._parseStringTest( parser, 'cb', [ 'c', 'b' ] )
+		self._parseStringTest( parser, 'ad', [ 'a', 'd' ] )
+		self._parseStringTest( parser, 'cd', [ 'c', 'd' ] )
 		
 		
 	def testGrammarRecursive(self):
@@ -177,9 +177,9 @@ class GrammarTestCase (ParserTestCase):
 		
 		parser = g.expr()
 		
-		self._matchTest( parser, 'a', 'a' )
-		self._matchTest( parser, 'a*b', [ 'mul', 'a', 'b' ] )
-		self._matchTest( parser, 'a*b*c', [ 'mul', [ 'mul', 'a', 'b' ], 'c' ] )
+		self._parseStringTest( parser, 'a', 'a' )
+		self._parseStringTest( parser, 'a*b', [ 'mul', 'a', 'b' ] )
+		self._parseStringTest( parser, 'a*b*c', [ 'mul', [ 'mul', 'a', 'b' ], 'c' ] )
 
 		
 	def testGrammarRecursiveOverload(self):
@@ -187,12 +187,12 @@ class GrammarTestCase (ParserTestCase):
 		
 		parser = g.expr()
 		
-		self._matchTest( parser, 'a', 'a' )
-		self._matchTest( parser, 'a*b', [ 'mul', 'a', 'b' ] )
-		self._matchTest( parser, 'a*b*c', [ 'mul', [ 'mul', 'a', 'b' ], 'c' ] )
-		self._matchTest( parser, 'a+b', [ 'add', 'a', 'b' ] )
-		self._matchTest( parser, 'a+b*c', [ 'add', 'a', [ 'mul', 'b', 'c' ] ] )
-		self._matchTest( parser, 'a*b+c', [ 'add', [ 'mul', 'a', 'b' ], 'c' ] )
+		self._parseStringTest( parser, 'a', 'a' )
+		self._parseStringTest( parser, 'a*b', [ 'mul', 'a', 'b' ] )
+		self._parseStringTest( parser, 'a*b*c', [ 'mul', [ 'mul', 'a', 'b' ], 'c' ] )
+		self._parseStringTest( parser, 'a+b', [ 'add', 'a', 'b' ] )
+		self._parseStringTest( parser, 'a+b*c', [ 'add', 'a', [ 'mul', 'b', 'c' ] ] )
+		self._parseStringTest( parser, 'a*b+c', [ 'add', [ 'mul', 'a', 'b' ], 'c' ] )
 
 		
 	def testGrammarIndirectRecursiveOverload(self):
@@ -200,14 +200,14 @@ class GrammarTestCase (ParserTestCase):
 		
 		parser = g.expr()
 		
-		self._matchTest( parser, 'a', 'a' )
-		self._matchTest( parser, 'a*b', [ 'mul', 'a', 'b' ] )
-		self._matchTest( parser, 'a*b*c', [ 'mul', [ 'mul', 'a', 'b' ], 'c' ] )
-		self._matchTest( parser, 'a+b', [ 'add', 'a', 'b' ] )
-		self._matchTest( parser, 'a+b*c', [ 'add', 'a', [ 'mul', 'b', 'c' ] ] )
-		self._matchTest( parser, 'a*b+c', [ 'add', [ 'mul', 'a', 'b' ], 'c' ] )
-		self._matchTest( parser, '(a+b)*c', [ 'mul', [ 'add', 'a', 'b' ], 'c' ] )
-		self._matchTest( parser, 'a*(b+c)', [ 'mul', 'a', [ 'add', 'b', 'c' ] ] )
+		self._parseStringTest( parser, 'a', 'a' )
+		self._parseStringTest( parser, 'a*b', [ 'mul', 'a', 'b' ] )
+		self._parseStringTest( parser, 'a*b*c', [ 'mul', [ 'mul', 'a', 'b' ], 'c' ] )
+		self._parseStringTest( parser, 'a+b', [ 'add', 'a', 'b' ] )
+		self._parseStringTest( parser, 'a+b*c', [ 'add', 'a', [ 'mul', 'b', 'c' ] ] )
+		self._parseStringTest( parser, 'a*b+c', [ 'add', [ 'mul', 'a', 'b' ], 'c' ] )
+		self._parseStringTest( parser, '(a+b)*c', [ 'mul', [ 'add', 'a', 'b' ], 'c' ] )
+		self._parseStringTest( parser, 'a*(b+c)', [ 'mul', 'a', [ 'add', 'b', 'c' ] ] )
 
 		
 	def testGrammarRecursiveList(self):
@@ -244,14 +244,14 @@ class GrammarTestCase (ParserTestCase):
 		self.assert_( isinstance( mul, Production ) )
 		self.assert_( mul.getExpression() is x[0] )
 
-		self._matchTest( g.expr(), 'a', 'a' )
-		self._matchTest( g.expr(), 'a*b', [ 'mul', 'a', 'b' ] )
-		self._matchTest( g.expr(), 'a*b*c', [ 'mul', [ 'mul', 'a', 'b' ], 'c' ] )
-		self._matchTest( g.expr(), 'a+b', [ 'add', 'a', 'b' ] )
-		self._matchTest( g.expr(), 'a+b*c', [ 'add', 'a', [ 'mul', 'b', 'c' ] ] )
-		self._matchTest( g.expr(), 'a*b+c', [ 'add', [ 'mul', 'a', 'b' ], 'c' ] )
-		self._matchTest( g.expr(), '(a+b)*c', [ 'mul', [ 'add', 'a', 'b' ], 'c' ] )
-		self._matchTest( g.expr(), 'a*(b+c)', [ 'mul', 'a', [ 'add', 'b', 'c' ] ] )
+		self._parseStringTest( g.expr(), 'a', 'a' )
+		self._parseStringTest( g.expr(), 'a*b', [ 'mul', 'a', 'b' ] )
+		self._parseStringTest( g.expr(), 'a*b*c', [ 'mul', [ 'mul', 'a', 'b' ], 'c' ] )
+		self._parseStringTest( g.expr(), 'a+b', [ 'add', 'a', 'b' ] )
+		self._parseStringTest( g.expr(), 'a+b*c', [ 'add', 'a', [ 'mul', 'b', 'c' ] ] )
+		self._parseStringTest( g.expr(), 'a*b+c', [ 'add', [ 'mul', 'a', 'b' ], 'c' ] )
+		self._parseStringTest( g.expr(), '(a+b)*c', [ 'mul', [ 'add', 'a', 'b' ], 'c' ] )
+		self._parseStringTest( g.expr(), 'a*(b+c)', [ 'mul', 'a', [ 'add', 'b', 'c' ] ] )
 
 		
 		

@@ -26,18 +26,18 @@ def _dataForStr(data):
 	
 
 
-def replace(ctx, data, replacement):
-	if isinstance( data, DocTreeNode ):
-		parent = data.getParentTreeNode()
+def replace(ctx, target, replacement):
+	if isinstance( target, DocTreeNode ):
+		parent = target.getParentTreeNode()
 		if parent is None:
-			print 'EditOperations:replace(): no parent ', data
-		index = parent.indexOfById( data.getNode() )
+			print 'EditOperations:replace(): no parent ', target
+		index = parent.indexOfById( target.getNode() )
 		if index == -1:
 			raise ValueError, 'could not replace'
 		parent[index] = replacement
 		return parent[index]
 	else:
-		raise TypeError, 'EditOperations:replace(): @data must be a DocTreeNode'
+		raise TypeError, 'EditOperations:replace(): @target must be a DocTreeNode'
 	
 	
 def replaceNodeContents(ctx, node, replacement):
@@ -52,83 +52,83 @@ def replaceNodeContents(ctx, node, replacement):
 		raise TypeError, 'EditOperations:replace(): @node must be a DocTreeNode'
 	
 	
-def replaceWithRange(ctx, data, replacement):
-	if isinstance( data, DocTreeNode ):
-		parent = data.getParentTreeNode()
+def replaceWithRange(ctx, target, replacement):
+	if isinstance( target, DocTreeNode ):
+		parent = target.getParentTreeNode()
 		if parent is None:
-			print 'EditOperations:replaceWithRange(): no parent ', data
-		index = parent.indexOfById( data.getNode() )
+			print 'EditOperations:replaceWithRange(): no parent ', target
+		index = parent.indexOfById( target.getNode() )
 		if index == -1:
 			raise ValueError, 'could not replace with range'
 		parent[index:index+1] = replacement
 		return parent[index:index+len(replacement)]
 	else:
-		raise TypeError, 'EditOperations:replaceWithRange(): @data must be a DocTreeNode; it is a %s'  %  ( type( data ), )
+		raise TypeError, 'EditOperations:replaceWithRange(): @target must be a DocTreeNode; it is a %s'  %  ( type( target ), )
 	
 	
 	
 
-def append(ctx, xs, data):
-	if isinstance( x, DocTreeNode ):
-		#xs.append( data )
-		xs.add( data )
-		return xs[-1]
+def append(ctx, target, data):
+	if isinstance( target, DocTreeNode ):
+		#target.append( data )
+		target.add( data )
+		return target[-1]
 	else:
-		raise TypeError, 'EditOperations:append(): @x must be a DocTreeNode'
+		raise TypeError, 'EditOperations:append(): @target must be a DocTreeNode'
 
-def prepend(ctx, xs, data):
-	if isinstance( xs, DocTreeNode ):
-		#xs.insert( 0, data )
-		xs.add( 0, data )
-		return xs[0]
+def prepend(ctx, target, data):
+	if isinstance( target, DocTreeNode ):
+		#target.insert( 0, data )
+		target.add( 0, data )
+		return target[0]
 	else:
-		raise TypeError, 'EditOperations:prepend(): @x must be a DocTreeNode'
+		raise TypeError, 'EditOperations:prepend(): @target must be a DocTreeNode'
 
-def insertElement(ctx, xs, index, data):
-	if isinstance( xs, DocTreeNode ):
+def insertElement(ctx, target, index, data):
+	if isinstance( target, DocTreeNode ):
 		#parent.insert( index, data )
-		xs.add( index, data )
-		return xs[index]
+		target.add( index, data )
+		return target[index]
 	else:
-		raise TypeError, 'EditOperations:insertElement(): @xs must be a DocTreeNode'
+		raise TypeError, 'EditOperations:insertElement(): @target must be a DocTreeNode'
 	
-def insertRange(ctx, xs, index, data):
-	if isinstance( xs, DocTreeNode ):
+def insertRange(ctx, target, index, data):
+	if isinstance( target, DocTreeNode ):
 		#parent.insert( index, data )
-		xs.addAll( index, data )
-		return xs[index:index+len(data)]
+		target.addAll( index, data )
+		return target[index:index+len(data)]
 	else:
-		raise TypeError, 'EditOperations:insertRange(): @xs must be a DocTreeNode'
+		raise TypeError, 'EditOperations:insertRange(): @target must be a DocTreeNode'
 	
-def insertBefore(ctx, x, data):
-	if isinstance( x, DocTreeNode ):
-		parent = x.getParentTreeNode()
-		index = parent.indexOfById( x.getNode() )
+def insertBefore(ctx, target, data):
+	if isinstance( target, DocTreeNode ):
+		parent = target.getParentTreeNode()
+		index = parent.indexOfById( target.getNode() )
 		if index == -1:
 			raise ValueError, 'could not insert before'
 		#parent.insert( index, data )
 		parent.add( index, data )
 		return parent[index]
 	else:
-		raise TypeError, 'EditOperations:insertBefore(): @x must be a DocTreeNode'
+		raise TypeError, 'EditOperations:insertBefore(): @target must be a DocTreeNode'
 
 
-def insertRangeBefore(ctx, x, data):
-	if isinstance( x, DocTreeNode ):
-		parent = x.getParentTreeNode()
-		index = parent.indexOfById( x.getNode() )
+def insertRangeBefore(ctx, target, data):
+	if isinstance( target, DocTreeNode ):
+		parent = target.getParentTreeNode()
+		index = parent.indexOfById( target.getNode() )
 		if index == -1:
 			raise ValueError, 'could not insert range before'
 		parent[index:index] = data
 		return parent[index:index+len(data)]
 	else:
-		raise TypeError, 'EditOperations:insertRangeBefore(): @x must be a DocTreeNode'
+		raise TypeError, 'EditOperations:insertRangeBefore(): @target must be a DocTreeNode'
 
 
-def insertAfter(ctx, x, data):
-	if isinstance( x, DocTreeNode ):
-		parent = x.getParentTreeNode()
-		index = parent.getNode().indexOfById( x.getNode() )
+def insertAfter(ctx, target, data):
+	if isinstance( target, DocTreeNode ):
+		parent = target.getParentTreeNode()
+		index = parent.getNode().indexOfById( target.getNode() )
 		if index == -1:
 			raise ValueError, 'could not insert after'
 		index += 1
@@ -136,29 +136,29 @@ def insertAfter(ctx, x, data):
 		parent.add( index, data )
 		return parent[index]
 	else:
-		raise TypeError, 'EditOperations:insertAfter(): @x must be a DocTreeNode'
+		raise TypeError, 'EditOperations:insertAfter(): @target must be a DocTreeNode'
 
 	
-def insertRangeAfter(ctx, x, data):
-	if isinstance( x, DocTreeNode ):
-		parent = x.getParentTreeNode()
-		index = parent.getNode().indexOfById( x.getNode() )
+def insertRangeAfter(ctx, target, data):
+	if isinstance( target, DocTreeNode ):
+		parent = target.getParentTreeNode()
+		index = parent.getNode().indexOfById( target.getNode() )
 		if index == -1:
 			raise ValueError, 'could not insert range after'
 		index += 1
 		parent[index:index] = data
 		return parent[index:index+len(data)]
 	else:
-		raise TypeError, 'EditOperations:insertRangeAfter(): @x must be a DocTreeNode'
+		raise TypeError, 'EditOperations:insertRangeAfter(): @target must be a DocTreeNode'
 
 
-def remove(ctx, x):
-	if isinstance( x, DocTreeNode ):
-		parent = x.getParentTreeNode()
-		parent.remove( x.getNode() )
+def remove(ctx, target):
+	if isinstance( target, DocTreeNode ):
+		parent = target.getParentTreeNode()
+		parent.remove( target.getNode() )
 		return None
 	else:
-		raise TypeError, 'EditOperations:remove(): @x must be a DocTreeNode'
+		raise TypeError, 'EditOperations:remove(): @target must be a DocTreeNode'
 
 	
 	

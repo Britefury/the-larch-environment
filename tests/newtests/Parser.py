@@ -528,86 +528,86 @@ import unittest
 
 class TestCase_Python25Parser (ParserTestCase):
 	def test_shortStringLiteral(self):
-		self._matchTest( expression, '\'abc\'', [ 'stringLiteral', 'ascii', 'single', 'abc' ] )
-		self._matchTest( expression, '\"abc\"', [ 'stringLiteral', 'ascii', 'double', 'abc' ] )
-		self._matchTest( expression, 'u\'abc\'', [ 'stringLiteral', 'unicode', 'single', 'abc' ] )
-		self._matchTest( expression, 'u\"abc\"', [ 'stringLiteral', 'unicode', 'double', 'abc' ] )
-		self._matchTest( expression, 'r\'abc\'', [ 'stringLiteral', 'ascii-regex', 'single', 'abc' ] )
-		self._matchTest( expression, 'r\"abc\"', [ 'stringLiteral', 'ascii-regex', 'double', 'abc' ] )
-		self._matchTest( expression, 'ur\'abc\'', [ 'stringLiteral', 'unicode-regex', 'single', 'abc' ] )
-		self._matchTest( expression, 'ur\"abc\"', [ 'stringLiteral', 'unicode-regex', 'double', 'abc' ] )
+		self._parseStringTest( expression, '\'abc\'', [ 'stringLiteral', 'ascii', 'single', 'abc' ] )
+		self._parseStringTest( expression, '\"abc\"', [ 'stringLiteral', 'ascii', 'double', 'abc' ] )
+		self._parseStringTest( expression, 'u\'abc\'', [ 'stringLiteral', 'unicode', 'single', 'abc' ] )
+		self._parseStringTest( expression, 'u\"abc\"', [ 'stringLiteral', 'unicode', 'double', 'abc' ] )
+		self._parseStringTest( expression, 'r\'abc\'', [ 'stringLiteral', 'ascii-regex', 'single', 'abc' ] )
+		self._parseStringTest( expression, 'r\"abc\"', [ 'stringLiteral', 'ascii-regex', 'double', 'abc' ] )
+		self._parseStringTest( expression, 'ur\'abc\'', [ 'stringLiteral', 'unicode-regex', 'single', 'abc' ] )
+		self._parseStringTest( expression, 'ur\"abc\"', [ 'stringLiteral', 'unicode-regex', 'double', 'abc' ] )
 		
 		
 	def test_integerLiteral(self):
-		self._matchTest( expression, '123', [ 'intLiteral', 'decimal', 'int', '123' ] )
-		self._matchTest( expression, '123L', [ 'intLiteral', 'decimal', 'long', '123' ] )
-		self._matchTest( expression, '0x123', [ 'intLiteral', 'hex', 'int', '0x123' ] )
-		self._matchTest( expression, '0x123L', [ 'intLiteral', 'hex', 'long', '0x123' ] )
+		self._parseStringTest( expression, '123', [ 'intLiteral', 'decimal', 'int', '123' ] )
+		self._parseStringTest( expression, '123L', [ 'intLiteral', 'decimal', 'long', '123' ] )
+		self._parseStringTest( expression, '0x123', [ 'intLiteral', 'hex', 'int', '0x123' ] )
+		self._parseStringTest( expression, '0x123L', [ 'intLiteral', 'hex', 'long', '0x123' ] )
 	
 		
 	def test_floatLiteral(self):
-		self._matchTest( expression, '123.0', [ 'floatLiteral', '123.0' ] )
+		self._parseStringTest( expression, '123.0', [ 'floatLiteral', '123.0' ] )
 	
 		
 	def test_imaginaryLiteral(self):
-		self._matchTest( expression, '123.0j', [ 'imaginaryLiteral', '123.0j' ] )
+		self._parseStringTest( expression, '123.0j', [ 'imaginaryLiteral', '123.0j' ] )
 	
 		
 	def testTargets(self):
-		self._matchTest( targetList, 'a', [ 'singleTarget', 'a' ] )
-		self._matchTest( targetList, '(a)', [ 'singleTarget', 'a' ] )
+		self._parseStringTest( targetList, 'a', [ 'singleTarget', 'a' ] )
+		self._parseStringTest( targetList, '(a)', [ 'singleTarget', 'a' ] )
 		
-		self._matchTest( targetList, '(a,)', [ 'tupleTarget', [ 'singleTarget', 'a' ] ] )
-		self._matchTest( targetList, 'a,b', [ 'tupleTarget', [ 'singleTarget', 'a' ],  [ 'singleTarget', 'b' ] ] )
-		self._matchTest( targetList, '(a,b)', [ 'tupleTarget', [ 'singleTarget', 'a' ],  [ 'singleTarget', 'b' ] ] )
-		self._matchTest( targetList, '(a,b,)', [ 'tupleTarget', [ 'singleTarget', 'a' ],  [ 'singleTarget', 'b' ] ] )
-		self._matchTest( targetList, '(a,b),(c,d)', [ 'tupleTarget', [ 'tupleTarget', [ 'singleTarget', 'a' ], [ 'singleTarget', 'b' ] ], [ 'tupleTarget', [ 'singleTarget', 'c' ], [ 'singleTarget', 'd' ] ] ] )
+		self._parseStringTest( targetList, '(a,)', [ 'tupleTarget', [ 'singleTarget', 'a' ] ] )
+		self._parseStringTest( targetList, 'a,b', [ 'tupleTarget', [ 'singleTarget', 'a' ],  [ 'singleTarget', 'b' ] ] )
+		self._parseStringTest( targetList, '(a,b)', [ 'tupleTarget', [ 'singleTarget', 'a' ],  [ 'singleTarget', 'b' ] ] )
+		self._parseStringTest( targetList, '(a,b,)', [ 'tupleTarget', [ 'singleTarget', 'a' ],  [ 'singleTarget', 'b' ] ] )
+		self._parseStringTest( targetList, '(a,b),(c,d)', [ 'tupleTarget', [ 'tupleTarget', [ 'singleTarget', 'a' ], [ 'singleTarget', 'b' ] ], [ 'tupleTarget', [ 'singleTarget', 'c' ], [ 'singleTarget', 'd' ] ] ] )
 		
-		self._matchFailTest( targetList, '(a,) (b,)' )
+		self._parseStringFailTest( targetList, '(a,) (b,)' )
 
-		self._matchTest( targetList, '[a]', [ 'listTarget', [ 'singleTarget', 'a' ] ] )
-		self._matchTest( targetList, '[a,]', [ 'listTarget', [ 'singleTarget', 'a' ] ] )
-		self._matchTest( targetList, '[a,b]', [ 'listTarget', [ 'singleTarget', 'a' ],  [ 'singleTarget', 'b' ] ] )
-		self._matchTest( targetList, '[a,b,]', [ 'listTarget', [ 'singleTarget', 'a' ],  [ 'singleTarget', 'b' ] ] )
-		self._matchTest( targetList, '[a],[b,]', [ 'tupleTarget', [ 'listTarget', [ 'singleTarget', 'a' ] ], [ 'listTarget', [ 'singleTarget', 'b' ] ] ] )
-		self._matchTest( targetList, '[(a,)],[(b,)]', [ 'tupleTarget', [ 'listTarget', [ 'tupleTarget', [ 'singleTarget', 'a' ] ] ], [ 'listTarget', [ 'tupleTarget', [ 'singleTarget', 'b' ] ] ] ] )
+		self._parseStringTest( targetList, '[a]', [ 'listTarget', [ 'singleTarget', 'a' ] ] )
+		self._parseStringTest( targetList, '[a,]', [ 'listTarget', [ 'singleTarget', 'a' ] ] )
+		self._parseStringTest( targetList, '[a,b]', [ 'listTarget', [ 'singleTarget', 'a' ],  [ 'singleTarget', 'b' ] ] )
+		self._parseStringTest( targetList, '[a,b,]', [ 'listTarget', [ 'singleTarget', 'a' ],  [ 'singleTarget', 'b' ] ] )
+		self._parseStringTest( targetList, '[a],[b,]', [ 'tupleTarget', [ 'listTarget', [ 'singleTarget', 'a' ] ], [ 'listTarget', [ 'singleTarget', 'b' ] ] ] )
+		self._parseStringTest( targetList, '[(a,)],[(b,)]', [ 'tupleTarget', [ 'listTarget', [ 'tupleTarget', [ 'singleTarget', 'a' ] ] ], [ 'listTarget', [ 'tupleTarget', [ 'singleTarget', 'b' ] ] ] ] )
 
-		self._matchTest( subscript, 'a[x]', [ 'subscript', [ 'var', 'a' ], [ 'var', 'x' ] ] )
-		self._matchTest( attributeRef | subscript, 'a[x]', [ 'subscript', [ 'var', 'a' ], [ 'var', 'x' ] ] )
-		self._matchTest( targetItem, 'a[x]', [ 'subscript', [ 'var', 'a' ], [ 'var', 'x' ] ] )
-		self._matchTest( targetList, 'a[x]', [ 'subscript', [ 'var', 'a' ], [ 'var', 'x' ] ] )
-		self._matchTest( targetList, 'a[x][y]', [ 'subscript', [ 'subscript', [ 'var', 'a' ], [ 'var', 'x' ] ], [ 'var', 'y' ] ] )
-		self._matchTest( targetList, 'a.b', [ 'attributeRef', [ 'var', 'a' ], 'b' ] )
-		self._matchTest( targetList, 'a.b.c', [ 'attributeRef', [ 'attributeRef', [ 'var', 'a' ], 'b' ], 'c' ] )
+		self._parseStringTest( subscript, 'a[x]', [ 'subscript', [ 'var', 'a' ], [ 'var', 'x' ] ] )
+		self._parseStringTest( attributeRef | subscript, 'a[x]', [ 'subscript', [ 'var', 'a' ], [ 'var', 'x' ] ] )
+		self._parseStringTest( targetItem, 'a[x]', [ 'subscript', [ 'var', 'a' ], [ 'var', 'x' ] ] )
+		self._parseStringTest( targetList, 'a[x]', [ 'subscript', [ 'var', 'a' ], [ 'var', 'x' ] ] )
+		self._parseStringTest( targetList, 'a[x][y]', [ 'subscript', [ 'subscript', [ 'var', 'a' ], [ 'var', 'x' ] ], [ 'var', 'y' ] ] )
+		self._parseStringTest( targetList, 'a.b', [ 'attributeRef', [ 'var', 'a' ], 'b' ] )
+		self._parseStringTest( targetList, 'a.b.c', [ 'attributeRef', [ 'attributeRef', [ 'var', 'a' ], 'b' ], 'c' ] )
 
-		self._matchTest( targetList, 'a.b[x]', [ 'subscript', [ 'attributeRef', [ 'var', 'a' ], 'b' ], [ 'var', 'x' ] ] )
-		self._matchTest( targetList, 'a[x].b', [ 'attributeRef', [ 'subscript', [ 'var', 'a' ], [ 'var', 'x' ] ], 'b' ] )
+		self._parseStringTest( targetList, 'a.b[x]', [ 'subscript', [ 'attributeRef', [ 'var', 'a' ], 'b' ], [ 'var', 'x' ] ] )
+		self._parseStringTest( targetList, 'a[x].b', [ 'attributeRef', [ 'subscript', [ 'var', 'a' ], [ 'var', 'x' ] ], 'b' ] )
 
 		
 	def testListLiteral(self):
-		self._matchTest( expression, '[a,b]', [ 'listLiteral', [ 'var', 'a' ], [ 'var', 'b' ] ] )
-		self._matchTest( expression, '[a,b,]', [ 'listLiteral', [ 'var', 'a' ], [ 'var', 'b' ] ] )
+		self._parseStringTest( expression, '[a,b]', [ 'listLiteral', [ 'var', 'a' ], [ 'var', 'b' ] ] )
+		self._parseStringTest( expression, '[a,b,]', [ 'listLiteral', [ 'var', 'a' ], [ 'var', 'b' ] ] )
 		
 		
 	def testListComprehension(self):
-		self._matchTest( expression, '[i  for i in a]', [ 'listComprehension', [ 'var', 'i' ],
+		self._parseStringTest( expression, '[i  for i in a]', [ 'listComprehension', [ 'var', 'i' ],
 												[ 'listFor', [ 'singleTarget', 'i' ], [ 'var', 'a' ] ]
 										] )
-		self._matchFailTest( expression, '[i  if x]', )
-		self._matchTest( expression, '[i  for i in a  if x]', [ 'listComprehension', [ 'var', 'i' ],
+		self._parseStringFailTest( expression, '[i  if x]', )
+		self._parseStringTest( expression, '[i  for i in a  if x]', [ 'listComprehension', [ 'var', 'i' ],
 												[ 'listFor', [ 'singleTarget', 'i' ], [ 'var', 'a' ] ],
 												[ 'listIf', [ 'var', 'x' ] ]
 										] )
-		self._matchTest( expression, '[i  for i in a  for j in b]', [ 'listComprehension', [ 'var', 'i' ],
+		self._parseStringTest( expression, '[i  for i in a  for j in b]', [ 'listComprehension', [ 'var', 'i' ],
 												[ 'listFor', [ 'singleTarget', 'i' ], [ 'var', 'a' ] ],
 												[ 'listFor', [ 'singleTarget', 'j' ], [ 'var', 'b' ] ]
 										] )
-		self._matchTest( expression, '[i  for i in a  if x  for j in b]', [ 'listComprehension', [ 'var', 'i' ],
+		self._parseStringTest( expression, '[i  for i in a  if x  for j in b]', [ 'listComprehension', [ 'var', 'i' ],
 												[ 'listFor', [ 'singleTarget', 'i' ], [ 'var', 'a' ] ],
 												[ 'listIf', [ 'var', 'x' ] ],
 												[ 'listFor', [ 'singleTarget', 'j' ], [ 'var', 'b' ] ]
 										] )
-		self._matchTest( expression, '[i  for i in a  if x  for j in b  if y]', [ 'listComprehension', [ 'var', 'i' ],
+		self._parseStringTest( expression, '[i  for i in a  if x  for j in b  if y]', [ 'listComprehension', [ 'var', 'i' ],
 												[ 'listFor', [ 'singleTarget', 'i' ], [ 'var', 'a' ] ],
 												[ 'listIf', [ 'var', 'x' ] ],
 												[ 'listFor', [ 'singleTarget', 'j' ], [ 'var', 'b' ] ],
@@ -617,24 +617,24 @@ class TestCase_Python25Parser (ParserTestCase):
 
 		
 	def testGeneratorExpression(self):
-		self._matchTest( expression, '(i  for i in a)', [ 'generatorExpression', [ 'var', 'i' ],
+		self._parseStringTest( expression, '(i  for i in a)', [ 'generatorExpression', [ 'var', 'i' ],
 												[ 'genFor', [ 'singleTarget', 'i' ], [ 'var', 'a' ] ]
 										] )
-		self._matchFailTest( expression, '(i  if x)', )
-		self._matchTest( expression, '(i  for i in a  if x)', [ 'generatorExpression', [ 'var', 'i' ],
+		self._parseStringFailTest( expression, '(i  if x)', )
+		self._parseStringTest( expression, '(i  for i in a  if x)', [ 'generatorExpression', [ 'var', 'i' ],
 												[ 'genFor', [ 'singleTarget', 'i' ], [ 'var', 'a' ] ],
 												[ 'genIf', [ 'var', 'x' ] ]
 										] )
-		self._matchTest( expression, '(i  for i in a  for j in b)', [ 'generatorExpression', [ 'var', 'i' ],
+		self._parseStringTest( expression, '(i  for i in a  for j in b)', [ 'generatorExpression', [ 'var', 'i' ],
 												[ 'genFor', [ 'singleTarget', 'i' ], [ 'var', 'a' ] ],
 												[ 'genFor', [ 'singleTarget', 'j' ], [ 'var', 'b' ] ]
 										] )
-		self._matchTest( expression, '(i  for i in a  if x  for j in b)', [ 'generatorExpression', [ 'var', 'i' ],
+		self._parseStringTest( expression, '(i  for i in a  if x  for j in b)', [ 'generatorExpression', [ 'var', 'i' ],
 												[ 'genFor', [ 'singleTarget', 'i' ], [ 'var', 'a' ] ],
 												[ 'genIf', [ 'var', 'x' ] ],
 												[ 'genFor', [ 'singleTarget', 'j' ], [ 'var', 'b' ] ]
 										] )
-		self._matchTest( expression, '(i  for i in a  if x  for j in b  if y)', [ 'generatorExpression', [ 'var', 'i' ],
+		self._parseStringTest( expression, '(i  for i in a  if x  for j in b  if y)', [ 'generatorExpression', [ 'var', 'i' ],
 												[ 'genFor', [ 'singleTarget', 'i' ], [ 'var', 'a' ] ],
 												[ 'genIf', [ 'var', 'x' ] ],
 												[ 'genFor', [ 'singleTarget', 'j' ], [ 'var', 'b' ] ],
@@ -643,296 +643,296 @@ class TestCase_Python25Parser (ParserTestCase):
 
 		
 	def testDictLiteral(self):
-		self._matchTest( expression, '{a:x,b:y}', [ 'dictLiteral', [ 'keyValuePair', [ 'var', 'a' ], [ 'var', 'x' ] ],   [ 'keyValuePair', [ 'var', 'b' ], [ 'var', 'y' ] ] ] )
-		self._matchTest( expression, '{a:x,b:y,}', [ 'dictLiteral', [ 'keyValuePair', [ 'var', 'a' ], [ 'var', 'x' ] ],   [ 'keyValuePair', [ 'var', 'b' ], [ 'var', 'y' ] ] ] )
+		self._parseStringTest( expression, '{a:x,b:y}', [ 'dictLiteral', [ 'keyValuePair', [ 'var', 'a' ], [ 'var', 'x' ] ],   [ 'keyValuePair', [ 'var', 'b' ], [ 'var', 'y' ] ] ] )
+		self._parseStringTest( expression, '{a:x,b:y,}', [ 'dictLiteral', [ 'keyValuePair', [ 'var', 'a' ], [ 'var', 'x' ] ],   [ 'keyValuePair', [ 'var', 'b' ], [ 'var', 'y' ] ] ] )
 		
 		
 	def testYieldExpression(self):
-		self._matchTest( expression, '(yield 2+3)', [ 'yieldExpr', [ 'add', [ 'intLiteral', 'decimal', 'int', '2' ], [ 'intLiteral', 'decimal', 'int', '3' ] ] ] )
+		self._parseStringTest( expression, '(yield 2+3)', [ 'yieldExpr', [ 'add', [ 'intLiteral', 'decimal', 'int', '2' ], [ 'intLiteral', 'decimal', 'int', '3' ] ] ] )
 		
 		
 
 	def testAttributeRef(self):
-		self._matchTest( expression, 'a.b', [ 'attributeRef', [ 'var', 'a' ], 'b' ] )
+		self._parseStringTest( expression, 'a.b', [ 'attributeRef', [ 'var', 'a' ], 'b' ] )
 		
 		
 	def testSubscript(self):
-		self._matchTest( expression, 'a[x]', [ 'subscript', [ 'var', 'a' ], [ 'var', 'x' ] ] )
-		self._matchTest( expression, 'a[x:p]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptSlice', [ 'var', 'x' ], [ 'var', 'p' ] ] ] )
-		self._matchTest( expression, 'a[x:]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptSlice', [ 'var', 'x' ], None ] ] )
-		self._matchTest( expression, 'a[:p]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptSlice', None, [ 'var', 'p' ] ] ] )
-		self._matchTest( expression, 'a[:]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptSlice', None, None ] ] )
-		self._matchTest( expression, 'a[x:p:f]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptLongSlice', [ 'var', 'x' ], [ 'var', 'p' ], [ 'var', 'f' ] ] ] )
-		self._matchTest( expression, 'a[x:p:]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptLongSlice', [ 'var', 'x' ], [ 'var', 'p' ], None ] ] )
-		self._matchTest( expression, 'a[x::f]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptLongSlice', [ 'var', 'x' ], None, [ 'var', 'f' ] ] ] )
-		self._matchTest( expression, 'a[:p:f]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptLongSlice', None, [ 'var', 'p' ], [ 'var', 'f' ] ] ] )
-		self._matchTest( expression, 'a[::]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptLongSlice', None, None, None ] ] )
-		self._matchTest( expression, 'a[::f]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptLongSlice', None, None, [ 'var', 'f' ] ] ] )
-		self._matchTest( expression, 'a[x::]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptLongSlice', [ 'var', 'x' ], None, None ] ] )
-		self._matchTest( expression, 'a[:p:]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptLongSlice', None, [ 'var', 'p' ], None ] ] )
-		self._matchTest( expression, 'a[x,y]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptTuple', [ 'var', 'x' ], [ 'var', 'y' ] ] ] )
-		self._matchTest( expression, 'a[x:p,y:q]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptTuple', [ 'subscriptSlice', [ 'var', 'x' ], [ 'var', 'p' ] ], [ 'subscriptSlice', [ 'var', 'y' ], [ 'var', 'q' ] ] ] ] )
-		self._matchTest( expression, 'a[x:p:f,y:q:g]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptTuple', [ 'subscriptLongSlice', [ 'var', 'x' ], [ 'var', 'p' ], [ 'var', 'f' ] ], [ 'subscriptLongSlice', [ 'var', 'y' ], [ 'var', 'q' ], [ 'var', 'g' ] ] ] ] )
-		self._matchTest( expression, 'a[x:p:f,y:q:g,...]', [ 'subscript', [ 'var', 'a' ],
+		self._parseStringTest( expression, 'a[x]', [ 'subscript', [ 'var', 'a' ], [ 'var', 'x' ] ] )
+		self._parseStringTest( expression, 'a[x:p]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptSlice', [ 'var', 'x' ], [ 'var', 'p' ] ] ] )
+		self._parseStringTest( expression, 'a[x:]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptSlice', [ 'var', 'x' ], None ] ] )
+		self._parseStringTest( expression, 'a[:p]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptSlice', None, [ 'var', 'p' ] ] ] )
+		self._parseStringTest( expression, 'a[:]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptSlice', None, None ] ] )
+		self._parseStringTest( expression, 'a[x:p:f]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptLongSlice', [ 'var', 'x' ], [ 'var', 'p' ], [ 'var', 'f' ] ] ] )
+		self._parseStringTest( expression, 'a[x:p:]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptLongSlice', [ 'var', 'x' ], [ 'var', 'p' ], None ] ] )
+		self._parseStringTest( expression, 'a[x::f]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptLongSlice', [ 'var', 'x' ], None, [ 'var', 'f' ] ] ] )
+		self._parseStringTest( expression, 'a[:p:f]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptLongSlice', None, [ 'var', 'p' ], [ 'var', 'f' ] ] ] )
+		self._parseStringTest( expression, 'a[::]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptLongSlice', None, None, None ] ] )
+		self._parseStringTest( expression, 'a[::f]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptLongSlice', None, None, [ 'var', 'f' ] ] ] )
+		self._parseStringTest( expression, 'a[x::]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptLongSlice', [ 'var', 'x' ], None, None ] ] )
+		self._parseStringTest( expression, 'a[:p:]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptLongSlice', None, [ 'var', 'p' ], None ] ] )
+		self._parseStringTest( expression, 'a[x,y]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptTuple', [ 'var', 'x' ], [ 'var', 'y' ] ] ] )
+		self._parseStringTest( expression, 'a[x:p,y:q]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptTuple', [ 'subscriptSlice', [ 'var', 'x' ], [ 'var', 'p' ] ], [ 'subscriptSlice', [ 'var', 'y' ], [ 'var', 'q' ] ] ] ] )
+		self._parseStringTest( expression, 'a[x:p:f,y:q:g]', [ 'subscript', [ 'var', 'a' ], [ 'subscriptTuple', [ 'subscriptLongSlice', [ 'var', 'x' ], [ 'var', 'p' ], [ 'var', 'f' ] ], [ 'subscriptLongSlice', [ 'var', 'y' ], [ 'var', 'q' ], [ 'var', 'g' ] ] ] ] )
+		self._parseStringTest( expression, 'a[x:p:f,y:q:g,...]', [ 'subscript', [ 'var', 'a' ],
 								     [ 'subscriptTuple', [ 'subscriptLongSlice', [ 'var', 'x' ], [ 'var', 'p' ], [ 'var', 'f' ] ], [ 'subscriptLongSlice', [ 'var', 'y' ], [ 'var', 'q' ], [ 'var', 'g' ] ], [ 'ellipsis' ] ] ] )
 		
 		
 
 	def testCall(self):
-		self._matchTest( expression, 'a()', [ 'call', [ 'var', 'a' ] ] )
-		self._matchTest( expression, 'a(f)', [ 'call', [ 'var', 'a' ], [ 'var', 'f' ] ] )
-		self._matchTest( expression, 'a(f,)', [ 'call', [ 'var', 'a' ], [ 'var', 'f' ] ] )
-		self._matchTest( expression, 'a(f,g)', [ 'call', [ 'var', 'a' ], [ 'var', 'f' ], [ 'var', 'g' ] ] )
-		self._matchTest( expression, 'a(f,g,m=a)', [ 'call', [ 'var', 'a' ], [ 'var', 'f' ], [ 'var', 'g' ], [ 'kwArg', 'm', [ 'var', 'a' ] ] ] )
-		self._matchTest( expression, 'a(f,g,m=a,n=b)', [ 'call', [ 'var', 'a' ], [ 'var', 'f' ], [ 'var', 'g' ], [ 'kwArg', 'm', [ 'var', 'a' ] ], [ 'kwArg', 'n', [ 'var', 'b' ] ] ] )
-		self._matchTest( expression, 'a(f,g,m=a,n=b,*p)', [ 'call', [ 'var', 'a' ], [ 'var', 'f' ], [ 'var', 'g' ], [ 'kwArg', 'm', [ 'var', 'a' ] ], [ 'kwArg', 'n', [ 'var', 'b' ] ], [ 'argList', [ 'var', 'p' ] ] ] )
-		self._matchTest( expression, 'a(f,m=a,*p,**w)', [ 'call', [ 'var', 'a' ], [ 'var', 'f' ], [ 'kwArg', 'm', [ 'var', 'a' ] ], [ 'argList', [ 'var', 'p' ] ], [ 'kwArgList', [ 'var', 'w' ] ] ] )
-		self._matchTest( expression, 'a(f,m=a,*p)', [ 'call', [ 'var', 'a' ], [ 'var', 'f' ], [ 'kwArg', 'm', [ 'var', 'a' ] ], [ 'argList', [ 'var', 'p' ] ] ] )
-		self._matchTest( expression, 'a(f,m=a,**w)', [ 'call', [ 'var', 'a' ], [ 'var', 'f' ], [ 'kwArg', 'm', [ 'var', 'a' ] ], [ 'kwArgList', [ 'var', 'w' ] ] ] )
-		self._matchTest( expression, 'a(f,*p,**w)', [ 'call', [ 'var', 'a' ], [ 'var', 'f' ], [ 'argList', [ 'var', 'p' ] ], [ 'kwArgList', [ 'var', 'w' ] ] ] )
-		self._matchTest( expression, 'a(m=a,*p,**w)', [ 'call', [ 'var', 'a' ], [ 'kwArg', 'm', [ 'var', 'a' ] ], [ 'argList', [ 'var', 'p' ] ], [ 'kwArgList', [ 'var', 'w' ] ] ] )
-		self._matchTest( expression, 'a(*p,**w)', [ 'call', [ 'var', 'a' ], [ 'argList', [ 'var', 'p' ] ], [ 'kwArgList', [ 'var', 'w' ] ] ] )
-		self._matchTest( expression, 'a(**w)', [ 'call', [ 'var', 'a' ], [ 'kwArgList', [ 'var', 'w' ] ] ] )
-		self._matchFailTest( expression, 'a(m=a,f)' )
-		self._matchFailTest( expression, 'a(*p,f)' )
-		self._matchFailTest( expression, 'a(**w,f)' )
-		self._matchFailTest( expression, 'a(*p,m=a)' )
-		self._matchFailTest( expression, 'a(**w,m=a)' )
-		self._matchFailTest( expression, 'a(**w,*p)' )
+		self._parseStringTest( expression, 'a()', [ 'call', [ 'var', 'a' ] ] )
+		self._parseStringTest( expression, 'a(f)', [ 'call', [ 'var', 'a' ], [ 'var', 'f' ] ] )
+		self._parseStringTest( expression, 'a(f,)', [ 'call', [ 'var', 'a' ], [ 'var', 'f' ] ] )
+		self._parseStringTest( expression, 'a(f,g)', [ 'call', [ 'var', 'a' ], [ 'var', 'f' ], [ 'var', 'g' ] ] )
+		self._parseStringTest( expression, 'a(f,g,m=a)', [ 'call', [ 'var', 'a' ], [ 'var', 'f' ], [ 'var', 'g' ], [ 'kwArg', 'm', [ 'var', 'a' ] ] ] )
+		self._parseStringTest( expression, 'a(f,g,m=a,n=b)', [ 'call', [ 'var', 'a' ], [ 'var', 'f' ], [ 'var', 'g' ], [ 'kwArg', 'm', [ 'var', 'a' ] ], [ 'kwArg', 'n', [ 'var', 'b' ] ] ] )
+		self._parseStringTest( expression, 'a(f,g,m=a,n=b,*p)', [ 'call', [ 'var', 'a' ], [ 'var', 'f' ], [ 'var', 'g' ], [ 'kwArg', 'm', [ 'var', 'a' ] ], [ 'kwArg', 'n', [ 'var', 'b' ] ], [ 'argList', [ 'var', 'p' ] ] ] )
+		self._parseStringTest( expression, 'a(f,m=a,*p,**w)', [ 'call', [ 'var', 'a' ], [ 'var', 'f' ], [ 'kwArg', 'm', [ 'var', 'a' ] ], [ 'argList', [ 'var', 'p' ] ], [ 'kwArgList', [ 'var', 'w' ] ] ] )
+		self._parseStringTest( expression, 'a(f,m=a,*p)', [ 'call', [ 'var', 'a' ], [ 'var', 'f' ], [ 'kwArg', 'm', [ 'var', 'a' ] ], [ 'argList', [ 'var', 'p' ] ] ] )
+		self._parseStringTest( expression, 'a(f,m=a,**w)', [ 'call', [ 'var', 'a' ], [ 'var', 'f' ], [ 'kwArg', 'm', [ 'var', 'a' ] ], [ 'kwArgList', [ 'var', 'w' ] ] ] )
+		self._parseStringTest( expression, 'a(f,*p,**w)', [ 'call', [ 'var', 'a' ], [ 'var', 'f' ], [ 'argList', [ 'var', 'p' ] ], [ 'kwArgList', [ 'var', 'w' ] ] ] )
+		self._parseStringTest( expression, 'a(m=a,*p,**w)', [ 'call', [ 'var', 'a' ], [ 'kwArg', 'm', [ 'var', 'a' ] ], [ 'argList', [ 'var', 'p' ] ], [ 'kwArgList', [ 'var', 'w' ] ] ] )
+		self._parseStringTest( expression, 'a(*p,**w)', [ 'call', [ 'var', 'a' ], [ 'argList', [ 'var', 'p' ] ], [ 'kwArgList', [ 'var', 'w' ] ] ] )
+		self._parseStringTest( expression, 'a(**w)', [ 'call', [ 'var', 'a' ], [ 'kwArgList', [ 'var', 'w' ] ] ] )
+		self._parseStringFailTest( expression, 'a(m=a,f)' )
+		self._parseStringFailTest( expression, 'a(*p,f)' )
+		self._parseStringFailTest( expression, 'a(**w,f)' )
+		self._parseStringFailTest( expression, 'a(*p,m=a)' )
+		self._parseStringFailTest( expression, 'a(**w,m=a)' )
+		self._parseStringFailTest( expression, 'a(**w,*p)' )
 
 
 		
 	def testParams(self):
-		self._matchTest( params, '', [] )
-		self._matchTest( params, 'f', [ [ 'simpleParam', 'f' ] ] )
-		self._matchTest( params, 'f,', [ [ 'simpleParam', 'f' ] ] )
-		self._matchTest( params, 'f,g', [ [ 'simpleParam', 'f' ], [ 'simpleParam', 'g' ] ] )
-		self._matchTest( params, 'f,g,m=a', [ [ 'simpleParam', 'f' ], [ 'simpleParam', 'g' ], [ 'defaultValueParam', 'm', [ 'var', 'a' ] ] ] )
-		self._matchTest( params, 'f,g,m=a,n=b', [ [ 'simpleParam', 'f' ], [ 'simpleParam', 'g' ], [ 'defaultValueParam', 'm', [ 'var', 'a' ] ], [ 'defaultValueParam', 'n', [ 'var', 'b' ] ] ] )
-		self._matchTest( params, 'f,g,m=a,n=b,*p', [ [ 'simpleParam', 'f' ], [ 'simpleParam', 'g' ], [ 'defaultValueParam', 'm', [ 'var', 'a' ] ], [ 'defaultValueParam', 'n', [ 'var', 'b' ] ], [ 'paramList', 'p' ] ] )
-		self._matchTest( params, 'f,m=a,*p,**w', [ [ 'simpleParam', 'f' ], [ 'defaultValueParam', 'm', [ 'var', 'a' ] ], [ 'paramList', 'p' ], [ 'kwParamList', 'w' ] ] )
-		self._matchTest( params, 'f,m=a,*p', [ [ 'simpleParam', 'f' ], [ 'defaultValueParam', 'm', [ 'var', 'a' ] ], [ 'paramList', 'p' ] ] )
-		self._matchTest( params, 'f,m=a,**w', [ [ 'simpleParam', 'f' ], [ 'defaultValueParam', 'm', [ 'var', 'a' ] ], [ 'kwParamList', 'w' ] ] )
-		self._matchTest( params, 'f,*p,**w', [ [ 'simpleParam', 'f' ], [ 'paramList', 'p' ], [ 'kwParamList', 'w' ] ] )
-		self._matchTest( params, 'm=a,*p,**w', [ [ 'defaultValueParam', 'm', [ 'var', 'a' ] ], [ 'paramList', 'p' ], [ 'kwParamList', 'w' ] ] )
-		self._matchTest( params, '*p,**w', [ [ 'paramList', 'p' ], [ 'kwParamList', 'w' ] ] )
-		self._matchTest( params, '**w', [ [ 'kwParamList', 'w' ] ] )
-		self._matchFailTest( params, 'm=a,f' )
-		self._matchFailTest( params, '*p,f' )
-		self._matchFailTest( params, '**w,f' )
-		self._matchFailTest( params, '*p,m=a' )
-		self._matchFailTest( params, '**w,m=a' )
-		self._matchFailTest( params, '**w,*p' )
+		self._parseStringTest( params, '', [] )
+		self._parseStringTest( params, 'f', [ [ 'simpleParam', 'f' ] ] )
+		self._parseStringTest( params, 'f,', [ [ 'simpleParam', 'f' ] ] )
+		self._parseStringTest( params, 'f,g', [ [ 'simpleParam', 'f' ], [ 'simpleParam', 'g' ] ] )
+		self._parseStringTest( params, 'f,g,m=a', [ [ 'simpleParam', 'f' ], [ 'simpleParam', 'g' ], [ 'defaultValueParam', 'm', [ 'var', 'a' ] ] ] )
+		self._parseStringTest( params, 'f,g,m=a,n=b', [ [ 'simpleParam', 'f' ], [ 'simpleParam', 'g' ], [ 'defaultValueParam', 'm', [ 'var', 'a' ] ], [ 'defaultValueParam', 'n', [ 'var', 'b' ] ] ] )
+		self._parseStringTest( params, 'f,g,m=a,n=b,*p', [ [ 'simpleParam', 'f' ], [ 'simpleParam', 'g' ], [ 'defaultValueParam', 'm', [ 'var', 'a' ] ], [ 'defaultValueParam', 'n', [ 'var', 'b' ] ], [ 'paramList', 'p' ] ] )
+		self._parseStringTest( params, 'f,m=a,*p,**w', [ [ 'simpleParam', 'f' ], [ 'defaultValueParam', 'm', [ 'var', 'a' ] ], [ 'paramList', 'p' ], [ 'kwParamList', 'w' ] ] )
+		self._parseStringTest( params, 'f,m=a,*p', [ [ 'simpleParam', 'f' ], [ 'defaultValueParam', 'm', [ 'var', 'a' ] ], [ 'paramList', 'p' ] ] )
+		self._parseStringTest( params, 'f,m=a,**w', [ [ 'simpleParam', 'f' ], [ 'defaultValueParam', 'm', [ 'var', 'a' ] ], [ 'kwParamList', 'w' ] ] )
+		self._parseStringTest( params, 'f,*p,**w', [ [ 'simpleParam', 'f' ], [ 'paramList', 'p' ], [ 'kwParamList', 'w' ] ] )
+		self._parseStringTest( params, 'm=a,*p,**w', [ [ 'defaultValueParam', 'm', [ 'var', 'a' ] ], [ 'paramList', 'p' ], [ 'kwParamList', 'w' ] ] )
+		self._parseStringTest( params, '*p,**w', [ [ 'paramList', 'p' ], [ 'kwParamList', 'w' ] ] )
+		self._parseStringTest( params, '**w', [ [ 'kwParamList', 'w' ] ] )
+		self._parseStringFailTest( params, 'm=a,f' )
+		self._parseStringFailTest( params, '*p,f' )
+		self._parseStringFailTest( params, '**w,f' )
+		self._parseStringFailTest( params, '*p,m=a' )
+		self._parseStringFailTest( params, '**w,m=a' )
+		self._parseStringFailTest( params, '**w,*p' )
 
 
 		
 	def testLambda(self):
-		self._matchTest( expression, 'lambda f,m=a,*p,**w: f+m+p+w', [ 'lambdaExpr', [ [ 'simpleParam', 'f' ], [ 'defaultValueParam', 'm', [ 'var', 'a' ] ], [ 'paramList', 'p' ], [ 'kwParamList', 'w' ] ],
+		self._parseStringTest( expression, 'lambda f,m=a,*p,**w: f+m+p+w', [ 'lambdaExpr', [ [ 'simpleParam', 'f' ], [ 'defaultValueParam', 'm', [ 'var', 'a' ] ], [ 'paramList', 'p' ], [ 'kwParamList', 'w' ] ],
 									   [ 'add', [ 'add', [ 'add', [ 'var', 'f' ], [ 'var', 'm' ] ], [ 'var', 'p' ] ], [ 'var', 'w' ] ] ] )
 
 		
 		
 	def testConditionalExpr(self):
-		self._matchTest( expression, 'x   if y else   z', [ 'conditionalExpr', [ 'var', 'y' ], [ 'var', 'x' ], [ 'var', 'z' ] ] )
-		self._matchTest( expression, '(x   if y else   z)   if w else   q', [ 'conditionalExpr', [ 'var', 'w' ], [ 'conditionalExpr', [ 'var', 'y' ], [ 'var', 'x' ], [ 'var', 'z' ] ], [ 'var', 'q' ] ] )
-		self._matchTest( expression, 'w   if (x   if y else   z) else   q', [ 'conditionalExpr', [ 'conditionalExpr', [ 'var', 'y' ], [ 'var', 'x' ], [ 'var', 'z' ] ], [ 'var', 'w' ], [ 'var', 'q' ] ] )
-		self._matchTest( expression, 'w   if q else   x   if y else   z', [ 'conditionalExpr', [ 'var', 'q' ], [ 'var', 'w' ], [ 'conditionalExpr', [ 'var', 'y' ], [ 'var', 'x' ], [ 'var', 'z' ] ] ] )
-		self._matchFailTest( expression, 'w   if x   if y else   z else   q' )
+		self._parseStringTest( expression, 'x   if y else   z', [ 'conditionalExpr', [ 'var', 'y' ], [ 'var', 'x' ], [ 'var', 'z' ] ] )
+		self._parseStringTest( expression, '(x   if y else   z)   if w else   q', [ 'conditionalExpr', [ 'var', 'w' ], [ 'conditionalExpr', [ 'var', 'y' ], [ 'var', 'x' ], [ 'var', 'z' ] ], [ 'var', 'q' ] ] )
+		self._parseStringTest( expression, 'w   if (x   if y else   z) else   q', [ 'conditionalExpr', [ 'conditionalExpr', [ 'var', 'y' ], [ 'var', 'x' ], [ 'var', 'z' ] ], [ 'var', 'w' ], [ 'var', 'q' ] ] )
+		self._parseStringTest( expression, 'w   if q else   x   if y else   z', [ 'conditionalExpr', [ 'var', 'q' ], [ 'var', 'w' ], [ 'conditionalExpr', [ 'var', 'y' ], [ 'var', 'x' ], [ 'var', 'z' ] ] ] )
+		self._parseStringFailTest( expression, 'w   if x   if y else   z else   q' )
 		
 		
 	
 	def testTupleOrExpression(self):
-		self._matchTest( tupleOrExpression, 'a', [ 'var', 'a' ] )
-		self._matchTest( tupleOrExpression, 'a,b', [ 'tupleLiteral', [ 'var', 'a' ], [ 'var', 'b' ] ] )
-		self._matchTest( tupleOrExpression, 'a,2', [ 'tupleLiteral', [ 'var', 'a' ], [ 'intLiteral', 'decimal', 'int', '2' ] ] )
-		self._matchTest( tupleOrExpression, 'lambda x, y: x+y,2', [ 'tupleLiteral', [ 'lambdaExpr', [ [ 'simpleParam', 'x' ], [ 'simpleParam', 'y' ] ], [ 'add', [ 'var', 'x' ], [ 'var', 'y' ] ] ], [ 'intLiteral', 'decimal', 'int', '2' ] ] )
+		self._parseStringTest( tupleOrExpression, 'a', [ 'var', 'a' ] )
+		self._parseStringTest( tupleOrExpression, 'a,b', [ 'tupleLiteral', [ 'var', 'a' ], [ 'var', 'b' ] ] )
+		self._parseStringTest( tupleOrExpression, 'a,2', [ 'tupleLiteral', [ 'var', 'a' ], [ 'intLiteral', 'decimal', 'int', '2' ] ] )
+		self._parseStringTest( tupleOrExpression, 'lambda x, y: x+y,2', [ 'tupleLiteral', [ 'lambdaExpr', [ [ 'simpleParam', 'x' ], [ 'simpleParam', 'y' ] ], [ 'add', [ 'var', 'x' ], [ 'var', 'y' ] ] ], [ 'intLiteral', 'decimal', 'int', '2' ] ] )
 		
 		
 		
 	def testAssertStmt(self):
-		self._matchTest( statement, 'assert x', [ 'assertStmt', [ 'var', 'x' ], None ] )
-		self._matchTest( statement, 'assert x,y', [ 'assertStmt', [ 'var', 'x' ], [ 'var', 'y' ] ] )
+		self._parseStringTest( statement, 'assert x', [ 'assertStmt', [ 'var', 'x' ], None ] )
+		self._parseStringTest( statement, 'assert x,y', [ 'assertStmt', [ 'var', 'x' ], [ 'var', 'y' ] ] )
 	
 	
 	def testAssignmentStmt(self):
-		self._matchTest( statement, 'a=x', [ 'assignmentStmt', [ [ 'singleTarget', 'a' ] ], [ 'var', 'x' ] ] )
-		self._matchTest( statement, 'a,b=c,d=x', [ 'assignmentStmt', [ [ 'tupleTarget', [ 'singleTarget', 'a' ],  [ 'singleTarget', 'b' ] ],  [ 'tupleTarget', [ 'singleTarget', 'c' ],  [ 'singleTarget', 'd' ] ] ], [ 'var', 'x' ] ] )
-		self._matchTest( statement, 'a=yield x', [ 'assignmentStmt', [ [ 'singleTarget', 'a' ] ], [ 'yieldExpr', [ 'var', 'x' ] ] ] )
-		self._matchFailTest( statement, '=x' )
+		self._parseStringTest( statement, 'a=x', [ 'assignmentStmt', [ [ 'singleTarget', 'a' ] ], [ 'var', 'x' ] ] )
+		self._parseStringTest( statement, 'a,b=c,d=x', [ 'assignmentStmt', [ [ 'tupleTarget', [ 'singleTarget', 'a' ],  [ 'singleTarget', 'b' ] ],  [ 'tupleTarget', [ 'singleTarget', 'c' ],  [ 'singleTarget', 'd' ] ] ], [ 'var', 'x' ] ] )
+		self._parseStringTest( statement, 'a=yield x', [ 'assignmentStmt', [ [ 'singleTarget', 'a' ] ], [ 'yieldExpr', [ 'var', 'x' ] ] ] )
+		self._parseStringFailTest( statement, '=x' )
 		
 		
 	def testAugAssignStmt(self):
-		self._matchTest( statement, 'a += b', [ 'augAssignStmt', '+=', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
-		self._matchTest( statement, 'a -= b', [ 'augAssignStmt', '-=', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
-		self._matchTest( statement, 'a *= b', [ 'augAssignStmt', '*=', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
-		self._matchTest( statement, 'a /= b', [ 'augAssignStmt', '/=', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
-		self._matchTest( statement, 'a %= b', [ 'augAssignStmt', '%=', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
-		self._matchTest( statement, 'a **= b', [ 'augAssignStmt', '**=', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
-		self._matchTest( statement, 'a >>= b', [ 'augAssignStmt', '>>=', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
-		self._matchTest( statement, 'a <<= b', [ 'augAssignStmt', '<<=', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
-		self._matchTest( statement, 'a &= b', [ 'augAssignStmt', '&=', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
-		self._matchTest( statement, 'a ^= b', [ 'augAssignStmt', '^=', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
-		self._matchTest( statement, 'a |= b', [ 'augAssignStmt', '|=', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
+		self._parseStringTest( statement, 'a += b', [ 'augAssignStmt', '+=', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
+		self._parseStringTest( statement, 'a -= b', [ 'augAssignStmt', '-=', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
+		self._parseStringTest( statement, 'a *= b', [ 'augAssignStmt', '*=', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
+		self._parseStringTest( statement, 'a /= b', [ 'augAssignStmt', '/=', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
+		self._parseStringTest( statement, 'a %= b', [ 'augAssignStmt', '%=', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
+		self._parseStringTest( statement, 'a **= b', [ 'augAssignStmt', '**=', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
+		self._parseStringTest( statement, 'a >>= b', [ 'augAssignStmt', '>>=', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
+		self._parseStringTest( statement, 'a <<= b', [ 'augAssignStmt', '<<=', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
+		self._parseStringTest( statement, 'a &= b', [ 'augAssignStmt', '&=', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
+		self._parseStringTest( statement, 'a ^= b', [ 'augAssignStmt', '^=', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
+		self._parseStringTest( statement, 'a |= b', [ 'augAssignStmt', '|=', [ 'singleTarget', 'a' ], [ 'var', 'b' ] ] )
 
 		
 	def testPassStmt(self):
-		self._matchTest( statement, 'pass', [ 'passStmt' ] )
+		self._parseStringTest( statement, 'pass', [ 'passStmt' ] )
 		
 		
 	def testDelStmt(self):
-		self._matchTest( statement, 'del x', [ 'delStmt', [ 'singleTarget', 'x' ] ] )
+		self._parseStringTest( statement, 'del x', [ 'delStmt', [ 'singleTarget', 'x' ] ] )
 		
 		
 	def testReturnStmt(self):
-		self._matchTest( statement, 'return x', [ 'returnStmt', [ 'var', 'x' ] ] )
+		self._parseStringTest( statement, 'return x', [ 'returnStmt', [ 'var', 'x' ] ] )
 		
 	
 	def testYieldStmt(self):
-		self._matchTest( statement, 'yield x', [ 'yieldStmt', [ 'var', 'x' ] ] )
+		self._parseStringTest( statement, 'yield x', [ 'yieldStmt', [ 'var', 'x' ] ] )
 		
 		
 	def testRaiseStmt(self):
-		self._matchTest( statement, 'raise', [ 'raiseStmt', None, None, None ] )
-		self._matchTest( statement, 'raise x', [ 'raiseStmt', [ 'var', 'x' ], None, None ] )
-		self._matchTest( statement, 'raise x,y', [ 'raiseStmt', [ 'var', 'x' ], [ 'var', 'y' ], None ] )
-		self._matchTest( statement, 'raise x,y,z', [ 'raiseStmt', [ 'var', 'x' ], [ 'var', 'y' ], [ 'var', 'z' ] ] )
+		self._parseStringTest( statement, 'raise', [ 'raiseStmt', None, None, None ] )
+		self._parseStringTest( statement, 'raise x', [ 'raiseStmt', [ 'var', 'x' ], None, None ] )
+		self._parseStringTest( statement, 'raise x,y', [ 'raiseStmt', [ 'var', 'x' ], [ 'var', 'y' ], None ] )
+		self._parseStringTest( statement, 'raise x,y,z', [ 'raiseStmt', [ 'var', 'x' ], [ 'var', 'y' ], [ 'var', 'z' ] ] )
 		
 		
 	def testBreakStmt(self):
-		self._matchTest( statement, 'break', [ 'breakStmt' ] )
+		self._parseStringTest( statement, 'break', [ 'breakStmt' ] )
 		
 		
 	def testContinueStmt(self):
-		self._matchTest( statement, 'continue', [ 'continueStmt' ] )
+		self._parseStringTest( statement, 'continue', [ 'continueStmt' ] )
 		
 		
 	def testImportStmt(self):
-		self._matchTest( _moduleIdentifier, 'abc', 'abc' )
-		self._matchTest( moduleName, 'abc', 'abc' )
-		self._matchTest( moduleName, 'abc.xyz', 'abc.xyz' )
-		self._matchTest( _relModDotsModule, 'abc.xyz', 'abc.xyz' )
-		self._matchTest( _relModDotsModule, '...abc.xyz', '...abc.xyz' )
-		self._matchTest( _relModDots, '...', '...' )
-		self._matchTest( relativeModule, 'abc.xyz', [ 'relativeModule', 'abc.xyz' ] )
-		self._matchTest( relativeModule, '...abc.xyz', [ 'relativeModule', '...abc.xyz' ] )
-		self._matchTest( relativeModule, '...', [ 'relativeModule', '...' ] )
-		self._matchTest( moduleImport, 'abc.xyz', [ 'moduleImport', 'abc.xyz' ] )
-		self._matchTest( moduleImport, 'abc.xyz as q', [ 'moduleImportAs', 'abc.xyz', 'q' ] )
-		self._matchTest( simpleImport, 'import a', [ 'importStmt', [ 'moduleImport', 'a' ] ] )
-		self._matchTest( simpleImport, 'import a.b', [ 'importStmt', [ 'moduleImport', 'a.b' ] ] )
-		self._matchTest( simpleImport, 'import a.b as x', [ 'importStmt', [ 'moduleImportAs', 'a.b', 'x' ] ] )
-		self._matchTest( simpleImport, 'import a.b as x, c.d as y', [ 'importStmt', [ 'moduleImportAs', 'a.b', 'x' ], [ 'moduleImportAs', 'c.d', 'y' ] ] )
-		self._matchTest( moduleContentImport, 'xyz', [ 'moduleContentImport', 'xyz' ] )
-		self._matchTest( moduleContentImport, 'xyz as q', [ 'moduleContentImportAs', 'xyz', 'q' ] )
-		self._matchTest( fromImport, 'from x import a', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImport', 'a' ] ] )
-		self._matchTest( fromImport, 'from x import a as p', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImportAs', 'a', 'p' ] ] )
-		self._matchTest( fromImport, 'from x import a as p, b as q', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImportAs', 'a', 'p' ], [ 'moduleContentImportAs', 'b', 'q' ] ] )
-		self._matchTest( fromImport, 'from x import (a)', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImport', 'a' ] ] )
-		self._matchTest( fromImport, 'from x import (a,)', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImport', 'a' ] ] )
-		self._matchTest( fromImport, 'from x import (a as p)', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImportAs', 'a', 'p' ] ] )
-		self._matchTest( fromImport, 'from x import (a as p,)', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImportAs', 'a', 'p' ] ] )
-		self._matchTest( fromImport, 'from x import ( a as p, b as q )', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImportAs', 'a', 'p' ], [ 'moduleContentImportAs', 'b', 'q' ] ] )
-		self._matchTest( fromImport, 'from x import ( a as p, b as q, )', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImportAs', 'a', 'p' ], [ 'moduleContentImportAs', 'b', 'q' ] ] )
-		self._matchTest( fromImportAll, 'from x import *', [ 'fromImportAllStmt', [ 'relativeModule', 'x' ] ] )
-		self._matchTest( importStmt, 'import a', [ 'importStmt', [ 'moduleImport', 'a' ] ] )
-		self._matchTest( importStmt, 'import a.b', [ 'importStmt', [ 'moduleImport', 'a.b' ] ] )
-		self._matchTest( importStmt, 'import a.b as x', [ 'importStmt', [ 'moduleImportAs', 'a.b', 'x' ] ] )
-		self._matchTest( importStmt, 'import a.b as x, c.d as y', [ 'importStmt', [ 'moduleImportAs', 'a.b', 'x' ], [ 'moduleImportAs', 'c.d', 'y' ] ] )
-		self._matchTest( importStmt, 'from x import a', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImport', 'a' ] ] )
-		self._matchTest( importStmt, 'from x import a as p', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImportAs', 'a', 'p' ] ] )
-		self._matchTest( importStmt, 'from x import a as p, b as q', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImportAs', 'a', 'p' ], [ 'moduleContentImportAs', 'b', 'q' ] ] )
-		self._matchTest( importStmt, 'from x import (a)', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImport', 'a' ] ] )
-		self._matchTest( importStmt, 'from x import (a,)', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImport', 'a' ] ] )
-		self._matchTest( importStmt, 'from x import (a as p)', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImportAs', 'a', 'p' ] ] )
-		self._matchTest( importStmt, 'from x import (a as p,)', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImportAs', 'a', 'p' ] ] )
-		self._matchTest( importStmt, 'from x import ( a as p, b as q )', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImportAs', 'a', 'p' ], [ 'moduleContentImportAs', 'b', 'q' ] ] )
-		self._matchTest( importStmt, 'from x import ( a as p, b as q, )', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImportAs', 'a', 'p' ], [ 'moduleContentImportAs', 'b', 'q' ] ] )
-		self._matchTest( importStmt, 'from x import *', [ 'fromImportAllStmt', [ 'relativeModule', 'x' ] ] )
+		self._parseStringTest( _moduleIdentifier, 'abc', 'abc' )
+		self._parseStringTest( moduleName, 'abc', 'abc' )
+		self._parseStringTest( moduleName, 'abc.xyz', 'abc.xyz' )
+		self._parseStringTest( _relModDotsModule, 'abc.xyz', 'abc.xyz' )
+		self._parseStringTest( _relModDotsModule, '...abc.xyz', '...abc.xyz' )
+		self._parseStringTest( _relModDots, '...', '...' )
+		self._parseStringTest( relativeModule, 'abc.xyz', [ 'relativeModule', 'abc.xyz' ] )
+		self._parseStringTest( relativeModule, '...abc.xyz', [ 'relativeModule', '...abc.xyz' ] )
+		self._parseStringTest( relativeModule, '...', [ 'relativeModule', '...' ] )
+		self._parseStringTest( moduleImport, 'abc.xyz', [ 'moduleImport', 'abc.xyz' ] )
+		self._parseStringTest( moduleImport, 'abc.xyz as q', [ 'moduleImportAs', 'abc.xyz', 'q' ] )
+		self._parseStringTest( simpleImport, 'import a', [ 'importStmt', [ 'moduleImport', 'a' ] ] )
+		self._parseStringTest( simpleImport, 'import a.b', [ 'importStmt', [ 'moduleImport', 'a.b' ] ] )
+		self._parseStringTest( simpleImport, 'import a.b as x', [ 'importStmt', [ 'moduleImportAs', 'a.b', 'x' ] ] )
+		self._parseStringTest( simpleImport, 'import a.b as x, c.d as y', [ 'importStmt', [ 'moduleImportAs', 'a.b', 'x' ], [ 'moduleImportAs', 'c.d', 'y' ] ] )
+		self._parseStringTest( moduleContentImport, 'xyz', [ 'moduleContentImport', 'xyz' ] )
+		self._parseStringTest( moduleContentImport, 'xyz as q', [ 'moduleContentImportAs', 'xyz', 'q' ] )
+		self._parseStringTest( fromImport, 'from x import a', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImport', 'a' ] ] )
+		self._parseStringTest( fromImport, 'from x import a as p', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImportAs', 'a', 'p' ] ] )
+		self._parseStringTest( fromImport, 'from x import a as p, b as q', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImportAs', 'a', 'p' ], [ 'moduleContentImportAs', 'b', 'q' ] ] )
+		self._parseStringTest( fromImport, 'from x import (a)', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImport', 'a' ] ] )
+		self._parseStringTest( fromImport, 'from x import (a,)', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImport', 'a' ] ] )
+		self._parseStringTest( fromImport, 'from x import (a as p)', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImportAs', 'a', 'p' ] ] )
+		self._parseStringTest( fromImport, 'from x import (a as p,)', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImportAs', 'a', 'p' ] ] )
+		self._parseStringTest( fromImport, 'from x import ( a as p, b as q )', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImportAs', 'a', 'p' ], [ 'moduleContentImportAs', 'b', 'q' ] ] )
+		self._parseStringTest( fromImport, 'from x import ( a as p, b as q, )', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImportAs', 'a', 'p' ], [ 'moduleContentImportAs', 'b', 'q' ] ] )
+		self._parseStringTest( fromImportAll, 'from x import *', [ 'fromImportAllStmt', [ 'relativeModule', 'x' ] ] )
+		self._parseStringTest( importStmt, 'import a', [ 'importStmt', [ 'moduleImport', 'a' ] ] )
+		self._parseStringTest( importStmt, 'import a.b', [ 'importStmt', [ 'moduleImport', 'a.b' ] ] )
+		self._parseStringTest( importStmt, 'import a.b as x', [ 'importStmt', [ 'moduleImportAs', 'a.b', 'x' ] ] )
+		self._parseStringTest( importStmt, 'import a.b as x, c.d as y', [ 'importStmt', [ 'moduleImportAs', 'a.b', 'x' ], [ 'moduleImportAs', 'c.d', 'y' ] ] )
+		self._parseStringTest( importStmt, 'from x import a', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImport', 'a' ] ] )
+		self._parseStringTest( importStmt, 'from x import a as p', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImportAs', 'a', 'p' ] ] )
+		self._parseStringTest( importStmt, 'from x import a as p, b as q', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImportAs', 'a', 'p' ], [ 'moduleContentImportAs', 'b', 'q' ] ] )
+		self._parseStringTest( importStmt, 'from x import (a)', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImport', 'a' ] ] )
+		self._parseStringTest( importStmt, 'from x import (a,)', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImport', 'a' ] ] )
+		self._parseStringTest( importStmt, 'from x import (a as p)', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImportAs', 'a', 'p' ] ] )
+		self._parseStringTest( importStmt, 'from x import (a as p,)', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImportAs', 'a', 'p' ] ] )
+		self._parseStringTest( importStmt, 'from x import ( a as p, b as q )', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImportAs', 'a', 'p' ], [ 'moduleContentImportAs', 'b', 'q' ] ] )
+		self._parseStringTest( importStmt, 'from x import ( a as p, b as q, )', [ 'fromImportStmt', [ 'relativeModule', 'x' ], [ 'moduleContentImportAs', 'a', 'p' ], [ 'moduleContentImportAs', 'b', 'q' ] ] )
+		self._parseStringTest( importStmt, 'from x import *', [ 'fromImportAllStmt', [ 'relativeModule', 'x' ] ] )
 		
 		
 	def testGlobalStmt(self):
-		self._matchTest( statement, 'global x', [ 'globalStmt', [ 'globalVar', 'x' ] ] )
-		self._matchTest( statement, 'global x, y', [ 'globalStmt', [ 'globalVar', 'x' ], [ 'globalVar', 'y' ] ] )
+		self._parseStringTest( statement, 'global x', [ 'globalStmt', [ 'globalVar', 'x' ] ] )
+		self._parseStringTest( statement, 'global x, y', [ 'globalStmt', [ 'globalVar', 'x' ], [ 'globalVar', 'y' ] ] )
 	
 		
 	def testExecStmt(self):
-		self._matchTest( statement, 'exec a', [ 'execStmt', [ 'var', 'a' ], None, None ] )
-		self._matchTest( statement, 'exec a in b', [ 'execStmt', [ 'var', 'a' ], [ 'var', 'b' ], None ] )
-		self._matchTest( statement, 'exec a in b,c', [ 'execStmt', [ 'var', 'a' ], [ 'var', 'b' ], [ 'var', 'c' ] ] )
+		self._parseStringTest( statement, 'exec a', [ 'execStmt', [ 'var', 'a' ], None, None ] )
+		self._parseStringTest( statement, 'exec a in b', [ 'execStmt', [ 'var', 'a' ], [ 'var', 'b' ], None ] )
+		self._parseStringTest( statement, 'exec a in b,c', [ 'execStmt', [ 'var', 'a' ], [ 'var', 'b' ], [ 'var', 'c' ] ] )
 		
 		
 	def testIfStmt(self):
-		self._matchTest( ifStmt, 'if a:', [ 'ifStmt', [ 'var', 'a' ], [] ] )
+		self._parseStringTest( ifStmt, 'if a:', [ 'ifStmt', [ 'var', 'a' ], [] ] )
 		
 		
 	def testElIfStmt(self):
-		self._matchTest( elifStmt, 'elif a:', [ 'elifStmt', [ 'var', 'a' ], [] ] )
+		self._parseStringTest( elifStmt, 'elif a:', [ 'elifStmt', [ 'var', 'a' ], [] ] )
 		
 		
 	def testElseStmt(self):
-		self._matchTest( elseStmt, 'else:', [ 'elseStmt', [] ] )
+		self._parseStringTest( elseStmt, 'else:', [ 'elseStmt', [] ] )
 		
 		
 	def testWhileStmt(self):
-		self._matchTest( whileStmt, 'while a:', [ 'whileStmt', [ 'var', 'a' ], [] ] )
+		self._parseStringTest( whileStmt, 'while a:', [ 'whileStmt', [ 'var', 'a' ], [] ] )
 		
 		
 	def testForStmt(self):
-		self._matchTest( forStmt, 'for x in y:', [ 'forStmt', [ 'singleTarget', 'x' ], [ 'var', 'y' ], [] ] )
+		self._parseStringTest( forStmt, 'for x in y:', [ 'forStmt', [ 'singleTarget', 'x' ], [ 'var', 'y' ], [] ] )
 		
 		
 	def testTryStmt(self):
-		self._matchTest( tryStmt, 'try:', [ 'tryStmt', [] ] )
+		self._parseStringTest( tryStmt, 'try:', [ 'tryStmt', [] ] )
 		
 		
 	def testExceptStmt(self):
-		self._matchTest( exceptStmt, 'except:', [ 'exceptStmt', None, None, [] ] )
-		self._matchTest( exceptStmt, 'except x:', [ 'exceptStmt', [ 'var', 'x' ], None, [] ] )
-		self._matchTest( exceptStmt, 'except x, y:', [ 'exceptStmt', [ 'var', 'x' ], [ 'singleTarget', 'y' ], [] ] )
+		self._parseStringTest( exceptStmt, 'except:', [ 'exceptStmt', None, None, [] ] )
+		self._parseStringTest( exceptStmt, 'except x:', [ 'exceptStmt', [ 'var', 'x' ], None, [] ] )
+		self._parseStringTest( exceptStmt, 'except x, y:', [ 'exceptStmt', [ 'var', 'x' ], [ 'singleTarget', 'y' ], [] ] )
 		
 		
 	def testFinallyStmt(self):
-		self._matchTest( finallyStmt, 'finally:', [ 'finallyStmt', [] ] )
+		self._parseStringTest( finallyStmt, 'finally:', [ 'finallyStmt', [] ] )
 		
 		
 	def testWithStmt(self):
-		self._matchTest( withStmt, 'with a:', [ 'withStmt', [ 'var', 'a' ], None, [] ] )
-		self._matchTest( withStmt, 'with a as b:', [ 'withStmt', [ 'var', 'a' ], [ 'singleTarget', 'b' ], [] ] )
+		self._parseStringTest( withStmt, 'with a:', [ 'withStmt', [ 'var', 'a' ], None, [] ] )
+		self._parseStringTest( withStmt, 'with a as b:', [ 'withStmt', [ 'var', 'a' ], [ 'singleTarget', 'b' ], [] ] )
 		
 		
 	def testDefStmt(self):
-		self._matchTest( defStmt, 'def f():', [ 'defStmt', 'f', [], [] ] )
-		self._matchTest( defStmt, 'def f(x):', [ 'defStmt', 'f', [ [ 'simpleParam', 'x' ] ], [] ] )
+		self._parseStringTest( defStmt, 'def f():', [ 'defStmt', 'f', [], [] ] )
+		self._parseStringTest( defStmt, 'def f(x):', [ 'defStmt', 'f', [ [ 'simpleParam', 'x' ] ], [] ] )
 		
 		
 	def testDecoStmt(self):
-		self._matchTest( decoStmt, '@f', [ 'decoStmt', 'f', None ] )
-		self._matchTest( decoStmt, '@f(x)', [ 'decoStmt', 'f', [ [ 'var', 'x' ] ] ] )
+		self._parseStringTest( decoStmt, '@f', [ 'decoStmt', 'f', None ] )
+		self._parseStringTest( decoStmt, '@f(x)', [ 'decoStmt', 'f', [ [ 'var', 'x' ] ] ] )
 		
 		
 	def testClassStmt(self):
-		self._matchTest( classStmt, 'class Q:', [ 'classStmt', 'Q', None, [] ] )
-		self._matchTest( classStmt, 'class Q (x):', [ 'classStmt', 'Q', [ [ 'var', 'x' ] ], [] ] )
-		self._matchTest( classStmt, 'class Q (x,y):', [ 'classStmt', 'Q', [ [ 'var', 'x' ], [ 'var', 'y' ] ], [] ] )
+		self._parseStringTest( classStmt, 'class Q:', [ 'classStmt', 'Q', None, [] ] )
+		self._parseStringTest( classStmt, 'class Q (x):', [ 'classStmt', 'Q', [ [ 'var', 'x' ] ], [] ] )
+		self._parseStringTest( classStmt, 'class Q (x,y):', [ 'classStmt', 'Q', [ [ 'var', 'x' ], [ 'var', 'y' ] ], [] ] )
 		
 		
 	def testCommentStmt(self):
-		self._matchTest( commentStmt, '#x', [ 'commentStmt', 'x' ] )
-		self._matchTest( commentStmt, '#' + string.printable, [ 'commentStmt', string.printable ] )
+		self._parseStringTest( commentStmt, '#x', [ 'commentStmt', 'x' ] )
+		self._parseStringTest( commentStmt, '#' + string.printable, [ 'commentStmt', string.printable ] )
 		
 		
 
 		
 		
 	def testFnCallStStmt(self):
-		self._matchTest( expression, 'x.y()', [ 'call', [ 'attributeRef', [ 'var', 'x' ], 'y' ] ] )
-		self._matchTest( statement, 'x.y()', [ 'call', [ 'attributeRef', [ 'var', 'x' ], 'y' ] ] )
+		self._parseStringTest( expression, 'x.y()', [ 'call', [ 'attributeRef', [ 'var', 'x' ], 'y' ] ] )
+		self._parseStringTest( statement, 'x.y()', [ 'call', [ 'attributeRef', [ 'var', 'x' ], 'y' ] ] )
 		
 		
 		
 		
 	def testDictInList(self):
-		self._matchTest( statement, 'y = [ x, { a : b } ]', [ 'assignmentStmt', [ [ 'singleTarget', 'y' ] ], [ 'listLiteral', [ 'var', 'x' ], [ 'dictLiteral', [ 'keyValuePair', [ 'var', 'a' ], [ 'var', 'b' ] ] ] ] ] )
+		self._parseStringTest( statement, 'y = [ x, { a : b } ]', [ 'assignmentStmt', [ [ 'singleTarget', 'y' ] ], [ 'listLiteral', [ 'var', 'x' ], [ 'dictLiteral', [ 'keyValuePair', [ 'var', 'a' ], [ 'var', 'b' ] ] ] ] ] )
 		
 		
 		

@@ -74,19 +74,19 @@ import unittest
 class TestCase_LISPParser (ParserTestCase):
 	def testString(self):
 		g = LispGrammar()
-		self._matchTest( g.expression(), 'abc', 'abc' )
-		self._matchTest( g.expression(), "'abc'", 'abc' )
-		self._matchTest( g.expression(), '"abc"', 'abc' )
-		self._matchTest( g.expression(), "u'abc'", u'abc' )
-		self._matchTest( g.expression(), 'u"abc"', u'abc' )
+		self._parseStringTest( g.expression(), 'abc', 'abc' )
+		self._parseStringTest( g.expression(), "'abc'", 'abc' )
+		self._parseStringTest( g.expression(), '"abc"', 'abc' )
+		self._parseStringTest( g.expression(), "u'abc'", u'abc' )
+		self._parseStringTest( g.expression(), 'u"abc"', u'abc' )
 
 	def testList(self):
 		g = LispGrammar()
-		self._matchTest( g.expression(), '()', [] )
-		self._matchTest( g.expression(), '(x)', [ 'x' ] )
-		self._matchTest( g.expression(), '(())', [ [] ] )
-		self._matchTest( g.expression(), '(x y z)', [ 'x', 'y', 'z' ] )
-		self._matchTest( g.expression(), '(x (y (z())))', [ 'x', [ 'y', [ 'z', []]]] )
+		self._parseStringTest( g.expression(), '()', [] )
+		self._parseStringTest( g.expression(), '(x)', [ 'x' ] )
+		self._parseStringTest( g.expression(), '(())', [ [] ] )
+		self._parseStringTest( g.expression(), '(x y z)', [ 'x', 'y', 'z' ] )
+		self._parseStringTest( g.expression(), '(x (y (z())))', [ 'x', [ 'y', [ 'z', []]]] )
 
 
 if __name__ == '__main__':

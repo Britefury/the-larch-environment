@@ -19,13 +19,17 @@ module = DMModule( 'Python25', 'py', 'GSymCore.Languages.Python25.Python25' )
 Node = module.newClass( 'Node', [] )
 Expr = module.newClass( 'Expr', Node, [ 'parens' ] )
 Stmt = module.newClass( 'Stmt', Node, [] )
-CompoundStmt = module.newClass( 'CompoundStmt', Stmt, [ 'suite' ] )
 
 
 #
-# Module, blank line, comment, unparsed
+# Module
 #
 PythonModule = module.newClass( 'PythonModule', Node, [ 'suite' ] )
+
+
+#
+# Blank line, commentm unparsed
+#
 BlankLine = module.newClass( 'BlankLine', Node, [] )
 CommentStmt = module.newClass( 'CommentStmt', Stmt, [ 'comment' ] )
 UNPARSED = module.newClass( 'UNPARSED', Node, [ 'value' ] )
@@ -126,52 +130,81 @@ ConditionalExpr = module.newClass( 'ConditionalExpr', Expr, [ 'condition', 'expr
 
 
 #
-# Statements
+# Simple statements
 #
+SimpleStmt = module.newClass( 'SimpleStmt', Stmt, [] )
 # Expression statement
-ExprStmt = module.newClass( 'ExprStmt', Stmt, [ 'expr' ] )
+ExprStmt = module.newClass( 'ExprStmt', SimpleStmt, [ 'expr' ] )
 # Other statements
-AssertStmt = module.newClass( 'AssertStmt', Stmt, [ 'condition', 'fail' ] )
-AssignStmt = module.newClass( 'AssignStmt', Stmt, [ 'targets', 'value' ] )
-AugAssignStmt = module.newClass( 'AugAssignStmt', Stmt, [ 'op', 'target', 'value' ] )
-PassStmt = module.newClass( 'PassStmt', Stmt, [] )
-DelStmt = module.newClass( 'DelStmt', Stmt, [ 'target' ] )
-ReturnStmt = module.newClass( 'ReturnStmt', Stmt, [ 'value' ] )
-YieldStmt = module.newClass( 'YieldStmt', Stmt, [ 'value' ] )
-RaiseStmt = module.newClass( 'RaiseStmt', Stmt, [ 'excType', 'excValue', 'traceback' ] )
-BreakStmt = module.newClass( 'BreakStmt', Stmt, [] )
-ContinueStmt = module.newClass( 'ContinueStmt', Stmt, [] )
-ExecStmt = module.newClass( 'ExecStmt', Stmt, [ 'source', 'locals', 'globals' ] )
+AssertStmt = module.newClass( 'AssertStmt', SimpleStmt, [ 'condition', 'fail' ] )
+AssignStmt = module.newClass( 'AssignStmt', SimpleStmt, [ 'targets', 'value' ] )
+AugAssignStmt = module.newClass( 'AugAssignStmt', SimpleStmt, [ 'op', 'target', 'value' ] )
+PassStmt = module.newClass( 'PassStmt', SimpleStmt, [] )
+DelStmt = module.newClass( 'DelStmt', SimpleStmt, [ 'target' ] )
+ReturnStmt = module.newClass( 'ReturnStmt', SimpleStmt, [ 'value' ] )
+YieldStmt = module.newClass( 'YieldStmt', SimpleStmt, [ 'value' ] )
+RaiseStmt = module.newClass( 'RaiseStmt', SimpleStmt, [ 'excType', 'excValue', 'traceback' ] )
+BreakStmt = module.newClass( 'BreakStmt', SimpleStmt, [] )
+ContinueStmt = module.newClass( 'ContinueStmt', SimpleStmt, [] )
+ExecStmt = module.newClass( 'ExecStmt', SimpleStmt, [ 'source', 'locals', 'globals' ] )
 # Import
 RelativeModule = module.newClass( 'RelativeModule', Node, [ 'name' ] )
 ModuleImport = module.newClass( 'ModuleImport', Node, [ 'name' ] )
 ModuleImportAs = module.newClass( 'ModuleImportAs', Node, [ 'name', 'asName' ] )
 ModuleContentImport = module.newClass( 'ModuleContentImport', Node, [ 'name' ] )
 ModuleContentImportAs = module.newClass( 'ModuleContentImportAs', Node, [ 'name', 'asName' ] )
-ImportStmt = module.newClass( 'ImportStmt', Stmt, [ 'modules' ] )
-FromImportStmt = module.newClass( 'FromImportStmt', Stmt, [ 'module', 'imports' ] )
-FromImportAllStmt = module.newClass( 'FromImportAllStmt', Stmt, [ 'module' ] )
+ImportStmt = module.newClass( 'ImportStmt', SimpleStmt, [ 'modules' ] )
+FromImportStmt = module.newClass( 'FromImportStmt', SimpleStmt, [ 'module', 'imports' ] )
+FromImportAllStmt = module.newClass( 'FromImportAllStmt', SimpleStmt, [ 'module' ] )
 # Global
 GlobalVar = module.newClass( 'GlobalVar', Node, [ 'name' ] )
-GlobalStmt = module.newClass( 'GlobalStmt', Stmt, [ 'vars' ] )
+GlobalStmt = module.newClass( 'GlobalStmt', SimpleStmt, [ 'vars' ] )
+
+
+
+#
+# Compound statement headers
+#
+CompountStmtHeader = module.newClass( 'CompountStmtHeader', Stmt, [] )
+IfStmtHeader = module.newClass( 'IfStmtHeader', CompountStmtHeader, [ 'condition' ] )
+ElifStmtHeader = module.newClass( 'ElifStmtHeader', CompountStmtHeader, [ 'condition' ] )
+ElseStmtHeader = module.newClass( 'ElseStmtHeader', CompountStmtHeader, [] )
+WhileStmtHeader = module.newClass( 'WhileStmtHeader', CompountStmtHeader, [ 'condition' ] )
+ForStmtHeader = module.newClass( 'ForStmtHeader', CompountStmtHeader, [ 'target', 'source' ] )
+TryStmtHeader = module.newClass( 'TryStmtHeader', CompountStmtHeader, [] )
+ExceptStmtHeader = module.newClass( 'ExceptStmtHeader', CompountStmtHeader, [ 'exception', 'target' ] )
+FinallyStmtHeader = module.newClass( 'FinallyStmtHeader', CompountStmtHeader, [] )
+WithStmtHeader = module.newClass( 'WithStmtHeader', CompountStmtHeader, [ 'expr', 'target' ] )
+DecoStmtHeader = module.newClass( 'DecoStmtHeader', CompountStmtHeader, [ 'name', 'args', 'argsTrailingSeparator' ] )
+DefStmtHeader = module.newClass( 'DefStmtHeader', CompountStmtHeader, [ 'name', 'params', 'paramsTrailingSeparator' ] )
+ClassStmtHeader = module.newClass( 'ClassStmtHeader', CompountStmtHeader, [ 'name', 'bases', 'basesTrailingSeparator' ] )
+
 
 
 #
 # Compound statements
 #
-IfStmt = module.newClass( 'IfStmt', CompoundStmt, [ 'condition' ] )
-ElifStmt = module.newClass( 'ElifStmt', CompoundStmt, [ 'condition' ] )
-ElseStmt = module.newClass( 'ElseStmt', CompoundStmt, [] )
-WhileStmt = module.newClass( 'WhileStmt', CompoundStmt, [ 'condition' ] )
-ForStmt = module.newClass( 'ForStmt', CompoundStmt, [ 'target', 'source' ] )
-TryStmt = module.newClass( 'TryStmt', CompoundStmt, [] )
-ExceptStmt = module.newClass( 'ExceptStmt', CompoundStmt, [ 'exception', 'target' ] )
-FinallyStmt = module.newClass( 'FinallyStmt', CompoundStmt, [] )
-WithStmt = module.newClass( 'WithStmt', CompoundStmt, [ 'expr', 'target' ] )
-DefStmt = module.newClass( 'DefStmt', CompoundStmt, [ 'name', 'params', 'paramsTrailingSeparator' ] )
-DecoStmt = module.newClass( 'DecoStmt', CompoundStmt, [ 'name', 'args', 'argsTrailingSeparator' ] )
-ClassStmt = module.newClass( 'ClassStmt', CompoundStmt, [ 'name', 'bases', 'basesTrailingSeparator' ] )
-IndentedBlock = module.newClass( 'IndentedBlock', CompoundStmt, [] )
+CompoundComponent = module.newClass( 'CompoundComponent', Node, [] )
+CompoundStmt = module.newClass( 'CompoundStmt', Stmt, [] )
+IfStmt = module.newClass( 'IfStmt', CompoundStmt, [ 'condition', 'suite', 'elifBlocks', 'elseSuite' ] )
+ElifBlock = module.newClass( 'ElifBlock', CompoundComponent, [ 'condition', 'suite' ] )
+WhileStmt = module.newClass( 'WhileStmt', CompoundStmt, [ 'condition', 'suite', 'elseSuite' ] )
+ForStmt = module.newClass( 'ForStmt', CompoundStmt, [ 'target', 'source', 'suite', 'elseSuite' ] )
+TryStmt = module.newClass( 'TryStmt', CompoundStmt, [ 'suite', 'exceptBlocks', 'elseSuite', 'finallySuite' ] )
+ExceptBlock = module.newClass( 'ExceptBlock', CompoundComponent, [ 'exception', 'target', 'suite' ] )
+WithStmt = module.newClass( 'WithStmt', CompoundStmt, [ 'expr', 'target', 'suite' ] )
+Decorator = module.newClass( 'Decorator', CompoundComponent, [ 'name', 'args', 'argsTrailingSeparator' ] )
+DefStmt = module.newClass( 'DefStmt', CompoundStmt, [ 'decorators', 'name', 'params', 'paramsTrailingSeparator', 'suite' ] )
+ClassStmt = module.newClass( 'ClassStmt', CompoundStmt, [ 'name', 'bases', 'basesTrailingSeparator', 'suite' ] )
 
+
+
+#
+# Structure nodes
+#
+Indent = module.newClass( 'Indent', Node, [] )
+Dedent = module.newClass( 'Dedent', Node, [] )
+
+IndentedBlock = module.newClass( 'IndentedBlock', CompoundStmt, [ 'suite' ] )
 
 

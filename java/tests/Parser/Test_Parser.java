@@ -619,6 +619,10 @@ public class Test_Parser extends ParserTestCase
 		bindingsTestStreamSX( parser6, new ItemStreamBuilder( new ItemStreamBuilder.Item[] { new ItemStreamBuilder.StructuralItem( readInputSX( "{m=M : (m A x=abc y=def)}" ) ) } ).stream(),
 		"[[x def]]" );
 		bindingsTestListSX( parser6, "{m=M : [(m A x=abc y=def)]}", "[[x def]]" );
+		
+		ParserExpression parser7 = new ObjectNode( Bar, new String[] { "b" }, new Object[] { identifier } );
+		matchTestNodeSX( parser7, "{m=M : (m Bar b=abc)}", "{m=M : (m Bar b=abc)}" );
+		matchTestNodeSX( parser7, "{m=M : (m Bar2 b=abc c=def)}", "{m=M : (m Bar2 b=abc c=def)}" );
 	}
 
 

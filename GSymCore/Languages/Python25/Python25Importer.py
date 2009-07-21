@@ -148,11 +148,11 @@ class _ImportFromImporter (_Importer):
 	
 class _DecoratorImporter (_Importer):
 	def Name(self, node):
-		return Nodes.DecoStmt( name=node.id, args=None )
+		return Nodes.Decorator( name=node.id, args=None )
 
 	def Call(self, node):
 		_starArg = lambda name, x:   [ [ name, _expr( x ) ] ]   if x is not None   else   []
-		return Nodes.DecoStmt( name=node.func.id, args=[ _expr( x )   for x in node.args ]  +  [ _expr( x )   for x in node.keywords ]  +  _starArg( 'argList', node.starargs )  +  _starArg( 'kwArgList', node.kwargs ) )
+		return Nodes.Decorator( name=node.func.id, args=[ _expr( x )   for x in node.args ]  +  [ _expr( x )   for x in node.keywords ]  +  _starArg( 'argList', node.starargs )  +  _starArg( 'kwArgList', node.kwargs ) )
 
 	def keyword(self, node):
 		return Nodes.CallKWArg( name=node.arg, value=_expr( node.value ) )
@@ -467,12 +467,17 @@ class _ExceptHandlerImporter (_Importer):
 			except AttributeError:
 				return Nodes.UNPARSED( value=name )
 		return method( structTab, node )
-	# Import statement
+	
+	# Except block
 	def ExceptHandler(self, structTab, node):
-		return Nodes.ExceptStmt( exception=_expr( node.type )   if node.type is not None   else None, target=_target( node.name )   if node.name is not None   else None, suite=_flattenedCompound( structTab, node.body ) )
+		exception = _expr( node.type )   if node.type is not None   else None
+		target = _target( node.name )   if node.name is not None   else None
+		suite = _flattenedCompound( structTab, node.body )
+		
+		return Nodes.ExceptBlock( exception=exception, target=target, suite=suite )
 		
 	def ExceptHandlerType(self, structTab, node):
-		return self.ExceptHandler( structTab, node )
+		return self.ExceptBlock( structTab, node )
 
 	
 
@@ -491,74 +496,69 @@ class _CompoundStmtImporter (_Importer):
 	
 	# If
 	def If(self, structTab, node):
-		def _handleNode(n, bFirst):
-			nodeClass = Nodes.IfStmt   if bFirst   else Nodes.ElifStmt
-			result = [ nodeClass( condition=_expr( n.test ), suite= _flattenedCompound( structTab, n.body ) ) ]
-			if len( n.orelse ) == 1   and   isinstance( n.orelse[0], _ast.If ):
-				xs = structTab.nodesTo( n.orelse[0].lineno - 1 )
-				result.extend( xs )
-				result.extend( _handleNode( n.orelse[0], False ) )
-			elif len( n.orelse ) == 0:
-				pass
-			else:
-				xs = structTab.nodesTo( n.orelse[0].lineno - 1 )
-				result.extend( xs )
-				result.extend( [ Nodes.ElseStmt( suite=_flattenedCompound( structTab, n.orelse ) ) ] )
-			return result;
+		condition = _expr( node.test )
+		suite = _flattenedCompound( structTab, node.body )
+		
+		elifBlocks = []
+		src = node
+		while len( src.orelse ) == 1   and   isinstance( src.orelse[0], _ast.If ):
+			src = src.orelse[0]
+			e = Nodes.ElifBlock( condition=_expr( src.test ), suite=_flattenedCompound( structTab, src.body ) )
+			elifBlocks.append( e )
+		
+		elseSuite = _flattenedCompound( structTab, src.orelse )   if len( src.orelse ) > 0   else   None
 			
-		return _handleNode( node, True )
+		return [ Nodes.IfStmt( condition=condition, suite=suite, elifBlocks=elifBlocks, elseSuite=elseSuite ) ]
 
 	
 	# While
 	def While(self, structTab, node):
-		result = [ Nodes.WhileStmt( condition=_expr( node.test ), suite=_flattenedCompound( structTab, node.body ) ) ]
-		if len( node.orelse ) > 0:
-			xs = structTab.nodesTo( node.orelse[0].lineno - 1 )
-			result.extend( xs )
-			result.append( Nodes.ElseStmt( suite=_flattenedCompound( structTab, node.orelse ) + xs ) )
-		return result
+		condition = _expr( node.test )
+		suite = _flattenedCompound( structTab, node.body )
+		elseSuite = _flattenedCompound( structTab, node.orelse )   if len( node.orelse ) > 0   else   None
+		return [ Nodes.WhileStmt( condition=condition, suite=suite, elseSuite=elseSuite ) ]
 
 	
 	# For
 	def For(self, structTab, node):
-		result = [ Nodes.ForStmt( target=_target( node.target ), source=_expr( node.iter ), suite=_flattenedCompound( structTab, node.body ) ) ]
-		if len( node.orelse ) > 0:
-			xs = structTab.nodesTo( node.orelse[0].lineno - 1 )
-			result.extend( xs )
-			result.append( Nodes.ElseStmt( suite=_flattenedCompound( structTab, node.orelse ) ) )
-		return result
+		target = _target( node.target )
+		source = _expr( node.iter )
+		suite = _flattenedCompound( structTab, node.body )
+		elseSuite = _flattenedCompound( structTab, node.orelse )   if len( node.orelse ) > 0   else   None
+		return [ Nodes.ForStmt( target=target, source=source, suite=suite, elseSuite=elseSuite ) ]
 	
 	
 	# Try
 	def TryExcept(self, structTab, node):
-		result = [ Nodes.TryStmt( suite=_flattenedCompound( structTab, node.body ) ) ]
-		for h in node.handlers:
-			xs = structTab.nodesTo( h.lineno - 1 )
-			result.extend( xs )
-			result.append( _except( structTab, h ) )
-		if len( node.orelse ) > 0:
-			xs = structTab.nodesTo( node.orelse[0].lineno - 1 )
-			result.extend( xs )
-			result.append( Nodes.ElseStmt( suite=_flattenedCompound( structTab, node.orelse ) ) )
-		return result
-	
+		suite=_flattenedCompound( structTab, node.body )
+		exceptBlocks = [ _except( structTab, h )   for h in node.handlers ]
+		elseSuite = _flattenedCompound( structTab, node.orelse )   if len( node.orelse ) > 0   else   None
+		return [ Nodes.TryStmt( suite=suite, exceptBlocks=exceptBlocks, elseSuite=elseSuite, finallySuite=None ) ]
+
 	def TryFinally(self, structTab, node):
-		body = _flattenedCompound( structTab, node.body )
-		body.append( Nodes.FinallyStmt( suite=_flattenedCompound( structTab, node.finalbody ) ) )
-		return body
+		body = node.body[0]
+		suite=_flattenedCompound( structTab, body.body )
+		exceptBlocks = [ _except( structTab, h )   for h in body.handlers ]
+		elseSuite = _flattenedCompound( structTab, body.orelse )   if len( body.orelse ) > 0   else   None
+		finallySuite = _flattenedCompound( structTab, node.finalbody )   if len( node.finalbody ) > 0   else   None
+		return [ Nodes.TryStmt( suite=suite, exceptBlocks=exceptBlocks, elseSuite=elseSuite, finallySuite=finallySuite ) ]
 	
 	
 	# With
 	def With(self, structTab, node):
-		return [ Nodes.WithStmt( expr=_expr( node.expr ), target=_target( node.vars )   if node.vars is not None   else   None, suite=_flattenedCompound( structTab, node.body ) ) ]
+		expr = _expr( node.expr )
+		target = _target( node.vars )   if node.vars is not None   else   None
+		suite = _flattenedCompound( structTab, node.body )
+		return [ Nodes.WithStmt( expr=expr, target=target, suite=suite ) ]
 	
 	
 	# Function
 	def FunctionDef(self, structTab, node):
-		result = [ _decorator( dec )   for dec in node.decorator_list ]
+		decorators = [ _decorator( dec )   for dec in node.decorator_list ]
+		name = node.name
 		params = _extractParameters( node.args )
-		result.append( Nodes.DefStmt( name=node.name, params=params, suite=_flattenedCompound( structTab, node.body ) ) )
-		return result
+		suite = _flattenedCompound( structTab, node.body )
+		return [ Nodes.DefStmt( decorators=decorators, name=name, params=params, suite=suite ) ]
 		
 	
 
@@ -612,7 +612,7 @@ def _flattenedCompound(structTab, nodeList):
 	xs = []
 	for node in nodeList:
 		xs.extend( _compound( structTab, node ) )
-	xs.extend( structTab.nodesToIndentationChange() )
+	xs.extend( structTab.nodesToNextStatement() )
 	return xs
 	
 
@@ -724,7 +724,7 @@ class _StructureTable (object):
 		lines = source.split( '\n' )
 		pos = 0
 		self.table = [ None ] * len( lines )
-		self.indentationChange = [ False ] * len( lines )
+		self.isStatement = [ False ] * len( lines )
 		tableIndex = 0
 		
 		prevIndentation = None
@@ -747,16 +747,10 @@ class _StructureTable (object):
 				commentPos = pos + line.index( '#' )
 				if not _isQuoted( commentPos, quoteTable, tableIndex ):
 					self.table[i] = Nodes.CommentStmt( comment=x[x.index( '#' )+1:] )
+			else:
+				self.isStatement[i] = True
 			
 			pos += lineEndPos + 1
-			
-			
-			if x != '':
-				indentation = line[:line.index( x )]
-				if prevIndentation is not None  and  indentation != prevIndentation:
-					self.indentationChange[i] = True
-					
-				prevIndentation = indentation
 					
 		self.pos = 0
 		
@@ -774,10 +768,10 @@ class _StructureTable (object):
 			return []
 	
 	
-	def nodesToIndentationChange(self):
-		pos = len( self.indentationChange )
-		for i in xrange( self.pos, len( self.indentationChange ) ):
-			if self.indentationChange[i]:
+	def nodesToNextStatement(self):
+		pos = len( self.isStatement )
+		for i in xrange( self.pos, len( self.isStatement ) ):
+			if self.isStatement[i]:
 				pos = i
 				break
 			
@@ -1048,6 +1042,10 @@ class ImporterTestCase (unittest.TestCase):
 		
 
 	
+	#
+	# Simple statements
+	#
+	
 	def testAssert(self):
 		self._stmtTest( 'assert a', Nodes.AssertStmt( condition=Nodes.Load( name='a' ), fail=None ) )
 		self._stmtTest( 'assert a,b', Nodes.AssertStmt( condition=Nodes.Load( name='a' ), fail=Nodes.Load( name='b' ) ) )
@@ -1137,7 +1135,12 @@ class ImporterTestCase (unittest.TestCase):
 		self._stmtTest( 'print x', Nodes.Call( target=Nodes.Load( name='print' ), args=[ Nodes.Load( name='x' ) ] ) )
 		self._stmtTest( 'print x,y', Nodes.Call( target=Nodes.Load( name='print' ), args=[ Nodes.Load( name='x' ), Nodes.Load( name='y' ) ] ) )
 		
+
 		
+	#
+	# Compound statements
+	#
+	
 	def testIf(self):
 		src1 = \
 """
@@ -1148,7 +1151,9 @@ if a:
 if a:
 	x
 elif b:
-	y"""
+	y
+elif c:
+	z"""
 		src3 = \
 """
 if a:
@@ -1161,12 +1166,14 @@ if a:
 	x
 elif b:
 	y
+elif c:
+	z
 else:
-	z"""
-		self._compStmtTest( src1, [ Nodes.BlankLine(), Nodes.IfStmt( condition=Nodes.Load( name='a' ), suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='x' ) ) ] ) ] )
-		self._compStmtTest( src2, [ Nodes.BlankLine(), Nodes.IfStmt( condition=Nodes.Load( name='a' ), suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='x' ) ) ] ), Nodes.ElifStmt( condition=Nodes.Load( name='b' ), suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='y' ) ) ] ) ] )
-		self._compStmtTest( src3, [ Nodes.BlankLine(), Nodes.IfStmt( condition=Nodes.Load( name='a' ), suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='x' ) ) ] ), Nodes.ElseStmt( suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='z' ) ) ] ) ] )
-		self._compStmtTest( src4, [ Nodes.BlankLine(), Nodes.IfStmt( condition=Nodes.Load( name='a' ), suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='x' ) ) ] ), Nodes.ElifStmt( condition=Nodes.Load( name='b' ), suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='y' ) ) ] ), Nodes.ElseStmt( suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='z' ) ) ] ) ] )
+	w"""
+		self._compStmtTest( src1, [ Nodes.BlankLine(), Nodes.IfStmt( condition=Nodes.Load( name='a' ), suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='x' ) ) ], elifBlocks=[], elseSuite=None ) ] )
+		self._compStmtTest( src2, [ Nodes.BlankLine(), Nodes.IfStmt( condition=Nodes.Load( name='a' ), suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='x' ) ) ], elifBlocks=[ Nodes.ElifBlock( condition=Nodes.Load( name='b' ), suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='y' ) ) ] ), Nodes.ElifBlock( condition=Nodes.Load( name='c' ), suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='z' ) ) ] ) ], elseSuite=None ) ] )
+		self._compStmtTest( src3, [ Nodes.BlankLine(), Nodes.IfStmt( condition=Nodes.Load( name='a' ), suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='x' ) ) ], elifBlocks=[], elseSuite=[ Nodes.ExprStmt( expr=Nodes.Load( name='z' ) ) ] ) ] )
+		self._compStmtTest( src4, [ Nodes.BlankLine(), Nodes.IfStmt( condition=Nodes.Load( name='a' ), suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='x' ) ) ], elifBlocks=[ Nodes.ElifBlock( condition=Nodes.Load( name='b' ), suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='y' ) ) ] ), Nodes.ElifBlock( condition=Nodes.Load( name='c' ), suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='z' ) ) ] ) ], elseSuite=[ Nodes.ExprStmt( expr=Nodes.Load( name='w' ) ) ] ) ] )
 
 		
 	def testWhile(self):
@@ -1181,8 +1188,8 @@ while a:
 	x
 else:
 	z"""
-		self._compStmtTest( src1, [ Nodes.BlankLine(), Nodes.WhileStmt( condition=Nodes.Load( name='a' ), suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='x' ) ) ] ) ] )
-		self._compStmtTest( src2, [ Nodes.BlankLine(), Nodes.WhileStmt( condition=Nodes.Load( name='a' ), suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='x' ) ) ] ), Nodes.ElseStmt( suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='z' ) ) ] ) ] )
+		self._compStmtTest( src1, [ Nodes.BlankLine(), Nodes.WhileStmt( condition=Nodes.Load( name='a' ), suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='x' ) ) ], elseSuite=None ) ] )
+		self._compStmtTest( src2, [ Nodes.BlankLine(), Nodes.WhileStmt( condition=Nodes.Load( name='a' ), suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='x' ) ) ], elseSuite=[ Nodes.ExprStmt( expr=Nodes.Load( name='z' ) ) ] ) ] )
 
 		
 		
@@ -1197,8 +1204,8 @@ for a in q:
 	x
 else:
 	z"""
-		self._compStmtTest( src1, [ Nodes.BlankLine(), Nodes.ForStmt( target=Nodes.SingleTarget( name='a' ), source=Nodes.Load( name='q' ), suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='x' ) ) ] ) ] )
-		self._compStmtTest( src2, [ Nodes.BlankLine(), Nodes.ForStmt( target=Nodes.SingleTarget( name='a' ), source=Nodes.Load( name='q' ), suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='x' ) ) ] ), Nodes.ElseStmt( suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='z' ) ) ] ) ] )
+		self._compStmtTest( src1, [ Nodes.BlankLine(), Nodes.ForStmt( target=Nodes.SingleTarget( name='a' ), source=Nodes.Load( name='q' ), suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='x' ) ) ], elseSuite=None ) ] )
+		self._compStmtTest( src2, [ Nodes.BlankLine(), Nodes.ForStmt( target=Nodes.SingleTarget( name='a' ), source=Nodes.Load( name='q' ), suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='x' ) ) ], elseSuite=[ Nodes.ExprStmt( expr=Nodes.Load( name='z' ) ) ] ) ] )
 
 		
 		
@@ -1212,8 +1219,7 @@ except:
 except a:
 	q
 except a,b:
-	r
-"""
+	r"""
 		src2 = \
 """
 try:
@@ -1230,9 +1236,9 @@ except:
 	p
 finally:
 	z"""
-		self._compStmtTest( src1, [ Nodes.BlankLine(), Nodes.TryStmt( suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='x' ) ) ] ),  Nodes.ExceptStmt( exception=None, target=None, suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='p' ) ) ] ),   Nodes.ExceptStmt( exception=Nodes.Load( name='a' ), target=None, suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='q' ) ) ] ),    Nodes.ExceptStmt( exception=Nodes.Load( name='a' ), target=Nodes.SingleTarget( name='b' ), suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='r' ) ) ] ) ] )
-		self._compStmtTest( src2, [ Nodes.BlankLine(), Nodes.TryStmt( suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='x' ) ) ] ),  Nodes.ExceptStmt( exception=None, target=None, suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='p' ) ) ] ),   Nodes.ElseStmt( suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='z' ) ) ] ) ] )
-		self._compStmtTest( src3, [ Nodes.BlankLine(), Nodes.TryStmt( suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='x' ) ) ] ),  Nodes.ExceptStmt( exception=None, target=None, suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='p' ) ) ] ),   Nodes.FinallyStmt( suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='z' ) ) ] ) ] )
+		self._compStmtTest( src1, [ Nodes.BlankLine(), Nodes.TryStmt( suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='x' ) ) ], exceptBlocks=[ Nodes.ExceptBlock( exception=None, target=None, suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='p' ) ) ] ),   Nodes.ExceptBlock( exception=Nodes.Load( name='a' ), target=None, suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='q' ) ) ] ),    Nodes.ExceptBlock( exception=Nodes.Load( name='a' ), target=Nodes.SingleTarget( name='b' ), suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='r' ) ) ] ) ], elseSuite=None, finallySuite=None ) ] )
+		self._compStmtTest( src2, [ Nodes.BlankLine(), Nodes.TryStmt( suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='x' ) ) ], exceptBlocks=[ Nodes.ExceptBlock( exception=None, target=None, suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='p' ) ) ] ) ], elseSuite=[ Nodes.ExprStmt( expr=Nodes.Load( name='z' ) ) ], finallySuite=None ) ] )
+		self._compStmtTest( src3, [ Nodes.BlankLine(), Nodes.TryStmt( suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='x' ) ) ],  exceptBlocks=[ Nodes.ExceptBlock( exception=None, target=None, suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='p' ) ) ] ) ],   elseSuite=None, finallySuite=[ Nodes.ExprStmt( expr=Nodes.Load( name='z' ) ) ] ) ] )
 
 		
 		
@@ -1278,11 +1284,11 @@ def f():
 @q(j)
 def f():
 	x"""
-		self._compStmtTest( src1, [ Nodes.BlankLine(), Nodes.DefStmt( name='f', params=[], suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='x' ) ) ] ) ] )
-		self._compStmtTest( src2, [ Nodes.BlankLine(), Nodes.DefStmt( name='f', params=[ Nodes.SimpleParam( name='a' ), Nodes.DefaultValueParam( name='b', defaultValue=Nodes.Load( name='q' ) ), Nodes.ParamList( name='c' ), Nodes.KWParamList( name='d' ) ], suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='x' ) ) ] ) ] )
-		self._compStmtTest( src3, [ Nodes.BlankLine(), Nodes.DecoStmt( name='p', args=None ), Nodes.DefStmt( name='f', params=[], suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='x' ) ) ] ) ] )
-		self._compStmtTest( src4, [ Nodes.BlankLine(), Nodes.DecoStmt( name='p', args=[ Nodes.Load( name='h' ) ] ), Nodes.DefStmt( name='f', params=[], suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='x' ) ) ] ) ] )
-		self._compStmtTest( src5, [ Nodes.BlankLine(), Nodes.DecoStmt( name='p', args=[ Nodes.Load( name='h' ) ] ), Nodes.DecoStmt( name='q', args=[ Nodes.Load( name='j' ) ] ), Nodes.DefStmt( name='f', params=[], suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='x' ) ) ] ) ] )
+		self._compStmtTest( src1, [ Nodes.BlankLine(), Nodes.DefStmt( decorators=[], name='f', params=[], suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='x' ) ) ] ) ] )
+		self._compStmtTest( src2, [ Nodes.BlankLine(), Nodes.DefStmt( decorators=[], name='f', params=[ Nodes.SimpleParam( name='a' ), Nodes.DefaultValueParam( name='b', defaultValue=Nodes.Load( name='q' ) ), Nodes.ParamList( name='c' ), Nodes.KWParamList( name='d' ) ], suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='x' ) ) ] ) ] )
+		self._compStmtTest( src3, [ Nodes.BlankLine(), Nodes.DefStmt( decorators=[ Nodes.Decorator( name='p', args=None ) ], name='f', params=[], suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='x' ) ) ] ) ] )
+		self._compStmtTest( src4, [ Nodes.BlankLine(), Nodes.DefStmt( decorators=[ Nodes.Decorator( name='p', args=[ Nodes.Load( name='h' ) ] ) ], name='f', params=[], suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='x' ) ) ] ) ] )
+		self._compStmtTest( src5, [ Nodes.BlankLine(), Nodes.DefStmt( decorators=[ Nodes.Decorator( name='p', args=[ Nodes.Load( name='h' ) ] ), Nodes.Decorator( name='q', args=[ Nodes.Load( name='j' ) ] ) ], name='f', params=[], suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='x' ) ) ] ) ] )
 
 		
 	def testClass(self):

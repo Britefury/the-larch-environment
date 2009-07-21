@@ -9,6 +9,7 @@ package BritefuryJ.DocPresent.StyleSheets;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.Paint;
 import java.awt.font.FontRenderContext;
 import java.awt.font.LineMetrics;
 
@@ -23,7 +24,7 @@ public class MathRootStyleSheet extends ContainerStyleSheet
 	public static MathRootStyleSheet defaultStyleSheet = new MathRootStyleSheet();
 	
 	protected Font font;
-	protected Color colour;
+	protected Paint symbolPaint;
 	protected double thickness;
 	
 	protected double glyphLineWidths[], glyphWidth, barSpacing;
@@ -37,17 +38,17 @@ public class MathRootStyleSheet extends ContainerStyleSheet
 		this( defaultFont, Color.BLACK, 1.5 );
 	}
 	
-	public MathRootStyleSheet(Color colour, double thickness)
+	public MathRootStyleSheet(Paint symbolPaint, double thickness)
 	{
-		this( defaultFont, colour, thickness );
+		this( defaultFont, symbolPaint, thickness );
 	}
 	
-	public MathRootStyleSheet(Font font, Color colour, double thickness)
+	public MathRootStyleSheet(Font font, Paint symbolPaint, double thickness)
 	{
 		super();
 		
 		this.font = font;
-		this.colour = colour;
+		this.symbolPaint = symbolPaint;
 		this.thickness = thickness;
 		glyphLineWidths = new double[3];
 		this.barSpacing = 0.0;
@@ -60,9 +61,9 @@ public class MathRootStyleSheet extends ContainerStyleSheet
 		return font;
 	}
 
-	public Color getColour()
+	public Paint getSymbolPaint()
 	{
-		return colour;
+		return symbolPaint;
 	}
 
 	public double getThickness()

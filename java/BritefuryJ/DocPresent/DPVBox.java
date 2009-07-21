@@ -141,6 +141,8 @@ public class DPVBox extends DPAbstractBox
 	
 	protected AABox2[] computeCollatedBranchBoundsBoxes(DPContainer collatedBranch, int rangeStart, int rangeEnd)
 	{
+		refreshCollation();
+		
 		DPWidget startLeaf = collationLeaves[rangeStart];
 		DPWidget endLeaf = collationLeaves[rangeEnd-1];
 		double yStart = startLeaf.getPositionInParentSpaceY();

@@ -7,6 +7,7 @@
 package BritefuryJ.DocPresent.StyleSheets;
 
 import java.awt.Color;
+import java.awt.Paint;
 
 public class FractionStyleSheet extends ContainerStyleSheet
 {
@@ -15,20 +16,20 @@ public class FractionStyleSheet extends ContainerStyleSheet
 		public static BarStyleSheet defaultStyleSheet = new BarStyleSheet( Color.black );
 		
 		
-		protected Color colour;
+		protected Paint barPaint;
 		
 		
-		public BarStyleSheet(Color colour)
+		public BarStyleSheet(Paint barPaint)
 		{
 			super();
 			
-			this.colour = colour;
+			this.barPaint = barPaint;
 		}
 		
 		
-		public Color getColour()
+		public Paint getBarPaint()
 		{
-			return colour;
+			return barPaint;
 		}
 	}
 
@@ -47,12 +48,12 @@ public class FractionStyleSheet extends ContainerStyleSheet
 		this( 2.0, 3.0, 5.0, Color.black );
 	}
 	
-	public FractionStyleSheet(Color colour)
+	public FractionStyleSheet(Paint barPaint)
 	{
-		this( 2.0, 3.0, 5.0, colour );
+		this( 2.0, 3.0, 5.0, barPaint );
 	}
 	
-	public FractionStyleSheet(double vspacing, double hpadding, double yOffset, Color colour)
+	public FractionStyleSheet(double vspacing, double hpadding, double yOffset, Paint barPaint)
 	{
 		super();
 		
@@ -60,7 +61,7 @@ public class FractionStyleSheet extends ContainerStyleSheet
 		this.hpadding = hpadding;
 		this.yOffset = yOffset;
 		
-		barStyleSheet = new BarStyleSheet( colour );
+		barStyleSheet = new BarStyleSheet( barPaint );
 	}
 	
 	

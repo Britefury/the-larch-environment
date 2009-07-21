@@ -7,8 +7,8 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Paint;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
@@ -67,8 +67,10 @@ public class DPCustomSymbol extends DPContentLeafEditableEntry
 	{
 		super.draw( graphics );
 		
-		graphics.setColor( getColour() );
+		Paint curPaint = graphics.getPaint();
+		graphics.setPaint( getSymbolPaint() );
 		symbol.draw( graphics );
+		graphics.setPaint( curPaint );
 	}
 	
 	
@@ -84,9 +86,9 @@ public class DPCustomSymbol extends DPContentLeafEditableEntry
 	}
 	
 	
-	protected Color getColour()
+	protected Paint getSymbolPaint()
 	{
-		return ((CustomSymbolStyleSheet)styleSheet).getColour();
+		return ((CustomSymbolStyleSheet)styleSheet).getSymbolPaint();
 	}
 
 	

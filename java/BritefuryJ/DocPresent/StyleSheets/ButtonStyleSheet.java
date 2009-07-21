@@ -7,6 +7,8 @@
 package BritefuryJ.DocPresent.StyleSheets;
 
 import java.awt.Color;
+import java.awt.Paint;
+import java.awt.RadialGradientPaint;
 
 import BritefuryJ.DocPresent.Border.SolidBorder;
 
@@ -16,41 +18,46 @@ public class ButtonStyleSheet extends ContainerStyleSheet
 	
 	
 	
-	protected Color borderColour, backgroundColour, highlightBackgColour;
+	protected Paint borderPaint, backgroundPaint, highlightBackgPaint;
 	protected SolidBorder border, highlightBorder;
 	
 	
 	public ButtonStyleSheet()
 	{
-//		this( new Color( 0.55f, 0.75f, 1.0f ), new Color( 0.85f, 0.95f, 1.0f ), new Color( 0.75f, 0.85f, 1.0f ) );
-		this( new Color( 0.4f, 0.7f, 1.0f ), new Color( 0.9f, 0.92f, 1.0f ), null );
-	}
-	
-	public ButtonStyleSheet(Color borderColour, Color backgroundColour, Color highlightBackgColour)
-	{
-		this.borderColour = borderColour;
-		this.backgroundColour = backgroundColour;
-		this.highlightBackgColour = highlightBackgColour;
+		//this( new Color( 0.55f, 0.75f, 1.0f ), new Color( 0.85f, 0.95f, 1.0f ), new Color( 0.75f, 0.85f, 1.0f ) );
 		
-		border = new SolidBorder( 1.0, 2.0, 10.0, 10.0, borderColour, backgroundColour );
-		highlightBorder = new SolidBorder( 1.0, 2.0, 10.0, 10.0, borderColour, highlightBackgColour );
+		//this( new Color( 0.4f, 0.7f, 1.0f ), new Color( 0.9f, 0.92f, 1.0f ), null );
+		
+		this( new RadialGradientPaint( -10.0f, -10.0f, 100.0f, new float[] { 0.0f, 1.0f }, new Color[] { new Color( 0.2f, 0.3f, 0.5f ), new Color( 0.3f, 0.45f, 0.75f ) }, RadialGradientPaint.CycleMethod.NO_CYCLE ),
+				new RadialGradientPaint( -10.0f, -10.0f, 100.0f, new float[] { 0.0f, 1.0f }, new Color[] { new Color( 0.9f, 0.92f, 1.0f ), new Color( 0.75f, 0.825f, 0.9f ) }, RadialGradientPaint.CycleMethod.NO_CYCLE ),
+				new RadialGradientPaint( -10.0f, -10.0f, 100.0f, new float[] { 0.0f, 1.0f }, new Color[] { new Color( 1.0f, 1.0f, 1.0f ), new Color( 0.85f, 0.85f, 0.85f ) }, RadialGradientPaint.CycleMethod.NO_CYCLE ) );
+	}
+	
+	public ButtonStyleSheet(Paint borderPaint, Paint backgroundPaint, Paint highlightBackgPaint)
+	{
+		this.borderPaint = borderPaint;
+		this.backgroundPaint = backgroundPaint;
+		this.highlightBackgPaint = highlightBackgPaint;
+		
+		border = new SolidBorder( 1.0, 2.0, 10.0, 10.0, borderPaint, backgroundPaint );
+		highlightBorder = new SolidBorder( 1.0, 2.0, 10.0, 10.0, borderPaint, highlightBackgPaint );
 	}
 	
 	
 	
-	public Color getBorderColour()
+	public Paint getBorderPaint()
 	{
-		return borderColour;
+		return borderPaint;
 	}
 	
-	public Color getBackgroundColour()
+	public Paint getBackgroundPaint()
 	{
-		return backgroundColour;
+		return backgroundPaint;
 	}
 	
-	public Color getHighlightBackgroundColour()
+	public Paint getHighlightBackgroundPaint()
 	{
-		return highlightBackgColour;
+		return highlightBackgPaint;
 	}
 	
 	

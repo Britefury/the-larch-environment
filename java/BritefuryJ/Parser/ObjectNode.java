@@ -183,7 +183,8 @@ public class ObjectNode extends ParserExpression
 	{
 		if ( input.isInstanceOf( objClass ) )
 		{
-			DMObject value = input.getDMClass().newInstance();
+			DMObjectClass inputClass = input.getDMClass();
+			DMObject value = inputClass.newInstance();
 			Map<String, Object> bindings = null;
 			
 			for (int i = 0; i < fieldExpTable.length; i++)
@@ -208,6 +209,12 @@ public class ObjectNode extends ParserExpression
 				{
 					value.set( i, input.get( i ) );
 				}
+			}
+			
+			int clsSize = inputClass.getNumFields();			
+			for (int i = fieldExpTable.length; i < clsSize; i++)
+			{
+				value.set( i, input.get( i ) );
 			}
 			
 			return new ParseResult( value, 0, 1, bindings );

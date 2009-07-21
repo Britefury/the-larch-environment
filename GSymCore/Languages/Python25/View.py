@@ -31,6 +31,8 @@ from BritefuryJ.GSym.View.ListView import ParagraphListViewLayout, HorizontalLis
 from GSymCore.Languages.Python25.Parser import Python25Grammar
 from GSymCore.Languages.Python25.Styles import *
 from GSymCore.Languages.Python25.PythonEditOperations import *
+from GSymCore.Languages.Python25.NodeEditor import *
+from GSymCore.Languages.Python25.SelectionEditor import *
 from GSymCore.Languages.Python25.Keywords import *
 from GSymCore.Languages.Python25.Precedence import *
 from GSymCore.Languages.Python25 import NodeClasses as Nodes
@@ -44,10 +46,10 @@ DEFAULT_LINE_BREAK_PRIORITY = 100
 
 class _TextFactory (object):
 	__slots__ = [ 'ctx' ]
-	
+
 	style = default_textStyle
 	text = ''
-	
+
 	def __init__(self, ctx):
 		self.ctx = ctx
 
@@ -58,10 +60,10 @@ class _TextFactory (object):
 
 class _TextSeparatorFactory (object):
 	__slots__ = [ 'ctx' ]
-	
+
 	style = default_textStyle
 	text = ''
-	
+
 	def __init__(self, ctx):
 		self.ctx = ctx
 
@@ -72,35 +74,35 @@ class _TextSeparatorFactory (object):
 class _CommaFactory (_TextSeparatorFactory):
 	style = punctuation_textStyle
 	text = ','
-	
-	
+
+
 
 class _OpenBracketFactory (_TextFactory):
 	style = punctuation_textStyle
 	text = '['
-	
+
 class _CloseBracketFactory (_TextFactory):
 	style = punctuation_textStyle
 	text = ']'
 
-	
+
 class _OpenBraceFactory (_TextFactory):
 	style = punctuation_textStyle
 	text = '{'
-	
+
 class _CloseBraceFactory (_TextFactory):
 	style = punctuation_textStyle
 	text = '}'
-	
+
 
 class _OpenParenFactory (_TextFactory):
 	style = punctuation_textStyle
 	text = '('
-	
+
 class _CloseParenFactory (_TextFactory):
 	style = punctuation_textStyle
 	text = ')'
-	
+
 
 
 
@@ -116,7 +118,7 @@ def capitalisedKeywordText(ctx, keyword):
 
 _statementKeyboardListener = StatementKeyboardListener()
 
-			
+
 
 
 
@@ -179,21 +181,43 @@ def statementNodeEditor(ctx, node, contents, precedence, state):
 	if mode == MODE_EDITSTATEMENT:
 		contents = _precedenceParen( ctx, node, contents, precedence, outerPrecedence )
 		segment = ctx.segment( default_textStyle, True, True, contents )
-		segment = ctx.textRepresentationListener( segment, ParsedLineTextRepresentationListener.newListener( parser ) )
+		segment = ctx.textRepresentationListener( segment, SimpleStatementTextRepresentationListener.newListener( parser ) )
 
 		newLine = ctx.whitespace( '\n' )
 		newLine = ctx.textRepresentationListener( newLine, StatementNewLineTextRepresentationListener.newListener( parser ) )
 
-		segment = ctx.paragraph( python_paragraphStyle, [ segment, newLine ] )
-		segment = ctx.keyboardListener( segment, _statementKeyboardListener )
-		return segment
+		para = ctx.paragraph( python_paragraphStyle, [ segment, newLine ] )
+		para = ctx.keyboardListener( para, _statementKeyboardListener )
+		return para
 	else:
 		raise ValueError, 'invalid mode %d'  %  mode
 
 
-def compoundStatementEditor(ctx, node, headerContents, precedence, suite, state, statementParser, headerContainerFn=None):
+def compoundStatementHeaderEditor(ctx, node, headerContents, precedence, state, headerContainerFn=None):
 	outerPrecedence, parser, mode = state
-	
+
+	# THE EDIT OPERATIONS RELY ON THE ELEMENT STRUCTURE USED HERE:
+	#	Paragraph - header
+	#		Segment - header
+	#			header content
+	#		NewLine - header
+
+	headerSegment = ctx.segment( default_textStyle, True, True, headerContents )
+	headerSegment = ctx.textRepresentationListener( headerSegment, SimpleStatementTextRepresentationListener.newListener( parser ) )
+
+	newLine = ctx.whitespace( '\n' )
+	newLine = ctx.textRepresentationListener( newLine, StatementNewLineTextRepresentationListener.newListener( parser ) )
+
+	headerParagraph = ctx.paragraph( python_paragraphStyle, [ headerSegment, newLine ] )
+	headerParagraph = ctx.keyboardListener( headerParagraph, _statementKeyboardListener )
+	if headerContainerFn is not None:
+		headerParagraph = headerContainerFn( headerParagraph )
+	return headerParagraph
+
+
+def compoundStatementEditor(ctx, node, precedence, compoundBlocks, state, statementParser):
+	outerPrecedence, parser, mode = state
+
 	# THE EDIT OPERATIONS RELY ON THE ELEMENT STRUCTURE USED HERE:
 	#	VBox - compound stmt
 	#		Paragraph - header
@@ -203,17 +227,32 @@ def compoundStatementEditor(ctx, node, headerContents, precedence, suite, state,
 	#		Indent - suite
 	#			suite view
 
-	headerSegment = ctx.segment( default_textStyle, True, True, headerContents )
-
-	newLine = ctx.whitespace( '\n' )
-	newLine = ctx.textRepresentationListener( newLine, StatementNewLineTextRepresentationListener.newListener( parser ) )
-
-	headerParagraph = ctx.paragraph( python_paragraphStyle, [ headerSegment, newLine ] )
-	headerElement = ctx.textRepresentationListener( headerParagraph, ParsedLineTextRepresentationListener.newListener( parser ) )
-	headerElement = ctx.keyboardListener( headerElement, _statementKeyboardListener )
-	if headerContainerFn is not None:
-		headerElement = headerContainerFn( headerElement )
-	statementElement = ctx.vbox( compoundStmt_vboxStyle, [ headerElement, ctx.indent( 30.0, suiteView( ctx, suite, statementParser ) ) ] )
+	statementContents = []
+	for i, block in enumerate( compoundBlocks ):
+		if len( block ) == 2:
+			headerContents, suite = block
+			headerContainerFn = None
+		elif len( block ) == 3:
+			headerContents, suite, headerContainerFn = block
+		else:
+			raise TypeError, 'Compound block should be of the form (headerContents, suite)  or  (headerContents, suite, headerContainerFn)'
+		
+		headerSegment = ctx.segment( default_textStyle, True, True, headerContents )
+		headerSegment = ctx.textRepresentationListener( headerSegment, CompoundStatementTextRepresentationListener.newListener( parser, i ) )
+	
+		newLine = ctx.whitespace( '\n' )
+		newLine = ctx.textRepresentationListener( newLine, StatementNewLineTextRepresentationListener.newListener( parser ) )
+	
+		headerParagraph = ctx.paragraph( python_paragraphStyle, [ headerSegment, newLine ] )
+		headerParagraph = ctx.keyboardListener( headerParagraph, _statementKeyboardListener )
+		if headerContainerFn is not None:
+			headerParagraph = headerContainerFn( headerParagraph )
+		
+		if suite is not None:
+			statementContents.extend( [ headerParagraph, ctx.indent( 30.0, suiteView( ctx, suite, statementParser ) ) ] )
+		else:
+			statementContents.append( headerParagraph )
+	statementElement = ctx.vbox( compoundStmt_vboxStyle, statementContents )
 	return statementElement
 
 
@@ -224,25 +263,25 @@ def spanBinOpView(ctx, state, node, x, y, op, precedence, bRightAssociative, exp
 	yView = ctx.viewEvalFn( y, None, python25ViewState( yPrec, expressionParser ) )
 	opView = ctx.text( operator_textStyle, op )
 	return expressionNodeEditor( ctx, node,
-			   ctx.span( [ xView, ctx.text( default_textStyle, ' ' ), opView, ctx.lineBreak( precedence, ctx.text( default_textStyle, ' ' ) ), yView ] ),
-			   precedence,
-			   state )
+				     ctx.span( [ xView, ctx.text( default_textStyle, ' ' ), opView, ctx.lineBreak( precedence, ctx.text( default_textStyle, ' ' ) ), yView ] ),
+				     precedence,
+				     state )
 
 def spanCmpOpView(ctx, state, node, op, y, precedence, expressionParser):
 	opView = ctx.text( operator_textStyle, op )
 	yView = ctx.viewEvalFn( y, None, python25ViewState( precedence, expressionParser ) )
 	return expressionNodeEditor( ctx, node,
-			   ctx.span( [ ctx.text( default_textStyle, ' ' ), opView, ctx.lineBreak( precedence, ctx.text( default_textStyle, ' ' ) ), yView ] ),
-			   precedence,
-			   state )
+				     ctx.span( [ ctx.text( default_textStyle, ' ' ), opView, ctx.lineBreak( precedence, ctx.text( default_textStyle, ' ' ) ), yView ] ),
+				     precedence,
+				     state )
 
 def spanPrefixOpView(ctx, state, node, x, op, precedence, expressionParser):
 	xView = ctx.viewEvalFn( x, None, python25ViewState( precedence, expressionParser ) )
 	opView = ctx.text( operator_textStyle, op )
 	return expressionNodeEditor( ctx, node,
-			   ctx.span( [ opView, xView ] ),
-			   precedence,
-			   state )
+				     ctx.span( [ opView, xView ] ),
+				     precedence,
+				     state )
 
 
 
@@ -250,9 +289,9 @@ def tupleView(ctx, state, node, xs, trailingSeparator, parser):
 	xViews = ctx.mapViewEvalFn( xs, None, python25ViewState( PRECEDENCE_CONTAINER_ELEMENT, parser ) )
 	layout = tuple_listViewLayout   if trailingSeparator is None   else tuple_listViewLayoutSep
 	return expressionNodeEditor( ctx, node,
-			   ctx.listView( layout, None, None, _CommaFactory( ctx ), xViews ),
-			   PRECEDENCE_TUPLE,
-			   state )
+				     ctx.listView( layout, None, None, _CommaFactory( ctx ), xViews ),
+				     PRECEDENCE_TUPLE,
+				     state )
 
 
 def suiteView(ctx, suite, parser):
@@ -270,17 +309,17 @@ def printElem(elem, level):
 	if isinstance( elem, BranchElement ):
 		for x in elem.getChildren():
 			printElem( x, level + 1 )
-	
+
 
 
 class Python25View (GSymViewObjectNodeDispatch):
 	__dispatch_module__ = Nodes.module
-	
-	
+
+
 	def __init__(self):
 		self._parser = Python25Grammar()
-		
-		
+
+
 	# MISC
 	@ObjectNodeDispatchMethod
 	def PythonModule(self, ctx, state, node, suite):
@@ -291,24 +330,24 @@ class Python25View (GSymViewObjectNodeDispatch):
 	@ObjectNodeDispatchMethod
 	def BlankLine(self, ctx, state, node):
 		return statementNodeEditor( ctx, node,
-				   ctx.text( default_textStyle, '' ),
-				   None,
-				   state )
+					    ctx.text( default_textStyle, '' ),
+					    None,
+					    state )
 
 
 	@ObjectNodeDispatchMethod
 	def UNPARSED(self, ctx, state, node, value):
 		return expressionNodeEditor( ctx, node,
-				   ctx.text( unparsed_textStyle, value ),
-				   None,
-				   state )
+					     ctx.text( unparsed_textStyle, value ),
+					     None,
+					     state )
 
 
 	# String literal
 	@ObjectNodeDispatchMethod
 	def StringLiteral(self, ctx, state, node, format, quotation, value):
 		boxContents = []
-		
+
 		if format == 'ascii':
 			pass
 		elif format == 'unicode':
@@ -332,9 +371,9 @@ class Python25View (GSymViewObjectNodeDispatch):
 		boxContents[-2] = ctx.text( default_textStyle, value )
 
 		return expressionNodeEditor( ctx, node,
-				   ctx.span( boxContents ),
-				   PRECEDENCE_LITERALVALUE,
-				   state )
+					     ctx.span( boxContents ),
+					     PRECEDENCE_LITERALVALUE,
+					     state )
 
 
 	# Integer literal
@@ -357,9 +396,9 @@ class Python25View (GSymViewObjectNodeDispatch):
 			boxContents.append( ctx.text( literalFormat_textStyle, 'L' ) )
 
 		return expressionNodeEditor( ctx, node,
-				   ctx.span( boxContents ),
-				   PRECEDENCE_LITERALVALUE,
-				   state )
+					     ctx.span( boxContents ),
+					     PRECEDENCE_LITERALVALUE,
+					     state )
 
 
 
@@ -367,9 +406,9 @@ class Python25View (GSymViewObjectNodeDispatch):
 	@ObjectNodeDispatchMethod
 	def FloatLiteral(self, ctx, state, node, value):
 		return expressionNodeEditor( ctx, node,
-				   ctx.text( numericLiteral_textStyle, value ),
-				   PRECEDENCE_LITERALVALUE,
-				   state )
+					     ctx.text( numericLiteral_textStyle, value ),
+					     PRECEDENCE_LITERALVALUE,
+					     state )
 
 
 
@@ -377,9 +416,9 @@ class Python25View (GSymViewObjectNodeDispatch):
 	@ObjectNodeDispatchMethod
 	def ImaginaryLiteral(self, ctx, state, node, value):
 		return expressionNodeEditor( ctx, node,
-				   ctx.text( numericLiteral_textStyle, value ),
-				   PRECEDENCE_LITERALVALUE,
-				   state )
+					     ctx.text( numericLiteral_textStyle, value ),
+					     PRECEDENCE_LITERALVALUE,
+					     state )
 
 
 
@@ -387,9 +426,9 @@ class Python25View (GSymViewObjectNodeDispatch):
 	@ObjectNodeDispatchMethod
 	def SingleTarget(self, ctx, state, node, name):
 		return expressionNodeEditor( ctx, node,
-				   ctx.text( default_textStyle, name ),
-				   PRECEDENCE_TARGET,
-				   state )
+					     ctx.text( default_textStyle, name ),
+					     PRECEDENCE_TARGET,
+					     state )
 
 
 	@ObjectNodeDispatchMethod
@@ -401,9 +440,9 @@ class Python25View (GSymViewObjectNodeDispatch):
 		targetViews = ctx.mapViewEvalFn( targets, None, python25ViewState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.targetItem() ) )
 		layout = list_listViewLayout   if trailingSeparator is None   else list_listViewLayoutSep		
 		return expressionNodeEditor( ctx, node,
-				   ctx.listView( layout, _OpenBracketFactory( ctx ), _CloseBracketFactory( ctx ), _CommaFactory( ctx ), targetViews ),
-				   PRECEDENCE_TARGET,
-				   state )
+					     ctx.listView( layout, _OpenBracketFactory( ctx ), _CloseBracketFactory( ctx ), _CommaFactory( ctx ), targetViews ),
+					     PRECEDENCE_TARGET,
+					     state )
 
 
 
@@ -412,9 +451,9 @@ class Python25View (GSymViewObjectNodeDispatch):
 	@ObjectNodeDispatchMethod
 	def Load(self, ctx, state, node, name):
 		return expressionNodeEditor( ctx, node,
-				   ctx.text( default_textStyle, name ),
-				   PRECEDENCE_LOAD,
-				   state )
+					     ctx.text( default_textStyle, name ),
+					     PRECEDENCE_LOAD,
+					     state )
 
 
 
@@ -431,9 +470,9 @@ class Python25View (GSymViewObjectNodeDispatch):
 		valueViews = ctx.mapViewEvalFn( values, None, python25ViewState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.expression() ) )
 		layout = list_listViewLayout   if trailingSeparator is None   else list_listViewLayoutSep		
 		return expressionNodeEditor( ctx, node,
-				   ctx.listView( layout, _OpenBracketFactory( ctx ), _CloseBracketFactory( ctx ), _CommaFactory( ctx ), valueViews ),
-				   PRECEDENCE_LISTDISPLAY,
-				   state )
+					     ctx.listView( layout, _OpenBracketFactory( ctx ), _CloseBracketFactory( ctx ), _CommaFactory( ctx ), valueViews ),
+					     PRECEDENCE_LISTDISPLAY,
+					     state )
 
 
 
@@ -443,17 +482,17 @@ class Python25View (GSymViewObjectNodeDispatch):
 		targetView = ctx.viewEvalFn( target, None, python25ViewState( PRECEDENCE_CONTAINER_COMPREHENSIONFOR, self._parser.targetListOrTargetItem() ) )
 		sourceView = ctx.viewEvalFn( source, None, python25ViewState( PRECEDENCE_CONTAINER_COMPREHENSIONFOR, self._parser.oldTupleOrExpression() ) )
 		return expressionNodeEditor( ctx, node,
-				   ctx.span( [ capitalisedKeywordText( ctx, forKeyword ), ctx.text( default_textStyle, ' ' ), targetView, ctx.text( default_textStyle, ' ' ), capitalisedKeywordText( ctx, inKeyword ), ctx.text( default_textStyle, ' ' ), sourceView ] ),
-				   PRECEDENCE_NONE,
-				   state )
+					     ctx.span( [ capitalisedKeywordText( ctx, forKeyword ), ctx.text( default_textStyle, ' ' ), targetView, ctx.text( default_textStyle, ' ' ), capitalisedKeywordText( ctx, inKeyword ), ctx.text( default_textStyle, ' ' ), sourceView ] ),
+					     PRECEDENCE_NONE,
+					     state )
 
 	@ObjectNodeDispatchMethod
 	def ComprehensionIf(self, ctx, state, node, condition):
 		conditionView = ctx.viewEvalFn( condition, None, python25ViewState( PRECEDENCE_CONTAINER_COMPREHENSIONIF, self._parser.oldExpression() ) )
 		return expressionNodeEditor( ctx, node,
-				   ctx.span( [ capitalisedKeywordText( ctx, ifKeyword ), ctx.text( default_textStyle, ' ' ), conditionView ] ),
-				   PRECEDENCE_NONE,
-				   state )
+					     ctx.span( [ capitalisedKeywordText( ctx, ifKeyword ), ctx.text( default_textStyle, ' ' ), conditionView ] ),
+					     PRECEDENCE_NONE,
+					     state )
 
 	@ObjectNodeDispatchMethod
 	def ListComp(self, ctx, state, node, resultExpr, comprehensionItems):
@@ -466,9 +505,9 @@ class Python25View (GSymViewObjectNodeDispatch):
 				itemViewsSpaced.append( ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY, ctx.whitespace( ' ', 15.0 ) ) )
 			itemViewsSpaced.append( itemViews[-1] )
 		return expressionNodeEditor( ctx, node,
-				   ctx.span( [ ctx.text( punctuation_textStyle, '[' ),  exprView,  ctx.whitespace( ' ', 15.0 ) ] + itemViewsSpaced + [ ctx.text( punctuation_textStyle, ']' ) ] ),
-				   PRECEDENCE_LISTDISPLAY,
-				   state )
+					     ctx.span( [ ctx.text( punctuation_textStyle, '[' ),  exprView,  ctx.whitespace( ' ', 15.0 ) ] + itemViewsSpaced + [ ctx.text( punctuation_textStyle, ']' ) ] ),
+					     PRECEDENCE_LISTDISPLAY,
+					     state )
 
 
 	@ObjectNodeDispatchMethod
@@ -482,9 +521,9 @@ class Python25View (GSymViewObjectNodeDispatch):
 				itemViewsSpaced.append( ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY, ctx.whitespace( ' ', 15.0 ) ) )
 			itemViewsSpaced.append( itemViews[-1] )
 		return expressionNodeEditor( ctx, node,
-				   ctx.span( [ ctx.text( punctuation_textStyle, '(' ),  exprView,  ctx.whitespace( ' ', 15.0 ) ] + itemViewsSpaced + [ ctx.text( punctuation_textStyle, ')' ) ] ),
-				   PRECEDENCE_GENERATOREXPRESSION,
-				   state )
+					     ctx.span( [ ctx.text( punctuation_textStyle, '(' ),  exprView,  ctx.whitespace( ' ', 15.0 ) ] + itemViewsSpaced + [ ctx.text( punctuation_textStyle, ')' ) ] ),
+					     PRECEDENCE_GENERATOREXPRESSION,
+					     state )
 
 
 
@@ -495,18 +534,18 @@ class Python25View (GSymViewObjectNodeDispatch):
 		keyView = ctx.viewEvalFn( key, None, python25ViewState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.expression() ) )
 		valueView = ctx.viewEvalFn( value, None, python25ViewState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.expression() ) )
 		return expressionNodeEditor( ctx, node,
-				   ctx.span( [ keyView, ctx.text( punctuation_textStyle, ' : ' ), valueView ] ),
-				   PRECEDENCE_NONE,
-				   state )
+					     ctx.span( [ keyView, ctx.text( punctuation_textStyle, ' : ' ), valueView ] ),
+					     PRECEDENCE_NONE,
+					     state )
 
 	@ObjectNodeDispatchMethod
 	def DictLiteral(self, ctx, state, node, values, trailingSeparator):
 		valueViews = ctx.mapViewEvalFn( values, None, python25ViewState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.keyValuePair() ) )
 		layout = dict_listViewLayout   if trailingSeparator is None   else dict_listViewLayoutSep		
 		return expressionNodeEditor( ctx, node,
-				   ctx.listView( layout, _OpenBraceFactory( ctx ), _CloseBraceFactory( ctx ), _CommaFactory( ctx ), valueViews ),
-				   PRECEDENCE_DICTDISPLAY,
-				   state )
+					     ctx.listView( layout, _OpenBraceFactory( ctx ), _CloseBraceFactory( ctx ), _CommaFactory( ctx ), valueViews ),
+					     PRECEDENCE_DICTDISPLAY,
+					     state )
 
 
 	# Yield expression
@@ -514,9 +553,9 @@ class Python25View (GSymViewObjectNodeDispatch):
 	def YieldAtom(self, ctx, state, node, value):
 		valueView = ctx.viewEvalFn( value, None, python25ViewState( PRECEDENCE_CONTAINER_YIELDATOM, self._parser.expression() ) )
 		return expressionNodeEditor( ctx, node,
-				   ctx.span( [ ctx.text( punctuation_textStyle, '(' ),  capitalisedKeywordText( ctx, yieldKeyword ),  ctx.text( punctuation_textStyle, ' ' ),  valueView,  ctx.text( punctuation_textStyle, ')' ) ] ),
-				   PRECEDENCE_YIELDEXPR,
-				   state )
+					     ctx.span( [ ctx.text( punctuation_textStyle, '(' ),  capitalisedKeywordText( ctx, yieldKeyword ),  ctx.text( punctuation_textStyle, ' ' ),  valueView,  ctx.text( punctuation_textStyle, ')' ) ] ),
+					     PRECEDENCE_YIELDEXPR,
+					     state )
 
 
 
@@ -525,9 +564,9 @@ class Python25View (GSymViewObjectNodeDispatch):
 	def AttributeRef(self, ctx, state, node, target, name):
 		targetView = ctx.viewEvalFn( target, None, python25ViewState( PRECEDENCE_CONTAINER_ATTRIBUTEREFTARGET, self._parser.expression() ) )
 		return expressionNodeEditor( ctx, node,
-				   ctx.span( [ targetView,  ctx.text( punctuation_textStyle, '.' ),  ctx.text( default_textStyle, name ) ] ),
-				   PRECEDENCE_ATTR,
-				   state )
+					     ctx.span( [ targetView,  ctx.text( punctuation_textStyle, '.' ),  ctx.text( default_textStyle, name ) ] ),
+					     PRECEDENCE_ATTR,
+					     state )
 
 
 
@@ -542,9 +581,9 @@ class Python25View (GSymViewObjectNodeDispatch):
 		lowerView = _sliceIndex( lower )
 		upperView = _sliceIndex( upper )
 		return expressionNodeEditor( ctx, node,
-				   ctx.span( lowerView + [ ctx.text( punctuation_textStyle, ':' ), ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY ) ] + upperView ),
-				   PRECEDENCE_NONE,
-				   state )
+					     ctx.span( lowerView + [ ctx.text( punctuation_textStyle, ':' ), ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY ) ] + upperView ),
+					     PRECEDENCE_NONE,
+					     state )
 
 	@ObjectNodeDispatchMethod
 	def SubscriptLongSlice(self, ctx, state, node, lower, upper, stride):
@@ -557,35 +596,35 @@ class Python25View (GSymViewObjectNodeDispatch):
 		upperView = _sliceIndex( upper )
 		strideView = _sliceIndex( stride )
 		return expressionNodeEditor( ctx, node,
-				   ctx.span( lowerView + [ ctx.text( punctuation_textStyle, ':' ), ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY ) ] +  upperView + \
-						  [ ctx.text( punctuation_textStyle, ':' ), ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY ) ] + strideView ),
-				   PRECEDENCE_NONE,
-				   state )
+					     ctx.span( lowerView + [ ctx.text( punctuation_textStyle, ':' ), ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY ) ] +  upperView + \
+						       [ ctx.text( punctuation_textStyle, ':' ), ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY ) ] + strideView ),
+					     PRECEDENCE_NONE,
+					     state )
 
 	@ObjectNodeDispatchMethod
 	def SubscriptEllipsis(self, ctx, state, node):
 		return expressionNodeEditor( ctx, node,
-				   ctx.text( punctuation_textStyle, '...' ),
-				   PRECEDENCE_NONE,
-				   state )
+					     ctx.text( punctuation_textStyle, '...' ),
+					     PRECEDENCE_NONE,
+					     state )
 
 	@ObjectNodeDispatchMethod
 	def SubscriptTuple(self, ctx, state, node, values, trailingSeparator):
 		valueViews = ctx.mapViewEvalFn( values, None, python25ViewState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.subscriptItem() ) )
 		layout = tuple_listViewLayout   if trailingSeparator is None   else tuple_listViewLayoutSep
 		return expressionNodeEditor( ctx, node,
-				   ctx.listView( layout, None, None, _CommaFactory( ctx ), valueViews ),
-				   PRECEDENCE_TUPLE,
-				   state )
+					     ctx.listView( layout, None, None, _CommaFactory( ctx ), valueViews ),
+					     PRECEDENCE_TUPLE,
+					     state )
 
 	@ObjectNodeDispatchMethod
 	def Subscript(self, ctx, state, node, target, index):
 		targetView = ctx.viewEvalFn( target, None, python25ViewState( PRECEDENCE_CONTAINER_SUBSCRIPTTARGET, self._parser.expression() ) )
 		indexView = ctx.viewEvalFn( index, None, python25ViewState( PRECEDENCE_CONTAINER_SUBSCRIPTINDEX, self._parser.subscriptIndex() ) )
 		return expressionNodeEditor( ctx, node,
-				   ctx.span( [ targetView,  ctx.text( punctuation_textStyle, '[' ),  indexView,  ctx.text( punctuation_textStyle, ']' ) ] ),
-				   PRECEDENCE_SUBSCRIPT,
-				   state )
+					     ctx.span( [ targetView,  ctx.text( punctuation_textStyle, '[' ),  indexView,  ctx.text( punctuation_textStyle, ']' ) ] ),
+					     PRECEDENCE_SUBSCRIPT,
+					     state )
 
 
 
@@ -595,25 +634,25 @@ class Python25View (GSymViewObjectNodeDispatch):
 	def CallKWArg(self, ctx, state, node, name, value):
 		valueView = ctx.viewEvalFn( value, None, python25ViewState( PRECEDENCE_CONTAINER_CALLARG, self._parser.expression() ) )
 		return expressionNodeEditor( ctx, node,
-				   ctx.span( [ ctx.text( default_textStyle, name ), ctx.text( punctuation_textStyle, '=' ), valueView ] ),
-				   PRECEDENCE_NONE,
-				   state )
+					     ctx.span( [ ctx.text( default_textStyle, name ), ctx.text( punctuation_textStyle, '=' ), valueView ] ),
+					     PRECEDENCE_NONE,
+					     state )
 
 	@ObjectNodeDispatchMethod
 	def CallArgList(self, ctx, state, node, value):
 		valueView = ctx.viewEvalFn( value, None, python25ViewState( PRECEDENCE_CONTAINER_CALLARG, self._parser.expression() ) )
 		return expressionNodeEditor( ctx, node,
-				   ctx.span( [ ctx.text( punctuation_textStyle, '*' ),  valueView ] ),
-				   PRECEDENCE_NONE,
-				   state )
+					     ctx.span( [ ctx.text( punctuation_textStyle, '*' ),  valueView ] ),
+					     PRECEDENCE_NONE,
+					     state )
 
 	@ObjectNodeDispatchMethod
 	def CallKWArgList(self, ctx, state, node, value):
 		valueView = ctx.viewEvalFn( value, None, python25ViewState( PRECEDENCE_CONTAINER_CALLARG, self._parser.expression() ) )
 		return expressionNodeEditor( ctx, node,
-				   ctx.span( [ ctx.text( punctuation_textStyle, '**' ),  valueView ] ),
-				   PRECEDENCE_NONE,
-				   state )
+					     ctx.span( [ ctx.text( punctuation_textStyle, '**' ),  valueView ] ),
+					     PRECEDENCE_NONE,
+					     state )
 
 	@ObjectNodeDispatchMethod
 	def Call(self, ctx, state, node, target, args, argsTrailingSeparator):
@@ -630,9 +669,9 @@ class Python25View (GSymViewObjectNodeDispatch):
 				argElements.append( ctx.text( punctuation_textStyle, ',' ) )
 				argElements.append( ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY, ctx.text( punctuation_textStyle, ' ' ) ) )
 		return expressionNodeEditor( ctx, node,
-				   ctx.span( [ targetView, ctx.text( punctuation_textStyle, '(' ) ]  +  argElements  +  [ ctx.text( punctuation_textStyle, ')' ) ] ),
-				   PRECEDENCE_CALL,
-				   state )
+					     ctx.span( [ targetView, ctx.text( punctuation_textStyle, '(' ) ]  +  argElements  +  [ ctx.text( punctuation_textStyle, ')' ) ] ),
+					     PRECEDENCE_CALL,
+					     state )
 
 
 
@@ -647,9 +686,9 @@ class Python25View (GSymViewObjectNodeDispatch):
 		yView = ctx.viewEvalFn( y, None, python25ViewState( yPrec, self._parser.expression(), MODE_EDITEXPRESSION ) )
 		yElement = ctx.paragraph( python_paragraphStyle, [ ctx.text( punctuation_textStyle, '**' ), ctx.text( default_textStyle, ' ' ), yView ] )
 		return expressionNodeEditor( ctx, node,
-				   ctx.scriptRSuper( pow_scriptStyle, xElement, yElement ),
-				   PRECEDENCE_POW,
-				   state )
+					     ctx.scriptRSuper( pow_scriptStyle, xElement, yElement ),
+					     PRECEDENCE_POW,
+					     state )
 
 
 	@ObjectNodeDispatchMethod
@@ -675,15 +714,15 @@ class Python25View (GSymViewObjectNodeDispatch):
 		xView = ctx.viewEvalFn( x, None, python25ViewState( xPrec, self._parser.expression(), MODE_EDITEXPRESSION ) )
 		yView = ctx.viewEvalFn( y, None, python25ViewState( yPrec, self._parser.expression(), MODE_EDITEXPRESSION ) )
 		return expressionNodeEditor( ctx, node,
-				   ctx.fraction( div_fractionStyle, xView, yView, '/' ),
-				   PRECEDENCE_MULDIVMOD,
-				   state )
+					     ctx.fraction( div_fractionStyle, xView, yView, '/' ),
+					     PRECEDENCE_MULDIVMOD,
+					     state )
 
 	@ObjectNodeDispatchMethod
 	def Mod(self, ctx, state, node, x, y):
 		return spanBinOpView( ctx, state, node, x, y, '%', PRECEDENCE_MULDIVMOD, False, self._parser.expression() )
 
-	
+
 	@ObjectNodeDispatchMethod
 	def Add(self, ctx, state, node, x, y):
 		return spanBinOpView( ctx, state, node, x, y, '+', PRECEDENCE_ADDSUB, False, self._parser.expression() )
@@ -720,51 +759,51 @@ class Python25View (GSymViewObjectNodeDispatch):
 		xView = ctx.viewEvalFn( x, None, python25ViewState( PRECEDENCE_CMP, self._parser.expression() ) )
 		opViews = ctx.mapViewEvalFn( ops, None, python25ViewState( PRECEDENCE_CMP, self._parser.expression() ) )
 		return expressionNodeEditor( ctx, node,
-				   ctx.span( [ xView ] + opViews ),
-				   PRECEDENCE_CMP,
-				   state )
-	
+					     ctx.span( [ xView ] + opViews ),
+					     PRECEDENCE_CMP,
+					     state )
+
 	@ObjectNodeDispatchMethod
 	def CmpOpLte(self, ctx, state, node, y):
 		return spanCmpOpView( ctx, state, node, '<=', y, PRECEDENCE_CMP, self._parser.expression() )
-		
+
 	@ObjectNodeDispatchMethod
 	def CmpOpLt(self, ctx, state, node, y):
 		return spanCmpOpView( ctx, state, node, '<', y, PRECEDENCE_CMP, self._parser.expression() )
-		
+
 	@ObjectNodeDispatchMethod
 	def CmpOpGte(self, ctx, state, node, y):
 		return spanCmpOpView( ctx, state, node, '>=', y, PRECEDENCE_CMP, self._parser.expression() )
-		
+
 	@ObjectNodeDispatchMethod
 	def CmpOpGt(self, ctx, state, node, y):
 		return spanCmpOpView( ctx, state, node, '>', y, PRECEDENCE_CMP, self._parser.expression() )
-		
+
 	@ObjectNodeDispatchMethod
 	def CmpOpEq(self, ctx, state, node, y):
 		return spanCmpOpView( ctx, state, node, '==', y, PRECEDENCE_CMP, self._parser.expression() )
-		
+
 	@ObjectNodeDispatchMethod
 	def CmpOpNeq(self, ctx, state, node, y):
 		return spanCmpOpView( ctx, state, node, '!=', y, PRECEDENCE_CMP, self._parser.expression() )
-		
+
 	@ObjectNodeDispatchMethod
 	def CmpOpIsNot(self, ctx, state, node, y):
 		return spanCmpOpView( ctx, state, node, 'is not', y, PRECEDENCE_CMP, self._parser.expression() )
-		
+
 	@ObjectNodeDispatchMethod
 	def CmpOpIs(self, ctx, state, node, y):
 		return spanCmpOpView( ctx, state, node, 'is', y, PRECEDENCE_CMP, self._parser.expression() )
-		
+
 	@ObjectNodeDispatchMethod
 	def CmpOpNotIn(self, ctx, state, node, y):
 		return spanCmpOpView( ctx, state, node, 'not in', y, PRECEDENCE_CMP, self._parser.expression() )
-		
+
 	@ObjectNodeDispatchMethod
 	def CmpOpIn(self, ctx, state, node, y):
 		return spanCmpOpView( ctx, state, node, 'in', y, PRECEDENCE_CMP, self._parser.expression() )
-		
-		
+
+
 
 	@ObjectNodeDispatchMethod
 	def NotTest(self, ctx, state, node, x):
@@ -786,31 +825,31 @@ class Python25View (GSymViewObjectNodeDispatch):
 	@ObjectNodeDispatchMethod
 	def SimpleParam(self, ctx, state, node, name):
 		return expressionNodeEditor( ctx, node,
-				   ctx.text( default_textStyle, name ),
-				   PRECEDENCE_NONE,
-				   state )
+					     ctx.text( default_textStyle, name ),
+					     PRECEDENCE_NONE,
+					     state )
 
 	@ObjectNodeDispatchMethod
 	def DefaultValueParam(self, ctx, state, node, name, defaultValue):
 		valueView = ctx.viewEvalFn( defaultValue, None, python25ViewState( PRECEDENCE_NONE, self._parser.expression() ) )
 		return expressionNodeEditor( ctx, node,
-				   ctx.span( [ ctx.text( default_textStyle, name ), ctx.text( punctuation_textStyle, '=' ), valueView ] ),
-				   PRECEDENCE_NONE,
-				   state )
+					     ctx.span( [ ctx.text( default_textStyle, name ), ctx.text( punctuation_textStyle, '=' ), valueView ] ),
+					     PRECEDENCE_NONE,
+					     state )
 
 	@ObjectNodeDispatchMethod
 	def ParamList(self, ctx, state, node, name):
 		return expressionNodeEditor( ctx, node,
-				   ctx.span( [ ctx.text( punctuation_textStyle, '*' ),  ctx.text( default_textStyle, name ) ] ),
-				   PRECEDENCE_NONE,
-				   state )
+					     ctx.span( [ ctx.text( punctuation_textStyle, '*' ),  ctx.text( default_textStyle, name ) ] ),
+					     PRECEDENCE_NONE,
+					     state )
 
 	@ObjectNodeDispatchMethod
 	def KWParamList(self, ctx, state, node, name):
 		return expressionNodeEditor( ctx, node,
-				   ctx.span( [ ctx.text( punctuation_textStyle, '**' ),  ctx.text( default_textStyle, name ) ] ),
-				   PRECEDENCE_NONE,
-				   state )
+					     ctx.span( [ ctx.text( punctuation_textStyle, '**' ),  ctx.text( default_textStyle, name ) ] ),
+					     PRECEDENCE_NONE,
+					     state )
 
 
 
@@ -838,12 +877,12 @@ class Python25View (GSymViewObjectNodeDispatch):
 			if paramsTrailingSeparator is not None:
 				paramElements.append( ctx.text( punctuation_textStyle, ',' ) )
 				paramElements.append( ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY, ctx.text( punctuation_textStyle, ' ' ) ) )
-				
+
 		return expressionNodeEditor( ctx, node,
-				   ctx.span( [ capitalisedKeywordText( ctx, lambdaKeyword ),  ctx.text( default_textStyle, ' ' ) ]  +  paramElements  +  \
-						  [ ctx.text( punctuation_textStyle, ':' ), ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY, ctx.text( punctuation_textStyle, ' ' ) ), exprView ] ),
-				   PRECEDENCE_LAMBDAEXPR,
-				   state )
+					     ctx.span( [ capitalisedKeywordText( ctx, lambdaKeyword ),  ctx.text( default_textStyle, ' ' ) ]  +  paramElements  +  \
+						       [ ctx.text( punctuation_textStyle, ':' ), ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY, ctx.text( punctuation_textStyle, ' ' ) ), exprView ] ),
+					     PRECEDENCE_LAMBDAEXPR,
+					     state )
 
 
 
@@ -854,25 +893,29 @@ class Python25View (GSymViewObjectNodeDispatch):
 		exprView = ctx.viewEvalFn( expr, None, python25ViewState( PRECEDENCE_CONTAINER_CONDITIONALEXPR, self._parser.orTest() ) )
 		elseExprView = ctx.viewEvalFn( elseExpr, None, python25ViewState( PRECEDENCE_CONTAINER_CONDITIONALEXPR, self._parser.expression() ) )
 		return expressionNodeEditor( ctx, node,
-				   ctx.span( [ exprView,   ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY, ctx.whitespace( '  ', 15.0 ) ),
-									    capitalisedKeywordText( ctx, ifKeyword ), ctx.text( default_textStyle, ' ' ), conditionView,   ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY, ctx.whitespace( '  ', 15.0 ) ),
-									    capitalisedKeywordText( ctx, elseKeyword ), ctx.text( default_textStyle, ' ' ), elseExprView ] ),
-				   PRECEDENCE_CONDITIONAL,
-				   state )
+					     ctx.span( [ exprView,   ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY, ctx.whitespace( '  ', 15.0 ) ),
+							 capitalisedKeywordText( ctx, ifKeyword ), ctx.text( default_textStyle, ' ' ), conditionView,   ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY, ctx.whitespace( '  ', 15.0 ) ),
+							 capitalisedKeywordText( ctx, elseKeyword ), ctx.text( default_textStyle, ' ' ), elseExprView ] ),
+					     PRECEDENCE_CONDITIONAL,
+					     state )
 
 
 
 
+	#
+	#
+	# SIMPLE STATEMENTS
+	#
+	#
 
-	
 	# Expression statement
 	@ObjectNodeDispatchMethod
 	def ExprStmt(self, ctx, state, node, expr):
 		exprView = ctx.viewEvalFn( expr, None, python25ViewState( PRECEDENCE_STMT, self._parser.expression() ) )
 		return statementNodeEditor( ctx, node, exprView, PRECEDENCE_STMT, state )
 
-	
-	
+
+
 	# Assert statement
 	@ObjectNodeDispatchMethod
 	def AssertStmt(self, ctx, state, node, condition, fail):
@@ -882,9 +925,9 @@ class Python25View (GSymViewObjectNodeDispatch):
 			failView = ctx.viewEvalFn( fail, None, python25ViewState( PRECEDENCE_STMT, self._parser.expression() ) )
 			elements.extend( [ ctx.text( punctuation_textStyle, ',' ), ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY, ctx.text( punctuation_textStyle, ' ' ) ), failView ] )
 		return statementNodeEditor( ctx, node,
-				   ctx.span( elements ),
-				   PRECEDENCE_STMT,
-				   state )
+					    ctx.span( elements ),
+					    PRECEDENCE_STMT,
+					    state )
 
 
 	# Assignment statement
@@ -896,9 +939,9 @@ class Python25View (GSymViewObjectNodeDispatch):
 		for t in targetViews:
 			targetElements.extend( [ t,  ctx.text( punctuation_textStyle, ' =' ),  ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY, ctx.text( punctuation_textStyle, ' ' ) ) ] )
 		return statementNodeEditor( ctx, node,
-				   ctx.span( targetElements  +  [ valueView ] ),
-				   PRECEDENCE_STMT,
-				   state )
+					    ctx.span( targetElements  +  [ valueView ] ),
+					    PRECEDENCE_STMT,
+					    state )
 
 
 	# Augmented assignment statement
@@ -907,18 +950,18 @@ class Python25View (GSymViewObjectNodeDispatch):
 		targetView = ctx.viewEvalFn( target, None, python25ViewState( PRECEDENCE_STMT, self._parser.targetItem() ) )
 		valueView = ctx.viewEvalFn( value, None, python25ViewState( PRECEDENCE_STMT, self._parser.tupleOrExpressionOrYieldExpression() ) )
 		return statementNodeEditor( ctx, node,
-				   ctx.span( [ targetView,  ctx.text( punctuation_textStyle, ' ' + op + ' ' ),  valueView ] ),
-				   PRECEDENCE_STMT,
-				   state )
+					    ctx.span( [ targetView,  ctx.text( punctuation_textStyle, ' ' + op + ' ' ),  valueView ] ),
+					    PRECEDENCE_STMT,
+					    state )
 
 
 	# Pass statement
 	@ObjectNodeDispatchMethod
 	def PassStmt(self, ctx, state, node):
 		return statementNodeEditor( ctx, node,
-				   capitalisedKeywordText( ctx, passKeyword ),
-				   PRECEDENCE_STMT,
-				   state )
+					    capitalisedKeywordText( ctx, passKeyword ),
+					    PRECEDENCE_STMT,
+					    state )
 
 
 	# Del statement
@@ -926,9 +969,9 @@ class Python25View (GSymViewObjectNodeDispatch):
 	def DelStmt(self, ctx, state, node, target):
 		targetView = ctx.viewEvalFn( target, None, python25ViewState( PRECEDENCE_STMT, self._parser.targetListOrTargetItem() ) )
 		return statementNodeEditor( ctx, node,
-				   ctx.span( [ capitalisedKeywordText( ctx, delKeyword ),  ctx.text( default_textStyle, ' ' ),  targetView ] ),
-				   PRECEDENCE_STMT,
-				   state )
+					    ctx.span( [ capitalisedKeywordText( ctx, delKeyword ),  ctx.text( default_textStyle, ' ' ),  targetView ] ),
+					    PRECEDENCE_STMT,
+					    state )
 
 
 	# Return statement
@@ -936,9 +979,9 @@ class Python25View (GSymViewObjectNodeDispatch):
 	def ReturnStmt(self, ctx, state, node, value):
 		valueView = ctx.viewEvalFn( value, None, python25ViewState( PRECEDENCE_STMT, self._parser.tupleOrExpression() ) )
 		return statementNodeEditor( ctx, node,
-				   ctx.span( [ capitalisedKeywordText( ctx, returnKeyword ),  ctx.text( default_textStyle, ' ' ),  valueView ] ),
-				   PRECEDENCE_STMT,
-				   state )
+					    ctx.span( [ capitalisedKeywordText( ctx, returnKeyword ),  ctx.text( default_textStyle, ' ' ),  valueView ] ),
+					    PRECEDENCE_STMT,
+					    state )
 
 
 	# Yield statement
@@ -946,9 +989,9 @@ class Python25View (GSymViewObjectNodeDispatch):
 	def YieldStmt(self, ctx, state, node, value):
 		valueView = ctx.viewEvalFn( value, None, python25ViewState( PRECEDENCE_STMT, self._parser.expression() ) )
 		return statementNodeEditor( ctx, node,
-				   ctx.span( [ capitalisedKeywordText( ctx, yieldKeyword ),  ctx.text( default_textStyle, ' ' ),  valueView ] ),
-				   PRECEDENCE_STMT,
-				   state )
+					    ctx.span( [ capitalisedKeywordText( ctx, yieldKeyword ),  ctx.text( default_textStyle, ' ' ),  valueView ] ),
+					    PRECEDENCE_STMT,
+					    state )
 
 
 	# Raise statement
@@ -962,67 +1005,67 @@ class Python25View (GSymViewObjectNodeDispatch):
 				xElements.extend( [ x,  ctx.text( punctuation_textStyle, ', ' ) ] )
 			xElements.append( xViews[-1] )
 		return statementNodeEditor( ctx, node,
-				   ctx.span( [ capitalisedKeywordText( ctx, raiseKeyword ),  ctx.text( default_textStyle, ' ' ) ] + xElements ),
-				   PRECEDENCE_STMT,
-				   state )
+					    ctx.span( [ capitalisedKeywordText( ctx, raiseKeyword ),  ctx.text( default_textStyle, ' ' ) ] + xElements ),
+					    PRECEDENCE_STMT,
+					    state )
 
 
 	# Break statement
 	@ObjectNodeDispatchMethod
 	def BreakStmt(self, ctx, state, node):
 		return statementNodeEditor( ctx, node,
-				   capitalisedKeywordText( ctx, breakKeyword ),
-				   PRECEDENCE_STMT,
-				   state )
+					    capitalisedKeywordText( ctx, breakKeyword ),
+					    PRECEDENCE_STMT,
+					    state )
 
 
 	# Continue statement
 	@ObjectNodeDispatchMethod
 	def ContinueStmt(self, ctx, state, node):
 		return statementNodeEditor( ctx, node,
-				   capitalisedKeywordText( ctx, continueKeyword ),
-				   PRECEDENCE_STMT,
-				   state )
+					    capitalisedKeywordText( ctx, continueKeyword ),
+					    PRECEDENCE_STMT,
+					    state )
 
 
 	# Import statement
 	@ObjectNodeDispatchMethod
 	def RelativeModule(self, ctx, state, node, name):
 		return expressionNodeEditor( ctx, node,
-				   ctx.text( default_textStyle, name ),
-				   PRECEDENCE_IMPORTCONTENT,
-				   state )
-	
+					     ctx.text( default_textStyle, name ),
+					     PRECEDENCE_IMPORTCONTENT,
+					     state )
+
 	@ObjectNodeDispatchMethod
 	def ModuleImport(self, ctx, state, node, name):
 		return expressionNodeEditor( ctx, node,
-				   ctx.text( default_textStyle, name ),
-				   PRECEDENCE_IMPORTCONTENT,
-				   state )
-	
+					     ctx.text( default_textStyle, name ),
+					     PRECEDENCE_IMPORTCONTENT,
+					     state )
+
 	@ObjectNodeDispatchMethod
 	def ModuleImportAs(self, ctx, state, node, name, asName):
 		return expressionNodeEditor( ctx, node,
-				   ctx.span( [ ctx.text( default_textStyle, name ),  ctx.text( default_textStyle, ' ' ),  capitalisedKeywordText( ctx, asKeyword ),
-									    ctx.text( default_textStyle, ' ' ),  ctx.text( default_textStyle, asName ) ] ),
-				   PRECEDENCE_IMPORTCONTENT,
-				   state )
-	
+					     ctx.span( [ ctx.text( default_textStyle, name ),  ctx.text( default_textStyle, ' ' ),  capitalisedKeywordText( ctx, asKeyword ),
+							 ctx.text( default_textStyle, ' ' ),  ctx.text( default_textStyle, asName ) ] ),
+					     PRECEDENCE_IMPORTCONTENT,
+					     state )
+
 	@ObjectNodeDispatchMethod
 	def ModuleContentImport(self, ctx, state, node, name):
 		return expressionNodeEditor( ctx, node,
-				   ctx.text( default_textStyle, name ),
-				   PRECEDENCE_IMPORTCONTENT,
-				   state )
-	
+					     ctx.text( default_textStyle, name ),
+					     PRECEDENCE_IMPORTCONTENT,
+					     state )
+
 	@ObjectNodeDispatchMethod
 	def ModuleContentImportAs(self, ctx, state, node, name, asName):
 		return expressionNodeEditor( ctx, node,
-				   ctx.span( [ ctx.text( default_textStyle, name ),  ctx.text( default_textStyle, ' ' ),  capitalisedKeywordText( ctx, asKeyword ),
-									    ctx.text( default_textStyle, ' ' ),  ctx.text( default_textStyle, asName ) ] ),
-				   PRECEDENCE_IMPORTCONTENT,
-				   state )
-	
+					     ctx.span( [ ctx.text( default_textStyle, name ),  ctx.text( default_textStyle, ' ' ),  capitalisedKeywordText( ctx, asKeyword ),
+							 ctx.text( default_textStyle, ' ' ),  ctx.text( default_textStyle, asName ) ] ),
+					     PRECEDENCE_IMPORTCONTENT,
+					     state )
+
 	@ObjectNodeDispatchMethod
 	def ImportStmt(self, ctx, state, node, modules):
 		moduleViews = ctx.mapViewEvalFn( modules, None, python25ViewState( PRECEDENCE_STMT, self._parser.moduleImport() ) )
@@ -1032,10 +1075,10 @@ class Python25View (GSymViewObjectNodeDispatch):
 				moduleElements.extend( [ mv,  ctx.text( punctuation_textStyle, ',' ),  ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY, ctx.text( punctuation_textStyle, ' ' ) ) ] )
 			moduleElements.append( moduleViews[-1] )
 		return statementNodeEditor( ctx, node,
-				   ctx.span( [ capitalisedKeywordText( ctx, importKeyword ), ctx.text( default_textStyle, ' ' ) ]  +  moduleElements ),
-				   PRECEDENCE_STMT,
-				   state )
-	
+					    ctx.span( [ capitalisedKeywordText( ctx, importKeyword ), ctx.text( default_textStyle, ' ' ) ]  +  moduleElements ),
+					    PRECEDENCE_STMT,
+					    state )
+
 	@ObjectNodeDispatchMethod
 	def FromImportStmt(self, ctx, state, node, module, imports):
 		moduleView = ctx.viewEvalFn( module, None, python25ViewState( PRECEDENCE_STMT, self._parser.moduleContentImport() ) )
@@ -1046,29 +1089,29 @@ class Python25View (GSymViewObjectNodeDispatch):
 				importElements.extend( [ iv,  ctx.text( punctuation_textStyle, ',' ),  ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY, ctx.text( punctuation_textStyle, ' ' ) ) ] )
 			importElements.append( importViews[-1] )
 		return statementNodeEditor( ctx, node,
-				   ctx.span( [ capitalisedKeywordText( ctx, fromKeyword ), ctx.text( default_textStyle, ' ' ), moduleView, ctx.text( default_textStyle, ' ' ),
-									    capitalisedKeywordText( ctx, importKeyword ), ctx.text( default_textStyle, ' ' ) ]  +  importElements ),
-				   PRECEDENCE_STMT,
-				   state )
-	
+					    ctx.span( [ capitalisedKeywordText( ctx, fromKeyword ), ctx.text( default_textStyle, ' ' ), moduleView, ctx.text( default_textStyle, ' ' ),
+							capitalisedKeywordText( ctx, importKeyword ), ctx.text( default_textStyle, ' ' ) ]  +  importElements ),
+					    PRECEDENCE_STMT,
+					    state )
+
 	@ObjectNodeDispatchMethod
 	def FromImportAllStmt(self, ctx, state, node, module):
 		moduleView = ctx.viewEvalFn( module, None, python25ViewState( PRECEDENCE_STMT, self._parser.moduleContentImport() ) )
 		return statementNodeEditor( ctx, node,
-				   ctx.span( [ capitalisedKeywordText( ctx, fromKeyword ), ctx.text( default_textStyle, ' ' ), moduleView, ctx.text( default_textStyle, ' ' ),
-									     capitalisedKeywordText( ctx, importKeyword ), ctx.text( default_textStyle, ' ' ),  ctx.text( punctuation_textStyle, '*' ) ] ),
-				   PRECEDENCE_STMT,
-				   state )
+					    ctx.span( [ capitalisedKeywordText( ctx, fromKeyword ), ctx.text( default_textStyle, ' ' ), moduleView, ctx.text( default_textStyle, ' ' ),
+							capitalisedKeywordText( ctx, importKeyword ), ctx.text( default_textStyle, ' ' ),  ctx.text( punctuation_textStyle, '*' ) ] ),
+					    PRECEDENCE_STMT,
+					    state )
 
 
 	# Global statement
 	@ObjectNodeDispatchMethod
 	def GlobalVar(self, ctx, state, node, name):
 		return statementNodeEditor( ctx, node,
-				   ctx.text( default_textStyle, name ),
-				   PRECEDENCE_STMT,
-				   state )
-	
+					    ctx.text( default_textStyle, name ),
+					    PRECEDENCE_STMT,
+					    state )
+
 	@ObjectNodeDispatchMethod
 	def GlobalStmt(self, ctx, state, node, vars):
 		varViews = ctx.mapViewEvalFn( vars, None, python25ViewState( PRECEDENCE_STMT, self._parser.globalVar() ) )
@@ -1078,12 +1121,12 @@ class Python25View (GSymViewObjectNodeDispatch):
 				varElements.extend( [ vv,  ctx.text( punctuation_textStyle, ',' ),  ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY, ctx.text( punctuation_textStyle, ' ' ) ) ] )
 			varElements.append( varViews[-1] )
 		return statementNodeEditor( ctx, node,
-				   ctx.span( [ capitalisedKeywordText( ctx, globalKeyword ),  ctx.text( default_textStyle, ' ' ) ]  +  varElements ),
-				   PRECEDENCE_STMT,
-				   state )
-	
+					    ctx.span( [ capitalisedKeywordText( ctx, globalKeyword ),  ctx.text( default_textStyle, ' ' ) ]  +  varElements ),
+					    PRECEDENCE_STMT,
+					    state )
 
-	
+
+
 	# Exec statement
 	@ObjectNodeDispatchMethod
 	def ExecStmt(self, ctx, state, node, source, locals, globals):
@@ -1096,94 +1139,102 @@ class Python25View (GSymViewObjectNodeDispatch):
 			globalsView = ctx.viewEvalFn( globals, None, python25ViewState( PRECEDENCE_STMT, self._parser.expression() ) )
 			elements.extend( [ ctx.text( default_textStyle, ',' ),  ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY, ctx.text( punctuation_textStyle, ' ' ) ),  globalsView ] )
 		return statementNodeEditor( ctx, node,
-				   ctx.span( [ capitalisedKeywordText( ctx, execKeyword ),  ctx.text( default_textStyle, ' ' ) ]  +  elements ),
-				   PRECEDENCE_STMT,
-				   state )
+					    ctx.span( [ capitalisedKeywordText( ctx, execKeyword ),  ctx.text( default_textStyle, ' ' ) ]  +  elements ),
+					    PRECEDENCE_STMT,
+					    state )
 
 
-	
-	
-	
+
+	#
+	#
+	# COMPOUND STATEMENT HEADERS
+	#
+	#
+
 	# If statement
-	@ObjectNodeDispatchMethod
-	def IfStmt(self, ctx, state, node, condition, suite):
+	def _ifStmtHeaderElement(self, ctx, state, condition):
 		conditionView = ctx.viewEvalFn( condition, None, python25ViewState( PRECEDENCE_STMT, self._parser.expression() ) )
-		return compoundStatementEditor( ctx, node,
-						ctx.span( [ capitalisedKeywordText( ctx, ifKeyword ),  ctx.text( default_textStyle, ' ' ),  conditionView,  ctx.text( punctuation_textStyle, ':' ) ] ),
-						PRECEDENCE_STMT,
-						suite,
-						state,
-						self._parser.statement() )
-	
-	
-	
+		return ctx.span( [ capitalisedKeywordText( ctx, ifKeyword ),  ctx.text( default_textStyle, ' ' ),  conditionView,  ctx.text( punctuation_textStyle, ':' ) ] )
+
+	@ObjectNodeDispatchMethod
+	def IfStmtHeader(self, ctx, state, node, condition):
+		return compoundStatementHeaderEditor( ctx, node,
+					    self._ifStmtHeaderElement( ctx, state, condition ),
+					    PRECEDENCE_STMT,
+					    state )
+
+
 	# Elif statement
-	@ObjectNodeDispatchMethod
-	def ElifStmt(self, ctx, state, node, condition, suite):
+	def _elifStmtHeaderElement(self, ctx, state, condition):
 		conditionView = ctx.viewEvalFn( condition, None, python25ViewState( PRECEDENCE_STMT, self._parser.expression() ) )
-		return compoundStatementEditor( ctx, node,
-						ctx.span( [ capitalisedKeywordText( ctx, elifKeyword ),  ctx.text( default_textStyle, ' ' ),  conditionView,  ctx.text( punctuation_textStyle, ':' ) ] ),
-						PRECEDENCE_STMT,
-						suite,
-						state,
-						self._parser.statement())
-	
-	
-	
+		return ctx.span( [ capitalisedKeywordText( ctx, elifKeyword ),  ctx.text( default_textStyle, ' ' ),  conditionView,  ctx.text( punctuation_textStyle, ':' ) ] )
+
+	@ObjectNodeDispatchMethod
+	def ElifStmtHeader(self, ctx, state, node, condition):
+		return compoundStatementHeaderEditor( ctx, node,
+					    self._elifStmtHeaderElement( ctx, state, condition ),
+					    PRECEDENCE_STMT,
+					    state )
+
+
+
 	# Else statement
+	def _elseStmtHeaderElement(self, ctx, state):
+		return ctx.span( [ capitalisedKeywordText( ctx, elseKeyword ),  ctx.text( punctuation_textStyle, ':' ) ] )
+
 	@ObjectNodeDispatchMethod
-	def ElseStmt(self, ctx, state, node, suite):
-		return compoundStatementEditor( ctx, node,
-						ctx.span( [ capitalisedKeywordText( ctx, elseKeyword ),  ctx.text( punctuation_textStyle, ':' ) ] ),
-						PRECEDENCE_STMT,
-						suite,
-						state,
-						self._parser.statement())
-	
-	
+	def ElseStmtHeader(self, ctx, state, node):
+		return compoundStatementHeaderEditor( ctx, node,
+					    self._elseStmtHeaderElement( ctx, state ),
+					    PRECEDENCE_STMT,
+					    state )
+
+
 	# While statement
-	@ObjectNodeDispatchMethod
-	def WhileStmt(self, ctx, state, node, condition, suite):
+	def _whileStmtHeaderElement(self, ctx, state, condition):
 		conditionView = ctx.viewEvalFn( condition, None, python25ViewState( PRECEDENCE_STMT, self._parser.expression() ) )
-		return compoundStatementEditor( ctx, node,
-						ctx.span( [ capitalisedKeywordText( ctx, whileKeyword ),  ctx.text( default_textStyle, ' ' ),  conditionView,  ctx.text( punctuation_textStyle, ':' ) ] ),
-						PRECEDENCE_STMT,
-						suite,
-						state,
-						self._parser.statement() )
+		return ctx.span( [ capitalisedKeywordText( ctx, whileKeyword ),  ctx.text( default_textStyle, ' ' ),  conditionView,  ctx.text( punctuation_textStyle, ':' ) ] )
+
+	@ObjectNodeDispatchMethod
+	def WhileStmtHeader(self, ctx, state, node, condition):
+		return compoundStatementHeaderEditor( ctx, node,
+					    self._whileStmtHeaderElement( ctx, state, condition ),
+					    PRECEDENCE_STMT,
+					    state )
 
 
 	# For statement
-	@ObjectNodeDispatchMethod
-	def ForStmt(self, ctx, state, node, target, source, suite):
+	def _forStmtHeaderElement(self, ctx, state, target, source):
 		targetView = ctx.viewEvalFn( target, None, python25ViewState( PRECEDENCE_STMT, self._parser.targetListOrTargetItem() ) )
 		sourceView = ctx.viewEvalFn( source, None, python25ViewState( PRECEDENCE_STMT, self._parser.tupleOrExpression() ) )
-		return compoundStatementEditor( ctx, node,
-						ctx.span( [ capitalisedKeywordText( ctx, forKeyword ),  ctx.text( default_textStyle, ' ' ),  targetView,  ctx.text( default_textStyle, ' ' ),
-											 capitalisedKeywordText( ctx, inKeyword ),  ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY, ctx.text( punctuation_textStyle, ' ' ) ),
-											 sourceView,  ctx.text( punctuation_textStyle, ':' ) ] ),
+		return ctx.span( [ capitalisedKeywordText( ctx, forKeyword ),  ctx.text( default_textStyle, ' ' ),  targetView,  ctx.text( default_textStyle, ' ' ),
+							    capitalisedKeywordText( ctx, inKeyword ),  ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY, ctx.text( punctuation_textStyle, ' ' ) ),
+							    sourceView,  ctx.text( punctuation_textStyle, ':' ) ] )
+
+	@ObjectNodeDispatchMethod
+	def ForStmtHeader(self, ctx, state, node, target, source):
+		return compoundStatementHeaderEditor( ctx, node,
+						self._forStmtHeaderElement( ctx, state, target, source ),
 						PRECEDENCE_STMT,
-						suite,
-						state,
-						self._parser.statement() )
-	
-	
+						state )
+
+
 
 	# Try statement
+	def _tryStmtHeaderElement(self, ctx, state):
+		return ctx.span( [ capitalisedKeywordText( ctx, tryKeyword ),  ctx.text( punctuation_textStyle, ':' ) ] )
+
 	@ObjectNodeDispatchMethod
-	def TryStmt(self, ctx, state, node, suite):
-		return compoundStatementEditor( ctx, node,
-						ctx.span( [ capitalisedKeywordText( ctx, tryKeyword ),  ctx.text( punctuation_textStyle, ':' ) ] ),
-						PRECEDENCE_STMT,
-						suite,
-						state,
-						self._parser.statement() )
-	
-	
-	
+	def TryStmtHeader(self, ctx, state, node):
+		return compoundStatementHeaderEditor( ctx, node,
+					    self._tryStmtHeaderElement( ctx, state ),
+					    PRECEDENCE_STMT,
+					    state )
+
+
+
 	# Except statement
-	@ObjectNodeDispatchMethod
-	def ExceptStmt(self, ctx, state, node, exception, target, suite):
+	def _exceptStmtHeaderElement(self, ctx, state, exception, target):
 		elements = []
 		if exception is not None:
 			excView = ctx.viewEvalFn( exception, None, python25ViewState( PRECEDENCE_STMT, self._parser.expression() ) )
@@ -1192,72 +1243,51 @@ class Python25View (GSymViewObjectNodeDispatch):
 			targetView = ctx.viewEvalFn( target, None, python25ViewState( PRECEDENCE_STMT, self._parser.expression() ) )
 			elements.extend( [ ctx.text( default_textStyle, ',' ),  ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY, ctx.text( punctuation_textStyle, ' ' ) ),  targetView ] )
 		elements.append( ctx.text( punctuation_textStyle, ':' ) )
-		return compoundStatementEditor( ctx, node,
-						ctx.span( [ capitalisedKeywordText( ctx, exceptKeyword ) ]  +  elements ),
-						PRECEDENCE_STMT,
-						suite,
-						state,
-						self._parser.statement() )
+		return ctx.span( [ capitalisedKeywordText( ctx, exceptKeyword ) ]  +  elements )
 
-	
-	
+	@ObjectNodeDispatchMethod
+	def ExceptStmtHeader(self, ctx, state, node, exception, target):
+		return compoundStatementHeaderEditor( ctx, node,
+					    self._exceptStmtHeaderElement( ctx, state, exception, target ),
+					    PRECEDENCE_STMT,
+					    state )
+
+
+
 	# Finally statement
+	def _finallyStmtHeaderElement(self, ctx, state):
+		return ctx.span( [ capitalisedKeywordText( ctx, finallyKeyword ),  ctx.text( punctuation_textStyle, ':' ) ] )
+
 	@ObjectNodeDispatchMethod
-	def FinallyStmt(self, ctx, state, node, suite):
-		return compoundStatementEditor( ctx, node,
-						ctx.span( [ capitalisedKeywordText( ctx, finallyKeyword ),  ctx.text( punctuation_textStyle, ':' ) ] ),
-						PRECEDENCE_STMT,
-						suite,
-						state,
-						self._parser.statement() )
-	
-	
-	
+	def FinallyStmtHeader(self, ctx, state, node):
+		return compoundStatementHeaderEditor( ctx, node,
+					    self._finallyStmtHeaderElement( ctx, state ),
+					    PRECEDENCE_STMT,
+					    state )
+
+
+
 	# With statement
-	@ObjectNodeDispatchMethod
-	def WithStmt(self, ctx, state, node, expr, target, suite):
+	def _withStmtHeaderElement(self, ctx, state, expr, target):
 		exprView = ctx.viewEvalFn( expr, None, python25ViewState( PRECEDENCE_STMT, self._parser.expression() ) )
 		elements = [ exprView ]
 		if target is not None:
 			targetView = ctx.viewEvalFn( target, None, python25ViewState( PRECEDENCE_STMT, self._parser.expression() ) )
 			elements.extend( [ ctx.text( default_textStyle, ' ' ),  capitalisedKeywordText( ctx, asKeyword ),  ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY, ctx.text( punctuation_textStyle, ' ' ) ),  targetView ] )
 		elements.append( ctx.text( punctuation_textStyle, ':' ) )
-		return compoundStatementEditor( ctx, node,
-						ctx.span( [ capitalisedKeywordText( ctx, withKeyword ),  ctx.text( default_textStyle, ' ' ) ]  +  elements ),
-						PRECEDENCE_STMT,
-						suite,
-						state,
-						self._parser.statement() )
+		return ctx.span( [ capitalisedKeywordText( ctx, withKeyword ),  ctx.text( default_textStyle, ' ' ) ]  +  elements )
 
-	
-	
-	# Def statement
 	@ObjectNodeDispatchMethod
-	def DefStmt(self, ctx, state, node, name, params, paramsTrailingSeparator, suite):
-		paramViews = ctx.mapViewEvalFn( params, None, python25ViewState( PRECEDENCE_STMT, self._parser.param() ) )
-		paramElements = [ ctx.text( punctuation_textStyle, '(' ) ]
-		if len( params ) > 0:
-			for p in paramViews[:-1]:
-				paramElements.extend( [ p,  ctx.text( punctuation_textStyle, ', ' ) ] )
-			paramElements.append( paramViews[-1] )
-			if paramsTrailingSeparator is not None:
-				paramElements.append( ctx.text( punctuation_textStyle, ', ' ) )
-				
-		paramElements.append( ctx.text( punctuation_textStyle, ')' ) )
-		editor = compoundStatementEditor( ctx, node,
-						ctx.span( [ capitalisedKeywordText( ctx, defKeyword ),  ctx.text( default_textStyle, ' ' ),  ctx.text( default_textStyle, name ) ]  +  \
-							   paramElements  +  [ ctx.text( punctuation_textStyle, ':' ) ] ),
-						PRECEDENCE_STMT,
-						suite,
-						state,
-						self._parser.statement(),
-						lambda header: ctx.border( defHeader_border, ContainerStyleSheet.defaultStyleSheet, header ) )
-		return ctx.border( defBackground_border, ContainerStyleSheet.defaultStyleSheet, editor )
+	def WithStmtHeader(self, ctx, state, node, expr, target):
+		return compoundStatementHeaderEditor( ctx, node,
+					    self._withStmtHeaderElement( ctx, state, expr, target ),
+					    PRECEDENCE_STMT,
+					    state )
 
-	
+
+
 	# Decorator statement
-	@ObjectNodeDispatchMethod
-	def DecoStmt(self, ctx, state, node, name, args, argsTrailingSeparator):
+	def _decoStmtHeaderElement(self, ctx, state, name, args, argsTrailingSeparator):
 		if args is not None:
 			argViews = ctx.mapViewEvalFn( args, None, python25ViewState( PRECEDENCE_STMT, self._parser.callArg() ) )
 			argElements = [ ctx.text( punctuation_textStyle, '(' ) ]
@@ -1270,51 +1300,199 @@ class Python25View (GSymViewObjectNodeDispatch):
 			argElements.append( ctx.text( punctuation_textStyle, ')' ) )
 		else:
 			argElements = []
-		return statementNodeEditor( ctx, node,
-				   ctx.span( [ ctx.text( punctuation_textStyle, '@' ),  ctx.text( default_textStyle, name ) ]  +  argElements ),
-				   PRECEDENCE_STMT,
-				   state )
-	
-	
-	
-	# Def statement
+		return ctx.span( [ ctx.text( punctuation_textStyle, '@' ),  ctx.text( default_textStyle, name ) ]  +  argElements )
+
 	@ObjectNodeDispatchMethod
-	def ClassStmt(self, ctx, state, node, name, bases, basesTrailingSeparator, suite):
+	def DecoStmtHeader(self, ctx, state, node, name, args, argsTrailingSeparator):
+		return compoundStatementHeaderEditor( ctx, node,
+					    self._decoStmtHeaderElement( ctx, state, name, args, argsTrailingSeparator ),
+					    PRECEDENCE_STMT,
+					    state )
+
+
+
+	# Def statement
+	def _defStmtHeaderElement(self, ctx, state, name, params, paramsTrailingSeparator):
+		paramViews = ctx.mapViewEvalFn( params, None, python25ViewState( PRECEDENCE_STMT, self._parser.param() ) )
+		paramElements = [ ctx.text( punctuation_textStyle, '(' ) ]
+		if len( params ) > 0:
+			for p in paramViews[:-1]:
+				paramElements.extend( [ p,  ctx.text( punctuation_textStyle, ', ' ) ] )
+			paramElements.append( paramViews[-1] )
+			if paramsTrailingSeparator is not None:
+				paramElements.append( ctx.text( punctuation_textStyle, ', ' ) )
+
+		paramElements.append( ctx.text( punctuation_textStyle, ')' ) )
+		return ctx.span( [ capitalisedKeywordText( ctx, defKeyword ),  ctx.text( default_textStyle, ' ' ),  ctx.text( default_textStyle, name ) ]  +  \
+							    paramElements  +  [ ctx.text( punctuation_textStyle, ':' ) ] )
+
+	@ObjectNodeDispatchMethod
+	def DefStmtHeader(self, ctx, state, node, name, params, paramsTrailingSeparator):
+		editor = compoundStatementHeaderEditor( ctx, node,
+					    self._defStmtHeaderElement( ctx, state, name, params, paramsTrailingSeparator ),
+					    PRECEDENCE_STMT,
+					    state,
+					    lambda header: ctx.border( defHeader_border, ContainerStyleSheet.defaultStyleSheet, header ) )
+		#return ctx.border( defBackground_border, ContainerStyleSheet.defaultStyleSheet, editor )
+		return editor
+
+
+	# Def statement
+	def _classStmtHeaderElement(self, ctx, state, name, bases, basesTrailingSeparator):
 		if bases is not None:
 			baseViews = ctx.mapViewEvalFn( bases, None, python25ViewState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.expression() ) )
 			layout = tuple_listViewLayout   if basesTrailingSeparator is None   else tuple_listViewLayoutSep
 			baseElements = [ ctx.text( punctuation_textStyle, '(' ),  ctx.listView( layout, None, None, _CommaFactory( ctx ), baseViews ),  ctx.text( punctuation_textStyle, ')' ) ]
 		else:
 			baseElements = []
-			
-		editor = compoundStatementEditor( ctx, node,
-						ctx.span( [ capitalisedKeywordText( ctx, classKeyword ),  ctx.text( default_textStyle, ' ' ),  ctx.text( default_textStyle, name ) ]  +  \
-							   baseElements  +  [ ctx.text( punctuation_textStyle, ':' ) ] ),
-						PRECEDENCE_STMT,
-						suite,
-						state,
-						self._parser.statement(),
-						lambda header: ctx.border( classHeader_border, ContainerStyleSheet.defaultStyleSheet, header ) )
-		
-		return ctx.border( classBackground_border, ContainerStyleSheet.defaultStyleSheet, editor )
-	
+		return ctx.span( [ capitalisedKeywordText( ctx, classKeyword ),  ctx.text( default_textStyle, ' ' ),  ctx.text( default_textStyle, name ) ]  +  \
+							    baseElements  +  [ ctx.text( punctuation_textStyle, ':' ) ] )
+
+	@ObjectNodeDispatchMethod
+	def ClassStmtHeader(self, ctx, state, node, name, bases, basesTrailingSeparator):
+		editor = compoundStatementHeaderEditor( ctx, node,
+						  self._classStmtHeaderElement( ctx, state, name, params, paramsTrailingSeparator ),
+						  PRECEDENCE_STMT,
+						  state,
+						  lambda header: ctx.border( classHeader_border, ContainerStyleSheet.defaultStyleSheet, header ) )
+		#return ctx.border( classBackground_border, ContainerStyleSheet.defaultStyleSheet, editor )
+		return editor
+
 
 	
+
+	#
+	#
+	# STRUCTURE STATEMENTS
+	#
+	#
+
 	# Indented block
 	@ObjectNodeDispatchMethod
 	def IndentedBlock(self, ctx, state, node, suite):
 		indentedSuite = ctx.indent( 30.0, suiteView( ctx, suite, self._parser.statement() ) )
 		return ctx.border( indentedBlock_border, ContainerStyleSheet.defaultStyleSheet, indentedSuite )
-		
+
+
+
+
+
+	#
+	#
+	# COMPOUND STATEMENTS
+	#
+	#
+
+	# If statement
+	@ObjectNodeDispatchMethod
+	def IfStmt(self, ctx, state, node, condition, suite, elifBlocks, elseSuite):
+		compoundBlocks = [ ( self._ifStmtHeaderElement( ctx, state, condition ), suite ) ]
+		for b in elifBlocks:
+			if not b.isInstanceOf( Nodes.ElifBlock ):
+				raise TypeError, 'IfStmt elifBlocks should only contain ElifBlock instances'
+			compoundBlocks.append( ( self._elifStmtHeaderElement( ctx, state, b['condition'] ),  b['suite'] ) )
+		if elseSuite is not None:
+			compoundBlocks.append( ( self._elseStmtHeaderElement( ctx, state ),  elseSuite ) )
+		return compoundStatementEditor( ctx, node, PRECEDENCE_STMT,
+						compoundBlocks,
+						state,
+						self._parser.statement() )
+
+
+
+	# While statement
+	@ObjectNodeDispatchMethod
+	def WhileStmt(self, ctx, state, node, condition, suite, elseSuite):
+		compoundBlocks = [ ( self._whileStmtHeaderElement( ctx, state, condition ), suite ) ]
+		if elseSuite is not None:
+			compoundBlocks.append( ( self._elseStmtHeaderElement( ctx, state ),  elseSuite ) )
+		return compoundStatementEditor( ctx, node, PRECEDENCE_STMT,
+						compoundBlocks,
+						state,
+						self._parser.statement() )
+
 	
-	
+
+	# For statement
+	@ObjectNodeDispatchMethod
+	def ForStmt(self, ctx, state, node, target, source, suite, elseSuite):
+		compoundBlocks = [ ( self._forStmtHeaderElement( ctx, state, target, source ), suite ) ]
+		if elseSuite is not None:
+			compoundBlocks.append( ( self._elseStmtHeaderElement( ctx, state ),  elseSuite ) )
+		return compoundStatementEditor( ctx, node, PRECEDENCE_STMT,
+						compoundBlocks,
+						state,
+						self._parser.statement() )
+
+
+
+	# Try statement
+	@ObjectNodeDispatchMethod
+	def TryStmt(self, ctx, state, node, suite, exceptBlocks, elseSuite, finallySuite):
+		compoundBlocks = [ ( self._tryStmtHeaderElement( ctx, state ), suite ) ]
+		for b in exceptBlocks:
+			if not b.isInstanceOf( Nodes.ExceptBlock ):
+				raise TypeError, 'TryStmt elifBlocks should only contain ExceptBlock instances'
+			compoundBlocks.append( ( self._exceptStmtHeaderElement( ctx, state, b['exception'], b['target'] ),  b['suite'] ) )
+		if elseSuite is not None:
+			compoundBlocks.append( ( self._elseStmtHeaderElement( ctx, state ),  elseSuite ) )
+		if finallySuite is not None:
+			compoundBlocks.append( ( self._finallyStmtHeaderElement( ctx, state ),  finallySuite ) )
+		return compoundStatementEditor( ctx, node, PRECEDENCE_STMT,
+						compoundBlocks,
+						state,
+						self._parser.statement() )
+
+
+
+
+	# With statement
+	@ObjectNodeDispatchMethod
+	def WithStmt(self, ctx, state, node, expr, target, suite):
+		compoundBlocks = [ ( self._withStmtHeaderElement( ctx, state, expr, target ), suite ) ]
+		return compoundStatementEditor( ctx, node, PRECEDENCE_STMT,
+						compoundBlocks,
+						state,
+						self._parser.statement() )
+
+
+
+	# Def statement
+	@ObjectNodeDispatchMethod
+	def DefStmt(self, ctx, state, node, decorators, name, params, paramsTrailingSeparator, suite):
+		compoundBlocks = []
+		for d in decorators:
+			if not d.isInstanceOf( Nodes.Decorator ):
+				raise TypeError, 'DefStmt decorators should only contain Decorator instances'
+			compoundBlocks.append( ( self._decoStmtHeaderElement( ctx, state, d['name'], d['args'], d['argsTrailingSeparator'] ),  None ) )
+			
+		compoundBlocks.append( ( self._defStmtHeaderElement( ctx, state, name, params, paramsTrailingSeparator ), suite, lambda header: ctx.border( defHeader_border, ContainerStyleSheet.defaultStyleSheet, header ) ) )
+		editor = compoundStatementEditor( ctx, node, PRECEDENCE_STMT,
+						compoundBlocks,
+						state,
+						self._parser.statement() )
+		return ctx.border( defBackground_border, ContainerStyleSheet.defaultStyleSheet, editor )
+
+
+	# Class statement
+	@ObjectNodeDispatchMethod
+	def ClassStmt(self, ctx, state, node, name, bases, basesTrailingSeparator, suite):
+		compoundBlocks = [ ( self._classStmtHeaderElement( ctx, state, name, bases, basesTrailingSeparator ), suite, lambda header: ctx.border( classHeader_border, ContainerStyleSheet.defaultStyleSheet, header ) ) ]
+		editor = compoundStatementEditor( ctx, node, PRECEDENCE_STMT,
+						compoundBlocks,
+						state,
+						self._parser.statement() )
+		return ctx.border( classBackground_border, ContainerStyleSheet.defaultStyleSheet, editor )
+
+
+
 	# Comment statement
 	@ObjectNodeDispatchMethod
 	def CommentStmt(self, ctx, state, node, comment):
 		return statementNodeEditor( ctx, node,
-				   ctx.text( comment_textStyle, '#' + comment ),
-				   PRECEDENCE_STMT,
-				   state )
+					    ctx.text( comment_textStyle, '#' + comment ),
+					    PRECEDENCE_STMT,
+					    state )
 
 
 
@@ -1327,16 +1505,16 @@ class _Python25ViewPage (Page):
 		self._app = app
 		viewContext = GSymViewInstance( pythonDocRootNode, self._frame, self._viewFn, self._viewRootFn, commandHistory, self )
 		self._frame.setEditHandler( Python25EditHandler( viewContext ) )
-		
-		
+
+
 	def getContentsElement(self):
 		return self._frame
-		
-		
+
+
 	def _viewRootFn(self, node, ctx, state):
 		return self._viewFn( node, ctx, state )
 
-	
+
 
 
 def viewLocationAsPage(pythonDocRootNode, location, commandHistory, app):

@@ -52,18 +52,18 @@ import unittest
 
 class TestCase_LISPParser (ParserTestCase):
 	def testString(self):
-		self._matchTest( parser, 'abc', 'abc' )
-		self._matchTest( parser, "'abc'", 'abc' )
-		self._matchTest( parser, '"abc"', 'abc' )
-		self._matchTest( parser, "u'abc'", u'abc' )
-		self._matchTest( parser, 'u"abc"', u'abc' )
+		self._parseStringTest( parser, 'abc', 'abc' )
+		self._parseStringTest( parser, "'abc'", 'abc' )
+		self._parseStringTest( parser, '"abc"', 'abc' )
+		self._parseStringTest( parser, "u'abc'", u'abc' )
+		self._parseStringTest( parser, 'u"abc"', u'abc' )
 
 	def testList(self):
-		self._matchTest( parser, '()', [] )
-		self._matchTest( parser, '(x)', [ 'x' ] )
-		self._matchTest( parser, '(())', [ [] ] )
-		self._matchTest( parser, '(x y z)', [ 'x', 'y', 'z' ] )
-		self._matchTest( parser, '(x (y (z())))', [ 'x', [ 'y', [ 'z', []]]] )
+		self._parseStringTest( parser, '()', [] )
+		self._parseStringTest( parser, '(x)', [ 'x' ] )
+		self._parseStringTest( parser, '(())', [ [] ] )
+		self._parseStringTest( parser, '(x y z)', [ 'x', 'y', 'z' ] )
+		self._parseStringTest( parser, '(x (y (z())))', [ 'x', [ 'y', [ 'z', []]]] )
 
 
 if __name__ == '__main__':
