@@ -7,7 +7,7 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-public interface ElementTextRepresentationListener
+public interface ElementLinearRepresentationListener
 {
 	public boolean textRepresentationModified(DPWidget element);
 }

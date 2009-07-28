@@ -7,6 +7,7 @@
 package BritefuryJ.DocPresent;
 
 import java.awt.Graphics2D;
+import java.util.ArrayList;
 
 import org.python.core.Py;
 import org.python.core.PyObject;
@@ -14,6 +15,7 @@ import org.python.core.PyObject;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
+import BritefuryJ.DocPresent.Input.PointerInterface;
 import BritefuryJ.DocPresent.StyleSheets.ButtonStyleSheet;
 
 public class DPButton extends DPBin
@@ -91,6 +93,7 @@ public class DPButton extends DPBin
 		super.drawBackground( graphics );
 		ButtonStyleSheet buttonStyle = (ButtonStyleSheet)styleSheet;
 		
+		ArrayList<PointerInterface> pointersWithinBounds = getPointersWithinBounds();
 		if ( pointersWithinBounds != null  &&  pointersWithinBounds.size() > 0 )
 		{
 			buttonStyle.getHighlightBorder().draw( graphics, 0.0, 0.0, getAllocationX(), getAllocationY() );
@@ -118,6 +121,12 @@ public class DPButton extends DPBin
 	protected boolean onButtonDown(PointerButtonEvent event)
 	{
 		super.onButtonDown( event );
+		return event.button == 1;
+	}
+
+	protected boolean onButtonUp(PointerButtonEvent event)
+	{
+		super.onButtonUp( event );
 		
 		if ( isRealised() )
 		{

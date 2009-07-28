@@ -29,11 +29,11 @@ class Python25StructureUnparser (object):
 
 
 	def _handleHeaderSuite(self, node, header, suite):
-		return [ header, Nodes.Indent() ]  +  suite  +  [ Nodes.Dedent() ]
+		return self._handleHeader( header )  +   [ Nodes.Indent() ]  +  suite  +  [ Nodes.Dedent() ]
 
 
 	def _handleHeader(self, node, header):
-		return header
+		return [ header ]
 
 
 	def _elseSuite(self, node, suite):
@@ -79,7 +79,7 @@ class Python25StructureUnparser (object):
 
 	@ObjectNodeDispatchMethod
 	def DefStmt(self, node, decorators, name, params, paramsTrailingSeparator, suite):
-		return [ self._handleHeader( node, Nodes.DecoStmtHeader( name=d['name'], args=d['args'], argsTrailingSeparator=d['argsTrailingSeparator'] ) )  for d in decorators ]  +  \
+		return _join( [ self._handleHeader( node, Nodes.DecoStmtHeader( name=d['name'], args=d['args'], argsTrailingSeparator=d['argsTrailingSeparator'] ) )  for d in decorators ] )  +  \
 		       self._handleHeaderSuite( node, Nodes.DefStmtHeader( name=name, params=params, paramsTrailingSeparator=paramsTrailingSeparator ), suite )
 
 	@ObjectNodeDispatchMethod

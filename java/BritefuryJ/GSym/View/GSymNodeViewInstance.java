@@ -33,7 +33,7 @@ import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.ElementContext;
 import BritefuryJ.DocPresent.ElementFactory;
 import BritefuryJ.DocPresent.ElementKeyboardListener;
-import BritefuryJ.DocPresent.ElementTextRepresentationListener;
+import BritefuryJ.DocPresent.ElementLinearRepresentationListener;
 import BritefuryJ.DocPresent.PyElementFactory;
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Layout.VAlignment;
@@ -413,20 +413,20 @@ public class GSymNodeViewInstance implements ElementContext, DVNode.NodeContext
 	
 	
 	
-	public DPWidget textRepresentationListener(DPWidget child, ElementTextRepresentationListener listener)
+	public DPWidget linearRepresentationListener(DPWidget child, ElementLinearRepresentationListener listener)
 	{
 		viewInstance.getView().profile_startElement();
-		child.setTextRepresentationListener( listener );
+		child.setLinearRepresentationListener( listener );
 		viewInstance.getView().profile_stopElement();
 		return child;
 	}
 	
-	public List<DPWidget> textRepresentationListener(List<DPWidget> children, ElementTextRepresentationListener listener)
+	public List<DPWidget> linearRepresentationListener(List<DPWidget> children, ElementLinearRepresentationListener listener)
 	{
 		viewInstance.getView().profile_startElement();
 		for (DPWidget child: children)
 		{
-			child.setTextRepresentationListener( listener );
+			child.setLinearRepresentationListener( listener );
 		}
 		viewInstance.getView().profile_stopElement();
 		return children;

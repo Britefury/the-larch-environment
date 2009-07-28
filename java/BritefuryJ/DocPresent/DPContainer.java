@@ -12,6 +12,7 @@ import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import BritefuryJ.DocPresent.Border.EmptyBorder;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
@@ -134,6 +135,18 @@ public abstract class DPContainer extends DPWidget
 			pressGrabButton = -1;
 		}
 		
+		if ( pointerChildTable != null )
+		{
+			
+			for (Map.Entry<PointerInterface, DPWidget> e: pointerChildTable.entrySet())
+			{
+				if ( e.getValue() == child )
+				{
+					pointerChildTable.remove( e.getKey() );
+				}
+			}
+		}
+
 		if ( isRealised() )
 		{
 			child.handleUnrealise( child );
@@ -372,7 +385,7 @@ public abstract class DPContainer extends DPWidget
 			if ( child != null )
 			{
 				boolean bHandled = child.handleButtonDown( event.transformed( child.getParentToLocalXform() ) );
-				if ( bHandled )
+				if ( bHandled  &&  isRealised() )
 				{
 					pressGrabChild = child;
 					pressGrabButton = event.button;
@@ -437,7 +450,7 @@ public abstract class DPContainer extends DPWidget
 				DPWidget savedPressGrabChild = pressGrabChild;
 				pressGrabChild = null;
 				
-				if ( localPos.x >= 0.0  &&  localPos.x <= getAllocationX()  &&  localPos.y >= 0.0  &&  localPos.y <= getAllocationY() )
+				if ( isRealised()  &&  localPos.x >= 0.0  &&  localPos.x <= getAllocationX()  &&  localPos.y >= 0.0  &&  localPos.y <= getAllocationY() )
 				{
 					DPWidget child = getChildAtLocalPoint( localPos );
 					if ( child != null )
@@ -582,6 +595,11 @@ public abstract class DPContainer extends DPWidget
 	
 	protected void handleUnrealise(DPWidget unrealiseRoot)
 	{
+		if ( pressGrabChild != null )
+		{
+			pressGrabChild = null;
+			pressGrabButton = -1;
+		}
 		for (DPWidget child: registeredChildren)
 		{
 			child.handleUnrealise( unrealiseRoot );

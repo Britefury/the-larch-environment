@@ -122,6 +122,12 @@ public class DPLink extends DPStaticText
 	protected boolean onButtonDown(PointerButtonEvent event)
 	{
 		super.onButtonDown( event );
+		return event.button == 1;
+	}
+
+	protected boolean onButtonUp(PointerButtonEvent event)
+	{
+		super.onButtonUp( event );
 		
 		if ( isRealised() )
 		{

@@ -15,6 +15,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.WeakHashMap;
 
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Border.EmptyBorder;
@@ -120,26 +121,42 @@ abstract public class DPWidget
 	//
 	//
 	
+	protected static int FLAG_REALISED = 0x1;
+	protected static int FLAG_RESIZE_QUEUED = 0x2;
+	protected static int FLAG_SIZE_UP_TO_DATE = 0x4;
+	
+	protected int flags;
+	
 	protected WidgetStyleSheet styleSheet;
 	protected DPContainer parent;
 	protected DPPresentationArea presentationArea;
-	protected boolean bRealised, bResizeQueued, bSizeUpToDate;
 	protected LReqBox layoutReqBox;
 	protected LAllocBox layoutAllocBox;
 	protected PackingParams parentPacking;
 	
-	protected ArrayList<Runnable> waitingImmediateEvents;			// only initialised when non-empty; otherwise null
-	protected ArrayList<PointerInterface> pointersWithinBounds;		// only initialised when non-empty; otherwise null
-	
 	protected DndState dndState;								// only initialised when in use; otherwise null
 	
-	protected ElementTextRepresentationListener textRepresentationListener;
+	protected ElementLinearRepresentationListener linearRepresentationListener;
 	protected ElementKeyboardListener keyboardListener;
 	
 	protected ElementContext context;
 
 	protected DPWidget metaElement;
 	protected String debugName;
+	
+	
+	
+	
+	//
+	//
+	// FIELDS AS DICTIONARY VALUES
+	//
+	//
+	
+	// These fields would be null/non-existant for the vast majority of elements, so store them in a global dictionary to
+	// save space
+	
+	private static WeakHashMap<DPWidget, ArrayList<Runnable>> waitingImmediateEventsByWidget = new WeakHashMap<DPWidget, ArrayList<Runnable>>();
 	
 	
 	
@@ -165,12 +182,11 @@ abstract public class DPWidget
 	
 	public DPWidget(WidgetStyleSheet styleSheet)
 	{
+		flags = 0;
 		this.styleSheet = styleSheet;
 		layoutReqBox = new LReqBox();
 		layoutAllocBox = new LAllocBox( this );
 		parentPacking = null;
-		waitingImmediateEvents = null;
-		pointersWithinBounds = null;
 		context = null;
 	}
 	
@@ -470,6 +486,79 @@ abstract public class DPWidget
 	
 	
 	
+
+	//
+	//
+	// Flag methods
+	//
+	//
+	
+	protected boolean isResizeQueued()
+	{
+		return ( flags & FLAG_RESIZE_QUEUED )  !=  0;
+	}
+	
+	protected boolean isSizeUpToDate()
+	{
+		return ( flags & FLAG_SIZE_UP_TO_DATE )  !=  0;
+	}
+	
+	
+	protected void clearFlagRealised()
+	{
+		flags &= ~FLAG_REALISED;
+	}
+	
+	protected void setFlagRealised()
+	{
+		flags |= FLAG_REALISED;
+	}
+	
+	
+	protected void clearFlagResizeQueued()
+	{
+		flags &= ~FLAG_RESIZE_QUEUED;
+	}
+	
+	protected void setFlagResizeQueued()
+	{
+		flags |= FLAG_RESIZE_QUEUED;
+	}
+	
+	
+	protected void clearFlagSizeUpToDate()
+	{
+		flags &= ~FLAG_SIZE_UP_TO_DATE;
+	}
+	
+	protected void setFlagSizeUpToDate()
+	{
+		flags |= FLAG_SIZE_UP_TO_DATE;
+	}
+	
+	
+	
+	
+	//
+	//
+	// Pointers within bounds
+	//
+	//
+	
+	protected ArrayList<PointerInterface> getPointersWithinBounds()
+	{
+		if ( presentationArea != null )
+		{
+			return presentationArea.pointersWithinBoundsByWidget.get( this );
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	
+	
 	
 	//
 	//
@@ -479,7 +568,7 @@ abstract public class DPWidget
 	
 	public boolean isRealised()
 	{
-		return bRealised;
+		return ( flags & FLAG_REALISED )  !=  0;
 	}
 	
 	public DPPresentationArea getPresentationArea()
@@ -508,9 +597,7 @@ abstract public class DPWidget
 		if ( parent != null )
 		{
 			parent.replaceChildWithEmpty( this );
-			parent = null;
 		}
-		presentationArea = null;
 	}
 	
 	
@@ -638,12 +725,14 @@ abstract public class DPWidget
 			presentationArea = area;
 			if ( presentationArea != null )
 			{
+				ArrayList<Runnable> waitingImmediateEvents = waitingImmediateEventsByWidget.get( this );
 				if ( waitingImmediateEvents != null )
 				{
 					for (Runnable event: waitingImmediateEvents)
 					{
 						presentationArea.queueImmediateEvent( event );
 					}
+					waitingImmediateEventsByWidget.remove( this );
 					waitingImmediateEvents = null;
 				}
 			}
@@ -946,9 +1035,11 @@ abstract public class DPWidget
 		}
 		else
 		{
+			ArrayList<Runnable> waitingImmediateEvents = waitingImmediateEventsByWidget.get( this );
 			if ( waitingImmediateEvents == null )
 			{
 				waitingImmediateEvents = new ArrayList<Runnable>();
+				waitingImmediateEventsByWidget.put( this, waitingImmediateEvents );
 			}
 			if ( !waitingImmediateEvents.contains( event ) )
 			{
@@ -966,12 +1057,14 @@ abstract public class DPWidget
 		}
 		else
 		{
+			ArrayList<Runnable> waitingImmediateEvents = waitingImmediateEventsByWidget.get( this );
 			if ( waitingImmediateEvents != null )
 			{
 				waitingImmediateEvents.remove( event );
 				if ( waitingImmediateEvents.isEmpty() )
 				{
 					waitingImmediateEvents = null;
+					waitingImmediateEventsByWidget.remove( this );
 				}
 			}
 		}
@@ -1064,13 +1157,13 @@ abstract public class DPWidget
 	
 	protected void handleQueueResize()
 	{
-		if ( !bResizeQueued  &&  bRealised )
+		if ( !isResizeQueued()  &&  isRealised() )
 		{
 			if ( parent != null )
 			{
 				parent.queueResize();
 			}
-			bResizeQueued = true;
+			setFlagResizeQueued();
 		}
 	}
 	
@@ -1078,13 +1171,13 @@ abstract public class DPWidget
 	protected void queueResize()
 	{
 		handleQueueResize();
-		bSizeUpToDate = false;
+		clearFlagSizeUpToDate();
 	}
 	
 	
 	protected void queueRedraw(Point2 localPos, Vector2 localSize)
 	{
-		if ( bRealised  &&  parent != null )
+		if ( isRealised()  &&  parent != null )
 		{
 			parent.childRedrawRequest( this, localPos, localSize );
 		}
@@ -1128,13 +1221,18 @@ abstract public class DPWidget
 	protected void handleMotion(PointerMotionEvent event)
 	{
 		PointerInterface pointer = event.pointer.concretePointer();
-		if ( pointersWithinBounds == null )
+		if ( presentationArea != null )
 		{
-			pointersWithinBounds = new ArrayList<PointerInterface>();
-		}
-		if ( !pointersWithinBounds.contains( pointer ) )
-		{
-			pointersWithinBounds.add( pointer );
+			ArrayList<PointerInterface> pointersWithinBounds = presentationArea.pointersWithinBoundsByWidget.get( this );
+			if ( pointersWithinBounds == null )
+			{
+				pointersWithinBounds = new ArrayList<PointerInterface>();
+				presentationArea.pointersWithinBoundsByWidget.put( this, pointersWithinBounds );
+			}
+			if ( !pointersWithinBounds.contains( pointer ) )
+			{
+				pointersWithinBounds.add( pointer );
+			}
 		}
 		onMotion( event );
 	}
@@ -1142,13 +1240,18 @@ abstract public class DPWidget
 	protected void handleEnter(PointerMotionEvent event)
 	{
 		PointerInterface pointer = event.pointer.concretePointer();
-		if ( pointersWithinBounds == null )
+		if ( presentationArea != null )
 		{
-			pointersWithinBounds = new ArrayList<PointerInterface>();
-		}
-		if ( !pointersWithinBounds.contains( pointer ) )
-		{
-			pointersWithinBounds.add( pointer );
+			ArrayList<PointerInterface> pointersWithinBounds = presentationArea.pointersWithinBoundsByWidget.get( this );
+			if ( pointersWithinBounds == null )
+			{
+				pointersWithinBounds = new ArrayList<PointerInterface>();
+				presentationArea.pointersWithinBoundsByWidget.put( this, pointersWithinBounds );
+			}
+			if ( !pointersWithinBounds.contains( pointer ) )
+			{
+				pointersWithinBounds.add( pointer );
+			}
 		}
 		onEnter( event );
 	}
@@ -1156,12 +1259,17 @@ abstract public class DPWidget
 	protected void handleLeave(PointerMotionEvent event)
 	{
 		PointerInterface pointer = event.pointer.concretePointer();
-		if ( pointersWithinBounds != null )
+		if ( presentationArea != null )
 		{
-			pointersWithinBounds.remove( pointer );
-			if ( pointersWithinBounds.isEmpty() )
+			ArrayList<PointerInterface> pointersWithinBounds = presentationArea.pointersWithinBoundsByWidget.get( this );
+			if ( pointersWithinBounds != null )
 			{
-				pointersWithinBounds = null;
+				pointersWithinBounds.remove( pointer );
+				if ( pointersWithinBounds.isEmpty() )
+				{
+					pointersWithinBounds = null;
+					presentationArea.pointersWithinBoundsByWidget.remove( this );
+				}
 			}
 		}
 		onLeave( event );
@@ -1174,23 +1282,29 @@ abstract public class DPWidget
 	
 	protected void handleRealise()
 	{
-		bRealised = true;
+		setFlagRealised();
 		onRealise();
 	}
 	
 	@SuppressWarnings("unchecked")
 	protected void handleUnrealise(DPWidget unrealiseRoot)
 	{
-		if ( pointersWithinBounds != null )
+		if ( presentationArea != null )
 		{
-			ArrayList<PointerInterface> pointers = (ArrayList<PointerInterface>)pointersWithinBounds.clone();
-			for (PointerInterface pointer: pointers)
+			ArrayList<PointerInterface> pointersWithinBounds = presentationArea.pointersWithinBoundsByWidget.get( this );
+			if ( pointersWithinBounds != null )
 			{
-				handleLeave( new PointerMotionEvent( pointer, PointerMotionEvent.Action.LEAVE ) );
+				ArrayList<PointerInterface> pointers = (ArrayList<PointerInterface>)pointersWithinBounds.clone();
+				for (PointerInterface pointer: pointers)
+				{
+					handleLeave( new PointerMotionEvent( pointer, PointerMotionEvent.Action.LEAVE ) );
+				}
+				pointersWithinBounds = null;
+				presentationArea.pointersWithinBoundsByWidget.remove( this );
 			}
 		}
 		onUnrealise( unrealiseRoot );
-		bRealised = false;		
+		clearFlagRealised();
 	}
 	
 	protected void handleDrawBackground(Graphics2D graphics, AABox2 areaBox)
@@ -1232,7 +1346,7 @@ abstract public class DPWidget
 	
 	protected LReqBox refreshRequisitionX()
 	{
-		if ( !bSizeUpToDate )
+		if ( !isSizeUpToDate() )
 		{
 			updateRequisitionX();
 		}
@@ -1241,7 +1355,7 @@ abstract public class DPWidget
 	
 	protected LReqBox refreshRequisitionY()
 	{
-		if ( !bSizeUpToDate )
+		if ( !isSizeUpToDate() )
 		{
 			updateRequisitionY();
 		}
@@ -1251,16 +1365,16 @@ abstract public class DPWidget
 	
 	protected void refreshAllocationX(double prevWidth)
 	{
-		if ( !bSizeUpToDate  ||  layoutAllocBox.getAllocationX() != prevWidth )
+		if ( !isSizeUpToDate()  ||  layoutAllocBox.getAllocationX() != prevWidth )
 		{
 			updateAllocationX();
-			bSizeUpToDate = false;
+			clearFlagSizeUpToDate();
 		}
 	}
 	
 	protected void refreshAllocationY(double prevHeight)
 	{
-		if ( !bSizeUpToDate  ||  layoutAllocBox.getAllocationY() != prevHeight )
+		if ( !isSizeUpToDate()  ||  layoutAllocBox.getAllocationY() != prevHeight )
 		{
 			updateAllocationY();
 		}
@@ -1270,8 +1384,8 @@ abstract public class DPWidget
 	
 	protected void onSizeRefreshed()
 	{
-		bResizeQueued = false;
-		bSizeUpToDate = true;
+		clearFlagResizeQueued();
+		setFlagSizeUpToDate();
 	}
 	
 	
@@ -1459,14 +1573,14 @@ abstract public class DPWidget
 	//
 	
 	
-	public ElementTextRepresentationListener getTextRepresentationListener()
+	public ElementLinearRepresentationListener getLinearRepresentationListener()
 	{
-		return textRepresentationListener;
+		return linearRepresentationListener;
 	}
 	
-	public void setTextRepresentationListener(ElementTextRepresentationListener listener)
+	public void setLinearRepresentationListener(ElementLinearRepresentationListener listener)
 	{
-		textRepresentationListener = listener;
+		linearRepresentationListener = listener;
 	}
 	
 
@@ -1548,9 +1662,9 @@ abstract public class DPWidget
 	
 	protected boolean onTextRepresentationModifiedEvent()
 	{
-		if ( textRepresentationListener != null )
+		if ( linearRepresentationListener != null )
 		{
-			if ( textRepresentationListener.textRepresentationModified( this ) )
+			if ( linearRepresentationListener.textRepresentationModified( this ) )
 			{
 				return true;
 			}
