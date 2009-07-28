@@ -168,7 +168,7 @@ def expressionNodeEditor(ctx, node, contents, precedence, state):
 		return contents
 	elif mode == MODE_EDITEXPRESSION:
 		contents = _precedenceParen( ctx, node, contents, precedence, outerPrecedence )
-		return ctx.textRepresentationListener( contents, ParsedExpressionTextRepresentationListener.newListener( parser, outerPrecedence ) )
+		return ctx.linearRepresentationListener( contents, ParsedExpressionTextRepresentationListener.newListener( parser, outerPrecedence ) )
 	elif mode == MODE_EDITSTATEMENT:
 		return statementNodeEditor( ctx, node, contents, precedence, state )
 	else:
@@ -181,10 +181,10 @@ def statementNodeEditor(ctx, node, contents, precedence, state):
 	if mode == MODE_EDITSTATEMENT:
 		contents = _precedenceParen( ctx, node, contents, precedence, outerPrecedence )
 		segment = ctx.segment( default_textStyle, True, True, contents )
-		segment = ctx.textRepresentationListener( segment, SimpleStatementTextRepresentationListener.newListener( parser ) )
+		segment = ctx.linearRepresentationListener( segment, SimpleStatementTextRepresentationListener.newListener( parser ) )
 
 		newLine = ctx.whitespace( '\n' )
-		newLine = ctx.textRepresentationListener( newLine, StatementNewLineTextRepresentationListener.newListener( parser ) )
+		newLine = ctx.linearRepresentationListener( newLine, SimpleStatementNewLineTextRepresentationListener.newListener( parser ) )
 
 		para = ctx.paragraph( python_paragraphStyle, [ segment, newLine ] )
 		para = ctx.keyboardListener( para, _statementKeyboardListener )
@@ -203,10 +203,10 @@ def compoundStatementHeaderEditor(ctx, node, headerContents, precedence, state, 
 	#		NewLine - header
 
 	headerSegment = ctx.segment( default_textStyle, True, True, headerContents )
-	headerSegment = ctx.textRepresentationListener( headerSegment, SimpleStatementTextRepresentationListener.newListener( parser ) )
+	headerSegment = ctx.linearRepresentationListener( headerSegment, SimpleStatementTextRepresentationListener.newListener( parser ) )
 
 	newLine = ctx.whitespace( '\n' )
-	newLine = ctx.textRepresentationListener( newLine, StatementNewLineTextRepresentationListener.newListener( parser ) )
+	newLine = ctx.linearRepresentationListener( newLine, SimpleStatementNewLineTextRepresentationListener.newListener( parser ) )
 
 	headerParagraph = ctx.paragraph( python_paragraphStyle, [ headerSegment, newLine ] )
 	headerParagraph = ctx.keyboardListener( headerParagraph, _statementKeyboardListener )
@@ -238,10 +238,12 @@ def compoundStatementEditor(ctx, node, precedence, compoundBlocks, state, statem
 			raise TypeError, 'Compound block should be of the form (headerContents, suite)  or  (headerContents, suite, headerContainerFn)'
 		
 		headerSegment = ctx.segment( default_textStyle, True, True, headerContents )
-		headerSegment = ctx.textRepresentationListener( headerSegment, CompoundStatementTextRepresentationListener.newListener( parser, i ) )
+		headerSegment = ctx.linearRepresentationListener( headerSegment, CompoundStatementTextRepresentationListener.newListener( parser, i ) )
+		
+		suiteElement = suiteView( ctx, suite, statementParser )
 	
 		newLine = ctx.whitespace( '\n' )
-		newLine = ctx.textRepresentationListener( newLine, StatementNewLineTextRepresentationListener.newListener( parser ) )
+		newLine = ctx.linearRepresentationListener( newLine, CompoundStatementNewLineTextRepresentationListener( parser, i, suiteElement ) )
 	
 		headerParagraph = ctx.paragraph( python_paragraphStyle, [ headerSegment, newLine ] )
 		headerParagraph = ctx.keyboardListener( headerParagraph, _statementKeyboardListener )
@@ -249,7 +251,7 @@ def compoundStatementEditor(ctx, node, precedence, compoundBlocks, state, statem
 			headerParagraph = headerContainerFn( headerParagraph )
 		
 		if suite is not None:
-			statementContents.extend( [ headerParagraph, ctx.indent( 30.0, suiteView( ctx, suite, statementParser ) ) ] )
+			statementContents.extend( [ headerParagraph, ctx.indent( 30.0, suiteElement ) ] )
 		else:
 			statementContents.append( headerParagraph )
 	statementElement = ctx.vbox( compoundStmt_vboxStyle, statementContents )

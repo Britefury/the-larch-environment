@@ -546,11 +546,29 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	private boolean bStructureRefreshQueued;
 	
 	
+	protected ArrayList<Runnable> waitingImmediateEvents;			// only initialised when non-empty; otherwise null
+
+	
+	
 	protected DPPresentationArea metaArea;
 	protected ElementTreeExplorer explorer;
 	
 	
-	protected PageController pageController; 
+	protected PageController pageController;
+	
+	
+	
+	
+	//
+	//
+	// WIDGET FIELDS AS DICTIONARY VALUES
+	//
+	//
+	
+	// These fields would normally be in the DPWidget class, but would be null/non-existant for the vast majority of elements,
+	// so store them in a global dictionary to save space
+	
+	protected WeakHashMap<DPWidget, ArrayList<PointerInterface>> pointersWithinBoundsByWidget;
 
 	
 	
@@ -559,6 +577,8 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	public DPPresentationArea()
 	{
 		super();
+		
+		pointersWithinBoundsByWidget = new WeakHashMap<DPWidget, ArrayList<PointerInterface>>();
 		
 		dndTable = new HashMap<PointerInterface, DndDrag>();
 		
@@ -1036,6 +1056,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 			bAllocationRequired = false;
 			
 			// Send motion events; pointer hasn't moved, but the widgets have
+			ArrayList<PointerInterface> pointersWithinBounds = getPointersWithinBounds();
 			if ( !dndTable.containsKey( rootSpaceMouse.concretePointer() )  &&  pointersWithinBounds != null  &&  pointersWithinBounds.contains( rootSpaceMouse.concretePointer() ) )
 			{
 				rootMotionEvent( new PointerMotionEvent( rootSpaceMouse, PointerMotionEvent.Action.MOTION ) );

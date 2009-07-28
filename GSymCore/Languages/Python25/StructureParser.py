@@ -127,7 +127,7 @@ class Python25StructureGrammar (Grammar):
 	
 	@Rule
 	def singleIndentedSuite(self):
-		return ( Parser.ObjectNode( Nodes.Indent )  +  self.suiteItem().zeroOrMore()  +  Parser.ObjectNode( Nodes.Dedent ) ).action( lambda input, begin, end, xs, bindings: xs[1] )
+		return ( Parser.ObjectNode( Nodes.Indent )  +  self.suiteItem().oneOrMore()  +  Parser.ObjectNode( Nodes.Dedent ) ).action( lambda input, begin, end, xs, bindings: xs[1] )
 	
 	@Rule
 	def indentedSuite(self):
@@ -481,4 +481,12 @@ class TestCase_Python25StructureParser (ParserTestCase):
 					     Nodes.Dedent() ],
 				      [
 					     Nodes.IndentedBlock( suite=[ Nodes.BlankLine(), Nodes.CommentStmt( comment='x' ) ] ) ] )
+
+		
+	def test_emptySuite(self):
+		g = Python25StructureGrammar()
+		self._parseListFailTest( g.suite(),
+				     [
+					     Nodes.Indent(),
+					     Nodes.Dedent(), ] )
 		

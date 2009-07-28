@@ -33,7 +33,7 @@ from GSymCore.Project import NodeClasses as Nodes
 
 
 
-class NameTextRepListener (ElementTextRepresentationListener):
+class NameTextRepListener (ElementLinearRepresentationListener):
 	
 	def __init__(self):
 		pass
@@ -53,7 +53,7 @@ def nameEditor(ctx, node, state, style):
 	name = node['name']
 	
 	text = ctx.text( style, name )
-	return ctx.textRepresentationListener( text, _nameTextRepListener )
+	return ctx.linearRepresentationListener( text, _nameTextRepListener )
 
 
 

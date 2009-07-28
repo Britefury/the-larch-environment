@@ -66,6 +66,9 @@ def isCompoundStmt(node):
 def isCompoundStmtHeader(node):
 	return isinstance( node, DMObjectInterface )  and  node.isInstanceOf( Nodes.CompountStmtHeader )
 
+def isCompoundStmtOrCompoundHeader(node):
+	return isinstance( node, DMObjectInterface )  and  ( node.isInstanceOf( Nodes.CompoundStmt )  or  node.isInstanceOf( Nodes.CompountStmtHeader ) )
+
 def isPythonModule(node):
 	return isinstance( node, DMObjectInterface )  and  node.isInstanceOf( Nodes.PythonModule )
 
@@ -359,7 +362,7 @@ def pyReplaceStatement(ctx, data, replacement, bDontReplaceIfEqual=True):
 	
 	
 	
-def pyReplaceStmt(ctx, target, replacement):
+def pyReplaceStmt(ctx, target, replacement, bDontReplaceIfEqual=True):
 	if isinstance( target, DocTreeNode ):
 		if target == replacement  and  bDontReplaceIfEqual:
 			# Same content; ignore

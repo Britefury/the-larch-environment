@@ -47,59 +47,73 @@ _structureParser = Python25StructureGrammar()
 
 
 
-class _CompoundHeaderUnparser (Python25StructureUnparser):
-	def __init__(self, compoundNode, headerIndex):
-		super( _CompoundHeaderUnparser, self ).__init__()
+class _ReplaceSimpleStatementUnparser (Python25StructureUnparser):
+	def __init__(self, target, replacementRange):
+		super( _ReplaceSimpleStatementUnparser, self ).__init__()
+		self._target = target
+		self._replacementRange = replacementRange
+		
+		
+	def _handleHeader(self, node, header):
+		if node is self._target:
+			return self._replacementRange
+		return super( _ReplaceSimpleStatementUnparser, self )._handleHeader( node, header )
+	
+	
+
+class _ReplaceCompoundHeaderUnparser (Python25StructureUnparser):
+	def __init__(self, compoundNode, headerIndex, replacementRange):
+		super( _ReplaceCompoundHeaderUnparser, self ).__init__()
 		self._compoundNode = compoundNode
 		self._headerIndex = headerIndex
+		self._replacementRange = replacementRange
 		self._headerCount = 0
-		self.targetHeader = None
 		
 		
-	def _handleHeaderSuite(self, node, header, suite):
-		if node is self._compoundNode:
-			if self._headerCount == self._headerIndex:
-				self.targetHeader = header
-			self._headerCount += 1
-		return super( _CompoundHeaderUnparser, self )._handleHeaderSuite( node, header, suite )
-
-
 	def _handleHeader(self, node, header):
 		if node is self._compoundNode:
 			if self._headerCount == self._headerIndex:
-				self.targetHeader = header
+				return self._replacementRange
 			self._headerCount += 1
-		return super( _CompoundHeaderUnparser, self )._handleHeader( node, header )
+		return super( _ReplaceCompoundHeaderUnparser, self )._handleHeader( node, header )
 	
 
 
+	
+	
+def _rebuildSuite(suite, unparser):
+	linear = reduce( lambda a, b: a + b, [ unparser( node )   for node in suite ] )
+	reparsed = _structureParser.suite().parseListItems( linear )
+	
+	if reparsed.isValid()  and  reparsed.getEnd() == len( linear ):
+		reparsed = reparsed.getValue()
+	else:
+		raise ValueError, 'NodeEditor:_rebuildSuite(): structure parse failed'
+	
+	return performSuiteEdits( suite, reparsed )
 
+
+def _rebuildParentSuite(target, unparser):
+	parent = target.getParentTreeNode()
+	if parent is None:
+		raise TypeError, 'NodeEditor:_rebuildParentSuite(): no parent '
+	suite = parent.getNode()
+
+	unparser = _ReplaceSimpleStatementUnparser( target.getNode(), replacement )
+	return _rebuildSuite( suite, unparser )
+	
+
+def _buildLineEditStructure(statements):
+	if len( statements ) > 1  and  isCompoundStmtHeader( statements[0] ):
+		return [ statements[0], Nodes.Indent() ]  +  statements[1:]  +  [ Nodes.Dedent() ]
+	else:
+		return statements
 
 
 def pyReplaceSimpleStmtWithCompoundRange(ctx, target, replacement):
 	if isinstance( target, DocTreeNode ):
-		parent = target.getParentTreeNode()
-		if parent is None:
-			raise TypeError, 'NodeEditor:pyReplaceSimpleStmtWithCompoundRange(): no parent '
-		suite = parent.getNode()
-
-		unparser = Python25StructureUnparser()
-		
-		linear = reduce( lambda a, b: a + b, [ unparser( node )   for node in suite ] )
-		index = indexById( linear, target.getNode() )
-		if index == -1:
-			raise ValueError, 'could not replace'
-		
-		linear[index:index+1] = replacement
-		
-		reparsed = _structureParser.suite().parseListItems( linear )
-		
-		if reparsed.isValid()  and  reparsed.getEnd() == len( linear ):
-			reparsed = reparsed.getValue()
-		else:
-			raise ValueError, 'NodeEditor:pyReplaceSimpleStmtWithCompoundRange(): could not parse'
-		
-		return performSuiteEdits( suite, reparsed )
+		unparser = _ReplaceSimpleStatementUnparser( target.getNode(), replacement )
+		return _rebuildParentSuite( target, unparser )
 	else:
 		raise TypeError, 'NodeEditor:pyReplaceSimpleStmtWithCompoundRange(): @target must be a DocTreeNode'
 	
@@ -111,17 +125,16 @@ def pyReplaceSimpleStatementWithRange(ctx, target, replacement):
 				return pyReplaceSimpleStmtWithCompoundRange( ctx, target, replacement )
 			else:
 				return [ pyReplaceStmt( ctx, target, replacement[0] ) ]
-		else:
+		elif len( replacement ) == 2:
 			if isCompoundStmtHeader( replacement[0] )  or  isCompoundStmtHeader( replacement[1] ):
-				if isCompoundStmtHeader( replacement[0] ):
-					r = [ replacement[0], Nodes.Indent(), replacement[1], Nodes.Dedent() ]
-				else:
-					r = replacement
-				return pyReplaceSimpleStmtWithCompoundRange( ctx, target, r )
+				replacement = _buildLineEditStructure( replacement )
+				return pyReplaceSimpleStmtWithCompoundRange( ctx, target, replacement )
 			else:
 				xs = EditOperations.insertRangeBefore( ctx, target, replacement[:-1] )
-				xs += [ pyReplaceStatement( ctx, target, replacement[-1], False ) ]
+				xs += [ pyReplaceStmt( ctx, target, replacement[-1], False ) ]
 				return xs
+		else:
+			raise ValueError, 'NodeEditor:pyReplaceSimpleStatementWithRange: replacement range must contain 1 or 2 statements'
 	else:
 		raise TypeError, 'NodeEditor:pyReplaceSimpleStatementWithRange(): @target must be a DocTreeNode'
 
@@ -130,33 +143,9 @@ def pyReplaceSimpleStatementWithRange(ctx, target, replacement):
 	
 def pyReplaceCompoundStatementHeaderWithRange(ctx, target, headerIndex, replacement):
 	if isinstance( target, DocTreeNode ):
-		if len( replacement ) > 1  and  isCompoundStmtHeader( replacement[0] ):
-				replacement = [ replacement[0], Nodes.Indent(), replacement[1], Nodes.Dedent() ]
-		
-				
-		parent = target.getParentTreeNode()
-		if parent is None:
-			raise TypeError, 'NodeEditor:pyReplaceCompoundStatementHeaderWithRange(): no parent '
-		suite = parent.getNode()
-
-		unparser = _CompoundHeaderUnparser( target, headerIndex )
-		
-		linear = reduce( lambda a, b: a + b, [ unparser( node )   for node in suite ] )
-		
-		index = indexById( linear, unparser.targetHeader )
-		if index == -1:
-			raise ValueError, 'could not replace'
-		
-		linear[index:index+1] = replacement
-		
-		reparsed = _structureParser.suite().parseListItems( linear )
-		
-		if reparsed.isValid()  and  reparsed.getEnd() == len( linear ):
-			reparsed = reparsed.getValue()
-		else:
-			raise ValueError, 'NodeEditor:pyReplaceCompoundStatementHeaderWithRange(): could not parse'
-		
-		return performSuiteEdits( suite, reparsed )
+		replacement = _buildLineEditStructure( replacement )
+		unparser = _ReplaceCompoundHeaderUnparser( target.getNode(), headerIndex, replacement )
+		return _rebuildParentSuite( target, unparser )
 	else:
 		raise TypeError, 'NodeEditor:pyReplaceCompoundStatementHeaderWithRange(): @target must be a DocTreeNode'
 
@@ -187,7 +176,7 @@ class _ListenerTable (object):
 		
 	
 	
-class ParsedExpressionTextRepresentationListener (ElementTextRepresentationListener):
+class ParsedExpressionTextRepresentationListener (ElementLinearRepresentationListener):
 	__slots__ = [ '_parser', '_outerPrecedence' ]
 	
 	def __init__(self, parser, outerPrecedence, node=None):
@@ -222,7 +211,7 @@ class ParsedExpressionTextRepresentationListener (ElementTextRepresentationListe
 		
 
 
-class _LineTextRepresentationListenerWithParser (ElementTextRepresentationListener):
+class _LineTextRepresentationListenerWithParser (ElementLinearRepresentationListener):
 	__slots__ = [ '_parser' ]
 
 	
@@ -320,11 +309,7 @@ class CompoundStatementTextRepresentationListener (_StatementTextRepresentationL
 			
 			
 			
-class StatementNewLineTextRepresentationListener (_LineTextRepresentationListenerWithParser):
-	def __init__(self, parser):
-		super( StatementNewLineTextRepresentationListener, self ).__init__( parser )
-
-	
+class _StatementNewLineTextRepresentationListener (_LineTextRepresentationListenerWithParser):
 	def _getNextStatementContext(self, statementContext):
 		while statementContext is not None:
 			nextContext = statementContext.getNextSibling()
@@ -337,9 +322,98 @@ class StatementNewLineTextRepresentationListener (_LineTextRepresentationListene
 			statementContext = parentContext
 		
 		return None
-		
-		
 
+
+	
+	
+	
+	
+	
+class SimpleStatementNewLineTextRepresentationListener (_StatementNewLineTextRepresentationListener):
+	_listenerTable = None
+		
+	@staticmethod
+	def newListener(parser):
+		if SimpleStatementNewLineTextRepresentationListener._listenerTable is None:
+			SimpleStatementNewLineTextRepresentationListener._listenerTable = _ListenerTable( SimpleStatementNewLineTextRepresentationListener )
+		return SimpleStatementNewLineTextRepresentationListener._listenerTable.get( parser )
+	
+	
+	def textRepresentationModified(self, element):
+		# Get the content
+		value = element.getTextRepresentation()
+		ctx = element.getContext()
+		node = ctx.getTreeNode()
+		if value == '':
+			# Newline has been deleted
+			statementContext = getStatementContextFromElement( element )
+			statementTextRep = statementContext.getViewNodeContentElement().getTextRepresentation().strip( '\n' )
+			
+				
+			# Join the statement with the one after
+			nextContext = self._getNextStatementContext( statementContext )
+			
+			if nextContext is not None:
+				nextTextRep = nextContext.getViewNodeContentElement().getTextRepresentation().strip( '\n' )
+				# Next statement is a compound statement; get the first line of text
+				if isCompoundStmt( nextContext.getDocNode() ):
+					nextTextRep = nextTextRep.split( '\n' )[0]
+				value = statementTextRep + nextTextRep
+		
+				# Split into lines
+				lineStrings = value.split( '\n' )
+				assert len( lineStrings ) == 1, 'SimpleStatementNewLineTextRepresentationListener.textRepresentationModified(): combined text should consist of 1 line only'
+				
+				# Parse
+				parsedLines = self.parseLines( lineStrings )
+
+				if getParentStatementContext( statementContext ) is getParentStatementContext( nextContext ):
+					# Siblings
+					
+					if not isCompoundStmt( nextContext.getDocNode() )  and  not isCompoundStmtHeader( parsedLines[0] ):
+						# Target node is not compound
+						# Next node is not compound
+						# Replacement node is not a compound header
+						
+						pyReplaceStmt( statementContext, statementContext.getTreeNode(), parsedLines[0] )
+						EditOperations.remove( nextContext, nextContext.getTreeNode() )
+					else:
+						# Target node is not compound
+						if isCompoundStmt( nextContext.getDocNode() ):
+							# Next node is compound
+							EditOperations.remove( statementContext, statementContext.getTreeNode() )
+							pyReplaceCompoundStatementHeaderWithRange( nextContext, nextContext.getTreeNode(), 0, parsedLines )
+						else:
+							# Next node is not compound
+							EditOperations.remove( statementContext, statementContext.getTreeNode() )
+							pyReplaceSimpleStatementWithRange( nextContext, nextContext.getTreeNode(), parsedLines )
+				else:
+					# Target node is not compound
+					
+					# TODO
+					# TODO
+					# TODO
+					# TODO
+					# Not siblings
+					if isCompoundStmt( nextContext.getDocNode() ):
+						block = Nodes.IndentedBlock( suite=nextContext.getDocNode()['suite'] )
+						EditOperations.replace( nextContext, nextContext.getTreeNode(), block )
+					else:
+						EditOperations.remove( nextContext, nextContext.getTreeNode() )
+					
+					EditOperations.replaceWithRange( statementContext, statementContext.getTreeNode(), parsedLines )
+
+					
+					
+
+
+class CompoundStatementNewLineTextRepresentationListener (_StatementNewLineTextRepresentationListener):
+	def __init__(self, parser, headerIndex, suiteElement):
+		super( CompoundStatementNewLineTextRepresentationListener, self ).__init__( parser )
+		self._headerIndex = headerIndex
+		self._suiteElement = suiteElement
+	
+	
 	def textRepresentationModified(self, element):
 		# Get the content
 		value = element.getTextRepresentation()
@@ -423,18 +497,10 @@ class StatementNewLineTextRepresentationListener (_LineTextRepresentationListene
 						EditOperations.remove( nextContext, nextContext.getTreeNode() )
 					
 					EditOperations.replaceWithRange( statementContext, statementContext.getTreeNode(), parsedLines )
-			
-			
-			
-	_listenerTable = None
-		
-	@staticmethod
-	def newListener(parser):
-		if StatementNewLineTextRepresentationListener._listenerTable is None:
-			StatementNewLineTextRepresentationListener._listenerTable = _ListenerTable( StatementNewLineTextRepresentationListener )
-		return StatementNewLineTextRepresentationListener._listenerTable.get( parser )
 
-
+					
+					
+	
 
 class StatementKeyboardListener (ElementKeyboardListener):
 	def __init__(self):
