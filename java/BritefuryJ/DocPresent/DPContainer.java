@@ -578,7 +578,7 @@ public abstract class DPContainer extends DPWidget
 		}
 		else if ( pointerChild != null )
 		{
-			pointerChild.handleScroll( event.transformed( pressGrabChild.getParentToLocalXform() ) );
+			pointerChild.handleScroll( event.transformed( pointerChild.getParentToLocalXform() ) );
 		}
 		return onScroll( event );
 	}

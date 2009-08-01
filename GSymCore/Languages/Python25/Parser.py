@@ -33,8 +33,6 @@ import GSymCore.Languages.Python25.NodeClasses as Nodes
 #
 #
 # !!!!!! NOTES !!!!!!
-# Print statements are not handled correctly
-#
 # Octal integers not handled correctly
 #
 # from-import statements are parsed, but information on whether the imports were wrapped in parens, or had a trailing separator, is not obtained
@@ -885,6 +883,18 @@ class Python25Grammar (Grammar):
 	@Rule
 	def execStmt(self):
 		return self.execCodeInLocalsAndGlobalsStmt() | self.execCodeInLocalsStmt() | self.execCodeStmt()
+	
+	
+	
+	
+	# Print statement
+	@Rule
+	def printStmt(self):
+		normalForm = ( Keyword( printKeyword )  +  SeparatedList( self.expression(), 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ) + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Nodes.PrintStmt( values=xs[1] ) )
+		chevronForm = ( Keyword( printKeyword )  +  Literal( '>>' )  +  self.expression()  +  ( Literal( ',' )  +
+													SeparatedList( self.expression(), 1, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ) ).optional() + Literal( '\n' ) ).action(
+														lambda input, begin, end, xs, bindings: Nodes.PrintStmt( destination=xs[2], values=xs[3][1]   if xs[3] is not None   else   [] ) )
+		return normalForm | chevronForm
 
 
 
@@ -1156,7 +1166,7 @@ class Python25Grammar (Grammar):
 	def simpleStmt(self):
 		return ObjectNode( Nodes.SimpleStmt )  |  \
 		       self.assertStmt() | self.assignmentStmt() | self.augAssignStmt() | self.passStmt() | self.delStmt() | self.returnStmt() | self.yieldStmt() | self.raiseStmt() | self.breakStmt() | \
-		       self.continueStmt() | self.importStmt() | self.globalStmt() | self.execStmt() | self.exprStmt()
+		       self.continueStmt() | self.importStmt() | self.globalStmt() | self.execStmt() | self.printStmt() | self.exprStmt()
 
 	@Rule
 	def compoundStmtHeader(self):
@@ -1193,7 +1203,7 @@ class Python25Grammar (Grammar):
 	
 	@Rule
 	def suiteItem(self):
-		return self.compoundStmt()  |  self.indentedBlock()  |  self.simpleStmt()  |  self.compoundStmtHeader()  |  self.emptyIndentedSuite()  |  self.commentStmt()  |  self.blankLine()  |  self.unparsed()
+		return self.commentStmt()  |  self.blankLine()  |  self.compoundStmt()  |  self.indentedBlock()  |  self.simpleStmt()  |  self.compoundStmtHeader()  |  self.emptyIndentedSuite()  |  self.unparsed()
 	
 	
 	@Rule
@@ -1692,7 +1702,19 @@ class TestCase_Python25Parser (ParserTestCase):
 
 
 		
+	def testPrintStmt(self):
+		g = Python25Grammar()
+		self._parseStringTest( g.singleLineStatementValid(), 'print\n', Nodes.PrintStmt( values=[] ) )
+		self._parseStringTest( g.singleLineStatementValid(), 'print a\n', Nodes.PrintStmt( values=[ Nodes.Load( name='a' ) ] ) )
+		self._parseStringTest( g.singleLineStatementValid(), 'print a,\n', Nodes.PrintStmt( values=[ Nodes.Load( name='a' ) ] ) )
+		self._parseStringTest( g.singleLineStatementValid(), 'print a, b\n', Nodes.PrintStmt( values=[ Nodes.Load( name='a' ), Nodes.Load( name='b' ) ] ) )
+		self._parseStringTest( g.singleLineStatementValid(), 'print >> x\n', Nodes.PrintStmt( destination=Nodes.Load( name='x' ), values=[] ) )
+		self._parseStringTest( g.singleLineStatementValid(), 'print >> x, a\n', Nodes.PrintStmt( destination=Nodes.Load( name='x' ), values=[ Nodes.Load( name='a' ) ] ) )
+		self._parseStringTest( g.singleLineStatementValid(), 'print >> x, a,\n', Nodes.PrintStmt( destination=Nodes.Load( name='x' ), values=[ Nodes.Load( name='a' ) ] ) )
+		self._parseStringTest( g.singleLineStatementValid(), 'print >> x, a, b\n', Nodes.PrintStmt( destination=Nodes.Load( name='x' ), values=[ Nodes.Load( name='a' ), Nodes.Load( name='b' ) ] ) )
+
 		
+	
 	#
 	# Compound statement headers
 	#

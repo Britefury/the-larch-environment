@@ -85,7 +85,7 @@ public abstract class DPContentLeafEditableEntry extends DPContentLeafEditable
 		}
 		else
 		{
-			removeText( caret.getMarker().getIndex() - 1, 1 );
+			removeText( caret.getMarker().getClampedIndex() - 1, 1 );
 			return true;
 		}
 	}

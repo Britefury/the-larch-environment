@@ -139,6 +139,11 @@ public class Marker
 		return bias == Bias.END  ?  position + 1  :  position;
 	}
 	
+	public int getClampedIndex()
+	{
+		return Math.min( bias == Bias.END  ?  position + 1  :  position,  widget.getMarkerRange() );
+	}
+	
 	public int getIndexInSubtree(DPWidget subtreeRoot) throws IsNotInSubtreeException
 	{
 		int p = getPositionInSubtree( subtreeRoot );

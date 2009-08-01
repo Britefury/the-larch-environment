@@ -252,21 +252,23 @@ def compoundStatementEditor(ctx, node, precedence, compoundBlocks, state, suiteP
 		
 		headerParagraph = ctx.paragraph( python_paragraphStyle, [ headerSegment, newLine ] )
 		headerParagraph.setStructuralRepresentationObject( headerNode )
+		headerParagraph = ctx.linearRepresentationListener( headerParagraph, CompoundHeaderLinearRepresentationListener.newListener( statementParser ) )
 		headerParagraph = ctx.keyboardListener( headerParagraph, _statementKeyboardListener )
 		
 		if headerContainerFn is not None:
 			headerParagraph = headerContainerFn( headerParagraph )
 
-			
-		suiteElement = indentedSuiteView( ctx, suite, statementParser )
-		suiteElement.setStructuralRepresentationObject( Nodes.IndentedBlock( suite=suite ) )
-		suiteElement = ctx.linearRepresentationListener( suiteElement, SuiteLinearRepresentationListener( suiteParser, suite ) )
-	
-		
+
+
 		if suite is not None:
+			suiteElement = indentedSuiteView( ctx, suite, statementParser )
+			suiteElement.setStructuralRepresentationObject( Nodes.IndentedBlock( suite=suite ) )
+			suiteElement = ctx.linearRepresentationListener( suiteElement, SuiteLinearRepresentationListener( suiteParser, suite ) )
+			
 			statementContents.extend( [ headerParagraph, ctx.indent( 30.0, suiteElement ) ] )
 		else:
 			statementContents.append( headerParagraph )
+			
 	statementElement = ctx.vbox( compoundStmt_vboxStyle, statementContents )
 	return statementElement
 
@@ -696,6 +698,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		argViews = ctx.mapViewEvalFn( args, None, python25ViewState( PRECEDENCE_CONTAINER_CALLARG, self._parser.callArg() ) )
 		argElements = []
 		if len( args ) > 0:
+			argElements.append( ctx.text( default_textStyle, ' ' ) )
 			for a in argViews[:-1]:
 				argElements.append( a )
 				argElements.append( ctx.text( punctuation_textStyle, ',' ) )
@@ -704,6 +707,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 			if argsTrailingSeparator is not None:
 				argElements.append( ctx.text( punctuation_textStyle, ',' ) )
 				argElements.append( ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY, ctx.text( punctuation_textStyle, ' ' ) ) )
+			argElements.append( ctx.text( default_textStyle, ' ' ) )
 		return expressionNodeEditor( ctx, node,
 					     ctx.span( [ targetView, ctx.text( punctuation_textStyle, '(' ) ]  +  argElements  +  [ ctx.text( punctuation_textStyle, ')' ) ] ),
 					     PRECEDENCE_CALL,
@@ -1181,6 +1185,35 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 
 
+
+
+
+	# Exec statement
+	@ObjectNodeDispatchMethod
+	def PrintStmt(self, ctx, state, node, destination, values):
+		elements = []
+		if destination is not None  or  len( values ) > 0:
+			elements.append( ctx.text( default_textStyle, ' ' ) )
+		if destination is not None:
+			destView = ctx.viewEvalFn( destination, None, python25ViewState( PRECEDENCE_STMT, self._parser.orOp() ) )
+			elements.extend( [ ctx.text( punctuation_textStyle, '>>' ), ctx.text( default_textStyle, ' ' ), destView ] )
+			if len( values ) > 0:
+				elements.extend( [ ctx.text( punctuation_textStyle, ',' ), ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY, ctx.text( punctuation_textStyle, ' ' ) ) ] )
+		bFirst = True
+		valueViews = ctx.mapViewEvalFn( values, None, python25ViewState( PRECEDENCE_STMT, self._parser.expression() ) )
+		for v in valueViews:
+			if not bFirst:
+				elements.extend( [ ctx.text( punctuation_textStyle, ',' ), ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY, ctx.text( punctuation_textStyle, ' ' ) ) ] )
+			elements.append( v )
+			bFirst = False
+		return statementNodeEditor( ctx, node,
+					    ctx.span( [ capitalisedKeywordText( ctx, printKeyword ) ]  +  elements ),
+					    PRECEDENCE_STMT,
+					    state )
+	
+	
+	
+	
 	#
 	#
 	# COMPOUND STATEMENT HEADERS
@@ -1387,7 +1420,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	@ObjectNodeDispatchMethod
 	def ClassStmtHeader(self, ctx, state, node, name, bases, basesTrailingSeparator):
 		editor = compoundStatementHeaderEditor( ctx, node,
-						  self._classStmtHeaderElement( ctx, state, name, params, paramsTrailingSeparator ),
+						  self._classStmtHeaderElement( ctx, state, name, bases, basesTrailingSeparator ),
 						  PRECEDENCE_STMT,
 						  state,
 						  lambda header: ctx.border( classHeader_border, ContainerStyleSheet.defaultStyleSheet, header ) )
@@ -1406,7 +1439,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Indented block
 	@ObjectNodeDispatchMethod
 	def IndentedBlock(self, ctx, state, node, suite):
-		suiteElement = ctx.indent( 30.0, suiteView( ctx, suite, self._parser.singleLineStatement() ) )
+		suiteElement = ctx.indent( 30.0, indentedSuiteView( ctx, suite, self._parser.singleLineStatement() ) )
 		suiteElement.setStructuralRepresentationObject( node )
 		suiteElement = ctx.linearRepresentationListener( suiteElement, SuiteLinearRepresentationListener( self._parser.compoundSuite(), suite ) )
 		return ctx.border( indentedBlock_border, ContainerStyleSheet.defaultStyleSheet, suiteElement )

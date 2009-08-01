@@ -5,10 +5,9 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-
 from weakref import WeakValueDictionary
 
-from java.lang import Object
+from java.lang import Object, System
 from java.io import IOException
 from java.util import List
 from java.awt.event import KeyEvent
@@ -105,7 +104,7 @@ class ParsedExpressionLinearRepresentationListener (ElementLinearRepresentationL
 		
 
 
-class _StatementLinearRepresentationListener (ElementLinearRepresentationListener):
+class StatementLinearRepresentationListener (ElementLinearRepresentationListener):
 	__slots__ = [ '_parser' ]
 
 	
@@ -113,11 +112,6 @@ class _StatementLinearRepresentationListener (ElementLinearRepresentationListene
 		self._parser = parser
 
 		
-		
-			
-			
-			
-class StatementLinearRepresentationListener (_StatementLinearRepresentationListener):
 	def linearRepresentationModified(self, element):
 		element.clearStructuralRepresentation()
 		ctx = element.getContext()
@@ -128,6 +122,7 @@ class StatementLinearRepresentationListener (_StatementLinearRepresentationListe
 		if parsed is not None:
 			return self.handleParsed( element, ctx, node, value, parsed )
 		else:
+			pyReplaceStmt( ctx, node, node, False )
 			return element.passLinearRepresentationModifiedEventUpwards()
 
 		
@@ -151,7 +146,43 @@ class StatementLinearRepresentationListener (_StatementLinearRepresentationListe
 			
 			
 			
-class SuiteLinearRepresentationListener (_StatementLinearRepresentationListener):
+class CompoundHeaderLinearRepresentationListener (ElementLinearRepresentationListener):
+	__slots__ = [ '_parser' ]
+
+	
+	def __init__(self, parser):
+		self._parser = parser
+
+		
+	def linearRepresentationModified(self, element):
+		element.clearStructuralRepresentation()
+		ctx = element.getContext()
+		# Get the content
+		value = element.getLinearRepresentation()
+		parsed = parseStream( self._parser, value )
+		if parsed is not None:
+			return self.handleParsed( element, value, parsed )
+		else:
+			return element.passLinearRepresentationModifiedEventUpwards()
+
+		
+	def handleParsed(self, element, value, parsed):
+		element.setStructuralRepresentationObject( parsed )
+		return element.passLinearRepresentationModifiedEventUpwards()
+
+			
+	_listenerTable = None
+		
+	@staticmethod
+	def newListener(parser):
+		if CompoundHeaderLinearRepresentationListener._listenerTable is None:
+			CompoundHeaderLinearRepresentationListener._listenerTable = _ListenerTable( CompoundHeaderLinearRepresentationListener )
+		return CompoundHeaderLinearRepresentationListener._listenerTable.get( parser )
+			
+			
+			
+			
+class SuiteLinearRepresentationListener (ElementLinearRepresentationListener):
 	__slots__ = [ '_parser', '_suite' ]
 
 	
@@ -165,7 +196,14 @@ class SuiteLinearRepresentationListener (_StatementLinearRepresentationListener)
 		ctx = element.getContext()
 		# Get the content
 		value = element.getLinearRepresentation()
+		#t1 = System.nanoTime()
 		parsed = parseStream( self._parser, value )
+		#t2 = System.nanoTime()
+		#f = open( 'parselog.txt', 'a+' )
+		#f.write( 'SuiteLinearRepresentationListener.linearRepresentationModified: parse time=%f\n'  %  ( float(t2-t1)/1.0e9, ) )
+		#f.write( value.toString() )
+		#f.write( '\n\n' )
+		#f.close()
 		if parsed is not None:
 			return self.handleParsed( value, parsed )
 		else:
@@ -183,7 +221,14 @@ class SuiteLinearRepresentationListener (_StatementLinearRepresentationListener)
 		ctx = element.getContext()
 		# Get the content
 		value = element.getLinearRepresentation()
+		#t1 = System.nanoTime()
 		parsed = parseStream( self._parser, value )
+		#t2 = System.nanoTime()
+		#f = open( 'parselog.txt', 'a+' )
+		#f.write( 'SuiteLinearRepresentationListener.innerElementLinearRepresentationModified: parse time=%f\n'  %  ( float(t2-t1)/1.0e9, ) )
+		#f.write( value.toString() )
+		#f.write( '\n\n' )
+		#f.close()
 		if parsed is not None:
 			return self.innerHandleParsed( value, parsed )
 		else:
@@ -228,7 +273,19 @@ class StatementKeyboardListener (ElementKeyboardListener):
 	def indent(self, element, contenxt, node):
 		statement = element.getStructuralRepresentationValue()
 		element.setStructuralRepresentationSequence( [ Nodes.Indent(), statement, Nodes.Dedent() ] )
-		element.passLinearRepresentationModifiedEventUpwards()
+		bSuccess = element.passLinearRepresentationModifiedEventUpwards()
+		if not bSuccess:
+			print 'StatementKeyboardListener.indent(): INDENT FAILED'
+			#f = open( 'parselog.txt', 'a+' )
+			#f.write( 'Parentage:\n' )
+			#x = node
+			#while x is not None:
+				#f.write( 'NODE:\n' )
+				#f.write( str( x ) + '\n' )
+				#x = x.getParentTreeNode()
+			#f.close()
+			
+			element.setStructuralRepresentationObject( statement )
 	
 	def dedent(self, element, context, node):
 		suite = node.getParentTreeNode()
@@ -236,7 +293,10 @@ class StatementKeyboardListener (ElementKeyboardListener):
 		if not suiteParent.isInstanceOf( Nodes.PythonModule ):
 			statement = element.getStructuralRepresentationValue()
 			element.setStructuralRepresentationSequence( [ Nodes.Dedent(), statement, Nodes.Indent() ] )
-			element.passLinearRepresentationModifiedEventUpwards()
+			bSuccess = element.passLinearRepresentationModifiedEventUpwards()
+			if not bSuccess:
+				print 'StatementKeyboardListener.dedent(): DEDENT FAILED'
+				element.setStructuralRepresentationObject( statement )
 	
 	
 	

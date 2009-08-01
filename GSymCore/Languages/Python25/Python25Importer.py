@@ -446,7 +446,7 @@ class _StmtImporter (_Importer):
 	
 	# Print
 	def Print(self, node):
-		return Nodes.Call( target=Nodes.Load( name='print' ), args=[ _expr( x )   for x in node.values ] )
+		return Nodes.PrintStmt( destination=_expr( node.dest ), values=[ _expr( x )   for x in node.values ] )
 	
 	
 	
@@ -1132,8 +1132,12 @@ class ImporterTestCase (unittest.TestCase):
 		
 		
 	def testPrintnl(self):
-		self._stmtTest( 'print x', Nodes.Call( target=Nodes.Load( name='print' ), args=[ Nodes.Load( name='x' ) ] ) )
-		self._stmtTest( 'print x,y', Nodes.Call( target=Nodes.Load( name='print' ), args=[ Nodes.Load( name='x' ), Nodes.Load( name='y' ) ] ) )
+		self._stmtTest( 'print', Nodes.PrintStmt( values=[] ) )
+		self._stmtTest( 'print x', Nodes.PrintStmt( values=[ Nodes.Load( name='x' ) ] ) )
+		self._stmtTest( 'print x,y', Nodes.PrintStmt( values=[ Nodes.Load( name='x' ), Nodes.Load( name='y' ) ] ) )
+		self._stmtTest( 'print >> a', Nodes.PrintStmt( destination=Nodes.Load( name='a' ), values=[] ) )
+		self._stmtTest( 'print >> a, x', Nodes.PrintStmt( destination=Nodes.Load( name='a' ), values=[ Nodes.Load( name='x' ) ] ) )
+		self._stmtTest( 'print >> a, x,y', Nodes.PrintStmt( destination=Nodes.Load( name='a' ), values=[ Nodes.Load( name='x' ), Nodes.Load( name='y' ) ] ) )
 		
 
 		

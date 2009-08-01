@@ -247,6 +247,22 @@ public class NodeElementChangeListenerDiff implements DVNode.NodeElementChangeLi
 				
 				
 				
+				if ( newPosition < 0 )
+				{
+					newPosition = 0;
+					newBias = Marker.Bias.START;
+				}
+				else if ( newPosition >= newTextRepresentation.length() )
+				{
+					newPosition = newTextRepresentation.length() - 1;
+					newBias = Marker.Bias.END;
+				}
+				
+				
+				int newIndex = newPosition  +  ( newBias == Marker.Bias.END  ?  1  :  0 );
+				
+				
+//				int oldIndex = position  +  ( bias == Marker.Bias.END  ?  1  :  0 );
 //				if ( bias == Marker.Bias.START )
 //				{
 //					System.out.println( textRepresentation.substring( 0, oldIndex ).toString().replace( "\n", "\\n" )  +  ">|"  +  textRepresentation.substring( oldIndex, textRepresentation.length() ).toString().replace( "\n", "\\n" ) );
@@ -264,21 +280,6 @@ public class NodeElementChangeListenerDiff implements DVNode.NodeElementChangeLi
 //				{
 //					System.out.println( newTextRepresentation.substring( 0, newIndex ).toString().replace( "\n", "\\n" )  +  "|<"  +  newTextRepresentation.substring( newIndex, newTextRepresentation.length() ).toString().replace( "\n", "\\n" ) );
 //				}
-				
-				
-				if ( newPosition < 0 )
-				{
-					newPosition = 0;
-					newBias = Marker.Bias.START;
-				}
-				else if ( newPosition >= newTextRepresentation.length() )
-				{
-					newPosition = newTextRepresentation.length() - 1;
-					newBias = Marker.Bias.END;
-				}
-				
-				
-				int newIndex = newPosition  +  ( newBias == Marker.Bias.END  ?  1  :  0 );
 				
 				
 				DPContentLeaf leaf = nodeElement.getLeafAtTextRepresentationPosition( newPosition );

@@ -7,9 +7,11 @@
 //##************************
 package BritefuryJ.DocPresent.Util;
 
+import java.awt.BasicStroke;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Shape;
+import java.awt.Stroke;
 import java.awt.font.FontRenderContext;
 import java.awt.font.LineMetrics;
 import java.awt.font.TextAttribute;
@@ -401,7 +403,10 @@ public class TextVisual
 	{
 		if ( squiggleUnderlineShape != null )
 		{
+			Stroke s = graphics.getStroke();
+			graphics.setStroke( new BasicStroke( 1.0f ) );
 			graphics.draw( squiggleUnderlineShape );
+			graphics.setStroke( s );
 		}
 	}
 	

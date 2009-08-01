@@ -199,7 +199,9 @@ def parseText(parser, text, outerPrecedence=None):
 #
 #
 
+
 def parseStream(parser, input, outerPrecedence=None):
+	#f = open( 'parselog.txt', 'a+' )
 	res = parser.parseStreamItems( input )
 	pos = res.getEnd()
 	if res.isValid():
@@ -207,13 +209,15 @@ def parseStream(parser, input, outerPrecedence=None):
 			value = res.getValue()
 			return removeUnNeededParens( value, outerPrecedence )
 		else:
-			print '<INCOMPLETE>'
-			print 'FULL TEXT:', input.toString().replace( '\n', '\\n' )
-			print 'PARSED:', input[:pos].toString().replace( '\n', '\\n' )
+			#f.write( '<INCOMPLETE> %s\n'  %  ( parser.getExpressionName(), ) )
+			#f.write( 'FULL TEXT: ' + input.toString() + '\n' )
+			#f.write( 'PARSED: ' + input[:pos].toString() + '\n' )
+			#f.close()
 			return None
 	else:
-		print 'FULL TEXT:', input.toString().replace( '\n', '\\n' )
-		print '<FAIL>'
+		#f.write( '<FAIL> %s\n'  %  ( parser.getExpressionName(), ) )
+		#f.write( 'FULL TEXT:' + input.toString() + '\n' )
+		#f.close()
 		return None
 
 

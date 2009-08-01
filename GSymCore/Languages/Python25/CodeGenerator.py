@@ -498,6 +498,20 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 		return txt
 	
 	
+	# Print statement
+	@ObjectNodeDispatchMethod
+	def PrintStmt(self, node, destination, values):
+		txt = 'print'
+		if destination is not None:
+			txt += ' >> %s'  %  self( destination )
+		if len( values ) > 0:
+			if destination is not None:
+				txt += ','
+			txt += ' '
+			txt += ', '.join( [ self( v )   for v in values ] )
+		return txt
+	
+	
 
 	def _elseSuiteToText(self, suite):
 		if suite is not None:
@@ -900,7 +914,15 @@ class TestCase_Python25CodeGenerator (unittest.TestCase):
 		self._testSX( '(py ExecStmt source=(py Load name=a) locals=(py Load name=b) globals=(py Load name=c))', 'exec a in b, c' )
 		
 		
+	def test_PrintStmt(self):
+		self._testSX( '(py PrintStmt values=[])', 'print' )
+		self._testSX( '(py PrintStmt values=[(py Load name=a)])', 'print a' )
+		self._testSX( '(py PrintStmt values=[(py Load name=a) (py Load name=b)])', 'print a, b' )
+		self._testSX( '(py PrintStmt destination=(py Load name=x) values=[])', 'print >> x' )
+		self._testSX( '(py PrintStmt destination=(py Load name=x) values=[(py Load name=a)])', 'print >> x, a' )
+		self._testSX( '(py PrintStmt destination=(py Load name=x) values=[(py Load name=a) (py Load name=b)])', 'print >> x, a, b' )
 		
+				
 	
 	#
 	# Compound statements

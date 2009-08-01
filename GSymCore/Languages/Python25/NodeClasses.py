@@ -147,6 +147,7 @@ RaiseStmt = module.newClass( 'RaiseStmt', SimpleStmt, [ 'excType', 'excValue', '
 BreakStmt = module.newClass( 'BreakStmt', SimpleStmt, [] )
 ContinueStmt = module.newClass( 'ContinueStmt', SimpleStmt, [] )
 ExecStmt = module.newClass( 'ExecStmt', SimpleStmt, [ 'source', 'locals', 'globals' ] )
+PrintStmt = module.newClass( 'PrintStmt', SimpleStmt, [ 'destination', 'values' ] )
 # Import
 RelativeModule = module.newClass( 'RelativeModule', Node, [ 'name' ] )
 ModuleImport = module.newClass( 'ModuleImport', Node, [ 'name' ] )
