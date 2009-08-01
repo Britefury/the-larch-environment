@@ -491,6 +491,11 @@ public class GSymNodeViewInstance implements ElementContext, DVNode.NodeContext
 	{
 		viewInstance.getView().profile_startJava();
 		
+		if ( x == null )
+		{
+			throw new RuntimeException( "GSymNodeViewInstance.viewEvanFn(): cannot build view of null node" );
+		}
+		
 		// A call to DocNode.buildNodeView builds the view, and puts it in the DocView's table
 		DVNode viewNode = viewInstance.getView().buildNodeView( x, viewInstance.makeNodeElementFactory( nodeViewFunction, state ) );
 		

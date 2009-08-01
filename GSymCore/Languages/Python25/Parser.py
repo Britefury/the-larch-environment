@@ -1827,6 +1827,8 @@ class TestCase_Python25Parser (ParserTestCase):
 	def test_unparsed(self):
 		g = Python25Grammar()
 		self._parseStringTest( g.singleLineStatement(), 'foo bar xyz\n', Nodes.UNPARSED( value=[ 'foo bar xyz' ] ) )
+		self._parseStringTest( g.singleLineStatement(), 'as\n', Nodes.UNPARSED( value=[ 'as' ] ) )
+		self._parseStringTest( g.suite(), 'as\n', [ Nodes.UNPARSED( value=[ 'as' ] ) ] )
 		
 
 

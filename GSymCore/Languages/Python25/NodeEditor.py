@@ -126,12 +126,12 @@ class StatementLinearRepresentationListener (_StatementLinearRepresentationListe
 		value = element.getLinearRepresentation()
 		parsed = parseStream( self._parser, value )
 		if parsed is not None:
-			return self.handleParsed( element, ctx, node, value, parsed )
+			return self.handleParsed( ctx, node, value, parsed )
 		else:
 			return element.passLinearRepresentationModifiedEventUpwards()
 
 		
-	def handleParsed(self, element, ctx, node, value, parsed):
+	def handleParsed(self, ctx, node, value, parsed):
 		if not isCompoundStmtOrCompoundHeader( node )  and  not isCompoundStmtOrCompoundHeader( parsed ):
 			pyReplaceStmt( ctx, node, parsed )
 			return True
@@ -151,21 +151,28 @@ class StatementLinearRepresentationListener (_StatementLinearRepresentationListe
 			
 			
 class SuiteLinearRepresentationListener (_StatementLinearRepresentationListener):
+	__slots__ = [ '_parser', '_suite' ]
+
+	
+	def __init__(self, parser, suite):
+		self._parser = parser
+		self._suite = suite
+
+		
 	def linearRepresentationModified(self, element):
 		element.clearStructuralRepresentation()
 		ctx = element.getContext()
-		node = ctx.getTreeNode()
 		# Get the content
 		value = element.getLinearRepresentation()
 		parsed = parseStream( self._parser, value )
 		if parsed is not None:
-			return self.handleParsed( element, ctx, node, value, parsed )
+			return self.handleParsed( value, parsed )
 		else:
 			return element.passLinearRepresentationModifiedEventUpwards()
 
 
-	def handleParsed(self, element, ctx, node, value, parsed):
-		performSuiteEdits( node, parsed )
+	def handleParsed(self, value, parsed):
+		performSuiteEdits( self._suite, parsed )
 		return True
 
 			
@@ -173,29 +180,18 @@ class SuiteLinearRepresentationListener (_StatementLinearRepresentationListener)
 	def innerElementLinearRepresentationModified(self, element):
 		element.clearStructuralRepresentation()
 		ctx = element.getContext()
-		node = ctx.getTreeNode()
 		# Get the content
 		value = element.getLinearRepresentation()
 		parsed = parseStream( self._parser, value )
 		if parsed is not None:
-			return self.innerHandleParsed( element, ctx, node, value, parsed )
+			return self.innerHandleParsed( value, parsed )
 		else:
 			return element.passLinearRepresentationModifiedEventUpwards()
 
 
-	def innerHandleParsed(self, element, ctx, node, value, parsed):
-		performSuiteEdits( node, parsed )
+	def innerHandleParsed(self, value, parsed):
+		performSuiteEdits( self._suite, parsed )
 		return True
-
-		
-		
-	_listenerTable = None
-		
-	@staticmethod
-	def newListener(parser, headerIndex):
-		if SuiteLinearRepresentationListener._listenerTable is None:
-			SuiteLinearRepresentationListener._listenerTable = _ListenerTable( SuiteLinearRepresentationListener )
-		return SuiteLinearRepresentationListener._listenerTable.get( parser )
 			
 			
 			

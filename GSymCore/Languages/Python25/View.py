@@ -260,7 +260,7 @@ def compoundStatementEditor(ctx, node, precedence, compoundBlocks, state, suiteP
 			
 		suiteElement = indentedSuiteView( ctx, suite, statementParser )
 		suiteElement.setStructuralRepresentation( suite )
-		suiteElement = ctx.linearRepresentationListener( suiteElement, SuiteLinearRepresentationListener( suiteParser ) )
+		suiteElement = ctx.linearRepresentationListener( suiteElement, SuiteLinearRepresentationListener( suiteParser, suite ) )
 	
 		
 		if suite is not None:
@@ -350,7 +350,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	def PythonModule(self, ctx, state, node, suite):
 		suiteElement = suiteView( ctx, suite, self._parser.singleLineStatement() )
 		suiteElement.setStructuralRepresentation( suite )
-		suiteElement = ctx.linearRepresentationListener( suiteElement, SuiteLinearRepresentationListener( self._parser.suite() ) )
+		suiteElement = ctx.linearRepresentationListener( suiteElement, SuiteLinearRepresentationListener( self._parser.suite(), suite ) )
 		return suiteElement
 
 

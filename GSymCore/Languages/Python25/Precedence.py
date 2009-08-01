@@ -5,7 +5,11 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
+from java.util import List
+
 from BritefuryJ.Transformation import DefaultIdentityTransformationFunction, Transformation, TransformationFunction
+
+from BritefuryJ.DocModel import DMObjectInterface, DMListInterface
 
 from Britefury.Dispatch.ObjectNodeMethodDispatch import ObjectNodeMethodDispatchMetaClass, ObjectNodeDispatchMethod, objectNodeMethodDispatch
 from Britefury.Dispatch.Dispatch import DispatchError
@@ -16,6 +20,7 @@ from GSymCore.Languages.Python25 import NodeClasses as Nodes
 
 PRECEDENCE_NONE = None
 PRECEDENCE_UNPARSED = None
+PRECEDENCE_COMMENT = None
 PRECEDENCE_STMT = 1000
 PRECEDENCE_EXPR = 0
 PRECEDENCE_TARGET = None
@@ -91,8 +96,18 @@ class NodePrecedence (object):
 		return objectNodeMethodDispatch( self, node )
 	
 	@ObjectNodeDispatchMethod
+	def CommentStmt(self, node):
+		return PRECEDENCE_COMMENT
+	
+	@ObjectNodeDispatchMethod
+	def BlankLine(self, node):
+		return PRECEDENCE_COMMENT
+	
+	@ObjectNodeDispatchMethod
 	def UNPARSED(self, node):
 		return PRECEDENCE_UNPARSED
+	
+	
 	
 	@ObjectNodeDispatchMethod
 	def Stmt(self, node):
@@ -369,12 +384,23 @@ class RemoveUnNeededParensXform (object):
 	
 _removeParensXform = Transformation( _identity, [ RemoveUnNeededParensXform() ] )
 
+def _removeUnNeededParensFromObject(node, outerPrecedence):
+	if node.isInstanceOf( Nodes.SimpleStmt )  or  node.isInstanceOf( Nodes.CompountStmtHeader )  or  node.isInstanceOf( Nodes.Expr ):
+		x = _removeParensXform( DMNode.coerce( node ) )
+		bParens = _areParensRequired( x, outerPrecedence )
+		if bParens:
+			x = _decrementParens( x, None )
+		return DMNode.coerce( x )
+	else:
+		return node
+	
 def removeUnNeededParens(node, outerPrecedence):
-	x = _removeParensXform( DMNode.coerce( node ) )
-	bParens = _areParensRequired( x, outerPrecedence )
-	if bParens:
-		x = _decrementParens( x, None )
-	return DMNode.coerce( x )
+	if isinstance( node, DMObjectInterface ):
+		return _removeUnNeededParensFromObject( node, outerPrecedence )
+	elif isinstance( node, List ):
+		return [ removeUnNeededParens( x, outerPrecedence )   for x in node ]
+	else:
+		raise TypeError, 'Cannot apply removeUnNeededParens to %s'  %  ( type( node ), )
 	
 
 	
