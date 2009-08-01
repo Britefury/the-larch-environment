@@ -115,6 +115,21 @@ public class ItemStreamBuilder
 		items.add( new StructuralItem( structuralValue ) );
 	}
 	
+	public void extend(ItemStream items)
+	{
+		for (ItemStream.Item item: items.getItems())
+		{
+			if ( item instanceof ItemStream.TextItem )
+			{
+				appendTextValue( ((ItemStream.TextItem)item).textValue );
+			}
+			else if ( item instanceof ItemStream.StructuralItem )
+			{
+				appendStructuralValue( ((ItemStream.StructuralItem)item).structuralValue );
+			}
+		}
+	}
+	
 	
 	public ItemStream stream()
 	{

@@ -10,9 +10,10 @@ import string
 
 from BritefuryJ.DocModel import DMObject, DMNode
 
-from BritefuryJ.Parser import Action, Condition, Suppress, Literal, Keyword, RegEx, Word, Sequence, Combine, Choice, Optional, Repetition, ZeroOrMore, OneOrMore, Peek, PeekNot, SeparatedList
+from BritefuryJ.Parser import Action, Condition, Suppress, Literal, Keyword, RegEx, Word, Sequence, Combine, Choice, Optional, Repetition, ZeroOrMore, OneOrMore, Peek, PeekNot, SeparatedList, ObjectNode
 from BritefuryJ.Parser.Utils.Tokens import identifier, decimalInteger, hexInteger, integer, singleQuotedString, doubleQuotedString, quotedString, floatingPoint
 from BritefuryJ.Parser.Utils.OperatorParser import PrefixLevel, SuffixLevel, InfixLeftLevel, InfixRightLevel, InfixChainLevel, UnaryOperator, BinaryOperator, ChainOperator, OperatorTable
+from BritefuryJ.Parser.ItemStream import ItemStreamBuilder
 
 from BritefuryJ.Transformation import DefaultIdentityTransformationFunction
 
@@ -66,6 +67,13 @@ def _incrementParens(node):
 
 
 class Python25Grammar (Grammar):
+	#
+	#
+	# BASICS
+	#
+	#
+	
+	
 	# Python identifier
 	@Rule
 	def pythonIdentifier(self):
@@ -78,8 +86,24 @@ class Python25Grammar (Grammar):
 
 
 
+	# Attribute name
+	@Rule
+	def attrName(self):
+		return self.pythonIdentifier()
 
 
+
+
+
+	#
+	#
+	# LITERALS
+	#
+	#
+	
+	
+	
+	
 	# String literal
 	@Rule
 	def asciiStringSLiteral(self):
@@ -171,13 +195,15 @@ class Python25Grammar (Grammar):
 		return self.shortStringLiteral() | self.imaginaryLiteral() | self.floatLiteral() | self.integerLiteral()
 
 
-
-	# Attribute name
-	@Rule
-	def attrName(self):
-		return self.pythonIdentifier()
-
-
+	
+	
+	
+	#
+	#
+	# TARGETS (assignment, for-loop, etc)
+	#
+	#
+	
 
 	# Target (assignment, for-loop, ...)
 	@Rule
@@ -212,6 +238,14 @@ class Python25Grammar (Grammar):
 
 
 
+		
+		
+	#
+	#
+	# EXPRESSIONS
+	#
+	#
+	
 
 	# Load local variable
 	@Rule
@@ -314,8 +348,13 @@ class Python25Grammar (Grammar):
 
 	# Yield expression
 	@Rule
+	def yieldExpression(self):
+		return ( Keyword( yieldKeyword )  +  self.tupleOrExpression() ).action( lambda input, begin, end, xs, bindings: Nodes.YieldExpr( value=xs[1] ) )
+
+
+	@Rule
 	def yieldAtom(self):
-		return ( Literal( '(' )  +  Keyword( yieldKeyword )  +  self.tupleOrExpression()  +  Literal( ')' ) ).action( lambda input, begin, end, xs, bindings: Nodes.YieldAtom( value=xs[2] ) )
+		return ( Literal( '(' )  +  self.yieldExpression()  +  Literal( ')' ) ).action( lambda input, begin, end, xs, bindings: xs[1] )
 
 
 
@@ -330,7 +369,7 @@ class Python25Grammar (Grammar):
 	# Atom
 	@Rule
 	def atom(self):
-		return self.enclosure() | self.literal() | self.loadLocal()
+		return ObjectNode( Nodes.Expr )  |  self.enclosure() | self.literal() | self.loadLocal()
 
 
 
@@ -593,35 +632,54 @@ class Python25Grammar (Grammar):
 
 	@Rule
 	def expression(self):
-		return self.lambdaExpr()  |  self.conditionalExpression()  |  self.orTest()
+		return ObjectNode( Nodes.Expr )  |  self.lambdaExpr()  |  self.conditionalExpression()  |  self.orTest()
 
 
 
 	# Tuple or (old) expression
 	@Rule
 	def tupleOrExpression(self):
-		return self.tupleAsExpressionList() | self.expression()
+		return self.tupleAsExpressionList()  |  self.expression()
 
 	@Rule
 	def oldTupleOrExpression(self):
-		return self.oldTupleAsExpressionList() | self.oldExpression()
-
-
-
-
-	# Tuple or expression or yield expression
+		return self.oldTupleAsExpressionList()  |  self.oldExpression()
+	
+	
 	@Rule
 	def tupleOrExpressionOrYieldExpression(self):
-		return self.tupleOrExpression() | self.yieldAtom()
+		return self.tupleOrExpression()  |  self.yieldExpression()
 
 
 
 
+	
+	
+	
+	#
+	#
+	# UNPARSED
+	#
+	#
+	
+	@Rule
+	def unparsed(self):
+		return ObjectNode( Nodes.UNPARSED )  |  ( ( RegEx( '[^\n]*' ) | ObjectNode( Nodes.Node ) ).oneOrMore()  +  Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Nodes.UNPARSED( value=xs[0] ) )
+	
+	
+	
+	
 
+	#
+	#
+	# SIMPLE STATEMENTS
+	#
+	#
+	
 	# Expression statement
 	@Rule
 	def exprStmt(self):
-		return self.expression().action( lambda input, begin, end, xs, bindings: Nodes.ExprStmt( expr=xs ) )
+		return ( self.tupleOrExpression() + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Nodes.ExprStmt( expr=xs[0] ) )
 
 
 
@@ -629,7 +687,7 @@ class Python25Grammar (Grammar):
 	# Assert statement
 	@Rule
 	def assertStmt(self):
-		return ( Keyword( assertKeyword ) + self.expression()  +  Optional( Literal( ',' ) + self.expression() ) ).action(
+		return ( Keyword( assertKeyword ) + self.expression()  +  Optional( Literal( ',' ) + self.expression() ) + Literal( '\n' ) ).action(
 			lambda input, begin, end, xs, bindings: Nodes.AssertStmt( condition=xs[1], fail=xs[2][1]   if xs[2] is not None  else  None ) )
 
 
@@ -638,7 +696,7 @@ class Python25Grammar (Grammar):
 	# Assignment statement
 	@Rule
 	def assignmentStmt(self):
-		return ( OneOrMore( ( self.targetListOrTargetItem()  +  '=' ).action( lambda input, begin, end, xs, bindings: xs[0] ) )  +  self.tupleOrExpressionOrYieldExpression() ).action(
+		return ( OneOrMore( ( self.targetListOrTargetItem()  +  '=' ).action( lambda input, begin, end, xs, bindings: xs[0] ) )  +  self.tupleOrExpressionOrYieldExpression() + Literal( '\n' ) ).action(
 			lambda input, begin, end, xs, bindings: Nodes.AssignStmt( targets=xs[0], value=xs[1] ) )
 
 
@@ -651,7 +709,7 @@ class Python25Grammar (Grammar):
 
 	@Rule
 	def augAssignStmt(self):
-		return ( self.targetItem()  +  self.augOp()  +  self.tupleOrExpressionOrYieldExpression() ).action(
+		return ( self.targetItem()  +  self.augOp()  +  self.tupleOrExpressionOrYieldExpression() + Literal( '\n' ) ).action(
 			lambda input, begin, end, xs, bindings: Nodes.AugAssignStmt( op=xs[1], target=xs[0], value=xs[2] ) )
 
 
@@ -660,28 +718,28 @@ class Python25Grammar (Grammar):
 	# Pass statement
 	@Rule
 	def passStmt(self):
-		return Keyword( passKeyword ).action( lambda input, begin, end, xs, bindings: Nodes.PassStmt() )
+		return ( Keyword( passKeyword ) + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Nodes.PassStmt() )
 
 
 
 	# Del statement
 	@Rule
 	def delStmt(self):
-		return ( Keyword( delKeyword )  +  self.targetListOrTargetItem() ).action( lambda input, begin, end, xs, bindings: Nodes.DelStmt( target=xs[1] ) )
+		return ( Keyword( delKeyword )  +  self.targetListOrTargetItem() + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Nodes.DelStmt( target=xs[1] ) )
 
 
 
 	# Return statement
 	@Rule
 	def returnStmt(self):
-		return ( Keyword( returnKeyword )  +  self.tupleOrExpression() ).action( lambda input, begin, end, xs, bindings: Nodes.ReturnStmt( value=xs[1] ) )
+		return ( Keyword( returnKeyword )  +  self.tupleOrExpression() + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Nodes.ReturnStmt( value=xs[1] ) )
 
 
 
 	# Yield statement
 	@Rule
 	def yieldStmt(self):
-		return ( Keyword( yieldKeyword )  +  self.expression() ).action( lambda input, begin, end, xs, bindings: Nodes.YieldStmt( value=xs[1] ) )
+		return ( Keyword( yieldKeyword )  +  self.expression() + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Nodes.YieldStmt( value=xs[1] ) )
 
 
 
@@ -701,7 +759,7 @@ class Python25Grammar (Grammar):
 
 	@Rule
 	def raiseStmt(self):
-		return ( Keyword( raiseKeyword ) + Optional( self.expression() + Optional( Literal( ',' ) + self.expression() + Optional( Literal( ',' ) + self.expression() ) ) ) ).action(
+		return ( Keyword( raiseKeyword ) + Optional( self.expression() + Optional( Literal( ',' ) + self.expression() + Optional( Literal( ',' ) + self.expression() ) ) ) + Literal( '\n' ) ).action(
 			lambda input, begin, end, xs, bindings: self._buildRaise( xs ) )
 
 
@@ -710,7 +768,7 @@ class Python25Grammar (Grammar):
 	# Break statement
 	@Rule
 	def breakStmt(self):
-		return Keyword( breakKeyword ).action( lambda input, begin, end, xs, bindings: Nodes.BreakStmt() )
+		return ( Keyword( breakKeyword ) + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Nodes.BreakStmt() )
 
 
 
@@ -718,7 +776,7 @@ class Python25Grammar (Grammar):
 	# Continue statement
 	@Rule
 	def continueStmt(self):
-		return Keyword( continueKeyword ).action( lambda input, begin, end, xs, bindings: Nodes.ContinueStmt() )
+		return ( Keyword( continueKeyword ) + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Nodes.ContinueStmt() )
 
 
 
@@ -758,7 +816,8 @@ class Python25Grammar (Grammar):
 	# 'import' <separatedList( moduleImport )>
 	@Rule
 	def simpleImport(self):
-		return ( Keyword( importKeyword )  +  SeparatedList( self.moduleImport(), 1, -1, SeparatedList.TrailingSeparatorPolicy.NEVER ) ).action( lambda input, begin, end, xs, bindings: Nodes.ImportStmt( modules=xs[1] ) )
+		return ( Keyword( importKeyword )  +  SeparatedList( self.moduleImport(), 1, -1, SeparatedList.TrailingSeparatorPolicy.NEVER ) + Literal( '\n' ) ).action(
+			lambda input, begin, end, xs, bindings: Nodes.ImportStmt( modules=xs[1] ) )
 
 
 	# ( <pythonIdentifier> 'as' <pythonIdentifier> )  |  <pythonIdentifier>
@@ -775,14 +834,14 @@ class Python25Grammar (Grammar):
 			 (  \
 				 SeparatedList( self.moduleContentImport(), 1, -1, SeparatedList.TrailingSeparatorPolicy.NEVER )  |  
 				 SeparatedList( self.moduleContentImport(), '(', ')', 1, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL )\
-				 )  \
+				 ) + Literal( '\n' )  \
 			 ).action( lambda input, begin, end, xs, bindings: Nodes.FromImportStmt( module=xs[1], imports=xs[3] ) )
 
 
 	# 'from' <relativeModule> 'import' '*'
 	@Rule
 	def fromImportAll(self):
-		return ( Keyword( fromKeyword ) + self.relativeModule() + Keyword( importKeyword ) + '*' ).action( lambda input, begin, end, xs, bindings: Nodes.FromImportAllStmt( module=xs[1] ) )
+		return ( Keyword( fromKeyword ) + self.relativeModule() + Keyword( importKeyword ) + '*' + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Nodes.FromImportAllStmt( module=xs[1] ) )
 
 
 	# Final :::
@@ -800,7 +859,8 @@ class Python25Grammar (Grammar):
 
 	@Rule
 	def globalStmt(self):
-		return ( Keyword( globalKeyword )  +  SeparatedList( self.globalVar(), 1, -1, SeparatedList.TrailingSeparatorPolicy.NEVER ) ).action( lambda input, begin, end, xs, bindings: Nodes.GlobalStmt( vars=xs[1] ) )
+		return ( Keyword( globalKeyword )  +  SeparatedList( self.globalVar(), 1, -1, SeparatedList.TrailingSeparatorPolicy.NEVER ) + Literal( '\n' ) ).action(
+			lambda input, begin, end, xs, bindings: Nodes.GlobalStmt( vars=xs[1] ) )
 
 
 
@@ -809,15 +869,16 @@ class Python25Grammar (Grammar):
 	# Exec statement
 	@Rule
 	def execCodeStmt(self):
-		return ( Keyword( execKeyword )  +  self.orOp() ).action( lambda input, begin, end, xs, bindings: Nodes.ExecStmt( source=xs[1], locals=None, globals=None ) )
+		return ( Keyword( execKeyword )  +  self.orOp() + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Nodes.ExecStmt( source=xs[1], locals=None, globals=None ) )
 
 	@Rule
 	def execCodeInLocalsStmt(self):
-		return ( Keyword( execKeyword )  +  self.orOp()  +  Keyword( inKeyword )  +  self.expression() ).action( lambda input, begin, end, xs, bindings: Nodes.ExecStmt( source=xs[1], locals=xs[3], globals=None ) )
+		return ( Keyword( execKeyword )  +  self.orOp()  +  Keyword( inKeyword )  +  self.expression() + Literal( '\n' ) ).action(
+			lambda input, begin, end, xs, bindings: Nodes.ExecStmt( source=xs[1], locals=xs[3], globals=None ) )
 
 	@Rule
 	def execCodeInLocalsAndGlobalsStmt(self):
-		return ( Keyword( execKeyword )  +  self.orOp()  +  Keyword( inKeyword )  +  self.expression()  +  ','  +  self.expression() ).action(
+		return ( Keyword( execKeyword )  +  self.orOp()  +  Keyword( inKeyword )  +  self.expression()  +  ','  +  self.expression() + Literal( '\n' ) ).action(
 			lambda input, begin, end, xs, bindings: Nodes.ExecStmt( source=xs[1], locals=xs[3], globals=xs[5] ) )
 
 	@Rule
@@ -827,42 +888,50 @@ class Python25Grammar (Grammar):
 
 
 
+	
 	#
-	# Compound statement headers
+	#
+	# COMPOUND STATEMENT HEADERS
+	#
 	#
 		
 	# If statement
 	@Rule
 	def ifStmtHeader(self):
-		return ( Keyword( ifKeyword )  +  self.expression()  +  ':' ).action( lambda input, begin, end, xs, bindings: Nodes.IfStmtHeader( condition=xs[1] ) )
+		return ObjectNode( Nodes.IfStmtHeader )  |  \
+		       ( Keyword( ifKeyword )  +  self.expression()  +  ':' + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Nodes.IfStmtHeader( condition=xs[1] ) )
 
 
 
 	# Elif statement
 	@Rule
 	def elifStmtHeader(self):
-		return ( Keyword( elifKeyword )  +  self.expression()  +  ':' ).action( lambda input, begin, end, xs, bindings: Nodes.ElifStmtHeader( condition=xs[1] ) )
+		return ObjectNode( Nodes.ElifStmtHeader )  |  \
+		       ( Keyword( elifKeyword )  +  self.expression()  +  ':' + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Nodes.ElifStmtHeader( condition=xs[1] ) )
 
 
 
 	# Else statement
 	@Rule
 	def elseStmtHeader(self):
-		return( Keyword( elseKeyword )  +  ':' ).action( lambda input, begin, end, xs, bindings: Nodes.ElseStmtHeader() )
+		return ObjectNode( Nodes.ElseStmtHeader )  |  \
+		       ( Keyword( elseKeyword )  +  ':' + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Nodes.ElseStmtHeader() )
 
 
 
 	# While statement
 	@Rule
 	def whileStmtHeader(self):
-		return ( Keyword( whileKeyword )  +  self.expression()  +  ':' ).action( lambda input, begin, end, xs, bindings: Nodes.WhileStmtHeader( condition=xs[1] ) )
+		return ObjectNode( Nodes.WhileStmtHeader )  |  \
+		       ( Keyword( whileKeyword )  +  self.expression()  +  ':' + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Nodes.WhileStmtHeader( condition=xs[1] ) )
 
 
 
 	# For statement
 	@Rule
 	def forStmtHeader(self):
-		return ( Keyword( forKeyword )  +  self.targetListOrTargetItem()  +  Keyword( inKeyword )  +  self.tupleOrExpression()  +  ':' ).action(
+		return ObjectNode( Nodes.ForStmtHeader )  |  \
+		       ( Keyword( forKeyword )  +  self.targetListOrTargetItem()  +  Keyword( inKeyword )  +  self.tupleOrExpression()  +  ':' + Literal( '\n' ) ).action(
 			lambda input, begin, end, xs, bindings: Nodes.ForStmtHeader( target=xs[1], source=xs[3] ) )
 
 
@@ -870,7 +939,8 @@ class Python25Grammar (Grammar):
 	# Try statement
 	@Rule
 	def tryStmtHeader(self):
-		return ( Keyword( tryKeyword )  +  ':' ).action( lambda input, begin, end, xs, bindings: Nodes.TryStmtHeader() )
+		return ObjectNode( Nodes.TryStmtHeader )  |  \
+		       ( Keyword( tryKeyword )  +  ':' + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Nodes.TryStmtHeader() )
 
 
 
@@ -878,19 +948,20 @@ class Python25Grammar (Grammar):
 	# Except statement
 	@Rule
 	def exceptAllStmtHeader(self):
-		return ( Keyword( exceptKeyword ) + ':' ).action( lambda input, begin, end, xs, bindings: Nodes.ExceptStmtHeader( exception=None, target=None ) )
+		return ( Keyword( exceptKeyword ) + ':' + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Nodes.ExceptStmtHeader( exception=None, target=None ) )
 
 	@Rule
 	def exceptExcStmtHeader(self):
-		return ( Keyword( exceptKeyword )  +  self.expression() + ':' ).action( lambda input, begin, end, xs, bindings: Nodes.ExceptStmtHeader( exception=xs[1], target=None ) )
+		return ( Keyword( exceptKeyword )  +  self.expression() + ':' + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Nodes.ExceptStmtHeader( exception=xs[1], target=None ) )
 
 	@Rule
 	def exceptExcIntoTargetStmtHeader(self):
-		return ( Keyword( exceptKeyword )  +  self.expression()  +  ','  +  self.targetItem() + ':' ).action( lambda input, begin, end, xs, bindings: Nodes.ExceptStmtHeader( exception=xs[1], target=xs[3] ) )
+		return ( Keyword( exceptKeyword )  +  self.expression()  +  ','  +  self.targetItem() + ':' + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Nodes.ExceptStmtHeader( exception=xs[1], target=xs[3] ) )
 
 	@Rule
 	def exceptStmtHeader(self):
-		return self.exceptExcIntoTargetStmtHeader() | self.exceptExcStmtHeader() | self.exceptAllStmtHeader()
+		return ObjectNode( Nodes.ExceptStmtHeader )  |  \
+		       self.exceptExcIntoTargetStmtHeader() | self.exceptExcStmtHeader() | self.exceptAllStmtHeader()
 
 
 
@@ -898,14 +969,16 @@ class Python25Grammar (Grammar):
 	# Finally statement
 	@Rule
 	def finallyStmtHeader(self):
-		return ( Keyword( finallyKeyword )  +  ':' ).action( lambda input, begin, end, xs, bindings: Nodes.FinallyStmtHeader() )
+		return ObjectNode( Nodes.FinallyStmtHeader )  |  \
+		       ( Keyword( finallyKeyword )  +  ':' + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Nodes.FinallyStmtHeader() )
 
 
 
 	# With statement
 	@Rule
 	def withStmtHeader(self):
-		return ( Keyword( withKeyword )  +  self.expression()  +  Optional( Keyword( asKeyword )  +  self.targetItem() )  +  ':' ).action(
+		return ObjectNode( Nodes.WithStmtHeader )  |  \
+		       ( Keyword( withKeyword )  +  self.expression()  +  Optional( Keyword( asKeyword )  +  self.targetItem() )  +  ':' + Literal( '\n' ) ).action(
 			lambda input, begin, end, xs, bindings: Nodes.WithStmtHeader( expr=xs[1], target=xs[2][1]   if xs[2] is not None   else   None ) )
 
 
@@ -913,7 +986,8 @@ class Python25Grammar (Grammar):
 	# Def statement
 	@Rule
 	def defStmtHeader(self):
-		return ( Keyword( defKeyword )  +  self.pythonIdentifier()  +  '('  +  self.params()  +  ')'  +  ':' ).action(
+		return ObjectNode( Nodes.DefStmtHeader )  |  \
+		       ( Keyword( defKeyword )  +  self.pythonIdentifier()  +  '('  +  self.params()  +  ')'  +  ':' + Literal( '\n' ) ).action(
 			lambda input, begin, end, xs, bindings: Nodes.DefStmtHeader( name=xs[1], params=xs[3][0], paramsTrailingSeparator=xs[3][1] ) )
 
 
@@ -930,7 +1004,8 @@ class Python25Grammar (Grammar):
 				trailingSeparator = None
 			return Nodes.DecoStmtHeader( name=xs[1], args=args, argsTrailingSeparator=trailingSeparator )
 
-		return ( Literal( '@' )  +  self.dottedPythonIdentifer()  +  Optional( Literal( '(' )  +  self.callArgs()  +  ')' ) ).action( _action )
+		return ObjectNode( Nodes.DecoStmtHeader )  |  \
+		       ( Literal( '@' )  +  self.dottedPythonIdentifer()  +  Optional( Literal( '(' )  +  self.callArgs()  +  ')' ) + Literal( '\n' ) ).action( _action )
 
 
 
@@ -946,33 +1021,199 @@ class Python25Grammar (Grammar):
 				bases = None
 				trailingSep = None
 			return Nodes.ClassStmtHeader( name=xs[1], bases=bases, basesTrailingSeparator=trailingSep )
-		return ( Keyword( classKeyword )  +  self.pythonIdentifier()  +  Optional( bases )  +  ':' ).action( _action )
+		return ObjectNode( Nodes.ClassStmtHeader )  |  \
+		       ( Keyword( classKeyword )  +  self.pythonIdentifier()  +  Optional( bases )  +  ':' + Literal( '\n' ) ).action( _action )
 
 
 
+	
+	#
+	#
+	# COMMENT STATEMENT
+	#
+	#
+	
 	# Comment statement
 	@Rule
 	def commentStmt(self):
-		return ( Literal( '#' )  +  Word( string.printable ).optional() ).action( lambda input, begin, end, xs, bindings: Nodes.CommentStmt( comment=xs[1]   if xs[1] is not None   else  '' ) )
+		return ObjectNode( Nodes.CommentStmt )  |  \
+		       ( Literal( '#' )  +  Word( string.printable.replace( '\n', '' ) ).optional() + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Nodes.CommentStmt( comment=xs[1]   if xs[1] is not None   else  '' ) )
+	
+	@Rule
+	def blankLine(self):
+		return ObjectNode( Nodes.BlankLine )  |  \
+		       Literal( '\n' ).action( lambda input, begin, end, xs, bindings: Nodes.BlankLine() )
+	
+	
+	
+	
+	#
+	#
+	# COMPOUND STATEMENTS
+	#
+	#
+	
+	@Rule
+	def ifStmt(self):
+		byLine = ( self.ifStmtHeader()  +  self.compoundSuite()  +  self.elifBlock().zeroOrMore()  +  self.elseBlock().optional() ).action(
+			lambda input, begin, end, xs, bindings: Nodes.IfStmt( condition=xs[0]['condition'], suite=xs[1], elifBlocks=xs[2], elseSuite=xs[3] ) )
+		join = ( ObjectNode( Nodes.IfStmt, elseSuite=None )  +  self.elifBlock().zeroOrMore()  +  self.elseBlock().optional() ).action(
+			lambda input, begin, end, xs, bindings: Nodes.IfStmt( condition=xs[0]['condition'], suite=xs[0]['suite'], elifBlocks=list(xs[0]['elifBlocks']) + list(xs[1]), elseSuite=xs[2] ) )
+		return byLine  |  join
+		
+	@Rule
+	def elifBlock(self):
+		return ( self.elifStmtHeader()  +  self.compoundSuite() ).action( lambda input, begin, end, xs, bindings: Nodes.ElifBlock( condition=xs[0]['condition'], suite=xs[1] ) )
+	
+	@Rule
+	def elseBlock(self):
+		return ( self.elseStmtHeader()  +  self.compoundSuite() ).action( lambda input, begin, end, xs, bindings: xs[1] )
+	
+	
+	@Rule
+	def whileStmt(self):
+		byLine = ( self.whileStmtHeader()  +  self.compoundSuite()  +  self.elseBlock().optional() ).action(
+			lambda input, begin, end, xs, bindings: Nodes.WhileStmt( condition=xs[0]['condition'], suite=xs[1], elseSuite=xs[2] ) )
+		join = ( ObjectNode( Nodes.WhileStmt, elseSuite=None )  +  self.elseBlock() ).action(
+			lambda input, begin, end, xs, bindings: Nodes.WhileStmt( condition=xs[0]['condition'], suite=xs[0]['suite'], elseSuite=xs[1] ) )
+		return byLine  |  join
+		
 
+	@Rule
+	def forStmt(self):
+		byLine = ( self.forStmtHeader()  +  self.compoundSuite()  +  self.elseBlock().optional() ).action(
+			lambda input, begin, end, xs, bindings: Nodes.ForStmt( target=xs[0]['target'], source=xs[0]['source'], suite=xs[1], elseSuite=xs[2] ) )
+		join = ( ObjectNode( Nodes.ForStmt, elseSuite=None )  +  self.elseBlock() ).action(
+			lambda input, begin, end, xs, bindings: Nodes.ForStmt( target=xs[0]['target'], source=xs[0]['source'], suite=xs[0]['suite'], elseSuite=xs[1] ) )
+		return byLine  |  join
+		
+		
+	@Rule
+	def tryStmt(self):
+		tryStmt1ByLine = ( self.tryStmtHeader()  +  self.compoundSuite()  +  self.exceptBlock().oneOrMore()  +  self.elseBlock().optional()  +  self.finallyBlock().optional() ).action(
+			lambda input, begin, end, xs, bindings: Nodes.TryStmt( suite=xs[1], exceptBlocks=xs[2], elseSuite=xs[3], finallySuite=xs[4] ) )
+		# No else or finally clause; add 1+ except blocks, and optionally, else and finally clauses
+		tryStmt1JoinA = ( ObjectNode( Nodes.TryStmt, elseSuite=None, finallySuite=None )  +  self.exceptBlock().oneOrMore()  +  self.elseBlock().optional()  +  self.finallyBlock().optional() ).action(
+			lambda input, begin, end, xs, bindings: Nodes.TryStmt( suite=xs[0]['suite'], exceptBlocks=list(xs[0]['exceptBlocks']) + list(xs[1]), elseSuite=xs[2], finallySuite=xs[3] ) )
+		# 1 or more except blocks, no else or finally clause; add an else clause, and optionally, a finally clause
+		tryStmt1JoinB = ( ObjectNode( Nodes.TryStmt, elseSuite=None, finallySuite=None ).condition( lambda input, begin, end, xs, bindings: len( xs['exceptBlocks'] ) > 0 )  +  \
+				  self.elseBlock()  +  self.finallyBlock().optional() ).action(
+					  lambda input, begin, end, xs, bindings: Nodes.TryStmt( suite=xs[0]['suite'], exceptBlocks=xs[0]['exceptBlocks'], elseSuite=xs[1], finallySuite=xs[2] ) )
+		# 1 or more except blocks, no finally clause; add a finally clause
+		tryStmt1JoinC = ( ObjectNode( Nodes.TryStmt, finallySuite=None ).condition( lambda input, begin, end, xs, bindings: len( xs['exceptBlocks'] ) > 0 )  +  self.finallyBlock() ).action(
+					  lambda input, begin, end, xs, bindings: Nodes.TryStmt( suite=xs[0]['suite'], exceptBlocks=xs[0]['exceptBlocks'], finallySuite=xs[1] ) )
+		tryStmt2ByLine = ( self.tryStmtHeader()  +  self.compoundSuite()  +  self.finallyBlock() ).action(
+			lambda input, begin, end, xs, bindings: Nodes.TryStmt( suite=xs[1], exceptBlocks=[], elseSuite=None, finallySuite=xs[2] ) )
+		return tryStmt1ByLine | tryStmt1JoinA  |  tryStmt1JoinB  |  tryStmt1JoinC  |  tryStmt2ByLine
+	
+	@Rule
+	def exceptBlock(self):
+		return ( self.exceptStmtHeader()  +  self.compoundSuite() ).action( lambda input, begin, end, xs, bindings: Nodes.ExceptBlock( exception=xs[0]['exception'], target=xs[0]['target'], suite=xs[1] ) )
+	
+	@Rule
+	def finallyBlock(self):
+		return ( self.finallyStmtHeader()  +  self.compoundSuite() ).action( lambda input, begin, end, xs, bindings: xs[1] )
+	
+	
+	@Rule
+	def withStmt(self):
+		return ( self.withStmtHeader()  +  self.compoundSuite() ).action(
+			lambda input, begin, end, xs, bindings: Nodes.WithStmt( expr=xs[0]['expr'], target=xs[0]['target'], suite=xs[1] ) )
+		
 
+	@Rule
+	def decorator(self):
+		return self.decoStmtHeader().action( lambda input, begin, end, xs, bindings: Nodes.Decorator( name=xs['name'], args=xs['args'], argsTrailingSeparator=xs['argsTrailingSeparator'] ) )
+	
+	@Rule
+	def defStmt(self):
+		byLine = ( self.decorator().zeroOrMore()  +  self.defStmtHeader()  +  self.compoundSuite() ).action(
+			lambda input, begin, end, xs, bindings: Nodes.DefStmt( decorators=xs[0], name=xs[1]['name'], params=xs[1]['params'], paramsTrailingSeparator=xs[1]['paramsTrailingSeparator'] , suite=xs[2] ) )
+		join = ( self.decorator().oneOrMore()  +  ObjectNode( Nodes.DefStmt ) ).action(
+			lambda input, begin, end, xs, bindings: Nodes.DefStmt( decorators=list(xs[0]) + list(xs[1]['decorators']), name=xs[1]['name'], params=xs[1]['params'], paramsTrailingSeparator=xs[1]['paramsTrailingSeparator'],
+									       suite=xs[1]['suite'] ) )
+		return byLine  |  join
+	
+	
+	@Rule
+	def classStmt(self):
+		return ( self.classStmtHeader()  +  self.compoundSuite() ).action(
+			lambda input, begin, end, xs, bindings: Nodes.ClassStmt( name=xs[0]['name'], bases=xs[0]['bases'], basesTrailingSeparator=xs[0]['basesTrailingSeparator'] , suite=xs[1] ) )
 
-
-
-	# Statements
+	
+	
+	
+	
+	#
+	#
+	# STATEMENTS
+	#
+	#
+	
 	@Rule
 	def simpleStmt(self):
-		return self.assertStmt() | self.assignmentStmt() | self.augAssignStmt() | self.passStmt() | self.delStmt() | self.returnStmt() | self.yieldStmt() | self.raiseStmt() | self.breakStmt() | \
-		       self.continueStmt() | self.importStmt() | self.globalStmt() | self.execStmt()
+		return ObjectNode( Nodes.SimpleStmt )  |  \
+		       self.assertStmt() | self.assignmentStmt() | self.augAssignStmt() | self.passStmt() | self.delStmt() | self.returnStmt() | self.yieldStmt() | self.raiseStmt() | self.breakStmt() | \
+		       self.continueStmt() | self.importStmt() | self.globalStmt() | self.execStmt() | self.exprStmt()
 
 	@Rule
 	def compoundStmtHeader(self):
-		return self.ifStmtHeader() | self.elifStmtHeader() | self.elseStmtHeader() | self.whileStmtHeader() | self.forStmtHeader() | self.tryStmtHeader() | self.exceptStmtHeader() | self.finallyStmtHeader() | \
+		return ObjectNode( Nodes.CompountStmtHeader )  |  \
+		       self.ifStmtHeader() | self.elifStmtHeader() | self.elseStmtHeader() | self.whileStmtHeader() | self.forStmtHeader() | self.tryStmtHeader() | self.exceptStmtHeader() | self.finallyStmtHeader() | \
 		       self.withStmtHeader() | self.defStmtHeader() | self.decoStmtHeader() | self.classStmtHeader()
 
 	@Rule
-	def statement(self):
-		return self.simpleStmt() | self.compoundStmtHeader() | self.commentStmt() | self.exprStmt()
+	def compoundStmt(self):
+		return self.ifStmt()  |  self.whileStmt()  |  self.forStmt()  |  self.tryStmt()  |  self.withStmt()  |  self.defStmt()  |  self.classStmt()  |  ObjectNode( Nodes.CompoundStmt )
+		       
+	
+	@Rule
+	def singleLineStatementValid(self):
+		return self.simpleStmt() | self.compoundStmtHeader() | self.commentStmt() | self.blankLine()
+
+	@Rule
+	def singleLineStatement(self):
+		return self.singleLineStatementValid() | self.unparsed()
+
+
+	
+	
+	#
+	#
+	# BLOCKS / STRUCTURE
+	#
+	#
+	
+	@Rule
+	def indentedBlock(self):
+		return self.compoundSuite().action( lambda input, begin, end, xs, bindings: Nodes.IndentedBlock( suite=xs ) )
+	
+	
+	@Rule
+	def suiteItem(self):
+		return self.compoundStmt()  |  self.indentedBlock()  |  self.simpleStmt()  |  self.compoundStmtHeader()  |  self.emptyIndentedSuite()  |  self.commentStmt()  |  self.blankLine()  |  self.unparsed()
+	
+	
+	@Rule
+	def singleIndentedSuite(self):
+		return ( ObjectNode( Nodes.Indent )  +  self.suiteItem().oneOrMore()  +  ObjectNode( Nodes.Dedent ) ).action( lambda input, begin, end, xs, bindings: xs[1] )  |  \
+		       ObjectNode( Nodes.IndentedBlock ).action( lambda input, begin, end, xs, bindings: xs['suite'] )
+	
+	@Rule
+	def compoundSuite(self):
+		return self.singleIndentedSuite().oneOrMore().action( lambda input, begin, end, xs, bindings: reduce( lambda a, b: list(a)+list(b), xs ) )
+
+	
+	@Rule
+	def emptyIndentedSuite(self):
+		return ( ObjectNode( Nodes.Indent )  +  ObjectNode( Nodes.Dedent ) ).suppress()
+	
+	@Rule
+	def suite(self):
+		return self.suiteItem().zeroOrMore()
+
+
+
 
 
 
@@ -983,6 +1224,16 @@ import unittest
 
 
 class TestCase_Python25Parser (ParserTestCase):
+	def _pythonStream(self, *args):
+		b = ItemStreamBuilder()
+		for x in args:
+			if isinstance( x, str ):
+				b.appendTextValue( x )
+			else:
+				b.appendStructuralValue( x )
+		return b.stream()
+	
+	
 	def test_shortStringLiteral(self):
 		g = Python25Grammar()
 		self._parseStringTest( g.expression(), '\'abc\'', Nodes.StringLiteral( format='ascii', quotation='single', value='abc' ) )
@@ -1129,9 +1380,9 @@ class TestCase_Python25Parser (ParserTestCase):
 											   Nodes.DictKeyValuePair( key=Nodes.Load( name='b' ), value=Nodes.Load( name='y' ) ) ], trailingSeparator='1' ) )
 
 
-	def testYieldAtom(self):
+	def testYieldExpr(self):
 		g = Python25Grammar()
-		self._parseStringTest( g.expression(), '(yield 2+3)', Nodes.YieldAtom( value=Nodes.Add( x=Nodes.IntLiteral( format='decimal', numType='int', value='2' ), y=Nodes.IntLiteral( format='decimal', numType='int', value='3' ) ) ) )
+		self._parseStringTest( g.expression(), '(yield 2+3)', Nodes.YieldExpr( value=Nodes.Add( x=Nodes.IntLiteral( format='decimal', numType='int', value='2' ), y=Nodes.IntLiteral( format='decimal', numType='int', value='3' ) ) ) )
 
 
 
@@ -1290,73 +1541,94 @@ class TestCase_Python25Parser (ParserTestCase):
 
 
 
+	def test_structuralAtom(self):
+		g = Python25Grammar()
+		s = self._pythonStream( Nodes.Div( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) )
+		self._parseStreamTest( g.atom(), s, Nodes.Div( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) )
+
+		
+		
+	def test_embeddedStructuralExpression(self):
+		g = Python25Grammar()
+		s = self._pythonStream( Nodes.Div( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) )
+		self._parseStreamTest( g.tupleOrExpression(), s, Nodes.Div( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) )
+		s = self._pythonStream( 'return ', Nodes.Div( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ), '\n' )
+		self._parseStreamTest( g.singleLineStatement(), s, Nodes.ReturnStmt( value=Nodes.Div( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) ) )
+		s = self._pythonStream( 'x + ', Nodes.Div( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) )
+		self._parseStreamTest( g.tupleOrExpression(), s, Nodes.Add( x=Nodes.Load( name='x' ), y=Nodes.Div( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) ) )
+
+		
+		
 	def testAssertStmt(self):
 		g = Python25Grammar()
-		self._parseStringTest( g.statement(), 'assert x', Nodes.AssertStmt( condition=Nodes.Load( name='x' ), fail=None ) )
-		self._parseStringTest( g.statement(), 'assert x,y', Nodes.AssertStmt( condition=Nodes.Load( name='x' ), fail=Nodes.Load( name='y' ) ) )
+		self._parseStringTest( g.singleLineStatementValid(), 'assert x\n', Nodes.AssertStmt( condition=Nodes.Load( name='x' ), fail=None ) )
+		self._parseStringTest( g.singleLineStatementValid(), 'assert x,y\n', Nodes.AssertStmt( condition=Nodes.Load( name='x' ), fail=Nodes.Load( name='y' ) ) )
+		self._parseNodeTest( g.singleLineStatementValid(), Nodes.AssertStmt( condition=Nodes.Load( name='x' ), fail=None ), Nodes.AssertStmt( condition=Nodes.Load( name='x' ), fail=None ) )
 
 
 	def testAssignmentStmt(self):
 		g = Python25Grammar()
-		self._parseStringTest( g.statement(), 'a=x', Nodes.AssignStmt( targets=[ Nodes.SingleTarget( name='a' ) ], value=Nodes.Load( name='x' ) ) )
-		self._parseStringTest( g.statement(), 'a=b=x', Nodes.AssignStmt( targets=[ Nodes.SingleTarget( name='a' ), Nodes.SingleTarget( name='b' ) ], value=Nodes.Load( name='x' ) ) )
-		self._parseStringTest( g.statement(), 'a,b=c,d=x', Nodes.AssignStmt( targets=[ Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='a' ),  Nodes.SingleTarget( name='b' ) ] ),
+		self._parseStringTest( g.singleLineStatementValid(), 'a=x\n', Nodes.AssignStmt( targets=[ Nodes.SingleTarget( name='a' ) ], value=Nodes.Load( name='x' ) ) )
+		self._parseStringTest( g.singleLineStatementValid(), 'a=b=x\n', Nodes.AssignStmt( targets=[ Nodes.SingleTarget( name='a' ), Nodes.SingleTarget( name='b' ) ], value=Nodes.Load( name='x' ) ) )
+		self._parseStringTest( g.singleLineStatementValid(), 'a,b=c,d=x\n', Nodes.AssignStmt( targets=[ Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='a' ),  Nodes.SingleTarget( name='b' ) ] ),
 											 Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='c' ),  Nodes.SingleTarget( name='d' ) ] ) ], value=Nodes.Load( name='x' ) ) )
-		self._parseStringTest( g.statement(), 'a=(yield x)', Nodes.AssignStmt( targets=[ Nodes.SingleTarget( name='a' ) ], value=Nodes.YieldAtom( value=Nodes.Load( name='x' ) ) ) )
-		self._parseStringFailTest( g.statement(), '=x' )
+		self._parseStringTest( g.singleLineStatementValid(), 'a=(yield x)\n', Nodes.AssignStmt( targets=[ Nodes.SingleTarget( name='a' ) ], value=Nodes.YieldExpr( value=Nodes.Load( name='x' ) ) ) )
+		self._parseStringTest( g.singleLineStatementValid(), 'a = yield x\n', Nodes.AssignStmt( targets=[ Nodes.SingleTarget( name='a' ) ], value=Nodes.YieldExpr( value=Nodes.Load( name='x' ) ) ) )
+		self._parseStringFailTest( g.singleLineStatementValid(), '=x' )
 
 
 	def testAugAssignStmt(self):
 		g = Python25Grammar()
-		self._parseStringTest( g.statement(), 'a += b', Nodes.AugAssignStmt( op='+=', target=Nodes.SingleTarget( name='a' ), value=Nodes.Load( name='b' ) ) )
-		self._parseStringTest( g.statement(), 'a -= b', Nodes.AugAssignStmt( op='-=', target=Nodes.SingleTarget( name='a' ), value=Nodes.Load( name='b' ) ) )
-		self._parseStringTest( g.statement(), 'a *= b', Nodes.AugAssignStmt( op='*=', target=Nodes.SingleTarget( name='a' ), value=Nodes.Load( name='b' ) ) )
-		self._parseStringTest( g.statement(), 'a /= b', Nodes.AugAssignStmt( op='/=', target=Nodes.SingleTarget( name='a' ), value=Nodes.Load( name='b' ) ) )
-		self._parseStringTest( g.statement(), 'a %= b', Nodes.AugAssignStmt( op='%=', target=Nodes.SingleTarget( name='a' ), value=Nodes.Load( name='b' ) ) )
-		self._parseStringTest( g.statement(), 'a **= b', Nodes.AugAssignStmt( op='**=', target=Nodes.SingleTarget( name='a' ), value=Nodes.Load( name='b' ) ) )
-		self._parseStringTest( g.statement(), 'a >>= b', Nodes.AugAssignStmt( op='>>=', target=Nodes.SingleTarget( name='a' ), value=Nodes.Load( name='b' ) ) )
-		self._parseStringTest( g.statement(), 'a <<= b', Nodes.AugAssignStmt( op='<<=', target=Nodes.SingleTarget( name='a' ), value=Nodes.Load( name='b' ) ) )
-		self._parseStringTest( g.statement(), 'a &= b', Nodes.AugAssignStmt( op='&=', target=Nodes.SingleTarget( name='a' ), value=Nodes.Load( name='b' ) ) )
-		self._parseStringTest( g.statement(), 'a ^= b', Nodes.AugAssignStmt( op='^=', target=Nodes.SingleTarget( name='a' ), value=Nodes.Load( name='b' ) ) )
-		self._parseStringTest( g.statement(), 'a |= b', Nodes.AugAssignStmt( op='|=', target=Nodes.SingleTarget( name='a' ), value=Nodes.Load( name='b' ) ) )
+		self._parseStringTest( g.singleLineStatementValid(), 'a += b\n', Nodes.AugAssignStmt( op='+=', target=Nodes.SingleTarget( name='a' ), value=Nodes.Load( name='b' ) ) )
+		self._parseStringTest( g.singleLineStatementValid(), 'a -= b\n', Nodes.AugAssignStmt( op='-=', target=Nodes.SingleTarget( name='a' ), value=Nodes.Load( name='b' ) ) )
+		self._parseStringTest( g.singleLineStatementValid(), 'a *= b\n', Nodes.AugAssignStmt( op='*=', target=Nodes.SingleTarget( name='a' ), value=Nodes.Load( name='b' ) ) )
+		self._parseStringTest( g.singleLineStatementValid(), 'a /= b\n', Nodes.AugAssignStmt( op='/=', target=Nodes.SingleTarget( name='a' ), value=Nodes.Load( name='b' ) ) )
+		self._parseStringTest( g.singleLineStatementValid(), 'a %= b\n', Nodes.AugAssignStmt( op='%=', target=Nodes.SingleTarget( name='a' ), value=Nodes.Load( name='b' ) ) )
+		self._parseStringTest( g.singleLineStatementValid(), 'a **= b\n', Nodes.AugAssignStmt( op='**=', target=Nodes.SingleTarget( name='a' ), value=Nodes.Load( name='b' ) ) )
+		self._parseStringTest( g.singleLineStatementValid(), 'a >>= b\n', Nodes.AugAssignStmt( op='>>=', target=Nodes.SingleTarget( name='a' ), value=Nodes.Load( name='b' ) ) )
+		self._parseStringTest( g.singleLineStatementValid(), 'a <<= b\n', Nodes.AugAssignStmt( op='<<=', target=Nodes.SingleTarget( name='a' ), value=Nodes.Load( name='b' ) ) )
+		self._parseStringTest( g.singleLineStatementValid(), 'a &= b\n', Nodes.AugAssignStmt( op='&=', target=Nodes.SingleTarget( name='a' ), value=Nodes.Load( name='b' ) ) )
+		self._parseStringTest( g.singleLineStatementValid(), 'a ^= b\n', Nodes.AugAssignStmt( op='^=', target=Nodes.SingleTarget( name='a' ), value=Nodes.Load( name='b' ) ) )
+		self._parseStringTest( g.singleLineStatementValid(), 'a |= b\n', Nodes.AugAssignStmt( op='|=', target=Nodes.SingleTarget( name='a' ), value=Nodes.Load( name='b' ) ) )
+		self._parseStringTest( g.singleLineStatementValid(), 'a += yield b\n', Nodes.AugAssignStmt( op='+=', target=Nodes.SingleTarget( name='a' ), value=Nodes.YieldExpr( value=Nodes.Load( name='b' ) ) ) )
 
 
 	def testPassStmt(self):
 		g = Python25Grammar()
-		self._parseStringTest( g.statement(), 'pass', Nodes.PassStmt() )
+		self._parseStringTest( g.singleLineStatementValid(), 'pass\n', Nodes.PassStmt() )
 
 
 	def testDelStmt(self):
 		g = Python25Grammar()
-		self._parseStringTest( g.statement(), 'del x', Nodes.DelStmt( target=Nodes.SingleTarget( name='x' ) ) )
+		self._parseStringTest( g.singleLineStatementValid(), 'del x\n', Nodes.DelStmt( target=Nodes.SingleTarget( name='x' ) ) )
 
 
 	def testReturnStmt(self):
 		g = Python25Grammar()
-		self._parseStringTest( g.statement(), 'return x', Nodes.ReturnStmt( value=Nodes.Load( name='x' ) ) )
+		self._parseStringTest( g.singleLineStatementValid(), 'return x\n', Nodes.ReturnStmt( value=Nodes.Load( name='x' ) ) )
 
 
 	def testYieldStmt(self):
 		g = Python25Grammar()
-		self._parseStringTest( g.statement(), 'yield x', Nodes.YieldStmt( value=Nodes.Load( name='x' ) ) )
+		self._parseStringTest( g.singleLineStatementValid(), 'yield x\n', Nodes.YieldStmt( value=Nodes.Load( name='x' ) ) )
 
 
 	def testRaiseStmt(self):
 		g = Python25Grammar()
-		self._parseStringTest( g.statement(), 'raise', Nodes.RaiseStmt( excType=None, excValue=None, traceback=None ) )
-		self._parseStringTest( g.statement(), 'raise x', Nodes.RaiseStmt( excType=Nodes.Load( name='x' ), excValue=None, traceback=None ) )
-		self._parseStringTest( g.statement(), 'raise x,y', Nodes.RaiseStmt( excType=Nodes.Load( name='x' ), excValue=Nodes.Load( name='y' ), traceback=None ) )
-		self._parseStringTest( g.statement(), 'raise x,y,z', Nodes.RaiseStmt( excType=Nodes.Load( name='x' ), excValue=Nodes.Load( name='y' ), traceback=Nodes.Load( name='z' ) ) )
+		self._parseStringTest( g.singleLineStatementValid(), 'raise\n', Nodes.RaiseStmt( excType=None, excValue=None, traceback=None ) )
+		self._parseStringTest( g.singleLineStatementValid(), 'raise x\n', Nodes.RaiseStmt( excType=Nodes.Load( name='x' ), excValue=None, traceback=None ) )
+		self._parseStringTest( g.singleLineStatementValid(), 'raise x,y\n', Nodes.RaiseStmt( excType=Nodes.Load( name='x' ), excValue=Nodes.Load( name='y' ), traceback=None ) )
+		self._parseStringTest( g.singleLineStatementValid(), 'raise x,y,z\n', Nodes.RaiseStmt( excType=Nodes.Load( name='x' ), excValue=Nodes.Load( name='y' ), traceback=Nodes.Load( name='z' ) ) )
 
 
 	def testBreakStmt(self):
 		g = Python25Grammar()
-		self._parseStringTest( g.statement(), 'break', Nodes.BreakStmt() )
+		self._parseStringTest( g.singleLineStatementValid(), 'break\n', Nodes.BreakStmt() )
 
 
 	def testContinueStmt(self):
 		g = Python25Grammar()
-		self._parseStringTest( g.statement(), 'continue', Nodes.ContinueStmt() )
+		self._parseStringTest( g.singleLineStatementValid(), 'continue\n', Nodes.ContinueStmt() )
 
 
 	def testImportStmt(self):
@@ -1372,49 +1644,49 @@ class TestCase_Python25Parser (ParserTestCase):
 		self._parseStringTest( g.relativeModule(), '...', Nodes.RelativeModule( name='...' ) )
 		self._parseStringTest( g.moduleImport(), 'abc.xyz', Nodes.ModuleImport( name='abc.xyz' ) )
 		self._parseStringTest( g.moduleImport(), 'abc.xyz as q', Nodes.ModuleImportAs( name='abc.xyz', asName='q' ) )
-		self._parseStringTest( g.simpleImport(), 'import a', Nodes.ImportStmt( modules=[ Nodes.ModuleImport( name='a' ) ] ) )
-		self._parseStringTest( g.simpleImport(), 'import a.b', Nodes.ImportStmt( modules=[ Nodes.ModuleImport( name='a.b' ) ] ) )
-		self._parseStringTest( g.simpleImport(), 'import a.b as x', Nodes.ImportStmt( modules=[ Nodes.ModuleImportAs( name='a.b', asName='x' ) ] ) )
-		self._parseStringTest( g.simpleImport(), 'import a.b as x, c.d as y', Nodes.ImportStmt( modules=[ Nodes.ModuleImportAs( name='a.b', asName='x' ), Nodes.ModuleImportAs( name='c.d', asName='y' ) ] ) )
+		self._parseStringTest( g.simpleImport(), 'import a\n', Nodes.ImportStmt( modules=[ Nodes.ModuleImport( name='a' ) ] ) )
+		self._parseStringTest( g.simpleImport(), 'import a.b\n', Nodes.ImportStmt( modules=[ Nodes.ModuleImport( name='a.b' ) ] ) )
+		self._parseStringTest( g.simpleImport(), 'import a.b as x\n', Nodes.ImportStmt( modules=[ Nodes.ModuleImportAs( name='a.b', asName='x' ) ] ) )
+		self._parseStringTest( g.simpleImport(), 'import a.b as x, c.d as y\n', Nodes.ImportStmt( modules=[ Nodes.ModuleImportAs( name='a.b', asName='x' ), Nodes.ModuleImportAs( name='c.d', asName='y' ) ] ) )
 		self._parseStringTest( g.moduleContentImport(), 'xyz', Nodes.ModuleContentImport( name='xyz' ) )
 		self._parseStringTest( g.moduleContentImport(), 'xyz as q', Nodes.ModuleContentImportAs( name='xyz', asName='q' ) )
-		self._parseStringTest( g.fromImport(), 'from x import a', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImport( name='a' ) ] ) )
-		self._parseStringTest( g.fromImport(), 'from x import a as p', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ) ] ) )
-		self._parseStringTest( g.fromImport(), 'from x import a as p, b as q', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ), Nodes.ModuleContentImportAs( name='b', asName='q' ) ] ) )
-		self._parseStringTest( g.fromImport(), 'from x import (a)', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImport( name='a' ) ] ) )
-		self._parseStringTest( g.fromImport(), 'from x import (a,)', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImport( name='a' ) ] ) )
-		self._parseStringTest( g.fromImport(), 'from x import (a as p)', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ) ] ) )
-		self._parseStringTest( g.fromImport(), 'from x import (a as p,)', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ) ] ) )
-		self._parseStringTest( g.fromImport(), 'from x import ( a as p, b as q )', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ), Nodes.ModuleContentImportAs( name='b', asName='q' ) ] ) )
-		self._parseStringTest( g.fromImport(), 'from x import ( a as p, b as q, )', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ), Nodes.ModuleContentImportAs( name='b', asName='q' ) ] ) )
-		self._parseStringTest( g.fromImportAll(), 'from x import *', Nodes.FromImportAllStmt( module=Nodes.RelativeModule( name='x' ) ) )
-		self._parseStringTest( g.importStmt(), 'import a', Nodes.ImportStmt( modules=[ Nodes.ModuleImport( name='a' ) ] ) )
-		self._parseStringTest( g.importStmt(), 'import a.b', Nodes.ImportStmt( modules=[ Nodes.ModuleImport( name='a.b' ) ] ) )
-		self._parseStringTest( g.importStmt(), 'import a.b as x', Nodes.ImportStmt( modules=[ Nodes.ModuleImportAs( name='a.b', asName='x' ) ] ) )
-		self._parseStringTest( g.importStmt(), 'import a.b as x, c.d as y', Nodes.ImportStmt( modules=[ Nodes.ModuleImportAs( name='a.b', asName='x' ), Nodes.ModuleImportAs( name='c.d', asName='y' ) ] ) )
-		self._parseStringTest( g.importStmt(), 'from x import a', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImport( name='a' ) ] ) )
-		self._parseStringTest( g.importStmt(), 'from x import a as p', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ) ] ) )
-		self._parseStringTest( g.importStmt(), 'from x import a as p, b as q', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ), Nodes.ModuleContentImportAs( name='b', asName='q' ) ] ) )
-		self._parseStringTest( g.importStmt(), 'from x import (a)', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImport( name='a' ) ] ) )
-		self._parseStringTest( g.importStmt(), 'from x import (a,)', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImport( name='a' ) ] ) )
-		self._parseStringTest( g.importStmt(), 'from x import (a as p)', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ) ] ) )
-		self._parseStringTest( g.importStmt(), 'from x import (a as p,)', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ) ] ) )
-		self._parseStringTest( g.importStmt(), 'from x import ( a as p, b as q )', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ), Nodes.ModuleContentImportAs( name='b', asName='q' ) ] ) )
-		self._parseStringTest( g.importStmt(), 'from x import ( a as p, b as q, )', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ), Nodes.ModuleContentImportAs( name='b', asName='q' ) ] ) )
-		self._parseStringTest( g.importStmt(), 'from x import *', Nodes.FromImportAllStmt( module=Nodes.RelativeModule( name='x' ) ) )
+		self._parseStringTest( g.fromImport(), 'from x import a\n', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImport( name='a' ) ] ) )
+		self._parseStringTest( g.fromImport(), 'from x import a as p\n', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ) ] ) )
+		self._parseStringTest( g.fromImport(), 'from x import a as p, b as q\n', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ), Nodes.ModuleContentImportAs( name='b', asName='q' ) ] ) )
+		self._parseStringTest( g.fromImport(), 'from x import (a)\n', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImport( name='a' ) ] ) )
+		self._parseStringTest( g.fromImport(), 'from x import (a,)\n', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImport( name='a' ) ] ) )
+		self._parseStringTest( g.fromImport(), 'from x import (a as p)\n', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ) ] ) )
+		self._parseStringTest( g.fromImport(), 'from x import (a as p,)\n', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ) ] ) )
+		self._parseStringTest( g.fromImport(), 'from x import ( a as p, b as q )\n', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ), Nodes.ModuleContentImportAs( name='b', asName='q' ) ] ) )
+		self._parseStringTest( g.fromImport(), 'from x import ( a as p, b as q, )\n', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ), Nodes.ModuleContentImportAs( name='b', asName='q' ) ] ) )
+		self._parseStringTest( g.fromImportAll(), 'from x import *\n', Nodes.FromImportAllStmt( module=Nodes.RelativeModule( name='x' ) ) )
+		self._parseStringTest( g.importStmt(), 'import a\n', Nodes.ImportStmt( modules=[ Nodes.ModuleImport( name='a' ) ] ) )
+		self._parseStringTest( g.importStmt(), 'import a.b\n', Nodes.ImportStmt( modules=[ Nodes.ModuleImport( name='a.b' ) ] ) )
+		self._parseStringTest( g.importStmt(), 'import a.b as x\n', Nodes.ImportStmt( modules=[ Nodes.ModuleImportAs( name='a.b', asName='x' ) ] ) )
+		self._parseStringTest( g.importStmt(), 'import a.b as x, c.d as y\n', Nodes.ImportStmt( modules=[ Nodes.ModuleImportAs( name='a.b', asName='x' ), Nodes.ModuleImportAs( name='c.d', asName='y' ) ] ) )
+		self._parseStringTest( g.importStmt(), 'from x import a\n', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImport( name='a' ) ] ) )
+		self._parseStringTest( g.importStmt(), 'from x import a as p\n', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ) ] ) )
+		self._parseStringTest( g.importStmt(), 'from x import a as p, b as q\n', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ), Nodes.ModuleContentImportAs( name='b', asName='q' ) ] ) )
+		self._parseStringTest( g.importStmt(), 'from x import (a)\n', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImport( name='a' ) ] ) )
+		self._parseStringTest( g.importStmt(), 'from x import (a,)\n', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImport( name='a' ) ] ) )
+		self._parseStringTest( g.importStmt(), 'from x import (a as p)\n', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ) ] ) )
+		self._parseStringTest( g.importStmt(), 'from x import (a as p,)\n', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ) ] ) )
+		self._parseStringTest( g.importStmt(), 'from x import ( a as p, b as q )\n', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ), Nodes.ModuleContentImportAs( name='b', asName='q' ) ] ) )
+		self._parseStringTest( g.importStmt(), 'from x import ( a as p, b as q, )\n', Nodes.FromImportStmt( module=Nodes.RelativeModule( name='x' ), imports=[ Nodes.ModuleContentImportAs( name='a', asName='p' ), Nodes.ModuleContentImportAs( name='b', asName='q' ) ] ) )
+		self._parseStringTest( g.importStmt(), 'from x import *\n', Nodes.FromImportAllStmt( module=Nodes.RelativeModule( name='x' ) ) )
 
 
 	def testGlobalStmt(self):
 		g = Python25Grammar()
-		self._parseStringTest( g.statement(), 'global x', Nodes.GlobalStmt( vars=[ Nodes.GlobalVar( name='x' ) ] ) )
-		self._parseStringTest( g.statement(), 'global x, y', Nodes.GlobalStmt( vars=[ Nodes.GlobalVar( name='x' ), Nodes.GlobalVar( name='y' ) ] ) )
+		self._parseStringTest( g.singleLineStatementValid(), 'global x\n', Nodes.GlobalStmt( vars=[ Nodes.GlobalVar( name='x' ) ] ) )
+		self._parseStringTest( g.singleLineStatementValid(), 'global x, y\n', Nodes.GlobalStmt( vars=[ Nodes.GlobalVar( name='x' ), Nodes.GlobalVar( name='y' ) ] ) )
 
 
 	def testExecStmt(self):
 		g = Python25Grammar()
-		self._parseStringTest( g.statement(), 'exec a', Nodes.ExecStmt( source=Nodes.Load( name='a' ), locals=None, globals=None ) )
-		self._parseStringTest( g.statement(), 'exec a in b', Nodes.ExecStmt( source=Nodes.Load( name='a' ), locals=Nodes.Load( name='b' ), globals=None ) )
-		self._parseStringTest( g.statement(), 'exec a in b,c', Nodes.ExecStmt( source=Nodes.Load( name='a' ), locals=Nodes.Load( name='b' ), globals=Nodes.Load( name='c' ) ) )
+		self._parseStringTest( g.singleLineStatementValid(), 'exec a\n', Nodes.ExecStmt( source=Nodes.Load( name='a' ), locals=None, globals=None ) )
+		self._parseStringTest( g.singleLineStatementValid(), 'exec a in b\n', Nodes.ExecStmt( source=Nodes.Load( name='a' ), locals=Nodes.Load( name='b' ), globals=None ) )
+		self._parseStringTest( g.singleLineStatementValid(), 'exec a in b,c\n', Nodes.ExecStmt( source=Nodes.Load( name='a' ), locals=Nodes.Load( name='b' ), globals=Nodes.Load( name='c' ) ) )
 
 
 		
@@ -1425,76 +1697,111 @@ class TestCase_Python25Parser (ParserTestCase):
 		
 	def testIfStmtHeader(self):
 		g = Python25Grammar()
-		self._parseStringTest( g.ifStmtHeader(), 'if a:', Nodes.IfStmtHeader( condition=Nodes.Load( name='a' ) ) )
+		self._parseStringTest( g.ifStmtHeader(), 'if a:\n', Nodes.IfStmtHeader( condition=Nodes.Load( name='a' ) ) )
+		self._parseNodeTest( g.ifStmtHeader(), Nodes.IfStmtHeader( condition=Nodes.Load( name='a' ) ), Nodes.IfStmtHeader( condition=Nodes.Load( name='a' ) ) )
+		self._parseNodeTest( g.compoundStmtHeader(), Nodes.IfStmtHeader( condition=Nodes.Load( name='a' ) ), Nodes.IfStmtHeader( condition=Nodes.Load( name='a' ) ) )
 
 
 	def testElIfStmtHeader(self):
 		g = Python25Grammar()
-		self._parseStringTest( g.elifStmtHeader(), 'elif a:', Nodes.ElifStmtHeader( condition=Nodes.Load( name='a' ) ) )
+		self._parseStringTest( g.elifStmtHeader(), 'elif a:\n', Nodes.ElifStmtHeader( condition=Nodes.Load( name='a' ) ) )
+		self._parseNodeTest( g.elifStmtHeader(), Nodes.ElifStmtHeader( condition=Nodes.Load( name='a' ) ), Nodes.ElifStmtHeader( condition=Nodes.Load( name='a' ) ) )
+		self._parseNodeTest( g.compoundStmtHeader(), Nodes.ElifStmtHeader( condition=Nodes.Load( name='a' ) ), Nodes.ElifStmtHeader( condition=Nodes.Load( name='a' ) ) )
 
 
 	def testElseStmtHeader(self):
 		g = Python25Grammar()
-		self._parseStringTest( g.elseStmtHeader(), 'else:', Nodes.ElseStmtHeader() )
+		self._parseStringTest( g.elseStmtHeader(), 'else:\n', Nodes.ElseStmtHeader() )
+		self._parseNodeTest( g.elseStmtHeader(), Nodes.ElseStmtHeader(), Nodes.ElseStmtHeader() )
+		self._parseNodeTest( g.compoundStmtHeader(), Nodes.ElseStmtHeader(), Nodes.ElseStmtHeader() )
 
 
 	def testWhileStmtHeader(self):
 		g = Python25Grammar()
-		self._parseStringTest( g.whileStmtHeader(), 'while a:', Nodes.WhileStmtHeader( condition=Nodes.Load( name='a' ) ) )
+		self._parseStringTest( g.whileStmtHeader(), 'while a:\n', Nodes.WhileStmtHeader( condition=Nodes.Load( name='a' ) ) )
+		self._parseNodeTest( g.whileStmtHeader(), Nodes.WhileStmtHeader( condition=Nodes.Load( name='a' ) ), Nodes.WhileStmtHeader( condition=Nodes.Load( name='a' ) ) )
+		self._parseNodeTest( g.compoundStmtHeader(), Nodes.WhileStmtHeader( condition=Nodes.Load( name='a' ) ), Nodes.WhileStmtHeader( condition=Nodes.Load( name='a' ) ) )
 
 
 	def testForStmtHeader(self):
 		g = Python25Grammar()
-		self._parseStringTest( g.forStmtHeader(), 'for x in y:', Nodes.ForStmtHeader( target=Nodes.SingleTarget( name='x' ), source=Nodes.Load( name='y' ) ) )
+		self._parseStringTest( g.forStmtHeader(), 'for x in y:\n', Nodes.ForStmtHeader( target=Nodes.SingleTarget( name='x' ), source=Nodes.Load( name='y' ) ) )
+		self._parseNodeTest( g.forStmtHeader(), Nodes.ForStmtHeader( target=Nodes.SingleTarget( name='x' ), source=Nodes.Load( name='y' ) ),
+				     Nodes.ForStmtHeader( target=Nodes.SingleTarget( name='x' ), source=Nodes.Load( name='y' ) ) )
+		self._parseNodeTest( g.compoundStmtHeader(), Nodes.ForStmtHeader( target=Nodes.SingleTarget( name='x' ), source=Nodes.Load( name='y' ) ),
+				     Nodes.ForStmtHeader( target=Nodes.SingleTarget( name='x' ), source=Nodes.Load( name='y' ) ) )
 
 
 	def testTryStmtHeader(self):
 		g = Python25Grammar()
-		self._parseStringTest( g.tryStmtHeader(), 'try:', Nodes.TryStmtHeader() )
+		self._parseStringTest( g.tryStmtHeader(), 'try:\n', Nodes.TryStmtHeader() )
+		self._parseNodeTest( g.tryStmtHeader(), Nodes.TryStmtHeader(), Nodes.TryStmtHeader() )
+		self._parseNodeTest( g.compoundStmtHeader(), Nodes.TryStmtHeader(), Nodes.TryStmtHeader() )
 
 
 	def testExceptStmtHeader(self):
 		g = Python25Grammar()
-		self._parseStringTest( g.exceptStmtHeader(), 'except:', Nodes.ExceptStmtHeader( exception=None, target=None ) )
-		self._parseStringTest( g.exceptStmtHeader(), 'except x:', Nodes.ExceptStmtHeader( exception=Nodes.Load( name='x' ), target=None ) )
-		self._parseStringTest( g.exceptStmtHeader(), 'except x, y:', Nodes.ExceptStmtHeader( exception=Nodes.Load( name='x' ), target=Nodes.SingleTarget( name='y' ) ) )
+		self._parseStringTest( g.exceptStmtHeader(), 'except:\n', Nodes.ExceptStmtHeader( exception=None, target=None ) )
+		self._parseStringTest( g.exceptStmtHeader(), 'except x:\n', Nodes.ExceptStmtHeader( exception=Nodes.Load( name='x' ), target=None ) )
+		self._parseStringTest( g.exceptStmtHeader(), 'except x, y:\n', Nodes.ExceptStmtHeader( exception=Nodes.Load( name='x' ), target=Nodes.SingleTarget( name='y' ) ) )
+		self._parseNodeTest( g.exceptStmtHeader(), Nodes.ExceptStmtHeader( exception=None, target=None ), Nodes.ExceptStmtHeader( exception=None, target=None ) )
+		self._parseNodeTest( g.compoundStmtHeader(), Nodes.ExceptStmtHeader( exception=None, target=None ), Nodes.ExceptStmtHeader( exception=None, target=None ) )
 
 
 	def testFinallyStmtHeader(self):
 		g = Python25Grammar()
-		self._parseStringTest( g.finallyStmtHeader(), 'finally:', Nodes.FinallyStmtHeader() )
+		self._parseStringTest( g.finallyStmtHeader(), 'finally:\n', Nodes.FinallyStmtHeader() )
+		self._parseNodeTest( g.finallyStmtHeader(), Nodes.FinallyStmtHeader(), Nodes.FinallyStmtHeader() )
+		self._parseNodeTest( g.compoundStmtHeader(), Nodes.FinallyStmtHeader(), Nodes.FinallyStmtHeader() )
 
 
 	def testWithStmtHeader(self):
 		g = Python25Grammar()
-		self._parseStringTest( g.withStmtHeader(), 'with a:', Nodes.WithStmtHeader( expr=Nodes.Load( name='a' ), target=None ) )
-		self._parseStringTest( g.withStmtHeader(), 'with a as b:', Nodes.WithStmtHeader( expr=Nodes.Load( name='a' ), target=Nodes.SingleTarget( name='b' ) ) )
+		self._parseStringTest( g.withStmtHeader(), 'with a:\n', Nodes.WithStmtHeader( expr=Nodes.Load( name='a' ), target=None ) )
+		self._parseStringTest( g.withStmtHeader(), 'with a as b:\n', Nodes.WithStmtHeader( expr=Nodes.Load( name='a' ), target=Nodes.SingleTarget( name='b' ) ) )
+		self._parseNodeTest( g.withStmtHeader(), Nodes.WithStmtHeader( expr=Nodes.Load( name='a' ), target=None ), Nodes.WithStmtHeader( expr=Nodes.Load( name='a' ), target=None ) )
+		self._parseNodeTest( g.compoundStmtHeader(), Nodes.WithStmtHeader( expr=Nodes.Load( name='a' ), target=None ), Nodes.WithStmtHeader( expr=Nodes.Load( name='a' ), target=None ) )
 
 
 	def testDecoStmtHeader(self):
 		g = Python25Grammar()
-		self._parseStringTest( g.decoStmtHeader(), '@f', Nodes.DecoStmtHeader( name='f', args=None ) )
-		self._parseStringTest( g.decoStmtHeader(), '@f(x)', Nodes.DecoStmtHeader( name='f', args=[ Nodes.Load( name='x' ) ] ) )
+		self._parseStringTest( g.decoStmtHeader(), '@f\n', Nodes.DecoStmtHeader( name='f', args=None ) )
+		self._parseStringTest( g.decoStmtHeader(), '@f(x)\n', Nodes.DecoStmtHeader( name='f', args=[ Nodes.Load( name='x' ) ] ) )
+		self._parseNodeTest( g.decoStmtHeader(), Nodes.DecoStmtHeader( name='f', args=None ), Nodes.DecoStmtHeader( name='f', args=None ) )
+		self._parseNodeTest( g.compoundStmtHeader(), Nodes.DecoStmtHeader( name='f', args=None ), Nodes.DecoStmtHeader( name='f', args=None ) )
 
 
 	def testDefStmtHeader(self):
 		g = Python25Grammar()
-		self._parseStringTest( g.defStmtHeader(), 'def f():', Nodes.DefStmtHeader( name='f', params=[] ) )
-		self._parseStringTest( g.defStmtHeader(), 'def f(x):', Nodes.DefStmtHeader( name='f', params=[ Nodes.SimpleParam( name='x' ) ] ) )
+		self._parseStringTest( g.defStmtHeader(), 'def f():\n', Nodes.DefStmtHeader( name='f', params=[] ) )
+		self._parseStringTest( g.defStmtHeader(), 'def f(x):\n', Nodes.DefStmtHeader( name='f', params=[ Nodes.SimpleParam( name='x' ) ] ) )
+		self._parseNodeTest( g.defStmtHeader(), Nodes.DefStmtHeader( name='f', params=[] ), Nodes.DefStmtHeader( name='f', params=[] ) )
+		self._parseNodeTest( g.compoundStmtHeader(), Nodes.DefStmtHeader( name='f', params=[] ), Nodes.DefStmtHeader( name='f', params=[] ) )
 
 
 	def testClassStmtHeader(self):
 		g = Python25Grammar()
-		self._parseStringTest( g.classStmtHeader(), 'class Q:', Nodes.ClassStmtHeader( name='Q', bases=None ) )
-		self._parseStringTest( g.classStmtHeader(), 'class Q (x):', Nodes.ClassStmtHeader( name='Q', bases=[ Nodes.Load( name='x' ) ] ) )
-		self._parseStringTest( g.classStmtHeader(), 'class Q (x,):', Nodes.ClassStmtHeader( name='Q', bases=[ Nodes.Load( name='x' ) ], basesTrailingSeparator='1' ) )
-		self._parseStringTest( g.classStmtHeader(), 'class Q (x,y):', Nodes.ClassStmtHeader( name='Q', bases=[ Nodes.Load( name='x' ), Nodes.Load( name='y' ) ] ) )
+		self._parseStringTest( g.classStmtHeader(), 'class Q:\n', Nodes.ClassStmtHeader( name='Q', bases=None ) )
+		self._parseStringTest( g.classStmtHeader(), 'class Q (x):\n', Nodes.ClassStmtHeader( name='Q', bases=[ Nodes.Load( name='x' ) ] ) )
+		self._parseStringTest( g.classStmtHeader(), 'class Q (x,):\n', Nodes.ClassStmtHeader( name='Q', bases=[ Nodes.Load( name='x' ) ], basesTrailingSeparator='1' ) )
+		self._parseStringTest( g.classStmtHeader(), 'class Q (x,y):\n', Nodes.ClassStmtHeader( name='Q', bases=[ Nodes.Load( name='x' ), Nodes.Load( name='y' ) ] ) )
+		self._parseNodeTest( g.classStmtHeader(), Nodes.ClassStmtHeader( name='Q', bases=[ Nodes.Load( name='x' ), Nodes.Load( name='y' ) ] ),
+				     Nodes.ClassStmtHeader( name='Q', bases=[ Nodes.Load( name='x' ), Nodes.Load( name='y' ) ] ) )
+		self._parseNodeTest( g.compoundStmtHeader(), Nodes.ClassStmtHeader( name='Q', bases=[ Nodes.Load( name='x' ), Nodes.Load( name='y' ) ] ),
+				     Nodes.ClassStmtHeader( name='Q', bases=[ Nodes.Load( name='x' ), Nodes.Load( name='y' ) ] ) )
 
 
 	def testCommentStmt(self):
 		g = Python25Grammar()
-		self._parseStringTest( g.commentStmt(), '#x', Nodes.CommentStmt( comment='x' ) )
-		self._parseStringTest( g.commentStmt(), '#' + string.printable, Nodes.CommentStmt( comment=string.printable ) )
+		self._parseStringTest( g.commentStmt(), '#x\n', Nodes.CommentStmt( comment='x' ) )
+		self._parseStringTest( g.commentStmt(), '#' + string.printable.replace( '\n', '' ) + '\n', Nodes.CommentStmt( comment=string.printable.replace( '\n', '' ) ) )
+		self._parseNodeTest( g.commentStmt(), Nodes.CommentStmt( comment=string.printable.replace( '\n', '' ) ), Nodes.CommentStmt( comment=string.printable.replace( '\n', '' ) ) )
+
+
+
+	def testBlankLine(self):
+		g = Python25Grammar()
+		self._parseStringTest( g.blankLine(), '\n', Nodes.BlankLine() )
 
 
 
@@ -1503,16 +1810,489 @@ class TestCase_Python25Parser (ParserTestCase):
 	def testFnCallStStmt(self):
 		g = Python25Grammar()
 		self._parseStringTest( g.expression(), 'x.y()', Nodes.Call( target=Nodes.AttributeRef( target=Nodes.Load( name='x' ), name='y' ), args=[] ) )
-		self._parseStringTest( g.statement(), 'x.y()', Nodes.ExprStmt( expr=Nodes.Call( target=Nodes.AttributeRef( target=Nodes.Load( name='x' ), name='y' ), args=[] ) ) )
+		self._parseStringTest( g.singleLineStatementValid(), 'x.y()\n', Nodes.ExprStmt( expr=Nodes.Call( target=Nodes.AttributeRef( target=Nodes.Load( name='x' ), name='y' ), args=[] ) ) )
+		self._parseNodeTest( g.singleLineStatementValid(), Nodes.ExprStmt( expr=Nodes.Call( target=Nodes.AttributeRef( target=Nodes.Load( name='x' ), name='y' ), args=[] ) ),
+				     Nodes.ExprStmt( expr=Nodes.Call( target=Nodes.AttributeRef( target=Nodes.Load( name='x' ), name='y' ), args=[] ) ) )
 
 
 
 
 	def testDictInList(self):
 		g = Python25Grammar()
-		self._parseStringTest( g.statement(), 'y = [ x, { a : b } ]', Nodes.AssignStmt( targets=[ Nodes.SingleTarget( name='y' ) ], value=Nodes.ListLiteral( values=[ Nodes.Load( name='x' ), Nodes.DictLiteral( values=[ Nodes.DictKeyValuePair( key=Nodes.Load( name='a' ), value=Nodes.Load( name='b' ) ) ] ) ] ) ) )
+		self._parseStringTest( g.singleLineStatementValid(), 'y = [ x, { a : b } ]\n', Nodes.AssignStmt( targets=[ Nodes.SingleTarget( name='y' ) ], value=Nodes.ListLiteral( values=[ Nodes.Load( name='x' ), Nodes.DictLiteral( values=[ Nodes.DictKeyValuePair( key=Nodes.Load( name='a' ), value=Nodes.Load( name='b' ) ) ] ) ] ) ) )
+		
+		
+		
+		
+	def test_unparsed(self):
+		g = Python25Grammar()
+		self._parseStringTest( g.singleLineStatement(), 'foo bar xyz\n', Nodes.UNPARSED( value=[ 'foo bar xyz' ] ) )
+		
 
 
+		
+		
+		
+	def test_emptyIndentedSuite(self):
+		g = Python25Grammar()
+		self._parseListTest( g.emptyIndentedSuite(),
+				     [
+					     Nodes.Indent(),
+					     Nodes.Dedent(), ],
+				     [
+					     Nodes.Indent(),
+					     Nodes.Dedent(), ] )
+
+		
+	def test_singleIndentedSuite(self):
+		g = Python25Grammar()
+		self._parseListTest( g.singleIndentedSuite(),
+				     [
+					     Nodes.Indent(),
+					     Nodes.ContinueStmt(),
+					     Nodes.Dedent(), ],
+				     [ Nodes.ContinueStmt() ] )
+		self._parseListTest( g.singleIndentedSuite(),
+				     [
+					     Nodes.IndentedBlock( suite=[ Nodes.ContinueStmt() ] ), ],
+				     [ Nodes.ContinueStmt() ] )
+
+		
+	def test_compoundSuite(self):
+		g = Python25Grammar()
+		self._parseListTest( g.compoundSuite(),
+				     [
+					     Nodes.Indent(),
+					     Nodes.ContinueStmt(),
+					     Nodes.Dedent(), ],
+				     [ Nodes.ContinueStmt() ] )
+		self._parseListTest( g.compoundSuite(),
+				     [
+					     Nodes.Indent(),
+					     Nodes.ContinueStmt(),
+					     Nodes.Dedent(),
+					     Nodes.Indent(),
+					     Nodes.BreakStmt(),
+					     Nodes.Dedent(), ],
+				     [ Nodes.ContinueStmt(), Nodes.BreakStmt() ] )
+		self._parseListTest( g.compoundSuite(),
+				     [
+					     Nodes.Indent(),
+					     Nodes.ContinueStmt(),
+					     Nodes.Dedent(),
+					     Nodes.IndentedBlock( suite=[ Nodes.BreakStmt() ] ), ],
+				     [ Nodes.ContinueStmt(), Nodes.BreakStmt() ] )
+
+		
+		
+	def test_indentedBlock(self):
+		g = Python25Grammar()
+		self._parseListTest( g.suiteItem(),
+				     [
+					     Nodes.Indent(),
+					     	Nodes.BlankLine(),
+					     Nodes.Dedent() ],
+				     Nodes.IndentedBlock( suite=[ Nodes.BlankLine() ] ) )
+
+
+		
+	def test_ifStmt(self):
+		g = Python25Grammar()
+		self._parseListTest( g.suiteItem(),
+				     [
+					     Nodes.IfStmtHeader( condition=Nodes.Load( name='a' ) ),
+					     Nodes.Indent(),
+					     	Nodes.BlankLine(),
+					     Nodes.Dedent() ],
+				     Nodes.IfStmt( condition=Nodes.Load( name='a' ), suite=[ Nodes.BlankLine() ], elifBlocks=[] ) )
+		self._parseListTest( g.suiteItem(),
+				     [
+					     Nodes.IfStmtHeader( condition=Nodes.Load( name='a' ) ),
+					     Nodes.Indent(),
+					     	Nodes.BlankLine(),
+					     Nodes.Dedent(),
+					     Nodes.ElseStmtHeader(),
+					     Nodes.Indent(),
+					     	Nodes.CommentStmt( comment='x' ),
+					     Nodes.Dedent() ],
+				     Nodes.IfStmt( condition=Nodes.Load( name='a' ), suite=[ Nodes.BlankLine() ], elifBlocks=[], elseSuite=[ Nodes.CommentStmt( comment='x' ) ] ) )
+		self._parseListTest( g.suiteItem(),
+				     [
+					     Nodes.IfStmtHeader( condition=Nodes.Load( name='a' ) ),
+					     Nodes.Indent(),
+					     	Nodes.BlankLine(),
+					     Nodes.Dedent(),
+					     Nodes.ElifStmtHeader( condition=Nodes.Load( name='b' ) ),
+					     Nodes.Indent(),
+					     	Nodes.CommentStmt( comment='y' ),
+					     Nodes.Dedent() ],
+				     Nodes.IfStmt( condition=Nodes.Load( name='a' ), suite=[ Nodes.BlankLine() ], elifBlocks=[ Nodes.ElifBlock( condition=Nodes.Load( name='b' ), suite=[ Nodes.CommentStmt( comment='y' ) ] ) ] ) )
+		self._parseListTest( g.suiteItem(),
+				     [
+					     Nodes.IfStmt( condition=Nodes.Load( name='a' ), suite=[ Nodes.BreakStmt() ], elifBlocks=[] ),
+					     Nodes.ElifStmtHeader( condition=Nodes.Load( name='b' ) ),
+					     Nodes.Indent(),
+					     	Nodes.CommentStmt( comment='y' ),
+					     Nodes.Dedent() ],
+				     Nodes.IfStmt( condition=Nodes.Load( name='a' ), suite=[ Nodes.BreakStmt() ], elifBlocks=[ Nodes.ElifBlock( condition=Nodes.Load( name='b' ), suite=[ Nodes.CommentStmt( comment='y' ) ] ) ] ) )
+		self._parseListTest( g.suiteItem(),
+				     [
+					     Nodes.IfStmt( condition=Nodes.Load( name='a' ), suite=[ Nodes.BlankLine() ], elifBlocks=[ Nodes.ElifBlock( condition=Nodes.Load( name='b' ), suite=[ Nodes.CommentStmt( comment='y' ) ] ) ] ),
+					     Nodes.ElseStmtHeader(),
+					     Nodes.Indent(),
+					     	Nodes.CommentStmt( comment='z' ),
+					     Nodes.Dedent() ],
+				     Nodes.IfStmt( condition=Nodes.Load( name='a' ), suite=[ Nodes.BlankLine() ], elifBlocks=[ Nodes.ElifBlock( condition=Nodes.Load( name='b' ), suite=[ Nodes.CommentStmt( comment='y' ) ] ) ],
+						   elseSuite=[ Nodes.CommentStmt( comment='z' ) ]) )
+
+		
+	def test_whileStmt(self):
+		g = Python25Grammar()
+		self._parseListTest( g.suiteItem(),
+				     [
+					     Nodes.WhileStmtHeader( condition=Nodes.Load( name='a' ) ),
+					     Nodes.Indent(),
+					     	Nodes.BlankLine(),
+					     Nodes.Dedent() ],
+				     Nodes.WhileStmt( condition=Nodes.Load( name='a' ), suite=[ Nodes.BlankLine() ] ) )
+		self._parseListTest( g.suiteItem(),
+				     [
+					     Nodes.WhileStmtHeader( condition=Nodes.Load( name='a' ) ),
+					     Nodes.Indent(),
+					     	Nodes.BlankLine(),
+					     Nodes.Dedent(),
+					     Nodes.ElseStmtHeader(),
+					     Nodes.Indent(),
+					     	Nodes.CommentStmt( comment='x' ),
+					     Nodes.Dedent() ],
+				     Nodes.WhileStmt( condition=Nodes.Load( name='a' ), suite=[ Nodes.BlankLine() ], elseSuite=[ Nodes.CommentStmt( comment='x' ) ] ) )
+		self._parseListTest( g.suiteItem(),
+				     [
+					     Nodes.WhileStmt( condition=Nodes.Load( name='a' ), suite=[ Nodes.BlankLine() ] ),
+					     Nodes.ElseStmtHeader(),
+					     Nodes.Indent(),
+					     	Nodes.CommentStmt( comment='x' ),
+					     Nodes.Dedent() ],
+				     Nodes.WhileStmt( condition=Nodes.Load( name='a' ), suite=[ Nodes.BlankLine() ], elseSuite=[ Nodes.CommentStmt( comment='x' ) ] ) )
+	
+		
+	def test_forStmt(self):
+		g = Python25Grammar()
+		self._parseListTest( g.suiteItem(),
+				     [
+					     Nodes.ForStmtHeader( target=Nodes.SingleTarget( name='a' ), source=Nodes.Load( name='x' ) ),
+					     Nodes.Indent(),
+					     	Nodes.BlankLine(),
+					     Nodes.Dedent() ],
+				     Nodes.ForStmt( target=Nodes.SingleTarget( name='a' ), source=Nodes.Load( name='x' ), suite=[ Nodes.BlankLine() ] ) )
+		self._parseListTest( g.suiteItem(),
+				     [
+					     Nodes.ForStmtHeader( target=Nodes.SingleTarget( name='a' ), source=Nodes.Load( name='x' ) ),
+					     Nodes.Indent(),
+					     	Nodes.BlankLine(),
+					     Nodes.Dedent(),
+					     Nodes.ElseStmtHeader(),
+					     Nodes.Indent(),
+					     	Nodes.CommentStmt( comment='x' ),
+					     Nodes.Dedent() ],
+				     Nodes.ForStmt( target=Nodes.SingleTarget( name='a' ), source=Nodes.Load( name='x' ), suite=[ Nodes.BlankLine() ], elseSuite=[ Nodes.CommentStmt( comment='x' ) ] ) )
+		self._parseListTest( g.suiteItem(),
+				     [
+					     Nodes.ForStmt( target=Nodes.SingleTarget( name='a' ), source=Nodes.Load( name='x' ), suite=[ Nodes.BlankLine() ] ),
+					     Nodes.ElseStmtHeader(),
+					     Nodes.Indent(),
+					     	Nodes.CommentStmt( comment='x' ),
+					     Nodes.Dedent() ],
+				     Nodes.ForStmt( target=Nodes.SingleTarget( name='a' ), source=Nodes.Load( name='x' ), suite=[ Nodes.BlankLine() ], elseSuite=[ Nodes.CommentStmt( comment='x' ) ] ) )
+
+		
+	def test_tryStmt(self):
+		g = Python25Grammar()
+		self._parseListTest( g.suiteItem(),
+				     [
+					     Nodes.TryStmtHeader(),
+					     Nodes.Indent(),
+					     	Nodes.BlankLine(),
+					     Nodes.Dedent(),
+					     Nodes.FinallyStmtHeader(),
+					     Nodes.Indent(),
+					     	Nodes.CommentStmt( comment='x' ),
+					     Nodes.Dedent() ],
+				     Nodes.TryStmt( suite=[ Nodes.BlankLine() ], exceptBlocks=[], finallySuite=[ Nodes.CommentStmt( comment='x' ) ] ) )
+		self._parseListTest( g.suiteItem(),
+				     [
+					     Nodes.TryStmtHeader(),
+					     Nodes.Indent(),
+					     	Nodes.BlankLine(),
+					     Nodes.Dedent(),
+					     Nodes.ExceptStmtHeader( exception=Nodes.Load( name='j' ), target=Nodes.SingleTarget( name='p' ) ),
+					     Nodes.Indent(),
+					     	Nodes.CommentStmt( comment='x' ),
+					     Nodes.Dedent() ],
+				     Nodes.TryStmt( suite=[ Nodes.BlankLine() ], exceptBlocks=[ Nodes.ExceptBlock( exception=Nodes.Load( name='j' ), target=Nodes.SingleTarget( name='p' ), suite=[ Nodes.CommentStmt( comment='x' ) ] ) ] ) )
+		self._parseListTest( g.suiteItem(),
+				     [
+					     Nodes.TryStmtHeader(),
+					     Nodes.Indent(),
+					     	Nodes.BlankLine(),
+					     Nodes.Dedent(),
+					     Nodes.ExceptStmtHeader( exception=Nodes.Load( name='j' ), target=Nodes.SingleTarget( name='p' ) ),
+					     Nodes.Indent(),
+					     	Nodes.CommentStmt( comment='x' ),
+					     Nodes.Dedent(),
+					     Nodes.ExceptStmtHeader( exception=Nodes.Load( name='k' ), target=Nodes.SingleTarget( name='q' ) ),
+					     Nodes.Indent(),
+					     	Nodes.CommentStmt( comment='y' ),
+					     Nodes.Dedent() ],
+				     Nodes.TryStmt( suite=[ Nodes.BlankLine() ], exceptBlocks=[ Nodes.ExceptBlock( exception=Nodes.Load( name='j' ), target=Nodes.SingleTarget( name='p' ), suite=[ Nodes.CommentStmt( comment='x' ) ] ),
+												Nodes.ExceptBlock( exception=Nodes.Load( name='k' ), target=Nodes.SingleTarget( name='q' ), suite=[ Nodes.CommentStmt( comment='y' ) ] )] ) )
+		self._parseListTest( g.suiteItem(),
+				     [
+					     Nodes.TryStmtHeader(),
+					     Nodes.Indent(),
+					     	Nodes.BlankLine(),
+					     Nodes.Dedent(),
+					     Nodes.ExceptStmtHeader( exception=Nodes.Load( name='j' ), target=Nodes.SingleTarget( name='p' ) ),
+					     Nodes.Indent(),
+					     	Nodes.CommentStmt( comment='x' ),
+					     Nodes.Dedent(),
+					     Nodes.ElseStmtHeader(),
+					     Nodes.Indent(),
+					     	Nodes.CommentStmt( comment='y' ),
+					     Nodes.Dedent() ],
+				     Nodes.TryStmt( suite=[ Nodes.BlankLine() ], exceptBlocks=[ Nodes.ExceptBlock( exception=Nodes.Load( name='j' ), target=Nodes.SingleTarget( name='p' ), suite=[ Nodes.CommentStmt( comment='x' ) ] ) ],
+						    elseSuite=[ Nodes.CommentStmt( comment='y' ) ] ) )
+		self._parseListTest( g.suiteItem(),
+				     [
+					     Nodes.TryStmtHeader(),
+					     Nodes.Indent(),
+					     	Nodes.BlankLine(),
+					     Nodes.Dedent(),
+					     Nodes.ExceptStmtHeader( exception=Nodes.Load( name='j' ), target=Nodes.SingleTarget( name='p' ) ),
+					     Nodes.Indent(),
+					     	Nodes.CommentStmt( comment='x' ),
+					     Nodes.Dedent(),
+					     Nodes.FinallyStmtHeader(),
+					     Nodes.Indent(),
+					     	Nodes.CommentStmt( comment='y' ),
+					     Nodes.Dedent() ],
+				     Nodes.TryStmt( suite=[ Nodes.BlankLine() ], exceptBlocks=[ Nodes.ExceptBlock( exception=Nodes.Load( name='j' ), target=Nodes.SingleTarget( name='p' ), suite=[ Nodes.CommentStmt( comment='x' ) ] ) ],
+						    finallySuite=[ Nodes.CommentStmt( comment='y' ) ] ) )
+		self._parseListTest( g.suiteItem(),
+				     [
+					     Nodes.TryStmtHeader(),
+					     Nodes.Indent(),
+					     	Nodes.BlankLine(),
+					     Nodes.Dedent(),
+					     Nodes.ExceptStmtHeader( exception=Nodes.Load( name='j' ), target=Nodes.SingleTarget( name='p' ) ),
+					     Nodes.Indent(),
+					     	Nodes.CommentStmt( comment='x' ),
+					     Nodes.Dedent(),
+					     Nodes.ElseStmtHeader(),
+					     Nodes.Indent(),
+					     	Nodes.CommentStmt( comment='y' ),
+					     Nodes.Dedent(),
+					     Nodes.FinallyStmtHeader(),
+					     Nodes.Indent(),
+					     	Nodes.CommentStmt( comment='z' ),
+					     Nodes.Dedent() ],
+				     Nodes.TryStmt( suite=[ Nodes.BlankLine() ], exceptBlocks=[ Nodes.ExceptBlock( exception=Nodes.Load( name='j' ), target=Nodes.SingleTarget( name='p' ), suite=[ Nodes.CommentStmt( comment='x' ) ] ) ],
+						    elseSuite=[ Nodes.CommentStmt( comment='y' ) ], finallySuite=[ Nodes.CommentStmt( comment='z' ) ] ) )
+
+		self._parseListFailTest( g.suiteItem(),
+				     [
+					     Nodes.TryStmtHeader(),
+					     Nodes.Indent(),
+					     	Nodes.BlankLine(),
+					     Nodes.Dedent() ] )
+		self._parseListFailTest( g.suiteItem(),
+				     [
+					     Nodes.TryStmtHeader(),
+					     Nodes.Indent(),
+					     	Nodes.BlankLine(),
+					     Nodes.Dedent(),
+					     Nodes.ElseStmtHeader(),
+					     Nodes.Indent(),
+					     	Nodes.CommentStmt( comment='y' ),
+					     Nodes.Dedent() ] )
+
+		# Try with 1 except block, add another
+		self._parseListTest( g.suiteItem(),
+				     [
+					     Nodes.TryStmt( suite=[ Nodes.BlankLine() ],
+							    exceptBlocks=[ Nodes.ExceptBlock( exception=Nodes.Load( name='j' ), target=Nodes.SingleTarget( name='p' ), suite=[ Nodes.CommentStmt( comment='x' ) ] ) ] ),
+					     Nodes.ExceptStmtHeader( exception=Nodes.Load( name='k' ), target=Nodes.SingleTarget( name='q' ) ),
+					     Nodes.Indent(),
+					     	Nodes.CommentStmt( comment='x' ),
+					     Nodes.Dedent() ],
+				     Nodes.TryStmt( suite=[ Nodes.BlankLine() ], exceptBlocks=[ Nodes.ExceptBlock( exception=Nodes.Load( name='j' ), target=Nodes.SingleTarget( name='p' ), suite=[ Nodes.CommentStmt( comment='x' ) ] ),
+												Nodes.ExceptBlock( exception=Nodes.Load( name='k' ), target=Nodes.SingleTarget( name='q' ), suite=[ Nodes.CommentStmt( comment='x' ) ] ) ] ) )
+		# Try with 1 except block, add an else
+		self._parseListTest( g.suiteItem(),
+				     [
+					     Nodes.TryStmt( suite=[ Nodes.BlankLine() ],
+							    exceptBlocks=[ Nodes.ExceptBlock( exception=Nodes.Load( name='j' ), target=Nodes.SingleTarget( name='p' ), suite=[ Nodes.CommentStmt( comment='x' ) ] ) ] ),
+					     Nodes.ElseStmtHeader(),
+					     Nodes.Indent(),
+					     	Nodes.CommentStmt( comment='y' ),
+					     Nodes.Dedent() ],
+				     Nodes.TryStmt( suite=[ Nodes.BlankLine() ], exceptBlocks=[ Nodes.ExceptBlock( exception=Nodes.Load( name='j' ), target=Nodes.SingleTarget( name='p' ), suite=[ Nodes.CommentStmt( comment='x' ) ] ) ],
+						    elseSuite=[ Nodes.CommentStmt( comment='y' ) ] ) )
+		# Try with 1 except block, add a finally
+		self._parseListTest( g.suiteItem(),
+				     [
+					     Nodes.TryStmt( suite=[ Nodes.BlankLine() ],
+							    exceptBlocks=[ Nodes.ExceptBlock( exception=Nodes.Load( name='j' ), target=Nodes.SingleTarget( name='p' ), suite=[ Nodes.CommentStmt( comment='x' ) ] ) ] ),
+					     Nodes.FinallyStmtHeader(),
+					     Nodes.Indent(),
+					     	Nodes.CommentStmt( comment='y' ),
+					     Nodes.Dedent() ],
+				     Nodes.TryStmt( suite=[ Nodes.BlankLine() ], exceptBlocks=[ Nodes.ExceptBlock( exception=Nodes.Load( name='j' ), target=Nodes.SingleTarget( name='p' ), suite=[ Nodes.CommentStmt( comment='x' ) ] ) ],
+						    finallySuite=[ Nodes.CommentStmt( comment='y' ) ] ) )
+		# Try with 1 except block, add an else and a finally
+		self._parseListTest( g.suiteItem(),
+				     [
+					     Nodes.TryStmt( suite=[ Nodes.BlankLine() ],
+							    exceptBlocks=[ Nodes.ExceptBlock( exception=Nodes.Load( name='j' ), target=Nodes.SingleTarget( name='p' ), suite=[ Nodes.CommentStmt( comment='x' ) ] ) ] ),
+					     Nodes.ElseStmtHeader(),
+					     Nodes.Indent(),
+					     	Nodes.CommentStmt( comment='y' ),
+					     Nodes.Dedent(),
+					     Nodes.FinallyStmtHeader(),
+					     Nodes.Indent(),
+					     	Nodes.CommentStmt( comment='z' ),
+					     Nodes.Dedent() ],
+				     Nodes.TryStmt( suite=[ Nodes.BlankLine() ], exceptBlocks=[ Nodes.ExceptBlock( exception=Nodes.Load( name='j' ), target=Nodes.SingleTarget( name='p' ), suite=[ Nodes.CommentStmt( comment='x' ) ] ) ],
+						    elseSuite=[ Nodes.CommentStmt( comment='y' ) ],  finallySuite=[ Nodes.CommentStmt( comment='z' ) ] ) )
+		
+		
+	def test_withStmt(self):
+		g = Python25Grammar()
+		self._parseListTest( g.suiteItem(),
+				     [
+					     Nodes.WithStmtHeader( expr=Nodes.SingleTarget( name='a' ), target=Nodes.Load( name='x' ) ),
+					     Nodes.Indent(),
+					     	Nodes.BlankLine(),
+					     Nodes.Dedent() ],
+				     Nodes.WithStmt( expr=Nodes.SingleTarget( name='a' ), target=Nodes.Load( name='x' ), suite=[ Nodes.BlankLine() ] ) )
+	
+		
+	def test_defStmt(self):
+		g = Python25Grammar()
+		self._parseListTest( g.suiteItem(),
+				     [
+					     Nodes.DefStmtHeader( name='f', params=[ Nodes.SimpleParam( name='x' ) ] ),
+					     Nodes.Indent(),
+					     	Nodes.BlankLine(),
+					     Nodes.Dedent() ],
+				     Nodes.DefStmt( decorators=[], name='f', params=[ Nodes.SimpleParam( name='x' ) ], suite=[ Nodes.BlankLine() ] ) )
+		self._parseListTest( g.suiteItem(),
+				     [
+					     Nodes.DecoStmtHeader( name='a', args=[ Nodes.Load( name='x' ) ] ),
+					     Nodes.DefStmtHeader( name='f', params=[ Nodes.SimpleParam( name='x' ) ] ),
+					     Nodes.Indent(),
+					     	Nodes.BlankLine(),
+					     Nodes.Dedent() ],
+				     Nodes.DefStmt( decorators=[ Nodes.Decorator( name='a', args=[ Nodes.Load( name='x' ) ] ) ], name='f', params=[ Nodes.SimpleParam( name='x' ) ], suite=[ Nodes.BlankLine() ] ) )
+		self._parseListTest( g.suiteItem(),
+				     [
+					     Nodes.DecoStmtHeader( name='a', args=[ Nodes.Load( name='x' ) ] ),
+					     Nodes.DecoStmtHeader( name='b', args=[ Nodes.Load( name='y' ) ] ),
+					     Nodes.DefStmtHeader( name='f', params=[ Nodes.SimpleParam( name='x' ) ] ),
+					     Nodes.Indent(),
+					     	Nodes.BlankLine(),
+					     Nodes.Dedent() ],
+				     Nodes.DefStmt( decorators=[ Nodes.Decorator( name='a', args=[ Nodes.Load( name='x' ) ] ), Nodes.Decorator( name='b', args=[ Nodes.Load( name='y' ) ] ) ],
+						    name='f', params=[ Nodes.SimpleParam( name='x' ) ], suite=[ Nodes.BlankLine() ] ) )
+		self._parseListTest( g.suiteItem(),
+				     [
+					     Nodes.DecoStmtHeader( name='a', args=[ Nodes.Load( name='x' ) ] ),
+					     Nodes.DefStmt( decorators=[ Nodes.Decorator( name='b', args=[ Nodes.Load( name='y' ) ] ) ], name='f', params=[ Nodes.SimpleParam( name='x' ) ], suite=[ Nodes.BlankLine() ] ) ],
+				     Nodes.DefStmt( decorators=[ Nodes.Decorator( name='a', args=[ Nodes.Load( name='x' ) ] ), Nodes.Decorator( name='b', args=[ Nodes.Load( name='y' ) ] ) ],
+						    name='f', params=[ Nodes.SimpleParam( name='x' ) ], suite=[ Nodes.BlankLine() ] ) )
+	
+		
+	def test_classStmt(self):
+		g = Python25Grammar()
+		self._parseListTest( g.suiteItem(),
+				     [
+					     Nodes.ClassStmtHeader( name='A', bases=[ Nodes.Load( name='x' ) ] ),
+					     Nodes.Indent(),
+					     	Nodes.BlankLine(),
+					     Nodes.Dedent() ],
+				     Nodes.ClassStmt( name='A', bases=[ Nodes.Load( name='x' ) ], suite=[ Nodes.BlankLine() ] ) )
+		
+		
+	def test_nestedStructure(self):
+		g = Python25Grammar()
+		self._parseListTest( g.suiteItem(),
+				     [
+					     Nodes.ClassStmtHeader( name='A', bases=[ Nodes.Load( name='x' ) ] ),
+					     Nodes.Indent(),
+					     	Nodes.DefStmtHeader( name='f', params=[ Nodes.SimpleParam( name='x' ) ] ),
+						Nodes.Indent(),
+					     		Nodes.WhileStmtHeader( condition=Nodes.Load( name='a' ) ),
+					     		Nodes.Indent(),
+								Nodes.BlankLine(),
+					     		Nodes.Dedent(),
+						Nodes.Dedent(),
+					     Nodes.Dedent() ],
+				     Nodes.ClassStmt( name='A', bases=[ Nodes.Load( name='x' ) ], suite=[
+					     Nodes.DefStmt( decorators=[], name='f', params=[ Nodes.SimpleParam( name='x' ) ], suite=[ Nodes.WhileStmt( condition=Nodes.Load( name='a' ), suite=[ Nodes.BlankLine() ] ) ] ) ] ) )
+	
+		
+	def test_suite(self):
+		g = Python25Grammar()
+		self._parseListTest( g.suite(),
+				     [
+					     Nodes.CommentStmt( comment='x' ),
+					     Nodes.BlankLine() ],
+				      [
+					     Nodes.CommentStmt( comment='x' ),
+					     Nodes.BlankLine() ] )
+		
+
+	
+		
+	def test_header_indentedBlock(self):
+		g = Python25Grammar()
+		self._parseListTest( g.suite(),
+				     [
+					     Nodes.WhileStmtHeader( condition=Nodes.Load( name='x' ) ),
+					     Nodes.IndentedBlock( suite=[ Nodes.CommentStmt( comment='a' ) ] ) ],
+				      [
+					     Nodes.WhileStmt( condition=Nodes.Load( name='x' ), suite=[ Nodes.CommentStmt( comment='a' ) ] ) ] )
+		
+
+	
+		
+	def test_headers(self):
+		g = Python25Grammar()
+		self._parseListTest( g.suite(),
+				     [
+					     Nodes.IfStmtHeader( condition=Nodes.Load( name='x' ) ),
+					     Nodes.WhileStmtHeader( condition=Nodes.Load( name='a' ) ),
+					     Nodes.Indent(),
+					     	Nodes.BlankLine(),
+					     Nodes.Dedent() ],
+				      [
+					     Nodes.IfStmtHeader( condition=Nodes.Load( name='x' ) ),
+					     Nodes.WhileStmt( condition=Nodes.Load( name='a' ), suite=[ Nodes.BlankLine() ] ) ] )
+
+		
+	def test_streamSuite(self):	
+		g = Python25Grammar()
+		s = self._pythonStream( 'while a:\n', Nodes.Indent(), 'continue\n', Nodes.Dedent() )
+		self._parseStreamTest( g.suite(), s, [ Nodes.WhileStmt( condition=Nodes.Load( name='a' ), suite=[ Nodes.ContinueStmt() ] ) ] )
+		
+		
+	def test_embeddedStructural(self):
+		g = Python25Grammar()
+		#s = self._pythonStream( 'x = ', Nodes.Div( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ), '\n' )
+		s = self._pythonStream( 'x = ', Nodes.Div( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ), '\n' )
+		self._parseStreamTest( g.suite(), s, [ Nodes.AssignStmt( targets=[ Nodes.SingleTarget( name='x' ) ], value=Nodes.Div( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) ) ] )
+		
+		
 
 
 def parserViewTest():
@@ -1521,7 +2301,7 @@ def parserViewTest():
 	#print dot
 
 	#g = Python25Grammar()
-	#g.statement().parseStringChars( 'raise' )
+	#g.singleLineStatementValid().parseStringChars( 'raise' )
 
 	from BritefuryJ.ParserDebugViewer import ParseViewFrame
 

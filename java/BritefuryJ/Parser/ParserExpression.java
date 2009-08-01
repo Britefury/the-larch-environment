@@ -672,7 +672,11 @@ public abstract class ParserExpression implements ParserExpressionInterface
 
 	public static ParserExpression coerce(Object x) throws ParserCoerceException
 	{
-		if ( x instanceof ParserExpression )
+		if ( x == null )
+		{
+			return new LiteralNode( null );
+		}
+		else if ( x instanceof ParserExpression )
 		{
 			return (ParserExpression)x;
 		}

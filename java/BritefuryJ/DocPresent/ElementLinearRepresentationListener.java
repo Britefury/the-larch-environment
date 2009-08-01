@@ -7,7 +7,20 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-public interface ElementLinearRepresentationListener
+public abstract class ElementLinearRepresentationListener
 {
-	public boolean textRepresentationModified(DPWidget element);
+	public boolean textRepresentationModified(DPWidget element)
+	{
+		return false;
+	}
+	
+	public boolean linearRepresentationModified(DPWidget element)
+	{
+		return false;
+	}
+
+	public boolean innerElementLinearRepresentationModified(DPWidget element)
+	{
+		return false;
+	}
 }

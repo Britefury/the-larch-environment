@@ -41,8 +41,6 @@ from GSymCore.Languages.Python25 import NodeClasses as Nodes
 from GSymCore.Languages.Python25.Parser import Python25Grammar
 from GSymCore.Languages.Python25.Precedence import *
 from GSymCore.Languages.Python25.CodeGenerator import Python25CodeGenerator
-from GSymCore.Languages.Python25.StructureUnparser import Python25StructureUnparser
-from GSymCore.Languages.Python25.StructureParser import Python25StructureGrammar
 from GSymCore.Languages.Python25.PythonEditOperations import *
 
 

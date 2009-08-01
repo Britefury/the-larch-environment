@@ -21,6 +21,8 @@ import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleSheets.ContentLeafStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.Math.Point2;
+import BritefuryJ.Parser.ItemStream.ItemStream;
+import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
 
 public abstract class DPContentLeaf extends DPWidget
 {
@@ -772,6 +774,7 @@ public abstract class DPContentLeaf extends DPWidget
 	// TEXT REPRESENTATION METHODS
 	//
 	//
+	
 	public String getTextRepresentation()
 	{
 		return textRepresentation;
@@ -829,6 +832,62 @@ public abstract class DPContentLeaf extends DPWidget
 		super.onTextRepresentationModified();
 		
 		refreshMetaHeader();
+	}
+	
+	
+	
+	
+	
+	
+	
+	//
+	//
+	// LINEAR REPRESENTATION METHODS
+	//
+	//
+	
+	protected void buildLinearRepresentation(ItemStreamBuilder builder)
+	{
+		builder.appendTextValue( textRepresentation );
+	}
+	
+	protected void getLinearRepresentationFromStartToPath(ItemStreamBuilder builder, Marker marker, ArrayList<DPWidget> path, int pathMyIndex)
+	{
+		builder.appendTextValue( textRepresentation.substring( 0, marker.getIndex() ) );
+	}
+
+	protected void getLinearRepresentationFromPathToEnd(ItemStreamBuilder builder, Marker marker, ArrayList<DPWidget> path, int pathMyIndex)
+	{
+		builder.appendTextValue( textRepresentation.substring( marker.getIndex() ) );
+	}
+
+	public ItemStream getLinearRepresentationBetweenMarkers(Marker startMarker, Marker endMarker)
+	{
+		if ( startMarker.getElement() != this  ||  endMarker.getElement() != this )
+		{
+			throw new RuntimeException();
+		}
+		ItemStreamBuilder builder = new ItemStreamBuilder();
+		builder.appendTextValue( textRepresentation.substring( startMarker.getIndex(), endMarker.getIndex() ) );
+		return builder.stream();
+	}
+
+	protected void getLinearRepresentationFromStartOfRootToMarker(ItemStreamBuilder builder, Marker marker, DPWidget root)
+	{
+		if ( this != root  &&  parent != null )
+		{
+			parent.getLinearRepresentationFromStartOfRootToMarkerFromChild( builder, marker, root, this );
+		}
+		builder.appendTextValue( textRepresentation.substring( 0, marker.getIndex() ) );
+	}
+	
+	protected void getLinearRepresentationFromMarkerToEndOfRoot(ItemStreamBuilder builder, Marker marker, DPWidget root)
+	{
+		builder.appendTextValue( textRepresentation.substring( marker.getIndex() ) );
+		if ( this != root  &&  parent != null )
+		{
+			parent.getLinearRepresentationFromMarkerToEndOfRootFromChild( builder, marker, root, this );
+		}
 	}
 	
 	

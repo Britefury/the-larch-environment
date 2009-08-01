@@ -112,6 +112,8 @@ public class ListNode extends BranchExpression
 	{
 		if ( start < input.length() )
 		{
+			start = state.skipJunkChars( input, start );
+			
 			Object valueArray[] = input.matchStructuralNode( start );
 			
 			if ( valueArray != null )

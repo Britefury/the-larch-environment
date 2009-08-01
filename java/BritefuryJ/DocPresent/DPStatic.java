@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleSheets.WidgetStyleSheet;
 import BritefuryJ.Math.Point2;
+import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
 
 public abstract class DPStatic extends DPWidget
 {
@@ -47,5 +48,19 @@ public abstract class DPStatic extends DPWidget
 	public int getTextRepresentationLength()
 	{
 		return 0;
+	}
+
+
+
+	public void buildLinearRepresentation(ItemStreamBuilder builder)
+	{
+	}
+
+	protected void getLinearRepresentationFromPathToEnd(ItemStreamBuilder builder, Marker marker, ArrayList<DPWidget> path, int pathMyIndex)
+	{
+	}
+
+	protected void getLinearRepresentationFromStartToPath(ItemStreamBuilder builder, Marker marker, ArrayList<DPWidget> path, int pathMyIndex)
+	{
 	}
 }

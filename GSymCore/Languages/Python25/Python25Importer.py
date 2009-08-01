@@ -271,7 +271,7 @@ class _ExprImporter (_Importer):
 	
 	# Yield expresion
 	def Yield(self, node):
-		return Nodes.YieldAtom( value=[ _expr( node.value ) ] )
+		return Nodes.YieldExpr( value=[ _expr( node.value ) ] )
 	
 	
 	
@@ -940,7 +940,7 @@ class ImporterTestCase (unittest.TestCase):
 		
 		
 	def testYieldExpr(self):
-		self._exprTest( '(yield a)', Nodes.YieldAtom( value=[ Nodes.Load( name='a' ) ] ) )
+		self._exprTest( '(yield a)', Nodes.YieldExpr( value=[ Nodes.Load( name='a' ) ] ) )
 		
 		
 	def testAttribute(self):
@@ -1054,7 +1054,7 @@ class ImporterTestCase (unittest.TestCase):
 	def testAssign(self):
 		self._stmtTest( 'a=x', Nodes.AssignStmt( targets=[ Nodes.SingleTarget( name='a' ) ], value=Nodes.Load( name='x' ) ) )
 		self._stmtTest( 'a,b=c,d=x', Nodes.AssignStmt( targets=[ Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='a' ), Nodes.SingleTarget( name='b' ) ] ),  Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='c' ), Nodes.SingleTarget( name='d' ) ] ) ], value=Nodes.Load( name='x' ) ) )
-		self._stmtTest( 'a=yield x', Nodes.AssignStmt( targets=[ Nodes.SingleTarget( name='a' ) ], value=Nodes.YieldAtom( value=[ Nodes.Load( name='x' ) ] ) ) )
+		self._stmtTest( 'a=yield x', Nodes.AssignStmt( targets=[ Nodes.SingleTarget( name='a' ) ], value=Nodes.YieldExpr( value=[ Nodes.Load( name='x' ) ] ) ) )
 	
 		
 	def testAugAssignStmt(self):
@@ -1085,7 +1085,7 @@ class ImporterTestCase (unittest.TestCase):
 		
 	
 	def testYieldStmt(self):
-		self._stmtTest( 'yield x', Nodes.ExprStmt( expr=Nodes.YieldAtom( value=[ Nodes.Load( name='x' ) ] ) ) )
+		self._stmtTest( 'yield x', Nodes.ExprStmt( expr=Nodes.YieldExpr( value=[ Nodes.Load( name='x' ) ] ) ) )
 		
 		
 	def testRaiseStmt(self):

@@ -14,7 +14,7 @@ import cStringIO
 
 import re
 
-_whitespaceRegex = '[' + re.escape( string.whitespace ) + ']*'
+_whitespaceRegex = '[ ]*'
 
 def _deepList(xs):
 	if isinstance( xs, java.util.List )  or  isinstance( xs, list ):
@@ -213,7 +213,7 @@ class ParserTestCase (unittest.TestCase):
 
 		if result.end != len( input ):
 			print 'INCOMPLETE PARSE while parsing', input
-			print 'Parsed %d/%d characters'  %  ( result.end, len( input ) )
+			print 'Parsed %d/%d items'  %  ( result.end, len( input ) )
 			print input[:result.end]
 			print 'EXPECTED:'
 			print expected
@@ -249,7 +249,7 @@ class ParserTestCase (unittest.TestCase):
 
 		if result.end != len( input ):
 			print 'INCOMPLETE PARSE while parsing', input
-			print 'Parsed %d/%d characters'  %  ( result.end, len( input ) )
+			print 'Parsed %d/%d items'  %  ( result.end, len( input ) )
 			print input[:result.end]
 			print 'EXPECTED:'
 			print expectedSX
@@ -277,7 +277,7 @@ class ParserTestCase (unittest.TestCase):
 			print ''
 			print 'RESULT:'
 			print result.value
-			print 'consumed %d/%d chars'  %  ( result.end, len( input ) )
+			print 'consumed %d/%d items'  %  ( result.end, len( input ) )
 		self.assert_( not result.isValid()  or  result.end != len( input ) )
 
 		
@@ -294,8 +294,92 @@ class ParserTestCase (unittest.TestCase):
 			print ''
 			print 'RESULT:'
 			print result.value
-			print 'consumed %d/%d chars'  %  ( result.end, len( input ) )
+			print 'consumed %d/%d items'  %  ( result.end, len( input ) )
 		self.assert_( not result.isValid()  or  result.end != len( input ) )
 
 		
 		
+
+		
+		
+		
+	def _parseStreamTest(self, parser, input, expected, ignoreChars=_whitespaceRegex):
+		result = parser.parseStreamItems( input, ignoreChars )
+		
+		if not result.isValid():
+			print 'PARSE FAILURE while parsing %s, stopped at %d: %s'  %  ( input, result.end, input[:result.end] )
+			print 'EXPECTED:'
+			print expected
+		self.assert_( result.isValid() )
+		
+		value = DMNode.coerce( result.value )
+		expected = DMNode.coerce( expected )
+
+		if result.end != len( input ):
+			print 'INCOMPLETE PARSE while parsing', input
+			print 'Parsed %d/%d items'  %  ( result.end, len( input ) )
+			print input[:result.end]
+			print 'EXPECTED:'
+			print expected
+			print 'RESULT:'
+			print value
+
+		bSame = value == expected
+		if not bSame:
+			print 'While parsing', input
+			print 'EXPECTED:'
+			print expected
+			print ''
+			print 'RESULT:'
+			print value
+		self.assert_( bSame )
+
+
+
+	def _parseStreamTestSX(self, parser, input, expectedSX, ignoreChars=_whitespaceRegex):
+		expected = DMIOReader.readFromString( expectedSX, self.resolver )
+		
+		result = parser.parseListItems( input, ignoreChars )
+
+		if not result.isValid():
+			print 'PARSE FAILURE while parsing', input
+			print 'EXPECTED:'
+			print expectedSX
+		self.assert_( result.isValid() )
+
+		value = DMNode.coerce( result.value )
+		expected = DMNode.coerce( expected )
+
+		if result.end != len( input ):
+			print 'INCOMPLETE PARSE while parsing', input
+			print 'Parsed %d/%d items'  %  ( result.end, len( input ) )
+			print input[:result.end]
+			print 'EXPECTED:'
+			print expectedSX
+			print 'RESULT:'
+			print DMIOWriter.writeAsString( value )
+
+		bSame = value == expected
+		if not bSame:
+			print 'While parsing', input
+			print 'EXPECTED:'
+			print expectedSX
+			print ''
+			print 'RESULT:'
+			print DMIOWriter.writeAsString( value )
+		self.assert_( bSame )
+
+		
+	def _parseStreamFailTest(self, parser, input, ignoreChars=_whitespaceRegex):
+		result = parser.parseListItems( input, ignoreChars )
+		
+		if result.isValid()   and   result.end == len( input ):
+			print 'While parsing', input
+			print 'EXPECTED:'
+			print '<fail>'
+			print ''
+			print 'RESULT:'
+			print result.value
+			print 'consumed %d/%d items'  %  ( result.end, len( input ) )
+		self.assert_( not result.isValid()  or  result.end != len( input ) )
+	

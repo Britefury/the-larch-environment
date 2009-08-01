@@ -542,6 +542,12 @@ public class Test_Parser extends ParserTestCase
 		bindingsTestNodeSX( parser6, "[abc [abc]]", "[[x abc]]" );
 		matchTestNodeSX( parser6, "[abc [d]]", "[abc [d]]" );
 		bindingsTestNodeSX( parser6, "[abc [d]]", "[[x d]]" );
+
+		ParserExpression parser7 = new ListNode( new Object[] { new Literal( "abc" ), null } );
+		matchTestNodeSX( parser7, "[abc `null`]", "[abc `null`]" );
+		matchFailTestNodeSX( parser7, "[abcx def]" );
+		matchFailTestNodeSX( parser7, "[abc defx]" );
+		matchFailTestNodeSX( parser7, "[abcx defx]" );
 	}
 
 	
@@ -623,6 +629,11 @@ public class Test_Parser extends ParserTestCase
 		ParserExpression parser7 = new ObjectNode( Bar, new String[] { "b" }, new Object[] { identifier } );
 		matchTestNodeSX( parser7, "{m=M : (m Bar b=abc)}", "{m=M : (m Bar b=abc)}" );
 		matchTestNodeSX( parser7, "{m=M : (m Bar2 b=abc c=def)}", "{m=M : (m Bar2 b=abc c=def)}" );
+
+		ParserExpression parser8 = new ObjectNode( A, new String[] { "y" }, new Object[] { null } );
+		matchTestNodeSX( parser8, "{m=M : (m A x=abc y=`null`)}", "{m=M : (m A x=abc y=`null`)}" );
+		matchTestNodeSX( parser8, "{m=M : (m A x=pqr y=`null`)}", "{m=M : (m A x=pqr y=`null`)}" );
+		matchFailTestNodeSX( parser8, "{m=M : (m A x=abc y=pqr)}" );
 	}
 
 
