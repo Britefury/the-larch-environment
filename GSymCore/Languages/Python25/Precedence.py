@@ -15,6 +15,7 @@ from GSymCore.Languages.Python25 import NodeClasses as Nodes
 
 
 PRECEDENCE_NONE = None
+PRECEDENCE_UNPARSED = None
 PRECEDENCE_STMT = 1000
 PRECEDENCE_EXPR = 0
 PRECEDENCE_TARGET = None
@@ -46,7 +47,7 @@ PRECEDENCE_TUPLE = 0
 PRECEDENCE_LISTDISPLAY = 0
 PRECEDENCE_GENERATOREXPRESSION = 0
 PRECEDENCE_DICTDISPLAY = 0
-PRECEDENCE_YIELDEXPR = 0
+PRECEDENCE_YIELDEXPR = 200
 
 PRECEDENCE_CONTAINER_ELEMENT = 500
 PRECEDENCE_CONTAINER_ATTRIBUTEREFTARGET = 0
@@ -56,7 +57,7 @@ PRECEDENCE_CONTAINER_CALLTARGET = 0
 PRECEDENCE_CONTAINER_CALLARG = 500
 
 # The lambda expression should only expect orTest or lambda expression
-PRECEDENCE_CONTAINER_YIELDATOM = 200
+PRECEDENCE_CONTAINER_YIELDEXPR = 199
 
 # The lambda expression should only expect orTest or lambda expression
 PRECEDENCE_CONTAINER_LAMBDAEXPR = 50
@@ -69,6 +70,9 @@ PRECEDENCE_CONTAINER_COMPREHENSIONFOR = 25
 
 # The comprehension if statements should only expect orTest or lambda expression
 PRECEDENCE_CONTAINER_COMPREHENSIONIF = 50
+
+
+PRECEDENCE_CONTAINER_UNPARSED = None
 
 
 PRECEDENCE_IMPORTCONTENT = 0
@@ -85,6 +89,10 @@ class NodePrecedence (object):
 	
 	def __call__(self, node):
 		return objectNodeMethodDispatch( self, node )
+	
+	@ObjectNodeDispatchMethod
+	def UNPARSED(self, node):
+		return PRECEDENCE_UNPARSED
 	
 	@ObjectNodeDispatchMethod
 	def Stmt(self, node):

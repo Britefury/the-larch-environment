@@ -41,8 +41,6 @@ from GSymCore.Languages.Python25 import NodeClasses as Nodes
 from GSymCore.Languages.Python25.Parser import Python25Grammar
 from GSymCore.Languages.Python25.Precedence import *
 from GSymCore.Languages.Python25.CodeGenerator import Python25CodeGenerator
-from GSymCore.Languages.Python25.StructureUnparser import Python25StructureUnparser
-from GSymCore.Languages.Python25.StructureParser import Python25StructureGrammar
 
 
 class NotImplementedError (Exception):
@@ -440,5 +438,28 @@ def parseText(parser, text, outerPrecedence=None):
 		return None
 
 
+
+#
+#
+# PARSE STREAM
+#
+#
+
+def parseStream(parser, input, outerPrecedence=None):
+	res = parser.parseStreamItems( input )
+	pos = res.getEnd()
+	if res.isValid():
+		if pos == len( input ):
+			value = res.getValue()
+			return removeUnNeededParens( value, outerPrecedence )
+		else:
+			print '<INCOMPLETE>'
+			print 'FULL TEXT:', input
+			print 'PARSED:', input[:pos]
+			return None
+	else:
+		print 'FULL TEXT:', input
+		print '<FAIL>'
+		return None
 
 

@@ -70,7 +70,7 @@ GeneratorExpr = module.newClass( 'GeneratorExpr', Expr, [ 'resultExpr', 'compreh
 DictKeyValuePair = module.newClass( 'DictKeyValuePair', Node, [ 'key', 'value' ] )
 DictLiteral = module.newClass( 'DictLiteral', Expr, [ 'values', 'trailingSeparator' ] )
 # Yield
-YieldAtom = module.newClass( 'YieldAtom', Expr, [ 'value' ] )
+YieldExpr = module.newClass( 'YieldExpr', Expr, [ 'value' ] )
 # Attribute reference
 AttributeRef = module.newClass( 'AttributeRef', Expr, [ 'target', 'name' ] )
 # Subscript

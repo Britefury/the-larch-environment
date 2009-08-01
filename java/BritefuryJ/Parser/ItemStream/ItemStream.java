@@ -9,6 +9,8 @@ package BritefuryJ.Parser.ItemStream;
 import java.util.Arrays;
 import java.util.List;
 
+import org.python.core.PySlice;
+
 public class ItemStream
 {
 	public static abstract class Item
@@ -174,6 +176,44 @@ public class ItemStream
 	public int length()
 	{
 		return length;
+	}
+	
+	public int __len__()
+	{
+		return length;
+	}
+	
+	
+	public Object __getitem__(int pos)
+	{
+		Item x = itemAt( pos );
+		if ( x instanceof StructuralItem )
+		{
+			return ((StructuralItem)x).structuralValue;
+		}
+		else if ( x instanceof TextItem )
+		{
+			pos -= x.start;
+			return ((TextItem)x).textValue.substring( pos, pos + 1 );
+		}
+		else
+		{
+			throw new RuntimeException();
+		}
+	}
+	
+	public ItemStream __getitem__(PySlice i)
+	{
+		int indices[] = i.indicesEx( length );
+		int start = indices[0];
+		int stop = indices[1];
+		int step = indices[2];
+		if ( step != 1 )
+		{
+			throw new RuntimeException( "ItemStream.__getItem__(PySlice) does not support slice step != 1" );
+		}
+
+		return subStream( start, stop );
 	}
 	
 	

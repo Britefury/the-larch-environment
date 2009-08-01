@@ -8,6 +8,7 @@
 from java.awt.event import KeyEvent
 
 from BritefuryJ.Parser import ParserExpression
+from BritefuryJ.Parser.ItemStream import ItemStreamBuilder
 
 from Britefury.Dispatch.ObjectNodeMethodDispatch import ObjectNodeDispatchMethod
 
@@ -168,7 +169,7 @@ def expressionNodeEditor(ctx, node, contents, precedence, state):
 		return contents
 	elif mode == MODE_EDITEXPRESSION:
 		contents = _precedenceParen( ctx, node, contents, precedence, outerPrecedence )
-		return ctx.linearRepresentationListener( contents, ParsedExpressionTextRepresentationListener.newListener( parser, outerPrecedence ) )
+		return ctx.linearRepresentationListener( contents, ParsedExpressionLinearRepresentationListener.newListener( parser, outerPrecedence ) )
 	elif mode == MODE_EDITSTATEMENT:
 		return statementNodeEditor( ctx, node, contents, precedence, state )
 	else:
@@ -181,12 +182,22 @@ def statementNodeEditor(ctx, node, contents, precedence, state):
 	if mode == MODE_EDITSTATEMENT:
 		contents = _precedenceParen( ctx, node, contents, precedence, outerPrecedence )
 		segment = ctx.segment( default_textStyle, True, True, contents )
-		segment = ctx.linearRepresentationListener( segment, SimpleStatementTextRepresentationListener.newListener( parser ) )
-
 		newLine = ctx.whitespace( '\n' )
-		newLine = ctx.linearRepresentationListener( newLine, SimpleStatementNewLineTextRepresentationListener.newListener( parser ) )
 
 		para = ctx.paragraph( python_paragraphStyle, [ segment, newLine ] )
+		if node.isInstanceOf( Nodes.UNPARSED ):
+			builder = ItemStreamBuilder()
+			for x in node['value']:
+				if isinstance( x, str )  or  isinstance( x, unicode ):
+					builder.appendTextValue( x )
+				elif isinstance( x, DMObjectInterface ):
+					builder.appendStructuralValue( x )
+				else:
+					raise TypeError, 'UNPARSED node should only contain strings or objects, not %s'  %  ( type( x ), )
+			para.setStructuralRepresentation( builder.stream() )
+		else:
+			para.setStructuralRepresentation( node )
+		para = ctx.linearRepresentationListener( para, StatementLinearRepresentationListener.newListener( parser ) )
 		para = ctx.keyboardListener( para, _statementKeyboardListener )
 		return para
 	else:
@@ -202,20 +213,19 @@ def compoundStatementHeaderEditor(ctx, node, headerContents, precedence, state, 
 	#			header content
 	#		NewLine - header
 
-	headerSegment = ctx.segment( default_textStyle, True, True, headerContents )
-	headerSegment = ctx.linearRepresentationListener( headerSegment, SimpleStatementTextRepresentationListener.newListener( parser ) )
-
+	segment = ctx.segment( default_textStyle, True, True, headerContents )
 	newLine = ctx.whitespace( '\n' )
-	newLine = ctx.linearRepresentationListener( newLine, SimpleStatementNewLineTextRepresentationListener.newListener( parser ) )
 
-	headerParagraph = ctx.paragraph( python_paragraphStyle, [ headerSegment, newLine ] )
-	headerParagraph = ctx.keyboardListener( headerParagraph, _statementKeyboardListener )
+	para = ctx.paragraph( python_paragraphStyle, [ segment, newLine ] )
+	para.setStructuralRepresentation( node )
+	para = ctx.linearRepresentationListener( para, StatementLinearRepresentationListener.newListener( parser ) )
+	para = ctx.keyboardListener( para, _statementKeyboardListener )
 	if headerContainerFn is not None:
-		headerParagraph = headerContainerFn( headerParagraph )
-	return headerParagraph
+		para = headerContainerFn( para )
+	return para
 
 
-def compoundStatementEditor(ctx, node, precedence, compoundBlocks, state, statementParser):
+def compoundStatementEditor(ctx, node, precedence, compoundBlocks, state, suiteParser, statementParser):
 	outerPrecedence, parser, mode = state
 
 	# THE EDIT OPERATIONS RELY ON THE ELEMENT STRUCTURE USED HERE:
@@ -229,26 +239,29 @@ def compoundStatementEditor(ctx, node, precedence, compoundBlocks, state, statem
 
 	statementContents = []
 	for i, block in enumerate( compoundBlocks ):
-		if len( block ) == 2:
-			headerContents, suite = block
+		if len( block ) == 3:
+			headerNode, headerContents, suite = block
 			headerContainerFn = None
-		elif len( block ) == 3:
-			headerContents, suite, headerContainerFn = block
+		elif len( block ) == 4:
+			headerNode, headerContents, suite, headerContainerFn = block
 		else:
 			raise TypeError, 'Compound block should be of the form (headerContents, suite)  or  (headerContents, suite, headerContainerFn)'
 		
 		headerSegment = ctx.segment( default_textStyle, True, True, headerContents )
-		headerSegment = ctx.linearRepresentationListener( headerSegment, CompoundStatementTextRepresentationListener.newListener( parser, i ) )
-		
-		suiteElement = suiteView( ctx, suite, statementParser )
-	
 		newLine = ctx.whitespace( '\n' )
-		newLine = ctx.linearRepresentationListener( newLine, CompoundStatementNewLineTextRepresentationListener( parser, i, suiteElement ) )
-	
+		
 		headerParagraph = ctx.paragraph( python_paragraphStyle, [ headerSegment, newLine ] )
+		headerParagraph.setStructuralRepresentation( headerNode )
 		headerParagraph = ctx.keyboardListener( headerParagraph, _statementKeyboardListener )
+		
 		if headerContainerFn is not None:
 			headerParagraph = headerContainerFn( headerParagraph )
+
+			
+		suiteElement = indentedSuiteView( ctx, suite, statementParser )
+		suiteElement.setStructuralRepresentation( suite )
+		suiteElement = ctx.linearRepresentationListener( suiteElement, SuiteLinearRepresentationListener( suiteParser ) )
+	
 		
 		if suite is not None:
 			statementContents.extend( [ headerParagraph, ctx.indent( 30.0, suiteElement ) ] )
@@ -305,6 +318,16 @@ def suiteView(ctx, suite, parser):
 	return ctx.vbox( suite_vboxStyle, lineViews )
 
 
+def indentedSuiteView(ctx, suite, parser):
+	# THE EDIT OPERATIONS RELY ON THE ELEMENT STRUCTURE USED HERE:
+	#	VBox - suite
+	#		children*
+
+	indent = ctx.hiddenStructuralNode( Nodes.Indent() )
+	dedent = ctx.hiddenStructuralNode( Nodes.Dedent() )
+	lineViews = [ indent ]  + ctx.mapViewEvalFn( suite, None, python25ViewState( PRECEDENCE_NONE, parser, MODE_EDITSTATEMENT ) )  +  [ dedent ]
+	return ctx.vbox( suite_vboxStyle, lineViews )
+
 
 def printElem(elem, level):
 	print '  ' * level, elem, elem.getTextRepresentation()
@@ -325,7 +348,10 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# MISC
 	@ObjectNodeDispatchMethod
 	def PythonModule(self, ctx, state, node, suite):
-		return suiteView( ctx, suite, self._parser.statement() )
+		suiteElement = suiteView( ctx, suite, self._parser.singleLineStatement() )
+		suiteElement.setStructuralRepresentation( suite )
+		suiteElement = ctx.linearRepresentationListener( suiteElement, SuiteLinearRepresentationListener( self._parser.suite() ) )
+		return suiteElement
 
 
 
@@ -339,8 +365,16 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	@ObjectNodeDispatchMethod
 	def UNPARSED(self, ctx, state, node, value):
+		def _viewItem(x):
+			if isinstance( x, str )  or  isinstance( x, unicode ):
+				return ctx.text( unparsed_textStyle, x )
+			elif isinstance( x, DMObjectInterface ):
+				return ctx.viewEvalFn( x, None, python25ViewState( PRECEDENCE_CONTAINER_UNPARSED, self._parser.expression() ) )
+			else:
+				raise TypeError, 'UNPARSED should contain a list of only strings or nodes, not a %s'  %  ( type( x ), )
+		views = [ _viewItem( x )   for x in value ]
 		return expressionNodeEditor( ctx, node,
-					     ctx.text( unparsed_textStyle, value ),
+					     ctx.span( views ),
 					     None,
 					     state )
 
@@ -552,10 +586,10 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# Yield expression
 	@ObjectNodeDispatchMethod
-	def YieldAtom(self, ctx, state, node, value):
-		valueView = ctx.viewEvalFn( value, None, python25ViewState( PRECEDENCE_CONTAINER_YIELDATOM, self._parser.expression() ) )
+	def YieldExpr(self, ctx, state, node, value):
+		valueView = ctx.viewEvalFn( value, None, python25ViewState( PRECEDENCE_CONTAINER_YIELDEXPR, self._parser.expression() ) )
 		return expressionNodeEditor( ctx, node,
-					     ctx.span( [ ctx.text( punctuation_textStyle, '(' ),  capitalisedKeywordText( ctx, yieldKeyword ),  ctx.text( punctuation_textStyle, ' ' ),  valueView,  ctx.text( punctuation_textStyle, ')' ) ] ),
+					     ctx.span( [ capitalisedKeywordText( ctx, yieldKeyword ),  ctx.text( punctuation_textStyle, ' ' ),  valueView ] ),
 					     PRECEDENCE_YIELDEXPR,
 					     state )
 
@@ -716,7 +750,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		xView = ctx.viewEvalFn( x, None, python25ViewState( xPrec, self._parser.expression(), MODE_EDITEXPRESSION ) )
 		yView = ctx.viewEvalFn( y, None, python25ViewState( yPrec, self._parser.expression(), MODE_EDITEXPRESSION ) )
 		return expressionNodeEditor( ctx, node,
-					     ctx.fraction( div_fractionStyle, xView, yView, '/' ),
+					     ctx.structuralRepresentation( ctx.fraction( div_fractionStyle, xView, yView, '/' ), node ),
 					     PRECEDENCE_MULDIVMOD,
 					     state )
 
@@ -1388,62 +1422,62 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# If statement
 	@ObjectNodeDispatchMethod
 	def IfStmt(self, ctx, state, node, condition, suite, elifBlocks, elseSuite):
-		compoundBlocks = [ ( self._ifStmtHeaderElement( ctx, state, condition ), suite ) ]
+		compoundBlocks = [ ( Nodes.IfStmtHeader( condition=condition ), self._ifStmtHeaderElement( ctx, state, condition ), suite ) ]
 		for b in elifBlocks:
 			if not b.isInstanceOf( Nodes.ElifBlock ):
 				raise TypeError, 'IfStmt elifBlocks should only contain ElifBlock instances'
-			compoundBlocks.append( ( self._elifStmtHeaderElement( ctx, state, b['condition'] ),  b['suite'] ) )
+			compoundBlocks.append( ( Nodes.ElifStmtHeader( condition=b['condition'] ), self._elifStmtHeaderElement( ctx, state, b['condition'] ),  b['suite'] ) )
 		if elseSuite is not None:
-			compoundBlocks.append( ( self._elseStmtHeaderElement( ctx, state ),  elseSuite ) )
+			compoundBlocks.append( ( Nodes.ElseStmtHeader(), self._elseStmtHeaderElement( ctx, state ),  elseSuite ) )
 		return compoundStatementEditor( ctx, node, PRECEDENCE_STMT,
 						compoundBlocks,
 						state,
-						self._parser.statement() )
+						self._parser.compoundSuite(), self._parser.singleLineStatement() )
 
 
 
 	# While statement
 	@ObjectNodeDispatchMethod
 	def WhileStmt(self, ctx, state, node, condition, suite, elseSuite):
-		compoundBlocks = [ ( self._whileStmtHeaderElement( ctx, state, condition ), suite ) ]
+		compoundBlocks = [ ( Nodes.WhileStmtHeader( condition=condition ), self._whileStmtHeaderElement( ctx, state, condition ), suite ) ]
 		if elseSuite is not None:
-			compoundBlocks.append( ( self._elseStmtHeaderElement( ctx, state ),  elseSuite ) )
+			compoundBlocks.append( ( Nodes.ElseStmtHeader(), self._elseStmtHeaderElement( ctx, state ),  elseSuite ) )
 		return compoundStatementEditor( ctx, node, PRECEDENCE_STMT,
 						compoundBlocks,
 						state,
-						self._parser.statement() )
+						self._parser.compoundSuite(), self._parser.singleLineStatement() )
 
 	
 
 	# For statement
 	@ObjectNodeDispatchMethod
 	def ForStmt(self, ctx, state, node, target, source, suite, elseSuite):
-		compoundBlocks = [ ( self._forStmtHeaderElement( ctx, state, target, source ), suite ) ]
+		compoundBlocks = [ ( Nodes.ForStmtHeader( target=target, source=source ), self._forStmtHeaderElement( ctx, state, target, source ), suite ) ]
 		if elseSuite is not None:
 			compoundBlocks.append( ( self._elseStmtHeaderElement( ctx, state ),  elseSuite ) )
 		return compoundStatementEditor( ctx, node, PRECEDENCE_STMT,
 						compoundBlocks,
 						state,
-						self._parser.statement() )
+						self._parser.compoundSuite(), self._parser.singleLineStatement() )
 
 
 
 	# Try statement
 	@ObjectNodeDispatchMethod
 	def TryStmt(self, ctx, state, node, suite, exceptBlocks, elseSuite, finallySuite):
-		compoundBlocks = [ ( self._tryStmtHeaderElement( ctx, state ), suite ) ]
+		compoundBlocks = [ ( Nodes.TryStmtHeader(), self._tryStmtHeaderElement( ctx, state ), suite ) ]
 		for b in exceptBlocks:
 			if not b.isInstanceOf( Nodes.ExceptBlock ):
 				raise TypeError, 'TryStmt elifBlocks should only contain ExceptBlock instances'
-			compoundBlocks.append( ( self._exceptStmtHeaderElement( ctx, state, b['exception'], b['target'] ),  b['suite'] ) )
+			compoundBlocks.append( ( Nodes.ExceptStmtHeader( exception=b['exception'], target=b['target'] ), self._exceptStmtHeaderElement( ctx, state, b['exception'], b['target'] ),  b['suite'] ) )
 		if elseSuite is not None:
-			compoundBlocks.append( ( self._elseStmtHeaderElement( ctx, state ),  elseSuite ) )
+			compoundBlocks.append( ( Nodes.ElseStmtHeader(), self._elseStmtHeaderElement( ctx, state ),  elseSuite ) )
 		if finallySuite is not None:
-			compoundBlocks.append( ( self._finallyStmtHeaderElement( ctx, state ),  finallySuite ) )
+			compoundBlocks.append( ( Nodes.FinallyStmtHeader(), self._finallyStmtHeaderElement( ctx, state ),  finallySuite ) )
 		return compoundStatementEditor( ctx, node, PRECEDENCE_STMT,
 						compoundBlocks,
 						state,
-						self._parser.statement() )
+						self._parser.compoundSuite(), self._parser.singleLineStatement() )
 
 
 
@@ -1451,11 +1485,11 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# With statement
 	@ObjectNodeDispatchMethod
 	def WithStmt(self, ctx, state, node, expr, target, suite):
-		compoundBlocks = [ ( self._withStmtHeaderElement( ctx, state, expr, target ), suite ) ]
+		compoundBlocks = [ ( Nodes.WithStmtHeader( expr=expr, target=target ), self._withStmtHeaderElement( ctx, state, expr, target ), suite ) ]
 		return compoundStatementEditor( ctx, node, PRECEDENCE_STMT,
 						compoundBlocks,
 						state,
-						self._parser.statement() )
+						self._parser.compoundSuite(), self._parser.singleLineStatement() )
 
 
 
@@ -1466,24 +1500,27 @@ class Python25View (GSymViewObjectNodeDispatch):
 		for d in decorators:
 			if not d.isInstanceOf( Nodes.Decorator ):
 				raise TypeError, 'DefStmt decorators should only contain Decorator instances'
-			compoundBlocks.append( ( self._decoStmtHeaderElement( ctx, state, d['name'], d['args'], d['argsTrailingSeparator'] ),  None ) )
+			compoundBlocks.append( ( Nodes.DecoStmtHeader( name=d['name'], args=d['args'], argsTrailingSeparator=d['argsTrailingSeparator'] ), 
+						 self._decoStmtHeaderElement( ctx, state, d['name'], d['args'], d['argsTrailingSeparator'] ),  None ) )
 			
-		compoundBlocks.append( ( self._defStmtHeaderElement( ctx, state, name, params, paramsTrailingSeparator ), suite, lambda header: ctx.border( defHeader_border, ContainerStyleSheet.defaultStyleSheet, header ) ) )
+		compoundBlocks.append( ( Nodes.DefStmtHeader( name=name, params=params, paramsTrailingSeparator=paramsTrailingSeparator ),
+					 self._defStmtHeaderElement( ctx, state, name, params, paramsTrailingSeparator ), suite, lambda header: ctx.border( defHeader_border, ContainerStyleSheet.defaultStyleSheet, header ) ) )
 		editor = compoundStatementEditor( ctx, node, PRECEDENCE_STMT,
 						compoundBlocks,
 						state,
-						self._parser.statement() )
+						self._parser.compoundSuite(), self._parser.singleLineStatement() )
 		return ctx.border( defBackground_border, ContainerStyleSheet.defaultStyleSheet, editor )
 
 
 	# Class statement
 	@ObjectNodeDispatchMethod
 	def ClassStmt(self, ctx, state, node, name, bases, basesTrailingSeparator, suite):
-		compoundBlocks = [ ( self._classStmtHeaderElement( ctx, state, name, bases, basesTrailingSeparator ), suite, lambda header: ctx.border( classHeader_border, ContainerStyleSheet.defaultStyleSheet, header ) ) ]
+		compoundBlocks = [ ( Nodes.ClassStmtHeader( name=name, bases=bases, basesTrailingSeparator=basesTrailingSeparator ),
+				     self._classStmtHeaderElement( ctx, state, name, bases, basesTrailingSeparator ), suite, lambda header: ctx.border( classHeader_border, ContainerStyleSheet.defaultStyleSheet, header ) ) ]
 		editor = compoundStatementEditor( ctx, node, PRECEDENCE_STMT,
 						compoundBlocks,
 						state,
-						self._parser.statement() )
+						self._parser.compoundSuite(), self._parser.singleLineStatement() )
 		return ctx.border( classBackground_border, ContainerStyleSheet.defaultStyleSheet, editor )
 
 

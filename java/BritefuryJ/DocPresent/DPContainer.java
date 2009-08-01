@@ -29,6 +29,7 @@ import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
 import BritefuryJ.Math.Xform2;
+import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
 
 
 
@@ -1447,6 +1448,140 @@ public abstract class DPContainer extends DPWidget
 		if ( root != this  &&  parent != null )
 		{
 			parent.getTextRepresentationFromMarkerToEndOfRootFromChild( builder, marker, root, this );
+		}
+	}
+
+	
+	
+	
+	
+	//
+	//
+	// LINEAR REPRESENTATION METHODS
+	//
+	//
+	
+	protected boolean onChildLinearRepresentationModifiedEvent(DPWidget child)
+	{
+		return onLinearRepresentationModifiedEvent();
+	}
+	
+	
+	protected boolean onChildInnerElementLinearRepresentationModifiedEvent(DPWidget child)
+	{
+		return onInnerElementLinearRepresentationModifiedEvent();
+	}
+	
+	
+	public void buildLinearRepresentation(ItemStreamBuilder builder)
+	{
+		for (DPWidget child: getInternalChildren())
+		{
+			child.appendToLinearRepresentation( builder );
+		}
+	}
+	
+	
+	
+
+	public void getLinearRepresentationFromStartToPath(ItemStreamBuilder builder, Marker marker, ArrayList<DPWidget> path, int pathMyIndex)
+	{
+		DPWidget pathChild = path.get( pathMyIndex + 1 );
+		for (DPWidget child: getInternalChildren())
+		{
+			if ( child != pathChild )
+			{
+				child.appendToLinearRepresentation( builder );
+			}
+			else
+			{
+				child.getLinearRepresentationFromStartToPath( builder, marker, path, pathMyIndex + 1 );
+				break;
+			}
+		}
+	}
+	
+	public void getLinearRepresentationFromPathToEnd(ItemStreamBuilder builder, Marker marker, ArrayList<DPWidget> path, int pathMyIndex)
+	{
+		List<DPWidget> children = getInternalChildren();
+		int pathChildIndex = pathMyIndex + 1;
+		DPWidget pathChild = path.get( pathChildIndex );
+		int childIndex = children.indexOf( pathChild );
+		
+		pathChild.getLinearRepresentationFromPathToEnd( builder, marker, path, pathChildIndex );
+
+		if ( (childIndex + 1) < children.size() )
+		{
+			for (DPWidget child: children.subList( childIndex + 1, children.size() ))
+			{
+				child.appendToLinearRepresentation( builder );
+			}
+		}
+	}
+
+	public void getLinearRepresentationBetweenPaths(ItemStreamBuilder builder, Marker startMarker, ArrayList<DPWidget> startPath, int startPathMyIndex,
+			Marker endMarker, ArrayList<DPWidget> endPath, int endPathMyIndex)
+	{
+		List<DPWidget> children = getInternalChildren();
+		
+	
+		int startPathChildIndex = startPathMyIndex + 1;
+		int endPathChildIndex = endPathMyIndex + 1;
+		
+		DPWidget startChild = startPath.get( startPathChildIndex );
+		DPWidget endChild = endPath.get( endPathChildIndex );
+		
+		int startIndex = children.indexOf( startChild );
+		int endIndex = children.indexOf( endChild );
+	
+		
+		startChild.getLinearRepresentationFromPathToEnd( builder, startMarker, startPath, startPathChildIndex );
+		
+		for (int i = startIndex + 1; i < endIndex; i++)
+		{
+			children.get( i ).appendToLinearRepresentation( builder );
+		}
+
+		endChild.getLinearRepresentationFromStartToPath( builder, endMarker, endPath, endPathChildIndex );
+	}
+
+
+	protected void getLinearRepresentationFromStartOfRootToMarkerFromChild(ItemStreamBuilder builder, Marker marker, DPWidget root, DPWidget fromChild)
+	{
+		if ( root != this  &&  parent != null )
+		{
+			parent.getLinearRepresentationFromStartOfRootToMarkerFromChild( builder, marker, root, this );
+		}
+		
+		for (DPWidget child: getInternalChildren())
+		{
+			if ( child != fromChild )
+			{
+				child.appendToLinearRepresentation( builder );
+			}
+			else
+			{
+				break;
+			}
+		}
+	}
+	
+	protected void getLinearRepresentationFromMarkerToEndOfRootFromChild(ItemStreamBuilder builder, Marker marker, DPWidget root, DPWidget fromChild)
+	{
+		List<DPWidget> children = getInternalChildren();
+		int childIndex = children.indexOf( fromChild );
+		
+		if ( (childIndex + 1) < children.size() )
+		{
+			for (DPWidget child: children.subList( childIndex + 1, children.size() ))
+			{
+				child.appendToLinearRepresentation( builder );
+			}
+		}
+
+		if ( root != this  &&  parent != null )
+		{
+			parent.getLinearRepresentationFromMarkerToEndOfRootFromChild( builder, marker, root, this );
 		}
 	}
 

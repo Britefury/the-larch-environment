@@ -19,6 +19,7 @@ import org.python.core.PyUnicode;
 
 import BritefuryJ.DocModel.DMObject;
 import BritefuryJ.DocModel.DMObjectClass;
+import BritefuryJ.DocModel.DMObjectInterface;
 import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
 import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
 
@@ -179,7 +180,7 @@ public class ObjectNode extends ParserExpression
 	
 	
 	
-	private ParseResult matchObjectContents(ParserState state, DMObject input)
+	private ParseResult matchObjectContents(ParserState state, DMObjectInterface input)
 	{
 		if ( input.isInstanceOf( objClass ) )
 		{
@@ -228,9 +229,9 @@ public class ObjectNode extends ParserExpression
 	
 	protected ParseResult evaluateNode(ParserState state, Object input)
 	{
-		if ( input instanceof DMObject )
+		if ( input instanceof DMObjectInterface )
 		{
-			DMObject node = (DMObject)input;
+			DMObjectInterface node = (DMObjectInterface)input;
 			ParseResult res = matchObjectContents( state, node );
 			if ( res.isValid() )
 			{
@@ -251,13 +252,15 @@ public class ObjectNode extends ParserExpression
 	{
 		if ( start < input.length() )
 		{
+			start = state.skipJunkChars( input, start );
+			
 			Object valueArray[] = input.matchStructuralNode( start );
 			
 			if ( valueArray != null )
 			{
-				if ( valueArray[0] instanceof DMObject )
+				if ( valueArray[0] instanceof DMObjectInterface )
 				{
-					DMObject node = (DMObject)valueArray[0];
+					DMObjectInterface node = (DMObjectInterface)valueArray[0];
 					ParseResult res = matchObjectContents( state, node );
 					if ( res.isValid() )
 					{
@@ -275,9 +278,9 @@ public class ObjectNode extends ParserExpression
 		if ( start < input.size() )
 		{
 			Object x = input.get( start );
-			if ( x instanceof DMObject )
+			if ( x instanceof DMObjectInterface )
 			{
-				DMObject node = (DMObject)x;
+				DMObjectInterface node = (DMObjectInterface)x;
 				ParseResult res = matchObjectContents( state, node );
 				if ( res.isValid() )
 				{

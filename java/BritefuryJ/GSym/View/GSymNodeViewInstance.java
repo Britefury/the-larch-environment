@@ -117,6 +117,16 @@ public class GSymNodeViewInstance implements ElementContext, DVNode.NodeContext
 		return element;
 	}
 	
+	public DPWidget hiddenStructuralNode(Object structuralRepresentation)
+	{
+		viewInstance.getView().profile_startElement();
+		DPWidget element = new DPEmpty();
+		element.setStructuralRepresentation( structuralRepresentation );
+		element.setContext( this );
+		viewInstance.getView().profile_stopElement();
+		return element;
+	}
+	
 	public DPWidget hiddenText(String txt)
 	{
 		viewInstance.getView().profile_startElement();
@@ -433,6 +443,15 @@ public class GSymNodeViewInstance implements ElementContext, DVNode.NodeContext
 	}
 	
 	
+	public DPWidget structuralRepresentation(DPWidget child, Object structuralRepresentation)
+	{
+		viewInstance.getView().profile_startElement();
+		child.setStructuralRepresentation( structuralRepresentation );
+		viewInstance.getView().profile_stopElement();
+		return child;
+	}
+	
+
 	public DPWidget keyboardListener(DPWidget child, ElementKeyboardListener listener)
 	{
 		viewInstance.getView().profile_startElement();

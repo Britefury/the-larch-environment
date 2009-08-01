@@ -39,6 +39,8 @@ public class AnyNode extends ParserExpression
 	{
 		if ( start < input.length() )
 		{
+			start = state.skipJunkChars( input, start );
+			
 			Object valueArray[] = input.matchStructuralNode( start );
 			
 			if ( valueArray != null )

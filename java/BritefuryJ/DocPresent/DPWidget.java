@@ -35,6 +35,8 @@ import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
 import BritefuryJ.Math.Xform2;
+import BritefuryJ.Parser.ItemStream.ItemStream;
+import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
 
 
 
@@ -124,6 +126,7 @@ abstract public class DPWidget
 	protected static int FLAG_REALISED = 0x1;
 	protected static int FLAG_RESIZE_QUEUED = 0x2;
 	protected static int FLAG_SIZE_UP_TO_DATE = 0x4;
+	protected static int FLAG_STRUCTURAL_REPRESENTATION = 0x8;
 	
 	protected int flags;
 	
@@ -143,6 +146,8 @@ abstract public class DPWidget
 
 	protected DPWidget metaElement;
 	protected String debugName;
+	
+	protected Object structuralRepresentation;
 	
 	
 	
@@ -534,6 +539,17 @@ abstract public class DPWidget
 	protected void setFlagSizeUpToDate()
 	{
 		flags |= FLAG_SIZE_UP_TO_DATE;
+	}
+	
+	
+	protected void clearFlagStructuralRepresentation()
+	{
+		flags &= ~FLAG_STRUCTURAL_REPRESENTATION;
+	}
+	
+	protected void setFlagStructuralRepresentation()
+	{
+		flags |= FLAG_STRUCTURAL_REPRESENTATION;
 	}
 	
 	
@@ -1650,6 +1666,7 @@ abstract public class DPWidget
 	{
 		onTextRepresentationModified();
 		onTextRepresentationModifiedEvent();
+		linearRepresentationChanged();
 	}
 	
 	protected void onTextRepresentationModified()
@@ -1686,6 +1703,139 @@ abstract public class DPWidget
 		
 	public abstract String getTextRepresentation();
 	public abstract int getTextRepresentationLength();
+	
+	
+	
+	
+	
+	//
+	//
+	// LINEAR REPRESENTATION METHODS
+	//
+	//
+	
+	
+	public ItemStream getLinearRepresentationFromStartToMarker(Marker marker)
+	{
+		ItemStreamBuilder builder = new ItemStreamBuilder();
+		marker.getElement().getLinearRepresentationFromStartOfRootToMarker( builder, marker, this );
+		return builder.stream();
+	}
+	
+	public ItemStream getLinearRepresentationFromMarkerToEnd(Marker marker)
+	{
+		ItemStreamBuilder builder = new ItemStreamBuilder();
+		marker.getElement().getLinearRepresentationFromMarkerToEndOfRoot( builder, marker, this );
+		return builder.stream();
+	}
+
+	protected abstract void getLinearRepresentationFromStartToPath(ItemStreamBuilder builder, Marker marker, ArrayList<DPWidget> path, int pathMyIndex);
+	protected abstract void getLinearRepresentationFromPathToEnd(ItemStreamBuilder builder, Marker marker, ArrayList<DPWidget> path, int pathMyIndex);
+
+
+
+	
+	public void passLinearRepresentationModifiedEventUpwards()
+	{
+		if ( parent != null )
+		{
+			parent.onChildInnerElementLinearRepresentationModifiedEvent( this );
+		}
+	}
+	
+	protected void linearRepresentationChanged()
+	{
+		onLinearRepresentationModifiedEvent();
+	}
+	
+	protected boolean onLinearRepresentationModifiedEvent()
+	{
+		if ( linearRepresentationListener != null )
+		{
+			if ( linearRepresentationListener.linearRepresentationModified( this ) )
+			{
+				return true;
+			}
+		}
+		
+		if ( parent != null )
+		{
+			return parent.onChildLinearRepresentationModifiedEvent( this );
+		}
+		
+		return false;
+	}
+	
+	protected boolean onInnerElementLinearRepresentationModifiedEvent()
+	{
+		if ( linearRepresentationListener != null )
+		{
+			if ( linearRepresentationListener.innerElementLinearRepresentationModified( this ) )
+			{
+				return true;
+			}
+		}
+		
+		if ( parent != null )
+		{
+			return parent.onChildInnerElementLinearRepresentationModifiedEvent( this );
+		}
+		
+		return false;
+	}
+	
+		
+	protected abstract void buildLinearRepresentation(ItemStreamBuilder builder);
+	
+	protected void appendToLinearRepresentation(ItemStreamBuilder builder)
+	{
+		if ( hasStructuralRepresentation() )
+		{
+			if ( structuralRepresentation instanceof ItemStream )
+			{
+				builder.extend( (ItemStream)structuralRepresentation );
+			}
+			else
+			{
+				builder.appendStructuralValue( structuralRepresentation );
+			}
+		}
+		else
+		{
+			buildLinearRepresentation( builder );
+		}
+	}
+	
+	public ItemStream getLinearRepresentation()
+	{
+		ItemStreamBuilder builder = new ItemStreamBuilder();
+		appendToLinearRepresentation( builder );
+		return builder.stream();
+	}
+	
+	
+	
+	public void clearStructuralRepresentation()
+	{
+		clearFlagStructuralRepresentation();
+		structuralRepresentation = null;
+	}
+	
+	public void setStructuralRepresentation(Object structuralRepresentation)
+	{
+		setFlagStructuralRepresentation();
+		this.structuralRepresentation = structuralRepresentation;
+	}
+	
+	public Object getStructuralRepresentation()
+	{
+		return structuralRepresentation;
+	}
+	
+	public boolean hasStructuralRepresentation()
+	{
+		return ( flags & FLAG_STRUCTURAL_REPRESENTATION )  !=  0;
+	}
 	
 	
 	

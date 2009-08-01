@@ -166,7 +166,7 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 	
 	# Yield expression and yield atom
 	@ObjectNodeDispatchMethod
-	def YieldAtom(self, node, value):
+	def YieldExpr(self, node, value):
 		return '(yield ' + self( value ) + ')'
 		
 	
@@ -739,8 +739,8 @@ class TestCase_Python25CodeGenerator (unittest.TestCase):
 		self._testSX( '(py DictLiteral values=[(py DictKeyValuePair key=(py Load name=a) value=(py Load name=b)) (py DictKeyValuePair key=(py Load name=c) value=(py Load name=d))])', '{ a:b, c:d }' )
 		
 	
-	def test_YieldAtom(self):
-		self._testSX( '(py YieldAtom value=(py Load name=a))', '(yield a)' )
+	def test_YieldExpr(self):
+		self._testSX( '(py YieldExpr value=(py Load name=a))', '(yield a)' )
 		
 		
 	def test_AttributeRef(self):

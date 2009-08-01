@@ -38,7 +38,7 @@ public class LiteralNode extends ParserExpression
 	
 	protected ParseResult evaluateNode(ParserState state, Object input)
 	{
-		if ( input.equals( matchValue ) )
+		if ( input == matchValue  ||  input.equals( matchValue ) )
 		{
 			return new ParseResult( input, 0, 1 );
 		}
@@ -55,11 +55,13 @@ public class LiteralNode extends ParserExpression
 	{
 		if ( start < input.length() )
 		{
+			start = state.skipJunkChars( input, start );
+			
 			Object valueArray[] = input.matchStructuralNode( start );
 			
 			if ( valueArray != null )
 			{
-				if ( valueArray[0].equals( matchValue ) )
+				if ( valueArray[0] == matchValue  ||  valueArray[0].equals( matchValue ) )
 				{
 					return new ParseResult( valueArray[0], start, start + 1 );
 				}
@@ -75,7 +77,7 @@ public class LiteralNode extends ParserExpression
 		{
 			Object x = input.get( start );
 			
-			if ( x.equals( matchValue ) )
+			if ( x == matchValue  ||  x.equals( matchValue ) )
 			{
 				return new ParseResult( x, start, start + 1 );
 			}
