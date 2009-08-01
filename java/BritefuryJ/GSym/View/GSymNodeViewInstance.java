@@ -52,6 +52,7 @@ import BritefuryJ.DocView.DVNode;
 import BritefuryJ.GSym.View.ListView.ListViewLayout;
 import BritefuryJ.GSym.View.ListView.PySeparatorElementFactory;
 import BritefuryJ.GSym.View.ListView.SeparatorElementFactory;
+import BritefuryJ.Parser.ItemStream.ItemStream;
 
 public class GSymNodeViewInstance implements ElementContext, DVNode.NodeContext
 {
@@ -117,11 +118,32 @@ public class GSymNodeViewInstance implements ElementContext, DVNode.NodeContext
 		return element;
 	}
 	
-	public DPWidget hiddenStructuralNode(Object structuralRepresentation)
+	public DPWidget hiddenStructuralObject(Object structuralRepresentation)
 	{
 		viewInstance.getView().profile_startElement();
 		DPWidget element = new DPEmpty();
-		element.setStructuralRepresentation( structuralRepresentation );
+		element.setStructuralRepresentationObject( structuralRepresentation );
+		element.setContext( this );
+		viewInstance.getView().profile_stopElement();
+		return element;
+	}
+	
+	public DPWidget hiddenStructuralSequence(List<Object> structuralRepresentation)
+	{
+		viewInstance.getView().profile_startElement();
+		DPWidget element = new DPEmpty();
+		element.setStructuralRepresentationSequence( structuralRepresentation );
+		element.setContext( this );
+		viewInstance.getView().profile_stopElement();
+		return element;
+	}
+	
+	
+	public DPWidget hiddenStructuralStream(ItemStream structuralRepresentation)
+	{
+		viewInstance.getView().profile_startElement();
+		DPWidget element = new DPEmpty();
+		element.setStructuralRepresentationStream( structuralRepresentation );
 		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
@@ -443,10 +465,26 @@ public class GSymNodeViewInstance implements ElementContext, DVNode.NodeContext
 	}
 	
 	
-	public DPWidget structuralRepresentation(DPWidget child, Object structuralRepresentation)
+	public DPWidget structuralRepresentationObject(DPWidget child, Object structuralRepresentation)
 	{
 		viewInstance.getView().profile_startElement();
-		child.setStructuralRepresentation( structuralRepresentation );
+		child.setStructuralRepresentationObject( structuralRepresentation );
+		viewInstance.getView().profile_stopElement();
+		return child;
+	}
+	
+	public DPWidget structuralRepresentationSequence(DPWidget child, List<Object> structuralRepresentation)
+	{
+		viewInstance.getView().profile_startElement();
+		child.setStructuralRepresentationSequence( structuralRepresentation );
+		viewInstance.getView().profile_stopElement();
+		return child;
+	}
+	
+	public DPWidget structuralRepresentationStream(DPWidget child, ItemStream structuralRepresentation)
+	{
+		viewInstance.getView().profile_startElement();
+		child.setStructuralRepresentationStream( structuralRepresentation );
 		viewInstance.getView().profile_stopElement();
 		return child;
 	}

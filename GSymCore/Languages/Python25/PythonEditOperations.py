@@ -208,11 +208,11 @@ def parseStream(parser, input, outerPrecedence=None):
 			return removeUnNeededParens( value, outerPrecedence )
 		else:
 			print '<INCOMPLETE>'
-			print 'FULL TEXT:', input
-			print 'PARSED:', input[:pos]
+			print 'FULL TEXT:', input.toString().replace( '\n', '\\n' )
+			print 'PARSED:', input[:pos].toString().replace( '\n', '\\n' )
 			return None
 	else:
-		print 'FULL TEXT:', input
+		print 'FULL TEXT:', input.toString().replace( '\n', '\\n' )
 		print '<FAIL>'
 		return None
 

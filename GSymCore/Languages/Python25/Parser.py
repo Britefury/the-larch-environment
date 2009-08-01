@@ -6,6 +6,7 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
 
+import re
 import string
 
 from BritefuryJ.DocModel import DMObject, DMNode
@@ -1037,7 +1038,8 @@ class Python25Grammar (Grammar):
 	@Rule
 	def commentStmt(self):
 		return ObjectNode( Nodes.CommentStmt )  |  \
-		       ( Literal( '#' )  +  Word( string.printable.replace( '\n', '' ) ).optional() + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Nodes.CommentStmt( comment=xs[1]   if xs[1] is not None   else  '' ) )
+		       ( RegEx( re.escape( '#' ) + '[' + re.escape( string.printable.replace( '\n', '' ) ) + ']*' ) + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Nodes.CommentStmt( comment=xs[0][1:] ) )
+	
 	
 	@Rule
 	def blankLine(self):

@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.WeakHashMap;
 
+
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Border.EmptyBorder;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
@@ -28,6 +29,10 @@ import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Layout.PackingParams;
 import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.Marker.Marker;
+import BritefuryJ.DocPresent.StructuralRepresentation.StructuralRepresentation;
+import BritefuryJ.DocPresent.StructuralRepresentation.StructuralRepresentationObject;
+import BritefuryJ.DocPresent.StructuralRepresentation.StructuralRepresentationSequence;
+import BritefuryJ.DocPresent.StructuralRepresentation.StructuralRepresentationStream;
 import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.WidgetStyleSheet;
@@ -126,7 +131,6 @@ abstract public class DPWidget
 	protected static int FLAG_REALISED = 0x1;
 	protected static int FLAG_RESIZE_QUEUED = 0x2;
 	protected static int FLAG_SIZE_UP_TO_DATE = 0x4;
-	protected static int FLAG_STRUCTURAL_REPRESENTATION = 0x8;
 	
 	protected int flags;
 	
@@ -147,7 +151,7 @@ abstract public class DPWidget
 	protected DPWidget metaElement;
 	protected String debugName;
 	
-	protected Object structuralRepresentation;
+	protected StructuralRepresentation structuralRepresentation;
 	
 	
 	
@@ -539,17 +543,6 @@ abstract public class DPWidget
 	protected void setFlagSizeUpToDate()
 	{
 		flags |= FLAG_SIZE_UP_TO_DATE;
-	}
-	
-	
-	protected void clearFlagStructuralRepresentation()
-	{
-		flags &= ~FLAG_STRUCTURAL_REPRESENTATION;
-	}
-	
-	protected void setFlagStructuralRepresentation()
-	{
-		flags |= FLAG_STRUCTURAL_REPRESENTATION;
 	}
 	
 	
@@ -1789,16 +1782,9 @@ abstract public class DPWidget
 	
 	protected void appendToLinearRepresentation(ItemStreamBuilder builder)
 	{
-		if ( hasStructuralRepresentation() )
+		if ( structuralRepresentation != null )
 		{
-			if ( structuralRepresentation instanceof ItemStream )
-			{
-				builder.extend( (ItemStream)structuralRepresentation );
-			}
-			else
-			{
-				builder.appendStructuralValue( structuralRepresentation );
-			}
+			structuralRepresentation.addToStream( builder );
 		}
 		else
 		{
@@ -1817,24 +1803,38 @@ abstract public class DPWidget
 	
 	public void clearStructuralRepresentation()
 	{
-		clearFlagStructuralRepresentation();
 		structuralRepresentation = null;
 	}
 	
-	public void setStructuralRepresentation(Object structuralRepresentation)
+	public void setStructuralRepresentation(StructuralRepresentation structuralRepresentation)
 	{
-		setFlagStructuralRepresentation();
 		this.structuralRepresentation = structuralRepresentation;
 	}
 	
-	public Object getStructuralRepresentation()
+	public void setStructuralRepresentationObject(Object value)
 	{
-		return structuralRepresentation;
+		this.structuralRepresentation = new StructuralRepresentationObject( value );
+	}
+	
+	public void setStructuralRepresentationSequence(List<Object> values)
+	{
+		this.structuralRepresentation = new StructuralRepresentationSequence( values );
+	}
+	
+	public void setStructuralRepresentationStream(ItemStream value)
+	{
+		this.structuralRepresentation = new StructuralRepresentationStream( value );
+	}
+	
+	
+	public Object getStructuralRepresentationValue()
+	{
+		return structuralRepresentation.getValue();
 	}
 	
 	public boolean hasStructuralRepresentation()
 	{
-		return ( flags & FLAG_STRUCTURAL_REPRESENTATION )  !=  0;
+		return structuralRepresentation != null;
 	}
 	
 	

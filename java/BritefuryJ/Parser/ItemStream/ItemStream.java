@@ -183,6 +183,46 @@ public class ItemStream
 		return length;
 	}
 	
+	public boolean contains(String sub)
+	{
+		for (Item item: items)
+		{
+			if ( item instanceof TextItem )
+			{
+				if ( ((TextItem)item).textValue.contains( sub ) )
+				{
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	public boolean contains(Object sub)
+	{
+		for (Item item: items)
+		{
+			if ( item instanceof StructuralItem )
+			{
+				if ( sub == ((StructuralItem)item).structuralValue )
+				{
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	public boolean __contains__(String sub)
+	{
+		return contains( sub );
+	}
+	
+	public boolean __contains__(Object sub)
+	{
+		return contains( sub );
+	}
+	
 	
 	public Object __getitem__(int pos)
 	{
