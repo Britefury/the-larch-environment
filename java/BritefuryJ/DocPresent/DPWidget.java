@@ -1728,11 +1728,15 @@ abstract public class DPWidget
 
 
 	
-	public void passLinearRepresentationModifiedEventUpwards()
+	public boolean passLinearRepresentationModifiedEventUpwards()
 	{
 		if ( parent != null )
 		{
-			parent.onChildInnerElementLinearRepresentationModifiedEvent( this );
+			return parent.onChildInnerElementLinearRepresentationModifiedEvent( this );
+		}
+		else
+		{
+			return false;
 		}
 	}
 	

@@ -66,10 +66,9 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	
 	public void insertText(Marker marker, String x)
 	{
-		int index = marker.getIndex();
-		index = Math.min( Math.max( index, 0 ), textRepresentation.length() );
-		textRepresentation = textRepresentation.substring( 0, index ) + x + textRepresentation.substring( index );
+		int index = marker.getClampedIndex();
 		markerInsert( index, x.length() );
+		textRepresentation = textRepresentation.substring( 0, index ) + x + textRepresentation.substring( index );
 		textRepresentationChanged();
 	}
 
@@ -100,8 +99,7 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	
 	public void replaceText(Marker marker, int length, String x)
 	{
-		int index = marker.getIndex();
-		index = Math.min( Math.max( index, 0 ), textRepresentation.length() );
+		int index = marker.getClampedIndex();
 		textRepresentation = textRepresentation.substring( 0, index )  +  x  +  textRepresentation.substring( index + length );
 		
 		if ( x.length() > length )

@@ -183,8 +183,8 @@ public class DPText extends DPContentLeafEditableEntry
 	public void drawSelection(Graphics2D graphics, Marker from, Marker to)
 	{
 		AffineTransform current = pushGraphicsTransform( graphics );
-		int startIndex = from != null  ?  from.getIndex()  :  0;
-		int endIndex = to != null  ?  to.getIndex()  :  textRepresentation.length();
+		int startIndex = from != null  ?  from.getClampedIndex()  :  0;
+		int endIndex = to != null  ?  to.getClampedIndex()  :  textRepresentation.length();
 		visual.drawSelection( graphics, startIndex, endIndex );
 		popGraphicsTransform( graphics, current );
 	}
@@ -213,7 +213,7 @@ public class DPText extends DPContentLeafEditableEntry
 
 	protected Point2 getMarkerPosition(Marker marker)
 	{
-		int index = marker.getIndex();
+		int index = marker.getClampedIndex();
 		return visual.getCharacterBoundaryPosition( index );
 	}
 	
