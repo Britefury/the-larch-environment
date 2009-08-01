@@ -371,6 +371,6 @@ public class DocTreeList extends DocTreeNode implements DMListInterface
 	
 	public String toString()
 	{
-		return "DocTreeList<< " + node.toString() + " >>";
+		return "DocTreeList<" + node.toString() + ">";
 	}
 }

@@ -259,7 +259,7 @@ def compoundStatementEditor(ctx, node, precedence, compoundBlocks, state, suiteP
 
 			
 		suiteElement = indentedSuiteView( ctx, suite, statementParser )
-		suiteElement.setStructuralRepresentationObject( suite )
+		suiteElement.setStructuralRepresentationObject( Nodes.IndentedBlock( suite=suite ) )
 		suiteElement = ctx.linearRepresentationListener( suiteElement, SuiteLinearRepresentationListener( suiteParser, suite ) )
 	
 		
@@ -1406,8 +1406,10 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Indented block
 	@ObjectNodeDispatchMethod
 	def IndentedBlock(self, ctx, state, node, suite):
-		indentedSuite = ctx.indent( 30.0, suiteView( ctx, suite, self._parser.statement() ) )
-		return ctx.border( indentedBlock_border, ContainerStyleSheet.defaultStyleSheet, indentedSuite )
+		suiteElement = ctx.indent( 30.0, suiteView( ctx, suite, self._parser.singleLineStatement() ) )
+		suiteElement.setStructuralRepresentationObject( node )
+		suiteElement = ctx.linearRepresentationListener( suiteElement, SuiteLinearRepresentationListener( self._parser.compoundSuite(), suite ) )
+		return ctx.border( indentedBlock_border, ContainerStyleSheet.defaultStyleSheet, suiteElement )
 
 
 

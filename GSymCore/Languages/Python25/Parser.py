@@ -1897,6 +1897,14 @@ class TestCase_Python25Parser (ParserTestCase):
 					     	Nodes.BlankLine(),
 					     Nodes.Dedent() ],
 				     Nodes.IndentedBlock( suite=[ Nodes.BlankLine() ] ) )
+		self._parseListTest( g.suiteItem(),
+				     [
+					     Nodes.Indent(),
+					     Nodes.Indent(),
+					     	Nodes.BlankLine(),
+					     Nodes.Dedent(),
+					     Nodes.Dedent() ],
+				     Nodes.IndentedBlock( suite=[ Nodes.IndentedBlock( suite=[ Nodes.BlankLine() ] ) ] ) )
 
 
 		
