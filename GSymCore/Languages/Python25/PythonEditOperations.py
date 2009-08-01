@@ -120,194 +120,6 @@ def getStatementContextPathsFromCommonRoot(ctx0, ctx1):
 
 	
 
-
-#
-#
-# LINE LIST
-#
-#
-
-class PyLine (object):
-	def __init__(self, indent):
-		self.indent = indent
-		
-	def getAST(self, parser):
-		return None
-	
-	def withIndent(self, indent):
-		pass
-	
-	
-	@abstractmethod
-	def copy(self):
-		pass
-	
-	
-
-		
-class PyTextLine (PyLine):
-	def __init__(self, indent, text):
-		super( PyTextLine, self ).__init__( indent )
-		self.text = text
-		
-	def getAST(self, parser):
-		return parseText( parser, self.text )
-	
-	def withIndent(self, indent):
-		return _TextLine( indent, self.text )
-	
-	def __eq__(self, x):
-		if isinstance( x, PyTextLine ):
-			return self.indent == x.indent  and  self.text == x.text
-		else:
-			return self.text == x
-		
-	def __str__(self):
-		return '>>' + '\t' * self.indent  +  str( self.text )
-	
-	
-	def copy(self):
-		return PyTextLine( self.indent, self.text )
-	
-	
-		
-_identity = DefaultIdentityTransformationFunction()
-_innerFn = lambda x, f: x
-
-class PyASTLine (PyLine):
-	def __init__(self, indent, ast):
-		super( PyASTLine, self ).__init__( indent )
-		if isinstance( ast, DocTreeNode ):
-			ast = ast.getNode()
-		self.ast = ast
-		
-	def getAST(self, parser):
-		return self.ast
-	
-	def withIndent(self, indent):
-		return _ASTLine( indent, self.ast )
-		
-	def __eq__(self, x):
-		if isinstance( x, PyASTLine ):
-			return self.indent == x.indent  and  self.ast is x.ast
-		else:
-			return self.ast is x
-		
-	def __str__(self):
-		return '>>' + '\t' * self.indent  +  str( self.ast )
-	
-	def copy(self):
-		ast = _identity( self.ast, _innerFn )
-		if isCompoundStmt( ast ):
-			ast['suite'] = []
-		return PyASTLine( self.indent, ast )
-
-	
-		
-class PyLineList (object):
-	def __init__(self, nodes):
-		self.lines = []
-		for node in nodes:
-			self._visit( 0, node )
-	
-			
-	def indexOf(self, x):
-		for i, line in enumerate( self.lines ):
-			if line == x:
-				return i
-		return None
-	
-	
-	def subList(self, startIndex, endIndex):
-		x = PyLineList( [] )
-		x.lines = [ line.copy()   for line in self.lines[startIndex:endIndex] ]
-		minIndent = min( [ line.indent   for line in x.lines ] )   if len( x.lines ) > 0   else   0
-		for line in x.lines:
-			line.indent -= minIndent
-		return x
-	
-	
-	def replaceRangeWithAST(self, startIndex, endIndex, astLines):
-		indent = self.lines[startIndex].indent
-		self.lines[startIndex:endIndex] = [ PyASTLine( indent, ast )   for ast in astLines ]
-		
-		
-	def insertLineList(self, index, lineList, indentOffset):
-		insertion = [ line.copy()   for line in lineList.lines ]
-		for line in insertion:
-			line.indent += indentOffset
-		self.lines[index:index] = insertion
-	
-	def insertASTLine(self, index, ast, indentation):
-		self.lines.insert( index, PyASTLine( indentation, ast ) )
-		
-	def deleteLine(self, index):
-		del self.lines[index]
-	
-	def indentRange(self, startIndex, endIndex):
-		for line in self.lines[startIndex:endIndex]:
-			line.indent += 1
-			
-	def dedentRange(self, startIndex, endIndex):
-		for line in self.lines[startIndex:endIndex]:
-			line.indent -= 1
-			
-	
-	def parse(self, lineParser):
-		suite = []
-		suiteStack = [ suite ]
-		
-		currentIndent = 0
-		for line in self.lines:
-			indent = line.indent
-			indent = max( indent, 0 )
-			
-			# Handle change in indentation
-			while indent > currentIndent:
-				if len( suite ) == 0  or  not isCompoundStmt( suite[-1] ):
-					suite.append( Nodes.IndentedBlock( suite=[] ) )
-	
-				comp = suite[-1]
-				suite = comp['suite']
-				suiteStack.append( suite )
-				currentIndent += 1
-			
-			while indent < currentIndent:
-				del suiteStack[-1]
-				suite = suiteStack[-1]
-				currentIndent -= 1
-				
-			
-			# Add the node
-			ast = line.getAST( lineParser )
-			if isCompoundStmt( ast ):
-				ast['suite'] = []
-			suite.append( ast )
-		
-		return suiteStack[0]
-	
-	
-	
-	def _visit(self, indent, node):
-		if not isIndentedBlock( node )   and   not isPythonModule( node ):
-			self.lines.append( PyASTLine( indent, node ) )
-		if isCompoundStmt( node )  or  isPythonModule( node ):
-			for n in node['suite']:
-				self._visit( indent + 1, n )
-				
-				
-				
-	def copy(self):
-		x = PyLineList( [] )
-		x.lines = [ line.copy()   for line in self.lines ]
-		return x
-				
-				
-	def __str__(self):
-		return '\n'.join( [ str( line )   for line in self.lines ] )
-
-		
-		
 			
 		
 
@@ -323,42 +135,6 @@ def pyReplaceExpression(ctx, data, replacement):
 	return EditOperations.replaceNodeContents( ctx, data, replacement )
 
 
-def pyReplaceStatement(ctx, data, replacement, bDontReplaceIfEqual=True):
-	if isinstance( data, DocTreeNode ):
-		if data == replacement  and  bDontReplaceIfEqual:
-			# Same data; ignore
-			return data
-		else:
-			if isCompoundStmt( data ):
-				originalSuite = data['suite']
-				if isCompoundStmt( replacement ):
-					replacement['suite'].extend( originalSuite )
-					return EditOperations.replaceNodeContents( ctx, data, replacement )
-				else:
-					return EditOperations.replaceWithRange( ctx, data, [ replacement, Nodes.IndentedBlock( suite=originalSuite ) ] )
-			else:
-				if isCompoundStmt( replacement ):
-					parent = data.getParentTreeNode()
-					if parent is None:
-						raise TypeError, 'PythonEditOperations:pyReplace(): no parent '
-					index = parent.indexOfById( data.getNode() )
-					if index == -1:
-						raise ValueError, 'could not replace'
-					if len( parent )  > ( index + 1 ):
-						if isIndentedBlock( parent[index+1] ):
-							# Join the indented block
-							indentedBlock = parent[index+1]
-							originalSuite = indentedBlock['suite']
-							replacement['suite'].extend( originalSuite )
-							del parent[index+1]
-							return EditOperations.replaceNodeContents( ctx, data, replacement )
-					return EditOperations.replaceNodeContents( ctx, data, replacement )
-				else:
-					return EditOperations.replaceNodeContents( ctx, data, replacement )
-	else:
-		raise TypeError, 'PythonEditOperations:pyReplace(): @data must be a DocTreeNode'
-	
-	
 	
 def pyReplaceStmt(ctx, target, replacement, bDontReplaceIfEqual=True):
 	if isinstance( target, DocTreeNode ):
@@ -370,13 +146,6 @@ def pyReplaceStmt(ctx, target, replacement, bDontReplaceIfEqual=True):
 	else:
 		raise TypeError, 'PythonEditOperations:pyReplaceStmt(): @target must be a DocTreeNode'
 			
-def indexById(xs, y):
-	for i, x in enumerate( xs ):
-		if y is x:
-			return i
-	return -1
-
-
 def performSuiteEdits(target, modified):
 	commonPrefixLen = 0
 	for i, (t, m) in enumerate( zip( target, modified ) ):
@@ -397,21 +166,6 @@ def performSuiteEdits(target, modified):
 	target[commonPrefixLen:len(target)-commonSuffixLen] = modified[commonPrefixLen:len(modified)-commonSuffixLen]
 	return target[commonPrefixLen:len(target)-commonSuffixLen]
 	
-
-
-
-
-def pyReplaceStatementWithRange(ctx, data, replacement):
-	if isinstance( data, DocTreeNode ):
-		if len( replacement ) == 1:
-			return [ pyReplaceStatement( ctx, data, replacement[0] ) ]
-		else:
-			xs = EditOperations.insertRangeBefore( ctx, data, replacement[:-1] )
-			xs += [ pyReplaceStatement( ctx, data, replacement[-1], False ) ]
-			return xs
-	else:
-		raise TypeError, 'PythonEditOperations:pyReplace(): @data must be a DocTreeNode'
-
 
 
 #
