@@ -175,6 +175,6 @@ public class DocTreeObject extends DocTreeNode implements DMObjectInterface
 	
 	public String toString()
 	{
-		return "DocTreeObject<< " + node.toString() + " >>";
+		return "DocTreeObject<" + node.toString() + ">";
 	}
 }

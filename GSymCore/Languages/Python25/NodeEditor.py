@@ -136,6 +136,7 @@ class StatementLinearRepresentationListener (_StatementLinearRepresentationListe
 			pyReplaceStmt( ctx, node, parsed )
 			return True
 		else:
+			element.setStructuralRepresentationObject( parsed )
 			return element.passLinearRepresentationModifiedEventUpwards()
 
 			
@@ -230,7 +231,12 @@ class StatementKeyboardListener (ElementKeyboardListener):
 		element.passLinearRepresentationModifiedEventUpwards()
 	
 	def dedent(self, element, context, node):
-		pass
+		suite = node.getParentTreeNode()
+		suiteParent = suite.getParentTreeNode()
+		if not suiteParent.isInstanceOf( Nodes.PythonModule ):
+			statement = element.getStructuralRepresentationValue()
+			element.setStructuralRepresentationSequence( [ Nodes.Dedent(), statement, Nodes.Indent() ] )
+			element.passLinearRepresentationModifiedEventUpwards()
 	
 	
 	
