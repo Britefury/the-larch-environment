@@ -194,9 +194,9 @@ def statementNodeEditor(ctx, node, contents, precedence, state):
 					builder.appendStructuralValue( x )
 				else:
 					raise TypeError, 'UNPARSED node should only contain strings or objects, not %s'  %  ( type( x ), )
-			para.setStructuralRepresentation( builder.stream() )
+			para.setStructuralRepresentationStream( builder.stream() )
 		else:
-			para.setStructuralRepresentation( node )
+			para.setStructuralRepresentationObject( node )
 		para = ctx.linearRepresentationListener( para, StatementLinearRepresentationListener.newListener( parser ) )
 		para = ctx.keyboardListener( para, _statementKeyboardListener )
 		return para
@@ -217,7 +217,7 @@ def compoundStatementHeaderEditor(ctx, node, headerContents, precedence, state, 
 	newLine = ctx.whitespace( '\n' )
 
 	para = ctx.paragraph( python_paragraphStyle, [ segment, newLine ] )
-	para.setStructuralRepresentation( node )
+	para.setStructuralRepresentationObject( node )
 	para = ctx.linearRepresentationListener( para, StatementLinearRepresentationListener.newListener( parser ) )
 	para = ctx.keyboardListener( para, _statementKeyboardListener )
 	if headerContainerFn is not None:
@@ -251,7 +251,7 @@ def compoundStatementEditor(ctx, node, precedence, compoundBlocks, state, suiteP
 		newLine = ctx.whitespace( '\n' )
 		
 		headerParagraph = ctx.paragraph( python_paragraphStyle, [ headerSegment, newLine ] )
-		headerParagraph.setStructuralRepresentation( headerNode )
+		headerParagraph.setStructuralRepresentationObject( headerNode )
 		headerParagraph = ctx.keyboardListener( headerParagraph, _statementKeyboardListener )
 		
 		if headerContainerFn is not None:
@@ -259,7 +259,7 @@ def compoundStatementEditor(ctx, node, precedence, compoundBlocks, state, suiteP
 
 			
 		suiteElement = indentedSuiteView( ctx, suite, statementParser )
-		suiteElement.setStructuralRepresentation( suite )
+		suiteElement.setStructuralRepresentationObject( suite )
 		suiteElement = ctx.linearRepresentationListener( suiteElement, SuiteLinearRepresentationListener( suiteParser, suite ) )
 	
 		
@@ -323,8 +323,8 @@ def indentedSuiteView(ctx, suite, parser):
 	#	VBox - suite
 	#		children*
 
-	indent = ctx.hiddenStructuralNode( Nodes.Indent() )
-	dedent = ctx.hiddenStructuralNode( Nodes.Dedent() )
+	indent = ctx.hiddenStructuralObject( Nodes.Indent() )
+	dedent = ctx.hiddenStructuralObject( Nodes.Dedent() )
 	lineViews = [ indent ]  + ctx.mapViewEvalFn( suite, None, python25ViewState( PRECEDENCE_NONE, parser, MODE_EDITSTATEMENT ) )  +  [ dedent ]
 	return ctx.vbox( suite_vboxStyle, lineViews )
 
@@ -349,7 +349,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	@ObjectNodeDispatchMethod
 	def PythonModule(self, ctx, state, node, suite):
 		suiteElement = suiteView( ctx, suite, self._parser.singleLineStatement() )
-		suiteElement.setStructuralRepresentation( suite )
+		suiteElement.setStructuralRepresentationObject( suite )
 		suiteElement = ctx.linearRepresentationListener( suiteElement, SuiteLinearRepresentationListener( self._parser.suite(), suite ) )
 		return suiteElement
 
@@ -750,7 +750,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		xView = ctx.viewEvalFn( x, None, python25ViewState( xPrec, self._parser.expression(), MODE_EDITEXPRESSION ) )
 		yView = ctx.viewEvalFn( y, None, python25ViewState( yPrec, self._parser.expression(), MODE_EDITEXPRESSION ) )
 		return expressionNodeEditor( ctx, node,
-					     ctx.structuralRepresentation( ctx.fraction( div_fractionStyle, xView, yView, '/' ), node ),
+					     ctx.structuralRepresentationObject( ctx.fraction( div_fractionStyle, xView, yView, '/' ), node ),
 					     PRECEDENCE_MULDIVMOD,
 					     state )
 

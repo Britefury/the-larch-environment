@@ -126,12 +126,12 @@ class StatementLinearRepresentationListener (_StatementLinearRepresentationListe
 		value = element.getLinearRepresentation()
 		parsed = parseStream( self._parser, value )
 		if parsed is not None:
-			return self.handleParsed( ctx, node, value, parsed )
+			return self.handleParsed( element, ctx, node, value, parsed )
 		else:
 			return element.passLinearRepresentationModifiedEventUpwards()
 
 		
-	def handleParsed(self, ctx, node, value, parsed):
+	def handleParsed(self, element, ctx, node, value, parsed):
 		if not isCompoundStmtOrCompoundHeader( node )  and  not isCompoundStmtOrCompoundHeader( parsed ):
 			pyReplaceStmt( ctx, node, parsed )
 			return True
@@ -209,9 +209,9 @@ class StatementKeyboardListener (ElementKeyboardListener):
 			node = context.getTreeNode()
 			
 			if event.getModifiers() & KeyEvent.SHIFT_MASK  !=  0:
-				context.getViewContext().getEditHandler().dedent( context, node )
+				self.dedent( element, context, node )
 			else:
-				context.getViewContext().getEditHandler().indent( context, node )
+				self.indent( element, context, node )
 			return True
 		else:
 			return False
@@ -221,7 +221,16 @@ class StatementKeyboardListener (ElementKeyboardListener):
 		return False
 	
 	def onKeyRelease(self, element, event):
-		return False
+		return False#
+	
+	
+	def indent(self, element, contenxt, node):
+		statement = element.getStructuralRepresentationValue()
+		element.setStructuralRepresentationSequence( [ Nodes.Indent(), statement, Nodes.Dedent() ] )
+		element.passLinearRepresentationModifiedEventUpwards()
+	
+	def dedent(self, element, context, node):
+		pass
 	
 	
 	
