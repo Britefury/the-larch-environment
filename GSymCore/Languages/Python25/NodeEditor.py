@@ -222,7 +222,10 @@ class SuiteLinearRepresentationListener (ElementLinearRepresentationListener):
 		# Get the content
 		value = element.getLinearRepresentation()
 		#t1 = System.nanoTime()
+		
 		parsed = parseStream( self._parser, value )
+		#parsed = debugParseStream( self._parser, value )
+
 		#t2 = System.nanoTime()
 		#f = open( 'parselog.txt', 'a+' )
 		#f.write( 'SuiteLinearRepresentationListener.innerElementLinearRepresentationModified: parse time=%f\n'  %  ( float(t2-t1)/1.0e9, ) )

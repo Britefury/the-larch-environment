@@ -629,7 +629,7 @@ abstract public class ParserTestCase extends TestCase
 		{
 			System.out.println( "PARSE FAILURE while parsing " + input + ", stopped at " + String.valueOf( result.getEnd() ) + ": " + input.subList(  0, result.getEnd() ) );
 			System.out.println( "EXPECTED:" );
-			System.out.println( expected.toString() );
+			System.out.println( "" + expected );
 		}
 		assertTrue( result.isValid() );
 		

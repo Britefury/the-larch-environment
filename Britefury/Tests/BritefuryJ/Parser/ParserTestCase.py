@@ -7,6 +7,7 @@
 ##-*************************
 from BritefuryJ.DocModel import DMNode
 from BritefuryJ.DocModel import DMIOReader, DMIOWriter, DMModuleResolver
+from BritefuryJ.ParserDebugViewer import ParseViewFrame
 
 import string
 import unittest
@@ -33,13 +34,27 @@ class ParserTestCase (unittest.TestCase):
 	resolver = Resolver()
 	
 	
+	
+	def __init__(self, *args, **kwargs):
+		super( ParserTestCase, self ).__init__( *args, **kwargs )
+		self._bShowDebugView = False
+		self._bDebugViewVisible = False
+		
+	
+	def enableDebugView(self):
+		self._bShowDebugView = True
+		
+	
+	
+	
 	def _parseStringTest(self, parser, input, expected, ignoreChars=_whitespaceRegex):
-		result = parser.parseStringChars( input, ignoreChars )
+		result = parser.debugParseStringChars( input, ignoreChars )
 		
 		if not result.isValid():
 			print 'PARSE FAILURE while parsing %s, stopped at %d: %s'  %  ( input, result.end, input[:result.end] )
 			print 'EXPECTED:'
 			print expected
+			self._onError( result )
 		self.assert_( result.isValid() )
 		
 		value = DMNode.coerce( result.value )
@@ -53,6 +68,7 @@ class ParserTestCase (unittest.TestCase):
 			print expected
 			print 'RESULT:'
 			print value
+			self._onError( result )
 
 		bSame = value == expected
 		if not bSame:
@@ -62,12 +78,13 @@ class ParserTestCase (unittest.TestCase):
 			print ''
 			print 'RESULT:'
 			print value
+			self._onError( result )
 		self.assert_( bSame )
 
 
 
 	def _parseStringTestSX(self, parser, input, expectedSX, ignoreChars=_whitespaceRegex):
-		result = parser.parseStringChars( input, ignoreChars )
+		result = parser.debugParseStringChars( input, ignoreChars )
 
 		expected = DMIOReader.readFromString( expectedSX, self.resolver )
 		
@@ -75,6 +92,7 @@ class ParserTestCase (unittest.TestCase):
 			print 'PARSE FAILURE while parsing', input
 			print 'EXPECTED:'
 			print expectedSX
+			self._onError( result )
 		self.assert_( result.isValid() )
 
 		value = DMNode.coerce( result.value )
@@ -88,6 +106,7 @@ class ParserTestCase (unittest.TestCase):
 			print expectedSX
 			print 'RESULT:'
 			print DMIOWriter.writeAsString( value )
+			self._onError( result )
 
 		bSame = value == expected
 		if not bSame:
@@ -97,11 +116,12 @@ class ParserTestCase (unittest.TestCase):
 			print ''
 			print 'RESULT:'
 			print DMIOWriter.writeAsString( value )
+			self._onError( result )
 		self.assert_( bSame )
 
 		
 	def _parseStringFailTest(self, parser, input, ignoreChars=_whitespaceRegex):
-		result = parser.parseStringChars( input, ignoreChars )
+		result = parser.debugParseStringChars( input, ignoreChars )
 		
 		if result.isValid()   and   result.end == len( input ):
 			print 'While parsing', input
@@ -111,18 +131,20 @@ class ParserTestCase (unittest.TestCase):
 			print 'RESULT:'
 			print result.value
 			print 'consumed %d/%d chars'  %  ( result.end, len( input ) )
+			self._onError( result )
 		self.assert_( not result.isValid()  or  result.end != len( input ) )
 
 		
 		
 		
 	def _parseNodeTest(self, parser, input, expected, ignoreChars=_whitespaceRegex):
-		result = parser.parseNode( input, ignoreChars )
+		result = parser.debugParseNode( input, ignoreChars )
 		
 		if not result.isValid():
 			print 'PARSE FAILURE while parsing %s'  %  ( input, )
 			print 'EXPECTED:'
 			print expected
+			self._onError( result )
 		self.assert_( result.isValid() )
 		
 		value = DMNode.coerce( result.value )
@@ -136,6 +158,7 @@ class ParserTestCase (unittest.TestCase):
 			print ''
 			print 'RESULT:'
 			print value
+			self._onError( result )
 		self.assert_( bSame )
 
 
@@ -144,12 +167,13 @@ class ParserTestCase (unittest.TestCase):
 		input = DMIOReader.readFromString( inputXS, self.resolver )
 		expected = DMIOReader.readFromString( expectedSX, self.resolver )
 		
-		result = parser.parseNode( input, ignoreChars )
+		result = parser.debugParseNode( input, ignoreChars )
 
 		if not result.isValid():
 			print 'PARSE FAILURE while parsing', input
 			print 'EXPECTED:'
 			print expectedSX
+			self._onError( result )
 		self.assert_( result.isValid() )
 
 		value = DMNode.coerce( result.value )
@@ -163,11 +187,12 @@ class ParserTestCase (unittest.TestCase):
 			print ''
 			print 'RESULT:'
 			print DMIOWriter.writeAsString( value )
+			self._onError( result )
 		self.assert_( bSame )
 
 		
 	def _parseNodeFailTest(self, parser, input, ignoreChars=_whitespaceRegex):
-		result = parser.parseNode( input, ignoreChars )
+		result = parser.debugParseNode( input, ignoreChars )
 		
 		if result.isValid()   and   result.end == len( input ):
 			print 'While parsing', input
@@ -177,13 +202,14 @@ class ParserTestCase (unittest.TestCase):
 			print 'RESULT:'
 			print result.value
 			print 'consumed %d/%d chars'  %  ( result.end, len( input ) )
+			self._onError( result )
 		self.assert_( not result.isValid()  or  result.end != len( input ) )
 
 		
 	def _parseNodeFailTestSX(self, parser, inputSX, ignoreChars=_whitespaceRegex):
 		input = DMIOReader.readFromString( inputXS, self.resolver )
 	
-		result = parser.parseNode( input, ignoreChars )
+		result = parser.debugParseNode( input, ignoreChars )
 		
 		if result.isValid()   and   result.end == len( input ):
 			print 'While parsing', input
@@ -193,6 +219,7 @@ class ParserTestCase (unittest.TestCase):
 			print 'RESULT:'
 			print result.value
 			print 'consumed %d/%d chars'  %  ( result.end, len( input ) )
+			self._onError( result )
 		self.assert_( not result.isValid()  or  result.end != len( input ) )
 
 		
@@ -200,12 +227,13 @@ class ParserTestCase (unittest.TestCase):
 		
 		
 	def _parseListTest(self, parser, input, expected, ignoreChars=_whitespaceRegex):
-		result = parser.parseListItems( input, ignoreChars )
+		result = parser.debugParseListItems( input, ignoreChars )
 		
 		if not result.isValid():
 			print 'PARSE FAILURE while parsing %s, stopped at %d: %s'  %  ( input, result.end, input[:result.end] )
 			print 'EXPECTED:'
 			print expected
+			self._onError( result )
 		self.assert_( result.isValid() )
 		
 		value = DMNode.coerce( result.value )
@@ -219,6 +247,7 @@ class ParserTestCase (unittest.TestCase):
 			print expected
 			print 'RESULT:'
 			print value
+			self._onError( result )
 
 		bSame = value == expected
 		if not bSame:
@@ -228,6 +257,7 @@ class ParserTestCase (unittest.TestCase):
 			print ''
 			print 'RESULT:'
 			print value
+			self._onError( result )
 		self.assert_( bSame )
 
 
@@ -236,12 +266,13 @@ class ParserTestCase (unittest.TestCase):
 		input = DMIOReader.readFromString( inputSX, self.resolver )
 		expected = DMIOReader.readFromString( expectedSX, self.resolver )
 		
-		result = parser.parseListItems( input, ignoreChars )
+		result = parser.debugParseListItems( input, ignoreChars )
 
 		if not result.isValid():
 			print 'PARSE FAILURE while parsing', input
 			print 'EXPECTED:'
 			print expectedSX
+			self._onError( result )
 		self.assert_( result.isValid() )
 
 		value = DMNode.coerce( result.value )
@@ -255,6 +286,7 @@ class ParserTestCase (unittest.TestCase):
 			print expectedSX
 			print 'RESULT:'
 			print DMIOWriter.writeAsString( value )
+			self._onError( result )
 
 		bSame = value == expected
 		if not bSame:
@@ -264,11 +296,12 @@ class ParserTestCase (unittest.TestCase):
 			print ''
 			print 'RESULT:'
 			print DMIOWriter.writeAsString( value )
+			self._onError( result )
 		self.assert_( bSame )
 
 		
 	def _parseListFailTest(self, parser, input, ignoreChars=_whitespaceRegex):
-		result = parser.parseListItems( input, ignoreChars )
+		result = parser.debugParseListItems( input, ignoreChars )
 		
 		if result.isValid()   and   result.end == len( input ):
 			print 'While parsing', input
@@ -278,6 +311,7 @@ class ParserTestCase (unittest.TestCase):
 			print 'RESULT:'
 			print result.value
 			print 'consumed %d/%d items'  %  ( result.end, len( input ) )
+			self._onError( result )
 		self.assert_( not result.isValid()  or  result.end != len( input ) )
 
 		
@@ -285,7 +319,7 @@ class ParserTestCase (unittest.TestCase):
 	def _parseListFailTestSX(self, parser, inputSX, ignoreChars=_whitespaceRegex):
 		input = DMIOReader.readFromString( inputSX, self.resolver )
 
-		result = parser.parseListItems( input, ignoreChars )
+		result = parser.debugParseListItems( input, ignoreChars )
 		
 		if result.isValid()   and   result.end == len( input ):
 			print 'While parsing', input
@@ -295,6 +329,7 @@ class ParserTestCase (unittest.TestCase):
 			print 'RESULT:'
 			print result.value
 			print 'consumed %d/%d items'  %  ( result.end, len( input ) )
+			self._onError( result )
 		self.assert_( not result.isValid()  or  result.end != len( input ) )
 
 		
@@ -304,12 +339,13 @@ class ParserTestCase (unittest.TestCase):
 		
 		
 	def _parseStreamTest(self, parser, input, expected, ignoreChars=_whitespaceRegex):
-		result = parser.parseStreamItems( input, ignoreChars )
+		result = parser.debugParseStreamItems( input, ignoreChars )
 		
 		if not result.isValid():
 			print 'PARSE FAILURE while parsing %s, stopped at %d: %s'  %  ( input, result.end, input[:result.end] )
 			print 'EXPECTED:'
 			print expected
+			self._onError( result )
 		self.assert_( result.isValid() )
 		
 		value = DMNode.coerce( result.value )
@@ -323,6 +359,7 @@ class ParserTestCase (unittest.TestCase):
 			print expected
 			print 'RESULT:'
 			print value
+			self._onError( result )
 
 		bSame = value == expected
 		if not bSame:
@@ -332,6 +369,7 @@ class ParserTestCase (unittest.TestCase):
 			print ''
 			print 'RESULT:'
 			print value
+			self._onError( result )
 		self.assert_( bSame )
 
 
@@ -339,12 +377,13 @@ class ParserTestCase (unittest.TestCase):
 	def _parseStreamTestSX(self, parser, input, expectedSX, ignoreChars=_whitespaceRegex):
 		expected = DMIOReader.readFromString( expectedSX, self.resolver )
 		
-		result = parser.parseListItems( input, ignoreChars )
+		result = parser.debugParseListItems( input, ignoreChars )
 
 		if not result.isValid():
 			print 'PARSE FAILURE while parsing', input
 			print 'EXPECTED:'
 			print expectedSX
+			self._onError( result )
 		self.assert_( result.isValid() )
 
 		value = DMNode.coerce( result.value )
@@ -358,6 +397,7 @@ class ParserTestCase (unittest.TestCase):
 			print expectedSX
 			print 'RESULT:'
 			print DMIOWriter.writeAsString( value )
+			self._onError( result )
 
 		bSame = value == expected
 		if not bSame:
@@ -367,11 +407,12 @@ class ParserTestCase (unittest.TestCase):
 			print ''
 			print 'RESULT:'
 			print DMIOWriter.writeAsString( value )
+			self._onError( result )
 		self.assert_( bSame )
 
 		
 	def _parseStreamFailTest(self, parser, input, ignoreChars=_whitespaceRegex):
-		result = parser.parseListItems( input, ignoreChars )
+		result = parser.debugParseListItems( input, ignoreChars )
 		
 		if result.isValid()   and   result.end == len( input ):
 			print 'While parsing', input
@@ -381,5 +422,14 @@ class ParserTestCase (unittest.TestCase):
 			print 'RESULT:'
 			print result.value
 			print 'consumed %d/%d items'  %  ( result.end, len( input ) )
+			self._onError( result )
 		self.assert_( not result.isValid()  or  result.end != len( input ) )
+		
+		
+		
+	def _onError(self, parseResult):
+		if self._bShowDebugView:
+			if not self._bDebugViewVisible:
+				ParseViewFrame( parseResult )
+				self._bDebugViewVisible = True
 	

@@ -144,7 +144,7 @@ public class ParseView
 		callEdges = new ArrayList<Edge>();
 		memoEdges = new ArrayList<Edge>();
 		
-		root = getNodeView( result.getDebugNode() );
+		root = buildNodeView( result.getDebugNode() );
 		
 		root.registerEdges();
 		
@@ -167,7 +167,7 @@ public class ParseView
 	}
 	
 	
-	protected NodeView getNodeView(DebugNode node)
+	protected NodeView buildNodeView(DebugNode node)
 	{
 		NodeView view = nodeTable.get( node );
 		
@@ -176,11 +176,21 @@ public class ParseView
 			view = new NodeView( this, node );
 			nodeTable.put( node, view );
 		}
+		else
+		{
+			throw new RuntimeException( "View for debug node " + node + " already built" );
+		}
 		
 		return view;
 	}
 	
+
+	protected NodeView getNodeView(DebugNode node)
+	{
+		return nodeTable.get( node );
+	}
 	
+
 	protected void addCallEdge(NodeView a, NodeView b)
 	{
 		callEdges.add( new Edge( this, a, b ) );
