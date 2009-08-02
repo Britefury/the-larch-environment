@@ -168,6 +168,13 @@ public class ItemStream
 	
 	
 	
+	public boolean startsWithText()
+	{
+		return items.length > 0  &&  items[0] instanceof TextItem;
+	}
+	
+	
+	
 	public List<Item> getItems()
 	{
 		return Arrays.asList( items );

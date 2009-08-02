@@ -663,7 +663,7 @@ class Python25Grammar (Grammar):
 	
 	@Rule
 	def unparsed(self):
-		return ObjectNode( Nodes.UNPARSED )  |  ( ( RegEx( '[^\n]*' ) | ObjectNode( Nodes.Node ) ).oneOrMore()  +  Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Nodes.UNPARSED( value=xs[0] ) )
+		return ObjectNode( Nodes.UNPARSED )  |  ( ( RegEx( '[^\n]*' ) | ObjectNode( Nodes.Expr ) ).oneOrMore()  +  Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Nodes.UNPARSED( value=xs[0] ) )
 	
 	
 	
@@ -1244,6 +1244,11 @@ class TestCase_Python25Parser (ParserTestCase):
 			else:
 				b.appendStructuralValue( x )
 		return b.stream()
+	
+	
+	def setUp(self):
+		#self.enableDebugView()
+		pass
 	
 	
 	def test_shortStringLiteral(self):

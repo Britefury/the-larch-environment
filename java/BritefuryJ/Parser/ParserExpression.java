@@ -14,9 +14,8 @@ import org.python.core.PyObject;
 import BritefuryJ.Parser.ItemStream.ItemStream;
 import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
 import BritefuryJ.ParserHelpers.DebugNode;
-import BritefuryJ.ParserHelpers.ParserExpressionInterface;
 
-public abstract class ParserExpression implements ParserExpressionInterface
+public abstract class ParserExpression
 {
 	public static class ParserCoerceException extends Exception
 	{
@@ -34,13 +33,15 @@ public abstract class ParserExpression implements ParserExpressionInterface
 		STREAM,
 		LIST
 	}
-
-
-
-
-
+	
+	
 	protected String debugName = "";
 	
+	
+	
+	public ParserExpression()
+	{
+	}
 	
 	
 
@@ -175,7 +176,7 @@ public abstract class ParserExpression implements ParserExpressionInterface
 	{
 		ParserState state = new ParserState( junkRegex, delegateAction );
 		state.enableDebugging();
-		DebugParseResult result = (DebugParseResult)evaluateStringChars( state, input, 0 );
+		DebugParseResult result = (DebugParseResult)handleStringChars( state, input, 0 );
 		if ( result.isValid() )
 		{
 			result.end = state.skipJunkChars( input, result.end );
@@ -274,7 +275,7 @@ public abstract class ParserExpression implements ParserExpressionInterface
 	{
 		ParserState state = new ParserState( junkRegex, delegateAction );
 		state.enableDebugging();
-		DebugParseResult result = (DebugParseResult)evaluateStreamItems( state, input, 0 );
+		DebugParseResult result = (DebugParseResult)handleStreamItems( state, input, 0 );
 		if ( result.isValid() )
 		{
 			result.end = state.skipJunkChars( input, result.end );
@@ -666,10 +667,10 @@ public abstract class ParserExpression implements ParserExpressionInterface
 	{
 		return false;
 	}
-
-
-
-
+	
+	
+	
+	
 	public static ParserExpression coerce(Object x) throws ParserCoerceException
 	{
 		if ( x == null )

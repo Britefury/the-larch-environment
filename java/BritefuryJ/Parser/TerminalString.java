@@ -8,6 +8,7 @@ package BritefuryJ.Parser;
 
 import java.util.List;
 
+import BritefuryJ.Parser.ItemStream.ItemStream;
 import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
 
 /*
@@ -41,11 +42,12 @@ public abstract class TerminalString extends ParserExpression
 				return res.withRange( start, start + 1 );
 			}
 		}
-		else if ( input instanceof ItemStreamAccessor )
+		else if ( input instanceof ItemStream )
 		{
-			ItemStreamAccessor s = (ItemStreamAccessor)input;
+			ItemStream s = (ItemStream)input;
+			ItemStreamAccessor accessor = s.accessor();
 			
-			ParseResult res = consumeStream( s, 0 );
+			ParseResult res = consumeStream( accessor, 0 );
 			if ( res.getEnd() == s.length() )
 			{
 				return res.withRange( start, start + 1 );

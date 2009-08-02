@@ -60,24 +60,22 @@ public class Production extends ParserExpression
 
 	
 	
-	public ParserExpression setExpression(Object exp) throws ParserCoerceException, CannotOverwriteProductionExpressionException
+	public void setExpression(Object exp) throws ParserCoerceException, CannotOverwriteProductionExpressionException
 	{
 		if ( subexp != null )
 		{
 			throw new CannotOverwriteProductionExpressionException();
 		}
 		subexp = coerce( exp );
-		return this;
 	}
 	
-	public ParserExpression setExpression(ParserExpression exp) throws CannotOverwriteProductionExpressionException
+	public void setExpression(ParserExpression exp) throws CannotOverwriteProductionExpressionException
 	{
 		if ( subexp != null )
 		{
 			throw new CannotOverwriteProductionExpressionException();
 		}
 		subexp = exp;
-		return this;
 	}
 	
 	public ParserExpression getExpression()

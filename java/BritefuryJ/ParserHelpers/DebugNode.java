@@ -8,19 +8,21 @@ package BritefuryJ.ParserHelpers;
 
 import java.util.ArrayList;
 
+import BritefuryJ.Parser.ParserExpression;
+
 public class DebugNode
 {
 	private DebugNode prev;
 	private ArrayList<DebugNode> callChildren, memoChildren;
 
-	private ParserExpressionInterface expression;
+	private ParserExpression expression;
 	private ParseResultInterface result;
 	
 	private Object input;
 	private int start;
 	
 	
-	public DebugNode(DebugNode prev, ParserExpressionInterface expression, Object input, int start)
+	public DebugNode(DebugNode prev, ParserExpression expression, Object input, int start)
 	{
 		callChildren = new ArrayList<DebugNode>();
 		memoChildren = new ArrayList<DebugNode>();
@@ -65,7 +67,7 @@ public class DebugNode
 	}
 
 
-	public ParserExpressionInterface getExpression()
+	public ParserExpression getExpression()
 	{
 		return expression;
 	}

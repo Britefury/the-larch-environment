@@ -154,6 +154,25 @@ public class ItemStreamAccessor
 		return null;
 	}
 	
+	
+	
+	public boolean canMatchTextAt(int pos)
+	{
+		updateCurrentItem( pos );
+		return currentItem instanceof ItemStream.TextItem;
+	}
+	
+	public boolean canMatchStructuralNodeAt(int pos)
+	{
+		updateCurrentItem( pos );
+		return currentItem instanceof ItemStream.StructuralItem;
+	}
+	
+	public boolean isAtEnd(int pos)
+	{
+		return pos == stream.length;
+	}
+	
 
 	
 	public CharSequence getItemTextFrom(int start)

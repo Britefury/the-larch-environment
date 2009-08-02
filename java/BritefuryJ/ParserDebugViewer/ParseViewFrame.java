@@ -29,12 +29,12 @@ import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
 
 import BritefuryJ.DocPresent.DPPresentationArea;
+import BritefuryJ.Parser.ParserExpression;
 import BritefuryJ.Parser.ItemStream.ItemStream;
 import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
 import BritefuryJ.ParserHelpers.DebugNode;
 import BritefuryJ.ParserHelpers.DebugParseResultInterface;
 import BritefuryJ.ParserHelpers.ParseResultInterface;
-import BritefuryJ.ParserHelpers.ParserExpressionInterface;
 
 public class ParseViewFrame implements ParseView.ParseViewListener
 {
@@ -204,7 +204,7 @@ public class ParseViewFrame implements ParseView.ParseViewListener
 			if ( selection != null )
 			{
 				ParseResultInterface result = selection.getResult();
-				ParserExpressionInterface expression = selection.getExpression();
+				ParserExpression expression = selection.getExpression();
 				Object inputObject = selection.getInput();
 				
 				parserDoc.insertString( 0, expression.toString(), inputDoc.getStyle( "parser" ) );

@@ -33,6 +33,7 @@ import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
+import BritefuryJ.Parser.ParserExpression;
 import BritefuryJ.Parser.ItemStream.ItemStream;
 import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
 import BritefuryJ.ParserHelpers.DebugNode;
@@ -153,7 +154,6 @@ public class NodeView
 	{
 		this.parseView = parseView;
 		this.data = data;
-		//this.input = data.getInput();
 		
 		nodeWidget = makeNodeWidget( data );
 		
@@ -161,7 +161,7 @@ public class NodeView
 		children = new ArrayList<NodeView>();
 		for (DebugNode child: data.getCallChildren())
 		{
-			NodeView childView = parseView.getNodeView( child );
+			NodeView childView = parseView.buildNodeView( child );
 			children.add( childView );
 			childWidgets.add( childView.getWidget() );
 		}
@@ -237,14 +237,16 @@ public class NodeView
 	
 	private DPWidget makeTitleWidget(DebugNode data)
 	{
-		String exprName = data.getExpression().getExpressionName();
+		ParserExpression expr = data.getExpression();
+		String exprName = expr.getExpressionName();
 		
-		String className = data.getExpression().getClass().getName();
+		String className = expr.getClass().getName();
 		if ( className.contains( "." ) )
 		{
 			String[] nameParts = className.split( Pattern.quote( "." ) );
 			className = nameParts[ nameParts.length - 1 ];
 		}
+		
 		
 		DPText classText = new DPText( classNameStyle, "[" + className + "]" );
 		if ( exprName != null )
