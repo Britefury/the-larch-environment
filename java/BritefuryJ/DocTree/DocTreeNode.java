@@ -16,7 +16,7 @@ public abstract class DocTreeNode
 	public abstract int getIndexInParent();
 	
 	
-	protected static Object coerce(Object x)
+	public static Object unwrap(Object x)
 	{
 		if ( x instanceof DocTreeNode )
 		{
@@ -29,13 +29,13 @@ public abstract class DocTreeNode
 	}
 
 
-	protected static ArrayList<Object> coerceCollection(Collection<? extends Object> xs)
+	protected static ArrayList<Object> unwrapCollection(Collection<? extends Object> xs)
 	{
 		ArrayList<Object> ys = new ArrayList<Object>();
 		ys.ensureCapacity( xs.size() );
 		for (Object x: xs)
 		{
-			ys.add( coerce( x ) );
+			ys.add( unwrap( x ) );
 		}
 		return ys;
 	}

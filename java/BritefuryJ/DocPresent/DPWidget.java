@@ -1772,7 +1772,6 @@ abstract public class DPWidget
 		if ( structuralRepresentation != null )
 		{
 			structuralRepresentation.addPrefixToStream( builder );
-			
 			if ( structuralRepresentation.getMainValue()  !=  null )
 			{
 				structuralRepresentation.addMainToStream( builder );
@@ -1786,6 +1785,22 @@ abstract public class DPWidget
 		else
 		{
 			buildLinearRepresentation( builder );
+		}
+	}
+	
+	protected void appendStructuralPrefixToLinearRepresentation(ItemStreamBuilder builder)
+	{
+		if ( structuralRepresentation != null )
+		{
+			structuralRepresentation.addPrefixToStream( builder );
+		}
+	}
+	
+	protected void appendStructuralSuffixToLinearRepresentation(ItemStreamBuilder builder)
+	{
+		if ( structuralRepresentation != null )
+		{
+			structuralRepresentation.addSuffixToStream( builder );
 		}
 	}
 	

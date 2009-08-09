@@ -62,6 +62,8 @@ import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
 import BritefuryJ.Math.Xform2;
+import BritefuryJ.Parser.ItemStream.ItemStream;
+import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
 
 
 
@@ -465,6 +467,12 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 		}
 		
 		
+		public JComponent getPresentationComponent()
+		{
+			return presentation;
+		}
+		
+		
 		
 		private void setRange(Vector2 rootSize, Vector2 extents, Point2 value)
 		{
@@ -645,7 +653,11 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 		return component;
 	}
 
-	
+	public JComponent getPresentationComponent()
+	{
+		return component.getPresentationComponent();
+	}
+
 	public Caret getCaret()
 	{
 		return caret;
@@ -702,6 +714,34 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 			else
 			{
 				return ((DPContentLeaf)startPath.get( 0 )).getTextRepresentationBetweenMarkers( s.getStartMarker(), s.getEndMarker() );
+			}
+		}
+	}
+
+	
+	public ItemStream getLinearRepresentationInSelection(Selection s)
+	{
+		if ( s.isEmpty() )
+		{
+			return null;
+		}
+		else
+		{
+			DPContainer commonRoot = s.getCommonRoot();
+			ArrayList<DPWidget> startPath = s.getStartPathFromCommonRoot();
+			ArrayList<DPWidget> endPath = s.getEndPathFromCommonRoot();
+			
+			if ( commonRoot != null )
+			{
+				ItemStreamBuilder builder = new ItemStreamBuilder();
+
+				commonRoot.getLinearRepresentationBetweenPaths( builder, s.getStartMarker(), startPath, 0, s.getEndMarker(), endPath, 0 );
+			
+				return builder.stream();
+			}
+			else
+			{
+				return ((DPContentLeaf)startPath.get( 0 )).getLinearRepresentationBetweenMarkers( s.getStartMarker(), s.getEndMarker() );
 			}
 		}
 	}
@@ -1855,7 +1895,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	{
 		if ( !selection.isEmpty() )
 		{
-			return selection.getCommonRoot().getFrame();
+			return selection.getFrame();
 		}
 		else
 		{

@@ -69,7 +69,7 @@ public class DocTreeObject extends DocTreeNode implements DMObjectInterface
 	
 	public int indexOfById(Object x)
 	{
-		return node.indexOfById( DocTreeNode.coerce( x ) );
+		return node.indexOfById( DocTreeNode.unwrap( x ) );
 	}
 	
 	public Object get(int index)
@@ -94,12 +94,12 @@ public class DocTreeObject extends DocTreeNode implements DMObjectInterface
 	
 	public void set(int index, Object value)
 	{
-		node.set( index, DocTreeNode.coerce( value ) );
+		node.set( index, DocTreeNode.unwrap( value ) );
 	}
 	
 	public void set(String key, Object value) throws InvalidFieldNameException
 	{
-		node.set( key, DocTreeNode.coerce( value ) );
+		node.set( key, DocTreeNode.unwrap( value ) );
 	}
 	
 	
@@ -114,7 +114,7 @@ public class DocTreeObject extends DocTreeNode implements DMObjectInterface
 		coercedTable.putAll( table );
 		for (Map.Entry<String, Object> entry: coercedTable.entrySet())
 		{
-			entry.setValue( DocTreeNode.coerce( entry.getValue() ) );
+			entry.setValue( DocTreeNode.unwrap( entry.getValue() ) );
 		}
 		node.update( coercedTable );
 	}
@@ -153,12 +153,12 @@ public class DocTreeObject extends DocTreeNode implements DMObjectInterface
 	
 	public void __setitem__(int fieldIndex, Object value)
 	{
-		node.__setitem__( fieldIndex, DocTreeNode.coerce( value ) );
+		node.__setitem__( fieldIndex, DocTreeNode.unwrap( value ) );
 	}
 
 	public void __setitem__(String key, Object value)
 	{
-		node.__setitem__( key, DocTreeNode.coerce( value ) );
+		node.__setitem__( key, DocTreeNode.unwrap( value ) );
 	}
 
 
@@ -170,7 +170,7 @@ public class DocTreeObject extends DocTreeNode implements DMObjectInterface
 			return true;
 		}
 		
-		return node.equals( DocTreeNode.coerce( x ) );
+		return node.equals( DocTreeNode.unwrap( x ) );
 	}
 	
 	public String toString()

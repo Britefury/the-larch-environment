@@ -58,7 +58,7 @@ public class Browser implements PageController
 		area = new DPPresentationArea();
 		area.setPageController( this );
 		
-		ActionMap actionMap = area.getComponent().getActionMap();
+		ActionMap actionMap = area.getPresentationComponent().getActionMap();
 		actionMap.put( TransferHandler.getCutAction().getValue( Action.NAME ), TransferHandler.getCutAction() );
 		actionMap.put( TransferHandler.getCopyAction().getValue( Action.NAME ), TransferHandler.getCopyAction() );
 		actionMap.put( TransferHandler.getPasteAction().getValue( Action.NAME ), TransferHandler.getPasteAction() );
