@@ -60,7 +60,7 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 			markerRemove( newLength, oldLength - newLength );
 		}
 		
-		textRepresentationChanged();
+		textRepresentationChanged( new LinearRepresentationEventTextReplace( this, 0, oldLength, newTextRepresentation ) );
 	}
 	
 	
@@ -69,7 +69,7 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 		int index = marker.getClampedIndex();
 		markerInsert( index, x.length() );
 		textRepresentation = textRepresentation.substring( 0, index ) + x + textRepresentation.substring( index );
-		textRepresentationChanged();
+		textRepresentationChanged( new LinearRepresentationEventTextInsert( this, index, x ) );
 	}
 
 	public void removeText(int index, int length)
@@ -78,7 +78,7 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 		length = Math.min( length, getTextRepresentationLength() - index );
 		textRepresentation = textRepresentation.substring( 0, index ) + textRepresentation.substring( index + length );
 		markerRemove( index, length );
-		textRepresentationChanged();
+		textRepresentationChanged( new LinearRepresentationEventTextRemove( this, index, length ) );
 	}
 	
 	public void removeText(Marker marker, int length)
@@ -110,7 +110,7 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 		{
 			markerRemove( index + x.length(), length - x.length() );
 		}
-		textRepresentationChanged();
+		textRepresentationChanged( new LinearRepresentationEventTextReplace( this, index, length, x ) );
 	}
 	
 	public boolean clearText()
@@ -120,7 +120,7 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 		{
 			textRepresentation = "";
 			markerRemove( 0, length );
-			textRepresentationChanged();
+			textRepresentationChanged( new LinearRepresentationEventTextRemove( this, 0, length ) );
 			return true;
 		}
 		else

@@ -38,7 +38,7 @@ class NameTextRepListener (ElementLinearRepresentationListener):
 	def __init__(self):
 		pass
 
-	def textRepresentationModified(self, element):
+	def textRepresentationModified(self, element, event):
 		value = element.getTextRepresentation()
 		ctx = element.getContext()
 		node = ctx.getTreeNode()
