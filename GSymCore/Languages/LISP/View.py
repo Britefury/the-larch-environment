@@ -172,9 +172,9 @@ class _LISPViewPage (Page):
 	def __init__(self, docRootNode, location, commandHistory, app):
 		self._docRootNode = docRootNode
 		self._location = location
-		self._frame = DPFrame()
 		self._app = app
-		viewContext = GSymViewInstance( docRootNode, self._frame, viewLispNode, self._viewRootFn, commandHistory, self )
+		viewContext = GSymViewInstance( docRootNode, viewLispNode, self._viewRootFn, commandHistory, self )
+		self._frame = viewContext.getFrame()
 		
 		
 	def getContentsElement(self):

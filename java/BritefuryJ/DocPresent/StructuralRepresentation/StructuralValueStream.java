@@ -6,14 +6,15 @@
 //##************************
 package BritefuryJ.DocPresent.StructuralRepresentation;
 
+import BritefuryJ.Parser.ItemStream.ItemStream;
 import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
 
-public class StructuralRepresentationObject extends StructuralRepresentation
+public class StructuralValueStream extends StructuralValue
 {
-	private Object value;
+	private ItemStream value;
 	
 	
-	public StructuralRepresentationObject(Object value)
+	public StructuralValueStream(ItemStream value)
 	{
 		this.value = value;
 	}
@@ -21,8 +22,9 @@ public class StructuralRepresentationObject extends StructuralRepresentation
 	
 	public void addToStream(ItemStreamBuilder builder)
 	{
-		builder.appendStructuralValue( value );
+		builder.extend( value );
 	}
+
 
 	public Object getValue()
 	{

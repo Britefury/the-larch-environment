@@ -185,8 +185,9 @@ ClassStmtHeader = module.newClass( 'ClassStmtHeader', CompountStmtHeader, [ 'nam
 #
 # Compound statements
 #
-CompoundComponent = module.newClass( 'CompoundComponent', Node, [] )
 CompoundStmt = module.newClass( 'CompoundStmt', Stmt, [] )
+CompoundComponent = module.newClass( 'CompoundComponent', Node, [] )
+
 IfStmt = module.newClass( 'IfStmt', CompoundStmt, [ 'condition', 'suite', 'elifBlocks', 'elseSuite' ] )
 ElifBlock = module.newClass( 'ElifBlock', CompoundComponent, [ 'condition', 'suite' ] )
 WhileStmt = module.newClass( 'WhileStmt', CompoundStmt, [ 'condition', 'suite', 'elseSuite' ] )

@@ -154,7 +154,8 @@ class _ProjectViewPage (Page):
 		self._frame = DPFrame()
 		self._viewFn = ProjectView()
 		self._app = app
-		viewContext = GSymViewInstance( docRootNode, self._frame, self._viewFn, self._viewRootFn, commandHistory, self )
+		viewContext = GSymViewInstance( docRootNode, self._viewFn, self._viewRootFn, commandHistory, self )
+		self._frame = viewContext.getFrame()
 		#self._frame.setEditHandler( Python25EditHandler( viewContext ) )
 		
 		

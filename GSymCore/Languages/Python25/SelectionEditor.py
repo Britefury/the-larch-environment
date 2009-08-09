@@ -83,6 +83,11 @@ class Python25Buffer (object):
 	pass
 
 
+class Python25BufferStream (Python25Buffer):
+	def __init__(self, stream):
+		self.stream = stream
+		
+		
 class Python25BufferString (Python25Buffer):
 	def __init__(self, text):
 		self.text = text
@@ -111,11 +116,11 @@ class Python25EditHandler (EditHandler):
 		
 		
 			
-	def indent(self, context, node):
+	def indent(self, element, context, node):
 		selection = self._viewContext.getSelection()
 		
 		if selection.isEmpty():
-			self._indentLine( context, node )
+			self._indentLine( element, context, node )
 		else:
 			startMarker = selection.getStartMarker()
 			endMarker = selection.getEndMarker()
@@ -125,17 +130,17 @@ class Python25EditHandler (EditHandler):
 			endContext = getStatementContextFromElement( endMarker.getElement() )
 			
 			if startContext is endContext:
-				self._indentLine( context, node )
+				self._indentLine( element, context, node )
 			else:
 				self._indentSelection( selection )
 			
 			
 			
-	def dedent(self, context, node):
+	def dedent(self, element, context, node):
 		selection = self._viewContext.getSelection()
 		
 		if selection.isEmpty():
-			self._dedentLine( context, node )
+			self._dedentLine( element, context, node )
 		else:
 			startMarker = selection.getStartMarker()
 			endMarker = selection.getEndMarker()
@@ -145,81 +150,35 @@ class Python25EditHandler (EditHandler):
 			endContext = getStatementContextFromElement( endMarker.getElement() )
 			
 			if startContext is endContext:
-				self._indentLine( context, node )
+				self._dedentLine( element, context, node )
 			else:
 				self._dedentSelection( selection )
 				
 			
 			
-	def _indentLine(self, context, node):
-		# If @node comes after a compunt statement, move it to the end of that statement
-		suite = node.getParentTreeNode()
-		index = suite.indexOfById( node )
-		next = suite[index+1]   if index < len( suite ) - 1   else None
-		if index > 0:
-			prev = suite[index-1]
-			if isCompoundStmt( prev ):
-				prevSuite = prev['suite']
-				
-				nodes = [ node ]
-				
-				# If @node is followed by an indented block, join the contents of the indented block onto @prevSuite
-				if next is not None   and   isIndentedBlock( next ):
-					nodes.extend( next['suite'] )
-					EditOperations.remove( context, next )
-						
-				del suite[index]
-				prevSuite.extend( nodes )
-				
-				# Now, 
-				return
-			
-
-		if next is not None   and   isIndentedBlock( next ):
-			# If @node is followed by an indented block, insert into the indented block
-			EditOperations.remove( context, node )
-			next['suite'].insert( 0, node )
-		else:
-			# Else, move @node into its own indented block
-			indentedNode = Nodes.IndentedBlock( suite=[ node ] )
-			EditOperations.replace( context, node, indentedNode )
+	def _indentLine(self, element, context, node):
+		element.setStructuralPrefixObject( Nodes.Indent() )
+		element.setStructuralSuffixObject( Nodes.Dedent() )
+		bSuccess = element.passLinearRepresentationModifiedEventUpwards()
+		if not bSuccess:
+			print 'Python25EditHandler._indentLine(): INDENT LINE FAILED'
+			element.clearStructuralPrefix()
+			element.clearStructuralSuffix()
 			
 	
 	
-	def _dedentLine(self, context, node):
+	def _dedentLine(self, element, context, node):
 		suite = node.getParentTreeNode()
-		compStmt = suite.getParentTreeNode()
-		outerSuite = compStmt.getParentTreeNode()   if compStmt is not None   else None
-		outerIndex = outerSuite.indexOfById( compStmt )   if outerSuite is not None   else None
-
-		# If @outerSuite is None, then this suite is from the module node, in which case we cannot dedent
-		if outerSuite is not None:
-			index = suite.indexOfById( node )
-			if index == len( suite ) - 1:
-				# If @node is at the end of a suite, move it into the parent suite
-				outerIndex = outerSuite.indexOfById( compStmt )
-				
-				del suite[-1]
-				outerSuite.insert( outerIndex + 1, node )
-				
-				# If @node was inside an indented block, which will now be empty: remove the indented block
-				if len( suite ) == 0   and   isIndentedBlock( compStmt ):
-					EditOperations.remove( context, compStmt )
-				return
-			elif index == 0  and  isIndentedBlock( compStmt ):
-				# @node is the first node in an indented block; move it out.
-				# The indented block has 2 or more child statements, otherwise the previous if-statment
-				# would have been taken
-				EditOperations.remove( context, node )
-				outerSuite.insert( outerIndex, node )
-			else:
-				# Remove @node and all subsequent nodes from @suite.
-				# Place @node into @outerSuite
-				# Place all subsequent nodes into an indented block
-				subsequentNodes = suite[index+1:]
-				del suite[index:]
-				outerSuite.insert( outerIndex + 1, Nodes.IndentedBlock( suite=subsequentNodes ) )
-				outerSuite.insert( outerIndex + 1, node )
+		suiteParent = suite.getParentTreeNode()
+		if not suiteParent.isInstanceOf( Nodes.PythonModule ):
+			# This statement is not in the root node
+			element.setStructuralPrefixObject( Nodes.Dedent() )
+			element.setStructuralSuffixObject( Nodes.Indent() )
+			bSuccess = element.passLinearRepresentationModifiedEventUpwards()
+			if not bSuccess:
+				print 'Python25EditHandler._dedentLine(): DEDENT LINE FAILED'
+				element.clearStructuralPrefix()
+				element.clearStructuralSuffix()
 				
 				
 				
@@ -238,28 +197,20 @@ class Python25EditHandler (EditHandler):
 		# Get paths to start and end nodes, from the common root statement
 		path0, path1 = getStatementContextPathsFromCommonRoot( startContext, endContext )
 		root = path0[0]
+		
+		rootElement = root.getViewNodeElement()
 				
-		if len( path0 ) == 1:
-			# Start of selection is in the header of a compound statement; we need to work from one node up
-			r = getParentStatementContext( root )
-			if r is not None:
-				root = r
-			
-		rootDoc = root.getDocNode()
+		startStmtElement.setStructuralPrefixObject( Nodes.Indent() )
+		endStmtElement.setStructuralSuffixObject( Nodes.Dedent() )
 		
-		# Convert to a line list
-		lineList = PyLineList( rootDoc['suite'] )
+		startContext.getViewNodeElement().clearStructuralRepresentationUpTo( rootElement )
+		endContext.getViewNodeElement().clearStructuralRepresentationUpTo( rootElement )
 		
-		# Replace the lines in the range startIndex->endIndex with the new parsed line
-		startIndex = lineList.indexOf( startContext.getDocNode() )
-		endIndex = lineList.indexOf( endContext.getDocNode() )
-		lineList.indentRange( startIndex, endIndex + 1 )
-		
-		# Parse to ASTs
-		newRootASTs = lineList.parse( self._grammar.statement() )
-		
-		# Insert into document
-		rootDoc['suite'] = newRootASTs
+		bSuccess = rootElement.passLinearRepresentationModifiedEventUpwards()
+		if not bSuccess:
+			print 'Python25EditHandler._indentSelection(): INDENT SELECTION'
+			startStmtElement.clearStructuralPrefix()
+			endStmtElement.clearStructuralSuffix()
 			
 				
 	
@@ -277,33 +228,28 @@ class Python25EditHandler (EditHandler):
 
 		# Get paths to start and end nodes, from the common root statement
 		path0, path1 = getStatementContextPathsFromCommonRoot( startContext, endContext )
-		commonRoot = path0[0]
+		root = path0[0]
 		
 		if len( path0 ) == 1:
 			# Start marker is in the header of a compound statement
 			# Move up one
-			commonRoot = getParentStatementContext( commonRoot )
-			if commonRoot is None:
+			root = getParentStatementContext( root )
+			if root is None:
 				return
 		
-		rootParent = getParentStatementContext( commonRoot )
+		rootElement = root.getViewNodeElement()
+				
+		startStmtElement.setStructuralPrefixObject( Nodes.Dedent() )
+		endStmtElement.setStructuralSuffixObject( Nodes.Indent() )
 		
-		if rootParent is not None:
-			rootParentDoc = rootParent.getDocNode()
-			
-			# Convert to a line list
-			lineList = PyLineList( rootParentDoc['suite'] )
-			
-			# Replace the lines in the range startIndex->endIndex with the new parsed line
-			startIndex = lineList.indexOf( startContext.getDocNode() )
-			endIndex = lineList.indexOf( endContext.getDocNode() )
-			lineList.dedentRange( startIndex, endIndex + 1 )
-			
-			# Parse to ASTs
-			newRootASTs = lineList.parse( self._grammar.statement() )
-			
-			# Insert into document
-			rootParentDoc['suite'] = newRootASTs
+		startContext.getViewNodeElement().clearStructuralRepresentationUpTo( rootElement )
+		endContext.getViewNodeElement().clearStructuralRepresentationUpTo( rootElement )
+		
+		bSuccess = rootElement.passLinearRepresentationModifiedEventUpwards()
+		if not bSuccess:
+			print 'Python25EditHandler._dedentSelection(): DEDENT SELECTION'
+			startStmtElement.clearStructuralPrefix()
+			endStmtElement.clearStructuralSuffix()
 
 			
 			

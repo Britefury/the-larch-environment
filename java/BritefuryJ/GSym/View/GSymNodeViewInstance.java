@@ -122,7 +122,7 @@ public class GSymNodeViewInstance implements ElementContext, DVNode.NodeContext
 	{
 		viewInstance.getView().profile_startElement();
 		DPWidget element = new DPEmpty();
-		element.setStructuralRepresentationObject( structuralRepresentation );
+		element.setStructuralValueObject( structuralRepresentation );
 		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
@@ -132,7 +132,7 @@ public class GSymNodeViewInstance implements ElementContext, DVNode.NodeContext
 	{
 		viewInstance.getView().profile_startElement();
 		DPWidget element = new DPEmpty();
-		element.setStructuralRepresentationSequence( structuralRepresentation );
+		element.setStructuralValueSequence( structuralRepresentation );
 		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
@@ -143,7 +143,7 @@ public class GSymNodeViewInstance implements ElementContext, DVNode.NodeContext
 	{
 		viewInstance.getView().profile_startElement();
 		DPWidget element = new DPEmpty();
-		element.setStructuralRepresentationStream( structuralRepresentation );
+		element.setStructuralValueStream( structuralRepresentation );
 		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
@@ -465,31 +465,6 @@ public class GSymNodeViewInstance implements ElementContext, DVNode.NodeContext
 	}
 	
 	
-	public DPWidget structuralRepresentationObject(DPWidget child, Object structuralRepresentation)
-	{
-		viewInstance.getView().profile_startElement();
-		child.setStructuralRepresentationObject( structuralRepresentation );
-		viewInstance.getView().profile_stopElement();
-		return child;
-	}
-	
-	public DPWidget structuralRepresentationSequence(DPWidget child, List<Object> structuralRepresentation)
-	{
-		viewInstance.getView().profile_startElement();
-		child.setStructuralRepresentationSequence( structuralRepresentation );
-		viewInstance.getView().profile_stopElement();
-		return child;
-	}
-	
-	public DPWidget structuralRepresentationStream(DPWidget child, ItemStream structuralRepresentation)
-	{
-		viewInstance.getView().profile_startElement();
-		child.setStructuralRepresentationStream( structuralRepresentation );
-		viewInstance.getView().profile_stopElement();
-		return child;
-	}
-	
-
 	public DPWidget keyboardListener(DPWidget child, ElementKeyboardListener listener)
 	{
 		viewInstance.getView().profile_startElement();

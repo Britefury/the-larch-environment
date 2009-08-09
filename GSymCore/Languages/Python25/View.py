@@ -194,9 +194,9 @@ def statementNodeEditor(ctx, node, contents, precedence, state):
 					builder.appendStructuralValue( x )
 				else:
 					raise TypeError, 'UNPARSED node should only contain strings or objects, not %s'  %  ( type( x ), )
-			para.setStructuralRepresentationStream( builder.stream() )
+			para.setStructuralValueStream( builder.stream() )
 		else:
-			para.setStructuralRepresentationObject( node )
+			para.setStructuralValueObject( node )
 		para = ctx.linearRepresentationListener( para, StatementLinearRepresentationListener.newListener( parser ) )
 		para = ctx.keyboardListener( para, _statementKeyboardListener )
 		return para
@@ -217,7 +217,7 @@ def compoundStatementHeaderEditor(ctx, node, headerContents, precedence, state, 
 	newLine = ctx.whitespace( '\n' )
 
 	para = ctx.paragraph( python_paragraphStyle, [ segment, newLine ] )
-	para.setStructuralRepresentationObject( node )
+	para.setStructuralValueObject( node )
 	para = ctx.linearRepresentationListener( para, StatementLinearRepresentationListener.newListener( parser ) )
 	para = ctx.keyboardListener( para, _statementKeyboardListener )
 	if headerContainerFn is not None:
@@ -251,7 +251,7 @@ def compoundStatementEditor(ctx, node, precedence, compoundBlocks, state, suiteP
 		newLine = ctx.whitespace( '\n' )
 		
 		headerParagraph = ctx.paragraph( python_paragraphStyle, [ headerSegment, newLine ] )
-		headerParagraph.setStructuralRepresentationObject( headerNode )
+		headerParagraph.setStructuralValueObject( headerNode )
 		headerParagraph = ctx.linearRepresentationListener( headerParagraph, CompoundHeaderLinearRepresentationListener.newListener( statementParser ) )
 		headerParagraph = ctx.keyboardListener( headerParagraph, _statementKeyboardListener )
 		
@@ -262,7 +262,7 @@ def compoundStatementEditor(ctx, node, precedence, compoundBlocks, state, suiteP
 
 		if suite is not None:
 			suiteElement = indentedSuiteView( ctx, suite, statementParser )
-			suiteElement.setStructuralRepresentationObject( Nodes.IndentedBlock( suite=suite ) )
+			suiteElement.setStructuralValueObject( Nodes.IndentedBlock( suite=suite ) )
 			suiteElement = ctx.linearRepresentationListener( suiteElement, SuiteLinearRepresentationListener( suiteParser, suite ) )
 			
 			statementContents.extend( [ headerParagraph, ctx.indent( 30.0, suiteElement ) ] )
@@ -351,7 +351,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	@ObjectNodeDispatchMethod
 	def PythonModule(self, ctx, state, node, suite):
 		suiteElement = suiteView( ctx, suite, self._parser.singleLineStatement() )
-		suiteElement.setStructuralRepresentationObject( suite )
+		suiteElement.setStructuralValueObject( suite )
 		suiteElement = ctx.linearRepresentationListener( suiteElement, SuiteLinearRepresentationListener( self._parser.suite(), suite ) )
 		return suiteElement
 
@@ -753,8 +753,10 @@ class Python25View (GSymViewObjectNodeDispatch):
 		xPrec, yPrec = computeBinOpViewPrecedenceValues( PRECEDENCE_MULDIVMOD, False )
 		xView = ctx.viewEvalFn( x, None, python25ViewState( xPrec, self._parser.expression(), MODE_EDITEXPRESSION ) )
 		yView = ctx.viewEvalFn( y, None, python25ViewState( yPrec, self._parser.expression(), MODE_EDITEXPRESSION ) )
+		element = ctx.fraction( div_fractionStyle, xView, yView, '/' )
+		element.setStructuralValueObject( node )
 		return expressionNodeEditor( ctx, node,
-					     ctx.structuralRepresentationObject( ctx.fraction( div_fractionStyle, xView, yView, '/' ), node ),
+					     element,
 					     PRECEDENCE_MULDIVMOD,
 					     state )
 
@@ -1440,7 +1442,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	@ObjectNodeDispatchMethod
 	def IndentedBlock(self, ctx, state, node, suite):
 		suiteElement = ctx.indent( 30.0, indentedSuiteView( ctx, suite, self._parser.singleLineStatement() ) )
-		suiteElement.setStructuralRepresentationObject( node )
+		suiteElement.setStructuralValueObject( node )
 		suiteElement = ctx.linearRepresentationListener( suiteElement, SuiteLinearRepresentationListener( self._parser.compoundSuite(), suite ) )
 		return ctx.border( indentedBlock_border, ContainerStyleSheet.defaultStyleSheet, suiteElement )
 
@@ -1574,10 +1576,10 @@ class _Python25ViewPage (Page):
 	def __init__(self, pythonDocRootNode, location, commandHistory, app):
 		self._pythonDocRootNode = pythonDocRootNode
 		self._location = location
-		self._frame = DPFrame()
 		self._viewFn = Python25View()
 		self._app = app
-		viewContext = GSymViewInstance( pythonDocRootNode, self._frame, self._viewFn, self._viewRootFn, commandHistory, self )
+		viewContext = GSymViewInstance( pythonDocRootNode, self._viewFn, self._viewRootFn, commandHistory, self )
+		self._frame = viewContext.getFrame()
 		self._frame.setEditHandler( Python25EditHandler( viewContext ) )
 
 
