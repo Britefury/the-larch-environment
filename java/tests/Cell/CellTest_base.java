@@ -9,10 +9,10 @@ package tests.Cell;
 
 import java.util.HashMap;
 
+import junit.framework.TestCase;
 import BritefuryJ.Cell.CellEvaluator;
 import BritefuryJ.Cell.CellInterface;
 import BritefuryJ.Cell.CellListener;
-import junit.framework.TestCase;
 
 public class CellTest_base extends TestCase
 {

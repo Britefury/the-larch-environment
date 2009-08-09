@@ -7,7 +7,6 @@
 //##************************
 package BritefuryJ.Math;
 
-import BritefuryJ.Math.Point2;
 
 public class AABox2 implements Cloneable
 {

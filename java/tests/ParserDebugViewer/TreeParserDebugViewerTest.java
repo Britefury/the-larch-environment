@@ -14,7 +14,6 @@ import BritefuryJ.DocModel.DMIOReader.BadModuleNameException;
 import BritefuryJ.DocModel.DMIOReader.ParseErrorException;
 import BritefuryJ.DocModel.DMModule.UnknownClassException;
 import BritefuryJ.DocModel.DMModuleResolver.CouldNotResolveModuleException;
-import BritefuryJ.ParserDebugViewer.ParseViewFrame;
 import BritefuryJ.Parser.AnyNode;
 import BritefuryJ.Parser.Choice;
 import BritefuryJ.Parser.DebugParseResult;
@@ -25,6 +24,7 @@ import BritefuryJ.Parser.Production;
 import BritefuryJ.Parser.RegEx;
 import BritefuryJ.Parser.ParserExpression.ParserCoerceException;
 import BritefuryJ.Parser.Production.CannotOverwriteProductionExpressionException;
+import BritefuryJ.ParserDebugViewer.ParseViewFrame;
 
 public class TreeParserDebugViewerTest
 {

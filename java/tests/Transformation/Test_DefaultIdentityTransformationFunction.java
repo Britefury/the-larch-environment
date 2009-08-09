@@ -8,6 +8,7 @@ package tests.Transformation;
 
 import java.util.Arrays;
 
+import junit.framework.TestCase;
 import BritefuryJ.DocModel.DMList;
 import BritefuryJ.DocModel.DMModule;
 import BritefuryJ.DocModel.DMObject;
@@ -15,7 +16,6 @@ import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMModule.ClassAlreadyDefinedException;
 import BritefuryJ.Transformation.DefaultIdentityTransformationFunction;
 import BritefuryJ.Transformation.TransformationFunction;
-import junit.framework.TestCase;
 
 public class Test_DefaultIdentityTransformationFunction extends TestCase
 {

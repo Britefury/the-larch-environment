@@ -7,7 +7,6 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Input.PointerInterface;
 import BritefuryJ.Math.Point2;

@@ -7,7 +7,6 @@
 //##************************
 package BritefuryJ.Math;
 
-import BritefuryJ.Math.Vector2;
 
 public class Point2 {
 	public double x, y;

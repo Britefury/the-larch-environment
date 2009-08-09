@@ -7,21 +7,21 @@
 //##************************
 package visualtests.DocPresent;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Color;
 import java.util.Arrays;
 
 import javax.swing.JFrame;
 
 import BritefuryJ.DocPresent.DPFraction;
+import BritefuryJ.DocPresent.DPHBox;
 import BritefuryJ.DocPresent.DPParagraph;
 import BritefuryJ.DocPresent.DPPresentationArea;
+import BritefuryJ.DocPresent.DPScript;
+import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.DPText;
-import BritefuryJ.DocPresent.DPHBox;
-import BritefuryJ.DocPresent.DPScript;
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.Layout.VTypesetting;

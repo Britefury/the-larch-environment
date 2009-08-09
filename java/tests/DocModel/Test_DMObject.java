@@ -9,13 +9,13 @@ package tests.DocModel;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import junit.framework.TestCase;
 import BritefuryJ.CommandHistory.CommandHistory;
 import BritefuryJ.DocModel.DMModule;
 import BritefuryJ.DocModel.DMObject;
 import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMModule.ClassAlreadyDefinedException;
 import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
-import junit.framework.TestCase;
 
 public class Test_DMObject extends TestCase
 {

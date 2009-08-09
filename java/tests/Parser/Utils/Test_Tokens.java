@@ -6,11 +6,11 @@
 //##************************
 package tests.Parser.Utils;
 
+import tests.Parser.ParserTestCase;
 import BritefuryJ.DocModel.DMModule;
 import BritefuryJ.DocModel.DMModuleResolver;
-import BritefuryJ.Parser.Utils.Tokens;
 import BritefuryJ.Parser.ParserExpression;
-import tests.Parser.ParserTestCase;
+import BritefuryJ.Parser.Utils.Tokens;
 
 public class Test_Tokens extends ParserTestCase
 {

@@ -95,6 +95,12 @@ public class ItemStream
 		}
 		
 		
+		public String getTextValue()
+		{
+			return textValue;
+		}
+
+		
 		public String toString()
 		{
 			return textValue;
@@ -139,6 +145,12 @@ public class ItemStream
 		public Item copyAt(int atPos)
 		{
 			return new StructuralItem( structuralValue, atPos, atPos + 1 );
+		}
+		
+		
+		public Object getStructuralValue()
+		{
+			return structuralValue;
 		}
 		
 		

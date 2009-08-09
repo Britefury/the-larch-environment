@@ -6,6 +6,7 @@
 //##************************
 package tests.Transformation;
 
+import junit.framework.TestCase;
 import BritefuryJ.DocModel.DMModule;
 import BritefuryJ.DocModel.DMObject;
 import BritefuryJ.DocModel.DMObjectClass;
@@ -14,7 +15,6 @@ import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
 import BritefuryJ.Transformation.DefaultIdentityTransformationFunction;
 import BritefuryJ.Transformation.Transformation;
 import BritefuryJ.Transformation.TransformationFunction;
-import junit.framework.TestCase;
 
 public class Test_Transformation extends TestCase
 {

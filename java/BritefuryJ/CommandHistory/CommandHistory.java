@@ -6,8 +6,8 @@
 //##************************
 package BritefuryJ.CommandHistory;
 
-import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class CommandHistory
 {

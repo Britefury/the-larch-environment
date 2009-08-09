@@ -6,9 +6,9 @@
 //##************************
 package tests.DocPresent.Layout;
 
+import junit.framework.TestCase;
 import BritefuryJ.DocPresent.Layout.LAllocBox;
 import BritefuryJ.DocPresent.Layout.LReqBox;
-import junit.framework.TestCase;
 
 public class Test_Layout_base extends TestCase
 {

@@ -7,8 +7,8 @@
 //##************************
 package tests.JythonInterface;
 
-import BritefuryJ.JythonInterface.JythonSlice;
 import junit.framework.TestCase;
+import BritefuryJ.JythonInterface.JythonSlice;
 
 public class TestCase_JythonSlice extends TestCase
 {

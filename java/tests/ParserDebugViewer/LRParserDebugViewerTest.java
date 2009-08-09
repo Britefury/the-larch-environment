@@ -6,11 +6,11 @@
 //##************************
 package tests.ParserDebugViewer;
 
-import BritefuryJ.ParserDebugViewer.ParseViewFrame;
 import BritefuryJ.Parser.DebugParseResult;
 import BritefuryJ.Parser.Literal;
 import BritefuryJ.Parser.ParserExpression;
 import BritefuryJ.Parser.Production;
+import BritefuryJ.ParserDebugViewer.ParseViewFrame;
 
 public class LRParserDebugViewerTest
 {

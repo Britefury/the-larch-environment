@@ -9,13 +9,13 @@ package tests.DocPresent;
 
 import java.util.Arrays;
 
+import junit.framework.TestCase;
 import BritefuryJ.DocPresent.DPBin;
 import BritefuryJ.DocPresent.DPEmpty;
 import BritefuryJ.DocPresent.DPHBox;
 import BritefuryJ.DocPresent.DPParagraph;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPWidget;
-import junit.framework.TestCase;
 
 public class ElementContentTest extends TestCase
 {
