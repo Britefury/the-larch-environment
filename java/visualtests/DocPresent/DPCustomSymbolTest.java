@@ -8,11 +8,10 @@
 package visualtests.DocPresent;
 
 
-import java.awt.geom.*;
-
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.awt.geom.Line2D;
 
 import javax.swing.JFrame;
 

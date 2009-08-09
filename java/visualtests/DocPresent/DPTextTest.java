@@ -14,8 +14,8 @@ import java.awt.Font;
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 
-import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPPresentationArea;
+import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.VTypesetting;

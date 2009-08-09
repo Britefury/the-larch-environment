@@ -6,12 +6,12 @@
 //##************************
 package tests.DocModel;
 
+import junit.framework.TestCase;
 import BritefuryJ.DocModel.DMModule;
 import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMObjectField;
 import BritefuryJ.DocModel.DMModule.ClassAlreadyDefinedException;
 import BritefuryJ.DocModel.DMModule.UnknownClassException;
-import junit.framework.TestCase;
 
 public class Test_DMModule extends TestCase
 {

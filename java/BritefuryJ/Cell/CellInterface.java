@@ -8,9 +8,9 @@
 package BritefuryJ.Cell;
 
 
-import java.util.WeakHashMap;
 import java.util.LinkedList;
 import java.util.Set;
+import java.util.WeakHashMap;
 
 
 

@@ -6,12 +6,12 @@
 //##************************
 package tests.CommandHistory;
 
+import junit.framework.TestCase;
 import BritefuryJ.CommandHistory.Command;
 import BritefuryJ.CommandHistory.CommandHistory;
 import BritefuryJ.CommandHistory.CommandTracker;
 import BritefuryJ.CommandHistory.CommandTrackerFactory;
 import BritefuryJ.CommandHistory.Trackable;
-import junit.framework.TestCase;
 
 public class Test_CommandHistory extends TestCase
 {

@@ -208,7 +208,6 @@ public class ParserState
 	}
 	
 
-	@SuppressWarnings("unchecked")
 	ParseResult memoisedMatch(ParserExpression rule, ParserExpression.Mode mode, Object input, int start)
 	{
 		if ( input != currentInput  ||  mode != currentMode )
@@ -236,11 +235,8 @@ public class ParserState
 			
 			
 			// Take a copy of the dependencies, and clear the global list
-			HashSet<MemoEntry> deps = dependencies != null  ?  (HashSet<MemoEntry>)dependencies.clone()  :  null;
-			if ( dependencies != null )
-			{
-				dependencies.clear();
-			}
+			HashSet<MemoEntry> deps = dependencies;
+			dependencies = null;
 			
 			
 			// Mark the rule is 'evaluating'
@@ -256,10 +252,14 @@ public class ParserState
 			{
 				if ( dependencies == null )
 				{
-					dependencies = new HashSet<MemoEntry>();
+					dependencies = deps;
 				}
-				dependencies.addAll( deps );
+				else
+				{
+					dependencies.addAll( deps );
+				}
 			}
+			// Register @memoEntry as a dependent of all current dependencies
 			if ( dependencies != null )
 			{
 				for (MemoEntry d: dependencies)

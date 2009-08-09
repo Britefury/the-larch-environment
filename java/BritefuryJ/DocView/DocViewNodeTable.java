@@ -10,8 +10,8 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.WeakHashMap;
 import java.util.Map;
+import java.util.WeakHashMap;
 
 import BritefuryJ.DocTree.DocTreeNode;
 import BritefuryJ.DocView.DVNode.CannotChangeDocNodeException;

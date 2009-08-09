@@ -8,14 +8,13 @@ package tests.DocView;
 
 import java.util.Arrays;
 
+import junit.framework.TestCase;
 import BritefuryJ.DocModel.DMList;
 import BritefuryJ.DocTree.DocTree;
 import BritefuryJ.DocTree.DocTreeList;
 import BritefuryJ.DocView.DVNode;
 import BritefuryJ.DocView.DocView;
 import BritefuryJ.DocView.DocViewNodeTable;
-
-import junit.framework.TestCase;
 
 public class Test_DocViewNodeTable extends TestCase
 {

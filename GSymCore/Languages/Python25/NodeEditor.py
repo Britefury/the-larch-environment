@@ -181,7 +181,25 @@ class CompoundHeaderLinearRepresentationListener (ElementLinearRepresentationLis
 			
 			
 			
-			
+from BritefuryJ.Parser.ItemStream import ItemStream
+from BritefuryJ.DocModel import DMIOWriter, DMNode
+from java.util import ArrayList
+def _writeValue(x):
+	def _handleItem(i):
+		if isinstance( i, ItemStream.TextItem ):
+			return i.getTextValue()
+		elif isinstance( i, ItemStream.StructuralItem ):
+			return i.getStructuralValue()
+		else:
+			return None
+	value = DMNode.coerce( [ _handleItem( i )   for i in x.getItems() ] )
+	s = DMIOWriter.writeAsString( value )
+	f = open( 'parsevalue.in', 'w' )
+	f.write( s )
+	f.close()
+	
+	
+	
 class SuiteLinearRepresentationListener (ElementLinearRepresentationListener):
 	__slots__ = [ '_parser', '_suite' ]
 
@@ -223,6 +241,7 @@ class SuiteLinearRepresentationListener (ElementLinearRepresentationListener):
 		value = element.getLinearRepresentation()
 		#t1 = System.nanoTime()
 		
+		_writeValue( value )
 		parsed = parseStream( self._parser, value )
 		#parsed = debugParseStream( self._parser, value )
 

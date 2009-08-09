@@ -7,7 +7,6 @@
 //##************************
 package BritefuryJ.DocPresent.Input;
 
-import BritefuryJ.DocPresent.Input.Modifier;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Xform2;
 

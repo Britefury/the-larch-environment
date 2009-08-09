@@ -6,8 +6,8 @@
 //##************************
 package tests.DocModel;
 
-import BritefuryJ.DocModel.DMObjectField;
 import junit.framework.TestCase;
+import BritefuryJ.DocModel.DMObjectField;
 
 public class Test_DMObjectField extends TestCase
 {

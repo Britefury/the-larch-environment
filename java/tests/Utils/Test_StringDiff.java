@@ -10,10 +10,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import junit.framework.TestCase;
 import BritefuryJ.Utils.StringDiff;
 import BritefuryJ.Utils.StringDiff.Operation;
 import BritefuryJ.Utils.StringDiff.Operation.OpCode;
-import junit.framework.TestCase;
 
 public class Test_StringDiff extends TestCase
 {

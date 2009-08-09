@@ -11,6 +11,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 
+import junit.framework.TestCase;
 import BritefuryJ.DocModel.DMList;
 import BritefuryJ.DocModel.DMModule;
 import BritefuryJ.DocModel.DMModuleResolver;
@@ -18,7 +19,6 @@ import BritefuryJ.DocModel.DMObject;
 import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMObjectInputStream;
 import BritefuryJ.DocModel.DMObjectOutputStream;
-import junit.framework.TestCase;
 
 public class Test_DocModelSerialisation extends TestCase
 {

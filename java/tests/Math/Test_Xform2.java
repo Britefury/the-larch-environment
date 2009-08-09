@@ -7,10 +7,10 @@
 //##************************
 package tests.Math;
 
+import junit.framework.TestCase;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
 import BritefuryJ.Math.Xform2;
-import junit.framework.TestCase;
 
 public class Test_Xform2 extends TestCase
 {

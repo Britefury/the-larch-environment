@@ -6,8 +6,8 @@
 //##************************
 package tests.Utils;
 
-import BritefuryJ.Utils.BinarySearch;
 import junit.framework.TestCase;
+import BritefuryJ.Utils.BinarySearch;
 
 public class Test_BinarySearch extends TestCase
 {
