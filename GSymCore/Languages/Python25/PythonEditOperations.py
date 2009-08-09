@@ -26,6 +26,8 @@ from BritefuryJ.DocTree import DocTreeNode, DocTreeList, DocTreeObject
 
 from BritefuryJ.ParserDebugViewer import ParseViewFrame
 
+from BritefuryJ.Parser.ItemStream import ItemStreamBuilder, ItemStream
+
 
 from BritefuryJ.DocPresent.StyleSheets import *
 from BritefuryJ.DocPresent import *
@@ -116,7 +118,12 @@ def getStatementContextPathsFromCommonRoot(ctx0, ctx1):
 			break
 	return path0[commonLength-1:], path1[commonLength-1:]
 		
-	
+def getStatementDepth(ctx):
+	depth = -1
+	while ctx is not None:
+		depth += 1
+		ctx = getParentStatementContext( ctx )
+	return depth
 	
 	
 
@@ -253,3 +260,133 @@ def debugParseStream(parser, input, outerPrecedence=None):
 		#f.write( 'FULL TEXT:' + input.toString() + '\n' )
 		#f.close()
 		return None
+
+	
+	
+	
+	
+#
+#
+# STREAM OPERATIONS
+#
+#
+
+def getMinDepthOfStream(itemStream):
+	depth = 0
+	minDepth = 0
+	for item in itemStream.getItems():
+		if isinstance( item, ItemStream.StructuralItem ):
+			v = item.getStructuralValue()
+			if v.isInstanceOf( Nodes.Indent ):
+				depth += 1
+				minDepth = min( minDepth, depth )
+			elif v.isInstanceOf( Nodes.Dedent ):
+				depth -= 1
+				minDepth = min( minDepth, depth )
+	return minDepth
+
+
+def getDepthOffsetOfStream(itemStream):
+	depth = 0
+	for item in itemStream.getItems():
+		if isinstance( item, ItemStream.StructuralItem ):
+			v = item.getStructuralValue()
+			if v.isInstanceOf( Nodes.Indent ):
+				depth += 1
+			elif v.isInstanceOf( Nodes.Dedent ):
+				depth -= 1
+	return depth
+
+
+def joinStreamsAroundDeletionPoint(before, after):
+	beforeOffset = getDepthOffsetOfStream( before )
+	afterOffset = getDepthOffsetOfStream( after )
+	builder = ItemStreamBuilder()
+	if ( beforeOffset + afterOffset )  ==  0:
+		builder.extend( before )
+		builder.extend( after )
+	else:
+		offset = beforeOffset + afterOffset
+		builder.extend( before )
+		afterItems = after.getItems()
+		if len( afterItems ) > 0:
+			firstItem = afterItems[0]
+			if isinstance( firstItem, ItemStream.TextItem ):
+				builder.appendItemStreamItem( firstItem )
+				afterItems = list(afterItems)[1:]
+				
+		if offset < 0:
+			for i in xrange( 0, -offset ):
+				builder.appendStructuralValue( Nodes.Indent() )
+		else:
+			for i in xrange( 0, offset ):
+				builder.appendStructuralValue( Nodes.Dedent() )
+
+		for x in afterItems:
+			builder.appendItemStreamItem( x )
+	return builder.stream()
+
+
+
+def _extendStreamWithoutDedents(builder, itemStream, startDepth):
+	depth = startDepth
+	indentsToSkip = 0
+	for item in itemStream.getItems():
+		if isinstance( item, ItemStream.StructuralItem ):
+			v = item.getStructuralValue()
+			if v.isInstanceOf( Nodes.Indent ):
+				if indentsToSkip > 0:
+					indentsToSkip -= 1
+					item = None
+				else:
+					depth += 1
+			elif v.isInstanceOf( Nodes.Dedent ):
+				if depth == 0:
+					indentsToSkip += 1
+					item = None
+				else:
+					depth -= 1
+		if item is not None:
+			builder.appendItemStreamItem( item )
+	
+
+
+def joinStreamsForInsertion(commonRootCtx, before, insertion, after):
+	# Work out how much 'room' we have to play with, in case the inserted data dedents
+	rootDepth = getStatementDepth( commonRootCtx )
+	
+	beforeOffset = getDepthOffsetOfStream( before )
+	insertionOffset = getDepthOffsetOfStream( insertion )
+	insertionMinDepth = getMinDepthOfStream( insertion )
+	afterOffset = getDepthOffsetOfStream( after )
+	
+	builder = ItemStreamBuilder()
+	if ( beforeOffset + insertionOffset + afterOffset )  ==  0   and   ( beforeOffset + insertionMinDepth )  >=  0:
+		builder.extend( before )
+		builder.extend( insertion )
+		builder.extend( after )
+	else:
+		offset = beforeOffset + insertionOffset + afterOffset
+		builder.extend( before )
+		if ( beforeOffset + insertionMinDepth )  <  0:
+			_extendStreamWithoutDedents( builder, insertion, beforeOffset )
+		else:
+			builder.extend( insertion )
+		
+		afterItems = after.getItems()
+		if len( afterItems ) > 0:
+			firstItem = afterItems[0]
+			if isinstance( firstItem, ItemStream.TextItem ):
+				builder.appendItemStreamItem( firstItem )
+				afterItems = list(afterItems)[1:]
+				
+		if offset < 0:
+			for i in xrange( 0, -offset ):
+				builder.appendStructuralValue( Nodes.Indent() )
+		else:
+			for i in xrange( 0, offset ):
+				builder.appendStructuralValue( Nodes.Dedent() )
+
+		for x in afterItems:
+			builder.appendItemStreamItem( x )
+	return builder.stream()

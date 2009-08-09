@@ -9,6 +9,7 @@ package BritefuryJ.DocPresent.Selection;
 import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.DPContainer;
+import BritefuryJ.DocPresent.DPFrame;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Marker.MarkerListener;
@@ -88,6 +89,27 @@ public class Selection implements MarkerListener
 	{
 		refresh();
 		return commonRoot;
+	}
+	
+	
+	public DPFrame getFrame()
+	{
+		if ( isEmpty() )
+		{
+			return null;
+		}
+		else
+		{
+			DPContainer root = getCommonRoot();
+			if ( root != null )
+			{
+				return root.getFrame();
+			}
+			else
+			{
+				return marker0.getElement().getFrame();
+			}
+		}
 	}
 	
 	

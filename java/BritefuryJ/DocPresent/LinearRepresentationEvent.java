@@ -15,4 +15,10 @@ public class LinearRepresentationEvent
 	{
 		this.sourceElement = sourceElement;
 	}
+	
+	
+	public DPWidget getSourceElement()
+	{
+		return sourceElement;
+	}
 }

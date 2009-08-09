@@ -66,7 +66,7 @@ public class DocTreeList extends DocTreeNode implements DMListInterface
 
 		public void add(Object x)
 		{
-			iter.add( DocTreeNode.coerce( x ) );
+			iter.add( DocTreeNode.unwrap( x ) );
 		}
 
 		public void remove()
@@ -76,7 +76,7 @@ public class DocTreeList extends DocTreeNode implements DMListInterface
 
 		public void set(Object x)
 		{
-			iter.set( DocTreeNode.coerce( x ) );
+			iter.set( DocTreeNode.unwrap( x ) );
 		}
 	}
 	
@@ -117,22 +117,22 @@ public class DocTreeList extends DocTreeNode implements DMListInterface
 
 	public boolean add(Object x)
 	{
-		return node.add( DocTreeNode.coerce( x ) );
+		return node.add( DocTreeNode.unwrap( x ) );
 	}
 	
 	public void add(int index, Object x)
 	{
-		node.add( index, DocTreeNode.coerce( x ) );
+		node.add( index, DocTreeNode.unwrap( x ) );
 	}
 	
 	public boolean addAll(Collection<? extends Object> xs)
 	{
-		return node.addAll( DocTreeNode.coerceCollection( xs ) );
+		return node.addAll( DocTreeNode.unwrapCollection( xs ) );
 	}
 	
 	public boolean addAll(int index, Collection<? extends Object> xs)
 	{
-		return node.addAll( index, DocTreeNode.coerceCollection( xs ) );
+		return node.addAll( index, DocTreeNode.unwrapCollection( xs ) );
 	}
 	
 
@@ -145,13 +145,13 @@ public class DocTreeList extends DocTreeNode implements DMListInterface
 	
 	public boolean contains(Object x)
 	{
-		return node.contains( DocTreeNode.coerce( x ) );
+		return node.contains( DocTreeNode.unwrap( x ) );
 	}
 	
 
 	public boolean containsAll(Collection<?> xs)
 	{
-		return node.containsAll( DocTreeNode.coerceCollection( xs ) );
+		return node.containsAll( DocTreeNode.unwrapCollection( xs ) );
 	}
 	
 	
@@ -162,7 +162,7 @@ public class DocTreeList extends DocTreeNode implements DMListInterface
 			return true;
 		}
 		
-		return node.equals( DocTreeNode.coerce( xs ) );
+		return node.equals( DocTreeNode.unwrap( xs ) );
 	}
 	
 	
@@ -174,12 +174,12 @@ public class DocTreeList extends DocTreeNode implements DMListInterface
 	
 	public int indexOf(Object x)
 	{
-		return node.indexOf( DocTreeNode.coerce( x ) );
+		return node.indexOf( DocTreeNode.unwrap( x ) );
 	}
 
 	public int indexOfById(Object x)
 	{
-		return node.indexOfById( DocTreeNode.coerce( x ) );
+		return node.indexOfById( DocTreeNode.unwrap( x ) );
 	}
 
 	
@@ -197,7 +197,7 @@ public class DocTreeList extends DocTreeNode implements DMListInterface
 	
 	public int lastIndexOf(Object x)
 	{
-		return node.lastIndexOf( DocTreeNode.coerce( x ) );
+		return node.lastIndexOf( DocTreeNode.unwrap( x ) );
 	}
 
 	
@@ -218,22 +218,22 @@ public class DocTreeList extends DocTreeNode implements DMListInterface
 	
 	public boolean remove(Object x)
 	{
-		return node.remove( DocTreeNode.coerce( x ) );
+		return node.remove( DocTreeNode.unwrap( x ) );
 	}
 	
 	public boolean removeAll(Collection<?> x)
 	{
-		return node.removeAll( DocTreeNode.coerceCollection( x ) );
+		return node.removeAll( DocTreeNode.unwrapCollection( x ) );
 	}
 	
 	public boolean retainAll(Collection<?> x)
 	{
-		return node.retainAll( DocTreeNode.coerceCollection( x ) );
+		return node.retainAll( DocTreeNode.unwrapCollection( x ) );
 	}
 	
 	public Object set(int index, Object x)
 	{
-		return node.set( index, DocTreeNode.coerce( x ) );
+		return node.set( index, DocTreeNode.unwrap( x ) );
 	}
 	
 	public int size()
@@ -268,17 +268,17 @@ public class DocTreeList extends DocTreeNode implements DMListInterface
 	
 	public void append(Object x)
 	{
-		node.append( DocTreeNode.coerce( x ) );
+		node.append( DocTreeNode.unwrap( x ) );
 	}
 	
 	public void extend(List<Object> xs)
 	{
-		node.extend( DocTreeNode.coerceCollection( xs ) );
+		node.extend( DocTreeNode.unwrapCollection( xs ) );
 	}
 	
 	public void insert(int i, Object x)
 	{
-		node.insert( i, DocTreeNode.coerce( x ) );
+		node.insert( i, DocTreeNode.unwrap( x ) );
 	}
 	
 	public Object __getitem__(int i)
@@ -300,12 +300,12 @@ public class DocTreeList extends DocTreeNode implements DMListInterface
 	
 	public void __setitem__(int i, Object x)
 	{
-		node.__setitem__( i, DocTreeNode.coerce( x ) );
+		node.__setitem__( i, DocTreeNode.unwrap( x ) );
 	}
 	
 	public void __setitem__(PySlice i, List<Object> xs)
 	{
-		node.__setitem__(  i, DocTreeNode.coerceCollection( xs ) );
+		node.__setitem__(  i, DocTreeNode.unwrapCollection( xs ) );
 	}
 	
 	public void __delitem__(int i)
@@ -335,27 +335,27 @@ public class DocTreeList extends DocTreeNode implements DMListInterface
 	
 	public int index(Object x)
 	{
-		return node.index( DocTreeNode.coerce( x ) );
+		return node.index( DocTreeNode.unwrap( x ) );
 	}
 	
 	public int index(Object x, int j)
 	{
-		return node.index( DocTreeNode.coerce( x ), j );
+		return node.index( DocTreeNode.unwrap( x ), j );
 	}
 
 	public int index(Object x, int j, int k)
 	{
-		return node.index( DocTreeNode.coerce( x ), j, k );
+		return node.index( DocTreeNode.unwrap( x ), j, k );
 	}
 	
 	public int count(Object x)
 	{
-		return node.count( DocTreeNode.coerce( x ) );
+		return node.count( DocTreeNode.unwrap( x ) );
 	}
 	
 	public DMListInterface __add__(List<Object> xs)
 	{
-		return node.__add__( DocTreeNode.coerceCollection( xs ) );
+		return node.__add__( DocTreeNode.unwrapCollection( xs ) );
 	}
 	
 	public DMListInterface __mul__(int n)

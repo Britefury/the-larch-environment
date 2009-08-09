@@ -36,6 +36,7 @@ from GSymCore.Languages.Python25.Parser import Python25Grammar
 from GSymCore.Languages.Python25.Precedence import *
 from GSymCore.Languages.Python25.CodeGenerator import Python25CodeGenerator
 from GSymCore.Languages.Python25.PythonEditOperations import *
+from GSymCore.Languages.Python25.SelectionEditor import SelectionEditLinearRepresentationEvent
 
 
 
@@ -113,7 +114,8 @@ class StatementLinearRepresentationListener (ElementLinearRepresentationListener
 
 		
 	def linearRepresentationModified(self, element, event):
-		element.clearStructuralRepresentation()
+		if not isinstance( event, SelectionEditLinearRepresentationEvent )  or  event.getSourceElement() is not element:
+			element.clearStructuralRepresentation()
 		ctx = element.getContext()
 		node = ctx.getTreeNode()
 		# Get the content
@@ -155,7 +157,8 @@ class CompoundHeaderLinearRepresentationListener (ElementLinearRepresentationLis
 
 		
 	def linearRepresentationModified(self, element, event):
-		element.clearStructuralRepresentation()
+		if not isinstance( event, SelectionEditLinearRepresentationEvent )  or  event.getSourceElement() is not element:
+			element.clearStructuralRepresentation()
 		ctx = element.getContext()
 		# Get the content
 		value = element.getLinearRepresentation()
@@ -179,27 +182,10 @@ class CompoundHeaderLinearRepresentationListener (ElementLinearRepresentationLis
 			CompoundHeaderLinearRepresentationListener._listenerTable = _ListenerTable( CompoundHeaderLinearRepresentationListener )
 		return CompoundHeaderLinearRepresentationListener._listenerTable.get( parser )
 			
+
+	
+
 			
-			
-from BritefuryJ.Parser.ItemStream import ItemStream
-from BritefuryJ.DocModel import DMIOWriter, DMNode
-from java.util import ArrayList
-def _writeValue(x):
-	def _handleItem(i):
-		if isinstance( i, ItemStream.TextItem ):
-			return i.getTextValue()
-		elif isinstance( i, ItemStream.StructuralItem ):
-			return i.getStructuralValue()
-		else:
-			return None
-	value = DMNode.coerce( [ _handleItem( i )   for i in x.getItems() ] )
-	s = DMIOWriter.writeAsString( value )
-	f = open( 'parsevalue.in', 'w' )
-	f.write( s )
-	f.close()
-	
-	
-	
 class SuiteLinearRepresentationListener (ElementLinearRepresentationListener):
 	__slots__ = [ '_parser', '_suite' ]
 
@@ -210,7 +196,8 @@ class SuiteLinearRepresentationListener (ElementLinearRepresentationListener):
 
 		
 	def linearRepresentationModified(self, element, event):
-		element.clearStructuralRepresentation()
+		if not isinstance( event, SelectionEditLinearRepresentationEvent )  or  event.getSourceElement() is not element:
+			element.clearStructuralRepresentation()
 		ctx = element.getContext()
 		# Get the content
 		value = element.getLinearRepresentation()

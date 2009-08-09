@@ -1535,6 +1535,8 @@ public abstract class DPContainer extends DPWidget
 			parent.getLinearRepresentationFromStartOfRootToMarkerFromChild( builder, marker, root, this );
 		}
 		
+		appendStructuralPrefixToLinearRepresentation( builder );
+
 		for (DPWidget child: getInternalChildren())
 		{
 			if ( child != fromChild )
@@ -1560,6 +1562,8 @@ public abstract class DPContainer extends DPWidget
 				child.appendToLinearRepresentation( builder );
 			}
 		}
+
+		appendStructuralSuffixToLinearRepresentation( builder );
 
 		if ( root != this  &&  parent != null )
 		{
