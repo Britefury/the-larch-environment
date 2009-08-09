@@ -76,7 +76,7 @@ class ParsedExpressionLinearRepresentationListener (ElementLinearRepresentationL
 		self._parser = parser
 		self._outerPrecedence = outerPrecedence
 
-	def linearRepresentationModified(self, element):
+	def linearRepresentationModified(self, element, event):
 		value = element.getLinearRepresentation()
 		ctx = element.getContext()
 		node = ctx.getTreeNode()
@@ -112,7 +112,7 @@ class StatementLinearRepresentationListener (ElementLinearRepresentationListener
 		self._parser = parser
 
 		
-	def linearRepresentationModified(self, element):
+	def linearRepresentationModified(self, element, event):
 		element.clearStructuralRepresentation()
 		ctx = element.getContext()
 		node = ctx.getTreeNode()
@@ -120,19 +120,19 @@ class StatementLinearRepresentationListener (ElementLinearRepresentationListener
 		value = element.getLinearRepresentation()
 		parsed = parseStream( self._parser, value )
 		if parsed is not None:
-			return self.handleParsed( element, ctx, node, value, parsed )
+			return self.handleParsed( element, ctx, node, value, parsed, event )
 		else:
 			pyReplaceStmt( ctx, node, node, False )
-			return element.passLinearRepresentationModifiedEventUpwards()
+			return element.passLinearRepresentationModifiedEventUpwards( event )
 
 		
-	def handleParsed(self, element, ctx, node, value, parsed):
+	def handleParsed(self, element, ctx, node, value, parsed, event):
 		if not isCompoundStmtOrCompoundHeader( node )  and  not isCompoundStmtOrCompoundHeader( parsed ):
 			pyReplaceStmt( ctx, node, parsed )
 			return True
 		else:
 			element.setStructuralValueObject( parsed )
-			return element.passLinearRepresentationModifiedEventUpwards()
+			return element.passLinearRepresentationModifiedEventUpwards( event )
 
 			
 	_listenerTable = None
@@ -154,21 +154,21 @@ class CompoundHeaderLinearRepresentationListener (ElementLinearRepresentationLis
 		self._parser = parser
 
 		
-	def linearRepresentationModified(self, element):
+	def linearRepresentationModified(self, element, event):
 		element.clearStructuralRepresentation()
 		ctx = element.getContext()
 		# Get the content
 		value = element.getLinearRepresentation()
 		parsed = parseStream( self._parser, value )
 		if parsed is not None:
-			return self.handleParsed( element, value, parsed )
+			return self.handleParsed( element, value, parsed, event )
 		else:
-			return element.passLinearRepresentationModifiedEventUpwards()
+			return element.passLinearRepresentationModifiedEventUpwards( event )
 
 		
-	def handleParsed(self, element, value, parsed):
+	def handleParsed(self, element, value, parsed, event):
 		element.setStructuralValueObject( parsed )
-		return element.passLinearRepresentationModifiedEventUpwards()
+		return element.passLinearRepresentationModifiedEventUpwards( event )
 
 			
 	_listenerTable = None
@@ -209,7 +209,7 @@ class SuiteLinearRepresentationListener (ElementLinearRepresentationListener):
 		self._suite = suite
 
 		
-	def linearRepresentationModified(self, element):
+	def linearRepresentationModified(self, element, event):
 		element.clearStructuralRepresentation()
 		ctx = element.getContext()
 		# Get the content
@@ -218,28 +218,10 @@ class SuiteLinearRepresentationListener (ElementLinearRepresentationListener):
 		if parsed is not None:
 			return self.handleParsed( value, parsed )
 		else:
-			return element.passLinearRepresentationModifiedEventUpwards()
+			return element.passLinearRepresentationModifiedEventUpwards( event )
 
 
 	def handleParsed(self, value, parsed):
-		performSuiteEdits( self._suite, parsed )
-		return True
-
-			
-
-	def innerElementLinearRepresentationModified(self, element):
-		element.clearStructuralRepresentation()
-		ctx = element.getContext()
-		# Get the content
-		value = element.getLinearRepresentation()
-		parsed = parseStream( self._parser, value )
-		if parsed is not None:
-			return self.innerHandleParsed( value, parsed )
-		else:
-			return element.passLinearRepresentationModifiedEventUpwards()
-
-
-	def innerHandleParsed(self, value, parsed):
 		performSuiteEdits( self._suite, parsed )
 		return True
 			

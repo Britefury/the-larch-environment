@@ -1655,11 +1655,11 @@ abstract public class DPWidget
 
 
 	
-	protected void textRepresentationChanged()
+	protected void textRepresentationChanged(LinearRepresentationEvent event)
 	{
 		onTextRepresentationModified();
-		onTextRepresentationModifiedEvent();
-		linearRepresentationChanged();
+		onTextRepresentationModifiedEvent( event );
+		onLinearRepresentationModifiedEvent( event );
 	}
 	
 	protected void onTextRepresentationModified()
@@ -1670,11 +1670,11 @@ abstract public class DPWidget
 		}
 	}
 	
-	protected boolean onTextRepresentationModifiedEvent()
+	protected boolean onTextRepresentationModifiedEvent(LinearRepresentationEvent event)
 	{
 		if ( linearRepresentationListener != null )
 		{
-			if ( linearRepresentationListener.textRepresentationModified( this ) )
+			if ( linearRepresentationListener.textRepresentationModified( this, event ) )
 			{
 				return true;
 			}
@@ -1682,7 +1682,7 @@ abstract public class DPWidget
 		
 		if ( parent != null )
 		{
-			return parent.onTextRepresentationModifiedEvent();
+			return parent.onTextRepresentationModifiedEvent( event );
 		}
 		
 		return false;
@@ -1728,11 +1728,11 @@ abstract public class DPWidget
 
 
 	
-	public boolean passLinearRepresentationModifiedEventUpwards()
+	public boolean passLinearRepresentationModifiedEventUpwards(LinearRepresentationEvent event)
 	{
 		if ( parent != null )
 		{
-			return parent.onInnerElementLinearRepresentationModifiedEvent();
+			return parent.onLinearRepresentationModifiedEvent( event );
 		}
 		else
 		{
@@ -1740,22 +1740,17 @@ abstract public class DPWidget
 		}
 	}
 	
-	public boolean sendLinearRepresentationModifiedEvent()
+	public boolean sendLinearRepresentationModifiedEvent(LinearRepresentationEvent event)
 	{
-		return onLinearRepresentationModifiedEvent();
+		return onLinearRepresentationModifiedEvent( event );
 	}
 	
 	
-	protected void linearRepresentationChanged()
-	{
-		onLinearRepresentationModifiedEvent();
-	}
-	
-	protected boolean onLinearRepresentationModifiedEvent()
+	protected boolean onLinearRepresentationModifiedEvent(LinearRepresentationEvent event)
 	{
 		if ( linearRepresentationListener != null )
 		{
-			if ( linearRepresentationListener.linearRepresentationModified( this ) )
+			if ( linearRepresentationListener.linearRepresentationModified( this, event ) )
 			{
 				return true;
 			}
@@ -1763,25 +1758,7 @@ abstract public class DPWidget
 		
 		if ( parent != null )
 		{
-			return parent.onLinearRepresentationModifiedEvent();
-		}
-		
-		return false;
-	}
-	
-	protected boolean onInnerElementLinearRepresentationModifiedEvent()
-	{
-		if ( linearRepresentationListener != null )
-		{
-			if ( linearRepresentationListener.innerElementLinearRepresentationModified( this ) )
-			{
-				return true;
-			}
-		}
-		
-		if ( parent != null )
-		{
-			return parent.onInnerElementLinearRepresentationModifiedEvent();
+			return parent.onLinearRepresentationModifiedEvent( event );
 		}
 		
 		return false;
