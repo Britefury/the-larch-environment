@@ -1308,12 +1308,6 @@ public abstract class DPContainer extends DPWidget
 
 
 
-	protected boolean onChildTextRepresentationModifiedEvent(DPWidget child)
-	{
-		return onTextRepresentationModifiedEvent();
-	}
-	
-	
 	public void onTextRepresentationModified()
 	{
 		cachedTextRep = null;
@@ -1460,18 +1454,6 @@ public abstract class DPContainer extends DPWidget
 	// LINEAR REPRESENTATION METHODS
 	//
 	//
-	
-	protected boolean onChildLinearRepresentationModifiedEvent(DPWidget child)
-	{
-		return onLinearRepresentationModifiedEvent();
-	}
-	
-	
-	protected boolean onChildInnerElementLinearRepresentationModifiedEvent(DPWidget child)
-	{
-		return onInnerElementLinearRepresentationModifiedEvent();
-	}
-	
 	
 	public void buildLinearRepresentation(ItemStreamBuilder builder)
 	{

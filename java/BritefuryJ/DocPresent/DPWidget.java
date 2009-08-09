@@ -29,9 +29,10 @@ import BritefuryJ.DocPresent.Layout.PackingParams;
 import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StructuralRepresentation.StructuralRepresentation;
-import BritefuryJ.DocPresent.StructuralRepresentation.StructuralRepresentationObject;
-import BritefuryJ.DocPresent.StructuralRepresentation.StructuralRepresentationSequence;
-import BritefuryJ.DocPresent.StructuralRepresentation.StructuralRepresentationStream;
+import BritefuryJ.DocPresent.StructuralRepresentation.StructuralValue;
+import BritefuryJ.DocPresent.StructuralRepresentation.StructuralValueObject;
+import BritefuryJ.DocPresent.StructuralRepresentation.StructuralValueSequence;
+import BritefuryJ.DocPresent.StructuralRepresentation.StructuralValueStream;
 import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.WidgetStyleSheet;
@@ -1681,7 +1682,7 @@ abstract public class DPWidget
 		
 		if ( parent != null )
 		{
-			return parent.onChildTextRepresentationModifiedEvent( this );
+			return parent.onTextRepresentationModifiedEvent();
 		}
 		
 		return false;
@@ -1731,13 +1732,19 @@ abstract public class DPWidget
 	{
 		if ( parent != null )
 		{
-			return parent.onChildInnerElementLinearRepresentationModifiedEvent( this );
+			return parent.onInnerElementLinearRepresentationModifiedEvent();
 		}
 		else
 		{
 			return false;
 		}
 	}
+	
+	public boolean sendLinearRepresentationModifiedEvent()
+	{
+		return onLinearRepresentationModifiedEvent();
+	}
+	
 	
 	protected void linearRepresentationChanged()
 	{
@@ -1756,7 +1763,7 @@ abstract public class DPWidget
 		
 		if ( parent != null )
 		{
-			return parent.onChildLinearRepresentationModifiedEvent( this );
+			return parent.onLinearRepresentationModifiedEvent();
 		}
 		
 		return false;
@@ -1774,7 +1781,7 @@ abstract public class DPWidget
 		
 		if ( parent != null )
 		{
-			return parent.onChildInnerElementLinearRepresentationModifiedEvent( this );
+			return parent.onInnerElementLinearRepresentationModifiedEvent();
 		}
 		
 		return false;
@@ -1787,7 +1794,17 @@ abstract public class DPWidget
 	{
 		if ( structuralRepresentation != null )
 		{
-			structuralRepresentation.addToStream( builder );
+			structuralRepresentation.addPrefixToStream( builder );
+			
+			if ( structuralRepresentation.getMainValue()  !=  null )
+			{
+				structuralRepresentation.addMainToStream( builder );
+			}
+			else
+			{
+				buildLinearRepresentation( builder );
+			}
+			structuralRepresentation.addSuffixToStream( builder );
 		}
 		else
 		{
@@ -1809,31 +1826,124 @@ abstract public class DPWidget
 		structuralRepresentation = null;
 	}
 	
-	public void setStructuralRepresentation(StructuralRepresentation structuralRepresentation)
+	public void clearStructuralRepresentationUpTo(DPWidget subtreeRoot)
 	{
-		this.structuralRepresentation = structuralRepresentation;
+		structuralRepresentation = null;
+		if ( this != subtreeRoot )
+		{
+			if ( parent != null )
+			{
+				parent.clearStructuralRepresentationUpTo( subtreeRoot );
+			}
+			else
+			{
+				throw new IsNotInSubtreeException();
+			}
+		}
 	}
-	
-	public void setStructuralRepresentationObject(Object value)
-	{
-		this.structuralRepresentation = new StructuralRepresentationObject( value );
-	}
-	
-	public void setStructuralRepresentationSequence(List<Object> values)
-	{
-		this.structuralRepresentation = new StructuralRepresentationSequence( values );
-	}
-	
-	public void setStructuralRepresentationStream(ItemStream value)
-	{
-		this.structuralRepresentation = new StructuralRepresentationStream( value );
-	}
+
 	
 	
-	public Object getStructuralRepresentationValue()
+	public void setStructuralPrefix(StructuralValue value)
 	{
-		return structuralRepresentation.getValue();
+		if ( structuralRepresentation == null )
+		{
+			structuralRepresentation = new StructuralRepresentation();
+		}
+		structuralRepresentation.setPrefixValue( value );
 	}
+	
+	public void setStructuralPrefixObject(Object value)
+	{
+		setStructuralPrefix( new StructuralValueObject( value ) );
+	}
+	
+	public void setStructuralPrefixSequence(List<Object> value)
+	{
+		setStructuralPrefix( new StructuralValueSequence( value ) );
+	}
+	
+	public void setStructuralPrefixStream(ItemStream value)
+	{
+		setStructuralPrefix( new StructuralValueStream( value ) );
+	}
+	
+	public void clearStructuralPrefix()
+	{
+		if ( structuralRepresentation != null )
+		{
+			structuralRepresentation.clearPrefixValue();
+		}
+	}
+	
+	
+	public void setStructuralSuffix(StructuralValue value)
+	{
+		if ( structuralRepresentation == null )
+		{
+			structuralRepresentation = new StructuralRepresentation();
+		}
+		structuralRepresentation.setSuffixValue( value );
+	}
+	
+	public void setStructuralSuffixObject(Object value)
+	{
+		setStructuralSuffix( new StructuralValueObject( value ) );
+	}
+	
+	public void setStructuralSuffixSequence(List<Object> value)
+	{
+		setStructuralSuffix( new StructuralValueSequence( value ) );
+	}
+	
+	public void setStructuralSuffixStream(ItemStream value)
+	{
+		setStructuralSuffix( new StructuralValueStream( value ) );
+	}
+	
+	public void clearStructuralValue()
+	{
+		if ( structuralRepresentation != null )
+		{
+			structuralRepresentation.clearMainValue();
+		}
+	}
+	
+	
+	
+	public void setStructuralValue(StructuralValue value)
+	{
+		if ( structuralRepresentation == null )
+		{
+			structuralRepresentation = new StructuralRepresentation();
+		}
+		structuralRepresentation.setMainValue( value );
+	}
+	
+	public void setStructuralValueObject(Object value)
+	{
+		setStructuralValue( new StructuralValueObject( value ) );
+	}
+	
+	public void setStructuralValueSequence(List<Object> value)
+	{
+		setStructuralValue( new StructuralValueSequence( value ) );
+	}
+	
+	public void setStructuralValueStream(ItemStream value)
+	{
+		setStructuralValue( new StructuralValueStream( value ) );
+	}
+	
+	public void clearStructuralSuffix()
+	{
+		if ( structuralRepresentation != null )
+		{
+			structuralRepresentation.clearSuffixValue();
+		}
+	}
+	
+	
 	
 	public boolean hasStructuralRepresentation()
 	{

@@ -11,12 +11,12 @@ import java.util.List;
 
 import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
 
-public class StructuralRepresentationSequence extends StructuralRepresentation
+public class StructuralValueSequence extends StructuralValue
 {
 	private List<Object> values;
 	
 	
-	public StructuralRepresentationSequence(List<Object> values)
+	public StructuralValueSequence(List<Object> values)
 	{
 		this.values = new ArrayList<Object>();
 		this.values.addAll( values );
