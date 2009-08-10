@@ -90,6 +90,7 @@ class Python25BufferStream (Python25Buffer):
 	
 
 
+
 		
 class IndentLinearRepresentationEvent (LinearRepresentationEvent):
 	def __init__(self, element):
@@ -99,7 +100,19 @@ class DedentLinearRepresentationEvent (LinearRepresentationEvent):
 	def __init__(self, element):
 		super( DedentLinearRepresentationEvent, self ).__init__( element )
 
-class SelectionEditLinearRepresentationEvent (LinearRepresentationEvent):
+class SelectionLinearRepresentationEvent (LinearRepresentationEvent):
+	def __init__(self, element):
+		super( SelectionLinearRepresentationEvent, self ).__init__( element )
+
+class IndentSelectionLinearRepresentationEvent (SelectionLinearRepresentationEvent):
+	def __init__(self, element):
+		super( IndentSelectionLinearRepresentationEvent, self ).__init__( element )
+
+class DedentSelectionLinearRepresentationEvent (SelectionLinearRepresentationEvent):
+	def __init__(self, element):
+		super( DedentSelectionLinearRepresentationEvent, self ).__init__( element )
+
+class SelectionEditLinearRepresentationEvent (SelectionLinearRepresentationEvent):
 	def __init__(self, element):
 		super( SelectionEditLinearRepresentationEvent, self ).__init__( element )
 
@@ -159,7 +172,7 @@ class Python25EditHandler (EditHandler):
 	def _indentLine(self, element, context, node):
 		element.setStructuralPrefixObject( Nodes.Indent() )
 		element.setStructuralSuffixObject( Nodes.Dedent() )
-		bSuccess = element.passLinearRepresentationModifiedEventUpwards( IndentLinearRepresentationEvent( element ) )
+		bSuccess = element.sendLinearRepresentationModifiedEventToParent( IndentLinearRepresentationEvent( element ) )
 		if not bSuccess:
 			print 'Python25EditHandler._indentLine(): INDENT LINE FAILED'
 			element.clearStructuralPrefix()
@@ -174,7 +187,7 @@ class Python25EditHandler (EditHandler):
 			# This statement is not in the root node
 			element.setStructuralPrefixObject( Nodes.Dedent() )
 			element.setStructuralSuffixObject( Nodes.Indent() )
-			bSuccess = element.passLinearRepresentationModifiedEventUpwards( DedentLinearRepresentationEvent( element ) )
+			bSuccess = element.sendLinearRepresentationModifiedEventToParent( DedentLinearRepresentationEvent( element ) )
 			if not bSuccess:
 				print 'Python25EditHandler._dedentLine(): DEDENT LINE FAILED'
 				element.clearStructuralPrefix()
@@ -206,7 +219,7 @@ class Python25EditHandler (EditHandler):
 		startContext.getViewNodeElement().clearStructuralRepresentationUpTo( rootElement )
 		endContext.getViewNodeElement().clearStructuralRepresentationUpTo( rootElement )
 		
-		bSuccess = rootElement.passLinearRepresentationModifiedEventUpwards( IndentLinearRepresentationEvent( rootElement ) )
+		bSuccess = root.getViewNodeContentElement().sendLinearRepresentationModifiedEvent( IndentSelectionLinearRepresentationEvent( rootElement ) )
 		if not bSuccess:
 			print 'Python25EditHandler._indentSelection(): INDENT SELECTION FAILED'
 			startStmtElement.clearStructuralPrefix()
@@ -238,7 +251,7 @@ class Python25EditHandler (EditHandler):
 		startContext.getViewNodeElement().clearStructuralRepresentationUpTo( rootElement )
 		endContext.getViewNodeElement().clearStructuralRepresentationUpTo( rootElement )
 		
-		bSuccess = rootElement.passLinearRepresentationModifiedEventUpwards( DedentLinearRepresentationEvent( rootElement ) )
+		bSuccess = rootElement.sendLinearRepresentationModifiedEvent( DedentSelectionLinearRepresentationEvent( rootElement ) )
 		if not bSuccess:
 			print 'Python25EditHandler._dedentSelection(): DEDENT SELECTION FAILED'
 			startStmtElement.clearStructuralPrefix()
