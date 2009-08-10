@@ -1728,7 +1728,7 @@ abstract public class DPWidget
 
 
 	
-	public boolean passLinearRepresentationModifiedEventUpwards(LinearRepresentationEvent event)
+	public boolean sendLinearRepresentationModifiedEventToParent(LinearRepresentationEvent event)
 	{
 		if ( parent != null )
 		{

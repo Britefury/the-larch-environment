@@ -36,7 +36,7 @@ from GSymCore.Languages.Python25.Parser import Python25Grammar
 from GSymCore.Languages.Python25.Precedence import *
 from GSymCore.Languages.Python25.CodeGenerator import Python25CodeGenerator
 from GSymCore.Languages.Python25.PythonEditOperations import *
-from GSymCore.Languages.Python25.SelectionEditor import SelectionEditLinearRepresentationEvent
+from GSymCore.Languages.Python25.SelectionEditor import SelectionLinearRepresentationEvent
 
 
 
@@ -114,7 +114,7 @@ class StatementLinearRepresentationListener (ElementLinearRepresentationListener
 
 		
 	def linearRepresentationModified(self, element, event):
-		if not isinstance( event, SelectionEditLinearRepresentationEvent )  or  event.getSourceElement() is not element:
+		if not isinstance( event, SelectionLinearRepresentationEvent )  or  event.getSourceElement() is not element:
 			element.clearStructuralRepresentation()
 		ctx = element.getContext()
 		node = ctx.getTreeNode()
@@ -125,7 +125,7 @@ class StatementLinearRepresentationListener (ElementLinearRepresentationListener
 			return self.handleParsed( element, ctx, node, value, parsed, event )
 		else:
 			pyReplaceStmt( ctx, node, node, False )
-			return element.passLinearRepresentationModifiedEventUpwards( event )
+			return element.sendLinearRepresentationModifiedEventToParent( event )
 
 		
 	def handleParsed(self, element, ctx, node, value, parsed, event):
@@ -134,7 +134,7 @@ class StatementLinearRepresentationListener (ElementLinearRepresentationListener
 			return True
 		else:
 			element.setStructuralValueObject( parsed )
-			return element.passLinearRepresentationModifiedEventUpwards( event )
+			return element.sendLinearRepresentationModifiedEventToParent( event )
 
 			
 	_listenerTable = None
@@ -157,7 +157,7 @@ class CompoundHeaderLinearRepresentationListener (ElementLinearRepresentationLis
 
 		
 	def linearRepresentationModified(self, element, event):
-		if not isinstance( event, SelectionEditLinearRepresentationEvent )  or  event.getSourceElement() is not element:
+		if not isinstance( event, SelectionLinearRepresentationEvent )  or  event.getSourceElement() is not element:
 			element.clearStructuralRepresentation()
 		ctx = element.getContext()
 		# Get the content
@@ -166,12 +166,12 @@ class CompoundHeaderLinearRepresentationListener (ElementLinearRepresentationLis
 		if parsed is not None:
 			return self.handleParsed( element, value, parsed, event )
 		else:
-			return element.passLinearRepresentationModifiedEventUpwards( event )
+			return element.sendLinearRepresentationModifiedEventToParent( event )
 
 		
 	def handleParsed(self, element, value, parsed, event):
 		element.setStructuralValueObject( parsed )
-		return element.passLinearRepresentationModifiedEventUpwards( event )
+		return element.sendLinearRepresentationModifiedEventToParent( event )
 
 			
 	_listenerTable = None
@@ -196,7 +196,7 @@ class SuiteLinearRepresentationListener (ElementLinearRepresentationListener):
 
 		
 	def linearRepresentationModified(self, element, event):
-		if not isinstance( event, SelectionEditLinearRepresentationEvent )  or  event.getSourceElement() is not element:
+		if not isinstance( event, SelectionLinearRepresentationEvent )  or  event.getSourceElement() is not element:
 			element.clearStructuralRepresentation()
 		ctx = element.getContext()
 		# Get the content
@@ -205,7 +205,7 @@ class SuiteLinearRepresentationListener (ElementLinearRepresentationListener):
 		if parsed is not None:
 			return self.handleParsed( value, parsed )
 		else:
-			return element.passLinearRepresentationModifiedEventUpwards( event )
+			return element.sendLinearRepresentationModifiedEventToParent( event )
 
 
 	def handleParsed(self, value, parsed):
