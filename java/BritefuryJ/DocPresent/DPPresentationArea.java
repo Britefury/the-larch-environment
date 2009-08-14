@@ -95,36 +95,6 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 		{
 			private static final long serialVersionUID = 1L;
 			
-			public boolean canImport(TransferHandler.TransferSupport support)
-			{
-				DPFrame frame = area.getCaretFrame();
-				if ( frame != null )
-				{
-					EditHandler editHandler = frame.getEditHandler();
-					if ( editHandler != null )
-					{
-						return editHandler.canImport( support );
-					}
-				}
-				return false;
-			}
-
-			public boolean importData(TransferHandler.TransferSupport info)
-			{
-				DPFrame frame = area.getCaretFrame();
-				if ( frame != null )
-				{
-					EditHandler editHandler = frame.getEditHandler();
-					if ( editHandler != null )
-					{
-						return editHandler.importData( info );
-					}
-				}
-				return false;
-			}
-			
-			
-			
 			public int getSourceActions(JComponent component)
 			{
 				DPFrame frame = area.getSelectionFrame();
@@ -164,6 +134,37 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 						editHandler.exportDone( data, action );
 					}
 				}
+			}
+
+			
+			
+			
+			public boolean canImport(TransferHandler.TransferSupport support)
+			{
+				DPFrame frame = area.getCaretFrame();
+				if ( frame != null )
+				{
+					EditHandler editHandler = frame.getEditHandler();
+					if ( editHandler != null )
+					{
+						return editHandler.canImport( support );
+					}
+				}
+				return false;
+			}
+
+			public boolean importData(TransferHandler.TransferSupport info)
+			{
+				DPFrame frame = area.getCaretFrame();
+				if ( frame != null )
+				{
+					EditHandler editHandler = frame.getEditHandler();
+					if ( editHandler != null )
+					{
+						return editHandler.importData( info );
+					}
+				}
+				return false;
 			}
 		}
 		

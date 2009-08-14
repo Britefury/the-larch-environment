@@ -9,7 +9,8 @@ package BritefuryJ.DocPresent;
 
 import BritefuryJ.Math.Point2;
 
-public interface DndListener {
+public interface DndListener
+{
 	public Object onDndBegin(DndDrag drag);
 	
 	public boolean dndCanDropFrom(DndDrag drag, DPWidget dest, Point2 destLocalPos);
