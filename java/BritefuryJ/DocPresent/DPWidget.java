@@ -1395,6 +1395,10 @@ abstract public class DPWidget
 	{
 		clearFlagResizeQueued();
 		setFlagSizeUpToDate();
+		if ( parent != null )
+		{
+			parent.onChildSizeRefreshed();
+		}
 	}
 	
 	
