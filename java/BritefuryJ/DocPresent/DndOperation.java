@@ -7,6 +7,6 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-public class DndOperation {
-
+public class DndOperation
+{
 }

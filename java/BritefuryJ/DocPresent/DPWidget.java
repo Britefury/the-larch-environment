@@ -99,10 +99,12 @@ abstract public class DPWidget
 		protected DndListener dndListener;
 		
 		
-		protected DndState()
+		protected DndState(DndListener dndListener)
 		{
 			sourceOps = new ArrayList<DndOperation>();
 			destOps = new ArrayList<DndOperation>();
+			
+			this.dndListener = dndListener;
 		}
 	}
 	
@@ -771,11 +773,11 @@ abstract public class DPWidget
 	//
 	
 	
-	public void enableDnd()
+	public void enableDnd(DndListener listener)
 	{
 		if ( dndState == null )
 		{
-			dndState = new DndState();
+			dndState = new DndState( listener );
 		}
 	}
 	

@@ -90,7 +90,7 @@ public class TableLayout
 	private static LReqBox[] computeRowYBoxes(LReqBox children[], TablePackingParams packingParams[], int numColumns, int numRows, double spacingY)
 	{
 		LReqBox rowBoxes[] = new LReqBox[numRows];
-		for (int i = 0; i < numColumns; i++)
+		for (int i = 0; i < numRows; i++)
 		{
 			rowBoxes[i] = new LReqBox();
 		}
@@ -162,7 +162,7 @@ public class TableLayout
 	private static LReqBox[] computeRowYBoxesWithBaselines(LReqBox children[], TablePackingParams packingParams[], int numColumns, int numRows, double spacingY)
 	{
 		LReqBox rowBoxes[] = new LReqBox[numRows];
-		for (int i = 0; i < numColumns; i++)
+		for (int i = 0; i < numRows; i++)
 		{
 			rowBoxes[i] = new LReqBox();
 			rowBoxes[i].bHasBaseline = true;
