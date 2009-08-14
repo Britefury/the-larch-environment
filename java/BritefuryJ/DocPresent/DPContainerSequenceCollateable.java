@@ -130,16 +130,6 @@ public abstract class DPContainerSequenceCollateable extends DPContainerSequence
 
 	
 	
-	protected void onChildListModified()
-	{
-		super.onChildListModified();
-		
-		if ( collationRoot != null )
-		{
-			collationRoot.onCollatedBranchChildListModified( this );
-		}
-	}
-
 
 
 
@@ -206,6 +196,25 @@ public abstract class DPContainerSequenceCollateable extends DPContainerSequence
 	protected void handleQueueResize()
 	{
 		super.handleQueueResize();
+		
+		boundsBoxes = null;
+	}
+	
+	protected void onChildListModified()
+	{
+		super.onChildListModified();
+		
+		if ( collationRoot != null )
+		{
+			collationRoot.onCollatedBranchChildListModified( this );
+		}
+
+		boundsBoxes = null;
+	}
+
+	protected void onChildSizeRefreshed()
+	{
+		super.onChildSizeRefreshed();
 		
 		boundsBoxes = null;
 	}

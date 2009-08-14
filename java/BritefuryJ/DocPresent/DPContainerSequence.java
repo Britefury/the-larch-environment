@@ -55,7 +55,7 @@ abstract public class DPContainerSequence extends DPContainer
 				queueResize();
 			}
 		}
-		else if ( registeredChildren.size() == 1 )
+		else if ( registeredChildren.size() == 1  &&  items.size() <= 1 )
 		{
 			// Special case for when there is only 1 child
 			if ( items.size() == 0 )

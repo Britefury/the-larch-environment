@@ -166,6 +166,11 @@ public abstract class DPContainer extends DPWidget
 	}
 	
 	
+	protected void onChildSizeRefreshed()
+	{
+	}
+	
+	
 	protected abstract PackingParams getDefaultPackingParams();
 	
 	

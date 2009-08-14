@@ -130,16 +130,6 @@ public abstract class DPContainerCollateable extends DPContainer implements Coll
 
 	
 	
-	protected void onChildListModified()
-	{
-		super.onChildListModified();
-		
-		if ( collationRoot != null )
-		{
-			collationRoot.onCollatedBranchChildListModified( this );
-		}
-	}
-
 
 
 
@@ -200,6 +190,33 @@ public abstract class DPContainerCollateable extends DPContainer implements Coll
 	{
 		super.onUnrealise( unrealiseRoot );
 		setCollationRoot( null );
+	}
+	
+	
+	protected void handleQueueResize()
+	{
+		super.handleQueueResize();
+		
+		boundsBoxes = null;
+	}
+	
+	protected void onChildListModified()
+	{
+		super.onChildListModified();
+		
+		if ( collationRoot != null )
+		{
+			collationRoot.onCollatedBranchChildListModified( this );
+		}
+
+		boundsBoxes = null;
+	}
+
+	protected void onChildSizeRefreshed()
+	{
+		super.onChildSizeRefreshed();
+		
+		boundsBoxes = null;
 	}
 	
 	
