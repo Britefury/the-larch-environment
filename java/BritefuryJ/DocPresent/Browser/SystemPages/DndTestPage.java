@@ -8,6 +8,11 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.IOException;
 
 import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPHBox;
@@ -15,11 +20,11 @@ import BritefuryJ.DocPresent.DPStaticText;
 import BritefuryJ.DocPresent.DPTable;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.DndDrag;
-import BritefuryJ.DocPresent.DndListener;
-import BritefuryJ.DocPresent.DndOperation;
+import BritefuryJ.DocPresent.DndDrop;
+import BritefuryJ.DocPresent.DndHandler;
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Border.EmptyBorder;
+import BritefuryJ.DocPresent.Input.PointerInterface;
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.Layout.VTypesetting;
@@ -27,14 +32,12 @@ import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.StaticTextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TableStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
-import BritefuryJ.Math.Point2;
 
 public class DndTestPage extends SystemPage
 {
 	private static StaticTextStyleSheet textStyle = new StaticTextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );
 	private static Border sourceBorder = new EmptyBorder( 10.0, 10.0, 10.0, 10.0, new Color( 0.75f, 0.85f, 1.0f ) );
 	private static Border destBorder = new EmptyBorder( 10.0, 10.0, 10.0, 10.0, new Color( 1.0f, 0.9f, 0.75f ) );
-	private static DndOperation dndOp = new DndOperation();
 
 	protected DndTestPage()
 	{
@@ -49,41 +52,30 @@ public class DndTestPage extends SystemPage
 	
 	
 	
-	protected DPWidget makeSourceElement(String title, final Object beginData, final Object dragData)
+	protected DPWidget makeSourceElement(String title, final String dragData)
 	{
 		DPStaticText sourceText = new DPStaticText( textStyle, title );
 		DPBorder sourceBorderElement = new DPBorder( sourceBorder );
 		sourceBorderElement.setChild( sourceText );
 		
-		DndListener sourceListener = new DndListener()
+		DndHandler sourceHandler = new DndHandler()
 		{
-			public Object onDndBegin(DndDrag drag)
+			public int getSourceRequestedAction(DPWidget sourceElement, PointerInterface pointer, int button)
 			{
-				return beginData;
+				return COPY;
 			}
 
-			public Object dndDragTo(DndDrag drag, DPWidget dest)
+			public Transferable createTransferable(DPWidget sourceElement)
 			{
-				return dragData;
+				return new StringSelection( dragData );
 			}
 
-			
-			public boolean dndCanDropFrom(DndDrag drag, DPWidget dest, Point2 destLocalPos)
-			{
-				return false;
-			}
-
-			public void onDndMotion(DndDrag drag, DPWidget dest, Point2 destLocalPos)
-			{
-			}
-
-			public void dndDropFrom(DndDrag drag, DPWidget dest, Point2 destLocalPos)
+			public void exportDone(DPWidget sourceElement, Transferable data, int action)
 			{
 			}
 		};
 		
-		sourceBorderElement.enableDnd( sourceListener );
-		sourceBorderElement.addDndSourceOp( dndOp );
+		sourceBorderElement.enableDnd( sourceHandler );
 
 		return sourceBorderElement;
 	}
@@ -94,36 +86,37 @@ public class DndTestPage extends SystemPage
 		DPBorder destBorderElement = new DPBorder( destBorder );
 		destBorderElement.setChild( destText );
 		
-		DndListener destListener = new DndListener()
+		DndHandler destHandler = new DndHandler()
 		{
-			public Object onDndBegin(DndDrag drag)
-			{
-				return null;
-			}
-
-			public Object dndDragTo(DndDrag drag, DPWidget dest)
-			{
-				return null;
-			}
-
-			
-			public boolean dndCanDropFrom(DndDrag drag, DPWidget dest, Point2 destLocalPos)
+			public boolean canDrop(DPWidget destElement, DndDrop drop)
 			{
 				return true;
 			}
 
-			public void onDndMotion(DndDrag drag, DPWidget dest, Point2 destLocalPos)
+			public boolean acceptDrop(DPWidget destElement, DndDrop drop)
 			{
-			}
-
-			public void dndDropFrom(DndDrag drag, DPWidget dest, Point2 destLocalPos)
-			{
-				((DPStaticText)((DPBorder)dest).getChild()).setText( (String)drag.getDragData() );
+				Transferable x = drop.getTransferable();
+				String text = null;
+				try
+				{
+					text = (String)x.getTransferData( DataFlavor.stringFlavor );
+				}
+				catch (UnsupportedFlavorException e)
+				{
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				catch (IOException e)
+				{
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				((DPStaticText)((DPBorder)destElement).getChild()).setText( text );
+				return true;
 			}
 		};
 		
-		destBorderElement.enableDnd( destListener );
-		destBorderElement.addDndDestOp( dndOp );
+		destBorderElement.enableDnd( destHandler );
 
 		return destBorderElement;
 	}
@@ -140,8 +133,8 @@ public class DndTestPage extends SystemPage
 		
 		
 		DPStaticText sourceTitle = new DPStaticText( rowTitleStyle, "Source:" );
-		DPWidget source0 = makeSourceElement( "abc", "begin", "abc" );
-		DPWidget source1 = makeSourceElement( "xyz", "begin", "xyz" );
+		DPWidget source0 = makeSourceElement( "abc", "abc" );
+		DPWidget source1 = makeSourceElement( "xyz", "xyz" );
 
 		DPStaticText destTitle = new DPStaticText( rowTitleStyle, "Destination:" );
 		DPWidget dest0 = makeDestElement( "abc" );

@@ -59,6 +59,7 @@ public class TabbedBrowser implements Browser.BrowserListener
 		locationField = new JTextField( location );
 		locationField.setMaximumSize( new Dimension( locationField.getMaximumSize().width, locationField.getMinimumSize().height ) );
 		locationField.setBorder( BorderFactory.createLineBorder( Color.black, 1 ) );
+		locationField.setDragEnabled( true );
 	
 		ActionListener locationActionListener = new ActionListener()
 		{
