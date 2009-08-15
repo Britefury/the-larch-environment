@@ -47,6 +47,13 @@ public class DndDropLocal extends DndDrop
 		return transferable;
 	}
 	
+	
+	
+	public DPWidget getSourceElement()
+	{
+		return sourceElement;
+	}
+	
 
 	
 	public DataFlavor[] getDataFlavors()
