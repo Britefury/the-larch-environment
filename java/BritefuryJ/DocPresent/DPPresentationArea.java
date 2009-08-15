@@ -95,44 +95,69 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 		private class PresAreaTransferHandler extends TransferHandler
 		{
 			private static final long serialVersionUID = 1L;
+			private DndDropLocal drop = null;
+			
+			
+			
 			
 			public int getSourceActions(JComponent component)
 			{
-				DPFrame frame = area.getSelectionFrame();
-				if ( frame != null )
+				if ( drop != null )
 				{
-					EditHandler editHandler = frame.getEditHandler();
-					if ( editHandler != null )
-					{	
-						return editHandler.getSourceActions();
-					}
+					return drop.getSourceDropActions();
 				}
-				return NONE;
+				else
+				{
+					DPFrame frame = area.getSelectionFrame();
+					if ( frame != null )
+					{
+						EditHandler editHandler = frame.getEditHandler();
+						if ( editHandler != null )
+						{	
+							return editHandler.getSourceActions();
+						}
+					}
+					return NONE;
+				}
 			}
 			
 			public Transferable createTransferable(JComponent component)
 			{
-				DPFrame frame = area.getSelectionFrame();
-				if ( frame != null )
+				if ( drop != null )
 				{
-					EditHandler editHandler = frame.getEditHandler();
-					if ( editHandler != null )
-					{
-						return editHandler.createTransferable();
-					}
+					return drop.getTransferable();
 				}
-				return null;
+				else
+				{
+					DPFrame frame = area.getSelectionFrame();
+					if ( frame != null )
+					{
+						EditHandler editHandler = frame.getEditHandler();
+						if ( editHandler != null )
+						{
+							return editHandler.createTransferable();
+						}
+					}
+					return null;
+				}
 			}
 			
 			public void exportDone(JComponent component, Transferable data, int action)
 			{
-				DPFrame frame = area.getSelectionFrame();
-				if ( frame != null )
+				if ( drop != null )
 				{
-					EditHandler editHandler = frame.getEditHandler();
-					if ( editHandler != null )
+					drop.getSourceElement().dndHandler.exportDone( drop.getSourceElement(), data, action );
+				}
+				else
+				{
+					DPFrame frame = area.getSelectionFrame();
+					if ( frame != null )
 					{
-						editHandler.exportDone( data, action );
+						EditHandler editHandler = frame.getEditHandler();
+						if ( editHandler != null )
+						{
+							editHandler.exportDone( data, action );
+						}
 					}
 				}
 			}
@@ -180,6 +205,16 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 					}
 					return false;
 				}
+			}
+
+			public void beginExportDnd(DndDropLocal drop)
+			{
+				this.drop = drop;
+			}
+
+			public void endExportDnd()
+			{
+				drop = null;
 			}
 		}
 		
@@ -1710,9 +1745,9 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	//
 	//
 	
-	protected TransferHandler getDndTransferHandler()
+	protected PresentationAreaComponent.PresAreaTransferHandler getDndTransferHandler()
 	{
-		return component.getPresentationComponent().getTransferHandler();
+		return (PresentationAreaComponent.PresAreaTransferHandler)component.getPresentationComponent().getTransferHandler();
 	}
 	
 	
@@ -1749,7 +1784,15 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 					int requestedAction = drop.sourceElement.dndHandler.getSourceRequestedAction( drop.sourceElement, event.pointer, drop.sourceButton );
 					Transferable transferable = drop.sourceElement.dndHandler.createTransferable( drop.sourceElement );
 					drop.initialise( transferable, requestedAction );
-					getDndTransferHandler().exportAsDrag( component.getPresentationComponent(), mouseEvent, requestedAction );
+					
+					if ( event.pointer.concretePointer()  ==  rootSpaceMouse )
+					{
+						PresentationAreaComponent.PresAreaTransferHandler xferHandler = getDndTransferHandler();
+						xferHandler.beginExportDnd( drop );
+						xferHandler.exportAsDrag( component.getPresentationComponent(), mouseEvent, requestedAction );
+						xferHandler.endExportDnd();
+					}
+					
 					setCursorDrag( event.pointer );
 				}
 			}
