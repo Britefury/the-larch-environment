@@ -315,65 +315,34 @@ public abstract class DPContainer extends DPWidget
 	
 	
 	//
-	// Drag and drop methods
+	//
+	// DRAG AND DROP METHODS
+	//
 	//
 	
-	protected DndDrag handleDndButtonDown(PointerButtonEvent event)
+	protected DPWidget getDndElement(Point2 localPos)
 	{
-		DPWidget child = getChildAtLocalPoint( event.pointer.getLocalPos() );
+		DPWidget child = getChildAtLocalPoint( localPos );
 		if ( child != null )
 		{
-			DndDrag drag = child.handleDndButtonDown( event.transformed( child.getParentToLocalXform() ) );
-			if ( drag != null )
+			DPWidget element = child.getDndElement( child.getParentToLocalXform().transform( localPos ) );
+			if ( element != null )
 			{
-				return drag;
-			}
-			else
-			{
-				return super.handleDndButtonDown( event );
+				return element;
 			}
 		}
 		
-		return null;
+		if ( dndHandler != null )
+		{
+			return this;
+		}
+		else
+		{
+			return null;
+		}
 	}
+
 	
-	protected boolean handleDndMotion(PointerMotionEvent event, DndDrag drag)
-	{
-		DPWidget child = getChildAtLocalPoint( event.pointer.getLocalPos() );
-		if ( child != null )
-		{
-			boolean bDropped = child.handleDndMotion( event.transformed( child.getParentToLocalXform() ), drag );
-			if ( bDropped )
-			{
-				return true;
-			}
-			else
-			{
-				return super.handleDndMotion( event, drag );
-			}
-		}
-		
-		return false;
-	}
-	
-	protected boolean handleDndButtonUp(PointerButtonEvent event, DndDrag drag)
-	{
-		DPWidget child = getChildAtLocalPoint( event.pointer.getLocalPos() );
-		if ( child != null )
-		{
-			boolean bDropped = child.handleDndButtonUp( event.transformed( child.getParentToLocalXform() ), drag );
-			if ( bDropped )
-			{
-				return true;
-			}
-			else
-			{
-				return super.handleDndButtonUp( event, drag );
-			}
-		}
-		
-		return false;
-	}
 	
 	
 	

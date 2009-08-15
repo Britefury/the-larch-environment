@@ -86,33 +86,6 @@ abstract public class DPWidget
 	
 	//
 	//
-	// Drag and drop classes
-	//
-	//
-	
-	// Drag and drop state
-	protected static class DndState
-	{
-		protected ArrayList<DndOperation> sourceOps, destOps;
-
-
-		protected DndListener dndListener;
-		
-		
-		protected DndState(DndListener dndListener)
-		{
-			sourceOps = new ArrayList<DndOperation>();
-			destOps = new ArrayList<DndOperation>();
-			
-			this.dndListener = dndListener;
-		}
-	}
-	
-	
-	
-	
-	//
-	//
 	// Parent packing
 	//
 	//
@@ -143,7 +116,7 @@ abstract public class DPWidget
 	protected LAllocBox layoutAllocBox;
 	protected PackingParams parentPacking;
 	
-	protected DndState dndState;								// only initialised when in use; otherwise null
+	protected DndHandler dndHandler;
 	
 	protected ElementLinearRepresentationListener linearRepresentationListener;
 	protected ElementKeyboardListener keyboardListener;
@@ -769,124 +742,33 @@ abstract public class DPWidget
 	
 	
 	//
-	// Drag and drop methods
+	//
+	// DRAG AND DROP METHODS
+	//
 	//
 	
-	
-	public void enableDnd(DndListener listener)
+	public void enableDnd(DndHandler handler)
 	{
-		if ( dndState == null )
-		{
-			dndState = new DndState( listener );
-		}
+		dndHandler = handler;
 	}
 	
 	public void disableDnd()
 	{
-		if ( dndState != null )
-		{
-			dndState = null;
-		}
+		dndHandler = null;
 	}
 	
 	public boolean isDndEnabled()
 	{
-		return dndState != null;
+		return dndHandler != null;
 	}
 	
 	
 	
-	public void addDndSourceOp(DndOperation op) throws DndOperationAlreadyInList
+	protected DPWidget getDndElement(Point2 localPos)
 	{
-		if ( !isDndEnabled() )
+		if ( dndHandler != null )
 		{
-			throw new DndDisabledException();
-		}
-		
-		if ( dndState.sourceOps.contains( op ) )
-		{
-			throw new DndOperationAlreadyInList();
-		}
-		
-		dndState.sourceOps.add( op );
-	}
-
-	public void removeDndSourceOp(DndOperation op) throws DndOperationNotInList
-	{
-		if ( !isDndEnabled() )
-		{
-			throw new DndDisabledException();
-		}
-		
-		if ( !dndState.sourceOps.contains( op ) )
-		{
-			throw new DndOperationNotInList();
-		}
-		
-		dndState.sourceOps.remove( op );
-	}
-
-
-
-	public void addDndDestOp(DndOperation op) throws DndOperationAlreadyInList
-	{
-		if ( !isDndEnabled() )
-		{
-			throw new DndDisabledException();
-		}
-		
-		if ( dndState.destOps.contains( op ) )
-		{
-			throw new DndOperationAlreadyInList();
-		}
-		
-		dndState.destOps.add( op );
-	}
-
-	public void removeDndDestOp(DndOperation op) throws DndOperationNotInList
-	{
-		if ( !isDndEnabled() )
-		{
-			throw new DndDisabledException();
-		}
-		
-		if ( !dndState.destOps.contains( op ) )
-		{
-			throw new DndOperationNotInList();
-		}
-		
-		dndState.destOps.remove( op );
-	}
-	
-	
-	
-	//
-	//
-	// DRAG AND DROP PROTOCOL
-	//
-	// 1. The user presses a mouse button:
-	//    onButtonDown is sent.
-	//    onDndButtonDown is also sent. If a widget with DnD enabled can be found, it creates and returns a DndDrag structure that will be used to track information
-	//    on the drag.
-	// 2. The first motion event after the button press:
-	//    onDndBegin is sent. It calls the onDndBegin() method of the DnD listener. The resulting DnD begin data is stored in the beginData field of the DnDDrag structure.
-	//	  onDndMotion is also sent
-	// 3. Motion events:
-	//	  onDndMotion is sent
-	//      This results in the dndCanDropFrom() method of the DnD listener being called to determine if a drop to this widget is possible. If so, then
-	//      the onDndMotion() method of the DnD listener is sent
-	// 
-	//
-	//
-	//
-	
-	
-	
-	protected DndDrag onDndButtonDown(PointerButtonEvent event)
-	{
-		if ( dndState != null  &&  dndState.sourceOps.size() > 0 )
-		{
-			return new DndDrag( this, event );
+			return this;
 		}
 		else
 		{
@@ -894,143 +776,8 @@ abstract public class DPWidget
 		}
 	}
 	
-	protected DndDrag handleDndButtonDown(PointerButtonEvent event)
-	{
-		return onDndButtonDown( event );
-	}
-
-
 	
 	
-	protected void onDndBegin(PointerMotionEvent event, DndDrag drag)
-	{
-		if ( dndState != null  &&  dndState.dndListener != null )
-		{
-			drag.beginData = dndState.dndListener.onDndBegin( drag );
-		}
-	}
-	
-	protected void handleDndBegin(PointerMotionEvent event, DndDrag drag)
-	{
-		if ( dndState != null )
-		{
-			onDndBegin( event, drag );
-		}
-	}
-	
-	
-
-	
-	protected boolean onDndMotion(PointerMotionEvent event, DndDrag drag)
-	{
-		DPWidget dndSrc = drag.srcWidget;
-		if ( dndState != null  &&  dndSrc.dndState != null )
-		{
-			boolean bCanDrop = false;
-			
-			for (DndOperation op: dndState.destOps)
-			{
-				if ( dndSrc.dndState.sourceOps.contains( op ) )
-				{
-					bCanDrop = dndCanDropFrom( event.pointer, drag );
-				}
-			}
-			
-			if ( bCanDrop )
-			{
-				if ( dndState.dndListener != null )
-				{
-					dndState.dndListener.onDndMotion( drag, this, event.pointer.getLocalPos() );
-				}
-				return true;
-			}
-		}
-		
-		return false;
-	}
-	
-	protected boolean handleDndMotion(PointerMotionEvent event, DndDrag drag)
-	{
-		return onDndMotion( event, drag );
-	}
-	
-	protected boolean dndCanDropFrom(PointerInterface pointer, DndDrag drag)
-	{
-		if ( dndState != null )
-		{
-			if ( dndState.dndListener != null )
-			{
-				return dndState.dndListener.dndCanDropFrom( drag, this, pointer.getLocalPos() );
-			}
-			else
-			{
-				return true;
-			}
-		}
-		else
-		{
-			return false;
-		}
-	}
-	
-
-	
-	
-	
-	protected boolean onDndButtonUp(PointerButtonEvent event, DndDrag drag)
-	{
-		if ( dndState != null )
-		{
-			DPWidget dndSrc = drag.srcWidget;
-
-			if ( dndSrc.dndState != null )
-			{
-				for (DndOperation op: dndState.destOps)
-				{
-					if ( dndSrc.dndState.sourceOps.contains( op ) )
-					{
-						boolean bCanDrop = dndCanDropFrom( event.pointer, drag );
-						if ( bCanDrop )
-						{
-							Object dndData = dndSrc.dndDragTo( drag, this );
-							drag.dragData = dndData;
-							dndDropFrom( drag, event.pointer );
-							return true;
-						}
-					}
-				}
-			}
-		}
-		
-		return false;
-	}
-	
-	protected boolean handleDndButtonUp(PointerButtonEvent event, DndDrag drag)
-	{
-		return onDndButtonUp( event, drag );
-	}
-	
-	
-	protected Object dndDragTo(DndDrag drag, DPWidget dragDest)
-	{
-		if ( dndState != null  &&  dndState.dndListener != null )
-		{
-			return dndState.dndListener.dndDragTo( drag, dragDest );
-		}
-		else
-		{
-			return null;
-		}
-	}
-	
-	protected void dndDropFrom(DndDrag drag, PointerInterface pointer)
-	{
-		if ( dndState != null  &&  dndState.dndListener != null )
-		{
-			dndState.dndListener.dndDropFrom( drag, this, pointer.getLocalPos() );
-		}
-	}
-
 	
 	
 	
