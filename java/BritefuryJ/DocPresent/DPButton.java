@@ -6,7 +6,10 @@
 //##************************
 package BritefuryJ.DocPresent;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Paint;
+import java.awt.RadialGradientPaint;
 import java.util.ArrayList;
 
 import org.python.core.Py;
@@ -16,10 +19,32 @@ import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Input.PointerInterface;
-import BritefuryJ.DocPresent.StyleSheets.ButtonStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.ElementStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.ElementStyleSheetField;
+import BritefuryJ.DocPresent.StyleSheets.StyleSheetValueFieldDirect;
+import BritefuryJ.DocPresent.StyleSheets.StyleSheetValueFieldSet;
 
 public class DPButton extends DPBin
 {
+	protected static ElementStyleSheetField borderPaintField = ElementStyleSheetField.newField( "buttonBorderPaint", Paint.class );
+	protected static ElementStyleSheetField backgPaintField = ElementStyleSheetField.newField( "buttonBackgroundPaint", Paint.class );
+	protected static ElementStyleSheetField backgHighlightPaintField = ElementStyleSheetField.newField( "buttonBackgroundHighlightPaint", Paint.class );
+
+	protected static StyleSheetValueFieldDirect borderPaintValueField = StyleSheetValueFieldDirect.newField( "buttonBorderPaint", Paint.class,
+			new RadialGradientPaint( -10.0f, -10.0f, 100.0f, new float[] { 0.0f, 1.0f }, new Color[] { new Color( 0.2f, 0.3f, 0.5f ), new Color( 0.3f, 0.45f, 0.75f ) }, RadialGradientPaint.CycleMethod.NO_CYCLE ),
+			borderPaintField );
+	protected static StyleSheetValueFieldDirect backgPaintValueField = StyleSheetValueFieldDirect.newField( "buttonBackgroundPaint", Paint.class,
+			new RadialGradientPaint( -10.0f, -10.0f, 100.0f, new float[] { 0.0f, 1.0f }, new Color[] { new Color( 0.9f, 0.92f, 1.0f ), new Color( 0.75f, 0.825f, 0.9f ) }, RadialGradientPaint.CycleMethod.NO_CYCLE ),
+			backgPaintField );
+	protected static StyleSheetValueFieldDirect backgHighlightPaintValueField = StyleSheetValueFieldDirect.newField( "buttonBackgroundHighlightPaint", Paint.class,
+			new RadialGradientPaint( -10.0f, -10.0f, 100.0f, new float[] { 0.0f, 1.0f }, new Color[] { new Color( 1.0f, 1.0f, 1.0f ), new Color( 0.85f, 0.85f, 0.85f ) }, RadialGradientPaint.CycleMethod.NO_CYCLE ),
+			backgHighlightPaintField );
+	
+	
+	protected static StyleSheetValueFieldSet useStyleSheetFields_Button = useStyleSheetFields_Element.join( borderPaintValueField, backgPaintValueField, backgHighlightPaintValueField );
+
+	
+	
 	public interface ButtonListener
 	{
 		public void onButtonClicked(DPButton button);
@@ -44,37 +69,40 @@ public class DPButton extends DPBin
 	
 	
 	protected ButtonListener listener;
+	protected SolidBorder border, highlightBorder;
 	
 	
 	
 	public DPButton()
 	{
-		this( ButtonStyleSheet.defaultStyleSheet, (ButtonListener)null );
+		this( null, (ButtonListener)null );
 	}
 
 	public DPButton(ButtonListener listener)
 	{
-		this( ButtonStyleSheet.defaultStyleSheet, listener );
+		this( null, listener );
 	}
 
 	public DPButton(PyObject listener)
 	{
-		this( ButtonStyleSheet.defaultStyleSheet, new PyButtonListener( listener ) );
+		this( null, new PyButtonListener( listener ) );
 	}
 
-	public DPButton(ButtonStyleSheet styleSheet)
+	public DPButton(ElementStyleSheet styleSheet)
 	{
 		this( styleSheet, (ButtonListener)null );
 	}
 
-	public DPButton(ButtonStyleSheet styleSheet, ButtonListener listener)
+	public DPButton(ElementStyleSheet styleSheet, ButtonListener listener)
 	{
 		super( styleSheet );
 		
 		this.listener = listener;
+		border = new SolidBorder( 1.0, 2.0, 10.0, 10.0, getBorderPaint(), getBackgroundPaint() );
+		highlightBorder = new SolidBorder( 1.0, 2.0, 10.0, 10.0, getBorderPaint(), getBackgroundHighlightPaint() );
 	}
 	
-	public DPButton(ButtonStyleSheet styleSheet, PyObject listener)
+	public DPButton(ElementStyleSheet styleSheet, PyObject listener)
 	{
 		this( styleSheet, new PyButtonListener( listener ) );
 	}
@@ -91,16 +119,15 @@ public class DPButton extends DPBin
 	protected void drawBackground(Graphics2D graphics)
 	{
 		super.drawBackground( graphics );
-		ButtonStyleSheet buttonStyle = (ButtonStyleSheet)styleSheet;
 		
 		ArrayList<PointerInterface> pointersWithinBounds = getPointersWithinBounds();
 		if ( pointersWithinBounds != null  &&  pointersWithinBounds.size() > 0 )
 		{
-			buttonStyle.getHighlightBorder().draw( graphics, 0.0, 0.0, getAllocationX(), getAllocationY() );
+			highlightBorder.draw( graphics, 0.0, 0.0, getAllocationX(), getAllocationY() );
 		}
 		else
 		{
-			buttonStyle.getBorder().draw( graphics, 0.0, 0.0, getAllocationX(), getAllocationY() );
+			border.draw( graphics, 0.0, 0.0, getAllocationX(), getAllocationY() );
 		}
 	}
 	
@@ -146,9 +173,6 @@ public class DPButton extends DPBin
 	
 	protected void updateRequisitionX()
 	{
-		ButtonStyleSheet buttonStyle = (ButtonStyleSheet)styleSheet;
-		SolidBorder border = buttonStyle.getBorder();
-		
 		DPWidget child = getChild();
 		if ( child != null )
 		{
@@ -163,9 +187,6 @@ public class DPButton extends DPBin
 
 	protected void updateRequisitionY()
 	{
-		ButtonStyleSheet buttonStyle = (ButtonStyleSheet)styleSheet;
-		SolidBorder border = buttonStyle.getBorder();
-		
 		DPWidget child = getChild();
 		if ( child != null )
 		{
@@ -183,9 +204,6 @@ public class DPButton extends DPBin
 	
 	protected void updateAllocationX()
 	{
-		ButtonStyleSheet buttonStyle = (ButtonStyleSheet)styleSheet;
-		SolidBorder border = buttonStyle.getBorder();
-		
 		DPWidget child = getChild();
 		if ( child != null )
 		{
@@ -198,9 +216,6 @@ public class DPButton extends DPBin
 
 	protected void updateAllocationY()
 	{
-		ButtonStyleSheet buttonStyle = (ButtonStyleSheet)styleSheet;
-		SolidBorder border = buttonStyle.getBorder();
-		
 		DPWidget child = getChild();
 		if ( child != null )
 		{
@@ -209,5 +224,27 @@ public class DPButton extends DPBin
 			layoutAllocBox.allocateChildY( child.layoutAllocBox, border.getTopMargin(), layoutAllocBox.getAllocationY() - vborder );
 			child.refreshAllocationY( prevHeight );
 		}
+	}
+	
+	
+	protected StyleSheetValueFieldSet getUsedStyleSheetValueFields()
+	{
+		return useStyleSheetFields_Button;
+	}
+
+	
+	private Paint getBorderPaint()
+	{
+		return (Paint)styleSheetValues.get( borderPaintValueField );
+	}
+	
+	private Paint getBackgroundPaint()
+	{
+		return (Paint)styleSheetValues.get( backgPaintValueField );
+	}
+	
+	private Paint getBackgroundHighlightPaint()
+	{
+		return (Paint)styleSheetValues.get( backgHighlightPaintValueField );
 	}
 }

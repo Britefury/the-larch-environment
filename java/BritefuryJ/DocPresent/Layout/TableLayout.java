@@ -6,12 +6,20 @@
 //##************************
 package BritefuryJ.DocPresent.Layout;
 
+import BritefuryJ.DocPresent.StyleSheets.StyleSheetValueFieldPack;
+import BritefuryJ.DocPresent.StyleSheets.StyleSheetValues;
+
 
 
 
 public class TableLayout
 {
-	private static LReqBox[] computeColumnXBoxes(LReqBox children[], TablePackingParams packingParams[], int numColumns, int numRows, double spacingX)
+	public static StyleSheetValueFieldPack pack_xPaddingValueField = HorizontalLayout.pack_xPaddingValueField;
+	public static StyleSheetValueFieldPack pack_yPaddingValueField = VerticalLayout.pack_yPaddingValueField;
+
+	
+	
+	private static LReqBox[] computeColumnXBoxes(LReqBox children[], StyleSheetValues styleSheetValues[], TablePackingParams packingParams[], int numColumns, int numRows, double colSpacing)
 	{
 		LReqBox columnBoxes[] = new LReqBox[numColumns];
 		for (int i = 0; i < numColumns; i++)
@@ -28,7 +36,7 @@ public class TableLayout
 			
 			if ( packing.colSpan == 1 )
 			{
-				double totalPad = packing.paddingX * 2.0;
+				double totalPad = styleSheetValues != null  ?  (Double)styleSheetValues[i].get( pack_xPaddingValueField ) * 2.0  :  0.0;
 				LReqBox b = columnBoxes[packing.x];
 				b.minWidth = Math.max( b.minWidth, child.minWidth + totalPad );
 				b.prefWidth = Math.max( b.prefWidth, child.prefWidth + totalPad );
@@ -53,7 +61,7 @@ public class TableLayout
 				{
 					LReqBox colBox = columnBoxes[c];
 					
-					double spacing = c != endColumn-1  ?  spacingX  :  0.0;
+					double spacing = c != endColumn-1  ?  colSpacing  :  0.0;
 					
 					minWidthAvailable += colBox.minWidth + spacing;
 					prefWidthAvailable += colBox.prefWidth + spacing;
@@ -87,7 +95,7 @@ public class TableLayout
 
 
 
-	private static LReqBox[] computeRowYBoxes(LReqBox children[], TablePackingParams packingParams[], int numColumns, int numRows, double spacingY)
+	private static LReqBox[] computeRowYBoxes(LReqBox children[], StyleSheetValues styleSheetValues[], TablePackingParams packingParams[], int numColumns, int numRows, double rowSpacing)
 	{
 		LReqBox rowBoxes[] = new LReqBox[numRows];
 		for (int i = 0; i < numRows; i++)
@@ -104,7 +112,7 @@ public class TableLayout
 			
 			if ( packing.rowSpan == 1 )
 			{
-				double totalPad = packing.paddingY * 2.0;
+				double totalPad = styleSheetValues != null  ?  (Double)styleSheetValues[i].get( pack_yPaddingValueField ) * 2.0  :  0.0;
 				LReqBox b = rowBoxes[packing.y];
 				b.setRequisitionY( Math.max( b.getReqHeight(), child.getReqHeight() + totalPad ),  0.0 );
 			}
@@ -128,7 +136,7 @@ public class TableLayout
 				{
 					LReqBox rowBox = rowBoxes[r];
 					
-					double spacing = r != endRow-1  ?  spacingY  :  0.0;
+					double spacing = r != endRow-1  ?  rowSpacing  :  0.0;
 					
 					heightAvailable += rowBox.getReqHeight() + spacing;
 				}
@@ -159,7 +167,7 @@ public class TableLayout
 
 
 
-	private static LReqBox[] computeRowYBoxesWithBaselines(LReqBox children[], TablePackingParams packingParams[], int numColumns, int numRows, double spacingY)
+	private static LReqBox[] computeRowYBoxesWithBaselines(LReqBox children[], StyleSheetValues styleSheetValues[], TablePackingParams packingParams[], int numColumns, int numRows, double rowSpacing)
 	{
 		LReqBox rowBoxes[] = new LReqBox[numRows];
 		for (int i = 0; i < numRows; i++)
@@ -180,15 +188,16 @@ public class TableLayout
 				LReqBox b = rowBoxes[packing.y];
 				
 				double ascent, descent;
+				double paddingY = styleSheetValues != null  ?  (Double)styleSheetValues[i].get( pack_yPaddingValueField )  :  0.0;
 
 				if ( child.bHasBaseline )
 				{
-					ascent = child.reqAscent + packing.paddingY;
-					descent = child.reqDescent + packing.paddingY;
+					ascent = child.reqAscent + paddingY;
+					descent = child.reqDescent + paddingY;
 				}
 				else
 				{
-					ascent = descent = child.getReqHeight() * 0.5 + packing.paddingY;
+					ascent = descent = child.getReqHeight() * 0.5 + paddingY;
 				}
 
 				b.reqAscent = Math.max( b.reqAscent, ascent );
@@ -214,7 +223,7 @@ public class TableLayout
 				{
 					LReqBox rowBox = rowBoxes[r];
 					
-					double spacing = r != endRow-1  ?  spacingY  :  0.0;
+					double spacing = r != endRow-1  ?  rowSpacing  :  0.0;
 					
 					heightAvailable += rowBox.getReqHeight() + spacing;
 				}
@@ -243,10 +252,10 @@ public class TableLayout
 	
 	
 	
-	public static LReqBox[] computeRequisitionX(LReqBox box, LReqBox children[], TablePackingParams packingParams[], int numColumns, int numRows,
-			double spacingX, double spacingY, boolean bExpandX, boolean bExpandY, HAlignment colAlignment, VAlignment rowAlignment)
+	public static LReqBox[] computeRequisitionX(LReqBox box, LReqBox children[], StyleSheetValues styleSheetValues[], TablePackingParams packingParams[], int numColumns, int numRows,
+			double colSpacing, double rowSpacing, boolean bExpandX, boolean bExpandY, HAlignment colAlignment, VAlignment rowAlignment)
 	{
-		LReqBox columnBoxes[] = computeColumnXBoxes( children, packingParams, numColumns, numRows, spacingX );
+		LReqBox columnBoxes[] = computeColumnXBoxes( children, styleSheetValues, packingParams, numColumns, numRows, colSpacing );
 		
 		double minWidth = 0.0, prefWidth = 0.0;
 		for (LReqBox colBox: columnBoxes)
@@ -254,7 +263,7 @@ public class TableLayout
 			minWidth += colBox.minWidth;
 			prefWidth += colBox.prefWidth;
 		}
-		double spacing = spacingX * (double)Math.max( columnBoxes.length - 1, 0 );
+		double spacing = colSpacing * (double)Math.max( columnBoxes.length - 1, 0 );
 		minWidth += spacing;
 		prefWidth += spacing;
 		
@@ -265,18 +274,18 @@ public class TableLayout
 
 
 
-	public static LReqBox[] computeRequisitionY(LReqBox box, LReqBox children[], TablePackingParams packingParams[], int numColumns, int numRows,
-			double spacingX, double spacingY, boolean bExpandX, boolean bExpandY, HAlignment colAlignment, VAlignment rowAlignment)
+	public static LReqBox[] computeRequisitionY(LReqBox box, LReqBox children[], StyleSheetValues styleSheetValues[], TablePackingParams packingParams[], int numColumns, int numRows,
+			double colSpacing, double rowSpacing, boolean bExpandX, boolean bExpandY, HAlignment colAlignment, VAlignment rowAlignment)
 	{
 		LReqBox rowBoxes[];
 		
 		if ( rowAlignment == VAlignment.BASELINES )
 		{
-			rowBoxes = computeRowYBoxesWithBaselines( children, packingParams, numColumns, numRows, spacingX );
+			rowBoxes = computeRowYBoxesWithBaselines( children, styleSheetValues, packingParams, numColumns, numRows, colSpacing );
 		}
 		else
 		{
-			rowBoxes = computeRowYBoxes( children, packingParams, numColumns, numRows, spacingX );
+			rowBoxes = computeRowYBoxes( children, styleSheetValues, packingParams, numColumns, numRows, colSpacing );
 		}
 		
 		double reqHeight = 0.0;
@@ -284,7 +293,7 @@ public class TableLayout
 		{
 			reqHeight += rowBox.getReqHeight();
 		}
-		double spacing = spacingY * (double)Math.max( rowBoxes.length - 1, 0 );
+		double spacing = rowSpacing * (double)Math.max( rowBoxes.length - 1, 0 );
 		reqHeight += spacing;
 		
 		box.setRequisitionY( reqHeight, 0.0 );
@@ -297,11 +306,11 @@ public class TableLayout
 	
 	public static void allocateX(LReqBox box, LReqBox columnBoxes[], LReqBox children[],
 			LAllocBox allocBox, LAllocBox columnAllocBoxes[], LAllocBox childrenAlloc[], 
-			TablePackingParams packingParams[], int numColumns, int numRows,
-			double spacingX, double spacingY, boolean bExpandX, boolean bExpandY, HAlignment colAlignment, VAlignment rowAlignment)
+			StyleSheetValues styleSheetValues[], TablePackingParams packingParams[], int numColumns, int numRows,
+			double colSpacing, double rowSpacing, boolean bExpandX, boolean bExpandY, HAlignment colAlignment, VAlignment rowAlignment)
 	{
 		// Allocate space to the columns
-		HorizontalLayout.allocateX( box, columnBoxes, allocBox, columnAllocBoxes, spacingX, bExpandX );
+		HorizontalLayout.allocateX( box, columnBoxes, allocBox, columnAllocBoxes, colSpacing, bExpandX );
 		
 		// Allocate children
 		for (int i = 0; i < children.length; i++)
@@ -313,8 +322,9 @@ public class TableLayout
 			int startCol = packing.x;
 			int endCol = packing.x + packing.colSpan;
 			LAllocBox startColAlloc = columnAllocBoxes[startCol], endColAlloc = columnAllocBoxes[endCol-1];
-			double xStart = startColAlloc.positionInParentSpaceX + packing.paddingX;
-			double xEnd = endColAlloc.positionInParentSpaceX  +  endColAlloc.allocationX - packing.paddingX;
+			double paddingX = styleSheetValues != null  ?  (Double)styleSheetValues[i].get( pack_xPaddingValueField )  :  0.0;
+			double xStart = startColAlloc.positionInParentSpaceX + paddingX;
+			double xEnd = endColAlloc.positionInParentSpaceX  +  endColAlloc.allocationX - paddingX;
 			double widthAvailable = xEnd - xStart;
 			double cellWidth = Math.max( widthAvailable, child.minWidth );
 			
@@ -352,11 +362,11 @@ public class TableLayout
 	
 	public static void allocateY(LReqBox box, LReqBox rowBoxes[], LReqBox children[],
 			LAllocBox allocBox, LAllocBox rowAllocBoxes[], LAllocBox childrenAlloc[],
-			TablePackingParams packingParams[], int numColumns, int numRows,
-			double spacingX, double spacingY, boolean bExpandX, boolean bExpandY, HAlignment colAlignment, VAlignment rowAlignment)
+			StyleSheetValues styleSheetValues[], TablePackingParams packingParams[], int numColumns, int numRows,
+			double colSpacing, double rowSpacing, boolean bExpandX, boolean bExpandY, HAlignment colAlignment, VAlignment rowAlignment)
 	{
 		// Allocate space to the columns
-		VerticalLayout.allocateY( box, rowBoxes, allocBox, rowAllocBoxes, spacingY, bExpandY );
+		VerticalLayout.allocateY( box, rowBoxes, allocBox, rowAllocBoxes, rowSpacing, bExpandY );
 		
 		// Allocate children
 		for (int i = 0; i < children.length; i++)
@@ -380,8 +390,9 @@ public class TableLayout
 				int startRow = packing.y;
 				int endRow = packing.y + packing.rowSpan;
 				LAllocBox startRowAlloc = rowAllocBoxes[startRow], endRowAlloc = rowAllocBoxes[endRow-1];
-				double yStart = startRowAlloc.positionInParentSpaceY + packing.paddingY;
-				double yEnd = endRowAlloc.positionInParentSpaceY + endRowAlloc.allocationY - packing.paddingY;
+				double paddingY = styleSheetValues != null  ?  (Double)styleSheetValues[i].get( pack_yPaddingValueField )  :  0.0;
+				double yStart = startRowAlloc.positionInParentSpaceY + paddingY;
+				double yEnd = endRowAlloc.positionInParentSpaceY + endRowAlloc.allocationY - paddingY;
 				double heightAvailable = yEnd - yStart;
 				double reqHeight = child.getReqHeight();
 				double cellHeight = Math.max( heightAvailable, reqHeight );

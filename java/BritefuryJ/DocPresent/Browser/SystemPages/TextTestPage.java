@@ -14,8 +14,7 @@ import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.VTypesetting;
-import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.ElementStyleSheet;
 
 public class TextTestPage extends SystemPage
 {
@@ -32,14 +31,14 @@ public class TextTestPage extends SystemPage
 
 	protected DPWidget createContents()
 	{
-		TextStyleSheet ts0 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );
-		TextStyleSheet ts1 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK, true );
-		TextStyleSheet ts2 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK, Color.RED );
+		ElementStyleSheet ts0 = DPText.styleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );
+		ElementStyleSheet ts1 = DPText.styleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK, true );
+		ElementStyleSheet ts2 = DPText.styleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK, Color.RED );
 		DPText t0 = new DPText( ts0, "Hello World Abcdefghijklmnopqrstuvwxyz" );
 		DPText t1 = new DPText( ts1, "Hello World Abcdefghijklmnopqrstuvwxyz" );
 		DPText t2 = new DPText( ts2, "Hello World Abcdefghijklmnopqrstuvwxyz" );
 
-		VBoxStyleSheet b0s = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.LEFT, 0.0, false, 0.0 );
+		ElementStyleSheet b0s = DPVBox.styleSheet( VTypesetting.NONE, HAlignment.LEFT, 0.0, false, 0.0 );
 		DPVBox b0 = new DPVBox( b0s );
 		b0.append( t0 );
 		b0.append( t1 );

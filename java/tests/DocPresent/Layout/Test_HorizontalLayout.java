@@ -6,14 +6,35 @@
 //##************************
 package tests.DocPresent.Layout;
 
-import BritefuryJ.DocPresent.Layout.BoxPackingParams;
 import BritefuryJ.DocPresent.Layout.HorizontalLayout;
 import BritefuryJ.DocPresent.Layout.LAllocBox;
 import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Layout.VAlignment;
+import BritefuryJ.DocPresent.StyleSheets.ElementStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.StyleSheetValueFieldSet;
+import BritefuryJ.DocPresent.StyleSheets.StyleSheetValues;
 
 public class Test_HorizontalLayout extends Test_Layout_base
 {
+	private StyleSheetValues hboxPack(double padding)
+	{
+		ElementStyleSheet elementSheet = new ElementStyleSheet( new String[] { "pack_xPadding" }, new Object[] { padding } );
+		return StyleSheetValues.cascade(  new StyleSheetValues(), elementSheet, new StyleSheetValueFieldSet() );
+	}
+	
+	private StyleSheetValues hboxPack(boolean bExpand)
+	{
+		ElementStyleSheet elementSheet = new ElementStyleSheet( new String[] { "pack_xExpand" }, new Object[] { bExpand } );
+		return StyleSheetValues.cascade(  new StyleSheetValues(), elementSheet, new StyleSheetValueFieldSet() );
+	}
+	
+	private StyleSheetValues hboxPack(double padding, boolean bExpand)
+	{
+		ElementStyleSheet elementSheet = new ElementStyleSheet( new String[] { "pack_xPadding", "pack_xExpand" }, new Object[] { padding, bExpand } );
+		return StyleSheetValues.cascade(  new StyleSheetValues(), elementSheet, new StyleSheetValueFieldSet() );
+	}
+	
+	
 	//
 	//
 	// REQUISITION TESTS
@@ -39,21 +60,21 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		assertEquals( result, new LReqBox() );
 
 		// requisitionX( [ <0,0>:pad=1 ] )  ->  <2,0>
-		HorizontalLayout.computeRequisitionX( result, new LReqBox[] { new LReqBox() },  0.0, new BoxPackingParams[] { new BoxPackingParams( 1.0 ) } );
+		HorizontalLayout.computeRequisitionX( result, new LReqBox[] { new LReqBox() },  0.0, new StyleSheetValues[] { hboxPack( 1.0 ) } );
 		assertEquals( result, xbox( 2.0, 0.0 ) );
 
 		// requisitionX( [ <10,0>:pad=2 ] )  ->  <14,0>
-		HorizontalLayout.computeRequisitionX( result, new LReqBox[] { xbox( 10.0, 0.0 ) },  0.0, new BoxPackingParams[] { new BoxPackingParams( 2.0 ) } );
+		HorizontalLayout.computeRequisitionX( result, new LReqBox[] { xbox( 10.0, 0.0 ) },  0.0, new StyleSheetValues[] { hboxPack( 2.0 ) } );
 		assertEquals( result, xbox( 14.0, 0.0 ) );
 
 		// Padding 'consumes' h-spacing
 		// requisitionX( [ <10,1>:pad=2 ] )  ->  <14,0>
-		HorizontalLayout.computeRequisitionX( result, new LReqBox[] { xbox( 10.0, 1.0 ) },  0.0, new BoxPackingParams[] { new BoxPackingParams( 2.0 ) } );
+		HorizontalLayout.computeRequisitionX( result, new LReqBox[] { xbox( 10.0, 1.0 ) },  0.0, new StyleSheetValues[] { hboxPack( 2.0 ) } );
 		assertEquals( result, xbox( 14.0, 0.0 ) );
 
 		// Padding 'consumes' all h-spacing
 		// requisitionX( [ <10,3>:pad=2 ] )  ->  <14,1>
-		HorizontalLayout.computeRequisitionX( result, new LReqBox[] { xbox( 10.0, 3.0 ) },  0.0, new BoxPackingParams[] { new BoxPackingParams( 2.0 ) } );
+		HorizontalLayout.computeRequisitionX( result, new LReqBox[] { xbox( 10.0, 3.0 ) },  0.0, new StyleSheetValues[] { hboxPack( 2.0 ) } );
 		assertEquals( result, xbox( 14.0, 1.0 ) );
 
 		// requisitionX( [ <0,0>, <0,0> ] )  ->  <0,0>
@@ -213,7 +234,7 @@ public class Test_HorizontalLayout extends Test_Layout_base
 	//
 	//
 
-	private void allocXSpaceTest(LReqBox children[], double spacing, BoxPackingParams packingParams[], LReqBox expectedBox, double boxAllocation, double expectedSpaceAllocation[])
+	private void allocXSpaceTest(LReqBox children[], double spacing, StyleSheetValues styleSheetValues[], LReqBox expectedBox, double boxAllocation, double expectedSpaceAllocation[])
 	{ 
 		LReqBox box = new LReqBox();
 		LAllocBox boxAlloc = new LAllocBox( null );
@@ -223,12 +244,12 @@ public class Test_HorizontalLayout extends Test_Layout_base
 			childrenAlloc[i] = new LAllocBox( null );
 		}
 		
-		HorizontalLayout.computeRequisitionX( box, children, spacing, packingParams );
+		HorizontalLayout.computeRequisitionX( box, children, spacing, styleSheetValues );
 		
 		assertBoxesEqual( box, expectedBox, "PARENT BOX" );
 
 		boxAlloc.setAllocationX( boxAllocation );
-		HorizontalLayout.allocateSpaceX( box, children, boxAlloc, childrenAlloc, packingParams );
+		HorizontalLayout.allocateSpaceX( box, children, boxAlloc, childrenAlloc, styleSheetValues );
 		for (int i = 0; i < children.length; i++)
 		{
 			if ( childrenAlloc[i].getAllocationX() != expectedSpaceAllocation[i] )
@@ -240,11 +261,11 @@ public class Test_HorizontalLayout extends Test_Layout_base
 	}
 
 	
-	private void allocXSpaceTests(LReqBox children[], double spacing, BoxPackingParams packingParams[], LReqBox expectedBox, double boxAllocations[], double expectedSpaceAllocations[][])
+	private void allocXSpaceTests(LReqBox children[], double spacing, StyleSheetValues styleSheetValues[], LReqBox expectedBox, double boxAllocations[], double expectedSpaceAllocations[][])
 	{
 		for (int i = 0; i  < boxAllocations.length; i++)
 		{
-			allocXSpaceTest( children, spacing, packingParams, expectedBox, boxAllocations[i], expectedSpaceAllocations[i] );
+			allocXSpaceTest( children, spacing, styleSheetValues, expectedBox, boxAllocations[i], expectedSpaceAllocations[i] );
 		}
 	}
 
@@ -297,7 +318,7 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		// 	boxAllocation=100   ->   [ 100 ]		- will not go below minimum, 20 to padding
 		// 	boxAllocation=50   ->   [ 100 ]		- will not go below minimum, 20 to padding
 		// 10 padding, no expand
-		allocXSpaceTests( new LReqBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ) }, 0.0, new BoxPackingParams[] { new BoxPackingParams( 10.0 ) },
+		allocXSpaceTests( new LReqBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ) }, 0.0, new StyleSheetValues[] { hboxPack( 10.0 ) },
 				xbox( 120.0, 220.0, 0.0, 0.0 ),
 				new double[] { 300.0, 220.0, 200.0, 150.0, 120.0, 100.0, 50.0 },
 				new double[][] {
@@ -317,7 +338,7 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		// 	boxAllocation=100   ->   [ 100 ]		- all allocated to 1 child
 		// 	boxAllocation=50   ->   [ 100 ]		- will not go below minimum
 		// No padding, expand
-		allocXSpaceTests( new LReqBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ) }, 0.0, new BoxPackingParams[] { new BoxPackingParams( true ) },
+		allocXSpaceTests( new LReqBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ) }, 0.0, new StyleSheetValues[] { hboxPack( true ) },
 				xbox( 100.0, 200.0, 0.0, 0.0 ),
 				new double[] { 300.0, 200.0, 150.0, 100.0, 50.0 },
 				new double[][] {
@@ -337,7 +358,7 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		// 	boxAllocation=100   ->   [ 100 ]		- will not go below minimum, 20 to padding
 		// 	boxAllocation=50   ->   [ 100 ]		- will not go below minimum, 20 to padding
 		// 10 padding, expand
-		allocXSpaceTests( new LReqBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ) }, 0.0, new BoxPackingParams[] { new BoxPackingParams( 10.0, true ) },
+		allocXSpaceTests( new LReqBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ) }, 0.0, new StyleSheetValues[] { hboxPack( 10.0, true ) },
 				xbox( 120.0, 220.0, 0.0, 0.0 ),
 				new double[] { 300.0, 220.0, 200.0, 150.0, 120.0, 100.0, 50.0 },
 				new double[][] {
@@ -398,7 +419,7 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		// 	boxAllocation=210   ->   [ 150, 60 ]		- space above minimum distributed evenly
 		// 	boxAllocation=150   ->   [ 100, 50 ]		- minimum sizes
 		// 	boxAllocation=100   ->   [ 100, 50 ]		- will not go below minimum
-		allocXSpaceTests( new LReqBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ),  xbox( 50.0, 70.0, 0.0, 0.0 ) }, 0.0, new BoxPackingParams[] { new BoxPackingParams( true ), new BoxPackingParams( false ) },
+		allocXSpaceTests( new LReqBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ),  xbox( 50.0, 70.0, 0.0, 0.0 ) }, 0.0, new StyleSheetValues[] { hboxPack( true ), hboxPack( false ) },
 				xbox( 150.0, 270.0, 0.0, 0.0 ),
 				new double[] { 300.0, 270.0, 210.0, 150.0, 100.0 },
 				new double[][] {
@@ -415,7 +436,7 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		// 	boxAllocation=210   ->   [ 150, 60 ]		- space above minimum distributed evenly
 		// 	boxAllocation=150   ->   [ 100, 50 ]		- minimum sizes
 		// 	boxAllocation=100   ->   [ 100, 50 ]		- will not go below minimum
-		allocXSpaceTests( new LReqBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ),  xbox( 50.0, 70.0, 0.0, 0.0 ) }, 0.0, new BoxPackingParams[] { new BoxPackingParams( false ), new BoxPackingParams( true ) },
+		allocXSpaceTests( new LReqBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ),  xbox( 50.0, 70.0, 0.0, 0.0 ) }, 0.0, new StyleSheetValues[] { hboxPack( false ), hboxPack( true ) },
 				xbox( 150.0, 270.0, 0.0, 0.0 ),
 				new double[] { 300.0, 270.0, 210.0, 150.0, 100.0 },
 				new double[][] {
@@ -432,7 +453,7 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		// 	boxAllocation=210   ->   [ 150, 60 ]		- space above minimum distributed evenly
 		// 	boxAllocation=150   ->   [ 100, 50 ]		- minimum sizes
 		// 	boxAllocation=100   ->   [ 100, 50 ]		- will not go below minimum
-		allocXSpaceTests( new LReqBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ),  xbox( 50.0, 70.0, 0.0, 0.0 ) }, 0.0, new BoxPackingParams[] { new BoxPackingParams( true ), new BoxPackingParams( true ) },
+		allocXSpaceTests( new LReqBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ),  xbox( 50.0, 70.0, 0.0, 0.0 ) }, 0.0, new StyleSheetValues[] { hboxPack( true ), hboxPack( true ) },
 				xbox( 150.0, 270.0, 0.0, 0.0 ),
 				new double[] { 300.0, 270.0, 210.0, 150.0, 100.0 },
 				new double[][] {
@@ -455,7 +476,7 @@ public class Test_HorizontalLayout extends Test_Layout_base
 	//
 	//
 
-	private void allocXTest(LReqBox children[], double spacing, BoxPackingParams packingParams[], LReqBox expectedBox, double boxAllocation, double expectedSize[], double expectedPosition[])
+	private void allocXTest(LReqBox children[], double spacing, StyleSheetValues styleSheetValues[], LReqBox expectedBox, double boxAllocation, double expectedSize[], double expectedPosition[])
 	{ 
 		LReqBox box = new LReqBox();
 		LAllocBox boxAlloc = new LAllocBox( null );
@@ -465,12 +486,12 @@ public class Test_HorizontalLayout extends Test_Layout_base
 			childrenAlloc[i] = new LAllocBox( null );
 		}
 
-		HorizontalLayout.computeRequisitionX( box, children, spacing, packingParams );
+		HorizontalLayout.computeRequisitionX( box, children, spacing, styleSheetValues );
 
 		assertBoxesEqual( box, expectedBox, "PARENT BOX" );
 
 		boxAlloc.setAllocationX( boxAllocation );
-		HorizontalLayout.allocateX( box, children, boxAlloc, childrenAlloc, spacing, packingParams );
+		HorizontalLayout.allocateX( box, children, boxAlloc, childrenAlloc, spacing, styleSheetValues );
 		for (int i = 0; i < children.length; i++)
 		{
 			if ( childrenAlloc[i].getAllocationX() != expectedSize[i] )
@@ -487,11 +508,11 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		}
 	}
 	
-	private void allocXTests(LReqBox children[], double spacing, BoxPackingParams packingParams[], LReqBox expectedBox, double boxAllocations[], double expectedSize[][], double expectedPosition[][])
+	private void allocXTests(LReqBox children[], double spacing, StyleSheetValues styleSheetValues[], LReqBox expectedBox, double boxAllocations[], double expectedSize[][], double expectedPosition[][])
 	{
 		for (int i = 0; i  < boxAllocations.length; i++)
 		{
-			allocXTest( children, spacing, packingParams, expectedBox, boxAllocations[i], expectedSize[i], expectedPosition[i] );
+			allocXTest( children, spacing, styleSheetValues, expectedBox, boxAllocations[i], expectedSize[i], expectedPosition[i] );
 		}
 	}
 
@@ -551,7 +572,7 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		// 	boxAllocation=270   ->   [ 150, 60 ] @ [ 0, 190 ]		- space above minimum distributed evenly
 		// 	boxAllocation=210   ->   [ 100, 50 ] @ [ 0, 140 ]		- minimum sizes
 		// 	boxAllocation=100   ->   [ 100, 50 ] @ [ 0, 140 ]		- will not go below minimum
-		allocXTests( new LReqBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ),  xbox( 50.0, 70.0, 0.0, 0.0 ) }, 0.0, new BoxPackingParams[] { new BoxPackingParams( 10.0 ), new BoxPackingParams( 20.0 ) },
+		allocXTests( new LReqBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ),  xbox( 50.0, 70.0, 0.0, 0.0 ) }, 0.0, new StyleSheetValues[] { hboxPack( 10.0 ), hboxPack( 20.0 ) },
 				xbox( 210.0, 330.0, 0.0, 0.0 ),
 				new double[] { 400.0, 330.0, 270.0, 210.0, 100.0 },
 				new double[][] {
@@ -574,7 +595,7 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		// 	boxAllocation=275   ->   [ 150, 60 ] @ [ 0, 195 ]		- space above minimum distributed evenly
 		// 	boxAllocation=215   ->   [ 100, 50 ] @ [ 0, 145 ]		- minimum sizes
 		// 	boxAllocation=100   ->   [ 100, 50 ] @ [ 0, 145 ]		- will not go below minimum
-		allocXTests( new LReqBox[] { xbox( 100.0, 200.0, 15.0, 15.0 ),  xbox( 50.0, 70.0, 0.0, 0.0 ) }, 0.0, new BoxPackingParams[] { new BoxPackingParams( 10.0 ), new BoxPackingParams( 20.0 ) },
+		allocXTests( new LReqBox[] { xbox( 100.0, 200.0, 15.0, 15.0 ),  xbox( 50.0, 70.0, 0.0, 0.0 ) }, 0.0, new StyleSheetValues[] { hboxPack( 10.0 ), hboxPack( 20.0 ) },
 				xbox( 215.0, 335.0, 0.0, 0.0 ),
 				new double[] { 400.0, 335.0, 275.0, 215.0, 100.0 },
 				new double[][] {

@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import BritefuryJ.DocPresent.Layout.PackingParams;
-import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.ElementStyleSheet;
 
 public class DPSegment extends DPContainerCollateable
 {
@@ -36,7 +36,6 @@ public class DPSegment extends DPContainerCollateable
 
 	
 	
-	protected TextStyleSheet textStyleSheet;
 	protected boolean bGuardBegin, bGuardEnd;
 	protected DPWidget beginGuard, endGuard;
 	protected DPWidget child;
@@ -49,13 +48,12 @@ public class DPSegment extends DPContainerCollateable
 	
 	public DPSegment(boolean bGuardBegin, boolean bGuardEnd)
 	{
-		this( TextStyleSheet.defaultStyleSheet, bGuardBegin, bGuardEnd );
+		this( null, bGuardBegin, bGuardEnd );
 	}
 
-	public DPSegment(TextStyleSheet textStyleSheet, boolean bGuardBegin, boolean bGuardEnd)
+	public DPSegment(ElementStyleSheet styleSheet, boolean bGuardBegin, boolean bGuardEnd)
 	{
-		super();
-		this.textStyleSheet = textStyleSheet;
+		super( styleSheet );
 		this.bGuardBegin = bGuardBegin;
 		this.bGuardEnd = bGuardEnd;
 		bGuardsRefreshing = false;
@@ -157,7 +155,7 @@ public class DPSegment extends DPContainerCollateable
 			if ( bBegin  &&  !( beginGuard instanceof DPText ) )
 			{
 				unregisterBeginGuard();
-				beginGuard = new DPText( textStyleSheet, "" );
+				beginGuard = new DPText( styleSheet, "" );
 				registerBeginGuard();
 			}
 			
@@ -180,7 +178,7 @@ public class DPSegment extends DPContainerCollateable
 			if ( bEnd  &&  !( endGuard instanceof DPText ) )
 			{
 				unregisterEndGuard();
-				endGuard = new DPText( textStyleSheet, "" );
+				endGuard = new DPText( styleSheet, "" );
 				registerEndGuard();
 			}
 			

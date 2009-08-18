@@ -16,8 +16,7 @@ import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.VTypesetting;
-import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.ElementStyleSheet;
 
 public class MathRootTestPage extends SystemPage
 {
@@ -32,7 +31,7 @@ public class MathRootTestPage extends SystemPage
 		return "Math-root test";
 	}
 
-	protected DPWidget makeText(String text, TextStyleSheet styleSheet)
+	protected DPWidget makeText(String text, ElementStyleSheet styleSheet)
 	{
 		if ( text != null )
 		{
@@ -48,7 +47,7 @@ public class MathRootTestPage extends SystemPage
 	protected DPWidget makeFraction(String numeratorText, String denominatorText)
 	{
 		Font f0 = new Font( "Sans serif", Font.PLAIN, 14 );
-		TextStyleSheet s0 = new TextStyleSheet( f0, new Color( 0.0f, 0.5f, 0.0f ) );
+		ElementStyleSheet s0 = DPText.styleSheet( f0, new Color( 0.0f, 0.5f, 0.0f ) );
 		DPText num = new DPText( s0, numeratorText );
 		DPText denom = new DPText( s0, denominatorText );
 		
@@ -72,7 +71,7 @@ public class MathRootTestPage extends SystemPage
 	protected DPWidget makeRoot(String text)
 	{
 		Font f0 = new Font( "Sans serif", Font.PLAIN, 14 );
-		TextStyleSheet s0 = new TextStyleSheet( f0, new Color( 0.0f, 0.5f, 0.0f ) );
+		ElementStyleSheet s0 = DPText.styleSheet( f0, new Color( 0.0f, 0.5f, 0.0f ) );
 		DPText t = new DPText( s0, text );
 		return makeRoot( t );
 	}
@@ -81,7 +80,7 @@ public class MathRootTestPage extends SystemPage
 	
 	protected DPWidget createContents()
 	{
-		VBoxStyleSheet boxs = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.LEFT, 0.0, false, 0.0 );
+		ElementStyleSheet boxs = DPVBox.styleSheet( VTypesetting.NONE, HAlignment.LEFT, 0.0, false, 0.0 );
 		DPVBox box = new DPVBox( boxs );
 		
 		box.append( makeRoot( "a" ) );

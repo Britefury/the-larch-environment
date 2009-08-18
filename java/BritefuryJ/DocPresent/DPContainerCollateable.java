@@ -6,6 +6,7 @@
 //##************************
 package BritefuryJ.DocPresent;
 
+import BritefuryJ.DocPresent.StyleSheets.ElementStyleSheet;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
@@ -19,7 +20,12 @@ public abstract class DPContainerCollateable extends DPContainer implements Coll
 	
 	public DPContainerCollateable()
 	{
-		super();
+		this( null );
+	}
+
+	public DPContainerCollateable(ElementStyleSheet styleSheet)
+	{
+		super(styleSheet);
 		
 		layoutReqBox = null;
 		layoutAllocBox = null;

@@ -20,9 +20,7 @@ import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.Layout.VTypesetting;
-import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.ElementStyleSheet;
 
 public class ScriptTestPage extends SystemPage
 {
@@ -37,7 +35,7 @@ public class ScriptTestPage extends SystemPage
 		return "Script test";
 	}
 
-	protected DPWidget makeText(String text, TextStyleSheet styleSheet)
+	protected DPWidget makeText(String text, ElementStyleSheet styleSheet)
 	{
 		if ( text != null )
 		{
@@ -76,15 +74,15 @@ public class ScriptTestPage extends SystemPage
 
 	protected DPWidget makeScriptLine(DPWidget main, DPWidget leftSuper, DPWidget leftSub, DPWidget rightSuper, DPWidget rightSub)
 	{
-		TextStyleSheet sPre = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.blue );
-		TextStyleSheet sPost = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 24 ), Color.red );
+		ElementStyleSheet sPre = DPText.styleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.blue );
+		ElementStyleSheet sPost = DPText.styleSheet( new Font( "Sans serif", Font.PLAIN, 24 ), Color.red );
 		
 		DPWidget script = makeScript( main, leftSuper, leftSub, rightSuper, rightSub );
 		
 		DPText labelA = new DPText( sPre, "Label A yYgGjJpPqQ" );
 		DPText labelB = new DPText( sPost, "Label B yYgGjJpPqQ" );
 		
-		HBoxStyleSheet boxs = new HBoxStyleSheet( VAlignment.BASELINES, 0.0, false, 0.0 );
+		ElementStyleSheet boxs = DPHBox.styleSheet( VAlignment.BASELINES, 0.0, false, 0.0 );
 		DPHBox box = new DPHBox( boxs );
 		box.append( labelA );
 		box.append( script );
@@ -97,10 +95,10 @@ public class ScriptTestPage extends SystemPage
 	
 	protected DPWidget makeScriptFraction(String mainText, String numText, String denomText)
 	{
-		TextStyleSheet sMain = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 16 ), Color.black );
-		TextStyleSheet sScript = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 16 ), Color.black );
-		TextStyleSheet sPre = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.blue );
-		TextStyleSheet sPost = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 24 ), Color.red );
+		ElementStyleSheet sMain = DPText.styleSheet( new Font( "Sans serif", Font.PLAIN, 16 ), Color.black );
+		ElementStyleSheet sScript = DPText.styleSheet( new Font( "Sans serif", Font.PLAIN, 16 ), Color.black );
+		ElementStyleSheet sPre = DPText.styleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.blue );
+		ElementStyleSheet sPost = DPText.styleSheet( new Font( "Sans serif", Font.PLAIN, 24 ), Color.red );
 		DPText main = new DPText( sMain, mainText );
 		
 		DPFraction fraction = new DPFraction();
@@ -118,7 +116,7 @@ public class ScriptTestPage extends SystemPage
 		DPText labelA = new DPText( sPre, "Label A yYgGjJpPqQ" );
 		DPText labelB = new DPText( sPost, "Label B yYgGjJpPqQ" );
 		
-		HBoxStyleSheet boxs = new HBoxStyleSheet( VAlignment.BASELINES, 0.0, false, 0.0 );
+		ElementStyleSheet boxs = DPHBox.styleSheet( VAlignment.BASELINES, 0.0, false, 0.0 );
 		DPHBox box = new DPHBox( boxs );
 		box.append( labelA );
 		box.append( script );
@@ -131,11 +129,11 @@ public class ScriptTestPage extends SystemPage
 	
 	protected DPWidget createContents()
 	{
-		TextStyleSheet sMain = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 16 ), Color.black );
-		TextStyleSheet sScript = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 16 ), Color.black );
-		TextStyleSheet blackStyle = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 24 ), Color.black );
+		ElementStyleSheet sMain = DPText.styleSheet( new Font( "Sans serif", Font.PLAIN, 16 ), Color.black );
+		ElementStyleSheet sScript = DPText.styleSheet( new Font( "Sans serif", Font.PLAIN, 16 ), Color.black );
+		ElementStyleSheet blackStyle = DPText.styleSheet( new Font( "Sans serif", Font.PLAIN, 24 ), Color.black );
 
-		VBoxStyleSheet boxs = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.LEFT, 0.0, false, 0.0 );
+		ElementStyleSheet boxs = DPVBox.styleSheet( VTypesetting.NONE, HAlignment.LEFT, 0.0, false, 0.0 );
 		DPVBox box = new DPVBox( boxs );
 		
 		for (int i = 0; i < 16; i++)

@@ -16,17 +16,17 @@ import BritefuryJ.DocPresent.DPParagraph;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.ElementFactory;
 import BritefuryJ.DocPresent.PyElementFactory;
-import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.ElementStyleSheet;
 
 public class ParagraphListViewLayout extends ListViewLayout
 {
-	private ParagraphStyleSheet styleSheet;
+	private ElementStyleSheet styleSheet;
 	private ElementFactory spacingFactory;
 	private int lineBreakPriority;
 	private TrailingSeparator trailingSeparator;
 	
 	
-	public ParagraphListViewLayout(ParagraphStyleSheet styleSheet, ElementFactory spacingFactory, int lineBreakPriority, TrailingSeparator trailingSeparator)
+	public ParagraphListViewLayout(ElementStyleSheet styleSheet, ElementFactory spacingFactory, int lineBreakPriority, TrailingSeparator trailingSeparator)
 	{
 		this.styleSheet = styleSheet;
 		this.spacingFactory = spacingFactory;
@@ -34,7 +34,7 @@ public class ParagraphListViewLayout extends ListViewLayout
 		this.trailingSeparator = trailingSeparator;
 	}
 	
-	public ParagraphListViewLayout(ParagraphStyleSheet styleSheet, PyObject spacingFactory, int lineBreakPriority, TrailingSeparator trailingSeparator)
+	public ParagraphListViewLayout(ElementStyleSheet styleSheet, PyObject spacingFactory, int lineBreakPriority, TrailingSeparator trailingSeparator)
 	{
 		this( styleSheet, PyElementFactory.pyToElementFactory( spacingFactory ), lineBreakPriority, trailingSeparator );
 	}

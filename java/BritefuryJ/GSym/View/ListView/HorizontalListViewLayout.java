@@ -15,23 +15,23 @@ import BritefuryJ.DocPresent.DPHBox;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.ElementFactory;
 import BritefuryJ.DocPresent.PyElementFactory;
-import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.ElementStyleSheet;
 
 public class HorizontalListViewLayout extends ListViewLayout
 {
-	private HBoxStyleSheet styleSheet;
+	private ElementStyleSheet styleSheet;
 	private ElementFactory spacingFactory;
 	private TrailingSeparator trailingSeparator;
 	
 	
-	public HorizontalListViewLayout(HBoxStyleSheet styleSheet, ElementFactory spacingFactory, TrailingSeparator trailingSeparator)
+	public HorizontalListViewLayout(ElementStyleSheet styleSheet, ElementFactory spacingFactory, TrailingSeparator trailingSeparator)
 	{
 		this.styleSheet = styleSheet;
 		this.spacingFactory = spacingFactory;
 		this.trailingSeparator = trailingSeparator;
 	}
 	
-	public HorizontalListViewLayout(HBoxStyleSheet styleSheet, PyObject spacingFactory, TrailingSeparator trailingSeparator)
+	public HorizontalListViewLayout(ElementStyleSheet styleSheet, PyObject spacingFactory, TrailingSeparator trailingSeparator)
 	{
 		this( styleSheet, PyElementFactory.pyToElementFactory( spacingFactory ), trailingSeparator );
 	}

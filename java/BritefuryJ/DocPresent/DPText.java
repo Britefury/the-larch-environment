@@ -7,47 +7,64 @@
 //##************************
 package BritefuryJ.DocPresent;
 
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.font.TextHitInfo;
 import java.awt.geom.AffineTransform;
 
 import BritefuryJ.DocPresent.Caret.Caret;
+import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Marker.Marker;
-import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.ElementStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.ElementStyleSheetField;
+import BritefuryJ.DocPresent.StyleSheets.StyleSheetValueFieldCascading;
+import BritefuryJ.DocPresent.StyleSheets.StyleSheetValueFieldSet;
 import BritefuryJ.DocPresent.Util.TextVisual;
 import BritefuryJ.Math.Point2;
 
 public class DPText extends DPContentLeafEditableEntry
 {
+	protected static ElementStyleSheetField fontField = DPStaticText.fontField;
+	protected static ElementStyleSheetField paintField = DPStaticText.paintField;
+	protected static ElementStyleSheetField squiggleUndelinePaintField = ElementStyleSheetField.newField( "squiggleUndelinePaint", Paint.class );
+	protected static ElementStyleSheetField bMixedSizeCapsField = DPStaticText.bMixedSizeCapsField;
+	
+	protected static StyleSheetValueFieldCascading fontValueField = DPStaticText.fontValueField;
+	protected static StyleSheetValueFieldCascading paintValueField = DPStaticText.paintValueField;
+	protected static StyleSheetValueFieldCascading squiggleUndelinePaintValueField = StyleSheetValueFieldCascading.newField( "squiggleUndelinePaint", Paint.class, null, squiggleUndelinePaintField );
+	protected static StyleSheetValueFieldCascading bMixedSizeCapsValueField = DPStaticText.bMixedSizeCapsValueField;
+	
+	
+	protected static StyleSheetValueFieldSet useStyleSheetFields_Text = useStyleSheetFields_Element.join( fontValueField, paintValueField, squiggleUndelinePaintValueField, bMixedSizeCapsValueField );
+	
+	
 	protected TextVisual visual;
 	protected String text;
 	
 	
 	public DPText(String text)
 	{
-		this( TextStyleSheet.defaultStyleSheet, text, text );
+		this( null, text, text );
 	}
 	
 	public DPText(String text, String textRepresentation)
 	{
-		this( TextStyleSheet.defaultStyleSheet, text, textRepresentation );
+		this( null, text, textRepresentation );
 	}
 	
-	public DPText(TextStyleSheet styleSheet, String text)
+	public DPText(ElementStyleSheet styleSheet, String text)
 	{
 		this( styleSheet, text, text );
 	}
 
-	public DPText(TextStyleSheet styleSheet, String text, String textRepresentation)
+	public DPText(ElementStyleSheet styleSheet, String text, String textRepresentation)
 	{
 		super( styleSheet, textRepresentation );
 		
 		this.text = text;
 		
-		visual = TextVisual.getTextVisual( getPresentationArea(), this.text, styleSheet.getFont(), styleSheet.getMixedSizeCaps() );
-		
-		layoutReqBox = visual.getRequisition();
+		visual = null;
 	}
 	
 	
@@ -72,20 +89,35 @@ public class DPText extends DPContentLeafEditableEntry
 	
 	
 	
+	protected TextVisual createTextVisual()
+	{
+		return TextVisual.getTextVisual( getPresentationArea(), text, (Font)styleSheetValues.get( fontValueField ), (Boolean)styleSheetValues.get( bMixedSizeCapsValueField ) );
+	}
+	
+	protected Paint getTextPaint()
+	{
+		return (Paint)styleSheetValues.get( paintValueField );
+	}
+	
+	
 	private void onTextModified()
 	{
-		TextStyleSheet textStyleSheet = (TextStyleSheet)styleSheet;
-
-		TextVisual v = TextVisual.getTextVisual( getPresentationArea(), text, textStyleSheet.getFont(), textStyleSheet.getMixedSizeCaps() );
-		if ( v != visual )
+		if ( isRealised() )
 		{
-			visual = v;
-			layoutReqBox = visual.getRequisition();
-			if ( isRealised() )
+			TextVisual v = createTextVisual();
+			if ( v != visual )
 			{
-				visual.realise( getPresentationArea() );
+				visual = v;
+				layoutReqBox = visual.getRequisition();
+				if ( isRealised() )
+				{
+					visual.realise( getPresentationArea() );
+				}
+				queueResize();
 			}
-			
+		}
+		else
+		{
 			queueResize();
 		}
 	}
@@ -101,28 +133,36 @@ public class DPText extends DPContentLeafEditableEntry
 	protected void onRealise()
 	{
 		super.onRealise();
+		visual = createTextVisual();
 		visual.realise( getPresentationArea() );
+	}
+	
+	protected void onUnrealise(DPWidget unrealiseRoot)
+	{
+		visual = null;
+		super.onUnrealise( unrealiseRoot );
 	}
 	
 	
 	
 	protected void draw(Graphics2D graphics)
 	{
-		TextStyleSheet textStyleSheet = (TextStyleSheet)styleSheet;
-
-		Paint prevPaint = graphics.getPaint();
-
-		Paint squiggleUnderlinePaint = textStyleSheet.getSquiggleUnderlinePaint();
-		if ( squiggleUnderlinePaint != null )
+		if ( visual != null )
 		{
-			graphics.setPaint( squiggleUnderlinePaint );
-			visual.drawSquiggleUnderline( graphics );
+			Paint prevPaint = graphics.getPaint();
+	
+			Paint squiggleUnderlinePaint = (Paint)styleSheetValues.get( squiggleUndelinePaintValueField );;
+			if ( squiggleUnderlinePaint != null )
+			{
+				graphics.setPaint( squiggleUnderlinePaint );
+				visual.drawSquiggleUnderline( graphics );
+			}
+	
+			graphics.setPaint( (Paint)styleSheetValues.get( paintValueField ) );
+			visual.drawText( graphics );
+			
+			graphics.setPaint( prevPaint );
 		}
-
-		graphics.setPaint( textStyleSheet.getTextPaint() );
-		visual.drawText( graphics );
-		
-		graphics.setPaint( prevPaint );
 	}
 	
 	
@@ -130,12 +170,12 @@ public class DPText extends DPContentLeafEditableEntry
 	
 	protected void updateRequisitionX()
 	{
-		layoutReqBox = visual.getRequisition();
+		layoutReqBox = visual != null  ?  visual.getRequisition()  :  new LReqBox();
 	}
 
 	protected void updateRequisitionY()
 	{
-		layoutReqBox = visual.getRequisition();
+		layoutReqBox = visual != null  ?  visual.getRequisition()  :  new LReqBox();
 	}
 
 	
@@ -148,28 +188,37 @@ public class DPText extends DPContentLeafEditableEntry
 	
 	public void drawCaret(Graphics2D graphics, Caret c)
 	{
-		int index = c.getMarker().getIndex();
-		if ( index < 0  ||  ( text.length() > 0  ?  ( index > text.length() )  :  ( index > 1 ) ) )
+		if ( visual != null )
 		{
-			throw new RuntimeException( "DPText.drawCaret(): caret marker is out of range; " + index + " is not within the range[0-" + text.length() + "]." );
+			int index = c.getMarker().getIndex();
+			if ( index < 0  ||  ( text.length() > 0  ?  ( index > text.length() )  :  ( index > 1 ) ) )
+			{
+				throw new RuntimeException( "DPText.drawCaret(): caret marker is out of range; " + index + " is not within the range[0-" + text.length() + "]." );
+			}
+			AffineTransform current = pushGraphicsTransform( graphics );
+			visual.drawCaret( graphics, index );
+			popGraphicsTransform( graphics, current );
 		}
-		AffineTransform current = pushGraphicsTransform( graphics );
-		visual.drawCaret( graphics, index );
-		popGraphicsTransform( graphics, current );
 	}
 
 	public void drawCaretAtStart(Graphics2D graphics)
 	{
-		AffineTransform current = pushGraphicsTransform( graphics );
-		visual.drawCaretAtStart( graphics );
-		popGraphicsTransform( graphics, current );
+		if ( visual != null )
+		{
+			AffineTransform current = pushGraphicsTransform( graphics );
+			visual.drawCaretAtStart( graphics );
+			popGraphicsTransform( graphics, current );
+		}
 	}
 
 	public void drawCaretAtEnd(Graphics2D graphics)
 	{
-		AffineTransform current = pushGraphicsTransform( graphics );
-		visual.drawCaretAtEnd( graphics );
-		popGraphicsTransform( graphics, current );
+		if ( visual != null )
+		{
+			AffineTransform current = pushGraphicsTransform( graphics );
+			visual.drawCaretAtEnd( graphics );
+			popGraphicsTransform( graphics, current );
+		}
 	}
 
 
@@ -263,5 +312,33 @@ public class DPText extends DPContentLeafEditableEntry
 		setText( "" );
 		
 		return bResult;
+	}
+	
+	
+	
+	protected StyleSheetValueFieldSet getUsedStyleSheetValueFields()
+	{
+		return useStyleSheetFields_Text;
+	}
+
+	
+	public static ElementStyleSheet styleSheet(Font font, Paint paint)
+	{
+		return new ElementStyleSheet( new String[] { "font", "paint" }, new Object[] { font, paint } );
+	}
+
+	public static ElementStyleSheet styleSheet(Font font, Paint paint, Paint squiggleUnderlinePaint)
+	{
+		return new ElementStyleSheet( new String[] { "font", "paint", "squiggleUndelinePaint" }, new Object[] { font, paint, squiggleUnderlinePaint } );
+	}
+
+	public static ElementStyleSheet styleSheet(Font font, Paint paint, boolean bMixedSizeCaps)
+	{
+		return new ElementStyleSheet( new String[] { "font", "paint", "bMixedSizeCaps" }, new Object[] { font, paint, bMixedSizeCaps } );
+	}
+
+	public static ElementStyleSheet styleSheet(Font font, Paint paint, Paint squiggleUnderlinePaint, boolean bMixedSizeCaps)
+	{
+		return new ElementStyleSheet( new String[] { "font", "paint", "squiggleUndelinePaint", "bMixedSizeCaps" }, new Object[] { font, paint, squiggleUnderlinePaint, bMixedSizeCaps } );
 	}
 }

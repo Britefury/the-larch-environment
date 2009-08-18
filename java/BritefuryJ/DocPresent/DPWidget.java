@@ -33,9 +33,9 @@ import BritefuryJ.DocPresent.StructuralRepresentation.StructuralValue;
 import BritefuryJ.DocPresent.StructuralRepresentation.StructuralValueObject;
 import BritefuryJ.DocPresent.StructuralRepresentation.StructuralValueSequence;
 import BritefuryJ.DocPresent.StructuralRepresentation.StructuralValueStream;
-import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.WidgetStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.ElementStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.StyleSheetValueFieldSet;
+import BritefuryJ.DocPresent.StyleSheets.StyleSheetValues;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
@@ -50,6 +50,9 @@ import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
 abstract public class DPWidget
 {
 	protected static double NON_TYPESET_CHILD_BASELINE_OFFSET = -5.0;
+	
+	
+	protected static StyleSheetValueFieldSet useStyleSheetFields_Element = new StyleSheetValueFieldSet();
 	
 	
 	
@@ -109,7 +112,8 @@ abstract public class DPWidget
 	
 	protected int flags;
 	
-	protected WidgetStyleSheet styleSheet;
+	protected ElementStyleSheet styleSheet;
+	protected StyleSheetValues styleSheetValues;
 	protected DPContainer parent;
 	protected DPPresentationArea presentationArea;
 	protected LReqBox layoutReqBox;
@@ -161,13 +165,14 @@ abstract public class DPWidget
 	
 	public DPWidget()
 	{
-		this( WidgetStyleSheet.defaultStyleSheet );
+		this( null );
 	}
 	
-	public DPWidget(WidgetStyleSheet styleSheet)
+	public DPWidget(ElementStyleSheet styleSheet)
 	{
 		flags = 0;
 		this.styleSheet = styleSheet;
+		styleSheetValues = computeStyleSheetValues( new StyleSheetValues() );
 		layoutReqBox = new LReqBox();
 		layoutAllocBox = new LAllocBox( this );
 		parentPacking = null;
@@ -206,6 +211,39 @@ abstract public class DPWidget
 	public void setParentPacking(PackingParams parentPacking)
 	{
 		this.parentPacking = parentPacking;
+	}
+	
+	
+	
+	//
+	// Stylesheet methods
+	//
+	
+	public ElementStyleSheet getStyleSheet()
+	{
+		return styleSheet;
+	}
+	
+	protected StyleSheetValues computeStyleSheetValues(StyleSheetValues parentValues)
+	{
+		if ( isPackingContainer() )
+		{
+			return StyleSheetValues.packingContainerCascade( parentValues, styleSheet, getUsedStyleSheetValueFields() );
+		}
+		else
+		{
+			return StyleSheetValues.cascade( parentValues, styleSheet, getUsedStyleSheetValueFields() );
+		}
+	}
+	
+	protected boolean isPackingContainer()
+	{
+		return false;
+	}
+	
+	protected StyleSheetValueFieldSet getUsedStyleSheetValueFields()
+	{
+		return useStyleSheetFields_Element;
 	}
 	
 
@@ -569,6 +607,8 @@ abstract public class DPWidget
 	protected void setParent(DPContainer parent, DPPresentationArea area)
 	{
 		this.parent = parent;
+		StyleSheetValues parentValues = parent != null  ?  parent.styleSheetValues  :  new StyleSheetValues();
+		styleSheetValues = computeStyleSheetValues( parentValues );
 		if ( area != presentationArea )
 		{
 			setPresentationArea( area );
@@ -1806,9 +1846,9 @@ abstract public class DPWidget
 	// Meta-element
 	//
 	
-	protected static TextStyleSheet headerDebugTextStyle = new TextStyleSheet( new Font( "Sans serif", Font.BOLD, 14 ), new Color( 0.0f, 0.5f, 0.5f ) );
-	protected static TextStyleSheet headerDescriptionTextStyle = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 14 ), new Color( 0.0f, 0.0f, 0.75f ) );
-	protected static HBoxStyleSheet metaHeaderHBoxStyle = new HBoxStyleSheet( VAlignment.BASELINES, 10.0, false, 0.0 );
+	protected static ElementStyleSheet headerDebugTextStyle = DPStaticText.styleSheet( new Font( "Sans serif", Font.PLAIN, 14 ), new Color( 0.0f, 0.5f, 0.5f ) );
+	protected static ElementStyleSheet headerDescriptionTextStyle = DPStaticText.styleSheet( new Font( "Sans serif", Font.PLAIN, 14 ), new Color( 0.0f, 0.0f, 0.75f ) );
+	protected static ElementStyleSheet metaHeaderHBoxStyle = DPHBox.styleSheet( VAlignment.BASELINES, 10.0, false, 0.0 );
 	protected static EmptyBorder metaHeaderEmptyBorder = new EmptyBorder();
 
 
@@ -1821,7 +1861,7 @@ abstract public class DPWidget
 	{
 		if ( debugName != null )
 		{
-			return new DPText( headerDebugTextStyle, "<" + debugName + ">" );
+			return new DPStaticText( headerDebugTextStyle, "<" + debugName + ">" );
 		}
 		else
 		{
@@ -1833,7 +1873,7 @@ abstract public class DPWidget
 	{
 		String description = toString();
 		description = description.replace( "BritefuryJ.DocPresent.", "" );
-		return new DPText( headerDescriptionTextStyle, description );
+		return new DPStaticText( headerDescriptionTextStyle, description );
 	}
 	
 	protected Border getMetaHeaderBorder()

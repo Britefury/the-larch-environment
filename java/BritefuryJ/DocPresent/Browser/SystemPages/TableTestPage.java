@@ -16,9 +16,7 @@ import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.Layout.VTypesetting;
-import BritefuryJ.DocPresent.StyleSheets.TableStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.ElementStyleSheet;
 
 public class TableTestPage extends SystemPage
 {
@@ -33,8 +31,8 @@ public class TableTestPage extends SystemPage
 		return "Table test";
 	}
 
-	private static TextStyleSheet t12 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );
-	private static TextStyleSheet t18 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 18 ), Color.BLACK );
+	private static ElementStyleSheet t12 = DPText.styleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );
+	private static ElementStyleSheet t18 = DPText.styleSheet( new Font( "Sans serif", Font.PLAIN, 18 ), Color.BLACK );
 
 	protected static DPText text12(String s)
 	{
@@ -48,7 +46,7 @@ public class TableTestPage extends SystemPage
 	
 	protected static DPTable makeTable0()
 	{
-		TableStyleSheet tbls0 = new TableStyleSheet( VAlignment.BASELINES, HAlignment.CENTRE, 5.0, false, 0.0, 5.0, false, 0.0 );
+		ElementStyleSheet tbls0 = DPTable.styleSheet( VAlignment.BASELINES, HAlignment.CENTRE, 5.0, false, 0.0, 5.0, false, 0.0 );
 		DPTable table = new DPTable( tbls0 );
 		for (int row = 0; row < 6; row++)
 		{
@@ -99,7 +97,7 @@ public class TableTestPage extends SystemPage
 	
 	protected DPWidget createContents()
 	{
-		VBoxStyleSheet boxS = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.EXPAND, 20.0, false, 0.0 );
+		ElementStyleSheet boxS = DPVBox.styleSheet( VTypesetting.NONE, HAlignment.EXPAND, 20.0, false, 0.0 );
 		DPVBox box = new DPVBox( boxS );
 		box.append( makeTable0() );
 		box.append( makeTable1() );

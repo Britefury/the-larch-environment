@@ -12,6 +12,6 @@ from BritefuryJ.DocPresent.StyleSheets import *
 
 
 
-viewError_textStyle = TextStyleSheet( Font( 'SansSerif', Font.BOLD, 12 ),  Color( 0.8, 0.0, 0.0 ) )
+viewError_textStyle = ElementStyleSheet( font=Font( 'SansSerif', Font.BOLD, 12 ),  paint=Color( 0.8, 0.0, 0.0 ) )
 
 
