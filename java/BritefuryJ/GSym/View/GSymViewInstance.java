@@ -33,7 +33,7 @@ public class GSymViewInstance implements DocView.RefreshListener
 	//
 	//
 	
-	static boolean ENABLE_PROFILING = false;
+	static boolean ENABLE_PROFILING = true;
 	
 	
 	public static class CannotViewTerminalDocNode extends Exception

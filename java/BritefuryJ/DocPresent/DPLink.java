@@ -6,15 +6,35 @@
 //##************************
 package BritefuryJ.DocPresent;
 
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Paint;
+
 import org.python.core.Py;
 import org.python.core.PyObject;
 
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
-import BritefuryJ.DocPresent.StyleSheets.LinkStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.ElementStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.ElementStyleSheetField;
+import BritefuryJ.DocPresent.StyleSheets.StyleSheetValueFieldCascading;
+import BritefuryJ.DocPresent.StyleSheets.StyleSheetValueFieldSet;
+import BritefuryJ.DocPresent.Util.TextVisual;
 
 public class DPLink extends DPStaticText
 {
+	protected static ElementStyleSheetField link_fontField = ElementStyleSheetField.newField( "link_font", Font.class );
+	protected static ElementStyleSheetField link_paintField = ElementStyleSheetField.newField( "link_paint", Paint.class );
+	protected static ElementStyleSheetField link_bMixedSizeCapsField = ElementStyleSheetField.newField( "link_bMixedSizeCaps", Boolean.class );
+	
+	protected static StyleSheetValueFieldCascading link_fontValueField = StyleSheetValueFieldCascading.newField( "link_font", Font.class, new Font( "Sans serif", Font.PLAIN, 14 ), link_fontField );
+	protected static StyleSheetValueFieldCascading link_paintValueField = StyleSheetValueFieldCascading.newField( "link_paint", Paint.class, Color.blue, link_paintField );
+	protected static StyleSheetValueFieldCascading link_bMixedSizeCapsValueField = StyleSheetValueFieldCascading.newField( "link_bMixedSizeCaps", Boolean.class, false, link_bMixedSizeCapsField );
+	
+	
+	protected static StyleSheetValueFieldSet useStyleSheetFields_Link = useStyleSheetFields_Element.join( link_fontValueField, link_paintValueField, link_bMixedSizeCapsValueField );
+	
+	
 	public interface LinkListener
 	{
 		public void onLinkClicked(DPLink link);
@@ -66,20 +86,20 @@ public class DPLink extends DPStaticText
 
 	public DPLink(String text, String targetLocation)
 	{
-		this( LinkStyleSheet.defaultStyleSheet, text, new LinkTargetListener( targetLocation ) );
+		this( null, text, new LinkTargetListener( targetLocation ) );
 	}
 	
-	public DPLink(LinkStyleSheet styleSheet, String text, String targetLocation)
+	public DPLink(ElementStyleSheet styleSheet, String text, String targetLocation)
 	{
 		this( styleSheet, text, new LinkTargetListener( targetLocation ) );
 	}
 
 	public DPLink(String text, LinkListener listener)
 	{
-		this( LinkStyleSheet.defaultStyleSheet, text, listener );
+		this( null, text, listener );
 	}
 	
-	public DPLink(LinkStyleSheet styleSheet, String text, LinkListener listener)
+	public DPLink(ElementStyleSheet styleSheet, String text, LinkListener listener)
 	{
 		super( styleSheet, text );
 		this.listener = listener;
@@ -87,10 +107,10 @@ public class DPLink extends DPStaticText
 
 	public DPLink(String text, PyObject listener)
 	{
-		this( LinkStyleSheet.defaultStyleSheet, text, new PyLinkListener( listener ) );
+		this( null, text, new PyLinkListener( listener ) );
 	}
 	
-	public DPLink(LinkStyleSheet styleSheet, String text, PyObject listener)
+	public DPLink(ElementStyleSheet styleSheet, String text, PyObject listener)
 	{
 		this( styleSheet, text, new PyLinkListener( listener ) );
 	}
@@ -98,6 +118,17 @@ public class DPLink extends DPStaticText
 
 	
 	
+	
+	protected TextVisual createTextVisual()
+	{
+		return TextVisual.getTextVisual( getPresentationArea(), text, (Font)styleSheetValues.get( link_fontValueField ), (Boolean)styleSheetValues.get( link_bMixedSizeCapsValueField ) );
+	}
+	
+	protected Paint getTextPaint()
+	{
+		return (Paint)styleSheetValues.get( link_paintValueField );
+	}
+
 	
 	protected void onEnter(PointerMotionEvent event)
 	{
@@ -139,5 +170,12 @@ public class DPLink extends DPStaticText
 		}
 		
 		return false;
+	}
+
+
+
+	protected StyleSheetValueFieldSet getUsedStyleSheetValueFields()
+	{
+		return useStyleSheetFields_Link;
 	}
 }

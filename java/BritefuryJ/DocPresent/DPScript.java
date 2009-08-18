@@ -15,13 +15,25 @@ import BritefuryJ.DocPresent.Layout.LAllocBox;
 import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Layout.PackingParams;
 import BritefuryJ.DocPresent.Layout.ScriptLayout;
-import BritefuryJ.DocPresent.StyleSheets.ScriptStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.ElementStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.ElementStyleSheetField;
+import BritefuryJ.DocPresent.StyleSheets.StyleSheetValueFieldDirect;
+import BritefuryJ.DocPresent.StyleSheets.StyleSheetValueFieldSet;
 import BritefuryJ.Math.Point2;
 
 
 public class DPScript extends DPContainer
 {
+	protected static ElementStyleSheetField colSpacingField = ElementStyleSheetField.newField( "scriptColSpacing", Double.class );
+	protected static ElementStyleSheetField rowSpacingField = ElementStyleSheetField.newField( "scriptRowSpacing", Double.class );
+
+	protected static StyleSheetValueFieldDirect colSpacingValueField = StyleSheetValueFieldDirect.newField( "scriptColSpacing", Double.class, 1.0, colSpacingField );
+	protected static StyleSheetValueFieldDirect rowSpacingValueField = StyleSheetValueFieldDirect.newField( "scriptRowSpacing", Double.class, 1.0, rowSpacingField );
+	
+	
+	protected static StyleSheetValueFieldSet useStyleSheetFields_Script = useStyleSheetFields_Element.join( colSpacingValueField, rowSpacingValueField );
+
+	
 	public static int LEFTSUPER = 0;
 	public static int LEFTSUB = 1;
 	public static int MAIN = 2;
@@ -42,21 +54,18 @@ public class DPScript extends DPContainer
 	protected DPSegment segs[];
 	protected DPParagraph paras[];
 	protected LReqBox columnBoxes[];
-	TextStyleSheet segmentTextStyleSheet;
 	protected double rowBaselineY[];
 	
 	
 	
 	public DPScript()
 	{
-		this( ScriptStyleSheet.defaultStyleSheet, TextStyleSheet.defaultStyleSheet );
+		this( null );
 	}
 	
-	public DPScript(ScriptStyleSheet styleSheet, TextStyleSheet segmentTextStyleSheet)
+	public DPScript(ElementStyleSheet styleSheet)
 	{
 		super( styleSheet );
-		
-		this.segmentTextStyleSheet = segmentTextStyleSheet;
 		
 		children = new DPWidget[NUMCHILDREN];
 		segs = new DPSegment[NUMCHILDREN];
@@ -91,7 +100,7 @@ public class DPScript extends DPContainer
 
 			if ( bSegmentRequired  &&  !bSegmentPresent )
 			{
-				DPSegment seg = new DPSegment( segmentTextStyleSheet, isBeginGuardRequired( slot ), isEndGuardRequired( slot ) );
+				DPSegment seg = new DPSegment( styleSheet, isBeginGuardRequired( slot ), isEndGuardRequired( slot ) );
 				segs[slot] = seg;
 				DPParagraph para = new DPParagraph();
 				para.setChildren( Arrays.asList( new DPWidget[] { seg } ) );
@@ -317,7 +326,7 @@ public class DPScript extends DPContainer
 			}
 		}
 		
-		ScriptLayout.computeRequisitionX( layoutReqBox, columnBoxes, boxes[LEFTSUPER], boxes[LEFTSUB], boxes[MAIN], boxes[RIGHTSUPER], boxes[RIGHTSUB], getSpacing(), getScriptSpacing() );
+		ScriptLayout.computeRequisitionX( layoutReqBox, columnBoxes, boxes[LEFTSUPER], boxes[LEFTSUB], boxes[MAIN], boxes[RIGHTSUPER], boxes[RIGHTSUB], getColSpacing(), getRowSpacing() );
 	}
 
 	protected void updateRequisitionY()
@@ -335,7 +344,7 @@ public class DPScript extends DPContainer
 			}
 		}
 		
-		ScriptLayout.computeRequisitionY( layoutReqBox, rowBaselineY, boxes[LEFTSUPER], boxes[LEFTSUB], boxes[MAIN], boxes[RIGHTSUPER], boxes[RIGHTSUB], getSpacing(), getScriptSpacing() );
+		ScriptLayout.computeRequisitionY( layoutReqBox, rowBaselineY, boxes[LEFTSUPER], boxes[LEFTSUB], boxes[MAIN], boxes[RIGHTSUPER], boxes[RIGHTSUB], getColSpacing(), getRowSpacing() );
 	}
 	
 
@@ -365,7 +374,7 @@ public class DPScript extends DPContainer
 		
 		ScriptLayout.allocateX( layoutReqBox, reqBoxes[LEFTSUPER], reqBoxes[LEFTSUB], reqBoxes[MAIN], reqBoxes[RIGHTSUPER], reqBoxes[RIGHTSUB], columnBoxes,
 				layoutAllocBox, allocBoxes[LEFTSUPER], allocBoxes[LEFTSUB], allocBoxes[MAIN], allocBoxes[RIGHTSUPER], allocBoxes[RIGHTSUB],
-				getSpacing(), getScriptSpacing() );
+				getColSpacing(), getRowSpacing() );
 		
 		for (int i = 0; i < NUMCHILDREN; i++)
 		{
@@ -404,7 +413,7 @@ public class DPScript extends DPContainer
 		
 		ScriptLayout.allocateY( layoutReqBox, reqBoxes[LEFTSUPER], reqBoxes[LEFTSUB], reqBoxes[MAIN], reqBoxes[RIGHTSUPER], reqBoxes[RIGHTSUB], rowBaselineY,
 				layoutAllocBox, allocBoxes[LEFTSUPER], allocBoxes[LEFTSUB], allocBoxes[MAIN], allocBoxes[RIGHTSUPER], allocBoxes[RIGHTSUB],
-				getSpacing(), getScriptSpacing() );
+				getColSpacing(), getRowSpacing() );
 		
 		for (int i = 0; i < NUMCHILDREN; i++)
 		{
@@ -683,13 +692,19 @@ public class DPScript extends DPContainer
 	// STYLESHEET METHODS
 	//
 	
-	protected double getSpacing()
+	protected StyleSheetValueFieldSet getUsedStyleSheetValueFields()
 	{
-		return ((ScriptStyleSheet)styleSheet).getSpacing();
+		return useStyleSheetFields_Script;
 	}
 
-	protected double getScriptSpacing()
+	
+	protected double getColSpacing()
 	{
-		return ((ScriptStyleSheet)styleSheet).getScriptSpacing();
+		return (Double)styleSheetValues.get( colSpacingValueField );
+	}
+
+	protected double getRowSpacing()
+	{
+		return (Double)styleSheetValues.get( rowSpacingValueField );
 	}
 }

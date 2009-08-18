@@ -29,10 +29,7 @@ import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.Layout.VTypesetting;
-import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.ElementStyleSheet;
 import BritefuryJ.Parser.ParserExpression;
 import BritefuryJ.Parser.ItemStream.ItemStream;
 import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
@@ -48,7 +45,7 @@ public class NodeView
 		
 		public DPNodeBin(NodeView nodeView)
 		{
-			super( ContainerStyleSheet.defaultStyleSheet );
+			super();
 			
 			this.nodeView = nodeView;
 			bSelected = false;
@@ -123,22 +120,22 @@ public class NodeView
 	
 	static int MAX_STRING_LENGTH = 64;
 	
-	static TextStyleSheet debugNameStyle = new TextStyleSheet( new Font( "Sans serif", Font.BOLD, 24 ), Color.blue );
-	static TextStyleSheet classNameStyle = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 18 ), new Color( 0.0f, 0.0f, 0.5f ) );
-	static TextStyleSheet rangeStyle = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.black );
-	static TextStyleSheet inputStyle = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.black );
-	static TextStyleSheet valueStyle = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 16 ), Color.black );
-	static TextStyleSheet failStyle = new TextStyleSheet( new Font( "Sans serif", Font.ITALIC, 16 ), new Color( 0.5f, 0.0f, 0.0f ) );
-	static HBoxStyleSheet titleTextHBoxStyle = new HBoxStyleSheet( VAlignment.BASELINES, 10.0, false, 0.0 );
-	static VBoxStyleSheet titleVBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.CENTRE, 0.0, false, 0.0 );
+	static ElementStyleSheet debugNameStyle = DPText.styleSheet( new Font( "Sans serif", Font.BOLD, 24 ), Color.blue );
+	static ElementStyleSheet classNameStyle =  DPText.styleSheet( new Font( "Sans serif", Font.PLAIN, 18 ), new Color( 0.0f, 0.0f, 0.5f ) );
+	static ElementStyleSheet rangeStyle =  DPText.styleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.black );
+	static ElementStyleSheet inputStyle =  DPText.styleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.black );
+	static ElementStyleSheet valueStyle =  DPText.styleSheet( new Font( "Sans serif", Font.PLAIN, 16 ), Color.black );
+	static ElementStyleSheet failStyle =  DPText.styleSheet( new Font( "Sans serif", Font.ITALIC, 16 ), new Color( 0.5f, 0.0f, 0.0f ) );
+	static ElementStyleSheet titleTextHBoxStyle =  DPHBox.styleSheet( VAlignment.BASELINES, 10.0, false, 0.0 );
+	static ElementStyleSheet titleVBoxStyle = DPVBox.styleSheet( VTypesetting.NONE, HAlignment.CENTRE, 0.0, false, 0.0 );
 	static Border titleSuccessBorder = new EmptyBorder( 0.0, 0.0, 0.0, 0.0, new Color( 0.85f, 0.95f, 0.85f ) );
 	static Border titleFailBorder = new EmptyBorder( 0.0, 0.0, 0.0, 0.0, new Color( 1.0f, 0.85f, 0.85f ) );
-	static VBoxStyleSheet contentVBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.LEFT, 0.0, false, 0.0 );
-	static VBoxStyleSheet nodeVBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.EXPAND, 0.0, false, 0.0 );
+	static ElementStyleSheet contentVBoxStyle = DPVBox.styleSheet( VTypesetting.NONE, HAlignment.LEFT, 0.0, false, 0.0 );
+	static ElementStyleSheet nodeVBoxStyle = DPVBox.styleSheet( VTypesetting.NONE, HAlignment.EXPAND, 0.0, false, 0.0 );
 	static Border nodeBorder = new SolidBorder( 1.0, 1.0, Color.black, null );
 	
-	static VBoxStyleSheet childrenVBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.LEFT, 3.0, false, 3.0 );
-	static HBoxStyleSheet mainHBoxStyle = new HBoxStyleSheet( VAlignment.CENTRE, 80.0, false, 0.0 );
+	static ElementStyleSheet childrenVBoxStyle = DPVBox.styleSheet( VTypesetting.NONE, HAlignment.LEFT, 3.0, false, 3.0 );
+	static ElementStyleSheet mainHBoxStyle = DPHBox.styleSheet( VAlignment.CENTRE, 80.0, false, 0.0 );
 	
 	
 	

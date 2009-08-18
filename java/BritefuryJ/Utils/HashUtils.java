@@ -31,4 +31,34 @@ public class HashUtils
 		x = ( x ^ a ) * mult;
 		return x + 97351;
 	}
+	
+	public static int quadHash(int a, int b, int c, int d)
+	{
+		int mult = 1000003;
+		int x = 0x345678;
+		x = ( x ^ d ) * mult;
+		mult += 82520 + 6;
+		x = ( x ^ c ) * mult;
+		mult += 82520 + 4;
+		x = ( x ^ b ) * mult;
+		mult += 82520 + 2;
+		x = ( x ^ a ) * mult;
+		return x + 97351;
+	}
+	
+	public static int hashArray(Object array[])
+	{
+		int y;
+		int len = array.length;
+		int mult = 1000003;
+		int x = 0x345678;
+		while ( --len >= 0 )
+		{
+			Object o = array[len];
+			y = o != null  ?  o.hashCode()  :  0;
+			x = ( x ^ y )  *  mult;
+			mult += 82520 + len + len;
+		}
+		return x + 97351;
+	}
 }

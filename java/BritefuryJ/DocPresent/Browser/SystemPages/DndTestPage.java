@@ -28,14 +28,11 @@ import BritefuryJ.DocPresent.Input.PointerInterface;
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.Layout.VTypesetting;
-import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.StaticTextStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.TableStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.ElementStyleSheet;
 
 public class DndTestPage extends SystemPage
 {
-	private static StaticTextStyleSheet textStyle = new StaticTextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );
+	private static ElementStyleSheet textStyle = DPStaticText.styleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );
 	private static Border sourceBorder = new EmptyBorder( 10.0, 10.0, 10.0, 10.0, new Color( 0.75f, 0.85f, 1.0f ) );
 	private static Border destBorder = new EmptyBorder( 10.0, 10.0, 10.0, 10.0, new Color( 1.0f, 0.9f, 0.75f ) );
 
@@ -125,11 +122,11 @@ public class DndTestPage extends SystemPage
 	
 	protected DPWidget createContents()
 	{
-		StaticTextStyleSheet instructionsStyle = new StaticTextStyleSheet( new Font( "Sans serif", Font.PLAIN, 16 ), Color.BLACK );
+		ElementStyleSheet instructionsStyle = DPStaticText.styleSheet( new Font( "Sans serif", Font.PLAIN, 16 ), Color.BLACK );
 		DPStaticText instructions = new DPStaticText( instructionsStyle, "Drag data from sources to destinations." );
 		
 		
-		StaticTextStyleSheet rowTitleStyle = new StaticTextStyleSheet( new Font( "Sans serif", Font.PLAIN, 14 ), Color.BLACK );
+		ElementStyleSheet rowTitleStyle = DPStaticText.styleSheet( new Font( "Sans serif", Font.PLAIN, 14 ), Color.BLACK );
 		
 		
 		DPStaticText sourceTitle = new DPStaticText( rowTitleStyle, "Source:" );
@@ -141,7 +138,7 @@ public class DndTestPage extends SystemPage
 		DPWidget dest1 = makeDestElement( "xyz" );
 		
 		
-		TableStyleSheet tableStyle = new TableStyleSheet( VAlignment.BASELINES, HAlignment.LEFT, 25.0, false, 0.0, 25.0, false, 0.0 );
+		ElementStyleSheet tableStyle = DPTable.styleSheet( VAlignment.BASELINES, HAlignment.LEFT, 25.0, false, 0.0, 25.0, false, 0.0 );
 		
 		
 		DPTable table = new DPTable( tableStyle );
@@ -154,12 +151,12 @@ public class DndTestPage extends SystemPage
 
 
 		
-		VBoxStyleSheet vboxS = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.LEFT, 20.0, false, 0.0 );
+		ElementStyleSheet vboxS = DPVBox.styleSheet( VTypesetting.NONE, HAlignment.LEFT, 20.0, false, 0.0 );
 		DPVBox vbox = new DPVBox( vboxS );
 		vbox.append( instructions );
 		vbox.append( table );
 		
-		HBoxStyleSheet hboxS = new HBoxStyleSheet( VAlignment.TOP, 0.0, false, 10.0 );
+		ElementStyleSheet hboxS = DPHBox.styleSheet( VAlignment.TOP, 0.0, false, 10.0 );
 		DPHBox hbox = new DPHBox( hboxS );
 		hbox.append( vbox );
 

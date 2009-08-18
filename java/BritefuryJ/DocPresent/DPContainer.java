@@ -23,8 +23,7 @@ import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.PackingParams;
 import BritefuryJ.DocPresent.Layout.VTypesetting;
 import BritefuryJ.DocPresent.Marker.Marker;
-import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.ElementStyleSheet;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
@@ -81,10 +80,10 @@ public abstract class DPContainer extends DPWidget
 	
 	public DPContainer()
 	{
-		this( ContainerStyleSheet.defaultStyleSheet );
+		this( null );
 	}
 
-	public DPContainer(ContainerStyleSheet styleSheet)
+	public DPContainer(ElementStyleSheet styleSheet)
 	{
 		super( styleSheet );
 		
@@ -171,7 +170,10 @@ public abstract class DPContainer extends DPWidget
 	}
 	
 	
-	protected abstract PackingParams getDefaultPackingParams();
+	protected PackingParams getDefaultPackingParams()
+	{
+		return null;
+	}
 	
 	
 	
@@ -1554,7 +1556,7 @@ public abstract class DPContainer extends DPWidget
 	//
 	
 	static EmptyBorder metaIndentBorder = new EmptyBorder( 25.0, 0.0, 0.0, 0.0 );
-	static VBoxStyleSheet metaVBoxStyle = new VBoxStyleSheet( VTypesetting.ALIGN_WITH_BOTTOM, HAlignment.LEFT, 0.0, false, 0.0 );
+	static ElementStyleSheet metaVBoxStyle = DPVBox.styleSheet( VTypesetting.ALIGN_WITH_BOTTOM, HAlignment.LEFT, 0.0, false, 0.0 );
 	
 	public DPBorder getMetaHeaderBorderWidget()
 	{
@@ -1624,20 +1626,5 @@ public abstract class DPContainer extends DPWidget
 			}
 		}
 		super.shutdownMetaElement();
-	}
-
-	
-	
-	
-	
-	//
-	//
-	// STYLESHEET METHODS
-	//
-	//
-	
-	protected ContainerStyleSheet getStyleSheet()
-	{
-		return (ContainerStyleSheet)styleSheet;
 	}
 }

@@ -27,10 +27,7 @@ import BritefuryJ.DocPresent.Browser.SystemPages.SystemRootPage;
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.Layout.VTypesetting;
-import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.StaticTextStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.ElementStyleSheet;
 
 public class Browser implements PageController
 {
@@ -192,24 +189,24 @@ public class Browser implements PageController
 	
 	private DPWidget createResolveErrorElement(String location)
 	{
-		VBoxStyleSheet pageBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.CENTRE, 40.0, false, 10.0 );
+		ElementStyleSheet pageBoxStyle = DPVBox.styleSheet( VTypesetting.NONE, HAlignment.CENTRE, 40.0, false, 10.0 );
 		DPVBox pageBox = new DPVBox( pageBoxStyle );
 		
 
-		HBoxStyleSheet linkBoxStyle = new HBoxStyleSheet( VAlignment.BASELINES, 0.0, false, 10.0 );
+		ElementStyleSheet linkBoxStyle = DPHBox.styleSheet( VAlignment.BASELINES, 0.0, false, 10.0 );
 		DPHBox linkBox = new DPHBox( linkBoxStyle );
 		
 		linkBox.append( new DPLink( "WELCOME PAGE", "" ) );
 		
 		
-		TextStyleSheet titleStyle = new TextStyleSheet( new Font( "Serif", Font.BOLD, 32 ), Color.BLACK );
+		ElementStyleSheet titleStyle = DPText.styleSheet( new Font( "Serif", Font.BOLD, 32 ), Color.BLACK );
 		DPText title = new DPText( titleStyle, "Could Not Resolve Location" );
 		
-		VBoxStyleSheet errorBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.CENTRE, 10.0, false, 0.0 );
+		ElementStyleSheet errorBoxStyle = DPVBox.styleSheet( VTypesetting.NONE, HAlignment.CENTRE, 10.0, false, 0.0 );
 		DPVBox errorBox = new DPVBox( errorBoxStyle );
 		
-		TextStyleSheet locationStyle = new TextStyleSheet( new Font( "SansSerif", Font.PLAIN, 16 ), Color.BLACK );
-		TextStyleSheet errorStyle = new TextStyleSheet( new Font( "SansSerif", Font.PLAIN, 16 ), Color.BLACK );
+		ElementStyleSheet locationStyle = DPText.styleSheet( new Font( "Sans serif", Font.PLAIN, 16 ), Color.BLACK );
+		ElementStyleSheet errorStyle = DPText.styleSheet( new Font( "Sans serif", Font.PLAIN, 16 ), Color.BLACK );
 
 		DPText loc = new DPText( locationStyle, location );
 		DPText error = new DPText( errorStyle, "could not be resolved" );
@@ -227,22 +224,22 @@ public class Browser implements PageController
 	
 	private DPWidget createDefaultRootElement()
 	{
-		VBoxStyleSheet pageBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.EXPAND, 0.0, false, 0.0 );
+		ElementStyleSheet pageBoxStyle = DPVBox.styleSheet( VTypesetting.NONE, HAlignment.EXPAND, 0.0, false, 0.0 );
 		DPVBox pageBox = new DPVBox( pageBoxStyle );
 		
-		VBoxStyleSheet contentBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.EXPAND, 40.0, false, 0.0 );
+		ElementStyleSheet contentBoxStyle = DPVBox.styleSheet( VTypesetting.NONE, HAlignment.EXPAND, 40.0, false, 0.0 );
 		DPVBox contentBox = new DPVBox( contentBoxStyle );
 		
-		VBoxStyleSheet titleBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.CENTRE, 40.0, false, 0.0 );
+		ElementStyleSheet titleBoxStyle = DPVBox.styleSheet( VTypesetting.NONE, HAlignment.CENTRE, 40.0, false, 0.0 );
 		DPVBox titleBox = new DPVBox( titleBoxStyle );
 		
 
 		pageBox.append( SystemRootPage.createLinkHeader( SystemRootPage.LINKHEADER_SYSTEMPAGE ) );
 		
-		StaticTextStyleSheet titleStyle = new StaticTextStyleSheet( new Font( "Serif", Font.BOLD, 32 ), Color.BLACK );
+		ElementStyleSheet titleStyle = DPStaticText.styleSheet( new Font( "Serif", Font.BOLD, 32 ), Color.BLACK );
 		DPStaticText title = new DPStaticText( titleStyle, "Default root page" );
 		
-		StaticTextStyleSheet contentsStyle = new StaticTextStyleSheet( new Font( "SansSerif", Font.PLAIN, 16 ), Color.BLACK );
+		ElementStyleSheet contentsStyle = DPStaticText.styleSheet( new Font( "SansSerif", Font.PLAIN, 16 ), Color.BLACK );
 		DPStaticText contents = new DPStaticText( contentsStyle, "Empty document" );
 
 		titleBox.append( title );

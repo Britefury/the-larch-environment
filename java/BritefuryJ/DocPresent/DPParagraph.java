@@ -9,13 +9,17 @@ package BritefuryJ.DocPresent;
 
 import java.util.List;
 
-import BritefuryJ.DocPresent.Layout.BoxPackingParams;
+import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.LAllocBox;
 import BritefuryJ.DocPresent.Layout.LReqBox;
-import BritefuryJ.DocPresent.Layout.PackingParams;
 import BritefuryJ.DocPresent.Layout.ParagraphLayout;
 import BritefuryJ.DocPresent.Layout.VAlignment;
-import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
+import BritefuryJ.DocPresent.Layout.VTypesetting;
+import BritefuryJ.DocPresent.StyleSheets.ElementStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.ElementStyleSheetField;
+import BritefuryJ.DocPresent.StyleSheets.StyleSheetValueFieldDirect;
+import BritefuryJ.DocPresent.StyleSheets.StyleSheetValueFieldSet;
+import BritefuryJ.DocPresent.StyleSheets.StyleSheetValues;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 
@@ -23,6 +27,26 @@ import BritefuryJ.Math.Point2;
 
 public class DPParagraph extends DPContainerSequenceCollationRoot
 {
+	protected static ElementStyleSheetField xSpacingField = DPHBox.xSpacingField;
+	protected static ElementStyleSheetField vAlignmentField = DPHBox.vAlignmentField;
+	protected static ElementStyleSheetField paragraphIndentationField = ElementStyleSheetField.newField( "paragraphIndentation", Double.class );
+	protected static ElementStyleSheetField lineSpacingField = ElementStyleSheetField.newField( "lineSpacing", Double.class );
+	protected static ElementStyleSheetField hAlignmentField = DPVBox.hAlignmentField;
+	protected static ElementStyleSheetField vTypesettingField = DPVBox.vTypesettingField;
+	
+	protected static StyleSheetValueFieldDirect xSpacingValueField = DPHBox.xSpacingValueField;
+	protected static StyleSheetValueFieldDirect vAlignmentValueField = DPHBox.vAlignmentValueField;
+	protected static StyleSheetValueFieldDirect paragraphIndentationValueField = StyleSheetValueFieldDirect.newField( "paragraphIndentation", Double.class, 0.0, paragraphIndentationField );
+	protected static StyleSheetValueFieldDirect lineSpacingValueField = StyleSheetValueFieldDirect.newField( "lineSpacing", Double.class, 0.0, lineSpacingField );
+	protected static StyleSheetValueFieldDirect hAlignmentValueField = DPVBox.hAlignmentValueField;
+	protected static StyleSheetValueFieldDirect vTypesettingValueField = DPVBox.vTypesettingValueField;
+	
+	
+	protected static StyleSheetValueFieldSet useStyleSheetFields_Paragraph = useStyleSheetFields_Element.join( xSpacingValueField, vAlignmentValueField, paragraphIndentationValueField,
+			lineSpacingValueField, hAlignmentValueField, vTypesettingValueField );
+
+	
+	
 	public static class CouldNotFindInsertionPointException extends RuntimeException
 	{
 		private static final long serialVersionUID = 1L;
@@ -37,10 +61,10 @@ public class DPParagraph extends DPContainerSequenceCollationRoot
 	
 	public DPParagraph()
 	{
-		this( ParagraphStyleSheet.defaultStyleSheet );
+		this( null );
 	}
 
-	public DPParagraph(ParagraphStyleSheet styleSheet)
+	public DPParagraph(ElementStyleSheet styleSheet)
 	{
 		super( styleSheet );
 		
@@ -55,15 +79,15 @@ public class DPParagraph extends DPContainerSequenceCollationRoot
 	{
 		refreshCollation();
 		
-		LReqBox[] childBoxes = new LReqBox[collationLeaves.length];
-		BoxPackingParams[] packingParams = new BoxPackingParams[collationLeaves.length];
+		LReqBox childBoxes[] = new LReqBox[collationLeaves.length];
+		StyleSheetValues styleSheetValues[] = new StyleSheetValues[collationLeaves.length];
 		for (int i = 0; i < collationLeaves.length; i++)
 		{
 			childBoxes[i] = collationLeaves[i].refreshRequisitionX();
-			packingParams[i] = (BoxPackingParams)collationLeaves[i].getParentPacking();
+			styleSheetValues[i] = collationLeaves[i].styleSheetValues;
 		}
 
-		ParagraphLayout.computeRequisitionX( layoutReqBox, childBoxes, getIndentation(), getSpacing(), packingParams );
+		ParagraphLayout.computeRequisitionX( layoutReqBox, childBoxes, getIndentation(), getXSpacing(), styleSheetValues );
 	}
 
 	protected void updateRequisitionY()
@@ -73,7 +97,7 @@ public class DPParagraph extends DPContainerSequenceCollationRoot
 			child.refreshRequisitionY();
 		}
 
-		ParagraphLayout.computeRequisitionY( layoutReqBox, lines, getVSpacing(), getAlignment() );
+		ParagraphLayout.computeRequisitionY( layoutReqBox, lines, getLineSpacing(), getVAlignment() );
 	}
 	
 
@@ -85,9 +109,9 @@ public class DPParagraph extends DPContainerSequenceCollationRoot
 		LReqBox childBoxes[] = getCollatedChildrenRequisitionBoxes();
 		LAllocBox childAllocBoxes[] = getCollatedChildrenAllocationBoxes();
 		double prevWidths[] = getCollatedChildrenAllocationX();
-		BoxPackingParams packing[] = (BoxPackingParams[])getCollatedChildrenPackingParams( new BoxPackingParams[collationLeaves.length] );
+		StyleSheetValues styleSheetValues[] = getCollatedChildrenStyleSheetValues();
 		
-		lines = ParagraphLayout.allocateX( layoutReqBox, childBoxes, layoutAllocBox, childAllocBoxes, getIndentation(), getSpacing(), packing );
+		lines = ParagraphLayout.allocateX( layoutReqBox, childBoxes, layoutAllocBox, childAllocBoxes, getIndentation(), getXSpacing(), styleSheetValues );
 		
 		int i = 0;
 		for (DPWidget child: collationLeaves)
@@ -114,7 +138,7 @@ public class DPParagraph extends DPContainerSequenceCollationRoot
 			}
 		}
 		
-		ParagraphLayout.allocateY( layoutReqBox, layoutAllocBox, lines, getSpacing(), getAlignment() );
+		ParagraphLayout.allocateY( layoutReqBox, layoutAllocBox, lines, getLineSpacing(), getVAlignment() );
 		
 		for (int y = 0; y < lines.length; y++)
 		{
@@ -490,34 +514,54 @@ public class DPParagraph extends DPContainerSequenceCollationRoot
 	//
 	//
 
-	protected PackingParams getDefaultPackingParams()
+	protected StyleSheetValueFieldSet getUsedStyleSheetValueFields()
 	{
-		return ((ParagraphStyleSheet)styleSheet).getDefaultPackingParams();
+		return useStyleSheetFields_Paragraph;
 	}
 
-
-	public VAlignment getAlignment()
+	
+	protected VAlignment getVAlignment()
 	{
-		return ((ParagraphStyleSheet)styleSheet).getAlignment();
+		return (VAlignment)styleSheetValues.get( vAlignmentValueField );
+	}
+	
+	protected double getXSpacing()
+	{
+		return (Double)styleSheetValues.get( xSpacingValueField );
 	}
 
-	public double getSpacing()
+	
+	protected HAlignment getHAlignment()
 	{
-		return ((ParagraphStyleSheet)styleSheet).getSpacing();
+		return (HAlignment)styleSheetValues.get( hAlignmentValueField );
+	}
+	
+	protected VTypesetting getVTypesetting()
+	{
+		return (VTypesetting)styleSheetValues.get( vTypesettingValueField );
+	}
+	
+	protected double getLineSpacing()
+	{
+		return (Double)styleSheetValues.get( lineSpacingValueField );
 	}
 
-	public double getVSpacing()
-	{
-		return ((ParagraphStyleSheet)styleSheet).getVSpacing();
-	}
-
-	public double getPadding()
-	{
-		return ((ParagraphStyleSheet)styleSheet).getPadding();
-	}
-
+	
 	public double getIndentation()
 	{
-		return ((ParagraphStyleSheet)styleSheet).getIndentation();
+		return (Double)styleSheetValues.get( paragraphIndentationValueField );
+	}
+	
+	
+	
+	public static ElementStyleSheet styleSheet()
+	{
+		return styleSheet( VAlignment.BASELINES, 0.0, 0.0, 0.0, 0.0 );
+	}
+
+	public static ElementStyleSheet styleSheet(VAlignment alignment, double xSpacing, double ySpacing, double xPadding, double indentation)
+	{
+		return new ElementStyleSheet( new String[] { "vAlignment", "xSpacing", "ySpacing", "childPack_xPadding", "paragraphIndentation" },
+				new Object[] { alignment, xSpacing, ySpacing, xPadding, indentation } );
 	}
 }

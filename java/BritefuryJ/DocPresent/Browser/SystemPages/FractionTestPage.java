@@ -19,9 +19,7 @@ import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.Layout.VTypesetting;
-import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.ElementStyleSheet;
 
 public class FractionTestPage extends SystemPage
 {
@@ -36,7 +34,7 @@ public class FractionTestPage extends SystemPage
 		return "Fraction test";
 	}
 
-	protected DPWidget makeText(String text, TextStyleSheet styleSheet)
+	protected DPWidget makeText(String text, ElementStyleSheet styleSheet)
 	{
 		if ( text != null )
 		{
@@ -61,15 +59,15 @@ public class FractionTestPage extends SystemPage
 
 	protected DPWidget makeFractionLine(DPWidget num, DPWidget denom)
 	{
-		TextStyleSheet s1 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 10 ), Color.blue );
-		TextStyleSheet s2 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 24 ), Color.red );
+		ElementStyleSheet s1 = DPText.styleSheet( new Font( "Sans serif", Font.PLAIN, 10 ), Color.blue );
+		ElementStyleSheet s2 = DPText.styleSheet( new Font( "Sans serif", Font.PLAIN, 24 ), Color.red );
 		
 		DPWidget frac = makeFraction( num, denom );
 		
 		DPText labelA = new DPText( s1, "Label A yYgGjJpPqQ" );
 		DPText labelB = new DPText( s2, "Label B yYgGjJpPqQ" );
 		
-		HBoxStyleSheet boxs = new HBoxStyleSheet( VAlignment.BASELINES, 0.0, false, 0.0 );
+		ElementStyleSheet boxs = DPHBox.styleSheet( VAlignment.BASELINES, 0.0, false, 0.0 );
 		DPHBox box = new DPHBox( boxs );
 		box.append( labelA );
 		box.append( frac );
@@ -88,10 +86,10 @@ public class FractionTestPage extends SystemPage
 	
 	protected DPWidget createContents()
 	{
-		TextStyleSheet s0 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 16 ), new Color( 0.0f, 0.5f, 0.0f ) );
-		TextStyleSheet blackStyle = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 24 ), Color.black );
+		ElementStyleSheet s0 = DPText.styleSheet( new Font( "Sans serif", Font.PLAIN, 16 ), new Color( 0.0f, 0.5f, 0.0f ) );
+		ElementStyleSheet blackStyle = DPText.styleSheet( new Font( "Sans serif", Font.PLAIN, 24 ), Color.black );
 
-		VBoxStyleSheet boxs = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.LEFT, 10.0, false, 0.0 );
+		ElementStyleSheet boxs = DPVBox.styleSheet( VTypesetting.NONE, HAlignment.LEFT, 10.0, false, 0.0 );
 		DPVBox box = new DPVBox( boxs );
 		
 		box.append( makeFractionLine( makeText( "a", s0 ), makeText( "p", s0 ) ) );

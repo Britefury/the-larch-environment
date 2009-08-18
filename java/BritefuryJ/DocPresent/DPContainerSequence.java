@@ -16,7 +16,8 @@ import org.python.core.PySlice;
 import BritefuryJ.DocPresent.Layout.LAllocBox;
 import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Layout.PackingParams;
-import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.ElementStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.StyleSheetValues;
 import BritefuryJ.JythonInterface.JythonIndex;
 import BritefuryJ.JythonInterface.JythonSlice;
 
@@ -26,10 +27,10 @@ abstract public class DPContainerSequence extends DPContainer
 {
 	public DPContainerSequence()
 	{
-		this( ContainerStyleSheet.defaultStyleSheet );
+		this( null );
 	}
 
-	public DPContainerSequence(ContainerStyleSheet styleSheet)
+	public DPContainerSequence(ElementStyleSheet styleSheet)
 	{
 		super( styleSheet );
 	}
@@ -421,6 +422,17 @@ abstract public class DPContainerSequence extends DPContainer
 	
 	
 	
+	protected StyleSheetValues[] getChildrenStyleSheetValues(List<DPWidget> nodes)
+	{
+		StyleSheetValues values[] = new StyleSheetValues[nodes.size()];
+		for (int i = 0; i < nodes.size(); i++)
+		{
+			values[i] = nodes.get( i ).styleSheetValues;
+		}
+		return values;
+	}
+
+
 	
 	protected double[] getChildrenAllocationX(List<DPWidget> nodes)
 	{

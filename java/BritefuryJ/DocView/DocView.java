@@ -12,7 +12,7 @@ import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.VTypesetting;
-import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.ElementStyleSheet;
 import BritefuryJ.DocTree.DocTree;
 import BritefuryJ.DocTree.DocTreeNode;
 import BritefuryJ.Utils.Profile.ProfileTimer;
@@ -38,7 +38,7 @@ public class DocView implements DVNode.NodeRefreshListener
 	private boolean bProfilingEnabled;
 	private ProfileTimer pythonTimer, javaTimer, elementTimer, contentChangeTimer, updateNodeElementTimer;
 	
-	private static VBoxStyleSheet rootBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.EXPAND, 0.0, true, 0.0 );
+	private static ElementStyleSheet rootBoxStyle = DPVBox.styleSheet( VTypesetting.NONE, HAlignment.EXPAND, 0.0, true, 0.0 );
 	
 	
 	

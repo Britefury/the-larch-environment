@@ -12,31 +12,30 @@ import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Layout.TableLayout;
 import BritefuryJ.DocPresent.Layout.TablePackingParams;
 import BritefuryJ.DocPresent.Layout.VAlignment;
+import BritefuryJ.DocPresent.StyleSheets.ElementStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.StyleSheetValueFieldSet;
+import BritefuryJ.DocPresent.StyleSheets.StyleSheetValues;
 
 public class Test_TableLayout extends Test_Layout_base
 {
 	private TablePackingParams pack(int x, int y)
 	{
-		return new TablePackingParams( x, 1, 0.0, y, 1, 0.0 );
+		return new TablePackingParams( x, 1, y, 1 );
 	}
 	
 	private TablePackingParams pack(int x, int y, int colspan, int rowspan)
 	{
-		return new TablePackingParams( x, colspan, 0.0, y, rowspan, 0.0 );
+		return new TablePackingParams( x, colspan, y, rowspan );
 	}
 	
-	private TablePackingParams pack(int x, int y, double paddingX, double paddingY)
+	
+	
+	private StyleSheetValues packStyle(double xPadding, double yPadding)
 	{
-		return new TablePackingParams( x, 1, paddingX, y, 1, paddingY );
+		ElementStyleSheet elementSheet = new ElementStyleSheet( new String[] { "pack_xPadding", "pack_yPadding" }, new Object[] { xPadding, yPadding } );
+		return StyleSheetValues.cascade(  new StyleSheetValues(), elementSheet, new StyleSheetValueFieldSet() );
 	}
-	
-	private TablePackingParams pack(int x, int y, int colspan, int rowspan, double paddingX, double paddingY)
-	{
-		return new TablePackingParams( x, colspan, paddingX, y, rowspan, paddingY );
-	}
-	
-	
-	
+
 	
 	//
 	//
@@ -44,12 +43,12 @@ public class Test_TableLayout extends Test_Layout_base
 	//
 	//
 	
-	private void reqTest(LReqBox children[], TablePackingParams packingParams[], int numColumns, int numRows, double spacingX, double spacingY, boolean bExpandX, boolean bExpandY,
+	private void reqTest(LReqBox children[], StyleSheetValues styleSheetValues[], TablePackingParams packingParams[], int numColumns, int numRows, double spacingX, double spacingY, boolean bExpandX, boolean bExpandY,
 			HAlignment colAlignment, VAlignment rowAlignment, LReqBox expectedColumnBoxes[], LReqBox expectedRowBoxes[], LReqBox expectedParentBox)
 	{
 		LReqBox box = new LReqBox();
-		LReqBox columnBoxes[] = TableLayout.computeRequisitionX( box, children, packingParams, numColumns, numRows, spacingX, spacingY, bExpandX, bExpandY, colAlignment, rowAlignment );
-		LReqBox rowBoxes[] = TableLayout.computeRequisitionY( box, children, packingParams, numColumns, numRows, spacingX, spacingY, bExpandX, bExpandY, colAlignment, rowAlignment );
+		LReqBox columnBoxes[] = TableLayout.computeRequisitionX( box, children, styleSheetValues, packingParams, numColumns, numRows, spacingX, spacingY, bExpandX, bExpandY, colAlignment, rowAlignment );
+		LReqBox rowBoxes[] = TableLayout.computeRequisitionY( box, children, styleSheetValues, packingParams, numColumns, numRows, spacingX, spacingY, bExpandX, bExpandY, colAlignment, rowAlignment );
 		
 		for (int i = 0; i < numColumns; i++)
 		{
@@ -72,6 +71,7 @@ public class Test_TableLayout extends Test_Layout_base
 				new LReqBox[] {
 						box( 10, 0, 10, 0 ) ,
 				},
+				null,
 				new TablePackingParams[] {
 						pack( 0, 0 ),
 				},
@@ -92,6 +92,7 @@ public class Test_TableLayout extends Test_Layout_base
 						box( 10, 0, 10, 0 ),		box( 5, 0, 5, 0 ),
 						box( 15, 0, 2, 0 ),		box( 4, 0, 4, 0 ),
 				},
+				null,
 				new TablePackingParams[] {
 						pack( 0, 0 ),			pack( 1, 0 ),
 						pack( 0, 1 ),			pack( 1, 1 ),
@@ -114,6 +115,7 @@ public class Test_TableLayout extends Test_Layout_base
 						box( 10, 0, 10, 0 ),		box( 5, 0, 5, 0 ),
 						box( 15, 0, 2, 0 ),		box( 4, 0, 4, 0 ),
 				},
+				null,
 				new TablePackingParams[] {
 						pack( 0, 0 ),			pack( 1, 0 ),
 						pack( 0, 1 ),			pack( 1, 1 ),
@@ -139,6 +141,7 @@ public class Test_TableLayout extends Test_Layout_base
 						box( 15, 0, 2, 0 ),		box( 8, 0, 4, 0 ),		box( 10, 0, 4, 0 ),
 						box( 5, 0, 4, 0 ),		box( 6, 0, 8, 0 ),		box( 10, 0, 6, 0 ),
 				},
+				null,
 				new TablePackingParams[] {
 						pack( 0, 0 ),			pack( 1, 0 ),			pack( 2, 0 ),
 						pack( 0, 1 ),			pack( 1, 1 ),			pack( 2, 1 ),
@@ -165,6 +168,7 @@ public class Test_TableLayout extends Test_Layout_base
 						box( 15, 0, 2, 0 ),		box( 8, 0, 4, 0 ),		box( 10, 0, 4, 0 ),
 						box( 5, 0, 4, 0 ),		box( 6, 0, 8, 0 ),		box( 10, 0, 6, 0 ),
 				},
+				null,
 				new TablePackingParams[] {
 						pack( 0, 0 ),			pack( 1, 0 ),			pack( 2, 0 ),
 						pack( 0, 1 ),			pack( 1, 1 ),			pack( 2, 1 ),
@@ -192,6 +196,7 @@ public class Test_TableLayout extends Test_Layout_base
 						box( 15, 0, 2, 0 ),							box( 10, 0, 4, 0 ),
 						box( 5, 0, 4, 0 ),		box( 6, 0, 8, 0 ),		box( 10, 0, 6, 0 ),
 				},
+				null,
 				new TablePackingParams[] {
 						pack( 0, 0 ),			pack( 1, 0 ),			pack( 2, 0 ),
 						pack( 0, 1 ),								pack( 2, 1 ),
@@ -219,6 +224,7 @@ public class Test_TableLayout extends Test_Layout_base
 						box( 15, 0, 2, 0 ),		box( 40, 0, 6, 0 ),
 						box( 5, 0, 4, 0 ),		box( 10, 0, 8, 0 ),		box( 10, 0, 6, 0 ),
 				},
+				null,
 				new TablePackingParams[] {
 						pack( 0, 0 ),			pack( 1, 0 ),			pack( 2, 0 ),
 						pack( 0, 1 ),			pack( 1, 1, 2, 1 ),
@@ -246,6 +252,7 @@ public class Test_TableLayout extends Test_Layout_base
 						box( 15, 0, 2, 0 ),		box( 8, 0, 20, 0 ),		box( 10, 0, 4, 0 ),
 						box( 5, 0, 4, 0 ),							box( 10, 0, 6, 0 ),
 				},
+				null,
 				new TablePackingParams[] {
 						pack( 0, 0 ),			pack( 1, 0 ),			pack( 2, 0 ),
 						pack( 0, 1 ),			pack( 1, 1, 1, 2 ),		pack( 2, 1 ),
@@ -273,6 +280,7 @@ public class Test_TableLayout extends Test_Layout_base
 						box( 15, 0, 2, 0 ),		box( 35, 0, 20, 0 ),		
 						box( 5, 0, 4, 0 ),							
 				},
+				null,
 				new TablePackingParams[] {
 						pack( 0, 0 ),			pack( 1, 0 ),			pack( 2, 0 ),
 						pack( 0, 1 ),			pack( 1, 1, 2, 2 ),		
@@ -300,6 +308,7 @@ public class Test_TableLayout extends Test_Layout_base
 						box( 15, 0, 4, 4, 0 ),		box( 8, 0, 2, 6, 0 ),		box( 10, 0, 5, 2, 0 ),
 						box( 5, 0, 4, 0 ),		box( 6, 0, 8, 0 ),		box( 10, 0, 6, 0 ),
 				},
+				null,
 				new TablePackingParams[] {
 						pack( 0, 0 ),			pack( 1, 0 ),			pack( 2, 0 ),
 						pack( 0, 1 ),			pack( 1, 1 ),			pack( 2, 1 ),
@@ -328,7 +337,7 @@ public class Test_TableLayout extends Test_Layout_base
 	//
 	//
 	
-	private void allocTest(LReqBox children[], TablePackingParams packingParams[], int numColumns, int numRows, double spacingX, double spacingY, boolean bExpandX, boolean bExpandY,
+	private void allocTest(LReqBox children[], StyleSheetValues styleSheetValues[], TablePackingParams packingParams[], int numColumns, int numRows, double spacingX, double spacingY, boolean bExpandX, boolean bExpandY,
 			HAlignment colAlignment, VAlignment rowAlignment,
 			double allocX, double allocY, LAllocBox expectedChildAllocations[], LAllocBox expectedColAllocations[], LAllocBox expectedRowAllocations[])
 	{
@@ -342,7 +351,7 @@ public class Test_TableLayout extends Test_Layout_base
 		}
 		
 
-		LReqBox columnBoxes[] = TableLayout.computeRequisitionX( box, children, packingParams, numColumns, numRows, spacingX, spacingY, bExpandX, bExpandY, colAlignment, rowAlignment );
+		LReqBox columnBoxes[] = TableLayout.computeRequisitionX( box, children, styleSheetValues, packingParams, numColumns, numRows, spacingX, spacingY, bExpandX, bExpandY, colAlignment, rowAlignment );
 		LAllocBox columnAllocs[] = new LAllocBox[columnBoxes.length];
 		for (int i = 0; i < columnAllocs.length; i++)
 		{
@@ -350,9 +359,9 @@ public class Test_TableLayout extends Test_Layout_base
 		}
 		
 		boxAlloc.setAllocationX( allocX );
-		TableLayout.allocateX( box, columnBoxes, children, boxAlloc, columnAllocs, childrenAllocs, packingParams, numColumns, numRows, spacingX, spacingY, bExpandX, bExpandY, colAlignment, rowAlignment );
+		TableLayout.allocateX( box, columnBoxes, children, boxAlloc, columnAllocs, childrenAllocs, styleSheetValues, packingParams, numColumns, numRows, spacingX, spacingY, bExpandX, bExpandY, colAlignment, rowAlignment );
 
-		LReqBox rowBoxes[] = TableLayout.computeRequisitionY( box, children, packingParams, numColumns, numRows, spacingX, spacingY, bExpandX, bExpandY, colAlignment, rowAlignment);
+		LReqBox rowBoxes[] = TableLayout.computeRequisitionY( box, children, styleSheetValues, packingParams, numColumns, numRows, spacingX, spacingY, bExpandX, bExpandY, colAlignment, rowAlignment);
 		LAllocBox rowAllocs[] = new LAllocBox[rowBoxes.length];
 		for (int i = 0; i < rowAllocs.length; i++)
 		{
@@ -360,7 +369,7 @@ public class Test_TableLayout extends Test_Layout_base
 		}
 
 		boxAlloc.setAllocationY( allocY );
-		TableLayout.allocateY( box, rowBoxes, children, boxAlloc, rowAllocs, childrenAllocs, packingParams, numColumns, numRows, spacingX, spacingY, bExpandX, bExpandY, colAlignment, rowAlignment );
+		TableLayout.allocateY( box, rowBoxes, children, boxAlloc, rowAllocs, childrenAllocs, styleSheetValues, packingParams, numColumns, numRows, spacingX, spacingY, bExpandX, bExpandY, colAlignment, rowAlignment );
 		
 		
 		for (int i = 0; i < numColumns; i++)
@@ -388,6 +397,7 @@ public class Test_TableLayout extends Test_Layout_base
 				new LReqBox[] {
 						box( 10, 0, 10, 0 ) ,
 				},
+				null,
 				new TablePackingParams[] {
 						pack( 0, 0 ),
 				},
@@ -409,6 +419,7 @@ public class Test_TableLayout extends Test_Layout_base
 				new LReqBox[] {
 						box( 10, 0, 10, 0 ) ,
 				},
+				null,
 				new TablePackingParams[] {
 						pack( 0, 0 ),
 				},
@@ -430,6 +441,7 @@ public class Test_TableLayout extends Test_Layout_base
 				new LReqBox[] {
 						box( 10, 0, 10, 0 ) ,
 				},
+				null,
 				new TablePackingParams[] {
 						pack( 0, 0 ),
 				},
@@ -451,6 +463,7 @@ public class Test_TableLayout extends Test_Layout_base
 				new LReqBox[] {
 						box( 10, 0, 10, 0 ) ,
 				},
+				null,
 				new TablePackingParams[] {
 						pack( 0, 0 ),
 				},
@@ -472,6 +485,7 @@ public class Test_TableLayout extends Test_Layout_base
 				new LReqBox[] {
 						box( 10, 0, 10, 0 ) ,
 				},
+				null,
 				new TablePackingParams[] {
 						pack( 0, 0 ),
 				},
@@ -497,6 +511,7 @@ public class Test_TableLayout extends Test_Layout_base
 						box( 5, 0, 2, 0 ),		box( 4, 0, 5, 0 ),		box( 10, 0, 4, 0 ),
 						box( 5, 0, 2, 0 ),		box( 2, 0, 2, 0 ),		box( 10, 0, 5, 0 ),
 				},
+				null,
 				new TablePackingParams[] {
 						pack( 0, 0 ),			pack( 1, 0 ),			pack( 2, 0 ),
 						pack( 0, 1 ),			pack( 1, 1 ),			pack( 2, 1 ),
@@ -531,6 +546,7 @@ public class Test_TableLayout extends Test_Layout_base
 						box( 5, 0, 2, 0 ),		box( 4, 0, 5, 0 ),		box( 10, 0, 4, 0 ),
 						box( 5, 0, 2, 0 ),		box( 2, 0, 2, 0 ),		box( 10, 0, 5, 0 ),
 				},
+				null,
 				new TablePackingParams[] {
 						pack( 0, 0 ),			pack( 1, 0 ),			pack( 2, 0 ),
 						pack( 0, 1 ),			pack( 1, 1 ),			pack( 2, 1 ),
@@ -565,6 +581,7 @@ public class Test_TableLayout extends Test_Layout_base
 						box( 5, 0, 2, 0 ),		box( 4, 0, 5, 0 ),		box( 10, 0, 4, 0 ),
 						box( 5, 0, 2, 0 ),		box( 2, 0, 2, 0 ),		box( 10, 0, 5, 0 ),
 				},
+				null,
 				new TablePackingParams[] {
 						pack( 0, 0 ),			pack( 1, 0 ),			pack( 2, 0 ),
 						pack( 0, 1 ),			pack( 1, 1 ),			pack( 2, 1 ),
@@ -598,6 +615,7 @@ public class Test_TableLayout extends Test_Layout_base
 						box( 5, 0, 2, 0 ),		box( 4, 0, 5, 0 ),		box( 10, 0, 4, 0 ),
 						box( 5, 0, 2, 0 ),		box( 2, 0, 2, 0 ),		box( 10, 0, 5, 0 ),
 				},
+				null,
 				new TablePackingParams[] {
 						pack( 0, 0 ),			pack( 1, 0 ),			pack( 2, 0 ),
 						pack( 0, 1 ),			pack( 1, 1 ),			pack( 2, 1 ),
@@ -630,6 +648,7 @@ public class Test_TableLayout extends Test_Layout_base
 						box( 5, 0, 5, 0 ),		box( 5, 0, 5, 0 ),
 						box( 5, 0, 5, 0 ),		
 				},
+				null,
 				new TablePackingParams[] {
 						pack( 0, 0 ),			pack( 1, 0 ),			pack( 2, 0 ),
 						pack( 0, 1 ),			pack( 1, 1, 2, 2 ),
@@ -662,10 +681,15 @@ public class Test_TableLayout extends Test_Layout_base
 						box( 5, 0, 5, 0 ),		box( 5, 0, 5, 0 ),
 						box( 5, 0, 5, 0 ),		
 				},
+				new StyleSheetValues[] {
+						packStyle( 1.0, 1.0 ),		packStyle( 1.0, 1.0 ),		packStyle( 1.0, 1.0 ),
+						packStyle( 1.0, 1.0 ),		packStyle( 1.0, 1.0 ),
+						packStyle( 1.0, 1.0 ),
+				},
 				new TablePackingParams[] {
-						pack( 0, 0, 1.0, 1.0 ),	pack( 1, 0, 1.0, 1.0 ),	pack( 2, 0, 1.0, 1.0 ),
-						pack( 0, 1, 1.0, 1.0 ),	pack( 1, 1, 2, 2, 1.0, 1.0 ),
-						pack( 0, 2, 1.0, 1.0 ),			
+						pack( 0, 0 ),			pack( 1, 0 ),			pack( 2, 0 ),
+						pack( 0, 1 ),			pack( 1, 1, 2, 2 ),
+						pack( 0, 2 ),			
 				},
 				3, 3, 0.0, 0.0, true, true, HAlignment.EXPAND, VAlignment.EXPAND,
 				41, 41,

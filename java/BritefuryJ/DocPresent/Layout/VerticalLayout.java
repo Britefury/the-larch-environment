@@ -6,8 +6,24 @@
 //##************************
 package BritefuryJ.DocPresent.Layout;
 
+import BritefuryJ.DocPresent.StyleSheets.ElementStyleSheetField;
+import BritefuryJ.DocPresent.StyleSheets.StyleSheetValueFieldChildPack;
+import BritefuryJ.DocPresent.StyleSheets.StyleSheetValueFieldPack;
+import BritefuryJ.DocPresent.StyleSheets.StyleSheetValues;
+
 public class VerticalLayout
 {
+	public static ElementStyleSheetField childPack_yPaddingField = ElementStyleSheetField.newField( "childPack_yPadding", Double.class );
+	public static ElementStyleSheetField pack_yPaddingField = ElementStyleSheetField.newField( "pack_yPadding", Double.class );
+	public static ElementStyleSheetField childPack_yExpandField = ElementStyleSheetField.newField( "childPack_yExpand", Boolean.class );
+	public static ElementStyleSheetField pack_yExpandField = ElementStyleSheetField.newField( "pack_yExpand", Boolean.class );
+	
+	public static StyleSheetValueFieldChildPack childPack_yPaddingValueField = StyleSheetValueFieldChildPack.newField( "childPack_yPadding", Double.class, 0.0, childPack_yPaddingField );
+	public static StyleSheetValueFieldPack pack_yPaddingValueField = StyleSheetValueFieldPack.newField( "pack_yPadding", Double.class, 0.0, pack_yPaddingField, childPack_yPaddingValueField );
+	public static StyleSheetValueFieldChildPack childPack_yExpandValueField = StyleSheetValueFieldChildPack.newField( "childPack_yExpand", Boolean.class, false, childPack_yExpandField );
+	public static StyleSheetValueFieldPack pack_yExpandValueField = StyleSheetValueFieldPack.newField( "pack_yExpand", Boolean.class, false, pack_yExpandField, childPack_yExpandValueField );
+	
+	
 	private static void applyTypesettingToRequisitionY(LReqBox box, LReqBox children[], VTypesetting typesetting, double height, double vspacing)
 	{
 		if ( typesetting == VTypesetting.NONE )
@@ -69,7 +85,7 @@ public class VerticalLayout
 		box.setRequisitionX( minWidth, prefWidth, minAdvance - minWidth, prefAdvance - prefWidth );
 	}
 
-	public static void computeRequisitionY(LReqBox box, LReqBox children[], VTypesetting typesetting, double spacing, BoxPackingParams packingParams[])
+	public static void computeRequisitionY(LReqBox box, LReqBox children[], VTypesetting typesetting, double spacing, StyleSheetValues styleSheetValues[])
 	{
 		if ( children.length == 0 )
 		{
@@ -94,8 +110,7 @@ public class VerticalLayout
 			{
 				LReqBox chBox = children[i];
 				
-				BoxPackingParams params = packingParams != null  ?  packingParams[i]  :  null;
-				double padding = params != null  ?  params.padding  :  0.0;
+				double padding = styleSheetValues != null  ?  (Double)styleSheetValues[i].get( pack_yPaddingValueField )  :  0.0;
 				
 				double reqChildSpacing = Math.max( chBox.reqVSpacing - padding, 0.0 );
 				
@@ -150,22 +165,19 @@ public class VerticalLayout
 	
 	
 	
-	public static void allocateSpaceY(LReqBox box, LReqBox children[], LAllocBox allocBox, LAllocBox childrenAlloc[], BoxPackingParams packingParams[])
+	public static void allocateSpaceY(LReqBox box, LReqBox children[], LAllocBox allocBox, LAllocBox childrenAlloc[], StyleSheetValues styleSheetValues[])
 	{
 		int numExpand = 0;
 		
 		// Count the number of children that should expand to use additional space
-		if ( packingParams != null )
+		if ( styleSheetValues != null )
 		{
-			assert packingParams.length == children.length;
-			for (BoxPackingParams params: packingParams)
+			assert styleSheetValues.length == children.length;
+			for (StyleSheetValues v: styleSheetValues)
 			{
-				if ( params != null )
+				if ( (Boolean)v.get( pack_yExpandValueField ) )
 				{
-					if ( LReqBox.testPackFlagExpand( params.packFlags ) )
-					{
-						numExpand++;
-					}
+					numExpand++;
 				}
 			}
 		}
@@ -203,8 +215,8 @@ public class VerticalLayout
 				{
 					LReqBox child = children[i];
 					LAllocBox childAlloc = childrenAlloc[i];
-					BoxPackingParams params = packingParams != null  ?  packingParams[i]  :  null;
-					if ( params != null  &&  LReqBox.testPackFlagExpand( params.packFlags ) )
+					StyleSheetValues v = styleSheetValues != null  ?  styleSheetValues[i]  :  null;
+					if ( v != null  &&  (Boolean)v.get( pack_yExpandValueField ) )
 					{
 						allocBox.allocateChildSpaceY( childAlloc, child.getReqHeight() + expandPerChild );
 					}
@@ -229,7 +241,7 @@ public class VerticalLayout
 		}
 	}
 	
-	public static void allocateY(LReqBox box, LReqBox children[], LAllocBox allocBox, LAllocBox childrenAlloc[], double spacing, BoxPackingParams packingParams[])
+	public static void allocateY(LReqBox box, LReqBox children[], LAllocBox allocBox, LAllocBox childrenAlloc[], double spacing, StyleSheetValues styleSheetValues[])
 	{
 		// Each packed child consists of:
 		//	- start padding
@@ -239,7 +251,7 @@ public class VerticalLayout
 		
 		// There should be at least the specified amount of spacing between each child, or the child's own h-spacing if it is greater
 
-		allocateSpaceY( box, children, allocBox, childrenAlloc, packingParams );
+		allocateSpaceY( box, children, allocBox, childrenAlloc, styleSheetValues );
 		
 		double size = 0.0;
 		double pos = 0.0;
@@ -249,8 +261,7 @@ public class VerticalLayout
 			LAllocBox childAlloc = childrenAlloc[i];
 
 			// Get the padding
-			BoxPackingParams params = packingParams != null  ?  packingParams[i]  :  null;
-			double padding = params != null  ?  params.padding  :  0.0;
+			double padding = styleSheetValues != null  ?  (Double)styleSheetValues[i].get( pack_yPaddingValueField )  :  0.0;
 			
 			// Compute the spacing; padding consumes child spacing
 			double childSpacing = Math.max( child.reqVSpacing - padding, 0.0 );

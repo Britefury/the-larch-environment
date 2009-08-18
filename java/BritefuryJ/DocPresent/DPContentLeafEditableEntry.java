@@ -10,7 +10,7 @@ package BritefuryJ.DocPresent;
 import java.awt.event.KeyEvent;
 
 import BritefuryJ.DocPresent.Caret.Caret;
-import BritefuryJ.DocPresent.StyleSheets.ContentLeafStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.ElementStyleSheet;
 
 public abstract class DPContentLeafEditableEntry extends DPContentLeafEditable
 {
@@ -34,7 +34,7 @@ public abstract class DPContentLeafEditableEntry extends DPContentLeafEditable
 		super( textRepresentation );
 	}
 	
-	protected DPContentLeafEditableEntry(ContentLeafStyleSheet styleSheet, String textRepresentation)
+	protected DPContentLeafEditableEntry(ElementStyleSheet styleSheet, String textRepresentation)
 	{
 		super( styleSheet, textRepresentation );
 	}
