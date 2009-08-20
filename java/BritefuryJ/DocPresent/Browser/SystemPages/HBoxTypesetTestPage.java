@@ -16,7 +16,9 @@ import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.Layout.VTypesetting;
-import BritefuryJ.DocPresent.StyleSheets.ElementStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
 public class HBoxTypesetTestPage extends SystemPage
 {
@@ -34,7 +36,7 @@ public class HBoxTypesetTestPage extends SystemPage
 	
 	protected static DPText[] makeTexts(String header)
 	{
-		ElementStyleSheet t12 = DPText.styleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );
+		TextStyleSheet t12 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );
 		DPText t0 = new DPText( t12, "Hello" );
 		DPText t1 = new DPText( t12, "World" );
 		DPText t2 = new DPText( t12, "Foo" );
@@ -48,13 +50,13 @@ public class HBoxTypesetTestPage extends SystemPage
 	protected static DPHBox makeTypesetHBox(VTypesetting typesetting, String header)
 	{
 		DPText[] txt = makeTexts( header );
-		ElementStyleSheet vs = DPVBox.styleSheet( typesetting, HAlignment.LEFT, 0.0, false, 0.0 );
+		VBoxStyleSheet vs = new VBoxStyleSheet( typesetting, HAlignment.LEFT, 0.0, false, 0.0 );
 		DPVBox v = new DPVBox( vs );
 		v.extend( txt );
-		ElementStyleSheet t18 = DPText.styleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );
+		TextStyleSheet t18 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );
 		DPText before = new DPText( t18, header );
 		DPText after = new DPText( t18, " After" );
-		ElementStyleSheet ts = DPHBox.styleSheet( VAlignment.BASELINES, 0.0, false, 0.0 );
+		HBoxStyleSheet ts = new HBoxStyleSheet( VAlignment.BASELINES, 0.0, false, 0.0 );
 		DPHBox t = new DPHBox( ts );
 		t.append( before );
 		t.append( v );
@@ -69,7 +71,7 @@ public class HBoxTypesetTestPage extends SystemPage
 		DPHBox t1 = makeTypesetHBox( VTypesetting.ALIGN_WITH_TOP, "ALIGN_WITH_TOP" );
 		DPHBox t2 = makeTypesetHBox( VTypesetting.ALIGN_WITH_BOTTOM, "ALIGN_WITH_BOTTOM" );
 		
-		ElementStyleSheet boxs = DPVBox.styleSheet( VTypesetting.NONE, HAlignment.EXPAND, 20.0, false, 0.0 );
+		VBoxStyleSheet boxs = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.EXPAND, 20.0, false, 0.0 );
 		DPVBox box = new DPVBox( boxs );
 		box.append( t0 );
 		box.append( t1 );

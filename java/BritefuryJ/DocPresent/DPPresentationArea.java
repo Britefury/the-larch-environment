@@ -32,7 +32,6 @@ import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.WeakHashMap;
 
@@ -47,12 +46,13 @@ import javax.swing.event.ChangeListener;
 
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Caret.CaretListener;
-import BritefuryJ.DocPresent.Event.PointerButtonEvent;
-import BritefuryJ.DocPresent.Event.PointerMotionEvent;
-import BritefuryJ.DocPresent.Event.PointerScrollEvent;
+import BritefuryJ.DocPresent.Input.DndDropLocal;
+import BritefuryJ.DocPresent.Input.DndDropSwing;
 import BritefuryJ.DocPresent.Input.InputTable;
 import BritefuryJ.DocPresent.Input.Modifier;
 import BritefuryJ.DocPresent.Input.Pointer;
+import BritefuryJ.DocPresent.Input.PointerDndController;
+import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Input.PointerInterface;
 import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Marker.Marker;
@@ -70,7 +70,7 @@ import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
 
 
 
-public class DPPresentationArea extends DPFrame implements CaretListener, SelectionListener
+public class DPPresentationArea extends DPFrame implements CaretListener, SelectionListener, PointerDndController
 {
 	public static class CannotGetGraphics2DException extends RuntimeException
 	{
@@ -146,7 +146,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 			{
 				if ( drop != null )
 				{
-					drop.getSourceElement().dndHandler.exportDone( drop.getSourceElement(), data, action );
+					drop.getSourceElement().getDndHandler().exportDone( drop.getSourceElement(), data, action );
 				}
 				else
 				{
@@ -573,7 +573,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	
 	
 	
-	private HashMap<PointerInterface, DndDropLocal> dndTable;
+	//private HashMap<PointerInterface, DndDropLocal> dndTable;
 	
 	private Point2 windowTopLeftCornerInRootSpace;
 	private double rootScaleInWindowSpace;
@@ -614,20 +614,6 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	
 	
 	protected PageController pageController;
-	
-	
-	
-	
-	//
-	//
-	// WIDGET FIELDS AS DICTIONARY VALUES
-	//
-	//
-	
-	// These fields would normally be in the DPWidget class, but would be null/non-existant for the vast majority of elements,
-	// so store them in a global dictionary to save space
-	
-	protected WeakHashMap<DPWidget, ArrayList<PointerInterface>> pointersWithinBoundsByWidget;
 
 	
 	
@@ -636,10 +622,6 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	public DPPresentationArea()
 	{
 		super();
-		
-		pointersWithinBoundsByWidget = new WeakHashMap<DPWidget, ArrayList<PointerInterface>>();
-		
-		dndTable = new HashMap<PointerInterface, DndDropLocal>();
 		
 		presentationArea = this;
 		
@@ -652,8 +634,8 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 		
 		component = new ScrollablePresentationAreaComponent( this );
 
-		rootSpaceMouse = new Pointer();
-		inputTable = new InputTable( rootSpaceMouse );
+		inputTable = new InputTable( this, this );
+		rootSpaceMouse = inputTable.getMouse();
 		
 		stateKeyListeners = new WeakHashMap<StateKeyListener, Object>();
 		
@@ -1147,11 +1129,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 			bAllocationRequired = false;
 			
 			// Send motion events; pointer hasn't moved, but the widgets have
-			ArrayList<PointerInterface> pointersWithinBounds = getPointersWithinBounds();
-			if ( !dndTable.containsKey( rootSpaceMouse.concretePointer() )  &&  pointersWithinBounds != null  &&  pointersWithinBounds.contains( rootSpaceMouse.concretePointer() ) )
-			{
-				rootMotionEvent( new PointerMotionEvent( rootSpaceMouse, PointerMotionEvent.Action.MOTION ), null );
-			}			
+			inputTable.onRootElementReallocate();
 			long t2 = System.nanoTime();
 			System.out.println( "DPPresentationArea.performAllocation(): TYPESET TIME = " + (double)(t2-t1) * 1.0e-9  +  ", used memory = "  + ( Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory() ) );
 		}
@@ -1338,10 +1316,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 
 		if ( ( modifiers & Modifier.ALT )  ==  0 )
 		{
-			PointerButtonEvent event = new PointerButtonEvent( rootSpaceMouse, button, PointerButtonEvent.Action.DOWN );
-				
-			dndButtonDownEvent( event );
-			handleButtonDown( event );
+			rootSpaceMouse.buttonDown( rootPos, button );
 		}
 		else
 		{
@@ -1359,10 +1334,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 		rootSpaceMouse.setModifiers( modifiers );
 		if ( ( modifiers & Modifier.ALT )  ==  0 )
 		{
-			PointerButtonEvent event = new PointerButtonEvent( rootSpaceMouse, button, PointerButtonEvent.Action.UP );
-			
-			dndButtonUpEvent( event );
-			handleButtonUp( event );
+			rootSpaceMouse.buttonUp( rootPos, button );
 		}
 		
 		if ( dragButton != 0 )
@@ -1401,8 +1373,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 		
 		if ( dragButton == 0 )
 		{
-			PointerMotionEvent event = new PointerMotionEvent( rootSpaceMouse, PointerMotionEvent.Action.MOTION );
-			rootMotionEvent( event, mouseEvent );
+			rootSpaceMouse.motion( rootPos, mouseEvent );
 		}
 		else
 		{
@@ -1429,18 +1400,6 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 
 
 
-	protected void rootMotionEvent(PointerMotionEvent event, MouseEvent mouseEvent)
-	{
-		boolean bHandled = dndMotionEvent( event, mouseEvent );
-		
-		if ( !bHandled )
-		{
-			handleMotion( event );
-		}
-	}
-
-	
-
 	
 	protected void mouseEnterEvent(Point2 windowPos, int modifiers)
 	{
@@ -1450,8 +1409,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 		
 		if ( dragButton == 0 )
 		{
-			PointerMotionEvent event = new PointerMotionEvent( rootSpaceMouse, PointerMotionEvent.Action.ENTER );
-			handleEnter( event );
+			rootSpaceMouse.enter( rootPos );
 		}
 		
 		emitImmediateEvents();
@@ -1465,8 +1423,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 		
 		if ( dragButton == 0 )
 		{
-			PointerMotionEvent event = new PointerMotionEvent( rootSpaceMouse, PointerMotionEvent.Action.LEAVE );
-			handleLeave( event );
+			rootSpaceMouse.leave( rootPos );
 		}
 		
 		emitImmediateEvents();
@@ -1478,7 +1435,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 		Point2 rootPos = windowSpaceToRootSpace( windowPos );
 		rootSpaceMouse.setLocalPos( rootPos );
 		rootSpaceMouse.setModifiers( modifiers );
-		handleButtonDown2( new PointerButtonEvent( rootSpaceMouse, button, PointerButtonEvent.Action.DOWN2 ) );
+		rootSpaceMouse.buttonDown2( rootPos, button );
 	}
 
 
@@ -1487,7 +1444,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 		Point2 rootPos = windowSpaceToRootSpace( windowPos );
 		rootSpaceMouse.setLocalPos( rootPos );
 		rootSpaceMouse.setModifiers( modifiers );
-		handleButtonDown3( new PointerButtonEvent( rootSpaceMouse, button, PointerButtonEvent.Action.DOWN3 ) );
+		rootSpaceMouse.buttonDown3( rootPos, button );
 	}
 	
 	
@@ -1505,7 +1462,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 		}
 		else if ( ( modifiers & Modifier._KEYS_MASK )  !=  0 )
 		{
-			handleScroll( new PointerScrollEvent( rootSpaceMouse, 0, -wheelClicks ) );
+			rootSpaceMouse.scroll( 0, -wheelClicks );
 			emitImmediateEvents();
 		}
 		else
@@ -1751,111 +1708,35 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	}
 	
 	
-
-	private void dndButtonDownEvent(PointerButtonEvent event)
+	public void pointerDndInitiateDrag(Pointer pointer, DndDropLocal drop, MouseEvent mouseEvent, int requestedAction)
 	{
-		if ( !dndTable.containsKey( event.pointer.concretePointer() ) )
-		{
-			DPWidget sourceElement = getDndElement( event.pointer.getLocalPos() );
-			
-			if ( sourceElement != null )
-			{
-				DndDropLocal drag = new DndDropLocal( sourceElement, event.button );
-				
-				if ( drag != null )
-				{
-					dndTable.put( event.pointer.concretePointer(), drag );
-				}
-			}
-		}
-	}
-	
-	private boolean dndMotionEvent(PointerMotionEvent event, MouseEvent mouseEvent)
-	{
-		DndDropLocal drop = dndTable.get( event.pointer.concretePointer() );
-
-		if ( drop != null )
-		{
-			if ( !drop.bInProgress )
-			{
-				if ( mouseEvent != null )
-				{
-					drop.bInProgress = true;
-					int requestedAction = drop.sourceElement.dndHandler.getSourceRequestedAction( drop.sourceElement, event.pointer, drop.sourceButton );
-					Transferable transferable = drop.sourceElement.dndHandler.createTransferable( drop.sourceElement );
-					drop.initialise( transferable, requestedAction );
-					
-					if ( event.pointer.concretePointer()  ==  rootSpaceMouse )
-					{
-						PresentationAreaComponent.PresAreaTransferHandler xferHandler = getDndTransferHandler();
-						xferHandler.beginExportDnd( drop );
-						xferHandler.exportAsDrag( component.getPresentationComponent(), mouseEvent, requestedAction );
-						xferHandler.endExportDnd();
-					}
-					
-					setCursorDrag( event.pointer );
-				}
-			}
-			else
-			{
-				DPWidget targetElement = getDndElement( event.pointer.getLocalPos() );
-				if ( targetElement != null )
-				{
-					Point2 localPos = targetElement.getRootToLocalXform().transform( event.pointer.getLocalPos() );
-					drop.setTarget( targetElement, localPos );
-					targetElement.dndHandler.canDrop( targetElement, drop );
-				}
-			}
-			
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		PresentationAreaComponent.PresAreaTransferHandler xferHandler = getDndTransferHandler();
+		xferHandler.beginExportDnd( drop );
+		xferHandler.exportAsDrag( component.getPresentationComponent(), mouseEvent, requestedAction );
+		xferHandler.endExportDnd();
 	}
 
-	private boolean dndButtonUpEvent(PointerButtonEvent event)
+	public void pointerDndSetCursorDrag(Pointer pointer)
 	{
-		DndDropLocal drop = dndTable.get( event.pointer.concretePointer() );
-		
-		if ( drop != null )
-		{
-			DPWidget targetElement = getDndElement( event.pointer.getLocalPos() );
-			if ( targetElement != null )
-			{
-				Point2 localPos = targetElement.getRootToLocalXform().transform( event.pointer.getLocalPos() );
-				drop.setTarget( targetElement, localPos );
-				if ( targetElement.dndHandler.canDrop( targetElement, drop ) )
-				{
-					targetElement.dndHandler.acceptDrop( targetElement, drop );
-				}
-			}
-
-			drop.bInProgress = false;
-			dndTable.remove( event.pointer.concretePointer() );
-			setCursorArrow( event.pointer );
-			
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		setCursorDrag( pointer );
 	}
 	
-	
+	public void pointerDndSetCursorArrow(Pointer pointer)
+	{
+		setCursorArrow( pointer );
+	}
+
 	
 	private boolean swingDndCanImport(TransferHandler.TransferSupport transfer)
 	{
 		Point windowPos = transfer.getDropLocation().getDropPoint();
 		Point2 rootPos = windowSpaceToRootSpace( new Point2( windowPos.x, windowPos.y ) );
-		DPWidget targetElement = getDndElement( rootPos );
+		Point2 targetPos[] = new Point2[] { null };
+		PointerInputElement targetElement = getDndElement( rootPos, targetPos );
 		if ( targetElement != null )
 		{
-			Point2 targetPosition = targetElement.getRootToLocalXform().transform( rootPos );
-			DndDropSwing drop = new DndDropSwing( targetElement, targetPosition, transfer );
-			return targetElement.dndHandler.canDrop( targetElement, drop );
+			DndDropSwing drop = new DndDropSwing( targetElement, targetPos[0], transfer );
+			return targetElement.getDndHandler().canDrop( targetElement, drop );
 		}
 		else
 		{
@@ -1867,12 +1748,12 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	{
 		Point windowPos = transfer.getDropLocation().getDropPoint();
 		Point2 rootPos = windowSpaceToRootSpace( new Point2( windowPos.x, windowPos.y ) );
-		DPWidget targetElement = getDndElement( rootPos );
+		Point2 targetPos[] = new Point2[] { null };
+		PointerInputElement targetElement = getDndElement( rootPos, targetPos );
 		if ( targetElement != null )
 		{
-			Point2 targetPosition = targetElement.getRootToLocalXform().transform( rootPos );
-			DndDropSwing drop = new DndDropSwing( targetElement, targetPosition, transfer );
-			return targetElement.dndHandler.acceptDrop( targetElement, drop );
+			DndDropSwing drop = new DndDropSwing( targetElement, targetPos[0], transfer );
+			return targetElement.getDndHandler().acceptDrop( targetElement, drop );
 		}
 		else
 		{
@@ -1903,6 +1784,10 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 		return inputTable;
 	}
 	
+	public void elementUnrealised(DPWidget element)
+	{
+		inputTable.onElementUnrealised( element );
+	}
 	
 	
 	public Graphics2D getGraphics()

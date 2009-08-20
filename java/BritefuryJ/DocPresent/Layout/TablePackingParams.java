@@ -9,12 +9,15 @@ package BritefuryJ.DocPresent.Layout;
 public class TablePackingParams extends PackingParams
 {
 	public int x, y, colSpan, rowSpan;
+	public double paddingX, paddingY;
 	
-	public TablePackingParams(int x, int colSpan, int y, int rowSpan)
+	public TablePackingParams(int x, int colSpan, double paddingX, int y, int rowSpan, double paddingY)
 	{
 		this.x = x;
 		this.colSpan = colSpan;
+		this.paddingX = paddingX;
 		this.y = y;
 		this.rowSpan = rowSpan;
+		this.paddingY = paddingY;
 	}
 }

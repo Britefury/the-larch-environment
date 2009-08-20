@@ -15,6 +15,7 @@ import java.util.HashMap;
 import BritefuryJ.DocPresent.DPBin;
 import BritefuryJ.DocPresent.DPPresentationArea;
 import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
 import BritefuryJ.ParserHelpers.DebugNode;
@@ -26,9 +27,9 @@ public class ParseView
 	{
 		private ParseView parseView;
 		
-		public DPViewBin(ParseView parseView)
+		public DPViewBin(ContainerStyleSheet styleSheet, ParseView parseView)
 		{
-			super();
+			super( styleSheet );
 			
 			this.parseView = parseView;
 		}
@@ -137,7 +138,7 @@ public class ParseView
 		
 		area = new DPPresentationArea();
 		
-		bin = new DPViewBin( this );
+		bin = new DPViewBin( ContainerStyleSheet.defaultStyleSheet, this );
 		
 		nodeTable = new HashMap<DebugNode, NodeView>();
 		callEdges = new ArrayList<Edge>();

@@ -7,7 +7,7 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-import BritefuryJ.DocPresent.StyleSheets.ElementStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 
 public class DPLineBreak extends DPBin implements LineBreakInterface
 {
@@ -19,17 +19,17 @@ public class DPLineBreak extends DPBin implements LineBreakInterface
 		this( 0 );
 	}
 	
-	public DPLineBreak(ElementStyleSheet styleSheet)
+	public DPLineBreak(ContainerStyleSheet styleSheet)
 	{
 		this( styleSheet, 0 );
 	}
 	
 	public DPLineBreak(int lineBreakPriority)
 	{
-		this( null, lineBreakPriority );
+		this( ContainerStyleSheet.defaultStyleSheet, lineBreakPriority );
 	}
 	
-	public DPLineBreak(ElementStyleSheet styleSheet, int lineBreakPriority)
+	public DPLineBreak(ContainerStyleSheet styleSheet, int lineBreakPriority)
 	{
 		super( styleSheet );
 		this.lineBreakPriority = lineBreakPriority;

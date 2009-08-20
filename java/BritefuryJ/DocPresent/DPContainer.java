@@ -10,20 +10,17 @@ package BritefuryJ.DocPresent;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import BritefuryJ.DocPresent.Border.EmptyBorder;
-import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
-import BritefuryJ.DocPresent.Event.PointerScrollEvent;
-import BritefuryJ.DocPresent.Input.PointerInterface;
+import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.PackingParams;
 import BritefuryJ.DocPresent.Layout.VTypesetting;
 import BritefuryJ.DocPresent.Marker.Marker;
-import BritefuryJ.DocPresent.StyleSheets.ElementStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
@@ -66,9 +63,6 @@ public abstract class DPContainer extends DPWidget
 	
 	
 	protected ArrayList<DPWidget> registeredChildren;
-	protected DPWidget pressGrabChild;
-	protected int pressGrabButton;
-	protected HashMap<PointerInterface, DPWidget> pointerChildTable;
 	public String cachedTextRep;
 	
 	
@@ -80,10 +74,10 @@ public abstract class DPContainer extends DPWidget
 	
 	public DPContainer()
 	{
-		this( null );
+		this( ContainerStyleSheet.defaultStyleSheet );
 	}
 
-	public DPContainer(ElementStyleSheet styleSheet)
+	public DPContainer(ContainerStyleSheet styleSheet)
 	{
 		super( styleSheet );
 		
@@ -129,24 +123,6 @@ public abstract class DPContainer extends DPWidget
 	
 	protected void unregisterChild(DPWidget child)
 	{
-		if ( pressGrabChild == child )
-		{
-			pressGrabChild = null;
-			pressGrabButton = -1;
-		}
-		
-		if ( pointerChildTable != null )
-		{
-			
-			for (Map.Entry<PointerInterface, DPWidget> e: pointerChildTable.entrySet())
-			{
-				if ( e.getValue() == child )
-				{
-					pointerChildTable.remove( e.getKey() );
-				}
-			}
-		}
-
 		if ( isRealised() )
 		{
 			child.handleUnrealise( child );
@@ -170,10 +146,7 @@ public abstract class DPContainer extends DPWidget
 	}
 	
 	
-	protected PackingParams getDefaultPackingParams()
-	{
-		return null;
-	}
+	protected abstract PackingParams getDefaultPackingParams();
 	
 	
 	
@@ -300,10 +273,24 @@ public abstract class DPContainer extends DPWidget
 	
 	
 	
-	protected DPWidget getChildAtLocalPoint(Point2 localPos)
+	protected DPWidget getFirstChildAtLocalPoint(Point2 localPos)
 	{
 		for (DPWidget child: registeredChildren)
 		{
+			if ( child.containsParentSpacePoint( localPos ) )
+			{
+				return child;
+			}
+		}
+		
+		return null;
+	}
+	
+	protected DPWidget getLastChildAtLocalPoint(Point2 localPos)
+	{
+		for (int i = registeredChildren.size() - 1; i >= 0; i--)
+		{
+			DPWidget child = registeredChildren.get( i );
 			if ( child.containsParentSpacePoint( localPos ) )
 			{
 				return child;
@@ -322,20 +309,28 @@ public abstract class DPContainer extends DPWidget
 	//
 	//
 	
-	protected DPWidget getDndElement(Point2 localPos)
+	public PointerInputElement getDndElement(Point2 localPos, Point2 targetPos[])
 	{
-		DPWidget child = getChildAtLocalPoint( localPos );
+		DPWidget child = getFirstChildAtLocalPoint( localPos );
 		if ( child != null )
 		{
-			DPWidget element = child.getDndElement( child.getParentToLocalXform().transform( localPos ) );
+			PointerInputElement element = child.getDndElement( child.getParentToLocalXform().transform( localPos ), targetPos );
 			if ( element != null )
 			{
+				if ( targetPos != null )
+				{
+					targetPos[0] = child.getLocalToParentXform().transform( targetPos[0] );
+				}
 				return element;
 			}
 		}
 		
 		if ( dndHandler != null )
 		{
+			if ( targetPos != null )
+			{
+				targetPos[0] = localPos;
+			}
 			return this;
 		}
 		else
@@ -354,212 +349,6 @@ public abstract class DPContainer extends DPWidget
 	// Regular events
 	//
 	
-	protected boolean handleButtonDown(PointerButtonEvent event)
-	{
-		if ( pressGrabChild == null )
-		{
-			DPWidget child = getChildAtLocalPoint( event.pointer.getLocalPos() );
-			if ( child != null )
-			{
-				boolean bHandled = child.handleButtonDown( event.transformed( child.getParentToLocalXform() ) );
-				if ( bHandled  &&  isRealised() )
-				{
-					pressGrabChild = child;
-					pressGrabButton = event.button;
-					return true;
-				}
-			}
-			
-			if ( pressGrabChild == null )
-			{
-				return onButtonDown( event );
-			}
-			else
-			{
-				return false;
-			}
-		}
-		else
-		{
-			return pressGrabChild.handleButtonDown( event.transformed( pressGrabChild.getParentToLocalXform() ) );
-		}
-	}
-	
-	protected boolean handleButtonDown2(PointerButtonEvent event)
-	{
-		if ( pressGrabChild != null )
-		{
-			return pressGrabChild.handleButtonDown2( event.transformed( pressGrabChild.getParentToLocalXform() ) );
-		}
-		else
-		{
-			return onButtonDown2( event );
-		}
-	}
-	
-	protected boolean handleButtonDown3(PointerButtonEvent event)
-	{
-		if ( pressGrabChild != null )
-		{
-			return pressGrabChild.handleButtonDown3( event.transformed( pressGrabChild.getParentToLocalXform() ) );
-		}
-		else
-		{
-			return onButtonDown3( event );
-		}
-	}
-	
-	protected boolean handleButtonUp(PointerButtonEvent event)
-	{
-		if ( pressGrabChild != null )
-		{
-			PointerButtonEvent childSpaceEvent = event.transformed( pressGrabChild.getParentToLocalXform() );
-			if ( event.button == pressGrabButton )
-			{
-				pressGrabButton = 0;
-				Point2 localPos = event.pointer.getLocalPos();
-				if ( !pressGrabChild.containsParentSpacePoint( localPos ) )
-				{
-					pressGrabChild.handleLeave( new PointerMotionEvent( childSpaceEvent.pointer, PointerMotionEvent.Action.LEAVE ) );
-				}
-				
-				boolean bHandled = pressGrabChild.handleButtonUp( childSpaceEvent );
-				DPWidget savedPressGrabChild = pressGrabChild;
-				pressGrabChild = null;
-				
-				if ( isRealised()  &&  localPos.x >= 0.0  &&  localPos.x <= getAllocationX()  &&  localPos.y >= 0.0  &&  localPos.y <= getAllocationY() )
-				{
-					DPWidget child = getChildAtLocalPoint( localPos );
-					if ( child != null )
-					{
-						if ( child != savedPressGrabChild )
-						{
-							child.handleEnter( new PointerMotionEvent( childSpaceEvent.pointer, PointerMotionEvent.Action.ENTER ) );
-						}
-						putChildForPointer( event.pointer.concretePointer(), child );
-					}
-					else
-					{
-						removeChildForPointer( event.pointer.concretePointer() );
-						onEnter( new PointerMotionEvent( event.pointer, PointerMotionEvent.Action.ENTER ) );
-					}
-				}
-				
-				return bHandled;
-			}
-			else
-			{
-				return pressGrabChild.handleButtonUp( childSpaceEvent );
-			}
-		}
-		else
-		{
-			return onButtonUp( event );
-		}
-	}
-
-
-	protected void handleMotion(PointerMotionEvent event)
-	{
-		if ( pressGrabChild != null )
-		{
-			pressGrabChild.handleMotion( event.transformed( pressGrabChild.getParentToLocalXform() ) );
-		}
-		else
-		{
-			DPWidget pointerChild = getChildForPointer( event.pointer.concretePointer() );
-			DPWidget oldPointerChild = pointerChild;
-			
-			if ( pointerChild != null )
-			{
-				if ( !pointerChild.containsParentSpacePoint( event.pointer.getLocalPos() ) )
-				{
-					pointerChild.handleLeave( new PointerMotionEvent( event.pointer.transformed( pointerChild.getParentToLocalXform() ), PointerMotionEvent.Action.LEAVE ) );
-					removeChildForPointer( event.pointer.concretePointer() );
-					pointerChild = null;
-				}
-				else
-				{
-					pointerChild.handleMotion( event.transformed( pointerChild.getParentToLocalXform() ) );
-				}
-			}
-			
-			if ( pointerChild == null )
-			{
-				DPWidget child = getChildAtLocalPoint( event.pointer.getLocalPos() );
-				if ( child != null )
-				{
-					child.handleEnter( event.transformed( child.getParentToLocalXform() ) );
-					pointerChild = child;
-					putChildForPointer( event.pointer.concretePointer(), pointerChild );
-				}
-			}
-			
-			if ( oldPointerChild == null  &&  pointerChild != null )
-			{
-				onLeaveIntoChild( new PointerMotionEvent( event.pointer, PointerMotionEvent.Action.LEAVE ), pointerChild );
-			}
-			else if ( oldPointerChild != null  &&  pointerChild == null )
-			{
-				onEnterFromChild( new PointerMotionEvent( event.pointer, PointerMotionEvent.Action.ENTER ), oldPointerChild );
-			}
-		}
-		
-		super.handleMotion( event );
-	}
-	
-	protected void handleEnter(PointerMotionEvent event)
-	{
-		super.handleEnter( event );
-		
-		Point2 localPos = event.pointer.getLocalPos();
-		
-		for (int i = registeredChildren.size() - 1; i >= 0; i--)
-		{
-			DPWidget child = registeredChildren.get( i );
-			if ( child.containsParentSpacePoint( localPos ) )
-			{
-				child.handleEnter( event.transformed( child.getParentToLocalXform() ) );
-				putChildForPointer( event.pointer.concretePointer(), child );
-				onLeaveIntoChild( new PointerMotionEvent( event.pointer, PointerMotionEvent.Action.LEAVE ), child );
-				break;
-			}
-		}
-	}
-	
-	protected void handleLeave(PointerMotionEvent event)
-	{
-		if ( pressGrabChild == null )
-		{
-			DPWidget pointerChild = getChildForPointer( event.pointer.concretePointer() );
-			if ( pointerChild != null )
-			{
-				pointerChild.handleLeave( event.transformed( pointerChild.getParentToLocalXform() ) );
-				onEnterFromChild( new PointerMotionEvent( event.pointer, PointerMotionEvent.Action.ENTER ), pointerChild );
-				removeChildForPointer( event.pointer.concretePointer() );
-			}
-		}
-
-		super.handleLeave( event );
-	}
-	
-	
-	
-	protected boolean handleScroll(PointerScrollEvent event)
-	{
-		DPWidget pointerChild = getChildForPointer( event.pointer.concretePointer() );
-		if ( pressGrabChild != null )
-		{
-			pressGrabChild.handleScroll( event.transformed( pressGrabChild.getParentToLocalXform() ) );
-		}
-		else if ( pointerChild != null )
-		{
-			pointerChild.handleScroll( event.transformed( pointerChild.getParentToLocalXform() ) );
-		}
-		return onScroll( event );
-	}
-	
-	
 	
 	protected void handleRealise()
 	{
@@ -572,11 +361,6 @@ public abstract class DPContainer extends DPWidget
 	
 	protected void handleUnrealise(DPWidget unrealiseRoot)
 	{
-		if ( pressGrabChild != null )
-		{
-			pressGrabChild = null;
-			pressGrabButton = -1;
-		}
 		for (DPWidget child: registeredChildren)
 		{
 			child.handleUnrealise( unrealiseRoot );
@@ -1184,49 +968,6 @@ public abstract class DPContainer extends DPWidget
 	
 	//
 	//
-	// PRIVATE ACCESSOR METHODS FOR @pointerChildTable AND @pointerDndChildTable
-	//
-	//
-	
-	private DPWidget getChildForPointer(PointerInterface pointer)
-	{
-		if ( pointerChildTable != null )
-		{
-			return pointerChildTable.get( pointer );
-		}
-		else
-		{
-			return null;
-		}
-	}
-	
-	private void putChildForPointer(PointerInterface pointer, DPWidget child)
-	{
-		if ( pointerChildTable == null )
-		{
-			pointerChildTable = new HashMap<PointerInterface, DPWidget>();
-		}
-		pointerChildTable.put( pointer, child );
-	}
-	
-	private void removeChildForPointer(PointerInterface pointer)
-	{
-		if ( pointerChildTable != null )
-		{
-			pointerChildTable.remove( pointer );
-			if ( pointerChildTable.size() == 0 )
-			{
-				pointerChildTable = null;
-			}
-		}
-	}
-
-	
-
-	
-	
-	//
-	//
 	// TEXT REPRESENTATION METHODS
 	//
 	//
@@ -1556,7 +1297,7 @@ public abstract class DPContainer extends DPWidget
 	//
 	
 	static EmptyBorder metaIndentBorder = new EmptyBorder( 25.0, 0.0, 0.0, 0.0 );
-	static ElementStyleSheet metaVBoxStyle = DPVBox.styleSheet( VTypesetting.ALIGN_WITH_BOTTOM, HAlignment.LEFT, 0.0, false, 0.0 );
+	static VBoxStyleSheet metaVBoxStyle = new VBoxStyleSheet( VTypesetting.ALIGN_WITH_BOTTOM, HAlignment.LEFT, 0.0, false, 0.0 );
 	
 	public DPBorder getMetaHeaderBorderWidget()
 	{
@@ -1626,5 +1367,20 @@ public abstract class DPContainer extends DPWidget
 			}
 		}
 		super.shutdownMetaElement();
+	}
+
+	
+	
+	
+	
+	//
+	//
+	// STYLESHEET METHODS
+	//
+	//
+	
+	protected ContainerStyleSheet getStyleSheet()
+	{
+		return (ContainerStyleSheet)styleSheet;
 	}
 }

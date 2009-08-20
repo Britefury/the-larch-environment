@@ -6,7 +6,6 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-import BritefuryJ.DocPresent.StyleSheets.ElementStyleSheet;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
@@ -20,12 +19,7 @@ public abstract class DPContainerCollateable extends DPContainer implements Coll
 	
 	public DPContainerCollateable()
 	{
-		this( null );
-	}
-
-	public DPContainerCollateable(ElementStyleSheet styleSheet)
-	{
-		super(styleSheet);
+		super();
 		
 		layoutReqBox = null;
 		layoutAllocBox = null;
@@ -93,7 +87,22 @@ public abstract class DPContainerCollateable extends DPContainer implements Coll
 
 	
 	
-	protected boolean containsParentSpacePoint(Point2 p)
+	public boolean containsParentSpacePoint(Point2 p)
+	{
+		refreshBoundsBoxes();
+		
+		for (AABox2 box: boundsBoxes)
+		{
+			if ( box.containsPoint( p ) )
+			{
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	public boolean containsLocalSpacePoint(Point2 p)
 	{
 		refreshBoundsBoxes();
 		

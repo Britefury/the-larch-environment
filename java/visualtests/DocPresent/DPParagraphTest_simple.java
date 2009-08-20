@@ -24,14 +24,16 @@ import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.Layout.VTypesetting;
-import BritefuryJ.DocPresent.StyleSheets.ElementStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
 public class DPParagraphTest_simple
 {
 	protected static ArrayList<DPWidget> makeTexts(String header)
 	{
-		ElementStyleSheet t12 = DPText.styleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );
-		ElementStyleSheet t18 = DPText.styleSheet( new Font( "Sans serif", Font.BOLD, 18 ), Color.BLACK );
+		TextStyleSheet t12 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );
+		TextStyleSheet t18 = new TextStyleSheet( new Font( "Sans serif", Font.BOLD, 18 ), Color.BLACK );
 		DPText h = new DPText( t18, header );
 		DPText t0 = new DPText( t12, "Hello" );
 		DPText t1 = new DPText( t12, "World" );
@@ -60,30 +62,29 @@ public class DPParagraphTest_simple
 		return nodesOut;
 	}
 	
-	public static void main(final String[] args)
-	{
+	public static void main(final String[] args) {
 		JFrame frame = new JFrame( "Flow; simple test" );
-		
+
 		//This stops the app on window close.
 		frame.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
-		
+
 		DPPresentationArea area = new DPPresentationArea();
-		     
-		     
+	     
+	     
 		ArrayList<DPWidget> c0 = makeTexts( "UNINDENTED" );
 		c0 = addLineBreaks( c0, 1 );
 		ArrayList<DPWidget> c1 = makeTexts( "INDENTED" );
 		c1 = addLineBreaks( c1, 1 );
 		
-		ElementStyleSheet b0s = DPParagraph.styleSheet( VAlignment.BASELINES, 10.0, 0.0, 0.0, 0.0 );
+		ParagraphStyleSheet b0s = new ParagraphStyleSheet( VAlignment.BASELINES, 10.0, 0.0, 0.0, 0.0 );
 		DPParagraph b0 = new DPParagraph( b0s );
 		b0.extend( c0 );
 		
-		ElementStyleSheet b1s = DPParagraph.styleSheet( VAlignment.BASELINES, 10.0, 0.0, 0.0, 30.0 );
+		ParagraphStyleSheet b1s = new ParagraphStyleSheet( VAlignment.BASELINES, 10.0, 0.0, 0.0, 30.0 );
 		DPParagraph b1 = new DPParagraph( b1s );
 		b1.extend( c1 );
 		
-		ElementStyleSheet boxS = DPVBox.styleSheet( VTypesetting.NONE, HAlignment.EXPAND, 20.0, false, 0.0 );
+		VBoxStyleSheet boxS = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.EXPAND, 20.0, false, 0.0 );
 		DPVBox box = new DPVBox( boxS );
 		box.append( b0 );
 		box.append( b1 );

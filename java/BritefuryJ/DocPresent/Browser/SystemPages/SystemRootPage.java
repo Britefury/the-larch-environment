@@ -18,7 +18,9 @@ import BritefuryJ.DocPresent.Browser.Page;
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.Layout.VTypesetting;
-import BritefuryJ.DocPresent.StyleSheets.ElementStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.StaticTextStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
 public class SystemRootPage extends Page
 {
@@ -31,16 +33,16 @@ public class SystemRootPage extends Page
 	
 	public DPWidget getContentsElement()
 	{
-		ElementStyleSheet pageBoxStyle = DPVBox.styleSheet( VTypesetting.NONE, HAlignment.EXPAND, 40.0, false, 0.0 );
+		VBoxStyleSheet pageBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.EXPAND, 40.0, false, 0.0 );
 		DPVBox pageBox = new DPVBox( pageBoxStyle );
 		
-		ElementStyleSheet headBoxStyle = DPVBox.styleSheet( VTypesetting.NONE, HAlignment.EXPAND, 0.0, false, 0.0 );
+		VBoxStyleSheet headBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.EXPAND, 0.0, false, 0.0 );
 		DPVBox headBox = new DPVBox( headBoxStyle );
 		
-		ElementStyleSheet titleBoxStyle = DPVBox.styleSheet( VTypesetting.NONE, HAlignment.CENTRE, 0.0, false, 0.0 );
+		VBoxStyleSheet titleBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.CENTRE, 0.0, false, 0.0 );
 		DPVBox titleBox = new DPVBox( titleBoxStyle );
 		
-		ElementStyleSheet titleStyle = DPStaticText.styleSheet( new Font( "Serif", Font.BOLD, 32 ), Color.BLACK );
+		StaticTextStyleSheet titleStyle = new StaticTextStyleSheet( new Font( "Serif", Font.BOLD, 32 ), Color.BLACK );
 		DPStaticText title = new DPStaticText( titleStyle, "gSym System Page" );
 		titleBox.append( title );
 		
@@ -56,10 +58,10 @@ public class SystemRootPage extends Page
 	
 	protected DPWidget createContents()
 	{
-		ElementStyleSheet contentsBoxStyle = DPVBox.styleSheet( VTypesetting.NONE, HAlignment.LEFT, 0.0, false, 0.0 );
+		VBoxStyleSheet contentsBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.LEFT, 0.0, false, 0.0 );
 		DPVBox contentsBox = new DPVBox( contentsBoxStyle );
 		
-		ElementStyleSheet titleStyle = DPStaticText.styleSheet( new Font( "Serif", Font.BOLD, 18 ), Color.BLACK );
+		StaticTextStyleSheet titleStyle = new StaticTextStyleSheet( new Font( "Serif", Font.BOLD, 18 ), Color.BLACK );
 		DPStaticText title = new DPStaticText( titleStyle, "Tests:" );
 		contentsBox.append( title );
 		
@@ -85,8 +87,8 @@ public class SystemRootPage extends Page
 	
 	public static DPWidget createLinkHeader(int linkHeaderFlags)
 	{
-		ElementStyleSheet linkVBoxStyle = DPVBox.styleSheet( VTypesetting.NONE, HAlignment.RIGHT, 0.0, false, 10.0 );
-		ElementStyleSheet linkHBoxStyle = DPHBox.styleSheet( VAlignment.BASELINES, 0.0, false, 10.0 );
+		VBoxStyleSheet linkVBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.RIGHT, 0.0, false, 10.0 );
+		HBoxStyleSheet linkHBoxStyle = new HBoxStyleSheet( VAlignment.BASELINES, 0.0, false, 10.0 );
 		DPVBox linkVBox = new DPVBox( linkVBoxStyle );
 		DPHBox linkHBox = new DPHBox( linkHBoxStyle );
 		

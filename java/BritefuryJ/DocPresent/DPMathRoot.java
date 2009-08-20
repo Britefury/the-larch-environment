@@ -7,95 +7,29 @@
 package BritefuryJ.DocPresent;
 
 import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.Stroke;
-import java.awt.font.FontRenderContext;
-import java.awt.font.LineMetrics;
 import java.awt.geom.Path2D;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
-import javax.swing.JComponent;
-
 import BritefuryJ.DocPresent.Layout.PackingParams;
-import BritefuryJ.DocPresent.StyleSheets.ElementStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.ElementStyleSheetField;
-import BritefuryJ.DocPresent.StyleSheets.StyleSheetValueFieldCascading;
-import BritefuryJ.DocPresent.StyleSheets.StyleSheetValueFieldDirect;
-import BritefuryJ.DocPresent.StyleSheets.StyleSheetValueFieldSet;
-import BritefuryJ.DocPresent.StyleSheets.StyleSheetValues;
+import BritefuryJ.DocPresent.StyleSheets.MathRootStyleSheet;
 import BritefuryJ.Math.Point2;
 
 public class DPMathRoot extends DPContainer
 {
-	private static class GlyphMetrics
-	{
-		protected StyleSheetValues styleSheetValues;
-		protected double glyphLineWidths[], glyphWidth, barSpacing;
-
-		
-		
-		public GlyphMetrics(StyleSheetValues styleSheetValues, DPPresentationArea a)
-		{
-			this( styleSheetValues, a.getComponent() );
-		}
-		
-		public GlyphMetrics(StyleSheetValues styleSheetValues, JComponent component)
-		{
-			this( styleSheetValues, (Graphics2D)component.getGraphics() );
-		}
-		
-		public GlyphMetrics(StyleSheetValues styleSheetValues, Graphics2D graphics)
-		{
-			this.styleSheetValues = styleSheetValues;
-			
-			FontRenderContext frc = graphics.getFontRenderContext();
-			LineMetrics metrics = ((Font)styleSheetValues.get( DPMathRoot.fontValueField )).getLineMetrics( " ", frc );
-			double height = metrics.getAscent() + metrics.getDescent();
-			
-			glyphLineWidths = new double[3];
-			barSpacing = height * 0.1;
-			glyphLineWidths[2] = height * 0.5;
-			glyphLineWidths[1] = glyphLineWidths[2] * 0.4;
-			glyphLineWidths[0] = glyphLineWidths[2] * 0.3;
-			glyphWidth = glyphLineWidths[0] + glyphLineWidths[1] + glyphLineWidths[2];
-		}
-	}
-	
-	
-	
-	protected static ElementStyleSheetField fontField = DPStaticText.fontField;
-	protected static ElementStyleSheetField paintField = ElementStyleSheetField.newField( "mathRootPaint", Paint.class );
-	protected static ElementStyleSheetField thicknessField = ElementStyleSheetField.newField( "mathRootThickness", Double.class );
-	
-	protected static StyleSheetValueFieldCascading fontValueField = DPStaticText.fontValueField;
-	protected static StyleSheetValueFieldDirect paintValueField = StyleSheetValueFieldDirect.newField( "mathRootPaint", Paint.class, Color.black, paintField );
-	protected static StyleSheetValueFieldDirect thicknessValueField = StyleSheetValueFieldDirect.newField( "mathRootThickness", Double.class, 1.5, thicknessField );
-	
-	
-	protected static StyleSheetValueFieldSet useStyleSheetFields_MathRoot = useStyleSheetFields_Element.join( fontValueField, paintValueField, thicknessValueField );
-
-	
-	
-	
-	private static HashMap<StyleSheetValues, GlyphMetrics> metricsTable = new HashMap<StyleSheetValues, GlyphMetrics>();
-	
-	
 	protected DPWidget child;
-	protected GlyphMetrics glyphMetrics;
 	
 	
 	
 	public DPMathRoot()
 	{
-		this( null );
+		this( MathRootStyleSheet.defaultStyleSheet );
 	}
 
-	public DPMathRoot(ElementStyleSheet styleSheet)
+	public DPMathRoot(MathRootStyleSheet styleSheet)
 	{
 		super( styleSheet );
 	}
@@ -161,16 +95,8 @@ public class DPMathRoot extends DPContainer
 	protected void onRealise()
 	{
 		super.onRealise();
-		if ( glyphMetrics == null  ||  glyphMetrics.styleSheetValues != styleSheetValues )
-		{
-			GlyphMetrics metrics = metricsTable.get( styleSheetValues );
-			if ( metrics == null )
-			{
-				metrics = new GlyphMetrics( styleSheetValues, presentationArea );
-				metricsTable.put( styleSheetValues, metrics );
-			}
-			glyphMetrics = metrics;
-		}
+		MathRootStyleSheet s = (MathRootStyleSheet)styleSheet;
+		s.realise( presentationArea );
 	}
 
 	
@@ -179,28 +105,32 @@ public class DPMathRoot extends DPContainer
 	{
 		super.draw( graphics );
 		
-		if ( child != null  &&  glyphMetrics != null )
+		if ( child != null )
 		{
 			double allocationX = getAllocationX();
 			double allocationY = getAllocationY();
 
+			MathRootStyleSheet s = (MathRootStyleSheet)styleSheet;
+			
 			Stroke curStroke = graphics.getStroke();
 			Paint curPaint = graphics.getPaint();
 			
-			double thickness = getThickness();
+			double thickness = s.getThickness();
 			
 			Stroke stroke = new BasicStroke( (float)thickness, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL );
 			graphics.setStroke( stroke );
-			graphics.setPaint( getPaint() );
+			graphics.setPaint( s.getSymbolPaint() );
 			
 			double yOffset = thickness * 0.5;
+			double glyphWidth = s.getGlyphWidth();
+			double glyphLineWidths[] = s.getGlyphLineWidths();
 			double h = allocationY - thickness;
 
 			Path2D.Double path = new Path2D.Double();
 			path.moveTo( 0.0, yOffset + h * 0.65 );
-			path.lineTo( glyphMetrics.glyphLineWidths[0], yOffset + h * 0.6 );
-			path.lineTo( glyphMetrics.glyphLineWidths[0] + glyphMetrics.glyphLineWidths[1], yOffset + h );
-			path.lineTo( glyphMetrics.glyphWidth, yOffset );
+			path.lineTo( glyphLineWidths[0], yOffset + h * 0.6 );
+			path.lineTo( glyphLineWidths[0] + glyphLineWidths[1], yOffset + h );
+			path.lineTo( glyphWidth, yOffset );
 			path.lineTo( allocationX, yOffset );
 			
 			graphics.draw( path );
@@ -214,10 +144,12 @@ public class DPMathRoot extends DPContainer
 	
 	protected void updateRequisitionX()
 	{
-		if ( child != null  &&  glyphMetrics != null )
+		if ( child != null )
 		{
+			MathRootStyleSheet s = (MathRootStyleSheet)styleSheet;
+			
 			layoutReqBox.setRequisitionX( child.refreshRequisitionX() );
-			layoutReqBox.borderX( glyphMetrics.glyphWidth, 0.0 );
+			layoutReqBox.borderX( s.getGlyphWidth(), 0.0 );
 		}
 		else
 		{
@@ -227,10 +159,12 @@ public class DPMathRoot extends DPContainer
 
 	protected void updateRequisitionY()
 	{
-		if ( child != null  &&  glyphMetrics != null )
+		if ( child != null )
 		{
+			MathRootStyleSheet s = (MathRootStyleSheet)styleSheet;
+			
 			layoutReqBox.setRequisitionY( child.refreshRequisitionY() );
-			layoutReqBox.borderY( glyphMetrics.barSpacing + getThickness(), 0.0 );
+			layoutReqBox.borderY( s.getBarSpacing() + s.getThickness(), 0.0 );
 		}
 		else
 		{
@@ -243,10 +177,12 @@ public class DPMathRoot extends DPContainer
 	
 	protected void updateAllocationX()
 	{
-		if ( child != null  &&  glyphMetrics != null )
+		if ( child != null )
 		{
+			MathRootStyleSheet s = (MathRootStyleSheet)styleSheet;
+
 			double prevWidth = child.getAllocationX();
-			double offset = glyphMetrics.glyphWidth;
+			double offset = s.getGlyphWidth();
 			layoutAllocBox.allocateChildX( child.layoutAllocBox, offset, getAllocationX() - offset );
 			child.refreshAllocationX( prevWidth );
 		}
@@ -254,10 +190,12 @@ public class DPMathRoot extends DPContainer
 
 	protected void updateAllocationY()
 	{
-		if ( child != null  &&  glyphMetrics != null )
+		if ( child != null )
 		{
+			MathRootStyleSheet s = (MathRootStyleSheet)styleSheet;
+
 			double prevHeight = child.getAllocationY();
-			double offset = glyphMetrics.barSpacing + getThickness();
+			double offset = s.getBarSpacing() + s.getThickness();
 			layoutAllocBox.allocateChildY( child.layoutAllocBox, offset, getAllocationY() - offset );
 			child.refreshAllocationY( prevHeight );
 		}
@@ -318,23 +256,5 @@ public class DPMathRoot extends DPContainer
 		{
 			return null;
 		}
-	}
-	
-	
-	
-	protected StyleSheetValueFieldSet getUsedStyleSheetValueFields()
-	{
-		return useStyleSheetFields_MathRoot;
-	}
-
-	
-	private Paint getPaint()
-	{
-		return (Paint)styleSheetValues.get( paintValueField );
-	}
-
-	private double getThickness()
-	{
-		return (Double)styleSheetValues.get( thicknessValueField );
 	}
 }

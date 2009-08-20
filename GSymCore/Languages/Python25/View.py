@@ -1403,8 +1403,8 @@ class Python25View (GSymViewObjectNodeDispatch):
 					    self._defStmtHeaderElement( ctx, state, name, params, paramsTrailingSeparator ),
 					    PRECEDENCE_STMT,
 					    state,
-					    lambda header: ctx.border( defHeader_border, None, header ) )
-		#return ctx.border( defBackground_border, None, editor )
+					    lambda header: ctx.border( defHeader_border, ContainerStyleSheet.defaultStyleSheet, header ) )
+		#return ctx.border( defBackground_border, ContainerStyleSheet.defaultStyleSheet, editor )
 		return editor
 
 
@@ -1425,8 +1425,8 @@ class Python25View (GSymViewObjectNodeDispatch):
 						  self._classStmtHeaderElement( ctx, state, name, bases, basesTrailingSeparator ),
 						  PRECEDENCE_STMT,
 						  state,
-						  lambda header: ctx.border( classHeader_border, None, header ) )
-		#return ctx.border( classBackground_border, None, editor )
+						  lambda header: ctx.border( classHeader_border, ContainerStyleSheet.defaultStyleSheet, header ) )
+		#return ctx.border( classBackground_border, ContainerStyleSheet.defaultStyleSheet, editor )
 		return editor
 
 
@@ -1444,7 +1444,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		suiteElement = ctx.indent( 30.0, indentedSuiteView( ctx, suite, self._parser.singleLineStatement() ) )
 		suiteElement.setStructuralValueObject( node )
 		suiteElement = ctx.linearRepresentationListener( suiteElement, SuiteLinearRepresentationListener( self._parser.compoundSuite(), suite ) )
-		return ctx.border( indentedBlock_border, None, suiteElement )
+		return ctx.border( indentedBlock_border, ContainerStyleSheet.defaultStyleSheet, suiteElement )
 
 
 
@@ -1541,24 +1541,24 @@ class Python25View (GSymViewObjectNodeDispatch):
 						 self._decoStmtHeaderElement( ctx, state, d['name'], d['args'], d['argsTrailingSeparator'] ),  None ) )
 			
 		compoundBlocks.append( ( Nodes.DefStmtHeader( name=name, params=params, paramsTrailingSeparator=paramsTrailingSeparator ),
-					 self._defStmtHeaderElement( ctx, state, name, params, paramsTrailingSeparator ), suite, lambda header: ctx.border( defHeader_border, None, header ) ) )
+					 self._defStmtHeaderElement( ctx, state, name, params, paramsTrailingSeparator ), suite, lambda header: ctx.border( defHeader_border, ContainerStyleSheet.defaultStyleSheet, header ) ) )
 		editor = compoundStatementEditor( ctx, node, PRECEDENCE_STMT,
 						compoundBlocks,
 						state,
 						self._parser.compoundSuite(), self._parser.singleLineStatement() )
-		return ctx.border( defBackground_border, None, editor )
+		return ctx.border( defBackground_border, ContainerStyleSheet.defaultStyleSheet, editor )
 
 
 	# Class statement
 	@ObjectNodeDispatchMethod
 	def ClassStmt(self, ctx, state, node, name, bases, basesTrailingSeparator, suite):
 		compoundBlocks = [ ( Nodes.ClassStmtHeader( name=name, bases=bases, basesTrailingSeparator=basesTrailingSeparator ),
-				     self._classStmtHeaderElement( ctx, state, name, bases, basesTrailingSeparator ), suite, lambda header: ctx.border( classHeader_border, None, header ) ) ]
+				     self._classStmtHeaderElement( ctx, state, name, bases, basesTrailingSeparator ), suite, lambda header: ctx.border( classHeader_border, ContainerStyleSheet.defaultStyleSheet, header ) ) ]
 		editor = compoundStatementEditor( ctx, node, PRECEDENCE_STMT,
 						compoundBlocks,
 						state,
 						self._parser.compoundSuite(), self._parser.singleLineStatement() )
-		return ctx.border( classBackground_border, None, editor )
+		return ctx.border( classBackground_border, ContainerStyleSheet.defaultStyleSheet, editor )
 
 
 

@@ -12,7 +12,8 @@ import BritefuryJ.Math.Point2;
 
 
 
-public class PointerState {
+public class PointerState
+{
 	protected PointerInterface pointer;
 	protected Point2 localPos;
 	protected int modifiers;

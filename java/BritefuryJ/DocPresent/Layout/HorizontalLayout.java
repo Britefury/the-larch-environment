@@ -6,25 +6,9 @@
 //##************************
 package BritefuryJ.DocPresent.Layout;
 
-import BritefuryJ.DocPresent.StyleSheets.ElementStyleSheetField;
-import BritefuryJ.DocPresent.StyleSheets.StyleSheetValueFieldChildPack;
-import BritefuryJ.DocPresent.StyleSheets.StyleSheetValueFieldPack;
-import BritefuryJ.DocPresent.StyleSheets.StyleSheetValues;
-
 public class HorizontalLayout
 {
-	public static ElementStyleSheetField childPack_xPaddingField = ElementStyleSheetField.newField( "childPack_xPadding", Double.class );
-	public static ElementStyleSheetField pack_xPaddingField = ElementStyleSheetField.newField( "pack_xPadding", Double.class );
-	public static ElementStyleSheetField childPack_xExpandField = ElementStyleSheetField.newField( "childPack_xExpand", Boolean.class );
-	public static ElementStyleSheetField pack_xExpandField = ElementStyleSheetField.newField( "pack_xExpand", Boolean.class );
-	
-	public static StyleSheetValueFieldChildPack childPack_xPaddingValueField = StyleSheetValueFieldChildPack.newField( "childPack_xPadding", Double.class, 0.0, childPack_xPaddingField );
-	public static StyleSheetValueFieldPack pack_xPaddingValueField = StyleSheetValueFieldPack.newField( "pack_xPadding", Double.class, 0.0, pack_xPaddingField, childPack_xPaddingValueField );
-	public static StyleSheetValueFieldChildPack childPack_xExpandValueField = StyleSheetValueFieldChildPack.newField( "childPack_xExpand", Boolean.class, false, childPack_xExpandField );
-	public static StyleSheetValueFieldPack pack_xExpandValueField = StyleSheetValueFieldPack.newField( "pack_xExpand", Boolean.class, false, pack_xExpandField, childPack_xExpandValueField );
-	
-	
-	public static void computeRequisitionX(LReqBox box, LReqBox children[], double spacing, StyleSheetValues styleSheetValues[])
+	public static void computeRequisitionX(LReqBox box, LReqBox children[], double spacing, BoxPackingParams packingParams[])
 	{
 		// Accumulate the width required for all the children
 		
@@ -43,7 +27,8 @@ public class HorizontalLayout
 		{
 			LReqBox child = children[i];
 			
-			double padding = styleSheetValues != null  ?  (Double)styleSheetValues[i].get( pack_xPaddingValueField )  :  0.0;
+			BoxPackingParams params = packingParams != null  ?  packingParams[i]  :  null;
+			double padding = params != null  ?  params.padding  :  0.0;
 			
 			// Filter out any h-spacing that is within the amount of padding
 			double minChildSpacing = Math.max( child.minHSpacing - padding, 0.0 );
@@ -137,19 +122,22 @@ public class HorizontalLayout
 
 
 
-	public static void allocateSpaceX(LReqBox box, LReqBox children[], LAllocBox allocBox, LAllocBox childrenAlloc[], StyleSheetValues styleSheetValues[])
+	public static void allocateSpaceX(LReqBox box, LReqBox children[], LAllocBox allocBox, LAllocBox childrenAlloc[], BoxPackingParams packingParams[])
 	{
 		int numExpand = 0;
 		
 		// Count the number of children that should expand to use additional space
-		if ( styleSheetValues != null )
+		if ( packingParams != null )
 		{
-			assert styleSheetValues.length == children.length;
-			for (StyleSheetValues v: styleSheetValues)
+			assert packingParams.length == children.length;
+			for (BoxPackingParams params: packingParams)
 			{
-				if ( (Boolean)v.get( pack_xExpandValueField ) )
+				if ( params != null )
 				{
-					numExpand++;
+					if ( LReqBox.testPackFlagExpand( params.packFlags ) )
+					{
+						numExpand++;
+					}
 				}
 			}
 		}
@@ -185,8 +173,8 @@ public class HorizontalLayout
 				
 				for (int i = 0; i < children.length; i++)
 				{
-					StyleSheetValues v = styleSheetValues != null  ?  styleSheetValues[i]  :  null;
-					if ( v != null  &&  (Boolean)v.get( pack_xExpandValueField ) )
+					BoxPackingParams params = packingParams != null  ?  packingParams[i]  :  null;
+					if ( params != null  &&  LReqBox.testPackFlagExpand( params.packFlags ) )
 					{
 						allocBox.allocateChildSpaceX( childrenAlloc[i], children[i].getPrefWidth() + expandPerChild );
 					}
@@ -236,7 +224,7 @@ public class HorizontalLayout
 	
 	
 
-	public static void allocateX(LReqBox box, LReqBox children[], LAllocBox allocBox, LAllocBox childrenAlloc[], double spacing, StyleSheetValues styleSheetValues[])
+	public static void allocateX(LReqBox box, LReqBox children[], LAllocBox allocBox, LAllocBox childrenAlloc[], double spacing, BoxPackingParams packingParams[])
 	{
 		// Each packed child consists of:
 		//	- start padding
@@ -246,7 +234,7 @@ public class HorizontalLayout
 		
 		// There should be at least the specified amount of spacing between each child, or the child's own h-spacing if it is greater
 
-		allocateSpaceX( box, children, allocBox, childrenAlloc, styleSheetValues );
+		allocateSpaceX( box, children, allocBox, childrenAlloc, packingParams );
 		
 		double size = 0.0;
 		double pos = 0.0;
@@ -256,7 +244,8 @@ public class HorizontalLayout
 			LAllocBox childAlloc = childrenAlloc[i];
 
 			// Get the padding
-			double padding = styleSheetValues != null  ?  (Double)styleSheetValues[i].get( pack_xPaddingValueField )  :  0.0;
+			BoxPackingParams params = packingParams != null  ?  packingParams[i]  :  null;
+			double padding = params != null  ?  params.padding  :  0.0;
 			
 			// Compute the spacing
 			// Use 'preferred' spacing, if the child was allocated its preferred amount of space, or more

@@ -4,13 +4,11 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.DocPresent;
+package BritefuryJ.DocPresent.Input;
 
 import java.awt.datatransfer.Transferable;
 
 import javax.swing.TransferHandler;
-
-import BritefuryJ.DocPresent.Input.PointerInterface;
 
 public abstract class DndHandler
 {
@@ -22,29 +20,29 @@ public abstract class DndHandler
 
 	
 	
-	public int getSourceRequestedAction(DPWidget sourceElement, PointerInterface pointer, int button)
+	public int getSourceRequestedAction(PointerInputElement sourceElement, PointerInterface pointer, int button)
 	{
 		return COPY;
 	}
 	
-	public Transferable createTransferable(DPWidget sourceElement)
+	public Transferable createTransferable(PointerInputElement sourceElement)
 	{
 		return null;
 	}
 	
-	public void exportDone(DPWidget sourceElement, Transferable data, int action)
+	public void exportDone(PointerInputElement sourceElement, Transferable data, int action)
 	{
 	}
 
 	
 	
 	
-	public boolean canDrop(DPWidget destElement, DndDrop drop)
+	public boolean canDrop(PointerInputElement destElement, DndDrop drop)
 	{
 		return false;
 	}
 	
-	public boolean acceptDrop(DPWidget destElement, DndDrop drop)
+	public boolean acceptDrop(PointerInputElement destElement, DndDrop drop)
 	{
 		return false;
 	}

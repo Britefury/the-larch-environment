@@ -15,21 +15,21 @@ from BritefuryJ.DocPresent.Layout import *
 
 
 
-default_textStyle = ElementStyleSheet( font=Font( 'SansSerif', Font.PLAIN, 14 ),  paint=Color.black )
+default_textStyle = TextStyleSheet( Font( 'SansSerif', Font.PLAIN, 14 ),  Color.black )
 
-string_textStyle = ElementStyleSheet( font=Font( 'SansSerif', Font.PLAIN, 14 ),  paint=Color( 0.0, 0.5, 0.5 ) )
-punctuation_textStyle = ElementStyleSheet( font=Font( 'SansSerif', Font.PLAIN, 14 ),  paint=Color( 0.0, 0.0, 1.0 ) )
-className_textStyle = ElementStyleSheet( font=Font( 'SansSerif', Font.PLAIN, 14 ),  paint=Color( 0.0, 0.5, 0.0 ) )
-fieldName_textStyle = ElementStyleSheet( font=Font( 'SansSerif', Font.PLAIN, 14 ),  paint=Color( 0.5, 0.0, 0.5 ) )
-
-
-lisp_paragraphStyle = ElementStyleSheet( vAlignment=VAlignment.BASELINES, paragraphIndentation=60.0 )
+string_textStyle = TextStyleSheet( Font( 'SansSerif', Font.PLAIN, 14 ),  Color( 0.0, 0.5, 0.5 ) )
+punctuation_textStyle = TextStyleSheet( Font( 'SansSerif', Font.PLAIN, 14 ),  Color( 0.0, 0.0, 1.0 ) )
+className_textStyle = TextStyleSheet( Font( 'SansSerif', Font.PLAIN, 14 ),  Color( 0.0, 0.5, 0.0 ) )
+fieldName_textStyle = TextStyleSheet( Font( 'SansSerif', Font.PLAIN, 14 ),  Color( 0.5, 0.0, 0.5 ) )
 
 
-paragraph_listViewLayout = ParagraphListViewLayout( ElementStyleSheet(), lambda: DPText( default_textStyle, ' ' ), 0, ListViewLayout.TrailingSeparator.NEVER )
+lisp_paragraphStyle = ParagraphStyleSheet( VAlignment.BASELINES, 0.0, 0.0, 0.0, 60.0 )
 
-verticalInline_listViewLayout = VerticalInlineListViewLayout( ElementStyleSheet( vTypesetting=VTypesetting.ALIGN_WITH_TOP, hAlighment=HAlignment.LEFT, ySpacing=0.0, childPack_yExpand=False, chidlPack_yPadding=0.0 ), \
-						ElementStyleSheet(), 30.0, ListViewLayout.TrailingSeparator.NEVER )
 
-vertical_listViewLayout = VerticalListViewLayout( ElementStyleSheet( vTypesetting=VTypesetting.ALIGN_WITH_TOP, hAlighment=HAlignment.LEFT, ySpacing=0.0, childPack_yExpand=False, chidlPack_yPadding=0.0 ), \
-						ElementStyleSheet(), 30.0, ListViewLayout.TrailingSeparator.NEVER )
+paragraph_listViewLayout = ParagraphListViewLayout( ParagraphStyleSheet(), lambda: DPText( default_textStyle, ' ' ), 0, ListViewLayout.TrailingSeparator.NEVER )
+
+verticalInline_listViewLayout = VerticalInlineListViewLayout( VBoxStyleSheet( VTypesetting.ALIGN_WITH_TOP, HAlignment.LEFT, 0.0, False, 0.0 ), \
+						ParagraphStyleSheet(), 30.0, ListViewLayout.TrailingSeparator.NEVER )
+
+vertical_listViewLayout = VerticalListViewLayout( VBoxStyleSheet( VTypesetting.ALIGN_WITH_TOP, HAlignment.LEFT, 0.0, False, 0.0 ), \
+						ParagraphStyleSheet(), 30.0, ListViewLayout.TrailingSeparator.NEVER )

@@ -14,8 +14,6 @@ import java.util.Arrays;
 
 import javax.swing.JFrame;
 
-import BritefuryJ.DocPresent.DPHBox;
-import BritefuryJ.DocPresent.DPParagraph;
 import BritefuryJ.DocPresent.DPPresentationArea;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
@@ -24,7 +22,10 @@ import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.ElementFactory;
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.VTypesetting;
-import BritefuryJ.DocPresent.StyleSheets.ElementStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 import BritefuryJ.GSym.View.ListView.HorizontalListViewLayout;
 import BritefuryJ.GSym.View.ListView.ListViewLayout;
 import BritefuryJ.GSym.View.ListView.ParagraphListViewLayout;
@@ -34,7 +35,7 @@ import BritefuryJ.GSym.View.ListView.VerticalListViewLayout;
 
 public class ListViewTest
 {
-	protected DPWidget makeText(String text, ElementStyleSheet styleSheet)
+	protected DPWidget makeText(String text, TextStyleSheet styleSheet)
 	{
 		if ( text != null )
 		{
@@ -49,9 +50,9 @@ public class ListViewTest
 	static class TextElementFactory implements ElementFactory
 	{
 		String text;
-		ElementStyleSheet styleSheet;
+		TextStyleSheet styleSheet;
 		
-		public TextElementFactory(String text, ElementStyleSheet styleSheet)
+		public TextElementFactory(String text, TextStyleSheet styleSheet)
 		{
 			this.text = text;
 			this.styleSheet = styleSheet;
@@ -67,9 +68,9 @@ public class ListViewTest
 	static class TextSeparatorElementFactory implements SeparatorElementFactory
 	{
 		String text;
-		ElementStyleSheet styleSheet;
+		TextStyleSheet styleSheet;
 		
-		public TextSeparatorElementFactory(String text, ElementStyleSheet styleSheet)
+		public TextSeparatorElementFactory(String text, TextStyleSheet styleSheet)
 		{
 			this.text = text;
 			this.styleSheet = styleSheet;
@@ -101,9 +102,9 @@ public class ListViewTest
 	
 	protected DPWidget makeListView(ListViewLayout layout, String[] txt, String title, String beginDelim, String endDelim, String separator)
 	{
-		ElementStyleSheet s0 = DPText.styleSheet( new Font( "Sans serif", Font.BOLD, 16 ), Color.blue );
-		ElementStyleSheet s1 = DPText.styleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.black );
-		ElementStyleSheet s2 = DPText.styleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), new Color( 0.0f, 0.5f, 0.0f ) );
+		TextStyleSheet s0 = new TextStyleSheet( new Font( "Sans serif", Font.BOLD, 16 ), Color.blue );
+		TextStyleSheet s1 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.black );
+		TextStyleSheet s2 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), new Color( 0.0f, 0.5f, 0.0f ) );
 
 		DPWidget children[] = new DPText[txt.length];
 		for (int i = 0; i < txt.length; i++)
@@ -115,7 +116,7 @@ public class ListViewTest
 		
 		DPWidget titleElem = new DPText( s0, title );
 		
-		ElementStyleSheet boxs = DPVBox.styleSheet( VTypesetting.NONE, HAlignment.LEFT, 0.0, false, 0.0 );
+		VBoxStyleSheet boxs = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.LEFT, 0.0, false, 0.0 );
 		DPVBox vbox = new DPVBox( boxs );
 		vbox.setChildren( Arrays.asList( new DPWidget[] { titleElem, ls } ) );
 		return vbox;
@@ -124,15 +125,15 @@ public class ListViewTest
 	
 	protected DPWidget createContentNode()
 	{
-		ElementStyleSheet boxs = DPVBox.styleSheet( VTypesetting.NONE, HAlignment.LEFT, 15.0, false, 0.0 );
+		VBoxStyleSheet boxs = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.LEFT, 15.0, false, 0.0 );
 		DPVBox box = new DPVBox( boxs );
 		ArrayList<DPWidget> children = new ArrayList<DPWidget>();
 		
 
 		
-		ElementStyleSheet paraStyle = DPParagraph.styleSheet();
-		ElementStyleSheet hboxStyle = DPHBox.styleSheet();
-		ElementStyleSheet vboxStyle = DPVBox.styleSheet( VTypesetting.NONE, HAlignment.LEFT, 0.0, false, 0.0 );
+		ParagraphStyleSheet paraStyle = new ParagraphStyleSheet();
+		HBoxStyleSheet hboxStyle = new HBoxStyleSheet();
+		VBoxStyleSheet vboxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.LEFT, 0.0, false, 0.0 );
 		
 		String[] txt = new String[] { "abcdef", "123456", "hello", "world", "this", "is", "a", "test", "of", "the", "list", "layout", "system" };
 		
