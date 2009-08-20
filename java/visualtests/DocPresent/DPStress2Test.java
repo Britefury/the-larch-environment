@@ -33,6 +33,8 @@ public class DPStress2Test
 	// [1] With collation					A			10240	62.7MB				38.6MB				0.6MB				0.611s					0.536s
 	// [2] With collation finished			A			10240	63.4MB				37.9MB				0.6MB				0.624s					0.524s
 	// [3] Element tree functionality			A			10240	69.4MB				44.8MB				0.7MB				0.631s					0.563s
+	// [4] Minor optimisations				A			10240	69.0MB				43.3MB				0.9MB				0.653s					0.566s
+	// [5] Pointer refactor				A			10240	68.8MB				43.9MB				1.0MB				0.639s					0.585s
 	//
 	//
 	// States:
@@ -40,6 +42,8 @@ public class DPStress2Test
 	// [1] HBoxes, VBoxes and Paragraphs can collate contents from children that are span elements
 	// [2] Collation system finished
 	// [3] All ElementTree functionality merged into document presentation system
+	// [4] Minor optimisations - pointer containment (pointer within bounds of element) moved to root (DPPresentationArea)
+	// [5] Pointer refactor - moved all pointer containment state out of the widget tree and into the input system
 	//
 	// Platform A:
 	//	CPU: Intel Core Duo 1.86GHz
