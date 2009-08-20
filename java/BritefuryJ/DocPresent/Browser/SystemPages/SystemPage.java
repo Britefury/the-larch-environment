@@ -16,7 +16,8 @@ import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Browser.Page;
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.VTypesetting;
-import BritefuryJ.DocPresent.StyleSheets.ElementStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.StaticTextStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
 public abstract class SystemPage extends Page
 {
@@ -43,16 +44,16 @@ public abstract class SystemPage extends Page
 
 	public DPWidget getContentsElement()
 	{
-		ElementStyleSheet pageBoxStyle = DPVBox.styleSheet( VTypesetting.NONE, HAlignment.EXPAND, 40.0, false, 0.0 );
+		VBoxStyleSheet pageBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.EXPAND, 40.0, false, 0.0 );
 		DPVBox pageBox = new DPVBox( pageBoxStyle );
 		
-		ElementStyleSheet headBoxStyle = DPVBox.styleSheet( VTypesetting.NONE, HAlignment.EXPAND, 0.0, false, 0.0 );
+		VBoxStyleSheet headBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.EXPAND, 0.0, false, 0.0 );
 		DPVBox headBox = new DPVBox( headBoxStyle );
 		
-		ElementStyleSheet titleBoxStyle = DPVBox.styleSheet( VTypesetting.NONE, HAlignment.CENTRE, 0.0, false, 0.0 );
+		VBoxStyleSheet titleBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.CENTRE, 0.0, false, 0.0 );
 		DPVBox titleBox = new DPVBox( titleBoxStyle );
 		
-		ElementStyleSheet titleStyle = DPStaticText.styleSheet( new Font( "Serif", Font.BOLD, 32 ), Color.BLACK );
+		StaticTextStyleSheet titleStyle = new StaticTextStyleSheet( new Font( "Serif", Font.BOLD, 32 ), Color.BLACK );
 		DPStaticText title = new DPStaticText( titleStyle, "System page: " + getTitle() );
 		titleBox.append( title );
 		

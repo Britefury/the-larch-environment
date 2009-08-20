@@ -14,19 +14,21 @@ import BritefuryJ.DocPresent.DPParagraph;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.ElementFactory;
-import BritefuryJ.DocPresent.StyleSheets.ElementStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
 public class VerticalListViewLayout extends IndentedListViewLayout
 {
-	private ElementStyleSheet vboxStyleSheet, paraStyleSheet;
+	private VBoxStyleSheet styleSheet;
+	private ParagraphStyleSheet lineParagraphStyleSheet;
 	private TrailingSeparator trailingSeparator;
 	
 	
-	public VerticalListViewLayout(ElementStyleSheet vboxStyleSheet, ElementStyleSheet paraStyleSheet, float indentation, TrailingSeparator trailingSeparator)
+	public VerticalListViewLayout(VBoxStyleSheet styleSheet, ParagraphStyleSheet lineParagraphStyleSheet, float indentation, TrailingSeparator trailingSeparator)
 	{
 		super( indentation );
-		this.vboxStyleSheet = vboxStyleSheet;
-		this.paraStyleSheet = paraStyleSheet;
+		this.styleSheet = styleSheet;
+		this.lineParagraphStyleSheet = lineParagraphStyleSheet;
 		this.trailingSeparator = trailingSeparator;
 	}
 	
@@ -35,7 +37,7 @@ public class VerticalListViewLayout extends IndentedListViewLayout
 	{
 		if ( separator != null )
 		{
-			DPParagraph paragraph = new DPParagraph( paraStyleSheet );
+			DPParagraph paragraph = new DPParagraph( lineParagraphStyleSheet );
 			//paragraph.setChildren( Arrays.asList( new Element[] { child, separator.createElement(), new WhitespaceElement( "\n" ) } ) );
 			paragraph.setChildren( Arrays.asList( new DPWidget[] { child, separator.createElement( index, child ) } ) );
 			return paragraph;
@@ -49,7 +51,7 @@ public class VerticalListViewLayout extends IndentedListViewLayout
 
 	public DPWidget createListElement(List<DPWidget> children, ElementFactory beginDelim, ElementFactory endDelim, SeparatorElementFactory separator)
 	{
-		DPVBox vbox = new DPVBox( vboxStyleSheet );
+		DPVBox vbox = new DPVBox( styleSheet );
 		
 		ArrayList<DPWidget> childElems = new ArrayList<DPWidget>();
 		childElems.ensureCapacity( children.size() );
@@ -78,7 +80,7 @@ public class VerticalListViewLayout extends IndentedListViewLayout
 		
 		if ( beginDelim != null  ||  endDelim != null )
 		{
-			DPVBox outerVBox = new DPVBox( vboxStyleSheet );
+			DPVBox outerVBox = new DPVBox( styleSheet );
 			
 			ArrayList<DPWidget> outerChildElems = new ArrayList<DPWidget>();
 			outerChildElems.ensureCapacity( 3 );

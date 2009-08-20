@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.DocPresent;
+package BritefuryJ.DocPresent.Input;
 
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -18,7 +18,7 @@ public class DndDropSwing extends DndDrop
 	protected TransferHandler.TransferSupport support;
 	
 	
-	protected DndDropSwing(DPWidget targetElement, Point2 targetPosition, TransferHandler.TransferSupport support)
+	public DndDropSwing(PointerInputElement targetElement, Point2 targetPosition, TransferHandler.TransferSupport support)
 	{
 		super( targetElement, targetPosition );
 

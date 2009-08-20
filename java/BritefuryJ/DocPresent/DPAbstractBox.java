@@ -7,7 +7,8 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-import BritefuryJ.DocPresent.StyleSheets.ElementStyleSheet;
+import BritefuryJ.DocPresent.Layout.PackingParams;
+import BritefuryJ.DocPresent.StyleSheets.AbstractBoxStyleSheet;
 
 
 
@@ -22,11 +23,36 @@ abstract public class DPAbstractBox extends DPContainerSequenceCollationRoot
 	
 	public DPAbstractBox()
 	{
-		this( null );
+		this( AbstractBoxStyleSheet.defaultStyleSheet );
 	}
 
-	public DPAbstractBox(ElementStyleSheet styleSheet)
+	public DPAbstractBox(AbstractBoxStyleSheet styleSheet)
 	{
 		super( styleSheet );
+	}
+
+
+	
+	
+
+	protected PackingParams getDefaultPackingParams()
+	{
+		return ((AbstractBoxStyleSheet)styleSheet).getDefaultPackingParams();
+	}
+
+
+	public double getSpacing()
+	{
+		return ((AbstractBoxStyleSheet)styleSheet).getSpacing();
+	}
+
+	public boolean getExpand()
+	{
+		return ((AbstractBoxStyleSheet)styleSheet).getExpand();
+	}
+
+	public double getPadding()
+	{
+		return ((AbstractBoxStyleSheet)styleSheet).getPadding();
 	}
 }

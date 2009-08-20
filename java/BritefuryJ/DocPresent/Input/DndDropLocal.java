@@ -4,14 +4,14 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.DocPresent;
+package BritefuryJ.DocPresent.Input;
 
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 
 public class DndDropLocal extends DndDrop
 {
-	protected DPWidget sourceElement;
+	protected PointerInputElement sourceElement;
 	protected int sourceButton;
 	
 	protected boolean bInProgress;
@@ -22,7 +22,7 @@ public class DndDropLocal extends DndDrop
 	
 	
 
-	protected DndDropLocal(DPWidget sourceElement, int sourceButton)
+	protected DndDropLocal(PointerInputElement sourceElement, int sourceButton)
 	{
 		super();
 		
@@ -49,7 +49,7 @@ public class DndDropLocal extends DndDrop
 	
 	
 	
-	public DPWidget getSourceElement()
+	public PointerInputElement getSourceElement()
 	{
 		return sourceElement;
 	}

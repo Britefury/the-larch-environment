@@ -21,7 +21,9 @@ import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.VTypesetting;
-import BritefuryJ.DocPresent.StyleSheets.ElementStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
 public class DPStressTest
 {
@@ -67,9 +69,9 @@ public class DPStressTest
 	
 	
 	Font f0 = new Font( "Sans serif", Font.PLAIN, 12 );
-	ElementStyleSheet nameStyle = DPText.styleSheet( f0, Color.black );
-	ElementStyleSheet puncStyle = DPText.styleSheet( f0, Color.blue );
-	ElementStyleSheet paraStyle = DPParagraph.styleSheet();
+	TextStyleSheet nameStyle = new TextStyleSheet( f0, Color.black );
+	TextStyleSheet puncStyle = new TextStyleSheet( f0, Color.blue );
+	ParagraphStyleSheet paraStyle = new ParagraphStyleSheet();
 
 	public DPWidget name(String n)
 	{
@@ -114,7 +116,7 @@ public class DPStressTest
 	
 	protected DPWidget createContentNode()
 	{
-		ElementStyleSheet boxs = DPVBox.styleSheet( VTypesetting.NONE, HAlignment.LEFT, 0.0, false, 0.0 );
+		VBoxStyleSheet boxs = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.LEFT, 0.0, false, 0.0 );
 		DPVBox box = new DPVBox( boxs );
 		ArrayList<DPWidget> children = new ArrayList<DPWidget>();
 		

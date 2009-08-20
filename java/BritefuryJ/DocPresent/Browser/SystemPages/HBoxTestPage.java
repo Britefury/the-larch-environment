@@ -16,7 +16,9 @@ import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.Layout.VTypesetting;
-import BritefuryJ.DocPresent.StyleSheets.ElementStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
 public class HBoxTestPage extends SystemPage
 {
@@ -34,8 +36,8 @@ public class HBoxTestPage extends SystemPage
 	
 	protected static DPText[] makeTexts(String header)
 	{
-		ElementStyleSheet t12 = DPText.styleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );
-		ElementStyleSheet t18 = DPText.styleSheet( new Font( "Sans serif", Font.BOLD, 18 ), Color.BLACK );
+		TextStyleSheet t12 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );
+		TextStyleSheet t18 = new TextStyleSheet( new Font( "Sans serif", Font.BOLD, 18 ), Color.BLACK );
 		DPText h = new DPText( t18, header );
 		DPText t0 = new DPText( t12, "Hello" );
 		DPText t1 = new DPText( t12, "World" );
@@ -59,27 +61,27 @@ public class HBoxTestPage extends SystemPage
 		DPText[] c3 = makeTexts( "EXPAND" );
 		DPText[] c4 = makeTexts( "BASELINES" );
 		
-		ElementStyleSheet b0s = DPHBox.styleSheet( VAlignment.TOP, 0.0, false, 0.0 );
+		HBoxStyleSheet b0s = new HBoxStyleSheet( VAlignment.TOP, 0.0, false, 0.0 );
 		DPHBox b0 = new DPHBox( b0s );
 		b0.extend( c0 );
 		
-		ElementStyleSheet b1s = DPHBox.styleSheet( VAlignment.CENTRE, 0.0, false, 0.0 );
+		HBoxStyleSheet b1s = new HBoxStyleSheet( VAlignment.CENTRE, 0.0, false, 0.0 );
 		DPHBox b1 = new DPHBox( b1s );
 		b1.extend( c1 );
 		
-		ElementStyleSheet b2s = DPHBox.styleSheet( VAlignment.BOTTOM, 0.0, false, 0.0 );
+		HBoxStyleSheet b2s = new HBoxStyleSheet( VAlignment.BOTTOM, 0.0, false, 0.0 );
 		DPHBox b2 = new DPHBox( b2s );
 		b2.extend( c2 );
 		
-		ElementStyleSheet b3s = DPHBox.styleSheet( VAlignment.EXPAND, 0.0, false, 0.0 );
+		HBoxStyleSheet b3s = new HBoxStyleSheet( VAlignment.EXPAND, 0.0, false, 0.0 );
 		DPHBox b3 = new DPHBox( b3s );
 		b3.extend( c3 );
 		
-		ElementStyleSheet b4s = DPHBox.styleSheet( VAlignment.BASELINES, 0.0, false, 0.0 );
+		HBoxStyleSheet b4s = new HBoxStyleSheet( VAlignment.BASELINES, 0.0, false, 0.0 );
 		DPHBox b4 = new DPHBox( b4s );
 		b4.extend( c4 );
 		
-		ElementStyleSheet boxS = DPVBox.styleSheet( VTypesetting.NONE, HAlignment.EXPAND, 20.0, false, 0.0 );
+		VBoxStyleSheet boxS = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.EXPAND, 20.0, false, 0.0 );
 		DPVBox box = new DPVBox( boxS );
 		box.append( b0 );
 		box.append( b1 );

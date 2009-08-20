@@ -12,8 +12,7 @@ import java.util.List;
 import BritefuryJ.DocPresent.Layout.LAllocBox;
 import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Layout.PackingParams;
-import BritefuryJ.DocPresent.StyleSheets.ElementStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.StyleSheetValues;
+import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 import BritefuryJ.Math.AABox2;
 
 public abstract class DPContainerSequenceCollationRoot extends DPContainerSequence
@@ -24,10 +23,10 @@ public abstract class DPContainerSequenceCollationRoot extends DPContainerSequen
 	
 	public DPContainerSequenceCollationRoot()
 	{
-		this( null );
+		this( ContainerStyleSheet.defaultStyleSheet );
 	}
 
-	public DPContainerSequenceCollationRoot(ElementStyleSheet styleSheet)
+	public DPContainerSequenceCollationRoot(ContainerStyleSheet styleSheet)
 	{
 		super( styleSheet );
 	}
@@ -165,11 +164,6 @@ public abstract class DPContainerSequenceCollationRoot extends DPContainerSequen
 	<T extends PackingParams> T[] getCollatedChildrenPackingParams(T packingParams[])
 	{
 		return getChildrenPackingParams( Arrays.asList( collationLeaves ), packingParams );
-	}
-	
-	StyleSheetValues[] getCollatedChildrenStyleSheetValues()
-	{
-		return getChildrenStyleSheetValues( Arrays.asList( collationLeaves ) );
 	}
 	
 	

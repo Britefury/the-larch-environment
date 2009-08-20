@@ -11,7 +11,7 @@ import java.awt.Graphics2D;
 
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Border.EmptyBorder;
-import BritefuryJ.DocPresent.StyleSheets.ElementStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 
 
 public class DPBorder extends DPBin
@@ -24,20 +24,20 @@ public class DPBorder extends DPBin
 	
 	public DPBorder()
 	{
-		this( null, defaultBorder );
+		this( defaultBorder, ContainerStyleSheet.defaultStyleSheet );
 	}
 
 	public DPBorder(Border border)
 	{
-		this( null, border );
+		this( border, ContainerStyleSheet.defaultStyleSheet );
 	}
 
-	public DPBorder(ElementStyleSheet styleSheet)
+	public DPBorder(ContainerStyleSheet styleSheet)
 	{
-		this( styleSheet, defaultBorder );
+		this( defaultBorder, styleSheet );
 	}
 	
-	public DPBorder(ElementStyleSheet styleSheet, Border border)
+	public DPBorder(Border border, ContainerStyleSheet styleSheet)
 	{
 		super( styleSheet );
 		

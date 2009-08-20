@@ -20,8 +20,11 @@ import java.util.WeakHashMap;
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Border.EmptyBorder;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
+import BritefuryJ.DocPresent.Event.PointerEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Event.PointerScrollEvent;
+import BritefuryJ.DocPresent.Input.DndHandler;
+import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Input.PointerInterface;
 import BritefuryJ.DocPresent.Layout.LAllocBox;
 import BritefuryJ.DocPresent.Layout.LReqBox;
@@ -33,9 +36,9 @@ import BritefuryJ.DocPresent.StructuralRepresentation.StructuralValue;
 import BritefuryJ.DocPresent.StructuralRepresentation.StructuralValueObject;
 import BritefuryJ.DocPresent.StructuralRepresentation.StructuralValueSequence;
 import BritefuryJ.DocPresent.StructuralRepresentation.StructuralValueStream;
-import BritefuryJ.DocPresent.StyleSheets.ElementStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.StyleSheetValueFieldSet;
-import BritefuryJ.DocPresent.StyleSheets.StyleSheetValues;
+import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.WidgetStyleSheet;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
@@ -47,12 +50,9 @@ import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
 
 
 
-abstract public class DPWidget
+abstract public class DPWidget extends PointerInputElement
 {
 	protected static double NON_TYPESET_CHILD_BASELINE_OFFSET = -5.0;
-	
-	
-	protected static StyleSheetValueFieldSet useStyleSheetFields_Element = new StyleSheetValueFieldSet();
 	
 	
 	
@@ -112,8 +112,7 @@ abstract public class DPWidget
 	
 	protected int flags;
 	
-	protected ElementStyleSheet styleSheet;
-	protected StyleSheetValues styleSheetValues;
+	protected WidgetStyleSheet styleSheet;
 	protected DPContainer parent;
 	protected DPPresentationArea presentationArea;
 	protected LReqBox layoutReqBox;
@@ -165,14 +164,13 @@ abstract public class DPWidget
 	
 	public DPWidget()
 	{
-		this( null );
+		this( WidgetStyleSheet.defaultStyleSheet );
 	}
 	
-	public DPWidget(ElementStyleSheet styleSheet)
+	public DPWidget(WidgetStyleSheet styleSheet)
 	{
 		flags = 0;
 		this.styleSheet = styleSheet;
-		styleSheetValues = computeStyleSheetValues( new StyleSheetValues() );
 		layoutReqBox = new LReqBox();
 		layoutAllocBox = new LAllocBox( this );
 		parentPacking = null;
@@ -211,39 +209,6 @@ abstract public class DPWidget
 	public void setParentPacking(PackingParams parentPacking)
 	{
 		this.parentPacking = parentPacking;
-	}
-	
-	
-	
-	//
-	// Stylesheet methods
-	//
-	
-	public ElementStyleSheet getStyleSheet()
-	{
-		return styleSheet;
-	}
-	
-	protected StyleSheetValues computeStyleSheetValues(StyleSheetValues parentValues)
-	{
-		if ( isPackingContainer() )
-		{
-			return StyleSheetValues.packingContainerCascade( parentValues, styleSheet, getUsedStyleSheetValueFields() );
-		}
-		else
-		{
-			return StyleSheetValues.cascade( parentValues, styleSheet, getUsedStyleSheetValueFields() );
-		}
-	}
-	
-	protected boolean isPackingContainer()
-	{
-		return false;
-	}
-	
-	protected StyleSheetValueFieldSet getUsedStyleSheetValueFields()
-	{
-		return useStyleSheetFields_Element;
 	}
 	
 
@@ -487,12 +452,6 @@ abstract public class DPWidget
 	}
 	
 	
-	protected boolean containsParentSpacePoint(Point2 p)
-	{
-		return getAABoxInParentSpace().containsPoint( p );
-	}
-	
-	
 	protected AffineTransform pushGraphicsTransform(Graphics2D graphics)
 	{
 		AffineTransform current = graphics.getTransform();
@@ -571,7 +530,7 @@ abstract public class DPWidget
 	{
 		if ( presentationArea != null )
 		{
-			return presentationArea.pointersWithinBoundsByWidget.get( this );
+			return presentationArea.getInputTable().getPointersWithinBoundsOfElement( this );
 		}
 		else
 		{
@@ -607,8 +566,6 @@ abstract public class DPWidget
 	protected void setParent(DPContainer parent, DPPresentationArea area)
 	{
 		this.parent = parent;
-		StyleSheetValues parentValues = parent != null  ?  parent.styleSheetValues  :  new StyleSheetValues();
-		styleSheetValues = computeStyleSheetValues( parentValues );
 		if ( area != presentationArea )
 		{
 			setPresentationArea( area );
@@ -804,20 +761,6 @@ abstract public class DPWidget
 	
 	
 	
-	protected DPWidget getDndElement(Point2 localPos)
-	{
-		if ( dndHandler != null )
-		{
-			return this;
-		}
-		else
-		{
-			return null;
-		}
-	}
-	
-	
-	
 	
 	
 	
@@ -909,6 +852,14 @@ abstract public class DPWidget
 	{
 	}
 	
+	protected void onLeaveIntoChild(PointerMotionEvent event, PointerInputElement child)
+	{
+	}
+	
+	protected void onEnterFromChild(PointerMotionEvent event, PointerInputElement child)
+	{
+	}
+	
 	
 	protected boolean onScroll(PointerScrollEvent event)
 	{
@@ -995,111 +946,17 @@ abstract public class DPWidget
 
 
 
-	protected boolean handleButtonDown(PointerButtonEvent event)
-	{
-		return onButtonDown( event );
-	}
-	
-	protected boolean handleButtonDown2(PointerButtonEvent event)
-	{
-		return onButtonDown2( event );
-	}
-	
-	protected boolean handleButtonDown3(PointerButtonEvent event)
-	{
-		return onButtonDown3( event );
-	}
-	
-	protected boolean handleButtonUp(PointerButtonEvent event)
-	{
-		return onButtonUp( event );
-	}
-	
-	
-	protected void handleMotion(PointerMotionEvent event)
-	{
-		PointerInterface pointer = event.pointer.concretePointer();
-		if ( presentationArea != null )
-		{
-			ArrayList<PointerInterface> pointersWithinBounds = presentationArea.pointersWithinBoundsByWidget.get( this );
-			if ( pointersWithinBounds == null )
-			{
-				pointersWithinBounds = new ArrayList<PointerInterface>();
-				presentationArea.pointersWithinBoundsByWidget.put( this, pointersWithinBounds );
-			}
-			if ( !pointersWithinBounds.contains( pointer ) )
-			{
-				pointersWithinBounds.add( pointer );
-			}
-		}
-		onMotion( event );
-	}
-	
-	protected void handleEnter(PointerMotionEvent event)
-	{
-		PointerInterface pointer = event.pointer.concretePointer();
-		if ( presentationArea != null )
-		{
-			ArrayList<PointerInterface> pointersWithinBounds = presentationArea.pointersWithinBoundsByWidget.get( this );
-			if ( pointersWithinBounds == null )
-			{
-				pointersWithinBounds = new ArrayList<PointerInterface>();
-				presentationArea.pointersWithinBoundsByWidget.put( this, pointersWithinBounds );
-			}
-			if ( !pointersWithinBounds.contains( pointer ) )
-			{
-				pointersWithinBounds.add( pointer );
-			}
-		}
-		onEnter( event );
-	}
-	
-	protected void handleLeave(PointerMotionEvent event)
-	{
-		PointerInterface pointer = event.pointer.concretePointer();
-		if ( presentationArea != null )
-		{
-			ArrayList<PointerInterface> pointersWithinBounds = presentationArea.pointersWithinBoundsByWidget.get( this );
-			if ( pointersWithinBounds != null )
-			{
-				pointersWithinBounds.remove( pointer );
-				if ( pointersWithinBounds.isEmpty() )
-				{
-					pointersWithinBounds = null;
-					presentationArea.pointersWithinBoundsByWidget.remove( this );
-				}
-			}
-		}
-		onLeave( event );
-	}
-	
-	protected boolean handleScroll(PointerScrollEvent event)
-	{
-		return onScroll( event );
-	}
-	
 	protected void handleRealise()
 	{
 		setFlagRealised();
 		onRealise();
 	}
 	
-	@SuppressWarnings("unchecked")
 	protected void handleUnrealise(DPWidget unrealiseRoot)
 	{
 		if ( presentationArea != null )
 		{
-			ArrayList<PointerInterface> pointersWithinBounds = presentationArea.pointersWithinBoundsByWidget.get( this );
-			if ( pointersWithinBounds != null )
-			{
-				ArrayList<PointerInterface> pointers = (ArrayList<PointerInterface>)pointersWithinBounds.clone();
-				for (PointerInterface pointer: pointers)
-				{
-					handleLeave( new PointerMotionEvent( pointer, PointerMotionEvent.Action.LEAVE ) );
-				}
-				pointersWithinBounds = null;
-				presentationArea.pointersWithinBoundsByWidget.remove( this );
-			}
+			presentationArea.elementUnrealised( this );
 		}
 		onUnrealise( unrealiseRoot );
 		clearFlagRealised();
@@ -1118,6 +975,149 @@ abstract public class DPWidget
 	{
 		draw( graphics );
 	}
+	
+
+	
+	
+	
+	//
+	//
+	// Element tree traversal methods
+	//
+	//
+	
+	protected DPWidget getFirstChildAtLocalPoint(Point2 localPos)
+	{
+		return null;
+	}
+	
+	protected DPWidget getLastChildAtLocalPoint(Point2 localPos)
+	{
+		return null;
+	}
+	
+
+	
+	
+	//
+	//
+	// POINTER INPUT ELEMENT METHODS
+	//
+	//
+
+	protected boolean handlePointerButtonDown(PointerButtonEvent event)
+	{
+		return onButtonDown( event );
+	}
+	
+	protected boolean handlePointerButtonDown2(PointerButtonEvent event)
+	{
+		return onButtonDown2( event );
+	}
+	
+	protected boolean handlePointerButtonDown3(PointerButtonEvent event)
+	{
+		return onButtonDown3( event );
+	}
+	
+	protected boolean handlePointerButtonUp(PointerButtonEvent event)
+	{
+		return onButtonUp( event );
+	}
+	
+	protected void handlePointerMotion(PointerMotionEvent event)
+	{
+		onMotion( event );
+	}
+	
+	protected void handlePointerEnter(PointerMotionEvent event)
+	{
+		onEnter( event );
+	}
+	
+	protected void handlePointerLeave(PointerMotionEvent event)
+	{
+		onLeave( event );
+	}
+	
+
+	protected void handlePointerEnterFromChild(PointerMotionEvent event, PointerInputElement childElement)
+	{
+		onEnterFromChild( event, childElement );
+	}
+	
+	protected void handlePointerLeaveIntoChild(PointerMotionEvent event, PointerInputElement childElement)
+	{
+		onLeaveIntoChild( event, childElement );
+	}
+	
+	protected boolean handlePointerScroll(PointerScrollEvent event)
+	{
+		return onScroll( event );
+	}
+	
+	
+	protected PointerInputElement getFirstPointerChildAtLocalPoint(Point2 localPos)
+	{
+		return getFirstChildAtLocalPoint( localPos );
+	}
+	
+	protected PointerInputElement getLastPointerChildAtLocalPoint(Point2 localPos)
+	{
+		return getLastChildAtLocalPoint( localPos );
+	}
+	
+	protected PointerEvent transformParentToLocalEvent(PointerEvent event)
+	{
+		return event.transformed( getParentToLocalXform() );
+	}
+	
+	protected PointerInterface transformParentToLocalPointer(PointerInterface pointer)
+	{
+		return pointer.transformed( getParentToLocalXform() );
+	}
+	
+	public Point2 transformParentToLocalPoint(Point2 parentPos)
+	{
+		return getParentToLocalXform().transform( parentPos );
+	}
+	
+	protected boolean isPointerInputElementRealised()
+	{
+		return isRealised();
+	}
+	
+	public boolean containsParentSpacePoint(Point2 parentPos)
+	{
+		return getAABoxInParentSpace().containsPoint( parentPos );
+	}
+
+	public boolean containsLocalSpacePoint(Point2 localPos)
+	{
+		return localPos.x >= 0.0  &&  localPos.y >= 0.0  &&  localPos.x < getAllocationX()  &&  localPos.y < getAllocationY();
+	}
+	
+	protected PointerInputElement getDndElement(Point2 localPos, Point2 targetPos[])				// targetPos is an output parameter
+	{
+		if ( dndHandler != null )
+		{
+			if ( targetPos != null )
+			{
+				targetPos[0] = localPos;
+			}
+			return this;
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	public DndHandler getDndHandler()
+	{
+		return dndHandler;
+	}
+	
 	
 	
 	
@@ -1846,9 +1846,9 @@ abstract public class DPWidget
 	// Meta-element
 	//
 	
-	protected static ElementStyleSheet headerDebugTextStyle = DPStaticText.styleSheet( new Font( "Sans serif", Font.PLAIN, 14 ), new Color( 0.0f, 0.5f, 0.5f ) );
-	protected static ElementStyleSheet headerDescriptionTextStyle = DPStaticText.styleSheet( new Font( "Sans serif", Font.PLAIN, 14 ), new Color( 0.0f, 0.0f, 0.75f ) );
-	protected static ElementStyleSheet metaHeaderHBoxStyle = DPHBox.styleSheet( VAlignment.BASELINES, 10.0, false, 0.0 );
+	protected static TextStyleSheet headerDebugTextStyle = new TextStyleSheet( new Font( "Sans serif", Font.BOLD, 14 ), new Color( 0.0f, 0.5f, 0.5f ) );
+	protected static TextStyleSheet headerDescriptionTextStyle = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 14 ), new Color( 0.0f, 0.0f, 0.75f ) );
+	protected static HBoxStyleSheet metaHeaderHBoxStyle = new HBoxStyleSheet( VAlignment.BASELINES, 10.0, false, 0.0 );
 	protected static EmptyBorder metaHeaderEmptyBorder = new EmptyBorder();
 
 
@@ -1861,7 +1861,7 @@ abstract public class DPWidget
 	{
 		if ( debugName != null )
 		{
-			return new DPStaticText( headerDebugTextStyle, "<" + debugName + ">" );
+			return new DPText( headerDebugTextStyle, "<" + debugName + ">" );
 		}
 		else
 		{
@@ -1873,7 +1873,7 @@ abstract public class DPWidget
 	{
 		String description = toString();
 		description = description.replace( "BritefuryJ.DocPresent.", "" );
-		return new DPStaticText( headerDescriptionTextStyle, description );
+		return new DPText( headerDescriptionTextStyle, description );
 	}
 	
 	protected Border getMetaHeaderBorder()

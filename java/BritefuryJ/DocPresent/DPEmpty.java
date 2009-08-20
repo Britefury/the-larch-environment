@@ -10,7 +10,7 @@ package BritefuryJ.DocPresent;
 import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.Marker.Marker;
-import BritefuryJ.DocPresent.StyleSheets.ElementStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.WidgetStyleSheet;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
 
@@ -21,20 +21,20 @@ public class DPEmpty extends DPWidget
 	
 	public DPEmpty()
 	{
-		this( null, "" );
+		this( WidgetStyleSheet.defaultStyleSheet, "" );
 	}
 	
 	public DPEmpty(String textRepresentation)
 	{
-		this( null, textRepresentation );
+		this( WidgetStyleSheet.defaultStyleSheet, textRepresentation );
 	}
 	
-	public DPEmpty(ElementStyleSheet styleSheet)
+	public DPEmpty(WidgetStyleSheet styleSheet)
 	{
 		this( styleSheet, "" );
 	}
 
-	public DPEmpty(ElementStyleSheet styleSheet, String textRepresentation)
+	public DPEmpty(WidgetStyleSheet styleSheet, String textRepresentation)
 	{
 		super( styleSheet );
 		

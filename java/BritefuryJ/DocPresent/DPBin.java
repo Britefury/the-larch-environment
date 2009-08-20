@@ -10,7 +10,7 @@ package BritefuryJ.DocPresent;
 import java.util.List;
 
 import BritefuryJ.DocPresent.Layout.PackingParams;
-import BritefuryJ.DocPresent.StyleSheets.ElementStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 import BritefuryJ.Math.Point2;
 
 
@@ -18,10 +18,10 @@ public class DPBin extends DPContainer
 {
 	public DPBin()
 	{
-		this( null );
+		this( ContainerStyleSheet.defaultStyleSheet );
 	}
 
-	public DPBin(ElementStyleSheet styleSheet)
+	public DPBin(ContainerStyleSheet styleSheet)
 	{
 		super( styleSheet );
 	}

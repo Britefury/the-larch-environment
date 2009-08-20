@@ -6,13 +6,11 @@
 //##************************
 package tests.DocPresent.Layout;
 
+import BritefuryJ.DocPresent.Layout.BoxPackingParams;
 import BritefuryJ.DocPresent.Layout.LAllocBox;
 import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Layout.ParagraphLayout;
 import BritefuryJ.DocPresent.Layout.VAlignment;
-import BritefuryJ.DocPresent.StyleSheets.ElementStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.StyleSheetValueFieldSet;
-import BritefuryJ.DocPresent.StyleSheets.StyleSheetValues;
 
 public class Test_ParagraphLayout extends Test_Layout_base
 {
@@ -31,13 +29,6 @@ public class Test_ParagraphLayout extends Test_Layout_base
 		return new LReqBox( width, hSpacing, 0.0, 0.0 ).lineBreakBox( cost );
 	}
 	
-	
-	private StyleSheetValues hPack(double padding)
-	{
-		ElementStyleSheet elementSheet = new ElementStyleSheet( new String[] { "pack_xPadding" }, new Object[] { padding } );
-		return StyleSheetValues.cascade(  new StyleSheetValues(), elementSheet, new StyleSheetValueFieldSet() );
-	}
-
 	
 	//
 	//
@@ -70,21 +61,21 @@ public class Test_ParagraphLayout extends Test_Layout_base
 		assertEquals( result, new LReqBox() );
 
 		// requisitionX( [ <0,0>:pad=1 ] )  ->  <2,0>
-		ParagraphLayout.computeRequisitionX( result, new LReqBox[] { new LReqBox() },  0.0, 0.0, new StyleSheetValues[] { hPack( 1.0 ) } );
+		ParagraphLayout.computeRequisitionX( result, new LReqBox[] { new LReqBox() },  0.0, 0.0, new BoxPackingParams[] { new BoxPackingParams( 1.0 ) } );
 		assertEquals( result, xbox( 2.0, 0.0 ) );
 
 		// requisitionX( [ <10,0>:pad=2 ] )  ->  <14,0>
-		ParagraphLayout.computeRequisitionX( result, new LReqBox[] { xbox( 10.0, 0.0 ) },  0.0, 0.0, new StyleSheetValues[] { hPack( 2.0 ) } );
+		ParagraphLayout.computeRequisitionX( result, new LReqBox[] { xbox( 10.0, 0.0 ) },  0.0, 0.0, new BoxPackingParams[] { new BoxPackingParams( 2.0 ) } );
 		assertEquals( result, xbox( 14.0, 0.0 ) );
 
 		// Padding 'consumes' h-spacing
 		// requisitionX( [ <10,1>:pad=2 ] )  ->  <14,0>
-		ParagraphLayout.computeRequisitionX( result, new LReqBox[] { xbox( 10.0, 1.0 ) },  0.0, 0.0, new StyleSheetValues[] { hPack( 2.0 ) } );
+		ParagraphLayout.computeRequisitionX( result, new LReqBox[] { xbox( 10.0, 1.0 ) },  0.0, 0.0, new BoxPackingParams[] { new BoxPackingParams( 2.0 ) } );
 		assertEquals( result, xbox( 14.0, 0.0 ) );
 
 		// Padding 'consumes' all h-spacing
 		// requisitionX( [ <10,3>:pad=2 ] )  ->  <14,1>
-		ParagraphLayout.computeRequisitionX( result, new LReqBox[] { xbox( 10.0, 3.0 ) },  0.0, 0.0, new StyleSheetValues[] { hPack( 2.0 ) } );
+		ParagraphLayout.computeRequisitionX( result, new LReqBox[] { xbox( 10.0, 3.0 ) },  0.0, 0.0, new BoxPackingParams[] { new BoxPackingParams( 2.0 ) } );
 		assertEquals( result, xbox( 14.0, 1.0 ) );
 
 		// requisitionX( [ <0,0>, <0,0> ] )  ->  <0,0>
@@ -140,7 +131,7 @@ public class Test_ParagraphLayout extends Test_Layout_base
 		// Padding around line break should only affect the preferred width, not the minimum width
 		// Padding before line break should effect both
 		ParagraphLayout.computeRequisitionX( result, new LReqBox[] { xbox( 10.0, 0.0 ), xbox( 20.0, 0.0 ), lineBreakBox( 0 ), xbox( 15.0, 0.0 ) },  0.0, 0.0,
-				new StyleSheetValues[] { hPack( 0.0 ), hPack( 10.0 ), hPack( 100.0 ), hPack( 0.0 ) } );
+				new BoxPackingParams[] { new BoxPackingParams( 0.0 ), new BoxPackingParams( 10.0 ), new BoxPackingParams( 100.0 ), new BoxPackingParams( 0.0 ) } );
 		assertEquals( result, xbox( 50.0, 265.0, 0.0, 0.0 ) );
 
 		// Two lines, the second of greater length than the first, with spacing
@@ -200,7 +191,7 @@ public class Test_ParagraphLayout extends Test_Layout_base
 	//
 	//
 
-	private void allocXTest(LReqBox children[], double indentation, double hSpacing, StyleSheetValues styleSheetValues[], LReqBox expectedBox, double boxAllocation, double expectedSize[], double expectedPosition[])
+	private void allocXTest(LReqBox children[], double indentation, double hSpacing, BoxPackingParams packingParams[],LReqBox expectedBox, double boxAllocation, double expectedSize[], double expectedPosition[])
 	{ 
 		LReqBox box = new LReqBox();
 		LAllocBox boxAlloc = new LAllocBox( null );
@@ -210,12 +201,12 @@ public class Test_ParagraphLayout extends Test_Layout_base
 			childrenAlloc[i] = new LAllocBox( null );
 		}
 
-		ParagraphLayout.computeRequisitionX( box, children, indentation, hSpacing, styleSheetValues );
+		ParagraphLayout.computeRequisitionX( box, children, indentation, hSpacing, packingParams );
 		
 		assertBoxesEqual( box, expectedBox, "PARENT BOX" );
 
 		boxAlloc.setAllocationX( boxAllocation );
-		ParagraphLayout.allocateX( box, children, boxAlloc, childrenAlloc, indentation, hSpacing, styleSheetValues );
+		ParagraphLayout.allocateX( box, children, boxAlloc, childrenAlloc, indentation, hSpacing, packingParams );
 		for (int i = 0; i < children.length; i++)
 		{
 			if ( childrenAlloc[i].getAllocationX() != expectedSize[i] )
@@ -232,7 +223,7 @@ public class Test_ParagraphLayout extends Test_Layout_base
 		}
 	}
 	
-	private void allocXTests(LReqBox children[], double indentation, double hSpacing, StyleSheetValues styleSheetValues[], LReqBox expectedBox, double boxAllocations[], double expectedSize[][], double expectedPosition[][])
+	private void allocXTests(LReqBox children[], double indentation, double hSpacing, BoxPackingParams packingParams[], LReqBox expectedBox, double boxAllocations[], double expectedSize[][], double expectedPosition[][])
 	{
 		LReqBox childrenCopy[] = new LReqBox[children.length];
 		for (int i = 0; i  < boxAllocations.length; i++)
@@ -241,7 +232,7 @@ public class Test_ParagraphLayout extends Test_Layout_base
 			{
 				childrenCopy[j] = children[j].copy();
 			}
-			allocXTest( childrenCopy, indentation, hSpacing, styleSheetValues, expectedBox, boxAllocations[i], expectedSize[i], expectedPosition[i] );
+			allocXTest( childrenCopy, indentation, hSpacing, packingParams, expectedBox, boxAllocations[i], expectedSize[i], expectedPosition[i] );
 		}
 	}
 
@@ -328,7 +319,7 @@ public class Test_ParagraphLayout extends Test_Layout_base
 	//
 	// REQUISITION Y TESTS
 
-	private void allocYTest(LReqBox children[], double indentation, double hSpacing, double vSpacing, VAlignment vAlignment, StyleSheetValues styleSheetValues[],
+	private void allocYTest(LReqBox children[], double indentation, double hSpacing, double vSpacing, VAlignment vAlignment, BoxPackingParams packingParams[],
 			LReqBox expectedBox, double boxAllocation, double expectedSize[], double expectedPosition[])
 	{ 
 		LReqBox box = new LReqBox();
@@ -340,9 +331,9 @@ public class Test_ParagraphLayout extends Test_Layout_base
 		}
 		
 		// X
-		ParagraphLayout.computeRequisitionX( box, children, indentation, hSpacing, styleSheetValues );
+		ParagraphLayout.computeRequisitionX( box, children, indentation, hSpacing, packingParams );
 		boxAlloc.setAllocationX( boxAllocation );
-		ParagraphLayout.Line lines[] = ParagraphLayout.allocateX( box, children, boxAlloc, childrenAlloc, indentation, hSpacing, styleSheetValues );
+		ParagraphLayout.Line lines[] = ParagraphLayout.allocateX( box, children, boxAlloc, childrenAlloc, indentation, hSpacing, packingParams );
 		
 		// Y
 		ParagraphLayout.computeRequisitionY( box, lines, vSpacing, vAlignment );

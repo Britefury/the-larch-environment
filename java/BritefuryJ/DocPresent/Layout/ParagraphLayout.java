@@ -8,14 +8,8 @@ package BritefuryJ.DocPresent.Layout;
 
 import java.util.ArrayList;
 
-import BritefuryJ.DocPresent.StyleSheets.StyleSheetValueFieldPack;
-import BritefuryJ.DocPresent.StyleSheets.StyleSheetValues;
-
 public class ParagraphLayout
 {
-	public static StyleSheetValueFieldPack pack_xPaddingValueField = HorizontalLayout.pack_xPaddingValueField;
-
-	
 	public static class Line
 	{
 		protected LReqBox lineReqBox;
@@ -25,16 +19,16 @@ public class ParagraphLayout
 		protected int startIndex, endIndex;
 		
 		
-		private Line(LReqBox ch[], LAllocBox chAlloc[], double indentation, double spacing, StyleSheetValues styleSheetValues[], double allocation, int startIndex, int endIndex)
+		private Line(LReqBox ch[], LAllocBox chAlloc[], double indentation, double spacing, BoxPackingParams packingParams[], double allocation, int startIndex, int endIndex)
 		{
 			children = ch;
 			childrenAlloc = chAlloc;
 			
 			lineReqBox = new LReqBox();
 			lineAllocBox = new LAllocBox( null );
-			HorizontalLayout.computeRequisitionX( lineReqBox, children, spacing, styleSheetValues );
+			HorizontalLayout.computeRequisitionX( lineReqBox, children, spacing, packingParams );
 			lineAllocBox.allocationX = allocation - indentation;
-			HorizontalLayout.allocateX( lineReqBox, children, lineAllocBox, childrenAlloc, spacing, styleSheetValues );
+			HorizontalLayout.allocateX( lineReqBox, children, lineAllocBox, childrenAlloc, spacing, packingParams );
 			for (LAllocBox childAlloc: childrenAlloc)
 			{
 				childAlloc.positionInParentSpaceX += indentation;
@@ -94,7 +88,7 @@ public class ParagraphLayout
 		
 		public static Line createRangeTestLine(int startIndex, int endIndex)
 		{
-			return new Line( new LReqBox[] {}, new LAllocBox[] {}, 0.0, 0.0, new StyleSheetValues[] {}, 0.0, startIndex, endIndex );
+			return new Line( new LReqBox[] {}, new LAllocBox[] {}, 0.0, 0.0, new BoxPackingParams[] {}, 0.0, startIndex, endIndex );
 		}
 		
 		
@@ -151,7 +145,7 @@ public class ParagraphLayout
 	
 	
 
-	public static void computeRequisitionX(LReqBox box, LReqBox children[], double indentation, double hSpacing, StyleSheetValues styleSheetValues[])
+	public static void computeRequisitionX(LReqBox box, LReqBox children[], double indentation, double hSpacing, BoxPackingParams packingParams[])
 	{
 		// Accumulate the width required for all the children
 		
@@ -170,7 +164,8 @@ public class ParagraphLayout
 		{
 			LReqBox child = children[i];
 			
-			double padding = styleSheetValues != null  ?  (Double)styleSheetValues[i].get( pack_xPaddingValueField )  :  0.0;
+			BoxPackingParams params = packingParams != null  ?  packingParams[i]  :  null;
+			double padding = params != null  ?  params.padding  :  0.0;
 			
 			// Filter out any h-spacing that is within the amount of padding
 			double prefChildSpacing = Math.max( child.prefHSpacing - padding, 0.0 );
@@ -234,7 +229,7 @@ public class ParagraphLayout
 
 
 
-	public static Line[] allocateX(LReqBox box, LReqBox children[], LAllocBox allocBox, LAllocBox childrenAlloc[], double indentation, double hSpacing, StyleSheetValues styleSheetValues[])
+	public static Line[] allocateX(LReqBox box, LReqBox children[], LAllocBox allocBox, LAllocBox childrenAlloc[], double indentation, double hSpacing, BoxPackingParams packingParams[])
 	{
 		boolean bFirstLine = true;
 		
@@ -257,7 +252,8 @@ public class ParagraphLayout
 		{
 			LReqBox child = children[i];
 			
-			double padding = styleSheetValues != null  ?  (Double)styleSheetValues[i].get( HorizontalLayout.pack_xPaddingValueField )  :  0.0;
+			BoxPackingParams params = packingParams != null  ?  packingParams[i]  :  null;
+			double padding = params != null  ?  params.padding  :  0.0;
 			
 			// Filter out any h-spacing that is within the amount of padding
 			double childSpacing = Math.max( child.prefHSpacing - padding, 0.0 );
@@ -321,13 +317,13 @@ public class ParagraphLayout
 				LAllocBox lineChildrenAlloc[] = new LAllocBox[lineLength];
 				System.arraycopy( children, lineStartIndex, lineChildren, 0, lineLength );
 				System.arraycopy( childrenAlloc, lineStartIndex, lineChildrenAlloc, 0, lineLength );
-				StyleSheetValues lineStyleSheetValues[] =  null;
-				if ( styleSheetValues != null )
+				BoxPackingParams linePackingParams[] =  null;
+				if ( packingParams != null )
 				{
-					lineStyleSheetValues = new StyleSheetValues[lineLength];
-					System.arraycopy( styleSheetValues, lineStartIndex, lineStyleSheetValues, 0, lineLength );
+					linePackingParams = new BoxPackingParams[lineLength];
+					System.arraycopy( packingParams, lineStartIndex, linePackingParams, 0, lineLength );
 				}
-				lines.add( new Line( lineChildren, lineChildrenAlloc, bFirstLine  ?  0.0  :  indentation, hSpacing, lineStyleSheetValues, allocBox.allocationX, lineStartIndex, lineBreakIndex ) );
+				lines.add( new Line( lineChildren, lineChildrenAlloc, bFirstLine  ?  0.0  :  indentation, hSpacing, linePackingParams, allocBox.allocationX, lineStartIndex, lineBreakIndex ) );
 				
 				// Next line
 				lineStartIndex = lineBreakIndex + 1;
@@ -357,13 +353,13 @@ public class ParagraphLayout
 			LAllocBox lineChildrenAlloc[] = new LAllocBox[lineLength];
 			System.arraycopy( children, lineStartIndex, lineChildren, 0, lineLength );
 			System.arraycopy( childrenAlloc, lineStartIndex, lineChildrenAlloc, 0, lineLength );
-			StyleSheetValues lineStyleSheetValues[] =  null;
-			if ( styleSheetValues != null )
+			BoxPackingParams linePackingParams[] =  null;
+			if ( packingParams != null )
 			{
-				lineStyleSheetValues = new StyleSheetValues[lineLength];
-				System.arraycopy( styleSheetValues, lineStartIndex, lineStyleSheetValues, 0, lineLength );
+				linePackingParams = new BoxPackingParams[lineLength];
+				System.arraycopy( packingParams, lineStartIndex, linePackingParams, 0, lineLength );
 			}
-			lines.add( new Line( lineChildren, lineChildrenAlloc, bFirstLine  ?  0.0  :  indentation, hSpacing, lineStyleSheetValues, allocBox.allocationX, lineStartIndex, children.length ) );
+			lines.add( new Line( lineChildren, lineChildrenAlloc, bFirstLine  ?  0.0  :  indentation, hSpacing, linePackingParams, allocBox.allocationX, lineStartIndex, children.length ) );
 		}
 		
 		

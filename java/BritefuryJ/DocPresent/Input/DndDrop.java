@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.DocPresent;
+package BritefuryJ.DocPresent.Input;
 
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -13,7 +13,7 @@ import BritefuryJ.Math.Point2;
 
 public abstract class DndDrop
 {
-	protected DPWidget targetElement;
+	protected PointerInputElement targetElement;
 	protected Point2 targetPosition;
 	
 	
@@ -22,7 +22,7 @@ public abstract class DndDrop
 	{
 	}
 	
-	protected DndDrop(DPWidget targetElement, Point2 targetPosition)
+	protected DndDrop(PointerInputElement targetElement, Point2 targetPosition)
 	{
 		this.targetElement = targetElement;
 		this.targetPosition = targetPosition;
@@ -43,7 +43,7 @@ public abstract class DndDrop
 
 
 
-	public DPWidget getTargetElement()
+	public PointerInputElement getTargetElement()
 	{
 		return targetElement;
 	}
@@ -54,7 +54,7 @@ public abstract class DndDrop
 	}
 	
 	
-	protected void setTarget(DPWidget element, Point2 pos)
+	protected void setTarget(PointerInputElement element, Point2 pos)
 	{
 		targetElement = element;
 		targetPosition = pos;

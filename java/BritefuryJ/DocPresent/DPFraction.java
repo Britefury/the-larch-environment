@@ -6,7 +6,6 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.Shape;
@@ -22,46 +21,24 @@ import BritefuryJ.DocPresent.Layout.LAllocBox;
 import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Layout.PackingParams;
 import BritefuryJ.DocPresent.Marker.Marker;
-import BritefuryJ.DocPresent.StyleSheets.ElementStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.ElementStyleSheetField;
-import BritefuryJ.DocPresent.StyleSheets.StyleSheetValueFieldDirect;
-import BritefuryJ.DocPresent.StyleSheets.StyleSheetValueFieldSet;
+import BritefuryJ.DocPresent.StyleSheets.FractionStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.Math.Point2;
 
 public class DPFraction extends DPContainer
 {
-	protected static ElementStyleSheetField vSpacingField = ElementStyleSheetField.newField( "fractionVSpacing", Double.class );
-	protected static ElementStyleSheetField hPaddingField = ElementStyleSheetField.newField( "fractionHPadding", Double.class );
-	protected static ElementStyleSheetField yOffsetField = ElementStyleSheetField.newField( "fractionYOffset", Double.class );
-
-	protected static StyleSheetValueFieldDirect vSpacingValueField = StyleSheetValueFieldDirect.newField( "fractionVSpacing", Double.class, 2.0, vSpacingField );
-	protected static StyleSheetValueFieldDirect hPaddingValueField = StyleSheetValueFieldDirect.newField( "fractionHPadding", Double.class, 3.0, hPaddingField );
-	protected static StyleSheetValueFieldDirect yOffsetValueField = StyleSheetValueFieldDirect.newField( "fractionYOffset", Double.class, 5.0, yOffsetField );
-	
-	
-	protected static StyleSheetValueFieldSet useStyleSheetFields_Fraction = useStyleSheetFields_Element.join( vSpacingValueField, hPaddingValueField, yOffsetValueField );
-
-	
 	private static double childScale = 0.85;
 
 	
 	
 	public static class DPFractionBar extends DPContentLeafEditableEntry
 	{
-		protected static ElementStyleSheetField barPaintField = ElementStyleSheetField.newField( "fractionBarPaint", Paint.class );
-
-		protected static StyleSheetValueFieldDirect barPaintValueField = StyleSheetValueFieldDirect.newField( "fractionBarPaint", Paint.class, Color.black, barPaintField );
-		
-		
-		protected static StyleSheetValueFieldSet useStyleSheetFields_FractionBar = useStyleSheetFields_Element.join( barPaintValueField );
-
-		
 		public DPFractionBar(String textRepresentation)
 		{
-			this( null, textRepresentation );
+			this( FractionStyleSheet.BarStyleSheet.defaultStyleSheet, textRepresentation );
 		}
 
-		public DPFractionBar(ElementStyleSheet styleSheet, String textRepresentation)
+		public DPFractionBar(FractionStyleSheet.BarStyleSheet styleSheet, String textRepresentation)
 		{
 			super( styleSheet, textRepresentation );
 		}
@@ -178,13 +155,7 @@ public class DPFraction extends DPContainer
 		
 		protected Paint getBarPaint()
 		{
-			return (Paint)styleSheetValues.get( barPaintValueField );
-		}
-		
-		
-		protected StyleSheetValueFieldSet getUsedStyleSheetValueFields()
-		{
-			return useStyleSheetFields_FractionBar;
+			return ((FractionStyleSheet.BarStyleSheet)styleSheet).getBarPaint();
 		}
 	}
 	
@@ -200,34 +171,37 @@ public class DPFraction extends DPContainer
 	protected DPWidget children[];
 	protected DPSegment segs[];
 	protected DPParagraph paras[];
+	TextStyleSheet segmentTextStyleSheet;
 
 	
 	
 	
 	public DPFraction()
 	{
-		this( null, "/" );
+		this( FractionStyleSheet.defaultStyleSheet, TextStyleSheet.defaultStyleSheet, "/" );
 	}
 	
 	public DPFraction(String barTextRepresentation)
 	{
-		this( null, barTextRepresentation );
+		this( FractionStyleSheet.defaultStyleSheet, TextStyleSheet.defaultStyleSheet, barTextRepresentation );
 	}
 	
-	public DPFraction(ElementStyleSheet styleSheet)
+	public DPFraction(FractionStyleSheet styleSheet, TextStyleSheet segmentTextStyleSheet)
 	{
-		this( styleSheet, "/" );
+		this( styleSheet, segmentTextStyleSheet, "/" );
 	}
 	
-	public DPFraction(ElementStyleSheet styleSheet, String barTextRepresentation)
+	public DPFraction(FractionStyleSheet styleSheet, TextStyleSheet segmentTextStyleSheet, String barTextRepresentation)
 	{
 		super( styleSheet );
+		
+		this.segmentTextStyleSheet = segmentTextStyleSheet;
 		
 		children = new DPWidget[NUMCHILDREN];
 		segs = new DPSegment[NUMCHILDREN];
 		paras = new DPParagraph[NUMCHILDREN];
 		
-		setChild( BAR, new DPFractionBar( styleSheet, barTextRepresentation ) );
+		setChild( BAR, new DPFractionBar( styleSheet.getBarStyleSheet(), barTextRepresentation ) );
 	}
 
 	
@@ -271,7 +245,7 @@ public class DPFraction extends DPContainer
 
 				if ( bSegmentRequired  &&  !bSegmentPresent )
 				{
-					DPSegment seg = new DPSegment( styleSheet, true, true );
+					DPSegment seg = new DPSegment( segmentTextStyleSheet, true, true );
 					segs[slot] = seg;
 					DPParagraph para = new DPParagraph();
 					para.setChildren( Arrays.asList( new DPWidget[] { seg } ) );
@@ -554,25 +528,18 @@ public class DPFraction extends DPContainer
 	// STYLESHEET METHODS
 	//
 	
-	protected StyleSheetValueFieldSet getUsedStyleSheetValueFields()
-	{
-		return useStyleSheetFields_Fraction;
-	}
-
-	
-	
 	protected double getVSpacing()
 	{
-		return (Double)styleSheetValues.get( vSpacingValueField );
+		return ((FractionStyleSheet)styleSheet).getVSpacing();
 	}
 
 	protected double getHPadding()
 	{
-		return (Double)styleSheetValues.get( hPaddingValueField );
+		return ((FractionStyleSheet)styleSheet).getHPadding();
 	}
 
 	protected double getYOffset()
 	{
-		return (Double)styleSheetValues.get( yOffsetValueField );
+		return ((FractionStyleSheet)styleSheet).getYOffset();
 	}
 }

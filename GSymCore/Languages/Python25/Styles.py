@@ -15,16 +15,16 @@ from BritefuryJ.DocPresent.Layout import *
 from BritefuryJ.DocPresent.Border import *
 
 
-default_textStyle = ElementStyleSheet( font=Font( 'Sans serif', Font.BOLD, 14 ), paint=Color.black )
+default_textStyle = TextStyleSheet()
 
-unparsed_textStyle = ElementStyleSheet( font=Font( 'SansSerif', Font.PLAIN, 14 ),  paint=Color( 0.0, 0.0, 0.0 ), squiggleUndelinePaint=Color( 1.0, 0.0, 0.0, 0.5 ) )
-keyword_textStyle = ElementStyleSheet( font=Font( 'SansSerif', Font.BOLD, 14 ),  paint=Color( 0.25, 0.0, 0.5 ) )
-capitalisedKeyword_textStyle = ElementStyleSheet( font=Font( 'SansSerif', Font.BOLD, 14 ),  paint=Color( 0.25, 0.0, 0.5 ), bMixedSizeCaps=True )
-numericLiteral_textStyle = ElementStyleSheet( font=Font( 'SansSerif', Font.PLAIN, 14 ),  paint=Color( 0.0, 0.5, 0.5 ) )
-literalFormat_textStyle = ElementStyleSheet( font=Font( 'SansSerif', Font.PLAIN, 14 ),  paint=Color( 0.0, 0.0, 0.5 ) )
-punctuation_textStyle = ElementStyleSheet( font=Font( 'SansSerif', Font.PLAIN, 14 ),  paint=Color( 0.0, 0.0, 1.0 ) )
-operator_textStyle = ElementStyleSheet( font=Font( 'SansSerif', Font.BOLD, 14 ),  paint=Color( 0.0, 0.5, 0.0 ) )
-comment_textStyle = ElementStyleSheet( font=Font( 'SansSerif', Font.PLAIN, 14 ),  paint=Color( 0.4, 0.4, 0.4 ) )
+unparsed_textStyle = TextStyleSheet( Font( 'SansSerif', Font.PLAIN, 14 ),  Color( 0.0, 0.0, 0.0 ), Color( 1.0, 0.0, 0.0, 0.5 ) )
+keyword_textStyle = TextStyleSheet( Font( 'SansSerif', Font.BOLD, 14 ),  Color( 0.25, 0.0, 0.5 ) )
+capitalisedKeyword_textStyle = TextStyleSheet( Font( 'SansSerif', Font.BOLD, 14 ),  Color( 0.25, 0.0, 0.5 ), True )
+numericLiteral_textStyle = TextStyleSheet( Font( 'SansSerif', Font.PLAIN, 14 ),  Color( 0.0, 0.5, 0.5 ) )
+literalFormat_textStyle = TextStyleSheet( Font( 'SansSerif', Font.PLAIN, 14 ),  Color( 0.0, 0.0, 0.5 ) )
+punctuation_textStyle = TextStyleSheet( Font( 'SansSerif', Font.PLAIN, 14 ),  Color( 0.0, 0.0, 1.0 ) )
+operator_textStyle = TextStyleSheet( Font( 'SansSerif', Font.BOLD, 14 ),  Color( 0.0, 0.5, 0.0 ) )
+comment_textStyle = TextStyleSheet( Font( 'SansSerif', Font.PLAIN, 14 ),  Color( 0.4, 0.4, 0.4 ) )
 
 defBackground_border = SolidBorder( 2.0, 2.0, 5.0, 5.0, Color( 0.420, 0.620, 0.522 ), None )
 defHeader_border = EmptyBorder( 0.0, 0.0, 0.0, 0.0, 3.0, 3.0, Color( 0.913, 0.953, 0.933 ) )
@@ -34,12 +34,12 @@ classHeader_border = EmptyBorder( 0.0, 0.0, 0.0, 0.0, 3.0, 3.0, Color( 0.933, 0.
 
 indentedBlock_border = SolidBorder( 2.0, 2.0, 5.0, 5.0, Color.red, None )
 
-pow_scriptStyle = ElementStyleSheet()
-div_fractionStyle = ElementStyleSheet( fractionBarPaint=Color( 0.0, 0.5, 0.0 ) )
+pow_scriptStyle = ScriptStyleSheet( 0.0, 0.0 )
+div_fractionStyle = FractionStyleSheet( Color( 0.0, 0.5, 0.0 ) )
 
-python_paragraphStyle = ElementStyleSheet( vAlignment=VAlignment.BASELINES, paragraphIndentation=30.0 )
+python_paragraphStyle = ParagraphStyleSheet( VAlignment.BASELINES, 0.0, 0.0, 0.0, 30.0 )
 
-compoundStmt_vboxStyle = ElementStyleSheet( vTypesetting=VTypesetting.ALIGN_WITH_TOP, hAlighment=HAlignment.EXPAND )
+compoundStmt_vboxStyle = VBoxStyleSheet( VTypesetting.ALIGN_WITH_TOP, HAlignment.EXPAND, 0.0, False, 0.0 )
 
 tuple_listViewLayout = SpanListViewLayout( lambda: DPText( default_textStyle, ' ' ), 0, ListViewLayout.TrailingSeparator.NEVER )
 tuple_listViewLayoutSep = SpanListViewLayout( lambda: DPText( default_textStyle, ' ' ), 0, ListViewLayout.TrailingSeparator.ALWAYS )
@@ -48,7 +48,7 @@ list_listViewLayoutSep = SpanListViewLayout( lambda: DPText( default_textStyle, 
 dict_listViewLayout = SpanListViewLayout( lambda: DPText( default_textStyle, ' ' ), 0, ListViewLayout.TrailingSeparator.NEVER )
 dict_listViewLayoutSep = SpanListViewLayout( lambda: DPText( default_textStyle, ' ' ), 0, ListViewLayout.TrailingSeparator.NEVER )
 
-suite_vboxStyle = ElementStyleSheet( vTypesetting=VTypesetting.ALIGN_WITH_TOP, hAlighment=HAlignment.LEFT )
+suite_vboxStyle = VBoxStyleSheet( VTypesetting.ALIGN_WITH_TOP, HAlignment.LEFT, 0.0, False, 0.0 )
 
 
 #lineEditorStyle = GSymStyleSheet( highlightBackgroundColour=Colour3f( 0.85, 0.85, 1.0 ) )

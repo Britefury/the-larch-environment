@@ -87,7 +87,22 @@ public abstract class DPContainerSequenceCollateable extends DPContainerSequence
 
 	
 	
-	protected boolean containsParentSpacePoint(Point2 p)
+	public boolean containsParentSpacePoint(Point2 p)
+	{
+		refreshBoundsBoxes();
+		
+		for (AABox2 box: boundsBoxes)
+		{
+			if ( box.containsPoint( p ) )
+			{
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	public boolean containsLocalSpacePoint(Point2 p)
 	{
 		refreshBoundsBoxes();
 		
