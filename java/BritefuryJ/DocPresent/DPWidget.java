@@ -109,6 +109,7 @@ abstract public class DPWidget extends PointerInputElement
 	protected static int FLAG_REALISED = 0x1;
 	protected static int FLAG_RESIZE_QUEUED = 0x2;
 	protected static int FLAG_SIZE_UP_TO_DATE = 0x4;
+	protected static int FLAGS_ELEMENT_END = 0x8;
 	
 	protected int flags;
 	
@@ -476,45 +477,73 @@ abstract public class DPWidget extends PointerInputElement
 	
 	protected boolean isResizeQueued()
 	{
-		return ( flags & FLAG_RESIZE_QUEUED )  !=  0;
+		return testFlag( FLAG_RESIZE_QUEUED );
 	}
 	
 	protected boolean isSizeUpToDate()
 	{
-		return ( flags & FLAG_SIZE_UP_TO_DATE )  !=  0;
+		return testFlag( FLAG_SIZE_UP_TO_DATE );
+	}
+	
+	
+	protected void clearFlag(int flag)
+	{
+		flags &= ~flag;
+	}
+	
+	protected void setFlag(int flag)
+	{
+		flags |= flag;
+	}
+	
+	protected void setFlagValue(int flag, boolean value)
+	{
+		if ( value )
+		{
+			flags |= flag;
+		}
+		else
+		{
+			flags &= ~flag;
+		}
+	}
+	
+	protected boolean testFlag(int flag)
+	{
+		return ( flags & flag )  !=  0;
 	}
 	
 	
 	protected void clearFlagRealised()
 	{
-		flags &= ~FLAG_REALISED;
+		clearFlag( FLAG_REALISED );
 	}
 	
 	protected void setFlagRealised()
 	{
-		flags |= FLAG_REALISED;
+		setFlag( FLAG_REALISED );
 	}
 	
 	
 	protected void clearFlagResizeQueued()
 	{
-		flags &= ~FLAG_RESIZE_QUEUED;
+		clearFlag( FLAG_RESIZE_QUEUED );
 	}
 	
 	protected void setFlagResizeQueued()
 	{
-		flags |= FLAG_RESIZE_QUEUED;
+		setFlag( FLAG_RESIZE_QUEUED );
 	}
 	
 	
 	protected void clearFlagSizeUpToDate()
 	{
-		flags &= ~FLAG_SIZE_UP_TO_DATE;
+		clearFlag( FLAG_SIZE_UP_TO_DATE );
 	}
 	
 	protected void setFlagSizeUpToDate()
 	{
-		flags |= FLAG_SIZE_UP_TO_DATE;
+		setFlag( FLAG_SIZE_UP_TO_DATE );
 	}
 	
 	
@@ -549,7 +578,7 @@ abstract public class DPWidget extends PointerInputElement
 	
 	public boolean isRealised()
 	{
-		return ( flags & FLAG_REALISED )  !=  0;
+		return testFlag( FLAG_REALISED );
 	}
 	
 	public DPPresentationArea getPresentationArea()

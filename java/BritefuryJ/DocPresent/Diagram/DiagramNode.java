@@ -6,74 +6,56 @@
 //##************************
 package BritefuryJ.DocPresent.Diagram;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 
+import BritefuryJ.DocPresent.Event.PointerButtonEvent;
+import BritefuryJ.DocPresent.Event.PointerEvent;
+import BritefuryJ.DocPresent.Event.PointerMotionEvent;
+import BritefuryJ.DocPresent.Event.PointerScrollEvent;
+import BritefuryJ.DocPresent.Input.DndHandler;
+import BritefuryJ.DocPresent.Input.PointerInputElement;
+import BritefuryJ.DocPresent.Input.PointerInterface;
+import BritefuryJ.Math.AABox2;
+import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
 
-public abstract class DiagramNode
+public abstract class DiagramNode extends PointerInputElement
 {
 	protected static class DrawContext
 	{
-		protected static int BITMASK_STROKE = 0x1;
-		protected static int BITMASK_FILL = 0x2;
-		
-		protected int flags;
+		protected Paint strokePaint, fillPaint;
 		
 		
 		public DrawContext()
 		{
-			flags = 0;
 		}
 		
 		
-		public void setStrokeEnabled(boolean bEnabled)
+		public void setStrokePaint(Paint strokePaint)
 		{
-			if ( bEnabled )
-			{
-				flags |= BITMASK_STROKE;
-			}
-			else
-			{
-				flags &= ~BITMASK_STROKE;
-			}
-		}
-
-		public void setFillEnabled(boolean bEnabled)
-		{
-			if ( bEnabled )
-			{
-				flags |= BITMASK_FILL;
-			}
-			else
-			{
-				flags &= ~BITMASK_FILL;
-			}
+			this.strokePaint = strokePaint;
 		}
 		
-		
-		public boolean isStrokeEnabled()
+		public void setFillPaint(Paint fillPaint)
 		{
-			return ( flags & BITMASK_STROKE )  !=  0;
+			this.fillPaint = fillPaint;
 		}
 		
-		public boolean isFillEnabled()
+		public Paint getStrokePaint()
 		{
-			return ( flags & BITMASK_FILL )  !=  0;
+			return strokePaint;
+		}
+		
+		public Paint getFillPaint()
+		{
+			return fillPaint;
 		}
 	}
-	
-	
-	// Hover
-	protected HoverMonitor hoverMonitor;
-	protected DiagramNode hoverHighlight;
-	
-	// Interaction
-	protected InteractionListener interaction;
-	
 	
 	
 	
@@ -93,14 +75,14 @@ public abstract class DiagramNode
 		return new StyleNode( this, stroke );
 	}
 	
-	public DiagramNode colour(Color colour)
-	{
-		return new StyleNode( this, colour );
-	}
-	
 	public DiagramNode paint(Paint paint)
 	{
-		return new StyleNode( this, paint );
+		return StyleNode.paintNode( this, paint );
+	}
+	
+	public DiagramNode fillPaint(Paint paint)
+	{
+		return StyleNode.fillPaintNode( this, paint );
 	}
 	
 	public DiagramNode hoverMonitor(HoverMonitor monitor)
@@ -156,8 +138,128 @@ public abstract class DiagramNode
 		return transform( AffineTransform.getRotateInstance( r ) );
 	}
 
+	public DiagramNode rotateDegrees(double r)
+	{
+		return transform( AffineTransform.getRotateInstance( Math.toRadians( r ) ) );
+	}
+
 	
 	
 	// Interface API
 	public abstract void draw(Graphics2D graphics, DrawContext context);
+
+
+	public void draw(Graphics2D graphics)
+	{
+		DrawContext context = new DrawContext();
+
+		Stroke s = graphics.getStroke();
+		graphics.setStroke( new BasicStroke( 1.0f ) );
+
+		context.setStrokePaint( Color.black );
+		draw( graphics, context );
+		
+		graphics.setStroke( s );
+	}
+
+	
+	
+	public abstract AABox2 getParentSpaceBoundingBox();
+
+
+
+
+
+
+
+	protected boolean handlePointerButtonDown(PointerButtonEvent event)
+	{
+		return false;
+	}
+	
+	protected boolean handlePointerButtonDown2(PointerButtonEvent event)
+	{
+		return false;
+	}
+	
+	protected boolean handlePointerButtonDown3(PointerButtonEvent event)
+	{
+		return false;
+	}
+	
+	protected boolean handlePointerButtonUp(PointerButtonEvent event)
+	{
+		return false;
+	}
+	
+	protected void handlePointerMotion(PointerMotionEvent event)
+	{
+	}
+	
+	protected void handlePointerEnter(PointerMotionEvent event)
+	{
+	}
+	
+	protected void handlePointerLeave(PointerMotionEvent event)
+	{
+	}
+	
+	protected void handlePointerEnterFromChild(PointerMotionEvent event, PointerInputElement childElement)
+	{
+	}
+	
+	protected void handlePointerLeaveIntoChild(PointerMotionEvent event, PointerInputElement childElement)
+	{
+	}
+	
+	protected boolean handlePointerScroll(PointerScrollEvent event)
+	{
+		return false;
+	}
+	
+	
+	protected PointerInputElement getFirstPointerChildAtLocalPoint(Point2 localPos)
+	{
+		return null;
+	}
+	
+	protected PointerInputElement getLastPointerChildAtLocalPoint(Point2 localPos)
+	{
+		return null;
+	}
+	
+	protected PointerEvent transformParentToLocalEvent(PointerEvent event)
+	{
+		return event;
+	}
+	
+	protected PointerInterface transformParentToLocalPointer(PointerInterface pointer)
+	{
+		return pointer;
+	}
+	
+	public Point2 transformParentToLocalPoint(Point2 parentPos)
+	{
+		return parentPos;
+	}
+	
+
+	protected boolean isPointerInputElementRealised()
+	{
+		return true;
+	}
+	
+	public abstract boolean containsParentSpacePoint(Point2 parentPos);
+	public abstract boolean containsLocalSpacePoint(Point2 localPos);
+	
+	
+	protected PointerInputElement getDndElement(Point2 localPos, Point2 targetPos[])				// targetPos is an output parameter
+	{
+		return null;
+	}
+	
+	public DndHandler getDndHandler()
+	{
+		return null;
+	}
 }

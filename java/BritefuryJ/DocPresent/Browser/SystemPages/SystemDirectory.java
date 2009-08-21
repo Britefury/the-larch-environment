@@ -18,6 +18,7 @@ public class SystemDirectory
 	protected static void initialise()
 	{
 		testPages.add( new BorderTestPage() );
+		testPages.add( new DiagramTestPage() );
 		testPages.add( new DndTestPage() );
 		testPages.add( new FractionTestPage() );
 		testPages.add( new HBoxTestPage() );
