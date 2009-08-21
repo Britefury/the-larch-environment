@@ -49,8 +49,8 @@ public class AffineTransformedPointer extends PointerInterface
 
 	public AffineTransformedPointer transformed(AffineTransform parentToX)
 	{
-		AffineTransform x = (AffineTransform)globalToLocal.clone();
-		x.concatenate( parentToX );
+		AffineTransform x = (AffineTransform)parentToX.clone();
+		x.concatenate( globalToLocal );
 		return new AffineTransformedPointer( pointer, x );
 	}
 

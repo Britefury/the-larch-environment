@@ -7,11 +7,16 @@
 package BritefuryJ.DocPresent;
 
 import java.awt.Graphics2D;
+import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.Diagram.DiagramNode;
+import BritefuryJ.DocPresent.Diagram.DiagramOwner;
+import BritefuryJ.DocPresent.Input.PointerInputElement;
+import BritefuryJ.DocPresent.Input.PointerInterface;
 import BritefuryJ.DocPresent.StyleSheets.WidgetStyleSheet;
+import BritefuryJ.Math.Point2;
 
-public class DPDiagram extends DPStatic
+public class DPDiagram extends DPStatic implements DiagramOwner
 {
 	protected static int FLAG_DIAGRAM_SHRINK_X = FLAGS_ELEMENT_END * 0x1;
 	protected static int FLAG_DIAGRAM_SHRINK_Y = FLAGS_ELEMENT_END * 0x2;
@@ -54,6 +59,23 @@ public class DPDiagram extends DPStatic
 	}
 	
 	
+	
+	
+	protected void onRealise()
+	{
+		super.onRealise();
+		
+		diagram.realise( this );
+	}
+	
+	protected void onUnrealise(DPWidget unrealiseRoot)
+	{
+		diagram.unrealise();
+
+		super.onUnrealise( unrealiseRoot );
+	}
+	
+	
 
 	
 	protected void updateRequisitionX()
@@ -88,5 +110,28 @@ public class DPDiagram extends DPStatic
 			}
 		}
 		layoutReqBox.setRequisitionY( height, 0.0 );
+	}
+
+
+	protected PointerInputElement getFirstPointerChildAtLocalPoint(Point2 localPos)
+	{
+		return diagram;
+	}
+	
+	protected PointerInputElement getLastPointerChildAtLocalPoint(Point2 localPos)
+	{
+		return diagram;
+	}
+	
+
+	
+	public void diagramQueueRedraw()
+	{
+		queueFullRedraw();
+	}
+
+	public ArrayList<PointerInterface> getPointersWithinDiagramNodeBounds(DiagramNode node)
+	{
+		return presentationArea.getInputTable().getPointersWithinBoundsOfElement( node );
 	}
 }

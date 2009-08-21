@@ -35,19 +35,19 @@ public class DiagramTestPage extends SystemPage
 	protected DiagramNode createMinuteTick()
 	{
 		Rectangle2D.Double shape = new Rectangle2D.Double( -2.0, -5.0, 4.0, 10.0 );
-		return new ShapeNode( shape ).fillPaint( new Color( 144, 155, 196 ) ).translate( 0.0, -200.0 );
+		return new ShapeNode( shape ).fillPaint( new Color( 144, 155, 196 ) ).hoverHighlight( new ShapeNode( shape ).fillPaint( new Color( 255, 0, 0 ) ) ).translate( 0.0, -200.0 );
 	}
 	
 	protected DiagramNode create5MinuteTick()
 	{
 		Rectangle2D.Double shape = new Rectangle2D.Double( -3.0, -5.0, 6.0, 16.0 );
-		return new ShapeNode( shape ).fillPaint( new Color( 142, 184, 196 ) ).translate( 0.0, -200.0 );
+		return new ShapeNode( shape ).fillPaint( new Color( 142, 184, 196 ) ).hoverHighlight( new ShapeNode( shape ).fillPaint( new Color( 255, 0, 0 ) ) ).translate( 0.0, -200.0 );
 	}
 	
 	protected DiagramNode create15MinuteTick()
 	{
 		Rectangle2D.Double shape = new Rectangle2D.Double( -4.0, -5.0, 8.0, 20.0 );
-		return new ShapeNode( shape ).fillPaint( new Color( 155, 185, 171 ) ).translate( 0.0, -200.0 );
+		return new ShapeNode( shape ).fillPaint( new Color( 155, 185, 171 ) ).hoverHighlight( new ShapeNode( shape ).fillPaint( new Color( 255, 0, 0 ) ) ).translate( 0.0, -200.0 );
 	}
 	
 	protected DiagramNode createTicks4Minutes()
