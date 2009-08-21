@@ -58,6 +58,9 @@ public abstract class DiagramNode extends PointerInputElement
 	}
 	
 	
+	protected DiagramOwner owner;
+	
+	
 	
 	protected DiagramNode()
 	{
@@ -67,6 +70,27 @@ public abstract class DiagramNode extends PointerInputElement
 	{
 	}
 	
+	
+	
+	public void realise(DiagramOwner owner)
+	{
+		this.owner = owner;
+	}
+	
+	public void unrealise()
+	{
+		owner = null;
+	}
+	
+	
+	
+	protected void queueRedraw()
+	{
+		if ( owner != null )
+		{
+			owner.diagramQueueRedraw();
+		}
+	}
 	
 	
 	// User API

@@ -45,6 +45,27 @@ public class GroupNode extends DiagramNode
 
 
 
+	public void realise(DiagramOwner owner)
+	{
+		super.realise( owner );
+		
+		for (DiagramNode child: children)
+		{
+			child.realise( owner );
+		}
+	}
+	
+	public void unrealise()
+	{
+		for (DiagramNode child: children)
+		{
+			child.unrealise();
+		}
+
+		super.unrealise();
+	}
+
+	
 	public void draw(Graphics2D graphics, DrawContext context)
 	{
 		for (DiagramNode child: children)

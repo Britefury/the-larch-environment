@@ -7,11 +7,13 @@
 package BritefuryJ.DocPresent.Diagram;
 
 import java.awt.Graphics2D;
+import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Event.PointerScrollEvent;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
+import BritefuryJ.DocPresent.Input.PointerInterface;
 
 public class InteractionNode extends UnaryBranchNode
 {
@@ -50,6 +52,29 @@ public class InteractionNode extends UnaryBranchNode
 	}
 
 	
+
+	public void realise(DiagramOwner owner)
+	{
+		super.realise( owner );
+		
+		if ( hoverHighlight != null )
+		{
+			hoverHighlight.realise( owner );
+		}
+	}
+	
+	public void unrealise()
+	{
+		if ( hoverHighlight != null )
+		{
+			hoverHighlight.unrealise();
+		}
+		
+		super.unrealise();
+	}
+
+	
+
 	// User API
 	public DiagramNode hoverMonitor(HoverMonitor hoverMonitor)
 	{
@@ -89,7 +114,22 @@ public class InteractionNode extends UnaryBranchNode
 	
 	public void draw(Graphics2D graphics, DrawContext context)
 	{
-		child.draw( graphics, context );
+		if ( hoverHighlight != null )
+		{
+			ArrayList<PointerInterface> pointers = owner != null  ?  owner.getPointersWithinDiagramNodeBounds( this )  :  null;
+			if ( pointers != null  &&  pointers.size() > 0 )
+			{
+				hoverHighlight.draw( graphics, context );
+			}
+			else
+			{
+				child.draw( graphics, context );
+			}
+		}
+		else
+		{
+			child.draw( graphics, context );
+		}
 	}
 
 
@@ -120,10 +160,18 @@ public class InteractionNode extends UnaryBranchNode
 	
 	protected void handlePointerEnter(PointerMotionEvent event)
 	{
+		if ( hoverHighlight != null )
+		{
+			queueRedraw();
+		}
 	}
 	
 	protected void handlePointerLeave(PointerMotionEvent event)
 	{
+		if ( hoverHighlight != null )
+		{
+			queueRedraw();
+		}
 	}
 	
 	protected void handlePointerEnterFromChild(PointerMotionEvent event, PointerInputElement childElement)

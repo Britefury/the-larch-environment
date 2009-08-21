@@ -24,6 +24,19 @@ public abstract class UnaryBranchNode extends DiagramNode
 	}
 	
 	
+	public void realise(DiagramOwner owner)
+	{
+		super.realise( owner );
+		child.realise( owner );
+	}
+	
+	public void unrealise()
+	{
+		child.unrealise();
+		super.unrealise();
+	}
+
+	
 	public void draw(Graphics2D graphics, DrawContext context)
 	{
 		child.draw( graphics, context );
