@@ -8,6 +8,7 @@
 package BritefuryJ.Math;
 
 import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
 
 public class Xform2 implements Cloneable
 {
@@ -91,6 +92,15 @@ public class Xform2 implements Cloneable
 	public AABox2 transform(AABox2 b)
 	{
 		return new AABox2( transform( b.getLower() ), transform( b.getUpper() ) );
+	}
+	
+	
+	public AffineTransform toAffineTransform()
+	{
+		AffineTransform x = new AffineTransform();
+		x.scale( scale, scale );
+		x.translate( translation.x, translation.y );
+		return x;
 	}
 	
 	

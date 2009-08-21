@@ -8,7 +8,12 @@ package BritefuryJ.DocPresent.Diagram;
 
 import java.awt.Graphics2D;
 
-public class InteractionNode extends DiagramNode
+import BritefuryJ.DocPresent.Event.PointerButtonEvent;
+import BritefuryJ.DocPresent.Event.PointerMotionEvent;
+import BritefuryJ.DocPresent.Event.PointerScrollEvent;
+import BritefuryJ.DocPresent.Input.PointerInputElement;
+
+public class InteractionNode extends UnaryBranchNode
 {
 	// Hover
 	protected HoverMonitor hoverMonitor;
@@ -16,35 +21,29 @@ public class InteractionNode extends DiagramNode
 	
 	// Interaction
 	protected InteractionListener interactionListener;
-
-	
-	// Child
-	protected DiagramNode child;
 	
 	
 	public InteractionNode(DiagramNode child, HoverMonitor hoverMonitor)
 	{
-		this.child = child;
+		super( child );
 		this.hoverMonitor = hoverMonitor;
 	}
 
 	public InteractionNode(DiagramNode child, DiagramNode hoverHighlight)
 	{
-		this.child = child;
+		super( child );
 		this.hoverHighlight = hoverHighlight;
 	}
 
 	public InteractionNode(DiagramNode child, InteractionListener interactionListener)
 	{
-		this.child = child;
+		super( child );
 		this.interactionListener = interactionListener;
 	}
 	
-	
-	
 	private InteractionNode(InteractionNode i)
 	{
-		child = i.child;
+		super( i.child );
 		hoverMonitor = i.hoverMonitor;
 		hoverHighlight = i.hoverHighlight;
 		interactionListener = i.interactionListener;
@@ -91,5 +90,52 @@ public class InteractionNode extends DiagramNode
 	public void draw(Graphics2D graphics, DrawContext context)
 	{
 		child.draw( graphics, context );
+	}
+
+
+
+	protected boolean handlePointerButtonDown(PointerButtonEvent event)
+	{
+		return false;
+	}
+	
+	protected boolean handlePointerButtonDown2(PointerButtonEvent event)
+	{
+		return false;
+	}
+	
+	protected boolean handlePointerButtonDown3(PointerButtonEvent event)
+	{
+		return false;
+	}
+	
+	protected boolean handlePointerButtonUp(PointerButtonEvent event)
+	{
+		return false;
+	}
+	
+	protected void handlePointerMotion(PointerMotionEvent event)
+	{
+	}
+	
+	protected void handlePointerEnter(PointerMotionEvent event)
+	{
+	}
+	
+	protected void handlePointerLeave(PointerMotionEvent event)
+	{
+	}
+	
+	protected void handlePointerEnterFromChild(PointerMotionEvent event, PointerInputElement childElement)
+	{
+	}
+	
+	protected void handlePointerLeaveIntoChild(PointerMotionEvent event, PointerInputElement childElement)
+	{
+	}
+	
+	protected boolean handlePointerScroll(PointerScrollEvent event)
+	{
+		return false;
 	}
 }

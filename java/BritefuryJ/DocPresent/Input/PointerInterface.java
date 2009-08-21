@@ -7,6 +7,8 @@
 //##************************
 package BritefuryJ.DocPresent.Input;
 
+import java.awt.geom.AffineTransform;
+
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Xform2;
 
@@ -25,22 +27,16 @@ public abstract class PointerInterface
 	}
 	
 	
-	public Xform2 getLocalToGlobalXform()
-	{
-		return new Xform2();
-	}
-	
-	public Xform2 getGlobalToLocalXform()
-	{
-		return new Xform2();
-	}
-	
-	
 	public LocalPointerInterface transformed(Xform2 parentToX)
 	{
 		return new LocalPointerInterface( this, parentToX );
 	}
 	
+	public AffineTransformedPointer transformed(AffineTransform parentToX)
+	{
+		return new AffineTransformedPointer( this, parentToX );
+	}
+
 	
 	abstract public PointerInterface concretePointer();
 }

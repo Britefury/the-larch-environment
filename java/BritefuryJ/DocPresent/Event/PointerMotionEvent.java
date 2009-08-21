@@ -7,6 +7,8 @@
 //##************************
 package BritefuryJ.DocPresent.Event;
 
+import java.awt.geom.AffineTransform;
+
 import BritefuryJ.DocPresent.Input.PointerInterface;
 import BritefuryJ.Math.Xform2;
 
@@ -34,6 +36,11 @@ public class PointerMotionEvent extends PointerEvent
 	
 	
 	public PointerMotionEvent transformed(Xform2 xToLocal)
+	{
+		return new PointerMotionEvent( pointer.transformed( xToLocal ), action );
+	}
+
+	public PointerEvent transformed(AffineTransform xToLocal)
 	{
 		return new PointerMotionEvent( pointer.transformed( xToLocal ), action );
 	}

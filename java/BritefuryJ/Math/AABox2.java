@@ -63,6 +63,31 @@ public class AABox2 implements Cloneable
 	}
 	
 	
+	public void addPoint(double x, double y)
+	{
+		lowerX = Math.min( lowerX, x );
+		lowerY = Math.min( lowerY, y );
+		upperX = Math.max( upperX, x );
+		upperY = Math.max( upperY, y );
+	}
+	
+	public void addPoint(Point2 p)
+	{
+		lowerX = Math.min( lowerX, p.x );
+		lowerY = Math.min( lowerY, p.y );
+		upperX = Math.max( upperX, p.x );
+		upperY = Math.max( upperY, p.y );
+	}
+	
+	public void addBox(AABox2 b)
+	{
+		lowerX = Math.min( lowerX, b.lowerX );
+		lowerY = Math.min( lowerY, b.lowerY );
+		upperX = Math.max( upperX, b.upperX );
+		upperY = Math.max( upperY, b.upperY );
+	}
+	
+	
 	public Point2 getLower()
 	{
 		return new Point2( lowerX, lowerY );
@@ -71,6 +96,27 @@ public class AABox2 implements Cloneable
 	public Point2 getUpper()
 	{
 		return new Point2( upperX, upperY );
+	}
+	
+	
+	public double getLowerX()
+	{
+		return lowerX;
+	}
+	
+	public double getLowerY()
+	{
+		return lowerY;
+	}
+	
+	public double getUpperX()
+	{
+		return upperX;
+	}
+	
+	public double getUpperY()
+	{
+		return upperY;
 	}
 	
 
