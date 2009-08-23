@@ -12,8 +12,10 @@ import java.util.ArrayList;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Event.PointerScrollEvent;
+import BritefuryJ.DocPresent.Input.DndHandler;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Input.PointerInterface;
+import BritefuryJ.Math.Point2;
 
 public class InteractionNode extends UnaryBranchNode
 {
@@ -23,6 +25,10 @@ public class InteractionNode extends UnaryBranchNode
 	
 	// Interaction
 	protected InteractionListener interactionListener;
+	
+	// Dnd
+	protected DndHandler dndHandler;
+	
 	
 	
 	public InteractionNode(DiagramNode child, HoverMonitor hoverMonitor)
@@ -43,12 +49,19 @@ public class InteractionNode extends UnaryBranchNode
 		this.interactionListener = interactionListener;
 	}
 	
+	public InteractionNode(DiagramNode child, DndHandler dndHandler)
+	{
+		super( child );
+		this.dndHandler = dndHandler;
+	}
+	
 	private InteractionNode(InteractionNode i)
 	{
 		super( i.child );
 		hoverMonitor = i.hoverMonitor;
 		hoverHighlight = i.hoverHighlight;
 		interactionListener = i.interactionListener;
+		dndHandler = i.dndHandler;
 	}
 
 	
@@ -111,6 +124,20 @@ public class InteractionNode extends UnaryBranchNode
 		}
 	}
 	
+	public DiagramNode enableDnd(DndHandler dndHandler)
+	{
+		if ( this.dndHandler == null )
+		{
+			InteractionNode i = new InteractionNode( this );
+			i.dndHandler = dndHandler;
+			return i;
+		}
+		else
+		{
+			return new InteractionNode( this, dndHandler );
+		}
+	}
+	
 	
 	public void draw(Graphics2D graphics, DrawContext context)
 	{
@@ -136,26 +163,58 @@ public class InteractionNode extends UnaryBranchNode
 
 	protected boolean handlePointerButtonDown(PointerButtonEvent event)
 	{
-		return false;
+		if ( interactionListener != null )
+		{
+			return interactionListener.onButtonDown( event );
+		}
+		else
+		{
+			return false;
+		}
 	}
 	
 	protected boolean handlePointerButtonDown2(PointerButtonEvent event)
 	{
-		return false;
+		if ( interactionListener != null )
+		{
+			return interactionListener.onButtonDown2( event );
+		}
+		else
+		{
+			return false;
+		}
 	}
 	
 	protected boolean handlePointerButtonDown3(PointerButtonEvent event)
 	{
-		return false;
+		if ( interactionListener != null )
+		{
+			return interactionListener.onButtonDown3( event );
+		}
+		else
+		{
+			return false;
+		}
 	}
 	
 	protected boolean handlePointerButtonUp(PointerButtonEvent event)
 	{
-		return false;
+		if ( interactionListener != null )
+		{
+			return interactionListener.onButtonUp( event );
+		}
+		else
+		{
+			return false;
+		}
 	}
 	
 	protected void handlePointerMotion(PointerMotionEvent event)
 	{
+		if ( interactionListener != null )
+		{
+			interactionListener.onMotion( event );
+		}
 	}
 	
 	protected void handlePointerEnter(PointerMotionEvent event)
@@ -164,10 +223,26 @@ public class InteractionNode extends UnaryBranchNode
 		{
 			queueRedraw();
 		}
+		if ( hoverMonitor != null )
+		{
+			hoverMonitor.onEnter();
+		}
+		if ( interactionListener != null )
+		{
+			interactionListener.onEnter( event );
+		}
 	}
 	
 	protected void handlePointerLeave(PointerMotionEvent event)
 	{
+		if ( interactionListener != null )
+		{
+			interactionListener.onLeave( event );
+		}
+		if ( hoverMonitor != null )
+		{
+			hoverMonitor.onLeave();
+		}
 		if ( hoverHighlight != null )
 		{
 			queueRedraw();
@@ -176,14 +251,76 @@ public class InteractionNode extends UnaryBranchNode
 	
 	protected void handlePointerEnterFromChild(PointerMotionEvent event, PointerInputElement childElement)
 	{
+		if ( interactionListener != null )
+		{
+			interactionListener.onEnterFromChild( event, childElement );
+		}
 	}
 	
 	protected void handlePointerLeaveIntoChild(PointerMotionEvent event, PointerInputElement childElement)
 	{
+		if ( interactionListener != null )
+		{
+			interactionListener.onLeaveIntoChild( event, childElement );
+		}
 	}
 	
 	protected boolean handlePointerScroll(PointerScrollEvent event)
 	{
-		return false;
+		if ( interactionListener != null )
+		{
+			return interactionListener.onScroll( event );
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+
+
+	public PointerInputElement getDndElement(Point2 localPos, Point2 targetPos[])				// targetPos is an output parameter
+	{
+		DiagramNode childNode = null;
+		if ( hoverHighlight != null )
+		{
+			ArrayList<PointerInterface> pointers = owner != null  ?  owner.getPointersWithinDiagramNodeBounds( this )  :  null;
+			if ( pointers != null  &&  pointers.size() > 0 )
+			{
+				childNode = hoverHighlight;
+			}
+			else
+			{
+				childNode = child;
+			}
+		}
+		else
+		{
+			childNode = child;
+		}
+
+		PointerInputElement element = childNode.getDndElement( localPos, targetPos );
+		if ( element != null )
+		{
+			return element;
+		}
+		
+		if ( dndHandler != null )
+		{
+			if ( targetPos != null )
+			{
+				targetPos[0] = localPos;
+			}
+			return this;
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	public DndHandler getDndHandler()
+	{
+		return dndHandler;
 	}
 }

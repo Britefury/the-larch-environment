@@ -6,7 +6,57 @@
 //##************************
 package BritefuryJ.DocPresent.Diagram;
 
-public interface InteractionListener
-{
+import BritefuryJ.DocPresent.Event.PointerButtonEvent;
+import BritefuryJ.DocPresent.Event.PointerMotionEvent;
+import BritefuryJ.DocPresent.Event.PointerScrollEvent;
+import BritefuryJ.DocPresent.Input.PointerInputElement;
 
+public class InteractionListener
+{
+	public boolean onButtonDown(PointerButtonEvent event)
+	{
+		return false;
+	}
+
+	public boolean onButtonDown2(PointerButtonEvent event)
+	{
+		return false;
+	}
+	
+	public boolean onButtonDown3(PointerButtonEvent event)
+	{
+		return false;
+	}
+
+	public boolean onButtonUp(PointerButtonEvent event)
+	{
+		return false;
+	}
+
+
+	public void onMotion(PointerMotionEvent event)
+	{
+	}
+
+	public void onEnter(PointerMotionEvent event)
+	{
+	}
+
+	public void onLeave(PointerMotionEvent event)
+	{
+	}
+	
+	public void onLeaveIntoChild(PointerMotionEvent event, PointerInputElement child)
+	{
+	}
+	
+	public void onEnterFromChild(PointerMotionEvent event, PointerInputElement child)
+	{
+	}
+	
+	
+	public boolean onScroll(PointerScrollEvent event)
+	{
+		return false;
+	}
 }

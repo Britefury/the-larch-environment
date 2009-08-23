@@ -1712,7 +1712,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	{
 		PresentationAreaComponent.PresAreaTransferHandler xferHandler = getDndTransferHandler();
 		xferHandler.beginExportDnd( drop );
-		xferHandler.exportAsDrag( component.getPresentationComponent(), mouseEvent, requestedAction );
+		//xferHandler.exportAsDrag( component.getPresentationComponent(), mouseEvent, requestedAction );
 		xferHandler.endExportDnd();
 	}
 

@@ -8,6 +8,11 @@ package BritefuryJ.DocPresent.Diagram;
 
 public abstract class HoverMonitor
 {
-	protected abstract void onEnter();
-	protected abstract void onLeave();
+	protected void onEnter()
+	{
+	}
+
+	protected void onLeave()
+	{
+	}
 }

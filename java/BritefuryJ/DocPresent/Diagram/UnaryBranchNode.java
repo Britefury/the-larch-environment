@@ -70,4 +70,16 @@ public abstract class UnaryBranchNode extends DiagramNode
 	{
 		return child.containsParentSpacePoint( parentPos );
 	}
+
+
+	public PointerInputElement getDndElement(Point2 localPos, Point2 targetPos[])				// targetPos is an output parameter
+	{
+		PointerInputElement element = child.getDndElement( localPos, targetPos );
+		if ( element != null )
+		{
+			return element;
+		}
+		
+		return null;
+	}
 }

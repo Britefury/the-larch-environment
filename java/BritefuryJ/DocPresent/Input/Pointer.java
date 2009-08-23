@@ -493,7 +493,7 @@ public class Pointer extends PointerInterface
 		{
 			DndDropLocal drop = dndDrop;
 			
-			if ( drop != null )
+			if ( drop != null  &&  drop.bInProgress )
 			{
 				Point2 targetPos[] = new Point2[] { null };
 				PointerInputElement targetElement = rootEntry.element.getDndElement( event.pointer.getLocalPos(), targetPos );
@@ -505,7 +505,7 @@ public class Pointer extends PointerInterface
 						targetElement.getDndHandler().acceptDrop( targetElement, drop );
 					}
 				}
-	
+				
 				drop.bInProgress = false;
 				dndDrop = null;
 				dndController.pointerDndSetCursorArrow( this );

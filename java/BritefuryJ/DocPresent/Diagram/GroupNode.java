@@ -134,4 +134,27 @@ public class GroupNode extends DiagramNode
 		}
 		return false;
 	}
+
+
+
+	//
+	//
+	// DRAG AND DROP METHODS
+	//
+	//
+	
+	public PointerInputElement getDndElement(Point2 localPos, Point2 targetPos[])
+	{
+		DiagramNode child = (DiagramNode)getFirstPointerChildAtLocalPoint( localPos );
+		if ( child != null )
+		{
+			PointerInputElement element = child.getDndElement( localPos, targetPos );
+			if ( element != null )
+			{
+				return element;
+			}
+		}
+		
+		return null;
+	}
 }
