@@ -91,29 +91,36 @@ public class DndTestPage extends SystemPage
 		{
 			public boolean canDrop(PointerInputElement destElement, DndDrop drop)
 			{
-				return true;
+				return drop.getTransferable() != null;
 			}
 
 			public boolean acceptDrop(PointerInputElement destElement, DndDrop drop)
 			{
 				Transferable x = drop.getTransferable();
-				String text = null;
-				try
+				if ( x != null )
 				{
-					text = (String)x.getTransferData( DataFlavor.stringFlavor );
+					String text = null;
+					try
+					{
+						text = (String)x.getTransferData( DataFlavor.stringFlavor );
+					}
+					catch (UnsupportedFlavorException e)
+					{
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					catch (IOException e)
+					{
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					((DPStaticText)((DPBorder)destElement).getChild()).setText( text );
+					return true;
 				}
-				catch (UnsupportedFlavorException e)
+				else
 				{
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					return false;
 				}
-				catch (IOException e)
-				{
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				((DPStaticText)((DPBorder)destElement).getChild()).setText( text );
-				return true;
 			}
 		};
 		

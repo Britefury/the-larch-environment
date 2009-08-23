@@ -124,6 +124,11 @@ public abstract class DiagramNode extends PointerInputElement
 		return new InteractionNode( this, listener );
 	}
 
+	public DiagramNode enableDnd(DndHandler dndHandler)
+	{
+		return new InteractionNode( this, dndHandler );
+	}
+
 	public DiagramNode transform(AffineTransform t)
 	{
 		return new TransformationNode( this, t );
@@ -277,7 +282,7 @@ public abstract class DiagramNode extends PointerInputElement
 	public abstract boolean containsLocalSpacePoint(Point2 localPos);
 	
 	
-	protected PointerInputElement getDndElement(Point2 localPos, Point2 targetPos[])				// targetPos is an output parameter
+	public PointerInputElement getDndElement(Point2 localPos, Point2 targetPos[])				// targetPos is an output parameter
 	{
 		return null;
 	}

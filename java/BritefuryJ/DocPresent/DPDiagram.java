@@ -125,6 +125,49 @@ public class DPDiagram extends DPStatic implements DiagramOwner
 	
 
 	
+	//
+	//
+	// DRAG AND DROP METHODS
+	//
+	//
+	
+	public PointerInputElement getDndElement(Point2 localPos, Point2 targetPos[])
+	{
+		if ( diagram != null )
+		{
+			PointerInputElement element = diagram.getDndElement( localPos, targetPos );
+			if ( element != null )
+			{
+				if ( targetPos != null )
+				{
+					targetPos[0] = localPos;
+				}
+				return element;
+			}
+		}
+		
+		if ( dndHandler != null )
+		{
+			if ( targetPos != null )
+			{
+				targetPos[0] = localPos;
+			}
+			return this;
+		}
+		else
+		{
+			return null;
+		}
+	}
+
+	
+	
+	//
+	//
+	// DIAGRAM OWNER METHODS
+	//
+	//
+	
 	public void diagramQueueRedraw()
 	{
 		queueFullRedraw();
