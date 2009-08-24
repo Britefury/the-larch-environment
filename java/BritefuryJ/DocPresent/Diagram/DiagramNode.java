@@ -225,6 +225,10 @@ public abstract class DiagramNode extends PointerInputElement
 	{
 	}
 	
+	protected void handlePointerDrag(PointerMotionEvent event)
+	{
+	}
+	
 	protected void handlePointerEnter(PointerMotionEvent event)
 	{
 	}

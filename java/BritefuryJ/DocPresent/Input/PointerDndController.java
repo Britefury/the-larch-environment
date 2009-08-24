@@ -11,7 +11,4 @@ import java.awt.event.MouseEvent;
 public interface PointerDndController
 {
 	void pointerDndInitiateDrag(Pointer pointer, DndDropLocal drop, MouseEvent mouseEvent, int requestedAction);
-	
-	void pointerDndSetCursorDrag(Pointer pointer);
-	void pointerDndSetCursorArrow(Pointer pointer);
 }

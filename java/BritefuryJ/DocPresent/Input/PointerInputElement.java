@@ -19,6 +19,7 @@ public abstract class PointerInputElement
 	protected abstract boolean handlePointerButtonDown3(PointerButtonEvent event);
 	protected abstract boolean handlePointerButtonUp(PointerButtonEvent event);
 	protected abstract void handlePointerMotion(PointerMotionEvent event);
+	protected abstract void handlePointerDrag(PointerMotionEvent event);
 	protected abstract void handlePointerEnter(PointerMotionEvent event);
 	protected abstract void handlePointerLeave(PointerMotionEvent event);
 	protected abstract void handlePointerEnterFromChild(PointerMotionEvent event, PointerInputElement childElement);

@@ -873,6 +873,10 @@ abstract public class DPWidget extends PointerInputElement
 	{
 	}
 
+	protected void onDrag(PointerMotionEvent event)
+	{
+	}
+
 	protected void onEnter(PointerMotionEvent event)
 	{
 	}
@@ -1057,6 +1061,11 @@ abstract public class DPWidget extends PointerInputElement
 	protected void handlePointerMotion(PointerMotionEvent event)
 	{
 		onMotion( event );
+	}
+	
+	protected void handlePointerDrag(PointerMotionEvent event)
+	{
+		onDrag( event );
 	}
 	
 	protected void handlePointerEnter(PointerMotionEvent event)
