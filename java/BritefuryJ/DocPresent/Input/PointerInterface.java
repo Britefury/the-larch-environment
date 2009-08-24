@@ -26,6 +26,11 @@ public abstract class PointerInterface
 		return Modifier.getButton( getModifiers(), button );
 	}
 	
+	public boolean isAButtonPressed()
+	{
+		return Modifier.isAButtonPressed( getModifiers() );
+	}
+	
 	
 	public LocalPointerInterface transformed(Xform2 parentToX)
 	{

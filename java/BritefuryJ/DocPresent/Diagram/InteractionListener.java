@@ -38,6 +38,10 @@ public class InteractionListener
 	{
 	}
 
+	public void onDrag(PointerMotionEvent event)
+	{
+	}
+
 	public void onEnter(PointerMotionEvent event)
 	{
 	}

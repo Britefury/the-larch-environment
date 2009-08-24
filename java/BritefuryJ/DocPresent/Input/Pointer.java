@@ -30,7 +30,6 @@ public class Pointer extends PointerInterface
 	{
 		public PointerInputElement element;
 		public ElementEntry pressGrabChild, childUnderPointer;
-		public int pressGrabButton;
 		
 		
 		public ElementEntry(PointerInputElement element)
@@ -51,7 +50,6 @@ public class Pointer extends PointerInterface
 					if ( bHandled  &&  element.isPointerInputElementRealised() )
 					{
 						pressGrabChild = childEntry;
-						pressGrabButton = event.button;
 						return true;
 					}
 				}
@@ -100,9 +98,12 @@ public class Pointer extends PointerInterface
 			if ( pressGrabChild != null )
 			{
 				PointerButtonEvent childSpaceEvent = (PointerButtonEvent)pressGrabChild.element.transformParentToLocalEvent( event );
-				if ( event.button == pressGrabButton )
+				if ( pointer.isAButtonPressed() )
 				{
-					pressGrabButton = 0;
+					return pressGrabChild.handleButtonUp( pointer, childSpaceEvent );
+				}
+				else
+				{
 					Point2 localPos = event.pointer.getLocalPos();
 					if ( !pressGrabChild.element.containsParentSpacePoint( localPos ) )
 					{
@@ -134,10 +135,6 @@ public class Pointer extends PointerInterface
 					}
 					
 					return bHandled;
-				}
-				else
-				{
-					return pressGrabChild.handleButtonUp( pointer, childSpaceEvent );
 				}
 			}
 			else
@@ -204,6 +201,20 @@ public class Pointer extends PointerInterface
 			
 			element.handlePointerMotion( event );
 		}
+		
+		
+		
+		protected void handleDrag(Pointer pointer, PointerMotionEvent event)
+		{
+			pressGrabChild.handleDrag( pointer, (PointerMotionEvent)pressGrabChild.element.transformParentToLocalEvent( event ) );
+			
+			
+			element.handlePointerDrag( event );
+		}
+		
+		
+		
+		
 		
 		protected void handleEnter(Pointer pointer, PointerMotionEvent event)
 		{
@@ -275,7 +286,6 @@ public class Pointer extends PointerInterface
 			if ( pressGrabChild != null )
 			{
 				pressGrabChild = null;
-				pressGrabButton = -1;
 			}
 			
 			pointer.inputTable.removePointerWithinElementBounds( pointer, element );
@@ -397,10 +407,16 @@ public class Pointer extends PointerInterface
 	public void motion(Point2 pos, MouseEvent mouseEvent)
 	{
 		PointerMotionEvent event = new PointerMotionEvent( this, PointerMotionEvent.Action.MOTION );
-		boolean bHandled = dndMotionEvent( event, mouseEvent );
+		rootEntry.handleMotion( this, event );
+	}
+
+	public void drag(Point2 pos, MouseEvent mouseEvent)
+	{
+		PointerMotionEvent event = new PointerMotionEvent( this, PointerMotionEvent.Action.MOTION );
+		boolean bHandled = dndDragEvent( event, mouseEvent );
 		if ( !bHandled )
 		{
-			rootEntry.handleMotion( this, event );
+			rootEntry.handleDrag( this, event );
 		}
 	}
 
@@ -441,7 +457,7 @@ public class Pointer extends PointerInterface
 		}
 	}
 	
-	private boolean dndMotionEvent(PointerMotionEvent event, MouseEvent mouseEvent)
+	private boolean dndDragEvent(PointerMotionEvent event, MouseEvent mouseEvent)
 	{
 		if ( dndController != null )
 		{
@@ -459,8 +475,6 @@ public class Pointer extends PointerInterface
 						drop.initialise( transferable, requestedAction );
 						
 						dndController.pointerDndInitiateDrag( this, drop, mouseEvent, requestedAction );
-						
-						dndController.pointerDndSetCursorDrag( this );
 					}
 				}
 				else
@@ -508,7 +522,6 @@ public class Pointer extends PointerInterface
 				
 				drop.bInProgress = false;
 				dndDrop = null;
-				dndController.pointerDndSetCursorArrow( this );
 				
 				return true;
 			}

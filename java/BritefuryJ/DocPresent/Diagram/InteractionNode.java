@@ -217,6 +217,14 @@ public class InteractionNode extends UnaryBranchNode
 		}
 	}
 	
+	protected void handlePointerDrag(PointerMotionEvent event)
+	{
+		if ( interactionListener != null )
+		{
+			interactionListener.onDrag( event );
+		}
+	}
+	
 	protected void handlePointerEnter(PointerMotionEvent event)
 	{
 		if ( hoverHighlight != null )

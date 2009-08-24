@@ -45,4 +45,10 @@ public class Modifier
 			return modifiers & ~mask;
 		}
 	}
+
+
+	public static boolean isAButtonPressed(int modifiers)
+	{
+		return ( modifiers & _BUTTONS_MASK ) != 0;
+	}
 }
