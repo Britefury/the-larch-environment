@@ -12,7 +12,6 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -81,22 +80,22 @@ public class DiagramTestPage extends SystemPage
 	
 	protected DiagramNode createMinuteTick(int index)
 	{
-		Rectangle2D.Double shape = new Rectangle2D.Double( -4.0, 0.0, 8.0, 20.0 );
-		DiagramNode tick = new ShapeNode( shape ).fillPaint( new Color( 144, 155, 196 ) ).hoverHighlight( new ShapeNode( shape ).fillPaint( new Color( 255, 0, 0 ) ) ).enableDnd( dndSource( index ) );
+		DiagramNode shape = ShapeNode.rectangle( -4.0, 0.0, 8.0, 20.0 );
+		DiagramNode tick = shape.fillPaint( new Color( 144, 155, 196 ) ).hoverHighlight( shape.fillPaint( new Color( 255, 0, 0 ) ) ).enableDnd( dndSource( index ) );
 		return new GroupNode( new DiagramNode[] { tick, new TextNode( new Integer( index ).toString() ).translate( 0.0, -20.0 ) } ).translate( 0.0, -220.0 );
 	}
 	
 	protected DiagramNode create5MinuteTick(int index)
 	{
-		Rectangle2D.Double shape = new Rectangle2D.Double( -5.0, 0.0, 10.0, 30.0 );
-		DiagramNode tick = new ShapeNode( shape ).fillPaint( new Color( 142, 184, 196 ) ).hoverHighlight( new ShapeNode( shape ).fillPaint( new Color( 255, 0, 0 ) ) ).enableDnd( dndSource( index ) );
+		DiagramNode shape = ShapeNode.rectangle( -5.0, 0.0, 10.0, 30.0 );
+		DiagramNode tick = shape.fillPaint( new Color( 142, 184, 196 ) ).hoverHighlight( shape.fillPaint( new Color( 255, 0, 0 ) ) ).enableDnd( dndSource( index ) );
 		return new GroupNode( new DiagramNode[] { tick, new TextNode( new Integer( index ).toString() ).translate( 0.0, -20.0 ) } ).translate( 0.0, -220.0 );
 	}
 	
 	protected DiagramNode create15MinuteTick(int index)
 	{
-		Rectangle2D.Double shape = new Rectangle2D.Double( -6.0, 0.0, 12.0, 48.0 );
-		DiagramNode tick = new ShapeNode( shape ).fillPaint( new Color( 155, 185, 171 ) ).hoverHighlight( new ShapeNode( shape ).fillPaint( new Color( 255, 0, 0 ) ) ).enableDnd( dndSource( index ) );
+		DiagramNode shape = ShapeNode.rectangle( -6.0, 0.0, 12.0, 48.0 );
+		DiagramNode tick = shape.fillPaint( new Color( 155, 185, 171 ) ).hoverHighlight( shape.fillPaint( new Color( 255, 0, 0 ) ) ).enableDnd( dndSource( index ) );
 		return new GroupNode( new DiagramNode[] { tick, new TextNode( new Integer( index ).toString() ).translate( 0.0, -20.0 ) } ).translate( 0.0, -220.0 );
 	}
 	
