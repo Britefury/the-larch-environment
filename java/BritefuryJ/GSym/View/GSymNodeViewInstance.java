@@ -89,7 +89,7 @@ public class GSymNodeViewInstance implements ElementContext, DVNode.NodeContext
 		return element;
 	}
 	
-	public DPWidget indent(float indentation, DPWidget child)
+	public DPWidget indent(double indentation, DPWidget child)
 	{
 		viewInstance.getView().profile_startElement();
 		Border border = viewInstance.indentationBorder( indentation );
@@ -99,6 +99,28 @@ public class GSymNodeViewInstance implements ElementContext, DVNode.NodeContext
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
+	
+	public DPWidget padding(double xPad, double yPad, DPWidget child)
+	{
+		viewInstance.getView().profile_startElement();
+		Border border = viewInstance.paddingBorder( xPad, yPad );
+		DPBorder element = new DPBorder( border );
+		element.setChild( child );
+		element.setContext( this );
+		viewInstance.getView().profile_stopElement();
+		return element;
+	}
+	
+	public DPWidget padX(double xPad, DPWidget child)
+	{
+		return padding( xPad, 0.0, child );
+	}
+	
+	public DPWidget padY(double yPad, DPWidget child)
+	{
+		return padding( 0.0, yPad, child );
+	}
+	
 	
 	public DPWidget text(TextStyleSheet styleSheet, String txt)
 	{
