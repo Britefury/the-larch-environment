@@ -24,10 +24,6 @@ public class GroupNode extends DiagramNode
 		super();
 		this.children = children;
 		parentSpaceBox = new AABox2();
-		for (DiagramNode node: children)
-		{
-			parentSpaceBox.addBox( node.getParentSpaceBoundingBox() );
-		}
 	}
 
 	public GroupNode(List<DiagramNode> children)
@@ -36,10 +32,6 @@ public class GroupNode extends DiagramNode
 		this.children = new DiagramNode[children.size()];
 		this.children = children.toArray( this.children );
 		parentSpaceBox = new AABox2();
-		for (DiagramNode node: children)
-		{
-			parentSpaceBox.addBox( node.getParentSpaceBoundingBox() );
-		}
 	}
 
 
@@ -53,10 +45,18 @@ public class GroupNode extends DiagramNode
 		{
 			child.realise( owner );
 		}
+
+		parentSpaceBox = new AABox2();
+		for (DiagramNode node: children)
+		{
+			parentSpaceBox.addBox( node.getParentSpaceBoundingBox() );
+		}
 	}
 	
 	public void unrealise()
 	{
+		parentSpaceBox = new AABox2();
+
 		for (DiagramNode child: children)
 		{
 			child.unrealise();
