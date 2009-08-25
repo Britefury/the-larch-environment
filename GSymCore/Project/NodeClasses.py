@@ -10,7 +10,7 @@ from BritefuryJ.DocModel import DMModule, DMObjectClass
 
 
 
-module = DMModule( 'GSymProject', 'py', 'GSymCore.Project.Project' )
+module = DMModule( 'GSymProject', 'prj', 'GSymCore.Project.Project' )
 
 
 
