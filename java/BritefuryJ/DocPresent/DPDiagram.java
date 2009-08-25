@@ -173,6 +173,11 @@ public class DPDiagram extends DPStatic implements DiagramOwner
 		queueFullRedraw();
 	}
 
+	public DPPresentationArea getDiagramPresentationArea()
+	{
+		return presentationArea;
+	}
+
 	public ArrayList<PointerInterface> getPointersWithinDiagramNodeBounds(DiagramNode node)
 	{
 		return presentationArea.getInputTable().getPointersWithinBoundsOfElement( node );

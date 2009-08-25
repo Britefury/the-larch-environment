@@ -27,6 +27,7 @@ import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Diagram.DiagramNode;
 import BritefuryJ.DocPresent.Diagram.GroupNode;
 import BritefuryJ.DocPresent.Diagram.ShapeNode;
+import BritefuryJ.DocPresent.Diagram.TextNode;
 import BritefuryJ.DocPresent.Input.DndDrop;
 import BritefuryJ.DocPresent.Input.DndHandler;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
@@ -81,19 +82,22 @@ public class DiagramTestPage extends SystemPage
 	protected DiagramNode createMinuteTick(int index)
 	{
 		Rectangle2D.Double shape = new Rectangle2D.Double( -4.0, 0.0, 8.0, 20.0 );
-		return new ShapeNode( shape ).fillPaint( new Color( 144, 155, 196 ) ).hoverHighlight( new ShapeNode( shape ).fillPaint( new Color( 255, 0, 0 ) ) ).enableDnd( dndSource( index ) ).translate( 0.0, -220.0 );
+		DiagramNode tick = new ShapeNode( shape ).fillPaint( new Color( 144, 155, 196 ) ).hoverHighlight( new ShapeNode( shape ).fillPaint( new Color( 255, 0, 0 ) ) ).enableDnd( dndSource( index ) );
+		return new GroupNode( new DiagramNode[] { tick, new TextNode( new Integer( index ).toString() ).translate( 0.0, -20.0 ) } ).translate( 0.0, -220.0 );
 	}
 	
 	protected DiagramNode create5MinuteTick(int index)
 	{
 		Rectangle2D.Double shape = new Rectangle2D.Double( -5.0, 0.0, 10.0, 30.0 );
-		return new ShapeNode( shape ).fillPaint( new Color( 142, 184, 196 ) ).hoverHighlight( new ShapeNode( shape ).fillPaint( new Color( 255, 0, 0 ) ) ).enableDnd( dndSource( index ) ).translate( 0.0, -220.0 );
+		DiagramNode tick = new ShapeNode( shape ).fillPaint( new Color( 142, 184, 196 ) ).hoverHighlight( new ShapeNode( shape ).fillPaint( new Color( 255, 0, 0 ) ) ).enableDnd( dndSource( index ) );
+		return new GroupNode( new DiagramNode[] { tick, new TextNode( new Integer( index ).toString() ).translate( 0.0, -20.0 ) } ).translate( 0.0, -220.0 );
 	}
 	
 	protected DiagramNode create15MinuteTick(int index)
 	{
 		Rectangle2D.Double shape = new Rectangle2D.Double( -6.0, 0.0, 12.0, 48.0 );
-		return new ShapeNode( shape ).fillPaint( new Color( 155, 185, 171 ) ).hoverHighlight( new ShapeNode( shape ).fillPaint( new Color( 255, 0, 0 ) ) ).enableDnd( dndSource( index ) ).translate( 0.0, -220.0 );
+		DiagramNode tick = new ShapeNode( shape ).fillPaint( new Color( 155, 185, 171 ) ).hoverHighlight( new ShapeNode( shape ).fillPaint( new Color( 255, 0, 0 ) ) ).enableDnd( dndSource( index ) );
+		return new GroupNode( new DiagramNode[] { tick, new TextNode( new Integer( index ).toString() ).translate( 0.0, -20.0 ) } ).translate( 0.0, -220.0 );
 	}
 	
 	protected DiagramNode createTicks4Minutes(int index)

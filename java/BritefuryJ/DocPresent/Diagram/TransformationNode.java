@@ -37,8 +37,16 @@ public class TransformationNode extends UnaryBranchNode
 		{
 			parentToLocal = new AffineTransform();
 		}
-		
-		
+
+		parentSpaceBox = new AABox2();
+	}
+	
+	
+	
+	public void realise(DiagramOwner owner)
+	{
+		super.realise( owner );
+
 		AABox2 childBox = child.getParentSpaceBoundingBox();
 		parentSpaceBox = new AABox2();
 		
@@ -59,9 +67,14 @@ public class TransformationNode extends UnaryBranchNode
 		p.setLocation( childBox.getUpperX(), childBox.getUpperY() );
 		localToParent.transform( p, p );
 		parentSpaceBox.addPoint( p.x, p.y );
+}
+	
+	public void unrealise()
+	{
+		parentSpaceBox = new AABox2();
+		super.unrealise();
 	}
-	
-	
+
 	
 	// User API
 	public DiagramNode transform(AffineTransform t)

@@ -8,10 +8,12 @@ package BritefuryJ.DocPresent.Diagram;
 
 import java.util.ArrayList;
 
+import BritefuryJ.DocPresent.DPPresentationArea;
 import BritefuryJ.DocPresent.Input.PointerInterface;
 
 public interface DiagramOwner
 {
 	void diagramQueueRedraw();
+	DPPresentationArea getDiagramPresentationArea();
 	ArrayList<PointerInterface> getPointersWithinDiagramNodeBounds(DiagramNode node);
 }

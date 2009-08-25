@@ -119,6 +119,17 @@ public class AABox2 implements Cloneable
 		return upperY;
 	}
 	
+	
+	public double getWidth()
+	{
+		return upperX - lowerX;
+	}
+	
+	public double getHeight()
+	{
+		return upperY - lowerY;
+	}
+	
 
 	public String toString()
 	{

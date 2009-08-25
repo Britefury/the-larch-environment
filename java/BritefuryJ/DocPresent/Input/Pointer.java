@@ -206,7 +206,10 @@ public class Pointer extends PointerInterface
 		
 		protected void handleDrag(Pointer pointer, PointerMotionEvent event)
 		{
-			pressGrabChild.handleDrag( pointer, (PointerMotionEvent)pressGrabChild.element.transformParentToLocalEvent( event ) );
+			if ( pressGrabChild != null )
+			{
+				pressGrabChild.handleDrag( pointer, (PointerMotionEvent)pressGrabChild.element.transformParentToLocalEvent( event ) );
+			}
 			
 			
 			element.handlePointerDrag( event );
