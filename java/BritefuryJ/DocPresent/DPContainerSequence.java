@@ -14,6 +14,7 @@ import java.util.List;
 import org.python.core.PySlice;
 
 import BritefuryJ.DocPresent.Layout.LAllocBox;
+import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Layout.PackingParams;
 import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
@@ -452,5 +453,22 @@ abstract public class DPContainerSequence extends DPContainer
 	protected double[] getChildrenAllocationY()
 	{
 		return getChildrenAllocationY( registeredChildren );
+	}
+
+
+
+	protected LAllocV[] getChildrenAllocV(List<DPWidget> nodes)
+	{
+		LAllocV[] values = new LAllocV[nodes.size()];
+		for (int i = 0; i < nodes.size(); i++)
+		{
+			values[i] = nodes.get( i ).getAllocV();
+		}
+		return values;
+	}
+
+	protected LAllocV[] getChildrenAllocV()
+	{
+		return getChildrenAllocV( registeredChildren );
 	}
 }

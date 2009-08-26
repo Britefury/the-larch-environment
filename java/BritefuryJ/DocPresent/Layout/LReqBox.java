@@ -16,8 +16,8 @@ public class LReqBox
 	protected static double ONE_PLUS_EPSILON = 1.0 + EPSILON;
 	
 	
-	private static int FLAG_HASBASELINE = 0x1;
-	private static int FLAG_LINEBREAK = 0x2;
+	private static int FLAG_HASBASELINE = 0x1  *  ElementAlignment._ELEMENTALIGN_END;
+	private static int FLAG_LINEBREAK = 0x2  *  ElementAlignment._ELEMENTALIGN_END;
 	
 	
 	protected int flags = 0;
@@ -44,6 +44,17 @@ public class LReqBox
 		lineBreakCost = -1;
 	}
 	
+	public LReqBox(HAlignment hAlign, VAlignment vAlign, double width, double hSpacing, double height, double vSpacing)
+	{
+		minWidth = prefWidth = width;
+		minHSpacing = prefHSpacing = hSpacing;
+		reqAscent = height;
+		reqVSpacing = vSpacing;
+		setAlignment( hAlign, vAlign );
+		setFlag( FLAG_HASBASELINE, false );
+		lineBreakCost = -1;
+	}
+	
 	public LReqBox(double width, double hSpacing, double ascent, double descent, double vSpacing)
 	{
 		minWidth = prefWidth = width;
@@ -51,6 +62,18 @@ public class LReqBox
 		reqAscent = ascent;
 		reqDescent = descent;
 		reqVSpacing = vSpacing;
+		setFlag( FLAG_HASBASELINE, true );
+		lineBreakCost = -1;
+	}
+
+	public LReqBox(HAlignment hAlign, VAlignment vAlign, double width, double hSpacing, double ascent, double descent, double vSpacing)
+	{
+		minWidth = prefWidth = width;
+		minHSpacing = prefHSpacing = hSpacing;
+		reqAscent = ascent;
+		reqDescent = descent;
+		reqVSpacing = vSpacing;
+		setAlignment( hAlign, vAlign );
 		setFlag( FLAG_HASBASELINE, true );
 		lineBreakCost = -1;
 	}
@@ -67,6 +90,19 @@ public class LReqBox
 		lineBreakCost = -1;
 	}
 
+	public LReqBox(HAlignment hAlign, VAlignment vAlign, double minWidth, double prefWidth, double minHSpacing, double prefHSpacing, double height, double vSpacing)
+	{
+		this.minWidth = minWidth;
+		this.prefWidth = prefWidth;
+		this.minHSpacing = minHSpacing;
+		this.prefHSpacing = prefHSpacing;
+		this.reqAscent = height;
+		this.reqVSpacing = vSpacing;
+		setAlignment( hAlign, vAlign );
+		setFlag( FLAG_HASBASELINE, false );
+		lineBreakCost = -1;
+	}
+
 	public LReqBox(double minWidth, double prefWidth, double minHSpacing, double prefHSpacing, double ascent, double descent, double vSpacing)
 	{
 		this.minWidth = minWidth;
@@ -76,6 +112,20 @@ public class LReqBox
 		this.reqAscent = ascent;
 		this.reqDescent = descent;
 		this.reqVSpacing = vSpacing;
+		setFlag( FLAG_HASBASELINE, true );
+		lineBreakCost = -1;
+	}
+
+	public LReqBox(HAlignment hAlign, VAlignment vAlign, double minWidth, double prefWidth, double minHSpacing, double prefHSpacing, double ascent, double descent, double vSpacing)
+	{
+		this.minWidth = minWidth;
+		this.prefWidth = prefWidth;
+		this.minHSpacing = minHSpacing;
+		this.prefHSpacing = prefHSpacing;
+		this.reqAscent = ascent;
+		this.reqDescent = descent;
+		this.reqVSpacing = vSpacing;
+		setAlignment( hAlign, vAlign );
 		setFlag( FLAG_HASBASELINE, true );
 		lineBreakCost = -1;
 	}
@@ -92,6 +142,7 @@ public class LReqBox
 		reqVSpacing = box.reqVSpacing;
 		setFlag( FLAG_HASBASELINE, box.hasBaseline() );
 		setFlag( FLAG_LINEBREAK, box.isLineBreak() );
+		setAlignmentIntValue( box.getAlignmentIntValue() );
 		lineBreakCost = box.lineBreakCost;
 	}
 	
@@ -106,6 +157,7 @@ public class LReqBox
 		reqVSpacing = box.reqVSpacing * scale;
 		setFlag( FLAG_HASBASELINE, box.hasBaseline() );
 		setFlag( FLAG_LINEBREAK, box.isLineBreak() );
+		setAlignmentIntValue( box.getAlignmentIntValue() );
 		lineBreakCost = box.lineBreakCost;
 	}
 	
@@ -250,6 +302,43 @@ public class LReqBox
 	{
 		lineBreakCost = cost;
 		setFlag( FLAG_LINEBREAK, true );
+	}
+	
+	
+	
+	private void setAlignmentIntValue(int value)
+	{
+		flags = ( flags & ~ElementAlignment._ELEMENTALIGN_MASK )  |  value;
+	}
+	
+	private int getAlignmentIntValue()
+	{
+		return flags & ElementAlignment._ELEMENTALIGN_MASK;
+	}
+	
+	public void setAlignment(HAlignment hAlign, VAlignment vAlign)
+	{
+		setAlignmentIntValue( ElementAlignment.intValue( hAlign, vAlign ) );
+	}
+
+	public void setHAlignment(HAlignment hAlign)
+	{
+		setAlignmentIntValue( ElementAlignment.intValue( hAlign ) );
+	}
+
+	public void setVAlignment(VAlignment vAlign)
+	{
+		setAlignmentIntValue( ElementAlignment.intValue( vAlign ) );
+	}
+	
+	public HAlignment getHAlignment()
+	{
+		return ElementAlignment.getHAlignment( getAlignmentIntValue() );
+	}
+
+	public VAlignment getVAlignment()
+	{
+		return ElementAlignment.getVAlignment( getAlignmentIntValue() );
 	}
 
 	

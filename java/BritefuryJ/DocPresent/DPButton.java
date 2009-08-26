@@ -16,6 +16,7 @@ import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Input.PointerInterface;
+import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.StyleSheets.ButtonStyleSheet;
 
 public class DPButton extends DPBin
@@ -205,9 +206,9 @@ public class DPButton extends DPBin
 		if ( child != null )
 		{
 			double vborder = border.getTopMargin() + border.getBottomMargin();
-			double prevHeight = child.layoutAllocBox.getAllocationY();
+			LAllocV prevAllocV = child.layoutAllocBox.getAllocV();
 			layoutAllocBox.allocateChildY( child.layoutAllocBox, border.getTopMargin(), layoutAllocBox.getAllocationY() - vborder );
-			child.refreshAllocationY( prevHeight );
+			child.refreshAllocationY( prevAllocV );
 		}
 	}
 }

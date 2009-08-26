@@ -12,9 +12,9 @@ import BritefuryJ.Math.Vector2;
 
 public class LAllocBox
 {
-	protected DPWidget element;
 	protected double positionInParentSpaceX, positionInParentSpaceY;
 	protected double allocationX, allocationY;
+	protected DPWidget element;
 
 	
 	public LAllocBox(DPWidget element)
@@ -59,6 +59,11 @@ public class LAllocBox
 	public double getAllocationY()
 	{
 		return allocationY;
+	}
+	
+	public LAllocV getAllocV()
+	{
+		return new LAllocV( allocationY );
 	}
 	
 	public Vector2 getAllocation()

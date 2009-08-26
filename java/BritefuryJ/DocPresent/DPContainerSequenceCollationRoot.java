@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import BritefuryJ.DocPresent.Layout.LAllocBox;
+import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Layout.PackingParams;
 import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
@@ -175,5 +176,10 @@ public abstract class DPContainerSequenceCollationRoot extends DPContainerSequen
 	double[] getCollatedChildrenAllocationY()
 	{
 		return getChildrenAllocationY( Arrays.asList( collationLeaves ) );
+	}
+
+	LAllocV[] getCollatedChildrenAllocV()
+	{
+		return getChildrenAllocV( Arrays.asList( collationLeaves ) );
 	}
 }

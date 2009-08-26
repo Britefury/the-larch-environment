@@ -54,6 +54,7 @@ import BritefuryJ.DocPresent.Input.Pointer;
 import BritefuryJ.DocPresent.Input.PointerDndController;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Input.PointerInterface;
+import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Selection.Selection;
@@ -1131,9 +1132,9 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 			LReqBox reqY = refreshRequisitionY();
 			
 			// Allocate Y
-			double prevHeight = layoutAllocBox.getAllocationY();
+			LAllocV prevAllocV = layoutAllocBox.getAllocV();
 			layoutAllocBox.setAllocationY( reqY.getReqHeight() );
-			refreshAllocationY( prevHeight );
+			refreshAllocationY( prevAllocV );
 			
 			updateRange();
 			bAllocationRequired = false;

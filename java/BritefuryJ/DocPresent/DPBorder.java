@@ -11,6 +11,7 @@ import java.awt.Graphics2D;
 
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Border.EmptyBorder;
+import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 
 
@@ -125,9 +126,9 @@ public class DPBorder extends DPBin
 		if ( child != null )
 		{
 			double vborder = border.getTopMargin() + border.getBottomMargin();
-			double prevHeight = child.layoutAllocBox.getAllocationY();
+			LAllocV prevAllocV = child.layoutAllocBox.getAllocV();
 			layoutAllocBox.allocateChildY( child.layoutAllocBox, border.getTopMargin(), layoutAllocBox.getAllocationY() - vborder );
-			child.refreshAllocationY( prevHeight );
+			child.refreshAllocationY( prevAllocV );
 		}
 	}
 }

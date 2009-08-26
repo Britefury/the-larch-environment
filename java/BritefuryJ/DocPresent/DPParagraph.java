@@ -11,6 +11,7 @@ import java.util.List;
 
 import BritefuryJ.DocPresent.Layout.BoxPackingParams;
 import BritefuryJ.DocPresent.Layout.LAllocBox;
+import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Layout.PackingParams;
 import BritefuryJ.DocPresent.Layout.ParagraphLayout;
@@ -103,14 +104,14 @@ public class DPParagraph extends DPContainerSequenceCollationRoot
 	{
 		super.updateAllocationY();
 		
-		double prevHeights[][] = new double[lines.length][];
+		LAllocV prevAllocVs[][] = new LAllocV[lines.length][];
 		for (int y = 0; y < lines.length; y++)
 		{
 			LAllocBox[] lineChildren = lines[y].getChildAllocBoxes();
-			prevHeights[y] = new double[lineChildren.length];
+			prevAllocVs[y] = new LAllocV[lineChildren.length];
 			for (int x = 0; x < lineChildren.length; x++)
 			{
-				prevHeights[y][x] = lineChildren[x].getAllocationY();
+				prevAllocVs[y][x] = lineChildren[x].getAllocV();
 			}
 		}
 		
@@ -121,7 +122,7 @@ public class DPParagraph extends DPContainerSequenceCollationRoot
 			LAllocBox[] lineChildren = lines[y].getChildAllocBoxes();
 			for (int x = 0; x < lineChildren.length; x++)
 			{
-				lineChildren[x].getElement().refreshAllocationY( prevHeights[y][x] );
+				lineChildren[x].getElement().refreshAllocationY( prevAllocVs[y][x] );
 			}
 		}
 	}

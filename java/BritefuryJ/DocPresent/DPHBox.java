@@ -13,6 +13,7 @@ import java.util.List;
 import BritefuryJ.DocPresent.Layout.BoxPackingParams;
 import BritefuryJ.DocPresent.Layout.HorizontalLayout;
 import BritefuryJ.DocPresent.Layout.LAllocBox;
+import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
@@ -107,14 +108,14 @@ public class DPHBox extends DPAbstractBox
 		
 		LReqBox childBoxes[] = getCollatedChildrenRequisitionBoxes();
 		LAllocBox childAllocBoxes[] = getCollatedChildrenAllocationBoxes();
-		double prevHeights[] = getCollatedChildrenAllocationY();
+		LAllocV prevAllocVs[] = getCollatedChildrenAllocV();
 		
 		HorizontalLayout.allocateY( layoutReqBox, childBoxes, layoutAllocBox, childAllocBoxes, getAlignment() );
 		
 		int i = 0;
 		for (DPWidget child: collationLeaves)
 		{
-			child.refreshAllocationY( prevHeights[i] );
+			child.refreshAllocationY( prevAllocVs[i] );
 			i++;
 		}
 	}

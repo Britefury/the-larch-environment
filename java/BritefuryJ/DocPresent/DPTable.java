@@ -15,6 +15,7 @@ import org.python.core.PyTuple;
 
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.LAllocBox;
+import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Layout.PackingParams;
 import BritefuryJ.DocPresent.Layout.TableLayout;
@@ -538,14 +539,14 @@ public class DPTable extends DPContainer
 		
 		LReqBox childBoxes[] = new LReqBox[registeredChildren.size()];
 		LAllocBox childAllocBoxes[] = new LAllocBox[registeredChildren.size()];
-		double prevHeights[] = new double[registeredChildren.size()];
+		LAllocV prevAllocVs[] = new LAllocV[registeredChildren.size()];
 		TablePackingParams[] packingParams = new TablePackingParams[registeredChildren.size()];
 		for (int i = 0; i < registeredChildren.size(); i++)
 		{
 			DPWidget child = registeredChildren.get( i );
 			childBoxes[i] = child.layoutReqBox;
 			childAllocBoxes[i] = child.layoutAllocBox;
-			prevHeights[i] = child.getAllocationY();
+			prevAllocVs[i] = child.getAllocV();
 			packingParams[i] = (TablePackingParams)child.getParentPacking();
 		}
 		
@@ -554,7 +555,7 @@ public class DPTable extends DPContainer
 		int i = 0;
 		for (DPWidget child: registeredChildren)
 		{
-			child.refreshAllocationY( prevHeights[i] );
+			child.refreshAllocationY( prevAllocVs[i] );
 			i++;
 		}
 	}
