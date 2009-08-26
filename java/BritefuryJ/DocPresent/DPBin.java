@@ -9,6 +9,7 @@ package BritefuryJ.DocPresent;
 
 import java.util.List;
 
+import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.PackingParams;
 import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 import BritefuryJ.Math.Point2;
@@ -121,9 +122,9 @@ public class DPBin extends DPContainer
 		DPWidget child = getChild();
 		if ( child != null )
 		{
-			double prevHeight = child.layoutAllocBox.getAllocationY();
+			LAllocV prevAllocV = child.layoutAllocBox.getAllocV();
 			layoutAllocBox.allocateChildY( child.layoutAllocBox );
-			child.refreshAllocationY( prevHeight );
+			child.refreshAllocationY( prevAllocV );
 		}
 	}
 	

@@ -617,9 +617,9 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		{
 			if ( childrenAlloc[i].getAllocationY() != expectedSize[i] )
 			{
-				System.out.println( "Child allocation for " + i + " is not as expected; expected=" + expectedSize[i] + ", result=" + childrenAlloc[i].getAllocationY() + ", boxAllocation=" + boxAllocation );
+				System.out.println( "Child allocation for " + i + " is not as expected; expected=" + expectedSize[i] + ", result=" + childrenAlloc[i].getAllocV() + ", boxAllocation=" + boxAllocation );
 			}
-			assertEquals( childrenAlloc[i].getAllocationY(), expectedSize[i] );
+			assertEquals( childrenAlloc[i].getAllocV(), expectedSize[i] );
 
 			if ( childrenAlloc[i].getPositionInParentSpaceY() != expectedPosition[i] )
 			{

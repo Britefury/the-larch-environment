@@ -27,6 +27,7 @@ import BritefuryJ.DocPresent.Input.DndHandler;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Input.PointerInterface;
 import BritefuryJ.DocPresent.Layout.LAllocBox;
+import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Layout.PackingParams;
 import BritefuryJ.DocPresent.Layout.VAlignment;
@@ -240,6 +241,11 @@ abstract public class DPWidget extends PointerInputElement
 	public double getAllocationY()
 	{
 		return layoutAllocBox.getAllocationY();
+	}
+	
+	public LAllocV getAllocV()
+	{
+		return layoutAllocBox.getAllocV();
 	}
 	
 	public Vector2 getAllocation()
@@ -1208,9 +1214,9 @@ abstract public class DPWidget extends PointerInputElement
 		}
 	}
 	
-	protected void refreshAllocationY(double prevHeight)
+	protected void refreshAllocationY(LAllocV prevHeight)
 	{
-		if ( !isSizeUpToDate()  ||  layoutAllocBox.getAllocationY() != prevHeight )
+		if ( !isSizeUpToDate()  ||  !layoutAllocBox.getAllocV().equals( prevHeight ) )
 		{
 			updateAllocationY();
 		}

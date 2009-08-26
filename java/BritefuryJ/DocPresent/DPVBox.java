@@ -13,6 +13,7 @@ import java.util.List;
 import BritefuryJ.DocPresent.Layout.BoxPackingParams;
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.LAllocBox;
+import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Layout.VTypesetting;
 import BritefuryJ.DocPresent.Layout.VerticalLayout;
@@ -117,7 +118,7 @@ public class DPVBox extends DPAbstractBox
 		
 		LReqBox childBoxes[] = getCollatedChildrenRequisitionBoxes();
 		LAllocBox childAllocBoxes[] = getCollatedChildrenAllocationBoxes();
-		double prevHeights[] = getCollatedChildrenAllocationY();
+		LAllocV prevAllocVs[] = getCollatedChildrenAllocV();
 		BoxPackingParams packing[] = (BoxPackingParams[])getCollatedChildrenPackingParams( new BoxPackingParams[collationLeaves.length] );
 		
 		VerticalLayout.allocateY( layoutReqBox, childBoxes, layoutAllocBox, childAllocBoxes, getSpacing(), packing );
@@ -125,7 +126,7 @@ public class DPVBox extends DPAbstractBox
 		int i = 0;
 		for (DPWidget child: collationLeaves)
 		{
-			child.refreshAllocationY( prevHeights[i] );
+			child.refreshAllocationY( prevAllocVs[i] );
 			i++;
 		}
 	}

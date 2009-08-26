@@ -18,6 +18,7 @@ import java.util.List;
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Layout.FractionLayout;
 import BritefuryJ.DocPresent.Layout.LAllocBox;
+import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Layout.PackingParams;
 import BritefuryJ.DocPresent.Marker.Marker;
@@ -449,20 +450,20 @@ public class DPFraction extends DPContainer
 		
 		LReqBox reqBoxes[] = new LReqBox[NUMCHILDREN];
 		LAllocBox allocBoxes[] = new LAllocBox[NUMCHILDREN];
-		double prevChildHeights[] = new double[NUMCHILDREN];
+		LAllocV prevChildAllocVs[] = new LAllocV[NUMCHILDREN];
 		for (int i = 0; i < NUMCHILDREN; i++)
 		{
 			if ( i != BAR )
 			{
 				reqBoxes[i] = paras[i] != null  ?  paras[i].layoutReqBox.scaled( childScale )  :  null;
 				allocBoxes[i] = paras[i] != null  ?  paras[i].layoutAllocBox  :  null;
-				prevChildHeights[i] = paras[i] != null  ?  paras[i].layoutAllocBox.getAllocationY()  :  0.0;
+				prevChildAllocVs[i] = paras[i] != null  ?  paras[i].layoutAllocBox.getAllocV()  :  null;
 			}
 			else
 			{
 				reqBoxes[i] = children[i] != null  ?  children[i].layoutReqBox  :  null;
 				allocBoxes[i] = children[i] != null  ?  children[i].layoutAllocBox  :  null;
-				prevChildHeights[i] = children[i] != null  ?  children[i].layoutAllocBox.getAllocationY()  :  0.0;
+				prevChildAllocVs[i] = children[i] != null  ?  children[i].layoutAllocBox.getAllocV()  :  null;
 			}
 		}
 		
@@ -477,11 +478,11 @@ public class DPFraction extends DPContainer
 				if ( i != BAR )
 				{
 					allocBoxes[i].scaleAllocationY( 1.0 / childScale );
-					paras[i].refreshAllocationY( prevChildHeights[i] );
+					paras[i].refreshAllocationY( prevChildAllocVs[i] );
 				}
 				else
 				{
-					children[i].refreshAllocationY( prevChildHeights[i] );
+					children[i].refreshAllocationY( prevChildAllocVs[i] );
 				}
 			}
 		}

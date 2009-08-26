@@ -351,9 +351,9 @@ public class Test_ParagraphLayout extends Test_Layout_base
 
 			if ( childrenAlloc[i].getAllocationY() != expectedSize[i*2+1] )
 			{
-				System.out.println( "Child allocation height for " + i + " is not as expected; expected=" + expectedSize[i*2+1] + ", result=" + childrenAlloc[i].getAllocationY() );
+				System.out.println( "Child allocation height for " + i + " is not as expected; expected=" + expectedSize[i*2+1] + ", result=" + childrenAlloc[i].getAllocV() );
 			}
-			assertEquals( childrenAlloc[i].getAllocationY(), expectedSize[i*2+1] );
+			assertEquals( childrenAlloc[i].getAllocV(), expectedSize[i*2+1] );
 
 			
 			if ( childrenAlloc[i].getPositionInParentSpaceX() != expectedPosition[i*2] )
