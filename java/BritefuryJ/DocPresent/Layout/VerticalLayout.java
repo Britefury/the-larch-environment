@@ -17,7 +17,7 @@ public class VerticalLayout
 		else if ( typesetting == VTypesetting.ALIGN_WITH_TOP )
 		{
 			LReqBox top = children[0];
-			if ( top.bHasBaseline )
+			if ( top.hasBaseline() )
 			{
 				box.setRequisitionY( top.reqAscent, height - top.reqAscent, vspacing );
 			}
@@ -29,7 +29,7 @@ public class VerticalLayout
 		else if ( typesetting == VTypesetting.ALIGN_WITH_BOTTOM )
 		{
 			LReqBox bottom = children[children.length-1];
-			if ( bottom.bHasBaseline )
+			if ( bottom.hasBaseline() )
 			{
 				box.setRequisitionY( height - bottom.reqDescent, bottom.reqDescent, vspacing );
 			}

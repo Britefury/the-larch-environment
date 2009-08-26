@@ -16,19 +16,21 @@ public class LReqBox
 	protected static double ONE_PLUS_EPSILON = 1.0 + EPSILON;
 	
 	
+	private static int FLAG_HASBASELINE = 0x1;
+	private static int FLAG_LINEBREAK = 0x2;
+	
+	
+	protected int flags = 0;
+	protected int lineBreakCost;
 	
 	protected double minWidth, prefWidth, minHSpacing, prefHSpacing;
 	protected double reqAscent, reqDescent, reqVSpacing;
 	
-	protected boolean bHasBaseline;		// If false, then ascent = height, descent = 0
-
-	protected boolean bLineBreak;
-	protected int lineBreakCost;
 	
 	
 	public LReqBox()
 	{
-		bHasBaseline = false;
+		setFlag( FLAG_HASBASELINE, false );
 		lineBreakCost = -1;
 	}
 	
@@ -38,7 +40,7 @@ public class LReqBox
 		minHSpacing = prefHSpacing = hSpacing;
 		reqAscent = height;
 		reqVSpacing = vSpacing;
-		bHasBaseline = false;
+		setFlag( FLAG_HASBASELINE, false );
 		lineBreakCost = -1;
 	}
 	
@@ -49,7 +51,7 @@ public class LReqBox
 		reqAscent = ascent;
 		reqDescent = descent;
 		reqVSpacing = vSpacing;
-		bHasBaseline = true;
+		setFlag( FLAG_HASBASELINE, true );
 		lineBreakCost = -1;
 	}
 
@@ -61,7 +63,7 @@ public class LReqBox
 		this.prefHSpacing = prefHSpacing;
 		this.reqAscent = height;
 		this.reqVSpacing = vSpacing;
-		bHasBaseline = false;
+		setFlag( FLAG_HASBASELINE, false );
 		lineBreakCost = -1;
 	}
 
@@ -74,7 +76,7 @@ public class LReqBox
 		this.reqAscent = ascent;
 		this.reqDescent = descent;
 		this.reqVSpacing = vSpacing;
-		bHasBaseline = true;
+		setFlag( FLAG_HASBASELINE, true );
 		lineBreakCost = -1;
 	}
 	
@@ -88,8 +90,8 @@ public class LReqBox
 		reqAscent = box.reqAscent;
 		reqDescent = box.reqDescent;
 		reqVSpacing = box.reqVSpacing;
-		bHasBaseline = box.bHasBaseline;
-		bLineBreak = box.bLineBreak;
+		setFlag( FLAG_HASBASELINE, box.hasBaseline() );
+		setFlag( FLAG_LINEBREAK, box.isLineBreak() );
 		lineBreakCost = box.lineBreakCost;
 	}
 	
@@ -102,8 +104,8 @@ public class LReqBox
 		reqAscent = box.reqAscent * scale;
 		reqDescent = box.reqDescent * scale;
 		reqVSpacing = box.reqVSpacing * scale;
-		bHasBaseline = box.bHasBaseline;
-		bLineBreak = box.bLineBreak;
+		setFlag( FLAG_HASBASELINE, box.hasBaseline() );
+		setFlag( FLAG_LINEBREAK, box.isLineBreak() );
 		lineBreakCost = box.lineBreakCost;
 	}
 	
@@ -151,9 +153,15 @@ public class LReqBox
 	}
 	
 	
+	
+	protected void setHasBaseline(boolean value)
+	{
+		setFlag( FLAG_HASBASELINE, value );
+	}
+	
 	public boolean hasBaseline()
 	{
-		return bHasBaseline;
+		return getFlag( FLAG_HASBASELINE );
 	}
 	
 	
@@ -162,7 +170,7 @@ public class LReqBox
 	{
 		minWidth = prefWidth = minHSpacing = prefHSpacing = 0.0;
 		reqAscent = reqDescent = reqVSpacing = 0.0;
-		bHasBaseline = false;
+		setFlag( FLAG_HASBASELINE, false );
 	}
 	
 	public void clearRequisitionX()
@@ -206,7 +214,7 @@ public class LReqBox
 		reqAscent = height;
 		reqDescent = 0.0;
 		reqVSpacing = vSpacing;
-		bHasBaseline = false;
+		setFlag( FLAG_HASBASELINE, false );
 	}
 	
 	public void setRequisitionY(double ascent, double descent, double vSpacing)
@@ -214,7 +222,7 @@ public class LReqBox
 		reqAscent = ascent;
 		reqDescent = descent;
 		reqVSpacing = vSpacing;
-		bHasBaseline = true;
+		setFlag( FLAG_HASBASELINE, true );
 	}
 	
 	public void setRequisitionY(LReqBox box)
@@ -222,7 +230,7 @@ public class LReqBox
 		reqAscent = box.reqAscent;
 		reqDescent = box.reqDescent;
 		reqVSpacing = box.reqVSpacing;
-		bHasBaseline = box.bHasBaseline;
+		setFlag( FLAG_HASBASELINE, box.hasBaseline() );
 	}
 	
 	
@@ -241,7 +249,7 @@ public class LReqBox
 	public void setLineBreakCost(int cost)
 	{
 		lineBreakCost = cost;
-		bLineBreak = true;
+		setFlag( FLAG_LINEBREAK, true );
 	}
 
 	
@@ -257,7 +265,7 @@ public class LReqBox
 	
 	public void borderY(double topMargin, double bottomMargin)
 	{
-		if ( bHasBaseline )
+		if ( hasBaseline() )
 		{
 			reqAscent += topMargin;
 			reqDescent += bottomMargin;
@@ -282,7 +290,7 @@ public class LReqBox
 			LReqBox b = (LReqBox)x;
 			
 			return minWidth == b.minWidth  &&  prefWidth == b.prefWidth  &&  minHSpacing == b.minHSpacing  &&  prefHSpacing == b.prefHSpacing  &&
-					reqAscent == b.reqAscent  &&  reqDescent == b.reqDescent  &&  reqVSpacing == b.reqVSpacing  &&  bHasBaseline == b.bHasBaseline;
+					reqAscent == b.reqAscent  &&  reqDescent == b.reqDescent  &&  reqVSpacing == b.reqVSpacing  &&  hasBaseline() == b.hasBaseline();
 		}
 		else
 		{
@@ -294,7 +302,7 @@ public class LReqBox
 	public String toString()
 	{
 		return "LReqBox( minWidth=" + minWidth + ", prefWidth=" + prefWidth +  ", minHSpacing=" + minHSpacing + ", prefHSpacing=" + prefHSpacing +
-			", reqAscent=" + reqAscent + ", reqDescent=" + reqDescent + ", reqVSpacing=" + reqVSpacing +  ", bHasBaseline=" + bHasBaseline + ")";
+			", reqAscent=" + reqAscent + ", reqDescent=" + reqDescent + ", reqVSpacing=" + reqVSpacing +  ", bHasBaseline=" + hasBaseline() + ")";
 	}
 
 
@@ -337,8 +345,32 @@ public class LReqBox
 	public LReqBox lineBreakBox(int cost)
 	{
 		LReqBox b = new LReqBox( this );
-		b.bLineBreak = true;
+		b.setFlag( FLAG_LINEBREAK, true );
 		b.lineBreakCost = cost;
 		return b;
+	}
+	
+	protected boolean isLineBreak()
+	{
+		return getFlag( FLAG_LINEBREAK );
+	}
+	
+	
+	
+	private void setFlag(int f, boolean value)
+	{
+		if ( value )
+		{
+			flags |= f;
+		}
+		else
+		{
+			flags &= ~f;
+		}
+	}
+	
+	private boolean getFlag(int f)
+	{
+		return ( flags & f )  !=  0;
 	}
 }
