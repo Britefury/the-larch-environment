@@ -8,9 +8,10 @@ package BritefuryJ.DocPresent.Layout;
 
 public enum VAlignment
 {
+	BASELINES,
+	BASELINES_EXPAND,
 	TOP,
 	CENTRE,
 	BOTTOM,
-	EXPAND,
-	BASELINES
+	EXPAND
 }

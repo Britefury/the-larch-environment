@@ -270,7 +270,7 @@ public class HorizontalLayout
 	
 	public static void allocateY(LReqBox box, LReqBox children[], LAllocBox allocBox, LAllocBox childrenAlloc[], VAlignment alignment)
 	{
-		if ( alignment == VAlignment.BASELINES  &&  box.bHasBaseline )
+		if ( alignment == VAlignment.BASELINES  &&  box.hasBaseline() )
 		{
 			// Compute the amount of space allocated (do not allow to fall below minimum requirement)
 			double allocation = Math.max( allocBox.allocationY, box.getReqHeight() );
@@ -286,7 +286,7 @@ public class HorizontalLayout
 				LReqBox child = children[i];
 				double childAscent, childDescent;
 				
-				if ( child.bHasBaseline )
+				if ( child.hasBaseline() )
 				{
 					childAscent = child.getReqAscent();
 					childDescent = child.getReqDescent();
@@ -321,7 +321,7 @@ public class HorizontalLayout
 					{
 						allocBox.allocateChildY( childAlloc, 0.0, childHeight );
 					}
-					else if ( alignment == VAlignment.CENTRE  ||  ( alignment == VAlignment.BASELINES  &&  !box.bHasBaseline ) )
+					else if ( alignment == VAlignment.CENTRE  ||  ( alignment == VAlignment.BASELINES  &&  !box.hasBaseline() ) )
 					{
 						allocBox.allocateChildY( childAlloc, ( allocation - childHeight )  *  0.5, childHeight );
 					}

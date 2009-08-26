@@ -165,7 +165,7 @@ public class TableLayout
 		for (int i = 0; i < numRows; i++)
 		{
 			rowBoxes[i] = new LReqBox();
-			rowBoxes[i].bHasBaseline = true;
+			rowBoxes[i].setHasBaseline( true );
 		}
 		
 		
@@ -181,7 +181,7 @@ public class TableLayout
 				
 				double ascent, descent;
 
-				if ( child.bHasBaseline )
+				if ( child.hasBaseline() )
 				{
 					ascent = child.reqAscent + packing.paddingY;
 					descent = child.reqDescent + packing.paddingY;
@@ -365,7 +365,7 @@ public class TableLayout
 			LAllocBox childAlloc = childrenAlloc[i];
 			TablePackingParams packing = (TablePackingParams)packingParams[i];
 
-			if ( packing.rowSpan == 1  &&  rowAlignment == VAlignment.BASELINES  &&  child.bHasBaseline  &&  rowBoxes[packing.y].bHasBaseline )
+			if ( packing.rowSpan == 1  &&  rowAlignment == VAlignment.BASELINES  &&  child.hasBaseline()  &&  rowBoxes[packing.y].hasBaseline() )
 			{
 				LReqBox rowBox = rowBoxes[packing.y];
 				LAllocBox rowAlloc = rowAllocBoxes[packing.y];

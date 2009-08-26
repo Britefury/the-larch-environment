@@ -175,7 +175,7 @@ public class ParagraphLayout
 			prefX = prefAdvance + hSpacing;
 
 		
-			if ( child.bLineBreak )
+			if ( child.isLineBreak() )
 			{
 				minWidth = Math.max( minWidth, lineWidth );
 				minAdvance = Math.max( minAdvance, lineAdvance );
@@ -259,7 +259,7 @@ public class ParagraphLayout
 			double childSpacing = Math.max( child.prefHSpacing - padding, 0.0 );
 			
 			// Keep track of the best and most recent line break boxes
-			if ( child.bLineBreak )
+			if ( child.isLineBreak() )
 			{
 				if ( bestLineBreak == null  ||  child.lineBreakCost <= bestLineBreak.lineBreakCost )
 				{
