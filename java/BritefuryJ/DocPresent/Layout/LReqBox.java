@@ -45,7 +45,8 @@ public class LReqBox
 	{
 		minWidth = prefWidth = width;
 		minHSpacing = prefHSpacing = hSpacing;
-		reqAscent = height;
+		reqAscent = height * 0.5;
+		reqDescent = height * 0.5;
 		reqVSpacing = vSpacing;
 		setFlag( FLAG_HASBASELINE, false );
 		lineBreakCost = -1;
@@ -55,7 +56,8 @@ public class LReqBox
 	{
 		minWidth = prefWidth = width;
 		minHSpacing = prefHSpacing = hSpacing;
-		reqAscent = height;
+		reqAscent = height * 0.5;
+		reqDescent = height * 0.5;
 		reqVSpacing = vSpacing;
 		setAlignment( hAlign, vAlign );
 		setFlag( FLAG_HASBASELINE, false );
@@ -91,7 +93,8 @@ public class LReqBox
 		this.prefWidth = prefWidth;
 		this.minHSpacing = minHSpacing;
 		this.prefHSpacing = prefHSpacing;
-		this.reqAscent = height;
+		reqAscent = height * 0.5;
+		reqDescent = height * 0.5;
 		this.reqVSpacing = vSpacing;
 		setFlag( FLAG_HASBASELINE, false );
 		lineBreakCost = -1;
@@ -103,7 +106,8 @@ public class LReqBox
 		this.prefWidth = prefWidth;
 		this.minHSpacing = minHSpacing;
 		this.prefHSpacing = prefHSpacing;
-		this.reqAscent = height;
+		reqAscent = height * 0.5;
+		reqDescent = height * 0.5;
 		this.reqVSpacing = vSpacing;
 		setAlignment( hAlign, vAlign );
 		setFlag( FLAG_HASBASELINE, false );
@@ -267,8 +271,8 @@ public class LReqBox
 
 	public void setRequisitionY(double height, double vSpacing)
 	{
-		reqAscent = height;
-		reqDescent = 0.0;
+		reqAscent = height * 0.5;
+		reqDescent = height * 0.5;
 		reqVSpacing = vSpacing;
 		setFlag( FLAG_HASBASELINE, false );
 	}

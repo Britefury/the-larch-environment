@@ -97,8 +97,8 @@ public class LAllocBox
 	
 	public void setAllocationY(double allocation)
 	{
-		this.allocationAscent = allocation;
-		this.allocationDescent = 0.0;
+		this.allocationAscent = allocation * 0.5;
+		this.allocationDescent = allocation * 0.5;
 		bHasBaseline = false;
 	}
 	
@@ -194,9 +194,9 @@ public class LAllocBox
 		{
 			double topMargin = localPosY;
 			double bottomMargin = Math.max( getAllocationY() - ( localPosY + localHeight ),  0.0 );
-			if ( hasBaseline() )
+			if ( childReq.hasBaseline() )
 			{
-				if ( childReq.hasBaseline() )
+				if ( hasBaseline() )
 				{
 					double ascent = Math.max( allocationAscent - topMargin, childReq.getReqAscent() );
 					double descent = Math.max( allocationDescent - bottomMargin, childReq.getReqDescent() );
@@ -204,21 +204,13 @@ public class LAllocBox
 				}
 				else
 				{
-					allocateChildY( child, 0.0, getAllocationY() );
+					double delta = localHeight - childHeight;
+					allocateChildY( child, localPosY, childReq.getReqAscent() + delta * 0.5, childReq.getReqDescent() + delta * 0.5 );
 				}
 			}
 			else
 			{
-				if ( childReq.hasBaseline() )
-				{
-					double delta = localHeight - childHeight;
-					allocateChildY( child, localPosY, childReq.getReqAscent() + delta * 0.5, childReq.getReqDescent() + delta * 0.5 );
-				}
-				else
-				{
-					double ascent = localHeight  *  0.5;
-					allocateChildY( child, localPosY, ascent, ascent );
-				}
+				allocateChildY( child, localPosY, localHeight );
 			}
 		}
 		else if ( alignment == VAlignment.BASELINES )
@@ -231,7 +223,10 @@ public class LAllocBox
 				}
 				else
 				{
-					allocateChildY( child, 0.0, childReq.getReqHeight() );
+					double deltaY = localHeight - childReq.getReqHeight();
+					double offsetY = Math.max( allocationAscent - childReq.getReqHeight() * 0.5,  0.0 );
+					double y = localPosY + Math.min( offsetY, deltaY );
+					allocateChildY( child, y, childReq.getReqHeight() );
 				}
 			}
 			else
@@ -244,8 +239,7 @@ public class LAllocBox
 				}
 				else
 				{
-					double ascent = childHeight * 0.5;
-					allocateChildY( child, y, ascent, ascent );
+					allocateChildY( child, y, childHeight );
 				}
 			}
 		}
