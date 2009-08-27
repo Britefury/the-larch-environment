@@ -7,7 +7,6 @@
 //##************************
 package BritefuryJ.DocPresent.StyleSheets;
 
-import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.VTypesetting;
 
 public class VBoxStyleSheet extends AbstractBoxStyleSheet
@@ -16,20 +15,18 @@ public class VBoxStyleSheet extends AbstractBoxStyleSheet
 	
 	
 	protected VTypesetting typesetting;
-	protected HAlignment alignment;
 
 
 	public VBoxStyleSheet()
 	{
-		this( VTypesetting.NONE, HAlignment.EXPAND, 0.0, false, 0.0 );
+		this( VTypesetting.NONE, 0.0 );
 	}
 	
-	public VBoxStyleSheet(VTypesetting typesetting, HAlignment alignment, double spacing, boolean bExpand, double padding)
+	public VBoxStyleSheet(VTypesetting typesetting, double spacing)
 	{
-		super( spacing, bExpand, padding );
+		super( spacing );
 		
 		this.typesetting = typesetting;
-		this.alignment = alignment;
 	}
 
 	
@@ -37,10 +34,5 @@ public class VBoxStyleSheet extends AbstractBoxStyleSheet
 	public VTypesetting getTypesetting()
 	{
 		return typesetting;
-	}
-
-	public HAlignment getAlignment()
-	{
-		return alignment;
 	}
 }

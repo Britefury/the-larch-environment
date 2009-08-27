@@ -37,6 +37,11 @@ abstract public class DPContainerSequence extends DPContainer
 
 	
 	
+	public void setChildren(DPWidget items[])
+	{
+		setChildren( Arrays.asList( items ) );
+	}
+	
 	public void setChildren(List<DPWidget> items)
 	{
 		if ( registeredChildren.isEmpty() )

@@ -16,10 +16,7 @@ import BritefuryJ.DocPresent.DPSpan;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.Layout.HAlignment;
-import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.Layout.VTypesetting;
-import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
@@ -69,8 +66,7 @@ public class FractionTestPage extends SystemPage
 		DPText labelA = new DPText( s1, "Label A yYgGjJpPqQ" );
 		DPText labelB = new DPText( s2, "Label B yYgGjJpPqQ" );
 		
-		HBoxStyleSheet boxs = new HBoxStyleSheet( VAlignment.BASELINES, 0.0, false, 0.0 );
-		DPHBox box = new DPHBox( boxs );
+		DPHBox box = new DPHBox();
 		box.append( labelA );
 		box.append( frac );
 		box.append( labelB );
@@ -91,7 +87,7 @@ public class FractionTestPage extends SystemPage
 		TextStyleSheet s0 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 16 ), new Color( 0.0f, 0.5f, 0.0f ) );
 		TextStyleSheet blackStyle = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 24 ), Color.black );
 
-		VBoxStyleSheet boxs = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.LEFT, 10.0, false, 0.0 );
+		VBoxStyleSheet boxs = new VBoxStyleSheet( VTypesetting.NONE, 10.0 );
 		DPVBox box = new DPVBox( boxs );
 		
 		box.append( makeFractionLine( makeText( "a", s0 ), makeText( "p", s0 ) ) );

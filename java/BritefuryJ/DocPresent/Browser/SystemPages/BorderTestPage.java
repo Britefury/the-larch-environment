@@ -11,13 +11,14 @@ import java.awt.Font;
 
 import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPHBox;
+import BritefuryJ.DocPresent.DPStaticText;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Border.EmptyBorder;
-import BritefuryJ.DocPresent.Layout.HAlignment;
+import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Layout.VTypesetting;
+import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
@@ -47,45 +48,81 @@ public class BorderTestPage extends SystemPage
 		return texts;
 	}
 	
+	protected static DPWidget makeTextOnGrey(String text)
+	{
+		DPStaticText t = new DPStaticText( text );
+		
+		EmptyBorder b = new EmptyBorder( new Color( 0.8f, 0.8f, 0.8f ) );
+		DPBorder border = new DPBorder( b );
+		border.setChild( t );
+		return border;
+	}
+	
 	
 	protected DPWidget createContents()
 	{
-		DPText[] c0 = makeTexts( "LEFT" );
-		DPText[] c1 = makeTexts( "CENTRE" );
-		DPText[] c2 = makeTexts( "RIGHT" );
-		DPText[] c3 = makeTexts( "EXPAND" );
+		VBoxStyleSheet mainBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, 10.0 );
+		DPVBox mainBox = new DPVBox( mainBoxStyle );
 		
-		VBoxStyleSheet b0s = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.LEFT, 0.0, false, 0.0 );
-		DPVBox b0 = new DPVBox( b0s );
-		b0.extend( c0 );
+		SolidBorder singlePixelBorder = new SolidBorder( 1.0, 2.0, Color.black, null );
 		
-		VBoxStyleSheet b1s = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.CENTRE, 0.0, false, 0.0 );
-		DPVBox b1 = new DPVBox( b1s );
-		b1.extend( c1 );
+		DPBorder halignLeft = new DPBorder( singlePixelBorder );
+		DPBorder halignCentre = new DPBorder( singlePixelBorder );
+		DPBorder halignRight = new DPBorder( singlePixelBorder );
+		DPBorder halignExpand = new DPBorder( singlePixelBorder );
 		
-		VBoxStyleSheet b2s = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.RIGHT, 0.0, false, 0.0 );
-		DPVBox b2 = new DPVBox( b2s );
-		b2.extend( c2 );
-		
-		VBoxStyleSheet b3s = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.EXPAND, 0.0, true, 0.0 );
-		DPVBox b3 = new DPVBox( b3s );
-		b3.extend( c3 );
+		halignLeft.setChild( makeTextOnGrey( "hAlign=left" ).alignHLeft() );
+		halignCentre.setChild( makeTextOnGrey( "hAlign=centre" ).alignHCentre() );
+		halignRight.setChild( makeTextOnGrey( "hAlign=right" ).alignHRight() );
+		halignExpand.setChild( makeTextOnGrey( "hAlign=expand" ).alignHExpand() );
 		
 		
-		Border b = new EmptyBorder( 20.0, 40.0, 60.0, 80.0, new Color( 0.75f, 0.75f, 1.0f ) );
-		DPBorder border = new DPBorder( b );
-		border.setChild( b0 );
-		DPHBox hb = new DPHBox();
-		hb.append( border );
+		
+		
+		EmptyBorder spacerBorder = new EmptyBorder( 5.0, 5.0, 200.0, 200.0, new Color( 0.7f, 0.8f, 0.9f ) );
+		DPBorder spacer = new DPBorder( spacerBorder );
+		spacer.setChild( new DPStaticText( "SPACER" ) );
+		
+		
+		DPBorder valignBaselines = new DPBorder( singlePixelBorder );
+		DPBorder valignBaselinesExpand = new DPBorder( singlePixelBorder );
+		DPBorder valignTop = new DPBorder( singlePixelBorder );
+		DPBorder valignCentre = new DPBorder( singlePixelBorder );
+		DPBorder valignBottom = new DPBorder( singlePixelBorder );
+		DPBorder valignExpand = new DPBorder( singlePixelBorder );
+		
+		
+		valignBaselines.setChild( makeTextOnGrey( "vAlign=baselines" ).alignVBaselines() );
+		valignBaselinesExpand.setChild( makeTextOnGrey( "vAlign=b-expand" ).alignVBaselinesExpand() );
+		valignTop.setChild( makeTextOnGrey( "vAlign=top" ).alignVTop() );
+		valignCentre.setChild( makeTextOnGrey( "vAlign=centre" ).alignVCentre() );
+		valignBottom.setChild( makeTextOnGrey( "vAlign=bottom" ).alignVBottom() );
+		valignExpand.setChild( makeTextOnGrey( "vAlign=expand" ).alignVExpand() );
 
 		
-		VBoxStyleSheet boxS = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.EXPAND, 20.0, false, 0.0 );
-		DPVBox box = new DPVBox( boxS );
-		box.append( hb );
-		box.append( b1 );
-		box.append( b2 );
-		box.append( b3 );
+		HBoxStyleSheet vAlignBoxStyle = new HBoxStyleSheet( 10.0 );
+		DPHBox vAlignBox = new DPHBox( vAlignBoxStyle );
+		vAlignBox.append( valignBaselines.alignVExpand() );
+		vAlignBox.append( valignBaselinesExpand.alignVExpand() );
+		vAlignBox.append( valignTop.alignVExpand() );
+		vAlignBox.append( valignCentre.alignVExpand() );
+		vAlignBox.append( valignBottom.alignVExpand() );
+		vAlignBox.append( valignExpand.alignVExpand() );
 		
-		return box;
+		
+		HBoxStyleSheet bottomBoxStyle = new HBoxStyleSheet( 50.0 );
+		DPHBox bottomBox = new DPHBox( bottomBoxStyle );
+		bottomBox.append( spacer );
+		bottomBox.append( vAlignBox.alignVExpand() );
+		
+		
+		mainBox.append( halignLeft.alignHExpand() );
+		mainBox.append( halignCentre.alignHExpand() );
+		mainBox.append( halignRight.alignHExpand() );
+		mainBox.append( halignExpand.alignHExpand() );
+		mainBox.append( bottomBox );
+		
+		
+		return mainBox;
 	}
 }

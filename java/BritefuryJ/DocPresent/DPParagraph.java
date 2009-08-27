@@ -9,13 +9,11 @@ package BritefuryJ.DocPresent;
 
 import java.util.List;
 
-import BritefuryJ.DocPresent.Layout.BoxPackingParams;
 import BritefuryJ.DocPresent.Layout.LAllocBox;
 import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Layout.PackingParams;
 import BritefuryJ.DocPresent.Layout.ParagraphLayout;
-import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
@@ -57,14 +55,12 @@ public class DPParagraph extends DPContainerSequenceCollationRoot
 		refreshCollation();
 		
 		LReqBox[] childBoxes = new LReqBox[collationLeaves.length];
-		BoxPackingParams[] packingParams = new BoxPackingParams[collationLeaves.length];
 		for (int i = 0; i < collationLeaves.length; i++)
 		{
 			childBoxes[i] = collationLeaves[i].refreshRequisitionX();
-			packingParams[i] = (BoxPackingParams)collationLeaves[i].getParentPacking();
 		}
 
-		ParagraphLayout.computeRequisitionX( layoutReqBox, childBoxes, getIndentation(), getSpacing(), packingParams );
+		ParagraphLayout.computeRequisitionX( layoutReqBox, childBoxes, getIndentation(), getSpacing() );
 	}
 
 	protected void updateRequisitionY()
@@ -74,7 +70,7 @@ public class DPParagraph extends DPContainerSequenceCollationRoot
 			child.refreshRequisitionY();
 		}
 
-		ParagraphLayout.computeRequisitionY( layoutReqBox, lines, getVSpacing(), getAlignment() );
+		ParagraphLayout.computeRequisitionY( layoutReqBox, lines, getLineSpacing() );
 	}
 	
 
@@ -86,9 +82,8 @@ public class DPParagraph extends DPContainerSequenceCollationRoot
 		LReqBox childBoxes[] = getCollatedChildrenRequisitionBoxes();
 		LAllocBox childAllocBoxes[] = getCollatedChildrenAllocationBoxes();
 		double prevWidths[] = getCollatedChildrenAllocationX();
-		BoxPackingParams packing[] = (BoxPackingParams[])getCollatedChildrenPackingParams( new BoxPackingParams[collationLeaves.length] );
 		
-		lines = ParagraphLayout.allocateX( layoutReqBox, childBoxes, layoutAllocBox, childAllocBoxes, getIndentation(), getSpacing(), packing );
+		lines = ParagraphLayout.allocateX( layoutReqBox, childBoxes, layoutAllocBox, childAllocBoxes, getIndentation(), getSpacing() );
 		
 		int i = 0;
 		for (DPWidget child: collationLeaves)
@@ -115,7 +110,7 @@ public class DPParagraph extends DPContainerSequenceCollationRoot
 			}
 		}
 		
-		ParagraphLayout.allocateY( layoutReqBox, layoutAllocBox, lines, getSpacing(), getAlignment() );
+		ParagraphLayout.allocateY( layoutReqBox, layoutAllocBox, lines, getSpacing() );
 		
 		for (int y = 0; y < lines.length; y++)
 		{
@@ -491,15 +486,10 @@ public class DPParagraph extends DPContainerSequenceCollationRoot
 	//
 	//
 
+
 	protected PackingParams getDefaultPackingParams()
 	{
-		return ((ParagraphStyleSheet)styleSheet).getDefaultPackingParams();
-	}
-
-
-	public VAlignment getAlignment()
-	{
-		return ((ParagraphStyleSheet)styleSheet).getAlignment();
+		return null;
 	}
 
 	public double getSpacing()
@@ -507,14 +497,9 @@ public class DPParagraph extends DPContainerSequenceCollationRoot
 		return ((ParagraphStyleSheet)styleSheet).getSpacing();
 	}
 
-	public double getVSpacing()
+	public double getLineSpacing()
 	{
-		return ((ParagraphStyleSheet)styleSheet).getVSpacing();
-	}
-
-	public double getPadding()
-	{
-		return ((ParagraphStyleSheet)styleSheet).getPadding();
+		return ((ParagraphStyleSheet)styleSheet).getLineSpacing();
 	}
 
 	public double getIndentation()

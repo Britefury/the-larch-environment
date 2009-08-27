@@ -381,7 +381,7 @@ public class TableLayout
 				int endRow = packing.y + packing.rowSpan;
 				LAllocBox startRowAlloc = rowAllocBoxes[startRow], endRowAlloc = rowAllocBoxes[endRow-1];
 				double yStart = startRowAlloc.positionInParentSpaceY + packing.paddingY;
-				double yEnd = endRowAlloc.positionInParentSpaceY + endRowAlloc.allocationY - packing.paddingY;
+				double yEnd = endRowAlloc.positionInParentSpaceY + endRowAlloc.getAllocationY() - packing.paddingY;
 				double heightAvailable = yEnd - yStart;
 				double reqHeight = child.getReqHeight();
 				double cellHeight = Math.max( heightAvailable, reqHeight );

@@ -24,8 +24,6 @@ import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.PageController;
 import BritefuryJ.DocPresent.Browser.SystemPages.SystemLocationResolver;
 import BritefuryJ.DocPresent.Browser.SystemPages.SystemRootPage;
-import BritefuryJ.DocPresent.Layout.HAlignment;
-import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.Layout.VTypesetting;
 import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.StaticTextStyleSheet;
@@ -173,7 +171,7 @@ public class Browser implements PageController
 		else
 		{
 			page.addBrowser( this );
-			area.setChild( page.getContentsElement() );		
+			area.setChild( page.getContentsElement().alignHExpand() );		
 		}
 	}
 	
@@ -192,20 +190,20 @@ public class Browser implements PageController
 	
 	private DPWidget createResolveErrorElement(String location)
 	{
-		VBoxStyleSheet pageBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.CENTRE, 40.0, false, 10.0 );
+		VBoxStyleSheet pageBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, 40.0 );
 		DPVBox pageBox = new DPVBox( pageBoxStyle );
 		
 
-		HBoxStyleSheet linkBoxStyle = new HBoxStyleSheet( VAlignment.BASELINES, 0.0, false, 10.0 );
+		HBoxStyleSheet linkBoxStyle = new HBoxStyleSheet( 0.0 );
 		DPHBox linkBox = new DPHBox( linkBoxStyle );
 		
-		linkBox.append( new DPLink( "WELCOME PAGE", "" ) );
+		linkBox.append( new DPLink( "WELCOME PAGE", "" ).padX( 10.0 ) );
 		
 		
 		TextStyleSheet titleStyle = new TextStyleSheet( new Font( "Serif", Font.BOLD, 32 ), Color.BLACK );
 		DPText title = new DPText( titleStyle, "Could Not Resolve Location" );
 		
-		VBoxStyleSheet errorBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.CENTRE, 10.0, false, 0.0 );
+		VBoxStyleSheet errorBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, 10.0 );
 		DPVBox errorBox = new DPVBox( errorBoxStyle );
 		
 		TextStyleSheet locationStyle = new TextStyleSheet( new Font( "SansSerif", Font.PLAIN, 16 ), Color.BLACK );
@@ -214,30 +212,25 @@ public class Browser implements PageController
 		DPText loc = new DPText( locationStyle, location );
 		DPText error = new DPText( errorStyle, "could not be resolved" );
 		
-		errorBox.append( loc );
-		errorBox.append( error );
+		errorBox.append( loc.alignHCentre() );
+		errorBox.append( error.alignHCentre() );
 
-		pageBox.append( linkBox );
-		pageBox.append( title );
-		pageBox.append( errorBox );
+		pageBox.append( SystemRootPage.createLinkHeader( SystemRootPage.LINKHEADER_ROOTPAGE ) );
+		pageBox.append( title.padY( 10.0 ).alignHCentre() );
+		pageBox.append( errorBox.padY( 10.0 ).alignHCentre() );
 		
-		return pageBox;
+		return pageBox.alignHExpand();
 	}
 	
 	
 	private DPWidget createDefaultRootElement()
 	{
-		VBoxStyleSheet pageBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.EXPAND, 0.0, false, 0.0 );
-		DPVBox pageBox = new DPVBox( pageBoxStyle );
+		DPVBox pageBox = new DPVBox();
 		
-		VBoxStyleSheet contentBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.EXPAND, 40.0, false, 0.0 );
+		VBoxStyleSheet contentBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, 40.0 );
 		DPVBox contentBox = new DPVBox( contentBoxStyle );
 		
-		VBoxStyleSheet titleBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.CENTRE, 40.0, false, 0.0 );
-		DPVBox titleBox = new DPVBox( titleBoxStyle );
-		
 
-		pageBox.append( SystemRootPage.createLinkHeader( SystemRootPage.LINKHEADER_SYSTEMPAGE ) );
 		
 		StaticTextStyleSheet titleStyle = new StaticTextStyleSheet( new Font( "Serif", Font.BOLD, 32 ), Color.BLACK );
 		DPStaticText title = new DPStaticText( titleStyle, "Default root page" );
@@ -245,15 +238,14 @@ public class Browser implements PageController
 		StaticTextStyleSheet contentsStyle = new StaticTextStyleSheet( new Font( "SansSerif", Font.PLAIN, 16 ), Color.BLACK );
 		DPStaticText contents = new DPStaticText( contentsStyle, "Empty document" );
 
-		titleBox.append( title );
-		
-		contentBox.append( titleBox );
-		contentBox.append( contents );
+		contentBox.append( title.alignHCentre() );
+		contentBox.append( contents.alignHExpand() );
 
-		pageBox.append( contentBox );
+		pageBox.append( SystemRootPage.createLinkHeader( SystemRootPage.LINKHEADER_SYSTEMPAGE ) );
+		pageBox.append( contentBox.alignHExpand() );
 
 		
-		return pageBox;
+		return pageBox.alignHExpand();
 	}
 	
 	

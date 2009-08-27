@@ -10,12 +10,10 @@ package BritefuryJ.DocPresent;
 import java.util.Arrays;
 import java.util.List;
 
-import BritefuryJ.DocPresent.Layout.BoxPackingParams;
 import BritefuryJ.DocPresent.Layout.HorizontalLayout;
 import BritefuryJ.DocPresent.Layout.LAllocBox;
 import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.LReqBox;
-import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
@@ -37,34 +35,17 @@ public class DPHBox extends DPAbstractBox
 	
 	
 	
-	public void append(DPWidget child,  boolean bExpand, double padding)
-	{
-		append( child );
-		child.setParentPacking( new BoxPackingParams( padding, bExpand ) );
-	}
-
-	
-	public void insert(int index, DPWidget child, boolean bExpand, double padding)
-	{
-		insert( index, child );
-		child.setParentPacking( new BoxPackingParams( padding, bExpand ) );
-	}
-	
-	
-	
 	protected void updateRequisitionX()
 	{
 		refreshCollation();
 		
 		LReqBox[] childBoxes = new LReqBox[collationLeaves.length];
-		BoxPackingParams[] packingParams = new BoxPackingParams[collationLeaves.length];
 		for (int i = 0; i < collationLeaves.length; i++)
 		{
 			childBoxes[i] = collationLeaves[i].refreshRequisitionX();
-			packingParams[i] = (BoxPackingParams)collationLeaves[i].getParentPacking();
 		}
 
-		HorizontalLayout.computeRequisitionX( layoutReqBox, childBoxes, getSpacing(), packingParams );
+		HorizontalLayout.computeRequisitionX( layoutReqBox, childBoxes, getSpacing() );
 	}
 
 	protected void updateRequisitionY()
@@ -75,7 +56,7 @@ public class DPHBox extends DPAbstractBox
 			childBoxes[i] = collationLeaves[i].refreshRequisitionY();
 		}
 
-		HorizontalLayout.computeRequisitionY( layoutReqBox, childBoxes, getAlignment() );
+		HorizontalLayout.computeRequisitionY( layoutReqBox, childBoxes );
 	}
 	
 
@@ -88,9 +69,8 @@ public class DPHBox extends DPAbstractBox
 		LReqBox childBoxes[] = getCollatedChildrenRequisitionBoxes();
 		LAllocBox childAllocBoxes[] = getCollatedChildrenAllocationBoxes();
 		double prevWidths[] = getCollatedChildrenAllocationX();
-		BoxPackingParams packing[] = (BoxPackingParams[])getCollatedChildrenPackingParams( new BoxPackingParams[collationLeaves.length] );
 		
-		HorizontalLayout.allocateX( layoutReqBox, childBoxes, layoutAllocBox, childAllocBoxes, getSpacing(), packing );
+		HorizontalLayout.allocateX( layoutReqBox, childBoxes, layoutAllocBox, childAllocBoxes, getSpacing() );
 		
 		int i = 0;
 		for (DPWidget child: collationLeaves)
@@ -110,7 +90,7 @@ public class DPHBox extends DPAbstractBox
 		LAllocBox childAllocBoxes[] = getCollatedChildrenAllocationBoxes();
 		LAllocV prevAllocVs[] = getCollatedChildrenAllocV();
 		
-		HorizontalLayout.allocateY( layoutReqBox, childBoxes, layoutAllocBox, childAllocBoxes, getAlignment() );
+		HorizontalLayout.allocateY( layoutReqBox, childBoxes, layoutAllocBox, childAllocBoxes );
 		
 		int i = 0;
 		for (DPWidget child: collationLeaves)
@@ -150,11 +130,5 @@ public class DPHBox extends DPAbstractBox
 	protected List<DPWidget> horizontalNavigationList()
 	{
 		return getCollatedChildren();
-	}
-	
-	
-	protected VAlignment getAlignment()
-	{
-		return ((HBoxStyleSheet)styleSheet).getAlignment();
 	}
 }

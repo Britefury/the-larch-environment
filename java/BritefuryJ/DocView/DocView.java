@@ -10,7 +10,6 @@ import java.util.Arrays;
 
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.VTypesetting;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 import BritefuryJ.DocTree.DocTree;
@@ -38,7 +37,7 @@ public class DocView implements DVNode.NodeRefreshListener
 	private boolean bProfilingEnabled;
 	private ProfileTimer pythonTimer, javaTimer, elementTimer, contentChangeTimer, updateNodeElementTimer;
 	
-	private static VBoxStyleSheet rootBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.EXPAND, 0.0, true, 0.0 );
+	private static VBoxStyleSheet rootBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, 0.0 );
 	
 	
 	
@@ -97,6 +96,8 @@ public class DocView implements DVNode.NodeRefreshListener
 		{
 			performRefresh();
 			DVNode rootView = getRootView();
+			rootView.getElement().alignHExpand();
+			rootView.getElement().alignVExpand();
 			rootBox = new DPVBox( rootBoxStyle );
 			rootBox.setChildren( Arrays.asList( new DPWidget[] { rootView.getElement() } ) );
 		}

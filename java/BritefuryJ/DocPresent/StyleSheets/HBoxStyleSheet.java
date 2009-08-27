@@ -7,31 +7,19 @@
 //##************************
 package BritefuryJ.DocPresent.StyleSheets;
 
-import BritefuryJ.DocPresent.Layout.VAlignment;
 
 public class HBoxStyleSheet extends AbstractBoxStyleSheet
 {
 	public static HBoxStyleSheet defaultStyleSheet = new HBoxStyleSheet();
 	
 	
-	protected VAlignment alignment;
-
-
 	public HBoxStyleSheet()
 	{
-		this( VAlignment.CENTRE, 0.0, false, 0.0 );
+		this( 0.0 );
 	}
 	
-	public HBoxStyleSheet(VAlignment alignment, double spacing, boolean bExpand, double padding)
+	public HBoxStyleSheet(double spacing)
 	{
-		super( spacing, bExpand, padding );
-		
-		this.alignment = alignment;
-	}
-
-	
-	public VAlignment getAlignment()
-	{
-		return alignment;
+		super( spacing );
 	}
 }

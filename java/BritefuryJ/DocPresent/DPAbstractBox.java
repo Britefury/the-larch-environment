@@ -37,22 +37,12 @@ abstract public class DPAbstractBox extends DPContainerSequenceCollationRoot
 
 	protected PackingParams getDefaultPackingParams()
 	{
-		return ((AbstractBoxStyleSheet)styleSheet).getDefaultPackingParams();
+		return null;
 	}
 
 
 	public double getSpacing()
 	{
 		return ((AbstractBoxStyleSheet)styleSheet).getSpacing();
-	}
-
-	public boolean getExpand()
-	{
-		return ((AbstractBoxStyleSheet)styleSheet).getExpand();
-	}
-
-	public double getPadding()
-	{
-		return ((AbstractBoxStyleSheet)styleSheet).getPadding();
 	}
 }

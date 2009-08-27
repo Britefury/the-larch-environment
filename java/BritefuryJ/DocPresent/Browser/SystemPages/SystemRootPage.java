@@ -9,14 +9,14 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 import java.awt.Color;
 import java.awt.Font;
 
+import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPHBox;
 import BritefuryJ.DocPresent.DPLink;
 import BritefuryJ.DocPresent.DPStaticText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.Border.EmptyBorder;
 import BritefuryJ.DocPresent.Browser.Page;
-import BritefuryJ.DocPresent.Layout.HAlignment;
-import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.Layout.VTypesetting;
 import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.StaticTextStyleSheet;
@@ -33,33 +33,28 @@ public class SystemRootPage extends Page
 	
 	public DPWidget getContentsElement()
 	{
-		VBoxStyleSheet pageBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.EXPAND, 40.0, false, 0.0 );
+		VBoxStyleSheet pageBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, 40.0 );
 		DPVBox pageBox = new DPVBox( pageBoxStyle );
 		
-		VBoxStyleSheet headBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.EXPAND, 0.0, false, 0.0 );
+		VBoxStyleSheet headBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, 0.0 );
 		DPVBox headBox = new DPVBox( headBoxStyle );
-		
-		VBoxStyleSheet titleBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.CENTRE, 0.0, false, 0.0 );
-		DPVBox titleBox = new DPVBox( titleBoxStyle );
 		
 		StaticTextStyleSheet titleStyle = new StaticTextStyleSheet( new Font( "Serif", Font.BOLD, 32 ), Color.BLACK );
 		DPStaticText title = new DPStaticText( titleStyle, "gSym System Page" );
-		titleBox.append( title );
 		
 		headBox.append( SystemRootPage.createLinkHeader( SystemRootPage.LINKHEADER_ROOTPAGE ) );
-		headBox.append( titleBox );
+		headBox.append( title.alignHCentre() );
 		
-		pageBox.append( headBox );
-		pageBox.append( createContents() );
+		pageBox.append( headBox.alignHExpand() );
+		pageBox.append( createContents().alignHExpand() );
 		
-		return pageBox;
+		return pageBox.alignHExpand();
 	}
 
 	
 	protected DPWidget createContents()
 	{
-		VBoxStyleSheet contentsBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.LEFT, 0.0, false, 0.0 );
-		DPVBox contentsBox = new DPVBox( contentsBoxStyle );
+		DPVBox contentsBox = new DPVBox();
 		
 		StaticTextStyleSheet titleStyle = new StaticTextStyleSheet( new Font( "Serif", Font.BOLD, 18 ), Color.BLACK );
 		DPStaticText title = new DPStaticText( titleStyle, "Tests:" );
@@ -87,9 +82,12 @@ public class SystemRootPage extends Page
 	
 	public static DPWidget createLinkHeader(int linkHeaderFlags)
 	{
-		VBoxStyleSheet linkVBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.RIGHT, 0.0, false, 10.0 );
-		HBoxStyleSheet linkHBoxStyle = new HBoxStyleSheet( VAlignment.BASELINES, 0.0, false, 10.0 );
-		DPVBox linkVBox = new DPVBox( linkVBoxStyle );
+		EmptyBorder inner = new EmptyBorder( 5.0, 5.0, 5.0, 5.0, new Color( 184, 206, 203 ) );
+		EmptyBorder outer = new EmptyBorder( 5.0, 5.0, 5.0, 5.0 );
+		HBoxStyleSheet linkHBoxStyle = new HBoxStyleSheet( 25.0 );
+		
+		DPBorder innerBorder = new DPBorder( inner );
+		DPBorder outerBorder = new DPBorder( outer );
 		DPHBox linkHBox = new DPHBox( linkHBoxStyle );
 		
 		if ( ( linkHeaderFlags & LINKHEADER_ROOTPAGE )  !=  0 )
@@ -102,8 +100,9 @@ public class SystemRootPage extends Page
 			linkHBox.append( new DPLink( "SYSTEM PAGE", "system" ) );
 		}
 
-		linkVBox.append( linkHBox );
+		innerBorder.setChild( linkHBox.alignHRight() );
+		outerBorder.setChild( innerBorder.alignHExpand() );
 		
-		return linkVBox;
+		return outerBorder.alignHExpand();
 	}
 }

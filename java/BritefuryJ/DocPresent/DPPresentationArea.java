@@ -1119,12 +1119,11 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 			double prevWidth = layoutAllocBox.getAllocationX();
 			if ( bHorizontalClamp )
 			{
-				double scaleFactor = Math.min( rootScaleInWindowSpace, 1.0 );
-				layoutAllocBox.setAllocationX( windowSize.x / scaleFactor );
+				layoutAllocBox.setAllocationX( windowSize.x );
 			}
 			else
 			{
-				layoutAllocBox.setAllocationX( reqX.getPrefWidth() );
+				layoutAllocBox.setAllocationX( Math.max( reqX.getPrefWidth(), windowSize.x ) );
 			}
 			refreshAllocationX( prevWidth );
 			
@@ -1133,7 +1132,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 			
 			// Allocate Y
 			LAllocV prevAllocV = layoutAllocBox.getAllocV();
-			layoutAllocBox.setAllocationY( reqY.getReqHeight() );
+			layoutAllocBox.setAllocationY( reqY );
 			refreshAllocationY( prevAllocV );
 			
 			updateRange();

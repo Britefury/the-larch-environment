@@ -265,9 +265,9 @@ def compoundStatementEditor(ctx, node, precedence, compoundBlocks, state, suiteP
 			suiteElement.setStructuralValueObject( Nodes.IndentedBlock( suite=suite ) )
 			suiteElement = ctx.linearRepresentationListener( suiteElement, SuiteLinearRepresentationListener( suiteParser, suite ) )
 			
-			statementContents.extend( [ headerParagraph, ctx.indent( 30.0, suiteElement ) ] )
+			statementContents.extend( [ headerParagraph.alignHExpand(), ctx.indent( 30.0, suiteElement ).alignHExpand() ] )
 		else:
-			statementContents.append( headerParagraph )
+			statementContents.append( headerParagraph.alignHExpand() )
 			
 	statementElement = ctx.vbox( compoundStmt_vboxStyle, statementContents )
 	return statementElement
