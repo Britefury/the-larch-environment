@@ -26,8 +26,6 @@ import BritefuryJ.DocPresent.Border.EmptyBorder;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
-import BritefuryJ.DocPresent.Layout.HAlignment;
-import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.Layout.VTypesetting;
 import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
@@ -129,16 +127,15 @@ public class NodeView
 	static TextStyleSheet inputStyle = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.black );
 	static TextStyleSheet valueStyle = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 16 ), Color.black );
 	static TextStyleSheet failStyle = new TextStyleSheet( new Font( "Sans serif", Font.ITALIC, 16 ), new Color( 0.5f, 0.0f, 0.0f ) );
-	static HBoxStyleSheet titleTextHBoxStyle = new HBoxStyleSheet( VAlignment.BASELINES, 10.0, false, 0.0 );
-	static VBoxStyleSheet titleVBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.CENTRE, 0.0, false, 0.0 );
+	static HBoxStyleSheet titleTextHBoxStyle = new HBoxStyleSheet( 10.0 );
 	static Border titleSuccessBorder = new EmptyBorder( 0.0, 0.0, 0.0, 0.0, new Color( 0.85f, 0.95f, 0.85f ) );
 	static Border titleFailBorder = new EmptyBorder( 0.0, 0.0, 0.0, 0.0, new Color( 1.0f, 0.85f, 0.85f ) );
-	static VBoxStyleSheet contentVBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.LEFT, 0.0, false, 0.0 );
-	static VBoxStyleSheet nodeVBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.EXPAND, 0.0, false, 0.0 );
+	static VBoxStyleSheet contentVBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, 0.0 );
+	static VBoxStyleSheet nodeVBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, 0.0 );
 	static Border nodeBorder = new SolidBorder( 1.0, 1.0, Color.black, null );
 	
-	static VBoxStyleSheet childrenVBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.LEFT, 3.0, false, 3.0 );
-	static HBoxStyleSheet mainHBoxStyle = new HBoxStyleSheet( VAlignment.CENTRE, 80.0, false, 0.0 );
+	static VBoxStyleSheet childrenVBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, 3.0 );
+	static HBoxStyleSheet mainHBoxStyle = new HBoxStyleSheet( 80.0 );
 	
 	
 	
@@ -163,15 +160,14 @@ public class NodeView
 		{
 			NodeView childView = parseView.buildNodeView( child );
 			children.add( childView );
-			childWidgets.add( childView.getWidget() );
+			childWidgets.add( childView.getWidget().padY( 3.0 ) );
 		}
 		
 		DPVBox childrenVBox = new DPVBox( childrenVBoxStyle );
 		childrenVBox.setChildren( childWidgets );
 		
 		DPHBox mainHBox = new DPHBox( mainHBoxStyle );
-		DPWidget[] mainChildren = { nodeWidget, childrenVBox };
-		mainHBox.setChildren( Arrays.asList( mainChildren ) );
+		mainHBox.setChildren( new DPWidget[] { nodeWidget.alignVCentre(), childrenVBox.alignVCentre() } );
 		
 		mainWidget = mainHBox;
 	}
@@ -267,15 +263,9 @@ public class NodeView
 	{
 		DPWidget titleWidget = makeTitleWidget( data );
 		
-		DPVBox titleBoxWidget = new DPVBox( titleVBoxStyle );
-		
-		DPWidget[] children = { titleWidget };
-		titleBoxWidget.setChildren( Arrays.asList( children ) );
-		
-		
 		Border b = data.getResult().isValid()  ?  titleSuccessBorder  :  titleFailBorder;
 		DPBorder border = new DPBorder( b );
-		border.setChild( titleBoxWidget );
+		border.setChild( titleWidget.alignVCentre() );
 		
 		return border;
 	}
@@ -369,8 +359,7 @@ public class NodeView
 		DPWidget contentBoxWidget = makeContentBoxWidget( data );
 		
 		DPVBox nodeBoxWidget = new DPVBox( nodeVBoxStyle );
-		DPWidget[] children = { titleBoxWidget, contentBoxWidget };
-		nodeBoxWidget.setChildren( Arrays.asList( children ) );
+		nodeBoxWidget.setChildren( new DPWidget[] { titleBoxWidget.alignHExpand(), contentBoxWidget.alignHExpand() } );
 		
 		nodeBinWidget = new DPNodeBin( this );
 		nodeBinWidget.setChild( nodeBoxWidget );

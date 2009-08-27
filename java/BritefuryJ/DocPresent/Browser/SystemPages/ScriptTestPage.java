@@ -17,12 +17,7 @@ import BritefuryJ.DocPresent.DPScript;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.Layout.HAlignment;
-import BritefuryJ.DocPresent.Layout.VAlignment;
-import BritefuryJ.DocPresent.Layout.VTypesetting;
-import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
 public class ScriptTestPage extends SystemPage
 {
@@ -84,8 +79,7 @@ public class ScriptTestPage extends SystemPage
 		DPText labelA = new DPText( sPre, "Label A yYgGjJpPqQ" );
 		DPText labelB = new DPText( sPost, "Label B yYgGjJpPqQ" );
 		
-		HBoxStyleSheet boxs = new HBoxStyleSheet( VAlignment.BASELINES, 0.0, false, 0.0 );
-		DPHBox box = new DPHBox( boxs );
+		DPHBox box = new DPHBox();
 		box.append( labelA );
 		box.append( script );
 		box.append( labelB );
@@ -118,8 +112,7 @@ public class ScriptTestPage extends SystemPage
 		DPText labelA = new DPText( sPre, "Label A yYgGjJpPqQ" );
 		DPText labelB = new DPText( sPost, "Label B yYgGjJpPqQ" );
 		
-		HBoxStyleSheet boxs = new HBoxStyleSheet( VAlignment.BASELINES, 0.0, false, 0.0 );
-		DPHBox box = new DPHBox( boxs );
+		DPHBox box = new DPHBox();
 		box.append( labelA );
 		box.append( script );
 		box.append( labelB );
@@ -135,8 +128,7 @@ public class ScriptTestPage extends SystemPage
 		TextStyleSheet sScript = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 16 ), Color.black );
 		TextStyleSheet blackStyle = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 24 ), Color.black );
 
-		VBoxStyleSheet boxs = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.LEFT, 0.0, false, 0.0 );
-		DPVBox box = new DPVBox( boxs );
+		DPVBox box = new DPVBox();
 		
 		for (int i = 0; i < 16; i++)
 		{

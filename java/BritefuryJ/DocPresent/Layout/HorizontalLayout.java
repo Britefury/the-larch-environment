@@ -8,7 +8,7 @@ package BritefuryJ.DocPresent.Layout;
 
 public class HorizontalLayout
 {
-	public static void computeRequisitionX(LReqBox box, LReqBox children[], double spacing, BoxPackingParams packingParams[])
+	public static void computeRequisitionX(LReqBox box, LReqBox children[], double spacing)
 	{
 		// Accumulate the width required for all the children
 		
@@ -27,17 +27,10 @@ public class HorizontalLayout
 		{
 			LReqBox child = children[i];
 			
-			BoxPackingParams params = packingParams != null  ?  packingParams[i]  :  null;
-			double padding = params != null  ?  params.padding  :  0.0;
-			
-			// Filter out any h-spacing that is within the amount of padding
-			double minChildSpacing = Math.max( child.minHSpacing - padding, 0.0 );
-			double prefChildSpacing = Math.max( child.prefHSpacing - padding, 0.0 );
-			
-			minWidth = minX + child.minWidth  +  padding * 2.0;
-			prefWidth = prefX + child.prefWidth  +  padding * 2.0;
-			minAdvance = minWidth + minChildSpacing;
-			prefAdvance = prefWidth + prefChildSpacing;
+			minWidth = minX + child.minWidth;
+			prefWidth = prefX + child.prefWidth;
+			minAdvance = minWidth + child.minHSpacing;
+			prefAdvance = prefWidth + child.prefHSpacing;
 			minX = minAdvance + spacing;
 			prefX = prefAdvance + spacing;
 		}
@@ -47,7 +40,7 @@ public class HorizontalLayout
 
 	
 	
-	public static void computeRequisitionY(LReqBox box, LReqBox children[], VAlignment alignment)
+	public static void computeRequisitionY(LReqBox box, LReqBox children[])
 	{
 		// The resulting box should have the following properties:
 		// In the case where alignment is BASELINES:
@@ -65,92 +58,70 @@ public class HorizontalLayout
 		
 		box.clearRequisitionY();
 		
-		if ( alignment == VAlignment.BASELINES )
+		double reqAscent = 0.0, reqDescent = 0.0, reqDescentAndSpacing = 0.0, reqHeight = 0.0, reqAdvance = 0.0;
+		int baselineCount = 0;
+		for (LReqBox child: children)
 		{
-			double reqAscent = 0.0, reqDescent = 0.0, reqDescentAndSpacing = 0.0, reqHeight = 0.0, reqAdvance = 0.0;
-			int baselineCount = 0;
-			for (LReqBox child: children)
+			VAlignment v = child.getVAlignment();
+			
+			boolean bBaseline = v == VAlignment.BASELINES  ||  v == VAlignment.BASELINES_EXPAND;
+			if ( bBaseline )
 			{
-				if ( child.hasBaseline() )
-				{
-					double childReqDescentAndSpacing = child.reqDescent + child.reqVSpacing;
-					reqAscent = Math.max( reqAscent, child.reqAscent );
-					reqDescent = Math.max( reqDescent, child.reqDescent );
-					reqDescentAndSpacing = Math.max( reqDescentAndSpacing, childReqDescentAndSpacing );
-					baselineCount++;
-				}
-				else
-				{
-					double childReqHeight = child.getReqHeight();
-					double childReqAdvance = childReqHeight + child.reqVSpacing;
-					reqHeight = Math.max( reqHeight, childReqHeight );
-					reqAdvance = Math.max( reqAdvance, childReqAdvance );
-
-					double childReqHalfHeight = childReqHeight * 0.5;
-					reqAscent = Math.max( reqAscent, childReqHalfHeight );
-					reqDescent = Math.max( reqDescent, childReqHalfHeight );
-					reqDescentAndSpacing = Math.max( reqDescentAndSpacing, childReqHalfHeight + child.reqVSpacing );
-				}
+				baselineCount++;
 			}
 			
-			if ( baselineCount == 0 )
+			if ( bBaseline  &&  child.hasBaseline() )
 			{
-				// No children had baselines; result in a box that has no baseline
-				box.setRequisitionY( reqHeight, reqAdvance - reqHeight );
+				double childReqDescentAndSpacing = child.reqDescent + child.reqVSpacing;
+				reqAscent = Math.max( reqAscent, child.reqAscent );
+				reqDescent = Math.max( reqDescent, child.reqDescent );
+				reqDescentAndSpacing = Math.max( reqDescentAndSpacing, childReqDescentAndSpacing );
 			}
 			else
-			{
-				box.setRequisitionY( reqAscent, reqDescent, reqDescentAndSpacing - reqDescent );
-			}
-		}
-		else
-		{
-			double reqHeight = 0.0;
-			double reqAdvance = 0.0;
-			for (LReqBox child: children)
 			{
 				double childReqHeight = child.getReqHeight();
 				double childReqAdvance = childReqHeight + child.reqVSpacing;
 				reqHeight = Math.max( reqHeight, childReqHeight );
 				reqAdvance = Math.max( reqAdvance, childReqAdvance );
+
+				double childReqHalfHeight = childReqHeight * 0.5;
+				reqAscent = Math.max( reqAscent, childReqHalfHeight );
+				reqDescent = Math.max( reqDescent, childReqHalfHeight );
+				reqDescentAndSpacing = Math.max( reqDescentAndSpacing, childReqHalfHeight + child.reqVSpacing );
 			}
-			
+		}
+		
+		if ( baselineCount == 0 )
+		{
+			// No children had baselines; result in a box that has no baseline
 			box.setRequisitionY( reqHeight, reqAdvance - reqHeight );
+		}
+		else
+		{
+			box.setRequisitionY( reqAscent, reqDescent, reqDescentAndSpacing - reqDescent );
 		}
 	}
 
 
 
 
-	public static void allocateSpaceX(LReqBox box, LReqBox children[], LAllocBox allocBox, LAllocBox childrenAlloc[], BoxPackingParams packingParams[])
+	public static void allocateSpaceX(LReqBox box, LReqBox children[], LAllocBox allocBox, LAllocBox childrenAlloc[])
 	{
 		int numExpand = 0;
 		
-		// Count the number of children that should expand to use additional space
-		if ( packingParams != null )
-		{
-			assert packingParams.length == children.length;
-			for (BoxPackingParams params: packingParams)
-			{
-				if ( params != null )
-				{
-					if ( LReqBox.testPackFlagExpand( params.packFlags ) )
-					{
-						numExpand++;
-					}
-				}
-			}
-		}
-		
-		
-		// Compute the amount of space required
+		// Compute the amount of space required, and count the number of children that should expand to use additional space
 		double minSizeTotal = 0.0, prefSizeTotal = 0.0;
 		if ( children.length > 0 )
 		{
 			for (LReqBox child: children)
 			{
+				HAlignment h = child.getHAlignment();
 				minSizeTotal += child.getMinWidth();
 				prefSizeTotal += child.getPrefWidth();
+				if ( h == HAlignment.EXPAND )
+				{
+					numExpand++;
+				}
 			}
 		}
 		double minSpacingTotal = box.getMinWidth() - minSizeTotal; 
@@ -173,8 +144,8 @@ public class HorizontalLayout
 				
 				for (int i = 0; i < children.length; i++)
 				{
-					BoxPackingParams params = packingParams != null  ?  packingParams[i]  :  null;
-					if ( params != null  &&  LReqBox.testPackFlagExpand( params.packFlags ) )
+					HAlignment h = children[i].getHAlignment();
+					if ( h == HAlignment.EXPAND )
 					{
 						allocBox.allocateChildSpaceX( childrenAlloc[i], children[i].getPrefWidth() + expandPerChild );
 					}
@@ -224,7 +195,7 @@ public class HorizontalLayout
 	
 	
 
-	public static void allocateX(LReqBox box, LReqBox children[], LAllocBox allocBox, LAllocBox childrenAlloc[], double spacing, BoxPackingParams packingParams[])
+	public static void allocateX(LReqBox box, LReqBox children[], LAllocBox allocBox, LAllocBox childrenAlloc[], double spacing)
 	{
 		// Each packed child consists of:
 		//	- start padding
@@ -234,7 +205,7 @@ public class HorizontalLayout
 		
 		// There should be at least the specified amount of spacing between each child, or the child's own h-spacing if it is greater
 
-		allocateSpaceX( box, children, allocBox, childrenAlloc, packingParams );
+		allocateSpaceX( box, children, allocBox, childrenAlloc );
 		
 		double size = 0.0;
 		double pos = 0.0;
@@ -243,24 +214,15 @@ public class HorizontalLayout
 			LReqBox child = children[i];
 			LAllocBox childAlloc = childrenAlloc[i];
 
-			// Get the padding
-			BoxPackingParams params = packingParams != null  ?  packingParams[i]  :  null;
-			double padding = params != null  ?  params.padding  :  0.0;
-			
 			// Compute the spacing
 			// Use 'preferred' spacing, if the child was allocated its preferred amount of space, or more
 			double childSpacing = ( childAlloc.allocationX >= child.prefWidth * LReqBox.ONE_MINUS_EPSILON )  ?  child.prefHSpacing  :  child.minHSpacing;
-			// padding consumes child spacing
-			childSpacing = Math.max( childSpacing - padding, 0.0 );
 
-			// Offset the child position using padding
-			double childX = pos + padding;
-			
 			// Allocate child position
-			allocBox.allocateChildPositionX( childAlloc, childX );
+			allocBox.allocateChildPositionX( childAlloc, pos );
 
 			// Accumulate width and x
-			size = pos + childAlloc.allocationX + padding * 2.0;
+			size = pos + childAlloc.allocationX;
 			pos = size + childSpacing + spacing;
 		}
 	}
@@ -268,22 +230,46 @@ public class HorizontalLayout
 
 	
 	
-	public static void allocateY(LReqBox box, LReqBox children[], LAllocBox allocBox, LAllocBox childrenAlloc[], VAlignment alignment)
+	public static void allocateY(LReqBox box, LReqBox children[], LAllocBox allocBox, LAllocBox childrenAlloc[])
 	{
-		if ( alignment == VAlignment.BASELINES  &&  box.hasBaseline() )
+		// Compute the amount of space allocated (do not allow to fall below minimum requirement)
+		double allocationHeight = Math.max( allocBox.getAllocationY(), box.getReqHeight() );
+		
+		double ascent = 0.0, descent = 0.0;
+		
+		if ( allocBox.hasBaseline() )
 		{
-			// Compute the amount of space allocated (do not allow to fall below minimum requirement)
-			double allocation = Math.max( allocBox.allocationY, box.getReqHeight() );
-			
+			ascent = Math.max( allocBox.getAllocationAscent(), box.getReqAscent() );
+			descent = Math.max( allocBox.getAllocationDescent(), box.getReqDescent() );
+		}
+		else
+		{
 			// Compute the difference (clamped to >0) between the allocation and the preferred height 
-			double delta = Math.max( allocation - box.getReqHeight(), 0.0 );
-			
-			// Compute the baseline position (distribute the 'delta' around the contents)
-			double baselineY = box.getReqAscent() + delta * 0.5; 
-			
-			for (int i = 0; i < children.length; i++)
+			double delta = Math.max( allocationHeight - box.getReqHeight(), 0.0 );
+		
+			// Compute the default ascent and descent (distribute the 'delta' around the contents)
+			if ( box.hasBaseline() )
 			{
-				LReqBox child = children[i];
+				ascent = box.getReqAscent() + delta * 0.5;
+				descent = box.getReqDescent() + delta * 0.5;
+			}
+			else
+			{
+				ascent = box.getReqHeight() * 0.5  +  delta * 0.5;
+				descent = ascent;
+			}
+		}
+
+		
+		for (int i = 0; i < children.length; i++)
+		{
+			LReqBox child = children[i];
+			LAllocBox childAlloc = childrenAlloc[i];
+			
+			VAlignment alignment = child.getVAlignment();
+			
+			if ( alignment == VAlignment.BASELINES )
+			{
 				double childAscent, childDescent;
 				
 				if ( child.hasBaseline() )
@@ -298,41 +284,35 @@ public class HorizontalLayout
 					childDescent = halfHeight;
 				}
 				
-				allocBox.allocateChildY( childrenAlloc[i], baselineY - childAscent, childAscent + childDescent );
+				allocBox.allocateChildY( childAlloc, ascent - childAscent, childAscent, childDescent );
 			}
-		}
-		else
-		{
-			double allocation = Math.max( allocBox.allocationY, box.getReqHeight() );
-			for (int i = 0; i < children.length; i++)
+			else if ( alignment == VAlignment.BASELINES_EXPAND )
 			{
-				LReqBox child = children[i];
-				LAllocBox childAlloc = childrenAlloc[i];
+				allocBox.allocateChildY( childAlloc, 0.0, ascent, descent );
+			}
+			else if ( alignment == VAlignment.EXPAND )
+			{
+				allocBox.allocateChildYByReq( childAlloc, 0.0, child, allocationHeight );
+			}
+			else
+			{
+				double childHeight = Math.min( allocationHeight, child.getReqHeight() );
 				
-				if ( alignment == VAlignment.EXPAND )
+				if ( alignment == VAlignment.TOP )
 				{
-					allocBox.allocateChildY( childAlloc, 0.0, allocation );
+					allocBox.allocateChildYByReq( childAlloc, 0.0, child );
+				}
+				else if ( alignment == VAlignment.CENTRE )
+				{
+					allocBox.allocateChildYByReq( childAlloc, ( allocationHeight - childHeight )  *  0.5, child );
+				}
+				else if ( alignment == VAlignment.BOTTOM )
+				{
+					allocBox.allocateChildYByReq( childAlloc, allocationHeight - childHeight, child );
 				}
 				else
 				{
-					double childHeight = Math.min( allocation, child.getReqHeight() );
-					
-					if ( alignment == VAlignment.TOP )
-					{
-						allocBox.allocateChildY( childAlloc, 0.0, childHeight );
-					}
-					else if ( alignment == VAlignment.CENTRE  ||  ( alignment == VAlignment.BASELINES  &&  !box.hasBaseline() ) )
-					{
-						allocBox.allocateChildY( childAlloc, ( allocation - childHeight )  *  0.5, childHeight );
-					}
-					else if ( alignment == VAlignment.BOTTOM )
-					{
-						allocBox.allocateChildY( childAlloc, allocation - childHeight, childHeight );
-					}
-					else
-					{
-						throw new RuntimeException( "Invalid v-alignment" );
-					}
+					throw new RuntimeException( "Invalid v-alignment" );
 				}
 			}
 		}

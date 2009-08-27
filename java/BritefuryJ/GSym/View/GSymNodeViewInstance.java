@@ -36,7 +36,6 @@ import BritefuryJ.DocPresent.ElementKeyboardListener;
 import BritefuryJ.DocPresent.ElementLinearRepresentationListener;
 import BritefuryJ.DocPresent.PyElementFactory;
 import BritefuryJ.DocPresent.Border.Border;
-import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.StyleSheets.ButtonStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.FractionStyleSheet;
@@ -98,27 +97,6 @@ public class GSymNodeViewInstance implements ElementContext, DVNode.NodeContext
 		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
-	}
-	
-	public DPWidget padding(double xPad, double yPad, DPWidget child)
-	{
-		viewInstance.getView().profile_startElement();
-		Border border = viewInstance.paddingBorder( xPad, yPad );
-		DPBorder element = new DPBorder( border );
-		element.setChild( child );
-		element.setContext( this );
-		viewInstance.getView().profile_stopElement();
-		return element;
-	}
-	
-	public DPWidget padX(double xPad, DPWidget child)
-	{
-		return padding( xPad, 0.0, child );
-	}
-	
-	public DPWidget padY(double yPad, DPWidget child)
-	{
-		return padding( 0.0, yPad, child );
 	}
 	
 	
@@ -798,5 +776,5 @@ public class GSymNodeViewInstance implements ElementContext, DVNode.NodeContext
 	
 
 	
-	private static HBoxStyleSheet ahboxStyleSheet = new HBoxStyleSheet( VAlignment.BASELINES, 0.0, false, 0.0 ); 
+	private static HBoxStyleSheet ahboxStyleSheet = new HBoxStyleSheet( 0.0 ); 
 }

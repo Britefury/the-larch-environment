@@ -64,7 +64,7 @@ public class TextNode extends DiagramNode
 		DPPresentationArea area = owner.getDiagramPresentationArea();
 		visual = TextVisual.getTextVisual( area, text, font, bMixedSizeCaps );
 		visual.realise( area );
-		LReqBox req = visual.getRequisition();
+		LReqBox req = visual.getRequisition( 0 );
 		parentSpaceBox = new AABox2( 0.0, 0.0, req.getPrefWidth(), req.getReqHeight() );
 	}
 	

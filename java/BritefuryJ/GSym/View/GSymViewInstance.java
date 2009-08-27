@@ -23,7 +23,6 @@ import BritefuryJ.DocTree.DocTree;
 import BritefuryJ.DocTree.DocTreeNode;
 import BritefuryJ.DocView.DVNode;
 import BritefuryJ.DocView.DocView;
-import BritefuryJ.Utils.HashUtils;
 import BritefuryJ.Utils.Profile.ProfileTimer;
 
 public class GSymViewInstance implements DocView.RefreshListener
@@ -126,47 +125,6 @@ public class GSymViewInstance implements DocView.RefreshListener
 		}
 	}
 	
-	public static class PaddingKey
-	{
-		private double xPad, yPad;
-		private int hash;
-		
-		
-		public PaddingKey(double xPad, double yPad)
-		{
-			this.xPad = xPad;
-			this.yPad = yPad;
-			hash = HashUtils.doubleHash( new Double( xPad ).hashCode(), new Double( yPad ).hashCode() );
-		}
-		
-		
-		public int hashCode()
-		{
-			return hash;
-		}
-		
-		
-		public boolean equals(Object x)
-		{
-			if ( this == x )
-			{
-				return true;
-			}
-			
-			
-			if ( x instanceof PaddingKey )
-			{
-				PaddingKey k = (PaddingKey)x;
-				
-				return xPad == k.xPad  &&  yPad == k.yPad;
-			}
-			else
-			{
-				return false;
-			}
-		}
-	}
-	
 	
 	
 	private Object docRootNode;
@@ -180,7 +138,6 @@ public class GSymViewInstance implements DocView.RefreshListener
 	private DPFrame frame;
 	
 	private HashMap<Double, Border> indentationBorders;
-	private HashMap<PaddingKey, Border> paddingBorders;
 	private HashMap<NodeContentsFactoryKey, NodeContentsFactory> nodeContentsFactories;
 	
 	private Object owner;
@@ -202,13 +159,12 @@ public class GSymViewInstance implements DocView.RefreshListener
 			frame = new DPFrame();
 			
 			indentationBorders = new HashMap<Double, Border>();
-			paddingBorders = new HashMap<PaddingKey, Border>();
 			nodeContentsFactories = new HashMap<NodeContentsFactoryKey, NodeContentsFactory>();
 	
 			view = new DocView( tree, treeRootNode, makeNodeElementFactory( rootNodeViewFunction, null ) );
 			view.setElementChangeListener( new NodeElementChangeListenerDiff() );
 			view.setRefreshListener( this );
-			frame.setChild( view.getRootViewElement() );
+			frame.setChild( view.getRootViewElement().alignHExpand() );
 		}
 		else
 		{
@@ -241,21 +197,6 @@ public class GSymViewInstance implements DocView.RefreshListener
 		{
 			border = new EmptyBorder( indentation, 0.0, 0.0, 0.0 );
 			indentationBorders.put( indentation, border );
-		}
-		
-		return border;
-	}
-	
-	
-	protected Border paddingBorder(double xPad, double yPad)
-	{
-		PaddingKey key = new PaddingKey( xPad, yPad );
-		Border border = paddingBorders.get( key );
-		
-		if ( border == null )
-		{
-			border = new EmptyBorder( xPad, xPad, yPad, yPad );
-			paddingBorders.put( key, border );
 		}
 		
 		return border;

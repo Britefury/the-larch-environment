@@ -31,7 +31,6 @@ import BritefuryJ.DocPresent.Input.DndDrop;
 import BritefuryJ.DocPresent.Input.DndHandler;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Input.PointerInterface;
-import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.VTypesetting;
 import BritefuryJ.DocPresent.StyleSheets.StaticTextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
@@ -195,7 +194,7 @@ public class DiagramTestPage extends SystemPage
 		
 		DPWidget dest0 = makeDestElement( "Number" );
 
-		VBoxStyleSheet vboxS = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.LEFT, 20.0, false, 0.0 );
+		VBoxStyleSheet vboxS = new VBoxStyleSheet( VTypesetting.NONE, 20.0 );
 		DPVBox vbox = new DPVBox( vboxS );
 		vbox.append( instructions );
 		vbox.append( border );

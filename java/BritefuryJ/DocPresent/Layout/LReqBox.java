@@ -34,6 +34,13 @@ public class LReqBox
 		lineBreakCost = -1;
 	}
 	
+	public LReqBox(HAlignment hAlign, VAlignment vAlign)
+	{
+		setAlignment( hAlign, vAlign );
+		setFlag( FLAG_HASBASELINE, false );
+		lineBreakCost = -1;
+	}
+	
 	public LReqBox(double width, double hSpacing, double height, double vSpacing)
 	{
 		minWidth = prefWidth = width;
@@ -140,9 +147,7 @@ public class LReqBox
 		reqAscent = box.reqAscent;
 		reqDescent = box.reqDescent;
 		reqVSpacing = box.reqVSpacing;
-		setFlag( FLAG_HASBASELINE, box.hasBaseline() );
-		setFlag( FLAG_LINEBREAK, box.isLineBreak() );
-		setAlignmentIntValue( box.getAlignmentIntValue() );
+		flags = box.flags;
 		lineBreakCost = box.lineBreakCost;
 	}
 	
@@ -155,9 +160,7 @@ public class LReqBox
 		reqAscent = box.reqAscent * scale;
 		reqDescent = box.reqDescent * scale;
 		reqVSpacing = box.reqVSpacing * scale;
-		setFlag( FLAG_HASBASELINE, box.hasBaseline() );
-		setFlag( FLAG_LINEBREAK, box.isLineBreak() );
-		setAlignmentIntValue( box.getAlignmentIntValue() );
+		flags = box.flags;
 		lineBreakCost = box.lineBreakCost;
 	}
 	
@@ -222,7 +225,7 @@ public class LReqBox
 	{
 		minWidth = prefWidth = minHSpacing = prefHSpacing = 0.0;
 		reqAscent = reqDescent = reqVSpacing = 0.0;
-		setFlag( FLAG_HASBASELINE, false );
+		flags = 0;
 	}
 	
 	public void clearRequisitionX()
@@ -233,6 +236,7 @@ public class LReqBox
 	public void clearRequisitionY()
 	{
 		reqAscent = reqDescent = reqVSpacing = 0.0;
+		setFlag( FLAG_HASBASELINE, false );
 	}
 	
 	
@@ -306,12 +310,12 @@ public class LReqBox
 	
 	
 	
-	private void setAlignmentIntValue(int value)
+	public void setAlignmentIntValue(int value)
 	{
 		flags = ( flags & ~ElementAlignment._ELEMENTALIGN_MASK )  |  value;
 	}
 	
-	private int getAlignmentIntValue()
+	public int getAlignmentIntValue()
 	{
 		return flags & ElementAlignment._ELEMENTALIGN_MASK;
 	}

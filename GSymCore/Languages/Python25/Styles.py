@@ -37,9 +37,9 @@ indentedBlock_border = SolidBorder( 2.0, 2.0, 5.0, 5.0, Color.red, None )
 pow_scriptStyle = ScriptStyleSheet( 0.0, 0.0 )
 div_fractionStyle = FractionStyleSheet( Color( 0.0, 0.5, 0.0 ) )
 
-python_paragraphStyle = ParagraphStyleSheet( VAlignment.BASELINES, 0.0, 0.0, 0.0, 30.0 )
+python_paragraphStyle = ParagraphStyleSheet( 0.0, 0.0, 30.0 )
 
-compoundStmt_vboxStyle = VBoxStyleSheet( VTypesetting.ALIGN_WITH_TOP, HAlignment.EXPAND, 0.0, False, 0.0 )
+compoundStmt_vboxStyle = VBoxStyleSheet( VTypesetting.ALIGN_WITH_TOP, 0.0 )
 
 tuple_listViewLayout = SpanListViewLayout( lambda: DPText( default_textStyle, ' ' ), 0, ListViewLayout.TrailingSeparator.NEVER )
 tuple_listViewLayoutSep = SpanListViewLayout( lambda: DPText( default_textStyle, ' ' ), 0, ListViewLayout.TrailingSeparator.ALWAYS )
@@ -48,7 +48,7 @@ list_listViewLayoutSep = SpanListViewLayout( lambda: DPText( default_textStyle, 
 dict_listViewLayout = SpanListViewLayout( lambda: DPText( default_textStyle, ' ' ), 0, ListViewLayout.TrailingSeparator.NEVER )
 dict_listViewLayoutSep = SpanListViewLayout( lambda: DPText( default_textStyle, ' ' ), 0, ListViewLayout.TrailingSeparator.NEVER )
 
-suite_vboxStyle = VBoxStyleSheet( VTypesetting.ALIGN_WITH_TOP, HAlignment.LEFT, 0.0, False, 0.0 )
+suite_vboxStyle = VBoxStyleSheet( VTypesetting.ALIGN_WITH_TOP, 0.0 )
 
 
 #lineEditorStyle = GSymStyleSheet( highlightBackgroundColour=Colour3f( 0.85, 0.85, 1.0 ) )

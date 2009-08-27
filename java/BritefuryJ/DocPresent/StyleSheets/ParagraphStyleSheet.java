@@ -7,70 +7,43 @@
 //##************************
 package BritefuryJ.DocPresent.StyleSheets;
 
-import BritefuryJ.DocPresent.Layout.BoxPackingParams;
-import BritefuryJ.DocPresent.Layout.PackingParams;
-import BritefuryJ.DocPresent.Layout.VAlignment;
 
 public class ParagraphStyleSheet extends ContainerStyleSheet
 {
 	public static ParagraphStyleSheet defaultStyleSheet = new ParagraphStyleSheet();
 	
 	
-	private double spacing, vSpacing, padding, indentation;
-	private VAlignment alignment;
-	protected BoxPackingParams defaultPackingParams;
+	private double spacing, lineSpacing, indentation;
 	
 	
 	public ParagraphStyleSheet()
 	{
-		this( VAlignment.BASELINES, 0.0, 0.0, 0.0, 0.0 );
+		this( 0.0, 0.0, 0.0 );
 	}
 	
-	public ParagraphStyleSheet(VAlignment alignment, double spacing, double vSpacing, double padding, double indentation)
+	public ParagraphStyleSheet(double spacing, double lineSpacing, double indentation)
 	{
 		super();
 		
-		this.alignment = alignment;
 		this.spacing = spacing;
-		this.vSpacing = vSpacing;
-		this.padding = padding;
+		this.lineSpacing = lineSpacing;
 		this.indentation = indentation;
-
-		defaultPackingParams = new BoxPackingParams( padding, false );
 	}
 	
 	
 	
-	public VAlignment getAlignment()
-	{
-		return alignment;
-	}
-
 	public double getSpacing()
 	{
 		return spacing;
 	}
 
-	public double getVSpacing()
+	public double getLineSpacing()
 	{
-		return vSpacing;
-	}
-
-	public double getPadding()
-	{
-		return padding;
+		return lineSpacing;
 	}
 
 	public double getIndentation()
 	{
 		return indentation;
-	}
-
-
-
-
-	public PackingParams getDefaultPackingParams()
-	{
-		return defaultPackingParams;
 	}
 }

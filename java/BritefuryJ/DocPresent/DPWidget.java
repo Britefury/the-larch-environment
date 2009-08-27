@@ -14,6 +14,7 @@ import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.WeakHashMap;
 
@@ -26,6 +27,7 @@ import BritefuryJ.DocPresent.Event.PointerScrollEvent;
 import BritefuryJ.DocPresent.Input.DndHandler;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Input.PointerInterface;
+import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.LAllocBox;
 import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.LReqBox;
@@ -46,6 +48,7 @@ import BritefuryJ.Math.Vector2;
 import BritefuryJ.Math.Xform2;
 import BritefuryJ.Parser.ItemStream.ItemStream;
 import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
+import BritefuryJ.Utils.HashUtils;
 
 
 
@@ -100,7 +103,59 @@ abstract public class DPWidget extends PointerInputElement
 
 	
 	
+	//
+	//
+	// Padding
+	//
+	//
+	
+	private static class PaddingKey
+	{
+		private double xPad, yPad;
+		private int hash;
+		
+		
+		public PaddingKey(double xPad, double yPad)
+		{
+			this.xPad = xPad;
+			this.yPad = yPad;
+			hash = HashUtils.doubleHash( new Double( xPad ).hashCode(), new Double( yPad ).hashCode() );
+		}
+		
+		
+		public int hashCode()
+		{
+			return hash;
+		}
+		
+		
+		public boolean equals(Object x)
+		{
+			if ( this == x )
+			{
+				return true;
+			}
+			
+			
+			if ( x instanceof PaddingKey )
+			{
+				PaddingKey k = (PaddingKey)x;
+				
+				return xPad == k.xPad  &&  yPad == k.yPad;
+			}
+			else
+			{
+				return false;
+			}
+		}
+	}
+	
 
+	private static HashMap<PaddingKey, EmptyBorder> paddingBorders = new HashMap<PaddingKey, EmptyBorder>();
+
+	
+	
+	
 	//
 	//
 	// FIELDS
@@ -196,6 +251,128 @@ abstract public class DPWidget extends PointerInputElement
 		this.context = context;
 	}
 
+	
+	
+	
+	//
+	// Alignment methods
+	//
+	
+	public DPWidget align(HAlignment hAlign, VAlignment vAlign)
+	{
+		if ( layoutReqBox != null )
+		{
+			layoutReqBox.setAlignment( hAlign, vAlign );
+		}
+		return this;
+	}
+
+	public DPWidget alignH(HAlignment hAlign)
+	{
+		if ( layoutReqBox != null )
+		{
+			layoutReqBox.setHAlignment( hAlign );
+		}
+		return this;
+	}
+	
+	public DPWidget alignV(VAlignment vAlign)
+	{
+		if ( layoutReqBox != null )
+		{
+			layoutReqBox.setVAlignment( vAlign );
+		}
+		return this;
+	}
+	
+
+	public DPWidget alignHLeft()
+	{
+		return alignH( HAlignment.LEFT );
+	}
+
+	public DPWidget alignHCentre()
+	{
+		return alignH( HAlignment.CENTRE );
+	}
+
+	public DPWidget alignHRight()
+	{
+		return alignH( HAlignment.RIGHT );
+	}
+
+	public DPWidget alignHExpand()
+	{
+		return alignH( HAlignment.EXPAND );
+	}
+	
+	
+	public DPWidget alignVBaselines()
+	{
+		return alignV( VAlignment.BASELINES );
+	}
+
+	public DPWidget alignVBaselinesExpand()
+	{
+		return alignV( VAlignment.BASELINES_EXPAND );
+	}
+
+	public DPWidget alignVTop()
+	{
+		return alignV( VAlignment.TOP );
+	}
+
+	public DPWidget alignVCentre()
+	{
+		return alignV( VAlignment.CENTRE );
+	}
+
+	public DPWidget alignVBottom()
+	{
+		return alignV( VAlignment.BOTTOM );
+	}
+
+	public DPWidget alignVExpand()
+	{
+		return alignV( VAlignment.EXPAND );
+	}
+	
+	
+	
+	
+	//
+	// Padding methods
+	//
+	
+	public DPWidget pad(double xPad, double yPad)
+	{
+		PaddingKey key = new PaddingKey( xPad, yPad );
+		EmptyBorder border = paddingBorders.get( key );
+		
+		if ( border == null )
+		{
+			border = new EmptyBorder( xPad, xPad, yPad, yPad );
+			paddingBorders.put( key, border );
+		}
+		
+		DPBorder padElement = new DPBorder( border );
+		padElement.setChild( this );
+		padElement.setContext( context );
+		return padElement;
+	}
+	
+	public DPWidget padX(double xPad)
+	{
+		return pad( xPad, 0.0 );
+	}
+	
+	public DPWidget padY(double yPad)
+	{
+		return pad( 0.0, yPad );
+	}
+	
+
+	
 	
 	
 	
@@ -1892,7 +2069,7 @@ abstract public class DPWidget extends PointerInputElement
 	
 	protected static TextStyleSheet headerDebugTextStyle = new TextStyleSheet( new Font( "Sans serif", Font.BOLD, 14 ), new Color( 0.0f, 0.5f, 0.5f ) );
 	protected static TextStyleSheet headerDescriptionTextStyle = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 14 ), new Color( 0.0f, 0.0f, 0.75f ) );
-	protected static HBoxStyleSheet metaHeaderHBoxStyle = new HBoxStyleSheet( VAlignment.BASELINES, 10.0, false, 0.0 );
+	protected static HBoxStyleSheet metaHeaderHBoxStyle = new HBoxStyleSheet( 10.0 );
 	protected static EmptyBorder metaHeaderEmptyBorder = new EmptyBorder();
 
 

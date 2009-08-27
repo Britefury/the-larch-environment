@@ -13,6 +13,9 @@ import java.awt.font.TextHitInfo;
 import java.awt.geom.AffineTransform;
 
 import BritefuryJ.DocPresent.Caret.Caret;
+import BritefuryJ.DocPresent.Layout.ElementAlignment;
+import BritefuryJ.DocPresent.Layout.HAlignment;
+import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.Util.TextVisual;
@@ -47,7 +50,7 @@ public class DPText extends DPContentLeafEditableEntry
 		
 		visual = TextVisual.getTextVisual( getPresentationArea(), this.text, styleSheet.getFont(), styleSheet.getMixedSizeCaps() );
 		
-		layoutReqBox = visual.getRequisition();
+		layoutReqBox = visual.getRequisition( 0 );
 	}
 	
 	
@@ -72,6 +75,26 @@ public class DPText extends DPContentLeafEditableEntry
 	
 	
 	
+	public DPWidget align(HAlignment hAlign, VAlignment vAlign)
+	{
+		layoutReqBox = visual.getRequisition( ElementAlignment.intValue( hAlign, vAlign ) );
+		return this;
+	}
+
+	public DPWidget alignH(HAlignment hAlign)
+	{
+		layoutReqBox = visual.getRequisition( ElementAlignment.intValue( hAlign, ElementAlignment.getVAlignment( layoutReqBox.getAlignmentIntValue() ) ) );
+		return this;
+	}
+	
+	public DPWidget alignV(VAlignment vAlign)
+	{
+		layoutReqBox = visual.getRequisition( ElementAlignment.intValue( ElementAlignment.getHAlignment( layoutReqBox.getAlignmentIntValue() ), vAlign ) );
+		return this;
+	}
+
+	
+	
 	private void onTextModified()
 	{
 		TextStyleSheet textStyleSheet = (TextStyleSheet)styleSheet;
@@ -80,7 +103,7 @@ public class DPText extends DPContentLeafEditableEntry
 		if ( v != visual )
 		{
 			visual = v;
-			layoutReqBox = visual.getRequisition();
+			layoutReqBox = visual.getRequisition( layoutReqBox.getAlignmentIntValue() );
 			if ( isRealised() )
 			{
 				visual.realise( getPresentationArea() );
@@ -112,6 +135,15 @@ public class DPText extends DPContentLeafEditableEntry
 
 		Paint prevPaint = graphics.getPaint();
 
+		AffineTransform prevTransform = null;
+		double deltaY = layoutAllocBox.getAllocationAscent()  -  layoutReqBox.getReqAscent();
+		if ( deltaY != 0.0 )
+		{
+			prevTransform = graphics.getTransform();
+			graphics.translate( 0.0, deltaY );
+		}
+
+		
 		Paint squiggleUnderlinePaint = textStyleSheet.getSquiggleUnderlinePaint();
 		if ( squiggleUnderlinePaint != null )
 		{
@@ -122,6 +154,12 @@ public class DPText extends DPContentLeafEditableEntry
 		graphics.setPaint( textStyleSheet.getTextPaint() );
 		visual.drawText( graphics );
 		
+		if ( deltaY != 0.0 )
+		{
+			graphics.setTransform( prevTransform );
+		}
+
+
 		graphics.setPaint( prevPaint );
 	}
 	
@@ -130,12 +168,12 @@ public class DPText extends DPContentLeafEditableEntry
 	
 	protected void updateRequisitionX()
 	{
-		layoutReqBox = visual.getRequisition();
+		layoutReqBox = visual.getRequisition( layoutReqBox.getAlignmentIntValue() );
 	}
 
 	protected void updateRequisitionY()
 	{
-		layoutReqBox = visual.getRequisition();
+		layoutReqBox = visual.getRequisition( layoutReqBox.getAlignmentIntValue() );
 	}
 
 	

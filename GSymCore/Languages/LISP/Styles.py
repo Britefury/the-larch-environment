@@ -23,13 +23,13 @@ className_textStyle = TextStyleSheet( Font( 'SansSerif', Font.PLAIN, 14 ),  Colo
 fieldName_textStyle = TextStyleSheet( Font( 'SansSerif', Font.PLAIN, 14 ),  Color( 0.5, 0.0, 0.5 ) )
 
 
-lisp_paragraphStyle = ParagraphStyleSheet( VAlignment.BASELINES, 0.0, 0.0, 0.0, 60.0 )
+lisp_paragraphStyle = ParagraphStyleSheet( 0.0, 0.0, 60.0 )
 
 
 paragraph_listViewLayout = ParagraphListViewLayout( ParagraphStyleSheet(), lambda: DPText( default_textStyle, ' ' ), 0, ListViewLayout.TrailingSeparator.NEVER )
 
-verticalInline_listViewLayout = VerticalInlineListViewLayout( VBoxStyleSheet( VTypesetting.ALIGN_WITH_TOP, HAlignment.LEFT, 0.0, False, 0.0 ), \
+verticalInline_listViewLayout = VerticalInlineListViewLayout( VBoxStyleSheet( VTypesetting.ALIGN_WITH_TOP, 0.0 ), \
 						ParagraphStyleSheet(), 30.0, ListViewLayout.TrailingSeparator.NEVER )
 
-vertical_listViewLayout = VerticalListViewLayout( VBoxStyleSheet( VTypesetting.ALIGN_WITH_TOP, HAlignment.LEFT, 0.0, False, 0.0 ), \
+vertical_listViewLayout = VerticalListViewLayout( VBoxStyleSheet( VTypesetting.ALIGN_WITH_TOP, 0.0 ), \
 						ParagraphStyleSheet(), 30.0, ListViewLayout.TrailingSeparator.NEVER )

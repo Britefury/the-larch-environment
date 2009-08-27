@@ -84,16 +84,13 @@ class ProjectView (GSymViewObjectNodeDispatch):
 	@ObjectNodeDispatchMethod
 	def Project(self, ctx, state, node, rootPackage):
 		title = ctx.staticText( prj_projectTitleStyle, 'Project' )
-		titleBox = ctx.vbox( prj_projectTitleBoxStyle, [ title ] )
 		
 		indexHeader = ctx.staticText( prj_projectIndexHeaderStyle, 'Index' )
-		indexBox = ctx.vbox( prj_projectIndexBoxStyle, [ indexHeader, ctx.viewEval( rootPackage, _ProjectViewState( '' ) ) ] )
+		indexBox = ctx.vbox( prj_projectIndexBoxStyle, [ indexHeader.alignHExpand(), ctx.viewEval( rootPackage, _ProjectViewState( '' ) ).alignHExpand() ] )
 		
-		contentBox = ctx.vbox( prj_projectContentBoxStyle, [ titleBox, indexBox ] )
+		contentBox = ctx.vbox( prj_projectContentBoxStyle, [ title.alignHCentre(), indexBox.alignHExpand() ] )
 		
-		pageBox = ctx.vbox( prj_projectPageBoxStyle, [ contentBox ] )
-		
-		return pageBox
+		return contentBox.alignHExpand()
 
 
 
@@ -129,7 +126,7 @@ class ProjectView (GSymViewObjectNodeDispatch):
 		
 		contentsBox = ctx.vbox( prj_packageContentsBoxStyle, ctx.mapViewEval( contents, _ProjectViewState( _joinLocation( location, name ) ) ) )
 
-		return ctx.vbox( prj_packageBoxStyle, [ headerBox, ctx.indent( 20.0, contentsBox ) ] )
+		return ctx.vbox( prj_packageBoxStyle, [ headerBox.alignHExpand(), ctx.indent( 20.0, contentsBox ).alignHExpand() ] )
 
 
 

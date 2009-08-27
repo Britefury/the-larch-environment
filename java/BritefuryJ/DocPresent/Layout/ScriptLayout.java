@@ -320,7 +320,7 @@ public class ScriptLayout
 			LAllocBox allocBox, LAllocBox leftSuperAlloc, LAllocBox leftSubAlloc, LAllocBox mainAlloc, LAllocBox rightSuperAlloc, LAllocBox rightSubAlloc,
 			double spacing, double scriptSpacing)
 	{
-		double padding = Math.max( ( allocBox.allocationY - box.getReqHeight() ) * 0.5, 0.0 );
+		double padding = Math.max( ( allocBox.getAllocationY() - box.getReqHeight() ) * 0.5, 0.0 );
 		
 		
 		double superBaselineY = rowBaselineY[0], mainBaselineY = rowBaselineY[1], subBaselineY = rowBaselineY[2];

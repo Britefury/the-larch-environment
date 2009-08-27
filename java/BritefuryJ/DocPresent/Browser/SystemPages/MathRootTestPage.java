@@ -14,10 +14,7 @@ import BritefuryJ.DocPresent.DPMathRoot;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.Layout.HAlignment;
-import BritefuryJ.DocPresent.Layout.VTypesetting;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
 public class MathRootTestPage extends SystemPage
 {
@@ -81,8 +78,7 @@ public class MathRootTestPage extends SystemPage
 	
 	protected DPWidget createContents()
 	{
-		VBoxStyleSheet boxs = new VBoxStyleSheet( VTypesetting.NONE, HAlignment.LEFT, 0.0, false, 0.0 );
-		DPVBox box = new DPVBox( boxs );
+		DPVBox box = new DPVBox();
 		
 		box.append( makeRoot( "a" ) );
 		box.append( makeRoot( "a+p" ) );
