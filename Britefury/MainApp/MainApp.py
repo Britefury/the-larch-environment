@@ -41,10 +41,11 @@ from Britefury.Event.QueuedEvent import queueEvent
 
 from Britefury.gSym.gSymWorld import GSymWorld
 from Britefury.gSym.gSymEnvironment import GSymEnvironment
-from Britefury.gSym.gSymDocument import GSymDocument, viewUnitLocationAsPage, viewUnitLispLocationAsPage, transformUnit
+from Britefury.gSym.gSymDocument import GSymDocument
 
 from Britefury.Plugin import InitPlugins
 
+from GSymCore.GSymApp import GSymApp
 from GSymCore.Project import Project
 
 
@@ -117,9 +118,9 @@ class _AppLocationResolver (LocationResolver):
 		
 		
 	def resolveLocation(self, location):
-		unit = self._app._document.unit   if self._app._document is not None   else   None
-		if unit is not None:
-			return viewUnitLocationAsPage( unit, location, self._app._world, self._app._commandHistory, self._app )
+		document = self._app._document
+		if document is not None:
+			return document.viewDocLocationAsPage( location, self._app )
 		else:
 			return None
 				
@@ -130,9 +131,9 @@ class _AppLocationResolverLISP (LocationResolver):
 		
 		
 	def resolveLocation(self, location):
-		unit = self._app._document.unit   if self._app._document is not None   else   None
-		if unit is not None:
-			return viewUnitLispLocationAsPage( unit, location, self._app._world, self._app._commandHistory, self._app )
+		document = self._app._document
+		if document is not None:
+			return document.viewDocLocationAsLispPage( location, self._app )
 		else:
 			return None
 				
@@ -140,14 +141,15 @@ class _AppLocationResolverLISP (LocationResolver):
 				
 class MainApp (object):
 	def __init__(self, world, unit):
-		if unit is None:
-			unit = Project.newProject()
-		document = GSymDocument( unit )
-		self._document = None
-		self._commandHistory = None
-		self._bUnsavedData = False
-		
 		self._world = world
+		
+		if unit is None:
+			#unit = GSymApp.newAppState()
+			unit = Project.newProject()
+		document = GSymDocument( self._world, unit )
+		
+		self._document = None
+		self._bUnsavedData = False
 		
 		self._resolver = _AppLocationResolver( self )
 		self._lispResolver = _AppLocationResolverLISP( self )
@@ -341,25 +343,18 @@ class MainApp (object):
 
 
 	def setDocument(self, document):
-		if self._document is not None:
-			print 'command history no longer tracking tracking a ', type( self._document.unit )
-			self._commandHistory.stopTracking( self._document.unit )
-
 		self._document = document
 		
 		#self._actionsMenu.removeAll()
 		
 		
 
-		self._commandHistory = CommandHistory()
-		
 		class Listener (CommandHistoryListener):
 			def onCommandHistoryChanged(_self, history):
 				self._onCommandHistoryChanged( history )
 		
 		if self._document is not None:
-			self._commandHistory.track( self._document.unit )
-		self._commandHistory.setListener( Listener() )
+			self._document._commandHistory.setListener( Listener() )
 		self._bUnsavedData = False
 		
 
@@ -519,12 +514,12 @@ class MainApp (object):
 
 
 	def _onUndo(self):
-		if self._commandHistory.canUndo():
-			self._commandHistory.undo()
+		if self._document._commandHistory.canUndo():
+			self._document._commandHistory.undo()
 
 	def _onRedo(self):
-		if self._commandHistory.canRedo():
-			self._commandHistory.redo()
+		if self._document._commandHistory.canRedo():
+			self._document._commandHistory.redo()
 
 
 		
@@ -618,10 +613,10 @@ class MainApp (object):
 
 		
 	#def _p_onScriptPreCommand(self, console, code):
-		#self._commandHistory.freeze()
+		#self._document._commandHistory.freeze()
 
 	#def _p_onScriptPostCommand(self, console, code):
-		#self._commandHistory.thaw()
+		#self._document._commandHistory.thaw()
 
 
 

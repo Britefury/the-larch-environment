@@ -53,13 +53,13 @@ import BritefuryJ.GSym.View.ListView.PySeparatorElementFactory;
 import BritefuryJ.GSym.View.ListView.SeparatorElementFactory;
 import BritefuryJ.Parser.ItemStream.ItemStream;
 
-public class GSymNodeViewInstance implements ElementContext, DVNode.NodeContext
+public class GSymNodeViewContext implements ElementContext, DVNode.NodeContext
 {
-	protected GSymViewInstance viewInstance;
+	protected GSymViewContext viewInstance;
 	protected DVNode viewNode;
 	
 	
-	public GSymNodeViewInstance(GSymViewInstance viewInstance, DVNode viewNode)
+	public GSymNodeViewContext(GSymViewContext viewInstance, DVNode viewNode)
 	{
 		this.viewInstance = viewInstance;
 		this.viewNode = viewNode;
@@ -86,6 +86,11 @@ public class GSymNodeViewInstance implements ElementContext, DVNode.NodeContext
 		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
+	}
+	
+	public DPWidget border(Border border, DPWidget child)
+	{
+		return border( border, ContainerStyleSheet.defaultStyleSheet, child );
 	}
 	
 	public DPWidget indent(double indentation, DPWidget child)
@@ -604,7 +609,7 @@ public class GSymNodeViewInstance implements ElementContext, DVNode.NodeContext
 	
 	
 	
-	private GSymNodeViewInstance getPreviousSiblingFromChildElement(GSymNodeViewInstance parent, DPWidget fromChild)
+	private GSymNodeViewContext getPreviousSiblingFromChildElement(GSymNodeViewContext parent, DPWidget fromChild)
 	{
 		if ( fromChild == null )
 		{
@@ -620,7 +625,7 @@ public class GSymNodeViewInstance implements ElementContext, DVNode.NodeContext
 		int index = children.indexOf( fromChild );
 		for (int i = index - 1; i >= 0; i--)
 		{
-			GSymNodeViewInstance sibling = getLastChildFromParentElement( parent, children.get( i ) );
+			GSymNodeViewContext sibling = getLastChildFromParentElement( parent, children.get( i ) );
 			if ( sibling != null )
 			{
 				return sibling;
@@ -630,12 +635,12 @@ public class GSymNodeViewInstance implements ElementContext, DVNode.NodeContext
 		return getNextSiblingFromChildElement( parent, parentElement.getParent() );
 	}
 	
-	private GSymNodeViewInstance getLastChildFromParentElement(GSymNodeViewInstance parent, DPWidget element)
+	private GSymNodeViewContext getLastChildFromParentElement(GSymNodeViewContext parent, DPWidget element)
 	{
 		if ( element.getContext() != parent )
 		{
 			// We have recursed down the element tree far enough when we encounter an element with a different context
-			return (GSymNodeViewInstance)element.getContext();
+			return (GSymNodeViewContext)element.getContext();
 		}
 		else if ( element instanceof DPContainer )
 		{
@@ -643,7 +648,7 @@ public class GSymNodeViewInstance implements ElementContext, DVNode.NodeContext
 			List<DPWidget> children = branch.getChildren();
 			for (int i = children.size() - 1; i >= 0; i--)
 			{
-				GSymNodeViewInstance sibling = getLastChildFromParentElement( parent, children.get( i ) );
+				GSymNodeViewContext sibling = getLastChildFromParentElement( parent, children.get( i ) );
 				if ( sibling != null )
 				{
 					return sibling;
@@ -655,7 +660,7 @@ public class GSymNodeViewInstance implements ElementContext, DVNode.NodeContext
 	
 
 	
-	private GSymNodeViewInstance getNextSiblingFromChildElement(GSymNodeViewInstance parent, DPWidget fromChild)
+	private GSymNodeViewContext getNextSiblingFromChildElement(GSymNodeViewContext parent, DPWidget fromChild)
 	{
 		if ( fromChild == null )
 		{
@@ -671,7 +676,7 @@ public class GSymNodeViewInstance implements ElementContext, DVNode.NodeContext
 		int index = children.indexOf( fromChild );
 		for (int i = index + 1; i < children.size(); i++)
 		{
-			GSymNodeViewInstance sibling = getFirstChildFromParentElement( parent, children.get( i ) );
+			GSymNodeViewContext sibling = getFirstChildFromParentElement( parent, children.get( i ) );
 			if ( sibling != null )
 			{
 				return sibling;
@@ -681,19 +686,19 @@ public class GSymNodeViewInstance implements ElementContext, DVNode.NodeContext
 		return getNextSiblingFromChildElement( parent, parentElement.getParent() );
 	}
 	
-	private GSymNodeViewInstance getFirstChildFromParentElement(GSymNodeViewInstance parent, DPWidget element)
+	private GSymNodeViewContext getFirstChildFromParentElement(GSymNodeViewContext parent, DPWidget element)
 	{
 		if ( element.getContext() != parent )
 		{
 			// We have recursed down the element tree far enough when we encounter an element with a different context
-			return (GSymNodeViewInstance)element.getContext();
+			return (GSymNodeViewContext)element.getContext();
 		}
 		else if ( element instanceof DPContainer )
 		{
 			DPContainer branch = (DPContainer)element;
 			for (DPWidget child: branch.getChildren())
 			{
-				GSymNodeViewInstance sibling = getFirstChildFromParentElement( parent, child );
+				GSymNodeViewContext sibling = getFirstChildFromParentElement( parent, child );
 				if ( sibling != null )
 				{
 					return sibling;
@@ -705,42 +710,42 @@ public class GSymNodeViewInstance implements ElementContext, DVNode.NodeContext
 	
 
 	
-	public GSymNodeViewInstance getParent()
+	public GSymNodeViewContext getParent()
 	{
 		DVNode parentViewNode = viewNode.getParent();
-		return parentViewNode != null  ?  (GSymNodeViewInstance)parentViewNode.getContext()  :  null;
+		return parentViewNode != null  ?  (GSymNodeViewContext)parentViewNode.getContext()  :  null;
 	}
 	
 
-	public GSymNodeViewInstance getPrevSibling()
+	public GSymNodeViewContext getPrevSibling()
 	{
 		return getPreviousSiblingFromChildElement( getParent(), getViewNodeElement() );
 	}
 	
-	public GSymNodeViewInstance getNextSibling()
+	public GSymNodeViewContext getNextSibling()
 	{
 		return getNextSiblingFromChildElement( this, getViewNodeElement() );
 	}
 	
 	
 	
-	public GSymNodeViewInstance getFirstChild()
+	public GSymNodeViewContext getFirstChild()
 	{
 		return getFirstChildFromParentElement( getParent(), getViewNodeElement() );
 	}
 	
-	public GSymNodeViewInstance getLastChild()
+	public GSymNodeViewContext getLastChild()
 	{
 		return getNextSiblingFromChildElement( this, getViewNodeElement() );
 	}
 	
 	
 	
-	public ArrayList<GSymNodeViewInstance> getNodeViewInstancePathFromRoot()
+	public ArrayList<GSymNodeViewContext> getNodeViewInstancePathFromRoot()
 	{
-		ArrayList<GSymNodeViewInstance> path = new ArrayList<GSymNodeViewInstance>();
+		ArrayList<GSymNodeViewContext> path = new ArrayList<GSymNodeViewContext>();
 		
-		GSymNodeViewInstance n = this;
+		GSymNodeViewContext n = this;
 		while ( n != null )
 		{
 			path.add( 0, n );
@@ -750,11 +755,11 @@ public class GSymNodeViewInstance implements ElementContext, DVNode.NodeContext
 		return path;
 	}
 	
-	public ArrayList<GSymNodeViewInstance> getNodeViewInstancePathFromSubtreeRoot(GSymNodeViewInstance root)
+	public ArrayList<GSymNodeViewContext> getNodeViewInstancePathFromSubtreeRoot(GSymNodeViewContext root)
 	{
-		ArrayList<GSymNodeViewInstance> path = new ArrayList<GSymNodeViewInstance>();
+		ArrayList<GSymNodeViewContext> path = new ArrayList<GSymNodeViewContext>();
 		
-		GSymNodeViewInstance n = this;
+		GSymNodeViewContext n = this;
 		while ( n != null )
 		{
 			path.add( 0, n );
@@ -769,7 +774,7 @@ public class GSymNodeViewInstance implements ElementContext, DVNode.NodeContext
 	}
 	
 	
-	public GSymViewInstance getViewContext()
+	public GSymViewContext getViewContext()
 	{
 		return viewInstance;
 	}

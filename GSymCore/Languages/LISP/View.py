@@ -14,7 +14,7 @@ from BritefuryJ.DocPresent import *
 from BritefuryJ.DocPresent.Browser import Page
 from BritefuryJ.DocPresent.StyleSheets import *
 
-from BritefuryJ.GSym.View import GSymViewInstance
+from BritefuryJ.GSym.View import GSymViewContext
 from BritefuryJ.GSym.View.ListView import ParagraphListViewLayout, HorizontalListViewLayout, VerticalInlineListViewLayout, VerticalListViewLayout
 
 
@@ -173,7 +173,7 @@ class _LISPViewPage (Page):
 		self._docRootNode = docRootNode
 		self._location = location
 		self._app = app
-		viewContext = GSymViewInstance( docRootNode, viewLispNode, self._viewRootFn, commandHistory, self )
+		viewContext = GSymViewContext( docRootNode, viewLispNode, self._viewRootFn, commandHistory, self )
 		self._frame = viewContext.getFrame()
 		
 		
@@ -187,5 +187,5 @@ class _LISPViewPage (Page):
 	
 
 
-def viewLocationAsPage(docRootNode, location, commandHistory, app):
+def viewLocationAsPage(document, docRootNode, location, commandHistory, app):
 	return _LISPViewPage( docRootNode, location, commandHistory, app )

@@ -14,8 +14,6 @@ import javax.swing.ActionMap;
 import javax.swing.JComponent;
 import javax.swing.TransferHandler;
 
-import BritefuryJ.DocPresent.DPHBox;
-import BritefuryJ.DocPresent.DPLink;
 import BritefuryJ.DocPresent.DPPresentationArea;
 import BritefuryJ.DocPresent.DPStaticText;
 import BritefuryJ.DocPresent.DPText;
@@ -25,7 +23,6 @@ import BritefuryJ.DocPresent.PageController;
 import BritefuryJ.DocPresent.Browser.SystemPages.SystemLocationResolver;
 import BritefuryJ.DocPresent.Browser.SystemPages.SystemRootPage;
 import BritefuryJ.DocPresent.Layout.VTypesetting;
-import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.StaticTextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
@@ -194,12 +191,6 @@ public class Browser implements PageController
 		DPVBox pageBox = new DPVBox( pageBoxStyle );
 		
 
-		HBoxStyleSheet linkBoxStyle = new HBoxStyleSheet( 0.0 );
-		DPHBox linkBox = new DPHBox( linkBoxStyle );
-		
-		linkBox.append( new DPLink( "WELCOME PAGE", "" ).padX( 10.0 ) );
-		
-		
 		TextStyleSheet titleStyle = new TextStyleSheet( new Font( "Serif", Font.BOLD, 32 ), Color.BLACK );
 		DPText title = new DPText( titleStyle, "Could Not Resolve Location" );
 		

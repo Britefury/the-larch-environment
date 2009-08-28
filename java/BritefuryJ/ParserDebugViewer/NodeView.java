@@ -130,8 +130,6 @@ public class NodeView
 	static HBoxStyleSheet titleTextHBoxStyle = new HBoxStyleSheet( 10.0 );
 	static Border titleSuccessBorder = new EmptyBorder( 0.0, 0.0, 0.0, 0.0, new Color( 0.85f, 0.95f, 0.85f ) );
 	static Border titleFailBorder = new EmptyBorder( 0.0, 0.0, 0.0, 0.0, new Color( 1.0f, 0.85f, 0.85f ) );
-	static VBoxStyleSheet contentVBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, 0.0 );
-	static VBoxStyleSheet nodeVBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, 0.0 );
 	static Border nodeBorder = new SolidBorder( 1.0, 1.0, Color.black, null );
 	
 	static VBoxStyleSheet childrenVBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, 3.0 );
@@ -347,7 +345,7 @@ public class NodeView
 		DPWidget inputWidget = makeInputWidget( data );
 		DPWidget valueWidget = makeValueWidget( data );
 		
-		DPVBox contentBoxWidget = new DPVBox( contentVBoxStyle );
+		DPVBox contentBoxWidget = new DPVBox();
 		DPWidget[] children = { rangeWidget, inputWidget, valueWidget };
 		contentBoxWidget.setChildren( Arrays.asList( children ) );
 		return contentBoxWidget;
@@ -358,7 +356,7 @@ public class NodeView
 		DPWidget titleBoxWidget = makeTitleBoxWidget( data );
 		DPWidget contentBoxWidget = makeContentBoxWidget( data );
 		
-		DPVBox nodeBoxWidget = new DPVBox( nodeVBoxStyle );
+		DPVBox nodeBoxWidget = new DPVBox();
 		nodeBoxWidget.setChildren( new DPWidget[] { titleBoxWidget.alignHExpand(), contentBoxWidget.alignHExpand() } );
 		
 		nodeBinWidget = new DPNodeBin( this );

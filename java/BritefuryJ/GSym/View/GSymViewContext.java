@@ -25,7 +25,7 @@ import BritefuryJ.DocView.DVNode;
 import BritefuryJ.DocView.DocView;
 import BritefuryJ.Utils.Profile.ProfileTimer;
 
-public class GSymViewInstance implements DocView.RefreshListener
+public class GSymViewContext implements DocView.RefreshListener
 {
 	//
 	//
@@ -44,12 +44,12 @@ public class GSymViewInstance implements DocView.RefreshListener
 	
 	protected static class NodeContentsFactory implements DVNode.NodeElementFactory
 	{
-		private GSymViewInstance viewInstance;
+		private GSymViewContext viewInstance;
 		private GSymNodeViewFunction nodeViewFunction;
 		private Object state;
 		
 		
-		public NodeContentsFactory(GSymViewInstance viewInstance, GSymNodeViewFunction viewFunction, Object state)
+		public NodeContentsFactory(GSymViewContext viewInstance, GSymNodeViewFunction viewFunction, Object state)
 		{
 			assert viewFunction != null;
 			
@@ -62,7 +62,7 @@ public class GSymViewInstance implements DocView.RefreshListener
 		public DPWidget createNodeElement(DVNode viewNode, DocTreeNode treeNode)
 		{
 			// Create the node view instance
-			GSymNodeViewInstance nodeViewInstance = new GSymNodeViewInstance( viewInstance, viewNode );
+			GSymNodeViewContext nodeViewInstance = new GSymNodeViewContext( viewInstance, viewNode );
 			
 			// Build the contents
 			//return nodeViewFunction.createElement( treeNode, nodeViewInstance, state );
@@ -142,14 +142,17 @@ public class GSymViewInstance implements DocView.RefreshListener
 	
 	private Object owner;
 	
+	private CommandHistory commandHistory;
 	
-	public GSymViewInstance(Object docRootNode, GSymNodeViewFunction generalNodeViewFunction, GSymNodeViewFunction rootNodeViewFunction,
+	
+	public GSymViewContext(Object docRootNode, GSymNodeViewFunction generalNodeViewFunction, GSymNodeViewFunction rootNodeViewFunction,
 			CommandHistory commandHistory, Object owner) throws CannotViewTerminalDocNode
 	{
 		this.docRootNode = docRootNode;
 		tree = new DocTree();
 		Object docTreeRoot = tree.treeNode( docRootNode );
 		this.owner = owner;
+		this.commandHistory = commandHistory;
 		
 		if ( docTreeRoot instanceof DocTreeNode )
 		{
@@ -173,7 +176,7 @@ public class GSymViewInstance implements DocView.RefreshListener
 	}
 	
 	
-	public GSymViewInstance(Object docRootNode, PyObject generalNodeViewFunction, PyObject rootNodeViewFunction,
+	public GSymViewContext(Object docRootNode, PyObject generalNodeViewFunction, PyObject rootNodeViewFunction,
 			CommandHistory commandHistory, Object owner) throws CannotViewTerminalDocNode
 	{
 		this( docRootNode, new PyGSymNodeViewFunction( generalNodeViewFunction ), new PyGSymNodeViewFunction( generalNodeViewFunction ), commandHistory, owner );
@@ -279,6 +282,12 @@ public class GSymViewInstance implements DocView.RefreshListener
 		return treeRootNode;
 	}
 
+	
+	
+	public CommandHistory getCommandHistory()
+	{
+		return commandHistory;
+	}
 
 
 

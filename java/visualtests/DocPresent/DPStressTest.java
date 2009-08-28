@@ -19,10 +19,8 @@ import BritefuryJ.DocPresent.DPPresentationArea;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.Layout.VTypesetting;
 import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
 public class DPStressTest
 {
@@ -119,8 +117,7 @@ public class DPStressTest
 	
 	protected DPWidget createContentNode()
 	{
-		VBoxStyleSheet boxs = new VBoxStyleSheet( VTypesetting.NONE, 0.0 );
-		DPVBox box = new DPVBox( boxs );
+		DPVBox box = new DPVBox();
 		ArrayList<DPWidget> children = new ArrayList<DPWidget>();
 		
 		for (int i = 0; i < NUMLINES; i++)
