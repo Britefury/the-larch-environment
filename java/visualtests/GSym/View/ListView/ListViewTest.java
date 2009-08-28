@@ -115,8 +115,7 @@ public class ListViewTest
 		
 		DPWidget titleElem = new DPText( s0, title );
 		
-		VBoxStyleSheet boxs = new VBoxStyleSheet( VTypesetting.NONE, 0.0 );
-		DPVBox vbox = new DPVBox( boxs );
+		DPVBox vbox = new DPVBox();
 		vbox.setChildren( Arrays.asList( new DPWidget[] { titleElem, ls } ) );
 		return vbox;
 	}
@@ -132,7 +131,7 @@ public class ListViewTest
 		
 		ParagraphStyleSheet paraStyle = new ParagraphStyleSheet();
 		HBoxStyleSheet hboxStyle = new HBoxStyleSheet();
-		VBoxStyleSheet vboxStyle = new VBoxStyleSheet( VTypesetting.NONE, 0.0 );
+		VBoxStyleSheet vboxStyle = VBoxStyleSheet.defaultStyleSheet;
 		
 		String[] txt = new String[] { "abcdef", "123456", "hello", "world", "this", "is", "a", "test", "of", "the", "list", "layout", "system" };
 		

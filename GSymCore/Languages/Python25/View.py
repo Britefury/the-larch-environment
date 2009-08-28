@@ -24,7 +24,7 @@ from BritefuryJ.DocPresent.StyleSheets import *
 from BritefuryJ.DocPresent.Browser import Page
 from BritefuryJ.DocPresent import *
 
-from BritefuryJ.GSym.View import GSymViewInstance
+from BritefuryJ.GSym.View import GSymViewContext
 from BritefuryJ.GSym.View.ListView import ParagraphListViewLayout, HorizontalListViewLayout, VerticalInlineListViewLayout, VerticalListViewLayout
 
 
@@ -1573,12 +1573,12 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 
 class _Python25ViewPage (Page):
-	def __init__(self, pythonDocRootNode, location, commandHistory, app):
-		self._pythonDocRootNode = pythonDocRootNode
+	def __init__(self, docRootNode, location, commandHistory, app):
+		self._docRootNode = docRootNode
 		self._location = location
 		self._viewFn = Python25View()
 		self._app = app
-		viewContext = GSymViewInstance( pythonDocRootNode, self._viewFn, self._viewRootFn, commandHistory, self )
+		viewContext = GSymViewContext( docRootNode, self._viewFn, self._viewRootFn, commandHistory, self )
 		self._frame = viewContext.getFrame()
 		self._frame.setEditHandler( Python25EditHandler( viewContext ) )
 
@@ -1593,7 +1593,7 @@ class _Python25ViewPage (Page):
 
 
 
-def viewLocationAsPage(pythonDocRootNode, location, commandHistory, app):
-	return _Python25ViewPage( pythonDocRootNode, location, commandHistory, app )
+def viewLocationAsPage(document, docRootNode, location, commandHistory, app):
+	return _Python25ViewPage( docRootNode, location, commandHistory, app )
 
 

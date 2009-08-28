@@ -24,7 +24,7 @@ from BritefuryJ.DocPresent.StyleSheets import *
 from BritefuryJ.DocPresent.Browser import Page
 from BritefuryJ.DocPresent import *
 
-from BritefuryJ.GSym.View import GSymViewInstance
+from BritefuryJ.GSym.View import GSymViewContext
 from BritefuryJ.GSym.View.ListView import ParagraphListViewLayout, HorizontalListViewLayout, VerticalInlineListViewLayout, VerticalListViewLayout
 
 
@@ -148,10 +148,9 @@ class _ProjectViewPage (Page):
 	def __init__(self, docRootNode, location, commandHistory, app):
 		self._docRootNode = docRootNode
 		self._location = location
-		self._frame = DPFrame()
 		self._viewFn = ProjectView()
 		self._app = app
-		viewContext = GSymViewInstance( docRootNode, self._viewFn, self._viewRootFn, commandHistory, self )
+		viewContext = GSymViewContext( docRootNode, self._viewFn, self._viewRootFn, commandHistory, self )
 		self._frame = viewContext.getFrame()
 		#self._frame.setEditHandler( Python25EditHandler( viewContext ) )
 		
@@ -164,10 +163,7 @@ class _ProjectViewPage (Page):
 		return self._viewFn( node, ctx, state )
 
 	
-def _viewPage(docRootNode, location, commandHistory, app):
-	return gSymDocument.viewUnitLocationAsPage( docRootNode, location, app._world, commandHistory, app )
-
-def viewLocationAsPage(docRootNode, location, commandHistory, app):
+def viewLocationAsPage(document, docRootNode, location, commandHistory, app):
 	if location == '':
 		return _ProjectViewPage( docRootNode, location, commandHistory, app )
 	else:
@@ -188,7 +184,7 @@ def viewLocationAsPage(docRootNode, location, commandHistory, app):
 				if n.isInstanceOf( Nodes.Package ):
 					package = n
 				elif n.isInstanceOf( Nodes.Page ):
-					return _viewPage( n['unit'], loc, commandHistory, app )
+					return document.viewUnitLocationAsPage( n['unit'], loc, app )
 				else:
 					return None
 			else:

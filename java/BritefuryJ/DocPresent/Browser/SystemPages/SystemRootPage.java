@@ -36,8 +36,7 @@ public class SystemRootPage extends Page
 		VBoxStyleSheet pageBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, 40.0 );
 		DPVBox pageBox = new DPVBox( pageBoxStyle );
 		
-		VBoxStyleSheet headBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, 0.0 );
-		DPVBox headBox = new DPVBox( headBoxStyle );
+		DPVBox headBox = new DPVBox();
 		
 		StaticTextStyleSheet titleStyle = new StaticTextStyleSheet( new Font( "Serif", Font.BOLD, 32 ), Color.BLACK );
 		DPStaticText title = new DPStaticText( titleStyle, "gSym System Page" );
