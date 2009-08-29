@@ -24,6 +24,10 @@ prj_projectIndexBoxStyle = VBoxStyleSheet( VTypesetting.NONE, 10.0 )
 prj_projectContentBoxStyle = VBoxStyleSheet()
 
 
+prj_controlsBorder = SolidBorder( 2.0, 2.0, Color( 131, 149, 172 ), None )
+prj_controlsBoxStyle = HBoxStyleSheet( 30.0 )
+
+
 prj_packageNameStyle = TextStyleSheet( Font( 'Sans serif', Font.BOLD, 14 ), Color( 0, 0, 128 ) )
 
 prj_packageButtonLabelStyle = StaticTextStyleSheet()
