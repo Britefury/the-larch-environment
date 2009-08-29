@@ -5,28 +5,32 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from Britefury.gSym.gSymLanguage import GSymLanguage
+from Britefury.gSym.gSymLanguage import GSymLanguage, GSymPageFactory, GSymPageImporter
+from Britefury.gSym.gSymDocument import gSymUnit
 
 from GSymCore.Languages.Python25.CodeGenerator import Python25CodeGenerator
 from GSymCore.Languages.Python25.View import viewLocationAsPage
 from GSymCore.Languages.Python25 import NodeClasses as Nodes
+from GSymCore.Languages.Python25.Python25Importer import importPy25File
 
 
 
-def pyTransformModify(cur, new):
-	cur['contents'] = new['contents']
+def _py25New():
+	return gSymUnit( 'GSymCore.Languages.Python25', Nodes.PythonModule( suite=[ Nodes.BlankLine() ] ) )
 
-
-
-def initialiseModule(world):
-	world.registerDMModule( Nodes.module )
+def _py25ImportFile(filename):
+	content = importPy25File( filename )
+	return gSymUnit( 'GSymCore.Languages.Python25', content )
 
 
 
 language = GSymLanguage()
 language.registerCodeGeneratorFactory( 'ascii', Python25CodeGenerator )
 language.registerViewLocationAsPageFn( viewLocationAsPage )
-language.registerTransformModifyFn( pyTransformModify )
 
 
+newPageFactory = GSymPageFactory( 'Python 2.5', _py25New )
+
+
+pageImporter = GSymPageImporter( 'Python 2.5', 'Python 2.5 source (*.py)', 'py', _py25ImportFile )
 

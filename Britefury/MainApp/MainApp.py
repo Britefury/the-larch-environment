@@ -42,8 +42,6 @@ from Britefury.Event.QueuedEvent import queueEvent
 from Britefury.gSym.gSymWorld import GSymWorld
 from Britefury.gSym.gSymDocument import GSymDocument
 
-from Britefury.Plugin import InitPlugins
-
 from GSymCore.GSymApp import GSymApp
 from GSymCore.Project import Project
 
@@ -72,20 +70,6 @@ class GSymScriptEnvironment (object):
 	
 	
 	
-class MainAppPluginInterface (object):
-	def __init__(self, app):
-		self._app = app
-		
-		
-	def registerNewPageFactory(self, menuLabel, newDocFn):
-		self._app.registerNewPageFactory( menuLabel, newDocFn )
-		
-	def registerImporter(self, menuLabel, fileType, filePattern, importFn):
-		self._app.registerImporter( menuLabel, fileType, filePattern, importFn )
-		
-
-		
-		
 def _action(name, f):
 	class Act (AbstractAction):
 		def actionPerformed(action, event):
@@ -299,14 +283,6 @@ class MainApp (object):
 		
 
 		#
-		# Plugins
-		#
-		self._pluginInterface = MainAppPluginInterface( self )
-		InitPlugins.initPlugins( self._pluginInterface )
-
-		
-		
-		#
 		# Script window
 		#
 		scriptBanner = _( "gSym scripting console (uses pyconsole by Yevgen Muntyan)\nPython %s\nType help(object) for help on an object\nThe gSym scripting environment is available via the local variable 'gsym'\n" ) % ( sys.version, )
@@ -378,9 +354,6 @@ class MainApp (object):
 			self.setDocument( GSymDocument( Project.newProject() ) )
 
 
-	def registerNewPageFactory(self, menuLabel, newUnitFn):
-		self._newPageFactories.append( ( menuLabel, newUnitFn ) )
-
 		
 	def promptNewPage(self, unitReceiverFn):
 		def _make_newPage(newUnitFn):
@@ -389,8 +362,8 @@ class MainApp (object):
 				unitReceiverFn( unit )
 			return newPage
 		newPageMenu = JPopupMenu( 'New page' )
-		for menuLabel, newUnitFn in self._newPageFactories:
-			newPageMenu.add( _action( menuLabel, _make_newPage( newUnitFn ) ) )
+		for newPageFactory in self._world.newPageFactories:
+			newPageMenu.add( _action( newPageFactory.menuLabelText, _make_newPage( newPageFactory.newPageFn ) ) )
 		pos = self._frame.getMousePosition( True )
 		newPageMenu.show( self._frame, pos.x, pos.y )
 		
@@ -474,17 +447,13 @@ class MainApp (object):
 			return _import
 
 		importPageMenu = JPopupMenu( 'Import page' )
-		for menuLabel, fileType, filePattern, importUnitFn in self._pageImporters:
-			importPageMenu.add( _action( menuLabel, _make_importPage( fileType, filePattern, importUnitFn ) ) )
+		for pageImporter in self._world.pageImporters:
+			importPageMenu.add( _action( pageImporter.menuLabelText, _make_importPage( pageImporter.fileType, pageImporter.filePattern, pageImporter.importFn ) ) )
 
 		pos = self._frame.getMousePosition( True )
 		importPageMenu.show( self._frame, pos.x, pos.y )
 			
 			
-	def registerImporter(self, menuLabel, fileType, filePattern, importFn):
-		self._pageImporters.append( ( menuLabel, fileType, filePattern, importFn ) )
-
-		
 		
 		
 		

@@ -38,3 +38,28 @@ class GSymLanguage (object):
 		return self._transformModifyFn
 
 
+
+
+class GSymPageFactory (object):
+	def __init__(self, menuLabelText, newPageFn):
+		self.menuLabelText = menuLabelText
+		self.newPageFn = newPageFn
+
+
+
+class GSymPageImporter (object):
+	def __init__(self, menuLabelText, fileType, filePattern, importFn):
+		self.menuLabelText = menuLabelText
+		self.fileType = fileType
+		self.filePattern = filePattern
+		self.importFn = importFn
+
+		
+		
+class GSymDocumentFactory (object):
+	def __init__(self, menuLabelText, newDocumentFn):
+		self.menuLabelText = menuLabelText
+		self.newDocumentFn = newDocumentFn
+
+
+

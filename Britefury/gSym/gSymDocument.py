@@ -113,7 +113,7 @@ class GSymDocument (CommandHistoryListener):
 
 	
 	def viewUnitLocationAsPage(self, unit, location, app):
-		language = self._world.getModuleLanguage( gSymUnit_getLanguageModuleName( unit ) )
+		language = self._world.getLanguage( gSymUnit_getLanguageModuleName( unit ) )
 		viewLocationAsPageFn = language.getViewLocationAsPageFn()
 		return viewLocationAsPageFn( self, gSymUnit_getContent( unit ), location, self._commandHistory, app )
 	
@@ -194,3 +194,5 @@ class GSymDocument (CommandHistoryListener):
 			self._commandHistoryListener.onCommandHistoryChanged( history )
 
 
+
+			

@@ -5,12 +5,13 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from Britefury.gSym.gSymLanguage import GSymLanguage
+from GSymCore.Project import NodeClasses as Nodes
+from GSymCore.Project import Project
 
-from GSymCore.Languages.LISP.View import viewLocationAsPage
 
 
-language = GSymLanguage()
-language.registerViewLocationAsPageFn( viewLocationAsPage )
-
+def initPlugin(plugin, world):
+	world.registerDMModule( plugin, Nodes.module )
+	world.registerLanguage( plugin, Project.language )
+	world.registerNewDocumentFactory( plugin, Project.newDocumentFactory )
 
