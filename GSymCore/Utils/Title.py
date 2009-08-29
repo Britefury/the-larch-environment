@@ -10,11 +10,21 @@ from java.awt import Font, Color
 from BritefuryJ.DocPresent.Border import *
 from BritefuryJ.DocPresent.StyleSheets import *
 
+_headerStyle = StaticTextStyleSheet( Font( 'Sans serif', Font.PLAIN, 14 ), Color( 0.0, 0.5, 0.0 ) )
 _titleStyle = StaticTextStyleSheet( Font( 'Serif', Font.BOLD, 32 ), Color.BLACK )
+_titleVBoxStyle = VBoxStyleSheet()
 _titleBackgroundBorder = EmptyBorder( 5.0, 5.0, 5.0, 5.0, Color( 240, 240, 240 ) )
 
 
 def titleBar(ctx, text):
 	title = ctx.staticText( _titleStyle, text )
 	titleBackground = ctx.border( _titleBackgroundBorder, title.alignHCentre() )
+	return titleBackground.alignHExpand().pad( 5.0, 5.0 ).alignHExpand()
+
+
+def titleBarWithHeader(ctx, headerText, text):
+	header = ctx.staticText( _headerStyle, headerText )
+	title = ctx.staticText( _titleStyle, text )
+	titleVBox = ctx.vbox( _titleVBoxStyle, [ header.alignHCentre(), title.alignHCentre() ] )
+	titleBackground = ctx.border( _titleBackgroundBorder, titleVBox.alignHCentre() )
 	return titleBackground.alignHExpand().pad( 5.0, 5.0 ).alignHExpand()
