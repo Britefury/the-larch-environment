@@ -8,6 +8,8 @@ package BritefuryJ.DocPresent.Browser;
 
 import java.util.ArrayList;
 
+import BritefuryJ.CommandHistory.CommandHistoryController;
+import BritefuryJ.CommandHistory.CommandHistoryListener;
 import BritefuryJ.DocPresent.DPWidget;
 
 public abstract class Page
@@ -26,6 +28,15 @@ public abstract class Page
 	
 	
 	public abstract DPWidget getContentsElement();
+	
+	public CommandHistoryController getCommandHistoryController()
+	{
+		return null;
+	}
+	
+	public void setCommandHistoryListener(CommandHistoryListener listener)
+	{
+	}
 
 
 	protected void addBrowser(Browser browser)

@@ -1576,19 +1576,23 @@ class _Python25ViewPage (Page):
 	def __init__(self, docRootNode, location, commandHistory, app):
 		self._docRootNode = docRootNode
 		self._location = location
-		self._viewFn = Python25View()
+		self._commandHistory = commandHistory
 		self._app = app
-		viewContext = GSymViewContext( docRootNode, self._viewFn, self._viewRootFn, commandHistory, self )
+		self._viewFn = Python25View()
+		viewContext = GSymViewContext( docRootNode, self._viewFn, self._viewFn, commandHistory, self )
 		self._frame = viewContext.getFrame()
 		self._frame.setEditHandler( Python25EditHandler( viewContext ) )
 
 
 	def getContentsElement(self):
 		return self._frame
-
-
-	def _viewRootFn(self, node, ctx, state):
-		return self._viewFn( node, ctx, state )
+		
+		
+	def getCommandHistoryController(self):
+		return self._commandHistory
+	
+	def setCommandHistoryListener(self, listener):
+		self._commandHistory.setCommandHistoryListener( listener )
 
 
 

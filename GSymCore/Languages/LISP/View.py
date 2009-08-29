@@ -172,8 +172,9 @@ class _LISPViewPage (Page):
 	def __init__(self, docRootNode, location, commandHistory, app):
 		self._docRootNode = docRootNode
 		self._location = location
+		self._commandHistory = commandHistory
 		self._app = app
-		viewContext = GSymViewContext( docRootNode, viewLispNode, self._viewRootFn, commandHistory, self )
+		viewContext = GSymViewContext( docRootNode, viewLispNode, viewLispNode, commandHistory, self )
 		self._frame = viewContext.getFrame()
 		
 		
@@ -181,8 +182,11 @@ class _LISPViewPage (Page):
 		return self._frame
 		
 		
-	def _viewRootFn(self, node, ctx, state):
-		return viewLispNode( node, ctx, state )
+	def getCommandHistoryController(self):
+		return self._commandHistory
+	
+	def setCommandHistoryListener(self, listener):
+		self._commandHistory.setCommandHistoryListener( listener )
 
 	
 

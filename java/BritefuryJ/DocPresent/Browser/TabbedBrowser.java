@@ -24,6 +24,9 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
 
+import BritefuryJ.CommandHistory.CommandHistoryController;
+import BritefuryJ.CommandHistory.CommandHistoryListener;
+
 public class TabbedBrowser implements Browser.BrowserListener
 {
 	private static String COMMAND_BACK = "back";
@@ -37,6 +40,7 @@ public class TabbedBrowser implements Browser.BrowserListener
 	
 	private ArrayList<Browser> browsers;
 	private Browser currentBrowser;
+	private CommandHistoryListener commandHistoryListener;
 	
 	
 	
@@ -44,9 +48,10 @@ public class TabbedBrowser implements Browser.BrowserListener
 	{
 		this.resolver = resolver;
 		
-		currentBrowser = createBrowser( location );
+		Browser browser = createBrowser( location );
 		browsers = new ArrayList<Browser>();
-		browsers.add( currentBrowser );
+		browsers.add( browser );
+		setCurrentBrowser( browser );
 		
 
 		toolbar = new JToolBar();
@@ -99,6 +104,18 @@ public class TabbedBrowser implements Browser.BrowserListener
 	}
 	
 	
+	public CommandHistoryController getCommandHistoryController()
+	{
+		return currentBrowser.getCommandHistoryController();
+	}
+	
+	public void setCommandHistoryListener(CommandHistoryListener listener)
+	{
+		commandHistoryListener = listener;
+		currentBrowser.setCommandHistoryListener( listener );
+	}
+	
+
 	
 	public void reset(String location)
 	{
@@ -179,6 +196,31 @@ public class TabbedBrowser implements Browser.BrowserListener
 		}
 		
 		return button;
+	}
+	
+	
+	
+	private void setCurrentBrowser(Browser browser)
+	{
+		if ( browser != currentBrowser )
+		{
+			if ( currentBrowser != null )
+			{
+				currentBrowser.setCommandHistoryListener( null );
+			}
+			
+			currentBrowser = browser;
+			
+			if ( currentBrowser != null  &&  commandHistoryListener != null )
+			{
+				currentBrowser.setCommandHistoryListener( commandHistoryListener );
+			}
+	
+			if ( commandHistoryListener != null )
+			{
+				commandHistoryListener.onCommandHistoryChanged( getCommandHistoryController() );
+			}
+		}
 	}
 	
 	

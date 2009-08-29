@@ -16,14 +16,11 @@ i18n.initialise()
 
 from BritefuryJ.DocModel import DMIOReader, DMNode
 
-from Britefury.gSym.gSymEnvironment import initGSymEnvironment, shutdownGSymEnvironment
 from Britefury.gSym.gSymWorld import GSymWorld
 
 from Britefury.MainApp.MainApp import MainApp
 
 def main():
-	initGSymEnvironment()
-	
 	world = GSymWorld()
 	
 
@@ -41,8 +38,6 @@ def main():
 	app = MainApp( world, None )
 
 	app.run()
-	
-	shutdownGSymEnvironment()
 
 
 if __name__ == '__main__':

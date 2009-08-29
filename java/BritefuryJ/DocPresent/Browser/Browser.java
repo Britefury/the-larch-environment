@@ -14,6 +14,8 @@ import javax.swing.ActionMap;
 import javax.swing.JComponent;
 import javax.swing.TransferHandler;
 
+import BritefuryJ.CommandHistory.CommandHistoryController;
+import BritefuryJ.CommandHistory.CommandHistoryListener;
 import BritefuryJ.DocPresent.DPPresentationArea;
 import BritefuryJ.DocPresent.DPStaticText;
 import BritefuryJ.DocPresent.DPText;
@@ -41,6 +43,7 @@ public class Browser implements PageController
 	private LocationResolver resolver;
 	private Page page;
 	private BrowserListener listener;
+	private CommandHistoryListener commandHistoryListener;
 	
 	
 	
@@ -83,6 +86,29 @@ public class Browser implements PageController
 	}
 	
 	
+	
+	public CommandHistoryController getCommandHistoryController()
+	{
+		if ( page != null )
+		{
+			return page.getCommandHistoryController();
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	public void setCommandHistoryListener(CommandHistoryListener listener)
+	{
+		commandHistoryListener = listener;
+		if ( page != null )
+		{
+			page.setCommandHistoryListener( listener );
+		}
+	}
+	
+
 	
 	public void reset(String location)
 	{
@@ -139,22 +165,24 @@ public class Browser implements PageController
 	
 	private void resolve()
 	{
-		if ( page != null )
+		Page p = page;
+		
+		if ( p != null )
 		{
-			page.removeBrowser( this );
-			page = null;
+			p.removeBrowser( this );
+			p = null;
 		}
 		
 		String location = history.getCurrentContext().getLocation();
 		
-		page = SystemLocationResolver.getSystemResolver().resolveLocation( location );
+		p = SystemLocationResolver.getSystemResolver().resolveLocation( location );
 		
-		if ( page == null  &&  resolver != null )
+		if ( p == null  &&  resolver != null )
 		{
-			page = resolver.resolveLocation( location );
+			p = resolver.resolveLocation( location );
 		}
 
-		if ( page == null )
+		if ( p == null )
 		{
 			if ( location.equals( "" ) )
 			{
@@ -167,8 +195,34 @@ public class Browser implements PageController
 		}
 		else
 		{
-			page.addBrowser( this );
-			area.setChild( page.getContentsElement().alignHExpand() );		
+			p.addBrowser( this );
+			area.setChild( p.getContentsElement().alignHExpand() );		
+		}
+		
+		
+		setPage( p );
+	}
+	
+	private void setPage(Page p)
+	{
+		if ( p != page )
+		{
+			if ( page != null )
+			{
+				page.setCommandHistoryListener( null );
+			}
+			
+			page = p;
+			
+			if ( page != null  &&  commandHistoryListener != null )
+			{
+				page.setCommandHistoryListener( commandHistoryListener );
+			}
+			
+			if ( commandHistoryListener != null )
+			{
+				commandHistoryListener.onCommandHistoryChanged( getCommandHistoryController() );
+			}
 		}
 	}
 	
