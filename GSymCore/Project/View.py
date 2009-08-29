@@ -88,6 +88,14 @@ class ProjectView (GSymViewObjectNodeDispatch):
 		
 	@ObjectNodeDispatchMethod
 	def Project(self, ctx, state, node, rootPackage):
+		def _onSave(link):
+			pass
+		
+		def _onSaveAs(link):
+			pass
+		
+		
+		
 		document = ctx.getViewContext().getPage()._document
 		
 		name = document.getDocumentName()
@@ -96,12 +104,17 @@ class ProjectView (GSymViewObjectNodeDispatch):
 		linkHeader = linkHeaderBar( ctx, [ homeLink ] )
 		
 		title = titleBarWithHeader( ctx, 'DOCUMENT', name )
-
+		
+		
+		saveLink = ctx.link( prj_linkStyle, 'SAVE', _onSave )
+		saveAsLink = ctx.link( prj_linkStyle, 'SAVE AS', _onSaveAs )
+		controlsBox = ctx.hbox( prj_controlsBoxStyle, [ saveLink.padX( 10.0 ), saveAsLink.padX( 10.0 ) ] )
+		controlsBorder = ctx.border( prj_controlsBorder, controlsBox )
 		
 		root = ctx.vbox( prj_projectIndexBoxStyle, [ ctx.viewEval( rootPackage, _ProjectViewState( '' ) ).alignHExpand() ] )
 		indexBox = tabbedBox( ctx, 'Project Index', root )
 		
-		contentBox = ctx.vbox( prj_projectContentBoxStyle, [ linkHeader, title, indexBox.pad( 10.0, 10.0 ).alignHLeft() ] )
+		contentBox = ctx.vbox( prj_projectContentBoxStyle, [ linkHeader, title, controlsBorder.pad( 5.0, 10.0 ).alignHLeft(), indexBox.pad( 10.0, 10.0 ).alignHLeft() ] )
 		
 		return contentBox.alignHExpand()
 
