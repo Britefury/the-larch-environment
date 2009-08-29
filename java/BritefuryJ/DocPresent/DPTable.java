@@ -175,6 +175,18 @@ public class DPTable extends DPContainer
 		onChildListModified();
 		queueResize();
 	}
+
+	public void setChildren(List<List<DPWidget>> itemTable)
+	{
+		DPWidget itemArray[][] = new DPWidget[itemTable.size()][];
+		int i = 0;
+		for (List<DPWidget> srcRow: itemTable)
+		{
+			DPWidget row[] = new DPWidget[srcRow.size()];
+			itemArray[i++] = srcRow.toArray( row );
+		}
+		setChildren( itemArray );
+	}
 	
 
 	

@@ -174,7 +174,7 @@ class _LISPViewPage (Page):
 		self._location = location
 		self._commandHistory = commandHistory
 		self._app = app
-		viewContext = GSymViewContext( docRootNode, viewLispNode, viewLispNode, commandHistory, self )
+		viewContext = GSymViewContext( docRootNode, viewLispNode, commandHistory, self )
 		self._frame = viewContext.getFrame()
 		
 		
