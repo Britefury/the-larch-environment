@@ -40,7 +40,6 @@ from Britefury.Event.QueuedEvent import queueEvent
 
 
 from Britefury.gSym.gSymWorld import GSymWorld
-from Britefury.gSym.gSymEnvironment import GSymEnvironment
 from Britefury.gSym.gSymDocument import GSymDocument
 
 from Britefury.Plugin import InitPlugins
@@ -149,7 +148,6 @@ class MainApp (object):
 		document = GSymDocument( self._world, unit )
 		
 		self._document = None
-		self._bUnsavedData = False
 		
 		self._resolver = _AppLocationResolver( self )
 		self._lispResolver = _AppLocationResolverLISP( self )
@@ -158,6 +156,11 @@ class MainApp (object):
 		self._browser.getComponent().setPreferredSize( Dimension( 800, 600 ) )
 
 		
+		class _CommandHistoryListener (CommandHistoryListener):
+			def onCommandHistoryChanged(_self, history):
+				self._onCommandHistoryChanged( history )
+		
+		self._browser.setCommandHistoryListener( _CommandHistoryListener() )
 		
 		
 		# NEW PAGE POPUP MENU
@@ -346,23 +349,13 @@ class MainApp (object):
 		self._document = document
 		
 		#self._actionsMenu.removeAll()
-		
-		
-
-		class Listener (CommandHistoryListener):
-			def onCommandHistoryChanged(_self, history):
-				self._onCommandHistoryChanged( history )
-		
-		if self._document is not None:
-			self._document._commandHistory.setListener( Listener() )
-		self._bUnsavedData = False
-		
 
 		self._browser.reset( '' )
 		
 		self._setLispDocument()
 			
-			
+
+
 	def _setLispDocument(self):
 		if self._lispBrowser is not None:
 			self._lispBrowser.reset( '' )
@@ -372,7 +365,7 @@ class MainApp (object):
 			
 			
 	def _onCommandHistoryChanged(self, commandHistory):
-		self._bUnsavedData = True
+		print 'Not implemented; update date of undo and redo menu entries'
 
 		
 		
@@ -417,19 +410,9 @@ class MainApp (object):
 				if sf is not None:
 					filename = sf.getPath()
 					if filename is not None:
-						f = open( filename, 'r' )
-						if f is not None:
-							try:
-								t1 = datetime.now()
-								documentRoot = DMIOReader.readFromString( f.read(), self._world.resolver )
-								t2 = datetime.now()
-								documentRoot = DMNode.coerce( documentRoot )
-								t3 = datetime.now()
-								print 'Read SX time=%s, convert to DMNode time=%s'  %  ( t2 - t1, t3 - t2 )
-								document = GSymDocument.read( self._world, documentRoot )
-								self.setDocument( document )
-							except IOError:
-								pass
+						document = GSymDocument.readFile( self._world, filename )
+						if document is not None:
+							self.setDocument( document )
 
 
 	def _onSave(self):
@@ -462,7 +445,8 @@ class MainApp (object):
 				bFinished = True
 
 		if filename is not None:
-			self._writeFile( filename )
+			if self._document is not None:
+				self._document.saveAs( filename )
 			return True
 		else:
 			return False
@@ -504,22 +488,15 @@ class MainApp (object):
 		
 		
 		
-	def _writeFile(self, filename):
-		if self._document is not None:
-			f = open( filename, 'w' )
-			if f is not None:
-				f.write( DMIOWriter.writeAsString( self._document.write() ) )
-				f.close()
-				self._bUnsavedData = False
-
-
 	def _onUndo(self):
-		if self._document._commandHistory.canUndo():
-			self._document._commandHistory.undo()
+		commandHistoryController = self._browser.getCommandHistoryController()
+		if commandHistoryController.canUndo():
+			commandHistoryController.undo()
 
 	def _onRedo(self):
-		if self._document._commandHistory.canRedo():
-			self._document._commandHistory.redo()
+		commandHistoryController = self._browser.getCommandHistoryController()
+		if commandHistoryController.canRedo():
+			commandHistoryController.redo()
 
 
 		

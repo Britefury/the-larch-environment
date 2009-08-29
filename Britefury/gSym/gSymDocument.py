@@ -5,6 +5,8 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
+from datetime import datetime
+
 from BritefuryJ.CommandHistory import CommandHistory, CommandHistoryListener
 
 from BritefuryJ.DocModel import DMNode, DMModule
@@ -16,7 +18,6 @@ from Britefury.gSymConfig.gSymVersion import compareVersions, gSymVersion
 
 from Britefury.gSym.gSymWorld import GSymWorld
 
-from Britefury.gSym.gSymEnvironment import GSymEnvironment
 from GSymCore.Languages.LISP import LISP
 
 
@@ -67,18 +68,40 @@ def gSymUnit_getContent(unit):
 
 
 	
-class GSymDocument (object):
+class GSymDocument (CommandHistoryListener):
 	def __init__(self, world, unit):
 		self._world = world
 		self._unit = DMNode.coerce( unit )
 		self._commandHistory = CommandHistory()
 		self._commandHistory.track( self._unit )
+		self._commandHistory.setCommandHistoryListener( self )
+		
+		self._bHasUnsavedData = False
+		self._commandHistoryListener = None
+		self._unsavedDataListener = None
+		self._filename = None
+		self._saveTime = None
 	
-	
-	def write(self):
-		return nodeClass_GSymDocument( version='0.1-alpha', content=self._unit )
 
+		
+	def hasUnsavedData(self):
+		return self._bHasUnsavedData
 	
+	def getFilename(self):
+		return self._filename
+	
+	def getSaveTime(self):
+		return self._saveTime
+		
+	
+	def setCommandHistoryListener(self, listener):
+		self._commandHistoryListener = listener
+		
+
+	def setUnsavedDataListener(self, listener):
+		self._unsavedDataListener = listener
+		
+		
 	
 	def viewDocLocationAsPage(self, location, app):
 		return self.viewUnitLocationAsPage( self._unit, location, app )
@@ -101,6 +124,29 @@ class GSymDocument (object):
 		return viewLocationAsPageFn( self, gSymUnit_getContent( unit ), location, self._commandHistory, app )
 
 
+	
+	def saveAs(self, filename):
+		self._filename = filename
+		self.save()
+		
+		
+	def save(self):
+		f = open( self._filename, 'w' )
+		if f is not None:
+			f.write( DMIOWriter.writeAsString( self._write() ) )
+			f.close()
+			if self._bHasUnsavedData:
+				self._bHasUnsavedData = False
+				if self._unsavedDataListener is not None:
+					self._unsavedDataListener( self )
+			self._saveTime = datetime.now()
+		
+	
+	
+	def _write(self):
+		return nodeClass_GSymDocument( version='0.1-alpha', content=self._unit )
+
+	
 
 	@staticmethod
 	def read(world, doc):
@@ -124,5 +170,27 @@ class GSymDocument (object):
 			raise GSymDocumentUnsupportedVersion
 		
 		return GSymDocument( world, content )
+
+
+	@staticmethod
+	def readFile(world, filename):
+		f = open( filename, 'r' )
+		if f is not None:
+			try:
+				documentRoot = DMIOReader.readFromString( f.read(), self._world.resolver )
+				documentRoot = DMNode.coerce( documentRoot )
+				return GSymDocument.read( self._world, documentRoot )
+			except IOError:
+				return None
+		
+			
+			
+	def onCommandHistoryChanged(self, history):
+		if not self._bHasUnsavedData:
+			self._bHasUnsavedData = True
+			if self._unsavedDataListener is not None:
+				self._unsavedDataListener( self )
+		if self._commandHistoryListener is not None:
+			self._commandHistoryListener.onCommandHistoryChanged( history )
 
 

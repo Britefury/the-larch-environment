@@ -8,5 +8,5 @@ package BritefuryJ.CommandHistory;
 
 public interface CommandHistoryListener
 {
-	public void onCommandHistoryChanged(CommandHistory history);
+	public void onCommandHistoryChanged(CommandHistoryController history);
 }

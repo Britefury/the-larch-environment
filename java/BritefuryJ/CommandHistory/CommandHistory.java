@@ -9,7 +9,7 @@ package BritefuryJ.CommandHistory;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class CommandHistory
+public class CommandHistory implements CommandHistoryController
 {
 	private static abstract class Entry
 	{
@@ -127,7 +127,7 @@ public class CommandHistory
 	
 	
 	
-	public void setListener(CommandHistoryListener listener)
+	public void setCommandHistoryListener(CommandHistoryListener listener)
 	{
 		this.listener = listener;
 	}
