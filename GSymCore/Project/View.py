@@ -30,7 +30,7 @@ from BritefuryJ.GSym.View.ListView import ParagraphListViewLayout, HorizontalLis
 
 
 from GSymCore.Utils.LinkHeader import linkHeaderBar
-from GSymCore.Utils.Title import titleBar
+from GSymCore.Utils.Title import titleBarWithHeader
 from GSymCore.Utils.TabbedBox import tabbedBox
 
 from GSymCore.Project.Styles import *
@@ -95,7 +95,7 @@ class ProjectView (GSymViewObjectNodeDispatch):
 		homeLink = ctx.link( prj_linkStyle, 'HOME PAGE', '' )
 		linkHeader = linkHeaderBar( ctx, [ homeLink ] )
 		
-		title = titleBar( ctx, name )
+		title = titleBarWithHeader( ctx, 'DOCUMENT', name )
 
 		
 		root = ctx.vbox( prj_projectIndexBoxStyle, [ ctx.viewEval( rootPackage, _ProjectViewState( '' ) ).alignHExpand() ] )
