@@ -22,7 +22,6 @@ from Britefury.MainApp.MainApp import MainApp
 
 def main():
 	world = GSymWorld()
-	
 
 	if len( sys.argv ) == 2:
 		filename = sys.argv[1]

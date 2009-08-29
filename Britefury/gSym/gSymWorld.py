@@ -9,14 +9,15 @@ import os
 
 from BritefuryJ.DocModel import DMModule, DMModuleResolver
 
+from Britefury.gSym.gSymPlugin import GSymPlugin
+
 
 
 _internalModules = {}
 
 
 class GSymDMModuleResolver (DMModuleResolver):
-	def __init__(self, world):
-		self._world = world
+	def __init__(self):
 		self._locationToModule = {}
 		
 		
@@ -27,15 +28,7 @@ class GSymDMModuleResolver (DMModuleResolver):
 			try:
 				return self._locationToModule[location]
 			except KeyError:
-				if self._world is not None:
-					self._world._initialiseModule( location )
-				
-					try:
-						return self._locationToModule[location]
-					except KeyError:
-						raise DMModuleResolver.CouldNotResolveModuleException( location )
-				else:
-					raise DMModuleResolver.CouldNotResolveModuleException( location )
+				raise DMModuleResolver.CouldNotResolveModuleException( location )
 			
 	
 	
@@ -56,41 +49,43 @@ class GSymDMModuleResolver (DMModuleResolver):
 #
 
 class GSymWorld (object):
-	def __init__(self):
+	def __init__(self, pluginOverrides={}):
 		super( GSymWorld, self ).__init__()
-		self.resolver = GSymDMModuleResolver( self )
+		self.resolver = GSymDMModuleResolver()
+		self._plugins = GSymPlugin.loadPlugins( pluginOverrides )
+		self._languages = {}
+		self.newPageFactories = []
+		self.newDocumentFactories = []
+		self.pageImporters = []
 		
-		
-	def registerDMModule(self, mod):
+		for plugin in self._plugins:
+			plugin.initialise( self )
+	
+
+			
+	def registerDMModule(self, plugin, mod):
 		self.resolver.registerDMModule( mod )
+	
+	def registerLanguage(self, plugin, language):
+		self._languages[plugin.name] = language
+	
+	def registerNewPageFactory(self, plugin, newPageFactory):
+		self.newPageFactories.append( newPageFactory )
+		
+	def registerNewDocumentFactory(self, plugin, newDocumentFactory):
+		self.newDocumentFactories.append( newDocumentFactory )
+		
+	def registerPageImporter(self, plugin, pageImporter):
+		self.pageImporters.append( pageImporter )
 
 		
-	def _initialiseModule(self, location ):
-		mod = self._readModule( location )
+
+	def getLanguage(self, location):
 		try:
-			initFn = getattr( mod, 'initialiseModule' )
-		except AttributeError:
-			initFn = None
-		
-		if initFn is not None:
-			return initFn( self )
-		else:
+			return self._languages[location]
+		except KeyError:
+			print 'Could not get language %s/%s'  %  ( location, self._languages.keys() )
 			return None
-
-	
-	def getModuleLanguage(self, location):
-		mod = self._readModule( location )
-		return getattr( mod, 'language' )
-	
-	
-	
-	
-	def _readModule(self, location):
-		mod = __import__( location )
-		components = location.split( '.' )
-		for comp in components[1:]:
-			mod = getattr( mod, comp )
-		return mod
 		
 		
 	
@@ -104,11 +99,7 @@ class GSymWorld (object):
 		return _internalResolver
 
 	
-_internalResolver = GSymDMModuleResolver( None )
+_internalResolver = GSymDMModuleResolver()
 	
-module = DMModule( 'GSymWorld', 'gsw', 'org.Britefury.gSym.Internal.GSymWorld' )
-
-nodeClass_GSymPlugin = module.newClass( 'GSymPlugin', [ 'location' ] )
 
 
-GSymWorld.registerInternalDMModule( module )
