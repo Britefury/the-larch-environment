@@ -140,18 +140,18 @@ public class GSymViewContext implements DocView.RefreshListener
 	private HashMap<Double, Border> indentationBorders;
 	private HashMap<NodeContentsFactoryKey, NodeContentsFactory> nodeContentsFactories;
 	
-	private Object owner;
+	private GSymViewPage page;
 	
 	private CommandHistory commandHistory;
 	
 	
 	public GSymViewContext(Object docRootNode, GSymNodeViewFunction generalNodeViewFunction, GSymNodeViewFunction rootNodeViewFunction,
-			CommandHistory commandHistory, Object owner) throws CannotViewTerminalDocNode
+			CommandHistory commandHistory, GSymViewPage page) throws CannotViewTerminalDocNode
 	{
 		this.docRootNode = docRootNode;
 		tree = new DocTree();
 		Object docTreeRoot = tree.treeNode( docRootNode );
-		this.owner = owner;
+		this.page = page;
 		this.commandHistory = commandHistory;
 		
 		if ( docTreeRoot instanceof DocTreeNode )
@@ -177,17 +177,28 @@ public class GSymViewContext implements DocView.RefreshListener
 	
 	
 	public GSymViewContext(Object docRootNode, PyObject generalNodeViewFunction, PyObject rootNodeViewFunction,
-			CommandHistory commandHistory, Object owner) throws CannotViewTerminalDocNode
+			CommandHistory commandHistory, GSymViewPage page) throws CannotViewTerminalDocNode
 	{
-		this( docRootNode, new PyGSymNodeViewFunction( generalNodeViewFunction ), new PyGSymNodeViewFunction( generalNodeViewFunction ), commandHistory, owner );
+		this( docRootNode, new PyGSymNodeViewFunction( generalNodeViewFunction ), new PyGSymNodeViewFunction( generalNodeViewFunction ), commandHistory, page );
+	}
+
+	
+	public GSymViewContext(Object docRootNode, GSymNodeViewFunction nodeViewFunction, CommandHistory commandHistory, GSymViewPage page) throws CannotViewTerminalDocNode
+	{
+		this( docRootNode, nodeViewFunction, nodeViewFunction, commandHistory, page );
+	}
+
+	public GSymViewContext(Object docRootNode, PyObject nodeViewFunction, CommandHistory commandHistory, GSymViewPage page) throws CannotViewTerminalDocNode
+	{
+		this( docRootNode, new PyGSymNodeViewFunction( nodeViewFunction ), commandHistory, page );
 	}
 
 	
 	
 	
-	public Object getOwner()
+	public GSymViewPage getPage()
 	{
-		return owner;
+		return page;
 	}
 	
 	

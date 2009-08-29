@@ -5,6 +5,8 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
+import os
+
 from java.awt.event import KeyEvent
 
 from javax.swing import JPopupMenu
@@ -21,12 +23,15 @@ from Britefury.Util.NodeUtil import *
 
 
 from BritefuryJ.DocPresent.StyleSheets import *
-from BritefuryJ.DocPresent.Browser import Page
 from BritefuryJ.DocPresent import *
 
-from BritefuryJ.GSym.View import GSymViewContext
+from BritefuryJ.GSym.View import GSymViewContext, GSymViewPage
 from BritefuryJ.GSym.View.ListView import ParagraphListViewLayout, HorizontalListViewLayout, VerticalInlineListViewLayout, VerticalListViewLayout
 
+
+from GSymCore.Utils.LinkHeader import linkHeaderBar
+from GSymCore.Utils.Title import titleBar
+from GSymCore.Utils.TabbedBox import tabbedBox
 
 from GSymCore.Project.Styles import *
 from GSymCore.Project import NodeClasses as Nodes
@@ -83,12 +88,20 @@ class ProjectView (GSymViewObjectNodeDispatch):
 		
 	@ObjectNodeDispatchMethod
 	def Project(self, ctx, state, node, rootPackage):
-		title = ctx.staticText( prj_projectTitleStyle, 'Project' )
+		document = ctx.getViewContext().getPage()._document
 		
-		indexHeader = ctx.staticText( prj_projectIndexHeaderStyle, 'Index' )
-		indexBox = ctx.vbox( prj_projectIndexBoxStyle, [ indexHeader.alignHExpand(), ctx.viewEval( rootPackage, _ProjectViewState( '' ) ).alignHExpand() ] )
+		name = document.getDocumentName()
 		
-		contentBox = ctx.vbox( prj_projectContentBoxStyle, [ title.alignHCentre(), indexBox.alignHExpand() ] )
+		homeLink = ctx.link( prj_linkStyle, 'HOME PAGE', '' )
+		linkHeader = linkHeaderBar( ctx, [ homeLink ] )
+		
+		title = titleBar( ctx, name )
+
+		
+		root = ctx.vbox( prj_projectIndexBoxStyle, [ ctx.viewEval( rootPackage, _ProjectViewState( '' ) ).alignHExpand() ] )
+		indexBox = tabbedBox( ctx, 'Project Index', root )
+		
+		contentBox = ctx.vbox( prj_projectContentBoxStyle, [ linkHeader, title, indexBox.pad( 10.0, 10.0 ).alignHLeft() ] )
 		
 		return contentBox.alignHExpand()
 
@@ -103,12 +116,12 @@ class ProjectView (GSymViewObjectNodeDispatch):
 				#contents.append( Nodes.Page( name='New page', unit=pageUnit ) )
 				p = Nodes.Page( name='New page', unit=pageUnit )
 				contents.append( p )
-			ctx.getViewContext().getOwner()._app.promptNewPage( _add )
+			ctx.getViewContext().getPage()._app.promptNewPage( _add )
 		
 		def _onImportPage(button):
 			def _import(name, pageUnit):
 				contents.append( Nodes.Page( name=name, unit=pageUnit ) )
-			ctx.getViewContext().getOwner()._app.promptImportPage( _import )
+			ctx.getViewContext().getPage()._app.promptImportPage( _import )
 		
 		def _onAddPackage(button):
 			contents.append( Nodes.Package( name='New package', contents=[] ) )
@@ -144,14 +157,15 @@ class ProjectView (GSymViewObjectNodeDispatch):
 	
 
 
-class _ProjectViewPage (Page):
-	def __init__(self, docRootNode, location, commandHistory, app):
+class _ProjectViewPage (GSymViewPage):
+	def __init__(self, document, docRootNode, location, commandHistory, app):
+		self._document = document
 		self._docRootNode = docRootNode
 		self._location = location
 		self._commandHistory = commandHistory
 		self._app = app
 		self._viewFn = ProjectView()
-		viewContext = GSymViewContext( docRootNode, self._viewFn, self._viewFn, commandHistory, self )
+		viewContext = GSymViewContext( docRootNode, self._viewFn, commandHistory, self )
 		self._frame = viewContext.getFrame()
 		#self._frame.setEditHandler( Python25EditHandler( viewContext ) )
 		
@@ -170,7 +184,7 @@ class _ProjectViewPage (Page):
 	
 def viewLocationAsPage(document, docRootNode, location, commandHistory, app):
 	if location == '':
-		return _ProjectViewPage( docRootNode, location, commandHistory, app )
+		return _ProjectViewPage( document, docRootNode, location, commandHistory, app )
 	else:
 		loc = location
 		package = docRootNode['rootPackage']

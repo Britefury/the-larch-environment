@@ -54,9 +54,11 @@ class GSymWorld (object):
 		self.resolver = GSymDMModuleResolver()
 		self._plugins = GSymPlugin.loadPlugins( pluginOverrides )
 		self._languages = {}
+		self._locationToDocument = {}
 		self.newPageFactories = []
 		self.newDocumentFactories = []
 		self.pageImporters = []
+		
 		
 		for plugin in self._plugins:
 			plugin.initialise( self )
@@ -79,7 +81,23 @@ class GSymWorld (object):
 		self.pageImporters.append( pageImporter )
 
 		
-
+	
+	def addDocument(self, location, document):
+		if location in self._locationToDocument:
+			raise KeyError
+		else:
+			self._locationToDocument[location] = document
+		
+		
+	def getDocument(self, location):
+		try:
+			return self._locationToDocument[location]
+		except KeyError:
+			return None
+		
+		
+		
+	
 	def getLanguage(self, location):
 		try:
 			return self._languages[location]
@@ -87,8 +105,8 @@ class GSymWorld (object):
 			print 'Could not get language %s/%s'  %  ( location, self._languages.keys() )
 			return None
 		
-		
 	
+
 	@staticmethod
 	def registerInternalDMModule(mod):
 		_internalModules[mod.getLocation()] = mod

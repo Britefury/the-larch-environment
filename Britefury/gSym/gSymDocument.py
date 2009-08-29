@@ -81,6 +81,7 @@ class GSymDocument (CommandHistoryListener):
 		self._unsavedDataListener = None
 		self._filename = None
 		self._saveTime = None
+		self._docName = ''
 	
 
 		
@@ -92,6 +93,14 @@ class GSymDocument (CommandHistoryListener):
 	
 	def getSaveTime(self):
 		return self._saveTime
+	
+	
+	def getDocumentName(self):
+		return self._docName
+	
+	def setDocumentName(self, name):
+		self._docName = name
+
 		
 	
 	def setCommandHistoryListener(self, listener):
@@ -179,7 +188,10 @@ class GSymDocument (CommandHistoryListener):
 			try:
 				documentRoot = DMIOReader.readFromString( f.read(), self._world.resolver )
 				documentRoot = DMNode.coerce( documentRoot )
-				return GSymDocument.read( self._world, documentRoot )
+				document = GSymDocument.read( self._world, documentRoot )
+				document._filename = filename
+				document._saveTime = datetime.now()
+				return document
 			except IOError:
 				return None
 		

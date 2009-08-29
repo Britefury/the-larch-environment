@@ -41,6 +41,7 @@ from Britefury.Event.QueuedEvent import queueEvent
 
 from Britefury.gSym.gSymWorld import GSymWorld
 from Britefury.gSym.gSymDocument import GSymDocument
+from Britefury.gSym.AppControlInterface import AppControlInterface
 
 from GSymCore.GSymApp import GSymApp
 from GSymCore.Project import Project
@@ -122,13 +123,13 @@ class _AppLocationResolverLISP (LocationResolver):
 				
 
 				
-class MainApp (object):
+class MainApp (AppControlInterface):
 	def __init__(self, world, unit):
 		self._world = world
 		
 		if unit is None:
-			#unit = GSymApp.newAppState()
-			unit = Project.newProject()
+			unit = GSymApp.newAppState()
+			#unit = Project.newProject()
 		document = GSymDocument( self._world, unit )
 		
 		self._document = None
@@ -355,11 +356,14 @@ class MainApp (object):
 
 
 		
-	def promptNewPage(self, unitReceiverFn):
-		def _make_newPage(newUnitFn):
+			
+			
+	# handleNewPageFn(unit)
+	def promptNewPage(self, handleNewPageFn):
+		def _make_newPage(newPageFn):
 			def newPage():
-				unit = newUnitFn()
-				unitReceiverFn( unit )
+				unit = newPageFn()
+				handleNewPageFn( unit )
 			return newPage
 		newPageMenu = JPopupMenu( 'New page' )
 		for newPageFactory in self._world.newPageFactories:
@@ -369,6 +373,113 @@ class MainApp (object):
 		
 		
 		
+	# handleImportedPageFn(name, unit)
+	def promptImportPage(self, handleImportedPageFn):
+		def _make_importPage(fileType, filePattern, importUnitFn):
+			def _import():
+				openDialog = JFileChooser()
+				openDialog.setFileFilter( FileNameExtensionFilter( fileType, [ filePattern ] ) )
+				response = openDialog.showDialog( self._frame, 'Import' )
+				if response == JFileChooser.APPROVE_OPTION:
+					sf = openDialog.getSelectedFile()
+					if sf is not None:
+						filename = sf.getPath()
+						if filename is not None:
+							t1 = datetime.now()
+							unit = importUnitFn( filename )
+							t2 = datetime.now()
+							if unit is not None:
+								unitName = os.path.splitext( filename )[0]
+								unitName = os.path.split( unitName )[1]
+								print 'MainApp: IMPORT TIME = %s'  %  ( t2 - t1, )
+								handleImportedPageFn( unitName, unit )
+			return _import
+
+		importPageMenu = JPopupMenu( 'Import page' )
+		for pageImporter in self._world.pageImporters:
+			importPageMenu.add( _action( pageImporter.menuLabelText, _make_importPage( pageImporter.fileType, pageImporter.filePattern, pageImporter.importFn ) ) )
+
+		pos = self._frame.getMousePosition( True )
+		importPageMenu.show( self._frame, pos.x, pos.y )
+			
+			
+		
+		
+	# handleNewDocumentFn(unit)
+	def promptNewDocument(self, handleNewDocumentFn):
+		def _make_newDocument(newUnitFn):
+			def newDoc():
+				unit = newUnitFn()
+				handleNewDocumentFn( unit )
+			return newDoc
+		newDocumentMenu = JPopupMenu( 'New document' )
+		for newDocumentFactory in self._world.newDocumentFactories:
+			newDocumentMenu.add( _action( newDocumentFactory.menuLabelText, _make_newDocument( newDocumentFactory.newDocumentFn ) ) )
+		pos = self._frame.getMousePosition( True )
+		newDocumentMenu.show( self._frame, pos.x, pos.y )
+	
+		
+		
+	# handleOpenedDocumentFn(fullPath, document)
+	def promptOpenDocument(self, handleOpenedDocumentFn):
+		openDialog = JFileChooser()
+		openDialog.setFileFilter( FileNameExtensionFilter( 'gSym project (*.gsym)', [ 'gsym' ] ) )
+		response = openDialog.showDialog( self._frame, 'Open' )
+		if response == JFileChooser.APPROVE_OPTION:
+			sf = openDialog.getSelectedFile()
+			if sf is not None:
+				filename = sf.getPath()
+				if filename is not None:
+					document = GSymDocument.readFile( self._world, filename )
+					if document is not None:
+						handleOpenedDocumentFn( filename, document )
+	
+	
+	
+	# handleSaveDocumentAsFn(filename)
+	def promptSaveDocumentAs(self, handleSaveDocumentAsFn):
+		filename = None
+		bFinished = False
+		while not bFinished:
+			openDialog = JFileChooser()
+			openDialog.setFileFilter( FileNameExtensionFilter( 'gSym project (*.gsym)', [ 'gsym' ] ) )
+			response = openDialog.showSaveDialog( self._frame )
+			if response == JFileChooser.APPROVE_OPTION:
+				sf = openDialog.getSelectedFile()
+				if sf is not None:
+					filenameFromDialog = sf.getPath()
+					if filenameFromDialog is not None:
+						if os.path.exists( filenameFromDialog ):
+							response = JOptionPane.showOptionDialog( self._frame, 'File already exists. Overwrite?', 'File already exists', JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, None, [ 'Overwrite', 'Cancel' ], 'Cancel' )
+							if response == JFileChooser.APPROVE_OPTION:
+								filename = filenameFromDialog
+								bFinished = True
+							else:
+								bFinished = False
+						else:
+							filename = filenameFromDialog
+							bFinished = True
+					else:
+						bFinished = True
+				else:
+					bFinished = True
+			else:
+				bFinished = True
+
+		if filename is not None:
+			handleSaveDocumentAsFn( filename )
+			return True
+		else:
+			return False
+		
+		
+	
+	def getWorld(self):
+		return self._world
+
+	
+	
+	
 	def _onOpen(self):
 		bProceed = True
 		if self._bUnsavedData:
@@ -425,36 +536,6 @@ class MainApp (object):
 			return False
 
 
-	def promptImportPage(self, unitReceiverFn):
-		def _make_importPage(fileType, filePattern, importUnitFn):
-			def _import():
-				openDialog = JFileChooser()
-				openDialog.setFileFilter( FileNameExtensionFilter( fileType, [ filePattern ] ) )
-				response = openDialog.showDialog( self._frame, 'Import' )
-				if response == JFileChooser.APPROVE_OPTION:
-					sf = openDialog.getSelectedFile()
-					if sf is not None:
-						filename = sf.getPath()
-						if filename is not None:
-							t1 = datetime.now()
-							unit = importUnitFn( filename )
-							t2 = datetime.now()
-							if unit is not None:
-								unitName = os.path.splitext( filename )[0]
-								unitName = os.path.split( unitName )[1]
-								print 'MainApp: IMPORT TIME = %s'  %  ( t2 - t1, )
-								unitReceiverFn( unitName, unit )
-			return _import
-
-		importPageMenu = JPopupMenu( 'Import page' )
-		for pageImporter in self._world.pageImporters:
-			importPageMenu.add( _action( pageImporter.menuLabelText, _make_importPage( pageImporter.fileType, pageImporter.filePattern, pageImporter.importFn ) ) )
-
-		pos = self._frame.getMousePosition( True )
-		importPageMenu.show( self._frame, pos.x, pos.y )
-			
-			
-		
 		
 		
 	def _onUndo(self):

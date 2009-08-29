@@ -1579,7 +1579,7 @@ class _Python25ViewPage (Page):
 		self._commandHistory = commandHistory
 		self._app = app
 		self._viewFn = Python25View()
-		viewContext = GSymViewContext( docRootNode, self._viewFn, self._viewFn, commandHistory, self )
+		viewContext = GSymViewContext( docRootNode, self._viewFn, commandHistory, self )
 		self._frame = viewContext.getFrame()
 		self._frame.setEditHandler( Python25EditHandler( viewContext ) )
 

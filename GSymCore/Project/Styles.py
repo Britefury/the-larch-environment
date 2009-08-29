@@ -15,15 +15,13 @@ from BritefuryJ.DocPresent.Layout import *
 from BritefuryJ.DocPresent.Border import *
 
 
-prj_projectTitleStyle = StaticTextStyleSheet( Font( 'Serif', Font.BOLD, 32 ), Color.BLACK )
+prj_linkStyle = LinkStyleSheet()
+
 
 prj_projectIndexHeaderStyle = StaticTextStyleSheet( Font( "SansSerif", Font.PLAIN, 18 ), Color.BLACK )
 prj_projectIndexBoxStyle = VBoxStyleSheet( VTypesetting.NONE, 10.0 )
 
-prj_projectContentBoxStyle = VBoxStyleSheet( VTypesetting.NONE, 40.0 )
-
-
-
+prj_projectContentBoxStyle = VBoxStyleSheet()
 
 
 prj_packageNameStyle = TextStyleSheet( Font( 'Sans serif', Font.BOLD, 14 ), Color( 0, 0, 128 ) )

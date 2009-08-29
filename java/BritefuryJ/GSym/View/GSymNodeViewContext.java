@@ -19,6 +19,7 @@ import BritefuryJ.DocPresent.DPContainer;
 import BritefuryJ.DocPresent.DPEmpty;
 import BritefuryJ.DocPresent.DPFraction;
 import BritefuryJ.DocPresent.DPHBox;
+import BritefuryJ.DocPresent.DPLine;
 import BritefuryJ.DocPresent.DPLineBreak;
 import BritefuryJ.DocPresent.DPLink;
 import BritefuryJ.DocPresent.DPParagraph;
@@ -26,6 +27,7 @@ import BritefuryJ.DocPresent.DPScript;
 import BritefuryJ.DocPresent.DPSegment;
 import BritefuryJ.DocPresent.DPSpan;
 import BritefuryJ.DocPresent.DPStaticText;
+import BritefuryJ.DocPresent.DPTable;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWhitespace;
@@ -40,10 +42,12 @@ import BritefuryJ.DocPresent.StyleSheets.ButtonStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.FractionStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.LineStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.LinkStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.ScriptStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.StaticTextStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.TableStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 import BritefuryJ.DocTree.DocTreeNode;
@@ -222,6 +226,17 @@ public class GSymNodeViewContext implements ElementContext, DVNode.NodeContext
 	
 
 	
+	public DPWidget line(LineStyleSheet styleSheet)
+	{
+		viewInstance.getView().profile_startElement();
+		DPWidget element = new DPLine( styleSheet );
+		element.setContext( this );
+		viewInstance.getView().profile_stopElement();
+		return element;
+	}
+	
+
+	
 	public DPWidget button(ButtonStyleSheet styleSheet, DPButton.ButtonListener listener, DPWidget child)
 	{
 		viewInstance.getView().profile_startElement();
@@ -263,6 +278,16 @@ public class GSymNodeViewContext implements ElementContext, DVNode.NodeContext
 	{
 		viewInstance.getView().profile_startElement();
 		DPVBox element = new DPVBox( styleSheet );
+		element.setChildren( children );
+		element.setContext( this );
+		viewInstance.getView().profile_stopElement();
+		return element;
+	}
+	
+	public DPWidget table(TableStyleSheet styleSheet, List<List<DPWidget>> children)
+	{
+		viewInstance.getView().profile_startElement();
+		DPTable element = new DPTable( styleSheet );
 		element.setChildren( children );
 		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
