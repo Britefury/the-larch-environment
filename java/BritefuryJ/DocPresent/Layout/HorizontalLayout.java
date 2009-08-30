@@ -40,7 +40,7 @@ public class HorizontalLayout
 
 	
 	
-	public static void computeRequisitionY(LReqBox box, LReqBox children[])
+	public static void computeRequisitionY(LReqBox box, LReqBox children[], int childAllocationFlags[])
 	{
 		// The resulting box should have the following properties:
 		// In the case where alignment is BASELINES:
@@ -60,9 +60,10 @@ public class HorizontalLayout
 		
 		double reqAscent = 0.0, reqDescent = 0.0, reqDescentAndSpacing = 0.0, reqHeight = 0.0, reqAdvance = 0.0;
 		int baselineCount = 0;
-		for (LReqBox child: children)
+		for (int i = 0; i < children.length; i++)
 		{
-			VAlignment v = child.getVAlignment();
+			LReqBox child = children[i];
+			VAlignment v = ElementAlignment.getVAlignment( childAllocationFlags[i] );
 			
 			boolean bBaseline = v == VAlignment.BASELINES  ||  v == VAlignment.BASELINES_EXPAND;
 			if ( bBaseline )
@@ -105,7 +106,7 @@ public class HorizontalLayout
 
 
 
-	public static void allocateSpaceX(LReqBox box, LReqBox children[], LAllocBox allocBox, LAllocBox childrenAlloc[])
+	public static void allocateSpaceX(LReqBox box, LReqBox children[], LAllocBox allocBox, LAllocBox childrenAlloc[], int childAllocationFlags[])
 	{
 		int numExpand = 0;
 		
@@ -113,9 +114,10 @@ public class HorizontalLayout
 		double minSizeTotal = 0.0, prefSizeTotal = 0.0;
 		if ( children.length > 0 )
 		{
-			for (LReqBox child: children)
+			for (int i = 0; i < children.length; i++)
 			{
-				HAlignment h = child.getHAlignment();
+				LReqBox child = children[i];
+				HAlignment h = ElementAlignment.getHAlignment( childAllocationFlags[i] );
 				minSizeTotal += child.getMinWidth();
 				prefSizeTotal += child.getPrefWidth();
 				if ( h == HAlignment.EXPAND )
@@ -144,7 +146,7 @@ public class HorizontalLayout
 				
 				for (int i = 0; i < children.length; i++)
 				{
-					HAlignment h = children[i].getHAlignment();
+					HAlignment h = ElementAlignment.getHAlignment( childAllocationFlags[i] );
 					if ( h == HAlignment.EXPAND )
 					{
 						allocBox.allocateChildSpaceX( childrenAlloc[i], children[i].getPrefWidth() + expandPerChild );
@@ -195,7 +197,7 @@ public class HorizontalLayout
 	
 	
 
-	public static void allocateX(LReqBox box, LReqBox children[], LAllocBox allocBox, LAllocBox childrenAlloc[], double spacing)
+	public static void allocateX(LReqBox box, LReqBox children[], LAllocBox allocBox, LAllocBox childrenAlloc[], int childAllocationFlags[], double spacing)
 	{
 		// Each packed child consists of:
 		//	- start padding
@@ -205,7 +207,7 @@ public class HorizontalLayout
 		
 		// There should be at least the specified amount of spacing between each child, or the child's own h-spacing if it is greater
 
-		allocateSpaceX( box, children, allocBox, childrenAlloc );
+		allocateSpaceX( box, children, allocBox, childrenAlloc, childAllocationFlags );
 		
 		double size = 0.0;
 		double pos = 0.0;
@@ -230,7 +232,7 @@ public class HorizontalLayout
 
 	
 	
-	public static void allocateY(LReqBox box, LReqBox children[], LAllocBox allocBox, LAllocBox childrenAlloc[])
+	public static void allocateY(LReqBox box, LReqBox children[], LAllocBox allocBox, LAllocBox childrenAlloc[], int childAllocationFlags[])
 	{
 		// Compute the amount of space allocated (do not allow to fall below minimum requirement)
 		double allocationHeight = Math.max( allocBox.getAllocationY(), box.getReqHeight() );
@@ -266,7 +268,7 @@ public class HorizontalLayout
 			LReqBox child = children[i];
 			LAllocBox childAlloc = childrenAlloc[i];
 			
-			VAlignment alignment = child.getVAlignment();
+			VAlignment alignment = ElementAlignment.getVAlignment( childAllocationFlags[i] );
 			
 			if ( alignment == VAlignment.BASELINES )
 			{

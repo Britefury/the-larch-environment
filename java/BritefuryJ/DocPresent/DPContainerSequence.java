@@ -409,6 +409,23 @@ abstract public class DPContainerSequence extends DPContainer
 	
 	
 	
+	protected int[] getChildrenAlignmentFlags(List<DPWidget> nodes)
+	{
+		int alignmentFlags[] = new int[nodes.size()];
+		for (int i = 0; i < nodes.size(); i++)
+		{
+			alignmentFlags[i] = nodes.get( i ).getAlignmentFlags();
+		}
+		return alignmentFlags;
+	}
+
+	protected int[] getChildrenAlignmentFlags()
+	{
+		return getChildrenAlignmentFlags( registeredChildren );
+	}
+	
+	
+	
 	
 	@SuppressWarnings("unchecked")
 	protected <T extends PackingParams> T[] getChildrenPackingParams(List<DPWidget> nodes, T packingParams[])

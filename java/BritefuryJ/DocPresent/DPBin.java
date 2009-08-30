@@ -112,7 +112,7 @@ public class DPBin extends DPContainer
 		if ( child != null )
 		{
 			double prevWidth = child.layoutAllocBox.getAllocationX();
-			layoutAllocBox.allocateChildXAligned( child.layoutAllocBox, child.layoutReqBox, 0.0, layoutAllocBox.getAllocationX() );
+			layoutAllocBox.allocateChildXAligned( child.layoutAllocBox, child.layoutReqBox, child.getAlignmentFlags(), 0.0, layoutAllocBox.getAllocationX() );
 			child.refreshAllocationX( prevWidth );
 		}
 	}
@@ -123,7 +123,7 @@ public class DPBin extends DPContainer
 		if ( child != null )
 		{
 			LAllocV prevAllocV = child.layoutAllocBox.getAllocV();
-			layoutAllocBox.allocateChildYAligned( child.layoutAllocBox, child.layoutReqBox, 0.0, layoutAllocBox.getAllocationY() );
+			layoutAllocBox.allocateChildYAligned( child.layoutAllocBox, child.layoutReqBox, child.getAlignmentFlags(), 0.0, layoutAllocBox.getAllocationY() );
 			child.refreshAllocationY( prevAllocV );
 		}
 	}

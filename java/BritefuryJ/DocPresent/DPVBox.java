@@ -79,9 +79,10 @@ public class DPVBox extends DPAbstractBox
 		
 		LReqBox childBoxes[] = getCollatedChildrenRequisitionBoxes();
 		LAllocBox childAllocBoxes[] = getCollatedChildrenAllocationBoxes();
+		int childAllocFlags[] = getCollatedChildrenAlignmentFlags();
 		double prevWidths[] = getCollatedChildrenAllocationX();
 		
-		VerticalLayout.allocateX( layoutReqBox, childBoxes, layoutAllocBox, childAllocBoxes );
+		VerticalLayout.allocateX( layoutReqBox, childBoxes, layoutAllocBox, childAllocBoxes, childAllocFlags );
 		
 		int i = 0;
 		for (DPWidget child: collationLeaves)
@@ -97,9 +98,10 @@ public class DPVBox extends DPAbstractBox
 		
 		LReqBox childBoxes[] = getCollatedChildrenRequisitionBoxes();
 		LAllocBox childAllocBoxes[] = getCollatedChildrenAllocationBoxes();
+		int childAllocFlags[] = getCollatedChildrenAlignmentFlags();
 		LAllocV prevAllocVs[] = getCollatedChildrenAllocV();
 		
-		VerticalLayout.allocateY( layoutReqBox, childBoxes, layoutAllocBox, childAllocBoxes, getSpacing() );
+		VerticalLayout.allocateY( layoutReqBox, childBoxes, layoutAllocBox, childAllocBoxes, childAllocFlags, getSpacing() );
 		
 		int i = 0;
 		for (DPWidget child: collationLeaves)

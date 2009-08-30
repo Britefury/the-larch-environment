@@ -106,7 +106,7 @@ public class VerticalLayout
 
 
 
-	public static void allocateX(LReqBox box, LReqBox children[], LAllocBox allocBox, LAllocBox childrenAlloc[])
+	public static void allocateX(LReqBox box, LReqBox children[], LAllocBox allocBox, LAllocBox childrenAlloc[], int childAllocationFlags[])
 	{
 		double allocation = allocBox.allocationX;
 		for (int i = 0; i < children.length; i++)
@@ -114,7 +114,7 @@ public class VerticalLayout
 			LReqBox child = children[i];
 			LAllocBox childAlloc = childrenAlloc[i];
 			
-			HAlignment alignment = child.getHAlignment();
+			HAlignment alignment = ElementAlignment.getHAlignment( childAllocationFlags[i] );
 			if ( alignment == HAlignment.EXPAND )
 			{
 				allocBox.allocateChildX( childAlloc, 0.0, allocation );
@@ -146,16 +146,16 @@ public class VerticalLayout
 	
 	
 	
-	public static void allocateSpaceY(LReqBox box, LReqBox children[], LAllocBox allocBox, LAllocBox childrenAlloc[])
+	public static void allocateSpaceY(LReqBox box, LReqBox children[], LAllocBox allocBox, LAllocBox childrenAlloc[], int childAllocationFlags[])
 	{
 		int numExpand = 0;
 		
 		// Count the number of children that should expand to use additional space
 		if ( children.length > 0 )
 		{
-			for (LReqBox child: children)
+			for (int flags: childAllocationFlags)
 			{
-				VAlignment alignment = child.getVAlignment();
+				VAlignment alignment = ElementAlignment.getVAlignment( flags );
 				if ( alignment == VAlignment.EXPAND  ||  alignment == VAlignment.BASELINES_EXPAND )
 				{
 					numExpand++;
@@ -183,7 +183,7 @@ public class VerticalLayout
 			{
 				LReqBox child = children[i];
 				LAllocBox childAlloc = childrenAlloc[i];
-				VAlignment alignment = child.getVAlignment();
+				VAlignment alignment = ElementAlignment.getVAlignment( childAllocationFlags[i] );
 				if ( alignment == VAlignment.EXPAND  ||  alignment == VAlignment.BASELINES_EXPAND )
 				{
 					allocBox.allocateChildSpaceYByReq( childAlloc, child, child.getReqHeight() + expandPerChild );
@@ -196,7 +196,7 @@ public class VerticalLayout
 		}
 	}
 	
-	public static void allocateY(LReqBox box, LReqBox children[], LAllocBox allocBox, LAllocBox childrenAlloc[], double spacing)
+	public static void allocateY(LReqBox box, LReqBox children[], LAllocBox allocBox, LAllocBox childrenAlloc[], int childAllocationFlags[], double spacing)
 	{
 		// Each packed child consists of:
 		//	- start padding
@@ -206,7 +206,7 @@ public class VerticalLayout
 		
 		// There should be at least the specified amount of spacing between each child, or the child's own h-spacing if it is greater
 
-		allocateSpaceY( box, children, allocBox, childrenAlloc );
+		allocateSpaceY( box, children, allocBox, childrenAlloc, childAllocationFlags );
 		
 		double size = 0.0;
 		double pos = 0.0;

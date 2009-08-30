@@ -15,8 +15,8 @@ public class LAllocV
 	
 	public LAllocV(double height)
 	{
-		this.ascent = height;
-		this.descent = 0.0;
+		this.ascent = height * 0.5;
+		this.descent = height * 0.5;
 		bHasBaseline = false;
 	}
 	

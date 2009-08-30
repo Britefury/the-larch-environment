@@ -34,13 +34,6 @@ public class LReqBox
 		lineBreakCost = -1;
 	}
 	
-	public LReqBox(HAlignment hAlign, VAlignment vAlign)
-	{
-		setAlignment( hAlign, vAlign );
-		setFlag( FLAG_HASBASELINE, false );
-		lineBreakCost = -1;
-	}
-	
 	public LReqBox(double width, double hSpacing, double height, double vSpacing)
 	{
 		minWidth = prefWidth = width;
@@ -52,18 +45,6 @@ public class LReqBox
 		lineBreakCost = -1;
 	}
 	
-	public LReqBox(HAlignment hAlign, VAlignment vAlign, double width, double hSpacing, double height, double vSpacing)
-	{
-		minWidth = prefWidth = width;
-		minHSpacing = prefHSpacing = hSpacing;
-		reqAscent = height * 0.5;
-		reqDescent = height * 0.5;
-		reqVSpacing = vSpacing;
-		setAlignment( hAlign, vAlign );
-		setFlag( FLAG_HASBASELINE, false );
-		lineBreakCost = -1;
-	}
-	
 	public LReqBox(double width, double hSpacing, double ascent, double descent, double vSpacing)
 	{
 		minWidth = prefWidth = width;
@@ -71,18 +52,6 @@ public class LReqBox
 		reqAscent = ascent;
 		reqDescent = descent;
 		reqVSpacing = vSpacing;
-		setFlag( FLAG_HASBASELINE, true );
-		lineBreakCost = -1;
-	}
-
-	public LReqBox(HAlignment hAlign, VAlignment vAlign, double width, double hSpacing, double ascent, double descent, double vSpacing)
-	{
-		minWidth = prefWidth = width;
-		minHSpacing = prefHSpacing = hSpacing;
-		reqAscent = ascent;
-		reqDescent = descent;
-		reqVSpacing = vSpacing;
-		setAlignment( hAlign, vAlign );
 		setFlag( FLAG_HASBASELINE, true );
 		lineBreakCost = -1;
 	}
@@ -100,20 +69,6 @@ public class LReqBox
 		lineBreakCost = -1;
 	}
 
-	public LReqBox(HAlignment hAlign, VAlignment vAlign, double minWidth, double prefWidth, double minHSpacing, double prefHSpacing, double height, double vSpacing)
-	{
-		this.minWidth = minWidth;
-		this.prefWidth = prefWidth;
-		this.minHSpacing = minHSpacing;
-		this.prefHSpacing = prefHSpacing;
-		reqAscent = height * 0.5;
-		reqDescent = height * 0.5;
-		this.reqVSpacing = vSpacing;
-		setAlignment( hAlign, vAlign );
-		setFlag( FLAG_HASBASELINE, false );
-		lineBreakCost = -1;
-	}
-
 	public LReqBox(double minWidth, double prefWidth, double minHSpacing, double prefHSpacing, double ascent, double descent, double vSpacing)
 	{
 		this.minWidth = minWidth;
@@ -127,20 +82,6 @@ public class LReqBox
 		lineBreakCost = -1;
 	}
 
-	public LReqBox(HAlignment hAlign, VAlignment vAlign, double minWidth, double prefWidth, double minHSpacing, double prefHSpacing, double ascent, double descent, double vSpacing)
-	{
-		this.minWidth = minWidth;
-		this.prefWidth = prefWidth;
-		this.minHSpacing = minHSpacing;
-		this.prefHSpacing = prefHSpacing;
-		this.reqAscent = ascent;
-		this.reqDescent = descent;
-		this.reqVSpacing = vSpacing;
-		setAlignment( hAlign, vAlign );
-		setFlag( FLAG_HASBASELINE, true );
-		lineBreakCost = -1;
-	}
-	
 	
 	private LReqBox(LReqBox box)
 	{
@@ -313,44 +254,6 @@ public class LReqBox
 	}
 	
 	
-	
-	public void setAlignmentIntValue(int value)
-	{
-		flags = ( flags & ~ElementAlignment._ELEMENTALIGN_MASK )  |  value;
-	}
-	
-	public int getAlignmentIntValue()
-	{
-		return flags & ElementAlignment._ELEMENTALIGN_MASK;
-	}
-	
-	public void setAlignment(HAlignment hAlign, VAlignment vAlign)
-	{
-		setAlignmentIntValue( ElementAlignment.intValue( hAlign, vAlign ) );
-	}
-
-	public void setHAlignment(HAlignment hAlign)
-	{
-		setAlignmentIntValue( ElementAlignment.intValue( hAlign ) );
-	}
-
-	public void setVAlignment(VAlignment vAlign)
-	{
-		setAlignmentIntValue( ElementAlignment.intValue( vAlign ) );
-	}
-	
-	public HAlignment getHAlignment()
-	{
-		return ElementAlignment.getHAlignment( getAlignmentIntValue() );
-	}
-
-	public VAlignment getVAlignment()
-	{
-		return ElementAlignment.getVAlignment( getAlignmentIntValue() );
-	}
-
-	
-
 	
 	public void borderX(double leftMargin, double rightMargin)
 	{

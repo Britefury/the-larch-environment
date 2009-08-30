@@ -13,9 +13,6 @@ import java.awt.font.TextHitInfo;
 import java.awt.geom.AffineTransform;
 
 import BritefuryJ.DocPresent.Caret.Caret;
-import BritefuryJ.DocPresent.Layout.ElementAlignment;
-import BritefuryJ.DocPresent.Layout.HAlignment;
-import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.Util.TextVisual;
@@ -50,7 +47,7 @@ public class DPText extends DPContentLeafEditableEntry
 		
 		visual = TextVisual.getTextVisual( getPresentationArea(), this.text, styleSheet.getFont(), styleSheet.getMixedSizeCaps() );
 		
-		layoutReqBox = visual.getRequisition( 0 );
+		layoutReqBox = visual.getRequisition();
 	}
 	
 	
@@ -75,26 +72,6 @@ public class DPText extends DPContentLeafEditableEntry
 	
 	
 	
-	public DPWidget align(HAlignment hAlign, VAlignment vAlign)
-	{
-		layoutReqBox = visual.getRequisition( ElementAlignment.intValue( hAlign, vAlign ) );
-		return this;
-	}
-
-	public DPWidget alignH(HAlignment hAlign)
-	{
-		layoutReqBox = visual.getRequisition( ElementAlignment.intValue( hAlign, ElementAlignment.getVAlignment( layoutReqBox.getAlignmentIntValue() ) ) );
-		return this;
-	}
-	
-	public DPWidget alignV(VAlignment vAlign)
-	{
-		layoutReqBox = visual.getRequisition( ElementAlignment.intValue( ElementAlignment.getHAlignment( layoutReqBox.getAlignmentIntValue() ), vAlign ) );
-		return this;
-	}
-
-	
-	
 	private void onTextModified()
 	{
 		TextStyleSheet textStyleSheet = (TextStyleSheet)styleSheet;
@@ -103,7 +80,7 @@ public class DPText extends DPContentLeafEditableEntry
 		if ( v != visual )
 		{
 			visual = v;
-			layoutReqBox = visual.getRequisition( layoutReqBox.getAlignmentIntValue() );
+			layoutReqBox = visual.getRequisition();
 			if ( isRealised() )
 			{
 				visual.realise( getPresentationArea() );
@@ -168,12 +145,12 @@ public class DPText extends DPContentLeafEditableEntry
 	
 	protected void updateRequisitionX()
 	{
-		layoutReqBox = visual.getRequisition( layoutReqBox.getAlignmentIntValue() );
+		layoutReqBox = visual.getRequisition();
 	}
 
 	protected void updateRequisitionY()
 	{
-		layoutReqBox = visual.getRequisition( layoutReqBox.getAlignmentIntValue() );
+		layoutReqBox = visual.getRequisition();
 	}
 
 	
@@ -301,5 +278,12 @@ public class DPText extends DPContentLeafEditableEntry
 		setText( "" );
 		
 		return bResult;
+	}
+	
+	
+	
+	public String toString()
+	{
+		return super.toString()  +  " <" + text + ">";
 	}
 }

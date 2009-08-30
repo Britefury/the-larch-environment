@@ -10,9 +10,6 @@ import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.geom.AffineTransform;
 
-import BritefuryJ.DocPresent.Layout.ElementAlignment;
-import BritefuryJ.DocPresent.Layout.HAlignment;
-import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.StyleSheets.StaticTextStyleSheet;
 import BritefuryJ.DocPresent.Util.TextVisual;
 
@@ -35,7 +32,7 @@ public class DPStaticText extends DPStatic
 		
 		visual = TextVisual.getTextVisual( getPresentationArea(), text, styleSheet.getFont(), styleSheet.getMixedSizeCaps() );
 		
-		layoutReqBox = visual.getRequisition( 0 );
+		layoutReqBox = visual.getRequisition();
 	}
 	
 	
@@ -53,26 +50,6 @@ public class DPStaticText extends DPStatic
 	
 	
 	
-	public DPWidget align(HAlignment hAlign, VAlignment vAlign)
-	{
-		layoutReqBox = visual.getRequisition( ElementAlignment.intValue( hAlign, vAlign ) );
-		return this;
-	}
-
-	public DPWidget alignH(HAlignment hAlign)
-	{
-		layoutReqBox = visual.getRequisition( ElementAlignment.intValue( hAlign, ElementAlignment.getVAlignment( layoutReqBox.getAlignmentIntValue() ) ) );
-		return this;
-	}
-	
-	public DPWidget alignV(VAlignment vAlign)
-	{
-		layoutReqBox = visual.getRequisition( ElementAlignment.intValue( ElementAlignment.getHAlignment( layoutReqBox.getAlignmentIntValue() ), vAlign ) );
-		return this;
-	}
-
-	
-	
 	private void onTextModified()
 	{
 		StaticTextStyleSheet textStyleSheet = (StaticTextStyleSheet)styleSheet;
@@ -81,7 +58,7 @@ public class DPStaticText extends DPStatic
 		if ( v != visual )
 		{
 			visual = v;
-			layoutReqBox = visual.getRequisition( layoutReqBox.getAlignmentIntValue() );
+			layoutReqBox = visual.getRequisition();
 			if ( isRealised() )
 			{
 				visual.realise( getPresentationArea() );
@@ -133,11 +110,18 @@ public class DPStaticText extends DPStatic
 	
 	protected void updateRequisitionX()
 	{
-		layoutReqBox = visual.getRequisition( layoutReqBox.getAlignmentIntValue() );
+		layoutReqBox = visual.getRequisition();
 	}
 
 	protected void updateRequisitionY()
 	{
-		layoutReqBox = visual.getRequisition( layoutReqBox.getAlignmentIntValue() );
+		layoutReqBox = visual.getRequisition();
+	}
+	
+	
+	
+	public String toString()
+	{
+		return super.toString()  +  " <" + text + ">";
 	}
 }

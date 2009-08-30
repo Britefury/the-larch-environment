@@ -27,7 +27,7 @@ public class ElementAlignment
 
 	
 	
-	public static int intValue(HAlignment hAlignment)
+	public static int flagValue(HAlignment hAlignment)
 	{
 		if ( hAlignment == HAlignment.LEFT )
 		{
@@ -52,7 +52,7 @@ public class ElementAlignment
 	}
 	
 	
-	public static int intValue(VAlignment vAlignment)
+	public static int flagValue(VAlignment vAlignment)
 	{
 		if ( vAlignment == VAlignment.BASELINES )
 		{
@@ -85,7 +85,7 @@ public class ElementAlignment
 	}
 	
 	
-	public static int intValue(HAlignment hAlignment, VAlignment vAlignment)
+	public static int flagValue(HAlignment hAlignment, VAlignment vAlignment)
 	{
 		int value = 0;
 		

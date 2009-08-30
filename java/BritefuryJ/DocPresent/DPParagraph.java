@@ -81,9 +81,10 @@ public class DPParagraph extends DPContainerSequenceCollationRoot
 		
 		LReqBox childBoxes[] = getCollatedChildrenRequisitionBoxes();
 		LAllocBox childAllocBoxes[] = getCollatedChildrenAllocationBoxes();
+		int childAllocFlags[] = getCollatedChildrenAlignmentFlags();
 		double prevWidths[] = getCollatedChildrenAllocationX();
 		
-		lines = ParagraphLayout.allocateX( layoutReqBox, childBoxes, layoutAllocBox, childAllocBoxes, getIndentation(), getSpacing() );
+		lines = ParagraphLayout.allocateX( layoutReqBox, childBoxes, layoutAllocBox, childAllocBoxes, childAllocFlags, getIndentation(), getSpacing() );
 		
 		int i = 0;
 		for (DPWidget child: collationLeaves)
